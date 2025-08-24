@@ -6,7 +6,6 @@
 #include "types/LgsGroup.h"
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
-#include "types/LgsTable.h"
 
 class LgsTable;
 
@@ -15,9 +14,6 @@ LgsSymbol::LgsSymbol()
 
 LgsSymbol::LgsSymbol(LgsParam* param)
     : name(&param->name), symbolType(PARAM), param(param), location(&param->location) {}
-
-LgsSymbol::LgsSymbol(LgsTable* table)
-    : name(&table->name), symbolType(TABLE), table(table), location(&table->location) {}
 
 LgsSymbol::LgsSymbol(LgsField* field)
     : name(&field->name), symbolType(ENUM_FIELD), field(field), location(&field->location) {}

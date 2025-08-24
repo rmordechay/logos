@@ -40,7 +40,6 @@
 #include "types/LgsInterface.h"
 #include "types/LgsMap.h"
 #include "types/LgsNullable.h"
-#include "types/LgsTable.h"
 #include "types/LgsUnknown.h"
 #include "types/primitives/LgsDouble.h"
 #include "types/primitives/LgsShort.h"
@@ -114,12 +113,6 @@ LgsMainFile* LgsParserAdapter::getMainFile(LogosParser::MainFileContext* ctx, co
         auto lgsInterface = getInterface(interface->interfaceBody(), interface->IDENTIFIER());
         file->interfaces.push_back(lgsInterface);
         addFileSymbol(file, LgsSymbol(lgsInterface));
-    }
-
-    for (const auto table : ctx->table()) {
-        auto lgsTable = getTable(table);
-        file->tables.push_back(lgsTable);
-        addFileSymbol(file, LgsSymbol(lgsTable));
     }
 
     for (const auto func : funcs) {
@@ -383,28 +376,6 @@ LgsObject* LgsParserAdapter::getObject(LogosParser::ObjectBodyContext* ctx, antl
     }
 
     return obj;
-}
-
-LgsTable* LgsParserAdapter::getTable(LogosParser::TableContext* ctx) {
-    const auto table = new LgsTable(ctx->IDENTIFIER()->getText());
-    setLocation(table->location, ctx->start);
-    // Fields
-    for (int i = 0; i < ctx->tableBody()->field().size(); ++i) {
-        const auto lgsField = getField(ctx->tableBody()->field(i), i, table);
-        const auto fieldAdded = table->addField(lgsField);
-        if (!fieldAdded) {
-            errHandler.addError(E10056, &table->location, {table->name, lgsField->name});
-        }
-    }
-    // Methods
-    for (const auto& func : ctx->tableBody()->method()) {
-        const auto method = getMethod(func, table);
-        const auto methodAdded = table->addMethod(method);
-        if (!methodAdded) {
-            errHandler.addError(E10072, &table->location, {table->name, method->funcType->pname()});
-        }
-    }
-    return table;
 }
 
 LgsParam LgsParserAdapter::getParam(LgsFuncType* funcType, LogosParser::ParamContext* param) {

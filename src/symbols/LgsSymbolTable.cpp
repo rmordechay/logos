@@ -9,7 +9,6 @@
 #include "types/LgsGroup.h"
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
-#include "types/LgsTable.h"
 
 void LgsSymbolTable::addSymbol(const LgsSymbol& symbol, LgsErrHandler* errHandler) {
     const auto symbolName = *symbol.name;
@@ -52,9 +51,6 @@ void LgsSymbolTable::freeSymbols() {
             break;
         case ENUM:
             delete symbol.lgsEnum;
-            break;
-        case TABLE:
-            delete symbol.table;
             break;
         case UNKNOWN:
             break;

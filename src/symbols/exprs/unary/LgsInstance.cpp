@@ -4,21 +4,6 @@
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsObject.h"
-#include "types/LgsTable.h"
-
-void LgsInstance::createIRTable(LgsLLVM& codeGen) {
-    const auto tableFieldType = codeGen.getStructType({codeGen.ptrTy(), codeGen.ptrTy()}, "_Table_Field");
-    const auto fieldsType = ArrayType::get(tableFieldType, 1024);
-    const auto tableType = codeGen.getStructType({codeGen.ptrTy(), codeGen.sizeTy(), fieldsType}, "_Table");
-    IRValue = codeGen.builder.CreateAlloca(tableType);
-    codeGen.callLgsFunc("Table_init", codeGen.getFT(codeGen.voidTy(), {codeGen.ptrTy()}), {IRValue});
-    const auto ft = codeGen.getFT(codeGen.voidTy(), {codeGen.ptrTy(), codeGen.ptrTy(), codeGen.ptrTy()});
-    for (int i = 0; i < table->fields.size(); ++i) {
-        const auto fieldNameIR = codeGen.getIRStr(table->fields[i]->name);
-        const auto fieldTypeIR = codeGen.getIRStr(table->fields[i]->type->getName());
-        codeGen.callLgsFunc("Table_add", ft, {IRValue, fieldNameIR, fieldTypeIR});
-    }
-}
 
 void LgsInstance::setObject(LgsObject* newObj) {
     obj = newObj;

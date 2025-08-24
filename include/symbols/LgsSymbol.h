@@ -1,6 +1,5 @@
 #pragma once
 
-class LgsTable;
 class LgsVariable;
 class LgsGroup;
 class LgsField;
@@ -21,7 +20,6 @@ enum LgsSymbolType {
     INTERFACE,
     GROUP,
     ENUM,
-    TABLE,
     UNKNOWN,
 };
 
@@ -39,13 +37,11 @@ struct LgsSymbol {
     LgsEnum* lgsEnum = nullptr;
     LgsFunc* func = nullptr;
     LgsGroup* group = nullptr;
-    LgsTable* table = nullptr;
     LgsLocation* location;
 
     explicit LgsSymbol();
     explicit LgsSymbol(LgsParam* param);
     explicit LgsSymbol(LgsVarDec* varDec);
-    explicit LgsSymbol(LgsTable* table);
     explicit LgsSymbol(LgsField* field);
     explicit LgsSymbol(LgsGroup* group);
     explicit LgsSymbol(LgsInterface* interface);

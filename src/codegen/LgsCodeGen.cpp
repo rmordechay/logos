@@ -34,7 +34,6 @@
 #include "loops/LgsWhileLoop.h"
 #include "stmts/LgsAssignment.h"
 #include "stmts/LgsIfStmt.h"
-#include "types/LgsTable.h"
 #include <llvm/IR/Module.h>
 #include <llvm/Target/TargetMachine.h>
 
@@ -137,10 +136,6 @@ void LgsCodeGen::visitInterface(LgsInterface* interface) const {
 }
 
 void LgsCodeGen::visitGroup(LgsGroup* group) {
-    assert(0);
-}
-
-void LgsCodeGen::visitTable(LgsTable* table) {
     assert(0);
 }
 
@@ -653,9 +648,6 @@ void LgsCodeGen::visitVariable(LgsVariable* variable) {
     case ENUM_FIELD:
         variable->IRValue = cg.getIRStr(variable->name);
         break;
-    case TABLE:
-        variable->IRValue = variable->ref.table->instance->IRValue;
-        break;
     case INTERFACE:
     case GROUP:
     case UNKNOWN:
@@ -742,7 +734,6 @@ void LgsCodeGen::visitStrConst(LgsStrConst* strConst) const {
 }
 
 void LgsCodeGen::visitInstance(LgsInstance* instance) {
-    if (instance->table) return instance->createIRTable(cg);
     const auto objIRType = instance->obj->getIRType(cg);
     if(instance->obj->singleton) {
         instance->IRValue = cg.createGlobal(objIRType, ConstantAggregateZero::get(objIRType), instance->obj->name);
@@ -913,6 +904,7 @@ Value* LgsCodeGen::createDynamicArray(LgsArrayExpr* arrayExpr) {
     for (int i = 0; i < arrayExpr->initialElements.size(); ++i) {
         const auto element = arrayExpr->initialElements[i];
         visitExpr(element);
+        arr->addFunc->call(cg, {arrayExpr, element});
     }
     return arrayExpr->IRValue;
 }

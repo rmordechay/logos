@@ -13,7 +13,7 @@ logosAppFile:
     ;
 
 mainFile:
-        (object | enumDeclaration | interface | group | table)* func+ EOF
+        (object | enumDeclaration | interface | group)* func+ EOF
     ;
 
 objectFile:
@@ -48,16 +48,8 @@ object:
         (OBJECT | SINGLETON) IDENTIFIER LBRACE objectBody RBRACE
     ;
 
-table:
-        TABLE IDENTIFIER LBRACE tableBody RBRACE
-    ;
-
 objectBody:
         implements? field* method*
-    ;
-
-tableBody:
-        field* method*
     ;
 
 field:
@@ -421,7 +413,6 @@ DOUBLE_LANGLE: '>>';
 SLIDER: '_/';
 
 OBJECT: 'object';
-TABLE: 'table';
 SINGLETON: 'single';
 SELF_INSTANCE: 'self';
 SELF_CLASS: 'Self';

@@ -65,7 +65,6 @@ public:
     void visitObject(LgsObject* obj) const;
     void visitInterface(LgsInterface* interface) const;
     void visitGroup(LgsGroup* group);
-    void visitTable(LgsTable* table);
     void visitField(LgsField* field) const;
     void visitParam(LgsParam* param);
     void visitLoop(LgsForLoop* loopStmt);

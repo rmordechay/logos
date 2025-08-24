@@ -89,8 +89,6 @@ LgsType* LgsTypeResolver::resolveType(LgsType* type, LgsFile* file) {
             break;
         case ENUM_FIELD:
             break;
-        case TABLE:
-            break;
         case UNKNOWN:
             break;
         }

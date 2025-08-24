@@ -56,7 +56,6 @@ set(CORE_SOURCES
     src/codegen/LgsLLVM.cpp
     src/files/LgsInterfaceFile.cpp
     src/utils/LgsErrHandler.cpp
-    src/symbols/types/LgsTable.cpp
 
     src/symbols/LgsSymbol.cpp
     src/symbols/LgsSymbolTable.cpp
@@ -116,7 +115,6 @@ set(CORE_SOURCES
     src/symbols/types/LgsUnknown.cpp
     src/symbols/types/LgsVec.cpp
     src/symbols/types/LgsVoid.cpp
-    src/symbols/types/LgsTable.cpp
     src/symbols/types/primitives/LgsBool.cpp
     src/symbols/types/primitives/LgsChar.cpp
     src/symbols/types/primitives/LgsDouble.cpp
@@ -139,7 +137,6 @@ set(RUNTIME_SOURCES
     runtime/lib/Lgs_scheduler.cpp
     runtime/lib/Lgs_stack.cpp
     runtime/lib/Lgs_print.cpp
-    runtime/lib/Lgs_table.cpp
 )
 
 add_library(lgs_core SHARED ${CORE_SOURCES} ${RUNTIME_SOURCES})

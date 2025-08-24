@@ -54,7 +54,6 @@ public:
     LgsMainFunc* getMainFunc(LogosParser::FuncContext* ctx);
     LgsInterface* getInterface(LogosParser::InterfaceBodyContext* ctx, antlr4::tree::TerminalNode* interfaceName);
     LgsObject* getObject(LogosParser::ObjectBodyContext* ctx, antlr4::tree::TerminalNode* objName, bool isSingleton);
-    LgsTable* getTable(LogosParser::TableContext* ctx);
     LgsField* getField(LogosParser::FieldContext* ctx, size_t position, LgsType* parentType);
     LgsFunc* getLambda(LogosParser::LambdaContext* ctx);
     LgsParam getParam(LgsFuncType* funcType, LogosParser::ParamContext* param);
