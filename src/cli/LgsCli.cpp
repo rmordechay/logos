@@ -13,17 +13,20 @@ void LgsCli::execute() const {
         exit(0);
     }
 
-    const std::string cmdStr = argv[1];
-    if (cmdStr == "run") {
+    const std::string firstCmdStr = argv[1];
+    if (firstCmdStr == "run") {
         LgsRunCmd cmd(argc, argv);
         runCmd(cmd);
-    } else if (cmdStr == "ast") {
+    } else if (firstCmdStr == "ast") {
         LgsAstCmd cmd(argc, argv);
         runCmd(cmd);
-    } else if (cmdStr == "help") {
+    } else if (firstCmdStr == "help") {
         printLgsHelp();
-    } else if (cmdStr == "version" || cmdStr == "-v" || cmdStr == "--version") {
+    } else if (firstCmdStr == "version" || firstCmdStr == "-v" || firstCmdStr == "--version") {
         logInfo(std::string(LOGOS_VERSION));
+    } else {
+        logError("Unknown command '" + cmdStr + "'\n\n");
+        printLgsHelp();
     }
 }
 
@@ -60,4 +63,22 @@ void printLgsHelp() {
     }
     txt << "\nFor more information: lgs <command> help\n";
     logInfo(txt.str());
+}
+
+void LgsCli::joinCmdStr() {
+    std::ostringstream oss;
+    for (int i = 0; i < argc; i++) {
+        if (i > 0) oss << " ";
+        if (i == 0) {
+            std::string prog(argv[0]);
+            const auto pos = prog.find_last_of("/\\");
+            if (pos != std::string::npos) {
+                prog = prog.substr(pos + 1);
+            }
+            oss << prog;
+        } else {
+            oss << argv[i];
+        }
+    }
+    cmdStr = oss.str();
 }
