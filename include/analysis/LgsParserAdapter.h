@@ -41,6 +41,7 @@ public:
     LgsSymbolTable& globals;
     LgsErrHandler errHandler;
     LgsFunc* currentFunc = nullptr;
+    LgsFile* currentFile = nullptr;
 
     explicit LgsParserAdapter(const int fileID, LgsPaths& paths, LgsSymbolTable& globals) : fileID(fileID), paths(paths), globals(globals) {}
     LgsFile* parseFile(const fs::path& filePath);
@@ -48,7 +49,7 @@ public:
     LgsMainFile* getMainFile(LogosParser::MainFileContext* ctx, const fs::path& filePath);
     LgsObjectFile* getObjectFile(LogosParser::ObjectFileContext* ctx, const fs::path& filePath);
     LgsFile* getInterfaceFile(LogosParser::InterfaceFileContext* ctx, const fs::path& filePath);
-    LgsFile* getTestFile(LogosParser::TestFileContext* ctx, const fs::path& filePath) const;
+    LgsFile* getTestFile(LogosParser::TestFileContext* ctx, const fs::path& filePath);
     void setAppConfigs(LgsAppConfigs& appConfigs);
     LgsEnvFile* getEnvFile(const fs::path& filePath);
     LgsFunc* getFunc(LogosParser::FuncContext* ctx);

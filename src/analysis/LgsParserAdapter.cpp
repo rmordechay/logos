@@ -94,6 +94,7 @@ LgsFile* LgsParserAdapter::getLogosFile(LogosParser::LogosFileContext* ctx, cons
 LgsMainFile* LgsParserAdapter::getMainFile(LogosParser::MainFileContext* ctx, const fs::path& filePath) {
     const auto funcs = ctx->func();
     const auto file = new LgsMainFile(fileID, filePath);
+    currentFile = file;
     setLocation(file->location, ctx->start);
 
     for (const auto enumDeclaration : ctx->enumDeclaration()) {
@@ -137,6 +138,7 @@ LgsMainFile* LgsParserAdapter::getMainFile(LogosParser::MainFileContext* ctx, co
 LgsObjectFile* LgsParserAdapter::getObjectFile(LogosParser::ObjectFileContext* ctx, const fs::path& filePath) {
     const auto objName = ctx->IDENTIFIER();
     const auto file = new LgsObjectFile(fileID, objName->getText(), filePath);
+    currentFile = file;
     setLocation(file->location, ctx->start);
     file->obj = getObject(ctx->objectBody(), objName, !!ctx->SINGLETON());
     globals.addSymbol(LgsSymbol(file->obj), &errHandler);
@@ -146,16 +148,18 @@ LgsObjectFile* LgsParserAdapter::getObjectFile(LogosParser::ObjectFileContext* c
 LgsFile* LgsParserAdapter::getInterfaceFile(LogosParser::InterfaceFileContext* ctx, const fs::path& filePath) {
     const auto interfaceNameToken = ctx->IDENTIFIER();
     const auto file = new LgsInterfaceFile(fileID, interfaceNameToken->getText(), filePath);
+    currentFile = file;
     setLocation(file->location, ctx->start);
     file->interface = getInterface(ctx->interfaceBody(), interfaceNameToken);
     globals.addSymbol(LgsSymbol(file->interface), &errHandler);
     return file;
 }
 
-LgsFile* LgsParserAdapter::getTestFile(LogosParser::TestFileContext* ctx, const fs::path& filePath) const {
-    const auto testFile = new LgsTestFile(fileID, ctx->IDENTIFIER()->getText(), filePath);
-    setLocation(testFile->location, ctx->start);
-    return testFile;
+LgsFile* LgsParserAdapter::getTestFile(LogosParser::TestFileContext* ctx, const fs::path& filePath) {
+    const auto file = new LgsTestFile(fileID, ctx->IDENTIFIER()->getText(), filePath);
+    currentFile = file;
+    setLocation(file->location, ctx->start);
+    return file;
 }
 
 void LgsParserAdapter::setAppConfigs(LgsAppConfigs& appConfigs) {
