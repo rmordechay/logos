@@ -619,7 +619,7 @@ void LgsSema::visitInnerSelections(const LgsSelection* selection) {
             visitFieldSelection(var, parentExpr->type);
         } else if (const auto methodCall = childExpr->asFuncCall()) {
             visitMethodCall(methodCall, parentExpr->type);
-            if (!methodCall->func->funcType->isStatic) {
+            if (methodCall->func->funcType->isMethod) {
                 methodCall->args.insert(methodCall->args.begin(), parentExpr);
             }
         }

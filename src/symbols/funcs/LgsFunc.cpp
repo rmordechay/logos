@@ -37,7 +37,7 @@ Value* LgsFunc::callIR(LgsCodeGen& codeGen, const std::vector<Value*>& args) {
     return rv;
 }
 
-void LgsFunc::setIRArgs(LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args, std::vector<Value*> IRArgs) const {
+void LgsFunc::setIRArgs(LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args, std::vector<Value*>& IRArgs) const {
     for (int i = 0; i < args.size(); ++i) {
         auto arg = args[i];
         const auto& param = funcType->params[i];
@@ -89,7 +89,7 @@ void LgsFunc::initFunc(const std::string& name, LgsType* rt, const std::vector<L
     funcType->name = name;
     funcType->rt = rt;
     funcType->setFuncOptions(ops);
-    if (funcType->isMethod && !funcType->isStatic) {
+    if (funcType->isMethod) {
         funcType->parentName = paramTypes.front()->getName();
     }
     for (const auto paramsType : paramTypes) {

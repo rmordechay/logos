@@ -24,7 +24,7 @@ public:
         initFunc(name, rt, paramTypes, ops);
     }
     explicit LgsFunc(LgsFuncType* funcType) : funcType(funcType) {}
-    void setIRArgs(LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args, std::vector<Value*> IRArgs) const;
+    void setIRArgs(LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args, std::vector<Value*>& IRArgs) const;
     virtual Value* call(LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args);
     Value* callIR(LgsCodeGen& codeGen, const std::vector<Value*>& args = {});
     virtual Function* getIRFunc(LgsCodeGen& codeGen);

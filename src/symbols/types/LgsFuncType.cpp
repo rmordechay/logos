@@ -1,19 +1,17 @@
 #include "types/LgsFuncType.h"
-#include "configs/LgsConfig.h"
 #include "configs/LgsDefinitions.h"
 #include "codegen/LgsCodeGen.h"
 #include "utils/LgsUtils.h"
 
 void LgsFuncType::setFuncOptions(const uint32_t ops) {
-    isMethod = ops & METHOD;
     isPublic = ops & PUBLIC;
     isInternal = ops & INTERNAL;
     isVirtual = ops & VIRTUAL;
-    if (ops & STATIC && isMethod) isStatic = true;
     isVariadic = ops & VARIADIC;
-    hasDefaults = ops & HAS_DEFAULTS;
     isOptional = ops & OPTIONAL;
     isTerminator = ops & TERMINATOR;
+    hasDefaults = ops & HAS_DEFAULTS;
+    isMethod = ops & METHOD;
 }
 
 Type* LgsFuncType::getIRType(LgsCodeGen& codeGen) {
@@ -89,15 +87,14 @@ json::value LgsFuncType::asJSON() {
         jsonParams.emplace_back(param.asJSON());
     }
     jsonObj["params"] = jsonParams;
-    jsonObj["isMethod"] = isMethod;
     jsonObj["isPublic"] = isPublic;
     jsonObj["isInternal"] = isInternal;
     jsonObj["isVirtual"] = isVirtual;
     jsonObj["isVariadic"] = isVariadic;
-    jsonObj["isStatic"] = isStatic;
     jsonObj["isOptional"] = isOptional;
     jsonObj["isTerminator"] = isTerminator;
     jsonObj["isAnonymous"] = isLambda;
+    jsonObj["isMethod"] = isMethod;
     jsonObj["hasDefaults"] = hasDefaults;
     return jsonObj;
 }
@@ -131,15 +128,14 @@ LgsType* LgsFuncType::clone() {
     for (auto p : params) {
         copy->params.push_back(p.clone());
     }
-    copy->isMethod    = isMethod;
-    copy->isPublic    = isPublic;
-    copy->isInternal  = isInternal;
-    copy->isVirtual   = isVirtual;
-    copy->isVariadic  = isVariadic;
-    copy->isStatic    = isStatic;
-    copy->isOptional  = isOptional;
-    copy->isTerminator= isTerminator;
-    copy->isLambda    = isLambda;
+    copy->isMethod = isMethod;
+    copy->isPublic = isPublic;
+    copy->isInternal = isInternal;
+    copy->isVirtual = isVirtual;
+    copy->isVariadic = isVariadic;
+    copy->isOptional = isOptional;
+    copy->isTerminator = isTerminator;
+    copy->isLambda = isLambda;
     copy->hasDefaults = hasDefaults;
     return copy;
 }

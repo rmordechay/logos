@@ -10,12 +10,12 @@
 class LgsSystem final : public LgsObject {
 public:
     static constexpr auto name = "System";
-    LgsFunc* pidFunc = new LgsFunc{"pid", &LGS_LONG, {this}, PUBLIC | STATIC | INTERNAL | METHOD};
-    LgsFunc* sleepFunc = new LgsFunc{"sleep", &LGS_VOID, {this, &LGS_INT}, PUBLIC | STATIC | INTERNAL | METHOD};
-    LgsFunc* exitFunc = new LgsFunc{"exit", &LGS_VOID, {this, &LGS_INT}, PUBLIC | STATIC | INTERNAL | METHOD | TERMINATOR};
-    LgsFunc* cwdFunc = new LgsFunc{"cwd", new LgsStr(), {this}, PUBLIC | STATIC | INTERNAL | METHOD};
-    LgsFunc* getEnvFunc = new LgsFunc{"getEnv", new LgsStr(), {this, new LgsStr(), new LgsNullable(new LgsStr())}, PUBLIC | STATIC | INTERNAL | METHOD | HAS_DEFAULTS};
-    LgsFunc* coresNumFunc = new LgsFunc{"coresNumber", &LGS_LONG, {this}, PUBLIC | STATIC | INTERNAL | METHOD};
+    LgsFunc* pidFunc = new LgsFunc{"pid", &LGS_LONG, {this}, PUBLIC | INTERNAL | METHOD};
+    LgsFunc* sleepFunc = new LgsFunc{"sleep", &LGS_VOID, {this, &LGS_INT}, PUBLIC | INTERNAL | METHOD};
+    LgsFunc* exitFunc = new LgsFunc{"exit", &LGS_VOID, {this, &LGS_INT}, PUBLIC | INTERNAL | METHOD | TERMINATOR};
+    LgsFunc* cwdFunc = new LgsFunc{"cwd", new LgsStr(), {this}, PUBLIC | INTERNAL | METHOD};
+    LgsFunc* getEnvFunc = new LgsFunc{"getEnv", new LgsStr(), {this, new LgsStr(), new LgsNullable(new LgsStr())}, PUBLIC | INTERNAL | METHOD | HAS_DEFAULTS};
+    LgsFunc* coresNumFunc = new LgsFunc{"coresNumber", &LGS_LONG, {this}, PUBLIC | INTERNAL | METHOD};
 
     explicit LgsSystem() : LgsObject(name) {
         getEnvFunc->funcType->params[2].expr = new LgsNull();

@@ -103,7 +103,8 @@ public:
     void visitPrefixExpr(LgsPrefixExpr* prefixExpr);
     void visitPostfixExpr(LgsPostfixExpr* postfixExpr) const;
     void visitStrConst(LgsStrConst* strConst) const;
-    void visitInstance(LgsInstance* instance) const;
+    void visitInstance(LgsInstance* instance);
+    void initFields(LgsInstance* instance);
     void visitIterIndex(LgsIterIndex* iterIndex);
 
     void generateIf(Value* cond, const std::function<void()>& blockStmtCb);

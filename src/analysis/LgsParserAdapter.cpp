@@ -241,7 +241,7 @@ LgsFunc* LgsParserAdapter::getFunc(LogosParser::FuncContext* ctx) {
     setLocation(func->location, tokenName->getSymbol());
     setParams(func->funcType, funcSignature->funcSignatureHeader()->param());
     func->stmtsBlock = getStmtBlock(ctx->statementsBlock());
-    if (func->funcType->isMethod && func->funcType->isStatic) {
+    if (!func->funcType->isMethod) {
         func->funcType->params.erase(func->funcType->params.begin());
     }
     currentFunc = nullptr;
@@ -283,7 +283,7 @@ LgsFunc* LgsParserAdapter::getMethod(LogosParser::MethodContext* ctx, LgsType* o
     method->funcType->params.push_back(self);
     setParams(method->funcType, funcSignature->funcSignatureHeader()->param());
     method->stmtsBlock = getStmtBlock(ctx->statementsBlock());
-    if (method->funcType->isStatic) {
+    if (!method->funcType->isMethod) {
         method->funcType->params.erase(method->funcType->params.begin());
     }
     if (ctx->VISIBILITY()) {
@@ -931,7 +931,7 @@ LgsUnaryExpr* LgsParserAdapter::getFirstSelection(LogosParser::SelectionContext*
     if (const auto variable = firstExpr->IDENTIFIER()) {
         const auto var = getVariable(variable);
         if (var->name == LGS_SELF) {
-            currentFunc->funcType->isStatic = true;
+            currentFunc->funcType->isMethod = true;
         }
         return var;
     }

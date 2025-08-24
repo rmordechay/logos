@@ -696,13 +696,20 @@ void LgsCodeGenVisitor::visitFuncCall(LgsFuncCall* funcCall) {
     for (const auto& arg : funcCall->args) {
         visitExpr(arg);
     }
+    const auto ft = funcCall->func->funcType;
+    if (ft->hasDefaults) {
+        const auto diff = ft->params.size() - funcCall->args.size();
+        for (int i = diff - 1; i < ft->params.size(); ++i) {
+            visitExpr(ft->params[i].expr);
+        }
+    }
     if (funcCall->ref.symbolType == PARAM) {
         LgsFunc f(funcCall->ref.param->type->asFuncType());
         f.setIRValue(getIRValue(funcCall->ref.param));
         funcCall->IRValue = f.call(cg, funcCall->args);
         return;
     }
-    if (funcCall->func->funcType->isVirtual) {
+    if (ft->isVirtual) {
         funcCall->resolveVirtualFunc(cg);
     }
     funcCall->IRValue = funcCall->func->call(cg, funcCall->args);
@@ -735,7 +742,7 @@ void LgsCodeGenVisitor::visitStrConst(LgsStrConst* strConst) const {
     strConst->IRValue = cg.getIRStr(strConst->value);
 }
 
-void LgsCodeGenVisitor::visitInstance(LgsInstance* instance) const {
+void LgsCodeGenVisitor::visitInstance(LgsInstance* instance) {
     if (instance->table) return instance->createIRTable(cg);
     const auto objIRType = instance->obj->getIRType(cg);
     if(instance->obj->singleton) {
@@ -743,9 +750,21 @@ void LgsCodeGenVisitor::visitInstance(LgsInstance* instance) const {
     } else {
         instance->IRValue = cg.builder.CreateAlloca(objIRType);
     }
-    instance->initFields(cg);
+    initFields(instance);
     if (!instance->obj->interfaces.empty()) {
         instance->setVirtuals(cg);
+    }
+}
+
+void LgsCodeGenVisitor::initFields(LgsInstance* instance) {
+    for (const auto& [argName, arg] : instance->args) {
+        visitExpr(arg->expr);
+        const auto exprIR = arg->expr->IRValue;
+        const auto field = instance->obj->getField(argName);
+        if (!field) continue;
+        field->parentIRValue = instance->IRValue;
+        const auto gep = field->IRValue;
+        cg.builder.CreateStore(exprIR, gep);
     }
 }
 
@@ -841,6 +860,8 @@ Value* LgsCodeGenVisitor::getIRValue(LgsValue* value) {
         visitExpr(expr);
     } else if (const auto param = dynamic_cast<LgsParam*>(value)) {
         visitParam(param);
+    } else if (const auto field = dynamic_cast<LgsField*>(value)) {
+        visitField(field);
     } else {
         assert(0);
     }

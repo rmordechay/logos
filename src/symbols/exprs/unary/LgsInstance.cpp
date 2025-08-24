@@ -20,17 +20,6 @@ void LgsInstance::createIRTable(LgsCodeGen& codeGen) {
     }
 }
 
-void LgsInstance::initFields(LgsCodeGen& codeGen) {
-    for (const auto& [argName, arg] : args) {
-        const auto exprIR = arg->expr->IRValue;
-        const auto field = obj->getField(argName);
-        if (!field) continue;
-        field->parentIRValue = IRValue;
-        const auto gep = field->IRValue;
-        codeGen.builder.CreateStore(exprIR, gep);
-    }
-}
-
 void LgsInstance::setObject(LgsObject* newObj) {
     obj = newObj;
     setType(obj);

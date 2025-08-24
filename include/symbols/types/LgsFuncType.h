@@ -7,16 +7,15 @@ namespace llvm {
 }
 
 enum LgsFuncFlags : uint32_t {
-    METHOD = 1 << 0,
-    PUBLIC = 1 << 1,
-    INTERNAL = 1 << 2,
-    VIRTUAL = 1 << 3,
-    STATIC = 1 << 4,
-    VARIADIC = 1 << 5,
-    LAMBDA = 1 << 6,
-    HAS_DEFAULTS = 1 << 7,
-    OPTIONAL = 1 << 8,
-    TERMINATOR = 1 << 9,
+    PUBLIC = 1 << 0,
+    INTERNAL = 1 << 1,
+    VIRTUAL = 1 << 2,
+    VARIADIC = 1 << 3,
+    LAMBDA = 1 << 4,
+    OPTIONAL = 1 << 5,
+    TERMINATOR = 1 << 6,
+    METHOD = 1 << 7,
+    HAS_DEFAULTS = 1 << 8,
 };
 
 class LgsFuncType final : public LgsType {
@@ -26,15 +25,14 @@ public:
     std::string parentName;
     LgsType* rt = nullptr;
     std::vector<LgsParam> params;
-    bool isMethod = false;
     bool isPublic = false;
     bool isInternal = false;
     bool isVirtual = false;
     bool isVariadic = false;
-    bool isStatic = true;
+    bool isLambda = false;
     bool isOptional = false;
     bool isTerminator = false;
-    bool isLambda = false;
+    bool isMethod = false;
     bool hasDefaults = false;
     llvm::FunctionType* IRType = nullptr;
 
