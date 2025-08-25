@@ -213,8 +213,9 @@ unaryExpr:
     |   selection
     |   arrayExpr
     |   hashMap
-    |   isFirst
-    |   isLast
+    |   FORI
+    |   FOR_IS_FIRST
+    |   FOR_IS_LAST
     |   SELF_INSTANCE
     |   SELF_CLASS
     |   NULL
@@ -281,14 +282,6 @@ index:
         LBRACK from=expr COLON? RBRACK
     |   LBRACK COLON to=expr RBRACK
     |   LBRACK from=expr COLON to=expr RBRACK
-    ;
-
-isFirst:
-        FOR_IS_FIRST
-    ;
-
-isLast:
-        FOR_IS_LAST
     ;
 
 selection:
@@ -457,6 +450,7 @@ GO: 'go';
 DEFER: 'defer';
 FOR_IS_FIRST: 'for.isFirst';
 FOR_IS_LAST: 'for.isLast';
+FORI: 'for.i';
 
 VEC2: 'vec2';
 VEC3: 'vec3';

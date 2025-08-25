@@ -99,8 +99,8 @@ public:
     LgsUnaryExpr* getConstant(LogosParser::ConstantContext* ctx);
     LgsStrConst* getStrConst(antlr4::tree::TerminalNode* ctx);
     LgsUnaryExpr* getNullValue(const antlr4::tree::TerminalNode* ctx) const;
-    LgsUnaryExpr* getLoopIsFirst(LogosParser::IsFirstContext* ctx) const;
-    LgsUnaryExpr* getLoopIsLast(LogosParser::IsLastContext* ctx) const;
+    LgsUnaryExpr* getLoopIsFirst(antlr4::tree::TerminalNode* ctx) const;
+    LgsUnaryExpr* getLoopIsLast(antlr4::tree::TerminalNode* ctx) const;
     LgsType* getType(LogosParser::TypeContext* ctx);
     LgsGroup* getGroup(LogosParser::GroupContext* ctx);
     LgsFuncType* getFuncType(LogosParser::FuncTypeContext* ctx);

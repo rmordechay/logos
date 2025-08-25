@@ -5,6 +5,17 @@
 #include "stmts/LgsVarDec.h"
 #include <codegen/LgsLLVM.h>
 
+Value* LgsVariable::loadIR(LgsLLVM& codeGen) {
+    switch (ref.symbolType) {
+    case PARAM:
+        return ref.param->loadIR(codeGen);
+    case VAR_DEC:
+        return ref.varDec->expr->loadIR(codeGen);
+    default:
+        assert(0);
+    }
+}
+
 Value* LgsVariable::hash(LgsLLVM& codeGen) {
     switch (ref.symbolType) {
     case PARAM:

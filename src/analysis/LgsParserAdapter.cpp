@@ -749,8 +749,8 @@ LgsUnaryExpr* LgsParserAdapter::getUnaryExpr(LogosParser::UnaryExprContext* ctx)
     if (const auto func = ctx->lambda()) return getLambda(func);
     if (const auto vector = ctx->vector()) return getVector(vector);
     if (const auto null = ctx->NULL_()) return getNullValue(null);
-    if (const auto isFirst = ctx->isFirst()) return getLoopIsFirst(isFirst);
-    if (const auto isLast = ctx->isLast()) return getLoopIsLast(isLast);
+    if (const auto isFirst = ctx->FOR_IS_FIRST()) return getLoopIsFirst(isFirst);
+    if (const auto isLast = ctx->FOR_IS_LAST()) return getLoopIsLast(isLast);
     if (const auto json = ctx->json()) return getJSON(json);
     assert(0);
 }
@@ -1039,15 +1039,15 @@ LgsUnaryExpr* LgsParserAdapter::getNullValue(const antlr4::tree::TerminalNode* c
     return lgsNull;
 }
 
-LgsUnaryExpr* LgsParserAdapter::getLoopIsFirst(LogosParser::IsFirstContext* ctx) const {
+LgsUnaryExpr* LgsParserAdapter::getLoopIsFirst(antlr4::tree::TerminalNode* ctx) const {
     const auto var = new LgsVariable(ctx->getText(), &LGS_BOOL);
-    setLocation(var->location, ctx->start);
+    setLocation(var->location, ctx->getSymbol());
     return var;
 }
 
-LgsUnaryExpr* LgsParserAdapter::getLoopIsLast(LogosParser::IsLastContext* ctx) const {
+LgsUnaryExpr* LgsParserAdapter::getLoopIsLast(antlr4::tree::TerminalNode* ctx) const {
     const auto var = new LgsVariable(ctx->getText(), &LGS_BOOL);
-    setLocation(var->location, ctx->start);
+    setLocation(var->location, ctx->getSymbol());
     return var;
 }
 

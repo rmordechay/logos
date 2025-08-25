@@ -6,7 +6,9 @@ class LgsHashMap final : public LgsUnaryExpr {
 public:
     std::vector<LgsMapEntry*> initialElements;
 
-    explicit LgsHashMap(LgsMap* mapType) : LgsUnaryExpr(mapType) {}
+    explicit LgsHashMap(LgsMap* mapType) : LgsUnaryExpr(mapType) {
+        mapType->isHeapAlloc = true;
+    }
     explicit LgsHashMap(LgsType* keyType = nullptr, LgsType* valueType = nullptr) : LgsHashMap(new LgsMap(keyType, valueType)) {}
     std::string pname() override;
     json::value asJSON() override;

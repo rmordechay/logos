@@ -23,7 +23,7 @@ public:
             return codeGen.callGetPid();
         };
         sleepFunc->fn = [](LgsLLVM& codeGen, const std::vector<LgsExpr*>& args) {
-            const auto arg = LgsFunc::loadIRArg(&codeGen, args[1]->IRValue, args[1]->type);
+            const auto arg = args[1]->loadIR(codeGen);
             return codeGen.callSleep(arg);
         };
         exitFunc->fn = [](LgsLLVM& codeGen, const std::vector<LgsExpr*>& args) {

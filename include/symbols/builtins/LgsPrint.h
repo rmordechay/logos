@@ -16,7 +16,7 @@ public:
         const auto formatStr = firstArg->type->strFormatPart() + '\n';
         if (const auto strConst = firstArg->asStrConst()) {
             if (!strConst->templateParts.empty()) {
-                return printFormat(&codeGen, strConst);
+                return printFormat(codeGen, strConst);
             }
             LgsStrConst withNewLine(strConst->value + '\n');
             withNewLine.IRValue = codeGen.getIRStr(strConst->value);
@@ -24,14 +24,14 @@ public:
         } else if (const auto obj = firstArg->type->asObject()) {
             IRArgs.emplace_back(codeGen.getIRStr(formatStr));
             for (const auto& field : obj->fields) {
-                const auto ir = field->IRValue;
-                IRArgs.emplace_back(loadIRArg(&codeGen, ir, field->type));
+                auto loadIrArg = field->loadIR(codeGen);
+                IRArgs.emplace_back(loadIrArg);
             }
         } else {
             IRArgs.emplace_back(codeGen.getIRStr(formatStr));
             for (int i = 0; i < args.size(); ++i) {
                 const auto arg = args[i];
-                const auto ir = loadIRArg(&codeGen, arg->IRValue, arg->type);
+                const auto ir = arg->loadIR(codeGen);
                 IRArgs.emplace_back(ir);
             }
         }
@@ -43,19 +43,19 @@ public:
         return codeGen.getFunc("printf", ft);
     }
 
-    static Value* printFormat(LgsLLVM* codeGen, const LgsStrConst* const strConst) {
+    static Value* printFormat(LgsLLVM& codeGen, const LgsStrConst* const strConst) {
         auto formated = strConst->formatedStr;
         std::vector<Value*> values;
         for (const auto part : strConst->templateParts) {
-            auto partIR = loadIRArg(codeGen, part->IRValue, part->type);
+            auto partIR = part->loadIR(codeGen);
             values.push_back(partIR);
             const auto pos = formated.find(LGS_STR_FMT_PLACEHOLDER);
             if (pos != std::string::npos) {
                 formated.replace(pos, strlen(LGS_STR_FMT_PLACEHOLDER), part->type->strFormatPart());
             }
         }
-        std::vector IRArgs = {codeGen->getIRStr(formated)};
+        std::vector IRArgs = {codeGen.getIRStr(formated)};
         IRArgs.insert(IRArgs.end(), values.begin(), values.end());
-        return codeGen->callPrintf(IRArgs);
+        return codeGen.callPrintf(IRArgs);
     }
 };

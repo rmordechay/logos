@@ -30,7 +30,6 @@ public:
     virtual Value* call(LgsLLVM& codeGen, const std::vector<LgsExpr*>& args);
     Value* callIR(LgsLLVM& codeGen, const std::vector<Value*>& args = {});
     virtual Function* getIRFunc(LgsLLVM& codeGen);
-    static Value* loadIRArg(LgsLLVM* codeGen, Value* v, LgsType* type);
     void initFunc(const std::string& name, LgsType* rt, const std::vector<LgsType*>& paramTypes, const uint32_t ops);
     BasicBlock* getCleanupBlock(LgsLLVM& codeGen);
     void completeType(LgsType* toType) override;

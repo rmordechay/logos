@@ -1,6 +1,5 @@
 #pragma once
 #include "configs/LgsErrors.h"
-
 #include <llvm/IR/DebugInfoMetadata.h>
 
 class LgsType;
@@ -20,8 +19,9 @@ public:
     LgsLocation location{0, 0, 0};
 
     void setIRValue(llvm::Value* value);
+    virtual llvm::Value* loadIR(LgsLLVM& codeGen);
     virtual void setDebugValue(LgsLLVM& codeGen);
     virtual json::value asJSON() = 0;
-    virtual ~LgsValue() = default;
     llvm::DILocation* getDebugLoc(LgsLLVM& codeGen) const;
+    virtual ~LgsValue() = default;
 };

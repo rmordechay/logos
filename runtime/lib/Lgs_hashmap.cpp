@@ -3,7 +3,6 @@
 
 struct Lgs_Map {
     size_t valueSize;
-    LgsErrHandler errHandler;
     std::unordered_map<std::string, std::vector<char>>* data;
 };
 
@@ -25,7 +24,7 @@ extern "C" void* Lgs_Map_get(const Lgs_Map* map, const char* key) {
     if (!map || !key) std::exit(1);
     const auto it = map->data->find(key);
     if (it == map->data->end()) {
-        formatAndLogError(E10067, {key});
+        // formatAndLogError(E10067, {key});
         return nullptr;
     }
     return it->second.data();
@@ -48,7 +47,7 @@ extern "C" bool Lgs_Map_isNotEmpty(const Lgs_Map* map) {
     return map ? !map->data->empty() : false;
 }
 
-extern "C" void Lgs_Map_free(const Lgs_Map* map) {
-    if (!map) return;
+extern "C" void Lgs_Map_free(Lgs_Map* map) {
     delete map->data;
+    std::free(map);
 }

@@ -532,7 +532,6 @@ void LgsCodeGen::visitExpr(LgsExpr* expr) {
     if (expr->type->isHeapAlloc && !expr->asVariable()) {
         stack.currentFunc()->heapAllocExprs.push_back(expr);
     }
-    assert(expr->IRValue);
 }
 
 void LgsCodeGen::visitUnaryExpr(LgsUnaryExpr* unaryExpr) {
@@ -619,7 +618,8 @@ void LgsCodeGen::visitHashMap(LgsHashMap* hashMap) {
     const auto mapType = hashMap->type->asMap();
     const auto valueType = mapType->typePair->value;
     const auto elementSize = cg.isize(valueType->getSizeBytes());
-    hashMap->IRValue = cg.builder.CreateAlloca(mapType->getMapStruct(cg));
+    const auto arrSize = cg.typeSize(mapType->getMapStruct(cg));
+    hashMap->IRValue = cg.callMalloc(arrSize.getFixedValue());
     mapType->initFunc->callIR(cg, {getIRValue(hashMap), elementSize});
     for (const auto element : hashMap->initialElements) {
         visitExpr(element->key);
@@ -755,20 +755,7 @@ void LgsCodeGen::visitIterIndex(LgsIterIndex* iterIndex) {
     visitExpr(iterIndex->baseExpr);
     visitExpr(iterIndex->index->from);
     visitExpr(iterIndex->index->to);
-    const auto baseExprType = iterIndex->baseExpr->type;
-    if (baseExprType->asSArray()) {
-        iterIndex->IRValue = iterIndex->loadFromSArray(cg);
-    } else if (iterIndex->baseExpr->type->isVector()) {
-        iterIndex->IRValue = iterIndex->loadFromVec(cg);
-    } else if (const auto arr = baseExprType->asDArray()) {
-        iterIndex->IRValue = iterIndex->loadFromDArray(cg, arr);
-    } else if (const auto map = baseExprType->asMap()) {
-        iterIndex->IRValue = iterIndex->loadFromMap(cg, map);
-    } else if (const auto str = baseExprType->asStr()) {
-        iterIndex->IRValue = iterIndex->loadFromStr(cg, str);
-    } else {
-        assert(0);
-    }
+    iterIndex->IRValue = iterIndex->baseExpr->IRValue;
 }
 
 void LgsCodeGen::initFields(LgsInstance* instance) {
@@ -810,8 +797,8 @@ void LgsCodeGen::createEpilogue(LgsFunc* func) {
     }
 
     if (func->returnStmts.empty()) {
-        cg.callPopStack();
         freeHeap(func);
+        cg.callPopStack();
         return;
     }
 
@@ -956,7 +943,7 @@ Value* LgsCodeGen::createDynamicArray(LgsArrayExpr* arrayExpr) {
     const auto arr = arrayExpr->type->asDArray();
     const auto size = arr->baseType->getSizeBytes();
     const auto elementSize = cg.i64(size);
-    const auto arrSize = cg.typeSize(arr->getArrStruct(&cg));
+    const auto arrSize = cg.typeSize(arr->getArrStruct(cg));
     arrayExpr->IRValue = cg.callMalloc(arrSize.getFixedValue());
     arr->initFunc->callIR(cg, {arrayExpr->IRValue, elementSize});
     for (int i = 0; i < arrayExpr->initialElements.size(); ++i) {

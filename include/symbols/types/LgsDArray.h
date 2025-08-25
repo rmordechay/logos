@@ -5,6 +5,7 @@
 #include "primitives/LgsLong.h"
 #include "LgsVoid.h"
 #include "funcs/LgsFunc.h"
+#include "primitives/LgsSize.h"
 #include "types/LgsIterable.h"
 
 class LgsDArray final : public LgsIterable {
@@ -17,7 +18,7 @@ public:
     LgsFunc* isEmptyFunc = new LgsFunc("isEmpty", &LGS_BOOL, {this}, INTERNAL | PUBLIC | METHOD);
     LgsFunc* isNotEmptyFunc = new LgsFunc("isNotEmpty", &LGS_BOOL, {this}, INTERNAL | PUBLIC | METHOD);
     LgsFunc* initFunc = new LgsFunc("init", &LGS_VOID, {this, &LGS_LONG}, INTERNAL | METHOD);
-    LgsFunc* putFunc = new LgsFunc("put", &LGS_VOID, {this, &LGS_LONG, &LGS_ANY}, INTERNAL | METHOD);
+    LgsFunc* putFunc = new LgsFunc("put", &LGS_VOID, {this, &LGS_INT, &LGS_ANY}, INTERNAL | METHOD);
     LgsFunc* deleteFunc = new LgsFunc("delete", &LGS_VOID, {this, &LGS_LONG}, INTERNAL | METHOD);
     LgsFunc* freeFunc = new LgsFunc("free", &LGS_VOID, {this}, INTERNAL | METHOD);
 
@@ -41,7 +42,7 @@ public:
     LgsType* getIndexType() override;
     uint16_t getUnpackCount() const override;
     std::string strFormatPart() const override;
-    StructType* getArrStruct(LgsLLVM* codeGen);
+    StructType* getArrStruct(LgsLLVM& codeGen);
     void freeValue(LgsLLVM& codeGen, Value* value) override;
     Value* IRLength(LgsLLVM& codeGen, LgsExpr* iterable) override;
     Value* IRIsEmpty(LgsLLVM* codeGen, LgsExpr* iterable) override;

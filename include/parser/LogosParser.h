@@ -24,11 +24,11 @@ public:
     PIPE = 49, CARET = 50, DOUBLE_RANGLE = 51, DOUBLE_LANGLE = 52, SLIDER = 53, 
     OBJECT = 54, SINGLETON = 55, SELF_INSTANCE = 56, SELF_CLASS = 57, INTERFACE = 58, 
     EXTERN = 59, VISIBILITY = 60, IMPLEMENTS = 61, CONST = 62, ENUM = 63, 
-    GO = 64, DEFER = 65, FOR_IS_FIRST = 66, FOR_IS_LAST = 67, VEC2 = 68, 
-    VEC3 = 69, VEC4 = 70, IF = 71, ELSE = 72, FOR = 73, BREAK = 74, CONTINUE = 75, 
-    RETURN = 76, AND = 77, OR = 78, NOT = 79, IN = 80, LONG = 81, INTEGER = 82, 
-    FLOAT = 83, BOOL = 84, NULL_ = 85, IDENTIFIER = 86, STRING = 87, TAG = 88, 
-    LINE_COMMENT = 89, BLOCK_COMMENT = 90, WS = 91
+    GO = 64, DEFER = 65, FOR_IS_FIRST = 66, FOR_IS_LAST = 67, FORI = 68, 
+    VEC2 = 69, VEC3 = 70, VEC4 = 71, IF = 72, ELSE = 73, FOR = 74, BREAK = 75, 
+    CONTINUE = 76, RETURN = 77, AND = 78, OR = 79, NOT = 80, IN = 81, LONG = 82, 
+    INTEGER = 83, FLOAT = 84, BOOL = 85, NULL_ = 86, IDENTIFIER = 87, STRING = 88, 
+    TAG = 89, LINE_COMMENT = 90, BLOCK_COMMENT = 91, WS = 92
   };
 
   enum {
@@ -48,11 +48,11 @@ public:
     RuleArrayExpr = 47, RuleHashMap = 48, RuleKeyValue = 49, RuleFuncCall = 50, 
     RuleFuncArgList = 51, RuleFuncArg = 52, RuleInstance = 53, RuleInstanceArgList = 54, 
     RuleInstanceArg = 55, RuleConstant = 56, RuleIterIndex = 57, RuleIndex = 58, 
-    RuleIsFirst = 59, RuleIsLast = 60, RuleSelection = 61, RuleFirstSelectionElement = 62, 
-    RuleInnerSelectionElement = 63, RuleRange = 64, RuleType = 65, RuleMapType = 66, 
-    RuleArraySize = 67, RuleFuncType = 68, RuleVector = 69, RuleExtern = 70, 
-    RuleRequireEnvVars = 71, RuleRequirePackages = 72, RuleAssignemntOp = 73, 
-    RuleJson = 74, RuleJsonObj = 75, RuleJsonPair = 76, RuleJsonArray = 77
+    RuleSelection = 59, RuleFirstSelectionElement = 60, RuleInnerSelectionElement = 61, 
+    RuleRange = 62, RuleType = 63, RuleMapType = 64, RuleArraySize = 65, 
+    RuleFuncType = 66, RuleVector = 67, RuleExtern = 68, RuleRequireEnvVars = 69, 
+    RuleRequirePackages = 70, RuleAssignemntOp = 71, RuleJson = 72, RuleJsonObj = 73, 
+    RuleJsonPair = 74, RuleJsonArray = 75
   };
 
   explicit LogosParser(antlr4::TokenStream *input);
@@ -131,8 +131,6 @@ public:
   class ConstantContext;
   class IterIndexContext;
   class IndexContext;
-  class IsFirstContext;
-  class IsLastContext;
   class SelectionContext;
   class FirstSelectionElementContext;
   class InnerSelectionElementContext;
@@ -868,8 +866,9 @@ public:
     SelectionContext *selection();
     ArrayExprContext *arrayExpr();
     HashMapContext *hashMap();
-    IsFirstContext *isFirst();
-    IsLastContext *isLast();
+    antlr4::tree::TerminalNode *FORI();
+    antlr4::tree::TerminalNode *FOR_IS_FIRST();
+    antlr4::tree::TerminalNode *FOR_IS_LAST();
     antlr4::tree::TerminalNode *SELF_INSTANCE();
     antlr4::tree::TerminalNode *SELF_CLASS();
     antlr4::tree::TerminalNode *NULL_();
@@ -1088,28 +1087,6 @@ public:
   };
 
   IndexContext* index();
-
-  class  IsFirstContext : public antlr4::ParserRuleContext {
-  public:
-    IsFirstContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *FOR_IS_FIRST();
-
-   
-  };
-
-  IsFirstContext* isFirst();
-
-  class  IsLastContext : public antlr4::ParserRuleContext {
-  public:
-    IsLastContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *FOR_IS_LAST();
-
-   
-  };
-
-  IsLastContext* isLast();
 
   class  SelectionContext : public antlr4::ParserRuleContext {
   public:

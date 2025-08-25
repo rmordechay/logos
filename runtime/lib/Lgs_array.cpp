@@ -1,8 +1,6 @@
 #include "configs/LgsErrors.h"
 #include "utils/LgsUtils.h"
-
 #include <cstring>
-#include <iostream>
 #include <vector>
 
 struct Lgs_Array {
@@ -27,6 +25,13 @@ extern "C" void Lgs_DArray_addMany(const Lgs_Array* arr, const void* values, con
     const auto bytesToAdd = arr->elementSize * count;
     arr->data->resize(oldSize + bytesToAdd);
     std::memcpy(arr->data->data() + oldSize, values, bytesToAdd);
+}
+
+extern "C" void Lgs_DArray_put(const Lgs_Array* arr, const int index, const void* value) {
+    if (!arr || !arr->data) return;
+    const size_t arrLen = arr->data->size() / arr->elementSize;
+    if (index >= arrLen) return;
+    std::memcpy(arr->data->data() + index * arr->elementSize, value, arr->elementSize);
 }
 
 extern "C" void* Lgs_DArray_get(const Lgs_Array* arr, const size_t index) {
@@ -63,7 +68,7 @@ extern "C" bool Lgs_DArray_contains(const Lgs_Array* arr, const void* value) {
     return false;
 }
 
-extern "C" void Lgs_DArray_free(const Lgs_Array* arr) {
+extern "C" void Lgs_DArray_free(Lgs_Array* arr) {
     delete arr->data;
-    delete arr;
+    std::free(arr);
 }

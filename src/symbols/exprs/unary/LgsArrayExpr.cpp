@@ -1,8 +1,4 @@
 #include "exprs/unary/LgsArrayExpr.h"
-#include "cli/LgsCli.h"
-#include "exprs/unary/constants/LgsIntConst.h"
-
-#include <llvm/IR/Module.h>
 
 std::string LgsArrayExpr::pname() {
     return type->pname();

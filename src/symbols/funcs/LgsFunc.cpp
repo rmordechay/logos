@@ -44,23 +44,12 @@ void LgsFunc::setIRArgs(LgsLLVM& codeGen, const std::vector<LgsExpr*>& args, std
         if (!param.isSelf) {
             arg = arg->castTo(param.type);
         }
-        auto v = arg->IRValue;
-        v = loadIRArg(&codeGen, v, arg->type);
+        auto v = arg->loadIR(codeGen);
         if (!param.isSelf && args[i] != arg) {
             freeExpr(arg);
         }
         IRArgs.emplace_back(v);
     }
-}
-
-Value* LgsFunc::loadIRArg(LgsLLVM* codeGen, Value* v, LgsType* type) {
-    if (type->asCPtr() || type->asFuncType() || type->asObject() || type->asDArray() || type->asSArray()) return v;
-    const auto vTy = v->getType();
-    if (vTy->isIntegerTy() || vTy->isFloatingPointTy()) return v;
-    if (!vTy->isPointerTy()) return v;
-    if (isa<GlobalVariable>(v) || isa<LoadInst>(v)) return v;
-    const auto ty = type->getIRType(*codeGen);
-    return codeGen->builder.CreateLoad(ty, v);
 }
 
 Function* LgsFunc::getIRFunc(LgsLLVM& codeGen) {

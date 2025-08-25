@@ -2,18 +2,6 @@
 #include "exprs/unary/LgsHashMap.h"
 #include "stmts/LgsVarDec.h"
 
-Value* LgsMap::callAdd(LgsLLVM& codeGen, const std::vector<LgsExpr*>& args) const {
-    const auto map = args[0];
-    const auto key = args[1];
-    const auto value = args[2];
-    const auto exprIR = value->IRValue;
-    const auto mapPtr = map->IRValue;
-    const auto exprTy = value->type;
-    const auto valurPtr = codeGen.builder.CreateAlloca(exprTy->getIRType(codeGen));
-    codeGen.builder.CreateStore(exprIR, valurPtr);
-    return addFunc->callIR(codeGen, {mapPtr, key->IRValue, valurPtr});
-}
-
 Type* LgsMap::getIRType(LgsLLVM& codeGen) {
     return getMapStruct(codeGen);
 }
@@ -78,6 +66,21 @@ void LgsMap::freeValue(LgsLLVM& codeGen, Value* value) {
 
 std::string LgsMap::strFormatPart() const {
     return "%s";
+}
+
+Value* LgsMap::callAdd(LgsLLVM& codeGen, const std::vector<LgsExpr*>& args) const {
+    const auto map = args[0];
+    const auto key = args[1];
+    const auto value = args[2];
+    const auto exprIR = value->IRValue;
+    const auto mapPtr = map->IRValue;
+    const auto exprTy = value->type;
+    if (exprTy->asDArray()) {
+        return addFunc->callIR(codeGen, {mapPtr, key->IRValue, value->IRValue});
+    }
+    const auto valurPtr = codeGen.builder.CreateAlloca(exprTy->getIRType(codeGen));
+    codeGen.builder.CreateStore(exprIR, valurPtr);
+    return addFunc->callIR(codeGen, {mapPtr, key->IRValue, valurPtr});
 }
 
 LgsMap::~LgsMap() {

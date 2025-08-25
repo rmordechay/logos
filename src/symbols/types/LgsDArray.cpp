@@ -16,7 +16,7 @@ Value* LgsDArray::callAdd(LgsLLVM& codeGen, const std::vector<LgsExpr*>& args) c
 
 Type* LgsDArray::getIRType(LgsLLVM& codeGen) {
     if (IRType) return IRType;
-    return getArrStruct(&codeGen);
+    return getArrStruct(codeGen);
 }
 
 std::string LgsDArray::getName() {
@@ -49,9 +49,9 @@ std::string LgsDArray::strFormatPart() const {
     return "%p";
 }
 
-StructType* LgsDArray::getArrStruct(LgsLLVM* codeGen) {
+StructType* LgsDArray::getArrStruct(LgsLLVM& codeGen) {
     if (arrStruct) return arrStruct;
-    arrStruct = codeGen->getStructType({codeGen->i64Ty(), codeGen->i64Ty(), codeGen->i64Ty(), codeGen->ptrTy()}, name);
+    arrStruct = codeGen.getStructType({codeGen.i64Ty(), codeGen.i64Ty(), codeGen.i64Ty(), codeGen.ptrTy()}, name);
     return arrStruct;
 }
 

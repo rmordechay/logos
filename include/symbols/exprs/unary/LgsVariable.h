@@ -10,6 +10,7 @@ public:
     LgsSymbol ref;
 
     explicit LgsVariable(const std::string& name, LgsType* type = nullptr) : LgsUnaryExpr(type), name(name) {}
+    Value* loadIR(LgsLLVM& codeGen) override;
     Value* hash(LgsLLVM& codeGen) override;
     LgsExpr* castTo(LgsType* toType) override;
     void assign(LgsLLVM& codeGen, LgsExpr* expr) override;
