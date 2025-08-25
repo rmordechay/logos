@@ -1,4 +1,6 @@
 #pragma once
+#include "files/LgsMainFile.h"
+#include "utils/ThreadPool.h"
 
 class LgsGroup;
 class LgsFuncType;
@@ -16,8 +18,9 @@ public:
     LgsSymbolTable& globals;
 
     LgsTypeResolver(LgsErrHandler& errHandler, LgsSymbolTable& globals) : errHandler(errHandler), globals(globals) {}
-    bool resolveGlobalTypes(const std::vector<LgsFile*>& ast);
+    bool resolveGlobalTypes(const std::vector<LgsFile*>& ast, ThreadPool& pool);
     LgsType* resolveType(LgsType* type, LgsFile* file);
+    void resolveMainFileTypes(LgsMainFile* mf);
     void resolveObjTypes(LgsObject* obj, LgsFile& file);
     void resolveInterfaceTypes(LgsInterface* interface, LgsFile& file);
     void resolveIterable(LgsIterable* iterable, LgsFile& file);

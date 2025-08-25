@@ -199,7 +199,7 @@ void LgsSema::visitAssignment(const LgsAssignment* assignment) {
     const auto lValue = assignment->lValue;
     const auto rValue = assignment->rValue;
     visitExpr(lValue);
-    if (lValue->isAssignable) {
+    if (!dynamic_cast<LgsAssignable*>(lValue)) {
         errHandler.addError(E10012, &lValue->location);
     }
     visitExpr(rValue);

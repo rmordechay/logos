@@ -29,22 +29,6 @@ extern "C" void Lgs_DArray_addMany(const Lgs_Array* arr, const void* values, con
     std::memcpy(arr->data->data() + oldSize, values, bytesToAdd);
 }
 
-extern "C" void Lgs_DArray_addBool(const Lgs_Array* a, const bool v)   {
-    Lgs_DArray_add(a, &v);
-}
-
-extern "C" void Lgs_DArray_addShort(const Lgs_Array* a, const int16_t v) {
-    Lgs_DArray_add(a, &v);
-}
-
-extern "C" void Lgs_DArray_addInt(const Lgs_Array* a, const int32_t v)   {
-    Lgs_DArray_add(a, &v);
-}
-
-extern "C" void Lgs_DArray_addLong(const Lgs_Array* a, const int64_t v)   {
-    Lgs_DArray_add(a, &v);
-}
-
 extern "C" void* Lgs_DArray_get(const Lgs_Array* arr, const size_t index) {
     const auto arrLen = arr->data->size() / arr->elementSize;
     if (index >= arrLen) {

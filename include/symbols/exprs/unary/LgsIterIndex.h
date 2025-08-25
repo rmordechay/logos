@@ -1,19 +1,17 @@
 #pragma once
+#include "LgsAssignable.h"
 #include "LgsUnaryExpr.h"
 
 class LgsMap;
 class LgsDArray;
 struct LgsIndex;
 
-class LgsIterIndex final : public LgsUnaryExpr {
+class LgsIterIndex final : public LgsUnaryExpr, public LgsAssignable {
 public:
     LgsUnaryExpr* baseExpr;
     LgsIndex* index = nullptr;
 
-    explicit LgsIterIndex(LgsUnaryExpr* baseExpr, LgsIndex* index = nullptr) : baseExpr(baseExpr), index(index) {
-        isAssignable = true;
-    }
-
+    explicit LgsIterIndex(LgsUnaryExpr* baseExpr, LgsIndex* index = nullptr) : baseExpr(baseExpr), index(index) {}
     Value* loadFromDArray(LgsLLVM& codeGen, const LgsDArray* arr) const;
     Value* loadFromMap(LgsLLVM& codeGen, const LgsMap* map) const;
     Value* loadFromStr(LgsLLVM& codeGen, const LgsStr* str) const;
@@ -21,6 +19,10 @@ public:
     Value* createStrSlice(LgsLLVM& codeGen, const LgsStr* str) const;
     Value* loadFromSArray(LgsLLVM& codeGen) const;
     Value* getStrGEP(LgsLLVM& codeGen) const;
+    void assignScalar(LgsLLVM& codeGen, LgsExpr* expr);
+    void assignHashMap(LgsLLVM& codeGen, LgsHashMap* map);
+    void assign(LgsLLVM& codeGen, LgsExpr* expr) override;
+    void assignArray(LgsLLVM& codeGen, const LgsArrayExpr* arr) const;
     std::string pname() override;
     json::value asJSON() override;
     ~LgsIterIndex() override;

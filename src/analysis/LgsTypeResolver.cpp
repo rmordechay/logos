@@ -14,30 +14,24 @@
 #include "types/LgsNullable.h"
 #include "utils/LgsErrHandler.h"
 
-bool LgsTypeResolver::resolveGlobalTypes(const std::vector<LgsFile*>& ast) {
+bool LgsTypeResolver::resolveGlobalTypes(const std::vector<LgsFile*>& ast, ThreadPool& pool) {
     bool successful = true;
     for (const auto& file : ast) {
-        if (const auto mf = dynamic_cast<LgsMainFile*>(file)) {
-            for (const auto object : mf->objects) {
-                resolveObjTypes(object, *mf);
+        pool.runTask([this, file, &successful] {
+            if (const auto mf = dynamic_cast<LgsMainFile*>(file)) {
+                resolveMainFileTypes(mf);
+            } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
+                resolveObjTypes(objFile->obj, *objFile);
+            } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
+                resolveInterfaceTypes(interfaceFile->interface, *interfaceFile);
             }
-            for (const auto interface : mf->interfaces) {
-                resolveInterfaceTypes(interface, *mf);
+            {
+                std::lock_guard lock(mtx);
+                successful = successful && errHandler.successful;
             }
-            for (const auto group : mf->groups) {
-                resolveGroupTypes(group, *mf);
-            }
-            for (const auto [_, func] : mf->funcs) {
-                if (dynamic_cast<LgsMainFunc*>(func)) continue;
-                resolveFuncTypes(func->funcType, *mf);
-            }
-        } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
-            resolveObjTypes(objFile->obj, *objFile);
-        } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
-            resolveInterfaceTypes(interfaceFile->interface, *interfaceFile);
-        }
-        successful = successful && errHandler.successful;
+        });
     }
+    pool.wait();
     return successful;
 }
 
@@ -84,11 +78,8 @@ LgsType* LgsTypeResolver::resolveType(LgsType* type, LgsFile* file) {
             newType = symbol->lgsEnum;
             break;
         case VAR_DEC:
-            break;
         case PARAM:
-            break;
         case ENUM_FIELD:
-            break;
         case UNKNOWN:
             break;
         }
@@ -97,6 +88,22 @@ LgsType* LgsTypeResolver::resolveType(LgsType* type, LgsFile* file) {
         type = newType;
     }
     return type;
+}
+
+void LgsTypeResolver::resolveMainFileTypes(LgsMainFile* mf) {
+    for (const auto object : mf->objects) {
+        resolveObjTypes(object, *mf);
+    }
+    for (const auto interface : mf->interfaces) {
+        resolveInterfaceTypes(interface, *mf);
+    }
+    for (const auto group : mf->groups) {
+        resolveGroupTypes(group, *mf);
+    }
+    for (const auto [_, func] : mf->funcs) {
+        if (dynamic_cast<LgsMainFunc*>(func)) continue;
+        resolveFuncTypes(func->funcType, *mf);
+    }
 }
 
 void LgsTypeResolver::resolveObjTypes(LgsObject* obj, LgsFile& file) {

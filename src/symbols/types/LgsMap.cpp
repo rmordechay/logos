@@ -3,15 +3,15 @@
 #include "stmts/LgsVarDec.h"
 
 Value* LgsMap::callAdd(LgsLLVM& codeGen, const std::vector<LgsExpr*>& args) const {
-    const auto arr = args[0];
-    const auto keyIR = args[1]->IRValue;
+    const auto map = args[0];
+    const auto key = args[1];
     const auto value = args[2];
     const auto exprIR = value->IRValue;
-    const auto arrPtr = arr->IRValue;
+    const auto mapPtr = map->IRValue;
     const auto exprTy = value->type;
-    const auto ptr = codeGen.builder.CreateAlloca(exprTy->getIRType(codeGen));
-    codeGen.builder.CreateStore(exprIR, ptr);
-    return addFunc->callIR(codeGen, {arrPtr, keyIR, ptr});
+    const auto valurPtr = codeGen.builder.CreateAlloca(exprTy->getIRType(codeGen));
+    codeGen.builder.CreateStore(exprIR, valurPtr);
+    return addFunc->callIR(codeGen, {mapPtr, key->IRValue, valurPtr});
 }
 
 Type* LgsMap::getIRType(LgsLLVM& codeGen) {

@@ -15,8 +15,6 @@
 #include "llvm/IR/Verifier.h"
 #include <llvm/Target/TargetMachine.h>
 
-extern char **environ;
-
 void LgsApp::run() {
     if (!setup()) exitWithErrors();
     if (!parse()) exitWithErrors();
@@ -59,7 +57,7 @@ bool LgsApp::parse() {
 
 bool LgsApp::analyse() {
     LgsTypeResolver typeResolver(errHandler, globals);
-    if (!typeResolver.resolveGlobalTypes(ast)) {
+    if (!typeResolver.resolveGlobalTypes(ast, threadPool)) {
         return false;
     }
     for (const auto file : ast) {

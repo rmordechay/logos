@@ -4,6 +4,7 @@
 #include "exprs/unary/LgsVariable.h"
 #include "stmts/LgsField.h"
 #include "types/LgsInterface.h"
+#include "types/LgsVec.h"
 
 LgsExpr* LgsSelection::lastExpr() const {
     assert(exprs.size() > 1);
@@ -12,6 +13,21 @@ LgsExpr* LgsSelection::lastExpr() const {
 
 LgsExpr* LgsSelection::lastExprParent() const {
     return exprs[exprs.size() - 2];
+}
+
+void LgsSelection::assign(LgsLLVM& codeGen, LgsExpr* expr) {
+    const auto rIR = expr->IRValue;
+    auto exprParent = lastExprParent();
+    if (exprParent->type->asVec()) {
+        const auto vecTy = exprParent->type->getIRType(codeGen);
+        const auto vec = codeGen.builder.CreateLoad(vecTy, exprParent->IRValue);
+        const auto c = lastExpr()->asVariable()->name;
+        const auto i = codeGen.i32(LgsVec::getComponentIndex(c.front()));
+        const auto insert = codeGen.builder.CreateInsertElement(vec, rIR, i);
+        codeGen.builder.CreateStore(insert, exprParent->IRValue);
+    } else {
+        codeGen.builder.CreateStore(rIR, IRValue);
+    }
 }
 
 std::string LgsSelection::pname() {

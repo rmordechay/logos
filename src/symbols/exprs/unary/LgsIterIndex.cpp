@@ -71,6 +71,68 @@ Value* LgsIterIndex::getStrGEP(LgsLLVM& codeGen) const {
     return codeGen.builder.CreateGEP(ty, value, {codeGen.i32Zero(), iValue});
 }
 
+void LgsIterIndex::assign(LgsLLVM& codeGen, LgsExpr* expr) {
+    if (const auto map = expr->asHashMap()) {
+        assignHashMap(codeGen, map);
+    } else if (const auto arr = expr->asArrayExpr()) {
+        assignArray(codeGen, arr);
+    } else {
+        assignScalar(codeGen, expr);
+    }
+}
+
+void LgsIterIndex::assignArray(LgsLLVM& codeGen, const LgsArrayExpr* arr) const {
+    const auto IRType = baseExpr->type->getIRType(codeGen);
+    const auto arrPtr = baseExpr->IRValue;
+
+    // Flatten the indices and reverse them to use them as indices.
+    std::vector<LgsIndex*> indices;
+    auto iterIndex = this;
+    while (iterIndex) {
+        if (iterIndex->index) indices.push_back(iterIndex->index);
+        iterIndex = baseExpr->asIterIndex();
+    }
+    reverse(indices.begin(), indices.end());
+
+    std::vector<Value*> IRIndices = {codeGen.i32Zero()};
+    for (const auto i : indices) {
+        IRIndices.emplace_back(i->from->IRValue);
+    }
+    for (int i = 0; i < arr->initialElements.size(); ++i) {
+        const auto element = arr->initialElements[i];
+        const auto IRIndex = codeGen.i32(i);
+        IRIndices.push_back(IRIndex);
+        const auto gep = codeGen.builder.CreateGEP(IRType, arrPtr, IRIndices);
+        const auto rValue = element->IRValue;
+        codeGen.builder.CreateStore(rValue, gep);
+        IRIndices.pop_back();
+    }
+}
+
+void LgsIterIndex::assignScalar(LgsLLVM& codeGen, LgsExpr* expr) {
+    const auto rIRValue = expr->IRValue;
+    const auto baseIRValue = baseExpr;
+    if (const auto arr = baseExpr->type->asDArray()) {
+        const auto ptr = codeGen.builder.CreateAlloca(expr->type->getIRType(codeGen));
+        codeGen.builder.CreateStore(rIRValue, ptr);
+        arr->putFunc->callIR(codeGen, {baseIRValue->IRValue, index->from->IRValue, ptr});
+        return;
+    }
+    if (baseExpr->type->asSArray()) {
+        codeGen.builder.CreateStore(rIRValue, loadFromSArray(codeGen));
+        return;
+    }
+    if (const auto map = baseExpr->type->asMap()) {
+        map->addFunc->call(codeGen, {baseExpr, index->from, expr});
+    } else {
+        codeGen.builder.CreateStore(rIRValue, IRValue);
+    }
+}
+
+void LgsIterIndex::assignHashMap(LgsLLVM& codeGen, LgsHashMap* map) {
+    assert(0);
+}
+
 std::string LgsIterIndex::pname() {
     std::stringstream str;
     str << baseExpr->pname();

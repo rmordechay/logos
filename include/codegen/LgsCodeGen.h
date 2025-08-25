@@ -2,6 +2,7 @@
 #include "LgsLLVM.h"
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "files/LgsFile.h"
+#include "logos/LgsStack.h"
 
 class LgsMainFunc;
 class LgsInterfaceFile;
@@ -71,8 +72,8 @@ public:
     void visitLoop(LgsForLoop* loopStmt);
     void visitRangeLoop(LgsRangeLoop* loop);
     void visitForeachLoop(LgsForeachLoop* loop);
-    void visitInfiniteLoop(LgsInfiniteLoop* loop);
-    void visitWhileLoop(LgsWhileLoop* loop);
+    void visitInfiniteLoop(LgsInfiniteLoop* loop) const;
+    void visitWhileLoop(const LgsWhileLoop* loop);
     void visitLoopTerminals(const LgsRangeLoop* loop, Value* iValue);
     void visitStmt(LgsStmt* stmt);
     void visitStmtsBlock(const LgsStmtsBlock* stmtsBlock);
@@ -103,9 +104,9 @@ public:
     void visitPrefixExpr(LgsPrefixExpr* prefixExpr);
     void visitPostfixExpr(LgsPostfixExpr* postfixExpr) const;
     void visitStrConst(LgsStrConst* strConst) const;
+    void visitIterIndex(LgsIterIndex* iterIndex);
     void visitInstance(LgsInstance* instance);
     void initFields(LgsInstance* instance);
-    void visitIterIndex(LgsIterIndex* iterIndex);
 
     // Funcs
     void initMainArgs(LgsMainFunc* mainFunc);
@@ -117,7 +118,7 @@ public:
     Function* getThunkFunc(const LgsFuncCall* fc, Type* ctxTy) const;
 
     // If stmt
-    void generateIf(Value* cond, const std::function<void()>& blockStmtCb);
+    void generateIf(Value* cond, const std::function<void()>& blockStmtCb) const;
 
     // Loops
     Value* loopEnd(const LgsRangeLoop* loop);
@@ -128,10 +129,13 @@ public:
     Value* createDynamicArray(LgsArrayExpr* arrayExpr);
     void setStrIterVars(const LgsForeachLoop* loop, const LgsStr* str) const;
     void setArrIterVars(LgsForeachLoop* loop, LgsDArray* arr) const;
-    void setMapIterVars(const LgsForeachLoop* loop, LgsIterator* iterator) const;
-    void initIterator(LgsIterator* iterator) const;
-    Value* iterNext(LgsIterator* iterator) const;
-    Value* iterHasNext(LgsIterator* iterator) const;
+    void setMapIterVars(const LgsForeachLoop* loop, LgsIterator* iterator);
+    void initIterator(LgsIterator* iterator);
+    Value* iterNext(LgsIterator* iterator);
+    Value* iterHasNext(LgsIterator* iterator);
+
+    // Assignment
+    void createIRAssignment(const LgsAssignment* assignment) const;
 
     // Generic
     Value* getIRValue(LgsValue* value);

@@ -22,6 +22,10 @@ LgsExpr* LgsVariable::castTo(LgsType* toType) {
     return this;
 }
 
+void LgsVariable::assign(LgsLLVM& codeGen, LgsExpr* expr) {
+    codeGen.builder.CreateStore(expr->IRValue, IRValue);
+}
+
 std::string LgsVariable::pname() {
     return name;
 }
