@@ -1,6 +1,4 @@
-#include "codegen/LgsCodeGen.h"
 #include "configs/LgsDefinitions.h"
-#include "exprs/unary/LgsFuncCall.h"
 #include "files/LgsFile.h"
 #include "funcs/LgsFunc.h"
 #include "types/LgsAny.h"
@@ -337,7 +335,7 @@ TargetMachine* LgsLLVM::getTargetMachine() {
     return target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), std::nullopt);
 }
 
-LgsLLVM::~LgsLLVM() {
+void LgsLLVM::finalizeDebugger() {
     if (!diBuilder) return;
     diBuilder->finalize();
     std::error_code EC;
@@ -347,3 +345,4 @@ LgsLLVM::~LgsLLVM() {
     delete diBuilder;
     diBuilder = nullptr;
 }
+

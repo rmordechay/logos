@@ -1,6 +1,5 @@
 #pragma once
-#include "../logos/LgsApp.h"
-#include "../logos/LgsStack.h"
+#include "logos/LgsApp.h"
 
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/LLVMContext.h>
@@ -119,5 +118,5 @@ public:
 
     static void initLLVM();
     static TargetMachine* getTargetMachine();
-    ~LgsLLVM();
+    void finalizeDebugger();
 };

@@ -15,8 +15,6 @@
 #include "types/primitives/LgsShort.h"
 #include "types/primitives/LgsUInt.h"
 
-class LgsShort;
-
 LgsField* LgsType::getField(const std::string& name) {
     for (auto* f : fields) {
         if (f->name == name) return f;
@@ -55,8 +53,14 @@ bool LgsType::isBig() {
     return (asObject() || asDArray()) && getSizeBytes() >= BIG_SIZE_THRESHOLD;
 }
 
-void LgsType::freeValue(LgsLLVM& codeGen, Value* value) {}
-LgsType* LgsType::clone() { if (isPrimitive || isVoid()) return this; assert(0); }
+void LgsType::freeValue(LgsLLVM& codeGen, Value* value) {
+
+}
+
+LgsType* LgsType::clone() {
+    if (isPrimitive) return this; assert(0);
+}
+
 LgsBool* LgsType::asBool() { return dynamic_cast<LgsBool*>(this); }
 LgsChar* LgsType::asChar() { return dynamic_cast<LgsChar*>(this); }
 LgsShort* LgsType::asShort() { return dynamic_cast<LgsShort*>(this); }

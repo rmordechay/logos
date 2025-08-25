@@ -1,6 +1,19 @@
 # Logos Programming Language
 
 ## Build
+### Requirements
+- clang 19
+- LLVM 19
+- antlr4
+- boost
+- cmake
+
+#### Linux
+
+#### Mac
+
+#### Windows
+Not working yet.
 
 ## Basic syntax
 #### Hello world
@@ -13,9 +26,16 @@ main() {
 #### Variable Declaration
 ```
 main() {
+    // Implicit typing
     x = 3
     y = 4
-    z = x
+    z = x + y
+    print(z)
+    
+    // Explicit typing
+    x: Int = 3
+    y: Long = 4
+    z: Float = y / 3
     print(z)
 }
 ```
@@ -32,7 +52,8 @@ main() {
 ```
 
 ### Conditional
-#### If statement
+#### If Statement
+Logos doesn't have 'else if' but uses only 'else + condition'.
 ```
 main() {
     x = 3
@@ -74,8 +95,7 @@ main() {
 
 ### Iteration
 #### Range Loop
-To iterate over an index, use the range loop. The range loop has one variable loop, usually named 'i'. The range
-'for i in n..m' which will iterate m - n times, from n to m - 1.
+To iterate over an index, use the range loop. The range loop has one variable loop, usually named 'i'.
 ```
 main() {
     x = 10
@@ -84,16 +104,7 @@ main() {
     }
 }
 ```
-
-prints:
-```
-5
-6
-7
-8
-9
-```
-
+Or
 ```
 main() {
     x = 10
@@ -114,21 +125,12 @@ main() {
         print(i)
         print(element)
     }
-    for i in arr.len() {
-        print(arr[i])
-    }
 }
 ```
 
 #### Infinite Loop
 ```
 main() {
-    for i {
-        print(i)
-        if i == 10 {
-            break
-        }
-    }
     for {
         print("in infitine loop")
         if true {
@@ -136,4 +138,62 @@ main() {
         } 
     }
 }
+```
+
+#### 'for.isFirst' and 'for.isLast'
+You can hook into the first and last iteration of a loop using special constructs called 'for.isFirst' and 'for.isLast' instead
+of calculating the index yourself.
+```
+main() {
+    for i in 5..x {
+        if for.isFirst {
+            print(i)
+        }
+        if for.isLast {
+            print(i)
+        }
+    }
+}
+```
+Prints:
+```
+5
+9
+```
+
+### Control Flow
+```
+func() {
+    for i in 5..10 {
+        if i > 2 {
+            break
+        }
+        if i == 5 {
+            continue
+        }
+        if i == 9 {
+            return
+        }
+    }
+}
+main() {
+    func()
+}
+```
+You can also break from if statement using 'break if'. This will break from the outermost
+if. For example:
+```
+main() {
+    if true {
+        if true {
+            print("inside nested if")
+            break if
+        }
+        print("inside if")
+    }
+}
+```
+Prints:
+```
+inside nested if
 ```

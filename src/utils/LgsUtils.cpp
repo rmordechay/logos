@@ -3,7 +3,6 @@
 #include "configs/LgsDefinitions.h"
 #include "files/LgsFile.h"
 #include "types/LgsStr.h"
-#include "utils/LgsErrHandler.h"
 
 #define FNV_PRIME 16777619
 #define MAX_STR_HASH_LEN 1024
@@ -81,7 +80,7 @@ std::string removeUnderscores(const std::string& input) {
 
 void freeType(LgsType* type) {
     if (!type) return;
-    if (type->isPrimitive || type->isVoid()) return;
+    if (type->isPrimitive) return;
     if (type->isUnknown()) return;
     delete type;
 }

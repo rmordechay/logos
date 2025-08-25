@@ -5,6 +5,9 @@ class LgsVoid final : public LgsType {
 public:
     static constexpr auto name = "Void";
 
+    LgsVoid() {
+        isPrimitive = true;
+    }
     std::string pname() override;
     llvm::Type* getIRType(LgsLLVM& codeGen) override;
     size_t getSizeBytes() override;
