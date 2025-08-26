@@ -1,5 +1,10 @@
 #pragma once
-#include "stmts/LgsStmt.h"
+#include "loops/LgsLoopMetaVar.h"
+
+class LgsWhileLoop;
+class LgsRangeLoop;
+class LgsInfiniteLoop;
+class LgsForeachLoop;
 
 namespace llvm {
     class BasicBlock;
@@ -13,18 +18,26 @@ class LgsExpr;
 class LgsForLoop : public LgsStmt {
 public:
     std::vector<LgsVarDec*> loopVars;
-    llvm::AllocaInst* iPtr = nullptr;
+    std::map<LgsLoopMetaVarType, LgsLoopMetaVar*> metaVars;
+    AllocaInst* iPtr = nullptr;
+    Value* iValue = nullptr;
     LgsStmtsBlock* stmtsBlock = nullptr;
-    llvm::BasicBlock* IRCondBlock = nullptr;
-    llvm::BasicBlock* IRBodyBlock = nullptr;
-    llvm::BasicBlock* IRExitBlock = nullptr;
-    LgsVarDec* isFirst = nullptr;
-    LgsVarDec* isLast = nullptr;
+    BasicBlock* IRCondBlock = nullptr;
+    BasicBlock* IRBodyBlock = nullptr;
+    BasicBlock* IRExitBlock = nullptr;
+
+    LgsForeachLoop* asForeachLoop();
+    LgsRangeLoop* asRangeLoop();
+    LgsInfiniteLoop* asInfiniteLoop();
+    LgsWhileLoop* asWhileLoop();
 
     virtual void setBlocks(LgsLLVM& codeGen);
-    virtual void incAndJumpToCond(LgsLLVM& codeGen) const;
-    void incIndex(LgsLLVM* codeGen) const;
-    llvm::Value* loadIndex(LgsLLVM& codeGen) const;
+    virtual void incAndJumpToCond(LgsLLVM& codeGen);
+    virtual Value* loopStart(LgsLLVM& codeGen) = 0;
+    virtual Value* loopEnd(LgsLLVM& codeGen) = 0;
+    void incIndex(LgsLLVM* codeGen);
+    Value* loadIndex(LgsLLVM& codeGen) const;
     json::value asJSON() override;
+
     ~LgsForLoop() override;
 };

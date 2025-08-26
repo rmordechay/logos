@@ -3,6 +3,7 @@
 #include "logos/LgsStack.h"
 #include "utils/LgsErrHandler.h"
 #include "analysis/LgsTypeResolver.h"
+#include "loops/LgsLoopMetaVar.h"
 
 class LgsInterfaceFile;
 class LgsObjectFile;
@@ -74,7 +75,7 @@ public:
     void visitBoolPatternMatching(LgsIfStmt* pm);
     void visitWhileLoop(const LgsWhileLoop* whileLoop);
     void visitLoopStmt(LgsForLoop* loopStmt);
-    void visitRangeLoop(const LgsRangeLoop* rangeLoop);
+    void visitRangeLoop(LgsRangeLoop* rangeLoop);
     void visitForeachLoop(LgsForeachLoop* foreachLoop);
     void visitInfiniteLoop(const LgsInfiniteLoop* infiniteLoop);
     void visitCoroutine(const LgsCoroutine* coroutine);
@@ -106,8 +107,7 @@ public:
     void visitIterIndex(LgsIterIndex* iterIndex);
     void visitSlice(LgsIterIndex* iterIndex);
     void visitGroup(LgsGroup* group);
-    void visitForIsFirst(const LgsVariable* variable);
-    void visitForIsLast(const LgsVariable* variable);
+    void visitLoopMetaVar(LgsLoopMetaVar* metaVar);
 
     void validateObjImplements(LgsObject* obj, const std::vector<LgsType*>& interfaces);
     void validateObjInterface(LgsObject* obj, LgsInterface* interface);

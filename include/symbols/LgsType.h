@@ -64,13 +64,14 @@ public:
     virtual std::string pname() = 0; // pretty name
     virtual bool canCastTo(LgsType* other) = 0;
     virtual std::string strFormatPart() const = 0;
-    virtual json::value asJSON() = 0;
-    virtual LgsType* clone();
     virtual llvm::DIBasicType* getDebugType(LgsLLVM& codeGen);
     virtual void freeValue(LgsLLVM& codeGen, llvm::Value* value);
+    virtual LgsType* clone();
+    virtual json::value asJSON() = 0;
 
     bool addField(LgsField* field);
     bool addMethod(LgsFunc* method);
+    bool equals(LgsType* other);
     LgsBool* asBool();
     LgsChar* asChar();
     LgsStr* asStr();

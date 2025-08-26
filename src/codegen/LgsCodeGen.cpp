@@ -163,23 +163,23 @@ void LgsCodeGen::visitParam(LgsParam* param) {
 
 }
 
-void LgsCodeGen::visitLoop(LgsForLoop* loopStmt) {
-    stack.enterScope(loopStmt);
-    loopStmt->setBlocks(cg);
-    if (const auto rangeLoop = dynamic_cast<LgsRangeLoop*>(loopStmt)) {
+void LgsCodeGen::visitLoop(LgsForLoop* loop) {
+    stack.enterScope(loop);
+    loop->setBlocks(cg);
+    if (const auto rangeLoop = dynamic_cast<LgsRangeLoop*>(loop)) {
         visitRangeLoop(rangeLoop);
-    } else if (const auto foreachLoop = dynamic_cast<LgsForeachLoop*>(loopStmt)) {
+    } else if (const auto foreachLoop = dynamic_cast<LgsForeachLoop*>(loop)) {
         visitForeachLoop(foreachLoop);
-    } else if (const auto infiniteLoop = dynamic_cast<LgsInfiniteLoop*>(loopStmt)) {
+    } else if (const auto infiniteLoop = dynamic_cast<LgsInfiniteLoop*>(loop)) {
         visitInfiniteLoop(infiniteLoop);
-    } else if (const auto whileLoop = dynamic_cast<LgsWhileLoop*>(loopStmt)) {
+    } else if (const auto whileLoop = dynamic_cast<LgsWhileLoop*>(loop)) {
         visitWhileLoop(whileLoop);
     } else {
         assert(0);
     }
-    visitStmtsBlock(loopStmt->stmtsBlock);
-    loopStmt->incAndJumpToCond(cg);
-    cg.startBlock(loopStmt->IRExitBlock, currentIRFunc);
+    visitStmtsBlock(loop->stmtsBlock);
+    loop->incAndJumpToCond(cg);
+    cg.startBlock(loop->IRExitBlock, currentIRFunc);
     stack.exitScope();
 }
 
@@ -190,14 +190,15 @@ void LgsCodeGen::visitRangeLoop(LgsRangeLoop* loop) {
 
     // Condition
     cg.startBlock(loop->IRCondBlock, currentIRFunc);
-    const auto iValue = loop->loadIndex(cg);
-    const auto condition = cg.builder.CreateICmpSLT(iValue, loopEnd(loop));
-    visitLoopTerminals(loop, iValue);
+    loop->iValue = loop->loadIndex(cg);
+    const auto condition = cg.builder.CreateICmpSLT(loop->iValue, loopEnd(loop));
     cg.builder.CreateCondBr(condition, loop->IRBodyBlock, loop->IRExitBlock);
 
     // Body
     cg.startBlock(loop->IRBodyBlock, currentIRFunc);
-    loop->loopVars.front()->setIRValue(iValue);
+    if (!loop->loopVars.empty()) {
+        loop->loopVars.front()->setIRValue(loop->iValue);
+    }
 }
 
 void LgsCodeGen::visitForeachLoop(LgsForeachLoop* loop) {
@@ -213,12 +214,12 @@ void LgsCodeGen::visitForeachLoop(LgsForeachLoop* loop) {
         loop->iterPtr = getIRValue(loop->iterExpr);
         setMapIterVars(loop, &iterator);
     } else { // Without iterator
-        auto iValue = loop->loadIndex(cg);
-        const auto loopEnd = iterable->IRLength(cg, loop->iterExpr);
+        loop->iValue = loop->loadIndex(cg);
+        const auto loopEnd = loop->loopEnd(cg);
         if (loopEnd->getType()->isIntegerTy(64)) {
-            iValue = cg.builder.CreateSExt(iValue, cg.i64Ty());
+            loop->iValue = cg.builder.CreateSExt(loop->iValue, cg.i64Ty());
         }
-        const auto condition = cg.builder.CreateICmpSLT(iValue, loopEnd);
+        const auto condition = cg.builder.CreateICmpSLT(loop->iValue, loopEnd);
         cg.builder.CreateCondBr(condition, loop->IRBodyBlock, loop->IRExitBlock);
         cg.startBlock(loop->IRBodyBlock, currentIRFunc);
         loop->iterPtr = getIRValue(loop->iterExpr);
@@ -232,16 +233,8 @@ void LgsCodeGen::visitForeachLoop(LgsForeachLoop* loop) {
     }
 }
 
-void LgsCodeGen::visitInfiniteLoop(LgsInfiniteLoop* loop) const {
-    if (!loop->loopVars.empty()) {
-        loop->iPtr = cg.builder.CreateAlloca(cg.i32Ty());
-        cg.builder.CreateStore(cg.i32Zero(), loop->iPtr);
-    }
+void LgsCodeGen::visitInfiniteLoop(const LgsInfiniteLoop* loop) const {
     cg.branchAndStartBlock(loop->IRBodyBlock, currentIRFunc);
-    if (!loop->loopVars.empty()) {
-        const auto iValue = loop->loadIndex(cg);
-        loop->loopVars.front()->setIRValue(iValue);
-    }
 }
 
 void LgsCodeGen::visitWhileLoop(const LgsWhileLoop* loop) {
@@ -254,13 +247,20 @@ void LgsCodeGen::visitWhileLoop(const LgsWhileLoop* loop) {
     cg.startBlock(loop->IRBodyBlock, currentIRFunc);
 }
 
-void LgsCodeGen::visitLoopTerminals(const LgsRangeLoop* loop, Value* iValue) {
-    if (loop->isFirst) {
-        loop->isFirst->setIRValue(cg.builder.CreateICmpEQ(iValue, loopStart(loop)));
-    }
-    if (loop->isLast) {
-        const auto decremented = cg.builder.CreateSub(loopEnd(loop), cg.i32(1));
-        loop->isLast->setIRValue(cg.builder.CreateICmpEQ(iValue, decremented));
+void LgsCodeGen::visitLoopMetaVar(LgsLoopMetaVar* metaVar) {
+    const auto loop = stack.currentLoop();
+    const auto iValue = loop->iValue;
+    switch (metaVar->varType) {
+    case FOR_I:
+        metaVar->IRValue = iValue;
+        break;
+    case FOR_IS_FIRST:
+        metaVar->setIRValue(cg.builder.CreateICmpEQ(iValue, loop->loopStart(cg)));
+        break;
+    case FOR_IS_LAST:
+        const auto decremented = cg.builder.CreateSub(loop->loopEnd(cg), cg.i32(1));
+        metaVar->setIRValue(cg.builder.CreateICmpEQ(iValue, decremented));
+        break;
     }
 }
 
@@ -548,6 +548,7 @@ void LgsCodeGen::visitUnaryExpr(LgsUnaryExpr* unaryExpr) {
     if (const auto prefixExpr = unaryExpr->asPrefixExpr()) return visitPrefixExpr(prefixExpr);
     if (const auto vecExpr = unaryExpr->asVectorExpr()) return visitVectorExpr(vecExpr);
     if (const auto intConst = unaryExpr->asIntConst()) return visitIntConst(intConst);
+    if (const auto loopMetaVar = unaryExpr->asLoopMetaVar()) return visitLoopMetaVar(loopMetaVar);
     assert(0);
 }
 

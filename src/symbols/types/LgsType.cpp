@@ -30,6 +30,10 @@ LgsFunc* LgsType::getMethod(const std::string& name) {
     return nullptr;
 }
 
+bool LgsType::equals(LgsType* other) {
+    return getName() == other->getName();
+}
+
 DIBasicType* LgsType::getDebugType(LgsLLVM& codeGen) {
     assert(0);
 }

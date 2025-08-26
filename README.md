@@ -140,6 +140,9 @@ main() {
 }
 ```
 
+### Loop Meta Varaibles
+#### 'for.i'
+
 #### 'for.isFirst' and 'for.isLast'
 You can hook into the first and last iteration of a loop using special constructs called 'for.isFirst' and 'for.isLast' instead
 of calculating the index yourself.

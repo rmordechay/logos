@@ -69,12 +69,12 @@ public:
     void visitGroup(LgsGroup* group);
     void visitField(LgsField* field) const;
     void visitParam(LgsParam* param);
-    void visitLoop(LgsForLoop* loopStmt);
+    void visitLoop(LgsForLoop* loop);
     void visitRangeLoop(LgsRangeLoop* loop);
     void visitForeachLoop(LgsForeachLoop* loop);
-    void visitInfiniteLoop(LgsInfiniteLoop* loop) const;
+    void visitInfiniteLoop(const LgsInfiniteLoop* loop) const;
     void visitWhileLoop(const LgsWhileLoop* loop);
-    void visitLoopTerminals(const LgsRangeLoop* loop, Value* iValue);
+    void visitLoopMetaVar(LgsLoopMetaVar* metaVar);
     void visitStmt(LgsStmt* stmt);
     void visitStmtsBlock(const LgsStmtsBlock* stmtsBlock);
     void visitVarDec(LgsVarDec* varDec);

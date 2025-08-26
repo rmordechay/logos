@@ -12,6 +12,7 @@
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
 #include "exprs/unary/LgsIterator.h"
+#include "loops/LgsLoopMetaVar.h"
 
 size_t LgsExpr::getConstInt() {
     if (const auto intConst = asIntConst()) {
@@ -95,6 +96,7 @@ LgsFloatConst* LgsExpr::asFloatConst() { return dynamic_cast<LgsFloatConst*>(thi
 LgsStrConst* LgsExpr::asStrConst() { return dynamic_cast<LgsStrConst*>(this); }
 LgsVectorExpr* LgsExpr::asVectorExpr() { return dynamic_cast<LgsVectorExpr*>(this); }
 LgsIntConst* LgsExpr::asIntConst() { return dynamic_cast<LgsIntConst*>(this); }
+LgsLoopMetaVar* LgsExpr::asLoopMetaVar() { return dynamic_cast<LgsLoopMetaVar*>(this); }
 
 LgsExpr::~LgsExpr() {
     if (type) {

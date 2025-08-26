@@ -24,11 +24,12 @@ public:
     PIPE = 49, CARET = 50, DOUBLE_RANGLE = 51, DOUBLE_LANGLE = 52, SLIDER = 53, 
     OBJECT = 54, SINGLETON = 55, SELF_INSTANCE = 56, SELF_CLASS = 57, INTERFACE = 58, 
     EXTERN = 59, VISIBILITY = 60, IMPLEMENTS = 61, CONST = 62, ENUM = 63, 
-    GO = 64, DEFER = 65, FOR_IS_FIRST = 66, FOR_IS_LAST = 67, FORI = 68, 
-    VEC2 = 69, VEC3 = 70, VEC4 = 71, IF = 72, ELSE = 73, FOR = 74, BREAK = 75, 
-    CONTINUE = 76, RETURN = 77, AND = 78, OR = 79, NOT = 80, IN = 81, LONG = 82, 
-    INTEGER = 83, FLOAT = 84, BOOL = 85, NULL_ = 86, IDENTIFIER = 87, STRING = 88, 
-    TAG = 89, LINE_COMMENT = 90, BLOCK_COMMENT = 91, WS = 92
+    GO = 64, DEFER = 65, FOR_IS_FIRST = 66, FOR_IS_LAST = 67, FOR_I = 68, 
+    VEC2 = 69, VEC3 = 70, VEC4 = 71, IF = 72, WHILE = 73, ELSE = 74, FOR = 75, 
+    BREAK = 76, CONTINUE = 77, RETURN = 78, AND = 79, OR = 80, NOT = 81, 
+    IN = 82, LONG = 83, INTEGER = 84, FLOAT = 85, BOOL = 86, NULL_ = 87, 
+    IDENTIFIER = 88, STRING = 89, TAG = 90, LINE_COMMENT = 91, BLOCK_COMMENT = 92, 
+    WS = 93
   };
 
   enum {
@@ -42,17 +43,17 @@ public:
     RuleStatementsBlock = 27, RuleAssignment = 28, RuleExplicitVarDec = 29, 
     RuleImplicitVarDec = 30, RuleIfStatement = 31, RuleElseIfStatement = 32, 
     RuleElseStatement = 33, RulePatternMatching = 34, RulePattern = 35, 
-    RuleLoopStatement = 36, RuleBreakStmt = 37, RuleReturnStatement = 38, 
-    RuleEnumDeclaration = 39, RuleEnumField = 40, RuleCoroutine = 41, RuleDeferStmt = 42, 
-    RuleExpr = 43, RuleUnaryExpr = 44, RulePrefixExpr = 45, RulePostfixExpr = 46, 
-    RuleArrayExpr = 47, RuleHashMap = 48, RuleKeyValue = 49, RuleFuncCall = 50, 
-    RuleFuncArgList = 51, RuleFuncArg = 52, RuleInstance = 53, RuleInstanceArgList = 54, 
-    RuleInstanceArg = 55, RuleConstant = 56, RuleIterIndex = 57, RuleIndex = 58, 
-    RuleSelection = 59, RuleFirstSelectionElement = 60, RuleInnerSelectionElement = 61, 
-    RuleRange = 62, RuleType = 63, RuleMapType = 64, RuleArraySize = 65, 
-    RuleFuncType = 66, RuleVector = 67, RuleExtern = 68, RuleRequireEnvVars = 69, 
-    RuleRequirePackages = 70, RuleAssignemntOp = 71, RuleJson = 72, RuleJsonObj = 73, 
-    RuleJsonPair = 74, RuleJsonArray = 75
+    RuleLoopStatement = 36, RuleRangeLoop = 37, RuleBreakStmt = 38, RuleReturnStatement = 39, 
+    RuleEnumDeclaration = 40, RuleEnumField = 41, RuleCoroutine = 42, RuleDeferStmt = 43, 
+    RuleExpr = 44, RuleUnaryExpr = 45, RulePrefixExpr = 46, RulePostfixExpr = 47, 
+    RuleArrayExpr = 48, RuleHashMap = 49, RuleKeyValue = 50, RuleFuncCall = 51, 
+    RuleFuncArgList = 52, RuleFuncArg = 53, RuleInstance = 54, RuleInstanceArgList = 55, 
+    RuleInstanceArg = 56, RuleConstant = 57, RuleIterIndex = 58, RuleIndex = 59, 
+    RuleSelection = 60, RuleFirstSelectionElement = 61, RuleInnerSelectionElement = 62, 
+    RuleForVariable = 63, RuleRange = 64, RuleType = 65, RuleMapType = 66, 
+    RuleArraySize = 67, RuleFuncType = 68, RuleVector = 69, RuleExtern = 70, 
+    RuleRequireEnvVars = 71, RuleRequirePackages = 72, RuleAssignemntOp = 73, 
+    RuleJson = 74, RuleJsonObj = 75, RuleJsonPair = 76, RuleJsonArray = 77
   };
 
   explicit LogosParser(antlr4::TokenStream *input);
@@ -109,6 +110,7 @@ public:
   class PatternMatchingContext;
   class PatternContext;
   class LoopStatementContext;
+  class RangeLoopContext;
   class BreakStmtContext;
   class ReturnStatementContext;
   class EnumDeclarationContext;
@@ -134,6 +136,7 @@ public:
   class SelectionContext;
   class FirstSelectionElementContext;
   class InnerSelectionElementContext;
+  class ForVariableContext;
   class RangeContext;
   class TypeContext;
   class MapTypeContext;
@@ -710,25 +713,41 @@ public:
   class  LoopStatementContext : public antlr4::ParserRuleContext {
   public:
     LogosParser::ExprContext *whileExpr = nullptr;
-    LogosParser::RangeContext *iterableRange = nullptr;
     LogosParser::UnaryExprContext *iterableExpr = nullptr;
     LoopStatementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *FOR();
+    antlr4::tree::TerminalNode *WHILE();
     StatementsBlockContext *statementsBlock();
     ExprContext *expr();
+    antlr4::tree::TerminalNode *FOR();
     std::vector<antlr4::tree::TerminalNode *> IDENTIFIER();
     antlr4::tree::TerminalNode* IDENTIFIER(size_t i);
     antlr4::tree::TerminalNode *IN();
-    RangeContext *range();
     UnaryExprContext *unaryExpr();
     std::vector<antlr4::tree::TerminalNode *> COMMA();
     antlr4::tree::TerminalNode* COMMA(size_t i);
+    RangeLoopContext *rangeLoop();
 
    
   };
 
   LoopStatementContext* loopStatement();
+
+  class  RangeLoopContext : public antlr4::ParserRuleContext {
+  public:
+    LogosParser::RangeContext *iterableRange = nullptr;
+    RangeLoopContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *FOR();
+    antlr4::tree::TerminalNode *IDENTIFIER();
+    antlr4::tree::TerminalNode *IN();
+    RangeContext *range();
+    ExprContext *expr();
+
+   
+  };
+
+  RangeLoopContext* rangeLoop();
 
   class  BreakStmtContext : public antlr4::ParserRuleContext {
   public:
@@ -866,9 +885,7 @@ public:
     SelectionContext *selection();
     ArrayExprContext *arrayExpr();
     HashMapContext *hashMap();
-    antlr4::tree::TerminalNode *FORI();
-    antlr4::tree::TerminalNode *FOR_IS_FIRST();
-    antlr4::tree::TerminalNode *FOR_IS_LAST();
+    ForVariableContext *forVariable();
     antlr4::tree::TerminalNode *SELF_INSTANCE();
     antlr4::tree::TerminalNode *SELF_CLASS();
     antlr4::tree::TerminalNode *NULL_();
@@ -1134,6 +1151,19 @@ public:
   };
 
   InnerSelectionElementContext* innerSelectionElement();
+
+  class  ForVariableContext : public antlr4::ParserRuleContext {
+  public:
+    ForVariableContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *FOR_I();
+    antlr4::tree::TerminalNode *FOR_IS_FIRST();
+    antlr4::tree::TerminalNode *FOR_IS_LAST();
+
+   
+  };
+
+  ForVariableContext* forVariable();
 
   class  RangeContext : public antlr4::ParserRuleContext {
   public:

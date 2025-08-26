@@ -34,6 +34,7 @@
 #include "types/LgsNullable.h"
 #include "loops/LgsForeachLoop.h"
 #include "loops/LgsForLoop.h"
+#include "loops/LgsLoopMetaVar.h"
 #include "loops/LgsRangeLoop.h"
 #include "stmts/LgsAssignment.h"
 #include "stmts/LgsIfStmt.h"
@@ -281,26 +282,15 @@ void LgsSema::visitBoolPatternMatching(LgsIfStmt* pm) {
     }
 }
 
-void LgsSema::visitWhileLoop(const LgsWhileLoop* whileLoop) {
-    visitExpr(whileLoop->condExpr);
-    const auto condType = whileLoop->condExpr->type;
-    if (!condType->asBool()) {
-        return errHandler.addError(E10066, &whileLoop->location, {whileLoop->condExpr->pname(), condType->pname()});
-    }
-    visitStmtsBlock(whileLoop->stmtsBlock);
-}
-
 void LgsSema::visitLoopStmt(LgsForLoop* loopStmt) {
     stack.enterScope(loopStmt);
-    if (loopStmt->isFirst) addLocalSymbol(LgsSymbol(loopStmt->isFirst));
-    if (loopStmt->isLast) addLocalSymbol(LgsSymbol(loopStmt->isLast));
-    if (const auto rangeLoop = dynamic_cast<LgsRangeLoop*>(loopStmt)) {
+    if (const auto rangeLoop = loopStmt->asRangeLoop()) {
         visitRangeLoop(rangeLoop);
-    } else if (const auto foreachLoop = dynamic_cast<LgsForeachLoop*>(loopStmt)) {
+    } else if (const auto foreachLoop = loopStmt->asForeachLoop()) {
         visitForeachLoop(foreachLoop);
-    } else if (const auto infiniteLoop = dynamic_cast<LgsInfiniteLoop*>(loopStmt)) {
+    } else if (const auto infiniteLoop = loopStmt->asInfiniteLoop()) {
         visitInfiniteLoop(infiniteLoop);
-    } else if (const auto whileLoop = dynamic_cast<LgsWhileLoop*>(loopStmt)) {
+    } else if (const auto whileLoop = loopStmt->asWhileLoop()) {
         visitWhileLoop(whileLoop);
     } else {
         assert(0);
@@ -308,18 +298,32 @@ void LgsSema::visitLoopStmt(LgsForLoop* loopStmt) {
     stack.exitScope();
 }
 
-void LgsSema::visitRangeLoop(const LgsRangeLoop* rangeLoop) {
+void LgsSema::visitRangeLoop(LgsRangeLoop* rangeLoop) {
     const auto startRange = rangeLoop->startRange;
     const auto endRange = rangeLoop->endRange;
+    assert(endRange);
     visitExpr(startRange);
     visitExpr(endRange);
-    if (startRange && startRange->type && !startRange->type->isNumber) {
-        errHandler.addError(E10002, &startRange->location, {startRange->pname(), startRange->type->pname()});
+    if (endRange->type && !endRange->type->isNumber) {
+        errHandler.addError(E10082, &endRange->location, {endRange->pname(), endRange->type->pname()});
     }
-    if (endRange && endRange->type && !endRange->type->isNumber) {
-        errHandler.addError(E10002, &endRange->location, {endRange->pname(), endRange->type->pname()});
+
+    if (startRange) {
+        if (startRange->type && !startRange->type->isNumber) {
+            errHandler.addError(E10082, &startRange->location, {startRange->pname(), startRange->type->pname()});
+        }
+        if (!startRange->type->equals(endRange->type)) {
+            errHandler.addError(E10081, &startRange->location, {startRange->pname(), endRange->pname()});
+        }
+    } else {
+        rangeLoop->startRange = endRange->type->getZeroValue();
     }
-    addLocalSymbol(LgsSymbol(rangeLoop->loopVars.front()));
+
+    // Range loop can have only one var
+    if (!rangeLoop->loopVars.empty()) {
+        rangeLoop->loopVars.front()->type = endRange->type;
+        addLocalSymbol(LgsSymbol(rangeLoop->loopVars.front()));
+    }
     visitStmtsBlock(rangeLoop->stmtsBlock);
 }
 
@@ -345,6 +349,15 @@ void LgsSema::visitInfiniteLoop(const LgsInfiniteLoop* infiniteLoop) {
         addLocalSymbol(LgsSymbol(infiniteLoop->loopVars.front()));
     }
     visitStmtsBlock(infiniteLoop->stmtsBlock);
+}
+
+void LgsSema::visitWhileLoop(const LgsWhileLoop* whileLoop) {
+    visitExpr(whileLoop->condExpr);
+    const auto condType = whileLoop->condExpr->type;
+    if (!condType->asBool()) {
+        return errHandler.addError(E10066, &whileLoop->location, {whileLoop->condExpr->pname(), condType->pname()});
+    }
+    visitStmtsBlock(whileLoop->stmtsBlock);
 }
 
 void LgsSema::visitCoroutine(const LgsCoroutine* coroutine) {
@@ -422,6 +435,7 @@ void LgsSema::visitUnaryExpr(LgsUnaryExpr* unaryExpr) {
     else if (const auto variable = unaryExpr->asVariable()) visitVariable(variable);
     else if (const auto postfixExpr = unaryExpr->asPostfixExpr()) visitPostfixExpr(postfixExpr);
     else if (const auto prefixExpr = unaryExpr->asPrefixExpr()) visitPrefixExpr(prefixExpr);
+    else if (const auto forVar = unaryExpr->asLoopMetaVar()) visitLoopMetaVar(forVar);
     else if (const auto vecExpr = unaryExpr->asVectorExpr()) visitVector(vecExpr);
 }
 
@@ -544,8 +558,6 @@ void LgsSema::visitVector(const LgsVectorExpr* vec) {
 }
 
 void LgsSema::visitVariable(LgsVariable* variable) {
-    if (variable->name == "for.isFirst") return visitForIsFirst(variable);
-    if (variable->name == "for.isLast") return visitForIsLast(variable);
     const auto symbol = getSymbol(variable->name, &variable->location);
     if (!symbol) return;
     variable->ref.symbolType = symbol->symbolType;
@@ -816,33 +828,30 @@ void LgsSema::visitGroup(LgsGroup* group) {
     }
 }
 
-void LgsSema::visitForIsFirst(const LgsVariable* variable) {
+void LgsSema::visitLoopMetaVar(LgsLoopMetaVar* metaVar) {
     const auto loop = stack.currentLoop();
     if (!loop) {
-        return errHandler.addError(E10060, &variable->location);
+        return errHandler.addError(E10060, &metaVar->location);
     }
-    if (dynamic_cast<LgsWhileLoop*>(loop)) {
-        return errHandler.addError(E10065, &variable->location);
-    }
-    const auto varDec = new LgsVarDec("for.isLast", new LgsIntConst(&LGS_BOOL, false));
-    varDec->isConst = true;
-    loop->isFirst = varDec;
-}
 
-void LgsSema::visitForIsLast(const LgsVariable* variable) {
-    const auto loop = stack.currentLoop();
-    if (!loop) {
-        return errHandler.addError(E10060, &variable->location);
+    const auto name = metaVar->pname();
+    if (loop->asWhileLoop()) {
+        errHandler.addError(E10065, &metaVar->location, {name});
+    } else if (loop->asInfiniteLoop()) {
+        errHandler.addError(E10061, &metaVar->location, {name});
     }
-    if (dynamic_cast<LgsInfiniteLoop*>(loop)) {
-        return errHandler.addError(E10061, &variable->location);
+
+    if (metaVar->varType == FOR_I) {
+        if (const auto rangeLoop = loop->asRangeLoop()) {
+            metaVar->setType(rangeLoop->endRange->type);
+        } else {
+            metaVar->setType(&LGS_INT);
+        }
     }
-    if (dynamic_cast<LgsWhileLoop*>(loop)) {
-        return errHandler.addError(E10065, &variable->location);
+
+    if (loop->metaVars.find(metaVar->varType) == loop->metaVars.end()) {
+        loop->metaVars[metaVar->varType] = metaVar;
     }
-    const auto varDec = new LgsVarDec("for.isLast", new LgsIntConst(&LGS_BOOL, false));
-    varDec->isConst = true;
-    loop->isLast = varDec;
 }
 
 void LgsSema::validateObjImplements(LgsObject* obj, const std::vector<LgsType*>& interfaces) {

@@ -1,19 +1,24 @@
 #include "loops/LgsForLoop.h"
 #include "configs/LgsDefinitions.h"
 #include "codegen/LgsLLVM.h"
+#include "loops/LgsForeachLoop.h"
+#include "loops/LgsInfiniteLoop.h"
+#include "loops/LgsRangeLoop.h"
+#include "loops/LgsWhileLoop.h"
 #include "stmts/LgsStmtsBlock.h"
 #include "stmts/LgsVarDec.h"
 
-json::value LgsForLoop::asJSON() {
-    assert(0);
-}
+LgsForeachLoop* LgsForLoop::asForeachLoop() { return dynamic_cast<LgsForeachLoop*>(this);}
+LgsRangeLoop* LgsForLoop::asRangeLoop() { return dynamic_cast<LgsRangeLoop*>(this);}
+LgsInfiniteLoop* LgsForLoop::asInfiniteLoop() { return dynamic_cast<LgsInfiniteLoop*>(this);}
+LgsWhileLoop* LgsForLoop::asWhileLoop() { return dynamic_cast<LgsWhileLoop*>(this);}
 
 Value* LgsForLoop::loadIndex(LgsLLVM& codeGen) const {
     return codeGen.builder.CreateLoad(codeGen.i32Ty(), iPtr);
 }
 
-void LgsForLoop::incIndex(LgsLLVM* codeGen) const {
-    const auto iValue = loadIndex(*codeGen);
+void LgsForLoop::incIndex(LgsLLVM* codeGen) {
+    iValue = loadIndex(*codeGen);
     const auto inc = codeGen->builder.CreateAdd(iValue, codeGen->i32(1));
     codeGen->builder.CreateStore(inc, iPtr);
 }
@@ -24,21 +29,17 @@ void LgsForLoop::setBlocks(LgsLLVM& codeGen) {
     IRCondBlock = codeGen.createBlock(BLOCK_NAME_LOOP_COND);
 }
 
-void LgsForLoop::incAndJumpToCond(LgsLLVM& codeGen) const {
+void LgsForLoop::incAndJumpToCond(LgsLLVM& codeGen) {
     if (codeGen.lastInstTerminator()) return;
     incIndex(&codeGen);
     codeGen.builder.CreateBr(IRCondBlock);
 }
 
+json::value LgsForLoop::asJSON() {
+    assert(0);
+}
+
 LgsForLoop::~LgsForLoop() {
-    if (isFirst) {
-        delete isFirst;
-        isFirst = nullptr;
-    }
-    if (isLast) {
-        delete isLast;
-        isLast = nullptr;
-    }
     if (stmtsBlock) {
         delete stmtsBlock;
         stmtsBlock = nullptr;

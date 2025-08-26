@@ -11,6 +11,8 @@ public:
     LgsUnaryExpr* iterExpr = nullptr;
 
     explicit LgsForeachLoop(LgsUnaryExpr* iterable) : iterExpr(iterable) {}
+    Value* loopStart(LgsLLVM& codeGen) override;
+    Value* loopEnd(LgsLLVM& codeGen) override;
     ~LgsForeachLoop() override;
 };
 

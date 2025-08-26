@@ -1,5 +1,7 @@
 #pragma once
-#include "exprs/LgsExpr.h"
+
+class LgsExpr;
+class LgsLLVM;
 
 class LgsAssignable {
 public:

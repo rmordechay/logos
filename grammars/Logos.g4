@@ -157,10 +157,15 @@ pattern:
     ;
 
 loopStatement:
-        FOR whileExpr=expr statementsBlock
-    |   FOR IDENTIFIER IN iterableRange=range statementsBlock
+        WHILE whileExpr=expr statementsBlock
     |   FOR IDENTIFIER (COMMA IDENTIFIER)* COMMA? IN iterableExpr=unaryExpr statementsBlock
-    |   FOR IDENTIFIER? statementsBlock
+    |   FOR statementsBlock
+    |   rangeLoop statementsBlock
+    ;
+
+rangeLoop:
+        FOR IDENTIFIER IN iterableRange=range
+    |   FOR expr
     ;
 
 breakStmt:
@@ -213,9 +218,7 @@ unaryExpr:
     |   selection
     |   arrayExpr
     |   hashMap
-    |   FORI
-    |   FOR_IS_FIRST
-    |   FOR_IS_LAST
+    |   forVariable
     |   SELF_INSTANCE
     |   SELF_CLASS
     |   NULL
@@ -304,10 +307,15 @@ innerSelectionElement:
     |   IDENTIFIER
     ;
 
+forVariable:
+        FOR_I
+    |   FOR_IS_FIRST
+    |   FOR_IS_LAST
+    ;
+
 range:
         start=expr DOUBLE_DOT end=expr
     |   DOUBLE_DOT end=expr
-    |   start=expr DOUBLE_DOT
     ;
 
 type:
@@ -450,13 +458,14 @@ GO: 'go';
 DEFER: 'defer';
 FOR_IS_FIRST: 'for.isFirst';
 FOR_IS_LAST: 'for.isLast';
-FORI: 'for.i';
+FOR_I: 'for.i';
 
 VEC2: 'vec2';
 VEC3: 'vec3';
 VEC4: 'vec4';
 
 IF: 'if';
+WHILE: 'while';
 ELSE: 'else';
 FOR: 'for';
 BREAK: 'break';

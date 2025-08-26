@@ -37,24 +37,26 @@ llvm_map_components_to_libnames(LLVM_LIBS
 set(CORE_SOURCES
     src/logos/LgsApp.cpp
     src/logos/LgsStack.cpp
-    src/codegen/LgsLinker.cpp
     src/logos/LgsPaths.cpp
+    src/codegen/LgsLinker.cpp
+    src/codegen/LgsCodeGen.cpp
+    src/codegen/LgsLLVM.cpp
     src/analysis/LgsParserAdapter.cpp
     src/analysis/LgsSema.cpp
     src/analysis/LgsTypeResolver.cpp
+    src/files/LgsMainFile.cpp
+    src/files/LgsTestFile.cpp
+    src/files/LgsObjectFile.cpp
+    src/files/LgsInterfaceFile.cpp
+    src/parser/LogosLexer.cpp
+    src/parser/LogosParser.cpp
     src/cli/LgsCli.cpp
     src/cli/LgsCliCmd.cpp
     src/cli/LgsRunCmd.cpp
     src/cli/LgsAstCmd.cpp
     src/lgsc/LgsCLang.cpp
     src/lgsc/LgsCLangVisitor.cpp
-    src/files/LgsMainFile.cpp
-    src/files/LgsObjectFile.cpp
-    src/parser/LogosLexer.cpp
-    src/parser/LogosParser.cpp
     src/utils/LgsUtils.cpp
-    src/codegen/LgsLLVM.cpp
-    src/files/LgsInterfaceFile.cpp
     src/utils/LgsErrHandler.cpp
 
     src/symbols/LgsSymbol.cpp
@@ -88,6 +90,7 @@ set(CORE_SOURCES
     src/symbols/loops/LgsInfiniteLoop.cpp
     src/symbols/loops/LgsRangeLoop.cpp
     src/symbols/loops/LgsWhileLoop.cpp
+    src/symbols/loops/LgsForVariables.cpp
     src/symbols/stmts/LgsAssignment.cpp
     src/symbols/stmts/LgsBreak.cpp
     src/symbols/stmts/LgsContinue.cpp
@@ -124,10 +127,6 @@ set(CORE_SOURCES
     src/symbols/types/primitives/LgsShort.cpp
     src/symbols/types/primitives/LgsSize.cpp
     src/symbols/types/primitives/LgsUInt.cpp
-    src/codegen/LgsCodeGen.cpp
-    include/codegen/LgsCodeGen.h
-    src/files/LgsTestFile.cpp
-    include/files/LgsTestFile.h
 )
 
 set(RUNTIME_SOURCES
@@ -139,9 +138,6 @@ set(RUNTIME_SOURCES
     runtime/lib/Lgs_scheduler.cpp
     runtime/lib/Lgs_stack.cpp
     runtime/lib/Lgs_print.cpp
-    include/logos/LgsAppConfigs.h
-    include/symbols/LgsMock.h
-    include/symbols/LgsAssignable.h
 )
 
 add_library(lgs_core SHARED ${CORE_SOURCES} ${RUNTIME_SOURCES})

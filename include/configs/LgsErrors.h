@@ -80,11 +80,11 @@ inline LgsBaseError E10057{.msg = "Pattern matching expression '%s' must be of t
 inline LgsBaseError E10058{.msg = "Field '%s' is defined in multiple interfaces: '%s'.", .errCode = errCodeStart++};
 inline LgsBaseError E10059{.msg = "Unreachable code.", .errCode = errCodeStart++};
 inline LgsBaseError E10060{.msg = "'for.isFirst' and 'for.isLast' are only allowed inside a for loop.", .errCode = errCodeStart++};
-inline LgsBaseError E10061{.msg = "'for.isLast' is not allowed in an infinite loop.", .errCode = errCodeStart++};
+inline LgsBaseError E10061{.msg = "'%s' is not allowed in an infinite loop.", .errCode = errCodeStart++};
 inline LgsBaseError E10062{.msg = "Interface '%s' implements all its methods which is not allowed. Make at least one of the methods abstract (without implementation) or change it to 'object'", .errCode = errCodeStart++};
 inline LgsBaseError E10063{.msg = "Interfaces must have at least one (abstract) method or field.", .errCode = errCodeStart++};
 inline LgsBaseError E10064{.msg = "'%s' is already defined in '%s'.", .errCode = errCodeStart++};
-inline LgsBaseError E10065{.msg = "'for.isFirst' and 'for.isLast' are not allowed in a while loop.", .errCode = errCodeStart++};
+inline LgsBaseError E10065{.msg = "'%s' is not allowed in a while loop.", .errCode = errCodeStart++};
 inline LgsBaseError E10066{.msg = "While loop condition '%s' must be of type Bool. Given: '%s'.", .errCode = errCodeStart++};
 inline LgsBaseError E10067{.msg = "'%s' was not found.", .errCode = errCodeStart++};
 inline LgsBaseError E10068{.msg = "App version must be in the form of '1.0.0'. Given: '%s'.", .errCode = errCodeStart++};
@@ -95,3 +95,5 @@ inline LgsBaseError E10072{.msg = "Type '%s' has multiple methods with the same 
 inline LgsBaseError E10078{.msg = "Type '%s' has multiple methods with the same name '%s'.", .errCode = errCodeStart++};
 inline LgsBaseError E10079{.msg = "Defer functions must return 'Void'. Given: '%s'.", .errCode = errCodeStart++};
 inline LgsBaseError E10080{.msg = "Index '%s' was not found in iterable.", .errCode = errCodeStart++};
+inline LgsBaseError E10081{.msg = "Range-start type '%s' is not equal to the range-end type '%s'.", .errCode = errCodeStart++};
+inline LgsBaseError E10082{.msg = "Loop range '%s' must be a number. Given: '%s'.", .errCode = errCodeStart++};

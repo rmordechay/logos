@@ -10,7 +10,7 @@ Value* LgsVariable::loadIR(LgsLLVM& codeGen) {
     case PARAM:
         return ref.param->loadIR(codeGen);
     case VAR_DEC:
-        return ref.varDec->expr->loadIR(codeGen);
+        return ref.varDec->loadIR(codeGen);
     default:
         assert(0);
     }

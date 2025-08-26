@@ -1,9 +1,13 @@
 #include "loops/LgsForeachLoop.h"
-#include "exprs/unary/LgsIterIndex.h"
-#include "stmts/LgsVarDec.h"
-#include "types/LgsDArray.h"
-#include "exprs/unary/LgsIterator.h"
 #include "types/LgsMap.h"
+
+Value* LgsForeachLoop::loopStart(LgsLLVM& codeGen) {
+    return codeGen.i32Zero();
+}
+
+Value* LgsForeachLoop::loopEnd(LgsLLVM& codeGen) {
+    return iterExpr->type->asIterable()->IRLength(codeGen, iterExpr);
+}
 
 LgsForeachLoop::~LgsForeachLoop() {
     if (iterExpr) {

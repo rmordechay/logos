@@ -47,6 +47,10 @@
 #include "types/primitives/LgsSize.h"
 #include "types/primitives/LgsUInt.h"
 #include "utils/LgsUtils.h"
+
+#include <LogosParser.h>
+#include <LogosParser.h>
+#include <loops/LgsLoopMetaVar.h>
 #include <loops/LgsForeachLoop.h>
 #include <loops/LgsRangeLoop.h>
 #include <loops/LgsWhileLoop.h>
@@ -444,16 +448,16 @@ LgsStmt* LgsParserAdapter::getDeferStmt(LogosParser::DeferStmtContext* ctx) {
 }
 
 LgsStmt* LgsParserAdapter::getStmt(LogosParser::StatementContext* ctx) {
+    if (const auto expr = ctx->expr()) return getExpr(expr);
+    if (const auto ifStmt = ctx->ifStatement()) return getIfStatement(ifStmt);
     if (const auto fieldDef = ctx->assignment()) return getAssignment(fieldDef);
     if (const auto implicitVarDec = ctx->implicitVarDec()) return getImplicitVarDec(implicitVarDec);
     if (const auto explicitVarDec = ctx->explicitVarDec()) return getExplicitVarDec(explicitVarDec);
-    if (const auto coroutine = ctx->coroutine()) return getCoroutine(coroutine);
-    if (const auto deferStmt = ctx->deferStmt()) return getDeferStmt(deferStmt);
-    if (const auto ifStmt = ctx->ifStatement()) return getIfStatement(ifStmt);
     if (const auto patternMatching = ctx->patternMatching()) return getPatternMatching(patternMatching);
     if (const auto loopStmt = ctx->loopStatement()) return getForLoop(loopStmt);
+    if (const auto coroutine = ctx->coroutine()) return getCoroutine(coroutine);
+    if (const auto deferStmt = ctx->deferStmt()) return getDeferStmt(deferStmt);
     if (const auto returnStmt = ctx->returnStatement()) return getReturnStmt(returnStmt);
-    if (const auto expr = ctx->expr()) return getExpr(expr);
     if (const auto breakStmt = ctx->breakStmt()) return getBreakStmt(breakStmt);
     if (ctx->CONTINUE()) return getContinueStmt(ctx);
     assert(0);
@@ -651,9 +655,9 @@ LgsForLoop* LgsParserAdapter::getForLoop(LogosParser::LoopStatementContext* ctx)
     LgsForLoop* loopStmt = nullptr;
     if (ctx->iterableExpr) {
         loopStmt = getForeachLoop(ctx);
-    } else if (ctx->iterableRange) {
-        loopStmt = getRangeLoop(ctx);
-    } else if (ctx->whileExpr) {
+    } else if (ctx->rangeLoop()) {
+        loopStmt = getRangeLoop(ctx->rangeLoop());
+    } else if (ctx->WHILE()) {
         loopStmt = getWhileLoop(ctx);
     } else {
         loopStmt = getInfiniteLoop(ctx);
@@ -663,16 +667,17 @@ LgsForLoop* LgsParserAdapter::getForLoop(LogosParser::LoopStatementContext* ctx)
     return loopStmt;
 }
 
-LgsForLoop* LgsParserAdapter::getRangeLoop(LogosParser::LoopStatementContext* ctx) {
-    const auto startExpr = getExpr(ctx->iterableRange->start);
-    const auto endExpr = getExpr(ctx->iterableRange->end);
-    const auto rangeLoop = new LgsRangeLoop(startExpr, endExpr);
-    const auto loopVarToken = ctx->IDENTIFIER().front();
-    const auto loopVarName = loopVarToken->getText();
-    auto varDec = getVarDec(loopVarToken, true, LGS_INT.getZeroValue());
-    varDec->type = &LGS_INT;
-    varDec->expr->location = varDec->location;
-    rangeLoop->loopVars.emplace_back(varDec);
+LgsForLoop* LgsParserAdapter::getRangeLoop(LogosParser::RangeLoopContext* ctx) {
+    LgsRangeLoop* rangeLoop = nullptr;
+    if (ctx->expr()) {
+        rangeLoop = new LgsRangeLoop(nullptr, getExpr(ctx->expr()));
+    } else {
+        rangeLoop = new LgsRangeLoop(getExpr(ctx->iterableRange->start), getExpr(ctx->iterableRange->end));
+        const auto loopVarToken = ctx->IDENTIFIER();
+        const auto loopVarName = loopVarToken->getText();
+        rangeLoop->loopVars.emplace_back(getVarDec(loopVarToken, true));
+    }
+    setLocation(rangeLoop->location, ctx->start);
     return rangeLoop;
 }
 
@@ -694,14 +699,9 @@ LgsForLoop* LgsParserAdapter::getWhileLoop(const LogosParser::LoopStatementConte
     return whileLoop;
 }
 
-LgsForLoop* LgsParserAdapter::getInfiniteLoop(LogosParser::LoopStatementContext* ctx) const {
+LgsForLoop* LgsParserAdapter::getInfiniteLoop(const LogosParser::LoopStatementContext* ctx) const {
     const auto rangeLoop = new LgsInfiniteLoop();
-    if (!ctx->IDENTIFIER().empty()) {
-        const auto idToken = ctx->IDENTIFIER().front();
-        const auto loopVarName = idToken->getText();
-        const auto varDec = getVarDec(idToken, true, LGS_INT.getZeroValue());
-        rangeLoop->loopVars.push_back(varDec);
-    }
+    setLocation(rangeLoop->location, ctx->start);
     return rangeLoop;
 }
 
@@ -746,11 +746,10 @@ LgsUnaryExpr* LgsParserAdapter::getUnaryExpr(LogosParser::UnaryExprContext* ctx)
     if (const auto hashMap = ctx->hashMap()) return getHashMap(hashMap);
     if (const auto iterIndex = ctx->iterIndex()) return getIterIndex(iterIndex);
     if (const auto selection = ctx->selection()) return getSelection(selection);
+    if (const auto isFirst = ctx->forVariable()) return getLoopMetaVar(isFirst);
     if (const auto func = ctx->lambda()) return getLambda(func);
     if (const auto vector = ctx->vector()) return getVector(vector);
     if (const auto null = ctx->NULL_()) return getNullValue(null);
-    if (const auto isFirst = ctx->FOR_IS_FIRST()) return getLoopIsFirst(isFirst);
-    if (const auto isLast = ctx->FOR_IS_LAST()) return getLoopIsLast(isLast);
     if (const auto json = ctx->json()) return getJSON(json);
     assert(0);
 }
@@ -1039,15 +1038,20 @@ LgsUnaryExpr* LgsParserAdapter::getNullValue(const antlr4::tree::TerminalNode* c
     return lgsNull;
 }
 
-LgsUnaryExpr* LgsParserAdapter::getLoopIsFirst(antlr4::tree::TerminalNode* ctx) const {
-    const auto var = new LgsVariable(ctx->getText(), &LGS_BOOL);
-    setLocation(var->location, ctx->getSymbol());
-    return var;
-}
-
-LgsUnaryExpr* LgsParserAdapter::getLoopIsLast(antlr4::tree::TerminalNode* ctx) const {
-    const auto var = new LgsVariable(ctx->getText(), &LGS_BOOL);
-    setLocation(var->location, ctx->getSymbol());
+LgsUnaryExpr* LgsParserAdapter::getLoopMetaVar(LogosParser::ForVariableContext* ctx) const {
+    LgsLoopMetaVar* var;
+    if (ctx->FOR_I()) {
+        var = new LgsLoopMetaVar(FOR_I);
+    } else if (ctx->FOR_IS_FIRST()) {
+        var = new LgsLoopMetaVar(FOR_IS_FIRST);
+        var->type = &LGS_BOOL;
+    } else if (ctx->FOR_IS_LAST()) {
+        var = new LgsLoopMetaVar(FOR_IS_LAST);
+        var->type = &LGS_BOOL;
+    } else {
+        assert(0);
+    }
+    setLocation(var->location, ctx->start);
     return var;
 }
 
