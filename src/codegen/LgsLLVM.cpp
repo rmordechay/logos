@@ -108,7 +108,7 @@ Value* LgsLLVM::callLgsFunc(const std::string& funcName, FunctionType* ft, const
 }
 
 Value* LgsLLVM::callMalloc(const size_t size) {
-    return builder.CreateMalloc(sizeTy(), sizeTy(), isize(size), nullptr);
+    return builder.CreateMalloc(sizeTy(), sizeTy(), usize(size), nullptr);
 }
 
 Value* LgsLLVM::callPrintf(const std::vector<Value*>& args) {
@@ -282,7 +282,7 @@ Constant* LgsLLVM::doublev(const double_t v) {
     return ConstantFP::get(doubleTy(), v);
 }
 
-ConstantInt* LgsLLVM::isize(const size_t v) {
+ConstantInt* LgsLLVM::usize(const size_t v) {
     return ConstantInt::get(sizeTy(), v);
 }
 

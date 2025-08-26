@@ -76,7 +76,7 @@ public:
     void visitWhileLoop(const LgsWhileLoop* whileLoop);
     void visitLoopStmt(LgsForLoop* loopStmt);
     void visitRangeLoop(LgsRangeLoop* rangeLoop);
-    void visitForeachLoop(LgsForeachLoop* foreachLoop);
+    void visitForeachLoop(const LgsForeachLoop* foreachLoop);
     void visitInfiniteLoop(const LgsInfiniteLoop* infiniteLoop);
     void visitCoroutine(const LgsCoroutine* coroutine);
     void visitReturnStmt(LgsReturn* returnStmt);
@@ -120,7 +120,7 @@ public:
 
     void resolveFuncCall(LgsFuncCall* funcCall);
     bool resolveMethodCall(LgsFuncCall* methodCall, LgsType* parentType);
-    bool resolveLoopVars(LgsForeachLoop* foreachLoop, LgsUnaryExpr* iterExpr, const LgsIterable* iterable);
+    bool resolveForeachVars(const LgsForeachLoop* foreachLoop, LgsUnaryExpr* iterExpr, const LgsIterable* iterable);
     void resolveScalars(const LgsVariable* fieldVar, LgsVec* vec);
     void checkMock(const LgsSelection* selection);
     LgsSymbol* getSymbol(const std::string& name, const LgsLocation* location);

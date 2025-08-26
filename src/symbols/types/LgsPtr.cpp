@@ -39,7 +39,7 @@ bool LgsPtr::canCastTo(LgsType* other) {
 }
 
 std::string LgsPtr::strFormatPart() const {
-    return "%p";
+    return baseType->strFormatPart();
 }
 
 LgsPtr::~LgsPtr() {

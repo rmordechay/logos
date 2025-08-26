@@ -1,0 +1,24 @@
+object File
+name: Str
+
+io {
+    open(name: Str): File {
+        return File(name)
+    }
+    close() {
+        closeFile(self.name)
+    }
+}
+
+foo() {
+    io file = self.open("fd") {
+        a: Str
+        if file.name == "fome" {
+            return
+        } else {
+            a = "bal"
+        }
+        line = file.read()
+        print(line)
+    }
+}

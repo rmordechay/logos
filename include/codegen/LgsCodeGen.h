@@ -120,16 +120,9 @@ public:
     // If stmt
     void generateIf(Value* cond, const std::function<void()>& blockStmtCb) const;
 
-    // Loops
-    Value* loopEnd(const LgsRangeLoop* loop);
-    Value* loopStart(const LgsRangeLoop* loop);
-
     // Iterables
     Value* createConstArray(const LgsArrayExpr* arrayExpr);
     Value* createDynamicArray(LgsArrayExpr* arrayExpr);
-    void setStrIterVars(const LgsForeachLoop* loop, const LgsStr* str) const;
-    void setArrIterVars(LgsForeachLoop* loop, LgsDArray* arr) const;
-    void setMapIterVars(const LgsForeachLoop* loop, LgsIterator* iterator);
     void initIterator(LgsIterator* iterator);
     Value* iterNext(LgsIterator* iterator);
     Value* iterHasNext(LgsIterator* iterator);

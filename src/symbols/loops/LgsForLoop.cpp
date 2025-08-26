@@ -14,12 +14,12 @@ LgsInfiniteLoop* LgsForLoop::asInfiniteLoop() { return dynamic_cast<LgsInfiniteL
 LgsWhileLoop* LgsForLoop::asWhileLoop() { return dynamic_cast<LgsWhileLoop*>(this);}
 
 Value* LgsForLoop::loadIndex(LgsLLVM& codeGen) const {
-    return codeGen.builder.CreateLoad(codeGen.i32Ty(), iPtr);
+    return codeGen.builder.CreateLoad(codeGen.sizeTy(), iPtr);
 }
 
 void LgsForLoop::incIndex(LgsLLVM* codeGen) {
     iValue = loadIndex(*codeGen);
-    const auto inc = codeGen->builder.CreateAdd(iValue, codeGen->i32(1));
+    const auto inc = codeGen->builder.CreateAdd(iValue, codeGen->usize(1));
     codeGen->builder.CreateStore(inc, iPtr);
 }
 

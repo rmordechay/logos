@@ -1,0 +1,28 @@
+main() {
+    for i in ..10 {
+        print(i)
+        print(for.i)
+    }
+    for 10 {
+        print(for.i)
+        print(for.isFirst)
+        print(for.isLast)
+    }
+    arr = ["234", "235", "873"]
+    for i in arr {
+        print(i)
+        print(for.i)
+        print(for.isFirst)
+        print(for.isLast)
+    }
+    for {
+        // for.i not allowed
+        // for.isFirst not allowed
+        // for.isLast not allowed
+    }
+    while true {
+        // for.i not allowed
+        // for.isFirst not allowed
+        // for.isLast not allowed
+    }
+}

@@ -42,7 +42,7 @@ uint16_t LgsVec::getUnpackCount() const {
 }
 
 Value* LgsVec::IRLength(LgsLLVM& codeGen, LgsExpr* iterable) {
-    return codeGen.isize(2);
+    return codeGen.usize(2);
 }
 
 Value* LgsVec::IRIsEmpty(LgsLLVM* codeGen, LgsExpr* iterable) {

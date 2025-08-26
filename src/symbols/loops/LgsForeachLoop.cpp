@@ -2,7 +2,7 @@
 #include "types/LgsMap.h"
 
 Value* LgsForeachLoop::loopStart(LgsLLVM& codeGen) {
-    return codeGen.i32Zero();
+    return codeGen.sizeZero();
 }
 
 Value* LgsForeachLoop::loopEnd(LgsLLVM& codeGen) {

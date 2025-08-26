@@ -1,15 +1,27 @@
 #include "stmts/LgsVarDec.h"
 #include "exprs/unary/LgsArrayExpr.h"
+#include "types/LgsPtr.h"
 #include "utils/LgsUtils.h"
 
 #include <llvm/IR/DIBuilder.h>
 
-json::value LgsVarDec::asJSON() {
-    json::object obj;
-    obj["stmtKind"] = "VarDec";
-    obj["type"] = type->asJSON();
-    obj["expr"] = expr->asJSON();
-    return obj;
+Value* LgsVarDec::loadIR(LgsLLVM& codeGen) {
+    if (const auto ptr = type->asPtr()) {
+        return codeGen.builder.CreateLoad(ptr->baseType->getIRType(codeGen), IRValue);
+    }
+    return IRValue;
+}
+
+bool LgsVarDec::shouldAllocate(const Type* IRType) const {
+    if (type->isNumber ||
+        type->isVector() ||
+        type->asFuncType() ||
+        type->asMap() ||
+        type->asDArray() ||
+        expr->asInstance() ||
+        (expr->asFuncCall() && type->isNumber)
+    ) return false;
+    return !IRType->isArrayTy() && !IRType->isPointerTy() && !IRType->isVoidTy();
 }
 
 void LgsVarDec::setDebugValue(LgsLLVM& codeGen) {
@@ -29,16 +41,12 @@ void LgsVarDec::setDebugValue(LgsLLVM& codeGen) {
     );
 }
 
-bool LgsVarDec::shouldAllocate(const Type* IRType) const {
-    if (type->isNumber ||
-        type->isVector() ||
-        type->asFuncType() ||
-        type->asMap() ||
-        type->asDArray() ||
-        expr->asInstance() ||
-        (expr->asFuncCall() && type->isNumber)
-    ) return false;
-    return !IRType->isArrayTy() && !IRType->isPointerTy() && !IRType->isVoidTy();
+json::value LgsVarDec::asJSON() {
+    json::object obj;
+    obj["stmtKind"] = "VarDec";
+    obj["type"] = type->asJSON();
+    obj["expr"] = expr->asJSON();
+    return obj;
 }
 
 LgsVarDec::~LgsVarDec() {

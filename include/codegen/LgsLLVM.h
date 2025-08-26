@@ -104,7 +104,7 @@ public:
     ConstantInt* i64(int64_t v);
     Constant* floatv(float_t v);
     Constant* doublev(double_t v);
-    ConstantInt* isize(size_t v);
+    ConstantInt* usize(size_t v);
     ConstantInt* i32Zero();
     ConstantInt* i64Zero();
     ConstantInt* sizeZero();

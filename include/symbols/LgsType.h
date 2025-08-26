@@ -91,7 +91,7 @@ public:
     LgsSArray* asSArray();
     LgsVec* asVec();
     LgsFuncType* asFuncType();
-    LgsPtr* asCPtr();
+    LgsPtr* asPtr();
     LgsGroup* asGroup();
     LgsTypePair* asPair();
     bool isVector();

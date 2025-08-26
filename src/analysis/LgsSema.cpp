@@ -38,6 +38,7 @@
 #include "loops/LgsRangeLoop.h"
 #include "stmts/LgsAssignment.h"
 #include "stmts/LgsIfStmt.h"
+#include "types/LgsPtr.h"
 #include "types/primitives/LgsDouble.h"
 
 void LgsSema::analyse() {
@@ -327,7 +328,7 @@ void LgsSema::visitRangeLoop(LgsRangeLoop* rangeLoop) {
     visitStmtsBlock(rangeLoop->stmtsBlock);
 }
 
-void LgsSema::visitForeachLoop(LgsForeachLoop* foreachLoop) {
+void LgsSema::visitForeachLoop(const LgsForeachLoop* foreachLoop) {
     const auto iterExpr = foreachLoop->iterExpr;
     visitUnaryExpr(iterExpr);
     const auto iterable = iterExpr->type->asIterable();
@@ -337,7 +338,7 @@ void LgsSema::visitForeachLoop(LgsForeachLoop* foreachLoop) {
         }
         return;
     }
-    if (resolveLoopVars(foreachLoop, iterExpr, iterable)) return;
+    if (!resolveForeachVars(foreachLoop, iterExpr, iterable)) return;
     for (const auto varDec : foreachLoop->loopVars) {
         addLocalSymbol(LgsSymbol(varDec));
     }
@@ -869,26 +870,20 @@ void LgsSema::validateObjImplements(LgsObject* obj, const std::vector<LgsType*>&
     }
 }
 
-bool LgsSema::resolveLoopVars(LgsForeachLoop* foreachLoop, LgsUnaryExpr* iterExpr, const LgsIterable* iterable) {
+bool LgsSema::resolveForeachVars(const LgsForeachLoop* foreachLoop, LgsUnaryExpr* iterExpr, const LgsIterable* iterable) {
     const auto varDecSize = foreachLoop->loopVars.size();
     const auto unpackCount = iterable->getUnpackCount();
-    foreachLoop->withIndex = unpackCount + 1 == varDecSize;
-    const bool withIndex = foreachLoop->withIndex;
-    if (withIndex) {
-        foreachLoop->loopVars[0]->type = &LGS_INT;
-        foreachLoop->loopVars[0]->expr = LGS_INT.getZeroValue();
-    } else if (unpackCount != varDecSize) {
+    if (unpackCount != varDecSize) {
         errHandler.addError(E10041, &iterExpr->location, {iterExpr->pname(), std::to_string(unpackCount), std::to_string(unpackCount + 1), std::to_string(varDecSize)});
-        return true;
+        return false;
     }
-
     if (const auto pair = iterable->baseType->asPair()) {
-        foreachLoop->loopVars[0 + withIndex]->type = pair->key;
-        foreachLoop->loopVars[1 + withIndex]->type = pair->value;
+        foreachLoop->loopVars[0]->type = pair->key;
+        foreachLoop->loopVars[1]->type = pair->value;
     } else {
-        foreachLoop->loopVars[0 + withIndex]->type = iterable->baseType;
+        foreachLoop->loopVars[0]->type = new LgsPtr(iterable->baseType);
     }
-    return false;
+    return true;
 }
 
 std::string getMissingImplementsStr(const std::vector<LgsField*>& fields, const std::vector<LgsFunc*>& methods) {

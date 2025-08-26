@@ -13,7 +13,7 @@ public:
     static constexpr auto name = "DArray";
     StructType* arrStruct = nullptr;
     LgsFunc* addFunc = new LgsFunc("add", &LGS_VOID, {this, &LGS_ANY}, INTERNAL | PUBLIC | METHOD);
-    LgsFunc* lenFunc = new LgsFunc("len", &LGS_INT, {this}, INTERNAL | PUBLIC | METHOD);
+    LgsFunc* lenFunc = new LgsFunc("len", &LGS_SIZE, {this}, INTERNAL | PUBLIC | METHOD);
     LgsFunc* getFunc = new LgsFunc("get", &LGS_ANY, {this, &LGS_LONG}, INTERNAL | PUBLIC | METHOD);
     LgsFunc* isEmptyFunc = new LgsFunc("isEmpty", &LGS_BOOL, {this}, INTERNAL | PUBLIC | METHOD);
     LgsFunc* isNotEmptyFunc = new LgsFunc("isNotEmpty", &LGS_BOOL, {this}, INTERNAL | PUBLIC | METHOD);
