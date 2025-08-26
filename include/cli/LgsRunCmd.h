@@ -9,6 +9,7 @@ public:
     void run() override;
     std::string joinArgs() const;
     LgsCliCmdHelp& getHelp() override;
+    void setArg(const std::string& key, const std::string& value, LgsApp& app) override;
 };
 
 inline LgsCliCmdHelp runCmdHelp{

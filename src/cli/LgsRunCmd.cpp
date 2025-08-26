@@ -8,30 +8,7 @@ void LgsRunCmd::run() {
     if (subCmd[0] == '-') return exitWithError(unknownCmd + ": " + subCmd + ".");
     if (!fs::exists(subCmd)) return exitWithError("Path not found");
     LgsApp app(subCmd);
-
-    for (int i = 3; i < argc; ++i) {
-        std::string arg = argv[i];
-        if (arg[0] != '-' || arg.length() <= 1) {
-            app.appArgs.emplace_back(arg.data());
-            continue;
-        }
-        const char flag = arg[1];
-        std::string value;
-        if (arg.length() > 2) {
-            value = arg.substr(2);
-        } else if (i + 1 < argc && argv[i + 1][0] != '-') {
-            value = argv[i + 1];
-            i++;
-        }
-
-        switch (flag) {
-        case 'o':
-            app.configs.optLevel = value.empty() ? 0 : std::stoi(value);
-            break;
-        default:
-            return exitWithError("Unknown flag: -" + std::string(1, flag));
-        }
-    }
+    parseArguments(3, app);
     app.run();
 }
 
@@ -46,4 +23,10 @@ std::string LgsRunCmd::joinArgs() const {
 
 LgsCliCmdHelp& LgsRunCmd::getHelp() {
     return runCmdHelp;
+}
+
+void LgsRunCmd::setArg(const std::string& key, const std::string& value, LgsApp& app) {
+    if (key == "o") {
+        app.configs.optLevel = std::stoi(value);
+    }
 }
