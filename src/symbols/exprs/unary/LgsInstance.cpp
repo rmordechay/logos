@@ -45,7 +45,10 @@ LgsInstance::~LgsInstance() {
     for (const auto [_, arg] : args) {
         delete arg;
     }
+    args.clear();
     if (obj) {
-        delete obj;
+        freeType(obj);
+        obj = nullptr;
+        type = nullptr;
     }
 }

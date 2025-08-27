@@ -41,16 +41,16 @@ void LgsSymbolTable::freeSymbols() {
             delete symbol.func;
             break;
         case OBJECT:
-            delete symbol.object;
+            freeType(symbol.object);
             break;
         case INTERFACE:
-            delete symbol.interface;
+            freeType(symbol.interface);
             break;
         case GROUP:
-            delete symbol.group;
+            freeType(symbol.group);
             break;
         case ENUM:
-            delete symbol.lgsEnum;
+            freeType(symbol.lgsEnum);
             break;
         case UNKNOWN:
             break;

@@ -1,5 +1,6 @@
 #include "exprs/LgsBinaryExpr.h"
 #include "exprs/unary/LgsUnaryExpr.h"
+#include "utils/LgsUtils.h"
 
 json::value LgsBinaryExpr::asJSON() {
     assert(0);
@@ -87,11 +88,11 @@ std::string LgsBinaryExpr::pname() {
 
 LgsBinaryExpr::~LgsBinaryExpr() {
     if (left) {
-        delete left;
+        freeExpr(left);
         right = nullptr;
     }
     if (right) {
-        delete right;
+        freeExpr(right);
         left = nullptr;
     }
 }

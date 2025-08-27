@@ -108,6 +108,10 @@ LgsObject* LgsObject::clone() {
     for (const auto& field : fields) {
         cloned->addField(field->clone());
     }
+    cloned->methods.clear();
+    for (const auto& [_, method] : methods) {
+        cloned->addMethod(method->clone()->asFunc());
+    }
     return cloned;
 }
 

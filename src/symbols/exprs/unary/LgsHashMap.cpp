@@ -17,11 +17,11 @@ LgsHashMap::~LgsHashMap() {
 
 LgsMapEntry::~LgsMapEntry() {
     if (key) {
-        delete key;
+        freeExpr(key);
         key = nullptr;
     }
     if (value) {
-        delete value;
+        freeExpr(value);
         value = nullptr;
     }
 }

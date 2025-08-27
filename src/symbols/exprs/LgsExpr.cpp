@@ -57,7 +57,7 @@ void LgsExpr::setType(LgsType* newType) {
     type = newType;
 }
 
-bool LgsExpr::equals(LgsExpr* other) {
+bool LgsExpr::equals(const LgsExpr* other) {
     if (const auto var = asVariable()) {
         switch (var->ref.symbolType) {
         case VAR_DEC:
