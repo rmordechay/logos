@@ -33,6 +33,7 @@
 #include "loops/LgsRangeLoop.h"
 #include "loops/LgsWhileLoop.h"
 #include "stmts/LgsAssignment.h"
+#include "stmts/LgsIOStmt.h"
 #include "stmts/LgsIfStmt.h"
 #include <llvm/IR/Module.h>
 #include <llvm/Target/TargetMachine.h>
@@ -280,6 +281,7 @@ void LgsCodeGen::visitStmt(LgsStmt* stmt) {
     if (const auto funcCall = stmt->asFuncCall()) return visitFuncCall(funcCall);
     if (const auto postfixExpr = stmt->asPostfixExpr()) return visitPostfixExpr(postfixExpr);
     if (const auto selection = stmt->asSelection()) return visitSelection(selection);
+    if (const auto ioStmt = stmt->asIOStmt()) return visitIOStmt(ioStmt);
     if (const auto returnStmt = stmt->asReturn()) return visitReturnStmt(returnStmt);
     if (const auto breakStmt = stmt->asBreak()) return visitBreakStmt(breakStmt);
     if (stmt->asContinue()) return visitContinueStmt();
@@ -468,6 +470,11 @@ void LgsCodeGen::visitCoroutine(const LgsCoroutine* coroutine) {
     const auto ctx = getThunkCtx(fc, ctxTy);
     const auto func = getThunkFunc(fc, ctxTy);
     cg.addCoro(func, ctx);
+}
+
+void LgsCodeGen::visitIOStmt(const LgsIOStmt* ioStmt) {
+    visitVarDec(ioStmt->varDec);
+    visitStmtsBlock(ioStmt->stmtsBlock);
 }
 
 void LgsCodeGen::visitReturnStmt(LgsReturn* returnStmt) {

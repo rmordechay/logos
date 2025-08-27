@@ -76,6 +76,7 @@ set(CORE_SOURCES
     src/symbols/exprs/unary/LgsSelection.cpp
     src/symbols/exprs/unary/LgsVariable.cpp
     src/symbols/exprs/unary/LgsVectorExpr.cpp
+    src/symbols/exprs/unary/LgsTypeExpr.cpp
     src/symbols/exprs/unary/constants/LgsCharConst.cpp
     src/symbols/exprs/unary/constants/LgsFloatConst.cpp
     src/symbols/exprs/unary/constants/LgsIntConst.cpp
@@ -91,6 +92,8 @@ set(CORE_SOURCES
     src/symbols/loops/LgsRangeLoop.cpp
     src/symbols/loops/LgsWhileLoop.cpp
     src/symbols/loops/LgsForVariables.cpp
+    src/symbols/stmts/LgsIOPair.cpp
+    src/symbols/stmts/LgsIOStmt.cpp
     src/symbols/stmts/LgsAssignment.cpp
     src/symbols/stmts/LgsBreak.cpp
     src/symbols/stmts/LgsContinue.cpp
@@ -138,8 +141,6 @@ set(RUNTIME_SOURCES
     runtime/lib/Lgs_scheduler.cpp
     runtime/lib/Lgs_stack.cpp
     runtime/lib/Lgs_print.cpp
-    src/symbols/exprs/unary/LgsTypeExpr.cpp
-    include/symbols/exprs/unary/LgsTypeExpr.h
 )
 
 add_library(lgs_core SHARED ${CORE_SOURCES} ${RUNTIME_SOURCES})

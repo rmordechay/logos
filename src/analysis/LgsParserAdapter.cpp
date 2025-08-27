@@ -35,6 +35,8 @@
 #include "lgsc/LgsCLang.h"
 #include "loops/LgsInfiniteLoop.h"
 #include "stmts/LgsAssignment.h"
+#include "stmts/LgsIOPair.h"
+#include "stmts/LgsIOStmt.h"
 #include "stmts/LgsIfStmt.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsDArray.h"
@@ -169,6 +171,26 @@ LgsFile* LgsParserAdapter::getTestFile(LogosParser::TestFileContext* ctx, const 
     return file;
 }
 
+LgsEnvFile* LgsParserAdapter::getEnvFile(const fs::path& filePath) {
+    const auto absFilePath = fs::path(fs::canonical(filePath));
+    const auto codeText = getFileText(absFilePath);
+    antlr4::ANTLRInputStream input(codeText);
+    LogosLexer lexer(&input);
+    antlr4::CommonTokenStream tokens(&lexer);
+    LogosParser parser(&tokens);
+    const auto ctx = parser.logosEnvFile();
+    std::vector<LgsVarDec*> varDecs;
+    for (const auto& explicitVarDec : ctx->explicitVarDec()) {
+        varDecs.emplace_back(getExplicitVarDec(explicitVarDec));
+    }
+    for (const auto& implicitVarDec : ctx->implicitVarDec()) {
+        varDecs.emplace_back(getImplicitVarDec(implicitVarDec));
+    }
+    auto file = new LgsEnvFile(fileID, "EnvFile", absFilePath, varDecs);
+    if (!checkParserErrors(&parser)) return file;
+    return file;
+}
+
 void LgsParserAdapter::setAppConfigs(LgsAppConfigs& appConfigs) {
     if (!fs::exists(paths.appFilePath)) return;
     auto codeText = getFileText(paths.appFilePath);
@@ -222,103 +244,48 @@ void LgsParserAdapter::setAppConfigs(LgsAppConfigs& appConfigs) {
     }
 }
 
-LgsEnvFile* LgsParserAdapter::getEnvFile(const fs::path& filePath) {
-    const auto absFilePath = fs::path(fs::canonical(filePath));
-    const auto codeText = getFileText(absFilePath);
-    antlr4::ANTLRInputStream input(codeText);
-    LogosLexer lexer(&input);
-    antlr4::CommonTokenStream tokens(&lexer);
-    LogosParser parser(&tokens);
-    const auto ctx = parser.logosEnvFile();
-    std::vector<LgsVarDec*> varDecs;
-    for (const auto& explicitVarDec : ctx->explicitVarDec()) {
-        varDecs.emplace_back(getExplicitVarDec(explicitVarDec));
-    }
-    for (const auto& implicitVarDec : ctx->implicitVarDec()) {
-        varDecs.emplace_back(getImplicitVarDec(implicitVarDec));
-    }
-    auto file = new LgsEnvFile(fileID, "EnvFile", absFilePath, varDecs);
-    if (!checkParserErrors(&parser)) return file;
-    return file;
-}
+LgsObject* LgsParserAdapter::getObject(LogosParser::ObjectBodyContext* ctx, antlr4::tree::TerminalNode* objName, const bool isSingleton) {
+    const auto obj = new LgsObject(objName->getText());
+    setLocation(obj->location, objName->getSymbol());
+    if (!validateTypeName(obj->name, &obj->location)) return obj;
 
-LgsFunc* LgsParserAdapter::getFunc(LogosParser::FuncContext* ctx) {
-    const auto rt = getFuncReturnType(ctx->funcSignature()->type());
-    const auto funcSignature = ctx->funcSignature();
-    const auto funcNameToken = funcSignature->funcSignatureHeader()->IDENTIFIER();
-    const auto funcName = funcNameToken->getText();
-    const auto func = new LgsFunc(funcName, rt);
-    currentFunc = func;
-    setLocation(func->location, funcNameToken->getSymbol());
-    setParams(func->funcType, funcSignature->funcSignatureHeader()->param());
-    func->stmtsBlock = getStmtBlock(ctx->statementsBlock());
-    currentFunc = nullptr;
-    return func;
-}
-
-LgsMainFunc* LgsParserAdapter::getMainFunc(LogosParser::FuncContext* ctx) {
-    const auto mainFunc = new LgsMainFunc();
-    currentFunc = mainFunc;
-    const auto funcSignature = ctx->funcSignature();
-    setLocation(mainFunc->location, funcSignature->funcSignatureHeader()->IDENTIFIER()->getSymbol());
-    mainFunc->stmtsBlock = getStmtBlock(ctx->statementsBlock());
-    bool isValid = true;
-    const auto paramSize = funcSignature->funcSignatureHeader()->param().size();
-    if (paramSize > 1) {
-        isValid = false;
-    } else if (paramSize == 1) {
-        isValid = setMainArgsParam(mainFunc, funcSignature);
-        if (isValid) mainFunc->setMainArgs();
-    }
-    if (!isValid) {
-        errHandler.addError(E10039, &mainFunc->location);
-    }
-    currentFunc = nullptr;
-    return mainFunc;
-}
-
-LgsFunc* LgsParserAdapter::getMethod(LogosParser::MethodContext* ctx, LgsType* obj) {
-    const auto rt = getFuncReturnType(ctx->funcSignature()->type());
-    const auto funcSignature = ctx->funcSignature();
-    const auto nameToken = funcSignature->funcSignatureHeader()->IDENTIFIER();
-    const auto method = new LgsFunc(nameToken->getText(), rt);
-    currentFunc = method;
-    setLocation(method->location, nameToken->getSymbol());
-    method->funcType->parentName = obj->getName();
-    setParams(method->funcType, funcSignature->funcSignatureHeader()->param());
-    method->stmtsBlock = getStmtBlock(ctx->statementsBlock());
-    if (ctx->VISIBILITY()) {
-        method->funcType->isPublic = true;
-    }
-    if (method->funcType->isMethod) {
-        method->funcType->params.insert(method->funcType->params.begin(), LgsParam(obj, LGS_SELF));
-    }
-    currentFunc = nullptr;
-    return method;
-}
-
-LgsFunc* LgsParserAdapter::getLambda(LogosParser::LambdaContext* ctx) {
-    const auto func = new LgsFunc(LGS_ANONYMOUS_STR);
-    currentFunc = func;
-    func->funcType->isLambda = true;
-    func->funcType->rt = getType(ctx->rt);
-    if (const auto singleParam = ctx->IDENTIFIER()) {
-        auto lgsParam = LgsParam(nullptr, singleParam->getText());
-        setLocation(lgsParam.location, singleParam->getSymbol());
-        func->funcType->params.push_back(lgsParam);
-    } else if (const auto params = ctx->lambdaParams()) {
-        for (const auto lambdaParam : params->lambdaParam()) {
-            const auto param = lambdaParam->IDENTIFIER();
-            const auto type = getType(lambdaParam->type());
-            auto lgsParam = LgsParam(type, param->getText());
-            setLocation(lgsParam.location, param->getSymbol());
-            func->funcType->params.push_back(lgsParam);
+    // Fields
+    for (int i = 0; i < ctx->field().size(); ++i) {
+        const auto lgsField = getField(ctx->field(i), i);
+        const auto fieldAdded = obj->addField(lgsField);
+        if (!fieldAdded) {
+            errHandler.addError(E10056, &obj->location, {obj->name, lgsField->name});
         }
     }
-    func->stmtsBlock = getStmtBlock(ctx->statementsBlock());
-    setLocation(func->location, ctx->start);
-    currentFunc = nullptr;
-    return func;
+
+    // Methods
+    for (const auto& func : ctx->method()) {
+        const auto method = getMethod(func, obj);
+        const auto methodAdded = obj->addMethod(method);
+        if (!methodAdded) {
+            errHandler.addError(E10072, &obj->location, {obj->name, method->funcType->pname()});
+        }
+    }
+
+    // IO Pairs
+    for (const auto& ioPair : ctx->ioPair()) {
+        const auto lgsIOPair = getIOPair(ioPair);
+        obj->ioPairs.push_back(lgsIOPair);
+    }
+
+    // Interfaces
+    if (ctx->implements()) {
+        for (const auto& type : ctx->implements()->IDENTIFIER()) {
+            auto implementType = getTypeFromText(type);
+            obj->interfaces.push_back(implementType);
+        }
+    }
+
+    if (isSingleton) {
+        obj->singleton = new LgsInstance(obj);
+    }
+
+    return obj;
 }
 
 LgsInterface* LgsParserAdapter::getInterface(LogosParser::InterfaceBodyContext* ctx, antlr4::tree::TerminalNode* interfaceName) {
@@ -359,55 +326,83 @@ LgsInterface* LgsParserAdapter::getInterface(LogosParser::InterfaceBodyContext* 
     return interface;
 }
 
-LgsObject* LgsParserAdapter::getObject(LogosParser::ObjectBodyContext* ctx, antlr4::tree::TerminalNode* objName, const bool isSingleton) {
-    const auto obj = new LgsObject(objName->getText());
-    setLocation(obj->location, objName->getSymbol());
-    if (!validateTypeName(obj->name, &obj->location)) return obj;
-
-    // Fields
-    for (int i = 0; i < ctx->field().size(); ++i) {
-        const auto lgsField = getField(ctx->field(i), i);
-        const auto fieldAdded = obj->addField(lgsField);
-        if (!fieldAdded) {
-            errHandler.addError(E10056, &obj->location, {obj->name, lgsField->name});
-        }
-    }
-
-    // Methods
-    for (const auto& func : ctx->method()) {
-        const auto method = getMethod(func, obj);
-        const auto methodAdded = obj->addMethod(method);
-        if (!methodAdded) {
-            errHandler.addError(E10072, &obj->location, {obj->name, method->funcType->pname()});
-        }
-    }
-
-    // Interfaces
-    if (ctx->implements()) {
-        for (const auto& type : ctx->implements()->IDENTIFIER()) {
-            auto implementType = getTypeFromText(type);
-            obj->interfaces.push_back(implementType);
-        }
-    }
-    if (isSingleton) {
-        obj->singleton = new LgsInstance(obj);
-    }
-
-    return obj;
+LgsFunc* LgsParserAdapter::getFunc(LogosParser::FuncContext* ctx) {
+    const auto rt = getFuncReturnType(ctx->funcSignature()->type());
+    const auto funcSignature = ctx->funcSignature();
+    const auto funcNameToken = funcSignature->funcSignatureHeader()->IDENTIFIER();
+    const auto funcName = funcNameToken->getText();
+    const auto func = new LgsFunc(funcName, rt);
+    currentFunc = func;
+    setLocation(func->location, funcNameToken->getSymbol());
+    setParams(func->funcType, funcSignature->funcSignatureHeader()->param());
+    func->stmtsBlock = getStmtBlock(ctx->statementsBlock());
+    currentFunc = nullptr;
+    return func;
 }
 
-LgsParam LgsParserAdapter::getParam(LgsFuncType* funcType, LogosParser::ParamContext* param) {
-    const auto variableName = param->IDENTIFIER()->getText();
-    const auto expr = getExpr(param->expr());
-    auto lgsParam = LgsParam(getType(param->type()), variableName, expr);
-    setLocation(lgsParam.location, param->start);
-    if (param->TRIPLE_DOT()) {
-        lgsParam.isVariadic = true;
-        funcType->isVariadic = true;
-    } else if (lgsParam.expr) {
-        funcType->hasDefaults = true;
+LgsMainFunc* LgsParserAdapter::getMainFunc(LogosParser::FuncContext* ctx) {
+    const auto mainFunc = new LgsMainFunc();
+    currentFunc = mainFunc;
+    const auto funcSignature = ctx->funcSignature();
+    setLocation(mainFunc->location, funcSignature->funcSignatureHeader()->IDENTIFIER()->getSymbol());
+    mainFunc->stmtsBlock = getStmtBlock(ctx->statementsBlock());
+    bool isValid = true;
+    const auto paramSize = funcSignature->funcSignatureHeader()->param().size();
+    if (paramSize > 1) {
+        isValid = false;
+    } else if (paramSize == 1) {
+        isValid = setMainArgsParam(mainFunc, funcSignature);
+        if (isValid) mainFunc->setMainArgs();
     }
-    return lgsParam;
+    if (!isValid) {
+        errHandler.addError(E10039, &mainFunc->location);
+    }
+    currentFunc = nullptr;
+    return mainFunc;
+}
+
+LgsFunc* LgsParserAdapter::getLambda(LogosParser::LambdaContext* ctx) {
+    const auto func = new LgsFunc(LGS_ANONYMOUS_STR);
+    currentFunc = func;
+    func->funcType->isLambda = true;
+    func->funcType->rt = getType(ctx->rt);
+    if (const auto singleParam = ctx->IDENTIFIER()) {
+        auto lgsParam = LgsParam(nullptr, singleParam->getText());
+        setLocation(lgsParam.location, singleParam->getSymbol());
+        func->funcType->params.push_back(lgsParam);
+    } else if (const auto params = ctx->lambdaParams()) {
+        for (const auto lambdaParam : params->lambdaParam()) {
+            const auto param = lambdaParam->IDENTIFIER();
+            const auto type = getType(lambdaParam->type());
+            auto lgsParam = LgsParam(type, param->getText());
+            setLocation(lgsParam.location, param->getSymbol());
+            func->funcType->params.push_back(lgsParam);
+        }
+    }
+    func->stmtsBlock = getStmtBlock(ctx->statementsBlock());
+    setLocation(func->location, ctx->start);
+    currentFunc = nullptr;
+    return func;
+}
+
+LgsFunc* LgsParserAdapter::getMethod(LogosParser::MethodContext* ctx, LgsType* obj) {
+    const auto rt = getFuncReturnType(ctx->funcSignature()->type());
+    const auto funcSignature = ctx->funcSignature();
+    const auto nameToken = funcSignature->funcSignatureHeader()->IDENTIFIER();
+    const auto method = new LgsFunc(nameToken->getText(), rt);
+    currentFunc = method;
+    setLocation(method->location, nameToken->getSymbol());
+    method->funcType->parentName = obj->getName();
+    setParams(method->funcType, funcSignature->funcSignatureHeader()->param());
+    method->stmtsBlock = getStmtBlock(ctx->statementsBlock());
+    if (ctx->VISIBILITY()) {
+        method->funcType->isPublic = true;
+    }
+    if (method->funcType->isMethod) {
+        method->funcType->params.insert(method->funcType->params.begin(), LgsParam(obj, LGS_SELF));
+    }
+    currentFunc = nullptr;
+    return method;
 }
 
 LgsField* LgsParserAdapter::getField(LogosParser::FieldContext* ctx, const size_t position) {
@@ -430,6 +425,26 @@ LgsField* LgsParserAdapter::getInterfaceField(LogosParser::InterfaceFieldContext
     field->isConst = ctx->CONST() != nullptr;
     setLocation(field->location, ctx->start);
     return field;
+}
+
+LgsParam LgsParserAdapter::getParam(LgsFuncType* funcType, LogosParser::ParamContext* param) {
+    const auto variableName = param->IDENTIFIER()->getText();
+    const auto expr = getExpr(param->expr());
+    auto lgsParam = LgsParam(getType(param->type()), variableName, expr);
+    setLocation(lgsParam.location, param->start);
+    if (param->TRIPLE_DOT()) {
+        lgsParam.isVariadic = true;
+        funcType->isVariadic = true;
+    } else if (lgsParam.expr) {
+        funcType->hasDefaults = true;
+    }
+    return lgsParam;
+}
+
+LgsIOPair* LgsParserAdapter::getIOPair(const LogosParser::IoPairContext* ioPair) const {
+    const auto lgsIOPair = new LgsIOPair(ioPair->opening->getText(), ioPair->closing->getText());
+    setLocation(lgsIOPair->location, ioPair->start);
+    return lgsIOPair;
 }
 
 LgsStmt* LgsParserAdapter::getDeferStmt(LogosParser::DeferStmtContext* ctx) {
@@ -457,6 +472,7 @@ LgsStmt* LgsParserAdapter::getStmt(LogosParser::StatementContext* ctx) {
     if (const auto deferStmt = ctx->deferStmt()) return getDeferStmt(deferStmt);
     if (const auto returnStmt = ctx->returnStatement()) return getReturnStmt(returnStmt);
     if (const auto breakStmt = ctx->breakStmt()) return getBreakStmt(breakStmt);
+    if (const auto ioStmt = ctx->ioStatement()) return getIOStmt(ioStmt);
     if (ctx->CONTINUE()) return getContinueStmt(ctx);
     assert(0);
 }
@@ -630,6 +646,21 @@ LgsBreak* LgsParserAdapter::getBreakStmt(LogosParser::BreakStmtContext* ctx) con
         breakStmt->isBreakIf = true;
     }
     return breakStmt;
+}
+
+LgsStmt* LgsParserAdapter::getIOStmt(LogosParser::IoStatementContext* ioStmt) {
+    const auto stmtsBlock = getStmtBlock(ioStmt->statementsBlock());
+    const auto lgsIOStmt = new LgsIOStmt(stmtsBlock);
+    setLocation(lgsIOStmt->location, ioStmt->start);
+    lgsIOStmt->varDec = getVarDec(ioStmt->IDENTIFIER(), true);
+    if (ioStmt->funcCall()) {
+        lgsIOStmt->varDec->expr = getFuncCall(ioStmt->funcCall());
+    } else if (ioStmt->selection()) {
+        lgsIOStmt->varDec->expr = getSelection(ioStmt->selection());
+    } else {
+        assert(0);
+    }
+    return lgsIOStmt;
 }
 
 LgsStmt* LgsParserAdapter::getContinueStmt(const LogosParser::StatementContext* ctx) const {

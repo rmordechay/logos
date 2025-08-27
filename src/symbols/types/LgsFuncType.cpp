@@ -78,28 +78,6 @@ std::string LgsFuncType::pname() {
     return strStream.str();
 }
 
-json::value LgsFuncType::asJSON() {
-    json::object jsonObj;
-    jsonObj["name"] = name;
-    jsonObj["rt"] = rt->asJSON();
-    json::array jsonParams;
-    for (auto& param : params) {
-        jsonParams.emplace_back(param.asJSON());
-    }
-    jsonObj["params"] = jsonParams;
-    jsonObj["isPublic"] = isPublic;
-    jsonObj["isInternal"] = isInternal;
-    jsonObj["isVirtual"] = isVirtual;
-    jsonObj["isVariadic"] = isVariadic;
-    jsonObj["isLambda"] = isLambda;
-    jsonObj["isOptional"] = isOptional;
-    jsonObj["isTerminator"] = isTerminator;
-    jsonObj["isMethod"] = isMethod;
-    jsonObj["isTest"] = isTest;
-    jsonObj["hasDefaults"] = hasDefaults;
-    return jsonObj;
-}
-
 std::string LgsFuncType::strFormatPart() const {
     return "%p";
 }
@@ -138,8 +116,31 @@ LgsType* LgsFuncType::clone() {
     copy->isTerminator = isTerminator;
     copy->isLambda = isLambda;
     copy->isTest = isTest;
+    copy->isIO = isIO;
     copy->hasDefaults = hasDefaults;
     return copy;
+}
+
+json::value LgsFuncType::asJSON() {
+    json::object jsonObj;
+    jsonObj["name"] = name;
+    jsonObj["rt"] = rt->asJSON();
+    json::array jsonParams;
+    for (auto& param : params) {
+        jsonParams.emplace_back(param.asJSON());
+    }
+    jsonObj["params"] = jsonParams;
+    jsonObj["isPublic"] = isPublic;
+    jsonObj["isInternal"] = isInternal;
+    jsonObj["isVirtual"] = isVirtual;
+    jsonObj["isVariadic"] = isVariadic;
+    jsonObj["isLambda"] = isLambda;
+    jsonObj["isOptional"] = isOptional;
+    jsonObj["isTerminator"] = isTerminator;
+    jsonObj["isMethod"] = isMethod;
+    jsonObj["isTest"] = isTest;
+    jsonObj["hasDefaults"] = hasDefaults;
+    return jsonObj;
 }
 
 LgsFuncType::~LgsFuncType() {

@@ -32,18 +32,6 @@ interface:
         INTERFACE IDENTIFIER LBRACE interfaceBody RBRACE
     ;
 
-group:
-        IDENTIFIER EQUAL LBRACE groupTypesList RBRACE ARROW LBRACE groupTargetList RBRACE
-    ;
-
-groupTypesList:
-        type (COMMA type)* COMMA?
-    ;
-
-groupTargetList:
-        IDENTIFIER (COMMA IDENTIFIER)* COMMA?
-    ;
-
 interfaceBody:
             implements? interfaceField* interfaceFunc*
     ;
@@ -53,7 +41,7 @@ object:
     ;
 
 objectBody:
-        implements? field* method*
+        implements? field* method* ioPair*
     ;
 
 field:
@@ -66,6 +54,22 @@ interfaceField:
 
 implements:
         IMPLEMENTS COLON IDENTIFIER (COMMA IDENTIFIER)? COMMA?
+    ;
+
+ioPair:
+        IO LBRACE opening=IDENTIFIER closing=IDENTIFIER RBRACE
+    ;
+
+group:
+        IDENTIFIER EQUAL LBRACE groupTypesList RBRACE ARROW LBRACE groupTargetList RBRACE
+    ;
+
+groupTypesList:
+        type (COMMA type)* COMMA?
+    ;
+
+groupTargetList:
+        IDENTIFIER (COMMA IDENTIFIER)* COMMA?
     ;
 
 funcSignatureHeader:
@@ -115,6 +119,7 @@ statement:
     |   coroutine
     |   deferStmt
     |   breakStmt
+    |   ioStatement
     |   expr
     |   CONTINUE
     ;
@@ -133,7 +138,7 @@ explicitVarDec:
     ;
 
 implicitVarDec:
-        CONST? IDENTIFIER (QUEST_MARK)? EQUAL expr
+        CONST? IDENTIFIER EQUAL expr QUEST_MARK?
     ;
 
 ifStatement:
@@ -174,6 +179,10 @@ breakStmt:
 
 returnStatement:
         RETURN expr?
+    ;
+
+ioStatement:
+        IO (implicitVarDec) statementsBlock
     ;
 
 enumDeclaration:
@@ -456,6 +465,7 @@ CONST: 'const';
 ENUM: 'enum';
 GO: 'go';
 DEFER: 'defer';
+IO: 'io';
 FOR_IS_FIRST: 'for.isFirst';
 FOR_IS_LAST: 'for.isLast';
 FOR_I: 'for.i';

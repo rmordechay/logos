@@ -5,11 +5,13 @@
 class LgsInstance;
 class LgsLLVM;
 class LgsField;
+class LgsIOPair;
 
 class LgsObject : public LgsType {
 public:
     std::string name;
     std::vector<LgsType*> interfaces;
+    std::vector<LgsIOPair*> ioPairs;
     LgsInstance* singleton = nullptr;
 
     explicit LgsObject(std::string  name) : name(std::move(name)) {}

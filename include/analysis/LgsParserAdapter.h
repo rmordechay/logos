@@ -4,6 +4,7 @@
 #include "utils/LgsErrHandler.h"
 #include "stmts/LgsAssignment.h"
 
+class LgsIOPair;
 struct LgsPaths;
 class LgsStrConst;
 class LgsType;
@@ -49,17 +50,18 @@ public:
     LgsObjectFile* getObjectFile(LogosParser::ObjectFileContext* ctx, const fs::path& filePath);
     LgsFile* getInterfaceFile(LogosParser::InterfaceFileContext* ctx, const fs::path& filePath);
     LgsFile* getTestFile(LogosParser::TestFileContext* ctx, const fs::path& filePath);
-    void setAppConfigs(LgsAppConfigs& appConfigs);
     LgsEnvFile* getEnvFile(const fs::path& filePath);
+    void setAppConfigs(LgsAppConfigs& appConfigs);
+    LgsObject* getObject(LogosParser::ObjectBodyContext* ctx, antlr4::tree::TerminalNode* objName, bool isSingleton);
+    LgsInterface* getInterface(LogosParser::InterfaceBodyContext* ctx, antlr4::tree::TerminalNode* interfaceName);
     LgsFunc* getFunc(LogosParser::FuncContext* ctx);
     LgsMainFunc* getMainFunc(LogosParser::FuncContext* ctx);
-    LgsInterface* getInterface(LogosParser::InterfaceBodyContext* ctx, antlr4::tree::TerminalNode* interfaceName);
-    LgsObject* getObject(LogosParser::ObjectBodyContext* ctx, antlr4::tree::TerminalNode* objName, bool isSingleton);
-    LgsField* getField(LogosParser::FieldContext* ctx, size_t position);
     LgsFunc* getLambda(LogosParser::LambdaContext* ctx);
-    LgsParam getParam(LgsFuncType* funcType, LogosParser::ParamContext* param);
-    LgsField* getInterfaceField(LogosParser::InterfaceFieldContext* ctx);
     LgsFunc* getMethod(LogosParser::MethodContext* ctx, LgsType* obj);
+    LgsField* getField(LogosParser::FieldContext* ctx, size_t position);
+    LgsField* getInterfaceField(LogosParser::InterfaceFieldContext* ctx);
+    LgsParam getParam(LgsFuncType* funcType, LogosParser::ParamContext* param);
+    LgsIOPair* getIOPair(const LogosParser::IoPairContext* ioPair) const;
     LgsStmt* getDeferStmt(LogosParser::DeferStmtContext* ctx);
     LgsStmt* getStmt(LogosParser::StatementContext* ctx);
     LgsAssignment* getAssignment(LogosParser::AssignmentContext* ctx);
@@ -70,6 +72,7 @@ public:
     LgsVarDec* getExplicitVarDec(LogosParser::ExplicitVarDecContext* ctx);
     LgsStmt* getReturnStmt(LogosParser::ReturnStatementContext* ctx);
     LgsBreak* getBreakStmt(LogosParser::BreakStmtContext* ctx) const;
+    LgsStmt* getIOStmt(LogosParser::IoStatementContext* ioStmt);
     LgsStmt* getContinueStmt(const LogosParser::StatementContext* ctx) const;
     LgsIfStmt* getIfStatement(LogosParser::IfStatementContext* ctx);
     LgsStmt* getPatternMatching(LogosParser::PatternMatchingContext* ctx);

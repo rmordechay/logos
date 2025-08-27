@@ -38,6 +38,7 @@
 #include "loops/LgsLoopMetaVar.h"
 #include "loops/LgsRangeLoop.h"
 #include "stmts/LgsAssignment.h"
+#include "stmts/LgsIOStmt.h"
 #include "stmts/LgsIfStmt.h"
 #include "types/LgsPtr.h"
 #include "types/primitives/LgsDouble.h"
@@ -71,12 +72,24 @@ void LgsSema::visitMainFile(LgsMainFile* mainFile) {
     }
 }
 
+void LgsSema::visitTestFile(const LgsTestFile* testFile) {
+    for (const auto& func : testFile->funcs) {
+        visitFunc(func);
+    }
+    for (const auto& test : testFile->tests) {
+        visitFunc(test);
+    }
+}
+
 void LgsSema::visitObject(LgsObject* obj) {
     for (const auto& field : obj->fields) {
         visitField(field);
     }
     for (const auto& [_, method] : obj->methods) {
         visitFunc(method);
+    }
+    for (const auto& ioPair : obj->ioPairs) {
+        visitIOPair(ioPair, obj);
     }
     validateObjImplements(obj, obj->interfaces);
 }
@@ -92,15 +105,6 @@ void LgsSema::visitInterface(LgsInterface* interface) {
     }
     if (allMethodsImplemented) {
         errHandler.addError(E10062, &interface->location, {interface->name});
-    }
-}
-
-void LgsSema::visitTestFile(const LgsTestFile* testFile) {
-    for (const auto& func : testFile->funcs) {
-        visitFunc(func);
-    }
-    for (const auto& test : testFile->tests) {
-        visitFunc(test);
     }
 }
 
@@ -150,6 +154,17 @@ void LgsSema::visitParam(LgsParam* param) {
     addLocalSymbol(LgsSymbol(param));
 }
 
+void LgsSema::visitIOPair(LgsIOPair* ioPair, LgsObject* obj) {
+    ioPair->openFunc = obj->getMethod(ioPair->openFuncName);
+    ioPair->closeFunc = obj->getMethod(ioPair->closeFuncName);
+    if (!ioPair->openFunc) {
+        errHandler.addError(E10005, &ioPair->openFunc->location, {ioPair->openFuncName, obj->pname()});
+    }
+    if (!ioPair->closeFunc) {
+        errHandler.addError(E10005, &ioPair->closeFunc->location, {ioPair->closeFuncName, obj->pname()});
+    }
+}
+
 void LgsSema::visitStmt(LgsStmt* stmt) {
     if (const auto ifStmt = stmt->asIfStmt()) visitIfStmt(ifStmt);
     else if (const auto pattern = stmt->asPattern()) visitPatternMatching(pattern);
@@ -163,6 +178,7 @@ void LgsSema::visitStmt(LgsStmt* stmt) {
     else if (const auto selection = stmt->asSelection()) visitSelection(selection);
     else if (const auto returnStmt = stmt->asReturn()) visitReturnStmt(returnStmt);
     else if (const auto continueStmt = stmt->asContinue()) visitContinueStmt(continueStmt);
+    else if (const auto ioStmt = stmt->asIOStmt()) visitIOStmt(ioStmt);
     else if (const auto breakStmt = stmt->asBreak()) visitBreakStmt(breakStmt);
 }
 
@@ -284,6 +300,15 @@ void LgsSema::visitBoolPatternMatching(LgsIfStmt* pm) {
     }
 }
 
+void LgsSema::visitWhileLoop(const LgsWhileLoop* whileLoop) {
+    visitExpr(whileLoop->condExpr);
+    const auto condType = whileLoop->condExpr->type;
+    if (!condType->asBool()) {
+        return errHandler.addError(E10066, &whileLoop->location, {whileLoop->condExpr->pname(), condType->pname()});
+    }
+    visitStmtsBlock(whileLoop->stmtsBlock);
+}
+
 void LgsSema::visitLoopStmt(LgsForLoop* loopStmt) {
     stack.enterScope(loopStmt);
     if (const auto rangeLoop = loopStmt->asRangeLoop()) {
@@ -353,15 +378,6 @@ void LgsSema::visitInfiniteLoop(const LgsInfiniteLoop* infiniteLoop) {
     visitStmtsBlock(infiniteLoop->stmtsBlock);
 }
 
-void LgsSema::visitWhileLoop(const LgsWhileLoop* whileLoop) {
-    visitExpr(whileLoop->condExpr);
-    const auto condType = whileLoop->condExpr->type;
-    if (!condType->asBool()) {
-        return errHandler.addError(E10066, &whileLoop->location, {whileLoop->condExpr->pname(), condType->pname()});
-    }
-    visitStmtsBlock(whileLoop->stmtsBlock);
-}
-
 void LgsSema::visitCoroutine(const LgsCoroutine* coroutine) {
     if (coroutine->funcCall) {
         visitFuncCall(coroutine->funcCall);
@@ -387,6 +403,13 @@ void LgsSema::visitReturnStmt(LgsReturn* returnStmt) {
     } else if (retExpr && retExpr->type && !rt->canCastTo(retExpr->type)) {
         errHandler.addError(E10004, &returnStmt->location, {funcType->name, rt->pname(), retExpr->type->pname()});
     }
+}
+
+void LgsSema::visitIOStmt(const LgsIOStmt* ioStmt) {
+    visitVarDec(ioStmt->varDec);
+    const auto expr = ioStmt->varDec->expr;
+    const auto funcCall = expr->asFuncCall() ? expr->asFuncCall() : expr->asSelection()->lastExpr()->asFuncCall();
+    visitStmtsBlock(ioStmt->stmtsBlock);
 }
 
 void LgsSema::visitContinueStmt(const LgsContinue* continueStmt) {

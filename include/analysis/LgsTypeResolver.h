@@ -2,6 +2,7 @@
 #include "files/LgsMainFile.h"
 #include "utils/ThreadPool.h"
 
+class LgsIOPair;
 class LgsGroup;
 class LgsFuncType;
 class LgsIterable;
@@ -26,4 +27,5 @@ public:
     void resolveIterable(LgsIterable* iterable, LgsFile& file);
     void resolveFuncTypes(LgsFuncType* funcType, LgsFile& file);
     void resolveGroupTypes(LgsGroup* group, LgsFile& file);
+    void resolveIOPair(LgsIOPair* ioPair, LgsFile& file);
 };

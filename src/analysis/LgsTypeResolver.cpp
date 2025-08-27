@@ -120,6 +120,9 @@ void LgsTypeResolver::resolveObjTypes(LgsObject* obj, LgsFile& file) {
     for (auto& interface : obj->interfaces) {
         interface = resolveType(interface, &file);
     }
+    for (auto& ioPair : obj->ioPairs) {
+        resolveIOPair(ioPair, file);
+    }
 }
 
 void LgsTypeResolver::resolveInterfaceTypes(LgsInterface* interface, LgsFile& file) {
@@ -156,4 +159,8 @@ void LgsTypeResolver::resolveGroupTypes(LgsGroup* group, LgsFile& file) {
     for (auto& type : group->types) {
         type = resolveType(type, &file);
     }
+}
+
+void LgsTypeResolver::resolveIOPair(LgsIOPair* ioPair, LgsFile& file) {
+    assert(0);
 }

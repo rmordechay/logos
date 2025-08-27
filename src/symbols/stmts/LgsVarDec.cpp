@@ -2,7 +2,6 @@
 #include "exprs/unary/LgsArrayExpr.h"
 #include "types/LgsPtr.h"
 #include "utils/LgsUtils.h"
-
 #include <llvm/IR/DIBuilder.h>
 
 Value* LgsVarDec::loadIR(LgsLLVM& codeGen) {

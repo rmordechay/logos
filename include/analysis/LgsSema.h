@@ -4,6 +4,8 @@
 #include "utils/LgsErrHandler.h"
 #include "analysis/LgsTypeResolver.h"
 #include "loops/LgsLoopMetaVar.h"
+#include "stmts/LgsIOPair.h"
+#include "stmts/LgsIOStmt.h"
 
 class LgsInterfaceFile;
 class LgsObjectFile;
@@ -60,12 +62,13 @@ public:
     explicit LgsSema(LgsFile* file, LgsSymbolTable& globals) : file(file), globals(globals), typeResolver(errHandler, globals) {}
     void analyse();
     void visitMainFile(LgsMainFile* mainFile);
+    void visitTestFile(const LgsTestFile* testFile);
     void visitObject(LgsObject* obj);
     void visitInterface(LgsInterface* interface);
-    void visitTestFile(const LgsTestFile* testFile);
     void visitField(LgsField* field);
     void visitFunc(LgsFunc* func);
     void visitParam(LgsParam* param);
+    void visitIOPair(LgsIOPair* ioPair, LgsObject* obj);
     void visitStmt(LgsStmt* stmt);
     void visitStmtsBlock(LgsStmtsBlock* stmtsBlock);
     void visitVarDec(LgsVarDec* varDec);
@@ -80,6 +83,7 @@ public:
     void visitInfiniteLoop(const LgsInfiniteLoop* infiniteLoop);
     void visitCoroutine(const LgsCoroutine* coroutine);
     void visitReturnStmt(LgsReturn* returnStmt);
+    void visitIOStmt(const LgsIOStmt* ioStmt);
     void visitContinueStmt(const LgsContinue* continueStmt);
     void visitBreakStmt(const LgsBreak* breakStmt);
     void visitDeferStmt(const LgsDeferStmt* deferStmt);

@@ -15,7 +15,8 @@ enum LgsFuncFlags : uint32_t {
     OPTIONAL = 1 << 5,
     TERMINATOR = 1 << 6,
     METHOD = 1 << 7,
-    HAS_DEFAULTS = 1 << 8,
+    IO = 1 << 8,
+    HAS_DEFAULTS = 1 << 9,
 };
 
 class LgsFuncType final : public LgsType {
@@ -34,6 +35,7 @@ public:
     bool isTerminator = false;
     bool isMethod = false;
     bool isTest = false;
+    bool isIO = false;
     bool hasDefaults = false;
     llvm::FunctionType* IRType = nullptr;
 

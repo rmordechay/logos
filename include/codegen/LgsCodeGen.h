@@ -85,6 +85,7 @@ public:
     void visitElseIf(LgsIfStmt* ifStmt);
     void visitPatternMatching(LgsIfStmt* pm);
     void visitCoroutine(const LgsCoroutine* coroutine);
+    void visitIOStmt(const LgsIOStmt* ioStmt);
     void visitReturnStmt(LgsReturn* returnStmt);
     void visitContinueStmt();
     void visitBreakStmt(const LgsBreak* breakStmt);
