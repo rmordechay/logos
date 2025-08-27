@@ -2,6 +2,7 @@
 #include <stmts/LgsStmt.h>
 #include "LgsValue.h"
 
+class LgsTypeExpr;
 class LgsLoopMetaVar;
 class LgsIntConst;
 class LgsVectorExpr;
@@ -63,6 +64,7 @@ public:
     LgsVariable* asVariable();
     LgsPrefixExpr* asPrefixExpr();
     LgsIterIndex* asIterIndex();
+    LgsTypeExpr* asTypeExpr();
     LgsInstance* asInstance();
     LgsArrayExpr* asArrayExpr();
     LgsHashMap* asHashMap();

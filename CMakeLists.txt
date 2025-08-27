@@ -138,6 +138,8 @@ set(RUNTIME_SOURCES
     runtime/lib/Lgs_scheduler.cpp
     runtime/lib/Lgs_stack.cpp
     runtime/lib/Lgs_print.cpp
+    src/symbols/exprs/unary/LgsTypeExpr.cpp
+    include/symbols/exprs/unary/LgsTypeExpr.h
 )
 
 add_library(lgs_core SHARED ${CORE_SOURCES} ${RUNTIME_SOURCES})

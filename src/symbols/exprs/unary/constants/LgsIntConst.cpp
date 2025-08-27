@@ -7,6 +7,10 @@
 #include "types/primitives/LgsLong.h"
 #include "types/primitives/LgsShort.h"
 
+Value* LgsIntConst::loadIR(LgsLLVM& codeGen) {
+    return IRValue;
+}
+
 LgsExpr* LgsIntConst::castTo(LgsType* toType) {
     if (type->getName() == toType->getName()) return this;
     if (toType->asLong()) {

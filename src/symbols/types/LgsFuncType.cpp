@@ -121,9 +121,9 @@ bool LgsFuncType::canCastTo(LgsType* other) {
 
 LgsType* LgsFuncType::clone() {
     const auto copy = new LgsFuncType();
-    copy->name        = name;
-    copy->IRName      = IRName;
-    copy->parentName  = parentName;
+    copy->name = name;
+    copy->IRName = IRName;
+    copy->parentName = parentName;
     if (rt) copy->rt = rt->clone();
     copy->params.reserve(params.size());
     for (auto p : params) {

@@ -55,7 +55,7 @@ public:
     LgsMainFunc* getMainFunc(LogosParser::FuncContext* ctx);
     LgsInterface* getInterface(LogosParser::InterfaceBodyContext* ctx, antlr4::tree::TerminalNode* interfaceName);
     LgsObject* getObject(LogosParser::ObjectBodyContext* ctx, antlr4::tree::TerminalNode* objName, bool isSingleton);
-    LgsField* getField(LogosParser::FieldContext* ctx, size_t position, LgsType* parentType);
+    LgsField* getField(LogosParser::FieldContext* ctx, size_t position);
     LgsFunc* getLambda(LogosParser::LambdaContext* ctx);
     LgsParam getParam(LgsFuncType* funcType, LogosParser::ParamContext* param);
     LgsField* getInterfaceField(LogosParser::InterfaceFieldContext* ctx);
@@ -110,7 +110,7 @@ public:
     bool setMainArgsParam(const LgsMainFunc* mainFunc, LogosParser::FuncSignatureContext* funcSignature);
     void addFileSymbol(LgsMainFile* file, const LgsSymbol& newSymbol);
     bool isArgsDuplicate(const std::unordered_set<std::string>& initializedArgs, LgsVarDec* varDec);
-    bool validateTypeName(const std::string& typeName, LgsLocation* location);
+    bool validateTypeName(const std::string& typeName, const LgsLocation* location);
     void extractStrParts(LgsStrConst& strConst);
     bool checkParserErrors(LogosParser* parser);
     void setLocation(LgsLocation& location, const antlr4::Token* start) const;

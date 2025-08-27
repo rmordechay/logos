@@ -3,7 +3,7 @@
 
 Value* LgsValue::loadIR(LgsLLVM& codeGen) {
     assert(IRValue);
-    return IRValue;
+    return codeGen.builder.CreateLoad(IRValue->getType(), IRValue);
 }
 
 void LgsValue::setIRValue(Value* value) {

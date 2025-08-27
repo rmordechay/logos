@@ -25,6 +25,7 @@
 #include "exprs/unary/LgsHashMap.h"
 #include "exprs/unary/LgsPostfixExpr.h"
 #include "exprs/unary/LgsPrefixExpr.h"
+#include "exprs/unary/LgsTypeExpr.h"
 #include "exprs/unary/LgsVectorExpr.h"
 #include "files/LgsAppFile.h"
 #include "files/LgsMainFile.h"
@@ -47,9 +48,6 @@
 #include "types/primitives/LgsSize.h"
 #include "types/primitives/LgsUInt.h"
 #include "utils/LgsUtils.h"
-
-#include <LogosParser.h>
-#include <LogosParser.h>
 #include <loops/LgsLoopMetaVar.h>
 #include <loops/LgsForeachLoop.h>
 #include <loops/LgsRangeLoop.h>
@@ -368,7 +366,7 @@ LgsObject* LgsParserAdapter::getObject(LogosParser::ObjectBodyContext* ctx, antl
 
     // Fields
     for (int i = 0; i < ctx->field().size(); ++i) {
-        const auto lgsField = getField(ctx->field(i), i, obj);
+        const auto lgsField = getField(ctx->field(i), i);
         const auto fieldAdded = obj->addField(lgsField);
         if (!fieldAdded) {
             errHandler.addError(E10056, &obj->location, {obj->name, lgsField->name});
@@ -412,7 +410,7 @@ LgsParam LgsParserAdapter::getParam(LgsFuncType* funcType, LogosParser::ParamCon
     return lgsParam;
 }
 
-LgsField* LgsParserAdapter::getField(LogosParser::FieldContext* ctx, const size_t position, LgsType* parentType) {
+LgsField* LgsParserAdapter::getField(LogosParser::FieldContext* ctx, const size_t position) {
     const auto name = ctx->IDENTIFIER()->getText();
     const auto type = getType(ctx->type());
     const auto expr = getExpr(ctx->expr());
@@ -908,6 +906,7 @@ LgsSelection* LgsParserAdapter::getSelection(LogosParser::SelectionContext* ctx)
 LgsUnaryExpr* LgsParserAdapter::getFirstSelection(LogosParser::SelectionContext* ctx) {
     const auto firstExpr = ctx->firstSelectionElement();
     if (const auto variable = firstExpr->IDENTIFIER()) {
+        if (isupper(variable->getText()[0])) return new LgsTypeExpr(getTypeFromText(variable));
         return getVariable(variable);
     }
     if (const auto funcCall = firstExpr->funcCall()) {
@@ -1185,7 +1184,7 @@ bool LgsParserAdapter::isArgsDuplicate(const std::unordered_set<std::string>& in
     return false;
 }
 
-bool LgsParserAdapter::validateTypeName(const std::string& typeName, LgsLocation* location) {
+bool LgsParserAdapter::validateTypeName(const std::string& typeName, const LgsLocation* location) {
     if (islower(typeName[0])) {
         errHandler.addError(E10033, location, {typeName});
         return false;

@@ -17,6 +17,7 @@
 #include "exprs/unary/LgsHashMap.h"
 #include "exprs/unary/LgsPostfixExpr.h"
 #include "exprs/unary/LgsPrefixExpr.h"
+#include "exprs/unary/LgsTypeExpr.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "files/LgsMainFile.h"
 #include "files/LgsTestFile.h"
@@ -619,6 +620,10 @@ void LgsSema::visitFirstSelection(LgsExpr* firstExpr) {
         visitFuncCall(funcCall);
     } else if (const auto iterIndex = firstExpr->asIterIndex()) {
         visitIterIndex(iterIndex);
+    } else if (const auto typeExpr = firstExpr->asTypeExpr()) {
+        visitTypeExpr(typeExpr);
+    } else {
+        assert(0);
     }
 }
 
@@ -660,7 +665,11 @@ void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent) {
     }
     if (!resolveMethodCall(methodCall, parent->type)) return;
     if (methodCall->func->funcType->isMethod) {
-        methodCall->args.insert(methodCall->args.begin(), parent);
+        if (parent->asTypeExpr()) {
+            errHandler.addError(E10083, &methodCall->location, {methodCall->func->funcType->pname()});
+        } else {
+            methodCall->args.insert(methodCall->args.begin(), parent);
+        }
     }
     validateMethodVisibility(methodCall, parent->type->asObject());
 }
@@ -701,6 +710,10 @@ void LgsSema::visitStrConst(const LgsStrConst* strConst) {
     for (const auto templatePart : strConst->templateParts) {
         visitExpr(templatePart);
     }
+}
+
+void LgsSema::visitTypeExpr(LgsTypeExpr* typeExpr) {
+    typeExpr->type = typeResolver.resolveType(typeExpr->type, file);
 }
 
 void LgsSema::visitInstance(LgsInstance* instance) {

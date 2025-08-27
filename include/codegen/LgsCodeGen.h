@@ -104,6 +104,7 @@ public:
     void visitPrefixExpr(LgsPrefixExpr* prefixExpr);
     void visitPostfixExpr(LgsPostfixExpr* postfixExpr) const;
     void visitStrConst(LgsStrConst* strConst) const;
+    void visitTypeExpr(LgsTypeExpr* typeExpr);
     void visitIterIndex(LgsIterIndex* iterIndex);
     void visitInstance(LgsInstance* instance);
     void initFields(LgsInstance* instance);

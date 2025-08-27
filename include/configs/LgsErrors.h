@@ -92,8 +92,14 @@ inline LgsBaseError E10069{.msg = "Too many scalars passed to '%s'.", .errCode =
 inline LgsBaseError E10070{.msg = "Invalid scalars '%s' for '%s'.", .errCode = errCodeStart++};
 inline LgsBaseError E10071{.msg = "'break if' must be inside an if statement.", .errCode = errCodeStart++};
 inline LgsBaseError E10072{.msg = "Type '%s' has multiple methods with the same name '%s'.", .errCode = errCodeStart++};
-inline LgsBaseError E10078{.msg = "Type '%s' has multiple methods with the same name '%s'.", .errCode = errCodeStart++};
-inline LgsBaseError E10079{.msg = "Defer functions must return 'Void'. Given: '%s'.", .errCode = errCodeStart++};
+inline LgsBaseError E10073{.msg = "", .errCode = errCodeStart++};
+inline LgsBaseError E10074{.msg = "", .errCode = errCodeStart++};
+inline LgsBaseError E10075{.msg = "", .errCode = errCodeStart++};
+inline LgsBaseError E10076{.msg = "", .errCode = errCodeStart++};
+inline LgsBaseError E10077{.msg = "", .errCode = errCodeStart++};
+inline LgsBaseError E10078{.msg = "Defer functions must return 'Void'. Given: '%s'.", .errCode = errCodeStart++};
+inline LgsBaseError E10079{.msg = "", .errCode = errCodeStart++};
 inline LgsBaseError E10080{.msg = "Index '%s' was not found in iterable.", .errCode = errCodeStart++};
 inline LgsBaseError E10081{.msg = "Range-start type '%s' is not equal to the range-end type '%s'.", .errCode = errCodeStart++};
 inline LgsBaseError E10082{.msg = "Loop range '%s' must be a number. Given: '%s'.", .errCode = errCodeStart++};
+inline LgsBaseError E10083{.msg = "Method '%s' is an object method but was called as a class method.", .errCode = errCodeStart++};

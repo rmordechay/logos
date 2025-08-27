@@ -98,7 +98,7 @@ LgsType::~LgsType() {
     fields.clear();
     for (const auto& [_, method] : methods) {
         if (method->funcType->isInternal) continue;
-        delete method;
+        // delete method;
     }
     methods.clear();
 }

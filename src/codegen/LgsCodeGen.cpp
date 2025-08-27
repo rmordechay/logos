@@ -43,9 +43,9 @@ void LgsCodeGen::generate(const LgsAppConfigs& appConfigs, TargetMachine& target
     if (const auto mainFile = dynamic_cast<LgsMainFile*>(&file)) {
         visitMainFile(mainFile);
     } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(&file)) {
-        visitObject(objFile->obj);
+        visitObjFile(objFile);
     } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(&file)) {
-        visitInterface(interfaceFile->interface);
+        visitInterfaceFile(interfaceFile);
     }
 }
 
@@ -553,6 +553,7 @@ void LgsCodeGen::visitUnaryExpr(LgsUnaryExpr* unaryExpr) {
     if (const auto vecExpr = unaryExpr->asVectorExpr()) return visitVectorExpr(vecExpr);
     if (const auto intConst = unaryExpr->asIntConst()) return visitIntConst(intConst);
     if (const auto loopMetaVar = unaryExpr->asLoopMetaVar()) return visitLoopMetaVar(loopMetaVar);
+    if (const auto typeExpr = unaryExpr->asTypeExpr()) return visitTypeExpr(typeExpr);
     assert(0);
 }
 
@@ -673,6 +674,7 @@ void LgsCodeGen::visitSelection(LgsSelection* selection) {
         selection->exprs.front() = parentAsVar->ref.object->singleton;
         startIndex = 1;
     }
+
     for (int i = startIndex; i < selection->exprs.size() - 1; ++i) {
         const auto parentExpr = selection->exprs[i];
         const auto childExpr = selection->exprs[i + 1];
@@ -681,7 +683,7 @@ void LgsCodeGen::visitSelection(LgsSelection* selection) {
             field->parentIRType = parentExpr->type->getIRType(cg);
             field->parentIRValue = getIRValue(parentExpr);
             if (i > 0) {
-                field->parentIRValue = cg.builder.CreateLoad(cg.ptrTy(), field->parentIRValue);
+                field->parentIRValue = field->loadIR(cg);
             }
             const auto fieldIR = getIRValue(field);
             childExpr->setIRValue(fieldIR);
@@ -741,6 +743,10 @@ void LgsCodeGen::visitPostfixExpr(LgsPostfixExpr* postfixExpr) const {
 
 void LgsCodeGen::visitStrConst(LgsStrConst* strConst) const {
     strConst->IRValue = cg.getIRStr(strConst->value);
+}
+
+void LgsCodeGen::visitTypeExpr(LgsTypeExpr* typeExpr) {
+    assert(0);
 }
 
 void LgsCodeGen::visitInstance(LgsInstance* instance) {
