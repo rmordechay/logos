@@ -44,11 +44,12 @@ bool LgsApp::setup() {
 bool LgsApp::parse() {
     loadBuiltins();
     if (!parseAppFile()) return false;
-    threadPool.start();
     for (const auto& entry : fs::recursive_directory_iterator(paths.srcDir)) {
         if (!isLogosFile(entry)) continue;
         threadPool.runTask([entry, this] {
-            parseSrcFile(entry);
+            const auto absFilePath = fs::path(fs::canonical(entry));
+            const std::string code = getFileText(absFilePath);
+            parseSrcFile(code, entry);
         });
     }
     threadPool.wait();
@@ -137,10 +138,10 @@ void LgsApp::parseEnvFile(const fs::path& filePath) {
     errHandler.mergeErrors(antlrConverter.errHandler);
 }
 
-void LgsApp::parseSrcFile(const fs::path& filePath) {
+void LgsApp::parseSrcFile(const std::string& code, const fs::path& filePath) {
     const auto fileID = nextFileID.fetch_add(1, std::memory_order_relaxed);
     LgsParserAdapter antlrConverter(fileID, paths, globals);
-    const auto lgsFile = antlrConverter.parseFile(filePath);
+    const auto lgsFile = antlrConverter.parseFile(code, filePath);
     {
         std::lock_guard lock(mtx);
         lgsFile->id = fileID;
@@ -202,7 +203,7 @@ void LgsApp::exitWithErrors() const {
 }
 
 void LgsApp::freeApp() {
-    threadPool.shutdown();
+    threadPool.~ThreadPool();
     for (const auto file : ast) {
         delete file;
     }

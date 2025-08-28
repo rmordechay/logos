@@ -51,7 +51,7 @@ public:
     void loadEnvFiles();
     bool parseAppFile();
     void parseEnvFile(const fs::path& filePath);
-    void parseSrcFile(const fs::path& filePath = "");
+    void parseSrcFile(const std::string& code, const fs::path& filePath = "");
     void initBuild();
     void writeIRFiles();
     void exitWithErrors() const;

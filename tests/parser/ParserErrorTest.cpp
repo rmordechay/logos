@@ -1,32 +1,8 @@
 #include "logos/LgsApp.h"
+#include "utils/LgsUtils.h"
 #include <external/doctest.h>
 
-TEST_CASE("TestSema10012") {
-    LgsApp app;
-    const auto code = R"(
-    main() {
-        obj = Obj{}
-        obj.func() := 23
-    }
-    )";
-    app.parseSrcFile("code.lgs");
-    CHECK_EQ(app.errHandler.errors.size(), 1);
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10012.errCode);
-}
-
-TEST_CASE("TestSema10017A") {
-    LgsApp app;
-    const auto code = R"(
-    main() {
-        break
-    }
-    )";
-    app.parseSrcFile();
-    CHECK_EQ(app.errHandler.errors.size(), 1);
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10017.errCode);
-}
-
-TEST_CASE("TestSema10021") {
+TEST_CASE("TestParser10021") {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -34,8 +10,8 @@ TEST_CASE("TestSema10021") {
         go obj.x
     }
     )";
-    app.parseSrcFile();
-    CHECK_EQ(app.errHandler.errors.size(), 1);
+    app.parseSrcFile(code);
+    CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10021, code));
     CHECK_EQ(app.errHandler.errors[0].errCode, E10021.errCode);
 }
 
@@ -45,8 +21,8 @@ TEST_CASE("TestParser10033A") {
         object obj
         x: Int
     )";
-    app.parseSrcFile();
-    CHECK_EQ(app.errHandler.errors.size(), 1);
+    app.parseSrcFile(code);
+    CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10033, code));
     CHECK_EQ(app.errHandler.errors[0].errCode, E10033.errCode);
 }
 
@@ -56,8 +32,8 @@ TEST_CASE("ParserTest10033B") {
         interface inter
         x: Int
     )";
-    app.parseSrcFile();
-    CHECK_EQ(app.errHandler.errors.size(), 1);
+    app.parseSrcFile(code);
+    CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10033, code));
     CHECK_EQ(app.errHandler.errors[0].errCode, E10033.errCode);
 }
 
@@ -68,7 +44,7 @@ TEST_CASE("ParserTest10033C") {
         object obj {}
         main() {}
     )";
-    app.parseSrcFile();
+    app.parseSrcFile(code);
     CHECK_EQ(app.errHandler.errors.size(), 2);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10033.errCode);
     CHECK_EQ(app.errHandler.errors[1].errCode, E10033.errCode);

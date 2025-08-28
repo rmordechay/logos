@@ -6,5 +6,7 @@ add_executable(lgs_tests
     codegen/CodegenTest.cpp
     sema/SemaErrorTest.cpp
 )
+
 target_precompile_headers(lgs_tests REUSE_FROM lgs_core)
-target_link_libraries(lgs_tests PRIVATE lgs_core lgs_runtime)
+target_include_directories(lgs_tests PRIVATE /Users/r.mordechay/Desktop/Programming/logos/tests/helpers.h)
+target_link_libraries(lgs_tests PRIVATE lgs_core)

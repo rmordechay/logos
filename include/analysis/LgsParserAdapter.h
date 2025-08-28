@@ -44,7 +44,7 @@ public:
     LgsFunc* currentFunc = nullptr;
 
     explicit LgsParserAdapter(const int fileID, LgsPaths& paths, LgsSymbolTable& globals) : fileID(fileID), paths(paths), globals(globals) {}
-    LgsFile* parseFile(const fs::path& filePath);
+    LgsFile* parseFile(const std::string& codeText, const fs::path& filePath);
     LgsFile* getLogosFile(LogosParser::LogosFileContext* ctx, const fs::path& filePath);
     LgsMainFile* getMainFile(LogosParser::MainFileContext* ctx, const fs::path& filePath);
     LgsObjectFile* getObjectFile(LogosParser::ObjectFileContext* ctx, const fs::path& filePath);

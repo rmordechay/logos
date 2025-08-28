@@ -8,6 +8,8 @@ class LgsErrHandler;
 struct LgsLocation;
 class LgsType;
 
+#define EXPECTED_ERR(E, code) "Expected error: '" << std::string(E.msg) << "'" << std::string(code)
+
 void logInfo(const std::string& text = "");
 void logError(const std::string& msg, const std::string& path = "");
 void formatAndLogError(const LgsBaseError& lgsErr, const std::vector<std::string>& args = {});

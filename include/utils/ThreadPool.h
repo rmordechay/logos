@@ -9,7 +9,7 @@ public:
     std::atomic<size_t> active = 0;
     bool stop = false;
 
-    void start(size_t n = std::thread::hardware_concurrency()) {
+    explicit ThreadPool(size_t n = std::thread::hardware_concurrency()) {
         n = std::max<size_t>(1, n);
         workers.reserve(n);
         for (size_t i = 0; i < n; ++i) {
@@ -59,7 +59,7 @@ public:
         }
     }
 
-    void shutdown() {
+    ~ThreadPool() {
         {
             std::lock_guard lock(mtx);
             stop = true;

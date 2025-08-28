@@ -58,16 +58,14 @@
 #include <types/LgsStr.h>
 #include <types/LgsVoid.h>
 
-LgsFile* LgsParserAdapter::parseFile(const fs::path& filePath) {
-    const auto absFilePath = fs::path(fs::canonical(filePath));
-    const auto codeText = getFileText(absFilePath);
+LgsFile* LgsParserAdapter::parseFile(const std::string& codeText, const fs::path& filePath) {
     antlr4::ANTLRInputStream input(codeText);
     LogosLexer lexer(&input);
     antlr4::CommonTokenStream tokens(&lexer);
     LogosParser parser(&tokens);
     const auto file = parser.logosFile();
     checkParserErrors(&parser);
-    return getLogosFile(file, absFilePath);
+    return getLogosFile(file, filePath);
 }
 
 LgsFile* LgsParserAdapter::getLogosFile(LogosParser::LogosFileContext* ctx, const fs::path& filePath) {

@@ -9,7 +9,9 @@ void LgsAstCmd::run() {
     LgsApp app(fs::canonical(filePath));
     app.setup();
     app.loadBuiltins();
-    app.parseSrcFile(app.paths.rootDir);
+    const auto absFilePath = fs::path(fs::canonical(filePath));
+    const std::string code = getFileText(absFilePath);
+    app.parseSrcFile(code, absFilePath);
     app.analyse();
     json::object ast;
     ast["ast"] = app.ast.front()->asJSON();

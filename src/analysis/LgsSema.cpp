@@ -218,10 +218,10 @@ void LgsSema::visitAssignment(const LgsAssignment* assignment) {
     const auto lValue = assignment->lValue;
     const auto rValue = assignment->rValue;
     visitExpr(lValue);
-    if (!dynamic_cast<LgsAssignable*>(lValue)) {
-        errHandler.addError(E10012, &lValue->location);
-    }
     visitExpr(rValue);
+    if (!dynamic_cast<LgsAssignable*>(lValue)) {
+        return errHandler.addError(E10012, &lValue->location);
+    }
     if (!lValue->isMutable) {
         return errHandler.addError(E10051, &lValue->location, {lValue->pname()});
     }
