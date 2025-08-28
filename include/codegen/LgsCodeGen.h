@@ -96,9 +96,10 @@ public:
     void visitCast(LgsCast* lgsCast);
     void visitLambda(LgsFunc* func);
     void visitIntConst(LgsIntConst* intConst) const;
+    void visitFloatConst(LgsFloatConst* floatConst) const;
     void visitArrayExpr(LgsArrayExpr* array);
     void visitHashMap(LgsHashMap* hashMap);
-    void visitVectorExpr(LgsVectorExpr* vec);
+    void visitVectorExpr(LgsVectorExpr* vectorExpr);
     void visitVariable(LgsVariable* variable);
     void visitSelection(LgsSelection* selection);
     void visitFuncCall(LgsFuncCall* funcCall);
@@ -134,4 +135,5 @@ public:
 
     // Generic
     Value* getIRValue(LgsValue* value);
+    bool allArgsAreConst(const std::vector<LgsExpr*>& args);
 };

@@ -461,7 +461,7 @@ void LgsSema::visitUnaryExpr(LgsUnaryExpr* unaryExpr) {
     else if (const auto postfixExpr = unaryExpr->asPostfixExpr()) visitPostfixExpr(postfixExpr);
     else if (const auto prefixExpr = unaryExpr->asPrefixExpr()) visitPrefixExpr(prefixExpr);
     else if (const auto forVar = unaryExpr->asLoopMetaVar()) visitLoopMetaVar(forVar);
-    else if (const auto vecExpr = unaryExpr->asVectorExpr()) visitVector(vecExpr);
+    else if (const auto vecExpr = unaryExpr->asVectorExpr()) visitVectorExpr(vecExpr);
 }
 
 void LgsSema::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
@@ -576,9 +576,20 @@ void LgsSema::visitHashMap(const LgsHashMap* hashMap) {
     typePair->value = firstElement->value->type;
 }
 
-void LgsSema::visitVector(const LgsVectorExpr* vec) {
-    for (const auto arg : vec->args) {
+void LgsSema::visitVectorExpr(const LgsVectorExpr* vectorExpr) {
+    auto sumDim = 0;
+    for (const auto arg : vectorExpr->args) {
         visitExpr(arg);
+        if (arg->type->isNumber) {
+            sumDim++;
+        } else if (const auto otherVec = arg->type->asVec()) {
+            sumDim += otherVec->dim;
+        } else {
+            errHandler.addError(E10073, &vectorExpr->location, {arg->type->pname()});
+        }
+    }
+    if (sumDim > vectorExpr->vecType->dim) {
+        errHandler.addError(E10074, &vectorExpr->location, {std::to_string(vectorExpr->vecType->dim), std::to_string(sumDim)});
     }
 }
 
@@ -667,7 +678,7 @@ void LgsSema::visitInnerSelections(const LgsSelection* selection) {
 void LgsSema::visitFieldSelection(LgsVariable* child, LgsType* parentType) {
     if (!parentType) return;
     auto childName = child->name;
-    if (parentType->isVector()) resolveScalars(child, parentType->asVec());
+    if (parentType->asVec()) resolveScalars(child, parentType->asVec());
     const auto field = parentType->getField(childName);
     if (!field) {
         errHandler.addError(E10005, &child->location, {childName, parentType->pname()});

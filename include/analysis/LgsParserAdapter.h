@@ -93,7 +93,7 @@ public:
     LgsUnaryExpr* getHashMap(LogosParser::HashMapContext* ctx);
     LgsVariable* getVariable(antlr4::tree::TerminalNode* ctx) const;
     LgsFuncCall* getFuncCall(LogosParser::FuncCallContext* ctx);
-    LgsUnaryExpr* getVector(LogosParser::VectorContext* ctx);
+    LgsUnaryExpr* getVectorExpr(LogosParser::VectorContext* ctx);
     LgsSelection* getSelection(LogosParser::SelectionContext* ctx);
     LgsUnaryExpr* getFirstSelection(LogosParser::SelectionContext* ctx);
     std::vector<LgsUnaryExpr*> getSelectionExprs(LogosParser::SelectionContext* ctx);

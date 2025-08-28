@@ -4,13 +4,17 @@
 
 class LgsVectorExpr final : public LgsUnaryExpr {
 public:
-    size_t dim = 0;
     std::vector<LgsExpr*> args;
+    LgsVec* vecType;
 
-    LgsVectorExpr() {
+    LgsVectorExpr(const int8_t dim) {
         isMutable = true;
+        vecType = new LgsVec(dim);
+        type = vecType;
     }
 
+    explicit LgsVectorExpr(LgsVec* vecType): vecType(vecType) {}
+    Value* loadIR(LgsLLVM& codeGen) override;
     std::string pname() override;
     json::value asJSON() override;
     ~LgsVectorExpr() override;

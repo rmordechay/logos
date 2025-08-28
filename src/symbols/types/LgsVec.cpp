@@ -2,7 +2,7 @@
 #include "exprs/unary/LgsVectorExpr.h"
 
 Type* LgsVec::getIRType(LgsLLVM& codeGen) {
-    IRType = FixedVectorType::get(baseType->getIRType(codeGen), 2);
+    IRType = FixedVectorType::get(baseType->getIRType(codeGen), dim);
     return IRType;
 }
 
@@ -30,7 +30,7 @@ size_t LgsVec::getSizeBytes() {
 }
 
 LgsExpr* LgsVec::getZeroValue() {
-    return new LgsVectorExpr();
+    return new LgsVectorExpr(this);
 }
 
 LgsType* LgsVec::getIndexType() {
@@ -54,7 +54,9 @@ Value* LgsVec::IRIsNotEmpty(LgsLLVM* codeGen, LgsExpr* iterable) {
 }
 
 bool LgsVec::canCastTo(LgsType* other) {
-    assert(0);
+    const auto otherName = other->getName();
+    if (otherName == LgsAny::name) return true;
+    return other->asVec();
 }
 
 int8_t LgsVec::getSwizzleSet(const char c) {
@@ -75,5 +77,19 @@ int8_t LgsVec::getComponentIndex(const char c) {
 }
 
 std::string LgsVec::strFormatPart() const {
-    return baseType->strFormatPart();
+    std::stringstream str;
+    str << '<';
+    for (int i = 0; i < dim; i++) {
+        str << baseType->strFormatPart();
+        if (i < dim - 1) str << ", ";
+    }
+    str << '>';
+    return str.str();
+}
+
+void LgsVec::setRTT() {
+    if (dim == 2) rtt = RTT_VEC2;
+    else if (dim == 3) rtt = RTT_VEC3;
+    else if (dim == 4) rtt = RTT_VEC4;
+    else rtt = RTT_UNKNOWN;
 }

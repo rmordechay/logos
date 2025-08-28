@@ -3,6 +3,10 @@
 #include "exprs/LgsExpr.h"
 #include "exprs/unary/LgsHashMap.h"
 
+Value* LgsField::loadIR(LgsLLVM& codeGen) {
+    assert(0);
+}
+
 Value* LgsField::resolveVirtualField(LgsLLVM* codeGen, const LgsHashMap* vtable) const {
     const auto vtableMap = vtable->type->asMap();
     const auto fieldIRType = type->getIRType(*codeGen);

@@ -29,7 +29,7 @@ size_t LgsFloat::getSizeBytes() {
 }
 
 std::string LgsFloat::strFormatPart() const {
-    return "%f";
+    return "%.3f";
 }
 
 bool LgsFloat::canCastTo(LgsType* other) {

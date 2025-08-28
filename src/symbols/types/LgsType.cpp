@@ -87,7 +87,6 @@ LgsFuncType* LgsType::asFuncType() { return dynamic_cast<LgsFuncType*>(this); }
 LgsPtr* LgsType::asPtr() { return dynamic_cast<LgsPtr*>(this); }
 LgsGroup* LgsType::asGroup() { return dynamic_cast<LgsGroup*>(this); }
 LgsTypePair* LgsType::asPair() { return dynamic_cast<LgsTypePair*>(this); }
-bool LgsType::isVector() { return dynamic_cast<LgsVec*>(this); }
 bool LgsType::isVoid() { return dynamic_cast<LgsVoid*>(this); }
 bool LgsType::isUnknown() { return dynamic_cast<LgsUnknown*>(this); }
 

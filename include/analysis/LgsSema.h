@@ -95,7 +95,7 @@ public:
     void visitStaticArray(const LgsArrayExpr* arrayExpr);
     void visitDynamicArray(const LgsArrayExpr* array);
     void visitHashMap(const LgsHashMap* hashMap);
-    void visitVector(const LgsVectorExpr* vec);
+    void visitVectorExpr(const LgsVectorExpr* vectorExpr);
     void visitVariable(LgsVariable* variable);
     void visitSelection(LgsSelection* selection);
     void visitFirstSelection(LgsExpr* firstExpr);

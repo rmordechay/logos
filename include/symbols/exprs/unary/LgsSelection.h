@@ -9,6 +9,7 @@ public:
     std::vector<LgsUnaryExpr*> exprs;
 
     explicit LgsSelection(const std::vector<LgsUnaryExpr*>& exprs) : exprs(exprs) {}
+    Value* loadIR(LgsLLVM& codeGen) override;
     LgsExpr* lastExpr() const;
     LgsExpr* lastExprParent() const;
     void assign(LgsLLVM& codeGen, LgsExpr* expr) override;

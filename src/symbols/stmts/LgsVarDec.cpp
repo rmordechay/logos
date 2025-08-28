@@ -9,7 +9,7 @@ Value* LgsVarDec::loadIR(LgsLLVM& codeGen) {
 }
 
 bool LgsVarDec::shouldAllocate(const Type* IRType) const {
-    if (type->isVector() ||
+    if (type->asVec() ||
         type->asFuncType() ||
         type->asMap() ||
         type->asDArray() ||

@@ -1,4 +1,5 @@
 #pragma once
+#include "configs/LgsDefinitions.h"
 #include "configs/LgsErrors.h"
 
 class LgsPtr;
@@ -54,6 +55,7 @@ public:
     LgsLocation location{0, 0, 0};
     std::vector<LgsField*> fields;
     std::map<std::string, LgsFunc*> methods;
+    LgsRTType rtt;
 
     virtual LgsField* getField(const std::string& name);
     virtual LgsFunc* getMethod(const std::string& name);
@@ -94,7 +96,6 @@ public:
     LgsPtr* asPtr();
     LgsGroup* asGroup();
     LgsTypePair* asPair();
-    bool isVector();
     bool isVoid();
     bool isUnknown();
     bool isBig();

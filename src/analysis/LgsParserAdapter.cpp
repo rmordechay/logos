@@ -775,7 +775,7 @@ LgsUnaryExpr* LgsParserAdapter::getUnaryExpr(LogosParser::UnaryExprContext* ctx)
     if (const auto selection = ctx->selection()) return getSelection(selection);
     if (const auto isFirst = ctx->forVariable()) return getLoopMetaVar(isFirst);
     if (const auto func = ctx->lambda()) return getLambda(func);
-    if (const auto vector = ctx->vector()) return getVector(vector);
+    if (const auto vector = ctx->vector()) return getVectorExpr(vector);
     if (const auto null = ctx->NULL_()) return getNullValue(null);
     if (const auto json = ctx->json()) return getJSON(json);
     assert(0);
@@ -910,14 +910,14 @@ LgsFuncCall* LgsParserAdapter::getFuncCall(LogosParser::FuncCallContext* ctx) {
     return funcCall;
 }
 
-LgsUnaryExpr* LgsParserAdapter::getVector(LogosParser::VectorContext* ctx) {
-    const auto lgsVec = new LgsVectorExpr();
+LgsUnaryExpr* LgsParserAdapter::getVectorExpr(LogosParser::VectorContext* ctx) {
     uint8_t dim = 0;
     if (ctx->VEC2()) dim = 2;
     else if (ctx->VEC3()) dim = 3;
     else if (ctx->VEC4()) dim = 4;
     else assert(0);
-    lgsVec->type = new LgsVec(dim);
+
+    const auto lgsVec = new LgsVectorExpr(dim);
     setLocation(lgsVec->location, ctx->start);
     for (const auto& expr : ctx->expr()) {
         lgsVec->args.emplace_back(getExpr(expr));

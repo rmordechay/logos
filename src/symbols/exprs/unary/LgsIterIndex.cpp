@@ -8,7 +8,7 @@ Value* LgsIterIndex::loadIR(LgsLLVM& codeGen) {
     const auto baseExprType = baseExpr->type;
     if (baseExprType->asSArray()) {
         IRValue = loadFromSArray(codeGen);
-    } else if (baseExpr->type->isVector()) {
+    } else if (baseExpr->type->asVec()) {
         IRValue = loadFromVec(codeGen);
     } else if (const auto arr = baseExprType->asDArray()) {
         IRValue = loadFromDArray(codeGen, arr);

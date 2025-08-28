@@ -18,6 +18,7 @@
 #include "exprs/unary/LgsPostfixExpr.h"
 #include "exprs/unary/LgsPrefixExpr.h"
 #include "exprs/unary/LgsVectorExpr.h"
+#include "exprs/unary/constants/LgsFloatConst.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "files/LgsMainFile.h"
 #include "funcs/LgsMainFunc.h"
@@ -559,6 +560,7 @@ void LgsCodeGen::visitUnaryExpr(LgsUnaryExpr* unaryExpr) {
     if (const auto prefixExpr = unaryExpr->asPrefixExpr()) return visitPrefixExpr(prefixExpr);
     if (const auto vecExpr = unaryExpr->asVectorExpr()) return visitVectorExpr(vecExpr);
     if (const auto intConst = unaryExpr->asIntConst()) return visitIntConst(intConst);
+    if (const auto floatConst = unaryExpr->asFloatConst()) return visitFloatConst(floatConst);
     if (const auto loopMetaVar = unaryExpr->asLoopMetaVar()) return visitLoopMetaVar(loopMetaVar);
     if (const auto typeExpr = unaryExpr->asTypeExpr()) return visitTypeExpr(typeExpr);
     assert(0);
@@ -615,6 +617,18 @@ void LgsCodeGen::visitIntConst(LgsIntConst* intConst) const {
         intConst->IRValue = cg.i32(intConst->value);
     } else if (intConst->type->asLong()) {
         intConst->IRValue = cg.i64(intConst->value);
+    } else {
+        assert(0);
+    }
+}
+
+void LgsCodeGen::visitFloatConst(LgsFloatConst* floatConst) const {
+    if (floatConst->type->asFloat()) {
+        floatConst->IRValue = cg.floatv(floatConst->value);
+    } else if (floatConst->type->asDouble()) {
+        floatConst->IRValue = cg.doublev(floatConst->value);
+    } else {
+        assert(0);
     }
 }
 
@@ -641,10 +655,19 @@ void LgsCodeGen::visitHashMap(LgsHashMap* hashMap) {
     }
 }
 
-void LgsCodeGen::visitVectorExpr(LgsVectorExpr* vec) {
-    const auto ty = vec->type->getIRType(cg);
-    vec->IRValue = cg.builder.CreateAlloca(ty);
-    cg.builder.CreateStore(ConstantAggregateZero::get(ty), getIRValue(vec));
+void LgsCodeGen::visitVectorExpr(LgsVectorExpr* vectorExpr) {
+    const auto ty = vectorExpr->type->getIRType(cg);
+    vectorExpr->IRValue = cg.builder.CreateAlloca(ty);
+    if (!vectorExpr->args.empty()) {
+        Value* vectorValue = UndefValue::get(ty);
+        for (size_t i = 0; i < vectorExpr->args.size(); ++i) {
+            const auto elementValue = getIRValue(vectorExpr->args[i]);
+            vectorValue = cg.builder.CreateInsertElement(vectorValue, elementValue, ConstantInt::get(Type::getInt32Ty(cg.context), i));
+        }
+        cg.builder.CreateStore(vectorValue, vectorExpr->IRValue);
+    } else {
+        cg.builder.CreateStore(ConstantAggregateZero::get(ty), vectorExpr->IRValue);
+    }
 }
 
 void LgsCodeGen::visitVariable(LgsVariable* variable) {
@@ -675,14 +698,12 @@ void LgsCodeGen::visitVariable(LgsVariable* variable) {
 }
 
 void LgsCodeGen::visitSelection(LgsSelection* selection) {
-    auto startIndex = 0;
     const auto parentAsVar = selection->exprs.front()->asVariable();
     if (parentAsVar && parentAsVar->ref.symbolType == OBJECT) {
-        selection->exprs.front() = parentAsVar->ref.object->singleton;
-        startIndex = 1;
+        assert(0);
     }
 
-    for (int i = startIndex; i < selection->exprs.size() - 1; ++i) {
+    for (int i = 0; i < selection->exprs.size() - 1; ++i) {
         const auto parentExpr = selection->exprs[i];
         const auto childExpr = selection->exprs[i + 1];
         if (const auto var = childExpr->asVariable()) {
@@ -929,16 +950,7 @@ Value* LgsCodeGen::createConstArray(const LgsArrayExpr* arrayExpr) {
     const auto arrIRType = ArrayType::get(baseIRType, arr->sizeExpr->getConstInt());
     const auto arrIRPtr = cg.builder.CreateAlloca(arrIRType);
     if (arrayExpr->initialElements.empty()) return arrIRPtr;
-
-    bool allElementsConst = true;
-    for (const auto element : arrayExpr->initialElements) {
-        visitExpr(element);
-        if (!llvm::isa<Constant>(getIRValue(element))) {
-            allElementsConst = false;
-        }
-    }
-
-    if (allElementsConst) {
+    if (allArgsAreConst(arrayExpr->initialElements)) {
         std::vector<Constant*> IRValues;
         for (int i = 0; i < arrayExpr->initialElements.size(); ++i) {
             const auto element = arrayExpr->initialElements[i];
@@ -1019,4 +1031,15 @@ Value* LgsCodeGen::getIRValue(LgsValue* value) {
     }
     assert(value->IRValue);
     return value->IRValue;
+}
+
+bool LgsCodeGen::allArgsAreConst(const std::vector<LgsExpr*>& args) {
+    bool allElementsConst = true;
+    for (const auto element : args) {
+        visitExpr(element);
+        if (!llvm::isa<Constant>(getIRValue(element))) {
+            allElementsConst = false;
+        }
+    }
+    return allElementsConst;
 }

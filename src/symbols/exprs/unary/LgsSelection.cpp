@@ -6,6 +6,10 @@
 #include "types/LgsInterface.h"
 #include "types/LgsVec.h"
 
+Value* LgsSelection::loadIR(LgsLLVM& codeGen) {
+    return IRValue;
+}
+
 LgsExpr* LgsSelection::lastExpr() const {
     assert(exprs.size() > 1);
     return exprs[exprs.size() - 1];
@@ -17,7 +21,7 @@ LgsExpr* LgsSelection::lastExprParent() const {
 
 void LgsSelection::assign(LgsLLVM& codeGen, LgsExpr* expr) {
     const auto rIR = expr->IRValue;
-    auto exprParent = lastExprParent();
+    const auto exprParent = lastExprParent();
     if (exprParent->type->asVec()) {
         const auto vecTy = exprParent->type->getIRType(codeGen);
         const auto vec = codeGen.builder.CreateLoad(vecTy, exprParent->IRValue);

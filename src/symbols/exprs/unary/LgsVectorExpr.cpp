@@ -1,5 +1,9 @@
 #include "exprs/unary/LgsVectorExpr.h"
 
+Value* LgsVectorExpr::loadIR(LgsLLVM& codeGen) {
+    assert(0);
+}
+
 std::string LgsVectorExpr::pname() {
     return "vec2";
 }

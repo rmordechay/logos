@@ -92,8 +92,8 @@ inline LgsBaseError E10069{.msg = "Too many scalars passed to '%s'.", .errCode =
 inline LgsBaseError E10070{.msg = "Invalid scalars '%s' for '%s'.", .errCode = errCodeStart++};
 inline LgsBaseError E10071{.msg = "'break if' must be inside an if statement.", .errCode = errCodeStart++};
 inline LgsBaseError E10072{.msg = "Type '%s' has multiple methods with the same name '%s'.", .errCode = errCodeStart++};
-inline LgsBaseError E10073{.msg = "", .errCode = errCodeStart++};
-inline LgsBaseError E10074{.msg = "", .errCode = errCodeStart++};
+inline LgsBaseError E10073{.msg = "Only numbers or vectors can be elements of a vector. Given: '%s'.", .errCode = errCodeStart++};
+inline LgsBaseError E10074{.msg = "Vector mismatch. Vector dimension: %s. Given: %s.", .errCode = errCodeStart++};
 inline LgsBaseError E10075{.msg = "", .errCode = errCodeStart++};
 inline LgsBaseError E10076{.msg = "", .errCode = errCodeStart++};
 inline LgsBaseError E10077{.msg = "", .errCode = errCodeStart++};
