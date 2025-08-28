@@ -103,7 +103,7 @@ public:
     void visitSelection(LgsSelection* selection);
     void visitFuncCall(LgsFuncCall* funcCall);
     void visitPrefixExpr(LgsPrefixExpr* prefixExpr);
-    void visitPostfixExpr(LgsPostfixExpr* postfixExpr) const;
+    void visitPostfixExpr(LgsPostfixExpr* postfixExpr);
     void visitStrConst(LgsStrConst* strConst) const;
     void visitTypeExpr(LgsTypeExpr* typeExpr);
     void visitIterIndex(LgsIterIndex* iterIndex);

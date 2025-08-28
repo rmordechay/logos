@@ -5,15 +5,11 @@
 #include <llvm/IR/DIBuilder.h>
 
 Value* LgsVarDec::loadIR(LgsLLVM& codeGen) {
-    if (const auto ptr = type->asPtr()) {
-        return codeGen.builder.CreateLoad(ptr->baseType->getIRType(codeGen), IRValue);
-    }
-    return IRValue;
+    return codeGen.builder.CreateLoad(type->getIRType(codeGen), IRValue);;
 }
 
 bool LgsVarDec::shouldAllocate(const Type* IRType) const {
-    if (type->isNumber ||
-        type->isVector() ||
+    if (type->isVector() ||
         type->asFuncType() ||
         type->asMap() ||
         type->asDArray() ||

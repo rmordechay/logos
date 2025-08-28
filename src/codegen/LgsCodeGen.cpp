@@ -744,8 +744,21 @@ void LgsCodeGen::visitPrefixExpr(LgsPrefixExpr* prefixExpr) {
     }
 }
 
-void LgsCodeGen::visitPostfixExpr(LgsPostfixExpr* postfixExpr) const {
-    postfixExpr->IRValue = postfixExpr->IncOrDecValue(cg);
+void LgsCodeGen::visitPostfixExpr(LgsPostfixExpr* postfixExpr) {
+    visitExpr(postfixExpr->expr);
+    const auto exprIRValue = postfixExpr->expr->IRValue;
+    const auto exprIRType = postfixExpr->expr->type->getIRType(cg);
+    const auto exprLoad = postfixExpr->expr->loadIR(cg);
+    const auto oneConst = ConstantInt::get(exprIRType, 1);
+    switch (postfixExpr->op) {
+    case INC:
+        postfixExpr->IRValue = cg.builder.CreateAdd(exprLoad, oneConst);
+        break;
+    case DEC:
+        postfixExpr->IRValue = cg.builder.CreateSub(exprLoad, oneConst);
+        break;
+    }
+    cg.builder.CreateStore(postfixExpr->IRValue, exprIRValue);
 }
 
 void LgsCodeGen::visitStrConst(LgsStrConst* strConst) const {

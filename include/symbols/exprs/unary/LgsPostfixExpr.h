@@ -1,6 +1,5 @@
 #pragma once
 #include "LgsUnaryExpr.h"
-#include "stmts/LgsStmt.h"
 
 enum LgsPostfixOperator {
     INC,
@@ -13,7 +12,6 @@ public:
     LgsPostfixOperator op;
 
     LgsPostfixExpr(LgsUnaryExpr* baseExpr, const LgsPostfixOperator op) : expr(baseExpr), op(op) {}
-    Value* IncOrDecValue(LgsLLVM& codeGen) const;
     std::string pname() override;
     json::value asJSON() override;
     ~LgsPostfixExpr() override;

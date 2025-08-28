@@ -767,7 +767,7 @@ void LgsSema::visitInstance(LgsInstance* instance) {
         if (!validateFieldVisibility(field, instance->obj)) continue;
         visitExpr(arg->expr);
         matchExprToType(arg->expr, field->type);
-        field->expr = arg->expr->clone();
+        field->expr = arg->expr;
     }
 
     // Missing required fields

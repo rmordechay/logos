@@ -1,24 +1,30 @@
-object File
-name: Str
+object Obj {
+    pub const x: Int
+    y: Int
 
-io {
-    open(name: Str): File {
-        return File(name)
+    pub make() {
+        print(2)
     }
-    close() {
-        closeFile(self.name)
+
+    pub openFile() {
+        print("opening file")
+    }
+
+    pub closeFile() {
+        print("closing file")
+    }
+
+    io {
+        openFile
+        closeFile
     }
 }
 
-foo() {
-    io file = self.open("fd") {
-        a: Str
-        if file.name == "fome" {
-            return
-        } else {
-            a = "bal"
-        }
-        line = file.read()
+main() {
+    obj = Obj{x = 34}
+    Obj.make()
+    io file = obj.openFile() {
+        line = file.readLine()
         print(line)
     }
 }
