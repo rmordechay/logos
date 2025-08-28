@@ -2,6 +2,7 @@
 #include "LgsAssignable.h"
 #include "LgsUnaryExpr.h"
 
+class LgsStr;
 class LgsMap;
 class LgsDArray;
 struct LgsIndex;

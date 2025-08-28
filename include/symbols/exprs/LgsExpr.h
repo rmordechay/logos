@@ -34,6 +34,7 @@ public:
 
     explicit LgsExpr(LgsType* type) : type(type) {}
     virtual std::string pname() = 0; // pretty name
+    virtual llvm::Value* getIRPtrTo(LgsLLVM& codeGen);
     virtual llvm::Value* addIR(LgsLLVM& codeGen, LgsExpr* other) = 0;
     virtual llvm::Value* subIR(LgsLLVM& codeGen, LgsExpr* other) = 0;
     virtual llvm::Value* mulIR(LgsLLVM& codeGen, LgsExpr* other) = 0;

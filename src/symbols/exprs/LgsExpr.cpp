@@ -17,6 +17,10 @@
 
 class LgsTypeExpr;
 
+Value* LgsExpr::getIRPtrTo(LgsLLVM& codeGen) {
+    return IRValue;
+}
+
 size_t LgsExpr::getConstInt() {
     if (const auto intConst = asIntConst()) {
         return intConst->value;

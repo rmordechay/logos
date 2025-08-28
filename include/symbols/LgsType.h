@@ -1,5 +1,5 @@
 #pragma once
-#include "configs/LgsDefinitions.h"
+#include "Lgs_types.h"
 #include "configs/LgsErrors.h"
 
 class LgsPtr;
@@ -42,6 +42,8 @@ class LgsField;
 class LgsFunc;
 class LgsLLVM;
 
+using namespace llvm;
+
 class LgsType {
 public:
     bool isInt = false;
@@ -51,7 +53,7 @@ public:
     bool isPrimitive = false;
     bool isSliceable = false;
     bool isHeapAlloc = false;
-    llvm::Type* IRType = nullptr;
+    Type* IRType = nullptr;
     LgsLocation location{0, 0, 0};
     std::vector<LgsField*> fields;
     std::map<std::string, LgsFunc*> methods;
@@ -59,15 +61,15 @@ public:
 
     virtual LgsField* getField(const std::string& name);
     virtual LgsFunc* getMethod(const std::string& name);
-    virtual llvm::Type* getIRType(LgsLLVM& codeGen) = 0;
+    virtual Type* getIRType(LgsLLVM& codeGen) = 0;
     virtual size_t getSizeBytes() = 0;
     virtual LgsExpr* getZeroValue() = 0;
     virtual std::string getName() = 0;
     virtual std::string pname() = 0; // pretty name
     virtual bool canCastTo(LgsType* other) = 0;
     virtual std::string strFormatPart() const = 0;
-    virtual llvm::DIBasicType* getDebugType(LgsLLVM& codeGen);
-    virtual void freeValue(LgsLLVM& codeGen, llvm::Value* value);
+    virtual DIBasicType* getDebugType(LgsLLVM& codeGen);
+    virtual void freeValue(LgsLLVM& codeGen, Value* value);
     virtual LgsType* clone();
     virtual json::value asJSON() = 0;
 

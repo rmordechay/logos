@@ -1,14 +1,17 @@
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "exprs/unary/constants/LgsFloatConst.h"
 #include "types/primitives/LgsBool.h"
-#include "types/primitives/LgsChar.h"
 #include "types/primitives/LgsDouble.h"
-#include "types/primitives/LgsInt.h"
 #include "types/primitives/LgsLong.h"
-#include "types/primitives/LgsShort.h"
 
 Value* LgsIntConst::loadIR(LgsLLVM& codeGen) {
     return IRValue;
+}
+
+Value* LgsIntConst::getIRPtrTo(LgsLLVM& codeGen) {
+    const auto ptr = codeGen.builder.CreateAlloca(type->getIRType(codeGen));
+    codeGen.builder.CreateStore(IRValue, ptr);
+    return ptr;
 }
 
 LgsExpr* LgsIntConst::castTo(LgsType* toType) {

@@ -9,6 +9,7 @@ public:
         isPrimitive = true;
         isNumber = true;
         isInt = true;
+        rtt = RTT_INT;
     }
     size_t getSizeBytes() override;
     llvm::Type* getIRType(LgsLLVM& codeGen) override;

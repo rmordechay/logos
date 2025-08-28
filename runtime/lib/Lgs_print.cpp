@@ -1,25 +1,29 @@
-#include "configs/LgsDefinitions.h"
-#include "stmts/LgsField.h"
+#include "Lgs_types.h"
 
 extern "C" void Lgs_print(const char* fmt, const LgsRTType rtt, const void* v) {
     switch (rtt) {
+    case RTT_INT: {
+        const auto str = *static_cast<const int*>(v);
+        printf(fmt, str);
+        break;
+    }
     case RTT_STR: {
-        const auto* str = static_cast<const char*>(v);
+        const auto str = static_cast<const char*>(v);
         printf(fmt, str);
         break;
     }
     case RTT_VEC2: {
-        const auto* vec = static_cast<const Vec2*>(v);
+        const auto vec = static_cast<const Vec2*>(v);
         printf(fmt, vec->x, vec->y);
         break;
     }
     case RTT_VEC3: {
-        const auto* vec = static_cast<const Vec3*>(v);
+        const auto vec = static_cast<const Vec3*>(v);
         printf(fmt, vec->x, vec->y, vec->z);
         break;
     }
     case RTT_VEC4: {
-        const auto* vec = static_cast<const Vec4*>(v);
+        const auto vec = static_cast<const Vec4*>(v);
         printf(fmt, vec->x, vec->y, vec->z, vec->w);
         break;
     }

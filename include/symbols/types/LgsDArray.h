@@ -24,7 +24,7 @@ public:
 
     explicit LgsDArray(LgsType* baseType = nullptr) : LgsIterable(baseType) {
         addFunc->fn = [this](LgsLLVM& cg, const std::vector<LgsExpr*>& args) {
-            return callAdd(cg, args);
+            return addFunc->callIR(cg, {args[0]->IRValue, args[1]->getIRPtrTo(cg)});
         };
         addMethod(addFunc);
         addMethod(lenFunc);
@@ -33,7 +33,6 @@ public:
         isSliceable = true;
     }
 
-    Value* callAdd(LgsLLVM& codeGen, const std::vector<LgsExpr*>& args) const;
     Type* getIRType(LgsLLVM& codeGen) override;
     std::string getName() override;
     std::string pname() override;

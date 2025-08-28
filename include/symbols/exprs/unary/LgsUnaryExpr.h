@@ -1,7 +1,6 @@
 #pragma once
-#include "LgsType.h"
 #include "exprs/LgsExpr.h"
-#include "../codegen/LgsLLVM.h"
+#include "codegen/LgsLLVM.h"
 
 class LgsUnaryExpr : public LgsExpr {
 public:

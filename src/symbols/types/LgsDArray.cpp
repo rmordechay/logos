@@ -3,17 +3,6 @@
 #include "exprs/unary/LgsArrayExpr.h"
 #include "types/primitives/LgsInt.h"
 
-Value* LgsDArray::callAdd(LgsLLVM& codeGen, const std::vector<LgsExpr*>& args) const {
-    const auto arr = args[0];
-    const auto exprToAdd = args[1];
-    const auto exprIR = exprToAdd->IRValue;
-    const auto arrPtr = arr->IRValue;
-    const auto exprTy = exprToAdd->type;
-    const auto ptr = codeGen.builder.CreateAlloca(exprTy->getIRType(codeGen));
-    codeGen.builder.CreateStore(exprIR, ptr);
-    return addFunc->callIR(codeGen, {arrPtr, ptr});
-}
-
 Type* LgsDArray::getIRType(LgsLLVM& codeGen) {
     if (IRType) return IRType;
     return getArrStruct(codeGen);
