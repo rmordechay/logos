@@ -1,12 +1,12 @@
 #include "types/LgsAny.h"
-#include "codegen/LgsLLVM.h"
+#include "codegen/LgsLLVMGen.h"
 
 size_t LgsAny::getSizeBytes() {
     return sizeof(void*);
 }
 
-Type* LgsAny::getIRType(LgsLLVM& codeGen) {
-    return codeGen.ptrTy();
+Type* LgsAny::getIRType(LgsLLVMGen& cg) {
+    return cg.ptrTy();
 }
 
 std::string LgsAny::getName() {

@@ -3,8 +3,8 @@
 #include "LgsType.h"
 #include "utils/LgsUtils.h"
 
-Value* LgsCast::addIR(LgsLLVM& codeGen, LgsExpr* other) {
-    return toValue->addIR(codeGen, other);
+Value* LgsCast::addIR(LgsLLVMGen& cg, LgsExpr* other) {
+    return toValue->addIR(cg, other);
 }
 
 std::string LgsCast::pname() {

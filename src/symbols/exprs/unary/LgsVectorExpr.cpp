@@ -1,6 +1,6 @@
 #include "exprs/unary/LgsVectorExpr.h"
 
-Value* LgsVectorExpr::loadIR(LgsLLVM& codeGen) {
+Value* LgsVectorExpr::loadIR(LgsLLVMGen& cg) {
     assert(0);
 }
 

@@ -14,8 +14,8 @@ public:
     LgsFunc* isNotEmptyFunc = new LgsFunc("isNotEmpty", &LGS_BOOL, {this}, INTERNAL | PUBLIC | METHOD);
 
     LgsStr();
-    Type* getIRBaseType(LgsLLVM* codeGen) const;
-    Type* getIRType(LgsLLVM& codeGen) override;
+    Type* getIRBaseType(LgsLLVMGen* cg) const;
+    Type* getIRType(LgsLLVMGen& cg) override;
     std::string getName() override;
     std::string pname() override;
     json::value asJSON() override;
@@ -24,8 +24,8 @@ public:
     LgsType* getIndexType() override;
     std::string strFormatPart() const override;
     uint16_t getUnpackCount() const override;
-    Value* IRLength(LgsLLVM& codeGen, LgsExpr* iterable) override;
-    Value* IRIsEmpty(LgsLLVM* codeGen, LgsExpr* iterable) override;
-    Value* IRIsNotEmpty(LgsLLVM* codeGen, LgsExpr* iterable) override;
+    Value* IRLength(LgsLLVMGen& cg, LgsExpr* iterable) override;
+    Value* IRIsEmpty(LgsLLVMGen* cg, LgsExpr* iterable) override;
+    Value* IRIsNotEmpty(LgsLLVMGen* cg, LgsExpr* iterable) override;
     bool canCastTo(LgsType* other) override;
 };

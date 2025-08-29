@@ -8,7 +8,7 @@ public:
     std::string name;
 
     explicit LgsUnknown(std::string name = LGS_UNKNOWN_TYPE) : name(std::move(name)) {}
-    llvm::Type* getIRType(LgsLLVM& codeGen) override;
+    llvm::Type* getIRType(LgsLLVMGen& cg) override;
     std::string getName() override;
     std::string pname() override;
     json::value asJSON() override;

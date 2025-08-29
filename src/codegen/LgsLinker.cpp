@@ -1,6 +1,6 @@
 #include "codegen/LgsLinker.h"
 #include "configs/LgsDefinitions.h"
-#include "codegen/LgsLLVM.h"
+#include "codegen/LgsLLVMGen.h"
 #include "utils/LgsUtils.h"
 #include "llvm/Linker/Linker.h"
 #include <llvm/Passes/PassBuilder.h>
@@ -30,7 +30,7 @@ bool LgsLinker::link() const {
     LLVMContext context;
     std::unique_ptr<Module> mainModule = nullptr;
     std::vector<std::unique_ptr<Module>> modules;
-    const auto targetMachine = LgsLLVM::getTargetMachine();
+    const auto targetMachine = LgsLLVMGen::getTargetMachine();
     for (const auto& entry : fs::directory_iterator(paths.buildIR)) {
         if (!isLLVMFile(entry)) continue;
         auto module = parseModule(context, entry.path());

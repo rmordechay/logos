@@ -1,6 +1,6 @@
 #include "types/primitives/LgsDouble.h"
 #include "exprs/unary/constants/LgsFloatConst.h"
-#include "../codegen/LgsLLVM.h"
+#include "../codegen/LgsLLVMGen.h"
 
 std::string LgsDouble::getName() {
     return name;
@@ -26,8 +26,8 @@ std::string LgsDouble::strFormatPart() const {
     return "%f";
 }
 
-Type* LgsDouble::getIRType(LgsLLVM& codeGen) {
-    return codeGen.builder.getDoubleTy();
+Type* LgsDouble::getIRType(LgsLLVMGen& cg) {
+    return cg.builder.getDoubleTy();
 }
 
 bool LgsDouble::canCastTo(LgsType* other) {

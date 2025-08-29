@@ -40,7 +40,7 @@ class LgsExpr;
 class LgsFuncCall;
 class LgsField;
 class LgsFunc;
-class LgsLLVM;
+class LgsLLVMGen;
 
 using namespace llvm;
 
@@ -61,15 +61,15 @@ public:
 
     virtual LgsField* getField(const std::string& name);
     virtual LgsFunc* getMethod(const std::string& name);
-    virtual Type* getIRType(LgsLLVM& codeGen) = 0;
+    virtual Type* getIRType(LgsLLVMGen& cg) = 0;
     virtual size_t getSizeBytes() = 0;
     virtual LgsExpr* getZeroValue() = 0;
     virtual std::string getName() = 0;
     virtual std::string pname() = 0; // pretty name
     virtual bool canCastTo(LgsType* other) = 0;
     virtual std::string strFormatPart() const = 0;
-    virtual DIBasicType* getDebugType(LgsLLVM& codeGen);
-    virtual void freeValue(LgsLLVM& codeGen, Value* value);
+    virtual DIBasicType* getDebugType(LgsLLVMGen& cg);
+    virtual void freeValue(LgsLLVMGen& cg, Value* value);
     virtual LgsType* clone();
     virtual json::value asJSON() = 0;
 

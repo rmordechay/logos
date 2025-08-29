@@ -3,9 +3,9 @@
 #include "exprs/unary/LgsArrayExpr.h"
 #include "types/primitives/LgsInt.h"
 
-Type* LgsDArray::getIRType(LgsLLVM& codeGen) {
+Type* LgsDArray::getIRType(LgsLLVMGen& cg) {
     if (IRType) return IRType;
-    return getArrStruct(codeGen);
+    return getArrStruct(cg);
 }
 
 std::string LgsDArray::getName() {
@@ -38,26 +38,26 @@ std::string LgsDArray::strFormatPart() const {
     return "%p";
 }
 
-StructType* LgsDArray::getArrStruct(LgsLLVM& codeGen) {
+StructType* LgsDArray::getArrStruct(LgsLLVMGen& cg) {
     if (arrStruct) return arrStruct;
-    arrStruct = codeGen.getStructType({codeGen.i64Ty(), codeGen.i64Ty(), codeGen.i64Ty(), codeGen.ptrTy()}, name);
+    arrStruct = cg.getStructType({cg.i64Ty(), cg.i64Ty(), cg.i64Ty(), cg.ptrTy()}, name);
     return arrStruct;
 }
 
-void LgsDArray::freeValue(LgsLLVM& codeGen, Value* value) {
-    freeFunc->callIR(codeGen, {value});
+void LgsDArray::freeValue(LgsLLVMGen& cg, Value* value) {
+    freeFunc->callIR(cg, {value});
 }
 
-Value* LgsDArray::IRLength(LgsLLVM& codeGen, LgsExpr* iterable) {
-    return lenFunc->call(codeGen, {iterable});
+Value* LgsDArray::IRLength(LgsLLVMGen& cg, LgsExpr* iterable) {
+    return lenFunc->call(cg, {iterable});
 }
 
-Value* LgsDArray::IRIsEmpty(LgsLLVM* codeGen, LgsExpr* iterable) {
-    return isEmptyFunc->call(*codeGen, {iterable});
+Value* LgsDArray::IRIsEmpty(LgsLLVMGen* cg, LgsExpr* iterable) {
+    return isEmptyFunc->call(*cg, {iterable});
 }
 
-Value* LgsDArray::IRIsNotEmpty(LgsLLVM* codeGen, LgsExpr* iterable) {
-    return isNotEmptyFunc->call(*codeGen, {iterable});
+Value* LgsDArray::IRIsNotEmpty(LgsLLVMGen* cg, LgsExpr* iterable) {
+    return isNotEmptyFunc->call(*cg, {iterable});
 }
 
 bool LgsDArray::canCastTo(LgsType* other) {

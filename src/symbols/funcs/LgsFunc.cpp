@@ -8,43 +8,43 @@
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/Module.h>
 
-Value* LgsFunc::call(LgsLLVM& codeGen, const std::vector<LgsExpr*>& args) {
-    if (fn) return fn(codeGen, args);
+Value* LgsFunc::call(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
+    if (fn) return fn(cg, args);
     std::vector<Value*> IRArgs;
     if (funcType->hasDefaults) {
         const auto diff = funcType->params.size() - args.size();
-        setIRArgs(codeGen, args, IRArgs);
+        setIRArgs(cg, args, IRArgs);
         for (int i = diff - 1; i < funcType->params.size(); ++i) {
             const auto& param = funcType->params[i];
             IRArgs.emplace_back(param.expr->IRValue);
         }
     } else {
-        setIRArgs(codeGen, args, IRArgs);
+        setIRArgs(cg, args, IRArgs);
     }
-    return callIR(codeGen, IRArgs);
+    return callIR(cg, IRArgs);
 }
 
-Value* LgsFunc::callIR(LgsLLVM& codeGen, const std::vector<Value*>& args) {
+Value* LgsFunc::callIR(LgsLLVMGen& cg, const std::vector<Value*>& args) {
     CallInst* rv = nullptr;
     if (IRValue) {
-        const auto funcTypeIR = funcType->getIRType(codeGen);
+        const auto funcTypeIR = funcType->getIRType(cg);
         const auto IRFuncType = llvm::cast<FunctionType>(funcTypeIR);
-        rv = codeGen.builder.CreateCall(IRFuncType, IRValue, args);
+        rv = cg.builder.CreateCall(IRFuncType, IRValue, args);
     } else {
-        const auto IRFunc = getIRFunc(codeGen);
-        rv = codeGen.builder.CreateCall(IRFunc, args);
+        const auto IRFunc = getIRFunc(cg);
+        rv = cg.builder.CreateCall(IRFunc, args);
     }
     return rv;
 }
 
-void LgsFunc::setIRArgs(LgsLLVM& codeGen, const std::vector<LgsExpr*>& args, std::vector<Value*>& IRArgs) const {
+void LgsFunc::setIRArgs(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args, std::vector<Value*>& IRArgs) const {
     for (int i = 0; i < args.size(); ++i) {
         auto arg = args[i];
         const auto& param = funcType->params[i];
         if (!param.isSelf) {
             arg = arg->castTo(param.type);
         }
-        auto v = arg->loadIR(codeGen);
+        auto v = arg->loadIR(cg);
         if (!param.isSelf && args[i] != arg) {
             freeExpr(arg);
         }
@@ -52,16 +52,16 @@ void LgsFunc::setIRArgs(LgsLLVM& codeGen, const std::vector<LgsExpr*>& args, std
     }
 }
 
-Function* LgsFunc::getIRFunc(LgsLLVM& codeGen) {
+Function* LgsFunc::getIRFunc(LgsLLVMGen& cg) {
     auto funcName = funcType->getName();
-    auto IRFunc = codeGen.IRModule->getFunction(funcName);
+    auto IRFunc = cg.IRModule->getFunction(funcName);
     if (IRFunc) return IRFunc;
-    const auto type = funcType->getIRType(codeGen);
+    const auto type = funcType->getIRType(cg);
     const auto funcTy = llvm::cast<FunctionType>(type);
     if (funcType->isInternal) {
         funcName = LGS_RUNTIME_NAMES_PREFIX + funcName;
     }
-    IRFunc = codeGen.getFunc(funcName, funcTy);
+    IRFunc = cg.getFunc(funcName, funcTy);
     if (funcType->params.empty()) return IRFunc;
     auto args = IRFunc->arg_begin();
     for (int i = 0; i < funcType->params.size(); ++i) {
@@ -100,9 +100,9 @@ void LgsFunc::completeType(LgsType* toType) {
     }
 }
 
-BasicBlock* LgsFunc::getCleanupBlock(LgsLLVM& codeGen) {
+BasicBlock* LgsFunc::getCleanupBlock(LgsLLVMGen& cg) {
     if (cleanupBlock) return cleanupBlock;
-    cleanupBlock = codeGen.createBlock(BLOCK_NAME_CLEANUP);
+    cleanupBlock = cg.createBlock(BLOCK_NAME_CLEANUP);
     return cleanupBlock;
 }
 
@@ -128,22 +128,22 @@ LgsExpr* LgsFunc::clone() {
     return newFunc;
 }
 
-void LgsFunc::setDebugValue(LgsLLVM& codeGen) {
-    const auto diBuilder = codeGen.diBuilder;
-    const auto dbInt32 = funcType->rt->getDebugType(codeGen);
+void LgsFunc::setDebugValue(LgsLLVMGen& cg) {
+    const auto diBuilder = cg.diBuilder;
+    const auto dbInt32 = funcType->rt->getDebugType(cg);
     const auto parameterTypes = diBuilder->getOrCreateTypeArray({dbInt32});
     const auto subroutine = diBuilder->createSubroutineType(parameterTypes);
-    codeGen.diProgram = diBuilder->createFunction(
-        codeGen.compileUnit,
+    cg.diProgram = diBuilder->createFunction(
+        cg.compileUnit,
         funcType->name,
         "",
-        codeGen.diFile,
+        cg.diFile,
         location.lineStart,
         subroutine,
         location.lineStart
     );
-    getIRFunc(codeGen)->setSubprogram(codeGen.diProgram);
-    codeGen.builder.SetCurrentDebugLocation(getDebugLoc(codeGen));
+    getIRFunc(cg)->setSubprogram(cg.diProgram);
+    cg.builder.SetCurrentDebugLocation(getDebugLoc(cg));
 }
 
 LgsFunc::~LgsFunc() {

@@ -1,9 +1,9 @@
 #include "types/LgsNullable.h"
-#include "codegen/LgsLLVM.h"
+#include "codegen/LgsLLVMGen.h"
 #include "utils/LgsUtils.h"
 
-Type* LgsNullable::getIRType(LgsLLVM& codeGen) {
-    return codeGen.ptrTy();
+Type* LgsNullable::getIRType(LgsLLVMGen& cg) {
+    return cg.ptrTy();
 }
 
 std::string LgsNullable::getName() {

@@ -1,17 +1,17 @@
 #include "loops/LgsWhileLoop.h"
 #include "exprs/LgsExpr.h"
-#include "codegen/LgsLLVM.h"
+#include "codegen/LgsLLVMGen.h"
 
-void LgsWhileLoop::incAndJumpToCond(LgsLLVM& codeGen) {
-    if (codeGen.lastInstTerminator()) return;
-    codeGen.builder.CreateBr(IRCondBlock);
+void LgsWhileLoop::incAndJumpToCond(LgsLLVMGen& cg) {
+    if (cg.lastInstTerminator()) return;
+    cg.builder.CreateBr(IRCondBlock);
 }
 
-Value* LgsWhileLoop::loopStart(LgsLLVM& codeGen) {
+Value* LgsWhileLoop::loopStart(LgsLLVMGen& cg) {
     assert(0);
 }
 
-Value* LgsWhileLoop::loopEnd(LgsLLVM& codeGen) {
+Value* LgsWhileLoop::loopEnd(LgsLLVMGen& cg) {
     assert(0);
 }
 

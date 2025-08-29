@@ -34,7 +34,7 @@ bool LgsType::equals(LgsType* other) {
     return getName() == other->getName();
 }
 
-DIBasicType* LgsType::getDebugType(LgsLLVM& codeGen) {
+DIBasicType* LgsType::getDebugType(LgsLLVMGen& cg) {
     assert(0);
 }
 
@@ -57,7 +57,7 @@ bool LgsType::isBig() {
     return (asObject() || asDArray()) && getSizeBytes() >= BIG_SIZE_THRESHOLD;
 }
 
-void LgsType::freeValue(LgsLLVM& codeGen, Value* value) {
+void LgsType::freeValue(LgsLLVMGen& cg, Value* value) {
 
 }
 

@@ -1,6 +1,6 @@
 #include "loops/LgsForLoop.h"
 #include "configs/LgsDefinitions.h"
-#include "codegen/LgsLLVM.h"
+#include "codegen/LgsLLVMGen.h"
 #include "loops/LgsForeachLoop.h"
 #include "loops/LgsInfiniteLoop.h"
 #include "loops/LgsRangeLoop.h"
@@ -13,26 +13,26 @@ LgsRangeLoop* LgsForLoop::asRangeLoop() { return dynamic_cast<LgsRangeLoop*>(thi
 LgsInfiniteLoop* LgsForLoop::asInfiniteLoop() { return dynamic_cast<LgsInfiniteLoop*>(this);}
 LgsWhileLoop* LgsForLoop::asWhileLoop() { return dynamic_cast<LgsWhileLoop*>(this);}
 
-Value* LgsForLoop::loadIndex(LgsLLVM& codeGen) const {
-    return codeGen.builder.CreateLoad(codeGen.sizeTy(), iPtr);
+Value* LgsForLoop::loadIndex(LgsLLVMGen& cg) const {
+    return cg.builder.CreateLoad(cg.sizeTy(), iPtr);
 }
 
-void LgsForLoop::incIndex(LgsLLVM* codeGen) {
-    iValue = loadIndex(*codeGen);
-    const auto inc = codeGen->builder.CreateAdd(iValue, codeGen->usize(1));
-    codeGen->builder.CreateStore(inc, iPtr);
+void LgsForLoop::incIndex(LgsLLVMGen* cg) {
+    iValue = loadIndex(*cg);
+    const auto inc = cg->builder.CreateAdd(iValue, cg->usize(1));
+    cg->builder.CreateStore(inc, iPtr);
 }
 
-void LgsForLoop::setBlocks(LgsLLVM& codeGen) {
-    IRBodyBlock = codeGen.createBlock(BLOCK_NAME_LOOP_BODY);
-    IRExitBlock = codeGen.createBlock(BLOCK_NAME_LOOP_EXIT);
-    IRCondBlock = codeGen.createBlock(BLOCK_NAME_LOOP_COND);
+void LgsForLoop::setBlocks(LgsLLVMGen& cg) {
+    IRBodyBlock = cg.createBlock(BLOCK_NAME_LOOP_BODY);
+    IRExitBlock = cg.createBlock(BLOCK_NAME_LOOP_EXIT);
+    IRCondBlock = cg.createBlock(BLOCK_NAME_LOOP_COND);
 }
 
-void LgsForLoop::incAndJumpToCond(LgsLLVM& codeGen) {
-    if (codeGen.lastInstTerminator()) return;
-    incIndex(&codeGen);
-    codeGen.builder.CreateBr(IRCondBlock);
+void LgsForLoop::incAndJumpToCond(LgsLLVMGen& cg) {
+    if (cg.lastInstTerminator()) return;
+    incIndex(&cg);
+    cg.builder.CreateBr(IRCondBlock);
 }
 
 json::value LgsForLoop::asJSON() {

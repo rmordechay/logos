@@ -2,8 +2,8 @@
 #include "exprs/unary/LgsHashMap.h"
 #include "stmts/LgsVarDec.h"
 
-Type* LgsMap::getIRType(LgsLLVM& codeGen) {
-    return getMapStruct(codeGen);
+Type* LgsMap::getIRType(LgsLLVMGen& cg) {
+    return getMapStruct(cg);
 }
 
 std::string LgsMap::getName() {
@@ -34,21 +34,21 @@ uint16_t LgsMap::getUnpackCount() const {
     return 2;
 }
 
-Value* LgsMap::IRLength(LgsLLVM& codeGen, LgsExpr* iterable) {
-    return codeGen.i32(1024);
+Value* LgsMap::IRLength(LgsLLVMGen& cg, LgsExpr* iterable) {
+    return cg.i32(1024);
 }
 
-Value* LgsMap::IRIsEmpty(LgsLLVM* codeGen, LgsExpr* iterable) {
-    return isEmptyFunc->call(*codeGen, {iterable});
+Value* LgsMap::IRIsEmpty(LgsLLVMGen* cg, LgsExpr* iterable) {
+    return isEmptyFunc->call(*cg, {iterable});
 }
 
-Value* LgsMap::IRIsNotEmpty(LgsLLVM* codeGen, LgsExpr* iterable) {
-    return isNotEmptyFunc->call(*codeGen, {iterable});
+Value* LgsMap::IRIsNotEmpty(LgsLLVMGen* cg, LgsExpr* iterable) {
+    return isNotEmptyFunc->call(*cg, {iterable});
 }
 
-StructType* LgsMap::getMapStruct(LgsLLVM& codeGen) {
-    const std::vector<Type*> mapStructFields = {codeGen.ptrTy(), codeGen.i64Ty(), codeGen.i64Ty()};
-    mapStruct = codeGen.getStructType(mapStructFields, name);
+StructType* LgsMap::getMapStruct(LgsLLVMGen& cg) {
+    const std::vector<Type*> mapStructFields = {cg.ptrTy(), cg.i64Ty(), cg.i64Ty()};
+    mapStruct = cg.getStructType(mapStructFields, name);
     return mapStruct;
 }
 
@@ -60,15 +60,15 @@ bool LgsMap::canCastTo(LgsType* other) {
     return keyEqual && typePair->value->canCastTo(otherKvType->value);
 }
 
-void LgsMap::freeValue(LgsLLVM& codeGen, Value* value) {
-    freeFunc->callIR(codeGen, {value});
+void LgsMap::freeValue(LgsLLVMGen& cg, Value* value) {
+    freeFunc->callIR(cg, {value});
 }
 
 std::string LgsMap::strFormatPart() const {
     return "%s";
 }
 
-Value* LgsMap::callAdd(LgsLLVM& codeGen, const std::vector<LgsExpr*>& args) const {
+Value* LgsMap::callAdd(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) const {
     const auto map = args[0];
     const auto key = args[1];
     const auto value = args[2];
@@ -76,11 +76,11 @@ Value* LgsMap::callAdd(LgsLLVM& codeGen, const std::vector<LgsExpr*>& args) cons
     const auto mapPtr = map->IRValue;
     const auto exprTy = value->type;
     if (exprTy->asDArray()) {
-        return addFunc->callIR(codeGen, {mapPtr, key->IRValue, value->IRValue});
+        return addFunc->callIR(cg, {mapPtr, key->IRValue, value->IRValue});
     }
-    const auto valurPtr = codeGen.builder.CreateAlloca(exprTy->getIRType(codeGen));
-    codeGen.builder.CreateStore(exprIR, valurPtr);
-    return addFunc->callIR(codeGen, {mapPtr, key->IRValue, valurPtr});
+    const auto valurPtr = cg.builder.CreateAlloca(exprTy->getIRType(cg));
+    cg.builder.CreateStore(exprIR, valurPtr);
+    return addFunc->callIR(cg, {mapPtr, key->IRValue, valurPtr});
 }
 
 LgsMap::~LgsMap() {

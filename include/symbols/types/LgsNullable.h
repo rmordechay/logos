@@ -6,7 +6,7 @@ public:
     LgsType* baseType;
 
     explicit LgsNullable(LgsType* baseType) : baseType(baseType) {}
-    llvm::Type* getIRType(LgsLLVM& codeGen) override;
+    llvm::Type* getIRType(LgsLLVMGen& cg) override;
     std::string getName() override;
     LgsExpr* getZeroValue() override;
     std::string pname() override;

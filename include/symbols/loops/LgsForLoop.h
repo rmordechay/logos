@@ -31,12 +31,12 @@ public:
     LgsInfiniteLoop* asInfiniteLoop();
     LgsWhileLoop* asWhileLoop();
 
-    virtual void setBlocks(LgsLLVM& codeGen);
-    virtual void incAndJumpToCond(LgsLLVM& codeGen);
-    virtual Value* loopStart(LgsLLVM& codeGen) = 0;
-    virtual Value* loopEnd(LgsLLVM& codeGen) = 0;
-    void incIndex(LgsLLVM* codeGen);
-    Value* loadIndex(LgsLLVM& codeGen) const;
+    virtual void setBlocks(LgsLLVMGen& cg);
+    virtual void incAndJumpToCond(LgsLLVMGen& cg);
+    virtual Value* loopStart(LgsLLVMGen& cg) = 0;
+    virtual Value* loopEnd(LgsLLVMGen& cg) = 0;
+    void incIndex(LgsLLVMGen* cg);
+    Value* loadIndex(LgsLLVMGen& cg) const;
     json::value asJSON() override;
 
     ~LgsForLoop() override;

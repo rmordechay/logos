@@ -1,6 +1,6 @@
 #include "types/primitives/LgsUInt.h"
 #include "exprs/unary/constants/LgsIntConst.h"
-#include "../codegen/LgsLLVM.h"
+#include "../codegen/LgsLLVMGen.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsInt.h"
 #include "types/primitives/LgsSize.h"
@@ -17,8 +17,8 @@ std::string LgsUInt::pname() {
     return name;
 }
 
-llvm::Type* LgsUInt::getIRType(LgsLLVM& codeGen) {
-    return codeGen.i32Ty();
+llvm::Type* LgsUInt::getIRType(LgsLLVMGen& cg) {
+    return cg.i32Ty();
 }
 
 std::string LgsUInt::getName() {

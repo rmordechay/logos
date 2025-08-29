@@ -142,10 +142,16 @@ void LgsCodeGen::visitGroup(LgsGroup* group) {
 }
 
 void LgsCodeGen::visitField(LgsField* field) const {
-    if (field->parentIRType->isVectorTy()) {
-        const auto vec = cg.builder.CreateLoad(field->parentIRType, field->parentIRValue);
-        const auto i = cg.usize(field->position);
-        field->IRValue = cg.builder.CreateExtractElement(vec, i);
+    if (const auto vec = field->type->asVec()) {
+        std::vector<int> mask(vec->dim);
+        for (unsigned i = 0; i < vec->dim; i++) {
+            mask[i] = LgsVec::getComponentIndex(field->name[i]);
+        }
+        const ArrayRef maskRef(mask);
+        const auto parentLoaded = cg.builder.CreateLoad(field->parentIRType, field->parentIRValue);
+        const auto newVec = cg.builder.CreateShuffleVector(parentLoaded, UndefValue::get(field->parentIRType), maskRef);
+        field->IRValue = cg.builder.CreateAlloca(field->parentIRType);
+        cg.builder.CreateStore(newVec, field->IRValue);
     } else {
         field->IRValue = cg.builder.CreateStructGEP(field->parentIRType, field->parentIRValue, field->position);
     }
@@ -311,7 +317,7 @@ void LgsCodeGen::visitAssignment(const LgsAssignment* assignment) {
     visitExpr(assignment->rValue);
     Value* results = nullptr;
     switch (assignment->assignmentType) {
-    case ASSIGN: createIRAssignment(assignment); return;
+    case ASSIGN: assignment->lValue->assign(cg, assignment->rValue); return;
     case ASSIGN_ADD: results = assignment->lValue->addIR(cg, assignment->rValue); break;
     case ASSIGN_SUB: results = assignment->lValue->subIR(cg, assignment->rValue); break;
     case ASSIGN_MUL: results = assignment->lValue->mulIR(cg, assignment->rValue); break;
@@ -710,11 +716,8 @@ void LgsCodeGen::visitSelection(LgsSelection* selection) {
             const auto field = parentExpr->type->getField(var->name);
             field->parentIRType = parentExpr->type->getIRType(cg);
             field->parentIRValue = getIRValue(parentExpr);
-            if (i > 0) {
-                field->parentIRValue = field->loadIR(cg);
-            }
-            const auto fieldIR = getIRValue(field);
-            childExpr->setIRValue(fieldIR);
+            visitField(field);
+            childExpr->setIRValue(field->IRValue);
         } else {
             getIRValue(childExpr);
         }
@@ -1010,12 +1013,6 @@ Value* LgsCodeGen::iterHasNext(LgsIterator* iterator) {
     return iterInitFunc.callIR(cg, {getIRValue(iterator)});
 }
 
-void LgsCodeGen::createIRAssignment(const LgsAssignment* assignment) const {
-    const auto assignable = dynamic_cast<LgsAssignable*>(assignment->lValue);
-    assert(assignable);
-    assignable->assign(cg, assignment->rValue);
-}
-
 Value* LgsCodeGen::getIRValue(LgsValue* value) {
     if (value->IRValue) return value->IRValue;
     if (const auto expr = dynamic_cast<LgsExpr*>(value)) {
@@ -1024,8 +1021,6 @@ Value* LgsCodeGen::getIRValue(LgsValue* value) {
         visitStmt(stmt);
     } else if (const auto param = dynamic_cast<LgsParam*>(value)) {
         visitParam(param);
-    } else if (const auto field = dynamic_cast<LgsField*>(value)) {
-        visitField(field);
     } else {
         assert(0);
     }

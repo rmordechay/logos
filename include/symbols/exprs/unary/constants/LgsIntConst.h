@@ -6,8 +6,7 @@ public:
     uint64_t value;
 
     LgsIntConst(LgsType* type, const size_t value) : LgsUnaryExpr(type), value(value) {}
-    Value* loadIR(LgsLLVM& codeGen) override;
-    Value* getIRPtrTo(LgsLLVM& codeGen) override;
+    Value* loadIR(LgsLLVMGen& cg) override;
     LgsExpr* castTo(LgsType* toType) override;
     LgsExpr* clone() override;
     std::string pname() override;

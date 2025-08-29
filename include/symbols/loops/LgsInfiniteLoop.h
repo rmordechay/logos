@@ -3,8 +3,8 @@
 
 class LgsInfiniteLoop final : public LgsForLoop {
 public:
-    void setBlocks(LgsLLVM& codeGen) override;
-    void incAndJumpToCond(LgsLLVM& codeGen) override;
-    Value* loopStart(LgsLLVM& codeGen) override;
-    Value* loopEnd(LgsLLVM& codeGen) override;
+    void setBlocks(LgsLLVMGen& cg) override;
+    void incAndJumpToCond(LgsLLVMGen& cg) override;
+    Value* loopStart(LgsLLVMGen& cg) override;
+    Value* loopEnd(LgsLLVMGen& cg) override;
 };

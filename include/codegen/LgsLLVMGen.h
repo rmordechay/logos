@@ -18,7 +18,7 @@ class LgsFuncType;
 
 using namespace llvm;
 
-class LgsLLVM {
+class LgsLLVMGen {
 public:
     LLVMContext context;
     Module* IRModule = nullptr;

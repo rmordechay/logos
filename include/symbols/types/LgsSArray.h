@@ -13,7 +13,7 @@ public:
         addMethod(lenFunc);
     }
 
-    Type* getIRType(LgsLLVM& codeGen) override;
+    Type* getIRType(LgsLLVMGen& cg) override;
     std::string getName() override;
     std::string pname() override;
     json::value asJSON() override;
@@ -22,9 +22,9 @@ public:
     LgsType* getIndexType() override;
     uint16_t getUnpackCount() const override;
     std::string strFormatPart() const override;
-    Value* IRLength(LgsLLVM& codeGen, LgsExpr* iterable) override;
-    Value* IRIsEmpty(LgsLLVM* codeGen, LgsExpr* iterable) override;
-    Value* IRIsNotEmpty(LgsLLVM* codeGen, LgsExpr* iterable) override;
+    Value* IRLength(LgsLLVMGen& cg, LgsExpr* iterable) override;
+    Value* IRIsEmpty(LgsLLVMGen* cg, LgsExpr* iterable) override;
+    Value* IRIsNotEmpty(LgsLLVMGen* cg, LgsExpr* iterable) override;
     bool canCastTo(LgsType* other) override;
     ~LgsSArray() override;
 };

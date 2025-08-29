@@ -8,8 +8,8 @@ size_t LgsSize::getSizeBytes() {
     return sizeof(size_t);
 }
 
-Type* LgsSize::getIRType(LgsLLVM& codeGen) {
-    return codeGen.sizeTy();
+Type* LgsSize::getIRType(LgsLLVMGen& cg) {
+    return cg.sizeTy();
 }
 
 std::string LgsSize::getName() {

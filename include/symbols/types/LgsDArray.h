@@ -23,7 +23,7 @@ public:
     LgsFunc* freeFunc = new LgsFunc("free", &LGS_VOID, {this}, INTERNAL | METHOD);
 
     explicit LgsDArray(LgsType* baseType = nullptr) : LgsIterable(baseType) {
-        addFunc->fn = [this](LgsLLVM& cg, const std::vector<LgsExpr*>& args) {
+        addFunc->fn = [this](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
             return addFunc->callIR(cg, {args[0]->IRValue, args[1]->getIRPtrTo(cg)});
         };
         addMethod(addFunc);
@@ -33,7 +33,7 @@ public:
         isSliceable = true;
     }
 
-    Type* getIRType(LgsLLVM& codeGen) override;
+    Type* getIRType(LgsLLVMGen& cg) override;
     std::string getName() override;
     std::string pname() override;
     size_t getSizeBytes() override;
@@ -41,11 +41,11 @@ public:
     LgsType* getIndexType() override;
     uint16_t getUnpackCount() const override;
     std::string strFormatPart() const override;
-    StructType* getArrStruct(LgsLLVM& codeGen);
-    void freeValue(LgsLLVM& codeGen, Value* value) override;
-    Value* IRLength(LgsLLVM& codeGen, LgsExpr* iterable) override;
-    Value* IRIsEmpty(LgsLLVM* codeGen, LgsExpr* iterable) override;
-    Value* IRIsNotEmpty(LgsLLVM* codeGen, LgsExpr* iterable) override;
+    StructType* getArrStruct(LgsLLVMGen& cg);
+    void freeValue(LgsLLVMGen& cg, Value* value) override;
+    Value* IRLength(LgsLLVMGen& cg, LgsExpr* iterable) override;
+    Value* IRIsEmpty(LgsLLVMGen* cg, LgsExpr* iterable) override;
+    Value* IRIsNotEmpty(LgsLLVMGen* cg, LgsExpr* iterable) override;
     bool canCastTo(LgsType* other) override;
     json::value asJSON() override;
 };

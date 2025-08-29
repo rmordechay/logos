@@ -77,7 +77,7 @@ bool LgsApp::analyse() {
 
 bool LgsApp::generate() {
     initBuild();
-    const auto targetMachine = LgsLLVM::getTargetMachine();
+    const auto targetMachine = LgsLLVMGen::getTargetMachine();
     for (const auto& file : ast) {
         threadPool.runTask([this, file, targetMachine] {
             LgsCodeGen code(*file);
@@ -154,7 +154,7 @@ void LgsApp::parseSrcFile(const std::string& code, const fs::path& filePath) {
 void LgsApp::initBuild() {
     fs::create_directories(paths.buildDir);
     fs::create_directories(paths.buildIR);
-    LgsLLVM::initLLVM();
+    LgsLLVMGen::initLLVM();
     paths.objFilePath = paths.buildDir / (configs.name + ".o");
     paths.execFilePath = paths.buildDir / configs.name;
 }

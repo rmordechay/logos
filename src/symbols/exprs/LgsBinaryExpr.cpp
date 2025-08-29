@@ -6,79 +6,79 @@ json::value LgsBinaryExpr::asJSON() {
     assert(0);
 }
 
-Value* LgsBinaryExpr::addIR(LgsLLVM& codeGen, LgsExpr* other) {
-    return left->addIR(codeGen, right);
+Value* LgsBinaryExpr::addIR(LgsLLVMGen& cg, LgsExpr* other) {
+    return left->addIR(cg, right);
 }
 
-Value* LgsBinaryExpr::subIR(LgsLLVM& codeGen, LgsExpr* other) {
-    return left->subIR(codeGen, right);
+Value* LgsBinaryExpr::subIR(LgsLLVMGen& cg, LgsExpr* other) {
+    return left->subIR(cg, right);
 }
 
-Value* LgsBinaryExpr::mulIR(LgsLLVM& codeGen, LgsExpr* other) {
-    return left->mulIR(codeGen, right);
+Value* LgsBinaryExpr::mulIR(LgsLLVMGen& cg, LgsExpr* other) {
+    return left->mulIR(cg, right);
 }
 
-Value* LgsBinaryExpr::divIR(LgsLLVM& codeGen, LgsExpr* other) {
-    return left->divIR(codeGen, right);
+Value* LgsBinaryExpr::divIR(LgsLLVMGen& cg, LgsExpr* other) {
+    return left->divIR(cg, right);
 }
 
-Value* LgsBinaryExpr::inIR(LgsLLVM& codeGen, LgsExpr* other) {
-    return left->inIR(codeGen, right);
+Value* LgsBinaryExpr::inIR(LgsLLVMGen& cg, LgsExpr* other) {
+    return left->inIR(cg, right);
 }
 
-Value* LgsBinaryExpr::modIR(LgsLLVM& codeGen, LgsExpr* other)  {
+Value* LgsBinaryExpr::modIR(LgsLLVMGen& cg, LgsExpr* other)  {
     assert(0);
 }
 
-Value* LgsBinaryExpr::eqIR(LgsLLVM& codeGen, LgsExpr* other)  {
+Value* LgsBinaryExpr::eqIR(LgsLLVMGen& cg, LgsExpr* other)  {
     assert(0);
 }
 
-Value* LgsBinaryExpr::neIR(LgsLLVM& codeGen, LgsExpr* other)  {
+Value* LgsBinaryExpr::neIR(LgsLLVMGen& cg, LgsExpr* other)  {
     assert(0);
 }
 
-Value* LgsBinaryExpr::ltIR(LgsLLVM& codeGen, LgsExpr* other)  {
+Value* LgsBinaryExpr::ltIR(LgsLLVMGen& cg, LgsExpr* other)  {
     assert(0);
 }
 
-Value* LgsBinaryExpr::gtIR(LgsLLVM& codeGen, LgsExpr* other)  {
+Value* LgsBinaryExpr::gtIR(LgsLLVMGen& cg, LgsExpr* other)  {
     assert(0);
 }
 
-Value* LgsBinaryExpr::geIR(LgsLLVM& codeGen, LgsExpr* other)  {
+Value* LgsBinaryExpr::geIR(LgsLLVMGen& cg, LgsExpr* other)  {
     assert(0);
 }
 
-Value* LgsBinaryExpr::leIR(LgsLLVM& codeGen, LgsExpr* other)  {
+Value* LgsBinaryExpr::leIR(LgsLLVMGen& cg, LgsExpr* other)  {
     assert(0);
 }
 
-Value* LgsBinaryExpr::andIR(LgsLLVM& codeGen, LgsExpr* other)  {
+Value* LgsBinaryExpr::andIR(LgsLLVMGen& cg, LgsExpr* other)  {
     assert(0);
 }
 
-Value* LgsBinaryExpr::orIR(LgsLLVM& codeGen, LgsExpr* other)  {
+Value* LgsBinaryExpr::orIR(LgsLLVMGen& cg, LgsExpr* other)  {
     assert(0);
 }
 
-Value* LgsBinaryExpr::bitAndIR(LgsLLVM& codeGen, LgsExpr* other)  {
+Value* LgsBinaryExpr::bitAndIR(LgsLLVMGen& cg, LgsExpr* other)  {
     assert(0);
 }
 
-Value* LgsBinaryExpr::bitOrIR(LgsLLVM& codeGen, LgsExpr* other)  {
+Value* LgsBinaryExpr::bitOrIR(LgsLLVMGen& cg, LgsExpr* other)  {
     assert(0);
 }
 
-Value* LgsBinaryExpr::bitXorIR(LgsLLVM& codeGen, LgsExpr* other)  {
+Value* LgsBinaryExpr::bitXorIR(LgsLLVMGen& cg, LgsExpr* other)  {
     assert(0);
 }
 
-Value* LgsBinaryExpr::rshiftIR(LgsLLVM& codeGen, LgsExpr* other)  {
+Value* LgsBinaryExpr::rshiftIR(LgsLLVMGen& cg, LgsExpr* other)  {
     assert(0);
 }
 
-Value* LgsBinaryExpr::lshiftIR(LgsLLVM& codeGen, LgsExpr* other)  {
+Value* LgsBinaryExpr::lshiftIR(LgsLLVMGen& cg, LgsExpr* other)  {
     assert(0);
 }
 

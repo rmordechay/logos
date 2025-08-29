@@ -23,7 +23,7 @@ public:
     explicit LgsMap(LgsType* keyType = nullptr, LgsType* valueType = nullptr) {
         typePair = new LgsTypePair(keyType, valueType);
         baseType = typePair;
-        addFunc->fn = [this](LgsLLVM& cg, const std::vector<LgsExpr*>& args) {
+        addFunc->fn = [this](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
             return callAdd(cg, args);
         };
         addMethod(lenFunc);
@@ -31,8 +31,8 @@ public:
         addMethod(isNotEmptyFunc);
     }
 
-    Value* callAdd(LgsLLVM& codeGen, const std::vector<LgsExpr*>& args) const;
-    Type* getIRType(LgsLLVM& codeGen) override;
+    Value* callAdd(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) const;
+    Type* getIRType(LgsLLVMGen& cg) override;
     std::string getName() override;
     std::string pname() override;
     json::value asJSON() override;
@@ -40,12 +40,12 @@ public:
     LgsExpr* getZeroValue() override;
     LgsType* getIndexType() override;
     uint16_t getUnpackCount() const override;
-    Value* IRLength(LgsLLVM& codeGen, LgsExpr* iterable) override;
-    Value* IRIsEmpty(LgsLLVM* codeGen, LgsExpr* iterable) override;
-    Value* IRIsNotEmpty(LgsLLVM* codeGen, LgsExpr* iterable) override;
-    StructType* getMapStruct(LgsLLVM& codeGen);
+    Value* IRLength(LgsLLVMGen& cg, LgsExpr* iterable) override;
+    Value* IRIsEmpty(LgsLLVMGen* cg, LgsExpr* iterable) override;
+    Value* IRIsNotEmpty(LgsLLVMGen* cg, LgsExpr* iterable) override;
+    StructType* getMapStruct(LgsLLVMGen& cg);
     bool canCastTo(LgsType* other) override;
-    void freeValue(LgsLLVM& codeGen, Value* value) override;
+    void freeValue(LgsLLVMGen& cg, Value* value) override;
     std::string strFormatPart() const override;
     ~LgsMap() override;
 };

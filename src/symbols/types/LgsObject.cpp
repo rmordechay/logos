@@ -5,7 +5,7 @@
 #include "types/LgsInterface.h"
 #include "utils/LgsUtils.h"
 
-Type* LgsObject::getIRType(LgsLLVM& codeGen) {
+Type* LgsObject::getIRType(LgsLLVMGen& cg) {
     if (IRType) return IRType;
     std::vector<Type*> elementTypes;
     elementTypes.reserve(fields.size());
@@ -14,15 +14,15 @@ Type* LgsObject::getIRType(LgsLLVM& codeGen) {
         field->position = i;
         Type* fieldType;
         if (field->type->asObject() || field->type->asFuncType()) {
-            fieldType = codeGen.ptrTy();
+            fieldType = cg.ptrTy();
         } else {
-            fieldType = field->type->getIRType(codeGen);
+            fieldType = field->type->getIRType(cg);
         }
         elementTypes.push_back(fieldType);
     }
-    IRType = StructType::getTypeByName(codeGen.context, name);
+    IRType = StructType::getTypeByName(cg.context, name);
     if (!IRType) {
-        IRType = StructType::create(codeGen.context, elementTypes, name);
+        IRType = StructType::create(cg.context, elementTypes, name);
     }
     for (const auto& field : fields) {
         field->parentIRType = IRType;
@@ -63,8 +63,8 @@ LgsFunc* LgsObject::getMethod(const std::string& methodName) {
     return nullptr;
 }
 
-void LgsObject::freeValue(LgsLLVM& codeGen, Value* value) {
-    codeGen.builder.CreateFree(value);
+void LgsObject::freeValue(LgsLLVMGen& cg, Value* value) {
+    cg.builder.CreateFree(value);
 }
 
 size_t LgsObject::getSizeBytes() {

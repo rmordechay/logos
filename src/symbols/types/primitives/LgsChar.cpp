@@ -16,8 +16,8 @@ size_t LgsChar::getSizeBytes() {
     return sizeof(char);
 }
 
-Type* LgsChar::getIRType(LgsLLVM& codeGen) {
-    return codeGen.i8Ty();
+Type* LgsChar::getIRType(LgsLLVMGen& cg) {
+    return cg.i8Ty();
 }
 
 std::string LgsChar::getName() {

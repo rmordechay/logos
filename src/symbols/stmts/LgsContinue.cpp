@@ -1,5 +1,5 @@
 #include "stmts/LgsContinue.h"
-#include "codegen/LgsLLVM.h"
+#include "codegen/LgsLLVMGen.h"
 #include <loops/LgsForLoop.h>
 
 json::value LgsContinue::asJSON() {

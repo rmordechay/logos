@@ -3,18 +3,18 @@
 #include "exprs/LgsExpr.h"
 #include "exprs/unary/LgsHashMap.h"
 
-Value* LgsField::loadIR(LgsLLVM& codeGen) {
-    assert(0);
+Value* LgsField::loadIR(LgsLLVMGen& cg) {
+    return IRValue;
 }
 
-Value* LgsField::resolveVirtualField(LgsLLVM* codeGen, const LgsHashMap* vtable) const {
+Value* LgsField::resolveVirtualField(LgsLLVMGen* cg, const LgsHashMap* vtable) const {
     const auto vtableMap = vtable->type->asMap();
-    const auto fieldIRType = type->getIRType(*codeGen);
-    const auto keyIR = codeGen->getIRStr(name);
-    const auto vtableIRType = vtable->type->getIRType(*codeGen);
-    const auto mapPtr = codeGen->builder.CreateGEP(vtableIRType, parentIRValue, {codeGen->i64Zero()});
-    const auto rv = vtableMap->getFunc->callIR(*codeGen, {mapPtr, keyIR});
-    return codeGen->builder.CreateLoad(fieldIRType, rv);
+    const auto fieldIRType = type->getIRType(*cg);
+    const auto keyIR = cg->getIRStr(name);
+    const auto vtableIRType = vtable->type->getIRType(*cg);
+    const auto mapPtr = cg->builder.CreateGEP(vtableIRType, parentIRValue, {cg->i64Zero()});
+    const auto rv = vtableMap->getFunc->callIR(*cg, {mapPtr, keyIR});
+    return cg->builder.CreateLoad(fieldIRType, rv);
 }
 
 json::value LgsField::asJSON() {

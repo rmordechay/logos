@@ -11,7 +11,7 @@ public:
         isInt = true;
     }
     size_t getSizeBytes() override;
-    llvm::Type* getIRType(LgsLLVM& codeGen) override;
+    llvm::Type* getIRType(LgsLLVMGen& cg) override;
     std::string getName() override;
     std::string pname() override;
     json::value asJSON() override;

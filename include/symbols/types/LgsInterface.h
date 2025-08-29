@@ -8,7 +8,7 @@ public:
     std::string pname() override;
     json::value asJSON() override;
     std::string getName() override;
-    llvm::Type* getIRType(LgsLLVM& codeGen) override;
+    llvm::Type* getIRType(LgsLLVMGen& cg) override;
     LgsField* getField(const std::string& fieldName) override;
     LgsFunc* getMethod(const std::string& methodName) override;
     LgsExpr* getZeroValue() override;

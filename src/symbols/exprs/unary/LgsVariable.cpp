@@ -3,27 +3,27 @@
 #include "funcs/LgsParam.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
-#include <codegen/LgsLLVM.h>
+#include <codegen/LgsLLVMGen.h>
 
-Value* LgsVariable::loadIR(LgsLLVM& codeGen) {
+Value* LgsVariable::loadIR(LgsLLVMGen& cg) {
     switch (ref.symbolType) {
     case PARAM:
-        return ref.param->loadIR(codeGen);
+        return ref.param->loadIR(cg);
     case VAR_DEC:
-        return ref.varDec->loadIR(codeGen);
+        return ref.varDec->loadIR(cg);
     default:
         assert(0);
     }
 }
 
-Value* LgsVariable::hash(LgsLLVM& codeGen) {
+Value* LgsVariable::hash(LgsLLVMGen& cg) {
     switch (ref.symbolType) {
     case PARAM:
-        return codeGen.callHashStr(ref.param->IRValue);
+        return cg.callHashStr(ref.param->IRValue);
     case VAR_DEC:
-        return ref.varDec->expr->hash(codeGen);
+        return ref.varDec->expr->hash(cg);
     case ENUM_FIELD:
-        return codeGen.i32(hashStr(ref.field->name.c_str()));
+        return cg.i32(hashStr(ref.field->name.c_str()));
     default:
         assert(0);
     }
@@ -33,8 +33,8 @@ LgsExpr* LgsVariable::castTo(LgsType* toType) {
     return this;
 }
 
-void LgsVariable::assign(LgsLLVM& codeGen, LgsExpr* expr) {
-    codeGen.builder.CreateStore(expr->IRValue, IRValue);
+void LgsVariable::assign(LgsLLVMGen& cg, LgsExpr* expr) {
+    cg.builder.CreateStore(expr->IRValue, IRValue);
 }
 
 std::string LgsVariable::pname() {

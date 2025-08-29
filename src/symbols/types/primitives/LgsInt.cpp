@@ -11,8 +11,8 @@ size_t LgsInt::getSizeBytes() {
     return sizeof(int);
 }
 
-Type* LgsInt::getIRType(LgsLLVM& codeGen) {
-    return codeGen.i32Ty();
+Type* LgsInt::getIRType(LgsLLVMGen& cg) {
+    return cg.i32Ty();
 }
 
 LgsExpr* LgsInt::getZeroValue() {
@@ -50,6 +50,6 @@ LgsType* LgsInt::clone() {
     return this;
 }
 
-DIBasicType* LgsInt::getDebugType(LgsLLVM& codeGen) {
-    return codeGen.diBuilder->createBasicType(name, 32, dwarf::DW_ATE_signed);
+DIBasicType* LgsInt::getDebugType(LgsLLVMGen& cg) {
+    return cg.diBuilder->createBasicType(name, 32, dwarf::DW_ATE_signed);
 }

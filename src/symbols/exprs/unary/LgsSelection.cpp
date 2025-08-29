@@ -6,7 +6,7 @@
 #include "types/LgsInterface.h"
 #include "types/LgsVec.h"
 
-Value* LgsSelection::loadIR(LgsLLVM& codeGen) {
+Value* LgsSelection::loadIR(LgsLLVMGen& cg) {
     return IRValue;
 }
 
@@ -19,18 +19,18 @@ LgsExpr* LgsSelection::lastExprParent() const {
     return exprs[exprs.size() - 2];
 }
 
-void LgsSelection::assign(LgsLLVM& codeGen, LgsExpr* expr) {
+void LgsSelection::assign(LgsLLVMGen& cg, LgsExpr* expr) {
     const auto rIR = expr->IRValue;
     const auto exprParent = lastExprParent();
     if (exprParent->type->asVec()) {
-        const auto vecTy = exprParent->type->getIRType(codeGen);
-        const auto vec = codeGen.builder.CreateLoad(vecTy, exprParent->IRValue);
+        const auto vecTy = exprParent->type->getIRType(cg);
+        const auto vec = cg.builder.CreateLoad(vecTy, exprParent->IRValue);
         const auto c = lastExpr()->asVariable()->name;
-        const auto i = codeGen.i32(LgsVec::getComponentIndex(c.front()));
-        const auto insert = codeGen.builder.CreateInsertElement(vec, rIR, i);
-        codeGen.builder.CreateStore(insert, exprParent->IRValue);
+        const auto i = cg.i32(LgsVec::getComponentIndex(c.front()));
+        const auto insert = cg.builder.CreateInsertElement(vec, rIR, i);
+        cg.builder.CreateStore(insert, exprParent->IRValue);
     } else {
-        codeGen.builder.CreateStore(rIR, IRValue);
+        cg.builder.CreateStore(rIR, IRValue);
     }
 }
 
@@ -43,9 +43,9 @@ std::string LgsSelection::pname() {
     return str.str();
 }
 
-Value* LgsSelection::hash(LgsLLVM& codeGen) {
+Value* LgsSelection::hash(LgsLLVMGen& cg) {
     const auto lgsExpr = lastExpr();
-    return lgsExpr->hash(codeGen);
+    return lgsExpr->hash(cg);
 }
 
 json::value LgsSelection::asJSON() {

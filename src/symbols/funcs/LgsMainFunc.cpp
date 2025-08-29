@@ -3,15 +3,15 @@
 #include <llvm/IR/Module.h>
 #include "types/LgsStr.h"
 
-Function* LgsMainFunc::getIRFunc(LgsLLVM& codeGen) {
+Function* LgsMainFunc::getIRFunc(LgsLLVMGen& cg) {
     if (IRFunc) return IRFunc;
     FunctionType* mainFuncType;
     if (funcType->params.empty()) {
-        mainFuncType = codeGen.getFT(codeGen.i32Ty());
+        mainFuncType = cg.getFT(cg.i32Ty());
     } else {
-        mainFuncType = codeGen.getFT(codeGen.i32Ty(), {codeGen.i32Ty(), codeGen.builder.getPtrTy()});
+        mainFuncType = cg.getFT(cg.i32Ty(), {cg.i32Ty(), cg.builder.getPtrTy()});
     }
-    IRFunc = codeGen.getFunc(LGS_MAIN_FUNC_NAME, mainFuncType);
+    IRFunc = cg.getFunc(LGS_MAIN_FUNC_NAME, mainFuncType);
     if (funcType->params.empty()) return IRFunc;
     auto IRArgs = IRFunc->arg_begin();
     argc = IRArgs;

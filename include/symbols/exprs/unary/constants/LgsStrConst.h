@@ -16,10 +16,10 @@ public:
     }
 
     std::string pname() override;
-    Value* hash(LgsLLVM& codeGen) override;
+    Value* hash(LgsLLVMGen& cg) override;
     json::value asJSON() override;
-    Value* eqIR(LgsLLVM& codeGen, LgsExpr* other) override;
-    Value* addIR(LgsLLVM& codeGen, LgsExpr* other) override;
+    Value* eqIR(LgsLLVMGen& cg, LgsExpr* other) override;
+    Value* addIR(LgsLLVMGen& cg, LgsExpr* other) override;
     LgsExpr* clone() override;
     LgsExpr* castTo(LgsType* toType) override;
     ~LgsStrConst() override;

@@ -15,7 +15,7 @@ public:
         setRTT();
     }
 
-    Type* getIRType(LgsLLVM& codeGen) override;
+    Type* getIRType(LgsLLVMGen& cg) override;
     LgsField* getField(const std::string& fieldName) override;
     std::string getName() override;
     std::string pname() override;
@@ -24,9 +24,9 @@ public:
     LgsExpr* getZeroValue() override;
     LgsType* getIndexType() override;
     uint16_t getUnpackCount() const override;
-    Value* IRLength(LgsLLVM& codeGen, LgsExpr* iterable) override;
-    Value* IRIsEmpty(LgsLLVM* codeGen, LgsExpr* iterable) override;
-    Value* IRIsNotEmpty(LgsLLVM* codeGen, LgsExpr* iterable) override;
+    Value* IRLength(LgsLLVMGen& cg, LgsExpr* iterable) override;
+    Value* IRIsEmpty(LgsLLVMGen* cg, LgsExpr* iterable) override;
+    Value* IRIsNotEmpty(LgsLLVMGen* cg, LgsExpr* iterable) override;
     bool canCastTo(LgsType* other) override;
     static int8_t getSwizzleSet(char c);
     static int8_t getComponentIndex(char c);

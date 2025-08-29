@@ -677,8 +677,8 @@ void LgsSema::visitInnerSelections(const LgsSelection* selection) {
 
 void LgsSema::visitFieldSelection(LgsVariable* child, LgsType* parentType) {
     if (!parentType) return;
+    if (parentType->asVec() && !validateVecElements(child, parentType->asVec())) return;
     auto childName = child->name;
-    if (parentType->asVec()) resolveScalars(child, parentType->asVec());
     const auto field = parentType->getField(childName);
     if (!field) {
         errHandler.addError(E10005, &child->location, {childName, parentType->pname()});
@@ -1147,30 +1147,32 @@ bool LgsSema::resolveMethodCall(LgsFuncCall* methodCall, LgsType* parentType) {
     return true;
 }
 
-void LgsSema::resolveScalars(const LgsVariable* fieldVar, LgsVec* vec) {
+bool LgsSema::validateVecElements(const LgsVariable* fieldVar, LgsVec* vec) {
     const auto fieldName = fieldVar->name;
     const auto dim = vec->dim;
     if (fieldName.empty() || fieldName.size() > 4) {
-        return errHandler.addError(E10069, &fieldVar->location, {vec->pname()});
+        errHandler.addError(E10069, &fieldVar->location, {vec->pname()});
+        return false;
     }
 
     const auto expectedSet = LgsVec::getSwizzleSet(fieldName[0]);
     if (expectedSet < 0) {
-        return errHandler.addError(E10070, &fieldVar->location, {fieldName, vec->pname()});
+        errHandler.addError(E10070, &fieldVar->location, {fieldName, vec->pname()});
+        return false;
     }
 
-    std::vector<uint8_t> indices;
-    indices.reserve(fieldName.size());
     for (const char c : fieldName) {
         if (LgsVec::getSwizzleSet(c) != expectedSet) {
-            return errHandler.addError(E10070, &fieldVar->location, {fieldName, vec->pname()});
+            errHandler.addError(E10070, &fieldVar->location, {fieldName, vec->pname()});
+            return false;
         }
         const auto componentIndex = LgsVec::getComponentIndex(c);
         if (componentIndex >= dim) {
-            return errHandler.addError(E10070, &fieldVar->location, {fieldName, vec->pname()});
+            errHandler.addError(E10070, &fieldVar->location, {fieldName, vec->pname()});
+            return false;
         }
-        indices.push_back(componentIndex);
     }
+    return true;
 }
 
 void LgsSema::checkMock(const LgsSelection* selection) {

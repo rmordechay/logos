@@ -4,14 +4,8 @@
 #include "types/primitives/LgsDouble.h"
 #include "types/primitives/LgsLong.h"
 
-Value* LgsIntConst::loadIR(LgsLLVM& codeGen) {
+Value* LgsIntConst::loadIR(LgsLLVMGen& cg) {
     return IRValue;
-}
-
-Value* LgsIntConst::getIRPtrTo(LgsLLVM& codeGen) {
-    const auto ptr = codeGen.builder.CreateAlloca(type->getIRType(codeGen));
-    codeGen.builder.CreateStore(IRValue, ptr);
-    return ptr;
 }
 
 LgsExpr* LgsIntConst::castTo(LgsType* toType) {

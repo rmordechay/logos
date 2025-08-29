@@ -1,7 +1,7 @@
 #pragma once
 #include "LgsSymbolTable.h"
 #include "configs/LgsErrors.h"
-#include "../codegen/LgsLLVM.h"
+#include "../codegen/LgsLLVMGen.h"
 
 class LgsRuntime;
 class LgsStrConst;
@@ -12,7 +12,7 @@ public:
     size_t id = 0;
     std::string name;
     fs::path path;
-    LgsLLVM generator;
+    LgsLLVMGen generator;
     LgsSymbolTable symbolTable;
     LgsRuntime* runtime = nullptr;
     LgsLocation location{0, 0, 0};

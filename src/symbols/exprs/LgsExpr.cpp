@@ -17,8 +17,12 @@
 
 class LgsTypeExpr;
 
-Value* LgsExpr::getIRPtrTo(LgsLLVM& codeGen) {
-    return IRValue;
+Value* LgsExpr::getIRPtrTo(LgsLLVMGen& cg) const {
+    const auto ty = type->getIRType(cg);
+    if (IRValue->getType()->isPointerTy()) return IRValue;
+    const auto ptr = cg.builder.CreateAlloca(ty);
+    cg.builder.CreateStore(IRValue, ptr);
+    return ptr;
 }
 
 size_t LgsExpr::getConstInt() {
@@ -86,7 +90,11 @@ LgsExpr* LgsExpr::castTo(LgsType* toType) {
     assert(0);
 }
 
-Value* LgsExpr::hash(LgsLLVM& codeGen) {
+Value* LgsExpr::hash(LgsLLVMGen& cg) {
+    assert(0);
+}
+
+void LgsExpr::assign(LgsLLVMGen& cg, LgsExpr* expr) {
     assert(0);
 }
 

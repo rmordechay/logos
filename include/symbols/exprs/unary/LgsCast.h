@@ -13,7 +13,7 @@ public:
     LgsExpr* toValue = nullptr;
 
     LgsCast(LgsType* castToType, LgsExpr* castFromValue) : LgsUnaryExpr(castToType), toType(castToType), fromValue(castFromValue) {}
-    Value* addIR(LgsLLVM& codeGen, LgsExpr* other) override;
+    Value* addIR(LgsLLVMGen& cg, LgsExpr* other) override;
     std::string pname() override;
     json::value asJSON() override;
     ~LgsCast() override;

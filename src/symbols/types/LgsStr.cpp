@@ -3,16 +3,16 @@
 #include "types/LgsAny.h"
 
 LgsStr::LgsStr(): LgsIterable(&LGS_CHAR) {
-    lenFunc->fn = [](LgsLLVM& codeGen, const std::vector<LgsExpr*>& args) {
-        return codeGen.callStrLen(args[0]->IRValue);
+    lenFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
+        return cg.callStrLen(args[0]->IRValue);
     };
-    isEmptyFunc->fn = [](LgsLLVM& codeGen, const std::vector<LgsExpr*>& args) {
-        const auto strLen = codeGen.callStrLen(args[0]->IRValue);
-        return codeGen.builder.CreateICmpEQ(strLen, codeGen.builder.getInt64(0));
+    isEmptyFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
+        const auto strLen = cg.callStrLen(args[0]->IRValue);
+        return cg.builder.CreateICmpEQ(strLen, cg.builder.getInt64(0));
     };
-    isNotEmptyFunc->fn = [](LgsLLVM& codeGen, const std::vector<LgsExpr*>& args) {
-        const auto strLen = codeGen.callStrLen(args[0]->IRValue);
-        return codeGen.builder.CreateICmpNE(strLen, codeGen.builder.getInt64(0));
+    isNotEmptyFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
+        const auto strLen = cg.callStrLen(args[0]->IRValue);
+        return cg.builder.CreateICmpNE(strLen, cg.builder.getInt64(0));
     };
     addMethod(lenFunc);
     addMethod(isEmptyFunc);
@@ -21,12 +21,12 @@ LgsStr::LgsStr(): LgsIterable(&LGS_CHAR) {
     rtt = RTT_STR;
 }
 
-Type* LgsStr::getIRBaseType(LgsLLVM* codeGen) const {
-    return ArrayType::get(baseType->getIRType(*codeGen), sizeExpr->getConstInt());
+Type* LgsStr::getIRBaseType(LgsLLVMGen* cg) const {
+    return ArrayType::get(baseType->getIRType(*cg), sizeExpr->getConstInt());
 }
 
-Type* LgsStr::getIRType(LgsLLVM& codeGen) {
-    return codeGen.ptrTy();
+Type* LgsStr::getIRType(LgsLLVMGen& cg) {
+    return cg.ptrTy();
 }
 
 size_t LgsStr::getSizeBytes() {
@@ -63,16 +63,16 @@ LgsType* LgsStr::getIndexType() {
     return &LGS_INT;
 }
 
-Value* LgsStr::IRLength(LgsLLVM& codeGen, LgsExpr* iterable) {
-    return lenFunc->call(codeGen, {iterable});
+Value* LgsStr::IRLength(LgsLLVMGen& cg, LgsExpr* iterable) {
+    return lenFunc->call(cg, {iterable});
 }
 
-Value* LgsStr::IRIsEmpty(LgsLLVM* codeGen, LgsExpr* iterable) {
-    return isEmptyFunc->call(*codeGen, {iterable});
+Value* LgsStr::IRIsEmpty(LgsLLVMGen* cg, LgsExpr* iterable) {
+    return isEmptyFunc->call(*cg, {iterable});
 }
 
-Value* LgsStr::IRIsNotEmpty(LgsLLVM* codeGen, LgsExpr* iterable) {
-    return isNotEmptyFunc->call(*codeGen, {iterable});
+Value* LgsStr::IRIsNotEmpty(LgsLLVMGen* cg, LgsExpr* iterable) {
+    return isNotEmptyFunc->call(*cg, {iterable});
 }
 
 bool LgsStr::canCastTo(LgsType* other) {

@@ -1,6 +1,6 @@
 #include "types/LgsFuncType.h"
 #include "configs/LgsDefinitions.h"
-#include "codegen/LgsLLVM.h"
+#include "codegen/LgsLLVMGen.h"
 #include "utils/LgsUtils.h"
 
 void LgsFuncType::setFuncOptions(const uint32_t ops) {
@@ -14,19 +14,19 @@ void LgsFuncType::setFuncOptions(const uint32_t ops) {
     isMethod = ops & METHOD;
 }
 
-Type* LgsFuncType::getIRType(LgsLLVM& codeGen) {
+Type* LgsFuncType::getIRType(LgsLLVMGen& cg) {
     std::vector<Type*> IRParamsTypes;
     for (int i = 0; i < params.size(); ++i) {
         const auto param = params[i];
         const auto paramType = param.type;
         if (param.isSelf || !paramType->isPrimitive) {
-            IRParamsTypes.emplace_back(codeGen.ptrTy());
+            IRParamsTypes.emplace_back(cg.ptrTy());
         } else {
-            IRParamsTypes.emplace_back(paramType->getIRType(codeGen));
+            IRParamsTypes.emplace_back(paramType->getIRType(cg));
         }
     }
-    const auto returnType = rt->isBig() ? codeGen.ptrTy() : rt->getIRType(codeGen);
-    IRType = codeGen.getFT(returnType, IRParamsTypes, this->isVariadic);
+    const auto returnType = rt->isBig() ? cg.ptrTy() : rt->getIRType(cg);
+    IRType = cg.getFT(returnType, IRParamsTypes, this->isVariadic);
     return IRType;
 }
 

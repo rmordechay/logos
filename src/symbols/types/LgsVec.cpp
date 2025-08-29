@@ -1,14 +1,15 @@
 #include "exprs/unary/LgsVariable.h"
 #include "exprs/unary/LgsVectorExpr.h"
 
-Type* LgsVec::getIRType(LgsLLVM& codeGen) {
-    IRType = FixedVectorType::get(baseType->getIRType(codeGen), dim);
+Type* LgsVec::getIRType(LgsLLVMGen& cg) {
+    IRType = FixedVectorType::get(baseType->getIRType(cg), dim);
     return IRType;
 }
 
 LgsField* LgsVec::getField(const std::string& fieldName) {
-    const auto fieldType = dim == 1 ? baseType : new LgsVec(dim);
-    const auto field = new LgsField(fieldName, fieldType);
+    for (auto* f : fields) if (f->name == fieldName) return f;
+    const auto scalarOrVector = dim == 1 ? baseType : new LgsVec(fieldName.size());
+    const auto field = new LgsField(fieldName, scalarOrVector);
     addField(field);
     return field;
 }
@@ -41,16 +42,16 @@ uint16_t LgsVec::getUnpackCount() const {
     return 1;
 }
 
-Value* LgsVec::IRLength(LgsLLVM& codeGen, LgsExpr* iterable) {
-    return codeGen.usize(2);
+Value* LgsVec::IRLength(LgsLLVMGen& cg, LgsExpr* iterable) {
+    return cg.usize(2);
 }
 
-Value* LgsVec::IRIsEmpty(LgsLLVM* codeGen, LgsExpr* iterable) {
-    return codeGen->builder.getFalse();
+Value* LgsVec::IRIsEmpty(LgsLLVMGen* cg, LgsExpr* iterable) {
+    return cg->builder.getFalse();
 }
 
-Value* LgsVec::IRIsNotEmpty(LgsLLVM* codeGen, LgsExpr* iterable) {
-    return codeGen->builder.getTrue();
+Value* LgsVec::IRIsNotEmpty(LgsLLVMGen* cg, LgsExpr* iterable) {
+    return cg->builder.getTrue();
 }
 
 bool LgsVec::canCastTo(LgsType* other) {

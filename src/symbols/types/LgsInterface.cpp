@@ -1,18 +1,18 @@
 #include "types/LgsInterface.h"
 #include "funcs/LgsFunc.h"
-#include "codegen/LgsLLVM.h"
+#include "codegen/LgsLLVMGen.h"
 #include "stmts/LgsField.h"
 #include "types/LgsObject.h"
 
-Type* LgsInterface::getIRType(LgsLLVM& codeGen) {
+Type* LgsInterface::getIRType(LgsLLVMGen& cg) {
     if (IRType) return IRType;
-    IRType = StructType::getTypeByName(codeGen.context, name);
+    IRType = StructType::getTypeByName(cg.context, name);
     std::vector<Type*> elementTypes;
     for (int i = 0; i < methods.size(); ++i) {
-        elementTypes.emplace_back(codeGen.ptrTy());
+        elementTypes.emplace_back(cg.ptrTy());
     }
     if (!IRType) {
-        IRType = StructType::create(codeGen.context, elementTypes, name);
+        IRType = StructType::create(cg.context, elementTypes, name);
     }
     return IRType;
 }

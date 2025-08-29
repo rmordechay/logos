@@ -1,6 +1,6 @@
 #include "stmts/LgsIfStmt.h"
 #include "funcs/LgsFunc.h"
-#include "codegen/LgsLLVM.h"
+#include "codegen/LgsLLVMGen.h"
 #include "utils/LgsUtils.h"
 
 json::value LgsIfStmt::asJSON() {

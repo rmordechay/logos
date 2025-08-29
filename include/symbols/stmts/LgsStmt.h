@@ -6,7 +6,7 @@ class LgsPattern;
 class LgsDeferStmt;
 class LgsCoroutine;
 class LgsPostfixExpr;
-class LgsLLVM;
+class LgsLLVMGen;
 class LgsForLoop;
 class LgsVarDec;
 class LgsSelection;

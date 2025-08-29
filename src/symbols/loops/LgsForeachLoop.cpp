@@ -1,12 +1,12 @@
 #include "loops/LgsForeachLoop.h"
 #include "types/LgsMap.h"
 
-Value* LgsForeachLoop::loopStart(LgsLLVM& codeGen) {
-    return codeGen.sizeZero();
+Value* LgsForeachLoop::loopStart(LgsLLVMGen& cg) {
+    return cg.sizeZero();
 }
 
-Value* LgsForeachLoop::loopEnd(LgsLLVM& codeGen) {
-    return iterExpr->type->asIterable()->IRLength(codeGen, iterExpr);
+Value* LgsForeachLoop::loopEnd(LgsLLVMGen& cg) {
+    return iterExpr->type->asIterable()->IRLength(cg, iterExpr);
 }
 
 LgsForeachLoop::~LgsForeachLoop() {

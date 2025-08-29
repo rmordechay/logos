@@ -3,9 +3,9 @@
 #include "exprs/unary/LgsArrayExpr.h"
 #include "types/primitives/LgsInt.h"
 
-Type* LgsSArray::getIRType(LgsLLVM& codeGen) {
+Type* LgsSArray::getIRType(LgsLLVMGen& cg) {
     if (IRType) return IRType;
-    const auto innerIRType = baseType->getIRType(codeGen);
+    const auto innerIRType = baseType->getIRType(cg);
     IRType = ArrayType::get(innerIRType, sizeExpr->getConstInt());
     return IRType;
 }
@@ -51,16 +51,16 @@ std::string LgsSArray::getName() {
     return name;
 }
 
-Value* LgsSArray::IRLength(LgsLLVM& codeGen, LgsExpr* iterable) {
+Value* LgsSArray::IRLength(LgsLLVMGen& cg, LgsExpr* iterable) {
     return sizeExpr->IRValue;
 }
 
-Value* LgsSArray::IRIsEmpty(LgsLLVM* codeGen, LgsExpr* iterable) {
-    return codeGen->builder.getFalse();
+Value* LgsSArray::IRIsEmpty(LgsLLVMGen* cg, LgsExpr* iterable) {
+    return cg->builder.getFalse();
 }
 
-Value* LgsSArray::IRIsNotEmpty(LgsLLVM* codeGen, LgsExpr* iterable) {
-    return codeGen->builder.getTrue();
+Value* LgsSArray::IRIsNotEmpty(LgsLLVMGen* cg, LgsExpr* iterable) {
+    return cg->builder.getTrue();
 }
 
 LgsSArray::~LgsSArray() {

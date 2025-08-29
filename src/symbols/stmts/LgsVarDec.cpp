@@ -4,8 +4,8 @@
 #include "utils/LgsUtils.h"
 #include <llvm/IR/DIBuilder.h>
 
-Value* LgsVarDec::loadIR(LgsLLVM& codeGen) {
-    return codeGen.builder.CreateLoad(type->getIRType(codeGen), IRValue);;
+Value* LgsVarDec::loadIR(LgsLLVMGen& cg) {
+    return cg.builder.CreateLoad(type->getIRType(cg), IRValue);;
 }
 
 bool LgsVarDec::shouldAllocate(const Type* IRType) const {
@@ -19,20 +19,20 @@ bool LgsVarDec::shouldAllocate(const Type* IRType) const {
     return !IRType->isArrayTy() && !IRType->isPointerTy() && !IRType->isVoidTy();
 }
 
-void LgsVarDec::setDebugValue(LgsLLVM& codeGen) {
-    const auto var = codeGen.diBuilder->createAutoVariable(
-        codeGen.compileUnit,
+void LgsVarDec::setDebugValue(LgsLLVMGen& cg) {
+    const auto var = cg.diBuilder->createAutoVariable(
+        cg.compileUnit,
         name,
-        codeGen.diFile,
+        cg.diFile,
         location.lineStart,
-        type->getDebugType(codeGen)
+        type->getDebugType(cg)
     );
-    codeGen.diBuilder->insertDeclare(
+    cg.diBuilder->insertDeclare(
         IRValue,
         var,
-        codeGen.diBuilder->createExpression(),
-        getDebugLoc(codeGen),
-        codeGen.builder.GetInsertBlock()
+        cg.diBuilder->createExpression(),
+        getDebugLoc(cg),
+        cg.builder.GetInsertBlock()
     );
 }
 

@@ -10,7 +10,7 @@
 class LgsTestFile;
 class LgsAppFile;
 class LogosParser;
-class LgsLLVM;
+class LgsLLVMGen;
 class LgsStrConst;
 class LgsFile;
 class LgsEnvFile;

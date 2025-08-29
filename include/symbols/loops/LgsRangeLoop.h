@@ -7,7 +7,7 @@ public:
     LgsExpr* endRange = nullptr;
 
     LgsRangeLoop(LgsExpr* rangeStart, LgsExpr* rangeEnd) : startRange(rangeStart), endRange(rangeEnd) {}
-    Value* loopStart(LgsLLVM& codeGen) override;
-    Value* loopEnd(LgsLLVM& codeGen) override;
+    Value* loopStart(LgsLLVMGen& cg) override;
+    Value* loopEnd(LgsLLVMGen& cg) override;
     ~LgsRangeLoop() override;
 };

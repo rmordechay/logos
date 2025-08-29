@@ -1,5 +1,5 @@
 #pragma once
-#include "LgsLLVM.h"
+#include "LgsLLVMGen.h"
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "files/LgsFile.h"
 #include "logos/LgsStack.h"
@@ -54,7 +54,7 @@ class LgsCodeGen {
 public:
     LgsFile& file;
     LgsStack stack;
-    LgsLLVM& cg;
+    LgsLLVMGen& cg;
     Function* currentIRFunc = nullptr;
 
     explicit LgsCodeGen(LgsFile& file) : file(file), cg(file.generator) {}
@@ -129,9 +129,6 @@ public:
     void initIterator(LgsIterator* iterator);
     Value* iterNext(LgsIterator* iterator);
     Value* iterHasNext(LgsIterator* iterator);
-
-    // Assignment
-    void createIRAssignment(const LgsAssignment* assignment) const;
 
     // Generic
     Value* getIRValue(LgsValue* value);

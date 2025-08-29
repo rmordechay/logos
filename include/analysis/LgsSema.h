@@ -126,7 +126,7 @@ public:
     void resolveFuncCall(LgsFuncCall* funcCall);
     bool resolveMethodCall(LgsFuncCall* methodCall, LgsType* parentType);
     bool resolveForeachVars(const LgsForeachLoop* foreachLoop, LgsUnaryExpr* iterExpr, const LgsIterable* iterable);
-    void resolveScalars(const LgsVariable* fieldVar, LgsVec* vec);
+    bool validateVecElements(const LgsVariable* fieldVar, LgsVec* vec);
     void checkMock(const LgsSelection* selection);
     LgsSymbol* getSymbol(const std::string& name, const LgsLocation* location);
     void addLocalSymbol(const LgsSymbol& newSymbol);
