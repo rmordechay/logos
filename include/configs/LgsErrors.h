@@ -31,7 +31,7 @@ inline LgsBaseError E10008{.msg = "'Main.lgs' could not be found in 'src' direct
 inline LgsBaseError E10009{.msg = "Duplicate Main files were found in the project. Locations:%s", .errCode = errCodeStart++};
 inline LgsBaseError E10010{.msg = "Not a root path of a logos project.", .errCode = errCodeStart++};
 inline LgsBaseError E10011{.msg = "'%s' is already declared.", .errCode = errCodeStart++};
-inline LgsBaseError E10012{.msg = "Function call cannot be assigned to a value.", .errCode = errCodeStart++};
+inline LgsBaseError E10012{.msg = "'%s' of type '%s' cannot be %s-assigned to type '%s'.", .errCode = errCodeStart++};
 inline LgsBaseError E10013{.msg = "Field '%s' is with function type. Declare it as a standard function instead.", .errCode = errCodeStart++};
 inline LgsBaseError E10014{.msg = "Expression of type '%s' does not match base type '%s'.", .errCode = errCodeStart++};
 inline LgsBaseError E10015{.msg = "Function '%s' was found but it doesn't match the parameters.%pGiven:\t  %s%pExpected:  %s", .errCode = errCodeStart++};
@@ -70,7 +70,7 @@ inline LgsBaseError E10047{.msg = "External file '%s' was not found.", .errCode 
 inline LgsBaseError E10048{.msg = "Static iterable '%s' must have a constant size.", .errCode = errCodeStart++};
 inline LgsBaseError E10049{.msg = "Not enough information to infer the type of the iterable. Specify an explicit type or initialize with element(s).", .errCode = errCodeStart++};
 inline LgsBaseError E10050{.msg = "Only integer values can be incremented (++) or decremented (--). Given: '%s'.", .errCode = errCodeStart++};
-inline LgsBaseError E10051{.msg = "Constant field '%s' cannot be overwritten.", .errCode = errCodeStart++};
+inline LgsBaseError E10051{.msg = "'%s' is defined as constant and cannot be overwritten.", .errCode = errCodeStart++};
 inline LgsBaseError E10052{.msg = "Spread operator in '%s...' must only be used with iterables. Given type: '%s'.", .errCode = errCodeStart++};
 inline LgsBaseError E10053{.msg = "'%s' is a Logos global name and cannot be redefined.", .errCode = errCodeStart++};
 inline LgsBaseError E10054{.msg = "Field '%s' is set more than one time.", .errCode = errCodeStart++};

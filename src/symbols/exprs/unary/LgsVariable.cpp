@@ -5,6 +5,141 @@
 #include "stmts/LgsVarDec.h"
 #include <codegen/LgsLLVMGen.h>
 
+void LgsVariable::assign(LgsLLVMGen& cg, LgsExpr* expr) {
+    IRValue = expr->loadIR(cg);
+}
+
+Value* LgsVariable::addIR(LgsLLVMGen& cg, LgsExpr* other) {
+    switch (ref.symbolType) {
+    case VAR_DEC:
+        return ref.varDec->expr->addIR(cg, other);
+    default:
+        assert(0);
+    }
+}
+
+Value* LgsVariable::subIR(LgsLLVMGen& cg, LgsExpr* other) {
+    switch (ref.symbolType) {
+    case VAR_DEC:
+        return ref.varDec->expr->subIR(cg, other);
+    default:
+        assert(0);
+    }
+}
+
+Value* LgsVariable::mulIR(LgsLLVMGen& cg, LgsExpr* other) {
+    switch (ref.symbolType) {
+    case VAR_DEC:
+        return ref.varDec->expr->mulIR(cg, other);
+    default:
+        assert(0);
+    }
+}
+
+Value* LgsVariable::divIR(LgsLLVMGen& cg, LgsExpr* other) {
+    switch (ref.symbolType) {
+    case VAR_DEC:
+        return ref.varDec->expr->divIR(cg, other);
+    default:
+        assert(0);
+    }
+}
+
+Value* LgsVariable::inIR(LgsLLVMGen& cg, LgsExpr* other) {
+    assert(0);
+}
+
+Value* LgsVariable::modIR(LgsLLVMGen& cg, LgsExpr* other) {
+    switch (ref.symbolType) {
+    case VAR_DEC:
+        return ref.varDec->expr->modIR(cg, other);
+    default:
+        assert(0);
+    }
+}
+
+Value* LgsVariable::eqIR(LgsLLVMGen& cg, LgsExpr* other) {
+    switch (ref.symbolType) {
+    case VAR_DEC:
+        return ref.varDec->expr->eqIR(cg, other);
+    default:
+        assert(0);
+    }
+}
+
+Value* LgsVariable::neIR(LgsLLVMGen& cg, LgsExpr* other) {
+    switch (ref.symbolType) {
+    case VAR_DEC:
+        return ref.varDec->expr->neIR(cg, other);
+    default:
+        assert(0);
+    }
+}
+
+Value* LgsVariable::ltIR(LgsLLVMGen& cg, LgsExpr* other) {
+    switch (ref.symbolType) {
+    case VAR_DEC:
+        return ref.varDec->expr->ltIR(cg, other);
+    default:
+        assert(0);
+    }
+}
+
+Value* LgsVariable::gtIR(LgsLLVMGen& cg, LgsExpr* other) {
+    switch (ref.symbolType) {
+    case VAR_DEC:
+        return ref.varDec->expr->gtIR(cg, other);
+    default:
+        assert(0);
+    }
+}
+
+Value* LgsVariable::geIR(LgsLLVMGen& cg, LgsExpr* other) {
+    switch (ref.symbolType) {
+    case VAR_DEC:
+        return ref.varDec->expr->geIR(cg, other);
+    default:
+        assert(0);
+    }
+}
+
+Value* LgsVariable::leIR(LgsLLVMGen& cg, LgsExpr* other) {
+    switch (ref.symbolType) {
+    case VAR_DEC:
+        return ref.varDec->expr->leIR(cg, other);
+    default:
+        assert(0);
+    }
+}
+
+Value* LgsVariable::andIR(LgsLLVMGen& cg, LgsExpr* other) {
+    assert(0);
+}
+
+Value* LgsVariable::orIR(LgsLLVMGen& cg, LgsExpr* other) {
+    assert(0);
+}
+
+Value* LgsVariable::bitAndIR(LgsLLVMGen& cg, LgsExpr* other) {
+    assert(0);
+}
+
+Value* LgsVariable::bitOrIR(LgsLLVMGen& cg, LgsExpr* other) {
+    assert(0);
+}
+
+Value* LgsVariable::bitXorIR(LgsLLVMGen& cg, LgsExpr* other) {
+    assert(0);
+}
+
+Value* LgsVariable::rshiftIR(LgsLLVMGen& cg, LgsExpr* other) {
+    assert(0);
+}
+
+Value* LgsVariable::lshiftIR(LgsLLVMGen& cg, LgsExpr* other) {
+    assert(0);
+}
+
 Value* LgsVariable::loadIR(LgsLLVMGen& cg) {
     switch (ref.symbolType) {
     case PARAM:
@@ -31,10 +166,6 @@ Value* LgsVariable::hash(LgsLLVMGen& cg) {
 
 LgsExpr* LgsVariable::castTo(LgsType* toType) {
     return this;
-}
-
-void LgsVariable::assign(LgsLLVMGen& cg, LgsExpr* expr) {
-    cg.builder.CreateStore(expr->IRValue, IRValue);
 }
 
 std::string LgsVariable::pname() {

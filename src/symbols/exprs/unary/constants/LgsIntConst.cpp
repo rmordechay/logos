@@ -27,7 +27,7 @@ LgsExpr* LgsIntConst::clone() {
 }
 
 std::string LgsIntConst::pname() {
-    return type->getName();
+    return std::to_string(value);
 }
 
 json::value LgsIntConst::asJSON() {

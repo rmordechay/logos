@@ -29,7 +29,7 @@
 #include "stmts/LgsContinue.h"
 #include "stmts/LgsDeferStmt.h"
 #include "stmts/LgsVarDec.h"
-#include "types/LgsDArray.h"
+#include "types/iterables/LgsDArray.h"
 #include "types/LgsGroup.h"
 #include "types/LgsInterface.h"
 #include "types/LgsNullable.h"
@@ -219,17 +219,14 @@ void LgsSema::visitAssignment(const LgsAssignment* assignment) {
     const auto rValue = assignment->rValue;
     visitExpr(lValue);
     visitExpr(rValue);
-    if (!dynamic_cast<LgsAssignable*>(lValue)) {
-        return errHandler.addError(E10012, &lValue->location);
-    }
-    if (!lValue->isMutable) {
-        return errHandler.addError(E10051, &lValue->location, {lValue->pname()});
-    }
     const auto lType = lValue->type;
     const auto rType = rValue->type;
     if (!lType || !rType) return;
-    if (!lType->canCastTo(rType)) {
-        errHandler.addError(E10001, &assignment->location, {lType->pname(), rType->pname()});
+    if (!lValue->isMutable) {
+        return errHandler.addError(E10051, &lValue->location, {lValue->pname()});
+    }
+    if (!lType->canAssignTo(rType, assignment->assignmentType)) {
+        return errHandler.addError(E10012, &lValue->location, {lValue->pname(), lType->pname(), assignment->getAssignTypeStr(), rValue->pname()});
     }
 }
 

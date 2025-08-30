@@ -1,7 +1,7 @@
 #include "exprs/unary/constants/LgsStrConst.h"
 
 std::string LgsStrConst::pname() {
-    return type->pname();
+    return value.substr(0, 50) + "...";
 }
 
 Value* LgsStrConst::hash(LgsLLVMGen& cg) {

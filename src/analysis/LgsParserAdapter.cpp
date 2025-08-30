@@ -39,10 +39,10 @@
 #include "stmts/LgsIOStmt.h"
 #include "stmts/LgsIfStmt.h"
 #include "stmts/LgsVarDec.h"
-#include "types/LgsDArray.h"
+#include "types/iterables/LgsDArray.h"
 #include "types/LgsGroup.h"
 #include "types/LgsInterface.h"
-#include "types/LgsMap.h"
+#include "types/iterables/LgsMap.h"
 #include "types/LgsNullable.h"
 #include "types/LgsUnknown.h"
 #include "types/primitives/LgsDouble.h"
@@ -55,7 +55,7 @@
 #include <loops/LgsRangeLoop.h>
 #include <loops/LgsWhileLoop.h>
 #include <stmts/LgsDeferStmt.h>
-#include <types/LgsStr.h>
+#include <types/iterables/LgsStr.h>
 #include <types/LgsVoid.h>
 
 LgsFile* LgsParserAdapter::parseFile(const std::string& codeText, const fs::path& filePath) {

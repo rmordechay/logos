@@ -1,3 +1,4 @@
+#include "codegen/LgsLLVMGen.h"
 #include "exprs/LgsNull.h"
 #include "exprs/unary/constants/LgsFloatConst.h"
 #include "types/LgsAny.h"
@@ -38,4 +39,8 @@ bool LgsFloat::canCastTo(LgsType* other) {
     if (IRName == LgsAny::name) return true;
     if (IRName == LgsDouble::name) return true;
     return false;
+}
+
+bool LgsFloat::canAssignTo(LgsType* other, LgsAssignType op) {
+    return canCastTo(other);
 }

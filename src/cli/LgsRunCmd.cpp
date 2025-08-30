@@ -1,7 +1,7 @@
 #include "cli/LgsRunCmd.h"
 #include "cli/LgsCliHelp.h"
 #include "logos/LgsApp.h"
-#include "types/LgsStr.h"
+#include "types/iterables/LgsStr.h"
 
 void LgsRunCmd::run() {
     const std::string subCmd = argv[2];

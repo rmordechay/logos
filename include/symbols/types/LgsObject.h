@@ -15,10 +15,10 @@ public:
     LgsInstance* singleton = nullptr;
 
     explicit LgsObject(std::string  name) : name(std::move(name)) {}
-    llvm::Type* getIRType(LgsLLVMGen& cg) override;
+    Type* getIRType(LgsLLVMGen& cg) override;
     LgsField* getField(const std::string& fieldName) override;
     LgsFunc* getMethod(const std::string& methodName) override;
-    void freeValue(LgsLLVMGen& cg, llvm::Value* value) override;
+    void freeValue(LgsLLVMGen& cg, Value* value) override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
     std::string strFormatPart() const override;
@@ -27,6 +27,7 @@ public:
     std::string getName() override;
     std::string pname() override;
     bool canCastTo(LgsType* other) override;
+    bool canAssignTo(LgsType* other, LgsAssignType op) override;
     json::value asJSON() override;
     ~LgsObject() override;
 };

@@ -1,4 +1,5 @@
 #pragma once
+#include "LgsSymbol.h"
 #include "LgsUnaryExpr.h"
 
 class LgsFuncType;

@@ -12,15 +12,16 @@ public:
         rtt = RTT_INT;
     }
     size_t getSizeBytes() override;
-    llvm::Type* getIRType(LgsLLVMGen& cg) override;
+    Type* getIRType(LgsLLVMGen& cg) override;
     LgsExpr* getZeroValue() override;
     bool canCastTo(LgsType* other) override;
+    bool canAssignTo(LgsType* other, LgsAssignType op) override;
     std::string strFormatPart() const override;
     std::string getName() override;
     std::string pname() override;
     json::value asJSON() override;
     LgsType* clone() override;
-    llvm::DIBasicType* getDebugType(LgsLLVMGen& cg) override;
+    DIBasicType* getDebugType(LgsLLVMGen& cg) override;
 };
 
 inline LgsInt LGS_INT;

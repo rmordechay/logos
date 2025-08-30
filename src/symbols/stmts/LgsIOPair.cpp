@@ -1,4 +1,4 @@
-#include "../../../include/symbols/stmts/LgsIOPair.h"
+#include "stmts/LgsIOPair.h"
 
 json::value LgsIOPair::asJSON() {
     assert(0);

@@ -1,8 +1,8 @@
 #include "types/LgsPtr.h"
 #include "exprs/LgsNull.h"
 #include "types/LgsAny.h"
-#include "types/LgsDArray.h"
-#include "types/LgsSArray.h"
+#include "types/iterables/LgsDArray.h"
+#include "types/iterables/LgsSArray.h"
 #include "types/primitives/LgsLong.h"
 
 std::string LgsPtr::getName() {

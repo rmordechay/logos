@@ -2,7 +2,7 @@
 #include "exprs/unary/LgsVariable.h"
 #include "stmts/LgsVarDec.h"
 #include <exprs/unary/LgsArrayExpr.h>
-#include "types/LgsMap.h"
+#include "types/iterables/LgsMap.h"
 
 Value* LgsIterIndex::loadIR(LgsLLVMGen& cg) {
     const auto baseExprType = baseExpr->type;
@@ -40,7 +40,7 @@ Value* LgsIterIndex::loadFromMap(LgsLLVMGen& cg, const LgsMap* map) const {
 }
 
 Value* LgsIterIndex::loadFromStr(LgsLLVMGen& cg, const LgsStr* str) const {
-    if (index->to) return createStrSlice(cg, str);
+    if (index->to) return createStrSlice(cg);
     auto& builder = cg.builder;
     const auto baseExprIRValue = baseExpr->IRValue;
     const auto baseExprIRType = baseExpr->type->getIRType(cg);
@@ -79,7 +79,7 @@ Value* LgsIterIndex::loadFromSArray(LgsLLVMGen& cg) const {
     return cg.builder.CreateGEP(ty, ptr, IRIndices);
 }
 
-Value* LgsIterIndex::createStrSlice(LgsLLVMGen& cg, const LgsStr* str) const {
+Value* LgsIterIndex::createStrSlice(LgsLLVMGen& cg) const {
     const auto intFrom = index->from->asIntConst();
     const auto intTo = index->to->asIntConst();
     const auto strConst = baseExpr->getConstStr();

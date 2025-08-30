@@ -9,6 +9,7 @@ public:
         isPrimitive = true;
         isNumber = true;
         isFloatPoint = true;
+        rtt = RTT_FLOAT;
     }
     llvm::Type* getIRType(LgsLLVMGen& cg) override;
     std::string getName() override;
@@ -16,6 +17,7 @@ public:
     size_t getSizeBytes() override;
     std::string strFormatPart() const override;
     bool canCastTo(LgsType* other) override;
+    bool canAssignTo(LgsType* other, LgsAssignType op) override;
     std::string pname() override;
     json::value asJSON() override;
 };

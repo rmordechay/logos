@@ -3,7 +3,12 @@
 extern "C" void Lgs_print(const char* fmt, const LgsRTType rtt, const void* v) {
     switch (rtt) {
     case RTT_INT: {
-        const auto str = *static_cast<const int*>(v);
+        const auto str = *static_cast<const uint32_t*>(v);
+        printf(fmt, str);
+        break;
+    }
+    case RTT_FLOAT: {
+        const auto str = *static_cast<const float_t*>(v);
         printf(fmt, str);
         break;
     }

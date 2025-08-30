@@ -1,6 +1,6 @@
 #pragma once
 #include "LgsCliCmd.h"
-#include "types/LgsStr.h"
+#include "../symbols/types/iterables/LgsStr.h"
 #include "types/primitives/LgsInt.h"
 
 class LgsRunCmd final : public LgsCliCmd {

@@ -1,6 +1,6 @@
 #pragma once
 #include "LgsIntConst.h"
-#include "types/LgsStr.h"
+#include "../../../types/iterables/LgsStr.h"
 #include "types/primitives/LgsInt.h"
 
 class LgsStrConst final : public LgsUnaryExpr {

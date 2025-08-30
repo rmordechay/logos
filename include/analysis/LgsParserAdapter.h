@@ -4,6 +4,9 @@
 #include "utils/LgsErrHandler.h"
 #include "stmts/LgsAssignment.h"
 
+struct LgsSymbol;
+struct LgsAppConfigs;
+struct LgsSymbolTable;
 class LgsIOPair;
 struct LgsPaths;
 class LgsStrConst;

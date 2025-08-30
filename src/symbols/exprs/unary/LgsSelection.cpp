@@ -1,10 +1,9 @@
 #include "exprs/unary/LgsSelection.h"
 #include "exprs/unary/LgsFuncCall.h"
-#include "exprs/unary/LgsInstance.h"
 #include "exprs/unary/LgsVariable.h"
 #include "stmts/LgsField.h"
 #include "types/LgsInterface.h"
-#include "types/LgsVec.h"
+#include "types/iterables/LgsVec.h"
 
 Value* LgsSelection::loadIR(LgsLLVMGen& cg) {
     return IRValue;

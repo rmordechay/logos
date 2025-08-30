@@ -28,6 +28,10 @@ bool LgsInt::canCastTo(LgsType* other) {
     return false;
 }
 
+bool LgsInt::canAssignTo(LgsType* other, const LgsAssignType op) {
+    return canCastTo(other);
+}
+
 std::string LgsInt::strFormatPart() const {
     return "%d";
 }

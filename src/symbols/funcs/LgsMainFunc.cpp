@@ -1,7 +1,7 @@
 #include "funcs/LgsMainFunc.h"
 #include "exprs/unary/LgsArrayExpr.h"
 #include <llvm/IR/Module.h>
-#include "types/LgsStr.h"
+#include "types/iterables/LgsStr.h"
 
 Function* LgsMainFunc::getIRFunc(LgsLLVMGen& cg) {
     if (IRFunc) return IRFunc;

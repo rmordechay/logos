@@ -1,8 +1,8 @@
 #pragma once
 #include "LgsUnaryExpr.h"
 #include "exprs/LgsExpr.h"
-#include "types/LgsDArray.h"
-#include "types/LgsSArray.h"
+#include "../../types/iterables/LgsDArray.h"
+#include "../../types/iterables/LgsSArray.h"
 
 class LgsArrayExpr final : public LgsUnaryExpr {
 public:

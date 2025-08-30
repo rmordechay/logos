@@ -26,7 +26,7 @@
 #include "stmts/LgsContinue.h"
 #include "stmts/LgsDeferStmt.h"
 #include "stmts/LgsVarDec.h"
-#include "types/LgsDArray.h"
+#include "types/iterables/LgsDArray.h"
 #include "types/LgsInterface.h"
 #include "loops/LgsForLoop.h"
 #include "loops/LgsForeachLoop.h"
@@ -1021,6 +1021,8 @@ Value* LgsCodeGen::getIRValue(LgsValue* value) {
         visitStmt(stmt);
     } else if (const auto param = dynamic_cast<LgsParam*>(value)) {
         visitParam(param);
+    } else if (const auto field = dynamic_cast<LgsField*>(value)) {
+        visitField(field);
     } else {
         assert(0);
     }

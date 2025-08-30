@@ -1,5 +1,5 @@
 #include "loops/LgsForeachLoop.h"
-#include "types/LgsMap.h"
+#include "types/iterables/LgsMap.h"
 
 Value* LgsForeachLoop::loopStart(LgsLLVMGen& cg) {
     return cg.sizeZero();

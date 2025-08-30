@@ -3,7 +3,7 @@
 #include "funcs/LgsFunc.h"
 #include "types/LgsNullable.h"
 #include "types/LgsObject.h"
-#include "types/LgsStr.h"
+#include "../types/iterables/LgsStr.h"
 #include "types/primitives/LgsInt.h"
 #include <types/LgsVoid.h>
 

@@ -1,4 +1,4 @@
-#include "exprs/unary/LgsVariable.h"
+#include "types/iterables/LgsVec.h"
 #include "exprs/unary/LgsVectorExpr.h"
 
 Type* LgsVec::getIRType(LgsLLVMGen& cg) {
@@ -8,7 +8,8 @@ Type* LgsVec::getIRType(LgsLLVMGen& cg) {
 
 LgsField* LgsVec::getField(const std::string& fieldName) {
     for (auto* f : fields) if (f->name == fieldName) return f;
-    const auto scalarOrVector = dim == 1 ? baseType : new LgsVec(fieldName.size());
+    const size_t newFieldDim = fieldName.size();
+    const auto scalarOrVector = newFieldDim == 1 ? baseType : new LgsVec(newFieldDim);
     const auto field = new LgsField(fieldName, scalarOrVector);
     addField(field);
     return field;
@@ -55,9 +56,15 @@ Value* LgsVec::IRIsNotEmpty(LgsLLVMGen* cg, LgsExpr* iterable) {
 }
 
 bool LgsVec::canCastTo(LgsType* other) {
-    const auto otherName = other->getName();
-    if (otherName == LgsAny::name) return true;
-    return other->asVec();
+    if (other->getName() == LgsAny::name) return true;
+    const auto otherVec = other->asVec();
+    if (!otherVec) return false;
+    return dim == otherVec->dim && baseType->canCastTo(otherVec->baseType);
+}
+
+bool LgsVec::canAssignTo(LgsType* other, const LgsAssignType op) {
+    if (op == ASSIGN) return canCastTo(other);
+    return other->isNumber;
 }
 
 int8_t LgsVec::getSwizzleSet(const char c) {

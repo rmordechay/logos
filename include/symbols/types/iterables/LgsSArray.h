@@ -1,7 +1,7 @@
 #pragma once
 #include "funcs/LgsFunc.h"
-#include "primitives/LgsInt.h"
-#include "types/LgsIterable.h"
+#include "../primitives/LgsInt.h"
+#include "LgsIterable.h"
 
 class LgsSArray final : public LgsIterable {
 public:

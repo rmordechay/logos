@@ -1,13 +1,13 @@
 #pragma once
 #include "exprs/unary/LgsUnaryExpr.h"
-#include "types/LgsVec.h"
+#include "../../types/iterables/LgsVec.h"
 
 class LgsVectorExpr final : public LgsUnaryExpr {
 public:
     std::vector<LgsExpr*> args;
     LgsVec* vecType;
 
-    LgsVectorExpr(const int8_t dim) {
+    explicit LgsVectorExpr(const int8_t dim) {
         isMutable = true;
         vecType = new LgsVec(dim);
         type = vecType;

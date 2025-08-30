@@ -4,12 +4,12 @@
 #include "types/LgsPtr.h"
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
-#include "types/LgsDArray.h"
+#include "types/iterables/LgsDArray.h"
 #include "types/LgsEnum.h"
 #include "types/LgsGroup.h"
-#include "types/LgsMap.h"
+#include "types/iterables/LgsMap.h"
 #include "types/LgsNullable.h"
-#include "types/LgsSArray.h"
+#include "types/iterables/LgsSArray.h"
 #include "types/LgsUnknown.h"
 #include "types/primitives/LgsDouble.h"
 #include "types/primitives/LgsShort.h"
@@ -59,6 +59,10 @@ bool LgsType::isBig() {
 
 void LgsType::freeValue(LgsLLVMGen& cg, Value* value) {
 
+}
+
+bool LgsType::canAssignTo(LgsType* other, LgsAssignType op) {
+    assert(0);
 }
 
 LgsType* LgsType::clone() {

@@ -28,7 +28,7 @@ inline Value* LgsIterable::loadWithIndex(LgsLLVMGen* cg) {
 
 inline LgsIterable::~LgsIterable() {
     if (sizeExpr) {
-        delete sizeExpr;
+        freeExpr(sizeExpr);
         sizeExpr = nullptr;
     }
     if (baseType) {

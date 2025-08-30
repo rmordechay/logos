@@ -1,7 +1,7 @@
 #pragma once
-#include "LgsAny.h"
+#include "../LgsAny.h"
 #include "LgsStr.h"
-#include "LgsVoid.h"
+#include "../LgsVoid.h"
 #include "types/LgsTypePair.h"
 
 class LgsMapEntry;

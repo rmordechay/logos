@@ -1,10 +1,7 @@
 #pragma once
 #include "Lgs_types.h"
 #include "configs/LgsErrors.h"
-
-class LgsPtr;
-class LgsDouble;
-class LgsFloat;
+#include "symbols/LgsAssignable.h"
 
 namespace llvm {
     class DIBasicType;
@@ -12,9 +9,11 @@ namespace llvm {
     class Type;
 }
 
+class LgsPtr;
+class LgsDouble;
+class LgsFloat;
 class LgsVec;
 class LgsVectorExpr;
-
 class LgsChar;
 class LgsVariable;
 class LgsSArray;
@@ -70,6 +69,7 @@ public:
     virtual std::string strFormatPart() const = 0;
     virtual DIBasicType* getDebugType(LgsLLVMGen& cg);
     virtual void freeValue(LgsLLVMGen& cg, Value* value);
+    virtual bool canAssignTo(LgsType* other, LgsAssignType op);
     virtual LgsType* clone();
     virtual json::value asJSON() = 0;
 

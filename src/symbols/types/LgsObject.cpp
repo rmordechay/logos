@@ -143,6 +143,11 @@ bool LgsObject::canCastTo(LgsType* other) {
     return name == other->getName();
 }
 
+bool LgsObject::canAssignTo(LgsType* other, const LgsAssignType op) {
+    if (op == ASSIGN) return canCastTo(other);
+    assert(0);
+}
+
 json::value LgsObject::asJSON() {
     json::object jsonObj;
     jsonObj["name"] = getName();

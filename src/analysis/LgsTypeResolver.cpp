@@ -10,7 +10,7 @@
 #include "types/LgsFuncType.h"
 #include "types/LgsGroup.h"
 #include "types/LgsInterface.h"
-#include "types/LgsIterable.h"
+#include "types/iterables/LgsIterable.h"
 #include "types/LgsNullable.h"
 #include "utils/LgsErrHandler.h"
 

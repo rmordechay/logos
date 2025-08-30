@@ -1,12 +1,12 @@
 #pragma once
-#include "LgsAny.h"
-#include "primitives/LgsBool.h"
-#include "primitives/LgsInt.h"
-#include "primitives/LgsLong.h"
-#include "LgsVoid.h"
+#include "../LgsAny.h"
+#include "../primitives/LgsBool.h"
+#include "../primitives/LgsInt.h"
+#include "../primitives/LgsLong.h"
+#include "../LgsVoid.h"
 #include "funcs/LgsFunc.h"
-#include "primitives/LgsSize.h"
-#include "types/LgsIterable.h"
+#include "../primitives/LgsSize.h"
+#include "LgsIterable.h"
 
 class LgsDArray final : public LgsIterable {
 public:

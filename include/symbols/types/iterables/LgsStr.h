@@ -1,10 +1,10 @@
 #pragma once
 #include "funcs/LgsFunc.h"
 #include "codegen/LgsCodeGen.h"
-#include "primitives/LgsBool.h"
-#include "primitives/LgsChar.h"
-#include "primitives/LgsLong.h"
-#include "types/LgsIterable.h"
+#include "../primitives/LgsBool.h"
+#include "../primitives/LgsChar.h"
+#include "../primitives/LgsLong.h"
+#include "LgsIterable.h"
 
 class LgsStr final : public LgsIterable {
 public:
