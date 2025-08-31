@@ -1,14 +1,12 @@
 #pragma once
-#include "../logos/LgsPaths.h"
-
+#include "logos/LgsPaths.h"
 #include <llvm/Passes/OptimizationLevel.h>
-
-struct LgsAppConfigs;
 
 namespace llvm {
     class Module;
     class TargetMachine;
 }
+struct LgsAppConfigs;
 class LgsFile;
 class LgsLLVMGen;
 

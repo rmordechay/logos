@@ -1,4 +1,5 @@
-#include "../symbols/exprs/unary/LgsIterator.h"
+#include "exprs/unary/LgsIterator.h"
+#include "codegen/LgsLLVMGen.h"
 
 std::string LgsIterator::pname() {
     assert(0);

@@ -16,7 +16,8 @@ public:
     LgsFuncType* funcType;
     std::vector<LgsReturn*> returnStmts;
     LgsStmtsBlock* stmtsBlock = nullptr;
-    std::vector<LgsExpr*> heapAllocExprs;
+    std::vector<LgsExpr*> ownedHeapExprs;
+    std::vector<LgsExpr*> orphanHeapExprs;
     BasicBlock* cleanupBlock = nullptr;
     std::vector<LgsMock> mocks;
     bool hasDefers = false;

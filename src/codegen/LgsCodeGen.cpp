@@ -88,6 +88,7 @@ void LgsCodeGen::visitMainFunc(LgsMainFunc* func) {
     if (!func->funcType->params.empty()) initMainArgs(func);
     visitStmtsBlock(func->stmtsBlock);
     createEpilogue(func);
+    currentIRFunc = nullptr;
     cg.builder.CreateRet(cg.i32(EXIT_SUCCESS));
     stack.exitScope();
 }
@@ -97,6 +98,7 @@ void LgsCodeGen::visitFunc(LgsFunc* func) {
     createPrologue(func);
     visitStmtsBlock(func->stmtsBlock);
     createEpilogue(func);
+    currentIRFunc = nullptr;
     if (!cg.lastInstTerminator()) cg.builder.CreateRetVoid();
     stack.exitScope();
 }
@@ -489,7 +491,7 @@ void LgsCodeGen::visitIOStmt(const LgsIOStmt* ioStmt) {
 void LgsCodeGen::visitReturnStmt(LgsReturn* returnStmt) {
     returnStmt->IRValue = returnStmt->expr ? getIRValue(returnStmt->expr) : nullptr;
     const auto currentFunc = stack.currentFunc();
-    if (!currentFunc->heapAllocExprs.empty()) {
+    if (currentFunc->needsCleanup()) {
         returnStmt->parentBlock = cg.builder.GetInsertBlock();
         const auto cleanupBlock = currentFunc->getCleanupBlock(cg);
         cg.builder.CreateBr(cleanupBlock);
@@ -549,6 +551,7 @@ void LgsCodeGen::visitExpr(LgsExpr* expr) {
     } else {
         assert(0);
     }
+    addHeapExpr(expr);
 }
 
 void LgsCodeGen::visitUnaryExpr(LgsUnaryExpr* unaryExpr) {
@@ -652,7 +655,7 @@ void LgsCodeGen::visitHashMap(LgsHashMap* hashMap) {
     const auto valueType = mapType->typePair->value;
     const auto elementSize = cg.usize(valueType->getSizeBytes());
     const auto arrSize = cg.typeSize(mapType->getMapStruct(cg));
-    hashMap->IRValue = cg.callMalloc(arrSize.getFixedValue());
+    hashMap->IRValue = cg.callMalloc(arrSize.getFixedValue(), LgsMap::name);
     mapType->initFunc->callIR(cg, {getIRValue(hashMap), elementSize});
     for (const auto element : hashMap->initialElements) {
         visitExpr(element->key);
@@ -812,7 +815,7 @@ void LgsCodeGen::visitInstance(LgsInstance* instance) {
     if(instance->obj->singleton) {
         instance->IRValue = cg.createGlobal(objIRType, ConstantAggregateZero::get(objIRType), instance->obj->name);
     } else {
-        instance->IRValue = cg.callMalloc(instance->obj->getSizeBytes());
+        instance->IRValue = cg.callMalloc(instance->obj->getSizeBytes(), instance->name);
     }
     initFields(instance);
     if (!instance->obj->interfaces.empty()) {
@@ -830,16 +833,15 @@ void LgsCodeGen::initFields(LgsInstance* instance) {
         field->parentIRValue = getIRValue(instance);
         const auto gep = getIRValue(field);
         cg.builder.CreateStore(exprIR, gep);
-        addHeapExpr(arg->expr);
     }
 
     // Zero values
     for (const auto field : instance->obj->fields) {
         if (visited.count(field->name)) continue;
         field->parentIRValue = getIRValue(instance);
+        visitField(field);
         const auto zeroIRValue = getIRValue(field->expr);
-        cg.builder.CreateStore(zeroIRValue, getIRValue(field));
-        addHeapExpr(field->expr);
+        cg.builder.CreateStore(zeroIRValue, field->IRValue);
     }
 }
 
@@ -862,55 +864,52 @@ void LgsCodeGen::createPrologue(LgsFunc* func) {
 
 void LgsCodeGen::createEpilogue(LgsFunc* func) {
     cg.branchAndStartBlock(func->getCleanupBlock(cg), currentIRFunc);
-    currentIRFunc = nullptr;
     if (func->hasDefers) cg.callDefers();
 
-    if (func->heapAllocExprs.empty()) {
-        cg.callPopStack();
-        return;
-    }
-
-    if (func->returnStmts.empty()) {
-        freeHeap(func);
-        cg.callPopStack();
-        return;
-    }
-
-    if (func->returnStmts.size() == 1) {
-        if (func->heapAllocExprs.size() == 1) {
-            const auto returnRef = func->returnStmts.front()->expr;
-            const auto heapExprRef = func->heapAllocExprs.front();
-            if (returnRef->equals(heapExprRef)) {
-                cg.callPopStack();
-                cg.builder.CreateRet(getIRValue(func->returnStmts.front()));
-                return;
+    if (func->needsCleanup()) {
+        if (func->returnStmts.empty()) {
+            freeFuncHeap(func);
+            cg.callPopStack();
+        } else if (func->returnStmts.size() == 1) {
+            if (func->ownedHeapExprs.size() == 1) {
+                const auto returnRef = func->returnStmts.front()->expr;
+                const auto heapExprRef = func->ownedHeapExprs.front();
+                if (returnRef->equals(heapExprRef)) {
+                    cg.callPopStack();
+                    cg.builder.CreateRet(getIRValue(func->returnStmts.front()));
+                    return;
+                }
             }
+            freeFuncHeap(func);
+            cg.builder.CreateRet(getIRValue(func->returnStmts.front()));
         }
-        freeHeap(func);
-        cg.builder.CreateRet(getIRValue(func->returnStmts.front()));
-        return;
+    } else {
+        cg.callPopStack();
     }
-
-    // multiple return stmts, one or more heap allocations
-    auto rt = func->funcType->rt->getIRType(cg);
-    if (func->funcType->rt->asDArray()) {
-        rt = rt->getPointerTo();
-    }
-    const auto phi = cg.builder.CreatePHI(rt, func->returnStmts.size());
-    for (const auto returnStmt : func->returnStmts) {
-        phi->addIncoming(getIRValue(returnStmt->expr), returnStmt->parentBlock);
-    }
-    cg.callPopStack();
-    cg.builder.CreateRet(phi);
-    assert(0);
 }
 
-void LgsCodeGen::freeHeap(const LgsFunc* func) const {
-    cg.printStr("Freeing: " + std::to_string(func->heapAllocExprs.size()) + " exprs:\n");
-    for (const auto expr : func->heapAllocExprs) {
+void LgsCodeGen::addHeapExpr(LgsExpr* expr) {
+    if (!expr->type->isHeapAlloc) return;
+    const auto currentFunc = stack.currentFunc();
+    if (expr->owner) {
+        currentFunc->ownedHeapExprs.push_back(expr);
+    } else {
+        currentFunc->orphanHeapExprs.push_back(expr);
+    }
+}
+
+void LgsCodeGen::freeFuncHeap(const LgsFunc* func) const {
+    cg.printStr("---\n");
+    cg.printStr("Freeing " + std::to_string(func->ownedHeapExprs.size()) + " owned exprs.\n");
+    for (const auto expr : func->ownedHeapExprs) {
+        expr->type->freeValue(cg, expr);
+    }
+    cg.printStr("Freeing " + std::to_string(func->orphanHeapExprs.size()) + " orphan exprs.\n");
+    for (const auto expr : func->orphanHeapExprs) {
         expr->type->freeValue(cg, expr);
     }
 }
+
 
 Value* LgsCodeGen::getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) const {
     if (fc->args.empty()) return cg.null();
@@ -921,7 +920,6 @@ Value* LgsCodeGen::getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) const {
     }
     return ctx;
 }
-
 
 Type* LgsCodeGen::getThunkCtxType(const LgsFuncCall* fc) const {
     if (fc->args.empty()) return cg.ptrTy();
@@ -999,7 +997,7 @@ Value* LgsCodeGen::createDynamicArray(LgsArrayExpr* arrayExpr) {
     const auto size = arr->baseType->getSizeBytes();
     const auto elementSize = cg.i64(size);
     const auto arrSize = cg.typeSize(arr->getArrStruct(cg));
-    arrayExpr->IRValue = cg.callMalloc(arrSize.getFixedValue());
+    arrayExpr->IRValue = cg.callMalloc(arrSize.getFixedValue(), LgsDArray::name);
     arr->initFunc->callIR(cg, {arrayExpr->IRValue, elementSize});
     for (int i = 0; i < arrayExpr->initialElements.size(); ++i) {
         const auto element = arrayExpr->initialElements[i];
@@ -1011,14 +1009,7 @@ Value* LgsCodeGen::createDynamicArray(LgsArrayExpr* arrayExpr) {
 
 void LgsCodeGen::initIterator(LgsIterator* iterator) {
     LgsFunc iterInitFunc{"initIter", &LGS_VOID, {iterator->type, &LGS_ANY}};
-    const auto structType = cg.getStructType({
-                                                 cg.ptrTy(),
-                                                 cg.i64Ty(),
-                                                 cg.ptrTy(),
-                                                 cg.ptrTy(),
-                                                 cg.ptrTy(),
-                                                 cg.ptrTy()
-                                             }, iterator->name);
+    const auto structType = cg.getIteratorIRType(iterator->name);
     iterator->IRValue = cg.builder.CreateAlloca(structType);
     iterInitFunc.callIR(cg, {getIRValue(iterator->baseExpr), getIRValue(iterator)});
 }
@@ -1031,21 +1022,6 @@ Value* LgsCodeGen::iterNext(LgsIterator* iterator) {
 Value* LgsCodeGen::iterHasNext(LgsIterator* iterator) {
     LgsFunc iterInitFunc{"hasNext", &LGS_BOOL, {&LGS_ANY}};
     return iterInitFunc.callIR(cg, {getIRValue(iterator)});
-}
-
-void LgsCodeGen::addHeapExpr(LgsExpr* expr) {
-    if (!expr->type->isHeapAlloc || !expr->owner) return;
-    const auto currentFunc = stack.currentFunc();
-    auto found = false;
-    for (const auto heapAllocExpr : currentFunc->heapAllocExprs) {
-        if (heapAllocExpr == expr) {
-            found = true;
-            break;
-        }
-    }
-    if (!found) {
-        currentFunc->heapAllocExprs.push_back(expr);
-    }
 }
 
 Value* LgsCodeGen::getIRValue(LgsValue* value) {

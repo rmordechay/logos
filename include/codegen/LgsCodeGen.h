@@ -115,7 +115,8 @@ public:
     void initMainArgs(LgsMainFunc* mainFunc);
     void createPrologue(LgsFunc* func);
     void createEpilogue(LgsFunc* func);
-    void freeHeap(const LgsFunc* func) const;
+    void addHeapExpr(LgsExpr* expr);
+    void freeFuncHeap(const LgsFunc* func) const;
     Value* getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) const;
     Type* getThunkCtxType(const LgsFuncCall* fc) const;
     Function* getThunkFunc(const LgsFuncCall* fc, Type* ctxTy) const;
@@ -130,7 +131,6 @@ public:
     Value* iterNext(LgsIterator* iterator);
     Value* iterHasNext(LgsIterator* iterator);
 
-    void addHeapExpr(LgsExpr* expr);
     Value* getIRValue(LgsValue* value);
     bool allArgsAreConst(const std::vector<LgsExpr*>& args);
 };

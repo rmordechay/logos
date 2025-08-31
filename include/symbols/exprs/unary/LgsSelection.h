@@ -13,6 +13,7 @@ public:
     LgsExpr* lastExprParent() const;
     void assign(LgsLLVMGen& cg, LgsExpr* expr) override;
     std::string pname() override;
+    LgsExpr* castTo(LgsType* toType) override;
     Value* hash(LgsLLVMGen& cg) override;
     json::value asJSON() override;
     ~LgsSelection() override;

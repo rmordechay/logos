@@ -10,7 +10,6 @@ public:
     explicit LgsIterator(LgsExpr* baseExpr) : baseExpr(baseExpr) {
         type = baseExpr->type;
     }
-
     std::string pname() override;
     json::value asJSON() override;
 };

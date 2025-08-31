@@ -107,8 +107,10 @@ Value* LgsLLVMGen::callLgsFunc(const std::string& funcName, FunctionType* ft, co
     return callFunc(LGS_RUNTIME_NAMES_PREFIX + funcName, ft, args);
 }
 
-Value* LgsLLVMGen::callMalloc(const size_t size) {
-    return builder.CreateMalloc(sizeTy(), sizeTy(), usize(size), nullptr);
+Value* LgsLLVMGen::callMalloc(const size_t size, const std::string& name) {
+    const auto ptr = builder.CreateMalloc(sizeTy(), sizeTy(), usize(size), nullptr, nullptr, name);
+    printPtr(ptr, "malloc: ");
+    return ptr;
 }
 
 Value* LgsLLVMGen::callPrintf(const std::vector<Value*>& args) {
@@ -346,3 +348,7 @@ void LgsLLVMGen::finalizeDebugger() {
     diBuilder = nullptr;
 }
 
+
+StructType* LgsLLVMGen::getIteratorIRType(const std::string& name) {
+    return getStructType({ptrTy(), i64Ty(), ptrTy(), ptrTy(), ptrTy(), ptrTy()}, name);
+}

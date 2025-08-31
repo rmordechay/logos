@@ -215,6 +215,7 @@ void LgsSema::visitVarDec(LgsVarDec* varDec) {
         if (varDec->expr->owner) {
             errHandler.addError(E10075, &varDec->expr->location, {varDec->expr->pname()});
         }
+        varDec->expr->owner = varDec;
     }
     addLocalSymbol(LgsSymbol(varDec));
 }

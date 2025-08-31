@@ -1,9 +1,9 @@
 main() {
-    funcVar = (x: Int, y: Int): Void -> {
+    funcVar1 = (x: Int, y: Int): Void -> {
         print(x + y)
     }
-    funcVar = (x: Int, y: Int): Void -> print(x + y)
-    funcVar = (x: Int, y: Int) -> print(x + y)
-    funcVar = (x, y) -> print(x + y)
-    funcVar = x -> print(x) // only with single param
+    funcVar2 = (x: Int, y: Int): Void -> print(x + y)
+    funcVar3 = (x: Int, y: Int) -> print(x + y)
+    funcVar4 = (x, y) -> print(x + y)
+    funcVar5 = x -> print(x) // only with single param
 }

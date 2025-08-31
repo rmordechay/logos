@@ -107,7 +107,7 @@ BasicBlock* LgsFunc::getCleanupBlock(LgsLLVMGen& cg) {
 }
 
 bool LgsFunc::needsCleanup() const {
-    return !heapAllocExprs.empty();
+    return !ownedHeapExprs.empty() || !orphanHeapExprs.empty();
 }
 
 std::string LgsFunc::pname() {

@@ -1,6 +1,5 @@
 #pragma once
 #include "logos/LgsApp.h"
-
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/LLVMContext.h>
 
@@ -8,13 +7,6 @@ namespace llvm {
     class TargetMachine;
     class DIBuilder;
 }
-
-class LgsFuncCall;
-class LgsRuntime;
-class LgsFile;
-class LgsErrHandler;
-class LgsForLoop;
-class LgsFuncType;
 
 using namespace llvm;
 
@@ -52,7 +44,7 @@ public:
     Value* callLgsFunc(const std::string& funcName, FunctionType* ft, const std::vector<Value*>& args = {});
 
     // System
-    Value* callMalloc(size_t size);
+    Value* callMalloc(size_t size, const std::string& name);
     Value* callPrintf(const std::vector<Value*>& args);
     Value* callSleep(Value* time);
     Value* callExit(Value* exitCode);
@@ -95,7 +87,7 @@ public:
     IntegerType* sizeTy();
     PointerType* ptrTy();
 
-    // values
+    // Values
     Value* null();
     ConstantInt* i1(bool v);
     ConstantInt* i8(int8_t v);
@@ -110,6 +102,7 @@ public:
     ConstantInt* sizeZero();
     ConstantInt* iN(unsigned size, size_t v);
     TypeSize typeSize(StructType* v) const;
+    StructType* getIteratorIRType(const std::string& name);
 
     // Debugging
     void printPtr(Value* ptr, const std::string& text = "");
