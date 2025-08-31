@@ -11,9 +11,7 @@ public:
     LgsUnaryExpr* baseExpr;
     LgsIndex* index = nullptr;
 
-    explicit LgsIterIndex(LgsUnaryExpr* baseExpr, LgsIndex* index = nullptr) : baseExpr(baseExpr), index(index) {
-        isAssignable = true;
-    }
+    explicit LgsIterIndex(LgsUnaryExpr* baseExpr, LgsIndex* index = nullptr) : baseExpr(baseExpr), index(index) {}
     Value* loadIR(LgsLLVMGen& cg) override;
     Value* loadFromDArray(LgsLLVMGen& cg, const LgsDArray* arr) const;
     Value* loadFromMap(LgsLLVMGen& cg, const LgsMap* map) const;

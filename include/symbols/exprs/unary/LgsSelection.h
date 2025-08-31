@@ -7,9 +7,7 @@ class LgsSelection final : public LgsUnaryExpr {
 public:
     std::vector<LgsUnaryExpr*> exprs;
 
-    explicit LgsSelection(const std::vector<LgsUnaryExpr*>& exprs) : exprs(exprs) {
-        isAssignable = true;
-    }
+    explicit LgsSelection(const std::vector<LgsUnaryExpr*>& exprs) : exprs(exprs) {}
     Value* loadIR(LgsLLVMGen& cg) override;
     LgsExpr* lastExpr() const;
     LgsExpr* lastExprParent() const;

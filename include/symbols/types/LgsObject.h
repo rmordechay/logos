@@ -14,11 +14,13 @@ public:
     std::vector<LgsIOPair*> ioPairs;
     LgsInstance* singleton = nullptr;
 
-    explicit LgsObject(std::string  name) : name(std::move(name)) {}
+    explicit LgsObject(std::string  name) : name(std::move(name)) {
+        isHeapAlloc = true;
+    }
     Type* getIRType(LgsLLVMGen& cg) override;
     LgsField* getField(const std::string& fieldName) override;
     LgsFunc* getMethod(const std::string& methodName) override;
-    void freeValue(LgsLLVMGen& cg, Value* value) override;
+    void freeValue(LgsLLVMGen& cg, LgsExpr* value) override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
     std::string strFormatPart() const override;

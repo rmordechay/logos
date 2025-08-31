@@ -68,7 +68,7 @@ public:
     virtual bool canCastTo(LgsType* other) = 0;
     virtual std::string strFormatPart() const = 0;
     virtual DIBasicType* getDebugType(LgsLLVMGen& cg);
-    virtual void freeValue(LgsLLVMGen& cg, Value* value);
+    virtual void freeValue(LgsLLVMGen& cg, LgsExpr* value);
     virtual bool canAssignTo(LgsType* other, LgsAssignType op);
     virtual LgsType* clone();
     virtual json::value asJSON() = 0;

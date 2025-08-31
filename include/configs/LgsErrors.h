@@ -94,7 +94,7 @@ inline LgsBaseError E10071{.msg = "'break if' must be inside an if statement.", 
 inline LgsBaseError E10072{.msg = "Type '%s' has multiple methods with the same name '%s'.", .errCode = errCodeStart++};
 inline LgsBaseError E10073{.msg = "Only numbers or vectors can be elements of a vector. Given: '%s'.", .errCode = errCodeStart++};
 inline LgsBaseError E10074{.msg = "Vector mismatch. Vector dimension: %s. Given: %s.", .errCode = errCodeStart++};
-inline LgsBaseError E10075{.msg = "", .errCode = errCodeStart++};
+inline LgsBaseError E10075{.msg = "Expression '%s' already has an owner.", .errCode = errCodeStart++};
 inline LgsBaseError E10076{.msg = "", .errCode = errCodeStart++};
 inline LgsBaseError E10077{.msg = "", .errCode = errCodeStart++};
 inline LgsBaseError E10078{.msg = "Defer functions must return 'Void'. Given: '%s'.", .errCode = errCodeStart++};

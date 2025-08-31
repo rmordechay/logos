@@ -211,6 +211,11 @@ void LgsSema::visitVarDec(LgsVarDec* varDec) {
         varDec->expr = varDec->type->getZeroValue();
         varDec->expr->location = varDec->location;
     }
+    if (varDec->isOwner && varDec->expr) {
+        if (varDec->expr->owner) {
+            errHandler.addError(E10075, &varDec->expr->location, {varDec->expr->pname()});
+        }
+    }
     addLocalSymbol(LgsSymbol(varDec));
 }
 
@@ -641,6 +646,7 @@ void LgsSema::visitSelection(LgsSelection* selection) {
     visitInnerSelections(selection);
     selection->setType(selection->lastExpr()->type);
     selection->isMutable = selection->lastExpr()->isMutable;
+    selection->owner = selection->lastExpr()->owner;
     checkMock(selection);
 }
 
@@ -690,6 +696,9 @@ void LgsSema::visitVarSelection(LgsVariable* child, LgsType* parentType) {
     child->setType(field->type);
     child->isMutable = !field->isConst;
     child->ref = LgsSymbol(field);
+    if (field->isOwner) {
+        child->owner = field;
+    }
     if (const auto parentAsObj = parentType->asObject()) {
         validateFieldVisibility(field, parentAsObj);
     }
@@ -776,7 +785,9 @@ void LgsSema::visitInstance(LgsInstance* instance) {
 
     instance->setObject(obj->clone());
     // Args
-    for (const auto& [_, arg] : instance->args) {
+    std::unordered_set<std::string> visited;
+    for (const auto& [argName, arg] : instance->args) {
+        visited.insert(argName);
         const auto field = instance->obj->getField(arg->name);
         if (!field) {
             errHandler.addError(E10005, &arg->location, {arg->name, objName});
@@ -786,6 +797,18 @@ void LgsSema::visitInstance(LgsInstance* instance) {
         visitExpr(arg->expr);
         matchExprToType(arg->expr, field->type);
         field->expr = arg->expr;
+        if (field->isOwner) {
+            field->expr->owner = field;
+        }
+    }
+
+    // Zero values
+    for (const auto field : instance->obj->fields) {
+        if (visited.count(field->name)) continue;
+        field->expr = field->type->getZeroValue();
+        if (field->isOwner) {
+            field->expr->owner = field;
+        }
     }
 
     // Missing required fields

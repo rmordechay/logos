@@ -33,7 +33,7 @@ public:
     bool isNull = false;
     bool isSpread = false;
     bool isMutable = false;
-    bool isAssignable = false;
+    LgsValue* owner = nullptr;
 
     explicit LgsExpr(LgsType* type) : type(type) {}
     virtual std::string pname() = 0; // pretty name
@@ -85,5 +85,6 @@ public:
     LgsVectorExpr* asVectorExpr();
     LgsIntConst* asIntConst();
     LgsLoopMetaVar* asLoopMetaVar();
+
     ~LgsExpr() override;
 };

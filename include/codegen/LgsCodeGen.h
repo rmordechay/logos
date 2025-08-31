@@ -67,7 +67,7 @@ public:
     void visitObject(LgsObject* obj) const;
     void visitInterface(LgsInterface* interface) const;
     void visitGroup(LgsGroup* group);
-    void visitField(LgsField* field) const;
+    void visitField(LgsField* field);
     void visitParam(LgsParam* param);
     void visitLoop(LgsForLoop* loop);
     void visitRangeLoop(LgsRangeLoop* loop);
@@ -115,7 +115,7 @@ public:
     void initMainArgs(LgsMainFunc* mainFunc);
     void createPrologue(LgsFunc* func);
     void createEpilogue(LgsFunc* func);
-    void freeHeap(const LgsFunc* func);
+    void freeHeap(const LgsFunc* func) const;
     Value* getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) const;
     Type* getThunkCtxType(const LgsFuncCall* fc) const;
     Function* getThunkFunc(const LgsFuncCall* fc, Type* ctxTy) const;
@@ -130,6 +130,7 @@ public:
     Value* iterNext(LgsIterator* iterator);
     Value* iterHasNext(LgsIterator* iterator);
 
+    void addHeapExpr(LgsExpr* expr);
     Value* getIRValue(LgsValue* value);
     bool allArgsAreConst(const std::vector<LgsExpr*>& args);
 };

@@ -142,7 +142,7 @@ void LgsCodeGen::visitGroup(LgsGroup* group) {
     assert(0);
 }
 
-void LgsCodeGen::visitField(LgsField* field) const {
+void LgsCodeGen::visitField(LgsField* field) {
     if (const auto vec = field->type->asVec()) {
         std::vector<int> mask(vec->dim);
         for (unsigned i = 0; i < vec->dim; i++) {
@@ -269,7 +269,7 @@ void LgsCodeGen::visitLoopMetaVar(LgsLoopMetaVar* metaVar) {
         const auto loopStart = cg.builder.CreateSExt(loop->loopStart(cg), cg.sizeTy());
         metaVar->setIRValue(cg.builder.CreateICmpEQ(iValue, loopStart));
     }
-        break;
+    break;
     case FOR_IS_LAST: {
         const auto loopEnd = cg.builder.CreateSExt(loop->loopEnd(cg), cg.sizeTy());
         const auto decremented = cg.builder.CreateSub(loopEnd, cg.usize(1));
@@ -549,9 +549,6 @@ void LgsCodeGen::visitExpr(LgsExpr* expr) {
     } else {
         assert(0);
     }
-    if (expr->type->isHeapAlloc && !expr->asVariable()) {
-        stack.currentFunc()->heapAllocExprs.push_back(expr);
-    }
 }
 
 void LgsCodeGen::visitUnaryExpr(LgsUnaryExpr* unaryExpr) {
@@ -801,25 +798,26 @@ void LgsCodeGen::visitTypeExpr(LgsTypeExpr* typeExpr) {
     assert(0);
 }
 
-void LgsCodeGen::visitInstance(LgsInstance* instance) {
-    visitObject(instance->obj);
-    const auto objIRType = instance->obj->getIRType(cg);
-    if(instance->obj->singleton) {
-        instance->IRValue = cg.createGlobal(objIRType, ConstantAggregateZero::get(objIRType), instance->obj->name);
-    } else {
-        instance->IRValue = cg.builder.CreateAlloca(objIRType);
-    }
-    initFields(instance);
-    if (!instance->obj->interfaces.empty()) {
-        instance->setVirtuals(cg);
-    }
-}
-
 void LgsCodeGen::visitIterIndex(LgsIterIndex* iterIndex) {
     visitExpr(iterIndex->baseExpr);
     visitExpr(iterIndex->index->from);
     visitExpr(iterIndex->index->to);
     iterIndex->IRValue = iterIndex->baseExpr->IRValue;
+}
+
+void LgsCodeGen::visitInstance(LgsInstance* instance) {
+    if (instance->IRValue) return;
+    visitObject(instance->obj);
+    const auto objIRType = instance->obj->getIRType(cg);
+    if(instance->obj->singleton) {
+        instance->IRValue = cg.createGlobal(objIRType, ConstantAggregateZero::get(objIRType), instance->obj->name);
+    } else {
+        instance->IRValue = cg.callMalloc(instance->obj->getSizeBytes());
+    }
+    initFields(instance);
+    if (!instance->obj->interfaces.empty()) {
+        instance->setVirtuals(cg);
+    }
 }
 
 void LgsCodeGen::initFields(LgsInstance* instance) {
@@ -832,13 +830,16 @@ void LgsCodeGen::initFields(LgsInstance* instance) {
         field->parentIRValue = getIRValue(instance);
         const auto gep = getIRValue(field);
         cg.builder.CreateStore(exprIR, gep);
+        addHeapExpr(arg->expr);
     }
-    for (const auto& field : instance->obj->fields) {
+
+    // Zero values
+    for (const auto field : instance->obj->fields) {
         if (visited.count(field->name)) continue;
         field->parentIRValue = getIRValue(instance);
-        const auto zeroValue = field->type->getZeroValue();
-        const auto zeroIRValue = getIRValue(zeroValue);
+        const auto zeroIRValue = getIRValue(field->expr);
         cg.builder.CreateStore(zeroIRValue, getIRValue(field));
+        addHeapExpr(field->expr);
     }
 }
 
@@ -870,7 +871,7 @@ void LgsCodeGen::createEpilogue(LgsFunc* func) {
     }
 
     if (func->returnStmts.empty()) {
-        // freeHeap(func);
+        freeHeap(func);
         cg.callPopStack();
         return;
     }
@@ -904,9 +905,10 @@ void LgsCodeGen::createEpilogue(LgsFunc* func) {
     assert(0);
 }
 
-void LgsCodeGen::freeHeap(const LgsFunc* func) {
+void LgsCodeGen::freeHeap(const LgsFunc* func) const {
+    cg.printStr("Freeing: " + std::to_string(func->heapAllocExprs.size()) + " exprs:\n");
     for (const auto expr : func->heapAllocExprs) {
-        expr->type->freeValue(cg, getIRValue(expr));
+        expr->type->freeValue(cg, expr);
     }
 }
 
@@ -1010,13 +1012,13 @@ Value* LgsCodeGen::createDynamicArray(LgsArrayExpr* arrayExpr) {
 void LgsCodeGen::initIterator(LgsIterator* iterator) {
     LgsFunc iterInitFunc{"initIter", &LGS_VOID, {iterator->type, &LGS_ANY}};
     const auto structType = cg.getStructType({
-        cg.ptrTy(),
-        cg.i64Ty(),
-        cg.ptrTy(),
-        cg.ptrTy(),
-        cg.ptrTy(),
-        cg.ptrTy()
-    }, iterator->name);
+                                                 cg.ptrTy(),
+                                                 cg.i64Ty(),
+                                                 cg.ptrTy(),
+                                                 cg.ptrTy(),
+                                                 cg.ptrTy(),
+                                                 cg.ptrTy()
+                                             }, iterator->name);
     iterator->IRValue = cg.builder.CreateAlloca(structType);
     iterInitFunc.callIR(cg, {getIRValue(iterator->baseExpr), getIRValue(iterator)});
 }
@@ -1029,6 +1031,21 @@ Value* LgsCodeGen::iterNext(LgsIterator* iterator) {
 Value* LgsCodeGen::iterHasNext(LgsIterator* iterator) {
     LgsFunc iterInitFunc{"hasNext", &LGS_BOOL, {&LGS_ANY}};
     return iterInitFunc.callIR(cg, {getIRValue(iterator)});
+}
+
+void LgsCodeGen::addHeapExpr(LgsExpr* expr) {
+    if (!expr->type->isHeapAlloc || !expr->owner) return;
+    const auto currentFunc = stack.currentFunc();
+    auto found = false;
+    for (const auto heapAllocExpr : currentFunc->heapAllocExprs) {
+        if (heapAllocExpr == expr) {
+            found = true;
+            break;
+        }
+    }
+    if (!found) {
+        currentFunc->heapAllocExprs.push_back(expr);
+    }
 }
 
 Value* LgsCodeGen::getIRValue(LgsValue* value) {

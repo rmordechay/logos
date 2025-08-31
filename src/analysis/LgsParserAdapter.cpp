@@ -409,7 +409,7 @@ LgsField* LgsParserAdapter::getField(LogosParser::FieldContext* ctx, const size_
     const auto expr = getExpr(ctx->expr());
     const auto field = new LgsField(name, type, expr);
     field->isPublic = !!ctx->VISIBILITY();
-    field->isConst = ctx->CONST() != nullptr;
+    field->isConst = !!ctx->CONST();
     field->position = position;
     setLocation(field->location, ctx->start);
     return field;
@@ -579,13 +579,15 @@ LgsVarDec* LgsParserAdapter::getVarDec(antlr4::tree::TerminalNode* name, const b
 LgsVarDec* LgsParserAdapter::getImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx) {
     const auto varDec = getVarDec(ctx->IDENTIFIER(), !!ctx->QUEST_MARK(), getExpr(ctx->expr()));
     varDec->isNullable = !!ctx->QUEST_MARK();
-    varDec->isConst = !ctx->CONST();
+    varDec->isConst = !!ctx->CONST();
+    varDec->isOwner = !!ctx->OWNER();
     return varDec;
 }
 
 LgsVarDec* LgsParserAdapter::getExplicitVarDec(LogosParser::ExplicitVarDecContext* ctx) {
     const auto varDec = getVarDec(ctx->IDENTIFIER());
-    varDec->isConst = !ctx->CONST();
+    varDec->isConst = !!ctx->CONST();
+    varDec->isOwner = !!ctx->OWNER();
     if (ctx->expr()) {
         varDec->expr = getExpr(ctx->expr());
         varDec->expr->isMutable = varDec->isConst;

@@ -306,13 +306,13 @@ TypeSize LgsLLVMGen::typeSize(StructType* v) const {
     return IRModule->getDataLayout().getTypeStoreSize(v);
 }
 
-void LgsLLVMGen::printPtr(Value* ptr, const std::string& text = "") {
+void LgsLLVMGen::printPtr(Value* ptr, const std::string& text) {
     assert(ptr->getType()->isPointerTy());
     if (text != "") printStr(text);
     callPrintf({getIRStr(LGS_ANY.strFormatPart() + '\n'), ptr});
 }
 
-void LgsLLVMGen::printInt(Value* number, const std::string& text = "") {
+void LgsLLVMGen::printInt(Value* number, const std::string& text) {
     if (text != "") printStr(text);
     callPrintf({getIRStr("%d\n"), number});
 }

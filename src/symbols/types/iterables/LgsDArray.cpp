@@ -43,8 +43,8 @@ StructType* LgsDArray::getArrStruct(LgsLLVMGen& cg) {
     return arrStruct;
 }
 
-void LgsDArray::freeValue(LgsLLVMGen& cg, Value* value) {
-    freeFunc->callIR(cg, {value});
+void LgsDArray::freeValue(LgsLLVMGen& cg, LgsExpr* value) {
+    freeFunc->callIR(cg, {value->IRValue});
 }
 
 Value* LgsDArray::IRLength(LgsLLVMGen& cg, LgsExpr* iterable) {

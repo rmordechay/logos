@@ -57,9 +57,7 @@ bool LgsType::isBig() {
     return (asObject() || asDArray()) && getSizeBytes() >= BIG_SIZE_THRESHOLD;
 }
 
-void LgsType::freeValue(LgsLLVMGen& cg, Value* value) {
-
-}
+void LgsType::freeValue(LgsLLVMGen& cg, LgsExpr* value) {}
 
 bool LgsType::canAssignTo(LgsType* other, LgsAssignType op) {
     assert(0);

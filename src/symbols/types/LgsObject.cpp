@@ -42,8 +42,9 @@ LgsFunc* LgsObject::getMethod(const std::string& methodName) {
     return nullptr;
 }
 
-void LgsObject::freeValue(LgsLLVMGen& cg, Value* value) {
-    cg.builder.CreateFree(value);
+void LgsObject::freeValue(LgsLLVMGen& cg, LgsExpr* value) {
+    // cg.builder.CreateFree(value->IRValue);
+    cg.printPtr(value->IRValue, "Freeing obj: ");
 }
 
 size_t LgsObject::getSizeBytes() {
@@ -59,7 +60,11 @@ size_t LgsObject::getSizeBytes() {
 }
 
 LgsExpr* LgsObject::getZeroValue() {
-    return new LgsInstance(this);
+    const auto instance = new LgsInstance(this);
+    for (const auto field : fields) {
+        field->expr = field->type->getZeroValue();
+    }
+    return instance;
 }
 
 std::string LgsObject::strFormatPart() const {

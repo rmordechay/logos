@@ -112,8 +112,8 @@ public:
     TypeSize typeSize(StructType* v) const;
 
     // Debugging
-    void printPtr(Value* ptr, const std::string& text);
-    void printInt(Value* number, const std::string& text);
+    void printPtr(Value* ptr, const std::string& text = "");
+    void printInt(Value* number, const std::string& text = "");
     void printStr(const std::string& str);
 
     static void initLLVM();
