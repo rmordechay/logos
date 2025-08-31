@@ -44,6 +44,7 @@ StructType* LgsDArray::getArrStruct(LgsLLVMGen& cg) {
 }
 
 void LgsDArray::freeValue(LgsLLVMGen& cg, LgsExpr* value) {
+    cg.printPtr(value->IRValue, "Freeing arr: ");
     freeFunc->callIR(cg, {value->IRValue});
 }
 

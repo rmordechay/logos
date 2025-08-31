@@ -63,8 +63,8 @@ public:
     LgsFunc* getMethod(LogosParser::MethodContext* ctx, LgsType* obj);
     LgsField* getField(LogosParser::FieldContext* ctx, size_t position);
     LgsField* getInterfaceField(LogosParser::InterfaceFieldContext* ctx);
-    LgsParam getParam(LgsFuncType* funcType, LogosParser::ParamContext* param);
-    LgsIOPair* getIOPair(const LogosParser::IoPairContext* ioPair) const;
+    LgsParam getParam(LgsFuncType* funcType, LogosParser::ParamContext* ctx);
+    LgsIOPair* getIOPair(const LogosParser::IoPairContext* ctx) const;
     LgsStmt* getDeferStmt(LogosParser::DeferStmtContext* ctx);
     LgsStmt* getStmt(LogosParser::StatementContext* ctx);
     LgsAssignment* getAssignment(LogosParser::AssignmentContext* ctx);
@@ -75,7 +75,7 @@ public:
     LgsVarDec* getExplicitVarDec(LogosParser::ExplicitVarDecContext* ctx);
     LgsStmt* getReturnStmt(LogosParser::ReturnStatementContext* ctx);
     LgsBreak* getBreakStmt(LogosParser::BreakStmtContext* ctx) const;
-    LgsStmt* getIOStmt(LogosParser::IoStatementContext* ioStmt);
+    LgsStmt* getIOStmt(LogosParser::IoStatementContext* ctx);
     LgsStmt* getContinueStmt(const LogosParser::StatementContext* ctx) const;
     LgsIfStmt* getIfStatement(LogosParser::IfStatementContext* ctx);
     LgsStmt* getPatternMatching(LogosParser::PatternMatchingContext* ctx);
@@ -87,7 +87,7 @@ public:
     LgsEnum* getEnum(LogosParser::EnumDeclarationContext* ctx);
     LgsExpr* getExpr(LogosParser::ExprContext* ctx);
     LgsExpr* getCast(LogosParser::ExprContext* ctx);
-    LgsUnaryExpr* getJSON(LogosParser::JsonContext* json);
+    LgsUnaryExpr* getJSON(LogosParser::JsonContext* ctx);
     LgsUnaryExpr* getUnaryExpr(LogosParser::UnaryExprContext* ctx);
     LgsExpr* getBinaryExpr(LogosParser::ExprContext* ctx);
     LgsUnaryExpr* getPrefixExpr(LogosParser::PrefixExprContext* ctx);
@@ -119,5 +119,5 @@ public:
     bool validateTypeName(const std::string& typeName, const LgsLocation* location);
     void extractStrParts(LgsStrConst& strConst);
     bool checkParserErrors(LogosParser* parser);
-    void setLocation(LgsLocation& location, const antlr4::Token* start) const;
+    void setLocation(LgsLocation& location, const antlr4::Token* start, const antlr4::Token* stop) const;
 };

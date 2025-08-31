@@ -72,6 +72,6 @@ extern "C" bool Lgs_DArray_contains(const Lgs_Array* arr, const void* value) {
 }
 
 extern "C" void Lgs_DArray_free(Lgs_Array* arr) {
-    delete arr->data;
-    std::free(arr);
+    // delete arr->data;
+    // std::free(arr);
 }

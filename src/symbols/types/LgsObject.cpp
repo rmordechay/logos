@@ -43,8 +43,8 @@ LgsFunc* LgsObject::getMethod(const std::string& methodName) {
 }
 
 void LgsObject::freeValue(LgsLLVMGen& cg, LgsExpr* value) {
-    // cg.builder.CreateFree(value->IRValue);
     cg.printPtr(value->IRValue, "Freeing obj: ");
+    // cg.builder.CreateFree(value->IRValue);
 }
 
 size_t LgsObject::getSizeBytes() {

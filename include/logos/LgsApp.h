@@ -55,5 +55,6 @@ public:
     void initBuild();
     void writeIRFiles();
     void exitWithErrors() const;
+    LgsFile* getFileByID(size_t fileID) const;
     void freeApp();
 };

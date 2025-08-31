@@ -15,14 +15,14 @@ main() {
         print(for.isFirst)
         print(for.isLast)
     }
-    for {
-        // for.i not allowed
-        // for.isFirst not allowed
-        // for.isLast not allowed
-    }
-    while true {
-        // for.i not allowed
-        // for.isFirst not allowed
-        // for.isLast not allowed
-    }
+    //for {
+    //    // for.i not allowed
+    //    // for.isFirst not allowed
+    //    // for.isLast not allowed
+    //}
+    //while true {
+    //    // for.i not allowed
+    //    // for.isFirst not allowed
+    //    // for.isLast not allowed
+    //}
 }

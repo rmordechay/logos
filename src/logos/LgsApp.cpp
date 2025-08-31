@@ -185,21 +185,25 @@ void LgsApp::exitWithErrors() const {
         const auto err = errHandler.errors[i];
         const auto posInLine = std::to_string(err.location.posInLine);
         const auto lineNumber = std::to_string(err.location.lineStart);
-        const LgsFile* errFile = nullptr;
-        for (const auto& file : ast) {
-            if (file->id != err.location.fileID) continue;
-            errFile = file;
-            break;
-        }
-        assert(errFile);
-        const auto filePath = errFile->path.string();
-        const auto fullPath = filePath + ":" + lineNumber + ":" + posInLine;
+        const auto file = getFileByID(err.location.fileID);
+        const auto fullPath = getFullPath(err.location, file->path);
+        auto line = trim(getLine(file->path.string(), err.location.lineStart));
+        // line += '\n' + std::string(err.location.posInLine + std::strlen(LGS_ERROR_PADDING) + 1, ' ') + "^";
         const auto path = "\n   at: " + fullPath;
-        logError(err.msg, path);
+        const auto finalMsg = line + err.msg;
+        logError(finalMsg, path);
         if (i != errHandler.errors.size() - 1) logInfo(LGS_MSG_LINE_SEPERATOR);
     }
     logInfo("\n");
     exit(1);
+}
+
+LgsFile* LgsApp::getFileByID(const size_t fileID) const {
+    for (const auto& file : ast) {
+        if (file->id != fileID) continue;
+        return file;
+    }
+    assert(0);
 }
 
 void LgsApp::freeApp() {

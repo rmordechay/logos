@@ -24,3 +24,7 @@ void freeType(LgsType* type);
 void freeExpr(const LgsExpr* expr);
 size_t hashStr(const char* key);
 bool startsWith(const std::string& str, const std::string& prefix);
+std::string getTextFromFile(const std::string& filename, const LgsLocation& location);
+std::string getLine(const std::string& filename, size_t lineNumber);
+std::string trim(const std::string& str);
+std::string getFullPath(const LgsLocation& location, const std::string& filePath);

@@ -17,9 +17,7 @@ void logInfo(const std::string& text) {
 
 void logError(const std::string& msg, const std::string& path) {
     logInfo(LGS_ERROR_STR + msg);
-    if (path != "") {
-        logInfo(path);
-    }
+    if (path != "") logInfo(path);
 }
 
 void formatAndLogError(const LgsBaseError& lgsErr, const std::vector<std::string>& args) {
@@ -44,6 +42,7 @@ void formatErrorMsg(const LgsBaseError& lgsErr, const std::vector<std::string>& 
         pos += args[argIndex].length();
         argIndex++;
     }
+    result = LGS_ERROR_PADDING + result;
 }
 
 bool isLogosFile(const fs::path& filePath) {
@@ -102,4 +101,47 @@ size_t hashStr(const char* key) {
 
 bool startsWith(const std::string& str, const std::string& prefix) {
     return str.size() >= prefix.size() && str.compare(0, prefix.size(), prefix) == 0;
+}
+
+std::string getTextFromFile(const std::string& filename, const LgsLocation& location) {
+    std::ifstream file(filename, std::ios::binary);
+    const auto start = location.indexStart;
+    const auto end = location.indexEnd;
+    if (start >= end) return "";
+    file.seekg(start);
+    std::string result(end - start, '\0');
+    file.read(result.data(), end - start);
+    return result;
+}
+
+std::string getLine(const std::string& filename, const size_t lineNumber) {
+    std::ifstream file(filename);
+    std::string line;
+    int currentLine = 1;
+    while (std::getline(file, line)) {
+        if (currentLine == lineNumber) {
+            break;
+        }
+        currentLine++;
+    }
+    file.close();
+    const auto commentPos = line.find("//");
+    if (commentPos != std::string::npos) {
+        return line.substr(0, commentPos);
+    }
+    return line;
+}
+
+std::string trim(const std::string& str) {
+    const auto start = std::find_if(str.begin(), str.end(), [](const unsigned char ch) {
+        return !std::isspace(ch);
+    });
+    const auto end = std::find_if(str.rbegin(), str.rend(), [](const unsigned char ch) {
+        return !std::isspace(ch);
+    }).base();
+    return start < end ? std::string(start, end) : std::string();
+}
+
+std::string getFullPath(const LgsLocation& location, const std::string& filePath) {
+    return filePath + ":" + std::to_string(location.lineStart) + ":" + std::to_string(location.posInLine);
 }

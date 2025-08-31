@@ -2,6 +2,8 @@
 
 struct LgsLocation {
     size_t fileID;
+    size_t indexStart;
+    size_t indexEnd;
     size_t lineStart;
     size_t posInLine;
 };

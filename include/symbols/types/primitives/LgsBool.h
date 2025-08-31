@@ -11,6 +11,7 @@ public:
         isPrimitive = true;
         isNumber = true;
         isInt = true;
+        rtt = RTT_BOOL;
     }
     std::string pname() override;
     json::value asJSON() override;

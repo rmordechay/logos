@@ -96,7 +96,7 @@ LgsFile* LgsParserAdapter::getLogosFile(LogosParser::LogosFileContext* ctx, cons
 LgsMainFile* LgsParserAdapter::getMainFile(LogosParser::MainFileContext* ctx, const fs::path& filePath) {
     const auto funcs = ctx->func();
     const auto file = new LgsMainFile(fileID, filePath);
-    setLocation(file->location, ctx->start);
+    setLocation(file->location, ctx->start, ctx->stop);
 
     for (const auto enumDeclaration : ctx->enumDeclaration()) {
         auto lgsEnum = getEnum(enumDeclaration);
@@ -139,7 +139,7 @@ LgsMainFile* LgsParserAdapter::getMainFile(LogosParser::MainFileContext* ctx, co
 LgsObjectFile* LgsParserAdapter::getObjectFile(LogosParser::ObjectFileContext* ctx, const fs::path& filePath) {
     const auto objName = ctx->IDENTIFIER();
     const auto file = new LgsObjectFile(fileID, objName->getText(), filePath);
-    setLocation(file->location, ctx->start);
+    setLocation(file->location, ctx->start, ctx->stop);
     file->obj = getObject(ctx->objectBody(), objName, !!ctx->SINGLETON());
     globals.addSymbol(LgsSymbol(file->obj), &errHandler);
     return file;
@@ -148,7 +148,7 @@ LgsObjectFile* LgsParserAdapter::getObjectFile(LogosParser::ObjectFileContext* c
 LgsFile* LgsParserAdapter::getInterfaceFile(LogosParser::InterfaceFileContext* ctx, const fs::path& filePath) {
     const auto interfaceNameToken = ctx->IDENTIFIER();
     const auto file = new LgsInterfaceFile(fileID, interfaceNameToken->getText(), filePath);
-    setLocation(file->location, ctx->start);
+    setLocation(file->location, ctx->start, ctx->stop);
     file->interface = getInterface(ctx->interfaceBody(), interfaceNameToken);
     globals.addSymbol(LgsSymbol(file->interface), &errHandler);
     return file;
@@ -156,7 +156,7 @@ LgsFile* LgsParserAdapter::getInterfaceFile(LogosParser::InterfaceFileContext* c
 
 LgsFile* LgsParserAdapter::getTestFile(LogosParser::TestFileContext* ctx, const fs::path& filePath) {
     const auto file = new LgsTestFile(fileID, ctx->IDENTIFIER()->getText(), filePath);
-    setLocation(file->location, ctx->start);
+    setLocation(file->location, ctx->start, ctx->stop);
     for (const auto& func : ctx->func()) {
         const auto lgsFunc = getFunc(func);
         if (startsWith(lgsFunc->funcType->name, "test")) {
@@ -199,7 +199,7 @@ void LgsParserAdapter::setAppConfigs(LgsAppConfigs& appConfigs) {
     if (!checkParserErrors(&parser)) return;
     const auto ctx = parser.logosAppFile();
     LgsAppFile lgsAppFile(fileID, paths.appFilePath);
-    setLocation(lgsAppFile.location, ctx->start);
+    setLocation(lgsAppFile.location, ctx->start, ctx->stop);
     for (int i = 0; i < ctx->IDENTIFIER().size(); ++i) {
         const auto varToken = ctx->IDENTIFIER()[i];
         const auto varName = varToken->getText();
@@ -244,7 +244,7 @@ void LgsParserAdapter::setAppConfigs(LgsAppConfigs& appConfigs) {
 
 LgsObject* LgsParserAdapter::getObject(LogosParser::ObjectBodyContext* ctx, antlr4::tree::TerminalNode* objName, const bool isSingleton) {
     const auto obj = new LgsObject(objName->getText());
-    setLocation(obj->location, objName->getSymbol());
+    setLocation(obj->location, objName->getSymbol(), nullptr);
     if (!validateTypeName(obj->name, &obj->location)) return obj;
 
     // Fields
@@ -288,7 +288,7 @@ LgsObject* LgsParserAdapter::getObject(LogosParser::ObjectBodyContext* ctx, antl
 
 LgsInterface* LgsParserAdapter::getInterface(LogosParser::InterfaceBodyContext* ctx, antlr4::tree::TerminalNode* interfaceName) {
     const auto interface = new LgsInterface(interfaceName->getText());
-    setLocation(interface->location, interfaceName->getSymbol());
+    setLocation(interface->location, interfaceName->getSymbol(), nullptr);
     if (!validateTypeName(interface->name, &interface->location)) return interface;
 
     if (ctx->implements()) {
@@ -311,7 +311,7 @@ LgsInterface* LgsParserAdapter::getInterface(LogosParser::InterfaceBodyContext* 
         const auto funcName = interfaceFunc->funcSignatureHeader()->IDENTIFIER();
         const auto func = new LgsFunc(funcName->getText(), type);
         currentFunc = func;
-        setLocation(func->location, funcName->getSymbol());
+        setLocation(func->location, funcName->getSymbol(), nullptr);
         func->funcType->parentName = interface->name;
         func->funcType->isPublic = true;
         func->funcType->isVirtual = !func->stmtsBlock;
@@ -331,7 +331,7 @@ LgsFunc* LgsParserAdapter::getFunc(LogosParser::FuncContext* ctx) {
     const auto funcName = funcNameToken->getText();
     const auto func = new LgsFunc(funcName, rt);
     currentFunc = func;
-    setLocation(func->location, funcNameToken->getSymbol());
+    setLocation(func->location, funcNameToken->getSymbol(), nullptr);
     setParams(func->funcType, funcSignature->funcSignatureHeader()->param());
     func->stmtsBlock = getStmtBlock(ctx->statementsBlock());
     currentFunc = nullptr;
@@ -342,7 +342,7 @@ LgsMainFunc* LgsParserAdapter::getMainFunc(LogosParser::FuncContext* ctx) {
     const auto mainFunc = new LgsMainFunc();
     currentFunc = mainFunc;
     const auto funcSignature = ctx->funcSignature();
-    setLocation(mainFunc->location, funcSignature->funcSignatureHeader()->IDENTIFIER()->getSymbol());
+    setLocation(mainFunc->location, funcSignature->funcSignatureHeader()->IDENTIFIER()->getSymbol(), nullptr);
     mainFunc->stmtsBlock = getStmtBlock(ctx->statementsBlock());
     bool isValid = true;
     const auto paramSize = funcSignature->funcSignatureHeader()->param().size();
@@ -366,19 +366,19 @@ LgsFunc* LgsParserAdapter::getLambda(LogosParser::LambdaContext* ctx) {
     func->funcType->rt = getType(ctx->rt);
     if (const auto singleParam = ctx->IDENTIFIER()) {
         auto lgsParam = LgsParam(nullptr, singleParam->getText());
-        setLocation(lgsParam.location, singleParam->getSymbol());
+        setLocation(lgsParam.location, singleParam->getSymbol(), nullptr);
         func->funcType->params.push_back(lgsParam);
     } else if (const auto params = ctx->lambdaParams()) {
         for (const auto lambdaParam : params->lambdaParam()) {
             const auto param = lambdaParam->IDENTIFIER();
             const auto type = getType(lambdaParam->type());
             auto lgsParam = LgsParam(type, param->getText());
-            setLocation(lgsParam.location, param->getSymbol());
+            setLocation(lgsParam.location, param->getSymbol(), nullptr);
             func->funcType->params.push_back(lgsParam);
         }
     }
     func->stmtsBlock = getStmtBlock(ctx->statementsBlock());
-    setLocation(func->location, ctx->start);
+    setLocation(func->location, ctx->start, ctx->stop);
     currentFunc = nullptr;
     return func;
 }
@@ -389,7 +389,7 @@ LgsFunc* LgsParserAdapter::getMethod(LogosParser::MethodContext* ctx, LgsType* o
     const auto nameToken = funcSignature->funcSignatureHeader()->IDENTIFIER();
     const auto method = new LgsFunc(nameToken->getText(), rt);
     currentFunc = method;
-    setLocation(method->location, nameToken->getSymbol());
+    setLocation(method->location, nameToken->getSymbol(), nullptr);
     method->funcType->parentName = obj->getName();
     setParams(method->funcType, funcSignature->funcSignatureHeader()->param());
     method->stmtsBlock = getStmtBlock(ctx->statementsBlock());
@@ -411,7 +411,7 @@ LgsField* LgsParserAdapter::getField(LogosParser::FieldContext* ctx, const size_
     field->isPublic = !!ctx->VISIBILITY();
     field->isConst = !!ctx->CONST();
     field->position = position;
-    setLocation(field->location, ctx->start);
+    setLocation(field->location, ctx->start, ctx->stop);
     return field;
 }
 
@@ -421,16 +421,16 @@ LgsField* LgsParserAdapter::getInterfaceField(LogosParser::InterfaceFieldContext
     const auto expr = getExpr(ctx->expr());
     const auto field = new LgsField(name, type, expr);
     field->isConst = ctx->CONST() != nullptr;
-    setLocation(field->location, ctx->start);
+    setLocation(field->location, ctx->start, ctx->stop);
     return field;
 }
 
-LgsParam LgsParserAdapter::getParam(LgsFuncType* funcType, LogosParser::ParamContext* param) {
-    const auto variableName = param->IDENTIFIER()->getText();
-    const auto expr = getExpr(param->expr());
-    auto lgsParam = LgsParam(getType(param->type()), variableName, expr);
-    setLocation(lgsParam.location, param->start);
-    if (param->TRIPLE_DOT()) {
+LgsParam LgsParserAdapter::getParam(LgsFuncType* funcType, LogosParser::ParamContext* ctx) {
+    const auto variableName = ctx->IDENTIFIER()->getText();
+    const auto expr = getExpr(ctx->expr());
+    auto lgsParam = LgsParam(getType(ctx->type()), variableName, expr);
+    setLocation(lgsParam.location, ctx->start, ctx->stop);
+    if (ctx->TRIPLE_DOT()) {
         lgsParam.isVariadic = true;
         funcType->isVariadic = true;
     } else if (lgsParam.expr) {
@@ -439,9 +439,9 @@ LgsParam LgsParserAdapter::getParam(LgsFuncType* funcType, LogosParser::ParamCon
     return lgsParam;
 }
 
-LgsIOPair* LgsParserAdapter::getIOPair(const LogosParser::IoPairContext* ioPair) const {
-    const auto lgsIOPair = new LgsIOPair(ioPair->opening->getText(), ioPair->closing->getText());
-    setLocation(lgsIOPair->location, ioPair->start);
+LgsIOPair* LgsParserAdapter::getIOPair(const LogosParser::IoPairContext* ctx) const {
+    const auto lgsIOPair = new LgsIOPair(ctx->opening->getText(), ctx->closing->getText());
+    setLocation(lgsIOPair->location, ctx->start, ctx->stop);
     return lgsIOPair;
 }
 
@@ -454,7 +454,7 @@ LgsStmt* LgsParserAdapter::getDeferStmt(LogosParser::DeferStmtContext* ctx) {
     } else {
         assert(0);
     }
-    setLocation(deferStmt->location, ctx->start);
+    setLocation(deferStmt->location, ctx->start, ctx->stop);
     return deferStmt;
 }
 
@@ -478,7 +478,7 @@ LgsStmt* LgsParserAdapter::getStmt(LogosParser::StatementContext* ctx) {
 LgsStmtsBlock* LgsParserAdapter::getStmtBlock(LogosParser::StatementsBlockContext* ctx) {
     if (!ctx) return nullptr;
     const auto stmtBlock = new LgsStmtsBlock();
-    setLocation(stmtBlock->location, ctx->start);
+    setLocation(stmtBlock->location, ctx->start, ctx->stop);
     for (const auto& statement : ctx->statement()) {
         auto stmt = getStmt(statement);
         stmtBlock->stmts.push_back(stmt);
@@ -488,7 +488,7 @@ LgsStmtsBlock* LgsParserAdapter::getStmtBlock(LogosParser::StatementsBlockContex
 
 LgsEnum* LgsParserAdapter::getEnum(LogosParser::EnumDeclarationContext* ctx) {
     const auto lgsEnum = new LgsEnum(ctx->IDENTIFIER()->getText());
-    setLocation(lgsEnum->location, ctx->start);
+    setLocation(lgsEnum->location, ctx->start, ctx->stop);
     if (!validateTypeName(lgsEnum->name, &lgsEnum->location)) return lgsEnum;
     std::unordered_set<std::string> seenNames;
     for (size_t i = 0; i < ctx->enumField().size(); ++i) {
@@ -502,7 +502,7 @@ LgsEnum* LgsParserAdapter::getEnum(LogosParser::EnumDeclarationContext* ctx) {
         if (enumField->STRING()) {
             field->expr = getStrConst(enumField->STRING());
         }
-        setLocation(field->location, ctx->start);
+        setLocation(field->location, ctx->start, ctx->stop);
         lgsEnum->fields.push_back(field);
     }
     return lgsEnum;
@@ -516,7 +516,7 @@ void LgsParserAdapter::setParams(LgsFuncType* funcType, const std::vector<LogosP
             lgsParamFuncType->name = param->IDENTIFIER()->getText();
             auto lgsParam = LgsParam(lgsParamFuncType);
             lgsParam.name = lgsParamFuncType->name;
-            setLocation(lgsParam.location, param->start);
+            setLocation(lgsParam.location, param->start, param->stop);
             funcType->params.push_back(lgsParam);
             continue;
         }
@@ -531,7 +531,7 @@ bool LgsParserAdapter::setMainArgsParam(const LgsMainFunc* mainFunc, LogosParser
     const auto variableName = param->IDENTIFIER()->getText();
     const auto expr = getExpr(param->expr());
     auto lgsParam = LgsParam(getType(type), variableName, expr);
-    setLocation(lgsParam.location, param->start);
+    setLocation(lgsParam.location, param->start, param->stop);
     const auto arr = lgsParam.type->asDArray();
     mainFunc->funcType->params.push_back(lgsParam);
     return arr && arr->baseType->asStr();
@@ -565,14 +565,14 @@ LgsAssignment* LgsParserAdapter::getAssignment(LogosParser::AssignmentContext* c
         assert(0);
     }
     const auto assignment = new LgsAssignment(mapAssignType(ctx), lValue, getExpr(ctx->expr()));
-    setLocation(assignment->location, ctx->start);
+    setLocation(assignment->location, ctx->start, ctx->stop);
     return assignment;
 }
 
 LgsVarDec* LgsParserAdapter::getVarDec(antlr4::tree::TerminalNode* name, const bool isConst, LgsExpr* expr) const {
     const auto varDec = new LgsVarDec(name->getText(), expr);
     varDec->isConst = isConst;
-    setLocation(varDec->location, name->getSymbol());
+    setLocation(varDec->location, name->getSymbol(), nullptr);
     return varDec;
 }
 
@@ -614,7 +614,7 @@ LgsCoroutine* LgsParserAdapter::getCoroutine(LogosParser::CoroutineContext* ctx)
 
 LgsStmt* LgsParserAdapter::getReturnStmt(LogosParser::ReturnStatementContext* ctx) {
     const auto rs = new LgsReturn(getExpr(ctx->expr()));
-    setLocation(rs->location, ctx->start);
+    setLocation(rs->location, ctx->start, ctx->stop);
     return rs;
 }
 
@@ -633,13 +633,13 @@ LgsIfStmt* LgsParserAdapter::getIfStatement(LogosParser::IfStatementContext* ctx
     if (const auto &elseStmt = ctx->elseStatement()) {
         ifStmt->elseBlock = getStmtBlock(elseStmt->statementsBlock());
     }
-    setLocation(ifStmt->location, ctx->start);
+    setLocation(ifStmt->location, ctx->start, ctx->stop);
     return ifStmt;
 }
 
 LgsBreak* LgsParserAdapter::getBreakStmt(LogosParser::BreakStmtContext* ctx) const {
     const auto breakStmt = new LgsBreak();
-    setLocation(breakStmt->location, ctx->start);
+    setLocation(breakStmt->location, ctx->start, ctx->stop);
     if (const auto tag = ctx->TAG()) {
         breakStmt->tag = tag->getText().substr(1);
     } else if (ctx->IF()) {
@@ -648,18 +648,18 @@ LgsBreak* LgsParserAdapter::getBreakStmt(LogosParser::BreakStmtContext* ctx) con
     return breakStmt;
 }
 
-LgsStmt* LgsParserAdapter::getIOStmt(LogosParser::IoStatementContext* ioStmt) {
-    const auto stmtsBlock = getStmtBlock(ioStmt->statementsBlock());
+LgsStmt* LgsParserAdapter::getIOStmt(LogosParser::IoStatementContext* ctx) {
+    const auto stmtsBlock = getStmtBlock(ctx->statementsBlock());
     const auto lgsIOStmt = new LgsIOStmt(stmtsBlock);
-    setLocation(lgsIOStmt->location, ioStmt->start);
-    lgsIOStmt->varDec = getVarDec(ioStmt->implicitVarDec()->IDENTIFIER(), true);
-    lgsIOStmt->varDec->expr = getExpr(ioStmt->implicitVarDec()->expr());
+    setLocation(lgsIOStmt->location, ctx->start, ctx->stop);
+    lgsIOStmt->varDec = getVarDec(ctx->implicitVarDec()->IDENTIFIER(), true);
+    lgsIOStmt->varDec->expr = getExpr(ctx->implicitVarDec()->expr());
     return lgsIOStmt;
 }
 
 LgsStmt* LgsParserAdapter::getContinueStmt(const LogosParser::StatementContext* ctx) const {
     const auto continueStmt = new LgsContinue();
-    setLocation(continueStmt->location, ctx->start);
+    setLocation(continueStmt->location, ctx->start, ctx->stop);
     return continueStmt;
 }
 
@@ -685,7 +685,7 @@ LgsForLoop* LgsParserAdapter::getForLoop(LogosParser::LoopStatementContext* ctx)
     } else {
         loopStmt = getInfiniteLoop(ctx);
     }
-    setLocation(loopStmt->location, ctx->start);
+    setLocation(loopStmt->location, ctx->start, ctx->stop);
     loopStmt->stmtsBlock = getStmtBlock(ctx->statementsBlock());
     return loopStmt;
 }
@@ -700,7 +700,7 @@ LgsForLoop* LgsParserAdapter::getRangeLoop(LogosParser::RangeLoopContext* ctx) {
         const auto loopVarName = loopVarToken->getText();
         rangeLoop->loopVars.emplace_back(getVarDec(loopVarToken, true));
     }
-    setLocation(rangeLoop->location, ctx->start);
+    setLocation(rangeLoop->location, ctx->start, ctx->stop);
     return rangeLoop;
 }
 
@@ -718,13 +718,13 @@ LgsForLoop* LgsParserAdapter::getForeachLoop(LogosParser::LoopStatementContext* 
 LgsForLoop* LgsParserAdapter::getWhileLoop(const LogosParser::LoopStatementContext* ctx) {
     const auto expr = getExpr(ctx->whileExpr);
     const auto whileLoop = new LgsWhileLoop(expr);
-    setLocation(whileLoop->location, ctx->start);
+    setLocation(whileLoop->location, ctx->start, ctx->stop);
     return whileLoop;
 }
 
 LgsForLoop* LgsParserAdapter::getInfiniteLoop(const LogosParser::LoopStatementContext* ctx) const {
     const auto rangeLoop = new LgsInfiniteLoop();
-    setLocation(rangeLoop->location, ctx->start);
+    setLocation(rangeLoop->location, ctx->start, ctx->stop);
     return rangeLoop;
 }
 
@@ -754,7 +754,7 @@ LgsExpr* LgsParserAdapter::getCast(LogosParser::ExprContext* ctx) {
     return new LgsCast(castToType, castFromValue);
 }
 
-LgsUnaryExpr* LgsParserAdapter::getJSON(LogosParser::JsonContext* json) {
+LgsUnaryExpr* LgsParserAdapter::getJSON(LogosParser::JsonContext* ctx) {
     assert(0);
 }
 
@@ -805,7 +805,7 @@ LgsExpr* LgsParserAdapter::getBinaryExpr(LogosParser::ExprContext* ctx) {
     const auto r = getExpr(ctx->right);
     const auto logosBinaryExpr = new LgsBinaryExpr(l->type, l, r, mapOperator(ctx));
     logosBinaryExpr->opStr = ctx->getText();
-    setLocation(logosBinaryExpr->location, ctx->start);
+    setLocation(logosBinaryExpr->location, ctx->start, ctx->stop);
     return logosBinaryExpr;
 }
 
@@ -822,7 +822,7 @@ LgsUnaryExpr* LgsParserAdapter::getPrefixExpr(LogosParser::PrefixExprContext* ct
     }
     const auto expr = getExpr(ctx->expr());
     const auto prefixExpr = new LgsPrefixExpr(expr, op);
-    setLocation(prefixExpr->location, ctx->start);
+    setLocation(prefixExpr->location, ctx->start, ctx->stop);
     return prefixExpr;
 }
 
@@ -848,7 +848,7 @@ LgsPostfixExpr* LgsParserAdapter::getPostfixExpr(LogosParser::PostfixExprContext
         assert(0);
     }
     const auto postfixExpr = new LgsPostfixExpr(expr, op);
-    setLocation(postfixExpr->location, ctx->start);
+    setLocation(postfixExpr->location, ctx->start, ctx->stop);
     return postfixExpr;
 }
 
@@ -863,7 +863,7 @@ LgsUnaryExpr* LgsParserAdapter::getArrayExpr(LogosParser::ArrayExprContext* ctx)
     for (const auto expr : ctx->expr()) {
         array->initialElements.emplace_back(getExpr(expr));
     }
-    setLocation(array->location, ctx->start);
+    setLocation(array->location, ctx->start, ctx->stop);
     return array;
 }
 
@@ -883,7 +883,7 @@ LgsVariable* LgsParserAdapter::getVariable(antlr4::tree::TerminalNode* ctx) cons
     if (variable->name == LGS_SELF) {
         currentFunc->funcType->isMethod = true;
     }
-    setLocation(variable->location, ctx->getSymbol());
+    setLocation(variable->location, ctx->getSymbol(), nullptr);
     return variable;
 }
 
@@ -902,7 +902,7 @@ LgsFuncCall* LgsParserAdapter::getFuncCall(LogosParser::FuncCallContext* ctx) {
         args[args.size() - 1]->isSpread = true;
     }
     const auto funcCall = new LgsFuncCall(name, args);
-    setLocation(funcCall->location, ctx->start);
+    setLocation(funcCall->location, ctx->start, ctx->stop);
     return funcCall;
 }
 
@@ -914,7 +914,7 @@ LgsUnaryExpr* LgsParserAdapter::getVectorExpr(LogosParser::VectorContext* ctx) {
     else assert(0);
 
     const auto lgsVec = new LgsVectorExpr(dim);
-    setLocation(lgsVec->location, ctx->start);
+    setLocation(lgsVec->location, ctx->start, ctx->stop);
     for (const auto& expr : ctx->expr()) {
         lgsVec->args.emplace_back(getExpr(expr));
     }
@@ -924,7 +924,7 @@ LgsUnaryExpr* LgsParserAdapter::getVectorExpr(LogosParser::VectorContext* ctx) {
 LgsSelection* LgsParserAdapter::getSelection(LogosParser::SelectionContext* ctx) {
     const auto exprs = getSelectionExprs(ctx);
     const auto selection = new LgsSelection(exprs);
-    setLocation(selection->location, ctx->start);
+    setLocation(selection->location, ctx->start, ctx->stop);
     return selection;
 }
 
@@ -974,7 +974,7 @@ std::vector<LgsUnaryExpr*> LgsParserAdapter::getSelectionExprs(LogosParser::Sele
 
 LgsInstance* LgsParserAdapter::getInstance(LogosParser::InstanceContext* ctx) {
     const auto instance = new LgsInstance(ctx->IDENTIFIER()->getText());
-    setLocation(instance->location, ctx->start);
+    setLocation(instance->location, ctx->start, ctx->stop);
     instance->type = new LgsUnknown(instance->name);
     const auto args = ctx->instanceArgList();
     if (!args) return instance;
@@ -1006,7 +1006,7 @@ LgsIterIndex* LgsParserAdapter::getIterIndex(LogosParser::IterIndexContext* ctx)
         const auto iterIndexTo = getExpr(indexExpr->to);
         const auto index = new LgsIndex{.from = iterIndexFrom, .to = iterIndexTo};
         const auto newIterIndex = new LgsIterIndex(baseExpr, index);
-        setLocation(newIterIndex->location, ctx->start);
+        setLocation(newIterIndex->location, ctx->start, ctx->stop);
         baseExpr = newIterIndex;
     }
 
@@ -1042,7 +1042,7 @@ LgsUnaryExpr* LgsParserAdapter::getConstant(LogosParser::ConstantContext* ctx) {
         }
     }
     if (constant) {
-        setLocation(constant->location, ctx->start);
+        setLocation(constant->location, ctx->start, ctx->stop);
     }
     return constant;
 }
@@ -1052,13 +1052,13 @@ LgsStrConst* LgsParserAdapter::getStrConst(antlr4::tree::TerminalNode* ctx) {
     cleanStr(text);
     const auto strConst = new LgsStrConst(text);
     extractStrParts(*strConst);
-    setLocation(strConst->location, ctx->getSymbol());
+    setLocation(strConst->location, ctx->getSymbol(), nullptr);
     return strConst;
 }
 
 LgsUnaryExpr* LgsParserAdapter::getNullValue(const antlr4::tree::TerminalNode* ctx) const {
     const auto lgsNull = new LgsNull();
-    setLocation(lgsNull->location, ctx->getSymbol());
+    setLocation(lgsNull->location, ctx->getSymbol(), nullptr);
     return lgsNull;
 }
 
@@ -1075,7 +1075,7 @@ LgsUnaryExpr* LgsParserAdapter::getLoopMetaVar(LogosParser::ForVariableContext* 
     } else {
         assert(0);
     }
-    setLocation(var->location, ctx->start);
+    setLocation(var->location, ctx->start, ctx->stop);
     return var;
 }
 
@@ -1094,13 +1094,13 @@ LgsType* LgsParserAdapter::getType(LogosParser::TypeContext* ctx) {
             result = new LgsNullable(result);
         }
     }
-    setLocation(result->location, ctx->start);
+    setLocation(result->location, ctx->start, ctx->stop);
     return result;
 }
 
 LgsGroup* LgsParserAdapter::getGroup(LogosParser::GroupContext* ctx) {
     const auto group = new LgsGroup(ctx->IDENTIFIER()->getText());
-    setLocation(group->location, ctx->start);
+    setLocation(group->location, ctx->start, ctx->stop);
     for (const auto type : ctx->groupTypesList()->type()) {
         const auto lgsType = getType(type);
         group->types.push_back(lgsType);
@@ -1116,7 +1116,7 @@ LgsGroup* LgsParserAdapter::getGroup(LogosParser::GroupContext* ctx) {
 LgsFuncType* LgsParserAdapter::getFuncType(LogosParser::FuncTypeContext* ctx) {
     const auto rt = getType(ctx->rt);
     const auto funcType = new LgsFuncType();
-    setLocation(funcType->location, ctx->start);
+    setLocation(funcType->location, ctx->start, ctx->stop);
     funcType->rt = rt;
     for (const auto paramType : ctx->type()) {
         if (paramType == ctx->rt) continue;
@@ -1174,7 +1174,7 @@ LgsType* LgsParserAdapter::getTypeFromText(antlr4::tree::TerminalNode* ctx) cons
     } else {
         type = new LgsUnknown(typeText);
     }
-    setLocation(type->location, ctx->getSymbol());
+    setLocation(type->location, ctx->getSymbol(), nullptr);
     return type;
 }
 
@@ -1184,7 +1184,7 @@ LgsType* LgsParserAdapter::getFuncReturnType(LogosParser::TypeContext* ctx) {
         result = &LGS_VOID;
     } else {
         result = getType(ctx);
-        setLocation(result->location, ctx->start);
+        setLocation(result->location, ctx->start, ctx->stop);
     }
     return result;
 }
@@ -1251,8 +1251,14 @@ bool LgsParserAdapter::checkParserErrors(LogosParser* parser) {
     return true;
 }
 
-void LgsParserAdapter::setLocation(LgsLocation& location, const antlr4::Token* start) const {
+void LgsParserAdapter::setLocation(LgsLocation& location, const antlr4::Token* start, const antlr4::Token* stop) const {
+    location.indexStart = start->getStartIndex();
     location.lineStart = start->getLine();
     location.posInLine = start->getCharPositionInLine() + 1;
+    if (stop) {
+        location.indexEnd = stop->getStopIndex() + 1;
+    } else {
+        location.indexEnd = start->getStartIndex() + start->getText().length() + 1;
+    }
     location.fileID = fileID;
 }

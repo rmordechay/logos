@@ -9,7 +9,9 @@ Value* LgsPrint::call(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
     const auto baseStr = cg.getIRStr(firstArg->type->strFormatPart());
     IRArgs.emplace_back(baseStr);
     IRArgs.emplace_back(cg.i32(firstArg->type->rtt));
-    IRArgs.emplace_back(firstArg->loadIR(cg));
+    const auto type = firstArg->IRValue->getType();
+    const auto v = type->isIntegerTy() ? firstArg->getIRPtrTo(cg) : firstArg->loadIR(cg);
+    IRArgs.emplace_back(v);
     const auto ft = cg.getFT(cg.voidTy(), {cg.ptrTy(), cg.i32Ty(), cg.ptrTy()}, false);
     return cg.callLgsFunc(name, ft, IRArgs);
 }
