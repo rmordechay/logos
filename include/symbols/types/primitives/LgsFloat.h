@@ -11,7 +11,7 @@ public:
         isFloatPoint = true;
         rtt = RTT_FLOAT;
     }
-    llvm::Type* getIRType(LgsLLVMGen& cg) override;
+    Type* getIRType(LgsLLVMGen& cg) override;
     std::string getName() override;
     LgsExpr* getZeroValue() override;
     size_t getSizeBytes() override;

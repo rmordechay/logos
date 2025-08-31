@@ -88,7 +88,6 @@ void LgsCodeGen::visitMainFunc(LgsMainFunc* func) {
     if (!func->funcType->params.empty()) initMainArgs(func);
     visitStmtsBlock(func->stmtsBlock);
     createEpilogue(func);
-    currentIRFunc = nullptr;
     cg.builder.CreateRet(cg.i32(EXIT_SUCCESS));
     stack.exitScope();
 }
@@ -98,7 +97,6 @@ void LgsCodeGen::visitFunc(LgsFunc* func) {
     createPrologue(func);
     visitStmtsBlock(func->stmtsBlock);
     createEpilogue(func);
-    currentIRFunc = nullptr;
     if (!cg.lastInstTerminator()) cg.builder.CreateRetVoid();
     stack.exitScope();
 }
@@ -544,12 +542,10 @@ void LgsCodeGen::visitExpr(LgsExpr* expr) {
     if (const auto iter = expr->type->asIterable()) {
         visitExpr(iter->sizeExpr);
     }
-    if (const auto unaryExpr = dynamic_cast<LgsExpr*>(expr)) {
-        visitUnaryExpr(unaryExpr);
-    } else if (const auto binaryExpr = dynamic_cast<LgsBinaryExpr*>(expr)) {
+    if (const auto binaryExpr = dynamic_cast<LgsBinaryExpr*>(expr)) {
         visitBinaryExpr(binaryExpr);
     } else {
-        assert(0);
+        visitUnaryExpr(expr);
     }
     addHeapExpr(expr);
 }
@@ -610,7 +606,9 @@ void LgsCodeGen::visitCast(LgsCast* lgsCast) {
 
 void LgsCodeGen::visitLambda(LgsFunc* func) {
     cg.savedIP = cg.builder.saveIP();
+    const auto originalFunc = currentIRFunc;
     visitFunc(func);
+    currentIRFunc = originalFunc;
     cg.builder.restoreIP(cg.savedIP);
     func->IRValue = func->getIRFunc(cg);
 }
@@ -680,6 +678,7 @@ void LgsCodeGen::visitVectorExpr(LgsVectorExpr* vectorExpr) {
 }
 
 void LgsCodeGen::visitVariable(LgsVariable* variable) {
+    assert(variable->ref.symbolType != UNKNOWN);
     switch (variable->ref.symbolType) {
     case VAR_DEC:
         variable->IRValue = getIRValue(variable->ref.varDec);
@@ -863,10 +862,13 @@ void LgsCodeGen::createPrologue(LgsFunc* func) {
 }
 
 void LgsCodeGen::createEpilogue(LgsFunc* func) {
+    const auto needsCleanup = func->needsCleanup();
+    if (!needsCleanup && !func->hasDefers) return;
     cg.branchAndStartBlock(func->getCleanupBlock(cg), currentIRFunc);
+    currentIRFunc = nullptr;
     if (func->hasDefers) cg.callDefers();
 
-    if (func->needsCleanup()) {
+    if (needsCleanup) {
         if (func->returnStmts.empty()) {
             freeFuncHeap(func);
             cg.callPopStack();

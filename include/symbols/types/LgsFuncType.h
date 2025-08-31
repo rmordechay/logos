@@ -37,10 +37,12 @@ public:
     bool isTest = false;
     bool isIO = false;
     bool hasDefaults = false;
-    llvm::FunctionType* IRType = nullptr;
+    FunctionType* IRType = nullptr;
 
+    LgsFuncType() = default;
+    LgsFuncType(LgsType* rt, const std::vector<LgsParam>& params = {}) : rt(rt), params(params) {}
     void setFuncOptions(uint32_t ops);
-    llvm::Type* getIRType(LgsLLVMGen& cg) override;
+    Type* getIRType(LgsLLVMGen& cg) override;
     LgsExpr* getZeroValue() override;
     size_t getSizeBytes() override;
     std::string getName() override;

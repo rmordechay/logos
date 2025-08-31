@@ -444,10 +444,10 @@ void LgsSema::visitExpr(LgsExpr* expr) {
     }
     if (const auto castExpr = dynamic_cast<LgsCast*>(expr)) {
         visitCast(castExpr);
-    } else if (const auto unaryExpr = dynamic_cast<LgsExpr*>(expr)) {
-        visitUnaryExpr(unaryExpr);
     } else if (const auto binaryExpr = dynamic_cast<LgsBinaryExpr*>(expr)) {
         visitBinaryExpr(binaryExpr);
+    } else {
+        visitUnaryExpr(expr);
     }
 }
 
@@ -516,11 +516,11 @@ void LgsSema::visitCast(LgsCast* lgsCast) {
     lgsCast->toType = typeResolver.resolveType(lgsCast->toType, file);
 }
 
-void LgsSema::visitArrayExpr(LgsArrayExpr* array) {
+void LgsSema::visitArrayExpr(const LgsArrayExpr* array) {
     for (const auto element : array->initialElements) {
         visitExpr(element);
     }
-    if (array->type->isHeapAlloc) {
+    if (array->type->asDArray()) {
         visitDynamicArray(array);
     } else {
         visitStaticArray(array);
@@ -534,6 +534,9 @@ void inferBaseType(const LgsArrayExpr* array) {
         baseType = innerArr->type;
     } else {
         baseType = first->type;
+        auto ft = new LgsFuncType(baseType, {LgsParam(baseType)});
+        array->type->asDArray()->mapFunc  = new LgsFunc("map", array->type, {first->type, ft}, INTERNAL | PUBLIC | METHOD);
+        array->type->asDArray()->addMethod(array->type->asDArray()->mapFunc);
     }
     array->type->asIterable()->baseType = baseType;
 }

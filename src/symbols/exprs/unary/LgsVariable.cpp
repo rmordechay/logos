@@ -10,18 +10,15 @@ void LgsVariable::assign(LgsLLVMGen& cg, LgsExpr* expr) {
 }
 
 Value* LgsVariable::addIR(LgsLLVMGen& cg, LgsExpr* other) {
-    switch (ref.symbolType) {
-    case VAR_DEC:
-        return ref.varDec->expr->addIR(cg, other);
-    default:
-        assert(0);
-    }
+    return cg.builder.CreateAdd(IRValue, other->IRValue);
 }
 
 Value* LgsVariable::subIR(LgsLLVMGen& cg, LgsExpr* other) {
     switch (ref.symbolType) {
     case VAR_DEC:
         return ref.varDec->expr->subIR(cg, other);
+    case PARAM:
+        return ref.param->expr->subIR(cg, other);
     default:
         assert(0);
     }
@@ -31,6 +28,8 @@ Value* LgsVariable::mulIR(LgsLLVMGen& cg, LgsExpr* other) {
     switch (ref.symbolType) {
     case VAR_DEC:
         return ref.varDec->expr->mulIR(cg, other);
+    case PARAM:
+        return ref.param->expr->mulIR(cg, other);
     default:
         assert(0);
     }
@@ -40,6 +39,8 @@ Value* LgsVariable::divIR(LgsLLVMGen& cg, LgsExpr* other) {
     switch (ref.symbolType) {
     case VAR_DEC:
         return ref.varDec->expr->divIR(cg, other);
+    case PARAM:
+        return ref.param->expr->divIR(cg, other);
     default:
         assert(0);
     }
