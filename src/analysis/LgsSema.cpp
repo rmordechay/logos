@@ -601,7 +601,7 @@ void LgsSema::visitVariable(LgsVariable* variable) {
         variable->setType(symbol->varDec->type);
         break;
     }
-    case ENUM_FIELD: {
+    case FIELD: {
         variable->ref.field = symbol->field;
         variable->isMutable = !symbol->field->isConst;
         variable->setType(symbol->field->type);
@@ -664,15 +664,21 @@ void LgsSema::visitInnerSelections(const LgsSelection* selection) {
         const auto parentExpr = exprs[i];
         const auto childExpr = exprs[i + 1];
         if (const auto var = childExpr->asVariable()) {
-            visitFieldSelection(var, parentExpr->type);
+            visitVarSelection(var, parentExpr->type);
         } else if (const auto methodCall = childExpr->asFuncCall()) {
             visitMethodCall(methodCall, parentExpr);
+        } else if (const auto iterIndex = childExpr->asIterIndex()) {
+            visitIterIndexSelection(iterIndex, parentExpr->type);
+        } else {
+            assert(0);
         }
-        if (!childExpr->type || childExpr->type->isUnknown()) return;
+        if (!childExpr->type || childExpr->type->isUnknown()) {
+            return;
+        }
     }
 }
 
-void LgsSema::visitFieldSelection(LgsVariable* child, LgsType* parentType) {
+void LgsSema::visitVarSelection(LgsVariable* child, LgsType* parentType) {
     if (!parentType) return;
     if (parentType->asVec() && !validateVecElements(child, parentType->asVec())) return;
     auto childName = child->name;
@@ -687,6 +693,10 @@ void LgsSema::visitFieldSelection(LgsVariable* child, LgsType* parentType) {
     if (const auto parentAsObj = parentType->asObject()) {
         validateFieldVisibility(field, parentAsObj);
     }
+}
+
+void LgsSema::visitIterIndexSelection(LgsIterIndex* child, LgsType* parentType) {
+    assert(0);
 }
 
 void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent) {
@@ -818,12 +828,8 @@ void LgsSema::visitInterfaceInstance(LgsInstance* instance, LgsInterface* interf
 
 void LgsSema::visitIterIndex(LgsIterIndex* iterIndex) {
     const auto baseExpr = iterIndex->baseExpr;
-    const auto exprFrom = iterIndex->index->from;
-    const auto exprTo = iterIndex->index->to;
     visitUnaryExpr(baseExpr);
     iterIndex->isMutable = baseExpr->isMutable;
-    visitExpr(exprFrom);
-    visitExpr(exprTo);
     if (baseExpr->type->isUnknown()) return;
     const auto iterable = baseExpr->type->asIterable();
     if (!iterable) {
@@ -832,6 +838,16 @@ void LgsSema::visitIterIndex(LgsIterIndex* iterIndex) {
         }
         return;
     }
+    visitIndex(iterIndex);
+}
+
+void LgsSema::visitIndex(LgsIterIndex* iterIndex) {
+    const auto iterable = iterIndex->baseExpr->type->asIterable();
+    assert(iterable);
+    const auto exprFrom = iterIndex->index->from;
+    const auto exprTo = iterIndex->index->to;
+    visitExpr(exprFrom);
+    visitExpr(exprTo);
     if (exprTo) {
         visitSlice(iterIndex);
         iterIndex->setType(iterable);

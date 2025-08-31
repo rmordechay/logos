@@ -1,5 +1,6 @@
 #include "exprs/LgsExpr.h"
 #include "exprs/unary/LgsArrayExpr.h"
+#include "exprs/unary/LgsCast.h"
 #include "exprs/unary/LgsIterIndex.h"
 #include "exprs/unary/LgsHashMap.h"
 #include "exprs/unary/LgsInstance.h"
@@ -33,7 +34,7 @@ size_t LgsExpr::getConstInt() {
         switch (var->ref.symbolType) {
         case VAR_DEC:
             return var->ref.varDec->expr->getConstInt();
-        case ENUM_FIELD:
+        case FIELD:
             return var->ref.field->expr->getConstInt();
         default:
             break;
@@ -50,7 +51,7 @@ std::string LgsExpr::getConstStr() {
         switch (var->ref.symbolType) {
         case VAR_DEC:
             return var->ref.varDec->expr->getConstStr();
-        case ENUM_FIELD:
+        case FIELD:
             return var->ref.field->expr->getConstStr();
         default:
             break;
@@ -121,6 +122,7 @@ LgsVariable* LgsExpr::asVariable() { return dynamic_cast<LgsVariable*>(this); }
 LgsPrefixExpr* LgsExpr::asPrefixExpr() { return dynamic_cast<LgsPrefixExpr*>(this); }
 LgsIterIndex* LgsExpr::asIterIndex() { return dynamic_cast<LgsIterIndex*>(this); }
 LgsTypeExpr* LgsExpr::asTypeExpr() { return dynamic_cast<LgsTypeExpr*>(this); }
+LgsCast* LgsExpr::asCast() { return dynamic_cast<LgsCast*>(this); }
 LgsInstance* LgsExpr::asInstance() { return dynamic_cast<LgsInstance*>(this); }
 LgsArrayExpr* LgsExpr::asArrayExpr() { return dynamic_cast<LgsArrayExpr*>(this); }
 LgsHashMap* LgsExpr::asHashMap() { return dynamic_cast<LgsHashMap*>(this); }

@@ -3,7 +3,6 @@
 #include "codegen/LgsLLVMGen.h"
 #include "exprs/LgsNull.h"
 
-
 std::string LgsVoid::pname() {
     return name;
 }

@@ -2,6 +2,7 @@
 
 enum LgsRTType {
     RTT_UNKNOWN,
+    RTT_VOID,
     RTT_STR,
     RTT_FLOAT,
     RTT_INT,

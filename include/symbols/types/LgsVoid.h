@@ -7,6 +7,7 @@ public:
 
     LgsVoid() {
         isPrimitive = true;
+        rtt = RTT_VOID;
     }
     std::string pname() override;
     llvm::Type* getIRType(LgsLLVMGen& cg) override;

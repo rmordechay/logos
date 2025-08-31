@@ -6,27 +6,6 @@
 #include "utils/LgsUtils.h"
 
 Type* LgsObject::getIRType(LgsLLVMGen& cg) {
-    if (IRType) return IRType;
-    std::vector<Type*> elementTypes;
-    elementTypes.reserve(fields.size());
-    for (int i = 0; i < fields.size(); ++i) {
-        const auto field = fields[i];
-        field->position = i;
-        Type* fieldType;
-        if (field->type->asObject() || field->type->asFuncType()) {
-            fieldType = cg.ptrTy();
-        } else {
-            fieldType = field->type->getIRType(cg);
-        }
-        elementTypes.push_back(fieldType);
-    }
-    IRType = StructType::getTypeByName(cg.context, name);
-    if (!IRType) {
-        IRType = StructType::create(cg.context, elementTypes, name);
-    }
-    for (const auto& field : fields) {
-        field->parentIRType = IRType;
-    }
     return IRType;
 }
 

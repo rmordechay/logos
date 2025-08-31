@@ -146,6 +146,8 @@ Value* LgsVariable::loadIR(LgsLLVMGen& cg) {
         return ref.param->loadIR(cg);
     case VAR_DEC:
         return ref.varDec->loadIR(cg);
+    case FIELD:
+        return ref.field->loadIR(cg);
     default:
         assert(0);
     }
@@ -157,7 +159,7 @@ Value* LgsVariable::hash(LgsLLVMGen& cg) {
         return cg.callHashStr(ref.param->IRValue);
     case VAR_DEC:
         return ref.varDec->expr->hash(cg);
-    case ENUM_FIELD:
+    case FIELD:
         return cg.i32(hashStr(ref.field->name.c_str()));
     default:
         assert(0);

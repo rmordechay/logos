@@ -109,7 +109,8 @@ void LgsCodeGen::visitObject(LgsObject* obj) const {
         const auto field = obj->fields[i];
         field->position = i;
         Type* fieldType;
-        if (field->type->asObject() || field->type->asFuncType()) {
+        const auto ptr = field->type->asObject() || field->type->asFuncType() || field->type->asInterface() || field->type->asDArray();
+        if (ptr) {
             fieldType = cg.ptrTy();
         } else {
             fieldType = field->type->getIRType(cg);
@@ -540,12 +541,12 @@ void LgsCodeGen::visitExpr(LgsExpr* expr) {
     if (const auto iter = expr->type->asIterable()) {
         visitExpr(iter->sizeExpr);
     }
-    if (const auto castExpr = dynamic_cast<LgsCast*>(expr)) {
-        visitCast(castExpr);
-    } else if (const auto unaryExpr = dynamic_cast<LgsUnaryExpr*>(expr)) {
+    if (const auto unaryExpr = dynamic_cast<LgsUnaryExpr*>(expr)) {
         visitUnaryExpr(unaryExpr);
     } else if (const auto binaryExpr = dynamic_cast<LgsBinaryExpr*>(expr)) {
         visitBinaryExpr(binaryExpr);
+    } else {
+        assert(0);
     }
     if (expr->type->isHeapAlloc && !expr->asVariable()) {
         stack.currentFunc()->heapAllocExprs.push_back(expr);
@@ -569,6 +570,7 @@ void LgsCodeGen::visitUnaryExpr(LgsUnaryExpr* unaryExpr) {
     if (const auto floatConst = unaryExpr->asFloatConst()) return visitFloatConst(floatConst);
     if (const auto loopMetaVar = unaryExpr->asLoopMetaVar()) return visitLoopMetaVar(loopMetaVar);
     if (const auto typeExpr = unaryExpr->asTypeExpr()) return visitTypeExpr(typeExpr);
+    if (const auto cast = unaryExpr->asCast()) return visitCast(cast);
     assert(0);
 }
 
@@ -692,7 +694,7 @@ void LgsCodeGen::visitVariable(LgsVariable* variable) {
         variable->IRValue = getIRValue(variable->ref.object->singleton);
         break;
     case ENUM:
-    case ENUM_FIELD:
+    case FIELD:
         variable->IRValue = cg.getIRStr(variable->name);
         break;
     case INTERFACE:
@@ -718,8 +720,12 @@ void LgsCodeGen::visitSelection(LgsSelection* selection) {
             field->parentIRValue = getIRValue(parentExpr);
             visitField(field);
             childExpr->setIRValue(field->IRValue);
-        } else {
+        } else if (childExpr->asFuncCall()) {
             getIRValue(childExpr);
+        } else if (const auto iterIndex = childExpr->asIterIndex()) {
+            assert(0);
+        } else {
+            assert(0);
         }
     }
     assert(selection->lastExpr()->IRValue);
@@ -727,8 +733,9 @@ void LgsCodeGen::visitSelection(LgsSelection* selection) {
 }
 
 void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
-    for (const auto arg : funcCall->args) {
-        visitExpr(arg);
+    const bool isMethod = funcCall->func->funcType->isMethod;
+    for (int i = isMethod; i < funcCall->args.size(); ++i) {
+        visitExpr(funcCall->args[i]);
     }
     const auto ft = funcCall->func->funcType;
     if (ft->hasDefaults) {
@@ -794,6 +801,7 @@ void LgsCodeGen::visitTypeExpr(LgsTypeExpr* typeExpr) {
 }
 
 void LgsCodeGen::visitInstance(LgsInstance* instance) {
+    visitObject(instance->obj);
     const auto objIRType = instance->obj->getIRType(cg);
     if(instance->obj->singleton) {
         instance->IRValue = cg.createGlobal(objIRType, ConstantAggregateZero::get(objIRType), instance->obj->name);
@@ -826,6 +834,10 @@ void LgsCodeGen::initFields(LgsInstance* instance) {
     }
     for (const auto& field : instance->obj->fields) {
         if (visited.count(field->name)) continue;
+        field->parentIRValue = getIRValue(instance);
+        const auto zeroValue = field->type->getZeroValue();
+        const auto zeroIRValue = getIRValue(zeroValue);
+        cg.builder.CreateStore(zeroIRValue, getIRValue(field));
     }
 }
 
@@ -857,7 +869,7 @@ void LgsCodeGen::createEpilogue(LgsFunc* func) {
     }
 
     if (func->returnStmts.empty()) {
-        freeHeap(func);
+        // freeHeap(func);
         cg.callPopStack();
         return;
     }

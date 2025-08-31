@@ -16,7 +16,7 @@ LgsSymbol::LgsSymbol(LgsParam* param)
     : name(&param->name), symbolType(PARAM), param(param), location(&param->location) {}
 
 LgsSymbol::LgsSymbol(LgsField* field)
-    : name(&field->name), symbolType(ENUM_FIELD), field(field), location(&field->location) {}
+    : name(&field->name), symbolType(FIELD), field(field), location(&field->location) {}
 
 LgsSymbol::LgsSymbol(LgsGroup* group)
     : name(&group->name), symbolType(GROUP), group(group), location(&group->location) {}

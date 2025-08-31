@@ -79,7 +79,7 @@ LgsType* LgsTypeResolver::resolveType(LgsType* type, LgsFile* file) {
             break;
         case VAR_DEC:
         case PARAM:
-        case ENUM_FIELD:
+        case FIELD:
         case UNKNOWN:
             break;
         }

@@ -6,7 +6,7 @@
 #include "types/iterables/LgsVec.h"
 
 Value* LgsSelection::loadIR(LgsLLVMGen& cg) {
-    return IRValue;
+    return lastExpr()->loadIR(cg);
 }
 
 LgsExpr* LgsSelection::lastExpr() const {

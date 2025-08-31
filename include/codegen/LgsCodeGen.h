@@ -130,7 +130,6 @@ public:
     Value* iterNext(LgsIterator* iterator);
     Value* iterHasNext(LgsIterator* iterator);
 
-    // Generic
     Value* getIRValue(LgsValue* value);
     bool allArgsAreConst(const std::vector<LgsExpr*>& args);
 };

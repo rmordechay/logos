@@ -3,6 +3,8 @@
 #include <cstring>
 #include <vector>
 
+#define MAX_ELEMENT_SIZE 1024*100
+
 struct Lgs_Array {
     size_t elementSize;
     std::vector<char>* data;
@@ -14,6 +16,7 @@ extern "C" void Lgs_DArray_init(Lgs_Array* arr, const size_t elementSize) {
 }
 
 extern "C" void Lgs_DArray_add(const Lgs_Array* arr, const void* value) {
+    assert(arr->elementSize <= MAX_ELEMENT_SIZE);
     const auto oldSize = arr->data->size();
     arr->data->resize(oldSize + arr->elementSize);
     std::memcpy(arr->data->data() + oldSize, value, arr->elementSize);

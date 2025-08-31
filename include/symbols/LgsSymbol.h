@@ -14,7 +14,7 @@ struct LgsLocation;
 enum LgsSymbolType {
     VAR_DEC,
     PARAM,
-    ENUM_FIELD,
+    FIELD,
     FUNC,
     OBJECT,
     INTERFACE,

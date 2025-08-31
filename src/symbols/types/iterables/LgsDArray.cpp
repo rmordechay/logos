@@ -39,7 +39,7 @@ std::string LgsDArray::strFormatPart() const {
 
 StructType* LgsDArray::getArrStruct(LgsLLVMGen& cg) {
     if (arrStruct) return arrStruct;
-    arrStruct = cg.getStructType({cg.i64Ty(), cg.i64Ty(), cg.i64Ty(), cg.ptrTy()}, name);
+    arrStruct = cg.getStructType({cg.i64Ty(), cg.ptrTy()}, name);
     return arrStruct;
 }
 
@@ -60,6 +60,7 @@ Value* LgsDArray::IRIsNotEmpty(LgsLLVMGen* cg, LgsExpr* iterable) {
 }
 
 bool LgsDArray::canCastTo(LgsType* other) {
+    if (other->getName() == LgsAny::name) return true;
     const auto otherArr = other->asDArray();
     if (!otherArr) return false;
     if (!baseType) return true;

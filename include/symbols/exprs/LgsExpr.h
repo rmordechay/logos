@@ -3,6 +3,7 @@
 #include "LgsValue.h"
 #include "stmts/LgsAssignment.h"
 
+class LgsCast;
 class LgsTypeExpr;
 class LgsLoopMetaVar;
 class LgsIntConst;
@@ -35,11 +36,12 @@ public:
     bool isAssignable = false;
 
     explicit LgsExpr(LgsType* type) : type(type) {}
+    virtual std::string pname() = 0; // pretty name
     virtual LgsExpr* clone();
     virtual LgsExpr* castTo(LgsType* toType);
     virtual void completeType(LgsType* toType);
+
     virtual Value* hash(LgsLLVMGen& cg);
-    virtual std::string pname() = 0; // pretty name
     virtual void assign(LgsLLVMGen& cg, LgsExpr* expr);
     virtual Value* addIR(LgsLLVMGen& cg, LgsExpr* other);
     virtual Value* subIR(LgsLLVMGen& cg, LgsExpr* other);
@@ -73,6 +75,7 @@ public:
     LgsPrefixExpr* asPrefixExpr();
     LgsIterIndex* asIterIndex();
     LgsTypeExpr* asTypeExpr();
+    LgsCast* asCast();
     LgsInstance* asInstance();
     LgsArrayExpr* asArrayExpr();
     LgsHashMap* asHashMap();

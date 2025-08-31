@@ -1,7 +1,6 @@
 #include "LgsValue.h"
 
 #include "codegen/LgsLLVMGen.h"
-#include "funcs/LgsFunc.h"
 
 Value* LgsValue::loadIR(LgsLLVMGen& cg) {
     assert(IRValue);

@@ -4,6 +4,9 @@
 #include "exprs/unary/LgsHashMap.h"
 
 Value* LgsField::loadIR(LgsLLVMGen& cg) {
+    if (type->asDArray()) {
+        return cg.builder.CreateLoad(IRValue->getType(), IRValue);
+    }
     return IRValue;
 }
 
