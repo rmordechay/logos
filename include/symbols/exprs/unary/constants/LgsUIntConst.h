@@ -1,12 +1,12 @@
 #pragma once
-#include "exprs/unary/LgsUnaryExpr.h"
+#include "exprs/LgsExpr.h"
 #include "types/primitives/LgsUInt.h"
 
-class LgsUIntConst final : public LgsUnaryExpr {
+class LgsUIntConst final : public LgsExpr {
 public:
     int64_t value;
 
-    explicit LgsUIntConst(const int value) : LgsUnaryExpr(&LGS_UINT), value(value) {}
+    explicit LgsUIntConst(const int value) : LgsExpr(&LGS_UINT), value(value) {}
     std::string pname() override;
     json::value asJSON() override;
     Value* eqIR(LgsLLVMGen& cg, LgsExpr* other) override;

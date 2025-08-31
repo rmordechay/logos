@@ -444,14 +444,14 @@ void LgsSema::visitExpr(LgsExpr* expr) {
     }
     if (const auto castExpr = dynamic_cast<LgsCast*>(expr)) {
         visitCast(castExpr);
-    } else if (const auto unaryExpr = dynamic_cast<LgsUnaryExpr*>(expr)) {
+    } else if (const auto unaryExpr = dynamic_cast<LgsExpr*>(expr)) {
         visitUnaryExpr(unaryExpr);
     } else if (const auto binaryExpr = dynamic_cast<LgsBinaryExpr*>(expr)) {
         visitBinaryExpr(binaryExpr);
     }
 }
 
-void LgsSema::visitUnaryExpr(LgsUnaryExpr* unaryExpr) {
+void LgsSema::visitUnaryExpr(LgsExpr* unaryExpr) {
     if (const auto func = unaryExpr->asFunc()) visitFunc(func);
     else if (const auto instance = unaryExpr->asInstance()) visitInstance(instance);
     else if (const auto funcCall = unaryExpr->asFuncCall()) visitFuncCall(funcCall);
@@ -508,7 +508,7 @@ void LgsSema::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
 
 void LgsSema::visitCast(LgsCast* lgsCast) {
     const auto fromValue = lgsCast->fromValue;
-    if (const auto unaryExpr = dynamic_cast<LgsUnaryExpr*>(fromValue)) {
+    if (const auto unaryExpr = dynamic_cast<LgsExpr*>(fromValue)) {
         visitUnaryExpr(unaryExpr);
     } else if (const auto binaryExpr = dynamic_cast<LgsBinaryExpr*>(fromValue)) {
         visitBinaryExpr(binaryExpr);
@@ -954,7 +954,7 @@ void LgsSema::validateObjImplements(LgsObject* obj, const std::vector<LgsType*>&
     }
 }
 
-bool LgsSema::resolveForeachVars(const LgsForeachLoop* foreachLoop, LgsUnaryExpr* iterExpr, const LgsIterable* iterable) {
+bool LgsSema::resolveForeachVars(const LgsForeachLoop* foreachLoop, LgsExpr* iterExpr, const LgsIterable* iterable) {
     const auto varDecSize = foreachLoop->loopVars.size();
     const auto unpackCount = iterable->getUnpackCount();
     if (unpackCount != varDecSize) {

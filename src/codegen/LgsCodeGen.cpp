@@ -544,7 +544,7 @@ void LgsCodeGen::visitExpr(LgsExpr* expr) {
     if (const auto iter = expr->type->asIterable()) {
         visitExpr(iter->sizeExpr);
     }
-    if (const auto unaryExpr = dynamic_cast<LgsUnaryExpr*>(expr)) {
+    if (const auto unaryExpr = dynamic_cast<LgsExpr*>(expr)) {
         visitUnaryExpr(unaryExpr);
     } else if (const auto binaryExpr = dynamic_cast<LgsBinaryExpr*>(expr)) {
         visitBinaryExpr(binaryExpr);
@@ -554,7 +554,7 @@ void LgsCodeGen::visitExpr(LgsExpr* expr) {
     addHeapExpr(expr);
 }
 
-void LgsCodeGen::visitUnaryExpr(LgsUnaryExpr* unaryExpr) {
+void LgsCodeGen::visitUnaryExpr(LgsExpr* unaryExpr) {
     if (const auto func = unaryExpr->asFunc()) return visitLambda(func);
     if (const auto instance = unaryExpr->asInstance()) return visitInstance(instance);
     if (const auto funcCall = unaryExpr->asFuncCall()) return visitFuncCall(funcCall);

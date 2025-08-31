@@ -1,13 +1,11 @@
 #pragma once
-#include "exprs/unary/LgsUnaryExpr.h"
+#include "exprs/LgsExpr.h"
 
-class LgsUnaryExpr;
-
-class LgsSelection final : public LgsUnaryExpr {
+class LgsSelection final : public LgsExpr {
 public:
-    std::vector<LgsUnaryExpr*> exprs;
+    std::vector<LgsExpr*> exprs;
 
-    explicit LgsSelection(const std::vector<LgsUnaryExpr*>& exprs) : exprs(exprs) {}
+    explicit LgsSelection(const std::vector<LgsExpr*>& exprs) : exprs(exprs) {}
     Value* loadIR(LgsLLVMGen& cg) override;
     LgsExpr* lastExpr() const;
     LgsExpr* lastExprParent() const;

@@ -1,11 +1,12 @@
 #pragma once
-#include "exprs/unary/LgsUnaryExpr.h"
+#include "exprs/LgsExpr.h"
 
-class LgsIntConst final : public LgsUnaryExpr {
+
+class LgsIntConst final : public LgsExpr {
 public:
     uint64_t value;
 
-    LgsIntConst(LgsType* type, const size_t value) : LgsUnaryExpr(type), value(value) {}
+    LgsIntConst(LgsType* type, const size_t value) : LgsExpr(type), value(value) {}
     Value* loadIR(LgsLLVMGen& cg) override;
     LgsExpr* castTo(LgsType* toType) override;
     LgsExpr* clone() override;

@@ -23,7 +23,6 @@ class LgsDArray;
 class LgsGroup;
 class LgsValue;
 class LgsVariable;
-class LgsUnaryExpr;
 class LgsStrConst;
 class LgsHashMap;
 class LgsExpr;
@@ -88,7 +87,7 @@ public:
     void visitBreakStmt(const LgsBreak* breakStmt);
     void visitDeferStmt(const LgsDeferStmt* deferStmt);
     void visitExpr(LgsExpr* expr);
-    void visitUnaryExpr(LgsUnaryExpr* unaryExpr);
+    void visitUnaryExpr(LgsExpr* unaryExpr);
     void visitBinaryExpr(LgsBinaryExpr* binaryExpr);
     void visitCast(LgsCast* lgsCast);
     void visitArrayExpr(LgsArrayExpr* array);
@@ -127,7 +126,7 @@ public:
 
     void resolveFuncCall(LgsFuncCall* funcCall);
     bool resolveMethodCall(LgsFuncCall* methodCall, LgsType* parentType);
-    bool resolveForeachVars(const LgsForeachLoop* foreachLoop, LgsUnaryExpr* iterExpr, const LgsIterable* iterable);
+    bool resolveForeachVars(const LgsForeachLoop* foreachLoop, LgsExpr* iterExpr, const LgsIterable* iterable);
     bool validateVecElements(const LgsVariable* fieldVar, LgsVec* vec);
     void checkMock(const LgsSelection* selection);
     LgsSymbol* getSymbol(const std::string& name, const LgsLocation* location);

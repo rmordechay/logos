@@ -1,17 +1,18 @@
 #pragma once
-#include "LgsUnaryExpr.h"
+#include "exprs/LgsExpr.h"
+
 
 class LgsStr;
 class LgsMap;
 class LgsDArray;
 struct LgsIndex;
 
-class LgsIterIndex final : public LgsUnaryExpr {
+class LgsIterIndex final : public LgsExpr {
 public:
-    LgsUnaryExpr* baseExpr;
+    LgsExpr* baseExpr;
     LgsIndex* index = nullptr;
 
-    explicit LgsIterIndex(LgsUnaryExpr* baseExpr, LgsIndex* index = nullptr) : baseExpr(baseExpr), index(index) {}
+    explicit LgsIterIndex(LgsExpr* baseExpr, LgsIndex* index = nullptr) : baseExpr(baseExpr), index(index) {}
     Value* loadIR(LgsLLVMGen& cg) override;
     Value* loadFromDArray(LgsLLVMGen& cg, const LgsDArray* arr) const;
     Value* loadFromMap(LgsLLVMGen& cg, const LgsMap* map) const;

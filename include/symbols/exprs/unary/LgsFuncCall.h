@@ -1,11 +1,12 @@
 #pragma once
 #include "LgsSymbol.h"
-#include "LgsUnaryExpr.h"
+#include "exprs/LgsExpr.h"
+
 
 class LgsFuncType;
 struct LgsSymbol;
 
-class LgsFuncCall final : public LgsUnaryExpr {
+class LgsFuncCall final : public LgsExpr {
 public:
     std::string name;
     std::vector<LgsExpr*> args;

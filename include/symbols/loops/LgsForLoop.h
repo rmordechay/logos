@@ -1,19 +1,18 @@
 #pragma once
 #include "loops/LgsLoopMetaVar.h"
-
-class LgsWhileLoop;
-class LgsRangeLoop;
-class LgsInfiniteLoop;
-class LgsForeachLoop;
+#include "stmts/LgsStmt.h"
 
 namespace llvm {
     class BasicBlock;
     class AllocaInst;
 }
 
-class LgsVariable;
+using namespace llvm;
+class LgsWhileLoop;
+class LgsInfiniteLoop;
+class LgsRangeLoop;
+class LgsForeachLoop;
 class LgsStmtsBlock;
-class LgsExpr;
 
 class LgsForLoop : public LgsStmt {
 public:

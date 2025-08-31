@@ -1,6 +1,5 @@
 #pragma once
 #include "LgsMock.h"
-#include "exprs/unary/LgsUnaryExpr.h"
 #include "types/LgsFuncType.h"
 
 class LgsStmtsBlock;
@@ -11,7 +10,7 @@ class LgsType;
 
 using CallFn = std::function<Value*(LgsLLVMGen&, const std::vector<LgsExpr*>&)>;
 
-class LgsFunc : public LgsUnaryExpr {
+class LgsFunc : public LgsExpr {
 public:
     LgsFuncType* funcType;
     std::vector<LgsReturn*> returnStmts;

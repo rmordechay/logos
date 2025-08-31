@@ -754,11 +754,11 @@ LgsExpr* LgsParserAdapter::getCast(LogosParser::ExprContext* ctx) {
     return new LgsCast(castToType, castFromValue);
 }
 
-LgsUnaryExpr* LgsParserAdapter::getJSON(LogosParser::JsonContext* ctx) {
+LgsExpr* LgsParserAdapter::getJSON(LogosParser::JsonContext* ctx) {
     assert(0);
 }
 
-LgsUnaryExpr* LgsParserAdapter::getUnaryExpr(LogosParser::UnaryExprContext* ctx) {
+LgsExpr* LgsParserAdapter::getUnaryExpr(LogosParser::UnaryExprContext* ctx) {
     if (const auto variable = ctx->IDENTIFIER()) return getVariable(variable);
     if (const auto funcCall = ctx->funcCall()) return getFuncCall(funcCall);
     if (const auto prefixExpr = ctx->prefixExpr()) return getPrefixExpr(prefixExpr);
@@ -809,7 +809,7 @@ LgsExpr* LgsParserAdapter::getBinaryExpr(LogosParser::ExprContext* ctx) {
     return logosBinaryExpr;
 }
 
-LgsUnaryExpr* LgsParserAdapter::getPrefixExpr(LogosParser::PrefixExprContext* ctx) {
+LgsExpr* LgsParserAdapter::getPrefixExpr(LogosParser::PrefixExprContext* ctx) {
     LgsPrefixOperator op;
     if (ctx->NOT()) {
         op = NOT_PREFIX;
@@ -835,7 +835,7 @@ LgsPostfixExpr* LgsParserAdapter::getPostfixExpr(LogosParser::PostfixExprContext
     } else {
         assert(0);
     }
-    LgsUnaryExpr* expr = nullptr;
+    LgsExpr* expr = nullptr;
     if (const auto var = ctx->IDENTIFIER()) {
         expr = getVariable(var);
     } else if (const auto selection = ctx->selection()) {
@@ -852,7 +852,7 @@ LgsPostfixExpr* LgsParserAdapter::getPostfixExpr(LogosParser::PostfixExprContext
     return postfixExpr;
 }
 
-LgsUnaryExpr* LgsParserAdapter::getArrayExpr(LogosParser::ArrayExprContext* ctx) {
+LgsExpr* LgsParserAdapter::getArrayExpr(LogosParser::ArrayExprContext* ctx) {
     LgsArrayExpr* array = nullptr;
     if (ctx->EXCLA_MARK()) {
         array = new LgsArrayExpr(new LgsSArray());
@@ -867,7 +867,7 @@ LgsUnaryExpr* LgsParserAdapter::getArrayExpr(LogosParser::ArrayExprContext* ctx)
     return array;
 }
 
-LgsUnaryExpr* LgsParserAdapter::getHashMap(LogosParser::HashMapContext* ctx) {
+LgsExpr* LgsParserAdapter::getHashMap(LogosParser::HashMapContext* ctx) {
     const auto hashMap = new LgsHashMap();
     for (const auto keyValue : ctx->keyValue()) {
         const auto kExpr = getExpr(keyValue->key);
@@ -906,7 +906,7 @@ LgsFuncCall* LgsParserAdapter::getFuncCall(LogosParser::FuncCallContext* ctx) {
     return funcCall;
 }
 
-LgsUnaryExpr* LgsParserAdapter::getVectorExpr(LogosParser::VectorContext* ctx) {
+LgsExpr* LgsParserAdapter::getVectorExpr(LogosParser::VectorContext* ctx) {
     uint8_t dim = 0;
     if (ctx->VEC2()) dim = 2;
     else if (ctx->VEC3()) dim = 3;
@@ -928,7 +928,7 @@ LgsSelection* LgsParserAdapter::getSelection(LogosParser::SelectionContext* ctx)
     return selection;
 }
 
-LgsUnaryExpr* LgsParserAdapter::getFirstSelection(LogosParser::SelectionContext* ctx) {
+LgsExpr* LgsParserAdapter::getFirstSelection(LogosParser::SelectionContext* ctx) {
     const auto firstExpr = ctx->firstSelectionElement();
     if (const auto variable = firstExpr->IDENTIFIER()) {
         if (isupper(variable->getText()[0])) return new LgsTypeExpr(getTypeFromText(variable));
@@ -952,7 +952,7 @@ LgsUnaryExpr* LgsParserAdapter::getFirstSelection(LogosParser::SelectionContext*
     assert(0);
 }
 
-std::vector<LgsUnaryExpr*> LgsParserAdapter::getSelectionExprs(LogosParser::SelectionContext* ctx) {
+std::vector<LgsExpr*> LgsParserAdapter::getSelectionExprs(LogosParser::SelectionContext* ctx) {
     std::vector exprs = {getFirstSelection(ctx)};
     const auto innerSelections = ctx->innerSelectionElement();
     for (int i = 0; i < innerSelections.size(); ++i) {
@@ -990,7 +990,7 @@ LgsInstance* LgsParserAdapter::getInstance(LogosParser::InstanceContext* ctx) {
 }
 
 LgsIterIndex* LgsParserAdapter::getIterIndex(LogosParser::IterIndexContext* ctx) {
-    LgsUnaryExpr* baseExpr;
+    LgsExpr* baseExpr;
     if (const auto variable = ctx->IDENTIFIER()) {
         baseExpr = getVariable(variable);
     } else if (const auto funcCall = ctx->funcCall()) {
@@ -1013,8 +1013,8 @@ LgsIterIndex* LgsParserAdapter::getIterIndex(LogosParser::IterIndexContext* ctx)
     return baseExpr->asIterIndex();
 }
 
-LgsUnaryExpr* LgsParserAdapter::getConstant(LogosParser::ConstantContext* ctx) {
-    LgsUnaryExpr* constant = nullptr;
+LgsExpr* LgsParserAdapter::getConstant(LogosParser::ConstantContext* ctx) {
+    LgsExpr* constant = nullptr;
     if (const auto intToken = ctx->INTEGER()) {
         const auto input = removeUnderscores(intToken->getText());
         char* end;
@@ -1056,13 +1056,13 @@ LgsStrConst* LgsParserAdapter::getStrConst(antlr4::tree::TerminalNode* ctx) {
     return strConst;
 }
 
-LgsUnaryExpr* LgsParserAdapter::getNullValue(const antlr4::tree::TerminalNode* ctx) const {
+LgsExpr* LgsParserAdapter::getNullValue(const antlr4::tree::TerminalNode* ctx) const {
     const auto lgsNull = new LgsNull();
     setLocation(lgsNull->location, ctx->getSymbol(), nullptr);
     return lgsNull;
 }
 
-LgsUnaryExpr* LgsParserAdapter::getLoopMetaVar(LogosParser::ForVariableContext* ctx) const {
+LgsExpr* LgsParserAdapter::getLoopMetaVar(LogosParser::ForVariableContext* ctx) const {
     LgsLoopMetaVar* var;
     if (ctx->FOR_I()) {
         var = new LgsLoopMetaVar(FOR_I);

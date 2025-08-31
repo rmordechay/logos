@@ -1,12 +1,12 @@
 #pragma once
-#include "LgsUnaryExpr.h"
+
 #include "../../types/iterables/LgsMap.h"
 
-class LgsHashMap final : public LgsUnaryExpr {
+class LgsHashMap final : public LgsExpr {
 public:
     std::vector<LgsMapEntry*> initialElements;
 
-    explicit LgsHashMap(LgsMap* mapType) : LgsUnaryExpr(mapType) {
+    explicit LgsHashMap(LgsMap* mapType) : LgsExpr(mapType) {
         mapType->isHeapAlloc = true;
     }
     explicit LgsHashMap(LgsType* keyType = nullptr, LgsType* valueType = nullptr) : LgsHashMap(new LgsMap(keyType, valueType)) {}

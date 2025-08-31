@@ -2,6 +2,7 @@
 #include "exprs/unary/constants/LgsFloatConst.h"
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsDouble.h"
+#include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsLong.h"
 
 Value* LgsIntConst::loadIR(LgsLLVMGen& cg) {

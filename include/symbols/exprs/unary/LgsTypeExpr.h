@@ -1,9 +1,10 @@
 #pragma once
-#include "LgsUnaryExpr.h"
+#include "exprs/LgsExpr.h"
 
-class LgsTypeExpr final : public LgsUnaryExpr {
+
+class LgsTypeExpr final : public LgsExpr {
 public:
-    explicit LgsTypeExpr(LgsType* type): LgsUnaryExpr(type) {}
+    explicit LgsTypeExpr(LgsType* type): LgsExpr(type) {}
     json::value asJSON() override;
     std::string pname() override;
 };

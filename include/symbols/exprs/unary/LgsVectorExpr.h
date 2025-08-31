@@ -1,8 +1,8 @@
 #pragma once
-#include "exprs/unary/LgsUnaryExpr.h"
+
 #include "../../types/iterables/LgsVec.h"
 
-class LgsVectorExpr final : public LgsUnaryExpr {
+class LgsVectorExpr final : public LgsExpr {
 public:
     std::vector<LgsExpr*> args;
     LgsVec* vecType;

@@ -1,11 +1,11 @@
 #pragma once
-#include "exprs/unary/LgsUnaryExpr.h"
+#include "exprs/LgsExpr.h"
 #include "types/primitives/LgsChar.h"
 
-class LgsCharConst final : public LgsUnaryExpr {
+class LgsCharConst final : public LgsExpr {
 public:
     char value;
-    explicit LgsCharConst(const char value) : LgsUnaryExpr(&LGS_CHAR), value(value) {}
+    explicit LgsCharConst(const char value) : LgsExpr(&LGS_CHAR), value(value) {}
     Value* loadIR(LgsLLVMGen& cg) override;
     std::string pname() override;
     json::value asJSON() override;

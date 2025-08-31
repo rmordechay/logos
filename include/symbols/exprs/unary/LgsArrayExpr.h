@@ -1,15 +1,15 @@
 #pragma once
-#include "LgsUnaryExpr.h"
+
 #include "exprs/LgsExpr.h"
 #include "types/iterables/LgsDArray.h"
 #include "types/iterables/LgsSArray.h"
 
-class LgsArrayExpr final : public LgsUnaryExpr {
+class LgsArrayExpr final : public LgsExpr {
 public:
     std::vector<LgsExpr*> initialElements;
 
-    explicit LgsArrayExpr(LgsSArray* arrType) : LgsUnaryExpr(arrType) {}
-    explicit LgsArrayExpr(LgsDArray* arrType) : LgsUnaryExpr(arrType) {
+    explicit LgsArrayExpr(LgsSArray* arrType) : LgsExpr(arrType) {}
+    explicit LgsArrayExpr(LgsDArray* arrType) : LgsExpr(arrType) {
         type->isHeapAlloc = true;
     }
     std::string pname() override;

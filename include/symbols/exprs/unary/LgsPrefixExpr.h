@@ -1,5 +1,6 @@
 #pragma once
-#include "LgsUnaryExpr.h"
+#include "exprs/LgsExpr.h"
+
 
 enum LgsPrefixOperator {
     NOT_PREFIX,
@@ -7,7 +8,7 @@ enum LgsPrefixOperator {
     SQRT_PREFIX,
 };
 
-class LgsPrefixExpr final : public LgsUnaryExpr {
+class LgsPrefixExpr final : public LgsExpr {
 public:
     LgsExpr* expr;
     LgsPrefixOperator op;

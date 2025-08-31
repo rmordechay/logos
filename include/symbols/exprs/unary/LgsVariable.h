@@ -1,16 +1,17 @@
 #pragma once
 #include "LgsAssignable.h"
 #include "LgsSymbol.h"
-#include "LgsUnaryExpr.h"
+#include "exprs/LgsExpr.h"
+
 
 struct LgsSymbol;
 
-class LgsVariable final :  public LgsUnaryExpr {
+class LgsVariable final : public LgsExpr {
 public:
     std::string name;
     LgsSymbol ref;
 
-    explicit LgsVariable(const std::string& name, LgsType* type = nullptr) : LgsUnaryExpr(type), name(name) {}
+    explicit LgsVariable(const std::string& name, LgsType* type = nullptr) : LgsExpr(type), name(name) {}
     Value* loadIR(LgsLLVMGen& cg) override;
     Value* hash(LgsLLVMGen& cg) override;
     LgsExpr* castTo(LgsType* toType) override;

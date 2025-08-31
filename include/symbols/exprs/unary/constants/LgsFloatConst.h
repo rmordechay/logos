@@ -1,12 +1,11 @@
 #pragma once
-#include "exprs/unary/LgsUnaryExpr.h"
-#include "types/primitives/LgsFloat.h"
+#include "exprs/LgsExpr.h"
 
-class LgsFloatConst final : public LgsUnaryExpr {
+class LgsFloatConst final : public LgsExpr {
 public:
     double_t value;
 
-    explicit LgsFloatConst(LgsType* type, const double_t value) : LgsUnaryExpr(type), value(value) {}
+    explicit LgsFloatConst(LgsType* type, const double_t value) : LgsExpr(type), value(value) {}
     json::value asJSON() override;
     std::string pname() override;
     ~LgsFloatConst() override = default;

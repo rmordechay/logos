@@ -1,9 +1,9 @@
 #pragma once
-#include "exprs/unary/LgsUnaryExpr.h"
+#include "exprs/LgsExpr.h"
 
-class LgsNull final : public LgsUnaryExpr {
+class LgsNull final : public LgsExpr {
 public:
-    explicit LgsNull() : LgsUnaryExpr(nullptr) {
+    explicit LgsNull() : LgsExpr(nullptr) {
         isNull = true;
     }
 

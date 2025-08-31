@@ -1,8 +1,8 @@
 #pragma once
-#include "exprs/unary/LgsUnaryExpr.h"
+
 #include "funcs/LgsFunc.h"
 
-class LgsIterator final : public LgsUnaryExpr {
+class LgsIterator final : public LgsExpr {
 public:
     static constexpr auto name = "Iterator";
     LgsExpr* baseExpr;

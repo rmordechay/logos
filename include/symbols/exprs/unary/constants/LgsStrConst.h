@@ -3,7 +3,7 @@
 #include "types/iterables/LgsStr.h"
 #include "types/primitives/LgsInt.h"
 
-class LgsStrConst final : public LgsUnaryExpr {
+class LgsStrConst final : public LgsExpr {
 public:
     std::string value;
     std::string formatedStr = "";
