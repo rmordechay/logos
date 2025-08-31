@@ -66,7 +66,8 @@ bool LgsType::canAssignTo(LgsType* other, LgsAssignType op) {
 }
 
 LgsType* LgsType::clone() {
-    if (isPrimitive) return this; assert(0);
+    if (isPrimitive) return this;
+    assert(0);
 }
 
 LgsBool* LgsType::asBool() { return dynamic_cast<LgsBool*>(this); }

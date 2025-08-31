@@ -152,7 +152,7 @@ json::value LgsObject::asJSON() {
     json::object jsonObj;
     jsonObj["name"] = getName();
     json::array jsonFields;
-    for (auto& field : fields) {
+    for (const auto& field : fields) {
         jsonFields.emplace_back(field->asJSON());
     }
     jsonObj["fields"] = jsonFields;

@@ -5,6 +5,10 @@
 #include "stmts/LgsVarDec.h"
 #include "types/LgsObject.h"
 
+Value* LgsInstance::loadIR(LgsLLVMGen& cg) {
+    return IRValue;
+}
+
 void LgsInstance::setObject(LgsObject* newObj) {
     obj = newObj;
     setType(obj);

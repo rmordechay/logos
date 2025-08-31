@@ -5,7 +5,7 @@
 #include <llvm/IR/DIBuilder.h>
 
 Value* LgsVarDec::loadIR(LgsLLVMGen& cg) {
-    return cg.builder.CreateLoad(type->getIRType(cg), IRValue);;
+    return expr->loadIR(cg);
 }
 
 bool LgsVarDec::shouldAllocate(const Type* IRType) const {

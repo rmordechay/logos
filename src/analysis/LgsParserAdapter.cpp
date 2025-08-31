@@ -650,14 +650,8 @@ LgsStmt* LgsParserAdapter::getIOStmt(LogosParser::IoStatementContext* ioStmt) {
     const auto stmtsBlock = getStmtBlock(ioStmt->statementsBlock());
     const auto lgsIOStmt = new LgsIOStmt(stmtsBlock);
     setLocation(lgsIOStmt->location, ioStmt->start);
-    lgsIOStmt->varDec = getVarDec(ioStmt->IDENTIFIER(), true);
-    if (ioStmt->funcCall()) {
-        lgsIOStmt->varDec->expr = getFuncCall(ioStmt->funcCall());
-    } else if (ioStmt->selection()) {
-        lgsIOStmt->varDec->expr = getSelection(ioStmt->selection());
-    } else {
-        assert(0);
-    }
+    lgsIOStmt->varDec = getVarDec(ioStmt->implicitVarDec()->IDENTIFIER(), true);
+    lgsIOStmt->varDec->expr = getExpr(ioStmt->implicitVarDec()->expr());
     return lgsIOStmt;
 }
 

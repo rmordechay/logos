@@ -1,4 +1,6 @@
 #include "exprs/unary/LgsFuncCall.h"
+
+#include "configs/LgsDefinitions.h"
 #include "exprs/unary/LgsHashMap.h"
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
@@ -49,7 +51,7 @@ std::string LgsFuncCall::pname() {
     std::stringstream strStream;
     strStream << name << '(';
     for (size_t i = isMethodCall; i < args.size(); ++i) {
-        strStream << args[i]->type->pname();
+        strStream << (args[i]->type ? args[i]->type->pname() : LGS_UNKNOWN_TYPE);
         if (i != args.size() - 1) strStream << ", ";
     }
     if (type && !type->isUnknown()) {

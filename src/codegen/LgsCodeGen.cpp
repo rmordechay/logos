@@ -814,13 +814,18 @@ void LgsCodeGen::visitIterIndex(LgsIterIndex* iterIndex) {
 }
 
 void LgsCodeGen::initFields(LgsInstance* instance) {
+    std::unordered_set<std::string> visited;
     for (const auto& [argName, arg] : instance->args) {
+        visited.insert(argName);
         const auto exprIR = getIRValue(arg->expr);
         const auto field = instance->obj->getField(argName);
-        if (!field) continue;
+        assert(field);
         field->parentIRValue = getIRValue(instance);
         const auto gep = getIRValue(field);
         cg.builder.CreateStore(exprIR, gep);
+    }
+    for (const auto& field : instance->obj->fields) {
+        if (visited.count(field->name)) continue;
     }
 }
 

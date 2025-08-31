@@ -17,7 +17,7 @@ mainFile:
     ;
 
 objectFile:
-        (OBJECT | SINGLETON) IDENTIFIER objectBody EOF
+        (SINGLETON | OBJECT) IDENTIFIER objectBody EOF
     ;
 
 interfaceFile:
@@ -37,7 +37,7 @@ interfaceBody:
     ;
 
 object:
-        (OBJECT | SINGLETON) IDENTIFIER LBRACE objectBody RBRACE
+        (SINGLETON | OBJECT) IDENTIFIER LBRACE objectBody RBRACE
     ;
 
 objectBody:
@@ -45,7 +45,7 @@ objectBody:
     ;
 
 field:
-        VISIBILITY? CONST? IDENTIFIER COLON type (EQUAL expr)?
+        OWNER? VISIBILITY? CONST? IDENTIFIER COLON type (EQUAL expr)?
     ;
 
 interfaceField:
@@ -105,7 +105,7 @@ method:
     ;
 
 param:
-        IDENTIFIER COLON type TRIPLE_DOT? (EQUAL expr)?
+        OWNER? IDENTIFIER COLON type TRIPLE_DOT? (EQUAL expr)?
     ;
 
 statement:
@@ -134,11 +134,11 @@ assignment:
     ;
 
 explicitVarDec:
-        CONST? IDENTIFIER COLON type (EQUAL expr)?
+        OWNER? CONST? IDENTIFIER COLON type (EQUAL expr)?
     ;
 
 implicitVarDec:
-        CONST? IDENTIFIER EQUAL expr QUEST_MARK?
+        OWNER? CONST? IDENTIFIER EQUAL expr QUEST_MARK?
     ;
 
 ifStatement:
@@ -454,7 +454,7 @@ DOUBLE_LANGLE: '>>';
 SLIDER: '_/';
 
 OBJECT: 'object';
-SINGLETON: 'single';
+SINGLETON: 'object.single';
 SELF_INSTANCE: 'self';
 SELF_CLASS: 'Self';
 INTERFACE: 'interface';
@@ -466,9 +466,7 @@ ENUM: 'enum';
 GO: 'go';
 DEFER: 'defer';
 IO: 'io';
-FOR_IS_FIRST: 'for.isFirst';
-FOR_IS_LAST: 'for.isLast';
-FOR_I: 'for.i';
+OWNER: 'owner';
 
 VEC2: 'vec2';
 VEC3: 'vec3';
@@ -477,10 +475,13 @@ VEC4: 'vec4';
 IF: 'if';
 WHILE: 'while';
 ELSE: 'else';
-FOR: 'for';
 BREAK: 'break';
 CONTINUE: 'continue';
 RETURN: 'return';
+FOR: 'for';
+FOR_IS_FIRST: 'for.isFirst';
+FOR_IS_LAST: 'for.isLast';
+FOR_I: 'for.i';
 
 AND: 'and';
 OR: 'or';

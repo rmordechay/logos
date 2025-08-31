@@ -24,12 +24,12 @@ public:
     PIPE = 49, CARET = 50, DOUBLE_RANGLE = 51, DOUBLE_LANGLE = 52, SLIDER = 53, 
     OBJECT = 54, SINGLETON = 55, SELF_INSTANCE = 56, SELF_CLASS = 57, INTERFACE = 58, 
     EXTERN = 59, VISIBILITY = 60, IMPLEMENTS = 61, CONST = 62, ENUM = 63, 
-    GO = 64, DEFER = 65, IO = 66, FOR_IS_FIRST = 67, FOR_IS_LAST = 68, FOR_I = 69, 
-    VEC2 = 70, VEC3 = 71, VEC4 = 72, IF = 73, WHILE = 74, ELSE = 75, FOR = 76, 
-    BREAK = 77, CONTINUE = 78, RETURN = 79, AND = 80, OR = 81, NOT = 82, 
-    IN = 83, LONG = 84, INTEGER = 85, FLOAT = 86, BOOL = 87, NULL_ = 88, 
-    IDENTIFIER = 89, STRING = 90, TAG = 91, LINE_COMMENT = 92, BLOCK_COMMENT = 93, 
-    WS = 94
+    GO = 64, DEFER = 65, IO = 66, OWNER = 67, VEC2 = 68, VEC3 = 69, VEC4 = 70, 
+    IF = 71, WHILE = 72, ELSE = 73, BREAK = 74, CONTINUE = 75, RETURN = 76, 
+    FOR = 77, FOR_IS_FIRST = 78, FOR_IS_LAST = 79, FOR_I = 80, AND = 81, 
+    OR = 82, NOT = 83, IN = 84, LONG = 85, INTEGER = 86, FLOAT = 87, BOOL = 88, 
+    NULL_ = 89, IDENTIFIER = 90, STRING = 91, TAG = 92, LINE_COMMENT = 93, 
+    BLOCK_COMMENT = 94, WS = 95
   };
 
   enum {
@@ -232,8 +232,8 @@ public:
     antlr4::tree::TerminalNode *IDENTIFIER();
     ObjectBodyContext *objectBody();
     antlr4::tree::TerminalNode *EOF();
-    antlr4::tree::TerminalNode *OBJECT();
     antlr4::tree::TerminalNode *SINGLETON();
+    antlr4::tree::TerminalNode *OBJECT();
 
    
   };
@@ -305,8 +305,8 @@ public:
     antlr4::tree::TerminalNode *LBRACE();
     ObjectBodyContext *objectBody();
     antlr4::tree::TerminalNode *RBRACE();
-    antlr4::tree::TerminalNode *OBJECT();
     antlr4::tree::TerminalNode *SINGLETON();
+    antlr4::tree::TerminalNode *OBJECT();
 
    
   };
@@ -337,6 +337,7 @@ public:
     antlr4::tree::TerminalNode *IDENTIFIER();
     antlr4::tree::TerminalNode *COLON();
     TypeContext *type();
+    antlr4::tree::TerminalNode *OWNER();
     antlr4::tree::TerminalNode *VISIBILITY();
     antlr4::tree::TerminalNode *CONST();
     antlr4::tree::TerminalNode *EQUAL();
@@ -567,6 +568,7 @@ public:
     antlr4::tree::TerminalNode *IDENTIFIER();
     antlr4::tree::TerminalNode *COLON();
     TypeContext *type();
+    antlr4::tree::TerminalNode *OWNER();
     antlr4::tree::TerminalNode *TRIPLE_DOT();
     antlr4::tree::TerminalNode *EQUAL();
     ExprContext *expr();
@@ -635,6 +637,7 @@ public:
     antlr4::tree::TerminalNode *IDENTIFIER();
     antlr4::tree::TerminalNode *COLON();
     TypeContext *type();
+    antlr4::tree::TerminalNode *OWNER();
     antlr4::tree::TerminalNode *CONST();
     antlr4::tree::TerminalNode *EQUAL();
     ExprContext *expr();
@@ -651,6 +654,7 @@ public:
     antlr4::tree::TerminalNode *IDENTIFIER();
     antlr4::tree::TerminalNode *EQUAL();
     ExprContext *expr();
+    antlr4::tree::TerminalNode *OWNER();
     antlr4::tree::TerminalNode *CONST();
     antlr4::tree::TerminalNode *QUEST_MARK();
 
@@ -802,11 +806,8 @@ public:
     IoStatementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *IO();
-    antlr4::tree::TerminalNode *IDENTIFIER();
-    antlr4::tree::TerminalNode *EQUAL();
     StatementsBlockContext *statementsBlock();
-    FuncCallContext *funcCall();
-    SelectionContext *selection();
+    ImplicitVarDecContext *implicitVarDec();
 
    
   };
