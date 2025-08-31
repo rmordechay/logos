@@ -25,6 +25,10 @@ void LgsArrayExpr::completeType(LgsType* toType) {
     }
 }
 
+Value* LgsArrayExpr::loadIR(LgsLLVMGen& cg) {
+    return IRValue;
+}
+
 LgsArrayExpr::~LgsArrayExpr() {
     for (const auto& initialElement : initialElements) {
         delete initialElement;

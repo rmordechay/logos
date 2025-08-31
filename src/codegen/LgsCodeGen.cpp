@@ -218,11 +218,13 @@ void LgsCodeGen::visitForeachLoop(LgsForeachLoop* loop) {
     cg.builder.CreateStore(cg.sizeZero(), loop->iPtr);
     cg.branchAndStartBlock(loop->IRCondBlock, currentIRFunc);
 
+    visitExpr(loop->iterExpr);
     const auto iterable = loop->iterExpr->type->asIterable();
     if (iterable->asMap()) assert(0);
 
     loop->iValue = loop->loadIndex(cg);
-    const auto loopEnd = loop->loopEnd(cg);
+    auto loopEnd = loop->loopEnd(cg);
+    loopEnd = cg.builder.CreateSExt(loopEnd, cg.sizeTy());
     const auto condition = cg.builder.CreateICmpSLT(loop->iValue, loopEnd);
     cg.builder.CreateCondBr(condition, loop->IRBodyBlock, loop->IRExitBlock);
 
@@ -230,8 +232,7 @@ void LgsCodeGen::visitForeachLoop(LgsForeachLoop* loop) {
     loop->iterPtr = getIRValue(loop->iterExpr);
     if (const auto str = iterable->asStr()) {
         const auto gep = cg.builder.CreateGEP(str->getIRBaseType(&cg), loop->iterPtr, {cg.i32Zero(), loop->iValue});
-        const auto load = cg.builder.CreateLoad(cg.i8Ty(), gep);
-        loop->loopVars[0]->setIRValue(load);
+        loop->loopVars[0]->setIRValue(gep);
     } else if (const auto dArr = iterable->asDArray()) {
         const auto element = dArr->getFunc->callIR(cg, {loop->iterPtr, loop->iValue});
         loop->loopVars[0]->setIRValue(element);

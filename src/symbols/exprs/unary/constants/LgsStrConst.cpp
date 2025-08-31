@@ -1,5 +1,9 @@
 #include "exprs/unary/constants/LgsStrConst.h"
 
+Value* LgsStrConst::loadIR(LgsLLVMGen& cg) {
+    return IRValue;
+}
+
 std::string LgsStrConst::pname() {
     return value.substr(0, 50) + "...";
 }

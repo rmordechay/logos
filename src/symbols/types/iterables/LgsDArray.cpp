@@ -48,7 +48,7 @@ void LgsDArray::freeValue(LgsLLVMGen& cg, Value* value) {
 }
 
 Value* LgsDArray::IRLength(LgsLLVMGen& cg, LgsExpr* iterable) {
-    return lenFunc->call(cg, {iterable});
+    return lenFunc->callIR(cg, {iterable->IRValue});
 }
 
 Value* LgsDArray::IRIsEmpty(LgsLLVMGen* cg, LgsExpr* iterable) {

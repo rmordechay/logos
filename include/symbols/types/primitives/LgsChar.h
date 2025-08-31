@@ -7,6 +7,7 @@ public:
 
     LgsChar() {
         isPrimitive = true;
+        rtt = RTT_CHAR;
     }
     std::string pname() override;
     json::value asJSON() override;

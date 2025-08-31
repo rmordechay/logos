@@ -1,6 +1,6 @@
 #pragma once
 #include "LgsIntConst.h"
-#include "../../../types/iterables/LgsStr.h"
+#include "types/iterables/LgsStr.h"
 #include "types/primitives/LgsInt.h"
 
 class LgsStrConst final : public LgsUnaryExpr {
@@ -15,6 +15,7 @@ public:
         type = lgsStr;
     }
 
+    Value* loadIR(LgsLLVMGen& cg) override;
     std::string pname() override;
     Value* hash(LgsLLVMGen& cg) override;
     json::value asJSON() override;

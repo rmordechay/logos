@@ -6,6 +6,7 @@ class LgsCharConst final : public LgsUnaryExpr {
 public:
     char value;
     explicit LgsCharConst(const char value) : LgsUnaryExpr(&LGS_CHAR), value(value) {}
+    Value* loadIR(LgsLLVMGen& cg) override;
     std::string pname() override;
     json::value asJSON() override;
 };

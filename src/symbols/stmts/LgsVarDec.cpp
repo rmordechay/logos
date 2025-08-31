@@ -5,7 +5,7 @@
 #include <llvm/IR/DIBuilder.h>
 
 Value* LgsVarDec::loadIR(LgsLLVMGen& cg) {
-    return expr->loadIR(cg);
+    return expr ? expr->loadIR(cg) : IRValue;
 }
 
 bool LgsVarDec::shouldAllocate(const Type* IRType) const {

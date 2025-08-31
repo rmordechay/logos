@@ -1,8 +1,8 @@
 #pragma once
 #include "LgsUnaryExpr.h"
 #include "exprs/LgsExpr.h"
-#include "../../types/iterables/LgsDArray.h"
-#include "../../types/iterables/LgsSArray.h"
+#include "types/iterables/LgsDArray.h"
+#include "types/iterables/LgsSArray.h"
 
 class LgsArrayExpr final : public LgsUnaryExpr {
 public:
@@ -15,5 +15,6 @@ public:
     std::string pname() override;
     json::value asJSON() override;
     void completeType(LgsType* toType) override;
+    Value* loadIR(LgsLLVMGen& cg) override;
     ~LgsArrayExpr() override;
 };

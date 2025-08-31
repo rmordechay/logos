@@ -12,6 +12,11 @@ extern "C" void Lgs_print(const char* fmt, const LgsRTType rtt, const void* v) {
         printf(fmt, str);
         break;
     }
+    case RTT_CHAR: {
+        const char ch = *static_cast<const char*>(v);
+        printf(fmt, ch);
+        break;
+    }
     case RTT_STR: {
         const auto str = static_cast<const char*>(v);
         printf(fmt, str);

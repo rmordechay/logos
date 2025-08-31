@@ -1,7 +1,8 @@
 #include "exprs/unary/constants/LgsCharConst.h"
 
-
-#include "utils/LgsUtils.h"
+Value* LgsCharConst::loadIR(LgsLLVMGen& cg) {
+    return IRValue;
+}
 
 std::string LgsCharConst::pname() {
     return type->pname();

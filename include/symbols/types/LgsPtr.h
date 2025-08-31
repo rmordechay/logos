@@ -7,7 +7,9 @@ public:
     static constexpr auto name = "CPtr";
     LgsType* baseType;
 
-    explicit LgsPtr(LgsType* baseType) : baseType(baseType) {}
+    explicit LgsPtr(LgsType* baseType) : baseType(baseType) {
+        rtt = baseType->rtt;
+    }
     std::string getName() override;
     std::string pname() override;
     json::value asJSON() override;
