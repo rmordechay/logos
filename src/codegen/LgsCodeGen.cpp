@@ -902,11 +902,11 @@ void LgsCodeGen::addHeapExpr(LgsExpr* expr) {
 
 void LgsCodeGen::freeFuncHeap(const LgsFunc* func) const {
     cg.printStr("---\n");
-    cg.printStr("Freeing " + std::to_string(func->ownedHeapExprs.size()) + " owned exprs.\n");
+    cg.printStr("Freeing " + std::to_string(func->ownedHeapExprs.size()) + " owned exprs:\n");
     for (const auto expr : func->ownedHeapExprs) {
         expr->type->freeValue(cg, expr);
     }
-    cg.printStr("Freeing " + std::to_string(func->orphanHeapExprs.size()) + " orphan exprs.\n");
+    cg.printStr("Freeing " + std::to_string(func->orphanHeapExprs.size()) + " orphan exprs:\n");
     for (const auto expr : func->orphanHeapExprs) {
         expr->type->freeValue(cg, expr);
     }

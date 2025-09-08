@@ -3,14 +3,13 @@
 #include "exprs/unary/constants/LgsStrConst.h"
 
 Value* LgsPrint::call(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
-    const auto firstArg = args.front();
-    assert(firstArg->type->rtt != RTT_UNKNOWN);
+    const auto arg = args.front();
+    assert(arg->type->rtt != RTT_UNKNOWN);
     std::vector<Value*> IRArgs;
-    const auto baseStr = cg.getIRStr(firstArg->type->strFormatPart());
+    const auto baseStr = cg.getIRStr(arg->type->strFormatPart());
     IRArgs.emplace_back(baseStr);
-    IRArgs.emplace_back(cg.i32(firstArg->type->rtt));
-    const auto type = firstArg->IRValue->getType();
-    const auto v = type->isIntegerTy() ? firstArg->getIRPtrTo(cg) : firstArg->loadIR(cg);
+    IRArgs.emplace_back(cg.i32(arg->type->rtt));
+    const auto v = arg->type->isPrimitive ? arg->getIRPtrTo(cg) : arg->loadIR(cg);
     IRArgs.emplace_back(v);
     const auto ft = cg.getFT(cg.voidTy(), {cg.ptrTy(), cg.i32Ty(), cg.ptrTy()}, false);
     return cg.callLgsFunc(name, ft, IRArgs);

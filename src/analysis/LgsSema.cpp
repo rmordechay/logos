@@ -534,9 +534,6 @@ void inferBaseType(const LgsArrayExpr* array) {
         baseType = innerArr->type;
     } else {
         baseType = first->type;
-        auto ft = new LgsFuncType(baseType, {LgsParam(baseType)});
-        array->type->asDArray()->mapFunc  = new LgsFunc("map", array->type, {first->type, ft}, INTERNAL | PUBLIC | METHOD);
-        array->type->asDArray()->addMethod(array->type->asDArray()->mapFunc);
     }
     array->type->asIterable()->baseType = baseType;
 }

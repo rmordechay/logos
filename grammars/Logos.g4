@@ -490,7 +490,7 @@ IN: 'in';
 
 LONG: [0-9][0-9_]*'L';
 INTEGER: [0-9][0-9_]*;
-FLOAT: '-'?[0-9]+'.'[0-9]+;
+FLOAT: '-'?[0-9]*'.'[0-9]+;
 BOOL: 'true' | 'false';
 NULL: 'null';
 IDENTIFIER: [a-zA-Z][a-zA-Z0-9_]*;
