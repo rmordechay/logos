@@ -1,7 +1,7 @@
 #include "types/primitives/LgsFloat.h"
 #include "codegen/LgsLLVMGen.h"
 #include "exprs/LgsNull.h"
-#include "exprs/unary/constants/LgsFloatConst.h"
+#include "exprs/constants/LgsFloatConst.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsDouble.h"
 

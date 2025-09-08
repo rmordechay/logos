@@ -2,7 +2,7 @@
 #include "configs/LgsDefinitions.h"
 #include "stmts/LgsStmtsBlock.h"
 #include "exprs/LgsExpr.h"
-#include "exprs/unary/constants/LgsStrConst.h"
+#include "exprs/constants/LgsStrConst.h"
 #include "types/LgsFuncType.h"
 #include "types/LgsVoid.h"
 #include <llvm/IR/DIBuilder.h>

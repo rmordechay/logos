@@ -1,4 +1,4 @@
-#include "exprs/unary/LgsArrayExpr.h"
+#include "exprs/LgsArrayExpr.h"
 
 std::string LgsArrayExpr::pname() {
     return type->pname();

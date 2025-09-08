@@ -1,5 +1,5 @@
 #include "configs/LgsConfig.h"
-#include "exprs/unary/LgsVectorExpr.h"
+#include "exprs/LgsVectorExpr.h"
 #include "stmts/LgsField.h"
 #include "types/LgsPtr.h"
 #include "types/LgsInterface.h"

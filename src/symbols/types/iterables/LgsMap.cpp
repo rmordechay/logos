@@ -1,5 +1,5 @@
 #include "types/iterables/LgsMap.h"
-#include "exprs/unary/LgsHashMap.h"
+#include "exprs/LgsHashMap.h"
 #include "stmts/LgsVarDec.h"
 
 Type* LgsMap::getIRType(LgsLLVMGen& cg) {

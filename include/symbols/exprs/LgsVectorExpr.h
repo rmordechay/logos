@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../types/iterables/LgsVec.h"
+#include "../types/iterables/LgsVec.h"
 
 class LgsVectorExpr final : public LgsExpr {
 public:

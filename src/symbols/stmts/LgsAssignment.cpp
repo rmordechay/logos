@@ -1,7 +1,7 @@
 #include "stmts/LgsAssignment.h"
-#include "exprs/unary/LgsArrayExpr.h"
-#include "exprs/unary/LgsHashMap.h"
-#include "exprs/unary/LgsVariable.h"
+#include "exprs/LgsArrayExpr.h"
+#include "exprs/LgsHashMap.h"
+#include "exprs/LgsVariable.h"
 #include "types/iterables/LgsVec.h"
 
 json::value LgsAssignment::asJSON() {

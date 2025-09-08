@@ -1,5 +1,5 @@
 #include "stmts/LgsVarDec.h"
-#include "exprs/unary/LgsArrayExpr.h"
+#include "exprs/LgsArrayExpr.h"
 #include "types/LgsPtr.h"
 #include "utils/LgsUtils.h"
 #include <llvm/IR/DIBuilder.h>

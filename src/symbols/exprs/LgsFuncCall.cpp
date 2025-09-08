@@ -1,7 +1,7 @@
-#include "exprs/unary/LgsFuncCall.h"
+#include "exprs/LgsFuncCall.h"
 
 #include "configs/LgsDefinitions.h"
-#include "exprs/unary/LgsHashMap.h"
+#include "exprs/LgsHashMap.h"
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"

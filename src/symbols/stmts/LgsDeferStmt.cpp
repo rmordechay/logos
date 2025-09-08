@@ -3,8 +3,8 @@
 #include "funcs/LgsFunc.h"
 #include "utils/LgsUtils.h"
 
-#include <exprs/unary/LgsFuncCall.h>
-#include <exprs/unary/LgsSelection.h>
+#include <exprs/LgsFuncCall.h>
+#include <exprs/LgsSelection.h>
 #include <llvm/IR/Module.h>
 
 json::value LgsDeferStmt::asJSON() {

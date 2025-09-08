@@ -1,5 +1,5 @@
 #include "types/primitives/LgsDouble.h"
-#include "exprs/unary/constants/LgsFloatConst.h"
+#include "exprs/constants/LgsFloatConst.h"
 #include "../codegen/LgsLLVMGen.h"
 
 std::string LgsDouble::getName() {

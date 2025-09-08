@@ -1,5 +1,5 @@
-#include "exprs/unary/constants/LgsIntConst.h"
-#include "exprs/unary/constants/LgsFloatConst.h"
+#include "exprs/constants/LgsIntConst.h"
+#include "exprs/constants/LgsFloatConst.h"
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsDouble.h"
 #include "types/primitives/LgsFloat.h"

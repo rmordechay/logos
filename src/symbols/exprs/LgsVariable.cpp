@@ -1,5 +1,5 @@
-#include "exprs/unary/LgsVariable.h"
-#include "exprs/unary/LgsInstance.h"
+#include "exprs/LgsVariable.h"
+#include "exprs/LgsInstance.h"
 #include "funcs/LgsParam.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"

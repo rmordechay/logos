@@ -1,4 +1,4 @@
-#include "exprs/unary/constants/LgsStrConst.h"
+#include "exprs/constants/LgsStrConst.h"
 
 Value* LgsStrConst::loadIR(LgsLLVMGen& cg) {
     return IRValue;

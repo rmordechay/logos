@@ -1,5 +1,5 @@
 #include "lgsc/LgsCLangVisitor.h"
-#include "exprs/unary/constants/LgsIntConst.h"
+#include "exprs/constants/LgsIntConst.h"
 #include "files/LgsFile.h"
 #include "stmts/LgsField.h"
 #include "types/iterables/LgsDArray.h"

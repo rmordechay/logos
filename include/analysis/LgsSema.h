@@ -1,5 +1,5 @@
 #pragma once
-#include "../symbols/exprs/unary/LgsVectorExpr.h"
+#include "../symbols/exprs/LgsVectorExpr.h"
 #include "logos/LgsStack.h"
 #include "utils/LgsErrHandler.h"
 #include "analysis/LgsTypeResolver.h"

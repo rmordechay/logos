@@ -1,4 +1,4 @@
-#include "exprs/unary/LgsTypeExpr.h"
+#include "exprs/LgsTypeExpr.h"
 
 #include "LgsType.h"
 

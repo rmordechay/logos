@@ -1,7 +1,7 @@
 #include "stmts/LgsField.h"
 #include "LgsType.h"
 #include "exprs/LgsExpr.h"
-#include "exprs/unary/LgsHashMap.h"
+#include "exprs/LgsHashMap.h"
 
 Value* LgsField::loadIR(LgsLLVMGen& cg) {
     if (type->asDArray()) {

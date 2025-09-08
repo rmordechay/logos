@@ -1,7 +1,8 @@
-#include "exprs/unary/LgsIterIndex.h"
-#include "exprs/unary/LgsVariable.h"
+#include "exprs/LgsIterIndex.h"
+#include "exprs/LgsVariable.h"
+#include "exprs/constants/LgsIntConst.h"
 #include "stmts/LgsVarDec.h"
-#include <exprs/unary/LgsArrayExpr.h>
+#include <exprs/LgsArrayExpr.h>
 #include "types/iterables/LgsMap.h"
 
 Value* LgsIterIndex::loadIR(LgsLLVMGen& cg) {

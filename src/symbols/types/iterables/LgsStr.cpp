@@ -1,4 +1,4 @@
-#include "exprs/unary/constants/LgsStrConst.h"
+#include "exprs/constants/LgsStrConst.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsAny.h"
 

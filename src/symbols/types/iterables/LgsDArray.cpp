@@ -1,5 +1,5 @@
 #include "types/iterables/LgsDArray.h"
-#include "exprs/unary/LgsArrayExpr.h"
+#include "exprs/LgsArrayExpr.h"
 #include "types/primitives/LgsInt.h"
 
 Type* LgsDArray::getIRType(LgsLLVMGen& cg) {

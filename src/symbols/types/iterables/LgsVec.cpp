@@ -1,5 +1,5 @@
 #include "types/iterables/LgsVec.h"
-#include "exprs/unary/LgsVectorExpr.h"
+#include "exprs/LgsVectorExpr.h"
 
 Type* LgsVec::getIRType(LgsLLVMGen& cg) {
     IRType = FixedVectorType::get(baseType->getIRType(cg), dim);

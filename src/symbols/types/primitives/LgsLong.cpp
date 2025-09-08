@@ -1,5 +1,5 @@
 #include "types/primitives/LgsLong.h"
-#include "exprs/unary/constants/LgsIntConst.h"
+#include "exprs/constants/LgsIntConst.h"
 #include "types/LgsAny.h"
 #include "types/LgsPtr.h"
 #include "types/primitives/LgsBool.h"

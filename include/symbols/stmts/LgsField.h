@@ -1,7 +1,7 @@
 #pragma once
 #include <utility>
 #include "LgsValue.h"
-#include "exprs/unary/LgsHashMap.h"
+#include "../exprs/LgsHashMap.h"
 
 class LgsEnum;
 class LgsObject;

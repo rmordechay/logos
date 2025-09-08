@@ -1,4 +1,4 @@
-#include "exprs/unary/LgsIterator.h"
+#include "exprs/LgsIterator.h"
 #include "codegen/LgsLLVMGen.h"
 
 std::string LgsIterator::pname() {

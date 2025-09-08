@@ -1,4 +1,4 @@
-#include "exprs/unary/LgsVectorExpr.h"
+#include "exprs/LgsVectorExpr.h"
 
 Value* LgsVectorExpr::loadIR(LgsLLVMGen& cg) {
     assert(0);

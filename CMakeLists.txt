@@ -64,23 +64,23 @@ set(CORE_SOURCES
     src/symbols/LgsValue.cpp
     src/symbols/exprs/LgsExpr.cpp
     src/symbols/exprs/LgsBinaryExpr.cpp
-    src/symbols/exprs/unary/LgsArrayExpr.cpp
-    src/symbols/exprs/unary/LgsCast.cpp
-    src/symbols/exprs/unary/LgsFuncCall.cpp
-    src/symbols/exprs/unary/LgsHashMap.cpp
-    src/symbols/exprs/unary/LgsInstance.cpp
-    src/symbols/exprs/unary/LgsIterIndex.cpp
-    src/symbols/exprs/unary/LgsPostfixExpr.cpp
-    src/symbols/exprs/unary/LgsPrefixExpr.cpp
-    src/symbols/exprs/unary/LgsSelection.cpp
-    src/symbols/exprs/unary/LgsVariable.cpp
-    src/symbols/exprs/unary/LgsVectorExpr.cpp
-    src/symbols/exprs/unary/LgsTypeExpr.cpp
-    src/symbols/exprs/unary/constants/LgsCharConst.cpp
-    src/symbols/exprs/unary/constants/LgsFloatConst.cpp
-    src/symbols/exprs/unary/constants/LgsIntConst.cpp
-    src/symbols/exprs/unary/constants/LgsStrConst.cpp
-    src/symbols/exprs/unary/constants/LgsUIntConst.cpp
+    src/symbols/exprs/LgsArrayExpr.cpp
+    src/symbols/exprs/LgsCast.cpp
+    src/symbols/exprs/LgsFuncCall.cpp
+    src/symbols/exprs/LgsHashMap.cpp
+    src/symbols/exprs/LgsInstance.cpp
+    src/symbols/exprs/LgsIterIndex.cpp
+    src/symbols/exprs/LgsPostfixExpr.cpp
+    src/symbols/exprs/LgsPrefixExpr.cpp
+    src/symbols/exprs/LgsSelection.cpp
+    src/symbols/exprs/LgsVariable.cpp
+    src/symbols/exprs/LgsVectorExpr.cpp
+    src/symbols/exprs/LgsTypeExpr.cpp
+    src/symbols/exprs/constants/LgsCharConst.cpp
+    src/symbols/exprs/constants/LgsFloatConst.cpp
+    src/symbols/exprs/constants/LgsIntConst.cpp
+    src/symbols/exprs/constants/LgsStrConst.cpp
+    src/symbols/exprs/constants/LgsUIntConst.cpp
     src/symbols/funcs/LgsCoroutine.cpp
     src/symbols/funcs/LgsFunc.cpp
     src/symbols/funcs/LgsMainFunc.cpp

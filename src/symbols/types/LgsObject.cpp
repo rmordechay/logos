@@ -1,5 +1,5 @@
 #include "types/LgsObject.h"
-#include "exprs/unary/LgsInstance.h"
+#include "exprs/LgsInstance.h"
 #include "stmts/LgsField.h"
 #include "types/LgsGroup.h"
 #include "types/LgsInterface.h"

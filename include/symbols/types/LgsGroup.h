@@ -1,5 +1,5 @@
 #pragma once
-#include "exprs/unary/LgsHashMap.h"
+#include "../exprs/LgsHashMap.h"
 class LgsVariable;
 
 class LgsGroup final : public LgsType {

@@ -1,6 +1,6 @@
 #include "builtins/LgsPrint.h"
 #include "configs/LgsDefinitions.h"
-#include "exprs/unary/constants/LgsStrConst.h"
+#include "exprs/constants/LgsStrConst.h"
 
 Value* LgsPrint::call(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
     const auto arg = args.front();

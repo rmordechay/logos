@@ -2,7 +2,7 @@
 
 #include "codegen/LgsLLVMGen.h"
 #include "exprs/LgsNull.h"
-#include "exprs/unary/constants/LgsCharConst.h"
+#include "exprs/constants/LgsCharConst.h"
 
 
 json::value LgsChar::asJSON() {

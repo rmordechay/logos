@@ -1,5 +1,5 @@
-#include "exprs/unary/LgsInstance.h"
-#include "exprs/unary/LgsHashMap.h"
+#include "exprs/LgsInstance.h"
+#include "exprs/LgsHashMap.h"
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"

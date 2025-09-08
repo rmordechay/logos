@@ -1,6 +1,5 @@
 #pragma once
 #include "LgsLLVMGen.h"
-#include "exprs/unary/constants/LgsIntConst.h"
 #include "files/LgsFile.h"
 #include "logos/LgsStack.h"
 
@@ -27,11 +26,13 @@ class LgsHashMap;
 class LgsExpr;
 class LgsType;
 class LgsContinue;
+class LgsFloatConst;
 class LgsBreak;
 class LgsReturn;
 class LgsForeachLoop;
 class LgsRangeLoop;
 class LgsStmtsBlock;
+class LgsLoopMetaVar;
 class LgsStmt;
 class LgsMainFile;
 class LgsApp;
@@ -41,11 +42,15 @@ class LgsInstance;
 class LgsIterIndex;
 class LgsSelection;
 class LgsFuncCall;
+class LgsIterator;
 class LgsBinaryExpr;
 class LgsArrayExpr;
 class LgsIfStmt;
 class LgsAssignment;
+class LgsIntConst;
 class LgsForLoop;
+class LgsTypeExpr;
+class LgsIOStmt;
 struct LgsSymbol;
 struct LgsIndex;
 
