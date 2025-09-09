@@ -442,34 +442,40 @@ void LgsSema::visitExpr(LgsExpr* expr) {
     if (const auto iter = expr->type->asIterable()) {
         visitExpr(iter->sizeExpr);
     }
-    if (const auto castExpr = dynamic_cast<LgsCast*>(expr)) {
-        visitCast(castExpr);
-    } else if (const auto binaryExpr = dynamic_cast<LgsBinaryExpr*>(expr)) {
+    if (const auto binaryExpr = dynamic_cast<LgsBinaryExpr*>(expr)) {
         visitBinaryExpr(binaryExpr);
     } else {
         visitUnaryExpr(expr);
     }
 }
 
-void LgsSema::visitUnaryExpr(LgsExpr* unaryExpr) {
-    if (const auto func = unaryExpr->asFunc()) visitFunc(func);
-    else if (const auto instance = unaryExpr->asInstance()) visitInstance(instance);
-    else if (const auto funcCall = unaryExpr->asFuncCall()) visitFuncCall(funcCall);
-    else if (const auto strConst = unaryExpr->asStrConst()) visitStrConst(strConst);
-    else if (const auto selection = unaryExpr->asSelection()) visitSelection(selection);
-    else if (const auto arrayExpr = unaryExpr->asArrayExpr()) visitArrayExpr(arrayExpr);
-    else if (const auto hashMap = unaryExpr->asHashMap()) visitHashMap(hashMap);
-    else if (const auto iterIndex = unaryExpr->asIterIndex()) visitIterIndex(iterIndex);
-    else if (const auto variable = unaryExpr->asVariable()) visitVariable(variable);
-    else if (const auto postfixExpr = unaryExpr->asPostfixExpr()) visitPostfixExpr(postfixExpr);
-    else if (const auto prefixExpr = unaryExpr->asPrefixExpr()) visitPrefixExpr(prefixExpr);
-    else if (const auto forVar = unaryExpr->asLoopMetaVar()) visitLoopMetaVar(forVar);
-    else if (const auto vecExpr = unaryExpr->asVectorExpr()) visitVectorExpr(vecExpr);
+void LgsSema::visitUnaryExpr(LgsExpr* expr) {
+    if (const auto func = expr->asFunc()) visitFunc(func);
+    else if (const auto instance = expr->asInstance()) visitInstance(instance);
+    else if (const auto funcCall = expr->asFuncCall()) visitFuncCall(funcCall);
+    else if (const auto strConst = expr->asStrConst()) visitStrConst(strConst);
+    else if (const auto selection = expr->asSelection()) visitSelection(selection);
+    else if (const auto arrayExpr = expr->asArrayExpr()) visitArrayExpr(arrayExpr);
+    else if (const auto hashMap = expr->asHashMap()) visitHashMap(hashMap);
+    else if (const auto iterIndex = expr->asIterIndex()) visitIterIndex(iterIndex);
+    else if (const auto variable = expr->asVariable()) visitVariable(variable);
+    else if (const auto postfixExpr = expr->asPostfixExpr()) visitPostfixExpr(postfixExpr);
+    else if (const auto prefixExpr = expr->asPrefixExpr()) visitPrefixExpr(prefixExpr);
+    else if (const auto forVar = expr->asLoopMetaVar()) visitLoopMetaVar(forVar);
+    else if (const auto vecExpr = expr->asVectorExpr()) visitVectorExpr(vecExpr);
+    else if (const auto castExpr = expr->asCast()) visitCast(castExpr);
 }
 
 void LgsSema::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
-    visitExpr(binaryExpr->left);
-    visitExpr(binaryExpr->right);
+    const auto l = binaryExpr->left;
+    const auto r = binaryExpr->right;
+    visitExpr(l);
+    visitExpr(r);
+    const auto ltype = l->type;
+    const auto rtype = r->type;
+    if (!ltype->canApplyOp(rtype, binaryExpr->op)) {
+        return errHandler.addError(E10076, &l->location, {getOpAsText(binaryExpr->op), ltype->pname(), rtype->pname()});
+    }
     LgsType* type = nullptr;
     switch (binaryExpr->op) {
     case ADD:
@@ -482,8 +488,8 @@ void LgsSema::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
     case BIT_XOR:
     case LSHIFT:
     case RSHIFT: {
-        const auto lType = binaryExpr->left->type;
-        const auto rType = binaryExpr->right->type;
+        const auto lType = ltype;
+        const auto rType = r->type;
         if (!lType || !rType) return;
         type = lType;
         break;

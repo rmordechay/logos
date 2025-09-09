@@ -145,3 +145,49 @@ std::string trim(const std::string& str) {
 std::string getFullPath(const LgsLocation& location, const std::string& filePath) {
     return filePath + ":" + std::to_string(location.lineStart) + ":" + std::to_string(location.posInLine);
 }
+
+std::string getOpAsText(const LgsOperator op) {
+    switch (op) {
+    case ADD:
+        return "Addition";
+    case SUB:
+        return "Subtraction";
+    case MUL:
+        return "Multiplication";
+    case DIV:
+        return "Division";
+    case MOD:
+        return "Modulo";
+    case EQ:
+        return "Equal";
+    case NE:
+        return "Not equal";
+    case LT:
+        return "Less than";
+    case GT:
+        return "Greater than";
+    case GE:
+        return "Greater than or equal to";
+    case LE:
+        return "Less than or equal to";
+    case AND:
+        return "And";
+    case OR:
+        return "Or";
+    case BIT_AND:
+        return "Bitwise and";
+    case BIT_OR:
+        return "Bitwise or";
+    case BIT_XOR:
+        return "Xor";
+    case LSHIFT:
+        return "Left shift";
+    case RSHIFT:
+        return "Right shift";
+    case IN:
+        return "In";
+    case NOOP:
+        break;
+    }
+    return "NOOP";
+}

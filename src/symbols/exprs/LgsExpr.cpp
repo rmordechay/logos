@@ -113,8 +113,8 @@ Value* LgsExpr::orIR(LgsLLVMGen& cg, LgsExpr* other) { assert(0); }
 Value* LgsExpr::bitAndIR(LgsLLVMGen& cg, LgsExpr* other) { assert(0); }
 Value* LgsExpr::bitOrIR(LgsLLVMGen& cg, LgsExpr* other) { assert(0); }
 Value* LgsExpr::bitXorIR(LgsLLVMGen& cg, LgsExpr* other) { assert(0); }
-Value* LgsExpr::rshiftIR(LgsLLVMGen& cg, LgsExpr* other) { assert(0); }
 Value* LgsExpr::lshiftIR(LgsLLVMGen& cg, LgsExpr* other) { assert(0); }
+Value* LgsExpr::rshiftIR(LgsLLVMGen& cg, LgsExpr* other) { assert(0); }
 
 // Casting
 LgsFunc* LgsExpr::asFunc() { return dynamic_cast<LgsFunc*>(this); }

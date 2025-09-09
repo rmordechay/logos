@@ -32,6 +32,16 @@ bool LgsInt::canAssignTo(LgsType* other, const LgsAssignType op) {
     return canCastTo(other);
 }
 
+bool LgsInt::canApplyOp(LgsType* other, LgsOperator op) {
+    const auto IRName = other->getName();
+    if (name == IRName) return true;
+    return false;
+}
+
+Value* LgsInt::addIR(LgsLLVMGen& cg, Value* value, LgsExpr* other) {
+    return cg.builder.CreateAdd(value, other->loadIR(cg));
+}
+
 std::string LgsInt::strFormatPart() const {
     return "%d";
 }

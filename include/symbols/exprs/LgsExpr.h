@@ -1,7 +1,6 @@
 #pragma once
 #include <stmts/LgsStmt.h>
 #include "LgsValue.h"
-#include "stmts/LgsAssignment.h"
 
 class LgsCast;
 class LgsTypeExpr;
@@ -26,6 +25,8 @@ class LgsCharConst;
 class LgsFloatConst;
 class LgsStrConst;
 class LgsTypeConst;
+
+using namespace llvm;
 
 class LgsExpr : virtual public LgsStmt {
 public:

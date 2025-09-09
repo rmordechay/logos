@@ -1,4 +1,5 @@
 #pragma once
+#include "exprs/LgsBinaryExpr.h"
 
 class LgsExpr;
 struct LgsError;
@@ -28,3 +29,4 @@ std::string getTextFromFile(const std::string& filename, const LgsLocation& loca
 std::string getLine(const std::string& filename, size_t lineNumber);
 std::string trim(const std::string& str);
 std::string getFullPath(const LgsLocation& location, const std::string& filePath);
+std::string getOpAsText(LgsOperator op);

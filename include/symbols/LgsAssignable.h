@@ -15,8 +15,3 @@ enum LgsAssignType {
     ASSIGN_LSHIFT,
     ASSIGN_RSHIFT,
 };
-
-class LgsAssignable {
-public:
-    virtual ~LgsAssignable() = default;
-};

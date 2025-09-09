@@ -31,6 +31,114 @@ std::string LgsIntConst::pname() {
     return std::to_string(value);
 }
 
+Value* LgsIntConst::addIR(LgsLLVMGen& cg, LgsExpr* other) {
+    const auto l = loadIR(cg);
+    const auto r = other->loadIR(cg);
+    return cg.builder.CreateAdd(l, r);
+}
+
+Value* LgsIntConst::subIR(LgsLLVMGen& cg, LgsExpr* other) {
+    const auto l = loadIR(cg);
+    const auto r = other->loadIR(cg);
+    return cg.builder.CreateSub(l, r);
+}
+
+Value* LgsIntConst::mulIR(LgsLLVMGen& cg, LgsExpr* other) {
+    const auto l = loadIR(cg);
+    const auto r = other->loadIR(cg);
+    return cg.builder.CreateMul(l, r);
+}
+
+Value* LgsIntConst::divIR(LgsLLVMGen& cg, LgsExpr* other) {
+    const auto l = loadIR(cg);
+    const auto r = other->loadIR(cg);
+    return cg.builder.CreateSDiv(l, r);
+}
+
+Value* LgsIntConst::inIR(LgsLLVMGen& cg, LgsExpr* other) {
+    assert(0);
+}
+
+Value* LgsIntConst::modIR(LgsLLVMGen& cg, LgsExpr* other) {
+    const auto l = loadIR(cg);
+    const auto r = other->loadIR(cg);
+    return cg.builder.CreateSRem(l, r);
+}
+
+Value* LgsIntConst::eqIR(LgsLLVMGen& cg, LgsExpr* other) {
+    const auto l = loadIR(cg);
+    const auto r = other->loadIR(cg);
+    return cg.builder.CreateICmpEQ(l, r);
+}
+
+Value* LgsIntConst::neIR(LgsLLVMGen& cg, LgsExpr* other) {
+    const auto l = loadIR(cg);
+    const auto r = other->loadIR(cg);
+    return cg.builder.CreateICmpNE(l, r);
+}
+
+Value* LgsIntConst::ltIR(LgsLLVMGen& cg, LgsExpr* other) {
+    const auto l = loadIR(cg);
+    const auto r = other->loadIR(cg);
+    return cg.builder.CreateICmpSLT(l, r);
+}
+
+Value* LgsIntConst::gtIR(LgsLLVMGen& cg, LgsExpr* other) {
+    const auto l = loadIR(cg);
+    const auto r = other->loadIR(cg);
+    return cg.builder.CreateICmpSGT(l, r);
+}
+
+Value* LgsIntConst::geIR(LgsLLVMGen& cg, LgsExpr* other) {
+    const auto l = loadIR(cg);
+    const auto r = other->loadIR(cg);
+    return cg.builder.CreateICmpSGE(l, r);
+}
+
+Value* LgsIntConst::leIR(LgsLLVMGen& cg, LgsExpr* other) {
+    const auto l = loadIR(cg);
+    const auto r = other->loadIR(cg);
+    return cg.builder.CreateICmpSLE(l, r);
+}
+
+Value* LgsIntConst::andIR(LgsLLVMGen& cg, LgsExpr* other) {
+    assert(0);
+}
+
+Value* LgsIntConst::orIR(LgsLLVMGen& cg, LgsExpr* other) {
+    assert(0);
+}
+
+Value* LgsIntConst::bitAndIR(LgsLLVMGen& cg, LgsExpr* other) {
+    const auto l = loadIR(cg);
+    const auto r = other->loadIR(cg);
+    return cg.builder.CreateAnd(l, r);
+}
+
+Value* LgsIntConst::bitOrIR(LgsLLVMGen& cg, LgsExpr* other) {
+    const auto l = loadIR(cg);
+    const auto r = other->loadIR(cg);
+    return cg.builder.CreateOr(l, r);
+}
+
+Value* LgsIntConst::bitXorIR(LgsLLVMGen& cg, LgsExpr* other) {
+    const auto l = loadIR(cg);
+    const auto r = other->loadIR(cg);
+    return cg.builder.CreateXor(l, r);
+}
+
+Value* LgsIntConst::lshiftIR(LgsLLVMGen& cg, LgsExpr* other) {
+    const auto l = loadIR(cg);
+    const auto r = other->loadIR(cg);
+    return cg.builder.CreateShl(l, r);
+}
+
+Value* LgsIntConst::rshiftIR(LgsLLVMGen& cg, LgsExpr* other) {
+    const auto l = loadIR(cg);
+    const auto r = other->loadIR(cg);
+    return cg.builder.CreateLShr(l, r);
+}
+
 json::value LgsIntConst::asJSON() {
     json::object jsonObj;
     jsonObj["exprType"] = "intConst";

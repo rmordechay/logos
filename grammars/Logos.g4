@@ -164,7 +164,7 @@ pattern:
 loopStatement:
         WHILE whileExpr=expr statementsBlock
     |   FOR IDENTIFIER (COMMA IDENTIFIER)* COMMA? IN iterableExpr=unaryExpr statementsBlock
-    |   FOR statementsBlock
+    |   FOREVER statementsBlock
     |   rangeLoop statementsBlock
     ;
 
@@ -479,6 +479,7 @@ BREAK: 'break';
 CONTINUE: 'continue';
 RETURN: 'return';
 FOR: 'for';
+FOREVER: 'for.ever';
 FOR_IS_FIRST: 'for.isFirst';
 FOR_IS_LAST: 'for.isLast';
 FOR_I: 'for.i';

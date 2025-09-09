@@ -43,7 +43,7 @@ LgsFunc* LgsObject::getMethod(const std::string& methodName) {
 }
 
 void LgsObject::freeValue(LgsLLVMGen& cg, LgsExpr* value) {
-    cg.printPtr(value->IRValue, "\tobj: ");
+    cg.printPtr(value->IRValue, "\t" + name + ": ");
     // cg.builder.CreateFree(value->IRValue);
 }
 

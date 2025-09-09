@@ -1,6 +1,7 @@
 #pragma once
 #include "Lgs_types.h"
 #include "configs/LgsErrors.h"
+#include "exprs/LgsBinaryExpr.h"
 #include "symbols/LgsAssignable.h"
 
 namespace llvm {
@@ -66,16 +67,22 @@ public:
     virtual std::string getName() = 0;
     virtual std::string pname() = 0; // pretty name
     virtual bool canCastTo(LgsType* other) = 0;
+    virtual bool canAssignTo(LgsType* other, LgsAssignType op);
+    virtual bool canApplyOp(LgsType* other, LgsOperator op);
     virtual std::string strFormatPart() const = 0;
     virtual DIBasicType* getDebugType(LgsLLVMGen& cg);
     virtual void freeValue(LgsLLVMGen& cg, LgsExpr* value);
-    virtual bool canAssignTo(LgsType* other, LgsAssignType op);
     virtual LgsType* clone();
     virtual json::value asJSON() = 0;
+
+    virtual Value* addIR(LgsLLVMGen& cg, Value* value, LgsExpr* other);
 
     bool addField(LgsField* field);
     bool addMethod(LgsFunc* method);
     bool equals(LgsType* other);
+    bool isVoid();
+    bool isUnknown();
+    bool isBig();
     LgsBool* asBool();
     LgsChar* asChar();
     LgsStr* asStr();
@@ -98,8 +105,5 @@ public:
     LgsPtr* asPtr();
     LgsGroup* asGroup();
     LgsTypePair* asPair();
-    bool isVoid();
-    bool isUnknown();
-    bool isBig();
     virtual ~LgsType();
 };

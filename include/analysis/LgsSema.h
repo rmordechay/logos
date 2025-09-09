@@ -87,7 +87,7 @@ public:
     void visitBreakStmt(const LgsBreak* breakStmt);
     void visitDeferStmt(const LgsDeferStmt* deferStmt);
     void visitExpr(LgsExpr* expr);
-    void visitUnaryExpr(LgsExpr* unaryExpr);
+    void visitUnaryExpr(LgsExpr* expr);
     void visitBinaryExpr(LgsBinaryExpr* binaryExpr);
     void visitCast(LgsCast* lgsCast);
     void visitArrayExpr(const LgsArrayExpr* array);

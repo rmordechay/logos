@@ -44,3 +44,9 @@ bool LgsFloat::canCastTo(LgsType* other) {
 bool LgsFloat::canAssignTo(LgsType* other, LgsAssignType op) {
     return canCastTo(other);
 }
+
+bool LgsFloat::canApplyOp(LgsType* other, const LgsOperator op) {
+    const auto IRName = other->getName();
+    if (name == IRName) return true;
+    return false;
+}

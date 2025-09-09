@@ -188,7 +188,7 @@ void LgsApp::exitWithErrors() const {
         const auto file = getFileByID(err.location.fileID);
         const auto fullPath = getFullPath(err.location, file->path);
         auto line = trim(getLine(file->path.string(), err.location.lineStart));
-        // line += '\n' + std::string(err.location.posInLine + std::strlen(LGS_ERROR_PADDING) + 1, ' ') + "^";
+        line += '\n' + std::string(err.location.posInLine + std::strlen(LGS_ERROR_PADDING) + 1, ' ') + '^';
         const auto path = "\n   at: " + fullPath;
         const auto finalMsg = line + err.msg;
         logError(finalMsg, path);

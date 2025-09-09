@@ -15,6 +15,21 @@ LgsField* LgsVec::getField(const std::string& fieldName) {
     return field;
 }
 
+bool LgsVec::canApplyOp(LgsType* other, const LgsOperator op) {
+    const auto IRName = other->getName();
+    switch (op) {
+    case ADD:
+    case SUB:
+        return getName() == IRName;
+    case MUL:
+    case DIV:
+        return getName() == IRName || other->isNumber;
+    default:
+        break;
+    }
+    return false;
+}
+
 std::string LgsVec::getName() {
     return "vec" + std::to_string(dim);
 }

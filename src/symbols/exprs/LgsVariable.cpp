@@ -10,7 +10,12 @@ void LgsVariable::assign(LgsLLVMGen& cg, LgsExpr* expr) {
 }
 
 Value* LgsVariable::addIR(LgsLLVMGen& cg, LgsExpr* other) {
-    return cg.builder.CreateAdd(IRValue, other->IRValue);
+    const auto loadLeft = loadIR(cg);
+    const auto loadRight = other->loadIR(cg);
+    if (type->isInt) {
+        return cg.builder.CreateAdd(loadLeft, loadRight);
+    }
+    return cg.builder.CreateFAdd(loadLeft, loadRight);
 }
 
 Value* LgsVariable::subIR(LgsLLVMGen& cg, LgsExpr* other) {

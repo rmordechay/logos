@@ -18,6 +18,7 @@ public:
     std::string strFormatPart() const override;
     bool canCastTo(LgsType* other) override;
     bool canAssignTo(LgsType* other, LgsAssignType op) override;
+    bool canApplyOp(LgsType* other, LgsOperator op) override;
     std::string pname() override;
     json::value asJSON() override;
 };

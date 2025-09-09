@@ -1,5 +1,4 @@
 #include "exprs/LgsBinaryExpr.h"
-
 #include "utils/LgsUtils.h"
 
 json::value LgsBinaryExpr::asJSON() {
@@ -27,59 +26,59 @@ Value* LgsBinaryExpr::inIR(LgsLLVMGen& cg, LgsExpr* other) {
 }
 
 Value* LgsBinaryExpr::modIR(LgsLLVMGen& cg, LgsExpr* other)  {
-    assert(0);
+    return left->modIR(cg, right);
 }
 
 Value* LgsBinaryExpr::eqIR(LgsLLVMGen& cg, LgsExpr* other)  {
-    assert(0);
+    return left->eqIR(cg, right);
 }
 
 Value* LgsBinaryExpr::neIR(LgsLLVMGen& cg, LgsExpr* other)  {
-    assert(0);
+    return left->neIR(cg, right);
 }
 
 Value* LgsBinaryExpr::ltIR(LgsLLVMGen& cg, LgsExpr* other)  {
-    assert(0);
+    return left->ltIR(cg, right);
 }
 
 Value* LgsBinaryExpr::gtIR(LgsLLVMGen& cg, LgsExpr* other)  {
-    assert(0);
+    return left->gtIR(cg, right);
 }
 
 Value* LgsBinaryExpr::geIR(LgsLLVMGen& cg, LgsExpr* other)  {
-    assert(0);
+    return left->geIR(cg, right);
 }
 
 Value* LgsBinaryExpr::leIR(LgsLLVMGen& cg, LgsExpr* other)  {
-    assert(0);
+    return left->leIR(cg, right);
 }
 
 Value* LgsBinaryExpr::andIR(LgsLLVMGen& cg, LgsExpr* other)  {
-    assert(0);
+    return left->andIR(cg, right);
 }
 
 Value* LgsBinaryExpr::orIR(LgsLLVMGen& cg, LgsExpr* other)  {
-    assert(0);
+    return left->orIR(cg, right);
 }
 
 Value* LgsBinaryExpr::bitAndIR(LgsLLVMGen& cg, LgsExpr* other)  {
-    assert(0);
+    return left->bitAndIR(cg, right);
 }
 
 Value* LgsBinaryExpr::bitOrIR(LgsLLVMGen& cg, LgsExpr* other)  {
-    assert(0);
+    return left->bitOrIR(cg, right);
 }
 
 Value* LgsBinaryExpr::bitXorIR(LgsLLVMGen& cg, LgsExpr* other)  {
-    assert(0);
+    return left->bitXorIR(cg, right);
 }
 
 Value* LgsBinaryExpr::rshiftIR(LgsLLVMGen& cg, LgsExpr* other)  {
-    assert(0);
+    return left->rshiftIR(cg, right);
 }
 
 Value* LgsBinaryExpr::lshiftIR(LgsLLVMGen& cg, LgsExpr* other)  {
-    assert(0);
+    return left->lshiftIR(cg, right);
 }
 
 std::string LgsBinaryExpr::pname() {

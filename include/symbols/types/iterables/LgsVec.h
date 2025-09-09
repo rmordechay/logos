@@ -17,6 +17,7 @@ public:
 
     Type* getIRType(LgsLLVMGen& cg) override;
     LgsField* getField(const std::string& fieldName) override;
+    bool canApplyOp(LgsType* other, LgsOperator op) override;
     std::string getName() override;
     std::string pname() override;
     json::value asJSON() override;

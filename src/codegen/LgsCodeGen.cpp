@@ -309,6 +309,7 @@ void LgsCodeGen::visitStmtsBlock(const LgsStmtsBlock* stmtsBlock) {
 void LgsCodeGen::visitVarDec(LgsVarDec* varDec) {
     const auto IRType = varDec->type->getIRType(cg);
     const auto exprIRValue = getIRValue(varDec->expr);
+    exprIRValue->setName(varDec->name);
     if (varDec->shouldAllocate(IRType)) {
         varDec->IRValue = cg.builder.CreateAlloca(IRType, nullptr, varDec->name);
         cg.builder.CreateStore(exprIRValue, getIRValue(varDec));
@@ -323,7 +324,7 @@ void LgsCodeGen::visitAssignment(const LgsAssignment* assignment) {
     Value* results = nullptr;
     switch (assignment->assignmentType) {
     case ASSIGN: assignment->lValue->assign(cg, assignment->rValue); return;
-    case ASSIGN_ADD: results = assignment->lValue->addIR(cg, assignment->rValue); break;
+    case ASSIGN_ADD: results = assignment->lValue->type->addIR(cg, assignment->lValue->IRValue, assignment->rValue); break;
     case ASSIGN_SUB: results = assignment->lValue->subIR(cg, assignment->rValue); break;
     case ASSIGN_MUL: results = assignment->lValue->mulIR(cg, assignment->rValue); break;
     case ASSIGN_DIV: results = assignment->lValue->divIR(cg, assignment->rValue); break;
@@ -578,7 +579,7 @@ void LgsCodeGen::visitBinaryExpr(LgsBinaryExpr* binExpr) {
     visitExpr(binExpr->left);
     visitExpr(binExpr->right);
     switch (binExpr->op) {
-    case ADD: binExpr->IRValue = binExpr->left->addIR(cg, binExpr->right); break;
+    case ADD: binExpr->IRValue = binExpr->left->type->addIR(cg, binExpr->left->IRValue, binExpr->right); break;
     case SUB: binExpr->IRValue = binExpr->left->subIR(cg, binExpr->right); break;
     case MUL: binExpr->IRValue = binExpr->left->mulIR(cg, binExpr->right); break;
     case DIV: binExpr->IRValue = binExpr->left->divIR(cg, binExpr->right); break;
@@ -780,19 +781,24 @@ void LgsCodeGen::visitPrefixExpr(LgsPrefixExpr* prefixExpr) {
 
 void LgsCodeGen::visitPostfixExpr(LgsPostfixExpr* postfixExpr) {
     visitExpr(postfixExpr->expr);
-    const auto exprIRValue = postfixExpr->expr->IRValue;
-    const auto exprIRType = postfixExpr->expr->type->getIRType(cg);
-    const auto exprLoad = postfixExpr->expr->loadIR(cg);
-    const auto oneConst = ConstantInt::get(exprIRType, 1);
+    const auto exprAddr = postfixExpr->expr->IRValue;
+    const auto exprType = postfixExpr->expr->type->getIRType(cg);
+    const auto oldValue = cg.builder.CreateLoad(exprType, exprAddr);
+    const auto oneConst = ConstantInt::get(exprType, 1);
     switch (postfixExpr->op) {
-    case INC:
-        postfixExpr->IRValue = cg.builder.CreateAdd(exprLoad, oneConst);
-        break;
-    case DEC:
-        postfixExpr->IRValue = cg.builder.CreateSub(exprLoad, oneConst);
+    case INC: {
+        postfixExpr->IRValue = oldValue;
+        const auto newValue = cg.builder.CreateAdd(oldValue, oneConst);
+        cg.builder.CreateStore(newValue, exprAddr);
         break;
     }
-    cg.builder.CreateStore(postfixExpr->IRValue, exprIRValue);
+    case DEC: {
+        postfixExpr->IRValue = oldValue;
+        const auto newValue = cg.builder.CreateSub(oldValue, oneConst);
+        cg.builder.CreateStore(newValue, exprAddr);
+        break;
+    }
+    }
 }
 
 void LgsCodeGen::visitStrConst(LgsStrConst* strConst) const {
@@ -904,12 +910,12 @@ void LgsCodeGen::addHeapExpr(LgsExpr* expr) {
 }
 
 void LgsCodeGen::freeFuncHeap(const LgsFunc* func) const {
-    cg.printStr("---\n");
-    cg.printStr("Freeing " + std::to_string(func->ownedHeapExprs.size()) + " owned exprs:\n");
+    cg.printStr("---\n" + func->funcType->name + '\n');
+    cg.printStr(std::to_string(func->ownedHeapExprs.size()) + " owned exprs:\n");
     for (const auto expr : func->ownedHeapExprs) {
         expr->type->freeValue(cg, expr);
     }
-    cg.printStr("Freeing " + std::to_string(func->orphanHeapExprs.size()) + " orphan exprs:\n");
+    cg.printStr(std::to_string(func->orphanHeapExprs.size()) + " orphan exprs:\n");
     for (const auto expr : func->orphanHeapExprs) {
         expr->type->freeValue(cg, expr);
     }

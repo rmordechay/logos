@@ -7,8 +7,8 @@ enum LgsOperator {
     MUL,
     DIV,
     MOD,
-    NE,
     EQ,
+    NE,
     LT,
     GT,
     GE,
@@ -33,25 +33,25 @@ public:
 
     explicit LgsBinaryExpr(LgsType* type, LgsExpr* left, LgsExpr* right, const LgsOperator op) : LgsExpr(type), left(left), right(right), op(op) {}
     json::value asJSON() override;
-    llvm::Value* addIR(LgsLLVMGen& cg, LgsExpr* other) override;
-    llvm::Value* mulIR(LgsLLVMGen& cg, LgsExpr* other) override;
-    llvm::Value* subIR(LgsLLVMGen& cg, LgsExpr* other) override;
-    llvm::Value* divIR(LgsLLVMGen& cg, LgsExpr* other) override;
-    llvm::Value* inIR(LgsLLVMGen& cg, LgsExpr* other) override;
-    llvm::Value* modIR(LgsLLVMGen& cg, LgsExpr* other) override;
-    llvm::Value* eqIR(LgsLLVMGen& cg, LgsExpr* other) override;
-    llvm::Value* neIR(LgsLLVMGen& cg, LgsExpr* other) override;
-    llvm::Value* ltIR(LgsLLVMGen& cg, LgsExpr* other) override;
-    llvm::Value* gtIR(LgsLLVMGen& cg, LgsExpr* other) override;
-    llvm::Value* geIR(LgsLLVMGen& cg, LgsExpr* other) override;
-    llvm::Value* leIR(LgsLLVMGen& cg, LgsExpr* other) override;
-    llvm::Value* andIR(LgsLLVMGen& cg, LgsExpr* other) override;
-    llvm::Value* orIR(LgsLLVMGen& cg, LgsExpr* other) override;
-    llvm::Value* bitAndIR(LgsLLVMGen& cg, LgsExpr* other) override;
-    llvm::Value* bitOrIR(LgsLLVMGen& cg, LgsExpr* other) override;
-    llvm::Value* bitXorIR(LgsLLVMGen& cg, LgsExpr* other) override;
-    llvm::Value* rshiftIR(LgsLLVMGen& cg, LgsExpr* other) override;
-    llvm::Value* lshiftIR(LgsLLVMGen& cg, LgsExpr* other) override;
+    Value* addIR(LgsLLVMGen& cg, LgsExpr* other) override;
+    Value* mulIR(LgsLLVMGen& cg, LgsExpr* other) override;
+    Value* subIR(LgsLLVMGen& cg, LgsExpr* other) override;
+    Value* divIR(LgsLLVMGen& cg, LgsExpr* other) override;
+    Value* inIR(LgsLLVMGen& cg, LgsExpr* other) override;
+    Value* modIR(LgsLLVMGen& cg, LgsExpr* other) override;
+    Value* eqIR(LgsLLVMGen& cg, LgsExpr* other) override;
+    Value* neIR(LgsLLVMGen& cg, LgsExpr* other) override;
+    Value* ltIR(LgsLLVMGen& cg, LgsExpr* other) override;
+    Value* gtIR(LgsLLVMGen& cg, LgsExpr* other) override;
+    Value* geIR(LgsLLVMGen& cg, LgsExpr* other) override;
+    Value* leIR(LgsLLVMGen& cg, LgsExpr* other) override;
+    Value* andIR(LgsLLVMGen& cg, LgsExpr* other) override;
+    Value* orIR(LgsLLVMGen& cg, LgsExpr* other) override;
+    Value* bitAndIR(LgsLLVMGen& cg, LgsExpr* other) override;
+    Value* bitOrIR(LgsLLVMGen& cg, LgsExpr* other) override;
+    Value* bitXorIR(LgsLLVMGen& cg, LgsExpr* other) override;
+    Value* rshiftIR(LgsLLVMGen& cg, LgsExpr* other) override;
+    Value* lshiftIR(LgsLLVMGen& cg, LgsExpr* other) override;
     std::string pname() override;
     ~LgsBinaryExpr() override;
 };
