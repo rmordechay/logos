@@ -17,7 +17,6 @@ public:
 
     Type* getIRType(LgsLLVMGen& cg) override;
     LgsField* getField(const std::string& fieldName) override;
-    bool canApplyOp(LgsType* other, LgsOperator op) override;
     std::string getName() override;
     std::string pname() override;
     json::value asJSON() override;
@@ -30,6 +29,11 @@ public:
     Value* IRIsNotEmpty(LgsLLVMGen* cg, LgsExpr* iterable) override;
     bool canCastTo(LgsType* other) override;
     bool canAssignTo(LgsType* other, LgsAssignType op) override;
+    bool canApplyOp(LgsType* other, LgsOperator op) override;
+    Value* addIR(LgsLLVMGen& cg, Value* value, LgsExpr* other) override;
+    Value* subIR(LgsLLVMGen& cg, Value* value, LgsExpr* other) override;
+    Value* mulIR(LgsLLVMGen& cg, Value* value, LgsExpr* other) override;
+    Value* divIR(LgsLLVMGen& cg, Value* value, LgsExpr* other) override;
     static int8_t getSwizzleSet(char c);
     static int8_t getComponentIndex(char c);
     std::string strFormatPart() const override;

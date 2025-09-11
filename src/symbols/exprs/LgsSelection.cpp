@@ -9,22 +9,6 @@ Value* LgsSelection::loadIR(LgsLLVMGen& cg) {
     return lastExpr()->loadIR(cg);
 }
 
-Value* LgsSelection::addIR(LgsLLVMGen& cg, LgsExpr* other) {
-    return lastExpr()->addIR(cg, other);
-}
-
-Value* LgsSelection::subIR(LgsLLVMGen& cg, LgsExpr* other) {
-    assert(0);
-}
-
-Value* LgsSelection::mulIR(LgsLLVMGen& cg, LgsExpr* other) {
-    assert(0);
-}
-
-Value* LgsSelection::divIR(LgsLLVMGen& cg, LgsExpr* other) {
-    assert(0);
-}
-
 LgsExpr* LgsSelection::lastExpr() const {
     assert(exprs.size() > 1);
     return exprs[exprs.size() - 1];

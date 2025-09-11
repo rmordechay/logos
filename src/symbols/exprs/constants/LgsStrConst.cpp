@@ -20,17 +20,6 @@ json::value LgsStrConst::asJSON() {
     return jsonObj;
 }
 
-Value* LgsStrConst::eqIR(LgsLLVMGen& cg, LgsExpr* other) {
-    return nullptr;
-}
-
-Value* LgsStrConst::addIR(LgsLLVMGen& cg, LgsExpr* other) {
-    if (const auto otherStrConst = other->asIntConst()) {
-        return cg.getIRStr(this->value + std::to_string(otherStrConst->value));
-    }
-    assert(0);
-}
-
 LgsExpr* LgsStrConst::clone() {
     return new LgsStrConst(*this);
 }

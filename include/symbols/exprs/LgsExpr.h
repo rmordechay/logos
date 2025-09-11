@@ -44,25 +44,6 @@ public:
 
     virtual Value* hash(LgsLLVMGen& cg);
     virtual void assign(LgsLLVMGen& cg, LgsExpr* expr);
-    virtual Value* addIR(LgsLLVMGen& cg, LgsExpr* other);
-    virtual Value* subIR(LgsLLVMGen& cg, LgsExpr* other);
-    virtual Value* mulIR(LgsLLVMGen& cg, LgsExpr* other);
-    virtual Value* divIR(LgsLLVMGen& cg, LgsExpr* other);
-    virtual Value* inIR(LgsLLVMGen& cg, LgsExpr* other);
-    virtual Value* modIR(LgsLLVMGen& cg, LgsExpr* other);
-    virtual Value* eqIR(LgsLLVMGen& cg, LgsExpr* other);
-    virtual Value* neIR(LgsLLVMGen& cg, LgsExpr* other);
-    virtual Value* ltIR(LgsLLVMGen& cg, LgsExpr* other);
-    virtual Value* gtIR(LgsLLVMGen& cg, LgsExpr* other);
-    virtual Value* geIR(LgsLLVMGen& cg, LgsExpr* other);
-    virtual Value* leIR(LgsLLVMGen& cg, LgsExpr* other);
-    virtual Value* andIR(LgsLLVMGen& cg, LgsExpr* other);
-    virtual Value* orIR(LgsLLVMGen& cg, LgsExpr* other);
-    virtual Value* bitAndIR(LgsLLVMGen& cg, LgsExpr* other);
-    virtual Value* bitOrIR(LgsLLVMGen& cg, LgsExpr* other);
-    virtual Value* bitXorIR(LgsLLVMGen& cg, LgsExpr* other);
-    virtual Value* rshiftIR(LgsLLVMGen& cg, LgsExpr* other);
-    virtual Value* lshiftIR(LgsLLVMGen& cg, LgsExpr* other);
 
     size_t getConstInt();
     std::string getConstStr();

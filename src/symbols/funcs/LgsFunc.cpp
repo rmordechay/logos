@@ -66,8 +66,8 @@ Function* LgsFunc::getIRFunc(LgsLLVMGen& cg) {
     auto args = IRFunc->arg_begin();
     for (int i = 0; i < funcType->params.size(); ++i) {
         auto& param = funcType->params[i];
-        param.setIRValue(args);
         args->setName(param.name);
+        param.setIRValue(args);
         args++;
     }
     return IRFunc;

@@ -3,10 +3,6 @@
 #include "LgsType.h"
 #include "utils/LgsUtils.h"
 
-Value* LgsCast::addIR(LgsLLVMGen& cg, LgsExpr* other) {
-    return toValue->addIR(cg, other);
-}
-
 std::string LgsCast::pname() {
     return fromValue->pname() + "->" + toType->pname();
 }

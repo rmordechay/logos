@@ -15,21 +15,6 @@ LgsField* LgsVec::getField(const std::string& fieldName) {
     return field;
 }
 
-bool LgsVec::canApplyOp(LgsType* other, const LgsOperator op) {
-    const auto IRName = other->getName();
-    switch (op) {
-    case ADD:
-    case SUB:
-        return getName() == IRName;
-    case MUL:
-    case DIV:
-        return getName() == IRName || other->isNumber;
-    default:
-        break;
-    }
-    return false;
-}
-
 std::string LgsVec::getName() {
     return "vec" + std::to_string(dim);
 }
@@ -80,6 +65,57 @@ bool LgsVec::canCastTo(LgsType* other) {
 bool LgsVec::canAssignTo(LgsType* other, const LgsAssignType op) {
     if (op == ASSIGN) return canCastTo(other);
     return other->isNumber;
+}
+
+bool LgsVec::canApplyOp(LgsType* other, const LgsOperator op) {
+    const auto IRName = other->getName();
+    switch (op) {
+    case ADD:
+    case SUB:
+        return getName() == IRName;
+    case MUL:
+    case DIV:
+        return getName() == IRName || other->isNumber;
+    default:
+        break;
+    }
+    return false;
+}
+
+Value* LgsVec::addIR(LgsLLVMGen& cg, Value* value, LgsExpr* other) {
+    const auto loadRight = other->loadIR(cg);
+    if (other->type->isInt) {
+        return cg.builder.CreateAdd(value, loadRight);
+    }
+    return cg.builder.CreateFAdd(value, loadRight);
+}
+
+Value* LgsVec::subIR(LgsLLVMGen& cg, Value* value, LgsExpr* other) {
+    const auto loadRight = other->loadIR(cg);
+    if (other->type->isInt) {
+        return cg.builder.CreateSub(value, loadRight);
+    }
+    return cg.builder.CreateFSub(value, loadRight);
+}
+
+Value* LgsVec::mulIR(LgsLLVMGen& cg, Value* value, LgsExpr* other) {
+    auto loadRight = other->loadIR(cg);
+    if (other->type->isInt) {
+        const auto vecTy = cast<VectorType>(value->getType());
+        loadRight = cg.builder.CreateSIToFP(loadRight, vecTy->getElementType());
+        loadRight = cg.builder.CreateVectorSplat(vecTy->getElementCount(), loadRight);
+        return cg.builder.CreateFMul(value, loadRight);
+    }
+    if (other->type->asFloat()) {
+        const auto vecTy = cast<VectorType>(value->getType());
+        loadRight = cg.builder.CreateVectorSplat(vecTy->getElementCount(), loadRight);
+        return cg.builder.CreateFMul(value, loadRight);
+    }
+    return cg.builder.CreateFMul(value, loadRight);
+}
+
+Value* LgsVec::divIR(LgsLLVMGen& cg, Value* value, LgsExpr* other) {
+    assert(0);
 }
 
 int8_t LgsVec::getSwizzleSet(const char c) {

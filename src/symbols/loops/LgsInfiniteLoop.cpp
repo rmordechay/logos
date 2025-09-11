@@ -5,7 +5,6 @@
 
 void LgsInfiniteLoop::incAndJumpToCond(LgsLLVMGen& cg) {
     if (cg.lastInstTerminator()) return;
-    if (!loopVars.empty()) incIndex(&cg);
     cg.builder.CreateBr(IRBodyBlock);
 }
 

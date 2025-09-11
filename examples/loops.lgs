@@ -1,0 +1,10 @@
+main() {
+    counter = 2
+    for.ever {
+        counter++
+        if counter > 1000 {
+            break
+        }
+        print(counter)
+    }
+}

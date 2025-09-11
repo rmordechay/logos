@@ -2,10 +2,8 @@
 #include "funcs/LgsFunc.h"
 #include "utils/LgsUtils.h"
 
-json::value LgsParam::asJSON() {
-    json::object obj;
-    obj["name"] = name;
-    return obj;
+Value* LgsParam::loadIR(LgsLLVMGen& cg) {
+    return IRValue;
 }
 
 LgsParam LgsParam::clone() const {
@@ -14,4 +12,10 @@ LgsParam LgsParam::clone() const {
     newParam.isVariadic = isVariadic;
     newParam.isSelf = isSelf;
     return newParam;
+}
+
+json::value LgsParam::asJSON() {
+    json::object obj;
+    obj["name"] = name;
+    return obj;
 }

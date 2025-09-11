@@ -16,6 +16,7 @@ public:
     llvm::Value* vaList = nullptr;
 
     explicit LgsParam(LgsType* type = nullptr, const std::string& name = "", LgsExpr* expr = nullptr) : name(name), type(type), expr(expr) {}
-    json::value asJSON() override;
+    Value* loadIR(LgsLLVMGen& cg) override;
     LgsParam clone() const;
+    json::value asJSON() override;
 };

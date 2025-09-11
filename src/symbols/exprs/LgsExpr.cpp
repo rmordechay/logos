@@ -96,25 +96,6 @@ Value* LgsExpr::hash(LgsLLVMGen& cg) {
 }
 
 void LgsExpr::assign(LgsLLVMGen& cg, LgsExpr* expr) { assert(0); }
-Value* LgsExpr::addIR(LgsLLVMGen& cg, LgsExpr* other) { assert(0); }
-Value* LgsExpr::subIR(LgsLLVMGen& cg, LgsExpr* other) { assert(0); }
-Value* LgsExpr::mulIR(LgsLLVMGen& cg, LgsExpr* other) { assert(0); }
-Value* LgsExpr::divIR(LgsLLVMGen& cg, LgsExpr* other) { assert(0); }
-Value* LgsExpr::inIR(LgsLLVMGen& cg, LgsExpr* other) { assert(0); }
-Value* LgsExpr::modIR(LgsLLVMGen& cg, LgsExpr* other) { assert(0); }
-Value* LgsExpr::eqIR(LgsLLVMGen& cg, LgsExpr* other) { assert(0); }
-Value* LgsExpr::neIR(LgsLLVMGen& cg, LgsExpr* other) { assert(0); }
-Value* LgsExpr::ltIR(LgsLLVMGen& cg, LgsExpr* other) { assert(0); }
-Value* LgsExpr::gtIR(LgsLLVMGen& cg, LgsExpr* other) { assert(0); }
-Value* LgsExpr::geIR(LgsLLVMGen& cg, LgsExpr* other) { assert(0); }
-Value* LgsExpr::leIR(LgsLLVMGen& cg, LgsExpr* other) { assert(0); }
-Value* LgsExpr::andIR(LgsLLVMGen& cg, LgsExpr* other) { assert(0); }
-Value* LgsExpr::orIR(LgsLLVMGen& cg, LgsExpr* other) { assert(0); }
-Value* LgsExpr::bitAndIR(LgsLLVMGen& cg, LgsExpr* other) { assert(0); }
-Value* LgsExpr::bitOrIR(LgsLLVMGen& cg, LgsExpr* other) { assert(0); }
-Value* LgsExpr::bitXorIR(LgsLLVMGen& cg, LgsExpr* other) { assert(0); }
-Value* LgsExpr::lshiftIR(LgsLLVMGen& cg, LgsExpr* other) { assert(0); }
-Value* LgsExpr::rshiftIR(LgsLLVMGen& cg, LgsExpr* other) { assert(0); }
 
 // Casting
 LgsFunc* LgsExpr::asFunc() { return dynamic_cast<LgsFunc*>(this); }

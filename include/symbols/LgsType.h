@@ -76,6 +76,24 @@ public:
     virtual json::value asJSON() = 0;
 
     virtual Value* addIR(LgsLLVMGen& cg, Value* value, LgsExpr* other);
+    virtual Value* subIR(LgsLLVMGen& cg, Value* value, LgsExpr* other);
+    virtual Value* mulIR(LgsLLVMGen& cg, Value* value, LgsExpr* other);
+    virtual Value* divIR(LgsLLVMGen& cg, Value* value, LgsExpr* other);
+    virtual Value* inIR(LgsLLVMGen& cg, Value* value, LgsExpr* other);
+    virtual Value* modIR(LgsLLVMGen& cg, Value* value, LgsExpr* other);
+    virtual Value* eqIR(LgsLLVMGen& cg, Value* value, LgsExpr* other);
+    virtual Value* neIR(LgsLLVMGen& cg, Value* value, LgsExpr* other);
+    virtual Value* ltIR(LgsLLVMGen& cg, Value* value, LgsExpr* other);
+    virtual Value* gtIR(LgsLLVMGen& cg, Value* value, LgsExpr* other);
+    virtual Value* geIR(LgsLLVMGen& cg, Value* value, LgsExpr* other);
+    virtual Value* leIR(LgsLLVMGen& cg, Value* value, LgsExpr* other);
+    virtual Value* andIR(LgsLLVMGen& cg, Value* value, LgsExpr* other);
+    virtual Value* orIR(LgsLLVMGen& cg, Value* value, LgsExpr* other);
+    virtual Value* bitAndIR(LgsLLVMGen& cg, Value* value, LgsExpr* other);
+    virtual Value* bitOrIR(LgsLLVMGen& cg, Value* value, LgsExpr* other);
+    virtual Value* bitXorIR(LgsLLVMGen& cg, Value* value, LgsExpr* other);
+    virtual Value* lshiftIR(LgsLLVMGen& cg, Value* value, LgsExpr* other);
+    virtual Value* rshiftIR(LgsLLVMGen& cg, Value* value, LgsExpr* other);
 
     bool addField(LgsField* field);
     bool addMethod(LgsFunc* method);

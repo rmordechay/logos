@@ -53,6 +53,79 @@ Value* LgsType::addIR(LgsLLVMGen& cg, Value* value, LgsExpr* other) {
     assert(0);
 }
 
+Value* LgsType::subIR(LgsLLVMGen& cg, Value* value, LgsExpr* other) {
+    assert(0);
+}
+
+Value* LgsType::mulIR(LgsLLVMGen& cg, Value* value, LgsExpr* other) {
+    assert(0);
+}
+
+Value* LgsType::divIR(LgsLLVMGen& cg, Value* value, LgsExpr* other) {
+    assert(0);
+}
+
+Value* LgsType::inIR(LgsLLVMGen& cg, Value* value, LgsExpr* other) {
+    assert(0);
+}
+
+Value* LgsType::modIR(LgsLLVMGen& cg, Value* value, LgsExpr* other) {
+    assert(0);
+}
+
+Value* LgsType::eqIR(LgsLLVMGen& cg, Value* value, LgsExpr* other) {
+    assert(0);
+}
+
+Value* LgsType::neIR(LgsLLVMGen& cg, Value* value, LgsExpr* other) {
+    assert(0);
+}
+
+Value* LgsType::ltIR(LgsLLVMGen& cg, Value* value, LgsExpr* other) {
+    assert(0);
+}
+
+Value* LgsType::gtIR(LgsLLVMGen& cg, Value* value, LgsExpr* other) {
+    assert(0);
+}
+
+Value* LgsType::geIR(LgsLLVMGen& cg, Value* value, LgsExpr* other) {
+    assert(0);
+}
+
+Value* LgsType::leIR(LgsLLVMGen& cg, Value* value, LgsExpr* other) {
+    assert(0);
+}
+
+Value* LgsType::andIR(LgsLLVMGen& cg, Value* value, LgsExpr* other) {
+    assert(0);
+}
+
+Value* LgsType::orIR(LgsLLVMGen& cg, Value* value, LgsExpr* other) {
+    assert(0);
+}
+
+Value* LgsType::bitAndIR(LgsLLVMGen& cg, Value* value, LgsExpr* other) {
+    assert(0);
+}
+
+Value* LgsType::bitOrIR(LgsLLVMGen& cg, Value* value, LgsExpr* other) {
+    assert(0);
+}
+
+Value* LgsType::bitXorIR(LgsLLVMGen& cg, Value* value, LgsExpr* other) {
+    assert(0);
+}
+
+Value* LgsType::lshiftIR(LgsLLVMGen& cg, Value* value, LgsExpr* other) {
+    assert(0);
+}
+
+Value* LgsType::rshiftIR(LgsLLVMGen& cg, Value* value, LgsExpr* other) {
+    assert(0);
+}
+
+
 bool LgsType::addField(LgsField* field) {
     for (const auto* f : fields) {
         if (f->name == field->name) return false;
