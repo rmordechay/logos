@@ -146,6 +146,7 @@ void LgsCodeGen::visitGroup(LgsGroup* group) {
 }
 
 void LgsCodeGen::visitField(LgsField* field) {
+    visitExpr(field->expr);
     if (const auto vec = field->type->asVec()) {
         std::vector<int> mask(vec->dim);
         for (unsigned i = 0; i < vec->dim; i++) {
@@ -338,7 +339,7 @@ void LgsCodeGen::visitAssignment(const LgsAssignment* assignment) {
     case ASSIGN_RSHIFT: results = assignment->lValue->type->rshiftIR(cg, loadLeft, assignment->rValue); break;
     }
     assert(results);
-    cg.builder.CreateStore(results, getIRValue(assignment->lValue));
+    cg.builder.CreateStore(results, assignment->lValue->IRValue);
 }
 
 void LgsCodeGen::visitIfStmt(LgsIfStmt* ifStmt) {
@@ -738,7 +739,7 @@ void LgsCodeGen::visitSelection(LgsSelection* selection) {
         }
     }
     assert(selection->lastExpr()->IRValue);
-    selection->IRValue = getIRValue(selection->lastExpr());
+    selection->IRValue = selection->lastExpr()->IRValue;
 }
 
 void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
@@ -834,28 +835,25 @@ void LgsCodeGen::visitInstance(LgsInstance* instance) {
     if (!instance->obj->interfaces.empty()) {
         instance->setVirtuals(cg);
     }
-    addHeapExpr(instance);
 }
 
 void LgsCodeGen::initFields(LgsInstance* instance) {
     std::unordered_set<std::string> visited;
     for (const auto& [argName, arg] : instance->args) {
         visited.insert(argName);
-        const auto exprIR = getIRValue(arg->expr);
+        const auto exprIR = arg->expr->IRValue;
         const auto field = instance->obj->getField(argName);
-        assert(field);
-        field->parentIRValue = getIRValue(instance);
-        const auto gep = getIRValue(field);
-        cg.builder.CreateStore(exprIR, gep);
+        visitField(field);
+        field->parentIRValue = instance->IRValue;
+        cg.builder.CreateStore(exprIR, field->IRValue);
     }
 
     // Zero values
     for (const auto field : instance->obj->fields) {
         if (visited.count(field->name)) continue;
-        field->parentIRValue = getIRValue(instance);
+        field->parentIRValue = instance->IRValue;
         visitField(field);
-        const auto zeroIRValue = getIRValue(field->expr);
-        cg.builder.CreateStore(zeroIRValue, field->IRValue);
+        cg.builder.CreateStore(field->expr->IRValue, field->IRValue);
     }
 }
 
@@ -888,9 +886,9 @@ void LgsCodeGen::createEpilogue(LgsFunc* func) {
             freeFuncHeap(func);
             cg.callPopStack();
         } else if (func->returnStmts.size() == 1) {
-            if (func->ownedHeapExprs.size() == 1) {
+            if (func->owners.size() == 1) {
                 const auto returnRef = func->returnStmts.front()->expr;
-                const auto heapExprRef = func->ownedHeapExprs.front();
+                const auto heapExprRef = func->owners.front();
                 if (returnRef->equals(heapExprRef)) {
                     cg.callPopStack();
                     cg.builder.CreateRet(getIRValue(func->returnStmts.front()));
@@ -905,26 +903,16 @@ void LgsCodeGen::createEpilogue(LgsFunc* func) {
     }
 }
 
-void LgsCodeGen::addHeapExpr(LgsExpr* expr) {
-    if (!expr->type->isHeapAlloc) return;
-    const auto currentFunc = stack.currentFunc();
-    if (expr->owner) {
-        currentFunc->ownedHeapExprs.push_back(expr);
-    } else {
-        currentFunc->orphanHeapExprs.push_back(expr);
-    }
-}
-
 void LgsCodeGen::freeFuncHeap(const LgsFunc* func) {
     cg.printStr("---\n" + func->funcType->name + '\n');
-    cg.printStr(std::to_string(func->ownedHeapExprs.size()) + " owned exprs:\n");
-    for (const auto expr : func->ownedHeapExprs) {
+    cg.printStr(std::to_string(func->owners.size()) + " owned exprs:\n");
+    for (const auto expr : func->owners) {
         cg.printStr("\t");
         expr->type->freeValue(cg, expr->IRValue);
     }
-    if (!func->orphanHeapExprs.empty()) {
-        cg.printStr("Found " + std::to_string(func->orphanHeapExprs.size()) + " orphan exprs:\n");
-        for (const auto expr : func->orphanHeapExprs) {
+    if (!func->orphans.empty()) {
+        cg.printStr("Found " + std::to_string(func->orphans.size()) + " orphan exprs:\n");
+        for (const auto expr : func->orphans) {
             cg.printPtr(expr->IRValue, "\t");
         }
     }

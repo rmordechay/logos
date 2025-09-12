@@ -117,6 +117,7 @@ void LgsSema::visitField(LgsField* field) {
     if (field->expr && field->expr->asFunc()) {
         errHandler.addError(E10013, &field->location, {field->name});
     }
+    field->isOwner = field->type->isHeapAlloc;
 }
 
 void LgsSema::visitFunc(LgsFunc* func) {
@@ -138,6 +139,9 @@ void LgsSema::visitFunc(LgsFunc* func) {
     }
     if (!validateBlockControlFlow(func->stmtsBlock, func)) {
         errHandler.addError(E10055, &func->location, {func->pname()});
+    }
+    for (const auto& orphan : func->orphans) {
+        errHandler.addError(E10077, &orphan->location, {orphan->pname()});
     }
     stack.exitScope();
 }
@@ -220,6 +224,7 @@ void LgsSema::visitVarDec(LgsVarDec* varDec) {
         varDec->expr->owner = varDec;
     }
     addLocalSymbol(LgsSymbol(varDec));
+    addHeapExpr(varDec->expr);
 }
 
 void LgsSema::visitAssignment(const LgsAssignment* assignment) {
@@ -830,7 +835,9 @@ void LgsSema::visitInstance(LgsInstance* instance) {
     // Zero values
     for (const auto field : instance->obj->fields) {
         if (visited.count(field->name)) continue;
-        field->expr = field->type->getZeroValue();
+        if (!field->expr) {
+            field->expr = field->type->getZeroValue();
+        }
         if (field->isOwner) {
             field->expr->owner = field;
         }
@@ -990,6 +997,16 @@ bool LgsSema::resolveForeachVars(const LgsForeachLoop* foreachLoop, LgsExpr* ite
         foreachLoop->loopVars[0]->type = new LgsPtr(iterable->baseType);
     }
     return true;
+}
+
+void LgsSema::addHeapExpr(LgsExpr* expr) {
+    if (!expr->type->isHeapAlloc) return;
+    const auto currentFunc = stack.currentFunc();
+    if (expr->owner) {
+        currentFunc->owners.push_back(expr);
+    } else {
+        currentFunc->orphans.push_back(expr);
+    }
 }
 
 std::string getMissingImplementsStr(const std::vector<LgsField*>& fields, const std::vector<LgsFunc*>& methods) {

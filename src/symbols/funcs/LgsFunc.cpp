@@ -95,6 +95,7 @@ void LgsFunc::completeType(LgsType* toType) {
         if (funcType->params[i].type) continue;
         funcType->params[i].type = otherFuncType->params[i].type;
     }
+    // TODO make rt of default void null
     freeType(funcType->rt);
     funcType->rt = otherFuncType->rt;
 }
@@ -106,7 +107,7 @@ BasicBlock* LgsFunc::getCleanupBlock(LgsLLVMGen& cg) {
 }
 
 bool LgsFunc::needsCleanup() const {
-    return !ownedHeapExprs.empty() || !orphanHeapExprs.empty();
+    return !owners.empty() || !orphans.empty();
 }
 
 std::string LgsFunc::pname() {

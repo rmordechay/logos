@@ -52,30 +52,33 @@ std::string LgsFuncType::getName() {
 }
 
 std::string LgsFuncType::pname() {
-    std::stringstream strStream;
+    std::stringstream str;
     if (isLambda) {
-        strStream << LGS_ANONYMOUS_STR << '(';
+        str << LGS_ANONYMOUS_STR << '(';
     } else {
-        strStream << name << '(';
+        str << name << '(';
     }
     for (size_t i = isMethod; i < params.size(); ++i) {
         const auto param = params[i];
+        if (param.isOwner) {
+            str << "owner ";
+        }
         if (param.type) {
-            strStream << param.type->pname();
+            str << param.type->pname();
         } else {
-            strStream << param.name;
+            str << param.name;
         }
         if (param.expr) {
-            strStream << " = " << param.expr->pname();
+            str << " = " << param.expr->pname();
         }
-        if (i != params.size() - 1) strStream << ", ";
+        if (i != params.size() - 1) str << ", ";
     }
     if (rt) {
-        strStream << "): " << rt->pname();
+        str << "): " << rt->pname();
     } else {
-        strStream << ')';
+        str << ')';
     }
-    return strStream.str();
+    return str.str();
 }
 
 std::string LgsFuncType::strFormatPart() const {

@@ -500,6 +500,7 @@ LgsEnum* LgsParserAdapter::getEnum(LogosParser::EnumDeclarationContext* ctx) {
             break;
         }
         const auto field = new LgsField(enumFieldName, lgsEnum);
+        field->isOwner = false;
         if (enumField->STRING()) {
             field->expr = getStrConst(enumField->STRING());
         }

@@ -119,7 +119,6 @@ public:
     void initMainArgs(LgsMainFunc* mainFunc);
     void createPrologue(LgsFunc* func);
     void createEpilogue(LgsFunc* func);
-    void addHeapExpr(LgsExpr* expr);
     void freeFuncHeap(const LgsFunc* func);
     Value* getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) const;
     Type* getThunkCtxType(const LgsFuncCall* fc) const;

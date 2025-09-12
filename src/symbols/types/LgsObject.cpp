@@ -43,12 +43,12 @@ LgsFunc* LgsObject::getMethod(const std::string& methodName) {
 }
 
 void LgsObject::freeValue(LgsLLVMGen& cg, Value* value) {
-    cg.printPtr(value, "Freeing " + name + ": ");
     for (const auto& field : fields) {
         if (!field->type->isHeapAlloc) continue;
-        cg.printPtr(value, "\t\tFreeing field " + field->name + ": ");
+        cg.printPtr(cg.builder.CreateLoad(cg.ptrTy(), field->IRValue), "Freeing field " + field->name + ": ");
         // field->type->freeValue(cg, field->expr->IRValue);
     }
+    cg.printPtr(value, "\tFreeing " + name + ": ");
     // cg.builder.CreateFree(value->IRValue);
 }
 
@@ -65,11 +65,7 @@ size_t LgsObject::getSizeBytes() {
 }
 
 LgsExpr* LgsObject::getZeroValue() {
-    const auto instance = new LgsInstance(this);
-    for (const auto field : fields) {
-        field->expr = field->type->getZeroValue();
-    }
-    return instance;
+    return new LgsInstance(this);
 }
 
 std::string LgsObject::strFormatPart() const {

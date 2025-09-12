@@ -129,6 +129,7 @@ public:
     void resolveFuncCall(LgsFuncCall* funcCall);
     bool resolveMethodCall(LgsFuncCall* methodCall, LgsType* parentType);
     bool resolveForeachVars(const LgsForeachLoop* foreachLoop, LgsExpr* iterExpr, const LgsIterable* iterable);
+    void addHeapExpr(LgsExpr* expr);
     void checkMock(const LgsSelection* selection);
     LgsSymbol* getSymbol(const std::string& name, const LgsLocation* location);
     void addLocalSymbol(const LgsSymbol& newSymbol);

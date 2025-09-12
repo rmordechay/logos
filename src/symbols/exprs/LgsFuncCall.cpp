@@ -14,15 +14,17 @@ bool LgsFuncCall::equals(const LgsFuncType* other) const {
     if (other->params.size() == 0 && args.size() == 0) return true;
     if (other->isLambda) return true;
     for (size_t i = other->isMethod; i < other->params.size(); ++i) {
-        const auto otherParamType = other->params[i].type;
+        const auto param = other->params[i];
+        const auto paramType = param.type;
         const auto arg = args[i - other->isMethod];
         const auto argType = arg->type;
-        if (!otherParamType || !argType) return false;
+        if (!paramType || !argType) return false;
         if (arg->isNull) continue;
-        if (otherParamType->asFuncType()) {
-            arg->completeType(otherParamType);
+        if (paramType->asFuncType()) {
+            arg->completeType(paramType);
         }
-        if (!argType->canCastTo(otherParamType)) return false;
+        if (!param.isOwner && arg->owner) return false;
+        if (!argType->canCastTo(paramType)) return false;
     }
     return true;
 }
@@ -51,18 +53,23 @@ void LgsFuncCall::resolveVirtualFunc(LgsLLVMGen& cg) const {
 }
 
 std::string LgsFuncCall::pname() {
-    std::stringstream strStream;
-    strStream << name << '(';
+    std::stringstream str;
+    str << name << '(';
     for (size_t i = isMethodCall; i < args.size(); ++i) {
-        strStream << (args[i]->type ? args[i]->type->pname() : LGS_UNKNOWN_TYPE);
-        if (i != args.size() - 1) strStream << ", ";
+        const auto arg = args[i];
+        if (arg->owner) {
+            str << "owner ";
+        }
+        str << (arg->type ? arg->type->pname() : LGS_UNKNOWN_TYPE);
+        if (i == args.size() - 1) continue;
+        str << ", ";
     }
     if (type && !type->isUnknown()) {
-        strStream << "): " << type->pname();
+        str << "): " << type->pname();
     } else {
-        strStream << ')';
+        str << ')';
     }
-    return strStream.str();
+    return str.str();
 }
 
 json::value LgsFuncCall::asJSON() {

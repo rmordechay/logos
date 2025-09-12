@@ -209,12 +209,36 @@ TEST_CASE("TestSema10014") {
     CHECK_EQ(app.errHandler.errors[0].errCode, E10014.errCode);
 }
 
-TEST_CASE("TestSema10015") {
+TEST_CASE("TestSema10015A") {
     LgsApp app;
     const auto code = R"(
     func(a: Int) { }
     main() {
         func("str")
+    }
+    )";
+    app.parseSrcFile(code);
+    app.analyse();
+    CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10015, code));
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10015.errCode);
+}
+
+TEST_CASE("TestSema10015B") {
+    LgsApp app;
+    const auto code = R"(
+    object Obj1 {
+        x: Int
+    }
+    object Obj2 {
+        obj1: Obj1
+    }
+    func(obj1: Obj1) {
+        obj2 = Obj2{}
+        obj2.obj1 := obj1
+    }
+    main() {
+        owner obj2 = Obj2{}
+        func(obj2.obj1)
     }
     )";
     app.parseSrcFile(code);
@@ -592,4 +616,28 @@ TEST_CASE("TestSema10066") {
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10066, code));
     CHECK_EQ(app.errHandler.errors[0].errCode, E10066.errCode);
+}
+
+TEST_CASE("TestSema10075") {
+    LgsApp app;
+    const auto code = R"(
+    object Obj1 {
+        x: Int
+    }
+    object Obj2 {
+        obj1: Obj1
+    }
+    func(owner obj1: Obj1) {
+        obj2 = Obj2{}
+        obj2.obj1 := obj1
+    }
+    main() {
+        owner obj2 = Obj2{}
+        func(obj2.obj1)
+    }
+    )";
+    app.parseSrcFile(code);
+    app.analyse();
+    CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10075, code));
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10075.errCode);
 }
