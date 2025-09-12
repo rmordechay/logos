@@ -115,19 +115,20 @@ public:
     void visitGroup(LgsGroup* group);
     void visitLoopMetaVar(LgsLoopMetaVar* metaVar);
 
+    void matchExprToType(const LgsExpr* expr, LgsType* type);
     void validateObjImplements(LgsObject* obj, const std::vector<LgsType*>& interfaces);
     void validateObjInterface(LgsObject* obj, LgsInterface* interface);
     void validateIndex(LgsIterIndex* iterIndex);
     void validateSliceBounds(LgsIterIndex* iterIndex);
     bool validateFieldVisibility(LgsField* field, const LgsObject* parent);
     bool validateMethodVisibility(const LgsFuncCall* methodCall, const LgsObject* parent);
+    bool validateVecElements(const LgsVariable* fieldVar, LgsVec* vec);
+    void validateTypeDuplicates(LgsType* type);
     static bool validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const LgsFunc* func);
-    void matchExprToType(const LgsExpr* expr, LgsType* type);
 
     void resolveFuncCall(LgsFuncCall* funcCall);
     bool resolveMethodCall(LgsFuncCall* methodCall, LgsType* parentType);
     bool resolveForeachVars(const LgsForeachLoop* foreachLoop, LgsExpr* iterExpr, const LgsIterable* iterable);
-    bool validateVecElements(const LgsVariable* fieldVar, LgsVec* vec);
     void checkMock(const LgsSelection* selection);
     LgsSymbol* getSymbol(const std::string& name, const LgsLocation* location);
     void addLocalSymbol(const LgsSymbol& newSymbol);

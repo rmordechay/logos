@@ -75,7 +75,7 @@ void logosParserInitialize() {
       "'-='", "'*='", "'/='", "'%='", "'&='", "'|='", "'^='", "'<<='", "'>>='", 
       "'++'", "'--'", "'.'", "':'", "'='", "'+'", "'-'", "'*'", "'/'", "'#'", 
       "'\\u003F'", "'!'", "'%'", "'$'", "'&'", "'|'", "'^'", "'<<'", "'>>'", 
-      "'_/'", "'object'", "'object.single'", "'self'", "'Self'", "'interface'", 
+      "'_/'", "'object'", "'single'", "'self'", "'Self'", "'interface'", 
       "'extern'", "'pub'", "'implements'", "'const'", "'enum'", "'go'", 
       "'defer'", "'io'", "'owner'", "'vec2'", "'vec3'", "'vec4'", "'if'", 
       "'while'", "'else'", "'break'", "'continue'", "'return'", "'for'", 
@@ -284,7 +284,7 @@ void logosParserInitialize() {
   	21,0,0,433,432,1,0,0,0,433,434,1,0,0,0,434,437,1,0,0,0,435,436,5,38,0,
   	0,436,438,3,92,46,0,437,435,1,0,0,0,437,438,1,0,0,0,438,53,1,0,0,0,439,
   	453,3,58,29,0,440,453,3,80,40,0,441,453,3,60,30,0,442,453,3,62,31,0,443,
-  	453,3,64,32,0,444,453,3,70,35,0,445,453,3,74,37,0,446,453,3,88,44,0,447,
+  	453,3,70,35,0,444,453,3,64,32,0,445,453,3,74,37,0,446,453,3,88,44,0,447,
   	453,3,90,45,0,448,453,3,78,39,0,449,453,3,82,41,0,450,453,3,92,46,0,451,
   	453,5,75,0,0,452,439,1,0,0,0,452,440,1,0,0,0,452,441,1,0,0,0,452,442,
   	1,0,0,0,452,443,1,0,0,0,452,444,1,0,0,0,452,445,1,0,0,0,452,446,1,0,0,
@@ -2808,12 +2808,12 @@ LogosParser::ImplicitVarDecContext* LogosParser::StatementContext::implicitVarDe
   return getRuleContext<LogosParser::ImplicitVarDecContext>(0);
 }
 
-LogosParser::IfStatementContext* LogosParser::StatementContext::ifStatement() {
-  return getRuleContext<LogosParser::IfStatementContext>(0);
-}
-
 LogosParser::PatternMatchingContext* LogosParser::StatementContext::patternMatching() {
   return getRuleContext<LogosParser::PatternMatchingContext>(0);
+}
+
+LogosParser::IfStatementContext* LogosParser::StatementContext::ifStatement() {
+  return getRuleContext<LogosParser::IfStatementContext>(0);
 }
 
 LogosParser::LoopStatementContext* LogosParser::StatementContext::loopStatement() {
@@ -2896,14 +2896,14 @@ LogosParser::StatementContext* LogosParser::statement() {
     case 5: {
       enterOuterAlt(_localctx, 5);
       setState(443);
-      ifStatement();
+      patternMatching();
       break;
     }
 
     case 6: {
       enterOuterAlt(_localctx, 6);
       setState(444);
-      patternMatching();
+      ifStatement();
       break;
     }
 

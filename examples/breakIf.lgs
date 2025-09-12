@@ -1,11 +1,9 @@
 main() {
     if true {
         if true {
-            if true {
-                print("sdjfh")
-                break if
-            }
+            print("inside")
+            break if
         }
-        print("sdjfhsdf")
+        print("outside")
     }
 }

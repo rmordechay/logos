@@ -271,6 +271,7 @@ TEST_CASE("TestSema10017") {
     }
     )";
     app.parseSrcFile(code);
+    app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10017, code));
     CHECK_EQ(app.errHandler.errors[0].errCode, E10017.errCode);
 }
@@ -582,7 +583,7 @@ TEST_CASE("TestSema10066") {
     const auto code = R"(
     main() {
         a = 0
-        for a {
+        while a {
             a++
         }
     }

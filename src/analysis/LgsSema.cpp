@@ -92,6 +92,7 @@ void LgsSema::visitObject(LgsObject* obj) {
         visitIOPair(ioPair, obj);
     }
     validateObjImplements(obj, obj->interfaces);
+    validateTypeDuplicates(obj);
 }
 
 void LgsSema::visitInterface(LgsInterface* interface) {
@@ -166,8 +167,8 @@ void LgsSema::visitIOPair(LgsIOPair* ioPair, LgsObject* obj) {
 }
 
 void LgsSema::visitStmt(LgsStmt* stmt) {
-    if (const auto ifStmt = stmt->asIfStmt()) visitIfStmt(ifStmt);
-    else if (const auto pattern = stmt->asPattern()) visitPatternMatching(pattern);
+    if (const auto pattern = stmt->asPattern()) visitPatternMatching(pattern);
+    else if (const auto ifStmt = stmt->asIfStmt()) visitIfStmt(ifStmt);
     else if (const auto varDec = stmt->asVarDec()) visitVarDec(varDec);
     else if (const auto loopStmt = stmt->asLoop()) visitLoopStmt(loopStmt);
     else if (const auto coroutine = stmt->asCoroutine()) visitCoroutine(coroutine);
@@ -205,6 +206,7 @@ void LgsSema::visitVarDec(LgsVarDec* varDec) {
     } else if (varDec->expr) {
         visitExpr(varDec->expr);
         varDec->type = varDec->expr->type;
+        matchExprToType(varDec->expr, varDec->type);
     } else {
         if (const auto iter = varDec->type->asIterable()) visitExpr(iter->sizeExpr);
         varDec->type = typeResolver.resolveType(varDec->type, file);
@@ -612,7 +614,7 @@ void LgsSema::visitVariable(LgsVariable* variable) {
     switch (symbol->symbolType) {
     case VAR_DEC: {
         variable->ref.varDec = symbol->varDec;
-        variable->isMutable = symbol->varDec->isConst;
+        variable->isMutable = !symbol->varDec->isConst;
         variable->setType(symbol->varDec->type);
         break;
     }
@@ -809,6 +811,7 @@ void LgsSema::visitInstance(LgsInstance* instance) {
     }
 
     instance->setObject(obj->clone());
+
     // Args
     std::unordered_set<std::string> visited;
     for (const auto& [argName, arg] : instance->args) {
@@ -1010,6 +1013,25 @@ std::string getMissingImplementsStr(const std::vector<LgsField*>& fields, const 
     return str.str();
 }
 
+void LgsSema::matchExprToType(const LgsExpr* expr, LgsType* type) {
+    if (expr->isNull) {
+        // null must have a type
+        if (!type || type->isUnknown()) {
+            return errHandler.addError(E10024, &expr->location);
+        }
+        // type must be nullable
+        if (!type->asNullable()) {
+            errHandler.addError(E10023, &type->location, {type->pname(), type->pname()});
+        }
+        return;
+    }
+    if (expr->type == type) return;
+    if (!type || !expr->type) return;
+    if (!type->canCastTo(expr->type)) {
+        errHandler.addError(E10001, &expr->location, {type->pname(), expr->type->pname()});
+    }
+}
+
 void LgsSema::validateObjInterface(LgsObject* obj, LgsInterface* interface) {
     // Fields
     std::vector<LgsField*> missingFields;
@@ -1105,6 +1127,54 @@ bool LgsSema::validateMethodVisibility(const LgsFuncCall* methodCall, const LgsO
     return true;
 }
 
+bool LgsSema::validateVecElements(const LgsVariable* fieldVar, LgsVec* vec) {
+    const auto fieldName = fieldVar->name;
+    const auto dim = vec->dim;
+    if (fieldName.empty() || fieldName.size() > 4) {
+        errHandler.addError(E10069, &fieldVar->location, {vec->pname()});
+        return false;
+    }
+
+    const auto expectedSet = LgsVec::getSwizzleSet(fieldName[0]);
+    if (expectedSet < 0) {
+        errHandler.addError(E10070, &fieldVar->location, {fieldName, vec->pname()});
+        return false;
+    }
+
+    for (const char c : fieldName) {
+        if (LgsVec::getSwizzleSet(c) != expectedSet) {
+            errHandler.addError(E10070, &fieldVar->location, {fieldName, vec->pname()});
+            return false;
+        }
+        const auto componentIndex = LgsVec::getComponentIndex(c);
+        if (componentIndex >= dim) {
+            errHandler.addError(E10070, &fieldVar->location, {fieldName, vec->pname()});
+            return false;
+        }
+    }
+    return true;
+}
+
+void LgsSema::validateTypeDuplicates(LgsType* type){
+    std::unordered_set<std::string> names;
+    for (const auto* f : type->fields) {
+        if (!f) continue;
+        const auto& name = f->name;
+        if (names.count(name)) {
+            errHandler.addError(E10056, &type->location, {type->getName(), name});
+            break;
+        }
+        names.insert(name);
+    }
+    for (const auto& [name, func] : type->methods) {
+        if (names.count(name)) {
+            errHandler.addError(E10056, &type->location, {type->getName(), name});
+            break;
+        }
+        names.insert(name);
+    }
+}
+
 bool LgsSema::validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const LgsFunc* func) {
     if (func->funcType->rt->isVoid()) return true;
     if (!stmtBlock) return true;
@@ -1127,25 +1197,6 @@ bool LgsSema::validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const Lgs
         }
     }
     return isValid;
-}
-
-void LgsSema::matchExprToType(const LgsExpr* expr, LgsType* type) {
-    if (expr->type == type) return;
-    if (expr->isNull) {
-        // null must have a type
-        if (!type || type->isUnknown()) {
-            return errHandler.addError(E10024, &expr->location);
-        }
-        // type must be nullable
-        if (!type->asNullable()) {
-            errHandler.addError(E10023, &type->location, {type->pname(), type->pname()});
-        }
-        return;
-    }
-    if (!type || !expr->type) return;
-    if (!type->canCastTo(expr->type)) {
-        errHandler.addError(E10001, &expr->location, {type->pname(), expr->type->pname()});
-    }
 }
 
 void LgsSema::resolveFuncCall(LgsFuncCall* funcCall) {
@@ -1179,10 +1230,7 @@ void LgsSema::resolveFuncCall(LgsFuncCall* funcCall) {
             } else {
                 errHandler.addError(E10015, &funcCall->location, {funcCall->name, funcCall->pname(), type->pname()});
             }
-        } else {
-            assert(0);
         }
-
         if (!type->asFuncType()) {
             errHandler.addError(E10046, &funcCall->location, {funcCall->name});
         }
@@ -1202,34 +1250,6 @@ bool LgsSema::resolveMethodCall(LgsFuncCall* methodCall, LgsType* parentType) {
     } else {
         errHandler.addError(E10034, &methodCall->location, {parentType->pname(), name, methodCall->pname(), method->pname()});
         return false;
-    }
-    return true;
-}
-
-bool LgsSema::validateVecElements(const LgsVariable* fieldVar, LgsVec* vec) {
-    const auto fieldName = fieldVar->name;
-    const auto dim = vec->dim;
-    if (fieldName.empty() || fieldName.size() > 4) {
-        errHandler.addError(E10069, &fieldVar->location, {vec->pname()});
-        return false;
-    }
-
-    const auto expectedSet = LgsVec::getSwizzleSet(fieldName[0]);
-    if (expectedSet < 0) {
-        errHandler.addError(E10070, &fieldVar->location, {fieldName, vec->pname()});
-        return false;
-    }
-
-    for (const char c : fieldName) {
-        if (LgsVec::getSwizzleSet(c) != expectedSet) {
-            errHandler.addError(E10070, &fieldVar->location, {fieldName, vec->pname()});
-            return false;
-        }
-        const auto componentIndex = LgsVec::getComponentIndex(c);
-        if (componentIndex >= dim) {
-            errHandler.addError(E10070, &fieldVar->location, {fieldName, vec->pname()});
-            return false;
-        }
     }
     return true;
 }

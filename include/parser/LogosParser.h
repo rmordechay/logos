@@ -586,8 +586,8 @@ public:
     ReturnStatementContext *returnStatement();
     ExplicitVarDecContext *explicitVarDec();
     ImplicitVarDecContext *implicitVarDec();
-    IfStatementContext *ifStatement();
     PatternMatchingContext *patternMatching();
+    IfStatementContext *ifStatement();
     LoopStatementContext *loopStatement();
     CoroutineContext *coroutine();
     DeferStmtContext *deferStmt();

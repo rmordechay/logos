@@ -140,7 +140,7 @@ void LgsTypeResolver::resolveInterfaceTypes(LgsInterface* interface, LgsFile& fi
 void LgsTypeResolver::resolveIterable(LgsIterable* iterable, LgsFile& file) {
     iterable->baseType = resolveType(iterable->baseType, &file);
     if (iterable->asSArray()) {
-        if (!iterable->sizeExpr->type) return;
+        if (iterable->sizeExpr && !iterable->sizeExpr->type) return;
         const auto exprConstNumber = iterable->sizeExpr->getConstInt();
         if (exprConstNumber == 0) {
             return errHandler.addError(E10048, &iterable->location, {iterable->pname()});

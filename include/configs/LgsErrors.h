@@ -72,7 +72,7 @@ inline LgsBaseError E10047{.msg = "External file '%s' was not found.", .errCode 
 inline LgsBaseError E10048{.msg = "Static iterable '%s' must have a constant size.", .errCode = errCodeStart++};
 inline LgsBaseError E10049{.msg = "Not enough information to infer the type of the iterable. Specify an explicit type or initialize with element(s).", .errCode = errCodeStart++};
 inline LgsBaseError E10050{.msg = "Only integer values can be incremented (++) or decremented (--). Given: '%s'.", .errCode = errCodeStart++};
-inline LgsBaseError E10051{.msg = "'%s' is defined as constant and cannot be overwritten.", .errCode = errCodeStart++};
+inline LgsBaseError E10051{.msg = "'%s' is constant and cannot be overwritten.", .errCode = errCodeStart++};
 inline LgsBaseError E10052{.msg = "Spread operator in '%s...' must only be used with iterables. Given type: '%s'.", .errCode = errCodeStart++};
 inline LgsBaseError E10053{.msg = "'%s' is a Logos global name and cannot be redefined.", .errCode = errCodeStart++};
 inline LgsBaseError E10054{.msg = "Field '%s' is set more than one time.", .errCode = errCodeStart++};

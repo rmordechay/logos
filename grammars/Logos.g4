@@ -113,8 +113,8 @@ statement:
     |   returnStatement
     |   explicitVarDec
     |   implicitVarDec
-    |   ifStatement
     |   patternMatching
+    |   ifStatement
     |   loopStatement
     |   coroutine
     |   deferStmt
@@ -454,7 +454,7 @@ DOUBLE_LANGLE: '>>';
 SLIDER: '_/';
 
 OBJECT: 'object';
-SINGLETON: 'object.single';
+SINGLETON: 'single';
 SELF_INSTANCE: 'self';
 SELF_CLASS: 'Self';
 INTERFACE: 'interface';

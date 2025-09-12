@@ -40,7 +40,7 @@ size_t LgsExpr::getConstInt() {
             break;
         }
     }
-    assert(0);
+    return 0;
 }
 
 std::string LgsExpr::getConstStr() {
