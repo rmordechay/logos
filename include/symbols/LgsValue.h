@@ -19,6 +19,7 @@ public:
     LgsLocation location{0, 0, 0};
 
     void setIRValue(llvm::Value* value);
+    virtual std::string pname(); // pretty name
     virtual llvm::Value* loadIR(LgsLLVMGen& cg);
     virtual void setDebugValue(LgsLLVMGen& cg);
     virtual json::value asJSON() = 0;

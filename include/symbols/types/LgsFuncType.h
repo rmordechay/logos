@@ -8,7 +8,7 @@ namespace llvm {
 
 enum LgsFuncFlags : uint32_t {
     PUBLIC = 1 << 0,
-    INTERNAL = 1 << 1,
+    BUILTIN = 1 << 1,
     VIRTUAL = 1 << 2,
     VARIADIC = 1 << 3,
     LAMBDA = 1 << 4,
@@ -27,7 +27,7 @@ public:
     LgsType* rt = nullptr;
     std::vector<LgsParam> params;
     bool isPublic = false;
-    bool isInternal = false;
+    bool isBuiltin = false;
     bool isVirtual = false;
     bool isVariadic = false;
     bool isLambda = false;

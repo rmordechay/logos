@@ -292,6 +292,7 @@ void LgsCodeGen::visitStmt(LgsStmt* stmt) {
     if (const auto assignment = stmt->asAssignment()) return visitAssignment(assignment);
     if (const auto funcCall = stmt->asFuncCall()) return visitFuncCall(funcCall);
     if (const auto postfixExpr = stmt->asPostfixExpr()) return visitPostfixExpr(postfixExpr);
+    if (const auto postfixExpr = stmt->asExpr()) return visitExpr(postfixExpr);
     if (const auto selection = stmt->asSelection()) return visitSelection(selection);
     if (const auto ioStmt = stmt->asIOStmt()) return visitIOStmt(ioStmt);
     if (const auto returnStmt = stmt->asReturn()) return visitReturnStmt(returnStmt);
@@ -644,7 +645,7 @@ void LgsCodeGen::visitFloatConst(LgsFloatConst* floatConst) const {
 
 void LgsCodeGen::visitArrayExpr(LgsArrayExpr* array) {
     if (array->type->asSArray()) {
-        array->IRValue = createConstArray(array);
+        array->IRValue = createStaticArray(array);
     } else if (array->type->asDArray()) {
         array->IRValue = createDynamicArray(array);
     }
@@ -914,16 +915,20 @@ void LgsCodeGen::addHeapExpr(LgsExpr* expr) {
     }
 }
 
-void LgsCodeGen::freeFuncHeap(const LgsFunc* func) const {
+void LgsCodeGen::freeFuncHeap(const LgsFunc* func) {
     cg.printStr("---\n" + func->funcType->name + '\n');
-    cg.printStr("Freeing " + std::to_string(func->ownedHeapExprs.size()) + " owned exprs:\n");
+    cg.printStr(std::to_string(func->ownedHeapExprs.size()) + " owned exprs:\n");
     for (const auto expr : func->ownedHeapExprs) {
+        cg.printStr("\t");
         expr->type->freeValue(cg, expr->IRValue);
     }
-    cg.printStr("Found " + std::to_string(func->orphanHeapExprs.size()) + " orphan exprs:\n");
-    for (const auto expr : func->orphanHeapExprs) {
-        cg.printPtr(expr->IRValue, "\t" + expr->type->getName() + ": ");
+    if (!func->orphanHeapExprs.empty()) {
+        cg.printStr("Found " + std::to_string(func->orphanHeapExprs.size()) + " orphan exprs:\n");
+        for (const auto expr : func->orphanHeapExprs) {
+            cg.printPtr(expr->IRValue, "\t");
+        }
     }
+
 }
 
 Value* LgsCodeGen::getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) const {
@@ -982,7 +987,7 @@ void LgsCodeGen::generateIf(Value* cond, const std::function<void()>& blockStmtC
     cg.branchAndStartBlock(IRBlockIfFalse, currentIRFunc);
 }
 
-Value* LgsCodeGen::createConstArray(const LgsArrayExpr* arrayExpr) {
+Value* LgsCodeGen::createStaticArray(const LgsArrayExpr* arrayExpr) {
     const auto arr = arrayExpr->type->asSArray();
     const auto baseIRType = arr->baseType->getIRType(cg);
     const auto arrIRType = ArrayType::get(baseIRType, arr->sizeExpr->getConstInt());

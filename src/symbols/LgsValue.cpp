@@ -11,6 +11,10 @@ void LgsValue::setIRValue(Value* value) {
     IRValue = value;
 }
 
+std::string LgsValue::pname() {
+    assert(0);
+}
+
 void LgsValue::setDebugValue(LgsLLVMGen& cg) {
     assert(0);
 }

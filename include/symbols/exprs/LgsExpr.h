@@ -37,7 +37,6 @@ public:
     LgsValue* owner = nullptr;
 
     explicit LgsExpr(LgsType* type = nullptr) : type(type) {}
-    virtual std::string pname() = 0; // pretty name
     virtual LgsExpr* clone();
     virtual LgsExpr* castTo(LgsType* toType);
     virtual void completeType(LgsType* toType);

@@ -9,9 +9,9 @@
 class LgsStr final : public LgsIterable {
 public:
     static constexpr auto name = "Str";
-    LgsFunc* lenFunc = new LgsFunc("len", &LGS_LONG, {this}, INTERNAL | PUBLIC | METHOD);
-    LgsFunc* isEmptyFunc = new LgsFunc("isEmpty", &LGS_BOOL, {this}, INTERNAL | PUBLIC | METHOD);
-    LgsFunc* isNotEmptyFunc = new LgsFunc("isNotEmpty", &LGS_BOOL, {this}, INTERNAL | PUBLIC | METHOD);
+    LgsFunc* lenFunc = new LgsFunc("len", &LGS_LONG, {this}, BUILTIN | PUBLIC | METHOD);
+    LgsFunc* isEmptyFunc = new LgsFunc("isEmpty", &LGS_BOOL, {this}, BUILTIN | PUBLIC | METHOD);
+    LgsFunc* isNotEmptyFunc = new LgsFunc("isNotEmpty", &LGS_BOOL, {this}, BUILTIN | PUBLIC | METHOD);
 
     LgsStr();
     Type* getIRBaseType(LgsLLVMGen* cg) const;

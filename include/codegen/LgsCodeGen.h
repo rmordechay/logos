@@ -120,7 +120,7 @@ public:
     void createPrologue(LgsFunc* func);
     void createEpilogue(LgsFunc* func);
     void addHeapExpr(LgsExpr* expr);
-    void freeFuncHeap(const LgsFunc* func) const;
+    void freeFuncHeap(const LgsFunc* func);
     Value* getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) const;
     Type* getThunkCtxType(const LgsFuncCall* fc) const;
     Function* getThunkFunc(const LgsFuncCall* fc, Type* ctxTy) const;
@@ -129,7 +129,7 @@ public:
     void generateIf(Value* cond, const std::function<void()>& blockStmtCb) const;
 
     // Iterables
-    Value* createConstArray(const LgsArrayExpr* arrayExpr);
+    Value* createStaticArray(const LgsArrayExpr* arrayExpr);
     Value* createDynamicArray(LgsArrayExpr* arrayExpr);
     void initIterator(LgsIterator* iterator);
     Value* iterNext(LgsIterator* iterator);

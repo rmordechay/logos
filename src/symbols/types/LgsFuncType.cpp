@@ -5,7 +5,7 @@
 
 void LgsFuncType::setFuncOptions(const uint32_t ops) {
     isPublic = ops & PUBLIC;
-    isInternal = ops & INTERNAL;
+    isBuiltin = ops & BUILTIN;
     isVirtual = ops & VIRTUAL;
     isVariadic = ops & VARIADIC;
     isOptional = ops & OPTIONAL;
@@ -92,6 +92,7 @@ bool LgsFuncType::canCastTo(LgsType* other) {
     for (size_t i = isMethod; i < params.size(); ++i) {
         const auto thisType = params[i].type;
         const auto otherType = otherFuncType->params[i].type;
+        if (!thisType || !otherType) return false;
         if (!thisType->canCastTo(otherType)) return false;
     }
     return true;
@@ -109,7 +110,7 @@ LgsType* LgsFuncType::clone() {
     }
     copy->isMethod = isMethod;
     copy->isPublic = isPublic;
-    copy->isInternal = isInternal;
+    copy->isBuiltin = isBuiltin;
     copy->isVirtual = isVirtual;
     copy->isVariadic = isVariadic;
     copy->isOptional = isOptional;
@@ -131,7 +132,7 @@ json::value LgsFuncType::asJSON() {
     }
     jsonObj["params"] = jsonParams;
     jsonObj["isPublic"] = isPublic;
-    jsonObj["isInternal"] = isInternal;
+    jsonObj["isInternal"] = isBuiltin;
     jsonObj["isVirtual"] = isVirtual;
     jsonObj["isVariadic"] = isVariadic;
     jsonObj["isLambda"] = isLambda;

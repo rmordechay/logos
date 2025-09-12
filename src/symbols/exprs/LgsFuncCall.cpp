@@ -7,19 +7,22 @@
 #include "stmts/LgsVarDec.h"
 #include "types/LgsObject.h"
 
-bool LgsFuncCall::equals(const LgsFuncType* funcType) const {
-    if (funcType->hasDefaults) return equalsDefaultParams(funcType);
-    if (funcType->isVariadic) return equalsVariadic(funcType);
-    if (funcType->params.size() - funcType->isMethod != args.size()) return false;
-    if (funcType->params.size() == 0 && args.size() == 0) return true;
-    if (funcType->isLambda) return true;
-    for (size_t i = funcType->isMethod; i < funcType->params.size(); ++i) {
-        const auto paramType = funcType->params[i].type;
-        const auto arg = args[i - funcType->isMethod];
+bool LgsFuncCall::equals(const LgsFuncType* other) const {
+    if (other->hasDefaults) return equalsDefaultParams(other);
+    if (other->isVariadic) return equalsVariadic(other);
+    if (other->params.size() - other->isMethod != args.size()) return false;
+    if (other->params.size() == 0 && args.size() == 0) return true;
+    if (other->isLambda) return true;
+    for (size_t i = other->isMethod; i < other->params.size(); ++i) {
+        const auto otherParamType = other->params[i].type;
+        const auto arg = args[i - other->isMethod];
         const auto argType = arg->type;
-        if (!paramType || !argType) return false;
+        if (!otherParamType || !argType) return false;
         if (arg->isNull) continue;
-        if (!argType->canCastTo(paramType)) return false;
+        if (otherParamType->asFuncType()) {
+            arg->completeType(otherParamType);
+        }
+        if (!argType->canCastTo(otherParamType)) return false;
     }
     return true;
 }

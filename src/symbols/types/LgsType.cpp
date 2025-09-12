@@ -251,7 +251,7 @@ LgsType::~LgsType() {
     }
     fields.clear();
     for (const auto& [_, method] : methods) {
-        if (method->funcType->isInternal) continue;
+        if (method->funcType->isBuiltin) continue;
         // delete method;
     }
     methods.clear();

@@ -58,7 +58,7 @@ Function* LgsFunc::getIRFunc(LgsLLVMGen& cg) {
     if (IRFunc) return IRFunc;
     const auto type = funcType->getIRType(cg);
     const auto funcTy = llvm::cast<FunctionType>(type);
-    if (funcType->isInternal) {
+    if (funcType->isBuiltin) {
         funcName = LGS_RUNTIME_NAMES_PREFIX + funcName;
     }
     IRFunc = cg.getFunc(funcName, funcTy);
@@ -95,9 +95,8 @@ void LgsFunc::completeType(LgsType* toType) {
         if (funcType->params[i].type) continue;
         funcType->params[i].type = otherFuncType->params[i].type;
     }
-    if (!funcType->rt) {
-        funcType->rt = otherFuncType->rt;
-    }
+    freeType(funcType->rt);
+    funcType->rt = otherFuncType->rt;
 }
 
 BasicBlock* LgsFunc::getCleanupBlock(LgsLLVMGen& cg) {

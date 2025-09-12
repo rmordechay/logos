@@ -55,7 +55,7 @@ inline LgsBaseError E10030{.msg = "Non-public field '%s' is used outside its par
 inline LgsBaseError E10031{.msg = "Non-public method '%s' is used outside its parent object '%s'.", .errCode = errCodeStart++};
 inline LgsBaseError E10032{.msg = "Singleton object '%s' cannot be instantiated.", .errCode = errCodeStart++};
 inline LgsBaseError E10033{.msg = "Type name must be capitalized. Given: '%s'.", .errCode = errCodeStart++};
-inline LgsBaseError E10034{.msg = "Object '%s' has a method with name '%s' but it doesn't match the parameters.%pGiven:\t  %s%pExpected:  %s", .errCode = errCodeStart++};
+inline LgsBaseError E10034{.msg = "'%s' has a method with name '%s' but it doesn't match the parameters.%pGiven:\t  %s%pExpected:  %s", .errCode = errCodeStart++};
 inline LgsBaseError E10035{.msg = "Index of %s has %s level which is too deep. Max level: %s.", .errCode = errCodeStart++};
 inline LgsBaseError E10036{.msg = "'%s' cannot be indexed with type '%s'.", .errCode = errCodeStart++};
 inline LgsBaseError E10037{.msg = "Left index of slice must be less or equal than the right index. Given: %s.", .errCode = errCodeStart++};

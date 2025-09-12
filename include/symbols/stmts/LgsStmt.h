@@ -28,6 +28,7 @@ public:
     LgsIOStmt* asIOStmt();
     LgsPattern* asPattern();
     LgsPostfixExpr* asPostfixExpr();
+    LgsExpr* asExpr();
     LgsSelection* asSelection();
     LgsBreak* asBreak();
     LgsContinue* asContinue();

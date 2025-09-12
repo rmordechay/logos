@@ -35,6 +35,7 @@ LgsIfStmt* LgsStmt::asIfStmt() { return dynamic_cast<LgsIfStmt*>(this); }
 LgsIOStmt* LgsStmt::asIOStmt() { return dynamic_cast<LgsIOStmt*>(this); }
 LgsPattern* LgsStmt::asPattern() { return dynamic_cast<LgsPattern*>(this); }
 LgsPostfixExpr* LgsStmt::asPostfixExpr() { return dynamic_cast<LgsPostfixExpr*>(this); }
+LgsExpr* LgsStmt::asExpr() { return dynamic_cast<LgsExpr*>(this); }
 LgsSelection* LgsStmt::asSelection() { return dynamic_cast<LgsSelection*>(this); }
 LgsBreak* LgsStmt::asBreak() { return dynamic_cast<LgsBreak*>(this); }
 LgsContinue* LgsStmt::asContinue() { return dynamic_cast<LgsContinue*>(this); }

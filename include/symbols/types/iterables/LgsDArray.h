@@ -12,15 +12,15 @@ class LgsDArray final : public LgsIterable {
 public:
     static constexpr auto name = "DArray";
     StructType* arrStruct = nullptr;
-    LgsFunc* addFunc = new LgsFunc("add", &LGS_VOID, {this, &LGS_ANY}, INTERNAL | PUBLIC | METHOD);
-    LgsFunc* lenFunc = new LgsFunc("len", &LGS_SIZE, {this}, INTERNAL | PUBLIC | METHOD);
-    LgsFunc* getFunc = new LgsFunc("get", &LGS_ANY, {this, &LGS_LONG}, INTERNAL | PUBLIC | METHOD);
-    LgsFunc* isEmptyFunc = new LgsFunc("isEmpty", &LGS_BOOL, {this}, INTERNAL | PUBLIC | METHOD);
-    LgsFunc* isNotEmptyFunc = new LgsFunc("isNotEmpty", &LGS_BOOL, {this}, INTERNAL | PUBLIC | METHOD);
-    LgsFunc* initFunc = new LgsFunc("init", &LGS_VOID, {this, &LGS_LONG}, INTERNAL | METHOD);
-    LgsFunc* putFunc = new LgsFunc("put", &LGS_VOID, {this, &LGS_INT, &LGS_ANY}, INTERNAL | METHOD);
-    LgsFunc* deleteFunc = new LgsFunc("delete", &LGS_VOID, {this, &LGS_LONG}, INTERNAL | METHOD);
-    LgsFunc* freeFunc = new LgsFunc("free", &LGS_VOID, {this}, INTERNAL | METHOD);
+    LgsFunc* addFunc = new LgsFunc("add", &LGS_VOID, {this, &LGS_ANY}, BUILTIN | PUBLIC | METHOD);
+    LgsFunc* lenFunc = new LgsFunc("len", &LGS_SIZE, {this}, BUILTIN | PUBLIC | METHOD);
+    LgsFunc* getFunc = new LgsFunc("get", &LGS_ANY, {this, &LGS_LONG}, BUILTIN | PUBLIC | METHOD);
+    LgsFunc* isEmptyFunc = new LgsFunc("isEmpty", &LGS_BOOL, {this}, BUILTIN | PUBLIC | METHOD);
+    LgsFunc* isNotEmptyFunc = new LgsFunc("isNotEmpty", &LGS_BOOL, {this}, BUILTIN | PUBLIC | METHOD);
+    LgsFunc* initFunc = new LgsFunc("init", &LGS_VOID, {this, &LGS_LONG}, BUILTIN | METHOD);
+    LgsFunc* putFunc = new LgsFunc("put", &LGS_VOID, {this, &LGS_INT, &LGS_ANY}, BUILTIN | METHOD);
+    LgsFunc* deleteFunc = new LgsFunc("delete", &LGS_VOID, {this, &LGS_LONG}, BUILTIN | METHOD);
+    LgsFunc* freeFunc = new LgsFunc("free", &LGS_VOID, {this}, BUILTIN | METHOD);
 
     explicit LgsDArray(LgsType* baseType = nullptr) : LgsIterable(baseType) {
         addFunc->fn = [this](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {

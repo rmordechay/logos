@@ -538,17 +538,6 @@ void LgsSema::visitArrayExpr(const LgsArrayExpr* array) {
     }
 }
 
-void inferBaseType(const LgsArrayExpr* array) {
-    LgsType* baseType = nullptr;
-    const auto first = array->initialElements.front();
-    if (const auto innerArr = first->asArrayExpr()) {
-        baseType = innerArr->type;
-    } else {
-        baseType = first->type;
-    }
-    array->type->asIterable()->baseType = baseType;
-}
-
 void LgsSema::visitStaticArray(const LgsArrayExpr* arrayExpr) {
     const auto& initialElements = arrayExpr->initialElements;
     const auto arr = arrayExpr->type->asSArray();
@@ -571,7 +560,15 @@ void LgsSema::visitDynamicArray(const LgsArrayExpr* array) {
     if (!dArr->baseType && array->initialElements.empty()) {
         errHandler.addError(E10049, &array->location);
     } else {
-        inferBaseType(array);
+        LgsType* baseType = nullptr;
+        const auto first = array->initialElements.front();
+        if (const auto innerArr = first->asArrayExpr()) {
+            baseType = innerArr->type;
+        } else {
+            baseType = first->type;
+        }
+        array->type->asIterable()->baseType = baseType;
+        array->type->addMethod(new LgsFunc("map", array->type, {array->type, new LgsFuncType(baseType, {LgsParam(baseType)})}, BUILTIN | PUBLIC | METHOD));
     }
 }
 

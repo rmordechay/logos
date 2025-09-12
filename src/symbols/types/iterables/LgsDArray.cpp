@@ -65,6 +65,7 @@ bool LgsDArray::canCastTo(LgsType* other) {
     const auto otherArr = other->asDArray();
     if (!otherArr) return false;
     if (!baseType) return true;
+    if (!otherArr->baseType) return true;
     return baseType->canCastTo(otherArr->baseType);
 }
 
