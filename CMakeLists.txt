@@ -143,6 +143,7 @@ set(RUNTIME_SOURCES
     runtime/include/Lgs_Types.h
     src/symbols/builtins/LgsPrint.cpp
     include/symbols/LgsAssignable.h
+    runtime/lib/Lgs_arena.cpp
 )
 
 add_library(lgs_core SHARED ${CORE_SOURCES} ${RUNTIME_SOURCES})
