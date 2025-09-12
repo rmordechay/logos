@@ -29,6 +29,7 @@ void LgsSelection::assign(LgsLLVMGen& cg, LgsExpr* expr) {
         const auto insert = cg.builder.CreateInsertElement(vec, rIR, i);
         cg.builder.CreateStore(insert, exprParent->IRValue);
     } else {
+        type->freeValue(cg, IRValue);
         cg.builder.CreateStore(rIR, IRValue);
     }
 }

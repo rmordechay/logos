@@ -6,12 +6,12 @@ object Obj2 {
     obj1: Obj1
 }
 
-func(obj1: Obj1) {
-    owner obj2 = Obj1{}
+func(owner obj1: Obj1) {
+    obj2 = Obj2{}
+    obj2.obj1 := obj1
 }
 
 main() {
-    obj2 = Obj2{}
-    obj2.obj1.x := 736
+    owner obj2 = Obj2{}
     func(obj2.obj1)
 }

@@ -42,7 +42,7 @@ public:
     uint16_t getUnpackCount() const override;
     std::string strFormatPart() const override;
     StructType* getArrStruct(LgsLLVMGen& cg);
-    void freeValue(LgsLLVMGen& cg, LgsExpr* value) override;
+    void freeValue(LgsLLVMGen& cg, Value* value) override;
     Value* IRLength(LgsLLVMGen& cg, LgsExpr* iterable) override;
     Value* IRIsEmpty(LgsLLVMGen* cg, LgsExpr* iterable) override;
     Value* IRIsNotEmpty(LgsLLVMGen* cg, LgsExpr* iterable) override;

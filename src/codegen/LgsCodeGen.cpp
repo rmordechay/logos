@@ -340,7 +340,6 @@ void LgsCodeGen::visitAssignment(const LgsAssignment* assignment) {
     cg.builder.CreateStore(results, getIRValue(assignment->lValue));
 }
 
-
 void LgsCodeGen::visitIfStmt(LgsIfStmt* ifStmt) {
     if (ifStmt->elseIfs.empty()) {
         if (!ifStmt->elseBlock) {
@@ -552,7 +551,6 @@ void LgsCodeGen::visitExpr(LgsExpr* expr) {
     } else {
         visitUnaryExpr(expr);
     }
-    addHeapExpr(expr);
 }
 
 void LgsCodeGen::visitUnaryExpr(LgsExpr* unaryExpr) {
@@ -700,7 +698,12 @@ void LgsCodeGen::visitVariable(LgsVariable* variable) {
         break;
     case ENUM:
     case FIELD:
-        variable->IRValue = cg.getIRStr(variable->name);
+        if (variable->ref.field->type->asEnum()) {
+            variable->IRValue = cg.getIRStr(variable->name);
+        } else {
+            assert(variable->ref.field->IRValue);
+            variable->IRValue = variable->ref.field->loadIR(cg);
+        }
         break;
     case INTERFACE:
     case GROUP:
@@ -725,10 +728,10 @@ void LgsCodeGen::visitSelection(LgsSelection* selection) {
             field->parentIRValue = getIRValue(parentExpr);
             visitField(field);
             childExpr->setIRValue(field->IRValue);
-        } else if (childExpr->asFuncCall()) {
-            getIRValue(childExpr);
+        } else if (const auto funcCall = childExpr->asFuncCall()) {
+            visitFuncCall(funcCall);
         } else if (const auto iterIndex = childExpr->asIterIndex()) {
-            assert(0);
+            visitIterIndex(iterIndex);
         } else {
             assert(0);
         }
@@ -830,6 +833,7 @@ void LgsCodeGen::visitInstance(LgsInstance* instance) {
     if (!instance->obj->interfaces.empty()) {
         instance->setVirtuals(cg);
     }
+    addHeapExpr(instance);
 }
 
 void LgsCodeGen::initFields(LgsInstance* instance) {
@@ -912,23 +916,23 @@ void LgsCodeGen::addHeapExpr(LgsExpr* expr) {
 
 void LgsCodeGen::freeFuncHeap(const LgsFunc* func) const {
     cg.printStr("---\n" + func->funcType->name + '\n');
-    cg.printStr(std::to_string(func->ownedHeapExprs.size()) + " owned exprs:\n");
+    cg.printStr("Freeing " + std::to_string(func->ownedHeapExprs.size()) + " owned exprs:\n");
     for (const auto expr : func->ownedHeapExprs) {
-        expr->type->freeValue(cg, expr);
+        expr->type->freeValue(cg, expr->IRValue);
     }
-    cg.printStr(std::to_string(func->orphanHeapExprs.size()) + " orphan exprs:\n");
+    cg.printStr("Found " + std::to_string(func->orphanHeapExprs.size()) + " orphan exprs:\n");
     for (const auto expr : func->orphanHeapExprs) {
-        expr->type->freeValue(cg, expr);
+        cg.printPtr(expr->IRValue, "\t" + expr->type->getName() + ": ");
     }
 }
-
 
 Value* LgsCodeGen::getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) const {
     if (fc->args.empty()) return cg.null();
     const auto ctx = cg.builder.CreateAlloca(ctxTy);
     for (int i = 0; i < fc->args.size(); i++) {
         const auto v = fc->args[i]->IRValue;
-        cg.storeValueInStruct(dyn_cast<StructType>(ctxTy), ctx, i, v);
+        const auto fieldPtr = cg.builder.CreateStructGEP(dyn_cast<StructType>(ctxTy), ctx, i);
+        cg.builder.CreateStore(v, fieldPtr);
     }
     return ctx;
 }
@@ -956,7 +960,8 @@ Function* LgsCodeGen::getThunkFunc(const LgsFuncCall* fc, Type* ctxTy) const {
 
     std::vector<Value*> args;
     for (int i = 0; i < fc->args.size(); i++) {
-        const auto v = cg.loadValueFromStruct(ctxTy, func->arg_begin(), i);
+        const auto gep = cg.builder.CreateStructGEP(ctxTy, func->arg_begin(), i);
+        const auto v = cg.builder.CreateLoad(ctxTy->getStructElementType(i), gep);
         args.push_back(v);
     }
 

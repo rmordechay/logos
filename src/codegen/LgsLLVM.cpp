@@ -54,16 +54,6 @@ StructType* LgsLLVMGen::getStructType(const std::vector<Type*>& fields, const st
     return structType;
 }
 
-void LgsLLVMGen::storeValueInStruct(StructType* ty, Value* ptr, const int i, Value* v) {
-    const auto fieldPtr = builder.CreateStructGEP(ty, ptr, i);
-    builder.CreateStore(v, fieldPtr);
-}
-
-Value* LgsLLVMGen::loadValueFromStruct(Type* ty, Value* ptr, const int i) {
-    const auto gep = builder.CreateStructGEP(ty, ptr, i);
-    return builder.CreateLoad(ty->getStructElementType(i), gep);
-}
-
 BasicBlock* LgsLLVMGen::createBlock(const std::string& name, Function* parent) {
     return BasicBlock::Create(context, name, parent);
 }

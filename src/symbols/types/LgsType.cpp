@@ -42,7 +42,7 @@ DIBasicType* LgsType::getDebugType(LgsLLVMGen& cg) {
     assert(0);
 }
 
-void LgsType::freeValue(LgsLLVMGen& cg, LgsExpr* value) {}
+void LgsType::freeValue(LgsLLVMGen& cg, Value* value) {}
 
 LgsType* LgsType::clone() {
     if (isPrimitive) return this;

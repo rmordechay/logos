@@ -27,8 +27,6 @@ public:
     GlobalVariable* createGlobal(Type* type, ConstantAggregateZero* zeroInit, const std::string& name = "") const;
     GlobalVariable* createConstGlobal(Type* type, Constant* zeroInit, const std::string& name = "") const;
     StructType* getStructType(const std::vector<Type*>& fields, const std::string& name = "");
-    void storeValueInStruct(StructType* ty, Value* ptr, int i, Value* v);
-    Value* loadValueFromStruct(Type* ty, Value* ptr, int i);
 
     // Blocks
     BasicBlock* createBlock(const std::string& name, Function* parent = nullptr);

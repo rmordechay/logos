@@ -430,6 +430,7 @@ LgsParam LgsParserAdapter::getParam(LgsFuncType* funcType, LogosParser::ParamCon
     const auto expr = getExpr(ctx->expr());
     auto lgsParam = LgsParam(getType(ctx->type()), variableName, expr);
     setLocation(lgsParam.location, ctx->start, ctx->stop);
+    lgsParam.isOwner = !!ctx->OWNER();
     if (ctx->TRIPLE_DOT()) {
         lgsParam.isVariadic = true;
         funcType->isVariadic = true;

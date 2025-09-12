@@ -2,12 +2,10 @@
 #include "LgsType.h"
 #include "exprs/LgsExpr.h"
 #include "exprs/LgsHashMap.h"
+#include "types/iterables/LgsDArray.h"
 
 Value* LgsField::loadIR(LgsLLVMGen& cg) {
-    if (type->asDArray()) {
-        return cg.builder.CreateLoad(IRValue->getType(), IRValue);
-    }
-    return IRValue;
+    return cg.builder.CreateLoad(parentIRType->getStructElementType(position), parentIRValue);
 }
 
 Value* LgsField::resolveVirtualField(LgsLLVMGen* cg, const LgsHashMap* vtable) const {

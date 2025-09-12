@@ -45,7 +45,7 @@ public:
     Value* IRIsNotEmpty(LgsLLVMGen* cg, LgsExpr* iterable) override;
     StructType* getMapStruct(LgsLLVMGen& cg);
     bool canCastTo(LgsType* other) override;
-    void freeValue(LgsLLVMGen& cg, LgsExpr* value) override;
+    void freeValue(LgsLLVMGen& cg, Value* value) override;
     std::string strFormatPart() const override;
     ~LgsMap() override;
 };

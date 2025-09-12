@@ -43,9 +43,9 @@ StructType* LgsDArray::getArrStruct(LgsLLVMGen& cg) {
     return arrStruct;
 }
 
-void LgsDArray::freeValue(LgsLLVMGen& cg, LgsExpr* value) {
-    cg.printPtr(value->IRValue, "Freeing arr: ");
-    freeFunc->callIR(cg, {value->IRValue});
+void LgsDArray::freeValue(LgsLLVMGen& cg, Value* value) {
+    cg.printPtr(value, "Freeing arr: ");
+    freeFunc->callIR(cg, {value});
 }
 
 Value* LgsDArray::IRLength(LgsLLVMGen& cg, LgsExpr* iterable) {

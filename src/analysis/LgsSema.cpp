@@ -234,6 +234,9 @@ void LgsSema::visitAssignment(const LgsAssignment* assignment) {
     if (!lType->canAssignTo(rType, assignment->assignmentType)) {
         return errHandler.addError(E10012, &lValue->location, {lValue->pname(), lType->pname(), assignment->getAssignTypeStr(), rValue->pname()});
     }
+    if (assignment->lValue->owner && assignment->rValue->owner) {
+        errHandler.addError(E10075, &lValue->location, {rValue->pname()});
+    }
 }
 
 void LgsSema::visitIfStmt(LgsIfStmt* ifStmt) {
@@ -622,6 +625,9 @@ void LgsSema::visitVariable(LgsVariable* variable) {
     case PARAM: {
         variable->ref.param = symbol->param;
         variable->setType(symbol->param->type);
+        if (symbol->param->isOwner) {
+            variable->owner = symbol->param;
+        }
         break;
     }
     case ENUM: {
@@ -712,7 +718,19 @@ void LgsSema::visitVarSelection(LgsVariable* child, LgsType* parentType) {
 }
 
 void LgsSema::visitIterIndexSelection(LgsIterIndex* child, LgsType* parentType) {
-    assert(0);
+    const auto baseExpr = child->baseExpr->asVariable();
+    const auto field = parentType->getField(baseExpr->name);
+    if (!field) {
+        return errHandler.addError(E10005, &child->location, {baseExpr->name, parentType->pname()});
+    }
+    const auto iterable = field->type->asIterable();
+    if (!iterable) {
+        return errHandler.addError(E10002, &child->location, {baseExpr->name});
+    }
+    child->type = iterable->baseType;
+    child->baseExpr->type = iterable;
+    baseExpr->ref = LgsSymbol(field);
+    visitIndex(child);
 }
 
 void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent) {
@@ -863,17 +881,15 @@ void LgsSema::visitIterIndex(LgsIterIndex* iterIndex) {
     if (baseExpr->type->isUnknown()) return;
     const auto iterable = baseExpr->type->asIterable();
     if (!iterable) {
-        if (baseExpr->type) {
-            errHandler.addError(E10002, &iterIndex->location, {baseExpr->pname(), baseExpr->type->pname()});
-        }
-        return;
+        const auto typeName = baseExpr->type ? baseExpr->type->pname() : LGS_UNKNOWN_TYPE;
+        return errHandler.addError(E10002, &iterIndex->location, {baseExpr->pname(), typeName});
     }
     visitIndex(iterIndex);
 }
 
 void LgsSema::visitIndex(LgsIterIndex* iterIndex) {
-    const auto iterable = iterIndex->baseExpr->type->asIterable();
-    assert(iterable);
+    const auto baseExpr = iterIndex->baseExpr;
+    const auto iterable = baseExpr->type->asIterable();
     const auto exprFrom = iterIndex->index->from;
     const auto exprTo = iterIndex->index->to;
     visitExpr(exprFrom);
