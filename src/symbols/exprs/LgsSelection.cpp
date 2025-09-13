@@ -20,7 +20,7 @@ LgsExpr* LgsSelection::lastExprParent() const {
 
 void LgsSelection::assign(LgsLLVMGen& cg, LgsExpr* expr) {
     const auto rIR = expr->IRValue;
-    const auto exprParent = lastExprParent();
+    const auto exprParent = lastExpr();
     if (!exprParent->type->asVec()) {
         if (type->isHeapAlloc) type->freeValue(cg, IRValue);
         cg.builder.CreateStore(rIR, IRValue);

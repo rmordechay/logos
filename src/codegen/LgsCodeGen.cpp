@@ -726,8 +726,8 @@ void LgsCodeGen::visitSelection(LgsSelection* selection) {
         const auto childExpr = selection->exprs[i + 1];
         if (const auto var = childExpr->asVariable()) {
             const auto field = parentExpr->type->getField(var->name);
-            field->parentIRType = parentExpr->type->getIRType(cg);
             field->parentIRValue = getIRValue(parentExpr);
+            field->parentIRType = parentExpr->type->getIRType(cg);
             visitField(field);
             childExpr->setIRValue(field->IRValue);
         } else if (const auto funcCall = childExpr->asFuncCall()) {

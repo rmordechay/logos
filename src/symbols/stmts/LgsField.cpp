@@ -5,10 +5,10 @@
 #include "types/iterables/LgsDArray.h"
 
 Value* LgsField::loadIR(LgsLLVMGen& cg) {
-    if (type->asDArray()) {
-        return cg.builder.CreateLoad(IRValue->getType(), IRValue);
+    if (type->isPrimitive) {
+        return cg.builder.CreateLoad(type->getIRType(cg), IRValue);
     }
-    return IRValue;
+    return cg.builder.CreateLoad(cg.ptrTy(), IRValue);
 }
 
 Value* LgsField::resolveVirtualField(LgsLLVMGen* cg, const LgsHashMap* vtable) const {

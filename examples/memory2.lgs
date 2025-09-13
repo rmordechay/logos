@@ -1,5 +1,5 @@
 object Obj1 {
-    x: Int
+    x: Int = 34
 }
 
 object Obj2 {
@@ -14,6 +14,7 @@ func(owner obj1: Obj1) {
 
 main() {
     owner obj2 = Obj2{}
-    //obj2.obj1.x := 32476
+    obj2.obj1.x := 3824
     func(obj2.obj1)
+    print(obj2.obj1.x)
 }
