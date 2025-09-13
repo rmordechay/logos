@@ -1,4 +1,6 @@
 #pragma once
+#include "LgsAssignable.h"
+
 #include <stmts/LgsStmt.h>
 #include "LgsValue.h"
 
@@ -43,6 +45,7 @@ public:
 
     virtual Value* hash(LgsLLVMGen& cg);
     virtual void assign(LgsLLVMGen& cg, LgsExpr* expr);
+    virtual bool canAssignTo(LgsType* other, LgsAssignType op);
 
     size_t getConstInt();
     std::string getConstStr();

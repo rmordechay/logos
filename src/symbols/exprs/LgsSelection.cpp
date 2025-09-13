@@ -20,17 +20,17 @@ LgsExpr* LgsSelection::lastExprParent() const {
 
 void LgsSelection::assign(LgsLLVMGen& cg, LgsExpr* expr) {
     const auto rIR = expr->IRValue;
-    const auto exprParent = lastExpr();
-    if (!exprParent->type->asVec()) {
+    const auto lExpr = lastExpr();
+    if (!lExpr->type->asVec()) {
         if (type->isHeapAlloc) type->freeValue(cg, IRValue);
         cg.builder.CreateStore(rIR, IRValue);
     } else {
-        const auto vecTy = exprParent->type->getIRType(cg);
-        const auto vec = cg.builder.CreateLoad(vecTy, exprParent->IRValue);
+        const auto vecTy = lExpr->type->getIRType(cg);
+        const auto vec = cg.builder.CreateLoad(vecTy, lExpr->IRValue);
         const auto c = lastExpr()->asVariable()->name;
         const auto i = cg.i32(LgsVec::getComponentIndex(c.front()));
         const auto insert = cg.builder.CreateInsertElement(vec, rIR, i);
-        cg.builder.CreateStore(insert, exprParent->IRValue);
+        cg.builder.CreateStore(insert, lExpr->IRValue);
     }
 }
 

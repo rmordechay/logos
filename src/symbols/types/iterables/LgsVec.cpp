@@ -62,24 +62,21 @@ bool LgsVec::canCastTo(LgsType* other) {
     return dim == otherVec->dim && baseType->canCastTo(otherVec->baseType);
 }
 
-bool LgsVec::canAssignTo(LgsType* other, const LgsAssignType op) {
-    if (op == ASSIGN) return canCastTo(other);
-    return other->isNumber;
-}
-
-bool LgsVec::canApplyOp(LgsType* other, const LgsOperator op) {
+LgsType* LgsVec::applyOp(LgsType* other, const LgsOperator op) {
     const auto IRName = other->getName();
     switch (op) {
     case ADD:
     case SUB:
-        return getName() == IRName;
+        if (getName() == IRName) return this;
+        break;
     case MUL:
     case DIV:
-        return getName() == IRName || other->isNumber;
+        if (getName() == IRName || other->isNumber) return this;
+        break;
     default:
         break;
     }
-    return false;
+    return nullptr;
 }
 
 Value* LgsVec::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
@@ -99,19 +96,20 @@ Value* LgsVec::subIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
 }
 
 Value* LgsVec::mulIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    auto loadRight = other->loadIR(cg);
+    auto loadOther = other->loadIR(cg);
+    const auto loadSelf = self->loadIR(cg);
     if (other->type->isInt) {
-        const auto vecTy = cast<VectorType>(self->IRValue->getType());
-        loadRight = cg.builder.CreateSIToFP(loadRight, vecTy->getElementType());
-        loadRight = cg.builder.CreateVectorSplat(vecTy->getElementCount(), loadRight);
-        return cg.builder.CreateFMul(self->loadIR(cg), loadRight);
+        const auto vecTy = cast<VectorType>(self->type->getIRType(cg));
+        loadOther = cg.builder.CreateSIToFP(loadOther, vecTy->getElementType());
+        loadOther = cg.builder.CreateVectorSplat(vecTy->getElementCount(), loadOther);
+        return cg.builder.CreateFMul(loadSelf, loadOther);
     }
     if (other->type->asFloat()) {
-        const auto vecTy = cast<VectorType>(self->IRValue->getType());
-        loadRight = cg.builder.CreateVectorSplat(vecTy->getElementCount(), loadRight);
-        return cg.builder.CreateFMul(self->loadIR(cg), loadRight);
+        const auto vecTy = cast<VectorType>(self->type->getIRType(cg));
+        loadOther = cg.builder.CreateVectorSplat(vecTy->getElementCount(), loadOther);
+        return cg.builder.CreateFMul(loadSelf, loadOther);
     }
-    return cg.builder.CreateFMul(self->loadIR(cg), loadRight);
+    return cg.builder.CreateFMul(loadSelf, loadOther);
 }
 
 Value* LgsVec::divIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {

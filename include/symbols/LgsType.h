@@ -67,8 +67,7 @@ public:
     virtual std::string getName() = 0;
     virtual std::string pname() = 0; // pretty name
     virtual bool canCastTo(LgsType* other) = 0;
-    virtual bool canAssignTo(LgsType* other, LgsAssignType op);
-    virtual bool canApplyOp(LgsType* other, LgsOperator op);
+    virtual LgsType* applyOp(LgsType* other, LgsOperator op);
     virtual std::string strFormatPart() const = 0;
     virtual DIBasicType* getDebugType(LgsLLVMGen& cg);
     virtual void freeValue(LgsLLVMGen& cg, Value* value);

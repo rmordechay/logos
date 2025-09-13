@@ -238,7 +238,7 @@ void LgsSema::visitAssignment(const LgsAssignment* assignment) {
     if (!lValue->isMutable) {
         return errHandler.addError(E10051, &lValue->location, {lValue->pname()});
     }
-    if (!lType->canAssignTo(rType, assignment->assignmentType)) {
+    if (!lValue->canAssignTo(rType, assignment->assignmentType)) {
         return errHandler.addError(E10012, &lValue->location, {lValue->pname(), lType->pname(), assignment->getAssignTypeStr(), rValue->pname()});
     }
     if (assignment->lValue->owner && assignment->rValue->owner) {
@@ -483,7 +483,8 @@ void LgsSema::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
     visitExpr(r);
     const auto ltype = l->type;
     const auto rtype = r->type;
-    if (!ltype->canApplyOp(rtype, binaryExpr->op)) {
+    const auto binaryType = ltype->applyOp(rtype, binaryExpr->op);
+    if (!binaryType) {
         return errHandler.addError(E10076, &l->location, {getOpAsText(binaryExpr->op), ltype->pname(), rtype->pname()});
     }
     LgsType* type = nullptr;
@@ -498,10 +499,7 @@ void LgsSema::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
     case BIT_XOR:
     case LSHIFT:
     case RSHIFT: {
-        const auto lType = ltype;
-        const auto rType = r->type;
-        if (!lType || !rType) return;
-        type = lType;
+        type = binaryType;
         break;
     }
     case AND:

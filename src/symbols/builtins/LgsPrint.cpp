@@ -10,7 +10,7 @@ Value* LgsPrint::call(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
     IRArgs.emplace_back(baseStr);
     IRArgs.emplace_back(cg.i32(arg->type->rtt));
     // TODO find better rule
-    auto v = arg->loadIR(cg);
+    auto v = arg->IRValue;
     if (!v->getType()->isPointerTy()) {
         v = arg->getIRPtrTo(cg);
     }

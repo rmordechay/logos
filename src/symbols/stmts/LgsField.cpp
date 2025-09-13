@@ -5,7 +5,7 @@
 #include "types/iterables/LgsDArray.h"
 
 Value* LgsField::loadIR(LgsLLVMGen& cg) {
-    if (type->isPrimitive) {
+    if (type->isPrimitive || type->asVec()) {
         return cg.builder.CreateLoad(type->getIRType(cg), IRValue);
     }
     return cg.builder.CreateLoad(cg.ptrTy(), IRValue);

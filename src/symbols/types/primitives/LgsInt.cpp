@@ -28,14 +28,19 @@ bool LgsInt::canCastTo(LgsType* other) {
     return false;
 }
 
-bool LgsInt::canAssignTo(LgsType* other, const LgsAssignType op) {
-    return canCastTo(other);
-}
-
-bool LgsInt::canApplyOp(LgsType* other, const LgsOperator op) {
+LgsType* LgsInt::applyOp(LgsType* other, const LgsOperator op) {
+    if (op == DIV) {
+        return &LGS_FLOAT;
+    }
+    if (other->asFloat()) {
+        return &LGS_FLOAT;
+    }
+    if (other->asDouble()) {
+        assert(0);
+    }
     const auto IRName = other->getName();
-    if (name == IRName) return true;
-    return false;
+    if (name == IRName) return this;
+    return nullptr;
 }
 
 Value* LgsInt::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {

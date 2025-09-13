@@ -24,7 +24,7 @@ extern "C" void* Lgs_Map_get(const Lgs_Map* map, const char* key) {
     if (!map || !key) std::exit(1);
     const auto it = map->data->find(key);
     if (it == map->data->end()) {
-        // formatAndLogError(E10067, {key});
+        formatAndLogError(E10067, {key});
         return nullptr;
     }
     return it->second.data();

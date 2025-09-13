@@ -30,11 +30,7 @@ LgsFunc* LgsType::getMethod(const std::string& name) {
     return nullptr;
 }
 
-bool LgsType::canAssignTo(LgsType* other, LgsAssignType op) {
-    assert(0);
-}
-
-bool LgsType::canApplyOp(LgsType* other, const LgsOperator op) {
+LgsType* LgsType::applyOp(LgsType* other, const LgsOperator op) {
     assert(0);
 }
 

@@ -146,16 +146,17 @@ void LgsCodeGen::visitGroup(LgsGroup* group) {
 }
 
 void LgsCodeGen::visitField(LgsField* field) {
-    visitExpr(field->expr);
+    visitExpr(field->expr); // This should set up the source vector
     if (const auto vec = field->type->asVec()) {
         std::vector<int> mask(vec->dim);
         for (unsigned i = 0; i < vec->dim; i++) {
             mask[i] = LgsVec::getComponentIndex(field->name[i]);
         }
         const ArrayRef maskRef(mask);
-        const auto parentLoaded = cg.builder.CreateLoad(field->parentIRType, field->parentIRValue);
-        const auto newVec = cg.builder.CreateShuffleVector(parentLoaded, UndefValue::get(field->parentIRType), maskRef);
-        field->IRValue = cg.builder.CreateAlloca(field->parentIRType);
+        const auto vecType = field->type->getIRType(cg);
+        field->IRValue = cg.builder.CreateAlloca(vecType);
+        const auto l = cg.builder.CreateLoad(field->parentIRType, field->parentIRValue);
+        const auto newVec = cg.builder.CreateShuffleVector(l, UndefValue::get(field->parentIRType), maskRef);
         cg.builder.CreateStore(newVec, field->IRValue);
     } else {
         field->IRValue = cg.builder.CreateStructGEP(field->parentIRType, field->parentIRValue, field->position);
@@ -550,54 +551,87 @@ void LgsCodeGen::visitExpr(LgsExpr* expr) {
     if (const auto binaryExpr = dynamic_cast<LgsBinaryExpr*>(expr)) {
         visitBinaryExpr(binaryExpr);
     } else {
-        visitUnaryExpr(expr);
+        if (const auto func = expr->asFunc()) return visitLambda(func);
+        if (const auto instance = expr->asInstance()) return visitInstance(instance);
+        if (const auto funcCall = expr->asFuncCall()) return visitFuncCall(funcCall);
+        if (const auto strConst = expr->asStrConst()) return visitStrConst(strConst);
+        if (const auto selection = expr->asSelection()) return visitSelection(selection);
+        if (const auto arrayExpr = expr->asArrayExpr()) return visitArrayExpr(arrayExpr);
+        if (const auto hashMap = expr->asHashMap()) return visitHashMap(hashMap);
+        if (const auto iterIndex = expr->asIterIndex()) return visitIterIndex(iterIndex);
+        if (const auto variable = expr->asVariable()) return visitVariable(variable);
+        if (const auto postfixExpr = expr->asPostfixExpr()) return visitPostfixExpr(postfixExpr);
+        if (const auto prefixExpr = expr->asPrefixExpr()) return visitPrefixExpr(prefixExpr);
+        if (const auto vecExpr = expr->asVectorExpr()) return visitVectorExpr(vecExpr);
+        if (const auto intConst = expr->asIntConst()) return visitIntConst(intConst);
+        if (const auto floatConst = expr->asFloatConst()) return visitFloatConst(floatConst);
+        if (const auto loopMetaVar = expr->asLoopMetaVar()) return visitLoopMetaVar(loopMetaVar);
+        if (const auto typeExpr = expr->asTypeExpr()) return visitTypeExpr(typeExpr);
+        if (const auto cast = expr->asCast()) return visitCast(cast);
     }
-}
-
-void LgsCodeGen::visitUnaryExpr(LgsExpr* unaryExpr) {
-    if (const auto func = unaryExpr->asFunc()) return visitLambda(func);
-    if (const auto instance = unaryExpr->asInstance()) return visitInstance(instance);
-    if (const auto funcCall = unaryExpr->asFuncCall()) return visitFuncCall(funcCall);
-    if (const auto strConst = unaryExpr->asStrConst()) return visitStrConst(strConst);
-    if (const auto selection = unaryExpr->asSelection()) return visitSelection(selection);
-    if (const auto arrayExpr = unaryExpr->asArrayExpr()) return visitArrayExpr(arrayExpr);
-    if (const auto hashMap = unaryExpr->asHashMap()) return visitHashMap(hashMap);
-    if (const auto iterIndex = unaryExpr->asIterIndex()) return visitIterIndex(iterIndex);
-    if (const auto variable = unaryExpr->asVariable()) return visitVariable(variable);
-    if (const auto postfixExpr = unaryExpr->asPostfixExpr()) return visitPostfixExpr(postfixExpr);
-    if (const auto prefixExpr = unaryExpr->asPrefixExpr()) return visitPrefixExpr(prefixExpr);
-    if (const auto vecExpr = unaryExpr->asVectorExpr()) return visitVectorExpr(vecExpr);
-    if (const auto intConst = unaryExpr->asIntConst()) return visitIntConst(intConst);
-    if (const auto floatConst = unaryExpr->asFloatConst()) return visitFloatConst(floatConst);
-    if (const auto loopMetaVar = unaryExpr->asLoopMetaVar()) return visitLoopMetaVar(loopMetaVar);
-    if (const auto typeExpr = unaryExpr->asTypeExpr()) return visitTypeExpr(typeExpr);
-    if (const auto cast = unaryExpr->asCast()) return visitCast(cast);
-    assert(0);
 }
 
 void LgsCodeGen::visitBinaryExpr(LgsBinaryExpr* binExpr) {
     visitExpr(binExpr->left);
     visitExpr(binExpr->right);
     switch (binExpr->op) {
-    case ADD: binExpr->IRValue = binExpr->left->type->addIR(cg, binExpr->left, binExpr->right); break;
-    case SUB: binExpr->IRValue = binExpr->left->type->subIR(cg, binExpr->left, binExpr->right); break;
-    case MUL: binExpr->IRValue = binExpr->left->type->mulIR(cg, binExpr->left, binExpr->right); break;
-    case DIV: binExpr->IRValue = binExpr->left->type->divIR(cg, binExpr->left, binExpr->right); break;
-    case IN: binExpr->IRValue = binExpr->left->type->inIR(cg, binExpr->left, binExpr->right); break;
-    case MOD: binExpr->IRValue = binExpr->left->type->modIR(cg, binExpr->left, binExpr->right); break;
-    case EQ: binExpr->IRValue = binExpr->left->type->eqIR(cg, binExpr->left, binExpr->right); break;
-    case NE: binExpr->IRValue = binExpr->left->type->neIR(cg, binExpr->left, binExpr->right); break;
-    case AND: binExpr->IRValue = binExpr->left->type->andIR(cg, binExpr->left, binExpr->right); break;
-    case OR: binExpr->IRValue = binExpr->left->type->orIR(cg, binExpr->left, binExpr->right); break;
-    case LT: binExpr->IRValue = binExpr->left->type->ltIR(cg, binExpr->left, binExpr->right); break;
-    case GT: binExpr->IRValue = binExpr->left->type->gtIR(cg, binExpr->left, binExpr->right); break;
-    case GE: binExpr->IRValue = binExpr->left->type->geIR(cg, binExpr->left, binExpr->right); break;
-    case LE: binExpr->IRValue = binExpr->left->type->leIR(cg, binExpr->left, binExpr->right); break;
-    case BIT_AND: binExpr->IRValue = binExpr->left->type->bitAndIR(cg, binExpr->left, binExpr->right); break;
-    case BIT_OR: binExpr->IRValue = binExpr->left->type->bitOrIR(cg, binExpr->left, binExpr->right); break;
-    case BIT_XOR: binExpr->IRValue = binExpr->left->type->bitXorIR(cg, binExpr->left, binExpr->right); break;
-    case LSHIFT: binExpr->IRValue = binExpr->left->type->rshiftIR(cg, binExpr->left, binExpr->right); break;
-    case RSHIFT: binExpr->IRValue = binExpr->left->type->lshiftIR(cg, binExpr->left, binExpr->right); break;
+    case ADD:
+        binExpr->IRValue = binExpr->type->addIR(cg, binExpr->left, binExpr->right);
+        break;
+    case SUB:
+        binExpr->IRValue = binExpr->type->subIR(cg, binExpr->left, binExpr->right);
+        break;
+    case MUL:
+        binExpr->IRValue = binExpr->type->mulIR(cg, binExpr->left, binExpr->right);
+        break;
+    case DIV:
+        binExpr->IRValue = binExpr->type->divIR(cg, binExpr->left, binExpr->right);
+        break;
+    case IN:
+        binExpr->IRValue = binExpr->type->inIR(cg, binExpr->left, binExpr->right);
+        break;
+    case MOD:
+        binExpr->IRValue = binExpr->type->modIR(cg, binExpr->left, binExpr->right);
+        break;
+    case EQ:
+        binExpr->IRValue = binExpr->type->eqIR(cg, binExpr->left, binExpr->right);
+        break;
+    case NE:
+        binExpr->IRValue = binExpr->type->neIR(cg, binExpr->left, binExpr->right);
+        break;
+    case AND:
+        binExpr->IRValue = binExpr->type->andIR(cg, binExpr->left, binExpr->right);
+        break;
+    case OR:
+        binExpr->IRValue = binExpr->type->orIR(cg, binExpr->left, binExpr->right);
+        break;
+    case LT:
+        binExpr->IRValue = binExpr->type->ltIR(cg, binExpr->left, binExpr->right);
+        break;
+    case GT:
+        binExpr->IRValue = binExpr->type->gtIR(cg, binExpr->left, binExpr->right);
+        break;
+    case GE:
+        binExpr->IRValue = binExpr->type->geIR(cg, binExpr->left, binExpr->right);
+        break;
+    case LE:
+        binExpr->IRValue = binExpr->type->leIR(cg, binExpr->left, binExpr->right);
+        break;
+    case BIT_AND:
+        binExpr->IRValue = binExpr->type->bitAndIR(cg, binExpr->left, binExpr->right);
+        break;
+    case BIT_OR:
+        binExpr->IRValue = binExpr->type->bitOrIR(cg, binExpr->left, binExpr->right);
+        break;
+    case BIT_XOR:
+        binExpr->IRValue = binExpr->type->bitXorIR(cg, binExpr->left, binExpr->right);
+        break;
+    case LSHIFT:
+        binExpr->IRValue = binExpr->type->rshiftIR(cg, binExpr->left, binExpr->right);
+        break;
+    case RSHIFT:
+        binExpr->IRValue = binExpr->type->lshiftIR(cg, binExpr->left, binExpr->right);
+        break;
     case NOOP: assert(0);
     }
 }
@@ -817,7 +851,7 @@ void LgsCodeGen::visitIterIndex(LgsIterIndex* iterIndex) {
     visitExpr(iterIndex->baseExpr);
     visitExpr(iterIndex->index->from);
     visitExpr(iterIndex->index->to);
-    iterIndex->IRValue = iterIndex->baseExpr->IRValue;
+    iterIndex->IRValue = iterIndex->baseExpr->loadIR(cg);
 }
 
 void LgsCodeGen::visitInstance(LgsInstance* instance) {

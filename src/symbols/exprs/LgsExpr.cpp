@@ -95,7 +95,13 @@ Value* LgsExpr::hash(LgsLLVMGen& cg) {
     assert(0);
 }
 
-void LgsExpr::assign(LgsLLVMGen& cg, LgsExpr* expr) { assert(0); }
+void LgsExpr::assign(LgsLLVMGen& cg, LgsExpr* expr) {
+    assert(0);
+}
+
+bool LgsExpr::canAssignTo(LgsType* other, const LgsAssignType op) {
+    return false;
+}
 
 // Casting
 LgsFunc* LgsExpr::asFunc() { return dynamic_cast<LgsFunc*>(this); }

@@ -5,7 +5,7 @@ Value* LgsStrConst::loadIR(LgsLLVMGen& cg) {
 }
 
 std::string LgsStrConst::pname() {
-    return value.substr(0, 50) + "...";
+    return '"' + value + '"';
 }
 
 Value* LgsStrConst::hash(LgsLLVMGen& cg) {

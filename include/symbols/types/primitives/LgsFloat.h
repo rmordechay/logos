@@ -17,8 +17,11 @@ public:
     size_t getSizeBytes() override;
     std::string strFormatPart() const override;
     bool canCastTo(LgsType* other) override;
-    bool canAssignTo(LgsType* other, LgsAssignType op) override;
-    bool canApplyOp(LgsType* other, LgsOperator op) override;
+    LgsType* applyOp(LgsType* other, LgsOperator op) override;
+    Value* addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
+    Value* subIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
+    Value* mulIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
+    Value* divIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
     std::string pname() override;
     json::value asJSON() override;
 };

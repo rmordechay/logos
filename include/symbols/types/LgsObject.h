@@ -29,7 +29,6 @@ public:
     std::string getName() override;
     std::string pname() override;
     bool canCastTo(LgsType* other) override;
-    bool canAssignTo(LgsType* other, LgsAssignType op) override;
     json::value asJSON() override;
     ~LgsObject() override;
 };

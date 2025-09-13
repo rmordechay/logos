@@ -1,7 +1,6 @@
 #include "exprs/LgsIterIndex.h"
 #include "exprs/LgsVariable.h"
 #include "exprs/constants/LgsIntConst.h"
-#include "stmts/LgsVarDec.h"
 #include <exprs/LgsArrayExpr.h>
 #include "types/iterables/LgsMap.h"
 
@@ -150,10 +149,15 @@ void LgsIterIndex::assignArray(LgsLLVMGen& cg, const LgsArrayExpr* arr) const {
     //     cg.builder.CreateStore(rValue, gep);
     //     IRIndices.pop_back();
     // }
+    assert(0);
 }
 
 void LgsIterIndex::assignHashMap(LgsLLVMGen& cg, LgsHashMap* map) {
     assert(0);
+}
+
+bool LgsIterIndex::canAssignTo(LgsType* other, const LgsAssignType op) {
+    return type->canCastTo(other);
 }
 
 std::string LgsIterIndex::pname() {

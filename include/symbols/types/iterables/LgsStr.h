@@ -20,7 +20,7 @@ public:
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
     LgsType* getIndexType() override;
-    bool canApplyOp(LgsType* other, LgsOperator op) override;
+    LgsType* applyOp(LgsType* other, LgsOperator op) override;
     Value* addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
     std::string strFormatPart() const override;
     uint16_t getUnpackCount() const override;

@@ -95,7 +95,6 @@ public:
     void visitBreakStmt(const LgsBreak* breakStmt);
     void visitDeferStmt(const LgsDeferStmt* deferStmt);
     void visitExpr(LgsExpr* expr);
-    void visitUnaryExpr(LgsExpr* unaryExpr);
     void visitBinaryExpr(LgsBinaryExpr* binExpr);
     void visitCast(LgsCast* lgsCast);
     void visitLambda(LgsFunc* func);

@@ -41,12 +41,57 @@ bool LgsFloat::canCastTo(LgsType* other) {
     return false;
 }
 
-bool LgsFloat::canAssignTo(LgsType* other, LgsAssignType op) {
-    return canCastTo(other);
+LgsType* LgsFloat::applyOp(LgsType* other, const LgsOperator op) {
+    if (other->asInt()) return this;
+    const auto IRName = other->getName();
+    if (name == IRName) return this;
+    return nullptr;
 }
 
-bool LgsFloat::canApplyOp(LgsType* other, const LgsOperator op) {
-    const auto IRName = other->getName();
-    if (name == IRName) return true;
-    return false;
+Value* LgsFloat::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+        auto l = self->loadIR(cg);
+    auto r = other->loadIR(cg);
+    if (l->getType()->isIntegerTy()) {
+        l = cg.builder.CreateSIToFP(l, cg.floatTy());
+    }
+    if (r->getType()->isIntegerTy()) {
+        r = cg.builder.CreateSIToFP(r, cg.floatTy());
+    }
+    return cg.builder.CreateFAdd(l, r);
+}
+
+Value* LgsFloat::subIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+        auto l = self->loadIR(cg);
+    auto r = other->loadIR(cg);
+    if (l->getType()->isIntegerTy()) {
+        l = cg.builder.CreateSIToFP(l, cg.floatTy());
+    }
+    if (r->getType()->isIntegerTy()) {
+        r = cg.builder.CreateSIToFP(r, cg.floatTy());
+    }
+    return cg.builder.CreateFSub(l, r);
+}
+
+Value* LgsFloat::mulIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+        auto l = self->loadIR(cg);
+    auto r = other->loadIR(cg);
+    if (l->getType()->isIntegerTy()) {
+        l = cg.builder.CreateSIToFP(l, cg.floatTy());
+    }
+    if (r->getType()->isIntegerTy()) {
+        r = cg.builder.CreateSIToFP(r, cg.floatTy());
+    }
+    return cg.builder.CreateFMul(l, r);
+}
+
+Value* LgsFloat::divIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    auto l = self->loadIR(cg);
+    auto r = other->loadIR(cg);
+    if (l->getType()->isIntegerTy()) {
+        l = cg.builder.CreateSIToFP(l, cg.floatTy());
+    }
+    if (r->getType()->isIntegerTy()) {
+        r = cg.builder.CreateSIToFP(r, cg.floatTy());
+    }
+    return cg.builder.CreateFDiv(l, r);
 }

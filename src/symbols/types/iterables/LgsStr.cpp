@@ -65,11 +65,14 @@ LgsType* LgsStr::getIndexType() {
     return &LGS_INT;
 }
 
-bool LgsStr::canApplyOp(LgsType* other, const LgsOperator op) {
+LgsType* LgsStr::applyOp(LgsType* other, const LgsOperator op) {
     const auto IRName = other->getName();
     switch (op) {
     case ADD:
-        return other->isNumber || name == IRName;
+        if (other->isNumber || name == IRName) {
+            return this;
+        }
+        break;
     case SUB:
         break;
     case MUL:
@@ -109,7 +112,7 @@ bool LgsStr::canApplyOp(LgsType* other, const LgsOperator op) {
     case NOOP:
         break;
     }
-    return false;
+    return nullptr;
 }
 
 Value* LgsStr::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
