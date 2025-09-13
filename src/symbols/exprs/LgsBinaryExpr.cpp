@@ -1,6 +1,10 @@
 #include "exprs/LgsBinaryExpr.h"
 #include "utils/LgsUtils.h"
 
+Value* LgsBinaryExpr::loadIR(LgsLLVMGen& cg) {
+    return IRValue;
+}
+
 json::value LgsBinaryExpr::asJSON() {
     assert(0);
 }

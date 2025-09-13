@@ -3,8 +3,7 @@
 #include "codegen/LgsLLVMGen.h"
 
 Value* LgsValue::loadIR(LgsLLVMGen& cg) {
-    assert(IRValue);
-    return cg.builder.CreateLoad(IRValue->getType(), IRValue);
+    assert(0);
 }
 
 void LgsValue::setIRValue(Value* value) {

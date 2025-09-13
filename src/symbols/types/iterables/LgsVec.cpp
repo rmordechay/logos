@@ -82,39 +82,39 @@ bool LgsVec::canApplyOp(LgsType* other, const LgsOperator op) {
     return false;
 }
 
-Value* LgsVec::addIR(LgsLLVMGen& cg, Value* value, LgsExpr* other) {
+Value* LgsVec::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     const auto loadRight = other->loadIR(cg);
     if (other->type->isInt) {
-        return cg.builder.CreateAdd(value, loadRight);
+        return cg.builder.CreateAdd(self->loadIR(cg), loadRight);
     }
-    return cg.builder.CreateFAdd(value, loadRight);
+    return cg.builder.CreateFAdd(self->loadIR(cg), loadRight);
 }
 
-Value* LgsVec::subIR(LgsLLVMGen& cg, Value* value, LgsExpr* other) {
+Value* LgsVec::subIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     const auto loadRight = other->loadIR(cg);
     if (other->type->isInt) {
-        return cg.builder.CreateSub(value, loadRight);
+        return cg.builder.CreateSub(self->loadIR(cg), loadRight);
     }
-    return cg.builder.CreateFSub(value, loadRight);
+    return cg.builder.CreateFSub(self->loadIR(cg), loadRight);
 }
 
-Value* LgsVec::mulIR(LgsLLVMGen& cg, Value* value, LgsExpr* other) {
+Value* LgsVec::mulIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     auto loadRight = other->loadIR(cg);
     if (other->type->isInt) {
-        const auto vecTy = cast<VectorType>(value->getType());
+        const auto vecTy = cast<VectorType>(self->IRValue->getType());
         loadRight = cg.builder.CreateSIToFP(loadRight, vecTy->getElementType());
         loadRight = cg.builder.CreateVectorSplat(vecTy->getElementCount(), loadRight);
-        return cg.builder.CreateFMul(value, loadRight);
+        return cg.builder.CreateFMul(self->loadIR(cg), loadRight);
     }
     if (other->type->asFloat()) {
-        const auto vecTy = cast<VectorType>(value->getType());
+        const auto vecTy = cast<VectorType>(self->IRValue->getType());
         loadRight = cg.builder.CreateVectorSplat(vecTy->getElementCount(), loadRight);
-        return cg.builder.CreateFMul(value, loadRight);
+        return cg.builder.CreateFMul(self->loadIR(cg), loadRight);
     }
-    return cg.builder.CreateFMul(value, loadRight);
+    return cg.builder.CreateFMul(self->loadIR(cg), loadRight);
 }
 
-Value* LgsVec::divIR(LgsLLVMGen& cg, Value* value, LgsExpr* other) {
+Value* LgsVec::divIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     assert(0);
 }
 

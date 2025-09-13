@@ -592,7 +592,7 @@ LgsVarDec* LgsParserAdapter::getExplicitVarDec(LogosParser::ExplicitVarDecContex
     varDec->isOwner = !!ctx->OWNER();
     if (ctx->expr()) {
         varDec->expr = getExpr(ctx->expr());
-        varDec->expr->isMutable = varDec->isConst;
+        varDec->expr->isMutable = !varDec->isConst;
     }
     varDec->type = getType(ctx->type());
     return varDec;

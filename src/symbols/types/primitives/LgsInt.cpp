@@ -32,86 +32,86 @@ bool LgsInt::canAssignTo(LgsType* other, const LgsAssignType op) {
     return canCastTo(other);
 }
 
-bool LgsInt::canApplyOp(LgsType* other, LgsOperator op) {
+bool LgsInt::canApplyOp(LgsType* other, const LgsOperator op) {
     const auto IRName = other->getName();
     if (name == IRName) return true;
     return false;
 }
 
-Value* LgsInt::addIR(LgsLLVMGen& cg, Value* value, LgsExpr* other) {
-    return cg.builder.CreateAdd(value, other->loadIR(cg));
+Value* LgsInt::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    return cg.builder.CreateAdd(self->loadIR(cg), other->loadIR(cg));
 }
 
-Value* LgsInt::subIR(LgsLLVMGen& cg, Value* value, LgsExpr* other) {
-    return cg.builder.CreateSub(value, other->loadIR(cg));
+Value* LgsInt::subIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    return cg.builder.CreateSub(self->loadIR(cg), other->loadIR(cg));
 }
 
-Value* LgsInt::mulIR(LgsLLVMGen& cg, Value* value, LgsExpr* other) {
-    return cg.builder.CreateMul(value, other->loadIR(cg));
+Value* LgsInt::mulIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    return cg.builder.CreateMul(self->loadIR(cg), other->loadIR(cg));
 }
 
-Value* LgsInt::divIR(LgsLLVMGen& cg, Value* value, LgsExpr* other) {
-    return cg.builder.CreateUDiv(value, other->loadIR(cg));
+Value* LgsInt::divIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    return cg.builder.CreateUDiv(self->loadIR(cg), other->loadIR(cg));
 }
 
-Value* LgsInt::inIR(LgsLLVMGen& cg, Value* value, LgsExpr* other) {
+Value* LgsInt::inIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsInt::modIR(LgsLLVMGen& cg, Value* value, LgsExpr* other) {
-    return cg.builder.CreateSRem(value, other->loadIR(cg));
+Value* LgsInt::modIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    return cg.builder.CreateSRem(self->loadIR(cg), other->loadIR(cg));
 }
 
-Value* LgsInt::eqIR(LgsLLVMGen& cg, Value* value, LgsExpr* other) {
-    return cg.builder.CreateICmpEQ(value, other->loadIR(cg));
+Value* LgsInt::eqIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    return cg.builder.CreateICmpEQ(self->loadIR(cg), other->loadIR(cg));
 }
 
-Value* LgsInt::neIR(LgsLLVMGen& cg, Value* value, LgsExpr* other) {
-    return cg.builder.CreateICmpNE(value, other->loadIR(cg));
+Value* LgsInt::neIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    return cg.builder.CreateICmpNE(self->loadIR(cg), other->loadIR(cg));
 }
 
-Value* LgsInt::ltIR(LgsLLVMGen& cg, Value* value, LgsExpr* other) {
-    return cg.builder.CreateICmpSLT(value, other->loadIR(cg));
+Value* LgsInt::ltIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    return cg.builder.CreateICmpSLT(self->loadIR(cg), other->loadIR(cg));
 }
 
-Value* LgsInt::gtIR(LgsLLVMGen& cg, Value* value, LgsExpr* other) {
-    return cg.builder.CreateICmpSGT(value, other->loadIR(cg));
+Value* LgsInt::gtIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    return cg.builder.CreateICmpSGT(self->loadIR(cg), other->loadIR(cg));
 }
 
-Value* LgsInt::geIR(LgsLLVMGen& cg, Value* value, LgsExpr* other) {
-    return cg.builder.CreateICmpSGE(value, other->loadIR(cg));
+Value* LgsInt::geIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    return cg.builder.CreateICmpSGE(self->loadIR(cg), other->loadIR(cg));
 }
 
-Value* LgsInt::leIR(LgsLLVMGen& cg, Value* value, LgsExpr* other) {
-    return cg.builder.CreateICmpSLE(value, other->loadIR(cg));
+Value* LgsInt::leIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    return cg.builder.CreateICmpSLE(self->loadIR(cg), other->loadIR(cg));
 }
 
-Value* LgsInt::andIR(LgsLLVMGen& cg, Value* value, LgsExpr* other) {
+Value* LgsInt::andIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsInt::orIR(LgsLLVMGen& cg, Value* value, LgsExpr* other) {
+Value* LgsInt::orIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsInt::bitAndIR(LgsLLVMGen& cg, Value* value, LgsExpr* other) {
-    return cg.builder.CreateAnd(value, other->loadIR(cg));
+Value* LgsInt::bitAndIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    return cg.builder.CreateAnd(self->loadIR(cg), other->loadIR(cg));
 }
 
-Value* LgsInt::bitOrIR(LgsLLVMGen& cg, Value* value, LgsExpr* other) {
-    return cg.builder.CreateOr(value, other->loadIR(cg));
+Value* LgsInt::bitOrIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    return cg.builder.CreateOr(self->loadIR(cg), other->loadIR(cg));
 }
 
-Value* LgsInt::bitXorIR(LgsLLVMGen& cg, Value* value, LgsExpr* other) {
-    return cg.builder.CreateXor(value, other->loadIR(cg));
+Value* LgsInt::bitXorIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    return cg.builder.CreateXor(self->loadIR(cg), other->loadIR(cg));
 }
 
-Value* LgsInt::lshiftIR(LgsLLVMGen& cg, Value* value, LgsExpr* other) {
-    return cg.builder.CreateShl(value, other->loadIR(cg));
+Value* LgsInt::lshiftIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    return cg.builder.CreateShl(self->loadIR(cg), other->loadIR(cg));
 }
 
-Value* LgsInt::rshiftIR(LgsLLVMGen& cg, Value* value, LgsExpr* other) {
-    return cg.builder.CreateLShr(value, other->loadIR(cg));
+Value* LgsInt::rshiftIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    return cg.builder.CreateLShr(self->loadIR(cg), other->loadIR(cg));
 }
 
 

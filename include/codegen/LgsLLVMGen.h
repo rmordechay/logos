@@ -53,7 +53,7 @@ public:
     Value* callCoresNum();
     Value* callStrLen(Value* str);
     Value* callSqrt(Value* radicant);
-    void callCopyMem(Value* dest, Value* src, ArrayType* at);
+    void callMemCpy(Value* dest, Value* src, Value* size);
     void callRuntimeInit();
 
     // Runtime

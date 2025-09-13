@@ -1,10 +1,8 @@
 #pragma once
-#include "funcs/LgsFunc.h"
-#include "codegen/LgsCodeGen.h"
-#include "../primitives/LgsBool.h"
-#include "../primitives/LgsChar.h"
-#include "../primitives/LgsLong.h"
 #include "LgsIterable.h"
+#include "funcs/LgsFunc.h"
+#include "types/primitives/LgsBool.h"
+#include "types/primitives/LgsLong.h"
 
 class LgsStr final : public LgsIterable {
 public:
@@ -22,6 +20,8 @@ public:
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
     LgsType* getIndexType() override;
+    bool canApplyOp(LgsType* other, LgsOperator op) override;
+    Value* addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
     std::string strFormatPart() const override;
     uint16_t getUnpackCount() const override;
     Value* IRLength(LgsLLVMGen& cg, LgsExpr* iterable) override;

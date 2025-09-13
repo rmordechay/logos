@@ -142,11 +142,10 @@ Value* LgsLLVMGen::callSqrt(Value* radicant) {
     return callFunc("sqrt", getFT(doubleTy(), {doubleTy()}), {d});
 }
 
-void LgsLLVMGen::callCopyMem(Value* dest, Value* src, ArrayType* at) {
+void LgsLLVMGen::callMemCpy(Value* dest, Value* src, Value* size) {
     const auto dataLayout = targetMachine->createDataLayout();
-    const auto size = dataLayout.getTypeAllocSize(at);
-    const auto align = dataLayout.getABITypeAlign(at).value();
-    builder.CreateMemCpy(dest, MaybeAlign(align), src, MaybeAlign(align), size);
+    const auto memCpy = Intrinsic::getDeclaration(IRModule, Intrinsic::memcpy, {ptrTy(), ptrTy(), sizeTy()});
+    builder.CreateCall(memCpy, {dest, src, size, builder.getFalse()});
 }
 
 void LgsLLVMGen::callRuntimeInit() {

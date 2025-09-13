@@ -1,0 +1,8 @@
+func(x: Str, y: Str) {
+    print(x + y + "lkdsjf")
+}
+
+main() {
+    print("Hello " + 67)
+    func("Hello", "World")
+}
