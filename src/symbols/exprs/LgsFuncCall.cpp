@@ -1,6 +1,6 @@
 #include "exprs/LgsFuncCall.h"
 
-#include "configs/LgsDefinitions.h"
+#include "data/LgsDefinitions.h"
 #include "exprs/LgsHashMap.h"
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"

@@ -1,7 +1,6 @@
 #include "logos/LgsApp.h"
 #include <llvm/Support/FileSystem.h>
 #include <llvm/IR/Module.h>
-#include "configs/LgsConfig.h"
 #include "analysis/LgsParserAdapter.h"
 #include "analysis/LgsSema.h"
 #include "logos/LgsPaths.h"
@@ -25,12 +24,12 @@ void LgsApp::run() {
 }
 
 bool LgsApp::setup() {
-    if (isLogosFile(paths.rootDir)) {
+    if (isLogosFile(paths.rootPath)) {
         isFileMode = true;
         return true;
     }
     paths.initPaths();
-    if (!is_directory(paths.rootDir) || !is_directory(paths.srcDir)) {
+    if (!is_directory(paths.rootPath) || !is_directory(paths.srcDir)) {
         errHandler.addError(E10010, nullptr);
         return false;
     }
@@ -81,7 +80,7 @@ bool LgsApp::generate() {
     for (const auto& file : ast) {
         threadPool.runTask([this, file, targetMachine] {
             LgsCodeGen code(*file);
-            code.generate(configs, *targetMachine);
+            code.generate(appConfigs, *targetMachine);
         });
     }
     threadPool.wait();
@@ -90,7 +89,7 @@ bool LgsApp::generate() {
 }
 
 bool LgsApp::link() {
-    const LgsLinker linker(configs, paths, ast);
+    const LgsLinker linker(appConfigs, paths, ast);
     return linker.link();
 }
 
@@ -123,7 +122,7 @@ void LgsApp::loadEnvFiles() {
 
 bool LgsApp::parseAppFile() {
     LgsParserAdapter antlrConverter(0, paths, globals);
-    antlrConverter.setAppConfigs(configs);
+    antlrConverter.setAppConfigs(appConfigs);
     if (!antlrConverter.errHandler.successful) {
         errHandler.mergeErrors(antlrConverter.errHandler);
     }
@@ -156,18 +155,23 @@ void LgsApp::parseSrcFile(const std::string& code, const fs::path& filePath) {
 }
 
 void LgsApp::initBuild() {
-    fs::create_directories(paths.buildDir);
-    fs::create_directories(paths.buildIR);
+    assert(paths.buildDir != "");
+    if (!fs::exists(paths.buildDir)) {
+        fs::create_directories(paths.buildDir);
+    }
+    if (!fs::exists(paths.buildIR)) {
+        fs::create_directories(paths.buildIR);
+    }
     LgsLLVMGen::initLLVM();
-    paths.objFilePath = paths.buildDir / (configs.name + ".o");
-    paths.execFilePath = paths.buildDir / configs.name;
+    paths.objFilePath = paths.buildDir / (appConfigs.name + ".o");
+    paths.execFilePath = paths.buildDir / appConfigs.name;
 }
 
 void LgsApp::writeIRFiles() {
     for (const auto file : ast) {
         const auto module = file->generator.IRModule;
         if (!module) continue;
-        if constexpr (LOG_LEVEL == DEBUG) {
+        if (appConfigs.logLevel == DEBUG) {
             module->print(outs(), nullptr);
             logInfo(LGS_MSG_LINE_SEPERATOR);
         }
@@ -175,7 +179,7 @@ void LgsApp::writeIRFiles() {
             errHandler.setUnsuccessful();
             continue;
         }
-        if constexpr (WRITE_IR_TO_FILE) {
+        if (appConfigs.writeIRFile) {
             const auto filePath = (paths.buildIR / module->getName().str()).string() + ".ll";
             std::error_code EC;
             raw_fd_ostream textFile(filePath, EC, sys::fs::OF_None);

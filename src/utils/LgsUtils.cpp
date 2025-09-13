@@ -1,6 +1,6 @@
 #include "utils/LgsUtils.h"
 #include "LgsType.h"
-#include "configs/LgsDefinitions.h"
+#include "data/LgsDefinitions.h"
 #include "files/LgsFile.h"
 #include "types/iterables/LgsStr.h"
 

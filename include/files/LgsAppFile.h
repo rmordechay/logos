@@ -1,6 +1,6 @@
 #pragma once
 #include "LgsFile.h"
-#include "configs/LgsDefinitions.h"
+#include "data/LgsDefinitions.h"
 #include "stmts/LgsVarDec.h"
 
 class LgsVarDec;

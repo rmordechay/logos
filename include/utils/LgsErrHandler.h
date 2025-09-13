@@ -1,6 +1,6 @@
 #pragma once
-#include "configs/LgsErrors.h"
-#include "configs/LgsWarnings.h"
+#include "data/LgsErrors.h"
+#include "data/LgsWarnings.h"
 
 struct LgsLocation;
 

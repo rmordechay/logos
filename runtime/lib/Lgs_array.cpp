@@ -1,4 +1,4 @@
-#include "configs/LgsErrors.h"
+#include "data/LgsErrors.h"
 #include "utils/LgsUtils.h"
 #include <cstring>
 #include <vector>

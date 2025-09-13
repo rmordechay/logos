@@ -1,5 +1,5 @@
 #include "types/LgsFuncType.h"
-#include "configs/LgsDefinitions.h"
+#include "data/LgsDefinitions.h"
 #include "codegen/LgsLLVMGen.h"
 #include "utils/LgsUtils.h"
 

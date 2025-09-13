@@ -1,5 +1,5 @@
 #pragma once
-#include "configs/LgsErrors.h"
+#include "data/LgsErrors.h"
 #include <llvm/IR/DebugInfoMetadata.h>
 
 class LgsType;

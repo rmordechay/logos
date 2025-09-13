@@ -1,4 +1,3 @@
-#include "configs/LgsConfig.h"
 #include "exprs/LgsVectorExpr.h"
 #include "stmts/LgsField.h"
 #include "types/LgsPtr.h"

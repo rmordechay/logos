@@ -1,5 +1,5 @@
 #include "LgsSymbolTable.h"
-#include "configs/LgsErrors.h"
+#include "data/LgsErrors.h"
 #include "funcs/LgsParam.h"
 #include "utils/LgsErrHandler.h"
 #include "funcs/LgsFunc.h"

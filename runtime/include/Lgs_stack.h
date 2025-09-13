@@ -1,6 +1,6 @@
 #pragma once
 #include "Lgs_stack.h"
-#include "configs/LgsConfig.h"
+#include "logos/LgsAppConfigs.h"
 
 typedef void (*Lgs_Defer_Func)(void*);
 

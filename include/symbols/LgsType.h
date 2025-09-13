@@ -1,6 +1,6 @@
 #pragma once
 #include "Lgs_types.h"
-#include "configs/LgsErrors.h"
+#include "data/LgsErrors.h"
 #include "exprs/LgsBinaryExpr.h"
 #include "symbols/LgsAssignable.h"
 

@@ -1,7 +1,7 @@
 #pragma once
 
 struct LgsPaths {
-    fs::path rootDir;
+    fs::path rootPath;
     fs::path srcDir;
     fs::path envsDir;
     fs::path buildDir;

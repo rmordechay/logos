@@ -1,6 +1,6 @@
 #pragma once
 #include "LgsSymbolTable.h"
-#include "configs/LgsErrors.h"
+#include "data/LgsErrors.h"
 #include "../codegen/LgsLLVMGen.h"
 
 class LgsRuntime;

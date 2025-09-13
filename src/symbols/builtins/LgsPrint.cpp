@@ -1,5 +1,5 @@
 #include "builtins/LgsPrint.h"
-#include "configs/LgsDefinitions.h"
+#include "data/LgsDefinitions.h"
 #include "exprs/constants/LgsStrConst.h"
 
 Value* LgsPrint::call(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {

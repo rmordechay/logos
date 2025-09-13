@@ -1,17 +1,17 @@
 #include "logos/LgsPaths.h"
 
-#include "configs/LgsDefinitions.h"
+#include "data/LgsDefinitions.h"
 
 #include <llvm/TargetParser/Host.h>
 #include <llvm/TargetParser/Triple.h>
 
 void LgsPaths::initPaths() {
-    assert(rootDir != "");
-    srcDir = rootDir / LGS_SRC_DIR;
-    envsDir = rootDir / LGS_ENVS_DIR;
-    buildDir = rootDir / LGS_BUILD_DIR;
+    assert(rootPath != "");
+    srcDir = rootPath / LGS_SRC_DIR;
+    envsDir = rootPath / LGS_ENVS_DIR;
+    buildDir = rootPath / LGS_BUILD_DIR;
     buildIR = buildDir / LGS_BUILD_IR;
-    appFilePath = rootDir / LGS_APP_FILE_NAME LGS_FILE_EXTENSION;
+    appFilePath = rootPath / LGS_APP_FILE_NAME LGS_FILE_EXTENSION;
     findLgsRoot();
     findCLibRoot();
     findCLibHeaders();
@@ -19,9 +19,9 @@ void LgsPaths::initPaths() {
 
 void LgsPaths::findLgsRoot() {
 #ifdef __APPLE__
-    lgsRoot = rootDir.parent_path() / "cmake-build-debug";
+    lgsRoot = rootPath.parent_path() / "cmake-build-debug";
 #elif defined(__linux__)
-    lgsRoot = rootDir.parent_path() / "build";
+    lgsRoot = rootPath.parent_path() / "build";
 #endif
 }
 

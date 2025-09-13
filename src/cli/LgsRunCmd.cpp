@@ -27,6 +27,6 @@ LgsCliCmdHelp& LgsRunCmd::getHelp() {
 
 void LgsRunCmd::setArg(const std::string& key, const std::string& value, LgsApp& app) {
     if (key == "o") {
-        app.configs.optLevel = std::stoi(value);
+        app.appConfigs.optLevel = std::stoi(value);
     }
 }

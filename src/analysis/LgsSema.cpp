@@ -1,6 +1,6 @@
 #include "analysis/LgsSema.h"
 #include "funcs/LgsCoroutine.h"
-#include "configs/LgsErrors.h"
+#include "data/LgsErrors.h"
 #include "files/LgsInterfaceFile.h"
 #include "files/LgsObjectFile.h"
 #include "stmts/LgsField.h"

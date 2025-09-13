@@ -1,5 +1,5 @@
 #include "loops/LgsForLoop.h"
-#include "configs/LgsDefinitions.h"
+#include "data/LgsDefinitions.h"
 #include "codegen/LgsLLVMGen.h"
 #include "loops/LgsForeachLoop.h"
 #include "loops/LgsInfiniteLoop.h"

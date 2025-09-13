@@ -1,6 +1,6 @@
 #include "cli/LgsCliCmd.h"
 #include "cli/LgsCliHelp.h"
-#include "configs/LgsDefinitions.h"
+#include "data/LgsDefinitions.h"
 #include "utils/LgsUtils.h"
 
 #define PADDING 6

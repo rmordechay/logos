@@ -1,5 +1,5 @@
 #include "funcs/LgsFunc.h"
-#include "configs/LgsDefinitions.h"
+#include "data/LgsDefinitions.h"
 #include "stmts/LgsStmtsBlock.h"
 #include "exprs/LgsExpr.h"
 #include "exprs/constants/LgsStrConst.h"

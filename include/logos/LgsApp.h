@@ -26,7 +26,7 @@ inline std::mutex mtx;
 class LgsApp final {
 public:
     LgsPaths paths;
-    LgsAppConfigs configs;
+    LgsAppConfigs appConfigs;
     LgsSymbolTable globals;
     LgsErrHandler errHandler;
     std::vector<LgsFile*> ast;
@@ -37,8 +37,8 @@ public:
     ThreadPool threadPool;
     bool isFileMode = false;
 
-    explicit LgsApp(const fs::path& rootOrFile = "") {
-        paths.rootDir = rootOrFile;
+    explicit LgsApp(const fs::path& rootPath = "") {
+        paths.rootPath = rootPath;
     }
     void run();
     bool setup();

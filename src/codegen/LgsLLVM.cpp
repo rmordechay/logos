@@ -1,4 +1,4 @@
-#include "configs/LgsDefinitions.h"
+#include "data/LgsDefinitions.h"
 #include "files/LgsFile.h"
 #include "funcs/LgsFunc.h"
 #include "types/LgsAny.h"

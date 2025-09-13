@@ -1,5 +1,5 @@
 #include "codegen/LgsLinker.h"
-#include "configs/LgsDefinitions.h"
+#include "data/LgsDefinitions.h"
 #include "codegen/LgsLLVMGen.h"
 #include "utils/LgsUtils.h"
 #include "llvm/Linker/Linker.h"
