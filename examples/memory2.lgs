@@ -8,13 +8,15 @@ object Obj2 {
 
 func(owner obj1: Obj1) {
     owner obj2 = Obj2{}
-    print(obj1.x)
-    //obj2.obj1 := obj1
+    obj2.obj1.x := 123
+    print(obj2.obj1.x)
+    owner obj2b = Obj2{}
+    obj2b.obj1.x := 125
+    obj2 := obj2b
+    print(obj2.obj1.x)
 }
 
 main() {
     owner obj2 = Obj2{}
-    obj2.obj1.x := 3824
     func(obj2.obj1)
-    print(obj2.obj1.x)
 }

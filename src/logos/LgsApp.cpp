@@ -95,12 +95,13 @@ bool LgsApp::link() {
 }
 
 void LgsApp::execute() {
-    appArgs.insert(appArgs.begin(), const_cast<char*>(paths.execFilePath.c_str()));
+    const auto execPath = paths.execFilePath.c_str();
+    appArgs.insert(appArgs.begin(), const_cast<char*>(execPath));
     if (appArgs.empty() || appArgs.back() != nullptr) {
         appArgs.push_back(nullptr);
     }
     freeApp();
-    execv(paths.execFilePath.c_str(), appArgs.data());
+    execv(execPath, appArgs.data());
     perror("Logos execution failed.");
     exit(EXIT_FAILURE);
 }
@@ -142,6 +143,9 @@ void LgsApp::parseSrcFile(const std::string& code, const fs::path& filePath) {
     const auto fileID = nextFileID.fetch_add(1, std::memory_order_relaxed);
     LgsParserAdapter antlrConverter(fileID, paths, globals);
     const auto lgsFile = antlrConverter.parseFile(code, filePath);
+    if (const auto mainFile = dynamic_cast<LgsMainFile*>(lgsFile)) {
+        mainFile->appArgs = appArgs;
+    }
     {
         std::lock_guard lock(mtx);
         lgsFile->id = fileID;

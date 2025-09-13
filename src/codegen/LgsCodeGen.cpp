@@ -63,7 +63,7 @@ void LgsCodeGen::visitMainFile(LgsMainFile* mainFile) {
     }
     for (const auto [_, func] : mainFile->funcs) {
         if (const auto mainFunc = dynamic_cast<LgsMainFunc*>(func)) {
-            visitMainFunc(mainFunc);
+            visitMainFunc(mainFunc, mainFile->appArgs);
         } else {
             visitFunc(func);
         }
@@ -84,7 +84,7 @@ void LgsCodeGen::visitInterfaceFile(const LgsInterfaceFile* interfaceFile) {
     }
 }
 
-void LgsCodeGen::visitMainFunc(LgsMainFunc* func) {
+void LgsCodeGen::visitMainFunc(LgsMainFunc* func, const std::vector<char*>& appArgs) {
     stack.enterScope(func);
     createPrologue(func);
     // codeGen->callRuntimeInit();
@@ -656,7 +656,7 @@ void LgsCodeGen::visitHashMap(LgsHashMap* hashMap) {
     const auto valueType = mapType->typePair->value;
     const auto elementSize = cg.usize(valueType->getSizeBytes());
     const auto arrSize = cg.typeSize(mapType->getMapStruct(cg));
-    hashMap->IRValue = cg.callMalloc(arrSize.getFixedValue(), LgsMap::name);
+    hashMap->IRValue = cg.callMalloc(arrSize.getFixedValue());
     mapType->initFunc->callIR(cg, {getIRValue(hashMap), elementSize});
     for (const auto element : hashMap->initialElements) {
         visitExpr(element->key);
@@ -827,7 +827,7 @@ void LgsCodeGen::visitInstance(LgsInstance* instance) {
     if(instance->obj->singleton) {
         instance->IRValue = cg.createGlobal(objIRType, ConstantAggregateZero::get(objIRType), instance->obj->name);
     } else {
-        instance->IRValue = cg.callMalloc(instance->obj->getSizeBytes(), instance->name);
+        instance->IRValue = cg.callMalloc(instance->obj->getSizeBytes());
     }
     initFields(instance);
     if (!instance->obj->interfaces.empty()) {
@@ -1005,7 +1005,7 @@ Value* LgsCodeGen::createDynamicArray(LgsArrayExpr* arrayExpr) {
     const auto size = arr->baseType->getSizeBytes();
     const auto elementSize = cg.i64(size);
     const auto arrSize = cg.typeSize(arr->getArrStruct(cg));
-    arrayExpr->IRValue = cg.callMalloc(arrSize.getFixedValue(), LgsDArray::name);
+    arrayExpr->IRValue = cg.callMalloc(arrSize.getFixedValue());
     arr->initFunc->callIR(cg, {arrayExpr->IRValue, elementSize});
     for (int i = 0; i < arrayExpr->initialElements.size(); ++i) {
         const auto element = arrayExpr->initialElements[i];

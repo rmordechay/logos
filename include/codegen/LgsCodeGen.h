@@ -66,7 +66,7 @@ public:
     void visitMainFile(LgsMainFile* mainFile);
     void visitObjFile(const LgsObjectFile* objFile);
     void visitInterfaceFile(const LgsInterfaceFile* interfaceFile);
-    void visitMainFunc(LgsMainFunc* func);
+    void visitMainFunc(LgsMainFunc* func, const std::vector<char*>& appArgs);
     void visitFunc(LgsFunc* func);
     void visitObject(LgsObject* obj) const;
     void visitInterface(LgsInterface* interface) const;

@@ -8,6 +8,7 @@ class LgsEnum;
 
 class LgsMainFile final : public LgsFile {
 public:
+    std::vector<char*> appArgs;
     std::vector<LgsEnum*> enums;
     std::vector<LgsObject*> objects;
     std::map<std::string, LgsFunc*> funcs;

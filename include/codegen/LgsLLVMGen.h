@@ -43,7 +43,7 @@ public:
     Value* callLgsFunc(const std::string& funcName, FunctionType* ft, const std::vector<Value*>& args = {});
 
     // System
-    Value* callMalloc(size_t size, const std::string& name);
+    Value* callMalloc(size_t size);
     Value* callPrintf(const std::vector<Value*>& args);
     Value* callSleep(Value* time);
     Value* callExit(Value* exitCode);

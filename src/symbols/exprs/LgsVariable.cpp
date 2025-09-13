@@ -6,7 +6,8 @@
 #include <codegen/LgsLLVMGen.h>
 
 void LgsVariable::assign(LgsLLVMGen& cg, LgsExpr* expr) {
-    IRValue = expr->loadIR(cg);
+    cg.builder.CreateStore(expr->IRValue, IRValue);
+    IRValue = expr->IRValue;
 }
 
 Value* LgsVariable::loadIR(LgsLLVMGen& cg) {

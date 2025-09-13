@@ -97,8 +97,8 @@ Value* LgsLLVMGen::callLgsFunc(const std::string& funcName, FunctionType* ft, co
     return callFunc(LGS_RUNTIME_NAMES_PREFIX + funcName, ft, args);
 }
 
-Value* LgsLLVMGen::callMalloc(const size_t size, const std::string& name) {
-    const auto ptr = builder.CreateMalloc(sizeTy(), sizeTy(), usize(size), nullptr, nullptr, name);
+Value* LgsLLVMGen::callMalloc(const size_t size) {
+    const auto ptr = builder.CreateMalloc(sizeTy(), sizeTy(), usize(size), nullptr);
     printPtr(ptr, "malloc: ");
     return ptr;
 }
