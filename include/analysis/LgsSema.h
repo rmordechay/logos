@@ -70,6 +70,7 @@ public:
     void visitTestFile(const LgsTestFile* testFile);
     void visitField(LgsField* field);
     void visitFunc(LgsFunc* func);
+    void visitLambda(LgsFunc* lambda);
     void visitParam(LgsParam* param);
     void visitIOPair(LgsIOPair* ioPair, LgsObject* obj);
     void visitTest(const LgsTest* test);
@@ -92,13 +93,12 @@ public:
     void visitBreakStmt(const LgsBreak* breakStmt);
     void visitDeferStmt(const LgsDeferStmt* deferStmt);
     void visitExpr(LgsExpr* expr);
-    void visitUnaryExpr(LgsExpr* expr);
     void visitBinaryExpr(LgsBinaryExpr* binaryExpr);
     void visitCast(LgsCast* lgsCast);
-    void visitArrayExpr(const LgsArrayExpr* array);
-    void visitStaticArray(const LgsArrayExpr* arrayExpr);
-    void visitDynamicArray(const LgsArrayExpr* array);
-    void visitHashMap(const LgsHashMap* hashMap);
+    void visitArrayExpr(LgsArrayExpr* array);
+    void visitStaticArray(LgsArrayExpr* arrayExpr);
+    void visitDynamicArray(LgsArrayExpr* array);
+    void visitHashMap(LgsHashMap* hashMap);
     void visitVectorExpr(const LgsVectorExpr* vectorExpr);
     void visitVariable(LgsVariable* variable);
     void visitSelection(LgsSelection* selection);
@@ -121,6 +121,11 @@ public:
     void visitLoopMetaVar(LgsLoopMetaVar* metaVar);
 
     void matchExprToType(const LgsExpr* expr, LgsType* type);
+    void resolveFuncCall(LgsFuncCall* funcCall);
+    bool resolveMethodCall(LgsFuncCall* methodCall, LgsType* parentType);
+    bool resolveForeachVars(const LgsForeachLoop* foreachLoop, LgsExpr* iterExpr, const LgsIterable* iterable);
+    void addHeapExpr(LgsExpr* expr);
+
     void validateObjImplements(LgsObject* obj, const std::vector<LgsType*>& interfaces);
     void validateObjInterface(LgsObject* obj, LgsInterface* interface);
     void validateIndex(LgsIterIndex* iterIndex);
@@ -129,13 +134,9 @@ public:
     bool validateMethodVisibility(const LgsFuncCall* methodCall, const LgsObject* parent);
     bool validateVecElements(const LgsVariable* fieldVar, LgsVec* vec);
     void validateTypeDuplicates(LgsType* type);
+    void validateMock(const LgsSelection* selection);
     static bool validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const LgsFunc* func);
 
-    void resolveFuncCall(LgsFuncCall* funcCall);
-    bool resolveMethodCall(LgsFuncCall* methodCall, LgsType* parentType);
-    bool resolveForeachVars(const LgsForeachLoop* foreachLoop, LgsExpr* iterExpr, const LgsIterable* iterable);
-    void addHeapExpr(LgsExpr* expr);
-    void checkMock(const LgsSelection* selection);
     LgsSymbol* getSymbol(const std::string& name, const LgsLocation* location);
     void addLocalSymbol(const LgsSymbol& newSymbol);
 };

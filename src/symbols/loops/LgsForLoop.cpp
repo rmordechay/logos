@@ -24,9 +24,9 @@ void LgsForLoop::incIndex(LgsLLVMGen* cg) {
 }
 
 void LgsForLoop::setBlocks(LgsLLVMGen& cg) {
+    IRCondBlock = cg.createBlock(BLOCK_NAME_LOOP_COND);
     IRBodyBlock = cg.createBlock(BLOCK_NAME_LOOP_BODY);
     IRExitBlock = cg.createBlock(BLOCK_NAME_LOOP_EXIT);
-    IRCondBlock = cg.createBlock(BLOCK_NAME_LOOP_COND);
 }
 
 void LgsForLoop::incAndJumpToCond(LgsLLVMGen& cg) {

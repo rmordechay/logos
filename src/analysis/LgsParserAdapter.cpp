@@ -309,7 +309,7 @@ LgsInterface* LgsParserAdapter::getInterface(LogosParser::InterfaceBodyContext* 
     }
 
     for (const auto& interfaceFunc : ctx->interfaceFunc()) {
-        const auto type = getFuncReturnType(interfaceFunc->type());
+        const auto type = getType(interfaceFunc->type());
         const auto funcName = interfaceFunc->funcSignatureHeader()->IDENTIFIER();
         const auto func = new LgsFunc(funcName->getText(), type);
         currentFunc = func;
@@ -327,7 +327,7 @@ LgsInterface* LgsParserAdapter::getInterface(LogosParser::InterfaceBodyContext* 
 }
 
 LgsFunc* LgsParserAdapter::getFunc(LogosParser::FuncContext* ctx) {
-    const auto rt = getFuncReturnType(ctx->funcSignature()->type());
+    const auto rt = getType(ctx->funcSignature()->type());
     const auto funcSignature = ctx->funcSignature();
     const auto funcNameToken = funcSignature->funcSignatureHeader()->IDENTIFIER();
     const auto funcName = funcNameToken->getText();
@@ -364,10 +364,10 @@ LgsMainFunc* LgsParserAdapter::getMainFunc(LogosParser::FuncContext* ctx) {
 LgsFunc* LgsParserAdapter::getLambda(LogosParser::LambdaContext* ctx) {
     const auto func = new LgsFunc(LGS_ANONYMOUS_STR);
     currentFunc = func;
-    func->funcType->isLambda = true;
+    func->isLambda = true;
     func->funcType->rt = getType(ctx->rt);
     if (const auto singleParam = ctx->IDENTIFIER()) {
-        auto lgsParam = LgsParam(nullptr, singleParam->getText());
+        auto lgsParam = LgsParam(getType(ctx->type()), singleParam->getText());
         setLocation(lgsParam.location, singleParam->getSymbol(), nullptr);
         func->funcType->params.push_back(lgsParam);
     } else if (const auto params = ctx->lambdaParams()) {
@@ -386,7 +386,7 @@ LgsFunc* LgsParserAdapter::getLambda(LogosParser::LambdaContext* ctx) {
 }
 
 LgsFunc* LgsParserAdapter::getMethod(LogosParser::MethodContext* ctx, LgsType* obj) {
-    const auto rt = getFuncReturnType(ctx->funcSignature()->type());
+    const auto rt = getType(ctx->funcSignature()->type());
     const auto funcSignature = ctx->funcSignature();
     const auto nameToken = funcSignature->funcSignatureHeader()->IDENTIFIER();
     const auto method = new LgsFunc(nameToken->getText(), rt);
@@ -1180,17 +1180,6 @@ LgsType* LgsParserAdapter::getTypeFromText(antlr4::tree::TerminalNode* ctx) cons
     }
     setLocation(type->location, ctx->getSymbol(), nullptr);
     return type;
-}
-
-LgsType* LgsParserAdapter::getFuncReturnType(LogosParser::TypeContext* ctx) {
-    LgsType* result = nullptr;
-    if (!ctx) {
-        result = &LGS_VOID;
-    } else {
-        result = getType(ctx);
-        setLocation(result->location, ctx->start, ctx->stop);
-    }
-    return result;
 }
 
 void LgsParserAdapter::addFileSymbol(LgsMainFile* file, const LgsSymbol& newSymbol) {

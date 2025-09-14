@@ -109,6 +109,7 @@ public:
     void visitVariable(LgsVariable* variable);
     void visitSelection(LgsSelection* selection);
     void visitFuncCall(LgsFuncCall* funcCall);
+    void createMapFunc(LgsFunc* func);
     void visitPrefixExpr(LgsPrefixExpr* prefixExpr);
     void visitPostfixExpr(LgsPostfixExpr* postfixExpr);
     void visitStrConst(LgsStrConst* strConst) const;

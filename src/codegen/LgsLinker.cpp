@@ -58,8 +58,7 @@ bool LgsLinker::link() const {
         paths.lgsRoot.c_str(),
         paths.execFilePath.c_str()
     );
-    std::system(linkCmd);
-    return true;
+    return std::system(linkCmd) == 0;
 }
 
 bool LgsLinker::generateObjFile(std::unique_ptr<Module> mainModule, TargetMachine* targetMachine) const {

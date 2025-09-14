@@ -204,7 +204,7 @@ void LgsApp::exitWithErrors() const {
         logError(finalMsg, path);
         if (i != errHandler.errors.size() - 1) logInfo(LGS_MSG_LINE_SEPERATOR);
     }
-    logInfo("\n");
+    if (!errHandler.errors.empty()) logInfo("\n");
     exit(1);
 }
 

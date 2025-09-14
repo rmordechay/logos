@@ -3,7 +3,7 @@ object Obj1 {
 }
 
 object Obj2 {
-    obj1: Obj1
+    owner obj1: Obj1
 }
 
 func(owner obj1: Obj1) {

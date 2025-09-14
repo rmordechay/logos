@@ -70,7 +70,7 @@ inline LgsBaseError E10045{.msg = "Variadic argument cannot have default argumen
 inline LgsBaseError E10046{.msg = "'%s' is not callable.", .errCode = errCodeStart++};
 inline LgsBaseError E10047{.msg = "External file '%s' was not found.", .errCode = errCodeStart++};
 inline LgsBaseError E10048{.msg = "Static iterable '%s' must have a constant size.", .errCode = errCodeStart++};
-inline LgsBaseError E10049{.msg = "Not enough information to infer the type of the iterable. Specify an explicit type or initialize with element(s).", .errCode = errCodeStart++};
+inline LgsBaseError E10049{.msg = "Not enough information to infer type of '%s'.", .errCode = errCodeStart++};
 inline LgsBaseError E10050{.msg = "Only integer values can be incremented (++) or decremented (--). Given: '%s'.", .errCode = errCodeStart++};
 inline LgsBaseError E10051{.msg = "'%s' is constant and cannot be overwritten.", .errCode = errCodeStart++};
 inline LgsBaseError E10052{.msg = "Spread operator in '%s...' must only be used with iterables. Given type: '%s'.", .errCode = errCodeStart++};

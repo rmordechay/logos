@@ -110,7 +110,6 @@ public:
     LgsFuncType* getFuncType(LogosParser::FuncTypeContext* ctx);
     LgsType* getArrayType(LogosParser::TypeContext* ctx);
     LgsType* getTypeFromText(antlr4::tree::TerminalNode* ctx) const;
-    LgsType* getFuncReturnType(LogosParser::TypeContext* ctx);
     void setParams(LgsFuncType* funcType, const std::vector<LogosParser::ParamContext*>& params);
     bool setMainArgsParam(const LgsMainFunc* mainFunc, LogosParser::FuncSignatureContext* funcSignature);
     void addFileSymbol(LgsMainFile* file, const LgsSymbol& newSymbol);

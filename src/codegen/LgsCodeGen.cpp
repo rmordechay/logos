@@ -766,7 +766,7 @@ void LgsCodeGen::visitSelection(LgsSelection* selection) {
     if (parentAsVar && parentAsVar->ref.symbolType == OBJECT) {
         assert(0);
     }
-
+    visitExpr(selection->exprs.front());
     for (int i = 0; i < selection->exprs.size() - 1; ++i) {
         const auto parentExpr = selection->exprs[i];
         const auto childExpr = selection->exprs[i + 1];
@@ -809,7 +809,47 @@ void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
     if (ft->isVirtual) {
         funcCall->resolveVirtualFunc(cg);
     }
+    if (funcCall->name == "map") {
+        createMapFunc(funcCall->func);
+    }
     funcCall->IRValue = funcCall->func->call(cg, funcCall->args);
+}
+
+void LgsCodeGen::createMapFunc(LgsFunc* func) {
+    cg.savedIP = cg.builder.saveIP();
+    const auto originalFunc = currentIRFunc;
+    createPrologue(func);
+    const auto l = new LgsArrayExpr(func->funcType->params[0].type->asDArray());
+    visitArrayExpr(l);
+
+    const auto iPtr = cg.builder.CreateAlloca(cg.sizeTy());
+    const auto loopStart = cg.builder.CreateSExt(cg.usize(0), cg.sizeTy());
+    const auto IRCondBlock = cg.createBlock(BLOCK_NAME_LOOP_COND);
+    const auto IRBodyBlock = cg.createBlock(BLOCK_NAME_LOOP_BODY);
+    const auto IRExitBlock = cg.createBlock(BLOCK_NAME_LOOP_EXIT);
+    cg.builder.CreateStore(loopStart, iPtr);
+    cg.builder.CreateBr(IRCondBlock);
+
+    // Condition
+    cg.startBlock(IRCondBlock, currentIRFunc);
+    const auto iValue = cg.builder.CreateLoad(cg.sizeTy(), iPtr);
+    const auto condition = cg.builder.CreateICmpSLT(iValue, cg.usize(10));
+    cg.builder.CreateCondBr(condition, IRBodyBlock, IRExitBlock);
+
+    // Body
+    cg.startBlock(IRBodyBlock, currentIRFunc);
+
+    if (cg.lastInstTerminator()) return;
+    const auto inc = cg.builder.CreateAdd(iValue, cg.usize(1));
+    cg.builder.CreateStore(inc, iPtr);
+    cg.builder.CreateBr(IRCondBlock);
+
+    cg.startBlock(IRExitBlock, currentIRFunc);
+    cg.builder.CreateRet(l->IRValue);
+    currentIRFunc = originalFunc;
+    cg.builder.restoreIP(cg.savedIP);
+    func->IRValue = func->getIRFunc(cg);
+    freeExpr(l);
 }
 
 void LgsCodeGen::visitPrefixExpr(LgsPrefixExpr* prefixExpr) {
@@ -1060,6 +1100,7 @@ Value* LgsCodeGen::createDynamicArray(LgsArrayExpr* arrayExpr) {
         visitExpr(element);
         arr->addFunc->call(cg, {arrayExpr, element});
     }
+    arr->mapFunc->getIRFunc(cg);
     return getIRValue(arrayExpr);
 }
 

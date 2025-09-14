@@ -11,15 +11,13 @@
 Value* LgsFunc::call(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
     if (fn) return fn(cg, args);
     std::vector<Value*> IRArgs;
+    setIRArgs(cg, args, IRArgs);
     if (funcType->hasDefaults) {
         const auto diff = funcType->params.size() - args.size();
-        setIRArgs(cg, args, IRArgs);
         for (int i = diff - 1; i < funcType->params.size(); ++i) {
             const auto& param = funcType->params[i];
             IRArgs.emplace_back(param.expr->IRValue);
         }
-    } else {
-        setIRArgs(cg, args, IRArgs);
     }
     return callIR(cg, IRArgs);
 }
@@ -37,16 +35,23 @@ Value* LgsFunc::callIR(LgsLLVMGen& cg, const std::vector<Value*>& args) {
     return rv;
 }
 
-void LgsFunc::setIRArgs(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args, std::vector<Value*>& IRArgs) const {
+Value* LgsFunc::loadIR(LgsLLVMGen& cg) {
+    return IRValue;
+}
+
+void LgsFunc::setIRArgs(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args, std::vector<Value*>& IRArgs) {
+    const auto f = getIRFunc(cg);
     for (int i = 0; i < args.size(); ++i) {
         auto arg = args[i];
         const auto& param = funcType->params[i];
+        Value* v = nullptr;
         if (!param.isSelf) {
             arg = arg->castTo(param.type);
         }
-        auto v = arg->loadIR(cg);
-        if (!param.isSelf && args[i] != arg) {
-            freeExpr(arg);
+        if (!param.isSelf && f->getArg(i)->getType()->isPointerTy()) {
+            v = arg->getIRPtrTo(cg);
+        } else {
+            v = arg->loadIR(cg);
         }
         IRArgs.emplace_back(v);
     }
@@ -90,14 +95,17 @@ void LgsFunc::initFunc(const std::string& name, LgsType* rt, const std::vector<L
 void LgsFunc::completeType(LgsType* toType) {
     const auto otherFuncType = toType->asFuncType();
     if (!otherFuncType) return;
-    if (otherFuncType->params.size() != funcType->params.size()) return;
     for (int i = 0; i < funcType->params.size(); ++i) {
         if (funcType->params[i].type) continue;
         funcType->params[i].type = otherFuncType->params[i].type;
     }
-    // TODO make rt of default void null
-    freeType(funcType->rt);
-    funcType->rt = otherFuncType->rt;
+    if (!funcType->rt) {
+        funcType->rt = otherFuncType->rt;
+    }
+}
+
+LgsExpr* LgsFunc::castTo(LgsType* toType) {
+    return this;
 }
 
 BasicBlock* LgsFunc::getCleanupBlock(LgsLLVMGen& cg) {

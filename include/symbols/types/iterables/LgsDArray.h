@@ -21,6 +21,7 @@ public:
     LgsFunc* putFunc = new LgsFunc("put", &LGS_VOID, {this, &LGS_INT, &LGS_ANY}, BUILTIN | METHOD);
     LgsFunc* deleteFunc = new LgsFunc("delete", &LGS_VOID, {this, &LGS_LONG}, BUILTIN | METHOD);
     LgsFunc* freeFunc = new LgsFunc("free", &LGS_VOID, {this}, BUILTIN | METHOD);
+    LgsFunc* mapFunc = new LgsFunc("map", this, {this, new LgsFuncType(nullptr, {LgsParam(nullptr)})}, BUILTIN | PUBLIC | METHOD);
 
     explicit LgsDArray(LgsType* baseType = nullptr) : LgsIterable(baseType) {
         addFunc->fn = [this](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
@@ -30,6 +31,7 @@ public:
         addMethod(lenFunc);
         addMethod(isEmptyFunc);
         addMethod(isNotEmptyFunc);
+        addMethod(mapFunc);
         isSliceable = true;
     }
 

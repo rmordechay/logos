@@ -145,12 +145,12 @@ bool LgsType::isVoid() {
     return dynamic_cast<LgsVoid*>(this);
 }
 
-bool LgsType::isUnknown() {
-    return dynamic_cast<LgsUnknown*>(this);
-}
-
 bool LgsType::isBig() {
     return (asObject() || asDArray()) && getSizeBytes() >= BIG_SIZE_THRESHOLD;
+}
+
+bool LgsType::isNullable() {
+    return asNullable() || asPtr();
 }
 
 LgsBool* LgsType::asBool() {

@@ -1,6 +1,5 @@
 #pragma once
 #include "LgsType.h"
-#include "codegen/LgsLLVMGen.h"
 
 class LgsPtr final : public LgsType {
 public:
@@ -9,6 +8,7 @@ public:
 
     explicit LgsPtr(LgsType* baseType) : baseType(baseType) {
         rtt = baseType->rtt;
+
     }
     std::string getName() override;
     std::string pname() override;

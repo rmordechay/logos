@@ -50,7 +50,7 @@ LgsType* LgsTypeResolver::resolveType(LgsType* type, LgsFile* file) {
         resolveFuncTypes(funcType, *file);
     }
 
-    if (type->isUnknown()) {
+    if (type->isUnknown) {
         auto typeName = type->getName();
         auto symbol = globals.getSymbol(typeName);
         if (!symbol) {
@@ -120,7 +120,7 @@ void LgsTypeResolver::resolveObjTypes(LgsObject* obj, LgsFile& file) {
     for (auto& interface : obj->interfaces) {
         interface = resolveType(interface, &file);
     }
-    for (auto& ioPair : obj->ioPairs) {
+    for (const auto& ioPair : obj->ioPairs) {
         resolveIOPair(ioPair, file);
     }
 }
@@ -152,7 +152,7 @@ void LgsTypeResolver::resolveFuncTypes(LgsFuncType* funcType, LgsFile& file) {
     for (auto & param : funcType->params) {
         param.type = resolveType(param.type, &file);
     }
-    funcType->rt = resolveType(funcType->rt, &file);
+    funcType->rt = !funcType->rt ? &LGS_VOID : resolveType(funcType->rt, &file);
 }
 
 void LgsTypeResolver::resolveGroupTypes(LgsGroup* group, LgsFile& file) {

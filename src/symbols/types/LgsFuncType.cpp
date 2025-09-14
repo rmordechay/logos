@@ -53,11 +53,7 @@ std::string LgsFuncType::getName() {
 
 std::string LgsFuncType::pname() {
     std::stringstream str;
-    if (isLambda) {
-        str << LGS_ANONYMOUS_STR << '(';
-    } else {
-        str << name << '(';
-    }
+    str << name << '(';
     for (size_t i = isMethod; i < params.size(); ++i) {
         const auto param = params[i];
         if (param.isOwner) {
@@ -118,7 +114,6 @@ LgsType* LgsFuncType::clone() {
     copy->isVariadic = isVariadic;
     copy->isOptional = isOptional;
     copy->isTerminator = isTerminator;
-    copy->isLambda = isLambda;
     copy->isIO = isIO;
     copy->hasDefaults = hasDefaults;
     return copy;
@@ -137,12 +132,20 @@ json::value LgsFuncType::asJSON() {
     jsonObj["isInternal"] = isBuiltin;
     jsonObj["isVirtual"] = isVirtual;
     jsonObj["isVariadic"] = isVariadic;
-    jsonObj["isLambda"] = isLambda;
     jsonObj["isOptional"] = isOptional;
     jsonObj["isTerminator"] = isTerminator;
     jsonObj["isMethod"] = isMethod;
     jsonObj["hasDefaults"] = hasDefaults;
     return jsonObj;
+}
+
+bool LgsFuncType::isTypeComplete() const {
+    if (name == LGS_MAIN_FUNC_NAME) return true;
+    if (!rt || rt->isUnknown) return false;
+    for (const auto & param : params) {
+        if (!param.type || param.type->isUnknown) return false;
+    }
+    return true;
 }
 
 LgsFuncType::~LgsFuncType() {

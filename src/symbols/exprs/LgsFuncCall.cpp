@@ -12,17 +12,13 @@ bool LgsFuncCall::equals(const LgsFuncType* other) const {
     if (other->isVariadic) return equalsVariadic(other);
     if (other->params.size() - other->isMethod != args.size()) return false;
     if (other->params.size() == 0 && args.size() == 0) return true;
-    if (other->isLambda) return true;
     for (size_t i = other->isMethod; i < other->params.size(); ++i) {
         const auto param = other->params[i];
         const auto paramType = param.type;
         const auto arg = args[i - other->isMethod];
         const auto argType = arg->type;
         if (!paramType || !argType) return false;
-        if (arg->isNull) continue;
-        if (paramType->asFuncType()) {
-            arg->completeType(paramType);
-        }
+        if (arg->isNull && !paramType->isNullable()) return false;
         if (!param.isOwner && arg->owner) return false;
         if (!argType->canCastTo(paramType)) return false;
     }
@@ -64,7 +60,7 @@ std::string LgsFuncCall::pname() {
         if (i == args.size() - 1) continue;
         str << ", ";
     }
-    if (type && !type->isUnknown()) {
+    if (type && !type->isUnknown) {
         str << "): " << type->pname();
     } else {
         str << ')';

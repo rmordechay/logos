@@ -48,6 +48,7 @@ class LgsType {
 public:
     bool isInt = false;
     bool isNumber = false;
+    bool isUnknown = false;
     bool isUnsigned = false;
     bool isFloatPoint = false;
     bool isPrimitive = false;
@@ -98,8 +99,8 @@ public:
     bool addMethod(LgsFunc* method);
     bool equals(LgsType* other);
     bool isVoid();
-    bool isUnknown();
     bool isBig();
+    bool isNullable();
     LgsBool* asBool();
     LgsChar* asChar();
     LgsStr* asStr();
