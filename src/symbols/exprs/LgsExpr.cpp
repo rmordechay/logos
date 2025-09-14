@@ -100,7 +100,7 @@ void LgsExpr::assign(LgsLLVMGen& cg, LgsExpr* expr) {
 }
 
 bool LgsExpr::canAssignTo(LgsType* other, const LgsAssignType op) {
-    return false;
+    return true;
 }
 
 // Casting

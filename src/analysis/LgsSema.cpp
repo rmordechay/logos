@@ -586,6 +586,7 @@ void LgsSema::visitDynamicArray(LgsArrayExpr* array) {
             baseType = first->type;
         }
         array->type->asIterable()->baseType = baseType;
+        // dArr->addFunc->funcType->params[1].type = baseType;
         const auto mapFT = dArr->mapFunc->funcType->params[1].type->asFuncType();
         mapFT->params[0].type = baseType;
         mapFT->rt = baseType;
@@ -753,14 +754,14 @@ void LgsSema::visitIterIndexSelection(LgsIterIndex* child, LgsType* parentType) 
 }
 
 void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent) {
-    if (!resolveMethodCall(methodCall, parent->type)) return;
-    if (methodCall->func->funcType->isMethod) {
+    if (methodCall->isMethodCall) {
         if (parent->asTypeExpr()) {
             errHandler.addError(E10083, &methodCall->location, {methodCall->func->funcType->pname()});
         } else {
             methodCall->args.insert(methodCall->args.begin(), parent);
         }
     }
+    if (!resolveMethodCall(methodCall, parent->type)) return;
     validateMethodVisibility(methodCall, parent->type->asObject());
 }
 

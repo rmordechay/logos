@@ -25,7 +25,7 @@ public:
 
     explicit LgsDArray(LgsType* baseType = nullptr) : LgsIterable(baseType) {
         addFunc->fn = [this](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
-            return addFunc->callIR(cg, {args[0]->loadIR(cg), args[1]->getIRPtrTo(cg)});
+            return addFunc->callIR(cg, {args[0]->IRValue, args[1]->getIRPtrTo(cg)});
         };
         addMethod(addFunc);
         addMethod(lenFunc);

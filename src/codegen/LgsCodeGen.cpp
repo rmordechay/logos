@@ -789,8 +789,7 @@ void LgsCodeGen::visitSelection(LgsSelection* selection) {
 }
 
 void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
-    const bool isMethod = funcCall->func->funcType->isMethod;
-    for (int i = isMethod; i < funcCall->args.size(); ++i) {
+    for (int i = 0; i < funcCall->args.size(); ++i) {
         visitExpr(funcCall->args[i]);
     }
     const auto ft = funcCall->func->funcType;
@@ -809,6 +808,7 @@ void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
     if (ft->isVirtual) {
         funcCall->resolveVirtualFunc(cg);
     }
+    // TODO make generic
     if (funcCall->name == "map") {
         createMapFunc(funcCall->func);
     }
@@ -905,7 +905,7 @@ void LgsCodeGen::visitIterIndex(LgsIterIndex* iterIndex) {
     visitExpr(iterIndex->baseExpr);
     visitExpr(iterIndex->index->from);
     visitExpr(iterIndex->index->to);
-    iterIndex->IRValue = iterIndex->baseExpr->loadIR(cg);
+    iterIndex->IRValue = iterIndex->loadIR(cg);
 }
 
 void LgsCodeGen::visitInstance(LgsInstance* instance) {
@@ -990,19 +990,18 @@ void LgsCodeGen::createEpilogue(LgsFunc* func) {
 }
 
 void LgsCodeGen::freeFuncHeap(const LgsFunc* func) {
+    if constexpr (!WITH_OWNERSHIP) return;
     cg.printStr("---\n" + func->funcType->name + '\n');
     cg.printStr(std::to_string(func->owners.size()) + " owned exprs:\n");
     for (const auto expr : func->owners) {
-        cg.printStr("\t");
         expr->type->freeValue(cg, expr->IRValue);
     }
     if (!func->orphans.empty()) {
         cg.printStr("Found " + std::to_string(func->orphans.size()) + " orphan exprs:\n");
         for (const auto expr : func->orphans) {
-            cg.printPtr(expr->IRValue, "\t");
+            cg.printPtr(expr->IRValue);
         }
     }
-
 }
 
 Value* LgsCodeGen::getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) const {

@@ -22,7 +22,12 @@ void LgsSelection::assign(LgsLLVMGen& cg, LgsExpr* expr) {
     const auto rIR = expr->IRValue;
     const auto lExpr = lastExpr();
     if (!lExpr->type->asVec()) {
-        if (type->isHeapAlloc) type->freeValue(cg, IRValue);
+        if (type->isHeapAlloc) {
+            expr->owner = nullptr;
+            const auto field = lastExprParent()->type->getField(lastExpr()->asVariable()->name);
+            field->isOwner = false;
+            type->freeValue(cg, loadIR(cg));
+        }
         cg.builder.CreateStore(rIR, IRValue);
     } else {
         const auto vecTy = lExpr->type->getIRType(cg);

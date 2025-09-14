@@ -10,13 +10,13 @@
 bool LgsFuncCall::equals(const LgsFuncType* other) const {
     if (other->hasDefaults) return equalsDefaultParams(other);
     if (other->isVariadic) return equalsVariadic(other);
-    if (other->params.size() - other->isMethod != args.size()) return false;
+    if (other->params.size() != args.size()) return false;
     if (other->params.size() == 0 && args.size() == 0) return true;
-    for (size_t i = other->isMethod; i < other->params.size(); ++i) {
+    for (size_t i = isMethodCall; i < other->params.size(); ++i) {
+        const auto arg = args[i];
         const auto param = other->params[i];
-        const auto paramType = param.type;
-        const auto arg = args[i - other->isMethod];
         const auto argType = arg->type;
+        const auto paramType = param.type;
         if (!paramType || !argType) return false;
         if (arg->isNull && !paramType->isNullable()) return false;
         if (!param.isOwner && arg->owner) return false;

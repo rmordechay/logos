@@ -99,7 +99,9 @@ Value* LgsLLVMGen::callLgsFunc(const std::string& funcName, FunctionType* ft, co
 
 Value* LgsLLVMGen::callMalloc(const size_t size) {
     const auto ptr = builder.CreateMalloc(sizeTy(), sizeTy(), usize(size), nullptr);
-    printPtr(ptr, "malloc: ");
+    if constexpr (WITH_OWNERSHIP) {
+        printPtr(ptr, "malloc: ");
+    }
     return ptr;
 }
 
@@ -297,8 +299,15 @@ TypeSize LgsLLVMGen::typeSize(StructType* v) const {
     return IRModule->getDataLayout().getTypeStoreSize(v);
 }
 
+StructType* LgsLLVMGen::getIteratorIRType(const std::string& name) {
+    return getStructType({ptrTy(), i64Ty(), ptrTy(), ptrTy(), ptrTy(), ptrTy()}, name);
+}
+
+void LgsLLVMGen::printStr(const std::string& str) {
+    callPrintf({getIRStr("%s"), getIRStr(str)});
+}
+
 void LgsLLVMGen::printPtr(Value* ptr, const std::string& text) {
-    assert(ptr->getType()->isPointerTy());
     if (text != "") printStr(text);
     callPrintf({getIRStr(LGS_ANY.strFormatPart() + '\n'), ptr});
 }
@@ -306,10 +315,6 @@ void LgsLLVMGen::printPtr(Value* ptr, const std::string& text) {
 void LgsLLVMGen::printInt(Value* number, const std::string& text) {
     if (text != "") printStr(text);
     callPrintf({getIRStr("%d\n"), number});
-}
-
-void LgsLLVMGen::printStr(const std::string& str) {
-    callPrintf({getIRStr("%s"), getIRStr(str)});
 }
 
 void LgsLLVMGen::initLLVM() {
@@ -326,6 +331,7 @@ TargetMachine* LgsLLVMGen::getTargetMachine() {
     return target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), std::nullopt);
 }
 
+
 void LgsLLVMGen::finalizeDebugger() {
     if (!diBuilder) return;
     diBuilder->finalize();
@@ -335,9 +341,4 @@ void LgsLLVMGen::finalizeDebugger() {
     file.flush();
     delete diBuilder;
     diBuilder = nullptr;
-}
-
-
-StructType* LgsLLVMGen::getIteratorIRType(const std::string& name) {
-    return getStructType({ptrTy(), i64Ty(), ptrTy(), ptrTy(), ptrTy(), ptrTy()}, name);
 }

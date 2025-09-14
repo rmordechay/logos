@@ -12,8 +12,8 @@ struct Lgs_Thunk_Func {
 struct Lgs_Stack_Frame {
     Lgs_Thunk_Func defers[LOCALS_CAPACITY];
     Lgs_Thunk_Func coros[LOCALS_CAPACITY];
-    int defers_count;
-    int coros_count;
+    int defersCount;
+    int corosCount;
 };
 
 struct Lgs_Stack {

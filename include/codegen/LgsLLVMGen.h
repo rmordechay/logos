@@ -11,6 +11,8 @@ namespace llvm {
 
 using namespace llvm;
 
+#define WITH_OWNERSHIP 0
+
 class LgsLLVMGen {
 public:
     LLVMContext context;
@@ -104,9 +106,9 @@ public:
     StructType* getIteratorIRType(const std::string& name);
 
     // Debugging
+    void printStr(const std::string& str);
     void printPtr(Value* ptr, const std::string& text = "");
     void printInt(Value* number, const std::string& text = "");
-    void printStr(const std::string& str);
 
     static void initLLVM();
     static TargetMachine* getTargetMachine();
