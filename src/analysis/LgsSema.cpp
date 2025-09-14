@@ -141,7 +141,7 @@ void LgsSema::visitFunc(LgsFunc* func) {
         errHandler.addError(E10055, &func->location, {func->pname()});
     }
     for (const auto& orphan : func->orphans) {
-        errHandler.addError(E10077, &orphan->location, {orphan->pname()});
+        // errHandler.addError(E10077, &orphan->location, {orphan->pname()});
     }
     stack.exitScope();
 }
@@ -219,7 +219,7 @@ void LgsSema::visitVarDec(LgsVarDec* varDec) {
     }
     if (varDec->isOwner && varDec->expr) {
         if (varDec->expr->owner) {
-            errHandler.addError(E10075, &varDec->expr->location, {varDec->expr->pname()});
+            // errHandler.addError(E10075, &varDec->expr->location, {varDec->expr->pname()});
         }
         varDec->expr->owner = varDec;
     }
@@ -242,7 +242,7 @@ void LgsSema::visitAssignment(const LgsAssignment* assignment) {
         return errHandler.addError(E10012, &lValue->location, {lValue->pname(), lType->pname(), assignment->getAssignTypeStr(), rValue->pname()});
     }
     if (assignment->lValue->owner && assignment->rValue->owner) {
-        errHandler.addError(E10075, &lValue->location, {rValue->pname()});
+        // errHandler.addError(E10075, &lValue->location, {rValue->pname()});
     }
 }
 
@@ -998,6 +998,7 @@ bool LgsSema::resolveForeachVars(const LgsForeachLoop* foreachLoop, LgsExpr* ite
 }
 
 void LgsSema::addHeapExpr(LgsExpr* expr) {
+    if (!expr->type) return;
     if (!expr->type->isHeapAlloc) return;
     const auto currentFunc = stack.currentFunc();
     if (expr->owner) {

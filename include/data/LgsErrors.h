@@ -97,7 +97,7 @@ inline LgsBaseError E10072{.msg = "Type '%s' has multiple methods with the same 
 inline LgsBaseError E10073{.msg = "Only numbers or vectors can be elements of a vector. Given: '%s'.", .errCode = errCodeStart++};
 inline LgsBaseError E10074{.msg = "Vector mismatch. Vector dimension: %s. Given: %s.", .errCode = errCodeStart++};
 inline LgsBaseError E10075{.msg = "Expression '%s' already has an owner.", .errCode = errCodeStart++};
-inline LgsBaseError E10076{.msg = "%s is not defined between %s and %s.", .errCode = errCodeStart++}; // operation, left-expr, right-expr
+inline LgsBaseError E10076{.msg = "%s is not defined between '%s' and '%s'.", .errCode = errCodeStart++}; // operation, left-expr, right-expr
 inline LgsBaseError E10077{.msg = "Expression '%s' has no owner.", .errCode = errCodeStart++};
 inline LgsBaseError E10078{.msg = "Defer functions must return 'Void'. Given: '%s'.", .errCode = errCodeStart++};
 inline LgsBaseError E10079{.msg = "", .errCode = errCodeStart++};

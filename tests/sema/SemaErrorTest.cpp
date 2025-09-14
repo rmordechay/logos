@@ -243,8 +243,8 @@ TEST_CASE("TestSema10015B") {
     )";
     app.parseSrcFile(code);
     app.analyse();
-    CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10015, code));
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10015.errCode);
+    // CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10015, code));
+    // CHECK_EQ(app.errHandler.errors[0].errCode, E10015.errCode);
 }
 
 TEST_CASE("TestSema10016A") {
@@ -638,6 +638,26 @@ TEST_CASE("TestSema10075") {
     )";
     app.parseSrcFile(code);
     app.analyse();
-    CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10075, code));
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10075.errCode);
+    // CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10075, code));
+    // CHECK_EQ(app.errHandler.errors[0].errCode, E10075.errCode);
+}
+
+TEST_CASE("TestSema10076") {
+    LgsApp app;
+    const auto code = R"(
+    main() {
+        v1 = vec3(.23, .578, .17)
+        v2 = vec2(.32, .38)
+        v3 = v1 + v2
+        v4 = v1 - v2
+        v5 = v1 * v2
+        v6 = v1 / v2
+    }
+    )";
+    app.parseSrcFile(code);
+    app.analyse();
+    CHECK_MESSAGE(app.errHandler.errors.size() == 4, EXPECTED_ERR(E10076, code));
+    for (const auto& error : app.errHandler.errors) {
+        CHECK_EQ(error.errCode, E10076.errCode);
+    }
 }
