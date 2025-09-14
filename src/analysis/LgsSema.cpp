@@ -40,6 +40,7 @@
 #include "stmts/LgsAssignment.h"
 #include "stmts/LgsIOStmt.h"
 #include "stmts/LgsIfStmt.h"
+#include "test/LgsTest.h"
 #include "types/LgsPtr.h"
 #include "types/primitives/LgsDouble.h"
 
@@ -72,15 +73,6 @@ void LgsSema::visitMainFile(LgsMainFile* mainFile) {
     }
 }
 
-void LgsSema::visitTestFile(const LgsTestFile* testFile) {
-    for (const auto& func : testFile->funcs) {
-        visitFunc(func);
-    }
-    for (const auto& test : testFile->tests) {
-        visitFunc(test);
-    }
-}
-
 void LgsSema::visitObject(LgsObject* obj) {
     for (const auto& field : obj->fields) {
         visitField(field);
@@ -106,6 +98,19 @@ void LgsSema::visitInterface(LgsInterface* interface) {
     }
     if (allMethodsImplemented) {
         errHandler.addError(E10062, &interface->location, {interface->name});
+    }
+}
+
+void LgsSema::visitTestFile(const LgsTestFile* testFile) {
+    const auto parentPath = testFile->path.parent_path();
+    if (!is_directory(parentPath) || parentPath.filename() != "tests") {
+        return errHandler.addError(E10079, &file->location, {file->name});
+    }
+    for (const auto& func : testFile->funcs) {
+        visitFunc(func);
+    }
+    for (const auto& test : testFile->tests) {
+        visitTest(test);
     }
 }
 
@@ -168,6 +173,10 @@ void LgsSema::visitIOPair(LgsIOPair* ioPair, LgsObject* obj) {
     if (!ioPair->closeFunc) {
         errHandler.addError(E10005, &ioPair->closeFunc->location, {ioPair->closeFuncName, obj->pname()});
     }
+}
+
+void LgsSema::visitTest(const LgsTest* test) {
+    visitFunc(test->func);
 }
 
 void LgsSema::visitStmt(LgsStmt* stmt) {
@@ -1120,7 +1129,7 @@ void LgsSema::validateSliceBounds(LgsIterIndex* iterIndex) {
 bool LgsSema::validateFieldVisibility(LgsField* field, const LgsObject* parent) {
     if (parent && parent->singleton) return true;
     if (!field || field->isVirtual) return false;
-    if (!field->isPublic && file->id != field->location.fileID) {
+    if (!field->isPublic && file->id != field->location.fileID && !stack.currentFunc()->isTest) {
         if (parent) errHandler.addError(E10030, &field->location, {field->name, parent->name});
         return false;
     }
@@ -1131,11 +1140,9 @@ bool LgsSema::validateMethodVisibility(const LgsFuncCall* methodCall, const LgsO
     if (parent && parent->singleton) return true;
     const auto method = methodCall->func;
     if (!method || method->funcType->isVirtual) return false;
-    if (!method->funcType->isPublic) {
-        if (file->id != method->location.fileID) {
-            errHandler.addError(E10031, &methodCall->location, {method->funcType->name, method->funcType->parentName});
-            return false;
-        }
+    if (!method->funcType->isPublic && file->id != method->location.fileID && !stack.currentFunc()->isTest) {
+        errHandler.addError(E10031, &methodCall->location, {method->funcType->name, method->funcType->parentName});
+        return false;
     }
     return true;
 }
@@ -1269,7 +1276,6 @@ bool LgsSema::resolveMethodCall(LgsFuncCall* methodCall, LgsType* parentType) {
 
 void LgsSema::checkMock(const LgsSelection* selection) {
     const auto currentFunc = stack.currentFunc();
-    if (!currentFunc->funcType->isTest) return;
     if (selection->exprs.size() != 2) {
         return;
     }

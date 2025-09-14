@@ -1,7 +1,7 @@
 #pragma once
 
-class LgsExpr;
 class LgsValue;
+class LgsExpr;
 
 struct LgsMock {
     LgsValue* when;

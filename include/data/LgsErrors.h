@@ -100,7 +100,7 @@ inline LgsBaseError E10075{.msg = "Expression '%s' already has an owner.", .errC
 inline LgsBaseError E10076{.msg = "%s is not defined between '%s' and '%s'.", .errCode = errCodeStart++}; // operation, left-expr, right-expr
 inline LgsBaseError E10077{.msg = "Expression '%s' has no owner.", .errCode = errCodeStart++};
 inline LgsBaseError E10078{.msg = "Defer functions must return 'Void'. Given: '%s'.", .errCode = errCodeStart++};
-inline LgsBaseError E10079{.msg = "", .errCode = errCodeStart++};
+inline LgsBaseError E10079{.msg = "Test file '%s' must be inside 'tests' directory.", .errCode = errCodeStart++};
 inline LgsBaseError E10080{.msg = "Index '%s' was not found in iterable.", .errCode = errCodeStart++};
 inline LgsBaseError E10081{.msg = "Range-start type '%s' is not equal to the range-end type '%s'.", .errCode = errCodeStart++};
 inline LgsBaseError E10082{.msg = "Loop range '%s' must be a number. Given: '%s'.", .errCode = errCodeStart++};

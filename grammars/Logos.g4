@@ -25,7 +25,7 @@ interfaceFile:
     ;
 
 testFile:
-        'test' IDENTIFIER func*
+        'test' IDENTIFIER field* func*
     ;
 
 interface:

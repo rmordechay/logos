@@ -1,5 +1,4 @@
 #pragma once
-#include "LgsMock.h"
 #include "types/LgsFuncType.h"
 
 class LgsStmtsBlock;
@@ -13,13 +12,13 @@ using CallFn = std::function<Value*(LgsLLVMGen&, const std::vector<LgsExpr*>&)>;
 class LgsFunc : public LgsExpr {
 public:
     LgsFuncType* funcType;
-    std::vector<LgsReturn*> returnStmts;
     LgsStmtsBlock* stmtsBlock = nullptr;
     std::vector<LgsExpr*> owners;
     std::vector<LgsExpr*> orphans;
+    std::vector<LgsReturn*> returnStmts;
     BasicBlock* cleanupBlock = nullptr;
-    std::vector<LgsMock> mocks;
     bool hasDefers = false;
+    bool isTest = false;
     CallFn fn;
 
     explicit LgsFunc(const std::string& name, LgsType* rt = nullptr, const std::vector<LgsType*>& paramTypes = {}, const uint32_t ops = 0) {

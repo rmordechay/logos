@@ -119,7 +119,6 @@ LgsType* LgsFuncType::clone() {
     copy->isOptional = isOptional;
     copy->isTerminator = isTerminator;
     copy->isLambda = isLambda;
-    copy->isTest = isTest;
     copy->isIO = isIO;
     copy->hasDefaults = hasDefaults;
     return copy;
@@ -142,7 +141,6 @@ json::value LgsFuncType::asJSON() {
     jsonObj["isOptional"] = isOptional;
     jsonObj["isTerminator"] = isTerminator;
     jsonObj["isMethod"] = isMethod;
-    jsonObj["isTest"] = isTest;
     jsonObj["hasDefaults"] = hasDefaults;
     return jsonObj;
 }

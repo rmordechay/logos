@@ -2,6 +2,7 @@
 #include "LgsLLVMGen.h"
 #include "files/LgsFile.h"
 #include "logos/LgsStack.h"
+#include "test/LgsTest.h"
 
 class LgsMainFunc;
 class LgsInterfaceFile;
@@ -66,6 +67,7 @@ public:
     void visitMainFile(LgsMainFile* mainFile);
     void visitObjFile(const LgsObjectFile* objFile);
     void visitInterfaceFile(const LgsInterfaceFile* interfaceFile);
+    void visitTestFile(LgsTestFile* testFile);
     void visitMainFunc(LgsMainFunc* func, const std::vector<char*>& appArgs);
     void visitFunc(LgsFunc* func);
     void visitObject(LgsObject* obj) const;
@@ -73,14 +75,15 @@ public:
     void visitGroup(LgsGroup* group);
     void visitField(LgsField* field);
     void visitParam(LgsParam* param);
+    void visitTest(const LgsTest* test);
+    void visitStmt(LgsStmt* stmt);
+    void visitStmtsBlock(const LgsStmtsBlock* stmtsBlock);
     void visitLoop(LgsForLoop* loop);
     void visitRangeLoop(LgsRangeLoop* loop);
     void visitForeachLoop(LgsForeachLoop* loop);
     void visitInfiniteLoop(const LgsInfiniteLoop* loop) const;
-    void visitWhileLoop(const LgsWhileLoop* loop);
     void visitLoopMetaVar(LgsLoopMetaVar* metaVar);
-    void visitStmt(LgsStmt* stmt);
-    void visitStmtsBlock(const LgsStmtsBlock* stmtsBlock);
+    void visitWhileLoop(const LgsWhileLoop* loop);
     void visitVarDec(LgsVarDec* varDec);
     void visitAssignment(const LgsAssignment* assignment);
     void visitIfStmt(LgsIfStmt* ifStmt);

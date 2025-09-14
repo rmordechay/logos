@@ -1,4 +1,5 @@
 #pragma once
+#include "../symbols/test/LgsMock.h"
 #include "exprs/LgsVectorExpr.h"
 #include "logos/LgsStack.h"
 #include "utils/LgsErrHandler.h"
@@ -7,6 +8,9 @@
 #include "stmts/LgsIOPair.h"
 #include "stmts/LgsIOStmt.h"
 
+#include <vector>
+
+class LgsTest;
 class LgsInterfaceFile;
 class LgsObjectFile;
 class LgsPostfixExpr;
@@ -61,13 +65,14 @@ public:
     explicit LgsSema(LgsFile* file, LgsSymbolTable& globals) : file(file), globals(globals), typeResolver(errHandler, globals) {}
     void analyse();
     void visitMainFile(LgsMainFile* mainFile);
-    void visitTestFile(const LgsTestFile* testFile);
     void visitObject(LgsObject* obj);
     void visitInterface(LgsInterface* interface);
+    void visitTestFile(const LgsTestFile* testFile);
     void visitField(LgsField* field);
     void visitFunc(LgsFunc* func);
     void visitParam(LgsParam* param);
     void visitIOPair(LgsIOPair* ioPair, LgsObject* obj);
+    void visitTest(const LgsTest* test);
     void visitStmt(LgsStmt* stmt);
     void visitStmtsBlock(LgsStmtsBlock* stmtsBlock);
     void visitVarDec(LgsVarDec* varDec);

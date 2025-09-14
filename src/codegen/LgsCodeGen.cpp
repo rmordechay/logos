@@ -1,5 +1,4 @@
 #include "codegen/LgsCodeGen.h"
-
 #include "exprs/LgsArrayExpr.h"
 #include "funcs/LgsCoroutine.h"
 #include "files/LgsInterfaceFile.h"
@@ -21,6 +20,7 @@
 #include "exprs/constants/LgsStrConst.h"
 #include "types/LgsEnum.h"
 #include "files/LgsMainFile.h"
+#include "files/LgsTestFile.h"
 #include "funcs/LgsMainFunc.h"
 #include "stmts/LgsBreak.h"
 #include "stmts/LgsContinue.h"
@@ -38,7 +38,6 @@
 #include "stmts/LgsIfStmt.h"
 #include "types/iterables/LgsSArray.h"
 #include "types/iterables/LgsVec.h"
-
 #include <llvm/IR/Module.h>
 #include <llvm/Target/TargetMachine.h>
 
@@ -51,6 +50,8 @@ void LgsCodeGen::generate(const LgsAppConfigs& appConfigs, TargetMachine& target
         visitObjFile(objFile);
     } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(&file)) {
         visitInterfaceFile(interfaceFile);
+    } else if (const auto testFile = dynamic_cast<LgsTestFile*>(&file)) {
+        visitTestFile(testFile);
     }
 }
 
@@ -81,6 +82,15 @@ void LgsCodeGen::visitInterfaceFile(const LgsInterfaceFile* interfaceFile) {
     for (const auto& [_, method] : interfaceFile->interface->methods) {
         if (!method->stmtsBlock) continue;
         visitFunc(method);
+    }
+}
+
+void LgsCodeGen::visitTestFile(LgsTestFile* testFile) {
+    for (const auto& func : testFile->funcs) {
+        visitFunc(func);
+    }
+    for (const auto& test : testFile->tests) {
+        visitTest(test);
     }
 }
 
@@ -176,6 +186,35 @@ void LgsCodeGen::visitParam(LgsParam* param) {
     param->IRValue = param->vaList;
 }
 
+void LgsCodeGen::visitTest(const LgsTest* test) {
+    visitFunc(test->func);
+}
+
+void LgsCodeGen::visitStmt(LgsStmt* stmt) {
+    if (const auto ifStmt = stmt->asIfStmt()) return visitIfStmt(ifStmt);
+    if (const auto pattern = stmt->asPattern()) return visitPatternMatching(pattern);
+    if (const auto varDec = stmt->asVarDec()) return visitVarDec(varDec);
+    if (const auto loopStmt = stmt->asLoop()) return visitLoop(loopStmt);
+    if (const auto coroutine = stmt->asCoroutine()) return visitCoroutine(coroutine);
+    if (const auto deferStmt = stmt->asDefer()) return visitDeferStmt(deferStmt);
+    if (const auto assignment = stmt->asAssignment()) return visitAssignment(assignment);
+    if (const auto funcCall = stmt->asFuncCall()) return visitFuncCall(funcCall);
+    if (const auto postfixExpr = stmt->asPostfixExpr()) return visitPostfixExpr(postfixExpr);
+    if (const auto postfixExpr = stmt->asExpr()) return visitExpr(postfixExpr);
+    if (const auto selection = stmt->asSelection()) return visitSelection(selection);
+    if (const auto ioStmt = stmt->asIOStmt()) return visitIOStmt(ioStmt);
+    if (const auto returnStmt = stmt->asReturn()) return visitReturnStmt(returnStmt);
+    if (const auto breakStmt = stmt->asBreak()) return visitBreakStmt(breakStmt);
+    if (stmt->asContinue()) return visitContinueStmt();
+    assert(0);
+}
+
+void LgsCodeGen::visitStmtsBlock(const LgsStmtsBlock* stmtsBlock) {
+    for (const auto stmt : stmtsBlock->stmts) {
+        visitStmt(stmt);
+    }
+}
+
 void LgsCodeGen::visitLoop(LgsForLoop* loop) {
     stack.enterScope(loop);
     loop->setBlocks(cg);
@@ -253,16 +292,6 @@ void LgsCodeGen::visitInfiniteLoop(const LgsInfiniteLoop* loop) const {
     cg.branchAndStartBlock(loop->IRBodyBlock, currentIRFunc);
 }
 
-void LgsCodeGen::visitWhileLoop(const LgsWhileLoop* loop) {
-    cg.builder.CreateBr(loop->IRCondBlock);
-    // Condition
-    cg.startBlock(loop->IRCondBlock, currentIRFunc);
-    const auto condition = getIRValue(loop->condExpr);
-    cg.builder.CreateCondBr(condition, loop->IRBodyBlock, loop->IRExitBlock);
-    // Body
-    cg.startBlock(loop->IRBodyBlock, currentIRFunc);
-}
-
 void LgsCodeGen::visitLoopMetaVar(LgsLoopMetaVar* metaVar) {
     const auto loop = stack.currentLoop();
     const auto iValue = loop->iValue;
@@ -284,29 +313,14 @@ void LgsCodeGen::visitLoopMetaVar(LgsLoopMetaVar* metaVar) {
     }
 }
 
-void LgsCodeGen::visitStmt(LgsStmt* stmt) {
-    if (const auto ifStmt = stmt->asIfStmt()) return visitIfStmt(ifStmt);
-    if (const auto pattern = stmt->asPattern()) return visitPatternMatching(pattern);
-    if (const auto varDec = stmt->asVarDec()) return visitVarDec(varDec);
-    if (const auto loopStmt = stmt->asLoop()) return visitLoop(loopStmt);
-    if (const auto coroutine = stmt->asCoroutine()) return visitCoroutine(coroutine);
-    if (const auto deferStmt = stmt->asDefer()) return visitDeferStmt(deferStmt);
-    if (const auto assignment = stmt->asAssignment()) return visitAssignment(assignment);
-    if (const auto funcCall = stmt->asFuncCall()) return visitFuncCall(funcCall);
-    if (const auto postfixExpr = stmt->asPostfixExpr()) return visitPostfixExpr(postfixExpr);
-    if (const auto postfixExpr = stmt->asExpr()) return visitExpr(postfixExpr);
-    if (const auto selection = stmt->asSelection()) return visitSelection(selection);
-    if (const auto ioStmt = stmt->asIOStmt()) return visitIOStmt(ioStmt);
-    if (const auto returnStmt = stmt->asReturn()) return visitReturnStmt(returnStmt);
-    if (const auto breakStmt = stmt->asBreak()) return visitBreakStmt(breakStmt);
-    if (stmt->asContinue()) return visitContinueStmt();
-    assert(0);
-}
-
-void LgsCodeGen::visitStmtsBlock(const LgsStmtsBlock* stmtsBlock) {
-    for (const auto stmt : stmtsBlock->stmts) {
-        visitStmt(stmt);
-    }
+void LgsCodeGen::visitWhileLoop(const LgsWhileLoop* loop) {
+    cg.builder.CreateBr(loop->IRCondBlock);
+    // Condition
+    cg.startBlock(loop->IRCondBlock, currentIRFunc);
+    const auto condition = getIRValue(loop->condExpr);
+    cg.builder.CreateCondBr(condition, loop->IRBodyBlock, loop->IRExitBlock);
+    // Body
+    cg.startBlock(loop->IRBodyBlock, currentIRFunc);
 }
 
 void LgsCodeGen::visitVarDec(LgsVarDec* varDec) {

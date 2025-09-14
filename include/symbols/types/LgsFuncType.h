@@ -34,7 +34,6 @@ public:
     bool isOptional = false;
     bool isTerminator = false;
     bool isMethod = false;
-    bool isTest = false;
     bool isIO = false;
     bool hasDefaults = false;
     FunctionType* IRType = nullptr;

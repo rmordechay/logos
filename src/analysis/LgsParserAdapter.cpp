@@ -39,6 +39,7 @@
 #include "stmts/LgsIOStmt.h"
 #include "stmts/LgsIfStmt.h"
 #include "stmts/LgsVarDec.h"
+#include "test/LgsTest.h"
 #include "types/iterables/LgsDArray.h"
 #include "types/LgsGroup.h"
 #include "types/LgsInterface.h"
@@ -57,6 +58,7 @@
 #include <stmts/LgsDeferStmt.h>
 #include <types/iterables/LgsStr.h>
 #include <types/LgsVoid.h>
+#include <../../include/symbols/test/LgsMock.h>
 
 LgsFile* LgsParserAdapter::parseFile(const std::string& codeText, const fs::path& filePath) {
     antlr4::ANTLRInputStream input(codeText);
@@ -160,8 +162,8 @@ LgsFile* LgsParserAdapter::getTestFile(LogosParser::TestFileContext* ctx, const 
     for (const auto& func : ctx->func()) {
         const auto lgsFunc = getFunc(func);
         if (startsWith(lgsFunc->funcType->name, "test")) {
-            lgsFunc->funcType->isTest = true;
-            file->tests.push_back(lgsFunc);
+            lgsFunc->isTest = true;
+            file->tests.push_back(new LgsTest(lgsFunc));
         } else {
             file->funcs.push_back(lgsFunc);
         }
@@ -184,7 +186,7 @@ LgsEnvFile* LgsParserAdapter::getEnvFile(const fs::path& filePath) {
     for (const auto& implicitVarDec : ctx->implicitVarDec()) {
         varDecs.emplace_back(getImplicitVarDec(implicitVarDec));
     }
-    auto file = new LgsEnvFile(fileID, "EnvFile", absFilePath, varDecs);
+    auto file = new LgsEnvFile(fileID, filePath.filename(), absFilePath, varDecs);
     if (!checkParserErrors(&parser)) return file;
     return file;
 }
