@@ -19,9 +19,9 @@ void LgsPaths::initPaths() {
 
 void LgsPaths::findLgsRoot() {
 #ifdef __APPLE__
-    lgsRoot = rootPath.parent_path() / "cmake-build-debug";
+    lgsLib = rootPath.parent_path() / "cmake-build-debug";
 #elif defined(__linux__)
-    lgsRoot = rootPath.parent_path() / "build";
+    lgsLib = rootPath.parent_path() / "build";
 #endif
 }
 

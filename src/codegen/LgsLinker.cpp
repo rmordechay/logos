@@ -54,8 +54,8 @@ bool LgsLinker::link() const {
         sizeof(linkCmd),
         LINK_STRING,
         paths.objFilePath.c_str(),
-        paths.lgsRoot.c_str(),
-        paths.lgsRoot.c_str(),
+        paths.lgsLib.c_str(),
+        paths.lgsLib.c_str(),
         paths.execFilePath.c_str()
     );
     return std::system(linkCmd) == 0;
