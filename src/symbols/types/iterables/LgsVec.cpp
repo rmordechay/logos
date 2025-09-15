@@ -43,7 +43,7 @@ uint16_t LgsVec::getUnpackCount() const {
     return 1;
 }
 
-Value* LgsVec::IRLength(LgsLLVMGen& cg, LgsExpr* iterable) {
+Value* LgsVec::IRLength(LgsLLVMGen& cg, Value* iterable) {
     return cg.usize(2);
 }
 

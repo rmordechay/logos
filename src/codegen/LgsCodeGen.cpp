@@ -819,11 +819,12 @@ void LgsCodeGen::createMapFunc(LgsFunc* func) {
     cg.savedIP = cg.builder.saveIP();
     const auto originalFunc = currentIRFunc;
     createPrologue(func);
-    const auto l = new LgsArrayExpr(func->funcType->params[0].type->asDArray());
+    const auto dArray = func->funcType->params[0].type->asDArray();
+    const auto l = new LgsArrayExpr(dArray);
     visitArrayExpr(l);
 
     const auto iPtr = cg.builder.CreateAlloca(cg.sizeTy());
-    const auto loopStart = cg.builder.CreateSExt(cg.usize(0), cg.sizeTy());
+    const auto loopStart = cg.builder.CreateSExt(cg.sizeZero(), cg.sizeTy());
     const auto IRCondBlock = cg.createBlock(BLOCK_NAME_LOOP_COND);
     const auto IRBodyBlock = cg.createBlock(BLOCK_NAME_LOOP_BODY);
     const auto IRExitBlock = cg.createBlock(BLOCK_NAME_LOOP_EXIT);
@@ -833,11 +834,15 @@ void LgsCodeGen::createMapFunc(LgsFunc* func) {
     // Condition
     cg.startBlock(IRCondBlock, currentIRFunc);
     const auto iValue = cg.builder.CreateLoad(cg.sizeTy(), iPtr);
-    const auto condition = cg.builder.CreateICmpSLT(iValue, cg.usize(10));
+    const auto condition = cg.builder.CreateICmpSLT(iValue, dArray->IRLength(cg, func->funcType->params[0].IRValue));
     cg.builder.CreateCondBr(condition, IRBodyBlock, IRExitBlock);
 
     // Body
     cg.startBlock(IRBodyBlock, currentIRFunc);
+
+    const auto f = dyn_cast<FunctionType>(func->funcType->params[1].type->getIRType(cg));
+    const auto v = cg.builder.CreateCall(f, func->funcType->params[1].IRValue, {cg.i32(2)});
+
 
     if (cg.lastInstTerminator()) return;
     const auto inc = cg.builder.CreateAdd(iValue, cg.usize(1));

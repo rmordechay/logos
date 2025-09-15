@@ -42,7 +42,7 @@ void formatErrorMsg(const LgsBaseError& lgsErr, const std::vector<std::string>& 
         pos += args[argIndex].length();
         argIndex++;
     }
-    // result = LGS_ERROR_PADDING + result;
+    result = LGS_ERROR_PADDING + result;
 }
 
 bool isLogosFile(const fs::path& filePath) {

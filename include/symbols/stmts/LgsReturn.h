@@ -9,7 +9,7 @@ namespace llvm {
 class LgsReturn final : public LgsStmt {
 public:
     LgsExpr *expr = nullptr;
-    llvm::BasicBlock* parentBlock = nullptr;
+    BasicBlock* parentBlock = nullptr;
 
     explicit LgsReturn(LgsExpr* expr) : expr(expr) {}
     json::value asJSON() override;

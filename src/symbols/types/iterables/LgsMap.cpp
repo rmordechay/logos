@@ -34,7 +34,7 @@ uint16_t LgsMap::getUnpackCount() const {
     return 2;
 }
 
-Value* LgsMap::IRLength(LgsLLVMGen& cg, LgsExpr* iterable) {
+Value* LgsMap::IRLength(LgsLLVMGen& cg, Value* iterable) {
     return cg.i32(1024);
 }
 

@@ -24,7 +24,7 @@ public:
     Value* addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
     std::string strFormatPart() const override;
     uint16_t getUnpackCount() const override;
-    Value* IRLength(LgsLLVMGen& cg, LgsExpr* iterable) override;
+    Value* IRLength(LgsLLVMGen& cg, Value* iterable) override;
     Value* IRIsEmpty(LgsLLVMGen* cg, LgsExpr* iterable) override;
     Value* IRIsNotEmpty(LgsLLVMGen* cg, LgsExpr* iterable) override;
     bool canCastTo(LgsType* other) override;

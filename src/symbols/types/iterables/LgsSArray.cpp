@@ -50,7 +50,7 @@ std::string LgsSArray::getName() {
     return name;
 }
 
-Value* LgsSArray::IRLength(LgsLLVMGen& cg, LgsExpr* iterable) {
+Value* LgsSArray::IRLength(LgsLLVMGen& cg, Value* iterable) {
     return sizeExpr->IRValue;
 }
 

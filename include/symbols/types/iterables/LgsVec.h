@@ -24,7 +24,7 @@ public:
     LgsExpr* getZeroValue() override;
     LgsType* getIndexType() override;
     uint16_t getUnpackCount() const override;
-    Value* IRLength(LgsLLVMGen& cg, LgsExpr* iterable) override;
+    Value* IRLength(LgsLLVMGen& cg, Value* iterable) override;
     Value* IRIsEmpty(LgsLLVMGen* cg, LgsExpr* iterable) override;
     Value* IRIsNotEmpty(LgsLLVMGen* cg, LgsExpr* iterable) override;
     bool canCastTo(LgsType* other) override;

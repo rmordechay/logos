@@ -1272,7 +1272,7 @@ bool LgsSema::resolveMethodCall(LgsFuncCall* methodCall, LgsType* parentType) {
     for (size_t i = method->funcType->isMethod; i < method->funcType->params.size(); ++i) {
         const auto param = method->funcType->params[i];
         const auto paramType = param.type;
-        const auto arg = methodCall->args[i - method->funcType->isMethod];
+        const auto arg = methodCall->args[i];
         arg->completeType(paramType);
         visitExpr(arg);
     }

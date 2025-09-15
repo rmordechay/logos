@@ -1,5 +1,4 @@
 #include "exprs/LgsFuncCall.h"
-
 #include "data/LgsDefinitions.h"
 #include "exprs/LgsHashMap.h"
 #include "funcs/LgsFunc.h"
@@ -10,8 +9,6 @@
 bool LgsFuncCall::equals(const LgsFuncType* other) const {
     if (other->hasDefaults) return equalsDefaultParams(other);
     if (other->isVariadic) return equalsVariadic(other);
-    if (other->params.size() != args.size()) return false;
-    if (other->params.size() == 0 && args.size() == 0) return true;
     for (size_t i = isMethodCall; i < other->params.size(); ++i) {
         const auto arg = args[i];
         const auto param = other->params[i];

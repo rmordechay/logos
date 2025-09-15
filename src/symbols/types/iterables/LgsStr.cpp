@@ -128,8 +128,8 @@ Value* LgsStr::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
         }
         assert(0);
     }
-    const auto selfSize = IRLength(cg, self);
-    const auto otherSize = IRLength(cg, other);
+    const auto selfSize = IRLength(cg, self->IRValue);
+    const auto otherSize = IRLength(cg, other->IRValue);
     auto newStrSize = cg.builder.CreateAdd(selfSize, otherSize);
     newStrSize = cg.builder.CreateAdd(newStrSize, cg.i64(1));
     const auto newStrPtr = cg.builder.CreateAlloca(cg.i8Ty(), newStrSize);
@@ -141,8 +141,8 @@ Value* LgsStr::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     return newStrPtr;
 }
 
-Value* LgsStr::IRLength(LgsLLVMGen& cg, LgsExpr* iterable) {
-    return lenFunc->call(cg, {iterable});
+Value* LgsStr::IRLength(LgsLLVMGen& cg, Value* iterable) {
+    return lenFunc->callIR(cg, {iterable});
 }
 
 Value* LgsStr::IRIsEmpty(LgsLLVMGen* cg, LgsExpr* iterable) {

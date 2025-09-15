@@ -1,0 +1,8 @@
+main() {
+    arr = [1]
+    arr.add(7)
+    ar = arr.map(it -> {
+        print(it * 2)
+        return it * 2
+    })
+}
