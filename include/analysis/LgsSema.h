@@ -123,7 +123,7 @@ public:
     void matchExprToType(const LgsExpr* expr, LgsType* type);
     void resolveFuncCall(LgsFuncCall* funcCall);
     bool resolveMethodCall(LgsFuncCall* methodCall, LgsType* parentType);
-    bool resolveForeachVars(const LgsForeachLoop* foreachLoop, LgsExpr* iterExpr, const LgsIterable* iterable);
+    bool resolveForeachVars(const LgsForeachLoop* foreachLoop);
     void addHeapExpr(LgsExpr* expr);
 
     void validateObjImplements(LgsObject* obj, const std::vector<LgsType*>& interfaces);

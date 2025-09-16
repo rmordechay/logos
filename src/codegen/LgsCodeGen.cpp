@@ -262,30 +262,21 @@ void LgsCodeGen::visitForeachLoop(LgsForeachLoop* loop) {
     cg.builder.CreateStore(cg.sizeZero(), loop->iPtr);
     cg.branchAndStartBlock(loop->IRCondBlock, currentIRFunc);
 
-    visitExpr(loop->iterExpr);
-    const auto iterable = loop->iterExpr->type->asIterable();
-    if (iterable->asMap()) assert(0);
+    const auto expr = loop->iterExpr;
+    const auto index = new LgsIndex{.from = new LgsIntConst(&LGS_SIZE, 0)};
+    const auto iterIndex = new LgsIterIndex(expr, index);
+    visitExpr(iterIndex);
 
     loop->iValue = loop->loadIndex(cg);
+    index->from->IRValue = loop->iValue;
     auto loopEnd = loop->loopEnd(cg);
     loopEnd = cg.builder.CreateSExt(loopEnd, cg.sizeTy());
     const auto condition = cg.builder.CreateICmpSLT(loop->iValue, loopEnd);
     cg.builder.CreateCondBr(condition, loop->IRBodyBlock, loop->IRExitBlock);
 
     cg.startBlock(loop->IRBodyBlock, currentIRFunc);
-    loop->iterPtr = getIRValue(loop->iterExpr);
-    if (const auto str = iterable->asStr()) {
-        const auto gep = cg.builder.CreateGEP(str->getIRBaseType(&cg), loop->iterPtr, {cg.i32Zero(), loop->iValue});
-        loop->loopVars[0]->setIRValue(gep);
-    } else if (const auto dArr = iterable->asDArray()) {
-        const auto element = dArr->getFunc->callIR(cg, {loop->iterPtr, loop->iValue});
-        loop->loopVars[0]->setIRValue(element);
-    } else if (const auto sArr = iterable->asSArray()) {
-        const auto gep = cg.builder.CreateGEP(sArr->getIRType(cg), loop->iterPtr, {cg.i32Zero(), loop->iValue});
-        loop->loopVars[0]->setIRValue(gep);
-    } else {
-        assert(0);
-    }
+    loop->iterPtr = iterIndex->IRValue;
+    loop->loopVars[0]->setIRValue(iterIndex->loadIR(cg));
 }
 
 void LgsCodeGen::visitInfiniteLoop(const LgsInfiniteLoop* loop) const {
@@ -675,6 +666,8 @@ void LgsCodeGen::visitIntConst(LgsIntConst* intConst) const {
         intConst->IRValue = cg.i32(intConst->value);
     } else if (intConst->type->asLong()) {
         intConst->IRValue = cg.i64(intConst->value);
+    } else if (intConst->type->asSize()) {
+        intConst->IRValue = cg.usize(intConst->value);
     } else {
         assert(0);
     }
@@ -732,10 +725,10 @@ void LgsCodeGen::visitVariable(LgsVariable* variable) {
     assert(variable->ref.symbolType != UNKNOWN);
     switch (variable->ref.symbolType) {
     case VAR_DEC:
-        variable->IRValue = getIRValue(variable->ref.varDec);
+        variable->IRValue = variable->ref.varDec->IRValue;
         break;
     case PARAM:
-        variable->IRValue = getIRValue(variable->ref.param);
+        variable->IRValue = variable->ref.param->IRValue;
         break;
     case FUNC:
         variable->IRValue = variable->ref.func->getIRFunc(cg);

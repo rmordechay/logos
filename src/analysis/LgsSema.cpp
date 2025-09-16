@@ -396,7 +396,7 @@ void LgsSema::visitForeachLoop(const LgsForeachLoop* foreachLoop) {
         }
         return;
     }
-    if (!resolveForeachVars(foreachLoop, iterExpr, iterable)) return;
+    if (!resolveForeachVars(foreachLoop)) return;
     for (const auto varDec : foreachLoop->loopVars) {
         addLocalSymbol(LgsSymbol(varDec));
     }
@@ -980,18 +980,22 @@ void LgsSema::visitLoopMetaVar(LgsLoopMetaVar* metaVar) {
     }
 }
 
-bool LgsSema::resolveForeachVars(const LgsForeachLoop* foreachLoop, LgsExpr* iterExpr, const LgsIterable* iterable) {
+bool LgsSema::resolveForeachVars(const LgsForeachLoop* foreachLoop) {
+    const auto iterable = foreachLoop->iterExpr->type->asIterable();
     const auto varDecSize = foreachLoop->loopVars.size();
     const auto unpackCount = iterable->getUnpackCount();
     if (unpackCount != varDecSize) {
-        errHandler.addError(E10041, &iterExpr->location, {iterExpr->pname(), std::to_string(unpackCount), std::to_string(unpackCount + 1), std::to_string(varDecSize)});
+        errHandler.addError(E10041, &foreachLoop->iterExpr->location, {foreachLoop->iterExpr->pname(), std::to_string(unpackCount), std::to_string(unpackCount + 1), std::to_string(varDecSize)});
         return false;
     }
     if (const auto pair = iterable->baseType->asPair()) {
         foreachLoop->loopVars[0]->type = pair->key;
         foreachLoop->loopVars[1]->type = pair->value;
     } else {
-        foreachLoop->loopVars[0]->type = new LgsPtr(iterable->baseType);
+        const auto iterIndex = new LgsIterIndex(foreachLoop->iterExpr, new LgsIndex{.from = iterable->baseType->getZeroValue()});
+        visitIterIndex(iterIndex);
+        foreachLoop->loopVars[0]->expr = iterIndex;
+        foreachLoop->loopVars[0]->type = foreachLoop->loopVars[0]->expr->type;
     }
     return true;
 }

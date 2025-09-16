@@ -4,6 +4,8 @@
 #include "exprs/LgsBinaryExpr.h"
 #include "symbols/LgsAssignable.h"
 
+class LgsSize;
+
 namespace llvm {
     class DIBasicType;
     class Value;
@@ -107,6 +109,7 @@ public:
     LgsInt* asInt();
     LgsShort* asShort();
     LgsLong* asLong();
+    LgsSize* asSize();
     LgsUInt* asUInt();
     LgsFloat* asFloat();
     LgsDouble* asDouble();

@@ -177,6 +177,10 @@ LgsLong* LgsType::asLong() {
     return dynamic_cast<LgsLong*>(this);
 }
 
+LgsSize* LgsType::asSize() {
+    return dynamic_cast<LgsSize*>(this);
+}
+
 LgsUInt* LgsType::asUInt() {
     return dynamic_cast<LgsUInt*>(this);
 }
