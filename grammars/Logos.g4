@@ -1,7 +1,7 @@
 grammar Logos;
 
 logosFile:
-        extern? (mainFile | objectFile | interfaceFile | testFile)
+        (extern_c | extern_cpp)? (mainFile | objectFile | interfaceFile | testFile)
     ;
 
 logosEnvFile:
@@ -351,8 +351,12 @@ vector:
         (VEC2 | VEC3 | VEC4) LPAREN (expr (COMMA expr)* COMMA?)? RPAREN
     ;
 
-extern:
+extern_c:
         EXTERN 'C' LBRACE STRING* RBRACE
+    ;
+
+extern_cpp:
+        EXTERN 'C++' LBRACE STRING* RBRACE
     ;
 
 requireEnvVars:

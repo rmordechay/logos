@@ -82,15 +82,17 @@ LgsFile* LgsParserAdapter::getLogosFile(LogosParser::LogosFileContext* ctx, cons
         file = getTestFile(testFile, filePath);
     }
     assert(file);
-    if (ctx->extern_()) {
+    if (ctx->extern_c()) {
         LgsCLang lgsCLang(paths);
-        for (const auto importPath : ctx->extern_()->STRING()) {
+        for (const auto importPath : ctx->extern_c()->STRING()) {
             file->externalCPaths.emplace_back(getStrConst(importPath));
             lgsCLang.resolveCFiles(file);
             if (!lgsCLang.errHandler.successful) {
                 errHandler.mergeErrors(lgsCLang.errHandler);
             }
         }
+    } else if (ctx->extern_cpp()) {
+        assert(0);
     }
     return file;
 }
