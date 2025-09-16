@@ -49,7 +49,7 @@ LgsType* LgsFloat::applyOp(LgsType* other, const LgsOperator op) {
 }
 
 Value* LgsFloat::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-        auto l = self->loadIR(cg);
+    auto l = self->loadIR(cg);
     auto r = other->loadIR(cg);
     if (l->getType()->isIntegerTy()) {
         l = cg.builder.CreateSIToFP(l, cg.floatTy());
@@ -61,7 +61,7 @@ Value* LgsFloat::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
 }
 
 Value* LgsFloat::subIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-        auto l = self->loadIR(cg);
+    auto l = self->loadIR(cg);
     auto r = other->loadIR(cg);
     if (l->getType()->isIntegerTy()) {
         l = cg.builder.CreateSIToFP(l, cg.floatTy());
@@ -73,7 +73,7 @@ Value* LgsFloat::subIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
 }
 
 Value* LgsFloat::mulIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-        auto l = self->loadIR(cg);
+    auto l = self->loadIR(cg);
     auto r = other->loadIR(cg);
     if (l->getType()->isIntegerTy()) {
         l = cg.builder.CreateSIToFP(l, cg.floatTy());

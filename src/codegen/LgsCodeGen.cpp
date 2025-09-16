@@ -785,18 +785,18 @@ void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
     for (int i = 0; i < funcCall->args.size(); ++i) {
         visitExpr(funcCall->args[i]);
     }
+    if (funcCall->ref.symbolType == PARAM) {
+        LgsFunc f(funcCall->ref.param->type->asFuncType());
+        f.setIRValue(getIRValue(funcCall->ref.param));
+        funcCall->IRValue = f.call(cg, funcCall->args);
+        return;
+    }
     const auto ft = funcCall->func->funcType;
     if (ft->hasDefaults) {
         const auto diff = ft->params.size() - funcCall->args.size();
         for (int i = diff - 1; i < ft->params.size(); ++i) {
             visitExpr(ft->params[i].expr);
         }
-    }
-    if (funcCall->ref.symbolType == PARAM) {
-        LgsFunc f(funcCall->ref.param->type->asFuncType());
-        f.setIRValue(getIRValue(funcCall->ref.param));
-        funcCall->IRValue = f.call(cg, funcCall->args);
-        return;
     }
     if (ft->isVirtual) {
         funcCall->resolveVirtualFunc(cg);

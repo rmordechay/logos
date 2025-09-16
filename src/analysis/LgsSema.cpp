@@ -172,6 +172,7 @@ void LgsSema::visitParam(LgsParam* param) {
         assert(0);
     }
     addLocalSymbol(LgsSymbol(param));
+    assert(param->type);
 }
 
 void LgsSema::visitIOPair(LgsIOPair* ioPair, LgsObject* obj) {
@@ -754,14 +755,29 @@ void LgsSema::visitIterIndexSelection(LgsIterIndex* child, LgsType* parentType) 
 }
 
 void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent) {
-    if (methodCall->isMethodCall) {
-        if (parent->asTypeExpr()) {
-            errHandler.addError(E10083, &methodCall->location, {methodCall->func->funcType->pname()});
-        } else {
-            methodCall->args.insert(methodCall->args.begin(), parent);
-        }
+    auto name = methodCall->name;
+    const auto method = parent->type->getMethod(name);
+    if (!method) {
+        errHandler.addError(E10005, &methodCall->location, {name, parent->type->pname()});
+        return;
     }
-    if (!resolveMethodCall(methodCall, parent->type)) return;
+    if (parent->asTypeExpr()) {
+        errHandler.addError(E10083, &methodCall->location, {methodCall->func->funcType->pname()});
+    } else {
+        methodCall->args.insert(methodCall->args.begin(), parent);
+    }
+    for (size_t i = method->funcType->isMethod; i < method->funcType->params.size(); ++i) {
+        const auto param = method->funcType->params[i];
+        const auto arg = methodCall->args[i];
+        visitExpr(arg);
+    }
+    if (methodCall->equals(method->funcType)) {
+        methodCall->func = method;
+        methodCall->setType(method->funcType->rt);
+    } else {
+        errHandler.addError(E10034, &methodCall->location, {parent->type->pname(), name, methodCall->pname(), method->pname()});
+        return;
+    }
     validateMethodVisibility(methodCall, parent->type->asObject());
 }
 
@@ -1243,51 +1259,29 @@ void LgsSema::resolveFuncCall(LgsFuncCall* funcCall) {
         LgsType* type = nullptr;
         if (symbol->symbolType == VAR_DEC) {
             type = symbol->varDec->type;
-            if (const auto func = symbol->varDec->expr->asFunc()) {
-                if (funcCall->equals(func->funcType)) {
-                    funcCall->func = func;
-                    funcCall->setType(func->funcType->rt);
-                } else {
-                    errHandler.addError(E10015, &funcCall->location, {funcCall->name, funcCall->pname(), func->pname()});
-                }
+            const auto ft = symbol->varDec->type->asFuncType();
+            if (funcCall->equals(ft)) {
+                funcCall->ref.symbolType = VAR_DEC;
+                funcCall->ref.varDec = symbol->varDec;
+                funcCall->setType(ft->rt);
+            } else {
+                errHandler.addError(E10015, &funcCall->location, {funcCall->name, funcCall->pname(), ft->pname()});
             }
         } else if (symbol->symbolType == PARAM) {
             type = symbol->param->type;
-            if (funcCall->equals(type->asFuncType())) {
+            const auto ft = symbol->param->type->asFuncType();
+            if (funcCall->equals(ft)) {
                 funcCall->ref.symbolType = PARAM;
                 funcCall->ref.param = symbol->param;
+                funcCall->setType(ft->rt);
             } else {
-                errHandler.addError(E10015, &funcCall->location, {funcCall->name, funcCall->pname(), type->pname()});
+                errHandler.addError(E10015, &funcCall->location, {funcCall->name, funcCall->pname(), ft->pname()});
             }
         }
         if (!type->asFuncType()) {
             errHandler.addError(E10046, &funcCall->location, {funcCall->name});
         }
     }
-}
-
-bool LgsSema::resolveMethodCall(LgsFuncCall* methodCall, LgsType* parentType) {
-    auto name = methodCall->name;
-    const auto method = parentType->getMethod(name);
-    if (!method) {
-        errHandler.addError(E10005, &methodCall->location, {name, parentType->pname()});
-        return false;
-    }
-    for (size_t i = method->funcType->isMethod; i < method->funcType->params.size(); ++i) {
-        const auto param = method->funcType->params[i];
-        const auto paramType = param.type;
-        const auto arg = methodCall->args[i];
-        arg->completeType(paramType);
-        visitExpr(arg);
-    }
-    if (methodCall->equals(method->funcType)) {
-        methodCall->func = method;
-        methodCall->setType(method->funcType->rt);
-    } else {
-        errHandler.addError(E10034, &methodCall->location, {parentType->pname(), name, methodCall->pname(), method->pname()});
-        return false;
-    }
-    return true;
 }
 
 void LgsSema::validateMock(const LgsSelection* selection) {

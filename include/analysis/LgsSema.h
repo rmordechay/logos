@@ -122,7 +122,6 @@ public:
 
     void matchExprToType(const LgsExpr* expr, LgsType* type);
     void resolveFuncCall(LgsFuncCall* funcCall);
-    bool resolveMethodCall(LgsFuncCall* methodCall, LgsType* parentType);
     bool resolveForeachVars(const LgsForeachLoop* foreachLoop);
     void addHeapExpr(LgsExpr* expr);
 

@@ -44,19 +44,23 @@ LgsType* LgsInt::applyOp(LgsType* other, const LgsOperator op) {
 }
 
 Value* LgsInt::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    return cg.builder.CreateAdd(self->loadIR(cg), other->loadIR(cg));
+    auto [l, r] = loadOperands(cg, self, other);
+    return cg.builder.CreateAdd(l, r);
 }
 
 Value* LgsInt::subIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    return cg.builder.CreateSub(self->loadIR(cg), other->loadIR(cg));
+    auto [l, r] = loadOperands(cg, self, other);
+    return cg.builder.CreateSub(l, r);
 }
 
 Value* LgsInt::mulIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    return cg.builder.CreateMul(self->loadIR(cg), other->loadIR(cg));
+    auto [l, r] = loadOperands(cg, self, other);
+    return cg.builder.CreateMul(l, r);
 }
 
 Value* LgsInt::divIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    return cg.builder.CreateUDiv(self->loadIR(cg), other->loadIR(cg));
+    auto [l, r] = loadOperands(cg, self, other);
+    return cg.builder.CreateUDiv(l, r);
 }
 
 Value* LgsInt::inIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
@@ -64,31 +68,38 @@ Value* LgsInt::inIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
 }
 
 Value* LgsInt::modIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    return cg.builder.CreateSRem(self->loadIR(cg), other->loadIR(cg));
+    auto [l, r] = loadOperands(cg, self, other);
+    return cg.builder.CreateSRem(l, r);
 }
 
 Value* LgsInt::eqIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    return cg.builder.CreateICmpEQ(self->loadIR(cg), other->loadIR(cg));
+    auto [l, r] = loadOperands(cg, self, other);
+    return cg.builder.CreateICmpEQ(l, r);
 }
 
 Value* LgsInt::neIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    return cg.builder.CreateICmpNE(self->loadIR(cg), other->loadIR(cg));
+    auto [l, r] = loadOperands(cg, self, other);
+    return cg.builder.CreateICmpNE(l, r);
 }
 
 Value* LgsInt::ltIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    return cg.builder.CreateICmpSLT(self->loadIR(cg), other->loadIR(cg));
+    auto [l, r] = loadOperands(cg, self, other);
+    return cg.builder.CreateICmpSLT(l, r);
 }
 
 Value* LgsInt::gtIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    return cg.builder.CreateICmpSGT(self->loadIR(cg), other->loadIR(cg));
+    auto [l, r] = loadOperands(cg, self, other);
+    return cg.builder.CreateICmpSGT(l, r);
 }
 
 Value* LgsInt::geIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    return cg.builder.CreateICmpSGE(self->loadIR(cg), other->loadIR(cg));
+    auto [l, r] = loadOperands(cg, self, other);
+    return cg.builder.CreateICmpSGE(l, r);
 }
 
 Value* LgsInt::leIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    return cg.builder.CreateICmpSLE(self->loadIR(cg), other->loadIR(cg));
+    auto [l, r] = loadOperands(cg, self, other);
+    return cg.builder.CreateICmpSLE(l, r);
 }
 
 Value* LgsInt::andIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
@@ -100,23 +111,28 @@ Value* LgsInt::orIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
 }
 
 Value* LgsInt::bitAndIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    return cg.builder.CreateAnd(self->loadIR(cg), other->loadIR(cg));
+    auto [l, r] = loadOperands(cg, self, other);
+    return cg.builder.CreateAnd(l, r);
 }
 
 Value* LgsInt::bitOrIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    return cg.builder.CreateOr(self->loadIR(cg), other->loadIR(cg));
+    auto [l, r] = loadOperands(cg, self, other);
+    return cg.builder.CreateOr(l, r);
 }
 
 Value* LgsInt::bitXorIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    return cg.builder.CreateXor(self->loadIR(cg), other->loadIR(cg));
+    auto [l, r] = loadOperands(cg, self, other);
+    return cg.builder.CreateXor(l, r);
 }
 
 Value* LgsInt::lshiftIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    return cg.builder.CreateShl(self->loadIR(cg), other->loadIR(cg));
+    auto [l, r] = loadOperands(cg, self, other);
+    return cg.builder.CreateShl(l, r);
 }
 
 Value* LgsInt::rshiftIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    return cg.builder.CreateLShr(self->loadIR(cg), other->loadIR(cg));
+    auto [l, r] = loadOperands(cg, self, other);
+    return cg.builder.CreateLShr(l, r);
 }
 
 

@@ -1,5 +1,9 @@
 #include "loops/LgsLoopMetaVar.h"
 
+Value* LgsLoopMetaVar::loadIR(LgsLLVMGen& cg) {
+    return IRValue;
+}
+
 std::string LgsLoopMetaVar::pname() {
     switch (varType) {
     case FOR_I:
