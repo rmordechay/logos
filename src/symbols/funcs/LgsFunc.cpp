@@ -12,13 +12,6 @@ Value* LgsFunc::call(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
     if (fn) return fn(cg, args);
     std::vector<Value*> IRArgs;
     setIRArgs(cg, args, IRArgs);
-    if (funcType->hasDefaults) {
-        const auto diff = funcType->params.size() - args.size();
-        for (int i = diff - 1; i < funcType->params.size(); ++i) {
-            const auto& param = funcType->params[i];
-            IRArgs.emplace_back(param.expr->IRValue);
-        }
-    }
     return callIR(cg, IRArgs);
 }
 
@@ -55,6 +48,14 @@ void LgsFunc::setIRArgs(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args, std::
         }
         IRArgs.emplace_back(v);
     }
+
+    if (funcType->hasDefaults) {
+        const auto diff = funcType->params.size() - args.size();
+        for (int i = diff - 1; i < funcType->params.size(); ++i) {
+            const auto& param = funcType->params[i];
+            IRArgs.emplace_back(param.expr->IRValue);
+        }
+    }
 }
 
 Function* LgsFunc::getIRFunc(LgsLLVMGen& cg) {
@@ -72,7 +73,7 @@ Function* LgsFunc::getIRFunc(LgsLLVMGen& cg) {
     for (int i = 0; i < funcType->params.size(); ++i) {
         auto& param = funcType->params[i];
         args->setName(param.name);
-        param.setIRValue(args);
+        param.IRValue = args;
         args++;
     }
     return IRFunc;

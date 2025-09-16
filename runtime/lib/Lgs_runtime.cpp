@@ -6,6 +6,8 @@ struct Lgs_runtime {
     Lgs_Stack stack;
     Lgs_Scheduler scheduler;
     std::map<void*, std::map<std::string, void*>> vtable;
+    std::vector<void*> owners;
+    std::vector<void*> orphans;
     sqlite3* db;
     void init();
     void close();
@@ -15,6 +17,24 @@ static inline Lgs_runtime runtime;
 
 extern "C" void Lgs_Runtime_init() {
     runtime.init();
+}
+
+extern "C" void Lgs_Runtime_addOwner(void* ptr) {
+    runtime.owners.push_back(ptr);
+}
+
+extern "C" void Lgs_Runtime_removeOwner(const void* owner) {
+    for (auto it = runtime.owners.begin(); it != runtime.owners.end(); ) {
+        if (*it == owner) {
+            it = runtime.owners.erase(it);
+        } else {
+            ++it;
+        }
+    }
+}
+
+extern "C" void Lgs_Runtime_addOrphan(void* ptr) {
+    runtime.orphans.push_back(ptr);
 }
 
 extern "C" void Lgs_Stack_push() {
@@ -59,10 +79,10 @@ extern "C" void* Lgs_Vtable_get(void* instancePtr, const char* name) {
 
 void Lgs_runtime::init() {
     // scheduler.run();
-    sqlite3_open(":memory:", &runtime.db);
+    //sqlite3_open(":memory:", &runtime.db);
 }
 
 void Lgs_runtime::close() {
     // scheduler.shutdown();
-    sqlite3_close(runtime.db);
+    // sqlite3_close(runtime.db);
 }

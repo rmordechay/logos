@@ -11,8 +11,6 @@ namespace llvm {
 
 using namespace llvm;
 
-#define WITH_OWNERSHIP 0
-
 class LgsLLVMGen {
 public:
     LLVMContext context;
@@ -45,7 +43,7 @@ public:
     Value* callLgsFunc(const std::string& funcName, FunctionType* ft, const std::vector<Value*>& args = {});
 
     // System
-    Value* callMalloc(size_t size);
+    Value* callMalloc(size_t size, bool isOwner);
     Value* callPrintf(const std::vector<Value*>& args);
     Value* callSleep(Value* time);
     Value* callExit(Value* exitCode);
@@ -62,6 +60,9 @@ public:
     void callStackPush();
     void callPopStack();
     void callDefers();
+    void addOwner(Value* ptr);
+    void removeOwner(Value* ptr);
+    void addOrphan(Value* ptr);
     void addDeferFunc(Value* deferFuncPtr, Value* ctx);
     void addPtrToVtable(Value* instancePtr, Value* name, Value* ptr);
     Value* getPtrFromVtable(Value* instancePtr, Value* name);

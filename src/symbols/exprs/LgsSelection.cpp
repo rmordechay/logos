@@ -6,7 +6,17 @@
 #include "types/iterables/LgsVec.h"
 
 Value* LgsSelection::loadIR(LgsLLVMGen& cg) {
-    return lastExpr()->loadIR(cg);
+    const auto gep = lastExprParent()->loadIR(cg);
+    return cg.builder.CreateLoad(type->getIRType(cg), gep);
+}
+
+Value* LgsSelection::getIRPtrTo(LgsLLVMGen& cg) const {
+    Value* v = nullptr;
+    for (int i = 1; i < exprs.size(); ++i) {
+        const auto childExpr = exprs[i];
+        // v = childExpr->loadIR(cg);
+    }
+    return LgsExpr::getIRPtrTo(cg);
 }
 
 LgsExpr* LgsSelection::lastExpr() const {
@@ -21,21 +31,16 @@ LgsExpr* LgsSelection::lastExprParent() const {
 void LgsSelection::assign(LgsLLVMGen& cg, LgsExpr* expr) {
     const auto rIR = expr->IRValue;
     const auto lExpr = lastExpr();
-    if (!lExpr->type->asVec()) {
-        if (type->isHeapAlloc) {
-            expr->owner = nullptr;
-            const auto field = lastExprParent()->type->getField(lastExpr()->asVariable()->name);
-            field->isOwner = false;
-            type->freeValue(cg, loadIR(cg));
-        }
-        cg.builder.CreateStore(rIR, IRValue);
-    } else {
+    if (lExpr->type->asVec()) {
         const auto vecTy = lExpr->type->getIRType(cg);
         const auto vec = cg.builder.CreateLoad(vecTy, lExpr->IRValue);
         const auto c = lastExpr()->asVariable()->name;
         const auto i = cg.i32(LgsVec::getComponentIndex(c.front()));
         const auto insert = cg.builder.CreateInsertElement(vec, rIR, i);
         cg.builder.CreateStore(insert, lExpr->IRValue);
+    } else {
+        if (type->isHeapAlloc) freeOwner(cg);
+        cg.builder.CreateStore(rIR, IRValue);
     }
 }
 

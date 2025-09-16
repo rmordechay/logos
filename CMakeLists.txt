@@ -62,6 +62,7 @@ set(CORE_SOURCES
     src/symbols/LgsSymbol.cpp
     src/symbols/LgsSymbolTable.cpp
     src/symbols/LgsValue.cpp
+    src/symbols/builtins/LgsPrint.cpp
     src/symbols/exprs/LgsExpr.cpp
     src/symbols/exprs/LgsBinaryExpr.cpp
     src/symbols/exprs/LgsArrayExpr.cpp
@@ -103,6 +104,7 @@ set(CORE_SOURCES
     src/symbols/stmts/LgsStmt.cpp
     src/symbols/stmts/LgsStmtsBlock.cpp
     src/symbols/stmts/LgsVarDec.cpp
+    src/symbols/test/LgsTest.cpp
     src/symbols/types/LgsAny.cpp
     src/symbols/types/LgsPtr.cpp
     src/symbols/types/iterables/LgsDArray.cpp
@@ -141,11 +143,7 @@ set(RUNTIME_SOURCES
     runtime/lib/Lgs_stack.cpp
     runtime/lib/Lgs_print.cpp
     runtime/include/Lgs_Types.h
-    src/symbols/builtins/LgsPrint.cpp
-    include/symbols/LgsAssignable.h
     runtime/lib/Lgs_arena.cpp
-    src/symbols/test/LgsTest.cpp
-    include/symbols/test/LgsTest.h
 )
 
 add_library(lgs_core SHARED ${CORE_SOURCES} ${RUNTIME_SOURCES})

@@ -13,7 +13,6 @@ public:
     LgsExpr* expr = nullptr;
     bool isSelf = false;
     bool isVariadic = false;
-    bool isOwner = false;
     Value* vaList = nullptr;
 
     explicit LgsParam(LgsType* type = nullptr, const std::string& name = "", LgsExpr* expr = nullptr) : name(name), type(type), expr(expr) {}

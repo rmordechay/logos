@@ -7,6 +7,7 @@ public:
 
     explicit LgsSelection(const std::vector<LgsExpr*>& exprs) : exprs(exprs) {}
     Value* loadIR(LgsLLVMGen& cg) override;
+    Value* getIRPtrTo(LgsLLVMGen& cg) const override;
     LgsExpr* lastExpr() const;
     LgsExpr* lastExprParent() const;
     void assign(LgsLLVMGen& cg, LgsExpr* expr) override;

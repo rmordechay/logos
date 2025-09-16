@@ -97,11 +97,10 @@ Value* LgsLLVMGen::callLgsFunc(const std::string& funcName, FunctionType* ft, co
     return callFunc(LGS_RUNTIME_NAMES_PREFIX + funcName, ft, args);
 }
 
-Value* LgsLLVMGen::callMalloc(const size_t size) {
+Value* LgsLLVMGen::callMalloc(const size_t size, const bool isOwner) {
     const auto ptr = builder.CreateMalloc(sizeTy(), sizeTy(), usize(size), nullptr);
-    if constexpr (WITH_OWNERSHIP) {
-        printPtr(ptr, "malloc: ");
-    }
+    if (isOwner) addOwner(ptr);
+    else addOrphan(ptr);
     return ptr;
 }
 
@@ -165,6 +164,18 @@ void LgsLLVMGen::callPopStack() {
 void LgsLLVMGen::callDefers() {
     const auto ft = getFT(voidTy());
     callLgsFunc("Stack_callDefers", ft);
+}
+
+void LgsLLVMGen::addOwner(Value* ptr) {
+    callLgsFunc("Runtime_addOwner", getFT(voidTy(), {ptrTy()}), {ptr});
+}
+
+void LgsLLVMGen::removeOwner(Value* ptr) {
+    callLgsFunc("Runtime_removeOwner", getFT(voidTy(), {ptrTy()}), {ptr});
+}
+
+void LgsLLVMGen::addOrphan(Value* ptr) {
+    callLgsFunc("Runtime_addOrphan", getFT(voidTy(), {ptrTy()}), {ptr});
 }
 
 void LgsLLVMGen::addDeferFunc(Value* deferFuncPtr, Value* ctx) {

@@ -64,7 +64,7 @@ void LgsCodeGen::visitMainFile(LgsMainFile* mainFile) {
     }
     for (const auto [_, func] : mainFile->funcs) {
         if (const auto mainFunc = dynamic_cast<LgsMainFunc*>(func)) {
-            visitMainFunc(mainFunc, mainFile->appArgs);
+            visitMainFunc(mainFunc);
         } else {
             visitFunc(func);
         }
@@ -94,10 +94,10 @@ void LgsCodeGen::visitTestFile(LgsTestFile* testFile) {
     }
 }
 
-void LgsCodeGen::visitMainFunc(LgsMainFunc* func, const std::vector<char*>& appArgs) {
+void LgsCodeGen::visitMainFunc(LgsMainFunc* func) {
     stack.enterScope(func);
     createPrologue(func);
-    // codeGen->callRuntimeInit();
+    cg.callRuntimeInit();
     if (!func->funcType->params.empty()) initMainArgs(func);
     visitStmtsBlock(func->stmtsBlock);
     createEpilogue(func);
@@ -253,7 +253,7 @@ void LgsCodeGen::visitRangeLoop(LgsRangeLoop* loop) {
     // Body
     cg.startBlock(loop->IRBodyBlock, currentIRFunc);
     if (!loop->loopVars.empty()) {
-        loop->loopVars.front()->setIRValue(loop->iValue);
+        loop->loopVars.front()->IRValue = loop->iValue;
     }
 }
 
@@ -276,7 +276,7 @@ void LgsCodeGen::visitForeachLoop(LgsForeachLoop* loop) {
 
     cg.startBlock(loop->IRBodyBlock, currentIRFunc);
     loop->iterPtr = iterIndex->IRValue;
-    loop->loopVars[0]->setIRValue(iterIndex->loadIR(cg));
+    loop->loopVars[0]->IRValue = iterIndex->loadIR(cg);
 }
 
 void LgsCodeGen::visitInfiniteLoop(const LgsInfiniteLoop* loop) const {
@@ -292,13 +292,13 @@ void LgsCodeGen::visitLoopMetaVar(LgsLoopMetaVar* metaVar) {
         break;
     case FOR_IS_FIRST: {
         const auto loopStart = cg.builder.CreateSExt(loop->loopStart(cg), cg.sizeTy());
-        metaVar->setIRValue(cg.builder.CreateICmpEQ(iValue, loopStart));
+        metaVar->IRValue = cg.builder.CreateICmpEQ(iValue, loopStart);
     }
     break;
     case FOR_IS_LAST: {
         const auto loopEnd = cg.builder.CreateSExt(loop->loopEnd(cg), cg.sizeTy());
         const auto decremented = cg.builder.CreateSub(loopEnd, cg.usize(1));
-        metaVar->setIRValue(cg.builder.CreateICmpEQ(iValue, decremented));
+        metaVar->IRValue = cg.builder.CreateICmpEQ(iValue, decremented);
         break;
     }
     }
@@ -697,7 +697,7 @@ void LgsCodeGen::visitHashMap(LgsHashMap* hashMap) {
     const auto valueType = mapType->typePair->value;
     const auto elementSize = cg.usize(valueType->getSizeBytes());
     const auto arrSize = cg.typeSize(mapType->getMapStruct(cg));
-    hashMap->IRValue = cg.callMalloc(arrSize.getFixedValue());
+    hashMap->IRValue = cg.callMalloc(arrSize.getFixedValue(), hashMap->owner);
     mapType->initFunc->callIR(cg, {getIRValue(hashMap), elementSize});
     for (const auto element : hashMap->initialElements) {
         visitExpr(element->key);
@@ -765,10 +765,9 @@ void LgsCodeGen::visitSelection(LgsSelection* selection) {
         const auto childExpr = selection->exprs[i + 1];
         if (const auto var = childExpr->asVariable()) {
             const auto field = parentExpr->type->getField(var->name);
-            field->parentIRValue = getIRValue(parentExpr);
+            field->parentIRValue = parentExpr->IRValue;
             field->parentIRType = parentExpr->type->getIRType(cg);
-            visitField(field);
-            childExpr->setIRValue(field->IRValue);
+            childExpr->IRValue = field->IRValue;
         } else if (const auto funcCall = childExpr->asFuncCall()) {
             visitFuncCall(funcCall);
         } else if (const auto iterIndex = childExpr->asIterIndex()) {
@@ -787,7 +786,7 @@ void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
     }
     if (funcCall->ref.symbolType == PARAM) {
         LgsFunc f(funcCall->ref.param->type->asFuncType());
-        f.setIRValue(getIRValue(funcCall->ref.param));
+        f.IRValue = getIRValue(funcCall->ref.param);
         funcCall->IRValue = f.call(cg, funcCall->args);
         return;
     }
@@ -913,7 +912,7 @@ void LgsCodeGen::visitInstance(LgsInstance* instance) {
     if(instance->obj->singleton) {
         instance->IRValue = cg.createGlobal(objIRType, ConstantAggregateZero::get(objIRType), instance->obj->name);
     } else {
-        instance->IRValue = cg.callMalloc(instance->obj->getSizeBytes());
+        instance->IRValue = cg.callMalloc(instance->obj->getSizeBytes(), instance->owner);
     }
     initFields(instance);
     if (!instance->obj->interfaces.empty()) {
@@ -947,7 +946,7 @@ void LgsCodeGen::initMainArgs(LgsMainFunc* mainFunc) {
     const auto arrStruct = cg.getStructType(structFields, LgsDArray::name);
     mainFunc->mainArgs->IRValue = builder.CreateAlloca(arrStruct);
     mainFunc->initArgsFunc->callIR(cg, {getIRValue(mainFunc->mainArgs), mainFunc->argc, mainFunc->argv});
-    mainFunc->funcType->params[0].setIRValue(getIRValue(mainFunc->mainArgs));
+    mainFunc->funcType->params[0].IRValue = getIRValue(mainFunc->mainArgs);
 }
 
 void LgsCodeGen::createPrologue(LgsFunc* func) {
@@ -988,18 +987,7 @@ void LgsCodeGen::createEpilogue(LgsFunc* func) {
 }
 
 void LgsCodeGen::freeFuncHeap(const LgsFunc* func) {
-    if constexpr (!WITH_OWNERSHIP) return;
-    cg.printStr("---\n" + func->funcType->name + '\n');
-    cg.printStr(std::to_string(func->owners.size()) + " owned exprs:\n");
-    for (const auto expr : func->owners) {
-        expr->type->freeValue(cg, expr->IRValue);
-    }
-    if (!func->orphans.empty()) {
-        cg.printStr("Found " + std::to_string(func->orphans.size()) + " orphan exprs:\n");
-        for (const auto expr : func->orphans) {
-            cg.printPtr(expr->IRValue);
-        }
-    }
+
 }
 
 Value* LgsCodeGen::getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) const {
@@ -1090,7 +1078,7 @@ Value* LgsCodeGen::createDynamicArray(LgsArrayExpr* arrayExpr) {
     const auto size = arr->baseType->getSizeBytes();
     const auto elementSize = cg.i64(size);
     const auto arrSize = cg.typeSize(arr->getArrStruct(cg));
-    arrayExpr->IRValue = cg.callMalloc(arrSize.getFixedValue());
+    arrayExpr->IRValue = cg.callMalloc(arrSize.getFixedValue(), arrayExpr->owner);
     arr->initFunc->callIR(cg, {arrayExpr->IRValue, elementSize});
     for (int i = 0; i < arrayExpr->initialElements.size(); ++i) {
         const auto element = arrayExpr->initialElements[i];

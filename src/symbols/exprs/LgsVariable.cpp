@@ -6,7 +6,7 @@
 #include <codegen/LgsLLVMGen.h>
 
 void LgsVariable::assign(LgsLLVMGen& cg, LgsExpr* expr) {
-    cg.builder.CreateStore(expr->IRValue, IRValue);
+    if (owner) freeOwner(cg);
     IRValue = expr->IRValue;
 }
 

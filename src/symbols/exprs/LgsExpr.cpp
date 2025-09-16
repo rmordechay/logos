@@ -18,12 +18,41 @@
 
 class LgsTypeExpr;
 
+LgsExpr* LgsExpr::clone() {
+    assert(0);
+}
+
+LgsExpr* LgsExpr::castTo(LgsType* toType) {
+    assert(0);
+}
+
+void LgsExpr::completeType(LgsType* toType) {
+
+}
+
+Value* LgsExpr::hash(LgsLLVMGen& cg) {
+    assert(0);
+}
+
+void LgsExpr::assign(LgsLLVMGen& cg, LgsExpr* expr) {
+    assert(0);
+}
+
+bool LgsExpr::canAssignTo(LgsType* other, const LgsAssignType op) {
+    return true;
+}
+
 Value* LgsExpr::getIRPtrTo(LgsLLVMGen& cg) const {
     const auto ty = type->getIRType(cg);
     if (IRValue->getType()->isPointerTy()) return IRValue;
     const auto ptr = cg.builder.CreateAlloca(ty);
     cg.builder.CreateStore(IRValue, ptr);
     return ptr;
+}
+
+void LgsExpr::freeOwner(LgsLLVMGen& cg) {
+    owner = nullptr;
+    type->freeValue(cg, IRValue);
 }
 
 size_t LgsExpr::getConstInt() {
@@ -79,28 +108,6 @@ bool LgsExpr::equals(const LgsExpr* other) {
         }
     }
     return false;
-}
-
-void LgsExpr::completeType(LgsType* toType) {}
-
-LgsExpr* LgsExpr::clone() {
-    assert(0);
-}
-
-LgsExpr* LgsExpr::castTo(LgsType* toType) {
-    assert(0);
-}
-
-Value* LgsExpr::hash(LgsLLVMGen& cg) {
-    assert(0);
-}
-
-void LgsExpr::assign(LgsLLVMGen& cg, LgsExpr* expr) {
-    assert(0);
-}
-
-bool LgsExpr::canAssignTo(LgsType* other, const LgsAssignType op) {
-    return true;
 }
 
 // Casting

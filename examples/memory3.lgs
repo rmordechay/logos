@@ -1,0 +1,20 @@
+object Obj1 {
+    x: Int = 34
+}
+
+object Obj2 {
+    obj1: Obj1
+}
+
+main() {
+    if false {
+        owner obj23 = Obj2{}
+    }
+    owner obj2a = Obj2{}
+    owner obj2b = Obj2{}
+    owner obj2c = Obj2{}
+    obj2a.obj1.x := 123
+    obj2b.obj1.x := 125
+    obj2a := obj2b
+    obj2c := obj2b
+}

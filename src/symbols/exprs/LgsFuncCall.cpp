@@ -41,8 +41,7 @@ void LgsFuncCall::resolveVirtualFunc(LgsLLVMGen& cg) const {
     const auto self = args[0];
     const auto keyIR = cg.getIRStr(func->funcType->getName());
     const auto selfPtr = self->IRValue;
-    const auto rv = cg.getPtrFromVtable(selfPtr, keyIR);
-    func->setIRValue(rv);
+    func->IRValue = cg.getPtrFromVtable(selfPtr, keyIR);
 }
 
 std::string LgsFuncCall::pname() {

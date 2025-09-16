@@ -45,8 +45,7 @@ LgsFunc* LgsObject::getMethod(const std::string& methodName) {
 void LgsObject::freeValue(LgsLLVMGen& cg, Value* value) {
     for (const auto& field : fields) {
         if (!field->type->isHeapAlloc || !field->isOwner) continue;
-        const auto loadIR = cg.builder.CreateLoad(cg.ptrTy(), field->IRValue);
-        cg.printPtr(loadIR, "Freeing field " + field->name + ": ");
+        cg.printPtr(field->loadIR(cg), "Freeing field " + field->name + ": ");
         // field->type->freeValue(cg, field->expr->IRValue);
     }
     cg.printPtr(value, "Freeing " + name + ": ");

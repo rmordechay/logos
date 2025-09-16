@@ -41,7 +41,6 @@
 #include "stmts/LgsIOStmt.h"
 #include "stmts/LgsIfStmt.h"
 #include "test/LgsTest.h"
-#include "types/LgsPtr.h"
 #include "types/primitives/LgsDouble.h"
 
 void LgsSema::analyse() {
@@ -144,7 +143,7 @@ void LgsSema::visitFunc(LgsFunc* func) {
         errHandler.addError(E10055, &func->location, {func->pname()});
     }
     for (const auto& orphan : func->orphans) {
-        // errHandler.addError(E10077, &orphan->location, {orphan->pname()});
+        errHandler.addError(E10077, &orphan->location, {orphan->pname()});
     }
     stack.exitScope();
 }
@@ -222,6 +221,12 @@ void LgsSema::visitStmtsBlock(LgsStmtsBlock* stmtsBlock) {
 }
 
 void LgsSema::visitVarDec(LgsVarDec* varDec) {
+    if (varDec->isOwner && varDec->expr) {
+        if (varDec->expr->owner) {
+            errHandler.addError(E10075, &varDec->expr->location, {varDec->expr->pname()});
+        }
+        varDec->expr->owner = varDec;
+    }
     if (varDec->expr && varDec->type) {
         varDec->type = typeResolver.resolveType(varDec->type, file);
         varDec->expr->completeType(varDec->type);
@@ -236,12 +241,6 @@ void LgsSema::visitVarDec(LgsVarDec* varDec) {
         varDec->type = typeResolver.resolveType(varDec->type, file);
         varDec->expr = varDec->type->getZeroValue();
         varDec->expr->location = varDec->location;
-    }
-    if (varDec->isOwner && varDec->expr) {
-        if (varDec->expr->owner) {
-            // errHandler.addError(E10075, &varDec->expr->location, {varDec->expr->pname()});
-        }
-        varDec->expr->owner = varDec;
     }
     addLocalSymbol(LgsSymbol(varDec));
     addHeapExpr(varDec->expr);
@@ -635,12 +634,18 @@ void LgsSema::visitVariable(LgsVariable* variable) {
         variable->ref.varDec = symbol->varDec;
         variable->isMutable = !symbol->varDec->isConst;
         variable->setType(symbol->varDec->type);
+        if (symbol->varDec->isOwner) {
+            variable->owner = symbol->varDec;
+        }
         break;
     }
     case FIELD: {
         variable->ref.field = symbol->field;
         variable->isMutable = !symbol->field->isConst;
         variable->setType(symbol->field->type);
+        if (symbol->field->isOwner) {
+            variable->owner = symbol->field;
+        }
         break;
     }
     case PARAM: {
@@ -704,7 +709,7 @@ void LgsSema::visitInnerSelections(const LgsSelection* selection) {
         const auto parentExpr = exprs[i];
         const auto childExpr = exprs[i + 1];
         if (const auto var = childExpr->asVariable()) {
-            visitVarSelection(var, parentExpr->type);
+            visitFieldSelection(var, parentExpr->type);
         } else if (const auto methodCall = childExpr->asFuncCall()) {
             visitMethodCall(methodCall, parentExpr);
         } else if (const auto iterIndex = childExpr->asIterIndex()) {
@@ -718,7 +723,7 @@ void LgsSema::visitInnerSelections(const LgsSelection* selection) {
     }
 }
 
-void LgsSema::visitVarSelection(LgsVariable* child, LgsType* parentType) {
+void LgsSema::visitFieldSelection(LgsVariable* child, LgsType* parentType) {
     if (!parentType) return;
     if (parentType->asVec() && !validateVecElements(child, parentType->asVec())) return;
     auto childName = child->name;
@@ -730,9 +735,7 @@ void LgsSema::visitVarSelection(LgsVariable* child, LgsType* parentType) {
     child->setType(field->type);
     child->isMutable = !field->isConst;
     child->ref = LgsSymbol(field);
-    if (field->isOwner) {
-        child->owner = field;
-    }
+    child->owner = field;
     if (const auto parentAsObj = parentType->asObject()) {
         validateFieldVisibility(field, parentAsObj);
     }
@@ -855,9 +858,7 @@ void LgsSema::visitInstance(LgsInstance* instance) {
         visitExpr(arg->expr);
         matchExprToType(arg->expr, field->type);
         field->expr = arg->expr;
-        if (field->isOwner) {
-            field->expr->owner = field;
-        }
+        field->expr->owner = field;
     }
 
     // Zero values
@@ -865,8 +866,6 @@ void LgsSema::visitInstance(LgsInstance* instance) {
         if (visited.count(field->name)) continue;
         if (!field->expr) {
             field->expr = field->type->getZeroValue();
-        }
-        if (field->isOwner) {
             field->expr->owner = field;
         }
     }
