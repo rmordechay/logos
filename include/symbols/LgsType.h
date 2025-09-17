@@ -60,7 +60,7 @@ public:
     LgsLocation location{0, 0, 0};
     std::vector<LgsField*> fields;
     std::map<std::string, LgsFunc*> methods;
-    LgsRTType rtt;
+    Lgs_RTType rtt;
 
     virtual LgsField* getField(const std::string& name);
     virtual LgsFunc* getMethod(const std::string& name);

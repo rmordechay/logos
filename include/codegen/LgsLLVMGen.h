@@ -1,4 +1,5 @@
 #pragma once
+#include "Lgs_types.h"
 #include "exprs/LgsExpr.h"
 #include "logos/LgsApp.h"
 #include <llvm/IR/IRBuilder.h>
@@ -43,7 +44,7 @@ public:
     Value* callLgsFunc(const std::string& funcName, FunctionType* ft, const std::vector<Value*>& args = {});
 
     // System
-    Value* callMalloc(size_t size, bool isOwner);
+    Value* callMalloc(size_t size, bool isOwner, Lgs_RTType type);
     Value* callPrintf(const std::vector<Value*>& args);
     Value* callSleep(Value* time);
     Value* callExit(Value* exitCode);
@@ -61,8 +62,9 @@ public:
     void callPopStack();
     void callDefers();
     void removeOwner(Value* ptr);
-    void addOwner(Value* ptr);
-    void addOrphan(Value* ptr);
+    void addOwner(Value* ptr, Lgs_RTType type);
+    void addOrphan(Value* ptr, Lgs_RTType type);
+    void callFuncCleanup();
     void addDeferFunc(Value* deferFuncPtr, Value* ctx);
     void addPtrToVtable(Value* instancePtr, Value* name, Value* ptr);
     Value* getPtrFromVtable(Value* instancePtr, Value* name);

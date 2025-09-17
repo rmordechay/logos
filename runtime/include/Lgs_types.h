@@ -1,6 +1,6 @@
 #pragma once
 
-enum LgsRTType {
+enum Lgs_RTType {
     RTT_UNKNOWN,
     RTT_VOID,
     RTT_BOOL,
@@ -12,6 +12,7 @@ enum LgsRTType {
     RTT_VEC3,
     RTT_VEC4,
     RTT_SARRAY,
+    RTT_DARRAY,
 };
 
 struct Vec2 {

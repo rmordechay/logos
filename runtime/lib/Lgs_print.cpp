@@ -1,6 +1,6 @@
 #include "Lgs_types.h"
 
-extern "C" void Lgs_print(const char* fmt, const LgsRTType rtt, const void* v) {
+extern "C" void Lgs_print(const char* fmt, const Lgs_RTType rtt, const void* v) {
     switch (rtt) {
     case RTT_BOOL: {
         const char ch = *static_cast<const uint8_t*>(v);
@@ -43,6 +43,9 @@ extern "C" void Lgs_print(const char* fmt, const LgsRTType rtt, const void* v) {
         break;
     }
     case RTT_SARRAY: {
+        assert(0);
+    }
+    case RTT_DARRAY: {
         assert(0);
     }
     case RTT_VOID:

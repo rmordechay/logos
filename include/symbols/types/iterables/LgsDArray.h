@@ -33,6 +33,7 @@ public:
         addMethod(isNotEmptyFunc);
         addMethod(mapFunc);
         isSliceable = true;
+        rtt = RTT_DARRAY;
     }
 
     Type* getIRType(LgsLLVMGen& cg) override;

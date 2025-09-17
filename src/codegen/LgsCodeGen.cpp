@@ -696,7 +696,7 @@ void LgsCodeGen::visitHashMap(LgsHashMap* hashMap) {
     const auto valueType = mapType->typePair->value;
     const auto elementSize = cg.usize(valueType->getSizeBytes());
     const auto arrSize = cg.typeSize(mapType->getMapStruct(cg));
-    hashMap->IRValue = cg.callMalloc(arrSize.getFixedValue(), hashMap->owner);
+    hashMap->IRValue = cg.callMalloc(arrSize.getFixedValue(), hashMap->owner, hashMap->type->rtt);
     mapType->initFunc->callIR(cg, {getIRValue(hashMap), elementSize});
     for (const auto element : hashMap->initialElements) {
         visitExpr(element->key);
@@ -917,7 +917,7 @@ void LgsCodeGen::visitInstance(LgsInstance* instance) {
     if(instance->obj->singleton) {
         instance->IRValue = cg.createGlobal(objIRType, ConstantAggregateZero::get(objIRType), instance->obj->name);
     } else {
-        instance->IRValue = cg.callMalloc(instance->obj->getSizeBytes(), instance->owner);
+        instance->IRValue = cg.callMalloc(instance->obj->getSizeBytes(), instance->owner, instance->obj->rtt);
     }
     initFields(instance);
     if (!instance->obj->interfaces.empty()) {
@@ -992,7 +992,7 @@ void LgsCodeGen::createEpilogue(LgsFunc* func) {
 }
 
 void LgsCodeGen::freeFuncHeap(const LgsFunc* func) {
-
+    cg.callFuncCleanup();
 }
 
 Value* LgsCodeGen::getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) const {
@@ -1083,7 +1083,7 @@ Value* LgsCodeGen::createDynamicArray(LgsArrayExpr* arrayExpr) {
     const auto size = arr->baseType->getSizeBytes();
     const auto elementSize = cg.i64(size);
     const auto arrSize = cg.typeSize(arr->getArrStruct(cg));
-    arrayExpr->IRValue = cg.callMalloc(arrSize.getFixedValue(), arrayExpr->owner);
+    arrayExpr->IRValue = cg.callMalloc(arrSize.getFixedValue(), arrayExpr->owner, arr->rtt);
     arr->initFunc->callIR(cg, {arrayExpr->IRValue, elementSize});
     for (int i = 0; i < arrayExpr->initialElements.size(); ++i) {
         const auto element = arrayExpr->initialElements[i];
