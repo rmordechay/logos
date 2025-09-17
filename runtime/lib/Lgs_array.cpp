@@ -1,14 +1,7 @@
+#include "Lgs_array.h"
 #include "data/LgsErrors.h"
 #include "utils/LgsUtils.h"
 #include <cstring>
-#include <vector>
-
-#define MAX_ELEMENT_SIZE 1024*100
-
-struct Lgs_Array {
-    size_t elementSize;
-    std::vector<char>* data;
-};
 
 extern "C" void Lgs_DArray_init(Lgs_Array* arr, const size_t elementSize) {
     arr->elementSize = elementSize;
@@ -72,6 +65,7 @@ extern "C" bool Lgs_DArray_contains(const Lgs_Array* arr, const void* value) {
 }
 
 extern "C" void Lgs_DArray_free(Lgs_Array* arr) {
+    std::cout << "Freeing: " << arr << std::endl;
     // delete arr->data;
     // std::free(arr);
 }

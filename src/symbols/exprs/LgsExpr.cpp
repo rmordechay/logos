@@ -51,7 +51,6 @@ Value* LgsExpr::getIRPtrTo(LgsLLVMGen& cg) const {
 
 void LgsExpr::freeOwner(LgsLLVMGen& cg) {
     owner = nullptr;
-    type->freeValue(cg, IRValue);
 }
 
 std::pair<Value*, Value*> LgsExpr::loadOperands(LgsLLVMGen& cg, LgsExpr* other) {

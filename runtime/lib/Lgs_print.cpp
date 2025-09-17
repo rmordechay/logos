@@ -48,6 +48,8 @@ extern "C" void Lgs_print(const char* fmt, const Lgs_RTType rtt, const void* v) 
     case RTT_DARRAY: {
         assert(0);
     }
+    case RTT_OBJECT:
+        assert(0);
     case RTT_VOID:
         break;
     case RTT_UNKNOWN:

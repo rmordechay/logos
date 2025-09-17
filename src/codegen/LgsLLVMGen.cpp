@@ -98,9 +98,10 @@ Value* LgsLLVMGen::callLgsFunc(const std::string& funcName, FunctionType* ft, co
 }
 
 Value* LgsLLVMGen::callMalloc(const size_t size, const bool isOwner, const Lgs_RTType type) {
+    assert(type != RTT_UNKNOWN);
     const auto ptr = builder.CreateMalloc(sizeTy(), sizeTy(), usize(size), nullptr);
-    if (isOwner) addOwner(ptr, type);
-    else addOrphan(ptr, type);
+    if (isOwner) callLgsFunc("Runtime_addOwner", getFT(voidTy(), {ptrTy(), i32Ty()}), {ptr, i32(type)});
+    else callLgsFunc("Runtime_addOrphan", getFT(voidTy(), {ptrTy(), i32Ty()}), {ptr, i32(type)});
     return ptr;
 }
 
@@ -164,16 +165,6 @@ void LgsLLVMGen::callPopStack() {
 void LgsLLVMGen::callDefers() {
     const auto ft = getFT(voidTy());
     callLgsFunc("Stack_callDefers", ft);
-}
-
-void LgsLLVMGen::addOwner(Value* ptr, const Lgs_RTType type) {
-    assert(type != RTT_UNKNOWN);
-    callLgsFunc("Runtime_addOwner", getFT(voidTy(), {ptrTy(), i32Ty()}), {ptr, i32(type)});
-}
-
-void LgsLLVMGen::addOrphan(Value* ptr, const Lgs_RTType type) {
-    assert(type != RTT_UNKNOWN);
-    callLgsFunc("Runtime_addOrphan", getFT(voidTy(), {ptrTy(), i32Ty()}), {ptr, i32(type)});
 }
 
 void LgsLLVMGen::removeOwner(Value* ptr) {

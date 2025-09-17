@@ -1,13 +1,24 @@
+#include "Lgs_array.h"
 #include "Lgs_scheduler.h"
 #include "Lgs_stack.h"
 #include "Lgs_types.h"
-
 #include <sqlite3.h>
+
+struct Lgs_Array;
 
 struct Lgs_Alloc {
     void* ptr;
     Lgs_RTType type;
+    void freeType() const;
 };
+
+void Lgs_Alloc::freeType() const {
+    std::cout << type << ": " << ptr << std::endl;
+    if (type == RTT_DARRAY) {
+        const auto sArray = static_cast<Lgs_Array*>(ptr);
+        Lgs_DArray_free(sArray);
+    }
+}
 
 struct Lgs_runtime {
     Lgs_Stack stack;
@@ -27,10 +38,12 @@ extern "C" void Lgs_Runtime_init() {
 }
 
 extern "C" void Lgs_Runtime_addOwner(void* ptr, const Lgs_RTType type) {
+    std::cout << "malloc: " << ptr << std::endl;
     runtime.owners.push_back(Lgs_Alloc{.ptr = ptr, .type = type});
 }
 
 extern "C" void Lgs_Runtime_addOrphan(void* ptr, const Lgs_RTType type) {
+    std::cout << "malloc: " << ptr << std::endl;
     runtime.orphans.push_back(Lgs_Alloc{.ptr = ptr, .type = type});
 }
 
@@ -45,13 +58,13 @@ extern "C" void Lgs_Runtime_removeOwner(const void* owner) {
 }
 
 extern "C" void Lgs_Runtime_funcCleanup() {
-    for (const auto [ptr, type] : runtime.owners) {
-        std::cout << ptr << std::endl;
-        std::cout << type << std::endl;
+    std::cout << "Owners:" << std::endl;
+    for (const auto owner : runtime.owners) {
+        owner.freeType();
     }
-    for (const auto [ptr, type] : runtime.orphans) {
-        std::cout << ptr << std::endl;
-        std::cout << type << std::endl;
+    std::cout << "Orpahns:" << std::endl;
+    for (const auto orphan : runtime.orphans) {
+        orphan.freeType();
     }
 }
 

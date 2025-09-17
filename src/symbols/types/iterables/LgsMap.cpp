@@ -60,10 +60,6 @@ bool LgsMap::canCastTo(LgsType* other) {
     return keyEqual && typePair->value->canCastTo(otherKvType->value);
 }
 
-void LgsMap::freeValue(LgsLLVMGen& cg, Value* value) {
-    freeFunc->callIR(cg, {value});
-}
-
 std::string LgsMap::strFormatPart() const {
     return "%s";
 }

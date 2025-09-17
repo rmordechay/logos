@@ -62,8 +62,6 @@ public:
     void callPopStack();
     void callDefers();
     void removeOwner(Value* ptr);
-    void addOwner(Value* ptr, Lgs_RTType type);
-    void addOrphan(Value* ptr, Lgs_RTType type);
     void callFuncCleanup();
     void addDeferFunc(Value* deferFuncPtr, Value* ctx);
     void addPtrToVtable(Value* instancePtr, Value* name, Value* ptr);

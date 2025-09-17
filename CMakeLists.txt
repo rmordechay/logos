@@ -144,6 +144,7 @@ set(RUNTIME_SOURCES
     runtime/lib/Lgs_print.cpp
     runtime/include/Lgs_Types.h
     runtime/lib/Lgs_arena.cpp
+    runtime/include/Lgs_array.h
 )
 
 add_library(lgs_core SHARED ${CORE_SOURCES} ${RUNTIME_SOURCES})

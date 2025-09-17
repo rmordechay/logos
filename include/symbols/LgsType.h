@@ -73,7 +73,6 @@ public:
     virtual LgsType* applyOp(LgsType* other, LgsOperator op);
     virtual std::string strFormatPart() const = 0;
     virtual DIBasicType* getDebugType(LgsLLVMGen& cg);
-    virtual void freeValue(LgsLLVMGen& cg, Value* value);
     virtual LgsType* clone();
     virtual json::value asJSON() = 0;
 
