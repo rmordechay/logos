@@ -28,17 +28,17 @@ extern "C" void Lgs_print(const char* fmt, const Lgs_RTType rtt, const void* v) 
         break;
     }
     case RTT_VEC2: {
-        const auto vec = static_cast<const Vec2*>(v);
+        const auto vec = static_cast<const Lgs_vec2*>(v);
         printf(fmt, vec->x, vec->y);
         break;
     }
     case RTT_VEC3: {
-        const auto vec = static_cast<const Vec3*>(v);
+        const auto vec = static_cast<const Lgs_vec3*>(v);
         printf(fmt, vec->x, vec->y, vec->z);
         break;
     }
     case RTT_VEC4: {
-        const auto vec = static_cast<const Vec4*>(v);
+        const auto vec = static_cast<const Lgs_vec4*>(v);
         printf(fmt, vec->x, vec->y, vec->z, vec->w);
         break;
     }

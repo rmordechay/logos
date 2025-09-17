@@ -16,15 +16,15 @@ enum Lgs_RTType {
     RTT_OBJECT,
 };
 
-struct Vec2 {
+struct Lgs_vec2 {
     float x, y;
 };
 
-struct Vec3 {
+struct Lgs_vec3 {
     float x, y, z;
 };
 
-struct Vec4 {
+struct Lgs_vec4 {
     float x, y, z, w;
 };
 

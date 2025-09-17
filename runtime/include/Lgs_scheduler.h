@@ -4,7 +4,7 @@
 
 using continuation = boost::context::continuation;
 
-struct Lgs_Scheduler {
+struct Lgs_scheduler {
     std::deque<continuation> queue;
 
     void run();

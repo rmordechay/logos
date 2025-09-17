@@ -50,6 +50,7 @@ Value* LgsExpr::getIRPtrTo(LgsLLVMGen& cg) const {
 }
 
 void LgsExpr::freeOwner(LgsLLVMGen& cg) {
+    cg.removeOwner(owner->IRValue);
     owner = nullptr;
 }
 

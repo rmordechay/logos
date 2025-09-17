@@ -120,10 +120,10 @@ public:
     void visitGroup(LgsGroup* group);
     void visitLoopMetaVar(LgsLoopMetaVar* metaVar);
 
-    void matchExprToType(const LgsExpr* expr, LgsType* type);
-    void resolveFuncCall(LgsFuncCall* funcCall);
-    bool resolveForeachVars(const LgsForeachLoop* foreachLoop);
     void addHeapExpr(LgsExpr* expr);
+    void matchExprToType(const LgsExpr* expr, LgsType* type);
+    bool resolveForeachVars(const LgsForeachLoop* foreachLoop);
+    void completeFuncCallType(const LgsFuncCall* funcCall, const LgsFuncType* funcType);
 
     void validateObjImplements(LgsObject* obj, const std::vector<LgsType*>& interfaces);
     void validateObjInterface(LgsObject* obj, LgsInterface* interface);

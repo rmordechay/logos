@@ -58,11 +58,11 @@ public:
     void callRuntimeInit();
 
     // Runtime
+    void removeOwner(Value* ptr);
+    void callFuncCleanup();
     void callStackPush();
     void callPopStack();
     void callDefers();
-    void removeOwner(Value* ptr);
-    void callFuncCleanup();
     void addDeferFunc(Value* deferFuncPtr, Value* ctx);
     void addPtrToVtable(Value* instancePtr, Value* name, Value* ptr);
     Value* getPtrFromVtable(Value* instancePtr, Value* name);

@@ -1,6 +1,6 @@
 #define BLOCK_SIZE 1024*4
 
-class Arena {
+class Lgd_arena {
     std::size_t currentOffset = 0;
     void* currentBlock = nullptr;
     std::vector<void*> blocks;
@@ -27,7 +27,7 @@ public:
         blocks.clear();
     }
 
-    ~Arena() {
+    ~Lgd_arena() {
         reset();
     }
 };

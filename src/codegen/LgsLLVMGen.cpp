@@ -100,8 +100,8 @@ Value* LgsLLVMGen::callLgsFunc(const std::string& funcName, FunctionType* ft, co
 Value* LgsLLVMGen::callMalloc(const size_t size, const bool isOwner, const Lgs_RTType type) {
     assert(type != RTT_UNKNOWN);
     const auto ptr = builder.CreateMalloc(sizeTy(), sizeTy(), usize(size), nullptr);
-    if (isOwner) callLgsFunc("Runtime_addOwner", getFT(voidTy(), {ptrTy(), i32Ty()}), {ptr, i32(type)});
-    else callLgsFunc("Runtime_addOrphan", getFT(voidTy(), {ptrTy(), i32Ty()}), {ptr, i32(type)});
+    if (isOwner) callLgsFunc("runtime_addOwner", getFT(voidTy(), {ptrTy(), i32Ty()}), {ptr, i32(type)});
+    else callLgsFunc("runtime_addOrphan", getFT(voidTy(), {ptrTy(), i32Ty()}), {ptr, i32(type)});
     return ptr;
 }
 
@@ -151,56 +151,56 @@ void LgsLLVMGen::callMemCpy(Value* dest, Value* src, Value* size) {
 }
 
 void LgsLLVMGen::callRuntimeInit() {
-    callLgsFunc("Runtime_init", getFT(voidTy()));
+    callLgsFunc("runtime_init", getFT(voidTy()));
+}
+
+void LgsLLVMGen::removeOwner(Value* ptr) {
+    callLgsFunc("runtime_removeOwner", getFT(voidTy(), {ptrTy()}), {ptr});
+}
+
+void LgsLLVMGen::callFuncCleanup() {
+    callLgsFunc("runtime_funcCleanup", getFT(voidTy()));
 }
 
 void LgsLLVMGen::callStackPush() {
-    callLgsFunc("Stack_push", getFT(voidTy()));
+    callLgsFunc("stack_push", getFT(voidTy()));
 }
 
 void LgsLLVMGen::callPopStack() {
-    callLgsFunc("Stack_pop", getFT(voidTy()));
+    callLgsFunc("stack_pop", getFT(voidTy()));
 }
 
 void LgsLLVMGen::callDefers() {
     const auto ft = getFT(voidTy());
-    callLgsFunc("Stack_callDefers", ft);
-}
-
-void LgsLLVMGen::removeOwner(Value* ptr) {
-    callLgsFunc("Runtime_removeOwner", getFT(voidTy(), {ptrTy()}), {ptr});
-}
-
-void LgsLLVMGen::callFuncCleanup() {
-    callLgsFunc("Runtime_funcCleanup", getFT(voidTy()));
+    callLgsFunc("stack_callDefers", ft);
 }
 
 void LgsLLVMGen::addDeferFunc(Value* deferFuncPtr, Value* ctx) {
-    callLgsFunc("Stack_addDefer", getFT(voidTy(), {ptrTy(), ptrTy()}), {deferFuncPtr, ctx});
+    callLgsFunc("stack_addDefer", getFT(voidTy(), {ptrTy(), ptrTy()}), {deferFuncPtr, ctx});
 }
 
 void LgsLLVMGen::addPtrToVtable(Value* instancePtr, Value* name, Value* ptr) {
-    callLgsFunc("Vtable_add", getFT(voidTy(), {ptrTy(), ptrTy(), ptrTy()}), {instancePtr, name, ptr});
+    callLgsFunc("vtable_add", getFT(voidTy(), {ptrTy(), ptrTy(), ptrTy()}), {instancePtr, name, ptr});
 }
 
 Value* LgsLLVMGen::getPtrFromVtable(Value* instancePtr, Value* name) {
-    return callLgsFunc("Vtable_get", getFT(ptrTy(), {ptrTy(), ptrTy()}), {instancePtr, name});
+    return callLgsFunc("vtable_get", getFT(ptrTy(), {ptrTy(), ptrTy()}), {instancePtr, name});
 }
 
 void LgsLLVMGen::addCoro(Value* coroPtr, Value* ctx) {
-    callLgsFunc("Stack_addCoro", getFT(voidTy(), {ptrTy(), ptrTy()}), {coroPtr, ctx});
+    callLgsFunc("stack_addCoro", getFT(voidTy(), {ptrTy(), ptrTy()}), {coroPtr, ctx});
 }
 
 void LgsLLVMGen::callSpawn(Value* task, Value* ctx) {
-    callLgsFunc("Scheduler_yield", getFT(voidTy(), {ptrTy(), ptrTy()}), {task, ctx});
+    callLgsFunc("scheduler_yield", getFT(voidTy(), {ptrTy(), ptrTy()}), {task, ctx});
 }
 
 void LgsLLVMGen::callYield() {
-    callLgsFunc("Scheduler_yield", getFT(voidTy()), {});
+    callLgsFunc("scheduler_yield", getFT(voidTy()), {});
 }
 
 void LgsLLVMGen::callShutdown() {
-    callLgsFunc("Scheduler_shutdown", getFT(voidTy()), {});
+    callLgsFunc("scheduler_shutdown", getFT(voidTy()), {});
 }
 
 Value* LgsLLVMGen::callHashStr(Value* value) {

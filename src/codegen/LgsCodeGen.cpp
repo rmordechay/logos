@@ -971,7 +971,7 @@ void LgsCodeGen::createEpilogue(LgsFunc* func) {
 
     if (needsCleanup) {
         if (func->returnStmts.empty()) {
-            freeFuncHeap(func);
+            cg.callFuncCleanup();
             cg.callPopStack();
         } else if (func->returnStmts.size() == 1) {
             if (func->owners.size() == 1) {
@@ -983,16 +983,12 @@ void LgsCodeGen::createEpilogue(LgsFunc* func) {
                     return;
                 }
             }
-            freeFuncHeap(func);
+            cg.callFuncCleanup();
             cg.builder.CreateRet(getIRValue(func->returnStmts.front()));
         }
     } else {
         cg.callPopStack();
     }
-}
-
-void LgsCodeGen::freeFuncHeap(const LgsFunc* func) {
-    cg.callFuncCleanup();
 }
 
 Value* LgsCodeGen::getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) const {

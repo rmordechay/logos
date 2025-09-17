@@ -9,16 +9,16 @@ struct Lgs_Thunk_Func {
     void* ctx;
 };
 
-struct Lgs_Stack_Frame {
+struct Lgs_stack_frame {
     Lgs_Thunk_Func defers[LOCALS_CAPACITY];
     Lgs_Thunk_Func coros[LOCALS_CAPACITY];
     int defersCount;
     int corosCount;
 };
 
-struct Lgs_Stack {
+struct Lgs_stack {
     int stackIndex;
-    Lgs_Stack_Frame frames[STACK_CAPACITY];
+    Lgs_stack_frame frames[STACK_CAPACITY];
 
     void push();
     void pop();

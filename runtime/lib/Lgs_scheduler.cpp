@@ -24,7 +24,7 @@ static void initSignals() {
     setitimer(ITIMER_REAL, &it, nullptr);
 }
 
-void Lgs_Scheduler::run() {
+void Lgs_scheduler::run() {
     initSignals();
     while (!queue.empty()) {
         auto c = std::move(queue.front());
@@ -35,7 +35,7 @@ void Lgs_Scheduler::run() {
     }
 }
 
-void Lgs_Scheduler::spawn(void (*task)(void*), void* ctx) {
+void Lgs_scheduler::spawn(void (*task)(void*), void* ctx) {
     queue.push_back(boost::context::callcc(
         [task, ctx](continuation&& c) mutable {
             tlsYield = [&c] {
@@ -47,7 +47,7 @@ void Lgs_Scheduler::spawn(void (*task)(void*), void* ctx) {
     ));
 }
 
-void Lgs_Scheduler::yield() {
+void Lgs_scheduler::yield() {
     if (!tlsYield) return;
     const auto shouldYield = preempt.exchange(false, std::memory_order_relaxed);
     if (shouldYield) {
@@ -55,7 +55,7 @@ void Lgs_Scheduler::yield() {
     }
 }
 
-void Lgs_Scheduler::shutdown() {
+void Lgs_scheduler::shutdown() {
     constexpr itimerval it{};
     setitimer(ITIMER_REAL, &it, nullptr);
 }
