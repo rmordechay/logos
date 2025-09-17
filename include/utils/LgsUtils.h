@@ -30,4 +30,3 @@ std::string getLine(const std::string& filename, size_t lineNumber);
 std::string trim(const std::string& str);
 std::string getFullPath(const LgsLocation& location, const std::string& filePath);
 std::string getOpAsText(LgsOperator op);
-std::pair<Value*, Value*> loadOperands(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);

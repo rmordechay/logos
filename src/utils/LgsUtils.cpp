@@ -191,16 +191,3 @@ std::string getOpAsText(const LgsOperator op) {
     }
     return "NOOP";
 }
-
-std::pair<Value*, Value*> loadOperands(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    auto l = self->loadIR(cg);
-    auto r = other->loadIR(cg);
-    const auto lt = cast<IntegerType>(l->getType());
-    const auto rt = cast<IntegerType>(r->getType());
-    if (lt->getBitWidth() > rt->getBitWidth()) {
-        r = cg.builder.CreateSExt(r, l->getType());
-    } else if (rt->getBitWidth() > lt->getBitWidth()) {
-        l = cg.builder.CreateSExt(l, r->getType());
-    }
-    return std::make_pair(l, r);
-}

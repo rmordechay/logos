@@ -265,7 +265,7 @@ void LgsCodeGen::visitForeachLoop(LgsForeachLoop* loop) {
     const auto expr = loop->iterExpr;
     const auto index = new LgsIndex{.from = new LgsIntConst(&LGS_SIZE, 0)};
     const auto iterIndex = new LgsIterIndex(expr, index);
-    visitExpr(iterIndex);
+    visitIterIndex(iterIndex);
 
     loop->iValue = loop->loadIndex(cg);
     index->from->IRValue = loop->iValue;
@@ -362,7 +362,6 @@ void LgsCodeGen::visitIfStmt(LgsIfStmt* ifStmt) {
 void LgsCodeGen::visitSimpleIf(LgsIfStmt* ifStmt) {
     const auto IRBlockIfTrue = cg.createBlock(BLOCK_NAME_IF_TRUE);
     ifStmt->IRExitBlock = cg.createBlock(BLOCK_NAME_IF_FALSE);
-
     stack.enterScope(ifStmt);
     cg.builder.CreateCondBr(getIRValue(ifStmt->ifCond), IRBlockIfTrue, ifStmt->IRExitBlock);
     cg.startBlock(IRBlockIfTrue, currentIRFunc);
@@ -811,9 +810,12 @@ void LgsCodeGen::createMapFunc(LgsFunc* func) {
     cg.savedIP = cg.builder.saveIP();
     const auto originalFunc = currentIRFunc;
     createPrologue(func);
-    const auto dArray = func->funcType->params[0].type->asDArray();
-    const auto l = new LgsArrayExpr(dArray);
-    visitArrayExpr(l);
+
+    const auto& originalArr = func->funcType->params[0];
+    const auto& callback = func->funcType->params[1];
+    const auto dArray = originalArr.type->asDArray();
+    const auto newArr = new LgsArrayExpr(dArray);
+    visitArrayExpr(newArr);
 
     const auto iPtr = cg.builder.CreateAlloca(cg.sizeTy());
     const auto loopStart = cg.builder.CreateSExt(cg.sizeZero(), cg.sizeTy());
@@ -832,9 +834,12 @@ void LgsCodeGen::createMapFunc(LgsFunc* func) {
     // Body
     cg.startBlock(IRBodyBlock, currentIRFunc);
 
-    const auto f = dyn_cast<FunctionType>(func->funcType->params[1].type->getIRType(cg));
-    const auto v = cg.builder.CreateCall(f, func->funcType->params[1].IRValue, {cg.i32(2)});
-
+    const auto f = dyn_cast<FunctionType>(callback.type->getIRType(cg));
+    const auto a = dArray->getFunc->callIR(cg, {originalArr.IRValue, iValue});
+    const auto v = cg.builder.CreateCall(f, callback.IRValue, {cg.builder.CreateLoad(dArray->baseType->getIRType(cg), a)});
+    const auto vPtr = cg.builder.CreateAlloca(cg.ptrTy());
+    cg.builder.CreateStore(v, vPtr);
+    dArray->addFunc->callIR(cg, {newArr->IRValue, vPtr});
 
     if (cg.lastInstTerminator()) return;
     const auto inc = cg.builder.CreateAdd(iValue, cg.usize(1));
@@ -842,11 +847,11 @@ void LgsCodeGen::createMapFunc(LgsFunc* func) {
     cg.builder.CreateBr(IRCondBlock);
 
     cg.startBlock(IRExitBlock, currentIRFunc);
-    cg.builder.CreateRet(l->IRValue);
+    cg.builder.CreateRet(newArr->IRValue);
     currentIRFunc = originalFunc;
     cg.builder.restoreIP(cg.savedIP);
     func->IRValue = func->getIRFunc(cg);
-    freeExpr(l);
+    freeExpr(newArr);
 }
 
 void LgsCodeGen::visitPrefixExpr(LgsPrefixExpr* prefixExpr) {

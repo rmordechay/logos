@@ -43,9 +43,8 @@ bool LgsExpr::canAssignTo(LgsType* other, const LgsAssignType op) {
 }
 
 Value* LgsExpr::getIRPtrTo(LgsLLVMGen& cg) const {
-    const auto ty = type->getIRType(cg);
     if (IRValue->getType()->isPointerTy()) return IRValue;
-    const auto ptr = cg.builder.CreateAlloca(ty);
+    const auto ptr = cg.builder.CreateAlloca(IRValue->getType());
     cg.builder.CreateStore(IRValue, ptr);
     return ptr;
 }
@@ -53,6 +52,19 @@ Value* LgsExpr::getIRPtrTo(LgsLLVMGen& cg) const {
 void LgsExpr::freeOwner(LgsLLVMGen& cg) {
     owner = nullptr;
     type->freeValue(cg, IRValue);
+}
+
+std::pair<Value*, Value*> LgsExpr::loadOperands(LgsLLVMGen& cg, LgsExpr* other) {
+    auto l = loadIR(cg);
+    auto r = other->loadIR(cg);
+    const auto lt = cast<IntegerType>(l->getType());
+    const auto rt = cast<IntegerType>(r->getType());
+    if (lt->getBitWidth() > rt->getBitWidth()) {
+        r = cg.builder.CreateSExt(r, l->getType());
+    } else if (rt->getBitWidth() > lt->getBitWidth()) {
+        l = cg.builder.CreateSExt(l, r->getType());
+    }
+    return std::make_pair(l, r);
 }
 
 size_t LgsExpr::getConstInt() {

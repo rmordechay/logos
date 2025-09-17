@@ -60,8 +60,8 @@ public:
     void callStackPush();
     void callPopStack();
     void callDefers();
-    void addOwner(Value* ptr);
     void removeOwner(Value* ptr);
+    void addOwner(Value* ptr);
     void addOrphan(Value* ptr);
     void addDeferFunc(Value* deferFuncPtr, Value* ctx);
     void addPtrToVtable(Value* instancePtr, Value* name, Value* ptr);

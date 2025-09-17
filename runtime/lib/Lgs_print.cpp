@@ -42,6 +42,9 @@ extern "C" void Lgs_print(const char* fmt, const LgsRTType rtt, const void* v) {
         printf(fmt, vec->x, vec->y, vec->z, vec->w);
         break;
     }
+    case RTT_SARRAY: {
+        assert(0);
+    }
     case RTT_VOID:
         break;
     case RTT_UNKNOWN:

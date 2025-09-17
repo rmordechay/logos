@@ -11,6 +11,7 @@ public:
     explicit LgsSArray(LgsType* baseType = nullptr): LgsIterable(baseType) {
         isSliceable = true;
         addMethod(lenFunc);
+        rtt = RTT_SARRAY;
     }
 
     Type* getIRType(LgsLLVMGen& cg) override;

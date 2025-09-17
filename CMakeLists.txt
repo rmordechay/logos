@@ -40,7 +40,7 @@ set(CORE_SOURCES
     src/logos/LgsPaths.cpp
     src/codegen/LgsLinker.cpp
     src/codegen/LgsCodeGen.cpp
-    src/codegen/LgsLLVM.cpp
+    src/codegen/LgsLLVMGen.cpp
     src/analysis/LgsParserAdapter.cpp
     src/analysis/LgsSema.cpp
     src/analysis/LgsTypeResolver.cpp

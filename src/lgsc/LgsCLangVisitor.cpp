@@ -59,6 +59,9 @@ LgsType* LgsCLangVisitor::mapCType(const clang::QualType type) {
         if (pointee.getTypePtr() == type.getTypePtr()) {
             return new LgsPtr(new LgsVoid());
         }
+        if (pointee.getTypePtr() == type.getTypePtr()) {
+            return new LgsPtr(new LgsVoid());
+        }
         if (pointee->isVoidType()) {
             return new LgsPtr(new LgsVoid());
         }

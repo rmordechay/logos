@@ -54,6 +54,7 @@ public:
     LgsIterator toIterator();
     void setType(LgsType* newType);
     bool equals(const LgsExpr* other);
+    std::pair<Value*, Value*> loadOperands(LgsLLVMGen& cg, LgsExpr* other);
 
     LgsFunc* asFunc();
     LgsVariable* asVariable();

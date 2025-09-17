@@ -143,7 +143,7 @@ void LgsSema::visitFunc(LgsFunc* func) {
         errHandler.addError(E10055, &func->location, {func->pname()});
     }
     for (const auto& orphan : func->orphans) {
-        errHandler.addError(E10077, &orphan->location, {orphan->pname()});
+        // errHandler.addError(E10077, &orphan->location, {orphan->pname()});
     }
     stack.exitScope();
 }
@@ -221,26 +221,28 @@ void LgsSema::visitStmtsBlock(LgsStmtsBlock* stmtsBlock) {
 }
 
 void LgsSema::visitVarDec(LgsVarDec* varDec) {
-    if (varDec->isOwner && varDec->expr) {
-        if (varDec->expr->owner) {
-            errHandler.addError(E10075, &varDec->expr->location, {varDec->expr->pname()});
-        }
-        varDec->expr->owner = varDec;
+    if (const auto iter = varDec->type->asIterable()) {
+        visitExpr(iter->sizeExpr);
     }
     if (varDec->expr && varDec->type) {
+        varDec->expr->owner = varDec;
         varDec->type = typeResolver.resolveType(varDec->type, file);
         varDec->expr->completeType(varDec->type);
         visitExpr(varDec->expr);
         matchExprToType(varDec->expr, varDec->type);
     } else if (varDec->expr) {
         visitExpr(varDec->expr);
+        varDec->expr->owner = varDec;
         varDec->type = varDec->expr->type;
         matchExprToType(varDec->expr, varDec->type);
     } else {
-        if (const auto iter = varDec->type->asIterable()) visitExpr(iter->sizeExpr);
         varDec->type = typeResolver.resolveType(varDec->type, file);
         varDec->expr = varDec->type->getZeroValue();
         varDec->expr->location = varDec->location;
+        visitExpr(varDec->expr);
+        if (varDec->isOwner) {
+            varDec->expr->owner = varDec;
+        }
     }
     addLocalSymbol(LgsSymbol(varDec));
     addHeapExpr(varDec->expr);
@@ -575,22 +577,23 @@ void LgsSema::visitDynamicArray(LgsArrayExpr* array) {
     if (!dArr->sizeExpr) {
         dArr->sizeExpr = new LgsIntConst(&LGS_LONG, array->initialElements.size());
     }
+
     if (!dArr->baseType && array->initialElements.empty()) {
-        errHandler.addError(E10049, &array->location, {array->pname()});
-    } else {
-        LgsType* baseType = nullptr;
-        const auto first = array->initialElements.front();
-        if (const auto innerArr = first->asArrayExpr()) {
-            baseType = innerArr->type;
-        } else {
-            baseType = first->type;
-        }
-        array->type->asIterable()->baseType = baseType;
-        // dArr->addFunc->funcType->params[1].type = baseType;
-        const auto mapFT = dArr->mapFunc->funcType->params[1].type->asFuncType();
-        mapFT->params[0].type = baseType;
-        mapFT->rt = baseType;
+        return errHandler.addError(E10049, &array->location, {array->pname()});
     }
+
+    LgsType* baseType = nullptr;
+    if (dArr->baseType) {
+        baseType = dArr->baseType;
+    } else if (const auto innerArr = array->initialElements.front()->asArrayExpr()) {
+        baseType = innerArr->type;
+    } else {
+        baseType = array->initialElements.front()->type;
+    }
+    dArr->baseType = baseType;
+    const auto mapFT = dArr->mapFunc->funcType->params[1].type->asFuncType();
+    mapFT->params[0].type = baseType;
+    mapFT->rt = baseType;
 }
 
 void LgsSema::visitHashMap(LgsHashMap* hashMap) {
@@ -772,6 +775,7 @@ void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent) {
     for (size_t i = method->funcType->isMethod; i < method->funcType->params.size(); ++i) {
         const auto param = method->funcType->params[i];
         const auto arg = methodCall->args[i];
+        arg->completeType(param.type);
         visitExpr(arg);
     }
     if (methodCall->equals(method->funcType)) {

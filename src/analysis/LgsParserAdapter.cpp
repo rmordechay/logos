@@ -364,7 +364,7 @@ LgsMainFunc* LgsParserAdapter::getMainFunc(LogosParser::FuncContext* ctx) {
 }
 
 LgsFunc* LgsParserAdapter::getLambda(LogosParser::LambdaContext* ctx) {
-    const auto func = new LgsFunc(LGS_ANONYMOUS_STR);
+    const auto func = new LgsFunc("");
     currentFunc = func;
     func->isLambda = true;
     func->funcType->rt = getType(ctx->rt);

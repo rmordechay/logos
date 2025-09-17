@@ -11,6 +11,7 @@ enum LgsRTType {
     RTT_VEC2,
     RTT_VEC3,
     RTT_VEC4,
+    RTT_SARRAY,
 };
 
 struct Vec2 {
