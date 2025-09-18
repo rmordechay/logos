@@ -5,7 +5,9 @@
 #include "types/iterables/LgsDArray.h"
 
 Value* LgsField::loadIR(LgsLLVMGen& cg) {
-    IRValue = cg.builder.CreateStructGEP(parentIRType, parentIRValue, position);
+    if (!IRValue) {
+        IRValue = cg.builder.CreateStructGEP(parentIRType, parentIRValue, position);
+    }
     if (type->isPrimitive || type->asVec()) {
         return cg.builder.CreateLoad(type->getIRType(cg), IRValue);
     }

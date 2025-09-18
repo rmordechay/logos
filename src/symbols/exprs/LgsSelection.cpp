@@ -10,15 +10,6 @@ Value* LgsSelection::loadIR(LgsLLVMGen& cg) {
     return cg.builder.CreateLoad(type->getIRType(cg), gep);
 }
 
-Value* LgsSelection::getIRPtrTo(LgsLLVMGen& cg) const {
-    Value* v = nullptr;
-    for (int i = 1; i < exprs.size(); ++i) {
-        const auto childExpr = exprs[i];
-        // v = childExpr->loadIR(cg);
-    }
-    return LgsExpr::getIRPtrTo(cg);
-}
-
 LgsExpr* LgsSelection::lastExpr() const {
     assert(exprs.size() > 1);
     return exprs[exprs.size() - 1];

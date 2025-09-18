@@ -5,11 +5,6 @@
 #include "stmts/LgsVarDec.h"
 #include <codegen/LgsLLVMGen.h>
 
-void LgsVariable::assign(LgsLLVMGen& cg, LgsExpr* expr) {
-    if (owner) freeOwner(cg);
-    IRValue = expr->IRValue;
-}
-
 Value* LgsVariable::loadIR(LgsLLVMGen& cg) {
     switch (ref.symbolType) {
     case PARAM:
@@ -21,6 +16,11 @@ Value* LgsVariable::loadIR(LgsLLVMGen& cg) {
     default:
         assert(0);
     }
+}
+
+void LgsVariable::assign(LgsLLVMGen& cg, LgsExpr* expr) {
+    if (owner) freeOwner(cg);
+    IRValue = expr->IRValue;
 }
 
 Value* LgsVariable::hash(LgsLLVMGen& cg) {

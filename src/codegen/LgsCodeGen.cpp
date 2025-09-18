@@ -72,7 +72,6 @@ void LgsCodeGen::visitMainFile(LgsMainFile* mainFile) {
 }
 
 void LgsCodeGen::visitObjFile(const LgsObjectFile* objFile) {
-    objFile->obj->getIRType(cg);
     for (const auto& [_, method] : objFile->obj->methods) {
         visitFunc(method);
     }
@@ -241,7 +240,7 @@ void LgsCodeGen::visitForeachLoop(LgsForeachLoop* loop) {
 
     cg.startBlock(loop->IRBodyBlock, currentIRFunc);
     loop->iterPtr = iterIndex->IRValue;
-    loop->loopVars[0]->IRValue = iterIndex->loadIR(cg);
+    loop->loopVars[0]->IRValue = iterIndex->IRValue;
 }
 
 void LgsCodeGen::visitInfiniteLoop(const LgsInfiniteLoop* loop) const {
@@ -875,7 +874,7 @@ void LgsCodeGen::visitIterIndex(LgsIterIndex* iterIndex) {
     visitExpr(iterIndex->baseExpr);
     visitExpr(iterIndex->index->from);
     visitExpr(iterIndex->index->to);
-    iterIndex->IRValue = iterIndex->loadIR(cg);
+    iterIndex->IRValue = iterIndex->baseExpr->IRValue;
 }
 
 void LgsCodeGen::visitInstance(LgsInstance* instance) {

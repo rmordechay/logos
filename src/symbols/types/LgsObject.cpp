@@ -5,6 +5,8 @@
 #include "types/LgsInterface.h"
 #include "utils/LgsUtils.h"
 
+#include <llvm/IR/Module.h>
+
 Type* LgsObject::getIRType(LgsLLVMGen& cg) {
     if (IRType) return IRType;
     std::vector<Type*> elementTypes;

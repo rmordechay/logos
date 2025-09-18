@@ -7,32 +7,33 @@
 Value* LgsIterIndex::loadIR(LgsLLVMGen& cg) {
     const auto baseExprType = baseExpr->type;
     if (baseExprType->asSArray()) {
-        IRValue = loadFromSArray(cg);
-    } else if (baseExpr->type->asVec()) {
-        IRValue = loadFromVec(cg);
-    } else if (const auto arr = baseExprType->asDArray()) {
-        IRValue = loadFromDArray(cg, arr);
-    } else if (const auto map = baseExprType->asMap()) {
-        IRValue = loadFromMap(cg, map);
-    } else if (const auto str = baseExprType->asStr()) {
-        IRValue = loadFromStr(cg, str);
-    } else {
-        assert(0);
+        return loadFromSArray(cg);
     }
-    return IRValue;
+    if (baseExpr->type->asVec()) {
+        return loadFromVec(cg);
+    }
+    if (const auto arr = baseExprType->asDArray()) {
+        return loadFromDArray(cg, arr);
+    }
+    if (const auto map = baseExprType->asMap()) {
+        return loadFromMap(cg, map);
+    }
+    if (const auto str = baseExprType->asStr()) {
+        return loadFromStr(cg, str);
+    }
+    assert(0);
 }
 
 Value* LgsIterIndex::loadFromDArray(LgsLLVMGen& cg, const LgsDArray* arr) const {
-    const auto arrPtr = baseExpr->IRValue;
     auto indexIRValue = index->from->IRValue;
     indexIRValue = cg.builder.CreateZExt(indexIRValue, cg.i64Ty());
-    const auto rv = arr->getFunc->callIR(cg, {arrPtr, indexIRValue});
+    const auto rv = arr->getFunc->callIR(cg, {IRValue, indexIRValue});
     const auto valueTy = arr->baseType->getIRType(cg);
     return cg.builder.CreateLoad(valueTy, rv);;
 }
 
 Value* LgsIterIndex::loadFromMap(LgsLLVMGen& cg, const LgsMap* map) const {
-    const auto mapPtr = baseExpr->IRValue;
+    const auto mapPtr = IRValue;
     const auto key = index->from->IRValue;
     const auto rv = map->getFunc->callIR(cg, {mapPtr, key});
     const auto valueTy = map->typePair->value->getIRType(cg);
@@ -42,16 +43,15 @@ Value* LgsIterIndex::loadFromMap(LgsLLVMGen& cg, const LgsMap* map) const {
 Value* LgsIterIndex::loadFromStr(LgsLLVMGen& cg, const LgsStr* str) const {
     if (index->to) return createStrSlice(cg);
     auto& builder = cg.builder;
-    const auto baseExprIRValue = baseExpr->IRValue;
     const auto baseExprIRType = baseExpr->type->getIRType(cg);
     const auto ptr = builder.CreateAlloca(baseExprIRType);
-    const auto vaArgInst = builder.CreateVAArg(baseExprIRValue, baseExprIRType);
+    const auto vaArgInst = builder.CreateVAArg(IRValue, baseExprIRType);
     builder.CreateStore(vaArgInst, ptr);
     return builder.CreateLoad(baseExprIRType, ptr);
 }
 
 Value* LgsIterIndex::loadFromVec(LgsLLVMGen& cg) const {
-    const auto ptr = baseExpr->IRValue;
+    const auto ptr = IRValue;
     const auto vec = cg.builder.CreateLoad(baseExpr->type->getIRType(cg), ptr);
     const auto i = index->from->IRValue;
     return cg.builder.CreateExtractElement(vec, i);
@@ -69,7 +69,7 @@ Value* LgsIterIndex::loadFromSArray(LgsLLVMGen& cg) const {
         if (innerIterIndex) {
             iterIndex = innerIterIndex;
         } else {
-            ptr = iterIndex->baseExpr->IRValue;
+            ptr = iterIndex->IRValue;
             ty = iterIndex->baseExpr->type->getIRType(cg);
             IRIndices.push_back(cg.i32Zero());
             break;
@@ -88,9 +88,8 @@ Value* LgsIterIndex::createStrSlice(LgsLLVMGen& cg) const {
 
 Value* LgsIterIndex::getStrGEP(LgsLLVMGen& cg) const {
     const auto ty = baseExpr->type->getIRType(cg);
-    const auto value = baseExpr->IRValue;
     const auto iValue = index->from->IRValue;
-    return cg.builder.CreateGEP(ty, value, {cg.i32Zero(), iValue});
+    return cg.builder.CreateGEP(ty, IRValue, {cg.i32Zero(), iValue});
 }
 
 void LgsIterIndex::assign(LgsLLVMGen& cg, LgsExpr* expr) {
@@ -125,7 +124,7 @@ void LgsIterIndex::assignScalar(LgsLLVMGen& cg, LgsExpr* expr) {
 
 void LgsIterIndex::assignArray(LgsLLVMGen& cg, const LgsArrayExpr* arr) const {
     // const auto IRType = baseExpr->type->getIRType(cg);
-    // const auto arrPtr = baseExpr->IRValue;
+    // const auto arrPtr = IRValue;
     //
     // // Flatten the indices and reverse them.
     // std::vector<LgsIndex*> indices;
