@@ -9,9 +9,10 @@ public:
         isPrimitive = true;
         isNumber = true;
         isInt = true;
+        rtt = RTT_SIZE;
     }
     size_t getSizeBytes() override;
-    llvm::Type* getIRType(LgsLLVMGen& cg) override;
+    Type* getIRType(LgsLLVMGen& cg) override;
     std::string getName() override;
     std::string pname() override;
     json::value asJSON() override;

@@ -5,17 +5,19 @@
 #include "types/LgsObject.h"
 #include "../types/iterables/LgsStr.h"
 #include "types/primitives/LgsInt.h"
+#include "types/primitives/LgsSize.h"
+
 #include <types/LgsVoid.h>
 
 class LgsSystem final : public LgsObject {
 public:
     static constexpr auto name = "System";
-    LgsFunc* pidFunc = new LgsFunc{"pid", &LGS_LONG, {this}, PUBLIC | BUILTIN | METHOD};
-    LgsFunc* sleepFunc = new LgsFunc{"sleep", &LGS_VOID, {this, &LGS_INT}, PUBLIC | BUILTIN | METHOD};
-    LgsFunc* exitFunc = new LgsFunc{"exit", &LGS_VOID, {this, &LGS_INT}, PUBLIC | BUILTIN | METHOD | TERMINATOR};
-    LgsFunc* cwdFunc = new LgsFunc{"cwd", new LgsStr(), {this}, PUBLIC | BUILTIN | METHOD};
-    LgsFunc* getEnvFunc = new LgsFunc{"getEnv", new LgsStr(), {this, new LgsStr(), new LgsNullable(new LgsStr())}, PUBLIC | BUILTIN | METHOD | HAS_DEFAULTS};
-    LgsFunc* coresNumFunc = new LgsFunc{"coresNumber", &LGS_LONG, {this}, PUBLIC | BUILTIN | METHOD};
+    LgsFunc* pidFunc = new LgsFunc{"pid", &LGS_SIZE, {}, PUBLIC | BUILTIN};
+    LgsFunc* sleepFunc = new LgsFunc{"sleep", &LGS_VOID, {&LGS_INT}, PUBLIC | BUILTIN};
+    LgsFunc* exitFunc = new LgsFunc{"exit", &LGS_VOID, {&LGS_INT}, PUBLIC | BUILTIN | TERMINATOR};
+    LgsFunc* cwdFunc = new LgsFunc{"cwd", new LgsStr(), {}, PUBLIC | BUILTIN};
+    LgsFunc* getEnvFunc = new LgsFunc{"getEnv", new LgsStr(), {new LgsStr(), new LgsNullable(new LgsStr())}, PUBLIC | BUILTIN | HAS_DEFAULTS};
+    LgsFunc* coresNumFunc = new LgsFunc{"coresNumber", &LGS_LONG, {}, PUBLIC | BUILTIN};
 
     explicit LgsSystem() : LgsObject(name) {
         getEnvFunc->funcType->params[2].expr = new LgsNull();

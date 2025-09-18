@@ -122,7 +122,7 @@ Value* LgsLLVMGen::callGetEnv(Value* name) {
 }
 
 Value* LgsLLVMGen::callGetPid() {
-    return callFunc("getpid", getFT(i32Ty()));
+    return callFunc("getpid", getFT(sizeTy()));
 }
 
 Value* LgsLLVMGen::callCwd() {

@@ -135,6 +135,9 @@ void LgsSema::visitFunc(LgsFunc* func) {
         }
         defaultParamsStarted = !!param.expr;
     }
+    if (!func->funcType->rt) {
+        func->funcType->rt = &LGS_VOID;
+    }
     visitStmtsBlock(func->stmtsBlock);
     if (func->funcType->isVariadic && func->funcType->hasDefaults) {
         errHandler.addError(E10043, &func->location);
@@ -773,12 +776,12 @@ void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent) {
         errHandler.addError(E10005, &methodCall->location, {name, parent->type->pname()});
         return;
     }
-    if (parent->asTypeExpr()) {
-        errHandler.addError(E10083, &methodCall->location, {methodCall->func->funcType->pname()});
-    } else {
+    if (parent->asTypeExpr() && method->funcType->isMethod) {
+        errHandler.addError(E10083, &methodCall->location, {method->funcType->pname()});
+    } else if (method->funcType->isMethod) {
         methodCall->args.insert(methodCall->args.begin(), parent);
     }
-    completeFuncCallType(methodCall, method->funcType);
+    method->completeType(method->funcType);
     if (methodCall->equals(method->funcType)) {
         methodCall->func = method;
         methodCall->setType(method->funcType->rt);
@@ -797,7 +800,7 @@ void LgsSema::visitFuncCall(LgsFuncCall* funcCall) {
     if (!symbol) return;
     if (symbol->symbolType == FUNC) {
         const auto func = symbol->func;
-        completeFuncCallType(funcCall, func->funcType);
+        funcCall->completeType(func->funcType);
         if (funcCall->equals(func->funcType)) {
             funcCall->func = func;
             funcCall->setType(func->funcType->rt);
@@ -809,7 +812,7 @@ void LgsSema::visitFuncCall(LgsFuncCall* funcCall) {
         if (symbol->symbolType == VAR_DEC) {
             type = symbol->varDec->type;
             const auto ft = symbol->varDec->type->asFuncType();
-            completeFuncCallType(funcCall, ft);
+            funcCall->completeType(ft);
             if (funcCall->equals(ft)) {
                 funcCall->ref.symbolType = VAR_DEC;
                 funcCall->ref.varDec = symbol->varDec;
@@ -820,7 +823,7 @@ void LgsSema::visitFuncCall(LgsFuncCall* funcCall) {
         } else if (symbol->symbolType == PARAM) {
             type = symbol->param->type;
             const auto ft = symbol->param->type->asFuncType();
-            completeFuncCallType(funcCall, ft);
+            funcCall->completeType(ft);
             if (funcCall->equals(ft)) {
                 funcCall->ref.symbolType = PARAM;
                 funcCall->ref.param = symbol->param;
@@ -1073,15 +1076,6 @@ bool LgsSema::resolveForeachVars(const LgsForeachLoop* foreachLoop) {
         foreachLoop->loopVars[0]->type = foreachLoop->loopVars[0]->expr->type;
     }
     return true;
-}
-
-void LgsSema::completeFuncCallType(const LgsFuncCall* funcCall, const LgsFuncType* funcType) {
-    for (size_t i = funcType->isMethod; i < funcType->params.size(); ++i) {
-        const auto param = funcType->params[i];
-        const auto arg = funcCall->args[i];
-        arg->completeType(param.type);
-        visitExpr(arg);
-    }
 }
 
 void LgsSema::validateObjImplements(LgsObject* obj, const std::vector<LgsType*>& interfaces) {

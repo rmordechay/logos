@@ -145,6 +145,8 @@ set(RUNTIME_SOURCES
     runtime/include/Lgs_Types.h
     runtime/lib/Lgs_arena.cpp
     runtime/include/Lgs_DArray.h
+    src/symbols/builtins/LgsMock.cpp
+    include/symbols/builtins/LgsMock.h
 )
 
 add_library(lgs_core SHARED ${CORE_SOURCES} ${RUNTIME_SOURCES})

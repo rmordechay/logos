@@ -867,7 +867,7 @@ void LgsCodeGen::visitStrConst(LgsStrConst* strConst) const {
 }
 
 void LgsCodeGen::visitTypeExpr(LgsTypeExpr* typeExpr) {
-    assert(0);
+    std::cout << "" << std::endl;
 }
 
 void LgsCodeGen::visitIterIndex(LgsIterIndex* iterIndex) {

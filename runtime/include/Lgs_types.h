@@ -8,12 +8,15 @@ enum Lgs_RTType {
     RTT_STR,
     RTT_FLOAT,
     RTT_INT,
+    RTT_LONG,
+    RTT_SIZE,
     RTT_VEC2,
     RTT_VEC3,
     RTT_VEC4,
     RTT_SARRAY,
     RTT_DARRAY,
     RTT_OBJECT,
+    RTT_TYPE,
 };
 
 struct Lgs_vec2 {

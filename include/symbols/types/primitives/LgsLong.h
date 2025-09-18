@@ -11,6 +11,7 @@ public:
         isPrimitive = true;
         isNumber = true;
         isInt = true;
+        rtt = RTT_LONG;
     }
     Type* getIRType(LgsLLVMGen& cg) override;
     size_t getSizeBytes() override;

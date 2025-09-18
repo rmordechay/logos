@@ -31,13 +31,18 @@ void freeType(void* ptr, const Lgs_RTType type) {
     case RTT_VOID:
     case RTT_BOOL:
     case RTT_CHAR:
-    case RTT_STR:
     case RTT_FLOAT:
     case RTT_INT:
     case RTT_VEC2:
     case RTT_VEC3:
     case RTT_VEC4:
+    case RTT_LONG:
+    case RTT_SIZE:
+    case RTT_STR:
+        return;
     case RTT_SARRAY:
+    case RTT_TYPE:
+        break;
         assert(0);
     case RTT_OBJECT: {
         // std::free(ptr);

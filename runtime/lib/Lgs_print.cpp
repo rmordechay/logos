@@ -17,6 +17,16 @@ extern "C" void Lgs_print(const char* fmt, const Lgs_RTType rtt, const void* v) 
         printf(fmt, str);
         break;
     }
+    case RTT_LONG: {
+        const auto str = *static_cast<const int64_t*>(v);
+        printf(fmt, str);
+        break;
+    }
+    case RTT_SIZE: {
+        const auto str = *static_cast<const size_t*>(v);
+        printf(fmt, str);
+        break;
+    }
     case RTT_FLOAT: {
         const auto str = *static_cast<const float_t*>(v);
         printf(fmt, str);
@@ -42,16 +52,12 @@ extern "C" void Lgs_print(const char* fmt, const Lgs_RTType rtt, const void* v) 
         printf(fmt, vec->x, vec->y, vec->z, vec->w);
         break;
     }
-    case RTT_SARRAY: {
-        assert(0);
-    }
-    case RTT_DARRAY: {
-        assert(0);
-    }
+    case RTT_SARRAY:
+    case RTT_DARRAY:
     case RTT_OBJECT:
+    case RTT_TYPE:
         assert(0);
     case RTT_VOID:
-        break;
     case RTT_UNKNOWN:
         return;
     }
