@@ -57,7 +57,7 @@ void LgsCodeGen::generate(const LgsAppConfigs& appConfigs, TargetMachine& target
 
 void LgsCodeGen::visitMainFile(LgsMainFile* mainFile) {
     for (const auto object : mainFile->objects) {
-        visitObject(object);
+        object->getIRType(cg);
         for (const auto& [_, method] : object->methods) {
             visitFunc(method);
         }
@@ -72,7 +72,7 @@ void LgsCodeGen::visitMainFile(LgsMainFile* mainFile) {
 }
 
 void LgsCodeGen::visitObjFile(const LgsObjectFile* objFile) {
-    visitObject(objFile->obj);
+    objFile->obj->getIRType(cg);
     for (const auto& [_, method] : objFile->obj->methods) {
         visitFunc(method);
     }
@@ -114,49 +114,12 @@ void LgsCodeGen::visitFunc(LgsFunc* func) {
     stack.exitScope();
 }
 
-void LgsCodeGen::visitObject(LgsObject* obj) const {
-    if (obj->IRType) return;
-    std::vector<Type*> elementTypes;
-    elementTypes.reserve(obj->fields.size());
-    for (int i = 0; i < obj->fields.size(); ++i) {
-        const auto field = obj->fields[i];
-        field->position = i;
-        Type* fieldType;
-        const auto ptr = field->type->asObject() || field->type->asFuncType() || field->type->asInterface() || field->type->asDArray();
-        if (ptr) {
-            fieldType = cg.ptrTy();
-        } else {
-            fieldType = field->type->getIRType(cg);
-        }
-        elementTypes.push_back(fieldType);
-    }
-    obj->IRType = StructType::getTypeByName(cg.context, obj->name);
-    if (!obj->IRType) {
-        obj->IRType = StructType::create(cg.context, elementTypes, obj->name);
-    }
-    for (const auto& field : obj->fields) {
-        field->parentIRType = obj->IRType;
-    }
-}
-
-void LgsCodeGen::visitInterface(LgsInterface* interface) const {
-    if (interface->IRType) return;
-    interface->IRType = StructType::getTypeByName(cg.context, interface->name);
-    std::vector<Type*> elementTypes;
-    for (int i = 0; i < interface->methods.size(); ++i) {
-        elementTypes.emplace_back(cg.ptrTy());
-    }
-    if (!interface->IRType) {
-        interface->IRType = StructType::create(cg.context, elementTypes, interface->name);
-    }
-}
-
 void LgsCodeGen::visitGroup(LgsGroup* group) {
     assert(0);
 }
 
 void LgsCodeGen::visitField(LgsField* field) {
-    visitExpr(field->expr); // This should set up the source vector
+    visitExpr(field->expr);
     if (const auto vec = field->type->asVec()) {
         std::vector<int> mask(vec->dim);
         for (unsigned i = 0; i < vec->dim; i++) {
@@ -169,21 +132,23 @@ void LgsCodeGen::visitField(LgsField* field) {
         const auto newVec = cg.builder.CreateShuffleVector(l, UndefValue::get(field->parentIRType), maskRef);
         cg.builder.CreateStore(newVec, field->IRValue);
     } else {
+        assert(field->parentIRType && field->parentIRValue);
         field->IRValue = cg.builder.CreateStructGEP(field->parentIRType, field->parentIRValue, field->position);
     }
 }
 
 void LgsCodeGen::visitParam(LgsParam* param) {
     visitExpr(param->expr);
-    if (!param->isVariadic) return;
-    if (param->vaList) {
+    if (param->isVariadic) {
+        if (param->vaList) {
+            param->IRValue = param->vaList;
+            return;
+        }
+        param->vaList = cg.builder.CreateAlloca(cg.builder.getPtrTy());
+        const auto vaStart = Intrinsic::getDeclaration(cg.IRModule, Intrinsic::vastart, {cg.builder.getPtrTy()});
+        cg.builder.CreateCall(vaStart, {param->vaList});
         param->IRValue = param->vaList;
-        return;
     }
-    param->vaList = cg.builder.CreateAlloca(cg.builder.getPtrTy());
-    const auto vaStart = Intrinsic::getDeclaration(cg.IRModule, Intrinsic::vastart, {cg.builder.getPtrTy()});
-    cg.builder.CreateCall(vaStart, {param->vaList});
-    param->IRValue = param->vaList;
 }
 
 void LgsCodeGen::visitTest(const LgsTest* test) {
@@ -497,13 +462,15 @@ void LgsCodeGen::visitIOStmt(const LgsIOStmt* ioStmt) {
 }
 
 void LgsCodeGen::visitReturnStmt(LgsReturn* returnStmt) {
-    returnStmt->IRValue = returnStmt->expr ? getIRValue(returnStmt->expr) : nullptr;
+    visitExpr(returnStmt->expr);
+    returnStmt->IRValue = returnStmt->expr ? returnStmt->expr->IRValue : nullptr;
     const auto currentFunc = stack.currentFunc();
     if (currentFunc->needsCleanup()) {
         returnStmt->parentBlock = cg.builder.GetInsertBlock();
         const auto cleanupBlock = currentFunc->getCleanupBlock(cg);
         cg.builder.CreateBr(cleanupBlock);
     } else {
+        cg.callPopStack();
         if (currentFunc->funcType->rt->isVoid()) {
             cg.builder.CreateRetVoid();
         } else {
@@ -721,7 +688,6 @@ void LgsCodeGen::visitVectorExpr(LgsVectorExpr* vectorExpr) {
 }
 
 void LgsCodeGen::visitVariable(LgsVariable* variable) {
-    assert(variable->ref.symbolType != UNKNOWN);
     switch (variable->ref.symbolType) {
     case VAR_DEC:
         variable->IRValue = variable->ref.varDec->IRValue;
@@ -741,14 +707,14 @@ void LgsCodeGen::visitVariable(LgsVariable* variable) {
         if (variable->ref.field->type->asEnum()) {
             variable->IRValue = cg.getIRStr(variable->name);
         } else {
-            assert(variable->ref.field->IRValue);
-            variable->IRValue = variable->ref.field->loadIR(cg);
+            variable->IRValue = variable->ref.field->IRValue;
         }
         break;
     case INTERFACE:
     case GROUP:
-    case UNKNOWN:
         break;
+    case UNKNOWN:
+        assert(0);
     }
     assert(variable->IRValue);
 }
@@ -766,6 +732,7 @@ void LgsCodeGen::visitSelection(LgsSelection* selection) {
             const auto field = parentExpr->type->getField(var->name);
             field->parentIRValue = parentExpr->IRValue;
             field->parentIRType = parentExpr->type->getIRType(cg);
+            visitField(field);
             childExpr->IRValue = field->IRValue;
         } else if (const auto funcCall = childExpr->asFuncCall()) {
             visitFuncCall(funcCall);
@@ -780,7 +747,7 @@ void LgsCodeGen::visitSelection(LgsSelection* selection) {
 }
 
 void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
-    for (int i = 0; i < funcCall->args.size(); ++i) {
+    for (int i = funcCall->func->funcType->isMethod; i < funcCall->args.size(); ++i) {
         visitExpr(funcCall->args[i]);
     }
     if (funcCall->ref.symbolType == PARAM) {
@@ -847,6 +814,7 @@ void LgsCodeGen::createMapFunc(LgsFunc* func) {
     cg.builder.CreateBr(IRCondBlock);
 
     cg.startBlock(IRExitBlock, currentIRFunc);
+    cg.callPopStack();
     cg.builder.CreateRet(newArr->IRValue);
     currentIRFunc = originalFunc;
     cg.builder.restoreIP(cg.savedIP);
@@ -912,7 +880,6 @@ void LgsCodeGen::visitIterIndex(LgsIterIndex* iterIndex) {
 
 void LgsCodeGen::visitInstance(LgsInstance* instance) {
     if (instance->IRValue) return;
-    visitObject(instance->obj);
     const auto objIRType = instance->obj->getIRType(cg);
     if(instance->obj->singleton) {
         instance->IRValue = cg.createGlobal(objIRType, ConstantAggregateZero::get(objIRType), instance->obj->name);
@@ -929,10 +896,10 @@ void LgsCodeGen::initFields(LgsInstance* instance) {
     std::unordered_set<std::string> visited;
     for (const auto& [argName, arg] : instance->args) {
         visited.insert(argName);
-        const auto exprIR = arg->expr->IRValue;
+        const auto exprIR = getIRValue(arg->expr);
         const auto field = instance->obj->getField(argName);
-        visitField(field);
         field->parentIRValue = instance->IRValue;
+        visitField(field);
         cg.builder.CreateStore(exprIR, field->IRValue);
     }
 
@@ -984,7 +951,22 @@ void LgsCodeGen::createEpilogue(LgsFunc* func) {
                 }
             }
             cg.callFuncCleanup();
+            cg.callPopStack();
             cg.builder.CreateRet(getIRValue(func->returnStmts.front()));
+        } else {
+            PHINode *phi = nullptr;
+            if (!func->funcType->rt->isVoid()) {
+                phi = cg.builder.CreatePHI(cg.ptrTy(), func->returnStmts.size());
+            }
+            for (const auto stmt : func->returnStmts) {
+                const auto retVal = getIRValue(stmt);
+                if (phi) {
+                    phi->addIncoming(retVal, stmt->parentBlock);
+                }
+            }
+            cg.callPopStack();
+            cg.callFuncCleanup();
+            cg.builder.CreateRet(phi);
         }
     } else {
         cg.callPopStack();

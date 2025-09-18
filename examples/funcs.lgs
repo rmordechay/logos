@@ -1,10 +1,10 @@
 main() {
     arr: Int[]
     for 10 {
-        arr.add(for.i * 2)
+        arr.add(for.i)
     }
-    //for e in arr {
-    //    print(e)
-    //}
     a = arr.map(it -> it * 2)
+    for e in a {
+        print(e)
+    }
 }

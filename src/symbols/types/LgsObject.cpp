@@ -6,6 +6,28 @@
 #include "utils/LgsUtils.h"
 
 Type* LgsObject::getIRType(LgsLLVMGen& cg) {
+    if (IRType) return IRType;
+    std::vector<Type*> elementTypes;
+    elementTypes.reserve(fields.size());
+    for (int i = 0; i < fields.size(); ++i) {
+        const auto field = fields[i];
+        field->position = i;
+        Type* fieldType;
+        const auto ptr = field->type->asObject() || field->type->asFuncType() || field->type->asInterface() || field->type->asDArray();
+        if (ptr) {
+            fieldType = cg.ptrTy();
+        } else {
+            fieldType = field->type->getIRType(cg);
+        }
+        elementTypes.push_back(fieldType);
+    }
+    IRType = StructType::getTypeByName(cg.context, name);
+    if (!IRType) {
+        IRType = StructType::create(cg.context, elementTypes, name);
+    }
+    for (const auto& field : fields) {
+        field->parentIRType = IRType;
+    }
     return IRType;
 }
 
@@ -99,6 +121,7 @@ std::string LgsObject::pname() {
 }
 
 bool LgsObject::canCastTo(LgsType* other) {
+    if (other->getName() == LgsAny::name) return true;
     if (const auto otherInterface = other->asInterface()) {
         for (const auto objInterface : interfaces) {
             if (objInterface->getName() == otherInterface->name) {

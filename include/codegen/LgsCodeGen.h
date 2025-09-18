@@ -61,6 +61,7 @@ public:
     LgsStack stack;
     LgsLLVMGen& cg;
     Function* currentIRFunc = nullptr;
+    Function* mapFunc = nullptr;
 
     explicit LgsCodeGen(LgsFile& file) : file(file), cg(file.generator) {}
     void generate(const LgsAppConfigs& appConfigs, TargetMachine& targetMachine);
@@ -70,8 +71,6 @@ public:
     void visitTestFile(LgsTestFile* testFile);
     void visitMainFunc(LgsMainFunc* func);
     void visitFunc(LgsFunc* func);
-    void visitObject(LgsObject* obj) const;
-    void visitInterface(LgsInterface* interface) const;
     void visitGroup(LgsGroup* group);
     void visitField(LgsField* field);
     void visitParam(LgsParam* param);

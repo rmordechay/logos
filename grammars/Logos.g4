@@ -472,26 +472,26 @@ DEFER: 'defer';
 IO: 'io';
 OWNER: 'owner';
 
-VEC2: 'vec2';
-VEC3: 'vec3';
-VEC4: 'vec4';
-
+AND: 'and';
+OR: 'or';
+NOT: 'not';
+IN: 'in';
 IF: 'if';
 WHILE: 'while';
 ELSE: 'else';
 BREAK: 'break';
 CONTINUE: 'continue';
 RETURN: 'return';
+
 FOR: 'for';
 FOREVER: 'for.ever';
 FOR_IS_FIRST: 'for.isFirst';
 FOR_IS_LAST: 'for.isLast';
 FOR_I: 'for.i';
 
-AND: 'and';
-OR: 'or';
-NOT: 'not';
-IN: 'in';
+VEC2: 'vec2';
+VEC3: 'vec3';
+VEC4: 'vec4';
 
 LONG: [0-9][0-9_]*'L';
 INTEGER: [0-9][0-9_]*;

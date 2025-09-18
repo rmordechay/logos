@@ -11,28 +11,6 @@
 Value* LgsFunc::call(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
     if (fn) return fn(cg, args);
     std::vector<Value*> IRArgs;
-    setIRArgs(cg, args, IRArgs);
-    return callIR(cg, IRArgs);
-}
-
-Value* LgsFunc::callIR(LgsLLVMGen& cg, const std::vector<Value*>& args) {
-    CallInst* rv = nullptr;
-    if (IRValue) {
-        const auto funcTypeIR = funcType->getIRType(cg);
-        const auto IRFuncType = llvm::cast<FunctionType>(funcTypeIR);
-        rv = cg.builder.CreateCall(IRFuncType, IRValue, args);
-    } else {
-        const auto IRFunc = getIRFunc(cg);
-        rv = cg.builder.CreateCall(IRFunc, args);
-    }
-    return rv;
-}
-
-Value* LgsFunc::loadIR(LgsLLVMGen& cg) {
-    return IRValue;
-}
-
-void LgsFunc::setIRArgs(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args, std::vector<Value*>& IRArgs) {
     const auto f = getIRFunc(cg);
     for (int i = 0; i < args.size(); ++i) {
         auto arg = args[i];
@@ -56,6 +34,24 @@ void LgsFunc::setIRArgs(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args, std::
             IRArgs.emplace_back(param.expr->IRValue);
         }
     }
+    return callIR(cg, IRArgs);
+}
+
+Value* LgsFunc::callIR(LgsLLVMGen& cg, const std::vector<Value*>& args) {
+    CallInst* rv = nullptr;
+    if (IRValue) {
+        const auto funcTypeIR = funcType->getIRType(cg);
+        const auto IRFuncType = llvm::cast<FunctionType>(funcTypeIR);
+        rv = cg.builder.CreateCall(IRFuncType, IRValue, args);
+    } else {
+        const auto IRFunc = getIRFunc(cg);
+        rv = cg.builder.CreateCall(IRFunc, args);
+    }
+    return rv;
+}
+
+Value* LgsFunc::loadIR(LgsLLVMGen& cg) {
+    return IRValue;
 }
 
 Function* LgsFunc::getIRFunc(LgsLLVMGen& cg) {

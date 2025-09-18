@@ -30,7 +30,6 @@ public:
     virtual Value* call(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args);
     Value* callIR(LgsLLVMGen& cg, const std::vector<Value*>& args = {});
     Value* loadIR(LgsLLVMGen& cg) override;
-    void setIRArgs(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args, std::vector<Value*>& IRArgs);
     void initFunc(const std::string& name, LgsType* rt, const std::vector<LgsType*>& paramTypes, uint32_t ops);
     void setDebugValue(LgsLLVMGen& cg) override;
     void completeType(LgsType* toType) override;

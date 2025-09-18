@@ -5,6 +5,8 @@
 #include "types/LgsPtr.h"
 #include "types/primitives/LgsDouble.h"
 #include "types/primitives/LgsFloat.h"
+#include "types/primitives/LgsSize.h"
+
 #include <llvm/IR/DIBuilder.h>
 
 size_t LgsInt::getSizeBytes() {
@@ -23,6 +25,7 @@ bool LgsInt::canCastTo(LgsType* other) {
     const auto otherName = other->getName();
     if (name == otherName) return true;
     if (otherName == LgsAny::name) return true;
+    if (otherName == LgsSize::name) return true;
     if (otherName == LgsFloat::name) return true;
     if (otherName == LgsDouble::name) return true;
     return false;

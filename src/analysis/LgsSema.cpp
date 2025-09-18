@@ -1066,7 +1066,8 @@ bool LgsSema::resolveForeachVars(const LgsForeachLoop* foreachLoop) {
         foreachLoop->loopVars[0]->type = pair->key;
         foreachLoop->loopVars[1]->type = pair->value;
     } else {
-        const auto iterIndex = new LgsIterIndex(foreachLoop->iterExpr, new LgsIndex{.from = iterable->baseType->getZeroValue()});
+        const auto iterIndex = new LgsIterIndex(foreachLoop->iterExpr, new LgsIndex{.from = LGS_SIZE.getZeroValue()});
+        iterIndex->location = foreachLoop->iterExpr->location;
         visitIterIndex(iterIndex);
         foreachLoop->loopVars[0]->expr = iterIndex;
         foreachLoop->loopVars[0]->type = foreachLoop->loopVars[0]->expr->type;

@@ -1,5 +1,6 @@
 #include "types/primitives/LgsSize.h"
 
+#include "exprs/constants/LgsIntConst.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsLong.h"
@@ -25,7 +26,7 @@ std::string LgsSize::pname() {
 }
 
 LgsExpr* LgsSize::getZeroValue() {
-    assert(0);
+    return new LgsIntConst(this, 0);
 }
 
 bool LgsSize::canCastTo(LgsType* other) {
