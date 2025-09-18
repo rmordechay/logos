@@ -16,7 +16,7 @@ Value* LgsFunc::call(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
         auto arg = args[i];
         const auto& param = funcType->params[i];
         Value* v = nullptr;
-        if (!param.isSelf) {
+        if (!param.isSelf && !arg->type->equals(param.type)) {
             arg = arg->castTo(param.type);
         }
         if (!param.isSelf && f->getArg(i)->getType()->isPointerTy()) {
@@ -27,7 +27,7 @@ Value* LgsFunc::call(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
         IRArgs.emplace_back(v);
     }
 
-    if (funcType->hasDefaults) {
+    if (funcType->hasDefaults()) {
         const auto diff = funcType->params.size() - args.size();
         for (int i = diff - 1; i < funcType->params.size(); ++i) {
             const auto& param = funcType->params[i];

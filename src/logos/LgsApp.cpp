@@ -3,6 +3,7 @@
 #include <llvm/IR/Module.h>
 #include "analysis/LgsParserAdapter.h"
 #include "analysis/LgsSema.h"
+#include "builtins/LgsTest.h"
 #include "logos/LgsPaths.h"
 #include "utils/ThreadPool.h"
 #include "builtins/LgsPrint.h"
@@ -108,6 +109,7 @@ void LgsApp::execute() {
 void LgsApp::loadBuiltins() {
     globals.addSymbol(LgsSymbol(new LgsPrint(), false, true), &errHandler);
     globals.addSymbol(LgsSymbol(new LgsSystem(), false, true), &errHandler);
+    globals.addSymbol(LgsSymbol(new LgsTest(), false, true), &errHandler);
 }
 
 void LgsApp::loadEnvFiles() {

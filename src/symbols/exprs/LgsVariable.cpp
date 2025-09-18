@@ -18,6 +18,18 @@ Value* LgsVariable::loadIR(LgsLLVMGen& cg) {
     }
 }
 
+bool LgsVariable::equals(LgsExpr* other) {
+    const auto otherVar = other->asVariable();
+    if (!otherVar) return false;
+    switch (ref.symbolType) {
+    case VAR_DEC:
+        return ref.varDec->name == otherVar->name;
+    default:
+        break;
+    }
+    assert(0);
+}
+
 void LgsVariable::assign(LgsLLVMGen& cg, LgsExpr* expr) {
     if (owner) freeOwner(cg);
     IRValue = expr->IRValue;

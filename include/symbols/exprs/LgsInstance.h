@@ -15,5 +15,6 @@ public:
     void setVirtuals(LgsLLVMGen& cg) const;
     json::value asJSON() override;
     std::string pname() override;
+    bool equals(LgsExpr* other) override;
     ~LgsInstance() override;
 };

@@ -2,9 +2,7 @@
 #include "Lgs_types.h"
 #include "data/LgsErrors.h"
 #include "exprs/LgsBinaryExpr.h"
-#include "symbols/LgsAssignable.h"
 
-class LgsSize;
 
 namespace llvm {
     class DIBasicType;
@@ -12,6 +10,7 @@ namespace llvm {
     class Type;
 }
 
+class LgsSize;
 class LgsPtr;
 class LgsDouble;
 class LgsFloat;
@@ -80,7 +79,6 @@ public:
     virtual Value* subIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
     virtual Value* mulIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
     virtual Value* divIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
-    virtual Value* inIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
     virtual Value* modIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
     virtual Value* eqIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
     virtual Value* neIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
@@ -88,6 +86,7 @@ public:
     virtual Value* gtIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
     virtual Value* geIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
     virtual Value* leIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
+    virtual Value* inIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
     virtual Value* andIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
     virtual Value* orIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
     virtual Value* bitAndIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);

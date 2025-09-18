@@ -45,6 +45,7 @@ std::string LgsSelection::pname() {
 }
 
 LgsExpr* LgsSelection::castTo(LgsType* toType) {
+    if (toType->getName() == LgsAny::name) return this;
     if (type->getName() == toType->getName()) return this;
     assert(0);
 }
@@ -52,6 +53,18 @@ LgsExpr* LgsSelection::castTo(LgsType* toType) {
 Value* LgsSelection::hash(LgsLLVMGen& cg) {
     const auto lgsExpr = lastExpr();
     return lgsExpr->hash(cg);
+}
+
+bool LgsSelection::equals(LgsExpr* other) {
+    const auto otherSelection = other->asSelection();
+    if (!otherSelection) return false;
+    if (exprs.size() != otherSelection->exprs.size()) return false;
+    for (int i = 0; i < exprs.size(); ++i) {
+        const auto expr = exprs[i];
+        const auto otherExpr = otherSelection->exprs[i];
+        if (!expr->equals(otherExpr)) return false;
+    }
+    return true;
 }
 
 json::value LgsSelection::asJSON() {

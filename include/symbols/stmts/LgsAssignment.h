@@ -1,13 +1,11 @@
 #pragma once
-#include "LgsAssignable.h"
 #include "LgsStmt.h"
-#include "LgsType.h"
+#include "exprs/LgsExpr.h"
 
 class LgsArrayExpr;
 class LgsHashMap;
 struct LgsIndex;
 class LgsIterIndex;
-class LgsExpr;
 class LgsType;
 
 class LgsAssignment final : public LgsStmt {

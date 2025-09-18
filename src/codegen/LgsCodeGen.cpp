@@ -1,4 +1,6 @@
 #include "codegen/LgsCodeGen.h"
+
+#include "builtins/LgsTest.h"
 #include "exprs/LgsArrayExpr.h"
 #include "funcs/LgsCoroutine.h"
 #include "files/LgsInterfaceFile.h"
@@ -84,12 +86,12 @@ void LgsCodeGen::visitInterfaceFile(const LgsInterfaceFile* interfaceFile) {
     }
 }
 
-void LgsCodeGen::visitTestFile(LgsTestFile* testFile) {
+void LgsCodeGen::visitTestFile(const LgsTestFile* testFile) {
     for (const auto& func : testFile->funcs) {
         visitFunc(func);
     }
     for (const auto& test : testFile->tests) {
-        visitTest(test);
+        visitFunc(test);
     }
 }
 
@@ -148,10 +150,6 @@ void LgsCodeGen::visitParam(LgsParam* param) {
         cg.builder.CreateCall(vaStart, {param->vaList});
         param->IRValue = param->vaList;
     }
-}
-
-void LgsCodeGen::visitTest(const LgsTest* test) {
-    visitFunc(test->func);
 }
 
 void LgsCodeGen::visitStmt(LgsStmt* stmt) {
@@ -521,6 +519,7 @@ void LgsCodeGen::visitExpr(LgsExpr* expr) {
     if (const auto binaryExpr = dynamic_cast<LgsBinaryExpr*>(expr)) {
         visitBinaryExpr(binaryExpr);
     } else {
+        if (checkMock(expr)) return;
         if (const auto func = expr->asFunc()) return visitLambda(func);
         if (const auto instance = expr->asInstance()) return visitInstance(instance);
         if (const auto funcCall = expr->asFuncCall()) return visitFuncCall(funcCall);
@@ -536,7 +535,6 @@ void LgsCodeGen::visitExpr(LgsExpr* expr) {
         if (const auto intConst = expr->asIntConst()) return visitIntConst(intConst);
         if (const auto floatConst = expr->asFloatConst()) return visitFloatConst(floatConst);
         if (const auto loopMetaVar = expr->asLoopMetaVar()) return visitLoopMetaVar(loopMetaVar);
-        if (const auto typeExpr = expr->asTypeExpr()) return visitTypeExpr(typeExpr);
         if (const auto cast = expr->asCast()) return visitCast(cast);
     }
 }
@@ -725,23 +723,28 @@ void LgsCodeGen::visitSelection(LgsSelection* selection) {
     }
     visitExpr(selection->exprs.front());
     for (int i = 0; i < selection->exprs.size() - 1; ++i) {
-        const auto parentExpr = selection->exprs[i];
-        const auto childExpr = selection->exprs[i + 1];
-        if (const auto var = childExpr->asVariable()) {
-            const auto field = parentExpr->type->getField(var->name);
-            field->parentIRValue = parentExpr->IRValue;
-            field->parentIRType = parentExpr->type->getIRType(cg);
+        const auto parent = selection->exprs[i];
+        const auto child = selection->exprs[i + 1];
+        if (const auto var = child->asVariable()) {
+            const auto field = parent->type->getField(var->name);
+            field->parentIRValue = parent->IRValue;
+            field->parentIRType = parent->type->getIRType(cg);
             visitField(field);
-            childExpr->IRValue = field->IRValue;
-        } else if (const auto funcCall = childExpr->asFuncCall()) {
-            visitFuncCall(funcCall);
-        } else if (const auto iterIndex = childExpr->asIterIndex()) {
+            child->IRValue = field->IRValue;
+        } else if (const auto methodCall = child->asFuncCall()) {
+            if (stack.currentFunc()->isTest && parent->type->getName() == LgsTest::name && methodCall->name == "mock") {
+                continue;
+            }
+            visitFuncCall(methodCall);
+        } else if (const auto iterIndex = child->asIterIndex()) {
             visitIterIndex(iterIndex);
         } else {
             assert(0);
         }
     }
-    assert(selection->lastExpr()->IRValue);
+    if (!selection->type->isVoid()) {
+        assert(selection->lastExpr()->IRValue);
+    }
     selection->IRValue = selection->lastExpr()->IRValue;
 }
 
@@ -756,7 +759,7 @@ void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
         return;
     }
     const auto ft = funcCall->func->funcType;
-    if (ft->hasDefaults) {
+    if (ft->hasDefaults()) {
         const auto diff = ft->params.size() - funcCall->args.size();
         for (int i = diff - 1; i < ft->params.size(); ++i) {
             visitExpr(ft->params[i].expr);
@@ -866,10 +869,6 @@ void LgsCodeGen::visitStrConst(LgsStrConst* strConst) const {
     strConst->IRValue = cg.getIRStr(strConst->value);
 }
 
-void LgsCodeGen::visitTypeExpr(LgsTypeExpr* typeExpr) {
-    std::cout << "" << std::endl;
-}
-
 void LgsCodeGen::visitIterIndex(LgsIterIndex* iterIndex) {
     visitExpr(iterIndex->baseExpr);
     visitExpr(iterIndex->index->from);
@@ -911,6 +910,19 @@ void LgsCodeGen::initFields(LgsInstance* instance) {
     }
 }
 
+bool LgsCodeGen::checkMock(LgsExpr* expr) {
+    const auto currentFunc = stack.currentFunc();
+    if (currentFunc->isTest) {
+        for (auto [when, then] : currentFunc->mocks) {
+            if (when->equals(expr)) {
+                expr->IRValue = then->IRValue;
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 void LgsCodeGen::initMainArgs(LgsMainFunc* mainFunc) {
     auto& builder = cg.builder;
     const std::vector<Type*> structFields{cg.i64Ty(), cg.i32Ty(), cg.i32Ty(), cg.ptrTy()};
@@ -921,6 +933,9 @@ void LgsCodeGen::initMainArgs(LgsMainFunc* mainFunc) {
 }
 
 void LgsCodeGen::createPrologue(LgsFunc* func) {
+    for (auto [_, then] : func->mocks) {
+        visitExpr(then);
+    }
     currentIRFunc = func->getIRFunc(cg);
     currentIRFunc->setLinkage(func->funcType->isPublic ? GlobalValue::ExternalLinkage : GlobalValue::PrivateLinkage);
     const auto entryBlock = cg.createBlock(BLOCK_NAME_ENTRY, currentIRFunc);

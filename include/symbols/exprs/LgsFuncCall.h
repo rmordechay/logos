@@ -15,6 +15,7 @@ public:
     LgsSymbol ref;
 
     explicit LgsFuncCall(const std::string& name, const std::vector<LgsExpr*>& args = {}) : name(name), args(args) {}
+    bool equals(LgsExpr* other) override;
     bool equals(const LgsFuncType* other) const;
     bool equalsVariadic(const LgsFuncType* funcType) const;
     bool equalsDefaultParams(const LgsFuncType* funcType) const;

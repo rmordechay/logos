@@ -1,5 +1,6 @@
 #include "exprs/constants/LgsIntConst.h"
 #include "exprs/constants/LgsFloatConst.h"
+#include "types/LgsAny.h"
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsDouble.h"
 #include "types/primitives/LgsFloat.h"
@@ -10,6 +11,7 @@ Value* LgsIntConst::loadIR(LgsLLVMGen& cg) {
 }
 
 LgsExpr* LgsIntConst::castTo(LgsType* toType) {
+    if (toType->getName() == LgsAny::name) return this;
     if (type->getName() == toType->getName()) return this;
     if (toType->asLong()) {
         return new LgsIntConst(&LGS_LONG, value);

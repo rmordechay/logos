@@ -9,7 +9,7 @@ public:
         isPrimitive = true;
     }
     size_t getSizeBytes() override;
-    llvm::Type* getIRType(LgsLLVMGen& cg) override;
+    Type* getIRType(LgsLLVMGen& cg) override;
     std::string getName() override;
     LgsExpr* getZeroValue() override;
     std::string pname() override;

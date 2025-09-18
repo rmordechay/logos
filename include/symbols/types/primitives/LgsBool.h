@@ -15,7 +15,18 @@ public:
     }
     std::string pname() override;
     json::value asJSON() override;
-    llvm::Type* getIRType(LgsLLVMGen& cg) override;
+    Type* getIRType(LgsLLVMGen& cg) override;
+    Value* addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
+    Value* subIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
+    Value* mulIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
+    Value* divIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
+    Value* modIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
+    Value* eqIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
+    Value* neIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
+    Value* ltIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
+    Value* gtIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
+    Value* geIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
+    Value* leIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
     std::string getName() override;
     LgsExpr* getZeroValue() override;
     std::string strFormatPart() const override;

@@ -1,15 +1,21 @@
 #include "exprs/LgsFuncCall.h"
 #include "data/LgsDefinitions.h"
 #include "exprs/LgsHashMap.h"
+#include "exprs/LgsVariable.h"
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
-#include "stmts/LgsVarDec.h"
 #include "types/LgsObject.h"
 
+bool LgsFuncCall::equals(LgsExpr* other) {
+    const auto otherFuncCall = other->asFuncCall();
+    if (!otherFuncCall) return false;
+    return name == otherFuncCall->name;
+}
+
 bool LgsFuncCall::equals(const LgsFuncType* other) const {
-    if (other->hasDefaults) return equalsDefaultParams(other);
+    if (other->hasDefaults()) return equalsDefaultParams(other);
     if (other->isVariadic) return equalsVariadic(other);
-    for (size_t i = isMethodCall; i < other->params.size(); ++i) {
+    for (size_t i = 0; i < other->params.size(); ++i) {
         const auto arg = args[i];
         const auto param = other->params[i];
         const auto argType = arg->type;
@@ -48,16 +54,14 @@ void LgsFuncCall::completeType(LgsType* toType) {
     const auto otherFuncType = toType->asFuncType();
     if (!otherFuncType) return;
     for (size_t i = otherFuncType->isMethod; i < otherFuncType->params.size(); ++i) {
-        const auto param = otherFuncType->params[i];
-        const auto arg = args[i];
-        arg->completeType(param.type);
+        args[i]->completeType(otherFuncType->params[i].type);
     }
 }
 
 std::string LgsFuncCall::pname() {
     std::stringstream str;
     str << name << '(';
-    for (size_t i = isMethodCall; i < args.size(); ++i) {
+    for (size_t i = 0; i < args.size(); ++i) {
         const auto arg = args[i];
         if (arg->owner) {
             str << "owner ";

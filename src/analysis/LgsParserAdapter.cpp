@@ -39,7 +39,6 @@
 #include "stmts/LgsIOStmt.h"
 #include "stmts/LgsIfStmt.h"
 #include "stmts/LgsVarDec.h"
-#include "test/LgsTest.h"
 #include "types/iterables/LgsDArray.h"
 #include "types/LgsGroup.h"
 #include "types/LgsInterface.h"
@@ -58,7 +57,6 @@
 #include <stmts/LgsDeferStmt.h>
 #include <types/iterables/LgsStr.h>
 #include <types/LgsVoid.h>
-#include <../../include/symbols/test/LgsMock.h>
 
 LgsFile* LgsParserAdapter::parseFile(const std::string& codeText, const fs::path& filePath) {
     antlr4::ANTLRInputStream input(codeText);
@@ -165,7 +163,7 @@ LgsFile* LgsParserAdapter::getTestFile(LogosParser::TestFileContext* ctx, const 
         const auto lgsFunc = getFunc(func);
         if (startsWith(lgsFunc->funcType->name, "test")) {
             lgsFunc->isTest = true;
-            file->tests.push_back(new LgsTest(lgsFunc));
+            file->tests.push_back(lgsFunc);
         } else {
             file->funcs.push_back(lgsFunc);
         }
@@ -438,8 +436,6 @@ LgsParam LgsParserAdapter::getParam(LgsFuncType* funcType, LogosParser::ParamCon
     if (ctx->TRIPLE_DOT()) {
         lgsParam.isVariadic = true;
         funcType->isVariadic = true;
-    } else if (lgsParam.expr) {
-        funcType->hasDefaults = true;
     }
     return lgsParam;
 }

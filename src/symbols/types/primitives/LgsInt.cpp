@@ -66,10 +66,6 @@ Value* LgsInt::divIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     return cg.builder.CreateUDiv(l, r);
 }
 
-Value* LgsInt::inIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    assert(0);
-}
-
 Value* LgsInt::modIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     auto [l, r] = self->loadOperands(cg, other);
     return cg.builder.CreateSRem(l, r);
@@ -105,6 +101,10 @@ Value* LgsInt::leIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     return cg.builder.CreateICmpSLE(l, r);
 }
 
+Value* LgsInt::inIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    assert(0);
+}
+
 Value* LgsInt::andIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     assert(0);
 }
@@ -137,7 +137,6 @@ Value* LgsInt::rshiftIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     auto [l, r] = self->loadOperands(cg, other);
     return cg.builder.CreateLShr(l, r);
 }
-
 
 std::string LgsInt::strFormatPart() const {
     return "%d";

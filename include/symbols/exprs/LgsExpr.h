@@ -1,6 +1,4 @@
 #pragma once
-#include "LgsAssignable.h"
-
 #include <stmts/LgsStmt.h>
 #include "LgsValue.h"
 
@@ -30,6 +28,20 @@ class LgsTypeConst;
 
 using namespace llvm;
 
+enum LgsAssignType {
+    ASSIGN,
+    ASSIGN_ADD,
+    ASSIGN_SUB,
+    ASSIGN_MUL,
+    ASSIGN_DIV,
+    ASSIGN_MOD,
+    ASSIGN_AND,
+    ASSIGN_OR,
+    ASSIGN_XOR,
+    ASSIGN_LSHIFT,
+    ASSIGN_RSHIFT,
+};
+
 class LgsExpr : virtual public LgsStmt {
 public:
     LgsType* type = nullptr;
@@ -47,13 +59,13 @@ public:
     virtual void assign(LgsLLVMGen& cg, LgsExpr* expr);
     virtual bool canAssignTo(LgsType* other, LgsAssignType op);
     virtual Value* getIRPtrTo(LgsLLVMGen& cg) const;
+    virtual bool equals(LgsExpr* other);
 
     void freeOwner(LgsLLVMGen& cg);
     size_t getConstInt();
     std::string getConstStr();
     LgsIterator toIterator();
     void setType(LgsType* newType);
-    bool equals(const LgsExpr* other);
     std::pair<Value*, Value*> loadOperands(LgsLLVMGen& cg, LgsExpr* other);
 
     LgsFunc* asFunc();

@@ -17,6 +17,7 @@ public:
     std::vector<LgsExpr*> orphans;
     std::vector<LgsReturn*> returnStmts;
     BasicBlock* cleanupBlock = nullptr;
+    std::vector<std::pair<LgsExpr*, LgsExpr*>> mocks;
     bool hasDefers = false;
     bool isTest = false;
     bool isLambda = false;

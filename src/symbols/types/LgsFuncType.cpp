@@ -10,7 +10,6 @@ void LgsFuncType::setFuncOptions(const uint32_t ops) {
     isVariadic = ops & VARIADIC;
     isOptional = ops & OPTIONAL;
     isTerminator = ops & TERMINATOR;
-    hasDefaults = ops & HAS_DEFAULTS;
     isMethod = ops & METHOD;
 }
 
@@ -79,6 +78,35 @@ std::string LgsFuncType::pname() {
     return str.str();
 }
 
+json::value LgsFuncType::asJSON() {
+    json::object jsonObj;
+    jsonObj["name"] = name;
+    jsonObj["rt"] = rt->asJSON();
+    json::array jsonParams;
+    for (auto& param : params) {
+        jsonParams.emplace_back(param.asJSON());
+    }
+    jsonObj["params"] = jsonParams;
+    jsonObj["isPublic"] = isPublic;
+    jsonObj["isInternal"] = isBuiltin;
+    jsonObj["isVirtual"] = isVirtual;
+    jsonObj["isVariadic"] = isVariadic;
+    jsonObj["isOptional"] = isOptional;
+    jsonObj["isTerminator"] = isTerminator;
+    jsonObj["isMethod"] = isMethod;
+    jsonObj["hasDefaults"] = hasDefaults();
+    return jsonObj;
+}
+
+bool LgsFuncType::isTypeComplete() const {
+    if (name == LGS_MAIN_FUNC_NAME) return true;
+    if (!rt || rt->isUnknown) return false;
+    for (const auto & param : params) {
+        if (!param.type || param.type->isUnknown) return false;
+    }
+    return true;
+}
+
 std::string LgsFuncType::strFormatPart() const {
     return "%p";
 }
@@ -117,37 +145,14 @@ LgsType* LgsFuncType::clone() {
     copy->isOptional = isOptional;
     copy->isTerminator = isTerminator;
     copy->isIO = isIO;
-    copy->hasDefaults = hasDefaults;
     return copy;
 }
 
-json::value LgsFuncType::asJSON() {
-    json::object jsonObj;
-    jsonObj["name"] = name;
-    jsonObj["rt"] = rt->asJSON();
-    json::array jsonParams;
-    for (auto& param : params) {
-        jsonParams.emplace_back(param.asJSON());
+bool LgsFuncType::hasDefaults() const {
+    for (const auto& param : params) {
+        if (param.expr) return true;
     }
-    jsonObj["params"] = jsonParams;
-    jsonObj["isPublic"] = isPublic;
-    jsonObj["isInternal"] = isBuiltin;
-    jsonObj["isVirtual"] = isVirtual;
-    jsonObj["isVariadic"] = isVariadic;
-    jsonObj["isOptional"] = isOptional;
-    jsonObj["isTerminator"] = isTerminator;
-    jsonObj["isMethod"] = isMethod;
-    jsonObj["hasDefaults"] = hasDefaults;
-    return jsonObj;
-}
-
-bool LgsFuncType::isTypeComplete() const {
-    if (name == LGS_MAIN_FUNC_NAME) return true;
-    if (!rt || rt->isUnknown) return false;
-    for (const auto & param : params) {
-        if (!param.type || param.type->isUnknown) return false;
-    }
-    return true;
+    return false;
 }
 
 LgsFuncType::~LgsFuncType() {

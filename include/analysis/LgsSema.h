@@ -1,5 +1,4 @@
 #pragma once
-#include "../symbols/test/LgsMock.h"
 #include "exprs/LgsVectorExpr.h"
 #include "logos/LgsStack.h"
 #include "utils/LgsErrHandler.h"
@@ -10,7 +9,6 @@
 
 #include <vector>
 
-class LgsTest;
 class LgsInterfaceFile;
 class LgsObjectFile;
 class LgsPostfixExpr;
@@ -73,7 +71,6 @@ public:
     void visitLambda(LgsFunc* lambda);
     void visitParam(LgsParam* param);
     void visitIOPair(LgsIOPair* ioPair, LgsObject* obj);
-    void visitTest(const LgsTest* test);
     void visitStmt(LgsStmt* stmt);
     void visitStmtsBlock(LgsStmtsBlock* stmtsBlock);
     void visitVarDec(LgsVarDec* varDec);
@@ -132,7 +129,6 @@ public:
     bool validateMethodVisibility(const LgsFuncCall* methodCall, const LgsObject* parent);
     bool validateVecElements(const LgsVariable* fieldVar, LgsVec* vec);
     void validateTypeDuplicates(LgsType* type);
-    void validateMock(const LgsSelection* selection);
     static bool validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const LgsFunc* func);
 
     LgsSymbol* getSymbol(const std::string& name, const LgsLocation* location);

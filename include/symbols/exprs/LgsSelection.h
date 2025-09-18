@@ -13,6 +13,7 @@ public:
     std::string pname() override;
     LgsExpr* castTo(LgsType* toType) override;
     Value* hash(LgsLLVMGen& cg) override;
+    bool equals(LgsExpr* other) override;
     json::value asJSON() override;
     ~LgsSelection() override;
 };

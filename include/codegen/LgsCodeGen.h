@@ -2,7 +2,6 @@
 #include "LgsLLVMGen.h"
 #include "files/LgsFile.h"
 #include "logos/LgsStack.h"
-#include "test/LgsTest.h"
 
 class LgsMainFunc;
 class LgsInterfaceFile;
@@ -68,13 +67,12 @@ public:
     void visitMainFile(LgsMainFile* mainFile);
     void visitObjFile(const LgsObjectFile* objFile);
     void visitInterfaceFile(const LgsInterfaceFile* interfaceFile);
-    void visitTestFile(LgsTestFile* testFile);
+    void visitTestFile(const LgsTestFile* testFile);
     void visitMainFunc(LgsMainFunc* func);
     void visitFunc(LgsFunc* func);
     void visitGroup(LgsGroup* group);
     void visitField(LgsField* field);
     void visitParam(LgsParam* param);
-    void visitTest(const LgsTest* test);
     void visitStmt(LgsStmt* stmt);
     void visitStmtsBlock(const LgsStmtsBlock* stmtsBlock);
     void visitLoop(LgsForLoop* loop);
@@ -112,10 +110,10 @@ public:
     void visitPrefixExpr(LgsPrefixExpr* prefixExpr);
     void visitPostfixExpr(LgsPostfixExpr* postfixExpr);
     void visitStrConst(LgsStrConst* strConst) const;
-    void visitTypeExpr(LgsTypeExpr* typeExpr);
     void visitIterIndex(LgsIterIndex* iterIndex);
     void visitInstance(LgsInstance* instance);
     void initFields(LgsInstance* instance);
+    bool checkMock(LgsExpr* expr);
 
     // Funcs
     void initMainArgs(LgsMainFunc* mainFunc);

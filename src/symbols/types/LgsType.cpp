@@ -59,10 +59,6 @@ Value* LgsType::divIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsType::inIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    assert(0);
-}
-
 Value* LgsType::modIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     assert(0);
 }
@@ -88,6 +84,10 @@ Value* LgsType::geIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
 }
 
 Value* LgsType::leIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    assert(0);
+}
+
+Value* LgsType::inIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     assert(0);
 }
 

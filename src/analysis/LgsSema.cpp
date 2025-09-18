@@ -1,4 +1,6 @@
 #include "analysis/LgsSema.h"
+
+#include "builtins/LgsTest.h"
 #include "funcs/LgsCoroutine.h"
 #include "data/LgsErrors.h"
 #include "files/LgsInterfaceFile.h"
@@ -40,7 +42,6 @@
 #include "stmts/LgsAssignment.h"
 #include "stmts/LgsIOStmt.h"
 #include "stmts/LgsIfStmt.h"
-#include "test/LgsTest.h"
 #include "types/primitives/LgsDouble.h"
 
 void LgsSema::analyse() {
@@ -109,7 +110,7 @@ void LgsSema::visitTestFile(const LgsTestFile* testFile) {
         visitFunc(func);
     }
     for (const auto& test : testFile->tests) {
-        visitTest(test);
+        visitFunc(test);
     }
 }
 
@@ -139,7 +140,7 @@ void LgsSema::visitFunc(LgsFunc* func) {
         func->funcType->rt = &LGS_VOID;
     }
     visitStmtsBlock(func->stmtsBlock);
-    if (func->funcType->isVariadic && func->funcType->hasDefaults) {
+    if (func->funcType->isVariadic && func->funcType->hasDefaults()) {
         errHandler.addError(E10043, &func->location);
     }
     if (!validateBlockControlFlow(func->stmtsBlock, func)) {
@@ -186,10 +187,6 @@ void LgsSema::visitIOPair(LgsIOPair* ioPair, LgsObject* obj) {
     if (!ioPair->closeFunc) {
         errHandler.addError(E10005, &ioPair->closeFunc->location, {ioPair->closeFuncName, obj->pname()});
     }
-}
-
-void LgsSema::visitTest(const LgsTest* test) {
-    visitFunc(test->func);
 }
 
 void LgsSema::visitStmt(LgsStmt* stmt) {
@@ -696,7 +693,6 @@ void LgsSema::visitSelection(LgsSelection* selection) {
     selection->setType(selection->lastExpr()->type);
     selection->isMutable = selection->lastExpr()->isMutable;
     selection->owner = selection->lastExpr()->owner;
-    validateMock(selection);
 }
 
 void LgsSema::visitFirstSelection(LgsExpr* firstExpr) {
@@ -781,15 +777,23 @@ void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent) {
     } else if (method->funcType->isMethod) {
         methodCall->args.insert(methodCall->args.begin(), parent);
     }
-    method->completeType(method->funcType);
+    for (const auto arg : methodCall->args) {
+        visitExpr(arg);
+    }
+    methodCall->completeType(method->funcType);
     if (methodCall->equals(method->funcType)) {
         methodCall->func = method;
         methodCall->setType(method->funcType->rt);
     } else {
+        assert(!method->funcType->isBuiltin);
         errHandler.addError(E10034, &methodCall->location, {parent->type->pname(), name, methodCall->pname(), method->pname()});
         return;
     }
-    validateMethodVisibility(methodCall, parent->type->asObject());
+    if (!validateMethodVisibility(methodCall, parent->type->asObject())) return;
+    if (stack.currentFunc()->isTest && parent->type->getName() == LgsTest::name && methodCall->name == "mock") {
+        const auto pair = std::make_pair(methodCall->args[0], methodCall->args[1]);
+        stack.currentFunc()->mocks.push_back(pair);
+    }
 }
 
 void LgsSema::visitFuncCall(LgsFuncCall* funcCall) {
@@ -1272,6 +1276,7 @@ void LgsSema::validateTypeDuplicates(LgsType* type){
 }
 
 bool LgsSema::validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const LgsFunc* func) {
+    assert(func->funcType->rt);
     if (func->funcType->rt->isVoid()) return true;
     if (!stmtBlock) return true;
     if (stmtBlock->returnExpr) return true;
@@ -1293,19 +1298,6 @@ bool LgsSema::validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const Lgs
         }
     }
     return isValid;
-}
-
-void LgsSema::validateMock(const LgsSelection* selection) {
-    const auto currentFunc = stack.currentFunc();
-    if (selection->exprs.size() != 2) {
-        return;
-    }
-    const auto funcCall1 = selection->exprs[0]->asFuncCall();
-    const auto funcCall2 = selection->exprs[1]->asFuncCall();
-    if (funcCall1 && funcCall2 && funcCall1->name == "when" && funcCall2->name == "ret") {
-        auto mock = LgsMock(funcCall1->args.front(), funcCall2->args.front());
-        assert(0);
-    }
 }
 
 LgsSymbol* LgsSema::getSymbol(const std::string& name, const LgsLocation* location) {

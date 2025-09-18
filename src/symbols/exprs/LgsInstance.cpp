@@ -45,6 +45,12 @@ std::string LgsInstance::pname() {
     return obj->name;
 }
 
+bool LgsInstance::equals(LgsExpr* other) {
+    const auto otherInstance = other->asInstance();
+    if (!otherInstance) return false;
+    assert(0);
+}
+
 LgsInstance::~LgsInstance() {
     for (const auto [_, arg] : args) {
         delete arg;

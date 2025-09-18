@@ -11,12 +11,11 @@ enum LgsFuncFlags : uint32_t {
     BUILTIN = 1 << 1,
     VIRTUAL = 1 << 2,
     VARIADIC = 1 << 3,
-    LAMBDA = 1 << 4,
-    OPTIONAL = 1 << 5,
-    TERMINATOR = 1 << 6,
-    METHOD = 1 << 7,
-    IO = 1 << 8,
-    HAS_DEFAULTS = 1 << 9,
+    OPTIONAL = 1 << 4,
+    TERMINATOR = 1 << 5,
+    METHOD = 1 << 6,
+    IO = 1 << 7,
+    HAS_DEFAULTS = 1 << 8,
 };
 
 class LgsFuncType final : public LgsType {
@@ -35,7 +34,6 @@ public:
     bool isTerminator = false;
     bool isMethod = false;
     bool isIO = false;
-    bool hasDefaults = false;
     FunctionType* IRType = nullptr;
 
     LgsFuncType() = default;
@@ -51,5 +49,6 @@ public:
     std::string strFormatPart() const override;
     bool canCastTo(LgsType* other) override;
     LgsType* clone() override;
+    bool hasDefaults() const;
     ~LgsFuncType() override;
 };

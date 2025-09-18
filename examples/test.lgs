@@ -1,6 +1,0 @@
-test Test
-
-testSomething() {
-    obj = Obj{}
-    Test.when(obj.f()).then(5)
-}
