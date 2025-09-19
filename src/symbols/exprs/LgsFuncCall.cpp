@@ -22,7 +22,7 @@ bool LgsFuncCall::equals(const LgsFuncType* other) const {
         const auto paramType = param.type;
         if (!paramType || !argType) return false;
         if (arg->isNull && !paramType->isNullable()) return false;
-        if (!param.isOwner && arg->owner) return false;
+        if (param.isOwner != !!arg->owner) return false;
         if (!argType->canCastTo(paramType)) return false;
     }
     return true;
@@ -53,6 +53,7 @@ void LgsFuncCall::resolveVirtualFunc(LgsLLVMGen& cg) const {
 void LgsFuncCall::completeType(LgsType* toType) {
     const auto otherFuncType = toType->asFuncType();
     if (!otherFuncType) return;
+    if (args.size() != otherFuncType->params.size()) return;
     for (size_t i = otherFuncType->isMethod; i < otherFuncType->params.size(); ++i) {
         args[i]->completeType(otherFuncType->params[i].type);
     }

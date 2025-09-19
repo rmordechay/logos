@@ -11,9 +11,19 @@ void LgsErrHandler::addError(const LgsBaseError& lgsErr, const LgsLocation* loca
     std::string result;
     formatErrorMsg(lgsErr, args, result);
     if (location) {
-        errors.emplace_back(LgsError{.msg = result, .errCode = lgsErr.errCode, .location = *location});
+        errors.emplace_back(LgsError{.msg = result, .errCode = lgsErr.code, .location = *location});
     } else {
-        errors.emplace_back(LgsError{.msg = result, .errCode = lgsErr.errCode});
+        errors.emplace_back(LgsError{.msg = result, .errCode = lgsErr.code});
+    }
+}
+
+void LgsErrHandler::addWarning(const LgsBaseError& lgsErr, const LgsLocation* location, const std::vector<std::string>& args) {
+    std::string result;
+    formatErrorMsg(lgsErr, args, result);
+    if (location) {
+        warnings.emplace_back(LgsWarning{.msg = result, .errCode = lgsErr.code, .location = *location});
+    } else {
+        warnings.emplace_back(LgsWarning{.msg = result, .errCode = lgsErr.code});
     }
 }
 

@@ -11,7 +11,7 @@ TEST_CASE("TestSema10000") {
     app.parseSrcFile(code);
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10000, code));
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10000.errCode);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10000.code);
 }
 
 TEST_CASE("TestSema10002A") {
@@ -25,7 +25,7 @@ TEST_CASE("TestSema10002A") {
     app.parseSrcFile(code);
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10002, code));
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10002.errCode);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10002.code);
 }
 
 TEST_CASE("TestSema10002B") {
@@ -39,7 +39,7 @@ TEST_CASE("TestSema10002B") {
     app.parseSrcFile(code);
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10002, code));
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10002.errCode);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10002.code);
 }
 
 TEST_CASE("TestSema10003") {
@@ -53,7 +53,7 @@ TEST_CASE("TestSema10003") {
     app.parseSrcFile(code);
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10003, code));
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10003.errCode);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10003.code);
 }
 
 TEST_CASE("TestSema10004") {
@@ -67,7 +67,7 @@ TEST_CASE("TestSema10004") {
     app.parseSrcFile(code);
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10004, code));
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10004.errCode);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10004.code);
 }
 
 TEST_CASE("TestSema10005A") {
@@ -84,7 +84,7 @@ TEST_CASE("TestSema10005A") {
     app.parseSrcFile(code);
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10005, code));
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10005.errCode);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10005.code);
 }
 
 TEST_CASE("TestSema10005B") {
@@ -100,7 +100,7 @@ TEST_CASE("TestSema10005B") {
     app.parseSrcFile(code);
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10005, code));
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10005.errCode);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10005.code);
 }
 
 TEST_CASE("TestSema10006A") {
@@ -113,7 +113,7 @@ TEST_CASE("TestSema10006A") {
     app.parseSrcFile(code);
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10006, code));
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10006.errCode);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10006.code);
 }
 
 TEST_CASE("TestSema10006B") {
@@ -135,7 +135,7 @@ TEST_CASE("TestSema10006B") {
     app.parseSrcFile(code);
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10006, code));
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10006.errCode);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10006.code);
 }
 
 TEST_CASE("TestSema10011A") {
@@ -149,7 +149,7 @@ TEST_CASE("TestSema10011A") {
     app.parseSrcFile(code);
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10011, code));
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10011.errCode);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10011.code);
 }
 
 TEST_CASE("TestSema10011B") {
@@ -162,7 +162,7 @@ TEST_CASE("TestSema10011B") {
     app.parseSrcFile(code);
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10011, code));
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10011.errCode);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10011.code);
 }
 
 TEST_CASE("TestSema10013A") {
@@ -177,7 +177,7 @@ TEST_CASE("TestSema10013A") {
     app.parseSrcFile(code);
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10005, code));
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10005.errCode);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10005.code);
 }
 
 TEST_CASE("TestSema10013B") {
@@ -191,7 +191,7 @@ TEST_CASE("TestSema10013B") {
     app.parseSrcFile(code);
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10005, code));
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10005.errCode);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10005.code);
 }
 
 TEST_CASE("TestSema10014") {
@@ -206,7 +206,7 @@ TEST_CASE("TestSema10014") {
     app.parseSrcFile(code);
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10014, code));
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10014.errCode);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10014.code);
 }
 
 TEST_CASE("TestSema10015A") {
@@ -220,7 +220,7 @@ TEST_CASE("TestSema10015A") {
     app.parseSrcFile(code);
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10015, code));
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10015.errCode);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10015.code);
 }
 
 TEST_CASE("TestSema10015B") {
@@ -262,7 +262,7 @@ TEST_CASE("TestSema10016A") {
     app.parseSrcFile(code);
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10016, code));
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10016.errCode);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10016.code);
 }
 
 TEST_CASE("TestSema10016B") {
@@ -283,8 +283,8 @@ TEST_CASE("TestSema10016B") {
     app.parseSrcFile(code);
     app.analyse();
     CHECK_EQ(app.errHandler.errors.size(), 2);
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10016.errCode);
-    CHECK_EQ(app.errHandler.errors[1].errCode, E10016.errCode);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10016.code);
+    CHECK_EQ(app.errHandler.errors[1].errCode, E10016.code);
 }
 
 TEST_CASE("TestSema10017") {
@@ -297,7 +297,7 @@ TEST_CASE("TestSema10017") {
     app.parseSrcFile(code);
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10017, code));
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10017.errCode);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10017.code);
 }
 
 TEST_CASE("TestSema10022") {
@@ -311,7 +311,7 @@ TEST_CASE("TestSema10022") {
     app.parseSrcFile(code);
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10022, code));
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10022.errCode);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10022.code);
 }
 
 TEST_CASE("TestSema10023") {
@@ -324,7 +324,7 @@ TEST_CASE("TestSema10023") {
     app.parseSrcFile(code);
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10023, code));
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10023.errCode);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10023.code);
 }
 
 TEST_CASE("TestSema10024") {
@@ -337,7 +337,7 @@ TEST_CASE("TestSema10024") {
     app.parseSrcFile(code);
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10024, code));
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10024.errCode);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10024.code);
 }
 
 TEST_CASE("TestSema10025") {
@@ -351,7 +351,7 @@ TEST_CASE("TestSema10025") {
     app.parseSrcFile(code);
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10025, code));
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10025.errCode);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10025.code);
 }
 
 TEST_CASE("TestSema10026") {
@@ -363,7 +363,7 @@ TEST_CASE("TestSema10026") {
     app.parseSrcFile(code);
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10026, code));
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10026.errCode);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10026.code);
 }
 
 TEST_CASE("TestSema10027") {
@@ -378,7 +378,7 @@ TEST_CASE("TestSema10027") {
     app.parseSrcFile(code);
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10027, code));
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10027.errCode);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10027.code);
 }
 
 TEST_CASE("TestSema10028") {
@@ -390,7 +390,7 @@ TEST_CASE("TestSema10028") {
     app.parseSrcFile(code);
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10028, code));
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10028.errCode);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10028.code);
 }
 
 TEST_CASE("TestSema10030A") {
@@ -409,7 +409,7 @@ TEST_CASE("TestSema10030A") {
     app.parseSrcFile(code2);
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10030, code1));
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10030.errCode);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10030.code);
 }
 
 TEST_CASE("TestSema10030B") {
@@ -427,7 +427,7 @@ TEST_CASE("TestSema10030B") {
     app.parseSrcFile(code2);
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10030, code1));
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10030.errCode);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10030.code);
 }
 
 TEST_CASE("TestSema10031") {
@@ -446,7 +446,7 @@ TEST_CASE("TestSema10031") {
     app.parseSrcFile(code2);
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10031, code1));
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10031.errCode);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10031.code);
 }
 
 TEST_CASE("TestSema10032") {
@@ -462,7 +462,7 @@ TEST_CASE("TestSema10032") {
     app.parseSrcFile(code);
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10032, code));
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10032.errCode);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10032.code);
 }
 
 TEST_CASE("TestSema10038") {
@@ -475,7 +475,7 @@ TEST_CASE("TestSema10038") {
     app.parseSrcFile(code);
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10038, code));
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10038.errCode);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10038.code);
 }
 
 TEST_CASE("TestSema10042") {
@@ -489,7 +489,7 @@ TEST_CASE("TestSema10042") {
     app.parseSrcFile(code);
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10042, code));
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10042.errCode);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10042.code);
 }
 
 TEST_CASE("TestSema10046") {
@@ -505,7 +505,7 @@ TEST_CASE("TestSema10046") {
     app.parseSrcFile(code);
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10046, code));
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10046.errCode);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10046.code);
 }
 
 TEST_CASE("TestSema10048A") {
@@ -521,7 +521,7 @@ TEST_CASE("TestSema10048A") {
     app.parseSrcFile(code);
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10048, code));
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10048.errCode);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10048.code);
 }
 
 TEST_CASE("TestSema10048B") {
@@ -534,7 +534,7 @@ TEST_CASE("TestSema10048B") {
     app.parseSrcFile(code);
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10048, code));
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10048.errCode);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10048.code);
 }
 
 TEST_CASE("TestSema10055") {
@@ -546,7 +546,7 @@ TEST_CASE("TestSema10055") {
     app.parseSrcFile(code);
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10055, code));
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10055.errCode);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10055.code);
 }
 
 TEST_CASE("TestSema10056A") {
@@ -561,7 +561,7 @@ TEST_CASE("TestSema10056A") {
     app.parseSrcFile(code);
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10056, code));
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10056.errCode);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10056.code);
 }
 
 TEST_CASE("TestSema10056B") {
@@ -576,7 +576,7 @@ TEST_CASE("TestSema10056B") {
     app.parseSrcFile(code);
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10056, code));
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10056.errCode);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10056.code);
 }
 
 TEST_CASE("TestSema10059") {
@@ -598,8 +598,8 @@ TEST_CASE("TestSema10059") {
     app.parseSrcFile(code);
     app.analyse();
     CHECK_EQ(app.errHandler.errors.size(), 2);
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10059.errCode);
-    CHECK_EQ(app.errHandler.errors[1].errCode, E10059.errCode);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10059.code);
+    CHECK_EQ(app.errHandler.errors[1].errCode, E10059.code);
 }
 
 TEST_CASE("TestSema10066") {
@@ -615,7 +615,7 @@ TEST_CASE("TestSema10066") {
     app.parseSrcFile(code);
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10066, code));
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10066.errCode);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10066.code);
 }
 
 TEST_CASE("TestSema10075") {
@@ -658,6 +658,6 @@ TEST_CASE("TestSema10076") {
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 4, EXPECTED_ERR(E10076, code));
     for (const auto& error : app.errHandler.errors) {
-        CHECK_EQ(error.errCode, E10076.errCode);
+        CHECK_EQ(error.errCode, E10076.code);
     }
 }

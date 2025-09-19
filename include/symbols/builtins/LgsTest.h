@@ -1,4 +1,5 @@
 #pragma once
+#include "exprs/constants/LgsStrConst.h"
 #include "funcs/LgsFunc.h"
 #include "types/LgsAny.h"
 #include "types/LgsFuncType.h"
@@ -14,6 +15,7 @@ public:
     LgsFunc* assertFunc = new LgsFunc{"assert", &LGS_BOOL, {&LGS_BOOL, new LgsStr()}, PUBLIC | BUILTIN};
 
     explicit LgsTest(): LgsObject(name) {
+        assertFunc->funcType->params[1].expr = new LgsStrConst("");
         addMethod(mockFunc);
         addMethod(assertFunc);
     }

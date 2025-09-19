@@ -2,12 +2,11 @@
 #include "data/LgsErrors.h"
 #include <llvm/IR/DebugInfoMetadata.h>
 
-class LgsType;
-
 namespace llvm {
     class Value;
 }
 
+class LgsType;
 class LgsVariable;
 class LgsExpr;
 class LgsLLVMGen;

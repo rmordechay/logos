@@ -15,7 +15,7 @@ public:
     LgsFunc* sleepFunc = new LgsFunc{"sleep", &LGS_VOID, {&LGS_INT}, PUBLIC | BUILTIN};
     LgsFunc* exitFunc = new LgsFunc{"exit", &LGS_VOID, {&LGS_INT}, PUBLIC | BUILTIN | TERMINATOR};
     LgsFunc* cwdFunc = new LgsFunc{"cwd", new LgsStr(), {}, PUBLIC | BUILTIN};
-    LgsFunc* getEnvFunc = new LgsFunc{"getEnv", new LgsStr(), {new LgsStr(), new LgsNullable(new LgsStr())}, PUBLIC | BUILTIN | HAS_DEFAULTS};
+    LgsFunc* getEnvFunc = new LgsFunc{"getEnv", new LgsStr(), {new LgsStr(), new LgsNullable(new LgsStr())}, PUBLIC | BUILTIN};
     LgsFunc* coresNumFunc = new LgsFunc{"coresNumber", &LGS_LONG, {}, PUBLIC | BUILTIN};
 
     explicit LgsSystem() : LgsObject(name) {

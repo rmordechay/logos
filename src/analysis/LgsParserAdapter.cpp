@@ -412,6 +412,7 @@ LgsField* LgsParserAdapter::getField(LogosParser::FieldContext* ctx, const size_
     const auto field = new LgsField(name, type, expr);
     field->isPublic = !!ctx->VISIBILITY();
     field->isConst = !!ctx->CONST();
+    field->isOwner = !!ctx->OWNER();
     field->position = position;
     setLocation(field->location, ctx->start, ctx->stop);
     return field;
@@ -500,7 +501,6 @@ LgsEnum* LgsParserAdapter::getEnum(LogosParser::EnumDeclarationContext* ctx) {
             break;
         }
         const auto field = new LgsField(enumFieldName, lgsEnum);
-        field->isOwner = false;
         if (enumField->STRING()) {
             field->expr = getStrConst(enumField->STRING());
         }

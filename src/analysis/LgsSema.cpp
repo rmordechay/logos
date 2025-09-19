@@ -122,7 +122,10 @@ void LgsSema::visitField(LgsField* field) {
     if (field->expr && field->expr->asFunc()) {
         errHandler.addError(E10013, &field->location, {field->name});
     }
-    field->isOwner = field->type->isHeapAlloc;
+    if (field->type->isHeapAlloc && field->isOwner) {
+        errHandler.addWarning(W10001, &field->location, {field->type->getName()});
+        field->isOwner = false;
+    }
 }
 
 void LgsSema::visitFunc(LgsFunc* func) {
@@ -741,7 +744,7 @@ void LgsSema::visitFieldSelection(LgsVariable* child, LgsType* parentType) {
     child->setType(field->type);
     child->isMutable = !field->isConst;
     child->ref = LgsSymbol(field);
-    if (field->type->isHeapAlloc) {
+    if (field->isOwner && field->type->isHeapAlloc) {
         child->owner = field;
     }
     if (const auto parentAsObj = parentType->asObject()) {
@@ -909,7 +912,7 @@ void LgsSema::visitInstance(LgsInstance* instance) {
         visitExpr(arg->expr);
         matchExprToType(arg->expr, field->type);
         field->expr = arg->expr;
-        if (field->type->isHeapAlloc) {
+        if (field->isOwner && field->type->isHeapAlloc) {
             field->expr->owner = field;
         }
     }
@@ -919,7 +922,7 @@ void LgsSema::visitInstance(LgsInstance* instance) {
         if (visited.count(field->name)) continue;
         if (!field->expr) {
             field->expr = field->type->getZeroValue();
-            if (field->type->isHeapAlloc) {
+            if (field->isOwner && field->type->isHeapAlloc) {
                 field->expr->owner = field;
             }
         }

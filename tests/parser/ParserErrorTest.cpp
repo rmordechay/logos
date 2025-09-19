@@ -12,7 +12,7 @@ TEST_CASE("TestParser10021") {
     )";
     app.parseSrcFile(code);
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10021, code));
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10021.errCode);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10021.code);
 }
 
 TEST_CASE("TestParser10033A") {
@@ -23,7 +23,7 @@ TEST_CASE("TestParser10033A") {
     )";
     app.parseSrcFile(code);
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10033, code));
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10033.errCode);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10033.code);
 }
 
 TEST_CASE("ParserTest10033B") {
@@ -34,7 +34,7 @@ TEST_CASE("ParserTest10033B") {
     )";
     app.parseSrcFile(code);
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10033, code));
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10033.errCode);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10033.code);
 }
 
 TEST_CASE("ParserTest10033C") {
@@ -46,6 +46,6 @@ TEST_CASE("ParserTest10033C") {
     )";
     app.parseSrcFile(code);
     CHECK_EQ(app.errHandler.errors.size(), 2);
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10033.errCode);
-    CHECK_EQ(app.errHandler.errors[1].errCode, E10033.errCode);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10033.code);
+    CHECK_EQ(app.errHandler.errors[1].errCode, E10033.code);
 }
