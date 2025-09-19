@@ -54,7 +54,7 @@ public:
     LgsFile* getInterfaceFile(LogosParser::InterfaceFileContext* ctx, const fs::path& filePath);
     LgsFile* getTestFile(LogosParser::TestFileContext* ctx, const fs::path& filePath);
     LgsEnvFile* getEnvFile(const fs::path& filePath);
-    void setAppConfigs(LgsAppConfigs& appConfigs);
+    void setAppConfigs();
     LgsObject* getObject(LogosParser::ObjectBodyContext* ctx, antlr4::tree::TerminalNode* objName, bool isSingleton);
     LgsInterface* getInterface(LogosParser::InterfaceBodyContext* ctx, antlr4::tree::TerminalNode* interfaceName);
     LgsFunc* getFunc(LogosParser::FuncContext* ctx);

@@ -267,7 +267,8 @@ void LgsSema::visitAssignment(const LgsAssignment* assignment) {
     if (!lValue->isMutable) {
         return errHandler.addError(E10051, &lValue->location, {lValue->pname()});
     }
-    if (!lValue->canAssignTo(rType, assignment->assignmentType)) {
+    const auto canAssign = lValue->asVariable() || lValue->asIterIndex() || lValue->asSelection();
+    if (!canAssign || !lType->canCastTo(rType)) {
         return errHandler.addError(E10012, &lValue->location, {lValue->pname(), lType->pname(), assignment->getAssignTypeStr(), rValue->pname()});
     }
     if (assignment->lValue->owner && assignment->rValue->owner) {
@@ -781,10 +782,10 @@ void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent) {
     } else if (method->funcType->isMethod) {
         methodCall->args.insert(methodCall->args.begin(), parent);
     }
+    methodCall->completeType(method->funcType);
     for (const auto arg : methodCall->args) {
         visitExpr(arg);
     }
-    methodCall->completeType(method->funcType);
     if (methodCall->equals(method->funcType)) {
         methodCall->func = method;
         methodCall->setType(method->funcType->rt);

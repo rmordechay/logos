@@ -38,10 +38,6 @@ void LgsExpr::assign(LgsLLVMGen& cg, LgsExpr* expr) {
     assert(0);
 }
 
-bool LgsExpr::canAssignTo(LgsType* other, const LgsAssignType op) {
-    return true;
-}
-
 Value* LgsExpr::getIRPtrTo(LgsLLVMGen& cg) const {
     if (IRValue->getType()->isPointerTy()) return IRValue;
     const auto ptr = cg.builder.CreateAlloca(IRValue->getType());

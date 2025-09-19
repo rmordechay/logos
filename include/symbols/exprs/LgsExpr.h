@@ -57,7 +57,6 @@ public:
 
     virtual Value* hash(LgsLLVMGen& cg);
     virtual void assign(LgsLLVMGen& cg, LgsExpr* expr);
-    virtual bool canAssignTo(LgsType* other, LgsAssignType op);
     virtual Value* getIRPtrTo(LgsLLVMGen& cg) const;
     virtual bool equals(LgsExpr* other);
 

@@ -33,7 +33,7 @@ interface:
     ;
 
 interfaceBody:
-            implements? interfaceField* interfaceFunc*
+        implements? interfaceField* interfaceFunc*
     ;
 
 object:
@@ -41,7 +41,7 @@ object:
     ;
 
 objectBody:
-        implements? field* method* ioPair*
+        implements? (enumDeclaration | field)* method* ioPair*
     ;
 
 field:
@@ -54,6 +54,14 @@ interfaceField:
 
 implements:
         IMPLEMENTS COLON IDENTIFIER (COMMA IDENTIFIER)? COMMA?
+    ;
+
+enumDeclaration:
+        ENUM IDENTIFIER LBRACE enumField* RBRACE
+    ;
+
+enumField:
+        IDENTIFIER (EQUAL STRING)?
     ;
 
 ioPair:
@@ -183,14 +191,6 @@ returnStatement:
 
 ioStatement:
         IO (implicitVarDec) statementsBlock
-    ;
-
-enumDeclaration:
-        ENUM IDENTIFIER LBRACE enumField* RBRACE
-    ;
-
-enumField:
-        IDENTIFIER (EQUAL STRING)?
     ;
 
 coroutine:
@@ -381,7 +381,6 @@ assignemntOp:
     |   EQUAL_DOUBLE_LANGLE
     ;
 
-// JSON
 json:
         STRING
     |   INTEGER

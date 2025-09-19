@@ -24,37 +24,37 @@ public:
     DOLLAR = 48, AMPERSAND = 49, PIPE = 50, CARET = 51, DOUBLE_RANGLE = 52, 
     DOUBLE_LANGLE = 53, SLIDER = 54, OBJECT = 55, SINGLETON = 56, SELF_INSTANCE = 57, 
     SELF_CLASS = 58, INTERFACE = 59, EXTERN = 60, VISIBILITY = 61, IMPLEMENTS = 62, 
-    CONST = 63, ENUM = 64, GO = 65, DEFER = 66, IO = 67, OWNER = 68, VEC2 = 69, 
-    VEC3 = 70, VEC4 = 71, IF = 72, WHILE = 73, ELSE = 74, BREAK = 75, CONTINUE = 76, 
-    RETURN = 77, FOR = 78, FOREVER = 79, FOR_IS_FIRST = 80, FOR_IS_LAST = 81, 
-    FOR_I = 82, AND = 83, OR = 84, NOT = 85, IN = 86, LONG = 87, INTEGER = 88, 
-    FLOAT = 89, BOOL = 90, NULL_ = 91, IDENTIFIER = 92, STRING = 93, TAG = 94, 
-    LINE_COMMENT = 95, BLOCK_COMMENT = 96, WS = 97
+    CONST = 63, ENUM = 64, GO = 65, DEFER = 66, IO = 67, OWNER = 68, AND = 69, 
+    OR = 70, NOT = 71, IN = 72, IF = 73, WHILE = 74, ELSE = 75, BREAK = 76, 
+    CONTINUE = 77, RETURN = 78, FOR = 79, FOREVER = 80, FOR_IS_FIRST = 81, 
+    FOR_IS_LAST = 82, FOR_I = 83, VEC2 = 84, VEC3 = 85, VEC4 = 86, LONG = 87, 
+    INTEGER = 88, FLOAT = 89, BOOL = 90, NULL_ = 91, IDENTIFIER = 92, STRING = 93, 
+    TAG = 94, LINE_COMMENT = 95, BLOCK_COMMENT = 96, WS = 97
   };
 
   enum {
     RuleLogosFile = 0, RuleLogosEnvFile = 1, RuleLogosAppFile = 2, RuleMainFile = 3, 
     RuleObjectFile = 4, RuleInterfaceFile = 5, RuleTestFile = 6, RuleInterface = 7, 
     RuleInterfaceBody = 8, RuleObject = 9, RuleObjectBody = 10, RuleField = 11, 
-    RuleInterfaceField = 12, RuleImplements = 13, RuleIoPair = 14, RuleGroup = 15, 
-    RuleGroupTypesList = 16, RuleGroupTargetList = 17, RuleFuncSignatureHeader = 18, 
-    RuleFuncSignature = 19, RuleInterfaceFunc = 20, RuleFunc = 21, RuleLambda = 22, 
-    RuleLambdaParams = 23, RuleLambdaParam = 24, RuleMethod = 25, RuleParam = 26, 
-    RuleStatement = 27, RuleStatementsBlock = 28, RuleAssignment = 29, RuleExplicitVarDec = 30, 
-    RuleImplicitVarDec = 31, RuleIfStatement = 32, RuleElseIfStatement = 33, 
-    RuleElseStatement = 34, RulePatternMatching = 35, RulePattern = 36, 
-    RuleLoopStatement = 37, RuleRangeLoop = 38, RuleBreakStmt = 39, RuleReturnStatement = 40, 
-    RuleIoStatement = 41, RuleEnumDeclaration = 42, RuleEnumField = 43, 
-    RuleCoroutine = 44, RuleDeferStmt = 45, RuleExpr = 46, RuleUnaryExpr = 47, 
-    RulePrefixExpr = 48, RulePostfixExpr = 49, RuleArrayExpr = 50, RuleHashMap = 51, 
-    RuleKeyValue = 52, RuleFuncCall = 53, RuleFuncArgList = 54, RuleFuncArg = 55, 
-    RuleInstance = 56, RuleInstanceArgList = 57, RuleInstanceArg = 58, RuleConstant = 59, 
-    RuleIterIndex = 60, RuleIndex = 61, RuleSelection = 62, RuleFirstSelectionElement = 63, 
-    RuleInnerSelectionElement = 64, RuleForVariable = 65, RuleRange = 66, 
-    RuleType = 67, RuleMapType = 68, RuleArraySize = 69, RuleFuncType = 70, 
-    RuleVector = 71, RuleExtern_c = 72, RuleExtern_cpp = 73, RuleRequireEnvVars = 74, 
-    RuleRequirePackages = 75, RuleAssignemntOp = 76, RuleJson = 77, RuleJsonObj = 78, 
-    RuleJsonPair = 79, RuleJsonArray = 80
+    RuleInterfaceField = 12, RuleImplements = 13, RuleEnumDeclaration = 14, 
+    RuleEnumField = 15, RuleIoPair = 16, RuleGroup = 17, RuleGroupTypesList = 18, 
+    RuleGroupTargetList = 19, RuleFuncSignatureHeader = 20, RuleFuncSignature = 21, 
+    RuleInterfaceFunc = 22, RuleFunc = 23, RuleLambda = 24, RuleLambdaParams = 25, 
+    RuleLambdaParam = 26, RuleMethod = 27, RuleParam = 28, RuleStatement = 29, 
+    RuleStatementsBlock = 30, RuleAssignment = 31, RuleExplicitVarDec = 32, 
+    RuleImplicitVarDec = 33, RuleIfStatement = 34, RuleElseIfStatement = 35, 
+    RuleElseStatement = 36, RulePatternMatching = 37, RulePattern = 38, 
+    RuleLoopStatement = 39, RuleRangeLoop = 40, RuleBreakStmt = 41, RuleReturnStatement = 42, 
+    RuleIoStatement = 43, RuleCoroutine = 44, RuleDeferStmt = 45, RuleExpr = 46, 
+    RuleUnaryExpr = 47, RulePrefixExpr = 48, RulePostfixExpr = 49, RuleArrayExpr = 50, 
+    RuleHashMap = 51, RuleKeyValue = 52, RuleFuncCall = 53, RuleFuncArgList = 54, 
+    RuleFuncArg = 55, RuleInstance = 56, RuleInstanceArgList = 57, RuleInstanceArg = 58, 
+    RuleConstant = 59, RuleIterIndex = 60, RuleIndex = 61, RuleSelection = 62, 
+    RuleFirstSelectionElement = 63, RuleInnerSelectionElement = 64, RuleForVariable = 65, 
+    RuleRange = 66, RuleType = 67, RuleMapType = 68, RuleArraySize = 69, 
+    RuleFuncType = 70, RuleVector = 71, RuleExtern_c = 72, RuleExtern_cpp = 73, 
+    RuleRequireEnvVars = 74, RuleRequirePackages = 75, RuleAssignemntOp = 76, 
+    RuleJson = 77, RuleJsonObj = 78, RuleJsonPair = 79, RuleJsonArray = 80
   };
 
   explicit LogosParser(antlr4::TokenStream *input);
@@ -88,6 +88,8 @@ public:
   class FieldContext;
   class InterfaceFieldContext;
   class ImplementsContext;
+  class EnumDeclarationContext;
+  class EnumFieldContext;
   class IoPairContext;
   class GroupContext;
   class GroupTypesListContext;
@@ -116,8 +118,6 @@ public:
   class BreakStmtContext;
   class ReturnStatementContext;
   class IoStatementContext;
-  class EnumDeclarationContext;
-  class EnumFieldContext;
   class CoroutineContext;
   class DeferStmtContext;
   class ExprContext;
@@ -322,6 +322,8 @@ public:
     ObjectBodyContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     ImplementsContext *implements();
+    std::vector<EnumDeclarationContext *> enumDeclaration();
+    EnumDeclarationContext* enumDeclaration(size_t i);
     std::vector<FieldContext *> field();
     FieldContext* field(size_t i);
     std::vector<MethodContext *> method();
@@ -384,6 +386,35 @@ public:
   };
 
   ImplementsContext* implements();
+
+  class  EnumDeclarationContext : public antlr4::ParserRuleContext {
+  public:
+    EnumDeclarationContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *ENUM();
+    antlr4::tree::TerminalNode *IDENTIFIER();
+    antlr4::tree::TerminalNode *LBRACE();
+    antlr4::tree::TerminalNode *RBRACE();
+    std::vector<EnumFieldContext *> enumField();
+    EnumFieldContext* enumField(size_t i);
+
+   
+  };
+
+  EnumDeclarationContext* enumDeclaration();
+
+  class  EnumFieldContext : public antlr4::ParserRuleContext {
+  public:
+    EnumFieldContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *IDENTIFIER();
+    antlr4::tree::TerminalNode *EQUAL();
+    antlr4::tree::TerminalNode *STRING();
+
+   
+  };
+
+  EnumFieldContext* enumField();
 
   class  IoPairContext : public antlr4::ParserRuleContext {
   public:
@@ -818,35 +849,6 @@ public:
   };
 
   IoStatementContext* ioStatement();
-
-  class  EnumDeclarationContext : public antlr4::ParserRuleContext {
-  public:
-    EnumDeclarationContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *ENUM();
-    antlr4::tree::TerminalNode *IDENTIFIER();
-    antlr4::tree::TerminalNode *LBRACE();
-    antlr4::tree::TerminalNode *RBRACE();
-    std::vector<EnumFieldContext *> enumField();
-    EnumFieldContext* enumField(size_t i);
-
-   
-  };
-
-  EnumDeclarationContext* enumDeclaration();
-
-  class  EnumFieldContext : public antlr4::ParserRuleContext {
-  public:
-    EnumFieldContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *IDENTIFIER();
-    antlr4::tree::TerminalNode *EQUAL();
-    antlr4::tree::TerminalNode *STRING();
-
-   
-  };
-
-  EnumFieldContext* enumField();
 
   class  CoroutineContext : public antlr4::ParserRuleContext {
   public:

@@ -12,6 +12,7 @@ public:
     std::string name;
     std::vector<LgsType*> interfaces;
     std::vector<LgsIOPair*> ioPairs;
+    std::vector<LgsEnum*> enums;
     LgsInstance* singleton = nullptr;
 
     explicit LgsObject(std::string  name) : name(std::move(name)) {

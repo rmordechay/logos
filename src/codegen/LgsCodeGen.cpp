@@ -905,7 +905,7 @@ void LgsCodeGen::initFields(LgsInstance* instance) {
 
     // Zero values
     for (const auto field : instance->obj->fields) {
-        if (visited.count(field->name)) continue;
+        if (visited.count(field->name) || field->type->asEnum()) continue;
         field->parentIRValue = instance->IRValue;
         visitField(field);
         cg.builder.CreateStore(field->expr->IRValue, field->IRValue);

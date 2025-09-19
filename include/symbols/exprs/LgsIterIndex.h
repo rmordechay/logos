@@ -23,7 +23,6 @@ public:
     void assignScalar(LgsLLVMGen& cg, LgsExpr* expr);
     void assignArray(LgsLLVMGen& cg, const LgsArrayExpr* arr) const;
     void assignHashMap(LgsLLVMGen& cg, LgsHashMap* map);
-    bool canAssignTo(LgsType* other, LgsAssignType op) override;
     std::string pname() override;
     json::value asJSON() override;
     ~LgsIterIndex() override;

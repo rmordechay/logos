@@ -132,7 +132,7 @@ void LgsApp::loadEnvFiles() {
 
 bool LgsApp::parseAppFile() {
     LgsParserAdapter parserAdapter(0, appConfigs, paths, globals);
-    parserAdapter.setAppConfigs(appConfigs);
+    parserAdapter.setAppConfigs();
     if (!parserAdapter.errHandler.successful) {
         errHandler.mergeErrors(parserAdapter.errHandler);
     }

@@ -107,6 +107,12 @@ void LgsTypeResolver::resolveMainFileTypes(LgsMainFile* mf) {
 }
 
 void LgsTypeResolver::resolveObjTypes(LgsObject* obj, LgsFile& file) {
+    for (const auto& enum_ : obj->enums) {
+        file.symbolTable.addSymbol(LgsSymbol(enum_), &errHandler);
+        for (const auto field : enum_->fields) {
+            file.symbolTable.addSymbol(LgsSymbol(field), &errHandler);
+        }
+    }
     for (const auto& field : obj->fields) {
         if (obj->name == field->type->getName()) {
             field->type = obj;
@@ -115,6 +121,18 @@ void LgsTypeResolver::resolveObjTypes(LgsObject* obj, LgsFile& file) {
         }
     }
     for (const auto& [_, method] : obj->methods) {
+        if (obj->name == method->type->getName()) {
+            method->funcType->rt = obj;
+        } else {
+            method->funcType->rt = resolveType(method->funcType->rt, &file);
+        }
+        for (auto& param : method->funcType->params) {
+            if (obj->name == param.type->getName()) {
+                param.type = obj;
+            } else {
+                param.type = resolveType(param.type, &file);
+            }
+        }
         resolveFuncTypes(method->funcType, file);
     }
     for (auto& interface : obj->interfaces) {

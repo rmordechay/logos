@@ -2,7 +2,6 @@
 #include "exprs/LgsVariable.h"
 #include "exprs/constants/LgsIntConst.h"
 #include "types/LgsVoid.h"
-
 #include <exprs/LgsArrayExpr.h>
 #include "types/iterables/LgsMap.h"
 
@@ -24,16 +23,6 @@ Value* LgsIterIndex::loadIR(LgsLLVMGen& cg) {
         return loadFromStr(cg);
     }
     assert(0);
-}
-
-void LgsIterIndex::assign(LgsLLVMGen& cg, LgsExpr* expr) {
-    if (const auto map = expr->asHashMap()) {
-        assignHashMap(cg, map);
-    } else if (const auto arr = expr->asArrayExpr()) {
-        assignArray(cg, arr);
-    } else {
-        assignScalar(cg, expr);
-    }
 }
 
 Value* LgsIterIndex::loadFromDArray(LgsLLVMGen& cg, const LgsDArray* arr) const {
@@ -96,6 +85,16 @@ Value* LgsIterIndex::loadFromSArray(LgsLLVMGen& cg) const {
     return cg.builder.CreateGEP(ty, ptr, IRIndices);
 }
 
+void LgsIterIndex::assign(LgsLLVMGen& cg, LgsExpr* expr) {
+    if (const auto map = expr->asHashMap()) {
+        assignHashMap(cg, map);
+    } else if (const auto arr = expr->asArrayExpr()) {
+        assignArray(cg, arr);
+    } else {
+        assignScalar(cg, expr);
+    }
+}
+
 void LgsIterIndex::assignScalar(LgsLLVMGen& cg, LgsExpr* expr) {
     const auto rIRValue = expr->IRValue;
     const auto baseIRValue = baseExpr;
@@ -123,10 +122,6 @@ void LgsIterIndex::assignArray(LgsLLVMGen& cg, const LgsArrayExpr* arr) const {
 
 void LgsIterIndex::assignHashMap(LgsLLVMGen& cg, LgsHashMap* map) {
     assert(0);
-}
-
-bool LgsIterIndex::canAssignTo(LgsType* other, const LgsAssignType op) {
-    return type->canCastTo(other);
 }
 
 std::string LgsIterIndex::pname() {

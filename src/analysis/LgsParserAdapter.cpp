@@ -144,7 +144,10 @@ LgsObjectFile* LgsParserAdapter::getObjectFile(LogosParser::ObjectFileContext* c
     const auto file = new LgsObjectFile(fileID, objName->getText(), filePath);
     setLocation(file->location, ctx->start, ctx->stop);
     file->obj = getObject(ctx->objectBody(), objName, !!ctx->SINGLETON());
-    globals.addSymbol(LgsSymbol(file->obj), &errHandler);
+    {
+        std::lock_guard lock(mtx);
+        globals.addSymbol(LgsSymbol(file->obj), &errHandler);
+    }
     return file;
 }
 
@@ -153,7 +156,10 @@ LgsFile* LgsParserAdapter::getInterfaceFile(LogosParser::InterfaceFileContext* c
     const auto file = new LgsInterfaceFile(fileID, interfaceNameToken->getText(), filePath);
     setLocation(file->location, ctx->start, ctx->stop);
     file->interface = getInterface(ctx->interfaceBody(), interfaceNameToken);
-    globals.addSymbol(LgsSymbol(file->interface), &errHandler);
+    {
+        std::lock_guard lock(mtx);
+        globals.addSymbol(LgsSymbol(file->interface), &errHandler);
+    }
     return file;
 }
 
@@ -192,7 +198,7 @@ LgsEnvFile* LgsParserAdapter::getEnvFile(const fs::path& filePath) {
     return file;
 }
 
-void LgsParserAdapter::setAppConfigs(LgsAppConfigs& appConfigs) {
+void LgsParserAdapter::setAppConfigs() {
     if (!fs::exists(paths.appFilePath)) return;
     auto codeText = getFileText(paths.appFilePath);
     antlr4::ANTLRInputStream input(codeText);
@@ -280,6 +286,12 @@ LgsObject* LgsParserAdapter::getObject(LogosParser::ObjectBodyContext* ctx, antl
             auto implementType = getTypeFromText(type);
             obj->interfaces.push_back(implementType);
         }
+    }
+
+    // Enums
+    for (const auto& enum_ : ctx->enumDeclaration()) {
+        const auto lgsEnum_ = getEnum(enum_);
+        obj->enums.push_back(lgsEnum_);
     }
 
     if (isSingleton) {
@@ -1112,7 +1124,10 @@ LgsGroup* LgsParserAdapter::getGroup(LogosParser::GroupContext* ctx) {
         const auto var = getVariable(target);
         group->targetSymbols.push_back(var);
     }
-    globals.addSymbol(LgsSymbol(group), &errHandler);
+    {
+        std::lock_guard lock(mtx);
+        globals.addSymbol(LgsSymbol(group), &errHandler);
+    }
     return group;
 }
 
