@@ -41,6 +41,7 @@ public:
         paths.rootPath = rootPath;
     }
     void run();
+    void runTests();
     bool setup();
     bool parse();
     bool analyse();

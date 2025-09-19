@@ -16,6 +16,7 @@ struct LgsAppConfigs {
     uint8_t optLevel = 2;
     bool debugMode = false;
     bool writeIRFile = true;
+    bool isTestRun = false;
     LgsLogLevel logLevel = DEBUG;
     std::string activeEnv = "Pro";
     struct { int major; int minor; int micro; } version{1, 0, 0};

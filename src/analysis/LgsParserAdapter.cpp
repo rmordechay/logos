@@ -77,6 +77,7 @@ LgsFile* LgsParserAdapter::getLogosFile(LogosParser::LogosFileContext* ctx, cons
     } else if (const auto interfaceFile = ctx->interfaceFile()) {
         file = getInterfaceFile(interfaceFile, filePath);
     } else if (const auto testFile = ctx->testFile()) {
+        if (!appConfigs.isTestRun) return nullptr;
         file = getTestFile(testFile, filePath);
     }
     assert(file);

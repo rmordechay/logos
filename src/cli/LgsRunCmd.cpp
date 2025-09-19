@@ -4,10 +4,10 @@
 #include "types/iterables/LgsStr.h"
 
 void LgsRunCmd::run() {
-    const std::string subCmd = argv[2];
-    if (subCmd[0] == '-') return exitWithError(unknownCmd + ": " + subCmd + ".");
-    if (!fs::exists(subCmd)) return exitWithError("Path not found");
-    LgsApp app(subCmd);
+    const std::string pathArg = argv[2];
+    if (pathArg[0] == '-') return exitWithError(unknownCmd + ": " + pathArg + ".");
+    if (!fs::exists(pathArg)) return exitWithError("Path not found");
+    LgsApp app(pathArg);
     parseArguments(3, app);
     app.run();
 }

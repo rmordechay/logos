@@ -1,6 +1,6 @@
 #pragma once
 #include "LgsCliCmd.h"
-#include "../symbols/types/iterables/LgsStr.h"
+#include "types/iterables/LgsStr.h"
 #include "types/primitives/LgsInt.h"
 
 class LgsRunCmd final : public LgsCliCmd {
@@ -15,13 +15,13 @@ public:
 inline LgsCliCmdHelp runCmdHelp{
     .name = "run",
     .usage = "lgs run <path> <options>",
-    .summary = "Runs a Logos application or a single file.",
-    .desc = "The run command runs a Logos application or a single file.",
+    .summary = "Runs Logos code.",
+    .desc = "The run command runs a Logos project or a single file.",
     .requiredArgs = {
         {
             .name = "<path>",
             .type = LgsStr::name,
-            .desc = "Path to file or application root.",
+            .desc = "Path to file or project root.",
         },
     },
     .optionalArgs = {

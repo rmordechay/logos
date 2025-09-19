@@ -24,6 +24,14 @@ void LgsApp::run() {
     execute();
 }
 
+void LgsApp::runTests() {
+    if (!setup()) exitWithErrors();
+    if (!parse()) exitWithErrors();
+    if (!analyse()) exitWithErrors();
+    if (!generate()) exitWithErrors();
+    if (!link()) exitWithErrors();
+}
+
 bool LgsApp::setup() {
     if (isLogosFile(paths.rootPath)) {
         isFileMode = true;
@@ -123,27 +131,28 @@ void LgsApp::loadEnvFiles() {
 }
 
 bool LgsApp::parseAppFile() {
-    LgsParserAdapter antlrConverter(0, paths, globals);
-    antlrConverter.setAppConfigs(appConfigs);
-    if (!antlrConverter.errHandler.successful) {
-        errHandler.mergeErrors(antlrConverter.errHandler);
+    LgsParserAdapter parserAdapter(0, appConfigs, paths, globals);
+    parserAdapter.setAppConfigs(appConfigs);
+    if (!parserAdapter.errHandler.successful) {
+        errHandler.mergeErrors(parserAdapter.errHandler);
     }
     return errHandler.successful;
 }
 
 void LgsApp::parseEnvFile(const fs::path& filePath) {
     const auto fileID = nextFileID.fetch_add(1, std::memory_order_relaxed);
-    LgsParserAdapter antlrConverter(fileID, paths, globals);
-    auto file = antlrConverter.getEnvFile(filePath);
+    LgsParserAdapter parserAdapter(fileID, appConfigs, paths, globals);
+    auto file = parserAdapter.getEnvFile(filePath);
     std::lock_guard lock(mtx);
     envFiles.emplace_back(file);
-    errHandler.mergeErrors(antlrConverter.errHandler);
+    errHandler.mergeErrors(parserAdapter.errHandler);
 }
 
 void LgsApp::parseSrcFile(const std::string& code, const fs::path& filePath) {
     const auto fileID = nextFileID.fetch_add(1, std::memory_order_relaxed);
-    LgsParserAdapter antlrConverter(fileID, paths, globals);
-    const auto lgsFile = antlrConverter.parseFile(code, filePath);
+    LgsParserAdapter parserAdapter(fileID, appConfigs, paths, globals);
+    const auto lgsFile = parserAdapter.parseFile(code, filePath);
+    if (!lgsFile) return;
     if (const auto mainFile = dynamic_cast<LgsMainFile*>(lgsFile)) {
         mainFile->appArgs = appArgs;
     }
@@ -151,8 +160,8 @@ void LgsApp::parseSrcFile(const std::string& code, const fs::path& filePath) {
         std::lock_guard lock(mtx);
         lgsFile->id = fileID;
         ast.push_back(lgsFile);
-        if (antlrConverter.errHandler.successful) return;
-        errHandler.mergeErrors(antlrConverter.errHandler);
+        if (parserAdapter.errHandler.successful) return;
+        errHandler.mergeErrors(parserAdapter.errHandler);
     }
 }
 

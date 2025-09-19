@@ -42,10 +42,11 @@ public:
     size_t fileID;
     LgsPaths& paths;
     LgsSymbolTable& globals;
+    LgsAppConfigs& appConfigs;
     LgsErrHandler errHandler;
     LgsFunc* currentFunc = nullptr;
 
-    explicit LgsParserAdapter(const int fileID, LgsPaths& paths, LgsSymbolTable& globals) : fileID(fileID), paths(paths), globals(globals) {}
+    explicit LgsParserAdapter(const int fileID, LgsAppConfigs& appConfigs, LgsPaths& paths, LgsSymbolTable& globals) : fileID(fileID), paths(paths), globals(globals), appConfigs(appConfigs) {}
     LgsFile* parseFile(const std::string& codeText, const fs::path& filePath);
     LgsFile* getLogosFile(LogosParser::LogosFileContext* ctx, const fs::path& filePath);
     LgsMainFile* getMainFile(LogosParser::MainFileContext* ctx, const fs::path& filePath);

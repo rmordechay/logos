@@ -1,6 +1,7 @@
 #include "cli/LgsCli.h"
 #include "cli/LgsAstCmd.h"
 #include "cli/LgsRunCmd.h"
+#include "cli/LgsTestCmd.h"
 #include "data/LgsDefinitions.h"
 #include "utils/LgsUtils.h"
 
@@ -16,6 +17,9 @@ void LgsCli::execute() const {
     const std::string firstCmdStr = argv[1];
     if (firstCmdStr == "run") {
         LgsRunCmd cmd(argc, argv);
+        runCmd(cmd);
+    } else if (firstCmdStr == "test") {
+        LgsTestCmd cmd(argc, argv);
         runCmd(cmd);
     } else if (firstCmdStr == "ast") {
         LgsAstCmd cmd(argc, argv);
