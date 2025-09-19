@@ -16,11 +16,9 @@ public:
     Value* loadIR(LgsLLVMGen& cg) override;
     Value* loadFromDArray(LgsLLVMGen& cg, const LgsDArray* arr) const;
     Value* loadFromMap(LgsLLVMGen& cg, const LgsMap* map) const;
-    Value* loadFromStr(LgsLLVMGen& cg, const LgsStr* str) const;
+    Value* loadFromStr(LgsLLVMGen& cg) const;
     Value* loadFromVec(LgsLLVMGen& cg) const;
     Value* loadFromSArray(LgsLLVMGen& cg) const;
-    Value* createStrSlice(LgsLLVMGen& cg) const;
-    Value* getStrGEP(LgsLLVMGen& cg) const;
     void assign(LgsLLVMGen& cg, LgsExpr* expr) override;
     void assignScalar(LgsLLVMGen& cg, LgsExpr* expr);
     void assignArray(LgsLLVMGen& cg, const LgsArrayExpr* arr) const;

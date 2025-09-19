@@ -55,14 +55,6 @@ Value* LgsSArray::IRLength(LgsLLVMGen& cg, Value* iterable) {
     return sizeExpr->IRValue;
 }
 
-Value* LgsSArray::IRIsEmpty(LgsLLVMGen* cg, LgsExpr* iterable) {
-    return cg->builder.getFalse();
-}
-
-Value* LgsSArray::IRIsNotEmpty(LgsLLVMGen* cg, LgsExpr* iterable) {
-    return cg->builder.getTrue();
-}
-
 LgsSArray::~LgsSArray() {
     delete sizeExpr;
 }

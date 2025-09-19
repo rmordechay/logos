@@ -1,6 +1,7 @@
 #include "types/iterables/LgsMap.h"
 #include "exprs/LgsHashMap.h"
 #include "stmts/LgsVarDec.h"
+#include "types/LgsVoid.h"
 
 Type* LgsMap::getIRType(LgsLLVMGen& cg) {
     return getMapStruct(cg);
@@ -16,6 +17,25 @@ std::string LgsMap::pname() {
 
 json::value LgsMap::asJSON() {
     assert(0);
+}
+
+LgsFunc* LgsMap::getAddFunc() {
+    const auto addFunc = methods.find(ADD_FUNC_NAME);
+    if (addFunc != methods.end() && addFunc->second) return addFunc->second;
+    addFunc->second = new LgsFunc(ADD_FUNC_NAME, &LGS_VOID, {this, new LgsStr(), &LGS_ANY}, PUBLIC | BUILTIN | METHOD);
+    addFunc->second->fn = [addFunc](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
+        const auto key = args[1];
+        const auto value = args[2];
+        const auto mapPtr = args[0]->IRValue;
+        if (value->type->asDArray()) {
+            return addFunc->second->callIR(cg, {mapPtr, key->IRValue, value->IRValue});
+        }
+        const auto valurPtr = cg.builder.CreateAlloca(value->type->getIRType(cg));
+        cg.builder.CreateStore(value->IRValue, valurPtr);
+        return addFunc->second->callIR(cg, {mapPtr, key->IRValue, valurPtr});
+    };
+    addMethod(addFunc->second);
+    return addFunc->second;
 }
 
 size_t LgsMap::getSizeBytes() {
@@ -38,14 +58,6 @@ Value* LgsMap::IRLength(LgsLLVMGen& cg, Value* iterable) {
     return cg.i32(1024);
 }
 
-Value* LgsMap::IRIsEmpty(LgsLLVMGen* cg, LgsExpr* iterable) {
-    return isEmptyFunc->call(*cg, {iterable});
-}
-
-Value* LgsMap::IRIsNotEmpty(LgsLLVMGen* cg, LgsExpr* iterable) {
-    return isNotEmptyFunc->call(*cg, {iterable});
-}
-
 StructType* LgsMap::getMapStruct(LgsLLVMGen& cg) {
     const std::vector<Type*> mapStructFields = {cg.ptrTy(), cg.i64Ty(), cg.i64Ty()};
     mapStruct = cg.getStructType(mapStructFields, name);
@@ -64,32 +76,7 @@ std::string LgsMap::strFormatPart() const {
     return "%s";
 }
 
-Value* LgsMap::callAdd(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) const {
-    const auto map = args[0];
-    const auto key = args[1];
-    const auto value = args[2];
-    const auto exprIR = value->IRValue;
-    const auto mapPtr = map->IRValue;
-    const auto exprTy = value->type;
-    if (exprTy->asDArray()) {
-        return addFunc->callIR(cg, {mapPtr, key->IRValue, value->IRValue});
-    }
-    const auto valurPtr = cg.builder.CreateAlloca(exprTy->getIRType(cg));
-    cg.builder.CreateStore(exprIR, valurPtr);
-    return addFunc->callIR(cg, {mapPtr, key->IRValue, valurPtr});
-}
-
 LgsMap::~LgsMap() {
-    freeType(typePair);
-    delete addFunc;
-    delete initFunc;
     delete getFunc;
-    delete deleteFunc;
-    delete freeFunc;
-    typePair = nullptr;
-    addFunc = nullptr;
-    initFunc = nullptr;
     getFunc = nullptr;
-    deleteFunc = nullptr;
-    freeFunc = nullptr;
 }

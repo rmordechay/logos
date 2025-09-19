@@ -1,27 +1,39 @@
 #include "exprs/LgsIterIndex.h"
 #include "exprs/LgsVariable.h"
 #include "exprs/constants/LgsIntConst.h"
+#include "types/LgsVoid.h"
+
 #include <exprs/LgsArrayExpr.h>
 #include "types/iterables/LgsMap.h"
 
 Value* LgsIterIndex::loadIR(LgsLLVMGen& cg) {
     const auto baseExprType = baseExpr->type;
-    if (baseExprType->asSArray()) {
-        return loadFromSArray(cg);
-    }
-    if (baseExpr->type->asVec()) {
-        return loadFromVec(cg);
+    if (const auto map = baseExprType->asMap()) {
+        return loadFromMap(cg, map);
     }
     if (const auto arr = baseExprType->asDArray()) {
         return loadFromDArray(cg, arr);
     }
-    if (const auto map = baseExprType->asMap()) {
-        return loadFromMap(cg, map);
+    if (baseExprType->asSArray()) {
+        return loadFromSArray(cg);
     }
-    if (const auto str = baseExprType->asStr()) {
-        return loadFromStr(cg, str);
+    if (baseExprType->asVec()) {
+        return loadFromVec(cg);
+    }
+    if (baseExprType->asStr()) {
+        return loadFromStr(cg);
     }
     assert(0);
+}
+
+void LgsIterIndex::assign(LgsLLVMGen& cg, LgsExpr* expr) {
+    if (const auto map = expr->asHashMap()) {
+        assignHashMap(cg, map);
+    } else if (const auto arr = expr->asArrayExpr()) {
+        assignArray(cg, arr);
+    } else {
+        assignScalar(cg, expr);
+    }
 }
 
 Value* LgsIterIndex::loadFromDArray(LgsLLVMGen& cg, const LgsDArray* arr) const {
@@ -40,8 +52,13 @@ Value* LgsIterIndex::loadFromMap(LgsLLVMGen& cg, const LgsMap* map) const {
     return cg.builder.CreateLoad(valueTy, rv);
 }
 
-Value* LgsIterIndex::loadFromStr(LgsLLVMGen& cg, const LgsStr* str) const {
-    if (index->to) return createStrSlice(cg);
+Value* LgsIterIndex::loadFromStr(LgsLLVMGen& cg) const {
+    if (index->to) {
+        const auto intFrom = index->from->asIntConst();
+        const auto intTo = index->to->asIntConst();
+        const auto strConst = baseExpr->getConstStr();
+        return cg.getIRStr(strConst.substr(intFrom->value, intTo->value));
+    }
     auto& builder = cg.builder;
     const auto baseExprIRType = baseExpr->type->getIRType(cg);
     const auto ptr = builder.CreateAlloca(baseExprIRType);
@@ -79,36 +96,14 @@ Value* LgsIterIndex::loadFromSArray(LgsLLVMGen& cg) const {
     return cg.builder.CreateGEP(ty, ptr, IRIndices);
 }
 
-Value* LgsIterIndex::createStrSlice(LgsLLVMGen& cg) const {
-    const auto intFrom = index->from->asIntConst();
-    const auto intTo = index->to->asIntConst();
-    const auto strConst = baseExpr->getConstStr();
-    return cg.getIRStr(strConst.substr(intFrom->value, intTo->value));
-}
-
-Value* LgsIterIndex::getStrGEP(LgsLLVMGen& cg) const {
-    const auto ty = baseExpr->type->getIRType(cg);
-    const auto iValue = index->from->IRValue;
-    return cg.builder.CreateGEP(ty, IRValue, {cg.i32Zero(), iValue});
-}
-
-void LgsIterIndex::assign(LgsLLVMGen& cg, LgsExpr* expr) {
-    if (const auto map = expr->asHashMap()) {
-        assignHashMap(cg, map);
-    } else if (const auto arr = expr->asArrayExpr()) {
-        assignArray(cg, arr);
-    } else {
-        assignScalar(cg, expr);
-    }
-}
-
 void LgsIterIndex::assignScalar(LgsLLVMGen& cg, LgsExpr* expr) {
     const auto rIRValue = expr->IRValue;
     const auto baseIRValue = baseExpr;
     if (const auto arr = baseExpr->type->asDArray()) {
         const auto ptr = cg.builder.CreateAlloca(expr->type->getIRType(cg));
         cg.builder.CreateStore(rIRValue, ptr);
-        arr->putFunc->callIR(cg, {baseIRValue->IRValue, index->from->IRValue, ptr});
+        LgsFunc putFunc("put", &LGS_VOID, {arr, &LGS_INT, &LGS_ANY}, BUILTIN | METHOD);
+        putFunc.callIR(cg, {baseIRValue->IRValue, index->from->IRValue, ptr});
         return;
     }
     if (baseExpr->type->asSArray()) {
@@ -116,38 +111,13 @@ void LgsIterIndex::assignScalar(LgsLLVMGen& cg, LgsExpr* expr) {
         return;
     }
     if (const auto map = baseExpr->type->asMap()) {
-        map->addFunc->call(cg, {baseExpr, index->from, expr});
+        map->getAddFunc()->call(cg, {baseExpr, index->from, expr});
     } else {
         cg.builder.CreateStore(rIRValue, IRValue);
     }
 }
 
 void LgsIterIndex::assignArray(LgsLLVMGen& cg, const LgsArrayExpr* arr) const {
-    // const auto IRType = baseExpr->type->getIRType(cg);
-    // const auto arrPtr = IRValue;
-    //
-    // // Flatten the indices and reverse them.
-    // std::vector<LgsIndex*> indices;
-    // auto iterIndex = this;
-    // while (iterIndex) {
-    //     if (iterIndex->index) indices.push_back(iterIndex->index);
-    //     iterIndex = baseExpr->asIterIndex();
-    // }
-    // reverse(indices.begin(), indices.end());
-    //
-    // std::vector<Value*> IRIndices = {cg.i32Zero()};
-    // for (const auto i : indices) {
-    //     IRIndices.emplace_back(i->from->IRValue);
-    // }
-    // for (int i = 0; i < arr->initialElements.size(); ++i) {
-    //     const auto element = arr->initialElements[i];
-    //     const auto IRIndex = cg.i32(i);
-    //     IRIndices.push_back(IRIndex);
-    //     const auto gep = cg.builder.CreateGEP(IRType, arrPtr, IRIndices);
-    //     const auto rValue = element->IRValue;
-    //     cg.builder.CreateStore(rValue, gep);
-    //     IRIndices.pop_back();
-    // }
     assert(0);
 }
 

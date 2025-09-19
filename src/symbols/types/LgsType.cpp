@@ -8,11 +8,12 @@
 #include "types/LgsGroup.h"
 #include "types/iterables/LgsMap.h"
 #include "types/LgsNullable.h"
+#include "types/LgsVoid.h"
 #include "types/iterables/LgsSArray.h"
-#include "types/LgsUnknown.h"
 #include "types/primitives/LgsChar.h"
 #include "types/primitives/LgsDouble.h"
 #include "types/primitives/LgsShort.h"
+#include "types/primitives/LgsSize.h"
 #include "types/primitives/LgsUInt.h"
 
 LgsField* LgsType::getField(const std::string& name) {
@@ -24,9 +25,7 @@ LgsField* LgsType::getField(const std::string& name) {
 
 LgsFunc* LgsType::getMethod(const std::string& name) {
     const auto method = methods.find(name);
-    if (method != methods.end()) {
-        return method->second;
-    }
+    if (method != methods.end()) return method->second;
     return nullptr;
 }
 
@@ -119,7 +118,6 @@ Value* LgsType::rshiftIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     assert(0);
 }
 
-
 bool LgsType::addField(LgsField* field) {
     for (const auto* f : fields) {
         if (f->name == field->name) return false;
@@ -132,6 +130,12 @@ bool LgsType::addField(LgsField* field) {
 bool LgsType::addMethod(LgsFunc* method) {
     if (methods.find(method->funcType->name) != methods.end()) return false;
     methods[method->funcType->name] = method;
+    return true;
+}
+
+bool LgsType::addEmptyMethod(const std::string& name) {
+    if (methods.find(name) != methods.end()) return false;
+    methods[name] = nullptr;
     return true;
 }
 

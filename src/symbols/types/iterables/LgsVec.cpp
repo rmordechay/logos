@@ -47,14 +47,6 @@ Value* LgsVec::IRLength(LgsLLVMGen& cg, Value* iterable) {
     return cg.usize(2);
 }
 
-Value* LgsVec::IRIsEmpty(LgsLLVMGen* cg, LgsExpr* iterable) {
-    return cg->builder.getFalse();
-}
-
-Value* LgsVec::IRIsNotEmpty(LgsLLVMGen* cg, LgsExpr* iterable) {
-    return cg->builder.getTrue();
-}
-
 bool LgsVec::canCastTo(LgsType* other) {
     if (other->getName() == LgsAny::name) return true;
     const auto otherVec = other->asVec();
@@ -142,11 +134,4 @@ std::string LgsVec::strFormatPart() const {
     }
     str << '>';
     return str.str();
-}
-
-void LgsVec::setRTT() {
-    if (dim == 2) rtt = RTT_VEC2;
-    else if (dim == 3) rtt = RTT_VEC3;
-    else if (dim == 4) rtt = RTT_VEC4;
-    else rtt = RTT_UNKNOWN;
 }

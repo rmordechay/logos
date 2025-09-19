@@ -43,6 +43,7 @@
 #include "stmts/LgsIOStmt.h"
 #include "stmts/LgsIfStmt.h"
 #include "types/primitives/LgsDouble.h"
+#include "types/primitives/LgsSize.h"
 
 void LgsSema::analyse() {
     if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {

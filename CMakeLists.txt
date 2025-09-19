@@ -143,6 +143,9 @@ set(RUNTIME_SOURCES
     runtime/lib/Lgs_stack.cpp
     runtime/lib/Lgs_print.cpp
     runtime/lib/Lgs_arena.cpp
+    src/symbols/types/iterables/LgsIterable.cpp
+    src/cli/LgsTestCmd.cpp
+    include/cli/LgsTestCmd.h
 )
 
 add_library(lgs_core SHARED ${CORE_SOURCES} ${RUNTIME_SOURCES})

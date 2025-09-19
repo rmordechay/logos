@@ -7,8 +7,6 @@
 #include "stmts/LgsIOPair.h"
 #include "stmts/LgsIOStmt.h"
 
-#include <vector>
-
 class LgsInterfaceFile;
 class LgsObjectFile;
 class LgsPostfixExpr;

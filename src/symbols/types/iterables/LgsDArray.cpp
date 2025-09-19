@@ -1,6 +1,8 @@
 #include "types/iterables/LgsDArray.h"
 #include "exprs/LgsArrayExpr.h"
+#include "types/LgsVoid.h"
 #include "types/primitives/LgsInt.h"
+#include "types/primitives/LgsSize.h"
 
 Type* LgsDArray::getIRType(LgsLLVMGen& cg) {
     if (IRType) return IRType;
@@ -43,16 +45,19 @@ StructType* LgsDArray::getArrStruct(LgsLLVMGen& cg) {
     return arrStruct;
 }
 
+LgsFunc* LgsDArray::getAddFunc() {
+    const auto addFunc = methods.find(ADD_FUNC_NAME);
+    if (addFunc != methods.end() && addFunc->second) return addFunc->second;
+    addFunc->second = new LgsFunc(ADD_FUNC_NAME, &LGS_VOID, {this, &LGS_ANY}, BUILTIN | PUBLIC | METHOD);
+    addFunc->second->fn = [addFunc](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
+        return addFunc->second->callIR(cg, {args[0]->IRValue, args[1]->getIRPtrTo(cg)});
+    };
+    addMethod(addFunc->second);
+    return addFunc->second;
+}
+
 Value* LgsDArray::IRLength(LgsLLVMGen& cg, Value* iterable) {
-    return lenFunc->callIR(cg, {iterable});
-}
-
-Value* LgsDArray::IRIsEmpty(LgsLLVMGen* cg, LgsExpr* iterable) {
-    return isEmptyFunc->call(*cg, {iterable});
-}
-
-Value* LgsDArray::IRIsNotEmpty(LgsLLVMGen* cg, LgsExpr* iterable) {
-    return isNotEmptyFunc->call(*cg, {iterable});
+    return getLenFunc()->callIR(cg, {iterable});
 }
 
 bool LgsDArray::canCastTo(LgsType* other) {

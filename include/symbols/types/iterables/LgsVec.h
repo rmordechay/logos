@@ -12,7 +12,10 @@ public:
     explicit LgsVec(const int8_t dim, LgsType* baseType = &LGS_FLOAT) : LgsIterable(baseType), dim(dim) {
         assert(dim > 1 && dim <= 4);
         sizeExpr = new LgsIntConst(&LGS_INT, dim);
-        setRTT();
+        if (dim == 2) rtt = RTT_VEC2;
+        else if (dim == 3) rtt = RTT_VEC3;
+        else if (dim == 4) rtt = RTT_VEC4;
+        else rtt = RTT_UNKNOWN;
     }
 
     Type* getIRType(LgsLLVMGen& cg) override;
@@ -24,10 +27,8 @@ public:
     LgsExpr* getZeroValue() override;
     LgsType* getIndexType() override;
     uint16_t getUnpackCount() const override;
-    Value* IRLength(LgsLLVMGen& cg, Value* iterable) override;
-    Value* IRIsEmpty(LgsLLVMGen* cg, LgsExpr* iterable) override;
-    Value* IRIsNotEmpty(LgsLLVMGen* cg, LgsExpr* iterable) override;
     bool canCastTo(LgsType* other) override;
+    Value* IRLength(LgsLLVMGen& cg, Value* iterable) override;
     LgsType* applyOp(LgsType* other, LgsOperator op) override;
     Value* addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
     Value* subIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
@@ -36,5 +37,4 @@ public:
     static int8_t getSwizzleSet(char c);
     static int8_t getComponentIndex(char c);
     std::string strFormatPart() const override;
-    void setRTT();
 };

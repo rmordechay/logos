@@ -40,6 +40,8 @@
 #include "stmts/LgsIfStmt.h"
 #include "types/iterables/LgsSArray.h"
 #include "types/iterables/LgsVec.h"
+#include "types/primitives/LgsSize.h"
+
 #include <llvm/IR/Module.h>
 #include <llvm/Target/TargetMachine.h>
 
@@ -238,7 +240,7 @@ void LgsCodeGen::visitForeachLoop(LgsForeachLoop* loop) {
 
     cg.startBlock(loop->IRBodyBlock, currentIRFunc);
     loop->iterPtr = iterIndex->IRValue;
-    loop->loopVars[0]->IRValue = iterIndex->IRValue;
+    loop->loopVars[0]->IRValue = iterIndex->loadIR(cg);
 }
 
 void LgsCodeGen::visitInfiniteLoop(const LgsInfiniteLoop* loop) const {
@@ -656,16 +658,17 @@ void LgsCodeGen::visitArrayExpr(LgsArrayExpr* array) {
 }
 
 void LgsCodeGen::visitHashMap(LgsHashMap* hashMap) {
-    const auto mapType = hashMap->type->asMap();
-    const auto valueType = mapType->typePair->value;
+    const auto map = hashMap->type->asMap();
+    const auto valueType = map->typePair->value;
     const auto elementSize = cg.usize(valueType->getSizeBytes());
-    const auto arrSize = cg.typeSize(mapType->getMapStruct(cg));
+    const auto arrSize = cg.typeSize(map->getMapStruct(cg));
     hashMap->IRValue = cg.callMalloc(arrSize.getFixedValue(), hashMap->owner, hashMap->type->rtt);
-    mapType->initFunc->callIR(cg, {getIRValue(hashMap), elementSize});
+    LgsFunc initFunc("init", &LGS_VOID, {map, &LGS_LONG}, BUILTIN | METHOD);
+    initFunc.callIR(cg, {getIRValue(hashMap), elementSize});
     for (const auto element : hashMap->initialElements) {
         visitExpr(element->key);
         visitExpr(element->value);
-        mapType->addFunc->call(cg, {hashMap, element->key, element->value});
+        map->getAddFunc()->call(cg, {hashMap, element->key, element->value});
     }
 }
 
@@ -783,8 +786,8 @@ void LgsCodeGen::createMapFunc(LgsFunc* func) {
     const auto& originalArr = func->funcType->params[0];
     const auto& callback = func->funcType->params[1];
     const auto dArray = originalArr.type->asDArray();
-    const auto newArr = new LgsArrayExpr(dArray);
-    visitArrayExpr(newArr);
+    auto newArr = LgsArrayExpr(dArray);
+    visitArrayExpr(&newArr);
 
     const auto iPtr = cg.builder.CreateAlloca(cg.sizeTy());
     const auto loopStart = cg.builder.CreateSExt(cg.sizeZero(), cg.sizeTy());
@@ -808,7 +811,7 @@ void LgsCodeGen::createMapFunc(LgsFunc* func) {
     const auto v = cg.builder.CreateCall(f, callback.IRValue, {cg.builder.CreateLoad(dArray->baseType->getIRType(cg), a)});
     const auto vPtr = cg.builder.CreateAlloca(cg.ptrTy());
     cg.builder.CreateStore(v, vPtr);
-    dArray->addFunc->callIR(cg, {newArr->IRValue, vPtr});
+    dArray->getAddFunc()->callIR(cg, {newArr.IRValue, vPtr});
 
     if (cg.lastInstTerminator()) return;
     const auto inc = cg.builder.CreateAdd(iValue, cg.usize(1));
@@ -817,11 +820,10 @@ void LgsCodeGen::createMapFunc(LgsFunc* func) {
 
     cg.startBlock(IRExitBlock, currentIRFunc);
     cg.callPopStack();
-    cg.builder.CreateRet(newArr->IRValue);
+    cg.builder.CreateRet(newArr.IRValue);
     currentIRFunc = originalFunc;
     cg.builder.restoreIP(cg.savedIP);
     func->IRValue = func->getIRFunc(cg);
-    freeExpr(newArr);
 }
 
 void LgsCodeGen::visitPrefixExpr(LgsPrefixExpr* prefixExpr) {
@@ -1076,11 +1078,12 @@ Value* LgsCodeGen::createDynamicArray(LgsArrayExpr* arrayExpr) {
     const auto elementSize = cg.i64(size);
     const auto arrSize = cg.typeSize(arr->getArrStruct(cg));
     arrayExpr->IRValue = cg.callMalloc(arrSize.getFixedValue(), arrayExpr->owner, arr->rtt);
-    arr->initFunc->callIR(cg, {arrayExpr->IRValue, elementSize});
+    LgsFunc initFunc("init", &LGS_VOID, {arr, &LGS_LONG}, BUILTIN | METHOD);
+    initFunc.callIR(cg, {arrayExpr->IRValue, elementSize});
     for (int i = 0; i < arrayExpr->initialElements.size(); ++i) {
         const auto element = arrayExpr->initialElements[i];
         visitExpr(element);
-        arr->addFunc->call(cg, {arrayExpr, element});
+        arr->getAddFunc()->call(cg, {arrayExpr, element});
     }
     arr->mapFunc->getIRFunc(cg);
     return getIRValue(arrayExpr);

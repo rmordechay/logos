@@ -1,4 +1,5 @@
 #include "Lgs_types.h"
+#include "types/primitives/LgsBool.h"
 
 extern "C" void Lgs_print(const char* fmt, const Lgs_RTType rtt, const void* v) {
     switch (rtt) {
@@ -8,8 +9,9 @@ extern "C" void Lgs_print(const char* fmt, const Lgs_RTType rtt, const void* v) 
         break;
     }
     case RTT_BOOL: {
-        const char ch = *static_cast<const uint8_t*>(v);
-        printf(fmt, ch);
+        const char b = *static_cast<const uint8_t*>(v);
+        if (b) printf(fmt, LgsBool::trueLiteral);
+        else printf(fmt, LgsBool::falseLiteral);
         break;
     }
     case RTT_INT: {

@@ -4,25 +4,6 @@
 #include "types/LgsAny.h"
 #include "types/primitives/LgsChar.h"
 
-LgsStr::LgsStr(): LgsIterable(&LGS_CHAR) {
-    lenFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
-        return cg.callStrLen(args[0]->IRValue);
-    };
-    isEmptyFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
-        const auto strLen = cg.callStrLen(args[0]->IRValue);
-        return cg.builder.CreateICmpEQ(strLen, cg.builder.getInt64(0));
-    };
-    isNotEmptyFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
-        const auto strLen = cg.callStrLen(args[0]->IRValue);
-        return cg.builder.CreateICmpNE(strLen, cg.builder.getInt64(0));
-    };
-    addMethod(lenFunc);
-    addMethod(isEmptyFunc);
-    addMethod(isNotEmptyFunc);
-    isSliceable = true;
-    rtt = RTT_STR;
-}
-
 Type* LgsStr::getIRBaseType(LgsLLVMGen* cg) const {
     return ArrayType::get(baseType->getIRType(*cg), sizeExpr->getConstInt());
 }
@@ -136,21 +117,37 @@ Value* LgsStr::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     cg.callMemCpy(newStrPtr, self->IRValue, selfSize);
     const auto dstPtr = cg.builder.CreateInBoundsGEP(cg.i8Ty(), newStrPtr, selfSize);
     cg.callMemCpy(dstPtr, other->IRValue, otherSize);
-    // const auto endPtr = cg.builder.CreateInBoundsGEP(cg.i8Ty(), newStrPtr, newStrSize);
-    // cg.builder.CreateStore(cg.i8(0), endPtr);
     return newStrPtr;
 }
 
+LgsFunc* LgsStr::getLenFunc() {
+    const auto lenFunc = LgsIterable::getLenFunc();
+    lenFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
+        return cg.callStrLen(args[0]->IRValue);
+    };
+    return lenFunc;
+}
+
+LgsFunc* LgsStr::getIsEmptyFunc() {
+    const auto isEmptyFunc = LgsIterable::getIsEmptyFunc();
+    isEmptyFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
+        const auto strLen = cg.callStrLen(args[0]->IRValue);
+        return cg.builder.CreateICmpEQ(strLen, cg.builder.getInt64(0));
+    };
+    return isEmptyFunc;
+}
+
+LgsFunc* LgsStr::getIsNotEmptyFunc() {
+    const auto isNotEmptyFunc = LgsIterable::getIsNotEmptyFunc();
+    isNotEmptyFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
+        const auto strLen = cg.callStrLen(args[0]->IRValue);
+        return cg.builder.CreateICmpNE(strLen, cg.builder.getInt64(0));
+    };
+    return isNotEmptyFunc;
+}
+
 Value* LgsStr::IRLength(LgsLLVMGen& cg, Value* iterable) {
-    return lenFunc->callIR(cg, {iterable});
-}
-
-Value* LgsStr::IRIsEmpty(LgsLLVMGen* cg, LgsExpr* iterable) {
-    return isEmptyFunc->call(*cg, {iterable});
-}
-
-Value* LgsStr::IRIsNotEmpty(LgsLLVMGen* cg, LgsExpr* iterable) {
-    return isNotEmptyFunc->call(*cg, {iterable});
+    return getLenFunc()->callIR(cg, {iterable});
 }
 
 bool LgsStr::canCastTo(LgsType* other) {

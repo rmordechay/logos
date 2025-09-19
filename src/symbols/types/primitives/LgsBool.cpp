@@ -98,7 +98,7 @@ bool LgsBool::canCastTo(LgsType* other) {
 }
 
 std::string LgsBool::strFormatPart() const {
-    return "%d";
+    return "%s";
 }
 
 size_t LgsBool::getSizeBytes() {

@@ -97,6 +97,7 @@ public:
 
     bool addField(LgsField* field);
     bool addMethod(LgsFunc* method);
+    bool addEmptyMethod(const std::string& name);
     bool equals(LgsType* other);
     bool isVoid();
     bool isBig();

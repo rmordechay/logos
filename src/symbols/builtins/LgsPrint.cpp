@@ -5,6 +5,9 @@
 Value* LgsPrint::call(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
     const auto arg = args.front();
     assert(arg->type->rtt != RTT_UNKNOWN);
+    if (const auto strConst = arg->asStrConst()) {
+        if (!strConst->templateParts.empty()) return printFormat(cg, strConst);
+    }
     std::vector<Value*> IRArgs;
     const auto baseStr = cg.getIRStr(arg->type->strFormatPart());
     IRArgs.emplace_back(baseStr);

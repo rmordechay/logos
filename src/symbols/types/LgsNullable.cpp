@@ -7,7 +7,7 @@ Type* LgsNullable::getIRType(LgsLLVMGen& cg) {
 }
 
 std::string LgsNullable::getName() {
-    assert(0);
+    return baseType->getName() + "?";
 }
 
 LgsExpr* LgsNullable::getZeroValue() {

@@ -31,7 +31,7 @@ LgsExpr* LgsStrConst::castTo(LgsType* toType) {
 
 LgsStrConst::~LgsStrConst() {
     if (formatedStr != "") {
-        delete formatedStr.c_str();
-        formatedStr = "";
+        // delete formatedStr.c_str();
+        // formatedStr = "";
     }
 }
