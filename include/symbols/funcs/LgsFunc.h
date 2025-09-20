@@ -34,7 +34,6 @@ public:
     void initFunc(const std::string& name, LgsType* rt, const std::vector<LgsType*>& paramTypes, uint32_t ops);
     void setDebugValue(LgsLLVMGen& cg) override;
     void completeType(LgsType* toType) override;
-    LgsExpr* castTo(LgsType* toType) override;
     BasicBlock* getCleanupBlock(LgsLLVMGen& cg);
     bool needsCleanup() const;
     std::string pname() override;

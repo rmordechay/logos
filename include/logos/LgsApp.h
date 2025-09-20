@@ -30,7 +30,7 @@ public:
     LgsSymbolTable globals;
     LgsErrHandler errHandler;
     std::vector<LgsFile*> ast;
-    std::vector<LgsTestFile*> tests;
+    std::vector<LgsTestFile*> testsFiles;
     std::vector<LgsEnvFile*> envFiles;
     std::atomic<size_t> nextFileID = 1;
     std::vector<char*> appArgs;

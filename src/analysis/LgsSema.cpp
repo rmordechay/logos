@@ -791,7 +791,6 @@ void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent) {
         methodCall->func = method;
         methodCall->setType(method->funcType->rt);
     } else {
-        assert(!method->funcType->isBuiltin);
         errHandler.addError(E10034, &methodCall->location, {parent->type->pname(), name, methodCall->pname(), method->pname()});
         return;
     }

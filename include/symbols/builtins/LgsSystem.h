@@ -19,16 +19,16 @@ public:
     LgsFunc* coresNumFunc = new LgsFunc{"coresNumber", &LGS_LONG, {}, PUBLIC | BUILTIN};
 
     explicit LgsSystem() : LgsObject(name) {
-        getEnvFunc->funcType->params[2].expr = new LgsNull();
+        getEnvFunc->funcType->params[0].expr = new LgsNull();
         pidFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsExpr*>&) {
             return cg.callGetPid();
         };
         sleepFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
-            const auto arg = args[1]->loadIR(cg);
+            const auto arg = args[0]->loadIR(cg);
             return cg.callSleep(arg);
         };
         exitFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
-            return cg.callExit(args[1]->IRValue);
+            return cg.callExit(args[0]->IRValue);
         };
         cwdFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsExpr*>&) {
             return cg.callCwd();

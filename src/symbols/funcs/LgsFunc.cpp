@@ -17,7 +17,9 @@ Value* LgsFunc::call(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
         const auto& param = funcType->params[i];
         Value* v = nullptr;
         if (!param.isSelf && !arg->type->equals(param.type)) {
-            arg = arg->castTo(param.type);
+            const auto cast = arg->castTo(param.type);
+            if (cast != arg) freeExpr(arg);
+            arg = cast;
         }
         if (!param.isSelf && f->getArg(i)->getType()->isPointerTy()) {
             v = arg->getIRPtrTo(cg);
@@ -34,6 +36,7 @@ Value* LgsFunc::call(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
             IRArgs.emplace_back(param.expr->IRValue);
         }
     }
+
     return callIR(cg, IRArgs);
 }
 
@@ -99,10 +102,6 @@ void LgsFunc::completeType(LgsType* toType) {
     if (!funcType->rt) {
         funcType->rt = otherFuncType->rt;
     }
-}
-
-LgsExpr* LgsFunc::castTo(LgsType* toType) {
-    return this;
 }
 
 BasicBlock* LgsFunc::getCleanupBlock(LgsLLVMGen& cg) {

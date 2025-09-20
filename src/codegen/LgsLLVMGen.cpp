@@ -147,7 +147,7 @@ Value* LgsLLVMGen::callSqrt(Value* radicant) {
 void LgsLLVMGen::callMemCpy(Value* dest, Value* src, Value* size) {
     const auto dataLayout = targetMachine->createDataLayout();
     const auto memCpy = Intrinsic::getDeclaration(IRModule, Intrinsic::memcpy, {ptrTy(), ptrTy(), sizeTy()});
-    builder.CreateCall(memCpy, {dest, src, size, builder.getFalse()});
+    builder.CreateCall(memCpy, {dest, src, builder.CreateSExt(size, i64Ty()), builder.getFalse()});
 }
 
 void LgsLLVMGen::callRuntimeInit() {

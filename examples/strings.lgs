@@ -1,3 +1,8 @@
+func(x: Str) {
+    print(x)
+    print("{x}")
+}
+
 func(x: Str, y: Str) {
     print(x + y + "lkdsjf")
 }

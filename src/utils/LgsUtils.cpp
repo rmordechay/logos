@@ -81,12 +81,13 @@ void freeType(LgsType* type) {
     if (!type) return;
     if (type->isPrimitive) return;
     if (type->isUnknown) return;
-    // delete type;
+    std::cout << "Delete type: " << type << std::endl;
+    delete type;
 }
 
 void freeExpr(const LgsExpr* expr) {
     if (!expr) return;
-    // delete expr;
+    delete expr;
 }
 
 size_t hashStr(const char* key) {

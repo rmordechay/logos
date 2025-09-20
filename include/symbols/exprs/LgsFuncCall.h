@@ -12,6 +12,7 @@ public:
     std::vector<LgsExpr*> args;
     LgsFunc* func = nullptr;
     bool isMethodCall = false;
+    bool isCoroutine = false;
     LgsSymbol ref;
 
     explicit LgsFuncCall(const std::string& name, const std::vector<LgsExpr*>& args = {}) : name(name), args(args) {}

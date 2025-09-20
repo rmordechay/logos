@@ -24,11 +24,6 @@ LgsExpr* LgsStrConst::clone() {
     return new LgsStrConst(*this);
 }
 
-LgsExpr* LgsStrConst::castTo(LgsType* toType) {
-    if (type->asStr()) return this;
-    assert(0);
-}
-
 LgsStrConst::~LgsStrConst() {
     if (formatedStr != "") {
         // delete formatedStr.c_str();

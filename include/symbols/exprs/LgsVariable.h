@@ -12,7 +12,6 @@ public:
     Value* loadIR(LgsLLVMGen& cg) override;
     bool equals(LgsExpr* other) override;
     Value* hash(LgsLLVMGen& cg) override;
-    LgsExpr* castTo(LgsType* toType) override;
     void assign(LgsLLVMGen& cg, LgsExpr* expr) override;
     std::string pname() override;
     json::value asJSON() override;

@@ -23,5 +23,4 @@ public:
     std::string strFormatPart() const override;
     Value* IRLength(LgsLLVMGen& cg, Value* iterable) override;
     bool canCastTo(LgsType* other) override;
-    ~LgsSArray() override;
 };

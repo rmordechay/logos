@@ -42,7 +42,7 @@ inline LgsBaseError E10017{.msg = "'break' must be inside a for loop.", .code = 
 inline LgsBaseError E10018{.msg = "Expression of type '%s' cannot cast to type '%s'.", .code = errCodeStart++};
 inline LgsBaseError E10019{.msg = "activeEnv '%s' could not be found in the envs directory.", .code = errCodeStart++};
 inline LgsBaseError E10020{.msg = "Environment '%s' does not define the required field '%s'.", .code = errCodeStart++};
-inline LgsBaseError E10021{.msg = "Only function call or block is allowed to run as coroutine.", .code = errCodeStart++};
+inline LgsBaseError E10021{.msg = "Only function call is allowed to run as coroutine.", .code = errCodeStart++};
 inline LgsBaseError E10022{.msg = "'%s' cannot be instantiated.", .code = errCodeStart++};
 inline LgsBaseError E10023{.msg = "Type '%s' must be nullable.", .code = errCodeStart++};
 inline LgsBaseError E10024{.msg = "Declaration of null value must have an explict nullable type.", .code = errCodeStart++};

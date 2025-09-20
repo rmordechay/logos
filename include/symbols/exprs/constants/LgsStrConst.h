@@ -20,6 +20,5 @@ public:
     Value* hash(LgsLLVMGen& cg) override;
     json::value asJSON() override;
     LgsExpr* clone() override;
-    LgsExpr* castTo(LgsType* toType) override;
     ~LgsStrConst() override;
 };

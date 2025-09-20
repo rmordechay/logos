@@ -775,7 +775,9 @@ void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
     if (funcCall->name == "map") {
         createMapFunc(funcCall->func);
     }
-    funcCall->IRValue = funcCall->func->call(cg, funcCall->args);
+    if (!funcCall->isCoroutine) {
+        funcCall->IRValue = funcCall->func->call(cg, funcCall->args);
+    }
 }
 
 void LgsCodeGen::createMapFunc(LgsFunc* func) {

@@ -26,6 +26,7 @@ bool LgsInt::canCastTo(LgsType* other) {
     if (name == otherName) return true;
     if (otherName == LgsAny::name) return true;
     if (otherName == LgsSize::name) return true;
+    if (otherName == LgsLong::name) return true;
     if (otherName == LgsFloat::name) return true;
     if (otherName == LgsDouble::name) return true;
     return false;

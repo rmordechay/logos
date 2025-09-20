@@ -44,12 +44,6 @@ std::string LgsSelection::pname() {
     return str.str();
 }
 
-LgsExpr* LgsSelection::castTo(LgsType* toType) {
-    if (toType->getName() == LgsAny::name) return this;
-    if (type->getName() == toType->getName()) return this;
-    assert(0);
-}
-
 Value* LgsSelection::hash(LgsLLVMGen& cg) {
     const auto lgsExpr = lastExpr();
     return lgsExpr->hash(cg);

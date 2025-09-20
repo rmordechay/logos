@@ -55,6 +55,3 @@ Value* LgsSArray::IRLength(LgsLLVMGen& cg, Value* iterable) {
     return sizeExpr->IRValue;
 }
 
-LgsSArray::~LgsSArray() {
-    delete sizeExpr;
-}

@@ -23,7 +23,7 @@ LgsExpr* LgsExpr::clone() {
 }
 
 LgsExpr* LgsExpr::castTo(LgsType* toType) {
-    assert(0);
+    return this;
 }
 
 void LgsExpr::completeType(LgsType* toType) {

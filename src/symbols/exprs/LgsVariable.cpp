@@ -48,10 +48,6 @@ Value* LgsVariable::hash(LgsLLVMGen& cg) {
     }
 }
 
-LgsExpr* LgsVariable::castTo(LgsType* toType) {
-    return this;
-}
-
 std::string LgsVariable::pname() {
     return name;
 }

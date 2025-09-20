@@ -136,11 +136,11 @@ extern "C" void* Lgs_vtable_get(void* instancePtr, const char* name) {
 }
 
 void Lgs_runtime::init() {
-    // scheduler.run();
+    scheduler.run();
     //sqlite3_open(":memory:", &runtime.db);
 }
 
 void Lgs_runtime::close() {
-    // scheduler.shutdown();
+    scheduler.shutdown();
     // sqlite3_close(runtime.db);
 }

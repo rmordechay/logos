@@ -11,6 +11,7 @@
 #include "files/LgsEnvFile.h"
 #include "codegen/LgsCodeGen.h"
 #include "codegen/LgsLinker.h"
+#include "files/LgsTestFile.h"
 #include "utils/LgsUtils.h"
 #include "llvm/IR/Verifier.h"
 #include <llvm/Target/TargetMachine.h>
@@ -237,4 +238,8 @@ void LgsApp::freeApp() {
         delete envFile;
     }
     envFiles.clear();
+    for (const auto testFile : testsFiles) {
+        delete testFile;
+    }
+    testsFiles.clear();
 }

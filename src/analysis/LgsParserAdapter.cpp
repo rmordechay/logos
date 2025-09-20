@@ -615,11 +615,14 @@ LgsCoroutine* LgsParserAdapter::getCoroutine(LogosParser::CoroutineContext* ctx)
     const auto coroutine = new LgsCoroutine();
     if (const auto funcCall = ctx->funcCall()) {
         coroutine->funcCall = getFuncCall(funcCall);
+        coroutine->funcCall->isCoroutine = true;
     } else if (const auto selection = ctx->selection()) {
         const auto lgsSelection = getSelection(selection);
-        if (!lgsSelection->lastExpr()->asFuncCall()) {
+        const auto methodCall = lgsSelection->lastExpr()->asFuncCall();
+        if (!methodCall) {
             errHandler.addError(E10021, &lgsSelection->location);
         }
+        methodCall->isCoroutine = true;
         coroutine->selection = lgsSelection;
     } else {
         assert(0);
