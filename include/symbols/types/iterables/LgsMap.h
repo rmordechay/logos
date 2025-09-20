@@ -1,5 +1,6 @@
 #pragma once
 #include "LgsStr.h"
+#include "funcs/LgsFunc.h"
 #include "types/LgsAny.h"
 #include "types/LgsTypePair.h"
 class LgsMapEntry;

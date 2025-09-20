@@ -1,5 +1,4 @@
 #pragma once
-#include "exprs/LgsVectorExpr.h"
 #include "logos/LgsStack.h"
 #include "utils/LgsErrHandler.h"
 #include "analysis/LgsTypeResolver.h"
@@ -7,6 +6,7 @@
 #include "stmts/LgsIOPair.h"
 #include "stmts/LgsIOStmt.h"
 
+class LgsVec;
 class LgsInterfaceFile;
 class LgsObjectFile;
 class LgsPostfixExpr;

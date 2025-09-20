@@ -20,6 +20,7 @@
 #include "exprs/LgsPostfixExpr.h"
 #include "exprs/LgsPrefixExpr.h"
 #include "exprs/LgsTypeExpr.h"
+#include "exprs/LgsVectorExpr.h"
 #include "exprs/constants/LgsStrConst.h"
 #include "files/LgsMainFile.h"
 #include "files/LgsTestFile.h"

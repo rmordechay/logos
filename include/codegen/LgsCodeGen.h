@@ -109,11 +109,13 @@ public:
     void createMapFunc(LgsFunc* func);
     void visitPrefixExpr(LgsPrefixExpr* prefixExpr);
     void visitPostfixExpr(LgsPostfixExpr* postfixExpr);
-    void visitStrConst(LgsStrConst* strConst) const;
+    void visitStrConst(LgsStrConst* strConst);
     void visitIterIndex(LgsIterIndex* iterIndex);
     void visitInstance(LgsInstance* instance);
+
     void initFields(LgsInstance* instance);
     bool checkMock(LgsExpr* expr);
+    bool shouldAllocate(const LgsVarDec* varDec) const;
 
     // Funcs
     void initMainArgs(LgsMainFunc* mainFunc);

@@ -26,14 +26,14 @@ Value* LgsPrint::printFormat(LgsLLVMGen& cg, const LgsStrConst* const strConst) 
     auto formated = strConst->formatedStr;
     std::vector<Value*> values;
     for (const auto part : strConst->templateParts) {
-        auto partIR = part->loadIR(cg);
+        auto partIR = part->IRValue;
         values.push_back(partIR);
         const auto pos = formated.find(LGS_STR_FMT_PLACEHOLDER);
         if (pos != std::string::npos) {
             formated.replace(pos, strlen(LGS_STR_FMT_PLACEHOLDER), part->type->strFormatPart());
         }
     }
-    std::vector IRArgs = {cg.getIRStr(formated)};
+    std::vector IRArgs = {cg.getIRStr(formated + "\n")};
     IRArgs.insert(IRArgs.end(), values.begin(), values.end());
     return cg.callPrintf(IRArgs);
 }

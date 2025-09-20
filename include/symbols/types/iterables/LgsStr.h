@@ -1,6 +1,5 @@
 #pragma once
 #include "LgsIterable.h"
-#include "funcs/LgsFunc.h"
 #include "types/primitives/LgsChar.h"
 #include "types/primitives/LgsLong.h"
 

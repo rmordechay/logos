@@ -8,17 +8,6 @@ Value* LgsVarDec::loadIR(LgsLLVMGen& cg) {
     return cg.builder.CreateLoad(type->getIRType(cg), IRValue);
 }
 
-bool LgsVarDec::shouldAllocate(const Type* IRType) const {
-    if (type->asVec() ||
-        type->asFuncType() ||
-        type->asMap() ||
-        type->asDArray() ||
-        expr->asInstance() ||
-        (expr->asFuncCall() && type->isNumber)
-    ) return false;
-    return !IRType->isArrayTy() && !IRType->isPointerTy() && !IRType->isVoidTy();
-}
-
 void LgsVarDec::setDebugValue(LgsLLVMGen& cg) {
     const auto var = cg.diBuilder->createAutoVariable(
         cg.compileUnit,

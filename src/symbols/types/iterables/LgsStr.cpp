@@ -1,5 +1,6 @@
 #include "exprs/constants/LgsFloatConst.h"
 #include "exprs/constants/LgsStrConst.h"
+#include "funcs/LgsFunc.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsChar.h"

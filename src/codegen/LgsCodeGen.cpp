@@ -281,7 +281,7 @@ void LgsCodeGen::visitWhileLoop(const LgsWhileLoop* loop) {
 void LgsCodeGen::visitVarDec(LgsVarDec* varDec) {
     const auto IRType = varDec->type->getIRType(cg);
     const auto exprIRValue = getIRValue(varDec->expr);
-    if (varDec->shouldAllocate(IRType)) {
+    if (shouldAllocate(varDec)) {
         varDec->IRValue = cg.builder.CreateAlloca(IRType, nullptr, varDec->name);
         cg.builder.CreateStore(exprIRValue, varDec->IRValue);
     } else {
@@ -867,7 +867,10 @@ void LgsCodeGen::visitPostfixExpr(LgsPostfixExpr* postfixExpr) {
     }
 }
 
-void LgsCodeGen::visitStrConst(LgsStrConst* strConst) const {
+void LgsCodeGen::visitStrConst(LgsStrConst* strConst) {
+    for (auto templatePart : strConst->templateParts) {
+        visitExpr(templatePart);
+    }
     strConst->IRValue = cg.getIRStr(strConst->value);
 }
 
@@ -923,6 +926,16 @@ bool LgsCodeGen::checkMock(LgsExpr* expr) {
         }
     }
     return false;
+}
+
+bool LgsCodeGen::shouldAllocate(const LgsVarDec* varDec) const {
+    const auto type = varDec->type;
+    const auto expr = varDec->expr;
+    const auto IRType = varDec->type->getIRType(cg);
+    if (type->asVec() || type->asFuncType() || type->isHeapAlloc || (expr->asFuncCall() && type->isNumber)) {
+        return false;
+    }
+    return !IRType->isArrayTy() && !IRType->isPointerTy() && !IRType->isVoidTy();
 }
 
 void LgsCodeGen::initMainArgs(LgsMainFunc* mainFunc) {

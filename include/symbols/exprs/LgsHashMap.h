@@ -1,6 +1,5 @@
 #pragma once
-
-#include "../types/iterables/LgsMap.h"
+#include "types/iterables/LgsMap.h"
 
 class LgsHashMap final : public LgsExpr {
 public:
