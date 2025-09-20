@@ -135,7 +135,7 @@ LgsType* LgsFuncType::clone() {
     if (rt) copy->rt = rt->clone();
     copy->params.reserve(params.size());
     for (auto p : params) {
-        copy->params.push_back(p.clone());
+        assert(0);
     }
     copy->isMethod = isMethod;
     copy->isPublic = isPublic;
@@ -160,9 +160,6 @@ LgsFuncType::~LgsFuncType() {
     for (int i = 0; i < params.size(); ++i) {
         const auto param = params[i];
         if (param.expr) {
-            if (param.type && param.expr->type != param.type) {
-                freeType(param.type);
-            }
             freeExpr(param.expr);
         } else if (param.type) {
             freeType(param.type);

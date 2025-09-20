@@ -39,7 +39,6 @@ public:
     std::string getName() override;
     std::string pname() override;
     json::value asJSON() override;
-    LgsType* clone() override;
     DIBasicType* getDebugType(LgsLLVMGen& cg) override;
 };
 

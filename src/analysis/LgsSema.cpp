@@ -972,7 +972,7 @@ void LgsSema::visitIterIndex(LgsIterIndex* iterIndex) {
     const auto baseExpr = iterIndex->baseExpr;
     visitExpr(baseExpr);
     iterIndex->isMutable = baseExpr->isMutable;
-    if (baseExpr->type->isUnknown) return;
+    if (!baseExpr->type) return;
     const auto iterable = baseExpr->type->asIterable();
     if (!iterable) {
         const auto typeName = baseExpr->type ? baseExpr->type->pname() : LGS_UNKNOWN_TYPE;

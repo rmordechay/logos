@@ -57,7 +57,13 @@ LgsInstance::~LgsInstance() {
     }
     args.clear();
     if (obj) {
-        freeType(obj);
+        for (const auto& field : obj->fields) {
+            delete field;
+        }
+        for (const auto interface : obj->interfaces) {
+            delete interface;
+        }
+        // delete obj;
         obj = nullptr;
         type = nullptr;
     }

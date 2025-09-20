@@ -157,10 +157,6 @@ json::value LgsInt::asJSON() {
     return jsonObj;
 }
 
-LgsType* LgsInt::clone() {
-    return this;
-}
-
 DIBasicType* LgsInt::getDebugType(LgsLLVMGen& cg) {
     return cg.diBuilder->createBasicType(name, 32, dwarf::DW_ATE_signed);
 }

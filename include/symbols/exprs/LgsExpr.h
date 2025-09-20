@@ -51,13 +51,12 @@ public:
     LgsValue* owner = nullptr;
 
     explicit LgsExpr(LgsType* type = nullptr) : type(type) {}
-    virtual LgsExpr* clone();
     virtual LgsExpr* castTo(LgsType* toType);
     virtual void completeType(LgsType* toType);
 
     virtual Value* hash(LgsLLVMGen& cg);
     virtual void assign(LgsLLVMGen& cg, LgsExpr* expr);
-    virtual Value* getIRPtrTo(LgsLLVMGen& cg) const;
+    virtual Value* getIRPtrTo(LgsLLVMGen& cg);
     virtual bool equals(LgsExpr* other);
 
     void freeOwner(LgsLLVMGen& cg);
@@ -82,6 +81,5 @@ public:
     LgsVectorExpr* asVectorExpr();
     LgsIntConst* asIntConst();
     LgsLoopMetaVar* asLoopMetaVar();
-
-    ~LgsExpr() override;
+    ~LgsExpr() override = default;
 };

@@ -105,12 +105,12 @@ LgsObject* LgsObject::clone() {
     const auto cloned = new LgsObject(*this);
     cloned->fields.clear();
     for (const auto& field : fields) {
-        cloned->addField(field->clone());
+        const auto newField = new LgsField(*field);
+        if (field->expr) {
+            assert(0);
+        }
+        cloned->addField(newField);
     }
-    // cloned->methods.clear();
-    // for (const auto& [_, method] : methods) {
-    //     cloned->addMethod(method->clone()->asFunc());
-    // }
     return cloned;
 }
 
@@ -154,9 +154,3 @@ json::value LgsObject::asJSON() {
     return jsonObj;
 }
 
-LgsObject::~LgsObject() {
-    for (const auto interface : interfaces) {
-        freeType(interface);
-    }
-    interfaces.clear();
-}

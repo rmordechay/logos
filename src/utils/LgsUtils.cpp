@@ -77,17 +77,18 @@ std::string removeUnderscores(const std::string& input) {
     return result;
 }
 
-void freeType(LgsType* type) {
+void freeType(const LgsType* type) {
     if (!type) return;
     if (type->isPrimitive) return;
     if (type->isUnknown) return;
-    std::cout << "Delete type: " << type << std::endl;
-    delete type;
+    // delete type;
 }
 
-void freeExpr(const LgsExpr* expr) {
+void freeExpr(LgsExpr* expr) {
     if (!expr) return;
-    delete expr;
+    if (!expr->asVariable()) freeType(expr->type);
+    expr->type = nullptr;
+    // delete expr;
 }
 
 size_t hashStr(const char* key) {

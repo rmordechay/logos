@@ -26,6 +26,5 @@ public:
     Value* loadIR(LgsLLVMGen& cg) override;
     Value* resolveVirtualField(LgsLLVMGen* cg, const LgsHashMap* vtable) const;
     json::value asJSON() override;
-    LgsField* clone() const;
     ~LgsField() override;
 };

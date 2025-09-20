@@ -15,7 +15,6 @@ public:
     Type* getIRType(LgsLLVMGen& cg) override;
     std::string getName() override;
     std::string pname() override;
-    json::value asJSON() override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
     LgsType* getIndexType() override;
@@ -23,4 +22,5 @@ public:
     std::string strFormatPart() const override;
     Value* IRLength(LgsLLVMGen& cg, Value* iterable) override;
     bool canCastTo(LgsType* other) override;
+    json::value asJSON() override;
 };

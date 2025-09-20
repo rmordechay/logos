@@ -104,6 +104,7 @@ void LgsCodeGen::visitMainFunc(LgsMainFunc* func) {
     if (!func->funcType->params.empty()) initMainArgs(func);
     visitStmtsBlock(func->stmtsBlock);
     createEpilogue(func);
+    cg.callPopStack();
     cg.builder.CreateRet(cg.i32(EXIT_SUCCESS));
     stack.exitScope();
 }
@@ -1073,8 +1074,9 @@ Value* LgsCodeGen::createStaticArray(const LgsArrayExpr* arrayExpr) {
             IRValues.push_back(dyn_cast<Constant>(getIRValue(element)));
         }
         const auto at = ArrayType::get(baseIRType, arrayExpr->initialElements.size());
+        const auto size = arr->baseType->getSizeBytes() * arrayExpr->initialElements.size();
         const auto constArr = cg.createConstGlobal(at, ConstantArray::get(at, IRValues));
-        cg.callMemCpy(arrIRPtr, constArr, arr->sizeExpr->IRValue);
+        cg.callMemCpy(arrIRPtr, constArr, cg.i64(size));
         return arrIRPtr;
     }
 

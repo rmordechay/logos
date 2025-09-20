@@ -19,6 +19,5 @@ public:
     std::string pname() override;
     Value* hash(LgsLLVMGen& cg) override;
     json::value asJSON() override;
-    LgsExpr* clone() override;
     ~LgsStrConst() override;
 };

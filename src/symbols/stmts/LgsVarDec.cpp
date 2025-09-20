@@ -35,10 +35,6 @@ json::value LgsVarDec::asJSON() {
 
 LgsVarDec::~LgsVarDec() {
     if (expr) {
-        if (expr->type != type) {
-            freeType(type);
-            type = nullptr;
-        }
         freeExpr(expr);
         expr = nullptr;
     } else if (type) {

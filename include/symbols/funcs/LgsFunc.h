@@ -38,6 +38,5 @@ public:
     bool needsCleanup() const;
     std::string pname() override;
     json::value asJSON() override;
-    LgsExpr* clone() override;
     ~LgsFunc() override;
 };

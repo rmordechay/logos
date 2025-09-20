@@ -125,5 +125,5 @@ public:
     LgsPtr* asPtr();
     LgsGroup* asGroup();
     LgsTypePair* asPair();
-    virtual ~LgsType();
+    virtual ~LgsType() = default;
 };

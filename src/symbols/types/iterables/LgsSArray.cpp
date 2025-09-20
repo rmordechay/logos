@@ -9,12 +9,18 @@ Type* LgsSArray::getIRType(LgsLLVMGen& cg) {
     return IRType;
 }
 
-size_t LgsSArray::getSizeBytes() {
-    return baseType->getSizeBytes() * sizeExpr->getConstInt();
+std::string LgsSArray::getName() {
+    return name;
 }
 
-uint16_t LgsSArray::getUnpackCount() const {
-    return 1;
+std::string LgsSArray::pname() {
+    const auto index = sizeExpr->getConstInt() == 0 ? "" : std::to_string(sizeExpr->getConstInt());
+    const auto ty = baseType ? baseType->pname() : "";
+    return ty + '[' + index + "]!";
+}
+
+size_t LgsSArray::getSizeBytes() {
+    return baseType->getSizeBytes() * sizeExpr->getConstInt();
 }
 
 LgsExpr* LgsSArray::getZeroValue() {
@@ -25,19 +31,17 @@ LgsType* LgsSArray::getIndexType() {
     return &LGS_INT;
 }
 
+uint16_t LgsSArray::getUnpackCount() const {
+    return 1;
+}
+
 std::string LgsSArray::strFormatPart() const {
     if (baseType->asChar()) return "%s";
     return "%p";
 }
 
-json::value LgsSArray::asJSON() {
-    assert(0);
-}
-
-std::string LgsSArray::pname() {
-    const auto index = sizeExpr->getConstInt() == 0 ? "" : std::to_string(sizeExpr->getConstInt());
-    const auto ty = baseType ? baseType->pname() : "";
-    return ty + '[' + index + "]!";
+Value* LgsSArray::IRLength(LgsLLVMGen& cg, Value* iterable) {
+    return sizeExpr->IRValue;
 }
 
 bool LgsSArray::canCastTo(LgsType* other) {
@@ -47,11 +51,7 @@ bool LgsSArray::canCastTo(LgsType* other) {
     return baseType->canCastTo(otherArr->baseType);
 }
 
-std::string LgsSArray::getName() {
-    return name;
-}
-
-Value* LgsSArray::IRLength(LgsLLVMGen& cg, Value* iterable) {
-    return sizeExpr->IRValue;
+json::value LgsSArray::asJSON() {
+    assert(0);
 }
 

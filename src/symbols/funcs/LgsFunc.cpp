@@ -11,7 +11,6 @@
 Value* LgsFunc::call(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
     if (fn) return fn(cg, args);
     std::vector<Value*> IRArgs;
-    const auto f = getIRFunc(cg);
     for (int i = 0; i < args.size(); ++i) {
         auto arg = args[i];
         const auto& param = funcType->params[i];
@@ -21,11 +20,7 @@ Value* LgsFunc::call(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
             if (cast != arg) freeExpr(arg);
             arg = cast;
         }
-        if (!param.isSelf && f->getArg(i)->getType()->isPointerTy()) {
-            v = arg->getIRPtrTo(cg);
-        } else {
-            v = arg->loadIR(cg);
-        }
+        v = arg->loadIR(cg);
         IRArgs.emplace_back(v);
     }
 
@@ -123,13 +118,6 @@ json::value LgsFunc::asJSON() {
     obj["funcType"] = funcType->asJSON();
     obj["stmtsBlock"] = stmtsBlock->asJSON();
     return obj;
-}
-
-LgsExpr* LgsFunc::clone() {
-    const auto newFunc = new LgsFunc(funcType->clone()->asFuncType());
-    newFunc->isNull = isNull;
-    newFunc->isSpread = isSpread;
-    return newFunc;
 }
 
 void LgsFunc::setDebugValue(LgsLLVMGen& cg) {

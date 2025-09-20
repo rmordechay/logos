@@ -31,5 +31,4 @@ public:
     std::string pname() override;
     bool canCastTo(LgsType* other) override;
     json::value asJSON() override;
-    ~LgsObject() override;
 };

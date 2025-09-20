@@ -18,10 +18,6 @@
 
 class LgsTypeExpr;
 
-LgsExpr* LgsExpr::clone() {
-    assert(0);
-}
-
 LgsExpr* LgsExpr::castTo(LgsType* toType) {
     return this;
 }
@@ -38,7 +34,8 @@ void LgsExpr::assign(LgsLLVMGen& cg, LgsExpr* expr) {
     assert(0);
 }
 
-Value* LgsExpr::getIRPtrTo(LgsLLVMGen& cg) const {
+Value* LgsExpr::getIRPtrTo(LgsLLVMGen& cg) {
+    if (asIterIndex()) return loadIR(cg);
     if (IRValue->getType()->isPointerTy()) return IRValue;
     const auto ptr = cg.builder.CreateAlloca(IRValue->getType());
     cg.builder.CreateStore(IRValue, ptr);
@@ -126,10 +123,3 @@ LgsStrConst* LgsExpr::asStrConst() { return dynamic_cast<LgsStrConst*>(this); }
 LgsVectorExpr* LgsExpr::asVectorExpr() { return dynamic_cast<LgsVectorExpr*>(this); }
 LgsIntConst* LgsExpr::asIntConst() { return dynamic_cast<LgsIntConst*>(this); }
 LgsLoopMetaVar* LgsExpr::asLoopMetaVar() { return dynamic_cast<LgsLoopMetaVar*>(this); }
-
-LgsExpr::~LgsExpr() {
-    if (type) {
-        freeType(type);
-        type = nullptr;
-    }
-}

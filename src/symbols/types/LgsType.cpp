@@ -246,16 +246,3 @@ LgsGroup* LgsType::asGroup() {
 LgsTypePair* LgsType::asPair() {
     return dynamic_cast<LgsTypePair*>(this);
 }
-
-LgsType::~LgsType() {
-    for (const auto& field : fields) {
-        delete field;
-    }
-    fields.clear();
-    for (const auto& [_, method] : methods) {
-        if (!method) continue;
-        if (method->funcType->isBuiltin) continue;
-        delete method;
-    }
-    methods.clear();
-}

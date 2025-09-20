@@ -146,7 +146,7 @@ json::value LgsIterIndex::asJSON() {
 
 LgsIterIndex::~LgsIterIndex() {
     if (baseExpr) {
-        delete baseExpr;
+        freeExpr(baseExpr);
         baseExpr = nullptr;
     }
     if (index) {

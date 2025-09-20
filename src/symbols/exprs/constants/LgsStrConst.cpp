@@ -20,10 +20,6 @@ json::value LgsStrConst::asJSON() {
     return jsonObj;
 }
 
-LgsExpr* LgsStrConst::clone() {
-    return new LgsStrConst(*this);
-}
-
 LgsStrConst::~LgsStrConst() {
     if (formatedStr != "") {
         // delete formatedStr.c_str();

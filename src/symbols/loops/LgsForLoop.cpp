@@ -45,7 +45,7 @@ LgsForLoop::~LgsForLoop() {
         stmtsBlock = nullptr;
     }
     for (const auto& loopVar : loopVars) {
-        delete loopVar;
+        // delete loopVar;
     }
     loopVars.clear();
 }

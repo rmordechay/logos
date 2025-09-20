@@ -15,7 +15,7 @@ std::string LgsDArray::getName() {
 
 std::string LgsDArray::pname() {
     assert(baseType);
-    return baseType->pname() + "[]";
+    return baseType->pname() + "[" + sizeExpr->pname() + "]";
 }
 
 size_t LgsDArray::getSizeBytes() {

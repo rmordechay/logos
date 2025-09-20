@@ -25,10 +25,6 @@ LgsExpr* LgsIntConst::castTo(LgsType* toType) {
     assert(0);
 }
 
-LgsExpr* LgsIntConst::clone() {
-    return new LgsIntConst(*this);
-}
-
 std::string LgsIntConst::pname() {
     return std::to_string(value);
 }
