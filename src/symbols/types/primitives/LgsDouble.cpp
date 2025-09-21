@@ -1,6 +1,7 @@
 #include "types/primitives/LgsDouble.h"
 #include "exprs/constants/LgsFloatConst.h"
 #include "../codegen/LgsLLVMGen.h"
+#include "types/LgsAny.h"
 
 std::string LgsDouble::getName() {
     return name;
@@ -31,5 +32,8 @@ Type* LgsDouble::getIRType(LgsLLVMGen& cg) {
 }
 
 bool LgsDouble::canCastTo(LgsType* other) {
-    return name == other->getName();
+    const auto IRName = other->getName();
+    if (name == IRName) return true;
+    if (IRName == LgsAny::name) return true;
+    return false;
 }

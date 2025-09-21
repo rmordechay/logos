@@ -375,7 +375,7 @@ LgsMainFunc* LgsParserAdapter::getMainFunc(LogosParser::FuncContext* ctx) {
 }
 
 LgsFunc* LgsParserAdapter::getLambda(LogosParser::LambdaContext* ctx) {
-    const auto func = new LgsFunc("");
+    const auto func = new LgsFunc("", nullptr);
     currentFunc = func;
     func->isLambda = true;
     func->funcType->rt = getType(ctx->rt);
@@ -552,22 +552,6 @@ bool LgsParserAdapter::setMainArgsParam(const LgsMainFunc* mainFunc, LogosParser
     return arr && arr->baseType->asStr();
 }
 
-LgsAssignType mapAssignType(LogosParser::AssignmentContext* assignment) {
-    const auto op = assignment->assignemntOp();
-    if (op->WALRUS()) return ASSIGN;
-    if (op->EQUAL_PLUS()) return ASSIGN_ADD;
-    if (op->EQUAL_MINUS()) return ASSIGN_SUB;
-    if (op->EQUAL_STAR()) return ASSIGN_MUL;
-    if (op->EQUAL_SLASH()) return ASSIGN_DIV;
-    if (op->EQUAL_PERCENT()) return ASSIGN_MOD;
-    if (op->EQUAL_DOUBLE_LANGLE()) return ASSIGN_LSHIFT;
-    if (op->EQUAL_DOUBLE_RANGLE()) return ASSIGN_RSHIFT;
-    if (op->EQUAL_AMPERSAND()) return ASSIGN_AND;
-    if (op->EQUAL_PIPE()) return ASSIGN_OR;
-    if (op->EQUAL_CARET()) return ASSIGN_XOR;
-    assert(false);
-}
-
 LgsAssignment* LgsParserAdapter::getAssignment(LogosParser::AssignmentContext* ctx) {
     LgsExpr* lValue = nullptr;
     if (const auto variable = ctx->IDENTIFIER()) {
@@ -579,6 +563,21 @@ LgsAssignment* LgsParserAdapter::getAssignment(LogosParser::AssignmentContext* c
     } else {
         assert(0);
     }
+    const auto mapAssignType = [](LogosParser::AssignmentContext* assignment) {
+        const auto op = assignment->assignemntOp();
+        if (op->WALRUS()) return ASSIGN;
+        if (op->EQUAL_PLUS()) return ASSIGN_ADD;
+        if (op->EQUAL_MINUS()) return ASSIGN_SUB;
+        if (op->EQUAL_STAR()) return ASSIGN_MUL;
+        if (op->EQUAL_SLASH()) return ASSIGN_DIV;
+        if (op->EQUAL_PERCENT()) return ASSIGN_MOD;
+        if (op->EQUAL_DOUBLE_LANGLE()) return ASSIGN_LSHIFT;
+        if (op->EQUAL_DOUBLE_RANGLE()) return ASSIGN_RSHIFT;
+        if (op->EQUAL_AMPERSAND()) return ASSIGN_AND;
+        if (op->EQUAL_PIPE()) return ASSIGN_OR;
+        if (op->EQUAL_CARET()) return ASSIGN_XOR;
+        assert(false);
+    };
     const auto assignment = new LgsAssignment(mapAssignType(ctx), lValue, getExpr(ctx->expr()));
     setLocation(assignment->location, ctx->start, ctx->stop);
     return assignment;
@@ -795,32 +794,31 @@ LgsExpr* LgsParserAdapter::getUnaryExpr(LogosParser::UnaryExprContext* ctx) {
     assert(0);
 }
 
-LgsOperator mapOperator(LogosParser::ExprContext* expr) {
-    if (expr->PLUS()) return ADD;
-    if (expr->MINUS()) return SUB;
-    if (expr->STAR()) return MUL;
-    if (expr->SLASH()) return DIV;
-    if (expr->PERCENT()) return MOD;
-    if (expr->NOT_EQUAL()) return NE;
-    if (expr->DOUBLE_EQUAL()) return EQ;
-    if (expr->RANGLE()) return GT;
-    if (expr->LANGLE()) return LT;
-    if (expr->GE()) return GE;
-    if (expr->LE()) return LE;
-    if (expr->AND()) return AND;
-    if (expr->OR()) return OR;
-    if (expr->AMPERSAND()) return BIT_AND;
-    if (expr->PIPE()) return BIT_OR;
-    if (expr->DOUBLE_LANGLE()) return LSHIFT;
-    if (expr->DOUBLE_RANGLE()) return RSHIFT;
-    if (expr->CARET()) return BIT_XOR;
-    if (expr->IN()) return IN;
-    assert(false);
-}
-
 LgsExpr* LgsParserAdapter::getBinaryExpr(LogosParser::ExprContext* ctx) {
     const auto l = getExpr(ctx->left);
     const auto r = getExpr(ctx->right);
+    const auto mapOperator = [](LogosParser::ExprContext* expr) {
+        if (expr->PLUS()) return ADD;
+        if (expr->MINUS()) return SUB;
+        if (expr->STAR()) return MUL;
+        if (expr->SLASH()) return DIV;
+        if (expr->PERCENT()) return MOD;
+        if (expr->NOT_EQUAL()) return NE;
+        if (expr->DOUBLE_EQUAL()) return EQ;
+        if (expr->RANGLE()) return GT;
+        if (expr->LANGLE()) return LT;
+        if (expr->GE()) return GE;
+        if (expr->LE()) return LE;
+        if (expr->AND()) return AND;
+        if (expr->OR()) return OR;
+        if (expr->AMPERSAND()) return BIT_AND;
+        if (expr->PIPE()) return BIT_OR;
+        if (expr->DOUBLE_LANGLE()) return LSHIFT;
+        if (expr->DOUBLE_RANGLE()) return RSHIFT;
+        if (expr->CARET()) return BIT_XOR;
+        if (expr->IN()) return IN;
+        assert(false);
+    };
     const auto logosBinaryExpr = new LgsBinaryExpr(l->type, l, r, mapOperator(ctx));
     logosBinaryExpr->opStr = ctx->getText();
     setLocation(logosBinaryExpr->location, ctx->start, ctx->stop);

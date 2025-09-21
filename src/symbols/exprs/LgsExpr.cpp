@@ -43,7 +43,7 @@ Value* LgsExpr::getIRPtrTo(LgsLLVMGen& cg) {
 }
 
 void LgsExpr::freeOwner(LgsLLVMGen& cg) {
-    cg.removeOwner(owner->IRValue);
+    cg.callLgsFunc("runtime_removeOwner", cg.getFT(cg.voidTy(), {cg.ptrTy()}), {owner->IRValue});
     owner = nullptr;
 }
 

@@ -15,6 +15,7 @@ enum LgsFuncFlags : uint32_t {
     TERMINATOR = 1 << 5,
     METHOD = 1 << 6,
     IO = 1 << 7,
+    SYSCALL = 1 << 8,
 };
 
 class LgsFuncType final : public LgsType {
@@ -33,6 +34,7 @@ public:
     bool isTerminator = false;
     bool isMethod = false;
     bool isIO = false;
+    bool isSysCall = false;
     FunctionType* IRType = nullptr;
 
     LgsFuncType() = default;

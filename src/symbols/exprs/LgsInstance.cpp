@@ -15,18 +15,19 @@ void LgsInstance::setObject(LgsObject* newObj) {
 }
 
 void LgsInstance::setVirtuals(LgsLLVMGen& cg) const {
+    const auto ft = cg.getFT(cg.voidTy(), {cg.ptrTy(), cg.ptrTy(), cg.ptrTy()});
     for (const auto& [methodName, method] : obj->methods) {
         if (!method->funcType->isVirtual) continue;
         const auto keyIRStr = cg.getIRStr(method->funcType->getName());
         const auto IRFunc = method->getIRFunc(cg);
-        cg.addPtrToVtable(IRValue, keyIRStr, IRFunc);
+        cg.callLgsFunc("vtable_add", ft, {IRValue, keyIRStr, IRFunc});
     }
     for (const auto& field : obj->fields) {
         if (!field->isVirtual) continue;
         const auto keyIRStr = cg.getIRStr(field->name);
         const auto objIR = obj->getIRType(cg);
         const auto fieldGEP = cg.builder.CreateStructGEP(objIR, IRValue, field->position);
-        cg.addPtrToVtable(IRValue, keyIRStr, fieldGEP);
+        cg.callLgsFunc("vtable_add", ft, {IRValue, keyIRStr, fieldGEP});
     }
 }
 

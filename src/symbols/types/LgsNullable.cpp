@@ -1,5 +1,6 @@
 #include "types/LgsNullable.h"
 #include "codegen/LgsLLVMGen.h"
+#include "exprs/LgsNull.h"
 #include "utils/LgsUtils.h"
 
 Type* LgsNullable::getIRType(LgsLLVMGen& cg) {
@@ -11,7 +12,7 @@ std::string LgsNullable::getName() {
 }
 
 LgsExpr* LgsNullable::getZeroValue() {
-    return baseType->getZeroValue();
+    return new LgsNull();
 }
 
 json::value LgsNullable::asJSON() {

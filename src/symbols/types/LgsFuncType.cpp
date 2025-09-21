@@ -11,6 +11,8 @@ void LgsFuncType::setFuncOptions(const uint32_t ops) {
     isOptional = ops & OPTIONAL;
     isTerminator = ops & TERMINATOR;
     isMethod = ops & METHOD;
+    isIO = ops & IO;
+    isSysCall = ops & SYSCALL;
 }
 
 Type* LgsFuncType::getIRType(LgsLLVMGen& cg) {

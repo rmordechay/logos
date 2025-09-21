@@ -123,27 +123,33 @@ Value* LgsStr::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
 
 LgsFunc* LgsStr::getLenFunc() {
     const auto lenFunc = LgsIterable::getLenFunc();
-    lenFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
-        return cg.callStrLen(args[0]->IRValue);
-    };
+    if (!lenFunc->fn) {
+        lenFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
+            return cg.callStrLen(args[0]->IRValue);
+        };
+    }
     return lenFunc;
 }
 
 LgsFunc* LgsStr::getIsEmptyFunc() {
     const auto isEmptyFunc = LgsIterable::getIsEmptyFunc();
-    isEmptyFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
-        const auto strLen = cg.callStrLen(args[0]->IRValue);
-        return cg.builder.CreateICmpEQ(strLen, cg.builder.getInt64(0));
-    };
+    if (!isEmptyFunc->fn) {
+        isEmptyFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
+            const auto strLen = cg.callStrLen(args[0]->IRValue);
+            return cg.builder.CreateICmpEQ(strLen, cg.builder.getInt64(0));
+        };
+    }
     return isEmptyFunc;
 }
 
 LgsFunc* LgsStr::getIsNotEmptyFunc() {
     const auto isNotEmptyFunc = LgsIterable::getIsNotEmptyFunc();
-    isNotEmptyFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
-        const auto strLen = cg.callStrLen(args[0]->IRValue);
-        return cg.builder.CreateICmpNE(strLen, cg.builder.getInt64(0));
-    };
+    if (!isNotEmptyFunc->fn) {
+        isNotEmptyFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
+            const auto strLen = cg.callStrLen(args[0]->IRValue);
+            return cg.builder.CreateICmpNE(strLen, cg.builder.getInt64(0));
+        };
+    }
     return isNotEmptyFunc;
 }
 

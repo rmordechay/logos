@@ -18,7 +18,7 @@ public:
     std::vector<LgsFile*> files;
     LgsAppConfigs& appConfigs;
 
-    LgsLinker(LgsAppConfigs& appConfigs, const LgsPaths& paths, const std::vector<LgsFile*>& modules) : appConfigs(appConfigs), paths(paths), files(modules) {}
+    LgsLinker(LgsAppConfigs& appConfigs, const LgsPaths& paths, const std::vector<LgsFile*>& modules) : paths(paths), files(modules), appConfigs(appConfigs) {}
     bool generateObjFile(std::unique_ptr<llvm::Module> mainModule, llvm::TargetMachine* targetMachine) const;
     bool link() const;
     llvm::OptimizationLevel getOptLevel(uint8_t level) const;

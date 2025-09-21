@@ -20,13 +20,13 @@ Value* LgsFunc::call(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
             if (cast != arg) freeExpr(arg);
             arg = cast;
         }
-        v = arg->loadIR(cg);
+        v = arg->IRValue;
         IRArgs.emplace_back(v);
     }
 
     if (funcType->hasDefaults()) {
         const auto diff = funcType->params.size() - args.size();
-        for (int i = diff - 1; i < funcType->params.size(); ++i) {
+        for (int i = diff; i < funcType->params.size(); ++i) {
             const auto& param = funcType->params[i];
             IRArgs.emplace_back(param.expr->IRValue);
         }
@@ -58,7 +58,7 @@ Function* LgsFunc::getIRFunc(LgsLLVMGen& cg) {
     if (IRFunc) return IRFunc;
     const auto type = funcType->getIRType(cg);
     const auto funcTy = llvm::cast<FunctionType>(type);
-    if (funcType->isBuiltin) {
+    if (funcType->isBuiltin && !funcType->isSysCall) {
         funcName = LGS_RUNTIME_NAMES_PREFIX + funcName;
     }
     IRFunc = cg.getFunc(funcName, funcTy);
@@ -73,16 +73,16 @@ Function* LgsFunc::getIRFunc(LgsLLVMGen& cg) {
     return IRFunc;
 }
 
-void LgsFunc::initFunc(const std::string& name, LgsType* rt, const std::vector<LgsType*>& paramTypes, const uint32_t ops) {
+void LgsFunc::initFunc(const std::string& name, LgsType* rt, const std::vector<LgsParam>& params, const uint32_t ops) {
     funcType = new LgsFuncType();
     funcType->name = name;
     funcType->rt = rt;
     funcType->setFuncOptions(ops);
     if (funcType->isMethod) {
-        funcType->parentName = paramTypes.front()->getName();
+        funcType->parentName = params.front().name;
     }
-    for (const auto paramsType : paramTypes) {
-        funcType->params.push_back(LgsParam(paramsType));
+    for (const auto& param : params) {
+        funcType->params.push_back(param);
     }
     type = funcType;
 }

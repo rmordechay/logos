@@ -124,7 +124,7 @@ void LgsSema::visitField(LgsField* field) {
     if (field->expr && field->expr->asFunc()) {
         errHandler.addError(E10013, &field->location, {field->name});
     }
-    if (field->type->isHeapAlloc && field->isOwner) {
+    if (!field->type->isHeapAlloc && field->isOwner) {
         errHandler.addWarning(W10001, &field->location, {field->type->getName()});
         field->isOwner = false;
     }
@@ -717,6 +717,7 @@ void LgsSema::visitFirstSelection(LgsExpr* firstExpr) {
 
 void LgsSema::visitInnerSelections(const LgsSelection* selection) {
     const auto exprs = selection->exprs;
+    visitExpr(exprs.front());
     for (int i = 0; i < exprs.size() - 1; ++i) {
         const auto parentExpr = exprs[i];
         const auto childExpr = exprs[i + 1];
@@ -916,17 +917,6 @@ void LgsSema::visitInstance(LgsInstance* instance) {
         field->expr = arg->expr;
         if (field->isOwner && field->type->isHeapAlloc) {
             field->expr->owner = field;
-        }
-    }
-
-    // Zero values
-    for (const auto field : instance->obj->fields) {
-        if (visited.count(field->name)) continue;
-        if (!field->expr) {
-            field->expr = field->type->getZeroValue();
-            if (field->isOwner && field->type->isHeapAlloc) {
-                field->expr->owner = field;
-            }
         }
     }
 

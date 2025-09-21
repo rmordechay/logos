@@ -23,15 +23,25 @@ public:
     bool isLambda = false;
     CallFn fn;
 
-    explicit LgsFunc(const std::string& name, LgsType* rt = nullptr, const std::vector<LgsType*>& paramTypes = {}, const uint32_t ops = 0) {
-        initFunc(name, rt, paramTypes, ops);
+    explicit LgsFunc(const std::string& name, LgsType* rt, const std::vector<LgsParam>& params, const uint32_t ops = 0) {
+        initFunc(name, rt, params, ops);
+    }
+    explicit LgsFunc(const std::string& name, LgsType* rt, const uint32_t ops = 0) {
+        initFunc(name, rt, {}, ops);
+    }
+    explicit LgsFunc(const std::string& name, LgsType* rt, const std::vector<LgsType*>& paramTypes, const uint32_t ops = 0) {
+        std::vector<LgsParam> params;
+        for (const auto paramType : paramTypes) {
+            params.push_back(LgsParam(paramType));
+        }
+        initFunc(name, rt, params, ops);
     }
     explicit LgsFunc(LgsFuncType* funcType) : funcType(funcType) {}
     virtual Function* getIRFunc(LgsLLVMGen& cg);
     virtual Value* call(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args);
     Value* callIR(LgsLLVMGen& cg, const std::vector<Value*>& args = {});
     Value* loadIR(LgsLLVMGen& cg) override;
-    void initFunc(const std::string& name, LgsType* rt, const std::vector<LgsType*>& paramTypes, uint32_t ops);
+    void initFunc(const std::string& name, LgsType* rt, const std::vector<LgsParam>& params, uint32_t ops);
     void setDebugValue(LgsLLVMGen& cg) override;
     void completeType(LgsType* toType) override;
     BasicBlock* getCleanupBlock(LgsLLVMGen& cg);

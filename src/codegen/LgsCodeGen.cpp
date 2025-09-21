@@ -100,11 +100,10 @@ void LgsCodeGen::visitTestFile(const LgsTestFile* testFile) {
 void LgsCodeGen::visitMainFunc(LgsMainFunc* func) {
     stack.enterScope(func);
     createPrologue(func);
-    cg.callRuntimeInit();
+    cg.callLgsFunc("runtime_init", cg.getFT(cg.voidTy()));
     if (!func->funcType->params.empty()) initMainArgs(func);
     visitStmtsBlock(func->stmtsBlock);
     createEpilogue(func);
-    cg.callPopStack();
     cg.builder.CreateRet(cg.i32(EXIT_SUCCESS));
     stack.exitScope();
 }
@@ -453,7 +452,7 @@ void LgsCodeGen::visitCoroutine(const LgsCoroutine* coroutine) {
     const auto ctxTy = getThunkCtxType(fc);
     const auto ctx = getThunkCtx(fc, ctxTy);
     const auto func = getThunkFunc(fc, ctxTy);
-    cg.addCoro(func, ctx);
+    cg.callLgsFunc("stack_addCoro", cg.getFT(cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}), {func, ctx});
 }
 
 void LgsCodeGen::visitIOStmt(const LgsIOStmt* ioStmt) {
@@ -511,7 +510,7 @@ void LgsCodeGen::visitDeferStmt(const LgsDeferStmt* deferStmt) {
     const auto ctxTy = getThunkCtxType(fc);
     const auto ctx = getThunkCtx(fc, ctxTy);
     const auto func = getThunkFunc(fc, ctxTy);
-    cg.addDeferFunc(func, ctx);
+    cg.callLgsFunc("stack_addDefer", cg.getFT(cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}), {func, ctx});
 }
 
 void LgsCodeGen::visitExpr(LgsExpr* expr) {
@@ -842,7 +841,8 @@ void LgsCodeGen::visitPrefixExpr(LgsPrefixExpr* prefixExpr) {
         break;
     }
     case SQRT_PREFIX: {
-        prefixExpr->IRValue = cg.callSqrt(exprIRVal);
+        auto d = cg.builder.CreateSIToFP(exprIRVal, cg.doubleTy());
+        prefixExpr->IRValue = cg.callFunc("sqrt", cg.getFT(cg.doubleTy(), {cg.doubleTy()}), {d});
         break;
     }
     }
@@ -913,6 +913,12 @@ void LgsCodeGen::initFields(LgsInstance* instance) {
     for (const auto field : instance->obj->fields) {
         if (visited.count(field->name) || field->type->asEnum()) continue;
         field->parentIRValue = instance->IRValue;
+        if (!field->expr) {
+            field->expr = field->type->getZeroValue();
+            if (field->isOwner && field->type->isHeapAlloc) {
+                field->expr->owner = field;
+            }
+        }
         visitField(field);
         cg.builder.CreateStore(field->expr->IRValue, field->IRValue);
     }
@@ -966,7 +972,7 @@ void LgsCodeGen::createEpilogue(LgsFunc* func) {
     if (!needsCleanup && !func->hasDefers) return;
     cg.branchAndStartBlock(func->getCleanupBlock(cg), currentIRFunc);
     currentIRFunc = nullptr;
-    if (func->hasDefers) cg.callDefers();
+    if (func->hasDefers) cg.callLgsFunc("stack_callDefers", cg.getFT(cg.voidTy()));;
 
     if (needsCleanup) {
         if (func->returnStmts.empty()) {

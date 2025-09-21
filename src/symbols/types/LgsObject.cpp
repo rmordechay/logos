@@ -3,8 +3,6 @@
 #include "stmts/LgsField.h"
 #include "types/LgsGroup.h"
 #include "types/LgsInterface.h"
-#include "utils/LgsUtils.h"
-
 #include <llvm/IR/Module.h>
 
 Type* LgsObject::getIRType(LgsLLVMGen& cg) {
@@ -69,6 +67,7 @@ LgsFunc* LgsObject::getMethod(const std::string& methodName) {
 size_t LgsObject::getSizeBytes() {
     size_t sum = 0;
     for (const auto& field : fields) {
+        // avoids recursion
         if (name == field->type->getName()) {
             sum += sizeof(void*);
         } else {

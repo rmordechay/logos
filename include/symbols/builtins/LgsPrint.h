@@ -9,6 +9,5 @@ public:
     explicit LgsPrint(): LgsFunc(name, &LGS_VOID, {&LGS_ANY}, PUBLIC) {}
 
     Value* call(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) override;
-    Function* getIRFunc(LgsLLVMGen& cg) override;
     static Value* printFormat(LgsLLVMGen& cg, const LgsStrConst* const strConst);
 };

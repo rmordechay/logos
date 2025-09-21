@@ -46,35 +46,12 @@ public:
     // System
     Value* callMalloc(size_t size, bool isOwner, Lgs_RTType type);
     Value* callPrintf(const std::vector<Value*>& args);
-    Value* callSleep(Value* time);
-    Value* callExit(Value* exitCode);
-    Value* callGetEnv(Value* name);
-    Value* callGetPid();
-    Value* callCwd();
-    Value* callCoresNum();
     Value* callStrLen(Value* str);
-    Value* callSqrt(Value* radicant);
     void callMemCpy(Value* dest, Value* src, Value* size);
-    void callRuntimeInit();
 
-    // Runtime
-    void removeOwner(Value* ptr);
     void callFuncCleanup();
     void callStackPush();
     void callPopStack();
-    void callDefers();
-    void addDeferFunc(Value* deferFuncPtr, Value* ctx);
-    void addPtrToVtable(Value* instancePtr, Value* name, Value* ptr);
-    Value* getPtrFromVtable(Value* instancePtr, Value* name);
-
-    // Coroutines
-    void addCoro(Value* coroPtr, Value* ctx);
-    void callSpawn(Value* task, Value* ctx);
-    void callYield();
-    void callShutdown();
-
-    // Internal
-    Value* callHashStr(Value* value);
 
     // Types
     Type* i1Ty();

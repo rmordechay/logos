@@ -11,7 +11,7 @@ public:
     LgsArrayExpr* mainArgs = nullptr;
     LgsFunc* initArgsFunc = nullptr;
 
-    explicit LgsMainFunc() : LgsFunc(LGS_MAIN_FUNC_NAME, &LGS_VOID, {}, PUBLIC) {}
+    explicit LgsMainFunc() : LgsFunc(LGS_MAIN_FUNC_NAME, &LGS_VOID, PUBLIC) {}
     void setMainArgs();
     Function* getIRFunc(LgsLLVMGen& cg) override;
     ~LgsMainFunc() override;

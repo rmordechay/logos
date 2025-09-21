@@ -17,11 +17,6 @@ Value* LgsPrint::call(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
     return cg.callLgsFunc(name, ft, IRArgs);
 }
 
-Function* LgsPrint::getIRFunc(LgsLLVMGen& cg) {
-    const auto ft = cg.getFT(cg.i32Ty(), {cg.ptrTy()}, true);
-    return cg.getFunc("printf", ft);
-}
-
 Value* LgsPrint::printFormat(LgsLLVMGen& cg, const LgsStrConst* const strConst) {
     auto formated = strConst->formatedStr;
     std::vector<Value*> values;

@@ -1,6 +1,5 @@
 #include "data/LgsDefinitions.h"
 #include "files/LgsFile.h"
-#include "funcs/LgsFunc.h"
 #include "types/LgsAny.h"
 #include <llvm/Support/FileSystem.h>
 #include <llvm/Bitcode/BitcodeWriter.h>
@@ -82,7 +81,7 @@ FunctionType* LgsLLVMGen::getFT(Type* rt, const std::vector<Type*>& params, cons
     return FunctionType::get(rt, params, isVariadic);
 }
 
-Function* LgsLLVMGen::getFunc(const std::string& funcName, FunctionType* ft, GlobalValue::LinkageTypes linkage) const {
+Function* LgsLLVMGen::getFunc(const std::string& funcName, FunctionType* ft, const GlobalValue::LinkageTypes linkage) const {
     const auto func = IRModule->getFunction(funcName);
     if (func) return func;
     return Function::Create(ft, linkage, funcName, IRModule);
@@ -109,53 +108,14 @@ Value* LgsLLVMGen::callPrintf(const std::vector<Value*>& args) {
     return callFunc("printf", getFT(i32Ty(), {ptrTy()}, true), args);
 }
 
-Value* LgsLLVMGen::callSleep(Value* time) {
-    return callFunc("sleep", getFT(i32Ty(), {i32Ty()}), {time});
-}
-
-Value* LgsLLVMGen::callExit(Value* exitCode) {
-    return callFunc("exit", getFT(voidTy(), {i32Ty()}), {exitCode});
-}
-
-Value* LgsLLVMGen::callGetEnv(Value* name) {
-    return callFunc("getenv", getFT(ptrTy(), {ptrTy()}), {name});
-}
-
-Value* LgsLLVMGen::callGetPid() {
-    return callFunc("getpid", getFT(sizeTy()));
-}
-
-Value* LgsLLVMGen::callCwd() {
-    const auto value = builder.CreateAlloca(ArrayType::get(i8Ty(), 1024));
-    callFunc("getcwd", getFT(voidTy(), {i32Ty()}), {value});
-    return value;
-}
-
-Value* LgsLLVMGen::callCoresNum() {
-    return callFunc("sysconf", getFT(i64Ty(), {i32Ty()}), {i32(58)});
-}
-
 Value* LgsLLVMGen::callStrLen(Value* str) {
     return callFunc("strlen", getFT(i64Ty(), {ptrTy()}), {str});
-}
-
-Value* LgsLLVMGen::callSqrt(Value* radicant) {
-    auto d = builder.CreateSIToFP(radicant, doubleTy());
-    return callFunc("sqrt", getFT(doubleTy(), {doubleTy()}), {d});
 }
 
 void LgsLLVMGen::callMemCpy(Value* dest, Value* src, Value* size) {
     const auto dataLayout = targetMachine->createDataLayout();
     const auto memCpy = Intrinsic::getDeclaration(IRModule, Intrinsic::memcpy, {ptrTy(), ptrTy(), sizeTy()});
     builder.CreateCall(memCpy, {dest, src, size, builder.getFalse()});
-}
-
-void LgsLLVMGen::callRuntimeInit() {
-    callLgsFunc("runtime_init", getFT(voidTy()));
-}
-
-void LgsLLVMGen::removeOwner(Value* ptr) {
-    callLgsFunc("runtime_removeOwner", getFT(voidTy(), {ptrTy()}), {ptr});
 }
 
 void LgsLLVMGen::callFuncCleanup() {
@@ -168,43 +128,6 @@ void LgsLLVMGen::callStackPush() {
 
 void LgsLLVMGen::callPopStack() {
     callLgsFunc("stack_pop", getFT(voidTy()));
-}
-
-void LgsLLVMGen::callDefers() {
-    const auto ft = getFT(voidTy());
-    callLgsFunc("stack_callDefers", ft);
-}
-
-void LgsLLVMGen::addDeferFunc(Value* deferFuncPtr, Value* ctx) {
-    callLgsFunc("stack_addDefer", getFT(voidTy(), {ptrTy(), ptrTy()}), {deferFuncPtr, ctx});
-}
-
-void LgsLLVMGen::addPtrToVtable(Value* instancePtr, Value* name, Value* ptr) {
-    callLgsFunc("vtable_add", getFT(voidTy(), {ptrTy(), ptrTy(), ptrTy()}), {instancePtr, name, ptr});
-}
-
-Value* LgsLLVMGen::getPtrFromVtable(Value* instancePtr, Value* name) {
-    return callLgsFunc("vtable_get", getFT(ptrTy(), {ptrTy(), ptrTy()}), {instancePtr, name});
-}
-
-void LgsLLVMGen::addCoro(Value* coroPtr, Value* ctx) {
-    callLgsFunc("stack_addCoro", getFT(voidTy(), {ptrTy(), ptrTy()}), {coroPtr, ctx});
-}
-
-void LgsLLVMGen::callSpawn(Value* task, Value* ctx) {
-    callLgsFunc("scheduler_yield", getFT(voidTy(), {ptrTy(), ptrTy()}), {task, ctx});
-}
-
-void LgsLLVMGen::callYield() {
-    callLgsFunc("scheduler_yield", getFT(voidTy()), {});
-}
-
-void LgsLLVMGen::callShutdown() {
-    callLgsFunc("scheduler_shutdown", getFT(voidTy()), {});
-}
-
-Value* LgsLLVMGen::callHashStr(Value* value) {
-    return callLgsFunc("hash", getFT(i32Ty(), {ptrTy()}), {value});
 }
 
 Type* LgsLLVMGen::i1Ty() {

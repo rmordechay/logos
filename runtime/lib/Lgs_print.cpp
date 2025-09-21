@@ -34,6 +34,11 @@ extern "C" void Lgs_print(const char* fmt, const Lgs_RTType rtt, const void* v) 
         printf(fmt, str);
         break;
     }
+    case RTT_DOUBLE: {
+        const auto str = *static_cast<const double_t*>(v);
+        printf(fmt, str);
+        break;
+    }
     case RTT_STR: {
         const auto str = static_cast<const char*>(v);
         printf(fmt, str);
@@ -58,10 +63,9 @@ extern "C" void Lgs_print(const char* fmt, const Lgs_RTType rtt, const void* v) 
     case RTT_DARRAY:
     case RTT_OBJECT:
     case RTT_TYPE:
-        assert(0);
     case RTT_VOID:
     case RTT_UNKNOWN:
-        return;
+        assert(0);
     }
     printf("\n");
 }

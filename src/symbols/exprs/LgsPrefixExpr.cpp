@@ -2,11 +2,15 @@
 
 #include "utils/LgsUtils.h"
 
-json::value LgsPrefixExpr::asJSON() {
-    assert(0);
+Value* LgsPrefixExpr::loadIR(LgsLLVMGen& cg) {
+    return IRValue;
 }
 
 std::string LgsPrefixExpr::pname() {
+    assert(0);
+}
+
+json::value LgsPrefixExpr::asJSON() {
     assert(0);
 }
 

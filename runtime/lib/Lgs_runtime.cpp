@@ -32,6 +32,7 @@ void freeType(void* ptr, const Lgs_RTType type) {
     case RTT_BOOL:
     case RTT_CHAR:
     case RTT_FLOAT:
+    case RTT_DOUBLE:
     case RTT_INT:
     case RTT_VEC2:
     case RTT_VEC3:

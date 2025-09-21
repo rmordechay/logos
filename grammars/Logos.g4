@@ -216,13 +216,13 @@ expr:
 
 unaryExpr:
         vector
+    |   constant
     |   funcCall
+    |   prefixExpr
     |   postfixExpr
     |   lambda
-    |   prefixExpr
     |   'json'json
     |   instance
-    |   constant
     |   iterIndex
     |   selection
     |   arrayExpr
@@ -443,6 +443,7 @@ EQUAL: '=';
 PLUS: '+';
 MINUS: '-';
 STAR: '*';
+SLIDER: '_/';
 SLASH: '/';
 HASH: '#';
 QUEST_MARK: '?';
@@ -454,7 +455,6 @@ PIPE: '|';
 CARET: '^';
 DOUBLE_RANGLE: '<<';
 DOUBLE_LANGLE: '>>';
-SLIDER: '_/';
 
 OBJECT: 'object';
 SINGLETON: 'single';
