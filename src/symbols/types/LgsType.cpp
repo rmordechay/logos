@@ -38,7 +38,7 @@ DIBasicType* LgsType::getDebugType(LgsLLVMGen& cg) {
 }
 
 LgsType* LgsType::clone() {
-    if (isPrimitive) return this;
+    if (isPrimitive || asSArray()) return this;
     assert(0);
 }
 

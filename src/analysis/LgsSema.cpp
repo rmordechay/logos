@@ -158,10 +158,12 @@ void LgsSema::visitFunc(LgsFunc* func) {
 }
 
 void LgsSema::visitLambda(LgsFunc* lambda) {
+    std::cout << "lambda" << std::endl;
     if (lambda->stmtsBlock->stmts.size() == 1) {
-        const auto expr = lambda->stmtsBlock->stmts[0]->asExpr();
-        assert(expr);
-        lambda->stmtsBlock->stmts[0] = new LgsReturn(expr);
+        const auto expr = lambda->stmtsBlock->stmts.front()->asExpr();
+        if (expr) {
+            lambda->stmtsBlock->stmts[0] = new LgsReturn(expr);
+        }
     }
     visitFunc(lambda);
     if (!lambda->funcType->isTypeComplete()) {
@@ -652,15 +654,6 @@ void LgsSema::visitVariable(LgsVariable* variable) {
         }
         break;
     }
-    case FIELD: {
-        variable->ref.field = symbol->field;
-        variable->isMutable = !symbol->field->isConst;
-        variable->setType(symbol->field->type);
-        if (symbol->field->isOwner) {
-            variable->owner = symbol->field;
-        }
-        break;
-    }
     case PARAM: {
         variable->ref.param = symbol->param;
         variable->setType(symbol->param->type);
@@ -762,12 +755,11 @@ void LgsSema::visitIterIndexSelection(LgsIterIndex* child, LgsType* parentType) 
     if (!field) {
         return errHandler.addError(E10005, &child->location, {baseExpr->name, parentType->pname()});
     }
-    const auto iterable = field->type->asIterable();
-    if (!iterable) {
+    if (!field->type->asIterable()) {
         return errHandler.addError(E10002, &child->location, {baseExpr->name});
     }
-    child->type = iterable->baseType;
-    child->baseExpr->type = iterable;
+    child->type = field->type->asIterable()->baseType;
+    child->baseExpr->type = field->type;
     baseExpr->ref = LgsSymbol(field);
     visitIndex(child);
 }
@@ -785,8 +777,8 @@ void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent) {
         methodCall->args.insert(methodCall->args.begin(), parent);
     }
     methodCall->completeType(method->funcType);
-    for (const auto arg : methodCall->args) {
-        visitExpr(arg);
+    for (int i = 1; i < methodCall->args.size(); ++i) {
+        visitExpr(methodCall->args[i]);
     }
     if (methodCall->equals(method->funcType)) {
         methodCall->func = method;

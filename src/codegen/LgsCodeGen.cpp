@@ -709,7 +709,6 @@ void LgsCodeGen::visitVariable(LgsVariable* variable) {
         variable->IRValue = variable->ref.func->getIRFunc(cg);
         break;
     case OBJECT:
-        assert(variable->ref.object->singleton);
         variable->IRValue = getIRValue(variable->ref.object->singleton);
         break;
     case ENUM:
@@ -750,13 +749,14 @@ void LgsCodeGen::visitSelection(LgsSelection* selection) {
             }
             visitFuncCall(methodCall);
         } else if (const auto iterIndex = child->asIterIndex()) {
+            const auto field = parent->type->getField(iterIndex->baseExpr->asVariable()->name);
+            field->parentIRValue = parent->IRValue;
+            field->parentIRType = parent->type->getIRType(cg);
+            visitField(field);
             visitIterIndex(iterIndex);
         } else {
             assert(0);
         }
-    }
-    if (!selection->type->isVoid()) {
-        assert(selection->lastExpr()->IRValue);
     }
     selection->IRValue = selection->lastExpr()->IRValue;
 }
@@ -817,10 +817,10 @@ void LgsCodeGen::createMapFunc(LgsFunc* func) {
 
     // Body
     cg.startBlock(IRBodyBlock, currentIRFunc);
-
     const auto f = dyn_cast<FunctionType>(callback.type->getIRType(cg));
     const auto a = dArray->getFunc->callIR(cg, {originalArr.IRValue, iValue});
-    const auto v = cg.builder.CreateCall(f, callback.IRValue, {cg.builder.CreateLoad(dArray->baseType->getIRType(cg), a)});
+    const auto arg = cg.builder.CreateLoad(dArray->baseType->getIRType(cg), a);
+    const auto v = cg.builder.CreateCall(f, callback.IRValue, {arg});
     const auto vPtr = cg.builder.CreateAlloca(cg.ptrTy());
     cg.builder.CreateStore(v, vPtr);
     dArray->getAddFunc()->callIR(cg, {newArr.IRValue, vPtr});

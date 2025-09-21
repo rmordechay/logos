@@ -6,7 +6,8 @@
 #include <llvm/IR/Module.h>
 
 Type* LgsObject::getIRType(LgsLLVMGen& cg) {
-    if (IRType) return IRType;
+    const auto type = cg.typesRegistry.find(name);
+    if (type != cg.typesRegistry.end()) return type->second;
     std::vector<Type*> elementTypes;
     elementTypes.reserve(fields.size());
     for (int i = 0; i < fields.size(); ++i) {
@@ -21,13 +22,11 @@ Type* LgsObject::getIRType(LgsLLVMGen& cg) {
         }
         elementTypes.push_back(fieldType);
     }
-    IRType = StructType::getTypeByName(cg.context, name);
-    if (!IRType) {
-        IRType = StructType::create(cg.context, elementTypes, name);
-    }
+    IRType = StructType::create(cg.context, elementTypes, name);
     for (const auto& field : fields) {
         field->parentIRType = IRType;
     }
+    cg.typesRegistry[name] = IRType;
     return IRType;
 }
 
@@ -105,10 +104,13 @@ LgsObject* LgsObject::clone() {
     cloned->fields.clear();
     for (const auto& field : fields) {
         const auto newField = new LgsField(*field);
-        if (field->expr) {
-            assert(0);
-        }
+        if (field->expr) assert(0);
         cloned->addField(newField);
+    }
+    cloned->methods.clear();
+    for (const auto& [_, method] : methods) {
+        const auto newField = new LgsFunc(*method);
+        cloned->addMethod(newField);
     }
     return cloned;
 }

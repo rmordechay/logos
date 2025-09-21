@@ -6,14 +6,11 @@
 
 Type* LgsInterface::getIRType(LgsLLVMGen& cg) {
     if (IRType) return IRType;
-    IRType = StructType::getTypeByName(cg.context, name);
     std::vector<Type*> elementTypes;
     for (int i = 0; i < methods.size(); ++i) {
         elementTypes.emplace_back(cg.ptrTy());
     }
-    if (!IRType) {
-        IRType = StructType::create(cg.context, elementTypes, name);
-    }
+    IRType = cg.getStructType(elementTypes, name);
     return IRType;
 }
 

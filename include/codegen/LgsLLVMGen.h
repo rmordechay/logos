@@ -23,6 +23,7 @@ public:
     DICompileUnit* compileUnit = nullptr;
     DISubprogram* diProgram = nullptr;
     TargetMachine* targetMachine = nullptr;
+    std::map<std::string, Type*> typesRegistry;
 
     void setupModule(const LgsFile& file, bool debugMode = false);
     Value* getIRStr(const std::string& value);

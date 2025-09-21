@@ -24,13 +24,13 @@ static void freeType(void* ptr, const Lgs_RTType type) {
         break;
         assert(0);
     case RTT_OBJECT: {
-        std::free(ptr);
+        // std::free(ptr);
         break;
     }
     case RTT_DARRAY: {
         const auto arr = static_cast<Lgs_darray*>(ptr);
-        delete arr->data;
-        std::free(arr);
+        // delete arr->data;
+        // std::free(arr);
         break;
     }
     }
