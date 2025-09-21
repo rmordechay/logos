@@ -79,7 +79,7 @@ void LgsFunc::initFunc(const std::string& name, LgsType* rt, const std::vector<L
     funcType->rt = rt;
     funcType->setFuncOptions(ops);
     if (funcType->isMethod) {
-        funcType->parentName = params.front().name;
+        funcType->parentName = params.front().type->getName();
     }
     for (const auto& param : params) {
         funcType->params.push_back(param);

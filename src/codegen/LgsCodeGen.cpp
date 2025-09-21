@@ -194,15 +194,15 @@ void LgsCodeGen::visitLoop(LgsForLoop* loop) {
         assert(0);
     }
     visitStmtsBlock(loop->stmtsBlock);
-    {
-        const auto doYieldBlock = cg.createBlock("do_yield_block");
-        const auto continueBlock = cg.createBlock("continue_block");
-        const auto shouldYield = cg.callLgsFunc("scheduler_shouldYield", cg.getFT(cg.i1Ty()));
-        cg.builder.CreateCondBr(shouldYield, doYieldBlock, continueBlock);
-        cg.startBlock(doYieldBlock, currentIRFunc);
-        cg.callLgsFunc("scheduler_yield", cg.getFT(cg.voidTy()));
-        cg.branchAndStartBlock(continueBlock, currentIRFunc);
-    }
+    // {
+    //     const auto doYieldBlock = cg.createBlock("do_yield_block");
+    //     const auto continueBlock = cg.createBlock("continue_block");
+    //     const auto shouldYield = cg.callLgsFunc("scheduler_shouldYield", cg.getFT(cg.i1Ty()));
+    //     cg.builder.CreateCondBr(shouldYield, doYieldBlock, continueBlock);
+    //     cg.startBlock(doYieldBlock, currentIRFunc);
+    //     cg.callLgsFunc("scheduler_yield", cg.getFT(cg.voidTy()));
+    //     cg.branchAndStartBlock(continueBlock, currentIRFunc);
+    // }
 
     loop->incAndJumpToCond(cg);
     cg.startBlock(loop->IRExitBlock, currentIRFunc);

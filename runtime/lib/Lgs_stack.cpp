@@ -24,13 +24,13 @@ static void freeType(void* ptr, const Lgs_RTType type) {
         break;
         assert(0);
     case RTT_OBJECT: {
-        // std::free(ptr);
+        std::free(ptr);
         break;
     }
     case RTT_DARRAY: {
         const auto arr = static_cast<Lgs_darray*>(ptr);
         delete arr->data;
-        // std::free(arr);
+        std::free(arr);
         break;
     }
     }
@@ -80,16 +80,22 @@ void Lgs_stack::removeOwner(const void* owner) const {
 
 void Lgs_stack::funcCleanup() const {
     auto stackFrame = frames[stackIndex];
-    std::cout << stackFrame.owners.size() << " owners:" << std::endl;
-    for (const auto [ptr, type] : stackFrame.owners) {
-        freeType(ptr, type);
+    const auto ownersSize = stackFrame.owners.size();
+    if (ownersSize > 0) {
+        std::cout << ownersSize << " owners:" << std::endl;
+        for (const auto [ptr, type] : stackFrame.owners) {
+            freeType(ptr, type);
+        }
+        stackFrame.owners.clear();
     }
-    stackFrame.owners.clear();
-    std::cout << stackFrame.orphans.size() << " orphans:" << std::endl;
-    for (const auto [ptr, type] : stackFrame.orphans) {
-        freeType(ptr, type);
+    const auto orphansSize = stackFrame.orphans.size();
+    if (orphansSize > 0) {
+        std::cout << orphansSize << " orphans:" << std::endl;
+        for (const auto [ptr, type] : stackFrame.orphans) {
+            freeType(ptr, type);
+        }
+        stackFrame.orphans.clear();
     }
-    stackFrame.orphans.clear();
 }
 
 void Lgs_stack::callDefers() const {

@@ -43,6 +43,7 @@ std::string LgsFuncType::getName() {
     if (IRName != "") return IRName;
     std::stringstream strStream;
     if (isMethod && !isVirtual) {
+        assert(parentName != "");
         strStream << parentName << "_";
     } else if (name == "") {
         strStream << LGS_ANONYMOUS_STR;

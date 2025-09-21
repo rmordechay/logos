@@ -123,7 +123,6 @@ void LgsLLVMGen::callStackPush() {
 }
 
 void LgsLLVMGen::callPopStack(const std::string& name) {
-    printStr(name + "\n");
     callLgsFunc("stack_pop", getFT(voidTy()));
 }
 
