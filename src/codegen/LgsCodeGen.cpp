@@ -194,6 +194,16 @@ void LgsCodeGen::visitLoop(LgsForLoop* loop) {
         assert(0);
     }
     visitStmtsBlock(loop->stmtsBlock);
+    {
+        const auto doYieldBlock = cg.createBlock("do_yield_block");
+        const auto continueBlock = cg.createBlock("continue_block");
+        const auto shouldYield = cg.callLgsFunc("scheduler_shouldYield", cg.getFT(cg.i1Ty()));
+        cg.builder.CreateCondBr(shouldYield, doYieldBlock, continueBlock);
+        cg.startBlock(doYieldBlock, currentIRFunc);
+        cg.callLgsFunc("scheduler_yield", cg.getFT(cg.voidTy()));
+        cg.branchAndStartBlock(continueBlock, currentIRFunc);
+    }
+
     loop->incAndJumpToCond(cg);
     cg.startBlock(loop->IRExitBlock, currentIRFunc);
     stack.exitScope();
@@ -469,7 +479,7 @@ void LgsCodeGen::visitReturnStmt(LgsReturn* returnStmt) {
         const auto cleanupBlock = currentFunc->getCleanupBlock(cg);
         cg.builder.CreateBr(cleanupBlock);
     } else {
-        cg.callPopStack();
+        cg.callPopStack(currentFunc->funcType->name);
         if (currentFunc->funcType->rt->isVoid()) {
             cg.builder.CreateRetVoid();
         } else {
@@ -733,7 +743,7 @@ void LgsCodeGen::visitSelection(LgsSelection* selection) {
             field->parentIRValue = parent->IRValue;
             field->parentIRType = parent->type->getIRType(cg);
             visitField(field);
-            child->IRValue = field->IRValue;
+            child->IRValue = field->loadIR(cg);
         } else if (const auto methodCall = child->asFuncCall()) {
             if (stack.currentFunc()->isTest && parent->type->getName() == LgsTest::name && methodCall->name == "mock") {
                 continue;
@@ -821,7 +831,7 @@ void LgsCodeGen::createMapFunc(LgsFunc* func) {
     cg.builder.CreateBr(IRCondBlock);
 
     cg.startBlock(IRExitBlock, currentIRFunc);
-    cg.callPopStack();
+    cg.callPopStack(func->funcType->name);
     cg.builder.CreateRet(newArr.IRValue);
     currentIRFunc = originalFunc;
     cg.builder.restoreIP(cg.savedIP);
@@ -972,24 +982,22 @@ void LgsCodeGen::createEpilogue(LgsFunc* func) {
     if (!needsCleanup && !func->hasDefers) return;
     cg.branchAndStartBlock(func->getCleanupBlock(cg), currentIRFunc);
     currentIRFunc = nullptr;
-    if (func->hasDefers) cg.callLgsFunc("stack_callDefers", cg.getFT(cg.voidTy()));;
+    if (func->hasDefers) cg.callLgsFunc("stack_callDefers", cg.getFT(cg.voidTy()));
 
     if (needsCleanup) {
         if (func->returnStmts.empty()) {
-            cg.callFuncCleanup();
-            cg.callPopStack();
+            cg.callPopStack(func->funcType->name);
         } else if (func->returnStmts.size() == 1) {
             if (func->owners.size() == 1) {
                 const auto returnRef = func->returnStmts.front()->expr;
                 const auto heapExprRef = func->owners.front();
                 if (returnRef->equals(heapExprRef)) {
-                    cg.callPopStack();
+                    cg.callPopStack(func->funcType->name);
                     cg.builder.CreateRet(getIRValue(func->returnStmts.front()));
                     return;
                 }
             }
-            cg.callFuncCleanup();
-            cg.callPopStack();
+            cg.callPopStack(func->funcType->name);
             cg.builder.CreateRet(getIRValue(func->returnStmts.front()));
         } else {
             PHINode *phi = nullptr;
@@ -1002,12 +1010,11 @@ void LgsCodeGen::createEpilogue(LgsFunc* func) {
                     phi->addIncoming(retVal, stmt->parentBlock);
                 }
             }
-            cg.callPopStack();
-            cg.callFuncCleanup();
+            cg.callPopStack(func->funcType->name);
             cg.builder.CreateRet(phi);
         }
     } else {
-        cg.callPopStack();
+        cg.callPopStack(func->funcType->name);
     }
 }
 

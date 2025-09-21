@@ -48,11 +48,11 @@ void Lgs_scheduler::spawn(void (*task)(void*), void* ctx) {
 }
 
 void Lgs_scheduler::yield() {
-    if (!tlsYield) return;
-    const auto shouldYield = preempt.exchange(false, std::memory_order_relaxed);
-    if (shouldYield) {
-        tlsYield();
-    }
+    tlsYield();
+}
+
+bool Lgs_scheduler::shouldYield() {
+    return preempt.load(std::memory_order_relaxed);
 }
 
 void Lgs_scheduler::shutdown() {

@@ -44,14 +44,13 @@ public:
     Value* callLgsFunc(const std::string& funcName, FunctionType* ft, const std::vector<Value*>& args = {});
 
     // System
-    Value* callMalloc(size_t size, bool isOwner, Lgs_RTType type);
     Value* callPrintf(const std::vector<Value*>& args);
     Value* callStrLen(Value* str);
     void callMemCpy(Value* dest, Value* src, Value* size);
+    Value* callMalloc(size_t size, bool isOwner, Lgs_RTType type);
 
-    void callFuncCleanup();
     void callStackPush();
-    void callPopStack();
+    void callPopStack(const std::string& name);
 
     // Types
     Type* i1Ty();

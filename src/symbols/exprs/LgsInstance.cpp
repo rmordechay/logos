@@ -43,7 +43,7 @@ json::value LgsInstance::asJSON() {
 }
 
 std::string LgsInstance::pname() {
-    return obj->name;
+    return name;
 }
 
 bool LgsInstance::equals(LgsExpr* other) {

@@ -21,7 +21,7 @@ public:
     explicit LgsSystem() : LgsObject(name) {
         pidFunc->funcType->IRName = "getpid";
         sleepFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
-            return cg.callFunc("sleep", cg.getFT(cg.i32Ty(), {cg.i32Ty()}), {args.front()->IRValue});
+            return cg.callLgsFunc("System_sleep", cg.getFT(cg.i32Ty(), {cg.i32Ty()}), {args.front()->IRValue});
         };
         cwdFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsExpr*>&) {
             const auto value = cg.builder.CreateAlloca(ArrayType::get(cg.i8Ty(), 1024));

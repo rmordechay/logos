@@ -10,4 +10,5 @@ func2() {
 
 main() {
     go func2()
+    System.sleep(10)
 }

@@ -9,6 +9,7 @@ struct Lgs_scheduler {
 
     void run();
     void spawn(void (*task)(void*), void* ctx);
+    static bool shouldYield();
     static void yield();
     static void shutdown();
 };

@@ -1,5 +1,6 @@
 #pragma once
 #include "Lgs_stack.h"
+#include "Lgs_types.h"
 #include "logos/LgsAppConfigs.h"
 
 typedef void (*Lgs_Defer_Func)(void*);
@@ -9,11 +10,16 @@ struct Lgs_Thunk_Func {
     void* ctx;
 };
 
+struct Lgs_alloc {
+    void* ptr;
+    Lgs_RTType type;
+};
+
 struct Lgs_stack_frame {
+    std::vector<Lgs_alloc> owners;
+    std::vector<Lgs_alloc> orphans;
     Lgs_Thunk_Func defers[LOCALS_CAPACITY];
-    Lgs_Thunk_Func coros[LOCALS_CAPACITY];
     int defersCount;
-    int corosCount;
 };
 
 struct Lgs_stack {
@@ -24,5 +30,8 @@ struct Lgs_stack {
     void pop();
     void callDefers() const;
     void addDefer(void* funcPtr, void* ctx);
-    void addCoro(void* funcPtr, void* ctx);
+    void addOwner(void* ptr, Lgs_RTType type);
+    void addOrphan(void* ptr, Lgs_RTType type);
+    void removeOwner(const void* owner) const;
+    void funcCleanup() const;
 };
