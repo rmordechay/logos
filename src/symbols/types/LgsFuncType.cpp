@@ -101,9 +101,9 @@ json::value LgsFuncType::asJSON() {
 
 bool LgsFuncType::isTypeComplete() const {
     if (name == LGS_MAIN_FUNC_NAME) return true;
-    if (!rt || rt->isUnknown) return false;
+    if (!rt || rt->isUnknown()) return false;
     for (const auto & param : params) {
-        if (!param.type || param.type->isUnknown) return false;
+        if (!param.type || param.type->isUnknown()) return false;
     }
     return true;
 }

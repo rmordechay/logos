@@ -47,19 +47,6 @@ void LgsExpr::freeOwner(LgsLLVMGen& cg) {
     owner = nullptr;
 }
 
-std::pair<Value*, Value*> LgsExpr::loadOperands(LgsLLVMGen& cg, LgsExpr* other) {
-    auto l = loadIR(cg);
-    auto r = other->loadIR(cg);
-    const auto lt = cast<IntegerType>(l->getType());
-    const auto rt = cast<IntegerType>(r->getType());
-    if (lt->getBitWidth() > rt->getBitWidth()) {
-        r = cg.builder.CreateSExt(r, l->getType());
-    } else if (rt->getBitWidth() > lt->getBitWidth()) {
-        l = cg.builder.CreateSExt(l, r->getType());
-    }
-    return std::make_pair(l, r);
-}
-
 size_t LgsExpr::getConstInt() {
     if (const auto intConst = asIntConst()) {
         return intConst->value;

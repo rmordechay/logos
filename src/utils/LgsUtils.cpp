@@ -77,10 +77,10 @@ std::string removeUnderscores(const std::string& input) {
     return result;
 }
 
-void freeType(const LgsType* type) {
+void freeType(LgsType* type) {
     if (!type) return;
     if (type->isPrimitive) return;
-    if (type->isUnknown) return;
+    if (type->isUnknown()) return;
     // delete type;
 }
 

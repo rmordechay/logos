@@ -1,5 +1,3 @@
-
-
 #include "codegen/LgsLLVMGen.h"
 #include "exprs/LgsNull.h"
 #include "exprs/constants/LgsCharConst.h"

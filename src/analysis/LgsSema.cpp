@@ -313,7 +313,7 @@ void LgsSema::visitPatternMatching(LgsIfStmt* pm) {
         stack.enterScope(pm);
         visitExpr(expr);
         visitStmtsBlock(block);
-        if (expr->type->isUnknown) continue;
+        if (expr->type->isUnknown()) continue;
         if (!baseExprType->canCastTo(expr->type)) {
             return errHandler.addError(E10014, &expr->location, {expr->type->pname(), baseExprType->pname()});
         }
@@ -375,12 +375,12 @@ void LgsSema::visitRangeLoop(LgsRangeLoop* rangeLoop) {
     assert(endRange);
     visitExpr(startRange);
     visitExpr(endRange);
-    if (endRange->type && !endRange->type->isNumber) {
+    if (endRange->type && !endRange->type->isNumber()) {
         errHandler.addError(E10082, &endRange->location, {endRange->pname(), endRange->type->pname()});
     }
 
     if (startRange) {
-        if (startRange->type && !startRange->type->isNumber) {
+        if (startRange->type && !startRange->type->isNumber()) {
             errHandler.addError(E10082, &startRange->location, {startRange->pname(), startRange->type->pname()});
         }
         if (!startRange->type->equals(endRange->type)) {
@@ -629,7 +629,7 @@ void LgsSema::visitVectorExpr(const LgsVectorExpr* vectorExpr) {
     auto sumDim = 0;
     for (const auto arg : vectorExpr->args) {
         visitExpr(arg);
-        if (arg->type->isNumber) {
+        if (arg->type->isNumber()) {
             sumDim++;
         } else if (const auto otherVec = arg->type->asVec()) {
             sumDim += otherVec->dim;
@@ -689,7 +689,7 @@ void LgsSema::visitSelection(LgsSelection* selection) {
     const auto exprs = selection->exprs;
     const auto firstExpr = exprs.front();
     visitFirstSelection(firstExpr);
-    if (!firstExpr->type || firstExpr->type->isUnknown) return;
+    if (!firstExpr->type || firstExpr->type->isUnknown()) return;
     visitInnerSelections(selection);
     selection->setType(selection->lastExpr()->type);
     selection->isMutable = selection->lastExpr()->isMutable;
@@ -724,7 +724,7 @@ void LgsSema::visitInnerSelections(const LgsSelection* selection) {
         } else {
             assert(0);
         }
-        if (!childExpr->type || childExpr->type->isUnknown) {
+        if (!childExpr->type || childExpr->type->isUnknown()) {
             return;
         }
     }
@@ -778,11 +778,16 @@ void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent) {
         methodCall->args.insert(methodCall->args.begin(), parent);
     }
 
+    // TODO make generic
     if (methodCall->name == "map") {
-        const auto mapFT = methodCall->args[1]->type->asFuncType();
+        const auto map = methodCall->args[1]->type->asFuncType();
         const auto baseType = parent->type->asIterable()->baseType;
-        mapFT->params[0].type = baseType;
-        mapFT->rt = baseType;
+        map->params[0].type = baseType;
+        map->rt = baseType;
+    } else if (methodCall->name == "filter") {
+        assert(0);
+    } else if (methodCall->name == "forEach") {
+        assert(0);
     }
 
     methodCall->completeType(method->funcType);
@@ -868,7 +873,7 @@ void LgsSema::visitPostfixExpr(LgsPostfixExpr* postfixExpr) {
     const auto baseExpr = postfixExpr->expr;
     visitExpr(baseExpr);
     const auto type = baseExpr->type;
-    if (!type->isNumber) {
+    if (!type->isNumber()) {
         return errHandler.addError(E10050, &postfixExpr->location, {type->pname()});
     }
     postfixExpr->setType(type);
@@ -998,7 +1003,7 @@ void LgsSema::visitSlice(LgsIterIndex* iterIndex) {
     const auto exprFrom = iterIndex->index->from;
     const auto exprTo = iterIndex->index->to;
     const auto iterable = baseExpr->type->asIterable();
-    if (!baseExpr->type->isSliceable) {
+    if (!baseExpr->type->isSliceable()) {
         return errHandler.addError(E10042, &iterIndex->location, {iterIndex->pname(), baseExpr->type->pname()});
     }
     if (!iterable->getIndexType()->canCastTo(exprFrom->type)) {
@@ -1115,7 +1120,7 @@ std::string getMissingImplementsStr(const std::vector<LgsField*>& fields, const 
 void LgsSema::validateExprType(const LgsExpr* expr, LgsType* type) {
     if (expr->isNull) {
         // null must have a type
-        if (!type || type->isUnknown) {
+        if (!type || type->isUnknown()) {
             return errHandler.addError(E10024, &expr->location);
         }
         // type must be nullable

@@ -9,7 +9,6 @@ public:
 
     LgsLong() {
         isPrimitive = true;
-        isNumber = true;
         isInt = true;
         rtt = RTT_LONG;
     }

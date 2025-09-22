@@ -61,6 +61,7 @@ public:
     LgsLLVMGen& cg;
     Function* currentIRFunc = nullptr;
     Function* mapFunc = nullptr;
+    static std::atomic<size_t> lambdaNamesCounter;
 
     explicit LgsCodeGen(LgsFile& file) : file(file), cg(file.generator) {}
     void generate(const LgsAppConfigs& appConfigs, TargetMachine& targetMachine);

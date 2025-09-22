@@ -63,14 +63,14 @@ void LgsLLVMGen::branchIfNeeded(BasicBlock* block) {
     }
 }
 
-void LgsLLVMGen::startBlock(BasicBlock* block, Function* func) {
-    block->insertInto(func);
+void LgsLLVMGen::startBlock(BasicBlock* block) {
+    block->insertInto(builder.GetInsertBlock()->getParent());
     builder.SetInsertPoint(block);
 }
 
-void LgsLLVMGen::branchAndStartBlock(BasicBlock* block, Function* func) {
+void LgsLLVMGen::branchAndStartBlock(BasicBlock* block) {
     branchIfNeeded(block);
-    startBlock(block, func);
+    startBlock(block);
 }
 
 bool LgsLLVMGen::lastInstTerminator() const {
@@ -88,7 +88,7 @@ Function* LgsLLVMGen::getFunc(const std::string& funcName, FunctionType* ft, con
 }
 
 Value* LgsLLVMGen::callFunc(const std::string& funcName, FunctionType* ft, const std::vector<Value*>& args) {
-    const auto func = getFunc(funcName, ft);
+    const auto func = IRModule->getOrInsertFunction(funcName, ft);
     return builder.CreateCall(func, args);
 }
 

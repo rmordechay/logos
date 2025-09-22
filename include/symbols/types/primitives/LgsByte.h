@@ -1,17 +1,16 @@
 #pragma once
 #include "LgsType.h"
 
-class LgsBool final : public LgsType {
+class LgsByte final : public LgsType {
 public:
-    static constexpr auto name = "Bool";
-    static constexpr auto trueLiteral = "true";
-    static constexpr auto falseLiteral = "false";
+    static constexpr auto name = "Byte";
 
-    LgsBool() {
+    LgsByte() {
         isPrimitive = true;
         isInt = true;
-        rtt = RTT_BOOL;
+        rtt = RTT_BYTE;
     }
+
     Type* getIRType(LgsLLVMGen& cg) override;
     LgsType* applyOp(LgsType* other, LgsOperator op) override;
     Value* addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
@@ -32,15 +31,13 @@ public:
     Value* lshiftIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
     Value* andIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
     Value* orIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
+    size_t getSizeBytes() override;
+    LgsExpr* getZeroValue() override;
     std::string getName() override;
     std::string pname() override;
-    json::value asJSON() override;
-    LgsExpr* getZeroValue() override;
-    std::string strFormatPart() const override;
-    size_t getSizeBytes() override;
     bool canCastTo(LgsType* other) override;
+    std::string strFormatPart() const override;
+    json::value asJSON() override;
 };
 
-inline LgsBool LGS_BOOL;
-
-
+inline LgsByte LGS_BYTE;

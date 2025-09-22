@@ -8,7 +8,6 @@ public:
     static constexpr auto name = "Str";
 
     LgsStr(): LgsIterable(&LGS_CHAR) {
-        isSliceable = true;
         rtt = RTT_STR;
     }
     Type* getIRBaseType(LgsLLVMGen* cg) const;

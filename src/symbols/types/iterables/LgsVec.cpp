@@ -63,7 +63,7 @@ LgsType* LgsVec::applyOp(LgsType* other, const LgsOperator op) {
         break;
     case MUL:
     case DIV:
-        if (getName() == IRName || other->isNumber) return this;
+        if (getName() == IRName || other->isNumber()) return this;
         break;
     default:
         break;

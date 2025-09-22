@@ -16,6 +16,9 @@ void LgsStack::enterScope(LgsValue* value) {
         stackFrame.symbolTable = top().symbolTable;
         stackFrame.ifStmt = ifStmt;
     }
+    if (size() > 0) {
+        stackFrame.inCoroutine = top().inCoroutine;
+    }
     push(stackFrame);
 }
 
@@ -59,4 +62,8 @@ BasicBlock* LgsStack::findTagExitBlock(const std::string& tag) {
 
 LgsSymbolTable& LgsStack::getSymbolTable() {
     return top().symbolTable;
+}
+
+bool LgsStack::inCoroutine() {
+    return top().inCoroutine;
 }

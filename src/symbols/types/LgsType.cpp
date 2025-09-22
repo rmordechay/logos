@@ -8,114 +8,30 @@
 #include "types/LgsGroup.h"
 #include "types/iterables/LgsMap.h"
 #include "types/LgsNullable.h"
+#include "types/LgsUnknown.h"
 #include "types/LgsVoid.h"
 #include "types/iterables/LgsSArray.h"
+#include "types/primitives/LgsByte.h"
 #include "types/primitives/LgsChar.h"
 #include "types/primitives/LgsDouble.h"
 #include "types/primitives/LgsShort.h"
 #include "types/primitives/LgsSize.h"
 #include "types/primitives/LgsUInt.h"
 
-LgsField* LgsType::getField(const std::string& name) {
-    for (auto* f : fields) {
-        if (f->name == name) return f;
+LgsType* LgsType::extendInt() {
+    if (asBool()) {
+        return &LGS_BYTE;
     }
-    return nullptr;
-}
-
-LgsFunc* LgsType::getMethod(const std::string& name) {
-    const auto method = methods.find(name);
-    if (method != methods.end()) return method->second;
-    return nullptr;
-}
-
-LgsType* LgsType::applyOp(LgsType* other, const LgsOperator op) {
-    assert(0);
-}
-
-DIBasicType* LgsType::getDebugType(LgsLLVMGen& cg) {
-    assert(0);
-}
-
-LgsType* LgsType::clone() {
-    if (isPrimitive || asSArray()) return this;
-    assert(0);
-}
-
-Value* LgsType::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    assert(0);
-}
-
-Value* LgsType::subIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    assert(0);
-}
-
-Value* LgsType::mulIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    assert(0);
-}
-
-Value* LgsType::divIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    assert(0);
-}
-
-Value* LgsType::modIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    assert(0);
-}
-
-Value* LgsType::eqIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    assert(0);
-}
-
-Value* LgsType::neIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    assert(0);
-}
-
-Value* LgsType::ltIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    assert(0);
-}
-
-Value* LgsType::gtIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    assert(0);
-}
-
-Value* LgsType::geIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    assert(0);
-}
-
-Value* LgsType::leIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    assert(0);
-}
-
-Value* LgsType::inIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    assert(0);
-}
-
-Value* LgsType::andIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    assert(0);
-}
-
-Value* LgsType::orIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    assert(0);
-}
-
-Value* LgsType::bitAndIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    assert(0);
-}
-
-Value* LgsType::bitOrIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    assert(0);
-}
-
-Value* LgsType::bitXorIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    assert(0);
-}
-
-Value* LgsType::lshiftIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    assert(0);
-}
-
-Value* LgsType::rshiftIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    assert(0);
+    if (asByte()) {
+        return &LGS_SHORT;
+    }
+    if (asShort()) {
+        return &LGS_INT;
+    }
+    if (asInt()) {
+        return &LGS_LONG;
+    }
+    return this;
 }
 
 bool LgsType::addField(LgsField* field) {
@@ -147,6 +63,10 @@ bool LgsType::isVoid() {
     return dynamic_cast<LgsVoid*>(this);
 }
 
+bool LgsType::isNumber() const {
+    return isInt || isFloat;
+}
+
 bool LgsType::isBig() {
     return (asObject() || asDArray()) && getSizeBytes() >= BIG_SIZE_THRESHOLD;
 }
@@ -155,8 +75,12 @@ bool LgsType::isNullable() {
     return asNullable() || asPtr();
 }
 
-LgsBool* LgsType::asBool() {
-    return dynamic_cast<LgsBool*>(this);
+bool LgsType::isUnknown() {
+    return dynamic_cast<LgsUnknown*>(this);
+}
+
+bool LgsType::isSliceable() {
+    return asStr() || asDArray() || asSArray();
 }
 
 LgsChar* LgsType::asChar() {
@@ -165,6 +89,14 @@ LgsChar* LgsType::asChar() {
 
 LgsStr* LgsType::asStr() {
     return dynamic_cast<LgsStr*>(this);
+}
+
+LgsBool* LgsType::asBool() {
+    return dynamic_cast<LgsBool*>(this);
+}
+
+LgsByte* LgsType::asByte() {
+    return dynamic_cast<LgsByte*>(this);
 }
 
 LgsInt* LgsType::asInt() {
@@ -245,4 +177,106 @@ LgsGroup* LgsType::asGroup() {
 
 LgsTypePair* LgsType::asPair() {
     return dynamic_cast<LgsTypePair*>(this);
+}
+
+LgsField* LgsType::getField(const std::string& name) {
+    for (auto* f : fields) {
+        if (f->name == name) return f;
+    }
+    return nullptr;
+}
+
+LgsFunc* LgsType::getMethod(const std::string& name) {
+    const auto method = methods.find(name);
+    if (method != methods.end()) return method->second;
+    return nullptr;
+}
+
+LgsType* LgsType::applyOp(LgsType* other, const LgsOperator op) {
+    assert(0);
+}
+
+DIBasicType* LgsType::getDebugType(LgsLLVMGen& cg) {
+    assert(0);
+}
+
+LgsType* LgsType::clone() {
+    if (isPrimitive || asSArray()) return this;
+    assert(0);
+}
+
+Value* LgsType::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    assert(0);
+}
+
+Value* LgsType::subIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    assert(0);
+}
+
+Value* LgsType::mulIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    assert(0);
+}
+
+Value* LgsType::divIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    assert(0);
+}
+
+Value* LgsType::modIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    assert(0);
+}
+
+Value* LgsType::eqIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    assert(0);
+}
+
+Value* LgsType::neIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    assert(0);
+}
+
+Value* LgsType::ltIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    assert(0);
+}
+
+Value* LgsType::gtIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    assert(0);
+}
+
+Value* LgsType::geIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    assert(0);
+}
+
+Value* LgsType::leIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    assert(0);
+}
+
+Value* LgsType::bitAndIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    assert(0);
+}
+
+Value* LgsType::bitOrIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    assert(0);
+}
+
+Value* LgsType::bitXorIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    assert(0);
+}
+
+Value* LgsType::lshiftIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    assert(0);
+}
+
+Value* LgsType::rshiftIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    assert(0);
+}
+
+Value* LgsType::inIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    assert(0);
+}
+
+Value* LgsType::andIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    assert(0);
+}
+
+Value* LgsType::orIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    assert(0);
 }

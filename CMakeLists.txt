@@ -54,6 +54,7 @@ set(CORE_SOURCES
     src/cli/LgsCliCmd.cpp
     src/cli/LgsRunCmd.cpp
     src/cli/LgsAstCmd.cpp
+    src/cli/LgsTestCmd.cpp
     src/lgsc/LgsCLang.cpp
     src/lgsc/LgsCLangVisitor.cpp
     src/utils/LgsUtils.cpp
@@ -105,23 +106,24 @@ set(CORE_SOURCES
     src/symbols/stmts/LgsStmt.cpp
     src/symbols/stmts/LgsStmtsBlock.cpp
     src/symbols/stmts/LgsVarDec.cpp
+    src/symbols/types/LgsType.cpp
+    src/symbols/types/LgsVoid.cpp
+    src/symbols/types/LgsUnknown.cpp
     src/symbols/types/LgsAny.cpp
     src/symbols/types/LgsPtr.cpp
-    src/symbols/types/iterables/LgsDArray.cpp
     src/symbols/types/LgsEnum.cpp
     src/symbols/types/LgsFuncType.cpp
     src/symbols/types/LgsGroup.cpp
     src/symbols/types/LgsInterface.cpp
     src/symbols/types/LgsIterator.cpp
-    src/symbols/types/iterables/LgsMap.cpp
     src/symbols/types/LgsNullable.cpp
     src/symbols/types/LgsObject.cpp
+    src/symbols/types/iterables/LgsMap.cpp
+    src/symbols/types/iterables/LgsDArray.cpp
     src/symbols/types/iterables/LgsSArray.cpp
     src/symbols/types/iterables/LgsStr.cpp
-    src/symbols/types/LgsType.cpp
-    src/symbols/types/LgsUnknown.cpp
+    src/symbols/types/iterables/LgsIterable.cpp
     src/symbols/types/iterables/LgsVec.cpp
-    src/symbols/types/LgsVoid.cpp
     src/symbols/types/primitives/LgsBool.cpp
     src/symbols/types/primitives/LgsChar.cpp
     src/symbols/types/primitives/LgsDouble.cpp
@@ -131,6 +133,7 @@ set(CORE_SOURCES
     src/symbols/types/primitives/LgsShort.cpp
     src/symbols/types/primitives/LgsSize.cpp
     src/symbols/types/primitives/LgsUInt.cpp
+    src/symbols/types/primitives/LgsByte.cpp
 )
 
 set(RUNTIME_SOURCES
@@ -143,9 +146,6 @@ set(RUNTIME_SOURCES
     runtime/lib/Lgs_stack.cpp
     runtime/lib/Lgs_print.cpp
     runtime/lib/Lgs_arena.cpp
-    src/symbols/types/iterables/LgsIterable.cpp
-    src/cli/LgsTestCmd.cpp
-    include/cli/LgsTestCmd.h
 )
 
 add_library(lgs_core SHARED ${CORE_SOURCES} ${RUNTIME_SOURCES})

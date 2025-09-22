@@ -51,7 +51,7 @@ LgsType* LgsStr::applyOp(LgsType* other, const LgsOperator op) {
     const auto IRName = other->getName();
     switch (op) {
     case ADD:
-        if (other->isNumber || name == IRName) {
+        if (other->isNumber() || name == IRName) {
             return this;
         }
         break;

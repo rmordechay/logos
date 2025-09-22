@@ -71,7 +71,7 @@ std::string LgsFuncCall::pname() {
         if (i == args.size() - 1) continue;
         str << ", ";
     }
-    if (type && !type->isUnknown) {
+    if (type && !type->isUnknown()) {
         str << "): " << type->pname();
     } else {
         str << ')';

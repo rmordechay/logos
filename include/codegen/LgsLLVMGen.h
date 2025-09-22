@@ -32,10 +32,10 @@ public:
     StructType* getStructType(const std::vector<Type*>& fields, const std::string& name = "");
 
     // Blocks
-    BasicBlock* createBlock(const std::string& name, Function* parent = nullptr);
+    BasicBlock* createBlock(const std::string& name = "", Function* parent = nullptr);
     void branchIfNeeded(BasicBlock* block);
-    void startBlock(BasicBlock* block, Function* func);
-    void branchAndStartBlock(BasicBlock* block, Function* func);
+    void startBlock(BasicBlock* block);
+    void branchAndStartBlock(BasicBlock* block);
     bool lastInstTerminator() const;
 
     // Funcs
@@ -50,6 +50,7 @@ public:
     void callMemCpy(Value* dest, Value* src, Value* size);
     Value* callMalloc(size_t size, bool isOwner, Lgs_RTType type);
 
+    // Stack
     void callStackPush();
     Value* callPopStack(const std::string& name);
 

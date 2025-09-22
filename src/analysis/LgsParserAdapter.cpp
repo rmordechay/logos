@@ -45,6 +45,7 @@
 #include "types/iterables/LgsMap.h"
 #include "types/LgsNullable.h"
 #include "types/LgsUnknown.h"
+#include "types/primitives/LgsByte.h"
 #include "types/primitives/LgsDouble.h"
 #include "types/primitives/LgsShort.h"
 #include "types/primitives/LgsSize.h"
@@ -378,8 +379,7 @@ LgsMainFunc* LgsParserAdapter::getMainFunc(LogosParser::FuncContext* ctx) {
 }
 
 LgsFunc* LgsParserAdapter::getLambda(LogosParser::LambdaContext* ctx) {
-    const auto lambdaID = lambdaNamesCounter.fetch_add(1);
-    const auto func = new LgsFunc(LGS_ANONYMOUS_STR + std::to_string(lambdaID), nullptr);
+    const auto func = new LgsFunc("", nullptr);
     currentFunc = func;
     func->isLambda = true;
     func->funcType->rt = getType(ctx->rt);
@@ -471,8 +471,15 @@ LgsStmt* LgsParserAdapter::getDeferStmt(LogosParser::DeferStmtContext* ctx) {
     const auto deferStmt = new LgsDeferStmt();
     if (const auto funcCall = ctx->funcCall()) {
         deferStmt->funcCall = getFuncCall(funcCall);
+        deferStmt->funcCall->isDeferred = true;
     } else if (const auto selection = ctx->selection()) {
         deferStmt->selection = getSelection(selection);
+        const auto methodCall = deferStmt->selection->lastExpr()->asFuncCall();
+        if (!methodCall) {
+            errHandler.addError(E10021, &deferStmt->selection->location);
+        } else {
+            methodCall->isDeferred = true;
+        }
     } else {
         assert(0);
     }
@@ -627,8 +634,9 @@ LgsCoroutine* LgsParserAdapter::getCoroutine(LogosParser::CoroutineContext* ctx)
         const auto methodCall = lgsSelection->lastExpr()->asFuncCall();
         if (!methodCall) {
             errHandler.addError(E10021, &lgsSelection->location);
+        } else {
+            methodCall->isCoroutine = true;
         }
-        methodCall->isCoroutine = true;
         coroutine->selection = lgsSelection;
     } else {
         assert(0);
@@ -985,9 +993,9 @@ std::vector<LgsExpr*> LgsParserAdapter::getSelectionExprs(LogosParser::Selection
             const auto lgsField = getVariable(field);
             exprs.push_back(lgsField);
         } else if (const auto funcCall = currentExpr->funcCall()) {
-            const auto logosMethodCall = getFuncCall(funcCall);
-            logosMethodCall->isMethodCall = true;
-            exprs.push_back(logosMethodCall);
+            const auto lgsMethodCall = getFuncCall(funcCall);
+            lgsMethodCall->isMethodCall = true;
+            exprs.push_back(lgsMethodCall);
         } else if (const auto iterIndex = currentExpr->iterIndex()) {
             const auto logosIterIndex = getIterIndex(iterIndex);
             exprs.push_back(logosIterIndex);
@@ -1180,6 +1188,8 @@ LgsType* LgsParserAdapter::getTypeFromText(antlr4::tree::TerminalNode* ctx) cons
         type = &LGS_CHAR;
     } else if (typeText == LgsInt::name) {
         type = &LGS_INT;
+    } else if (typeText == LgsByte::name) {
+        type = &LGS_BYTE;
     } else if (typeText == LgsUInt::name) {
         type = &LGS_UINT;
     } else if (typeText == LgsShort::name) {
@@ -1278,5 +1288,3 @@ void LgsParserAdapter::setLocation(LgsLocation& location, const antlr4::Token* s
     }
     location.fileID = fileID;
 }
-
-std::atomic<size_t> LgsParserAdapter::lambdaNamesCounter{0};

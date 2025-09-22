@@ -7,8 +7,6 @@ public:
 
     LgsFloat() {
         isPrimitive = true;
-        isNumber = true;
-        isFloatPoint = true;
         rtt = RTT_FLOAT;
     }
     Type* getIRType(LgsLLVMGen& cg) override;

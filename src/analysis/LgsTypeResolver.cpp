@@ -51,7 +51,7 @@ LgsType* LgsTypeResolver::resolveType(LgsType* type, LgsFile* file) {
         resolveFuncTypes(funcType, *file);
     }
 
-    if (type->isUnknown) {
+    if (type->isUnknown()) {
         auto typeName = type->getName();
         auto symbol = globals.getSymbol(typeName);
         if (!symbol) {

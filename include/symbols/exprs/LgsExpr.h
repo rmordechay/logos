@@ -56,15 +56,14 @@ public:
 
     virtual Value* hash(LgsLLVMGen& cg);
     virtual void assign(LgsLLVMGen& cg, LgsExpr* expr);
-    virtual Value* getIRPtrTo(LgsLLVMGen& cg);
     virtual bool equals(LgsExpr* other);
 
     void freeOwner(LgsLLVMGen& cg);
     size_t getConstInt();
     std::string getConstStr();
+    Value* getIRPtrTo(LgsLLVMGen& cg);
     LgsIterator toIterator();
     void setType(LgsType* newType);
-    std::pair<Value*, Value*> loadOperands(LgsLLVMGen& cg, LgsExpr* other);
 
     LgsFunc* asFunc();
     LgsVariable* asVariable();

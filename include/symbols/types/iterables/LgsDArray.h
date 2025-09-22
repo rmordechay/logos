@@ -14,7 +14,6 @@ public:
 
     explicit LgsDArray(LgsType* baseType = nullptr) : LgsIterable(baseType) {
         addMethod(mapFunc);
-        isSliceable = true;
         rtt = RTT_DARRAY;
     }
 

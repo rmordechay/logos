@@ -7,10 +7,8 @@ class LgsUnknown final : public LgsType {
 public:
     std::string name;
 
-    explicit LgsUnknown(std::string name = LGS_UNKNOWN_TYPE) : name(std::move(name)) {
-        isUnknown = true;
-    }
-    llvm::Type* getIRType(LgsLLVMGen& cg) override;
+    explicit LgsUnknown(std::string name = LGS_UNKNOWN_TYPE) : name(std::move(name)) {}
+    Type* getIRType(LgsLLVMGen& cg) override;
     std::string getName() override;
     std::string pname() override;
     json::value asJSON() override;

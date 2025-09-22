@@ -6,8 +6,6 @@ public:
     static constexpr auto name = "Double";
     LgsDouble() {
         isPrimitive = true;
-        isNumber = true;
-        isFloatPoint = true;
         rtt = RTT_DOUBLE;
     }
     llvm::Type* getIRType(LgsLLVMGen& cg) override;

@@ -6,6 +6,8 @@ enum Lgs_RTType {
     RTT_BOOL,
     RTT_CHAR,
     RTT_STR,
+    RTT_BYTE,
+    RTT_SHORT,
     RTT_INT,
     RTT_LONG,
     RTT_SIZE,

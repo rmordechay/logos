@@ -21,7 +21,7 @@ bool isLogosKeyword(const std::string& s);
 void cleanStr(std::string& value);
 std::string getFileText(const fs::path& filePath);
 std::string removeUnderscores(const std::string& input);
-void freeType(const LgsType* type);
+void freeType(LgsType* type);
 void freeExpr(LgsExpr* expr);
 size_t hashStr(const char* key);
 bool startsWith(const std::string& str, const std::string& prefix);

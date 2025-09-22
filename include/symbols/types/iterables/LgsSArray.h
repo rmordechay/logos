@@ -8,7 +8,6 @@ public:
     static constexpr auto name = "SArray";
 
     explicit LgsSArray(LgsType* baseType = nullptr): LgsIterable(baseType) {
-        isSliceable = true;
         rtt = RTT_SARRAY;
     }
 

@@ -7,7 +7,6 @@ public:
 
     LgsSize() {
         isPrimitive = true;
-        isNumber = true;
         isInt = true;
         rtt = RTT_SIZE;
     }

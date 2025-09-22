@@ -3,6 +3,7 @@
 #include "data/LgsErrors.h"
 #include "exprs/LgsBinaryExpr.h"
 
+class LgsByte;
 
 namespace llvm {
     class DIBasicType;
@@ -48,12 +49,9 @@ using namespace llvm;
 class LgsType {
 public:
     bool isInt = false;
-    bool isNumber = false;
-    bool isUnknown = false;
-    bool isUnsigned = false;
-    bool isFloatPoint = false;
+    bool isFloat = false;
     bool isPrimitive = false;
-    bool isSliceable = false;
+    bool isUnsigned = false;
     bool isHeapAlloc = false;
     Type* IRType = nullptr;
     LgsLocation location{0, 0, 0};
@@ -61,6 +59,41 @@ public:
     std::map<std::string, LgsFunc*> methods;
     Lgs_RTType rtt;
 
+    LgsType* extendInt();
+    bool addField(LgsField* field);
+    bool addMethod(LgsFunc* method);
+    bool addEmptyMethod(const std::string& name);
+    bool equals(LgsType* other);
+    bool isVoid();
+    bool isNumber() const;
+    bool isBig();
+    bool isNullable();
+    bool isUnknown();
+    bool isSliceable();
+    LgsChar* asChar();
+    LgsStr* asStr();
+    LgsBool* asBool();
+    LgsByte* asByte();
+    LgsInt* asInt();
+    LgsShort* asShort();
+    LgsLong* asLong();
+    LgsSize* asSize();
+    LgsUInt* asUInt();
+    LgsFloat* asFloat();
+    LgsDouble* asDouble();
+    LgsMap* asMap();
+    LgsEnum* asEnum();
+    LgsNullable* asNullable();
+    LgsObject* asObject();
+    LgsInterface* asInterface();
+    LgsIterable* asIterable();
+    LgsDArray* asDArray();
+    LgsSArray* asSArray();
+    LgsVec* asVec();
+    LgsFuncType* asFuncType();
+    LgsPtr* asPtr();
+    LgsGroup* asGroup();
+    LgsTypePair* asPair();
     virtual LgsField* getField(const std::string& name);
     virtual LgsFunc* getMethod(const std::string& name);
     virtual Type* getIRType(LgsLLVMGen& cg) = 0;
@@ -86,44 +119,13 @@ public:
     virtual Value* gtIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
     virtual Value* geIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
     virtual Value* leIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
-    virtual Value* inIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
-    virtual Value* andIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
-    virtual Value* orIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
     virtual Value* bitAndIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
     virtual Value* bitOrIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
     virtual Value* bitXorIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
     virtual Value* lshiftIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
     virtual Value* rshiftIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
-
-    bool addField(LgsField* field);
-    bool addMethod(LgsFunc* method);
-    bool addEmptyMethod(const std::string& name);
-    bool equals(LgsType* other);
-    bool isVoid();
-    bool isBig();
-    bool isNullable();
-    LgsBool* asBool();
-    LgsChar* asChar();
-    LgsStr* asStr();
-    LgsInt* asInt();
-    LgsShort* asShort();
-    LgsLong* asLong();
-    LgsSize* asSize();
-    LgsUInt* asUInt();
-    LgsFloat* asFloat();
-    LgsDouble* asDouble();
-    LgsMap* asMap();
-    LgsEnum* asEnum();
-    LgsNullable* asNullable();
-    LgsObject* asObject();
-    LgsInterface* asInterface();
-    LgsIterable* asIterable();
-    LgsDArray* asDArray();
-    LgsSArray* asSArray();
-    LgsVec* asVec();
-    LgsFuncType* asFuncType();
-    LgsPtr* asPtr();
-    LgsGroup* asGroup();
-    LgsTypePair* asPair();
+    virtual Value* inIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
+    virtual Value* andIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
+    virtual Value* orIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
     virtual ~LgsType() = default;
 };

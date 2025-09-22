@@ -14,6 +14,16 @@ extern "C" void Lgs_print(const char* fmt, const Lgs_RTType rtt, const void* v) 
         else printf(fmt, LgsBool::falseLiteral);
         break;
     }
+    case RTT_BYTE: {
+        const auto b = *static_cast<const int8_t*>(v);
+        printf(fmt, b);
+        break;
+    }
+    case RTT_SHORT: {
+        const auto s = *static_cast<const int16_t*>(v);
+        printf(fmt, s);
+        break;
+    }
     case RTT_INT: {
         const auto str = *static_cast<const int32_t*>(v);
         printf(fmt, str);
