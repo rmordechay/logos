@@ -795,7 +795,6 @@ void LgsCodeGen::createMapFunc(LgsFunc* func) {
     cg.savedIP = cg.builder.saveIP();
     const auto originalFunc = currentIRFunc;
     createPrologue(func);
-
     const auto& originalArr = func->funcType->params[0];
     const auto& callback = func->funcType->params[1];
     const auto dArray = originalArr.type->asDArray();
@@ -819,14 +818,13 @@ void LgsCodeGen::createMapFunc(LgsFunc* func) {
     // Body
     cg.startBlock(IRBodyBlock, currentIRFunc);
     const auto f = dyn_cast<FunctionType>(callback.type->getIRType(cg));
-    const auto a = dArray->getFunc->callIR(cg, {originalArr.IRValue, iValue});
-    const auto arg = cg.builder.CreateLoad(dArray->baseType->getIRType(cg), a);
+    const auto element = dArray->getFunc->callIR(cg, {originalArr.IRValue, iValue});
+    const auto arg = cg.builder.CreateLoad(dArray->baseType->getIRType(cg), element);
     const auto v = cg.builder.CreateCall(f, callback.IRValue, {arg});
     const auto vPtr = cg.builder.CreateAlloca(cg.ptrTy());
     cg.builder.CreateStore(v, vPtr);
     dArray->getAddFunc()->callIR(cg, {newArr.IRValue, vPtr});
 
-    if (cg.lastInstTerminator()) return;
     const auto inc = cg.builder.CreateAdd(iValue, cg.usize(1));
     cg.builder.CreateStore(inc, iPtr);
     cg.builder.CreateBr(IRCondBlock);

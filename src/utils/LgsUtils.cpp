@@ -151,43 +151,43 @@ std::string getFullPath(const LgsLocation& location, const std::string& filePath
 std::string getOpAsText(const LgsOperator op) {
     switch (op) {
     case ADD:
-        return "Addition";
+        return "+";
     case SUB:
-        return "Subtraction";
+        return "-";
     case MUL:
-        return "Multiplication";
+        return "*";
     case DIV:
-        return "Division";
+        return "/";
     case MOD:
-        return "Modulo";
+        return "%";
     case EQ:
-        return "Equal";
+        return "==";
     case NE:
-        return "Not equal";
+        return "!=";
     case LT:
-        return "Less than";
+        return "<";
     case GT:
-        return "Greater than";
+        return ">";
     case GE:
-        return "Greater than or equal to";
+        return ">=";
     case LE:
-        return "Less than or equal to";
+        return "<=";
     case AND:
-        return "And";
+        return "and";
     case OR:
-        return "Or";
+        return "or";
     case BIT_AND:
-        return "Bitwise and";
+        return "&";
     case BIT_OR:
-        return "Bitwise or";
+        return "|";
     case BIT_XOR:
-        return "Xor";
+        return "^";
     case LSHIFT:
-        return "Left shift";
+        return "<<";
     case RSHIFT:
-        return "Right shift";
+        return ">>";
     case IN:
-        return "In";
+        return "in";
     case NOOP:
         break;
     }

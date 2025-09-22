@@ -1,6 +1,7 @@
 #include "types/primitives/LgsBool.h"
 #include "exprs/constants/LgsIntConst.h"
 #include "types/LgsAny.h"
+#include "types/primitives/LgsChar.h"
 #include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsInt.h"
 #include "types/primitives/LgsLong.h"
@@ -20,6 +21,15 @@ std::string LgsBool::pname() {
 
 Type* LgsBool::getIRType(LgsLLVMGen& cg) {
     return cg.i1Ty();
+}
+
+LgsType* LgsBool::applyOp(LgsType* other, LgsOperator op) {
+    const auto IRName = other->getName();
+    if (name == IRName) {
+        if (op == ADD) return &LGS_INT;
+        return this;
+    }
+    return nullptr;
 }
 
 Value* LgsBool::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
@@ -77,6 +87,36 @@ Value* LgsBool::leIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     return cg.builder.CreateICmpSLE(l, r);
 }
 
+Value* LgsBool::andIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    const auto currentBlock = cg.builder.GetInsertBlock();
+    const auto func = currentBlock->getParent();
+    const auto rightBlock = cg.createBlock("and_right", func);
+    const auto endBlock = cg.createBlock("and_end", func);
+    cg.builder.CreateCondBr(other->IRValue, rightBlock, endBlock);
+    cg.builder.SetInsertPoint(rightBlock);
+    cg.builder.CreateBr(endBlock);
+    cg.builder.SetInsertPoint(endBlock);
+    auto* phi = cg.builder.CreatePHI(cg.builder.getInt1Ty(), 2);
+    phi->addIncoming(cg.builder.getFalse(), currentBlock);
+    phi->addIncoming(other->IRValue, rightBlock);
+    return phi;
+}
+
+Value* LgsBool::orIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    const auto currentBlock = cg.builder.GetInsertBlock();
+    const auto func = currentBlock->getParent();
+    const auto rightBlock = cg.createBlock("or_right", func);
+    const auto endBlock = cg.createBlock("or_end", func);
+    cg.builder.CreateCondBr(self->IRValue, endBlock, rightBlock);
+    cg.builder.SetInsertPoint(rightBlock);
+    cg.builder.CreateBr(endBlock);
+    cg.builder.SetInsertPoint(endBlock);
+    auto* phi = cg.builder.CreatePHI(cg.builder.getInt1Ty(), 2);
+    phi->addIncoming(cg.builder.getTrue(), currentBlock);
+    phi->addIncoming(other->IRValue, rightBlock);
+    return phi;
+}
+
 std::string LgsBool::getName() {
     return name;
 }
@@ -88,12 +128,13 @@ LgsExpr* LgsBool::getZeroValue() {
 bool LgsBool::canCastTo(LgsType* other) {
     const auto IRName = other->getName();
     if (IRName == LgsAny::name) return true;
+    if (IRName == LgsChar::name) return true;
     if (IRName == LgsShort::name) return true;
-    if (IRName == LgsBool::name) return true;
-    if (IRName == LgsUInt::name) return true;
+    if (IRName == LgsInt::name) return true;
     if (IRName == LgsSize::name) return true;
     if (IRName == LgsLong::name) return true;
     if (IRName == LgsFloat::name) return true;
+    if (IRName == LgsUInt::name) return true;
     return name == IRName;
 }
 

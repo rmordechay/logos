@@ -6,7 +6,6 @@
 #include "types/primitives/LgsDouble.h"
 #include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsSize.h"
-
 #include <llvm/IR/DIBuilder.h>
 
 size_t LgsInt::getSizeBytes() {

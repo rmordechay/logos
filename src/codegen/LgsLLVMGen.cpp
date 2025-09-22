@@ -122,8 +122,8 @@ void LgsLLVMGen::callStackPush() {
     callLgsFunc("stack_push", getFT(voidTy()));
 }
 
-void LgsLLVMGen::callPopStack(const std::string& name) {
-    callLgsFunc("stack_pop", getFT(voidTy()));
+Value* LgsLLVMGen::callPopStack(const std::string& name) {
+    return callLgsFunc("stack_pop", getFT(voidTy()));
 }
 
 Type* LgsLLVMGen::i1Ty() {

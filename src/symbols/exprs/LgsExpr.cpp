@@ -99,7 +99,7 @@ LgsIterator LgsExpr::toIterator() {
 }
 
 void LgsExpr::setType(LgsType* newType) {
-    if (type && type->isUnknown) freeType(type);
+    freeType(type);
     type = newType;
 }
 

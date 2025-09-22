@@ -51,7 +51,7 @@ public:
     Value* callMalloc(size_t size, bool isOwner, Lgs_RTType type);
 
     void callStackPush();
-    void callPopStack(const std::string& name);
+    Value* callPopStack(const std::string& name);
 
     // Types
     Type* i1Ty();
