@@ -23,6 +23,7 @@ public:
     bool isLambda = false;
     CallFn fn;
 
+    explicit LgsFunc(LgsFuncType* funcType) : funcType(funcType) {}
     explicit LgsFunc(const std::string& name, LgsType* rt, const std::vector<LgsParam>& params, const uint32_t ops = 0) {
         initFunc(name, rt, params, ops);
     }
@@ -36,7 +37,6 @@ public:
         }
         initFunc(name, rt, params, ops);
     }
-    explicit LgsFunc(LgsFuncType* funcType) : funcType(funcType) {}
     virtual Function* getIRFunc(LgsLLVMGen& cg);
     virtual Value* call(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args);
     Value* callIR(LgsLLVMGen& cg, const std::vector<Value*>& args = {});

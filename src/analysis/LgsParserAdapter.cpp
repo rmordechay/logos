@@ -375,7 +375,8 @@ LgsMainFunc* LgsParserAdapter::getMainFunc(LogosParser::FuncContext* ctx) {
 }
 
 LgsFunc* LgsParserAdapter::getLambda(LogosParser::LambdaContext* ctx) {
-    const auto func = new LgsFunc("", nullptr);
+    const auto lambdaID = lambdaNamesCounter.fetch_add(1);
+    const auto func = new LgsFunc(LGS_ANONYMOUS_STR + std::to_string(lambdaID), nullptr);
     currentFunc = func;
     func->isLambda = true;
     func->funcType->rt = getType(ctx->rt);
@@ -1270,3 +1271,5 @@ void LgsParserAdapter::setLocation(LgsLocation& location, const antlr4::Token* s
     }
     location.fileID = fileID;
 }
+
+std::atomic<size_t> LgsParserAdapter::lambdaNamesCounter{0};

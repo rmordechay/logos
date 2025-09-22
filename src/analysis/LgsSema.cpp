@@ -119,7 +119,7 @@ void LgsSema::visitTestFile(const LgsTestFile* testFile) {
 void LgsSema::visitField(LgsField* field) {
     if (field->expr) {
         visitExpr(field->expr);
-        matchExprToType(field->expr, field->type);
+        validateExprType(field->expr, field->type);
     }
     if (field->expr && field->expr->asFunc()) {
         errHandler.addError(E10013, &field->location, {field->name});
@@ -158,7 +158,6 @@ void LgsSema::visitFunc(LgsFunc* func) {
 }
 
 void LgsSema::visitLambda(LgsFunc* lambda) {
-    std::cout << "lambda" << std::endl;
     if (lambda->stmtsBlock->stmts.size() == 1) {
         const auto expr = lambda->stmtsBlock->stmts.front()->asExpr();
         if (expr) {
@@ -174,7 +173,7 @@ void LgsSema::visitLambda(LgsFunc* lambda) {
 void LgsSema::visitParam(LgsParam* param) {
     if (param->expr) {
         visitExpr(param->expr);
-        matchExprToType(param->expr, param->type);
+        validateExprType(param->expr, param->type);
     } else if (param->isVariadic) {
         if (param->expr) {
             errHandler.addError(E10045, &param->location);
@@ -238,14 +237,16 @@ void LgsSema::visitVarDec(LgsVarDec* varDec) {
         varDec->type = typeResolver.resolveType(varDec->type, file);
         varDec->expr->completeType(varDec->type);
         visitExpr(varDec->expr);
-        matchExprToType(varDec->expr, varDec->type);
+        validateExprType(varDec->expr, varDec->type);
+        freeType(varDec->type);
+        varDec->type = varDec->expr->type;
     } else if (varDec->expr) {
         visitExpr(varDec->expr);
         if (varDec->isOwner) {
             varDec->expr->owner = varDec;
         }
         varDec->type = varDec->expr->type;
-        matchExprToType(varDec->expr, varDec->type);
+        validateExprType(varDec->expr, varDec->type);
     } else {
         varDec->type = typeResolver.resolveType(varDec->type, file);
         varDec->expr = varDec->type->getZeroValue();
@@ -603,6 +604,7 @@ void LgsSema::visitDynamicArray(LgsArrayExpr* array) {
         baseType = array->initialElements.front()->type;
     }
     dArr->baseType = baseType;
+
     const auto mapFT = dArr->mapFunc->funcType->params[1].type->asFuncType();
     mapFT->params[0].type = baseType;
     mapFT->rt = baseType;
@@ -710,7 +712,6 @@ void LgsSema::visitFirstSelection(LgsExpr* firstExpr) {
 
 void LgsSema::visitInnerSelections(const LgsSelection* selection) {
     const auto exprs = selection->exprs;
-    visitExpr(exprs.front());
     for (int i = 0; i < exprs.size() - 1; ++i) {
         const auto parentExpr = exprs[i];
         const auto childExpr = exprs[i + 1];
@@ -776,6 +777,14 @@ void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent) {
     } else if (method->funcType->isMethod) {
         methodCall->args.insert(methodCall->args.begin(), parent);
     }
+
+    if (methodCall->name == "map") {
+        const auto mapFT = methodCall->args[1]->type->asFuncType();
+        const auto baseType = parent->type->asIterable()->baseType;
+        mapFT->params[0].type = baseType;
+        mapFT->rt = baseType;
+    }
+
     methodCall->completeType(method->funcType);
     for (int i = 1; i < methodCall->args.size(); ++i) {
         visitExpr(methodCall->args[i]);
@@ -787,6 +796,7 @@ void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent) {
         errHandler.addError(E10034, &methodCall->location, {parent->type->pname(), name, methodCall->pname(), method->pname()});
         return;
     }
+
     if (!validateMethodVisibility(methodCall, parent->type->asObject())) return;
     if (stack.currentFunc()->isTest && parent->type->getName() == LgsTest::name && methodCall->name == "mock") {
         const auto pair = std::make_pair(methodCall->args[0], methodCall->args[1]);
@@ -905,7 +915,7 @@ void LgsSema::visitInstance(LgsInstance* instance) {
         }
         if (!validateFieldVisibility(field, instance->obj)) continue;
         visitExpr(arg->expr);
-        matchExprToType(arg->expr, field->type);
+        validateExprType(arg->expr, field->type);
         field->expr = arg->expr;
         if (field->isOwner && field->type->isHeapAlloc) {
             field->expr->owner = field;
@@ -1102,7 +1112,7 @@ std::string getMissingImplementsStr(const std::vector<LgsField*>& fields, const 
     return str.str();
 }
 
-void LgsSema::matchExprToType(const LgsExpr* expr, LgsType* type) {
+void LgsSema::validateExprType(const LgsExpr* expr, LgsType* type) {
     if (expr->isNull) {
         // null must have a type
         if (!type || type->isUnknown) {

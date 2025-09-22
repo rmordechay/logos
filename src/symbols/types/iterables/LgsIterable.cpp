@@ -32,6 +32,10 @@ LgsFunc* LgsIterable::getAddFunc() {
     assert(0);
 }
 
+LgsFunc* LgsIterable::getMapFunc() {
+    assert(0);
+}
+
 LgsFunc* LgsIterable::getLenFunc() {
     const auto lenFunc = methods.find(LEN_FUNC_NAME);
     if (lenFunc != methods.end() && lenFunc->second) return lenFunc->second;

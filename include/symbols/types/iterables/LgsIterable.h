@@ -29,6 +29,7 @@ public:
     virtual LgsFunc* getIsEmptyFunc();
     virtual LgsFunc* getIsNotEmptyFunc();
     virtual LgsFunc* getAddFunc();
+    virtual LgsFunc* getMapFunc();
     virtual LgsType* getIndexType() = 0;
     virtual Value* loadWithIndex(LgsLLVMGen* cg);
     virtual uint16_t getUnpackCount() const = 0;

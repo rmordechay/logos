@@ -5,7 +5,6 @@
 #include "utils/LgsErrHandler.h"
 #include "LgsPaths.h"
 #include "utils/ThreadPool.h"
-#include <llvm/Passes/OptimizationLevel.h>
 
 class LgsTestFile;
 class LgsAppFile;

@@ -45,6 +45,7 @@ public:
     LgsAppConfigs& appConfigs;
     LgsErrHandler errHandler;
     LgsFunc* currentFunc = nullptr;
+    static std::atomic<size_t> lambdaNamesCounter;
 
     explicit LgsParserAdapter(const int fileID, LgsAppConfigs& appConfigs, LgsPaths& paths, LgsSymbolTable& globals) : fileID(fileID), paths(paths), globals(globals), appConfigs(appConfigs) {}
     LgsFile* parseFile(const std::string& codeText, const fs::path& filePath);

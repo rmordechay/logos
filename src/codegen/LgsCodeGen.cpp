@@ -625,10 +625,10 @@ void LgsCodeGen::visitCast(LgsCast* lgsCast) {
 void LgsCodeGen::visitLambda(LgsFunc* func) {
     cg.savedIP = cg.builder.saveIP();
     const auto originalFunc = currentIRFunc;
+    func->IRValue = func->getIRFunc(cg);
     visitFunc(func);
     currentIRFunc = originalFunc;
     cg.builder.restoreIP(cg.savedIP);
-    func->IRValue = func->getIRFunc(cg);
 }
 
 void LgsCodeGen::visitIntConst(LgsIntConst* intConst) const {
