@@ -1,0 +1,6 @@
+main() {
+    obj2 = Obj2{obj1 = Obj{x = 23}}
+    obj2.getObj1().arr[0] := 123
+    print(obj2.getObj1().arr[0])
+    print(obj2.getObj1().func())
+}

@@ -15,7 +15,7 @@ struct Lgs_runtime {
 static inline Lgs_runtime runtime;
 
 extern "C" void Lgs_runtime_init() {
-    runtime.scheduler.run();
+    runtime.scheduler.start();
     //sqlite3_open(":memory:", &runtime.db);
 }
 
