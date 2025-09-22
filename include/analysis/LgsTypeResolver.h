@@ -27,5 +27,5 @@ public:
     void resolveIterable(LgsIterable* iterable, LgsFile& file);
     void resolveFuncTypes(LgsFuncType* funcType, LgsFile& file);
     void resolveGroupTypes(LgsGroup* group, LgsFile& file);
-    void resolveIOPair(LgsIOPair* ioPair, LgsFile& file);
+    void resolveIOPair(LgsIOPair* ioPair, LgsObject* obj) const;
 };

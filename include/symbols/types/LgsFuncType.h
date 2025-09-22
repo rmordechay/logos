@@ -33,7 +33,7 @@ public:
     bool isOptional = false;
     bool isTerminator = false;
     bool isMethod = false;
-    bool isIO = false;
+    bool isInIOPair = false;
     bool isSysCall = false;
     FunctionType* IRType = nullptr;
 

@@ -65,7 +65,7 @@ enumField:
     ;
 
 ioPair:
-        IO LBRACE opening=IDENTIFIER closing=IDENTIFIER RBRACE
+        IO LBRACE (LPAREN opening=IDENTIFIER COMMA closing=IDENTIFIER RPAREN)+ RBRACE
     ;
 
 group:
@@ -190,7 +190,7 @@ returnStatement:
     ;
 
 ioStatement:
-        IO (implicitVarDec) statementsBlock
+        IO (IDENTIFIER (COLON type)? EQUAL)? expr statementsBlock
     ;
 
 coroutine:

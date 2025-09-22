@@ -141,9 +141,6 @@ void LgsSema::visitFunc(LgsFunc* func) {
         }
         defaultParamsStarted = !!param.expr;
     }
-    if (!func->funcType->rt) {
-        func->funcType->rt = &LGS_VOID;
-    }
     visitStmtsBlock(func->stmtsBlock);
     if (func->funcType->isVariadic && func->funcType->hasDefaults()) {
         errHandler.addError(E10043, &func->location);
@@ -456,6 +453,9 @@ void LgsSema::visitIOStmt(const LgsIOStmt* ioStmt) {
     visitVarDec(ioStmt->varDec);
     const auto expr = ioStmt->varDec->expr;
     const auto funcCall = expr->asFuncCall() ? expr->asFuncCall() : expr->asSelection()->lastExpr()->asFuncCall();
+    if (!funcCall->func->funcType->isInIOPair) {
+        errHandler.addError(E10084, &funcCall->location, {funcCall->pname()});
+    }
     visitStmtsBlock(ioStmt->stmtsBlock);
 }
 

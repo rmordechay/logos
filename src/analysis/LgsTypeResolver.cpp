@@ -6,6 +6,7 @@
 #include "funcs/LgsFunc.h"
 #include "funcs/LgsMainFunc.h"
 #include "stmts/LgsField.h"
+#include "stmts/LgsIOPair.h"
 #include "types/LgsEnum.h"
 #include "types/LgsFuncType.h"
 #include "types/LgsGroup.h"
@@ -133,13 +134,12 @@ void LgsTypeResolver::resolveObjTypes(LgsObject* obj, LgsFile& file) {
                 param.type = resolveType(param.type, &file);
             }
         }
-        resolveFuncTypes(method->funcType, file);
     }
     for (auto& interface : obj->interfaces) {
         interface = resolveType(interface, &file);
     }
     for (const auto& ioPair : obj->ioPairs) {
-        resolveIOPair(ioPair, file);
+        resolveIOPair(ioPair, obj);
     }
 }
 
@@ -179,6 +179,15 @@ void LgsTypeResolver::resolveGroupTypes(LgsGroup* group, LgsFile& file) {
     }
 }
 
-void LgsTypeResolver::resolveIOPair(LgsIOPair* ioPair, LgsFile& file) {
-    assert(0);
+void LgsTypeResolver::resolveIOPair(LgsIOPair* ioPair, LgsObject* obj) const {
+    ioPair->openFunc = obj->getMethod(ioPair->openFuncName);
+    ioPair->openFunc->funcType->isInIOPair = true;
+    if (!ioPair->openFunc) {
+        errHandler.addError(E10005, &ioPair->openFunc->location, {ioPair->openFuncName, obj->pname()});
+    }
+    ioPair->closeFunc = obj->getMethod(ioPair->closeFuncName);
+    ioPair->closeFunc->funcType->isInIOPair = true;
+    if (!ioPair->closeFunc) {
+        errHandler.addError(E10005, &ioPair->closeFunc->location, {ioPair->closeFuncName, obj->pname()});
+    }
 }

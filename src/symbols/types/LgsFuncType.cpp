@@ -11,7 +11,7 @@ void LgsFuncType::setFuncOptions(const uint32_t ops) {
     isOptional = ops & OPTIONAL;
     isTerminator = ops & TERMINATOR;
     isMethod = ops & METHOD;
-    isIO = ops & IO;
+    isInIOPair = ops & IO;
     isSysCall = ops & SYSCALL;
 }
 
@@ -145,7 +145,7 @@ LgsType* LgsFuncType::clone() {
     copy->isVariadic = isVariadic;
     copy->isOptional = isOptional;
     copy->isTerminator = isTerminator;
-    copy->isIO = isIO;
+    copy->isInIOPair = isInIOPair;
     return copy;
 }
 

@@ -340,7 +340,10 @@ LgsInterface* LgsParserAdapter::getInterface(LogosParser::InterfaceBodyContext* 
 }
 
 LgsFunc* LgsParserAdapter::getFunc(LogosParser::FuncContext* ctx) {
-    const auto rt = getType(ctx->funcSignature()->type());
+    auto rt = getType(ctx->funcSignature()->type());
+    if (!rt) {
+        rt = &LGS_VOID;
+    }
     const auto funcSignature = ctx->funcSignature();
     const auto funcNameToken = funcSignature->funcSignatureHeader()->IDENTIFIER();
     const auto funcName = funcNameToken->getText();
@@ -400,7 +403,10 @@ LgsFunc* LgsParserAdapter::getLambda(LogosParser::LambdaContext* ctx) {
 }
 
 LgsFunc* LgsParserAdapter::getMethod(LogosParser::MethodContext* ctx, LgsType* obj) {
-    const auto rt = getType(ctx->funcSignature()->type());
+    auto rt = getType(ctx->funcSignature()->type());
+    if (!rt) {
+        rt = &LGS_VOID;
+    }
     const auto funcSignature = ctx->funcSignature();
     const auto nameToken = funcSignature->funcSignatureHeader()->IDENTIFIER();
     const auto method = new LgsFunc(nameToken->getText(), rt);
@@ -670,8 +676,9 @@ LgsStmt* LgsParserAdapter::getIOStmt(LogosParser::IoStatementContext* ctx) {
     const auto stmtsBlock = getStmtBlock(ctx->statementsBlock());
     const auto lgsIOStmt = new LgsIOStmt(stmtsBlock);
     setLocation(lgsIOStmt->location, ctx->start, ctx->stop);
-    lgsIOStmt->varDec = getVarDec(ctx->implicitVarDec()->IDENTIFIER(), true);
-    lgsIOStmt->varDec->expr = getExpr(ctx->implicitVarDec()->expr());
+    lgsIOStmt->varDec = new LgsVarDec("", getExpr(ctx->expr()));
+    lgsIOStmt->varDec->isConst = true;
+    lgsIOStmt->varDec->location = lgsIOStmt->location;
     return lgsIOStmt;
 }
 
