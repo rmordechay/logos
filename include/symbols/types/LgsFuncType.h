@@ -38,7 +38,7 @@ public:
     FunctionType* IRType = nullptr;
 
     LgsFuncType() = default;
-    LgsFuncType(LgsType* rt, const std::vector<LgsParam>& params = {}) : rt(rt), params(params) {}
+    explicit LgsFuncType(LgsType* rt, const std::vector<LgsParam>& params = {}) : rt(rt), params(params) {}
     void setFuncOptions(uint32_t ops);
     Type* getIRType(LgsLLVMGen& cg) override;
     LgsExpr* getZeroValue() override;
@@ -46,7 +46,6 @@ public:
     std::string getName() override;
     std::string pname() override;
     json::value asJSON() override;
-    bool isTypeComplete() const;
     std::string strFormatPart() const override;
     bool canCastTo(LgsType* other) override;
     LgsType* clone() override;

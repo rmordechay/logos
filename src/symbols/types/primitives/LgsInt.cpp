@@ -71,75 +71,51 @@ Value* LgsInt::divIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
 }
 
 Value* LgsInt::modIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    const auto l = cg.builder.CreateZExt(self->loadIR(cg), getIRType(cg));
-    const auto r = cg.builder.CreateZExt(other->loadIR(cg), getIRType(cg));
-    return cg.builder.CreateSRem(l, r);
+    return cg.builder.CreateSRem(self->loadIR(cg), other->loadIR(cg));
 }
 
 Value* LgsInt::eqIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    const auto l = cg.builder.CreateZExt(self->loadIR(cg), getIRType(cg));
-    const auto r = cg.builder.CreateZExt(other->loadIR(cg), getIRType(cg));
-    return cg.builder.CreateICmpEQ(l, r);
+    return cg.builder.CreateICmpEQ(self->loadIR(cg), other->loadIR(cg));
 }
 
 Value* LgsInt::neIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    const auto l = cg.builder.CreateZExt(self->loadIR(cg), getIRType(cg));
-    const auto r = cg.builder.CreateZExt(other->loadIR(cg), getIRType(cg));
-    return cg.builder.CreateICmpNE(l, r);
+    return cg.builder.CreateICmpNE(self->loadIR(cg), other->loadIR(cg));
 }
 
 Value* LgsInt::ltIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    const auto l = cg.builder.CreateZExt(self->loadIR(cg), getIRType(cg));
-    const auto r = cg.builder.CreateZExt(other->loadIR(cg), getIRType(cg));
-    return cg.builder.CreateICmpSLT(l, r);
+    return cg.builder.CreateICmpSLT(self->loadIR(cg), other->loadIR(cg));
 }
 
 Value* LgsInt::gtIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    const auto l = cg.builder.CreateZExt(self->loadIR(cg), getIRType(cg));
-    const auto r = cg.builder.CreateZExt(other->loadIR(cg), getIRType(cg));
-    return cg.builder.CreateICmpSGT(l, r);
+    return cg.builder.CreateICmpSGT(self->loadIR(cg), other->loadIR(cg));
 }
 
 Value* LgsInt::geIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    const auto l = cg.builder.CreateZExt(self->loadIR(cg), getIRType(cg));
-    const auto r = cg.builder.CreateZExt(other->loadIR(cg), getIRType(cg));
-    return cg.builder.CreateICmpSGE(l, r);
+    return cg.builder.CreateICmpSGE(self->loadIR(cg), other->loadIR(cg));
 }
 
 Value* LgsInt::leIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    const auto l = cg.builder.CreateZExt(self->loadIR(cg), getIRType(cg));
-    const auto r = cg.builder.CreateZExt(other->loadIR(cg), getIRType(cg));
-    return cg.builder.CreateICmpSLE(l, r);
+    return cg.builder.CreateICmpSLE(self->loadIR(cg), other->loadIR(cg));
 }
 
 Value* LgsInt::bitAndIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    const auto l = cg.builder.CreateZExt(self->loadIR(cg), getIRType(cg));
-    const auto r = cg.builder.CreateZExt(other->loadIR(cg), getIRType(cg));
-    return cg.builder.CreateAnd(l, r);
+    return cg.builder.CreateAnd(self->loadIR(cg), other->loadIR(cg));
 }
 
 Value* LgsInt::bitOrIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    const auto l = cg.builder.CreateZExt(self->loadIR(cg), getIRType(cg));
-    const auto r = cg.builder.CreateZExt(other->loadIR(cg), getIRType(cg));
-    return cg.builder.CreateOr(l, r);
+    return cg.builder.CreateOr(self->loadIR(cg), other->loadIR(cg));
 }
 
 Value* LgsInt::bitXorIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    const auto l = cg.builder.CreateZExt(self->loadIR(cg), getIRType(cg));
-    const auto r = cg.builder.CreateZExt(other->loadIR(cg), getIRType(cg));
-    return cg.builder.CreateXor(l, r);
+    return cg.builder.CreateXor(self->loadIR(cg), other->loadIR(cg));
 }
 
 Value* LgsInt::rshiftIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    const auto l = cg.builder.CreateZExt(self->loadIR(cg), getIRType(cg));
-    const auto r = cg.builder.CreateZExt(other->loadIR(cg), getIRType(cg));
-    return cg.builder.CreateShl(l, r);
+    return cg.builder.CreateShl(self->loadIR(cg), other->loadIR(cg));
 }
 
 Value* LgsInt::lshiftIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    const auto l = cg.builder.CreateZExt(self->loadIR(cg), getIRType(cg));
-    const auto r = cg.builder.CreateZExt(other->loadIR(cg), getIRType(cg));
-    return cg.builder.CreateLShr(l, r);
+    return cg.builder.CreateLShr(self->loadIR(cg), other->loadIR(cg));
 }
 
 

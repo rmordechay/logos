@@ -61,7 +61,7 @@ public:
     LgsLLVMGen& cg;
     Function* currentIRFunc = nullptr;
     Function* mapFunc = nullptr;
-    static std::atomic<size_t> lambdaNamesCounter;
+    static std::atomic<size_t> namesCounter;
 
     explicit LgsCodeGen(LgsFile& file) : file(file), cg(file.generator) {}
     void generate(const LgsAppConfigs& appConfigs, TargetMachine& targetMachine);
@@ -107,7 +107,7 @@ public:
     void visitVariable(LgsVariable* variable);
     void visitSelection(LgsSelection* selection);
     void visitFuncCall(LgsFuncCall* funcCall);
-    void createMapFunc(LgsFunc* func);
+    void visitIterFunc(const LgsFuncCall* funcCall);
     void visitPrefixExpr(LgsPrefixExpr* prefixExpr);
     void visitPostfixExpr(LgsPostfixExpr* postfixExpr);
     void visitStrConst(LgsStrConst* strConst);
@@ -122,6 +122,8 @@ public:
     void initMainArgs(LgsMainFunc* mainFunc);
     void createPrologue(LgsFunc* func);
     void createEpilogue(LgsFunc* func);
+    void createMapFunc(LgsFunc* func);
+    void createFilterFunc(LgsFunc* func);
     Value* getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) const;
     Type* getThunkCtxType(const LgsFuncCall* fc) const;
     Function* getThunkFunc(const LgsFuncCall* fc, Type* ctxTy) const;

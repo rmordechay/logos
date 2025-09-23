@@ -14,8 +14,7 @@ std::string LgsDArray::getName() {
 }
 
 std::string LgsDArray::pname() {
-    assert(baseType);
-    return baseType->pname() + "[" + sizeExpr->pname() + "]";
+    return baseType->pname() + "[]";
 }
 
 size_t LgsDArray::getSizeBytes() {
@@ -46,14 +45,14 @@ StructType* LgsDArray::getArrStruct(LgsLLVMGen& cg) {
 }
 
 LgsFunc* LgsDArray::getAddFunc() {
-    const auto addFunc = methods.find(ADD_FUNC_NAME);
-    if (addFunc != methods.end() && addFunc->second) return addFunc->second;
-    addFunc->second = new LgsFunc(ADD_FUNC_NAME, &LGS_VOID, {this, &LGS_ANY}, BUILTIN | PUBLIC | METHOD);
-    addFunc->second->fn = [addFunc](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
-        return addFunc->second->callIR(cg, {args[0]->IRValue, args[1]->getIRPtrTo(cg)});
+    const auto func = methods.find(ADD_FUNC_NAME);
+    if (func != methods.end() && func->second) return func->second;
+    func->second = new LgsFunc(ADD_FUNC_NAME, &LGS_VOID, {this, &LGS_ANY}, BUILTIN | PUBLIC | METHOD);
+    func->second->fn = [func](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
+        return func->second->callIR(cg, {args[0]->IRValue, args[1]->getIRPtrTo(cg)});
     };
-    addMethod(addFunc->second);
-    return addFunc->second;
+    addMethod(func->second);
+    return func->second;
 }
 
 Value* LgsDArray::IRLength(LgsLLVMGen& cg, Value* iterable) {

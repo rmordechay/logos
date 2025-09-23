@@ -20,7 +20,8 @@ Type* LgsFuncType::getIRType(LgsLLVMGen& cg) {
     for (int i = 0; i < params.size(); ++i) {
         const auto param = params[i];
         const auto paramType = param.type;
-        if (param.isSelf || !paramType->isPrimitive) {
+        const auto isSelf = isMethod && i == 0;
+        if (isSelf || !paramType->isPrimitive) {
             IRParamsTypes.emplace_back(cg.ptrTy());
         } else {
             IRParamsTypes.emplace_back(paramType->getIRType(cg));
@@ -42,8 +43,7 @@ size_t LgsFuncType::getSizeBytes() {
 std::string LgsFuncType::getName() {
     if (IRName != "") return IRName;
     std::stringstream strStream;
-    if (isMethod && !isVirtual) {
-        assert(parentName != "");
+    if (parentName != "") {
         strStream << parentName << "_";
     }
     strStream << name;
@@ -97,15 +97,6 @@ json::value LgsFuncType::asJSON() {
     jsonObj["isMethod"] = isMethod;
     jsonObj["hasDefaults"] = hasDefaults();
     return jsonObj;
-}
-
-bool LgsFuncType::isTypeComplete() const {
-    if (name == LGS_MAIN_FUNC_NAME) return true;
-    if (!rt || rt->isUnknown()) return false;
-    for (const auto & param : params) {
-        if (!param.type || param.type->isUnknown()) return false;
-    }
-    return true;
 }
 
 std::string LgsFuncType::strFormatPart() const {

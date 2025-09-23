@@ -50,19 +50,10 @@ void LgsFuncCall::resolveVirtualFunc(LgsLLVMGen& cg) const {
     func->IRValue = cg.callLgsFunc("vtable_get", cg.getFT(cg.ptrTy(), {cg.ptrTy(), cg.ptrTy()}), {selfPtr, keyIR});;
 }
 
-void LgsFuncCall::completeType(LgsType* toType) {
-    const auto otherFuncType = toType->asFuncType();
-    if (!otherFuncType) return;
-    if (args.size() != otherFuncType->params.size()) return;
-    for (size_t i = otherFuncType->isMethod; i < otherFuncType->params.size(); ++i) {
-        args[i]->completeType(otherFuncType->params[i].type);
-    }
-}
-
 std::string LgsFuncCall::pname() {
     std::stringstream str;
     str << name << '(';
-    for (size_t i = 0; i < args.size(); ++i) {
+    for (size_t i = isMethodCall; i < args.size(); ++i) {
         const auto arg = args[i];
         if (arg->owner) {
             str << "owner ";

@@ -15,7 +15,8 @@ Value* LgsFunc::call(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
         auto arg = args[i];
         const auto& param = funcType->params[i];
         Value* v = nullptr;
-        if (!param.isSelf && !arg->type->equals(param.type)) {
+        const auto isSelf = funcType->isMethod && i == 0;
+        if (!isSelf && !arg->type->equals(param.type)) {
             const auto cast = arg->castTo(param.type);
             if (cast != arg) freeExpr(arg);
             arg = cast;
@@ -53,14 +54,11 @@ Value* LgsFunc::loadIR(LgsLLVMGen& cg) {
 }
 
 Function* LgsFunc::getIRFunc(LgsLLVMGen& cg) {
-    auto funcName = funcType->getName();
+    const auto funcName = getIRName();
     auto IRFunc = cg.IRModule->getFunction(funcName);
     if (IRFunc) return IRFunc;
     const auto type = funcType->getIRType(cg);
     const auto funcTy = llvm::cast<FunctionType>(type);
-    if (funcType->isBuiltin && !funcType->isSysCall) {
-        funcName = LGS_RUNTIME_NAMES_PREFIX + funcName;
-    }
     IRFunc = cg.getFunc(funcName, funcTy);
     if (funcType->params.empty()) return IRFunc;
     auto args = IRFunc->arg_begin();
@@ -111,6 +109,14 @@ bool LgsFunc::needsCleanup() const {
 
 std::string LgsFunc::pname() {
     return funcType->pname();
+}
+
+std::string LgsFunc::getIRName() const {
+    auto funcName = funcType->getName();
+    if (funcType->isBuiltin && !funcType->isSysCall) {
+        funcName = LGS_RUNTIME_NAMES_PREFIX + funcName;
+    }
+    return funcName;
 }
 
 json::value LgsFunc::asJSON() {

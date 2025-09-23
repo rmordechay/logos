@@ -162,9 +162,6 @@ void LgsSema::visitLambda(LgsFunc* lambda) {
         }
     }
     visitFunc(lambda);
-    if (!lambda->funcType->isTypeComplete()) {
-        return errHandler.addError(E10049, &lambda->location, {lambda->pname()});
-    }
 }
 
 void LgsSema::visitParam(LgsParam* param) {
@@ -604,10 +601,6 @@ void LgsSema::visitDynamicArray(LgsArrayExpr* array) {
         baseType = array->initialElements.front()->type;
     }
     dArr->baseType = baseType;
-
-    const auto mapFT = dArr->mapFunc->funcType->params[1].type->asFuncType();
-    mapFT->params[0].type = baseType;
-    mapFT->rt = baseType;
 }
 
 void LgsSema::visitHashMap(LgsHashMap* hashMap) {
@@ -734,19 +727,25 @@ void LgsSema::visitFieldSelection(LgsVariable* child, LgsType* parentType) {
     if (!parentType) return;
     if (parentType->asVec() && !validateVecElements(child, parentType->asVec())) return;
     auto childName = child->name;
-    const auto field = parentType->getField(childName);
-    if (!field) {
+    if (const auto field = parentType->getField(childName)) {
+        child->setType(field->type);
+        child->isMutable = !field->isConst;
+        child->ref = LgsSymbol(field);
+        if (field->isOwner && field->type->isHeapAlloc) {
+            child->owner = field;
+        }
+        if (const auto parentAsObj = parentType->asObject()) {
+            validateFieldVisibility(field, parentAsObj);
+        }
+    } else if (const auto method = parentType->getMethod(childName)) {
+        child->setType(method->type);
+        child->isMutable = false;
+        child->ref = LgsSymbol(method);
+        if (const auto parentAsObj = parentType->asObject()) {
+            validateMethodVisibility(method, parentAsObj, method->location);
+        }
+    } else {
         errHandler.addError(E10005, &child->location, {childName, parentType->pname()});
-        return;
-    }
-    child->setType(field->type);
-    child->isMutable = !field->isConst;
-    child->ref = LgsSymbol(field);
-    if (field->isOwner && field->type->isHeapAlloc) {
-        child->owner = field;
-    }
-    if (const auto parentAsObj = parentType->asObject()) {
-        validateFieldVisibility(field, parentAsObj);
     }
 }
 
@@ -778,21 +777,11 @@ void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent) {
         methodCall->args.insert(methodCall->args.begin(), parent);
     }
 
-    // TODO make generic
-    if (methodCall->name == "map") {
-        const auto map = methodCall->args[1]->type->asFuncType();
-        const auto baseType = parent->type->asIterable()->baseType;
-        map->params[0].type = baseType;
-        map->rt = baseType;
-    } else if (methodCall->name == "filter") {
-        assert(0);
-    } else if (methodCall->name == "forEach") {
-        assert(0);
-    }
-
-    methodCall->completeType(method->funcType);
-    for (int i = 1; i < methodCall->args.size(); ++i) {
-        visitExpr(methodCall->args[i]);
+    for (size_t i = method->funcType->isMethod; i < method->funcType->params.size(); ++i) {
+        const auto arg = methodCall->args[i];
+        const auto& param = method->funcType->params[i];
+        arg->completeType(param.type);
+        visitExpr(arg);
     }
     if (methodCall->equals(method->funcType)) {
         methodCall->func = method;
@@ -802,7 +791,7 @@ void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent) {
         return;
     }
 
-    if (!validateMethodVisibility(methodCall, parent->type->asObject())) return;
+    if (!validateMethodVisibility(method, parent->type->asObject(), methodCall->location)) return;
     if (stack.currentFunc()->isTest && parent->type->getName() == LgsTest::name && methodCall->name == "mock") {
         const auto pair = std::make_pair(methodCall->args[0], methodCall->args[1]);
         stack.currentFunc()->mocks.push_back(pair);
@@ -817,7 +806,6 @@ void LgsSema::visitFuncCall(LgsFuncCall* funcCall) {
     if (!symbol) return;
     if (symbol->symbolType == FUNC) {
         const auto func = symbol->func;
-        funcCall->completeType(func->funcType);
         if (funcCall->equals(func->funcType)) {
             funcCall->func = func;
             funcCall->setType(func->funcType->rt);
@@ -829,7 +817,6 @@ void LgsSema::visitFuncCall(LgsFuncCall* funcCall) {
         if (symbol->symbolType == VAR_DEC) {
             type = symbol->varDec->type;
             const auto ft = symbol->varDec->type->asFuncType();
-            funcCall->completeType(ft);
             if (funcCall->equals(ft)) {
                 funcCall->ref.symbolType = VAR_DEC;
                 funcCall->ref.varDec = symbol->varDec;
@@ -840,7 +827,6 @@ void LgsSema::visitFuncCall(LgsFuncCall* funcCall) {
         } else if (symbol->symbolType == PARAM) {
             type = symbol->param->type;
             const auto ft = symbol->param->type->asFuncType();
-            funcCall->completeType(ft);
             if (funcCall->equals(ft)) {
                 funcCall->ref.symbolType = PARAM;
                 funcCall->ref.param = symbol->param;
@@ -1218,12 +1204,12 @@ bool LgsSema::validateFieldVisibility(LgsField* field, const LgsObject* parent) 
     return true;
 }
 
-bool LgsSema::validateMethodVisibility(const LgsFuncCall* methodCall, const LgsObject* parent) {
+bool LgsSema::validateMethodVisibility(const LgsFunc* methodCall, const LgsObject* parent, const LgsLocation& location) {
     if (parent && parent->singleton) return true;
-    const auto method = methodCall->func;
+    const auto method = methodCall;
     if (!method || method->funcType->isVirtual) return false;
     if (!method->funcType->isPublic && file->id != method->location.fileID && !stack.currentFunc()->isTest) {
-        errHandler.addError(E10031, &methodCall->location, {method->funcType->name, method->funcType->parentName});
+        errHandler.addError(E10031, &location, {method->funcType->name, method->funcType->parentName});
         return false;
     }
     return true;

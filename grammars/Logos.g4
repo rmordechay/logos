@@ -340,7 +340,7 @@ mapType:
     ;
 
 arraySize:
-        LBRACK expr? RBRACK
+        LBRACK unaryExpr? RBRACK
     ;
 
 funcType:

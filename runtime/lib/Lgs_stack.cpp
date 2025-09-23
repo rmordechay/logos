@@ -2,6 +2,50 @@
 #include "Lgs_darray.h"
 #include "utils/LgsUtils.h"
 
+static std::string getTypeName(const Lgs_RTType type) {
+    switch (type) {
+    case RTT_UNKNOWN:
+        return "<Unknown>";
+    case RTT_VOID:
+        return "Void";
+    case RTT_BOOL:
+        return "Bool";
+    case RTT_CHAR:
+        return "Char";
+    case RTT_STR:
+        return "Str";
+    case RTT_BYTE:
+        return "Byte";
+    case RTT_SHORT:
+        return "Short";
+    case RTT_INT:
+        return "Int";
+    case RTT_LONG:
+        return "Long";
+    case RTT_SIZE:
+        return "Size";
+    case RTT_FLOAT:
+        return "Float";
+    case RTT_DOUBLE:
+        return "Double";
+    case RTT_VEC2:
+        return "Vec2";
+    case RTT_VEC3:
+        return "Vec3";
+    case RTT_VEC4:
+        return "Vec4";
+    case RTT_SARRAY:
+        return "SArray";
+    case RTT_DARRAY:
+        return "DArray";
+    case RTT_OBJECT:
+        return "Object";
+    case RTT_TYPE:
+        return "Type";
+    }
+    assert(0);
+}
+
 static void freeType(void* ptr, const Lgs_RTType type) {
     std::cout << "\tFreeing: " << ptr << std::endl;
     switch (type) {
@@ -45,8 +89,8 @@ void Lgs_stack::push() {
     frame.defersCount = 0;
 }
 
-void Lgs_stack::pop() {
-    funcCleanup();
+void Lgs_stack::pop(const bool cleanup) {
+    if (cleanup) funcCleanup();
     if (stackIndex < 0) std::exit(1);
     stackIndex--;
 }
@@ -59,16 +103,17 @@ void Lgs_stack::addDefer(void* funcPtr, void* ctx) {
 }
 
 void Lgs_stack::addOwner(void* ptr, const Lgs_RTType type) {
-    std::cout << "malloc: " << ptr << std::endl;
+    std::cout << "alloc owner " << getTypeName(type) << ": " << ptr << std::endl;
     frames[stackIndex].owners.push_back(Lgs_alloc{.ptr = ptr, .type = type});
 }
 
 void Lgs_stack::addOrphan(void* ptr, const Lgs_RTType type) {
-    std::cout << "malloc: " << ptr << std::endl;
+    std::cout << "alloc orphan " << getTypeName(type) << ": " << ptr << std::endl;
     frames[stackIndex].orphans.push_back(Lgs_alloc{.ptr = ptr, .type = type});
 }
 
 void Lgs_stack::removeOwner(const void* owner) const {
+    std::cout << "removing owner: " << owner << std::endl;
     auto stackFrame = frames[stackIndex];
     for (auto it = stackFrame.owners.begin(); it != stackFrame.owners.end(); ) {
         if (it->ptr == owner) {

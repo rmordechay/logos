@@ -47,6 +47,7 @@ public:
     BasicBlock* getCleanupBlock(LgsLLVMGen& cg);
     bool needsCleanup() const;
     std::string pname() override;
+    std::string getIRName() const;
     json::value asJSON() override;
     ~LgsFunc() override;
 };

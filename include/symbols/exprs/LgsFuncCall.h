@@ -22,7 +22,6 @@ public:
     bool equalsVariadic(const LgsFuncType* funcType) const;
     bool equalsDefaultParams(const LgsFuncType* funcType) const;
     void resolveVirtualFunc(LgsLLVMGen& cg) const;
-    void completeType(LgsType* toType) override;
     std::string pname() override;
     json::value asJSON() override;
     ~LgsFuncCall() override;

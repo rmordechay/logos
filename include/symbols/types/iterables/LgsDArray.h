@@ -10,10 +10,11 @@ public:
     static constexpr auto name = "DArray";
     StructType* arrStruct = nullptr;
     LgsFunc* getFunc = new LgsFunc("get", &LGS_ANY, {this, &LGS_LONG}, BUILTIN | PUBLIC | METHOD);
-    LgsFunc* mapFunc = new LgsFunc("map", this, {this, new LgsFuncType(nullptr, {LgsParam(nullptr)})}, BUILTIN | PUBLIC | METHOD);
 
     explicit LgsDArray(LgsType* baseType = nullptr) : LgsIterable(baseType) {
-        addMethod(mapFunc);
+        addEmptyMethod(MAP_FUNC_NAME);
+        addEmptyMethod(FILTER_FUNC_NAME);
+        addEmptyMethod(FOREACH_FUNC_NAME);
         rtt = RTT_DARRAY;
     }
 

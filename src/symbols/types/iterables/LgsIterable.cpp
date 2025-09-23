@@ -18,6 +18,15 @@ LgsFunc* LgsIterable::getMethod(const std::string& name) {
         if (name == IS_NOT_EMPTY_FUNC_NAME) {
             return getIsNotEmptyFunc();
         }
+        if (name == MAP_FUNC_NAME) {
+            return getMapFunc();
+        }
+        if (name == FILTER_FUNC_NAME) {
+            return getFilterFunc();
+        }
+        if (name == FOREACH_FUNC_NAME) {
+            assert(0);
+        }
         assert(method->second);
         return method->second;
     }
@@ -33,7 +42,19 @@ LgsFunc* LgsIterable::getAddFunc() {
 }
 
 LgsFunc* LgsIterable::getMapFunc() {
-    assert(0);
+    const auto func = methods.find(MAP_FUNC_NAME);
+    if (func != methods.end() && func->second) return func->second;
+    func->second = new LgsFunc(MAP_FUNC_NAME, this, {this, new LgsFuncType(baseType, {LgsParam(baseType)})}, BUILTIN | PUBLIC | METHOD);
+    addMethod(func->second);
+    return func->second;
+}
+
+LgsFunc* LgsIterable::getFilterFunc() {
+    const auto func = methods.find(FILTER_FUNC_NAME);
+    if (func != methods.end() && func->second) return func->second;
+    func->second = new LgsFunc("filter", this, {this, new LgsFuncType(&LGS_BOOL, {LgsParam(baseType)})}, BUILTIN | PUBLIC | METHOD);
+    addMethod(func->second);
+    return func->second;
 }
 
 LgsFunc* LgsIterable::getLenFunc() {

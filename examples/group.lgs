@@ -1,0 +1,17 @@
+object Obj1 {
+    func()
+}
+
+object Obj2 {
+    func()
+}
+
+T = {Obj1, Obj2} -> func
+
+test(T t) {
+    print(t.func())
+}
+
+main() {
+
+}

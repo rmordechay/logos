@@ -32,6 +32,7 @@ bool LgsVariable::equals(LgsExpr* other) {
 
 void LgsVariable::assign(LgsLLVMGen& cg, LgsExpr* expr) {
     if (owner) freeOwner(cg);
+    owner = expr->owner;
     IRValue = expr->IRValue;
 }
 

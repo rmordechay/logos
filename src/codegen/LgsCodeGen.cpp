@@ -45,6 +45,8 @@
 #include <llvm/IR/Module.h>
 #include <llvm/Target/TargetMachine.h>
 
+std::atomic<size_t> LgsCodeGen::namesCounter{0};
+
 void LgsCodeGen::generate(const LgsAppConfigs& appConfigs, TargetMachine& targetMachine) {
     cg.targetMachine = &targetMachine;
     cg.setupModule(file, appConfigs.debugMode);
@@ -624,7 +626,7 @@ void LgsCodeGen::visitCast(LgsCast* lgsCast) {
 void LgsCodeGen::visitLambda(LgsFunc* func) {
     cg.savedIP = cg.builder.saveIP();
     const auto originalFunc = currentIRFunc;
-    const auto lambdaID = lambdaNamesCounter.fetch_add(1);
+    const auto lambdaID = namesCounter.fetch_add(1);
     func->funcType->IRName = LGS_ANONYMOUS_STR + std::to_string(lambdaID);
     func->IRValue = func->getIRFunc(cg);
     visitFunc(func);
@@ -740,6 +742,10 @@ void LgsCodeGen::visitSelection(LgsSelection* selection) {
         const auto parent = selection->exprs[i];
         const auto child = selection->exprs[i + 1];
         if (const auto var = child->asVariable()) {
+            if (var->ref.symbolType == FUNC) {
+                child->IRValue = var->ref.func->getIRFunc(cg);
+                continue;
+            }
             const auto field = parent->type->getField(var->name);
             field->parentIRValue = parent->IRValue;
             field->parentIRType = parent->type->getIRType(cg);
@@ -783,78 +789,20 @@ void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
     if (ft->isVirtual) {
         funcCall->resolveVirtualFunc(cg);
     }
-
-    // TODO make generic
-    if (funcCall->name == "map") {
-        createMapFunc(funcCall->func);
-    } else if (funcCall->name == "filter") {
-        assert(0);
-    } else if (funcCall->name == "forEach") {
-        assert(0);
-    }
+    visitIterFunc(funcCall);
     if (!funcCall->isCoroutine && !funcCall->isDeferred) {
         funcCall->IRValue = funcCall->func->call(cg, funcCall->args);
     }
 }
 
-void LgsCodeGen::createMapFunc(LgsFunc* func) {
-    if (cg.IRModule->getFunction(func->funcType->getName())) return;
-    // Save state
-    cg.savedIP = cg.builder.saveIP();
-    const auto originalFunc = currentIRFunc;
-
-    // Init
-    func->funcType->IRName = func->funcType->name + std::to_string(lambdaNamesCounter.fetch_add(1));
-    createPrologue(func);
-    const auto iPtr = cg.builder.CreateAlloca(cg.sizeTy());
-    const auto loopStart = cg.builder.CreateSExt(cg.sizeZero(), cg.sizeTy());
-    const auto IRCondBlock = cg.createBlock(BLOCK_NAME_LOOP_COND);
-    const auto IRBodyBlock = cg.createBlock(BLOCK_NAME_LOOP_BODY);
-    const auto IRExitBlock = cg.createBlock(BLOCK_NAME_LOOP_EXIT);
-
-    const auto& originalArr = func->funcType->params[0];
-    const auto& callback = func->funcType->params[1];
-    const auto dArray = originalArr.type->asDArray();
-    auto newArr = LgsArrayExpr(dArray);
-    visitArrayExpr(&newArr);
-    cg.builder.CreateStore(loopStart, iPtr);
-    cg.builder.CreateBr(IRCondBlock);
-
-    // Condition
-    cg.startBlock(IRCondBlock);
-    const auto iValue = cg.builder.CreateLoad(cg.sizeTy(), iPtr);
-    const auto condition = cg.builder.CreateICmpSLT(iValue, dArray->IRLength(cg, func->funcType->params[0].IRValue));
-    cg.builder.CreateCondBr(condition, IRBodyBlock, IRExitBlock);
-
-    // Body
-    cg.startBlock(IRBodyBlock);
-    const auto f = dyn_cast<FunctionType>(callback.type->getIRType(cg));
-    const auto element = dArray->getFunc->callIR(cg, {originalArr.IRValue, iValue});
-    const auto arg = cg.builder.CreateLoad(dArray->baseType->getIRType(cg), element);
-    const auto v = cg.builder.CreateCall(f, callback.IRValue, {arg});
-
-    if (!v->getType()->isPointerTy()) {
-        const auto vPtr = cg.builder.CreateAlloca(cg.ptrTy());
-        cg.builder.CreateStore(v, vPtr);
-        dArray->getAddFunc()->callIR(cg, {newArr.IRValue, vPtr});
-    } else {
-        dArray->getAddFunc()->callIR(cg, {newArr.IRValue, v});
+void LgsCodeGen::visitIterFunc(const LgsFuncCall* funcCall) {
+    if (funcCall->name == MAP_FUNC_NAME) {
+        createMapFunc(funcCall->func);
+    } else if (funcCall->name == "filter") {
+        createFilterFunc(funcCall->func);
+    } else if (funcCall->name == "forEach") {
+        assert(0);
     }
-
-    // Increment
-    const auto inc = cg.builder.CreateAdd(iValue, cg.usize(1));
-    cg.builder.CreateStore(inc, iPtr);
-    cg.builder.CreateBr(IRCondBlock);
-
-    // End func
-    cg.startBlock(IRExitBlock);
-    cg.callPopStack(func->funcType->name);
-    cg.builder.CreateRet(newArr.IRValue);
-
-    // Restore state
-    currentIRFunc = originalFunc;
-    cg.builder.restoreIP(cg.savedIP);
-    func->IRValue = func->getIRFunc(cg);
 }
 
 void LgsCodeGen::visitPrefixExpr(LgsPrefixExpr* prefixExpr) {
@@ -1004,18 +952,18 @@ void LgsCodeGen::createEpilogue(LgsFunc* func) {
 
     if (needsCleanup) {
         if (func->returnStmts.empty()) {
-            cg.callPopStack(func->funcType->name);
+            cg.callPopStack(func->funcType->name, true);
         } else if (func->returnStmts.size() == 1) {
             if (func->owners.size() == 1) {
                 const auto returnRef = func->returnStmts.front()->expr;
                 const auto heapExprRef = func->owners.front();
                 if (returnRef->equals(heapExprRef)) {
-                    cg.callPopStack(func->funcType->name);
+                    cg.callPopStack(func->funcType->name, true);
                     cg.builder.CreateRet(getIRValue(func->returnStmts.front()));
                     return;
                 }
             }
-            cg.callPopStack(func->funcType->name);
+            cg.callPopStack(func->funcType->name, true);
             cg.builder.CreateRet(getIRValue(func->returnStmts.front()));
         } else {
             PHINode *phi = nullptr;
@@ -1028,12 +976,132 @@ void LgsCodeGen::createEpilogue(LgsFunc* func) {
                     phi->addIncoming(retVal, stmt->parentBlock);
                 }
             }
-            cg.callPopStack(func->funcType->name);
+            cg.callPopStack(func->funcType->name, true);
             cg.builder.CreateRet(phi);
         }
     } else {
         cg.callPopStack(func->funcType->name);
     }
+}
+
+void LgsCodeGen::createMapFunc(LgsFunc* func) {
+    if (cg.IRModule->getFunction(func->getIRName())) return;
+
+    // Save state
+    cg.savedIP = cg.builder.saveIP();
+    const auto originalFunc = currentIRFunc;
+
+    // Init
+    currentIRFunc = func->getIRFunc(cg);
+    const auto& originalArr = func->funcType->params[0];
+    const auto& callback = func->funcType->params[1];
+    const auto entryBlock = cg.createBlock(BLOCK_NAME_ENTRY, currentIRFunc);
+    const auto condBlock = cg.createBlock();
+    const auto bodyBlock = cg.createBlock();
+    const auto exitBlock = cg.createBlock();
+    cg.builder.SetInsertPoint(entryBlock);
+    cg.callStackPush();
+
+    const auto dArray = originalArr.type->asDArray();
+    LgsArrayExpr newArr(dArray);
+    visitArrayExpr(&newArr);
+
+    const auto iPtr = cg.builder.CreateAlloca(cg.sizeTy());
+    const auto loopStart = cg.builder.CreateSExt(cg.sizeZero(), cg.sizeTy());
+    cg.builder.CreateStore(loopStart, iPtr);
+    cg.builder.CreateBr(condBlock);
+
+    // Condition
+    cg.startBlock(condBlock);
+    const auto iValue = cg.builder.CreateLoad(cg.sizeTy(), iPtr);
+    const auto condition = cg.builder.CreateICmpSLT(iValue, dArray->IRLength(cg, func->funcType->params[0].IRValue));
+    cg.builder.CreateCondBr(condition, bodyBlock, exitBlock);
+
+    // Body
+    cg.startBlock(bodyBlock);
+    const auto element = dArray->getFunc->callIR(cg, {originalArr.IRValue, iValue});
+    const auto ft = dyn_cast<FunctionType>(callback.type->getIRType(cg));
+    const auto arg = cg.builder.CreateLoad(dArray->baseType->getIRType(cg), element);
+    const auto v = cg.builder.CreateCall(ft, callback.IRValue, {arg});
+    dArray->getAddFunc()->callIR(cg, {newArr.IRValue, cg.getPtr(v)});
+
+    // Increment
+    const auto inc = cg.builder.CreateAdd(iValue, cg.usize(1));
+    cg.builder.CreateStore(inc, iPtr);
+    cg.builder.CreateBr(condBlock);
+
+    // End func
+    cg.startBlock(exitBlock);
+    cg.callPopStack(func->funcType->name);
+    cg.builder.CreateRet(newArr.IRValue);
+
+    // Restore state
+    currentIRFunc = originalFunc;
+    cg.builder.restoreIP(cg.savedIP);
+    func->IRValue = func->getIRFunc(cg);
+}
+
+void LgsCodeGen::createFilterFunc(LgsFunc* func) {
+    if (cg.IRModule->getFunction(func->getIRName())) return;
+    // Save state
+    cg.savedIP = cg.builder.saveIP();
+    const auto originalFunc = currentIRFunc;
+
+    // Init
+    currentIRFunc = func->getIRFunc(cg);
+    const auto& originalArr = func->funcType->params[0];
+    const auto& callback = func->funcType->params[1];
+    const auto entryBlock = cg.createBlock(BLOCK_NAME_ENTRY, currentIRFunc);
+    const auto condBlock = cg.createBlock();
+    const auto bodyBlock = cg.createBlock();
+    const auto exitBlock = cg.createBlock();
+    const auto trueBlock = cg.createBlock();
+    const auto falseBlock = cg.createBlock();
+    cg.builder.SetInsertPoint(entryBlock);
+    cg.callStackPush();
+
+    const auto dArray = originalArr.type->asDArray();
+    LgsArrayExpr newArr(dArray);
+    visitArrayExpr(&newArr);
+
+    const auto iPtr = cg.builder.CreateAlloca(cg.sizeTy());
+    const auto loopStart = cg.builder.CreateSExt(cg.sizeZero(), cg.sizeTy());
+    cg.builder.CreateStore(loopStart, iPtr);
+    cg.builder.CreateBr(condBlock);
+
+    // Condition
+    cg.startBlock(condBlock);
+    const auto iValue = cg.builder.CreateLoad(cg.sizeTy(), iPtr);
+    const auto condition = cg.builder.CreateICmpSLT(iValue, dArray->IRLength(cg, func->funcType->params[0].IRValue));
+    cg.builder.CreateCondBr(condition, bodyBlock, exitBlock);
+
+    // Body
+    cg.startBlock(bodyBlock);
+    const auto element = dArray->getFunc->callIR(cg, {originalArr.IRValue, iValue});
+    const auto ft = dyn_cast<FunctionType>(callback.type->getIRType(cg));
+    const auto arg = cg.builder.CreateLoad(dArray->baseType->getIRType(cg), element);
+    const auto v = cg.builder.CreateCall(ft, callback.IRValue, {arg});
+
+    cg.builder.CreateCondBr(v, trueBlock, falseBlock);
+    cg.startBlock(trueBlock);
+    dArray->getAddFunc()->callIR(cg, {newArr.IRValue, element});
+    cg.builder.CreateBr(falseBlock);
+    cg.startBlock(falseBlock);
+
+    // Increment
+    const auto inc = cg.builder.CreateAdd(iValue, cg.usize(1));
+    cg.builder.CreateStore(inc, iPtr);
+    cg.builder.CreateBr(condBlock);
+
+    // End func
+    cg.startBlock(exitBlock);
+    cg.callPopStack(func->funcType->name);
+    cg.builder.CreateRet(newArr.IRValue);
+
+    // Restore state
+    currentIRFunc = originalFunc;
+    cg.builder.restoreIP(cg.savedIP);
+    func->IRValue = func->getIRFunc(cg);
 }
 
 Value* LgsCodeGen::getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) const {
@@ -1180,5 +1248,3 @@ bool LgsCodeGen::allArgsAreConst(const std::vector<LgsExpr*>& args) {
     }
     return allElementsConst;
 }
-
-std::atomic<size_t> LgsCodeGen::lambdaNamesCounter{0};

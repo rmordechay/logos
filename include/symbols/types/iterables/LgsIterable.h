@@ -11,6 +11,9 @@ struct CodegenMetadata;
 #define LEN_FUNC_NAME "len"
 #define IS_EMPTY_FUNC_NAME "isEmpty"
 #define IS_NOT_EMPTY_FUNC_NAME "isNotEmpty"
+#define MAP_FUNC_NAME "map"
+#define FILTER_FUNC_NAME "filter"
+#define FOREACH_FUNC_NAME "forEach"
 
 class LgsIterable : public LgsType {
 public:
@@ -30,6 +33,7 @@ public:
     virtual LgsFunc* getIsNotEmptyFunc();
     virtual LgsFunc* getAddFunc();
     virtual LgsFunc* getMapFunc();
+    virtual LgsFunc* getFilterFunc();
     virtual LgsType* getIndexType() = 0;
     virtual Value* loadWithIndex(LgsLLVMGen* cg);
     virtual uint16_t getUnpackCount() const = 0;

@@ -1,9 +1,13 @@
-main() {
-    arr: Int[]
-    for 10 {
-        arr.add(for.i)
+object Ob {
+    func(x: Int): Int {
+        return x * 2
     }
-    a = arr.map(it -> it * 2)
+}
+
+main() {
+    arr = [1, 2, 3, 4]
+    ob = Ob{}
+    a = arr.map(ob.func).filter(it -> it > 3)
     for e in a {
         print(e)
     }

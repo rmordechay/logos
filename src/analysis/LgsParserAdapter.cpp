@@ -1171,8 +1171,8 @@ LgsType* LgsParserAdapter::getArrayType(LogosParser::TypeContext* ctx) {
         } else {
             array = new LgsDArray(type);
         }
-        if (const auto sizeExpr = (*it)->expr()) {
-            array->sizeExpr = getExpr(sizeExpr);
+        if (const auto sizeExpr = (*it)->unaryExpr()) {
+            array->sizeExpr = getUnaryExpr(sizeExpr);
         }
         type = array;
     }

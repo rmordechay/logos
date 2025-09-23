@@ -40,8 +40,8 @@ extern "C" void Lgs_stack_push() {
     runtime.stack.push();
 }
 
-extern "C" void Lgs_stack_pop() {
-    runtime.stack.pop();
+extern "C" void Lgs_stack_pop(const bool cleanup) {
+    runtime.stack.pop(cleanup);
 }
 
 extern "C" void Lgs_stack_addDefer(void* funcPtr, void* ctx) {

@@ -424,7 +424,7 @@ void logosParserInitialize() {
   	894,1,0,0,0,892,890,1,0,0,0,892,893,1,0,0,0,893,135,1,0,0,0,894,892,1,
   	0,0,0,895,896,5,14,0,0,896,897,3,134,67,0,897,898,5,38,0,0,898,899,3,
   	134,67,0,899,900,5,15,0,0,900,137,1,0,0,0,901,903,5,16,0,0,902,904,3,
-  	92,46,0,903,902,1,0,0,0,903,904,1,0,0,0,904,905,1,0,0,0,905,906,5,17,
+  	94,47,0,903,902,1,0,0,0,903,904,1,0,0,0,904,905,1,0,0,0,905,906,5,17,
   	0,0,906,139,1,0,0,0,907,919,5,12,0,0,908,913,3,134,67,0,909,910,5,20,
   	0,0,910,912,3,134,67,0,911,909,1,0,0,0,912,915,1,0,0,0,913,911,1,0,0,
   	0,913,914,1,0,0,0,914,917,1,0,0,0,915,913,1,0,0,0,916,918,5,20,0,0,917,
@@ -7053,8 +7053,8 @@ tree::TerminalNode* LogosParser::ArraySizeContext::RBRACK() {
   return getToken(LogosParser::RBRACK, 0);
 }
 
-LogosParser::ExprContext* LogosParser::ArraySizeContext::expr() {
-  return getRuleContext<LogosParser::ExprContext>(0);
+LogosParser::UnaryExprContext* LogosParser::ArraySizeContext::unaryExpr() {
+  return getRuleContext<LogosParser::UnaryExprContext>(0);
 }
 
 
@@ -7087,7 +7087,7 @@ LogosParser::ArraySizeContext* LogosParser::arraySize() {
       ((1ULL << _la) & 432356559343931396) != 0) || ((((_la - 71) & ~ 0x3fULL) == 0) &&
       ((1ULL << (_la - 71)) & 8387585) != 0)) {
       setState(902);
-      expr(0);
+      unaryExpr();
     }
     setState(905);
     match(LogosParser::RBRACK);

@@ -1280,7 +1280,7 @@ public:
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *LBRACK();
     antlr4::tree::TerminalNode *RBRACK();
-    ExprContext *expr();
+    UnaryExprContext *unaryExpr();
 
    
   };

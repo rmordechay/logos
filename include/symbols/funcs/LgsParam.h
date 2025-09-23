@@ -11,7 +11,6 @@ public:
     std::string name;
     LgsType* type = nullptr;
     LgsExpr* expr = nullptr;
-    bool isSelf = false;
     bool isVariadic = false;
     Value* vaList = nullptr;
 

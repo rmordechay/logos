@@ -27,7 +27,7 @@ struct Lgs_stack {
     Lgs_stack_frame frames[STACK_CAPACITY];
 
     void push();
-    void pop();
+    void pop(bool cleanup);
     void callDefers() const;
     void addDefer(void* funcPtr, void* ctx);
     void addOwner(void* ptr, Lgs_RTType type);

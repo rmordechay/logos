@@ -96,6 +96,15 @@ Value* LgsLLVMGen::callLgsFunc(const std::string& funcName, FunctionType* ft, co
     return callFunc(LGS_RUNTIME_NAMES_PREFIX + funcName, ft, args);
 }
 
+Value* LgsLLVMGen::getPtr(Value* v) {
+    if (!v->getType()->isPointerTy()) {
+        const auto vPtr = builder.CreateAlloca(v->getType());
+        builder.CreateStore(v, vPtr);
+        return vPtr;
+    }
+    return v;
+}
+
 Value* LgsLLVMGen::callPrintf(const std::vector<Value*>& args) {
     return callFunc("printf", getFT(i32Ty(), {ptrTy()}, true), args);
 }
@@ -122,8 +131,8 @@ void LgsLLVMGen::callStackPush() {
     callLgsFunc("stack_push", getFT(voidTy()));
 }
 
-Value* LgsLLVMGen::callPopStack(const std::string& name) {
-    return callLgsFunc("stack_pop", getFT(voidTy()));
+Value* LgsLLVMGen::callPopStack(const std::string& name, const bool cleanup) {
+    return callLgsFunc("stack_pop", getFT(voidTy(), {i1Ty()}), {i1(cleanup)});
 }
 
 Type* LgsLLVMGen::i1Ty() {

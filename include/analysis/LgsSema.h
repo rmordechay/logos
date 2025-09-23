@@ -124,7 +124,7 @@ public:
     void validateIndex(LgsIterIndex* iterIndex);
     void validateSliceBounds(LgsIterIndex* iterIndex);
     bool validateFieldVisibility(LgsField* field, const LgsObject* parent);
-    bool validateMethodVisibility(const LgsFuncCall* methodCall, const LgsObject* parent);
+    bool validateMethodVisibility(const LgsFunc* methodCall, const LgsObject* parent, const LgsLocation& location);
     bool validateVecElements(const LgsVariable* fieldVar, LgsVec* vec);
     void validateTypeDuplicates(LgsType* type);
     static bool validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const LgsFunc* func);

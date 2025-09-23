@@ -43,6 +43,7 @@ public:
     Function* getFunc(const std::string& funcName, FunctionType* ft, GlobalValue::LinkageTypes linkage = GlobalValue::ExternalLinkage) const;
     Value* callFunc(const std::string& funcName, FunctionType* ft, const std::vector<Value*>& args = {});
     Value* callLgsFunc(const std::string& funcName, FunctionType* ft, const std::vector<Value*>& args = {});
+    Value* getPtr(Value* v);
 
     // System
     Value* callPrintf(const std::vector<Value*>& args);
@@ -52,7 +53,7 @@ public:
 
     // Stack
     void callStackPush();
-    Value* callPopStack(const std::string& name);
+    Value* callPopStack(const std::string& name, bool cleanup = false);
 
     // Types
     Type* i1Ty();
