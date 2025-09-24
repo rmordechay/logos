@@ -20,6 +20,11 @@ void logError(const std::string& msg, const std::string& path) {
     if (path != "") logInfo(path);
 }
 
+void logWarning(const std::string& msg, const std::string& path) {
+    logInfo(LGS_WARN_STR + msg);
+    if (path != "") logInfo(path);
+}
+
 void formatAndLogError(const LgsBaseError& lgsErr, const std::vector<std::string>& args) {
     std::string msg;
     formatErrorMsg(lgsErr, args, msg);

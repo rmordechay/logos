@@ -1,4 +1,5 @@
 #pragma once
+#include <types/LgsSubType.h>
 
 class LgsVariable;
 class LgsGroup;
@@ -18,6 +19,7 @@ enum LgsSymbolType {
     FUNC,
     OBJECT,
     INTERFACE,
+    SUBTYPE,
     GROUP,
     ENUM,
     UNKNOWN,
@@ -33,6 +35,7 @@ struct LgsSymbol {
     LgsParam* param = nullptr;
     LgsObject* object = nullptr;
     LgsInterface* interface = nullptr;
+    LgsSubType* subtype = nullptr;
     LgsField* field = nullptr;
     LgsEnum* lgsEnum = nullptr;
     LgsFunc* func = nullptr;
@@ -45,6 +48,7 @@ struct LgsSymbol {
     explicit LgsSymbol(LgsField* field);
     explicit LgsSymbol(LgsGroup* group);
     explicit LgsSymbol(LgsInterface* interface);
+    explicit LgsSymbol(LgsSubType* subtype);
     explicit LgsSymbol(LgsObject* object, bool isExternal = false, bool isBuiltin = false);
     explicit LgsSymbol(LgsEnum* lgsEnum, bool isExternal = false, bool isBuiltin = false);
     explicit LgsSymbol(LgsFunc* func, bool isExternal = false, bool isBuiltin = false);

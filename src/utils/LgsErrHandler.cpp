@@ -28,8 +28,17 @@ void LgsErrHandler::addWarning(const LgsBaseError& lgsErr, const LgsLocation* lo
 }
 
 void LgsErrHandler::mergeErrors(LgsErrHandler& other) {
-    setUnsuccessful();
-    errors.insert(errors.end(), other.errors.begin(), other.errors.end());
+    if (!other.successful) {
+        std::lock_guard lock(mtx);
+        setUnsuccessful();
+        errors.insert(errors.end(), other.errors.begin(), other.errors.end());
+        if (!other.warnings.empty()) {
+            warnings.insert(warnings.end(), other.warnings.begin(), other.warnings.end());
+        }
+    } else if (!other.warnings.empty()) {
+        std::lock_guard lock(mtx);
+        warnings.insert(warnings.end(), other.warnings.begin(), other.warnings.end());
+    }
 }
 
 json::value LgsErrHandler::asJSON() const {

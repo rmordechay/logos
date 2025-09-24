@@ -74,10 +74,7 @@ bool LgsApp::analyse() {
         threadPool.runTask([this, file] {
             LgsSema semaAnalyser(file, globals);
             semaAnalyser.analyse();
-            if (!semaAnalyser.errHandler.successful) {
-                std::lock_guard lock(mtx);
-                errHandler.mergeErrors(semaAnalyser.errHandler);
-            }
+            errHandler.mergeErrors(semaAnalyser.errHandler);
         });
     }
     threadPool.wait();
@@ -134,9 +131,7 @@ void LgsApp::loadEnvFiles() {
 bool LgsApp::parseAppFile() {
     LgsParserAdapter parserAdapter(0, appConfigs, paths, globals);
     parserAdapter.setAppConfigs();
-    if (!parserAdapter.errHandler.successful) {
-        errHandler.mergeErrors(parserAdapter.errHandler);
-    }
+    errHandler.mergeErrors(parserAdapter.errHandler);
     return errHandler.successful;
 }
 
@@ -180,6 +175,9 @@ void LgsApp::initBuild() {
 }
 
 void LgsApp::writeIRFiles() {
+    for (int i = 0; i < errHandler.warnings.size(); ++i) {
+        assert(0);
+    }
     for (const auto file : ast) {
         const auto module = file->generator.IRModule;
         if (!module) continue;

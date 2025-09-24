@@ -7,9 +7,7 @@ class LgsStr final : public LgsIterable {
 public:
     static constexpr auto name = "Str";
 
-    LgsStr(): LgsIterable(&LGS_CHAR) {
-        rtt = RTT_STR;
-    }
+    LgsStr(): LgsIterable(&LGS_CHAR) {}
     Type* getIRBaseType(LgsLLVMGen* cg) const;
     Type* getIRType(LgsLLVMGen& cg) override;
     std::string getName() override;
@@ -27,4 +25,5 @@ public:
     uint16_t getUnpackCount() const override;
     Value* IRLength(LgsLLVMGen& cg, Value* iterable) override;
     bool canCastTo(LgsType* other) override;
+    Lgs_RTType getRTType() override;
 };

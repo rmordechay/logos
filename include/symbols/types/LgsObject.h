@@ -6,6 +6,7 @@ class LgsInstance;
 class LgsLLVMGen;
 class LgsField;
 class LgsIOPair;
+class LgsSubType;
 
 class LgsObject : public LgsType {
 public:
@@ -13,6 +14,7 @@ public:
     std::vector<LgsType*> interfaces;
     std::vector<LgsIOPair*> ioPairs;
     std::vector<LgsEnum*> enums;
+    std::vector<LgsSubType*> subtypes;
     LgsInstance* singleton = nullptr;
 
     explicit LgsObject(std::string  name) : name(std::move(name)) {

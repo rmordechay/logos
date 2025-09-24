@@ -4,52 +4,29 @@
 
 static std::string getTypeName(const Lgs_RTType type) {
     switch (type) {
-    case RTT_UNKNOWN:
-        return "<Unknown>";
-    case RTT_VOID:
-        return "Void";
-    case RTT_BOOL:
-        return "Bool";
-    case RTT_CHAR:
-        return "Char";
-    case RTT_STR:
-        return "Str";
-    case RTT_BYTE:
-        return "Byte";
-    case RTT_SHORT:
-        return "Short";
-    case RTT_INT:
-        return "Int";
-    case RTT_LONG:
-        return "Long";
-    case RTT_SIZE:
-        return "Size";
-    case RTT_UBYTE:
-        return "UByte";
-    case RTT_USHORT:
-        return "UShort";
-    case RTT_UINT:
-        return "UInt";
-    case RTT_ULONG:
-        return "ULong";
-    case RTT_FLOAT:
-        return "Float";
-    case RTT_DOUBLE:
-        return "Double";
-    case RTT_VEC2:
-        return "Vec2";
-    case RTT_VEC3:
-        return "Vec3";
-    case RTT_VEC4:
-        return "Vec4";
-    case RTT_SARRAY:
-        return "SArray";
-    case RTT_DARRAY:
-        return "DArray";
-    case RTT_OBJECT:
-        return "Object";
-    case RTT_TYPE:
-        return "Type";
+    case RTT_UNKNOWN: return "<Unknown>";
+    case RTT_VOID: return "Void";
+    case RTT_BOOL: return "Bool";
+    case RTT_CHAR: return "Char";
+    case RTT_STR: return "Str";
+    case RTT_BYTE: return "Byte";
+    case RTT_SHORT: return "Short";
+    case RTT_INT: return "Int";
+    case RTT_LONG: return "Long";
+    case RTT_SIZE: return "Size";
+    case RTT_UBYTE: return "UByte";
+    case RTT_USHORT: return "UShort";
+    case RTT_UINT: return "UInt";
+    case RTT_ULONG: return "ULong";
+    case RTT_FLOAT: return "Float";
+    case RTT_DOUBLE: return "Double";
+    case RTT_VEC2: return "Vec2";
+    case RTT_VEC3: return "Vec3";
+    case RTT_VEC4: return "Vec4";
+    case RTT_SARRAY: return "SArray";
+    case RTT_DARRAY: return "DArray";
+    case RTT_OBJECT: return "Object";
+    case RTT_TYPE: return "Type";
     }
     assert(0);
 }
@@ -57,30 +34,6 @@ static std::string getTypeName(const Lgs_RTType type) {
 static void freeType(void* ptr, const Lgs_RTType type) {
     std::cout << "\tFreeing: " << ptr << std::endl;
     switch (type) {
-    case RTT_UNKNOWN:
-    case RTT_VOID:
-    case RTT_CHAR:
-    case RTT_BOOL:
-    case RTT_BYTE:
-    case RTT_SHORT:
-    case RTT_INT:
-    case RTT_LONG:
-    case RTT_SIZE:
-    case RTT_UBYTE:
-    case RTT_USHORT:
-    case RTT_UINT:
-    case RTT_ULONG:
-    case RTT_FLOAT:
-    case RTT_DOUBLE:
-    case RTT_VEC2:
-    case RTT_VEC3:
-    case RTT_VEC4:
-    case RTT_STR:
-        return;
-    case RTT_SARRAY:
-    case RTT_TYPE:
-        break;
-        assert(0);
     case RTT_OBJECT: {
         std::free(ptr);
         break;
@@ -91,6 +44,8 @@ static void freeType(void* ptr, const Lgs_RTType type) {
         std::free(arr);
         break;
     }
+    default:
+        assert(0);
     }
 }
 

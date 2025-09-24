@@ -4,14 +4,14 @@
 
 Value* LgsPrint::call(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
     const auto arg = args.front();
-    assert(arg->type->rtt != RTT_UNKNOWN);
+    assert(arg->type->getRTType() != RTT_UNKNOWN);
     if (const auto strConst = arg->asStrConst()) {
         if (!strConst->templateParts.empty()) return printFormat(cg, strConst);
     }
     std::vector<Value*> IRArgs;
     const auto baseStr = cg.getIRStr(arg->type->strFormatPart());
     IRArgs.emplace_back(baseStr);
-    IRArgs.emplace_back(cg.i32(arg->type->rtt));
+    IRArgs.emplace_back(cg.i32(arg->type->getRTType()));
     IRArgs.emplace_back(arg->getIRPtrTo(cg));
     const auto ft = cg.getFT(cg.voidTy(), {cg.ptrTy(), cg.i32Ty(), cg.ptrTy()}, false);
     return cg.callLgsFunc(name, ft, IRArgs);

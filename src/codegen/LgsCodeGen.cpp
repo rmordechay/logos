@@ -706,7 +706,7 @@ void LgsCodeGen::visitHashMap(LgsHashMap* hashMap) {
     const auto valueType = map->typePair->value;
     const auto elementSize = cg.usize(valueType->getSizeBytes());
     const auto arrSize = cg.typeSize(map->getMapStruct(cg));
-    hashMap->IRValue = cg.callMalloc(arrSize.getFixedValue(), hashMap->owner, hashMap->type->rtt);
+    hashMap->IRValue = cg.callMalloc(arrSize.getFixedValue(), hashMap->owner, hashMap->type->getRTType());
     LgsFunc initFunc("init", &LGS_VOID, {map, &LGS_LONG}, BUILTIN | METHOD);
     initFunc.callIR(cg, {getIRValue(hashMap), elementSize});
     for (const auto element : hashMap->initialElements) {
@@ -754,10 +754,10 @@ void LgsCodeGen::visitVariable(LgsVariable* variable) {
         }
         break;
     case INTERFACE:
+    case SUBTYPE:
     case GROUP:
-        break;
     case UNKNOWN:
-        assert(0);
+        break;
     }
     assert(variable->IRValue);
 }
@@ -832,9 +832,9 @@ void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
 void LgsCodeGen::visitIterFunc(const LgsFuncCall* funcCall) {
     if (funcCall->name == MAP_FUNC_NAME) {
         createMapFunc(funcCall->func);
-    } else if (funcCall->name == "filter") {
+    } else if (funcCall->name == FILTER_FUNC_NAME) {
         createFilterFunc(funcCall->func);
-    } else if (funcCall->name == "forEach") {
+    } else if (funcCall->name == FOREACH_FUNC_NAME) {
         assert(0);
     }
 }
@@ -901,7 +901,7 @@ void LgsCodeGen::visitInstance(LgsInstance* instance) {
     if(instance->obj->singleton) {
         instance->IRValue = cg.createGlobal(objIRType, ConstantAggregateZero::get(objIRType), instance->obj->name);
     } else {
-        instance->IRValue = cg.callMalloc(instance->obj->getSizeBytes(), instance->owner, instance->obj->rtt);
+        instance->IRValue = cg.callMalloc(instance->obj->getSizeBytes(), instance->owner, instance->obj->getRTType());
     }
     initFields(instance);
     if (!instance->obj->interfaces.empty()) {
@@ -1229,7 +1229,7 @@ Value* LgsCodeGen::createDynamicArray(LgsArrayExpr* arrayExpr) {
     const auto size = arr->baseType->getSizeBytes();
     const auto elementSize = cg.i64(size);
     const auto arrSize = cg.typeSize(arr->getArrStruct(cg));
-    arrayExpr->IRValue = cg.callMalloc(arrSize.getFixedValue(), arrayExpr->owner, arr->rtt);
+    arrayExpr->IRValue = cg.callMalloc(arrSize.getFixedValue(), arrayExpr->owner, arr->getRTType());
     LgsFunc initFunc("init", &LGS_VOID, {arr, &LGS_LONG}, BUILTIN | METHOD);
     initFunc.callIR(cg, {arrayExpr->IRValue, elementSize});
     for (int i = 0; i < arrayExpr->initialElements.size(); ++i) {

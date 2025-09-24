@@ -83,6 +83,10 @@ bool LgsType::isSliceable() {
     return asStr() || asDArray() || asSArray();
 }
 
+LgsAny* LgsType::asAny() {
+    return dynamic_cast<LgsAny*>(this);
+}
+
 LgsChar* LgsType::asChar() {
     return dynamic_cast<LgsChar*>(this);
 }
@@ -175,6 +179,10 @@ LgsGroup* LgsType::asGroup() {
     return dynamic_cast<LgsGroup*>(this);
 }
 
+LgsSubType* LgsType::asSubtype() {
+    return dynamic_cast<LgsSubType*>(this);
+}
+
 LgsTypePair* LgsType::asPair() {
     return dynamic_cast<LgsTypePair*>(this);
 }
@@ -190,6 +198,10 @@ LgsFunc* LgsType::getMethod(const std::string& name) {
     const auto method = methods.find(name);
     if (method != methods.end()) return method->second;
     return nullptr;
+}
+
+Lgs_RTType LgsType::getRTType() {
+    assert(0);
 }
 
 LgsType* LgsType::applyOp(LgsType* other, const LgsOperator op) {

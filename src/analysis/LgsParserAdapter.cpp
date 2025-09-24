@@ -87,9 +87,7 @@ LgsFile* LgsParserAdapter::getLogosFile(LogosParser::LogosFileContext* ctx, cons
         for (const auto importPath : ctx->extern_c()->STRING()) {
             file->externalCPaths.emplace_back(getStrConst(importPath));
             lgsCLang.resolveCFiles(file);
-            if (!lgsCLang.errHandler.successful) {
-                errHandler.mergeErrors(lgsCLang.errHandler);
-            }
+            errHandler.mergeErrors(lgsCLang.errHandler);
         }
     } else if (ctx->extern_cpp()) {
         assert(0);
@@ -102,12 +100,14 @@ LgsMainFile* LgsParserAdapter::getMainFile(LogosParser::MainFileContext* ctx, co
     const auto file = new LgsMainFile(fileID, filePath);
     setLocation(file->location, ctx->start, ctx->stop);
 
+    // Enums
     for (const auto enumDeclaration : ctx->enumDeclaration()) {
         auto lgsEnum = getEnum(enumDeclaration);
         file->enums.emplace_back(lgsEnum);
         addFileSymbol(file, LgsSymbol(lgsEnum));
     }
 
+    // Objects
     for (const auto object : ctx->object()) {
         auto lgsObject = getObject(object->objectBody(), object->IDENTIFIER(), !!object->SINGLETON());
         if (!lgsObject) continue;
@@ -115,12 +115,14 @@ LgsMainFile* LgsParserAdapter::getMainFile(LogosParser::MainFileContext* ctx, co
         addFileSymbol(file, LgsSymbol(lgsObject));
     }
 
+    // Interfaces
     for (const auto interface : ctx->interface()) {
         auto lgsInterface = getInterface(interface->interfaceBody(), interface->IDENTIFIER());
         file->interfaces.push_back(lgsInterface);
         addFileSymbol(file, LgsSymbol(lgsInterface));
     }
 
+    // Functions
     for (const auto func : funcs) {
         auto funcName = func->funcSignature()->funcSignatureHeader()->IDENTIFIER()->getText();
         if (funcName == LGS_MAIN_FUNC_NAME) {
@@ -132,9 +134,17 @@ LgsMainFile* LgsParserAdapter::getMainFile(LogosParser::MainFileContext* ctx, co
         }
     }
 
+    // Groups
     for (const auto group : ctx->group()) {
         const auto lgsGroup = getGroup(group);
         file->groups.push_back(lgsGroup);
+        addFileSymbol(file, LgsSymbol(lgsGroup));
+    }
+
+    // Subtypes
+    for (const auto subtype : ctx->subtype()) {
+        const auto lgsGroup = getSubtype(subtype);
+        file->subtypes.push_back(lgsGroup);
         addFileSymbol(file, LgsSymbol(lgsGroup));
     }
     return file;
@@ -295,6 +305,12 @@ LgsObject* LgsParserAdapter::getObject(LogosParser::ObjectBodyContext* ctx, antl
         obj->enums.push_back(lgsEnum_);
     }
 
+    // Subtypes
+    for (const auto subtype : ctx->subtype()) {
+        const auto lgsSubtype = getSubtype(subtype);
+        obj->subtypes.push_back(lgsSubtype);
+    }
+
     if (isSingleton) {
         obj->singleton = new LgsInstance(obj);
     }
@@ -338,6 +354,12 @@ LgsInterface* LgsParserAdapter::getInterface(LogosParser::InterfaceBodyContext* 
         interface->addMethod(func);
     }
     return interface;
+}
+
+LgsSubType* LgsParserAdapter::getSubtype(LogosParser::SubtypeContext* ctx) {
+    const auto subType = new LgsSubType(ctx->IDENTIFIER()->getText(), getType(ctx->type()));
+    setLocation(subType->location, ctx->start, ctx->stop);
+    return subType;
 }
 
 LgsFunc* LgsParserAdapter::getFunc(LogosParser::FuncContext* ctx) {

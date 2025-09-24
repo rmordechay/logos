@@ -233,8 +233,8 @@ void LgsSema::visitVarDec(LgsVarDec* varDec) {
         varDec->expr->completeType(varDec->type);
         visitExpr(varDec->expr);
         validateExprType(varDec->expr, varDec->type);
-        freeType(varDec->type);
-        varDec->type = varDec->expr->type;
+        freeType(varDec->expr->type);
+        varDec->expr->type = varDec->type;
     } else if (varDec->expr) {
         visitExpr(varDec->expr);
         if (varDec->isOwner) {
@@ -244,12 +244,17 @@ void LgsSema::visitVarDec(LgsVarDec* varDec) {
         validateExprType(varDec->expr, varDec->type);
     } else {
         varDec->type = typeResolver.resolveType(varDec->type, file);
+        if (!varDec->type) return;
         varDec->expr = varDec->type->getZeroValue();
         varDec->expr->location = varDec->location;
         visitExpr(varDec->expr);
         if (varDec->isOwner) {
             varDec->expr->owner = varDec;
         }
+    }
+    if (!varDec->type->isHeapAlloc && varDec->isOwner) {
+        errHandler.addWarning(W10001, &varDec->location, {varDec->type->getName()});
+        varDec->isOwner = false;
     }
     addLocalSymbol(LgsSymbol(varDec));
     addHeapExpr(varDec->expr);
@@ -269,9 +274,6 @@ void LgsSema::visitAssignment(const LgsAssignment* assignment) {
     const auto canAssign = lValue->asVariable() || lValue->asIterIndex() || lValue->asSelection();
     if (!canAssign || !lType->canCastTo(rType)) {
         return errHandler.addError(E10012, &lValue->location, {lValue->pname(), lType->pname(), assignment->getAssignTypeStr(), rValue->pname()});
-    }
-    if (assignment->lValue->owner && assignment->rValue->owner) {
-        // errHandler.addError(E10075, &lValue->location, {rValue->pname()});
     }
 }
 
@@ -997,7 +999,7 @@ void LgsSema::visitSlice(LgsIterIndex* iterIndex) {
         return errHandler.addError(E10036, &iterIndex->location, {iterIndex->pname(), exprFrom->type->pname()});
     }
     if (!iterable->getIndexType()->canCastTo(exprTo->type)) {
-        return errHandler.addError(E10036, &iterIndex->location, {iterIndex->pname(), exprFrom->type->pname()});
+        return errHandler.addError(E10036, &iterIndex->location, {iterIndex->pname(), exprTo->type->pname()});
     }
     validateSliceBounds(iterIndex);
 }
@@ -1119,9 +1121,7 @@ void LgsSema::validateExprType(const LgsExpr* expr, LgsType* type) {
         }
         return;
     }
-    if (expr->type == type) return;
-    if (!type || !expr->type) return;
-    if (!type->canCastTo(expr->type)) {
+    if (type && expr->type && !type->canCastTo(expr->type)) {
         errHandler.addError(E10001, &expr->location, {type->pname(), expr->type->pname()});
     }
 }

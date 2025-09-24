@@ -149,14 +149,14 @@ size_t LgsBool::getSizeBytes() {
 }
 
 bool LgsBool::canCastTo(LgsType* other) {
-    const auto IRName = other->getName();
-    if (IRName == LgsAny::name) return true;
-    if (IRName == LgsChar::name) return true;
-    if (IRName == LgsShort::name) return true;
-    if (IRName == LgsInt::name) return true;
-    if (IRName == LgsSize::name) return true;
-    if (IRName == LgsLong::name) return true;
-    if (IRName == LgsFloat::name) return true;
-    if (IRName == LgsUInt::name) return true;
-    return name == IRName;
+    const auto otherName = other->getName();
+    if (otherName == LgsAny::name) return true;
+    if (otherName == LgsChar::name) return true;
+    if (otherName == LgsShort::name) return true;
+    if (otherName == LgsInt::name) return true;
+    if (otherName == LgsSize::name) return true;
+    if (otherName == LgsLong::name) return true;
+    if (otherName == LgsFloat::name) return true;
+    if (otherName == LgsUInt::name) return true;
+    return name == otherName;
 }

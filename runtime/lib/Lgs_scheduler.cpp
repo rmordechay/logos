@@ -94,10 +94,8 @@ bool Lgs_scheduler::shouldYield() {
 }
 
 void Lgs_scheduler::yield() {
-    if (preempt.exchange(false, std::memory_order_relaxed)) {
-        if (tlsYield) {
-            tlsYield();
-        }
+    if (tlsYield && preempt.exchange(false, std::memory_order_relaxed)) {
+        tlsYield();
     }
 }
 

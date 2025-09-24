@@ -13,6 +13,7 @@ class LgsType;
 
 void logInfo(const std::string& text = "");
 void logError(const std::string& msg, const std::string& path = "");
+void logWarning(const std::string& msg, const std::string& path);
 void formatAndLogError(const LgsBaseError& lgsErr, const std::vector<std::string>& args = {});
 void formatErrorMsg(const LgsBaseError& lgsErr, const std::vector<std::string>& args, std::string& result);
 bool isLogosFile(const fs::path& filePath);

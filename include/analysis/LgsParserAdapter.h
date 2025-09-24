@@ -1,4 +1,6 @@
 #pragma once
+#include <types/LgsSubType.h>
+
 #include "LogosParser.h"
 #include "funcs/LgsFunc.h"
 #include "utils/LgsErrHandler.h"
@@ -57,6 +59,7 @@ public:
     void setAppConfigs();
     LgsObject* getObject(LogosParser::ObjectBodyContext* ctx, antlr4::tree::TerminalNode* objName, bool isSingleton);
     LgsInterface* getInterface(LogosParser::InterfaceBodyContext* ctx, antlr4::tree::TerminalNode* interfaceName);
+    LgsSubType* getSubtype(LogosParser::SubtypeContext* ctx);
     LgsFunc* getFunc(LogosParser::FuncContext* ctx);
     LgsMainFunc* getMainFunc(LogosParser::FuncContext* ctx);
     LgsFunc* getLambda(LogosParser::LambdaContext* ctx);

@@ -3,6 +3,8 @@
 #include "data/LgsErrors.h"
 #include "exprs/LgsBinaryExpr.h"
 
+class LgsAny;
+class LgsSubType;
 class LgsByte;
 
 namespace llvm {
@@ -70,6 +72,8 @@ public:
     bool isNullable();
     bool isUnknown();
     bool isSliceable();
+
+    LgsAny* asAny();
     LgsChar* asChar();
     LgsStr* asStr();
     LgsBool* asBool();
@@ -93,12 +97,15 @@ public:
     LgsFuncType* asFuncType();
     LgsPtr* asPtr();
     LgsGroup* asGroup();
+    LgsSubType* asSubtype();
     LgsTypePair* asPair();
+
     virtual LgsField* getField(const std::string& name);
     virtual LgsFunc* getMethod(const std::string& name);
     virtual Type* getIRType(LgsLLVMGen& cg) = 0;
     virtual size_t getSizeBytes() = 0;
     virtual LgsExpr* getZeroValue() = 0;
+    virtual Lgs_RTType getRTType();
     virtual std::string getName() = 0;
     virtual std::string pname() = 0; // pretty name
     virtual bool canCastTo(LgsType* other) = 0;

@@ -164,3 +164,7 @@ bool LgsStr::canCastTo(LgsType* other) {
     }
     return name == other->getName();
 }
+
+Lgs_RTType LgsStr::getRTType() {
+    return RTT_STR;
+}

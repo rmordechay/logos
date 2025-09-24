@@ -24,6 +24,9 @@ LgsSymbol::LgsSymbol(LgsGroup* group)
 LgsSymbol::LgsSymbol(LgsInterface* interface)
     : name(&interface->name), symbolType(INTERFACE), interface(interface), location(&interface->location) {}
 
+LgsSymbol::LgsSymbol(LgsSubType* subtype)
+    : name(&subtype->name), symbolType(SUBTYPE), subtype(subtype), location(&subtype->location) {}
+
 LgsSymbol::LgsSymbol(LgsObject* object, const bool isExternal, const bool isBuiltin)
     : name(&object->name), symbolType(OBJECT), isExternal(isExternal), isBuiltin(isBuiltin), object(object), location(&object->location) {}
 

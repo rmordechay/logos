@@ -78,6 +78,9 @@ LgsType* LgsTypeResolver::resolveType(LgsType* type, LgsFile* file) {
         case ENUM:
             newType = symbol->lgsEnum;
             break;
+        case SUBTYPE:
+            newType = symbol->subtype;
+            break;
         case VAR_DEC:
         case PARAM:
         case FIELD:
@@ -100,6 +103,9 @@ void LgsTypeResolver::resolveMainFileTypes(LgsMainFile* mf) {
     }
     for (const auto group : mf->groups) {
         resolveGroupTypes(group, *mf);
+    }
+    for (const auto subtype : mf->subtypes) {
+        subtype->subtype = resolveType(subtype->subtype, mf);
     }
     for (const auto [_, func] : mf->funcs) {
         if (dynamic_cast<LgsMainFunc*>(func)) continue;

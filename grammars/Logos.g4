@@ -13,7 +13,7 @@ logosAppFile:
     ;
 
 mainFile:
-        (object | enumDeclaration | interface | group)* func+ EOF
+        (subtype | object | enumDeclaration | interface | group)* func+ EOF
     ;
 
 objectFile:
@@ -28,6 +28,14 @@ testFile:
         'test' IDENTIFIER field* func*
     ;
 
+object:
+        (SINGLETON | OBJECT) IDENTIFIER LBRACE objectBody RBRACE
+    ;
+
+objectBody:
+        implements? (enumDeclaration | field | subtype)* method* ioPair*
+    ;
+
 interface:
         INTERFACE IDENTIFIER LBRACE interfaceBody RBRACE
     ;
@@ -36,12 +44,8 @@ interfaceBody:
         implements? interfaceField* interfaceFunc*
     ;
 
-object:
-        (SINGLETON | OBJECT) IDENTIFIER LBRACE objectBody RBRACE
-    ;
-
-objectBody:
-        implements? (enumDeclaration | field)* method* ioPair*
+subtype:
+        IDENTIFIER EQUAL type
     ;
 
 field:

@@ -52,6 +52,9 @@ void LgsSymbolTable::freeSymbols() {
         case ENUM:
             freeType(symbol.lgsEnum);
             break;
+        case SUBTYPE:
+            freeType(symbol.subtype);
+            break;
         case UNKNOWN:
             break;
         }
