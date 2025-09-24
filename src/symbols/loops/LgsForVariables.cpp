@@ -7,11 +7,15 @@ Value* LgsLoopMetaVar::loadIR(LgsLLVMGen& cg) {
 std::string LgsLoopMetaVar::pname() {
     switch (varType) {
     case FOR_I:
-        return FOR_I_NAME;
+        return "for.i";
     case FOR_IS_FIRST:
-        return FOR_IS_FIRST_NAME;
+        return "for.isFirst";
     case FOR_IS_LAST:
-        return FOR_IS_LAST_NAME;
+        return "for.isLast";
+    case FOR_PREV:
+        return "for.prev";
+    case FOR_NEXT:
+        return "for.next";
     }
     assert(0);
 }

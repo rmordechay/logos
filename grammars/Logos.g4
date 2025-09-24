@@ -320,6 +320,8 @@ forVariable:
         FOR_I
     |   FOR_IS_FIRST
     |   FOR_IS_LAST
+    |   FOR_PREV
+    |   FOR_NEXT
     ;
 
 range:
@@ -483,10 +485,12 @@ CONTINUE: 'continue';
 RETURN: 'return';
 
 FOR: 'for';
+FOR_I: 'for.i';
 FOREVER: 'for.ever';
+FOR_PREV: 'for.prev';
+FOR_NEXT: 'for.next';
 FOR_IS_FIRST: 'for.isFirst';
 FOR_IS_LAST: 'for.isLast';
-FOR_I: 'for.i';
 
 VEC2: 'vec2';
 VEC3: 'vec3';

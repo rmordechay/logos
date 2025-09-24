@@ -229,22 +229,23 @@ void LgsCodeGen::visitRangeLoop(LgsRangeLoop* loop) {
     // Body
     cg.startBlock(loop->IRBodyBlock);
     if (!loop->loopVars.empty()) {
-        loop->loopVars.front()->IRValue = loop->iValue;
+        loop->loopVars[0]->IRValue = loop->iValue;
     }
 }
 
 void LgsCodeGen::visitForeachLoop(LgsForeachLoop* loop) {
+    visitExpr(loop->iterExpr);
     loop->iPtr = cg.builder.CreateAlloca(cg.sizeTy());
     cg.builder.CreateStore(cg.sizeZero(), loop->iPtr);
     cg.branchAndStartBlock(loop->IRCondBlock);
 
     const auto expr = loop->iterExpr;
-    const auto index = new LgsIndex{.from = new LgsIntConst(&LGS_SIZE, 0)};
+    const auto index = LgsIndex{.from = new LgsIntConst(&LGS_SIZE, 0)};
     const auto iterIndex = new LgsIterIndex(expr, index);
     visitIterIndex(iterIndex);
 
     loop->iValue = loop->loadIndex(cg);
-    index->from->IRValue = loop->iValue;
+    index.from->IRValue = loop->iValue;
     auto loopEnd = loop->loopEnd(cg);
     loopEnd = cg.builder.CreateSExt(loopEnd, cg.sizeTy());
     const auto condition = cg.builder.CreateICmpSLT(loop->iValue, loopEnd);
@@ -260,17 +261,46 @@ void LgsCodeGen::visitInfiniteLoop(const LgsInfiniteLoop* loop) const {
 }
 
 void LgsCodeGen::visitLoopMetaVar(LgsLoopMetaVar* metaVar) {
-    const auto loop = stack.currentLoop();
+    const auto loop = metaVar->forLoop;
     const auto iValue = loop->iValue;
     switch (metaVar->varType) {
-    case FOR_I:
+    case FOR_I: {
         metaVar->IRValue = iValue;
         break;
+    }
+    case FOR_PREV: {
+        const auto i = cg.builder.CreateSub(loop->loadIndex(cg), cg.usize(1));
+        if (loop->asRangeLoop()) {
+            metaVar->IRValue = i;
+        } else if (const auto foreachLoop = loop->asForeachLoop()) {
+            const auto indexFrom = new LgsIntConst(&LGS_SIZE, 0);
+            auto iterIndex = LgsIterIndex(foreachLoop->iterExpr, LgsIndex{.from = indexFrom});
+            visitIterIndex(&iterIndex);
+            indexFrom->IRValue = i;
+            metaVar->IRValue = iterIndex.loadIR(cg);
+            assert(0);
+        }
+        break;
+    }
+    case FOR_NEXT: {
+        const auto i = cg.builder.CreateAdd(loop->loadIndex(cg), cg.usize(1));
+        if (loop->asRangeLoop()) {
+            metaVar->IRValue = i;
+        } else if (const auto foreachLoop = loop->asForeachLoop()) {
+            const auto indexFrom = new LgsIntConst(&LGS_SIZE, 0);
+            auto iterIndex = LgsIterIndex(foreachLoop->iterExpr, LgsIndex{.from = indexFrom});
+            visitIterIndex(&iterIndex);
+            indexFrom->IRValue = i;
+            metaVar->IRValue = iterIndex.loadIR(cg);
+            assert(0);
+        }
+        break;
+    }
     case FOR_IS_FIRST: {
         const auto loopStart = cg.builder.CreateSExt(loop->loopStart(cg), cg.sizeTy());
         metaVar->IRValue = cg.builder.CreateICmpEQ(iValue, loopStart);
+        break;
     }
-    break;
     case FOR_IS_LAST: {
         const auto loopEnd = cg.builder.CreateSExt(loop->loopEnd(cg), cg.sizeTy());
         const auto decremented = cg.builder.CreateSub(loopEnd, cg.usize(1));
@@ -856,8 +886,8 @@ void LgsCodeGen::visitStrConst(LgsStrConst* strConst) {
 
 void LgsCodeGen::visitIterIndex(LgsIterIndex* iterIndex) {
     visitExpr(iterIndex->baseExpr);
-    visitExpr(iterIndex->index->from);
-    visitExpr(iterIndex->index->to);
+    visitExpr(iterIndex->index.from);
+    visitExpr(iterIndex->index.to);
     iterIndex->IRValue = iterIndex->baseExpr->IRValue;
 }
 

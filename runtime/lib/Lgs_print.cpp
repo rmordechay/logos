@@ -39,6 +39,26 @@ extern "C" void Lgs_print(const char* fmt, const Lgs_RTType rtt, const void* v) 
         printf(fmt, str);
         break;
     }
+    case RTT_UBYTE: {
+        const auto b = *static_cast<const uint8_t*>(v);
+        printf(fmt, b);
+        break;
+    }
+    case RTT_USHORT: {
+        const auto s = *static_cast<const uint16_t*>(v);
+        printf(fmt, s);
+        break;
+    }
+    case RTT_UINT: {
+        const auto str = *static_cast<const uint32_t*>(v);
+        printf(fmt, str);
+        break;
+    }
+    case RTT_ULONG: {
+        const auto str = *static_cast<const uint64_t*>(v);
+        printf(fmt, str);
+        break;
+    }
     case RTT_FLOAT: {
         const auto str = *static_cast<const float_t*>(v);
         printf(fmt, str);

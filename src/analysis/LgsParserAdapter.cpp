@@ -1036,8 +1036,7 @@ LgsIterIndex* LgsParserAdapter::getIterIndex(LogosParser::IterIndexContext* ctx)
         const auto indexExprFrom = indexExpr->from;
         const auto iterIndexFrom = getExpr(indexExprFrom);
         const auto iterIndexTo = getExpr(indexExpr->to);
-        const auto index = new LgsIndex{.from = iterIndexFrom, .to = iterIndexTo};
-        const auto newIterIndex = new LgsIterIndex(baseExpr, index);
+        const auto newIterIndex = new LgsIterIndex(baseExpr, LgsIndex{.from = iterIndexFrom, .to = iterIndexTo});
         setLocation(newIterIndex->location, ctx->start, ctx->stop);
         baseExpr = newIterIndex;
     }
@@ -1098,6 +1097,11 @@ LgsExpr* LgsParserAdapter::getLoopMetaVar(LogosParser::ForVariableContext* ctx) 
     LgsLoopMetaVar* var;
     if (ctx->FOR_I()) {
         var = new LgsLoopMetaVar(FOR_I);
+        var->type = &LGS_SIZE;
+    } else if (ctx->FOR_PREV()) {
+        var = new LgsLoopMetaVar(FOR_PREV);
+    } else if (ctx->FOR_NEXT()) {
+        var = new LgsLoopMetaVar(FOR_NEXT);
     } else if (ctx->FOR_IS_FIRST()) {
         var = new LgsLoopMetaVar(FOR_IS_FIRST);
         var->type = &LGS_BOOL;

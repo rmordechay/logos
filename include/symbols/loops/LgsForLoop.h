@@ -20,6 +20,7 @@ public:
     std::map<LgsLoopMetaVarType, LgsLoopMetaVar*> metaVars;
     AllocaInst* iPtr = nullptr;
     Value* iValue = nullptr;
+
     LgsStmtsBlock* stmtsBlock = nullptr;
     BasicBlock* IRCondBlock = nullptr;
     BasicBlock* IRBodyBlock = nullptr;

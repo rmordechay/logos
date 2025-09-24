@@ -1,18 +1,21 @@
 #pragma once
 #include "exprs/LgsExpr.h"
 
-
 class LgsStr;
 class LgsMap;
 class LgsDArray;
-struct LgsIndex;
+
+struct LgsIndex {
+    LgsExpr* from;
+    LgsExpr* to;
+};
 
 class LgsIterIndex final : public LgsExpr {
 public:
     LgsExpr* baseExpr;
-    LgsIndex* index = nullptr;
+    LgsIndex index;
 
-    explicit LgsIterIndex(LgsExpr* baseExpr, LgsIndex* index = nullptr) : baseExpr(baseExpr), index(index) {
+    explicit LgsIterIndex(LgsExpr* baseExpr, const LgsIndex index) : baseExpr(baseExpr), index(index) {
         isMutable = true;
     }
     Value* loadIR(LgsLLVMGen& cg) override;
@@ -29,21 +32,3 @@ public:
     json::value asJSON() override;
     ~LgsIterIndex() override;
 };
-
-struct LgsIndex {
-    LgsExpr* from;
-    LgsExpr* to;
-
-    ~LgsIndex() {
-        if (from) {
-            delete from;
-            from = nullptr;
-        }
-        if (to) {
-            delete to;
-            to = nullptr;
-        }
-    }
-};
-
-

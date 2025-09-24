@@ -8,6 +8,7 @@ public:
     LgsUInt() {
         isUnsigned = true;
         isPrimitive = true;
+        rtt = RTT_UINT;
     }
     size_t getSizeBytes() override;
     llvm::Type* getIRType(LgsLLVMGen& cg) override;

@@ -24,6 +24,14 @@ static std::string getTypeName(const Lgs_RTType type) {
         return "Long";
     case RTT_SIZE:
         return "Size";
+    case RTT_UBYTE:
+        return "UByte";
+    case RTT_USHORT:
+        return "UShort";
+    case RTT_UINT:
+        return "UInt";
+    case RTT_ULONG:
+        return "ULong";
     case RTT_FLOAT:
         return "Float";
     case RTT_DOUBLE:

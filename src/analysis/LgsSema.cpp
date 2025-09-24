@@ -45,6 +45,7 @@
 #include "stmts/LgsIfStmt.h"
 #include "types/primitives/LgsDouble.h"
 #include "types/primitives/LgsSize.h"
+#include "types/primitives/LgsUInt.h"
 
 void LgsSema::analyse() {
     if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
@@ -967,8 +968,8 @@ void LgsSema::visitIterIndex(LgsIterIndex* iterIndex) {
 void LgsSema::visitIndex(LgsIterIndex* iterIndex) {
     const auto baseExpr = iterIndex->baseExpr;
     const auto iterable = baseExpr->type->asIterable();
-    const auto exprFrom = iterIndex->index->from;
-    const auto exprTo = iterIndex->index->to;
+    const auto exprFrom = iterIndex->index.from;
+    const auto exprTo = iterIndex->index.to;
     visitExpr(exprFrom);
     visitExpr(exprTo);
     if (exprTo) {
@@ -986,8 +987,8 @@ void LgsSema::visitIndex(LgsIterIndex* iterIndex) {
 
 void LgsSema::visitSlice(LgsIterIndex* iterIndex) {
     const auto baseExpr = iterIndex->baseExpr;
-    const auto exprFrom = iterIndex->index->from;
-    const auto exprTo = iterIndex->index->to;
+    const auto exprFrom = iterIndex->index.from;
+    const auto exprTo = iterIndex->index.to;
     const auto iterable = baseExpr->type->asIterable();
     if (!baseExpr->type->isSliceable()) {
         return errHandler.addError(E10042, &iterIndex->location, {iterIndex->pname(), baseExpr->type->pname()});
@@ -1017,19 +1018,22 @@ void LgsSema::visitLoopMetaVar(LgsLoopMetaVar* metaVar) {
     if (!loop) {
         return errHandler.addError(E10060, &metaVar->location);
     }
-
+    metaVar->forLoop = loop;
     const auto name = metaVar->pname();
     if (loop->asWhileLoop()) {
-        errHandler.addError(E10065, &metaVar->location, {name});
-    } else if (loop->asInfiniteLoop()) {
-        errHandler.addError(E10061, &metaVar->location, {name});
+        return errHandler.addError(E10061, &metaVar->location, {name});
+    }
+    if (loop->asInfiniteLoop()) {
+        return errHandler.addError(E10061, &metaVar->location, {name});
     }
 
-    if (metaVar->varType == FOR_I) {
-        if (const auto rangeLoop = loop->asRangeLoop()) {
-            metaVar->setType(rangeLoop->endRange->type);
-        } else {
-            metaVar->setType(&LGS_INT);
+    if (metaVar->varType == FOR_PREV || metaVar->varType == FOR_NEXT) {
+        if (loop->asRangeLoop()) {
+            metaVar->setType(&LGS_UINT);
+        } else if (const auto foreachLoop = loop->asForeachLoop()) {
+            const auto iterable = foreachLoop->iterExpr->type->asIterable();
+            if (!iterable) return;
+            metaVar->setType(iterable->baseType);
         }
     }
 
@@ -1061,7 +1065,7 @@ bool LgsSema::resolveForeachVars(const LgsForeachLoop* foreachLoop) {
         foreachLoop->loopVars[0]->type = pair->key;
         foreachLoop->loopVars[1]->type = pair->value;
     } else {
-        const auto iterIndex = new LgsIterIndex(foreachLoop->iterExpr, new LgsIndex{.from = LGS_SIZE.getZeroValue()});
+        const auto iterIndex = new LgsIterIndex(foreachLoop->iterExpr, LgsIndex{.from = LGS_SIZE.getZeroValue()});
         iterIndex->location = foreachLoop->iterExpr->location;
         visitIterIndex(iterIndex);
         foreachLoop->loopVars[0]->expr = iterIndex;
@@ -1160,7 +1164,7 @@ void LgsSema::validateObjInterface(LgsObject* obj, LgsInterface* interface) {
 
 void LgsSema::validateIndex(LgsIterIndex* iterIndex) {
     const auto baseExpr = iterIndex->baseExpr;
-    const auto exprFrom = iterIndex->index->from;
+    const auto exprFrom = iterIndex->index.from;
     const auto iterable = baseExpr->type->asIterable();
     if (!iterable->getIndexType()->canCastTo(exprFrom->type)) {
         return errHandler.addError(E10036, &iterIndex->location, {iterIndex->pname(), exprFrom->type->pname()});
@@ -1176,8 +1180,8 @@ void LgsSema::validateIndex(LgsIterIndex* iterIndex) {
 
 void LgsSema::validateSliceBounds(LgsIterIndex* iterIndex) {
     const auto baseExpr = iterIndex->baseExpr;
-    const auto exprFrom = iterIndex->index->from;
-    const auto exprTo = iterIndex->index->to;
+    const auto exprFrom = iterIndex->index.from;
+    const auto exprTo = iterIndex->index.to;
     const auto iterable = baseExpr->type->asIterable();
     if (const auto sArr = iterable->asSArray()) {
         const auto iterSizeFrom = exprFrom->getConstInt();

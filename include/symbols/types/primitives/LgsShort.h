@@ -3,7 +3,7 @@
 
 class LgsShort final : public LgsType {
 public:
-    static constexpr auto name = "Int";
+    static constexpr auto name = "Short";
 
     LgsShort() {
         isPrimitive = true;

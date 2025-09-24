@@ -30,13 +30,25 @@ extern "C" void Lgs_DArray_put(const Lgs_darray* arr, const int index, const voi
     std::memcpy(arr->data->data() + index * arr->elementSize, value, arr->elementSize);
 }
 
-extern "C" void* Lgs_DArray_get(const Lgs_darray* arr, const size_t index) {
+extern "C" void* Lgs_DArray_get(const Lgs_darray* arr, const int32_t index) {
+    if (!arr || !arr->data) return nullptr;
     const auto arrLen = arr->data->size() / arr->elementSize;
-    if (index >= arrLen) {
+    if (arrLen == 0) return nullptr;
+    size_t actualIndex;
+    if (index >= 0) {
+        actualIndex = index;
+    } else {
+        if (-index > arrLen) {
+            formatAndLogError(E10080, {std::to_string(index)});
+            return nullptr;
+        }
+        actualIndex = arrLen + index;
+    }
+    if (actualIndex >= arrLen) {
         formatAndLogError(E10080, {std::to_string(index)});
         return nullptr;
     }
-    return arr->data->data() + index * arr->elementSize;
+    return arr->data->data() + actualIndex * arr->elementSize;
 }
 
 extern "C" size_t Lgs_DArray_len(const Lgs_darray* arr) {

@@ -26,7 +26,7 @@ Value* LgsIterIndex::loadIR(LgsLLVMGen& cg) {
 }
 
 Value* LgsIterIndex::loadFromDArray(LgsLLVMGen& cg, const LgsDArray* arr) const {
-    auto indexIRValue = index->from->IRValue;
+    auto indexIRValue = index.from->IRValue;
     indexIRValue = cg.builder.CreateZExt(indexIRValue, cg.i64Ty());
     const auto rv = arr->getFunc->callIR(cg, {IRValue, indexIRValue});
     const auto valueTy = arr->baseType->getIRType(cg);
@@ -35,16 +35,16 @@ Value* LgsIterIndex::loadFromDArray(LgsLLVMGen& cg, const LgsDArray* arr) const 
 
 Value* LgsIterIndex::loadFromMap(LgsLLVMGen& cg, const LgsMap* map) const {
     const auto mapPtr = IRValue;
-    const auto key = index->from->IRValue;
+    const auto key = index.from->IRValue;
     const auto rv = map->getFunc->callIR(cg, {mapPtr, key});
     const auto valueTy = map->typePair->value->getIRType(cg);
     return cg.builder.CreateLoad(valueTy, rv);
 }
 
 Value* LgsIterIndex::loadFromStr(LgsLLVMGen& cg) const {
-    if (index->to) {
-        const auto intFrom = index->from->asIntConst();
-        const auto intTo = index->to->asIntConst();
+    if (index.to) {
+        const auto intFrom = index.from->asIntConst();
+        const auto intTo = index.to->asIntConst();
         const auto strConst = baseExpr->getConstStr();
         return cg.getIRStr(strConst.substr(intFrom->value, intTo->value));
     }
@@ -59,7 +59,7 @@ Value* LgsIterIndex::loadFromStr(LgsLLVMGen& cg) const {
 Value* LgsIterIndex::loadFromVec(LgsLLVMGen& cg) const {
     const auto ptr = IRValue;
     const auto vec = cg.builder.CreateLoad(baseExpr->type->getIRType(cg), ptr);
-    const auto i = index->from->IRValue;
+    const auto i = index.from->IRValue;
     return cg.builder.CreateExtractElement(vec, i);
 }
 
@@ -69,7 +69,7 @@ Value* LgsIterIndex::loadFromSArray(LgsLLVMGen& cg) const {
     Value* ptr = nullptr;
     auto iterIndex = this;
     while (true) {
-        auto irValue = iterIndex->index->from->IRValue;
+        auto irValue = iterIndex->index.from->IRValue;
         IRIndices.push_back(irValue);
         const auto innerIterIndex = iterIndex->baseExpr->asIterIndex();
         if (innerIterIndex) {
@@ -102,7 +102,7 @@ void LgsIterIndex::assignScalar(LgsLLVMGen& cg, LgsExpr* expr) {
         const auto ptr = cg.builder.CreateAlloca(expr->type->getIRType(cg));
         cg.builder.CreateStore(rIRValue, ptr);
         LgsFunc putFunc("put", &LGS_VOID, {arr, &LGS_INT, &LGS_ANY}, BUILTIN | METHOD);
-        putFunc.callIR(cg, {baseIRValue->IRValue, index->from->IRValue, ptr});
+        putFunc.callIR(cg, {baseIRValue->IRValue, index.from->IRValue, ptr});
         return;
     }
     if (baseExpr->type->asSArray()) {
@@ -110,7 +110,7 @@ void LgsIterIndex::assignScalar(LgsLLVMGen& cg, LgsExpr* expr) {
         return;
     }
     if (const auto map = baseExpr->type->asMap()) {
-        map->getAddFunc()->call(cg, {baseExpr, index->from, expr});
+        map->getAddFunc()->call(cg, {baseExpr, index.from, expr});
     } else {
         cg.builder.CreateStore(rIRValue, IRValue);
     }
@@ -127,10 +127,10 @@ void LgsIterIndex::assignHashMap(LgsLLVMGen& cg, LgsHashMap* map) {
 std::string LgsIterIndex::pname() {
     std::stringstream str;
     str << baseExpr->pname();
-    if (index->to) {
-        str << '[' << index->from->pname() << ':' << index->to->pname() << ']';
+    if (index.to) {
+        str << '[' << index.from->pname() << ':' << index.to->pname() << ']';
     } else {
-        str << '[' << index->from->pname() << ']';
+        str << '[' << index.from->pname() << ']';
     }
     return str.str();
 }
@@ -138,19 +138,19 @@ std::string LgsIterIndex::pname() {
 json::value LgsIterIndex::asJSON() {
     json::object jsonObj;
     jsonObj["exprType"] = "iterIndex";
-    jsonObj["from"] = index->from->asJSON();
-    if (index->to) jsonObj["to"] = index->to->asJSON();
+    jsonObj["from"] = index.from->asJSON();
+    if (index.to) jsonObj["to"] = index.to->asJSON();
     jsonObj["baseExpr"] = baseExpr->asJSON();
     return jsonObj;
 }
 
 LgsIterIndex::~LgsIterIndex() {
-    if (baseExpr) {
+    if (!baseExpr->asVariable()) {
         freeExpr(baseExpr);
-        baseExpr = nullptr;
     }
-    if (index) {
-        delete index;
-        index = nullptr;
-    }
+    freeExpr(index.from);
+    freeExpr(index.to);
+    baseExpr = nullptr;
+    index.from = nullptr;
+    index.to = nullptr;
 }
