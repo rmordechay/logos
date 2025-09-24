@@ -66,6 +66,10 @@ static void freeType(void* ptr, const Lgs_RTType type) {
     case RTT_INT:
     case RTT_LONG:
     case RTT_SIZE:
+    case RTT_UBYTE:
+    case RTT_USHORT:
+    case RTT_UINT:
+    case RTT_ULONG:
     case RTT_FLOAT:
     case RTT_DOUBLE:
     case RTT_VEC2:
@@ -78,13 +82,13 @@ static void freeType(void* ptr, const Lgs_RTType type) {
         break;
         assert(0);
     case RTT_OBJECT: {
-        // std::free(ptr);
+        std::free(ptr);
         break;
     }
     case RTT_DARRAY: {
         const auto arr = static_cast<Lgs_darray*>(ptr);
-        // delete arr->data;
-        // std::free(arr);
+        delete arr->data;
+        std::free(arr);
         break;
     }
     }

@@ -64,7 +64,7 @@ LgsInstance::~LgsInstance() {
         for (const auto interface : obj->interfaces) {
             delete interface;
         }
-        // delete obj;
+        delete obj;
         obj = nullptr;
         type = nullptr;
     }

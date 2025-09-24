@@ -77,7 +77,7 @@ size_t LgsObject::getSizeBytes() {
 }
 
 LgsExpr* LgsObject::getZeroValue() {
-    return new LgsInstance(this);
+    return new LgsInstance(clone());
 }
 
 std::string LgsObject::strFormatPart() const {
@@ -104,7 +104,9 @@ LgsObject* LgsObject::clone() {
     cloned->fields.clear();
     for (const auto& field : fields) {
         const auto newField = new LgsField(*field);
-        if (field->expr) assert(0);
+        if (field->expr) {
+            newField->expr = field->expr->clone();
+        }
         cloned->addField(newField);
     }
     cloned->methods.clear();

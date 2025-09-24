@@ -6,8 +6,7 @@
 #include "types/iterables/LgsVec.h"
 
 Value* LgsSelection::loadIR(LgsLLVMGen& cg) {
-    const auto gep = lastExprParent()->loadIR(cg);
-    return cg.builder.CreateLoad(type->getIRType(cg), gep);
+    assert(0);
 }
 
 LgsExpr* LgsSelection::lastExpr() const {

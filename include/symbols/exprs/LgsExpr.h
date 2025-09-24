@@ -57,6 +57,7 @@ public:
     virtual Value* hash(LgsLLVMGen& cg);
     virtual void assign(LgsLLVMGen& cg, LgsExpr* expr);
     virtual bool equals(LgsExpr* other);
+    virtual LgsExpr* clone();
 
     void freeOwner(LgsLLVMGen& cg);
     size_t getConstInt();

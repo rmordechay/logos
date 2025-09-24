@@ -29,6 +29,10 @@ std::string LgsIntConst::pname() {
     return std::to_string(value);
 }
 
+LgsExpr* LgsIntConst::clone() {
+    return new LgsIntConst(type->clone(), value);
+}
+
 json::value LgsIntConst::asJSON() {
     json::object jsonObj;
     jsonObj["exprType"] = "intConst";

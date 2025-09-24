@@ -780,7 +780,11 @@ void LgsCodeGen::visitSelection(LgsSelection* selection) {
             field->parentIRValue = parent->IRValue;
             field->parentIRType = parent->type->getIRType(cg);
             visitField(field);
-            child->IRValue = field->loadIR(cg);
+            if (i == selection->exprs.size() - 2) {
+                child->IRValue = field->IRValue;
+            } else {
+                child->IRValue = field->loadIR(cg);
+            }
         } else if (const auto methodCall = child->asFuncCall()) {
             if (stack.currentFunc()->isTest && parent->type->getName() == LgsTest::name && methodCall->name == "mock") {
                 continue;
@@ -912,6 +916,7 @@ void LgsCodeGen::initFields(LgsInstance* instance) {
         const auto exprIR = getIRValue(arg->expr);
         const auto field = instance->obj->getField(argName);
         field->parentIRValue = instance->IRValue;
+        field->parentIRType = instance->obj->getIRType(cg);
         visitField(field);
         cg.builder.CreateStore(exprIR, field->IRValue);
     }
@@ -920,6 +925,7 @@ void LgsCodeGen::initFields(LgsInstance* instance) {
     for (const auto field : instance->obj->fields) {
         if (visited.count(field->name) || field->type->asEnum()) continue;
         field->parentIRValue = instance->IRValue;
+        field->parentIRType = instance->obj->getIRType(cg);
         if (!field->expr) {
             field->expr = field->type->getZeroValue();
             if (field->isOwner && field->type->isHeapAlloc) {
