@@ -60,6 +60,7 @@ Function* LgsFunc::getIRFunc(LgsLLVMGen& cg) {
     const auto type = funcType->getIRType(cg);
     const auto funcTy = llvm::cast<FunctionType>(type);
     IRFunc = cg.getFunc(funcName, funcTy);
+    IRFunc->addFnAttr(Attribute::NoUnwind);
     if (funcType->params.empty()) return IRFunc;
     auto args = IRFunc->arg_begin();
     for (int i = 0; i < funcType->params.size(); ++i) {

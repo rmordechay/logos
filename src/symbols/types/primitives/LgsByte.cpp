@@ -131,6 +131,10 @@ LgsExpr* LgsByte::getZeroValue() {
     return new LgsIntConst(&LGS_BYTE, false);
 }
 
+Lgs_RTType LgsByte::getRTType() {
+    return RTT_BYTE;
+}
+
 std::string LgsByte::getName() {
     return name;
 }

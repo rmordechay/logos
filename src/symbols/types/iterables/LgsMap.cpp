@@ -46,6 +46,10 @@ LgsExpr* LgsMap::getZeroValue() {
     return new LgsHashMap(this);
 }
 
+Lgs_RTType LgsMap::getRTType() {
+    assert(0);
+}
+
 LgsType* LgsMap::getIndexType() {
     return typePair->key;
 }

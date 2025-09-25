@@ -29,6 +29,10 @@ LgsExpr* LgsSize::getZeroValue() {
     return new LgsIntConst(this, 0);
 }
 
+Lgs_RTType LgsSize::getRTType() {
+    return RTT_SIZE;
+}
+
 bool LgsSize::canCastTo(LgsType* other) {
     const auto IRName = other->getName();
     if (IRName == LgsAny::name) return true;

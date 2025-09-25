@@ -20,6 +20,10 @@ LgsExpr* LgsInt::getZeroValue() {
     return new LgsIntConst(&LGS_INT, 0);
 }
 
+Lgs_RTType LgsInt::getRTType() {
+    return RTT_INT;
+}
+
 bool LgsInt::canCastTo(LgsType* other) {
     const auto otherName = other->getName();
     if (name == otherName) return true;

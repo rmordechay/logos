@@ -7,11 +7,11 @@
 
 Value* LgsIterIndex::loadIR(LgsLLVMGen& cg) {
     const auto baseExprType = baseExpr->type;
-    if (const auto map = baseExprType->asMap()) {
-        return loadFromMap(cg, map);
+    if (baseExprType->asMap()) {
+        return loadFromMap(cg);
     }
-    if (const auto arr = baseExprType->asDArray()) {
-        return loadFromDArray(cg, arr);
+    if (baseExprType->asDArray()) {
+        return loadFromDArray(cg);
     }
     if (baseExprType->asSArray()) {
         return loadFromSArray(cg);
@@ -25,20 +25,42 @@ Value* LgsIterIndex::loadIR(LgsLLVMGen& cg) {
     assert(0);
 }
 
-Value* LgsIterIndex::loadFromDArray(LgsLLVMGen& cg, const LgsDArray* arr) const {
-    auto indexIRValue = index.from->IRValue;
-    indexIRValue = cg.builder.CreateZExt(indexIRValue, cg.i64Ty());
-    const auto rv = arr->getFunc->callIR(cg, {IRValue, indexIRValue});
-    const auto valueTy = arr->baseType->getIRType(cg);
-    return cg.builder.CreateLoad(valueTy, rv);;
+Value* LgsIterIndex::getIRPtrTo(LgsLLVMGen& cg) {
+    const auto baseExprType = baseExpr->type;
+    if (baseExprType->asMap()) {
+        const auto map = baseExpr->type->asMap();
+        const auto mapPtr = IRValue;
+        const auto key = index.from->IRValue;
+        return map->getFunc->callIR(cg, {mapPtr, key});
+    }
+    if (baseExprType->asDArray()) {
+        const auto arr = baseExpr->type->asDArray();
+        auto indexIRValue = index.from->IRValue;
+        indexIRValue = cg.builder.CreateZExt(indexIRValue, cg.i64Ty());
+        return arr->getFunc->callIR(cg, {IRValue, indexIRValue});
+    }
+    if (baseExprType->asSArray()) {
+        assert(0);
+    }
+    if (baseExprType->asVec()) {
+        assert(0);
+    }
+    if (baseExprType->asStr()) {
+        assert(0);
+    }
+    assert(0);
 }
 
-Value* LgsIterIndex::loadFromMap(LgsLLVMGen& cg, const LgsMap* map) const {
-    const auto mapPtr = IRValue;
-    const auto key = index.from->IRValue;
-    const auto rv = map->getFunc->callIR(cg, {mapPtr, key});
+Value* LgsIterIndex::loadFromDArray(LgsLLVMGen& cg) {
+    const auto arr = baseExpr->type->asDArray();
+    const auto valueTy = arr->baseType->getIRType(cg);
+    return cg.builder.CreateLoad(valueTy, getIRPtrTo(cg));
+}
+
+Value* LgsIterIndex::loadFromMap(LgsLLVMGen& cg) {
+    const auto map = baseExpr->type->asMap();
     const auto valueTy = map->typePair->value->getIRType(cg);
-    return cg.builder.CreateLoad(valueTy, rv);
+    return cg.builder.CreateLoad(valueTy, getIRPtrTo(cg));
 }
 
 Value* LgsIterIndex::loadFromStr(LgsLLVMGen& cg) const {

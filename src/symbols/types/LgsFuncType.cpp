@@ -36,6 +36,10 @@ LgsExpr* LgsFuncType::getZeroValue() {
     assert(0);
 }
 
+Lgs_RTType LgsFuncType::getRTType() {
+    assert(0);
+}
+
 size_t LgsFuncType::getSizeBytes() {
     return sizeof(void*);
 }

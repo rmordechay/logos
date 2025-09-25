@@ -8,14 +8,14 @@ public:
     LgsUInt() {
         isUnsigned = true;
         isPrimitive = true;
-        rtt = RTT_UINT;
     }
     size_t getSizeBytes() override;
-    llvm::Type* getIRType(LgsLLVMGen& cg) override;
+    Type* getIRType(LgsLLVMGen& cg) override;
     std::string getName() override;
     std::string pname() override;
     json::value asJSON() override;
     LgsExpr* getZeroValue() override;
+    Lgs_RTType getRTType() override;
     std::string strFormatPart() const override;
     bool canCastTo(LgsType* other) override;
 };

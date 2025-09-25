@@ -59,7 +59,6 @@ public:
     LgsLocation location{0, 0, 0};
     std::vector<LgsField*> fields;
     std::map<std::string, LgsFunc*> methods;
-    Lgs_RTType rtt;
 
     LgsType* extendInt();
     bool addField(LgsField* field);
@@ -105,7 +104,7 @@ public:
     virtual Type* getIRType(LgsLLVMGen& cg) = 0;
     virtual size_t getSizeBytes() = 0;
     virtual LgsExpr* getZeroValue() = 0;
-    virtual Lgs_RTType getRTType();
+    virtual Lgs_RTType getRTType() = 0;
     virtual std::string getName() = 0;
     virtual std::string pname() = 0; // pretty name
     virtual bool canCastTo(LgsType* other) = 0;

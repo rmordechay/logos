@@ -58,11 +58,11 @@ public:
     virtual void assign(LgsLLVMGen& cg, LgsExpr* expr);
     virtual bool equals(LgsExpr* other);
     virtual LgsExpr* clone();
+    virtual Value* getIRPtrTo(LgsLLVMGen& cg);
 
     void freeOwner(LgsLLVMGen& cg);
     size_t getConstInt();
     std::string getConstStr();
-    Value* getIRPtrTo(LgsLLVMGen& cg);
     LgsIterator toIterator();
     void setType(LgsType* newType);
 

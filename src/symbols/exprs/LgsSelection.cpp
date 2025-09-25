@@ -29,7 +29,7 @@ void LgsSelection::assign(LgsLLVMGen& cg, LgsExpr* expr) {
         const auto insert = cg.builder.CreateInsertElement(vec, rIR, i);
         cg.builder.CreateStore(insert, lExpr->IRValue);
     } else {
-        if (owner && type->isHeapAlloc) freeOwner(cg);
+        freeOwner(cg);
         cg.builder.CreateStore(rIR, IRValue);
     }
 }

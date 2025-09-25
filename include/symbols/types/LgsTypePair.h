@@ -11,6 +11,7 @@ public:
     Type* getIRType(LgsLLVMGen& cg) override;
     std::string getName() override;
     LgsExpr* getZeroValue() override;
+    Lgs_RTType getRTType() override;
     size_t getSizeBytes() override;
     std::string pname() override;
     json::value asJSON() override;
@@ -28,6 +29,10 @@ inline std::string LgsTypePair::getName() {
 
 inline LgsExpr* LgsTypePair::getZeroValue() {
     assert(false);
+}
+
+inline Lgs_RTType LgsTypePair::getRTType() {
+    assert(0);
 }
 
 inline size_t LgsTypePair::getSizeBytes() {

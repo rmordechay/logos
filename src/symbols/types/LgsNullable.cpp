@@ -15,6 +15,10 @@ LgsExpr* LgsNullable::getZeroValue() {
     return new LgsNull();
 }
 
+Lgs_RTType LgsNullable::getRTType() {
+    assert(0);
+}
+
 json::value LgsNullable::asJSON() {
     assert(0);
 }

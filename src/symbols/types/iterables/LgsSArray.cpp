@@ -27,6 +27,10 @@ LgsExpr* LgsSArray::getZeroValue() {
     return new LgsArrayExpr(this);
 }
 
+Lgs_RTType LgsSArray::getRTType() {
+    return RTT_SARRAY;
+}
+
 LgsType* LgsSArray::getIndexType() {
     return &LGS_INT;
 }

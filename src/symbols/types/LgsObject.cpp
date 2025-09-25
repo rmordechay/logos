@@ -93,6 +93,10 @@ std::string LgsObject::strFormatPart() const {
     return str.str();
 }
 
+Lgs_RTType LgsObject::getRTType() {
+    return RTT_OBJECT;
+}
+
 bool LgsObject::hasVirtuals() const {
     return std::any_of(methods.begin(), methods.end(), [](const auto& pair) {
         return pair.second->funcType->isVirtual;

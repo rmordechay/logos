@@ -37,6 +37,7 @@ public:
         }
         initFunc(name, rt, params, ops);
     }
+
     virtual Function* getIRFunc(LgsLLVMGen& cg);
     virtual Value* call(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args);
     Value* callIR(LgsLLVMGen& cg, const std::vector<Value*>& args = {});

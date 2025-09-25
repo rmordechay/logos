@@ -7,7 +7,6 @@ public:
 
     LgsChar() {
         isPrimitive = true;
-        rtt = RTT_CHAR;
     }
     std::string pname() override;
     json::value asJSON() override;
@@ -15,6 +14,7 @@ public:
     Type* getIRType(LgsLLVMGen& cg) override;
     std::string getName() override;
     LgsExpr* getZeroValue() override;
+    Lgs_RTType getRTType() override;
     std::string strFormatPart() const override;
     bool canCastTo(LgsType* other) override;
 };

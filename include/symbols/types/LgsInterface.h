@@ -12,6 +12,7 @@ public:
     LgsField* getField(const std::string& fieldName) override;
     LgsFunc* getMethod(const std::string& methodName) override;
     LgsExpr* getZeroValue() override;
+    Lgs_RTType getRTType() override;
     bool canCastTo(LgsType* other) override;
     size_t getSizeBytes() override;
     ~LgsInterface() override;

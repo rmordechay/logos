@@ -122,6 +122,7 @@ void LgsLLVMGen::callMemCpy(Value* dest, Value* src, Value* size) {
 Value* LgsLLVMGen::callMalloc(const size_t size, const bool isOwner, const Lgs_RTType type) {
     assert(type != RTT_UNKNOWN);
     const auto ptr = builder.CreateMalloc(sizeTy(), sizeTy(), usize(size), nullptr);
+    ptr->addRetAttr(Attribute::NoAlias);
     if (isOwner) callLgsFunc("stack_addOwner", getFT(voidTy(), {ptrTy(), i32Ty()}), {ptr, i32(type)});
     else callLgsFunc("stack_addOrphan", getFT(voidTy(), {ptrTy(), i32Ty()}), {ptr, i32(type)});
     return ptr;

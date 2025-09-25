@@ -28,6 +28,10 @@ LgsExpr* LgsLong::getZeroValue() {
     return new LgsIntConst(&LGS_LONG, 0);
 }
 
+Lgs_RTType LgsLong::getRTType() {
+    return RTT_LONG;
+}
+
 std::string LgsLong::getName() {
     return name;
 }

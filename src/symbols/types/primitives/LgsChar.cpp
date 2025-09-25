@@ -34,6 +34,10 @@ LgsExpr* LgsChar::getZeroValue() {
     return new LgsCharConst('0');
 }
 
+Lgs_RTType LgsChar::getRTType() {
+    return RTT_CHAR;
+}
+
 std::string LgsChar::strFormatPart() const {
     return "%c";
 }

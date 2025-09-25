@@ -25,6 +25,10 @@ LgsExpr* LgsFloat::getZeroValue() {
     return new LgsFloatConst(this, 0.0);
 }
 
+Lgs_RTType LgsFloat::getRTType() {
+    return RTT_FLOAT;
+}
+
 size_t LgsFloat::getSizeBytes() {
     return sizeof(float);
 }

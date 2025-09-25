@@ -10,6 +10,10 @@ LgsExpr* LgsGroup::getZeroValue() {
     assert(0);
 }
 
+Lgs_RTType LgsGroup::getRTType() {
+    assert(0);
+}
+
 std::string LgsGroup::getName() {
     return name;
 }

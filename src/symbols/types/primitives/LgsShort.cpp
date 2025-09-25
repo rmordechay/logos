@@ -31,6 +31,10 @@ LgsExpr* LgsShort::getZeroValue() {
     return new LgsIntConst(&LGS_SHORT, 0);
 }
 
+Lgs_RTType LgsShort::getRTType() {
+    return RTT_SHORT;
+}
+
 bool LgsShort::canCastTo(LgsType* other) {
     const auto IRName = other->getName();
     if (IRName == LgsAny::name) return true;

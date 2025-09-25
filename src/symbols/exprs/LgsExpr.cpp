@@ -35,7 +35,6 @@ void LgsExpr::assign(LgsLLVMGen& cg, LgsExpr* expr) {
 }
 
 Value* LgsExpr::getIRPtrTo(LgsLLVMGen& cg) {
-    if (asIterIndex()) return loadIR(cg);
     if (IRValue->getType()->isPointerTy()) return IRValue;
     const auto ptr = cg.builder.CreateAlloca(IRValue->getType());
     cg.builder.CreateStore(IRValue, ptr);
@@ -43,8 +42,10 @@ Value* LgsExpr::getIRPtrTo(LgsLLVMGen& cg) {
 }
 
 void LgsExpr::freeOwner(LgsLLVMGen& cg) {
-    cg.callLgsFunc("stack_removeOwner", cg.getFT(cg.voidTy(), {cg.ptrTy()}), {owner->IRValue});
-    owner = nullptr;
+    if (owner && type->isHeapAlloc) {
+        cg.callLgsFunc("stack_removeOwner", cg.getFT(cg.voidTy(), {cg.ptrTy()}), {owner->IRValue});
+        owner = nullptr;
+    }
 }
 
 size_t LgsExpr::getConstInt() {

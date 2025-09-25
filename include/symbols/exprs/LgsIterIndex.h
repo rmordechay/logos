@@ -19,8 +19,9 @@ public:
         isMutable = true;
     }
     Value* loadIR(LgsLLVMGen& cg) override;
-    Value* loadFromDArray(LgsLLVMGen& cg, const LgsDArray* arr) const;
-    Value* loadFromMap(LgsLLVMGen& cg, const LgsMap* map) const;
+    Value* getIRPtrTo(LgsLLVMGen& cg) override;
+    Value* loadFromDArray(LgsLLVMGen& cg);
+    Value* loadFromMap(LgsLLVMGen& cg);
     Value* loadFromStr(LgsLLVMGen& cg) const;
     Value* loadFromVec(LgsLLVMGen& cg) const;
     Value* loadFromSArray(LgsLLVMGen& cg) const;

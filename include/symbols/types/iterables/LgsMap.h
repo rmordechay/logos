@@ -24,6 +24,7 @@ public:
     LgsFunc* getAddFunc() override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
+    Lgs_RTType getRTType() override;
     LgsType* getIndexType() override;
     uint16_t getUnpackCount() const override;
     Value* IRLength(LgsLLVMGen& cg, Value* iterable) override;

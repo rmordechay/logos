@@ -11,6 +11,7 @@ public:
     std::string pname() override;
     json::value asJSON() override;
     LgsExpr* getZeroValue() override;
+    Lgs_RTType getRTType() override;
     bool canCastTo(LgsType* other) override;
     std::string strFormatPart() const override;
     size_t getSizeBytes() override;

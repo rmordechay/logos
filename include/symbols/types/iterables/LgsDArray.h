@@ -15,7 +15,6 @@ public:
         addEmptyMethod(MAP_FUNC_NAME);
         addEmptyMethod(FILTER_FUNC_NAME);
         addEmptyMethod(FOREACH_FUNC_NAME);
-        rtt = RTT_DARRAY;
     }
 
     Type* getIRType(LgsLLVMGen& cg) override;
@@ -23,6 +22,7 @@ public:
     std::string pname() override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
+    Lgs_RTType getRTType() override;
     LgsType* getIndexType() override;
     uint16_t getUnpackCount() const override;
     std::string strFormatPart() const override;

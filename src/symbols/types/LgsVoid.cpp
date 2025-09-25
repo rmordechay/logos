@@ -23,6 +23,10 @@ LgsExpr* LgsVoid::getZeroValue() {
     return nullptr;
 }
 
+Lgs_RTType LgsVoid::getRTType() {
+    return RTT_VOID;
+}
+
 std::string LgsVoid::strFormatPart() const {
     assert(0);
 }

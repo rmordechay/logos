@@ -10,7 +10,6 @@ public:
     LgsBool() {
         isPrimitive = true;
         isInt = true;
-        rtt = RTT_BOOL;
     }
     Type* getIRType(LgsLLVMGen& cg) override;
     LgsType* applyOp(LgsType* other, LgsOperator op) override;
@@ -36,6 +35,7 @@ public:
     std::string pname() override;
     json::value asJSON() override;
     LgsExpr* getZeroValue() override;
+    Lgs_RTType getRTType() override;
     std::string strFormatPart() const override;
     size_t getSizeBytes() override;
     bool canCastTo(LgsType* other) override;

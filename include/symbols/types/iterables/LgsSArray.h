@@ -7,15 +7,13 @@ class LgsSArray final : public LgsIterable {
 public:
     static constexpr auto name = "SArray";
 
-    explicit LgsSArray(LgsType* baseType = nullptr): LgsIterable(baseType) {
-        rtt = RTT_SARRAY;
-    }
-
+    explicit LgsSArray(LgsType* baseType = nullptr): LgsIterable(baseType) {}
     Type* getIRType(LgsLLVMGen& cg) override;
     std::string getName() override;
     std::string pname() override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
+    Lgs_RTType getRTType() override;
     LgsType* getIndexType() override;
     uint16_t getUnpackCount() const override;
     std::string strFormatPart() const override;

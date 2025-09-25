@@ -8,7 +8,6 @@ public:
     LgsByte() {
         isPrimitive = true;
         isInt = true;
-        rtt = RTT_BYTE;
     }
 
     Type* getIRType(LgsLLVMGen& cg) override;
@@ -33,6 +32,7 @@ public:
     Value* orIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
+    Lgs_RTType getRTType() override;
     std::string getName() override;
     std::string pname() override;
     bool canCastTo(LgsType* other) override;

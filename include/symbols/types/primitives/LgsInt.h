@@ -8,11 +8,11 @@ public:
     LgsInt() {
         isPrimitive = true;
         isInt = true;
-        rtt = RTT_INT;
     }
     size_t getSizeBytes() override;
     Type* getIRType(LgsLLVMGen& cg) override;
     LgsExpr* getZeroValue() override;
+    Lgs_RTType getRTType() override;
     bool canCastTo(LgsType* other) override;
     LgsType* applyOp(LgsType* other, LgsOperator op) override;
     Value* addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;

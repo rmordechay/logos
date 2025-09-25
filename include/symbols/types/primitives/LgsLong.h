@@ -10,11 +10,11 @@ public:
     LgsLong() {
         isPrimitive = true;
         isInt = true;
-        rtt = RTT_LONG;
     }
     Type* getIRType(LgsLLVMGen& cg) override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
+    Lgs_RTType getRTType() override;
     std::string strFormatPart() const override;
     std::string getName() override;
     std::string pname() override;

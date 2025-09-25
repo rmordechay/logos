@@ -12,10 +12,6 @@ public:
     explicit LgsVec(const int8_t dim, LgsType* baseType = &LGS_FLOAT) : LgsIterable(baseType), dim(dim) {
         assert(dim > 1 && dim <= 4);
         sizeExpr = new LgsIntConst(&LGS_INT, dim);
-        if (dim == 2) rtt = RTT_VEC2;
-        else if (dim == 3) rtt = RTT_VEC3;
-        else if (dim == 4) rtt = RTT_VEC4;
-        else rtt = RTT_UNKNOWN;
     }
 
     Type* getIRType(LgsLLVMGen& cg) override;
@@ -25,6 +21,7 @@ public:
     json::value asJSON() override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
+    Lgs_RTType getRTType() override;
     LgsType* getIndexType() override;
     uint16_t getUnpackCount() const override;
     bool canCastTo(LgsType* other) override;

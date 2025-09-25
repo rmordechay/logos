@@ -6,19 +6,21 @@ object Obj2 {
     obj1: Obj1
 }
 
-func(owner obj1: Obj1): Obj2 {
+func(obj1: Obj1): Obj2 {
     if false {
         a = Obj2{}
         return Obj2{}
     }
     obj2a = Obj2{}
-    obj2b = Obj2{}
     obj2a.obj1 := obj1
-    obj2b.obj1 := obj1
+    obj1.x := 123
     return obj2a
 }
 
 main() {
     owner obj2 = Obj2{}
+    obj2.obj1.x := 123
+    print(obj2.obj1.x)
     func(obj2.obj1)
+    print(obj2.obj1.x)
 }

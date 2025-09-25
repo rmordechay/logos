@@ -17,6 +17,10 @@ LgsExpr* LgsAny::getZeroValue() {
     assert(0);
 }
 
+Lgs_RTType LgsAny::getRTType() {
+    assert(0);
+}
+
 json::value LgsAny::asJSON() {
     assert(0);
 }

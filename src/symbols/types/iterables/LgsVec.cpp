@@ -35,6 +35,13 @@ LgsExpr* LgsVec::getZeroValue() {
     return new LgsVectorExpr(this);
 }
 
+Lgs_RTType LgsVec::getRTType() {
+    if (dim == 2) return RTT_VEC2;
+    if (dim == 3) return RTT_VEC3;
+    if (dim == 4) return RTT_VEC4;
+    return RTT_UNKNOWN;
+}
+
 LgsType* LgsVec::getIndexType() {
     return &LGS_INT;
 }

@@ -15,6 +15,7 @@ public:
     json::value asJSON() override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
+    Lgs_RTType getRTType() override;
     LgsType* getIndexType() override;
     LgsType* applyOp(LgsType* other, LgsOperator op) override;
     Value* addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
@@ -25,5 +26,4 @@ public:
     uint16_t getUnpackCount() const override;
     Value* IRLength(LgsLLVMGen& cg, Value* iterable) override;
     bool canCastTo(LgsType* other) override;
-    Lgs_RTType getRTType() override;
 };
