@@ -15,14 +15,16 @@ public:
     LgsExpr* baseExpr;
     LgsIndex index;
 
-    explicit LgsIterIndex(LgsExpr* baseExpr, const LgsIndex index) : baseExpr(baseExpr), index(index) {
+    explicit LgsIterIndex(LgsExpr* baseExpr, LgsExpr* from = nullptr, LgsExpr* to = nullptr) : baseExpr(baseExpr) {
         isMutable = true;
+        index.from = from;
+        index.to = to;
     }
     Value* loadIR(LgsLLVMGen& cg) override;
-    Value* getIRPtrTo(LgsLLVMGen& cg) override;
+    void setIRElementPtr(LgsLLVMGen& cg);
     Value* loadFromDArray(LgsLLVMGen& cg);
     Value* loadFromMap(LgsLLVMGen& cg);
-    Value* loadFromStr(LgsLLVMGen& cg) const;
+    Value* loadFromStr(LgsLLVMGen& cg);
     Value* loadFromVec(LgsLLVMGen& cg) const;
     Value* loadFromSArray(LgsLLVMGen& cg) const;
     void assign(LgsLLVMGen& cg, LgsExpr* expr) override;

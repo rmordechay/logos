@@ -3,6 +3,7 @@
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsAny.h"
+#include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsChar.h"
 
 Type* LgsStr::getIRBaseType(LgsLLVMGen* cg) const {
@@ -13,15 +14,11 @@ Type* LgsStr::getIRType(LgsLLVMGen& cg) {
     return cg.ptrTy();
 }
 
-size_t LgsStr::getSizeBytes() {
-    return sizeof(void*);
-}
-
-uint16_t LgsStr::getUnpackCount() const {
-    return 1;
-}
-
 std::string LgsStr::getName() {
+    return name;
+}
+
+std::string LgsStr::pname() {
     return name;
 }
 
@@ -31,16 +28,16 @@ json::value LgsStr::asJSON() {
     return jsonObj;
 }
 
-std::string LgsStr::pname() {
-    return name;
+size_t LgsStr::getSizeBytes() {
+    return sizeof(void*);
 }
 
 LgsExpr* LgsStr::getZeroValue() {
     return new LgsStrConst("");
 }
 
-std::string LgsStr::strFormatPart() const {
-    return "%s";
+Lgs_RTType LgsStr::getRTType() {
+    return RTT_STR;
 }
 
 LgsType* LgsStr::getIndexType() {
@@ -50,75 +47,54 @@ LgsType* LgsStr::getIndexType() {
 LgsType* LgsStr::applyOp(LgsType* other, const LgsOperator op) {
     const auto IRName = other->getName();
     switch (op) {
-    case ADD:
+    case ADD: {
         if (other->isNumber() || name == IRName) {
             return this;
         }
         break;
-    case SUB:
+    }
+    case IN: {
+        if (equals(other)) return &LGS_BOOL;
+        if (canCastTo(other->asIterable()->baseType)) return &LGS_BOOL;
+    }
+    case EQ: {
+        if (equals(other)) return &LGS_BOOL;
         break;
-    case MUL:
-        break;
-    case DIV:
-        break;
-    case MOD:
-        break;
-    case EQ:
-        break;
-    case NE:
-        break;
-    case LT:
-        break;
-    case GT:
-        break;
-    case GE:
-        break;
-    case LE:
-        break;
-    case AND:
-        break;
-    case OR:
-        break;
-    case BIT_AND:
-        break;
-    case BIT_OR:
-        break;
-    case BIT_XOR:
-        break;
-    case LSHIFT:
-        break;
-    case RSHIFT:
-        break;
-    case IN:
-        break;
-    case NOOP:
+    }
+    default:
         break;
     }
     return nullptr;
 }
 
 Value* LgsStr::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    if (const auto selfStr = self->asStrConst()) {
-        if (const auto otherStr = other->asStrConst()) {
-            return cg.getIRStr(selfStr->value + otherStr->value);
-        }
-        if (const auto intConst = other->asIntConst()) {
-            return cg.getIRStr(selfStr->value + std::to_string(intConst->value));
-        }
-        if (const auto floatConst = other->asFloatConst()) {
-            return cg.getIRStr(selfStr->value + std::to_string(floatConst->value));
-        }
-        assert(0);
-    }
-    const auto selfSize = IRLength(cg, self->IRValue);
-    const auto otherSize = IRLength(cg, other->IRValue);
+    return addIR(cg, self->IRValue, other->IRValue);
+}
+
+Value* LgsStr::addIR(LgsLLVMGen& cg, Value* self, Value* other) {
+    const auto selfSize = lengthIR(cg, self);
+    const auto otherSize = lengthIR(cg, other);
     auto newStrSize = cg.builder.CreateAdd(selfSize, otherSize);
     newStrSize = cg.builder.CreateAdd(newStrSize, cg.i64(1));
     const auto newStrPtr = cg.builder.CreateAlloca(cg.i8Ty(), newStrSize);
-    cg.callMemCpy(newStrPtr, self->IRValue, selfSize);
+    cg.callMemCpy(newStrPtr, self, selfSize);
     const auto dstPtr = cg.builder.CreateInBoundsGEP(cg.i8Ty(), newStrPtr, selfSize);
-    cg.callMemCpy(dstPtr, other->IRValue, otherSize);
+    cg.callMemCpy(dstPtr, other, otherSize);
     return newStrPtr;
+}
+
+Value* LgsStr::eqIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    return eqIR(cg, self->loadIR(cg), other->IRValue);
+}
+
+Value* LgsStr::eqIR(LgsLLVMGen& cg, Value* self, Value* other) {
+    const auto rt = cg.callFunc("strcmp", cg.getFT(cg.i32Ty(), {cg.ptrTy(), cg.ptrTy()}), {self, other});
+    return cg.builder.CreateICmpEQ(rt, cg.i32(0));
+}
+
+Value* LgsStr::getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) {
+    const auto gep =  cg.builder.CreateGEP(cg.i8Ty(), iterable, {cg.i32Zero(), index});
+    return cg.builder.CreateLoad(cg.i8Ty(), gep);
 }
 
 LgsFunc* LgsStr::getLenFunc() {
@@ -153,8 +129,21 @@ LgsFunc* LgsStr::getIsNotEmptyFunc() {
     return isNotEmptyFunc;
 }
 
-Value* LgsStr::IRLength(LgsLLVMGen& cg, Value* iterable) {
+std::string LgsStr::strFormatPart() const {
+    return "%s";
+}
+
+uint16_t LgsStr::getUnpackCount() const {
+    return 1;
+}
+
+Value* LgsStr::lengthIR(LgsLLVMGen& cg, Value* iterable) {
     return getLenFunc()->callIR(cg, {iterable});
+}
+
+Value* LgsStr::inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) {
+    const auto rv = cg.callFunc("strstr", cg.getFT(cg.ptrTy(), {cg.ptrTy(), cg.ptrTy()}), {iterableExpr->IRValue, value->IRValue});
+    return cg.builder.CreateIsNotNull(rv);
 }
 
 bool LgsStr::canCastTo(LgsType* other) {
@@ -163,8 +152,4 @@ bool LgsStr::canCastTo(LgsType* other) {
         return iter->baseType && iter->baseType->asChar();
     }
     return name == other->getName();
-}
-
-Lgs_RTType LgsStr::getRTType() {
-    return RTT_STR;
 }

@@ -1,9 +1,20 @@
 #include "types/primitives/LgsFloat.h"
 #include "codegen/LgsLLVMGen.h"
-#include "exprs/LgsNull.h"
 #include "exprs/constants/LgsFloatConst.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsDouble.h"
+
+std::pair<Value*, Value*> loadOperands(LgsLLVMGen& cg, Value* self, Value* other) {
+    auto l = self;
+    auto r = other;
+    if (l->getType()->isIntegerTy()) {
+        l = cg.builder.CreateSIToFP(l, cg.floatTy());
+    }
+    if (r->getType()->isIntegerTy()) {
+        r = cg.builder.CreateSIToFP(r, cg.floatTy());
+    }
+    return {l, r};
+}
 
 json::value LgsFloat::asJSON() {
     assert(0);
@@ -53,49 +64,46 @@ LgsType* LgsFloat::applyOp(LgsType* other, const LgsOperator op) {
 }
 
 Value* LgsFloat::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    auto l = self->loadIR(cg);
-    auto r = other->loadIR(cg);
-    if (l->getType()->isIntegerTy()) {
-        l = cg.builder.CreateSIToFP(l, cg.floatTy());
-    }
-    if (r->getType()->isIntegerTy()) {
-        r = cg.builder.CreateSIToFP(r, cg.floatTy());
-    }
-    return cg.builder.CreateFAdd(l, r);
+    return addIR(cg, self->IRValue, other->IRValue);
 }
 
 Value* LgsFloat::subIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    auto l = self->loadIR(cg);
-    auto r = other->loadIR(cg);
-    if (l->getType()->isIntegerTy()) {
-        l = cg.builder.CreateSIToFP(l, cg.floatTy());
-    }
-    if (r->getType()->isIntegerTy()) {
-        r = cg.builder.CreateSIToFP(r, cg.floatTy());
-    }
-    return cg.builder.CreateFSub(l, r);
+    return subIR(cg, self->IRValue, other->IRValue);
 }
 
 Value* LgsFloat::mulIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    auto l = self->loadIR(cg);
-    auto r = other->loadIR(cg);
-    if (l->getType()->isIntegerTy()) {
-        l = cg.builder.CreateSIToFP(l, cg.floatTy());
-    }
-    if (r->getType()->isIntegerTy()) {
-        r = cg.builder.CreateSIToFP(r, cg.floatTy());
-    }
-    return cg.builder.CreateFMul(l, r);
+    return mulIR(cg, self->IRValue, other->IRValue);
 }
 
 Value* LgsFloat::divIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    auto l = self->loadIR(cg);
-    auto r = other->loadIR(cg);
-    if (l->getType()->isIntegerTy()) {
-        l = cg.builder.CreateSIToFP(l, cg.floatTy());
-    }
-    if (r->getType()->isIntegerTy()) {
-        r = cg.builder.CreateSIToFP(r, cg.floatTy());
-    }
+    return divIR(cg, self->IRValue, other->IRValue);
+}
+
+Value* LgsFloat::eqIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    return LgsType::eqIR(cg, self, other);
+}
+
+Value* LgsFloat::addIR(LgsLLVMGen& cg, Value* self, Value* other) {
+    const auto [l, r] = loadOperands(cg, self, other);
+    return cg.builder.CreateFAdd(l, r);
+}
+
+Value* LgsFloat::subIR(LgsLLVMGen& cg, Value* self, Value* other) {
+    const auto [l, r] = loadOperands(cg, self, other);
+    return cg.builder.CreateFSub(l, r);
+}
+
+Value* LgsFloat::mulIR(LgsLLVMGen& cg, Value* self, Value* other) {
+    const auto [l, r] = loadOperands(cg, self, other);
+    return cg.builder.CreateFMul(l, r);
+}
+
+Value* LgsFloat::divIR(LgsLLVMGen& cg, Value* self, Value* other) {
+    const auto [l, r] = loadOperands(cg, self, other);
     return cg.builder.CreateFDiv(l, r);
+}
+
+Value* LgsFloat::eqIR(LgsLLVMGen& cg, Value* self, Value* other) {
+    const auto [l, r] = loadOperands(cg, self, other);
+    return cg.builder.CreateFCmpOEQ(l, r);
 }

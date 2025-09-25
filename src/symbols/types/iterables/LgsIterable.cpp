@@ -81,6 +81,10 @@ LgsFunc* LgsIterable::getIsNotEmptyFunc() {
     return isNotEmptyFunc->second;
 }
 
+Value* LgsIterable::getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) {
+    assert(0);
+}
+
 LgsIterable::~LgsIterable() {
     if (sizeExpr) {
         freeExpr(sizeExpr);

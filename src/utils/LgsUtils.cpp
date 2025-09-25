@@ -86,12 +86,11 @@ void freeType(LgsType* type) {
     if (!type) return;
     if (type->isPrimitive) return;
     if (type->isUnknown()) return;
-    // delete type;
+    delete type;
 }
 
 void freeExpr(LgsExpr* expr) {
     if (!expr) return;
-    if (!expr->asVariable()) freeType(expr->type);
     expr->type = nullptr;
     delete expr;
 }

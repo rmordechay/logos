@@ -17,12 +17,6 @@ Value* LgsForLoop::loadIndex(LgsLLVMGen& cg) const {
     return cg.builder.CreateLoad(cg.sizeTy(), iPtr);
 }
 
-void LgsForLoop::incIndex(LgsLLVMGen* cg) {
-    iValue = loadIndex(*cg);
-    const auto inc = cg->builder.CreateAdd(iValue, cg->usize(1));
-    cg->builder.CreateStore(inc, iPtr);
-}
-
 void LgsForLoop::setBlocks(LgsLLVMGen& cg) {
     IRCondBlock = cg.createBlock(BLOCK_NAME_LOOP_COND);
     IRBodyBlock = cg.createBlock(BLOCK_NAME_LOOP_BODY);
@@ -31,7 +25,9 @@ void LgsForLoop::setBlocks(LgsLLVMGen& cg) {
 
 void LgsForLoop::incAndJumpToCond(LgsLLVMGen& cg) {
     if (cg.lastInstTerminator()) return;
-    incIndex(&cg);
+    iValue = loadIndex(cg);
+    const auto inc = cg.builder.CreateAdd(iValue, cg.usize(1));
+    cg.builder.CreateStore(inc, iPtr);
     cg.builder.CreateBr(IRCondBlock);
 }
 

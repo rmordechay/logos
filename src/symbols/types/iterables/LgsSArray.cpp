@@ -1,6 +1,9 @@
 #include "types/iterables/LgsSArray.h"
 #include "exprs/LgsArrayExpr.h"
+#include "exprs/LgsIterIndex.h"
+#include "types/LgsAny.h"
 #include "types/primitives/LgsInt.h"
+#include "types/primitives/LgsSize.h"
 
 Type* LgsSArray::getIRType(LgsLLVMGen& cg) {
     if (IRType) return IRType;
@@ -44,8 +47,43 @@ std::string LgsSArray::strFormatPart() const {
     return "%p";
 }
 
-Value* LgsSArray::IRLength(LgsLLVMGen& cg, Value* iterable) {
+LgsType* LgsSArray::applyOp(LgsType* other, LgsOperator op) {
+    const auto IRName = other->getName();
+    switch (op) {
+    case IN: {
+        if (other->canCastTo(baseType)) return baseType;
+        break;
+    }
+    default:
+        break;
+    }
+    return nullptr;
+}
+
+Value* LgsSArray::lengthIR(LgsLLVMGen& cg, Value* iterable) {
     return sizeExpr->IRValue;
+}
+
+Value* LgsSArray::inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) {
+    const auto resultPtr = cg.builder.CreateAlloca(cg.builder.getInt1Ty());
+    cg.builder.CreateStore(cg.false_(), resultPtr);
+    cg.loop(sizeExpr->loadIR(cg), [this, &cg, iterableExpr, value, resultPtr](Value* index, BasicBlock* exitBlock) {
+        const auto trueBlock = cg.createBlock();
+        const auto falseBlock = cg.createBlock();
+        const auto e = getIRElement(cg, iterableExpr->IRValue, index);
+        const auto eq = baseType->eqIR(cg, e, value->loadIR(cg));
+        cg.builder.CreateCondBr(eq, trueBlock, falseBlock);
+        cg.startBlock(trueBlock);
+        cg.builder.CreateStore(cg.true_(), resultPtr);
+        cg.builder.CreateBr(exitBlock);
+        cg.startBlock(falseBlock);
+    });
+    return cg.builder.CreateLoad(cg.builder.getInt1Ty(), resultPtr);
+}
+
+Value* LgsSArray::getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) {
+    const auto gep =  cg.builder.CreateGEP(getIRType(cg), iterable, {cg.i32Zero(), index});
+    return cg.builder.CreateLoad(baseType->getIRType(cg), gep);
 }
 
 bool LgsSArray::canCastTo(LgsType* other) {

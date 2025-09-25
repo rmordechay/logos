@@ -32,7 +32,7 @@ static std::string getTypeName(const Lgs_RTType type) {
 }
 
 static void freeType(void* ptr, const Lgs_RTType type) {
-    std::cout << "\tFreeing: " << ptr << std::endl;
+    //std::cout << "\tFreeing: " << ptr << std::endl;
     switch (type) {
     case RTT_OBJECT: {
         std::free(ptr);
@@ -70,17 +70,17 @@ void Lgs_stack::addDefer(void* funcPtr, void* ctx) {
 }
 
 void Lgs_stack::addOwner(void* ptr, const Lgs_RTType type) {
-    std::cout << "alloc owner " << getTypeName(type) << ": " << ptr << std::endl;
+    //std::cout << "alloc owner " << getTypeName(type) << ": " << ptr << std::endl;
     frames[stackIndex].owners.push_back(Lgs_alloc{.ptr = ptr, .type = type});
 }
 
 void Lgs_stack::addOrphan(void* ptr, const Lgs_RTType type) {
-    std::cout << "alloc orphan " << getTypeName(type) << ": " << ptr << std::endl;
+    //std::cout << "alloc orphan " << getTypeName(type) << ": " << ptr << std::endl;
     frames[stackIndex].orphans.push_back(Lgs_alloc{.ptr = ptr, .type = type});
 }
 
 void Lgs_stack::removeOwner(const void* owner) const {
-    std::cout << "removing owner: " << owner << std::endl;
+    //std::cout << "removing owner: " << owner << std::endl;
     auto stackFrame = frames[stackIndex];
     for (auto it = stackFrame.owners.begin(); it != stackFrame.owners.end(); ) {
         if (it->ptr == owner) {
@@ -96,7 +96,7 @@ void Lgs_stack::funcCleanup() const {
     auto stackFrame = frames[stackIndex];
     const auto ownersSize = stackFrame.owners.size();
     if (ownersSize > 0) {
-        std::cout << ownersSize << " owners:" << std::endl;
+        //std::cout << ownersSize << " owners:" << std::endl;
         for (const auto [ptr, type] : stackFrame.owners) {
             freeType(ptr, type);
         }
@@ -104,7 +104,7 @@ void Lgs_stack::funcCleanup() const {
     }
     const auto orphansSize = stackFrame.orphans.size();
     if (orphansSize > 0) {
-        std::cout << orphansSize << " orphans:" << std::endl;
+        //std::cout << orphansSize << " orphans:" << std::endl;
         for (const auto [ptr, type] : stackFrame.orphans) {
             freeType(ptr, type);
         }

@@ -26,6 +26,7 @@ public:
     std::map<std::string, Type*> typesRegistry;
 
     void setupModule(const LgsFile& file, bool debugMode = false);
+    void loop(Value* loopLength, const std::function<void(Value*, BasicBlock*)>& body);
     Value* getIRStr(const std::string& value);
     GlobalVariable* createGlobal(Type* type, ConstantAggregateZero* zeroInit, const std::string& name = "") const;
     GlobalVariable* createConstGlobal(Type* type, Constant* zeroInit, const std::string& name = "") const;
@@ -70,6 +71,8 @@ public:
 
     // Values
     Value* null();
+    ConstantInt* true_();
+    ConstantInt* false_();
     ConstantInt* i1(bool v);
     ConstantInt* i8(int8_t v);
     ConstantInt* i16(int16_t v);

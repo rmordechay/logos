@@ -34,7 +34,12 @@ void LgsExpr::assign(LgsLLVMGen& cg, LgsExpr* expr) {
     assert(0);
 }
 
-Value* LgsExpr::getIRPtrTo(LgsLLVMGen& cg) {
+Value* LgsExpr::getIRPtr(LgsLLVMGen& cg) const {
+    if (const auto gepInst = dyn_cast<GetElementPtrInst>(IRValue)) {
+        if (gepInst->getType()->isPointerTy()) {
+            return cg.builder.CreateLoad(gepInst->getResultElementType(), gepInst);
+        }
+    }
     if (IRValue->getType()->isPointerTy()) return IRValue;
     const auto ptr = cg.builder.CreateAlloca(IRValue->getType());
     cg.builder.CreateStore(IRValue, ptr);
@@ -87,7 +92,6 @@ LgsIterator LgsExpr::toIterator() {
 }
 
 void LgsExpr::setType(LgsType* newType) {
-    freeType(type);
     type = newType;
 }
 

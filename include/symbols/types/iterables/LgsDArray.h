@@ -1,6 +1,4 @@
 #pragma once
-#include "types/LgsAny.h"
-#include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsLong.h"
 #include "funcs/LgsFunc.h"
 #include "LgsIterable.h"
@@ -9,7 +7,6 @@ class LgsDArray final : public LgsIterable {
 public:
     static constexpr auto name = "DArray";
     StructType* arrStruct = nullptr;
-    LgsFunc* getFunc = new LgsFunc("get", &LGS_ANY, {this, &LGS_LONG}, BUILTIN | PUBLIC | METHOD);
 
     explicit LgsDArray(LgsType* baseType = nullptr) : LgsIterable(baseType) {
         addEmptyMethod(MAP_FUNC_NAME);
@@ -28,7 +25,10 @@ public:
     std::string strFormatPart() const override;
     StructType* getArrStruct(LgsLLVMGen& cg);
     LgsFunc* getAddFunc() override;
-    Value* IRLength(LgsLLVMGen& cg, Value* iterable) override;
+    LgsType* applyOp(LgsType* other, LgsOperator op) override;
+    Value* lengthIR(LgsLLVMGen& cg, Value* iterable) override;
+    Value* inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
+    Value* getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) override;
     bool canCastTo(LgsType* other) override;
     json::value asJSON() override;
 };

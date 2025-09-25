@@ -58,8 +58,17 @@ uint16_t LgsMap::getUnpackCount() const {
     return 2;
 }
 
-Value* LgsMap::IRLength(LgsLLVMGen& cg, Value* iterable) {
+Value* LgsMap::lengthIR(LgsLLVMGen& cg, Value* iterable) {
     return cg.i32(1024);
+}
+
+Value* LgsMap::inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) {
+    assert(0);
+}
+
+Value* LgsMap::getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) {
+    LgsFunc f("get", &LGS_ANY, {this, new LgsStr()}, PUBLIC | BUILTIN | METHOD);
+    return f.callIR(cg, {iterable, index});
 }
 
 StructType* LgsMap::getMapStruct(LgsLLVMGen& cg) {
@@ -81,6 +90,6 @@ std::string LgsMap::strFormatPart() const {
 }
 
 LgsMap::~LgsMap() {
-    delete getFunc;
-    getFunc = nullptr;
+    freeType(typePair);
+    typePair = nullptr;
 }

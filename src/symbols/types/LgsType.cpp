@@ -11,6 +11,7 @@
 #include "types/LgsUnknown.h"
 #include "types/LgsVoid.h"
 #include "types/iterables/LgsSArray.h"
+#include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsByte.h"
 #include "types/primitives/LgsChar.h"
 #include "types/primitives/LgsDouble.h"
@@ -281,14 +282,83 @@ Value* LgsType::rshiftIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsType::inIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    assert(0);
-}
-
 Value* LgsType::andIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     assert(0);
 }
 
 Value* LgsType::orIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    assert(0);
+}
+
+
+Value* LgsType::addIR(LgsLLVMGen& cg, Value* self, Value* other) {
+    assert(0);
+}
+
+Value* LgsType::subIR(LgsLLVMGen& cg, Value* self, Value* other) {
+    assert(0);
+}
+
+Value* LgsType::mulIR(LgsLLVMGen& cg, Value* self, Value* other) {
+    assert(0);
+}
+
+Value* LgsType::divIR(LgsLLVMGen& cg, Value* self, Value* other) {
+    assert(0);
+}
+
+Value* LgsType::modIR(LgsLLVMGen& cg, Value* self, Value* other) {
+    assert(0);
+}
+
+Value* LgsType::eqIR(LgsLLVMGen& cg, Value* self, Value* other) {
+    assert(0);
+}
+
+Value* LgsType::neIR(LgsLLVMGen& cg, Value* self, Value* other) {
+    assert(0);
+}
+
+Value* LgsType::ltIR(LgsLLVMGen& cg, Value* self, Value* other) {
+    assert(0);
+}
+
+Value* LgsType::gtIR(LgsLLVMGen& cg, Value* self, Value* other) {
+    assert(0);
+}
+
+Value* LgsType::geIR(LgsLLVMGen& cg, Value* self, Value* other) {
+    assert(0);
+}
+
+Value* LgsType::leIR(LgsLLVMGen& cg, Value* self, Value* other) {
+    assert(0);
+}
+
+Value* LgsType::bitAndIR(LgsLLVMGen& cg, Value* self, Value* other) {
+    assert(0);
+}
+
+Value* LgsType::bitOrIR(LgsLLVMGen& cg, Value* self, Value* other) {
+    assert(0);
+}
+
+Value* LgsType::bitXorIR(LgsLLVMGen& cg, Value* self, Value* other) {
+    assert(0);
+}
+
+Value* LgsType::lshiftIR(LgsLLVMGen& cg, Value* self, Value* other) {
+    assert(0);
+}
+
+Value* LgsType::rshiftIR(LgsLLVMGen& cg, Value* self, Value* other) {
+    assert(0);
+}
+
+Value* LgsType::andIR(LgsLLVMGen& cg, Value* self, Value* other) {
+    assert(0);
+}
+
+Value* LgsType::orIR(LgsLLVMGen& cg, Value* self, Value* other) {
     assert(0);
 }

@@ -154,6 +154,7 @@ bool LgsFuncType::hasDefaults() const {
 LgsFuncType::~LgsFuncType() {
     freeType(rt);
     for (int i = 0; i < params.size(); ++i) {
+        if (isMethod && i == 0) continue;
         const auto param = params[i];
         if (param.expr) {
             freeExpr(param.expr);

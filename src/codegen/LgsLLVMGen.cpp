@@ -24,6 +24,33 @@ void LgsLLVMGen::setupModule(const LgsFile& file, const bool debugMode) {
     }
 }
 
+void LgsLLVMGen::loop(Value* loopLength, const std::function<void(Value*, BasicBlock*)>& body) {
+    const auto condBlock = createBlock(BLOCK_NAME_LOOP_COND);
+    const auto bodyBlock = createBlock(BLOCK_NAME_LOOP_BODY);
+    const auto exitBlock = createBlock(BLOCK_NAME_LOOP_EXIT);
+    const auto iPtr = builder.CreateAlloca(sizeTy());
+    const auto loopStart = builder.CreateSExt(sizeZero(), sizeTy());
+    builder.CreateStore(loopStart, iPtr);
+    builder.CreateBr(condBlock);
+
+    // Condition
+    startBlock(condBlock);
+    auto iValue = builder.CreateLoad(sizeTy(), iPtr);
+    const auto loopEnd = builder.CreateSExt(loopLength, sizeTy());
+    const auto condition = builder.CreateICmpSLT(iValue, loopEnd);
+    builder.CreateCondBr(condition, bodyBlock, exitBlock);
+
+    // Body
+    startBlock(bodyBlock);
+    body(iValue, exitBlock);
+    if (lastInstTerminator()) return;
+    iValue = builder.CreateLoad(sizeTy(), iPtr);
+    const auto inc = builder.CreateAdd(iValue, usize(1));
+    builder.CreateStore(inc, iPtr);
+    builder.CreateBr(condBlock);
+    startBlock(exitBlock);
+}
+
 Value* LgsLLVMGen::getIRStr(const std::string& value) {
     for (auto& globals : IRModule->globals()) {
         if (!globals.hasInitializer()) continue;
@@ -116,7 +143,7 @@ Value* LgsLLVMGen::callStrLen(Value* str) {
 void LgsLLVMGen::callMemCpy(Value* dest, Value* src, Value* size) {
     const auto dataLayout = targetMachine->createDataLayout();
     const auto memCpy = Intrinsic::getDeclaration(IRModule, Intrinsic::memcpy, {ptrTy(), ptrTy(), sizeTy()});
-    builder.CreateCall(memCpy, {dest, src, size, builder.getFalse()});
+    builder.CreateCall(memCpy, {dest, src, size, false_()});
 }
 
 Value* LgsLLVMGen::callMalloc(const size_t size, const bool isOwner, const Lgs_RTType type) {
@@ -182,6 +209,14 @@ PointerType* LgsLLVMGen::ptrTy() {
 
 Value* LgsLLVMGen::null() {
     return ConstantPointerNull::get(ptrTy());
+}
+
+ConstantInt* LgsLLVMGen::true_() {
+    return builder.getTrue();
+}
+
+ConstantInt* LgsLLVMGen::false_() {
+    return builder.getFalse();
 }
 
 ConstantInt* LgsLLVMGen::i1(const bool v) {

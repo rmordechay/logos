@@ -117,7 +117,6 @@ public:
 
     void addHeapExpr(LgsExpr* expr);
     void validateExprType(const LgsExpr* expr, LgsType* type);
-    bool resolveForeachVars(const LgsForeachLoop* foreachLoop);
 
     void validateObjImplements(LgsObject* obj, const std::vector<LgsType*>& interfaces);
     void validateObjInterface(LgsObject* obj, LgsInterface* interface);

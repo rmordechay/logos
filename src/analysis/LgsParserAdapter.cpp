@@ -45,6 +45,7 @@
 #include "types/iterables/LgsMap.h"
 #include "types/LgsNullable.h"
 #include "types/LgsUnknown.h"
+#include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsByte.h"
 #include "types/primitives/LgsDouble.h"
 #include "types/primitives/LgsShort.h"
@@ -1058,7 +1059,7 @@ LgsIterIndex* LgsParserAdapter::getIterIndex(LogosParser::IterIndexContext* ctx)
         const auto indexExprFrom = indexExpr->from;
         const auto iterIndexFrom = getExpr(indexExprFrom);
         const auto iterIndexTo = getExpr(indexExpr->to);
-        const auto newIterIndex = new LgsIterIndex(baseExpr, LgsIndex{.from = iterIndexFrom, .to = iterIndexTo});
+        const auto newIterIndex = new LgsIterIndex(baseExpr, iterIndexFrom,  iterIndexTo);
         setLocation(newIterIndex->location, ctx->start, ctx->stop);
         baseExpr = newIterIndex;
     }

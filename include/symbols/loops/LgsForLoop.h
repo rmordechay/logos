@@ -35,7 +35,6 @@ public:
     virtual void incAndJumpToCond(LgsLLVMGen& cg);
     virtual Value* loopStart(LgsLLVMGen& cg) = 0;
     virtual Value* loopEnd(LgsLLVMGen& cg) = 0;
-    void incIndex(LgsLLVMGen* cg);
     Value* loadIndex(LgsLLVMGen& cg) const;
     json::value asJSON() override;
 

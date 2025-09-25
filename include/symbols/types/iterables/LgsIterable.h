@@ -37,6 +37,8 @@ public:
     virtual LgsType* getIndexType() = 0;
     virtual Value* loadWithIndex(LgsLLVMGen* cg);
     virtual uint16_t getUnpackCount() const = 0;
-    virtual Value* IRLength(LgsLLVMGen& cg, Value* iterable) = 0;
+    virtual Value* lengthIR(LgsLLVMGen& cg, Value* iterable) = 0;
+    virtual Value* inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) = 0;
+    virtual Value* getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index);
     ~LgsIterable() override;
 };

@@ -1,0 +1,23 @@
+main() {
+    a = ["roi", "adi"]!
+    b = ["roi", "adi"]
+    c = vec2(1, 2)
+    c.x := 2.0
+    d = "roi"
+    print(a[0])
+    print(b[0])
+    print(c[0])
+    print(d[0])
+    if "roi" in a {
+        print("roi in a")
+    }
+    if "roi" in b {
+        print("roi in b")
+    }
+    if 1 in c {
+        print("1 in c")
+    }
+    if "r" in d {
+        print("r in d")
+    }
+}

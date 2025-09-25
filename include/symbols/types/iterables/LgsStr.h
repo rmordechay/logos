@@ -19,11 +19,16 @@ public:
     LgsType* getIndexType() override;
     LgsType* applyOp(LgsType* other, LgsOperator op) override;
     Value* addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
+    Value* addIR(LgsLLVMGen& cg, Value* self, Value* other) override;
+    Value* eqIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
+    Value* eqIR(LgsLLVMGen& cg, Value* self, Value* other) override;
+    Value* getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) override;
     LgsFunc* getLenFunc() override;
     LgsFunc* getIsEmptyFunc() override;
     LgsFunc* getIsNotEmptyFunc() override;
     std::string strFormatPart() const override;
     uint16_t getUnpackCount() const override;
-    Value* IRLength(LgsLLVMGen& cg, Value* iterable) override;
+    Value* lengthIR(LgsLLVMGen& cg, Value* iterable) override;
+    Value* inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
     bool canCastTo(LgsType* other) override;
 };

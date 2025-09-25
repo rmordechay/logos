@@ -408,7 +408,25 @@ void LgsSema::visitForeachLoop(const LgsForeachLoop* foreachLoop) {
         }
         return;
     }
-    if (!resolveForeachVars(foreachLoop)) return;
+
+    const auto varDecSize = foreachLoop->loopVars.size();
+    const auto unpackCount = iterable->getUnpackCount();
+    if (unpackCount != varDecSize) {
+        errHandler.addError(E10041, &foreachLoop->iterExpr->location, {foreachLoop->iterExpr->pname(), std::to_string(unpackCount), std::to_string(unpackCount + 1), std::to_string(varDecSize)});
+        return;
+    }
+
+    if (const auto pair = iterable->baseType->asPair()) {
+        foreachLoop->loopVars[0]->type = pair->key;
+        foreachLoop->loopVars[1]->type = pair->value;
+    } else {
+        const auto iterIndex = new LgsIterIndex(foreachLoop->iterExpr, LGS_SIZE.getZeroValue());
+        iterIndex->location = foreachLoop->iterExpr->location;
+        visitIterIndex(iterIndex);
+        foreachLoop->loopVars[0]->expr = iterIndex;
+        foreachLoop->loopVars[0]->type = foreachLoop->loopVars[0]->expr->type;
+    }
+
     for (const auto varDec : foreachLoop->loopVars) {
         addLocalSymbol(LgsSymbol(varDec));
     }
@@ -513,39 +531,14 @@ void LgsSema::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
     visitExpr(r);
     const auto ltype = l->type;
     const auto rtype = r->type;
-    const auto binaryType = ltype->applyOp(rtype, binaryExpr->op);
-    if (!binaryType) {
-        return errHandler.addError(E10076, &l->location, {getOpAsText(binaryExpr->op), ltype->pname(), rtype->pname()});
-    }
     LgsType* type = nullptr;
-    switch (binaryExpr->op) {
-    case ADD:
-    case SUB:
-    case MUL:
-    case DIV:
-    case MOD:
-    case BIT_AND:
-    case BIT_OR:
-    case BIT_XOR:
-    case LSHIFT:
-    case RSHIFT: {
-        type = binaryType;
-        break;
+    if (binaryExpr->op == IN) {
+        type = rtype->applyOp(ltype, binaryExpr->op);
+    } else {
+        type = ltype->applyOp(rtype, binaryExpr->op);
     }
-    case AND:
-    case OR:
-    case NE:
-    case EQ:
-    case LT:
-    case GT:
-    case GE:
-    case LE:
-    case IN: {
-        type = &LGS_BOOL;
-        break;
-    }
-    case NOOP:
-        break;
+    if (!type) {
+        return errHandler.addError(E10076, &l->location, {getOpAsText(binaryExpr->op), ltype->pname(), rtype->pname()});
     }
     binaryExpr->setType(type);
 }
@@ -1053,27 +1046,6 @@ void LgsSema::addHeapExpr(LgsExpr* expr) {
     } else {
         currentFunc->orphans.push_back(expr);
     }
-}
-
-bool LgsSema::resolveForeachVars(const LgsForeachLoop* foreachLoop) {
-    const auto iterable = foreachLoop->iterExpr->type->asIterable();
-    const auto varDecSize = foreachLoop->loopVars.size();
-    const auto unpackCount = iterable->getUnpackCount();
-    if (unpackCount != varDecSize) {
-        errHandler.addError(E10041, &foreachLoop->iterExpr->location, {foreachLoop->iterExpr->pname(), std::to_string(unpackCount), std::to_string(unpackCount + 1), std::to_string(varDecSize)});
-        return false;
-    }
-    if (const auto pair = iterable->baseType->asPair()) {
-        foreachLoop->loopVars[0]->type = pair->key;
-        foreachLoop->loopVars[1]->type = pair->value;
-    } else {
-        const auto iterIndex = new LgsIterIndex(foreachLoop->iterExpr, LgsIndex{.from = LGS_SIZE.getZeroValue()});
-        iterIndex->location = foreachLoop->iterExpr->location;
-        visitIterIndex(iterIndex);
-        foreachLoop->loopVars[0]->expr = iterIndex;
-        foreachLoop->loopVars[0]->type = foreachLoop->loopVars[0]->expr->type;
-    }
-    return true;
 }
 
 void LgsSema::validateObjImplements(LgsObject* obj, const std::vector<LgsType*>& interfaces) {

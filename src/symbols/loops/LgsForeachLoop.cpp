@@ -6,7 +6,7 @@ Value* LgsForeachLoop::loopStart(LgsLLVMGen& cg) {
 }
 
 Value* LgsForeachLoop::loopEnd(LgsLLVMGen& cg) {
-    return iterExpr->type->asIterable()->IRLength(cg, iterExpr->IRValue);
+    return iterExpr->type->asIterable()->lengthIR(cg, iterExpr->IRValue);
 }
 
 LgsForeachLoop::~LgsForeachLoop() {

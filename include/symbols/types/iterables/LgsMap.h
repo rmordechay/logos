@@ -10,7 +10,6 @@ public:
     static constexpr auto name = "Map";
     StructType* mapStruct = nullptr;
     LgsTypePair* typePair = nullptr;
-    LgsFunc* getFunc = new LgsFunc("get", &LGS_ANY, {this, new LgsStr()}, PUBLIC | BUILTIN | METHOD);
 
     explicit LgsMap(LgsType* keyType = nullptr, LgsType* valueType = nullptr) {
         typePair = new LgsTypePair(keyType, valueType);
@@ -27,7 +26,9 @@ public:
     Lgs_RTType getRTType() override;
     LgsType* getIndexType() override;
     uint16_t getUnpackCount() const override;
-    Value* IRLength(LgsLLVMGen& cg, Value* iterable) override;
+    Value* lengthIR(LgsLLVMGen& cg, Value* iterable) override;
+    Value* inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
+    Value* getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) override;
     StructType* getMapStruct(LgsLLVMGen& cg);
     bool canCastTo(LgsType* other) override;
     std::string strFormatPart() const override;

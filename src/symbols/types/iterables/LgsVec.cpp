@@ -1,5 +1,8 @@
 #include "types/iterables/LgsVec.h"
+
+#include "exprs/LgsIterIndex.h"
 #include "exprs/LgsVectorExpr.h"
+#include "types/primitives/LgsSize.h"
 
 Type* LgsVec::getIRType(LgsLLVMGen& cg) {
     IRType = FixedVectorType::get(baseType->getIRType(cg), dim);
@@ -50,10 +53,6 @@ uint16_t LgsVec::getUnpackCount() const {
     return 1;
 }
 
-Value* LgsVec::IRLength(LgsLLVMGen& cg, Value* iterable) {
-    return cg.usize(2);
-}
-
 bool LgsVec::canCastTo(LgsType* other) {
     if (other->getName() == LgsAny::name) return true;
     const auto otherVec = other->asVec();
@@ -65,13 +64,19 @@ LgsType* LgsVec::applyOp(LgsType* other, const LgsOperator op) {
     const auto IRName = other->getName();
     switch (op) {
     case ADD:
-    case SUB:
+    case SUB: {
         if (getName() == IRName) return this;
         break;
+    }
     case MUL:
-    case DIV:
+    case DIV: {
         if (getName() == IRName || other->isNumber()) return this;
         break;
+    }
+    case IN: {
+        if (other->canCastTo(baseType)) return baseType;
+        break;
+    }
     default:
         break;
     }
@@ -79,40 +84,92 @@ LgsType* LgsVec::applyOp(LgsType* other, const LgsOperator op) {
 }
 
 Value* LgsVec::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    const auto loadRight = other->loadIR(cg);
-    if (other->type->isInt) {
-        return cg.builder.CreateAdd(self->loadIR(cg), loadRight);
-    }
-    return cg.builder.CreateFAdd(self->loadIR(cg), loadRight);
+    return addIR(cg, self->loadIR(cg), other->loadIR(cg));
 }
 
 Value* LgsVec::subIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    const auto loadRight = other->loadIR(cg);
-    if (other->type->isInt) {
-        return cg.builder.CreateSub(self->loadIR(cg), loadRight);
-    }
-    return cg.builder.CreateFSub(self->loadIR(cg), loadRight);
+    return subIR(cg, self->loadIR(cg), other->loadIR(cg));
 }
 
 Value* LgsVec::mulIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    auto loadOther = other->loadIR(cg);
-    const auto loadSelf = self->loadIR(cg);
-    if (other->type->isInt) {
-        const auto vecTy = cast<VectorType>(self->type->getIRType(cg));
-        loadOther = cg.builder.CreateSIToFP(loadOther, vecTy->getElementType());
-        loadOther = cg.builder.CreateVectorSplat(vecTy->getElementCount(), loadOther);
-        return cg.builder.CreateFMul(loadSelf, loadOther);
-    }
-    if (other->type->asFloat()) {
-        const auto vecTy = cast<VectorType>(self->type->getIRType(cg));
-        loadOther = cg.builder.CreateVectorSplat(vecTy->getElementCount(), loadOther);
-        return cg.builder.CreateFMul(loadSelf, loadOther);
-    }
-    return cg.builder.CreateFMul(loadSelf, loadOther);
+    return mulIR(cg, self->loadIR(cg), other->loadIR(cg));
 }
 
 Value* LgsVec::divIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    assert(0);
+    return divIR(cg, self->loadIR(cg), other->loadIR(cg));
+}
+
+Value* LgsVec::addIR(LgsLLVMGen& cg, Value* self, Value* other) {
+    if (other->getType()->isIntegerTy()) {
+        return cg.builder.CreateAdd(self, other);
+    }
+    return cg.builder.CreateFAdd(self, other);
+}
+
+Value* LgsVec::subIR(LgsLLVMGen& cg, Value* self, Value* other) {
+    if (other->getType()->isIntegerTy()) {
+        return cg.builder.CreateSub(self, other);
+    }
+    return cg.builder.CreateFSub(self, other);
+}
+
+Value* LgsVec::mulIR(LgsLLVMGen& cg, Value* self, Value* other) {
+    auto loadOther = other;
+    if (other->getType()->isIntegerTy()) {
+        const auto vecTy = cast<VectorType>(self->getType());
+        loadOther = cg.builder.CreateSIToFP(loadOther, vecTy->getElementType());
+        loadOther = cg.builder.CreateVectorSplat(vecTy->getElementCount(), loadOther);
+        return cg.builder.CreateFMul(self, loadOther);
+    }
+    if (other->getType()->isFloatingPointTy()) {
+        const auto vecTy = cast<VectorType>(self->getType());
+        loadOther = cg.builder.CreateVectorSplat(vecTy->getElementCount(), loadOther);
+        return cg.builder.CreateFMul(self, loadOther);
+    }
+    return cg.builder.CreateFMul(self, loadOther);
+}
+
+Value* LgsVec::divIR(LgsLLVMGen& cg, Value* self, Value* other) {
+    auto loadOther = other;
+    if (other->getType()->isIntegerTy()) {
+        const auto vecTy = cast<VectorType>(self->getType());
+        loadOther = cg.builder.CreateSIToFP(loadOther, vecTy->getElementType());
+        loadOther = cg.builder.CreateVectorSplat(vecTy->getElementCount(), loadOther);
+        return cg.builder.CreateFDiv(self, loadOther);
+    }
+    if (other->getType()->isFloatingPointTy()) {
+        const auto vecTy = cast<VectorType>(self->getType());
+        loadOther = cg.builder.CreateVectorSplat(vecTy->getElementCount(), loadOther);
+        return cg.builder.CreateFDiv(self, loadOther);
+    }
+    return cg.builder.CreateFDiv(self, loadOther);
+}
+
+Value* LgsVec::inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) {
+    const auto resultPtr = cg.builder.CreateAlloca(cg.builder.getInt1Ty());
+    cg.builder.CreateStore(cg.false_(), resultPtr);
+    auto* vecLength = cg.builder.getInt64(dim);
+    cg.loop(vecLength, [this, &cg, iterableExpr, value, resultPtr](Value* index, BasicBlock* exitBlock) {
+        const auto trueBlock = cg.createBlock();
+        const auto falseBlock = cg.createBlock();
+        const auto e = getIRElement(cg, iterableExpr->IRValue, index);
+        const auto eq = baseType->eqIR(cg, e, value->loadIR(cg));
+        cg.builder.CreateCondBr(eq, trueBlock, falseBlock);
+        cg.startBlock(trueBlock);
+        cg.builder.CreateStore(cg.true_(), resultPtr);
+        cg.builder.CreateBr(exitBlock);
+        cg.startBlock(falseBlock);
+    });
+    return cg.builder.CreateLoad(cg.builder.getInt1Ty(), resultPtr);
+}
+
+Value* LgsVec::lengthIR(LgsLLVMGen& cg, Value* iterable) {
+    return cg.usize(2);
+}
+
+Value* LgsVec::getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) {
+    const auto gep = cg.builder.CreateGEP(getIRType(cg), iterable, {cg.i32Zero(), index});
+    return cg.builder.CreateLoad(baseType->getIRType(cg), gep);
 }
 
 int8_t LgsVec::getSwizzleSet(const char c) {

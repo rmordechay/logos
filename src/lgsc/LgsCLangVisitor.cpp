@@ -11,6 +11,7 @@
 #include "types/primitives/LgsShort.h"
 #include "types/primitives/LgsUInt.h"
 #include "types/LgsVoid.h"
+#include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsChar.h"
 
 void LgsCLangVisitor::HandleTranslationUnit(clang::ASTContext& clangContext){
