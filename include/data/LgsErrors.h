@@ -106,3 +106,4 @@ inline LgsBaseError E10081{.msg = "Range-start type '%s' is not equal to the ran
 inline LgsBaseError E10082{.msg = "Loop range '%s' must be a number. Given: '%s'.", .code = errCodeStart++};
 inline LgsBaseError E10083{.msg = "Method '%s' is an object method but was called as a class method.", .code = errCodeStart++};
 inline LgsBaseError E10084{.msg = "'%s' does not belong to an IO pair.", .code = errCodeStart++};
+inline LgsBaseError E10085{.msg = "Parsing error.", .code = errCodeStart++};

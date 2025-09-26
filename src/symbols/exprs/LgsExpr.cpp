@@ -48,7 +48,7 @@ Value* LgsExpr::getIRPtr(LgsLLVMGen& cg) const {
 }
 
 void LgsExpr::freeOwner(LgsLLVMGen& cg) {
-    if (owner && type->isHeapAlloc) {
+    if (type->isHeapAlloc && owner) {
         cg.callLgsFunc("stack_removeOwner", cg.getFT(cg.voidTy(), {cg.ptrTy()}), {owner->IRValue});
         owner = nullptr;
     }

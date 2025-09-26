@@ -2,7 +2,7 @@
 #include "Lgs_darray.h"
 #include "utils/LgsUtils.h"
 
-#define PRINT_MEMORY false
+#define PRINT_MEMORY true
 
 static std::string getTypeName(const Lgs_RTType type) {
     switch (type) {

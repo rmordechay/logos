@@ -910,7 +910,6 @@ void LgsSema::visitInstance(LgsInstance* instance) {
         if (!validateFieldVisibility(field, instance->obj)) continue;
         visitExpr(arg->expr);
         validateExprType(arg->expr, field->type);
-        field->expr = arg->expr;
         if (field->isOwner && field->type->isHeapAlloc) {
             field->expr->owner = field;
         }

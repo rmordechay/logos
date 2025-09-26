@@ -1284,6 +1284,7 @@ void LgsParserAdapter::extractStrParts(LgsStrConst& strConst) {
             antlr4::CommonTokenStream tokens(&lexer);
             LogosParser parser(&tokens);
             const auto expr = getExpr(parser.expr());
+            if (!expr) return errHandler.addError(E10085, &strConst.location);
             strConst.templateParts.push_back(expr);
         }
         replaced.replace(open, close - open + 1, LGS_STR_FMT_PLACEHOLDER);
