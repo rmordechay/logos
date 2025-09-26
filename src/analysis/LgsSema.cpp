@@ -252,7 +252,7 @@ void LgsSema::visitVarDec(LgsVarDec* varDec) {
             varDec->expr->owner = varDec;
         }
     }
-    if (!varDec->type->isHeapAlloc && varDec->isOwner) {
+    if (varDec->type && !varDec->type->isHeapAlloc && varDec->isOwner) {
         errHandler.addWarning(W10001, &varDec->location, {varDec->type->getName()});
         varDec->isOwner = false;
     }
@@ -624,6 +624,7 @@ void LgsSema::visitVectorExpr(const LgsVectorExpr* vectorExpr) {
             sumDim += otherVec->dim;
         } else {
             errHandler.addError(E10073, &vectorExpr->location, {arg->type->pname()});
+            break;
         }
     }
     if (sumDim > vectorExpr->vecType->dim) {
@@ -663,6 +664,15 @@ void LgsSema::visitVariable(LgsVariable* variable) {
     case OBJECT: {
         variable->ref.object = symbol->object;
         variable->setType(symbol->object);
+        break;
+    }
+    case FIELD: {
+        variable->ref.field = symbol->field;
+        variable->setType(symbol->field->type);
+        variable->isMutable = !symbol->field->isConst;
+        if (symbol->field->isOwner) {
+            variable->owner = symbol->field;
+        }
         break;
     }
     default:
@@ -1090,7 +1100,7 @@ void LgsSema::validateExprType(const LgsExpr* expr, LgsType* type) {
         }
         return;
     }
-    if (type && expr->type && !type->canCastTo(expr->type)) {
+    if (type && !type->isUnknown() && expr->type && !type->canCastTo(expr->type)) {
         errHandler.addError(E10001, &expr->location, {type->pname(), expr->type->pname()});
     }
 }

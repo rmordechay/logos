@@ -711,7 +711,7 @@ void LgsCodeGen::visitHashMap(LgsHashMap* hashMap) {
     for (const auto element : hashMap->initialElements) {
         visitExpr(element->key);
         visitExpr(element->value);
-        map->getAddFunc()->call(cg, {hashMap, element->key, element->value});
+        map->getAddFunc()->callIR(cg, {hashMap->IRValue, element->key->IRValue, element->value->IRValue});
     }
 }
 
@@ -779,10 +779,11 @@ void LgsCodeGen::visitSelection(LgsSelection* selection) {
             field->parentIRValue = parent->IRValue;
             field->parentIRType = parent->type->getIRType(cg);
             visitField(field);
-            if (i == selection->exprs.size() - 2) {
-                child->IRValue = field->IRValue;
-            } else {
+            const auto gep = dyn_cast<GetElementPtrInst>(field->IRValue);
+            if (gep->getResultElementType()->isPointerTy()) {
                 child->IRValue = field->loadIR(cg);
+            } else {
+                child->IRValue = field->IRValue;
             }
         } else if (const auto methodCall = child->asFuncCall()) {
             const bool isTest = stack.currentFunc()->isTest && parent->type->getName() == LgsTest::name && methodCall->name == "mock";
@@ -1227,7 +1228,7 @@ Value* LgsCodeGen::createDynamicArray(LgsArrayExpr* arrayExpr) {
     for (int i = 0; i < arrayExpr->initialElements.size(); ++i) {
         const auto element = arrayExpr->initialElements[i];
         visitExpr(element);
-        arr->getAddFunc()->call(cg, {arrayExpr, element});
+        arr->getAddFunc()->callIR(cg, {arrayExpr->IRValue, cg.getPtr(element->IRValue)});
     }
     return getIRValue(arrayExpr);
 }
@@ -1257,8 +1258,6 @@ Value* LgsCodeGen::getIRValue(LgsValue* value) {
         visitStmt(stmt);
     } else if (const auto param = dynamic_cast<LgsParam*>(value)) {
         visitParam(param);
-    } else if (const auto field = dynamic_cast<LgsField*>(value)) {
-        visitField(field);
     } else {
         assert(0);
     }

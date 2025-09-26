@@ -38,7 +38,7 @@ Value* LgsIterable::loadWithIndex(LgsLLVMGen* cg) {
 }
 
 LgsFunc* LgsIterable::getAddFunc() {
-    assert(0);
+    return nullptr;
 }
 
 LgsFunc* LgsIterable::getMapFunc() {

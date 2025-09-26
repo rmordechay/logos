@@ -7,6 +7,7 @@ public:
 
     LgsFloat() {
         isPrimitive = true;
+        isFloat = true;
     }
     Type* getIRType(LgsLLVMGen& cg) override;
     std::string getName() override;

@@ -37,9 +37,9 @@ void LgsExpr::assign(LgsLLVMGen& cg, LgsExpr* expr) {
 Value* LgsExpr::getIRPtr(LgsLLVMGen& cg) const {
     if (const auto gepInst = dyn_cast<GetElementPtrInst>(IRValue)) {
         if (gepInst->getResultElementType()->isPointerTy()) {
-            return cg.builder.CreateLoad(gepInst->getResultElementType(), gepInst);
+            return cg.builder.CreateLoad(cg.ptrTy(), gepInst);
         }
-        return gepInst;
+        return IRValue;
     }
     if (IRValue->getType()->isPointerTy()) return IRValue;
     const auto ptr = cg.builder.CreateAlloca(IRValue->getType());

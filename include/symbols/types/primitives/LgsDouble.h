@@ -6,8 +6,9 @@ public:
     static constexpr auto name = "Double";
     LgsDouble() {
         isPrimitive = true;
+        isFloat = true;
     }
-    llvm::Type* getIRType(LgsLLVMGen& cg) override;
+    Type* getIRType(LgsLLVMGen& cg) override;
     std::string getName() override;
     std::string pname() override;
     json::value asJSON() override;

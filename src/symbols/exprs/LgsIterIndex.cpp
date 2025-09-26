@@ -125,7 +125,7 @@ void LgsIterIndex::assignScalar(LgsLLVMGen& cg, LgsExpr* expr) {
         return;
     }
     if (const auto map = baseExpr->type->asMap()) {
-        map->getAddFunc()->call(cg, {baseExpr, index.from, expr});
+        map->getAddFunc()->callIR(cg, {baseExpr->IRValue, index.from->IRValue, expr->IRValue});
     } else {
         cg.builder.CreateStore(rIRValue, IRValue);
     }
