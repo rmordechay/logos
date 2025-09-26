@@ -60,9 +60,6 @@ std::string LgsFuncType::pname() {
     str << name << '(';
     for (size_t i = isMethod; i < params.size(); ++i) {
         const auto param = params[i];
-        if (param.isOwner) {
-            str << "owner ";
-        }
         if (param.type) {
             str << param.type->pname();
         } else if (param.name != ""){

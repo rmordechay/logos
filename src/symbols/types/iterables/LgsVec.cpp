@@ -83,22 +83,6 @@ LgsType* LgsVec::applyOp(LgsType* other, const LgsOperator op) {
     return nullptr;
 }
 
-Value* LgsVec::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    return addIR(cg, self->loadIR(cg), other->loadIR(cg));
-}
-
-Value* LgsVec::subIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    return subIR(cg, self->loadIR(cg), other->loadIR(cg));
-}
-
-Value* LgsVec::mulIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    return mulIR(cg, self->loadIR(cg), other->loadIR(cg));
-}
-
-Value* LgsVec::divIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    return divIR(cg, self->loadIR(cg), other->loadIR(cg));
-}
-
 Value* LgsVec::addIR(LgsLLVMGen& cg, Value* self, Value* other) {
     if (other->getType()->isIntegerTy()) {
         return cg.builder.CreateAdd(self, other);

@@ -470,7 +470,7 @@ void LgsSema::visitReturnStmt(LgsReturn* returnStmt) {
 void LgsSema::visitIOStmt(const LgsIOStmt* ioStmt) {
     visitVarDec(ioStmt->varDec);
     const auto expr = ioStmt->varDec->expr;
-    const auto funcCall = expr->asFuncCall() ? expr->asFuncCall() : expr->asSelection()->lastExpr()->asFuncCall();
+    const auto funcCall = expr->asFuncCall() ? expr->asFuncCall() : expr->asSelection()->asMethodCall();
     if (!funcCall->func->funcType->isInIOPair) {
         errHandler.addError(E10084, &funcCall->location, {funcCall->pname()});
     }
@@ -648,9 +648,6 @@ void LgsSema::visitVariable(LgsVariable* variable) {
     case PARAM: {
         variable->ref.param = symbol->param;
         variable->setType(symbol->param->type);
-        if (symbol->param->isOwner) {
-            variable->owner = symbol->param;
-        }
         break;
     }
     case ENUM: {

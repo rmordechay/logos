@@ -18,9 +18,7 @@ public:
     Lgs_RTType getRTType() override;
     LgsType* getIndexType() override;
     LgsType* applyOp(LgsType* other, LgsOperator op) override;
-    Value* addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
     Value* addIR(LgsLLVMGen& cg, Value* self, Value* other) override;
-    Value* eqIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
     Value* eqIR(LgsLLVMGen& cg, Value* self, Value* other) override;
     Value* getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) override;
     LgsFunc* getLenFunc() override;

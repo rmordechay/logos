@@ -63,26 +63,6 @@ LgsType* LgsFloat::applyOp(LgsType* other, const LgsOperator op) {
     return nullptr;
 }
 
-Value* LgsFloat::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    return addIR(cg, self->IRValue, other->IRValue);
-}
-
-Value* LgsFloat::subIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    return subIR(cg, self->IRValue, other->IRValue);
-}
-
-Value* LgsFloat::mulIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    return mulIR(cg, self->IRValue, other->IRValue);
-}
-
-Value* LgsFloat::divIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    return divIR(cg, self->IRValue, other->IRValue);
-}
-
-Value* LgsFloat::eqIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    return LgsType::eqIR(cg, self, other);
-}
-
 Value* LgsFloat::addIR(LgsLLVMGen& cg, Value* self, Value* other) {
     const auto [l, r] = loadOperands(cg, self, other);
     return cg.builder.CreateFAdd(l, r);

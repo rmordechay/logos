@@ -117,7 +117,7 @@ method:
     ;
 
 param:
-        OWNER? IDENTIFIER COLON type TRIPLE_DOT? (EQUAL expr)?
+        IDENTIFIER COLON type TRIPLE_DOT? (EQUAL expr)?
     ;
 
 statement:

@@ -14,7 +14,6 @@ class LgsFunc;
 
 class LgsValue {
 public:
-    bool isOwner = false;
     llvm::Value* IRValue = nullptr;
     LgsLocation location{0, 0, 0};
 

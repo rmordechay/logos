@@ -628,7 +628,6 @@ public:
     antlr4::tree::TerminalNode *IDENTIFIER();
     antlr4::tree::TerminalNode *COLON();
     TypeContext *type();
-    antlr4::tree::TerminalNode *OWNER();
     antlr4::tree::TerminalNode *TRIPLE_DOT();
     antlr4::tree::TerminalNode *EQUAL();
     ExprContext *expr();

@@ -476,7 +476,6 @@ LgsParam LgsParserAdapter::getParam(LgsFuncType* funcType, LogosParser::ParamCon
     const auto expr = getExpr(ctx->expr());
     auto lgsParam = LgsParam(getType(ctx->type()), variableName, expr);
     setLocation(lgsParam.location, ctx->start, ctx->stop);
-    lgsParam.isOwner = !!ctx->OWNER();
     if (ctx->TRIPLE_DOT()) {
         lgsParam.isVariadic = true;
         funcType->isVariadic = true;
@@ -497,7 +496,7 @@ LgsStmt* LgsParserAdapter::getDeferStmt(LogosParser::DeferStmtContext* ctx) {
         deferStmt->funcCall->isDeferred = true;
     } else if (const auto selection = ctx->selection()) {
         deferStmt->selection = getSelection(selection);
-        const auto methodCall = deferStmt->selection->lastExpr()->asFuncCall();
+        const auto methodCall = deferStmt->selection->asMethodCall();
         if (!methodCall) {
             errHandler.addError(E10021, &deferStmt->selection->location);
         } else {
@@ -654,7 +653,7 @@ LgsCoroutine* LgsParserAdapter::getCoroutine(LogosParser::CoroutineContext* ctx)
         coroutine->funcCall->isCoroutine = true;
     } else if (const auto selection = ctx->selection()) {
         const auto lgsSelection = getSelection(selection);
-        const auto methodCall = lgsSelection->lastExpr()->asFuncCall();
+        const auto methodCall = lgsSelection->asMethodCall();
         if (!methodCall) {
             errHandler.addError(E10021, &lgsSelection->location);
         } else {

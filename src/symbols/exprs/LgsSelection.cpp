@@ -10,12 +10,11 @@ Value* LgsSelection::loadIR(LgsLLVMGen& cg) {
 }
 
 LgsExpr* LgsSelection::lastExpr() const {
-    assert(exprs.size() > 1);
     return exprs[exprs.size() - 1];
 }
 
-LgsExpr* LgsSelection::lastExprParent() const {
-    return exprs[exprs.size() - 2];
+LgsFuncCall* LgsSelection::asMethodCall() const {
+    return lastExpr()->asFuncCall();
 }
 
 void LgsSelection::assign(LgsLLVMGen& cg, LgsExpr* expr) {
@@ -44,8 +43,7 @@ std::string LgsSelection::pname() {
 }
 
 Value* LgsSelection::hash(LgsLLVMGen& cg) {
-    const auto lgsExpr = lastExpr();
-    return lgsExpr->hash(cg);
+    assert(0);
 }
 
 bool LgsSelection::equals(LgsExpr* other) {

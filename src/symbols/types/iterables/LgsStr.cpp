@@ -67,10 +67,6 @@ LgsType* LgsStr::applyOp(LgsType* other, const LgsOperator op) {
     return nullptr;
 }
 
-Value* LgsStr::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    return addIR(cg, self->IRValue, other->IRValue);
-}
-
 Value* LgsStr::addIR(LgsLLVMGen& cg, Value* self, Value* other) {
     const auto selfSize = lengthIR(cg, self);
     const auto otherSize = lengthIR(cg, other);
@@ -81,10 +77,6 @@ Value* LgsStr::addIR(LgsLLVMGen& cg, Value* self, Value* other) {
     const auto dstPtr = cg.builder.CreateInBoundsGEP(cg.i8Ty(), newStrPtr, selfSize);
     cg.callMemCpy(dstPtr, other, otherSize);
     return newStrPtr;
-}
-
-Value* LgsStr::eqIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    return eqIR(cg, self->loadIR(cg), other->IRValue);
 }
 
 Value* LgsStr::eqIR(LgsLLVMGen& cg, Value* self, Value* other) {

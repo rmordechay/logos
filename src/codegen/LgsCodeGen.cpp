@@ -486,7 +486,7 @@ void LgsCodeGen::visitCoroutine(const LgsCoroutine* coroutine) {
         fc = coroutine->funcCall;
     } else if (coroutine->selection) {
         visitSelection(coroutine->selection);
-        fc = coroutine->selection->lastExpr()->asFuncCall();
+        fc = coroutine->selection->asMethodCall();
     } else {
         assert(0);
     }
@@ -541,7 +541,7 @@ void LgsCodeGen::visitDeferStmt(const LgsDeferStmt* deferStmt) {
         fc = deferStmt->funcCall;
     } else if (deferStmt->selection) {
         visitSelection(deferStmt->selection);
-        fc = deferStmt->selection->lastExpr()->asFuncCall();
+        fc = deferStmt->selection->asMethodCall();
     } else {
         assert(0);
     }
@@ -785,9 +785,8 @@ void LgsCodeGen::visitSelection(LgsSelection* selection) {
                 child->IRValue = field->loadIR(cg);
             }
         } else if (const auto methodCall = child->asFuncCall()) {
-            if (stack.currentFunc()->isTest && parent->type->getName() == LgsTest::name && methodCall->name == "mock") {
-                continue;
-            }
+            const bool isTest = stack.currentFunc()->isTest && parent->type->getName() == LgsTest::name && methodCall->name == "mock";
+            if (isTest) continue;
             visitFuncCall(methodCall);
         } else if (const auto iterIndex = child->asIterIndex()) {
             const auto field = parent->type->getField(iterIndex->baseExpr->asVariable()->name);
@@ -813,12 +812,6 @@ void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
         return;
     }
     const auto ft = funcCall->func->funcType;
-    if (ft->hasDefaults()) {
-        const auto diff = ft->params.size() - funcCall->args.size();
-        for (int i = diff - 1; i < ft->params.size(); ++i) {
-            visitExpr(ft->params[i].expr);
-        }
-    }
     if (ft->isVirtual) {
         funcCall->resolveVirtualFunc(cg);
     }

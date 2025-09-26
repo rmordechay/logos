@@ -22,7 +22,6 @@ bool LgsFuncCall::equals(const LgsFuncType* other) const {
         const auto paramType = param.type;
         if (!paramType || !argType) return false;
         if (arg->isNull && !paramType->isNullable()) return false;
-        if (param.isOwner != !!arg->owner) return false;
         if (!argType->canCastTo(paramType)) return false;
     }
     return true;
@@ -47,7 +46,7 @@ void LgsFuncCall::resolveVirtualFunc(LgsLLVMGen& cg) const {
     const auto self = args[0];
     const auto keyIR = cg.getIRStr(func->funcType->getName());
     const auto selfPtr = self->IRValue;
-    func->IRValue = cg.callLgsFunc("vtable_get", cg.getFT(cg.ptrTy(), {cg.ptrTy(), cg.ptrTy()}), {selfPtr, keyIR});;
+    func->IRValue = cg.callLgsFunc("vtable_get", cg.getFT(cg.ptrTy(), {cg.ptrTy(), cg.ptrTy()}), {selfPtr, keyIR});
 }
 
 std::string LgsFuncCall::pname() {
@@ -55,9 +54,6 @@ std::string LgsFuncCall::pname() {
     str << name << '(';
     for (size_t i = isMethodCall; i < args.size(); ++i) {
         const auto arg = args[i];
-        if (arg->owner) {
-            str << "owner ";
-        }
         str << (arg->type ? arg->type->pname() : LGS_UNKNOWN_TYPE);
         if (i == args.size() - 1) continue;
         str << ", ";

@@ -26,10 +26,6 @@ public:
     uint16_t getUnpackCount() const override;
     bool canCastTo(LgsType* other) override;
     LgsType* applyOp(LgsType* other, LgsOperator op) override;
-    Value* addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
-    Value* subIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
-    Value* mulIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
-    Value* divIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
     Value* addIR(LgsLLVMGen& cg, Value* self, Value* other) override;
     Value* subIR(LgsLLVMGen& cg, Value* self, Value* other) override;
     Value* mulIR(LgsLLVMGen& cg, Value* self, Value* other) override;

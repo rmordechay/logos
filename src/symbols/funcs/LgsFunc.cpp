@@ -14,15 +14,13 @@ Value* LgsFunc::call(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
     for (int i = 0; i < args.size(); ++i) {
         auto arg = args[i];
         const auto& param = funcType->params[i];
-        Value* v = nullptr;
         const auto isSelf = funcType->isMethod && i == 0;
         if (!isSelf && !arg->type->equals(param.type)) {
             const auto cast = arg->castTo(param.type);
             if (cast != arg) freeExpr(arg);
             arg = cast;
         }
-        v = arg->IRValue;
-        IRArgs.emplace_back(v);
+        IRArgs.emplace_back(arg->IRValue);
     }
 
     if (funcType->hasDefaults()) {
