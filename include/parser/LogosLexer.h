@@ -27,10 +27,10 @@ public:
     GO = 64, DEFER = 65, IO = 66, OWNER = 67, AND = 68, OR = 69, NOT = 70, 
     IN = 71, IF = 72, WHILE = 73, ELSE = 74, BREAK = 75, CONTINUE = 76, 
     RETURN = 77, FOR = 78, FOR_I = 79, FOREVER = 80, FOR_PREV = 81, FOR_NEXT = 82, 
-    FOR_IS_FIRST = 83, FOR_IS_LAST = 84, JSON = 85, SET = 86, VEC2 = 87, 
-    VEC3 = 88, VEC4 = 89, LONG = 90, INTEGER = 91, FLOAT = 92, BOOL = 93, 
-    NULL_ = 94, IDENTIFIER = 95, STRING = 96, TAG = 97, LINE_COMMENT = 98, 
-    BLOCK_COMMENT = 99, WS = 100
+    FOR_IS_FIRST = 83, FOR_IS_LAST = 84, JSON = 85, VEC2 = 86, VEC3 = 87, 
+    VEC4 = 88, LONG = 89, INTEGER = 90, FLOAT = 91, BOOL = 92, NULL_ = 93, 
+    IDENTIFIER = 94, STRING = 95, TAG = 96, LINE_COMMENT = 97, BLOCK_COMMENT = 98, 
+    WS = 99
   };
 
   explicit LogosLexer(antlr4::CharStream *input);

@@ -105,6 +105,10 @@ Lgs_RTType LgsType::getRTType() {
     assert(0);
 }
 
+std::string LgsType::pname() {
+    return getName();
+}
+
 LgsType* LgsType::applyOp(LgsType* other, const LgsOperator op) {
     assert(0);
 }

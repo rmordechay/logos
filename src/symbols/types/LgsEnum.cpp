@@ -21,10 +21,6 @@ json::value LgsEnum::asJsonStr() {
     assert(0);
 }
 
-std::string LgsEnum::pname() {
-    return name;
-}
-
 bool LgsEnum::canCastTo(LgsType* other) {
     return name == other->getName();
 }

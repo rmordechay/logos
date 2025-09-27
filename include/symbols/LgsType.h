@@ -80,7 +80,7 @@ public:
     virtual LgsExpr* getZeroValue() = 0;
     virtual Lgs_RTType getRTType() = 0;
     virtual std::string getName() = 0;
-    virtual std::string pname() = 0; // pretty name
+    virtual std::string pname(); // pretty name
     virtual bool canCastTo(LgsType* other) = 0;
     virtual LgsType* applyOp(LgsType* other, LgsOperator op);
     virtual std::string strFormatPart() const = 0;
@@ -115,7 +115,6 @@ public:
     LgsGroup* asGroup();
     LgsSubType* asSubtype();
     LgsTypePair* asPair();
-
     virtual Value* addIR(LgsLLVMGen& cg, Value* self, Value* other);
     virtual Value* subIR(LgsLLVMGen& cg, Value* self, Value* other);
     virtual Value* mulIR(LgsLLVMGen& cg, Value* self, Value* other);

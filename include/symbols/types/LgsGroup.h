@@ -13,7 +13,6 @@ public:
     std::string getName() override;
     LgsExpr* getZeroValue() override;
     Lgs_RTType getRTType() override;
-    std::string pname() override;
     json::value asJsonStr() override;
     size_t getSizeBytes() override;
     std::string strFormatPart() const override;

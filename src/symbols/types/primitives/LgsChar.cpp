@@ -14,10 +14,6 @@ json::value LgsChar::asJsonStr() {
     assert(0);
 }
 
-std::string LgsChar::pname() {
-    return name;
-}
-
 size_t LgsChar::getSizeBytes() {
     return sizeof(char);
 }

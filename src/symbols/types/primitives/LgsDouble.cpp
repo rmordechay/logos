@@ -11,10 +11,6 @@ json::value LgsDouble::asJsonStr() {
     assert(0);
 }
 
-std::string LgsDouble::pname() {
-    return getName();
-}
-
 size_t LgsDouble::getSizeBytes() {
     return sizeof(double_t);
 }

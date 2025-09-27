@@ -902,15 +902,15 @@ LgsPostfixExpr* LgsParserAdapter::getPostfixExpr(LogosParser::PostfixExprContext
 
 LgsArrayExpr* LgsParserAdapter::getArrayExpr(LogosParser::ArrayExprContext* ctx) {
     LgsArrayExpr* array = nullptr;
-    if (ctx->SET()) {
+    if (ctx->LBRACE() && ctx->RBRACE()) {
         array = new LgsArrayExpr(new LgsSet());
     } else if (ctx->EXCLA_MARK()) {
         array = new LgsArrayExpr(new LgsSArray());
     } else {
         array = new LgsArrayExpr(new LgsDArray());
     }
-    array->type->asIterable()->sizeExpr = new LgsIntConst(&LGS_INT, ctx->arrayExprBody()->expr().size());
-    for (const auto expr : ctx->arrayExprBody()->expr()) {
+    array->type->asIterable()->sizeExpr = new LgsIntConst(&LGS_INT, ctx->expr().size());
+    for (const auto expr : ctx->expr()) {
         array->initialElements.emplace_back(getExpr(expr));
     }
     setLocation(array->location, ctx->start, ctx->stop);
@@ -1164,7 +1164,7 @@ LgsType* LgsParserAdapter::getType(LogosParser::TypeContext* ctx) {
     LgsType* result = nullptr;
     if (const auto mapType = ctx->mapType()) {
         result = new LgsMap(getType(mapType->key), getType(mapType->value));
-    } else if (!ctx->arraySize().empty()) {
+    } else if (ctx->baseTypeSArr || ctx->baseTypeDArr || ctx->baseTypeSet) {
         result = getArrayType(ctx);
     } else if (const auto funcType = ctx->funcType()) {
         result = getFuncType(funcType);
@@ -1210,17 +1210,19 @@ LgsFuncType* LgsParserAdapter::getFuncType(LogosParser::FuncTypeContext* ctx) {
 }
 
 LgsType* LgsParserAdapter::getArrayType(LogosParser::TypeContext* ctx) {
-    LgsType* type = getType(ctx->baseType);
-    auto dims = ctx->arraySize();
-    for (auto it = dims.rbegin(); it != dims.rend(); ++it) {
+    LgsType* type = getType(ctx->type());
+    const auto dims = !ctx->LBRACK().empty() ? ctx->LBRACK() : ctx->LBRACE();
+    for (int i = dims.size() - 1; i >= 0; --i) {
         LgsIterable* array;
-        if (ctx->EXCLA_MARK()) {
+        if (ctx->baseTypeSet) {
+            array = new LgsSet(type);
+        } else if (ctx->baseTypeSArr) {
             array = new LgsSArray(type);
-        } else {
+            array->sizeExpr = getUnaryExpr(ctx->unaryExpr()[i]);
+        } else if (ctx->baseTypeDArr) {
             array = new LgsDArray(type);
-        }
-        if (const auto sizeExpr = (*it)->unaryExpr()) {
-            array->sizeExpr = getUnaryExpr(sizeExpr);
+        } else {
+            assert(0);
         }
         type = array;
     }

@@ -247,12 +247,8 @@ postfixExpr:
     ;
 
 arrayExpr:
-        arrayExprBody EXCLA_MARK?
-    |   SET arrayExprBody
-    ;
-
-arrayExprBody:
-        LBRACK (expr (COMMA expr)* COMMA?)? RBRACK
+        LBRACK (expr (COMMA expr)* COMMA?)? RBRACK EXCLA_MARK? // arr
+    |   LBRACE (expr (COMMA expr)* COMMA?)? RBRACE // set
     ;
 
 hashMap:
@@ -341,17 +337,15 @@ range:
 type:
         IDENTIFIER QUEST_MARK?
    |    SELF_CLASS
-   |    baseType=type arraySize+ EXCLA_MARK?
+   |    baseTypeSArr=type (LBRACK unaryExpr RBRACK)+ // sarr
+   |    baseTypeDArr=type (LBRACK RBRACK)+ // darr
+   |    baseTypeSet=type (LBRACE RBRACE)+ // set
    |    mapType
    |    funcType
    ;
 
 mapType:
         LBRACE key=type COLON value=type RBRACE
-    ;
-
-arraySize:
-        LBRACK unaryExpr? RBRACK
     ;
 
 funcType:
@@ -498,7 +492,6 @@ FOR_NEXT: 'for.next';
 FOR_IS_FIRST: 'for.isFirst';
 FOR_IS_LAST: 'for.isLast';
 JSON: '.json';
-SET: '.set';
 
 VEC2: 'vec2';
 VEC3: 'vec3';

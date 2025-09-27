@@ -13,11 +13,7 @@ json::value LgsUInt::asJsonStr() {
     assert(0);
 }
 
-std::string LgsUInt::pname() {
-    return name;
-}
-
-llvm::Type* LgsUInt::getIRType(LgsLLVMGen& cg) {
+Type* LgsUInt::getIRType(LgsLLVMGen& cg) {
     return cg.i32Ty();
 }
 

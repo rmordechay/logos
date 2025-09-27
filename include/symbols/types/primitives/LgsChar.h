@@ -8,7 +8,6 @@ public:
     LgsChar() {
         isPrimitive = true;
     }
-    std::string pname() override;
     json::value asJsonStr() override;
     size_t getSizeBytes() override;
     Type* getIRType(LgsLLVMGen& cg) override;

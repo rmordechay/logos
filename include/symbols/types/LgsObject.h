@@ -30,7 +30,6 @@ public:
     bool hasVirtuals() const;
     LgsObject* clone() override;
     std::string getName() override;
-    std::string pname() override;
     bool canCastTo(LgsType* other) override;
     json::value asJsonStr() override;
 };

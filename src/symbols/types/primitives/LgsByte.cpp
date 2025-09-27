@@ -139,10 +139,6 @@ std::string LgsByte::getName() {
     return name;
 }
 
-std::string LgsByte::pname() {
-    return name;
-}
-
 bool LgsByte::canCastTo(LgsType* other) {
     const auto IRName = other->getName();
     if (IRName == LgsAny::name) return true;

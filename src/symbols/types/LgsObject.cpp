@@ -125,10 +125,6 @@ std::string LgsObject::getName() {
     return name;
 }
 
-std::string LgsObject::pname() {
-    return name;
-}
-
 bool LgsObject::canCastTo(LgsType* other) {
     if (other->getName() == LgsAny::name) return true;
     if (const auto otherInterface = other->asInterface()) {

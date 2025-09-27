@@ -35,7 +35,6 @@ public:
     Value* orIR(LgsLLVMGen& cg, Value* self, Value* other) override;
     std::string strFormatPart() const override;
     std::string getName() override;
-    std::string pname() override;
     json::value asJsonStr() override;
     DIBasicType* getDebugType(LgsLLVMGen& cg) override;
 };

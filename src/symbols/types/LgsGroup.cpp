@@ -22,10 +22,6 @@ json::value LgsGroup::asJsonStr() {
     assert(0);
 }
 
-std::string LgsGroup::pname() {
-    return name;
-}
-
 size_t LgsGroup::getSizeBytes() {
     assert(0);
 }

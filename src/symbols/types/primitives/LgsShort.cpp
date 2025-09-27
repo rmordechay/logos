@@ -19,10 +19,6 @@ json::value LgsShort::asJsonStr() {
     assert(0);
 }
 
-std::string LgsShort::pname() {
-    return name;
-}
-
 std::string LgsShort::getName() {
     return name;
 }

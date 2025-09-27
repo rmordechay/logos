@@ -20,16 +20,12 @@ json::value LgsFloat::asJsonStr() {
     assert(0);
 }
 
-std::string LgsFloat::pname() {
+std::string LgsFloat::getName() {
     return name;
 }
 
 Type* LgsFloat::getIRType(LgsLLVMGen& cg) {
     return Type::getFloatTy(cg.context);
-}
-
-std::string LgsFloat::getName() {
-    return name;
 }
 
 LgsExpr* LgsFloat::getZeroValue() {

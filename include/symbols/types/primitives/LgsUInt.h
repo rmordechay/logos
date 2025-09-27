@@ -12,7 +12,6 @@ public:
     size_t getSizeBytes() override;
     Type* getIRType(LgsLLVMGen& cg) override;
     std::string getName() override;
-    std::string pname() override;
     json::value asJsonStr() override;
     LgsExpr* getZeroValue() override;
     Lgs_RTType getRTType() override;

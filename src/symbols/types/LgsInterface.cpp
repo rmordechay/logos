@@ -73,10 +73,6 @@ json::value LgsInterface::asJsonStr() {
     assert(0);
 }
 
-std::string LgsInterface::pname() {
-    return name;
-}
-
 LgsInterface::~LgsInterface() {
     for (const auto interface : interfaces) {
         delete interface;

@@ -27,10 +27,10 @@ public:
     GO = 64, DEFER = 65, IO = 66, OWNER = 67, AND = 68, OR = 69, NOT = 70, 
     IN = 71, IF = 72, WHILE = 73, ELSE = 74, BREAK = 75, CONTINUE = 76, 
     RETURN = 77, FOR = 78, FOR_I = 79, FOREVER = 80, FOR_PREV = 81, FOR_NEXT = 82, 
-    FOR_IS_FIRST = 83, FOR_IS_LAST = 84, JSON = 85, SET = 86, VEC2 = 87, 
-    VEC3 = 88, VEC4 = 89, LONG = 90, INTEGER = 91, FLOAT = 92, BOOL = 93, 
-    NULL_ = 94, IDENTIFIER = 95, STRING = 96, TAG = 97, LINE_COMMENT = 98, 
-    BLOCK_COMMENT = 99, WS = 100
+    FOR_IS_FIRST = 83, FOR_IS_LAST = 84, JSON = 85, VEC2 = 86, VEC3 = 87, 
+    VEC4 = 88, LONG = 89, INTEGER = 90, FLOAT = 91, BOOL = 92, NULL_ = 93, 
+    IDENTIFIER = 94, STRING = 95, TAG = 96, LINE_COMMENT = 97, BLOCK_COMMENT = 98, 
+    WS = 99
   };
 
   enum {
@@ -48,15 +48,14 @@ public:
     RuleLoopStatement = 40, RuleRangeLoop = 41, RuleBreakStmt = 42, RuleReturnStatement = 43, 
     RuleIoStatement = 44, RuleCoroutine = 45, RuleDeferStmt = 46, RuleExpr = 47, 
     RuleUnaryExpr = 48, RulePrefixExpr = 49, RulePostfixExpr = 50, RuleArrayExpr = 51, 
-    RuleArrayExprBody = 52, RuleHashMap = 53, RuleKeyValue = 54, RuleFuncCall = 55, 
-    RuleFuncArgList = 56, RuleFuncArg = 57, RuleInstance = 58, RuleInstanceArgList = 59, 
-    RuleInstanceArg = 60, RuleConstant = 61, RuleIterIndex = 62, RuleIndex = 63, 
-    RuleSelection = 64, RuleFirstSelectionElement = 65, RuleInnerSelectionElement = 66, 
-    RuleForVariable = 67, RuleRange = 68, RuleType = 69, RuleMapType = 70, 
-    RuleArraySize = 71, RuleFuncType = 72, RuleVector = 73, RuleExtern_c = 74, 
-    RuleExtern_cpp = 75, RuleRequireEnvVars = 76, RuleRequirePackages = 77, 
-    RuleAssignemntOp = 78, RuleJson = 79, RuleJsonObj = 80, RuleJsonPair = 81, 
-    RuleJsonArray = 82
+    RuleHashMap = 52, RuleKeyValue = 53, RuleFuncCall = 54, RuleFuncArgList = 55, 
+    RuleFuncArg = 56, RuleInstance = 57, RuleInstanceArgList = 58, RuleInstanceArg = 59, 
+    RuleConstant = 60, RuleIterIndex = 61, RuleIndex = 62, RuleSelection = 63, 
+    RuleFirstSelectionElement = 64, RuleInnerSelectionElement = 65, RuleForVariable = 66, 
+    RuleRange = 67, RuleType = 68, RuleMapType = 69, RuleFuncType = 70, 
+    RuleVector = 71, RuleExtern_c = 72, RuleExtern_cpp = 73, RuleRequireEnvVars = 74, 
+    RuleRequirePackages = 75, RuleAssignemntOp = 76, RuleJson = 77, RuleJsonObj = 78, 
+    RuleJsonPair = 79, RuleJsonArray = 80
   };
 
   explicit LogosParser(antlr4::TokenStream *input);
@@ -128,7 +127,6 @@ public:
   class PrefixExprContext;
   class PostfixExprContext;
   class ArrayExprContext;
-  class ArrayExprBodyContext;
   class HashMapContext;
   class KeyValueContext;
   class FuncCallContext;
@@ -147,7 +145,6 @@ public:
   class RangeContext;
   class TypeContext;
   class MapTypeContext;
-  class ArraySizeContext;
   class FuncTypeContext;
   class VectorContext;
   class Extern_cContext;
@@ -1009,30 +1006,20 @@ public:
   public:
     ArrayExprContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    ArrayExprBodyContext *arrayExprBody();
+    antlr4::tree::TerminalNode *LBRACK();
+    antlr4::tree::TerminalNode *RBRACK();
+    std::vector<ExprContext *> expr();
+    ExprContext* expr(size_t i);
     antlr4::tree::TerminalNode *EXCLA_MARK();
-    antlr4::tree::TerminalNode *SET();
+    std::vector<antlr4::tree::TerminalNode *> COMMA();
+    antlr4::tree::TerminalNode* COMMA(size_t i);
+    antlr4::tree::TerminalNode *LBRACE();
+    antlr4::tree::TerminalNode *RBRACE();
 
    
   };
 
   ArrayExprContext* arrayExpr();
-
-  class  ArrayExprBodyContext : public antlr4::ParserRuleContext {
-  public:
-    ArrayExprBodyContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *LBRACK();
-    antlr4::tree::TerminalNode *RBRACK();
-    std::vector<ExprContext *> expr();
-    ExprContext* expr(size_t i);
-    std::vector<antlr4::tree::TerminalNode *> COMMA();
-    antlr4::tree::TerminalNode* COMMA(size_t i);
-
-   
-  };
-
-  ArrayExprBodyContext* arrayExprBody();
 
   class  HashMapContext : public antlr4::ParserRuleContext {
   public:
@@ -1274,7 +1261,9 @@ public:
 
   class  TypeContext : public antlr4::ParserRuleContext {
   public:
-    LogosParser::TypeContext *baseType = nullptr;
+    LogosParser::TypeContext *baseTypeSArr = nullptr;
+    LogosParser::TypeContext *baseTypeDArr = nullptr;
+    LogosParser::TypeContext *baseTypeSet = nullptr;
     TypeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *IDENTIFIER();
@@ -1283,9 +1272,16 @@ public:
     MapTypeContext *mapType();
     FuncTypeContext *funcType();
     TypeContext *type();
-    std::vector<ArraySizeContext *> arraySize();
-    ArraySizeContext* arraySize(size_t i);
-    antlr4::tree::TerminalNode *EXCLA_MARK();
+    std::vector<antlr4::tree::TerminalNode *> LBRACK();
+    antlr4::tree::TerminalNode* LBRACK(size_t i);
+    std::vector<UnaryExprContext *> unaryExpr();
+    UnaryExprContext* unaryExpr(size_t i);
+    std::vector<antlr4::tree::TerminalNode *> RBRACK();
+    antlr4::tree::TerminalNode* RBRACK(size_t i);
+    std::vector<antlr4::tree::TerminalNode *> LBRACE();
+    antlr4::tree::TerminalNode* LBRACE(size_t i);
+    std::vector<antlr4::tree::TerminalNode *> RBRACE();
+    antlr4::tree::TerminalNode* RBRACE(size_t i);
 
    
   };
@@ -1308,19 +1304,6 @@ public:
   };
 
   MapTypeContext* mapType();
-
-  class  ArraySizeContext : public antlr4::ParserRuleContext {
-  public:
-    ArraySizeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *LBRACK();
-    antlr4::tree::TerminalNode *RBRACK();
-    UnaryExprContext *unaryExpr();
-
-   
-  };
-
-  ArraySizeContext* arraySize();
 
   class  FuncTypeContext : public antlr4::ParserRuleContext {
   public:

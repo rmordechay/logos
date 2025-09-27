@@ -34,7 +34,6 @@ public:
     LgsExpr* getZeroValue() override;
     Lgs_RTType getRTType() override;
     std::string getName() override;
-    std::string pname() override;
     bool canCastTo(LgsType* other) override;
     std::string strFormatPart() const override;
     json::value asJsonStr() override;

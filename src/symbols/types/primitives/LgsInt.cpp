@@ -160,10 +160,6 @@ std::string LgsInt::getName() {
     return name;
 }
 
-std::string LgsInt::pname() {
-    return getName();
-}
-
 json::value LgsInt::asJsonStr() {
     json::object jsonObj;
     jsonObj["name"] = name;

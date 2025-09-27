@@ -53,7 +53,6 @@ public:
     explicit LgsExpr(LgsType* type = nullptr) : type(type) {}
     virtual LgsExpr* castTo(LgsType* toType);
     virtual void completeType(LgsType* toType);
-
     virtual Value* hash(LgsLLVMGen& cg);
     virtual void assign(LgsLLVMGen& cg, LgsExpr* expr);
     virtual bool equals(LgsExpr* other);

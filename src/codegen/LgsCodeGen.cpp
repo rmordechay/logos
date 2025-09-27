@@ -321,13 +321,13 @@ void LgsCodeGen::visitWhileLoop(const LgsWhileLoop* loop) {
 
 void LgsCodeGen::visitVarDec(LgsVarDec* varDec) {
     const auto IRType = varDec->type->getIRType(cg);
-    const auto exprIRValue = getIRValue(varDec->expr);
+    visitExpr(varDec->expr);
     if (shouldAllocate(varDec)) {
         varDec->IRValue = cg.builder.CreateAlloca(IRType, nullptr, varDec->name);
-        cg.builder.CreateStore(exprIRValue, varDec->IRValue);
+        cg.builder.CreateStore(varDec->expr->IRValue, varDec->IRValue);
     } else {
-        exprIRValue->setName(varDec->name);
-        varDec->IRValue = exprIRValue;
+        varDec->expr->IRValue->setName(varDec->name);
+        varDec->IRValue = varDec->expr->IRValue;
     }
 }
 

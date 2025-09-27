@@ -5,7 +5,6 @@
 class LgsInterface final : public LgsObject {
 public:
     explicit LgsInterface(const std::string& name) : LgsObject(name) {}
-    std::string pname() override;
     json::value asJsonStr() override;
     std::string getName() override;
     llvm::Type* getIRType(LgsLLVMGen& cg) override;

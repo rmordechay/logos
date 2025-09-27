@@ -21,10 +21,6 @@ json::value LgsSize::asJsonStr() {
     assert(0);
 }
 
-std::string LgsSize::pname() {
-    return name;
-}
-
 LgsExpr* LgsSize::getZeroValue() {
     return new LgsIntConst(this, 0);
 }

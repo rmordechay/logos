@@ -12,10 +12,6 @@ json::value LgsLong::asJsonStr() {
     assert(0);
 }
 
-std::string LgsLong::pname() {
-    return name;
-}
-
 Type* LgsLong::getIRType(LgsLLVMGen& cg) {
     return cg.i64Ty();
 }

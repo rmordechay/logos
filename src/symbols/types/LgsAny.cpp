@@ -25,10 +25,6 @@ json::value LgsAny::asJsonStr() {
     assert(0);
 }
 
-std::string LgsAny::pname() {
-    return name;
-}
-
 std::string LgsAny::strFormatPart() const {
     return "%p";
 }

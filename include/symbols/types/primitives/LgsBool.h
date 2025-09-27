@@ -32,7 +32,6 @@ public:
     Value* andIR(LgsLLVMGen& cg, Value* self, Value* other) override;
     Value* orIR(LgsLLVMGen& cg, Value* self, Value* other) override;
     std::string getName() override;
-    std::string pname() override;
     json::value asJsonStr() override;
     LgsExpr* getZeroValue() override;
     Lgs_RTType getRTType() override;
