@@ -12,6 +12,7 @@
 #include "types/LgsUnknown.h"
 #include "types/LgsVoid.h"
 #include "types/iterables/LgsSArray.h"
+#include "types/iterables/LgsSet.h"
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsByte.h"
 #include "types/primitives/LgsChar.h"
@@ -157,17 +158,22 @@ LgsIterable* LgsType::asIterable() {
     return dynamic_cast<LgsIterable*>(this);
 }
 
+LgsSArray* LgsType::asSArray() {
+    return dynamic_cast<LgsSArray*>(this);
+}
+
 LgsDArray* LgsType::asDArray() {
     return dynamic_cast<LgsDArray*>(this);
 }
 
-LgsSArray* LgsType::asSArray() {
-    return dynamic_cast<LgsSArray*>(this);
+LgsSet* LgsType::asSet() {
+    return dynamic_cast<LgsSet*>(this);
 }
 
 LgsVec* LgsType::asVec() {
     return dynamic_cast<LgsVec*>(this);
 }
+
 
 LgsFuncType* LgsType::asFuncType() {
     return dynamic_cast<LgsFuncType*>(this);

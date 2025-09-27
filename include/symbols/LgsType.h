@@ -3,6 +3,7 @@
 #include "data/LgsErrors.h"
 #include "exprs/LgsBinaryExpr.h"
 
+class LgsSet;
 class LgsAny;
 class LgsSubType;
 class LgsByte;
@@ -90,8 +91,9 @@ public:
     LgsObject* asObject();
     LgsInterface* asInterface();
     LgsIterable* asIterable();
-    LgsDArray* asDArray();
     LgsSArray* asSArray();
+    LgsDArray* asDArray();
+    LgsSet* asSet();
     LgsVec* asVec();
     LgsFuncType* asFuncType();
     LgsPtr* asPtr();

@@ -115,7 +115,6 @@ set(CORE_SOURCES
     src/symbols/types/LgsFuncType.cpp
     src/symbols/types/LgsGroup.cpp
     src/symbols/types/LgsInterface.cpp
-    src/symbols/types/LgsIterator.cpp
     src/symbols/types/LgsNullable.cpp
     src/symbols/types/LgsObject.cpp
     src/symbols/types/LgsSubType.cpp
@@ -147,6 +146,10 @@ set(RUNTIME_SOURCES
     runtime/lib/Lgs_stack.cpp
     runtime/lib/Lgs_print.cpp
     runtime/lib/Lgs_arena.cpp
+    src/symbols/types/iterables/LgsSet.cpp
+    include/symbols/types/iterables/LgsSet.h
+    runtime/include/Lgs_set.h
+    runtime/lib/Lgs_set.cpp
 )
 
 add_library(lgs_core SHARED ${CORE_SOURCES} ${RUNTIME_SOURCES})

@@ -34,6 +34,10 @@ void LgsIterIndex::setIRElementPtr(LgsLLVMGen& cg) {
         auto indexIRValue = index.from->IRValue;
         indexIRValue = cg.builder.CreateZExt(indexIRValue, cg.i64Ty());
         IRValue = dArr->getIRElement(cg, baseExpr->IRValue, indexIRValue);
+    } else if (const auto set = baseExpr->type->asSet()) {
+        auto indexIRValue = index.from->IRValue;
+        indexIRValue = cg.builder.CreateZExt(indexIRValue, cg.i64Ty());
+        IRValue = set->getIRElement(cg, baseExpr->IRValue, indexIRValue);
     } else if (const auto vec = baseExprType->asVec()) {
         auto indexIRValue = index.from->IRValue;
         indexIRValue = cg.builder.CreateZExt(indexIRValue, cg.i64Ty());
@@ -52,6 +56,7 @@ void LgsIterIndex::setIRElementPtr(LgsLLVMGen& cg) {
             IRValue = cg.builder.CreateGEP(cg.i8Ty(), baseExpr->IRValue, {cg.i32Zero(), index.from->IRValue});
         }
     }
+    assert(IRValue);
 }
 
 Value* LgsIterIndex::loadFromDArray(LgsLLVMGen& cg) {

@@ -12,7 +12,6 @@
 #include "exprs/constants/LgsStrConst.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
-#include "exprs/LgsIterator.h"
 #include "exprs/LgsJson.h"
 #include "exprs/LgsTypeExpr.h"
 #include "loops/LgsLoopMetaVar.h"
@@ -87,10 +86,6 @@ std::string LgsExpr::getConstStr() {
         }
     }
     assert(0);
-}
-
-LgsIterator LgsExpr::toIterator() {
-    return LgsIterator(this);
 }
 
 void LgsExpr::setType(LgsType* newType) {

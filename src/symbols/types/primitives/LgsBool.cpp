@@ -14,7 +14,7 @@ Type* LgsBool::getIRType(LgsLLVMGen& cg) {
     return cg.i1Ty();
 }
 
-LgsType* LgsBool::applyOp(LgsType* other, LgsOperator op) {
+LgsType* LgsBool::applyOp(LgsType* other, const LgsOperator op) {
     const auto IRName = other->getName();
     if (name != IRName) return nullptr;
     if (op == ADD) return extendInt();

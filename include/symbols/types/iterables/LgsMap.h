@@ -26,6 +26,7 @@ public:
     Lgs_RTType getRTType() override;
     LgsType* getIndexType() override;
     uint16_t getUnpackCount() const override;
+    void unpackLoopVars(std::vector<LgsVarDec*> loopVars, LgsExpr* iterExpr) const override;
     Value* lengthIR(LgsLLVMGen& cg, Value* iterable) override;
     Value* inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
     Value* getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) override;

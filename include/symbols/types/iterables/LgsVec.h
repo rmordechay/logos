@@ -23,8 +23,8 @@ public:
     LgsExpr* getZeroValue() override;
     Lgs_RTType getRTType() override;
     LgsType* getIndexType() override;
-    uint16_t getUnpackCount() const override;
     bool canCastTo(LgsType* other) override;
+    uint16_t getUnpackCount() const override;
     LgsType* applyOp(LgsType* other, LgsOperator op) override;
     Value* addIR(LgsLLVMGen& cg, Value* self, Value* other) override;
     Value* subIR(LgsLLVMGen& cg, Value* self, Value* other) override;

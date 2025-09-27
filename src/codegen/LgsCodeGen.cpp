@@ -12,7 +12,6 @@
 #include "exprs/LgsFuncCall.h"
 #include "exprs/LgsInstance.h"
 #include "exprs/LgsIterIndex.h"
-#include "exprs/LgsIterator.h"
 #include "exprs/LgsJson.h"
 #include "exprs/LgsNull.h"
 #include "exprs/LgsPostfixExpr.h"
@@ -252,11 +251,10 @@ void LgsCodeGen::visitForeachLoop(LgsForeachLoop* loop) {
     cg.builder.CreateCondBr(condition, loop->IRBodyBlock, loop->IRExitBlock);
     cg.startBlock(loop->IRBodyBlock);
 
-    const auto varDec = loop->loopVars[0];
     const auto iterIndex = loop->loopVars[0]->expr->asIterIndex();
     iterIndex->index.from->IRValue = loop->iValue;
     iterIndex->setIRElementPtr(cg);
-    varDec->IRValue = iterIndex->IRValue;
+    loop->loopVars[0]->IRValue = iterIndex->IRValue;
 }
 
 void LgsCodeGen::visitInfiniteLoop(const LgsInfiniteLoop* loop) const {
@@ -703,8 +701,11 @@ void LgsCodeGen::visitArrayExpr(LgsArrayExpr* array) {
         array->IRValue = createStaticArray(array);
     } else if (array->type->asDArray()) {
         array->IRValue = createDynamicArray(array);
+    } else if (array->type->asSet()) {
+        array->IRValue = createSetExpr(array);
+    } else {
+        assert(0);
     }
-    else assert(0);
 }
 
 void LgsCodeGen::visitHashMap(LgsHashMap* hashMap) {
@@ -1273,7 +1274,23 @@ Value* LgsCodeGen::createDynamicArray(LgsArrayExpr* arrayExpr) {
         visitExpr(element);
         arr->getAddFunc()->callIR(cg, {arrayExpr->IRValue, cg.getPtr(element->IRValue)});
     }
-    return getIRValue(arrayExpr);
+    return arrayExpr->IRValue;
+}
+
+Value* LgsCodeGen::createSetExpr(LgsArrayExpr* setExpr) {
+    const auto arr = setExpr->type->asSet();
+    const auto size = arr->baseType->getSizeBytes();
+    const auto elementSize = cg.i64(size);
+    const auto arrSize = cg.typeSize(arr->getArrStruct(cg));
+    setExpr->IRValue = cg.callMalloc(arrSize.getFixedValue(), setExpr->owner, arr->getRTType());
+    LgsFunc initFunc("init", &LGS_VOID, {arr, &LGS_LONG}, BUILTIN | METHOD);
+    initFunc.callIR(cg, {setExpr->IRValue, elementSize});
+    for (int i = 0; i < setExpr->initialElements.size(); ++i) {
+        const auto element = setExpr->initialElements[i];
+        visitExpr(element);
+        arr->getAddFunc()->callIR(cg, {setExpr->IRValue, cg.getPtr(element->IRValue)});
+    }
+    return setExpr->IRValue;
 }
 
 Value* LgsCodeGen::getIRValue(LgsValue* value) {

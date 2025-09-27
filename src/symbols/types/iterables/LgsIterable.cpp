@@ -1,5 +1,8 @@
 #include "types/iterables/LgsIterable.h"
+
+#include "exprs/LgsIterIndex.h"
 #include "funcs/LgsFunc.h"
+#include "stmts/LgsVarDec.h"
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsSize.h"
 
@@ -33,10 +36,6 @@ LgsFunc* LgsIterable::getMethod(const std::string& name) {
     return nullptr;
 }
 
-Value* LgsIterable::loadWithIndex(LgsLLVMGen* cg) {
-    assert(0);
-}
-
 LgsFunc* LgsIterable::getAddFunc() {
     return nullptr;
 }
@@ -55,6 +54,13 @@ LgsFunc* LgsIterable::getFilterFunc() {
     func->second = new LgsFunc("filter", this, {this, new LgsFuncType(&LGS_BOOL, {LgsParam(baseType)})}, BUILTIN | PUBLIC | METHOD);
     addMethod(func->second);
     return func->second;
+}
+
+void LgsIterable::unpackLoopVars(const std::vector<LgsVarDec*> loopVars, LgsExpr* iterExpr) const {
+    const auto iterIndex = new LgsIterIndex(iterExpr, LGS_SIZE.getZeroValue());
+    iterIndex->setType(baseType);
+    loopVars[0]->expr = iterIndex;
+    loopVars[0]->type = iterIndex->type;
 }
 
 LgsFunc* LgsIterable::getLenFunc() {

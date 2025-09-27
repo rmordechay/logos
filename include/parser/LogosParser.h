@@ -12,25 +12,25 @@
 class  LogosParser : public antlr4::Parser {
 public:
   enum {
-    T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, T__4 = 5, T__5 = 6, T__6 = 7, 
-    DOUBLE_EQUAL = 8, NOT_EQUAL = 9, GE = 10, LE = 11, LPAREN = 12, RPAREN = 13, 
-    LBRACE = 14, RBRACE = 15, LBRACK = 16, RBRACK = 17, LANGLE = 18, RANGLE = 19, 
-    COMMA = 20, ARROW = 21, TRIPLE_DOT = 22, DOUBLE_DOT = 23, WALRUS = 24, 
-    EQUAL_PLUS = 25, EQUAL_MINUS = 26, EQUAL_STAR = 27, EQUAL_SLASH = 28, 
-    EQUAL_PERCENT = 29, EQUAL_AMPERSAND = 30, EQUAL_PIPE = 31, EQUAL_CARET = 32, 
-    EQUAL_DOUBLE_RANGLE = 33, EQUAL_DOUBLE_LANGLE = 34, INC = 35, DEC = 36, 
-    DOT = 37, COLON = 38, EQUAL = 39, PLUS = 40, MINUS = 41, STAR = 42, 
-    SLIDER = 43, SLASH = 44, HASH = 45, QUEST_MARK = 46, EXCLA_MARK = 47, 
-    PERCENT = 48, DOLLAR = 49, AMPERSAND = 50, PIPE = 51, CARET = 52, DOUBLE_RANGLE = 53, 
-    DOUBLE_LANGLE = 54, OBJECT = 55, SINGLETON = 56, SELF_INSTANCE = 57, 
-    SELF_CLASS = 58, INTERFACE = 59, EXTERN = 60, VISIBILITY = 61, IMPLEMENTS = 62, 
-    CONST = 63, ENUM = 64, GO = 65, DEFER = 66, IO = 67, OWNER = 68, AND = 69, 
-    OR = 70, NOT = 71, IN = 72, IF = 73, WHILE = 74, ELSE = 75, BREAK = 76, 
-    CONTINUE = 77, RETURN = 78, FOR = 79, FOR_I = 80, FOREVER = 81, FOR_PREV = 82, 
-    FOR_NEXT = 83, FOR_IS_FIRST = 84, FOR_IS_LAST = 85, VEC2 = 86, VEC3 = 87, 
-    VEC4 = 88, LONG = 89, INTEGER = 90, FLOAT = 91, BOOL = 92, NULL_ = 93, 
-    IDENTIFIER = 94, STRING = 95, TAG = 96, LINE_COMMENT = 97, BLOCK_COMMENT = 98, 
-    WS = 99
+    T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, T__4 = 5, T__5 = 6, DOUBLE_EQUAL = 7, 
+    NOT_EQUAL = 8, GE = 9, LE = 10, LPAREN = 11, RPAREN = 12, LBRACE = 13, 
+    RBRACE = 14, LBRACK = 15, RBRACK = 16, LANGLE = 17, RANGLE = 18, COMMA = 19, 
+    ARROW = 20, TRIPLE_DOT = 21, DOUBLE_DOT = 22, WALRUS = 23, EQUAL_PLUS = 24, 
+    EQUAL_MINUS = 25, EQUAL_STAR = 26, EQUAL_SLASH = 27, EQUAL_PERCENT = 28, 
+    EQUAL_AMPERSAND = 29, EQUAL_PIPE = 30, EQUAL_CARET = 31, EQUAL_DOUBLE_RANGLE = 32, 
+    EQUAL_DOUBLE_LANGLE = 33, INC = 34, DEC = 35, DOT = 36, COLON = 37, 
+    EQUAL = 38, PLUS = 39, MINUS = 40, STAR = 41, SLIDER = 42, SLASH = 43, 
+    HASH = 44, QUEST_MARK = 45, EXCLA_MARK = 46, PERCENT = 47, DOLLAR = 48, 
+    AMPERSAND = 49, PIPE = 50, CARET = 51, DOUBLE_RANGLE = 52, DOUBLE_LANGLE = 53, 
+    OBJECT = 54, SINGLETON = 55, SELF_INSTANCE = 56, SELF_CLASS = 57, INTERFACE = 58, 
+    EXTERN = 59, VISIBILITY = 60, IMPLEMENTS = 61, CONST = 62, ENUM = 63, 
+    GO = 64, DEFER = 65, IO = 66, OWNER = 67, AND = 68, OR = 69, NOT = 70, 
+    IN = 71, IF = 72, WHILE = 73, ELSE = 74, BREAK = 75, CONTINUE = 76, 
+    RETURN = 77, FOR = 78, FOR_I = 79, FOREVER = 80, FOR_PREV = 81, FOR_NEXT = 82, 
+    FOR_IS_FIRST = 83, FOR_IS_LAST = 84, JSON = 85, SET = 86, VEC2 = 87, 
+    VEC3 = 88, VEC4 = 89, LONG = 90, INTEGER = 91, FLOAT = 92, BOOL = 93, 
+    NULL_ = 94, IDENTIFIER = 95, STRING = 96, TAG = 97, LINE_COMMENT = 98, 
+    BLOCK_COMMENT = 99, WS = 100
   };
 
   enum {
@@ -48,14 +48,15 @@ public:
     RuleLoopStatement = 40, RuleRangeLoop = 41, RuleBreakStmt = 42, RuleReturnStatement = 43, 
     RuleIoStatement = 44, RuleCoroutine = 45, RuleDeferStmt = 46, RuleExpr = 47, 
     RuleUnaryExpr = 48, RulePrefixExpr = 49, RulePostfixExpr = 50, RuleArrayExpr = 51, 
-    RuleHashMap = 52, RuleKeyValue = 53, RuleFuncCall = 54, RuleFuncArgList = 55, 
-    RuleFuncArg = 56, RuleInstance = 57, RuleInstanceArgList = 58, RuleInstanceArg = 59, 
-    RuleConstant = 60, RuleIterIndex = 61, RuleIndex = 62, RuleSelection = 63, 
-    RuleFirstSelectionElement = 64, RuleInnerSelectionElement = 65, RuleForVariable = 66, 
-    RuleRange = 67, RuleType = 68, RuleMapType = 69, RuleArraySize = 70, 
-    RuleFuncType = 71, RuleVector = 72, RuleExtern_c = 73, RuleExtern_cpp = 74, 
-    RuleRequireEnvVars = 75, RuleRequirePackages = 76, RuleAssignemntOp = 77, 
-    RuleJson = 78, RuleJsonObj = 79, RuleJsonPair = 80, RuleJsonArray = 81
+    RuleArrayExprBody = 52, RuleHashMap = 53, RuleKeyValue = 54, RuleFuncCall = 55, 
+    RuleFuncArgList = 56, RuleFuncArg = 57, RuleInstance = 58, RuleInstanceArgList = 59, 
+    RuleInstanceArg = 60, RuleConstant = 61, RuleIterIndex = 62, RuleIndex = 63, 
+    RuleSelection = 64, RuleFirstSelectionElement = 65, RuleInnerSelectionElement = 66, 
+    RuleForVariable = 67, RuleRange = 68, RuleType = 69, RuleMapType = 70, 
+    RuleArraySize = 71, RuleFuncType = 72, RuleVector = 73, RuleExtern_c = 74, 
+    RuleExtern_cpp = 75, RuleRequireEnvVars = 76, RuleRequirePackages = 77, 
+    RuleAssignemntOp = 78, RuleJson = 79, RuleJsonObj = 80, RuleJsonPair = 81, 
+    RuleJsonArray = 82
   };
 
   explicit LogosParser(antlr4::TokenStream *input);
@@ -127,6 +128,7 @@ public:
   class PrefixExprContext;
   class PostfixExprContext;
   class ArrayExprContext;
+  class ArrayExprBodyContext;
   class HashMapContext;
   class KeyValueContext;
   class FuncCallContext;
@@ -949,6 +951,7 @@ public:
     UnaryExprContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     VectorContext *vector();
+    antlr4::tree::TerminalNode *JSON();
     JsonContext *json();
     ConstantContext *constant();
     FuncCallContext *funcCall();
@@ -1006,18 +1009,30 @@ public:
   public:
     ArrayExprContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
+    ArrayExprBodyContext *arrayExprBody();
+    antlr4::tree::TerminalNode *EXCLA_MARK();
+    antlr4::tree::TerminalNode *SET();
+
+   
+  };
+
+  ArrayExprContext* arrayExpr();
+
+  class  ArrayExprBodyContext : public antlr4::ParserRuleContext {
+  public:
+    ArrayExprBodyContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *LBRACK();
     antlr4::tree::TerminalNode *RBRACK();
     std::vector<ExprContext *> expr();
     ExprContext* expr(size_t i);
-    antlr4::tree::TerminalNode *EXCLA_MARK();
     std::vector<antlr4::tree::TerminalNode *> COMMA();
     antlr4::tree::TerminalNode* COMMA(size_t i);
 
    
   };
 
-  ArrayExprContext* arrayExpr();
+  ArrayExprBodyContext* arrayExprBody();
 
   class  HashMapContext : public antlr4::ParserRuleContext {
   public:

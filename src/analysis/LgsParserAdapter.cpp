@@ -902,13 +902,15 @@ LgsPostfixExpr* LgsParserAdapter::getPostfixExpr(LogosParser::PostfixExprContext
 
 LgsArrayExpr* LgsParserAdapter::getArrayExpr(LogosParser::ArrayExprContext* ctx) {
     LgsArrayExpr* array = nullptr;
-    if (ctx->EXCLA_MARK()) {
+    if (ctx->SET()) {
+        array = new LgsArrayExpr(new LgsSet());
+    } else if (ctx->EXCLA_MARK()) {
         array = new LgsArrayExpr(new LgsSArray());
     } else {
         array = new LgsArrayExpr(new LgsDArray());
     }
-    array->type->asIterable()->sizeExpr = new LgsIntConst(&LGS_INT, ctx->expr().size());
-    for (const auto expr : ctx->expr()) {
+    array->type->asIterable()->sizeExpr = new LgsIntConst(&LGS_INT, ctx->arrayExprBody()->expr().size());
+    for (const auto expr : ctx->arrayExprBody()->expr()) {
         array->initialElements.emplace_back(getExpr(expr));
     }
     setLocation(array->location, ctx->start, ctx->stop);

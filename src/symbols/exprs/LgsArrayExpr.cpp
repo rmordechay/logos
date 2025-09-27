@@ -1,14 +1,9 @@
 #include "exprs/LgsArrayExpr.h"
 
-std::string LgsArrayExpr::pname() {
-    return type->pname();
-}
+#include "types/iterables/LgsSet.h"
 
-json::value LgsArrayExpr::asJsonStr() {
-    json::object jsonObj;
-    jsonObj["exprKind"] = "arrayExpr";
-    jsonObj["type"] = type->asJsonStr();
-    return jsonObj;
+Value* LgsArrayExpr::loadIR(LgsLLVMGen& cg) {
+    return IRValue;
 }
 
 void LgsArrayExpr::completeType(LgsType* toType) {
@@ -32,16 +27,34 @@ void LgsArrayExpr::completeType(LgsType* toType) {
         if (!thisSArr->sizeExpr) {
             thisSArr->sizeExpr = otherSArr->sizeExpr;
         }
+        return;
+    }
+    const auto thisSet = type->asSet();
+    const auto otherSet = toType->asSet();
+    if (thisSet && otherSet) {
+        if (!thisSet->baseType) {
+            thisSet->baseType = otherSet->baseType;
+        }
+        if (!thisSet->sizeExpr) {
+            thisSet->sizeExpr = otherSet->sizeExpr;
+        }
     }
 }
 
-Value* LgsArrayExpr::loadIR(LgsLLVMGen& cg) {
-    return IRValue;
+std::string LgsArrayExpr::pname() {
+    return type->pname();
+}
+
+json::value LgsArrayExpr::asJsonStr() {
+    json::object jsonObj;
+    jsonObj["exprKind"] = "arrayExpr";
+    jsonObj["type"] = type->asJsonStr();
+    return jsonObj;
 }
 
 LgsArrayExpr::~LgsArrayExpr() {
     for (const auto& initialElement : initialElements) {
-        delete initialElement;
+        freeExpr(initialElement);
     }
     initialElements.clear();
 }

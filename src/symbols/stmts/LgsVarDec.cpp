@@ -1,4 +1,6 @@
 #include "stmts/LgsVarDec.h"
+
+#include "codegen/LgsLLVMGen.h"
 #include "exprs/LgsArrayExpr.h"
 #include "types/LgsPtr.h"
 #include "utils/LgsUtils.h"

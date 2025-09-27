@@ -1,8 +1,8 @@
 #pragma once
-
 #include "exprs/LgsExpr.h"
 #include "types/iterables/LgsDArray.h"
 #include "types/iterables/LgsSArray.h"
+#include "types/iterables/LgsSet.h"
 
 class LgsArrayExpr final : public LgsExpr {
 public:
@@ -12,9 +12,12 @@ public:
     explicit LgsArrayExpr(LgsDArray* arrType) : LgsExpr(arrType) {
         type->isHeapAlloc = true;
     }
+    explicit LgsArrayExpr(LgsSet* setType) : LgsExpr(setType) {
+        type->isHeapAlloc = true;
+    }
+    Value* loadIR(LgsLLVMGen& cg) override;
+    void completeType(LgsType* toType) override;
     std::string pname() override;
     json::value asJsonStr() override;
-    void completeType(LgsType* toType) override;
-    Value* loadIR(LgsLLVMGen& cg) override;
     ~LgsArrayExpr() override;
 };

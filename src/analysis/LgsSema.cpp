@@ -435,18 +435,7 @@ void LgsSema::visitForeachLoop(const LgsForeachLoop* foreachLoop) {
         errHandler.addError(E10041, &foreachLoop->iterExpr->location, {foreachLoop->iterExpr->pname(), std::to_string(unpackCount), std::to_string(unpackCount + 1), std::to_string(varDecSize)});
         return;
     }
-
-    if (const auto pair = iterable->baseType->asPair()) {
-        foreachLoop->loopVars[0]->type = pair->key;
-        foreachLoop->loopVars[1]->type = pair->value;
-    } else {
-        const auto iterIndex = new LgsIterIndex(foreachLoop->iterExpr, LGS_SIZE.getZeroValue());
-        iterIndex->location = foreachLoop->iterExpr->location;
-        visitIterIndex(iterIndex);
-        foreachLoop->loopVars[0]->expr = iterIndex;
-        foreachLoop->loopVars[0]->type = foreachLoop->loopVars[0]->expr->type;
-    }
-
+    iterable->unpackLoopVars(foreachLoop->loopVars, iterExpr);
     for (const auto varDec : foreachLoop->loopVars) {
         addLocalSymbol(LgsSymbol(varDec));
     }
@@ -578,7 +567,7 @@ void LgsSema::visitArrayExpr(LgsArrayExpr* array) {
     for (const auto element : array->initialElements) {
         visitExpr(element);
     }
-    if (array->type->asDArray()) {
+    if (array->type->asDArray() || array->type->asSet()) {
         visitDynamicArray(array);
     } else {
         visitStaticArray(array);
@@ -600,7 +589,7 @@ void LgsSema::visitStaticArray(LgsArrayExpr* arrayExpr) {
 }
 
 void LgsSema::visitDynamicArray(LgsArrayExpr* array) {
-    const auto dArr = array->type->asDArray();
+    const auto dArr = array->type->asIterable();
     if (!dArr->sizeExpr) {
         dArr->sizeExpr = new LgsIntConst(&LGS_LONG, array->initialElements.size());
     }
@@ -994,13 +983,11 @@ void LgsSema::visitIterIndex(LgsIterIndex* iterIndex) {
 }
 
 void LgsSema::visitIndex(LgsIterIndex* iterIndex) {
-    const auto baseExpr = iterIndex->baseExpr;
-    const auto iterable = baseExpr->type->asIterable();
-    const auto exprFrom = iterIndex->index.from;
+    const auto iterable = iterIndex->baseExpr->type->asIterable();
+    visitExpr(iterIndex->index.from);
     const auto exprTo = iterIndex->index.to;
-    visitExpr(exprFrom);
-    visitExpr(exprTo);
     if (exprTo) {
+        visitExpr(exprTo);
         visitSlice(iterIndex);
         iterIndex->setType(iterable);
     } else {

@@ -42,7 +42,6 @@ class LgsInstance;
 class LgsIterIndex;
 class LgsSelection;
 class LgsFuncCall;
-class LgsIterator;
 class LgsBinaryExpr;
 class LgsArrayExpr;
 class LgsIfStmt;
@@ -137,6 +136,7 @@ public:
     // Iterables
     Value* createStaticArray(const LgsArrayExpr* arrayExpr);
     Value* createDynamicArray(LgsArrayExpr* arrayExpr);
+    Value* createSetExpr(LgsArrayExpr* setExpr);
 
     Value* getIRValue(LgsValue* value);
     bool allArgsAreConst(const std::vector<LgsExpr*>& args);

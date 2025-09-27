@@ -1,8 +1,11 @@
 #include "types/iterables/LgsDArray.h"
+
+#include "codegen/LgsLLVMGen.h"
 #include "exprs/LgsArrayExpr.h"
 #include "types/LgsAny.h"
 #include "types/LgsVoid.h"
 #include "types/primitives/LgsInt.h"
+#include "types/primitives/LgsLong.h"
 
 Type* LgsDArray::getIRType(LgsLLVMGen& cg) {
     if (IRType) return IRType;
@@ -33,10 +36,6 @@ LgsType* LgsDArray::getIndexType() {
     return &LGS_INT;
 }
 
-uint16_t LgsDArray::getUnpackCount() const {
-    return 1;
-}
-
 std::string LgsDArray::strFormatPart() const {
     if (baseType->asChar()) return "%s";
     return "%p";
@@ -46,6 +45,23 @@ StructType* LgsDArray::getArrStruct(LgsLLVMGen& cg) {
     if (arrStruct) return arrStruct;
     arrStruct = cg.getStructType({cg.i64Ty(), cg.ptrTy()}, name);
     return arrStruct;
+}
+
+uint16_t LgsDArray::getUnpackCount() const {
+    return 1;
+}
+
+LgsType* LgsDArray::applyOp(LgsType* other, const LgsOperator op) {
+    const auto IRName = other->getName();
+    switch (op) {
+    case IN: {
+        if (other->canCastTo(baseType)) return baseType;
+        break;
+    }
+    default:
+        break;
+    }
+    return nullptr;
 }
 
 LgsFunc* LgsDArray::getAddFunc() {
@@ -61,19 +77,6 @@ LgsFunc* LgsDArray::getAddFunc() {
 
 Value* LgsDArray::lengthIR(LgsLLVMGen& cg, Value* iterable) {
     return getLenFunc()->callIR(cg, {iterable});
-}
-
-LgsType* LgsDArray::applyOp(LgsType* other, LgsOperator op) {
-    const auto IRName = other->getName();
-    switch (op) {
-    case IN: {
-        if (other->canCastTo(baseType)) return baseType;
-        break;
-    }
-    default:
-        break;
-    }
-    return nullptr;
 }
 
 Value* LgsDArray::inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) {

@@ -96,6 +96,7 @@ extern "C" void Lgs_print(const char* fmt, const Lgs_RTType rtt, const void* v) 
     }
     case RTT_SARRAY:
     case RTT_DARRAY:
+    case RTT_SET:
     case RTT_MAP:
     case RTT_OBJECT:
     case RTT_TYPE:

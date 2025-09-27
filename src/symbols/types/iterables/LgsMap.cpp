@@ -60,6 +60,11 @@ uint16_t LgsMap::getUnpackCount() const {
     return 2;
 }
 
+void LgsMap::unpackLoopVars(std::vector<LgsVarDec*> loopVars, LgsExpr* iterExpr) const {
+    loopVars[0]->type = typePair->key;
+    loopVars[1]->type = typePair->value;
+}
+
 Value* LgsMap::lengthIR(LgsLLVMGen& cg, Value* iterable) {
     return cg.i32(1024);
 }

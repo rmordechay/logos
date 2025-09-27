@@ -220,7 +220,7 @@ expr:
 
 unaryExpr:
         vector
-    |   '.json'json
+    |   JSON json
     |   constant
     |   funcCall
     |   prefixExpr
@@ -247,7 +247,12 @@ postfixExpr:
     ;
 
 arrayExpr:
-        LBRACK (expr (COMMA expr)* COMMA?)? RBRACK EXCLA_MARK?
+        arrayExprBody EXCLA_MARK?
+    |   SET arrayExprBody
+    ;
+
+arrayExprBody:
+        LBRACK (expr (COMMA expr)* COMMA?)? RBRACK
     ;
 
 hashMap:
@@ -492,6 +497,8 @@ FOR_PREV: 'for.prev';
 FOR_NEXT: 'for.next';
 FOR_IS_FIRST: 'for.isFirst';
 FOR_IS_LAST: 'for.isLast';
+JSON: '.json';
+SET: '.set';
 
 VEC2: 'vec2';
 VEC3: 'vec3';

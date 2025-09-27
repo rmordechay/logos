@@ -1,5 +1,6 @@
 #include "Lgs_stack.h"
 #include "Lgs_darray.h"
+#include "Lgs_set.h"
 #include "utils/LgsUtils.h"
 
 #define PRINT_MEMORY true
@@ -27,6 +28,7 @@ static std::string getTypeName(const Lgs_RTType type) {
     case RTT_VEC4: return "Vec4";
     case RTT_SARRAY: return "SArray";
     case RTT_DARRAY: return "DArray";
+    case RTT_SET: return "Set";
     case RTT_MAP: return "Map";
     case RTT_OBJECT: return "Object";
     case RTT_TYPE: return "Type";
@@ -46,6 +48,12 @@ static void freeType(void* ptr, const Lgs_RTType type) {
     }
     case RTT_DARRAY: {
         const auto arr = static_cast<Lgs_darray*>(ptr);
+        delete arr->data;
+        std::free(arr);
+        break;
+    }
+    case RTT_SET: {
+        const auto arr = static_cast<Lgs_set*>(ptr);
         delete arr->data;
         std::free(arr);
         break;

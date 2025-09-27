@@ -1,5 +1,6 @@
 #include "types/iterables/LgsSArray.h"
 
+#include "codegen/LgsLLVMGen.h"
 #include "data/LgsDefinitions.h"
 #include "exprs/LgsArrayExpr.h"
 #include "exprs/LgsIterIndex.h"
@@ -49,7 +50,7 @@ std::string LgsSArray::strFormatPart() const {
     return "%p";
 }
 
-LgsType* LgsSArray::applyOp(LgsType* other, LgsOperator op) {
+LgsType* LgsSArray::applyOp(LgsType* other, const LgsOperator op) {
     const auto IRName = other->getName();
     switch (op) {
     case IN: {

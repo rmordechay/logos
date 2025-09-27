@@ -9,7 +9,6 @@ class LgsLoopMetaVar;
 class LgsIntConst;
 class LgsVectorExpr;
 class LgsPrefixExpr;
-class LgsIterator;
 class LgsPostfixExpr;
 class LgsLLVMGen;
 class LgsFunc;
@@ -63,7 +62,6 @@ public:
     void freeOwner(LgsLLVMGen& cg);
     size_t getConstInt();
     std::string getConstStr();
-    LgsIterator toIterator();
     Value* getIRPtr(LgsLLVMGen& cg) const;
     void setType(LgsType* newType);
 
