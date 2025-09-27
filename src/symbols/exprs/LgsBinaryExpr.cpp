@@ -9,8 +9,8 @@ json::value LgsBinaryExpr::asJsonStr() {
     assert(0);
 }
 
-std::string LgsBinaryExpr::pname() {
-    return left->pname() + ' ' + opStr + ' ' + right->pname();
+std::string LgsBinaryExpr::getName() {
+    return left->getName() + ' ' + opStr + ' ' + right->getName();
 }
 
 LgsBinaryExpr::~LgsBinaryExpr() {

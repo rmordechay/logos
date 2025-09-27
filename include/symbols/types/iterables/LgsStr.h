@@ -8,10 +8,8 @@ public:
     static constexpr auto name = "Str";
 
     LgsStr(): LgsIterable(&LGS_CHAR) {}
-    Type* getIRBaseType(LgsLLVMGen* cg) const;
     Type* getIRType(LgsLLVMGen& cg) override;
     std::string getName() override;
-    std::string pname() override;
     json::value asJsonStr() override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;

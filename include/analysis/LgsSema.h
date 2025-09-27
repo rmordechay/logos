@@ -117,9 +117,7 @@ public:
     void visitGroup(LgsGroup* group);
     void visitLoopMetaVar(LgsLoopMetaVar* metaVar);
 
-    void addHeapExpr(LgsExpr* expr);
     void validateExprType(const LgsExpr* expr, LgsType* type);
-
     void validateObjImplements(LgsObject* obj, const std::vector<LgsType*>& interfaces);
     void validateObjInterface(LgsObject* obj, LgsInterface* interface);
     void validateIndex(LgsIterIndex* iterIndex);
@@ -130,6 +128,7 @@ public:
     void validateTypeDuplicates(LgsType* type);
     static bool validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const LgsFunc* func);
 
+    void addHeapExpr(LgsExpr* expr);
     LgsSymbol* getSymbol(const std::string& name, const LgsLocation* location);
     void addLocalSymbol(const LgsSymbol& newSymbol);
 };

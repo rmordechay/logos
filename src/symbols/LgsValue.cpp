@@ -6,7 +6,7 @@ Value* LgsValue::loadIR(LgsLLVMGen& cg) {
     assert(0);
 }
 
-std::string LgsValue::pname() {
+std::string LgsValue::getName() {
     assert(0);
 }
 

@@ -7,7 +7,7 @@ void LgsHashMap::completeType(LgsType* toType) {
     }
 }
 
-std::string LgsHashMap::pname() {
+std::string LgsHashMap::getName() {
     return type->pname();
 }
 

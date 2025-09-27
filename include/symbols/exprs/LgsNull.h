@@ -8,13 +8,13 @@ public:
     }
 
     json::value asJsonStr() override;
-    std::string pname() override;
+    std::string getName() override;
 };
 
 inline json::value LgsNull::asJsonStr() {
     return json::value(nullptr);
 }
 
-inline std::string LgsNull::pname() {
+inline std::string LgsNull::getName() {
     return "null";
 }

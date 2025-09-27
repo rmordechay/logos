@@ -3,12 +3,12 @@
 
 class LgsIntConst final : public LgsExpr {
 public:
-    uint64_t value;
+    int64_t value;
 
     LgsIntConst(LgsType* type, const size_t value) : LgsExpr(type), value(value) {}
     Value* loadIR(LgsLLVMGen& cg) override;
     LgsExpr* castTo(LgsType* toType) override;
-    std::string pname() override;
+    std::string getName() override;
     LgsExpr* clone() override;
     json::value asJsonStr() override;
 };

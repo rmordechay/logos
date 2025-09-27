@@ -4,7 +4,7 @@ Value* LgsLoopMetaVar::loadIR(LgsLLVMGen& cg) {
     return IRValue;
 }
 
-std::string LgsLoopMetaVar::pname() {
+std::string LgsLoopMetaVar::getName() {
     switch (varType) {
     case FOR_I:
         return "for.i";
@@ -21,5 +21,5 @@ std::string LgsLoopMetaVar::pname() {
 }
 
 json::value LgsLoopMetaVar::asJsonStr() {
-    return json::value(pname());
+    return json::value(getName());
 }

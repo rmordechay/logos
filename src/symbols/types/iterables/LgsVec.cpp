@@ -22,10 +22,6 @@ std::string LgsVec::getName() {
     return "vec" + std::to_string(dim);
 }
 
-std::string LgsVec::pname() {
-    return getName();
-}
-
 json::value LgsVec::asJsonStr() {
     assert(0);
 }

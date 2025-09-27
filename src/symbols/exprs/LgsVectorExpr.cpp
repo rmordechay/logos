@@ -4,7 +4,7 @@ Value* LgsVectorExpr::loadIR(LgsLLVMGen& cg) {
     return cg.builder.CreateLoad(vecType->getIRType(cg), IRValue);
 }
 
-std::string LgsVectorExpr::pname() {
+std::string LgsVectorExpr::getName() {
     return vecType->pname();
 }
 

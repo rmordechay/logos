@@ -13,7 +13,7 @@ public:
     LgsPostfixOperator op;
 
     LgsPostfixExpr(LgsExpr* baseExpr, const LgsPostfixOperator op) : expr(baseExpr), op(op) {}
-    std::string pname() override;
+    std::string getName() override;
     json::value asJsonStr() override;
     ~LgsPostfixExpr() override;
 };

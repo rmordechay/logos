@@ -3,10 +3,6 @@
 #include "codegen/LgsLLVMGen.h"
 #include "exprs/LgsNull.h"
 
-std::string LgsVoid::pname() {
-    return name;
-}
-
 Type* LgsVoid::getIRType(LgsLLVMGen& cg) {
     return Type::getVoidTy(cg.context);
 }

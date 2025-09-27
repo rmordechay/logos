@@ -42,7 +42,7 @@ json::value LgsInstance::asJsonStr() {
     return jsonObj;
 }
 
-std::string LgsInstance::pname() {
+std::string LgsInstance::getName() {
     return name;
 }
 

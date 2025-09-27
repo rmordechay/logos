@@ -1234,18 +1234,18 @@ void LgsCodeGen::generateIf(Value* cond, const std::function<void()>& blockStmtC
 Value* LgsCodeGen::createStaticArray(const LgsArrayExpr* arrayExpr) {
     const auto arr = arrayExpr->type->asSArray();
     const auto baseIRType = arr->baseType->getIRType(cg);
-    const auto arrIRType = ArrayType::get(baseIRType, arr->sizeExpr->getConstInt());
-    const auto arrIRPtr = cg.builder.CreateAlloca(arrIRType);
+    const auto arraySize = arr->sizeExpr->IRValue;
+    const auto arrIRPtr = cg.builder.CreateAlloca(baseIRType, arraySize);
     if (arrayExpr->initialElements.empty()) return arrIRPtr;
+    const auto arrIRType = ArrayType::get(baseIRType, arrayExpr->initialElements.size());
     if (allArgsAreConst(arrayExpr->initialElements)) {
         std::vector<Constant*> IRValues;
         for (int i = 0; i < arrayExpr->initialElements.size(); ++i) {
             const auto element = arrayExpr->initialElements[i];
             IRValues.push_back(dyn_cast<Constant>(getIRValue(element)));
         }
-        const auto at = ArrayType::get(baseIRType, arrayExpr->initialElements.size());
         const auto size = arr->baseType->getSizeBytes() * arrayExpr->initialElements.size();
-        const auto constArr = cg.createConstGlobal(at, ConstantArray::get(at, IRValues));
+        const auto constArr = cg.createConstGlobal(arrIRType, ConstantArray::get(arrIRType, IRValues));
         cg.callMemCpy(arrIRPtr, constArr, cg.i64(size));
         return arrIRPtr;
     }

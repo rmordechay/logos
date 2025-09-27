@@ -14,7 +14,7 @@ public:
     void setObject(LgsObject* newObj);
     void setVirtuals(LgsLLVMGen& cg) const;
     json::value asJsonStr() override;
-    std::string pname() override;
+    std::string getName() override;
     bool equals(LgsExpr* other) override;
     ~LgsInstance() override;
 };

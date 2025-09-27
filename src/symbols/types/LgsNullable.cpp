@@ -7,10 +7,6 @@ Type* LgsNullable::getIRType(LgsLLVMGen& cg) {
     return cg.ptrTy();
 }
 
-std::string LgsNullable::getName() {
-    return baseType->getName() + "?";
-}
-
 LgsExpr* LgsNullable::getZeroValue() {
     return new LgsNull();
 }
@@ -19,12 +15,16 @@ Lgs_RTType LgsNullable::getRTType() {
     assert(0);
 }
 
-json::value LgsNullable::asJsonStr() {
-    assert(0);
+std::string LgsNullable::getName() {
+    return baseType->getName() + "?";
 }
 
 std::string LgsNullable::pname() {
     return baseType->pname() + '?';
+}
+
+json::value LgsNullable::asJsonStr() {
+    assert(0);
 }
 
 bool LgsNullable::canCastTo(LgsType* other) {

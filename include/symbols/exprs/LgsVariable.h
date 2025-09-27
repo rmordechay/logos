@@ -13,6 +13,6 @@ public:
     bool equals(LgsExpr* other) override;
     Value* hash(LgsLLVMGen& cg) override;
     void assign(LgsLLVMGen& cg, LgsExpr* expr) override;
-    std::string pname() override;
+    std::string getName() override;
     json::value asJsonStr() override;
 };

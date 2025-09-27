@@ -2,7 +2,7 @@
 
 #include "exprs/constants/LgsStrConst.h"
 
-std::string LgsUIntConst::pname() {
+std::string LgsUIntConst::getName() {
     return std::to_string(value);
 }
 

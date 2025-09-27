@@ -3,8 +3,8 @@
 #include "LgsType.h"
 #include "utils/LgsUtils.h"
 
-std::string LgsCast::pname() {
-    return fromValue->pname() + "->" + toType->pname();
+std::string LgsCast::getName() {
+    return fromValue->getName() + "->" + toType->pname();
 }
 
 json::value LgsCast::asJsonStr() {

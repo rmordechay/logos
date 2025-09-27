@@ -54,7 +54,7 @@ void LgsExpr::freeOwner(LgsLLVMGen& cg) {
     }
 }
 
-size_t LgsExpr::getConstInt() {
+int64_t LgsExpr::getConstInt() {
     if (const auto intConst = asIntConst()) {
         return intConst->value;
     }
@@ -63,7 +63,8 @@ size_t LgsExpr::getConstInt() {
         case VAR_DEC:
             return var->ref.varDec->expr->getConstInt();
         case FIELD:
-            return var->ref.field->expr->getConstInt();
+            if (var->ref.field->expr) var->ref.field->expr->getConstInt();
+            break;
         default:
             break;
         }

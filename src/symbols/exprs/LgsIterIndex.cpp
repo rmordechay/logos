@@ -120,13 +120,13 @@ void LgsIterIndex::assignHashMap(LgsLLVMGen& cg, LgsHashMap* map) {
     assert(0);
 }
 
-std::string LgsIterIndex::pname() {
+std::string LgsIterIndex::getName() {
     std::stringstream str;
-    str << baseExpr->pname();
+    str << baseExpr->getName();
     if (index.to) {
-        str << '[' << index.from->pname() << ':' << index.to->pname() << ']';
+        str << '[' << index.from->getName() << ':' << index.to->getName() << ']';
     } else {
-        str << '[' << index.from->pname() << ']';
+        str << '[' << index.from->getName() << ']';
     }
     return str.str();
 }

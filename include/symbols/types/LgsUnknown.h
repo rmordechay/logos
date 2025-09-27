@@ -10,7 +10,6 @@ public:
     explicit LgsUnknown(std::string name = LGS_UNKNOWN_TYPE) : name(std::move(name)) {}
     Type* getIRType(LgsLLVMGen& cg) override;
     std::string getName() override;
-    std::string pname() override;
     json::value asJsonStr() override;
     LgsExpr* getZeroValue() override;
     Lgs_RTType getRTType() override;

@@ -6,19 +6,11 @@
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsChar.h"
 
-Type* LgsStr::getIRBaseType(LgsLLVMGen* cg) const {
-    return ArrayType::get(baseType->getIRType(*cg), sizeExpr->getConstInt());
-}
-
 Type* LgsStr::getIRType(LgsLLVMGen& cg) {
     return cg.ptrTy();
 }
 
 std::string LgsStr::getName() {
-    return name;
-}
-
-std::string LgsStr::pname() {
     return name;
 }
 

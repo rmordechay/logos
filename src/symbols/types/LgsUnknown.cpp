@@ -4,10 +4,6 @@ json::value LgsUnknown::asJsonStr() {
     assert(0);
 }
 
-std::string LgsUnknown::pname() {
-    return getName();
-}
-
 std::string LgsUnknown::getName() {
     return name;
 }

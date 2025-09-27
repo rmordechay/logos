@@ -16,7 +16,7 @@ public:
 
     explicit LgsLoopMetaVar(const LgsLoopMetaVarType forType) : varType(forType) {}
     Value* loadIR(LgsLLVMGen& cg) override;
-    std::string pname() override;
+    std::string getName() override;
     json::value asJsonStr() override;
 };
 

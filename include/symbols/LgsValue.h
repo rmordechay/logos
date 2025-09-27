@@ -17,7 +17,7 @@ public:
     llvm::Value* IRValue = nullptr;
     LgsLocation location{0, 0, 0};
 
-    virtual std::string pname(); // pretty name
+    virtual std::string getName(); // pretty name
     virtual llvm::Value* loadIR(LgsLLVMGen& cg);
     virtual void setDebugValue(LgsLLVMGen& cg);
     virtual json::value asJsonStr() = 0;

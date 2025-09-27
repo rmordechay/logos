@@ -49,7 +49,7 @@ void LgsFuncCall::resolveVirtualFunc(LgsLLVMGen& cg) const {
     func->IRValue = cg.callLgsFunc("vtable_get", cg.getFT(cg.ptrTy(), {cg.ptrTy(), cg.ptrTy()}), {selfPtr, keyIR});
 }
 
-std::string LgsFuncCall::pname() {
+std::string LgsFuncCall::getName() {
     std::stringstream str;
     str << name << '(';
     for (size_t i = isMethodCall; i < args.size(); ++i) {

@@ -13,7 +13,7 @@ public:
     explicit LgsArrayExpr(LgsSet* setType) : LgsExpr(setType) {}
     Value* loadIR(LgsLLVMGen& cg) override;
     void completeType(LgsType* toType) override;
-    std::string pname() override;
+    std::string getName() override;
     json::value asJsonStr() override;
     ~LgsArrayExpr() override;
 };

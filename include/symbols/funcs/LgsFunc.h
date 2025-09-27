@@ -47,7 +47,7 @@ public:
     void completeType(LgsType* toType) override;
     BasicBlock* getCleanupBlock(LgsLLVMGen& cg);
     bool needsCleanup() const;
-    std::string pname() override;
+    std::string getName() override;
     std::string getIRName() const;
     json::value asJsonStr() override;
     ~LgsFunc() override;

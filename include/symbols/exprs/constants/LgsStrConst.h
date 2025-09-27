@@ -16,7 +16,7 @@ public:
     }
 
     Value* loadIR(LgsLLVMGen& cg) override;
-    std::string pname() override;
+    std::string getName() override;
     Value* hash(LgsLLVMGen& cg) override;
     json::value asJsonStr() override;
     ~LgsStrConst() override;

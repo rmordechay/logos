@@ -59,7 +59,7 @@ public:
     virtual LgsExpr* clone();
 
     void freeOwner(LgsLLVMGen& cg);
-    size_t getConstInt();
+    int64_t getConstInt();
     std::string getConstStr();
     Value* getIRPtr(LgsLLVMGen& cg) const;
     void setType(LgsType* newType);

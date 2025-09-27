@@ -106,7 +106,7 @@ bool LgsFunc::needsCleanup() const {
     return !owners.empty() || !orphans.empty();
 }
 
-std::string LgsFunc::pname() {
+std::string LgsFunc::getName() {
     return funcType->pname();
 }
 

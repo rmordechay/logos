@@ -6,6 +6,6 @@ json::value LgsTypeExpr::asJsonStr() {
     assert(0);
 }
 
-std::string LgsTypeExpr::pname() {
+std::string LgsTypeExpr::getName() {
     return type->pname();
 }

@@ -8,7 +8,7 @@ public:
     LgsHashMap() = default;
     explicit LgsHashMap(LgsMap* mapType) : LgsExpr(mapType) {}
     void completeType(LgsType* toType) override;
-    std::string pname() override;
+    std::string getName() override;
     json::value asJsonStr() override;
     ~LgsHashMap() override;
 };

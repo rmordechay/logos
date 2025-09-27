@@ -49,7 +49,7 @@ Value* LgsVariable::hash(LgsLLVMGen& cg) {
     }
 }
 
-std::string LgsVariable::pname() {
+std::string LgsVariable::getName() {
     return name;
 }
 

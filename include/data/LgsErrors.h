@@ -108,3 +108,5 @@ inline LgsBaseError E10083{.msg = "Method '%s' is an object method but was calle
 inline LgsBaseError E10084{.msg = "'%s' does not belong to an IO pair.", .code = errCodeStart++};
 inline LgsBaseError E10085{.msg = "Parsing error.", .code = errCodeStart++};
 inline LgsBaseError E10089{.msg = "'%s' can only be assigned to an instance of '%s', not the object itself.", .code = errCodeStart++};
+inline LgsBaseError E10090{.msg = "'%s' can only prefix numbers. Given: '%s'.", .code = errCodeStart++};
+inline LgsBaseError E10091{.msg = "'not' can only prefix 'Bool'. Given: '%s'.", .code = errCodeStart++};

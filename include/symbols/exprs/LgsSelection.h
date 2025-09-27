@@ -11,7 +11,7 @@ public:
     LgsExpr* lastExprParent() const;
     LgsFuncCall* asMethodCall() const;
     void assign(LgsLLVMGen& cg, LgsExpr* expr) override;
-    std::string pname() override;
+    std::string getName() override;
     Value* hash(LgsLLVMGen& cg) override;
     bool equals(LgsExpr* other) override;
     json::value asJsonStr() override;

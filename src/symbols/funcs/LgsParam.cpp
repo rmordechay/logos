@@ -2,7 +2,7 @@
 #include "funcs/LgsFunc.h"
 #include "utils/LgsUtils.h"
 
-std::string LgsParam::pname() {
+std::string LgsParam::getName() {
     return name;
 }
 

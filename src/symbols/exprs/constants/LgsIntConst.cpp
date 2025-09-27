@@ -25,7 +25,7 @@ LgsExpr* LgsIntConst::castTo(LgsType* toType) {
     assert(0);
 }
 
-std::string LgsIntConst::pname() {
+std::string LgsIntConst::getName() {
     return std::to_string(value);
 }
 
@@ -36,7 +36,7 @@ LgsExpr* LgsIntConst::clone() {
 json::value LgsIntConst::asJsonStr() {
     json::object jsonObj;
     jsonObj["exprType"] = "intConst";
-    jsonObj["name"] = pname();
+    jsonObj["name"] = getName();
     jsonObj["type"] = type->asJsonStr();
     return jsonObj;
 }

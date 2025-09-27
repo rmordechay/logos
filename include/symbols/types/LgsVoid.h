@@ -8,8 +8,7 @@ public:
     LgsVoid() {
         isPrimitive = true;
     }
-    std::string pname() override;
-    llvm::Type* getIRType(LgsLLVMGen& cg) override;
+    Type* getIRType(LgsLLVMGen& cg) override;
     size_t getSizeBytes() override;
     std::string getName() override;
     LgsExpr* getZeroValue() override;

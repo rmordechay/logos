@@ -6,7 +6,7 @@ Value* LgsPrefixExpr::loadIR(LgsLLVMGen& cg) {
     return IRValue;
 }
 
-std::string LgsPrefixExpr::pname() {
+std::string LgsPrefixExpr::getName() {
     assert(0);
 }
 
