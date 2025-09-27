@@ -1,5 +1,12 @@
 #include "exprs/LgsHashMap.h"
 
+void LgsHashMap::completeType(LgsType* toType) {
+    if (!toType->asMap()) return;
+    if (!type) {
+        type = toType;
+    }
+}
+
 std::string LgsHashMap::pname() {
     return type->pname();
 }

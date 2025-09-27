@@ -18,7 +18,7 @@ void LgsAstCmd::run() {
     if (withErrors) {
         ast["errors"] = app.errHandler.asJSON();
     }
-    std::cout << app.ast.front()->asJSON() << std::endl;
+    std::cout << ast["ast"];
 }
 
 LgsCliCmdHelp& LgsAstCmd::getHelp() {

@@ -27,6 +27,7 @@ static std::string getTypeName(const Lgs_RTType type) {
     case RTT_VEC4: return "Vec4";
     case RTT_SARRAY: return "SArray";
     case RTT_DARRAY: return "DArray";
+    case RTT_MAP: return "Map";
     case RTT_OBJECT: return "Object";
     case RTT_TYPE: return "Type";
     }

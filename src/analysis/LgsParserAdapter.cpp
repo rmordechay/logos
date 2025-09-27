@@ -923,6 +923,7 @@ LgsExpr* LgsParserAdapter::getArrayExpr(LogosParser::ArrayExprContext* ctx) {
 
 LgsExpr* LgsParserAdapter::getHashMap(LogosParser::HashMapContext* ctx) {
     const auto hashMap = new LgsHashMap();
+    setLocation(hashMap->location, ctx->start, ctx->stop);
     for (const auto keyValue : ctx->keyValue()) {
         const auto kExpr = getExpr(keyValue->key);
         const auto vExpr = getExpr(keyValue->value);

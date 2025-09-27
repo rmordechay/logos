@@ -22,6 +22,7 @@ enum Lgs_RTType {
     RTT_VEC4,
     RTT_SARRAY,
     RTT_DARRAY,
+    RTT_MAP,
     RTT_OBJECT,
     RTT_TYPE,
 };

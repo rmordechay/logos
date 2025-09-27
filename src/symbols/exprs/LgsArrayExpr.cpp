@@ -13,15 +13,25 @@ json::value LgsArrayExpr::asJSON() {
 
 void LgsArrayExpr::completeType(LgsType* toType) {
     const auto thisDArr = type->asDArray();
-    if (thisDArr && toType->asDArray()) {
-        freeExpr(thisDArr->sizeExpr);
-        thisDArr->sizeExpr = toType->asDArray()->sizeExpr;
+    const auto otherDArr = toType->asDArray();
+    if (thisDArr && otherDArr) {
+        if (!thisDArr->baseType) {
+            thisDArr->baseType = otherDArr->baseType;
+        }
+        if (!thisDArr->sizeExpr) {
+            thisDArr->sizeExpr = otherDArr->sizeExpr;
+        }
         return;
     }
     const auto thisSArr = type->asSArray();
-    if (thisSArr && toType->asSArray()) {
-        freeExpr(thisSArr->sizeExpr);
-        thisSArr->sizeExpr = toType->asSArray()->sizeExpr;
+    const auto otherSArr = toType->asSArray();
+    if (thisSArr && otherSArr) {
+        if (!thisSArr->baseType) {
+            thisSArr->baseType = otherSArr->baseType;
+        }
+        if (!thisSArr->sizeExpr) {
+            thisSArr->sizeExpr = otherSArr->sizeExpr;
+        }
     }
 }
 

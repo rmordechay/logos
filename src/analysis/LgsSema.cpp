@@ -600,18 +600,16 @@ void LgsSema::visitDynamicArray(LgsArrayExpr* array) {
 }
 
 void LgsSema::visitHashMap(LgsHashMap* hashMap) {
-    const auto typePair = hashMap->type->asMap()->typePair;
-    if (typePair->key && typePair->value) return;
-    if (hashMap->initialElements.empty()) {
-        return errHandler.addError(E10049, &hashMap->location, {hashMap->pname()});
-    }
     for (const auto element : hashMap->initialElements) {
         visitExpr(element->key);
         visitExpr(element->value);
     }
+    if (hashMap->type) return;
+    if (hashMap->initialElements.empty()) {
+        return errHandler.addError(E10049, &hashMap->location, {LgsMap::name});
+    }
     const auto firstElement = hashMap->initialElements.front();
-    typePair->key = firstElement->key->type;
-    typePair->value = firstElement->value->type;
+    hashMap->type = new LgsMap(firstElement->key->type, firstElement->value->type);
 }
 
 void LgsSema::visitVectorExpr(const LgsVectorExpr* vectorExpr) {

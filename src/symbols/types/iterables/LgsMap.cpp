@@ -1,4 +1,6 @@
 #include "types/iterables/LgsMap.h"
+
+#include "data/LgsDefinitions.h"
 #include "exprs/LgsHashMap.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsVoid.h"
@@ -12,7 +14,7 @@ std::string LgsMap::getName() {
 }
 
 std::string LgsMap::pname() {
-    return '{' + typePair->key->pname() + ": " + typePair->value->pname() + '}';
+    return '{' + (typePair->key ? typePair->key->pname() : LGS_UNKNOWN_TYPE) + ": " + (typePair->value ? typePair->value->pname() : LGS_UNKNOWN_TYPE) + '}';
 }
 
 json::value LgsMap::asJSON() {
@@ -47,7 +49,7 @@ LgsExpr* LgsMap::getZeroValue() {
 }
 
 Lgs_RTType LgsMap::getRTType() {
-    assert(0);
+    return RTT_MAP;
 }
 
 LgsType* LgsMap::getIndexType() {
@@ -81,6 +83,7 @@ bool LgsMap::canCastTo(LgsType* other) {
     const auto otherMap = other->asMap();
     if (!otherMap) return false;
     const auto otherKvType = otherMap->typePair;
+    if (!typePair->key || !typePair->value) return false;
     const auto keyEqual = typePair->key->canCastTo(otherKvType->key);
     return keyEqual && typePair->value->canCastTo(otherKvType->value);
 }
