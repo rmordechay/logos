@@ -73,6 +73,21 @@ public:
     bool isUnknown();
     bool isSliceable();
 
+    virtual LgsField* getField(const std::string& name);
+    virtual LgsFunc* getMethod(const std::string& methodName);
+    virtual Type* getIRType(LgsLLVMGen& cg) = 0;
+    virtual size_t getSizeBytes() = 0;
+    virtual LgsExpr* getZeroValue() = 0;
+    virtual Lgs_RTType getRTType() = 0;
+    virtual std::string getName() = 0;
+    virtual std::string pname() = 0; // pretty name
+    virtual bool canCastTo(LgsType* other) = 0;
+    virtual LgsType* applyOp(LgsType* other, LgsOperator op);
+    virtual std::string strFormatPart() const = 0;
+    virtual DIBasicType* getDebugType(LgsLLVMGen& cg);
+    virtual LgsType* clone();
+    virtual json::value asJsonStr() = 0;
+
     LgsAny* asAny();
     LgsChar* asChar();
     LgsStr* asStr();
@@ -100,21 +115,6 @@ public:
     LgsGroup* asGroup();
     LgsSubType* asSubtype();
     LgsTypePair* asPair();
-
-    virtual LgsField* getField(const std::string& name);
-    virtual LgsFunc* getMethod(const std::string& name);
-    virtual Type* getIRType(LgsLLVMGen& cg) = 0;
-    virtual size_t getSizeBytes() = 0;
-    virtual LgsExpr* getZeroValue() = 0;
-    virtual Lgs_RTType getRTType() = 0;
-    virtual std::string getName() = 0;
-    virtual std::string pname() = 0; // pretty name
-    virtual bool canCastTo(LgsType* other) = 0;
-    virtual LgsType* applyOp(LgsType* other, LgsOperator op);
-    virtual std::string strFormatPart() const = 0;
-    virtual DIBasicType* getDebugType(LgsLLVMGen& cg);
-    virtual LgsType* clone();
-    virtual json::value asJsonStr() = 0;
 
     virtual Value* addIR(LgsLLVMGen& cg, Value* self, Value* other);
     virtual Value* subIR(LgsLLVMGen& cg, Value* self, Value* other);

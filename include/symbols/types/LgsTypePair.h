@@ -40,7 +40,7 @@ inline size_t LgsTypePair::getSizeBytes() {
 }
 
 inline std::string LgsTypePair::pname() {
-    return '<' + key->pname() + "," + value->pname() + '>';
+    return '<' + key->pname() + ", " + value->pname() + '>';
 }
 
 inline json::value LgsTypePair::asJsonStr() {

@@ -45,7 +45,6 @@
 #include "stmts/LgsIOStmt.h"
 #include "stmts/LgsIfStmt.h"
 #include "types/primitives/LgsDouble.h"
-#include "types/primitives/LgsSize.h"
 #include "types/primitives/LgsUInt.h"
 
 void LgsSema::analyse() {
@@ -418,7 +417,7 @@ void LgsSema::visitRangeLoop(LgsRangeLoop* rangeLoop) {
     visitStmtsBlock(rangeLoop->stmtsBlock);
 }
 
-void LgsSema::visitForeachLoop(const LgsForeachLoop* foreachLoop) {
+void LgsSema::visitForeachLoop(LgsForeachLoop* foreachLoop) {
     const auto iterExpr = foreachLoop->iterExpr;
     visitExpr(iterExpr);
     const auto iterable = iterExpr->type->asIterable();
@@ -429,13 +428,12 @@ void LgsSema::visitForeachLoop(const LgsForeachLoop* foreachLoop) {
         return;
     }
 
-    const auto varDecSize = foreachLoop->loopVars.size();
-    const auto unpackCount = iterable->getUnpackCount();
-    if (unpackCount != varDecSize) {
-        errHandler.addError(E10041, &foreachLoop->iterExpr->location, {foreachLoop->iterExpr->pname(), std::to_string(unpackCount), std::to_string(unpackCount + 1), std::to_string(varDecSize)});
+    const bool unpacked = iterable->unpackLoopVars(foreachLoop);
+    if (!unpacked) {
+        errHandler.addError(E10041, &foreachLoop->iterExpr->location, {foreachLoop->iterExpr->pname(), foreachLoop->iterExpr->type->pname(), std::to_string(foreachLoop->loopVars.size())});
         return;
     }
-    iterable->unpackLoopVars(foreachLoop->loopVars, iterExpr);
+
     for (const auto varDec : foreachLoop->loopVars) {
         addLocalSymbol(LgsSymbol(varDec));
     }
@@ -660,8 +658,8 @@ void LgsSema::visitVariable(LgsVariable* variable) {
         break;
     }
     case ENUM: {
-        variable->ref.lgsEnum = symbol->lgsEnum;
-        variable->setType(symbol->lgsEnum);
+        variable->ref.enum_ = symbol->enum_;
+        variable->setType(symbol->enum_);
         break;
     }
     case FUNC: {
@@ -810,45 +808,29 @@ void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent) {
 }
 
 void LgsSema::visitFuncCall(LgsFuncCall* funcCall) {
-    for (const auto arg : funcCall->args) {
-        visitExpr(arg);
-    }
     const auto symbol = getSymbol(funcCall->name, &funcCall->location);
     if (!symbol) return;
-    if (symbol->symbolType == FUNC) {
-        const auto func = symbol->func;
-        if (funcCall->equals(func->funcType)) {
+    const auto ft = symbol->getType()->asFuncType();
+    if (!ft) {
+        return errHandler.addError(E10046, &funcCall->location, {funcCall->name});
+    }
+    for (size_t i = ft->isMethod; i < ft->params.size(); ++i) {
+        const auto arg = funcCall->args[i];
+        const auto& param = ft->params[i];
+        arg->completeType(param.type);
+        visitExpr(arg);
+    }
+    if (funcCall->equals(ft)) {
+        if (symbol->symbolType == FUNC) {
+            const auto func = symbol->func;
             funcCall->func = func;
             funcCall->setType(func->funcType->rt);
         } else {
-            errHandler.addError(E10015, &funcCall->location, {funcCall->name, funcCall->pname(), func->pname()});
+            funcCall->ref = *symbol;
+            funcCall->setType(ft->rt);
         }
     } else {
-        LgsType* type = nullptr;
-        if (symbol->symbolType == VAR_DEC) {
-            type = symbol->varDec->type;
-            const auto ft = symbol->varDec->type->asFuncType();
-            if (funcCall->equals(ft)) {
-                funcCall->ref.symbolType = VAR_DEC;
-                funcCall->ref.varDec = symbol->varDec;
-                funcCall->setType(ft->rt);
-            } else {
-                errHandler.addError(E10015, &funcCall->location, {funcCall->name, funcCall->pname(), ft->pname()});
-            }
-        } else if (symbol->symbolType == PARAM) {
-            type = symbol->param->type;
-            const auto ft = symbol->param->type->asFuncType();
-            if (funcCall->equals(ft)) {
-                funcCall->ref.symbolType = PARAM;
-                funcCall->ref.param = symbol->param;
-                funcCall->setType(ft->rt);
-            } else {
-                errHandler.addError(E10015, &funcCall->location, {funcCall->name, funcCall->pname(), ft->pname()});
-            }
-        }
-        if (!type->asFuncType()) {
-            errHandler.addError(E10046, &funcCall->location, {funcCall->name});
-        }
+        errHandler.addError(E10015, &funcCall->location, {funcCall->name, funcCall->pname(), ft->pname()});
     }
 }
 
@@ -1113,7 +1095,8 @@ void LgsSema::validateExprType(const LgsExpr* expr, LgsType* type) {
         }
         return;
     }
-    if (type && !type->isUnknown() && expr->type && !type->canCastTo(expr->type)) {
+    if (!type || !expr->type || type->isUnknown() || expr->type->isUnknown()) return;
+    if (!type->canCastTo(expr->type)) {
         errHandler.addError(E10001, &expr->location, {type->pname(), expr->type->pname()});
     }
 }

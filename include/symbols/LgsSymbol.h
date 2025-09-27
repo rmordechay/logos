@@ -1,5 +1,6 @@
 #pragma once
 
+class LgsType;
 class LgsSubType;
 class LgsVariable;
 class LgsGroup;
@@ -37,7 +38,7 @@ struct LgsSymbol {
     LgsInterface* interface = nullptr;
     LgsSubType* subtype = nullptr;
     LgsField* field = nullptr;
-    LgsEnum* lgsEnum = nullptr;
+    LgsEnum* enum_ = nullptr;
     LgsFunc* func = nullptr;
     LgsGroup* group = nullptr;
     LgsLocation* location;
@@ -52,4 +53,5 @@ struct LgsSymbol {
     explicit LgsSymbol(LgsObject* object, bool isExternal = false, bool isBuiltin = false);
     explicit LgsSymbol(LgsEnum* lgsEnum, bool isExternal = false, bool isBuiltin = false);
     explicit LgsSymbol(LgsFunc* func, bool isExternal = false, bool isBuiltin = false);
+    LgsType* getType() const;
 };

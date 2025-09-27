@@ -2,6 +2,7 @@
 #include "LgsType.h"
 #include "utils/LgsUtils.h"
 
+class LgsForeachLoop;
 class LgsLLVMGen;
 class LgsVarDec;
 struct LgsIndex;
@@ -27,7 +28,7 @@ public:
         addEmptyMethod(IS_NOT_EMPTY_FUNC_NAME);
     }
 
-    LgsFunc* getMethod(const std::string& name) override;
+    LgsFunc* getMethod(const std::string& methodName) override;
     virtual LgsFunc* getLenFunc();
     virtual LgsFunc* getIsEmptyFunc();
     virtual LgsFunc* getIsNotEmptyFunc();
@@ -35,8 +36,8 @@ public:
     virtual LgsFunc* getMapFunc();
     virtual LgsFunc* getFilterFunc();
     virtual LgsType* getIndexType() = 0;
-    virtual uint16_t getUnpackCount() const = 0;
-    virtual void unpackLoopVars(std::vector<LgsVarDec*> loopVars, LgsExpr* iterExpr) const;
+    virtual bool unpackLoopVars(LgsForeachLoop* loop) const;
+    virtual void unpackIR(LgsLLVMGen& cg, std::vector<LgsVarDec*> varDecs, Value* iterPtr, Value* index) const;
     virtual Value* lengthIR(LgsLLVMGen& cg, Value* iterable) = 0;
     virtual Value* inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) = 0;
     virtual Value* getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index);

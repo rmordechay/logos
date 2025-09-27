@@ -22,7 +22,6 @@ public:
     StructType* getArrStruct(LgsLLVMGen& cg);
     LgsFunc* getAddFunc() override;
     LgsType* getIndexType() override;
-    uint16_t getUnpackCount() const override;
     LgsType* applyOp(LgsType* other, LgsOperator op) override;
     Value* lengthIR(LgsLLVMGen& cg, Value* iterable) override;
     Value* inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) override;

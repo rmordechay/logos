@@ -8,44 +8,43 @@
 
 Value* LgsIterIndex::loadIR(LgsLLVMGen& cg) {
     const auto baseExprType = baseExpr->type;
-    if (baseExprType->asMap()) {
-        return loadFromMap(cg);
-    }
-    if (baseExprType->asDArray()) {
-        return loadFromDArray(cg);
+    if (baseExprType->asMap() || baseExprType->asDArray() || baseExprType->asSet()) {
+        const auto arr = baseExpr->type->asIterable();
+        const auto valueTy = arr->baseType->getIRType(cg);
+        return cg.builder.CreateLoad(valueTy, IRValue);
     }
     if (baseExprType->asSArray()) {
         return loadFromSArray(cg);
     }
     if (baseExprType->asVec()) {
-        return loadFromVec(cg);
+        const auto vec = cg.builder.CreateLoad(baseExpr->type->getIRType(cg), IRValue);
+        const auto i = index.from->IRValue;
+        return cg.builder.CreateExtractElement(vec, i);
     }
     if (baseExprType->asStr()) {
-        return loadFromStr(cg);
+        if (index.to) assert(0);
+        return cg.builder.CreateLoad(cg.i8Ty(), IRValue);
     }
     assert(0);
 }
 
 void LgsIterIndex::setIRElementPtr(LgsLLVMGen& cg) {
     const auto baseExprType = baseExpr->type;
+    auto indexIRValue = index.from->IRValue;
     if (const auto sArr = baseExprType->asSArray()) {
         IRValue = IRValue = cg.builder.CreateGEP(sArr->getIRType(cg), baseExpr->IRValue, {cg.i32Zero(), index.from->IRValue});;
     } else if (const auto dArr = baseExpr->type->asDArray()) {
-        auto indexIRValue = index.from->IRValue;
         indexIRValue = cg.builder.CreateZExt(indexIRValue, cg.i64Ty());
         IRValue = dArr->getIRElement(cg, baseExpr->IRValue, indexIRValue);
     } else if (const auto set = baseExpr->type->asSet()) {
-        auto indexIRValue = index.from->IRValue;
         indexIRValue = cg.builder.CreateZExt(indexIRValue, cg.i64Ty());
         IRValue = set->getIRElement(cg, baseExpr->IRValue, indexIRValue);
     } else if (const auto vec = baseExprType->asVec()) {
-        auto indexIRValue = index.from->IRValue;
         indexIRValue = cg.builder.CreateZExt(indexIRValue, cg.i64Ty());
         IRValue = vec->getIRElement(cg, baseExpr->IRValue, indexIRValue);
     } else if (const auto map = baseExpr->type->asMap()) {
-        const auto mapPtr = IRValue;
         const auto key = index.from->IRValue;
-        IRValue = map->getIRElement(cg, mapPtr, key);
+        IRValue = map->getIRElement(cg, baseExpr->IRValue, key);
     } else if (baseExprType->asStr()) {
         if (index.to) {
             const auto intFrom = index.from->asIntConst();
@@ -57,29 +56,6 @@ void LgsIterIndex::setIRElementPtr(LgsLLVMGen& cg) {
         }
     }
     assert(IRValue);
-}
-
-Value* LgsIterIndex::loadFromDArray(LgsLLVMGen& cg) {
-    const auto arr = baseExpr->type->asDArray();
-    const auto valueTy = arr->baseType->getIRType(cg);
-    return cg.builder.CreateLoad(valueTy, IRValue);
-}
-
-Value* LgsIterIndex::loadFromMap(LgsLLVMGen& cg) {
-    const auto map = baseExpr->type->asMap();
-    const auto valueTy = map->typePair->value->getIRType(cg);
-    return cg.builder.CreateLoad(valueTy, IRValue);
-}
-
-Value* LgsIterIndex::loadFromStr(LgsLLVMGen& cg) {
-    if (index.to) assert(0);
-    return cg.builder.CreateLoad(cg.i8Ty(), IRValue);
-}
-
-Value* LgsIterIndex::loadFromVec(LgsLLVMGen& cg) const {
-    const auto vec = cg.builder.CreateLoad(baseExpr->type->getIRType(cg), IRValue);
-    const auto i = index.from->IRValue;
-    return cg.builder.CreateExtractElement(vec, i);
 }
 
 Value* LgsIterIndex::loadFromSArray(LgsLLVMGen& cg) const {

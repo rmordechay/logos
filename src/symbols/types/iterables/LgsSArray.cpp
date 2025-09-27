@@ -1,12 +1,9 @@
 #include "types/iterables/LgsSArray.h"
-
 #include "codegen/LgsLLVMGen.h"
 #include "data/LgsDefinitions.h"
 #include "exprs/LgsArrayExpr.h"
-#include "exprs/LgsIterIndex.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsInt.h"
-#include "types/primitives/LgsSize.h"
 
 Type* LgsSArray::getIRType(LgsLLVMGen& cg) {
     if (IRType) return IRType;
@@ -16,13 +13,13 @@ Type* LgsSArray::getIRType(LgsLLVMGen& cg) {
 }
 
 std::string LgsSArray::getName() {
-    return name;
-}
-
-std::string LgsSArray::pname() {
     const auto index = sizeExpr->getConstInt() == 0 ? "" : std::to_string(sizeExpr->getConstInt());
     const auto ty = baseType ? baseType->pname() : LGS_UNKNOWN_TYPE;
     return ty + '[' + index + "]!";
+}
+
+std::string LgsSArray::pname() {
+    return getName();
 }
 
 size_t LgsSArray::getSizeBytes() {
@@ -39,10 +36,6 @@ Lgs_RTType LgsSArray::getRTType() {
 
 LgsType* LgsSArray::getIndexType() {
     return &LGS_INT;
-}
-
-uint16_t LgsSArray::getUnpackCount() const {
-    return 1;
 }
 
 std::string LgsSArray::strFormatPart() const {

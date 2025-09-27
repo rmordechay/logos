@@ -2,38 +2,37 @@
 
 #include "exprs/LgsIterIndex.h"
 #include "funcs/LgsFunc.h"
+#include "loops/LgsForeachLoop.h"
 #include "stmts/LgsVarDec.h"
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsSize.h"
 
-LgsFunc* LgsIterable::getMethod(const std::string& name) {
-    const auto method = methods.find(name);
-    if (method != methods.end()) {
-        if (name == ADD_FUNC_NAME) {
-            return getAddFunc();
-        }
-        if (name == LEN_FUNC_NAME) {
-            return getLenFunc();
-        }
-        if (name == IS_EMPTY_FUNC_NAME) {
-            return getIsEmptyFunc();
-        }
-        if (name == IS_NOT_EMPTY_FUNC_NAME) {
-            return getIsNotEmptyFunc();
-        }
-        if (name == MAP_FUNC_NAME) {
-            return getMapFunc();
-        }
-        if (name == FILTER_FUNC_NAME) {
-            return getFilterFunc();
-        }
-        if (name == FOREACH_FUNC_NAME) {
-            assert(0);
-        }
-        assert(method->second);
-        return method->second;
+LgsFunc* LgsIterable::getMethod(const std::string& methodName) {
+    if (methodName == ADD_FUNC_NAME) {
+        return getAddFunc();
     }
-    return nullptr;
+    if (methodName == LEN_FUNC_NAME) {
+        return getLenFunc();
+    }
+    if (methodName == IS_EMPTY_FUNC_NAME) {
+        return getIsEmptyFunc();
+    }
+    if (methodName == IS_NOT_EMPTY_FUNC_NAME) {
+        return getIsNotEmptyFunc();
+    }
+    if (methodName == MAP_FUNC_NAME) {
+        return getMapFunc();
+    }
+    if (methodName == FILTER_FUNC_NAME) {
+        return getFilterFunc();
+    }
+    if (methodName == FOREACH_FUNC_NAME) {
+        assert(0);
+    }
+    const auto method = methods.find(methodName);
+    if (method == methods.end()) return nullptr;
+    assert(method->second);
+    return method->second;
 }
 
 LgsFunc* LgsIterable::getAddFunc() {
@@ -44,47 +43,56 @@ LgsFunc* LgsIterable::getMapFunc() {
     const auto func = methods.find(MAP_FUNC_NAME);
     if (func != methods.end() && func->second) return func->second;
     func->second = new LgsFunc(MAP_FUNC_NAME, this, {this, new LgsFuncType(baseType, {LgsParam(baseType)})}, BUILTIN | PUBLIC | METHOD);
-    addMethod(func->second);
+    methods[MAP_FUNC_NAME] = func->second;
     return func->second;
 }
 
 LgsFunc* LgsIterable::getFilterFunc() {
     const auto func = methods.find(FILTER_FUNC_NAME);
     if (func != methods.end() && func->second) return func->second;
-    func->second = new LgsFunc("filter", this, {this, new LgsFuncType(&LGS_BOOL, {LgsParam(baseType)})}, BUILTIN | PUBLIC | METHOD);
-    addMethod(func->second);
+    func->second = new LgsFunc(FILTER_FUNC_NAME, this, {this, new LgsFuncType(&LGS_BOOL, {LgsParam(baseType)})}, BUILTIN | PUBLIC | METHOD);
+    methods[FILTER_FUNC_NAME] = func->second;
     return func->second;
 }
 
-void LgsIterable::unpackLoopVars(const std::vector<LgsVarDec*> loopVars, LgsExpr* iterExpr) const {
-    const auto iterIndex = new LgsIterIndex(iterExpr, LGS_SIZE.getZeroValue());
+bool LgsIterable::unpackLoopVars(LgsForeachLoop* loop) const {
+    if (loop->loopVars.size() != 1) return false;
+    const auto iterIndex = new LgsIterIndex(loop->iterExpr, LGS_SIZE.getZeroValue());
     iterIndex->setType(baseType);
-    loopVars[0]->expr = iterIndex;
-    loopVars[0]->type = iterIndex->type;
+    loop->loopVars[0]->expr = iterIndex;
+    loop->loopVars[0]->type = iterIndex->type;
+    return true;
+}
+
+void LgsIterable::unpackIR(LgsLLVMGen& cg, const std::vector<LgsVarDec*> varDecs, Value* iterPtr, Value* index) const {
+    const auto iterIndex = varDecs[0]->expr->asIterIndex();
+    iterIndex->index.from->IRValue = index;
+    iterIndex->setIRElementPtr(cg);
+    varDecs[0]->IRValue = iterIndex->IRValue;
 }
 
 LgsFunc* LgsIterable::getLenFunc() {
-    const auto lenFunc = methods.find(LEN_FUNC_NAME);
-    if (lenFunc != methods.end() && lenFunc->second) return lenFunc->second;
-    lenFunc->second = new LgsFunc(LEN_FUNC_NAME, &LGS_SIZE, {this}, BUILTIN | PUBLIC | METHOD);
-    addMethod(lenFunc->second);
-    return lenFunc->second;
+    const auto func = methods.find(LEN_FUNC_NAME);
+    if (func != methods.end() && func->second) return func->second;
+    func->second = new LgsFunc(LEN_FUNC_NAME, &LGS_SIZE, {this}, BUILTIN | PUBLIC | METHOD);
+    methods[LEN_FUNC_NAME] = func->second;
+    return func->second;
 }
 
 LgsFunc* LgsIterable::getIsEmptyFunc() {
-    const auto isEmptyFunc = methods.find(IS_EMPTY_FUNC_NAME);
-    if (isEmptyFunc != methods.end() && isEmptyFunc->second) return isEmptyFunc->second;
-    isEmptyFunc->second = new LgsFunc(IS_EMPTY_FUNC_NAME, &LGS_BOOL, {this}, BUILTIN | PUBLIC | METHOD);
-    addMethod(isEmptyFunc->second);
-    return isEmptyFunc->second;
+    const auto func = methods.find(IS_EMPTY_FUNC_NAME);
+    if (func != methods.end() && func->second) return func->second;
+    func->second = new LgsFunc(IS_EMPTY_FUNC_NAME, &LGS_BOOL, {this}, BUILTIN | PUBLIC | METHOD);
+    methods[IS_EMPTY_FUNC_NAME] = func->second;
+    return func->second;
 }
 
 LgsFunc* LgsIterable::getIsNotEmptyFunc() {
-    const auto isNotEmptyFunc = methods.find(IS_NOT_EMPTY_FUNC_NAME);
-    if (isNotEmptyFunc != methods.end() && isNotEmptyFunc->second) return isNotEmptyFunc->second;
-    isNotEmptyFunc->second = new LgsFunc(IS_NOT_EMPTY_FUNC_NAME, &LGS_BOOL, {this}, BUILTIN | PUBLIC | METHOD);;;
-    addMethod(isNotEmptyFunc->second);
-    return isNotEmptyFunc->second;
+    const auto func = methods.find(IS_NOT_EMPTY_FUNC_NAME);
+    if (func != methods.end() && func->second) return func->second;
+    func->second = new LgsFunc(IS_NOT_EMPTY_FUNC_NAME, &LGS_BOOL, {this}, BUILTIN | PUBLIC | METHOD);;;
+    methods[IS_NOT_EMPTY_FUNC_NAME] = func->second;
+    return func->second;
 }
 
 Value* LgsIterable::getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) {

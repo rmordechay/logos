@@ -1,0 +1,11 @@
+main() {
+    map = {"roi": "rdofj"}
+    for k, v in map {
+        print(k)
+        print(v)
+    }
+    arr = [1, 2, 3]
+    for i in arr {
+        print(i)
+    }
+}

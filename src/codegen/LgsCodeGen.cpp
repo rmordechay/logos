@@ -251,10 +251,8 @@ void LgsCodeGen::visitForeachLoop(LgsForeachLoop* loop) {
     cg.builder.CreateCondBr(condition, loop->IRBodyBlock, loop->IRExitBlock);
     cg.startBlock(loop->IRBodyBlock);
 
-    const auto iterIndex = loop->loopVars[0]->expr->asIterIndex();
-    iterIndex->index.from->IRValue = loop->iValue;
-    iterIndex->setIRElementPtr(cg);
-    loop->loopVars[0]->IRValue = iterIndex->IRValue;
+    const auto iterable = loop->iterExpr->type->asIterable();
+    iterable->unpackIR(cg, loop->loopVars, loop->iterExpr->IRValue, loop->iValue);
 }
 
 void LgsCodeGen::visitInfiniteLoop(const LgsInfiniteLoop* loop) const {
@@ -817,7 +815,7 @@ void LgsCodeGen::visitSelection(LgsSelection* selection) {
 }
 
 void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
-    for (int i = funcCall->func->funcType->isMethod; i < funcCall->args.size(); ++i) {
+    for (int i = 0; i < funcCall->args.size(); ++i) {
         visitExpr(funcCall->args[i]);
     }
     if (funcCall->ref.symbolType == PARAM) {
@@ -889,7 +887,7 @@ void LgsCodeGen::visitPostfixExpr(LgsPostfixExpr* postfixExpr) {
 }
 
 void LgsCodeGen::visitStrConst(LgsStrConst* strConst) {
-    for (auto templatePart : strConst->templateParts) {
+    for (const auto templatePart : strConst->templateParts) {
         visitExpr(templatePart);
     }
     strConst->IRValue = cg.getIRStr(strConst->value);

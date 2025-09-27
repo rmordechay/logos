@@ -47,10 +47,6 @@ StructType* LgsDArray::getArrStruct(LgsLLVMGen& cg) {
     return arrStruct;
 }
 
-uint16_t LgsDArray::getUnpackCount() const {
-    return 1;
-}
-
 LgsType* LgsDArray::applyOp(LgsType* other, const LgsOperator op) {
     const auto IRName = other->getName();
     switch (op) {
@@ -71,7 +67,7 @@ LgsFunc* LgsDArray::getAddFunc() {
     func->second->fn = [func](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
         return func->second->callIR(cg, {args[0]->IRValue, args[1]->getIRPtr(cg)});
     };
-    addMethod(func->second);
+    methods[func->second->funcType->name] = func->second;
     return func->second;
 }
 

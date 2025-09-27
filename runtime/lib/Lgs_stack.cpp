@@ -1,6 +1,7 @@
 #include "Lgs_stack.h"
 #include "Lgs_darray.h"
 #include "Lgs_set.h"
+#include "Lgs_hashmap.h"
 #include "utils/LgsUtils.h"
 
 #define PRINT_MEMORY true
@@ -56,6 +57,12 @@ static void freeType(void* ptr, const Lgs_RTType type) {
         const auto arr = static_cast<Lgs_set*>(ptr);
         delete arr->data;
         std::free(arr);
+        break;
+    }
+    case RTT_MAP: {
+        const auto map = static_cast<Lgs_hashmap*>(ptr);
+        // delete map->data;
+        // std::free(map);
         break;
     }
     default:

@@ -40,18 +40,14 @@ bool LgsTypeResolver::resolveGlobalTypes(const std::vector<LgsFile*>& ast, Threa
 LgsType* LgsTypeResolver::resolveType(LgsType* type, LgsFile* file) {
     if (const auto nullable = type->asNullable()) {
         nullable->baseType = resolveType(nullable->baseType, file);
-    }
-    if (const auto iter = type->asIterable()) {
+    } else if (const auto iter = type->asIterable()) {
         resolveIterable(iter, *file);
-    }
-    if (const auto pair = type->asPair()) {
+    } else if (const auto pair = type->asPair()) {
         pair->key = resolveType(pair->key, file);
         pair->value = resolveType(pair->value, file);
-    }
-    if (const auto funcType = type->asFuncType()) {
+    } else if (const auto funcType = type->asFuncType()) {
         resolveFuncTypes(funcType, *file);
     }
-
     if (type->isUnknown()) {
         auto typeName = type->getName();
         auto symbol = globals.getSymbol(typeName);
@@ -77,7 +73,7 @@ LgsType* LgsTypeResolver::resolveType(LgsType* type, LgsFile* file) {
             newType = symbol->group;
             break;
         case ENUM:
-            newType = symbol->lgsEnum;
+            newType = symbol->enum_;
             break;
         case SUBTYPE:
             newType = symbol->subtype;

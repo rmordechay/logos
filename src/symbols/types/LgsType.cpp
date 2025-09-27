@@ -79,11 +79,43 @@ bool LgsType::isNullable() {
 }
 
 bool LgsType::isUnknown() {
-    return dynamic_cast<LgsUnknown*>(this);
+    if (dynamic_cast<LgsUnknown*>(this)) return false;
+    if (const auto iter = asIterable()) return dynamic_cast<LgsUnknown*>(iter->baseType);
+    return false;
 }
 
 bool LgsType::isSliceable() {
     return asStr() || asDArray() || asSArray();
+}
+
+LgsField* LgsType::getField(const std::string& name) {
+    for (auto* f : fields) {
+        if (f->name == name) return f;
+    }
+    return nullptr;
+}
+
+LgsFunc* LgsType::getMethod(const std::string& methodName) {
+    const auto method = methods.find(methodName);
+    if (method != methods.end()) return method->second;
+    return nullptr;
+}
+
+Lgs_RTType LgsType::getRTType() {
+    assert(0);
+}
+
+LgsType* LgsType::applyOp(LgsType* other, const LgsOperator op) {
+    assert(0);
+}
+
+DIBasicType* LgsType::getDebugType(LgsLLVMGen& cg) {
+    assert(0);
+}
+
+LgsType* LgsType::clone() {
+    if (isPrimitive || asSArray()) return this;
+    assert(0);
 }
 
 LgsAny* LgsType::asAny() {
@@ -150,6 +182,7 @@ LgsObject* LgsType::asObject() {
     return dynamic_cast<LgsObject*>(this);
 }
 
+
 LgsInterface* LgsType::asInterface() {
     return dynamic_cast<LgsInterface*>(this);
 }
@@ -174,7 +207,6 @@ LgsVec* LgsType::asVec() {
     return dynamic_cast<LgsVec*>(this);
 }
 
-
 LgsFuncType* LgsType::asFuncType() {
     return dynamic_cast<LgsFuncType*>(this);
 }
@@ -193,36 +225,6 @@ LgsSubType* LgsType::asSubtype() {
 
 LgsTypePair* LgsType::asPair() {
     return dynamic_cast<LgsTypePair*>(this);
-}
-
-LgsField* LgsType::getField(const std::string& name) {
-    for (auto* f : fields) {
-        if (f->name == name) return f;
-    }
-    return nullptr;
-}
-
-LgsFunc* LgsType::getMethod(const std::string& name) {
-    const auto method = methods.find(name);
-    if (method != methods.end()) return method->second;
-    return nullptr;
-}
-
-Lgs_RTType LgsType::getRTType() {
-    assert(0);
-}
-
-LgsType* LgsType::applyOp(LgsType* other, const LgsOperator op) {
-    assert(0);
-}
-
-DIBasicType* LgsType::getDebugType(LgsLLVMGen& cg) {
-    assert(0);
-}
-
-LgsType* LgsType::clone() {
-    if (isPrimitive || asSArray()) return this;
-    assert(0);
 }
 
 Value* LgsType::addIR(LgsLLVMGen& cg, Value* self, Value* other) {

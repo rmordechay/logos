@@ -68,10 +68,6 @@ LgsType* LgsSet::getIndexType() {
     return &LGS_INT;
 }
 
-uint16_t LgsSet::getUnpackCount() const {
-    return 1;
-}
-
 LgsType* LgsSet::applyOp(LgsType* other, const LgsOperator op) {
     const auto IRName = other->getName();
     switch (op) {

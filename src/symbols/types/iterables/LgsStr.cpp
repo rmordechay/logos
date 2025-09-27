@@ -125,10 +125,6 @@ std::string LgsStr::strFormatPart() const {
     return "%s";
 }
 
-uint16_t LgsStr::getUnpackCount() const {
-    return 1;
-}
-
 Value* LgsStr::lengthIR(LgsLLVMGen& cg, Value* iterable) {
     return getLenFunc()->callIR(cg, {iterable});
 }

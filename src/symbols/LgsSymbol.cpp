@@ -32,10 +32,36 @@ LgsSymbol::LgsSymbol(LgsObject* object, const bool isExternal, const bool isBuil
     : name(&object->name), symbolType(OBJECT), isExternal(isExternal), isBuiltin(isBuiltin), object(object), location(&object->location) {}
 
 LgsSymbol::LgsSymbol(LgsEnum* lgsEnum, const bool isExternal, const bool isBuiltin)
-    : name(&lgsEnum->name), symbolType(ENUM), isExternal(isExternal), isBuiltin(isBuiltin), lgsEnum(lgsEnum), location(&lgsEnum->location) {}
+    : name(&lgsEnum->name), symbolType(ENUM), isExternal(isExternal), isBuiltin(isBuiltin), enum_(lgsEnum), location(&lgsEnum->location) {}
 
 LgsSymbol::LgsSymbol(LgsFunc* func, const bool isExternal, const bool isBuiltin)
     : name(&func->funcType->name), symbolType(FUNC), isExternal(isExternal), isBuiltin(isBuiltin), func(func), location(&func->location) {}
 
 LgsSymbol::LgsSymbol(LgsVarDec* varDec)
     : name(&varDec->name), symbolType(VAR_DEC), varDec(varDec), location(&varDec->location) {}
+
+LgsType* LgsSymbol::getType() const {
+    switch (symbolType) {
+    case VAR_DEC:
+        return varDec->type;
+    case PARAM:
+        return param->type;
+    case FIELD:
+        return field->type;
+    case FUNC:
+        return func->type;
+    case OBJECT:
+        return object;
+    case INTERFACE:
+        return interface;
+    case SUBTYPE:
+        return subtype;
+    case GROUP:
+        return group;
+    case ENUM:
+        return enum_;
+    case UNKNOWN:
+        break;
+    }
+    return nullptr;
+}

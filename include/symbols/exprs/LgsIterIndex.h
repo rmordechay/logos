@@ -22,10 +22,6 @@ public:
     }
     Value* loadIR(LgsLLVMGen& cg) override;
     void setIRElementPtr(LgsLLVMGen& cg);
-    Value* loadFromDArray(LgsLLVMGen& cg);
-    Value* loadFromMap(LgsLLVMGen& cg);
-    Value* loadFromStr(LgsLLVMGen& cg);
-    Value* loadFromVec(LgsLLVMGen& cg) const;
     Value* loadFromSArray(LgsLLVMGen& cg) const;
     void assign(LgsLLVMGen& cg, LgsExpr* expr) override;
     void assignScalar(LgsLLVMGen& cg, LgsExpr* expr);

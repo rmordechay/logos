@@ -80,7 +80,7 @@ public:
     void visitWhileLoop(const LgsWhileLoop* whileLoop);
     void visitLoopStmt(LgsForLoop* loopStmt);
     void visitRangeLoop(LgsRangeLoop* rangeLoop);
-    void visitForeachLoop(const LgsForeachLoop* foreachLoop);
+    void visitForeachLoop(LgsForeachLoop* foreachLoop);
     void visitInfiniteLoop(const LgsInfiniteLoop* infiniteLoop);
     void visitCoroutine(const LgsCoroutine* coroutine);
     void visitReturnStmt(LgsReturn* returnStmt);

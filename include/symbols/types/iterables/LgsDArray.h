@@ -21,7 +21,6 @@ public:
     LgsType* getIndexType() override;
     std::string strFormatPart() const override;
     StructType* getArrStruct(LgsLLVMGen& cg);
-    uint16_t getUnpackCount() const override;
     LgsType* applyOp(LgsType* other, LgsOperator op) override;
     LgsFunc* getAddFunc() override;
     Value* lengthIR(LgsLLVMGen& cg, Value* iterable) override;

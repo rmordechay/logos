@@ -49,10 +49,6 @@ LgsType* LgsVec::getIndexType() {
     return &LGS_INT;
 }
 
-uint16_t LgsVec::getUnpackCount() const {
-    return 1;
-}
-
 bool LgsVec::canCastTo(LgsType* other) {
     if (other->getName() == LgsAny::name) return true;
     const auto otherVec = other->asVec();

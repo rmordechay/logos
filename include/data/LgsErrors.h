@@ -62,7 +62,7 @@ inline LgsBaseError E10037{.msg = "Left index of slice must be less or equal tha
 inline LgsBaseError E10038{.msg = "'continue' must be inside a for loop.", .code = errCodeStart++};
 inline LgsBaseError E10039{.msg = "main() function accepts only one optional parameter of type 'Str[]'.", .code = errCodeStart++};
 inline LgsBaseError E10040{.msg = "The number of variables in the for loop (%s) do not match the number of the iterable's returned values (%s).", .code = errCodeStart++};
-inline LgsBaseError E10041{.msg = "'%s' unpacks %s or %s, Given: %s.", .code = errCodeStart++};
+inline LgsBaseError E10041{.msg = "Could not unpack iterable '%s' of type '%s' with %s variables.", .code = errCodeStart++};
 inline LgsBaseError E10042{.msg = "Expression '%s' of type '%s' cannot be sliced.", .code = errCodeStart++};
 inline LgsBaseError E10043{.msg = "Default parameters and variadic arguments are not allowed in the same function.", .code = errCodeStart++};
 inline LgsBaseError E10044{.msg = "Variadic argument must be the last argument.", .code = errCodeStart++};

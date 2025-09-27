@@ -15,7 +15,6 @@ public:
     LgsExpr* getZeroValue() override;
     Lgs_RTType getRTType() override;
     LgsType* getIndexType() override;
-    uint16_t getUnpackCount() const override;
     std::string strFormatPart() const override;
     LgsType* applyOp(LgsType* other, LgsOperator op) override;
     Value* inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) override;

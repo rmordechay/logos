@@ -25,7 +25,6 @@ public:
     LgsFunc* getIsEmptyFunc() override;
     LgsFunc* getIsNotEmptyFunc() override;
     std::string strFormatPart() const override;
-    uint16_t getUnpackCount() const override;
     Value* lengthIR(LgsLLVMGen& cg, Value* iterable) override;
     Value* inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
     bool canCastTo(LgsType* other) override;
