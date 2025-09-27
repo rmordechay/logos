@@ -14,7 +14,7 @@ public:
 
     LgsCast(LgsType* castToType, LgsExpr* castFromValue) : LgsExpr(castToType), toType(castToType), fromValue(castFromValue) {}
     std::string pname() override;
-    json::value asJSON() override;
+    json::value asJsonStr() override;
     ~LgsCast() override;
 };
 

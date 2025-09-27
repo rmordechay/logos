@@ -7,7 +7,7 @@ std::string LgsCast::pname() {
     return fromValue->pname() + "->" + toType->pname();
 }
 
-json::value LgsCast::asJSON() {
+json::value LgsCast::asJsonStr() {
     assert(0);
 }
 

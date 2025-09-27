@@ -24,10 +24,10 @@ Value* LgsField::resolveVirtualField(LgsLLVMGen* cg, const LgsHashMap* vtable) c
     return cg->builder.CreateLoad(fieldIRType, rv);
 }
 
-json::value LgsField::asJSON() {
+json::value LgsField::asJsonStr() {
     json::object obj;
     obj["name"] = name;
-    obj["type"] = type->asJSON();
+    obj["type"] = type->asJsonStr();
     return obj;
 }
 

@@ -22,5 +22,5 @@ public:
     Value* getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) override;
     Value* lengthIR(LgsLLVMGen& cg, Value* iterable) override;
     bool canCastTo(LgsType* other) override;
-    json::value asJSON() override;
+    json::value asJsonStr() override;
 };

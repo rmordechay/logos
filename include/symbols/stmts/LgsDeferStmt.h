@@ -8,6 +8,6 @@ public:
     LgsFuncCall* funcCall = nullptr;
     LgsSelection* selection = nullptr;
 
-    json::value asJSON() override;
+    json::value asJsonStr() override;
     ~LgsDeferStmt() override;
 };

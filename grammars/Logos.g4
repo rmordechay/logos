@@ -220,12 +220,12 @@ expr:
 
 unaryExpr:
         vector
+    |   '.json'json
     |   constant
     |   funcCall
     |   prefixExpr
     |   postfixExpr
     |   lambda
-    |   'json'json
     |   instance
     |   iterIndex
     |   selection
@@ -388,13 +388,10 @@ assignemntOp:
     ;
 
 json:
-        STRING
-    |   INTEGER
-    |   FLOAT
-    |   BOOL
-    |   NULL
+        constant
     |   jsonObj
     |   jsonArray
+    |   NULL
     ;
 
 jsonObj:

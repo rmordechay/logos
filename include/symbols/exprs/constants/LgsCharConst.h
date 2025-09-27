@@ -8,7 +8,7 @@ public:
     explicit LgsCharConst(const char value) : LgsExpr(&LGS_CHAR), value(value) {}
     Value* loadIR(LgsLLVMGen& cg) override;
     std::string pname() override;
-    json::value asJSON() override;
+    json::value asJsonStr() override;
 };
 
 

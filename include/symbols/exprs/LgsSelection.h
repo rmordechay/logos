@@ -14,6 +14,6 @@ public:
     std::string pname() override;
     Value* hash(LgsLLVMGen& cg) override;
     bool equals(LgsExpr* other) override;
-    json::value asJSON() override;
+    json::value asJsonStr() override;
     ~LgsSelection() override;
 };

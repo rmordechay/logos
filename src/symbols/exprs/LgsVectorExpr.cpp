@@ -8,7 +8,7 @@ std::string LgsVectorExpr::pname() {
     return vecType->pname();
 }
 
-auto LgsVectorExpr::asJSON() -> json::value {
+auto LgsVectorExpr::asJsonStr() -> json::value {
     json::object obj;
     return obj;
 }

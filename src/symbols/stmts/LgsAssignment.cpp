@@ -4,10 +4,10 @@
 #include "exprs/LgsVariable.h"
 #include "types/iterables/LgsVec.h"
 
-json::value LgsAssignment::asJSON() {
+json::value LgsAssignment::asJsonStr() {
     json::object obj;
-    obj["lValue"] = lValue->asJSON();
-    obj["rValue"] = rValue->asJSON();
+    obj["lValue"] = lValue->asJsonStr();
+    obj["rValue"] = rValue->asJsonStr();
     obj["assignmentType"] = assignmentType;
     return obj;
 }

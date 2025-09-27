@@ -13,6 +13,8 @@
 #include "exprs/LgsInstance.h"
 #include "exprs/LgsIterIndex.h"
 #include "exprs/LgsIterator.h"
+#include "exprs/LgsJson.h"
+#include "exprs/LgsNull.h"
 #include "exprs/LgsPostfixExpr.h"
 #include "exprs/LgsPrefixExpr.h"
 #include "exprs/LgsSelection.h"
@@ -210,15 +212,7 @@ void LgsCodeGen::visitLoop(LgsForLoop* loop) {
         assert(0);
     }
     visitStmtsBlock(loop->stmtsBlock);
-    if (stack.inCoroutine()) {
-        const auto doYieldBlock = cg.createBlock("do_yield_block");
-        const auto continueBlock = cg.createBlock("continue_block");
-        const auto shouldYield = cg.callLgsFunc("scheduler_shouldYield", cg.getFT(cg.i1Ty()));
-        cg.builder.CreateCondBr(shouldYield, doYieldBlock, continueBlock);
-        cg.startBlock(doYieldBlock);
-        cg.callLgsFunc("scheduler_yield", cg.getFT(cg.voidTy()));
-        cg.branchAndStartBlock(continueBlock);
-    }
+    if (stack.inCoroutine()) yield();
     loop->incAndJumpToCond(cg);
     cg.startBlock(loop->IRExitBlock);
     stack.exitScope();
@@ -250,22 +244,19 @@ void LgsCodeGen::visitForeachLoop(LgsForeachLoop* loop) {
     visitExpr(loop->iterExpr);
     loop->iPtr = cg.builder.CreateAlloca(cg.sizeTy());
     cg.builder.CreateStore(cg.sizeZero(), loop->iPtr);
+    const auto loopEnd = cg.builder.CreateSExt(loop->loopEnd(cg), cg.sizeTy());
     cg.branchAndStartBlock(loop->IRCondBlock);
 
-    const auto expr = loop->iterExpr;
-    const auto iterIndex = new LgsIterIndex(expr, new LgsIntConst(&LGS_SIZE, 0));
-    visitIterIndex(iterIndex);
-
     loop->iValue = loop->loadIndex(cg);
-    iterIndex->index.from->IRValue = loop->iValue;
-    auto loopEnd = loop->loopEnd(cg);
-    loopEnd = cg.builder.CreateSExt(loopEnd, cg.sizeTy());
     const auto condition = cg.builder.CreateICmpSLT(loop->iValue, loopEnd);
     cg.builder.CreateCondBr(condition, loop->IRBodyBlock, loop->IRExitBlock);
-
     cg.startBlock(loop->IRBodyBlock);
-    loop->iterPtr = iterIndex->IRValue;
-    loop->loopVars[0]->IRValue = iterIndex->loadIR(cg);
+
+    const auto varDec = loop->loopVars[0];
+    const auto iterIndex = loop->loopVars[0]->expr->asIterIndex();
+    iterIndex->index.from->IRValue = loop->iValue;
+    iterIndex->setIRElementPtr(cg);
+    varDec->IRValue = iterIndex->IRValue;
 }
 
 void LgsCodeGen::visitInfiniteLoop(const LgsInfiniteLoop* loop) const {
@@ -593,6 +584,7 @@ void LgsCodeGen::visitExpr(LgsExpr* expr) {
         if (const auto loopMetaVar = expr->asLoopMetaVar()) return visitLoopMetaVar(loopMetaVar);
         if (const auto cast = expr->asCast()) return visitCast(cast);
         if (const auto typeExpr = expr->asTypeExpr()) return visitTypeExpr(typeExpr);
+        if (const auto json = expr->asJson()) return visitJson(json);
         assert(0);
     }
 }
@@ -922,6 +914,27 @@ void LgsCodeGen::visitTypeExpr(LgsTypeExpr* typeExpr) {
 
 }
 
+void LgsCodeGen::visitJson(LgsJson* json) {
+    if (const auto instance = json->instance) {
+        instance->obj->getIRType(cg);
+    } else if (const auto arr = json->arr) {
+        visitArrayExpr(arr);
+        json->IRValue = arr->IRValue;
+    } else if (const auto strConst = json->strConst) {
+        visitStrConst(strConst);
+        json->IRValue = strConst->IRValue;
+    } else if (const auto intConst = json->intConst) {
+        visitIntConst(intConst);
+        json->IRValue = intConst->IRValue;
+    } else if (const auto floatConst = json->floatConst) {
+        visitFloatConst(floatConst);
+        json->IRValue = floatConst->IRValue;
+    } else if (const auto null = json->null) {
+        null->IRValue = cg.null();
+        json->IRValue = null->IRValue;
+    }
+}
+
 void LgsCodeGen::initFields(LgsInstance* instance) {
     std::unordered_set<std::string> visited;
     for (const auto& [argName, arg] : instance->args) {
@@ -971,6 +984,16 @@ bool LgsCodeGen::shouldAllocate(const LgsVarDec* varDec) const {
         return false;
     }
     return !IRType->isArrayTy() && !IRType->isPointerTy() && !IRType->isVoidTy();
+}
+
+void LgsCodeGen::yield() const {
+    const auto doYieldBlock = cg.createBlock("do_yield_block");
+    const auto continueBlock = cg.createBlock("continue_block");
+    const auto shouldYield = cg.callLgsFunc("scheduler_shouldYield", cg.getFT(cg.i1Ty()));
+    cg.builder.CreateCondBr(shouldYield, doYieldBlock, continueBlock);
+    cg.startBlock(doYieldBlock);
+    cg.callLgsFunc("scheduler_yield", cg.getFT(cg.voidTy()));
+    cg.branchAndStartBlock(continueBlock);
 }
 
 void LgsCodeGen::initMainArgs(LgsMainFunc* mainFunc) {
@@ -1251,23 +1274,6 @@ Value* LgsCodeGen::createDynamicArray(LgsArrayExpr* arrayExpr) {
         arr->getAddFunc()->callIR(cg, {arrayExpr->IRValue, cg.getPtr(element->IRValue)});
     }
     return getIRValue(arrayExpr);
-}
-
-void LgsCodeGen::initIterator(LgsIterator* iterator) {
-    LgsFunc iterInitFunc{"initIter", &LGS_VOID, {iterator->type, &LGS_ANY}};
-    const auto structType = cg.getIteratorIRType(iterator->name);
-    iterator->IRValue = cg.builder.CreateAlloca(structType);
-    iterInitFunc.callIR(cg, {getIRValue(iterator->baseExpr), getIRValue(iterator)});
-}
-
-Value* LgsCodeGen::iterNext(LgsIterator* iterator) {
-    LgsFunc iterInitFunc{"next", &LGS_ANY, {&LGS_ANY}};
-    return iterInitFunc.callIR(cg, {getIRValue(iterator)});
-}
-
-Value* LgsCodeGen::iterHasNext(LgsIterator* iterator) {
-    LgsFunc iterInitFunc{"hasNext", &LGS_BOOL, {&LGS_ANY}};
-    return iterInitFunc.callIR(cg, {getIRValue(iterator)});
 }
 
 Value* LgsCodeGen::getIRValue(LgsValue* value) {

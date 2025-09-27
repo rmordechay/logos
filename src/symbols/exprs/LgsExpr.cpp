@@ -13,6 +13,7 @@
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
 #include "exprs/LgsIterator.h"
+#include "exprs/LgsJson.h"
 #include "exprs/LgsTypeExpr.h"
 #include "loops/LgsLoopMetaVar.h"
 
@@ -110,6 +111,7 @@ LgsVariable* LgsExpr::asVariable() { return dynamic_cast<LgsVariable*>(this); }
 LgsPrefixExpr* LgsExpr::asPrefixExpr() { return dynamic_cast<LgsPrefixExpr*>(this); }
 LgsIterIndex* LgsExpr::asIterIndex() { return dynamic_cast<LgsIterIndex*>(this); }
 LgsTypeExpr* LgsExpr::asTypeExpr() { return dynamic_cast<LgsTypeExpr*>(this); }
+LgsJson* LgsExpr::asJson() { return dynamic_cast<LgsJson*>(this); }
 LgsCast* LgsExpr::asCast() { return dynamic_cast<LgsCast*>(this); }
 LgsInstance* LgsExpr::asInstance() { return dynamic_cast<LgsInstance*>(this); }
 LgsArrayExpr* LgsExpr::asArrayExpr() { return dynamic_cast<LgsArrayExpr*>(this); }

@@ -80,13 +80,13 @@ std::string LgsFuncType::pname() {
     return str.str();
 }
 
-json::value LgsFuncType::asJSON() {
+json::value LgsFuncType::asJsonStr() {
     json::object jsonObj;
     jsonObj["name"] = name;
-    jsonObj["rt"] = rt->asJSON();
+    jsonObj["rt"] = rt->asJsonStr();
     json::array jsonParams;
     for (auto& param : params) {
-        jsonParams.emplace_back(param.asJSON());
+        jsonParams.emplace_back(param.asJsonStr());
     }
     jsonObj["params"] = jsonParams;
     jsonObj["isPublic"] = isPublic;

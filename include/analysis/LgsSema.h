@@ -108,6 +108,7 @@ public:
     void visitPostfixExpr(LgsPostfixExpr* postfixExpr);
     void visitStrConst(const LgsStrConst* strConst);
     void visitTypeExpr(LgsTypeExpr* typeExpr);
+    void visitJson(const LgsJson* json);
     void visitInstance(LgsInstance* instance);
     void visitInterfaceInstance(LgsInstance* instance, LgsInterface* interface);
     void visitIterIndex(LgsIterIndex* iterIndex);

@@ -18,6 +18,6 @@ public:
     Value* loadIR(LgsLLVMGen& cg) override;
     std::string pname() override;
     Value* hash(LgsLLVMGen& cg) override;
-    json::value asJSON() override;
+    json::value asJsonStr() override;
     ~LgsStrConst() override;
 };

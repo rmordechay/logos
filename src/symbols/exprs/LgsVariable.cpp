@@ -53,10 +53,10 @@ std::string LgsVariable::pname() {
     return name;
 }
 
-json::value LgsVariable::asJSON() {
+json::value LgsVariable::asJsonStr() {
     json::object jsonObj;
     jsonObj["exprType"] = "variable";
     jsonObj["name"] = name;
-    jsonObj["type"] = type->asJSON();
+    jsonObj["type"] = type->asJsonStr();
     return jsonObj;
 }

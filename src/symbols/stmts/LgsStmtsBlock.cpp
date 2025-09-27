@@ -9,10 +9,10 @@ LgsStmt* LgsStmtsBlock::lastStmt() const {
     return stmts[stmts.size() - 1];
 }
 
-json::value LgsStmtsBlock::asJSON() {
+json::value LgsStmtsBlock::asJsonStr() {
     json::array jsonStmts;
     for (const auto& stmt : stmts) {
-        jsonStmts.emplace_back(stmt->asJSON());
+        jsonStmts.emplace_back(stmt->asJsonStr());
     }
     return jsonStmts;
 }

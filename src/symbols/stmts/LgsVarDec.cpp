@@ -25,11 +25,11 @@ void LgsVarDec::setDebugValue(LgsLLVMGen& cg) {
     );
 }
 
-json::value LgsVarDec::asJSON() {
+json::value LgsVarDec::asJsonStr() {
     json::object obj;
     obj["stmtKind"] = "VarDec";
-    obj["type"] = type->asJSON();
-    obj["expr"] = expr->asJSON();
+    obj["type"] = type->asJsonStr();
+    obj["expr"] = expr->asJsonStr();
     return obj;
 }
 

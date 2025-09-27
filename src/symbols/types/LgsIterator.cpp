@@ -5,6 +5,6 @@ std::string LgsIterator::pname() {
     assert(0);
 }
 
-json::value LgsIterator::asJSON() {
+json::value LgsIterator::asJsonStr() {
     assert(0);
 }

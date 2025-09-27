@@ -8,7 +8,7 @@
 #include "types/primitives/LgsShort.h"
 #include "types/primitives/LgsSize.h"
 
-json::value LgsLong::asJSON() {
+json::value LgsLong::asJsonStr() {
     assert(0);
 }
 

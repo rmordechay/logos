@@ -66,13 +66,13 @@ std::string LgsFuncCall::pname() {
     return str.str();
 }
 
-json::value LgsFuncCall::asJSON() {
+json::value LgsFuncCall::asJsonStr() {
     json::object jsonObj;
     jsonObj["name"] = name;
-    jsonObj["type"] = type->asJSON();
+    jsonObj["type"] = type->asJsonStr();
     json::array jsonArgs;
     for (const auto& arg : args) {
-        jsonArgs.emplace_back(arg->asJSON());
+        jsonArgs.emplace_back(arg->asJsonStr());
     }
     return jsonObj;
 }

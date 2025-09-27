@@ -118,10 +118,10 @@ std::string LgsFunc::getIRName() const {
     return funcName;
 }
 
-json::value LgsFunc::asJSON() {
+json::value LgsFunc::asJsonStr() {
     json::object obj;
-    obj["funcType"] = funcType->asJSON();
-    obj["stmtsBlock"] = stmtsBlock->asJSON();
+    obj["funcType"] = funcType->asJsonStr();
+    obj["stmtsBlock"] = stmtsBlock->asJsonStr();
     return obj;
 }
 

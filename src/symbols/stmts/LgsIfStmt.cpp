@@ -3,15 +3,15 @@
 #include "codegen/LgsLLVMGen.h"
 #include "utils/LgsUtils.h"
 
-json::value LgsIfStmt::asJSON() {
+json::value LgsIfStmt::asJsonStr() {
     json::object obj;
-    obj["ifCond"] = ifCond->asJSON();
-    obj["ifBlock"] = ifBlock->asJSON();
-    if (elseBlock) obj["elseBlock"] = elseBlock->asJSON();
+    obj["ifCond"] = ifCond->asJsonStr();
+    obj["ifBlock"] = ifBlock->asJsonStr();
+    if (elseBlock) obj["elseBlock"] = elseBlock->asJsonStr();
     for (const auto& [expr, block] : elseIfs) {
         json::object elseIfObj;
-        elseIfObj["expr"] = expr->asJSON();
-        elseIfObj["block"] = block->asJSON();
+        elseIfObj["expr"] = expr->asJsonStr();
+        elseIfObj["block"] = block->asJsonStr();
         obj["elseIfs"].as_array().emplace_back(elseIfObj);
     }
     return obj;

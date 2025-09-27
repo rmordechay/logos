@@ -30,6 +30,7 @@ static std::string getTypeName(const Lgs_RTType type) {
     case RTT_MAP: return "Map";
     case RTT_OBJECT: return "Object";
     case RTT_TYPE: return "Type";
+    case RTT_ANY: return "Any";
     }
     assert(0);
 }

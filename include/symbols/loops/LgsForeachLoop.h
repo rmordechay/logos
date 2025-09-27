@@ -3,7 +3,6 @@
 
 class LgsForeachLoop final : public LgsForLoop {
 public:
-    Value* iterPtr = nullptr;
     LgsExpr* iterExpr = nullptr;
 
     explicit LgsForeachLoop(LgsExpr* iterable) : iterExpr(iterable) {}

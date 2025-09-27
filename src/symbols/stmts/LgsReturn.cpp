@@ -2,9 +2,9 @@
 #include "funcs/LgsFunc.h"
 #include "utils/LgsUtils.h"
 
-json::value LgsReturn::asJSON() {
+json::value LgsReturn::asJsonStr() {
     json::object obj;
-    obj["expr"] = expr->asJSON();
+    obj["expr"] = expr->asJsonStr();
     return obj;
 }
 

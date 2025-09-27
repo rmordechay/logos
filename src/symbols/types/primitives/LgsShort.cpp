@@ -15,7 +15,7 @@ Type* LgsShort::getIRType(LgsLLVMGen& cg) {
     return cg.i16Ty();
 }
 
-json::value LgsShort::asJSON() {
+json::value LgsShort::asJsonStr() {
     assert(0);
 }
 

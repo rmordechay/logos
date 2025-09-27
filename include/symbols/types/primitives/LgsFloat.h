@@ -23,7 +23,7 @@ public:
     Value* divIR(LgsLLVMGen& cg, Value* self, Value* other) override;
     Value* eqIR(LgsLLVMGen& cg, Value* self, Value* other) override;
     std::string pname() override;
-    json::value asJSON() override;
+    json::value asJsonStr() override;
 };
 
 inline LgsFloat LGS_FLOAT;

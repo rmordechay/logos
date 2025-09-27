@@ -1,5 +1,5 @@
 #include "stmts/LgsIOPair.h"
 
-json::value LgsIOPair::asJSON() {
+json::value LgsIOPair::asJsonStr() {
     assert(0);
 }

@@ -11,6 +11,6 @@ public:
     LgsFunc* closingFunc = nullptr;
 
     explicit LgsIOStmt(LgsStmtsBlock* stmtsBlock): stmtsBlock(stmtsBlock) {}
-    json::value asJSON() override;
+    json::value asJsonStr() override;
     ~LgsIOStmt() override;
 };

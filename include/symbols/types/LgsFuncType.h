@@ -46,7 +46,7 @@ public:
     size_t getSizeBytes() override;
     std::string getName() override;
     std::string pname() override;
-    json::value asJSON() override;
+    json::value asJsonStr() override;
     std::string strFormatPart() const override;
     bool canCastTo(LgsType* other) override;
     LgsType* clone() override;

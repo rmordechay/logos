@@ -17,7 +17,7 @@ std::string LgsSize::getName() {
     return name;
 }
 
-json::value LgsSize::asJSON() {
+json::value LgsSize::asJsonStr() {
     assert(0);
 }
 

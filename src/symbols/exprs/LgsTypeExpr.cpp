@@ -2,7 +2,7 @@
 
 #include "LgsType.h"
 
-json::value LgsTypeExpr::asJSON() {
+json::value LgsTypeExpr::asJsonStr() {
     assert(0);
 }
 

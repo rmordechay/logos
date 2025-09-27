@@ -69,7 +69,7 @@ size_t LgsInterface::getSizeBytes() {
     return 0;
 }
 
-json::value LgsInterface::asJSON() {
+json::value LgsInterface::asJsonStr() {
     assert(0);
 }
 

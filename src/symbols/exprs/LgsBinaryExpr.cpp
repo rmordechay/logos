@@ -5,7 +5,7 @@ Value* LgsBinaryExpr::loadIR(LgsLLVMGen& cg) {
     return IRValue;
 }
 
-json::value LgsBinaryExpr::asJSON() {
+json::value LgsBinaryExpr::asJsonStr() {
     assert(0);
 }
 

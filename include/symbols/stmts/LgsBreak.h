@@ -8,5 +8,5 @@ public:
     bool isBreakIf;
     std::string tag;
 
-    json::value asJSON() override;
+    json::value asJsonStr() override;
 };

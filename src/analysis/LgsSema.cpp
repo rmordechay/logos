@@ -17,6 +17,7 @@
 #include "exprs/LgsCast.h"
 #include "types/LgsEnum.h"
 #include "exprs/LgsHashMap.h"
+#include "exprs/LgsJson.h"
 #include "exprs/LgsPostfixExpr.h"
 #include "exprs/LgsPrefixExpr.h"
 #include "exprs/LgsTypeExpr.h"
@@ -540,6 +541,7 @@ void LgsSema::visitExpr(LgsExpr* expr) {
         else if (const auto forVar = expr->asLoopMetaVar()) visitLoopMetaVar(forVar);
         else if (const auto vecExpr = expr->asVectorExpr()) visitVectorExpr(vecExpr);
         else if (const auto castExpr = expr->asCast()) visitCast(castExpr);
+        else if (const auto json = expr->asJson()) visitJson(json);
     }
 }
 
@@ -894,6 +896,14 @@ void LgsSema::visitStrConst(const LgsStrConst* strConst) {
 
 void LgsSema::visitTypeExpr(LgsTypeExpr* typeExpr) {
     typeExpr->type = typeResolver.resolveType(typeExpr->type, file);
+}
+
+void LgsSema::visitJson(const LgsJson* json) {
+    if (const auto arr = json->arr) {
+        visitArrayExpr(arr);
+    } else if (const auto strConst = json->strConst) {
+        visitStrConst(strConst);
+    }
 }
 
 void LgsSema::visitInstance(LgsInstance* instance) {

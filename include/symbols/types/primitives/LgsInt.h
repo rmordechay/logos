@@ -36,7 +36,7 @@ public:
     std::string strFormatPart() const override;
     std::string getName() override;
     std::string pname() override;
-    json::value asJSON() override;
+    json::value asJsonStr() override;
     DIBasicType* getDebugType(LgsLLVMGen& cg) override;
 };
 

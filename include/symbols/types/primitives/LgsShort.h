@@ -13,7 +13,7 @@ public:
     llvm::Type* getIRType(LgsLLVMGen& cg) override;
     std::string getName() override;
     std::string pname() override;
-    json::value asJSON() override;
+    json::value asJsonStr() override;
     LgsExpr* getZeroValue() override;
     Lgs_RTType getRTType() override;
     bool canCastTo(LgsType* other) override;

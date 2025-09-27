@@ -17,7 +17,7 @@ std::string LgsEnum::getName() {
     return name;
 }
 
-json::value LgsEnum::asJSON() {
+json::value LgsEnum::asJsonStr() {
     assert(0);
 }
 

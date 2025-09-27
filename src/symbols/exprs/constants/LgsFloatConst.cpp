@@ -7,7 +7,7 @@ Value* LgsFloatConst::loadIR(LgsLLVMGen& cg) {
     return IRValue;
 }
 
-json::value LgsFloatConst::asJSON() {
+json::value LgsFloatConst::asJsonStr() {
     assert(0);
 }
 

@@ -23,6 +23,6 @@ public:
     bool equalsDefaultParams(const LgsFuncType* funcType) const;
     void resolveVirtualFunc(LgsLLVMGen& cg) const;
     std::string pname() override;
-    json::value asJSON() override;
+    json::value asJsonStr() override;
     ~LgsFuncCall() override;
 };

@@ -10,7 +10,7 @@
 #include "types/primitives/LgsUInt.h"
 
 
-json::value LgsChar::asJSON() {
+json::value LgsChar::asJsonStr() {
     assert(0);
 }
 

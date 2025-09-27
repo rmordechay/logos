@@ -10,5 +10,5 @@ public:
     LgsExpr* castTo(LgsType* toType) override;
     std::string pname() override;
     LgsExpr* clone() override;
-    json::value asJSON() override;
+    json::value asJsonStr() override;
 };

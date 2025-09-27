@@ -18,10 +18,10 @@ LgsExpr* LgsAny::getZeroValue() {
 }
 
 Lgs_RTType LgsAny::getRTType() {
-    assert(0);
+    return RTT_ANY;
 }
 
-json::value LgsAny::asJSON() {
+json::value LgsAny::asJsonStr() {
     assert(0);
 }
 

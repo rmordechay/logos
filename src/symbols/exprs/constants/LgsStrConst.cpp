@@ -12,11 +12,11 @@ Value* LgsStrConst::hash(LgsLLVMGen& cg) {
     return cg.i32(hashStr(value.c_str()));
 }
 
-json::value LgsStrConst::asJSON() {
+json::value LgsStrConst::asJsonStr() {
     json::object jsonObj;
     jsonObj["exprType"] = "strConst";
     jsonObj["value"] = value;
-    jsonObj["type"] = type->asJSON();
+    jsonObj["type"] = type->asJsonStr();
     return jsonObj;
 }
 

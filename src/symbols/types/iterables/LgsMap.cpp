@@ -17,7 +17,7 @@ std::string LgsMap::pname() {
     return '{' + (typePair->key ? typePair->key->pname() : LGS_UNKNOWN_TYPE) + ": " + (typePair->value ? typePair->value->pname() : LGS_UNKNOWN_TYPE) + '}';
 }
 
-json::value LgsMap::asJSON() {
+json::value LgsMap::asJsonStr() {
     assert(0);
 }
 

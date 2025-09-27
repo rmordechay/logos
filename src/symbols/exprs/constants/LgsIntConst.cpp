@@ -33,10 +33,10 @@ LgsExpr* LgsIntConst::clone() {
     return new LgsIntConst(type->clone(), value);
 }
 
-json::value LgsIntConst::asJSON() {
+json::value LgsIntConst::asJsonStr() {
     json::object jsonObj;
     jsonObj["exprType"] = "intConst";
     jsonObj["name"] = pname();
-    jsonObj["type"] = type->asJSON();
+    jsonObj["type"] = type->asJsonStr();
     return jsonObj;
 }

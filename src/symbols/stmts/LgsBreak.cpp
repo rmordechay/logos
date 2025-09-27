@@ -4,6 +4,6 @@
 #include "loops/LgsForLoop.h"
 #include "stmts/LgsIfStmt.h"
 
-json::value LgsBreak::asJSON() {
+json::value LgsBreak::asJsonStr() {
     assert(0);
 }

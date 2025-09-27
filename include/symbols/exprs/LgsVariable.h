@@ -14,5 +14,5 @@ public:
     Value* hash(LgsLLVMGen& cg) override;
     void assign(LgsLLVMGen& cg, LgsExpr* expr) override;
     std::string pname() override;
-    json::value asJSON() override;
+    json::value asJsonStr() override;
 };

@@ -15,7 +15,7 @@ public:
     LgsAssignType assignmentType;
 
     LgsAssignment(const LgsAssignType assignmentType, LgsExpr* lValue, LgsExpr* rValue) : lValue(lValue), rValue(rValue), assignmentType(assignmentType) {}
-    json::value asJSON() override;
+    json::value asJsonStr() override;
     std::string getAssignTypeStr() const;
     ~LgsAssignment() override;
 };

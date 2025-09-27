@@ -32,6 +32,6 @@ public:
     void assignArray(LgsLLVMGen& cg, const LgsArrayExpr* arr) const;
     void assignHashMap(LgsLLVMGen& cg, LgsHashMap* map);
     std::string pname() override;
-    json::value asJSON() override;
+    json::value asJsonStr() override;
     ~LgsIterIndex() override;
 };

@@ -9,7 +9,7 @@ public:
     explicit LgsHashMap(LgsMap* mapType) : LgsExpr(mapType) {}
     void completeType(LgsType* toType) override;
     std::string pname() override;
-    json::value asJSON() override;
+    json::value asJsonStr() override;
     ~LgsHashMap() override;
 };
 

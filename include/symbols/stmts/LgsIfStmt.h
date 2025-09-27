@@ -14,7 +14,7 @@ public:
     std::string tag;
 
     explicit LgsIfStmt(LgsExpr* ifCond, LgsStmtsBlock* ifStmtBlock) : ifCond(ifCond), ifBlock(ifStmtBlock) {}
-    json::value asJSON() override;
+    json::value asJsonStr() override;
     ~LgsIfStmt() override;
 };
 

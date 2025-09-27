@@ -131,7 +131,7 @@ std::string LgsBool::pname() {
     return name;
 }
 
-json::value LgsBool::asJSON() {
+json::value LgsBool::asJsonStr() {
     json::object obj;
     obj["name"] = name;
     return obj;

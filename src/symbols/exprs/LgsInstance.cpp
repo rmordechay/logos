@@ -31,13 +31,13 @@ void LgsInstance::setVirtuals(LgsLLVMGen& cg) const {
     }
 }
 
-json::value LgsInstance::asJSON() {
+json::value LgsInstance::asJsonStr() {
     json::object jsonObj;
     jsonObj["exprType"] = "instance";
-    jsonObj["obj"] = obj->asJSON();
+    jsonObj["obj"] = obj->asJsonStr();
     jsonObj["args"] = json::array();
     for (const auto& [argName, arg] : args) {
-        jsonObj["args"].as_array().push_back(arg->asJSON());
+        jsonObj["args"].as_array().push_back(arg->asJsonStr());
     }
     return jsonObj;
 }

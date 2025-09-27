@@ -6,6 +6,6 @@ std::string LgsUIntConst::pname() {
     return std::to_string(value);
 }
 
-json::value LgsUIntConst::asJSON() {
+json::value LgsUIntConst::asJsonStr() {
     assert(0);
 }

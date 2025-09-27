@@ -20,7 +20,7 @@ public:
     virtual std::string pname(); // pretty name
     virtual llvm::Value* loadIR(LgsLLVMGen& cg);
     virtual void setDebugValue(LgsLLVMGen& cg);
-    virtual json::value asJSON() = 0;
+    virtual json::value asJsonStr() = 0;
     llvm::DILocation* getDebugLoc(LgsLLVMGen& cg) const;
     virtual ~LgsValue() = default;
 };

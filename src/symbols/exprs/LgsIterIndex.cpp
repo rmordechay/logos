@@ -150,12 +150,12 @@ std::string LgsIterIndex::pname() {
     return str.str();
 }
 
-json::value LgsIterIndex::asJSON() {
+json::value LgsIterIndex::asJsonStr() {
     json::object jsonObj;
     jsonObj["exprType"] = "iterIndex";
-    jsonObj["from"] = index.from->asJSON();
-    if (index.to) jsonObj["to"] = index.to->asJSON();
-    jsonObj["baseExpr"] = baseExpr->asJSON();
+    jsonObj["from"] = index.from->asJsonStr();
+    if (index.to) jsonObj["to"] = index.to->asJsonStr();
+    jsonObj["baseExpr"] = baseExpr->asJsonStr();
     return jsonObj;
 }
 

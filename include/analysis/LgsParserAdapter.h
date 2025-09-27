@@ -1,4 +1,5 @@
 #pragma once
+#include <exprs/LgsJson.h>
 #include <types/LgsSubType.h>
 
 #include "LogosParser.h"
@@ -6,6 +7,7 @@
 #include "utils/LgsErrHandler.h"
 #include "stmts/LgsAssignment.h"
 
+class LgsNull;
 struct LgsSymbol;
 struct LgsAppConfigs;
 struct LgsSymbolTable;
@@ -95,7 +97,7 @@ public:
     LgsExpr* getBinaryExpr(LogosParser::ExprContext* ctx);
     LgsExpr* getPrefixExpr(LogosParser::PrefixExprContext* ctx);
     LgsPostfixExpr* getPostfixExpr(LogosParser::PostfixExprContext* ctx);
-    LgsExpr* getArrayExpr(LogosParser::ArrayExprContext* ctx);
+    LgsArrayExpr* getArrayExpr(LogosParser::ArrayExprContext* ctx);
     LgsExpr* getHashMap(LogosParser::HashMapContext* ctx);
     LgsVariable* getVariable(antlr4::tree::TerminalNode* ctx) const;
     LgsFuncCall* getFuncCall(LogosParser::FuncCallContext* ctx);
@@ -107,8 +109,10 @@ public:
     LgsIterIndex* getIterIndex(LogosParser::IterIndexContext* ctx);
     LgsExpr* getConstant(LogosParser::ConstantContext* ctx);
     LgsStrConst* getStrConst(antlr4::tree::TerminalNode* ctx);
-    LgsExpr* getNullValue(const antlr4::tree::TerminalNode* ctx) const;
+    LgsNull* getNullValue(const antlr4::tree::TerminalNode* ctx) const;
     LgsExpr* getLoopMetaVar(LogosParser::ForVariableContext* ctx) const;
+    LgsInstance* getObjectFromJson(LogosParser::JsonObjContext* ctx);
+    LgsArrayExpr* getArrayExprFromJson(LogosParser::JsonArrayContext* ctx);
     LgsType* getType(LogosParser::TypeContext* ctx);
     LgsGroup* getGroup(LogosParser::GroupContext* ctx);
     LgsFuncType* getFuncType(LogosParser::FuncTypeContext* ctx);

@@ -8,6 +8,6 @@ std::string LgsCharConst::pname() {
     return type->pname();
 }
 
-json::value LgsCharConst::asJSON() {
+json::value LgsCharConst::asJsonStr() {
     assert(0);
 }

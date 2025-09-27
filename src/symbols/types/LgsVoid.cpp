@@ -35,6 +35,6 @@ bool LgsVoid::canCastTo(LgsType* other) {
     return name == other->getName();
 }
 
-json::value LgsVoid::asJSON() {
+json::value LgsVoid::asJsonStr() {
     return name;
 }

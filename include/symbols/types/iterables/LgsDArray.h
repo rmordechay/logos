@@ -30,5 +30,5 @@ public:
     Value* inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
     Value* getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) override;
     bool canCastTo(LgsType* other) override;
-    json::value asJSON() override;
+    json::value asJsonStr() override;
 };

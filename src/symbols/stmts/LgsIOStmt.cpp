@@ -3,7 +3,7 @@
 #include "stmts/LgsIOPair.h"
 #include "stmts/LgsStmtsBlock.h"
 
-json::value LgsIOStmt::asJSON() {
+json::value LgsIOStmt::asJsonStr() {
     assert(0);
 }
 

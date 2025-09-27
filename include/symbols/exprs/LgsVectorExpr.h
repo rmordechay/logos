@@ -16,6 +16,6 @@ public:
     explicit LgsVectorExpr(LgsVec* vecType): vecType(vecType) {}
     Value* loadIR(LgsLLVMGen& cg) override;
     std::string pname() override;
-    json::value asJSON() override;
+    json::value asJsonStr() override;
     ~LgsVectorExpr() override;
 };

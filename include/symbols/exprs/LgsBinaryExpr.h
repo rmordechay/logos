@@ -33,7 +33,7 @@ public:
 
     explicit LgsBinaryExpr(LgsType* type, LgsExpr* left, LgsExpr* right, const LgsOperator op) : LgsExpr(type), left(left), right(right), op(op) {}
     Value* loadIR(LgsLLVMGen& cg) override;
-    json::value asJSON() override;
+    json::value asJsonStr() override;
     std::string pname() override;
     ~LgsBinaryExpr() override;
 };

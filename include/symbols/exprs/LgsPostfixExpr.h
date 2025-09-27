@@ -14,6 +14,6 @@ public:
 
     LgsPostfixExpr(LgsExpr* baseExpr, const LgsPostfixOperator op) : expr(baseExpr), op(op) {}
     std::string pname() override;
-    json::value asJSON() override;
+    json::value asJsonStr() override;
     ~LgsPostfixExpr() override;
 };

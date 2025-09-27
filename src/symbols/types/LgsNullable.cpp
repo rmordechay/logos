@@ -19,7 +19,7 @@ Lgs_RTType LgsNullable::getRTType() {
     assert(0);
 }
 
-json::value LgsNullable::asJSON() {
+json::value LgsNullable::asJsonStr() {
     assert(0);
 }
 

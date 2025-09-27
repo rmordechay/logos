@@ -7,7 +7,7 @@ std::string LgsDouble::getName() {
     return name;
 }
 
-json::value LgsDouble::asJSON() {
+json::value LgsDouble::asJsonStr() {
     assert(0);
 }
 

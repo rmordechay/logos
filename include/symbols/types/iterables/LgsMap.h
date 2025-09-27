@@ -19,7 +19,7 @@ public:
     Type* getIRType(LgsLLVMGen& cg) override;
     std::string getName() override;
     std::string pname() override;
-    json::value asJSON() override;
+    json::value asJsonStr() override;
     LgsFunc* getAddFunc() override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;

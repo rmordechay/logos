@@ -90,6 +90,10 @@ extern "C" void Lgs_print(const char* fmt, const Lgs_RTType rtt, const void* v) 
         printf(fmt, vec->x, vec->y, vec->z, vec->w);
         break;
     }
+    case RTT_ANY: {
+        printf(fmt, v);
+        break;
+    }
     case RTT_SARRAY:
     case RTT_DARRAY:
     case RTT_MAP:

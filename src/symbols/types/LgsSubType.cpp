@@ -36,6 +36,6 @@ std::string LgsSubType::strFormatPart() const {
     return subtype->strFormatPart();
 }
 
-json::value LgsSubType::asJSON() {
-    return subtype->asJSON();
+json::value LgsSubType::asJsonStr() {
+    return subtype->asJsonStr();
 }

@@ -150,12 +150,12 @@ bool LgsObject::canCastTo(LgsType* other) {
     return name == other->getName();
 }
 
-json::value LgsObject::asJSON() {
+json::value LgsObject::asJsonStr() {
     json::object jsonObj;
     jsonObj["name"] = getName();
     json::array jsonFields;
     for (const auto& field : fields) {
-        jsonFields.emplace_back(field->asJSON());
+        jsonFields.emplace_back(field->asJsonStr());
     }
     jsonObj["fields"] = jsonFields;
     return jsonObj;

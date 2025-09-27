@@ -9,7 +9,7 @@ std::string LgsPtr::getName() {
     return name;
 }
 
-json::value LgsPtr::asJSON() {
+json::value LgsPtr::asJsonStr() {
     assert(0);
 }
 

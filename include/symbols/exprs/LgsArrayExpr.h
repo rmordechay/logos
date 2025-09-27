@@ -13,7 +13,7 @@ public:
         type->isHeapAlloc = true;
     }
     std::string pname() override;
-    json::value asJSON() override;
+    json::value asJsonStr() override;
     void completeType(LgsType* toType) override;
     Value* loadIR(LgsLLVMGen& cg) override;
     ~LgsArrayExpr() override;

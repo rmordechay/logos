@@ -112,7 +112,7 @@ public:
     virtual std::string strFormatPart() const = 0;
     virtual DIBasicType* getDebugType(LgsLLVMGen& cg);
     virtual LgsType* clone();
-    virtual json::value asJSON() = 0;
+    virtual json::value asJsonStr() = 0;
 
     virtual Value* addIR(LgsLLVMGen& cg, Value* self, Value* other);
     virtual Value* subIR(LgsLLVMGen& cg, Value* self, Value* other);

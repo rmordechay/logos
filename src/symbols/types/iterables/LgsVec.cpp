@@ -26,7 +26,7 @@ std::string LgsVec::pname() {
     return getName();
 }
 
-json::value LgsVec::asJSON() {
+json::value LgsVec::asJsonStr() {
     assert(0);
 }
 

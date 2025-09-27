@@ -6,7 +6,7 @@ std::string LgsPostfixExpr::pname() {
     assert(0);
 }
 
-json::value LgsPostfixExpr::asJSON() {
+json::value LgsPostfixExpr::asJsonStr() {
     assert(0);
 }
 

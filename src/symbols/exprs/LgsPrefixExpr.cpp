@@ -10,7 +10,7 @@ std::string LgsPrefixExpr::pname() {
     assert(0);
 }
 
-json::value LgsPrefixExpr::asJSON() {
+json::value LgsPrefixExpr::asJsonStr() {
     assert(0);
 }
 

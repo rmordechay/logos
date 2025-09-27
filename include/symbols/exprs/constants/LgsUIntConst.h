@@ -8,7 +8,7 @@ public:
 
     explicit LgsUIntConst(const int value) : LgsExpr(&LGS_UINT), value(value) {}
     std::string pname() override;
-    json::value asJSON() override;
+    json::value asJsonStr() override;
     ~LgsUIntConst() override = default;
 };
 

@@ -9,7 +9,7 @@ public:
     explicit LgsPtr(LgsType* baseType) : baseType(baseType) {}
     std::string getName() override;
     std::string pname() override;
-    json::value asJSON() override;
+    json::value asJsonStr() override;
     Type* getIRType(LgsLLVMGen& cg) override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;

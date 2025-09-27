@@ -20,6 +20,6 @@ std::string LgsLoopMetaVar::pname() {
     assert(0);
 }
 
-json::value LgsLoopMetaVar::asJSON() {
+json::value LgsLoopMetaVar::asJsonStr() {
     return json::value(pname());
 }

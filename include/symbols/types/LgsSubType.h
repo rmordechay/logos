@@ -15,5 +15,5 @@ public:
     std::string pname() override;
     bool canCastTo(LgsType* other) override;
     std::string strFormatPart() const override;
-    json::value asJSON() override;
+    json::value asJsonStr() override;
 };

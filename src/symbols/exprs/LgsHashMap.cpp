@@ -11,7 +11,7 @@ std::string LgsHashMap::pname() {
     return type->pname();
 }
 
-json::value LgsHashMap::asJSON() {
+json::value LgsHashMap::asJsonStr() {
     assert(0);
 }
 

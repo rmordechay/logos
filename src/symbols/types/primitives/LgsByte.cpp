@@ -160,7 +160,7 @@ std::string LgsByte::strFormatPart() const {
     return "%d";
 }
 
-json::value LgsByte::asJSON() {
+json::value LgsByte::asJsonStr() {
     json::object obj;
     obj["name"] = name;
     return obj;

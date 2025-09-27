@@ -3,7 +3,7 @@
 #include "exprs/LgsFuncCall.h"
 #include "exprs/LgsSelection.h"
 
-json::value LgsCoroutine::asJSON() {
+json::value LgsCoroutine::asJsonStr() {
     assert(0);
 }
 

@@ -18,7 +18,7 @@ std::string LgsGroup::getName() {
     return name;
 }
 
-json::value LgsGroup::asJSON() {
+json::value LgsGroup::asJsonStr() {
     assert(0);
 }
 

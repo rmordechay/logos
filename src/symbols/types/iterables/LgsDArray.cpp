@@ -94,7 +94,7 @@ bool LgsDArray::canCastTo(LgsType* other) {
     return baseType->canCastTo(otherArr->baseType);
 }
 
-json::value LgsDArray::asJSON() {
+json::value LgsDArray::asJsonStr() {
     json::object jsonObj;
     jsonObj["name"] = name;
     return jsonObj;

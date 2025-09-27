@@ -3,7 +3,7 @@
 
 class LgsContinue final : public LgsStmt {
 public:
-    json::value asJSON() override;
+    json::value asJsonStr() override;
 };
 
 

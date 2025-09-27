@@ -16,7 +16,7 @@ std::pair<Value*, Value*> loadOperands(LgsLLVMGen& cg, Value* self, Value* other
     return {l, r};
 }
 
-json::value LgsFloat::asJSON() {
+json::value LgsFloat::asJsonStr() {
     assert(0);
 }
 

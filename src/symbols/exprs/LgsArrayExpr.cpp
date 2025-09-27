@@ -4,10 +4,10 @@ std::string LgsArrayExpr::pname() {
     return type->pname();
 }
 
-json::value LgsArrayExpr::asJSON() {
+json::value LgsArrayExpr::asJsonStr() {
     json::object jsonObj;
     jsonObj["exprKind"] = "arrayExpr";
-    jsonObj["type"] = type->asJSON();
+    jsonObj["type"] = type->asJsonStr();
     return jsonObj;
 }
 

@@ -1,4 +1,6 @@
 #include "types/iterables/LgsSArray.h"
+
+#include "data/LgsDefinitions.h"
 #include "exprs/LgsArrayExpr.h"
 #include "exprs/LgsIterIndex.h"
 #include "types/LgsAny.h"
@@ -18,7 +20,7 @@ std::string LgsSArray::getName() {
 
 std::string LgsSArray::pname() {
     const auto index = sizeExpr->getConstInt() == 0 ? "" : std::to_string(sizeExpr->getConstInt());
-    const auto ty = baseType ? baseType->pname() : "";
+    const auto ty = baseType ? baseType->pname() : LGS_UNKNOWN_TYPE;
     return ty + '[' + index + "]!";
 }
 
@@ -87,13 +89,14 @@ Value* LgsSArray::getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) {
 }
 
 bool LgsSArray::canCastTo(LgsType* other) {
+    if (!baseType) return false;
     if (other->getName() == LgsAny::name) return true;
     const auto otherArr = other->asIterable();
     if (!otherArr) return false;
     return baseType->canCastTo(otherArr->baseType);
 }
 
-json::value LgsSArray::asJSON() {
+json::value LgsSArray::asJsonStr() {
     assert(0);
 }
 

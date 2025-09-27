@@ -2,6 +2,7 @@
 #include <stmts/LgsStmt.h>
 #include "LgsValue.h"
 
+class LgsJson;
 class LgsCast;
 class LgsTypeExpr;
 class LgsLoopMetaVar;
@@ -71,6 +72,7 @@ public:
     LgsPrefixExpr* asPrefixExpr();
     LgsIterIndex* asIterIndex();
     LgsTypeExpr* asTypeExpr();
+    LgsJson* asJson();
     LgsCast* asCast();
     LgsInstance* asInstance();
     LgsArrayExpr* asArrayExpr();

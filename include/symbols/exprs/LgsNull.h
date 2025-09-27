@@ -7,11 +7,11 @@ public:
         isNull = true;
     }
 
-    json::value asJSON() override;
+    json::value asJsonStr() override;
     std::string pname() override;
 };
 
-inline json::value LgsNull::asJSON() {
+inline json::value LgsNull::asJsonStr() {
     return json::value(nullptr);
 }
 

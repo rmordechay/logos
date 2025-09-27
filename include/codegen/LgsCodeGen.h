@@ -114,10 +114,12 @@ public:
     void visitIterIndex(LgsIterIndex* iterIndex);
     void visitInstance(LgsInstance* instance);
     void visitTypeExpr(LgsTypeExpr* typeExpr);
+    void visitJson(LgsJson* json);
 
     void initFields(LgsInstance* instance);
     bool checkMock(LgsExpr* expr);
     bool shouldAllocate(const LgsVarDec* varDec) const;
+    void yield() const;
 
     // Funcs
     void initMainArgs(LgsMainFunc* mainFunc);
@@ -135,9 +137,6 @@ public:
     // Iterables
     Value* createStaticArray(const LgsArrayExpr* arrayExpr);
     Value* createDynamicArray(LgsArrayExpr* arrayExpr);
-    void initIterator(LgsIterator* iterator);
-    Value* iterNext(LgsIterator* iterator);
-    Value* iterHasNext(LgsIterator* iterator);
 
     Value* getIRValue(LgsValue* value);
     bool allArgsAreConst(const std::vector<LgsExpr*>& args);

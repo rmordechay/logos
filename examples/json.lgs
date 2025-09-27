@@ -1,0 +1,6 @@
+main() {
+    a = .json["roi", "dkf"]
+    for i in a {
+        print(i)
+    }
+}

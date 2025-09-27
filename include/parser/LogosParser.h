@@ -949,12 +949,12 @@ public:
     UnaryExprContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     VectorContext *vector();
+    JsonContext *json();
     ConstantContext *constant();
     FuncCallContext *funcCall();
     PrefixExprContext *prefixExpr();
     PostfixExprContext *postfixExpr();
     LambdaContext *lambda();
-    JsonContext *json();
     InstanceContext *instance();
     IterIndexContext *iterIndex();
     SelectionContext *selection();
@@ -1431,13 +1431,10 @@ public:
   public:
     JsonContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *STRING();
-    antlr4::tree::TerminalNode *INTEGER();
-    antlr4::tree::TerminalNode *FLOAT();
-    antlr4::tree::TerminalNode *BOOL();
-    antlr4::tree::TerminalNode *NULL_();
+    ConstantContext *constant();
     JsonObjContext *jsonObj();
     JsonArrayContext *jsonArray();
+    antlr4::tree::TerminalNode *NULL_();
 
    
   };

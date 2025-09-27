@@ -2,6 +2,6 @@
 #include "codegen/LgsLLVMGen.h"
 #include <loops/LgsForLoop.h>
 
-json::value LgsContinue::asJSON() {
+json::value LgsContinue::asJsonStr() {
     assert(0);
 }

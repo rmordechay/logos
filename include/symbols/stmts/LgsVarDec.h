@@ -18,7 +18,7 @@ public:
     explicit LgsVarDec(const std::string& name, LgsExpr* expr) : name(name), expr(expr) {}
     llvm::Value* loadIR(LgsLLVMGen& cg) override;
     void setDebugValue(LgsLLVMGen& cg) override;
-    json::value asJSON() override;
+    json::value asJsonStr() override;
     ~LgsVarDec() override;
 };
 

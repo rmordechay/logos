@@ -10,7 +10,7 @@ Value* LgsParam::loadIR(LgsLLVMGen& cg) {
     return IRValue;
 }
 
-json::value LgsParam::asJSON() {
+json::value LgsParam::asJsonStr() {
     json::object obj;
     obj["name"] = name;
     return obj;

@@ -14,7 +14,7 @@ public:
     Lgs_RTType getRTType() override;
     size_t getSizeBytes() override;
     std::string pname() override;
-    json::value asJSON() override;
+    json::value asJsonStr() override;
     bool canCastTo(LgsType* other) override;
     std::string strFormatPart() const override;
 };
@@ -43,7 +43,7 @@ inline std::string LgsTypePair::pname() {
     return '<' + key->pname() + "," + value->pname() + '>';
 }
 
-inline json::value LgsTypePair::asJSON() {
+inline json::value LgsTypePair::asJsonStr() {
     json::object obj;
     return obj;
 }

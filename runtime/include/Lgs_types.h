@@ -25,6 +25,7 @@ enum Lgs_RTType {
     RTT_MAP,
     RTT_OBJECT,
     RTT_TYPE,
+    RTT_ANY,
 };
 
 struct Lgs_vec2 {

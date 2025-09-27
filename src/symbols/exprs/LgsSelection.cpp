@@ -62,15 +62,15 @@ bool LgsSelection::equals(LgsExpr* other) {
     return true;
 }
 
-json::value LgsSelection::asJSON() {
+json::value LgsSelection::asJsonStr() {
     json::object jsonObj;
     jsonObj["stmtKind"] = "selection";
     json::array exprParts;
     for (const auto& expr : exprs) {
-        exprParts.emplace_back(expr->asJSON());
+        exprParts.emplace_back(expr->asJsonStr());
     }
     jsonObj["parts"] = exprParts;
-    jsonObj["type"] = type->asJSON();
+    jsonObj["type"] = type->asJsonStr();
     return jsonObj;
 }
 

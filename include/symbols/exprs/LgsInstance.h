@@ -13,7 +13,7 @@ public:
     Value* loadIR(LgsLLVMGen& cg) override;
     void setObject(LgsObject* newObj);
     void setVirtuals(LgsLLVMGen& cg) const;
-    json::value asJSON() override;
+    json::value asJsonStr() override;
     std::string pname() override;
     bool equals(LgsExpr* other) override;
     ~LgsInstance() override;

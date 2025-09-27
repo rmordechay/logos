@@ -1,6 +1,6 @@
 #include "types/LgsUnknown.h"
 
-json::value LgsUnknown::asJSON() {
+json::value LgsUnknown::asJsonStr() {
     assert(0);
 }
 
