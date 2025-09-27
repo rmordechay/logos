@@ -508,35 +508,6 @@ TEST_CASE("TestSema10046") {
     CHECK_EQ(app.errHandler.errors[0].errCode, E10046.code);
 }
 
-TEST_CASE("TestSema10048A") {
-    LgsApp app;
-    const auto code = R"(
-    func(): Int {
-        return 2
-    }
-    main() {
-        arr: Int[func()]!
-    }
-    )";
-    app.parseSrcFile(code);
-    app.analyse();
-    CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10048, code));
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10048.code);
-}
-
-TEST_CASE("TestSema10048B") {
-    LgsApp app;
-    const auto code = R"(
-    main() {
-        arr: Int[]!
-    }
-    )";
-    app.parseSrcFile(code);
-    app.analyse();
-    CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10048, code));
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10048.code);
-}
-
 TEST_CASE("TestSema10055") {
     LgsApp app;
     const auto code = R"(

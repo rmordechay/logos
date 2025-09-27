@@ -8,8 +8,7 @@ void LgsErrHandler::setUnsuccessful() {
 
 void LgsErrHandler::addError(const LgsBaseError& lgsErr, const LgsLocation* location, const std::vector<std::string>& args) {
     setUnsuccessful();
-    std::string result;
-    formatErrorMsg(lgsErr, args, result);
+    const auto result = formatErrorMsg(lgsErr.msg, args);
     if (location) {
         errors.emplace_back(LgsError{.msg = result, .errCode = lgsErr.code, .location = *location});
     } else {
@@ -18,8 +17,7 @@ void LgsErrHandler::addError(const LgsBaseError& lgsErr, const LgsLocation* loca
 }
 
 void LgsErrHandler::addWarning(const LgsBaseError& lgsErr, const LgsLocation* location, const std::vector<std::string>& args) {
-    std::string result;
-    formatErrorMsg(lgsErr, args, result);
+    const auto result = formatErrorMsg(lgsErr.msg, args);
     if (location) {
         warnings.emplace_back(LgsWarning{.msg = result, .errCode = lgsErr.code, .location = *location});
     } else {

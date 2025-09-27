@@ -320,9 +320,9 @@ void LgsCodeGen::visitWhileLoop(const LgsWhileLoop* loop) {
 }
 
 void LgsCodeGen::visitVarDec(LgsVarDec* varDec) {
-    const auto IRType = varDec->type->getIRType(cg);
     visitExpr(varDec->expr);
     if (shouldAllocate(varDec)) {
+        const auto IRType = varDec->type->getIRType(cg);
         varDec->IRValue = cg.builder.CreateAlloca(IRType, nullptr, varDec->name);
         cg.builder.CreateStore(varDec->expr->IRValue, varDec->IRValue);
     } else {
@@ -978,10 +978,10 @@ bool LgsCodeGen::checkMock(LgsExpr* expr) {
 bool LgsCodeGen::shouldAllocate(const LgsVarDec* varDec) const {
     const auto type = varDec->type;
     const auto expr = varDec->expr;
-    const auto IRType = varDec->type->getIRType(cg);
     if (type->asVec() || type->asFuncType() || type->isHeapAlloc || (expr->asFuncCall() && type->isNumber())) {
         return false;
     }
+    const auto IRType = varDec->type->getIRType(cg);
     return !IRType->isArrayTy() && !IRType->isPointerTy() && !IRType->isVoidTy();
 }
 
@@ -1057,7 +1057,6 @@ void LgsCodeGen::createEpilogue(LgsFunc* func) {
 
 void LgsCodeGen::createMapFunc(LgsFunc* func) {
     if (cg.IRModule->getFunction(func->getIRName())) return;
-
     // Save state
     cg.savedIP = cg.builder.saveIP();
     const auto originalFunc = currentIRFunc;
@@ -1237,22 +1236,30 @@ Value* LgsCodeGen::createStaticArray(const LgsArrayExpr* arrayExpr) {
     const auto arraySize = arr->sizeExpr->IRValue;
     const auto arrIRPtr = cg.builder.CreateAlloca(baseIRType, arraySize);
     if (arrayExpr->initialElements.empty()) return arrIRPtr;
-    const auto arrIRType = ArrayType::get(baseIRType, arrayExpr->initialElements.size());
+    const auto elementsNumber = arrayExpr->initialElements.size();
+    const auto arrIRType = ArrayType::get(baseIRType, elementsNumber);
     if (allArgsAreConst(arrayExpr->initialElements)) {
         std::vector<Constant*> IRValues;
-        for (int i = 0; i < arrayExpr->initialElements.size(); ++i) {
+        for (int i = 0; i < elementsNumber; ++i) {
             const auto element = arrayExpr->initialElements[i];
             IRValues.push_back(dyn_cast<Constant>(getIRValue(element)));
         }
-        const auto size = arr->baseType->getSizeBytes() * arrayExpr->initialElements.size();
+        const auto size = arr->baseType->getSizeBytes() * elementsNumber;
         const auto constArr = cg.createConstGlobal(arrIRType, ConstantArray::get(arrIRType, IRValues));
         cg.callMemCpy(arrIRPtr, constArr, cg.i64(size));
         return arrIRPtr;
     }
 
-    for (int i = 0; i < arrayExpr->initialElements.size(); ++i) {
+    const auto sizeInvalid = cg.builder.CreateICmpUGT(cg.usize(elementsNumber), cg.builder.CreateZExt(arraySize, cg.sizeTy()));
+    const auto sizeValidBlock = cg.createBlock();
+    const auto sizeInvalidBlock = cg.createBlock();
+    cg.builder.CreateCondBr(sizeInvalid, sizeInvalidBlock, sizeValidBlock);
+    cg.startBlock(sizeInvalidBlock);
+    cg.callFunc("exit", cg.getFT(cg.voidTy(), {cg.i32Ty()}), {cg.i32(1)});
+    cg.branchAndStartBlock(sizeValidBlock);
+    for (int i = 0; i < elementsNumber; ++i) {
         const auto element = arrayExpr->initialElements[i];
-        const auto gep = cg.builder.CreateGEP(arrIRType, arrIRPtr, {cg.i32Zero(), cg.i32(i)});
+        const auto gep = cg.builder.CreateGEP(baseIRType, arrIRPtr, cg.i32(i));
         cg.builder.CreateStore(element->IRValue, gep);
     }
 

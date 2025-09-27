@@ -25,16 +25,14 @@ void logWarning(const std::string& msg, const std::string& path) {
     if (path != "") logInfo(path);
 }
 
-void formatAndLogError(const LgsBaseError& lgsErr, const std::vector<std::string>& args) {
-    std::string msg;
-    formatErrorMsg(lgsErr, args, msg);
-    logError(msg + '\n');
+void formatAndLogError(const std::string& msg, const std::vector<std::string>& args) {
+    logError(formatErrorMsg(msg, args) + '\n');
 }
 
-void formatErrorMsg(const LgsBaseError& lgsErr, const std::vector<std::string>& args, std::string& result) {
+std::string formatErrorMsg(const std::string& msg, const std::vector<std::string>& args) {
     auto pos = 0;
     auto argIndex = 0;
-    result = std::string(lgsErr.msg);
+    auto result = std::string(msg);
     while ((pos = result.find(MSG_PLACEHOLDER, pos)) != std::string::npos && argIndex < args.size()) {
         result.replace(pos, std::strlen(MSG_PLACEHOLDER), args[argIndex]);
         pos += args[argIndex].length();
@@ -48,6 +46,7 @@ void formatErrorMsg(const LgsBaseError& lgsErr, const std::vector<std::string>& 
         argIndex++;
     }
     result = LGS_ERROR_PADDING + result;
+    return result;
 }
 
 bool isLogosFile(const fs::path& filePath) {

@@ -69,7 +69,7 @@ inline LgsBaseError E10044{.msg = "Variadic argument must be the last argument."
 inline LgsBaseError E10045{.msg = "Variadic argument cannot have default arguments.", .code = errCodeStart++};
 inline LgsBaseError E10046{.msg = "'%s' is not callable.", .code = errCodeStart++};
 inline LgsBaseError E10047{.msg = "External file '%s' was not found.", .code = errCodeStart++};
-inline LgsBaseError E10048{.msg = "Static iterable '%s' must have a constant size.", .code = errCodeStart++};
+inline LgsBaseError E10048{.msg = "", .code = errCodeStart++};
 inline LgsBaseError E10049{.msg = "Not enough information to infer type of '%s'.", .code = errCodeStart++};
 inline LgsBaseError E10050{.msg = "Only integer values can be incremented (++) or decremented (--). Given: '%s'.", .code = errCodeStart++};
 inline LgsBaseError E10051{.msg = "'%s' is constant and cannot be overwritten.", .code = errCodeStart++};

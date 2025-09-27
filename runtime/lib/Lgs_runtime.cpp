@@ -15,12 +15,12 @@ struct Lgs_runtime {
 static inline Lgs_runtime runtime;
 
 extern "C" void Lgs_runtime_init() {
-    runtime.scheduler.start();
+    // runtime.scheduler.start();
     //sqlite3_open(":memory:", &runtime.db);
 }
 
 extern "C" void Lgs_runtime_close() {
-    runtime.scheduler.shutdown();
+    // runtime.scheduler.shutdown();
     // sqlite3_close(runtime.db);
 }
 

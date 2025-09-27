@@ -32,7 +32,7 @@ void LgsIterIndex::setIRElementPtr(LgsLLVMGen& cg) {
     const auto baseExprType = baseExpr->type;
     auto indexIRValue = index.from->IRValue;
     if (const auto sArr = baseExprType->asSArray()) {
-        IRValue = IRValue = cg.builder.CreateGEP(sArr->getIRType(cg), baseExpr->IRValue, {cg.i32Zero(), index.from->IRValue});;
+        IRValue = cg.builder.CreateGEP(sArr->baseType->getIRType(cg), baseExpr->IRValue, index.from->IRValue);
     } else if (const auto dArr = baseExpr->type->asDArray()) {
         indexIRValue = cg.builder.CreateZExt(indexIRValue, cg.i64Ty());
         IRValue = dArr->getIRElement(cg, baseExpr->IRValue, indexIRValue);

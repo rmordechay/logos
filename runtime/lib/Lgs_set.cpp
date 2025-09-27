@@ -53,7 +53,7 @@ extern "C" void* Lgs_Set_get(const Lgs_set* set, const size_t index) {
     if (!set || !set->data) return nullptr;
     const auto len = set->data->size() / set->elementSize;
     if (index >= len) {
-        formatAndLogError(E10080, {std::to_string(index)});
+        formatAndLogError(E10080.msg, {std::to_string(index)});
         return nullptr;
     }
     return set->data->data() + index * set->elementSize;

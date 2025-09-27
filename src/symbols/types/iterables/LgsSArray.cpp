@@ -13,9 +13,8 @@ Type* LgsSArray::getIRType(LgsLLVMGen& cg) {
 }
 
 std::string LgsSArray::getName() {
-    const auto index = sizeExpr->getConstInt() == 0 ? "" : std::to_string(sizeExpr->getConstInt());
     const auto ty = baseType ? baseType->pname() : LGS_UNKNOWN_TYPE;
-    return ty + '[' + index + "]";
+    return ty + '[' + sizeExpr->getName() + "]";
 }
 
 std::string LgsSArray::pname() {
