@@ -7,9 +7,7 @@ public:
     explicit LgsInterface(const std::string& name) : LgsObject(name) {}
     json::value asJsonStr() override;
     std::string getName() override;
-    llvm::Type* getIRType(LgsLLVMGen& cg) override;
-    LgsField* getField(const std::string& fieldName) override;
-    LgsFunc* getMethod(const std::string& methodName) override;
+    Type* getIRType(LgsLLVMGen& cg) override;
     LgsExpr* getZeroValue() override;
     Lgs_RTType getRTType() override;
     bool canCastTo(LgsType* other) override;

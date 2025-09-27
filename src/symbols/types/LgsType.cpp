@@ -92,12 +92,45 @@ LgsField* LgsType::getField(const std::string& name) {
     for (auto* f : fields) {
         if (f->name == name) return f;
     }
+    if (const auto obj = asObject()) {
+        for (auto* f : fields) {
+            if (f->name == name) return f;
+        }
+        for (const auto interface : obj->interfaces) {
+            const auto interfaceField = interface->getField(name);
+            if (interfaceField) {
+                return interfaceField;
+            }
+        }
+    }
+    if (const auto vec = asVec()) {
+        for (auto* f : fields) if (f->name == name) return f;
+        const size_t newFieldDim = name.size();
+        const auto scalarOrVector = newFieldDim == 1 ? vec->baseType : new LgsVec(newFieldDim);
+        const auto field = new LgsField(name, scalarOrVector);
+        addField(field);
+        return field;
+    }
     return nullptr;
 }
 
 LgsFunc* LgsType::getMethod(const std::string& methodName) {
     const auto method = methods.find(methodName);
     if (method != methods.end()) return method->second;
+    if (const auto obj = asObject()) {
+        for (const auto* f : fields) {
+            if (f->name != methodName) continue;
+            if (f->expr && f->expr->asFunc()) {
+                return f->expr->asFunc();
+            }
+        }
+        for (const auto interface : obj->interfaces) {
+            const auto interfaceMethod = interface->getMethod(methodName);
+            if (interfaceMethod) {
+                return interfaceMethod;
+            }
+        }
+    }
     return nullptr;
 }
 

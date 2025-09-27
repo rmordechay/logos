@@ -19,7 +19,6 @@ public:
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
     Lgs_RTType getRTType() override;
-    LgsType* getIndexType() override;
     std::string strFormatPart() const override;
     StructType* getArrStruct(LgsLLVMGen& cg);
     LgsType* applyOp(LgsType* other, LgsOperator op) override;

@@ -104,6 +104,16 @@ bool LgsLLVMGen::lastInstTerminator() const {
     return builder.GetInsertBlock()->getTerminator();
 }
 
+void LgsLLVMGen::createGuard(Value* condition, const std::string& msg) {
+    const auto validBlock = createBlock();
+    const auto invalidBlock = createBlock();
+    builder.CreateCondBr(condition, invalidBlock, validBlock);
+    startBlock(invalidBlock);
+    callFunc("Lgs_printError", voidTy(), {ptrTy()}, {getIRStr(msg)});
+    callFunc("exit", voidTy(), {i32Ty()}, {i32(1)});
+    branchAndStartBlock(validBlock);
+}
+
 FunctionType* LgsLLVMGen::getFT(Type* rt, const std::vector<Type*>& params, const bool isVariadic) {
     return FunctionType::get(rt, params, isVariadic);
 }
@@ -119,8 +129,13 @@ Value* LgsLLVMGen::callFunc(const std::string& funcName, FunctionType* ft, const
     return builder.CreateCall(func, args);
 }
 
-Value* LgsLLVMGen::callLgsFunc(const std::string& funcName, FunctionType* ft, const std::vector<Value*>& args) {
-    return callFunc(LGS_RUNTIME_NAMES_PREFIX + funcName, ft, args);
+Value* LgsLLVMGen::callFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes, const std::vector<Value*>& args) {
+    const auto func = IRModule->getOrInsertFunction(funcName, FunctionType::get(rt, paramTypes, false));
+    return builder.CreateCall(func, args);
+}
+
+Value* LgsLLVMGen::callLgsFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes, const std::vector<Value*>& args) {
+    return callFunc(LGS_RUNTIME_NAMES_PREFIX + funcName, rt, paramTypes, args);
 }
 
 Value* LgsLLVMGen::getPtr(Value* v) {
@@ -137,7 +152,7 @@ Value* LgsLLVMGen::callPrintf(const std::vector<Value*>& args) {
 }
 
 Value* LgsLLVMGen::callStrLen(Value* str) {
-    return callFunc("strlen", getFT(i64Ty(), {ptrTy()}), {str});
+    return callFunc("strlen", i64Ty(), {ptrTy()}, {str});
 }
 
 void LgsLLVMGen::callMemCpy(Value* dest, Value* src, Value* size) {
@@ -150,17 +165,17 @@ Value* LgsLLVMGen::callMalloc(const size_t size, const bool isOwner, const Lgs_R
     assert(type != RTT_UNKNOWN);
     const auto ptr = builder.CreateMalloc(sizeTy(), sizeTy(), usize(size), nullptr);
     ptr->addRetAttr(Attribute::NoAlias);
-    if (isOwner) callLgsFunc("stack_addOwner", getFT(voidTy(), {ptrTy(), i32Ty()}), {ptr, i32(type)});
-    else callLgsFunc("stack_addOrphan", getFT(voidTy(), {ptrTy(), i32Ty()}), {ptr, i32(type)});
+    if (isOwner) callLgsFunc("stack_addOwner", voidTy(), {ptrTy(), i32Ty()}, {ptr, i32(type)});
+    else callLgsFunc("stack_addOrphan", voidTy(), {ptrTy(), i32Ty()}, {ptr, i32(type)});
     return ptr;
 }
 
 void LgsLLVMGen::callStackPush() {
-    callLgsFunc("stack_push", getFT(voidTy()));
+    callLgsFunc("stack_push", voidTy());
 }
 
 Value* LgsLLVMGen::callPopStack(const std::string& name, const bool cleanup) {
-    return callLgsFunc("stack_pop", getFT(voidTy(), {i1Ty()}), {i1(cleanup)});
+    return callLgsFunc("stack_pop", voidTy(), {i1Ty()}, {i1(cleanup)});
 }
 
 Type* LgsLLVMGen::i1Ty() {

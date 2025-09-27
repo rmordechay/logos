@@ -428,7 +428,7 @@ void LgsSema::visitForeachLoop(LgsForeachLoop* foreachLoop) {
         return;
     }
 
-    const bool unpacked = iterable->unpackLoopVars(foreachLoop);
+    const bool unpacked = iterable->unpackLoopVarsTypes(foreachLoop);
     if (!unpacked) {
         errHandler.addError(E10041, &foreachLoop->iterExpr->location, {foreachLoop->iterExpr->getName(), foreachLoop->iterExpr->type->pname(), std::to_string(foreachLoop->loopVars.size())});
         return;
@@ -983,19 +983,26 @@ void LgsSema::visitIterIndex(LgsIterIndex* iterIndex) {
 
 void LgsSema::visitIndex(LgsIterIndex* iterIndex) {
     const auto iterable = iterIndex->baseExpr->type->asIterable();
-    visitExpr(iterIndex->index.from);
+    const auto exprFrom = iterIndex->index.from;
+    visitExpr(exprFrom);
     const auto exprTo = iterIndex->index.to;
     if (exprTo) {
         visitExpr(exprTo);
         visitSlice(iterIndex);
         iterIndex->setType(iterable);
     } else {
-        validateIndex(iterIndex);
-        if (const auto map = iterable->asMap()) {
-            iterIndex->setType(map->typePair->value);
-        } else {
-            iterIndex->setType(iterable->baseType);
+        if (!iterable->getIndexType()->canCastTo(exprFrom->type)) {
+            return errHandler.addError(E10036, &iterIndex->location, {iterIndex->getName(), exprFrom->type->pname()});
         }
+        if (const auto sArr = iterable->asSArray()) {
+            const auto i = exprFrom->getConstInt();
+            const auto bound = sArr->sizeExpr->getConstInt();
+            if (i < 0 || bound < 0) return;
+            if (i >= bound) {
+                return errHandler.addError(E10092, &iterIndex->location, {iterIndex->getName(), std::to_string(bound)});
+            }
+        }
+        iterIndex->setType(iterable->getValueType());
     }
 }
 
@@ -1012,6 +1019,20 @@ void LgsSema::visitSlice(LgsIterIndex* iterIndex) {
     }
     if (!iterable->getIndexType()->canCastTo(exprTo->type)) {
         return errHandler.addError(E10036, &iterIndex->location, {iterIndex->getName(), exprTo->type->pname()});
+    }
+    if (const auto sArr = iterable->asSArray()) {
+        const auto sizeFrom = exprFrom->getConstInt();
+        const auto sizeTo = exprTo->getConstInt();
+        if (sizeFrom < 0 || sizeTo < 0) return;
+        if (sizeFrom > sizeTo) {
+            return errHandler.addError(E10037, &iterIndex->location, {iterIndex->getName()});
+        }
+        const auto i = sizeFrom;
+        const auto j = sizeTo;
+        const auto bound = sArr->sizeExpr->getConstInt();
+        if (i >= bound || j >= bound) {
+            return errHandler.addError(E10003, &iterIndex->location, {iterIndex->getName(), std::to_string(bound)});
+        }
     }
 }
 
@@ -1159,6 +1180,14 @@ void LgsSema::validateIndex(LgsIterIndex* iterIndex) {
     const auto iterable = baseExpr->type->asIterable();
     if (!iterable->getIndexType()->canCastTo(exprFrom->type)) {
         return errHandler.addError(E10036, &iterIndex->location, {iterIndex->getName(), exprFrom->type->pname()});
+    }
+    if (const auto sArr = iterable->asSArray()) {
+        const auto i = exprFrom->getConstInt();
+        const auto bound = sArr->sizeExpr->getConstInt();
+        if (i < 0 || bound < 0) return;
+        if (i >= bound) {
+            return errHandler.addError(E10092, &iterIndex->location, {iterIndex->getName(), std::to_string(bound)});
+        }
     }
 }
 

@@ -49,7 +49,7 @@ Value* LgsExpr::getIRPtr(LgsLLVMGen& cg) const {
 
 void LgsExpr::freeOwner(LgsLLVMGen& cg) {
     if (type->isHeapAlloc && owner) {
-        cg.callLgsFunc("stack_removeOwner", cg.getFT(cg.voidTy(), {cg.ptrTy()}), {owner->IRValue});
+        cg.callLgsFunc("stack_removeOwner", cg.voidTy(), {cg.ptrTy()}, {owner->IRValue});
         owner = nullptr;
     }
 }
@@ -69,7 +69,7 @@ int64_t LgsExpr::getConstInt() {
             break;
         }
     }
-    return 0;
+    return -1;
 }
 
 std::string LgsExpr::getConstStr() {

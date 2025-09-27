@@ -45,7 +45,6 @@ std::string formatErrorMsg(const std::string& msg, const std::vector<std::string
         pos += args[argIndex].length();
         argIndex++;
     }
-    result = LGS_ERROR_PADDING + result;
     return result;
 }
 

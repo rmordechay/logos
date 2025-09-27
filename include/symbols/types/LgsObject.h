@@ -21,8 +21,6 @@ public:
         isHeapAlloc = true;
     }
     Type* getIRType(LgsLLVMGen& cg) override;
-    LgsField* getField(const std::string& fieldName) override;
-    LgsFunc* getMethod(const std::string& methodName) override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
     Lgs_RTType getRTType() override;

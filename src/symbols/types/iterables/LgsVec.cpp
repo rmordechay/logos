@@ -1,5 +1,4 @@
 #include "types/iterables/LgsVec.h"
-
 #include "exprs/LgsIterIndex.h"
 #include "exprs/LgsVectorExpr.h"
 #include "types/primitives/LgsSize.h"
@@ -7,15 +6,6 @@
 Type* LgsVec::getIRType(LgsLLVMGen& cg) {
     IRType = FixedVectorType::get(baseType->getIRType(cg), dim);
     return IRType;
-}
-
-LgsField* LgsVec::getField(const std::string& fieldName) {
-    for (auto* f : fields) if (f->name == fieldName) return f;
-    const size_t newFieldDim = fieldName.size();
-    const auto scalarOrVector = newFieldDim == 1 ? baseType : new LgsVec(newFieldDim);
-    const auto field = new LgsField(fieldName, scalarOrVector);
-    addField(field);
-    return field;
 }
 
 std::string LgsVec::getName() {
@@ -39,10 +29,6 @@ Lgs_RTType LgsVec::getRTType() {
     if (dim == 3) return RTT_VEC3;
     if (dim == 4) return RTT_VEC4;
     return RTT_UNKNOWN;
-}
-
-LgsType* LgsVec::getIndexType() {
-    return &LGS_INT;
 }
 
 bool LgsVec::canCastTo(LgsType* other) {

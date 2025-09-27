@@ -61,7 +61,8 @@ public:
     std::vector<LgsField*> fields;
     std::map<std::string, LgsFunc*> methods;
 
-    LgsType* extendInt();
+    LgsField* getField(const std::string& name);
+    LgsFunc* getMethod(const std::string& methodName);
     bool addField(LgsField* field);
     bool addMethod(LgsFunc* method);
     bool addEmptyMethod(const std::string& name);
@@ -72,9 +73,8 @@ public:
     bool isNullable();
     bool isUnknown();
     bool isSliceable();
+    LgsType* extendInt();
 
-    virtual LgsField* getField(const std::string& name);
-    virtual LgsFunc* getMethod(const std::string& methodName);
     virtual Type* getIRType(LgsLLVMGen& cg) = 0;
     virtual size_t getSizeBytes() = 0;
     virtual LgsExpr* getZeroValue() = 0;

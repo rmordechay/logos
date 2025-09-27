@@ -1,9 +1,6 @@
 #include "Lgs_types.h"
 #include "types/primitives/LgsBool.h"
-
-extern "C" void Lgs_printError() {
-
-}
+#include "utils/LgsUtils.h"
 
 extern "C" void Lgs_print(const char* fmt, const Lgs_RTType rtt, const void* v) {
     if (!v) return;
@@ -109,4 +106,8 @@ extern "C" void Lgs_print(const char* fmt, const Lgs_RTType rtt, const void* v) 
         assert(0);
     }
     printf("\n");
+}
+
+extern "C" void Lgs_printError(const char* fmt) {
+    formatAndLogError(fmt);
 }

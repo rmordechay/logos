@@ -21,19 +21,19 @@ public:
     explicit LgsSystem() : LgsObject(name) {
         pidFunc->funcType->IRName = "getpid";
         sleepFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
-            return cg.callLgsFunc("System_sleep", cg.getFT(cg.i32Ty(), {cg.i32Ty()}), {args.front()->IRValue});
+            return cg.callLgsFunc("System_sleep", cg.i32Ty(), {cg.i32Ty()}, {args.front()->IRValue});
         };
         cwdFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsExpr*>&) {
             const auto value = cg.builder.CreateAlloca(ArrayType::get(cg.i8Ty(), 1024));
-            cg.callFunc("getcwd", cg.getFT(cg.ptrTy(), {cg.ptrTy(), cg.sizeTy()}), {value, cg.usize(1024)});
+            cg.callFunc("getcwd", cg.ptrTy(), {cg.ptrTy(), cg.sizeTy()}, {value, cg.usize(1024)});
             return value;
         };
         coresNumFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsExpr*>&) {
-            return cg.callFunc("sysconf", cg.getFT(cg.i64Ty(), {cg.i32Ty()}), {cg.i32(58)});
+            return cg.callFunc("sysconf", cg.i64Ty(), {cg.i32Ty()}, {cg.i32(58)});
         };
         getEnvFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
             const auto fallback = args.size() == 2 ? args.back()->IRValue : cg.null();
-            return cg.callLgsFunc("System_getEnv", cg.getFT(cg.ptrTy(), {cg.ptrTy(), cg.ptrTy()}), {args.front()->IRValue, fallback});
+            return cg.callLgsFunc("System_getEnv", cg.ptrTy(), {cg.ptrTy(), cg.ptrTy()}, {args.front()->IRValue, fallback});
         };
         addMethod(pidFunc);
         addMethod(sleepFunc);

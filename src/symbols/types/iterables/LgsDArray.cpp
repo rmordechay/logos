@@ -32,10 +32,6 @@ Lgs_RTType LgsDArray::getRTType() {
     return RTT_DARRAY;
 }
 
-LgsType* LgsDArray::getIndexType() {
-    return &LGS_INT;
-}
-
 std::string LgsDArray::strFormatPart() const {
     if (baseType->asChar()) return "%s";
     return "%p";
@@ -76,7 +72,7 @@ Value* LgsDArray::lengthIR(LgsLLVMGen& cg, Value* iterable) {
 }
 
 Value* LgsDArray::inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) {
-    return cg.callLgsFunc("DArray_contains", cg.getFT(cg.i1Ty(), {cg.ptrTy(), cg.ptrTy()}), {iterableExpr->IRValue, value->getIRPtr(cg)});
+    return cg.callLgsFunc("DArray_contains", cg.i1Ty(), {cg.ptrTy(), cg.ptrTy()}, {iterableExpr->IRValue, value->getIRPtr(cg)});
 }
 
 Value* LgsDArray::getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) {

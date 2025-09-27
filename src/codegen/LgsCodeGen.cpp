@@ -116,11 +116,11 @@ void LgsCodeGen::visitTestFile(const LgsTestFile* testFile) {
 void LgsCodeGen::visitMainFunc(LgsMainFunc* func) {
     stack.enterScope(func);
     createPrologue(func);
-    cg.callLgsFunc("runtime_init", cg.getFT(cg.voidTy()));
+    cg.callLgsFunc("runtime_init", cg.voidTy());
     if (!func->funcType->params.empty()) initMainArgs(func);
     visitStmtsBlock(func->stmtsBlock);
     createEpilogue(func);
-    cg.callLgsFunc("runtime_close", cg.getFT(cg.voidTy()));
+    cg.callLgsFunc("runtime_close", cg.voidTy());
     cg.builder.CreateRet(cg.i32(EXIT_SUCCESS));
     stack.exitScope();
 }
@@ -252,7 +252,7 @@ void LgsCodeGen::visitForeachLoop(LgsForeachLoop* loop) {
     cg.startBlock(loop->IRBodyBlock);
 
     const auto iterable = loop->iterExpr->type->asIterable();
-    iterable->unpackIR(cg, loop->loopVars, loop->iterExpr->IRValue, loop->iValue);
+    iterable->unpackLoopVarsIR(cg, loop->loopVars, loop->iterExpr->IRValue, loop->iValue);
 }
 
 void LgsCodeGen::visitInfiniteLoop(const LgsInfiniteLoop* loop) const {
@@ -493,7 +493,7 @@ void LgsCodeGen::visitCoroutine(const LgsCoroutine* coroutine) {
     const auto ctxTy = getThunkCtxType(fc);
     const auto ctx = getThunkCtx(fc, ctxTy);
     const auto func = getThunkFunc(fc, ctxTy);
-    cg.callLgsFunc("stack_addCoro", cg.getFT(cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}), {func, ctx});
+    cg.callLgsFunc("stack_addCoro", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {func, ctx});
 }
 
 void LgsCodeGen::visitIOStmt(const LgsIOStmt* ioStmt) {
@@ -551,7 +551,7 @@ void LgsCodeGen::visitDeferStmt(const LgsDeferStmt* deferStmt) {
     const auto ctxTy = getThunkCtxType(fc);
     const auto ctx = getThunkCtx(fc, ctxTy);
     const auto func = getThunkFunc(fc, ctxTy);
-    cg.callLgsFunc("stack_addDefer", cg.getFT(cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}), {func, ctx});
+    cg.callLgsFunc("stack_addDefer", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {func, ctx});
 }
 
 void LgsCodeGen::visitExpr(LgsExpr* expr) {
@@ -858,7 +858,7 @@ void LgsCodeGen::visitPrefixExpr(LgsPrefixExpr* prefixExpr) {
     }
     case SQRT_PREFIX: {
         auto d = cg.builder.CreateSIToFP(exprIRVal, cg.doubleTy());
-        prefixExpr->IRValue = cg.callFunc("sqrt", cg.getFT(cg.doubleTy(), {cg.doubleTy()}), {d});
+        prefixExpr->IRValue = cg.callFunc("sqrt", cg.doubleTy(), {cg.doubleTy()}, {d});
         break;
     }
     }
@@ -988,10 +988,10 @@ bool LgsCodeGen::shouldAllocate(const LgsVarDec* varDec) const {
 void LgsCodeGen::yield() const {
     const auto doYieldBlock = cg.createBlock("do_yield_block");
     const auto continueBlock = cg.createBlock("continue_block");
-    const auto shouldYield = cg.callLgsFunc("scheduler_shouldYield", cg.getFT(cg.i1Ty()));
+    const auto shouldYield = cg.callLgsFunc("scheduler_shouldYield", cg.i1Ty());
     cg.builder.CreateCondBr(shouldYield, doYieldBlock, continueBlock);
     cg.startBlock(doYieldBlock);
-    cg.callLgsFunc("scheduler_yield", cg.getFT(cg.voidTy()));
+    cg.callLgsFunc("scheduler_yield", cg.voidTy());
     cg.branchAndStartBlock(continueBlock);
 }
 
@@ -1019,7 +1019,7 @@ void LgsCodeGen::createEpilogue(LgsFunc* func) {
     if (!needsCleanup && !func->hasDefers) return;
     cg.branchAndStartBlock(func->getCleanupBlock(cg));
     currentIRFunc = nullptr;
-    if (func->hasDefers) cg.callLgsFunc("stack_callDefers", cg.getFT(cg.voidTy()));
+    if (func->hasDefers) cg.callLgsFunc("stack_callDefers", cg.voidTy());
 
     if (needsCleanup) {
         if (func->returnStmts.empty()) {
@@ -1201,7 +1201,7 @@ Function* LgsCodeGen::getThunkFunc(const LgsFuncCall* fc, Type* ctxTy) const {
 
     cg.savedIP = cg.builder.saveIP();
     const auto ft = cg.getFT(cg.voidTy(), {cg.ptrTy()});
-    func = Function::Create(ft, Function::PrivateLinkage, fc->name + "_thunk", cg.IRModule);
+    func = cg.getFunc(fc->name + "_thunk", ft, Function::PrivateLinkage);
     const auto entryBlock = BasicBlock::Create(cg.context, BLOCK_NAME_ENTRY);
     entryBlock->insertInto(func);
     cg.builder.SetInsertPoint(entryBlock);
@@ -1233,9 +1233,10 @@ void LgsCodeGen::generateIf(Value* cond, const std::function<void()>& blockStmtC
 Value* LgsCodeGen::createStaticArray(const LgsArrayExpr* arrayExpr) {
     const auto arr = arrayExpr->type->asSArray();
     const auto baseIRType = arr->baseType->getIRType(cg);
-    const auto arraySize = arr->sizeExpr->IRValue;
-    const auto arrIRPtr = cg.builder.CreateAlloca(baseIRType, arraySize);
+    const auto arraySizeIR = cg.builder.CreateZExt(arr->sizeExpr->IRValue, cg.sizeTy());
+    const auto arrIRPtr = cg.builder.CreateAlloca(baseIRType, arraySizeIR);
     if (arrayExpr->initialElements.empty()) return arrIRPtr;
+
     const auto elementsNumber = arrayExpr->initialElements.size();
     const auto arrIRType = ArrayType::get(baseIRType, elementsNumber);
     if (allArgsAreConst(arrayExpr->initialElements)) {
@@ -1250,19 +1251,13 @@ Value* LgsCodeGen::createStaticArray(const LgsArrayExpr* arrayExpr) {
         return arrIRPtr;
     }
 
-    const auto sizeInvalid = cg.builder.CreateICmpUGT(cg.usize(elementsNumber), cg.builder.CreateZExt(arraySize, cg.sizeTy()));
-    const auto sizeValidBlock = cg.createBlock();
-    const auto sizeInvalidBlock = cg.createBlock();
-    cg.builder.CreateCondBr(sizeInvalid, sizeInvalidBlock, sizeValidBlock);
-    cg.startBlock(sizeInvalidBlock);
-    cg.callFunc("exit", cg.getFT(cg.voidTy(), {cg.i32Ty()}), {cg.i32(1)});
-    cg.branchAndStartBlock(sizeValidBlock);
+    const auto isSizeInvalid = cg.builder.CreateICmpUGT(cg.usize(elementsNumber), arraySizeIR);
+    cg.createGuard(isSizeInvalid, E10003.msg);
     for (int i = 0; i < elementsNumber; ++i) {
         const auto element = arrayExpr->initialElements[i];
         const auto gep = cg.builder.CreateGEP(baseIRType, arrIRPtr, cg.i32(i));
         cg.builder.CreateStore(element->IRValue, gep);
     }
-
     return arrIRPtr;
 }
 

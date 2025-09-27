@@ -8,16 +8,6 @@
 #include "types/LgsVoid.h"
 #include "types/iterables/LgsDArray.h"
 
-LgsFunc* LgsMap::getMethod(const std::string& methodName) {
-    if (methodName == KEYS_FUNC_NAME) {
-        return getKeysFunc();
-    }
-    if (methodName == VALUES_FUNC_NAME) {
-        return getValuesFunc();
-    }
-    return LgsIterable::getMethod(methodName);
-}
-
 Type* LgsMap::getIRType(LgsLLVMGen& cg) {
     return getMapStruct(cg);
 }
@@ -50,7 +40,11 @@ LgsType* LgsMap::getIndexType() {
     return typePair->key;
 }
 
-bool LgsMap::unpackLoopVars(LgsForeachLoop* loop) const {
+LgsType* LgsMap::getValueType() {
+    return LgsIterable::getValueType();
+}
+
+bool LgsMap::unpackLoopVarsTypes(LgsForeachLoop* loop) const {
     if (loop->loopVars.size() == 1) {
         loop->loopVars[0]->type = typePair->key;
         return true;
@@ -63,15 +57,11 @@ bool LgsMap::unpackLoopVars(LgsForeachLoop* loop) const {
     return false;
 }
 
-void LgsMap::unpackIR(LgsLLVMGen& cg, const std::vector<LgsVarDec*> varDecs, Value* iterPtr, Value* index) const {
-    const auto getFunc = cg.getFT(cg.ptrTy(), {cg.ptrTy(), cg.sizeTy()});
-    if (varDecs.size() == 1) {
-        const auto keyPtr = cg.callLgsFunc("Map_getKeyAt", getFunc, {iterPtr, index});
-        varDecs[0]->IRValue = keyPtr;
-    } else if (varDecs.size() == 2) {
-        const auto keyPtr = cg.callLgsFunc("Map_getKeyAt", getFunc, {iterPtr, index});
-        varDecs[0]->IRValue = keyPtr;
-        const auto valuePtr = cg.callLgsFunc("Map_getValueAt", getFunc, {iterPtr, index});
+void LgsMap::unpackLoopVarsIR(LgsLLVMGen& cg, const std::vector<LgsVarDec*> varDecs, Value* iterPtr, Value* index) const {
+    const auto keyPtr = cg.callLgsFunc("Map_getKeyAt", cg.ptrTy(), {cg.ptrTy(), cg.sizeTy()}, {iterPtr, index});
+    varDecs[0]->IRValue = keyPtr;
+    if (varDecs.size() == 2) {
+        const auto valuePtr = cg.callLgsFunc("Map_getValueAt", cg.ptrTy(), {cg.ptrTy(), cg.sizeTy()}, {iterPtr, index});
         varDecs[1]->IRValue = valuePtr;
     }
 }

@@ -22,8 +22,10 @@ public:
         addEmptyMethod(VALUES_FUNC_NAME);
     }
 
-    LgsFunc* getMethod(const std::string& methodName) override;
     Type* getIRType(LgsLLVMGen& cg) override;
+    LgsFunc* getKeysFunc();
+    LgsFunc* getValuesFunc();
+    LgsFunc* getAddFunc() override;
     std::string getName() override;
     std::string pname() override;
     json::value asJsonStr() override;
@@ -31,14 +33,12 @@ public:
     LgsExpr* getZeroValue() override;
     Lgs_RTType getRTType() override;
     LgsType* getIndexType() override;
-    bool unpackLoopVars(LgsForeachLoop* loop) const override;
-    void unpackIR(LgsLLVMGen& cg, std::vector<LgsVarDec*> varDecs, Value* iterPtr, Value* index) const override;
+    LgsType* getValueType() override;
+    bool unpackLoopVarsTypes(LgsForeachLoop* loop) const override;
+    void unpackLoopVarsIR(LgsLLVMGen& cg, std::vector<LgsVarDec*> varDecs, Value* iterPtr, Value* index) const override;
     Value* lengthIR(LgsLLVMGen& cg, Value* iterable) override;
     Value* inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
     Value* getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) override;
-    LgsFunc* getKeysFunc();
-    LgsFunc* getValuesFunc();
-    LgsFunc* getAddFunc() override;
     StructType* getMapStruct(LgsLLVMGen& cg);
     bool canCastTo(LgsType* other) override;
     std::string strFormatPart() const override;

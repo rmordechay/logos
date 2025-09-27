@@ -39,7 +39,7 @@ void LgsVariable::assign(LgsLLVMGen& cg, LgsExpr* expr) {
 Value* LgsVariable::hash(LgsLLVMGen& cg) {
     switch (ref.symbolType) {
     case PARAM:
-        return cg.callLgsFunc("hash", cg.getFT(cg.i32Ty(), {cg.ptrTy()}), {ref.param->IRValue});
+        return cg.callLgsFunc("hash", cg.i32Ty(), {cg.ptrTy()}, {ref.param->IRValue});
     case VAR_DEC:
         return ref.varDec->expr->hash(cg);
     case FIELD:

@@ -30,39 +30,6 @@ Type* LgsObject::getIRType(LgsLLVMGen& cg) {
     return IRType;
 }
 
-LgsField* LgsObject::getField(const std::string& fieldName) {
-    for (auto* f : fields) {
-        if (f->name == fieldName) return f;
-    }
-    for (const auto interface : interfaces) {
-        const auto interfaceField = interface->getField(fieldName);
-        if (interfaceField) {
-            return interfaceField;
-        }
-    }
-    return nullptr;
-}
-
-LgsFunc* LgsObject::getMethod(const std::string& methodName) {
-    const auto method = methods.find(methodName);
-    if (method != methods.end()) {
-        return method->second;
-    }
-    for (const auto* f : fields) {
-        if (f->name != methodName) continue;
-        if (f->expr && f->expr->asFunc()) {
-            return f->expr->asFunc();
-        }
-    }
-    for (const auto interface : interfaces) {
-        const auto interfaceMethod = interface->getMethod(methodName);
-        if (interfaceMethod) {
-            return interfaceMethod;
-        }
-    }
-    return nullptr;
-}
-
 size_t LgsObject::getSizeBytes() {
     size_t sum = 0;
     for (const auto& field : fields) {

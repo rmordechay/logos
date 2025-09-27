@@ -5,35 +5,8 @@
 #include "loops/LgsForeachLoop.h"
 #include "stmts/LgsVarDec.h"
 #include "types/primitives/LgsBool.h"
+#include "types/primitives/LgsInt.h"
 #include "types/primitives/LgsSize.h"
-
-LgsFunc* LgsIterable::getMethod(const std::string& methodName) {
-    if (methodName == ADD_FUNC_NAME) {
-        return getAddFunc();
-    }
-    if (methodName == LEN_FUNC_NAME) {
-        return getLenFunc();
-    }
-    if (methodName == IS_EMPTY_FUNC_NAME) {
-        return getIsEmptyFunc();
-    }
-    if (methodName == IS_NOT_EMPTY_FUNC_NAME) {
-        return getIsNotEmptyFunc();
-    }
-    if (methodName == MAP_FUNC_NAME) {
-        return getMapFunc();
-    }
-    if (methodName == FILTER_FUNC_NAME) {
-        return getFilterFunc();
-    }
-    if (methodName == FOREACH_FUNC_NAME) {
-        assert(0);
-    }
-    const auto method = methods.find(methodName);
-    if (method == methods.end()) return nullptr;
-    assert(method->second);
-    return method->second;
-}
 
 LgsFunc* LgsIterable::getAddFunc() {
     return nullptr;
@@ -55,7 +28,15 @@ LgsFunc* LgsIterable::getFilterFunc() {
     return func->second;
 }
 
-bool LgsIterable::unpackLoopVars(LgsForeachLoop* loop) const {
+LgsType* LgsIterable::getIndexType() {
+    return &LGS_INT;
+}
+
+LgsType* LgsIterable::getValueType() {
+    return baseType;
+}
+
+bool LgsIterable::unpackLoopVarsTypes(LgsForeachLoop* loop) const {
     if (loop->loopVars.size() != 1) return false;
     const auto iterIndex = new LgsIterIndex(loop->iterExpr, LGS_SIZE.getZeroValue());
     iterIndex->setType(baseType);
@@ -64,7 +45,7 @@ bool LgsIterable::unpackLoopVars(LgsForeachLoop* loop) const {
     return true;
 }
 
-void LgsIterable::unpackIR(LgsLLVMGen& cg, const std::vector<LgsVarDec*> varDecs, Value* iterPtr, Value* index) const {
+void LgsIterable::unpackLoopVarsIR(LgsLLVMGen& cg, const std::vector<LgsVarDec*> varDecs, Value* iterPtr, Value* index) const {
     const auto iterIndex = varDecs[0]->expr->asIterIndex();
     iterIndex->index.from->IRValue = index;
     iterIndex->setIRElementPtr(cg);

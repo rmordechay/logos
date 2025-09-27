@@ -15,13 +15,11 @@ public:
     }
 
     Type* getIRType(LgsLLVMGen& cg) override;
-    LgsField* getField(const std::string& fieldName) override;
     std::string getName() override;
     json::value asJsonStr() override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
     Lgs_RTType getRTType() override;
-    LgsType* getIndexType() override;
     bool canCastTo(LgsType* other) override;
     LgsType* applyOp(LgsType* other, LgsOperator op) override;
     Value* addIR(LgsLLVMGen& cg, Value* self, Value* other) override;

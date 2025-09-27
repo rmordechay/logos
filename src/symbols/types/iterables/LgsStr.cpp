@@ -32,10 +32,6 @@ Lgs_RTType LgsStr::getRTType() {
     return RTT_STR;
 }
 
-LgsType* LgsStr::getIndexType() {
-    return &LGS_INT;
-}
-
 LgsType* LgsStr::applyOp(LgsType* other, const LgsOperator op) {
     const auto IRName = other->getName();
     switch (op) {
@@ -72,7 +68,7 @@ Value* LgsStr::addIR(LgsLLVMGen& cg, Value* self, Value* other) {
 }
 
 Value* LgsStr::eqIR(LgsLLVMGen& cg, Value* self, Value* other) {
-    const auto rt = cg.callFunc("strcmp", cg.getFT(cg.i32Ty(), {cg.ptrTy(), cg.ptrTy()}), {self, other});
+    const auto rt = cg.callFunc("strcmp", cg.i32Ty(), {cg.ptrTy(), cg.ptrTy()}, {self, other});
     return cg.builder.CreateICmpEQ(rt, cg.i32(0));
 }
 
@@ -122,7 +118,7 @@ Value* LgsStr::lengthIR(LgsLLVMGen& cg, Value* iterable) {
 }
 
 Value* LgsStr::inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) {
-    const auto rv = cg.callFunc("strstr", cg.getFT(cg.ptrTy(), {cg.ptrTy(), cg.ptrTy()}), {iterableExpr->IRValue, value->IRValue});
+    const auto rv = cg.callFunc("strstr", cg.ptrTy(), {cg.ptrTy(), cg.ptrTy()}, {iterableExpr->IRValue, value->IRValue});
     return cg.builder.CreateIsNotNull(rv);
 }
 

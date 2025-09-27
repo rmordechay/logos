@@ -64,8 +64,8 @@ Value* LgsIterIndex::loadFromSArray(LgsLLVMGen& cg) const {
     Value* ptr = nullptr;
     auto iterIndex = this;
     while (true) {
-        auto irValue = iterIndex->index.from->IRValue;
-        IRIndices.push_back(irValue);
+        auto indexIR = iterIndex->index.from->IRValue;
+        IRIndices.push_back(indexIR);
         const auto innerIterIndex = iterIndex->baseExpr->asIterIndex();
         if (innerIterIndex) {
             iterIndex = innerIterIndex;
@@ -91,7 +91,7 @@ void LgsIterIndex::assign(LgsLLVMGen& cg, LgsExpr* expr) {
     }
 }
 
-void LgsIterIndex::assignScalar(LgsLLVMGen& cg, LgsExpr* expr) {
+void LgsIterIndex::assignScalar(LgsLLVMGen& cg, LgsExpr* expr) const {
     const auto rIRValue = expr->IRValue;
     const auto baseIRValue = baseExpr;
     if (const auto arr = baseExpr->type->asDArray()) {

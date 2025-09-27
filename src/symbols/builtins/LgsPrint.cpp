@@ -13,8 +13,7 @@ Value* LgsPrint::call(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
     IRArgs.emplace_back(baseStr);
     IRArgs.emplace_back(cg.i32(arg->type->getRTType()));
     IRArgs.emplace_back(arg->getIRPtr(cg));
-    const auto ft = cg.getFT(cg.voidTy(), {cg.ptrTy(), cg.i32Ty(), cg.ptrTy()}, false);
-    return cg.callLgsFunc(name, ft, IRArgs);
+    return cg.callLgsFunc(name, cg.voidTy(), {cg.ptrTy(), cg.i32Ty(), cg.ptrTy()}, IRArgs);
 }
 
 Value* LgsPrint::printFormat(LgsLLVMGen& cg, const LgsStrConst* const strConst) {

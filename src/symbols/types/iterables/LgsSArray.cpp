@@ -33,10 +33,6 @@ Lgs_RTType LgsSArray::getRTType() {
     return RTT_SARRAY;
 }
 
-LgsType* LgsSArray::getIndexType() {
-    return &LGS_INT;
-}
-
 std::string LgsSArray::strFormatPart() const {
     if (baseType->asChar()) return "%s";
     return "%p";

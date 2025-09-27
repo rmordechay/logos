@@ -64,10 +64,6 @@ LgsFunc* LgsSet::getAddFunc() {
     return func->second;
 }
 
-LgsType* LgsSet::getIndexType() {
-    return &LGS_INT;
-}
-
 LgsType* LgsSet::applyOp(LgsType* other, const LgsOperator op) {
     const auto IRName = other->getName();
     switch (op) {
@@ -86,7 +82,7 @@ Value* LgsSet::lengthIR(LgsLLVMGen& cg, Value* iterable) {
 }
 
 Value* LgsSet::inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) {
-    return cg.callLgsFunc("Set_contains", cg.getFT(cg.i1Ty(), {cg.ptrTy(), cg.ptrTy()}), {iterableExpr->IRValue, value->getIRPtr(cg)});
+    return cg.callLgsFunc("Set_contains", cg.i1Ty(), {cg.ptrTy(), cg.ptrTy()}, {iterableExpr->IRValue, value->getIRPtr(cg)});
 }
 
 Value* LgsSet::getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) {

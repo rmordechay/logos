@@ -1,5 +1,6 @@
 #include "utils/LgsErrHandler.h"
 #include "codegen/LgsLLVMGen.h"
+#include "data/LgsDefinitions.h"
 #include "utils/LgsUtils.h"
 
 void LgsErrHandler::setUnsuccessful() {
@@ -8,7 +9,7 @@ void LgsErrHandler::setUnsuccessful() {
 
 void LgsErrHandler::addError(const LgsBaseError& lgsErr, const LgsLocation* location, const std::vector<std::string>& args) {
     setUnsuccessful();
-    const auto result = formatErrorMsg(lgsErr.msg, args);
+    const auto result = LGS_ERROR_PADDING + formatErrorMsg(lgsErr.msg, args);
     if (location) {
         errors.emplace_back(LgsError{.msg = result, .errCode = lgsErr.code, .location = *location});
     } else {
@@ -17,7 +18,7 @@ void LgsErrHandler::addError(const LgsBaseError& lgsErr, const LgsLocation* loca
 }
 
 void LgsErrHandler::addWarning(const LgsBaseError& lgsErr, const LgsLocation* location, const std::vector<std::string>& args) {
-    const auto result = formatErrorMsg(lgsErr.msg, args);
+    const auto result = LGS_ERROR_PADDING + formatErrorMsg(lgsErr.msg, args);
     if (location) {
         warnings.emplace_back(LgsWarning{.msg = result, .errCode = lgsErr.code, .location = *location});
     } else {
