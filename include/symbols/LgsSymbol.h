@@ -1,6 +1,6 @@
 #pragma once
-#include <types/LgsSubType.h>
 
+class LgsSubType;
 class LgsVariable;
 class LgsGroup;
 class LgsField;

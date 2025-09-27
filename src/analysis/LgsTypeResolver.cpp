@@ -13,6 +13,7 @@
 #include "types/LgsInterface.h"
 #include "types/iterables/LgsIterable.h"
 #include "types/LgsNullable.h"
+#include "types/LgsSubType.h"
 #include "utils/LgsErrHandler.h"
 
 bool LgsTypeResolver::resolveGlobalTypes(const std::vector<LgsFile*>& ast, ThreadPool& pool) {

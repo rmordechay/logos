@@ -16,6 +16,7 @@
 #include "exprs/LgsPostfixExpr.h"
 #include "exprs/LgsPrefixExpr.h"
 #include "exprs/LgsSelection.h"
+#include "exprs/LgsTypeExpr.h"
 #include "exprs/LgsVariable.h"
 #include "exprs/LgsVectorExpr.h"
 #include "exprs/constants/LgsFloatConst.h"
@@ -41,7 +42,6 @@
 #include "types/iterables/LgsSArray.h"
 #include "types/iterables/LgsVec.h"
 #include "types/primitives/LgsSize.h"
-
 #include <llvm/IR/Module.h>
 #include <llvm/Target/TargetMachine.h>
 
@@ -63,7 +63,11 @@ void LgsCodeGen::generate(const LgsAppConfigs& appConfigs, TargetMachine& target
 
 void LgsCodeGen::visitMainFile(LgsMainFile* mainFile) {
     for (const auto object : mainFile->objects) {
-        object->getIRType(cg);
+        const auto objIRType = object->getIRType(cg);
+        if(const auto singleton = object->singleton) {
+            const auto zeroInit = ConstantAggregateZero::get(objIRType);
+            singleton->IRValue = cg.createGlobal(objIRType, zeroInit, object->name);
+        }
         for (const auto& [_, method] : object->methods) {
             visitFunc(method);
         }
@@ -78,7 +82,16 @@ void LgsCodeGen::visitMainFile(LgsMainFile* mainFile) {
 }
 
 void LgsCodeGen::visitObjFile(const LgsObjectFile* objFile) {
-    for (const auto& [_, method] : objFile->obj->methods) {
+    const auto obj = objFile->obj;
+    if(const auto singleton = obj->singleton) {
+        const auto objIRType = obj->getIRType(cg);
+        singleton->IRValue = cg.IRModule->getGlobalVariable(obj->name);
+        if (!singleton->IRValue) {
+            const auto zeroInit = ConstantAggregateZero::get(objIRType);
+            singleton->IRValue = cg.createGlobal(objIRType, zeroInit, obj->name);
+        }
+    }
+    for (const auto& [_, method] : obj->methods) {
         visitFunc(method);
     }
 }
@@ -579,6 +592,8 @@ void LgsCodeGen::visitExpr(LgsExpr* expr) {
         if (const auto floatConst = expr->asFloatConst()) return visitFloatConst(floatConst);
         if (const auto loopMetaVar = expr->asLoopMetaVar()) return visitLoopMetaVar(loopMetaVar);
         if (const auto cast = expr->asCast()) return visitCast(cast);
+        if (const auto typeExpr = expr->asTypeExpr()) return visitTypeExpr(typeExpr);
+        assert(0);
     }
 }
 
@@ -762,10 +777,6 @@ void LgsCodeGen::visitVariable(LgsVariable* variable) {
 }
 
 void LgsCodeGen::visitSelection(LgsSelection* selection) {
-    const auto parentAsVar = selection->exprs.front()->asVariable();
-    if (parentAsVar && parentAsVar->ref.symbolType == OBJECT) {
-        assert(0);
-    }
     visitExpr(selection->exprs.front());
     for (int i = 0; i < selection->exprs.size() - 1; ++i) {
         const auto parent = selection->exprs[i];
@@ -776,6 +787,16 @@ void LgsCodeGen::visitSelection(LgsSelection* selection) {
                 continue;
             }
             const auto field = parent->type->getField(var->name);
+            if (parent->asTypeExpr()) {
+                const auto object = parent->type->asObject();
+                if (object && object->singleton) {
+                    field->parentIRValue = object->singleton->IRValue;
+                    field->parentIRType = object->getIRType(cg);
+                    visitField(field);
+                    child->IRValue = field->IRValue;
+                    continue;
+                }
+            }
             field->parentIRValue = parent->IRValue;
             field->parentIRType = parent->type->getIRType(cg);
             visitField(field);
@@ -890,16 +911,15 @@ void LgsCodeGen::visitIterIndex(LgsIterIndex* iterIndex) {
 
 void LgsCodeGen::visitInstance(LgsInstance* instance) {
     if (instance->IRValue) return;
-    const auto objIRType = instance->obj->getIRType(cg);
-    if(instance->obj->singleton) {
-        instance->IRValue = cg.createGlobal(objIRType, ConstantAggregateZero::get(objIRType), instance->obj->name);
-    } else {
-        instance->IRValue = cg.callMalloc(instance->obj->getSizeBytes(), instance->owner, instance->obj->getRTType());
-    }
+    instance->IRValue = cg.callMalloc(instance->obj->getSizeBytes(), instance->owner, instance->obj->getRTType());
     initFields(instance);
     if (!instance->obj->interfaces.empty()) {
         instance->setVirtuals(cg);
     }
+}
+
+void LgsCodeGen::visitTypeExpr(LgsTypeExpr* typeExpr) {
+
 }
 
 void LgsCodeGen::initFields(LgsInstance* instance) {

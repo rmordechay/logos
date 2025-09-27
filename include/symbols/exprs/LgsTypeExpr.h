@@ -1,5 +1,4 @@
 #pragma once
-#include "LgsType.h"
 #include "exprs/LgsExpr.h"
 
 

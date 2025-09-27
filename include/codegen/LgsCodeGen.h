@@ -113,6 +113,7 @@ public:
     void visitStrConst(LgsStrConst* strConst);
     void visitIterIndex(LgsIterIndex* iterIndex);
     void visitInstance(LgsInstance* instance);
+    void visitTypeExpr(LgsTypeExpr* typeExpr);
 
     void initFields(LgsInstance* instance);
     bool checkMock(LgsExpr* expr);

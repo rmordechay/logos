@@ -6,6 +6,7 @@
 #include "types/LgsGroup.h"
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
+#include "types/LgsSubType.h"
 
 class LgsTable;
 

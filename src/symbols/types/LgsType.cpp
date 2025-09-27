@@ -8,6 +8,7 @@
 #include "types/LgsGroup.h"
 #include "types/iterables/LgsMap.h"
 #include "types/LgsNullable.h"
+#include "types/LgsSubType.h"
 #include "types/LgsUnknown.h"
 #include "types/LgsVoid.h"
 #include "types/iterables/LgsSArray.h"

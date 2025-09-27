@@ -9,6 +9,7 @@
 #include "types/LgsGroup.h"
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
+#include "types/LgsSubType.h"
 
 void LgsSymbolTable::addSymbol(const LgsSymbol& symbol, LgsErrHandler* errHandler) {
     const auto symbolName = *symbol.name;

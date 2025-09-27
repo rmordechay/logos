@@ -637,3 +637,19 @@ TEST_CASE("TestSema10076") {
         CHECK_EQ(error.errCode, E10076.code);
     }
 }
+
+TEST_CASE("TestSema10089") {
+    LgsApp app;
+    const auto code = R"(
+    object Singleton {
+        x: Int
+    }
+    main() {
+        Singleton.x := 23
+    }
+    )";
+    app.parseSrcFile(code);
+    app.analyse();
+    CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10089, code));
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10089.code);
+}
