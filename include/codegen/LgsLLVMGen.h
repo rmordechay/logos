@@ -38,7 +38,7 @@ public:
     void startBlock(BasicBlock* block);
     void branchAndStartBlock(BasicBlock* block);
     bool lastInstTerminator() const;
-    void createGuard(Value* condition, const std::string& msg);
+    void createBoundsGuard(Value* len, Value* index);
 
     // Funcs
     static FunctionType* getFT(Type* rt, const std::vector<Type*>& params = {}, bool isVariadic = false);

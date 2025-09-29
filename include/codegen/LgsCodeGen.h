@@ -87,7 +87,7 @@ public:
     void visitSimpleIf(LgsIfStmt* ifStmt);
     void visitIfWithElse(LgsIfStmt* ifStmt);
     void visitElseIf(LgsIfStmt* ifStmt);
-    void visitPatternMatching(LgsIfStmt* pm);
+    void visitPatternMatching(LgsPatternMatching* pm);
     void visitCoroutine(const LgsCoroutine* coroutine);
     void visitIOStmt(const LgsIOStmt* ioStmt);
     void visitReturnStmt(LgsReturn* returnStmt);
@@ -121,11 +121,9 @@ public:
     void yield() const;
 
     // Funcs
-    void initMainArgs(LgsMainFunc* mainFunc);
     void createPrologue(LgsFunc* func);
     void createEpilogue(LgsFunc* func);
-    void createMapFunc(LgsFunc* func);
-    void createFilterFunc(LgsFunc* func);
+    void initMainArgs(LgsMainFunc* mainFunc);
     Value* getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) const;
     Type* getThunkCtxType(const LgsFuncCall* fc) const;
     Function* getThunkFunc(const LgsFuncCall* fc, Type* ctxTy) const;
@@ -137,6 +135,8 @@ public:
     Value* createStaticArray(const LgsArrayExpr* arrayExpr);
     Value* createDynamicArray(LgsArrayExpr* arrayExpr);
     Value* createSetExpr(LgsArrayExpr* setExpr);
+    void createMapFunc(LgsFunc* func);
+    void createFilterFunc(LgsFunc* func);
 
     Value* getIRValue(LgsValue* value);
     bool allArgsAreConst(const std::vector<LgsExpr*>& args);

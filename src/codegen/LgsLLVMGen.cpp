@@ -104,12 +104,13 @@ bool LgsLLVMGen::lastInstTerminator() const {
     return builder.GetInsertBlock()->getTerminator();
 }
 
-void LgsLLVMGen::createGuard(Value* condition, const std::string& msg) {
+void LgsLLVMGen::createBoundsGuard(Value* len, Value* index) {
+    const auto condition = builder.CreateICmpUGE(builder.CreateZExt(index, sizeTy()), len);
     const auto validBlock = createBlock();
     const auto invalidBlock = createBlock();
     builder.CreateCondBr(condition, invalidBlock, validBlock);
     startBlock(invalidBlock);
-    callFunc("Lgs_printError", voidTy(), {ptrTy()}, {getIRStr(msg)});
+    callFunc("Lgs_printError", voidTy(), {ptrTy()}, {getIRStr(E10003.msg)});
     callFunc("exit", voidTy(), {i32Ty()}, {i32(1)});
     branchAndStartBlock(validBlock);
 }

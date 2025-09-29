@@ -116,7 +116,31 @@ LgsField* LgsType::getField(const std::string& name) {
 
 LgsFunc* LgsType::getMethod(const std::string& methodName) {
     const auto method = methods.find(methodName);
-    if (method != methods.end()) return method->second;
+    if (method != methods.end()) {
+        if (method->second) {
+            return method->second;
+        }
+        const auto iter = asIterable();
+        if (methodName == ADD_FUNC_NAME) {
+            return iter->getAddFunc();
+        }
+        if (methodName == LEN_FUNC_NAME) {
+            return iter->getLenFunc();
+        }
+        if (methodName == IS_EMPTY_FUNC_NAME) {
+            return iter->getIsEmptyFunc();
+        }
+        if (methodName == IS_NOT_EMPTY_FUNC_NAME) {
+            return iter->getIsNotEmptyFunc();
+        }
+        if (methodName == MAP_FUNC_NAME) {
+            return iter->getMapFunc();
+        }
+        if (methodName == FILTER_FUNC_NAME) {
+            return iter->getFilterFunc();
+        }
+        assert(0);
+    }
     if (const auto obj = asObject()) {
         for (const auto* f : fields) {
             if (f->name != methodName) continue;

@@ -81,9 +81,9 @@ Value* LgsIterable::getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) 
 }
 
 LgsIterable::~LgsIterable() {
-    if (sizeExpr) {
-        freeExpr(sizeExpr);
-        sizeExpr = nullptr;
+    if (size) {
+        freeExpr(size);
+        size = nullptr;
     }
     if (baseType) {
         freeType(baseType);

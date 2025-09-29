@@ -13,8 +13,8 @@ void LgsArrayExpr::completeType(LgsType* toType) {
         if (!thisDArr->baseType) {
             thisDArr->baseType = otherDArr->baseType;
         }
-        if (!thisDArr->sizeExpr) {
-            thisDArr->sizeExpr = otherDArr->sizeExpr;
+        if (!thisDArr->size) {
+            thisDArr->size = otherDArr->size;
         }
         return;
     }
@@ -24,8 +24,8 @@ void LgsArrayExpr::completeType(LgsType* toType) {
         if (!thisSArr->baseType) {
             thisSArr->baseType = otherSArr->baseType;
         }
-        if (!thisSArr->sizeExpr) {
-            thisSArr->sizeExpr = otherSArr->sizeExpr;
+        if (!thisSArr->size) {
+            thisSArr->size = otherSArr->size;
         }
         return;
     }
@@ -35,8 +35,8 @@ void LgsArrayExpr::completeType(LgsType* toType) {
         if (!thisSet->baseType) {
             thisSet->baseType = otherSet->baseType;
         }
-        if (!thisSet->sizeExpr) {
-            thisSet->sizeExpr = otherSet->sizeExpr;
+        if (!thisSet->size) {
+            thisSet->size = otherSet->size;
         }
     }
 }

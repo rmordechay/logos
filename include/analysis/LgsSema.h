@@ -75,8 +75,8 @@ public:
     bool canAssignTo(LgsExpr* lValue, LgsExpr* rValue);
     void visitAssignment(const LgsAssignment* assignment);
     void visitIfStmt(LgsIfStmt* ifStmt);
-    void visitPatternMatching(LgsIfStmt* pm);
-    void visitBoolPatternMatching(LgsIfStmt* pm);
+    void visitPatternMatching(LgsPatternMatching* pm);
+    void visitBoolPatternMatching(LgsPatternMatching* pm);
     void visitWhileLoop(const LgsWhileLoop* whileLoop);
     void visitLoopStmt(LgsForLoop* loopStmt);
     void visitRangeLoop(LgsRangeLoop* rangeLoop);

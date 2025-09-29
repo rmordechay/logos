@@ -669,11 +669,11 @@ LgsIfStmt* LgsParserAdapter::getIfStatement(LogosParser::IfStatementContext* ctx
 }
 
 LgsStmt* LgsParserAdapter::getPatternMatching(LogosParser::PatternMatchingContext* ctx) {
-    const auto patternMatching = new LgsPattern(getExpr(ctx->expr()));
+    const auto patternMatching = new LgsPatternMatching(getExpr(ctx->expr()));
     for (const auto& pattern : ctx->pattern()) {
         const auto expr = getExpr(pattern->expr());
         const auto stmtBlock = getStmtBlock(pattern->statementsBlock());
-        patternMatching->elseIfs.emplace_back(std::make_pair(expr, stmtBlock));
+        patternMatching->patterns.emplace_back(std::make_pair(expr, stmtBlock));
     }
     patternMatching->elseBlock = getStmtBlock(ctx->statementsBlock());
     return patternMatching;
@@ -909,7 +909,7 @@ LgsArrayExpr* LgsParserAdapter::getArrayExpr(LogosParser::ArrayExprContext* ctx)
     } else {
         array = new LgsArrayExpr(new LgsDArray());
     }
-    array->type->asIterable()->sizeExpr = new LgsIntConst(&LGS_INT, ctx->expr().size());
+    array->type->asIterable()->size = new LgsIntConst(&LGS_INT, ctx->expr().size());
     for (const auto expr : ctx->expr()) {
         array->initialElements.emplace_back(getExpr(expr));
     }
@@ -1148,10 +1148,10 @@ LgsInstance* LgsParserAdapter::getObjectFromJson(LogosParser::JsonObjContext* ct
 
 LgsArrayExpr* LgsParserAdapter::getArrayExprFromJson(LogosParser::JsonArrayContext* ctx) {
     const auto sArray = new LgsSArray();
-    sArray->sizeExpr = new LgsIntConst(&LGS_SIZE, ctx->json().size());
+    sArray->size = new LgsIntConst(&LGS_SIZE, ctx->json().size());
     const auto array = new LgsArrayExpr(sArray);
     setLocation(sArray->location, ctx->start, ctx->stop);
-    setLocation(sArray->sizeExpr->location, ctx->start, ctx->stop);
+    setLocation(sArray->size->location, ctx->start, ctx->stop);
     setLocation(array->location, ctx->start, ctx->stop);
     for (const auto json : ctx->json()) {
         array->initialElements.emplace_back(getJSON(json));
@@ -1218,7 +1218,7 @@ LgsType* LgsParserAdapter::getArrayType(LogosParser::TypeContext* ctx) {
             array = new LgsSet(type);
         } else if (ctx->baseTypeSArr) {
             array = new LgsSArray(type);
-            array->sizeExpr = getUnaryExpr(ctx->unaryExpr()[i]);
+            array->size = getUnaryExpr(ctx->unaryExpr()[i]);
         } else if (ctx->baseTypeDArr) {
             array = new LgsDArray(type);
         } else {

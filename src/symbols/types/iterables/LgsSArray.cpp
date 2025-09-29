@@ -8,13 +8,13 @@
 Type* LgsSArray::getIRType(LgsLLVMGen& cg) {
     if (IRType) return IRType;
     const auto innerIRType = baseType->getIRType(cg);
-    IRType = ArrayType::get(innerIRType, sizeExpr->getConstInt());
+    IRType = ArrayType::get(innerIRType, size->getConstInt());
     return IRType;
 }
 
 std::string LgsSArray::getName() {
     const auto ty = baseType ? baseType->pname() : LGS_UNKNOWN_TYPE;
-    return ty + '[' + sizeExpr->getName() + "]";
+    return ty + '[' + size->getName() + "]";
 }
 
 std::string LgsSArray::pname() {
@@ -22,7 +22,7 @@ std::string LgsSArray::pname() {
 }
 
 size_t LgsSArray::getSizeBytes() {
-    return baseType->getSizeBytes() * sizeExpr->getConstInt();
+    return baseType->getSizeBytes() * size->getConstInt();
 }
 
 LgsExpr* LgsSArray::getZeroValue() {
@@ -52,13 +52,13 @@ LgsType* LgsSArray::applyOp(LgsType* other, const LgsOperator op) {
 }
 
 Value* LgsSArray::lengthIR(LgsLLVMGen& cg, Value* iterable) {
-    return sizeExpr->IRValue;
+    return size->IRValue;
 }
 
 Value* LgsSArray::inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) {
     const auto resultPtr = cg.builder.CreateAlloca(cg.builder.getInt1Ty());
     cg.builder.CreateStore(cg.false_(), resultPtr);
-    cg.loop(sizeExpr->loadIR(cg), [this, &cg, iterableExpr, value, resultPtr](Value* index, BasicBlock* exitBlock) {
+    cg.loop(size->loadIR(cg), [this, &cg, iterableExpr, value, resultPtr](Value* index, BasicBlock* exitBlock) {
         const auto trueBlock = cg.createBlock();
         const auto falseBlock = cg.createBlock();
         const auto e = getIRElement(cg, iterableExpr->IRValue, index);

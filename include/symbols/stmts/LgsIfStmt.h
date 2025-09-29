@@ -9,8 +9,7 @@ public:
     LgsStmtsBlock* ifBlock;
     std::vector<std::pair<LgsExpr*, LgsStmtsBlock*>> elseIfs;
     LgsStmtsBlock* elseBlock = nullptr;
-    bool isPatternMatching = false;
-    llvm::BasicBlock* IRExitBlock = nullptr;
+    BasicBlock* IRExitBlock = nullptr;
     std::string tag;
 
     explicit LgsIfStmt(LgsExpr* ifCond, LgsStmtsBlock* ifStmtBlock) : ifCond(ifCond), ifBlock(ifStmtBlock) {}
@@ -18,7 +17,13 @@ public:
     ~LgsIfStmt() override;
 };
 
-class LgsPattern final : public LgsIfStmt {
+class LgsPatternMatching final : public LgsStmt {
 public:
-    explicit LgsPattern(LgsExpr* ifCond) : LgsIfStmt(ifCond, nullptr) {}
+    LgsExpr* cond;
+    LgsStmtsBlock* elseBlock = nullptr;
+    std::vector<std::pair<LgsExpr*, LgsStmtsBlock*>> patterns;
+
+    explicit LgsPatternMatching(LgsExpr* cond): cond(cond){}
+    json::value asJsonStr() override;
+    ~LgsPatternMatching() override;
 };

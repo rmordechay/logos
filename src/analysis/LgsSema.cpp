@@ -205,6 +205,8 @@ void LgsSema::visitStmt(LgsStmt* stmt) {
     else if (const auto continueStmt = stmt->asContinue()) visitContinueStmt(continueStmt);
     else if (const auto ioStmt = stmt->asIOStmt()) visitIOStmt(ioStmt);
     else if (const auto breakStmt = stmt->asBreak()) visitBreakStmt(breakStmt);
+    else if (const auto expr = stmt->asExpr()) visitExpr(expr);
+    else assert(0);
 }
 
 void LgsSema::visitStmtsBlock(LgsStmtsBlock* stmtsBlock) {
@@ -223,7 +225,7 @@ void LgsSema::visitStmtsBlock(LgsStmtsBlock* stmtsBlock) {
 
 void LgsSema::visitVarDec(LgsVarDec* varDec) {
     if (const auto iter = varDec->type->asIterable()) {
-        visitExpr(iter->sizeExpr);
+        visitExpr(iter->size);
     }
     if (varDec->expr && varDec->type) {
         if (varDec->isOwner) {
@@ -314,27 +316,29 @@ void LgsSema::visitIfStmt(LgsIfStmt* ifStmt) {
     }
 }
 
-void LgsSema::visitPatternMatching(LgsIfStmt* pm) {
-    if (!pm->ifCond) {
+void LgsSema::visitPatternMatching(LgsPatternMatching* pm) {
+    if (!pm->cond) {
         return visitBoolPatternMatching(pm);
     }
-    const auto baseExpr = pm->ifCond;
     stack.enterScope(pm);
-    visitExpr(baseExpr);
-    const auto baseExprType = baseExpr->type;
+    visitExpr(pm->cond);
+    const auto condType = pm->cond->type;
     // Allows local enum fields to not have a qualifier inside the block
-    if (baseExprType->asEnum()) {
-        for (const auto& field : baseExprType->fields) {
+    if (condType && condType->asEnum()) {
+        for (const auto& field : condType->fields) {
             addLocalSymbol(LgsSymbol(field));
         }
     }
-    for (const auto [expr, block] : pm->elseIfs) {
+    for (const auto [expr, block] : pm->patterns) {
         stack.enterScope(pm);
         visitExpr(expr);
         visitStmtsBlock(block);
-        if (expr->type->isUnknown()) continue;
-        if (!baseExprType->canCastTo(expr->type)) {
-            return errHandler.addError(E10014, &expr->location, {expr->type->pname(), baseExprType->pname()});
+        if (!condType || expr->type->isUnknown()) {
+            stack.exitScope();
+            continue;
+        }
+        if (!condType->canCastTo(expr->type)) {
+            return errHandler.addError(E10014, &expr->location, {expr->type->pname(), condType->pname()});
         }
         stack.exitScope();
     }
@@ -346,8 +350,8 @@ void LgsSema::visitPatternMatching(LgsIfStmt* pm) {
     stack.exitScope();
 }
 
-void LgsSema::visitBoolPatternMatching(LgsIfStmt* pm) {
-    for (const auto [expr, block] : pm->elseIfs) {
+void LgsSema::visitBoolPatternMatching(LgsPatternMatching* pm) {
+    for (const auto [expr, block] : pm->patterns) {
         stack.enterScope(pm);
         visitExpr(expr);
         if (!expr->type->asBool()) {
@@ -509,7 +513,7 @@ void LgsSema::visitDeferStmt(const LgsDeferStmt* deferStmt) {
 void LgsSema::visitExpr(LgsExpr* expr) {
     if (!expr) return;
     if (const auto iter = expr->type->asIterable()) {
-        visitExpr(iter->sizeExpr);
+        visitExpr(iter->size);
     }
     if (const auto binaryExpr = dynamic_cast<LgsBinaryExpr*>(expr)) {
         visitBinaryExpr(binaryExpr);
@@ -588,8 +592,8 @@ void LgsSema::visitStaticArray(LgsArrayExpr* arrayExpr) {
 
 void LgsSema::visitDynamicArray(LgsArrayExpr* array) {
     const auto dArr = array->type->asIterable();
-    if (!dArr->sizeExpr) {
-        dArr->sizeExpr = new LgsIntConst(&LGS_LONG, array->initialElements.size());
+    if (!dArr->size) {
+        dArr->size = new LgsIntConst(&LGS_LONG, array->initialElements.size());
     }
 
     if (!dArr->baseType && array->initialElements.empty()) {
@@ -994,12 +998,15 @@ void LgsSema::visitIndex(LgsIterIndex* iterIndex) {
         if (!iterable->getIndexType()->canCastTo(exprFrom->type)) {
             return errHandler.addError(E10036, &iterIndex->location, {iterIndex->getName(), exprFrom->type->pname()});
         }
-        if (const auto sArr = iterable->asSArray()) {
+        if (iterable->isStatic) {
             const auto i = exprFrom->getConstInt();
-            const auto bound = sArr->sizeExpr->getConstInt();
-            if (i < 0 || bound < 0) return;
-            if (i >= bound) {
-                return errHandler.addError(E10092, &iterIndex->location, {iterIndex->getName(), std::to_string(bound)});
+            const auto bound = iterable->size->getConstInt();
+            if (i >= 0 && bound >= 0) {
+                if (i >= bound) {
+                    errHandler.addError(E10092, &iterIndex->location, {iterIndex->getName(), std::to_string(bound)});
+                } else {
+                    iterIndex->boundsChecked = true;
+                }
             }
         }
         iterIndex->setType(iterable->getValueType());
@@ -1029,7 +1036,7 @@ void LgsSema::visitSlice(LgsIterIndex* iterIndex) {
         }
         const auto i = sizeFrom;
         const auto j = sizeTo;
-        const auto bound = sArr->sizeExpr->getConstInt();
+        const auto bound = sArr->size->getConstInt();
         if (i >= bound || j >= bound) {
             return errHandler.addError(E10003, &iterIndex->location, {iterIndex->getName(), std::to_string(bound)});
         }
@@ -1183,7 +1190,7 @@ void LgsSema::validateIndex(LgsIterIndex* iterIndex) {
     }
     if (const auto sArr = iterable->asSArray()) {
         const auto i = exprFrom->getConstInt();
-        const auto bound = sArr->sizeExpr->getConstInt();
+        const auto bound = sArr->size->getConstInt();
         if (i < 0 || bound < 0) return;
         if (i >= bound) {
             return errHandler.addError(E10092, &iterIndex->location, {iterIndex->getName(), std::to_string(bound)});

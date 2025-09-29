@@ -173,6 +173,6 @@ LgsType* LgsCLangVisitor::mapCArray(const clang::QualType type) {
     const auto baseType = mapCType(arrayType->getElementType());
     const auto size = arrayType->getSize().getZExtValue();
     const auto arr = new LgsDArray(baseType);
-    arr->sizeExpr = new LgsIntConst(&LGS_INT, size);
+    arr->size = new LgsIntConst(&LGS_INT, size);
     return arr;
 }

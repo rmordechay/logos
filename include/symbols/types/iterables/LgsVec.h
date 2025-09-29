@@ -11,7 +11,8 @@ public:
 
     explicit LgsVec(const int8_t dim, LgsType* baseType = &LGS_FLOAT) : LgsIterable(baseType), dim(dim) {
         assert(dim > 1 && dim <= 4);
-        sizeExpr = new LgsIntConst(&LGS_INT, dim);
+        size = new LgsIntConst(&LGS_INT, dim);
+        isStatic = true;
     }
 
     Type* getIRType(LgsLLVMGen& cg) override;

@@ -19,7 +19,8 @@ struct CodegenMetadata;
 class LgsIterable : public LgsType {
 public:
     LgsType* baseType;
-    LgsExpr* sizeExpr = nullptr;
+    LgsExpr* size = nullptr;
+    bool isStatic = false;
 
     explicit LgsIterable(LgsType* baseType = nullptr) : baseType(baseType) {
         addEmptyMethod(ADD_FUNC_NAME);

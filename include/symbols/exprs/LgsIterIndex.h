@@ -14,6 +14,7 @@ class LgsIterIndex final : public LgsExpr {
 public:
     LgsExpr* baseExpr;
     LgsIndex index;
+    bool boundsChecked = false;
 
     explicit LgsIterIndex(LgsExpr* baseExpr, LgsExpr* from = nullptr, LgsExpr* to = nullptr) : baseExpr(baseExpr) {
         isMutable = true;

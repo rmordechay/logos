@@ -36,3 +36,23 @@ LgsIfStmt::~LgsIfStmt() {
     }
     elseIfs.clear();
 }
+
+json::value LgsPatternMatching::asJsonStr() {
+    assert(0);
+}
+
+LgsPatternMatching::~LgsPatternMatching() {
+    if (cond) {
+        freeExpr(cond);
+        cond = nullptr;
+    }
+    if (elseBlock) {
+        delete elseBlock;
+        elseBlock = nullptr;
+    }
+    for (const auto& [expr, block] : patterns) {
+        freeExpr(expr);
+        delete block;
+    }
+    patterns.clear();
+}

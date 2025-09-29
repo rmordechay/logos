@@ -7,7 +7,9 @@ class LgsSArray final : public LgsIterable {
 public:
     static constexpr auto name = "SArray";
 
-    explicit LgsSArray(LgsType* baseType = nullptr): LgsIterable(baseType) {}
+    explicit LgsSArray(LgsType* baseType = nullptr): LgsIterable(baseType) {
+        isStatic = true;
+    }
     Type* getIRType(LgsLLVMGen& cg) override;
     std::string getName() override;
     std::string pname() override;

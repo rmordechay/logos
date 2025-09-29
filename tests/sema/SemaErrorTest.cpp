@@ -624,3 +624,17 @@ TEST_CASE("TestSema10089") {
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10089, code));
     CHECK_EQ(app.errHandler.errors[0].errCode, E10089.code);
 }
+
+TEST_CASE("TestSema10092") {
+    LgsApp app;
+    const auto code = R"(
+    main() {
+        a = [123, 23]!
+        a[4]
+    }
+    )";
+    app.parseSrcFile(code);
+    app.analyse();
+    CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10092, code));
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10092.code);
+}

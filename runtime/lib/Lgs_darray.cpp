@@ -39,13 +39,11 @@ extern "C" void* Lgs_DArray_get(const Lgs_darray* arr, const int32_t index) {
         actualIndex = index;
     } else {
         if (-index > arrLen) {
-            formatAndLogError(E10080.msg, {std::to_string(index)});
             return nullptr;
         }
         actualIndex = arrLen + index;
     }
     if (actualIndex >= arrLen) {
-        formatAndLogError(E10080.msg, {std::to_string(index)});
         return nullptr;
     }
     return arr->data->data() + actualIndex * arr->elementSize;
