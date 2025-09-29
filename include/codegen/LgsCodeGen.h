@@ -132,9 +132,9 @@ public:
     void generateIf(Value* cond, const std::function<void()>& blockStmtCb) const;
 
     // Iterables
-    Value* createStaticArray(const LgsArrayExpr* arrayExpr);
-    Value* createDynamicArray(LgsArrayExpr* arrayExpr);
-    Value* createSetExpr(LgsArrayExpr* setExpr);
+    void setStaticArray(LgsArrayExpr* arrayExpr);
+    void setDynamicArray(LgsArrayExpr* arrayExpr);
+    void setSetExpr(LgsArrayExpr* setExpr);
     void createMapFunc(LgsFunc* func);
     void createFilterFunc(LgsFunc* func);
 

@@ -8,6 +8,7 @@ class LgsArrayExpr final : public LgsExpr {
 public:
     std::vector<LgsExpr*> initialElements;
 
+    LgsArrayExpr() = default;
     explicit LgsArrayExpr(LgsSArray* arrType) : LgsExpr(arrType) {}
     explicit LgsArrayExpr(LgsDArray* arrType) : LgsExpr(arrType) {}
     explicit LgsArrayExpr(LgsSet* setType) : LgsExpr(setType) {}

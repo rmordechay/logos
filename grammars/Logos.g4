@@ -41,7 +41,7 @@ interface:
     ;
 
 interfaceBody:
-        implements? interfaceField* interfaceFunc*
+        interfaceField* interfaceFunc*
     ;
 
 subtype:
@@ -53,7 +53,7 @@ field:
     ;
 
 interfaceField:
-        CONST? IDENTIFIER QUEST_MARK? COLON type (EQUAL expr)?
+        IDENTIFIER QUEST_MARK? COLON type
     ;
 
 implements:
@@ -132,7 +132,9 @@ statement:
     |   deferStmt
     |   breakStmt
     |   ioStatement
-    |   expr
+    |   funcCall
+    |   selection
+    |   postfixExpr
     |   CONTINUE
     ;
 
@@ -335,13 +337,13 @@ range:
     ;
 
 type:
-        IDENTIFIER QUEST_MARK?
-   |    SELF_CLASS
-   |    baseTypeSArr=type (LBRACK unaryExpr RBRACK)+ // sarr
-   |    baseTypeDArr=type (LBRACK RBRACK)+ // darr
-   |    baseTypeSet=type (LBRACE RBRACE)+ // set
+        type (LBRACK unaryExpr RBRACK)+
+   |    type (LBRACK RBRACK)+
+   |    type (LBRACE RBRACE)+
    |    mapType
    |    funcType
+   |    IDENTIFIER QUEST_MARK?
+   |    SELF_CLASS
    ;
 
 mapType:

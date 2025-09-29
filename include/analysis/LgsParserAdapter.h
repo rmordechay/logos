@@ -67,7 +67,6 @@ public:
     LgsFunc* getLambda(LogosParser::LambdaContext* ctx);
     LgsFunc* getMethod(LogosParser::MethodContext* ctx, LgsType* obj);
     LgsField* getField(LogosParser::FieldContext* ctx, size_t position);
-    LgsField* getInterfaceField(LogosParser::InterfaceFieldContext* ctx);
     LgsParam getParam(LgsFuncType* funcType, LogosParser::ParamContext* ctx);
     LgsIOPair* getIOPair(const LogosParser::IoPairContext* ctx) const;
     LgsStmt* getDeferStmt(LogosParser::DeferStmtContext* ctx);

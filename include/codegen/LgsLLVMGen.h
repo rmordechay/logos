@@ -39,6 +39,7 @@ public:
     void branchAndStartBlock(BasicBlock* block);
     bool lastInstTerminator() const;
     void createBoundsGuard(Value* len, Value* index);
+    Value* getIRPtr(Value* v);
 
     // Funcs
     static FunctionType* getFT(Type* rt, const std::vector<Type*>& params = {}, bool isVariadic = false);
@@ -80,15 +81,14 @@ public:
     ConstantInt* i16(int16_t v);
     ConstantInt* i32(int32_t v);
     ConstantInt* i64(int64_t v);
-    Constant* floatv(float_t v);
-    Constant* doublev(double_t v);
     ConstantInt* usize(size_t v);
     ConstantInt* i32Zero();
     ConstantInt* i64Zero();
     ConstantInt* sizeZero();
-    ConstantInt* iN(unsigned size, size_t v);
-    TypeSize typeSize(StructType* v) const;
-    StructType* getIteratorIRType(const std::string& name);
+    Value* extendToSize(Value* v);
+    Constant* floatv(float_t v);
+    Constant* doublev(double_t v);
+    TypeSize typeSize(Type* v) const;
 
     // Debugging
     void printStr(const std::string& str);

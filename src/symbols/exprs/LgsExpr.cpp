@@ -36,7 +36,8 @@ void LgsExpr::assign(LgsLLVMGen& cg, LgsExpr* expr) {
 
 Value* LgsExpr::getIRPtr(LgsLLVMGen& cg) const {
     if (const auto gepInst = dyn_cast<GetElementPtrInst>(IRValue)) {
-        if (gepInst->getResultElementType()->isPointerTy()) {
+        gepInst->getResultElementType()->print(outs());
+        if (gepInst->getResultElementType()->isPointerTy() || gepInst->getResultElementType()->isArrayTy()) {
             return cg.builder.CreateLoad(cg.ptrTy(), gepInst);
         }
         return IRValue;

@@ -8,10 +8,7 @@ Value* LgsField::loadIR(LgsLLVMGen& cg) {
     if (!IRValue) {
         IRValue = cg.builder.CreateStructGEP(parentIRType, parentIRValue, position);
     }
-    if (type->isPrimitive || type->asVec()) {
-        return cg.builder.CreateLoad(type->getIRType(cg), IRValue);
-    }
-    return cg.builder.CreateLoad(cg.ptrTy(), IRValue);
+    return cg.builder.CreateLoad(type->getIRType(cg), IRValue);
 }
 
 Value* LgsField::resolveVirtualField(LgsLLVMGen* cg, const LgsHashMap* vtable) const {

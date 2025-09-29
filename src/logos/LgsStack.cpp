@@ -15,6 +15,11 @@ void LgsStack::enterScope(LgsValue* value) {
         stackFrame.func = top().func;
         stackFrame.symbolTable = top().symbolTable;
         stackFrame.ifStmt = ifStmt;
+    } else if (dynamic_cast<LgsPatternMatching*>(value)) {
+        stackFrame.func = top().func;
+        stackFrame.symbolTable = top().symbolTable;
+    } else {
+        assert(0);
     }
     if (size() > 0) {
         stackFrame.inCoroutine = top().inCoroutine;

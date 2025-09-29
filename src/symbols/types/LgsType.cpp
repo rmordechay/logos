@@ -79,7 +79,7 @@ bool LgsType::isNullable() {
 }
 
 bool LgsType::isUnknown() {
-    if (dynamic_cast<LgsUnknown*>(this)) return false;
+    if (dynamic_cast<LgsUnknown*>(this)) return true;
     if (const auto iter = asIterable()) return dynamic_cast<LgsUnknown*>(iter->baseType);
     return false;
 }
@@ -91,17 +91,6 @@ bool LgsType::isSliceable() {
 LgsField* LgsType::getField(const std::string& name) {
     for (auto* f : fields) {
         if (f->name == name) return f;
-    }
-    if (const auto obj = asObject()) {
-        for (auto* f : fields) {
-            if (f->name == name) return f;
-        }
-        for (const auto interface : obj->interfaces) {
-            const auto interfaceField = interface->getField(name);
-            if (interfaceField) {
-                return interfaceField;
-            }
-        }
     }
     if (const auto vec = asVec()) {
         for (auto* f : fields) if (f->name == name) return f;

@@ -330,7 +330,6 @@ public:
   public:
     InterfaceBodyContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    ImplementsContext *implements();
     std::vector<InterfaceFieldContext *> interfaceField();
     InterfaceFieldContext* interfaceField(size_t i);
     std::vector<InterfaceFuncContext *> interfaceFunc();
@@ -379,10 +378,7 @@ public:
     antlr4::tree::TerminalNode *IDENTIFIER();
     antlr4::tree::TerminalNode *COLON();
     TypeContext *type();
-    antlr4::tree::TerminalNode *CONST();
     antlr4::tree::TerminalNode *QUEST_MARK();
-    antlr4::tree::TerminalNode *EQUAL();
-    ExprContext *expr();
 
    
   };
@@ -651,7 +647,9 @@ public:
     DeferStmtContext *deferStmt();
     BreakStmtContext *breakStmt();
     IoStatementContext *ioStatement();
-    ExprContext *expr();
+    FuncCallContext *funcCall();
+    SelectionContext *selection();
+    PostfixExprContext *postfixExpr();
     antlr4::tree::TerminalNode *CONTINUE();
 
    
@@ -1261,16 +1259,13 @@ public:
 
   class  TypeContext : public antlr4::ParserRuleContext {
   public:
-    LogosParser::TypeContext *baseTypeSArr = nullptr;
-    LogosParser::TypeContext *baseTypeDArr = nullptr;
-    LogosParser::TypeContext *baseTypeSet = nullptr;
     TypeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
+    MapTypeContext *mapType();
+    FuncTypeContext *funcType();
     antlr4::tree::TerminalNode *IDENTIFIER();
     antlr4::tree::TerminalNode *QUEST_MARK();
     antlr4::tree::TerminalNode *SELF_CLASS();
-    MapTypeContext *mapType();
-    FuncTypeContext *funcType();
     TypeContext *type();
     std::vector<antlr4::tree::TerminalNode *> LBRACK();
     antlr4::tree::TerminalNode* LBRACK(size_t i);

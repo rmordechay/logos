@@ -3,6 +3,8 @@
 #include "stmts/LgsField.h"
 #include "types/LgsGroup.h"
 #include "types/LgsInterface.h"
+#include "types/primitives/LgsInt.h"
+
 #include <llvm/IR/Module.h>
 
 Type* LgsObject::getIRType(LgsLLVMGen& cg) {

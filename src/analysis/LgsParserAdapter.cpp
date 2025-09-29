@@ -325,18 +325,12 @@ LgsInterface* LgsParserAdapter::getInterface(LogosParser::InterfaceBodyContext* 
     setLocation(interface->location, interfaceName->getSymbol(), nullptr);
     if (!validateTypeName(interface->name, &interface->location)) return interface;
 
-    if (ctx->implements()) {
-        for (const auto& type : ctx->implements()->IDENTIFIER()) {
-            auto implementType = getTypeFromText(type);
-            interface->interfaces.push_back(implementType);
-        }
-    }
-
     for (int i = 0; i < ctx->interfaceField().size(); ++i) {
-        const auto interfaceField = ctx->interfaceField()[i];
-        const auto field = getInterfaceField(interfaceField);
-        field->isOptional = !!interfaceField->QUEST_MARK();
-        field->isVirtual = true;
+        const auto filed = ctx->interfaceField()[i];
+        const auto name = filed->IDENTIFIER()->getText();
+        const auto field = new LgsField(name, getType(filed->type()));
+        setLocation(field->location, ctx->start, ctx->stop);
+        field->isOptional = !!filed->QUEST_MARK();
         interface->addField(field);
     }
 
@@ -462,16 +456,6 @@ LgsField* LgsParserAdapter::getField(LogosParser::FieldContext* ctx, const size_
     return field;
 }
 
-LgsField* LgsParserAdapter::getInterfaceField(LogosParser::InterfaceFieldContext* ctx) {
-    const auto name = ctx->IDENTIFIER()->getText();
-    const auto type = getType(ctx->type());
-    const auto expr = getExpr(ctx->expr());
-    const auto field = new LgsField(name, type, expr);
-    field->isConst = ctx->CONST() != nullptr;
-    setLocation(field->location, ctx->start, ctx->stop);
-    return field;
-}
-
 LgsParam LgsParserAdapter::getParam(LgsFuncType* funcType, LogosParser::ParamContext* ctx) {
     const auto variableName = ctx->IDENTIFIER()->getText();
     const auto expr = getExpr(ctx->expr());
@@ -511,7 +495,9 @@ LgsStmt* LgsParserAdapter::getDeferStmt(LogosParser::DeferStmtContext* ctx) {
 }
 
 LgsStmt* LgsParserAdapter::getStmt(LogosParser::StatementContext* ctx) {
-    if (const auto expr = ctx->expr()) return getExpr(expr);
+    if (const auto funcCall = ctx->funcCall()) return getFuncCall(funcCall);
+    if (const auto selection = ctx->selection()) return getSelection(selection);
+    if (const auto postfixExpr = ctx->postfixExpr()) return getPostfixExpr(postfixExpr);
     if (const auto ifStmt = ctx->ifStatement()) return getIfStatement(ifStmt);
     if (const auto fieldDef = ctx->assignment()) return getAssignment(fieldDef);
     if (const auto implicitVarDec = ctx->implicitVarDec()) return getImplicitVarDec(implicitVarDec);
@@ -904,12 +890,10 @@ LgsArrayExpr* LgsParserAdapter::getArrayExpr(LogosParser::ArrayExprContext* ctx)
     LgsArrayExpr* array = nullptr;
     if (ctx->LBRACE() && ctx->RBRACE()) {
         array = new LgsArrayExpr(new LgsSet());
-    } else if (ctx->EXCLA_MARK()) {
-        array = new LgsArrayExpr(new LgsSArray());
+        array->type->asIterable()->size = new LgsIntConst(&LGS_INT, ctx->expr().size());
     } else {
-        array = new LgsArrayExpr(new LgsDArray());
+        array = new LgsArrayExpr();
     }
-    array->type->asIterable()->size = new LgsIntConst(&LGS_INT, ctx->expr().size());
     for (const auto expr : ctx->expr()) {
         array->initialElements.emplace_back(getExpr(expr));
     }
@@ -1162,9 +1146,12 @@ LgsArrayExpr* LgsParserAdapter::getArrayExprFromJson(LogosParser::JsonArrayConte
 LgsType* LgsParserAdapter::getType(LogosParser::TypeContext* ctx) {
     if (!ctx) return nullptr;
     LgsType* result = nullptr;
+    const auto a = (!ctx->LBRACK().empty() && !ctx->RBRACK().empty());
+    const auto b = ctx->LBRACK().empty();
+    const auto c = ctx->RBRACK().empty();
     if (const auto mapType = ctx->mapType()) {
         result = new LgsMap(getType(mapType->key), getType(mapType->value));
-    } else if (ctx->baseTypeSArr || ctx->baseTypeDArr || ctx->baseTypeSet) {
+    } else if ((!ctx->LBRACK().empty() && !ctx->RBRACK().empty()) || (!ctx->LBRACE().empty() && !ctx->RBRACE().empty())) {
         result = getArrayType(ctx);
     } else if (const auto funcType = ctx->funcType()) {
         result = getFuncType(funcType);
@@ -1214,12 +1201,12 @@ LgsType* LgsParserAdapter::getArrayType(LogosParser::TypeContext* ctx) {
     const auto dims = !ctx->LBRACK().empty() ? ctx->LBRACK() : ctx->LBRACE();
     for (int i = dims.size() - 1; i >= 0; --i) {
         LgsIterable* array;
-        if (ctx->baseTypeSet) {
+        if (!ctx->LBRACE().empty() && !ctx->RBRACE().empty()) {
             array = new LgsSet(type);
-        } else if (ctx->baseTypeSArr) {
+        } else if (!ctx->LBRACK().empty() && !ctx->unaryExpr().empty() && !ctx->RBRACK().empty()) {
             array = new LgsSArray(type);
             array->size = getUnaryExpr(ctx->unaryExpr()[i]);
-        } else if (ctx->baseTypeDArr) {
+        } else if (!ctx->LBRACK().empty() && !ctx->RBRACK().empty()) {
             array = new LgsDArray(type);
         } else {
             assert(0);

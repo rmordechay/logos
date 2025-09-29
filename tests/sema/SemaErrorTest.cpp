@@ -46,14 +46,14 @@ TEST_CASE("TestSema10003") {
     LgsApp app;
     const auto code = R"(
     main() {
-        arr: Int[2]!
+        arr: Int[2]
         arr[3] := 2
     }
     )";
     app.parseSrcFile(code);
     app.analyse();
-    CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10003, code));
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10003.code);
+    CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10048, code));
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10048.code);
 }
 
 TEST_CASE("TestSema10004") {
@@ -184,7 +184,7 @@ TEST_CASE("TestSema10013B") {
     LgsApp app;
     const auto code = R"(
     main() {
-        arr: Int[34]!
+        arr: Int[34]
         arr.add(2)
     }
     )";
@@ -268,23 +268,20 @@ TEST_CASE("TestSema10016A") {
 TEST_CASE("TestSema10016B") {
     LgsApp app;
     const auto code = R"(
-    interface Type1 {
+    interface Type {
         a: Int
     }
-    interface Type2 {
-        implements: Type1
-        b: Int
-    }
+
     object Object {
-        implements: Type2
+        implements: Type
     }
+
     main() {}
     )";
     app.parseSrcFile(code);
     app.analyse();
-    CHECK_EQ(app.errHandler.errors.size(), 2);
+    CHECK_EQ(app.errHandler.errors.size(), 1);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10016.code);
-    CHECK_EQ(app.errHandler.errors[1].errCode, E10016.code);
 }
 
 TEST_CASE("TestSema10017") {
@@ -630,11 +627,11 @@ TEST_CASE("TestSema10092") {
     const auto code = R"(
     main() {
         a = [123, 23]!
-        a[4]
+        b = a[4]
     }
     )";
     app.parseSrcFile(code);
     app.analyse();
-    CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10092, code));
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10092.code);
+    CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10048, code));
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10048.code);
 }

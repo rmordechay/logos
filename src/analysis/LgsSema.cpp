@@ -1,5 +1,4 @@
 #include "analysis/LgsSema.h"
-
 #include "builtins/LgsTest.h"
 #include "funcs/LgsCoroutine.h"
 #include "data/LgsErrors.h"
@@ -285,6 +284,7 @@ void LgsSema::visitAssignment(const LgsAssignment* assignment) {
     const auto lValue = assignment->lValue;
     const auto rValue = assignment->rValue;
     visitExpr(lValue);
+    rValue->completeType(lValue->type);
     visitExpr(rValue);
     const auto lType = lValue->type;
     const auto rType = rValue->type;
@@ -320,8 +320,8 @@ void LgsSema::visitPatternMatching(LgsPatternMatching* pm) {
     if (!pm->cond) {
         return visitBoolPatternMatching(pm);
     }
-    stack.enterScope(pm);
     visitExpr(pm->cond);
+    stack.enterScope(pm);
     const auto condType = pm->cond->type;
     // Allows local enum fields to not have a qualifier inside the block
     if (condType && condType->asEnum()) {
@@ -330,15 +330,12 @@ void LgsSema::visitPatternMatching(LgsPatternMatching* pm) {
         }
     }
     for (const auto [expr, block] : pm->patterns) {
+        if (!condType || expr->type->isUnknown()) continue;
         stack.enterScope(pm);
         visitExpr(expr);
         visitStmtsBlock(block);
-        if (!condType || expr->type->isUnknown()) {
-            stack.exitScope();
-            continue;
-        }
-        if (!condType->canCastTo(expr->type)) {
-            return errHandler.addError(E10014, &expr->location, {expr->type->pname(), condType->pname()});
+        if (expr->type && !condType->canCastTo(expr->type)) {
+            errHandler.addError(E10014, &expr->location, {expr->type->pname(), condType->pname()});
         }
         stack.exitScope();
     }
@@ -567,12 +564,15 @@ void LgsSema::visitCast(LgsCast* lgsCast) {
 
 void LgsSema::visitArrayExpr(LgsArrayExpr* array) {
     for (const auto element : array->initialElements) {
+        element->completeType(array->type->asIterable()->baseType);
         visitExpr(element);
     }
     if (array->type->asDArray() || array->type->asSet()) {
         visitDynamicArray(array);
-    } else {
+    } else if (array->type->asSArray()) {
         visitStaticArray(array);
+    } else {
+        assert(0);
     }
 }
 
@@ -1003,7 +1003,7 @@ void LgsSema::visitIndex(LgsIterIndex* iterIndex) {
             const auto bound = iterable->size->getConstInt();
             if (i >= 0 && bound >= 0) {
                 if (i >= bound) {
-                    errHandler.addError(E10092, &iterIndex->location, {iterIndex->getName(), std::to_string(bound)});
+                    errHandler.addError(E10048, &iterIndex->location, {iterIndex->getName(), std::to_string(bound)});
                 } else {
                     iterIndex->boundsChecked = true;
                 }
@@ -1193,7 +1193,7 @@ void LgsSema::validateIndex(LgsIterIndex* iterIndex) {
         const auto bound = sArr->size->getConstInt();
         if (i < 0 || bound < 0) return;
         if (i >= bound) {
-            return errHandler.addError(E10092, &iterIndex->location, {iterIndex->getName(), std::to_string(bound)});
+            return errHandler.addError(E10048, &iterIndex->location, {iterIndex->getName(), std::to_string(bound)});
         }
     }
 }

@@ -105,7 +105,7 @@ bool LgsLLVMGen::lastInstTerminator() const {
 }
 
 void LgsLLVMGen::createBoundsGuard(Value* len, Value* index) {
-    const auto condition = builder.CreateICmpUGE(builder.CreateZExt(index, sizeTy()), len);
+    const auto condition = builder.CreateICmpUGE(extendToSize(index), extendToSize(len));
     const auto validBlock = createBlock();
     const auto invalidBlock = createBlock();
     builder.CreateCondBr(condition, invalidBlock, validBlock);
@@ -113,6 +113,13 @@ void LgsLLVMGen::createBoundsGuard(Value* len, Value* index) {
     callFunc("Lgs_printError", voidTy(), {ptrTy()}, {getIRStr(E10003.msg)});
     callFunc("exit", voidTy(), {i32Ty()}, {i32(1)});
     branchAndStartBlock(validBlock);
+}
+
+Value* LgsLLVMGen::getIRPtr(Value* v) {
+    if (v->getType()->isPointerTy()) return v;
+    const auto ptr = builder.CreateAlloca(v->getType());
+    builder.CreateStore(v, ptr);
+    return ptr;
 }
 
 FunctionType* LgsLLVMGen::getFT(Type* rt, const std::vector<Type*>& params, const bool isVariadic) {
@@ -140,12 +147,10 @@ Value* LgsLLVMGen::callLgsFunc(const std::string& funcName, Type* rt, const std:
 }
 
 Value* LgsLLVMGen::getPtr(Value* v) {
-    if (!v->getType()->isPointerTy()) {
-        const auto vPtr = builder.CreateAlloca(v->getType());
-        builder.CreateStore(v, vPtr);
-        return vPtr;
-    }
-    return v;
+    if (v->getType()->isPointerTy()) return v;
+    const auto vPtr = builder.CreateAlloca(v->getType());
+    builder.CreateStore(v, vPtr);
+    return vPtr;
 }
 
 Value* LgsLLVMGen::callPrintf(const std::vector<Value*>& args) {
@@ -279,16 +284,12 @@ ConstantInt* LgsLLVMGen::sizeZero() {
     return ConstantInt::get(sizeTy(), 0);
 }
 
-ConstantInt* LgsLLVMGen::iN(const unsigned size, const size_t v) {
-    return builder.getIntN(size, v);
+Value* LgsLLVMGen::extendToSize(Value* v) {
+    return builder.CreateZExt(v, sizeTy());
 }
 
-TypeSize LgsLLVMGen::typeSize(StructType* v) const {
+TypeSize LgsLLVMGen::typeSize(Type* v) const {
     return IRModule->getDataLayout().getTypeStoreSize(v);
-}
-
-StructType* LgsLLVMGen::getIteratorIRType(const std::string& name) {
-    return getStructType({ptrTy(), i64Ty(), ptrTy(), ptrTy(), ptrTy(), ptrTy()}, name);
 }
 
 void LgsLLVMGen::printStr(const std::string& str) {
