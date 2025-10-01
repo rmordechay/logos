@@ -223,9 +223,7 @@ void LgsSema::visitStmtsBlock(LgsStmtsBlock* stmtsBlock) {
 }
 
 void LgsSema::visitVarDec(LgsVarDec* varDec) {
-    if (const auto iter = varDec->type->asIterable()) {
-        visitExpr(iter->size);
-    }
+    if (const auto iter = varDec->type->asIterable()) visitExpr(iter->size);
     if (varDec->expr && varDec->type) {
         if (varDec->isOwner) {
             varDec->expr->owner = varDec;
@@ -256,6 +254,9 @@ void LgsSema::visitVarDec(LgsVarDec* varDec) {
     if (varDec->type && !varDec->type->isHeapAlloc && varDec->isOwner) {
         errHandler.addWarning(W10001, &varDec->location, {varDec->type->getName()});
         varDec->isOwner = false;
+    }
+    if (!varDec->type->isHeapAlloc) {
+        varDec->expr->destPtr = varDec;
     }
     addLocalSymbol(LgsSymbol(varDec));
     addHeapExpr(varDec->expr);
@@ -563,8 +564,14 @@ void LgsSema::visitCast(LgsCast* lgsCast) {
 }
 
 void LgsSema::visitArrayExpr(LgsArrayExpr* array) {
+    if (array->initialElements.empty() && !array->type) {
+        return errHandler.addError(E10049, &array->location, {array->getName()});
+    }
     for (const auto element : array->initialElements) {
-        element->completeType(array->type->asIterable()->baseType);
+        element->destPtr = array;
+        if (array->type) {
+            element->completeType(array->type->asIterable()->baseType);
+        }
         visitExpr(element);
     }
     if (array->type->asDArray() || array->type->asSet()) {
@@ -579,9 +586,6 @@ void LgsSema::visitArrayExpr(LgsArrayExpr* array) {
 void LgsSema::visitStaticArray(LgsArrayExpr* arrayExpr) {
     const auto& initialElements = arrayExpr->initialElements;
     const auto arr = arrayExpr->type->asSArray();
-    if (initialElements.empty() && !arr->baseType) {
-        return errHandler.addError(E10049, &arrayExpr->location, {arrayExpr->getName()});
-    }
     for (const auto element : initialElements) {
         visitExpr(element);
     }
@@ -762,19 +766,87 @@ void LgsSema::visitFieldSelection(LgsVariable* child, LgsType* parentType) {
     }
 }
 
-void LgsSema::visitIterIndexSelection(LgsIterIndex* child, LgsType* parentType) {
-    const auto baseExpr = child->baseExpr->asVariable();
+void LgsSema::visitIterIndexSelection(LgsIterIndex* iterIndex, LgsType* parentType) {
+    const auto baseExpr = iterIndex->getBaseExpr()->asVariable();
     const auto field = parentType->getField(baseExpr->name);
     if (!field) {
-        return errHandler.addError(E10005, &child->location, {baseExpr->name, parentType->pname()});
+        return errHandler.addError(E10005, &iterIndex->location, {baseExpr->name, parentType->pname()});
     }
-    if (!field->type->asIterable()) {
-        return errHandler.addError(E10002, &child->location, {baseExpr->name});
-    }
-    child->type = field->type->asIterable()->baseType;
-    child->baseExpr->type = field->type;
+    iterIndex->type = field->type->asIterable()->baseType;
+    iterIndex->baseExpr->type = field->type;
     baseExpr->ref = LgsSymbol(field);
-    visitIndex(child);
+    visitIndex(iterIndex);
+}
+
+void LgsSema::visitIterIndex(LgsIterIndex* iterIndex) {
+    const auto baseExpr = iterIndex->baseExpr;
+    visitExpr(baseExpr);
+    iterIndex->isMutable = baseExpr->isMutable;
+    if (!baseExpr->type) return;
+    const auto iterable = baseExpr->type->asIterable();
+    if (!iterable) {
+        const auto typeName = baseExpr->type ? baseExpr->type->pname() : LGS_UNKNOWN_TYPE;
+        return errHandler.addError(E10002, &iterIndex->location, {baseExpr->getName(), typeName});
+    }
+    visitIndex(iterIndex);
+}
+
+void LgsSema::visitIndex(LgsIterIndex* iterIndex) {
+    const auto iterable = iterIndex->baseExpr->type->asIterable();
+    const auto exprFrom = iterIndex->index.from;
+    visitExpr(exprFrom);
+    const auto exprTo = iterIndex->index.to;
+    if (exprTo) {
+        visitExpr(exprTo);
+        visitSlice(iterIndex);
+        iterIndex->setType(iterable);
+    } else {
+        if (!iterable->getIndexType()->canCastTo(exprFrom->type)) {
+            return errHandler.addError(E10036, &iterIndex->location, {iterIndex->getName(), exprFrom->type->pname()});
+        }
+        if (iterable->isStatic) {
+            const auto i = exprFrom->getConstInt();
+            const auto bound = iterable->size->getConstInt();
+            if (i >= 0 && bound >= 0) {
+                if (i >= bound) {
+                    errHandler.addError(E10048, &iterIndex->location, {iterIndex->getName(), std::to_string(bound)});
+                } else {
+                    iterIndex->boundsChecked = true;
+                }
+            }
+        }
+        iterIndex->setType(iterable->getValueType());
+    }
+}
+
+void LgsSema::visitSlice(LgsIterIndex* iterIndex) {
+    const auto baseExpr = iterIndex->baseExpr;
+    const auto exprFrom = iterIndex->index.from;
+    const auto exprTo = iterIndex->index.to;
+    const auto iterable = baseExpr->type->asIterable();
+    if (!baseExpr->type->isSliceable()) {
+        return errHandler.addError(E10042, &iterIndex->location, {iterIndex->getName(), baseExpr->type->pname()});
+    }
+    if (!iterable->getIndexType()->canCastTo(exprFrom->type)) {
+        return errHandler.addError(E10036, &iterIndex->location, {iterIndex->getName(), exprFrom->type->pname()});
+    }
+    if (!iterable->getIndexType()->canCastTo(exprTo->type)) {
+        return errHandler.addError(E10036, &iterIndex->location, {iterIndex->getName(), exprTo->type->pname()});
+    }
+    if (const auto sArr = iterable->asSArray()) {
+        const auto sizeFrom = exprFrom->getConstInt();
+        const auto sizeTo = exprTo->getConstInt();
+        if (sizeFrom < 0 || sizeTo < 0) return;
+        if (sizeFrom > sizeTo) {
+            return errHandler.addError(E10037, &iterIndex->location, {iterIndex->getName()});
+        }
+        const auto i = sizeFrom;
+        const auto j = sizeTo;
+        const auto bound = sArr->size->getConstInt();
+        if (i >= bound || j >= bound) {
+            return errHandler.addError(E10003, &iterIndex->location, {iterIndex->getName(), std::to_string(bound)});
+        }
+    }
 }
 
 void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent) {
@@ -969,77 +1041,6 @@ void LgsSema::visitInterfaceInstance(LgsInstance* instance, LgsInterface* interf
     }
     if (isValid) {
         visitObject(instance->obj);
-    }
-}
-
-void LgsSema::visitIterIndex(LgsIterIndex* iterIndex) {
-    const auto baseExpr = iterIndex->baseExpr;
-    visitExpr(baseExpr);
-    iterIndex->isMutable = baseExpr->isMutable;
-    if (!baseExpr->type) return;
-    const auto iterable = baseExpr->type->asIterable();
-    if (!iterable) {
-        const auto typeName = baseExpr->type ? baseExpr->type->pname() : LGS_UNKNOWN_TYPE;
-        return errHandler.addError(E10002, &iterIndex->location, {baseExpr->getName(), typeName});
-    }
-    visitIndex(iterIndex);
-}
-
-void LgsSema::visitIndex(LgsIterIndex* iterIndex) {
-    const auto iterable = iterIndex->baseExpr->type->asIterable();
-    const auto exprFrom = iterIndex->index.from;
-    visitExpr(exprFrom);
-    const auto exprTo = iterIndex->index.to;
-    if (exprTo) {
-        visitExpr(exprTo);
-        visitSlice(iterIndex);
-        iterIndex->setType(iterable);
-    } else {
-        if (!iterable->getIndexType()->canCastTo(exprFrom->type)) {
-            return errHandler.addError(E10036, &iterIndex->location, {iterIndex->getName(), exprFrom->type->pname()});
-        }
-        if (iterable->isStatic) {
-            const auto i = exprFrom->getConstInt();
-            const auto bound = iterable->size->getConstInt();
-            if (i >= 0 && bound >= 0) {
-                if (i >= bound) {
-                    errHandler.addError(E10048, &iterIndex->location, {iterIndex->getName(), std::to_string(bound)});
-                } else {
-                    iterIndex->boundsChecked = true;
-                }
-            }
-        }
-        iterIndex->setType(iterable->getValueType());
-    }
-}
-
-void LgsSema::visitSlice(LgsIterIndex* iterIndex) {
-    const auto baseExpr = iterIndex->baseExpr;
-    const auto exprFrom = iterIndex->index.from;
-    const auto exprTo = iterIndex->index.to;
-    const auto iterable = baseExpr->type->asIterable();
-    if (!baseExpr->type->isSliceable()) {
-        return errHandler.addError(E10042, &iterIndex->location, {iterIndex->getName(), baseExpr->type->pname()});
-    }
-    if (!iterable->getIndexType()->canCastTo(exprFrom->type)) {
-        return errHandler.addError(E10036, &iterIndex->location, {iterIndex->getName(), exprFrom->type->pname()});
-    }
-    if (!iterable->getIndexType()->canCastTo(exprTo->type)) {
-        return errHandler.addError(E10036, &iterIndex->location, {iterIndex->getName(), exprTo->type->pname()});
-    }
-    if (const auto sArr = iterable->asSArray()) {
-        const auto sizeFrom = exprFrom->getConstInt();
-        const auto sizeTo = exprTo->getConstInt();
-        if (sizeFrom < 0 || sizeTo < 0) return;
-        if (sizeFrom > sizeTo) {
-            return errHandler.addError(E10037, &iterIndex->location, {iterIndex->getName()});
-        }
-        const auto i = sizeFrom;
-        const auto j = sizeTo;
-        const auto bound = sArr->size->getConstInt();
-        if (i >= bound || j >= bound) {
-            return errHandler.addError(E10003, &iterIndex->location, {iterIndex->getName(), std::to_string(bound)});
-        }
     }
 }
 

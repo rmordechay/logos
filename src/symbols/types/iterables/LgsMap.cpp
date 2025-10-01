@@ -41,7 +41,7 @@ LgsType* LgsMap::getIndexType() {
 }
 
 LgsType* LgsMap::getValueType() {
-    return LgsIterable::getValueType();
+    return typePair->value;
 }
 
 bool LgsMap::unpackLoopVarsTypes(LgsForeachLoop* loop) const {
@@ -121,6 +121,7 @@ StructType* LgsMap::getMapStruct(LgsLLVMGen& cg) {
 }
 
 bool LgsMap::canCastTo(LgsType* other) {
+    if (other->getName() == LgsAny::name) return true;
     const auto otherMap = other->asMap();
     if (!otherMap) return false;
     const auto otherKvType = otherMap->typePair;

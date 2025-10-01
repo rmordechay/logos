@@ -133,6 +133,7 @@ public:
 
     // Iterables
     void setStaticArray(LgsArrayExpr* arrayExpr);
+    void setNestedSArr(const LgsArrayExpr* arrayExpr, Type* parentType, Value* parentValue, std::vector<Value*>& indices);
     void setDynamicArray(LgsArrayExpr* arrayExpr);
     void setSetExpr(LgsArrayExpr* setExpr);
     void createMapFunc(LgsFunc* func);

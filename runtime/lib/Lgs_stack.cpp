@@ -4,7 +4,7 @@
 #include "Lgs_hashmap.h"
 #include "utils/LgsUtils.h"
 
-#define PRINT_MEMORY true
+#define PRINT_MEMORY false
 
 static std::string getTypeName(const Lgs_RTType type) {
     switch (type) {

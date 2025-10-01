@@ -3,7 +3,7 @@
 #include "utils/LgsUtils.h"
 
 extern "C" void Lgs_print(const char* fmt, const Lgs_RTType rtt, const void* v) {
-    if (!v) return;
+    if (!v) assert(0);
     switch (rtt) {
     case RTT_CHAR: {
         const char ch = *static_cast<const char*>(v);

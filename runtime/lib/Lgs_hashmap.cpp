@@ -19,13 +19,13 @@ extern "C" void Lgs_Map_add(const Lgs_hashmap* map, const char* key, const void*
 }
 
 extern "C" void* Lgs_Map_get(const Lgs_hashmap* map, const char* key) {
-    if (!map || !key) assert(0);
-    const auto it = map->data->find(key);
-    if (it == map->data->end()) {
+    if (!map || !key || !map->data) assert(0);
+    const auto v = map->data->find(key);
+    if (v == map->data->end()) {
         formatAndLogError(E10067.msg, {key});
         return nullptr;
     }
-    return it->second.data();
+    return v->second.data();
 }
 
 extern "C" void Lgs_Map_delete(const Lgs_hashmap* map, const char* key) {

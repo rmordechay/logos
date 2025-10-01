@@ -1,10 +1,8 @@
 #include "types/iterables/LgsDArray.h"
-
 #include "codegen/LgsLLVMGen.h"
 #include "exprs/LgsArrayExpr.h"
 #include "types/LgsAny.h"
 #include "types/LgsVoid.h"
-#include "types/primitives/LgsInt.h"
 #include "types/primitives/LgsLong.h"
 
 Type* LgsDArray::getIRType(LgsLLVMGen& cg) {
@@ -59,9 +57,9 @@ LgsType* LgsDArray::applyOp(LgsType* other, const LgsOperator op) {
 LgsFunc* LgsDArray::getAddFunc() {
     const auto func = methods.find(ADD_FUNC_NAME);
     if (func != methods.end() && func->second) return func->second;
-    func->second = new LgsFunc(ADD_FUNC_NAME, &LGS_VOID, {this, &LGS_ANY}, BUILTIN | PUBLIC | METHOD);
-    func->second->fn = [func](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
-        return func->second->callIR(cg, {args[0]->IRValue, args[1]->getIRPtr(cg)});
+    func->second = new LgsFunc(ADD_FUNC_NAME, &LGS_VOID, {this, baseType}, BUILTIN | PUBLIC | METHOD);
+    func->second->fn = [](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
+        return cg.callLgsFunc("DArray_add", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {cg.getPtr(args[0]->IRValue), cg.getPtr(args[1]->IRValue)});
     };
     methods[func->second->funcType->name] = func->second;
     return func->second;
@@ -72,12 +70,13 @@ Value* LgsDArray::lengthIR(LgsLLVMGen& cg, Value* iterable) {
 }
 
 Value* LgsDArray::inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) {
-    return cg.callLgsFunc("DArray_contains", cg.i1Ty(), {cg.ptrTy(), cg.ptrTy()}, {iterableExpr->IRValue, value->getIRPtr(cg)});
+    return cg.callLgsFunc("DArray_contains", cg.i1Ty(), {cg.ptrTy(), cg.ptrTy()}, {iterableExpr->IRValue, cg.getPtr(value->IRValue)});
 }
 
 Value* LgsDArray::getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) {
     LgsFunc f("get", &LGS_ANY, {this, &LGS_LONG}, BUILTIN | PUBLIC | METHOD);
-    return f.callIR(cg, {iterable, index});
+    auto iterPtr = cg.getPtr(iterable);
+    return f.callIR(cg, {iterPtr, index});
 }
 
 bool LgsDArray::canCastTo(LgsType* other) {

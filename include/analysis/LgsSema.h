@@ -101,7 +101,7 @@ public:
     void visitFirstSelection(LgsExpr* firstExpr);
     void visitInnerSelections(const LgsSelection* selection);
     void visitFieldSelection(LgsVariable* child, LgsType* parentType);
-    void visitIterIndexSelection(LgsIterIndex* child, LgsType* parentType);
+    void visitIterIndexSelection(LgsIterIndex* iterIndex, LgsType* parentType);
     void visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent);
     void visitFuncCall(LgsFuncCall* funcCall);
     void visitPrefixExpr(LgsPrefixExpr* prefixExpr);

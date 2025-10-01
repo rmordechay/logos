@@ -49,6 +49,7 @@ public:
     bool isSpread = false;
     bool isMutable = false;
     LgsValue* owner = nullptr;
+    LgsValue* destPtr = nullptr;
 
     explicit LgsExpr(LgsType* type = nullptr) : type(type) {}
     virtual LgsExpr* castTo(LgsType* toType);
@@ -61,9 +62,7 @@ public:
     void freeOwner(LgsLLVMGen& cg);
     int64_t getConstInt();
     std::string getConstStr();
-    Value* getIRPtr(LgsLLVMGen& cg) const;
     void setType(LgsType* newType);
-
     LgsFunc* asFunc();
     LgsVariable* asVariable();
     LgsPrefixExpr* asPrefixExpr();

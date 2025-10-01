@@ -1,5 +1,4 @@
 #include "Lgs_darray.h"
-#include "data/LgsErrors.h"
 #include "utils/LgsUtils.h"
 #include <cstring>
 
@@ -15,14 +14,6 @@ extern "C" void Lgs_DArray_add(const Lgs_darray* arr, const void* value) {
     std::memcpy(arr->data->data() + oldSize, value, arr->elementSize);
 }
 
-extern "C" void Lgs_DArray_addMany(const Lgs_darray* arr, const void* values, const size_t count) {
-    if (count == 0) return;
-    const auto oldSize = arr->data->size();
-    const auto bytesToAdd = arr->elementSize * count;
-    arr->data->resize(oldSize + bytesToAdd);
-    std::memcpy(arr->data->data() + oldSize, values, bytesToAdd);
-}
-
 extern "C" void Lgs_DArray_put(const Lgs_darray* arr, const int index, const void* value) {
     if (!arr || !arr->data) return;
     const size_t arrLen = arr->data->size() / arr->elementSize;
@@ -30,10 +21,9 @@ extern "C" void Lgs_DArray_put(const Lgs_darray* arr, const int index, const voi
     std::memcpy(arr->data->data() + index * arr->elementSize, value, arr->elementSize);
 }
 
-extern "C" void* Lgs_DArray_get(const Lgs_darray* arr, const int32_t index) {
-    if (!arr || !arr->data) return nullptr;
+extern "C" void* Lgs_DArray_get(const Lgs_darray* arr, const int64_t index) {
+    if (!arr || arr->data->empty()) assert(0);
     const auto arrLen = arr->data->size() / arr->elementSize;
-    if (arrLen == 0) return nullptr;
     size_t actualIndex;
     if (index >= 0) {
         actualIndex = index;

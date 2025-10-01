@@ -892,12 +892,12 @@ LgsArrayExpr* LgsParserAdapter::getArrayExpr(LogosParser::ArrayExprContext* ctx)
         array = new LgsArrayExpr(new LgsSet());
         array->type->asIterable()->size = new LgsIntConst(&LGS_INT, ctx->expr().size());
     } else {
-        array = new LgsArrayExpr();
+        array = new LgsArrayExpr(new LgsDArray());
     }
+    setLocation(array->location, ctx->start, ctx->stop);
     for (const auto expr : ctx->expr()) {
         array->initialElements.emplace_back(getExpr(expr));
     }
-    setLocation(array->location, ctx->start, ctx->stop);
     return array;
 }
 

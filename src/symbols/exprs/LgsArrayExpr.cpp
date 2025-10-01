@@ -7,13 +7,22 @@ Value* LgsArrayExpr::loadIR(LgsLLVMGen& cg) {
 }
 
 void LgsArrayExpr::completeType(LgsType* toType) {
-    if (!type && (toType->asSArray() || toType->asDArray() || toType->asSet())) {
+    if (type && type->asDArray() && toType->asSArray()) {
+        freeType(type);
         type = toType;
+        return;
+    }
+    if (toType->asSArray() || toType->asDArray() || toType->asSet()) {
+        if (!type) {
+            type = toType;
+        } else if (!type->asIterable()->baseType) {
+            type->asIterable()->baseType = toType->asIterable()->baseType;
+        }
     }
 }
 
 std::string LgsArrayExpr::getName() {
-    return type->pname();
+    return type ? type->pname() : "[]";
 }
 
 json::value LgsArrayExpr::asJsonStr() {

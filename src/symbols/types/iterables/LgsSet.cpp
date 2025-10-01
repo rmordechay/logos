@@ -58,7 +58,7 @@ LgsFunc* LgsSet::getAddFunc() {
     if (func != methods.end() && func->second) return func->second;
     func->second = new LgsFunc(ADD_FUNC_NAME, &LGS_VOID, {this, &LGS_ANY}, BUILTIN | PUBLIC | METHOD);
     func->second->fn = [func](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
-        return func->second->callIR(cg, {args[0]->IRValue, args[1]->getIRPtr(cg)});
+        return func->second->callIR(cg, {args[0]->IRValue, cg.getPtr(args[1]->IRValue)});
     };
     addMethod(func->second);
     return func->second;
@@ -82,7 +82,7 @@ Value* LgsSet::lengthIR(LgsLLVMGen& cg, Value* iterable) {
 }
 
 Value* LgsSet::inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) {
-    return cg.callLgsFunc("Set_contains", cg.i1Ty(), {cg.ptrTy(), cg.ptrTy()}, {iterableExpr->IRValue, value->getIRPtr(cg)});
+    return cg.callLgsFunc("Set_contains", cg.i1Ty(), {cg.ptrTy(), cg.ptrTy()}, {iterableExpr->IRValue, cg.getPtr(value->IRValue)});
 }
 
 Value* LgsSet::getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) {

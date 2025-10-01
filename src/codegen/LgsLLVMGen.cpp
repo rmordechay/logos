@@ -147,10 +147,17 @@ Value* LgsLLVMGen::callLgsFunc(const std::string& funcName, Type* rt, const std:
 }
 
 Value* LgsLLVMGen::getPtr(Value* v) {
+    if (const auto gepInst = dyn_cast<GetElementPtrInst>(v)) {
+        const auto elementType = gepInst->getResultElementType();
+        if (elementType && (elementType->isPointerTy() || elementType->isArrayTy())) {
+            return builder.CreateLoad(ptrTy(), gepInst);
+        }
+        return v;
+    }
     if (v->getType()->isPointerTy()) return v;
-    const auto vPtr = builder.CreateAlloca(v->getType());
-    builder.CreateStore(v, vPtr);
-    return vPtr;
+    const auto ptr = builder.CreateAlloca(v->getType());
+    builder.CreateStore(v, ptr);
+    return ptr;
 }
 
 Value* LgsLLVMGen::callPrintf(const std::vector<Value*>& args) {
@@ -170,7 +177,6 @@ void LgsLLVMGen::callMemCpy(Value* dest, Value* src, Value* size) {
 Value* LgsLLVMGen::callMalloc(const size_t size, const bool isOwner, const Lgs_RTType type) {
     assert(type != RTT_UNKNOWN);
     const auto ptr = builder.CreateMalloc(sizeTy(), sizeTy(), usize(size), nullptr);
-    ptr->addRetAttr(Attribute::NoAlias);
     if (isOwner) callLgsFunc("stack_addOwner", voidTy(), {ptrTy(), i32Ty()}, {ptr, i32(type)});
     else callLgsFunc("stack_addOrphan", voidTy(), {ptrTy(), i32Ty()}, {ptr, i32(type)});
     return ptr;

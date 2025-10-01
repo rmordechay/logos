@@ -34,20 +34,6 @@ void LgsExpr::assign(LgsLLVMGen& cg, LgsExpr* expr) {
     assert(0);
 }
 
-Value* LgsExpr::getIRPtr(LgsLLVMGen& cg) const {
-    if (const auto gepInst = dyn_cast<GetElementPtrInst>(IRValue)) {
-        gepInst->getResultElementType()->print(outs());
-        if (gepInst->getResultElementType()->isPointerTy() || gepInst->getResultElementType()->isArrayTy()) {
-            return cg.builder.CreateLoad(cg.ptrTy(), gepInst);
-        }
-        return IRValue;
-    }
-    if (IRValue->getType()->isPointerTy()) return IRValue;
-    const auto ptr = cg.builder.CreateAlloca(IRValue->getType());
-    cg.builder.CreateStore(IRValue, ptr);
-    return ptr;
-}
-
 void LgsExpr::freeOwner(LgsLLVMGen& cg) {
     if (type->isHeapAlloc && owner) {
         cg.callLgsFunc("stack_removeOwner", cg.voidTy(), {cg.ptrTy()}, {owner->IRValue});

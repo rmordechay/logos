@@ -4,6 +4,10 @@
 #include "utils/LgsUtils.h"
 #include <llvm/IR/DIBuilder.h>
 
+std::string LgsVarDec::getName() {
+    return name;
+}
+
 Value* LgsVarDec::loadIR(LgsLLVMGen& cg) {
     return cg.builder.CreateLoad(type->getIRType(cg), IRValue);
 }

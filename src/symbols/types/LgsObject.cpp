@@ -35,11 +35,10 @@ Type* LgsObject::getIRType(LgsLLVMGen& cg) {
 size_t LgsObject::getSizeBytes() {
     size_t sum = 0;
     for (const auto& field : fields) {
-        // avoids recursion
-        if (name == field->type->getName()) {
-            sum += sizeof(void*);
-        } else {
+        if (field->type->isPrimitive) {
             sum += field->type->getSizeBytes();
+        } else {
+            sum += sizeof(void*);
         }
     }
     return sum;

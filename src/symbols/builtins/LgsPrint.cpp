@@ -12,7 +12,7 @@ Value* LgsPrint::call(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
     const auto baseStr = cg.getIRStr(arg->type->strFormatPart());
     IRArgs.emplace_back(baseStr);
     IRArgs.emplace_back(cg.i32(arg->type->getRTType()));
-    IRArgs.emplace_back(arg->getIRPtr(cg));
+    IRArgs.emplace_back(cg.getPtr(arg->IRValue));
     return cg.callLgsFunc(name, cg.voidTy(), {cg.ptrTy(), cg.i32Ty(), cg.ptrTy()}, IRArgs);
 }
 
