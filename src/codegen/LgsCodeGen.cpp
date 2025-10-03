@@ -517,7 +517,7 @@ void LgsCodeGen::visitReturnStmt(LgsReturn* returnStmt) {
         const auto cleanupBlock = currentFunc->getCleanupBlock(cg);
         cg.builder.CreateBr(cleanupBlock);
     } else {
-        cg.callPopStack(currentFunc->funcType->name);
+        cg.callPopStack();
         if (currentFunc->funcType->rt->isVoid()) {
             cg.builder.CreateRetVoid();
         } else {
@@ -1026,25 +1026,28 @@ void LgsCodeGen::createPrologue(LgsFunc* func) {
 
 void LgsCodeGen::createEpilogue(LgsFunc* func) {
     const auto needsCleanup = func->needsCleanup();
-    if (!needsCleanup && !func->hasDefers) return;
+    if (!needsCleanup && !func->hasDefers) {
+        cg.callPopStack(true);
+        return;
+    }
     cg.branchAndStartBlock(func->getCleanupBlock(cg));
     currentIRFunc = nullptr;
     if (func->hasDefers) cg.callLgsFunc("stack_callDefers", cg.voidTy());
 
     if (needsCleanup) {
         if (func->returnStmts.empty()) {
-            cg.callPopStack(func->funcType->name, true);
+            cg.callPopStack(true);
         } else if (func->returnStmts.size() == 1) {
             if (func->owners.size() == 1) {
                 const auto returnRef = func->returnStmts.front()->expr;
                 const auto heapExprRef = func->owners.front();
                 if (returnRef->equals(heapExprRef)) {
-                    cg.callPopStack(func->funcType->name, true);
+                    cg.callPopStack(true);
                     cg.builder.CreateRet(getIRValue(func->returnStmts.front()));
                     return;
                 }
             }
-            cg.callPopStack(func->funcType->name, true);
+            cg.callPopStack(true);
             cg.builder.CreateRet(getIRValue(func->returnStmts.front()));
         } else {
             PHINode *phi = nullptr;
@@ -1057,11 +1060,11 @@ void LgsCodeGen::createEpilogue(LgsFunc* func) {
                     phi->addIncoming(retVal, stmt->parentBlock);
                 }
             }
-            cg.callPopStack(func->funcType->name, true);
+            cg.callPopStack(true);
             cg.builder.CreateRet(phi);
         }
     } else {
-        cg.callPopStack(func->funcType->name);
+        cg.callPopStack();
     }
 }
 
@@ -1232,7 +1235,7 @@ void LgsCodeGen::createMapFunc(LgsFunc* func) {
 
     // End func
     cg.startBlock(exitBlock);
-    cg.callPopStack(func->funcType->name);
+    cg.callPopStack();
     cg.builder.CreateRet(newArr.IRValue);
 
     // Restore state
@@ -1295,7 +1298,7 @@ void LgsCodeGen::createFilterFunc(LgsFunc* func) {
 
     // End func
     cg.startBlock(exitBlock);
-    cg.callPopStack(func->funcType->name);
+    cg.callPopStack();
     cg.builder.CreateRet(newArr.IRValue);
 
     // Restore state

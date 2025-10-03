@@ -47,6 +47,9 @@ size_t LgsFuncType::getSizeBytes() {
 std::string LgsFuncType::getName() {
     if (IRName != "") return IRName;
     std::stringstream strStream;
+    if (!isBuiltin) {
+        strStream << "u_";
+    }
     if (parentName != "") {
         strStream << parentName << "_";
     }

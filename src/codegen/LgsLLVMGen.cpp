@@ -186,7 +186,7 @@ void LgsLLVMGen::callStackPush() {
     callLgsFunc("stack_push", voidTy());
 }
 
-Value* LgsLLVMGen::callPopStack(const std::string& name, const bool cleanup) {
+Value* LgsLLVMGen::callPopStack(const bool cleanup) {
     return callLgsFunc("stack_pop", voidTy(), {i1Ty()}, {i1(cleanup)});
 }
 

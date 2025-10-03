@@ -57,7 +57,7 @@ public:
 
     // Stack
     void callStackPush();
-    Value* callPopStack(const std::string& name, bool cleanup = false);
+    Value* callPopStack(bool cleanup = false);
 
     // Types
     Type* i1Ty();
