@@ -6,10 +6,10 @@
 
 class LgsVec final : public LgsIterable {
 public:
-    int8_t dim = 0;
+    int8_t vectorDim = 0;
     std::vector<uint8_t> indices;
 
-    explicit LgsVec(const int8_t dim, LgsType* baseType = &LGS_FLOAT) : LgsIterable(baseType), dim(dim) {
+    explicit LgsVec(const int8_t dim, LgsType* baseType = &LGS_FLOAT) : LgsIterable(baseType), vectorDim(dim) {
         assert(dim > 1 && dim <= 4);
         size = new LgsIntConst(&LGS_INT, dim);
         isStatic = true;
@@ -22,7 +22,7 @@ public:
     LgsExpr* getZeroValue() override;
     Lgs_RTType getRTType() override;
     bool canCastTo(LgsType* other) override;
-    LgsType* applyOp(LgsType* other, LgsOperator op) override;
+    LgsType* applyOp(LgsOperator op, LgsType* other) override;
     Value* addIR(LgsLLVMGen& cg, Value* self, Value* other) override;
     Value* subIR(LgsLLVMGen& cg, Value* self, Value* other) override;
     Value* mulIR(LgsLLVMGen& cg, Value* self, Value* other) override;

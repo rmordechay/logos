@@ -4,12 +4,12 @@
 #include "types/primitives/LgsSize.h"
 
 Type* LgsVec::getIRType(LgsLLVMGen& cg) {
-    IRType = FixedVectorType::get(baseType->getIRType(cg), dim);
+    IRType = FixedVectorType::get(baseType->getIRType(cg), vectorDim);
     return IRType;
 }
 
 std::string LgsVec::getName() {
-    return "vec" + std::to_string(dim);
+    return "vec" + std::to_string(vectorDim);
 }
 
 json::value LgsVec::asJsonStr() {
@@ -25,9 +25,9 @@ LgsExpr* LgsVec::getZeroValue() {
 }
 
 Lgs_RTType LgsVec::getRTType() {
-    if (dim == 2) return RTT_VEC2;
-    if (dim == 3) return RTT_VEC3;
-    if (dim == 4) return RTT_VEC4;
+    if (vectorDim == 2) return RTT_VEC2;
+    if (vectorDim == 3) return RTT_VEC3;
+    if (vectorDim == 4) return RTT_VEC4;
     return RTT_UNKNOWN;
 }
 
@@ -35,10 +35,10 @@ bool LgsVec::canCastTo(LgsType* other) {
     if (other->getName() == LgsAny::name) return true;
     const auto otherVec = other->asVec();
     if (!otherVec) return false;
-    return dim == otherVec->dim && baseType->canCastTo(otherVec->baseType);
+    return vectorDim == otherVec->vectorDim && baseType->canCastTo(otherVec->baseType);
 }
 
-LgsType* LgsVec::applyOp(LgsType* other, const LgsOperator op) {
+LgsType* LgsVec::applyOp(const LgsOperator op, LgsType* other) {
     const auto IRName = other->getName();
     switch (op) {
     case ADD:
@@ -110,11 +110,12 @@ Value* LgsVec::divIR(LgsLLVMGen& cg, Value* self, Value* other) {
 Value* LgsVec::inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) {
     const auto resultPtr = cg.builder.CreateAlloca(cg.i1Ty());
     cg.builder.CreateStore(cg.false_(), resultPtr);
-    cg.loop(cg.i64(dim), [this, &cg, iterableExpr, value, resultPtr](Value* index, BasicBlock* exitBlock) {
+    cg.loop(cg.i64(vectorDim), [this, &cg, iterableExpr, value, resultPtr](Value* index, BasicBlock* exitBlock) {
         const auto trueBlock = cg.createBlock();
         const auto falseBlock = cg.createBlock();
-        const auto e = getIRElement(cg, iterableExpr->IRValue, index);
-        const auto eq = baseType->eqIR(cg, e, value->loadIR(cg));
+        const auto zeroValue = baseType->getZeroValue();
+        zeroValue->IRValue = getIRElement(cg, iterableExpr->IRValue, index);
+        const auto eq = zeroValue->eqIR(cg, value->loadIR(cg));
         cg.builder.CreateCondBr(eq, trueBlock, falseBlock);
         cg.startBlock(trueBlock);
         cg.builder.CreateStore(cg.true_(), resultPtr);
@@ -153,9 +154,9 @@ int8_t LgsVec::getComponentIndex(const char c) {
 std::string LgsVec::strFormatPart() const {
     std::stringstream str;
     str << '<';
-    for (int i = 0; i < dim; i++) {
+    for (int i = 0; i < vectorDim; i++) {
         str << baseType->strFormatPart();
-        if (i < dim - 1) str << ", ";
+        if (i < vectorDim - 1) str << ", ";
     }
     str << '>';
     return str.str();

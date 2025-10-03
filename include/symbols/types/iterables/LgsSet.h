@@ -22,7 +22,7 @@ public:
     std::string strFormatPart() const override;
     StructType* getArrStruct(LgsLLVMGen& cg);
     LgsFunc* getAddFunc() override;
-    LgsType* applyOp(LgsType* other, LgsOperator op) override;
+    LgsType* applyOp(LgsOperator op, LgsType* other) override;
     Value* lengthIR(LgsLLVMGen& cg, Value* iterable) override;
     Value* inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
     Value* getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) override;

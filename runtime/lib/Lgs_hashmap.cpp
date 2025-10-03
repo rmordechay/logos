@@ -4,9 +4,12 @@
 #include "types/iterables/LgsMap.h"
 #include "utils/LgsUtils.h"
 
-extern "C" void Lgs_Map_init(Lgs_hashmap* map, const size_t valueSize) {
+extern "C" void Lgs_Map_init(Lgs_hashmap* map, const size_t valueSize, Lgs_RTType keyType, Lgs_RTType valueType) {
+    assert(keyType != RTT_UNKNOWN && valueType != RTT_UNKNOWN);
     if (!map || valueSize == 0 || valueSize > 4096) std::exit(1);
     map->valueSize = valueSize;
+    map->keyType = keyType;
+    map->valueType = valueType;
     map->data = new std::unordered_map<std::string, std::vector<char>>();
 }
 
@@ -62,7 +65,7 @@ extern "C" void* Lgs_Map_getValueAt(const Lgs_hashmap* map, const size_t index) 
 extern "C" Lgs_darray* Lgs_Map_keys(const Lgs_hashmap* map) {
     if (!map) return nullptr;
     const auto keys = new Lgs_darray();
-    Lgs_DArray_init(keys, sizeof(char*));
+    Lgs_DArray_init(keys, sizeof(char*), map->keyType);
     for (const auto& [k, v] : *map->data) {
         const auto keyStr = strdup(k.c_str());
         Lgs_DArray_add(keys, &keyStr);
@@ -73,7 +76,7 @@ extern "C" Lgs_darray* Lgs_Map_keys(const Lgs_hashmap* map) {
 extern "C" Lgs_darray* Lgs_Map_values(const Lgs_hashmap* map) {
     if (!map) return nullptr;
     const auto values = new Lgs_darray;
-    Lgs_DArray_init(values, map->valueSize);
+    Lgs_DArray_init(values, map->valueSize, map->valueType);
     for (const auto& [k, v] : *map->data) {
         Lgs_DArray_add(values, v.data());
     }

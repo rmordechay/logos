@@ -1,0 +1,11 @@
+main() {
+    c1: Char[][] = [["a"], ["r"]]
+    s1: Str[][] = [["adi"], ["roi"]]
+    s2: Int[][] = [[2], [2]]
+    a = ["adi"] in s1
+    b = [2] in s2
+    c = ["a"] in c1
+    print(a)
+    print(b)
+    print(c)
+}

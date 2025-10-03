@@ -81,6 +81,21 @@ LgsFunc* LgsIterable::getMethod(const std::string& methodName) {
     return nullptr;
 }
 
+size_t LgsIterable::getDim() {
+    size_t dim = 1;
+    auto nestedIter = this;
+    while (true) {
+        if (const auto innerIter = nestedIter->baseType->asIterable()) {
+            nestedIter = innerIter;
+            if (innerIter->asVec() || innerIter->asStr()) continue;
+            dim++;
+        } else {
+            break;
+        }
+    }
+    return dim;
+}
+
 LgsFunc* LgsIterable::getLenFunc() {
     const auto func = methods.find(LEN_FUNC_NAME);
     if (func != methods.end() && func->second) return func->second;

@@ -14,9 +14,8 @@ public:
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
     Lgs_RTType getRTType() override;
-    LgsType* applyOp(LgsType* other, LgsOperator op) override;
+    LgsType* applyOp(LgsOperator op, LgsType* other) override;
     Value* addIR(LgsLLVMGen& cg, Value* self, Value* other) override;
-    Value* eqIR(LgsLLVMGen& cg, Value* self, Value* other) override;
     Value* getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) override;
     LgsFunc* getLenFunc() override;
     LgsFunc* getIsEmptyFunc() override;

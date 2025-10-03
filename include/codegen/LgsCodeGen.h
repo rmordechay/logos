@@ -71,7 +71,7 @@ public:
     void visitMainFunc(LgsMainFunc* func);
     void visitFunc(LgsFunc* func);
     void visitGroup(LgsGroup* group);
-    void visitField(LgsField* field);
+    void visitField(LgsField* field) const;
     void visitParam(LgsParam* param);
     void visitStmt(LgsStmt* stmt);
     void visitStmtsBlock(const LgsStmtsBlock* stmtsBlock);

@@ -45,7 +45,7 @@ std::string LgsSArray::strFormatPart() const {
     return "%p";
 }
 
-LgsType* LgsSArray::applyOp(LgsType* other, const LgsOperator op) {
+LgsType* LgsSArray::applyOp(const LgsOperator op, LgsType* other) {
     const auto IRName = other->getName();
     switch (op) {
     case IN: {
@@ -68,19 +68,21 @@ Value* LgsSArray::inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) {
     cg.loop(size->loadIR(cg), [this, &cg, iterableExpr, value, resultPtr](Value* index, BasicBlock* exitBlock) {
         const auto trueBlock = cg.createBlock();
         const auto falseBlock = cg.createBlock();
-        const auto e = getIRElement(cg, iterableExpr->IRValue, index);
-        const auto eq = baseType->eqIR(cg, e, value->loadIR(cg));
+        const auto zeroValue = baseType->getZeroValue();
+        zeroValue->IRValue = getIRElement(cg, iterableExpr->IRValue, index);
+        const auto eq = zeroValue->eqIR(cg, value->IRValue);
         cg.builder.CreateCondBr(eq, trueBlock, falseBlock);
         cg.startBlock(trueBlock);
         cg.builder.CreateStore(cg.true_(), resultPtr);
         cg.builder.CreateBr(exitBlock);
         cg.startBlock(falseBlock);
+        freeExpr(zeroValue);
     });
     return cg.builder.CreateLoad(cg.builder.getInt1Ty(), resultPtr);
 }
 
 Value* LgsSArray::getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) {
-    const auto gep =  cg.builder.CreateGEP(getIRType(cg), iterable, {cg.i32Zero(), index});
+    const auto gep = cg.builder.CreateGEP(getIRType(cg), iterable, {cg.i32Zero(), index});
     return cg.builder.CreateLoad(baseType->getIRType(cg), gep);
 }
 

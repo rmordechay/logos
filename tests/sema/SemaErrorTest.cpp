@@ -14,6 +14,19 @@ TEST_CASE("TestSema10000") {
     CHECK_EQ(app.errHandler.errors[0].errCode, E10000.code);
 }
 
+TEST_CASE("TestSema10001A") {
+    LgsApp app;
+    const auto code = R"(
+    main() {
+        s1: Str[2] = [["adi"], ["roi"]]
+    }
+    )";
+    app.parseSrcFile(code);
+    app.analyse();
+    CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10001, code));
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10001.code);
+}
+
 TEST_CASE("TestSema10002A") {
     LgsApp app;
     const auto code = R"(
@@ -295,6 +308,20 @@ TEST_CASE("TestSema10017") {
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10017, code));
     CHECK_EQ(app.errHandler.errors[0].errCode, E10017.code);
+}
+
+TEST_CASE("TestSema10018") {
+    LgsApp app;
+    const auto code = R"(
+    main() {
+        s2: Int[] = [2.234, 2.34]
+        print(s2[0])
+    }
+    )";
+    app.parseSrcFile(code);
+    app.analyse();
+    CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10018, code));
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10018.code);
 }
 
 TEST_CASE("TestSema10022") {
@@ -635,3 +662,4 @@ TEST_CASE("TestSema10092") {
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10048, code));
     CHECK_EQ(app.errHandler.errors[0].errCode, E10048.code);
 }
+

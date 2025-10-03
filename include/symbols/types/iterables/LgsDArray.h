@@ -21,7 +21,7 @@ public:
     Lgs_RTType getRTType() override;
     std::string strFormatPart() const override;
     StructType* getArrStruct(LgsLLVMGen& cg);
-    LgsType* applyOp(LgsType* other, LgsOperator op) override;
+    LgsType* applyOp(LgsOperator op, LgsType* other) override;
     LgsFunc* getAddFunc() override;
     Value* lengthIR(LgsLLVMGen& cg, Value* iterable) override;
     Value* inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) override;

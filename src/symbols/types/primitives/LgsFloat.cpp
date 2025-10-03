@@ -52,7 +52,7 @@ bool LgsFloat::canCastTo(LgsType* other) {
     return false;
 }
 
-LgsType* LgsFloat::applyOp(LgsType* other, const LgsOperator op) {
+LgsType* LgsFloat::applyOp(const LgsOperator op, LgsType* other) {
     if (other->asInt()) return this;
     const auto IRName = other->getName();
     if (name == IRName) return this;
@@ -77,9 +77,4 @@ Value* LgsFloat::mulIR(LgsLLVMGen& cg, Value* self, Value* other) {
 Value* LgsFloat::divIR(LgsLLVMGen& cg, Value* self, Value* other) {
     const auto [l, r] = loadOperands(cg, self, other);
     return cg.builder.CreateFDiv(l, r);
-}
-
-Value* LgsFloat::eqIR(LgsLLVMGen& cg, Value* self, Value* other) {
-    const auto [l, r] = loadOperands(cg, self, other);
-    return cg.builder.CreateFCmpOEQ(l, r);
 }

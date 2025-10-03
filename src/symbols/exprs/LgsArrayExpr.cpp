@@ -10,14 +10,22 @@ void LgsArrayExpr::completeType(LgsType* toType) {
     if (type && type->asDArray() && toType->asSArray()) {
         freeType(type);
         type = toType;
-        return;
     }
     if (toType->asSArray() || toType->asDArray() || toType->asSet()) {
-        if (!type) {
-            type = toType;
-        } else if (!type->asIterable()->baseType) {
-            type->asIterable()->baseType = toType->asIterable()->baseType;
+        const auto otherBaseType = toType->asIterable()->baseType;
+        for (int i = 0; i < initialElements.size(); ++i) {
+            const auto element = initialElements[i];
+            if (!element->type) {
+                element->type = otherBaseType;
+            } else {
+                if (element->type->canCastTo(otherBaseType)) {
+                    const auto castTo = element->castTo(otherBaseType);
+                    freeExpr(element);
+                    initialElements[i] = castTo;
+                }
+            }
         }
+        type->asIterable()->baseType = otherBaseType;
     }
 }
 

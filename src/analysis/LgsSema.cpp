@@ -538,12 +538,7 @@ void LgsSema::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
     visitExpr(r);
     const auto ltype = l->type;
     const auto rtype = r->type;
-    LgsType* type = nullptr;
-    if (binaryExpr->op == IN) {
-        type = rtype->applyOp(ltype, binaryExpr->op);
-    } else {
-        type = ltype->applyOp(rtype, binaryExpr->op);
-    }
+    const auto type = ltype->applyOp(binaryExpr->op, rtype);
     if (!type) {
         return errHandler.addError(E10076, &l->location, {getOpAsText(binaryExpr->op), ltype->pname(), rtype->pname()});
     }
@@ -565,11 +560,12 @@ void LgsSema::visitArrayExpr(LgsArrayExpr* arrayExpr) {
     if (arrayExpr->initialElements.empty() && !arrayExpr->type) {
         return errHandler.addError(E10049, &arrayExpr->location, {arrayExpr->getName()});
     }
+    const auto iter = arrayExpr->type->asIterable();
     for (const auto element : arrayExpr->initialElements) {
-        if (arrayExpr->type) {
-            element->completeType(arrayExpr->type->asIterable()->baseType);
-        }
         visitExpr(element);
+        if (iter->baseType && !element->type->canCastTo(iter->baseType)) {
+            return errHandler.addError(E10018, &element->location, {element->getName(), iter->baseType->pname(), element->type->pname()});
+        }
     }
     if (arrayExpr->type->asDArray() || arrayExpr->type->asSet()) {
         visitDynamicArray(arrayExpr);
@@ -632,14 +628,14 @@ void LgsSema::visitVectorExpr(const LgsVectorExpr* vectorExpr) {
         if (arg->type->isNumber()) {
             sumDim++;
         } else if (const auto otherVec = arg->type->asVec()) {
-            sumDim += otherVec->dim;
+            sumDim += otherVec->vectorDim;
         } else {
             errHandler.addError(E10073, &vectorExpr->location, {arg->type->pname()});
             break;
         }
     }
-    if (sumDim > vectorExpr->vecType->dim) {
-        errHandler.addError(E10074, &vectorExpr->location, {std::to_string(vectorExpr->vecType->dim), std::to_string(sumDim)});
+    if (sumDim > vectorExpr->vecType->vectorDim) {
+        errHandler.addError(E10074, &vectorExpr->location, {std::to_string(vectorExpr->vecType->vectorDim), std::to_string(sumDim)});
     }
 }
 
@@ -1222,7 +1218,7 @@ bool LgsSema::validateMethodVisibility(const LgsFunc* methodCall, const LgsObjec
 
 bool LgsSema::validateVecElements(const LgsVariable* fieldVar, LgsVec* vec) {
     const auto fieldName = fieldVar->name;
-    const auto dim = vec->dim;
+    const auto dim = vec->vectorDim;
     if (fieldName.empty() || fieldName.size() > 4) {
         errHandler.addError(E10069, &fieldVar->location, {vec->pname()});
         return false;

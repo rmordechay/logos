@@ -82,7 +82,7 @@ public:
     virtual std::string getName() = 0;
     virtual std::string pname(); // pretty name
     virtual bool canCastTo(LgsType* other) = 0;
-    virtual LgsType* applyOp(LgsType* other, LgsOperator op);
+    virtual LgsType* applyOp(LgsOperator op, LgsType* other);
     virtual std::string strFormatPart() const = 0;
     virtual DIBasicType* getDebugType(LgsLLVMGen& cg);
     virtual LgsType* clone();
@@ -126,13 +126,5 @@ public:
     virtual Value* bitXorIR(LgsLLVMGen& cg, Value* self, Value* other);
     virtual Value* lshiftIR(LgsLLVMGen& cg, Value* self, Value* other);
     virtual Value* rshiftIR(LgsLLVMGen& cg, Value* self, Value* other);
-    virtual Value* eqIR(LgsLLVMGen& cg, Value* self, Value* other);
-    virtual Value* neIR(LgsLLVMGen& cg, Value* self, Value* other);
-    virtual Value* ltIR(LgsLLVMGen& cg, Value* self, Value* other);
-    virtual Value* gtIR(LgsLLVMGen& cg, Value* self, Value* other);
-    virtual Value* geIR(LgsLLVMGen& cg, Value* self, Value* other);
-    virtual Value* leIR(LgsLLVMGen& cg, Value* self, Value* other);
-    virtual Value* andIR(LgsLLVMGen& cg, Value* self, Value* other);
-    virtual Value* orIR(LgsLLVMGen& cg, Value* self, Value* other);
     virtual ~LgsType() = default;
 };

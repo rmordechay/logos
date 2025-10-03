@@ -39,15 +39,19 @@ std::string LgsDArray::strFormatPart() const {
 
 StructType* LgsDArray::getArrStruct(LgsLLVMGen& cg) {
     if (arrStruct) return arrStruct;
-    arrStruct = cg.getStructType({cg.i64Ty(), cg.ptrTy()}, name);
+    arrStruct = cg.getStructType({cg.sizeTy(), cg.sizeTy(), cg.ptrTy()}, name);
     return arrStruct;
 }
 
-LgsType* LgsDArray::applyOp(LgsType* other, const LgsOperator op) {
+LgsType* LgsDArray::applyOp(const LgsOperator op, LgsType* other) {
     const auto IRName = other->getName();
     switch (op) {
     case IN: {
-        if (other->canCastTo(baseType)) return &LGS_BOOL;
+        if (const auto otherIter = other->asIterable()) {
+            if (otherIter->getDim() - 1 == getDim()) return &LGS_BOOL;
+        } else {
+            if (other->canCastTo(baseType)) return &LGS_BOOL;
+        }
         break;
     }
     default:

@@ -3,6 +3,7 @@
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsAny.h"
+#include "types/iterables/LgsSArray.h"
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsChar.h"
 
@@ -32,7 +33,7 @@ Lgs_RTType LgsStr::getRTType() {
     return RTT_STR;
 }
 
-LgsType* LgsStr::applyOp(LgsType* other, const LgsOperator op) {
+LgsType* LgsStr::applyOp(const LgsOperator op, LgsType* other) {
     const auto IRName = other->getName();
     switch (op) {
     case ADD: {
@@ -43,7 +44,7 @@ LgsType* LgsStr::applyOp(LgsType* other, const LgsOperator op) {
     }
     case IN: {
         if (equals(other)) return &LGS_BOOL;
-        if (canCastTo(other->asIterable()->baseType)) return &LGS_BOOL;
+        if (other->asIterable() && canCastTo(other->asIterable()->baseType)) return &LGS_BOOL;
     }
     case EQ: {
         if (equals(other)) return &LGS_BOOL;
@@ -65,11 +66,6 @@ Value* LgsStr::addIR(LgsLLVMGen& cg, Value* self, Value* other) {
     const auto dstPtr = cg.builder.CreateInBoundsGEP(cg.i8Ty(), newStrPtr, selfSize);
     cg.callMemCpy(dstPtr, other, otherSize);
     return newStrPtr;
-}
-
-Value* LgsStr::eqIR(LgsLLVMGen& cg, Value* self, Value* other) {
-    const auto rt = cg.callFunc("strcmp", cg.i32Ty(), {cg.ptrTy(), cg.ptrTy()}, {self, other});
-    return cg.builder.CreateICmpEQ(rt, cg.i32(0));
 }
 
 Value* LgsStr::getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) {
@@ -124,7 +120,7 @@ Value* LgsStr::inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) {
 
 bool LgsStr::canCastTo(LgsType* other) {
     if (other->getName() == LgsAny::name) return true;
-    if (const auto iter = other->asIterable()) {
+    if (const auto iter = other->asSArray()) {
         return iter->baseType && iter->baseType->asChar();
     }
     return name == other->getName();

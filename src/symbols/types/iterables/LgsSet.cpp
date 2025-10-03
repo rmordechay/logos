@@ -64,7 +64,7 @@ LgsFunc* LgsSet::getAddFunc() {
     return func->second;
 }
 
-LgsType* LgsSet::applyOp(LgsType* other, const LgsOperator op) {
+LgsType* LgsSet::applyOp(const LgsOperator op, LgsType* other) {
     const auto IRName = other->getName();
     switch (op) {
     case IN: {

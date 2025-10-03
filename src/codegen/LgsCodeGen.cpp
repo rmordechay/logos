@@ -1,5 +1,4 @@
 #include "codegen/LgsCodeGen.h"
-
 #include "builtins/LgsTest.h"
 #include "exprs/LgsArrayExpr.h"
 #include "funcs/LgsCoroutine.h"
@@ -43,7 +42,6 @@
 #include "types/iterables/LgsSArray.h"
 #include "types/iterables/LgsVec.h"
 #include "types/primitives/LgsSize.h"
-
 #include <llvm/IR/InlineAsm.h>
 #include <llvm/IR/Module.h>
 #include <llvm/Target/TargetMachine.h>
@@ -142,10 +140,10 @@ void LgsCodeGen::visitGroup(LgsGroup* group) {
     assert(0);
 }
 
-void LgsCodeGen::visitField(LgsField* field) {
+void LgsCodeGen::visitField(LgsField* field) const {
     if (const auto vec = field->type->asVec()) {
-        std::vector<int> mask(vec->dim);
-        for (unsigned i = 0; i < vec->dim; i++) {
+        std::vector<int> mask(vec->vectorDim);
+        for (unsigned i = 0; i < vec->vectorDim; i++) {
             mask[i] = LgsVec::getComponentIndex(field->name[i]);
         }
         const ArrayRef maskRef(mask);
@@ -331,13 +329,15 @@ void LgsCodeGen::visitVarDec(LgsVarDec* varDec) {
     if (shouldAllocate) {
         varDec->IRValue = cg.builder.CreateAlloca(varDec->type->getIRType(cg));
         varDec->expr->destPtrValue = varDec->IRValue;
-    }
-    visitExpr(varDec->expr);
-    if (shouldAllocate) {
-        cg.builder.CreateStore(varDec->expr->IRValue, varDec->IRValue);
+        visitExpr(varDec->expr);
+        if (varDec->expr->IRValue != varDec->IRValue) {
+            cg.builder.CreateStore(varDec->expr->IRValue, varDec->IRValue);
+        }
     } else {
+        visitExpr(varDec->expr);
         varDec->IRValue = varDec->expr->IRValue;
     }
+    assert(varDec->IRValue);
     varDec->IRValue->setName(varDec->name);
 }
 
@@ -630,28 +630,28 @@ void LgsCodeGen::visitBinaryExpr(LgsBinaryExpr* binExpr) {
         binExpr->IRValue = binExpr->type->lshiftIR(cg, binExpr->left->loadIR(cg), binExpr->right->loadIR(cg));
         break;
     case EQ:
-        binExpr->IRValue = binExpr->type->eqIR(cg, binExpr->left->loadIR(cg), binExpr->right->loadIR(cg));
+        binExpr->IRValue = binExpr->left->eqIR(cg, binExpr->right->loadIR(cg));
         break;
     case NE:
-        binExpr->IRValue = binExpr->type->neIR(cg, binExpr->left->loadIR(cg), binExpr->right->loadIR(cg));
-        break;
-    case AND:
-        binExpr->IRValue = binExpr->type->andIR(cg, binExpr->left->loadIR(cg), binExpr->right->loadIR(cg));
-        break;
-    case OR:
-        binExpr->IRValue = binExpr->type->orIR(cg, binExpr->left->loadIR(cg), binExpr->right->loadIR(cg));
+        binExpr->IRValue = binExpr->left->neIR(cg, binExpr->right->loadIR(cg));
         break;
     case LT:
-        binExpr->IRValue = binExpr->type->ltIR(cg, binExpr->left->loadIR(cg), binExpr->right->loadIR(cg));
+        binExpr->IRValue = binExpr->left->ltIR(cg, binExpr->right->loadIR(cg));
         break;
     case GT:
-        binExpr->IRValue = binExpr->type->gtIR(cg, binExpr->left->loadIR(cg), binExpr->right->loadIR(cg));
+        binExpr->IRValue = binExpr->left->gtIR(cg, binExpr->right->loadIR(cg));
         break;
     case GE:
-        binExpr->IRValue = binExpr->type->geIR(cg, binExpr->left->loadIR(cg), binExpr->right->loadIR(cg));
+        binExpr->IRValue = binExpr->left->geIR(cg, binExpr->right->loadIR(cg));
         break;
     case LE:
-        binExpr->IRValue = binExpr->type->leIR(cg, binExpr->left->loadIR(cg), binExpr->right->loadIR(cg));
+        binExpr->IRValue = binExpr->left->leIR(cg, binExpr->right->loadIR(cg));
+        break;
+    case AND:
+        binExpr->IRValue = binExpr->left->andIR(cg, binExpr->right->loadIR(cg));
+        break;
+    case OR:
+        binExpr->IRValue = binExpr->left->orIR(cg, binExpr->right->loadIR(cg));
         break;
     case IN:
         binExpr->IRValue = binExpr->right->type->asIterable()->inIR(cg, binExpr->right, binExpr->left);
@@ -1182,8 +1182,8 @@ void LgsCodeGen::setDynamicArray(LgsArrayExpr* arrayExpr) {
     const auto elementSize = cg.i64(size);
     const auto arrSize = cg.typeSize(arr->getArrStruct(cg));
     arrayExpr->IRValue = cg.callMalloc(arrSize.getFixedValue(), arrayExpr->owner, arr->getRTType());
-    LgsFunc initFunc("init", &LGS_VOID, {arr, &LGS_LONG}, BUILTIN | METHOD);
-    initFunc.callIR(cg, {arrayExpr->IRValue, elementSize});
+    LgsFunc initFunc("init", &LGS_VOID, {arr, &LGS_SIZE, &LGS_SIZE}, BUILTIN | METHOD);
+    initFunc.callIR(cg, {arrayExpr->IRValue, elementSize, cg.usize(arr->baseType->getRTType())});
     for (int i = 0; i < arrayExpr->initialElements.size(); ++i) {
         const auto element = arrayExpr->initialElements[i];
         element->destPtrValue = arrayExpr->IRValue;

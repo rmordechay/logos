@@ -115,7 +115,7 @@ std::string LgsType::pname() {
     return getName();
 }
 
-LgsType* LgsType::applyOp(LgsType* other, const LgsOperator op) {
+LgsType* LgsType::applyOp(const LgsOperator op, LgsType* other) {
     assert(0);
 }
 
@@ -274,37 +274,5 @@ Value* LgsType::lshiftIR(LgsLLVMGen& cg, Value* self, Value* other) {
 }
 
 Value* LgsType::rshiftIR(LgsLLVMGen& cg, Value* self, Value* other) {
-    assert(0);
-}
-
-Value* LgsType::eqIR(LgsLLVMGen& cg, Value* self, Value* other) {
-    assert(0);
-}
-
-Value* LgsType::neIR(LgsLLVMGen& cg, Value* self, Value* other) {
-    assert(0);
-}
-
-Value* LgsType::ltIR(LgsLLVMGen& cg, Value* self, Value* other) {
-    assert(0);
-}
-
-Value* LgsType::gtIR(LgsLLVMGen& cg, Value* self, Value* other) {
-    assert(0);
-}
-
-Value* LgsType::geIR(LgsLLVMGen& cg, Value* self, Value* other) {
-    assert(0);
-}
-
-Value* LgsType::leIR(LgsLLVMGen& cg, Value* self, Value* other) {
-    assert(0);
-}
-
-Value* LgsType::andIR(LgsLLVMGen& cg, Value* self, Value* other) {
-    assert(0);
-}
-
-Value* LgsType::orIR(LgsLLVMGen& cg, Value* self, Value* other) {
     assert(0);
 }

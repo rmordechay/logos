@@ -4,6 +4,11 @@ Value* LgsStrConst::loadIR(LgsLLVMGen& cg) {
     return IRValue;
 }
 
+Value* LgsStrConst::eqIR(LgsLLVMGen& cg, Value* other) {
+    const auto rt = cg.callFunc("strcmp", cg.i32Ty(), {cg.ptrTy(), cg.ptrTy()}, {IRValue, other});
+    return cg.builder.CreateICmpEQ(rt, cg.i32(0));
+}
+
 std::string LgsStrConst::getName() {
     return '"' + value + '"';
 }
