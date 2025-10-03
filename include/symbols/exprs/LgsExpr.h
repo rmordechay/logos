@@ -49,7 +49,7 @@ public:
     bool isSpread = false;
     bool isMutable = false;
     LgsValue* owner = nullptr;
-    LgsValue* destPtr = nullptr;
+    Value* destPtrValue = nullptr;
 
     explicit LgsExpr(LgsType* type = nullptr) : type(type) {}
     virtual LgsExpr* castTo(LgsType* toType);

@@ -255,9 +255,6 @@ void LgsSema::visitVarDec(LgsVarDec* varDec) {
         errHandler.addWarning(W10001, &varDec->location, {varDec->type->getName()});
         varDec->isOwner = false;
     }
-    if (!varDec->type->isHeapAlloc) {
-        varDec->expr->destPtr = varDec;
-    }
     addLocalSymbol(LgsSymbol(varDec));
     addHeapExpr(varDec->expr);
 }
@@ -563,21 +560,20 @@ void LgsSema::visitCast(LgsCast* lgsCast) {
     lgsCast->toType = typeResolver.resolveType(lgsCast->toType, file);
 }
 
-void LgsSema::visitArrayExpr(LgsArrayExpr* array) {
-    if (array->initialElements.empty() && !array->type) {
-        return errHandler.addError(E10049, &array->location, {array->getName()});
+void LgsSema::visitArrayExpr(LgsArrayExpr* arrayExpr) {
+    if (arrayExpr->initialElements.empty() && !arrayExpr->type) {
+        return errHandler.addError(E10049, &arrayExpr->location, {arrayExpr->getName()});
     }
-    for (const auto element : array->initialElements) {
-        element->destPtr = array;
-        if (array->type) {
-            element->completeType(array->type->asIterable()->baseType);
+    for (const auto element : arrayExpr->initialElements) {
+        if (arrayExpr->type) {
+            element->completeType(arrayExpr->type->asIterable()->baseType);
         }
         visitExpr(element);
     }
-    if (array->type->asDArray() || array->type->asSet()) {
-        visitDynamicArray(array);
-    } else if (array->type->asSArray()) {
-        visitStaticArray(array);
+    if (arrayExpr->type->asDArray() || arrayExpr->type->asSet()) {
+        visitDynamicArray(arrayExpr);
+    } else if (arrayExpr->type->asSArray()) {
+        visitStaticArray(arrayExpr);
     } else {
         assert(0);
     }
@@ -767,14 +763,17 @@ void LgsSema::visitFieldSelection(LgsVariable* child, LgsType* parentType) {
 }
 
 void LgsSema::visitIterIndexSelection(LgsIterIndex* iterIndex, LgsType* parentType) {
-    const auto baseExpr = iterIndex->getBaseExpr()->asVariable();
-    const auto field = parentType->getField(baseExpr->name);
-    if (!field) {
-        return errHandler.addError(E10005, &iterIndex->location, {baseExpr->name, parentType->pname()});
+    if (const auto innerIterIndex = iterIndex->baseExpr->asIterIndex()) {
+        visitIterIndexSelection(innerIterIndex, parentType);
+    } else {
+        const auto baseExpr = iterIndex->baseExpr->asVariable();
+        const auto field = parentType->getField(baseExpr->name);
+        if (!field) {
+            return errHandler.addError(E10005, &iterIndex->location, {baseExpr->name, parentType->pname()});
+        }
+        baseExpr->type = field->type;
+        baseExpr->ref = LgsSymbol(field);
     }
-    iterIndex->type = field->type->asIterable()->baseType;
-    iterIndex->baseExpr->type = field->type;
-    baseExpr->ref = LgsSymbol(field);
     visitIndex(iterIndex);
 }
 

@@ -3,8 +3,6 @@
 #include "stmts/LgsField.h"
 #include "types/LgsGroup.h"
 #include "types/LgsInterface.h"
-#include "types/primitives/LgsInt.h"
-
 #include <llvm/IR/Module.h>
 
 Type* LgsObject::getIRType(LgsLLVMGen& cg) {
@@ -35,10 +33,10 @@ Type* LgsObject::getIRType(LgsLLVMGen& cg) {
 size_t LgsObject::getSizeBytes() {
     size_t sum = 0;
     for (const auto& field : fields) {
-        if (field->type->isPrimitive) {
-            sum += field->type->getSizeBytes();
-        } else {
+        if (field->type->asObject() || field->type->asFuncType() || field->type->asInterface() || field->type->asDArray()) {
             sum += sizeof(void*);
+        } else {
+            sum += field->type->getSizeBytes();
         }
     }
     return sum;

@@ -91,7 +91,7 @@ public:
     void visitExpr(LgsExpr* expr);
     void visitBinaryExpr(LgsBinaryExpr* binaryExpr);
     void visitCast(LgsCast* lgsCast);
-    void visitArrayExpr(LgsArrayExpr* array);
+    void visitArrayExpr(LgsArrayExpr* arrayExpr);
     void visitStaticArray(LgsArrayExpr* arrayExpr);
     void visitDynamicArray(LgsArrayExpr* array);
     void visitHashMap(LgsHashMap* hashMap);

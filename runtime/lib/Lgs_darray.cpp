@@ -8,7 +8,7 @@ extern "C" void Lgs_DArray_init(Lgs_darray* arr, const size_t elementSize) {
 }
 
 extern "C" void Lgs_DArray_add(const Lgs_darray* arr, const void* value) {
-    assert(arr->elementSize <= MAX_ELEMENT_SIZE);
+    assert(arr);
     const auto oldSize = arr->data->size();
     arr->data->resize(oldSize + arr->elementSize);
     std::memcpy(arr->data->data() + oldSize, value, arr->elementSize);
