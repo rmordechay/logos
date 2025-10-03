@@ -1,6 +1,7 @@
 #include "stmts/LgsVarDec.h"
 #include "codegen/LgsLLVMGen.h"
 #include "types/LgsPtr.h"
+#include "types/iterables/LgsStr.h"
 #include "utils/LgsUtils.h"
 #include <llvm/IR/DIBuilder.h>
 
@@ -10,6 +11,12 @@ std::string LgsVarDec::getName() {
 
 Value* LgsVarDec::loadIR(LgsLLVMGen& cg) {
     return cg.builder.CreateLoad(type->getIRType(cg), IRValue);
+}
+
+bool LgsVarDec::shouldAllocate() const {
+    if (type->isHeapAlloc || type->asFuncType()) return false;
+    if (type->asStr() && type->asStr()->isStatic) return false;
+    return true;
 }
 
 void LgsVarDec::setDebugValue(LgsLLVMGen& cg) {

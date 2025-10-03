@@ -18,8 +18,9 @@
 
 class LgsTypeExpr;
 
-LgsExpr* LgsExpr::castTo(LgsType* toType) {
-    return this;
+LgsExpr* LgsExpr::castTo(LgsType* toType, bool explicitCast) {
+    if (type->equals(toType)) return this;
+    assert(0);
 }
 
 void LgsExpr::completeType(LgsType* toType) {

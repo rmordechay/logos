@@ -162,6 +162,16 @@ std::string getOpAsText(const LgsOperator op) {
         return "/";
     case MOD:
         return "%";
+    case BIT_AND:
+        return "&";
+    case BIT_OR:
+        return "|";
+    case BIT_XOR:
+        return "^";
+    case LSHIFT:
+        return "<<";
+    case RSHIFT:
+        return ">>";
     case EQ:
         return "==";
     case NE:
@@ -178,16 +188,6 @@ std::string getOpAsText(const LgsOperator op) {
         return "and";
     case OR:
         return "or";
-    case BIT_AND:
-        return "&";
-    case BIT_OR:
-        return "|";
-    case BIT_XOR:
-        return "^";
-    case LSHIFT:
-        return "<<";
-    case RSHIFT:
-        return ">>";
     case IN:
         return "in";
     case NOOP:

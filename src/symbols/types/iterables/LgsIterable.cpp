@@ -1,5 +1,4 @@
 #include "types/iterables/LgsIterable.h"
-
 #include "exprs/LgsIterIndex.h"
 #include "funcs/LgsFunc.h"
 #include "loops/LgsForeachLoop.h"

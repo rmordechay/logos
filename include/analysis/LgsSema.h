@@ -90,9 +90,9 @@ public:
     void visitDeferStmt(const LgsDeferStmt* deferStmt);
     void visitExpr(LgsExpr* expr);
     void visitBinaryExpr(LgsBinaryExpr* binaryExpr);
-    void visitCast(LgsCast* lgsCast);
+    void visitCast(LgsCast* cast);
     void visitArrayExpr(LgsArrayExpr* arrayExpr);
-    void visitStaticArray(LgsArrayExpr* arrayExpr);
+    void visitStaticArray(const LgsArrayExpr* arrayExpr);
     void visitDynamicArray(LgsArrayExpr* array);
     void visitHashMap(LgsHashMap* hashMap);
     void visitVectorExpr(const LgsVectorExpr* vectorExpr);
@@ -125,6 +125,7 @@ public:
     bool validateMethodVisibility(const LgsFunc* methodCall, const LgsObject* parent, const LgsLocation& location);
     bool validateVecElements(const LgsVariable* fieldVar, LgsVec* vec);
     void validateTypeDuplicates(LgsType* type);
+    bool validateCast(LgsType* fromType, LgsType* toType, const LgsLocation& location);
     static bool validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const LgsFunc* func);
 
     void addHeapExpr(LgsExpr* expr);

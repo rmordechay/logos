@@ -21,20 +21,23 @@
 #include "types/primitives/LgsSize.h"
 #include "types/primitives/LgsUInt.h"
 
-LgsType* LgsType::extendInt() {
-    if (asBool()) {
-        return &LGS_BYTE;
+LgsField* LgsType::getField(const std::string& name) {
+    for (auto* f : fields) {
+        if (f->name == name) return f;
     }
-    if (asByte()) {
-        return &LGS_SHORT;
+    if (const auto vec = asVec()) {
+        for (auto* f : fields) if (f->name == name) return f;
+        const size_t newFieldDim = name.size();
+        const auto scalarOrVector = newFieldDim == 1 ? vec->baseType : new LgsVec(newFieldDim);
+        const auto field = new LgsField(name, scalarOrVector);
+        addField(field);
+        return field;
     }
-    if (asShort()) {
-        return &LGS_INT;
-    }
-    if (asInt()) {
-        return &LGS_LONG;
-    }
-    return this;
+    return nullptr;
+}
+
+LgsFunc* LgsType::getMethod(const std::string& methodName) {
+    assert(0);
 }
 
 bool LgsType::addField(LgsField* field) {
@@ -88,23 +91,20 @@ bool LgsType::isSliceable() {
     return asStr() || asDArray() || asSArray();
 }
 
-LgsField* LgsType::getField(const std::string& name) {
-    for (auto* f : fields) {
-        if (f->name == name) return f;
+LgsType* LgsType::extendInt() {
+    if (asBool()) {
+        return &LGS_BYTE;
     }
-    if (const auto vec = asVec()) {
-        for (auto* f : fields) if (f->name == name) return f;
-        const size_t newFieldDim = name.size();
-        const auto scalarOrVector = newFieldDim == 1 ? vec->baseType : new LgsVec(newFieldDim);
-        const auto field = new LgsField(name, scalarOrVector);
-        addField(field);
-        return field;
+    if (asByte()) {
+        return &LGS_SHORT;
     }
-    return nullptr;
-}
-
-LgsFunc* LgsType::getMethod(const std::string& methodName) {
-    assert(0);
+    if (asShort()) {
+        return &LGS_INT;
+    }
+    if (asInt()) {
+        return &LGS_LONG;
+    }
+    return this;
 }
 
 Lgs_RTType LgsType::getRTType() {
@@ -257,6 +257,26 @@ Value* LgsType::modIR(LgsLLVMGen& cg, Value* self, Value* other) {
     assert(0);
 }
 
+Value* LgsType::bitAndIR(LgsLLVMGen& cg, Value* self, Value* other) {
+    assert(0);
+}
+
+Value* LgsType::bitOrIR(LgsLLVMGen& cg, Value* self, Value* other) {
+    assert(0);
+}
+
+Value* LgsType::bitXorIR(LgsLLVMGen& cg, Value* self, Value* other) {
+    assert(0);
+}
+
+Value* LgsType::lshiftIR(LgsLLVMGen& cg, Value* self, Value* other) {
+    assert(0);
+}
+
+Value* LgsType::rshiftIR(LgsLLVMGen& cg, Value* self, Value* other) {
+    assert(0);
+}
+
 Value* LgsType::eqIR(LgsLLVMGen& cg, Value* self, Value* other) {
     assert(0);
 }
@@ -278,26 +298,6 @@ Value* LgsType::geIR(LgsLLVMGen& cg, Value* self, Value* other) {
 }
 
 Value* LgsType::leIR(LgsLLVMGen& cg, Value* self, Value* other) {
-    assert(0);
-}
-
-Value* LgsType::bitAndIR(LgsLLVMGen& cg, Value* self, Value* other) {
-    assert(0);
-}
-
-Value* LgsType::bitOrIR(LgsLLVMGen& cg, Value* self, Value* other) {
-    assert(0);
-}
-
-Value* LgsType::bitXorIR(LgsLLVMGen& cg, Value* self, Value* other) {
-    assert(0);
-}
-
-Value* LgsType::lshiftIR(LgsLLVMGen& cg, Value* self, Value* other) {
-    assert(0);
-}
-
-Value* LgsType::rshiftIR(LgsLLVMGen& cg, Value* self, Value* other) {
     assert(0);
 }
 

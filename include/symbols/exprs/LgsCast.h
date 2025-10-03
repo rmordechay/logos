@@ -1,18 +1,17 @@
 #pragma once
 #include "exprs/LgsExpr.h"
-#include "LgsValue.h"
-
 
 class LgsType;
 class LgsExpr;
 
 class LgsCast final : public LgsExpr {
 public:
-    LgsType* toType = nullptr;
     LgsExpr* fromValue = nullptr;
-    LgsExpr* toValue = nullptr;
+    LgsType* toType = nullptr;
+    LgsExpr* value = nullptr;
 
     LgsCast(LgsType* castToType, LgsExpr* castFromValue) : LgsExpr(castToType), toType(castToType), fromValue(castFromValue) {}
+    Value* loadIR(LgsLLVMGen& cg) override;
     std::string getName() override;
     json::value asJsonStr() override;
     ~LgsCast() override;

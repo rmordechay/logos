@@ -327,12 +327,15 @@ void LgsCodeGen::visitWhileLoop(const LgsWhileLoop* loop) {
 }
 
 void LgsCodeGen::visitVarDec(LgsVarDec* varDec) {
-    if (!varDec->type->isHeapAlloc && !varDec->type->asFuncType()) {
+    const bool shouldAllocate = varDec->shouldAllocate();
+    if (shouldAllocate) {
         varDec->IRValue = cg.builder.CreateAlloca(varDec->type->getIRType(cg));
         varDec->expr->destPtrValue = varDec->IRValue;
     }
     visitExpr(varDec->expr);
-    if (!varDec->IRValue) {
+    if (shouldAllocate) {
+        cg.builder.CreateStore(varDec->expr->IRValue, varDec->IRValue);
+    } else {
         varDec->IRValue = varDec->expr->IRValue;
     }
     varDec->IRValue->setName(varDec->name);
@@ -608,11 +611,23 @@ void LgsCodeGen::visitBinaryExpr(LgsBinaryExpr* binExpr) {
     case DIV:
         binExpr->IRValue = binExpr->type->divIR(cg, binExpr->left->loadIR(cg), binExpr->right->loadIR(cg));
         break;
-    case IN:
-        binExpr->IRValue = binExpr->right->type->asIterable()->inIR(cg, binExpr->right, binExpr->left);
-        break;
     case MOD:
         binExpr->IRValue = binExpr->type->modIR(cg, binExpr->left->loadIR(cg), binExpr->right->loadIR(cg));
+        break;
+    case BIT_AND:
+        binExpr->IRValue = binExpr->type->bitAndIR(cg, binExpr->left->loadIR(cg), binExpr->right->loadIR(cg));
+        break;
+    case BIT_OR:
+        binExpr->IRValue = binExpr->type->bitOrIR(cg, binExpr->left->loadIR(cg), binExpr->right->loadIR(cg));
+        break;
+    case BIT_XOR:
+        binExpr->IRValue = binExpr->type->bitXorIR(cg, binExpr->left->loadIR(cg), binExpr->right->loadIR(cg));
+        break;
+    case LSHIFT:
+        binExpr->IRValue = binExpr->type->rshiftIR(cg, binExpr->left->loadIR(cg), binExpr->right->loadIR(cg));
+        break;
+    case RSHIFT:
+        binExpr->IRValue = binExpr->type->lshiftIR(cg, binExpr->left->loadIR(cg), binExpr->right->loadIR(cg));
         break;
     case EQ:
         binExpr->IRValue = binExpr->type->eqIR(cg, binExpr->left->loadIR(cg), binExpr->right->loadIR(cg));
@@ -638,28 +653,17 @@ void LgsCodeGen::visitBinaryExpr(LgsBinaryExpr* binExpr) {
     case LE:
         binExpr->IRValue = binExpr->type->leIR(cg, binExpr->left->loadIR(cg), binExpr->right->loadIR(cg));
         break;
-    case BIT_AND:
-        binExpr->IRValue = binExpr->type->bitAndIR(cg, binExpr->left->loadIR(cg), binExpr->right->loadIR(cg));
-        break;
-    case BIT_OR:
-        binExpr->IRValue = binExpr->type->bitOrIR(cg, binExpr->left->loadIR(cg), binExpr->right->loadIR(cg));
-        break;
-    case BIT_XOR:
-        binExpr->IRValue = binExpr->type->bitXorIR(cg, binExpr->left->loadIR(cg), binExpr->right->loadIR(cg));
-        break;
-    case LSHIFT:
-        binExpr->IRValue = binExpr->type->rshiftIR(cg, binExpr->left->loadIR(cg), binExpr->right->loadIR(cg));
-        break;
-    case RSHIFT:
-        binExpr->IRValue = binExpr->type->lshiftIR(cg, binExpr->left->loadIR(cg), binExpr->right->loadIR(cg));
+    case IN:
+        binExpr->IRValue = binExpr->right->type->asIterable()->inIR(cg, binExpr->right, binExpr->left);
         break;
     case NOOP: assert(0);
     }
 }
 
-void LgsCodeGen::visitCast(LgsCast* lgsCast) {
-    visitExpr(lgsCast->toValue);
-    lgsCast->IRValue = getIRValue(lgsCast->toValue);
+void LgsCodeGen::visitCast(LgsCast* cast) {
+    assert(cast->value);
+    visitExpr(cast->value);
+    cast->IRValue = cast->value->IRValue;
 }
 
 void LgsCodeGen::visitLambda(LgsFunc* func) {

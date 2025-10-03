@@ -52,7 +52,7 @@ public:
     Value* destPtrValue = nullptr;
 
     explicit LgsExpr(LgsType* type = nullptr) : type(type) {}
-    virtual LgsExpr* castTo(LgsType* toType);
+    virtual LgsExpr* castTo(LgsType* toType, bool explicitCast = false);
     virtual void completeType(LgsType* toType);
     virtual Value* hash(LgsLLVMGen& cg);
     virtual void assign(LgsLLVMGen& cg, LgsExpr* expr);

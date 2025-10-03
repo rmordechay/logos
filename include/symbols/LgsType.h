@@ -115,22 +115,23 @@ public:
     LgsGroup* asGroup();
     LgsSubType* asSubtype();
     LgsTypePair* asPair();
+
     virtual Value* addIR(LgsLLVMGen& cg, Value* self, Value* other);
     virtual Value* subIR(LgsLLVMGen& cg, Value* self, Value* other);
     virtual Value* mulIR(LgsLLVMGen& cg, Value* self, Value* other);
     virtual Value* divIR(LgsLLVMGen& cg, Value* self, Value* other);
     virtual Value* modIR(LgsLLVMGen& cg, Value* self, Value* other);
+    virtual Value* bitAndIR(LgsLLVMGen& cg, Value* self, Value* other);
+    virtual Value* bitOrIR(LgsLLVMGen& cg, Value* self, Value* other);
+    virtual Value* bitXorIR(LgsLLVMGen& cg, Value* self, Value* other);
+    virtual Value* lshiftIR(LgsLLVMGen& cg, Value* self, Value* other);
+    virtual Value* rshiftIR(LgsLLVMGen& cg, Value* self, Value* other);
     virtual Value* eqIR(LgsLLVMGen& cg, Value* self, Value* other);
     virtual Value* neIR(LgsLLVMGen& cg, Value* self, Value* other);
     virtual Value* ltIR(LgsLLVMGen& cg, Value* self, Value* other);
     virtual Value* gtIR(LgsLLVMGen& cg, Value* self, Value* other);
     virtual Value* geIR(LgsLLVMGen& cg, Value* self, Value* other);
     virtual Value* leIR(LgsLLVMGen& cg, Value* self, Value* other);
-    virtual Value* bitAndIR(LgsLLVMGen& cg, Value* self, Value* other);
-    virtual Value* bitOrIR(LgsLLVMGen& cg, Value* self, Value* other);
-    virtual Value* bitXorIR(LgsLLVMGen& cg, Value* self, Value* other);
-    virtual Value* lshiftIR(LgsLLVMGen& cg, Value* self, Value* other);
-    virtual Value* rshiftIR(LgsLLVMGen& cg, Value* self, Value* other);
     virtual Value* andIR(LgsLLVMGen& cg, Value* self, Value* other);
     virtual Value* orIR(LgsLLVMGen& cg, Value* self, Value* other);
     virtual ~LgsType() = default;

@@ -3,6 +3,7 @@
 #include "exprs/LgsArrayExpr.h"
 #include "types/LgsAny.h"
 #include "types/LgsVoid.h"
+#include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsLong.h"
 
 Type* LgsDArray::getIRType(LgsLLVMGen& cg) {
@@ -15,7 +16,8 @@ std::string LgsDArray::getName() {
 }
 
 std::string LgsDArray::pname() {
-    return baseType->pname() + "[]";
+    if (baseType) baseType->pname() + "[]";
+    return "[]";
 }
 
 size_t LgsDArray::getSizeBytes() {
@@ -45,7 +47,7 @@ LgsType* LgsDArray::applyOp(LgsType* other, const LgsOperator op) {
     const auto IRName = other->getName();
     switch (op) {
     case IN: {
-        if (other->canCastTo(baseType)) return baseType;
+        if (other->canCastTo(baseType)) return &LGS_BOOL;
         break;
     }
     default:

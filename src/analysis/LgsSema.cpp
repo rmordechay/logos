@@ -550,14 +550,15 @@ void LgsSema::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
     binaryExpr->setType(type);
 }
 
-void LgsSema::visitCast(LgsCast* lgsCast) {
-    const auto fromValue = lgsCast->fromValue;
-    if (const auto unaryExpr = dynamic_cast<LgsExpr*>(fromValue)) {
-        visitExpr(unaryExpr);
-    } else if (const auto binaryExpr = dynamic_cast<LgsBinaryExpr*>(fromValue)) {
-        visitBinaryExpr(binaryExpr);
+void LgsSema::visitCast(LgsCast* cast) {
+    visitExpr(cast->fromValue);
+    cast->toType = typeResolver.resolveType(cast->toType, file);
+    cast->value = cast->fromValue->castTo(cast->toType, true);
+    if (!cast->value) {
+        errHandler.addError(E10018, &cast->location, {cast->fromValue->type->pname(), cast->toType->pname()});
+        return;
     }
-    lgsCast->toType = typeResolver.resolveType(lgsCast->toType, file);
+    cast->type = cast->value->type;
 }
 
 void LgsSema::visitArrayExpr(LgsArrayExpr* arrayExpr) {
@@ -579,7 +580,7 @@ void LgsSema::visitArrayExpr(LgsArrayExpr* arrayExpr) {
     }
 }
 
-void LgsSema::visitStaticArray(LgsArrayExpr* arrayExpr) {
+void LgsSema::visitStaticArray(const LgsArrayExpr* arrayExpr) {
     const auto& initialElements = arrayExpr->initialElements;
     const auto arr = arrayExpr->type->asSArray();
     for (const auto element : initialElements) {

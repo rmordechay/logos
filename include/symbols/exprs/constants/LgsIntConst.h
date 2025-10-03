@@ -7,7 +7,7 @@ public:
 
     LgsIntConst(LgsType* type, const size_t value) : LgsExpr(type), value(value) {}
     Value* loadIR(LgsLLVMGen& cg) override;
-    LgsExpr* castTo(LgsType* toType) override;
+    LgsExpr* castTo(LgsType* toType, bool explicitCast = false) override;
     std::string getName() override;
     LgsExpr* clone() override;
     json::value asJsonStr() override;

@@ -744,12 +744,12 @@ LgsEnum* LgsParserAdapter::getEnum(LogosParser::EnumDeclarationContext* ctx) {
 LgsExpr* LgsParserAdapter::getExpr(LogosParser::ExprContext* ctx) {
     if (!ctx) return nullptr;
     LgsExpr* expr = nullptr;
-    if (const auto unary = ctx->unaryExpr()) {
-        expr = getUnaryExpr(unary);
+    if (ctx->cast) {
+        expr = getCast(ctx);
     } else if (ctx->right){
         expr = getBinaryExpr(ctx);
-    }else if (ctx->cast) {
-        expr = getCast(ctx);
+    } else if (const auto unary = ctx->unaryExpr()) {
+        expr = getUnaryExpr(unary);
     } else if (ctx->LPAREN() && ctx->RPAREN()) {
         expr = getExpr(ctx->left);
     }
@@ -764,7 +764,9 @@ LgsExpr* LgsParserAdapter::getCast(LogosParser::ExprContext* ctx) {
         castFromValue = getBinaryExpr(ctx);
     }
     LgsType* castToType = getType(ctx->cast);
-    return new LgsCast(castToType, castFromValue);
+    const auto cast = new LgsCast(castToType, castFromValue);
+    setLocation(cast->location, ctx->start, ctx->stop);
+    return cast;
 }
 
 LgsExpr* LgsParserAdapter::getJSON(LogosParser::JsonContext* ctx) {

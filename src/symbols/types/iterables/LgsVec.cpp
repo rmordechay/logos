@@ -108,10 +108,9 @@ Value* LgsVec::divIR(LgsLLVMGen& cg, Value* self, Value* other) {
 }
 
 Value* LgsVec::inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) {
-    const auto resultPtr = cg.builder.CreateAlloca(cg.builder.getInt1Ty());
+    const auto resultPtr = cg.builder.CreateAlloca(cg.i1Ty());
     cg.builder.CreateStore(cg.false_(), resultPtr);
-    auto* vecLength = cg.builder.getInt64(dim);
-    cg.loop(vecLength, [this, &cg, iterableExpr, value, resultPtr](Value* index, BasicBlock* exitBlock) {
+    cg.loop(cg.i64(dim), [this, &cg, iterableExpr, value, resultPtr](Value* index, BasicBlock* exitBlock) {
         const auto trueBlock = cg.createBlock();
         const auto falseBlock = cg.createBlock();
         const auto e = getIRElement(cg, iterableExpr->IRValue, index);
@@ -122,7 +121,7 @@ Value* LgsVec::inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) {
         cg.builder.CreateBr(exitBlock);
         cg.startBlock(falseBlock);
     });
-    return cg.builder.CreateLoad(cg.builder.getInt1Ty(), resultPtr);
+    return cg.builder.CreateLoad(cg.i1Ty(), resultPtr);
 }
 
 Value* LgsVec::lengthIR(LgsLLVMGen& cg, Value* iterable) {

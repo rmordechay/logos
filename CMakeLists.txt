@@ -153,7 +153,6 @@ set(RUNTIME_SOURCES
     runtime/include/Lgs_hashmap.h
     src/symbols/types/LgsTypePair.cpp
     include/symbols/builtins/LgsReflect.h
-    src/symbols/builtins/LgsReflect.cpp
 )
 
 add_library(lgs_core SHARED ${CORE_SOURCES} ${RUNTIME_SOURCES})

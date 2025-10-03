@@ -8,4 +8,6 @@ object Obj {
 main() {
     obj = Obj{}
     field = Reflect.setField(obj, "name", "world")
+    method = Reflect.getMethod(obj, "func")
+    method()
 }

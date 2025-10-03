@@ -3,6 +3,7 @@
 #include "data/LgsDefinitions.h"
 #include "exprs/LgsArrayExpr.h"
 #include "types/LgsAny.h"
+#include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsInt.h"
 
 Type* LgsSArray::getIRType(LgsLLVMGen& cg) {
@@ -48,7 +49,7 @@ LgsType* LgsSArray::applyOp(LgsType* other, const LgsOperator op) {
     const auto IRName = other->getName();
     switch (op) {
     case IN: {
-        if (other->canCastTo(baseType)) return baseType;
+        if (other->canCastTo(baseType)) return &LGS_BOOL;
         break;
     }
     default:
