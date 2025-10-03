@@ -62,7 +62,7 @@ public:
     std::map<std::string, LgsFunc*> methods;
 
     LgsField* getField(const std::string& name);
-    LgsFunc* getMethod(const std::string& methodName);
+    virtual LgsFunc* getMethod(const std::string& methodName);
     bool addField(LgsField* field);
     bool addMethod(LgsFunc* method);
     bool addEmptyMethod(const std::string& name);

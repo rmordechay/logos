@@ -327,7 +327,7 @@ void LgsCodeGen::visitWhileLoop(const LgsWhileLoop* loop) {
 }
 
 void LgsCodeGen::visitVarDec(LgsVarDec* varDec) {
-    if (!varDec->type->isHeapAlloc) {
+    if (!varDec->type->isHeapAlloc && !varDec->type->asFuncType()) {
         varDec->IRValue = cg.builder.CreateAlloca(varDec->type->getIRType(cg));
         varDec->expr->destPtrValue = varDec->IRValue;
     }

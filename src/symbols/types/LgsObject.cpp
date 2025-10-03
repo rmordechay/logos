@@ -5,6 +5,29 @@
 #include "types/LgsInterface.h"
 #include <llvm/IR/Module.h>
 
+LgsFunc* LgsObject::getMethod(const std::string& methodName) {
+    const auto method = methods.find(methodName);
+    if (method != methods.end() && method->second) {
+        return method->second;
+    }
+    if (const auto obj = asObject()) {
+        for (const auto* f : fields) {
+            if (f->name != methodName) continue;
+            if (f->expr && f->expr->asFunc()) {
+                return f->expr->asFunc();
+            }
+        }
+        for (const auto interface : obj->interfaces) {
+            const auto interfaceMethod = interface->getMethod(methodName);
+            if (interfaceMethod) {
+                return interfaceMethod;
+            }
+        }
+    }
+    return nullptr;
+
+}
+
 Type* LgsObject::getIRType(LgsLLVMGen& cg) {
     const auto type = cg.typesRegistry.find(name);
     if (type != cg.typesRegistry.end()) return type->second;

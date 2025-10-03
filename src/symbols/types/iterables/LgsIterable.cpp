@@ -52,6 +52,36 @@ void LgsIterable::unpackLoopVarsIR(LgsLLVMGen& cg, const std::vector<LgsVarDec*>
     varDecs[0]->IRValue = iterIndex->IRValue;
 }
 
+LgsFunc* LgsIterable::getMethod(const std::string& methodName) {
+    const auto method = methods.find(methodName);
+    if (method != methods.end()) {
+        if (method->second) {
+            return method->second;
+        }
+        const auto iter = asIterable();
+        if (methodName == ADD_FUNC_NAME) {
+            return iter->getAddFunc();
+        }
+        if (methodName == LEN_FUNC_NAME) {
+            return iter->getLenFunc();
+        }
+        if (methodName == IS_EMPTY_FUNC_NAME) {
+            return iter->getIsEmptyFunc();
+        }
+        if (methodName == IS_NOT_EMPTY_FUNC_NAME) {
+            return iter->getIsNotEmptyFunc();
+        }
+        if (methodName == MAP_FUNC_NAME) {
+            return iter->getMapFunc();
+        }
+        if (methodName == FILTER_FUNC_NAME) {
+            return iter->getFilterFunc();
+        }
+        assert(0);
+    }
+    return nullptr;
+}
+
 LgsFunc* LgsIterable::getLenFunc() {
     const auto func = methods.find(LEN_FUNC_NAME);
     if (func != methods.end() && func->second) return func->second;

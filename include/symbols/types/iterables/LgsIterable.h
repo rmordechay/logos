@@ -29,6 +29,7 @@ public:
         addEmptyMethod(IS_NOT_EMPTY_FUNC_NAME);
     }
 
+    LgsFunc* getMethod(const std::string& methodName) override;
     virtual LgsFunc* getLenFunc();
     virtual LgsFunc* getIsEmptyFunc();
     virtual LgsFunc* getIsNotEmptyFunc();

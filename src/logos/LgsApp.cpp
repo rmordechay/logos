@@ -7,6 +7,7 @@
 #include "logos/LgsPaths.h"
 #include "utils/ThreadPool.h"
 #include "builtins/LgsPrint.h"
+#include "builtins/LgsReflect.h"
 #include "builtins/LgsSystem.h"
 #include "files/LgsEnvFile.h"
 #include "codegen/LgsCodeGen.h"
@@ -116,6 +117,7 @@ void LgsApp::loadBuiltins() {
     globals.addSymbol(LgsSymbol(new LgsPrint(), false, true), &errHandler);
     globals.addSymbol(LgsSymbol(new LgsSystem(), false, true), &errHandler);
     globals.addSymbol(LgsSymbol(new LgsTest(), false, true), &errHandler);
+    globals.addSymbol(LgsSymbol(new LgsReflect(), false, true), &errHandler);
 }
 
 void LgsApp::loadEnvFiles() {

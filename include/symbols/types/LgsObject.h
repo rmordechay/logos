@@ -20,6 +20,7 @@ public:
     explicit LgsObject(std::string  name) : name(std::move(name)) {
         isHeapAlloc = true;
     }
+    LgsFunc* getMethod(const std::string& methodName) override;
     Type* getIRType(LgsLLVMGen& cg) override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
