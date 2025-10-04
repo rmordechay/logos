@@ -2,7 +2,7 @@
 
 #define INITIAL_ARRAY_CAPACITY 2
 #define BIG_SIZE_THRESHOLD 4
-#define STACK_CAPACITY 8
+#define STACK_CAPACITY 1024
 #define LOCALS_CAPACITY 8
 
 enum LgsLogLevel {

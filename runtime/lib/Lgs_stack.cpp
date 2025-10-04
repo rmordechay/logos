@@ -49,8 +49,7 @@ static void freeType(void* ptr, const Lgs_RTType type) {
     }
     case RTT_DARRAY: {
         const auto arr = static_cast<Lgs_darray*>(ptr);
-        delete arr->data;
-        std::free(arr);
+        // std::free(arr);
         break;
     }
     case RTT_SET: {
@@ -71,7 +70,10 @@ static void freeType(void* ptr, const Lgs_RTType type) {
 }
 
 void Lgs_stack::push() {
-    if (stackIndex + 1 >= STACK_CAPACITY) std::exit(1);
+    if (stackIndex + 1 >= STACK_CAPACITY) {
+        fprintf(stderr, "Stack overflow at depth %d\n", STACK_CAPACITY);
+        exit(1);
+    }
     stackIndex++;
     Lgs_stack_frame& frame = frames[stackIndex];
     frame.defersCount = 0;
@@ -94,52 +96,51 @@ void Lgs_stack::addOwner(void* ptr, const Lgs_RTType type) {
     if constexpr (PRINT_MEMORY) {
         std::cout << "alloc owner " << getTypeName(type) << ": " << ptr << std::endl;
     }
-    frames[stackIndex].owners.push_back(Lgs_alloc{.ptr = ptr, .type = type});
+    frames[stackIndex].owners[frames[stackIndex].ownersCount++] = Lgs_alloc{.ptr = ptr, .type = type};
 }
 
 void Lgs_stack::addOrphan(void* ptr, const Lgs_RTType type) {
     if constexpr (PRINT_MEMORY) {
         std::cout << "alloc orphan " << getTypeName(type) << ": " << ptr << std::endl;
     }
-    frames[stackIndex].orphans.push_back(Lgs_alloc{.ptr = ptr, .type = type});
+    frames[stackIndex].orphans[frames[stackIndex].orphansCount++] = Lgs_alloc{.ptr = ptr, .type = type};
 }
 
-void Lgs_stack::removeOwner(const void* owner) const {
+void Lgs_stack::removeOwner(const void* owner) {
     if constexpr (PRINT_MEMORY) {
         std::cout << "removing owner: " << owner << std::endl;
     }
-    auto stackFrame = frames[stackIndex];
-    for (auto it = stackFrame.owners.begin(); it != stackFrame.owners.end(); ) {
-        if (it->ptr == owner) {
-            freeType(it->ptr, it->type);
-            it = stackFrame.owners.erase(it);
-        } else {
-            ++it;
+    auto& stackFrame = frames[stackIndex];
+    for (int i = 0; i < stackFrame.ownersCount; i++) {
+        if (stackFrame.owners[i].ptr == owner) {
+            freeType(stackFrame.owners[i].ptr, stackFrame.owners[i].type);
+            for (int j = i; j < stackFrame.ownersCount - 1; j++) {
+                stackFrame.owners[j] = stackFrame.owners[j + 1];
+            }
+            break;
         }
     }
 }
 
-void Lgs_stack::funcCleanup() const {
-    auto stackFrame = frames[stackIndex];
-    const auto ownersSize = stackFrame.owners.size();
-    if (ownersSize > 0) {
+void Lgs_stack::funcCleanup() {
+    auto& stackFrame = frames[stackIndex];
+    if (stackFrame.ownersCount > 0) {
         if constexpr (PRINT_MEMORY) {
-            std::cout << ownersSize << " owners:" << std::endl;
+            std::cout << stackFrame.ownersCount << " owners:" << std::endl;
         }
-        for (const auto [ptr, type] : stackFrame.owners) {
-            freeType(ptr, type);
+        for (int i = 0; i < stackFrame.ownersCount; i++) {
+            freeType(stackFrame.owners[i].ptr, stackFrame.owners[i].type);
         }
-        stackFrame.owners.clear();
+        stackFrame.ownersCount = 0;
     }
-    const auto orphansSize = stackFrame.orphans.size();
-    if (orphansSize > 0) {
+    if (stackFrame.orphansCount > 0) {
         if constexpr (PRINT_MEMORY) {
-            std::cout << orphansSize << " orphans:" << std::endl;
+            std::cout << stackFrame.orphansCount << " orphans:" << std::endl;
         }
-        for (const auto [ptr, type] : stackFrame.orphans) {
-            freeType(ptr, type);
+        for (int i = 0; i < stackFrame.orphansCount; i++) {
+            freeType(stackFrame.orphans[i].ptr, stackFrame.orphans[i].type);
         }
-        stackFrame.orphans.clear();
+        stackFrame.orphansCount = 0;
     }
 }
 

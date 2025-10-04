@@ -16,10 +16,12 @@ struct Lgs_alloc {
 };
 
 struct Lgs_stack_frame {
-    std::vector<Lgs_alloc> owners;
-    std::vector<Lgs_alloc> orphans;
+    Lgs_alloc owners[LOCALS_CAPACITY];
+    Lgs_alloc orphans[LOCALS_CAPACITY];
     Lgs_Thunk_Func defers[LOCALS_CAPACITY];
     int defersCount;
+    int ownersCount;
+    int orphansCount;
 };
 
 struct Lgs_stack {
@@ -32,6 +34,6 @@ struct Lgs_stack {
     void addDefer(void* funcPtr, void* ctx);
     void addOwner(void* ptr, Lgs_RTType type);
     void addOrphan(void* ptr, Lgs_RTType type);
-    void removeOwner(const void* owner) const;
-    void funcCleanup() const;
+    void removeOwner(const void* owner);
+    void funcCleanup();
 };

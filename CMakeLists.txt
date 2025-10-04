@@ -106,6 +106,7 @@ set(CORE_SOURCES
     src/symbols/stmts/LgsStmt.cpp
     src/symbols/stmts/LgsStmtsBlock.cpp
     src/symbols/stmts/LgsVarDec.cpp
+
     src/symbols/types/LgsType.cpp
     src/symbols/types/LgsVoid.cpp
     src/symbols/types/LgsUnknown.cpp
@@ -118,8 +119,10 @@ set(CORE_SOURCES
     src/symbols/types/LgsNullable.cpp
     src/symbols/types/LgsObject.cpp
     src/symbols/types/LgsSubType.cpp
+    src/symbols/types/LgsTypePair.cpp
     src/symbols/types/iterables/LgsMap.cpp
     src/symbols/types/iterables/LgsDArray.cpp
+    src/symbols/types/iterables/LgsSet.cpp
     src/symbols/types/iterables/LgsSArray.cpp
     src/symbols/types/iterables/LgsStr.cpp
     src/symbols/types/iterables/LgsIterable.cpp
@@ -146,13 +149,7 @@ set(RUNTIME_SOURCES
     runtime/lib/Lgs_stack.cpp
     runtime/lib/Lgs_print.cpp
     runtime/lib/Lgs_arena.cpp
-    src/symbols/types/iterables/LgsSet.cpp
-    include/symbols/types/iterables/LgsSet.h
-    runtime/include/Lgs_set.h
     runtime/lib/Lgs_set.cpp
-    runtime/include/Lgs_hashmap.h
-    src/symbols/types/LgsTypePair.cpp
-    include/symbols/builtins/LgsReflect.h
 )
 
 add_library(lgs_core SHARED ${CORE_SOURCES} ${RUNTIME_SOURCES})

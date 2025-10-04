@@ -182,12 +182,16 @@ Value* LgsLLVMGen::callMalloc(const size_t size, const bool isOwner, const Lgs_R
     return ptr;
 }
 
-void LgsLLVMGen::callStackPush() {
-    callLgsFunc("stack_push", voidTy());
+void LgsLLVMGen::callStackPush(const bool hasDefers, const bool needsCleanup) {
+    if (needsCleanup || hasDefers) {
+        callLgsFunc("stack_push", voidTy());
+    }
 }
 
-Value* LgsLLVMGen::callPopStack(const bool cleanup) {
-    return callLgsFunc("stack_pop", voidTy(), {i1Ty()}, {i1(cleanup)});
+void LgsLLVMGen::callPopStack(bool hasDefers, const bool needsCleanup) {
+    if (needsCleanup || hasDefers) {
+        callLgsFunc("stack_pop", voidTy(), {i1Ty()}, {i1(needsCleanup)});
+    }
 }
 
 Type* LgsLLVMGen::i1Ty() {

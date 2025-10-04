@@ -118,7 +118,7 @@ void LgsCodeGen::visitMainFunc(LgsMainFunc* func) {
     currentIRFunc = func->getIRFunc(cg);
     cg.builder.SetInsertPoint(cg.createBlock(BLOCK_NAME_ENTRY, currentIRFunc));
     cg.callLgsFunc("runtime_init", cg.voidTy());
-    cg.callStackPush();
+    cg.callStackPush(func->hasDefers, func->needsCleanup());
     if (!func->funcType->params.empty()) initMainArgs(func);
     visitStmtsBlock(func->stmtsBlock);
     createEpilogue(func);
@@ -347,16 +347,16 @@ void LgsCodeGen::visitAssignment(const LgsAssignment* assignment) {
     Value* results = nullptr;
     switch (assignment->assignmentType) {
     case ASSIGN: assignment->lValue->assign(cg, assignment->rValue); return;
-    case ASSIGN_ADD: results = assignment->lValue->type->addIR(cg, assignment->lValue->IRValue, assignment->rValue->IRValue); break;
-    case ASSIGN_SUB: results = assignment->lValue->type->subIR(cg, assignment->lValue->IRValue, assignment->rValue->IRValue); break;
-    case ASSIGN_MUL: results = assignment->lValue->type->mulIR(cg, assignment->lValue->IRValue, assignment->rValue->IRValue); break;
-    case ASSIGN_DIV: results = assignment->lValue->type->divIR(cg, assignment->lValue->IRValue, assignment->rValue->IRValue); break;
-    case ASSIGN_MOD: results = assignment->lValue->type->modIR(cg, assignment->lValue->IRValue, assignment->rValue->IRValue); break;
-    case ASSIGN_AND: results = assignment->lValue->type->bitAndIR(cg, assignment->lValue->IRValue, assignment->rValue->IRValue); break;
-    case ASSIGN_OR: results = assignment->lValue->type->bitOrIR(cg, assignment->lValue->IRValue, assignment->rValue->IRValue); break;
-    case ASSIGN_XOR: results = assignment->lValue->type->bitXorIR(cg, assignment->lValue->IRValue, assignment->rValue->IRValue); break;
-    case ASSIGN_LSHIFT: results = assignment->lValue->type->lshiftIR(cg, assignment->lValue->IRValue, assignment->rValue->IRValue); break;
-    case ASSIGN_RSHIFT: results = assignment->lValue->type->rshiftIR(cg, assignment->lValue->IRValue, assignment->rValue->IRValue); break;
+    case ASSIGN_ADD: results = assignment->lValue->type->addIR(cg, assignment->lValue->loadIR(cg), assignment->rValue->loadIR(cg)); break;
+    case ASSIGN_SUB: results = assignment->lValue->type->subIR(cg, assignment->lValue->loadIR(cg), assignment->rValue->loadIR(cg)); break;
+    case ASSIGN_MUL: results = assignment->lValue->type->mulIR(cg, assignment->lValue->loadIR(cg), assignment->rValue->loadIR(cg)); break;
+    case ASSIGN_DIV: results = assignment->lValue->type->divIR(cg, assignment->lValue->loadIR(cg), assignment->rValue->loadIR(cg)); break;
+    case ASSIGN_MOD: results = assignment->lValue->type->modIR(cg, assignment->lValue->loadIR(cg), assignment->rValue->loadIR(cg)); break;
+    case ASSIGN_AND: results = assignment->lValue->type->bitAndIR(cg, assignment->lValue->loadIR(cg), assignment->rValue->loadIR(cg)); break;
+    case ASSIGN_OR: results = assignment->lValue->type->bitOrIR(cg, assignment->lValue->loadIR(cg), assignment->rValue->loadIR(cg)); break;
+    case ASSIGN_XOR: results = assignment->lValue->type->bitXorIR(cg, assignment->lValue->loadIR(cg), assignment->rValue->loadIR(cg)); break;
+    case ASSIGN_LSHIFT: results = assignment->lValue->type->lshiftIR(cg, assignment->lValue->loadIR(cg), assignment->rValue->loadIR(cg)); break;
+    case ASSIGN_RSHIFT: results = assignment->lValue->type->rshiftIR(cg, assignment->lValue->loadIR(cg), assignment->rValue->loadIR(cg)); break;
     }
     assert(results);
     cg.builder.CreateStore(results, assignment->lValue->IRValue);
@@ -520,7 +520,7 @@ void LgsCodeGen::visitReturnStmt(LgsReturn* returnStmt) {
         const auto cleanupBlock = currentFunc->getCleanupBlock(cg);
         cg.builder.CreateBr(cleanupBlock);
     } else {
-        cg.callPopStack();
+        cg.callPopStack(currentFunc->hasDefers, currentFunc->needsCleanup());
         if (currentFunc->funcType->rt->isVoid()) {
             cg.builder.CreateRetVoid();
         } else {
@@ -1025,33 +1025,35 @@ void LgsCodeGen::createPrologue(LgsFunc* func) {
     currentIRFunc = func->getIRFunc(cg);
     const auto entryBlock = cg.createBlock(BLOCK_NAME_ENTRY, currentIRFunc);
     cg.builder.SetInsertPoint(entryBlock);
-    cg.callStackPush();
+    cg.callStackPush(func->hasDefers, func->needsCleanup());
 }
 
 void LgsCodeGen::createEpilogue(LgsFunc* func) {
     const auto needsCleanup = func->needsCleanup();
-    if (!needsCleanup && !func->hasDefers) {
-        cg.callPopStack(true);
+    if (!func->hasDefers || !needsCleanup) {
+        if (cg.lastInstTerminator()) assert(0);
+        cg.callPopStack(func->hasDefers, needsCleanup);
         return;
     }
     cg.branchAndStartBlock(func->getCleanupBlock(cg));
+    cg.callPopStack(func->hasDefers, needsCleanup);
     currentIRFunc = nullptr;
     if (func->hasDefers) cg.callLgsFunc("stack_callDefers", cg.voidTy());
 
     if (needsCleanup) {
         if (func->returnStmts.empty()) {
-            cg.callPopStack(true);
+            cg.callPopStack(func->hasDefers, func->needsCleanup());
         } else if (func->returnStmts.size() == 1) {
             if (func->owners.size() == 1) {
                 const auto returnRef = func->returnStmts.front()->expr;
                 const auto heapExprRef = func->owners.front();
                 if (returnRef->equals(heapExprRef)) {
-                    cg.callPopStack(true);
+                    cg.callPopStack(func->hasDefers, func->needsCleanup());
                     cg.builder.CreateRet(getIRValue(func->returnStmts.front()));
                     return;
                 }
             }
-            cg.callPopStack(true);
+            cg.callPopStack(func->hasDefers, func->needsCleanup());
             cg.builder.CreateRet(getIRValue(func->returnStmts.front()));
         } else {
             PHINode *phi = nullptr;
@@ -1064,11 +1066,11 @@ void LgsCodeGen::createEpilogue(LgsFunc* func) {
                     phi->addIncoming(retVal, stmt->parentBlock);
                 }
             }
-            cg.callPopStack(true);
+            cg.callPopStack(func->hasDefers, func->needsCleanup());
             cg.builder.CreateRet(phi);
         }
     } else {
-        cg.callPopStack();
+        cg.callPopStack(func->hasDefers, needsCleanup);
     }
 }
 
@@ -1207,7 +1209,7 @@ void LgsCodeGen::createMapFunc(LgsFunc* func) {
     const auto bodyBlock = cg.createBlock();
     const auto exitBlock = cg.createBlock();
     cg.builder.SetInsertPoint(entryBlock);
-    cg.callStackPush();
+    cg.callStackPush(func->hasDefers, func->needsCleanup());
 
     const auto dArray = originalArr.type->asDArray();
     LgsArrayExpr newArr(dArray);
@@ -1239,7 +1241,7 @@ void LgsCodeGen::createMapFunc(LgsFunc* func) {
 
     // End func
     cg.startBlock(exitBlock);
-    cg.callPopStack();
+    cg.callPopStack(func->hasDefers, func->needsCleanup());
     cg.builder.CreateRet(newArr.IRValue);
 
     // Restore state
@@ -1265,7 +1267,7 @@ void LgsCodeGen::createFilterFunc(LgsFunc* func) {
     const auto trueBlock = cg.createBlock();
     const auto falseBlock = cg.createBlock();
     cg.builder.SetInsertPoint(entryBlock);
-    cg.callStackPush();
+    cg.callStackPush(func->hasDefers, func->needsCleanup());
 
     const auto dArray = originalArr.type->asDArray();
     LgsArrayExpr newArr(dArray);
@@ -1302,7 +1304,7 @@ void LgsCodeGen::createFilterFunc(LgsFunc* func) {
 
     // End func
     cg.startBlock(exitBlock);
-    cg.callPopStack();
+    cg.callPopStack(func->hasDefers, func->needsCleanup());
     cg.builder.CreateRet(newArr.IRValue);
 
     // Restore state

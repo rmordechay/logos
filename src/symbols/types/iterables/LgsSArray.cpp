@@ -28,12 +28,7 @@ size_t LgsSArray::getSizeBytes() {
 
 LgsExpr* LgsSArray::getZeroValue() {
     assert(isStatic);
-    const auto arrExpr = new LgsArrayExpr(this);
-    const auto iterSize = size->getConstInt();
-    for (size_t i = 0; i < iterSize; i++) {
-        arrExpr->initialElements.push_back(baseType->getZeroValue());
-    }
-    return arrExpr;
+    return new LgsArrayExpr(this);
 }
 
 Lgs_RTType LgsSArray::getRTType() {

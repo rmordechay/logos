@@ -1,5 +1,4 @@
 #include "Lgs_darray.h"
-
 #include "Lgs_types.h"
 #include "utils/LgsUtils.h"
 #include <cstring>
@@ -16,6 +15,13 @@ extern "C" void Lgs_DArray_add(const Lgs_darray* arr, const void* value) {
     const auto oldSize = arr->data->size();
     arr->data->resize(oldSize + arr->elementSize);
     std::memcpy(arr->data->data() + oldSize, value, arr->elementSize);
+}
+
+extern "C" void Lgs_DArray_addLong(const Lgs_darray* arr, const int64_t value) {
+    assert(arr);
+    const auto oldSize = arr->data->size();
+    arr->data->resize(oldSize + arr->elementSize);
+    std::memcpy(arr->data->data() + oldSize, &value, arr->elementSize);
 }
 
 extern "C" void Lgs_DArray_put(const Lgs_darray* arr, const int index, const void* value) {

@@ -51,8 +51,8 @@ LgsType* LgsInt::applyOp(const LgsOperator op, LgsType* other) {
 }
 
 Value* LgsInt::addIR(LgsLLVMGen& cg, Value* self, Value* other) {
-    const auto l = cg.builder.CreateZExt(self, getIRType(cg));
-    const auto r = cg.builder.CreateZExt(other, getIRType(cg));
+    const auto l = cg.builder.CreateZExt(self, cg.i64Ty());
+    const auto r = cg.builder.CreateZExt(other, cg.i64Ty());
     return cg.builder.CreateAdd(l, r);
 }
 

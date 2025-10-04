@@ -56,8 +56,8 @@ public:
     Value* callMalloc(size_t size, bool isOwner, Lgs_RTType type);
 
     // Stack
-    void callStackPush();
-    Value* callPopStack(bool cleanup = false);
+    void callStackPush(bool hasDefers, bool needsCleanup);
+    void callPopStack(bool hasDefers, bool needsCleanup = false);
 
     // Types
     Type* i1Ty();

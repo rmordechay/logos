@@ -36,6 +36,38 @@ void LgsVariable::assign(LgsLLVMGen& cg, LgsExpr* expr) {
     IRValue = expr->IRValue;
 }
 
+Value* LgsVariable::eqIR(LgsLLVMGen& cg, Value* other) {
+    return cg.builder.CreateICmpEQ(IRValue, other);
+}
+
+Value* LgsVariable::neIR(LgsLLVMGen& cg, Value* other) {
+    assert(0);
+}
+
+Value* LgsVariable::ltIR(LgsLLVMGen& cg, Value* other) {
+    assert(0);
+}
+
+Value* LgsVariable::gtIR(LgsLLVMGen& cg, Value* other) {
+    assert(0);
+}
+
+Value* LgsVariable::geIR(LgsLLVMGen& cg, Value* other) {
+    assert(0);
+}
+
+Value* LgsVariable::leIR(LgsLLVMGen& cg, Value* other) {
+    return cg.builder.CreateICmpSLE(IRValue, other);
+}
+
+Value* LgsVariable::andIR(LgsLLVMGen& cg, Value* other) {
+    assert(0);
+}
+
+Value* LgsVariable::orIR(LgsLLVMGen& cg, Value* other) {
+    assert(0);
+}
+
 Value* LgsVariable::hash(LgsLLVMGen& cg) {
     switch (ref.symbolType) {
     case PARAM:

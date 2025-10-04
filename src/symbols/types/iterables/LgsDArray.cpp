@@ -1,4 +1,6 @@
 #include "types/iterables/LgsDArray.h"
+
+#include "Lgs_darray.h"
 #include "codegen/LgsLLVMGen.h"
 #include "exprs/LgsArrayExpr.h"
 #include "types/LgsAny.h"
@@ -16,12 +18,12 @@ std::string LgsDArray::getName() {
 }
 
 std::string LgsDArray::pname() {
-    if (baseType) baseType->pname() + "[]";
+    if (baseType) return baseType->pname() + "[]";
     return "[]";
 }
 
 size_t LgsDArray::getSizeBytes() {
-    return sizeof(size_t) + sizeof(size_t) + sizeof(size_t) + sizeof(void*);
+    return sizeof(Lgs_darray);
 }
 
 LgsExpr* LgsDArray::getZeroValue() {
@@ -64,8 +66,16 @@ LgsFunc* LgsDArray::getAddFunc() {
     const auto func = methods.find(ADD_FUNC_NAME);
     if (func != methods.end() && func->second) return func->second;
     func->second = new LgsFunc(ADD_FUNC_NAME, &LGS_VOID, {this, baseType}, BUILTIN | PUBLIC | METHOD);
-    func->second->fn = [](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
-        return cg.callLgsFunc("DArray_add", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {cg.getPtr(args[0]->IRValue), cg.getPtr(args[1]->IRValue)});
+    func->second->fn = [this](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
+        if (!baseType->isPrimitive) {
+            return cg.callLgsFunc("DArray_add", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {cg.getPtr(args[0]->IRValue), args[1]->IRValue});
+        }
+        if (baseType->asLong()) {
+            const auto f = cg.getFunc("Lgs_DArray_addLong", cg.getFT(cg.voidTy(), {cg.ptrTy(), cg.i64Ty()}));
+            f->addFnAttr(Attribute::AlwaysInline);
+            return dyn_cast<Value>(cg.builder.CreateCall(f, {cg.getPtr(args[0]->IRValue), args[1]->IRValue}));
+        }
+        assert(0);
     };
     methods[func->second->funcType->name] = func->second;
     return func->second;

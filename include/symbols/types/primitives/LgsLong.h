@@ -15,6 +15,17 @@ public:
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
     Lgs_RTType getRTType() override;
+    LgsType* applyOp(LgsOperator op, LgsType* other) override;
+    Value* addIR(LgsLLVMGen& cg, Value* self, Value* other) override;
+    Value* subIR(LgsLLVMGen& cg, Value* self, Value* other) override;
+    Value* mulIR(LgsLLVMGen& cg, Value* self, Value* other) override;
+    Value* divIR(LgsLLVMGen& cg, Value* self, Value* other) override;
+    Value* modIR(LgsLLVMGen& cg, Value* self, Value* other) override;
+    Value* bitAndIR(LgsLLVMGen& cg, Value* self, Value* other) override;
+    Value* bitOrIR(LgsLLVMGen& cg, Value* self, Value* other) override;
+    Value* bitXorIR(LgsLLVMGen& cg, Value* self, Value* other) override;
+    Value* rshiftIR(LgsLLVMGen& cg, Value* self, Value* other) override;
+    Value* lshiftIR(LgsLLVMGen& cg, Value* self, Value* other) override;
     std::string strFormatPart() const override;
     std::string getName() override;
     json::value asJsonStr() override;

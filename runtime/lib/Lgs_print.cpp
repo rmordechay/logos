@@ -3,9 +3,9 @@
 #include "types/primitives/LgsBool.h"
 #include "utils/LgsUtils.h"
 
-std::string formatArray(const Lgs_darray* arr);
+std::string formatArray(Lgs_darray* arr);
 
-std::string formatElement(const Lgs_RTType type, const void* elem) {
+std::string formatElement(const Lgs_RTType type, void* elem) {
     std::ostringstream oss;
     switch (type) {
     case RTT_CHAR:
@@ -67,7 +67,7 @@ std::string formatElement(const Lgs_RTType type, const void* elem) {
         break;
     }
     case RTT_DARRAY: {
-        const auto nested = static_cast<const Lgs_darray*>(elem);
+        const auto nested = static_cast<Lgs_darray*>(elem);
         oss << formatArray(nested);
         break;
     }
@@ -86,12 +86,12 @@ std::string formatElement(const Lgs_RTType type, const void* elem) {
     return oss.str();
 }
 
-std::string formatArray(const Lgs_darray* arr) {
+std::string formatArray(Lgs_darray* arr) {
     std::ostringstream oss;
     oss << "[";
     const size_t len = Lgs_DArray_len(arr);
     for (size_t i = 0; i < len; ++i) {
-        const void* elem = Lgs_DArray_get(arr, i);
+        void* elem = Lgs_DArray_get(arr, i);
         oss << formatElement(arr->baseType, elem);
         if (i < len - 1) {
             oss << ", ";
@@ -101,7 +101,7 @@ std::string formatArray(const Lgs_darray* arr) {
     return oss.str();
 }
 
-extern "C" void Lgs_print(const Lgs_RTType rtt, const void* v) {
+extern "C" void Lgs_print(const Lgs_RTType rtt, void* v) {
     if (!v) assert(0);
     printf("%s\n", formatElement(rtt, v).c_str());
 }

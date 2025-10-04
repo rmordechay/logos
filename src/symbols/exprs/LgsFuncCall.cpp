@@ -6,6 +6,10 @@
 #include "stmts/LgsField.h"
 #include "types/LgsObject.h"
 
+Value* LgsFuncCall::loadIR(LgsLLVMGen& cg) {
+    return IRValue;
+}
+
 bool LgsFuncCall::equals(LgsExpr* other) {
     const auto otherFuncCall = other->asFuncCall();
     if (!otherFuncCall) return false;
