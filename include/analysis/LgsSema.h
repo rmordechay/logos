@@ -72,7 +72,6 @@ public:
     void visitStmt(LgsStmt* stmt);
     void visitStmtsBlock(LgsStmtsBlock* stmtsBlock);
     void visitVarDec(LgsVarDec* varDec);
-    bool canAssignTo(LgsExpr* lValue, LgsExpr* rValue);
     void visitAssignment(const LgsAssignment* assignment);
     void visitIfStmt(LgsIfStmt* ifStmt);
     void visitPatternMatching(LgsPatternMatching* pm);

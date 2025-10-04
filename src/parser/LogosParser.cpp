@@ -265,7 +265,7 @@ void logosParserInitialize() {
   	5,12,0,0,345,340,1,0,0,0,346,347,1,0,0,0,347,345,1,0,0,0,347,348,1,0,
   	0,0,348,349,1,0,0,0,349,350,5,14,0,0,350,35,1,0,0,0,351,352,5,94,0,0,
   	352,353,5,38,0,0,353,354,5,13,0,0,354,355,3,38,19,0,355,356,5,14,0,0,
-  	356,357,5,20,0,0,357,358,5,13,0,0,358,359,3,40,20,0,359,360,5,14,0,0,
+  	356,357,5,20,0,0,357,358,5,11,0,0,358,359,3,40,20,0,359,360,5,12,0,0,
   	360,37,1,0,0,0,361,366,3,136,68,0,362,363,5,19,0,0,363,365,3,136,68,0,
   	364,362,1,0,0,0,365,368,1,0,0,0,366,364,1,0,0,0,366,367,1,0,0,0,367,370,
   	1,0,0,0,368,366,1,0,0,0,369,371,5,19,0,0,370,369,1,0,0,0,370,371,1,0,
@@ -2142,32 +2142,32 @@ tree::TerminalNode* LogosParser::GroupContext::EQUAL() {
   return getToken(LogosParser::EQUAL, 0);
 }
 
-std::vector<tree::TerminalNode *> LogosParser::GroupContext::LBRACE() {
-  return getTokens(LogosParser::LBRACE);
-}
-
-tree::TerminalNode* LogosParser::GroupContext::LBRACE(size_t i) {
-  return getToken(LogosParser::LBRACE, i);
+tree::TerminalNode* LogosParser::GroupContext::LBRACE() {
+  return getToken(LogosParser::LBRACE, 0);
 }
 
 LogosParser::GroupTypesListContext* LogosParser::GroupContext::groupTypesList() {
   return getRuleContext<LogosParser::GroupTypesListContext>(0);
 }
 
-std::vector<tree::TerminalNode *> LogosParser::GroupContext::RBRACE() {
-  return getTokens(LogosParser::RBRACE);
-}
-
-tree::TerminalNode* LogosParser::GroupContext::RBRACE(size_t i) {
-  return getToken(LogosParser::RBRACE, i);
+tree::TerminalNode* LogosParser::GroupContext::RBRACE() {
+  return getToken(LogosParser::RBRACE, 0);
 }
 
 tree::TerminalNode* LogosParser::GroupContext::ARROW() {
   return getToken(LogosParser::ARROW, 0);
 }
 
+tree::TerminalNode* LogosParser::GroupContext::LPAREN() {
+  return getToken(LogosParser::LPAREN, 0);
+}
+
 LogosParser::GroupTargetListContext* LogosParser::GroupContext::groupTargetList() {
   return getRuleContext<LogosParser::GroupTargetListContext>(0);
+}
+
+tree::TerminalNode* LogosParser::GroupContext::RPAREN() {
+  return getToken(LogosParser::RPAREN, 0);
 }
 
 
@@ -2202,11 +2202,11 @@ LogosParser::GroupContext* LogosParser::group() {
     setState(356);
     match(LogosParser::ARROW);
     setState(357);
-    match(LogosParser::LBRACE);
+    match(LogosParser::LPAREN);
     setState(358);
     groupTargetList();
     setState(359);
-    match(LogosParser::RBRACE);
+    match(LogosParser::RPAREN);
    
   }
   catch (RecognitionException &e) {

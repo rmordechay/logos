@@ -1178,10 +1178,6 @@ LgsGroup* LgsParserAdapter::getGroup(LogosParser::GroupContext* ctx) {
         const auto var = getVariable(target);
         group->targetSymbols.push_back(var);
     }
-    {
-        std::lock_guard lock(mtx);
-        globals.addSymbol(LgsSymbol(group), &errHandler);
-    }
     return group;
 }
 

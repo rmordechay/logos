@@ -1,14 +1,14 @@
 object Obj1 {
-    func()
+    func() {}
 }
 
 object Obj2 {
-    func()
+    func() {}
 }
 
-T = {Obj1, Obj2} -> func
+T = {Obj1, Obj2} -> (func)
 
-test(T t) {
+test(t: T) {
     print(t.func())
 }
 

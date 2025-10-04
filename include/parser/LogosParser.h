@@ -459,13 +459,13 @@ public:
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *IDENTIFIER();
     antlr4::tree::TerminalNode *EQUAL();
-    std::vector<antlr4::tree::TerminalNode *> LBRACE();
-    antlr4::tree::TerminalNode* LBRACE(size_t i);
+    antlr4::tree::TerminalNode *LBRACE();
     GroupTypesListContext *groupTypesList();
-    std::vector<antlr4::tree::TerminalNode *> RBRACE();
-    antlr4::tree::TerminalNode* RBRACE(size_t i);
+    antlr4::tree::TerminalNode *RBRACE();
     antlr4::tree::TerminalNode *ARROW();
+    antlr4::tree::TerminalNode *LPAREN();
     GroupTargetListContext *groupTargetList();
+    antlr4::tree::TerminalNode *RPAREN();
 
    
   };

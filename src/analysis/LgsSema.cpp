@@ -259,25 +259,6 @@ void LgsSema::visitVarDec(LgsVarDec* varDec) {
     addHeapExpr(varDec->expr);
 }
 
-bool LgsSema::canAssignTo(LgsExpr* lValue, LgsExpr* rValue) {
-    if (lValue->asIterIndex()) {
-        return true;
-    }
-    if (const auto selection = lValue->asSelection()) {
-        const auto lastExprParent = selection->lastExprParent();
-        if (const auto obj = lastExprParent->type->asObject()) {
-            if (!obj->singleton && lastExprParent->asTypeExpr()) {
-                errHandler.addError(E10089, &selection->location, {lastExprParent->getName(), selection->lastExpr()->getName()});
-                return false;
-            }
-        }
-    }
-    if (lValue->asVariable()) {
-        return true;
-    }
-    return false;
-}
-
 void LgsSema::visitAssignment(const LgsAssignment* assignment) {
     const auto lValue = assignment->lValue;
     const auto rValue = assignment->rValue;
@@ -290,8 +271,19 @@ void LgsSema::visitAssignment(const LgsAssignment* assignment) {
     if (!lValue->isMutable) {
         return errHandler.addError(E10051, &lValue->location, {lValue->getName()});
     }
-    if (!canAssignTo(lValue, rValue)) return;
-    if (!lType->canCastTo(rType)) {
+    auto canAssign = false;
+    if (lValue->asIterIndex() || lValue->asVariable()) {
+        canAssign = true;
+    } else if (const auto selection = lValue->asSelection()) {
+        const auto lastExprParent = selection->lastExprParent();
+        const auto obj = lastExprParent->type->asObject();
+        if (obj && !obj->singleton && lastExprParent->asTypeExpr()) {
+            errHandler.addError(E10089, &selection->location, {lastExprParent->getName(), selection->lastExpr()->getName()});
+            return;
+        }
+        canAssign = true;
+    }
+    if (!canAssign || !lType->canCastTo(rType)) {
         return errHandler.addError(E10012, &lValue->location, {lValue->getName(), lType->pname(), assignment->getAssignTypeStr(), rValue->getName()});
     }
 }

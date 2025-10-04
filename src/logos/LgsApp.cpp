@@ -154,12 +154,10 @@ void LgsApp::parseSrcFile(const std::string& code, const fs::path& filePath) {
     if (const auto mainFile = dynamic_cast<LgsMainFile*>(lgsFile)) {
         mainFile->appArgs = appArgs;
     }
-    {
-        lgsFile->id = fileID;
-        ast.push_back(lgsFile);
-        if (parserAdapter.errHandler.successful) return;
-        errHandler.mergeErrors(parserAdapter.errHandler);
-    }
+    lgsFile->id = fileID;
+    ast.push_back(lgsFile);
+    if (parserAdapter.errHandler.successful) return;
+    errHandler.mergeErrors(parserAdapter.errHandler);
 }
 
 void LgsApp::initBuild() {
@@ -176,9 +174,6 @@ void LgsApp::initBuild() {
 }
 
 void LgsApp::writeIRFiles() {
-    for (int i = 0; i < errHandler.warnings.size(); ++i) {
-        assert(0);
-    }
     for (const auto file : ast) {
         const auto module = file->generator.IRModule;
         if (!module) continue;

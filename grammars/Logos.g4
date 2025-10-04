@@ -73,7 +73,7 @@ ioPair:
     ;
 
 group:
-        IDENTIFIER EQUAL LBRACE groupTypesList RBRACE ARROW LBRACE groupTargetList RBRACE
+        IDENTIFIER EQUAL LBRACE groupTypesList RBRACE ARROW LPAREN groupTargetList RPAREN
     ;
 
 groupTypesList:
