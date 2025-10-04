@@ -7,6 +7,20 @@
 #include "types/LgsVoid.h"
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsLong.h"
+#include "types/primitives/LgsSize.h"
+
+LgsFunc* LgsDArray::getMethod(const std::string& methodName) {
+    const auto method = methods.find(methodName);
+    if (method != methods.end()) {
+        if (method->second) {
+            return method->second;
+        }
+        if (methodName == RESERVE_FUNC_NAME) {
+            return getReserveFunc();
+        }
+    }
+    return LgsIterable::getMethod(methodName);
+}
 
 Type* LgsDArray::getIRType(LgsLLVMGen& cg) {
     if (IRType) return IRType;
@@ -71,12 +85,18 @@ LgsFunc* LgsDArray::getAddFunc() {
             return cg.callLgsFunc("DArray_add", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {cg.getPtr(args[0]->IRValue), args[1]->IRValue});
         }
         if (baseType->asLong()) {
-            const auto f = cg.getFunc("Lgs_DArray_addLong", cg.getFT(cg.voidTy(), {cg.ptrTy(), cg.i64Ty()}));
-            f->addFnAttr(Attribute::AlwaysInline);
-            return dyn_cast<Value>(cg.builder.CreateCall(f, {cg.getPtr(args[0]->IRValue), args[1]->IRValue}));
+            return cg.callLgsFunc("DArray_addLong", cg.voidTy(), {cg.ptrTy(), cg.i64Ty()}, {cg.getPtr(args[0]->IRValue), args[1]->IRValue});
         }
         assert(0);
     };
+    methods[func->second->funcType->name] = func->second;
+    return func->second;
+}
+
+LgsFunc* LgsDArray::getReserveFunc() {
+    const auto func = methods.find(RESERVE_FUNC_NAME);
+    if (func != methods.end() && func->second) return func->second;
+    func->second = new LgsFunc(RESERVE_FUNC_NAME, &LGS_VOID, {this, &LGS_SIZE}, BUILTIN | PUBLIC | METHOD);
     methods[func->second->funcType->name] = func->second;
     return func->second;
 }

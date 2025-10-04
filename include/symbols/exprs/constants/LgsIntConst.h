@@ -8,6 +8,7 @@ public:
     LgsIntConst(LgsType* type, const size_t value) : LgsExpr(type), value(value) {}
     Value* loadIR(LgsLLVMGen& cg) override;
     LgsExpr* castTo(LgsType* toType, bool explicitCast = false) override;
+    Value* castToIR(LgsLLVMGen& cg, LgsType* toType) override;
     Value* eqIR(LgsLLVMGen& cg, Value* other) override;
     Value* neIR(LgsLLVMGen& cg, Value* other) override;
     Value* ltIR(LgsLLVMGen& cg, Value* other) override;

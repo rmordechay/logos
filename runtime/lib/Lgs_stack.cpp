@@ -49,7 +49,7 @@ static void freeType(void* ptr, const Lgs_RTType type) {
     }
     case RTT_DARRAY: {
         const auto arr = static_cast<Lgs_darray*>(ptr);
-        // std::free(arr);
+        free(arr->data);
         break;
     }
     case RTT_SET: {

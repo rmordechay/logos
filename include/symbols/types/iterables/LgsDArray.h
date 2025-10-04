@@ -1,18 +1,18 @@
 #pragma once
 #include "LgsIterable.h"
 
+#define RESERVE_FUNC_NAME "reserve"
+
 class LgsDArray final : public LgsIterable {
 public:
     static constexpr auto name = "DArray";
     StructType* arrStruct = nullptr;
 
     explicit LgsDArray(LgsType* baseType = nullptr) : LgsIterable(baseType) {
-        addEmptyMethod(MAP_FUNC_NAME);
-        addEmptyMethod(FILTER_FUNC_NAME);
-        addEmptyMethod(FOREACH_FUNC_NAME);
+        addEmptyMethod(RESERVE_FUNC_NAME);
         isHeapAlloc = true;
     }
-
+    LgsFunc* getMethod(const std::string& methodName) override;
     Type* getIRType(LgsLLVMGen& cg) override;
     std::string getName() override;
     std::string pname() override;
@@ -23,6 +23,7 @@ public:
     StructType* getArrStruct(LgsLLVMGen& cg);
     LgsType* applyOp(LgsOperator op, LgsType* other) override;
     LgsFunc* getAddFunc() override;
+    LgsFunc* getReserveFunc();
     Value* lengthIR(LgsLLVMGen& cg, Value* iterable) override;
     Value* inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
     Value* getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) override;

@@ -7,9 +7,6 @@ public:
     StructType* arrStruct = nullptr;
 
     explicit LgsSet(LgsType* baseType = nullptr) : LgsIterable(baseType) {
-        addEmptyMethod(MAP_FUNC_NAME);
-        addEmptyMethod(FILTER_FUNC_NAME);
-        addEmptyMethod(FOREACH_FUNC_NAME);
         isHeapAlloc = true;
     }
     Type* getIRType(LgsLLVMGen& cg) override;

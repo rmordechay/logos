@@ -2,11 +2,11 @@
 #include "stmts/LgsVarDec.h"
 
 Value* LgsRangeLoop::loopStart(LgsLLVMGen& cg) {
-    return startRange->IRValue;
+    return startRange->loadIR(cg);
 }
 
 Value* LgsRangeLoop::loopEnd(LgsLLVMGen& cg) {
-    return endRange->IRValue;
+    return endRange->loadIR(cg);
 }
 
 LgsRangeLoop::~LgsRangeLoop() {

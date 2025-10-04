@@ -23,6 +23,9 @@ public:
     bool isStatic = false;
 
     explicit LgsIterable(LgsType* baseType = nullptr) : baseType(baseType) {
+        addEmptyMethod(MAP_FUNC_NAME);
+        addEmptyMethod(FILTER_FUNC_NAME);
+        addEmptyMethod(FOREACH_FUNC_NAME);
         addEmptyMethod(ADD_FUNC_NAME);
         addEmptyMethod(LEN_FUNC_NAME);
         addEmptyMethod(IS_EMPTY_FUNC_NAME);
