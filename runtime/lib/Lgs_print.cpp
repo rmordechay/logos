@@ -30,7 +30,7 @@ std::string formatElement(const Lgs_RTType type, const void* elem) {
         oss << *static_cast<const size_t*>(elem);
         break;
     case RTT_UBYTE:
-        oss << static_cast<unsigned>(*static_cast<const uint8_t*>(elem));
+        oss << *static_cast<const uint8_t*>(elem);
         break;
     case RTT_USHORT:
         oss << *static_cast<const uint16_t*>(elem);
@@ -48,26 +48,26 @@ std::string formatElement(const Lgs_RTType type, const void* elem) {
         oss << *static_cast<const double*>(elem);
         break;
     case RTT_STR: {
-        oss << *static_cast<const char* const*>(elem);
+        oss << *static_cast<const char*>(elem);
         break;
     }
     case RTT_VEC2: {
-        const auto vec = *static_cast<const Lgs_vec2* const*>(elem);
+        const auto vec = static_cast<const Lgs_vec2*>(elem);
         oss << '<' << vec->x << ", " << vec->y << '>';
         break;
     }
     case RTT_VEC3: {
-        const auto vec = *static_cast<const Lgs_vec3* const*>(elem);
+        const auto vec = static_cast<const Lgs_vec3*>(elem);
         oss << '<' << vec->x << ", " << vec->y << ", " << vec->z << '>';
         break;
     }
     case RTT_VEC4: {
-        const auto vec = *static_cast<const Lgs_vec4* const*>(elem);
+        const auto vec = static_cast<const Lgs_vec4*>(elem);
         oss << '<' << vec->x << ", " << vec->y << ", " << vec->z << ", " << vec->w << '>';
         break;
     }
     case RTT_DARRAY: {
-        const auto nested = *static_cast<const Lgs_darray* const*>(elem);
+        const auto nested = static_cast<const Lgs_darray*>(elem);
         oss << formatArray(nested);
         break;
     }
@@ -101,10 +101,9 @@ std::string formatArray(const Lgs_darray* arr) {
     return oss.str();
 }
 
-extern "C" void Lgs_print(const char* fmt, const Lgs_RTType rtt, const void* v) {
+extern "C" void Lgs_print(const Lgs_RTType rtt, const void* v) {
     if (!v) assert(0);
-    printf(fmt, formatElement(rtt, v).c_str());
-    printf("\n");
+    printf("%s\n", formatElement(rtt, v).c_str());
 }
 
 extern "C" void Lgs_printError(const char* fmt) {

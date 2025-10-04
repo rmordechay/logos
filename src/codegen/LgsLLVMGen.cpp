@@ -304,7 +304,7 @@ void LgsLLVMGen::printStr(const std::string& str) {
 
 void LgsLLVMGen::printPtr(Value* ptr, const std::string& text) {
     if (text != "") printStr(text);
-    callPrintf({getIRStr(LGS_ANY.strFormatPart() + '\n'), ptr});
+    callPrintf({getIRStr("%p\n"), ptr});
 }
 
 void LgsLLVMGen::printInt(Value* number, const std::string& text) {
