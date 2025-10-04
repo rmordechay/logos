@@ -834,10 +834,8 @@ void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
         return;
     }
     const auto ft = funcCall->func->funcType;
-    if (ft->isVirtual) {
-        funcCall->resolveVirtualFunc(cg);
-    }
-    visitIterFunc(funcCall);
+    if (ft->isVirtual) funcCall->resolveVirtualFunc(cg);
+    else visitIterFunc(funcCall);
     if (!funcCall->isCoroutine && !funcCall->isDeferred) {
         funcCall->IRValue = funcCall->func->call(cg, funcCall->args);
     }

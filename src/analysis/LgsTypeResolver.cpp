@@ -1,4 +1,6 @@
 #include "analysis/LgsTypeResolver.h"
+
+#include "exprs/LgsVariable.h"
 #include "files/LgsFile.h"
 #include "files/LgsInterfaceFile.h"
 #include "files/LgsMainFile.h"
@@ -172,6 +174,14 @@ void LgsTypeResolver::resolveFuncTypes(LgsFuncType* funcType, LgsFile& file) {
 void LgsTypeResolver::resolveGroupTypes(LgsGroup* group, LgsFile& file) {
     for (auto& type : group->types) {
         type = resolveType(type, &file);
+        for (const auto target : group->targetSymbols) {
+            if (const auto method = type->getMethod(target->name)) {
+                method->funcType->isVirtual = true;
+                group->targetMethods[target->name] = method;
+            } else if (const auto field = type->getField(target->name)) {
+                group->targetFields[target->name] = field;
+            }
+        }
     }
 }
 

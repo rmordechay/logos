@@ -20,7 +20,7 @@ extern "C" void Lgs_DArray_reserve(Lgs_darray* arr, const size_t numElements) {
     arr->capacity = newCapacity;
 }
 
-static void resizeArr(Lgs_darray* arr) {
+static void resizeArrIfNeeded(Lgs_darray* arr) {
     if (arr->size + arr->elementSize <= arr->capacity) return;
     arr->capacity *= 2;
     arr->data = static_cast<char*>(realloc(arr->data, arr->capacity));
@@ -28,16 +28,23 @@ static void resizeArr(Lgs_darray* arr) {
 
 extern "C" void Lgs_DArray_add(Lgs_darray* arr, const void* value) {
     assert(arr);
-    resizeArr(arr);
+    resizeArrIfNeeded(arr);
     std::memcpy(arr->data + arr->size, value, arr->elementSize);
     arr->size += arr->elementSize;
 }
 
+extern "C" void Lgs_DArray_addInt(Lgs_darray* arr, const int32_t value) {
+    assert(arr);
+    resizeArrIfNeeded(arr);
+    *reinterpret_cast<int32_t*>(arr->data + arr->size) = value;
+    arr->size += sizeof(int32_t);
+}
+
 extern "C" void Lgs_DArray_addLong(Lgs_darray* arr, const int64_t value) {
     assert(arr);
-    resizeArr(arr);
+    resizeArrIfNeeded(arr);
     *reinterpret_cast<int64_t*>(arr->data + arr->size) = value;
-    arr->size += 8;
+    arr->size += sizeof(int64_t);
 }
 
 extern "C" void Lgs_DArray_put(const Lgs_darray* arr, const int index, const void* value) {

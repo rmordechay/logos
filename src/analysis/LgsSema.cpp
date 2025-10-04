@@ -1033,14 +1033,7 @@ void LgsSema::visitInterfaceInstance(LgsInstance* instance, LgsInterface* interf
 }
 
 void LgsSema::visitGroup(LgsGroup* group) {
-    for (const auto targetSymbol : group->targetSymbols) {
-        for (const auto type : group->types) {
-            const auto method = type->getMethod(targetSymbol->name);
-            if (!method) continue;
-            method->funcType->isVirtual = true;
-            group->addMethod(method);
-        }
-    }
+
 }
 
 void LgsSema::visitLoopMetaVar(LgsLoopMetaVar* metaVar) {

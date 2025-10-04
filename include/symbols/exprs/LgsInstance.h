@@ -10,6 +10,8 @@ public:
 
     explicit LgsInstance(const std::string& name): name(name) {}
     explicit LgsInstance(LgsObject* obj) : LgsExpr(obj), name(obj->name), obj(obj) {}
+    LgsExpr* castTo(LgsType* toType, bool explicitCast) override;
+    Value* castToIR(LgsLLVMGen& cg, LgsType* toType) override;
     Value* loadIR(LgsLLVMGen& cg) override;
     void setObject(LgsObject* newObj);
     void setVirtuals(LgsLLVMGen& cg) const;

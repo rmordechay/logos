@@ -5,6 +5,14 @@
 #include "stmts/LgsVarDec.h"
 #include "types/LgsObject.h"
 
+LgsExpr* LgsInstance::castTo(LgsType* toType, bool explicitCast) {
+    assert(0);
+}
+
+Value* LgsInstance::castToIR(LgsLLVMGen& cg, LgsType* toType) {
+    return IRValue;
+}
+
 Value* LgsInstance::loadIR(LgsLLVMGen& cg) {
     return IRValue;
 }
@@ -15,21 +23,18 @@ void LgsInstance::setObject(LgsObject* newObj) {
 }
 
 void LgsInstance::setVirtuals(LgsLLVMGen& cg) const {
-    const auto add = [this, &cg](Value* k, Value* v) {
-        cg.callLgsFunc("vtable_add", cg.voidTy(), {cg.ptrTy(), cg.ptrTy(), cg.ptrTy()}, {IRValue, k, v});
-    };
     for (const auto& [methodName, method] : obj->methods) {
         if (!method->funcType->isVirtual) continue;
         const auto keyIRStr = cg.getIRStr(method->funcType->getName());
         const auto IRFunc = method->getIRFunc(cg);
-        add(keyIRStr, IRFunc);
+        cg.callLgsFunc("vtable_add", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {keyIRStr, IRFunc});
     }
     for (const auto& field : obj->fields) {
         if (!field->isVirtual) continue;
         const auto keyIRStr = cg.getIRStr(field->name);
         const auto objIR = obj->getIRType(cg);
         const auto fieldGEP = cg.builder.CreateStructGEP(objIR, IRValue, field->position);
-        add(keyIRStr, fieldGEP);
+        cg.callLgsFunc("vtable_add", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {keyIRStr, fieldGEP});
     }
 }
 
@@ -62,9 +67,6 @@ LgsInstance::~LgsInstance() {
     if (obj) {
         for (const auto& field : obj->fields) {
             delete field;
-        }
-        for (const auto interface : obj->interfaces) {
-            delete interface;
         }
         delete obj;
         obj = nullptr;

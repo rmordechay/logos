@@ -1,5 +1,5 @@
 #pragma once
-#include "../exprs/LgsHashMap.h"
+#include "exprs/LgsHashMap.h"
 class LgsVariable;
 
 class LgsGroup final : public LgsType {
@@ -7,8 +7,11 @@ public:
     std::string name;
     std::vector<LgsType*> types;
     std::vector<LgsVariable*> targetSymbols;
+    std::map<std::string, LgsFunc*> targetMethods;
+    std::map<std::string, LgsField*> targetFields;
 
     explicit LgsGroup(const std::string& name) : name(name) {}
+    LgsFunc* getMethod(const std::string& methodName) override;
     Type* getIRType(LgsLLVMGen& cg) override;
     std::string getName() override;
     LgsExpr* getZeroValue() override;

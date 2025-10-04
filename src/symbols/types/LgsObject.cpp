@@ -25,7 +25,6 @@ LgsFunc* LgsObject::getMethod(const std::string& methodName) {
         }
     }
     return nullptr;
-
 }
 
 Type* LgsObject::getIRType(LgsLLVMGen& cg) {

@@ -11,6 +11,8 @@ public:
     explicit LgsVariable(const std::string& name, LgsType* type = nullptr) : LgsExpr(type), name(name) {}
     Value* loadIR(LgsLLVMGen& cg) override;
     bool equals(LgsExpr* other) override;
+    LgsExpr* castTo(LgsType* toType, bool explicitCast) override;
+    Value* castToIR(LgsLLVMGen& cg, LgsType* toType) override;
     Value* hash(LgsLLVMGen& cg) override;
     void assign(LgsLLVMGen& cg, LgsExpr* expr) override;
     Value* eqIR(LgsLLVMGen& cg, Value* other) override;

@@ -8,7 +8,7 @@ object Obj2 {
 
 T = {Obj1, Obj2} -> (func)
 
-test(t: T) {
+f(t: T) {
     print(t.func())
 }
 

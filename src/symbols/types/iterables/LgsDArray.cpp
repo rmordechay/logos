@@ -1,5 +1,4 @@
 #include "types/iterables/LgsDArray.h"
-
 #include "Lgs_darray.h"
 #include "codegen/LgsLLVMGen.h"
 #include "exprs/LgsArrayExpr.h"
@@ -83,6 +82,9 @@ LgsFunc* LgsDArray::getAddFunc() {
     func->second->fn = [this](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
         if (!baseType->isPrimitive) {
             return cg.callLgsFunc("DArray_add", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {cg.getPtr(args[0]->IRValue), args[1]->IRValue});
+        }
+        if (baseType->asInt()) {
+            return cg.callLgsFunc("DArray_addInt", cg.voidTy(), {cg.ptrTy(), cg.i32Ty()}, {cg.getPtr(args[0]->IRValue), args[1]->IRValue});
         }
         if (baseType->asLong()) {
             return cg.callLgsFunc("DArray_addLong", cg.voidTy(), {cg.ptrTy(), cg.i64Ty()}, {cg.getPtr(args[0]->IRValue), args[1]->IRValue});

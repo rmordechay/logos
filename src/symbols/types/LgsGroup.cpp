@@ -1,6 +1,12 @@
 #include "types/LgsGroup.h"
 
-
+LgsFunc* LgsGroup::getMethod(const std::string& methodName) {
+    const auto method = targetMethods.find(methodName);
+    if (method != targetMethods.end() && method->second) {
+        return method->second;
+    }
+    return nullptr;
+}
 
 Type* LgsGroup::getIRType(LgsLLVMGen& cg) {
     return cg.ptrTy();

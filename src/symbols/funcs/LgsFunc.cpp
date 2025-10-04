@@ -12,7 +12,7 @@ Value* LgsFunc::call(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
     if (fn) return fn(cg, args);
     std::vector<Value*> IRArgs;
     for (int i = 0; i < args.size(); ++i) {
-        auto arg = args[i];
+        const auto arg = args[i];
         const auto& param = funcType->params[i];
         const auto isSelf = funcType->isMethod && i == 0;
         if (!isSelf && !arg->type->equals(param.type)) {

@@ -18,7 +18,7 @@
 
 class LgsTypeExpr;
 
-LgsExpr* LgsExpr::castTo(LgsType* toType, bool explicitCast) {
+LgsExpr* LgsExpr::castTo(LgsType* toType, const bool explicitCast) {
     assert(0);
 }
 

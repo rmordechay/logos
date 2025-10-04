@@ -47,10 +47,8 @@ bool LgsFuncCall::equalsDefaultParams(const LgsFuncType* funcType) const {
 }
 
 void LgsFuncCall::resolveVirtualFunc(LgsLLVMGen& cg) const {
-    const auto self = args[0];
     const auto keyIR = cg.getIRStr(func->funcType->getName());
-    const auto selfPtr = self->IRValue;
-    func->IRValue = cg.callLgsFunc("vtable_get", cg.ptrTy(), {cg.ptrTy(), cg.ptrTy()}, {selfPtr, keyIR});
+    func->IRValue = cg.callLgsFunc("vtable_get", cg.ptrTy(), {cg.ptrTy()}, {keyIR});
 }
 
 std::string LgsFuncCall::getName() {

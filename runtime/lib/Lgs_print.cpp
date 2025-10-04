@@ -48,7 +48,7 @@ std::string formatElement(const Lgs_RTType type, void* elem) {
         oss << *static_cast<const double*>(elem);
         break;
     case RTT_STR: {
-        oss << *static_cast<const char*>(elem);
+        oss << static_cast<const char*>(elem);
         break;
     }
     case RTT_VEC2: {

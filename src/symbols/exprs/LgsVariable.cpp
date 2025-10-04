@@ -30,6 +30,32 @@ bool LgsVariable::equals(LgsExpr* other) {
     assert(0);
 }
 
+LgsExpr* LgsVariable::castTo(LgsType* toType, const bool explicitCast) {
+    switch (ref.symbolType) {
+    case PARAM:
+        assert(0);
+    case VAR_DEC:
+        return ref.varDec->expr->castTo(toType);
+    case FIELD:
+        assert(0);
+    default:
+        assert(0);
+    }
+}
+
+Value* LgsVariable::castToIR(LgsLLVMGen& cg, LgsType* toType) {
+    switch (ref.symbolType) {
+    case PARAM:
+        assert(0);
+    case VAR_DEC:
+        return ref.varDec->expr->castToIR(cg, toType);
+    case FIELD:
+        assert(0);
+    default:
+        assert(0);
+    }
+}
+
 void LgsVariable::assign(LgsLLVMGen& cg, LgsExpr* expr) {
     freeOwner(cg);
     owner = expr->owner;
