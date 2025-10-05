@@ -354,15 +354,6 @@ void LgsSema::visitBoolPatternMatching(LgsPatternMatching* pm) {
     }
 }
 
-void LgsSema::visitWhileLoop(const LgsWhileLoop* whileLoop) {
-    visitExpr(whileLoop->condExpr);
-    const auto condType = whileLoop->condExpr->type;
-    if (!condType->asBool()) {
-        return errHandler.addError(E10066, &whileLoop->location, {whileLoop->condExpr->getName(), condType->pname()});
-    }
-    visitStmtsBlock(whileLoop->stmtsBlock);
-}
-
 void LgsSema::visitLoopStmt(LgsForLoop* loopStmt) {
     stack.enterScope(loopStmt);
     if (const auto rangeLoop = loopStmt->asRangeLoop()) {
@@ -383,8 +374,8 @@ void LgsSema::visitRangeLoop(LgsRangeLoop* rangeLoop) {
     const auto startRange = rangeLoop->startRange;
     const auto endRange = rangeLoop->endRange;
     assert(endRange);
-    visitExpr(startRange);
     visitExpr(endRange);
+    visitExpr(startRange);
     if (endRange->type && !endRange->type->isNumber()) {
         errHandler.addError(E10082, &endRange->location, {endRange->getName(), endRange->type->pname()});
     }
@@ -436,6 +427,15 @@ void LgsSema::visitInfiniteLoop(const LgsInfiniteLoop* infiniteLoop) {
         addLocalSymbol(LgsSymbol(infiniteLoop->loopVars.front()));
     }
     visitStmtsBlock(infiniteLoop->stmtsBlock);
+}
+
+void LgsSema::visitWhileLoop(const LgsWhileLoop* whileLoop) {
+    visitExpr(whileLoop->condExpr);
+    const auto condType = whileLoop->condExpr->type;
+    if (!condType->asBool()) {
+        return errHandler.addError(E10066, &whileLoop->location, {whileLoop->condExpr->getName(), condType->pname()});
+    }
+    visitStmtsBlock(whileLoop->stmtsBlock);
 }
 
 void LgsSema::visitCoroutine(const LgsCoroutine* coroutine) {

@@ -109,7 +109,7 @@ public:
     LgsExpr* getConstant(LogosParser::ConstantContext* ctx);
     LgsStrConst* getStrConst(antlr4::tree::TerminalNode* ctx);
     LgsNull* getNullValue(const antlr4::tree::TerminalNode* ctx) const;
-    LgsExpr* getLoopMetaVar(LogosParser::ForVariableContext* ctx) const;
+    LgsExpr* getLoopMetaVar(antlr4::tree::TerminalNode* ctx) const;
     LgsInstance* getObjectFromJson(LogosParser::JsonObjContext* ctx);
     LgsArrayExpr* getArrayExprFromJson(LogosParser::JsonArrayContext* ctx);
     LgsType* getType(LogosParser::TypeContext* ctx);

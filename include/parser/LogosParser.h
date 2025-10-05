@@ -26,11 +26,10 @@ public:
     EXTERN = 59, VISIBILITY = 60, IMPLEMENTS = 61, CONST = 62, ENUM = 63, 
     GO = 64, DEFER = 65, IO = 66, OWNER = 67, AND = 68, OR = 69, NOT = 70, 
     IN = 71, IF = 72, WHILE = 73, ELSE = 74, BREAK = 75, CONTINUE = 76, 
-    RETURN = 77, FOR = 78, FOR_I = 79, FOREVER = 80, FOR_PREV = 81, FOR_NEXT = 82, 
-    FOR_IS_FIRST = 83, FOR_IS_LAST = 84, JSON = 85, VEC2 = 86, VEC3 = 87, 
-    VEC4 = 88, LONG = 89, INTEGER = 90, FLOAT = 91, BOOL = 92, NULL_ = 93, 
-    IDENTIFIER = 94, STRING = 95, TAG = 96, LINE_COMMENT = 97, BLOCK_COMMENT = 98, 
-    WS = 99
+    RETURN = 77, FOR = 78, FOR_META = 79, FOREVER = 80, JSON = 81, VEC2 = 82, 
+    VEC3 = 83, VEC4 = 84, LONG = 85, INTEGER = 86, FLOAT = 87, BOOL = 88, 
+    NULL_ = 89, IDENTIFIER = 90, STRING = 91, TAG = 92, LINE_COMMENT = 93, 
+    BLOCK_COMMENT = 94, WS = 95
   };
 
   enum {
@@ -51,11 +50,11 @@ public:
     RuleHashMap = 52, RuleKeyValue = 53, RuleFuncCall = 54, RuleFuncArgList = 55, 
     RuleFuncArg = 56, RuleInstance = 57, RuleInstanceArgList = 58, RuleInstanceArg = 59, 
     RuleConstant = 60, RuleIterIndex = 61, RuleIndex = 62, RuleSelection = 63, 
-    RuleFirstSelectionElement = 64, RuleInnerSelectionElement = 65, RuleForVariable = 66, 
-    RuleRange = 67, RuleType = 68, RuleMapType = 69, RuleFuncType = 70, 
-    RuleVector = 71, RuleExtern_c = 72, RuleExtern_cpp = 73, RuleRequireEnvVars = 74, 
-    RuleRequirePackages = 75, RuleAssignemntOp = 76, RuleJson = 77, RuleJsonObj = 78, 
-    RuleJsonPair = 79, RuleJsonArray = 80
+    RuleFirstSelectionElement = 64, RuleInnerSelectionElement = 65, RuleRange = 66, 
+    RuleType = 67, RuleMapType = 68, RuleFuncType = 69, RuleVector = 70, 
+    RuleExtern_c = 71, RuleExtern_cpp = 72, RuleRequireEnvVars = 73, RuleRequirePackages = 74, 
+    RuleAssignemntOp = 75, RuleJson = 76, RuleJsonObj = 77, RuleJsonPair = 78, 
+    RuleJsonArray = 79
   };
 
   explicit LogosParser(antlr4::TokenStream *input);
@@ -141,7 +140,6 @@ public:
   class SelectionContext;
   class FirstSelectionElementContext;
   class InnerSelectionElementContext;
-  class ForVariableContext;
   class RangeContext;
   class TypeContext;
   class MapTypeContext;
@@ -958,7 +956,7 @@ public:
     SelectionContext *selection();
     ArrayExprContext *arrayExpr();
     HashMapContext *hashMap();
-    ForVariableContext *forVariable();
+    antlr4::tree::TerminalNode *FOR_META();
     antlr4::tree::TerminalNode *SELF_INSTANCE();
     antlr4::tree::TerminalNode *SELF_CLASS();
     antlr4::tree::TerminalNode *NULL_();
@@ -1226,21 +1224,6 @@ public:
   };
 
   InnerSelectionElementContext* innerSelectionElement();
-
-  class  ForVariableContext : public antlr4::ParserRuleContext {
-  public:
-    ForVariableContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *FOR_I();
-    antlr4::tree::TerminalNode *FOR_IS_FIRST();
-    antlr4::tree::TerminalNode *FOR_IS_LAST();
-    antlr4::tree::TerminalNode *FOR_PREV();
-    antlr4::tree::TerminalNode *FOR_NEXT();
-
-   
-  };
-
-  ForVariableContext* forVariable();
 
   class  RangeContext : public antlr4::ParserRuleContext {
   public:

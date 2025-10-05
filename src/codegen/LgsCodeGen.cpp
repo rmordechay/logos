@@ -311,6 +311,8 @@ void LgsCodeGen::visitLoopMetaVar(LgsLoopMetaVar* metaVar) {
         metaVar->IRValue = cg.builder.CreateICmpEQ(iValue, decremented);
         break;
     }
+    case FOR_ELEMENT:
+        break;
     }
 }
 

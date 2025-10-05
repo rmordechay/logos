@@ -806,7 +806,7 @@ LgsExpr* LgsParserAdapter::getUnaryExpr(LogosParser::UnaryExprContext* ctx) {
     if (const auto hashMap = ctx->hashMap()) return getHashMap(hashMap);
     if (const auto iterIndex = ctx->iterIndex()) return getIterIndex(iterIndex);
     if (const auto selection = ctx->selection()) return getSelection(selection);
-    if (const auto isFirst = ctx->forVariable()) return getLoopMetaVar(isFirst);
+    if (const auto forMeta = ctx->FOR_META()) return getLoopMetaVar(forMeta);
     if (const auto func = ctx->lambda()) return getLambda(func);
     if (const auto vector = ctx->vector()) return getVectorExpr(vector);
     if (const auto null = ctx->NULL_()) return getNullValue(null);
@@ -1098,25 +1098,28 @@ LgsNull* LgsParserAdapter::getNullValue(const antlr4::tree::TerminalNode* ctx) c
     return lgsNull;
 }
 
-LgsExpr* LgsParserAdapter::getLoopMetaVar(LogosParser::ForVariableContext* ctx) const {
+LgsExpr* LgsParserAdapter::getLoopMetaVar(antlr4::tree::TerminalNode* ctx) const {
     LgsLoopMetaVar* var;
-    if (ctx->FOR_I()) {
-        var = new LgsLoopMetaVar(FOR_I);
+    const auto name = ctx->getText();
+    if (name == FOR_I_NAME) {
+        var = new LgsLoopMetaVar(name, FOR_I);
         var->type = &LGS_SIZE;
-    } else if (ctx->FOR_PREV()) {
-        var = new LgsLoopMetaVar(FOR_PREV);
-    } else if (ctx->FOR_NEXT()) {
-        var = new LgsLoopMetaVar(FOR_NEXT);
-    } else if (ctx->FOR_IS_FIRST()) {
-        var = new LgsLoopMetaVar(FOR_IS_FIRST);
+    } else if (name == FOR_PREV_NAME) {
+        var = new LgsLoopMetaVar(name, FOR_PREV);
+    } else if (name == FOR_NEXT_NAME) {
+        var = new LgsLoopMetaVar(name, FOR_NEXT);
+    } else if (name == FOR_IS_FIRST_NAME) {
+        var = new LgsLoopMetaVar(name, FOR_IS_FIRST);
         var->type = &LGS_BOOL;
-    } else if (ctx->FOR_IS_LAST()) {
-        var = new LgsLoopMetaVar(FOR_IS_LAST);
+    } else if (name == FOR_IS_LAST_NAME) {
+        var = new LgsLoopMetaVar(name, FOR_IS_LAST);
         var->type = &LGS_BOOL;
+    } else if (name == FOR_ELEMENT_NAME) {
+        var = new LgsLoopMetaVar(name, FOR_ELEMENT);
     } else {
         assert(0);
     }
-    setLocation(var->location, ctx->start, ctx->stop);
+    setLocation(var->location, ctx->getSymbol(), nullptr);
     return var;
 }
 

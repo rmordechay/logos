@@ -5,19 +5,7 @@ Value* LgsLoopMetaVar::loadIR(LgsLLVMGen& cg) {
 }
 
 std::string LgsLoopMetaVar::getName() {
-    switch (varType) {
-    case FOR_I:
-        return "for.i";
-    case FOR_IS_FIRST:
-        return "for.isFirst";
-    case FOR_IS_LAST:
-        return "for.isLast";
-    case FOR_PREV:
-        return "for.prev";
-    case FOR_NEXT:
-        return "for.next";
-    }
-    assert(0);
+    return name;
 }
 
 json::value LgsLoopMetaVar::asJsonStr() {
