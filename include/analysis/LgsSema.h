@@ -116,7 +116,7 @@ public:
     void visitGroup(LgsGroup* group);
     void visitLoopMetaVar(LgsLoopMetaVar* metaVar);
 
-    void validateExprType(const LgsExpr* expr, LgsType* type);
+    void validateExprType(LgsExpr* expr, LgsType* type);
     void validateObjImplements(LgsObject* obj, const std::vector<LgsType*>& interfaces);
     void validateObjInterface(LgsObject* obj, LgsInterface* interface);
     void validateIndex(LgsIterIndex* iterIndex);

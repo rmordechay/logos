@@ -13,6 +13,7 @@
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
 #include "exprs/LgsJson.h"
+#include "exprs/LgsNull.h"
 #include "exprs/LgsTypeExpr.h"
 #include "loops/LgsLoopMetaVar.h"
 
@@ -84,6 +85,7 @@ void LgsExpr::setType(LgsType* newType) {
     type = newType;
 }
 
+
 bool LgsExpr::equals(LgsExpr* other) {
     assert(0);
 }
@@ -93,6 +95,7 @@ LgsExpr* LgsExpr::clone() {
 }
 
 // Casting
+LgsNull* LgsExpr::asNull() { return dynamic_cast<LgsNull*>(this); }
 LgsFunc* LgsExpr::asFunc() { return dynamic_cast<LgsFunc*>(this); }
 LgsVariable* LgsExpr::asVariable() { return dynamic_cast<LgsVariable*>(this); }
 LgsPrefixExpr* LgsExpr::asPrefixExpr() { return dynamic_cast<LgsPrefixExpr*>(this); }

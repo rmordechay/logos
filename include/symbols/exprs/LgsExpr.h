@@ -2,6 +2,7 @@
 #include <stmts/LgsStmt.h>
 #include "LgsValue.h"
 
+class LgsNull;
 class LgsJson;
 class LgsCast;
 class LgsTypeExpr;
@@ -45,7 +46,6 @@ enum LgsAssignType {
 class LgsExpr : virtual public LgsStmt {
 public:
     LgsType* type = nullptr;
-    bool isNull = false;
     bool isSpread = false;
     bool isMutable = false;
     LgsValue* owner = nullptr;
@@ -64,6 +64,7 @@ public:
     int64_t getConstInt();
     std::string getConstStr();
     void setType(LgsType* newType);
+    LgsNull* asNull();
     LgsFunc* asFunc();
     LgsVariable* asVariable();
     LgsPrefixExpr* asPrefixExpr();

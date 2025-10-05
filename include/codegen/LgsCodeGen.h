@@ -112,8 +112,8 @@ public:
     void visitStrConst(LgsStrConst* strConst);
     void visitIterIndex(LgsIterIndex* iterIndex, bool inAssignment = false);
     void visitInstance(LgsInstance* instance);
-    void visitTypeExpr(LgsTypeExpr* typeExpr);
     void visitJson(LgsJson* json);
+    void visitNull(LgsNull* null) const;
 
     void initFields(LgsInstance* instance);
     bool checkMock(LgsExpr* expr);

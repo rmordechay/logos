@@ -4,7 +4,7 @@
 #include "utils/LgsUtils.h"
 
 Type* LgsNullable::getIRType(LgsLLVMGen& cg) {
-    return cg.ptrTy();
+    return cg.getStructType({cg.ptrTy(), cg.i1Ty()});
 }
 
 LgsExpr* LgsNullable::getZeroValue() {

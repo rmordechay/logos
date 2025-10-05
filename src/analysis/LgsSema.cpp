@@ -1100,8 +1100,8 @@ std::string getMissingImplementsStr(const std::vector<LgsField*>& fields, const 
     return str.str();
 }
 
-void LgsSema::validateExprType(const LgsExpr* expr, LgsType* type) {
-    if (expr->isNull) {
+void LgsSema::validateExprType(LgsExpr* expr, LgsType* type) {
+    if (expr->asNull()) {
         // null must have a type
         if (!type || type->isUnknown()) {
             return errHandler.addError(E10024, &expr->location);

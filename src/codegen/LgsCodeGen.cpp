@@ -602,8 +602,9 @@ void LgsCodeGen::visitExpr(LgsExpr* expr) {
         if (const auto floatConst = expr->asFloatConst()) return visitFloatConst(floatConst);
         if (const auto loopMetaVar = expr->asLoopMetaVar()) return visitLoopMetaVar(loopMetaVar);
         if (const auto cast = expr->asCast()) return visitCast(cast);
-        if (const auto typeExpr = expr->asTypeExpr()) return visitTypeExpr(typeExpr);
         if (const auto json = expr->asJson()) return visitJson(json);
+        if (const auto null = expr->asNull()) return visitNull(null);
+        if (expr->asTypeExpr()) return;
         assert(0);
     }
 }
@@ -822,7 +823,7 @@ void LgsCodeGen::visitSelection(LgsSelection* selection) {
             field->parentIRType = parent->type->getIRType(cg);
             visitField(field);
             if (field->type->asObject()) {
-                child->IRValue = cg.builder.CreateLoad(cg.ptrTy(), field->IRValue);;
+                child->IRValue = cg.builder.CreateLoad(cg.ptrTy(), field->IRValue);
             } else {
                 child->IRValue = field->IRValue;
             }
@@ -962,10 +963,6 @@ void LgsCodeGen::visitInstance(LgsInstance* instance) {
     }
 }
 
-void LgsCodeGen::visitTypeExpr(LgsTypeExpr* typeExpr) {
-
-}
-
 void LgsCodeGen::visitJson(LgsJson* json) {
     if (const auto instance = json->instance) {
         json->instance->destPtrValue = json->destPtrValue;
@@ -991,6 +988,10 @@ void LgsCodeGen::visitJson(LgsJson* json) {
         null->IRValue = cg.null();
         json->IRValue = null->IRValue;
     }
+}
+
+void LgsCodeGen::visitNull(LgsNull* null) const {
+    null->IRValue = cg.null();
 }
 
 void LgsCodeGen::initFields(LgsInstance* instance) {

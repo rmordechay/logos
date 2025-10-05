@@ -30,6 +30,7 @@ public:
     Value* inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
     Value* lengthIR(LgsLLVMGen& cg, Value* iterable) override;
     Value* getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) override;
+    Value* dotProduct(LgsLLVMGen& cg, Value* lhs, Value* rhs);
     static int8_t getSwizzleSet(char c);
     static int8_t getComponentIndex(char c);
     std::string strFormatPart() const override;
