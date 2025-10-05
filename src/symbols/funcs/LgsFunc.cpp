@@ -16,8 +16,7 @@ Value* LgsFunc::call(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
         const auto& param = funcType->params[i];
         const auto isSelf = funcType->isMethod && i == 0;
         if (!isSelf && !arg->type->equals(param.type)) {
-            const auto cast = arg->castToIR(cg, param.type);
-            IRArgs.emplace_back(cast);
+            IRArgs.emplace_back(arg->castToIR(cg, param.type));
         } else {
             IRArgs.emplace_back(arg->IRValue);
         }

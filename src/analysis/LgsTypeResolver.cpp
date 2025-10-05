@@ -105,6 +105,7 @@ void LgsTypeResolver::resolveMainFileTypes(LgsMainFile* mf) {
     }
     for (const auto subtype : mf->subtypes) {
         subtype->subtype = resolveType(subtype->subtype, mf);
+        subtype->isPrimitive = subtype->subtype->isPrimitive;
     }
     for (const auto [_, func] : mf->funcs) {
         if (dynamic_cast<LgsMainFunc*>(func)) continue;

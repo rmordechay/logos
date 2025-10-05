@@ -42,10 +42,10 @@ std::string formatElement(const Lgs_RTType type, void* elem) {
         oss << *static_cast<const uint64_t*>(elem);
         break;
     case RTT_FLOAT:
-        oss << *static_cast<const float*>(elem);
+        oss << *static_cast<const float_t*>(elem);
         break;
     case RTT_DOUBLE:
-        oss << *static_cast<const double*>(elem);
+        oss << *static_cast<const double_t*>(elem);
         break;
     case RTT_STR: {
         oss << static_cast<const char*>(elem);
