@@ -7,7 +7,7 @@
 #include "utils/LgsErrHandler.h"
 #include "stmts/LgsAssignment.h"
 
-class LgsNull;
+class LgsNullableExpr;
 struct LgsSymbol;
 struct LgsAppConfigs;
 struct LgsSymbolTable;
@@ -108,7 +108,7 @@ public:
     LgsIterIndex* getIterIndex(LogosParser::IterIndexContext* ctx);
     LgsExpr* getConstant(LogosParser::ConstantContext* ctx);
     LgsStrConst* getStrConst(antlr4::tree::TerminalNode* ctx);
-    LgsNull* getNullValue(const antlr4::tree::TerminalNode* ctx) const;
+    LgsNullableExpr* getNullValue(const antlr4::tree::TerminalNode* ctx) const;
     LgsExpr* getLoopMetaVar(antlr4::tree::TerminalNode* ctx) const;
     LgsInstance* getObjectFromJson(LogosParser::JsonObjContext* ctx);
     LgsArrayExpr* getArrayExprFromJson(LogosParser::JsonArrayContext* ctx);

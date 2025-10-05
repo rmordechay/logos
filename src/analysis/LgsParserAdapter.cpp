@@ -5,7 +5,7 @@
 #include "LogosLexer.h"
 #include "LogosParser.h"
 #include "exprs/LgsCast.h"
-#include "exprs/LgsNull.h"
+#include "exprs/LgsNullableExpr.h"
 #include "exprs/LgsBinaryExpr.h"
 #include "exprs/constants/LgsCharConst.h"
 #include "exprs/constants/LgsFloatConst.h"
@@ -45,6 +45,7 @@
 #include "types/LgsInterface.h"
 #include "types/iterables/LgsMap.h"
 #include "types/LgsNullable.h"
+#include "types/LgsPtr.h"
 #include "types/LgsUnknown.h"
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsByte.h"
@@ -583,9 +584,7 @@ LgsVarDec* LgsParserAdapter::getVarDec(antlr4::tree::TerminalNode* name, const b
 }
 
 LgsVarDec* LgsParserAdapter::getImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx) {
-    const auto varDec = getVarDec(ctx->IDENTIFIER(), !!ctx->QUEST_MARK(), getExpr(ctx->expr()));
-    varDec->isNullable = !!ctx->QUEST_MARK();
-    varDec->isConst = !!ctx->CONST();
+    const auto varDec = getVarDec(ctx->IDENTIFIER(), !!ctx->CONST(), getExpr(ctx->expr()));
     varDec->isOwner = !!ctx->OWNER();
     return varDec;
 }
@@ -752,6 +751,11 @@ LgsExpr* LgsParserAdapter::getExpr(LogosParser::ExprContext* ctx) {
         expr = getUnaryExpr(unary);
     } else if (ctx->LPAREN() && ctx->RPAREN()) {
         expr = getExpr(ctx->left);
+    }
+    if (ctx->QUEST_MARK()) {
+        const auto nullableExpr = new LgsNullableExpr(expr);
+        setLocation(nullableExpr->location, ctx->start, ctx->stop);
+        expr = nullableExpr;
     }
     return expr;
 }
@@ -1092,8 +1096,8 @@ LgsStrConst* LgsParserAdapter::getStrConst(antlr4::tree::TerminalNode* ctx) {
     return strConst;
 }
 
-LgsNull* LgsParserAdapter::getNullValue(const antlr4::tree::TerminalNode* ctx) const {
-    const auto lgsNull = new LgsNull();
+LgsNullableExpr* LgsParserAdapter::getNullValue(const antlr4::tree::TerminalNode* ctx) const {
+    const auto lgsNull = new LgsNullableExpr();
     setLocation(lgsNull->location, ctx->getSymbol(), nullptr);
     return lgsNull;
 }

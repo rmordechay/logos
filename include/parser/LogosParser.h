@@ -710,7 +710,6 @@ public:
     ExprContext *expr();
     antlr4::tree::TerminalNode *OWNER();
     antlr4::tree::TerminalNode *CONST();
-    antlr4::tree::TerminalNode *QUEST_MARK();
 
    
   };
@@ -914,6 +913,7 @@ public:
     antlr4::tree::TerminalNode *ARROW();
     TypeContext *type();
     UnaryExprContext *unaryExpr();
+    antlr4::tree::TerminalNode *QUEST_MARK();
     antlr4::tree::TerminalNode *STAR();
     antlr4::tree::TerminalNode *SLASH();
     antlr4::tree::TerminalNode *PERCENT();

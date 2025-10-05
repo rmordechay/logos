@@ -11,6 +11,7 @@ void LgsErrHandler::addError(const LgsBaseError& lgsErr, const LgsLocation* loca
     setUnsuccessful();
     const auto result = LGS_ERROR_PADDING + formatErrorMsg(lgsErr.msg, args);
     if (location) {
+        assert(location->fileID != 0);
         errors.emplace_back(LgsError{.msg = result, .errCode = lgsErr.code, .location = *location});
     } else {
         errors.emplace_back(LgsError{.msg = result, .errCode = lgsErr.code});

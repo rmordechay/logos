@@ -12,7 +12,7 @@
 #include "exprs/LgsInstance.h"
 #include "exprs/LgsIterIndex.h"
 #include "exprs/LgsJson.h"
-#include "exprs/LgsNull.h"
+#include "exprs/LgsNullableExpr.h"
 #include "exprs/LgsPostfixExpr.h"
 #include "exprs/LgsPrefixExpr.h"
 #include "exprs/LgsSelection.h"
@@ -143,6 +143,7 @@ void LgsCodeGen::visitGroup(LgsGroup* group) {
 }
 
 void LgsCodeGen::visitField(LgsField* field) const {
+    if (field->IRValue) return;
     if (const auto vec = field->type->asVec()) {
         std::vector<int> mask(vec->vectorDim);
         for (unsigned i = 0; i < vec->vectorDim; i++) {
@@ -156,7 +157,6 @@ void LgsCodeGen::visitField(LgsField* field) const {
         cg.builder.CreateStore(newVec, field->IRValue);
     } else {
         assert(field->parentIRType && field->parentIRValue);
-        if (field->IRValue) return;
         field->IRValue = cg.builder.CreateStructGEP(field->parentIRType, field->parentIRValue, field->position);
         if (field->expr) {
             field->expr->destPtrValue = field->IRValue;
@@ -355,6 +355,7 @@ void LgsCodeGen::visitAssignment(const LgsAssignment* assignment) {
     } else if (const auto selection = lValue->asSelection()) {
         visitSelection(selection);
     }
+    assignment->rValue->destPtrValue = lValue->IRValue;
     visitExpr(assignment->rValue);
 
     Value* results = nullptr;
@@ -601,9 +602,9 @@ void LgsCodeGen::visitExpr(LgsExpr* expr) {
         if (const auto intConst = expr->asIntConst()) return visitIntConst(intConst);
         if (const auto floatConst = expr->asFloatConst()) return visitFloatConst(floatConst);
         if (const auto loopMetaVar = expr->asLoopMetaVar()) return visitLoopMetaVar(loopMetaVar);
+        if (const auto null = expr->asNullableExpr()) return visitNullableExpr(null);
         if (const auto cast = expr->asCast()) return visitCast(cast);
         if (const auto json = expr->asJson()) return visitJson(json);
-        if (const auto null = expr->asNull()) return visitNull(null);
         if (expr->asTypeExpr()) return;
         assert(0);
     }
@@ -822,6 +823,19 @@ void LgsCodeGen::visitSelection(LgsSelection* selection) {
             field->parentIRValue = parent->IRValue;
             field->parentIRType = parent->type->getIRType(cg);
             visitField(field);
+            if (const auto nullable = field->type->asNullable()) {
+                const auto null = nullable->isNullIR(cg, field->IRValue);
+                const auto trueBlock = cg.createBlock();
+                const auto falseBlock = cg.createBlock();
+                const auto exitBlock = cg.createBlock();
+                cg.builder.CreateCondBr(null, trueBlock, falseBlock);
+                cg.startBlock(trueBlock);
+                cg.printStr("true\n");
+                cg.builder.CreateBr(exitBlock);
+                cg.startBlock(falseBlock);
+                cg.printStr("false\n");
+                cg.branchAndStartBlock(exitBlock);
+            }
             if (field->type->asObject()) {
                 child->IRValue = cg.builder.CreateLoad(cg.ptrTy(), field->IRValue);
             } else {
@@ -990,8 +1004,21 @@ void LgsCodeGen::visitJson(LgsJson* json) {
     }
 }
 
-void LgsCodeGen::visitNull(LgsNull* null) const {
-    null->IRValue = cg.null();
+void LgsCodeGen::visitNullableExpr(LgsNullableExpr* nullableExpr) {
+    if (nullableExpr->destPtrValue) {
+        nullableExpr->IRValue = nullableExpr->destPtrValue;
+    } else {
+        const auto nullStruct = nullableExpr->type->getIRType(cg);
+        nullableExpr->IRValue = cg.builder.CreateAlloca(nullStruct);
+    }
+
+    if (nullableExpr->isNull) {
+        nullableExpr->storeValue(cg, nullptr, true);
+    } else {
+        const auto baseType = nullableExpr->baseExpr;
+        visitExpr(baseType);
+        nullableExpr->storeValue(cg, baseType->IRValue, false);
+    }
 }
 
 void LgsCodeGen::initFields(LgsInstance* instance) {

@@ -113,7 +113,7 @@ public:
     void visitIterIndex(LgsIterIndex* iterIndex, bool inAssignment = false);
     void visitInstance(LgsInstance* instance);
     void visitJson(LgsJson* json);
-    void visitNull(LgsNull* null) const;
+    void visitNullableExpr(LgsNullableExpr* nullableExpr);
 
     void initFields(LgsInstance* instance);
     bool checkMock(LgsExpr* expr);

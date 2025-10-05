@@ -152,7 +152,7 @@ explicitVarDec:
     ;
 
 implicitVarDec:
-        OWNER? CONST? IDENTIFIER EQUAL expr QUEST_MARK?
+        OWNER? CONST? IDENTIFIER EQUAL expr
     ;
 
 ifStatement:
@@ -209,7 +209,7 @@ deferStmt:
 
 expr:
         LPAREN left=expr RPAREN (ARROW type)?
-    |   unaryExpr (ARROW cast=type)?
+    |   unaryExpr QUEST_MARK? (ARROW cast=type)?
     |   left=expr op=(STAR | SLASH | PERCENT) right=expr
     |   left=expr op=(PLUS | MINUS) right=expr
     |   left=expr op=(LANGLE | RANGLE | GE | LE) right=expr

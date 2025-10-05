@@ -53,6 +53,10 @@ Value* LgsValue::orIR(LgsLLVMGen& cg, Value* other) {
     assert(0);
 }
 
+LgsType* LgsValue::getType() {
+    assert(0);
+}
+
 std::string LgsValue::getName() {
     assert(0);
 }

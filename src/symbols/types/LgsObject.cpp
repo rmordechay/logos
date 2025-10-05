@@ -3,6 +3,8 @@
 #include "stmts/LgsField.h"
 #include "types/LgsGroup.h"
 #include "types/LgsInterface.h"
+#include "types/LgsNullable.h"
+
 #include <llvm/IR/Module.h>
 
 LgsFunc* LgsObject::getMethod(const std::string& methodName) {
@@ -115,7 +117,11 @@ std::string LgsObject::getName() {
 
 bool LgsObject::canCastTo(LgsType* other) {
     if (other->getName() == LgsAny::name) return true;
-    if (const auto otherInterface = other->asInterface()) {
+    auto otherType = other;
+    if (const auto nullable = other->asNullable()) {
+        otherType = nullable->baseType;
+    }
+    if (const auto otherInterface = otherType->asInterface()) {
         for (const auto objInterface : interfaces) {
             if (objInterface->getName() == otherInterface->name) {
                 return true;
@@ -123,7 +129,7 @@ bool LgsObject::canCastTo(LgsType* other) {
         }
         return false;
     }
-    if (const auto otherGroup = other->asGroup()) {
+    if (const auto otherGroup = otherType->asGroup()) {
         for (const auto otherGroupType : otherGroup->types) {
             if (name == otherGroupType->getName()) {
                 return true;
@@ -131,7 +137,7 @@ bool LgsObject::canCastTo(LgsType* other) {
         }
         return false;
     }
-    return name == other->getName();
+    return name == otherType->getName();
 }
 
 json::value LgsObject::asJsonStr() {

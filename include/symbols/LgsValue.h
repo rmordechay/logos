@@ -16,11 +16,12 @@ class LgsFunc;
 
 class LgsValue {
 public:
-    llvm::Value* IRValue = nullptr;
+    Value* IRValue = nullptr;
     LgsLocation location{0, 0, 0};
 
-    virtual std::string getName(); // pretty name
-    virtual llvm::Value* loadIR(LgsLLVMGen& cg);
+    virtual LgsType* getType();
+    virtual std::string getName();
+    virtual Value* loadIR(LgsLLVMGen& cg);
     virtual void setDebugValue(LgsLLVMGen& cg);
     virtual json::value asJsonStr() = 0;
     virtual Value* addIR(LgsLLVMGen& cg, Value* other);
@@ -35,6 +36,6 @@ public:
     virtual Value* leIR(LgsLLVMGen& cg, Value* other);
     virtual Value* andIR(LgsLLVMGen& cg, Value* other);
     virtual Value* orIR(LgsLLVMGen& cg, Value* other);
-    llvm::DILocation* getDebugLoc(LgsLLVMGen& cg) const;
+    DILocation* getDebugLoc(LgsLLVMGen& cg) const;
     virtual ~LgsValue() = default;
 };

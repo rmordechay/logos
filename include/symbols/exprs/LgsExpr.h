@@ -2,7 +2,7 @@
 #include <stmts/LgsStmt.h>
 #include "LgsValue.h"
 
-class LgsNull;
+class LgsNullableExpr;
 class LgsJson;
 class LgsCast;
 class LgsTypeExpr;
@@ -64,7 +64,7 @@ public:
     int64_t getConstInt();
     std::string getConstStr();
     void setType(LgsType* newType);
-    LgsNull* asNull();
+    LgsNullableExpr* asNullableExpr();
     LgsFunc* asFunc();
     LgsVariable* asVariable();
     LgsPrefixExpr* asPrefixExpr();

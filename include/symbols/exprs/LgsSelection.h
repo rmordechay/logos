@@ -8,7 +8,6 @@ public:
     explicit LgsSelection(const std::vector<LgsExpr*>& exprs) : exprs(exprs) {}
     Value* loadIR(LgsLLVMGen& cg) override;
     LgsExpr* lastExpr() const;
-    LgsExpr* lastExprParent() const;
     LgsFuncCall* asMethodCall() const;
     void assign(LgsLLVMGen& cg, LgsExpr* expr) override;
     std::string getName() override;

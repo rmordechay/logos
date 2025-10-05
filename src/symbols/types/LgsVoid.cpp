@@ -1,7 +1,5 @@
 #include "symbols/types/LgsVoid.h"
-
 #include "codegen/LgsLLVMGen.h"
-#include "exprs/LgsNull.h"
 
 Type* LgsVoid::getIRType(LgsLLVMGen& cg) {
     return Type::getVoidTy(cg.context);

@@ -21,15 +21,15 @@
 #include "types/primitives/LgsSize.h"
 #include "types/primitives/LgsUInt.h"
 
-LgsField* LgsType::getField(const std::string& name) {
+LgsField* LgsType::getField(const std::string& fieldName) {
     for (auto* f : fields) {
-        if (f->name == name) return f;
+        if (f->name == fieldName) return f;
     }
     if (const auto vec = asVec()) {
-        for (auto* f : fields) if (f->name == name) return f;
-        const size_t newFieldDim = name.size();
+        for (auto* f : fields) if (f->name == fieldName) return f;
+        const size_t newFieldDim = fieldName.size();
         const auto scalarOrVector = newFieldDim == 1 ? vec->baseType : new LgsVec(newFieldDim);
-        const auto field = new LgsField(name, scalarOrVector);
+        const auto field = new LgsField(fieldName, scalarOrVector);
         addField(field);
         return field;
     }
@@ -75,10 +75,6 @@ bool LgsType::isNumber() const {
 
 bool LgsType::isBig() {
     return (asObject() || asDArray()) && getSizeBytes() >= BIG_SIZE_THRESHOLD;
-}
-
-bool LgsType::isNullable() {
-    return asNullable() || asPtr();
 }
 
 bool LgsType::isUnknown() {

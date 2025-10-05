@@ -13,10 +13,6 @@ LgsExpr* LgsSelection::lastExpr() const {
     return exprs[exprs.size() - 1];
 }
 
-LgsExpr* LgsSelection::lastExprParent() const {
-    return exprs[exprs.size() - 2];
-}
-
 LgsFuncCall* LgsSelection::asMethodCall() const {
     return lastExpr()->asFuncCall();
 }
