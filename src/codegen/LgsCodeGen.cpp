@@ -713,8 +713,10 @@ void LgsCodeGen::visitArrayExpr(LgsArrayExpr* array) {
     }
     if (array->type->asSArray()) {
         setStaticArray(array);
-    } else if (array->type->asDArray() || array->type->asSet()) {
+    } else if (array->type->asDArray()) {
         setDynamicArray(array);
+    } else if (array->type->asSet()) {
+        setSetExpr(array);
     } else {
         assert(0);
     }
@@ -1175,11 +1177,25 @@ void LgsCodeGen::setNestedSArr(const LgsArrayExpr* arrayExpr, Type* parentType, 
 void LgsCodeGen::setDynamicArray(LgsArrayExpr* arrayExpr) {
     const auto arr = arrayExpr->type->asDArray();
     const auto size = arr->baseType->getSizeBytes();
-    const auto elementSize = cg.i64(size);
-    const auto arrSize = cg.typeSize(arr->getArrStruct(cg));
-    arrayExpr->IRValue = cg.callMalloc(arrSize.getFixedValue(), arrayExpr->owner, arr->getRTType());
+    arrayExpr->IRValue = cg.callMalloc(arr->getSizeBytes(), arrayExpr->owner, arr->getRTType());
     LgsFunc initFunc("init", &LGS_VOID, {arr, &LGS_SIZE, &LGS_SIZE}, BUILTIN | METHOD);
-    initFunc.callIR(cg, {arrayExpr->IRValue, elementSize, cg.usize(arr->baseType->getRTType())});
+    initFunc.callIR(cg, {arrayExpr->IRValue, cg.i64(size), cg.usize(arr->baseType->getRTType())});
+
+    for (int i = 0; i < arrayExpr->initialElements.size(); ++i) {
+        const auto element = arrayExpr->initialElements[i];
+        element->destPtrValue = arrayExpr->IRValue;
+        visitExpr(element);
+        arr->getAddFunc()->call(cg, {arrayExpr, element});
+    }
+}
+
+void LgsCodeGen::setSetExpr(LgsArrayExpr* arrayExpr) {
+    const auto arr = arrayExpr->type->asSet();
+    const auto size = arr->baseType->getSizeBytes();
+    arrayExpr->IRValue = cg.callMalloc(arr->getSizeBytes(), arrayExpr->owner, arr->getRTType());
+    LgsFunc initFunc("init", &LGS_VOID, {arr, &LGS_SIZE, &LGS_SIZE}, BUILTIN | METHOD);
+    initFunc.callIR(cg, {arrayExpr->IRValue, cg.i64(size), cg.usize(arr->baseType->getRTType())});
+
     for (int i = 0; i < arrayExpr->initialElements.size(); ++i) {
         const auto element = arrayExpr->initialElements[i];
         element->destPtrValue = arrayExpr->IRValue;

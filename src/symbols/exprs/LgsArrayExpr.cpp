@@ -20,7 +20,7 @@ void LgsArrayExpr::completeType(LgsType* toType) {
             } else {
                 if (element->type->canCastTo(otherBaseType)) {
                     const auto castTo = element->castTo(otherBaseType);
-                    freeExpr(element);
+                    if (element != castTo) freeExpr(element);
                     initialElements[i] = castTo;
                 }
             }

@@ -579,23 +579,19 @@ void LgsSema::visitStaticArray(const LgsArrayExpr* arrayExpr) {
     }
 }
 
-void LgsSema::visitDynamicArray(LgsArrayExpr* array) {
-    const auto dArr = array->type->asIterable();
-    if (!dArr->size) {
-        dArr->size = new LgsIntConst(&LGS_LONG, array->initialElements.size());
-    }
-
-    if (!dArr->baseType && array->initialElements.empty()) {
-        return errHandler.addError(E10049, &array->location, {array->getName()});
+void LgsSema::visitDynamicArray(LgsArrayExpr* arrayExpr) {
+    const auto dArr = arrayExpr->type->asIterable();
+    if (!dArr->baseType && arrayExpr->initialElements.empty()) {
+        return errHandler.addError(E10049, &arrayExpr->location, {arrayExpr->getName()});
     }
 
     LgsType* baseType = nullptr;
     if (dArr->baseType) {
         baseType = dArr->baseType;
-    } else if (const auto innerArr = array->initialElements.front()->asArrayExpr()) {
+    } else if (const auto innerArr = arrayExpr->initialElements.front()->asArrayExpr()) {
         baseType = innerArr->type;
     } else {
-        baseType = array->initialElements.front()->type;
+        baseType = arrayExpr->initialElements.front()->type;
     }
     dArr->baseType = baseType;
 }

@@ -92,7 +92,7 @@ public:
     void visitCast(LgsCast* cast);
     void visitArrayExpr(LgsArrayExpr* arrayExpr);
     void visitStaticArray(const LgsArrayExpr* arrayExpr);
-    void visitDynamicArray(LgsArrayExpr* array);
+    void visitDynamicArray(LgsArrayExpr* arrayExpr);
     void visitHashMap(LgsHashMap* hashMap);
     void visitVectorExpr(const LgsVectorExpr* vectorExpr);
     void visitVariable(LgsVariable* variable);

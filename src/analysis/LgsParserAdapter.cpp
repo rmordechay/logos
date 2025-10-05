@@ -890,9 +890,8 @@ LgsPostfixExpr* LgsParserAdapter::getPostfixExpr(LogosParser::PostfixExprContext
 
 LgsArrayExpr* LgsParserAdapter::getArrayExpr(LogosParser::ArrayExprContext* ctx) {
     LgsArrayExpr* array = nullptr;
-    if (ctx->LBRACE() && ctx->RBRACE()) {
+    if (ctx->EXCLA_MARK()) {
         array = new LgsArrayExpr(new LgsSet());
-        array->type->asIterable()->size = new LgsIntConst(&LGS_INT, ctx->expr().size());
     } else {
         array = new LgsArrayExpr(new LgsDArray());
     }
@@ -900,6 +899,7 @@ LgsArrayExpr* LgsParserAdapter::getArrayExpr(LogosParser::ArrayExprContext* ctx)
     for (const auto expr : ctx->expr()) {
         array->initialElements.emplace_back(getExpr(expr));
     }
+    array->type->asIterable()->size = new LgsIntConst(&LGS_SIZE, array->initialElements.size());
     return array;
 }
 
@@ -1156,7 +1156,7 @@ LgsType* LgsParserAdapter::getType(LogosParser::TypeContext* ctx) {
     const auto c = ctx->RBRACK().empty();
     if (const auto mapType = ctx->mapType()) {
         result = new LgsMap(getType(mapType->key), getType(mapType->value));
-    } else if ((!ctx->LBRACK().empty() && !ctx->RBRACK().empty()) || (!ctx->LBRACE().empty() && !ctx->RBRACE().empty())) {
+    } else if (!ctx->LBRACK().empty() && !ctx->RBRACK().empty()) {
         result = getArrayType(ctx);
     } else if (const auto funcType = ctx->funcType()) {
         result = getFuncType(funcType);
@@ -1199,16 +1199,15 @@ LgsFuncType* LgsParserAdapter::getFuncType(LogosParser::FuncTypeContext* ctx) {
 
 LgsType* LgsParserAdapter::getArrayType(LogosParser::TypeContext* ctx) {
     LgsType* type = getType(ctx->type());
-    const auto dims = !ctx->LBRACK().empty() ? ctx->LBRACK() : ctx->LBRACE();
-    for (int i = dims.size() - 1; i >= 0; --i) {
+    for (int i = ctx->LBRACK().size() - 1; i >= 0; --i) {
         LgsIterable* array;
-        if (!ctx->LBRACE().empty() && !ctx->RBRACE().empty()) {
+        if (ctx->EXCLA_MARK()) {
             array = new LgsSet(type);
-        } else if (!ctx->LBRACK().empty() && !ctx->unaryExpr().empty() && !ctx->RBRACK().empty()) {
+        } else if (!ctx->LBRACK().empty()) {
+            array = new LgsDArray(type);
+        } else if (!ctx->unaryExpr().empty()) {
             array = new LgsSArray(type);
             array->size = getUnaryExpr(ctx->unaryExpr()[i]);
-        } else if (!ctx->LBRACK().empty() && !ctx->RBRACK().empty()) {
-            array = new LgsDArray(type);
         } else {
             assert(0);
         }

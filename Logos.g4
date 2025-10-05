@@ -249,8 +249,7 @@ postfixExpr:
     ;
 
 arrayExpr:
-        LBRACK (expr (COMMA expr)* COMMA?)? RBRACK EXCLA_MARK? // arr
-    |   LBRACE (expr (COMMA expr)* COMMA?)? RBRACE // set
+        LBRACK (expr (COMMA expr)* COMMA?)? RBRACK EXCLA_MARK?
     ;
 
 hashMap:
@@ -330,8 +329,7 @@ range:
 
 type:
         type (LBRACK unaryExpr RBRACK)+
-   |    type (LBRACK RBRACK)+
-   |    type (LBRACE RBRACE)+
+   |    type (LBRACK RBRACK)+ EXCLA_MARK?
    |    mapType
    |    funcType
    |    IDENTIFIER QUEST_MARK?

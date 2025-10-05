@@ -134,6 +134,7 @@ public:
     void setStaticArray(LgsArrayExpr* arrayExpr);
     void setNestedSArr(const LgsArrayExpr* arrayExpr, Type* parentType, Value* parentValue, std::vector<Value*>& indices);
     void setDynamicArray(LgsArrayExpr* arrayExpr);
+    void setSetExpr(LgsArrayExpr* arrayExpr);
     void createMapFunc(LgsFunc* func);
     void createFilterFunc(LgsFunc* func);
 

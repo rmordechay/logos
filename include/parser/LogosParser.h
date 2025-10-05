@@ -1009,8 +1009,6 @@ public:
     antlr4::tree::TerminalNode *EXCLA_MARK();
     std::vector<antlr4::tree::TerminalNode *> COMMA();
     antlr4::tree::TerminalNode* COMMA(size_t i);
-    antlr4::tree::TerminalNode *LBRACE();
-    antlr4::tree::TerminalNode *RBRACE();
 
    
   };
@@ -1256,10 +1254,7 @@ public:
     UnaryExprContext* unaryExpr(size_t i);
     std::vector<antlr4::tree::TerminalNode *> RBRACK();
     antlr4::tree::TerminalNode* RBRACK(size_t i);
-    std::vector<antlr4::tree::TerminalNode *> LBRACE();
-    antlr4::tree::TerminalNode* LBRACE(size_t i);
-    std::vector<antlr4::tree::TerminalNode *> RBRACE();
-    antlr4::tree::TerminalNode* RBRACE(size_t i);
+    antlr4::tree::TerminalNode *EXCLA_MARK();
 
    
   };
