@@ -45,8 +45,21 @@ void LgsIterIndex::setIRElementPtr(LgsLLVMGen& cg) {
     auto fromIR = index.from->IRValue;
     const auto baseExprType = baseExpr->type;
     const auto baseExprIR = baseExpr->IRValue;
-    if (baseExprType->asSArray()) assert(0);
-    if (baseExprType->asStr()) {
+    if (baseExprType->asSArray()) {
+        std::vector<Value*> indices;
+        auto nestedIterIndex = this;
+        while (true) {
+            indices.push_back(nestedIterIndex->index.from->IRValue);
+            if (const auto innerIterIndex = nestedIterIndex->baseExpr->asIterIndex()) {
+                nestedIterIndex = innerIterIndex;
+            } else {
+                indices.push_back(cg.i32Zero());
+                reverse(indices.begin(), indices.end());
+                IRValue = cg.builder.CreateGEP(nestedIterIndex->baseExpr->type->getIRType(cg), nestedIterIndex->baseExpr->IRValue, indices);
+                break;
+            }
+        }
+    } else if (baseExprType->asStr()) {
         IRValue = cg.builder.CreateGEP(cg.i8Ty(), baseExprIR, {cg.i32Zero(), fromIR});
     } else if (const auto map = baseExpr->type->asMap()) {
         IRValue = map->getIRElement(cg, baseExprIR, fromIR);

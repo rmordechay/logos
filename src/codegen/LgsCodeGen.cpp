@@ -905,21 +905,9 @@ void LgsCodeGen::visitStrConst(LgsStrConst* strConst) {
 void LgsCodeGen::visitIterIndex(LgsIterIndex* iterIndex) {
     assert(!iterIndex->index.to);
     if (iterIndex->baseExpr->type->asSArray()) {
-        std::vector<Value*> indices;
-        auto nestedIterIndex = iterIndex;
-        while (true) {
-            visitExpr(nestedIterIndex->index.from);
-            indices.push_back(nestedIterIndex->index.from->IRValue);
-            if (const auto innerIterIndex = nestedIterIndex->baseExpr->asIterIndex()) {
-                nestedIterIndex = innerIterIndex;
-            } else {
-                visitExpr(nestedIterIndex->baseExpr);
-                indices.push_back(cg.i32Zero());
-                reverse(indices.begin(), indices.end());
-                iterIndex->IRValue = cg.builder.CreateGEP(nestedIterIndex->baseExpr->type->getIRType(cg), nestedIterIndex->baseExpr->IRValue, indices);
-                break;
-            }
-        }
+        visitExpr(iterIndex->index.from);
+        visitExpr(iterIndex->index.to);
+        iterIndex->setIRElementPtr(cg);
     } else {
         visitExpr(iterIndex->baseExpr);
         visitExpr(iterIndex->index.from);
@@ -943,20 +931,26 @@ void LgsCodeGen::visitTypeExpr(LgsTypeExpr* typeExpr) {
 
 void LgsCodeGen::visitJson(LgsJson* json) {
     if (const auto instance = json->instance) {
+        json->instance->destPtrValue = json->destPtrValue;
         instance->obj->getIRType(cg);
     } else if (const auto arr = json->arr) {
+        json->arr->destPtrValue = json->destPtrValue;
         visitArrayExpr(arr);
         json->IRValue = arr->IRValue;
     } else if (const auto strConst = json->strConst) {
+        json->strConst->destPtrValue = json->destPtrValue;
         visitStrConst(strConst);
         json->IRValue = strConst->IRValue;
     } else if (const auto intConst = json->intConst) {
+        json->intConst->destPtrValue = json->destPtrValue;
         visitIntConst(intConst);
         json->IRValue = intConst->IRValue;
     } else if (const auto floatConst = json->floatConst) {
+        json->floatConst->destPtrValue = json->destPtrValue;
         visitFloatConst(floatConst);
         json->IRValue = floatConst->IRValue;
     } else if (const auto null = json->null) {
+        json->null->destPtrValue = json->destPtrValue;
         null->IRValue = cg.null();
         json->IRValue = null->IRValue;
     }
