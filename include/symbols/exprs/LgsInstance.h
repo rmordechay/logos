@@ -14,7 +14,6 @@ public:
     Value* castToIR(LgsLLVMGen& cg, LgsType* toType) override;
     Value* loadIR(LgsLLVMGen& cg) override;
     void setObject(LgsObject* newObj);
-    void setVirtuals(LgsLLVMGen& cg) const;
     json::value asJsonStr() override;
     std::string getName() override;
     bool equals(LgsExpr* other) override;

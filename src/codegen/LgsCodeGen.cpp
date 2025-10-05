@@ -132,7 +132,9 @@ void LgsCodeGen::visitFunc(LgsFunc* func) {
     createPrologue(func);
     visitStmtsBlock(func->stmtsBlock);
     createEpilogue(func);
-    if (!cg.lastInstTerminator()) cg.builder.CreateRetVoid();
+    if (func->funcType->rt->isVoid() && !cg.lastInstTerminator()) {
+        cg.builder.CreateRetVoid();
+    }
     stack.exitScope();
 }
 
@@ -747,7 +749,11 @@ void LgsCodeGen::visitHashMap(LgsHashMap* hashMap) {
 
 void LgsCodeGen::visitVectorExpr(LgsVectorExpr* vectorExpr) {
     const auto ty = vectorExpr->type->getIRType(cg);
-    vectorExpr->IRValue = cg.builder.CreateAlloca(ty);
+    if (vectorExpr->destPtrValue) {
+        vectorExpr->IRValue = vectorExpr->destPtrValue;
+    } else {
+        vectorExpr->IRValue = cg.builder.CreateAlloca(ty);
+    }
     if (!vectorExpr->args.empty()) {
         Value* vectorValue = UndefValue::get(ty);
         for (size_t i = 0; i < vectorExpr->args.size(); ++i) {
@@ -815,7 +821,11 @@ void LgsCodeGen::visitSelection(LgsSelection* selection) {
             field->parentIRValue = parent->IRValue;
             field->parentIRType = parent->type->getIRType(cg);
             visitField(field);
-            child->IRValue = field->IRValue;
+            if (field->type->asObject()) {
+                child->IRValue = cg.builder.CreateLoad(cg.ptrTy(), field->IRValue);;
+            } else {
+                child->IRValue = field->IRValue;
+            }
         } else if (const auto methodCall = child->asFuncCall()) {
             const bool isTest = stack.currentFunc()->isTest && parent->type->getName() == LgsTest::name && methodCall->name == "mock";
             if (isTest) continue;
@@ -845,12 +855,17 @@ void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
         funcCall->IRValue = f.call(cg, funcCall->args);
         return;
     }
+
     const auto ft = funcCall->func->funcType;
-    if (ft->isVirtual) funcCall->resolveVirtualFunc(cg);
-    else visitIterFunc(funcCall);
-    if (!funcCall->isCoroutine && !funcCall->isDeferred) {
-        funcCall->IRValue = funcCall->func->call(cg, funcCall->args);
+    if (ft->isVirtual) {
+        const auto self = funcCall->selfPtr;
+        const auto keyIR = cg.getIRStr(funcCall->func->funcType->name);
+        funcCall->func->IRValue = cg.callLgsFunc("vtable_get", cg.ptrTy(), {cg.ptrTy(), cg.ptrTy()}, {self->IRValue, keyIR});
+    } else {
+        visitIterFunc(funcCall);
     }
+    if (funcCall->isCoroutine || funcCall->isDeferred) return;
+    funcCall->IRValue = funcCall->func->call(cg, funcCall->args);
 }
 
 void LgsCodeGen::visitIterFunc(const LgsFuncCall* funcCall) {
@@ -928,10 +943,22 @@ void LgsCodeGen::visitIterIndex(LgsIterIndex* iterIndex, const bool inAssignment
 
 void LgsCodeGen::visitInstance(LgsInstance* instance) {
     if (instance->IRValue) return;
-    instance->IRValue = cg.callMalloc(instance->obj->getSizeBytes(), instance->owner, instance->obj->getRTType());
+    const auto obj = instance->obj;
+    instance->IRValue = cg.callMalloc(obj->getSizeBytes(), instance->owner, obj->getRTType());
     initFields(instance);
-    if (!instance->obj->interfaces.empty()) {
-        instance->setVirtuals(cg);
+    if (obj->interfaces.empty()) return;
+    for (const auto& [methodName, method] : obj->methods) {
+        if (!method->funcType->isVirtual) continue;
+        const auto keyIRStr = cg.getIRStr(method->funcType->name);
+        const auto IRFunc = method->getIRFunc(cg);
+        cg.callLgsFunc("vtable_add", cg.voidTy(), {cg.ptrTy(), cg.ptrTy(), cg.ptrTy()}, {instance->IRValue, keyIRStr, IRFunc});
+    }
+    for (const auto& field : obj->fields) {
+        if (!field->isVirtual) continue;
+        const auto keyIRStr = cg.getIRStr(field->name);
+        const auto objIR = obj->getIRType(cg);
+        const auto fieldGEP = cg.builder.CreateStructGEP(objIR, instance->IRValue, field->position);
+        cg.callLgsFunc("vtable_add", cg.voidTy(), {cg.ptrTy(), cg.ptrTy(), cg.ptrTy()}, {instance->IRValue, keyIRStr, fieldGEP});
     }
 }
 
@@ -1034,15 +1061,14 @@ void LgsCodeGen::createPrologue(LgsFunc* func) {
 
 void LgsCodeGen::createEpilogue(LgsFunc* func) {
     const auto needsCleanup = func->needsCleanup();
-    if (!func->hasDefers || !needsCleanup) {
+    if (!func->hasDefers && !needsCleanup) {
         if (cg.lastInstTerminator()) assert(0);
         cg.callPopStack(func->hasDefers, needsCleanup);
         return;
     }
     cg.branchAndStartBlock(func->getCleanupBlock(cg));
-    cg.callPopStack(func->hasDefers, needsCleanup);
-    currentIRFunc = nullptr;
     if (func->hasDefers) cg.callLgsFunc("stack_callDefers", cg.voidTy());
+    currentIRFunc = nullptr;
 
     if (needsCleanup) {
         if (func->returnStmts.empty()) {

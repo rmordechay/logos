@@ -14,6 +14,7 @@ public:
     bool isMethodCall = false;
     bool isCoroutine = false;
     bool isDeferred = false;
+    LgsExpr* selfPtr = nullptr;
     LgsSymbol ref;
 
     explicit LgsFuncCall(const std::string& name, const std::vector<LgsExpr*>& args = {}) : name(name), args(args) {}
@@ -22,7 +23,6 @@ public:
     bool equals(const LgsFuncType* other) const;
     bool equalsVariadic(const LgsFuncType* funcType) const;
     bool equalsDefaultParams(const LgsFuncType* funcType) const;
-    void resolveVirtualFunc(LgsLLVMGen& cg) const;
     std::string getName() override;
     json::value asJsonStr() override;
     ~LgsFuncCall() override;

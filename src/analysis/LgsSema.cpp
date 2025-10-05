@@ -732,16 +732,12 @@ void LgsSema::visitFieldSelection(LgsVariable* child, LgsType* parentType) {
         if (field->isOwner && field->type->isHeapAlloc) {
             child->owner = field;
         }
-        if (const auto parentAsObj = parentType->asObject()) {
-            validateFieldVisibility(field, parentAsObj);
-        }
+        validateFieldVisibility(field, parentType);
     } else if (const auto method = parentType->getMethod(childName)) {
         child->setType(method->type);
         child->isMutable = false;
         child->ref = LgsSymbol(method);
-        if (const auto parentAsObj = parentType->asObject()) {
-            validateMethodVisibility(method, parentAsObj, method->location);
-        }
+        validateMethodVisibility(method, parentType, method->location);
     } else {
         errHandler.addError(E10005, &child->location, {childName, parentType->pname()});
     }
@@ -837,15 +833,15 @@ void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent) {
     auto name = methodCall->name;
     const auto method = parent->type->getMethod(name);
     if (!method) {
-        errHandler.addError(E10005, &methodCall->location, {name, parent->type->pname()});
-        return;
+        return errHandler.addError(E10005, &methodCall->location, {name, parent->type->pname()});
     }
     if (parent->asTypeExpr() && method->funcType->isMethod) {
-        errHandler.addError(E10083, &methodCall->location, {method->funcType->pname()});
-    } else if (method->funcType->isMethod) {
+        return errHandler.addError(E10083, &methodCall->location, {method->funcType->pname()});
+    }
+    methodCall->selfPtr = parent;
+    if (method->funcType->isMethod) {
         methodCall->args.insert(methodCall->args.begin(), parent);
     }
-
     for (size_t i = method->funcType->isMethod; i < method->funcType->params.size(); ++i) {
         if (i >= methodCall->args.size()) continue;
         const auto arg = methodCall->args[i];
@@ -861,7 +857,7 @@ void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent) {
         return;
     }
 
-    if (!validateMethodVisibility(method, parent->type->asObject(), methodCall->location)) return;
+    if (!validateMethodVisibility(method, parent->type, methodCall->location)) return;
     if (stack.currentFunc()->isTest && parent->type->getName() == LgsTest::name && methodCall->name == "mock") {
         const auto pair = std::make_pair(methodCall->args[0], methodCall->args[1]);
         stack.currentFunc()->mocks.push_back(pair);
@@ -962,7 +958,6 @@ void LgsSema::visitInstance(LgsInstance* instance) {
     if (symbol->symbolType != OBJECT && symbol->symbolType != INTERFACE) {
         return errHandler.addError(E10022, &instance->location, {objName});
     }
-
     if (symbol->symbolType == INTERFACE) {
         return visitInterfaceInstance(instance, symbol->interface);
     }
@@ -971,7 +966,6 @@ void LgsSema::visitInstance(LgsInstance* instance) {
     if (obj->singleton) {
         return errHandler.addError(E10032, &instance->location, {objName});
     }
-
     instance->setObject(obj->clone());
 
     // Args
@@ -1119,7 +1113,7 @@ void LgsSema::validateExprType(const LgsExpr* expr, LgsType* type) {
         return;
     }
     if (!type || !expr->type || type->isUnknown() || expr->type->isUnknown()) return;
-    if (!type->canCastTo(expr->type)) {
+    if (!expr->type->canCastTo(type)) {
         errHandler.addError(E10001, &expr->location, {type->pname(), expr->type->pname()});
     }
 }
@@ -1177,19 +1171,18 @@ void LgsSema::validateIndex(LgsIterIndex* iterIndex) {
     }
 }
 
-bool LgsSema::validateFieldVisibility(LgsField* field, const LgsObject* parent) {
-    if (parent && parent->singleton) return true;
+bool LgsSema::validateFieldVisibility(LgsField* field, LgsType* parent) {
+    if (parent && parent->asObject() && parent->asObject()->singleton) return true;
     if (!field || field->isVirtual) return false;
     if (!field->isPublic && file->id != field->location.fileID && !stack.currentFunc()->isTest) {
-        if (parent) errHandler.addError(E10030, &field->location, {field->name, parent->name});
+        if (parent) errHandler.addError(E10030, &field->location, {field->name, parent->getName()});
         return false;
     }
     return true;
 }
 
-bool LgsSema::validateMethodVisibility(const LgsFunc* methodCall, const LgsObject* parent, const LgsLocation& location) {
-    if (parent && parent->singleton) return true;
-    const auto method = methodCall;
+bool LgsSema::validateMethodVisibility(const LgsFunc* method, LgsType* parent, const LgsLocation& location) {
+    if (parent && parent->asObject() && parent->asObject()->singleton) return true;
     if (!method || method->funcType->isVirtual) return false;
     if (!method->funcType->isPublic && file->id != method->location.fileID && !stack.currentFunc()->isTest) {
         errHandler.addError(E10031, &location, {method->funcType->name, method->funcType->parentName});

@@ -78,7 +78,7 @@ extern "C" Lgs_darray* Lgs_Map_values(const Lgs_hashmap* map) {
     const auto values = new Lgs_darray;
     Lgs_DArray_init(values, map->valueSize, map->valueType);
     for (const auto& [k, v] : *map->data) {
-        // Lgs_DArray_add(values, v.data());
+        Lgs_DArray_add(values, v.data());
     }
     return values;
 }

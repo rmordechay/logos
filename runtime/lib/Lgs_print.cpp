@@ -8,6 +8,10 @@ std::string formatArray(Lgs_darray* arr);
 std::string formatElement(const Lgs_RTType type, void* elem) {
     std::ostringstream oss;
     switch (type) {
+    case RTT_TYPE:
+    case RTT_STR:
+        oss << static_cast<const char*>(elem);
+        break;
     case RTT_CHAR:
         oss << *static_cast<const char*>(elem);
         break;
@@ -47,10 +51,6 @@ std::string formatElement(const Lgs_RTType type, void* elem) {
     case RTT_DOUBLE:
         oss << *static_cast<const double_t*>(elem);
         break;
-    case RTT_STR: {
-        oss << static_cast<const char*>(elem);
-        break;
-    }
     case RTT_VEC2: {
         const auto vec = static_cast<const Lgs_vec2*>(elem);
         oss << '<' << vec->x << ", " << vec->y << '>';
@@ -66,6 +66,7 @@ std::string formatElement(const Lgs_RTType type, void* elem) {
         oss << '<' << vec->x << ", " << vec->y << ", " << vec->z << ", " << vec->w << '>';
         break;
     }
+    case RTT_SET:
     case RTT_DARRAY: {
         const auto nested = static_cast<Lgs_darray*>(elem);
         oss << formatArray(nested);
@@ -74,12 +75,10 @@ std::string formatElement(const Lgs_RTType type, void* elem) {
     case RTT_ANY:
         oss << elem;
         break;
-    case RTT_VOID:
     case RTT_SARRAY:
-    case RTT_SET:
     case RTT_MAP:
     case RTT_OBJECT:
-    case RTT_TYPE:
+    case RTT_VOID:
     case RTT_UNKNOWN:
         assert(0);
     }

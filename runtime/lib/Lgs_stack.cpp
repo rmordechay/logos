@@ -71,7 +71,7 @@ static void freeType(void* ptr, const Lgs_RTType type) {
 
 void Lgs_stack::push() {
     if (stackIndex + 1 >= STACK_CAPACITY) {
-        fprintf(stderr, "Stack overflow at depth %d\n", STACK_CAPACITY);
+        fprintf(stderr, "Stack overflow");
         exit(1);
     }
     stackIndex++;
@@ -81,7 +81,10 @@ void Lgs_stack::push() {
 
 void Lgs_stack::pop(const bool cleanup) {
     if (cleanup) funcCleanup();
-    if (stackIndex < 0) std::exit(1);
+    if (stackIndex < 0) {
+        fprintf(stderr, "Stack underflow");
+        exit(1);
+    }
     stackIndex--;
 }
 

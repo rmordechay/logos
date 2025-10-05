@@ -8,7 +8,7 @@ struct Lgs_darray;
 struct Lgs_runtime {
     Lgs_stack stack;
     Lgs_scheduler scheduler;
-    std::map<std::string, void*> vtable;
+    std::map<void*, std::map<std::string, void*>> vtable;
     sqlite3* db;
 };
 
@@ -73,10 +73,15 @@ extern "C" void Lgs_scheduler_shutdown() {
     runtime.scheduler.shutdown();
 }
 
-extern "C" void Lgs_vtable_add(const char* name, void* ptr) {
-    runtime.vtable[name] = ptr;
+extern "C" void Lgs_vtable_add(void* instancePtr, const char* name, void* ptr) {
+    std::cout << "inserting " << instancePtr << '\n';
+    runtime.vtable[instancePtr].emplace(name, ptr);
 }
 
-extern "C" void* Lgs_vtable_get(const char* name) {
-    return runtime.vtable[name];
+extern "C" void* Lgs_vtable_get(void* instancePtr, const char* name) {
+    const auto instance = runtime.vtable.find(instancePtr);
+    if (instance == runtime.vtable.end()) assert(0);
+    const auto method = instance->second.find(name);
+    if (method == instance->second.end()) assert(0);
+    return method->second;
 }

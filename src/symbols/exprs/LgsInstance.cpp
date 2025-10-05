@@ -22,22 +22,6 @@ void LgsInstance::setObject(LgsObject* newObj) {
     setType(obj);
 }
 
-void LgsInstance::setVirtuals(LgsLLVMGen& cg) const {
-    for (const auto& [methodName, method] : obj->methods) {
-        if (!method->funcType->isVirtual) continue;
-        const auto keyIRStr = cg.getIRStr(method->funcType->getName());
-        const auto IRFunc = method->getIRFunc(cg);
-        cg.callLgsFunc("vtable_add", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {keyIRStr, IRFunc});
-    }
-    for (const auto& field : obj->fields) {
-        if (!field->isVirtual) continue;
-        const auto keyIRStr = cg.getIRStr(field->name);
-        const auto objIR = obj->getIRType(cg);
-        const auto fieldGEP = cg.builder.CreateStructGEP(objIR, IRValue, field->position);
-        cg.callLgsFunc("vtable_add", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {keyIRStr, fieldGEP});
-    }
-}
-
 json::value LgsInstance::asJsonStr() {
     json::object jsonObj;
     jsonObj["exprType"] = "instance";

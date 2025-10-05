@@ -120,8 +120,8 @@ public:
     void validateObjImplements(LgsObject* obj, const std::vector<LgsType*>& interfaces);
     void validateObjInterface(LgsObject* obj, LgsInterface* interface);
     void validateIndex(LgsIterIndex* iterIndex);
-    bool validateFieldVisibility(LgsField* field, const LgsObject* parent);
-    bool validateMethodVisibility(const LgsFunc* methodCall, const LgsObject* parent, const LgsLocation& location);
+    bool validateFieldVisibility(LgsField* field, LgsType* parent);
+    bool validateMethodVisibility(const LgsFunc* method, LgsType* parent, const LgsLocation& location);
     bool validateVecElements(const LgsVariable* fieldVar, LgsVec* vec);
     void validateTypeDuplicates(LgsType* type);
     bool validateCast(LgsType* fromType, LgsType* toType, const LgsLocation& location);
