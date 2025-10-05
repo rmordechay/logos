@@ -6,6 +6,8 @@ namespace llvm {
     class Value;
 }
 
+using namespace llvm;
+
 class LgsType;
 class LgsVariable;
 class LgsExpr;
@@ -21,6 +23,18 @@ public:
     virtual llvm::Value* loadIR(LgsLLVMGen& cg);
     virtual void setDebugValue(LgsLLVMGen& cg);
     virtual json::value asJsonStr() = 0;
+    virtual Value* addIR(LgsLLVMGen& cg, Value* other);
+    virtual Value* subIR(LgsLLVMGen& cg, Value* other);
+    virtual Value* mulIR(LgsLLVMGen& cg, Value* other);
+    virtual Value* divIR(LgsLLVMGen& cg, Value* other);
+    virtual Value* eqIR(LgsLLVMGen& cg, Value* other);
+    virtual Value* neIR(LgsLLVMGen& cg, Value* other);
+    virtual Value* ltIR(LgsLLVMGen& cg, Value* other);
+    virtual Value* gtIR(LgsLLVMGen& cg, Value* other);
+    virtual Value* geIR(LgsLLVMGen& cg, Value* other);
+    virtual Value* leIR(LgsLLVMGen& cg, Value* other);
+    virtual Value* andIR(LgsLLVMGen& cg, Value* other);
+    virtual Value* orIR(LgsLLVMGen& cg, Value* other);
     llvm::DILocation* getDebugLoc(LgsLLVMGen& cg) const;
     virtual ~LgsValue() = default;
 };

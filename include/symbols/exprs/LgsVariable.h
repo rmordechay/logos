@@ -15,6 +15,10 @@ public:
     Value* castToIR(LgsLLVMGen& cg, LgsType* toType) override;
     Value* hash(LgsLLVMGen& cg) override;
     void assign(LgsLLVMGen& cg, LgsExpr* expr) override;
+    Value* addIR(LgsLLVMGen& cg, Value* other) override;
+    Value* subIR(LgsLLVMGen& cg, Value* other) override;
+    Value* mulIR(LgsLLVMGen& cg, Value* other) override;
+    Value* divIR(LgsLLVMGen& cg, Value* other) override;
     Value* eqIR(LgsLLVMGen& cg, Value* other) override;
     Value* neIR(LgsLLVMGen& cg, Value* other) override;
     Value* ltIR(LgsLLVMGen& cg, Value* other) override;

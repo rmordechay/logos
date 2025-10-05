@@ -62,8 +62,60 @@ void LgsVariable::assign(LgsLLVMGen& cg, LgsExpr* expr) {
     IRValue = expr->IRValue;
 }
 
+Value* LgsVariable::addIR(LgsLLVMGen& cg, Value* other) {
+    switch (ref.symbolType) {
+    case PARAM:
+        return ref.param->addIR(cg, other);
+    case VAR_DEC:
+        return ref.varDec->expr->addIR(cg, other);
+    case FIELD:
+        return ref.field->addIR(cg, other);
+    default:
+        assert(0);
+    }
+}
+
+Value* LgsVariable::subIR(LgsLLVMGen& cg, Value* other) {
+        switch (ref.symbolType) {
+    case PARAM:
+        return ref.param->subIR(cg, other);
+    case VAR_DEC:
+        return ref.varDec->expr->subIR(cg, other);
+    case FIELD:
+        return ref.field->subIR(cg, other);
+    default:
+        assert(0);
+    }
+}
+
+Value* LgsVariable::mulIR(LgsLLVMGen& cg, Value* other) {
+        switch (ref.symbolType) {
+    case PARAM:
+        return ref.param->mulIR(cg, other);
+    case VAR_DEC:
+        return ref.varDec->expr->mulIR(cg, other);
+    case FIELD:
+        return ref.field->mulIR(cg, other);
+    default:
+        assert(0);
+    }
+}
+
+Value* LgsVariable::divIR(LgsLLVMGen& cg, Value* other) {
+        switch (ref.symbolType) {
+    case PARAM:
+        return ref.param->divIR(cg, other);
+    case VAR_DEC:
+        return ref.varDec->expr->divIR(cg, other);
+    case FIELD:
+        return ref.field->divIR(cg, other);
+    default:
+        assert(0);
+    }
+}
+
 Value* LgsVariable::eqIR(LgsLLVMGen& cg, Value* other) {
-    return cg.builder.CreateICmpEQ(IRValue, other);
+    assert(0);
 }
 
 Value* LgsVariable::neIR(LgsLLVMGen& cg, Value* other) {
@@ -83,7 +135,7 @@ Value* LgsVariable::geIR(LgsLLVMGen& cg, Value* other) {
 }
 
 Value* LgsVariable::leIR(LgsLLVMGen& cg, Value* other) {
-    return cg.builder.CreateICmpSLE(IRValue, other);
+    assert(0);
 }
 
 Value* LgsVariable::andIR(LgsLLVMGen& cg, Value* other) {

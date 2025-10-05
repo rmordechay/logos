@@ -85,9 +85,6 @@ Value* LgsVec::mulIR(LgsLLVMGen& cg, Value* self, Value* other) {
         loadOther = cg.builder.CreateVectorSplat(vecTy->getElementCount(), loadOther);
         return cg.builder.CreateFMul(self, loadOther);
     }
-    if (other->getType()->isVectorTy()) {
-        return dotProduct(cg, self, loadOther);
-    }
     if (other->getType()->isFloatingPointTy()) {
         const auto vecTy = cast<VectorType>(self->getType());
         loadOther = cg.builder.CreateVectorSplat(vecTy->getElementCount(), loadOther);
@@ -137,38 +134,6 @@ Value* LgsVec::lengthIR(LgsLLVMGen& cg, Value* iterable) {
 Value* LgsVec::getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) {
     const auto gep = cg.builder.CreateGEP(getIRType(cg), iterable, {cg.i32Zero(), index});
     return cg.builder.CreateLoad(baseType->getIRType(cg), gep);
-}
-
-Value* LgsVec::dotProduct(LgsLLVMGen& cg, Value* lhs, Value* rhs) {
-    const auto lx = cg.builder.CreateExtractValue(lhs, {0});
-    const auto lhs_y = cg.builder.CreateExtractValue(lhs, {1});
-    const auto rhs_x = cg.builder.CreateExtractValue(rhs, {0});
-    const auto rhs_y = cg.builder.CreateExtractValue(rhs, {1});
-    const auto res_x = cg.builder.CreateFMul(lx, rhs_x);
-    const auto res_y = cg.builder.CreateFMul(lhs_y, rhs_y);
-    Value* result = UndefValue::get(getIRType(cg));
-    result = cg.builder.CreateInsertValue(result, res_x, {0});
-    result = cg.builder.CreateInsertValue(result, res_y, {1});
-    if (vectorDim == 2) return result;
-
-    const auto lhs_z = cg.builder.CreateExtractValue(lhs, {2});
-    const auto rhs_z = cg.builder.CreateExtractValue(rhs, {2});
-    const auto res_z = cg.builder.CreateFMul(lhs_z, rhs_z);
-    result = UndefValue::get(getIRType(cg));
-    result = cg.builder.CreateInsertValue(result, res_x, {0});
-    result = cg.builder.CreateInsertValue(result, res_y, {1});
-    result = cg.builder.CreateInsertValue(result, res_z, {2});
-    if (vectorDim == 3) return result;
-
-    const auto lhs_w = cg.builder.CreateExtractValue(lhs, {3});
-    const auto rhs_w = cg.builder.CreateExtractValue(rhs, {3});
-    const auto res_w = cg.builder.CreateFMul(lhs_w, rhs_w);
-    result = UndefValue::get(getIRType(cg));
-    result = cg.builder.CreateInsertValue(result, res_x, {0});
-    result = cg.builder.CreateInsertValue(result, res_y, {1});
-    result = cg.builder.CreateInsertValue(result, res_z, {2});
-    result = cg.builder.CreateInsertValue(result, res_w, {3});
-    return result;
 }
 
 int8_t LgsVec::getSwizzleSet(const char c) {

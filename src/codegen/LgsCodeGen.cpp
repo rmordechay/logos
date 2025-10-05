@@ -614,16 +614,16 @@ void LgsCodeGen::visitBinaryExpr(LgsBinaryExpr* binExpr) {
     visitExpr(binExpr->right);
     switch (binExpr->op) {
     case ADD:
-        binExpr->IRValue = binExpr->type->addIR(cg, binExpr->left->loadIR(cg), binExpr->right->loadIR(cg));
+        binExpr->IRValue = binExpr->left->addIR(cg, binExpr->right->loadIR(cg));
         break;
     case SUB:
-        binExpr->IRValue = binExpr->type->subIR(cg, binExpr->left->loadIR(cg), binExpr->right->loadIR(cg));
+        binExpr->IRValue = binExpr->left->subIR(cg, binExpr->right->loadIR(cg));
         break;
     case MUL:
-        binExpr->IRValue = binExpr->type->mulIR(cg, binExpr->left->loadIR(cg), binExpr->right->loadIR(cg));
+        binExpr->IRValue = binExpr->left->mulIR(cg, binExpr->right->loadIR(cg));
         break;
     case DIV:
-        binExpr->IRValue = binExpr->type->divIR(cg, binExpr->left->loadIR(cg), binExpr->right->loadIR(cg));
+        binExpr->IRValue = binExpr->left->divIR(cg, binExpr->right->loadIR(cg));
         break;
     case MOD:
         binExpr->IRValue = binExpr->type->modIR(cg, binExpr->left->loadIR(cg), binExpr->right->loadIR(cg));

@@ -81,14 +81,5 @@ public:
     LgsVectorExpr* asVectorExpr();
     LgsIntConst* asIntConst();
     LgsLoopMetaVar* asLoopMetaVar();
-
-    virtual Value* eqIR(LgsLLVMGen& cg, Value* other);
-    virtual Value* neIR(LgsLLVMGen& cg, Value* other);
-    virtual Value* ltIR(LgsLLVMGen& cg, Value* other);
-    virtual Value* gtIR(LgsLLVMGen& cg, Value* other);
-    virtual Value* geIR(LgsLLVMGen& cg, Value* other);
-    virtual Value* leIR(LgsLLVMGen& cg, Value* other);
-    virtual Value* andIR(LgsLLVMGen& cg, Value* other);
-    virtual Value* orIR(LgsLLVMGen& cg, Value* other);
     ~LgsExpr() override = default;
 };

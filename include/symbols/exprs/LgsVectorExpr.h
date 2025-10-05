@@ -15,6 +15,11 @@ public:
 
     explicit LgsVectorExpr(LgsVec* vecType): vecType(vecType) {}
     Value* loadIR(LgsLLVMGen& cg) override;
+    Value* addIR(LgsLLVMGen& cg, Value* other) override;
+    Value* subIR(LgsLLVMGen& cg, Value* other) override;
+    Value* mulIR(LgsLLVMGen& cg, Value* other) override;
+    Value* divIR(LgsLLVMGen& cg, Value* other) override;
+    Value* dotProduct(LgsLLVMGen& cg, Value* lVec, Value* rVec) const;
     std::string getName() override;
     json::value asJsonStr() override;
     ~LgsVectorExpr() override;

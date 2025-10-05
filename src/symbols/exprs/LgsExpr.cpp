@@ -112,35 +112,3 @@ LgsStrConst* LgsExpr::asStrConst() { return dynamic_cast<LgsStrConst*>(this); }
 LgsVectorExpr* LgsExpr::asVectorExpr() { return dynamic_cast<LgsVectorExpr*>(this); }
 LgsIntConst* LgsExpr::asIntConst() { return dynamic_cast<LgsIntConst*>(this); }
 LgsLoopMetaVar* LgsExpr::asLoopMetaVar() { return dynamic_cast<LgsLoopMetaVar*>(this); }
-
-Value* LgsExpr::eqIR(LgsLLVMGen& cg, Value* other) {
-    assert(0);
-}
-
-Value* LgsExpr::neIR(LgsLLVMGen& cg, Value* other) {
-    assert(0);
-}
-
-Value* LgsExpr::ltIR(LgsLLVMGen& cg, Value* other) {
-    assert(0);
-}
-
-Value* LgsExpr::gtIR(LgsLLVMGen& cg, Value* other) {
-    assert(0);
-}
-
-Value* LgsExpr::geIR(LgsLLVMGen& cg, Value* other) {
-    assert(0);
-}
-
-Value* LgsExpr::leIR(LgsLLVMGen& cg, Value* other) {
-    assert(0);
-}
-
-Value* LgsExpr::andIR(LgsLLVMGen& cg, Value* other) {
-    assert(0);
-}
-
-Value* LgsExpr::orIR(LgsLLVMGen& cg, Value* other) {
-    assert(0);
-}
