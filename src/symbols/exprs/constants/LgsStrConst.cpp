@@ -1,5 +1,13 @@
 #include "exprs/constants/LgsStrConst.h"
 
+LgsExpr* LgsStrConst::castTo(LgsType* toType, bool explicitCast) {
+    return LgsExpr::castTo(toType, explicitCast);
+}
+
+Value* LgsStrConst::castToIR(LgsLLVMGen& cg, LgsType* toType) {
+    return LgsExpr::castToIR(cg, toType);
+}
+
 Value* LgsStrConst::loadIR(LgsLLVMGen& cg) {
     return IRValue;
 }

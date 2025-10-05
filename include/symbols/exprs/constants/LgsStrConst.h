@@ -15,7 +15,8 @@ public:
         lgsStr->size = new LgsIntConst(&LGS_INT, value.size());
         type = lgsStr;
     }
-
+    LgsExpr* castTo(LgsType* toType, bool explicitCast) override;
+    Value* castToIR(LgsLLVMGen& cg, LgsType* toType) override;
     Value* loadIR(LgsLLVMGen& cg) override;
     Value* eqIR(LgsLLVMGen& cg, Value* other) override;
     std::string getName() override;

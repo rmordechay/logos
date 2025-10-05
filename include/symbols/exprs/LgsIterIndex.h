@@ -23,7 +23,7 @@ public:
     }
     Value* loadIR(LgsLLVMGen& cg) override;
     LgsExpr* getBaseExpr() const;
-    void setIRElementPtr(LgsLLVMGen& cg);
+    void setIRElementPtr(LgsLLVMGen& cg, bool inAssignment = false);
     void assign(LgsLLVMGen& cg, LgsExpr* expr) override;
     void assignScalar(LgsLLVMGen& cg, LgsExpr* expr) const;
     std::string getName() override;

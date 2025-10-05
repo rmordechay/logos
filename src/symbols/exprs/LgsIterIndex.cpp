@@ -41,7 +41,7 @@ LgsExpr* LgsIterIndex::getBaseExpr() const {
     }
 }
 
-void LgsIterIndex::setIRElementPtr(LgsLLVMGen& cg) {
+void LgsIterIndex::setIRElementPtr(LgsLLVMGen& cg, const bool inAssignment) {
     auto fromIR = index.from->IRValue;
     const auto baseExprType = baseExpr->type;
     const auto baseExprIR = baseExpr->IRValue;
@@ -61,6 +61,8 @@ void LgsIterIndex::setIRElementPtr(LgsLLVMGen& cg) {
         }
     } else if (baseExprType->asStr()) {
         IRValue = cg.builder.CreateGEP(cg.i8Ty(), baseExprIR, {cg.i32Zero(), fromIR});
+    } else if (inAssignment) {
+        return;
     } else if (const auto map = baseExpr->type->asMap()) {
         IRValue = map->getIRElement(cg, baseExprIR, fromIR);
     } else if (const auto iter = baseExpr->type->asIterable()) {

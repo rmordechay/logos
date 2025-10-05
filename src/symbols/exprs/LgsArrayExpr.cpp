@@ -18,6 +18,7 @@ void LgsArrayExpr::completeType(LgsType* toType) {
             if (!element->type) {
                 element->type = otherBaseType;
             } else {
+                if (element->type->equals(otherBaseType)) continue;
                 if (element->type->canCastTo(otherBaseType)) {
                     const auto castTo = element->castTo(otherBaseType);
                     if (element != castTo) freeExpr(element);

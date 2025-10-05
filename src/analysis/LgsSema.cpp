@@ -847,6 +847,7 @@ void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent) {
     }
 
     for (size_t i = method->funcType->isMethod; i < method->funcType->params.size(); ++i) {
+        if (i >= methodCall->args.size()) continue;
         const auto arg = methodCall->args[i];
         const auto& param = method->funcType->params[i];
         arg->completeType(param.type);

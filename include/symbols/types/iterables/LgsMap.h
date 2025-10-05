@@ -39,7 +39,6 @@ public:
     Value* lengthIR(LgsLLVMGen& cg, Value* iterable) override;
     Value* inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
     Value* getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) override;
-    StructType* getMapStruct(LgsLLVMGen& cg);
     bool canCastTo(LgsType* other) override;
     std::string strFormatPart() const override;
     ~LgsMap() override;

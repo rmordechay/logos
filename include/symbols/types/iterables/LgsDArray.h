@@ -6,7 +6,6 @@
 class LgsDArray final : public LgsIterable {
 public:
     static constexpr auto name = "DArray";
-    StructType* arrStruct = nullptr;
 
     explicit LgsDArray(LgsType* baseType = nullptr) : LgsIterable(baseType) {
         addEmptyMethod(RESERVE_FUNC_NAME);
@@ -20,7 +19,6 @@ public:
     LgsExpr* getZeroValue() override;
     Lgs_RTType getRTType() override;
     std::string strFormatPart() const override;
-    StructType* getArrStruct(LgsLLVMGen& cg);
     LgsType* applyOp(LgsOperator op, LgsType* other) override;
     LgsFunc* getAddFunc() override;
     LgsFunc* getReserveFunc();

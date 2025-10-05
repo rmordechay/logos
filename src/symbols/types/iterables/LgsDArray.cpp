@@ -23,7 +23,8 @@ LgsFunc* LgsDArray::getMethod(const std::string& methodName) {
 
 Type* LgsDArray::getIRType(LgsLLVMGen& cg) {
     if (IRType) return IRType;
-    return getArrStruct(cg);
+    IRType = cg.getStructType({cg.sizeTy(), cg.sizeTy(), cg.ptrTy()}, name);
+    return IRType;
 }
 
 std::string LgsDArray::getName() {
@@ -50,12 +51,6 @@ Lgs_RTType LgsDArray::getRTType() {
 std::string LgsDArray::strFormatPart() const {
     if (baseType->asChar()) return "%s";
     return "%p";
-}
-
-StructType* LgsDArray::getArrStruct(LgsLLVMGen& cg) {
-    if (arrStruct) return arrStruct;
-    arrStruct = cg.getStructType({cg.sizeTy(), cg.sizeTy(), cg.ptrTy()}, name);
-    return arrStruct;
 }
 
 LgsType* LgsDArray::applyOp(const LgsOperator op, LgsType* other) {

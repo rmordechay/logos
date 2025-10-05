@@ -1,5 +1,5 @@
 #include "types/iterables/LgsMap.h"
-
+#include "Lgs_hashmap.h"
 #include "data/LgsDefinitions.h"
 #include "exprs/LgsHashMap.h"
 #include "exprs/LgsIterIndex.h"
@@ -9,7 +9,10 @@
 #include "types/iterables/LgsDArray.h"
 
 Type* LgsMap::getIRType(LgsLLVMGen& cg) {
-    return getMapStruct(cg);
+    if (IRType) return IRType;
+    const std::vector<Type*> mapStructFields = {cg.i64Ty(), cg.i64Ty(), cg.i64Ty(), cg.ptrTy()};
+    IRType = cg.getStructType(mapStructFields, name);
+    return IRType;
 }
 
 std::string LgsMap::getName() {
@@ -25,7 +28,7 @@ json::value LgsMap::asJsonStr() {
 }
 
 size_t LgsMap::getSizeBytes() {
-    return sizeof(void*);
+    return sizeof(Lgs_hashmap);
 }
 
 LgsExpr* LgsMap::getZeroValue() {
@@ -112,12 +115,6 @@ LgsFunc* LgsMap::getAddFunc() {
     };
     methods[ADD_FUNC_NAME] = func->second;
     return func->second;
-}
-
-StructType* LgsMap::getMapStruct(LgsLLVMGen& cg) {
-    const std::vector<Type*> mapStructFields = {cg.ptrTy(), cg.i64Ty(), cg.i64Ty()};
-    mapStruct = cg.getStructType(mapStructFields, name);
-    return mapStruct;
 }
 
 bool LgsMap::canCastTo(LgsType* other) {

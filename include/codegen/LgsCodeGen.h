@@ -110,7 +110,7 @@ public:
     void visitPrefixExpr(LgsPrefixExpr* prefixExpr);
     void visitPostfixExpr(LgsPostfixExpr* postfixExpr);
     void visitStrConst(LgsStrConst* strConst);
-    void visitIterIndex(LgsIterIndex* iterIndex);
+    void visitIterIndex(LgsIterIndex* iterIndex, bool inAssignment = false);
     void visitInstance(LgsInstance* instance);
     void visitTypeExpr(LgsTypeExpr* typeExpr);
     void visitJson(LgsJson* json);

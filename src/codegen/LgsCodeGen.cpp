@@ -344,24 +344,33 @@ void LgsCodeGen::visitVarDec(LgsVarDec* varDec) {
 }
 
 void LgsCodeGen::visitAssignment(const LgsAssignment* assignment) {
-    visitExpr(assignment->lValue);
+    const auto lValue = assignment->lValue;
+    const auto rValue = assignment->rValue;
+    if (const auto iterIndex = lValue->asIterIndex()) {
+        visitIterIndex(iterIndex, true);
+    } else if (const auto var = lValue->asVariable()) {
+        visitVariable(var);
+    } else if (const auto selection = lValue->asSelection()) {
+        visitSelection(selection);
+    }
     visitExpr(assignment->rValue);
+
     Value* results = nullptr;
     switch (assignment->assignmentType) {
-    case ASSIGN: assignment->lValue->assign(cg, assignment->rValue); return;
-    case ASSIGN_ADD: results = assignment->lValue->type->addIR(cg, assignment->lValue->loadIR(cg), assignment->rValue->loadIR(cg)); break;
-    case ASSIGN_SUB: results = assignment->lValue->type->subIR(cg, assignment->lValue->loadIR(cg), assignment->rValue->loadIR(cg)); break;
-    case ASSIGN_MUL: results = assignment->lValue->type->mulIR(cg, assignment->lValue->loadIR(cg), assignment->rValue->loadIR(cg)); break;
-    case ASSIGN_DIV: results = assignment->lValue->type->divIR(cg, assignment->lValue->loadIR(cg), assignment->rValue->loadIR(cg)); break;
-    case ASSIGN_MOD: results = assignment->lValue->type->modIR(cg, assignment->lValue->loadIR(cg), assignment->rValue->loadIR(cg)); break;
-    case ASSIGN_AND: results = assignment->lValue->type->bitAndIR(cg, assignment->lValue->loadIR(cg), assignment->rValue->loadIR(cg)); break;
-    case ASSIGN_OR: results = assignment->lValue->type->bitOrIR(cg, assignment->lValue->loadIR(cg), assignment->rValue->loadIR(cg)); break;
-    case ASSIGN_XOR: results = assignment->lValue->type->bitXorIR(cg, assignment->lValue->loadIR(cg), assignment->rValue->loadIR(cg)); break;
-    case ASSIGN_LSHIFT: results = assignment->lValue->type->lshiftIR(cg, assignment->lValue->loadIR(cg), assignment->rValue->loadIR(cg)); break;
-    case ASSIGN_RSHIFT: results = assignment->lValue->type->rshiftIR(cg, assignment->lValue->loadIR(cg), assignment->rValue->loadIR(cg)); break;
+    case ASSIGN: lValue->assign(cg, rValue); return;
+    case ASSIGN_ADD: results = lValue->type->addIR(cg, lValue->loadIR(cg), rValue->loadIR(cg)); break;
+    case ASSIGN_SUB: results = lValue->type->subIR(cg, lValue->loadIR(cg), rValue->loadIR(cg)); break;
+    case ASSIGN_MUL: results = lValue->type->mulIR(cg, lValue->loadIR(cg), rValue->loadIR(cg)); break;
+    case ASSIGN_DIV: results = lValue->type->divIR(cg, lValue->loadIR(cg), rValue->loadIR(cg)); break;
+    case ASSIGN_MOD: results = lValue->type->modIR(cg, lValue->loadIR(cg), rValue->loadIR(cg)); break;
+    case ASSIGN_AND: results = lValue->type->bitAndIR(cg, lValue->loadIR(cg), rValue->loadIR(cg)); break;
+    case ASSIGN_OR: results = lValue->type->bitOrIR(cg, lValue->loadIR(cg), rValue->loadIR(cg)); break;
+    case ASSIGN_XOR: results = lValue->type->bitXorIR(cg, lValue->loadIR(cg), rValue->loadIR(cg)); break;
+    case ASSIGN_LSHIFT: results = lValue->type->lshiftIR(cg, lValue->loadIR(cg), rValue->loadIR(cg)); break;
+    case ASSIGN_RSHIFT: results = lValue->type->rshiftIR(cg, lValue->loadIR(cg), rValue->loadIR(cg)); break;
     }
     assert(results);
-    cg.builder.CreateStore(results, assignment->lValue->IRValue);
+    cg.builder.CreateStore(results, lValue->IRValue);
 }
 
 void LgsCodeGen::visitIfStmt(LgsIfStmt* ifStmt) {
@@ -726,8 +735,7 @@ void LgsCodeGen::visitHashMap(LgsHashMap* hashMap) {
     const auto map = hashMap->type->asMap();
     const auto valueType = map->typePair->value;
     const auto elementSize = cg.usize(valueType->getSizeBytes());
-    const auto arrSize = cg.typeSize(map->getMapStruct(cg));
-    hashMap->IRValue = cg.callMalloc(arrSize.getFixedValue(), hashMap->owner, hashMap->type->getRTType());
+    hashMap->IRValue = cg.callMalloc(map->getSizeBytes(), hashMap->owner, hashMap->type->getRTType());
     LgsFunc initFunc("init", &LGS_VOID, {map, &LGS_LONG}, BUILTIN | METHOD);
     initFunc.callIR(cg, {getIRValue(hashMap), elementSize});
     for (const auto element : hashMap->initialElements) {
@@ -904,17 +912,17 @@ void LgsCodeGen::visitStrConst(LgsStrConst* strConst) {
     strConst->IRValue = cg.getIRStr(strConst->value);
 }
 
-void LgsCodeGen::visitIterIndex(LgsIterIndex* iterIndex) {
+void LgsCodeGen::visitIterIndex(LgsIterIndex* iterIndex, const bool inAssignment) {
     assert(!iterIndex->index.to);
     if (iterIndex->baseExpr->type->asSArray()) {
         visitExpr(iterIndex->index.from);
         visitExpr(iterIndex->index.to);
-        iterIndex->setIRElementPtr(cg);
+        iterIndex->setIRElementPtr(cg, inAssignment);
     } else {
         visitExpr(iterIndex->baseExpr);
         visitExpr(iterIndex->index.from);
         visitExpr(iterIndex->index.to);
-        iterIndex->setIRElementPtr(cg);
+        iterIndex->setIRElementPtr(cg, inAssignment);
     }
 }
 
