@@ -44,10 +44,10 @@ bool LgsApp::setup() {
         errHandler.addError(E10010, nullptr);
         return false;
     }
-    if (!exists(paths.appFilePath)) {
-        errHandler.addError(E10008, nullptr);
-        return false;
-    }
+    // if (!exists(paths.appFilePath)) {
+    //     errHandler.addError(E10086, nullptr, {paths.rootPath});
+    //     return false;
+    // }
     return true;
 }
 

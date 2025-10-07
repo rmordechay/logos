@@ -831,12 +831,13 @@ void LgsCodeGen::visitSelection(LgsSelection* selection) {
                 cg.builder.CreateCondBr(null, trueBlock, falseBlock);
                 cg.startBlock(trueBlock);
                 cg.printStr("true\n");
+                child->IRValue = cg.null();
                 cg.builder.CreateBr(exitBlock);
                 cg.startBlock(falseBlock);
                 cg.printStr("false\n");
+                child->IRValue = nullable->getValue(cg, field->IRValue);
                 cg.branchAndStartBlock(exitBlock);
-            }
-            if (field->type->asObject()) {
+            } else if (field->type->asObject()) {
                 child->IRValue = cg.builder.CreateLoad(cg.ptrTy(), field->IRValue);
             } else {
                 child->IRValue = field->IRValue;

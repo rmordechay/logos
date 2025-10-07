@@ -151,6 +151,9 @@ set(RUNTIME_SOURCES
     runtime/lib/Lgs_arena.cpp
     runtime/lib/Lgs_set.cpp
     src/symbols/exprs/LgsNullableExpr.cpp
+    src/parser_new/LgsLexerNew.cpp
+    src/parser_new/LgsLexerNew.h
+    src/parser_new/LgsTokens.h
 )
 
 add_library(lgs_core SHARED ${CORE_SOURCES} ${RUNTIME_SOURCES})

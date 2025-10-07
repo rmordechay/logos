@@ -57,6 +57,14 @@ Value* LgsNullable::isNullIR(LgsLLVMGen& cg, Value* ptr) {
     return cg.builder.CreateICmpEQ(cg.true_(), nullableField);
 }
 
+Value* LgsNullable::getValue(LgsLLVMGen& cg, Value* ptr) {
+    const auto gep = cg.builder.CreateStructGEP(getIRType(cg), ptr, 0);
+    if (baseType->asObject()) {
+        return cg.builder.CreateLoad(cg.ptrTy(), gep);
+    }
+    return gep;
+}
+
 LgsNullable::~LgsNullable() {
     if (baseType) {
         freeType(baseType);

@@ -18,5 +18,6 @@ public:
     size_t getSizeBytes() override;
     std::string strFormatPart() const override;
     Value* isNullIR(LgsLLVMGen& cg, Value* ptr);
+    Value* getValue(LgsLLVMGen& cg, Value* ptr);
     ~LgsNullable() override;
 };

@@ -683,9 +683,15 @@ void LgsSema::visitSelection(LgsSelection* selection) {
     const auto exprs = selection->exprs;
     const auto firstExpr = exprs.front();
     visitFirstSelection(firstExpr);
+    selection->hasNullables = firstExpr->type->asNullable();
     if (!firstExpr->type || firstExpr->type->isUnknown()) return;
     visitInnerSelections(selection);
-    selection->setType(selection->lastExpr()->type);
+    if (selection->hasNullables) {
+        // selection->lastExpr()->type = new LgsNullable(selection->lastExpr()->type);
+        // selection->type = selection->lastExpr()->type;
+    } else {
+        selection->type = selection->lastExpr()->type;
+    }
     selection->isMutable = selection->lastExpr()->isMutable;
     selection->owner = selection->lastExpr()->owner;
 }
@@ -704,7 +710,7 @@ void LgsSema::visitFirstSelection(LgsExpr* firstExpr) {
     }
 }
 
-void LgsSema::visitInnerSelections(const LgsSelection* selection) {
+void LgsSema::visitInnerSelections(LgsSelection* selection) {
     const auto exprs = selection->exprs;
     for (int i = 0; i < exprs.size() - 1; ++i) {
         const auto parentExpr = exprs[i];
@@ -718,6 +724,7 @@ void LgsSema::visitInnerSelections(const LgsSelection* selection) {
         } else {
             assert(0);
         }
+        selection->hasNullables = selection->hasNullables || childExpr->type->asNullable();
         if (!childExpr->type || childExpr->type->isUnknown()) {
             return;
         }

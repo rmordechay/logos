@@ -4,6 +4,7 @@
 class LgsSelection final : public LgsExpr {
 public:
     std::vector<LgsExpr*> exprs;
+    bool hasNullables = false;
 
     explicit LgsSelection(const std::vector<LgsExpr*>& exprs) : exprs(exprs) {}
     Value* loadIR(LgsLLVMGen& cg) override;
