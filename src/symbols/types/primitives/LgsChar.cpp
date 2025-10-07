@@ -9,10 +9,6 @@
 #include "types/primitives/LgsUInt.h"
 
 
-json::value LgsChar::asJsonStr() {
-    assert(0);
-}
-
 size_t LgsChar::getSizeBytes() {
     return sizeof(char);
 }
@@ -29,7 +25,7 @@ LgsExpr* LgsChar::getZeroValue() {
     return new LgsCharConst('0');
 }
 
-Lgs_RTType LgsChar::getRTType() {
+Lgs_rttype LgsChar::getRTType() {
     return RTT_CHAR;
 }
 

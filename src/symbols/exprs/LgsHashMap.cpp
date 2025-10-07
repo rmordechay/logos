@@ -11,24 +11,15 @@ std::string LgsHashMap::getName() {
     return type->pname();
 }
 
-json::value LgsHashMap::asJsonStr() {
+void LgsHashMap::parseAsJSON(std::stringstream& json) {
     assert(0);
 }
 
 LgsHashMap::~LgsHashMap() {
-    for (const auto initialElement : initialElements) {
-        delete initialElement;
+    for (const auto initialElement : pairs) {
+        freeExpr(initialElement.key);
+        freeExpr(initialElement.value);
     }
-    initialElements.clear();
+    pairs.clear();
 }
 
-LgsMapEntry::~LgsMapEntry() {
-    if (key) {
-        freeExpr(key);
-        key = nullptr;
-    }
-    if (value) {
-        freeExpr(value);
-        value = nullptr;
-    }
-}

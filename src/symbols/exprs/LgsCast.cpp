@@ -10,10 +10,6 @@ std::string LgsCast::getName() {
     return fromValue->getName() + "->" + toType->pname();
 }
 
-json::value LgsCast::asJsonStr() {
-    assert(0);
-}
-
 LgsCast::~LgsCast() {
     freeExpr(fromValue);
     freeType(toType);

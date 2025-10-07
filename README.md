@@ -4,7 +4,6 @@
 ### Requirements
 - clang 19
 - LLVM 19
-- antlr4
 - boost
 - cmake
 

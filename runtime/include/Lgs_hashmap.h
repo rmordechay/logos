@@ -3,7 +3,7 @@
 
 struct Lgs_hashmap {
     size_t valueSize;
-    Lgs_RTType keyType;
-    Lgs_RTType valueType;
+    Lgs_rttype keyType;
+    Lgs_rttype valueType;
     std::unordered_map<std::string, std::vector<char>>* data;
 };

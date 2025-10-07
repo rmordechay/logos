@@ -11,14 +11,7 @@ void LgsAstCmd::run() {
     app.loadBuiltins();
     const auto absFilePath = fs::path(fs::canonical(filePath));
     const std::string code = getFileText(absFilePath);
-    app.parseSrcFile(code, absFilePath);
-    app.analyse();
-    json::object ast;
-    ast["ast"] = app.ast.front()->asJSON();
-    if (withErrors) {
-        ast["errors"] = app.errHandler.asJSON();
-    }
-    std::cout << ast["ast"];
+    app.loadSrcFile(code, absFilePath);
 }
 
 LgsCliCmdHelp& LgsAstCmd::getHelp() {

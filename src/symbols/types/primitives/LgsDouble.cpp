@@ -7,10 +7,6 @@ std::string LgsDouble::getName() {
     return name;
 }
 
-json::value LgsDouble::asJsonStr() {
-    assert(0);
-}
-
 size_t LgsDouble::getSizeBytes() {
     return sizeof(double_t);
 }
@@ -19,7 +15,7 @@ LgsExpr* LgsDouble::getZeroValue() {
     return new LgsFloatConst(this, 0.0);
 }
 
-Lgs_RTType LgsDouble::getRTType() {
+Lgs_rttype LgsDouble::getRTType() {
     return RTT_DOUBLE;
 }
 

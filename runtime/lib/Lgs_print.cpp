@@ -6,7 +6,7 @@
 
 std::string formatArray(Lgs_darray* arr);
 
-std::string formatElement(const Lgs_RTType type, void* elem) {
+std::string formatElement(const Lgs_rttype type, void* elem) {
     std::ostringstream oss;
     switch (type) {
     case RTT_TYPE:
@@ -77,6 +77,7 @@ std::string formatElement(const Lgs_RTType type, void* elem) {
         oss << elem;
         break;
     case RTT_SARRAY:
+    case RTT_NULLABLE:
     case RTT_MAP:
     case RTT_OBJECT:
     case RTT_VOID:
@@ -101,7 +102,7 @@ std::string formatArray(Lgs_darray* arr) {
     return oss.str();
 }
 
-extern "C" void Lgs_print(const Lgs_RTType rtt, void* v) {
+extern "C" void Lgs_print(const Lgs_rttype rtt, void* v) {
     if (v) printf("%s\n", formatElement(rtt, v).c_str());
     else printf("%s\n", LgsNullableExpr::nullLiteral);
 }

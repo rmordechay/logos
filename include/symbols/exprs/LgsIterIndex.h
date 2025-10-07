@@ -27,7 +27,6 @@ public:
     void assign(LgsLLVMGen& cg, LgsExpr* expr) override;
     void assignScalar(LgsLLVMGen& cg, LgsExpr* expr) const;
     std::string getName() override;
-    json::value asJsonStr() override;
     Type* getSArrayType(LgsLLVMGen& cg) const;
     ~LgsIterIndex() override;
 };

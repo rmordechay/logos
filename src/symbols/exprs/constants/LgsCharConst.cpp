@@ -7,7 +7,3 @@ Value* LgsCharConst::loadIR(LgsLLVMGen& cg) {
 std::string LgsCharConst::getName() {
     return type->pname();
 }
-
-json::value LgsCharConst::asJsonStr() {
-    assert(0);
-}

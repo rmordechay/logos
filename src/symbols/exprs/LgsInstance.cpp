@@ -22,17 +22,6 @@ void LgsInstance::setObject(LgsObject* newObj) {
     setType(obj);
 }
 
-json::value LgsInstance::asJsonStr() {
-    json::object jsonObj;
-    jsonObj["exprType"] = "instance";
-    jsonObj["obj"] = obj->asJsonStr();
-    jsonObj["args"] = json::array();
-    for (const auto& [argName, arg] : args) {
-        jsonObj["args"].as_array().push_back(arg->asJsonStr());
-    }
-    return jsonObj;
-}
-
 std::string LgsInstance::getName() {
     return name;
 }

@@ -10,10 +10,6 @@ std::string LgsPtr::getName() {
     return name;
 }
 
-json::value LgsPtr::asJsonStr() {
-    assert(0);
-}
-
 std::string LgsPtr::pname() {
     return name;
 }
@@ -27,10 +23,10 @@ size_t LgsPtr::getSizeBytes() {
 }
 
 LgsExpr* LgsPtr::getZeroValue() {
-    return new LgsNullableExpr();
+    return new LgsNullableExpr(nullptr);
 }
 
-Lgs_RTType LgsPtr::getRTType() {
+Lgs_rttype LgsPtr::getRTType() {
     assert(0);
 }
 

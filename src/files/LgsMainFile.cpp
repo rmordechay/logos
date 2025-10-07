@@ -1,38 +1,60 @@
 #include "files/LgsMainFile.h"
 #include "funcs/LgsFunc.h"
 #include "types/LgsEnum.h"
-#include "types/LgsGroup.h"
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
+#include "types/LgsSubType.h"
+#include "utils/LgsUtils.h"
 
-json::value LgsMainFile::asJSON() {
-    json::object obj;
-    json::array jsonEnums;
-    for (const auto& enum_ : enums) {
-        jsonEnums.emplace_back(enum_->asJsonStr());
+void LgsMainFile::parseAsJSON(std::stringstream& json) {
+    openJsonObject(json);
+
+    openJsonKeyArray(json, "funcs");
+    bool first = true;
+    for (const auto& [funcName, func] : funcs) {
+        if (!first) json << ',';
+        first = false;
+        func->parseAsJSON(json);
     }
-    obj["enums"] = jsonEnums;
-    json::array jsonObjects;
-    for (const auto& object : objects) {
-        jsonObjects.emplace_back(object->asJsonStr());
+    closeJsonArray(json, true);
+
+    openJsonKeyArray(json, "object");
+    first = true;
+    for (const auto obj : objects) {
+        if (!first) json << ',';
+        first = false;
+        obj->parseAsJSON(json);
     }
-    obj["objects"] = jsonObjects;
-    json::array jsonFuncs;
-    for (const auto& [_, func] : funcs) {
-        jsonFuncs.emplace_back(func->asJsonStr());
+    closeJsonArray(json, true);
+
+    openJsonKeyArray(json, "interfaces");
+    first = true;
+    for (const auto interface : interfaces) {
+        if (!first) json << ',';
+        first = false;
+        interface->parseAsJSON(json);
     }
-    obj["funcs"] = jsonFuncs;
-    json::array jsonInterfaces;
-    for (const auto& interface : interfaces) {
-        jsonInterfaces.emplace_back(interface->asJsonStr());
+    closeJsonArray(json, true);
+
+    openJsonKeyArray(json, "enums");
+    first = true;
+    for (const auto enum_ : enums) {
+        if (!first) json << ',';
+        first = false;
+        enum_->parseAsJSON(json);
     }
-    obj["interfaces"] = jsonInterfaces;
-    json::array jsonGroups;
-    for (const auto& group : groups) {
-        jsonGroups.emplace_back(group->asJsonStr());
+    closeJsonArray(json);
+
+    openJsonKeyArray(json, "subtypes");
+    first = true;
+    for (const auto subtype : subtypes) {
+        if (!first) json << ',';
+        first = false;
+        subtype->parseAsJSON(json);
     }
-    obj["groups"] = jsonGroups;
-    return obj;
+    closeJsonArray(json);
+
+    closeJsonObject(json);
 }
 
 void LgsMainFile::format() {

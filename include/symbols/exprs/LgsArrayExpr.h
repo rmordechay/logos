@@ -6,7 +6,7 @@
 
 class LgsArrayExpr final : public LgsExpr {
 public:
-    std::vector<LgsExpr*> initialElements;
+    std::vector<LgsExpr*> elements;
 
     LgsArrayExpr() = default;
     explicit LgsArrayExpr(LgsSArray* arrType) : LgsExpr(arrType) {}
@@ -15,6 +15,5 @@ public:
     Value* loadIR(LgsLLVMGen& cg) override;
     void completeType(LgsType* toType) override;
     std::string getName() override;
-    json::value asJsonStr() override;
     ~LgsArrayExpr() override;
 };

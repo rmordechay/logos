@@ -3,7 +3,7 @@
 #include "funcs/LgsFunc.h"
 #include "types/LgsAny.h"
 #include "types/LgsTypePair.h"
-class LgsMapEntry;
+class LgsPair;
 
 #define KEYS_FUNC_NAME "keys"
 #define VALUES_FUNC_NAME "values"
@@ -28,14 +28,13 @@ public:
     LgsFunc* getAddFunc() override;
     std::string getName() override;
     std::string pname() override;
-    json::value asJsonStr() override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
-    Lgs_RTType getRTType() override;
+    Lgs_rttype getRTType() override;
     LgsType* getIndexType() override;
     LgsType* getValueType() override;
     bool unpackLoopVarsTypes(LgsForeachLoop* loop) const override;
-    void unpackLoopVarsIR(LgsLLVMGen& cg, std::vector<LgsVarDec*> varDecs, Value* iterPtr, Value* index) const override;
+    void unpackLoopIR(LgsLLVMGen& cg, LgsForeachLoop* loop) const override;
     Value* lengthIR(LgsLLVMGen& cg, Value* iterable) override;
     Value* inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
     Value* getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) override;

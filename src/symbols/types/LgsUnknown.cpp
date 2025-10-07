@@ -1,8 +1,6 @@
 #include "types/LgsUnknown.h"
 
-json::value LgsUnknown::asJsonStr() {
-    assert(0);
-}
+#include "utils/LgsUtils.h"
 
 std::string LgsUnknown::getName() {
     return name;
@@ -12,7 +10,7 @@ LgsExpr* LgsUnknown::getZeroValue() {
     assert(0);
 }
 
-Lgs_RTType LgsUnknown::getRTType() {
+Lgs_rttype LgsUnknown::getRTType() {
     return RTT_UNKNOWN;
 }
 
@@ -26,6 +24,12 @@ bool LgsUnknown::canCastTo(LgsType* other) {
 
 std::string LgsUnknown::strFormatPart() const {
     assert(0);
+}
+
+void LgsUnknown::parseAsJSON(std::stringstream& json) {
+    openJsonObject(json);
+    addJsonKeyValue(json, "name", name);
+    closeJsonObject(json);
 }
 
 llvm::Type* LgsUnknown::getIRType(LgsLLVMGen& cg) {

@@ -1,6 +1,6 @@
 #pragma once
 
-enum Lgs_RTType {
+enum Lgs_rttype {
     RTT_UNKNOWN,
     RTT_VOID,
     RTT_BOOL,
@@ -27,6 +27,7 @@ enum Lgs_RTType {
     RTT_OBJECT,
     RTT_TYPE,
     RTT_ANY,
+    RTT_NULLABLE,
 };
 
 struct Lgs_vec2 {

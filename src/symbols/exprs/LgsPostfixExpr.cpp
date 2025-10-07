@@ -6,11 +6,7 @@ std::string LgsPostfixExpr::getName() {
     assert(0);
 }
 
-json::value LgsPostfixExpr::asJsonStr() {
-    assert(0);
-}
-
 LgsPostfixExpr::~LgsPostfixExpr() {
-    freeExpr(expr);
-    expr = nullptr;
+    freeExpr(baseExpr);
+    baseExpr = nullptr;
 }

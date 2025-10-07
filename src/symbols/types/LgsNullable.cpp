@@ -1,5 +1,6 @@
 #include "types/LgsNullable.h"
 #include "codegen/LgsLLVMGen.h"
+#include "data/LgsDefinitions.h"
 #include "exprs/LgsNullableExpr.h"
 #include "utils/LgsUtils.h"
 
@@ -16,13 +17,13 @@ Type* LgsNullable::getIRType(LgsLLVMGen& cg) {
 }
 
 LgsExpr* LgsNullable::getZeroValue() {
-    const auto nullableExpr = new LgsNullableExpr();
+    const auto nullableExpr = new LgsNullableExpr(nullptr);
     nullableExpr->type = this;
     return nullableExpr;
 }
 
-Lgs_RTType LgsNullable::getRTType() {
-    assert(0);
+Lgs_rttype LgsNullable::getRTType() {
+    return RTT_NULLABLE;
 }
 
 std::string LgsNullable::getName() {
@@ -30,14 +31,11 @@ std::string LgsNullable::getName() {
 }
 
 std::string LgsNullable::pname() {
-    return baseType->pname() + '?';
-}
-
-json::value LgsNullable::asJsonStr() {
-    assert(0);
+    return baseType ? baseType->pname() + '?' : LGS_UNKNOWN_TYPE;
 }
 
 bool LgsNullable::canCastTo(LgsType* other) {
+    if (other->getName() == LgsAny::name) return true;
     const auto otherNullable = other->asNullable();
     if (!otherNullable) return false;
     return baseType->canCastTo(otherNullable->baseType);

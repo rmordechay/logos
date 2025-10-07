@@ -6,12 +6,12 @@
 
 Type* LgsInterface::getIRType(LgsLLVMGen& cg) {
     if (IRType) return IRType;
-    std::vector<Type*> elementTypes;
-    for (int i = 0; i < methods.size(); ++i) {
-        elementTypes.emplace_back(cg.ptrTy());
-    }
-    IRType = cg.getStructType(elementTypes, name);
+    IRType = cg.ptrTy();
     return IRType;
+}
+
+LgsFunc* LgsInterface::getMethod(const std::string& methodName) {
+    return LgsObject::getMethod(methodName);
 }
 
 std::string LgsInterface::getName() {
@@ -22,7 +22,7 @@ LgsExpr* LgsInterface::getZeroValue() {
     assert(0);
 }
 
-Lgs_RTType LgsInterface::getRTType() {
+Lgs_rttype LgsInterface::getRTType() {
     return LgsObject::getRTType();
 }
 
@@ -31,7 +31,7 @@ bool LgsInterface::canCastTo(LgsType* other) {
         if (interface->name == getName()) return true;
     } else if (const auto obj = other->asObject()) {
         if (obj->name == getName()) return true;
-        for (const auto& implement : obj->interfaces) {
+        for (const auto& implement : obj->implements) {
             if (implement->getName() == getName()) return true;
         }
     }
@@ -42,12 +42,8 @@ size_t LgsInterface::getSizeBytes() {
     return 0;
 }
 
-json::value LgsInterface::asJsonStr() {
-    assert(0);
-}
-
 LgsInterface::~LgsInterface() {
-    for (const auto interface : interfaces) {
+    for (const auto interface : implements) {
         delete interface;
     }
 }

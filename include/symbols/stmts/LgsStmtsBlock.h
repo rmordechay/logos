@@ -12,6 +12,6 @@ public:
 
     explicit LgsStmtsBlock(const std::vector<LgsStmt*>& stmts = {}) : stmts(stmts) {}
     LgsStmt* lastStmt() const;
-    json::value asJsonStr() override;
+    void parseAsJSON(std::stringstream& json) override;
     ~LgsStmtsBlock() override;
 };

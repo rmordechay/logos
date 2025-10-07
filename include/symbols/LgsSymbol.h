@@ -3,7 +3,6 @@
 class LgsType;
 class LgsSubType;
 class LgsVariable;
-class LgsGroup;
 class LgsField;
 class LgsEnum;
 class LgsFunc;
@@ -21,7 +20,6 @@ enum LgsSymbolType {
     OBJECT,
     INTERFACE,
     SUBTYPE,
-    GROUP,
     ENUM,
     UNKNOWN,
 };
@@ -40,14 +38,12 @@ struct LgsSymbol {
     LgsField* field = nullptr;
     LgsEnum* enum_ = nullptr;
     LgsFunc* func = nullptr;
-    LgsGroup* group = nullptr;
     LgsLocation* location;
 
     explicit LgsSymbol();
     explicit LgsSymbol(LgsParam* param);
     explicit LgsSymbol(LgsVarDec* varDec);
     explicit LgsSymbol(LgsField* field);
-    explicit LgsSymbol(LgsGroup* group);
     explicit LgsSymbol(LgsInterface* interface);
     explicit LgsSymbol(LgsSubType* subtype);
     explicit LgsSymbol(LgsObject* object, bool isExternal = false, bool isBuiltin = false);

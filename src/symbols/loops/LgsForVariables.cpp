@@ -7,7 +7,3 @@ Value* LgsLoopMetaVar::loadIR(LgsLLVMGen& cg) {
 std::string LgsLoopMetaVar::getName() {
     return name;
 }
-
-json::value LgsLoopMetaVar::asJsonStr() {
-    return json::value(getName());
-}

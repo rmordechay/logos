@@ -13,8 +13,8 @@ void LgsArrayExpr::completeType(LgsType* toType) {
     }
     if (toType->asSArray() || toType->asDArray() || toType->asSet()) {
         const auto otherBaseType = toType->asIterable()->baseType;
-        for (int i = 0; i < initialElements.size(); ++i) {
-            const auto element = initialElements[i];
+        for (int i = 0; i < elements.size(); ++i) {
+            const auto element = elements[i];
             if (!element->type) {
                 element->type = otherBaseType;
             } else {
@@ -22,7 +22,7 @@ void LgsArrayExpr::completeType(LgsType* toType) {
                 if (element->type->canCastTo(otherBaseType)) {
                     const auto castTo = element->castTo(otherBaseType);
                     if (element != castTo) freeExpr(element);
-                    initialElements[i] = castTo;
+                    elements[i] = castTo;
                 }
             }
         }
@@ -34,16 +34,9 @@ std::string LgsArrayExpr::getName() {
     return type ? type->pname() : "[]";
 }
 
-json::value LgsArrayExpr::asJsonStr() {
-    json::object jsonObj;
-    jsonObj["exprKind"] = "arrayExpr";
-    jsonObj["type"] = type->asJsonStr();
-    return jsonObj;
-}
-
 LgsArrayExpr::~LgsArrayExpr() {
-    for (const auto& initialElement : initialElements) {
+    for (const auto& initialElement : elements) {
         freeExpr(initialElement);
     }
-    initialElements.clear();
+    elements.clear();
 }

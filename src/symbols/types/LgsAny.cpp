@@ -17,12 +17,8 @@ LgsExpr* LgsAny::getZeroValue() {
     assert(0);
 }
 
-Lgs_RTType LgsAny::getRTType() {
+Lgs_rttype LgsAny::getRTType() {
     return RTT_ANY;
-}
-
-json::value LgsAny::asJsonStr() {
-    assert(0);
 }
 
 std::string LgsAny::strFormatPart() const {

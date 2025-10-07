@@ -1,17 +1,20 @@
 #include "funcs/LgsParam.h"
-#include "funcs/LgsFunc.h"
-#include "utils/LgsUtils.h"
 
-std::string LgsParam::getName() {
-    return name;
-}
+#include "LgsType.h"
+#include "utils/LgsUtils.h"
 
 Value* LgsParam::loadIR(LgsLLVMGen& cg) {
     return IRValue;
 }
 
-json::value LgsParam::asJsonStr() {
-    json::object obj;
-    obj["name"] = name;
-    return obj;
+std::string LgsParam::getName() {
+    return name;
 }
+
+void LgsParam::parseAsJSON(std::stringstream& json) {
+    openJsonObject(json);
+    addJsonKeyValue(json, "name", name, true);
+    addJsonKeyValue(json, "type", type->getName());
+    closeJsonObject(json);
+}
+

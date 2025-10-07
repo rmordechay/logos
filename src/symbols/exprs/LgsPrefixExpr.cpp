@@ -10,10 +10,6 @@ std::string LgsPrefixExpr::getName() {
     assert(0);
 }
 
-json::value LgsPrefixExpr::asJsonStr() {
-    assert(0);
-}
-
 LgsPrefixExpr::~LgsPrefixExpr() {
     freeExpr(expr);
     expr = nullptr;

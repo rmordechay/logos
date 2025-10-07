@@ -15,10 +15,6 @@ Type* LgsShort::getIRType(LgsLLVMGen& cg) {
     return cg.i16Ty();
 }
 
-json::value LgsShort::asJsonStr() {
-    assert(0);
-}
-
 std::string LgsShort::getName() {
     return name;
 }
@@ -27,7 +23,7 @@ LgsExpr* LgsShort::getZeroValue() {
     return new LgsIntConst(&LGS_SHORT, 0);
 }
 
-Lgs_RTType LgsShort::getRTType() {
+Lgs_rttype LgsShort::getRTType() {
     return RTT_SHORT;
 }
 

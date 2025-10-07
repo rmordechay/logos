@@ -36,7 +36,7 @@ LgsExpr* LgsFuncType::getZeroValue() {
     assert(0);
 }
 
-Lgs_RTType LgsFuncType::getRTType() {
+Lgs_rttype LgsFuncType::getRTType() {
     assert(0);
 }
 
@@ -83,26 +83,6 @@ std::string LgsFuncType::pname() {
     return str.str();
 }
 
-json::value LgsFuncType::asJsonStr() {
-    json::object jsonObj;
-    jsonObj["name"] = name;
-    jsonObj["rt"] = rt->asJsonStr();
-    json::array jsonParams;
-    for (auto& param : params) {
-        jsonParams.emplace_back(param.asJsonStr());
-    }
-    jsonObj["params"] = jsonParams;
-    jsonObj["isPublic"] = isPublic;
-    jsonObj["isInternal"] = isBuiltin;
-    jsonObj["isVirtual"] = isVirtual;
-    jsonObj["isVariadic"] = isVariadic;
-    jsonObj["isOptional"] = isOptional;
-    jsonObj["isTerminator"] = isTerminator;
-    jsonObj["isMethod"] = isMethod;
-    jsonObj["hasDefaults"] = hasDefaults();
-    return jsonObj;
-}
-
 std::string LgsFuncType::strFormatPart() const {
     return "%p";
 }
@@ -119,6 +99,20 @@ bool LgsFuncType::canCastTo(LgsType* other) {
         const auto otherType = otherFuncType->params[i].type;
         if (!thisType || !otherType) return false;
         if (!thisType->canCastTo(otherType)) return false;
+    }
+    return true;
+}
+
+bool LgsFuncType::equals(LgsType* other) {
+    const auto otherFuncType = other->asFuncType();
+    if (!otherFuncType) return false;
+    if (name != otherFuncType->name) return false;
+    if (!rt->equals(otherFuncType->rt)) return false;
+    if (params.size() != otherFuncType->params.size()) return false;
+    for (size_t i = 0; i < params.size(); ++i) {
+        const auto param1 = params[i].type;
+        const auto param2 = otherFuncType->params[i];
+        if (!param1->equals(param2.type)) return false;
     }
     return true;
 }
@@ -153,14 +147,8 @@ bool LgsFuncType::hasDefaults() const {
 
 LgsFuncType::~LgsFuncType() {
     freeType(rt);
-    for (int i = 0; i < params.size(); ++i) {
-        if (isMethod && i == 0) continue;
-        const auto param = params[i];
-        if (param.expr) {
-            freeExpr(param.expr);
-        } else if (param.type) {
-            freeType(param.type);
-        }
+    if (isMethod) {
+        params.erase(params.begin());
     }
-    params.clear();
+    freeParams(params);
 }

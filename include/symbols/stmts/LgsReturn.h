@@ -12,7 +12,6 @@ public:
     BasicBlock* parentBlock = nullptr;
 
     explicit LgsReturn(LgsExpr* expr) : expr(expr) {}
-    json::value asJsonStr() override;
     ~LgsReturn() override;
 };
 

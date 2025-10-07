@@ -111,15 +111,6 @@ std::string LgsIterIndex::getName() {
     return str.str();
 }
 
-json::value LgsIterIndex::asJsonStr() {
-    json::object jsonObj;
-    jsonObj["exprType"] = "iterIndex";
-    jsonObj["from"] = index.from->asJsonStr();
-    if (index.to) jsonObj["to"] = index.to->asJsonStr();
-    jsonObj["baseExpr"] = baseExpr->asJsonStr();
-    return jsonObj;
-}
-
 Type* LgsIterIndex::getSArrayType(LgsLLVMGen& cg) const {
     auto current = this;
     while (true) {

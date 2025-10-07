@@ -12,7 +12,7 @@
 #include <clang/Frontend/CompilerInstance.h>
 #include <llvm/TargetParser/Host.h>
 
-void LgsCLang::resolveCFiles(LgsFile* lgsFile) {
+void LgsCLang::resolveCPaths(LgsFile* lgsFile) {
     for (const auto externalCPath : lgsFile->externalCPaths) {
         const auto entryPath = resolveExternalFile(externalCPath);
         if (entryPath == "") continue;

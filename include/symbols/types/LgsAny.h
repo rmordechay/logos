@@ -11,9 +11,8 @@ public:
     size_t getSizeBytes() override;
     Type* getIRType(LgsLLVMGen& cg) override;
     LgsExpr* getZeroValue() override;
-    Lgs_RTType getRTType() override;
+    Lgs_rttype getRTType() override;
     std::string getName() override;
-    json::value asJsonStr() override;
     std::string strFormatPart() const override;
     bool canCastTo(LgsType* other) override;
 };

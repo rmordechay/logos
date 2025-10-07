@@ -1,20 +1,21 @@
 #include "stmts/LgsStmtsBlock.h"
-#include "data/LgsDefinitions.h"
-#include "exprs/LgsSelection.h"
-#include "funcs/LgsFunc.h"
 #include "stmts/LgsReturn.h"
+#include "utils/LgsUtils.h"
 
 LgsStmt* LgsStmtsBlock::lastStmt() const {
     if (stmts.empty()) return nullptr;
     return stmts[stmts.size() - 1];
 }
 
-json::value LgsStmtsBlock::asJsonStr() {
-    json::array jsonStmts;
-    for (const auto& stmt : stmts) {
-        jsonStmts.emplace_back(stmt->asJsonStr());
+void LgsStmtsBlock::parseAsJSON(std::stringstream& json) {
+    openJsonArray(json);
+    bool first = true;
+    for (const auto stmt : stmts) {
+        if (!first) json << ',';
+        first = false;
+        stmt->parseAsJSON(json);
     }
-    return jsonStmts;
+    closeJsonArray(json);
 }
 
 LgsStmtsBlock::~LgsStmtsBlock() {

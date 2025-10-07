@@ -16,11 +16,12 @@ public:
     bool isOwner = false;
 
     explicit LgsVarDec(const std::string& name, LgsExpr* expr) : name(name), expr(expr) {}
+    LgsVarDec(const std::string& name, LgsType* type, LgsExpr* expr) : name(name), type(type), expr(expr) {}
     std::string getName() override;
     Value* loadIR(LgsLLVMGen& cg) override;
     bool shouldAllocate() const;
     void setDebugValue(LgsLLVMGen& cg) override;
-    json::value asJsonStr() override;
+    void parseAsJSON(std::stringstream& json) override;
     ~LgsVarDec() override;
 };
 

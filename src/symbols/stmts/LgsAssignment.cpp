@@ -4,14 +4,6 @@
 #include "exprs/LgsVariable.h"
 #include "types/iterables/LgsVec.h"
 
-json::value LgsAssignment::asJsonStr() {
-    json::object obj;
-    obj["lValue"] = lValue->asJsonStr();
-    obj["rValue"] = rValue->asJsonStr();
-    obj["assignmentType"] = assignmentType;
-    return obj;
-}
-
 std::string LgsAssignment::getAssignTypeStr() const {
     switch (assignmentType) {
     case ASSIGN:

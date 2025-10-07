@@ -1,5 +1,4 @@
 #include "analysis/LgsTypeResolver.h"
-
 #include "exprs/LgsVariable.h"
 #include "files/LgsFile.h"
 #include "files/LgsInterfaceFile.h"
@@ -11,7 +10,6 @@
 #include "stmts/LgsIOPair.h"
 #include "types/LgsEnum.h"
 #include "types/LgsFuncType.h"
-#include "types/LgsGroup.h"
 #include "types/LgsInterface.h"
 #include "types/iterables/LgsIterable.h"
 #include "types/LgsNullable.h"
@@ -71,9 +69,6 @@ LgsType* LgsTypeResolver::resolveType(LgsType* type, LgsFile* file) {
         case INTERFACE:
             newType = symbol->interface;
             break;
-        case GROUP:
-            newType = symbol->group;
-            break;
         case ENUM:
             newType = symbol->enum_;
             break;
@@ -100,9 +95,6 @@ void LgsTypeResolver::resolveMainFileTypes(LgsMainFile* mf) {
     for (const auto interface : mf->interfaces) {
         resolveInterfaceTypes(interface, *mf);
     }
-    for (const auto group : mf->groups) {
-        resolveGroupTypes(group, *mf);
-    }
     for (const auto subtype : mf->subtypes) {
         subtype->subtype = resolveType(subtype->subtype, mf);
         subtype->isPrimitive = subtype->subtype->isPrimitive;
@@ -121,27 +113,15 @@ void LgsTypeResolver::resolveObjTypes(LgsObject* obj, LgsFile& file) {
         }
     }
     for (const auto& field : obj->fields) {
-        if (obj->name == field->type->getName()) {
-            field->type = obj;
-        } else {
-            field->type = resolveType(field->type, &file);
-        }
+        field->type = resolveType(field->type, &file);
     }
     for (const auto& [_, method] : obj->methods) {
-        if (obj->name == method->type->getName()) {
-            method->funcType->rt = obj;
-        } else {
-            method->funcType->rt = resolveType(method->funcType->rt, &file);
-        }
+        method->funcType->rt = resolveType(method->funcType->rt, &file);
         for (auto& param : method->funcType->params) {
-            if (obj->name == param.type->getName()) {
-                param.type = obj;
-            } else {
-                param.type = resolveType(param.type, &file);
-            }
+            param.type = resolveType(param.type, &file);
         }
     }
-    for (auto& interface : obj->interfaces) {
+    for (auto& interface : obj->implements) {
         interface = resolveType(interface, &file);
     }
     for (const auto& ioPair : obj->ioPairs) {
@@ -156,7 +136,7 @@ void LgsTypeResolver::resolveInterfaceTypes(LgsInterface* interface, LgsFile& fi
     for (const auto& [_, method] : interface->methods) {
         resolveFuncTypes(method->funcType, file);
     }
-    for (auto& i : interface->interfaces) {
+    for (auto& i : interface->implements) {
         i = resolveType(i, &file);
     }
 }
@@ -166,24 +146,10 @@ void LgsTypeResolver::resolveIterable(LgsIterable* iterable, LgsFile& file) {
 }
 
 void LgsTypeResolver::resolveFuncTypes(LgsFuncType* funcType, LgsFile& file) {
-    for (auto & param : funcType->params) {
+    for (auto& param : funcType->params) {
         param.type = resolveType(param.type, &file);
     }
     funcType->rt = !funcType->rt ? &LGS_VOID : resolveType(funcType->rt, &file);
-}
-
-void LgsTypeResolver::resolveGroupTypes(LgsGroup* group, LgsFile& file) {
-    for (auto& type : group->types) {
-        type = resolveType(type, &file);
-        for (const auto target : group->targetSymbols) {
-            if (const auto method = type->getMethod(target->name)) {
-                method->funcType->isVirtual = true;
-                group->targetMethods[target->name] = method;
-            } else if (const auto field = type->getField(target->name)) {
-                group->targetFields[target->name] = field;
-            }
-        }
-    }
 }
 
 void LgsTypeResolver::resolveIOPair(LgsIOPair* ioPair, LgsObject* obj) const {

@@ -3,7 +3,6 @@
 #include "utils/ThreadPool.h"
 
 class LgsIOPair;
-class LgsGroup;
 class LgsFuncType;
 class LgsIterable;
 class LgsInterface;
@@ -26,6 +25,5 @@ public:
     void resolveInterfaceTypes(LgsInterface* interface, LgsFile& file);
     void resolveIterable(LgsIterable* iterable, LgsFile& file);
     void resolveFuncTypes(LgsFuncType* funcType, LgsFile& file);
-    void resolveGroupTypes(LgsGroup* group, LgsFile& file);
     void resolveIOPair(LgsIOPair* ioPair, LgsObject* obj) const;
 };

@@ -20,6 +20,7 @@ bool LgsFuncCall::equals(const LgsFuncType* other) const {
     if (other->hasDefaults()) return equalsDefaultParams(other);
     if (other->isVariadic) return equalsVariadic(other);
     for (size_t i = 0; i < other->params.size(); ++i) {
+        if (i >= args.size()) break;
         const auto arg = args[i];
         const auto param = other->params[i];
         const auto argType = arg->type;
@@ -63,15 +64,23 @@ std::string LgsFuncCall::getName() {
     return str.str();
 }
 
-json::value LgsFuncCall::asJsonStr() {
-    json::object jsonObj;
-    jsonObj["name"] = name;
-    jsonObj["type"] = type->asJsonStr();
-    json::array jsonArgs;
-    for (const auto& arg : args) {
-        jsonArgs.emplace_back(arg->asJsonStr());
+void LgsFuncCall::parseAsJSON(std::stringstream& json) {
+    openJsonObject(json);
+
+    addJsonKeyValue(json, "kind", "FuncCall", true);
+    addJsonKeyValue(json, "name", name, true);
+
+    openJsonKey(json, "args");
+    openJsonArray(json);
+    bool first = true;
+    for (const auto arg : args) {
+        if (!first) json << ',';
+        first = false;
+        arg->parseAsJSON(json);
     }
-    return jsonObj;
+    closeJsonArray(json);
+
+    closeJsonObject(json);
 }
 
 LgsFuncCall::~LgsFuncCall() {

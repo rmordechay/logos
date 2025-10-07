@@ -9,10 +9,6 @@ size_t LgsUInt::getSizeBytes() {
     return sizeof(uint32_t);
 }
 
-json::value LgsUInt::asJsonStr() {
-    assert(0);
-}
-
 Type* LgsUInt::getIRType(LgsLLVMGen& cg) {
     return cg.i32Ty();
 }
@@ -25,7 +21,7 @@ LgsExpr* LgsUInt::getZeroValue() {
     return new LgsIntConst(this, 0);
 }
 
-Lgs_RTType LgsUInt::getRTType() {
+Lgs_rttype LgsUInt::getRTType() {
     return RTT_UINT;
 }
 

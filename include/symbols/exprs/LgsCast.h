@@ -13,7 +13,6 @@ public:
     LgsCast(LgsType* castToType, LgsExpr* castFromValue) : LgsExpr(castToType), toType(castToType), fromValue(castFromValue) {}
     Value* loadIR(LgsLLVMGen& cg) override;
     std::string getName() override;
-    json::value asJsonStr() override;
     ~LgsCast() override;
 };
 

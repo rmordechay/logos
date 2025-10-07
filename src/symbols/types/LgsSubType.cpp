@@ -28,14 +28,10 @@ bool LgsSubType::canCastTo(LgsType* other) {
     return getName() == otherName;
 }
 
-Lgs_RTType LgsSubType::getRTType() {
+Lgs_rttype LgsSubType::getRTType() {
     return subtype->getRTType();
 }
 
 std::string LgsSubType::strFormatPart() const {
     return subtype->strFormatPart();
-}
-
-json::value LgsSubType::asJsonStr() {
-    return subtype->asJsonStr();
 }

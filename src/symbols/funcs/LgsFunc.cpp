@@ -117,11 +117,22 @@ std::string LgsFunc::getIRName() const {
     return funcName;
 }
 
-json::value LgsFunc::asJsonStr() {
-    json::object obj;
-    obj["funcType"] = funcType->asJsonStr();
-    obj["stmtsBlock"] = stmtsBlock->asJsonStr();
-    return obj;
+void LgsFunc::parseAsJSON(std::stringstream& json) {
+    openJsonObject(json);
+    addJsonKeyValue(json, "name", funcType->name, true);
+    addJsonKeyValue(json, "rt", funcType->rt->getName(), true);
+    openJsonKeyArray(json, "params");
+    bool first = true;
+    for (auto& param : funcType->params) {
+        if (!first) json << ',';
+        first = false;
+        param.parseAsJSON(json);
+    }
+    closeJsonArray(json, true);
+    openJsonKey(json, "statements");
+    if (stmtsBlock) stmtsBlock->parseAsJSON(json);
+    else json << "[]";
+    closeJsonObject(json);
 }
 
 void LgsFunc::setDebugValue(LgsLLVMGen& cg) {

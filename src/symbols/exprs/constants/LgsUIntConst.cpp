@@ -5,7 +5,3 @@
 std::string LgsUIntConst::getName() {
     return std::to_string(value);
 }
-
-json::value LgsUIntConst::asJsonStr() {
-    assert(0);
-}

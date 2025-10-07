@@ -6,7 +6,6 @@
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsEnum.h"
-#include "types/LgsGroup.h"
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
 #include "types/LgsSubType.h"
@@ -46,9 +45,6 @@ void LgsSymbolTable::freeSymbols() {
             break;
         case INTERFACE:
             freeType(symbol.interface);
-            break;
-        case GROUP:
-            freeType(symbol.group);
             break;
         case ENUM:
             freeType(symbol.enum_);

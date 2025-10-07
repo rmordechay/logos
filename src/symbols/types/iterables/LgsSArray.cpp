@@ -14,7 +14,7 @@ Type* LgsSArray::getIRType(LgsLLVMGen& cg) {
 }
 
 std::string LgsSArray::getName() {
-    const auto ty = baseType ? baseType->pname() : LGS_UNKNOWN_TYPE;
+    const auto ty = baseType ? baseType->getName() : LGS_UNKNOWN_TYPE;
     return ty + '[' + size->getName() + "]";
 }
 
@@ -31,7 +31,7 @@ LgsExpr* LgsSArray::getZeroValue() {
     return new LgsArrayExpr(this);
 }
 
-Lgs_RTType LgsSArray::getRTType() {
+Lgs_rttype LgsSArray::getRTType() {
     return RTT_SARRAY;
 }
 
@@ -40,7 +40,7 @@ std::string LgsSArray::strFormatPart() const {
     return "%p";
 }
 
-LgsType* LgsSArray::applyOp(const LgsOperator op, LgsType* other) {
+LgsType* LgsSArray::applyBinOp(const LgsBinOpType op, LgsType* other) {
     const auto IRName = other->getName();
     switch (op) {
     case IN: {
@@ -63,15 +63,15 @@ Value* LgsSArray::inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) {
     cg.loop(size->loadIR(cg), [this, &cg, iterableExpr, value, resultPtr](Value* index, BasicBlock* exitBlock) {
         const auto trueBlock = cg.createBlock();
         const auto falseBlock = cg.createBlock();
-        const auto zeroValue = baseType->getZeroValue();
-        zeroValue->IRValue = getIRElement(cg, iterableExpr->IRValue, index);
-        const auto eq = zeroValue->eqIR(cg, value->IRValue);
+        const auto dummyExpr = baseType->getZeroValue();
+        dummyExpr->IRValue = getIRElement(cg, iterableExpr->IRValue, index);
+        const auto eq = baseType->eqIR(cg, dummyExpr->IRValue, value->loadIR(cg));
         cg.builder.CreateCondBr(eq, trueBlock, falseBlock);
         cg.startBlock(trueBlock);
         cg.builder.CreateStore(cg.true_(), resultPtr);
         cg.builder.CreateBr(exitBlock);
         cg.startBlock(falseBlock);
-        freeExpr(zeroValue);
+        freeExpr(dummyExpr);
     });
     return cg.builder.CreateLoad(cg.builder.getInt1Ty(), resultPtr);
 }
@@ -88,8 +88,3 @@ bool LgsSArray::canCastTo(LgsType* other) {
     if (!otherArr) return false;
     return baseType->canCastTo(otherArr->baseType);
 }
-
-json::value LgsSArray::asJsonStr() {
-    assert(0);
-}
-

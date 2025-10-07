@@ -11,10 +11,11 @@ class LgsSubType;
 class LgsObject : public LgsType {
 public:
     std::string name;
-    std::vector<LgsType*> interfaces;
-    std::vector<LgsIOPair*> ioPairs;
+    std::vector<LgsType*> implements;
     std::vector<LgsEnum*> enums;
     std::vector<LgsSubType*> subtypes;
+    std::vector<LgsObject*> objects;
+    std::vector<LgsIOPair*> ioPairs;
     LgsInstance* singleton = nullptr;
 
     explicit LgsObject(std::string  name) : name(std::move(name)) {
@@ -24,11 +25,12 @@ public:
     Type* getIRType(LgsLLVMGen& cg) override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
-    Lgs_RTType getRTType() override;
+    Lgs_rttype getRTType() override;
     std::string strFormatPart() const override;
     bool hasVirtuals() const;
     LgsObject* clone() override;
     std::string getName() override;
     bool canCastTo(LgsType* other) override;
-    json::value asJsonStr() override;
+    void parseAsJSON(std::stringstream& json) override;
+    ~LgsObject() override;
 };

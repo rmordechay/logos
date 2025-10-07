@@ -10,21 +10,20 @@ class LgsApp;
 class LgsFile {
 public:
     size_t id = 0;
-    std::string name;
     fs::path path;
     LgsLLVMGen generator;
+    LgsLocation location;
     LgsSymbolTable symbolTable;
     LgsRuntime* runtime = nullptr;
-    LgsLocation location{0, 0, 0};
     std::vector<LgsStrConst*> externalCPaths;
 
-    explicit LgsFile(const size_t fileID, const std::string& name, const fs::path& path) : id(fileID), name(name), path(path) {}
-    virtual json::value asJSON();
+    explicit LgsFile(const size_t fileID, const fs::path& path) : id(fileID), path(path) {}
+    virtual void parseAsJSON(std::stringstream& json);
     virtual void format();
     virtual ~LgsFile() = default;
 };
 
-inline json::value LgsFile::asJSON() {
+inline void LgsFile::parseAsJSON(std::stringstream& json) {
     assert(0);
 }
 

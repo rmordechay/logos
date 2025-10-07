@@ -3,18 +3,12 @@
 #include "codegen/LgsLLVMGen.h"
 #include "utils/LgsUtils.h"
 
-json::value LgsIfStmt::asJsonStr() {
-    json::object obj;
-    obj["ifCond"] = ifCond->asJsonStr();
-    obj["ifBlock"] = ifBlock->asJsonStr();
-    if (elseBlock) obj["elseBlock"] = elseBlock->asJsonStr();
-    for (const auto& [expr, block] : elseIfs) {
-        json::object elseIfObj;
-        elseIfObj["expr"] = expr->asJsonStr();
-        elseIfObj["block"] = block->asJsonStr();
-        obj["elseIfs"].as_array().emplace_back(elseIfObj);
-    }
-    return obj;
+void LgsIfStmt::parseAsJSON(std::stringstream& json) {
+    openJsonObject(json);
+    addJsonKeyValue(json, "kind", "IfStmt", true);
+    openJsonKey(json, "ifCond");
+    ifCond->parseAsJSON(json);
+    closeJsonObject(json);
 }
 
 LgsIfStmt::~LgsIfStmt() {
@@ -37,11 +31,7 @@ LgsIfStmt::~LgsIfStmt() {
     elseIfs.clear();
 }
 
-json::value LgsPatternMatching::asJsonStr() {
-    assert(0);
-}
-
-LgsPatternMatching::~LgsPatternMatching() {
+LgsPatternMatch::~LgsPatternMatch() {
     if (cond) {
         freeExpr(cond);
         cond = nullptr;

@@ -16,10 +16,6 @@ std::pair<Value*, Value*> loadOperands(LgsLLVMGen& cg, Value* self, Value* other
     return {l, r};
 }
 
-json::value LgsFloat::asJsonStr() {
-    assert(0);
-}
-
 std::string LgsFloat::getName() {
     return name;
 }
@@ -32,7 +28,7 @@ LgsExpr* LgsFloat::getZeroValue() {
     return new LgsFloatConst(this, 0.0);
 }
 
-Lgs_RTType LgsFloat::getRTType() {
+Lgs_rttype LgsFloat::getRTType() {
     return RTT_FLOAT;
 }
 
@@ -52,7 +48,7 @@ bool LgsFloat::canCastTo(LgsType* other) {
     return false;
 }
 
-LgsType* LgsFloat::applyOp(const LgsOperator op, LgsType* other) {
+LgsType* LgsFloat::applyBinOp(const LgsBinOpType op, LgsType* other) {
     if (other->asInt()) return this;
     const auto IRName = other->getName();
     if (name == IRName) return this;

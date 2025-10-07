@@ -5,6 +5,5 @@
 class LgsTypeExpr final : public LgsExpr {
 public:
     explicit LgsTypeExpr(LgsType* type): LgsExpr(type) {}
-    json::value asJsonStr() override;
     std::string getName() override;
 };

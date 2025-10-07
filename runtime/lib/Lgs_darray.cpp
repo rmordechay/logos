@@ -3,7 +3,7 @@
 #include "utils/LgsUtils.h"
 #include <cstring>
 
-extern "C" void Lgs_DArray_init(Lgs_darray* arr, const size_t elementSize, const Lgs_RTType baseType) {
+extern "C" void Lgs_DArray_init(Lgs_darray* arr, const size_t elementSize, const Lgs_rttype baseType) {
     assert(baseType != RTT_UNKNOWN);
     arr->elementSize = elementSize;
     arr->baseType = baseType;

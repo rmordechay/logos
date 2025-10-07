@@ -2,6 +2,7 @@
 #include "Lgs_darray.h"
 #include "codegen/LgsLLVMGen.h"
 #include "exprs/LgsArrayExpr.h"
+#include "funcs/LgsFunc.h"
 #include "types/LgsAny.h"
 #include "types/LgsVoid.h"
 #include "types/primitives/LgsBool.h"
@@ -44,7 +45,7 @@ LgsExpr* LgsDArray::getZeroValue() {
     return new LgsArrayExpr(this);
 }
 
-Lgs_RTType LgsDArray::getRTType() {
+Lgs_rttype LgsDArray::getRTType() {
     return RTT_DARRAY;
 }
 
@@ -53,15 +54,12 @@ std::string LgsDArray::strFormatPart() const {
     return "%p";
 }
 
-LgsType* LgsDArray::applyOp(const LgsOperator op, LgsType* other) {
-    const auto IRName = other->getName();
+LgsType* LgsDArray::applyBinOp(const LgsBinOpType op, LgsType* other) {
     switch (op) {
     case IN: {
-        if (const auto otherIter = other->asIterable()) {
-            if (otherIter->getDim() - 1 == getDim()) return &LGS_BOOL;
-        } else {
-            if (other->canCastTo(baseType)) return &LGS_BOOL;
-        }
+        const auto otherIter = other->asIterable();
+        if (!otherIter) return nullptr;
+        if (otherIter->getDimension() - 1 == getDimension()) return &LGS_BOOL;
         break;
     }
     default:
@@ -119,10 +117,4 @@ bool LgsDArray::canCastTo(LgsType* other) {
     if (!baseType) return true;
     if (!otherArr->baseType) return true;
     return baseType->canCastTo(otherArr->baseType);
-}
-
-json::value LgsDArray::asJsonStr() {
-    json::object jsonObj;
-    jsonObj["name"] = name;
-    return jsonObj;
 }

@@ -1,9 +1,10 @@
 #include "types/LgsObject.h"
 #include "exprs/LgsInstance.h"
 #include "stmts/LgsField.h"
-#include "types/LgsGroup.h"
+#include "types/LgsEnum.h"
 #include "types/LgsInterface.h"
 #include "types/LgsNullable.h"
+#include "types/LgsSubType.h"
 
 #include <llvm/IR/Module.h>
 
@@ -12,18 +13,16 @@ LgsFunc* LgsObject::getMethod(const std::string& methodName) {
     if (method != methods.end() && method->second) {
         return method->second;
     }
-    if (const auto obj = asObject()) {
-        for (const auto* f : fields) {
-            if (f->name != methodName) continue;
-            if (f->expr && f->expr->asFunc()) {
-                return f->expr->asFunc();
-            }
+    for (const auto* f : fields) {
+        if (f->name != methodName) continue;
+        if (f->expr && f->expr->asFunc()) {
+            return f->expr->asFunc();
         }
-        for (const auto interface : obj->interfaces) {
-            const auto interfaceMethod = interface->getMethod(methodName);
-            if (interfaceMethod) {
-                return interfaceMethod;
-            }
+    }
+    for (const auto interface : implements) {
+        const auto interfaceMethod = interface->getMethod(methodName);
+        if (interfaceMethod) {
+            return interfaceMethod;
         }
     }
     return nullptr;
@@ -83,7 +82,7 @@ std::string LgsObject::strFormatPart() const {
     return str.str();
 }
 
-Lgs_RTType LgsObject::getRTType() {
+Lgs_rttype LgsObject::getRTType() {
     return RTT_OBJECT;
 }
 
@@ -122,16 +121,8 @@ bool LgsObject::canCastTo(LgsType* other) {
         otherType = nullable->baseType;
     }
     if (const auto otherInterface = otherType->asInterface()) {
-        for (const auto objInterface : interfaces) {
+        for (const auto objInterface : implements) {
             if (objInterface->getName() == otherInterface->name) {
-                return true;
-            }
-        }
-        return false;
-    }
-    if (const auto otherGroup = otherType->asGroup()) {
-        for (const auto otherGroupType : otherGroup->types) {
-            if (name == otherGroupType->getName()) {
                 return true;
             }
         }
@@ -140,14 +131,47 @@ bool LgsObject::canCastTo(LgsType* other) {
     return name == otherType->getName();
 }
 
-json::value LgsObject::asJsonStr() {
-    json::object jsonObj;
-    jsonObj["name"] = getName();
-    json::array jsonFields;
-    for (const auto& field : fields) {
-        jsonFields.emplace_back(field->asJsonStr());
+void LgsObject::parseAsJSON(std::stringstream& json) {
+    openJsonObject(json);
+    addJsonKeyValue(json, "name", name, true);
+
+    openJsonKeyArray(json, "fields");
+    bool first = true;
+    for (const auto field : fields) {
+        if (!first) json << ',';
+        first = false;
+        field->parseAsJSON(json);
     }
-    jsonObj["fields"] = jsonFields;
-    return jsonObj;
+    closeJsonArray(json, true);
+
+    openJsonKeyArray(json, "methods");
+    first = true;
+    for (const auto& [funcName, methods] : methods) {
+        if (!first) json << ',';
+        first = false;
+        methods->parseAsJSON(json);
+    }
+    closeJsonArray(json);
+
+    closeJsonObject(json);
+}
+
+LgsObject::~LgsObject() {
+    for (const auto interface : implements) {
+        freeType(interface);
+    }
+    implements.clear();
+    for (const auto enum_ : enums) {
+        freeType(enum_);
+    }
+    enums.clear();
+    for (const auto subtype : subtypes) {
+        freeType(subtype);
+    }
+    subtypes.clear();
+    for (const auto object : objects) {
+        freeType(object);
+    }
+    objects.clear();
 }
 

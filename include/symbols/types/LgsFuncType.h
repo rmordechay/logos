@@ -42,13 +42,13 @@ public:
     void setFuncOptions(uint32_t ops);
     Type* getIRType(LgsLLVMGen& cg) override;
     LgsExpr* getZeroValue() override;
-    Lgs_RTType getRTType() override;
+    Lgs_rttype getRTType() override;
     size_t getSizeBytes() override;
     std::string getName() override;
     std::string pname() override;
-    json::value asJsonStr() override;
     std::string strFormatPart() const override;
     bool canCastTo(LgsType* other) override;
+    bool equals(LgsType* other) override;
     LgsType* clone() override;
     bool hasDefaults() const;
     ~LgsFuncType() override;

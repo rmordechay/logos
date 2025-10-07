@@ -101,7 +101,7 @@ func:
     ;
 
 lambda:
-        (IDENTIFIER | (LPAREN lambdaParams? RPAREN)) (COLON rt=type)? ARROW statementsBlock
+        (lambdaParam | (LPAREN lambdaParams? RPAREN)) (COLON rt=type)? ARROW statementsBlock
     ;
 
 lambdaParams:
@@ -399,11 +399,13 @@ jsonArray:
     |   LBRACK RBRACK
     ;
 
-// Token
+// Tokens
 DOUBLE_EQUAL: '==';
 NOT_EQUAL: '!=';
 GE: '>=';
 LE: '<=';
+LANGLE: '<';
+RANGLE: '>';
 
 LPAREN: '(';
 RPAREN: ')';
@@ -411,13 +413,17 @@ LBRACE: '{';
 RBRACE: '}';
 LBRACK: '[';
 RBRACK: ']';
-LANGLE: '<';
-RANGLE: '>';
 
+DOT: '.';
 COMMA: ',';
 ARROW: '->';
+COLON: ':';
+EQUAL: '=';
+QUEST_MARK: '?';
+EXCLA_MARK: '!';
 TRIPLE_DOT: '...';
 DOUBLE_DOT: '..';
+
 WALRUS: ':=';
 EQUAL_PLUS: '+=';
 EQUAL_MINUS: '-=';
@@ -429,21 +435,15 @@ EQUAL_PIPE: '|=';
 EQUAL_CARET: '^=';
 EQUAL_DOUBLE_RANGLE: '<<=';
 EQUAL_DOUBLE_LANGLE: '>>=';
+
 INC: '++';
 DEC: '--';
-DOT: '.';
-COLON: ':';
-EQUAL: '=';
 PLUS: '+';
 MINUS: '-';
 STAR: '*';
 SLIDER: '_/';
 SLASH: '/';
-HASH: '#';
-QUEST_MARK: '?';
-EXCLA_MARK: '!';
 PERCENT: '%';
-DOLLAR: '$';
 AMPERSAND: '&';
 PIPE: '|';
 CARET: '^';
@@ -464,7 +464,6 @@ GO: 'go';
 DEFER: 'defer';
 IO: 'io';
 OWNER: 'owner';
-
 AND: 'and';
 OR: 'or';
 NOT: 'not';
@@ -475,15 +474,15 @@ ELSE: 'else';
 BREAK: 'break';
 CONTINUE: 'continue';
 RETURN: 'return';
+JSON: '.json';
+VEC2: 'vec2';
+VEC3: 'vec3';
+VEC4: 'vec4';
 
 FOR: 'for';
 FOR_META: 'for.'[a-zA-Z]+;
 FOREVER: 'for.ever';
-JSON: '.json';
 
-VEC2: 'vec2';
-VEC3: 'vec3';
-VEC4: 'vec4';
 
 LONG: [0-9][0-9_]*'L';
 INTEGER: [0-9][0-9_]*;

@@ -2,10 +2,6 @@
 #include "codegen/LgsLLVMGen.h"
 #include "utils/LgsUtils.h"
 
-json::value LgsNullableExpr::asJsonStr() {
-    return json::value(nullptr);
-}
-
 std::string LgsNullableExpr::getName() {
     return "null";
 }

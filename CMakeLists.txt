@@ -7,9 +7,8 @@ add_definitions(-DLOGOS_VERSION="${CMAKE_PROJECT_VERSION}")
 
 find_package(LLVM REQUIRED CONFIG)
 find_package(Clang REQUIRED CONFIG)
-find_package(antlr4-runtime REQUIRED)
 find_package(SQLite3 REQUIRED)
-find_package(Boost CONFIG REQUIRED context coroutine json)
+find_package(Boost CONFIG REQUIRED context coroutine)
 
 set(LLVM_LINK_LLVM_DYLIB ON)
 set(CLANG_LINK_CLANG_DYLIB ON)
@@ -41,15 +40,14 @@ set(CORE_SOURCES
     src/codegen/LgsLinker.cpp
     src/codegen/LgsCodeGen.cpp
     src/codegen/LgsLLVMGen.cpp
-    src/analysis/LgsParserAdapter.cpp
     src/analysis/LgsSema.cpp
     src/analysis/LgsTypeResolver.cpp
     src/files/LgsMainFile.cpp
     src/files/LgsTestFile.cpp
     src/files/LgsObjectFile.cpp
     src/files/LgsInterfaceFile.cpp
-    src/parser/LogosLexer.cpp
-    src/parser/LogosParser.cpp
+    src/parser/LgsLexer.cpp
+    src/parser/LgsParser.cpp
     src/cli/LgsCli.cpp
     src/cli/LgsCliCmd.cpp
     src/cli/LgsRunCmd.cpp
@@ -79,6 +77,7 @@ set(CORE_SOURCES
     src/symbols/exprs/LgsVariable.cpp
     src/symbols/exprs/LgsVectorExpr.cpp
     src/symbols/exprs/LgsTypeExpr.cpp
+    src/symbols/exprs/LgsNullableExpr.cpp
     src/symbols/exprs/constants/LgsCharConst.cpp
     src/symbols/exprs/constants/LgsFloatConst.cpp
     src/symbols/exprs/constants/LgsIntConst.cpp
@@ -114,7 +113,6 @@ set(CORE_SOURCES
     src/symbols/types/LgsPtr.cpp
     src/symbols/types/LgsEnum.cpp
     src/symbols/types/LgsFuncType.cpp
-    src/symbols/types/LgsGroup.cpp
     src/symbols/types/LgsInterface.cpp
     src/symbols/types/LgsNullable.cpp
     src/symbols/types/LgsObject.cpp
@@ -143,41 +141,32 @@ set(RUNTIME_SOURCES
     runtime/lib/Lgs_hashmap.cpp
     runtime/lib/Lgs_DArray.cpp
     runtime/lib/Lgs_system.cpp
-    runtime/lib/Lgs_defer.cpp
     runtime/lib/Lgs_runtime.cpp
     runtime/lib/Lgs_scheduler.cpp
     runtime/lib/Lgs_stack.cpp
     runtime/lib/Lgs_print.cpp
     runtime/lib/Lgs_arena.cpp
     runtime/lib/Lgs_set.cpp
-    src/symbols/exprs/LgsNullableExpr.cpp
-    src/parser_new/LgsLexerNew.cpp
-    src/parser_new/LgsLexerNew.h
-    src/parser_new/LgsTokens.h
+    include/data/LgsConfigs.h
+    include/parser/LgsToken.h
 )
 
 add_library(lgs_core SHARED ${CORE_SOURCES} ${RUNTIME_SOURCES})
 target_link_libraries(lgs_core PUBLIC
     LLVM
     clang-cpp
-    antlr4_shared
     Boost::context
     Boost::coroutine
-    Boost::json
     SQLite::SQLite3
 )
 
 target_precompile_headers(lgs_core PRIVATE include/pch.h)
 target_include_directories(lgs_core PUBLIC
-    include
-    include/external/include
-    include/external/antlr4-runtime
-    ${CLANG_INCLUDE_DIRS}
-    ${SQLite3_INCLUDE_DIRS}
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/include/symbols
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/parser
     ${CMAKE_CURRENT_SOURCE_DIR}/runtime/include
+    ${CLANG_INCLUDE_DIRS}
+    ${SQLite3_INCLUDE_DIRS}
 )
 
 add_executable(lgs main.cpp)

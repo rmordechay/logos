@@ -4,7 +4,7 @@
 #include "types/iterables/LgsMap.h"
 #include "utils/LgsUtils.h"
 
-extern "C" void Lgs_Map_init(Lgs_hashmap* map, const size_t valueSize, Lgs_RTType keyType, Lgs_RTType valueType) {
+extern "C" void Lgs_Map_init(Lgs_hashmap* map, const size_t valueSize, Lgs_rttype keyType, Lgs_rttype valueType) {
     assert(keyType != RTT_UNKNOWN && valueType != RTT_UNKNOWN);
     if (!map || valueSize == 0 || valueSize > 4096) std::exit(1);
     map->valueSize = valueSize;

@@ -58,16 +58,18 @@ bool LgsSelection::equals(LgsExpr* other) {
     return true;
 }
 
-json::value LgsSelection::asJsonStr() {
-    json::object jsonObj;
-    jsonObj["stmtKind"] = "selection";
-    json::array exprParts;
+void LgsSelection::parseAsJSON(std::stringstream& json) {
+    openJsonObject(json);
+    addJsonKeyValue(json, "kind", "Selection", true);
+    openJsonKeyArray(json, "exprs");
+    bool first = true;
     for (const auto& expr : exprs) {
-        exprParts.emplace_back(expr->asJsonStr());
+        if (!first) json << ',';
+        first = false;
+        expr->parseAsJSON(json);
     }
-    jsonObj["parts"] = exprParts;
-    jsonObj["type"] = type->asJsonStr();
-    return jsonObj;
+    closeJsonArray(json);
+    closeJsonObject(json);
 }
 
 LgsSelection::~LgsSelection() {

@@ -30,7 +30,6 @@ class LgsTypePair;
 class LgsLong;
 class LgsHashMap;
 class LgsVTable;
-class LgsGroup;
 class LgsFuncType;
 class LgsInterface;
 class LgsObject;
@@ -57,7 +56,7 @@ public:
     bool isUnsigned = false;
     bool isHeapAlloc = false;
     Type* IRType = nullptr;
-    LgsLocation location{0, 0, 0};
+    LgsLocation location;
     std::vector<LgsField*> fields;
     std::map<std::string, LgsFunc*> methods;
 
@@ -66,26 +65,27 @@ public:
     bool addField(LgsField* field);
     bool addMethod(LgsFunc* method);
     bool addEmptyMethod(const std::string& name);
-    bool equals(LgsType* other);
     bool isVoid();
     bool isNumber() const;
     bool isBig();
     bool isUnknown();
     bool isSliceable();
     LgsType* extendInt();
+    LgsType* applyIntBinOp(LgsBinOpType op, LgsType* other);
 
     virtual Type* getIRType(LgsLLVMGen& cg) = 0;
     virtual size_t getSizeBytes() = 0;
     virtual LgsExpr* getZeroValue() = 0;
-    virtual Lgs_RTType getRTType() = 0;
+    virtual Lgs_rttype getRTType() = 0;
     virtual std::string getName() = 0;
     virtual std::string pname(); // pretty name
+    virtual bool equals(LgsType* other);
     virtual bool canCastTo(LgsType* other) = 0;
-    virtual LgsType* applyOp(LgsOperator op, LgsType* other);
+    virtual LgsType* applyBinOp(LgsBinOpType op, LgsType* other);
     virtual std::string strFormatPart() const = 0;
     virtual DIBasicType* getDebugType(LgsLLVMGen& cg);
     virtual LgsType* clone();
-    virtual json::value asJsonStr() = 0;
+    virtual void parseAsJSON(std::stringstream& json);
 
     LgsAny* asAny();
     LgsChar* asChar();
@@ -111,7 +111,6 @@ public:
     LgsVec* asVec();
     LgsFuncType* asFuncType();
     LgsPtr* asPtr();
-    LgsGroup* asGroup();
     LgsSubType* asSubtype();
     LgsTypePair* asPair();
 
@@ -125,5 +124,13 @@ public:
     virtual Value* bitXorIR(LgsLLVMGen& cg, Value* self, Value* other);
     virtual Value* lshiftIR(LgsLLVMGen& cg, Value* self, Value* other);
     virtual Value* rshiftIR(LgsLLVMGen& cg, Value* self, Value* other);
+    virtual Value* eqIR(LgsLLVMGen& cg, Value* self, Value* other);
+    virtual Value* neIR(LgsLLVMGen& cg, Value* self, Value* other);
+    virtual Value* ltIR(LgsLLVMGen& cg, Value* self, Value* other);
+    virtual Value* gtIR(LgsLLVMGen& cg, Value* self, Value* other);
+    virtual Value* geIR(LgsLLVMGen& cg, Value* self, Value* other);
+    virtual Value* leIR(LgsLLVMGen& cg, Value* self, Value* other);
+    virtual Value* andIR(LgsLLVMGen& cg, Value* self, Value* other);
+    virtual Value* orIR(LgsLLVMGen& cg, Value* self, Value* other);
     virtual ~LgsType() = default;
 };

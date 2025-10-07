@@ -1,12 +1,12 @@
 #pragma once
 #include "exprs/LgsExpr.h"
 
-enum LgsOperator {
+enum LgsBinOpType {
     ADD,
     SUB,
     MUL,
     DIV,
-    MOD,
+    MODULO,
     BIT_AND,
     BIT_OR,
     BIT_XOR,
@@ -24,16 +24,20 @@ enum LgsOperator {
     NOOP,
 };
 
+struct LgsBinOp {
+    LgsBinOpType opType;
+    std::string name;
+};
+
 class LgsBinaryExpr final : public LgsExpr {
 public:
     LgsExpr* left;
     LgsExpr* right;
-    std::string opStr;
-    LgsOperator op;
+    LgsBinOp op = LgsBinOp{NOOP, ""};
 
-    explicit LgsBinaryExpr(LgsType* type, LgsExpr* left, LgsExpr* right, const LgsOperator op) : LgsExpr(type), left(left), right(right), op(op) {}
+    explicit LgsBinaryExpr(LgsType* type, LgsExpr* left, LgsExpr* right, const LgsBinOp& op) : LgsExpr(type), left(left), right(right), op(op) {}
     Value* loadIR(LgsLLVMGen& cg) override;
-    json::value asJsonStr() override;
+    void parseAsJSON(std::stringstream& json) override;
     std::string getName() override;
     ~LgsBinaryExpr() override;
 };

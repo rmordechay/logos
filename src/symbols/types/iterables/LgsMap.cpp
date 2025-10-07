@@ -23,10 +23,6 @@ std::string LgsMap::pname() {
     return '{' + (typePair->key ? typePair->key->pname() : LGS_UNKNOWN_TYPE) + ": " + (typePair->value ? typePair->value->pname() : LGS_UNKNOWN_TYPE) + '}';
 }
 
-json::value LgsMap::asJsonStr() {
-    assert(0);
-}
-
 size_t LgsMap::getSizeBytes() {
     return sizeof(Lgs_hashmap);
 }
@@ -35,7 +31,7 @@ LgsExpr* LgsMap::getZeroValue() {
     return new LgsHashMap(this);
 }
 
-Lgs_RTType LgsMap::getRTType() {
+Lgs_rttype LgsMap::getRTType() {
     return RTT_MAP;
 }
 
@@ -60,12 +56,12 @@ bool LgsMap::unpackLoopVarsTypes(LgsForeachLoop* loop) const {
     return false;
 }
 
-void LgsMap::unpackLoopVarsIR(LgsLLVMGen& cg, const std::vector<LgsVarDec*> varDecs, Value* iterPtr, Value* index) const {
-    const auto keyPtr = cg.callLgsFunc("Map_getKeyAt", cg.ptrTy(), {cg.ptrTy(), cg.sizeTy()}, {iterPtr, index});
-    varDecs[0]->IRValue = keyPtr;
-    if (varDecs.size() == 2) {
-        const auto valuePtr = cg.callLgsFunc("Map_getValueAt", cg.ptrTy(), {cg.ptrTy(), cg.sizeTy()}, {iterPtr, index});
-        varDecs[1]->IRValue = valuePtr;
+void LgsMap::unpackLoopIR(LgsLLVMGen& cg, LgsForeachLoop* loop) const {
+    const auto keyPtr = cg.callLgsFunc("Map_getKeyAt", cg.ptrTy(), {cg.ptrTy(), cg.sizeTy()}, {loop->iterExpr->IRValue, loop->iValue});
+    loop->loopVars[0]->IRValue = keyPtr;
+    if (loop->loopVars.size() == 2) {
+        const auto valuePtr = cg.callLgsFunc("Map_getValueAt", cg.ptrTy(), {cg.ptrTy(), cg.sizeTy()}, {loop->iterExpr->IRValue, loop->iValue});
+        loop->loopVars[1]->IRValue = valuePtr;
     }
 }
 

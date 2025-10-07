@@ -7,14 +7,14 @@
 
 using continuation = boost::context::continuation;
 
-struct TaskInfo {
+struct Lgs_taskInfo {
     void (*task)(void*);
     void* ctx;
 };
 
 struct Lgs_scheduler {
     std::deque<continuation> activeTasks;
-    std::deque<TaskInfo> pendingTasks;
+    std::deque<Lgs_taskInfo> pendingTasks;
     std::atomic<bool> running{false};
     std::thread schedulerThread;
     std::mutex mtx;

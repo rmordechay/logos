@@ -14,5 +14,4 @@ public:
     void addError(const LgsBaseError& lgsErr, const LgsLocation* location, const std::vector<std::string>& args = {});
     void addWarning(const LgsBaseError& lgsErr, const LgsLocation* location, const std::vector<std::string>& args = {});
     void mergeErrors(LgsErrHandler& other);
-    json::value asJSON() const;
 };

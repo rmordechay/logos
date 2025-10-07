@@ -1,23 +1,24 @@
 #pragma once
 
-#define INITIAL_ARRAY_CAPACITY 2
-#define BIG_SIZE_THRESHOLD 4
-#define STACK_CAPACITY 1024
-#define LOCALS_CAPACITY 8
-
-enum LgsLogLevel {
+enum LgsAppLogLevel {
     INFO,
     DEBUG,
     ERROR,
 };
 
+struct LgsAppVersion {
+    uint16_t major;
+    uint16_t minor;
+    uint16_t micro;
+};
+
 struct LgsAppConfigs {
-    std::string name = "app";
-    uint8_t optLevel = 2;
+    std::string name = "App";
+    std::string activeEnv = "";
+    LgsAppVersion version{1, 0, 0};
+    LgsAppLogLevel logLevel = INFO;
     bool debugMode = false;
-    bool writeIRFile = true;
     bool isTestRun = false;
-    LgsLogLevel logLevel = DEBUG;
-    std::string activeEnv = "Pro";
-    struct { int major; int minor; int micro; } version{1, 0, 0};
+    bool isFileMode = false;
+    uint8_t optLevel = 2;
 };

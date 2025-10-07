@@ -12,10 +12,6 @@ std::string LgsVec::getName() {
     return "vec" + std::to_string(vectorDim);
 }
 
-json::value LgsVec::asJsonStr() {
-    assert(0);
-}
-
 size_t LgsVec::getSizeBytes() {
     return baseType->getSizeBytes() * 2;
 }
@@ -24,7 +20,7 @@ LgsExpr* LgsVec::getZeroValue() {
     return new LgsVectorExpr(this);
 }
 
-Lgs_RTType LgsVec::getRTType() {
+Lgs_rttype LgsVec::getRTType() {
     if (vectorDim == 2) return RTT_VEC2;
     if (vectorDim == 3) return RTT_VEC3;
     if (vectorDim == 4) return RTT_VEC4;
@@ -38,7 +34,7 @@ bool LgsVec::canCastTo(LgsType* other) {
     return vectorDim == otherVec->vectorDim && baseType->canCastTo(otherVec->baseType);
 }
 
-LgsType* LgsVec::applyOp(const LgsOperator op, LgsType* other) {
+LgsType* LgsVec::applyBinOp(const LgsBinOpType op, LgsType* other) {
     const auto thisNme = getName();
     const auto otherName = other->getName();
     switch (op) {
@@ -85,6 +81,9 @@ Value* LgsVec::mulIR(LgsLLVMGen& cg, Value* self, Value* other) {
         loadOther = cg.builder.CreateVectorSplat(vecTy->getElementCount(), loadOther);
         return cg.builder.CreateFMul(self, loadOther);
     }
+    if (other->getType()->isVectorTy()) {
+        return dotProduct(cg, self, loadOther);
+    }
     if (other->getType()->isFloatingPointTy()) {
         const auto vecTy = cast<VectorType>(self->getType());
         loadOther = cg.builder.CreateVectorSplat(vecTy->getElementCount(), loadOther);
@@ -115,14 +114,15 @@ Value* LgsVec::inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) {
     cg.loop(cg.i64(vectorDim), [this, &cg, iterableExpr, value, resultPtr](Value* index, BasicBlock* exitBlock) {
         const auto trueBlock = cg.createBlock();
         const auto falseBlock = cg.createBlock();
-        const auto zeroValue = baseType->getZeroValue();
-        zeroValue->IRValue = getIRElement(cg, iterableExpr->IRValue, index);
-        const auto eq = zeroValue->eqIR(cg, value->loadIR(cg));
+        const auto dummyExpr = baseType->getZeroValue();
+        dummyExpr->IRValue = getIRElement(cg, iterableExpr->IRValue, index);
+        const auto eq = baseType->eqIR(cg, dummyExpr->IRValue, value->loadIR(cg));
         cg.builder.CreateCondBr(eq, trueBlock, falseBlock);
         cg.startBlock(trueBlock);
         cg.builder.CreateStore(cg.true_(), resultPtr);
         cg.builder.CreateBr(exitBlock);
         cg.startBlock(falseBlock);
+        freeExpr(dummyExpr);
     });
     return cg.builder.CreateLoad(cg.i1Ty(), resultPtr);
 }
@@ -134,6 +134,39 @@ Value* LgsVec::lengthIR(LgsLLVMGen& cg, Value* iterable) {
 Value* LgsVec::getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) {
     const auto gep = cg.builder.CreateGEP(getIRType(cg), iterable, {cg.i32Zero(), index});
     return cg.builder.CreateLoad(baseType->getIRType(cg), gep);
+}
+
+Value* LgsVec::dotProduct(LgsLLVMGen& cg, Value* self, Value* other) const {
+    const auto vecTypeIR = self->getType();
+    cg.savedIP = cg.builder.saveIP();
+    const auto dotFunc = cg.getFunc("Lgs_dotProduct", cg.getFT(cg.sizeTy(), {vecTypeIR, vecTypeIR}));
+    const auto block = cg.createBlock("entry", dotFunc);
+    cg.builder.SetInsertPoint(block);
+    const auto l = dotFunc->getArg(0);
+    const auto r = dotFunc->getArg(1);
+
+    const auto lx = cg.builder.CreateExtractValue(l, {0});
+    const auto rx = cg.builder.CreateExtractValue(r, {0});
+    const auto ly = cg.builder.CreateExtractValue(l, {1});
+    const auto ry = cg.builder.CreateExtractValue(r, {1});
+    const auto mulX = cg.builder.CreateFMul(lx, rx);
+    const auto mulY = cg.builder.CreateFMul(ly, ry);
+    Value* result = cg.builder.CreateFAdd(mulX, mulY);
+    if (vectorDim == 3) {
+        const auto lz = cg.builder.CreateExtractValue(l, {2});
+        const auto rz = cg.builder.CreateExtractValue(r, {2});
+        const auto mulZ = cg.builder.CreateFMul(lz, rz);
+        result = cg.builder.CreateFAdd(result, mulZ);
+    } else if (vectorDim == 4) {
+        const auto lw = cg.builder.CreateExtractValue(l, {3});
+        const auto rw = cg.builder.CreateExtractValue(r, {3});
+        const auto mulW = cg.builder.CreateFMul(lw, rw);
+        result = cg.builder.CreateFAdd(result, mulW);
+    }
+    cg.builder.CreateRet(result);
+    cg.builder.restoreIP(cg.savedIP);
+
+    return cg.builder.CreateCall(dotFunc, {self, other});
 }
 
 int8_t LgsVec::getSwizzleSet(const char c) {

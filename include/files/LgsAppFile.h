@@ -10,7 +10,7 @@ public:
     std::vector<LgsVarDec*> requireEnvVars;
     std::vector<std::string> requirePackages;
 
-    explicit LgsAppFile(const size_t fileID, const fs::path& path) : LgsFile(fileID, LGS_APP_FILE_NAME, path) {}
+    explicit LgsAppFile(const size_t fileID, const fs::path& path) : LgsFile(fileID, path) {}
     ~LgsAppFile() override;
 };
 

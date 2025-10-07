@@ -3,23 +3,20 @@
 
 class LgsHashMap final : public LgsExpr {
 public:
-    std::vector<LgsMapEntry*> initialElements;
+    std::vector<LgsPair> pairs;
 
     LgsHashMap() = default;
     explicit LgsHashMap(LgsMap* mapType) : LgsExpr(mapType) {}
     void completeType(LgsType* toType) override;
     std::string getName() override;
-    json::value asJsonStr() override;
+    void parseAsJSON(std::stringstream& json) override;
     ~LgsHashMap() override;
 };
 
-class LgsMapEntry final {
+class LgsPair final {
 public:
     LgsExpr* key;
     LgsExpr* value;
-
-    LgsMapEntry(LgsExpr* key, LgsExpr* value) : key(key), value(value) {}
-    ~LgsMapEntry();
 };
 
 

@@ -1,5 +1,6 @@
 #include "symbols/types/LgsVoid.h"
 #include "codegen/LgsLLVMGen.h"
+#include "utils/LgsUtils.h"
 
 Type* LgsVoid::getIRType(LgsLLVMGen& cg) {
     return Type::getVoidTy(cg.context);
@@ -17,7 +18,7 @@ LgsExpr* LgsVoid::getZeroValue() {
     return nullptr;
 }
 
-Lgs_RTType LgsVoid::getRTType() {
+Lgs_rttype LgsVoid::getRTType() {
     return RTT_VOID;
 }
 
@@ -29,6 +30,8 @@ bool LgsVoid::canCastTo(LgsType* other) {
     return name == other->getName();
 }
 
-json::value LgsVoid::asJsonStr() {
-    return name;
+void LgsVoid::parseAsJSON(std::stringstream& json) {
+    openJsonObject(json);
+    addJsonKeyValue(json, "name", name);
+    closeJsonObject(json);
 }

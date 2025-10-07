@@ -14,7 +14,7 @@ Type* LgsBool::getIRType(LgsLLVMGen& cg) {
     return cg.i1Ty();
 }
 
-LgsType* LgsBool::applyOp(const LgsOperator op, LgsType* other) {
+LgsType* LgsBool::applyBinOp(const LgsBinOpType op, LgsType* other) {
     const auto IRName = other->getName();
     if (name != IRName) return nullptr;
     if (op == ADD) return extendInt();
@@ -73,17 +73,11 @@ std::string LgsBool::getName() {
     return name;
 }
 
-json::value LgsBool::asJsonStr() {
-    json::object obj;
-    obj["name"] = name;
-    return obj;
-}
-
 LgsExpr* LgsBool::getZeroValue() {
     return new LgsIntConst(&LGS_BOOL, false);
 }
 
-Lgs_RTType LgsBool::getRTType() {
+Lgs_rttype LgsBool::getRTType() {
     return RTT_BOOL;
 }
 

@@ -22,7 +22,7 @@ public:
     LgsExpr* size = nullptr;
     bool isStatic = false;
 
-    explicit LgsIterable(LgsType* baseType = nullptr) : baseType(baseType) {
+    explicit LgsIterable(LgsType* baseType = nullptr, LgsExpr* size = nullptr) : baseType(baseType), size(size) {
         addEmptyMethod(MAP_FUNC_NAME);
         addEmptyMethod(FILTER_FUNC_NAME);
         addEmptyMethod(FOREACH_FUNC_NAME);
@@ -31,7 +31,7 @@ public:
         addEmptyMethod(IS_EMPTY_FUNC_NAME);
         addEmptyMethod(IS_NOT_EMPTY_FUNC_NAME);
     }
-    size_t getDim();
+    size_t getDimension();
     LgsFunc* getMethod(const std::string& methodName) override;
     virtual LgsFunc* getLenFunc();
     virtual LgsFunc* getIsEmptyFunc();
@@ -42,7 +42,7 @@ public:
     virtual LgsType* getIndexType();
     virtual LgsType* getValueType();
     virtual bool unpackLoopVarsTypes(LgsForeachLoop* loop) const;
-    virtual void unpackLoopVarsIR(LgsLLVMGen& cg, std::vector<LgsVarDec*> varDecs, Value* iterPtr, Value* index) const;
+    virtual void unpackLoopIR(LgsLLVMGen& cg, LgsForeachLoop* loop) const;
     virtual Value* lengthIR(LgsLLVMGen& cg, Value* iterable) = 0;
     virtual Value* inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) = 0;
     virtual Value* getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index);

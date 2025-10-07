@@ -36,7 +36,6 @@ public:
     virtual Value* loopStart(LgsLLVMGen& cg) = 0;
     virtual Value* loopEnd(LgsLLVMGen& cg) = 0;
     Value* loadIndex(LgsLLVMGen& cg) const;
-    json::value asJsonStr() override;
 
     ~LgsForLoop() override;
 };

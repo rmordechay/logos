@@ -1,4 +1,5 @@
 #pragma once
+#include "stmts/LgsStmtsBlock.h"
 #include "types/LgsFuncType.h"
 
 class LgsStmtsBlock;
@@ -23,7 +24,7 @@ public:
     bool isLambda = false;
     CallFn fn;
 
-    explicit LgsFunc(LgsFuncType* funcType) : funcType(funcType) {}
+    explicit LgsFunc(LgsFuncType* funcType) : LgsExpr(funcType), funcType(funcType) {}
     explicit LgsFunc(const std::string& name, LgsType* rt, const std::vector<LgsParam>& params, const uint32_t ops = 0) {
         initFunc(name, rt, params, ops);
     }
@@ -49,6 +50,6 @@ public:
     bool needsCleanup() const;
     std::string getName() override;
     std::string getIRName() const;
-    json::value asJsonStr() override;
+    void parseAsJSON(std::stringstream& json) override;
     ~LgsFunc() override;
 };

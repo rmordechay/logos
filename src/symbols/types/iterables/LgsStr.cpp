@@ -15,12 +15,6 @@ std::string LgsStr::getName() {
     return name;
 }
 
-json::value LgsStr::asJsonStr() {
-    json::object jsonObj;
-    jsonObj["name"] = name;
-    return jsonObj;
-}
-
 size_t LgsStr::getSizeBytes() {
     return sizeof(void*);
 }
@@ -29,11 +23,11 @@ LgsExpr* LgsStr::getZeroValue() {
     return new LgsStrConst("");
 }
 
-Lgs_RTType LgsStr::getRTType() {
+Lgs_rttype LgsStr::getRTType() {
     return RTT_STR;
 }
 
-LgsType* LgsStr::applyOp(const LgsOperator op, LgsType* other) {
+LgsType* LgsStr::applyBinOp(const LgsBinOpType op, LgsType* other) {
     const auto IRName = other->getName();
     switch (op) {
     case ADD: {
@@ -66,6 +60,16 @@ Value* LgsStr::addIR(LgsLLVMGen& cg, Value* self, Value* other) {
     const auto dstPtr = cg.builder.CreateInBoundsGEP(cg.i8Ty(), newStrPtr, selfSize);
     cg.callMemCpy(dstPtr, other, otherSize);
     return newStrPtr;
+}
+
+Value* LgsStr::eqIR(LgsLLVMGen& cg, Value* self, Value* other) {
+    const auto rt = cg.callFunc("strcmp", cg.i32Ty(), {cg.ptrTy(), cg.ptrTy()}, {self, other});
+    return cg.builder.CreateICmpEQ(rt, cg.i32(0));
+}
+
+Value* LgsStr::neIR(LgsLLVMGen& cg, Value* self, Value* other) {
+    const auto rt = cg.callFunc("strcmp", cg.i32Ty(), {cg.ptrTy(), cg.ptrTy()}, {self, other});
+    return cg.builder.CreateICmpNE(rt, cg.i32(0));
 }
 
 Value* LgsStr::getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) {

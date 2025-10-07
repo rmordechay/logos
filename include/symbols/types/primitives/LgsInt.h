@@ -12,9 +12,9 @@ public:
     size_t getSizeBytes() override;
     Type* getIRType(LgsLLVMGen& cg) override;
     LgsExpr* getZeroValue() override;
-    Lgs_RTType getRTType() override;
+    Lgs_rttype getRTType() override;
     bool canCastTo(LgsType* other) override;
-    LgsType* applyOp(LgsOperator op, LgsType* other) override;
+    LgsType* applyBinOp(LgsBinOpType op, LgsType* other) override;
     Value* addIR(LgsLLVMGen& cg, Value* self, Value* other) override;
     Value* subIR(LgsLLVMGen& cg, Value* self, Value* other) override;
     Value* mulIR(LgsLLVMGen& cg, Value* self, Value* other) override;
@@ -25,10 +25,18 @@ public:
     Value* bitXorIR(LgsLLVMGen& cg, Value* self, Value* other) override;
     Value* rshiftIR(LgsLLVMGen& cg, Value* self, Value* other) override;
     Value* lshiftIR(LgsLLVMGen& cg, Value* self, Value* other) override;
+    Value* eqIR(LgsLLVMGen& cg, Value* self, Value* other) override;
+    Value* neIR(LgsLLVMGen& cg, Value* self, Value* other) override;
+    Value* ltIR(LgsLLVMGen& cg, Value* self, Value* other) override;
+    Value* gtIR(LgsLLVMGen& cg, Value* self, Value* other) override;
+    Value* geIR(LgsLLVMGen& cg, Value* self, Value* other) override;
+    Value* leIR(LgsLLVMGen& cg, Value* self, Value* other) override;
+    Value* andIR(LgsLLVMGen& cg, Value* self, Value* other) override;
+    Value* orIR(LgsLLVMGen& cg, Value* self, Value* other) override;
     std::string strFormatPart() const override;
     std::string getName() override;
-    json::value asJsonStr() override;
     DIBasicType* getDebugType(LgsLLVMGen& cg) override;
+    void parseAsJSON(std::stringstream& json) override;
 };
 
 inline LgsInt LGS_INT;

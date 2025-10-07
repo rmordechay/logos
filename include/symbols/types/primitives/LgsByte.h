@@ -11,7 +11,7 @@ public:
     }
 
     Type* getIRType(LgsLLVMGen& cg) override;
-    LgsType* applyOp(LgsOperator op, LgsType* other) override;
+    LgsType* applyBinOp(LgsBinOpType op, LgsType* other) override;
     Value* addIR(LgsLLVMGen& cg, Value* self, Value* other) override;
     Value* subIR(LgsLLVMGen& cg, Value* self, Value* other) override;
     Value* mulIR(LgsLLVMGen& cg, Value* self, Value* other) override;
@@ -24,11 +24,10 @@ public:
     Value* lshiftIR(LgsLLVMGen& cg, Value* self, Value* other) override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
-    Lgs_RTType getRTType() override;
+    Lgs_rttype getRTType() override;
     std::string getName() override;
     bool canCastTo(LgsType* other) override;
     std::string strFormatPart() const override;
-    json::value asJsonStr() override;
 };
 
 inline LgsByte LGS_BYTE;

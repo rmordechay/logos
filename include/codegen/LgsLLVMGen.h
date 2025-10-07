@@ -53,7 +53,7 @@ public:
     Value* callPrintf(const std::vector<Value*>& args);
     Value* callStrLen(Value* str);
     void callMemCpy(Value* dest, Value* src, Value* size);
-    Value* callMalloc(size_t size, bool isOwner, Lgs_RTType type);
+    Value* callMalloc(size_t size, bool isOwner, Lgs_rttype type);
 
     // Stack
     void callStackPush(bool hasDefers, bool needsCleanup);

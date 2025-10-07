@@ -2,6 +2,12 @@ object Obj {
     pub const x: Int
     y: Int
 
+    io(openFile, closeFile)
+
+    pub make2(x: Obj) {
+        print(2)
+    }
+
     pub make() {
         print(2)
     }
@@ -13,18 +19,12 @@ object Obj {
     pub closeFile() {
         print("closing file")
     }
-
-    io {
-        openFile
-        closeFile
-    }
 }
 
 main() {
     obj = Obj{x = 34}
     Obj.make()
-    io file = obj.openFile() {
-        line = file.readLine()
-        print(line)
+    io obj.openFile() {
+        print("hello")
     }
 }

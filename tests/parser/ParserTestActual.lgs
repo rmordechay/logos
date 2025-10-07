@@ -1,0 +1,43 @@
+object Obj {
+    implements: Interface
+    x: Int
+
+    func() {
+        print("roi")
+    }
+}
+
+interface Interface {
+    func()
+}
+
+enum Enum {
+    AR = "Roi"
+}
+
+f2(x: Interface) {
+    x.func()
+}
+
+f(x: Int, y: Int): Obj {
+    print(x + y)
+}
+
+main() {
+    a = {"roi": "roi"}
+    f(1, 2)
+
+    f: (Int): Int = it -> {
+        print("Hello")
+        return 2 + it
+    }
+    print(f(2))
+
+    if true {
+        if true {
+            print("inside")
+            break if
+        }
+        print("outside")
+    }
+}

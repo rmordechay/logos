@@ -4,7 +4,7 @@ Type* LgsTypePair::getIRType(LgsLLVMGen& cg) {
     assert(0);
 }
 
-Lgs_RTType LgsTypePair::getRTType() {
+Lgs_rttype LgsTypePair::getRTType() {
     assert(0);
 }
 
@@ -22,11 +22,6 @@ std::string LgsTypePair::getName() {
 
 std::string LgsTypePair::pname() {
     return '<' + key->pname() + ", " + value->pname() + '>';
-}
-
-json::value LgsTypePair::asJsonStr() {
-    json::object obj;
-    return obj;
 }
 
 bool LgsTypePair::canCastTo(LgsType* other) {

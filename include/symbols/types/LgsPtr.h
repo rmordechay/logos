@@ -9,11 +9,10 @@ public:
     explicit LgsPtr(LgsType* baseType) : baseType(baseType) {}
     std::string getName() override;
     std::string pname() override;
-    json::value asJsonStr() override;
     Type* getIRType(LgsLLVMGen& cg) override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
-    Lgs_RTType getRTType() override;
+    Lgs_rttype getRTType() override;
     bool canCastTo(LgsType* other) override;
     std::string strFormatPart() const override;
     ~LgsPtr() override;

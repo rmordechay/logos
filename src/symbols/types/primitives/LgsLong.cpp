@@ -9,10 +9,6 @@
 #include "types/primitives/LgsShort.h"
 #include "types/primitives/LgsSize.h"
 
-json::value LgsLong::asJsonStr() {
-    assert(0);
-}
-
 Type* LgsLong::getIRType(LgsLLVMGen& cg) {
     return cg.i64Ty();
 }
@@ -25,11 +21,11 @@ LgsExpr* LgsLong::getZeroValue() {
     return new LgsIntConst(&LGS_LONG, 0);
 }
 
-Lgs_RTType LgsLong::getRTType() {
+Lgs_rttype LgsLong::getRTType() {
     return RTT_LONG;
 }
 
-LgsType* LgsLong::applyOp(const LgsOperator op, LgsType* other) {
+LgsType* LgsLong::applyBinOp(const LgsBinOpType op, LgsType* other) {
     if (op == DIV) {
         return &LGS_DOUBLE;
     }

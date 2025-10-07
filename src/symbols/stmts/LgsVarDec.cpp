@@ -10,6 +10,7 @@ std::string LgsVarDec::getName() {
 }
 
 Value* LgsVarDec::loadIR(LgsLLVMGen& cg) {
+    if (!IRValue->getType()->isPointerTy()) return IRValue;
     return cg.builder.CreateLoad(type->getIRType(cg), IRValue);
 }
 
@@ -36,12 +37,11 @@ void LgsVarDec::setDebugValue(LgsLLVMGen& cg) {
     );
 }
 
-json::value LgsVarDec::asJsonStr() {
-    json::object obj;
-    obj["stmtKind"] = "VarDec";
-    obj["type"] = type->asJsonStr();
-    obj["expr"] = expr->asJsonStr();
-    return obj;
+void LgsVarDec::parseAsJSON(std::stringstream& json) {
+    openJsonObject(json);
+    addJsonKeyValue(json, "kind", "VarDec", true);
+    addJsonKeyValue(json, "name", name);
+    closeJsonObject(json);
 }
 
 LgsVarDec::~LgsVarDec() {

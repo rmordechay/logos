@@ -17,12 +17,11 @@ public:
 
     Type* getIRType(LgsLLVMGen& cg) override;
     std::string getName() override;
-    json::value asJsonStr() override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
-    Lgs_RTType getRTType() override;
+    Lgs_rttype getRTType() override;
     bool canCastTo(LgsType* other) override;
-    LgsType* applyOp(LgsOperator op, LgsType* other) override;
+    LgsType* applyBinOp(LgsBinOpType op, LgsType* other) override;
     Value* addIR(LgsLLVMGen& cg, Value* self, Value* other) override;
     Value* subIR(LgsLLVMGen& cg, Value* self, Value* other) override;
     Value* mulIR(LgsLLVMGen& cg, Value* self, Value* other) override;
@@ -30,6 +29,7 @@ public:
     Value* inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
     Value* lengthIR(LgsLLVMGen& cg, Value* iterable) override;
     Value* getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) override;
+    Value* dotProduct(LgsLLVMGen& cg, Value* self, Value* other) const;
     static int8_t getSwizzleSet(char c);
     static int8_t getComponentIndex(char c);
     std::string strFormatPart() const override;

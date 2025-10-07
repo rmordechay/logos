@@ -21,7 +21,7 @@ LgsExpr* LgsSet::getZeroValue() {
     assert(0);
 }
 
-Lgs_RTType LgsSet::getRTType() {
+Lgs_rttype LgsSet::getRTType() {
     return RTT_SET;
 }
 
@@ -64,7 +64,7 @@ LgsFunc* LgsSet::getAddFunc() {
     return func->second;
 }
 
-LgsType* LgsSet::applyOp(const LgsOperator op, LgsType* other) {
+LgsType* LgsSet::applyBinOp(const LgsBinOpType op, LgsType* other) {
     const auto IRName = other->getName();
     switch (op) {
     case IN: {
@@ -89,10 +89,3 @@ Value* LgsSet::getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) {
     LgsFunc f("get", &LGS_ANY, {this, &LGS_LONG}, BUILTIN | PUBLIC | METHOD);
     return f.callIR(cg, {iterable, index});
 }
-
-json::value LgsSet::asJsonStr() {
-    json::object jsonObj;
-    jsonObj["name"] = name;
-    return jsonObj;
-}
-

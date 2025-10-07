@@ -1,11 +1,13 @@
 #include "types/LgsEnum.h"
 #include "codegen/LgsLLVMGen.h"
+#include "stmts/LgsField.h"
+#include "utils/LgsUtils.h"
 
 LgsExpr* LgsEnum::getZeroValue() {
     return nullptr;
 }
 
-Lgs_RTType LgsEnum::getRTType() {
+Lgs_rttype LgsEnum::getRTType() {
     assert(0);
 }
 
@@ -15,10 +17,6 @@ Type* LgsEnum::getIRType(LgsLLVMGen& cg) {
 
 std::string LgsEnum::getName() {
     return name;
-}
-
-json::value LgsEnum::asJsonStr() {
-    assert(0);
 }
 
 bool LgsEnum::canCastTo(LgsType* other) {
@@ -31,4 +29,21 @@ std::string LgsEnum::strFormatPart() const {
 
 size_t LgsEnum::getSizeBytes() {
     return sizeof(void*);
+}
+
+void LgsEnum::parseAsJSON(std::stringstream& json) {
+    openJsonObject(json);
+    addJsonKeyValue(json, "name", getName());
+    json << ',';
+    openJsonKeyArray(json, "fields");
+    auto first = true;
+    for (const auto f : fields) {
+        if (!first) json << ',';
+        first = false;
+        openJsonObject(json);
+        addJsonKeyValue(json, "name", f->name);
+        closeJsonObject(json);
+    }
+    closeJsonArray(json);
+    closeJsonObject(json);
 }

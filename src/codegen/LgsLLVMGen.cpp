@@ -12,7 +12,7 @@
 #include <llvm/Target/TargetOptions.h>
 
 void LgsLLVMGen::setupModule(const LgsFile& file, const bool debugMode) {
-    IRModule = new Module(file.name, context);
+    IRModule = new Module(file.path.filename().string(), context);
     IRModule->setTargetTriple(sys::getDefaultTargetTriple());
     IRModule->setDataLayout(targetMachine->createDataLayout());
     if (debugMode) {
@@ -174,7 +174,7 @@ void LgsLLVMGen::callMemCpy(Value* dest, Value* src, Value* size) {
     builder.CreateCall(memCpy, {dest, src, size, false_()});
 }
 
-Value* LgsLLVMGen::callMalloc(const size_t size, const bool isOwner, const Lgs_RTType type) {
+Value* LgsLLVMGen::callMalloc(const size_t size, const bool isOwner, const Lgs_rttype type) {
     assert(type != RTT_UNKNOWN);
     const auto ptr = builder.CreateMalloc(sizeTy(), sizeTy(), usize(size), nullptr);
     if (isOwner) callLgsFunc("stack_addOwner", voidTy(), {ptrTy(), i32Ty()}, {ptr, i32(type)});
@@ -188,7 +188,7 @@ void LgsLLVMGen::callStackPush(const bool hasDefers, const bool needsCleanup) {
     }
 }
 
-void LgsLLVMGen::callPopStack(bool hasDefers, const bool needsCleanup) {
+void LgsLLVMGen::callPopStack(const bool hasDefers, const bool needsCleanup) {
     if (needsCleanup || hasDefers) {
         callLgsFunc("stack_pop", voidTy(), {i1Ty()}, {i1(needsCleanup)});
     }

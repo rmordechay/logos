@@ -12,10 +12,10 @@ public:
     size_t getSizeBytes() override;
     std::string getName() override;
     LgsExpr* getZeroValue() override;
-    Lgs_RTType getRTType() override;
+    Lgs_rttype getRTType() override;
     std::string strFormatPart() const override;
     bool canCastTo(LgsType* other) override;
-    json::value asJsonStr() override;
+    void parseAsJSON(std::stringstream& json) override;
 };
 
 inline LgsVoid LGS_VOID;

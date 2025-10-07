@@ -1,6 +1,6 @@
 #pragma once
-#include "exprs/LgsBinaryExpr.h"
 
+class LgsParam;
 class LgsExpr;
 struct LgsError;
 struct LgsBaseError;
@@ -19,15 +19,26 @@ std::string formatErrorMsg(const std::string& msg, const std::vector<std::string
 bool isLogosFile(const fs::path& filePath);
 bool isLLVMFile(const fs::directory_entry& entry);
 bool isLogosKeyword(const std::string& s);
-void cleanStr(std::string& value);
+bool validateTypeType(const std::string& name);
 std::string getFileText(const fs::path& filePath);
-std::string removeUnderscores(const std::string& input);
 void freeType(LgsType* type);
+void freeTypes(std::vector<LgsType*>& types);
 void freeExpr(LgsExpr* expr);
+void freeExprs(std::vector<LgsExpr*>& exprs);
+void freeParams(std::vector<LgsParam>& params);
 size_t hashStr(const char* key);
 bool startsWith(const std::string& str, const std::string& prefix);
-std::string getTextFromFile(const std::string& filename, const LgsLocation& location);
 std::string getLine(const std::string& filename, size_t lineNumber);
 std::string trim(const std::string& str);
 std::string getFullPath(const LgsLocation& location, const std::string& filePath);
-std::string getOpAsText(LgsOperator op);
+void addJsonString(std::stringstream& json, const std::string& v);
+void addJsonBool(std::stringstream& json, bool v);
+void openJsonArray(std::stringstream& json);
+void closeJsonArray(std::stringstream& json, bool withComma = false);
+void openJsonObject(std::stringstream& json);
+void closeJsonObject(std::stringstream& json, bool withComma = false);
+void openJsonKey(std::stringstream& json, const std::string& v);
+void openJsonKeyArray(std::stringstream& json, const std::string& v);
+void openJsonKeyObject(std::stringstream& json, const std::string& v);
+void addJsonKeyValue(std::stringstream& json, const std::string& k, const std::string& v, bool withComma = false);
+void addJsonKeyValue(std::stringstream& json, const std::string& k, size_t v, bool withComma = false);

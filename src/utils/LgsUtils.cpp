@@ -2,6 +2,7 @@
 #include "LgsType.h"
 #include "data/LgsDefinitions.h"
 #include "files/LgsFile.h"
+#include "funcs/LgsParam.h"
 #include "types/iterables/LgsStr.h"
 
 #define FNV_PRIME 16777619
@@ -60,9 +61,8 @@ bool isLogosKeyword(const std::string& s) {
     return LOGOS_KEYWORDS.find(s) != LOGOS_KEYWORDS.end();
 }
 
-void cleanStr(std::string& value) {
-    value.erase(0, 1);
-    value.pop_back();
+bool validateTypeType(const std::string& name) {
+    return isupper(name[0]);
 }
 
 std::string getFileText(const fs::path& filePath) {
@@ -72,12 +72,6 @@ std::string getFileText(const fs::path& filePath) {
     std::stringstream fileContents;
     fileContents << file.rdbuf();
     return fileContents.str();
-}
-
-std::string removeUnderscores(const std::string& input) {
-    std::string result = input;
-    result.erase(remove(result.begin(), result.end(), '_'), result.end());
-    return result;
 }
 
 void freeType(LgsType* type) {
@@ -93,6 +87,32 @@ void freeExpr(LgsExpr* expr) {
     delete expr;
 }
 
+void freeTypes(std::vector<LgsType*>& types) {
+    for (const auto type : types) {
+        freeType(type);
+    }
+    types.clear();
+}
+
+void freeExprs(std::vector<LgsExpr*>& exprs) {
+    for (const auto expr : exprs) {
+        freeExpr(expr);
+    }
+    exprs.clear();
+}
+
+void freeParams(std::vector<LgsParam>& params) {
+    for (int i = 0; i < params.size(); ++i) {
+        const auto param = params[i];
+        if (param.expr) {
+            freeExpr(param.expr);
+        } else if (param.type) {
+            freeType(param.type);
+        }
+    }
+    params.clear();
+}
+
 size_t hashStr(const char* key) {
     size_t hash = 2166136261u;
     while (*key) {
@@ -105,17 +125,6 @@ size_t hashStr(const char* key) {
 
 bool startsWith(const std::string& str, const std::string& prefix) {
     return str.size() >= prefix.size() && str.compare(0, prefix.size(), prefix) == 0;
-}
-
-std::string getTextFromFile(const std::string& filename, const LgsLocation& location) {
-    std::ifstream file(filename, std::ios::binary);
-    const auto start = location.indexStart;
-    const auto end = location.indexEnd;
-    if (start >= end) return "";
-    file.seekg(start);
-    std::string result(end - start, '\0');
-    file.read(result.data(), end - start);
-    return result;
 }
 
 std::string getLine(const std::string& filename, const size_t lineNumber) {
@@ -147,51 +156,62 @@ std::string trim(const std::string& str) {
 }
 
 std::string getFullPath(const LgsLocation& location, const std::string& filePath) {
-    return filePath + ":" + std::to_string(location.lineStart) + ":" + std::to_string(location.posInLine);
+    return filePath + ":" + std::to_string(location.lineStart) + ":" + std::to_string(location.columnStart);
 }
 
-std::string getOpAsText(const LgsOperator op) {
-    switch (op) {
-    case ADD:
-        return "+";
-    case SUB:
-        return "-";
-    case MUL:
-        return "*";
-    case DIV:
-        return "/";
-    case MOD:
-        return "%";
-    case BIT_AND:
-        return "&";
-    case BIT_OR:
-        return "|";
-    case BIT_XOR:
-        return "^";
-    case LSHIFT:
-        return "<<";
-    case RSHIFT:
-        return ">>";
-    case EQ:
-        return "==";
-    case NE:
-        return "!=";
-    case LT:
-        return "<";
-    case GT:
-        return ">";
-    case GE:
-        return ">=";
-    case LE:
-        return "<=";
-    case AND:
-        return "and";
-    case OR:
-        return "or";
-    case IN:
-        return "in";
-    case NOOP:
-        break;
-    }
-    return "NOOP";
+void addJsonString(std::stringstream& json, const std::string& v) {
+    json << '"' << v << '"';
+}
+
+void addJsonBool(std::stringstream& json, const bool v) {
+    json << (v ? "true" : "false");
+}
+
+void openJsonArray(std::stringstream& json) {
+    json << '[';
+}
+
+void closeJsonArray(std::stringstream& json, const bool withComma) {
+    json << (withComma ? "]," : "]");
+}
+
+void openJsonObject(std::stringstream& json) {
+    json << '{';
+}
+
+void closeJsonObject(std::stringstream& json, const bool withComma) {
+    json << (withComma ? "}," : "}");
+}
+
+void openJsonKey(std::stringstream& json, const std::string& v) {
+    addJsonString(json, v);
+    json << ':';
+}
+
+void openJsonKeyArray(std::stringstream& json, const std::string& v) {
+    addJsonString(json, v);
+    json << ":[";
+}
+
+void openJsonKeyObject(std::stringstream& json, const std::string& v) {
+    addJsonString(json, v);
+    json << ":{";
+}
+
+void addJsonKeyValue(std::stringstream& json, const std::string& k, const std::string& v, const bool withComma) {
+    openJsonKey(json, k);
+    addJsonString(json, v);
+    if (withComma) json << ',';
+}
+
+void addJsonKeyValue(std::stringstream& json, const std::string& k, const size_t v, const bool withComma) {
+    openJsonKey(json, k);
+    json << v;
+    if (withComma) json << ',';
+}
+
+void addJsonKeyValue(std::stringstream& json, const std::string& k, const bool v, const bool withComma) {
+    openJsonKey(json, k);
+    addJsonBool(json, v);
+    if (withComma) json << ',';
 }

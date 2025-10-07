@@ -24,11 +24,11 @@ extern "C" void Lgs_runtime_close() {
     // sqlite3_close(runtime.db);
 }
 
-extern "C" void Lgs_stack_addOwner(void* ptr, const Lgs_RTType type) {
+extern "C" void Lgs_stack_addOwner(void* ptr, const Lgs_rttype type) {
     runtime.stack.addOwner(ptr, type);
 }
 
-extern "C" void Lgs_stack_addOrphan(void* ptr, const Lgs_RTType type) {
+extern "C" void Lgs_stack_addOrphan(void* ptr, const Lgs_rttype type) {
     runtime.stack.addOrphan(ptr, type);
 }
 
@@ -74,7 +74,6 @@ extern "C" void Lgs_scheduler_shutdown() {
 }
 
 extern "C" void Lgs_vtable_add(void* instancePtr, const char* name, void* ptr) {
-    std::cout << "inserting " << instancePtr << '\n';
     runtime.vtable[instancePtr].emplace(name, ptr);
 }
 

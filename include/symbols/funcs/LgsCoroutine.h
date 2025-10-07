@@ -6,6 +6,5 @@ public:
     LgsFuncCall* funcCall = nullptr;
     LgsSelection* selection = nullptr;
 
-    json::value asJsonStr() override;
     ~LgsCoroutine() override;
 };

@@ -5,12 +5,14 @@ Value* LgsBinaryExpr::loadIR(LgsLLVMGen& cg) {
     return IRValue;
 }
 
-json::value LgsBinaryExpr::asJsonStr() {
-    assert(0);
+void LgsBinaryExpr::parseAsJSON(std::stringstream& json) {
+    openJsonObject(json);
+    addJsonKeyValue(json, "kind", "BinaryExpr");
+    closeJsonObject(json);
 }
 
 std::string LgsBinaryExpr::getName() {
-    return left->getName() + ' ' + opStr + ' ' + right->getName();
+    return left->getName() + ' ' + op.name + ' ' + right->getName();
 }
 
 LgsBinaryExpr::~LgsBinaryExpr() {

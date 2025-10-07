@@ -3,6 +3,7 @@
 #include "stmts/LgsField.h"
 #include "types/LgsAny.h"
 #include "types/LgsPtr.h"
+#include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsDouble.h"
 #include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsSize.h"
@@ -20,7 +21,7 @@ LgsExpr* LgsInt::getZeroValue() {
     return new LgsIntConst(&LGS_INT, 0);
 }
 
-Lgs_RTType LgsInt::getRTType() {
+Lgs_rttype LgsInt::getRTType() {
     return RTT_INT;
 }
 
@@ -35,24 +36,13 @@ bool LgsInt::canCastTo(LgsType* other) {
     return false;
 }
 
-LgsType* LgsInt::applyOp(const LgsOperator op, LgsType* other) {
-    if (op == DIV) {
-        return &LGS_FLOAT;
-    }
-    if (other->asFloat()) {
-        return &LGS_FLOAT;
-    }
-    if (other->asDouble()) {
-        assert(0);
-    }
-    const auto IRName = other->getName();
-    if (name == IRName) return this;
-    return nullptr;
+LgsType* LgsInt::applyBinOp(const LgsBinOpType op, LgsType* other) {
+    return applyIntBinOp(op, other);
 }
 
 Value* LgsInt::addIR(LgsLLVMGen& cg, Value* self, Value* other) {
-    const auto l = cg.builder.CreateZExt(self, cg.i64Ty());
-    const auto r = cg.builder.CreateZExt(other, cg.i64Ty());
+    const auto l = cg.builder.CreateZExt(self, getIRType(cg));
+    const auto r = cg.builder.CreateZExt(other, getIRType(cg));
     return cg.builder.CreateAdd(l, r);
 }
 
@@ -98,6 +88,60 @@ Value* LgsInt::lshiftIR(LgsLLVMGen& cg, Value* self, Value* other) {
     return cg.builder.CreateLShr(self, other);
 }
 
+Value* LgsInt::eqIR(LgsLLVMGen& cg, Value* self, Value* other) {
+    return cg.builder.CreateICmpEQ(self, other);
+}
+
+Value* LgsInt::neIR(LgsLLVMGen& cg, Value* self, Value* other) {
+    return cg.builder.CreateICmpNE(self, other);
+}
+
+Value* LgsInt::ltIR(LgsLLVMGen& cg, Value* self, Value* other) {
+    return cg.builder.CreateICmpSLT(self, other);
+}
+
+Value* LgsInt::gtIR(LgsLLVMGen& cg, Value* self, Value* other) {
+    return cg.builder.CreateICmpSGT(self, other);
+}
+
+Value* LgsInt::geIR(LgsLLVMGen& cg, Value* self, Value* other) {
+    return cg.builder.CreateICmpSGE(self, other);
+}
+
+Value* LgsInt::leIR(LgsLLVMGen& cg, Value* self, Value* other) {
+    return cg.builder.CreateICmpSLE(self, other);
+}
+
+Value* LgsInt::andIR(LgsLLVMGen& cg, Value* self, Value* other) {
+    const auto currentBlock = cg.builder.GetInsertBlock();
+    const auto func = currentBlock->getParent();
+    const auto rightBlock = cg.createBlock("and_right", func);
+    const auto endBlock = cg.createBlock("and_end", func);
+    cg.builder.CreateCondBr(other, rightBlock, endBlock);
+    cg.builder.SetInsertPoint(rightBlock);
+    cg.builder.CreateBr(endBlock);
+    cg.builder.SetInsertPoint(endBlock);
+    auto* phi = cg.builder.CreatePHI(cg.builder.getInt1Ty(), 2);
+    phi->addIncoming(cg.false_(), currentBlock);
+    phi->addIncoming(other, rightBlock);
+    return phi;
+}
+
+Value* LgsInt::orIR(LgsLLVMGen& cg, Value* self, Value* other) {
+    const auto currentBlock = cg.builder.GetInsertBlock();
+    const auto func = currentBlock->getParent();
+    const auto rightBlock = cg.createBlock("or_right", func);
+    const auto endBlock = cg.createBlock("or_end", func);
+    cg.builder.CreateCondBr(self, endBlock, rightBlock);
+    cg.builder.SetInsertPoint(rightBlock);
+    cg.builder.CreateBr(endBlock);
+    cg.builder.SetInsertPoint(endBlock);
+    auto* phi = cg.builder.CreatePHI(cg.builder.getInt1Ty(), 2);
+    phi->addIncoming(cg.true_(), currentBlock);
+    phi->addIncoming(other, rightBlock);
+    return phi;
+}
+
 std::string LgsInt::strFormatPart() const {
     return "%d";
 }
@@ -106,12 +150,12 @@ std::string LgsInt::getName() {
     return name;
 }
 
-json::value LgsInt::asJsonStr() {
-    json::object jsonObj;
-    jsonObj["name"] = name;
-    return jsonObj;
-}
-
 DIBasicType* LgsInt::getDebugType(LgsLLVMGen& cg) {
     return cg.diBuilder->createBasicType(name, 32, dwarf::DW_ATE_signed);
+}
+
+void LgsInt::parseAsJSON(std::stringstream& json) {
+    openJsonObject(json);
+    addJsonKeyValue(json, "name", name);
+    closeJsonObject(json);
 }

@@ -1,7 +1,6 @@
 #pragma once
 #include "exprs/LgsExpr.h"
 
-
 enum LgsPostfixOperator {
     INC,
     DEC,
@@ -9,11 +8,10 @@ enum LgsPostfixOperator {
 
 class LgsPostfixExpr final : public LgsExpr {
 public:
-    LgsExpr* expr;
+    LgsExpr* baseExpr;
     LgsPostfixOperator op;
 
-    LgsPostfixExpr(LgsExpr* baseExpr, const LgsPostfixOperator op) : expr(baseExpr), op(op) {}
+    LgsPostfixExpr(LgsExpr* baseExpr, const LgsPostfixOperator op) : baseExpr(baseExpr), op(op) {}
     std::string getName() override;
-    json::value asJsonStr() override;
     ~LgsPostfixExpr() override;
 };

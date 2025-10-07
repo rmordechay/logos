@@ -12,16 +12,15 @@ public:
     Type* getIRType(LgsLLVMGen& cg) override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
-    Lgs_RTType getRTType() override;
+    Lgs_rttype getRTType() override;
     std::string getName() override;
     std::string pname() override;
     bool canCastTo(LgsType* other) override;
     std::string strFormatPart() const override;
     StructType* getArrStruct(LgsLLVMGen& cg);
     LgsFunc* getAddFunc() override;
-    LgsType* applyOp(LgsOperator op, LgsType* other) override;
+    LgsType* applyBinOp(LgsBinOpType op, LgsType* other) override;
     Value* lengthIR(LgsLLVMGen& cg, Value* iterable) override;
     Value* inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
     Value* getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) override;
-    json::value asJsonStr() override;
 };

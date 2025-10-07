@@ -1,11 +1,10 @@
 #pragma once
 
 struct LgsLocation {
-    size_t fileID;
-    size_t indexStart;
-    size_t indexEnd;
-    size_t lineStart;
-    size_t posInLine;
+    size_t fileID = 0;
+    size_t index = 0;
+    size_t lineStart = 0;
+    size_t columnStart = 0;
 };
 
 struct LgsBaseError {
@@ -31,7 +30,7 @@ inline LgsBaseError E10006{.msg = "'%s' is not defined.", .code = errCodeStart++
 inline LgsBaseError E10007{.msg = "File name '%s.lgs' is duplicate. All files in a project must be unique. Locations:%s", .code = errCodeStart++};
 inline LgsBaseError E10008{.msg = "'Main.lgs' could not be found in 'src' directory.", .code = errCodeStart++};
 inline LgsBaseError E10009{.msg = "Duplicate Main files were found in the project. Locations:%s", .code = errCodeStart++};
-inline LgsBaseError E10010{.msg = "Not a root path of a logos project.", .code = errCodeStart++};
+inline LgsBaseError E10010{.msg = "Not a root path of a Logos project.", .code = errCodeStart++};
 inline LgsBaseError E10011{.msg = "'%s' is already declared.", .code = errCodeStart++};
 inline LgsBaseError E10012{.msg = "'%s' of type '%s' cannot be %s-assigned to type '%s'.", .code = errCodeStart++};
 inline LgsBaseError E10013{.msg = "Field '%s' is with function type. Declare it as a standard function instead.", .code = errCodeStart++};
@@ -108,8 +107,8 @@ inline LgsBaseError E10083{.msg = "Method '%s' is an object method but was calle
 inline LgsBaseError E10084{.msg = "'%s' does not belong to an IO pair.", .code = errCodeStart++};
 inline LgsBaseError E10085{.msg = "Parsing error.", .code = errCodeStart++};
 inline LgsBaseError E10086{.msg = "'App.lgs' could not be found in root dir '%s'.", .code = errCodeStart++};
-inline LgsBaseError E10087{.msg = "", .code = errCodeStart++};
-inline LgsBaseError E10088{.msg = "", .code = errCodeStart++};
+inline LgsBaseError E10087{.msg = "Lexing error.", .code = errCodeStart++};
+inline LgsBaseError E10088{.msg = "Bad character.", .code = errCodeStart++};
 inline LgsBaseError E10089{.msg = "'%s' can only be assigned to an instance of '%s', not the object itself.", .code = errCodeStart++};
 inline LgsBaseError E10090{.msg = "'%s' can only prefix numbers. Given: '%s'.", .code = errCodeStart++};
 inline LgsBaseError E10091{.msg = "'not' can only prefix 'Bool'. Given: '%s'.", .code = errCodeStart++};

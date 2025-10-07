@@ -5,6 +5,7 @@ add_executable(lgs_tests
     parser/ParserErrorTest.cpp
     codegen/CodegenTest.cpp
     sema/SemaErrorTest.cpp
+    parser/ParserTest.cpp
 )
 
 target_precompile_headers(lgs_tests REUSE_FROM lgs_core)

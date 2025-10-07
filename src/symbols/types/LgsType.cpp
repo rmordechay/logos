@@ -1,3 +1,4 @@
+#include "data/LgsConfigs.h"
 #include "exprs/LgsVectorExpr.h"
 #include "stmts/LgsField.h"
 #include "types/LgsPtr.h"
@@ -5,7 +6,6 @@
 #include "types/LgsObject.h"
 #include "types/iterables/LgsDArray.h"
 #include "types/LgsEnum.h"
-#include "types/LgsGroup.h"
 #include "types/iterables/LgsMap.h"
 #include "types/LgsNullable.h"
 #include "types/LgsSubType.h"
@@ -37,7 +37,7 @@ LgsField* LgsType::getField(const std::string& fieldName) {
 }
 
 LgsFunc* LgsType::getMethod(const std::string& methodName) {
-    assert(0);
+    return nullptr;
 }
 
 bool LgsType::addField(LgsField* field) {
@@ -103,7 +103,49 @@ LgsType* LgsType::extendInt() {
     return this;
 }
 
-Lgs_RTType LgsType::getRTType() {
+LgsType* LgsType::applyIntBinOp(const LgsBinOpType op, LgsType* other) {
+    switch (op) {
+    case ADD:
+    case SUB:
+    case MUL:
+    case MODULO:
+    case BIT_AND:
+    case BIT_OR:
+    case BIT_XOR:
+    case LSHIFT:
+    case RSHIFT:
+        if (other->canCastTo(this)) return this;
+        break;
+    case DIV:
+        if (other->isNumber()) return &LGS_FLOAT;
+        break;
+    case EQ:
+    case NE:
+    case LT:
+    case GT:
+    case GE:
+    case LE: {
+        if (other->canCastTo(this)) return &LGS_BOOL;
+        break;
+    }
+    case IN: {
+        const auto iter = other->asIterable();
+        if (!iter) break;
+        if (iter->getDimension() == 1 && canCastTo(iter->baseType)) {
+            return &LGS_BOOL;
+        }
+        break;
+    }
+    case AND:
+    case OR:
+        break;
+    case NOOP:
+        break;
+    }
+    return nullptr;
+}
+
+Lgs_rttype LgsType::getRTType() {
     assert(0);
 }
 
@@ -111,7 +153,7 @@ std::string LgsType::pname() {
     return getName();
 }
 
-LgsType* LgsType::applyOp(const LgsOperator op, LgsType* other) {
+LgsType* LgsType::applyBinOp(const LgsBinOpType op, LgsType* other) {
     assert(0);
 }
 
@@ -121,6 +163,10 @@ DIBasicType* LgsType::getDebugType(LgsLLVMGen& cg) {
 
 LgsType* LgsType::clone() {
     if (isPrimitive || asSArray()) return this;
+    assert(0);
+}
+
+void LgsType::parseAsJSON(std::stringstream& json) {
     assert(0);
 }
 
@@ -188,7 +234,6 @@ LgsObject* LgsType::asObject() {
     return dynamic_cast<LgsObject*>(this);
 }
 
-
 LgsInterface* LgsType::asInterface() {
     return dynamic_cast<LgsInterface*>(this);
 }
@@ -219,10 +264,6 @@ LgsFuncType* LgsType::asFuncType() {
 
 LgsPtr* LgsType::asPtr() {
     return dynamic_cast<LgsPtr*>(this);
-}
-
-LgsGroup* LgsType::asGroup() {
-    return dynamic_cast<LgsGroup*>(this);
 }
 
 LgsSubType* LgsType::asSubtype() {
@@ -270,5 +311,37 @@ Value* LgsType::lshiftIR(LgsLLVMGen& cg, Value* self, Value* other) {
 }
 
 Value* LgsType::rshiftIR(LgsLLVMGen& cg, Value* self, Value* other) {
+    assert(0);
+}
+
+Value* LgsType::eqIR(LgsLLVMGen& cg, Value* self, Value* other) {
+    assert(0);
+}
+
+Value* LgsType::neIR(LgsLLVMGen& cg, Value* self, Value* other) {
+    assert(0);
+}
+
+Value* LgsType::ltIR(LgsLLVMGen& cg, Value* self, Value* other) {
+    assert(0);
+}
+
+Value* LgsType::gtIR(LgsLLVMGen& cg, Value* self, Value* other) {
+    assert(0);
+}
+
+Value* LgsType::geIR(LgsLLVMGen& cg, Value* self, Value* other) {
+    assert(0);
+}
+
+Value* LgsType::leIR(LgsLLVMGen& cg, Value* self, Value* other) {
+    assert(0);
+}
+
+Value* LgsType::andIR(LgsLLVMGen& cg, Value* self, Value* other) {
+    assert(0);
+}
+
+Value* LgsType::orIR(LgsLLVMGen& cg, Value* self, Value* other) {
     assert(0);
 }

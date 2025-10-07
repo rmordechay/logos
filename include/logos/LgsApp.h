@@ -7,7 +7,6 @@
 #include "utils/ThreadPool.h"
 
 class LgsTestFile;
-class LgsAppFile;
 class LogosParser;
 class LgsLLVMGen;
 class LgsStrConst;
@@ -34,7 +33,6 @@ public:
     std::atomic<size_t> nextFileID = 1;
     std::vector<char*> appArgs;
     ThreadPool threadPool;
-    bool isFileMode = false;
 
     explicit LgsApp(const fs::path& rootPath = "") {
         paths.rootPath = rootPath;
@@ -48,13 +46,13 @@ public:
     bool link();
     void execute();
     void loadBuiltins();
+    void loadSrcFile(const std::string& code, const fs::path& filePath = "");
+    bool loadAppFile();
     void loadEnvFiles();
-    bool parseAppFile();
-    void parseEnvFile(const fs::path& filePath);
-    void parseSrcFile(const std::string& code, const fs::path& filePath = "");
     void initBuild();
     void writeIRFiles();
     void exitWithErrors() const;
     LgsFile* getFileByID(size_t fileID) const;
     void freeApp();
+    ~LgsApp();
 };

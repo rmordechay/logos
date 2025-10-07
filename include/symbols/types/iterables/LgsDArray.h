@@ -17,14 +17,13 @@ public:
     std::string pname() override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
-    Lgs_RTType getRTType() override;
+    Lgs_rttype getRTType() override;
     std::string strFormatPart() const override;
-    LgsType* applyOp(LgsOperator op, LgsType* other) override;
+    LgsType* applyBinOp(LgsBinOpType op, LgsType* other) override;
     LgsFunc* getAddFunc() override;
     LgsFunc* getReserveFunc();
     Value* lengthIR(LgsLLVMGen& cg, Value* iterable) override;
     Value* inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
     Value* getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) override;
     bool canCastTo(LgsType* other) override;
-    json::value asJsonStr() override;
 };

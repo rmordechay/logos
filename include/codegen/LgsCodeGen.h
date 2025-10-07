@@ -18,7 +18,6 @@ class LgsFile;
 class LgsCoroutine;
 class LgsPrefixExpr;
 class LgsDArray;
-class LgsGroup;
 class LgsValue;
 class LgsVariable;
 class LgsStrConst;
@@ -70,7 +69,6 @@ public:
     void visitTestFile(const LgsTestFile* testFile);
     void visitMainFunc(LgsMainFunc* func);
     void visitFunc(LgsFunc* func);
-    void visitGroup(LgsGroup* group);
     void visitField(LgsField* field) const;
     void visitParam(LgsParam* param);
     void visitStmt(LgsStmt* stmt);
@@ -79,7 +77,7 @@ public:
     void visitRangeLoop(LgsRangeLoop* loop);
     void visitForeachLoop(LgsForeachLoop* loop);
     void visitInfiniteLoop(const LgsInfiniteLoop* loop) const;
-    void visitLoopMetaVar(LgsLoopMetaVar* metaVar);
+    void visitLoopMetaVar(LgsLoopMetaVar* metaVar) const;
     void visitWhileLoop(const LgsWhileLoop* loop);
     void visitVarDec(LgsVarDec* varDec);
     void visitAssignment(const LgsAssignment* assignment);
@@ -87,7 +85,7 @@ public:
     void visitSimpleIf(LgsIfStmt* ifStmt);
     void visitIfWithElse(LgsIfStmt* ifStmt);
     void visitElseIf(LgsIfStmt* ifStmt);
-    void visitPatternMatching(LgsPatternMatching* pm);
+    void visitPatternMatch(LgsPatternMatch* pm);
     void visitCoroutine(const LgsCoroutine* coroutine);
     void visitIOStmt(const LgsIOStmt* ioStmt);
     void visitReturnStmt(LgsReturn* returnStmt);
@@ -132,7 +130,7 @@ public:
 
     // Iterables
     void setStaticArray(LgsArrayExpr* arrayExpr);
-    void setNestedSArr(const LgsArrayExpr* arrayExpr, Type* parentType, Value* parentValue, std::vector<Value*>& indices);
+    void setNestedSArr(const LgsArrayExpr* arrayExpr, Type* parentType, Value* parentValue, const std::vector<Value*>& indices);
     void setDynamicArray(LgsArrayExpr* arrayExpr);
     void setSetExpr(LgsArrayExpr* arrayExpr);
     void createMapFunc(LgsFunc* func);

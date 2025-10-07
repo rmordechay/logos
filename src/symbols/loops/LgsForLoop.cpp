@@ -31,10 +31,6 @@ void LgsForLoop::incAndJumpToCond(LgsLLVMGen& cg) {
     cg.builder.CreateBr(IRCondBlock);
 }
 
-json::value LgsForLoop::asJsonStr() {
-    assert(0);
-}
-
 LgsForLoop::~LgsForLoop() {
     if (stmtsBlock) {
         delete stmtsBlock;

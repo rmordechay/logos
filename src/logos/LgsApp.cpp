@@ -1,7 +1,6 @@
 #include "logos/LgsApp.h"
 #include <llvm/Support/FileSystem.h>
 #include <llvm/IR/Module.h>
-#include "analysis/LgsParserAdapter.h"
 #include "analysis/LgsSema.h"
 #include "builtins/LgsTest.h"
 #include "logos/LgsPaths.h"
@@ -13,9 +12,14 @@
 #include "codegen/LgsCodeGen.h"
 #include "codegen/LgsLinker.h"
 #include "files/LgsTestFile.h"
+#include "parser/LgsLexer.h"
+#include "parser/LgsParser.h"
 #include "utils/LgsUtils.h"
 #include "llvm/IR/Verifier.h"
 #include <llvm/Target/TargetMachine.h>
+
+constexpr bool writeIRFile = true;
+constexpr bool printIR = true;
 
 void LgsApp::run() {
     if (!setup()) exitWithErrors();
@@ -36,7 +40,7 @@ void LgsApp::runTests() {
 
 bool LgsApp::setup() {
     if (isLogosFile(paths.rootPath)) {
-        isFileMode = true;
+        appConfigs.isFileMode = true;
         return true;
     }
     paths.initPaths();
@@ -53,13 +57,12 @@ bool LgsApp::setup() {
 
 bool LgsApp::parse() {
     loadBuiltins();
-    if (!parseAppFile()) return false;
+    if (!loadAppFile()) return false;
+    loadEnvFiles();
     for (const auto& entry : fs::recursive_directory_iterator(paths.srcDir)) {
         if (!isLogosFile(entry)) continue;
         threadPool.runTask([entry, this] {
-            const auto absFilePath = fs::path(fs::canonical(entry));
-            const std::string code = getFileText(absFilePath);
-            parseSrcFile(code, entry);
+            loadSrcFile(getFileText(entry), entry);
         });
     }
     threadPool.wait();
@@ -75,7 +78,11 @@ bool LgsApp::analyse() {
         threadPool.runTask([this, file] {
             LgsSema semaAnalyser(file, globals);
             semaAnalyser.analyse();
-            errHandler.mergeErrors(semaAnalyser.errHandler);
+            if (semaAnalyser.errHandler.successful) return;
+            {
+                std::lock_guard lock(mtx);
+                errHandler.mergeErrors(semaAnalyser.errHandler);
+            }
         });
     }
     threadPool.wait();
@@ -120,44 +127,60 @@ void LgsApp::loadBuiltins() {
     globals.addSymbol(LgsSymbol(new LgsReflect(), false, true), &errHandler);
 }
 
-void LgsApp::loadEnvFiles() {
-    for (const auto& entry : fs::directory_iterator(paths.envsDir)) {
-        if (!isLogosFile(entry)) continue;
-        threadPool.runTask([entry, this] {
-            parseEnvFile(entry);
-        });
+void LgsApp::loadSrcFile(const std::string& code, const fs::path& filePath) {
+    const auto fileID = nextFileID.fetch_add(1, std::memory_order_relaxed);
+    LgsLexer lexer(fileID, code);
+    const auto tokens = lexer.tokenize();
+    if (!lexer.errHandler.successful) {
+        errHandler.mergeErrors(lexer.errHandler);
+        return;
     }
-    threadPool.wait();
+    LgsParser parser(fileID, filePath, paths, globals, tokens);
+    const auto file = parser.parseSrcFile(appConfigs.isTestRun);
+    if (!file) return;
+    {
+        std::lock_guard lock(mtx);
+        ast.push_back(file);
+        if (parser.errHandler.successful) return;
+        errHandler.mergeErrors(parser.errHandler);
+    }
 }
 
-bool LgsApp::parseAppFile() {
-    LgsParserAdapter parserAdapter(0, appConfigs, paths, globals);
-    parserAdapter.setAppConfigs();
-    errHandler.mergeErrors(parserAdapter.errHandler);
+bool LgsApp::loadAppFile() {
+    if (appConfigs.isFileMode || !fs::exists(paths.appFilePath)) return true;
+    LgsLexer lexer(0, getFileText(paths.appFilePath));
+    const auto tokens = lexer.tokenize();
+    if (!lexer.errHandler.successful) {
+        errHandler.mergeErrors(lexer.errHandler);
+        return false;
+    }
+    LgsParser parser(0, paths.appFilePath, paths, globals, tokens);
+    parser.parseAppFile(appConfigs);
+    errHandler.mergeErrors(parser.errHandler);
     return errHandler.successful;
 }
 
-void LgsApp::parseEnvFile(const fs::path& filePath) {
-    const auto fileID = nextFileID.fetch_add(1, std::memory_order_relaxed);
-    LgsParserAdapter parserAdapter(fileID, appConfigs, paths, globals);
-    auto file = parserAdapter.getEnvFile(filePath);
-    std::lock_guard lock(mtx);
-    envFiles.emplace_back(file);
-    errHandler.mergeErrors(parserAdapter.errHandler);
-}
-
-void LgsApp::parseSrcFile(const std::string& code, const fs::path& filePath) {
-    const auto fileID = nextFileID.fetch_add(1, std::memory_order_relaxed);
-    LgsParserAdapter parserAdapter(fileID, appConfigs, paths, globals);
-    const auto lgsFile = parserAdapter.parseFile(code, filePath);
-    if (!lgsFile) return;
-    if (const auto mainFile = dynamic_cast<LgsMainFile*>(lgsFile)) {
-        mainFile->appArgs = appArgs;
+void LgsApp::loadEnvFiles() {
+    for (const auto& filePath : fs::directory_iterator(paths.envsDir)) {
+        if (!isLogosFile(filePath)) continue;
+        threadPool.runTask([filePath, this] {
+            auto code = getFileText(filePath);
+            const auto fileID = nextFileID.fetch_add(1, std::memory_order_relaxed);
+            LgsLexer lexer(fileID, code);
+            const auto tokens = lexer.tokenize();
+            if (!lexer.errHandler.successful) {
+                errHandler.mergeErrors(lexer.errHandler);
+                return;
+            }
+            LgsParser parser(fileID, filePath, paths, globals, tokens);
+            const auto file = parser.parseEnvFile();
+            if (!file) return;
+            {
+                std::lock_guard lock(mtx);
+                envFiles.push_back(file);
+            }
+        });
     }
-    lgsFile->id = fileID;
-    ast.push_back(lgsFile);
-    if (parserAdapter.errHandler.successful) return;
-    errHandler.mergeErrors(parserAdapter.errHandler);
 }
 
 void LgsApp::initBuild() {
@@ -177,7 +200,7 @@ void LgsApp::writeIRFiles() {
     for (const auto file : ast) {
         const auto module = file->generator.IRModule;
         if (!module) continue;
-        if (appConfigs.logLevel == DEBUG) {
+        if (printIR) {
             module->print(outs(), nullptr);
             logInfo(LGS_MSG_LINE_SEPERATOR);
         }
@@ -185,7 +208,7 @@ void LgsApp::writeIRFiles() {
             errHandler.setUnsuccessful();
             continue;
         }
-        if (appConfigs.writeIRFile) {
+        if (writeIRFile) {
             const auto filePath = (paths.buildIR / module->getName().str()).string() + ".ll";
             std::error_code EC;
             raw_fd_ostream textFile(filePath, EC, sys::fs::OF_None);
@@ -197,7 +220,7 @@ void LgsApp::writeIRFiles() {
 void LgsApp::exitWithErrors() const {
     for (int i = 0; i < errHandler.errors.size(); ++i) {
         const auto err = errHandler.errors[i];
-        const auto posInLine = std::to_string(err.location.posInLine);
+        const auto posInLine = std::to_string(err.location.columnStart);
         const auto lineNumber = std::to_string(err.location.lineStart);
         const auto file = getFileByID(err.location.fileID);
         const auto fullPath = getFullPath(err.location, file->path);
@@ -223,7 +246,6 @@ LgsFile* LgsApp::getFileByID(const size_t fileID) const {
 }
 
 void LgsApp::freeApp() {
-    threadPool.~ThreadPool();
     for (const auto file : ast) {
         delete file;
     }
@@ -236,4 +258,8 @@ void LgsApp::freeApp() {
         delete testFile;
     }
     testsFiles.clear();
+}
+
+LgsApp::~LgsApp() {
+    freeApp();
 }

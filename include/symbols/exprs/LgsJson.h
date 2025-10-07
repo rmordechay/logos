@@ -11,10 +11,5 @@ public:
     LgsIntConst* intConst = nullptr;
     LgsFloatConst* floatConst = nullptr;
     LgsNullableExpr* null = nullptr;
-    json::value asJsonStr() override;
     ~LgsJson() override = default;
 };
-
-inline json::value LgsJson::asJsonStr() {
-    assert(0);
-}

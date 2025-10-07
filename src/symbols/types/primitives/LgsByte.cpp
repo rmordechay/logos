@@ -14,7 +14,7 @@ Type* LgsByte::getIRType(LgsLLVMGen& cg) {
     return cg.i8Ty();
 }
 
-LgsType* LgsByte::applyOp(const LgsOperator op, LgsType* other) {
+LgsType* LgsByte::applyBinOp(const LgsBinOpType op, LgsType* other) {
     const auto IRName = other->getName();
     if (name != IRName) return nullptr;
     if (op == ADD) return extendInt();
@@ -77,7 +77,7 @@ LgsExpr* LgsByte::getZeroValue() {
     return new LgsIntConst(&LGS_BYTE, false);
 }
 
-Lgs_RTType LgsByte::getRTType() {
+Lgs_rttype LgsByte::getRTType() {
     return RTT_BYTE;
 }
 
@@ -100,10 +100,4 @@ bool LgsByte::canCastTo(LgsType* other) {
 
 std::string LgsByte::strFormatPart() const {
     return "%d";
-}
-
-json::value LgsByte::asJsonStr() {
-    json::object obj;
-    obj["name"] = name;
-    return obj;
 }

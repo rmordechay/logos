@@ -2,6 +2,7 @@
 #include "exprs/LgsArrayExpr.h"
 #include <llvm/IR/Module.h>
 #include "types/iterables/LgsStr.h"
+#include "types/primitives/LgsInt.h"
 
 Function* LgsMainFunc::getIRFunc(LgsLLVMGen& cg) {
     if (IRFunc) return IRFunc;

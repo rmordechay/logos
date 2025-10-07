@@ -44,11 +44,11 @@ bool LgsIterable::unpackLoopVarsTypes(LgsForeachLoop* loop) const {
     return true;
 }
 
-void LgsIterable::unpackLoopVarsIR(LgsLLVMGen& cg, const std::vector<LgsVarDec*> varDecs, Value* iterPtr, Value* index) const {
-    const auto iterIndex = varDecs[0]->expr->asIterIndex();
-    iterIndex->index.from->IRValue = index;
+void LgsIterable::unpackLoopIR(LgsLLVMGen& cg, LgsForeachLoop* loop) const {
+    const auto iterIndex = loop->loopVars[0]->expr->asIterIndex();
+    iterIndex->index.from->IRValue = loop->iValue;
     iterIndex->setIRElementPtr(cg);
-    varDecs[0]->IRValue = iterIndex->IRValue;
+    loop->loopVars[0]->IRValue = iterIndex->IRValue;
 }
 
 LgsFunc* LgsIterable::getMethod(const std::string& methodName) {
@@ -81,7 +81,7 @@ LgsFunc* LgsIterable::getMethod(const std::string& methodName) {
     return nullptr;
 }
 
-size_t LgsIterable::getDim() {
+size_t LgsIterable::getDimension() {
     size_t dim = 1;
     auto nestedIter = this;
     while (true) {

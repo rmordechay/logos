@@ -13,8 +13,6 @@ enum LgsLoopMetaVarType {
     FOR_ELEMENT,
     FOR_IS_FIRST,
     FOR_IS_LAST,
-    FOR_PREV,
-    FOR_NEXT,
 };
 
 class LgsLoopMetaVar final : public LgsExpr {
@@ -26,6 +24,5 @@ public:
     explicit LgsLoopMetaVar(const std::string& name, const LgsLoopMetaVarType forType) : name(name), varType(forType) {}
     Value* loadIR(LgsLLVMGen& cg) override;
     std::string getName() override;
-    json::value asJsonStr() override;
 };
 

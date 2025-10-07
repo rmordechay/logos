@@ -7,14 +7,6 @@
 #include <exprs/LgsSelection.h>
 #include <llvm/IR/Module.h>
 
-json::value LgsDeferStmt::asJsonStr() {
-    json::object obj;
-    obj["stmtKind"] = "DeferStmt";
-    obj["funcCall"] = funcCall ? funcCall->asJsonStr() : nullptr;
-    obj["selection"] = selection ? selection->asJsonStr() : nullptr;
-    return obj;
-}
-
 LgsDeferStmt::~LgsDeferStmt() {
     freeExpr(funcCall);
     freeExpr(selection);

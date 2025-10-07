@@ -2,11 +2,10 @@
 #include "Lgs_darray.h"
 #include "Lgs_set.h"
 #include "Lgs_hashmap.h"
-#include "utils/LgsUtils.h"
 
 #define PRINT_MEMORY false
 
-static std::string getTypeName(const Lgs_RTType type) {
+static std::string getTypeName(const Lgs_rttype type) {
     switch (type) {
     case RTT_UNKNOWN: return "<Unknown>";
     case RTT_VOID: return "Void";
@@ -34,11 +33,12 @@ static std::string getTypeName(const Lgs_RTType type) {
     case RTT_OBJECT: return "Object";
     case RTT_TYPE: return "Type";
     case RTT_ANY: return "Any";
+    case RTT_NULLABLE: return "Any?";
     }
     assert(0);
 }
 
-static void freeType(void* ptr, const Lgs_RTType type) {
+static void freeType(void* ptr, const Lgs_rttype type) {
     if constexpr (PRINT_MEMORY) {
         std::cout << "\tFreeing: " << ptr << std::endl;
     }
@@ -95,14 +95,14 @@ void Lgs_stack::addDefer(void* funcPtr, void* ctx) {
     frames[stackIndex].defers[frames[stackIndex].defersCount++] = func_entry;
 }
 
-void Lgs_stack::addOwner(void* ptr, const Lgs_RTType type) {
+void Lgs_stack::addOwner(void* ptr, const Lgs_rttype type) {
     if constexpr (PRINT_MEMORY) {
         std::cout << "alloc owner " << getTypeName(type) << ": " << ptr << std::endl;
     }
     frames[stackIndex].owners[frames[stackIndex].ownersCount++] = Lgs_alloc{.ptr = ptr, .type = type};
 }
 
-void Lgs_stack::addOrphan(void* ptr, const Lgs_RTType type) {
+void Lgs_stack::addOrphan(void* ptr, const Lgs_rttype type) {
     if constexpr (PRINT_MEMORY) {
         std::cout << "alloc orphan " << getTypeName(type) << ": " << ptr << std::endl;
     }

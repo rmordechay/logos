@@ -3,10 +3,6 @@
 #include "exprs/LgsFuncCall.h"
 #include "exprs/LgsSelection.h"
 
-json::value LgsCoroutine::asJsonStr() {
-    assert(0);
-}
-
 LgsCoroutine::~LgsCoroutine() {
     if (funcCall) {
         delete funcCall;

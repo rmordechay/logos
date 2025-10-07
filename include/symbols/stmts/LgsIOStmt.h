@@ -6,11 +6,11 @@ class LgsStmtsBlock;
 
 class LgsIOStmt final : public LgsStmt {
 public:
-    LgsStmtsBlock* stmtsBlock;
+    LgsStmtsBlock* stmtsBlock = nullptr;
     LgsVarDec* varDec = nullptr;
     LgsFunc* closingFunc = nullptr;
 
+    LgsIOStmt() = default;
     explicit LgsIOStmt(LgsStmtsBlock* stmtsBlock): stmtsBlock(stmtsBlock) {}
-    json::value asJsonStr() override;
     ~LgsIOStmt() override;
 };
