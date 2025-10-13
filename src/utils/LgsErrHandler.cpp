@@ -10,11 +10,12 @@ void LgsErrHandler::setUnsuccessful() {
 void LgsErrHandler::addError(const LgsBaseError& lgsErr, const LgsLocation* location, const std::vector<std::string>& args) {
     setUnsuccessful();
     const auto result = LGS_ERROR_PADDING + formatErrorMsg(lgsErr.msg, args);
+    LgsError err{.msg = result, .errCode = lgsErr.code};
     if (location) {
-        assert(location->fileID != 0);
-        errors.emplace_back(LgsError{.msg = result, .errCode = lgsErr.code, .location = *location});
+        err.location = *location;
+        errors.emplace_back(err);
     } else {
-        errors.emplace_back(LgsError{.msg = result, .errCode = lgsErr.code});
+        errors.emplace_back(err);
     }
 }
 

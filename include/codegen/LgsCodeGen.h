@@ -86,12 +86,12 @@ public:
     void visitIfWithElse(LgsIfStmt* ifStmt);
     void visitElseIf(LgsIfStmt* ifStmt);
     void visitPatternMatch(LgsPatternMatch* pm);
-    void visitCoroutine(const LgsCoroutine* coroutine);
-    void visitIOStmt(const LgsIOStmt* ioStmt);
-    void visitReturnStmt(LgsReturn* returnStmt);
     void visitContinueStmt();
+    void visitReturnStmt(LgsReturn* returnStmt);
     void visitBreakStmt(const LgsBreak* breakStmt);
+    void visitCoroutine(const LgsCoroutine* coroutine);
     void visitDeferStmt(const LgsDeferStmt* deferStmt);
+    void visitIOStmt(const LgsIOStmt* ioStmt);
     void visitExpr(LgsExpr* expr);
     void visitBinaryExpr(LgsBinaryExpr* binExpr);
     void visitCast(LgsCast* cast);

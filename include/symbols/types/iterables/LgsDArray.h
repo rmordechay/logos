@@ -5,7 +5,7 @@
 
 class LgsDArray final : public LgsIterable {
 public:
-    static constexpr auto name = "DArray";
+    static constexpr auto name = "darray";
 
     explicit LgsDArray(LgsType* baseType = nullptr) : LgsIterable(baseType) {
         addEmptyMethod(RESERVE_FUNC_NAME);

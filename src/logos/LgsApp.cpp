@@ -48,17 +48,17 @@ bool LgsApp::setup() {
         errHandler.addError(E10010, nullptr);
         return false;
     }
-    // if (!exists(paths.appFilePath)) {
-    //     errHandler.addError(E10086, nullptr, {paths.rootPath});
-    //     return false;
-    // }
+    if (!appConfigs.isFileMode && !fs::exists(paths.appFilePath)) {
+        errHandler.addError(E10086, nullptr, {paths.rootPath});
+        return false;
+    }
     return true;
 }
 
 bool LgsApp::parse() {
     loadBuiltins();
-    if (!loadAppFile()) return false;
-    loadEnvFiles();
+    // if (!loadAppFile()) return false;
+    // loadEnvFiles();
     for (const auto& entry : fs::recursive_directory_iterator(paths.srcDir)) {
         if (!isLogosFile(entry)) continue;
         threadPool.runTask([entry, this] {
@@ -114,7 +114,6 @@ void LgsApp::execute() {
     if (appArgs.empty() || appArgs.back() != nullptr) {
         appArgs.push_back(nullptr);
     }
-    freeApp();
     execv(execPath, appArgs.data());
     perror("Logos execution failed.");
     exit(EXIT_FAILURE);
@@ -128,7 +127,7 @@ void LgsApp::loadBuiltins() {
 }
 
 void LgsApp::loadSrcFile(const std::string& code, const fs::path& filePath) {
-    const auto fileID = nextFileID.fetch_add(1, std::memory_order_relaxed);
+    const auto fileID = getNextFileID(filePath);
     LgsLexer lexer(fileID, code);
     const auto tokens = lexer.tokenize();
     if (!lexer.errHandler.successful) {
@@ -147,14 +146,14 @@ void LgsApp::loadSrcFile(const std::string& code, const fs::path& filePath) {
 }
 
 bool LgsApp::loadAppFile() {
-    if (appConfigs.isFileMode || !fs::exists(paths.appFilePath)) return true;
-    LgsLexer lexer(0, getFileText(paths.appFilePath));
+    const auto appFileID = getNextFileID(paths.appFilePath);
+    LgsLexer lexer(appFileID, getFileText(paths.appFilePath));
     const auto tokens = lexer.tokenize();
     if (!lexer.errHandler.successful) {
         errHandler.mergeErrors(lexer.errHandler);
         return false;
     }
-    LgsParser parser(0, paths.appFilePath, paths, globals, tokens);
+    LgsParser parser(appFileID, paths.appFilePath, paths, globals, tokens);
     parser.parseAppFile(appConfigs);
     errHandler.mergeErrors(parser.errHandler);
     return errHandler.successful;
@@ -165,7 +164,7 @@ void LgsApp::loadEnvFiles() {
         if (!isLogosFile(filePath)) continue;
         threadPool.runTask([filePath, this] {
             auto code = getFileText(filePath);
-            const auto fileID = nextFileID.fetch_add(1, std::memory_order_relaxed);
+            const auto fileID = getNextFileID(filePath);
             LgsLexer lexer(fileID, code);
             const auto tokens = lexer.tokenize();
             if (!lexer.errHandler.successful) {
@@ -220,32 +219,40 @@ void LgsApp::writeIRFiles() {
 void LgsApp::exitWithErrors() const {
     for (int i = 0; i < errHandler.errors.size(); ++i) {
         const auto err = errHandler.errors[i];
-        const auto posInLine = std::to_string(err.location.columnStart);
-        const auto lineNumber = std::to_string(err.location.lineStart);
-        const auto file = getFileByID(err.location.fileID);
-        const auto fullPath = getFullPath(err.location, file->path);
-        auto line = trim(getLine(file->path.string(), err.location.lineStart));
-        const auto len = line.length();
-        line += '\n' + std::string(std::strlen(LGS_ERROR_PADDING) + 2, ' ');
-        line += std::string(len, '~');
-        const auto path = "\n   at: " + fullPath;
-        const auto finalMsg = line + err.msg;
-        logError(finalMsg, path);
+        const auto column = err.location.columnStart;
+        const auto line = err.location.lineStart;
+        const auto filePath = filePaths.find(err.location.fileID);
+        assert(filePath != filePaths.end());
+        const auto fullPath = getFullPath(err.location, filePath->second);
+        auto lineStr = getLine(filePath->second.string(), line);
+        const auto lineLen = lineStr.size();
+        auto errMsg = trim(lineStr);
+        const auto paddingLen = std::strlen(LGS_ERROR_PADDING) + 2;
+        // Adds new line and padding
+        errMsg += '\n' + std::string(paddingLen, ' ');
+        // Draw underneath the line
+        errMsg += std::string(column, '~');
+        errMsg += '^';
+        errMsg += std::string(lineLen - column, '~');
+        errMsg += err.msg;
+        const auto atPath = "\n   at: " + fullPath;
+        logError(errMsg, atPath);
         if (i != errHandler.errors.size() - 1) logInfo(LGS_MSG_LINE_SEPERATOR);
     }
     if (!errHandler.errors.empty()) logInfo("\n");
     exit(1);
 }
 
-LgsFile* LgsApp::getFileByID(const size_t fileID) const {
-    for (const auto& file : ast) {
-        if (file->id != fileID) continue;
-        return file;
+size_t LgsApp::getNextFileID(const fs::path& filePath) {
+    const auto fileID = nextFileID.fetch_add(1, std::memory_order_relaxed);
+    {
+        std::lock_guard lock(mtx);
+        filePaths[fileID] = filePath;
     }
-    assert(0);
+    return fileID;
 }
 
-void LgsApp::freeApp() {
+LgsApp::~LgsApp() {
     for (const auto file : ast) {
         delete file;
     }
@@ -258,8 +265,4 @@ void LgsApp::freeApp() {
         delete testFile;
     }
     testsFiles.clear();
-}
-
-LgsApp::~LgsApp() {
-    freeApp();
 }

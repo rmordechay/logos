@@ -19,9 +19,9 @@ struct Lgs_stack_frame {
     Lgs_alloc owners[LOCALS_CAPACITY];
     Lgs_alloc orphans[LOCALS_CAPACITY];
     Lgs_Thunk_Func defers[LOCALS_CAPACITY];
-    int defersCount;
-    int ownersCount;
-    int orphansCount;
+    size_t defersCount = 0;
+    size_t ownersCount = 0;
+    size_t orphansCount = 0;
 };
 
 struct Lgs_stack {

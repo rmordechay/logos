@@ -1,9 +1,12 @@
 #pragma once
-#include <vector>
+#include "Lgs_types.h"
 
 #define MAX_ELEMENT_SIZE 1024*100
 
 struct Lgs_set {
+    char* data;
+    size_t size;
+    size_t capacity;
     size_t elementSize;
-    std::vector<char>* data;
+    Lgs_rttype baseType;
 };

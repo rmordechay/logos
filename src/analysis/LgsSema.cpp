@@ -469,8 +469,6 @@ void LgsSema::visitDeferStmt(const LgsDeferStmt* deferStmt) {
     if (deferStmt->funcCall) visitFuncCall(deferStmt->funcCall);
     else if (deferStmt->selection) visitSelection(deferStmt->selection);
     else assert(0);
-    const auto deferType = deferStmt->funcCall ? deferStmt->funcCall->type : deferStmt->selection->type;
-    assert(deferType);
     stack.currentFunc()->hasDefers = true;
 }
 

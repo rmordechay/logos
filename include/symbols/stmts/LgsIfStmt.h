@@ -23,7 +23,6 @@ public:
     LgsExpr* cond;
     LgsStmtsBlock* elseBlock = nullptr;
     std::vector<std::pair<LgsExpr*, LgsStmtsBlock*>> patterns;
-    bool isBoolMatch = false;
 
     explicit LgsPatternMatch(LgsExpr* cond = nullptr): cond(cond){}
     ~LgsPatternMatch() override;

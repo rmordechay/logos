@@ -104,7 +104,8 @@ public:
     LgsVarDec* parseVarDec();
     LgsStmt* parseAssignment();
     LgsStmt* parseIfStmt();
-    LgsPatternMatch* parsePatternMatch(bool isBoolMatch);
+    void parsePatternMatchBody(LgsPatternMatch* patternMatch);
+    LgsPatternMatch* parseBoolPatternMatch();
     LgsForLoop* parseForLoop();
     LgsWhileLoop* parseWhileLoop();
     LgsInfiniteLoop* parseInfiniteLoop();
@@ -117,8 +118,9 @@ public:
     LgsJson* parseJson();
 
     // Exprs
-    LgsExpr* parseExpr();
-    LgsExpr* parseUnary();
+    LgsExpr* parseExpr(bool withInstance = true);
+    LgsExpr* parseUnary(bool withInstance = true);
+    LgsExpr* parseIterExpr();
     LgsBinOp parseBinaryOp();
     LgsVariable* parseVariable();
     LgsInstance* parseInstance();
@@ -147,7 +149,7 @@ public:
     LgsToken consume();
     LgsToken peek(size_t i = 1);
     bool matchAndConsume(LgsTokenType token);
-    bool matchOrReset(LgsTokenType t1, LgsTokenType t2, size_t resetIndex);
+    bool matchOrReset(LgsTokenType t2, size_t resetIndex);
     bool mustMatch(LgsTokenType t2);
     bool mustParse(const void* value);
     bool parsedOrReset(const void* value, size_t resetIndex);

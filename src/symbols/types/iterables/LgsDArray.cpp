@@ -74,13 +74,13 @@ LgsFunc* LgsDArray::getAddFunc() {
     func->second = new LgsFunc(ADD_FUNC_NAME, &LGS_VOID, {this, baseType}, BUILTIN | PUBLIC | METHOD);
     func->second->fn = [this](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
         if (!baseType->isPrimitive) {
-            return cg.callLgsFunc("DArray_add", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {cg.getPtr(args[0]->IRValue), args[1]->IRValue});
+            return cg.callLgsFunc(std::string(name) + "_add", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {cg.getPtr(args[0]->IRValue), args[1]->IRValue});
         }
         if (baseType->asInt()) {
-            return cg.callLgsFunc("DArray_addInt", cg.voidTy(), {cg.ptrTy(), cg.i32Ty()}, {cg.getPtr(args[0]->IRValue), args[1]->IRValue});
+            return cg.callLgsFunc(std::string(name) + "_addInt", cg.voidTy(), {cg.ptrTy(), cg.i32Ty()}, {cg.getPtr(args[0]->IRValue), args[1]->IRValue});
         }
         if (baseType->asLong()) {
-            return cg.callLgsFunc("DArray_addLong", cg.voidTy(), {cg.ptrTy(), cg.i64Ty()}, {cg.getPtr(args[0]->IRValue), args[1]->IRValue});
+            return cg.callLgsFunc(std::string(name) + "_addLong", cg.voidTy(), {cg.ptrTy(), cg.i64Ty()}, {cg.getPtr(args[0]->IRValue), args[1]->IRValue});
         }
         assert(0);
     };
@@ -106,8 +106,7 @@ Value* LgsDArray::inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) {
 
 Value* LgsDArray::getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) {
     LgsFunc f("get", &LGS_ANY, {this, &LGS_LONG}, BUILTIN | PUBLIC | METHOD);
-    auto iterPtr = cg.getPtr(iterable);
-    return f.callIR(cg, {iterPtr, index});
+    return f.callIR(cg, {iterable, index});
 }
 
 bool LgsDArray::canCastTo(LgsType* other) {

@@ -73,6 +73,8 @@ enum LgsTokenType {
     T_VEC2,
     T_VEC3,
     T_VEC4,
+    T_JSON,
+    T_SET,
     T_FOR,
     T_FOR_I,
     T_FOR_IS_FIRST,
@@ -125,6 +127,8 @@ const std::unordered_map<std::string, LgsTokenType> LGS_KEYWORDS = {
     {"vec2", T_VEC2},
     {"vec3", T_VEC3},
     {"vec4", T_VEC4},
+    {".json", T_JSON},
+    {".set", T_SET},
     {"true", T_BOOL},
     {"false", T_BOOL},
     {"null", T_NULL}

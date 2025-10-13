@@ -1,80 +1,100 @@
 #include "Lgs_set.h"
-#include "data/LgsErrors.h"
-#include "utils/LgsUtils.h"
+#include "Lgs_types.h"
 #include <cstring>
 
-extern "C" void Lgs_Set_init(Lgs_set* set, const size_t elementSize) {
+extern "C" void Lgs_set_init(Lgs_set* set, const size_t elementSize, const Lgs_rttype baseType) {
+    assert(baseType != RTT_UNKNOWN);
     set->elementSize = elementSize;
-    set->data = new std::vector<char>();
+    set->baseType = baseType;
+    set->capacity = elementSize * 10;
+    set->data = static_cast<char*>(malloc(set->capacity));
+    set->size = 0;
 }
 
-extern "C" bool Lgs_Set_contains(const Lgs_set* set, const void* value) {
-    if (!set || !set->data || set->data->empty()) return false;
-    const size_t len = set->data->size() / set->elementSize;
-    const char* base = set->data->data();
+extern "C" void Lgs_set_reserve(Lgs_set* set, const size_t numElements) {
+    const auto newCapacity = numElements * set->elementSize;
+    if (newCapacity <= set->capacity) return;
+    set->data = static_cast<char*>(realloc(set->data, newCapacity));
+    set->capacity = newCapacity;
+}
+
+static void resizeSetIfNeeded(Lgs_set* set) {
+    if (set->size + set->elementSize <= set->capacity) return;
+    set->capacity *= 2;
+    set->data = static_cast<char*>(realloc(set->data, set->capacity));
+}
+
+static bool elementsEqual(const void* elem1, const void* elem2, const size_t elementSize, const Lgs_rttype baseType) {
+    return std::memcmp(elem1, elem2, elementSize) == 0;
+}
+
+extern "C" bool Lgs_set_add(Lgs_set* set, const void* value) {
+    const size_t len = set->size / set->elementSize;
+    const char* base = set->data;
     for (size_t i = 0; i < len; ++i) {
         const void* elem = base + i * set->elementSize;
-        if (std::memcmp(elem, value, set->elementSize) == 0) {
-            return true;
+        if (elementsEqual(elem, value, set->elementSize, set->baseType)) {
+            return false; // Element already exists
         }
     }
-    return false;
-}
-
-extern "C" bool Lgs_Set_add(const Lgs_set* set, const void* value) {
-    assert(set->elementSize <= MAX_ELEMENT_SIZE);
-    if (Lgs_Set_contains(set, value)) return false;
-    const auto oldSize = set->data->size();
-    set->data->resize(oldSize + set->elementSize);
-    std::memcpy(set->data->data() + oldSize, value, set->elementSize);
+    resizeSetIfNeeded(set);
+    std::memcpy(set->data + set->size, value, set->elementSize);
+    set->size += set->elementSize;
     return true;
 }
 
-extern "C" bool Lgs_Set_remove(const Lgs_set* set, const void* value) {
-    if (!set || !set->data || set->data->empty()) return false;
-    const size_t len = set->data->size() / set->elementSize;
-    const char* base = set->data->data();
+extern "C" bool Lgs_set_contains(const Lgs_set* set, const void* value) {
+    if (set->size == 0) return false;
+    const size_t len = set->size / set->elementSize;
+    const char* base = set->data;
     for (size_t i = 0; i < len; ++i) {
         const void* elem = base + i * set->elementSize;
-        if (std::memcmp(elem, value, set->elementSize) == 0) {
-            // Found element, remove it by moving last element to this position
-            if (i < len - 1) {
-                const void* lastElem = base + (len - 1) * set->elementSize;
-                std::memcpy(const_cast<char*>(base) + i * set->elementSize, lastElem, set->elementSize);
-            }
-            set->data->resize(set->data->size() - set->elementSize);
+        if (elementsEqual(elem, value, set->elementSize, set->baseType)) {
             return true;
         }
     }
     return false;
 }
 
-extern "C" void* Lgs_Set_get(const Lgs_set* set, const size_t index) {
-    if (!set || !set->data) return nullptr;
-    const auto len = set->data->size() / set->elementSize;
-    if (index >= len) {
-        formatAndLogError(E10080.msg, {std::to_string(index)});
-        return nullptr;
+extern "C" bool Lgs_set_remove(Lgs_set* set, const void* value) {
+    assert(set);
+    if (set->size == 0) return false;
+    const size_t len = set->size / set->elementSize;
+    char* base = set->data;
+    for (size_t i = 0; i < len; ++i) {
+        char* elem = base + i * set->elementSize;
+        if (elementsEqual(elem, value, set->elementSize, set->baseType)) {
+            // Shift remaining elements down
+            const size_t remaining = set->size - (i + 1) * set->elementSize;
+            if (remaining > 0) {
+                std::memmove(elem, elem + set->elementSize, remaining);
+            }
+            set->size -= set->elementSize;
+            return true;
+        }
     }
-    return set->data->data() + index * set->elementSize;
+    return false;
 }
 
-extern "C" size_t Lgs_Set_size(const Lgs_set* set) {
-    return set->data->size() / set->elementSize;
+extern "C" void* Lgs_set_get(const Lgs_set* set, const size_t index) {
+    if (!set || set->size == 0) return nullptr;
+    const auto len = set->size / set->elementSize;
+    if (index >= len) return nullptr;
+    return set->data + index * set->elementSize;
 }
 
-extern "C" bool Lgs_Set_isEmpty(const Lgs_set* set) {
-    return set->data->empty();
+extern "C" size_t Lgs_set_len(const Lgs_set* set) {
+    return set->size / set->elementSize;
 }
 
-extern "C" bool Lgs_Set_isNotEmpty(const Lgs_set* set) {
-    return !set->data->empty();
+extern "C" bool Lgs_set_isEmpty(const Lgs_set* set) {
+    return set->size == 0;
 }
 
-extern "C" void Lgs_Set_clear(const Lgs_set* set) {
-    set->data->clear();
+extern "C" bool Lgs_set_isNotEmpty(const Lgs_set* set) {
+    return set->size != 0;
 }
 
-extern "C" size_t Lgs_Set_len(const Lgs_set* set) {
-    return set->data->size() / set->elementSize;
+extern "C" void Lgs_set_clear(Lgs_set* set) {
+    set->size = 0;
 }

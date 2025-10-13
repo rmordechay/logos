@@ -90,9 +90,9 @@ std::string formatElement(const Lgs_rttype type, void* elem) {
 std::string formatArray(Lgs_darray* arr) {
     std::ostringstream oss;
     oss << "[";
-    const size_t len = Lgs_DArray_len(arr);
+    const size_t len = Lgs_darray_len(arr);
     for (size_t i = 0; i < len; ++i) {
-        void* elem = Lgs_DArray_get(arr, i);
+        void* elem = Lgs_darray_get(arr, i);
         oss << formatElement(arr->baseType, elem);
         if (i < len - 1) {
             oss << ", ";

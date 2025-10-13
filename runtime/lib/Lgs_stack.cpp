@@ -70,26 +70,15 @@ static void freeType(void* ptr, const Lgs_rttype type) {
 }
 
 void Lgs_stack::push() {
-    if (stackIndex + 1 >= STACK_CAPACITY) {
-        fprintf(stderr, "Stack overflow");
-        exit(1);
-    }
     stackIndex++;
-    Lgs_stack_frame& frame = frames[stackIndex];
-    frame.defersCount = 0;
 }
 
 void Lgs_stack::pop(const bool cleanup) {
     if (cleanup) funcCleanup();
-    if (stackIndex < 0) {
-        fprintf(stderr, "Stack underflow");
-        exit(1);
-    }
     stackIndex--;
 }
 
 void Lgs_stack::addDefer(void* funcPtr, void* ctx) {
-    if (stackIndex < 0) std::exit(1);
     const auto deferFunc = reinterpret_cast<Lgs_Defer_Func>(funcPtr);
     const Lgs_Thunk_Func func_entry{deferFunc, ctx};
     frames[stackIndex].defers[frames[stackIndex].defersCount++] = func_entry;

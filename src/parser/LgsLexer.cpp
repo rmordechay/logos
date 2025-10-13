@@ -26,12 +26,6 @@ LgsToken LgsLexer::nextToken() {
         return nextToken();
     }
 
-    // String
-    if (currentChar == '"') {
-        auto const str = scanString();
-        return {T_STRING, str, location};
-    }
-
     // Tag
     if (currentChar == '@') {
         advance();
@@ -42,8 +36,10 @@ LgsToken LgsLexer::nextToken() {
         return {T_TAG, lexeme, location};
     }
 
+    // Dot, range or spread
     if (currentChar == '.') {
-        if (advance() == '.') {
+        advance();
+        if (currentChar == '.') {
             if (advance() == '.') {
                 advance();
                 return {T_TRIPLE_DOT, "...", location};
@@ -53,14 +49,22 @@ LgsToken LgsLexer::nextToken() {
         return {T_DOT, ".", location};
     }
 
+    // Number
     if (std::isdigit(currentChar)) {
         return scanNumber();
     }
     if (currentChar == '-' && std::isdigit(peek())) {
         return scanNumber();
     }
+
+    // Var or keyword
     if (std::isalpha(currentChar)) {
         return scanVarOrKeyword();
+    }
+
+    // String
+    if (currentChar == '"') {
+        return {T_STRING, scanString(), location};
     }
 
     switch (currentChar) {
@@ -73,45 +77,51 @@ LgsToken LgsLexer::nextToken() {
     case ',': advance(); return {T_COMMA, ",", location};
     case '?': advance(); return {T_QUEST_MARK, "?", location};
     case '=':
-        if (advance() == '=') return {T_DOUBLE_EQUAL, "==", location};
+        advance();
+        if (match('=')) return {T_DOUBLE_EQUAL, "==", location};
         return {T_EQUAL, "=", location};
     case '!':
-        if (advance() == '=') return {T_NOT_EQUAL, "!=", location};
+        advance();
+        if (match('=')) return {T_NOT_EQUAL, "!=", location};
         return {T_EXCLA_MARK, "!", location};
     case '<':
-        if (advance() == '<') {
-            if (advance() == '=') return {T_EQUAL_DOUBLE_RANGLE, "<<=", location};
+        advance();
+        if (match('<')) {
+            if (match('=')) return {T_EQUAL_DOUBLE_RANGLE, "<<=", location};
             return {T_DOUBLE_RANGLE, "<<", location};
         }
         if (currentChar == '=') return {T_LE, "<=", location};
         return {T_LANGLE, "<", location};
     case '>':
-        if (advance() == '>') {
-            if (advance() == '=') return {T_EQUAL_DOUBLE_LANGLE, ">>=", location};
+        advance();
+        if (match('>')) {
+            if (match('=')) return {T_EQUAL_DOUBLE_LANGLE, ">>=", location};
             return {T_DOUBLE_LANGLE, ">>", location};
         }
         if (currentChar == '=') return {T_GE, ">=", location};
         return {T_RANGLE, ">", location};
     case ':':
-        if (advance() == '=') return {T_WALRUS, ":=", location};
+        advance();
+        if (match('=')) return {T_WALRUS, ":=", location};
         return {T_COLON, ":", location};
     case '+':
         advance();
-        if (currentChar == '+') return {T_INC, "++", location};
-        if (currentChar == '=') return {T_EQUAL_PLUS, "+=", location};
+        if (match('+')) return {T_INC, "++", location};
+        if (match('=')) return {T_EQUAL_PLUS, "+=", location};
         return {T_PLUS, "+", location};
     case '-':
         advance();
-        if (currentChar == '-') return {T_DEC, "--", location};
-        if (currentChar == '>') return {T_ARROW, "->", location};
-        if (currentChar == '=') return {T_EQUAL_MINUS, "-=", location};
+        if (match('-')) return {T_DEC, "--", location};
+        if (match('>')) return {T_ARROW, "->", location};
+        if (match('=')) return {T_EQUAL_MINUS, "-=", location};
         return {T_MINUS, "-", location};
     case '*':
         advance();
-        if (currentChar == '=') return {T_EQUAL_STAR, "*=", location};
+        if (match('=')) return {T_EQUAL_STAR, "*=", location};
         return {T_STAR, "*", location};
     case '_':
-        if (advance() == '/') return {T_SLIDER, "_/", location};
+        advance();
+        if (match('/')) return {T_SLIDER, "_/", location};
         if (std::isalpha(peek(-1))) {
             position--;
             column--;
@@ -119,20 +129,25 @@ LgsToken LgsLexer::nextToken() {
         }
         return {T_IDENTIFIER, "_", location};
     case '/':
-        if (advance() == '=') return {T_EQUAL_SLASH, "/=", location};
+        advance();
+        if (match('=')) return {T_EQUAL_SLASH, "/=", location};
         return {T_SLASH, "/", location};
     case '%': {
-        if (advance() == '=') return {T_EQUAL_PERCENT, "%=", location};
+        advance();
+        if (match('=')) return {T_EQUAL_PERCENT, "%=", location};
         return {T_PERCENT, "%", location};
     }
     case '&':
-        if (advance() == '=') return {T_EQUAL_AMPERSAND, "&=", location};
+        advance();
+        if (match('=')) return {T_EQUAL_AMPERSAND, "&=", location};
         return {T_AMPERSAND, "&", location};
     case '|':
-        if (advance() == '=') return {T_EQUAL_PIPE, "|=", location};
+        advance();
+        if (match('=')) return {T_EQUAL_PIPE, "|=", location};
         return {T_PIPE, "|", location};
     case '^':
-        if (advance() == '=') return {T_EQUAL_CARET, "^=", location};
+        advance();
+        if (match('=')) return {T_EQUAL_CARET, "^=", location};
         return {T_CARET, "^", location};
     default:
         errHandler.addError(E10088, &location);
@@ -205,22 +220,26 @@ std::string LgsLexer::scanString() {
 LgsToken LgsLexer::scanNumber() {
     LgsLocation location{fileID, position, line, column};
     std::string lexeme;
-    auto const isNegative = currentChar == '-';
-    if (isNegative) {
-        lexeme += advance();
+    if (currentChar == '-') {
+        lexeme += currentChar;
+        advance();
     }
     while (std::isdigit(currentChar) || currentChar == '_') {
-        lexeme += advance();
+        lexeme += currentChar;
+        advance();
     }
     if (currentChar == '.' && std::isdigit(peek())) {
-        lexeme += advance();
+        lexeme += currentChar;
+        advance();
         while (std::isdigit(currentChar)) {
-            lexeme += advance();
+            lexeme += currentChar;
+            advance();
         }
         return {T_FLOAT, lexeme, location};
     }
     if (currentChar == 'L') {
-        lexeme += advance();
+        lexeme += currentChar;
+        advance();
         return {T_LONG, lexeme, location};
     }
     return {T_INTEGER, lexeme, location};

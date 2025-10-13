@@ -10,7 +10,7 @@ class LgsPair;
 
 class LgsMap final : public LgsIterable {
 public:
-    static constexpr auto name = "Map";
+    static constexpr auto name = "map";
     StructType* mapStruct = nullptr;
     LgsTypePair* typePair = nullptr;
 

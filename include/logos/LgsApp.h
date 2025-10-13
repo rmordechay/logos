@@ -28,9 +28,10 @@ public:
     LgsSymbolTable globals;
     LgsErrHandler errHandler;
     std::vector<LgsFile*> ast;
-    std::vector<LgsTestFile*> testsFiles;
     std::vector<LgsEnvFile*> envFiles;
-    std::atomic<size_t> nextFileID = 1;
+    std::vector<LgsTestFile*> testsFiles;
+    std::map<size_t, fs::path> filePaths;
+    std::atomic<size_t> nextFileID = 0;
     std::vector<char*> appArgs;
     ThreadPool threadPool;
 
@@ -52,7 +53,6 @@ public:
     void initBuild();
     void writeIRFiles();
     void exitWithErrors() const;
-    LgsFile* getFileByID(size_t fileID) const;
-    void freeApp();
+    size_t getNextFileID(const fs::path& filePath);
     ~LgsApp();
 };
