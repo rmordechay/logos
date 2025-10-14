@@ -6,6 +6,7 @@
 #include "LgsPaths.h"
 #include "utils/ThreadPool.h"
 
+class LgsConfigFile;
 class LgsTestFile;
 class LogosParser;
 class LgsLLVMGen;
@@ -27,11 +28,12 @@ public:
     LgsAppConfigs appConfigs;
     LgsSymbolTable globals;
     LgsErrHandler errHandler;
-    std::vector<LgsFile*> ast;
+    std::vector<LgsFile*> srcFiles;
     std::vector<LgsEnvFile*> envFiles;
     std::vector<LgsTestFile*> testsFiles;
     std::map<size_t, fs::path> filePaths;
-    std::atomic<size_t> nextFileID = 0;
+    LgsConfigFile* configFile = nullptr;
+    std::atomic<size_t> nextFileID = 1;
     std::vector<char*> appArgs;
     ThreadPool threadPool;
 
@@ -48,11 +50,12 @@ public:
     void execute();
     void loadBuiltins();
     void loadSrcFile(const std::string& code, const fs::path& filePath = "");
-    bool loadAppFile();
+    bool loadConfigFile();
     void loadEnvFiles();
     void initBuild();
     void writeIRFiles();
     void exitWithErrors() const;
+    void loadConfigs();
     size_t getNextFileID(const fs::path& filePath);
     ~LgsApp();
 };

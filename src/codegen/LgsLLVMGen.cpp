@@ -160,6 +160,10 @@ Value* LgsLLVMGen::getPtr(Value* v) {
     return ptr;
 }
 
+Value* LgsLLVMGen::callHash(Value* v) {
+    return callLgsFunc("hash", i32Ty(), {ptrTy()}, {v});
+}
+
 Value* LgsLLVMGen::callPrintf(const std::vector<Value*>& args) {
     return callFunc("printf", getFT(i32Ty(), {ptrTy()}, true), args);
 }

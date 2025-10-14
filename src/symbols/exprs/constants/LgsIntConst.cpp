@@ -67,6 +67,10 @@ std::string LgsIntConst::getName() {
     return std::to_string(value);
 }
 
+Value* LgsIntConst::hash(LgsLLVMGen& cg) {
+    return IRValue;
+}
+
 LgsExpr* LgsIntConst::clone() {
     return new LgsIntConst(type->clone(), value);
 }

@@ -48,6 +48,7 @@ public:
     Value* callFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes = {}, const std::vector<Value*>& args = {});
     Value* callLgsFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes = {}, const std::vector<Value*>& args = {});
     Value* getPtr(Value* v);
+    Value* callHash(Value* v);
 
     // System
     Value* callPrintf(const std::vector<Value*>& args);

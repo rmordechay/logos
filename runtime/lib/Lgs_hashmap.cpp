@@ -1,10 +1,13 @@
 #include "Lgs_hashmap.h"
-
 #include "Lgs_darray.h"
 #include "types/iterables/LgsMap.h"
 #include "utils/LgsUtils.h"
 
-extern "C" void Lgs_map_init(Lgs_hashmap* map, const size_t valueSize, Lgs_rttype keyType, Lgs_rttype valueType) {
+extern "C" size_t Lgs_hash(const char* s) {
+    return hashStr(s);
+}
+
+extern "C" void Lgs_map_init(Lgs_hashmap* map, const size_t valueSize, const Lgs_rttype keyType, const Lgs_rttype valueType) {
     assert(keyType != RTT_UNKNOWN && valueType != RTT_UNKNOWN);
     if (!map || valueSize == 0 || valueSize > 4096) std::exit(1);
     map->valueSize = valueSize;

@@ -1,5 +1,6 @@
 #pragma once
 #include "../data/LgsTokens.h"
+#include "files/LgsConfigFile.h"
 #include "funcs/LgsMainFunc.h"
 #include "loops/LgsForeachLoop.h"
 #include "utils/LgsErrHandler.h"
@@ -73,7 +74,7 @@ public:
     LgsInterfaceFile* parseInterfaceFile();
     LgsTestFile* parseTestFile();
     LgsEnvFile* parseEnvFile();
-    void parseAppFile(LgsAppConfigs& appConfigs);
+    LgsConfigFile* parseConfigFile();
     void parseExternalImports(LgsFile* file);
 
     // Object
@@ -92,10 +93,10 @@ public:
     LgsType* parseType();
 
     // Funcs
-    LgsMainFunc* parseMainFunc();
-    LgsFuncType* parseFuncHeader();
     LgsFunc* parseFunc();
+    LgsMainFunc* parseMainFunc();
     LgsFunc* parseMethod(LgsObject* obj);
+    LgsFuncType* parseFuncHeader();
     void parseParams(LgsFuncType* funcType);
 
     // Statements
@@ -105,7 +106,6 @@ public:
     LgsStmt* parseAssignment();
     LgsStmt* parseIfStmt();
     void parsePatternMatchBody(LgsPatternMatch* patternMatch);
-    LgsPatternMatch* parseBoolPatternMatch();
     LgsForLoop* parseForLoop();
     LgsWhileLoop* parseWhileLoop();
     LgsInfiniteLoop* parseInfiniteLoop();
@@ -118,9 +118,8 @@ public:
     LgsJson* parseJson();
 
     // Exprs
-    LgsExpr* parseExpr(bool withInstance = true);
-    LgsExpr* parseUnary(bool withInstance = true);
-    LgsExpr* parseIterExpr();
+    LgsExpr* parseExpr();
+    LgsExpr* parseUnary();
     LgsBinOp parseBinaryOp();
     LgsVariable* parseVariable();
     LgsInstance* parseInstance();

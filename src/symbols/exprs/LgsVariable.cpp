@@ -69,7 +69,8 @@ Value* LgsVariable::hash(LgsLLVMGen& cg) {
     case VAR_DEC:
         return ref.varDec->expr->hash(cg);
     case FIELD:
-        return cg.i32(hashStr(ref.field->name.c_str()));
+        if (type->asEnum()) return cg.i32(hashStr(ref.field->name.c_str()));
+        return cg.callLgsFunc("hash", cg.i32Ty(), {cg.ptrTy()}, {ref.field->IRValue});
     default:
         assert(0);
     }

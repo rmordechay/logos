@@ -9,7 +9,7 @@ TEST_CASE("TestParser") {
     const auto expectedTree = getFileText("../../tests/parser/ParserTestExpected.json");
     app.loadSrcFile(code, "Main.lgs");
     std::stringstream json;
-    app.ast.front()->parseAsJSON(json);
+    app.srcFiles.front()->parseAsJSON(json);
     std::ofstream("../../test.json") << json.str();
     CHECK(app.errHandler.errors.size() == 0);
     CHECK_EQ(json.str(), expectedTree);

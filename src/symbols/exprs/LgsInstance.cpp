@@ -5,6 +5,10 @@
 #include "stmts/LgsVarDec.h"
 #include "types/LgsObject.h"
 
+std::string LgsInstance::getName() {
+    return name + "{}";
+}
+
 LgsExpr* LgsInstance::castTo(LgsType* toType, bool explicitCast) {
     assert(0);
 }
@@ -20,10 +24,6 @@ Value* LgsInstance::loadIR(LgsLLVMGen& cg) {
 void LgsInstance::setObject(LgsObject* newObj) {
     obj = newObj;
     setType(obj);
-}
-
-std::string LgsInstance::getName() {
-    return name;
 }
 
 bool LgsInstance::equals(LgsExpr* other) {

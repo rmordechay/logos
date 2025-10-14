@@ -189,8 +189,26 @@ LgsToken LgsLexer::scanVarOrKeyword() {
     while (std::isalnum(currentChar) || currentChar == '_') {
         lexeme += currentChar;
         advance();
+        if (currentChar == '{') return {T_INSTANCE, lexeme, location};
         if (std::isspace(currentChar)) break;
     }
+    if (lexeme == "for") {
+        if (match('.')) {
+            std::string metaVar;
+            while (std::isalnum(currentChar)) {
+                metaVar += currentChar;
+                advance();
+                if (std::isspace(currentChar)) break;
+            }
+            const auto combined = lexeme + '.' + metaVar;
+            if (metaVar == "i") return {T_FOR_I, combined, location};
+            if (metaVar == "isFirst") return {T_FOR_IS_FIRST, combined, location};
+            if (metaVar == "isLast") return {T_FOR_IS_LAST, combined, location};
+            if (metaVar == "ever") return {T_FOR_EVER, combined, location};
+        }
+        return {T_FOR, lexeme, location};
+    }
+
     auto const it = LGS_KEYWORDS.find(lexeme);
     if (it != LGS_KEYWORDS.end()) {
         return {it->second, lexeme, location};
@@ -275,5 +293,5 @@ void LgsLexer::skipBlockComment() {
 
 void LgsLexer::addLexingError() {
     const LgsLocation location = {fileID, position, line, column};
-    return errHandler.addError(E10087, &location);
+    errHandler.addError(E10087, &location);
 }

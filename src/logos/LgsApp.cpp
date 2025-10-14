@@ -71,10 +71,10 @@ bool LgsApp::parse() {
 
 bool LgsApp::analyse() {
     LgsTypeResolver typeResolver(errHandler, globals);
-    if (!typeResolver.resolveGlobalTypes(ast, threadPool)) {
+    if (!typeResolver.resolveGlobalTypes(srcFiles, threadPool)) {
         return false;
     }
-    for (const auto file : ast) {
+    for (const auto file : srcFiles) {
         threadPool.runTask([this, file] {
             LgsSema semaAnalyser(file, globals);
             semaAnalyser.analyse();
@@ -92,7 +92,7 @@ bool LgsApp::analyse() {
 bool LgsApp::generate() {
     initBuild();
     const auto targetMachine = LgsLLVMGen::getTargetMachine();
-    for (const auto& file : ast) {
+    for (const auto& file : srcFiles) {
         threadPool.runTask([this, file, targetMachine] {
             LgsCodeGen code(*file);
             code.generate(appConfigs, *targetMachine);
@@ -104,7 +104,7 @@ bool LgsApp::generate() {
 }
 
 bool LgsApp::link() {
-    const LgsLinker linker(appConfigs, paths, ast);
+    const LgsLinker linker(appConfigs, paths, srcFiles);
     return linker.link();
 }
 
@@ -139,13 +139,13 @@ void LgsApp::loadSrcFile(const std::string& code, const fs::path& filePath) {
     if (!file) return;
     {
         std::lock_guard lock(mtx);
-        ast.push_back(file);
+        srcFiles.push_back(file);
         if (parser.errHandler.successful) return;
         errHandler.mergeErrors(parser.errHandler);
     }
 }
 
-bool LgsApp::loadAppFile() {
+bool LgsApp::loadConfigFile() {
     const auto appFileID = getNextFileID(paths.appFilePath);
     LgsLexer lexer(appFileID, getFileText(paths.appFilePath));
     const auto tokens = lexer.tokenize();
@@ -154,8 +154,9 @@ bool LgsApp::loadAppFile() {
         return false;
     }
     LgsParser parser(appFileID, paths.appFilePath, paths, globals, tokens);
-    parser.parseAppFile(appConfigs);
+    configFile = parser.parseConfigFile();
     errHandler.mergeErrors(parser.errHandler);
+    if (errHandler.successful) loadConfigs();
     return errHandler.successful;
 }
 
@@ -196,7 +197,7 @@ void LgsApp::initBuild() {
 }
 
 void LgsApp::writeIRFiles() {
-    for (const auto file : ast) {
+    for (const auto file : srcFiles) {
         const auto module = file->generator.IRModule;
         if (!module) continue;
         if (printIR) {
@@ -233,7 +234,7 @@ void LgsApp::exitWithErrors() const {
         // Draw underneath the line
         errMsg += std::string(column, '~');
         errMsg += '^';
-        errMsg += std::string(lineLen - column, '~');
+        // errMsg += std::string(lineLen - column, '~');
         errMsg += err.msg;
         const auto atPath = "\n   at: " + fullPath;
         logError(errMsg, atPath);
@@ -241,6 +242,27 @@ void LgsApp::exitWithErrors() const {
     }
     if (!errHandler.errors.empty()) logInfo("\n");
     exit(1);
+}
+
+void LgsApp::loadConfigs() {
+    for (const auto config : configFile->configs) {
+        const auto configNama = config->name;
+        if (configNama == "name") {
+            appConfigs.name = config->expr->asStrConst()->value;
+        }
+        if (configNama == "activeEnv") {
+            appConfigs.activeEnv = config->expr->asStrConst()->value;
+        }
+        if (configNama == "version") {
+            auto value = config->expr->asStrConst()->value;
+            int consumed = 0;
+            auto [major, minor, micro] = appConfigs.version;
+            const auto s = std::sscanf(value.c_str(), "%hu.%hu.%hu%n", &major, &minor, &micro, &consumed) == 3;
+            if (!s || value[consumed] != '\0') {
+                errHandler.addError(E10068, &config->location, {value});
+            }
+        }
+    }
 }
 
 size_t LgsApp::getNextFileID(const fs::path& filePath) {
@@ -253,10 +275,14 @@ size_t LgsApp::getNextFileID(const fs::path& filePath) {
 }
 
 LgsApp::~LgsApp() {
-    for (const auto file : ast) {
+    if (configFile) {
+        delete configFile;
+        configFile = nullptr;
+    }
+    for (const auto file : srcFiles) {
         delete file;
     }
-    ast.clear();
+    srcFiles.clear();
     for (const auto envFile : envFiles) {
         delete envFile;
     }

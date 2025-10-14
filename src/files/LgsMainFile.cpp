@@ -43,7 +43,7 @@ void LgsMainFile::parseAsJSON(std::stringstream& json) {
         first = false;
         enum_->parseAsJSON(json);
     }
-    closeJsonArray(json);
+    closeJsonArray(json, true);
 
     openJsonKeyArray(json, "subtypes");
     first = true;

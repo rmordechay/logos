@@ -70,6 +70,7 @@ enum LgsTokenType {
     T_BREAK,
     T_CONTINUE,
     T_RETURN,
+    T_INSTANCE,
     T_VEC2,
     T_VEC3,
     T_VEC4,

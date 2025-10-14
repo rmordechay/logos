@@ -43,6 +43,7 @@
 #include "stmts/LgsAssignment.h"
 #include "stmts/LgsIOStmt.h"
 #include "stmts/LgsIfStmt.h"
+#include "stmts/LgsPatternMatch.h"
 #include "types/primitives/LgsDouble.h"
 #include "types/primitives/LgsSize.h"
 
@@ -64,7 +65,10 @@ void LgsSema::visitMainFile(LgsMainFile* mainFile) {
     for (const auto obj : mainFile->objects) {
         visitObject(obj);
     }
-    for (const auto& [_, func] : mainFile->funcs) {
+    for (const auto& [funcName, func] : mainFile->funcs) {
+        if (funcName == LGS_MAIN_FUNC_NAME) {
+            visitMainFunc(dynamic_cast<LgsMainFunc*>(func));
+        }
         visitFunc(func);
     }
     if (mainFile->funcs.find(LGS_MAIN_FUNC_NAME) == mainFile->funcs.end()) {
@@ -137,6 +141,20 @@ void LgsSema::visitFunc(LgsFunc* func) {
     stack.exitScope();
 }
 
+void LgsSema::visitMainFunc(const LgsMainFunc* func) {
+    const auto ft = func->funcType;
+    const auto paramSize = ft->params.size();
+    if (paramSize > 1) {
+        errHandler.addError(E10039, &func->location);
+    } else if (paramSize == 1) {
+        const auto firstParam = ft->params.front();
+        const auto iterable = firstParam.type->asIterable();
+        if (!iterable || !iterable->baseType->asStr()) {
+            errHandler.addError(E10039, &func->location);
+        }
+    }
+}
+
 void LgsSema::visitLambda(LgsFunc* lambda) {
     const auto stmtsBlock = lambda->stmtsBlock;
     // Wraps in return if its the only statement
@@ -177,7 +195,7 @@ void LgsSema::visitIOPair(LgsIOPair* ioPair, LgsObject* obj) {
 }
 
 void LgsSema::visitStmt(LgsStmt* stmt) {
-    if (const auto pattern = stmt->asPattern()) visitPatternMatch(pattern);
+    if (const auto pattern = stmt->asPatternMatch()) visitPatternMatch(pattern);
     else if (const auto ifStmt = stmt->asIfStmt()) visitIfStmt(ifStmt);
     else if (const auto varDec = stmt->asVarDec()) visitVarDec(varDec);
     else if (const auto loopStmt = stmt->asLoop()) visitLoopStmt(loopStmt);
@@ -678,7 +696,7 @@ void LgsSema::visitSelection(LgsSelection* selection) {
     visitInnerSelections(selection);
 
     const auto lastExpr = selection->lastExpr();
-    if (selection->hasNullables) {
+    if (selection->hasNullables && !lastExpr->type->asNullable()) {
         lastExpr->type = new LgsNullable(lastExpr->type);
     }
 

@@ -17,13 +17,3 @@ public:
     void parseAsJSON(std::stringstream& json) override;
     ~LgsIfStmt() override;
 };
-
-class LgsPatternMatch final : public LgsStmt {
-public:
-    LgsExpr* cond;
-    LgsStmtsBlock* elseBlock = nullptr;
-    std::vector<std::pair<LgsExpr*, LgsStmtsBlock*>> patterns;
-
-    explicit LgsPatternMatch(LgsExpr* cond = nullptr): cond(cond){}
-    ~LgsPatternMatch() override;
-};

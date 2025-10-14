@@ -2,6 +2,7 @@
 #include "funcs/LgsFunc.h"
 #include "loops/LgsForLoop.h"
 #include "stmts/LgsIfStmt.h"
+#include "stmts/LgsPatternMatch.h"
 
 void LgsStack::enterScope(LgsValue* value) {
     LgsStackFrame stackFrame;

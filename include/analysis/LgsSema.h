@@ -65,6 +65,7 @@ public:
     void visitTestFile(const LgsTestFile* testFile);
     void visitField(LgsField* field);
     void visitFunc(LgsFunc* func);
+    void visitMainFunc(const LgsMainFunc* func);
     void visitLambda(LgsFunc* lambda);
     void visitParam(LgsParam* param);
     void visitIOPair(LgsIOPair* ioPair, LgsObject* obj);

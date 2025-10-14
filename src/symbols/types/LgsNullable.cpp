@@ -13,11 +13,12 @@ LgsFunc* LgsNullable::getMethod(const std::string& methodName) {
 }
 
 Type* LgsNullable::getIRType(LgsLLVMGen& cg) {
-    return cg.getStructType({baseType->getIRType(cg), cg.i1Ty()});
+    const auto type = baseType->isPrimitive ? baseType->getIRType(cg) : cg.ptrTy();
+    return cg.getStructType({type, cg.i1Ty()}, "nullable_" + baseType->getName());
 }
 
 LgsExpr* LgsNullable::getZeroValue() {
-    const auto nullableExpr = new LgsNullableExpr(nullptr);
+    const auto nullableExpr = new LgsNullableExpr(baseType->getZeroValue());
     nullableExpr->type = this;
     return nullableExpr;
 }

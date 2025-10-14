@@ -38,6 +38,7 @@
 #include "stmts/LgsAssignment.h"
 #include "stmts/LgsIOStmt.h"
 #include "stmts/LgsIfStmt.h"
+#include "stmts/LgsPatternMatch.h"
 #include "types/iterables/LgsSArray.h"
 #include "types/iterables/LgsVec.h"
 #include "types/primitives/LgsSize.h"
@@ -167,7 +168,7 @@ void LgsCodeGen::visitParam(LgsParam* param) {
 
 void LgsCodeGen::visitStmt(LgsStmt* stmt) {
     if (const auto ifStmt = stmt->asIfStmt()) return visitIfStmt(ifStmt);
-    if (const auto pattern = stmt->asPattern()) return visitPatternMatch(pattern);
+    if (const auto pattern = stmt->asPatternMatch()) return visitPatternMatch(pattern);
     if (const auto varDec = stmt->asVarDec()) return visitVarDec(varDec);
     if (const auto loopStmt = stmt->asLoop()) return visitLoop(loopStmt);
     if (const auto coroutine = stmt->asCoroutine()) return visitCoroutine(coroutine);
@@ -433,7 +434,7 @@ void LgsCodeGen::visitPatternMatch(LgsPatternMatch* pm) {
     assert(pm->cond);
     const auto defaultBlock = cg.createBlock(BLOCK_NAME_DEFAULT_CASE);
     const auto exitBlock = cg.createBlock(BLOCK_NAME_EXIT_PATTERN);
-
+    visitExpr(pm->cond);
     const auto exprIRValue = pm->cond->hash(cg);
     SwitchInst* switchInst;
     if (pm->elseBlock) {
@@ -445,12 +446,14 @@ void LgsCodeGen::visitPatternMatch(LgsPatternMatch* pm) {
 
     std::vector<BasicBlock*> blocks;
     for (size_t i = 0; i < pm->patterns.size(); ++i) {
-        const auto [expr, stmtsBlock] = pm->patterns[i];
         stack.enterScope(pm);
+        const auto [expr, stmtsBlock] = pm->patterns[i];
+        visitExpr(expr);
         const auto patterIRValue = expr->hash(cg);
         const auto patternBlock = cg.createBlock(BLOCK_NAME_CASE_PREFIX + std::to_string(i), currentIRFunc);
         switchInst->addCase(dyn_cast<ConstantInt>(patterIRValue), patternBlock);
-        cg.builder.SetInsertPoint(patternBlock);
+        cg.startBlock(patternBlock);
+        visitStmtsBlock(stmtsBlock);
         cg.builder.CreateBr(exitBlock);
         stack.exitScope();
     }
@@ -458,10 +461,10 @@ void LgsCodeGen::visitPatternMatch(LgsPatternMatch* pm) {
     if (pm->elseBlock) {
         stack.enterScope(pm);
         cg.startBlock(defaultBlock);
+        visitStmtsBlock(pm->elseBlock);
         cg.builder.CreateBr(exitBlock);
         stack.exitScope();
     }
-
     cg.startBlock(exitBlock);
 }
 
@@ -972,11 +975,11 @@ void LgsCodeGen::visitNullableExpr(LgsNullableExpr* nullableExpr) {
     }
 
     if (nullableExpr->isNull) {
-        nullableExpr->storeValue(cg, nullptr, true);
+        nullableExpr->store(cg, nullptr, false);
     } else {
         const auto baseType = nullableExpr->baseExpr;
         visitExpr(baseType);
-        nullableExpr->storeValue(cg, baseType->IRValue, false);
+        nullableExpr->store(cg, baseType->IRValue, true);
     }
 }
 

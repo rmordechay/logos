@@ -14,17 +14,15 @@ void LgsNullableExpr::completeType(LgsType* toType) {
     }
 }
 
-void LgsNullableExpr::storeValue(LgsLLVMGen& cg, Value* value, const bool null) const {
+void LgsNullableExpr::store(LgsLLVMGen& cg, Value* value, const bool isSet) const {
     const auto nullStruct = type->asNullable()->getIRType(cg);
-    const auto isNullField = cg.builder.CreateStructGEP(nullStruct, IRValue, 1);
-    if (null) {
-        cg.builder.CreateStore(cg.true_(), isNullField);
-        return;
+    const auto isSetField = cg.builder.CreateStructGEP(nullStruct, IRValue, 1);
+    if (isSet) {
+        cg.builder.CreateStore(cg.true_(), isSetField);
+        const auto vField = cg.builder.CreateStructGEP(nullStruct, IRValue, 0);
+        cg.builder.CreateStore(value, vField);
     }
-    cg.builder.CreateStore(cg.false_(), isNullField);
-    assert(value);
-    const auto vField = cg.builder.CreateStructGEP(nullStruct, IRValue, 0);
-    cg.builder.CreateStore(value, vField);
+    cg.builder.CreateStore(cg.false_(), isSetField);
 }
 
 LgsNullableExpr::~LgsNullableExpr() {

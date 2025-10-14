@@ -14,7 +14,7 @@ public:
     }
     std::string getName() override;
     void completeType(LgsType* toType) override;
-    void storeValue(LgsLLVMGen& cg, Value* value, const bool null) const;
+    void store(LgsLLVMGen& cg, Value* value, const bool isSet) const;
     ~LgsNullableExpr() override;
 };
 

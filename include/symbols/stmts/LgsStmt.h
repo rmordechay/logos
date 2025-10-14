@@ -26,7 +26,7 @@ public:
     LgsFuncCall* asFuncCall();
     LgsIfStmt* asIfStmt();
     LgsIOStmt* asIOStmt();
-    LgsPatternMatch* asPattern();
+    LgsPatternMatch* asPatternMatch();
     LgsPostfixExpr* asPostfixExpr();
     LgsExpr* asExpr();
     LgsSelection* asSelection();

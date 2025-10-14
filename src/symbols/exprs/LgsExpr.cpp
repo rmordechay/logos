@@ -17,8 +17,6 @@
 #include "exprs/LgsTypeExpr.h"
 #include "loops/LgsLoopMetaVar.h"
 
-class LgsTypeExpr;
-
 LgsExpr* LgsExpr::castTo(LgsType* toType, const bool explicitCast) {
     assert(0);
 }
