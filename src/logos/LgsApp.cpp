@@ -136,10 +136,9 @@ void LgsApp::loadSrcFile(const std::string& code, const fs::path& filePath) {
     }
     LgsParser parser(fileID, filePath, paths, globals, tokens);
     const auto file = parser.parseSrcFile(appConfigs.isTestRun);
-    if (!file) return;
     {
         std::lock_guard lock(mtx);
-        srcFiles.push_back(file);
+        if (file) srcFiles.push_back(file);
         if (parser.errHandler.successful) return;
         errHandler.mergeErrors(parser.errHandler);
     }

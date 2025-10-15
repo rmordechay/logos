@@ -6,6 +6,7 @@
 #include "stmts/LgsIOPair.h"
 #include "stmts/LgsIOStmt.h"
 
+class LgsTernaryExpr;
 class LgsVec;
 class LgsInterfaceFile;
 class LgsObjectFile;
@@ -89,6 +90,7 @@ public:
     void visitIOStmt(const LgsIOStmt* ioStmt);
     void visitExpr(LgsExpr* expr);
     void visitBinaryExpr(LgsBinaryExpr* binaryExpr);
+    void visitTernaryExpr(LgsTernaryExpr* ternary);
     void visitCast(LgsCast* cast);
     void visitArrayExpr(LgsArrayExpr* arrayExpr);
     void visitStaticArray(const LgsArrayExpr* arrayExpr);

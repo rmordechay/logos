@@ -20,6 +20,7 @@
 #include "exprs/LgsNullableExpr.h"
 #include "exprs/LgsPostfixExpr.h"
 #include "exprs/LgsPrefixExpr.h"
+#include "exprs/LgsTernaryExpr.h"
 #include "exprs/LgsTypeExpr.h"
 #include "exprs/LgsVectorExpr.h"
 #include "exprs/constants/LgsStrConst.h"
@@ -505,7 +506,9 @@ void LgsSema::visitExpr(LgsExpr* expr) {
     if (const auto iter = expr->type->asIterable()) {
         visitExpr(iter->size);
     }
-    if (const auto binaryExpr = dynamic_cast<LgsBinaryExpr*>(expr)) {
+    if (const auto ternaryExpr = dynamic_cast<LgsTernaryExpr*>(expr)) {
+        visitTernaryExpr(ternaryExpr);
+    } else if (const auto binaryExpr = dynamic_cast<LgsBinaryExpr*>(expr)) {
         visitBinaryExpr(binaryExpr);
     } else {
         if (const auto lambda = expr->asFunc()) return visitLambda(lambda);
@@ -539,6 +542,22 @@ void LgsSema::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
         return errHandler.addError(E10076, &l->location, {binaryExpr->op.name, ltype->pname(), rtype->pname()});
     }
     binaryExpr->setType(type);
+}
+
+void LgsSema::visitTernaryExpr(LgsTernaryExpr* ternary) {
+    const auto condExpr = ternary->condExpr;
+    const auto thenExpr = ternary->thenExpr;
+    const auto elseExpr = ternary->elseExpr;
+    visitExpr(condExpr);
+    visitExpr(thenExpr);
+    visitExpr(elseExpr);
+    if (!condExpr->type->asBool()) {
+        errHandler.addError(E10092, &ternary->location, {condExpr->getName(), condExpr->type->getName()});
+    }
+    if (!thenExpr->type->canCastTo(elseExpr->type)) {
+        errHandler.addError(E10021, &ternary->location, {thenExpr->getName(), elseExpr->getName(), thenExpr->type->getName(), elseExpr->type->getName()});
+    }
+    ternary->type = thenExpr->type;
 }
 
 void LgsSema::visitCast(LgsCast* cast) {

@@ -8,7 +8,7 @@ TEST_CASE("TestSema10000") {
     const auto code = R"(
     func() {}
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, "Main.lgs");
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10000, code));
     CHECK_EQ(app.errHandler.errors[0].errCode, E10000.code);
@@ -21,7 +21,7 @@ TEST_CASE("TestSema10001A") {
         s1: Str[2] = [["adi"], ["roi"]]
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, "Main.lgs");
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10001, code));
     CHECK_EQ(app.errHandler.errors[0].errCode, E10001.code);
@@ -35,7 +35,7 @@ TEST_CASE("TestSema10002A") {
         for i in a {}
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, "Main.lgs");
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10002, code));
     CHECK_EQ(app.errHandler.errors[0].errCode, E10002.code);
@@ -49,7 +49,7 @@ TEST_CASE("TestSema10002B") {
         a = num[1:3]
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, "Main.lgs");
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10002, code));
     CHECK_EQ(app.errHandler.errors[0].errCode, E10002.code);
@@ -63,7 +63,7 @@ TEST_CASE("TestSema10003") {
         arr[3] := 2
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, "Main.lgs");
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10048, code));
     CHECK_EQ(app.errHandler.errors[0].errCode, E10048.code);
@@ -77,7 +77,7 @@ TEST_CASE("TestSema10004") {
     }
     main() {}
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, "Main.lgs");
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10004, code));
     CHECK_EQ(app.errHandler.errors[0].errCode, E10004.code);
@@ -94,7 +94,7 @@ TEST_CASE("TestSema10005A") {
         a = obj.a
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, "Main.lgs");
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10005, code));
     CHECK_EQ(app.errHandler.errors[0].errCode, E10005.code);
@@ -110,7 +110,7 @@ TEST_CASE("TestSema10005B") {
         obj = Obj{a = 3487, b = 234}
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, "Main.lgs");
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10005, code));
     CHECK_EQ(app.errHandler.errors[0].errCode, E10005.code);
@@ -123,7 +123,7 @@ TEST_CASE("TestSema10006A") {
         a = b
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, "Main.lgs");
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10006, code));
     CHECK_EQ(app.errHandler.errors[0].errCode, E10006.code);
@@ -145,7 +145,7 @@ TEST_CASE("TestSema10006B") {
         func(10, Enum.ENUM1)
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, "Main.lgs");
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10006, code));
     CHECK_EQ(app.errHandler.errors[0].errCode, E10006.code);
@@ -159,7 +159,7 @@ TEST_CASE("TestSema10011A") {
         a = 3
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, "Main.lgs");
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10011, code));
     CHECK_EQ(app.errHandler.errors[0].errCode, E10011.code);
@@ -172,7 +172,7 @@ TEST_CASE("TestSema10011B") {
     func() {}
     main() {}
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, "Main.lgs");
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10011, code));
     CHECK_EQ(app.errHandler.errors[0].errCode, E10011.code);
@@ -187,7 +187,7 @@ TEST_CASE("TestSema10013A") {
         obj.func()
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, "Main.lgs");
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10005, code));
     CHECK_EQ(app.errHandler.errors[0].errCode, E10005.code);
@@ -201,7 +201,7 @@ TEST_CASE("TestSema10013B") {
         arr.add(2)
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, "Main.lgs");
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10005, code));
     CHECK_EQ(app.errHandler.errors[0].errCode, E10005.code);
@@ -216,7 +216,7 @@ TEST_CASE("TestSema10014") {
         }
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, "Main.lgs");
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10014, code));
     CHECK_EQ(app.errHandler.errors[0].errCode, E10014.code);
@@ -230,7 +230,7 @@ TEST_CASE("TestSema10015A") {
         func("str")
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, "Main.lgs");
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10015, code));
     CHECK_EQ(app.errHandler.errors[0].errCode, E10015.code);
@@ -254,7 +254,7 @@ TEST_CASE("TestSema10015B") {
         func(obj2.obj1)
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, "Main.lgs");
     app.analyse();
     // CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10015, code));
     // CHECK_EQ(app.errHandler.errors[0].errCode, E10015.errCode);
@@ -272,7 +272,7 @@ TEST_CASE("TestSema10016A") {
     }
     main() {}
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, "Main.lgs");
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10016, code));
     CHECK_EQ(app.errHandler.errors[0].errCode, E10016.code);
@@ -291,7 +291,7 @@ TEST_CASE("TestSema10016B") {
 
     main() {}
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, "Main.lgs");
     app.analyse();
     CHECK_EQ(app.errHandler.errors.size(), 1);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10016.code);
@@ -304,7 +304,7 @@ TEST_CASE("TestSema10017") {
         break
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, "Main.lgs");
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10017, code));
     CHECK_EQ(app.errHandler.errors[0].errCode, E10017.code);
@@ -318,7 +318,7 @@ TEST_CASE("TestSema10018") {
         print(s2[0])
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, "Main.lgs");
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10018, code));
     CHECK_EQ(app.errHandler.errors[0].errCode, E10018.code);
@@ -328,11 +328,10 @@ TEST_CASE("TestSema10021") {
     LgsApp app;
     const auto code = R"(
     main() {
-        obj = Obj{}
-        go obj.x
+        a = if true "3" else 6
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, "Main.lgs");
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10021, code));
     CHECK_EQ(app.errHandler.errors[0].errCode, E10021.code);
@@ -346,7 +345,7 @@ TEST_CASE("TestSema10022") {
         a = var{}
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, "Main.lgs");
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10022, code));
     CHECK_EQ(app.errHandler.errors[0].errCode, E10022.code);
@@ -359,7 +358,7 @@ TEST_CASE("TestSema10023") {
         a: Int = null
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, "Main.lgs");
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10023, code));
     CHECK_EQ(app.errHandler.errors[0].errCode, E10023.code);
@@ -372,7 +371,7 @@ TEST_CASE("TestSema10024") {
         a = null
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, "Main.lgs");
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10024, code));
     CHECK_EQ(app.errHandler.errors[0].errCode, E10024.code);
@@ -386,7 +385,7 @@ TEST_CASE("TestSema10025") {
     }
     main() {}
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, "Main.lgs");
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10025, code));
     CHECK_EQ(app.errHandler.errors[0].errCode, E10025.code);
@@ -398,7 +397,7 @@ TEST_CASE("TestSema10026") {
     func(): Int { return }
     main() {}
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, "Main.lgs");
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10026, code));
     CHECK_EQ(app.errHandler.errors[0].errCode, E10026.code);
@@ -413,7 +412,7 @@ TEST_CASE("TestSema10027") {
     }
     main() {}
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, "Main.lgs");
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10027, code));
     CHECK_EQ(app.errHandler.errors[0].errCode, E10027.code);
@@ -425,7 +424,7 @@ TEST_CASE("TestSema10028") {
     func(x: Int = 23, y: Str) { }
     main() {}
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, "Main.lgs");
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10028, code));
     CHECK_EQ(app.errHandler.errors[0].errCode, E10028.code);
@@ -497,7 +496,7 @@ TEST_CASE("TestSema10032") {
         obj = Obj{}
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, "Main.lgs");
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10032, code));
     CHECK_EQ(app.errHandler.errors[0].errCode, E10032.code);
@@ -510,7 +509,7 @@ TEST_CASE("TestSema10038") {
         continue
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, "Main.lgs");
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10038, code));
     CHECK_EQ(app.errHandler.errors[0].errCode, E10038.code);
@@ -524,7 +523,7 @@ TEST_CASE("TestSema10042") {
         a = map[1:3]
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, "Main.lgs");
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10042, code));
     CHECK_EQ(app.errHandler.errors[0].errCode, E10042.code);
@@ -540,7 +539,7 @@ TEST_CASE("TestSema10046") {
         obj = Obj()
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, "Main.lgs");
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10046, code));
     CHECK_EQ(app.errHandler.errors[0].errCode, E10046.code);
@@ -552,7 +551,7 @@ TEST_CASE("TestSema10055") {
     f(): Int {}
     main() {}
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, "Main.lgs");
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10055, code));
     CHECK_EQ(app.errHandler.errors[0].errCode, E10055.code);
@@ -567,7 +566,7 @@ TEST_CASE("TestSema10056A") {
     }
     main() {}
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, "Main.lgs");
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10056, code));
     CHECK_EQ(app.errHandler.errors[0].errCode, E10056.code);
@@ -582,7 +581,7 @@ TEST_CASE("TestSema10056B") {
     }
     main() {}
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, "Main.lgs");
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10056, code));
     CHECK_EQ(app.errHandler.errors[0].errCode, E10056.code);
@@ -604,7 +603,7 @@ TEST_CASE("TestSema10059") {
     }
     main() {}
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, "Main.lgs");
     app.analyse();
     CHECK_EQ(app.errHandler.errors.size(), 2);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10059.code);
@@ -621,7 +620,7 @@ TEST_CASE("TestSema10066") {
         }
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, "Main.lgs");
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10066, code));
     CHECK_EQ(app.errHandler.errors[0].errCode, E10066.code);
@@ -639,7 +638,7 @@ TEST_CASE("TestSema10076") {
         v6 = v1 / v2
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, "Main.lgs");
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 4, EXPECTED_ERR(E10076, code));
     for (const auto& error : app.errHandler.errors) {
@@ -657,7 +656,7 @@ TEST_CASE("TestSema10089") {
         Singleton.x := 23
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, "Main.lgs");
     app.analyse();
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10089, code));
     CHECK_EQ(app.errHandler.errors[0].errCode, E10089.code);
@@ -667,13 +666,11 @@ TEST_CASE("TestSema10092") {
     LgsApp app;
     const auto code = R"(
     main() {
-        a = [123, 23]!
-        b = a[4]
+        a = if 34 "3" else "6"
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, "Main.lgs");
     app.analyse();
-    CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10048, code));
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10048.code);
+    CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10092, code));
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10092.code);
 }
-

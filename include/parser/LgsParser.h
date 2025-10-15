@@ -1,5 +1,6 @@
 #pragma once
 #include "../data/LgsTokens.h"
+#include "exprs/LgsTernaryExpr.h"
 #include "files/LgsConfigFile.h"
 #include "funcs/LgsMainFunc.h"
 #include "loops/LgsForeachLoop.h"
@@ -117,6 +118,7 @@ public:
     LgsIOStmt* parseIOStmt();
     LgsJson* parseJson();
 
+    LgsExpr* parseExprWithPrecedence(int minPrecedence);
     // Exprs
     LgsExpr* parseExpr();
     LgsExpr* parseUnary();
@@ -141,6 +143,7 @@ public:
     void addFileSymbol(LgsMainFile* file, const LgsSymbol& newSymbol);
     void setLocation(LgsLocation& location, const LgsToken* token) const;
     static void extractStrParts(LgsStrConst& strConst);
+    static int getBinaryOpPrecedence(LgsBinOpType opType);
 
     // Parser
     bool isEOF();
@@ -156,5 +159,4 @@ public:
     void addParsingError();
     void recursionGuard();
     void validateTestFolder(const LgsFile* testFile);
-
 };

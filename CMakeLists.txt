@@ -151,6 +151,7 @@ set(RUNTIME_SOURCES
     include/parser/LgsToken.h
     src/symbols/stmts/LgsPatternMatch.cpp
     include/symbols/stmts/LgsPatternMatch.h
+    include/symbols/exprs/LgsTernaryExpr.h
 )
 
 add_library(lgs_core SHARED ${CORE_SOURCES} ${RUNTIME_SOURCES})

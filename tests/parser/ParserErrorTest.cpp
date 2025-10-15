@@ -31,7 +31,7 @@ TEST_CASE("ParserTest10033C") {
         object obj {}
         main() {}
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, "Main.lgs");
     CHECK_EQ(app.errHandler.errors.size(), 2);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10033.code);
     CHECK_EQ(app.errHandler.errors[1].errCode, E10033.code);

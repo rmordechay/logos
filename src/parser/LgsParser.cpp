@@ -26,6 +26,7 @@
 #include "loops/LgsRangeLoop.h"
 #include "loops/LgsWhileLoop.h"
 #include "data/LgsTokens.h"
+#include "exprs/LgsTernaryExpr.h"
 #include "files/LgsConfigFile.h"
 #include "stmts/LgsBreak.h"
 #include "stmts/LgsContinue.h"
@@ -60,9 +61,10 @@ LgsFile* LgsParser::parseSrcFile(const bool isTestRun) {
     if (const auto interfaceFile = parseInterfaceFile()) {
         return interfaceFile;
     }
-    if (const auto testFile = parseTestFile()) {
-        if (!isTestRun) return nullptr;
-        return testFile;
+    if (isTestRun) {
+        if (const auto testFile = parseTestFile()) {
+            return testFile;
+        }
     }
     return nullptr;
 }
@@ -112,6 +114,7 @@ LgsObjectFile* LgsParser::parseObjectFile() {
     if (withBraces) mustMatch(T_RBRACE);
     file->location = obj->location;
     file->obj = obj;
+    validateTypeName(obj->name, &obj->location);
     {
         std::lock_guard lock(mtx);
         globals.addSymbol(LgsSymbol(file->obj), &errHandler);
@@ -129,6 +132,7 @@ LgsInterfaceFile* LgsParser::parseInterfaceFile() {
     auto const file = new LgsInterfaceFile(fileID, filePath);
     file->location = interface->location;
     file->interface = interface;
+    validateTypeName(interface->name, &interface->location);
     {
         std::lock_guard lock(mtx);
         globals.addSymbol(LgsSymbol(file->interface), &errHandler);
@@ -579,16 +583,7 @@ LgsStmt* LgsParser::parseStmt() {
     if (const auto ioStmt = parseIOStmt()) return ioStmt;
     if (const auto varDec = parseVarDec()) return varDec;
     if (const auto assignment = parseAssignment()) return assignment;
-
-    LgsExpr* expr = nullptr;
-    if (const auto funcCall = parseFuncCall()) expr = funcCall;
-    else if (const auto variable = parseVariable()) expr = variable;
-    if (expr) {
-        if (matchAndConsume(T_DOT)) expr = parseSelection(expr);
-        if (const auto postfixExpr = parsePostfixExpr(expr)) return postfixExpr;
-        if (const auto iterIndex = parseIterIndex(expr)) return iterIndex;
-        return expr;
-    }
+    if (const auto expr = parseExpr()) return expr;
     return nullptr;
 }
 
@@ -729,6 +724,7 @@ LgsStmt* LgsParser::parseAssignment() {
 }
 
 LgsStmt* LgsParser::parseIfStmt() {
+    auto oldIndex = currentIndex;
     if (!matchAndConsume(T_IF)) return nullptr;
     if (currentToken.type == T_LBRACE) {
         const auto patternMatch = new LgsPatternMatch();
@@ -740,10 +736,10 @@ LgsStmt* LgsParser::parseIfStmt() {
     }
 
     const auto condExpr = parseExpr();
-    mustParse(condExpr);
+    if (!parsedOrReset(condExpr, oldIndex)) return nullptr;
 
     // Pattern matching
-    const auto oldIndex = currentIndex;
+    oldIndex = currentIndex;
     if (matchAndConsume(T_LBRACE)) {
         const auto firstPattern = parseExpr();
         if (matchOrReset(T_COLON, oldIndex)) {
@@ -981,19 +977,45 @@ LgsJson* LgsParser::parseJson() {
     return nullptr;
 }
 
-LgsExpr* LgsParser::parseExpr() {
+LgsExpr* LgsParser::parseExprWithPrecedence(const int minPrecedence) {
     const auto oldIndex = currentIndex;
     if (matchAndConsume(T_LPAREN)) {
-        const auto expr = parseExpr();
+        const auto expr = parseExprWithPrecedence(0);
         mustMatch(T_RPAREN);
         return expr;
     }
-    const auto l = parseUnary();
-    if (!parsedOrReset(l, oldIndex)) return nullptr;
-    const auto op = parseBinaryOp();
-    if (op.opType == NOOP) return l;
-    const auto r = parseUnary();
-    return new LgsBinaryExpr(l->type, l, r, op);
+
+    auto left = parseUnary();
+    if (!parsedOrReset(left, oldIndex)) return nullptr;
+    while (true) {
+        const auto op = parseBinaryOp();
+        if (op.opType == NOOP) break;
+        const auto precedence = getBinaryOpPrecedence(op.opType);
+        if (precedence < minPrecedence) {
+            currentIndex--;
+            currentToken = tokens[currentIndex];
+            break;
+        }
+        const auto right = parseExprWithPrecedence(precedence + 1);
+        if (!right) {
+            addParsingError();
+            return left;
+        }
+        left = new LgsBinaryExpr(left, right, op);
+    }
+    return left;
+}
+
+LgsExpr* LgsParser::parseExpr() {
+    const auto expr = parseExprWithPrecedence(0);
+    if (matchAndConsume(T_THEN)) {
+        const auto thenExpr = parseExpr();
+        mustMatch(T_ELSE);
+        const auto elseExpr = parseExpr();
+        mustParse(elseExpr);
+        return new LgsTernaryExpr(expr, thenExpr, elseExpr);
+    }
+    return expr;
 }
 
 LgsExpr* LgsParser::parseUnary() {
@@ -1048,7 +1070,6 @@ LgsBinOp LgsParser::parseBinaryOp() {
     return binOp;
 }
 
-
 LgsVariable* LgsParser::parseVariable() {
     if (currentToken.type != T_IDENTIFIER) return nullptr;
     const auto var = new LgsVariable(currentToken.lexeme);
@@ -1059,6 +1080,7 @@ LgsVariable* LgsParser::parseVariable() {
     consume();
     return var;
 }
+
 
 LgsInstance* LgsParser::parseInstance() {
     if (currentToken.type != T_INSTANCE) return nullptr;
@@ -1438,6 +1460,30 @@ void LgsParser::extractStrParts(LgsStrConst& strConst) {
     }
     if (replaced != strConst.value) {
         strConst.formatedStr = strdup(replaced.c_str());
+    }
+}
+
+int LgsParser::getBinaryOpPrecedence(const LgsBinOpType opType) {
+    switch (opType) {
+    case BIT_OR: return 1;
+    case BIT_XOR: return 2;
+    case BIT_AND: return 3;
+    case EQ:
+    case NE: return 4;
+    case LT:
+    case GT:
+    case LE:
+    case GE:
+    case IN: return 5;
+    case LSHIFT:
+    case RSHIFT: return 6;
+    case ADD:
+    case SUB: return 7;
+    case MUL:
+    case DIV:
+    case MODULO: return 8;
+    case NOOP:
+    default: return 0;
     }
 }
 

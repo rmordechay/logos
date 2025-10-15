@@ -3,6 +3,7 @@
 #include "files/LgsFile.h"
 #include "logos/LgsStack.h"
 
+class LgsTernaryExpr;
 class LgsMainFunc;
 class LgsInterfaceFile;
 class LgsObjectFile;
@@ -94,6 +95,7 @@ public:
     void visitIOStmt(const LgsIOStmt* ioStmt);
     void visitExpr(LgsExpr* expr);
     void visitBinaryExpr(LgsBinaryExpr* binExpr);
+    void visitTernaryExpr(LgsTernaryExpr* ternaryExpr);
     void visitCast(LgsCast* cast);
     void visitLambda(LgsFunc* func);
     void visitIntConst(LgsIntConst* intConst) const;

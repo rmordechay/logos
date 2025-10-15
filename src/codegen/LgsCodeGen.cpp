@@ -16,6 +16,7 @@
 #include "exprs/LgsPostfixExpr.h"
 #include "exprs/LgsPrefixExpr.h"
 #include "exprs/LgsSelection.h"
+#include "exprs/LgsTernaryExpr.h"
 #include "exprs/LgsTypeExpr.h"
 #include "exprs/LgsVariable.h"
 #include "exprs/LgsVectorExpr.h"
@@ -544,7 +545,9 @@ void LgsCodeGen::visitExpr(LgsExpr* expr) {
     if (const auto iter = expr->type->asIterable()) {
         visitExpr(iter->size);
     }
-    if (const auto binaryExpr = dynamic_cast<LgsBinaryExpr*>(expr)) {
+    if (const auto ternaryExpr = dynamic_cast<LgsTernaryExpr*>(expr)) {
+        visitTernaryExpr(ternaryExpr);
+    } else if (const auto binaryExpr = dynamic_cast<LgsBinaryExpr*>(expr)) {
         visitBinaryExpr(binaryExpr);
     } else {
         if (checkMock(expr)) return;
@@ -620,6 +623,16 @@ void LgsCodeGen::visitBinaryExpr(LgsBinaryExpr* binExpr) {
         binExpr->IRValue = r->type->asIterable()->inIR(cg, r, l); break;
     case NOOP: assert(0);
     }
+}
+
+void LgsCodeGen::visitTernaryExpr(LgsTernaryExpr* ternaryExpr) {
+    const auto cond = ternaryExpr->condExpr;
+    const auto then = ternaryExpr->thenExpr;
+    const auto else_ = ternaryExpr->elseExpr;
+    visitExpr(cond);
+    visitExpr(then);
+    visitExpr(else_);
+    ternaryExpr->IRValue = cg.builder.CreateSelect(cond->IRValue, then->IRValue, else_->IRValue);
 }
 
 void LgsCodeGen::visitCast(LgsCast* cast) {

@@ -35,7 +35,7 @@ public:
     LgsExpr* right;
     LgsBinOp op = LgsBinOp{NOOP, ""};
 
-    explicit LgsBinaryExpr(LgsType* type, LgsExpr* left, LgsExpr* right, const LgsBinOp& op) : LgsExpr(type), left(left), right(right), op(op) {}
+    explicit LgsBinaryExpr(LgsExpr* left, LgsExpr* right, const LgsBinOp& op) : left(left), right(right), op(op) {}
     Value* loadIR(LgsLLVMGen& cg) override;
     void parseAsJSON(std::stringstream& json) override;
     std::string getName() override;
