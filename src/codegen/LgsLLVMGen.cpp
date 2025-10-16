@@ -274,14 +274,6 @@ ConstantInt* LgsLLVMGen::i64(const int64_t v) {
     return builder.getInt64(v);
 }
 
-Constant* LgsLLVMGen::floatv(const float_t v) {
-    return ConstantFP::get(floatTy(), v);
-}
-
-Constant* LgsLLVMGen::doublev(const double_t v) {
-    return ConstantFP::get(doubleTy(), v);
-}
-
 ConstantInt* LgsLLVMGen::usize(const size_t v) {
     return ConstantInt::get(sizeTy(), v);
 }
@@ -302,6 +294,14 @@ Value* LgsLLVMGen::extendToSize(Value* v) {
     return builder.CreateZExt(v, sizeTy());
 }
 
+Constant* LgsLLVMGen::floatv(const float_t v) {
+    return ConstantFP::get(floatTy(), v);
+}
+
+Constant* LgsLLVMGen::doublev(const double_t v) {
+    return ConstantFP::get(doubleTy(), v);
+}
+
 TypeSize LgsLLVMGen::typeSize(Type* v) const {
     return IRModule->getDataLayout().getTypeStoreSize(v);
 }
@@ -320,6 +320,27 @@ void LgsLLVMGen::printInt(Value* number, const std::string& text) {
     callPrintf({getIRStr("%d\n"), number});
 }
 
+void LgsLLVMGen::generateIf(Value* cond, const std::function<void()>& blockStmtCb) {
+    const auto IRBlockIfTrue = createBlock(BLOCK_NAME_IF_TRUE);
+    const auto IRBlockIfFalse = createBlock(BLOCK_NAME_IF_FALSE);
+    builder.CreateCondBr(cond, IRBlockIfTrue, IRBlockIfFalse);
+    startBlock(IRBlockIfTrue);
+    blockStmtCb();
+    branchAndStartBlock(IRBlockIfFalse);
+}
+
+void LgsLLVMGen::finalizeDebugger() {
+    if (!diBuilder) return;
+    diBuilder->finalize();
+    std::error_code EC;
+    raw_fd_ostream file("logosdbg.bc", EC, sys::fs::OF_None);
+    WriteBitcodeToFile(*IRModule, file);
+    file.flush();
+    delete diBuilder;
+    diBuilder = nullptr;
+}
+
+
 void LgsLLVMGen::initLLVM() {
     InitializeNativeTarget();
     InitializeNativeTargetAsmPrinter();
@@ -332,16 +353,4 @@ TargetMachine* LgsLLVMGen::getTargetMachine() {
     const auto targetTriple = sys::getDefaultTargetTriple();
     const auto target = TargetRegistry::lookupTarget(targetTriple, error);
     return target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), std::nullopt);
-}
-
-
-void LgsLLVMGen::finalizeDebugger() {
-    if (!diBuilder) return;
-    diBuilder->finalize();
-    std::error_code EC;
-    raw_fd_ostream file("logosdbg.bc", EC, sys::fs::OF_None);
-    WriteBitcodeToFile(*IRModule, file);
-    file.flush();
-    delete diBuilder;
-    diBuilder = nullptr;
 }

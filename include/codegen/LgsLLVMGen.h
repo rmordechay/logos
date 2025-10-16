@@ -96,7 +96,8 @@ public:
     void printPtr(Value* ptr, const std::string& text = "");
     void printInt(Value* number, const std::string& text = "");
 
+    void generateIf(Value* cond, const std::function<void()>& blockStmtCb);
+    void finalizeDebugger();
     static void initLLVM();
     static TargetMachine* getTargetMachine();
-    void finalizeDebugger();
 };

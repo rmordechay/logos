@@ -44,7 +44,7 @@
 #include "stmts/LgsAssignment.h"
 #include "stmts/LgsIOStmt.h"
 #include "stmts/LgsIfStmt.h"
-#include "stmts/LgsPatternMatch.h"
+#include "stmts/LgsSwitch.h"
 #include "types/primitives/LgsDouble.h"
 #include "types/primitives/LgsSize.h"
 
@@ -159,8 +159,8 @@ void LgsSema::visitMainFunc(const LgsMainFunc* func) {
 void LgsSema::visitLambda(LgsFunc* lambda) {
     const auto stmtsBlock = lambda->stmtsBlock;
     // Wraps in return if its the only statement
-    if (!lambda->funcType->rt->isVoid() && stmtsBlock->stmts.size() == 1) {
-        const auto expr = stmtsBlock->stmts.front()->asExpr();
+    if (!lambda->funcType->rt->isVoid()) {
+        const auto expr = stmtsBlock->stmts.back()->asExpr();
         if (expr) {
             const auto returnStmt = new LgsReturn(expr);
             returnStmt->location = expr->location;
@@ -196,7 +196,7 @@ void LgsSema::visitIOPair(LgsIOPair* ioPair, LgsObject* obj) {
 }
 
 void LgsSema::visitStmt(LgsStmt* stmt) {
-    if (const auto pattern = stmt->asPatternMatch()) visitPatternMatch(pattern);
+    if (const auto pattern = stmt->asSwitch()) visitSwitch(pattern);
     else if (const auto ifStmt = stmt->asIfStmt()) visitIfStmt(ifStmt);
     else if (const auto varDec = stmt->asVarDec()) visitVarDec(varDec);
     else if (const auto loopStmt = stmt->asLoop()) visitLoopStmt(loopStmt);
@@ -271,7 +271,9 @@ void LgsSema::visitAssignment(const LgsAssignment* assignment) {
     visitExpr(lValue);
     rValue->completeType(lValue->type);
     visitExpr(rValue);
-    validateExprType(rValue, lValue->type);
+    if (!rValue->type->canCastTo(lValue->type)) {
+        return errHandler.addError(E10018, &assignment->location, {rValue->type->pname(), lValue->type->pname()});
+    }
     const auto lType = lValue->type;
     const auto rType = rValue->type;
     if (!lType || !rType) return;
@@ -313,22 +315,19 @@ void LgsSema::visitIfStmt(LgsIfStmt* ifStmt) {
     }
 }
 
-void LgsSema::visitPatternMatch(LgsPatternMatch* pm) {
-    if (!pm->cond) {
-        return visitBoolPatternMatch(pm);
-    }
-    visitExpr(pm->cond);
-    stack.enterScope(pm);
-    const auto condType = pm->cond->type;
+void LgsSema::visitSwitch(LgsSwitch* switchStmt) {
+    visitExpr(switchStmt->cond);
+    stack.enterScope(switchStmt);
+    const auto condType = switchStmt->cond->type;
     // Allows local enum fields to not have a qualifier inside the block
     if (condType && condType->asEnum()) {
         for (const auto& field : condType->fields) {
             addLocalSymbol(LgsSymbol(field));
         }
     }
-    for (const auto [expr, block] : pm->patterns) {
+    for (const auto [expr, block] : switchStmt->patterns) {
         if (!condType || expr->type->isUnknown()) continue;
-        stack.enterScope(pm);
+        stack.enterScope(switchStmt);
         visitExpr(expr);
         visitStmtsBlock(block);
         if (expr->type && !expr->type->canCastTo(condType)) {
@@ -336,29 +335,12 @@ void LgsSema::visitPatternMatch(LgsPatternMatch* pm) {
         }
         stack.exitScope();
     }
-    if (pm->elseBlock) {
-        stack.enterScope(pm);
-        visitStmtsBlock(pm->elseBlock);
+    if (switchStmt->elseBlock) {
+        stack.enterScope(switchStmt);
+        visitStmtsBlock(switchStmt->elseBlock);
         stack.exitScope();
     }
     stack.exitScope();
-}
-
-void LgsSema::visitBoolPatternMatch(LgsPatternMatch* pm) {
-    for (const auto [expr, block] : pm->patterns) {
-        stack.enterScope(pm);
-        visitExpr(expr);
-        if (!expr->type->asBool()) {
-            return errHandler.addError(E10057, &expr->location, {expr->getName()});
-        }
-        visitStmtsBlock(block);
-        stack.exitScope();
-    }
-    if (pm->elseBlock) {
-        stack.enterScope(pm);
-        visitStmtsBlock(pm->elseBlock);
-        stack.exitScope();
-    }
 }
 
 void LgsSema::visitWhileLoop(const LgsWhileLoop* whileLoop) {
@@ -537,6 +519,7 @@ void LgsSema::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
     visitExpr(r);
     const auto ltype = l->type;
     const auto rtype = r->type;
+    if (!ltype || !rtype) return;
     const auto type = ltype->applyBinOp(binaryExpr->op.opType, rtype);
     if (!type) {
         return errHandler.addError(E10076, &l->location, {binaryExpr->op.name, ltype->pname(), rtype->pname()});
@@ -579,7 +562,7 @@ void LgsSema::visitArrayExpr(LgsArrayExpr* arrayExpr) {
     for (const auto element : arrayExpr->elements) {
         visitExpr(element);
         if (iter->baseType && !element->type->canCastTo(iter->baseType)) {
-            return errHandler.addError(E10018, &element->location, {element->getName(), iter->baseType->pname(), element->type->pname()});
+            return errHandler.addError(E10001, &element->location, {iter->pname(), element->type->pname()});
         }
     }
     if (arrayExpr->type->asDArray() || arrayExpr->type->asSet()) {
@@ -1089,14 +1072,17 @@ void LgsSema::visitLoopMetaVar(LgsLoopMetaVar* metaVar) {
 }
 
 void LgsSema::validateExprType(LgsExpr* expr, LgsType* type) {
-    if (expr->asNullableExpr()) {
+    if (const auto nullableExpr = expr->asNullableExpr()) {
         // null must have a type
         if (!type || type->isUnknown()) {
             return errHandler.addError(E10024, &expr->location);
         }
         // type must be nullable
         if (!type->asNullable()) {
-            errHandler.addError(E10023, &expr->location, {type->pname(), type->pname()});
+            return errHandler.addError(E10023, &expr->location, {type->pname(), type->pname()});
+        }
+        if (nullableExpr->isNull && !nullableExpr->baseExpr) {
+            return errHandler.addError(E10024, &expr->location);
         }
         return;
     }
@@ -1263,11 +1249,11 @@ bool LgsSema::validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const Lgs
             isValid = isValid && validateBlockControlFlow(ifStmt->elseBlock, func);
         } else if (const auto loop = stmt->asLoop()) {
             isValid = isValid && validateBlockControlFlow(loop->stmtsBlock, func);
-        } else if (const auto patternMatch = stmt->asIfStmt()) {
-            for (const auto [_, patternsStmtBlock] : patternMatch->elseIfs) {
+        } else if (const auto switch_ = stmt->asIfStmt()) {
+            for (const auto [_, patternsStmtBlock] : switch_->elseIfs) {
                 isValid = isValid && validateBlockControlFlow(patternsStmtBlock, func);
             }
-            isValid = isValid && validateBlockControlFlow(patternMatch->elseBlock, func);
+            isValid = isValid && validateBlockControlFlow(switch_->elseBlock, func);
         }
     }
     return isValid;

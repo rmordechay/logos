@@ -34,7 +34,7 @@ class LgsInstance;
 class LgsVectorExpr;
 class LgsHashMap;
 class LgsArrayExpr;
-class LgsPatternMatch;
+class LgsSwitch;
 class LgsVarDec;
 class LgsIOStmt;
 class LgsDeferStmt;
@@ -106,7 +106,7 @@ public:
     LgsVarDec* parseVarDec();
     LgsStmt* parseAssignment();
     LgsStmt* parseIfStmt();
-    void parsePatternMatchBody(LgsPatternMatch* patternMatch);
+    LgsSwitch* parseSwitch();
     LgsForLoop* parseForLoop();
     LgsWhileLoop* parseWhileLoop();
     LgsInfiniteLoop* parseInfiniteLoop();
@@ -120,13 +120,13 @@ public:
 
     LgsExpr* parseExprWithPrecedence(int minPrecedence);
     // Exprs
-    LgsExpr* parseExpr();
+    LgsExpr* parseExpr(bool withLambda = true);
     LgsExpr* parseUnary();
     LgsBinOp parseBinaryOp();
     LgsVariable* parseVariable();
     LgsInstance* parseInstance();
     LgsFuncCall* parseFuncCall();
-    LgsVectorExpr* parseVector();
+    LgsVectorExpr* parseVectorExpr();
     LgsStrConst* parseStrConst();
     LgsLoopMetaVar* parseLoopMetaVar();
     LgsExpr* parseConstant();
@@ -143,7 +143,7 @@ public:
     void addFileSymbol(LgsMainFile* file, const LgsSymbol& newSymbol);
     void setLocation(LgsLocation& location, const LgsToken* token) const;
     static void extractStrParts(LgsStrConst& strConst);
-    static int getBinaryOpPrecedence(LgsBinOpType opType);
+    static int getBinOpPrecedence(LgsBinOpType opType);
 
     // Parser
     bool isEOF();

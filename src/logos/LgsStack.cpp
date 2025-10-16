@@ -2,7 +2,7 @@
 #include "funcs/LgsFunc.h"
 #include "loops/LgsForLoop.h"
 #include "stmts/LgsIfStmt.h"
-#include "stmts/LgsPatternMatch.h"
+#include "stmts/LgsSwitch.h"
 
 void LgsStack::enterScope(LgsValue* value) {
     LgsStackFrame stackFrame;
@@ -16,7 +16,7 @@ void LgsStack::enterScope(LgsValue* value) {
         stackFrame.func = top().func;
         stackFrame.symbolTable = top().symbolTable;
         stackFrame.ifStmt = ifStmt;
-    } else if (dynamic_cast<LgsPatternMatch*>(value)) {
+    } else if (dynamic_cast<LgsSwitch*>(value)) {
         stackFrame.func = top().func;
         stackFrame.symbolTable = top().symbolTable;
     } else {

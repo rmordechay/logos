@@ -2,7 +2,7 @@
 #include "LgsSymbolTable.h"
 #include <llvm/IR/BasicBlock.h>
 
-class LgsPatternMatch;
+class LgsSwitch;
 class LgsValue;
 class LgsStmtsBlock;
 class LgsStmt;

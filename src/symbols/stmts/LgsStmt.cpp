@@ -12,7 +12,7 @@
 #include "loops/LgsForLoop.h"
 #include "stmts/LgsDeferStmt.h"
 #include "stmts/LgsIOStmt.h"
-#include "stmts/LgsPatternMatch.h"
+#include "stmts/LgsSwitch.h"
 
 class LgsIOStmt;
 
@@ -34,7 +34,7 @@ LgsDeferStmt* LgsStmt::asDefer() { return dynamic_cast<LgsDeferStmt*>(this); }
 LgsFuncCall* LgsStmt::asFuncCall() { return dynamic_cast<LgsFuncCall*>(this); }
 LgsIfStmt* LgsStmt::asIfStmt() { return dynamic_cast<LgsIfStmt*>(this); }
 LgsIOStmt* LgsStmt::asIOStmt() { return dynamic_cast<LgsIOStmt*>(this); }
-LgsPatternMatch* LgsStmt::asPatternMatch() { return dynamic_cast<LgsPatternMatch*>(this); }
+LgsSwitch* LgsStmt::asSwitch() { return dynamic_cast<LgsSwitch*>(this); }
 LgsPostfixExpr* LgsStmt::asPostfixExpr() { return dynamic_cast<LgsPostfixExpr*>(this); }
 LgsExpr* LgsStmt::asExpr() { return dynamic_cast<LgsExpr*>(this); }
 LgsSelection* LgsStmt::asSelection() { return dynamic_cast<LgsSelection*>(this); }

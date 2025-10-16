@@ -38,6 +38,7 @@ LgsToken LgsLexer::nextToken() {
 
     // Dot, range or spread
     if (currentChar == '.') {
+        if (std::isdigit(peek())) return scanNumber();
         advance();
         if (currentChar == '.') {
             if (advance() == '.') {

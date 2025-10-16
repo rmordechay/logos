@@ -39,7 +39,7 @@
 #include "stmts/LgsAssignment.h"
 #include "stmts/LgsIOStmt.h"
 #include "stmts/LgsIfStmt.h"
-#include "stmts/LgsPatternMatch.h"
+#include "stmts/LgsSwitch.h"
 #include "types/iterables/LgsSArray.h"
 #include "types/iterables/LgsVec.h"
 #include "types/primitives/LgsSize.h"
@@ -169,7 +169,7 @@ void LgsCodeGen::visitParam(LgsParam* param) {
 
 void LgsCodeGen::visitStmt(LgsStmt* stmt) {
     if (const auto ifStmt = stmt->asIfStmt()) return visitIfStmt(ifStmt);
-    if (const auto pattern = stmt->asPatternMatch()) return visitPatternMatch(pattern);
+    if (const auto pattern = stmt->asSwitch()) return visitSwitch(pattern);
     if (const auto varDec = stmt->asVarDec()) return visitVarDec(varDec);
     if (const auto loopStmt = stmt->asLoop()) return visitLoop(loopStmt);
     if (const auto coroutine = stmt->asCoroutine()) return visitCoroutine(coroutine);
@@ -431,7 +431,7 @@ void LgsCodeGen::visitElseIf(LgsIfStmt* ifStmt) {
     cg.startBlock(ifStmt->IRExitBlock);
 }
 
-void LgsCodeGen::visitPatternMatch(LgsPatternMatch* pm) {
+void LgsCodeGen::visitSwitch(LgsSwitch* pm) {
     assert(pm->cond);
     const auto defaultBlock = cg.createBlock(BLOCK_NAME_DEFAULT_CASE);
     const auto exitBlock = cg.createBlock(BLOCK_NAME_EXIT_PATTERN);
@@ -1161,15 +1161,6 @@ Function* LgsCodeGen::getThunkFunc(const LgsFuncCall* fc, Type* ctxTy) const {
 
     cg.builder.restoreIP(cg.savedIP);
     return func;
-}
-
-void LgsCodeGen::generateIf(Value* cond, const std::function<void()>& blockStmtCb) const {
-    const auto IRBlockIfTrue = cg.createBlock(BLOCK_NAME_IF_TRUE);
-    const auto IRBlockIfFalse = cg.createBlock(BLOCK_NAME_IF_FALSE);
-    cg.builder.CreateCondBr(cond, IRBlockIfTrue, IRBlockIfFalse);
-    cg.startBlock(IRBlockIfTrue);
-    blockStmtCb();
-    cg.branchAndStartBlock(IRBlockIfFalse);
 }
 
 void LgsCodeGen::setStaticArray(LgsArrayExpr* arrayExpr) {

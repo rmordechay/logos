@@ -1,14 +1,14 @@
-#include "stmts/LgsPatternMatch.h"
+#include "stmts/LgsSwitch.h"
 #include "stmts/LgsStmtsBlock.h"
 #include "utils/LgsUtils.h"
 
-void LgsPatternMatch::parseAsJSON(std::stringstream& json) {
+void LgsSwitch::parseAsJSON(std::stringstream& json) {
     openJsonObject(json);
-    addJsonKeyValue(json, "kind", "PatternMatch", true);
+    addJsonKeyValue(json, "kind", "Switch", true);
     closeJsonObject(json);
 }
 
-LgsPatternMatch::~LgsPatternMatch() {
+LgsSwitch::~LgsSwitch() {
     if (cond) {
         freeExpr(cond);
         cond = nullptr;

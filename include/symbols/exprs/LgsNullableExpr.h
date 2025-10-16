@@ -9,7 +9,7 @@ public:
     bool isNull = false;
 
     explicit LgsNullableExpr(LgsExpr* baseExpr) : baseExpr(baseExpr) {
-        isNull = !!baseExpr;
+        isNull = !baseExpr;
         type = new LgsNullable(baseExpr ? baseExpr->type : nullptr);
     }
     std::string getName() override;

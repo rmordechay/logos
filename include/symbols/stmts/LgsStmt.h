@@ -2,7 +2,7 @@
 #include <LgsValue.h>
 
 class LgsIOStmt;
-class LgsPatternMatch;
+class LgsSwitch;
 class LgsDeferStmt;
 class LgsCoroutine;
 class LgsPostfixExpr;
@@ -26,7 +26,7 @@ public:
     LgsFuncCall* asFuncCall();
     LgsIfStmt* asIfStmt();
     LgsIOStmt* asIOStmt();
-    LgsPatternMatch* asPatternMatch();
+    LgsSwitch* asSwitch();
     LgsPostfixExpr* asPostfixExpr();
     LgsExpr* asExpr();
     LgsSelection* asSelection();

@@ -2,7 +2,21 @@
 #include "utils/LgsUtils.h"
 #include <external/doctest.h>
 
-TEST_CASE("TestParserError10033A") {
+TEST_CASE("Parser10011B") {
+    LgsApp app;
+    const auto code = R"(
+    func() {}
+    func() {}
+    main() {}
+    )";
+    app.loadSrcFile(code, "Main.lgs");
+    CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10011, code));
+    if (app.errHandler.errors.size() > 0) {
+        CHECK_EQ(app.errHandler.errors[0].errCode, E10011.code);
+    }
+}
+
+TEST_CASE("ParserError10033A") {
     LgsApp app;
     const auto code = R"(
         object obj
@@ -13,7 +27,7 @@ TEST_CASE("TestParserError10033A") {
     CHECK_EQ(app.errHandler.errors[0].errCode, E10033.code);
 }
 
-TEST_CASE("ParserTest10033B") {
+TEST_CASE("Parser10033B") {
     LgsApp app;
     const auto code = R"(
         interface inter
@@ -24,7 +38,7 @@ TEST_CASE("ParserTest10033B") {
     CHECK_EQ(app.errHandler.errors[0].errCode, E10033.code);
 }
 
-TEST_CASE("ParserTest10033C") {
+TEST_CASE("Parser10033C") {
     LgsApp app;
     const auto code = R"(
         interface inter {}

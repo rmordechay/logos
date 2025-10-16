@@ -41,10 +41,6 @@ LgsFunc* LgsType::getMethod(const std::string& methodName) {
 }
 
 bool LgsType::addField(LgsField* field) {
-    for (const auto* f : fields) {
-        if (f->name == field->name) return false;
-    }
-    if (methods.find(field->name) != methods.end()) return false;
     fields.push_back(field);
     return true;
 }

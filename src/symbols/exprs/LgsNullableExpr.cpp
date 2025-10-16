@@ -22,7 +22,6 @@ void LgsNullableExpr::store(LgsLLVMGen& cg, Value* value, const bool isSet) cons
         const auto vField = cg.builder.CreateStructGEP(nullStruct, IRValue, 0);
         cg.builder.CreateStore(value, vField);
     }
-    cg.builder.CreateStore(cg.false_(), isSetField);
 }
 
 LgsNullableExpr::~LgsNullableExpr() {
