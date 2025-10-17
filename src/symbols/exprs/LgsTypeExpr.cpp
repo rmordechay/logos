@@ -2,6 +2,6 @@
 
 #include "LgsType.h"
 
-std::string LgsTypeExpr::getName() {
+std::string LgsTypeExpr::asText() {
     return type->pname();
 }

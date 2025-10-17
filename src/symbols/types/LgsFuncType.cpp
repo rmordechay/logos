@@ -71,7 +71,7 @@ std::string LgsFuncType::pname() {
             str << LGS_UNKNOWN_TYPE;
         }
         if (param.expr) {
-            str << " = " << param.expr->getName();
+            str << " = " << param.expr->asText();
         }
         if (i != params.size() - 1) str << ", ";
     }

@@ -1,0 +1,13 @@
+object Obj {
+    x: Int?
+}
+
+main() {
+    a = 2?
+    print(a)
+    a := null
+    print(a)
+
+    obj = Obj{x = 2}
+    x = obj.x
+}

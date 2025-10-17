@@ -5,5 +5,5 @@
 class LgsTypeExpr final : public LgsExpr {
 public:
     explicit LgsTypeExpr(LgsType* type): LgsExpr(type) {}
-    std::string getName() override;
+    std::string asText() override;
 };

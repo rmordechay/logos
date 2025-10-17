@@ -76,7 +76,7 @@ Value* LgsVariable::hash(LgsLLVMGen& cg) {
     }
 }
 
-std::string LgsVariable::getName() {
+std::string LgsVariable::asText() {
     return name;
 }
 

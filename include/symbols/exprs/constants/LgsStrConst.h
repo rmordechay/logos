@@ -18,7 +18,7 @@ public:
     LgsExpr* castTo(LgsType* toType, bool explicitCast) override;
     Value* castToIR(LgsLLVMGen& cg, LgsType* toType) override;
     Value* loadIR(LgsLLVMGen& cg) override;
-    std::string getName() override;
+    std::string asText() override;
     Value* hash(LgsLLVMGen& cg) override;
     void parseAsJSON(std::stringstream& json) override;
     ~LgsStrConst() override;

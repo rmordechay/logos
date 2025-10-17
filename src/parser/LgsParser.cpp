@@ -93,6 +93,7 @@ LgsMainFile* LgsParser::parseMainFile() {
             file->subtypes.emplace_back(subType);
             addFileSymbol(file, LgsSymbol(subType));
         } else {
+            addParsingError();
             break;
         }
     }

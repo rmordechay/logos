@@ -42,3 +42,7 @@ struct Lgs_vec4 {
     float x, y, z, w;
 };
 
+struct Lgs_nullableInt {
+    int32_t v;
+    bool isSet;
+};

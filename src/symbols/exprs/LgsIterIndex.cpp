@@ -100,13 +100,13 @@ void LgsIterIndex::assignScalar(LgsLLVMGen& cg, LgsExpr* expr) const {
     }
 }
 
-std::string LgsIterIndex::getName() {
+std::string LgsIterIndex::asText() {
     std::stringstream str;
-    str << baseExpr->getName();
+    str << baseExpr->asText();
     if (index.to) {
-        str << '[' << index.from->getName() << ':' << index.to->getName() << ']';
+        str << '[' << index.from->asText() << ':' << index.to->asText() << ']';
     } else {
-        str << '[' << index.from->getName() << ']';
+        str << '[' << index.from->asText() << ']';
     }
     return str.str();
 }

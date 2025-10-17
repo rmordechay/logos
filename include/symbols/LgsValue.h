@@ -19,7 +19,7 @@ public:
     Value* IRValue = nullptr;
     LgsLocation location;
 
-    virtual std::string getName();
+    virtual std::string asText();
     virtual Value* loadIR(LgsLLVMGen& cg);
     virtual void parseAsJSON(std::stringstream& json);
     virtual void setDebugValue(LgsLLVMGen& cg);

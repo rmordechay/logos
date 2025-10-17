@@ -4,6 +4,6 @@ Value* LgsLoopMetaVar::loadIR(LgsLLVMGen& cg) {
     return IRValue;
 }
 
-std::string LgsLoopMetaVar::getName() {
+std::string LgsLoopMetaVar::asText() {
     return name;
 }

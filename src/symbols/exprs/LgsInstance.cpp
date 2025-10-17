@@ -5,7 +5,7 @@
 #include "stmts/LgsVarDec.h"
 #include "types/LgsObject.h"
 
-std::string LgsInstance::getName() {
+std::string LgsInstance::asText() {
     return name + "{}";
 }
 

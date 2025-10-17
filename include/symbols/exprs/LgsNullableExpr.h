@@ -10,9 +10,18 @@ public:
 
     explicit LgsNullableExpr(LgsExpr* baseExpr) : baseExpr(baseExpr) {
         isNull = !baseExpr;
-        type = new LgsNullable(baseExpr ? baseExpr->type : nullptr);
+        if (baseExpr) {
+            if (baseExpr->type->asNullable()) {
+                type = baseExpr->type;
+            } else {
+                type = new LgsNullable(baseExpr->type);
+            }
+        } else {
+            type = new LgsNullable(nullptr);
+        }
+        isMutable = true;
     }
-    std::string getName() override;
+    std::string asText() override;
     void completeType(LgsType* toType) override;
     void store(LgsLLVMGen& cg, Value* value, const bool isSet) const;
     ~LgsNullableExpr() override;

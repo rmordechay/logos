@@ -5,7 +5,7 @@
 #include "utils/LgsUtils.h"
 #include <llvm/IR/DIBuilder.h>
 
-std::string LgsVarDec::getName() {
+std::string LgsVarDec::asText() {
     return name;
 }
 

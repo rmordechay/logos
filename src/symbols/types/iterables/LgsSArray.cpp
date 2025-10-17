@@ -15,7 +15,7 @@ Type* LgsSArray::getIRType(LgsLLVMGen& cg) {
 
 std::string LgsSArray::getName() {
     const auto ty = baseType ? baseType->getName() : LGS_UNKNOWN_TYPE;
-    return ty + '[' + size->getName() + "]";
+    return ty + '[' + size->asText() + "]";
 }
 
 std::string LgsSArray::pname() {

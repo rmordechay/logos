@@ -33,11 +33,11 @@ void LgsSelection::assign(LgsLLVMGen& cg, LgsExpr* expr) {
     }
 }
 
-std::string LgsSelection::getName() {
+std::string LgsSelection::asText() {
     std::stringstream str;
-    str << exprs[0]->getName();
+    str << exprs[0]->asText();
     for (int i = 1; i < exprs.size(); ++i) {
-        str << '.' << exprs[i]->getName();
+        str << '.' << exprs[i]->asText();
     }
     return str.str();
 }

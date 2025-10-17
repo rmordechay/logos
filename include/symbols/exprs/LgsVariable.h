@@ -15,6 +15,6 @@ public:
     Value* castToIR(LgsLLVMGen& cg, LgsType* toType) override;
     Value* hash(LgsLLVMGen& cg) override;
     void assign(LgsLLVMGen& cg, LgsExpr* expr) override;
-    std::string getName() override;
+    std::string asText() override;
     void parseAsJSON(std::stringstream& json) override;
 };

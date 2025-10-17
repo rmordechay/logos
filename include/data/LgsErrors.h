@@ -32,7 +32,7 @@ inline LgsBaseError E10008{.msg = "Main.lgs could not be found in src directory.
 inline LgsBaseError E10009{.msg = "Duplicate Main files were found in the project. Locations:%s", .code = errCodeStart++};
 inline LgsBaseError E10010{.msg = "Not a root path of a Logos project.", .code = errCodeStart++};
 inline LgsBaseError E10011{.msg = "%s is already declared.", .code = errCodeStart++};
-inline LgsBaseError E10012{.msg = "%s of type %s cannot be %s-assigned to type %s.", .code = errCodeStart++};
+inline LgsBaseError E10012{.msg = "%s cannot be %s-assigned to type %s.", .code = errCodeStart++};
 inline LgsBaseError E10013{.msg = "Field %s is with function type. Declare it as a standard function instead.", .code = errCodeStart++};
 inline LgsBaseError E10014{.msg = "Expression of type %s does not match base type %s.", .code = errCodeStart++};
 inline LgsBaseError E10015{.msg = "Function %s was found but it doesnt match the parameters.%pGiven:\t  %s%pExpected:  %s", .code = errCodeStart++};
@@ -43,8 +43,8 @@ inline LgsBaseError E10019{.msg = "activeEnv %s could not be found in the envs d
 inline LgsBaseError E10020{.msg = "Environment %s does not define the required field %s.", .code = errCodeStart++};
 inline LgsBaseError E10021{.msg = "%s and %s must be the same type. Given: %s and %s.", .code = errCodeStart++};
 inline LgsBaseError E10022{.msg = "%s cannot be instantiated.", .code = errCodeStart++};
-inline LgsBaseError E10023{.msg = "Type %s must be nullable.", .code = errCodeStart++};
-inline LgsBaseError E10024{.msg = "Declaration of null value must have an explict nullable type.", .code = errCodeStart++};
+inline LgsBaseError E10023{.msg = "Expression with type %s must be nullable.", .code = errCodeStart++};
+inline LgsBaseError E10024{.msg = "null must have an explict nullable type.", .code = errCodeStart++};
 inline LgsBaseError E10025{.msg = "Only interfaces are allowed in implements. Given: %s.", .code = errCodeStart++};
 inline LgsBaseError E10026{.msg = "Function %s must return an expression of type %s. None was given.", .code = errCodeStart++};
 inline LgsBaseError E10027{.msg = "Void function can either return Void type or empty return. Given: %s.", .code = errCodeStart++};

@@ -2,8 +2,9 @@
 #include "codegen/LgsLLVMGen.h"
 #include "utils/LgsUtils.h"
 
-std::string LgsNullableExpr::getName() {
-    return "null";
+std::string LgsNullableExpr::asText() {
+    if (baseExpr) return baseExpr->asText();
+    return nullLiteral;
 }
 
 void LgsNullableExpr::completeType(LgsType* toType) {
@@ -17,8 +18,8 @@ void LgsNullableExpr::completeType(LgsType* toType) {
 void LgsNullableExpr::store(LgsLLVMGen& cg, Value* value, const bool isSet) const {
     const auto nullStruct = type->asNullable()->getIRType(cg);
     const auto isSetField = cg.builder.CreateStructGEP(nullStruct, IRValue, 1);
+    cg.builder.CreateStore(isSet ? cg.true_() : cg.false_(), isSetField);
     if (isSet) {
-        cg.builder.CreateStore(cg.true_(), isSetField);
         const auto vField = cg.builder.CreateStructGEP(nullStruct, IRValue, 0);
         cg.builder.CreateStore(value, vField);
     }

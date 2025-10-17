@@ -1,5 +1,4 @@
 #pragma once
-#include "LgsToken.h"
 #include "../data/LgsTokens.h"
 #include "utils/LgsErrHandler.h"
 

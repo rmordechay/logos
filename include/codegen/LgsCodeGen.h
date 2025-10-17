@@ -113,9 +113,9 @@ public:
     void visitIterIndex(LgsIterIndex* iterIndex, bool inAssignment = false);
     void visitInstance(LgsInstance* instance);
     void visitJson(LgsJson* json);
-    void visitNullableExpr(LgsNullableExpr* nullableExpr);
+    void visitNullableExpr(LgsNullableExpr* expr);
 
-    void initFields(LgsInstance* instance);
+    void resolveVirtuals(LgsInstance* instance) const;
     bool checkMock(LgsExpr* expr);
     void yield() const;
 

@@ -12,6 +12,6 @@ public:
     LgsPostfixOperator op;
 
     LgsPostfixExpr(LgsExpr* baseExpr, const LgsPostfixOperator op) : baseExpr(baseExpr), op(op) {}
-    std::string getName() override;
+    std::string asText() override;
     ~LgsPostfixExpr() override;
 };

@@ -23,6 +23,6 @@ public:
 
     explicit LgsLoopMetaVar(const std::string& name, const LgsLoopMetaVarType forType) : name(name), varType(forType) {}
     Value* loadIR(LgsLLVMGen& cg) override;
-    std::string getName() override;
+    std::string asText() override;
 };
 

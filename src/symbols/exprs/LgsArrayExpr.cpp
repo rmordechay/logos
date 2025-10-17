@@ -30,7 +30,7 @@ void LgsArrayExpr::completeType(LgsType* toType) {
     }
 }
 
-std::string LgsArrayExpr::getName() {
+std::string LgsArrayExpr::asText() {
     return type ? type->pname() : "[]";
 }
 

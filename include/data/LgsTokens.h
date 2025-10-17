@@ -1,4 +1,5 @@
 #pragma once
+#include "data/LgsErrors.h"
 
 enum LgsTokenType {
     T_DOUBLE_EQUAL,
@@ -137,4 +138,17 @@ const std::unordered_map<std::string, LgsTokenType> LGS_KEYWORDS = {
     {"true", T_BOOL},
     {"false", T_BOOL},
     {"null", T_NULL}
+};
+
+struct LgsToken {
+    LgsTokenType type = T_UNKNOWN;
+    std::string lexeme = "";
+    LgsLocation location;
+
+    LgsToken() = default;
+    LgsToken(const LgsTokenType type, const std::string& lexeme, const LgsLocation& location)
+        : type(type),
+          lexeme(lexeme),
+          location(location) {
+    }
 };

@@ -18,6 +18,7 @@ void logInfo(const std::string& text) {
 
 void logError(const std::string& msg, const std::string& path) {
     logInfo(LGS_ERROR_STR + msg);
+    // logInfo(LGS_ERROR_STR + msg);
     if (path != "") logInfo(path);
 }
 

@@ -2,6 +2,6 @@
 
 #include "exprs/constants/LgsStrConst.h"
 
-std::string LgsUIntConst::getName() {
+std::string LgsUIntConst::asText() {
     return std::to_string(value);
 }

@@ -316,6 +316,10 @@ void LgsCodeGen::visitAssignment(const LgsAssignment* assignment) {
         visitVariable(var);
     } else if (const auto selection = lValue->asSelection()) {
         visitSelection(selection);
+    } else if (const auto nullableExpr = lValue->asNullableExpr()) {
+        visitNullableExpr(nullableExpr);
+    } else {
+        assert(0);
     }
     assignment->rValue->destPtrValue = lValue->IRValue;
     visitExpr(assignment->rValue);
@@ -433,7 +437,7 @@ void LgsCodeGen::visitElseIf(LgsIfStmt* ifStmt) {
 
 void LgsCodeGen::visitSwitch(LgsSwitch* pm) {
     assert(pm->cond);
-    const auto defaultBlock = cg.createBlock(BLOCK_NAME_DEFAULT_CASE);
+    const auto defaultBlock = cg.createBlock(BLOCK_NAME_ELSE);
     const auto exitBlock = cg.createBlock(BLOCK_NAME_EXIT_PATTERN);
     visitExpr(pm->cond);
     const auto exprIRValue = pm->cond->hash(cg);
@@ -783,18 +787,18 @@ void LgsCodeGen::visitSelection(LgsSelection* selection) {
             field->parentIRType = parent->type->getIRType(cg);
             visitField(field);
             if (const auto nullable = field->type->asNullable()) {
-                const auto null = nullable->isNullIR(cg, field->IRValue);
-                const auto trueBlock = cg.createBlock();
-                const auto falseBlock = cg.createBlock();
-                const auto exitBlock = cg.createBlock();
-                cg.builder.CreateCondBr(null, trueBlock, falseBlock);
+                const auto isSet = nullable->isSetIR(cg, field->IRValue);
+                const auto trueBlock = cg.createBlock("is_set");
+                const auto falseBlock = cg.createBlock("is_not_set");
+                const auto exitBlock = cg.createBlock("exit_null_check");
+                cg.builder.CreateCondBr(isSet, trueBlock, falseBlock);
                 cg.startBlock(trueBlock);
-                cg.printStr("true\n");
-                child->IRValue = cg.null();
+                child->IRValue = nullable->getValue(cg, field->IRValue);
+                cg.printStr("isSet");
                 cg.builder.CreateBr(exitBlock);
                 cg.startBlock(falseBlock);
-                cg.printStr("false\n");
-                child->IRValue = nullable->getValue(cg, field->IRValue);
+                cg.printStr("isNotSet");
+                child->IRValue = cg.null();
                 cg.branchAndStartBlock(exitBlock);
             } else if (field->type->asObject()) {
                 child->IRValue = cg.builder.CreateLoad(cg.ptrTy(), field->IRValue);
@@ -932,71 +936,7 @@ void LgsCodeGen::visitInstance(LgsInstance* instance) {
     if (instance->IRValue) return;
     const auto obj = instance->obj;
     instance->IRValue = cg.callMalloc(obj->getSizeBytes(), instance->owner, obj->getRTType());
-    initFields(instance);
-    if (obj->implements.empty()) return;
 
-    // Resolve virtual fields and methods
-    for (const auto& field : obj->fields) {
-        if (!field->isVirtual) continue;
-        const auto keyIRStr = cg.getIRStr(field->name);
-        const auto objIR = obj->getIRType(cg);
-        const auto fieldGEP = cg.builder.CreateStructGEP(objIR, instance->IRValue, field->position);
-        cg.callLgsFunc("vtable_add", cg.voidTy(), {cg.ptrTy(), cg.ptrTy(), cg.ptrTy()}, {instance->IRValue, keyIRStr, fieldGEP});
-    }
-
-    for (const auto& [methodName, method] : obj->methods) {
-        if (!method->funcType->isVirtual) continue;
-        const auto keyIRStr = cg.getIRStr(method->funcType->name);
-        const auto IRFunc = method->getIRFunc(cg);
-        cg.callLgsFunc("vtable_add", cg.voidTy(), {cg.ptrTy(), cg.ptrTy(), cg.ptrTy()}, {instance->IRValue, keyIRStr, IRFunc});
-    }
-}
-
-void LgsCodeGen::visitJson(LgsJson* json) {
-    if (const auto instance = json->instance) {
-        json->instance->destPtrValue = json->destPtrValue;
-        instance->obj->getIRType(cg);
-    } else if (const auto arr = json->arr) {
-        json->arr->destPtrValue = json->destPtrValue;
-        visitArrayExpr(arr);
-        json->IRValue = arr->IRValue;
-    } else if (const auto strConst = json->strConst) {
-        json->strConst->destPtrValue = json->destPtrValue;
-        visitStrConst(strConst);
-        json->IRValue = strConst->IRValue;
-    } else if (const auto intConst = json->intConst) {
-        json->intConst->destPtrValue = json->destPtrValue;
-        visitIntConst(intConst);
-        json->IRValue = intConst->IRValue;
-    } else if (const auto floatConst = json->floatConst) {
-        json->floatConst->destPtrValue = json->destPtrValue;
-        visitFloatConst(floatConst);
-        json->IRValue = floatConst->IRValue;
-    } else if (const auto null = json->null) {
-        json->null->destPtrValue = json->destPtrValue;
-        null->IRValue = cg.null();
-        json->IRValue = null->IRValue;
-    }
-}
-
-void LgsCodeGen::visitNullableExpr(LgsNullableExpr* nullableExpr) {
-    if (nullableExpr->destPtrValue) {
-        nullableExpr->IRValue = nullableExpr->destPtrValue;
-    } else {
-        const auto nullStruct = nullableExpr->type->getIRType(cg);
-        nullableExpr->IRValue = cg.builder.CreateAlloca(nullStruct);
-    }
-
-    if (nullableExpr->isNull) {
-        nullableExpr->store(cg, nullptr, false);
-    } else {
-        const auto baseType = nullableExpr->baseExpr;
-        visitExpr(baseType);
-        nullableExpr->store(cg, baseType->IRValue, true);
-    }
-}
-
-void LgsCodeGen::initFields(LgsInstance* instance) {
     std::unordered_set<std::string> visited;
     for (const auto& [argName, arg] : instance->args) {
         visited.insert(argName);
@@ -1026,6 +966,70 @@ void LgsCodeGen::initFields(LgsInstance* instance) {
         visitExpr(field->expr);
         if (field->expr->IRValue == field->IRValue) continue;
         cg.builder.CreateStore(field->expr->IRValue, field->IRValue);
+    }
+    if (obj->implements.empty()) return;
+    resolveVirtuals(instance);
+}
+
+void LgsCodeGen::visitJson(LgsJson* json) {
+    if (const auto instance = json->instance) {
+        json->instance->destPtrValue = json->destPtrValue;
+        instance->obj->getIRType(cg);
+    } else if (const auto arr = json->arr) {
+        json->arr->destPtrValue = json->destPtrValue;
+        visitArrayExpr(arr);
+        json->IRValue = arr->IRValue;
+    } else if (const auto strConst = json->strConst) {
+        json->strConst->destPtrValue = json->destPtrValue;
+        visitStrConst(strConst);
+        json->IRValue = strConst->IRValue;
+    } else if (const auto intConst = json->intConst) {
+        json->intConst->destPtrValue = json->destPtrValue;
+        visitIntConst(intConst);
+        json->IRValue = intConst->IRValue;
+    } else if (const auto floatConst = json->floatConst) {
+        json->floatConst->destPtrValue = json->destPtrValue;
+        visitFloatConst(floatConst);
+        json->IRValue = floatConst->IRValue;
+    } else if (const auto null = json->null) {
+        json->null->destPtrValue = json->destPtrValue;
+        null->IRValue = cg.null();
+        json->IRValue = null->IRValue;
+    }
+}
+
+void LgsCodeGen::visitNullableExpr(LgsNullableExpr* expr) {
+    if (expr->destPtrValue) {
+        expr->IRValue = expr->destPtrValue;
+    } else {
+        const auto nullStruct = expr->type->getIRType(cg);
+        expr->IRValue = cg.builder.CreateAlloca(nullStruct);
+    }
+
+    if (expr->isNull) {
+        expr->store(cg, nullptr, false);
+    } else {
+        const auto baseType = expr->baseExpr;
+        visitExpr(baseType);
+        expr->store(cg, baseType->IRValue, true);
+    }
+}
+
+void LgsCodeGen::resolveVirtuals(LgsInstance* instance) const {
+    const auto obj = instance->obj;
+    for (const auto& field : obj->fields) {
+        if (!field->isVirtual) continue;
+        const auto keyIRStr = cg.getIRStr(field->name);
+        const auto objIR = obj->getIRType(cg);
+        const auto fieldGEP = cg.builder.CreateStructGEP(objIR, instance->IRValue, field->position);
+        cg.callLgsFunc("vtable_add", cg.voidTy(), {cg.ptrTy(), cg.ptrTy(), cg.ptrTy()}, {instance->IRValue, keyIRStr, fieldGEP});
+    }
+
+    for (const auto& [methodName, method] : obj->methods) {
+        if (!method->funcType->isVirtual) continue;
+        const auto keyIRStr = cg.getIRStr(method->funcType->name);
+        const auto IRFunc = method->getIRFunc(cg);
+        cg.callLgsFunc("vtable_add", cg.voidTy(), {cg.ptrTy(), cg.ptrTy(), cg.ptrTy()}, {instance->IRValue, keyIRStr, IRFunc});
     }
 }
 

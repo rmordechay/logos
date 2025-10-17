@@ -148,7 +148,6 @@ set(RUNTIME_SOURCES
     runtime/lib/Lgs_arena.cpp
     runtime/lib/Lgs_set.cpp
     include/data/LgsConfigs.h
-    include/parser/LgsToken.h
     src/symbols/stmts/LgsSwitch.cpp
     include/symbols/stmts/LgsSwitch.h
     include/symbols/exprs/LgsTernaryExpr.h

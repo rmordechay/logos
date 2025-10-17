@@ -15,6 +15,6 @@ public:
 
     explicit LgsVectorExpr(LgsVec* vecType): vecType(vecType) {}
     Value* loadIR(LgsLLVMGen& cg) override;
-    std::string getName() override;
+    std::string asText() override;
     ~LgsVectorExpr() override;
 };

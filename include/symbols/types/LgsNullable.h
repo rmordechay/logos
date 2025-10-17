@@ -17,7 +17,7 @@ public:
     bool canCastTo(LgsType* other) override;
     size_t getSizeBytes() override;
     std::string strFormatPart() const override;
-    Value* isNullIR(LgsLLVMGen& cg, Value* ptr);
+    Value* isSetIR(LgsLLVMGen& cg, Value* ptr);
     Value* getValue(LgsLLVMGen& cg, Value* ptr);
     ~LgsNullable() override;
 };

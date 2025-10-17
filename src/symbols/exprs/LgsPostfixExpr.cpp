@@ -2,7 +2,7 @@
 #include "LgsType.h"
 #include "utils/LgsUtils.h"
 
-std::string LgsPostfixExpr::getName() {
+std::string LgsPostfixExpr::asText() {
     assert(0);
 }
 

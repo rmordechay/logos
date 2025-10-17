@@ -17,7 +17,7 @@ public:
 
     explicit LgsVarDec(const std::string& name, LgsExpr* expr) : name(name), expr(expr) {}
     LgsVarDec(const std::string& name, LgsType* type, LgsExpr* expr) : name(name), type(type), expr(expr) {}
-    std::string getName() override;
+    std::string asText() override;
     Value* loadIR(LgsLLVMGen& cg) override;
     bool shouldAllocate() const;
     void setDebugValue(LgsLLVMGen& cg) override;

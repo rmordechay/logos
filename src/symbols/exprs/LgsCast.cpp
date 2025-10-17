@@ -6,8 +6,8 @@ Value* LgsCast::loadIR(LgsLLVMGen& cg) {
     return value->loadIR(cg);
 }
 
-std::string LgsCast::getName() {
-    return fromValue->getName() + "->" + toType->pname();
+std::string LgsCast::asText() {
+    return fromValue->asText() + "->" + toType->pname();
 }
 
 LgsCast::~LgsCast() {

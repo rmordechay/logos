@@ -12,7 +12,7 @@ Value* LgsStrConst::loadIR(LgsLLVMGen& cg) {
     return IRValue;
 }
 
-std::string LgsStrConst::getName() {
+std::string LgsStrConst::asText() {
     return '"' + value + '"';
 }
 

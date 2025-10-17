@@ -73,10 +73,10 @@ public:
     void visitStmt(LgsStmt* stmt);
     void visitStmtsBlock(LgsStmtsBlock* stmtsBlock);
     void visitVarDec(LgsVarDec* varDec);
-    void visitAssignment(const LgsAssignment* assignment);
+    void visitAssignment(LgsAssignment* assignment);
     void visitIfStmt(LgsIfStmt* ifStmt);
     void visitSwitch(LgsSwitch* switchStmt);
-    void visitWhileLoop(const LgsWhileLoop* whileLoop);
+    void visitWhileLoop(LgsWhileLoop* whileLoop);
     void visitLoopStmt(LgsForLoop* loopStmt);
     void visitRangeLoop(LgsRangeLoop* rangeLoop);
     void visitForeachLoop(LgsForeachLoop* foreachLoop);
@@ -87,7 +87,7 @@ public:
     void visitCoroutine(const LgsCoroutine* coroutine);
     void visitDeferStmt(const LgsDeferStmt* deferStmt);
     void visitIOStmt(const LgsIOStmt* ioStmt);
-    void visitExpr(LgsExpr* expr);
+    void visitExpr(LgsExpr*& expr);
     void visitBinaryExpr(LgsBinaryExpr* binaryExpr);
     void visitTernaryExpr(LgsTernaryExpr* ternary);
     void visitCast(LgsCast* cast);
@@ -109,7 +109,7 @@ public:
     void visitStrConst(const LgsStrConst* strConst);
     void visitTypeExpr(LgsTypeExpr* typeExpr);
     void visitJson(const LgsJson* json);
-    void visitNullableExpr(const LgsNullableExpr* nullableExpr);
+    void visitNullableExpr(LgsNullableExpr* nullableExpr);
     void visitInstance(LgsInstance* instance);
     void visitInterfaceInstance(LgsInstance* instance, LgsInterface* interface);
     void visitIterIndex(LgsIterIndex* iterIndex);
@@ -117,7 +117,7 @@ public:
     void visitSlice(LgsIterIndex* iterIndex);
     void visitLoopMetaVar(LgsLoopMetaVar* metaVar);
 
-    void validateExprType(LgsExpr* expr, LgsType* type);
+    bool validateExprType(LgsExpr* expr, LgsType* type);
     void validateObjImplements(LgsObject* obj, const std::vector<LgsType*>& interfaces);
     void validateIndex(LgsIterIndex* iterIndex);
     bool validateFieldVisibility(LgsField* field, LgsType* parent);

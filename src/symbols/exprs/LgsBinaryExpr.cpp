@@ -11,8 +11,8 @@ void LgsBinaryExpr::parseAsJSON(std::stringstream& json) {
     closeJsonObject(json);
 }
 
-std::string LgsBinaryExpr::getName() {
-    return left->getName() + ' ' + op.name + ' ' + right->getName();
+std::string LgsBinaryExpr::asText() {
+    return left->asText() + ' ' + op.name + ' ' + right->asText();
 }
 
 LgsBinaryExpr::~LgsBinaryExpr() {

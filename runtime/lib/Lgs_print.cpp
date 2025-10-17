@@ -73,11 +73,19 @@ std::string formatElement(const Lgs_rttype type, void* elem) {
         oss << formatArray(nested);
         break;
     }
+    case RTT_NULLABLE: {
+        const auto nullable = static_cast<Lgs_nullableInt*>(elem);
+        if (nullable->isSet) {
+            oss << nullable->v;
+        } else {
+            oss << LgsNullableExpr::nullLiteral;
+        }
+        break;
+    }
     case RTT_ANY:
         oss << elem;
         break;
     case RTT_SARRAY:
-    case RTT_NULLABLE:
     case RTT_MAP:
     case RTT_OBJECT:
     case RTT_VOID:

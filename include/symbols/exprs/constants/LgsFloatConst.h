@@ -7,6 +7,6 @@ public:
 
     explicit LgsFloatConst(LgsType* type, const double_t value) : LgsExpr(type), value(value) {}
     Value* loadIR(LgsLLVMGen& cg) override;
-    std::string getName() override;
+    std::string asText() override;
     ~LgsFloatConst() override = default;
 };

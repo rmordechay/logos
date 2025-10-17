@@ -47,7 +47,7 @@ bool LgsFuncCall::equalsDefaultParams(const LgsFuncType* funcType) const {
     return true;
 }
 
-std::string LgsFuncCall::getName() {
+std::string LgsFuncCall::asText() {
     std::stringstream str;
     str << name << '(';
     for (size_t i = isMethodCall; i < args.size(); ++i) {

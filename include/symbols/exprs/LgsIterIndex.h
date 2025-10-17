@@ -26,7 +26,7 @@ public:
     void setIRElementPtr(LgsLLVMGen& cg, bool inAssignment = false);
     void assign(LgsLLVMGen& cg, LgsExpr* expr) override;
     void assignScalar(LgsLLVMGen& cg, LgsExpr* expr) const;
-    std::string getName() override;
+    std::string asText() override;
     Type* getSArrayType(LgsLLVMGen& cg) const;
     ~LgsIterIndex() override;
 };

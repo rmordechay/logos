@@ -225,18 +225,23 @@ void LgsApp::exitWithErrors() const {
         assert(filePath != filePaths.end());
         const auto fullPath = getFullPath(err.location, filePath->second);
         auto lineStr = getLine(filePath->second.string(), line);
-        const auto lineLen = lineStr.size();
-        auto errMsg = trim(lineStr);
-        const auto paddingLen = std::strlen(LGS_ERROR_PADDING) + 2;
-        // Adds new line and padding
-        errMsg += '\n' + std::string(paddingLen, ' ');
-        // Draw underneath the line
-        errMsg += std::string(column, '~');
+        const auto firstNonSpace = std::find_if(lineStr.begin(), lineStr.end(), [](const unsigned char c) { return !std::isspace(c); });
+        const auto trimmedCount = std::distance(lineStr.begin(), firstNonSpace);
+        auto errMsg = lineStr.substr(trimmedCount);
+        auto firstPart = column - LGS_PADDING_SIZE + 1;
+        if (firstPart <= 0) {
+            firstPart = LGS_PADDING_SIZE;
+        }
+        errMsg += LGS_ERROR_PADDING + std::string(firstPart, '~');
         errMsg += '^';
-        // errMsg += std::string(lineLen - column, '~');
-        errMsg += err.msg;
+        auto secondPart = lineStr.size() - column + 1;
+        if (secondPart <= 0) {
+            secondPart = LGS_PADDING_SIZE;
+        }
+        errMsg += std::string(secondPart, '~');
         const auto atPath = "\n   at: " + fullPath;
-        logError(errMsg, atPath);
+        logInfo(LGS_ERROR_STR + errMsg);
+        logInfo(atPath);
         if (i != errHandler.errors.size() - 1) logInfo(LGS_MSG_LINE_SEPERATOR);
     }
     if (!errHandler.errors.empty()) logInfo("\n");

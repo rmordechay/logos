@@ -14,6 +14,6 @@ public:
     explicit LgsArrayExpr(LgsSet* setType) : LgsExpr(setType) {}
     Value* loadIR(LgsLLVMGen& cg) override;
     void completeType(LgsType* toType) override;
-    std::string getName() override;
+    std::string asText() override;
     ~LgsArrayExpr() override;
 };

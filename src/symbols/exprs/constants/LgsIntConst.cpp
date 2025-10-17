@@ -63,7 +63,7 @@ void LgsIntConst::parseAsJSON(std::stringstream& json) {
     closeJsonObject(json);
 }
 
-std::string LgsIntConst::getName() {
+std::string LgsIntConst::asText() {
     return std::to_string(value);
 }
 

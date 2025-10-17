@@ -18,7 +18,7 @@ Type* LgsNullable::getIRType(LgsLLVMGen& cg) {
 }
 
 LgsExpr* LgsNullable::getZeroValue() {
-    const auto nullableExpr = new LgsNullableExpr(baseType->getZeroValue());
+    const auto nullableExpr = new LgsNullableExpr(nullptr);
     nullableExpr->type = this;
     return nullableExpr;
 }
@@ -28,17 +28,18 @@ Lgs_rttype LgsNullable::getRTType() {
 }
 
 std::string LgsNullable::getName() {
-    return baseType->getName() + "?";
+    return baseType ? baseType->getName() : "Null";
 }
 
 std::string LgsNullable::pname() {
-    return baseType ? baseType->pname() + '?' : LGS_UNKNOWN_TYPE;
+    return (baseType ? baseType->pname() : LGS_UNKNOWN_TYPE) + '?';
 }
 
 bool LgsNullable::canCastTo(LgsType* other) {
     if (other->getName() == LgsAny::name) return true;
     const auto otherNullable = other->asNullable();
     if (!otherNullable) return false;
+    if (!baseType) return true;
     return baseType->canCastTo(otherNullable->baseType);
 }
 
@@ -50,7 +51,7 @@ std::string LgsNullable::strFormatPart() const {
     return baseType->strFormatPart();
 }
 
-Value* LgsNullable::isNullIR(LgsLLVMGen& cg, Value* ptr) {
+Value* LgsNullable::isSetIR(LgsLLVMGen& cg, Value* ptr) {
     auto nullableField = cg.builder.CreateStructGEP(getIRType(cg), ptr, 1);
     nullableField = cg.builder.CreateLoad(cg.i1Ty(), nullableField);
     return cg.builder.CreateICmpEQ(cg.true_(), nullableField);

@@ -7,6 +7,6 @@ Value* LgsFloatConst::loadIR(LgsLLVMGen& cg) {
     return IRValue;
 }
 
-std::string LgsFloatConst::getName() {
+std::string LgsFloatConst::asText() {
     return std::to_string(value);
 }
