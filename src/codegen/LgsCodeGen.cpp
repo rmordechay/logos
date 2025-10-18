@@ -291,8 +291,7 @@ void LgsCodeGen::visitWhileLoop(const LgsWhileLoop* loop) {
 }
 
 void LgsCodeGen::visitVarDec(LgsVarDec* varDec) {
-    const bool shouldAllocate = varDec->shouldAllocate();
-    if (shouldAllocate) {
+    if (varDec->shouldAllocate()) {
         varDec->IRValue = cg.builder.CreateAlloca(varDec->type->getIRType(cg));
         varDec->expr->destPtrValue = varDec->IRValue;
         visitExpr(varDec->expr);
@@ -317,7 +316,7 @@ void LgsCodeGen::visitAssignment(const LgsAssignment* assignment) {
     } else if (const auto selection = lValue->asSelection()) {
         visitSelection(selection);
     } else if (const auto nullableExpr = lValue->asNullableExpr()) {
-        visitNullableExpr(nullableExpr);
+        visitNullableExpr(nullableExpr, true);
     } else {
         assert(0);
     }
@@ -544,7 +543,7 @@ void LgsCodeGen::visitIOStmt(const LgsIOStmt* ioStmt) {
     visitStmtsBlock(ioStmt->stmtsBlock);
 }
 
-void LgsCodeGen::visitExpr(LgsExpr* expr) {
+void LgsCodeGen::visitExpr(LgsExpr* expr, const bool assign) {
     if (!expr) return;
     if (const auto iter = expr->type->asIterable()) {
         visitExpr(iter->size);
@@ -562,7 +561,7 @@ void LgsCodeGen::visitExpr(LgsExpr* expr) {
         if (const auto selection = expr->asSelection()) return visitSelection(selection);
         if (const auto arrayExpr = expr->asArrayExpr()) return visitArrayExpr(arrayExpr);
         if (const auto hashMap = expr->asHashMap()) return visitHashMap(hashMap);
-        if (const auto iterIndex = expr->asIterIndex()) return visitIterIndex(iterIndex);
+        if (const auto iterIndex = expr->asIterIndex()) return visitIterIndex(iterIndex, assign);
         if (const auto variable = expr->asVariable()) return visitVariable(variable);
         if (const auto postfixExpr = expr->asPostfixExpr()) return visitPostfixExpr(postfixExpr);
         if (const auto prefixExpr = expr->asPrefixExpr()) return visitPrefixExpr(prefixExpr);
@@ -570,7 +569,7 @@ void LgsCodeGen::visitExpr(LgsExpr* expr) {
         if (const auto intConst = expr->asIntConst()) return visitIntConst(intConst);
         if (const auto floatConst = expr->asFloatConst()) return visitFloatConst(floatConst);
         if (const auto loopMetaVar = expr->asLoopMetaVar()) return visitLoopMetaVar(loopMetaVar);
-        if (const auto null = expr->asNullableExpr()) return visitNullableExpr(null);
+        if (const auto null = expr->asNullableExpr()) return visitNullableExpr(null, assign);
         if (const auto cast = expr->asCast()) return visitCast(cast);
         if (const auto json = expr->asJson()) return visitJson(json);
         if (expr->asTypeExpr()) return;
@@ -780,7 +779,7 @@ void LgsCodeGen::visitSelection(LgsSelection* selection) {
             field->parentIRType = parent->type->getIRType(cg);
             visitField(field);
             iterIndex->destPtrValue = field->IRValue;
-            visitIterIndex(iterIndex);
+            visitIterIndex(iterIndex, false);
         } else {
             assert(0);
         }
@@ -908,20 +907,6 @@ void LgsCodeGen::visitStrConst(LgsStrConst* strConst) {
     strConst->IRValue = cg.getIRStr(strConst->value);
 }
 
-void LgsCodeGen::visitIterIndex(LgsIterIndex* iterIndex, const bool inAssignment) {
-    assert(!iterIndex->index.to);
-    if (iterIndex->baseExpr->type->asSArray()) {
-        visitExpr(iterIndex->index.from);
-        visitExpr(iterIndex->index.to);
-        iterIndex->setIRElementPtr(cg, inAssignment);
-    } else {
-        visitExpr(iterIndex->baseExpr);
-        visitExpr(iterIndex->index.from);
-        visitExpr(iterIndex->index.to);
-        iterIndex->setIRElementPtr(cg, inAssignment);
-    }
-}
-
 void LgsCodeGen::visitInstance(LgsInstance* instance) {
     if (instance->IRValue) return;
     const auto obj = instance->obj;
@@ -961,6 +946,31 @@ void LgsCodeGen::visitInstance(LgsInstance* instance) {
     resolveVirtuals(instance);
 }
 
+void LgsCodeGen::visitIterIndex(LgsIterIndex* iterIndex, const bool assign) {
+    assert(!iterIndex->index.to);
+    if (iterIndex->baseExpr->type->asSArray()) {
+        visitExpr(iterIndex->index.from);
+        visitExpr(iterIndex->index.to);
+        iterIndex->setIRElementPtr(cg, assign);
+    } else {
+        visitExpr(iterIndex->baseExpr);
+        visitExpr(iterIndex->index.from);
+        visitExpr(iterIndex->index.to);
+        iterIndex->setIRElementPtr(cg, assign);
+    }
+}
+
+void LgsCodeGen::visitNullableExpr(LgsNullableExpr* expr, const bool assign) {
+    if (expr->destPtrValue) {
+        expr->IRValue = expr->destPtrValue;
+    } else {
+        const auto nullStruct = expr->type->getIRType(cg);
+        expr->IRValue = cg.builder.CreateAlloca(nullStruct);
+    }
+    if (expr->isNull) expr->store(cg, nullptr, false);
+    else expr->store(cg, getIRValue(expr->baseExpr), true);
+}
+
 void LgsCodeGen::visitJson(LgsJson* json) {
     if (const auto instance = json->instance) {
         json->instance->destPtrValue = json->destPtrValue;
@@ -986,17 +996,6 @@ void LgsCodeGen::visitJson(LgsJson* json) {
         null->IRValue = cg.null();
         json->IRValue = null->IRValue;
     }
-}
-
-void LgsCodeGen::visitNullableExpr(LgsNullableExpr* expr) {
-    if (expr->destPtrValue) {
-        expr->IRValue = expr->destPtrValue;
-    } else {
-        const auto nullStruct = expr->type->getIRType(cg);
-        expr->IRValue = cg.builder.CreateAlloca(nullStruct);
-    }
-    if (expr->isNull) expr->store(cg, nullptr, false);
-    else expr->store(cg, getIRValue(expr->baseExpr), true);
 }
 
 void LgsCodeGen::resolveVirtuals(LgsInstance* instance) const {
@@ -1099,9 +1098,9 @@ void LgsCodeGen::initMainArgs(LgsMainFunc* mainFunc) {
     auto& builder = cg.builder;
     const std::vector<Type*> structFields{cg.i64Ty(), cg.i32Ty(), cg.i32Ty(), cg.ptrTy()};
     const auto arrStruct = cg.getStructType(structFields, LgsDArray::name);
-    mainFunc->mainArgs->IRValue = builder.CreateAlloca(arrStruct);
-    mainFunc->initArgsFunc->callIR(cg, {getIRValue(mainFunc->mainArgs), mainFunc->argc, mainFunc->argv});
-    mainFunc->funcType->params[0].IRValue = getIRValue(mainFunc->mainArgs);
+    mainFunc->argsArr->IRValue = builder.CreateAlloca(arrStruct);
+    mainFunc->initArgsFunc->callIR(cg, {getIRValue(mainFunc->argsArr), mainFunc->argc, mainFunc->argv});
+    mainFunc->funcType->params[0].IRValue = getIRValue(mainFunc->argsArr);
 }
 
 Value* LgsCodeGen::getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) const {

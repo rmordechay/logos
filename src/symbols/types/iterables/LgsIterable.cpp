@@ -14,7 +14,7 @@ LgsFunc* LgsIterable::getAddFunc() {
 LgsFunc* LgsIterable::getMapFunc() {
     const auto func = methods.find(MAP_FUNC_NAME);
     if (func != methods.end() && func->second) return func->second;
-    func->second = new LgsFunc(MAP_FUNC_NAME, this, {this, new LgsFuncType(baseType, {LgsParam(baseType)})}, BUILTIN | PUBLIC | METHOD);
+    func->second = new LgsFunc(MAP_FUNC_NAME, this, {this, new LgsFuncType(baseType, {LgsParam(baseType, "")})}, BUILTIN | PUBLIC | METHOD);
     methods[MAP_FUNC_NAME] = func->second;
     return func->second;
 }
@@ -22,7 +22,7 @@ LgsFunc* LgsIterable::getMapFunc() {
 LgsFunc* LgsIterable::getFilterFunc() {
     const auto func = methods.find(FILTER_FUNC_NAME);
     if (func != methods.end() && func->second) return func->second;
-    func->second = new LgsFunc(FILTER_FUNC_NAME, this, {this, new LgsFuncType(&LGS_BOOL, {LgsParam(baseType)})}, BUILTIN | PUBLIC | METHOD);
+    func->second = new LgsFunc(FILTER_FUNC_NAME, this, {this, new LgsFuncType(&LGS_BOOL, {LgsParam(baseType, "")})}, BUILTIN | PUBLIC | METHOD);
     methods[FILTER_FUNC_NAME] = func->second;
     return func->second;
 }

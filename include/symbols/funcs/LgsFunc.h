@@ -34,7 +34,7 @@ public:
     explicit LgsFunc(const std::string& name, LgsType* rt, const std::vector<LgsType*>& paramTypes, const uint32_t ops = 0) {
         std::vector<LgsParam> params;
         for (const auto paramType : paramTypes) {
-            params.push_back(LgsParam(paramType));
+            params.push_back(LgsParam(paramType, ""));
         }
         initFunc(name, rt, params, ops);
     }

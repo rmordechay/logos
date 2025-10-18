@@ -14,7 +14,7 @@ public:
     bool isVariadic = false;
     Value* vaList = nullptr;
 
-    explicit LgsParam(LgsType* type = nullptr, const std::string& name = "", LgsExpr* expr = nullptr) : name(name), type(type), expr(expr) {}
+    explicit LgsParam(LgsType* type, const std::string& name, LgsExpr* expr = nullptr) : name(name), type(type), expr(expr) {}
     Value* loadIR(LgsLLVMGen& cg) override;
     std::string asText() override;
     ~LgsParam() override = default;

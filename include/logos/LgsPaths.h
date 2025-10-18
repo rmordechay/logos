@@ -1,4 +1,7 @@
 #pragma once
+#include <filesystem>
+
+namespace fs = std::filesystem;
 
 struct LgsPaths {
     fs::path rootPath;

@@ -14,7 +14,7 @@ public:
     LgsFunc* sleepFunc = new LgsFunc{"sleep", &LGS_VOID, {&LGS_INT}, PUBLIC | BUILTIN | SYSCALL};
     LgsFunc* exitFunc = new LgsFunc{"exit", &LGS_VOID, {&LGS_INT}, PUBLIC | BUILTIN | SYSCALL | TERMINATOR};
     LgsFunc* cwdFunc = new LgsFunc{"cwd", new LgsStr(), PUBLIC | BUILTIN | SYSCALL};
-    LgsFunc* getEnvFunc = new LgsFunc{"getEnv", new LgsStr(), {LgsParam(new LgsStr()), LgsParam(new LgsStr(), "fallback", new LgsStrConst(""))}, PUBLIC | BUILTIN};
+    LgsFunc* getEnvFunc = new LgsFunc{"getEnv", new LgsStr(), {LgsParam(new LgsStr(), ""), LgsParam(new LgsStr(), "fallback", new LgsStrConst(""))}, PUBLIC | BUILTIN};
     LgsFunc* coresNumFunc = new LgsFunc{"coresNumber", &LGS_LONG, PUBLIC | BUILTIN | SYSCALL};
 
     explicit LgsSystem() : LgsObject(name) {

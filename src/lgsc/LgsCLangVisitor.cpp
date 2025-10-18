@@ -27,8 +27,9 @@ bool LgsCLangVisitor::VisitFunctionDecl(const clang::FunctionDecl* func) {
     const auto lgsType = mapCType(func->getReturnType());
     const auto funcImpl = new LgsFunc(name, lgsType);
     for (int i = 0; i < func->getNumParams(); ++i) {
-        const auto paramType = func->getParamDecl(i)->getType();
-        const auto lgsParam = LgsParam(mapCType(paramType));
+        const auto paramDecl = func->getParamDecl(i);
+        const auto paramType = paramDecl->getType();
+        const auto lgsParam = LgsParam(mapCType(paramType), paramDecl->getName().str());
         funcImpl->funcType->params.push_back(lgsParam);
     }
     funcImpl->funcType->isVariadic = func->isVariadic();
@@ -158,7 +159,7 @@ LgsType* LgsCLangVisitor::mapCFunc(const clang::QualType type) {
     const auto cFuncType = type->getAs<clang::FunctionProtoType>();
     lgsFuncType->rt = mapCType(cFuncType->getReturnType());
     for (const clang::QualType param : cFuncType->getParamTypes()) {
-        auto lgsParam = LgsParam(mapCType(param));
+        auto lgsParam = LgsParam(mapCType(param), param.getAsString());
         lgsFuncType->params.push_back(lgsParam);
     }
     return lgsFuncType;

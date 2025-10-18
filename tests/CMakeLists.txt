@@ -8,6 +8,7 @@ add_executable(lgs_tests
     parser/ParserTest.cpp
 )
 
-target_precompile_headers(lgs_tests REUSE_FROM lgs_core)
-target_include_directories(lgs_tests PRIVATE /Users/r.mordechay/Desktop/Programming/logos/tests/helpers.h)
-target_link_libraries(lgs_tests PRIVATE lgs_core)
+set_target_properties(lgs_tests PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
+
+target_include_directories(lgs_tests PRIVATE ${CMAKE_SOURCE_DIR}/tests)
+target_link_libraries(lgs_tests PRIVATE lgs_lib)

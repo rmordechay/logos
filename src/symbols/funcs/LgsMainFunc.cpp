@@ -23,11 +23,7 @@ Function* LgsMainFunc::getIRFunc(LgsLLVMGen& cg) {
 }
 
 void LgsMainFunc::setMainArgs() {
-    mainArgs = new LgsArrayExpr(new LgsDArray(new LgsStr()));
-    initArgsFunc = new LgsFunc("initArgs", &LGS_VOID);
-    initArgsFunc->funcType->params.emplace_back(LgsParam(mainArgs->type));
-    initArgsFunc->funcType->params.emplace_back(LgsParam(&LGS_INT));
-    initArgsFunc->funcType->params.emplace_back(LgsParam(new LgsStr()));
+    assert(0);
 }
 
 LgsMainFunc::~LgsMainFunc() {
@@ -35,8 +31,8 @@ LgsMainFunc::~LgsMainFunc() {
         delete initArgsFunc;
         initArgsFunc = nullptr;
     }
-    if (mainArgs) {
-        delete mainArgs;
-        mainArgs = nullptr;
+    if (argsArr) {
+        delete argsArr;
+        argsArr = nullptr;
     }
 }

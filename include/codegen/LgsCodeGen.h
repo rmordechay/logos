@@ -93,7 +93,7 @@ public:
     void visitCoroutine(const LgsCoroutine* coroutine);
     void visitDeferStmt(const LgsDeferStmt* deferStmt);
     void visitIOStmt(const LgsIOStmt* ioStmt);
-    void visitExpr(LgsExpr* expr);
+    void visitExpr(LgsExpr* expr, bool assign = false);
     void visitBinaryExpr(LgsBinaryExpr* binExpr);
     void visitTernaryExpr(LgsTernaryExpr* ternaryExpr);
     void visitCast(LgsCast* cast);
@@ -111,10 +111,10 @@ public:
     void visitPrefixExpr(LgsPrefixExpr* prefixExpr);
     void visitPostfixExpr(LgsPostfixExpr* postfixExpr);
     void visitStrConst(LgsStrConst* strConst);
-    void visitIterIndex(LgsIterIndex* iterIndex, bool inAssignment = false);
     void visitInstance(LgsInstance* instance);
+    void visitIterIndex(LgsIterIndex* iterIndex, bool assign);
+    void visitNullableExpr(LgsNullableExpr* expr, bool assign);
     void visitJson(LgsJson* json);
-    void visitNullableExpr(LgsNullableExpr* expr);
 
     void resolveVirtuals(LgsInstance* instance) const;
     bool checkMock(LgsExpr* expr);

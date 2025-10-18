@@ -100,7 +100,7 @@ std::string LgsLinker::findLgsLib() {
 #ifdef __APPLE__
         return paths.rootPath.parent_path() / "cmake-build-debug";
 #elif defined(__linux__)
-        return rootPath.parent_path() / "build";
+        return paths.rootPath.parent_path() / "build";
 #endif
     } else {
         return "$HOME/.logos/lib";

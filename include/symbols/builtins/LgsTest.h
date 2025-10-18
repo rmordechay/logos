@@ -11,8 +11,8 @@
 class LgsTest final : public LgsObject {
 public:
     static constexpr auto name = "Test";
-    LgsFunc* mockFunc = new LgsFunc{"mock", &LGS_VOID, {&LGS_ANY, &LGS_ANY}, PUBLIC | BUILTIN};
-    LgsFunc* assertFunc = new LgsFunc{"assert", &LGS_BOOL, {&LGS_BOOL, new LgsStr()}, PUBLIC | BUILTIN};
+    LgsFunc* mockFunc = new LgsFunc{"mock", &LGS_VOID, std::vector<LgsType*>{&LGS_ANY, &LGS_ANY}, PUBLIC | BUILTIN};
+    LgsFunc* assertFunc = new LgsFunc{"assert", &LGS_BOOL, std::vector<LgsType*>{&LGS_BOOL, new LgsStr()}, PUBLIC | BUILTIN};
 
     explicit LgsTest(): LgsObject(name) {
         assertFunc->funcType->params[1].expr = new LgsStrConst("");

@@ -10,6 +10,7 @@ find_package(Clang REQUIRED CONFIG)
 
 set(LLVM_LINK_LLVM_DYLIB ON)
 set(CLANG_LINK_CLANG_DYLIB ON)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 find_program(CCACHE_PROGRAM ccache)
 if (CCACHE_PROGRAM)
@@ -134,32 +135,29 @@ set(CORE_SOURCES
 )
 
 set(RUNTIME_SOURCES
-    runtime/lib/Lgs_hashmap.cpp
-    runtime/lib/Lgs_DArray.cpp
-    runtime/lib/Lgs_system.cpp
-    runtime/lib/Lgs_runtime.cpp
-    runtime/lib/Lgs_stack.cpp
-    runtime/lib/Lgs_print.cpp
-    runtime/lib/Lgs_arena.cpp
-    runtime/lib/Lgs_set.cpp
+    ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_hashmap.cpp
+    ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_darray.cpp
+    ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_system.cpp
+    ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_runtime.cpp
+    ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_stack.cpp
+    ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_print.cpp
+    ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_arena.cpp
+    ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_set.cpp
 )
 
-add_library(lgs_core SHARED ${CORE_SOURCES} ${RUNTIME_SOURCES})
-set_target_properties(lgs_core PROPERTIES OUTPUT_NAME "lgs")
-target_link_libraries(lgs_core PUBLIC
-    LLVM
-    clang-cpp
-)
+add_library(lgs_lib SHARED ${CORE_SOURCES} ${RUNTIME_SOURCES})
+set_target_properties(lgs_lib PROPERTIES OUTPUT_NAME "lgs")
+target_link_libraries(lgs_lib PUBLIC LLVM clang-cpp)
 
-target_precompile_headers(lgs_core PRIVATE include/pch.h)
-target_include_directories(lgs_core PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/symbols
-    ${CMAKE_CURRENT_SOURCE_DIR}/runtime/include
+target_precompile_headers(lgs_lib PRIVATE include/pch.h)
+target_include_directories(lgs_lib PUBLIC
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/include/symbols
+    ${CMAKE_SOURCE_DIR}/runtime/include
     ${CLANG_INCLUDE_DIRS}
 )
 
 add_executable(lgs main.cpp)
-target_link_libraries(lgs PRIVATE lgs_core)
+target_link_libraries(lgs PRIVATE lgs_lib)
 
 add_subdirectory(tests)

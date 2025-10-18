@@ -16,7 +16,10 @@
 #include <condition_variable>
 #include <functional>
 #include <sstream>
-#include <boost/json/object.hpp>
 #include <regex>
+#include <atomic>
+#include <mutex>
+#include <cmath>
+#include <cstring>
 
 namespace fs = std::filesystem;
