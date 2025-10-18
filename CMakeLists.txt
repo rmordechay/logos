@@ -7,8 +7,6 @@ add_definitions(-DLOGOS_VERSION="${CMAKE_PROJECT_VERSION}")
 
 find_package(LLVM REQUIRED CONFIG)
 find_package(Clang REQUIRED CONFIG)
-find_package(SQLite3 REQUIRED)
-find_package(Boost CONFIG REQUIRED context coroutine)
 
 set(LLVM_LINK_LLVM_DYLIB ON)
 set(CLANG_LINK_CLANG_DYLIB ON)
@@ -140,7 +138,6 @@ set(RUNTIME_SOURCES
     runtime/lib/Lgs_DArray.cpp
     runtime/lib/Lgs_system.cpp
     runtime/lib/Lgs_runtime.cpp
-    runtime/lib/Lgs_scheduler.cpp
     runtime/lib/Lgs_stack.cpp
     runtime/lib/Lgs_print.cpp
     runtime/lib/Lgs_arena.cpp
@@ -152,9 +149,6 @@ set_target_properties(lgs_core PROPERTIES OUTPUT_NAME "lgs")
 target_link_libraries(lgs_core PUBLIC
     LLVM
     clang-cpp
-    Boost::context
-    Boost::coroutine
-    SQLite::SQLite3
 )
 
 target_precompile_headers(lgs_core PRIVATE include/pch.h)
@@ -163,7 +157,6 @@ target_include_directories(lgs_core PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/symbols
     ${CMAKE_CURRENT_SOURCE_DIR}/runtime/include
     ${CLANG_INCLUDE_DIRS}
-    ${SQLite3_INCLUDE_DIRS}
 )
 
 add_executable(lgs main.cpp)
