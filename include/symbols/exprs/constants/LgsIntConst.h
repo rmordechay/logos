@@ -1,5 +1,6 @@
 #pragma once
 #include "exprs/LgsExpr.h"
+#include "types/primitives/LgsSize.h"
 
 class LgsIntConst final : public LgsExpr {
 public:
@@ -13,3 +14,5 @@ public:
     Value* hash(LgsLLVMGen& cg) override;
     LgsExpr* clone() override;
 };
+
+inline auto LGS_SIZE_ZERO = new LgsIntConst(&LGS_SIZE, 0);

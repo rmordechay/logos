@@ -1,10 +1,12 @@
 #include "exprs/LgsNullableExpr.h"
 #include "codegen/LgsLLVMGen.h"
+#include "data/LgsDefinitions.h"
 #include "utils/LgsUtils.h"
+#include <llvm/IR/Module.h>
 
 std::string LgsNullableExpr::asText() {
     if (baseExpr) return baseExpr->asText();
-    return nullLiteral;
+    return LGS_NULL_LITERAL;
 }
 
 void LgsNullableExpr::completeType(LgsType* toType) {
@@ -15,19 +17,16 @@ void LgsNullableExpr::completeType(LgsType* toType) {
     }
 }
 
-void LgsNullableExpr::store(LgsLLVMGen& cg, Value* value, const bool isSet) const {
-    const auto nullStruct = type->asNullable()->getIRType(cg);
-    const auto isSetField = cg.builder.CreateStructGEP(nullStruct, IRValue, 1);
-    cg.builder.CreateStore(isSet ? cg.true_() : cg.false_(), isSetField);
-    if (isSet) {
-        const auto vField = cg.builder.CreateStructGEP(nullStruct, IRValue, 0);
-        cg.builder.CreateStore(value, vField);
-    }
-}
-
 void LgsNullableExpr::assign(LgsLLVMGen& cg, LgsExpr* expr) {
-    if (isNull) store(cg, nullptr, false);
-    else store(cg, expr->IRValue, true);
+    const auto nullStruct = type->getIRType(cg);
+    const auto valueField = cg.builder.CreateStructGEP(nullStruct, IRValue, 0);
+    const auto isSetField = cg.builder.CreateStructGEP(type->getIRType(cg), IRValue, 1);
+    if (expr->asNullableExpr()->isNull) {
+        cg.builder.CreateStore(cg.false_(), isSetField);
+    } else {
+        cg.builder.CreateStore(cg.true_(), isSetField);
+        cg.builder.CreateStore(expr->IRValue, valueField);
+    }
 }
 
 LgsNullableExpr::~LgsNullableExpr() {

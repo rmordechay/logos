@@ -237,9 +237,6 @@ void LgsSema::visitVarDec(LgsVarDec* varDec) {
         }
         varDec->type = typeResolver.resolveType(varDec->type, file);
         varDec->expr->completeType(varDec->type);
-        if (varDec->type->asNullable() && !varDec->expr->type->asNullable()) {
-            varDec->expr->type = new LgsNullable(varDec->expr->type);
-        }
         visitExpr(varDec->expr);
         validateExprType(varDec->expr, varDec->type);
         freeType(varDec->expr->type);
@@ -384,10 +381,8 @@ void LgsSema::visitRangeLoop(LgsRangeLoop* rangeLoop) {
             errHandler.addError(E10081, &startRange->location, {startRange->asText(), endRange->asText()});
         }
     } else {
-        rangeLoop->startRange = endRange->type->getZeroValue();
+        rangeLoop->startRange = LGS_SIZE_ZERO;
     }
-    rangeLoop->startRange = rangeLoop->startRange->castTo(&LGS_SIZE);
-    rangeLoop->endRange = rangeLoop->endRange->castTo(&LGS_SIZE);
 
     // Range loop can have only one var
     if (!rangeLoop->loopVars.empty()) {
@@ -507,11 +502,11 @@ void LgsSema::visitExpr(LgsExpr*& expr) {
         else if (const auto nullableExpr = expr->asNullableExpr()) visitExpr(nullableExpr->baseExpr);
         else if (const auto castExpr = expr->asCast()) visitCast(castExpr);
         else if (const auto json = expr->asJson()) visitJson(json);
-        if (expr->type->asNullable() && !expr->asNullableExpr()) {
-            const auto nullableExpr = new LgsNullableExpr(expr);
-            nullableExpr->location = expr->location;
-            expr = nullableExpr;
-        }
+        // if (expr->type->asNullable() && !expr->asNullableExpr()) {
+        //     const auto nullableExpr = new LgsNullableExpr(expr);
+        //     nullableExpr->location = expr->location;
+        //     expr = nullableExpr;
+        // }
     }
 }
 

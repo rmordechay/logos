@@ -103,8 +103,8 @@ public:
     void visitArrayExpr(LgsArrayExpr* array);
     void visitHashMap(LgsHashMap* hashMap);
     void visitVectorExpr(LgsVectorExpr* vectorExpr);
-    void visitVariable(LgsVariable* variable);
-    void visitSelection(LgsSelection* selection);
+    void visitVariable(LgsVariable* variable, bool assign = false);
+    void visitSelection(LgsSelection* selection, bool assign = false);
     void visitFieldSelection(LgsVariable* var, LgsExpr* parent) const;
     void visitFuncCall(LgsFuncCall* funcCall);
     void visitIterFunc(const LgsFuncCall* funcCall);
@@ -116,6 +116,8 @@ public:
     void visitNullableExpr(LgsNullableExpr* expr, bool assign);
     void visitJson(LgsJson* json);
 
+    Value* getNullableValue(const LgsExpr* expr) const;
+    void initNullableExpr(const LgsNullableExpr* expr) const;
     void resolveVirtuals(LgsInstance* instance) const;
     bool checkMock(LgsExpr* expr);
     void yield() const;

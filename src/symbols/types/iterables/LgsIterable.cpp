@@ -1,5 +1,6 @@
 #include "types/iterables/LgsIterable.h"
 #include "exprs/LgsIterIndex.h"
+#include "exprs/constants/LgsIntConst.h"
 #include "funcs/LgsFunc.h"
 #include "loops/LgsForeachLoop.h"
 #include "stmts/LgsVarDec.h"
@@ -37,7 +38,7 @@ LgsType* LgsIterable::getValueType() {
 
 bool LgsIterable::unpackLoopVarsTypes(LgsForeachLoop* loop) const {
     if (loop->loopVars.size() != 1) return false;
-    const auto iterIndex = new LgsIterIndex(loop->iterExpr, LGS_SIZE.getZeroValue());
+    const auto iterIndex = new LgsIterIndex(loop->iterExpr, LGS_SIZE_ZERO);
     iterIndex->setType(baseType);
     loop->loopVars[0]->expr = iterIndex;
     loop->loopVars[0]->type = iterIndex->type;

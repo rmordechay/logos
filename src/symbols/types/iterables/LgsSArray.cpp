@@ -63,15 +63,13 @@ Value* LgsSArray::inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) {
     cg.loop(size->loadIR(cg), [this, &cg, iterableExpr, value, resultPtr](Value* index, BasicBlock* exitBlock) {
         const auto trueBlock = cg.createBlock();
         const auto falseBlock = cg.createBlock();
-        const auto dummyExpr = baseType->getZeroValue();
-        dummyExpr->IRValue = getIRElement(cg, iterableExpr->IRValue, index);
-        const auto eq = baseType->eqIR(cg, dummyExpr->IRValue, value->loadIR(cg));
+        const auto v = getIRElement(cg, iterableExpr->IRValue, index);
+        const auto eq = baseType->eqIR(cg, v, value->loadIR(cg));
         cg.builder.CreateCondBr(eq, trueBlock, falseBlock);
         cg.startBlock(trueBlock);
         cg.builder.CreateStore(cg.true_(), resultPtr);
         cg.builder.CreateBr(exitBlock);
         cg.startBlock(falseBlock);
-        freeExpr(dummyExpr);
     });
     return cg.builder.CreateLoad(cg.builder.getInt1Ty(), resultPtr);
 }

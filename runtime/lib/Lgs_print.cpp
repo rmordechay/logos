@@ -1,5 +1,6 @@
 #include "Lgs_darray.h"
 #include "Lgs_types.h"
+#include "data/LgsDefinitions.h"
 #include "exprs/LgsNullableExpr.h"
 #include "types/primitives/LgsBool.h"
 #include "utils/LgsUtils.h"
@@ -78,7 +79,7 @@ std::string formatElement(const Lgs_rttype type, void* elem) {
         if (nullable->isSet) {
             oss << nullable->v;
         } else {
-            oss << LgsNullableExpr::nullLiteral;
+            oss << LGS_NULL_LITERAL;
         }
         break;
     }
@@ -112,7 +113,7 @@ std::string formatArray(Lgs_darray* arr) {
 
 extern "C" void Lgs_print(const Lgs_rttype rtt, void* v) {
     if (v) printf("%s\n", formatElement(rtt, v).c_str());
-    else printf("%s\n", LgsNullableExpr::nullLiteral);
+    else printf("%s\n", LGS_NULL_LITERAL);
 }
 
 extern "C" void Lgs_printError(const char* fmt) {

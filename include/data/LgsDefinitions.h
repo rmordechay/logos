@@ -13,6 +13,7 @@
 #define LGS_STR_FMT_PLACEHOLDER "$!v!$"
 #define LGS_UNKNOWN_TYPE "<Unknown>"
 #define LGS_ANONYMOUS_STR "anonymous"
+#define LGS_NULL_LITERAL "null"
 
 #define BLOCK_NAME_IF_TRUE "if_true"
 #define BLOCK_NAME_IF_FALSE "if_false"

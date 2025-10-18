@@ -294,12 +294,12 @@ void LgsCodeGen::visitVarDec(LgsVarDec* varDec) {
     if (varDec->shouldAllocate()) {
         varDec->IRValue = cg.builder.CreateAlloca(varDec->type->getIRType(cg));
         varDec->expr->destPtrValue = varDec->IRValue;
-        visitExpr(varDec->expr);
+        visitExpr(varDec->expr, true);
         if (varDec->expr->IRValue != varDec->IRValue) {
             cg.builder.CreateStore(varDec->expr->IRValue, varDec->IRValue);
         }
     } else {
-        visitExpr(varDec->expr);
+        visitExpr(varDec->expr, true);
         varDec->IRValue = varDec->expr->IRValue;
     }
     assert(varDec->IRValue);
@@ -315,13 +315,11 @@ void LgsCodeGen::visitAssignment(const LgsAssignment* assignment) {
         visitVariable(var);
     } else if (const auto selection = lValue->asSelection()) {
         visitSelection(selection);
-    } else if (const auto nullableExpr = lValue->asNullableExpr()) {
-        visitNullableExpr(nullableExpr, true);
     } else {
         assert(0);
     }
     assignment->rValue->destPtrValue = lValue->IRValue;
-    visitExpr(assignment->rValue);
+    visitExpr(assignment->rValue, true);
 
     Value* results = nullptr;
     switch (assignment->assignmentType) {
@@ -558,11 +556,11 @@ void LgsCodeGen::visitExpr(LgsExpr* expr, const bool assign) {
         if (const auto instance = expr->asInstance()) return visitInstance(instance);
         if (const auto funcCall = expr->asFuncCall()) return visitFuncCall(funcCall);
         if (const auto strConst = expr->asStrConst()) return visitStrConst(strConst);
-        if (const auto selection = expr->asSelection()) return visitSelection(selection);
+        if (const auto selection = expr->asSelection()) return visitSelection(selection, assign);
         if (const auto arrayExpr = expr->asArrayExpr()) return visitArrayExpr(arrayExpr);
         if (const auto hashMap = expr->asHashMap()) return visitHashMap(hashMap);
         if (const auto iterIndex = expr->asIterIndex()) return visitIterIndex(iterIndex, assign);
-        if (const auto variable = expr->asVariable()) return visitVariable(variable);
+        if (const auto variable = expr->asVariable()) return visitVariable(variable, assign);
         if (const auto postfixExpr = expr->asPostfixExpr()) return visitPostfixExpr(postfixExpr);
         if (const auto prefixExpr = expr->asPrefixExpr()) return visitPrefixExpr(prefixExpr);
         if (const auto vecExpr = expr->asVectorExpr()) return visitVectorExpr(vecExpr);
@@ -731,13 +729,19 @@ void LgsCodeGen::visitVectorExpr(LgsVectorExpr* vectorExpr) {
     }
 }
 
-void LgsCodeGen::visitVariable(LgsVariable* variable) {
+void LgsCodeGen::visitVariable(LgsVariable* variable, const bool assign) {
     switch (variable->ref.symbolType) {
     case VAR_DEC:
         variable->IRValue = variable->ref.varDec->IRValue;
+        if (assign && variable->type->asNullable()) {
+            variable->IRValue = getNullableValue(variable);
+        }
         break;
     case PARAM:
         variable->IRValue = variable->ref.param->IRValue;
+        if (assign && variable->type->asNullable()) {
+            variable->IRValue = getNullableValue(variable);
+        }
         break;
     case FUNC:
         variable->IRValue = variable->ref.func->getIRFunc(cg);
@@ -751,6 +755,9 @@ void LgsCodeGen::visitVariable(LgsVariable* variable) {
             variable->IRValue = cg.getIRStr(variable->name);
         } else {
             variable->IRValue = variable->ref.field->IRValue;
+            if (assign && variable->type->asNullable()) {
+                variable->IRValue = getNullableValue(variable);
+            }
         }
         break;
     case INTERFACE:
@@ -761,7 +768,31 @@ void LgsCodeGen::visitVariable(LgsVariable* variable) {
     assert(variable->IRValue);
 }
 
-void LgsCodeGen::visitSelection(LgsSelection* selection) {
+Value* LgsCodeGen::getNullableValue(const LgsExpr* expr) const {
+    const auto nullable = expr->type->asNullable();
+    const auto isSet = cg.builder.CreateLoad(cg.i1Ty(), nullable->isSetField);
+    const auto v = cg.builder.CreateLoad(nullable->baseType->getIRType(cg), nullable->valueField);
+    return cg.builder.CreateSelect(isSet, v, cg.i32Zero());
+}
+
+void LgsCodeGen::initNullableExpr(const LgsNullableExpr* expr) const {
+    const auto nullStruct = expr->type->getIRType(cg);
+    const auto type = expr->nullableType;
+    if (!type->isSetField) {
+        type->isSetField = cg.builder.CreateStructGEP(expr->type->getIRType(cg), expr->IRValue, 1);
+    }
+    if (expr->isNull) {
+        cg.builder.CreateStore(cg.true_(), type->isSetField);
+    } else {
+        cg.builder.CreateStore(cg.true_(), type->isSetField);
+        if (!type->valueField) {
+            type->valueField = cg.builder.CreateStructGEP(nullStruct, expr->IRValue, 0);
+        }
+        cg.builder.CreateStore(expr->baseExpr->IRValue, type->valueField);
+    }
+}
+
+void LgsCodeGen::visitSelection(LgsSelection* selection, const bool assign) {
     visitExpr(selection->exprs.front());
     for (int i = 0; i < selection->exprs.size() - 1; ++i) {
         const auto parent = selection->exprs[i];
@@ -785,6 +816,9 @@ void LgsCodeGen::visitSelection(LgsSelection* selection) {
         }
     }
     selection->IRValue = selection->lastExpr()->IRValue;
+    if (assign && selection->type->asNullable()) {
+        selection->IRValue = getNullableValue(selection);
+    }
 }
 
 void LgsCodeGen::visitFieldSelection(LgsVariable* var, LgsExpr* parent) const {
@@ -938,7 +972,7 @@ void LgsCodeGen::visitInstance(LgsInstance* instance) {
             }
         }
         visitField(field);
-        visitExpr(field->expr);
+        visitExpr(field->expr, true);
         if (field->expr->IRValue == field->IRValue) continue;
         cg.builder.CreateStore(field->expr->IRValue, field->IRValue);
     }
@@ -961,14 +995,15 @@ void LgsCodeGen::visitIterIndex(LgsIterIndex* iterIndex, const bool assign) {
 }
 
 void LgsCodeGen::visitNullableExpr(LgsNullableExpr* expr, const bool assign) {
+    visitExpr(expr->baseExpr);
     if (expr->destPtrValue) {
         expr->IRValue = expr->destPtrValue;
-    } else {
-        const auto nullStruct = expr->type->getIRType(cg);
-        expr->IRValue = cg.builder.CreateAlloca(nullStruct);
     }
-    if (expr->isNull) expr->store(cg, nullptr, false);
-    else expr->store(cg, getIRValue(expr->baseExpr), true);
+    if (assign) {
+        initNullableExpr(expr);
+    } else {
+        expr->IRValue = getNullableValue(expr);
+    }
 }
 
 void LgsCodeGen::visitJson(LgsJson* json) {

@@ -1,4 +1,5 @@
 #pragma once
+#include "LgsDefinitions.h"
 #include "data/LgsErrors.h"
 
 enum LgsTokenType {
@@ -137,7 +138,7 @@ const std::unordered_map<std::string, LgsTokenType> LGS_KEYWORDS = {
     {".set", T_SET},
     {"true", T_BOOL},
     {"false", T_BOOL},
-    {"null", T_NULL}
+    {LGS_NULL_LITERAL, T_NULL}
 };
 
 struct LgsToken {
