@@ -503,10 +503,10 @@ void LgsSema::visitExpr(LgsExpr*& expr) {
         else if (const auto prefixExpr = expr->asPrefixExpr()) visitPrefixExpr(prefixExpr);
         else if (const auto forVar = expr->asLoopMetaVar()) visitLoopMetaVar(forVar);
         else if (const auto vecExpr = expr->asVectorExpr()) visitVectorExpr(vecExpr);
-        else if (const auto null = expr->asNullableExpr()) visitNullableExpr(null);
+        else if (const auto null = expr->asNullableExpr()) visitExpr(null->baseExpr);
         else if (const auto castExpr = expr->asCast()) visitCast(castExpr);
         else if (const auto json = expr->asJson()) visitJson(json);
-        if (expr->type->asNullable()) {
+        if (expr->type->asNullable() && !expr->asNullableExpr()) {
             const auto nullableExpr = new LgsNullableExpr(expr);
             nullableExpr->location = expr->location;
             expr = nullableExpr;
@@ -826,7 +826,7 @@ void LgsSema::visitFuncCall(LgsFuncCall* funcCall) {
     }
     for (size_t i = ft->isMethod; i < ft->params.size(); ++i) {
         if (i >= funcCall->args.size()) break;
-        auto arg = funcCall->args[i];
+        auto& arg = funcCall->args[i];
         const auto& param = ft->params[i];
         arg->completeType(param.type);
         visitExpr(arg);
@@ -903,13 +903,6 @@ void LgsSema::visitJson(const LgsJson* json) {
         visitArrayExpr(arr);
     } else if (const auto strConst = json->strConst) {
         visitStrConst(strConst);
-    }
-}
-
-void LgsSema::visitNullableExpr(LgsNullableExpr* nullableExpr) {
-    visitExpr(nullableExpr->baseExpr);
-    if (!nullableExpr->type->asNullable()) {
-        nullableExpr->type = new LgsNullable(nullableExpr->type);
     }
 }
 

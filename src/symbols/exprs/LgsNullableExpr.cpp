@@ -25,6 +25,11 @@ void LgsNullableExpr::store(LgsLLVMGen& cg, Value* value, const bool isSet) cons
     }
 }
 
+void LgsNullableExpr::assign(LgsLLVMGen& cg, LgsExpr* expr) {
+    if (isNull) store(cg, nullptr, false);
+    else store(cg, expr->IRValue, true);
+}
+
 LgsNullableExpr::~LgsNullableExpr() {
     freeType(type);
     type = nullptr;

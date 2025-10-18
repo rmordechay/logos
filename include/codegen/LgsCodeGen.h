@@ -105,6 +105,7 @@ public:
     void visitVectorExpr(LgsVectorExpr* vectorExpr);
     void visitVariable(LgsVariable* variable);
     void visitSelection(LgsSelection* selection);
+    void visitFieldSelection(LgsVariable* var, LgsExpr* parent) const;
     void visitFuncCall(LgsFuncCall* funcCall);
     void visitIterFunc(const LgsFuncCall* funcCall);
     void visitPrefixExpr(LgsPrefixExpr* prefixExpr);
@@ -126,9 +127,6 @@ public:
     Value* getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) const;
     Type* getThunkCtxType(const LgsFuncCall* fc) const;
     Function* getThunkFunc(const LgsFuncCall* fc, Type* ctxTy) const;
-
-    // If stmt
-    void generateIf(Value* cond, const std::function<void()>& blockStmtCb) const;
 
     // Iterables
     void setStaticArray(LgsArrayExpr* arrayExpr);

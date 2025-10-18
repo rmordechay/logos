@@ -2,7 +2,7 @@
 #include "utils/LgsUtils.h"
 #include <external/doctest.h>
 
-TEST_CASE("Parser10011B") {
+TEST_CASE("ParserError10011B") {
     LgsApp app;
     const auto code = R"(
     func() {}
@@ -16,7 +16,7 @@ TEST_CASE("Parser10011B") {
     }
 }
 
-TEST_CASE("ParserError10033A") {
+TEST_CASE("ParserErrorError10033A") {
     LgsApp app;
     const auto code = R"(
         object obj
@@ -27,7 +27,7 @@ TEST_CASE("ParserError10033A") {
     CHECK_EQ(app.errHandler.errors[0].errCode, E10033.code);
 }
 
-TEST_CASE("Parser10033B") {
+TEST_CASE("ParserError10033B") {
     LgsApp app;
     const auto code = R"(
         interface inter
@@ -38,7 +38,7 @@ TEST_CASE("Parser10033B") {
     CHECK_EQ(app.errHandler.errors[0].errCode, E10033.code);
 }
 
-TEST_CASE("Parser10033C") {
+TEST_CASE("ParserError10033C") {
     LgsApp app;
     const auto code = R"(
         interface inter {}
@@ -49,4 +49,23 @@ TEST_CASE("Parser10033C") {
     CHECK_EQ(app.errHandler.errors.size(), 2);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10033.code);
     CHECK_EQ(app.errHandler.errors[1].errCode, E10033.code);
+}
+
+TEST_CASE("ParserError10054") {
+    LgsApp app;
+    const auto code = R"(
+    object Obj {
+        x: Int?
+        y: Float
+        z: Str
+    }
+    main() {
+        obj1 = Obj{x = 2, z = "Test", z = 3.23}
+    }
+    )";
+    app.loadSrcFile(code, "Main.lgs");
+    CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10054, code));
+    if (app.errHandler.errors.size() > 0) {
+        CHECK_EQ(app.errHandler.errors[0].errCode, E10054.code);
+    }
 }

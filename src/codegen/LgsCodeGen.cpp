@@ -768,43 +768,7 @@ void LgsCodeGen::visitSelection(LgsSelection* selection) {
         const auto parent = selection->exprs[i];
         const auto child = selection->exprs[i + 1];
         if (const auto var = child->asVariable()) {
-            if (var->ref.symbolType == FUNC) {
-                child->IRValue = var->ref.func->getIRFunc(cg);
-                continue;
-            }
-            const auto field = parent->type->getField(var->name);
-            if (parent->asTypeExpr()) {
-                const auto object = parent->type->asObject();
-                if (object && object->singleton) {
-                    field->parentIRValue = object->singleton->IRValue;
-                    field->parentIRType = object->getIRType(cg);
-                    visitField(field);
-                    child->IRValue = field->IRValue;
-                    continue;
-                }
-            }
-            field->parentIRValue = parent->IRValue;
-            field->parentIRType = parent->type->getIRType(cg);
-            visitField(field);
-            if (const auto nullable = field->type->asNullable()) {
-                const auto isSet = nullable->isSetIR(cg, field->IRValue);
-                const auto trueBlock = cg.createBlock("is_set");
-                const auto falseBlock = cg.createBlock("is_not_set");
-                const auto exitBlock = cg.createBlock("exit_null_check");
-                cg.builder.CreateCondBr(isSet, trueBlock, falseBlock);
-                cg.startBlock(trueBlock);
-                child->IRValue = nullable->getValue(cg, field->IRValue);
-                cg.printStr("isSet");
-                cg.builder.CreateBr(exitBlock);
-                cg.startBlock(falseBlock);
-                cg.printStr("isNotSet");
-                child->IRValue = cg.null();
-                cg.branchAndStartBlock(exitBlock);
-            } else if (field->type->asObject()) {
-                child->IRValue = cg.builder.CreateLoad(cg.ptrTy(), field->IRValue);
-            } else {
-                child->IRValue = field->IRValue;
-            }
+            visitFieldSelection(var, parent);
         } else if (const auto methodCall = child->asFuncCall()) {
             const bool isTest = stack.currentFunc()->isTest && parent->type->getName() == LgsTest::name && methodCall->name == "mock";
             if (isTest) continue;
@@ -822,6 +786,32 @@ void LgsCodeGen::visitSelection(LgsSelection* selection) {
         }
     }
     selection->IRValue = selection->lastExpr()->IRValue;
+}
+
+void LgsCodeGen::visitFieldSelection(LgsVariable* var, LgsExpr* parent) const {
+    if (var->ref.symbolType == FUNC) {
+        var->IRValue = var->ref.func->getIRFunc(cg);
+        return;
+    }
+    const auto field = parent->type->getField(var->name);
+    if (parent->asTypeExpr()) {
+        const auto object = parent->type->asObject();
+        if (object && object->singleton) {
+            field->parentIRValue = object->singleton->IRValue;
+            field->parentIRType = object->getIRType(cg);
+            visitField(field);
+            var->IRValue = field->IRValue;
+            return;
+        }
+    }
+    field->parentIRValue = parent->IRValue;
+    field->parentIRType = parent->type->getIRType(cg);
+    visitField(field);
+    if (field->type->asObject()) {
+        var->IRValue = cg.builder.CreateLoad(cg.ptrTy(), field->IRValue);
+    } else {
+        var->IRValue = field->IRValue;
+    }
 }
 
 void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
@@ -1005,14 +995,8 @@ void LgsCodeGen::visitNullableExpr(LgsNullableExpr* expr) {
         const auto nullStruct = expr->type->getIRType(cg);
         expr->IRValue = cg.builder.CreateAlloca(nullStruct);
     }
-
-    if (expr->isNull) {
-        expr->store(cg, nullptr, false);
-    } else {
-        const auto baseType = expr->baseExpr;
-        visitExpr(baseType);
-        expr->store(cg, baseType->IRValue, true);
-    }
+    if (expr->isNull) expr->store(cg, nullptr, false);
+    else expr->store(cg, getIRValue(expr->baseExpr), true);
 }
 
 void LgsCodeGen::resolveVirtuals(LgsInstance* instance) const {

@@ -26,7 +26,6 @@ bool LgsFuncCall::equals(const LgsFuncType* other) const {
         const auto argType = arg->type;
         const auto paramType = param.type;
         if (!paramType || !argType) return false;
-        if (arg->asNullableExpr() && !paramType->asNullable()) return false;
         if (!argType->canCastTo(paramType)) return false;
     }
     return true;

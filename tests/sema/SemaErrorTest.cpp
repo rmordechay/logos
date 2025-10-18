@@ -3,7 +3,7 @@
 #include "logos/LgsApp.h"
 #include "utils/LgsUtils.h"
 
-TEST_CASE("Sema10000") {
+TEST_CASE("SemaError10000") {
     LgsApp app;
     const auto code = R"(
     func() {}
@@ -17,7 +17,7 @@ TEST_CASE("Sema10000") {
     }
 }
 
-TEST_CASE("Sema10001A") {
+TEST_CASE("SemaError10001A") {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -33,7 +33,7 @@ TEST_CASE("Sema10001A") {
     }
 }
 
-TEST_CASE("Sema10002A") {
+TEST_CASE("SemaError10002A") {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -50,7 +50,7 @@ TEST_CASE("Sema10002A") {
     }
 }
 
-TEST_CASE("Sema10002B") {
+TEST_CASE("SemaError10002B") {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -67,7 +67,7 @@ TEST_CASE("Sema10002B") {
     }
 }
 
-TEST_CASE("Sema10003") {
+TEST_CASE("SemaError10003") {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -84,7 +84,7 @@ TEST_CASE("Sema10003") {
     }
 }
 
-TEST_CASE("Sema10004") {
+TEST_CASE("SemaError10004") {
     LgsApp app;
     const auto code = R"(
     f(): Int {
@@ -101,7 +101,7 @@ TEST_CASE("Sema10004") {
     }
 }
 
-TEST_CASE("Sema10005A") {
+TEST_CASE("SemaError10005A") {
     LgsApp app;
     const auto code = R"(
     object Obj {
@@ -121,7 +121,7 @@ TEST_CASE("Sema10005A") {
     }
 }
 
-TEST_CASE("Sema10005B") {
+TEST_CASE("SemaError10005B") {
     LgsApp app;
     const auto code = R"(
     object Obj {
@@ -140,7 +140,7 @@ TEST_CASE("Sema10005B") {
     }
 }
 
-TEST_CASE("Sema10006A") {
+TEST_CASE("SemaError10006A") {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -156,7 +156,7 @@ TEST_CASE("Sema10006A") {
     }
 }
 
-TEST_CASE("Sema10006B") {
+TEST_CASE("SemaError10006B") {
     LgsApp app;
     const auto code = R"(
     enum Enum {
@@ -181,7 +181,7 @@ TEST_CASE("Sema10006B") {
     }
 }
 
-TEST_CASE("Sema10011A") {
+TEST_CASE("SemaError10011A") {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -198,7 +198,7 @@ TEST_CASE("Sema10011A") {
     }
 }
 
-TEST_CASE("Sema10013A") {
+TEST_CASE("SemaError10013A") {
     LgsApp app;
     const auto code = R"(
     object Obj {a: Int}
@@ -216,7 +216,7 @@ TEST_CASE("Sema10013A") {
     }
 }
 
-TEST_CASE("Sema10013B") {
+TEST_CASE("SemaError10013B") {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -233,7 +233,7 @@ TEST_CASE("Sema10013B") {
     }
 }
 
-TEST_CASE("Sema10014") {
+TEST_CASE("SemaError10014") {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -251,7 +251,7 @@ TEST_CASE("Sema10014") {
     }
 }
 
-TEST_CASE("Sema10015A") {
+TEST_CASE("SemaError10015A") {
     LgsApp app;
     const auto code = R"(
     func(a: Int) { }
@@ -268,7 +268,7 @@ TEST_CASE("Sema10015A") {
     }
 }
 
-TEST_CASE("Sema10015B") {
+TEST_CASE("SemaError10015B") {
     LgsApp app;
     const auto code = R"(
     object Obj1 {
@@ -295,7 +295,7 @@ TEST_CASE("Sema10015B") {
     }
 }
 
-TEST_CASE("Sema10016A") {
+TEST_CASE("SemaError10016A") {
     LgsApp app;
     const auto code = R"(
     interface Interface {
@@ -316,7 +316,7 @@ TEST_CASE("Sema10016A") {
     }
 }
 
-TEST_CASE("Sema10016B") {
+TEST_CASE("SemaError10016B") {
     LgsApp app;
     const auto code = R"(
     interface Type {
@@ -338,7 +338,7 @@ TEST_CASE("Sema10016B") {
     }
 }
 
-TEST_CASE("Sema10017") {
+TEST_CASE("SemaError10017") {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -354,7 +354,7 @@ TEST_CASE("Sema10017") {
     }
 }
 
-TEST_CASE("Sema10018") {
+TEST_CASE("SemaError10018") {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -370,7 +370,7 @@ TEST_CASE("Sema10018") {
     }
 }
 
-TEST_CASE("Sema10021") {
+TEST_CASE("SemaError10021") {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -386,7 +386,7 @@ TEST_CASE("Sema10021") {
     }
 }
 
-TEST_CASE("Sema10022") {
+TEST_CASE("SemaError10022") {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -403,7 +403,7 @@ TEST_CASE("Sema10022") {
     }
 }
 
-TEST_CASE("Sema10023") {
+TEST_CASE("SemaError10023") {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -419,7 +419,7 @@ TEST_CASE("Sema10023") {
     }
 }
 
-TEST_CASE("Sema10024") {
+TEST_CASE("SemaError10024") {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -435,7 +435,7 @@ TEST_CASE("Sema10024") {
     }
 }
 
-TEST_CASE("Sema10025") {
+TEST_CASE("SemaError10025") {
     LgsApp app;
     const auto code = R"(
     object Obj {
@@ -452,7 +452,7 @@ TEST_CASE("Sema10025") {
     }
 }
 
-TEST_CASE("Sema10026") {
+TEST_CASE("SemaError10026") {
     LgsApp app;
     const auto code = R"(
     func(): Int { return }
@@ -467,7 +467,7 @@ TEST_CASE("Sema10026") {
     }
 }
 
-TEST_CASE("Sema10027") {
+TEST_CASE("SemaError10027") {
     LgsApp app;
     const auto code = R"(
     fun(): Int { return 2 }
@@ -485,7 +485,7 @@ TEST_CASE("Sema10027") {
     }
 }
 
-TEST_CASE("Sema10028") {
+TEST_CASE("SemaError10028") {
     LgsApp app;
     const auto code = R"(
     func(x: Int = 23, y: Str) { }
@@ -500,7 +500,7 @@ TEST_CASE("Sema10028") {
     }
 }
 
-TEST_CASE("Sema10030A") {
+TEST_CASE("SemaError10030A") {
     LgsApp app;
     const auto code1 = R"(
     object Obj
@@ -523,7 +523,7 @@ TEST_CASE("Sema10030A") {
     }
 }
 
-TEST_CASE("Sema10030B") {
+TEST_CASE("SemaError10030B") {
     LgsApp app;
     const auto code1 = R"(
     object Obj
@@ -545,7 +545,7 @@ TEST_CASE("Sema10030B") {
     }
 }
 
-TEST_CASE("Sema10031") {
+TEST_CASE("SemaError10031") {
     LgsApp app;
     const auto code1 = R"(
     object Obj
@@ -568,7 +568,7 @@ TEST_CASE("Sema10031") {
     }
 }
 
-TEST_CASE("Sema10032") {
+TEST_CASE("SemaError10032") {
     LgsApp app;
     const auto code = R"(
     single Obj {
@@ -587,7 +587,7 @@ TEST_CASE("Sema10032") {
     }
 }
 
-TEST_CASE("Sema10038") {
+TEST_CASE("SemaError10038") {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -603,7 +603,7 @@ TEST_CASE("Sema10038") {
     }
 }
 
-TEST_CASE("Sema10042") {
+TEST_CASE("SemaError10042") {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -620,7 +620,7 @@ TEST_CASE("Sema10042") {
     }
 }
 
-TEST_CASE("Sema10046") {
+TEST_CASE("SemaError10046") {
     LgsApp app;
     const auto code = R"(
     object Obj {
@@ -639,7 +639,7 @@ TEST_CASE("Sema10046") {
     }
 }
 
-TEST_CASE("Sema10055") {
+TEST_CASE("SemaError10055") {
     LgsApp app;
     const auto code = R"(
     f(): Int {}
@@ -654,7 +654,7 @@ TEST_CASE("Sema10055") {
     }
 }
 
-TEST_CASE("Sema10056A") {
+TEST_CASE("SemaError10056A") {
     LgsApp app;
     const auto code = R"(
     object Obj {
@@ -672,7 +672,7 @@ TEST_CASE("Sema10056A") {
     }
 }
 
-TEST_CASE("Sema10056B") {
+TEST_CASE("SemaError10056B") {
     LgsApp app;
     const auto code = R"(
     object Obj {
@@ -690,7 +690,7 @@ TEST_CASE("Sema10056B") {
     }
 }
 
-TEST_CASE("Sema10059") {
+TEST_CASE("SemaError10059") {
     LgsApp app;
     const auto code = R"(
     func(): Int {
@@ -716,7 +716,7 @@ TEST_CASE("Sema10059") {
     CHECK_EQ(app.errHandler.errors[1].errCode, E10059.code);
 }
 
-TEST_CASE("Sema10066") {
+TEST_CASE("SemaError10066") {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -735,7 +735,7 @@ TEST_CASE("Sema10066") {
     }
 }
 
-TEST_CASE("Sema10076") {
+TEST_CASE("SemaError10076") {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -756,7 +756,7 @@ TEST_CASE("Sema10076") {
     }
 }
 
-TEST_CASE("Sema10089") {
+TEST_CASE("SemaError10089") {
     LgsApp app;
     const auto code = R"(
     object Singleton {
@@ -775,7 +775,7 @@ TEST_CASE("Sema10089") {
     }
 }
 
-TEST_CASE("Sema10092") {
+TEST_CASE("SemaError10092") {
     LgsApp app;
     const auto code = R"(
     main() {

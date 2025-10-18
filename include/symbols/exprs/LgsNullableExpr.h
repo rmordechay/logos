@@ -23,7 +23,8 @@ public:
     }
     std::string asText() override;
     void completeType(LgsType* toType) override;
-    void store(LgsLLVMGen& cg, Value* value, const bool isSet) const;
+    void store(LgsLLVMGen& cg, Value* value, bool isSet) const;
+    void assign(LgsLLVMGen& cg, LgsExpr* expr) override;
     ~LgsNullableExpr() override;
 };
 

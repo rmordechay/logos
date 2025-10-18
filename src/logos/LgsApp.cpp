@@ -239,6 +239,7 @@ void LgsApp::exitWithErrors() const {
             secondPart = LGS_PADDING_SIZE;
         }
         errMsg += std::string(secondPart, '~');
+        errMsg += err.msg;
         const auto atPath = "\n   at: " + fullPath;
         logInfo(LGS_ERROR_STR + errMsg);
         logInfo(atPath);
