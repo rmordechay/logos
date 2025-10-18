@@ -115,13 +115,6 @@ void LgsLLVMGen::createBoundsGuard(Value* len, Value* index) {
     branchAndStartBlock(validBlock);
 }
 
-Value* LgsLLVMGen::getIRPtr(Value* v) {
-    if (v->getType()->isPointerTy()) return v;
-    const auto ptr = builder.CreateAlloca(v->getType());
-    builder.CreateStore(v, ptr);
-    return ptr;
-}
-
 FunctionType* LgsLLVMGen::getFT(Type* rt, const std::vector<Type*>& params, const bool isVariadic) {
     return FunctionType::get(rt, params, isVariadic);
 }
@@ -155,9 +148,10 @@ Value* LgsLLVMGen::getPtr(Value* v) {
         return v;
     }
     if (v->getType()->isPointerTy()) return v;
-    const auto ptr = builder.CreateAlloca(v->getType());
-    builder.CreateStore(v, ptr);
-    return ptr;
+    if (v->getType()->isIntegerTy()) {
+        return builder.CreateIntToPtr(v, ptrTy());
+    }
+    assert(0);
 }
 
 Value* LgsLLVMGen::callHash(Value* v) {
@@ -318,15 +312,6 @@ void LgsLLVMGen::printPtr(Value* ptr, const std::string& text) {
 void LgsLLVMGen::printInt(Value* number, const std::string& text) {
     if (text != "") printStr(text);
     callPrintf({getIRStr("%d\n"), number});
-}
-
-void LgsLLVMGen::generateIf(Value* cond, const std::function<void()>& blockStmtCb) {
-    const auto IRBlockIfTrue = createBlock(BLOCK_NAME_IF_TRUE);
-    const auto IRBlockIfFalse = createBlock(BLOCK_NAME_IF_FALSE);
-    builder.CreateCondBr(cond, IRBlockIfTrue, IRBlockIfFalse);
-    startBlock(IRBlockIfTrue);
-    blockStmtCb();
-    branchAndStartBlock(IRBlockIfFalse);
 }
 
 void LgsLLVMGen::finalizeDebugger() {

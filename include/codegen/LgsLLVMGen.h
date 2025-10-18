@@ -39,7 +39,6 @@ public:
     void branchAndStartBlock(BasicBlock* block);
     bool lastInstTerminator() const;
     void createBoundsGuard(Value* len, Value* index);
-    Value* getIRPtr(Value* v);
 
     // Funcs
     static FunctionType* getFT(Type* rt, const std::vector<Type*>& params = {}, bool isVariadic = false);
@@ -96,7 +95,6 @@ public:
     void printPtr(Value* ptr, const std::string& text = "");
     void printInt(Value* number, const std::string& text = "");
 
-    void generateIf(Value* cond, const std::function<void()>& blockStmtCb);
     void finalizeDebugger();
     static void initLLVM();
     static TargetMachine* getTargetMachine();

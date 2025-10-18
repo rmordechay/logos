@@ -9,8 +9,7 @@ void LgsErrHandler::setUnsuccessful() {
 
 void LgsErrHandler::addError(const LgsBaseError& lgsErr, const LgsLocation* location, const std::vector<std::string>& args) {
     setUnsuccessful();
-    const auto result = LGS_ERROR_PADDING + formatErrorMsg(lgsErr.msg, args);
-    LgsError err{.msg = result, .errCode = lgsErr.code};
+    LgsError err{.msg = formatErrorMsg(lgsErr.msg, args), .errCode = lgsErr.code};
     if (location) {
         err.location = *location;
         errors.emplace_back(err);

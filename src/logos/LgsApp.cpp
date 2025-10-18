@@ -217,30 +217,20 @@ void LgsApp::writeIRFiles() {
 void LgsApp::exitWithErrors() const {
     for (int i = 0; i < errHandler.errors.size(); ++i) {
         const auto err = errHandler.errors[i];
-        const auto column = err.location.columnStart;
-        const auto line = err.location.lineStart;
         const auto filePath = filePaths.find(err.location.fileID);
         assert(filePath != filePaths.end());
-        const auto fullPath = getFullPath(err.location, filePath->second);
-        auto lineStr = getLine(filePath->second.string(), line);
-        const auto firstNonSpace = std::find_if(lineStr.begin(), lineStr.end(), [](const unsigned char c) { return !std::isspace(c); });
-        const auto trimmedCount = std::distance(lineStr.begin(), firstNonSpace);
-        auto errMsg = lineStr.substr(trimmedCount);
-        auto firstPart = column - LGS_PADDING_SIZE + 1;
-        if (firstPart <= 0) {
-            firstPart = LGS_PADDING_SIZE;
-        }
-        errMsg += LGS_ERROR_PADDING + std::string(firstPart, '~');
+        const auto column = err.location.columnStart;
+        const auto line = err.location.lineStart;
+        const auto rawLine = getLine(filePath->second.string(), line);
+        const auto firstNonSpace = std::find_if(rawLine.begin(), rawLine.end(), [](const unsigned char c) { return !std::isspace(c); });
+        const auto trimmedCount = std::distance(rawLine.begin(), firstNonSpace);
+        auto errMsg = trim(rawLine);
+        errMsg += LGS_ERROR_PADDING + std::string(column - trimmedCount - 2, '~');
         errMsg += '^';
-        auto secondPart = lineStr.size() - column + 1;
-        if (secondPart <= 0) {
-            secondPart = LGS_PADDING_SIZE;
-        }
-        errMsg += std::string(secondPart, '~');
-        errMsg += err.msg;
-        const auto atPath = "\n   at: " + fullPath;
+        errMsg += std::string(rawLine.size() - column + 1, '~');
+        errMsg += LGS_ERROR_PADDING + err.msg;
+        errMsg += "\n   at: " + getFullPath(err.location, filePath->second);
         logInfo(LGS_ERROR_STR + errMsg);
-        logInfo(atPath);
         if (i != errHandler.errors.size() - 1) logInfo(LGS_MSG_LINE_SEPERATOR);
     }
     if (!errHandler.errors.empty()) logInfo("\n");

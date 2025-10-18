@@ -116,8 +116,7 @@ public:
     void visitNull(LgsNull* null) const;
     void visitJson(LgsJson* json);
 
-    Value* getNullableValue(const LgsExpr* expr) const;
-    void initNullableExpr(LgsExpr* expr) const;
+    void setNullableValue(LgsExpr* expr);
     void resolveVirtuals(LgsInstance* instance) const;
     bool checkMock(LgsExpr* expr);
     void yield() const;

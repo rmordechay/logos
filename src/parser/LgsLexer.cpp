@@ -38,7 +38,7 @@ LgsToken LgsLexer::nextToken() {
 
     // Dot, range or spread
     if (currentChar == '.') {
-        if (std::isdigit(peek())) return scanNumber();
+        if (std::isdigit(peek())) return scanNumber(location);
         advance();
         if (currentChar == '.') {
             if (advance() == '.') {
@@ -52,15 +52,15 @@ LgsToken LgsLexer::nextToken() {
 
     // Number
     if (std::isdigit(currentChar)) {
-        return scanNumber();
+        return scanNumber(location);
     }
     if (currentChar == '-' && std::isdigit(peek())) {
-        return scanNumber();
+        return scanNumber(location);
     }
 
     // Var or keyword
     if (std::isalpha(currentChar)) {
-        return scanVarOrKeyword();
+        return scanVarOrKeyword(location);
     }
 
     // String
@@ -126,7 +126,7 @@ LgsToken LgsLexer::nextToken() {
         if (std::isalpha(peek(-1))) {
             position--;
             column--;
-            return scanVarOrKeyword();
+            return scanVarOrKeyword(location);
         }
         return {T_IDENTIFIER, "_", location};
     case '/':
@@ -184,8 +184,7 @@ char LgsLexer::peek(const size_t offset) const {
     return source[position + offset];
 }
 
-LgsToken LgsLexer::scanVarOrKeyword() {
-    LgsLocation location{fileID, position, line, column};
+LgsToken LgsLexer::scanVarOrKeyword(LgsLocation& location) {
     std::string lexeme;
     while (std::isalnum(currentChar) || currentChar == '_') {
         lexeme += currentChar;
@@ -236,8 +235,7 @@ std::string LgsLexer::scanString() {
     return result;
 }
 
-LgsToken LgsLexer::scanNumber() {
-    LgsLocation location{fileID, position, line, column};
+LgsToken LgsLexer::scanNumber(LgsLocation& location) {
     std::string lexeme;
     if (currentChar == '-') {
         lexeme += currentChar;
@@ -290,9 +288,4 @@ void LgsLexer::skipBlockComment() {
         }
         advance();
     }
-}
-
-void LgsLexer::addLexingError() {
-    const LgsLocation location = {fileID, position, line, column};
-    errHandler.addError(E10087, &location);
 }

@@ -143,6 +143,8 @@ set(RUNTIME_SOURCES
     ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_print.cpp
     ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_arena.cpp
     ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_set.cpp
+    include/analysis/LgsLinter.h
+    src/analysis/LgsLinter.cpp
 )
 
 add_library(lgs_lib SHARED ${CORE_SOURCES} ${RUNTIME_SOURCES})

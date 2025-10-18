@@ -733,15 +733,9 @@ void LgsCodeGen::visitVariable(LgsVariable* variable, const bool assign) {
     switch (variable->ref.symbolType) {
     case VAR_DEC:
         variable->IRValue = variable->ref.varDec->IRValue;
-        if (assign && variable->type->asNullable()) {
-            variable->IRValue = getNullableValue(variable);
-        }
         break;
     case PARAM:
         variable->IRValue = variable->ref.param->IRValue;
-        if (assign && variable->type->asNullable()) {
-            variable->IRValue = getNullableValue(variable);
-        }
         break;
     case FUNC:
         variable->IRValue = variable->ref.func->getIRFunc(cg);
@@ -755,9 +749,6 @@ void LgsCodeGen::visitVariable(LgsVariable* variable, const bool assign) {
             variable->IRValue = cg.getIRStr(variable->name);
         } else {
             variable->IRValue = variable->ref.field->IRValue;
-            if (assign && variable->type->asNullable()) {
-                variable->IRValue = getNullableValue(variable);
-            }
         }
         break;
     case INTERFACE:
@@ -793,7 +784,7 @@ void LgsCodeGen::visitSelection(LgsSelection* selection, const bool assign) {
     }
     selection->IRValue = selection->lastExpr()->IRValue;
     if (assign && selection->type->asNullable()) {
-        selection->IRValue = getNullableValue(selection);
+        setNullableValue(selection);
     }
 }
 
@@ -1001,28 +992,13 @@ void LgsCodeGen::visitJson(LgsJson* json) {
     }
 }
 
-Value* LgsCodeGen::getNullableValue(const LgsExpr* expr) const {
-    const auto nullable = expr->type->asNullable();
-    const auto isSet = cg.builder.CreateLoad(cg.i1Ty(), nullable->isSetField);
-    const auto v = cg.builder.CreateLoad(nullable->baseType->getIRType(cg), nullable->valueField);
-    return cg.builder.CreateSelect(isSet, v, cg.i32Zero());
-}
-
-void LgsCodeGen::initNullableExpr(LgsExpr* expr) const {
-    const auto type = expr->type->asNullable();
-    const auto nullStruct = type->getIRType(cg);
-    if (!type->isSetField) {
-        type->isSetField = cg.builder.CreateStructGEP(expr->type->getIRType(cg), expr->IRValue, 1);
+void LgsCodeGen::setNullableValue(LgsExpr* expr) {
+    if (const auto var = expr->asVariable()) {
+        visitVariable(var);
     }
-    if (expr->asNull()) {
-        cg.builder.CreateStore(cg.true_(), type->isSetField);
-    } else {
-        cg.builder.CreateStore(cg.true_(), type->isSetField);
-        if (!type->valueField) {
-            type->valueField = cg.builder.CreateStructGEP(nullStruct, expr->IRValue, 0);
-        }
-        cg.builder.CreateStore(expr->IRValue, type->valueField);
-    }
+    // const auto nullable = expr->type->asNullable();
+    // const auto ty = nullable->baseType->getIRType(cg);
+    // expr->IRValue = cg.builder.CreateLoad(ty, nullable->valueField);
 }
 
 void LgsCodeGen::resolveVirtuals(LgsInstance* instance) const {

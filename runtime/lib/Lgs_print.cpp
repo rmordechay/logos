@@ -18,34 +18,18 @@ std::string formatElement(const Lgs_rttype type, void* elem) {
         oss << *static_cast<const char*>(elem);
         break;
     case RTT_BOOL:
-        oss << (*static_cast<const uint8_t*>(elem) ? LgsBool::trueLiteral : LgsBool::falseLiteral);
+        oss << (reinterpret_cast<intptr_t>(elem) ? LgsBool::trueLiteral : LgsBool::falseLiteral);
         break;
     case RTT_BYTE:
-        oss << *static_cast<const int8_t*>(elem);
-        break;
     case RTT_SHORT:
-        oss << *static_cast<const int16_t*>(elem);
-        break;
     case RTT_INT:
-        oss << *static_cast<const int32_t*>(elem);
-        break;
     case RTT_LONG:
-        oss << *static_cast<const int64_t*>(elem);
-        break;
     case RTT_SIZE:
-        oss << *static_cast<const size_t*>(elem);
-        break;
     case RTT_UBYTE:
-        oss << *static_cast<const uint8_t*>(elem);
-        break;
     case RTT_USHORT:
-        oss << *static_cast<const uint16_t*>(elem);
-        break;
     case RTT_UINT:
-        oss << *static_cast<const uint32_t*>(elem);
-        break;
     case RTT_ULONG:
-        oss << *static_cast<const uint64_t*>(elem);
+        oss << reinterpret_cast<intptr_t>(elem);
         break;
     case RTT_FLOAT:
         oss << *static_cast<const float_t*>(elem);

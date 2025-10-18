@@ -19,11 +19,10 @@ public:
     char advance();
     bool match(char expected);
     char peek(size_t offset = 1) const;
-    LgsToken scanVarOrKeyword();
+    LgsToken scanVarOrKeyword(LgsLocation& location);
     std::string scanString();
-    LgsToken scanNumber();
+    LgsToken scanNumber(LgsLocation& location);
     void skipWhitespace();
     void skipLineComment();
     void skipBlockComment();
-    void addLexingError();
 };

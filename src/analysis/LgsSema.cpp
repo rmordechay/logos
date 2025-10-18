@@ -501,6 +501,9 @@ void LgsSema::visitExpr(LgsExpr*& expr) {
         else if (const auto vecExpr = expr->asVectorExpr()) visitVectorExpr(vecExpr);
         else if (const auto castExpr = expr->asCast()) visitCast(castExpr);
         else if (const auto json = expr->asJson()) visitJson(json);
+        if (expr->isNullable) {
+            expr->type = new LgsNullable(expr->type);
+        }
     }
 }
 
