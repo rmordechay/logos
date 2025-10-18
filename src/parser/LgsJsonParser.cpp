@@ -1,6 +1,6 @@
 #include "parser/LgsJsonParser.h"
 #include "exprs/LgsFuncCall.h"
-#include "exprs/LgsNullableExpr.h"
+#include "exprs/LgsNull.h"
 #include "exprs/LgsSelection.h"
 #include "exprs/LgsTernaryExpr.h"
 #include "exprs/LgsVariable.h"
@@ -296,7 +296,7 @@ void LgsJsonParser::visitExpr(LgsExpr*& expr) {
         if (const auto prefixExpr = expr->asPrefixExpr()) return visitPrefixExpr(prefixExpr);
         if (const auto forVar = expr->asLoopMetaVar()) return visitLoopMetaVar(forVar);
         if (const auto vecExpr = expr->asVectorExpr()) return visitVectorExpr(vecExpr);
-        if (const auto nullableExpr = expr->asNullableExpr()) return visitExpr(nullableExpr->baseExpr);
+        if (const auto null = expr->asNull()) return visitNull(null);
         if (const auto castExpr = expr->asCast()) return visitCast(castExpr);
         if (const auto jsonExpr = expr->asJson()) return visitJson(jsonExpr);
         assert(0);
@@ -401,6 +401,10 @@ void LgsJsonParser::visitJson(const LgsJson* jsonStmt) {
 }
 
 void LgsJsonParser::visitInstance(LgsInstance* instance) {
+    assert(0);
+}
+
+void LgsJsonParser::visitNull(LgsNull* null) {
     assert(0);
 }
 

@@ -1,7 +1,7 @@
 #include "types/LgsNullable.h"
 #include "codegen/LgsLLVMGen.h"
 #include "data/LgsDefinitions.h"
-#include "exprs/LgsNullableExpr.h"
+#include "exprs/LgsNull.h"
 #include "utils/LgsUtils.h"
 
 LgsField* LgsNullable::getField(const std::string& fieldName) {
@@ -18,10 +18,7 @@ Type* LgsNullable::getIRType(LgsLLVMGen& cg) {
 }
 
 LgsExpr* LgsNullable::getZeroValue() {
-    const auto nullableExpr = new LgsNullableExpr(nullptr);
-    nullableExpr->type = this;
-    nullableExpr->isNull = true;
-    return nullableExpr;
+    return new LgsNull();
 }
 
 Lgs_rttype LgsNullable::getRTType() {

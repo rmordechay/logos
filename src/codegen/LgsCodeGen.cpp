@@ -12,7 +12,7 @@
 #include "exprs/LgsInstance.h"
 #include "exprs/LgsIterIndex.h"
 #include "exprs/LgsJson.h"
-#include "exprs/LgsNullableExpr.h"
+#include "exprs/LgsNull.h"
 #include "exprs/LgsPostfixExpr.h"
 #include "exprs/LgsPrefixExpr.h"
 #include "exprs/LgsSelection.h"
@@ -567,7 +567,7 @@ void LgsCodeGen::visitExpr(LgsExpr* expr, const bool assign) {
         if (const auto intConst = expr->asIntConst()) return visitIntConst(intConst);
         if (const auto floatConst = expr->asFloatConst()) return visitFloatConst(floatConst);
         if (const auto loopMetaVar = expr->asLoopMetaVar()) return visitLoopMetaVar(loopMetaVar);
-        if (const auto null = expr->asNullableExpr()) return visitNullableExpr(null, assign);
+        if (const auto null = expr->asNull()) return visitNull(null);
         if (const auto cast = expr->asCast()) return visitCast(cast);
         if (const auto json = expr->asJson()) return visitJson(json);
         if (expr->asTypeExpr()) return;
@@ -766,30 +766,6 @@ void LgsCodeGen::visitVariable(LgsVariable* variable, const bool assign) {
         break;
     }
     assert(variable->IRValue);
-}
-
-Value* LgsCodeGen::getNullableValue(const LgsExpr* expr) const {
-    const auto nullable = expr->type->asNullable();
-    const auto isSet = cg.builder.CreateLoad(cg.i1Ty(), nullable->isSetField);
-    const auto v = cg.builder.CreateLoad(nullable->baseType->getIRType(cg), nullable->valueField);
-    return cg.builder.CreateSelect(isSet, v, cg.i32Zero());
-}
-
-void LgsCodeGen::initNullableExpr(const LgsNullableExpr* expr) const {
-    const auto nullStruct = expr->type->getIRType(cg);
-    const auto type = expr->nullableType;
-    if (!type->isSetField) {
-        type->isSetField = cg.builder.CreateStructGEP(expr->type->getIRType(cg), expr->IRValue, 1);
-    }
-    if (expr->isNull) {
-        cg.builder.CreateStore(cg.true_(), type->isSetField);
-    } else {
-        cg.builder.CreateStore(cg.true_(), type->isSetField);
-        if (!type->valueField) {
-            type->valueField = cg.builder.CreateStructGEP(nullStruct, expr->IRValue, 0);
-        }
-        cg.builder.CreateStore(expr->baseExpr->IRValue, type->valueField);
-    }
 }
 
 void LgsCodeGen::visitSelection(LgsSelection* selection, const bool assign) {
@@ -994,16 +970,8 @@ void LgsCodeGen::visitIterIndex(LgsIterIndex* iterIndex, const bool assign) {
     }
 }
 
-void LgsCodeGen::visitNullableExpr(LgsNullableExpr* expr, const bool assign) {
-    visitExpr(expr->baseExpr);
-    if (expr->destPtrValue) {
-        expr->IRValue = expr->destPtrValue;
-    }
-    if (assign) {
-        initNullableExpr(expr);
-    } else {
-        expr->IRValue = getNullableValue(expr);
-    }
+void LgsCodeGen::visitNull(LgsNull* null) const {
+    null->IRValue = cg.null();
 }
 
 void LgsCodeGen::visitJson(LgsJson* json) {
@@ -1030,6 +998,30 @@ void LgsCodeGen::visitJson(LgsJson* json) {
         json->null->destPtrValue = json->destPtrValue;
         null->IRValue = cg.null();
         json->IRValue = null->IRValue;
+    }
+}
+
+Value* LgsCodeGen::getNullableValue(const LgsExpr* expr) const {
+    const auto nullable = expr->type->asNullable();
+    const auto isSet = cg.builder.CreateLoad(cg.i1Ty(), nullable->isSetField);
+    const auto v = cg.builder.CreateLoad(nullable->baseType->getIRType(cg), nullable->valueField);
+    return cg.builder.CreateSelect(isSet, v, cg.i32Zero());
+}
+
+void LgsCodeGen::initNullableExpr(LgsExpr* expr) const {
+    const auto type = expr->type->asNullable();
+    const auto nullStruct = type->getIRType(cg);
+    if (!type->isSetField) {
+        type->isSetField = cg.builder.CreateStructGEP(expr->type->getIRType(cg), expr->IRValue, 1);
+    }
+    if (expr->asNull()) {
+        cg.builder.CreateStore(cg.true_(), type->isSetField);
+    } else {
+        cg.builder.CreateStore(cg.true_(), type->isSetField);
+        if (!type->valueField) {
+            type->valueField = cg.builder.CreateStructGEP(nullStruct, expr->IRValue, 0);
+        }
+        cg.builder.CreateStore(expr->IRValue, type->valueField);
     }
 }
 

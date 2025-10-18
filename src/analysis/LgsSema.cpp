@@ -17,7 +17,7 @@
 #include "types/LgsEnum.h"
 #include "exprs/LgsHashMap.h"
 #include "exprs/LgsJson.h"
-#include "exprs/LgsNullableExpr.h"
+#include "exprs/LgsNull.h"
 #include "exprs/LgsPostfixExpr.h"
 #include "exprs/LgsPrefixExpr.h"
 #include "exprs/LgsTernaryExpr.h"
@@ -276,7 +276,7 @@ void LgsSema::visitAssignment(LgsAssignment* assignment) {
         return errHandler.addError(E10051, &assignment->lValue->location, {assignment->lValue->asText()});
     }
     auto canAssign = false;
-    if (assignment->lValue->asIterIndex() || assignment->lValue->asVariable() || assignment->lValue->asNullableExpr()) {
+    if (assignment->lValue->asIterIndex() || assignment->lValue->asVariable() || assignment->lValue->asNull()) {
         canAssign = true;
     } else if (const auto selection = assignment->lValue->asSelection()) {
         const auto firstExpr = selection->exprs.front();
@@ -499,14 +499,8 @@ void LgsSema::visitExpr(LgsExpr*& expr) {
         else if (const auto prefixExpr = expr->asPrefixExpr()) visitPrefixExpr(prefixExpr);
         else if (const auto forVar = expr->asLoopMetaVar()) visitLoopMetaVar(forVar);
         else if (const auto vecExpr = expr->asVectorExpr()) visitVectorExpr(vecExpr);
-        else if (const auto nullableExpr = expr->asNullableExpr()) visitExpr(nullableExpr->baseExpr);
         else if (const auto castExpr = expr->asCast()) visitCast(castExpr);
         else if (const auto json = expr->asJson()) visitJson(json);
-        // if (expr->type->asNullable() && !expr->asNullableExpr()) {
-        //     const auto nullableExpr = new LgsNullableExpr(expr);
-        //     nullableExpr->location = expr->location;
-        //     expr = nullableExpr;
-        // }
     }
 }
 
@@ -1066,7 +1060,7 @@ void LgsSema::visitLoopMetaVar(LgsLoopMetaVar* metaVar) {
 }
 
 bool LgsSema::validateExprType(LgsExpr* expr, LgsType* type) {
-    if (expr->asNullableExpr()) {
+    if (expr->asNull()) {
         const auto nullable = type->asNullable();
         // null must have a type
         if (nullable && !nullable->baseType) {

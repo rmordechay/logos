@@ -73,7 +73,7 @@ set(CORE_SOURCES
     src/symbols/exprs/LgsVariable.cpp
     src/symbols/exprs/LgsVectorExpr.cpp
     src/symbols/exprs/LgsTypeExpr.cpp
-    src/symbols/exprs/LgsNullableExpr.cpp
+    src/symbols/exprs/LgsNull.cpp
     src/symbols/exprs/constants/LgsCharConst.cpp
     src/symbols/exprs/constants/LgsFloatConst.cpp
     src/symbols/exprs/constants/LgsIntConst.cpp

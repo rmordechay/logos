@@ -25,7 +25,7 @@
 #include "loops/LgsRangeLoop.h"
 #include "loops/LgsWhileLoop.h"
 #include "data/LgsTokens.h"
-#include "exprs/LgsNullableExpr.h"
+#include "exprs/LgsNull.h"
 #include "exprs/LgsTernaryExpr.h"
 #include "files/LgsConfigFile.h"
 #include "stmts/LgsBreak.h"
@@ -1017,7 +1017,7 @@ LgsExpr* LgsParser::parseUnary() {
     if (const auto postfixExpr = parsePostfixExpr(expr)) return postfixExpr;
 
     if (matchAndConsume(T_QUEST_MARK)) {
-        expr = new LgsNullableExpr(expr);
+        expr->isNullable = true;
     }
     return expr;
 }
@@ -1221,7 +1221,7 @@ LgsExpr* LgsParser::parseConstant() {
         break;
     }
     case T_NULL: {
-        constant = new LgsNullableExpr(nullptr);
+        constant = new LgsNull();
         break;
     }
     default:

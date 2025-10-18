@@ -2,7 +2,7 @@
 #include <stmts/LgsStmt.h>
 #include "LgsValue.h"
 
-class LgsNullableExpr;
+class LgsNull;
 class LgsJson;
 class LgsCast;
 class LgsTypeExpr;
@@ -50,6 +50,7 @@ public:
     bool isMutable = false;
     LgsValue* owner = nullptr;
     Value* destPtrValue = nullptr;
+    bool isNullable = false;
 
     explicit LgsExpr(LgsType* type = nullptr) : type(type) {}
     virtual LgsExpr* castTo(LgsType* toType, bool explicitCast = false);
@@ -64,7 +65,7 @@ public:
     int64_t getConstInt();
     std::string getConstStr();
     void setType(LgsType* newType);
-    LgsNullableExpr* asNullableExpr();
+    LgsNull* asNull();
     LgsFunc* asFunc();
     LgsVariable* asVariable();
     LgsPrefixExpr* asPrefixExpr();

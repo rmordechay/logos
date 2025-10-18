@@ -1,7 +1,7 @@
 #pragma once
 #include "LgsExpr.h"
 
-class LgsNullableExpr;
+class LgsNull;
 
 class LgsJson final : public LgsExpr {
 public:
@@ -10,6 +10,6 @@ public:
     LgsStrConst* strConst = nullptr;
     LgsIntConst* intConst = nullptr;
     LgsFloatConst* floatConst = nullptr;
-    LgsNullableExpr* null = nullptr;
+    LgsNull* null = nullptr;
     ~LgsJson() override = default;
 };

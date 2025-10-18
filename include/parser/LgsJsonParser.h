@@ -107,6 +107,7 @@ public:
     void visitTypeExpr(LgsTypeExpr* typeExpr);
     void visitJson(const LgsJson* jsonStmt);
     void visitInstance(LgsInstance* instance);
+    void visitNull(LgsNull* null);
     void visitIntConst(const LgsIntConst* intConst);
     void visitInterfaceInstance(LgsInstance* instance, LgsInterface* interface);
     void visitIterIndex(LgsIterIndex* iterIndex);

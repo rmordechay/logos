@@ -113,11 +113,11 @@ public:
     void visitStrConst(LgsStrConst* strConst);
     void visitInstance(LgsInstance* instance);
     void visitIterIndex(LgsIterIndex* iterIndex, bool assign);
-    void visitNullableExpr(LgsNullableExpr* expr, bool assign);
+    void visitNull(LgsNull* null) const;
     void visitJson(LgsJson* json);
 
     Value* getNullableValue(const LgsExpr* expr) const;
-    void initNullableExpr(const LgsNullableExpr* expr) const;
+    void initNullableExpr(LgsExpr* expr) const;
     void resolveVirtuals(LgsInstance* instance) const;
     bool checkMock(LgsExpr* expr);
     void yield() const;

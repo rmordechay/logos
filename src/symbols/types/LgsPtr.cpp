@@ -1,6 +1,6 @@
 #include "types/LgsPtr.h"
 
-#include "exprs/LgsNullableExpr.h"
+#include "exprs/LgsNull.h"
 #include "types/LgsAny.h"
 #include "types/iterables/LgsDArray.h"
 #include "types/iterables/LgsSArray.h"
@@ -23,7 +23,7 @@ size_t LgsPtr::getSizeBytes() {
 }
 
 LgsExpr* LgsPtr::getZeroValue() {
-    return new LgsNullableExpr(nullptr);
+    return new LgsNull();
 }
 
 Lgs_rttype LgsPtr::getRTType() {

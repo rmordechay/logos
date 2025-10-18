@@ -1,7 +1,7 @@
 #include "Lgs_darray.h"
 #include "Lgs_types.h"
 #include "data/LgsDefinitions.h"
-#include "exprs/LgsNullableExpr.h"
+#include "exprs/LgsNull.h"
 #include "types/primitives/LgsBool.h"
 #include "utils/LgsUtils.h"
 
