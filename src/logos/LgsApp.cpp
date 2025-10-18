@@ -11,15 +11,13 @@
 #include "files/LgsEnvFile.h"
 #include "codegen/LgsCodeGen.h"
 #include "codegen/LgsLinker.h"
+#include "data/LgsConfigs.h"
 #include "files/LgsTestFile.h"
 #include "parser/LgsLexer.h"
 #include "parser/LgsParser.h"
 #include "utils/LgsUtils.h"
 #include "llvm/IR/Verifier.h"
 #include <llvm/Target/TargetMachine.h>
-
-constexpr bool writeIRFile = true;
-constexpr bool printIR = true;
 
 void LgsApp::run() {
     if (!setup()) exitWithErrors();
@@ -104,7 +102,7 @@ bool LgsApp::generate() {
 }
 
 bool LgsApp::link() {
-    const LgsLinker linker(appConfigs, paths, srcFiles);
+    LgsLinker linker(appConfigs, paths, srcFiles);
     return linker.link();
 }
 
@@ -199,7 +197,7 @@ void LgsApp::writeIRFiles() {
     for (const auto file : srcFiles) {
         const auto module = file->generator.IRModule;
         if (!module) continue;
-        if (printIR) {
+        if constexpr (PRINT_IR) {
             module->print(outs(), nullptr);
             logInfo(LGS_MSG_LINE_SEPERATOR);
         }
@@ -207,7 +205,7 @@ void LgsApp::writeIRFiles() {
             errHandler.setUnsuccessful();
             continue;
         }
-        if (writeIRFile) {
+        if constexpr (WRITE_IR_TO_FILE && IS_DEVELOPMENT) {
             const auto filePath = (paths.buildIR / module->getName().str()).string() + ".ll";
             std::error_code EC;
             raw_fd_ostream textFile(filePath, EC, sys::fs::OF_None);

@@ -2,12 +2,6 @@
 #include "stmts/LgsStmtsBlock.h"
 #include "utils/LgsUtils.h"
 
-void LgsSwitch::parseAsJSON(std::stringstream& json) {
-    openJsonObject(json);
-    addJsonKeyValue(json, "kind", "Switch", true);
-    closeJsonObject(json);
-}
-
 LgsSwitch::~LgsSwitch() {
     if (cond) {
         freeExpr(cond);

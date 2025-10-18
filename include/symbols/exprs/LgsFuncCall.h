@@ -24,6 +24,5 @@ public:
     bool equalsVariadic(const LgsFuncType* funcType) const;
     bool equalsDefaultParams(const LgsFuncType* funcType) const;
     std::string asText() override;
-    void parseAsJSON(std::stringstream& json) override;
     ~LgsFuncCall() override;
 };

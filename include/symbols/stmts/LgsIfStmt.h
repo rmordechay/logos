@@ -14,6 +14,5 @@ public:
 
     explicit LgsIfStmt(LgsExpr* ifCond, LgsStmtsBlock* ifStmtBlock) : ifCond(ifCond), ifBlock(ifStmtBlock) {}
     explicit LgsIfStmt(LgsExpr* ifCond) : ifCond(ifCond) {}
-    void parseAsJSON(std::stringstream& json) override;
     ~LgsIfStmt() override;
 };

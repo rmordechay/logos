@@ -11,10 +11,6 @@ std::string LgsHashMap::asText() {
     return type->pname();
 }
 
-void LgsHashMap::parseAsJSON(std::stringstream& json) {
-    assert(0);
-}
-
 LgsHashMap::~LgsHashMap() {
     for (const auto initialElement : pairs) {
         freeExpr(initialElement.key);

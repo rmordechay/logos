@@ -36,7 +36,6 @@ public:
     std::string strFormatPart() const override;
     std::string getName() override;
     DIBasicType* getDebugType(LgsLLVMGen& cg) override;
-    void parseAsJSON(std::stringstream& json) override;
 };
 
 inline LgsInt LGS_INT;

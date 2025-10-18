@@ -3,14 +3,6 @@
 #include "codegen/LgsLLVMGen.h"
 #include "utils/LgsUtils.h"
 
-void LgsIfStmt::parseAsJSON(std::stringstream& json) {
-    openJsonObject(json);
-    addJsonKeyValue(json, "kind", "IfStmt", true);
-    openJsonKey(json, "ifCond");
-    ifCond->parseAsJSON(json);
-    closeJsonObject(json);
-}
-
 LgsIfStmt::~LgsIfStmt() {
     if (ifCond) {
         delete ifCond;

@@ -10,11 +10,9 @@ struct LgsPaths {
     fs::path appFilePath;
     fs::path objFilePath;
     fs::path execFilePath;
-    fs::path lgsLib;
     fs::path cLibRoot;
     fs::path cLibHeadersDir;
     void initPaths();
-    void findLgsRoot();
     void findCLibRoot();
     void findCLibHeaders();
 };

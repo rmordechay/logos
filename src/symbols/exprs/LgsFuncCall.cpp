@@ -63,25 +63,6 @@ std::string LgsFuncCall::asText() {
     return str.str();
 }
 
-void LgsFuncCall::parseAsJSON(std::stringstream& json) {
-    openJsonObject(json);
-
-    addJsonKeyValue(json, "kind", "FuncCall", true);
-    addJsonKeyValue(json, "name", name, true);
-
-    openJsonKey(json, "args");
-    openJsonArray(json);
-    bool first = true;
-    for (const auto arg : args) {
-        if (!first) json << ',';
-        first = false;
-        arg->parseAsJSON(json);
-    }
-    closeJsonArray(json);
-
-    closeJsonObject(json);
-}
-
 LgsFuncCall::~LgsFuncCall() {
     for (const auto& arg : args) {
         delete arg;

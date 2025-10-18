@@ -15,5 +15,4 @@ public:
     size_t getSizeBytes() override;
     bool canCastTo(LgsType* other) override;
     std::string strFormatPart() const override;
-    void parseAsJSON(std::stringstream& json) override;
 };

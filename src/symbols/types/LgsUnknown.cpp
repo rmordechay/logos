@@ -26,12 +26,6 @@ std::string LgsUnknown::strFormatPart() const {
     assert(0);
 }
 
-void LgsUnknown::parseAsJSON(std::stringstream& json) {
-    openJsonObject(json);
-    addJsonKeyValue(json, "name", name);
-    closeJsonObject(json);
-}
-
 llvm::Type* LgsUnknown::getIRType(LgsLLVMGen& cg) {
     assert(0);
 }

@@ -1,7 +1,5 @@
 #include "logos/LgsPaths.h"
-
 #include "data/LgsDefinitions.h"
-
 #include <llvm/TargetParser/Host.h>
 #include <llvm/TargetParser/Triple.h>
 
@@ -12,17 +10,8 @@ void LgsPaths::initPaths() {
     buildDir = rootPath / LGS_BUILD_DIR;
     buildIR = buildDir / LGS_BUILD_IR;
     appFilePath = rootPath / LGS_APP_FILE_NAME;
-    findLgsRoot();
     findCLibRoot();
     findCLibHeaders();
-}
-
-void LgsPaths::findLgsRoot() {
-#ifdef __APPLE__
-    lgsLib = rootPath.parent_path() / "cmake-build-debug";
-#elif defined(__linux__)
-    lgsLib = rootPath.parent_path() / "build";
-#endif
 }
 
 void LgsPaths::findCLibRoot() {

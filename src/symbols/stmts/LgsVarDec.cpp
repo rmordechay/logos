@@ -37,13 +37,6 @@ void LgsVarDec::setDebugValue(LgsLLVMGen& cg) {
     );
 }
 
-void LgsVarDec::parseAsJSON(std::stringstream& json) {
-    openJsonObject(json);
-    addJsonKeyValue(json, "kind", "VarDec", true);
-    addJsonKeyValue(json, "name", name);
-    closeJsonObject(json);
-}
-
 LgsVarDec::~LgsVarDec() {
     if (expr) {
         freeExpr(expr);

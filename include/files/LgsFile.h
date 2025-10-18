@@ -18,14 +18,9 @@ public:
     std::vector<LgsStrConst*> externalCPaths;
 
     explicit LgsFile(const size_t fileID, const fs::path& path) : id(fileID), path(path) {}
-    virtual void parseAsJSON(std::stringstream& json);
     virtual void format();
     virtual ~LgsFile() = default;
 };
-
-inline void LgsFile::parseAsJSON(std::stringstream& json) {
-    assert(0);
-}
 
 inline void LgsFile::format() {
     assert(false);

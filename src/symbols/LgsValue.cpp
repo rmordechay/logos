@@ -9,10 +9,6 @@ std::string LgsValue::asText() {
     assert(0);
 }
 
-void LgsValue::parseAsJSON(std::stringstream& json) {
-    assert(0);
-}
-
 void LgsValue::setDebugValue(LgsLLVMGen& cg) {
     assert(0);
 }

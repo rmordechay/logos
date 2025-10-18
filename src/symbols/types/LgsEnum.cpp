@@ -30,20 +30,3 @@ std::string LgsEnum::strFormatPart() const {
 size_t LgsEnum::getSizeBytes() {
     return sizeof(void*);
 }
-
-void LgsEnum::parseAsJSON(std::stringstream& json) {
-    openJsonObject(json);
-    addJsonKeyValue(json, "name", getName());
-    json << ',';
-    openJsonKeyArray(json, "fields");
-    auto first = true;
-    for (const auto f : fields) {
-        if (!first) json << ',';
-        first = false;
-        openJsonObject(json);
-        addJsonKeyValue(json, "name", f->name);
-        closeJsonObject(json);
-    }
-    closeJsonArray(json);
-    closeJsonObject(json);
-}

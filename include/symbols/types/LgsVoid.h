@@ -15,7 +15,6 @@ public:
     Lgs_rttype getRTType() override;
     std::string strFormatPart() const override;
     bool canCastTo(LgsType* other) override;
-    void parseAsJSON(std::stringstream& json) override;
 };
 
 inline LgsVoid LGS_VOID;

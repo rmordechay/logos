@@ -10,11 +10,3 @@ Value* LgsParam::loadIR(LgsLLVMGen& cg) {
 std::string LgsParam::asText() {
     return name;
 }
-
-void LgsParam::parseAsJSON(std::stringstream& json) {
-    openJsonObject(json);
-    addJsonKeyValue(json, "name", name, true);
-    addJsonKeyValue(json, "type", type->getName());
-    closeJsonObject(json);
-}
-

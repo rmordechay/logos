@@ -56,13 +56,6 @@ Value* LgsIntConst::castToIR(LgsLLVMGen& cg, LgsType* toType) {
     assert(0);
 }
 
-void LgsIntConst::parseAsJSON(std::stringstream& json) {
-    openJsonObject(json);
-    addJsonKeyValue(json, "kind", "IntConst", true);
-    addJsonKeyValue(json, "value", value);
-    closeJsonObject(json);
-}
-
 std::string LgsIntConst::asText() {
     return std::to_string(value);
 }

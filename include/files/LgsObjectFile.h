@@ -1,5 +1,7 @@
 #pragma once
 #include "LgsFile.h"
+#include "types/LgsObject.h"
+#include "utils/LgsUtils.h"
 
 class LgsObjectFile final : public LgsFile {
 public:
@@ -9,4 +11,8 @@ public:
     ~LgsObjectFile() override;
 };
 
+inline LgsObjectFile::~LgsObjectFile() {
+    freeType(obj);
+    obj = nullptr;
+}
 

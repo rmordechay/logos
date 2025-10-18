@@ -1,6 +1,7 @@
 #include "codegen/LgsLinker.h"
 #include "data/LgsDefinitions.h"
 #include "codegen/LgsLLVMGen.h"
+#include "data/LgsConfigs.h"
 #include "utils/LgsUtils.h"
 #include "llvm/Linker/Linker.h"
 #include <llvm/Passes/PassBuilder.h>
@@ -26,7 +27,7 @@ std::unique_ptr<Module> parseModule(LLVMContext& context, const std::string& pat
     return parsedModule;
 }
 
-bool LgsLinker::link() const {
+bool LgsLinker::link() {
     LLVMContext context;
     std::unique_ptr<Module> mainModule = nullptr;
     std::vector<std::unique_ptr<Module>> modules;
@@ -48,14 +49,15 @@ bool LgsLinker::link() const {
     if (!generateObjFile(std::move(mainModule), targetMachine)) {
         return false;
     }
+    const auto lgsLibPath = findLgsLib();
     char linkCmd[1024];
     std::snprintf(
         linkCmd,
         sizeof(linkCmd),
         LINK_STRING,
         paths.objFilePath.c_str(),
-        paths.lgsLib.c_str(),
-        paths.lgsLib.c_str(),
+        lgsLibPath.c_str(),
+        lgsLibPath.c_str(),
         paths.execFilePath.c_str()
     );
     return std::system(linkCmd) == 0;
@@ -91,6 +93,18 @@ bool LgsLinker::generateObjFile(std::unique_ptr<Module> mainModule, TargetMachin
     outputStream.flush();
     outputStream.close();
     return true;
+}
+
+std::string LgsLinker::findLgsLib() {
+    if constexpr (IS_DEVELOPMENT) {
+#ifdef __APPLE__
+        return paths.rootPath.parent_path() / "cmake-build-debug";
+#elif defined(__linux__)
+        return rootPath.parent_path() / "build";
+#endif
+    } else {
+        return "$HOME/.logos/lib";
+    }
 }
 
 OptimizationLevel LgsLinker::getOptLevel(const uint8_t level) const {

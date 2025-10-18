@@ -85,7 +85,6 @@ public:
     virtual std::string strFormatPart() const = 0;
     virtual DIBasicType* getDebugType(LgsLLVMGen& cg);
     virtual LgsType* clone();
-    virtual void parseAsJSON(std::stringstream& json);
 
     LgsAny* asAny();
     LgsChar* asChar();

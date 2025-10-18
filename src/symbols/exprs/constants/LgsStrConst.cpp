@@ -20,13 +20,6 @@ Value* LgsStrConst::hash(LgsLLVMGen& cg) {
     return cg.i32(hashStr(value.c_str()));
 }
 
-void LgsStrConst::parseAsJSON(std::stringstream& json) {
-    openJsonObject(json);
-    addJsonKeyValue(json, "kind", "IntConst", true);
-    addJsonKeyValue(json, "value", value);
-    closeJsonObject(json);
-}
-
 LgsStrConst::~LgsStrConst() {
     if (formatedStr != "") {
         // delete formatedStr.c_str();

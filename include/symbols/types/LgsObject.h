@@ -31,6 +31,5 @@ public:
     LgsObject* clone() override;
     std::string getName() override;
     bool canCastTo(LgsType* other) override;
-    void parseAsJSON(std::stringstream& json) override;
     ~LgsObject() override;
 };

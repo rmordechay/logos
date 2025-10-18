@@ -79,10 +79,3 @@ Value* LgsVariable::hash(LgsLLVMGen& cg) {
 std::string LgsVariable::asText() {
     return name;
 }
-
-void LgsVariable::parseAsJSON(std::stringstream& json) {
-    openJsonObject(json);
-    addJsonKeyValue(json, "kind", "Variable", true);
-    addJsonKeyValue(json, "name", name);
-    closeJsonObject(json);
-}

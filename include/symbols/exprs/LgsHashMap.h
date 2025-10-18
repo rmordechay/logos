@@ -9,7 +9,6 @@ public:
     explicit LgsHashMap(LgsMap* mapType) : LgsExpr(mapType) {}
     void completeType(LgsType* toType) override;
     std::string asText() override;
-    void parseAsJSON(std::stringstream& json) override;
     ~LgsHashMap() override;
 };
 

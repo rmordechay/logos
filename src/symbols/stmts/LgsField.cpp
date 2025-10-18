@@ -21,13 +21,6 @@ Value* LgsField::resolveVirtualField(LgsLLVMGen* cg, const LgsHashMap* vtable) c
     return cg->builder.CreateLoad(fieldIRType, rv);
 }
 
-void LgsField::parseAsJSON(std::stringstream& json) {
-    openJsonObject(json);
-    addJsonKeyValue(json, "name", name, true);
-    addJsonKeyValue(json, "type", type->getName());
-    closeJsonObject(json);
-}
-
 LgsField::~LgsField() {
     if (expr) {
         freeExpr(expr);

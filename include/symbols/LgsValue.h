@@ -21,7 +21,6 @@ public:
 
     virtual std::string asText();
     virtual Value* loadIR(LgsLLVMGen& cg);
-    virtual void parseAsJSON(std::stringstream& json);
     virtual void setDebugValue(LgsLLVMGen& cg);
     DILocation* getDebugLoc(LgsLLVMGen& cg) const;
     virtual ~LgsValue() = default;

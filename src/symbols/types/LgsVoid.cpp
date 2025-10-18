@@ -29,9 +29,3 @@ std::string LgsVoid::strFormatPart() const {
 bool LgsVoid::canCastTo(LgsType* other) {
     return name == other->getName();
 }
-
-void LgsVoid::parseAsJSON(std::stringstream& json) {
-    openJsonObject(json);
-    addJsonKeyValue(json, "name", name);
-    closeJsonObject(json);
-}

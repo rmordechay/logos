@@ -21,7 +21,6 @@ public:
     Value* loadIR(LgsLLVMGen& cg) override;
     bool shouldAllocate() const;
     void setDebugValue(LgsLLVMGen& cg) override;
-    void parseAsJSON(std::stringstream& json) override;
     ~LgsVarDec() override;
 };
 

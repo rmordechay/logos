@@ -1,6 +1,9 @@
 #pragma once
 #include "LgsFile.h"
-#include "data/LgsDefinitions.h"
+#include "funcs/LgsFunc.h"
+#include "types/LgsEnum.h"
+#include "types/LgsObject.h"
+#include "utils/LgsUtils.h"
 
 class LgsMainFunc;
 class LgsEnum;
@@ -16,6 +19,24 @@ public:
 
     explicit LgsMainFile(const size_t fileID, const fs::path& path) : LgsFile(fileID, path) {}
     void format() override;
-    void parseAsJSON(std::stringstream& json) override;
     ~LgsMainFile() override;
 };
+
+inline void LgsMainFile::format() {
+    std::string indentStr = "";
+}
+
+inline LgsMainFile::~LgsMainFile() {
+    for (const auto& [_, func] : funcs) {
+        delete func;
+    }
+    funcs.clear();
+    for (const auto& object : objects) {
+        freeType(object);
+    }
+    objects.clear();
+    for (const auto lgsEnum : enums) {
+        freeType(lgsEnum);
+    }
+    enums.clear();
+}

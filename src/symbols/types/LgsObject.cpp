@@ -131,31 +131,6 @@ bool LgsObject::canCastTo(LgsType* other) {
     return name == otherType->getName();
 }
 
-void LgsObject::parseAsJSON(std::stringstream& json) {
-    openJsonObject(json);
-    addJsonKeyValue(json, "name", name, true);
-
-    openJsonKeyArray(json, "fields");
-    bool first = true;
-    for (const auto field : fields) {
-        if (!first) json << ',';
-        first = false;
-        field->parseAsJSON(json);
-    }
-    closeJsonArray(json, true);
-
-    openJsonKeyArray(json, "methods");
-    first = true;
-    for (const auto& [funcName, methods] : methods) {
-        if (!first) json << ',';
-        first = false;
-        methods->parseAsJSON(json);
-    }
-    closeJsonArray(json);
-
-    closeJsonObject(json);
-}
-
 LgsObject::~LgsObject() {
     for (const auto interface : implements) {
         freeType(interface);

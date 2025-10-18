@@ -153,9 +153,3 @@ std::string LgsInt::getName() {
 DIBasicType* LgsInt::getDebugType(LgsLLVMGen& cg) {
     return cg.diBuilder->createBasicType(name, 32, dwarf::DW_ATE_signed);
 }
-
-void LgsInt::parseAsJSON(std::stringstream& json) {
-    openJsonObject(json);
-    addJsonKeyValue(json, "name", name);
-    closeJsonObject(json);
-}

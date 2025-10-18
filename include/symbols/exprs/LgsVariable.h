@@ -16,5 +16,4 @@ public:
     Value* hash(LgsLLVMGen& cg) override;
     void assign(LgsLLVMGen& cg, LgsExpr* expr) override;
     std::string asText() override;
-    void parseAsJSON(std::stringstream& json) override;
 };

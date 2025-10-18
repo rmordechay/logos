@@ -20,6 +20,5 @@ public:
     Value* loadIR(LgsLLVMGen& cg) override;
     std::string asText() override;
     Value* hash(LgsLLVMGen& cg) override;
-    void parseAsJSON(std::stringstream& json) override;
     ~LgsStrConst() override;
 };

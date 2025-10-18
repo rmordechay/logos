@@ -42,12 +42,9 @@ set(CORE_SOURCES
     src/codegen/LgsLLVMGen.cpp
     src/analysis/LgsSema.cpp
     src/analysis/LgsTypeResolver.cpp
-    src/files/LgsMainFile.cpp
-    src/files/LgsTestFile.cpp
-    src/files/LgsObjectFile.cpp
-    src/files/LgsInterfaceFile.cpp
     src/parser/LgsLexer.cpp
     src/parser/LgsParser.cpp
+    src/parser/LgsJsonParser.cpp
     src/cli/LgsCli.cpp
     src/cli/LgsCliCmd.cpp
     src/cli/LgsRunCmd.cpp
@@ -105,6 +102,7 @@ set(CORE_SOURCES
     src/symbols/stmts/LgsStmt.cpp
     src/symbols/stmts/LgsStmtsBlock.cpp
     src/symbols/stmts/LgsVarDec.cpp
+    src/symbols/stmts/LgsSwitch.cpp
 
     src/symbols/types/LgsType.cpp
     src/symbols/types/LgsVoid.cpp
@@ -147,13 +145,10 @@ set(RUNTIME_SOURCES
     runtime/lib/Lgs_print.cpp
     runtime/lib/Lgs_arena.cpp
     runtime/lib/Lgs_set.cpp
-    include/data/LgsConfigs.h
-    src/symbols/stmts/LgsSwitch.cpp
-    include/symbols/stmts/LgsSwitch.h
-    include/symbols/exprs/LgsTernaryExpr.h
 )
 
 add_library(lgs_core SHARED ${CORE_SOURCES} ${RUNTIME_SOURCES})
+set_target_properties(lgs_core PROPERTIES OUTPUT_NAME "lgs")
 target_link_libraries(lgs_core PUBLIC
     LLVM
     clang-cpp

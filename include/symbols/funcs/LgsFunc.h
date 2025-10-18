@@ -50,6 +50,5 @@ public:
     bool needsCleanup() const;
     std::string asText() override;
     std::string getIRName() const;
-    void parseAsJSON(std::stringstream& json) override;
     ~LgsFunc() override;
 };

@@ -162,10 +162,6 @@ LgsType* LgsType::clone() {
     assert(0);
 }
 
-void LgsType::parseAsJSON(std::stringstream& json) {
-    assert(0);
-}
-
 LgsAny* LgsType::asAny() {
     return dynamic_cast<LgsAny*>(this);
 }

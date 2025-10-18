@@ -42,6 +42,7 @@
 #include "loops/LgsLoopMetaVar.h"
 #include "loops/LgsRangeLoop.h"
 #include "stmts/LgsAssignment.h"
+#include "stmts/LgsIOPair.h"
 #include "stmts/LgsIOStmt.h"
 #include "stmts/LgsIfStmt.h"
 #include "stmts/LgsSwitch.h"
@@ -503,7 +504,7 @@ void LgsSema::visitExpr(LgsExpr*& expr) {
         else if (const auto prefixExpr = expr->asPrefixExpr()) visitPrefixExpr(prefixExpr);
         else if (const auto forVar = expr->asLoopMetaVar()) visitLoopMetaVar(forVar);
         else if (const auto vecExpr = expr->asVectorExpr()) visitVectorExpr(vecExpr);
-        else if (const auto null = expr->asNullableExpr()) visitExpr(null->baseExpr);
+        else if (const auto nullableExpr = expr->asNullableExpr()) visitExpr(nullableExpr->baseExpr);
         else if (const auto castExpr = expr->asCast()) visitCast(castExpr);
         else if (const auto json = expr->asJson()) visitJson(json);
         if (expr->type->asNullable() && !expr->asNullableExpr()) {
