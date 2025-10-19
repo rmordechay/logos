@@ -1,6 +1,9 @@
 #pragma once
-#include "types/LgsEnum.h"
 
+class LgsSubType;
+class LgsEnum;
+class LgsIntConst;
+class LgsNull;
 class LgsLoopMetaVar;
 class LgsJson;
 class LgsTypeExpr;
@@ -58,14 +61,9 @@ class LgsForLoop;
 struct LgsSymbol;
 struct LgsIndex;
 
-class LgsJsonParser final {
+class LgsFormatter {
 public:
-    std::stringstream json;
-    bool pretty = false;
-
-    void visitFile(LgsFile* file);
     void visitMainFile(LgsMainFile* mainFile);
-    void visitTestFile(LgsTestFile* testFile);
     void visitObject(LgsObject* obj);
     void visitInterface(LgsInterface* interface);
     void visitEnum(const LgsEnum* enum_);
@@ -116,17 +114,4 @@ public:
     void visitIndex(LgsIterIndex* iterIndex);
     void visitSlice(LgsIterIndex* iterIndex);
     void visitLoopMetaVar(LgsLoopMetaVar* metaVar);
-
-    void addString(const std::string& v);
-    void addBool(bool v);
-    void openArray();
-    void closeArray(bool withComma = false);
-    void openObject();
-    void closeObject(bool withComma = false);
-    void openKey(const std::string& v);
-    void openKeyArray(const std::string& v);
-    void openKeyObject(const std::string& v);
-    void addKeyValueStr(const std::string& k, const std::string& v, bool withComma = false);
-    void addKeyValueInt(const std::string& k, size_t v, bool withComma = false);
-    void addKeyValueBool(const std::string& k, bool v, bool withComma = false);
 };

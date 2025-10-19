@@ -1,6 +1,5 @@
 #pragma once
 #include "LgsCliHelp.h"
-#include "pch.h"
 #include "logos/LgsApp.h"
 
 struct LgsCliCmdHelp;

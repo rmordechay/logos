@@ -1,5 +1,5 @@
 #pragma once
-#include "LgsCliCmd.h"
+#include "../LgsCliCmd.h"
 #include "types/iterables/LgsStr.h"
 
 class LgsTestCmd final : public LgsCliCmd{

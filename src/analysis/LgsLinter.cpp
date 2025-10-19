@@ -1,206 +1,206 @@
 #include "analysis/LgsLinter.h"
 #include "files/LgsMainFile.h"
 
-void visitMainFile(LgsMainFile* mainFile) {
+void LgsLinter::visitMainFile(LgsMainFile* mainFile) {
     assert(0);
 }
 
-void visitObject(LgsObject* obj) {
+void LgsLinter::visitObject(LgsObject* obj) {
     assert(0);
 }
 
-void visitInterface(LgsInterface* interface) {
+void LgsLinter::visitInterface(LgsInterface* interface) {
     assert(0);
 }
 
-void visitEnum(const LgsEnum* enum_) {
+void LgsLinter::visitEnum(const LgsEnum* enum_) {
     assert(0);
 }
 
-void visitSubtype(LgsSubType * subtype) {
+void LgsLinter::visitSubtype(LgsSubType * subtype) {
     assert(0);
 }
 
-void visitField(const LgsField* field) {
+void LgsLinter::visitField(const LgsField* field) {
     assert(0);
 }
 
-void visitFunc(const LgsFunc* func) {
+void LgsLinter::visitFunc(const LgsFunc* func) {
     assert(0);
 }
 
-void visitParam(const LgsParam* param) {
+void LgsLinter::visitParam(const LgsParam* param) {
     assert(0);
 }
 
-void visitIOPair(LgsIOPair* ioPair, LgsObject* obj) {
+void LgsLinter::visitIOPair(LgsIOPair* ioPair, LgsObject* obj) {
     assert(0);
 }
 
-void visitStmt(LgsStmt* stmt) {
+void LgsLinter::visitStmt(LgsStmt* stmt) {
     assert(0);
 }
 
-void visitStmtsBlock(const LgsStmtsBlock* stmtsBlock) {
+void LgsLinter::visitStmtsBlock(const LgsStmtsBlock* stmtsBlock) {
     assert(0);
 }
 
-void visitVarDec(const LgsVarDec* varDec) {
+void LgsLinter::visitVarDec(const LgsVarDec* varDec) {
     assert(0);
 }
 
-void visitAssignment(LgsAssignment* assignment) {
+void LgsLinter::visitAssignment(LgsAssignment* assignment) {
     assert(0);
 }
 
-void visitIfStmt(LgsIfStmt* ifStmt) {
+void LgsLinter::visitIfStmt(LgsIfStmt* ifStmt) {
     assert(0);
 }
 
-void visitSwitch(LgsSwitch* switchStmt) {
+void LgsLinter::visitSwitch(LgsSwitch* switchStmt) {
     assert(0);
 }
 
-void visitWhileLoop(LgsWhileLoop* whileLoop) {
+void LgsLinter::visitWhileLoop(LgsWhileLoop* whileLoop) {
     assert(0);
 }
 
-void visitLoopStmt(LgsForLoop* loopStmt) {
+void LgsLinter::visitLoopStmt(LgsForLoop* loopStmt) {
     assert(0);
 }
 
-void visitRangeLoop(LgsRangeLoop* rangeLoop) {
+void LgsLinter::visitRangeLoop(LgsRangeLoop* rangeLoop) {
     assert(0);
 }
 
-void visitForeachLoop(LgsForeachLoop* foreachLoop) {
+void LgsLinter::visitForeachLoop(LgsForeachLoop* foreachLoop) {
     assert(0);
 }
 
-void visitInfiniteLoop(const LgsInfiniteLoop* infiniteLoop) {
+void LgsLinter::visitInfiniteLoop(const LgsInfiniteLoop* infiniteLoop) {
     assert(0);
 }
 
-void visitReturnStmt(LgsReturn* returnStmt) {
+void LgsLinter::visitReturnStmt(LgsReturn* returnStmt) {
     assert(0);
 }
 
-void visitContinueStmt(const LgsContinue* continueStmt) {
+void LgsLinter::visitContinueStmt(const LgsContinue* continueStmt) {
     assert(0);
 }
 
-void visitBreakStmt(const LgsBreak* breakStmt) {
+void LgsLinter::visitBreakStmt(const LgsBreak* breakStmt) {
     assert(0);
 }
 
-void visitCoroutine(const LgsCoroutine* coroutine) {
+void LgsLinter::visitCoroutine(const LgsCoroutine* coroutine) {
     assert(0);
 }
 
-void visitDeferStmt(const LgsDeferStmt* deferStmt) {
+void LgsLinter::visitDeferStmt(const LgsDeferStmt* deferStmt) {
     assert(0);
 }
 
-void visitIOStmt(const LgsIOStmt* ioStmt) {
+void LgsLinter::visitIOStmt(const LgsIOStmt* ioStmt) {
     assert(0);
 }
 
-void visitExpr(LgsExpr*& expr) {
+void LgsLinter::visitExpr(LgsExpr*& expr) {
     assert(0);
 }
 
-void visitBinaryExpr(const LgsBinaryExpr* binaryExpr) {
+void LgsLinter::visitBinaryExpr(const LgsBinaryExpr* binaryExpr) {
     assert(0);
 }
 
-void visitTernaryExpr(LgsTernaryExpr* ternary) {
+void LgsLinter::visitTernaryExpr(LgsTernaryExpr* ternary) {
     assert(0);
 }
 
-void visitCast(LgsCast* cast) {
+void LgsLinter::visitCast(LgsCast* cast) {
     assert(0);
 }
 
-void visitArrayExpr(LgsArrayExpr* arrayExpr) {
+void LgsLinter::visitArrayExpr(LgsArrayExpr* arrayExpr) {
     assert(0);
 }
 
-void visitStaticArray(const LgsArrayExpr* arrayExpr) {
+void LgsLinter::visitStaticArray(const LgsArrayExpr* arrayExpr) {
     assert(0);
 }
 
-void visitDynamicArray(LgsArrayExpr* arrayExpr) {
+void LgsLinter::visitDynamicArray(LgsArrayExpr* arrayExpr) {
     assert(0);
 }
 
-void visitHashMap(LgsHashMap* hashMap) {
+void LgsLinter::visitHashMap(LgsHashMap* hashMap) {
     assert(0);
 }
 
-void visitVectorExpr(const LgsVectorExpr* vectorExpr) {
+void LgsLinter::visitVectorExpr(const LgsVectorExpr* vectorExpr) {
     assert(0);
 }
 
-void visitVariable(const LgsVariable* variable) {
+void LgsLinter::visitVariable(const LgsVariable* variable) {
     assert(0);
 }
 
-void visitSelection(const LgsSelection* selection) {
+void LgsLinter::visitSelection(const LgsSelection* selection) {
     assert(0);
 }
 
-void visitFuncCall(const LgsFuncCall* funcCall) {
+void LgsLinter::visitFuncCall(const LgsFuncCall* funcCall) {
     assert(0);
 }
 
-void visitPrefixExpr(LgsPrefixExpr* prefixExpr) {
+void LgsLinter::visitPrefixExpr(LgsPrefixExpr* prefixExpr) {
     assert(0);
 }
 
-void visitPostfixExpr(LgsPostfixExpr* postfixExpr) {
+void LgsLinter::visitPostfixExpr(LgsPostfixExpr* postfixExpr) {
     assert(0);
 }
 
-void visitStrConst(const LgsStrConst* strConst) {
+void LgsLinter::visitStrConst(const LgsStrConst* strConst) {
     assert(0);
 }
 
-void visitTypeExpr(LgsTypeExpr* typeExpr) {
+void LgsLinter::visitTypeExpr(LgsTypeExpr* typeExpr) {
     assert(0);
 }
 
-void visitJson(const LgsJson* jsonStmt) {
+void LgsLinter::visitJson(const LgsJson* jsonStmt) {
     assert(0);
 }
 
-void visitInstance(LgsInstance* instance) {
+void LgsLinter::visitInstance(LgsInstance* instance) {
     assert(0);
 }
 
-void visitNull(LgsNull* null) {
+void LgsLinter::visitNull(LgsNull* null) {
     assert(0);
 }
 
-void visitIntConst(const LgsIntConst* intConst) {
+void LgsLinter::visitIntConst(const LgsIntConst* intConst) {
     assert(0);
 }
 
-void visitInterfaceInstance(LgsInstance* instance, LgsInterface* interface) {
+void LgsLinter::visitInterfaceInstance(LgsInstance* instance, LgsInterface* interface) {
     assert(0);
 }
 
-void visitIterIndex(LgsIterIndex* iterIndex) {
+void LgsLinter::visitIterIndex(LgsIterIndex* iterIndex) {
     assert(0);
 }
 
-void visitIndex(LgsIterIndex* iterIndex) {
+void LgsLinter::visitIndex(LgsIterIndex* iterIndex) {
     assert(0);
 }
 
-void visitSlice(LgsIterIndex* iterIndex) {
+void LgsLinter::visitSlice(LgsIterIndex* iterIndex) {
     assert(0);
 }
 
-void visitLoopMetaVar(LgsLoopMetaVar* metaVar) {
+void LgsLinter::visitLoopMetaVar(LgsLoopMetaVar* metaVar) {
     assert(0);
 }

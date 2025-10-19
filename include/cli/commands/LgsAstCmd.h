@@ -1,6 +1,6 @@
 #pragma once
-#include "LgsCliCmd.h"
-#include "../symbols/types/iterables/LgsStr.h"
+#include "../LgsCliCmd.h"
+#include "types/iterables/LgsStr.h"
 
 class LgsAstCmd final : public LgsCliCmd {
 public:
@@ -8,6 +8,7 @@ public:
 
     LgsAstCmd(const int argc, char** argv) : LgsCliCmd(argc, argv) {}
     void run() override;
+    void setArg(const std::string& key, const std::string& value, LgsApp& app) override;
     LgsCliCmdHelp& getHelp() override;
 };
 

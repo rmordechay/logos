@@ -1,4 +1,4 @@
-#include "cli/LgsRunCmd.h"
+#include "cli/commands/LgsRunCmd.h"
 #include "cli/LgsCliHelp.h"
 #include "logos/LgsApp.h"
 #include "types/iterables/LgsStr.h"

@@ -40,15 +40,19 @@ set(CORE_SOURCES
     src/codegen/LgsCodeGen.cpp
     src/codegen/LgsLLVMGen.cpp
     src/analysis/LgsSema.cpp
+    src/analysis/LgsLinter.cpp
     src/analysis/LgsTypeResolver.cpp
     src/parser/LgsLexer.cpp
     src/parser/LgsParser.cpp
     src/parser/LgsJsonParser.cpp
+    src/parser/LgsFormatter.cpp
     src/cli/LgsCli.cpp
     src/cli/LgsCliCmd.cpp
-    src/cli/LgsRunCmd.cpp
-    src/cli/LgsAstCmd.cpp
-    src/cli/LgsTestCmd.cpp
+    src/cli/commands/LgsRunCmd.cpp
+    src/cli/commands/LgsAstCmd.cpp
+    src/cli/commands/LgsTestCmd.cpp
+    src/cli/commands/LgsLinterCmd.cpp
+    src/cli/commands/LgsFormatCmd.cpp
     src/lgsc/LgsCLang.cpp
     src/lgsc/LgsCLangVisitor.cpp
     src/utils/LgsUtils.cpp
@@ -143,8 +147,6 @@ set(RUNTIME_SOURCES
     ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_print.cpp
     ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_arena.cpp
     ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_set.cpp
-    include/analysis/LgsLinter.h
-    src/analysis/LgsLinter.cpp
 )
 
 add_library(lgs_lib SHARED ${CORE_SOURCES} ${RUNTIME_SOURCES})

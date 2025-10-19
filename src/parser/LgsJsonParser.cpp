@@ -5,7 +5,10 @@
 #include "exprs/LgsTernaryExpr.h"
 #include "exprs/LgsVariable.h"
 #include "exprs/constants/LgsStrConst.h"
+#include "files/LgsInterfaceFile.h"
 #include "files/LgsMainFile.h"
+#include "files/LgsObjectFile.h"
+#include "files/LgsTestFile.h"
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsIfStmt.h"
@@ -14,6 +17,20 @@
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
 #include "types/LgsSubType.h"
+
+void LgsJsonParser::visitFile(LgsFile* file) {
+    if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
+        visitMainFile(mainFile);
+    } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
+        visitObject(objFile->obj);
+    } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
+        visitInterface(interfaceFile->interface);
+    } else if (const auto testFile = dynamic_cast<LgsTestFile*>(file)) {
+        visitTestFile(testFile);
+    } else {
+        assert(0);
+    }
+}
 
 void LgsJsonParser::visitMainFile(LgsMainFile* mainFile) {
     openObject();
@@ -64,6 +81,10 @@ void LgsJsonParser::visitMainFile(LgsMainFile* mainFile) {
     closeArray();
 
     closeObject();
+}
+
+void LgsJsonParser::visitTestFile(LgsTestFile* testFile) {
+    assert(0);
 }
 
 void LgsJsonParser::visitObject(LgsObject* obj) {

@@ -1,4 +1,4 @@
-#include "cli/LgsTestCmd.h"
+#include "cli/commands/LgsTestCmd.h"
 
 void LgsTestCmd::run() {
     const std::string pathArg = argv[2];

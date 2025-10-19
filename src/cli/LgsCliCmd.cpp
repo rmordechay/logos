@@ -1,4 +1,4 @@
-#include "cli/LgsCliCmd.h"
+#include "../../include/cli/LgsCliCmd.h"
 #include "cli/LgsCliHelp.h"
 #include "data/LgsDefinitions.h"
 #include "utils/LgsUtils.h"
@@ -6,7 +6,9 @@
 #define PADDING 6
 #define USAGE_STR "Usage:"
 
-void LgsCliCmd::setArg(const std::string& key, const std::string& value, LgsApp& app) {}
+void LgsCliCmd::setArg(const std::string& key, const std::string& value, LgsApp& app) {
+
+}
 
 void LgsCliCmd::parseArguments(const size_t startIndex, LgsApp& app) {
     std::unordered_set<std::string> seenArgs;

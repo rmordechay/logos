@@ -1,7 +1,7 @@
 #include "cli/LgsCli.h"
-#include "cli/LgsAstCmd.h"
-#include "cli/LgsRunCmd.h"
-#include "cli/LgsTestCmd.h"
+#include "cli/commands/LgsAstCmd.h"
+#include "cli/commands/LgsRunCmd.h"
+#include "cli/commands/LgsTestCmd.h"
 #include "data/LgsDefinitions.h"
 #include "utils/LgsUtils.h"
 

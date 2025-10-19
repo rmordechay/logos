@@ -4,6 +4,8 @@
 #include "LgsSymbolTable.h"
 #include "utils/LgsErrHandler.h"
 #include "LgsPaths.h"
+#include "analysis/LgsLinter.h"
+#include "parser/LgsJsonParser.h"
 #include "utils/ThreadPool.h"
 
 class LgsConfigFile;
@@ -36,6 +38,7 @@ public:
     std::atomic<size_t> nextFileID = 1;
     std::vector<char*> appArgs;
     ThreadPool threadPool;
+    LgsLinter linter;
 
     explicit LgsApp(const fs::path& rootPath = "") {
         paths.rootPath = rootPath;
