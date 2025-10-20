@@ -113,7 +113,7 @@ void LgsSema::visitField(LgsField* field) {
         errHandler.addError(E10013, &field->location, {field->name});
     }
     if (!field->type->isHeapAlloc && field->isOwner) {
-        errHandler.addWarning(W10001, &field->location, {field->type->getName()});
+        errHandler.addWarning(W50001, &field->location, {field->type->getName()});
         field->isOwner = false;
     }
 }
@@ -258,7 +258,7 @@ void LgsSema::visitVarDec(LgsVarDec* varDec) {
         }
     }
     if (varDec->type && !varDec->type->isHeapAlloc && varDec->isOwner) {
-        errHandler.addWarning(W10001, &varDec->location, {varDec->type->getName()});
+        errHandler.addWarning(W50001, &varDec->location, {varDec->type->getName()});
         varDec->isOwner = false;
     }
     addLocalSymbol(LgsSymbol(varDec));
@@ -380,7 +380,7 @@ void LgsSema::visitRangeLoop(LgsRangeLoop* rangeLoop) {
             errHandler.addError(E10081, &startRange->location, {startRange->asText(), endRange->asText()});
         }
     } else {
-        rangeLoop->startRange = LGS_SIZE_ZERO;
+        rangeLoop->startRange = LGS_SIZE.getZeroValue();
     }
 
     // Range loop can have only one var
@@ -1087,15 +1087,13 @@ std::string getMissingImplementsStr(const std::vector<LgsField*>& fields, const 
     std::stringstream str;
     str << "Missing fields/methods:";
     if (!fields.empty()) {
-        str << LGS_ERROR_PADDING << "Fields:";
         for (const auto& field : fields) {
-            str << LGS_ERROR_PADDING << "\t- " << field->name << ": " << field->type->pname();
+            str << "\n - " << field->name << ": " << field->type->pname();
         }
     }
     if (!methods.empty()) {
-        str << LGS_ERROR_PADDING << "Methods:";
         for (const auto& func : methods) {
-            str << LGS_ERROR_PADDING << "\t- " << func->asText();
+            str << "\n - " << func->asText();
         }
     }
     return str.str();

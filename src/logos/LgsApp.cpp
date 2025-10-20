@@ -28,14 +28,6 @@ void LgsApp::run() {
     execute();
 }
 
-void LgsApp::runTests() {
-    if (!setup()) exitWithErrors();
-    if (!parse()) exitWithErrors();
-    if (!analyse()) exitWithErrors();
-    if (!generate()) exitWithErrors();
-    if (!link()) exitWithErrors();
-}
-
 bool LgsApp::setup() {
     if (isLogosFile(paths.rootPath)) {
         appConfigs.isFileMode = true;
@@ -55,7 +47,7 @@ bool LgsApp::setup() {
 
 bool LgsApp::parse() {
     loadBuiltins();
-    // if (!loadAppFile()) return false;
+    // if (!loadConfigFile()) return false;
     // loadEnvFiles();
     for (const auto& entry : fs::recursive_directory_iterator(paths.srcDir)) {
         if (!isLogosFile(entry)) continue;
@@ -108,11 +100,11 @@ bool LgsApp::link() {
 
 void LgsApp::execute() {
     const auto execPath = paths.execFilePath.c_str();
-    appArgs.insert(appArgs.begin(), const_cast<char*>(execPath));
-    if (appArgs.empty() || appArgs.back() != nullptr) {
-        appArgs.push_back(nullptr);
+    mainArgs.insert(mainArgs.begin(), const_cast<char*>(execPath));
+    if (mainArgs.empty() || mainArgs.back() != nullptr) {
+        mainArgs.push_back(nullptr);
     }
-    execv(execPath, appArgs.data());
+    execv(execPath, mainArgs.data());
     perror("Logos execution failed.");
     exit(EXIT_FAILURE);
 }
@@ -125,7 +117,7 @@ void LgsApp::loadBuiltins() {
 }
 
 void LgsApp::loadSrcFile(const std::string& code, const fs::path& filePath) {
-    const auto fileID = getNextFileID(filePath);
+    const auto fileID = nextFileID.fetch_add(1, std::memory_order_relaxed);
     LgsLexer lexer(fileID, code);
     const auto tokens = lexer.tokenize();
     if (!lexer.errHandler.successful) {
@@ -136,6 +128,7 @@ void LgsApp::loadSrcFile(const std::string& code, const fs::path& filePath) {
     const auto file = parser.parseSrcFile(appConfigs.isTestRun);
     {
         std::lock_guard lock(mtx);
+        filePaths[fileID] = filePath;
         if (file) srcFiles.push_back(file);
         if (parser.errHandler.successful) return;
         errHandler.mergeErrors(parser.errHandler);
@@ -143,7 +136,7 @@ void LgsApp::loadSrcFile(const std::string& code, const fs::path& filePath) {
 }
 
 bool LgsApp::loadConfigFile() {
-    const auto appFileID = getNextFileID(paths.appFilePath);
+    const auto appFileID = nextFileID.fetch_add(1, std::memory_order_relaxed);
     LgsLexer lexer(appFileID, getFileText(paths.appFilePath));
     const auto tokens = lexer.tokenize();
     if (!lexer.errHandler.successful) {
@@ -162,7 +155,7 @@ void LgsApp::loadEnvFiles() {
         if (!isLogosFile(filePath)) continue;
         threadPool.runTask([filePath, this] {
             auto code = getFileText(filePath);
-            const auto fileID = getNextFileID(filePath);
+            const auto fileID = nextFileID.fetch_add(1, std::memory_order_relaxed);
             LgsLexer lexer(fileID, code);
             const auto tokens = lexer.tokenize();
             if (!lexer.errHandler.successful) {
@@ -197,7 +190,7 @@ void LgsApp::writeIRFiles() {
     for (const auto file : srcFiles) {
         const auto module = file->generator.IRModule;
         if (!module) continue;
-        if constexpr (PRINT_IR) {
+        if constexpr (DEBUG) {
             module->print(outs(), nullptr);
             logInfo(LGS_MSG_LINE_SEPERATOR);
         }
@@ -205,7 +198,7 @@ void LgsApp::writeIRFiles() {
             errHandler.setUnsuccessful();
             continue;
         }
-        if constexpr (WRITE_IR_TO_FILE && IS_DEVELOPMENT) {
+        if constexpr (WRITE_IR_TO_FILE) {
             const auto filePath = (paths.buildIR / module->getName().str()).string() + ".ll";
             std::error_code EC;
             raw_fd_ostream textFile(filePath, EC, sys::fs::OF_None);
@@ -221,16 +214,14 @@ void LgsApp::exitWithErrors() const {
         assert(filePath != filePaths.end());
         const auto column = err.location.columnStart;
         const auto line = err.location.lineStart;
-        const auto rawLine = getLine(filePath->second.string(), line);
-        const auto firstNonSpace = std::find_if(rawLine.begin(), rawLine.end(), [](const unsigned char c) { return !std::isspace(c); });
-        const auto trimmedCount = std::distance(rawLine.begin(), firstNonSpace);
-        auto errMsg = trim(rawLine);
-        errMsg += LGS_ERROR_PADDING + std::string(column - trimmedCount - 2, '~');
+        const auto rawLine = trim(getLine(filePath->second.string(), line));
+        auto errMsg = rawLine;
+        errMsg += '\n' + std::string(column - 2, '~');
         errMsg += '^';
         errMsg += std::string(rawLine.size() - column + 1, '~');
-        errMsg += LGS_ERROR_PADDING + err.msg;
-        errMsg += "\n   at: " + getFullPath(err.location, filePath->second);
-        logInfo(LGS_ERROR_STR + errMsg);
+        errMsg += '\n' + err.msg;
+        const auto path = "\n   at: " + getFullPath(err.location, filePath->second);
+        logError(errMsg, path);
         if (i != errHandler.errors.size() - 1) logInfo(LGS_MSG_LINE_SEPERATOR);
     }
     if (!errHandler.errors.empty()) logInfo("\n");
@@ -258,13 +249,15 @@ void LgsApp::loadConfigs() {
     }
 }
 
-size_t LgsApp::getNextFileID(const fs::path& filePath) {
-    const auto fileID = nextFileID.fetch_add(1, std::memory_order_relaxed);
-    {
-        std::lock_guard lock(mtx);
-        filePaths[fileID] = filePath;
-    }
-    return fileID;
+void LgsApp::printConfigs() const {
+    std::cout << "name       = " << appConfigs.name << std::endl;
+    std::cout << "activeEnv  = " << appConfigs.activeEnv << std::endl;
+    std::cout << "logLevel   = " << appConfigs.logLevel << std::endl;
+    std::cout << "version    = " << std::to_string(appConfigs.version.major) << '.' << std::to_string(appConfigs.version.minor) << '.'<< std::to_string(appConfigs.version.micro) << std::endl;
+    std::cout << "debugMode  = " << appConfigs.debugMode << std::endl;
+    std::cout << "isTestRun  = " << appConfigs.isTestRun << std::endl;
+    std::cout << "isFileMode = " << appConfigs.isFileMode << std::endl;
+    std::cout << "optLevel   = " << std::to_string(appConfigs.optLevel) << std::endl;
 }
 
 LgsApp::~LgsApp() {

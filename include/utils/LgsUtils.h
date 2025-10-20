@@ -12,14 +12,14 @@ class LgsType;
 #define EXPECTED_ERR(E, code) "Expected error: '" << std::string(E.msg) << "'" << std::string(code)
 
 void logInfo(const std::string& text = "");
-void logError(const std::string& msg, const std::string& path = "");
+void logError(const std::string& errMsg, const std::string& suffix = "");
 void logWarning(const std::string& msg, const std::string& path);
-void formatAndLogError(const std::string& msg, const std::vector<std::string>& args = {});
+void exitWithError(const LgsBaseError& err, const std::vector<std::string>& args = {});
 std::string formatErrorMsg(const std::string& msg, const std::vector<std::string>& args);
+std::string prefixErrorLines(const std::string& text);
 bool isLogosFile(const fs::path& filePath);
 bool isLLVMFile(const fs::directory_entry& entry);
 bool isLogosKeyword(const std::string& s);
-bool validateTypeType(const std::string& name);
 std::string getFileText(const fs::path& filePath);
 void freeType(LgsType* type);
 void freeTypes(std::vector<LgsType*>& types);

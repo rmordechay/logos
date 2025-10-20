@@ -35,8 +35,8 @@ inline LgsBaseError E10011{.msg = "%s is already declared.", .code = errCodeStar
 inline LgsBaseError E10012{.msg = "%s cannot be %s-assigned to type %s.", .code = errCodeStart++};
 inline LgsBaseError E10013{.msg = "Field %s is with function type. Declare it as a standard function instead.", .code = errCodeStart++};
 inline LgsBaseError E10014{.msg = "Expression of type %s does not match base type %s.", .code = errCodeStart++};
-inline LgsBaseError E10015{.msg = "Function %s was found but it doesnt match the parameters.%pGiven:\t  %s%pExpected:  %s", .code = errCodeStart++};
-inline LgsBaseError E10016{.msg = "Object %s does not fully implement %s. %s", .code = errCodeStart++};
+inline LgsBaseError E10015{.msg = "Function %s was found but it doesnt match the parameters.\nGiven:\t  %s\nExpected:  %s", .code = errCodeStart++};
+inline LgsBaseError E10016{.msg = "Object %s does not fully implement %s.\n%s", .code = errCodeStart++};
 inline LgsBaseError E10017{.msg = "break must be inside a for loop.", .code = errCodeStart++};
 inline LgsBaseError E10018{.msg = "Expression of type %s cannot cast to type %s.", .code = errCodeStart++};
 inline LgsBaseError E10019{.msg = "activeEnv %s could not be found in the envs directory.", .code = errCodeStart++};
@@ -54,7 +54,7 @@ inline LgsBaseError E10030{.msg = "Non-public field %s is used outside its paren
 inline LgsBaseError E10031{.msg = "Non-public method %s is used outside its parent object %s.", .code = errCodeStart++};
 inline LgsBaseError E10032{.msg = "Singleton object %s cannot be instantiated.", .code = errCodeStart++};
 inline LgsBaseError E10033{.msg = "Type name must be capitalized. Given: %s.", .code = errCodeStart++};
-inline LgsBaseError E10034{.msg = "%s has a method with name %s but it doesnt match the parameters.%pGiven:\t  %s%pExpected:  %s", .code = errCodeStart++};
+inline LgsBaseError E10034{.msg = "%s has a method with name %s but it doesnt match the parameters.\nGiven:\t  %s\nExpected:  %s", .code = errCodeStart++};
 inline LgsBaseError E10035{.msg = "Index of %s has %s level which is too deep. Max level: %s.", .code = errCodeStart++};
 inline LgsBaseError E10036{.msg = "%s cannot be indexed with type %s.", .code = errCodeStart++};
 inline LgsBaseError E10037{.msg = "Left index of slice must be less or equal than the right index. Given: %s.", .code = errCodeStart++};

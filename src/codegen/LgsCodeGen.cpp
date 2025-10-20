@@ -1098,12 +1098,11 @@ void LgsCodeGen::createEpilogue(LgsFunc* func) {
 }
 
 void LgsCodeGen::initMainArgs(LgsMainFunc* mainFunc) {
-    auto& builder = cg.builder;
-    const std::vector<Type*> structFields{cg.i64Ty(), cg.i32Ty(), cg.i32Ty(), cg.ptrTy()};
-    const auto arrStruct = cg.getStructType(structFields, LgsDArray::name);
-    mainFunc->argsArr->IRValue = builder.CreateAlloca(arrStruct);
-    mainFunc->initArgsFunc->callIR(cg, {getIRValue(mainFunc->argsArr), mainFunc->argc, mainFunc->argv});
-    mainFunc->funcType->params[0].IRValue = getIRValue(mainFunc->argsArr);
+    const auto dArray = new LgsDArray(new LgsStr());
+    dArray->size = LGS_SIZE.getZeroValue();
+    dArray->size->IRValue = mainFunc->argc;
+    LgsArrayExpr argsArr(dArray);
+    visitArrayExpr(&argsArr);
 }
 
 Value* LgsCodeGen::getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) const {
@@ -1195,7 +1194,9 @@ void LgsCodeGen::setNestedSArr(const LgsArrayExpr* arrayExpr, Type* parentType, 
 void LgsCodeGen::setDynamicArray(LgsArrayExpr* arrayExpr) {
     const auto arr = arrayExpr->type->asDArray();
     const auto size = arr->baseType->getSizeBytes();
-    arrayExpr->IRValue = cg.callMalloc(arr->getSizeBytes(), arrayExpr->owner, arr->getRTType());
+    if (!arrayExpr->IRValue) {
+        arrayExpr->IRValue = cg.callMalloc(arr->getSizeBytes(), arrayExpr->owner, arr->getRTType());
+    }
     LgsFunc initFunc("init", &LGS_VOID, {arr, &LGS_SIZE, &LGS_SIZE}, BUILTIN | METHOD);
     initFunc.callIR(cg, {arrayExpr->IRValue, cg.i64(size), cg.usize(arr->baseType->getRTType())});
 

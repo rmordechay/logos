@@ -1,7 +1,6 @@
 #include "codegen/LgsLinker.h"
 #include "data/LgsDefinitions.h"
 #include "codegen/LgsLLVMGen.h"
-#include "data/LgsConfigs.h"
 #include "utils/LgsUtils.h"
 #include "llvm/Linker/Linker.h"
 #include <llvm/Passes/PassBuilder.h>
@@ -96,15 +95,11 @@ bool LgsLinker::generateObjFile(std::unique_ptr<Module> mainModule, TargetMachin
 }
 
 std::string LgsLinker::findLgsLib() {
-    if constexpr (IS_DEVELOPMENT) {
 #ifdef __APPLE__
         return paths.rootPath.parent_path() / "cmake-build-debug";
 #elif defined(__linux__)
         return paths.rootPath.parent_path() / "build";
 #endif
-    } else {
-        return "$HOME/.logos/lib";
-    }
 }
 
 OptimizationLevel LgsLinker::getOptLevel(const uint8_t level) const {

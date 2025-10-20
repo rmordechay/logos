@@ -38,7 +38,7 @@ LgsType* LgsIterable::getValueType() {
 
 bool LgsIterable::unpackLoopVarsTypes(LgsForeachLoop* loop) const {
     if (loop->loopVars.size() != 1) return false;
-    const auto iterIndex = new LgsIterIndex(loop->iterExpr, LGS_SIZE_ZERO);
+    const auto iterIndex = new LgsIterIndex(loop->iterExpr, LGS_SIZE.getZeroValue());
     iterIndex->setType(baseType);
     loop->loopVars[0]->expr = iterIndex;
     loop->loopVars[0]->type = iterIndex->type;

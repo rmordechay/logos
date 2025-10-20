@@ -18,21 +18,21 @@
 #include "types/LgsObject.h"
 #include "types/LgsSubType.h"
 
-void LgsJsonParser::visitFile(LgsFile* file) {
+void LgsJsonParser::parseFile(LgsFile* file) {
     if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
-        visitMainFile(mainFile);
+        parseMainFile(mainFile);
     } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
-        visitObject(objFile->obj);
+        parseObject(objFile->obj);
     } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
-        visitInterface(interfaceFile->interface);
+        parseInterface(interfaceFile->interface);
     } else if (const auto testFile = dynamic_cast<LgsTestFile*>(file)) {
-        visitTestFile(testFile);
+        parseTestFile(testFile);
     } else {
         assert(0);
     }
 }
 
-void LgsJsonParser::visitMainFile(LgsMainFile* mainFile) {
+void LgsJsonParser::parseMainFile(LgsMainFile* mainFile) {
     openObject();
 
     openKeyArray("funcs");
@@ -40,7 +40,7 @@ void LgsJsonParser::visitMainFile(LgsMainFile* mainFile) {
     for (const auto& [funcName, func] : mainFile->funcs) {
         if (!first) json << ',';
         first = false;
-        visitFunc(func);
+        parseFunc(func);
     }
     closeArray(true);
 
@@ -49,7 +49,7 @@ void LgsJsonParser::visitMainFile(LgsMainFile* mainFile) {
     for (const auto obj : mainFile->objects) {
         if (!first) json << ',';
         first = false;
-        visitObject(obj);
+        parseObject(obj);
     }
     closeArray(true);
 
@@ -58,7 +58,7 @@ void LgsJsonParser::visitMainFile(LgsMainFile* mainFile) {
     for (const auto interface : mainFile->interfaces) {
         if (!first) json << ',';
         first = false;
-        visitInterface(interface);
+        parseInterface(interface);
     }
     closeArray(true);
 
@@ -67,7 +67,7 @@ void LgsJsonParser::visitMainFile(LgsMainFile* mainFile) {
     for (const auto enum_ : mainFile->enums) {
         if (!first) json << ',';
         first = false;
-        visitEnum(enum_);
+        parseEnum(enum_);
     }
     closeArray(true);
 
@@ -76,18 +76,18 @@ void LgsJsonParser::visitMainFile(LgsMainFile* mainFile) {
     for (const auto subtype : mainFile->subtypes) {
         if (!first) json << ',';
         first = false;
-        visitSubtype(subtype);
+        parseSubtype(subtype);
     }
     closeArray();
 
     closeObject();
 }
 
-void LgsJsonParser::visitTestFile(LgsTestFile* testFile) {
+void LgsJsonParser::parseTestFile(LgsTestFile* testFile) {
     assert(0);
 }
 
-void LgsJsonParser::visitObject(LgsObject* obj) {
+void LgsJsonParser::parseObject(LgsObject* obj) {
     openObject();
     addKeyValueStr("name", obj->name, true);
 
@@ -96,7 +96,7 @@ void LgsJsonParser::visitObject(LgsObject* obj) {
     for (const auto field : obj->fields) {
         if (!first) json << ',';
         first = false;
-        visitField(field);
+        parseField(field);
     }
     closeArray(true);
 
@@ -105,14 +105,14 @@ void LgsJsonParser::visitObject(LgsObject* obj) {
     for (const auto& [funcName, method] : obj->methods) {
         if (!first) json << ',';
         first = false;
-        visitFunc(method);
+        parseFunc(method);
     }
     closeArray();
 
     closeObject();
 }
 
-void LgsJsonParser::visitInterface(LgsInterface* interface) {
+void LgsJsonParser::parseInterface(LgsInterface* interface) {
     openObject();
     addKeyValueStr("name", interface->name, true);
 
@@ -121,7 +121,7 @@ void LgsJsonParser::visitInterface(LgsInterface* interface) {
     for (const auto field : interface->fields) {
         if (!first) json << ',';
         first = false;
-        visitField(field);
+        parseField(field);
     }
     closeArray(true);
 
@@ -130,14 +130,14 @@ void LgsJsonParser::visitInterface(LgsInterface* interface) {
     for (const auto& [funcName, method] : interface->methods) {
         if (!first) json << ',';
         first = false;
-        visitFunc(method);
+        parseFunc(method);
     }
     closeArray();
 
     closeObject();
 }
 
-void LgsJsonParser::visitEnum(const LgsEnum* enum_) {
+void LgsJsonParser::parseEnum(const LgsEnum* enum_) {
     openObject();
     addKeyValueStr("name", enum_->name);
     json << ',';
@@ -154,11 +154,11 @@ void LgsJsonParser::visitEnum(const LgsEnum* enum_) {
     closeObject();
 }
 
-void LgsJsonParser::visitSubtype(LgsSubType* subtype) {
+void LgsJsonParser::parseSubtype(LgsSubType* subtype) {
     assert(0);
 }
 
-void LgsJsonParser::visitField(const LgsField* field) {
+void LgsJsonParser::parseField(const LgsField* field) {
     openObject();
     addKeyValueStr("name", field->name, true);
     addKeyValueStr("type", field->type->getName(), true);
@@ -168,7 +168,7 @@ void LgsJsonParser::visitField(const LgsField* field) {
     closeObject();
 }
 
-void LgsJsonParser::visitFunc(const LgsFunc* func) {
+void LgsJsonParser::parseFunc(const LgsFunc* func) {
     openObject();
     addKeyValueStr("name", func->funcType->name, true);
     addKeyValueStr("rt", func->funcType->rt->getName(), true);
@@ -177,198 +177,198 @@ void LgsJsonParser::visitFunc(const LgsFunc* func) {
     for (const auto& param : func->funcType->params) {
         if (!first) json << ',';
         first = false;
-        visitParam(&param);
+        parseParam(&param);
     }
     closeArray(true);
     openKey("statements");
-    if (func->stmtsBlock) visitStmtsBlock(func->stmtsBlock);
+    if (func->stmtsBlock) parseStmtsBlock(func->stmtsBlock);
     else json << "[]";
     closeObject();
 }
 
-void LgsJsonParser::visitParam(const LgsParam* param) {
+void LgsJsonParser::parseParam(const LgsParam* param) {
     openObject();
     addKeyValueStr("name", param->name, true);
     addKeyValueStr("type", param->type->pname());
     closeObject();
 }
 
-void LgsJsonParser::visitIOPair(LgsIOPair* ioPair, LgsObject* obj) {
+void LgsJsonParser::parseIOPair(LgsIOPair* ioPair, LgsObject* obj) {
     assert(0);
 }
 
-void LgsJsonParser::visitStmt(LgsStmt* stmt) {
-    if (const auto pattern = stmt->asSwitch()) visitSwitch(pattern);
-    else if (const auto ifStmt = stmt->asIfStmt()) visitIfStmt(ifStmt);
-    else if (const auto varDec = stmt->asVarDec()) visitVarDec(varDec);
-    else if (const auto loopStmt = stmt->asLoop()) visitLoopStmt(loopStmt);
-    else if (const auto coroutine = stmt->asCoroutine()) visitCoroutine(coroutine);
-    else if (const auto deferStmt = stmt->asDefer()) visitDeferStmt(deferStmt);
-    else if (const auto assignment = stmt->asAssignment()) visitAssignment(assignment);
-    else if (const auto funcCall = stmt->asFuncCall()) visitFuncCall(funcCall);
-    else if (const auto postfixExpr = stmt->asPostfixExpr()) visitPostfixExpr(postfixExpr);
-    else if (const auto selection = stmt->asSelection()) visitSelection(selection);
-    else if (const auto returnStmt = stmt->asReturn()) visitReturnStmt(returnStmt);
-    else if (const auto continueStmt = stmt->asContinue()) visitContinueStmt(continueStmt);
-    else if (const auto ioStmt = stmt->asIOStmt()) visitIOStmt(ioStmt);
-    else if (const auto breakStmt = stmt->asBreak()) visitBreakStmt(breakStmt);
-    else if (auto expr = stmt->asExpr()) visitExpr(expr);
+void LgsJsonParser::parseStmt(LgsStmt* stmt) {
+    if (const auto pattern = stmt->asSwitch()) parseSwitch(pattern);
+    else if (const auto ifStmt = stmt->asIfStmt()) parseIfStmt(ifStmt);
+    else if (const auto varDec = stmt->asVarDec()) parseVarDec(varDec);
+    else if (const auto loopStmt = stmt->asLoop()) parseLoopStmt(loopStmt);
+    else if (const auto coroutine = stmt->asCoroutine()) parseCoroutine(coroutine);
+    else if (const auto deferStmt = stmt->asDefer()) parseDeferStmt(deferStmt);
+    else if (const auto assignment = stmt->asAssignment()) parseAssignment(assignment);
+    else if (const auto funcCall = stmt->asFuncCall()) parseFuncCall(funcCall);
+    else if (const auto postfixExpr = stmt->asPostfixExpr()) parsePostfixExpr(postfixExpr);
+    else if (const auto selection = stmt->asSelection()) parseSelection(selection);
+    else if (const auto returnStmt = stmt->asReturn()) parseReturnStmt(returnStmt);
+    else if (const auto continueStmt = stmt->asContinue()) parseContinueStmt(continueStmt);
+    else if (const auto ioStmt = stmt->asIOStmt()) parseIOStmt(ioStmt);
+    else if (const auto breakStmt = stmt->asBreak()) parseBreakStmt(breakStmt);
+    else if (auto expr = stmt->asExpr()) parseExpr(expr);
     else assert(0);
 }
 
-void LgsJsonParser::visitStmtsBlock(const LgsStmtsBlock* stmtsBlock) {
+void LgsJsonParser::parseStmtsBlock(const LgsStmtsBlock* stmtsBlock) {
     openArray();
     bool first = true;
     for (const auto stmt : stmtsBlock->stmts) {
         if (!first) json << ',';
         first = false;
-        visitStmt(stmt);
+        parseStmt(stmt);
     }
     closeArray();
 }
 
-void LgsJsonParser::visitVarDec(const LgsVarDec* varDec) {
+void LgsJsonParser::parseVarDec(const LgsVarDec* varDec) {
     openObject();
     addKeyValueStr("kind", "Variable", true);
     addKeyValueStr("name", varDec->name);
     closeObject();
 }
 
-void LgsJsonParser::visitAssignment(LgsAssignment* assignment) {
+void LgsJsonParser::parseAssignment(LgsAssignment* assignment) {
     assert(0);
 }
 
-void LgsJsonParser::visitIfStmt(LgsIfStmt* ifStmt) {
+void LgsJsonParser::parseIfStmt(LgsIfStmt* ifStmt) {
     openObject();
     addKeyValueStr("kind", "IfStmt", true);
     openKey("ifCond");
-    visitExpr(ifStmt->ifCond);
+    parseExpr(ifStmt->ifCond);
     closeObject();
 }
 
-void LgsJsonParser::visitSwitch(LgsSwitch* switchStmt) {
+void LgsJsonParser::parseSwitch(LgsSwitch* switchStmt) {
     openObject();
     addKeyValueStr("kind", "Switch");
     closeObject();
 }
 
-void LgsJsonParser::visitWhileLoop(LgsWhileLoop* whileLoop) {
+void LgsJsonParser::parseWhileLoop(LgsWhileLoop* whileLoop) {
     assert(0);
 }
 
-void LgsJsonParser::visitLoopStmt(LgsForLoop* loopStmt) {
+void LgsJsonParser::parseLoopStmt(LgsForLoop* loopStmt) {
     assert(0);
 }
 
-void LgsJsonParser::visitRangeLoop(LgsRangeLoop* rangeLoop) {
+void LgsJsonParser::parseRangeLoop(LgsRangeLoop* rangeLoop) {
     assert(0);
 }
 
-void LgsJsonParser::visitForeachLoop(LgsForeachLoop* foreachLoop) {
+void LgsJsonParser::parseForeachLoop(LgsForeachLoop* foreachLoop) {
     assert(0);
 }
 
-void LgsJsonParser::visitInfiniteLoop(const LgsInfiniteLoop* infiniteLoop) {
+void LgsJsonParser::parseInfiniteLoop(const LgsInfiniteLoop* infiniteLoop) {
     assert(0);
 }
 
-void LgsJsonParser::visitReturnStmt(LgsReturn* returnStmt) {
+void LgsJsonParser::parseReturnStmt(LgsReturn* returnStmt) {
     assert(0);
 }
 
-void LgsJsonParser::visitContinueStmt(const LgsContinue* continueStmt) {
+void LgsJsonParser::parseContinueStmt(const LgsContinue* continueStmt) {
     assert(0);
 }
 
-void LgsJsonParser::visitBreakStmt(const LgsBreak* breakStmt) {
+void LgsJsonParser::parseBreakStmt(const LgsBreak* breakStmt) {
     assert(0);
 }
 
-void LgsJsonParser::visitCoroutine(const LgsCoroutine* coroutine) {
+void LgsJsonParser::parseCoroutine(const LgsCoroutine* coroutine) {
     assert(0);
 }
 
-void LgsJsonParser::visitDeferStmt(const LgsDeferStmt* deferStmt) {
+void LgsJsonParser::parseDeferStmt(const LgsDeferStmt* deferStmt) {
     assert(0);
 }
 
-void LgsJsonParser::visitIOStmt(const LgsIOStmt* ioStmt) {
+void LgsJsonParser::parseIOStmt(const LgsIOStmt* ioStmt) {
     assert(0);
 }
 
-void LgsJsonParser::visitExpr(LgsExpr*& expr) {
+void LgsJsonParser::parseExpr(LgsExpr*& expr) {
     if (!expr) return;
     if (const auto ternaryExpr = dynamic_cast<LgsTernaryExpr*>(expr)) {
-        visitTernaryExpr(ternaryExpr);
+        parseTernaryExpr(ternaryExpr);
     } else if (const auto binaryExpr = dynamic_cast<LgsBinaryExpr*>(expr)) {
-        visitBinaryExpr(binaryExpr);
+        parseBinaryExpr(binaryExpr);
     } else {
-        if (const auto variable = expr->asVariable()) return visitVariable(variable);
-        if (const auto lambda = expr->asFunc()) return visitFunc(lambda);
-        if (const auto intConst = expr->asIntConst()) return visitIntConst(intConst);
-        if (const auto instance = expr->asInstance()) return visitInstance(instance);
-        if (const auto funcCall = expr->asFuncCall()) return visitFuncCall(funcCall);
-        if (const auto strConst = expr->asStrConst()) return visitStrConst(strConst);
-        if (const auto selection = expr->asSelection()) return visitSelection(selection);
-        if (const auto arrayExpr = expr->asArrayExpr()) return visitArrayExpr(arrayExpr);
-        if (const auto hashMap = expr->asHashMap()) return visitHashMap(hashMap);
-        if (const auto iterIndex = expr->asIterIndex()) return visitIterIndex(iterIndex);
-        if (const auto postfixExpr = expr->asPostfixExpr()) return visitPostfixExpr(postfixExpr);
-        if (const auto prefixExpr = expr->asPrefixExpr()) return visitPrefixExpr(prefixExpr);
-        if (const auto forVar = expr->asLoopMetaVar()) return visitLoopMetaVar(forVar);
-        if (const auto vecExpr = expr->asVectorExpr()) return visitVectorExpr(vecExpr);
-        if (const auto null = expr->asNull()) return visitNull(null);
-        if (const auto castExpr = expr->asCast()) return visitCast(castExpr);
-        if (const auto jsonExpr = expr->asJson()) return visitJson(jsonExpr);
+        if (const auto variable = expr->asVariable()) return parseVariable(variable);
+        if (const auto lambda = expr->asFunc()) return parseFunc(lambda);
+        if (const auto intConst = expr->asIntConst()) return parseIntConst(intConst);
+        if (const auto instance = expr->asInstance()) return parseInstance(instance);
+        if (const auto funcCall = expr->asFuncCall()) return parseFuncCall(funcCall);
+        if (const auto strConst = expr->asStrConst()) return parseStrConst(strConst);
+        if (const auto selection = expr->asSelection()) return parseSelection(selection);
+        if (const auto arrayExpr = expr->asArrayExpr()) return parseArrayExpr(arrayExpr);
+        if (const auto hashMap = expr->asHashMap()) return parseHashMap(hashMap);
+        if (const auto iterIndex = expr->asIterIndex()) return parseIterIndex(iterIndex);
+        if (const auto postfixExpr = expr->asPostfixExpr()) return parsePostfixExpr(postfixExpr);
+        if (const auto prefixExpr = expr->asPrefixExpr()) return parsePrefixExpr(prefixExpr);
+        if (const auto forVar = expr->asLoopMetaVar()) return parseLoopMetaVar(forVar);
+        if (const auto vecExpr = expr->asVectorExpr()) return parseVectorExpr(vecExpr);
+        if (const auto null = expr->asNull()) return parseNull(null);
+        if (const auto castExpr = expr->asCast()) return parseCast(castExpr);
+        if (const auto jsonExpr = expr->asJson()) return parseJson(jsonExpr);
         assert(0);
     }
 }
 
-void LgsJsonParser::visitBinaryExpr(const LgsBinaryExpr* binaryExpr) {
+void LgsJsonParser::parseBinaryExpr(const LgsBinaryExpr* binaryExpr) {
     openObject();
     addKeyValueStr("kind", "BinaryExpr", true);
     addKeyValueStr("operator", binaryExpr->op.name);
     closeObject();
 }
 
-void LgsJsonParser::visitTernaryExpr(LgsTernaryExpr* ternary) {
+void LgsJsonParser::parseTernaryExpr(LgsTernaryExpr* ternary) {
     openObject();
     addKeyValueStr("kind", "BinaryExpr");
     closeObject();
 }
 
-void LgsJsonParser::visitCast(LgsCast* cast) {
+void LgsJsonParser::parseCast(LgsCast* cast) {
     assert(0);
 }
 
-void LgsJsonParser::visitArrayExpr(LgsArrayExpr* arrayExpr) {
+void LgsJsonParser::parseArrayExpr(LgsArrayExpr* arrayExpr) {
     assert(0);
 }
 
-void LgsJsonParser::visitStaticArray(const LgsArrayExpr* arrayExpr) {
+void LgsJsonParser::parseStaticArray(const LgsArrayExpr* arrayExpr) {
     assert(0);
 }
 
-void LgsJsonParser::visitDynamicArray(LgsArrayExpr* arrayExpr) {
+void LgsJsonParser::parseDynamicArray(LgsArrayExpr* arrayExpr) {
     assert(0);
 }
 
-void LgsJsonParser::visitHashMap(LgsHashMap* hashMap) {
+void LgsJsonParser::parseHashMap(LgsHashMap* hashMap) {
     assert(0);
 }
 
-void LgsJsonParser::visitVectorExpr(const LgsVectorExpr* vectorExpr) {
+void LgsJsonParser::parseVectorExpr(const LgsVectorExpr* vectorExpr) {
     assert(0);
 }
 
-void LgsJsonParser::visitVariable(const LgsVariable* variable) {
+void LgsJsonParser::parseVariable(const LgsVariable* variable) {
     openObject();
     addKeyValueStr("kind", "Variable", true);
     addKeyValueStr("name", variable->name);
     closeObject();
 }
 
-void LgsJsonParser::visitSelection(const LgsSelection* selection) {
+void LgsJsonParser::parseSelection(const LgsSelection* selection) {
     openObject();
     addKeyValueStr("kind", "Selection", true);
     openKeyArray("exprs");
@@ -376,13 +376,13 @@ void LgsJsonParser::visitSelection(const LgsSelection* selection) {
     for (auto expr : selection->exprs) {
         if (!first) json << ',';
         first = false;
-        visitExpr(expr);
+        parseExpr(expr);
     }
     closeArray();
     closeObject();
 }
 
-void LgsJsonParser::visitFuncCall(const LgsFuncCall* funcCall) {
+void LgsJsonParser::parseFuncCall(const LgsFuncCall* funcCall) {
     openObject();
     addKeyValueStr("kind", "FuncCall", true);
     addKeyValueStr("name", funcCall->name, true);
@@ -392,44 +392,44 @@ void LgsJsonParser::visitFuncCall(const LgsFuncCall* funcCall) {
     for (auto arg : funcCall->args) {
         if (!first) json << ',';
         first = false;
-        visitExpr(arg);
+        parseExpr(arg);
     }
     closeArray();
     closeObject();
 }
 
-void LgsJsonParser::visitPrefixExpr(LgsPrefixExpr* prefixExpr) {
+void LgsJsonParser::parsePrefixExpr(LgsPrefixExpr* prefixExpr) {
     assert(0);
 }
 
-void LgsJsonParser::visitPostfixExpr(LgsPostfixExpr* postfixExpr) {
+void LgsJsonParser::parsePostfixExpr(LgsPostfixExpr* postfixExpr) {
     assert(0);
 }
 
-void LgsJsonParser::visitStrConst(const LgsStrConst* strConst) {
+void LgsJsonParser::parseStrConst(const LgsStrConst* strConst) {
     openObject();
     addKeyValueStr("kind", "IntConst", true);
     addKeyValueStr("value", strConst->value);
     closeObject();
 }
 
-void LgsJsonParser::visitTypeExpr(LgsTypeExpr* typeExpr) {
+void LgsJsonParser::parseTypeExpr(LgsTypeExpr* typeExpr) {
     assert(0);
 }
 
-void LgsJsonParser::visitJson(const LgsJson* jsonStmt) {
+void LgsJsonParser::parseJson(const LgsJson* jsonStmt) {
     assert(0);
 }
 
-void LgsJsonParser::visitInstance(LgsInstance* instance) {
+void LgsJsonParser::parseInstance(LgsInstance* instance) {
     assert(0);
 }
 
-void LgsJsonParser::visitNull(LgsNull* null) {
+void LgsJsonParser::parseNull(LgsNull* null) {
     assert(0);
 }
 
-void LgsJsonParser::visitIntConst(const LgsIntConst* intConst) {
+void LgsJsonParser::parseIntConst(const LgsIntConst* intConst) {
     openObject();
     addKeyValueStr("kind", "IntConst", true);
     addKeyValueStr("type", intConst->type->pname(), true);
@@ -437,23 +437,23 @@ void LgsJsonParser::visitIntConst(const LgsIntConst* intConst) {
     closeObject();
 }
 
-void LgsJsonParser::visitInterfaceInstance(LgsInstance* instance, LgsInterface* interface) {
+void LgsJsonParser::parseInterfaceInstance(LgsInstance* instance, LgsInterface* interface) {
     assert(0);
 }
 
-void LgsJsonParser::visitIterIndex(LgsIterIndex* iterIndex) {
+void LgsJsonParser::parseIterIndex(LgsIterIndex* iterIndex) {
     assert(0);
 }
 
-void LgsJsonParser::visitIndex(LgsIterIndex* iterIndex) {
+void LgsJsonParser::parseIndex(LgsIterIndex* iterIndex) {
     assert(0);
 }
 
-void LgsJsonParser::visitSlice(LgsIterIndex* iterIndex) {
+void LgsJsonParser::parseSlice(LgsIterIndex* iterIndex) {
     assert(0);
 }
 
-void LgsJsonParser::visitLoopMetaVar(LgsLoopMetaVar* metaVar) {
+void LgsJsonParser::parseLoopMetaVar(LgsLoopMetaVar* metaVar) {
     assert(0);
 }
 

@@ -1,58 +1,52 @@
 #include "cli/LgsCli.h"
 #include "cli/commands/LgsAstCmd.h"
+#include "cli/commands/LgsFormatCmd.h"
+#include "cli/commands/LgsLinterCmd.h"
 #include "cli/commands/LgsRunCmd.h"
 #include "cli/commands/LgsTestCmd.h"
+#include "data/LgsCliErrors.h"
 #include "data/LgsDefinitions.h"
 #include "utils/LgsUtils.h"
 
 void printLgsHelp();
 
 void LgsCli::execute() const {
-    if (argc < 2) {
-        logError("not enough arguments. See usage:\n\n");
-        printLgsHelp();
-        exit(0);
-    }
-
-    const std::string firstCmdStr = argv[1];
-    if (firstCmdStr == "run") {
+    if (argc < 2) exitWithError(E40001);
+    const std::string cmdStr = argv[1];
+    if (cmdStr == runCmdHelp.name) {
         LgsRunCmd cmd(argc, argv);
-        runCmd(cmd);
-    } else if (firstCmdStr == "test") {
+        cmd.run();
+    } else if (cmdStr == testCmdHelp.name) {
         LgsTestCmd cmd(argc, argv);
-        runCmd(cmd);
-    } else if (firstCmdStr == "ast") {
+        cmd.run();
+    } else if (cmdStr == astCmdHelp.name) {
         LgsAstCmd cmd(argc, argv);
-        runCmd(cmd);
-    } else if (firstCmdStr == "help") {
+        cmd.run();
+    } else if (cmdStr == formatCmdHelp.name) {
+        LgsLinterCmd cmd(argc, argv);
+        cmd.run();
+    } else if (cmdStr == linterCmdHelp.name) {
+        LgsFormatCmd cmd(argc, argv);
+        cmd.run();
+    } else if (cmdStr == "help") {
         printLgsHelp();
-    } else if (firstCmdStr == "version" || firstCmdStr == "-v" || firstCmdStr == "--version") {
+    } else if (cmdStr == "version") {
         logInfo(std::string(LOGOS_VERSION));
     } else {
-        logError("Unknown command.\n" + cmdStr + "\n\n");
+        logError(E40000.msg);
         printLgsHelp();
     }
-}
-
-void LgsCli::runCmd(LgsCliCmd& cmd) const {
-    if (isHelpCmd()) return cmd.printHelp();
-    const auto requiredArgs = cmd.getHelp().requiredArgs.size();
-    if (argc - 2 < requiredArgs) {
-        cmd.exitWithError("Too few arguments for command '%s" + cmd.getHelp().name + "'.");
-    }
-    cmd.run();
-}
-
-bool LgsCli::isHelpCmd() const {
-    return argc > 2 && std::string(argv[2]) == "help";
 }
 
 void printLgsHelp() {
     const std::string commands[][2] = {
-        {"run", runCmdHelp.summary},
-        {"ast", astCmdHelp.summary},
-        {"version, -v, --version", "Prints Logos version."},
-        {"help, --help", "Prints Logos help."},
+        {runCmdHelp.name, runCmdHelp.summary},
+        {testCmdHelp.name, testCmdHelp.summary},
+        {astCmdHelp.name, astCmdHelp.summary},
+        {formatCmdHelp.name, formatCmdHelp.summary},
+        {linterCmdHelp.name, linterCmdHelp.summary},
+        {"version", "Prints Logos version."},
+        {"help", "Prints Logos help."},
     };
     size_t maxLen = 0;
     std::ostringstream txt;
@@ -60,29 +54,11 @@ void printLgsHelp() {
         maxLen = std::max(maxLen, name.size());
     }
     txt << LGS_COLORIZE("Help\n", LGS_MSG_COLOR_WHITE);
-    txt << "Usage: " << "lgs <command> <options>\n\n";
+    txt << "Usage: " << "lgs <command> <options> <arguments>\n\n";
     txt << LGS_COLORIZE("Commands\n", LGS_MSG_COLOR_WHITE);
     for (auto& [name, desc] : commands) {
         txt << std::left << std::setw(maxLen + 4) << name << desc << '\n';
     }
-    txt << "\nFor more information: lgs <command> help\n";
+    txt << "\nFor more information run 'lgs <command> help'.\n";
     logInfo(txt.str());
-}
-
-void LgsCli::joinCmdStr() {
-    std::ostringstream oss;
-    for (int i = 0; i < argc; i++) {
-        if (i > 0) oss << " ";
-        if (i == 0) {
-            std::string prog(argv[0]);
-            const auto pos = prog.find_last_of("/\\");
-            if (pos != std::string::npos) {
-                prog = prog.substr(pos + 1);
-            }
-            oss << prog;
-        } else {
-            oss << argv[i];
-        }
-    }
-    cmdStr = oss.str();
 }

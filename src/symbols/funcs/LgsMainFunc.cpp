@@ -31,8 +31,4 @@ LgsMainFunc::~LgsMainFunc() {
         delete initArgsFunc;
         initArgsFunc = nullptr;
     }
-    if (argsArr) {
-        delete argsArr;
-        argsArr = nullptr;
-    }
 }

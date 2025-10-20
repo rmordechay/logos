@@ -1,9 +1,9 @@
 #pragma once
 
 enum LgsAppLogLevel {
-    INFO,
-    DEBUG,
-    ERROR,
+    APP_INFO,
+    APP_DEBUG,
+    APP_ERROR,
 };
 
 struct LgsAppVersion {
@@ -16,7 +16,7 @@ struct LgsAppConfigs {
     std::string name = "App";
     std::string activeEnv = "";
     LgsAppVersion version{1, 0, 0};
-    LgsAppLogLevel logLevel = INFO;
+    LgsAppLogLevel logLevel = APP_INFO;
     bool debugMode = false;
     bool isTestRun = false;
     bool isFileMode = false;

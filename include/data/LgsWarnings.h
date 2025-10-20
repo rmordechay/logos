@@ -7,7 +7,7 @@ struct LgsWarning {
 };
 
 /** Templates warnings. Should not be returned directly, but formatted and returned as a new LgsWarning */
-inline size_t warningCodeStart = 10000;
-inline LgsBaseError W10000{.msg = "Variable '%s' is not used.", .code = warningCodeStart};
-inline LgsBaseError W10001{.msg = "Setting owner for type '%s' has no meaning.", .code = warningCodeStart};
+inline size_t warningCodeStart = 50000;
+inline LgsBaseError W50000{.msg = "Variable '%s' is not used.", .code = warningCodeStart};
+inline LgsBaseError W50001{.msg = "Setting owner for type '%s' has no meaning.", .code = warningCodeStart};
 

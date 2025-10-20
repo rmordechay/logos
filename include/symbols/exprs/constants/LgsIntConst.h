@@ -14,5 +14,3 @@ public:
     Value* hash(LgsLLVMGen& cg) override;
     LgsExpr* clone() override;
 };
-
-inline auto LGS_SIZE_ZERO = new LgsIntConst(&LGS_SIZE, 0);

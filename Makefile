@@ -2,17 +2,8 @@ build:
 	cmake -S . -B build
 	cmake --build build -j5
 
-build_debug:
-	cmake -S . -B build
-	cmake --build build -j5
-
 run: build
 	cd build && ./lgs run ../project
-
-generate_grammar:
-	rm -rf src/parser
-	java -jar bin/antlr.jar -no-listener -Dlanguage=Cpp -o src/parser Logos.g4
-	mv src/parser/*.h include/parser/
 
 run_linux_docker tests/platforms/DockerfileUbuntu:
 	docker build -f tests/platforms/DockerfileUbuntu -v $(pwd):/app -t linux . && docker run -it -v $(pwd):/app linux

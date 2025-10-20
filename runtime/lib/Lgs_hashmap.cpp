@@ -28,7 +28,7 @@ extern "C" void* Lgs_map_get(const Lgs_hashmap* map, const char* key) {
     if (!map || !key || !map->data) assert(0);
     const auto v = map->data->find(key);
     if (v == map->data->end()) {
-        formatAndLogError(E10067.msg, {key});
+        exitWithError(E10067, {key});
         return nullptr;
     }
     return v->second.data();

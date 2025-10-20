@@ -99,7 +99,3 @@ extern "C" void Lgs_print(const Lgs_rttype rtt, void* v) {
     if (v) printf("%s\n", formatElement(rtt, v).c_str());
     else printf("%s\n", LGS_NULL_LITERAL);
 }
-
-extern "C" void Lgs_printError(const char* fmt) {
-    formatAndLogError(fmt);
-}

@@ -1,33 +1,33 @@
 #include "utils/LgsUtils.h"
 #include "LgsType.h"
 #include "data/LgsDefinitions.h"
-#include "files/LgsFile.h"
+#include "data/LgsTokens.h"
 #include "funcs/LgsParam.h"
 #include "types/iterables/LgsStr.h"
+#include <numeric>
 
 #define FNV_PRIME 16777619
 #define MAX_STR_HASH_LEN 1024
 #define MSG_PLACEHOLDER "%s"
-#define MSG_PADDING_PLACEHOLDER "%p"
-
-const std::unordered_set<std::string> LOGOS_KEYWORDS = {"object", "single", "self", "Self", "interface", "extern", "pub", "implements", "const", "enum",  "vec2", "vec3", "vec4", "if", "else", "for", "break", "continue", "return", "and", "or", "not", "in"};
 
 void logInfo(const std::string& text) {
     std::cout << text;
 }
 
-void logError(const std::string& msg, const std::string& path) {
-    logInfo(LGS_ERROR_STR + msg);
-    if (path != "") logInfo(path);
+void logError(const std::string& errMsg, const std::string& suffix) {
+    logInfo(prefixErrorLines(errMsg));
+    if (suffix != "") logInfo(suffix);
 }
 
 void logWarning(const std::string& msg, const std::string& path) {
-    logInfo(LGS_WARN_STR + msg);
+    logInfo(LGS_COLORIZE("Warning: ", LGS_MSG_COLOR_YELLOW));
     if (path != "") logInfo(path);
 }
 
-void formatAndLogError(const std::string& msg, const std::vector<std::string>& args) {
-    logError(formatErrorMsg(msg, args) + '\n');
+void exitWithError(const LgsBaseError& err, const std::vector<std::string>& args) {
+    const auto errMsg = formatErrorMsg(err.msg, args) + '\n';
+    logError(errMsg);
+    exit(1);
 }
 
 std::string formatErrorMsg(const std::string& msg, const std::vector<std::string>& args) {
@@ -39,14 +39,28 @@ std::string formatErrorMsg(const std::string& msg, const std::vector<std::string
         pos += args[argIndex].length();
         argIndex++;
     }
-    pos = 0;
-    argIndex = 0;
-    while ((pos = result.find(MSG_PADDING_PLACEHOLDER, pos)) != std::string::npos) {
-        result.replace(pos, std::strlen(MSG_PADDING_PLACEHOLDER), LGS_ERROR_PADDING);
-        pos += args[argIndex].length();
-        argIndex++;
-    }
     return result;
+}
+
+std::string prefixErrorLines(const std::string& text) {
+    if (text.empty()) return LGS_ERROR_TEXT;
+    std::string padding(std::strlen(LGS_ERROR_TEXT), ' ');
+    std::stringstream input(text);
+    std::stringstream result;
+    std::string line;
+    bool first = true;
+    while (std::getline(input, line)) {
+        if (first) {
+            result << LGS_COLORIZE_ERROR(LGS_ERROR_TEXT) << line;
+            first = false;
+        } else {
+            result << '\n' << padding << line;
+        }
+    }
+    if (!text.empty() && text.back() == '\n') {
+        result << '\n';
+    }
+    return result.str();
 }
 
 bool isLogosFile(const fs::path& filePath) {
@@ -58,11 +72,7 @@ bool isLLVMFile(const fs::directory_entry& entry) {
 }
 
 bool isLogosKeyword(const std::string& s) {
-    return LOGOS_KEYWORDS.find(s) != LOGOS_KEYWORDS.end();
-}
-
-bool validateTypeType(const std::string& name) {
-    return isupper(name[0]);
+    return LGS_KEYWORDS.find(s) != LGS_KEYWORDS.end();
 }
 
 std::string getFileText(const fs::path& filePath) {

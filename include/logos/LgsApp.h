@@ -26,7 +26,6 @@ inline std::mutex mtx;
 
 class LgsApp final {
 public:
-    LgsPaths paths;
     LgsAppConfigs appConfigs;
     LgsSymbolTable globals;
     LgsErrHandler errHandler;
@@ -36,15 +35,12 @@ public:
     std::map<size_t, fs::path> filePaths;
     LgsConfigFile* configFile = nullptr;
     std::atomic<size_t> nextFileID = 1;
-    std::vector<char*> appArgs;
+    std::vector<char*> mainArgs;
     ThreadPool threadPool;
     LgsLinter linter;
+    LgsPaths paths;
 
-    explicit LgsApp(const fs::path& rootPath = "") {
-        paths.rootPath = rootPath;
-    }
     void run();
-    void runTests();
     bool setup();
     bool parse();
     bool analyse();
@@ -59,6 +55,6 @@ public:
     void writeIRFiles();
     void exitWithErrors() const;
     void loadConfigs();
-    size_t getNextFileID(const fs::path& filePath);
+    void printConfigs() const;
     ~LgsApp();
 };

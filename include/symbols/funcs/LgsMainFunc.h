@@ -8,7 +8,6 @@ public:
     Function* IRFunc = nullptr;
     Value* argc = nullptr;
     Value* argv = nullptr;
-    LgsArrayExpr* argsArr = nullptr;
     LgsFunc* initArgsFunc = nullptr;
 
     explicit LgsMainFunc() : LgsFunc(LGS_MAIN_FUNC_NAME, &LGS_VOID, PUBLIC) {}

@@ -10,8 +10,8 @@ public:
 };
 
 inline LgsCliCmdHelp testCmdHelp{
-    .name = "run",
-    .usage = "lgs run <path> <options>",
+    .name = "test",
+    .usage = "lgs test <path> <options>",
     .summary = "Runs tests.",
     .desc = "The test command runs all the tests in a the project or a single test.",
     .requiredArgs = {

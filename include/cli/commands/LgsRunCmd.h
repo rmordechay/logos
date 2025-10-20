@@ -1,15 +1,14 @@
 #pragma once
-#include "../LgsCliCmd.h"
+#include "cli/LgsCliCmd.h"
 #include "types/iterables/LgsStr.h"
 #include "types/primitives/LgsInt.h"
 
 class LgsRunCmd final : public LgsCliCmd {
 public:
     LgsRunCmd(const int argc, char** argv) : LgsCliCmd(argc, argv) {}
+    void parseArgs(LgsApp& app) const;
     void run() override;
-    std::string joinArgs() const;
     LgsCliCmdHelp& getHelp() override;
-    void setArg(const std::string& key, const std::string& value, LgsApp& app) override;
 };
 
 inline LgsCliCmdHelp runCmdHelp{

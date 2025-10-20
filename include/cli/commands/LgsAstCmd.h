@@ -8,7 +8,7 @@ public:
 
     LgsAstCmd(const int argc, char** argv) : LgsCliCmd(argc, argv) {}
     void run() override;
-    void setArg(const std::string& key, const std::string& value, LgsApp& app) override;
+    void parseArgs(LgsApp& app) const;
     LgsCliCmdHelp& getHelp() override;
 };
 
