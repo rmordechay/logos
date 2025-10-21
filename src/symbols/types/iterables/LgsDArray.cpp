@@ -24,7 +24,7 @@ LgsFunc* LgsDArray::getMethod(const std::string& methodName) {
 
 Type* LgsDArray::getIRType(LgsLLVMGen& cg) {
     if (IRType) return IRType;
-    IRType = cg.getStructType({cg.sizeTy(), cg.sizeTy(), cg.ptrTy()}, name);
+    IRType = cg.getStructType({cg.ptrTy(), cg.sizeTy(), cg.sizeTy(), cg.ptrTy(), cg.i32Ty()}, name);
     return IRType;
 }
 

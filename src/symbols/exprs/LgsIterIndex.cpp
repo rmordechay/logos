@@ -77,7 +77,7 @@ void LgsIterIndex::assign(LgsLLVMGen& cg, LgsExpr* expr) {
     const auto baseIRValue = baseExpr;
     auto indexIR = index.from->IRValue;
     if (baseExpr->type->asDArray() || baseExpr->type->asSet()) {
-        const auto args = {baseIRValue->IRValue, indexIR, cg.getPtr(rIRValue)};
+        const auto args = {baseIRValue->IRValue, indexIR, cg.getPtrTo(rIRValue)};
         cg.callLgsFunc("put", cg.voidTy(), {cg.ptrTy(), cg.i32Ty(), cg.ptrTy()}, args);
     } else if (const auto map = baseExpr->type->asMap()) {
         map->getAddFunc()->callIR(cg, {baseExpr->IRValue, indexIR, expr->IRValue});
@@ -91,7 +91,7 @@ void LgsIterIndex::assignScalar(LgsLLVMGen& cg, LgsExpr* expr) const {
     const auto baseIRValue = baseExpr;
     auto indexIR = index.from->IRValue;
     if (baseExpr->type->asDArray() || baseExpr->type->asSet()) {
-        const auto args = {baseIRValue->IRValue, indexIR, cg.getPtr(rIRValue)};
+        const auto args = {baseIRValue->IRValue, indexIR, cg.getPtrTo(rIRValue)};
         cg.callLgsFunc("put", cg.voidTy(), {cg.ptrTy(), cg.i32Ty(), cg.ptrTy()}, args);
     } else if (const auto map = baseExpr->type->asMap()) {
         map->getAddFunc()->callIR(cg, {baseExpr->IRValue, indexIR, expr->IRValue});

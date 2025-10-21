@@ -139,7 +139,7 @@ Value* LgsLLVMGen::callLgsFunc(const std::string& funcName, Type* rt, const std:
     return callFunc(LGS_RUNTIME_NAMES_PREFIX + funcName, rt, paramTypes, args);
 }
 
-Value* LgsLLVMGen::getPtr(Value* v) {
+Value* LgsLLVMGen::getPtrTo(Value* v) {
     if (const auto gepInst = dyn_cast<GetElementPtrInst>(v)) {
         const auto elementType = gepInst->getResultElementType();
         if (elementType && (elementType->isPointerTy() || elementType->isArrayTy())) {

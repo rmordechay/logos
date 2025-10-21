@@ -142,18 +142,21 @@ void LgsSema::visitFunc(LgsFunc* func) {
     stack.exitScope();
 }
 
-void LgsSema::visitMainFunc(const LgsMainFunc* func) {
-    const auto ft = func->funcType;
+void LgsSema::visitMainFunc(LgsMainFunc* mainFunc) {
+    const auto ft = mainFunc->funcType;
     const auto paramSize = ft->params.size();
     if (paramSize > 1) {
-        errHandler.addError(E10039, &func->location);
+        errHandler.addError(E10039, &mainFunc->location);
     } else if (paramSize == 1) {
         const auto firstParam = ft->params.front();
         const auto iterable = firstParam.type->asIterable();
         if (!iterable || !iterable->baseType->asStr()) {
-            errHandler.addError(E10039, &func->location);
+            errHandler.addError(E10039, &mainFunc->location);
         }
     }
+    const auto dArray = new LgsDArray(new LgsStr());
+    dArray->size = LGS_SIZE.getZeroValue();
+    mainFunc->args = new LgsArrayExpr(dArray);
 }
 
 void LgsSema::visitLambda(LgsFunc* lambda) {

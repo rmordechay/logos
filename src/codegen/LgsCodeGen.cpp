@@ -112,7 +112,7 @@ void LgsCodeGen::visitTestFile(const LgsTestFile* testFile) {
 void LgsCodeGen::visitMainFunc(LgsMainFunc* func) {
     stack.enterScope(func);
     createPrologue(func);
-    if (!func->funcType->params.empty()) initMainArgs(func);
+    initMainArgs(func);
     visitStmtsBlock(func->stmtsBlock);
     createEpilogue(func);
     cg.callLgsFunc("runtime_close", cg.voidTy());
@@ -1097,12 +1097,20 @@ void LgsCodeGen::createEpilogue(LgsFunc* func) {
     }
 }
 
-void LgsCodeGen::initMainArgs(LgsMainFunc* mainFunc) {
-    const auto dArray = new LgsDArray(new LgsStr());
-    dArray->size = LGS_SIZE.getZeroValue();
-    dArray->size->IRValue = mainFunc->argc;
-    LgsArrayExpr argsArr(dArray);
-    visitArrayExpr(&argsArr);
+void LgsCodeGen::initMainArgs(const LgsMainFunc* mainFunc) {
+    if (mainFunc->funcType->params.empty()) return;
+    const auto& args = mainFunc->args;
+    const auto dArray = args->type->asDArray();
+    dArray->size->IRValue = currentIRFunc->getArg(0);
+    setDynamicArray(args);
+    const auto argv = currentIRFunc->getArg(1);
+    const auto cond = cg.builder.CreateSub(dArray->size->IRValue, cg.i32(1));
+    cg.loop(cond, [this, &args, &dArray, &argv](Value* iValue, BasicBlock*) {
+        const auto i = cg.builder.CreateAdd(iValue, cg.usize(1));
+        const auto gep = cg.builder.CreateInBoundsGEP(cg.ptrTy(), argv, {i});
+        dArray->getAddFunc()->callIR(cg, {args->IRValue, cg.builder.CreateLoad(cg.ptrTy(), gep)});
+    });
+    mainFunc->funcType->params[0].IRValue = args->IRValue;
 }
 
 Value* LgsCodeGen::getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) const {

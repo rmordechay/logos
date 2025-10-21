@@ -3,7 +3,6 @@
 #include "data/LgsDefinitions.h"
 #include "exprs/LgsNull.h"
 #include "types/primitives/LgsBool.h"
-#include "utils/LgsUtils.h"
 
 std::string formatArray(Lgs_darray* arr);
 
