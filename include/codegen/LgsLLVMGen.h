@@ -51,6 +51,7 @@ public:
 
     // System
     Value* callPrintf(const std::vector<Value*>& args);
+    Value* callSprintf(const std::vector<Value*>& args);
     Value* callStrLen(Value* str);
     void callMemCpy(Value* dest, Value* src, Value* size);
     Value* callMalloc(size_t size, bool isOwner, Lgs_rttype type);

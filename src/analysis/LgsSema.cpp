@@ -883,8 +883,8 @@ void LgsSema::visitPostfixExpr(LgsPostfixExpr* postfixExpr) {
 }
 
 void LgsSema::visitStrConst(const LgsStrConst* strConst) {
-    if (strConst->templateParts.empty()) return;
-    for (auto templatePart : strConst->templateParts) {
+    if (strConst->parts.empty()) return;
+    for (auto templatePart : strConst->parts) {
         visitExpr(templatePart);
     }
 }

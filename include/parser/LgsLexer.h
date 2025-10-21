@@ -20,7 +20,10 @@ public:
     bool match(char expected);
     char peek(size_t offset = 1) const;
     LgsToken scanVarOrKeyword(LgsLocation& location);
-    std::string scanString();
+    std::string scanDoubleQuotesString();
+    std::string scanSingleQuotesString();
+    std::string scanMultilineString();
+    char scanEscapeChar();
     LgsToken scanNumber(LgsLocation& location);
     void skipWhitespace();
     void skipLineComment();

@@ -21,8 +21,9 @@ Value* LgsStrConst::hash(LgsLLVMGen& cg) {
 }
 
 LgsStrConst::~LgsStrConst() {
-    if (formatedStr != "") {
-        // delete formatedStr.c_str();
-        // formatedStr = "";
+    for (const auto part : parts) {
+        freeExpr(part);
     }
+    parts.clear();
 }
+

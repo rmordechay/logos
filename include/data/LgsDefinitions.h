@@ -10,7 +10,7 @@
 #define LGS_APP_FILE_NAME "App.lgs"
 #define LGS_MAIN_FUNC_NAME "main"
 #define LGS_SELF "self"
-#define LGS_STR_FMT_PLACEHOLDER "$!v!$"
+#define LGS_STR_FMT_PLACEHOLDER "<!v!>"
 #define LGS_UNKNOWN_TYPE "<Unknown>"
 #define LGS_ANONYMOUS_STR "anonymous"
 #define LGS_NULL_LITERAL "null"

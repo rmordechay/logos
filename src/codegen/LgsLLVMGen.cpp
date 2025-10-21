@@ -162,6 +162,10 @@ Value* LgsLLVMGen::callPrintf(const std::vector<Value*>& args) {
     return callFunc("printf", getFT(i32Ty(), {ptrTy()}, true), args);
 }
 
+Value* LgsLLVMGen::callSprintf(const std::vector<Value*>& args) {
+    return callFunc("sprintf", getFT(i32Ty(), {ptrTy()}, true), args);
+}
+
 Value* LgsLLVMGen::callStrLen(Value* str) {
     return callFunc("strlen", i64Ty(), {ptrTy()}, {str});
 }

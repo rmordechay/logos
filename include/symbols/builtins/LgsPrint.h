@@ -8,5 +8,4 @@ public:
     static constexpr auto name = "print";
     explicit LgsPrint(): LgsFunc(name, &LGS_VOID, {&LGS_ANY}, PUBLIC | BUILTIN) {}
     Value* call(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) override;
-    static Value* printFormat(LgsLLVMGen& cg, const LgsStrConst* const strConst);
 };

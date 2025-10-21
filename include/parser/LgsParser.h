@@ -66,6 +66,9 @@ public:
 
     LgsParser(const size_t fileId, const fs::path& filePath, LgsPaths& paths, LgsSymbolTable& globals, const std::vector<LgsToken>& tokens) :
         fileID(fileId), paths(paths), globals(globals), filePath(filePath), tokens(tokens) {
+        if (!tokens.empty()) {
+            currentToken = tokens[0];
+        }
     }
 
     // Files
@@ -142,7 +145,7 @@ public:
     bool validateTypeName(const std::string& typeName, const LgsLocation* location);
     void addFileSymbol(LgsMainFile* file, const LgsSymbol& newSymbol);
     void setLocation(LgsLocation& location, const LgsToken* token) const;
-    static void extractStrParts(LgsStrConst& strConst);
+    void extractStrParts(LgsStrConst& strConst);
     static int getBinOpPrecedence(LgsBinOpType opType);
 
     // Parser
@@ -155,7 +158,6 @@ public:
     bool mustMatch(LgsTokenType t2);
     bool mustParse(const void* value);
     bool parsedOrReset(const void* value, size_t resetIndex);
-    bool initParser();
     void addParsingError();
     void recursionGuard();
     void validateTestFolder(const LgsFile* testFile);

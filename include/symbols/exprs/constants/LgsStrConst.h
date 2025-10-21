@@ -7,7 +7,7 @@ class LgsStrConst final : public LgsExpr {
 public:
     std::string value;
     std::string formatedStr = "";
-    std::vector<LgsExpr*> templateParts;
+    std::vector<LgsExpr*> parts;
 
     explicit LgsStrConst(const std::string& value) : value(value) {
         const auto lgsStr = new LgsStr();

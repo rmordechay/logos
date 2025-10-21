@@ -51,7 +51,6 @@
 #define MAX_TOKENS_NUMBER 10000
 
 LgsFile* LgsParser::parseSrcFile(const bool isTestRun) {
-    initParser();
     if (const auto mainFile = parseMainFile()) {
         return mainFile;
     }
@@ -143,7 +142,6 @@ LgsInterfaceFile* LgsParser::parseInterfaceFile() {
 
 
 LgsTestFile* LgsParser::parseTestFile() {
-    initParser();
     if (currentToken.lexeme != "test") {
         addParsingError();
         return nullptr;
@@ -177,7 +175,6 @@ LgsTestFile* LgsParser::parseTestFile() {
 }
 
 LgsEnvFile* LgsParser::parseEnvFile() {
-    initParser();
     if (currentToken.lexeme != "env") {
         addParsingError();
         return nullptr;
@@ -197,7 +194,6 @@ LgsEnvFile* LgsParser::parseEnvFile() {
 }
 
 LgsConfigFile* LgsParser::parseConfigFile() {
-    initParser();
     const auto configFile = new LgsConfigFile(0, filePath);
     while (true) {
         const auto varDec = parseVarDec();
@@ -977,9 +973,7 @@ LgsExpr* LgsParser::parseExprWithPrecedence(const int minPrecedence) {
 
 LgsExpr* LgsParser::parseExpr(const bool withLambda) {
     if (withLambda) {
-        if (const auto lambda = parseLambda()) {
-            return lambda;
-        }
+        if (const auto lambda = parseLambda()) return lambda;
     }
     const auto expr = parseExprWithPrecedence(0);
     if (matchAndConsume(T_THEN)) {
@@ -1439,19 +1433,24 @@ void LgsParser::extractStrParts(LgsStrConst& strConst) {
     size_t start = 0;
     std::string replaced = strConst.value;
     while (true) {
-        const auto open = replaced.find('{', start);
+        const auto open = replaced.find("${", start);
         if (open == std::string::npos) break;
         const auto close = replaced.find('}', open);
         if (close == std::string::npos) break;
-        if (close > open + 1) {
-            const auto part = replaced.substr(open + 1, close - open - 1);
-            assert(0);
+        if (close <= open + 2) {
+            addParsingError();
+            return;
         }
-        replaced.replace(open, close - open + 1, LGS_STR_FMT_PLACEHOLDER);
+        const auto part = replaced.substr(open + 2, close - 2);
+        LgsLexer lexer(fileID, part);
+        LgsParser parser(fileID, filePath, paths, globals, lexer.tokenize());
+        const auto expr = parser.parseExpr();
+        strConst.parts.push_back(expr);
+        replaced.replace(open, close + 1, LGS_STR_FMT_PLACEHOLDER);
         start = open + strlen(LGS_STR_FMT_PLACEHOLDER);
     }
     if (replaced != strConst.value) {
-        strConst.formatedStr = strdup(replaced.c_str());
+        strConst.formatedStr = replaced;
     }
 }
 
@@ -1544,12 +1543,6 @@ bool LgsParser::parsedOrReset(const void* value, const size_t resetIndex) {
     if (value) return true;
     reset(resetIndex);
     return false;
-}
-
-bool LgsParser::initParser() {
-    if (tokens.empty()) return false;
-    currentToken = tokens[0];
-    return true;
 }
 
 void LgsParser::addParsingError() {

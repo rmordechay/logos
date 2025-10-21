@@ -64,8 +64,14 @@ LgsToken LgsLexer::nextToken() {
     }
 
     // String
+    if (currentChar == '"' && peek() == '"') {
+        return {T_STRING, scanMultilineString(), location};
+    }
     if (currentChar == '"') {
-        return {T_STRING, scanString(), location};
+        return {T_STRING, scanDoubleQuotesString(), location};
+    }
+    if (currentChar == '\'') {
+        return {T_STRING, scanSingleQuotesString(), location};
     }
 
     switch (currentChar) {
@@ -216,22 +222,73 @@ LgsToken LgsLexer::scanVarOrKeyword(LgsLocation& location) {
     return {T_IDENTIFIER, lexeme, location};
 }
 
-std::string LgsLexer::scanString() {
-    std::string result;
+std::string LgsLexer::scanDoubleQuotesString() {
     advance();
+    std::string result;
     while (currentChar != '"' && currentChar != '\0') {
         if (currentChar == '\\') {
-            advance();
-            if (currentChar != '\0') {
-                result += currentChar;
-                advance();
-            }
+            result = scanEscapeChar();
         } else {
             result += currentChar;
             advance();
         }
     }
     if (currentChar == '"') advance();
+    return result;
+}
+
+std::string LgsLexer::scanSingleQuotesString() {
+    advance();
+    std::string result;
+    while (currentChar != '\'' && currentChar != '\0') {
+        if (currentChar == '\\') {
+            result = scanEscapeChar();
+        } else {
+            result += currentChar;
+            advance();
+        }
+    }
+    if (currentChar == '\'') advance();
+    return result;
+}
+
+std::string LgsLexer::scanMultilineString() {
+    advance();
+    advance();
+    std::string result;
+    while (currentChar != '\0') {
+        if (currentChar == '"' && peek() == '"') {
+            advance();
+            advance();
+            break;
+        }
+        if (currentChar == '\\') {
+            result += scanEscapeChar();
+        } else {
+            result += currentChar;
+            advance();
+        }
+    }
+    return result;
+}
+
+char LgsLexer::scanEscapeChar() {
+    advance();
+    char result;
+    switch (currentChar) {
+    case 'n':  result = '\n'; break;
+    case 't':  result = '\t'; break;
+    case 'r':  result = '\r'; break;
+    case '\\': result = '\\'; break;
+    case '"':  result = '"'; break;
+    case '\'': result = '\''; break;
+    case '0':  result = '\0'; break;
+    case 'b':  result = '\b'; break;
+    case 'f':  result = '\f'; break;
+    case 'v':  result = '\v'; break;
+    default: assert(0);
+    }
+    advance();
     return result;
 }
 
