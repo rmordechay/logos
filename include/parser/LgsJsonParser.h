@@ -1,5 +1,6 @@
 #pragma once
 #include "types/LgsEnum.h"
+#include <sstream>
 
 class LgsLoopMetaVar;
 class LgsJson;

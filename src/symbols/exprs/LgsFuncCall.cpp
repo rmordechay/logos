@@ -19,6 +19,7 @@ bool LgsFuncCall::equals(LgsExpr* other) {
 bool LgsFuncCall::equals(const LgsFuncType* other) const {
     if (other->hasDefaults()) return equalsDefaultParams(other);
     if (other->isVariadic) return equalsVariadic(other);
+    if (args.size() > other->params.size()) return false;
     for (size_t i = 0; i < other->params.size(); ++i) {
         if (i >= args.size()) break;
         const auto arg = args[i];

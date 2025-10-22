@@ -260,8 +260,6 @@ void LgsCodeGen::visitLoopMetaVar(LgsLoopMetaVar* metaVar) const {
     const auto loop = metaVar->forLoop;
     const auto iValue = loop->iValue;
     switch (metaVar->varType) {
-    case FOR_J:
-    case FOR_K:
     case FOR_I: {
         metaVar->IRValue = iValue;
         break;
@@ -823,19 +821,11 @@ void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
         visitExpr(funcCall->args[i]);
     }
 
-    auto ft = funcCall->func->funcType;
-    if (ft->hasDefaults()) {
-        const auto diff = ft->params.size() - funcCall->args.size() - 1;
-        for (int i = diff; i < ft->params.size(); ++i) {
-            visitExpr(ft->params[i].expr);
-        }
-    }
-
     if (funcCall->ref.symbolType == PARAM) {
         LgsFunc f(funcCall->ref.param->type->asFuncType());
         f.IRValue = getIRValue(funcCall->ref.param);
         if (!funcCall->isCoroutine && !funcCall->isDeferred) {
-            funcCall->IRValue = funcCall->func->call(cg, funcCall->args);
+            funcCall->IRValue = f.call(cg, funcCall->args);
         }
         return;
     }
@@ -844,9 +834,17 @@ void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
         LgsFunc f(funcCall->ref.varDec->type->asFuncType());
         f.IRValue = getIRValue(funcCall->ref.varDec);
         if (!funcCall->isCoroutine && !funcCall->isDeferred) {
-            funcCall->IRValue = funcCall->func->call(cg, funcCall->args);
+            funcCall->IRValue = f.call(cg, funcCall->args);
         }
         return;
+    }
+
+    auto ft = funcCall->func->funcType;
+    if (ft->hasDefaults()) {
+        const auto diff = ft->params.size() - funcCall->args.size() - 1;
+        for (int i = diff; i < ft->params.size(); ++i) {
+            visitExpr(ft->params[i].expr);
+        }
     }
 
     if (ft->isVirtual) {

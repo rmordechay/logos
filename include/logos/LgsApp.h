@@ -54,8 +54,8 @@ public:
     void loadEnvFiles();
     void initBuild();
     void writeIRFiles();
-    void exitWithErrors() const;
     void loadConfigs();
     void printConfigs() const;
+    void exitWithErrors() const;
     ~LgsApp();
 };

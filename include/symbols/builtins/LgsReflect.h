@@ -9,7 +9,7 @@ class LgsReflect final : public LgsObject {
 public:
     static constexpr auto name = "Reflect";
     LgsFunc* getFieldFunc = new LgsFunc{"getField", &LGS_ANY, {&LGS_ANY, new LgsStr()}, PUBLIC | BUILTIN};
-    LgsFunc* getMethodFunc = new LgsFunc{"getMethod", new LgsFuncType(), {&LGS_ANY, new LgsStr()}, PUBLIC | BUILTIN};
+    LgsFunc* getMethodFunc = new LgsFunc{"getMethod", new LgsFuncType(&LGS_ANY), {&LGS_ANY, new LgsStr()}, PUBLIC | BUILTIN};
 
     explicit LgsReflect() : LgsObject(name) {
         addMethod(getFieldFunc);

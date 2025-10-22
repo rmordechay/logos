@@ -1192,18 +1192,6 @@ LgsLoopMetaVar* LgsParser::parseLoopMetaVar() {
         metaVar->type = &LGS_SIZE;
         return metaVar;
     }
-    if (matchAndConsume(T_FOR_J)) {
-        const auto metaVar = new LgsLoopMetaVar(metaVarToken.lexeme, FOR_J);
-        setLocation(metaVar->location, &metaVarToken);
-        metaVar->type = &LGS_SIZE;
-        return metaVar;
-    }
-    if (matchAndConsume(T_FOR_K)) {
-        const auto metaVar = new LgsLoopMetaVar(metaVarToken.lexeme, FOR_K);
-        setLocation(metaVar->location, &metaVarToken);
-        metaVar->type = &LGS_SIZE;
-        return metaVar;
-    }
     if (matchAndConsume(T_FOR_IS_FIRST)) {
         const auto metaVar = new LgsLoopMetaVar(metaVarToken.lexeme, FOR_IS_FIRST);
         setLocation(metaVar->location, &metaVarToken);

@@ -195,6 +195,7 @@ LgsToken LgsLexer::scanVarOrKeyword(LgsLocation& location) {
     while (std::isalnum(currentChar) || currentChar == '_') {
         lexeme += currentChar;
         advance();
+        location.columnStart++;
         if (currentChar == '{') return {T_INSTANCE, lexeme, location};
         if (std::isspace(currentChar)) break;
     }
@@ -204,16 +205,16 @@ LgsToken LgsLexer::scanVarOrKeyword(LgsLocation& location) {
             while (std::isalnum(currentChar)) {
                 metaVar += currentChar;
                 advance();
+                location.columnStart++;
                 if (std::isspace(currentChar)) break;
             }
             const auto combined = lexeme + '.' + metaVar;
             if (metaVar == "i") return {T_FOR_I, combined, location};
-            if (metaVar == "j") return {T_FOR_J, combined, location};
-            if (metaVar == "k") return {T_FOR_K, combined, location};
             if (metaVar == "isFirst") return {T_FOR_IS_FIRST, combined, location};
             if (metaVar == "isLast") return {T_FOR_IS_LAST, combined, location};
             if (metaVar == "ever") return {T_FOR_EVER, combined, location};
-            assert(0);
+            errHandler.addError(E10088, &location);
+            return {T_EOF, "", location};
         }
         return {T_FOR, lexeme, location};
     }
@@ -300,23 +301,28 @@ LgsToken LgsLexer::scanNumber(LgsLocation& location) {
     if (currentChar == '-') {
         lexeme += currentChar;
         advance();
+        location.columnStart++;
     }
     while (std::isdigit(currentChar) || currentChar == '_') {
         lexeme += currentChar;
         advance();
+        location.columnStart++;
     }
     if (currentChar == '.' && std::isdigit(peek())) {
         lexeme += currentChar;
         advance();
+        location.columnStart++;
         while (std::isdigit(currentChar)) {
             lexeme += currentChar;
             advance();
+            location.columnStart++;
         }
         return {T_FLOAT, lexeme, location};
     }
     if (currentChar == 'L') {
         lexeme += currentChar;
         advance();
+        location.columnStart++;
         return {T_LONG, lexeme, location};
     }
     return {T_INTEGER, lexeme, location};

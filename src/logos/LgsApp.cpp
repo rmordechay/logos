@@ -121,16 +121,18 @@ void LgsApp::loadSrcFile(const std::string& code, const fs::path& filePath) {
     LgsLexer lexer(fileID, code);
     const auto tokens = lexer.tokenize();
     if (!lexer.errHandler.successful) {
+        std::lock_guard lock(mtx);
+        filePaths[fileID] = filePath;
         errHandler.mergeErrors(lexer.errHandler);
         return;
     }
+
     LgsParser parser(fileID, filePath, paths, globals, tokens);
     const auto file = parser.parseSrcFile(appConfigs.isTestRun);
-    {
-        std::lock_guard lock(mtx);
-        filePaths[fileID] = filePath;
-        if (file) srcFiles.push_back(file);
-        if (parser.errHandler.successful) return;
+    std::lock_guard lock(mtx);
+    filePaths[fileID] = filePath;
+    if (file) srcFiles.push_back(file);
+    if (!parser.errHandler.successful) {
         errHandler.mergeErrors(parser.errHandler);
     }
 }
@@ -207,30 +209,6 @@ void LgsApp::writeIRFiles() {
     }
 }
 
-void LgsApp::exitWithErrors() const {
-    for (int i = 0; i < errHandler.errors.size(); ++i) {
-        const auto err = errHandler.errors[i];
-        const auto filePath = filePaths.find(err.location.fileID);
-        assert(filePath != filePaths.end());
-        const auto column = err.location.columnStart;
-        const auto line = err.location.lineStart;
-        const auto rawLine = trim(getLine(filePath->second.string(), line));
-        auto errMsg = rawLine;
-        errMsg += '\n' + std::string(column - 2, '~');
-        errMsg += '^';
-        int rest = rawLine.size() - column + 1;
-        if (rest > 0) {
-            errMsg += std::string(rest, '~');
-        }
-        errMsg += '\n' + err.msg;
-        const auto path = "\n   at: " + getFullPath(err.location, filePath->second);
-        logError(errMsg, path);
-        if (i != errHandler.errors.size() - 1) logInfo(LGS_MSG_LINE_SEPERATOR);
-    }
-    if (!errHandler.errors.empty()) logInfo("\n");
-    exit(1);
-}
-
 void LgsApp::loadConfigs() {
     for (const auto config : configFile->configs) {
         const auto configNama = config->name;
@@ -261,6 +239,32 @@ void LgsApp::printConfigs() const {
     std::cout << "isTestRun  = " << appConfigs.isTestRun << std::endl;
     std::cout << "isFileMode = " << appConfigs.isFileMode << std::endl;
     std::cout << "optLevel   = " << std::to_string(appConfigs.optLevel) << std::endl;
+}
+
+void LgsApp::exitWithErrors() const {
+    for (int i = 0; i < errHandler.errors.size(); ++i) {
+        const auto err = errHandler.errors[i];
+        const auto filePath = filePaths.find(err.location.fileID);
+        assert(filePath != filePaths.end());
+        const auto column = err.location.columnStart;
+        const auto line = err.location.lineStart;
+        auto lineStr = getLine(filePath->second.string(), line);
+        const auto firstNonSpace = std::find_if(lineStr.begin(), lineStr.end(), [](const unsigned char c) { return !std::isspace(c); });
+        const auto trimmedCount = std::distance(lineStr.begin(), firstNonSpace);
+        auto errMsg = trim(lineStr);
+        errMsg += '\n' + std::string(column - trimmedCount - 2, '~');
+        errMsg += '^';
+        int rest = lineStr.size() - column + 1;
+        if (rest > 0) {
+            errMsg += std::string(rest, '~');
+        }
+        errMsg += '\n' + err.msg;
+        const auto path = "\n   at: " + getFullPath(err.location, filePath->second);
+        logError(errMsg, path);
+        if (i != errHandler.errors.size() - 1) logInfo(LGS_MSG_LINE_SEPERATOR);
+    }
+    if (!errHandler.errors.empty()) logInfo("\n");
+    exit(1);
 }
 
 LgsApp::~LgsApp() {
