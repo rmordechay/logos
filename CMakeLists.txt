@@ -150,6 +150,8 @@ set(RUNTIME_SOURCES
     include/data/LgsCliErrors.h
     include/symbols/types/LgsGeneric.h
     src/symbols/types/LgsGeneric.cpp
+    src/cli/commands/LgsGenerateCmd.cpp
+    include/cli/commands/LgsGenerateCmd.h
 )
 
 add_library(lgs_lib SHARED ${CORE_SOURCES} ${RUNTIME_SOURCES})

@@ -1,6 +1,7 @@
 #include "cli/LgsCli.h"
 #include "cli/commands/LgsAstCmd.h"
 #include "cli/commands/LgsFormatCmd.h"
+#include "cli/commands/LgsGenerateCmd.h"
 #include "cli/commands/LgsLinterCmd.h"
 #include "cli/commands/LgsRunCmd.h"
 #include "cli/commands/LgsTestCmd.h"
@@ -10,32 +11,61 @@
 
 void printLgsHelp();
 
+inline LgsCliCmdHelp versionCmdHelp{
+    .name = "version",
+    .usage = "lgs version",
+    .summary = "Prints Logos version.",
+    .desc = "The version command prints the version of the current lgs binary.",
+    .examples = {
+        "lgs version",
+    }
+};
+
+inline LgsCliCmdHelp helpCmdHelp{
+    .name = "help",
+    .usage = "lgs help",
+    .summary = "Prints Logos help.",
+    .desc = "The help command prints the main help of for lgs.",
+    .examples = {
+        "lgs help",
+    }
+};
+
 void LgsCli::execute() const {
     if (argc < 2) exitWithError(E40001);
     const std::string cmdStr = argv[1];
     if (cmdStr == runCmdHelp.name) {
         LgsRunCmd cmd(argc, argv);
-        cmd.run();
+        runCmd(cmd);
     } else if (cmdStr == testCmdHelp.name) {
         LgsTestCmd cmd(argc, argv);
-        cmd.run();
+        runCmd(cmd);
     } else if (cmdStr == astCmdHelp.name) {
         LgsAstCmd cmd(argc, argv);
-        cmd.run();
-    } else if (cmdStr == formatCmdHelp.name) {
-        LgsLinterCmd cmd(argc, argv);
-        cmd.run();
+        runCmd(cmd);
     } else if (cmdStr == linterCmdHelp.name) {
+        LgsLinterCmd cmd(argc, argv);
+        runCmd(cmd);
+    } else if (cmdStr == formatCmdHelp.name) {
         LgsFormatCmd cmd(argc, argv);
-        cmd.run();
-    } else if (cmdStr == "help") {
+        runCmd(cmd);
+    } else if (cmdStr == generateCmdHelp.name) {
+        LgsGenerateCmd cmd(argc, argv);
+        runCmd(cmd);
+    } else if (cmdStr == helpCmdHelp.name) {
         printLgsHelp();
-    } else if (cmdStr == "version") {
+    } else if (cmdStr == versionCmdHelp.name) {
         logInfo(std::string(LOGOS_VERSION));
     } else {
         logError(E40000.msg);
         printLgsHelp();
     }
+}
+
+void LgsCli::runCmd(LgsCliCmd& cmd) const {
+    const auto isHelp = argc == 3 && std::string(argv[2]) == helpCmdHelp.name;
+    if (isHelp) cmd.printHelp();
+    else cmd.run();
 }
 
 void printLgsHelp() {
@@ -45,8 +75,8 @@ void printLgsHelp() {
         {astCmdHelp.name, astCmdHelp.summary},
         {formatCmdHelp.name, formatCmdHelp.summary},
         {linterCmdHelp.name, linterCmdHelp.summary},
-        {"version", "Prints Logos version."},
-        {"help", "Prints Logos help."},
+        {versionCmdHelp.name, versionCmdHelp.summary},
+        {helpCmdHelp.name, helpCmdHelp.summary},
     };
     size_t maxLen = 0;
     std::ostringstream txt;
