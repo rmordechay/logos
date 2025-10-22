@@ -107,7 +107,7 @@ public:
 
     // Statements
     LgsStmt* parseStmt();
-    LgsStmtsBlock* parseStmtsBlock();
+    LgsStmtsBlock* parseStmtsBlock(bool withSingleStmt = true);
     LgsVarDec* parseVarDec();
     LgsStmt* parseAssignment();
     LgsStmt* parseIfStmt();

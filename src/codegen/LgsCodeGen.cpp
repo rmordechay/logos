@@ -55,24 +55,20 @@ void LgsCodeGen::generate(const LgsAppConfigs& appConfigs, TargetMachine& target
     if (const auto mainFile = dynamic_cast<LgsMainFile*>(&file)) {
         visitMainFile(mainFile);
     } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(&file)) {
-        visitObjFile(objFile);
+        visitObject(objFile->obj);
     } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(&file)) {
-        visitInterfaceFile(interfaceFile);
+        visitInterface(interfaceFile->interface);
     } else if (const auto testFile = dynamic_cast<LgsTestFile*>(&file)) {
         visitTestFile(testFile);
     }
 }
 
 void LgsCodeGen::visitMainFile(LgsMainFile* mainFile) {
+    for (const auto interface : mainFile->interfaces) {
+        visitInterface(interface);
+    }
     for (const auto object : mainFile->objects) {
-        const auto objIRType = object->getIRType(cg);
-        if(const auto singleton = object->singleton) {
-            const auto zeroInit = ConstantAggregateZero::get(objIRType);
-            singleton->IRValue = cg.createGlobal(objIRType, zeroInit, object->name);
-        }
-        for (const auto& [_, method] : object->methods) {
-            visitFunc(method);
-        }
+        visitObject(object);
     }
     for (const auto [_, func] : mainFile->funcs) {
         if (const auto mainFunc = dynamic_cast<LgsMainFunc*>(func)) {
@@ -83,8 +79,23 @@ void LgsCodeGen::visitMainFile(LgsMainFile* mainFile) {
     }
 }
 
-void LgsCodeGen::visitObjFile(const LgsObjectFile* objFile) {
-    const auto obj = objFile->obj;
+void LgsCodeGen::visitInterface(const LgsInterface* interface) {
+    for (const auto& [_, method] : interface->methods) {
+        if (!method->stmtsBlock) continue;
+        visitFunc(method);
+    }
+}
+
+void LgsCodeGen::visitTestFile(const LgsTestFile* testFile) {
+    for (const auto& func : testFile->funcs) {
+        visitFunc(func);
+    }
+    for (const auto& test : testFile->tests) {
+        visitFunc(test);
+    }
+}
+
+void LgsCodeGen::visitObject(LgsObject* obj) {
     if(const auto singleton = obj->singleton) {
         const auto objIRType = obj->getIRType(cg);
         singleton->IRValue = cg.IRModule->getGlobalVariable(obj->name);
@@ -95,17 +106,6 @@ void LgsCodeGen::visitObjFile(const LgsObjectFile* objFile) {
     }
     for (const auto& [_, method] : obj->methods) {
         visitFunc(method);
-    }
-}
-
-void LgsCodeGen::visitInterfaceFile(const LgsInterfaceFile* interfaceFile) {}
-
-void LgsCodeGen::visitTestFile(const LgsTestFile* testFile) {
-    for (const auto& func : testFile->funcs) {
-        visitFunc(func);
-    }
-    for (const auto& test : testFile->tests) {
-        visitFunc(test);
     }
 }
 
@@ -842,7 +842,7 @@ void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
     if (ft->isVirtual) {
         const auto self = funcCall->selfPtr;
         const auto keyIR = cg.getIRStr(funcCall->func->funcType->name);
-        funcCall->func->IRValue = cg.callLgsFunc("vtable_get", cg.ptrTy(), {cg.ptrTy(), cg.ptrTy()}, {self->IRValue, keyIR});
+        funcCall->func->IRValue = cg.callGetFromVTable(self->IRValue, keyIR);
     } else {
         visitIterFunc(funcCall);
     }
@@ -1022,21 +1022,33 @@ void LgsCodeGen::setNullableValue(LgsExpr* expr) {
     // expr->IRValue = cg.builder.CreateLoad(ty, nullable->valueField);
 }
 
-void LgsCodeGen::resolveVirtuals(LgsInstance* instance) const {
+void LgsCodeGen::resolveVirtuals(const LgsInstance* instance) const {
     const auto obj = instance->obj;
     for (const auto& field : obj->fields) {
         if (!field->isVirtual) continue;
         const auto keyIRStr = cg.getIRStr(field->name);
         const auto objIR = obj->getIRType(cg);
         const auto fieldGEP = cg.builder.CreateStructGEP(objIR, instance->IRValue, field->position);
-        cg.callLgsFunc("vtable_add", cg.voidTy(), {cg.ptrTy(), cg.ptrTy(), cg.ptrTy()}, {instance->IRValue, keyIRStr, fieldGEP});
+        cg.callAddToVTable(instance->IRValue, keyIRStr, fieldGEP);
+    }
+
+    // Implemented interface methods
+    for (const auto implement : instance->obj->implements) {
+        for (const auto& [name, interfaceMethod] : implement->methods) {
+            if (!interfaceMethod->stmtsBlock) continue;
+            const auto objMethod = obj->methods.find(name);
+            if (objMethod != obj->methods.end()) continue;
+            const auto keyIRStr = cg.getIRStr(interfaceMethod->funcType->name);
+            const auto IRFunc = interfaceMethod->getIRFunc(cg);
+            cg.callAddToVTable(instance->IRValue, keyIRStr, IRFunc);
+        }
     }
 
     for (const auto& [methodName, method] : obj->methods) {
         if (!method->funcType->isVirtual) continue;
         const auto keyIRStr = cg.getIRStr(method->funcType->name);
         const auto IRFunc = method->getIRFunc(cg);
-        cg.callLgsFunc("vtable_add", cg.voidTy(), {cg.ptrTy(), cg.ptrTy(), cg.ptrTy()}, {instance->IRValue, keyIRStr, IRFunc});
+        cg.callAddToVTable(instance->IRValue, keyIRStr, IRFunc);
     }
 }
 
@@ -1044,10 +1056,9 @@ bool LgsCodeGen::checkMock(LgsExpr* expr) {
     const auto currentFunc = stack.currentFunc();
     if (currentFunc->isTest) {
         for (auto [when, then] : currentFunc->mocks) {
-            if (when->equals(expr)) {
-                expr->IRValue = then->IRValue;
-                return true;
-            }
+            if (!when->equals(expr)) continue;
+            expr->IRValue = then->IRValue;
+            return true;
         }
     }
     return false;

@@ -120,7 +120,7 @@ public:
     bool validateFieldVisibility(LgsField* field, LgsType* parent);
     bool validateMethodVisibility(const LgsFunc* method, LgsType* parent, const LgsLocation& location);
     bool validateVecElements(const LgsVariable* fieldVar, LgsVec* vec);
-    void validateTypeDuplicates(LgsType* type);
+    void validateObjDuplicates(LgsType* type);
     static bool validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const LgsFunc* func);
 
     void addHeapExpr(LgsExpr* expr);

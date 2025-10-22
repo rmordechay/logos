@@ -28,6 +28,7 @@ public:
     void setupModule(const LgsFile& file, bool debugMode = false);
     void loop(Value* loopLength, const std::function<void(Value*, BasicBlock*)>& body);
     Value* getIRStr(const std::string& value);
+    Value* getPtrTo(Value* v);
     GlobalVariable* createGlobal(Type* type, ConstantAggregateZero* zeroInit, const std::string& name = "") const;
     GlobalVariable* createConstGlobal(Type* type, Constant* zeroInit, const std::string& name = "") const;
     StructType* getStructType(const std::vector<Type*>& fields, const std::string& name = "");
@@ -46,7 +47,6 @@ public:
     Value* callFunc(const std::string& funcName, FunctionType* ft, const std::vector<Value*>& args = {});
     Value* callFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes = {}, const std::vector<Value*>& args = {});
     Value* callLgsFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes = {}, const std::vector<Value*>& args = {});
-    Value* getPtrTo(Value* v);
     Value* callHash(Value* v);
 
     // System
@@ -59,6 +59,8 @@ public:
     // Stack
     void callStackPush(bool hasDefers, bool needsCleanup);
     void callPopStack(bool hasDefers, bool needsCleanup = false);
+    void callAddToVTable(Value* instance, Value* key, Value* ptr);
+    Value* callGetFromVTable(Value* instance, Value* key);
 
     // Types
     Type* i1Ty();

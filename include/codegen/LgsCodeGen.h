@@ -65,9 +65,9 @@ public:
     explicit LgsCodeGen(LgsFile& file) : file(file), cg(file.generator) {}
     void generate(const LgsAppConfigs& appConfigs, TargetMachine& targetMachine);
     void visitMainFile(LgsMainFile* mainFile);
-    void visitObjFile(const LgsObjectFile* objFile);
-    void visitInterfaceFile(const LgsInterfaceFile* interfaceFile);
+    void visitInterface(const LgsInterface* interface);
     void visitTestFile(const LgsTestFile* testFile);
+    void visitObject(LgsObject* obj);
     void visitMainFunc(LgsMainFunc* func);
     void visitFunc(LgsFunc* func);
     void visitField(LgsField* field) const;
@@ -117,7 +117,7 @@ public:
     void visitJson(LgsJson* json);
 
     void setNullableValue(LgsExpr* expr);
-    void resolveVirtuals(LgsInstance* instance) const;
+    void resolveVirtuals(const LgsInstance* instance) const;
     bool checkMock(LgsExpr* expr);
     void yield() const;
 

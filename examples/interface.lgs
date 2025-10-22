@@ -1,19 +1,36 @@
 interface Interface {
-    func()
-}
-
-object Obj {
-    implements: Interface
-    func() {
-        print("From Obj")
+    func1()
+    func2() {
+        print("From interface")
     }
 }
 
-r(o: Interface) {
-    o.func()
+object Obj1 {
+    implements: Interface
+    func1() { print("obj1") }
+    func2() {
+        print("From obj1")
+    }
+}
+
+object Obj2 {
+    implements: Interface
+    func1() { print("obj2") }
+}
+
+f(o: Interface) {
+    o.func1()
+}
+
+f2(o: Interface) {
+    o.func2()
 }
 
 main() {
-    obj = Obj{}
-    r(obj)
+    obj = Obj1{}
+    obj2 = Obj2{}
+    f(obj)
+    f(obj2)
+    f2(obj)
+    f2(obj2)
 }

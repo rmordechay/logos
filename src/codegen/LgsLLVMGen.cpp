@@ -64,6 +64,21 @@ Value* LgsLLVMGen::getIRStr(const std::string& value) {
     return globalVar;
 }
 
+Value* LgsLLVMGen::getPtrTo(Value* v) {
+    if (const auto gepInst = dyn_cast<GetElementPtrInst>(v)) {
+        const auto elementType = gepInst->getResultElementType();
+        if (elementType && (elementType->isPointerTy() || elementType->isArrayTy())) {
+            return builder.CreateLoad(ptrTy(), gepInst);
+        }
+        return v;
+    }
+    if (v->getType()->isPointerTy()) return v;
+    if (v->getType()->isIntegerTy()) {
+        return builder.CreateIntToPtr(v, ptrTy());
+    }
+    assert(0);
+}
+
 GlobalVariable* LgsLLVMGen::createGlobal(Type* type, ConstantAggregateZero* zeroInit, const std::string& name) const {
     return new GlobalVariable(*IRModule, type, false, GlobalValue::ExternalLinkage, zeroInit, name);
 }
@@ -139,21 +154,6 @@ Value* LgsLLVMGen::callLgsFunc(const std::string& funcName, Type* rt, const std:
     return callFunc(LGS_RUNTIME_NAMES_PREFIX + funcName, rt, paramTypes, args);
 }
 
-Value* LgsLLVMGen::getPtrTo(Value* v) {
-    if (const auto gepInst = dyn_cast<GetElementPtrInst>(v)) {
-        const auto elementType = gepInst->getResultElementType();
-        if (elementType && (elementType->isPointerTy() || elementType->isArrayTy())) {
-            return builder.CreateLoad(ptrTy(), gepInst);
-        }
-        return v;
-    }
-    if (v->getType()->isPointerTy()) return v;
-    if (v->getType()->isIntegerTy()) {
-        return builder.CreateIntToPtr(v, ptrTy());
-    }
-    assert(0);
-}
-
 Value* LgsLLVMGen::callHash(Value* v) {
     return callLgsFunc("hash", i32Ty(), {ptrTy()}, {v});
 }
@@ -194,6 +194,14 @@ void LgsLLVMGen::callPopStack(const bool hasDefers, const bool needsCleanup) {
     if (needsCleanup || hasDefers) {
         callLgsFunc("stack_pop", voidTy(), {i1Ty()}, {i1(needsCleanup)});
     }
+}
+
+void LgsLLVMGen::callAddToVTable(Value* instance, Value* key, Value* ptr) {
+    callLgsFunc("vtable_add", voidTy(), {ptrTy(), ptrTy(), ptrTy()}, {instance, key, ptr});
+}
+
+Value* LgsLLVMGen::callGetFromVTable(Value* instance, Value* key) {
+    return callLgsFunc("vtable_get", ptrTy(), {ptrTy(), ptrTy()}, {instance, key});
 }
 
 Type* LgsLLVMGen::i1Ty() {

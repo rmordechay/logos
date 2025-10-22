@@ -141,7 +141,6 @@ LgsInterfaceFile* LgsParser::parseInterfaceFile() {
     return file;
 }
 
-
 LgsTestFile* LgsParser::parseTestFile() {
     if (currentToken.lexeme != "test") {
         addParsingError();
@@ -234,17 +233,6 @@ LgsObject* LgsParser::parseObject() {
     return obj;
 }
 
-LgsInterface* LgsParser::parseInterface() {
-    if (!matchAndConsume(T_INTERFACE)) return nullptr;
-    const auto nameToken = currentToken;
-    mustMatch(T_IDENTIFIER);
-    mustMatch(T_LBRACE);
-    const auto interface = parseInterfaceBody(nameToken);
-    mustMatch(T_RBRACE);
-    validateTypeName(interface->name, &interface->location);
-    return interface;
-}
-
 LgsObject* LgsParser::parseObjectBody(const LgsToken& tokenName, const bool isSingleton) {
     auto const obj = new LgsObject(tokenName.lexeme);
     setLocation(obj->location, &tokenName);
@@ -306,6 +294,17 @@ LgsObject* LgsParser::parseObjectBody(const LgsToken& tokenName, const bool isSi
     return obj;
 }
 
+LgsInterface* LgsParser::parseInterface() {
+    if (!matchAndConsume(T_INTERFACE)) return nullptr;
+    const auto nameToken = currentToken;
+    mustMatch(T_IDENTIFIER);
+    mustMatch(T_LBRACE);
+    const auto interface = parseInterfaceBody(nameToken);
+    mustMatch(T_RBRACE);
+    validateTypeName(interface->name, &interface->location);
+    return interface;
+}
+
 LgsInterface* LgsParser::parseInterfaceBody(const LgsToken& tokenName) {
     auto const interface = new LgsInterface(tokenName.lexeme);
     setLocation(interface->location, &tokenName);
@@ -319,9 +318,11 @@ LgsInterface* LgsParser::parseInterfaceBody(const LgsToken& tokenName) {
     while (true) {
         const auto funcHeader = parseFuncHeader();
         if (!funcHeader) break;
+        funcHeader->parentName = interface->name;
         const auto method = new LgsFunc(funcHeader);
         method->funcType->isPublic = true;
         method->funcType->isVirtual = true;
+        method->stmtsBlock = parseStmtsBlock(false);
         interface->addMethod(method);
         if (currentToken.type == T_RBRACE || currentToken.type == T_EOF) break;
     }
@@ -540,9 +541,10 @@ LgsFunc* LgsParser::parseMethod(LgsObject* obj) {
     if (matchAndConsume(T_PUBLIC)) {
         isPublic = true;
     }
-    const auto ft = parseFuncHeader();
-    if (!ft) return nullptr;
-    const auto func = new LgsFunc(ft);
+    const auto funcHeader = parseFuncHeader();
+    if (!funcHeader) return nullptr;
+    funcHeader->parentName = obj->name;
+    const auto func = new LgsFunc(funcHeader);
     currentFunc = func;
     func->location = func->funcType->location;
     func->stmtsBlock = parseStmtsBlock();
@@ -607,7 +609,7 @@ LgsStmt* LgsParser::parseStmt() {
     return nullptr;
 }
 
-LgsStmtsBlock* LgsParser::parseStmtsBlock() {
+LgsStmtsBlock* LgsParser::parseStmtsBlock(const bool withSingleStmt) {
     LgsStmtsBlock* stmtsBlock = nullptr;
     if (matchAndConsume(T_LBRACE)) {
         stmtsBlock = new LgsStmtsBlock();
@@ -619,7 +621,7 @@ LgsStmtsBlock* LgsParser::parseStmtsBlock() {
             if (currentToken.type == T_RBRACE) break;
         }
         mustMatch(T_RBRACE);
-    } else {
+    } else if (withSingleStmt) {
         if (const auto stmt = parseStmt()) {
             stmtsBlock = new LgsStmtsBlock();
             stmtsBlock->location = stmt->location;

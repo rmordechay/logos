@@ -63,6 +63,9 @@ void LgsSema::analyse() {
 }
 
 void LgsSema::visitMainFile(LgsMainFile* mainFile) {
+    for (const auto interface : mainFile->interfaces) {
+        visitInterface(interface);
+    }
     for (const auto obj : mainFile->objects) {
         visitObject(obj);
     }
@@ -91,11 +94,13 @@ void LgsSema::visitObject(LgsObject* obj) {
         visitIOPair(ioPair, obj);
     }
     validateObjImplements(obj, obj->implements);
-    validateTypeDuplicates(obj);
+    validateObjDuplicates(obj);
 }
 
 void LgsSema::visitInterface(LgsInterface* interface) {
-
+    for (const auto& [_, method] : interface->methods) {
+        visitFunc(method);
+    }
 }
 
 void LgsSema::visitTestFile(const LgsTestFile* testFile) {
@@ -1138,6 +1143,10 @@ void LgsSema::validateObjImplements(LgsObject* obj, const std::vector<LgsType*>&
                 objMethod->second->funcType->isVirtual = true;
                 continue;
             }
+            if (interfaceMethod->stmtsBlock) {
+                interfaceMethod->funcType->isVirtual = true;
+                continue;
+            }
             missingMethods.emplace_back(interfaceMethod);
         }
 
@@ -1212,7 +1221,7 @@ bool LgsSema::validateVecElements(const LgsVariable* fieldVar, LgsVec* vec) {
     return true;
 }
 
-void LgsSema::validateTypeDuplicates(LgsType* type){
+void LgsSema::validateObjDuplicates(LgsType* type){
     std::unordered_set<std::string> names;
     for (const auto* f : type->fields) {
         if (!f) continue;
