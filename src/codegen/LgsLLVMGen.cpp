@@ -179,8 +179,7 @@ void LgsLLVMGen::callMemCpy(Value* dest, Value* src, Value* size) {
 Value* LgsLLVMGen::callMalloc(const size_t size, const bool isOwner, const Lgs_rttype type) {
     assert(type != RTT_UNKNOWN);
     const auto ptr = builder.CreateMalloc(sizeTy(), sizeTy(), usize(size), nullptr);
-    if (isOwner) callLgsFunc("stack_addOwner", voidTy(), {ptrTy(), i32Ty()}, {ptr, i32(type)});
-    else callLgsFunc("stack_addOrphan", voidTy(), {ptrTy(), i32Ty()}, {ptr, i32(type)});
+    addHeap(isOwner, type, ptr);
     return ptr;
 }
 
@@ -202,6 +201,11 @@ void LgsLLVMGen::callAddToVTable(Value* instance, Value* key, Value* ptr) {
 
 Value* LgsLLVMGen::callGetFromVTable(Value* instance, Value* key) {
     return callLgsFunc("vtable_get", ptrTy(), {ptrTy(), ptrTy()}, {instance, key});
+}
+
+void LgsLLVMGen::addHeap(const bool isOwner, const Lgs_rttype type, Value* ptr) {
+    if (isOwner) callLgsFunc("stack_addOwner", voidTy(), {ptrTy(), i32Ty()}, {ptr, i32(type)});
+    else callLgsFunc("stack_addOrphan", voidTy(), {ptrTy(), i32Ty()}, {ptr, i32(type)});
 }
 
 Type* LgsLLVMGen::i1Ty() {

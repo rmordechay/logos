@@ -1246,11 +1246,10 @@ void LgsCodeGen::setDynamicArray(LgsArrayExpr* arrayExpr) {
     const auto arr = arrayExpr->type->asDArray();
     const auto size = arr->baseType->getSizeBytes();
     if (!arrayExpr->IRValue) {
-        arrayExpr->IRValue = cg.callMalloc(arr->getSizeBytes(), arrayExpr->owner, arr->getRTType());
+        const auto rtt = arr->baseType->getRTType();
+        arrayExpr->IRValue = cg.callLgsFunc("darray_init", cg.ptrTy(), {cg.sizeTy(), cg.sizeTy()}, {cg.i64(size), cg.usize(rtt)});
+        cg.addHeap(arrayExpr->owner, rtt, arrayExpr->IRValue);
     }
-    LgsFunc initFunc("init", &LGS_VOID, {arr, &LGS_SIZE, &LGS_SIZE}, BUILTIN | METHOD);
-    initFunc.callIR(cg, {arrayExpr->IRValue, cg.i64(size), cg.usize(arr->baseType->getRTType())});
-
     for (int i = 0; i < arrayExpr->elements.size(); ++i) {
         const auto element = arrayExpr->elements[i];
         element->destPtrValue = arrayExpr->IRValue;

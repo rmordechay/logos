@@ -29,7 +29,7 @@ extern "C" void Lgs_stack_removeOwner(const void* owner) {
 }
 
 extern "C" void Lgs_stack_push() {
-    runtime.stack.push();
+    runtime.stack.stackIndex++;
 }
 
 extern "C" void Lgs_stack_pop(const bool cleanup) {

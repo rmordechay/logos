@@ -2,13 +2,15 @@
 #include "Lgs_types.h"
 #include <cstring>
 
-extern "C" void Lgs_darray_init(Lgs_darray* arr, const size_t elementSize, const Lgs_rttype baseType) {
+extern "C" Lgs_darray* Lgs_darray_init(const size_t elementSize, const Lgs_rttype baseType) {
     assert(baseType != RTT_UNKNOWN);
+    const auto arr = new Lgs_darray();
     arr->elementSize = elementSize;
     arr->baseType = baseType;
     arr->capacity = elementSize * 10;
     arr->data = static_cast<char*>(malloc(arr->capacity));
     arr->size = 0;
+    return arr;
 }
 
 extern "C" void Lgs_darray_reserve(Lgs_darray* arr, const size_t numElements) {

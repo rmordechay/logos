@@ -67,8 +67,7 @@ extern "C" void* Lgs_map_getValueAt(const Lgs_hashmap* map, const size_t index) 
 
 extern "C" Lgs_darray* Lgs_map_keys(const Lgs_hashmap* map) {
     if (!map) return nullptr;
-    const auto keys = new Lgs_darray();
-    Lgs_darray_init(keys, sizeof(char*), map->keyType);
+    const auto keys = Lgs_darray_init(sizeof(char*), map->keyType);
     for (const auto& [k, v] : *map->data) {
         const auto keyStr = strdup(k.c_str());
         Lgs_darray_add(keys, keyStr);
@@ -78,8 +77,7 @@ extern "C" Lgs_darray* Lgs_map_keys(const Lgs_hashmap* map) {
 
 extern "C" Lgs_darray* Lgs_map_values(const Lgs_hashmap* map) {
     if (!map) return nullptr;
-    const auto values = new Lgs_darray;
-    Lgs_darray_init(values, map->valueSize, map->valueType);
+    const auto values = Lgs_darray_init(map->valueSize, map->valueType);
     for (const auto& [k, v] : *map->data) {
         Lgs_darray_add(values, v.data());
     }

@@ -61,6 +61,7 @@ public:
     void callPopStack(bool hasDefers, bool needsCleanup = false);
     void callAddToVTable(Value* instance, Value* key, Value* ptr);
     Value* callGetFromVTable(Value* instance, Value* key);
+    void addHeap(bool isOwner, Lgs_rttype type, Value* ptr);
 
     // Types
     Type* i1Ty();
