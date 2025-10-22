@@ -75,6 +75,9 @@ LgsType* LgsTypeResolver::resolveType(LgsType* type, LgsFile* file) {
         case SUBTYPE:
             newType = symbol->subtype;
             break;
+        case GENERIC:
+            newType = symbol->generic;
+            break;
         case VAR_DEC:
         case PARAM:
         case FIELD:
@@ -112,6 +115,11 @@ void LgsTypeResolver::resolveObjTypes(LgsObject* obj, LgsFile& file) {
             file.symbolTable.addSymbol(LgsSymbol(field), &errHandler);
         }
     }
+
+    for (const auto generic : obj->generics) {
+        file.symbolTable.addSymbol(LgsSymbol(generic), &errHandler);
+    }
+
     for (const auto& field : obj->fields) {
         field->type = resolveType(field->type, &file);
     }

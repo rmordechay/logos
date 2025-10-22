@@ -103,7 +103,7 @@ public:
     void visitArrayExpr(LgsArrayExpr* array);
     void visitHashMap(LgsHashMap* hashMap);
     void visitVectorExpr(LgsVectorExpr* vectorExpr);
-    void visitVariable(LgsVariable* variable, bool assign = false);
+    void visitVariable(LgsVariable* variable);
     void visitSelection(LgsSelection* selection, bool assign = false);
     void visitFieldSelection(LgsVariable* var, LgsExpr* parent) const;
     void visitFuncCall(LgsFuncCall* funcCall);

@@ -38,6 +38,7 @@
 #include "stmts/LgsReturn.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsEnum.h"
+#include "types/LgsGeneric.h"
 #include "types/LgsInterface.h"
 #include "types/LgsSubType.h"
 #include "types/LgsUnknown.h"
@@ -248,6 +249,19 @@ LgsObject* LgsParser::parseObjectBody(const LgsToken& tokenName, const bool isSi
     auto const obj = new LgsObject(tokenName.lexeme);
     setLocation(obj->location, &tokenName);
 
+    // Generic types
+    if (matchAndConsume(T_COLON)) {
+        while (true) {
+            const auto type = parseGeneric();
+            if (!type) break;
+            obj->generics.push_back(type);
+            const auto ct = currentToken.type;
+            const auto nt = peek().type;
+            if (ct == T_EOF || ct == T_RBRACE || nt == T_COLON || nt == T_LPAREN || nt == T_ENUM || nt == T_INTERFACE || nt == T_IMPLEMENTS) break;
+            mustMatch(T_COMMA);
+        }
+    }
+
     // Implements
     if (matchAndConsume(T_IMPLEMENTS)) {
         mustMatch(T_COLON);
@@ -263,10 +277,10 @@ LgsObject* LgsParser::parseObjectBody(const LgsToken& tokenName, const bool isSi
     }
 
     while (true) {
-        if (const auto enum_ = parseEnum()) {
-            obj->enums.push_back(enum_);
-        } else if (const auto field = parseField()) {
+        if (const auto field = parseField()) {
             obj->addField(field);
+        } else if (const auto enum_ = parseEnum()) {
+            obj->enums.push_back(enum_);
         } else if (const auto subtype = parseSubtype()) {
             obj->subtypes.push_back(subtype);
         } else if (const auto ioPair = parseIOPair()) {
@@ -313,6 +327,14 @@ LgsInterface* LgsParser::parseInterfaceBody(const LgsToken& tokenName) {
     }
 
     return interface;
+}
+
+LgsGeneric* LgsParser::parseGeneric() {
+    if (currentToken.type != T_IDENTIFIER) return nullptr;
+    const auto generic = new LgsGeneric(currentToken.lexeme);
+    setLocation(generic->location, &currentToken);
+    consume();
+    return generic;
 }
 
 LgsField* LgsParser::parseField() {

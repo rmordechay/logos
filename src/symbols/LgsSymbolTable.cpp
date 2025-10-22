@@ -52,6 +52,7 @@ void LgsSymbolTable::freeSymbols() {
         case SUBTYPE:
             freeType(symbol.subtype);
             break;
+        case GENERIC:
         case UNKNOWN:
             break;
         }

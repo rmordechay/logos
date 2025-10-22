@@ -2,6 +2,7 @@
 #include <utility>
 #include "LgsType.h"
 
+class LgsGeneric;
 class LgsInstance;
 class LgsLLVMGen;
 class LgsField;
@@ -13,9 +14,10 @@ public:
     std::string name;
     std::vector<LgsType*> implements;
     std::vector<LgsEnum*> enums;
-    std::vector<LgsSubType*> subtypes;
     std::vector<LgsObject*> objects;
+    std::vector<LgsGeneric*> generics;
     std::vector<LgsIOPair*> ioPairs;
+    std::vector<LgsSubType*> subtypes;
     LgsInstance* singleton = nullptr;
 
     explicit LgsObject(std::string  name) : name(std::move(name)) {

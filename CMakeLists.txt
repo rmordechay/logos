@@ -148,6 +148,8 @@ set(RUNTIME_SOURCES
     ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_arena.cpp
     ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_set.cpp
     include/data/LgsCliErrors.h
+    include/symbols/types/LgsGeneric.h
+    src/symbols/types/LgsGeneric.cpp
 )
 
 add_library(lgs_lib SHARED ${CORE_SOURCES} ${RUNTIME_SOURCES})

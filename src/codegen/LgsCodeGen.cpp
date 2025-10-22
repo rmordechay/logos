@@ -560,7 +560,7 @@ void LgsCodeGen::visitExpr(LgsExpr* expr, const bool assign) {
         if (const auto arrayExpr = expr->asArrayExpr()) return visitArrayExpr(arrayExpr);
         if (const auto hashMap = expr->asHashMap()) return visitHashMap(hashMap);
         if (const auto iterIndex = expr->asIterIndex()) return visitIterIndex(iterIndex, assign);
-        if (const auto variable = expr->asVariable()) return visitVariable(variable, assign);
+        if (const auto variable = expr->asVariable()) return visitVariable(variable);
         if (const auto postfixExpr = expr->asPostfixExpr()) return visitPostfixExpr(postfixExpr);
         if (const auto prefixExpr = expr->asPrefixExpr()) return visitPrefixExpr(prefixExpr);
         if (const auto vecExpr = expr->asVectorExpr()) return visitVectorExpr(vecExpr);
@@ -729,7 +729,7 @@ void LgsCodeGen::visitVectorExpr(LgsVectorExpr* vectorExpr) {
     }
 }
 
-void LgsCodeGen::visitVariable(LgsVariable* variable, const bool assign) {
+void LgsCodeGen::visitVariable(LgsVariable* variable) {
     switch (variable->ref.symbolType) {
     case VAR_DEC:
         variable->IRValue = variable->ref.varDec->IRValue;
@@ -751,6 +751,8 @@ void LgsCodeGen::visitVariable(LgsVariable* variable, const bool assign) {
             variable->IRValue = variable->ref.field->IRValue;
         }
         break;
+    case GENERIC:
+        assert(0);
     case INTERFACE:
     case SUBTYPE:
     case UNKNOWN:
@@ -918,10 +920,12 @@ void LgsCodeGen::visitStrConst(LgsStrConst* strConst) {
                 formatted.replace(pos, strlen(LGS_STR_FMT_PLACEHOLDER), part->type->strFormatPart());
             }
         }
-        strConst->IRValue = cg.builder.CreateAlloca(ArrayType::get(cg.i8Ty(), 1024));
+        const auto arrTyp = ArrayType::get(cg.i8Ty(), 1024);
+        const auto buffer = cg.builder.CreateAlloca(arrTyp);
+        strConst->IRValue = buffer;
         std::vector IRArgs = {strConst->IRValue, cg.getIRStr(formatted + "\n")};
         IRArgs.insert(IRArgs.end(), values.begin(), values.end());
-        cg.callSprintf(IRArgs);
+        // cg.callSprintf(IRArgs);
     }
 }
 

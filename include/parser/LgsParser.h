@@ -7,6 +7,7 @@
 #include "utils/LgsErrHandler.h"
 #include "parser/LgsLexer.h"
 
+class LgsGeneric;
 struct LgsPaths;
 struct LgsSymbol;
 struct LgsAppConfigs;
@@ -86,6 +87,7 @@ public:
     LgsInterface* parseInterface();
     LgsObject* parseObjectBody(const LgsToken& tokenName, bool isSingleton);
     LgsInterface* parseInterfaceBody(const LgsToken& tokenName);
+    LgsGeneric* parseGeneric();
     LgsField* parseField();
     LgsIOPair* parseIOPair();
 

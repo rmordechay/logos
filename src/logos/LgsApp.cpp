@@ -218,7 +218,10 @@ void LgsApp::exitWithErrors() const {
         auto errMsg = rawLine;
         errMsg += '\n' + std::string(column - 2, '~');
         errMsg += '^';
-        errMsg += std::string(rawLine.size() - column + 1, '~');
+        int rest = rawLine.size() - column + 1;
+        if (rest > 0) {
+            errMsg += std::string(rest, '~');
+        }
         errMsg += '\n' + err.msg;
         const auto path = "\n   at: " + getFullPath(err.location, filePath->second);
         logError(errMsg, path);

@@ -3,6 +3,7 @@
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
+#include "types/LgsGeneric.h"
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
 #include "types/LgsSubType.h"
@@ -23,6 +24,9 @@ LgsSymbol::LgsSymbol(LgsInterface* interface)
 
 LgsSymbol::LgsSymbol(LgsSubType* subtype)
     : name(&subtype->name), symbolType(SUBTYPE), subtype(subtype), location(&subtype->location) {}
+
+LgsSymbol::LgsSymbol(LgsGeneric* generic)
+    : name(&generic->name), symbolType(GENERIC), generic(generic), location(&generic->location) {}
 
 LgsSymbol::LgsSymbol(LgsObject* object, const bool isExternal, const bool isBuiltin)
     : name(&object->name), symbolType(OBJECT), isExternal(isExternal), isBuiltin(isBuiltin), object(object), location(&object->location) {}
@@ -52,6 +56,8 @@ LgsType* LgsSymbol::getType() const {
         return interface;
     case SUBTYPE:
         return subtype;
+    case GENERIC:
+        return generic;
     case ENUM:
         return enum_;
     case UNKNOWN:

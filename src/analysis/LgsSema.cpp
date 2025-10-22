@@ -78,6 +78,9 @@ void LgsSema::visitMainFile(LgsMainFile* mainFile) {
 }
 
 void LgsSema::visitObject(LgsObject* obj) {
+    for (const auto& generic : obj->generics) {
+        visitGeneric(generic);
+    }
     for (const auto& field : obj->fields) {
         visitField(field);
     }
@@ -102,6 +105,9 @@ void LgsSema::visitTestFile(const LgsTestFile* testFile) {
     for (const auto& test : testFile->tests) {
         visitFunc(test);
     }
+}
+
+void LgsSema::visitGeneric(LgsGeneric* generic) {
 }
 
 void LgsSema::visitField(LgsField* field) {
