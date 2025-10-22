@@ -10,6 +10,8 @@
 
 enum LgsLoopMetaVarType {
     FOR_I,
+    FOR_J,
+    FOR_K,
     FOR_ELEMENT,
     FOR_IS_FIRST,
     FOR_IS_LAST,

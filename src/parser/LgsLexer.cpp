@@ -208,9 +208,12 @@ LgsToken LgsLexer::scanVarOrKeyword(LgsLocation& location) {
             }
             const auto combined = lexeme + '.' + metaVar;
             if (metaVar == "i") return {T_FOR_I, combined, location};
+            if (metaVar == "j") return {T_FOR_J, combined, location};
+            if (metaVar == "k") return {T_FOR_K, combined, location};
             if (metaVar == "isFirst") return {T_FOR_IS_FIRST, combined, location};
             if (metaVar == "isLast") return {T_FOR_IS_LAST, combined, location};
             if (metaVar == "ever") return {T_FOR_EVER, combined, location};
+            assert(0);
         }
         return {T_FOR, lexeme, location};
     }

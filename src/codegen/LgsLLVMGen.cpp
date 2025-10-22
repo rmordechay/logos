@@ -74,7 +74,9 @@ Value* LgsLLVMGen::getPtrTo(Value* v) {
     }
     if (v->getType()->isPointerTy()) return v;
     if (v->getType()->isIntegerTy()) {
-        return builder.CreateIntToPtr(v, ptrTy());
+        const auto a = builder.CreateAlloca(v->getType());
+        builder.CreateStore(v, a);
+        return a;
     }
     assert(0);
 }

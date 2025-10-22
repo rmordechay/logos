@@ -814,7 +814,7 @@ LgsForLoop* LgsParser::parseForLoop() {
 
     // At this point we are expecting a loop with an 'in' keyword (only variables are allowed).
     const auto firstLoopVar = firstExpr->asVariable();
-    mustParse(firstLoopVar);
+    if (!mustParse(firstLoopVar)) return nullptr;
     const auto firstVarName = firstLoopVar->name;
     freeExpr(firstExpr);
 
@@ -1188,6 +1188,18 @@ LgsLoopMetaVar* LgsParser::parseLoopMetaVar() {
     const auto metaVarToken = currentToken;
     if (matchAndConsume(T_FOR_I)) {
         const auto metaVar = new LgsLoopMetaVar(metaVarToken.lexeme, FOR_I);
+        setLocation(metaVar->location, &metaVarToken);
+        metaVar->type = &LGS_SIZE;
+        return metaVar;
+    }
+    if (matchAndConsume(T_FOR_J)) {
+        const auto metaVar = new LgsLoopMetaVar(metaVarToken.lexeme, FOR_J);
+        setLocation(metaVar->location, &metaVarToken);
+        metaVar->type = &LGS_SIZE;
+        return metaVar;
+    }
+    if (matchAndConsume(T_FOR_K)) {
+        const auto metaVar = new LgsLoopMetaVar(metaVarToken.lexeme, FOR_K);
         setLocation(metaVar->location, &metaVarToken);
         metaVar->type = &LGS_SIZE;
         return metaVar;

@@ -260,6 +260,8 @@ void LgsCodeGen::visitLoopMetaVar(LgsLoopMetaVar* metaVar) const {
     const auto loop = metaVar->forLoop;
     const auto iValue = loop->iValue;
     switch (metaVar->varType) {
+    case FOR_J:
+    case FOR_K:
     case FOR_I: {
         metaVar->IRValue = iValue;
         break;
