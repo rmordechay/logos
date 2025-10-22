@@ -101,8 +101,8 @@ public:
     void parseHashMap(LgsHashMap* hashMap);
     void parseVectorExpr(const LgsVectorExpr* vectorExpr);
     void parseVariable(const LgsVariable* variable);
-    void parseSelection(const LgsSelection* selection);
-    void parseFuncCall(const LgsFuncCall* funcCall);
+    void parseSelection(LgsSelection* selection);
+    void parseFuncCall(LgsFuncCall* funcCall);
     void parsePrefixExpr(LgsPrefixExpr* prefixExpr);
     void parsePostfixExpr(LgsPostfixExpr* postfixExpr);
     void parseStrConst(const LgsStrConst* strConst);

@@ -1,7 +1,6 @@
 #pragma once
 #include "cli/LgsCliCmd.h"
 #include "types/iterables/LgsStr.h"
-#include "types/primitives/LgsBool.h"
 
 class LgsFormatCmd final : public LgsCliCmd {
 public:
@@ -15,17 +14,8 @@ inline LgsCliCmdHelp formatCmdHelp{
     .usage = "lgs format <path> <options>",
     .summary = "Formats Logos code.",
     .desc = "The format command formats all the files in the project or a single file.",
-    .optionalArgs = {
-        {
-            .name = "-p",
-            .type = LgsBool::name,
-            .defaultVal = "false",
-            .possibleValues = "",
-            .desc = "Pretty print the JSON output."
-        },
-    },
     .examples = {
+        "lgs format path/to/root",
         "lgs format app.lgs",
-        "lgs format app.lgs -p",
     }
 };

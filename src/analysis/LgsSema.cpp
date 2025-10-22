@@ -186,6 +186,7 @@ void LgsSema::visitLambda(LgsFunc* lambda) {
 
 void LgsSema::visitParam(LgsParam* param) {
     if (param->expr) {
+        param->expr->completeType(param->type);
         visitExpr(param->expr);
         validateExprType(param->expr, param->type);
     } else if (param->isVariadic) {

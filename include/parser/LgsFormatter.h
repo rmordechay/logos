@@ -63,6 +63,9 @@ struct LgsIndex;
 
 class LgsFormatter {
 public:
+    uint16_t indentLevel = 0;
+    std::stringstream formatted;
+
     void formatFile(LgsFile* file);
     void formatMainFile(LgsMainFile* mainFile);
     void formatTestFile(LgsTestFile* testFile);
@@ -73,12 +76,13 @@ public:
     void formatEnum(const LgsEnum* enum_);
     void formatSubtype(LgsSubType* subtype);
     void formatField(const LgsField* field);
+    void formatFuncHeader(const LgsFunc* func);
     void formatFunc(const LgsFunc* func);
-    void formatParam(const LgsParam* param);
+    void formatParam(LgsParam& param);
     void formatIOPair(LgsIOPair* ioPair, LgsObject* obj);
     void formatStmt(LgsStmt* stmt);
     void formatStmtsBlock(const LgsStmtsBlock* stmtsBlock);
-    void formatVarDec(const LgsVarDec* varDec);
+    void formatVarDec(LgsVarDec* varDec);
     void formatAssignment(LgsAssignment* assignment);
     void formatIfStmt(LgsIfStmt* ifStmt);
     void formatSwitch(LgsSwitch* switchStmt);
@@ -94,7 +98,7 @@ public:
     void formatDeferStmt(const LgsDeferStmt* deferStmt);
     void formatIOStmt(const LgsIOStmt* ioStmt);
     void formatExpr(LgsExpr*& expr);
-    void formatBinaryExpr(const LgsBinaryExpr* binaryExpr);
+    void formatBinaryExpr(LgsBinaryExpr* binaryExpr);
     void formatTernaryExpr(LgsTernaryExpr* ternary);
     void formatCast(LgsCast* cast);
     void formatArrayExpr(LgsArrayExpr* arrayExpr);
@@ -104,7 +108,7 @@ public:
     void formatVectorExpr(const LgsVectorExpr* vectorExpr);
     void formatVariable(const LgsVariable* variable);
     void formatSelection(const LgsSelection* selection);
-    void formatFuncCall(const LgsFuncCall* funcCall);
+    void formatFuncCall(LgsFuncCall* funcCall);
     void formatPrefixExpr(LgsPrefixExpr* prefixExpr);
     void formatPostfixExpr(LgsPostfixExpr* postfixExpr);
     void formatStrConst(const LgsStrConst* strConst);
@@ -118,4 +122,6 @@ public:
     void formatIndex(LgsIterIndex* iterIndex);
     void formatSlice(LgsIterIndex* iterIndex);
     void formatLoopMetaVar(LgsLoopMetaVar* metaVar);
+    void insert(const std::string& text);
+    void newLine(bool withIndent = false, uint8_t lines = 1);
 };

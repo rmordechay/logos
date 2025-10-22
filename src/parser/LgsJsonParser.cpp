@@ -36,47 +36,39 @@ void LgsJsonParser::parseMainFile(LgsMainFile* mainFile) {
     openObject();
 
     openKeyArray("funcs");
-    bool first = true;
+    bool isFirst = true;
     for (const auto& [funcName, func] : mainFile->funcs) {
-        if (!first) json << ',';
-        first = false;
+        if (!isFirst) json << ',';
+        isFirst = false;
         parseFunc(func);
     }
     closeArray(true);
 
     openKeyArray("object");
-    first = true;
-    for (const auto obj : mainFile->objects) {
-        if (!first) json << ',';
-        first = false;
-        parseObject(obj);
+    for (int i = 0; i < mainFile->objects.size(); ++i) {
+        if (i > 0) json << ',';
+        parseObject(mainFile->objects[i]);
     }
     closeArray(true);
 
     openKeyArray("interfaces");
-    first = true;
-    for (const auto interface : mainFile->interfaces) {
-        if (!first) json << ',';
-        first = false;
-        parseInterface(interface);
+    for (int i = 0; i < mainFile->interfaces.size(); ++i) {
+        if (i > 0) json << ',';
+        parseInterface(mainFile->interfaces[i]);
     }
     closeArray(true);
 
     openKeyArray("enums");
-    first = true;
-    for (const auto enum_ : mainFile->enums) {
-        if (!first) json << ',';
-        first = false;
-        parseEnum(enum_);
+    for (int i = 0; i < mainFile->enums.size(); ++i) {
+        if (i > 0) json << ',';
+        parseEnum(mainFile->enums[i]);
     }
     closeArray(true);
 
     openKeyArray("subtypes");
-    first = true;
-    for (const auto subtype : mainFile->subtypes) {
-        if (!first) json << ',';
-        first = false;
-        parseSubtype(subtype);
+    for (int i = 0; i < mainFile->subtypes.size(); ++i) {
+        if (i > 0) json << ',';
+        parseSubtype(mainFile->subtypes[i]);
     }
     closeArray();
 
@@ -92,19 +84,17 @@ void LgsJsonParser::parseObject(LgsObject* obj) {
     addKeyValueStr("name", obj->name, true);
 
     openKeyArray("fields");
-    bool first = true;
-    for (const auto field : obj->fields) {
-        if (!first) json << ',';
-        first = false;
-        parseField(field);
+    for (int i = 0; i < obj->fields.size(); ++i) {
+        if (i > 0) json << ',';
+        parseField(obj->fields[i]);
     }
     closeArray(true);
 
     openKeyArray("methods");
-    first = true;
+    bool isFirst = true;
     for (const auto& [funcName, method] : obj->methods) {
-        if (!first) json << ',';
-        first = false;
+        if (!isFirst) json << ',';
+        isFirst = false;
         parseFunc(method);
     }
     closeArray();
@@ -117,19 +107,17 @@ void LgsJsonParser::parseInterface(LgsInterface* interface) {
     addKeyValueStr("name", interface->name, true);
 
     openKeyArray("fields");
-    bool first = true;
-    for (const auto field : interface->fields) {
-        if (!first) json << ',';
-        first = false;
-        parseField(field);
+    for (int i = 0; i < interface->fields.size(); ++i) {
+        if (i > 0) json << ',';
+        parseField(interface->fields[i]);
     }
     closeArray(true);
 
     openKeyArray("methods");
-    first = true;
+    bool isFirst = true;
     for (const auto& [funcName, method] : interface->methods) {
-        if (!first) json << ',';
-        first = false;
+        if (!isFirst) json << ',';
+        isFirst = false;
         parseFunc(method);
     }
     closeArray();
@@ -142,12 +130,10 @@ void LgsJsonParser::parseEnum(const LgsEnum* enum_) {
     addKeyValueStr("name", enum_->name);
     json << ',';
     openKeyArray("fields");
-    auto first = true;
-    for (const auto f : enum_->fields) {
-        if (!first) json << ',';
-        first = false;
+    for (int i = 0; i < enum_->fields.size(); ++i) {
+        if (i > 0) json << ',';
         openObject();
-        addKeyValueStr("name", f->name);
+        addKeyValueStr("name", enum_->fields[i]->name);
         closeObject();
     }
     closeArray();
@@ -173,11 +159,9 @@ void LgsJsonParser::parseFunc(const LgsFunc* func) {
     addKeyValueStr("name", func->funcType->name, true);
     addKeyValueStr("rt", func->funcType->rt->getName(), true);
     openKeyArray("params");
-    bool first = true;
-    for (const auto& param : func->funcType->params) {
-        if (!first) json << ',';
-        first = false;
-        parseParam(&param);
+    for (int i = 0; i < func->funcType->params.size(); ++i) {
+        if (i > 0) json << ',';
+        parseParam(&func->funcType->params[i]);
     }
     closeArray(true);
     openKey("statements");
@@ -218,11 +202,9 @@ void LgsJsonParser::parseStmt(LgsStmt* stmt) {
 
 void LgsJsonParser::parseStmtsBlock(const LgsStmtsBlock* stmtsBlock) {
     openArray();
-    bool first = true;
-    for (const auto stmt : stmtsBlock->stmts) {
-        if (!first) json << ',';
-        first = false;
-        parseStmt(stmt);
+    for (int i = 0; i < stmtsBlock->stmts.size(); ++i) {
+        if (i > 0) json << ',';
+        parseStmt(stmtsBlock->stmts[i]);
     }
     closeArray();
 }
@@ -368,31 +350,27 @@ void LgsJsonParser::parseVariable(const LgsVariable* variable) {
     closeObject();
 }
 
-void LgsJsonParser::parseSelection(const LgsSelection* selection) {
+void LgsJsonParser::parseSelection(LgsSelection* selection) {
     openObject();
     addKeyValueStr("kind", "Selection", true);
     openKeyArray("exprs");
-    bool first = true;
-    for (auto expr : selection->exprs) {
-        if (!first) json << ',';
-        first = false;
-        parseExpr(expr);
+    for (int i = 0; i < selection->exprs.size(); ++i) {
+        if (i > 0) json << ',';
+        parseExpr(selection->exprs[i]);
     }
     closeArray();
     closeObject();
 }
 
-void LgsJsonParser::parseFuncCall(const LgsFuncCall* funcCall) {
+void LgsJsonParser::parseFuncCall(LgsFuncCall* funcCall) {
     openObject();
     addKeyValueStr("kind", "FuncCall", true);
     addKeyValueStr("name", funcCall->name, true);
     openKey("args");
     openArray();
-    bool first = true;
-    for (auto arg : funcCall->args) {
-        if (!first) json << ',';
-        first = false;
-        parseExpr(arg);
+    for (int i = 0; i < funcCall->args.size(); ++i) {
+        if (i > 0) json << ',';
+        parseExpr(funcCall->args[i]);
     }
     closeArray();
     closeObject();

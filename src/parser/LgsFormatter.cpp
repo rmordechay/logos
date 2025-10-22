@@ -1,9 +1,16 @@
 #include "parser/LgsFormatter.h"
-
+#include "exprs/LgsArrayExpr.h"
+#include "exprs/LgsFuncCall.h"
+#include "exprs/LgsTernaryExpr.h"
+#include "exprs/LgsVariable.h"
+#include "exprs/constants/LgsStrConst.h"
 #include "files/LgsInterfaceFile.h"
 #include "files/LgsMainFile.h"
 #include "files/LgsObjectFile.h"
 #include "files/LgsTestFile.h"
+#include "stmts/LgsVarDec.h"
+
+#define TAB_SIZE 4
 
 void LgsFormatter::formatFile(LgsFile* file) {
     if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
@@ -17,11 +24,30 @@ void LgsFormatter::formatFile(LgsFile* file) {
     } else {
         assert(0);
     }
-
+    std::cout << formatted.str();
 }
 
 void LgsFormatter::formatMainFile(LgsMainFile* mainFile) {
-    assert(0);
+    for (const auto& [funcName, func] : mainFile->funcs) {
+        formatFunc(func);
+        newLine(false, 2);
+    }
+
+    for (const auto obj : mainFile->objects) {
+        formatObject(obj);
+    }
+
+    for (const auto interface : mainFile->interfaces) {
+        formatInterface(interface);
+    }
+
+    for (const auto enum_ : mainFile->enums) {
+        formatEnum(enum_);
+    }
+
+    for (const auto subtype : mainFile->subtypes) {
+        formatSubtype(subtype);
+    }
 }
 
 void LgsFormatter::formatTestFile(LgsTestFile* testFile) {
@@ -56,12 +82,26 @@ void LgsFormatter::formatField(const LgsField* field) {
     assert(0);
 }
 
-void LgsFormatter::formatFunc(const LgsFunc* func) {
-    assert(0);
+void LgsFormatter::formatFuncHeader(const LgsFunc* func) {
+    insert(func->funcType->name + '(');
+    for (int i = 0; i < func->funcType->params.size(); ++i) {
+        if (i > 0) insert(", ");
+        formatParam(func->funcType->params[i]);
+    }
+    insert(")");
 }
 
-void LgsFormatter::formatParam(const LgsParam* param) {
-    assert(0);
+void LgsFormatter::formatFunc(const LgsFunc* func) {
+    formatFuncHeader(func);
+    formatStmtsBlock(func->stmtsBlock);
+}
+
+void LgsFormatter::formatParam(LgsParam& param) {
+    insert(param.name + ": " + param.type->pname());
+    if (param.expr) {
+        insert(" = ");
+        formatExpr(param.expr);
+    }
 }
 
 void LgsFormatter::formatIOPair(LgsIOPair* ioPair, LgsObject* obj) {
@@ -69,15 +109,46 @@ void LgsFormatter::formatIOPair(LgsIOPair* ioPair, LgsObject* obj) {
 }
 
 void LgsFormatter::formatStmt(LgsStmt* stmt) {
-    assert(0);
+    if (const auto pattern = stmt->asSwitch()) formatSwitch(pattern);
+    else if (const auto ifStmt = stmt->asIfStmt()) formatIfStmt(ifStmt);
+    else if (const auto varDec = stmt->asVarDec()) formatVarDec(varDec);
+    else if (const auto loopStmt = stmt->asLoop()) formatLoopStmt(loopStmt);
+    else if (const auto coroutine = stmt->asCoroutine()) formatCoroutine(coroutine);
+    else if (const auto deferStmt = stmt->asDefer()) formatDeferStmt(deferStmt);
+    else if (const auto assignment = stmt->asAssignment()) formatAssignment(assignment);
+    else if (const auto funcCall = stmt->asFuncCall()) formatFuncCall(funcCall);
+    else if (const auto postfixExpr = stmt->asPostfixExpr()) formatPostfixExpr(postfixExpr);
+    else if (const auto selection = stmt->asSelection()) formatSelection(selection);
+    else if (const auto returnStmt = stmt->asReturn()) formatReturnStmt(returnStmt);
+    else if (const auto continueStmt = stmt->asContinue()) formatContinueStmt(continueStmt);
+    else if (const auto ioStmt = stmt->asIOStmt()) formatIOStmt(ioStmt);
+    else if (const auto breakStmt = stmt->asBreak()) formatBreakStmt(breakStmt);
+    else if (auto expr = stmt->asExpr()) formatExpr(expr);
+    else assert(0);
 }
 
 void LgsFormatter::formatStmtsBlock(const LgsStmtsBlock* stmtsBlock) {
-    assert(0);
+    if (!stmtsBlock) return;
+    insert(" {");
+    indentLevel++;
+    for (const auto stmt : stmtsBlock->stmts) {
+        newLine(true);
+        formatStmt(stmt);
+    }
+    newLine();
+    indentLevel--;
+    insert("}");
 }
 
-void LgsFormatter::formatVarDec(const LgsVarDec* varDec) {
-    assert(0);
+void LgsFormatter::formatVarDec(LgsVarDec* varDec) {
+    insert(varDec->name);
+    if (varDec->type) {
+        insert(": " + varDec->type->pname());
+    }
+    if (varDec->expr) {
+        insert(" = ");
+        formatExpr(varDec->expr);
+    }
 }
 
 void LgsFormatter::formatAssignment(LgsAssignment* assignment) {
@@ -137,11 +208,37 @@ void LgsFormatter::formatIOStmt(const LgsIOStmt* ioStmt) {
 }
 
 void LgsFormatter::formatExpr(LgsExpr*& expr) {
-    assert(0);
+    if (!expr) return;
+    if (const auto ternaryExpr = dynamic_cast<LgsTernaryExpr*>(expr)) {
+        formatTernaryExpr(ternaryExpr);
+    } else if (const auto binaryExpr = dynamic_cast<LgsBinaryExpr*>(expr)) {
+        formatBinaryExpr(binaryExpr);
+    } else {
+        if (const auto variable = expr->asVariable()) return formatVariable(variable);
+        if (const auto lambda = expr->asFunc()) return formatFunc(lambda);
+        if (const auto intConst = expr->asIntConst()) return formatIntConst(intConst);
+        if (const auto instance = expr->asInstance()) return formatInstance(instance);
+        if (const auto funcCall = expr->asFuncCall()) return formatFuncCall(funcCall);
+        if (const auto strConst = expr->asStrConst()) return formatStrConst(strConst);
+        if (const auto selection = expr->asSelection()) return formatSelection(selection);
+        if (const auto arrayExpr = expr->asArrayExpr()) return formatArrayExpr(arrayExpr);
+        if (const auto hashMap = expr->asHashMap()) return formatHashMap(hashMap);
+        if (const auto iterIndex = expr->asIterIndex()) return formatIterIndex(iterIndex);
+        if (const auto postfixExpr = expr->asPostfixExpr()) return formatPostfixExpr(postfixExpr);
+        if (const auto prefixExpr = expr->asPrefixExpr()) return formatPrefixExpr(prefixExpr);
+        if (const auto forVar = expr->asLoopMetaVar()) return formatLoopMetaVar(forVar);
+        if (const auto vecExpr = expr->asVectorExpr()) return formatVectorExpr(vecExpr);
+        if (const auto null = expr->asNull()) return formatNull(null);
+        if (const auto castExpr = expr->asCast()) return formatCast(castExpr);
+        if (const auto jsonExpr = expr->asJson()) return formatJson(jsonExpr);
+        assert(0);
+    }
 }
 
-void LgsFormatter::formatBinaryExpr(const LgsBinaryExpr* binaryExpr) {
-    assert(0);
+void LgsFormatter::formatBinaryExpr(LgsBinaryExpr* binaryExpr) {
+    formatExpr(binaryExpr->left);
+    insert(' ' + binaryExpr->op.name + ' ');
+    formatExpr(binaryExpr->right);
 }
 
 void LgsFormatter::formatTernaryExpr(LgsTernaryExpr* ternary) {
@@ -153,7 +250,11 @@ void LgsFormatter::formatCast(LgsCast* cast) {
 }
 
 void LgsFormatter::formatArrayExpr(LgsArrayExpr* arrayExpr) {
-    assert(0);
+    insert("[");
+    for (auto element : arrayExpr->elements) {
+        formatExpr(element);
+    }
+    insert("]");
 }
 
 void LgsFormatter::formatStaticArray(const LgsArrayExpr* arrayExpr) {
@@ -173,15 +274,21 @@ void LgsFormatter::formatVectorExpr(const LgsVectorExpr* vectorExpr) {
 }
 
 void LgsFormatter::formatVariable(const LgsVariable* variable) {
-    assert(0);
+    insert(variable->name);
 }
 
 void LgsFormatter::formatSelection(const LgsSelection* selection) {
     assert(0);
 }
 
-void LgsFormatter::formatFuncCall(const LgsFuncCall* funcCall) {
-    assert(0);
+void LgsFormatter::formatFuncCall(LgsFuncCall* funcCall) {
+    insert(funcCall->name);
+    insert("(");
+    for (int i = 0; i < funcCall->args.size(); ++i) {
+        if (i > 0) insert(", ");
+        formatExpr(funcCall->args[i]);
+    }
+    insert(")");
 }
 
 void LgsFormatter::formatPrefixExpr(LgsPrefixExpr* prefixExpr) {
@@ -193,7 +300,7 @@ void LgsFormatter::formatPostfixExpr(LgsPostfixExpr* postfixExpr) {
 }
 
 void LgsFormatter::formatStrConst(const LgsStrConst* strConst) {
-    assert(0);
+    insert("\"" + strConst->value + "\"");
 }
 
 void LgsFormatter::formatTypeExpr(LgsTypeExpr* typeExpr) {
@@ -213,7 +320,7 @@ void LgsFormatter::formatNull(LgsNull* null) {
 }
 
 void LgsFormatter::formatIntConst(const LgsIntConst* intConst) {
-    assert(0);
+    insert(std::to_string(intConst->value));
 }
 
 void LgsFormatter::formatInterfaceInstance(LgsInstance* instance, LgsInterface* interface) {
@@ -234,5 +341,16 @@ void LgsFormatter::formatSlice(LgsIterIndex* iterIndex) {
 
 void LgsFormatter::formatLoopMetaVar(LgsLoopMetaVar* metaVar) {
     assert(0);
+}
+
+void LgsFormatter::insert(const std::string& text) {
+    formatted << text;
+}
+
+void LgsFormatter::newLine(const bool withIndent, const uint8_t lines) {
+    formatted << std::string(lines, '\n');
+    if (withIndent) {
+        formatted << std::string(indentLevel * TAB_SIZE, ' ');
+    }
 }
 

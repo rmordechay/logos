@@ -10,8 +10,6 @@ void LgsCliCmd::printHelp() {
     const auto h = getHelp();
     assert(h.name != "" && h.usage != "" && h.desc != "" && !h.examples.empty());
     std::ostringstream txt;
-
-    txt << LGS_COLORIZE("Help", LGS_MSG_COLOR_WHITE) << '\n';
     getLongestArg(h);
     txt << padString(USAGE_STR) << h.usage << "\n";
 
@@ -33,15 +31,15 @@ void LgsCliCmd::printHelp() {
         txt << '\n';
     }
 
-    // Examples
-    txt << LGS_COLORIZE("Examples:", LGS_MSG_COLOR_WHITE) << '\n';
-    for (const auto& example : h.examples) {
-        txt << example << '\n';
-    }
-
     // Description
     txt << LGS_COLORIZE("\nDescription", LGS_MSG_COLOR_WHITE) << '\n';
     txt << h.desc << "\n";
+
+    // Examples
+    txt << LGS_COLORIZE("\nExamples:", LGS_MSG_COLOR_WHITE) << '\n';
+    for (const auto& example : h.examples) {
+        txt << example << '\n';
+    }
 
     logInfo(txt.str());
 }

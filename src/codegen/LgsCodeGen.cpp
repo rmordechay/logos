@@ -821,6 +821,14 @@ void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
         visitExpr(funcCall->args[i]);
     }
 
+    auto ft = funcCall->func->funcType;
+    if (ft->hasDefaults()) {
+        const auto diff = ft->params.size() - funcCall->args.size() - 1;
+        for (int i = diff; i < ft->params.size(); ++i) {
+            visitExpr(ft->params[i].expr);
+        }
+    }
+
     if (funcCall->ref.symbolType == PARAM) {
         LgsFunc f(funcCall->ref.param->type->asFuncType());
         f.IRValue = getIRValue(funcCall->ref.param);
@@ -829,6 +837,7 @@ void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
         }
         return;
     }
+
     if (funcCall->ref.symbolType == VAR_DEC) {
         LgsFunc f(funcCall->ref.varDec->type->asFuncType());
         f.IRValue = getIRValue(funcCall->ref.varDec);
@@ -838,10 +847,9 @@ void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
         return;
     }
 
-    const auto ft = funcCall->func->funcType;
     if (ft->isVirtual) {
         const auto self = funcCall->selfPtr;
-        const auto keyIR = cg.getIRStr(funcCall->func->funcType->name);
+        const auto keyIR = cg.getIRStr(ft->name);
         funcCall->func->IRValue = cg.callGetFromVTable(self->IRValue, keyIR);
     } else {
         visitIterFunc(funcCall);
