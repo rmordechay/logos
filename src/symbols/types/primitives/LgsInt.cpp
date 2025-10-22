@@ -151,5 +151,5 @@ std::string LgsInt::getName() {
 }
 
 DIBasicType* LgsInt::getDebugType(LgsLLVMGen& cg) {
-    return cg.diBuilder->createBasicType(name, 32, dwarf::DW_ATE_signed);
+    return cg.debugger.diBuilder->createBasicType(name, 32, dwarf::DW_ATE_signed);
 }

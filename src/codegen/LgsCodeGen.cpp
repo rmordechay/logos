@@ -61,6 +61,7 @@ void LgsCodeGen::generate(const LgsAppConfigs& appConfigs, TargetMachine& target
     } else if (const auto testFile = dynamic_cast<LgsTestFile*>(&file)) {
         visitTestFile(testFile);
     }
+    if (appConfigs.debugMode) cg.finalizeDebugger();
 }
 
 void LgsCodeGen::visitMainFile(LgsMainFile* mainFile) {
@@ -304,6 +305,7 @@ void LgsCodeGen::visitVarDec(LgsVarDec* varDec) {
     }
     assert(varDec->IRValue);
     varDec->IRValue->setName(varDec->name);
+    if (appConfigs.debugMode) varDec->setDebugValue(cg);
 }
 
 void LgsCodeGen::visitAssignment(const LgsAssignment* assignment) {
@@ -857,6 +859,7 @@ void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
 
     if (!funcCall->isCoroutine && !funcCall->isDeferred) {
         funcCall->IRValue = funcCall->func->call(cg, funcCall->args);
+        if (appConfigs.debugMode) funcCall->setDebugValue(cg);
     }
 }
 
@@ -1084,6 +1087,7 @@ void LgsCodeGen::yield() const {
 
 void LgsCodeGen::createPrologue(LgsFunc* func) {
     if (func->isTest) for (auto [_, then] : func->mocks) visitExpr(then);
+    if (appConfigs.debugMode) func->setDebugValue(cg);
     currentIRFunc = func->getIRFunc(cg);
     const auto entryBlock = cg.createBlock(BLOCK_NAME_ENTRY, currentIRFunc);
     cg.builder.SetInsertPoint(entryBlock);

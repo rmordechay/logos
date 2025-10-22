@@ -17,22 +17,21 @@ Value* LgsVarDec::loadIR(LgsLLVMGen& cg) {
 bool LgsVarDec::shouldAllocate() const {
     if (type->isHeapAlloc || type->asFuncType()) return false;
     if (type->asStr() && type->asStr()->isStatic) return false;
-    if (type->isNumber()) return false;
     return true;
 }
 
 void LgsVarDec::setDebugValue(LgsLLVMGen& cg) {
-    const auto var = cg.diBuilder->createAutoVariable(
-        cg.compileUnit,
+    const auto var = cg.debugger.diBuilder->createAutoVariable(
+        cg.debugger.diProgram,
         name,
-        cg.diFile,
+        cg.debugger.diFile,
         location.lineStart,
         type->getDebugType(cg)
     );
-    cg.diBuilder->insertDeclare(
+    cg.debugger.diBuilder->insertDeclare(
         IRValue,
         var,
-        cg.diBuilder->createExpression(),
+        cg.debugger.diBuilder->createExpression(),
         getDebugLoc(cg),
         cg.builder.GetInsertBlock()
     );

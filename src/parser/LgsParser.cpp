@@ -1583,7 +1583,7 @@ void LgsParser::recursionGuard() {
 
 void LgsParser::validateTestFolder(const LgsFile* testFile) {
     bool foundTestsFolder = false;
-    auto currentPath = testFile->path.parent_path();
+    auto currentPath = testFile->filePath.parent_path();
     while (currentPath != paths.rootPath && currentPath.has_parent_path()) {
         if (currentPath.filename() == "tests") {
             foundTestsFolder = true;
@@ -1592,6 +1592,6 @@ void LgsParser::validateTestFolder(const LgsFile* testFile) {
         currentPath = currentPath.parent_path();
     }
     if (!foundTestsFolder) {
-        errHandler.addError(E10079, &testFile->location, {testFile->path.filename()});
+        errHandler.addError(E10079, &testFile->location, {testFile->filePath.filename()});
     }
 }

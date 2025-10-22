@@ -19,7 +19,7 @@ struct LgsAppConfigs {
     std::string activeEnv = "";
     LgsAppVersion version{1, 0, 0};
     LgsAppLogLevel logLevel = APP_INFO;
-    bool debugMode = false;
+    bool debugMode = true;
     bool isTestRun = false;
     bool isFileMode = false;
     uint8_t optLevel = 2;

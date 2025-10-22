@@ -1,6 +1,6 @@
 #include "symbols/types/LgsVoid.h"
 #include "codegen/LgsLLVMGen.h"
-#include "utils/LgsUtils.h"
+#include <llvm/IR/DIBuilder.h>
 
 Type* LgsVoid::getIRType(LgsLLVMGen& cg) {
     return Type::getVoidTy(cg.context);
@@ -28,4 +28,8 @@ std::string LgsVoid::strFormatPart() const {
 
 bool LgsVoid::canCastTo(LgsType* other) {
     return name == other->getName();
+}
+
+DIBasicType* LgsVoid::getDebugType(LgsLLVMGen& cg) {
+    return cg.debugger.diBuilder->createUnspecifiedType(name);
 }

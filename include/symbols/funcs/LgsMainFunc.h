@@ -9,5 +9,6 @@ public:
 
     explicit LgsMainFunc() : LgsFunc(LGS_MAIN_FUNC_NAME, &LGS_VOID, PUBLIC) {}
     Function* getIRFunc(LgsLLVMGen& cg) override;
+    void setDebugValue(LgsLLVMGen& cg) override;
     ~LgsMainFunc() override;
 };

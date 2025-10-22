@@ -118,20 +118,22 @@ std::string LgsFunc::getIRName() const {
 }
 
 void LgsFunc::setDebugValue(LgsLLVMGen& cg) {
-    const auto diBuilder = cg.diBuilder;
+    const auto diBuilder = cg.debugger.diBuilder;
     const auto dbInt32 = funcType->rt->getDebugType(cg);
     const auto parameterTypes = diBuilder->getOrCreateTypeArray({dbInt32});
     const auto subroutine = diBuilder->createSubroutineType(parameterTypes);
-    cg.diProgram = diBuilder->createFunction(
-        cg.compileUnit,
+    cg.debugger.diProgram = diBuilder->createFunction(
+        cg.debugger.compileUnit,
         funcType->name,
-        "",
-        cg.diFile,
+        funcType->name,
+        cg.debugger.diFile,
         location.lineStart,
         subroutine,
-        location.lineStart
+        location.lineStart,
+        DINode::FlagPrototyped,
+        DISubprogram::SPFlagDefinition
     );
-    getIRFunc(cg)->setSubprogram(cg.diProgram);
+    getIRFunc(cg)->setSubprogram(cg.debugger.diProgram);
     cg.builder.SetCurrentDebugLocation(getDebugLoc(cg));
 }
 

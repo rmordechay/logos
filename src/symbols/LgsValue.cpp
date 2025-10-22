@@ -18,7 +18,7 @@ DILocation* LgsValue::getDebugLoc(LgsLLVMGen& cg) const {
         cg.context,
         location.lineStart,
         location.columnStart,
-        cg.diProgram,
-        cg.diProgram->getScope()
+        cg.debugger.diProgram,
+        cg.debugger.diProgram->getScope()
     );
 }

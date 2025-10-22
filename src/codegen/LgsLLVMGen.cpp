@@ -12,13 +12,13 @@
 #include <string>
 
 void LgsLLVMGen::setupModule(const LgsFile& file, const bool debugMode) {
-    IRModule = new Module(file.path.filename().string(), context);
+    IRModule = new Module(file.filePath.filename().string(), context);
     IRModule->setTargetTriple(sys::getDefaultTargetTriple());
     IRModule->setDataLayout(targetMachine->createDataLayout());
     if (debugMode) {
-        diBuilder = new DIBuilder(*IRModule);
-        diFile = diBuilder->createFile(file.path.string(), "");
-        compileUnit = diBuilder->createCompileUnit(dwarf::DW_LANG_lo_user, diFile, "", false, "", 0);
+        debugger.diBuilder = new DIBuilder(*IRModule);
+        debugger.diFile = debugger.diBuilder->createFile(file.filePath.string(), "");
+        debugger.compileUnit = debugger.diBuilder->createCompileUnit(dwarf::DW_LANG_C, debugger.diFile, "Logos", false, "", 0);
         IRModule->addModuleFlag(Module::Warning, "Dwarf Version", 5);
         IRModule->addModuleFlag(Module::Warning, "Debug Info Version", DEBUG_METADATA_VERSION);
     }
@@ -333,14 +333,14 @@ void LgsLLVMGen::printInt(Value* number, const std::string& text) {
 }
 
 void LgsLLVMGen::finalizeDebugger() {
-    if (!diBuilder) return;
-    diBuilder->finalize();
+    if (!debugger.diBuilder) return;
+    debugger.diBuilder->finalize();
     std::error_code EC;
     raw_fd_ostream file("logosdbg.bc", EC, sys::fs::OF_None);
     WriteBitcodeToFile(*IRModule, file);
     file.flush();
-    delete diBuilder;
-    diBuilder = nullptr;
+    delete debugger.diBuilder;
+    debugger.diBuilder = nullptr;
 }
 
 

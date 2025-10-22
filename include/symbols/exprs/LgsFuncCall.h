@@ -24,5 +24,6 @@ public:
     bool equalsVariadic(const LgsFuncType* funcType) const;
     bool equalsDefaultParams(const LgsFuncType* funcType) const;
     std::string asText() override;
+    void setDebugValue(LgsLLVMGen& cg) override;
     ~LgsFuncCall() override;
 };

@@ -14,16 +14,20 @@ namespace llvm {
 
 using namespace llvm;
 
-class LgsLLVMGen {
-public:
-    LLVMContext context;
-    Module* IRModule = nullptr;
-    IRBuilderBase::InsertPoint savedIP;
-    IRBuilder<> builder = IRBuilder(context);
+struct LgsLLDBGen {
     DIFile* diFile = nullptr;
     DIBuilder* diBuilder = nullptr;
     DICompileUnit* compileUnit = nullptr;
     DISubprogram* diProgram = nullptr;
+};
+
+class LgsLLVMGen {
+public:
+    LLVMContext context;
+    LgsLLDBGen debugger;
+    Module* IRModule = nullptr;
+    IRBuilderBase::InsertPoint savedIP;
+    IRBuilder<> builder = IRBuilder(context);
     TargetMachine* targetMachine = nullptr;
     std::map<std::string, Type*> typesRegistry;
 

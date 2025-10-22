@@ -64,6 +64,17 @@ std::string LgsFuncCall::asText() {
     return str.str();
 }
 
+void LgsFuncCall::setDebugValue(LgsLLVMGen& cg) {
+    cg.builder.SetCurrentDebugLocation(
+        DILocation::get(
+            cg.context,
+            location.lineStart,
+            location.columnStart,
+            cg.debugger.diProgram
+        )
+    );
+}
+
 LgsFuncCall::~LgsFuncCall() {
     for (const auto& arg : args) {
         delete arg;

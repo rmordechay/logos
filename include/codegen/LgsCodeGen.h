@@ -58,11 +58,11 @@ public:
     LgsFile& file;
     LgsStack stack;
     LgsLLVMGen& cg;
+    LgsAppConfigs& appConfigs;
     Function* currentIRFunc = nullptr;
-    Function* mapFunc = nullptr;
     static std::atomic<size_t> namesCounter;
 
-    explicit LgsCodeGen(LgsFile& file) : file(file), cg(file.generator) {}
+    explicit LgsCodeGen(LgsFile& file, LgsAppConfigs& appConfigs) : file(file), cg(file.generator), appConfigs(appConfigs) {}
     void generate(const LgsAppConfigs& appConfigs, TargetMachine& targetMachine);
     void visitMainFile(LgsMainFile* mainFile);
     void visitInterface(const LgsInterface* interface);

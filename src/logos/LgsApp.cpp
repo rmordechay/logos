@@ -84,7 +84,7 @@ bool LgsApp::generate() {
     const auto targetMachine = LgsLLVMGen::getTargetMachine();
     for (const auto& file : srcFiles) {
         threadPool.runTask([this, file, targetMachine] {
-            LgsCodeGen code(*file);
+            LgsCodeGen code(*file, appConfigs);
             code.generate(appConfigs, *targetMachine);
         });
     }
