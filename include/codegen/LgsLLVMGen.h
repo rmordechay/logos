@@ -4,6 +4,8 @@
 #include "logos/LgsApp.h"
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/LLVMContext.h>
+#include <cstdint>
+#include <cmath>
 
 namespace llvm {
     class TargetMachine;

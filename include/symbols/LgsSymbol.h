@@ -1,5 +1,6 @@
 #pragma once
 #include "types/LgsGeneric.h"
+#include <string>
 
 class LgsType;
 class LgsSubType;

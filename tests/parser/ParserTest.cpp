@@ -26,7 +26,7 @@ TEST_CASE("Parser1") {
     app.loadSrcFile(code, "Main.lgs");
     const auto mainFile = static_cast<LgsMainFile*>(app.srcFiles.front());
     LgsJsonParser parser;
-    parser.visitMainFile(mainFile);
+    parser.parseMainFile(mainFile);
     CHECK(app.errHandler.errors.size() == 0);
     CHECK_EQ(parser.json.str(), expectedTree);
 }
@@ -56,7 +56,7 @@ TEST_CASE("Parser2") {
     app.loadSrcFile(code, "Main.lgs");
     const auto mainFile = static_cast<LgsMainFile*>(app.srcFiles.front());
     LgsJsonParser parser;
-    parser.visitMainFile(mainFile);
+    parser.parseMainFile(mainFile);
     CHECK(app.errHandler.errors.size() == 0);
     CHECK_EQ(parser.json.str(), expectedTree);
 }
@@ -85,7 +85,7 @@ TEST_CASE("Parser3") {
     app.loadSrcFile(code, "Main.lgs");
     const auto mainFile = static_cast<LgsMainFile*>(app.srcFiles.front());
     LgsJsonParser parser;
-    parser.visitMainFile(mainFile);
+    parser.parseMainFile(mainFile);
     std::ofstream("../../test.json") << parser.json.str();
     CHECK(app.errHandler.errors.size() == 0);
     CHECK_EQ(parser.json.str(), expectedTree);

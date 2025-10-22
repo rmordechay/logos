@@ -7,6 +7,7 @@
 #include "analysis/LgsLinter.h"
 #include "parser/LgsJsonParser.h"
 #include "utils/ThreadPool.h"
+#include <mutex>
 
 class LgsConfigFile;
 class LgsTestFile;

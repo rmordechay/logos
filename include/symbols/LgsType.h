@@ -2,6 +2,7 @@
 #include "Lgs_types.h"
 #include "data/LgsErrors.h"
 #include "exprs/LgsBinaryExpr.h"
+#include <map>
 
 class LgsSet;
 class LgsAny;

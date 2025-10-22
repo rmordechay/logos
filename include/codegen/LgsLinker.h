@@ -1,7 +1,7 @@
 #pragma once
 #include "logos/LgsPaths.h"
 #include <llvm/Passes/OptimizationLevel.h>
-
+#include <vector>
 namespace llvm {
     class Module;
     class TargetMachine;

@@ -1,6 +1,5 @@
 #include "data/LgsDefinitions.h"
 #include "files/LgsFile.h"
-#include "types/LgsAny.h"
 #include <llvm/Support/FileSystem.h>
 #include <llvm/Bitcode/BitcodeWriter.h>
 #include <llvm/IR/Module.h>
@@ -10,6 +9,7 @@
 #include <llvm/MC/TargetRegistry.h>
 #include <llvm/Target/TargetMachine.h>
 #include <llvm/Target/TargetOptions.h>
+#include <string>
 
 void LgsLLVMGen::setupModule(const LgsFile& file, const bool debugMode) {
     IRModule = new Module(file.path.filename().string(), context);

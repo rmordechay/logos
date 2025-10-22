@@ -6,7 +6,7 @@ run: build
 	cd build && ./lgs run ../project
 
 run_linux_docker tests/platforms/DockerfileUbuntu:
-	docker build -f tests/platforms/DockerfileUbuntu -v $(pwd):/app -t linux . && docker run -it -v $(pwd):/app linux
+	docker build -f tests/platforms/ubuntu/Dockerfile -v $(pwd):/app -t linux . && docker run -it -v $(pwd):/app linux
 
 install_alpine:
 	qemu-img create -f qcow2 linux-x86.qcow2 10G

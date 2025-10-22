@@ -21,5 +21,6 @@
 #include <mutex>
 #include <cmath>
 #include <cstring>
+#include <cstdint>
 
 namespace fs = std::filesystem;

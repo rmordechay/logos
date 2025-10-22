@@ -1,4 +1,6 @@
 #pragma once
+#include <cstdint>
+#include <string>
 
 enum LgsAppLogLevel {
     APP_INFO,

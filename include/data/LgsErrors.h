@@ -1,4 +1,6 @@
 #pragma once
+#include <fstream>
+#include <string>
 
 struct LgsLocation {
     size_t fileID = 0;
