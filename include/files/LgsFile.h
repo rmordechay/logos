@@ -16,10 +16,10 @@ public:
     std::vector<LgsStrConst*> externalCPaths;
 
     explicit LgsFile(const size_t fileID, const fs::path& path) : id(fileID), filePath(path) {}
-    virtual void format();
+    virtual size_t hashFile();
     virtual ~LgsFile() = default;
 };
 
-inline void LgsFile::format() {
-    assert(false);
+inline size_t LgsFile::hashFile() {
+    assert(0);
 }

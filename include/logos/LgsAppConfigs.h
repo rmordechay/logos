@@ -9,9 +9,9 @@ enum LgsAppLogLevel {
 };
 
 struct LgsAppVersion {
-    uint16_t major;
-    uint16_t minor;
-    uint16_t micro;
+    size_t major;
+    size_t minor;
+    size_t micro;
 };
 
 struct LgsAppConfigs {
@@ -19,7 +19,7 @@ struct LgsAppConfigs {
     std::string activeEnv = "";
     LgsAppVersion version{1, 0, 0};
     LgsAppLogLevel logLevel = APP_INFO;
-    bool debugMode = true;
+    bool debugMode = false;
     bool isTestRun = false;
     bool isFileMode = false;
     uint8_t optLevel = 2;

@@ -117,6 +117,10 @@ std::string LgsFunc::getIRName() const {
     return funcName;
 }
 
+void LgsFunc::hashValue(size_t& oldHash) {
+    hashString(oldHash, funcType->name);
+}
+
 void LgsFunc::setDebugValue(LgsLLVMGen& cg) {
     const auto diBuilder = cg.debugger.diBuilder;
     const auto dbInt32 = funcType->rt->getDebugType(cg);

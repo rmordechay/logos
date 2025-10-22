@@ -157,6 +157,10 @@ DIBasicType* LgsType::getDebugType(LgsLLVMGen& cg) {
     assert(0);
 }
 
+void LgsType::hashValue(size_t& oldHash) {
+    assert(0);
+}
+
 LgsType* LgsType::clone() {
     if (isPrimitive || asSArray()) return this;
     assert(0);

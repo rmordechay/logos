@@ -46,6 +46,11 @@ set(CORE_SOURCES
     src/parser/LgsParser.cpp
     src/parser/LgsJsonParser.cpp
     src/parser/LgsFormatter.cpp
+    src/lgsc/LgsCLang.cpp
+    src/lgsc/LgsCLangVisitor.cpp
+    src/utils/LgsUtils.cpp
+    src/utils/LgsErrHandler.cpp
+
     src/cli/LgsCli.cpp
     src/cli/LgsCliCmd.cpp
     src/cli/commands/LgsRunCmd.cpp
@@ -53,10 +58,7 @@ set(CORE_SOURCES
     src/cli/commands/LgsTestCmd.cpp
     src/cli/commands/LgsLinterCmd.cpp
     src/cli/commands/LgsFormatCmd.cpp
-    src/lgsc/LgsCLang.cpp
-    src/lgsc/LgsCLangVisitor.cpp
-    src/utils/LgsUtils.cpp
-    src/utils/LgsErrHandler.cpp
+    src/cli/commands/LgsGenerateCmd.cpp
 
     src/symbols/LgsSymbol.cpp
     src/symbols/LgsSymbolTable.cpp
@@ -92,7 +94,7 @@ set(CORE_SOURCES
     src/symbols/loops/LgsInfiniteLoop.cpp
     src/symbols/loops/LgsRangeLoop.cpp
     src/symbols/loops/LgsWhileLoop.cpp
-    src/symbols/loops/LgsForVariables.cpp
+    src/symbols/loops/LgsLoopMetaVar.cpp
     src/symbols/stmts/LgsIOPair.cpp
     src/symbols/stmts/LgsIOStmt.cpp
     src/symbols/stmts/LgsAssignment.cpp
@@ -119,6 +121,7 @@ set(CORE_SOURCES
     src/symbols/types/LgsObject.cpp
     src/symbols/types/LgsSubType.cpp
     src/symbols/types/LgsTypePair.cpp
+    src/symbols/types/LgsGeneric.cpp
     src/symbols/types/iterables/LgsMap.cpp
     src/symbols/types/iterables/LgsDArray.cpp
     src/symbols/types/iterables/LgsSet.cpp
@@ -147,11 +150,6 @@ set(RUNTIME_SOURCES
     ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_print.cpp
     ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_arena.cpp
     ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_set.cpp
-    include/data/LgsCliErrors.h
-    include/symbols/types/LgsGeneric.h
-    src/symbols/types/LgsGeneric.cpp
-    src/cli/commands/LgsGenerateCmd.cpp
-    include/cli/commands/LgsGenerateCmd.h
 )
 
 add_library(lgs_lib SHARED ${CORE_SOURCES} ${RUNTIME_SOURCES})

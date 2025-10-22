@@ -193,15 +193,47 @@ LgsEnvFile* LgsParser::parseEnvFile() {
     return file;
 }
 
-LgsConfigFile* LgsParser::parseConfigFile() {
+LgsConfigFile* LgsParser::parseAppConfigFile() {
     const auto configFile = new LgsConfigFile(0, filePath);
     while (true) {
         const auto varDec = parseVarDec();
         if (!varDec) break;
         configFile->configs.push_back(varDec);
         if (currentToken.type != T_EOF) break;
+        if (currentToken.lexeme == "required") break;
+    }
+    if (currentToken.lexeme == "required" && peek().lexeme == "envs") {
+        consume();
+        consume();
+        mustMatch(T_LBRACE);
+        while (true) {
+            const auto strConst = parseStrConst();
+            if (!strConst) break;
+            LgsAppVersion version;
+            if (!parseVersion(version)) break;
+            if (currentToken.type != T_RBRACE) break;
+        }
+        mustMatch(T_RBRACE);
     }
     return configFile;
+}
+
+bool LgsParser::parseVersion(LgsAppVersion& appVersion) {
+    const auto major = parseConstant();
+    if (mustParse(major)) return false;
+    if (mustParse(major)) return false;
+    const auto minor = parseConstant();
+    if (mustParse(major)) return false;
+    if (mustParse(major)) return false;
+    const auto micro = parseConstant();
+    if (mustParse(major)) return false;
+    appVersion.major = major->asIntConst()->value;
+    appVersion.minor = minor->asIntConst()->value;
+    appVersion.micro = micro->asIntConst()->value;
+    freeExpr(major);
+    freeExpr(minor);
+    freeExpr(micro);
+    return true;
 }
 
 void LgsParser::parseExternalImports(LgsFile* file) {

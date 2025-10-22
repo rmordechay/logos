@@ -3,7 +3,6 @@
 #include <llvm/IR/Module.h>
 #include "types/iterables/LgsStr.h"
 #include "types/primitives/LgsInt.h"
-
 #include <llvm/IR/DIBuilder.h>
 
 Function* LgsMainFunc::getIRFunc(LgsLLVMGen& cg) {

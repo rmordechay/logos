@@ -13,6 +13,10 @@ void LgsValue::setDebugValue(LgsLLVMGen& cg) {
     assert(0);
 }
 
+void LgsValue::hashValue(size_t& oldHash) {
+    assert(0);
+}
+
 DILocation* LgsValue::getDebugLoc(LgsLLVMGen& cg) const {
     return DILocation::get(
         cg.context,

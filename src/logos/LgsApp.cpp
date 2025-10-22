@@ -129,6 +129,7 @@ void LgsApp::loadSrcFile(const std::string& code, const fs::path& filePath) {
 
     LgsParser parser(fileID, filePath, paths, globals, tokens);
     const auto file = parser.parseSrcFile(appConfigs.isTestRun);
+    std::cout << file->hashFile() << '\n';
     std::lock_guard lock(mtx);
     filePaths[fileID] = filePath;
     if (file) srcFiles.push_back(file);
@@ -146,7 +147,7 @@ bool LgsApp::loadConfigFile() {
         return false;
     }
     LgsParser parser(appFileID, paths.appFilePath, paths, globals, tokens);
-    configFile = parser.parseConfigFile();
+    configFile = parser.parseAppConfigFile();
     errHandler.mergeErrors(parser.errHandler);
     if (errHandler.successful) loadConfigs();
     return errHandler.successful;
@@ -200,12 +201,10 @@ void LgsApp::writeIRFiles() {
             errHandler.setUnsuccessful();
             continue;
         }
-        if constexpr (WRITE_IR_TO_FILE) {
-            const auto filePath = (paths.buildIR / module->getName().str()).string() + ".ll";
-            std::error_code EC;
-            raw_fd_ostream textFile(filePath, EC, sys::fs::OF_None);
-            module->print(textFile, nullptr);
-        }
+        const auto filePath = (paths.buildIR / module->getName().str()).string() + ".ll";
+        std::error_code EC;
+        raw_fd_ostream textFile(filePath, EC, sys::fs::OF_None);
+        module->print(textFile, nullptr);
     }
 }
 

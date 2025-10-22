@@ -79,7 +79,8 @@ public:
     LgsInterfaceFile* parseInterfaceFile();
     LgsTestFile* parseTestFile();
     LgsEnvFile* parseEnvFile();
-    LgsConfigFile* parseConfigFile();
+    LgsConfigFile* parseAppConfigFile();
+    bool parseVersion(LgsAppVersion& appVersion);
     void parseExternalImports(LgsFile* file);
 
     // Object

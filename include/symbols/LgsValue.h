@@ -22,6 +22,7 @@ public:
     virtual std::string asText();
     virtual Value* loadIR(LgsLLVMGen& cg);
     virtual void setDebugValue(LgsLLVMGen& cg);
+    virtual void hashValue(size_t& oldHash);
     DILocation* getDebugLoc(LgsLLVMGen& cg) const;
     virtual ~LgsValue() = default;
 };

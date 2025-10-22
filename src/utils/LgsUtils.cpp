@@ -169,4 +169,14 @@ std::string getFullPath(const LgsLocation& location, const std::string& filePath
     return filePath + ":" + std::to_string(location.lineStart) + ":" + std::to_string(location.columnStart);
 }
 
+void combineHash(size_t& oldHash, const size_t newHash) {
+    oldHash ^= newHash + 0x9e3779b9 + (oldHash << 6) + (oldHash >> 2);
+}
 
+void hashString(size_t& oldHash, const std::string& str) {
+    combineHash(oldHash, std::hash<std::string>{}(str));
+}
+
+void hashInt(size_t& oldHash, const size_t val) {
+    combineHash(oldHash, std::hash<size_t>{}(val));
+}
