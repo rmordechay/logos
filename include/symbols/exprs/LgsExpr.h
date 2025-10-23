@@ -2,6 +2,7 @@
 #include <stmts/LgsStmt.h>
 #include "LgsValue.h"
 
+class LgsBinaryExpr;
 class LgsNull;
 class LgsJson;
 class LgsCast;
@@ -82,5 +83,6 @@ public:
     LgsVectorExpr* asVectorExpr();
     LgsIntConst* asIntConst();
     LgsLoopMetaVar* asLoopMetaVar();
+    LgsBinaryExpr* asBinExpr();
     ~LgsExpr() override = default;
 };

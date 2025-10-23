@@ -55,8 +55,8 @@ LgsType* LgsFloat::applyBinOp(const LgsBinOpType op, LgsType* other) {
     return nullptr;
 }
 
-Value* LgsFloat::addIR(LgsLLVMGen& cg, Value* self, Value* other) {
-    const auto [l, r] = loadOperands(cg, self, other);
+Value* LgsFloat::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    const auto [l, r] = loadOperands(cg, self->IRValue, other->IRValue);
     return cg.builder.CreateFAdd(l, r);
 }
 

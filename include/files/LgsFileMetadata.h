@@ -12,24 +12,31 @@ struct LgsFileMetadata {
     LgsFileMetadata(const FileID id, const fs::path& filePath, const fs::file_time_type& lastWriteTime) : id(id), filePath(filePath), lastWriteTime(lastWriteTime) {}
 };
 
-inline void saveMetadataVector(const std::vector<LgsFileMetadata>& files, const std::string& filename) {
+struct LgsAppMetadata {
+    std::vector<LgsFileMetadata> files;
+
+    LgsAppMetadata() = default;
+    explicit LgsAppMetadata(std::vector<LgsFileMetadata> files) : files(std::move(files)) {}
+};
+
+inline void saveMetadata(const LgsAppMetadata& metadata, const std::string& filename) {
     std::ofstream outFile(filename, std::ios::binary);
-    const auto count = files.size();
+    const auto count = metadata.files.size();
     outFile.write(reinterpret_cast<const char*>(&count), sizeof(count));
-    for (const auto& metadata : files) {
-        outFile.write(reinterpret_cast<const char*>(&metadata.id), sizeof(metadata.id));
-        const auto pathStr = metadata.filePath.string();
+    for (const auto& file : metadata.files) {
+        outFile.write(reinterpret_cast<const char*>(&file.id), sizeof(file.id));
+        const auto pathStr = file.filePath.string();
         const auto pathLength = pathStr.size();
         outFile.write(reinterpret_cast<const char*>(&pathLength), sizeof(pathLength));
         outFile.write(pathStr.data(), pathLength);
-        const auto duration = metadata.lastWriteTime.time_since_epoch().count();
+        const auto duration = file.lastWriteTime.time_since_epoch().count();
         outFile.write(reinterpret_cast<const char*>(&duration), sizeof(duration));
     }
-    outFile.close();
 }
 
-inline std::vector<LgsFileMetadata> loadMetadataVector(const std::string& filename) {
+inline LgsAppMetadata loadMetadata(const std::string& filename) {
     std::ifstream inFile(filename, std::ios::binary);
+    if (!inFile) return LgsAppMetadata{};
     size_t count;
     inFile.read(reinterpret_cast<char*>(&count), sizeof(count));
     std::vector<LgsFileMetadata> metadataList;
@@ -47,6 +54,5 @@ inline std::vector<LgsFileMetadata> loadMetadataVector(const std::string& filena
         const fs::file_time_type lastWriteTime{fs::file_time_type::duration(duration)};
         metadataList.push_back(LgsFileMetadata(id, filePath, lastWriteTime));
     }
-    inFile.close();
-    return metadataList;
+    return LgsAppMetadata{std::move(metadataList)};
 }

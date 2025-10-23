@@ -59,11 +59,11 @@ LgsType* LgsVec::applyBinOp(const LgsBinOpType op, LgsType* other) {
     return nullptr;
 }
 
-Value* LgsVec::addIR(LgsLLVMGen& cg, Value* self, Value* other) {
-    if (other->getType()->isIntegerTy()) {
-        return cg.builder.CreateAdd(self, other);
+Value* LgsVec::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    if (other->IRValue->getType()->isIntegerTy()) {
+        return cg.builder.CreateAdd(self->IRValue, other->IRValue);
     }
-    return cg.builder.CreateFAdd(self, other);
+    return cg.builder.CreateFAdd(self->IRValue, other->IRValue);
 }
 
 Value* LgsVec::subIR(LgsLLVMGen& cg, Value* self, Value* other) {

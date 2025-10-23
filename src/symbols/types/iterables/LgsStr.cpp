@@ -50,15 +50,18 @@ LgsType* LgsStr::applyBinOp(const LgsBinOpType op, LgsType* other) {
     return nullptr;
 }
 
-Value* LgsStr::addIR(LgsLLVMGen& cg, Value* self, Value* other) {
-    const auto selfSize = lengthIR(cg, self);
-    const auto otherSize = lengthIR(cg, other);
+Value* LgsStr::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    if (isStatic && other->type->asStr()->isStatic) {
+        return cg.getIRStr(self->getConstStr() + other->getConstStr());
+    }
+    const auto selfSize = lengthIR(cg, self->IRValue);
+    const auto otherSize = lengthIR(cg, other->IRValue);
     auto newStrSize = cg.builder.CreateAdd(selfSize, otherSize);
     newStrSize = cg.builder.CreateAdd(newStrSize, cg.i64(1));
     const auto newStrPtr = cg.builder.CreateAlloca(cg.i8Ty(), newStrSize);
-    cg.callMemCpy(newStrPtr, self, selfSize);
+    cg.callMemCpy(newStrPtr, self->IRValue, selfSize);
     const auto dstPtr = cg.builder.CreateInBoundsGEP(cg.i8Ty(), newStrPtr, selfSize);
-    cg.callMemCpy(dstPtr, other, otherSize);
+    cg.callMemCpy(dstPtr, other->IRValue, otherSize);
     return newStrPtr;
 }
 

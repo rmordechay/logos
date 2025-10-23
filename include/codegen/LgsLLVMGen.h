@@ -110,7 +110,7 @@ public:
     void printPtr(Value* ptr, const std::string& text = "");
     void printInt(Value* number, const std::string& text = "");
 
-    void finalizeDebugger(const fs::path& buildPath) const;
+    void finalizeDebugger(const std::filesystem::path& buildPath) const;
     static void initLLVM();
     static TargetMachine* getTargetMachine();
     ~LgsLLVMGen();

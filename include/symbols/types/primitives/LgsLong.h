@@ -16,7 +16,7 @@ public:
     LgsExpr* getZeroValue() override;
     Lgs_rttype getRTType() override;
     LgsType* applyBinOp(LgsBinOpType op, LgsType* other) override;
-    Value* addIR(LgsLLVMGen& cg, Value* self, Value* other) override;
+    Value* addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
     Value* subIR(LgsLLVMGen& cg, Value* self, Value* other) override;
     Value* mulIR(LgsLLVMGen& cg, Value* self, Value* other) override;
     Value* divIR(LgsLLVMGen& cg, Value* self, Value* other) override;

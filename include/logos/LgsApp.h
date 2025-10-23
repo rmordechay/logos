@@ -30,13 +30,13 @@ class LgsApp final {
 public:
     LgsPaths paths;
     LgsSymbolTable globals;
+    LgsAppMetadata metadata;
     LgsAppConfigs appConfigs;
     LgsErrHandler errHandler;
     std::vector<LgsFile*> srcFiles;
     std::vector<LgsEnvFile*> envFiles;
     std::vector<LgsTestFile*> testsFiles;
     std::map<FileID, fs::path> filePaths;
-    std::vector<LgsFileMetadata> filesMetadata;
     std::atomic<FileID> nextFileID = 1;
     ThreadPool threadPool;
 
@@ -47,8 +47,7 @@ public:
     bool generate();
     bool link();
     void loadBuiltins();
-    void loadSrcFile(const LgsFileMetadata& metadata);
-    void loadSrcFile(const std::string& code, const std::string& filePath);
+    void loadSrcFile(const std::string& code, const std::string& filePath, size_t fileID = 0);
     bool loadAppConfigFile();
     void loadEnvFiles();
     void initBuild();

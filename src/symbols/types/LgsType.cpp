@@ -270,7 +270,7 @@ LgsTypePair* LgsType::asPair() {
     return dynamic_cast<LgsTypePair*>(this);
 }
 
-Value* LgsType::addIR(LgsLLVMGen& cg, Value* self, Value* other) {
+Value* LgsType::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     assert(0);
 }
 

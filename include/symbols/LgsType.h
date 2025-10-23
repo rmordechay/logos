@@ -115,7 +115,7 @@ public:
     LgsSubType* asSubtype();
     LgsTypePair* asPair();
 
-    virtual Value* addIR(LgsLLVMGen& cg, Value* self, Value* other);
+    virtual Value* addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
     virtual Value* subIR(LgsLLVMGen& cg, Value* self, Value* other);
     virtual Value* mulIR(LgsLLVMGen& cg, Value* self, Value* other);
     virtual Value* divIR(LgsLLVMGen& cg, Value* self, Value* other);

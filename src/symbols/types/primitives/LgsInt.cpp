@@ -40,9 +40,9 @@ LgsType* LgsInt::applyBinOp(const LgsBinOpType op, LgsType* other) {
     return applyIntBinOp(op, other);
 }
 
-Value* LgsInt::addIR(LgsLLVMGen& cg, Value* self, Value* other) {
-    const auto l = cg.builder.CreateZExt(self, getIRType(cg));
-    const auto r = cg.builder.CreateZExt(other, getIRType(cg));
+Value* LgsInt::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    const auto l = cg.builder.CreateZExt(self->loadIR(cg), getIRType(cg));
+    const auto r = cg.builder.CreateZExt(other->loadIR(cg), getIRType(cg));
     return cg.builder.CreateAdd(l, r);
 }
 

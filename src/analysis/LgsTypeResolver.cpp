@@ -17,7 +17,7 @@
 #include "types/LgsSubType.h"
 #include "utils/LgsErrHandler.h"
 
-bool LgsTypeResolver::resolveGlobalTypes(const std::vector<LgsFile*>& ast, ThreadPool& pool) {
+bool LgsTypeResolver::resolveGlobals(const std::vector<LgsFile*>& ast, ThreadPool& pool) {
     bool successful = true;
     for (const auto& file : ast) {
         pool.runTask([this, file, &successful] {

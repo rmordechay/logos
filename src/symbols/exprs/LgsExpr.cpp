@@ -76,6 +76,12 @@ std::string LgsExpr::getConstStr() {
             break;
         }
     }
+    if (const auto bin = asBinExpr()) {
+        if (bin->op.opType == ADD) {
+            assert(bin->type->asStr()->isStatic);
+            return bin->left->getConstStr() + bin->right->getConstStr();
+        }
+    }
     assert(0);
 }
 
@@ -110,3 +116,4 @@ LgsStrConst* LgsExpr::asStrConst() { return dynamic_cast<LgsStrConst*>(this); }
 LgsVectorExpr* LgsExpr::asVectorExpr() { return dynamic_cast<LgsVectorExpr*>(this); }
 LgsIntConst* LgsExpr::asIntConst() { return dynamic_cast<LgsIntConst*>(this); }
 LgsLoopMetaVar* LgsExpr::asLoopMetaVar() { return dynamic_cast<LgsLoopMetaVar*>(this); }
+LgsBinaryExpr* LgsExpr::asBinExpr() { return dynamic_cast<LgsBinaryExpr*>(this); }

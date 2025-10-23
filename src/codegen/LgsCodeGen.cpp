@@ -328,7 +328,7 @@ void LgsCodeGen::visitAssignment(const LgsAssignment* assignment) {
     Value* results = nullptr;
     switch (assignment->assignmentType) {
     case ASSIGN: lValue->assign(cg, rValue); return;
-    case ASSIGN_ADD: results = lValue->type->addIR(cg, lValue->loadIR(cg), rValue->loadIR(cg)); break;
+    case ASSIGN_ADD: results = lValue->type->addIR(cg, lValue, rValue); break;
     case ASSIGN_SUB: results = lValue->type->subIR(cg, lValue->loadIR(cg), rValue->loadIR(cg)); break;
     case ASSIGN_MUL: results = lValue->type->mulIR(cg, lValue->loadIR(cg), rValue->loadIR(cg)); break;
     case ASSIGN_DIV: results = lValue->type->divIR(cg, lValue->loadIR(cg), rValue->loadIR(cg)); break;
@@ -591,7 +591,7 @@ void LgsCodeGen::visitBinaryExpr(LgsBinaryExpr* binExpr) {
     const auto ltype = l->type;
     switch (binExpr->op.opType) {
     case ADD:
-        binExpr->IRValue = ltype->addIR(cg, selfLoad, otherLoad); break;
+        binExpr->IRValue = ltype->addIR(cg, l, r); break;
     case SUB:
         binExpr->IRValue = ltype->subIR(cg, selfLoad, otherLoad); break;
     case MUL:

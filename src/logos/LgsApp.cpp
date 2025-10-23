@@ -35,7 +35,7 @@ bool LgsApp::setup() {
     // File mode
     if (isLogosFile(paths.rootPath)) {
         appConfigs.isFileMode = true;
-        filesMetadata.emplace_back(LgsFileMetadata(getNextFileID(), fs::canonical(paths.rootPath)));
+        metadata.files.emplace_back(LgsFileMetadata(getNextFileID(), fs::canonical(paths.rootPath)));
         return true;
     }
 
@@ -48,7 +48,7 @@ bool LgsApp::setup() {
 
     // App file
     const auto appFileID = getNextFileID();
-    filesMetadata.emplace_back(LgsFileMetadata(
+    metadata.files.emplace_back(LgsFileMetadata(
         appFileID,
         fs::canonical(paths.appFilePath),
         fs::last_write_time(paths.appFilePath))
@@ -59,13 +59,13 @@ bool LgsApp::setup() {
     for (const auto& entry : fs::recursive_directory_iterator(paths.srcDir)) {
         if (!isLogosFile(entry)) continue;
         const auto fileName = entry.path().filename();
-        if (fileExists(entry, filesMetadata)) {
+        if (fileExists(entry, metadata.files)) {
             errHandler.addError(E10007, nullptr, {fileName});
             isValid = false;
             continue;
         }
         const auto fileID = getNextFileID();
-        filesMetadata.emplace_back(LgsFileMetadata(
+        metadata.files.emplace_back(LgsFileMetadata(
             fileID,
             fs::canonical(entry.path()),
             fs::last_write_time(entry)
@@ -78,23 +78,22 @@ bool LgsApp::setup() {
 bool LgsApp::parse() {
     assert(!appConfigs.isFileMode);
     if (!loadAppConfigFile()) return false;
-    // loadEnvFiles();
-    for (auto& metadata : filesMetadata) {
-        threadPool.runTask([&metadata, this] {
-            loadSrcFile(metadata);
+    loadEnvFiles();
+    for (auto& file : metadata.files) {
+        threadPool.runTask([&file, this] {
+            const auto code = getFileText(file.filePath);
+            loadSrcFile(code, file.filePath, file.id);
         });
     }
     threadPool.wait();
-    saveMetadataVector(filesMetadata, paths.filesMetadata);
+    saveMetadata(metadata, paths.filesMetadata);
     return errHandler.successful;
 }
 
 bool LgsApp::analyse() {
     loadBuiltins();
     LgsTypeResolver typeResolver(errHandler, globals);
-    if (!typeResolver.resolveGlobalTypes(srcFiles, threadPool)) {
-        return false;
-    }
+    if (!typeResolver.resolveGlobals(srcFiles, threadPool)) return false;
     for (const auto file : srcFiles) {
         threadPool.runTask([this, file] {
             LgsSema semaAnalyser(file, globals);
@@ -125,7 +124,7 @@ bool LgsApp::generate() {
 }
 
 bool LgsApp::link() {
-    LgsLinker linker(appConfigs, paths, srcFiles);
+    const LgsLinker linker(appConfigs, paths, srcFiles);
     return linker.link();
 }
 
@@ -136,26 +135,10 @@ void LgsApp::loadBuiltins() {
     globals.addSymbol(LgsSymbol(new LgsReflect(), false, true), &errHandler);
 }
 
-void LgsApp::loadSrcFile(const LgsFileMetadata& metadata) {
-    const auto code = getFileText(metadata.filePath);
-    LgsLexer lexer(metadata.id, code);
-    const auto tokens = lexer.tokenize();
-    if (!lexer.errHandler.successful) {
-        std::lock_guard lock(mtx);
-        errHandler.mergeErrors(lexer.errHandler);
-        return;
+void LgsApp::loadSrcFile(const std::string& code, const std::string& filePath, size_t fileID) {
+    if (fileID == 0) {
+        fileID = getNextFileID();
     }
-    LgsParser parser(metadata.id, metadata.filePath, paths, globals, tokens);
-    const auto file = parser.parseSrcFile(appConfigs.isTestRun);
-    std::lock_guard lock(mtx);
-    if (file) srcFiles.push_back(file);
-    if (!parser.errHandler.successful) {
-        errHandler.mergeErrors(parser.errHandler);
-    }
-}
-
-void LgsApp::loadSrcFile(const std::string& code, const std::string& filePath) {
-    const auto fileID = getNextFileID();
     LgsLexer lexer(fileID, code);
     const auto tokens = lexer.tokenize();
     if (!lexer.errHandler.successful) {
@@ -175,7 +158,7 @@ void LgsApp::loadSrcFile(const std::string& code, const std::string& filePath) {
 }
 
 bool LgsApp::loadAppConfigFile() {
-    constexpr auto appFileID = 1;
+    const auto appFileID = getNextFileID();
     LgsLexer lexer(appFileID, getFileText(paths.appFilePath));
     const auto tokens = lexer.tokenize();
     if (!lexer.errHandler.successful) {
