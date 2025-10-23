@@ -76,10 +76,11 @@ bool LgsApp::setup() {
 }
 
 bool LgsApp::parse() {
-    assert(!appConfigs.isFileMode);
-    if (!loadAppConfigFile()) return false;
-    loadEnvFiles();
+    // assert(!appConfigs.isFileMode);
+    // if (!loadAppConfigFile()) return false;
+    // loadEnvFiles();
     for (auto& file : metadata.files) {
+        if (file.id == 1) continue;
         threadPool.runTask([&file, this] {
             const auto code = getFileText(file.filePath);
             loadSrcFile(code, file.filePath, file.id);
@@ -135,7 +136,7 @@ void LgsApp::loadBuiltins() {
     globals.addSymbol(LgsSymbol(new LgsReflect(), false, true), &errHandler);
 }
 
-void LgsApp::loadSrcFile(const std::string& code, const std::string& filePath, size_t fileID) {
+void LgsApp::loadSrcFile(const std::string& code, const fs::path& filePath, size_t fileID) {
     if (fileID == 0) {
         fileID = getNextFileID();
     }
@@ -208,7 +209,6 @@ void LgsApp::initBuild() {
         fs::create_directories(paths.buildDirObjs);
     }
     LgsLLVMGen::initLLVM();
-    paths.objFilePath = paths.buildDir / (appConfigs.name + ".o");
     paths.execFilePath = paths.buildDir / appConfigs.name;
 }
 
@@ -217,16 +217,16 @@ void LgsApp::writeIRFiles() {
         const auto module = file->generator.IRModule;
         if (!module) continue;
         if constexpr (DEBUG) {
-            module->print(outs(), nullptr);
+            module->print(llvm::outs(), nullptr);
             logInfo(LGS_MSG_LINE_SEPERATOR);
         }
-        if (verifyModule(*module, &errs())) {
+        if (verifyModule(*module, &llvm::errs())) {
             errHandler.setUnsuccessful();
             continue;
         }
         const auto filePath = (paths.buildDirIR / module->getName().str()).string() + ".ll";
         std::error_code EC;
-        raw_fd_ostream textFile(filePath, EC, sys::fs::OF_None);
+        raw_fd_ostream textFile(filePath, EC, llvm::sys::fs::OF_None);
         module->print(textFile, nullptr);
     }
 }

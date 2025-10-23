@@ -11,6 +11,7 @@
 #include "stmts/LgsIOPair.h"
 #include "types/LgsEnum.h"
 #include "types/LgsFuncType.h"
+#include "types/LgsGeneric.h"
 #include "types/LgsInterface.h"
 #include "types/iterables/LgsIterable.h"
 #include "types/LgsNullable.h"
@@ -18,7 +19,7 @@
 #include "utils/LgsErrHandler.h"
 
 bool LgsTypeResolver::resolveGlobals(const std::vector<LgsFile*>& ast, ThreadPool& pool) {
-    bool successful = true;
+    std::atomic successful = true;
     for (const auto& file : ast) {
         pool.runTask([this, file, &successful] {
             if (const auto mf = dynamic_cast<LgsMainFile*>(file)) {
@@ -28,9 +29,8 @@ bool LgsTypeResolver::resolveGlobals(const std::vector<LgsFile*>& ast, ThreadPoo
             } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
                 resolveInterfaceTypes(interfaceFile->interface, *interfaceFile);
             }
-            {
-                std::lock_guard lock(mtx);
-                successful = successful && errHandler.successful;
+            if (!errHandler.successful) {
+                successful.store(false, std::memory_order_relaxed);
             }
         });
     }

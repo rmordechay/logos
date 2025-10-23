@@ -124,7 +124,7 @@ LgsType* LgsCLangVisitor::mapCType(const clang::QualType type) {
     if (typeStr == "fpos_t") {
         return new LgsLong();
     }
-    errs() << "Unhandled type: " << typeStr << "\n";
+    llvm::errs() << "Unhandled type: " << typeStr << "\n";
     assert(0);
 }
 
@@ -165,12 +165,12 @@ LgsType* LgsCLangVisitor::mapCFunc(const clang::QualType type) {
     return lgsFuncType;
 }
 
-std::unique_ptr<clang::ASTConsumer> LgsCLangFeAction::CreateASTConsumer(clang::CompilerInstance& compilerInstance, StringRef inFile) {
+std::unique_ptr<clang::ASTConsumer> LgsCLangFeAction::CreateASTConsumer(clang::CompilerInstance& compilerInstance, llvm::StringRef inFile) {
     return std::make_unique<LgsCLangVisitor>(file);
 }
 
 LgsType* LgsCLangVisitor::mapCArray(const clang::QualType type) {
-    const auto arrayType = cast<clang::ConstantArrayType>(type.getTypePtr());
+    const auto arrayType = llvm::cast<clang::ConstantArrayType>(type.getTypePtr());
     const auto baseType = mapCType(arrayType->getElementType());
     const auto size = arrayType->getSize().getZExtValue();
     const auto arr = new LgsDArray(baseType);

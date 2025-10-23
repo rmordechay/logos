@@ -32,6 +32,7 @@ LgsType* LgsStr::applyBinOp(const LgsBinOpType op, LgsType* other) {
     switch (op) {
     case ADD: {
         if (other->isNumber() || name == IRName) {
+            isHeapAlloc = true;
             return this;
         }
         break;
@@ -51,27 +52,34 @@ LgsType* LgsStr::applyBinOp(const LgsBinOpType op, LgsType* other) {
 }
 
 Value* LgsStr::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    if (isStatic && other->type->asStr()->isStatic) {
-        return cg.getIRStr(self->getConstStr() + other->getConstStr());
+    const auto otherStr = other->type->asStr();
+    if (isStatic && otherStr->isStatic) {
+        const auto selfConstStr = self->getConstStr();
+        const auto otherConstStr = other->getConstStr();
+        if (selfConstStr && otherConstStr) {
+            return cg.getIRStr(*selfConstStr + *otherConstStr);
+        }
     }
     const auto selfSize = lengthIR(cg, self->IRValue);
     const auto otherSize = lengthIR(cg, other->IRValue);
-    auto newStrSize = cg.builder.CreateAdd(selfSize, otherSize);
-    newStrSize = cg.builder.CreateAdd(newStrSize, cg.i64(1));
-    const auto newStrPtr = cg.builder.CreateAlloca(cg.i8Ty(), newStrSize);
+    const auto totalSize = cg.builder.CreateAdd(selfSize, otherSize);
+    const auto newStrSize = cg.builder.CreateAdd(totalSize, cg.i64(1));
+    const auto newStrPtr = cg.callMalloc(newStrSize, true, getRTType());
     cg.callMemCpy(newStrPtr, self->IRValue, selfSize);
     const auto dstPtr = cg.builder.CreateInBoundsGEP(cg.i8Ty(), newStrPtr, selfSize);
     cg.callMemCpy(dstPtr, other->IRValue, otherSize);
+    const auto nullPos = cg.builder.CreateGEP(cg.i8Ty(), newStrPtr, totalSize);
+    cg.builder.CreateStore(cg.i8(0), nullPos);
     return newStrPtr;
 }
 
-Value* LgsStr::eqIR(LgsLLVMGen& cg, Value* self, Value* other) {
-    const auto rt = cg.callFunc("strcmp", cg.i32Ty(), {cg.ptrTy(), cg.ptrTy()}, {self, other});
+Value* LgsStr::eqIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    const auto rt = cg.callFunc("strcmp", cg.i32Ty(), {cg.ptrTy(), cg.ptrTy()}, {self->IRValue, other->IRValue});
     return cg.builder.CreateICmpEQ(rt, cg.i32(0));
 }
 
-Value* LgsStr::neIR(LgsLLVMGen& cg, Value* self, Value* other) {
-    const auto rt = cg.callFunc("strcmp", cg.i32Ty(), {cg.ptrTy(), cg.ptrTy()}, {self, other});
+Value* LgsStr::neIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    const auto rt = cg.callFunc("strcmp", cg.i32Ty(), {cg.ptrTy(), cg.ptrTy()}, {self->IRValue, other->IRValue});
     return cg.builder.CreateICmpNE(rt, cg.i32(0));
 }
 

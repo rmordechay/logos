@@ -28,7 +28,7 @@ void LgsCLang::parseFile(const fs::path& fileName, LgsFile* lgsFile) const {
 }
 
 void LgsCLang::compile(const std::vector<LgsStrConst*>& files) const {
-    const auto targetTriple = sys::getDefaultTargetTriple();
+    const auto targetTriple = llvm::sys::getDefaultTargetTriple();
     clang::DiagnosticsEngine diags(new clang::DiagnosticIDs(), new clang::DiagnosticOptions(), new clang::DiagnosticConsumer());
     clang::driver::Driver driver("clang", targetTriple, diags);
     auto invocation = std::make_unique<clang::CompilerInvocation>();

@@ -20,8 +20,8 @@ public:
     LgsFunc* getIsNotEmptyFunc() override;
     std::string strFormatPart() const override;
     Value* addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
-    Value* eqIR(LgsLLVMGen& cg, Value* self, Value* other) override;
-    Value* neIR(LgsLLVMGen& cg, Value* self, Value* other) override;
+    Value* eqIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
+    Value* neIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
     Value* lengthIR(LgsLLVMGen& cg, Value* iterable) override;
     Value* inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
     bool canCastTo(LgsType* other) override;

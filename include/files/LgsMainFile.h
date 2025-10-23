@@ -29,7 +29,7 @@ inline size_t LgsMainFile::hashFile() {
     size_t hash = 0;
     hashString(hash, LGS_MAIN_FILE);
     for (const auto& [funcName, func] : funcs) {
-        func->hashValue(hash);
+        func->hashNode(hash);
     }
     for (const auto obj : objects) {
         obj->hashValue(hash);

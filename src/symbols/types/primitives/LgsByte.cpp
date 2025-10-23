@@ -27,46 +27,46 @@ Value* LgsByte::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     return cg.builder.CreateAdd(l, r);
 }
 
-Value* LgsByte::subIR(LgsLLVMGen& cg, Value* self, Value* other) {
-    const auto l = cg.builder.CreateZExt(self, getIRType(cg));
-    const auto r = cg.builder.CreateZExt(other, getIRType(cg));
+Value* LgsByte::subIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    const auto l = cg.builder.CreateZExt(self->loadIR(cg), getIRType(cg));
+    const auto r = cg.builder.CreateZExt(other->loadIR(cg), getIRType(cg));
     return cg.builder.CreateSub(l, r);
 }
 
-Value* LgsByte::mulIR(LgsLLVMGen& cg, Value* self, Value* other) {
-    const auto l = cg.builder.CreateZExt(self, getIRType(cg));
-    const auto r = cg.builder.CreateZExt(other, getIRType(cg));
+Value* LgsByte::mulIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    const auto l = cg.builder.CreateZExt(self->loadIR(cg), getIRType(cg));
+    const auto r = cg.builder.CreateZExt(other->loadIR(cg), getIRType(cg));
     return cg.builder.CreateMul(l, r);
 }
 
-Value* LgsByte::divIR(LgsLLVMGen& cg, Value* self, Value* other) {
-    const auto l = cg.builder.CreateZExt(self, getIRType(cg));
-    const auto r = cg.builder.CreateZExt(other, getIRType(cg));
+Value* LgsByte::divIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    const auto l = cg.builder.CreateZExt(self->loadIR(cg), getIRType(cg));
+    const auto r = cg.builder.CreateZExt(other->loadIR(cg), getIRType(cg));
     return cg.builder.CreateSDiv(l, r);
 }
 
-Value* LgsByte::modIR(LgsLLVMGen& cg, Value* self, Value* other) {
-    return cg.builder.CreateSRem(self, other);
+Value* LgsByte::modIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    return cg.builder.CreateSRem(self->loadIR(cg), other->loadIR(cg));
 }
 
-Value* LgsByte::bitAndIR(LgsLLVMGen& cg, Value* self, Value* other) {
-    return cg.builder.CreateAnd(self, other);
+Value* LgsByte::bitAndIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    return cg.builder.CreateAnd(self->loadIR(cg), other->loadIR(cg));
 }
 
-Value* LgsByte::bitOrIR(LgsLLVMGen& cg, Value* self, Value* other) {
-    return cg.builder.CreateOr(self, other);
+Value* LgsByte::bitOrIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    return cg.builder.CreateOr(self->loadIR(cg), other->loadIR(cg));
 }
 
-Value* LgsByte::bitXorIR(LgsLLVMGen& cg, Value* self, Value* other) {
-    return cg.builder.CreateXor(self, other);
+Value* LgsByte::bitXorIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    return cg.builder.CreateXor(self->loadIR(cg), other->loadIR(cg));
 }
 
-Value* LgsByte::rshiftIR(LgsLLVMGen& cg, Value* self, Value* other) {
-    return cg.builder.CreateShl(self, other);
+Value* LgsByte::rshiftIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    return cg.builder.CreateShl(self->loadIR(cg), other->loadIR(cg));
 }
 
-Value* LgsByte::lshiftIR(LgsLLVMGen& cg, Value* self, Value* other) {
-    return cg.builder.CreateLShr(self, other);
+Value* LgsByte::lshiftIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    return cg.builder.CreateLShr(self->loadIR(cg), other->loadIR(cg));
 }
 
 size_t LgsByte::getSizeBytes() {

@@ -44,9 +44,9 @@ void LgsExpr::freeOwner(LgsLLVMGen& cg) {
     }
 }
 
-int64_t LgsExpr::getConstInt() {
+int64_t* LgsExpr::getConstInt() {
     if (const auto intConst = asIntConst()) {
-        return intConst->value;
+        return &intConst->value;
     }
     if (const auto var = asVariable()) {
         switch (var->ref.symbolType) {
@@ -59,12 +59,12 @@ int64_t LgsExpr::getConstInt() {
             break;
         }
     }
-    return -1;
+    return nullptr;
 }
 
-std::string LgsExpr::getConstStr() {
+std::string* LgsExpr::getConstStr() {
     if (const auto strConst = asStrConst()) {
-        return strConst->value;
+        return &strConst->value;
     }
     if (const auto var = asVariable()) {
         switch (var->ref.symbolType) {
@@ -78,11 +78,15 @@ std::string LgsExpr::getConstStr() {
     }
     if (const auto bin = asBinExpr()) {
         if (bin->op.opType == ADD) {
-            assert(bin->type->asStr()->isStatic);
-            return bin->left->getConstStr() + bin->right->getConstStr();
+            const auto leftConstStr = bin->left->getConstStr();
+            const auto rightConstStr = bin->right->getConstStr();
+            if (!leftConstStr || !rightConstStr) return nullptr;
+            const auto concatStrConst = new LgsStrConst(*leftConstStr + *rightConstStr);
+            bin->results = concatStrConst;
+            return &concatStrConst->value;
         }
     }
-    assert(0);
+    return nullptr;
 }
 
 void LgsExpr::setType(LgsType* newType) {

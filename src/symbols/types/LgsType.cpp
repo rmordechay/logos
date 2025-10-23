@@ -274,70 +274,70 @@ Value* LgsType::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsType::subIR(LgsLLVMGen& cg, Value* self, Value* other) {
+Value* LgsType::subIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsType::mulIR(LgsLLVMGen& cg, Value* self, Value* other) {
+Value* LgsType::mulIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsType::divIR(LgsLLVMGen& cg, Value* self, Value* other) {
+Value* LgsType::divIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsType::modIR(LgsLLVMGen& cg, Value* self, Value* other) {
+Value* LgsType::modIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsType::bitAndIR(LgsLLVMGen& cg, Value* self, Value* other) {
+Value* LgsType::bitAndIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsType::bitOrIR(LgsLLVMGen& cg, Value* self, Value* other) {
+Value* LgsType::bitOrIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsType::bitXorIR(LgsLLVMGen& cg, Value* self, Value* other) {
+Value* LgsType::bitXorIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsType::lshiftIR(LgsLLVMGen& cg, Value* self, Value* other) {
+Value* LgsType::lshiftIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsType::rshiftIR(LgsLLVMGen& cg, Value* self, Value* other) {
+Value* LgsType::rshiftIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsType::eqIR(LgsLLVMGen& cg, Value* self, Value* other) {
+Value* LgsType::eqIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsType::neIR(LgsLLVMGen& cg, Value* self, Value* other) {
+Value* LgsType::neIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsType::ltIR(LgsLLVMGen& cg, Value* self, Value* other) {
+Value* LgsType::ltIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsType::gtIR(LgsLLVMGen& cg, Value* self, Value* other) {
+Value* LgsType::gtIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsType::geIR(LgsLLVMGen& cg, Value* self, Value* other) {
+Value* LgsType::geIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsType::leIR(LgsLLVMGen& cg, Value* self, Value* other) {
+Value* LgsType::leIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsType::andIR(LgsLLVMGen& cg, Value* self, Value* other) {
+Value* LgsType::andIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsType::orIR(LgsLLVMGen& cg, Value* self, Value* other) {
+Value* LgsType::orIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     assert(0);
 }

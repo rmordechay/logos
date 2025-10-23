@@ -17,7 +17,7 @@ public:
         getMethodFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
             assert(args.back()->type->asStr()->isStatic);
             const auto obj = args.front()->type->asObject();
-            const auto name = args.back()->getConstStr();
+            const auto name = *args.back()->getConstStr();
             const auto method = obj->getMethod(name);
             return method->getIRFunc(cg);
         };

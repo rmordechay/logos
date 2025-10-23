@@ -33,6 +33,7 @@ class LgsBinaryExpr final : public LgsExpr {
 public:
     LgsExpr* left;
     LgsExpr* right;
+    LgsExpr* results = nullptr;
     LgsBinOp op = LgsBinOp{NOOP, ""};
 
     explicit LgsBinaryExpr(LgsExpr* left, LgsExpr* right, const LgsBinOp& op) : left(left), right(right), op(op) {}

@@ -33,7 +33,7 @@ void LgsMainFunc::setDebugValue(LgsLLVMGen& cg) {
         location.lineStart,
         subroutine,
         location.lineStart,
-        DINode::FlagPrototyped,
+        llvm::DINode::FlagPrototyped,
         DISubprogram::SPFlagDefinition
     );
     getIRFunc(cg)->setSubprogram(cg.debugger.diProgram);

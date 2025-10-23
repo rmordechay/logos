@@ -23,13 +23,13 @@ public:
     bool canCastTo(LgsType* other) override;
     LgsType* applyBinOp(LgsBinOpType op, LgsType* other) override;
     Value* addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
-    Value* subIR(LgsLLVMGen& cg, Value* self, Value* other) override;
-    Value* mulIR(LgsLLVMGen& cg, Value* self, Value* other) override;
-    Value* divIR(LgsLLVMGen& cg, Value* self, Value* other) override;
+    Value* subIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
+    Value* mulIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
+    Value* divIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
     Value* inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
     Value* lengthIR(LgsLLVMGen& cg, Value* iterable) override;
     Value* getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) override;
-    Value* dotProduct(LgsLLVMGen& cg, Value* self, Value* other) const;
+    Value* dotProduct(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) const;
     static int8_t getSwizzleSet(char c);
     static int8_t getComponentIndex(char c);
     std::string strFormatPart() const override;

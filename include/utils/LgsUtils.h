@@ -25,7 +25,7 @@ bool isLLVMFile(const fs::directory_entry& entry);
 bool isLogosKeyword(const std::string& s);
 std::string getFileText(const fs::path& filePath);
 bool fileExists(const fs::path& entry, const std::vector<LgsFileMetadata>& filesMetadata);
-void freeType(LgsType* type);
+void freeType(const LgsType* type);
 void freeTypes(std::vector<LgsType*>& types);
 void freeExpr(LgsExpr* expr);
 void freeExprs(std::vector<LgsExpr*>& exprs);

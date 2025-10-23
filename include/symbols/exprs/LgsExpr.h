@@ -28,8 +28,6 @@ class LgsFloatConst;
 class LgsStrConst;
 class LgsTypeConst;
 
-using namespace llvm;
-
 enum LgsAssignType {
     ASSIGN,
     ASSIGN_ADD,
@@ -63,9 +61,10 @@ public:
     virtual LgsExpr* clone();
 
     void freeOwner(LgsLLVMGen& cg);
-    int64_t getConstInt();
-    std::string getConstStr();
+    int64_t* getConstInt();
+    std::string* getConstStr();
     void setType(LgsType* newType);
+
     LgsNull* asNull();
     LgsFunc* asFunc();
     LgsVariable* asVariable();

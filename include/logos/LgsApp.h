@@ -47,7 +47,7 @@ public:
     bool generate();
     bool link();
     void loadBuiltins();
-    void loadSrcFile(const std::string& code, const std::string& filePath, size_t fileID = 0);
+    void loadSrcFile(const std::string& code, const fs::path& filePath, size_t fileID = 0);
     bool loadAppConfigFile();
     void loadEnvFiles();
     void initBuild();

@@ -1,6 +1,8 @@
 #pragma once
 #include "types/iterables/LgsIterable.h"
 
+using llvm::StructType;
+
 class LgsSet final : public LgsIterable {
 public:
     static constexpr auto name = "set";

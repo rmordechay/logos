@@ -2,20 +2,19 @@
 #include "Lgs_types.h"
 #include "exprs/LgsExpr.h"
 #include <llvm/IR/IRBuilder.h>
-#include <llvm/IR/LLVMContext.h>
+#include <llvm/IR/DIBuilder.h>
 #include <cstdint>
 #include <cmath>
 #include <map>
 #include <filesystem>
 
 class LgsFile;
-
 namespace llvm {
     class TargetMachine;
-    class DIBuilder;
 }
-
-using namespace llvm;
+using llvm::DIBuilder;
+using llvm::IRBuilderBase;
+using llvm::IRBuilder;
 
 struct LgsLLDBGen {
     DIFile* diFile = nullptr;
@@ -66,6 +65,7 @@ public:
     Value* callStrLen(Value* str);
     void callMemCpy(Value* dest, Value* src, Value* size);
     Value* callMalloc(size_t size, bool isOwner, Lgs_rttype type);
+    Value* callMalloc(Value* size, bool isOwner, Lgs_rttype type);
 
     // Stack
     void callStackPush(bool hasDefers, bool needsCleanup);

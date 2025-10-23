@@ -1,5 +1,4 @@
 #include "exprs/LgsArrayExpr.h"
-
 #include "types/iterables/LgsSet.h"
 
 Value* LgsArrayExpr::loadIR(LgsLLVMGen& cg) {

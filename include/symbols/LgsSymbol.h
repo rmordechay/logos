@@ -1,7 +1,7 @@
 #pragma once
-#include "types/LgsGeneric.h"
 #include <string>
 
+class LgsGeneric;
 class LgsType;
 class LgsSubType;
 class LgsVariable;

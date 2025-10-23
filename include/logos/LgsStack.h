@@ -1,6 +1,9 @@
 #pragma once
 #include "LgsSymbolTable.h"
-#include <llvm/IR/BasicBlock.h>
+
+namespace llvm {
+    class BasicBlock;
+}
 
 class LgsSwitch;
 class LgsValue;

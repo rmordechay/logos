@@ -7,7 +7,6 @@ namespace llvm {
     class AllocaInst;
 }
 
-using namespace llvm;
 class LgsWhileLoop;
 class LgsInfiniteLoop;
 class LgsRangeLoop;
@@ -18,7 +17,7 @@ class LgsForLoop : public LgsStmt {
 public:
     std::vector<LgsVarDec*> loopVars;
     std::map<LgsLoopMetaVarType, LgsLoopMetaVar*> metaVars;
-    AllocaInst* iPtr = nullptr;
+    llvm::AllocaInst* iPtr = nullptr;
     Value* iValue = nullptr;
 
     LgsStmtsBlock* stmtsBlock = nullptr;

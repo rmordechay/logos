@@ -34,7 +34,7 @@ Value* LgsFunc::call(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
 }
 
 Value* LgsFunc::callIR(LgsLLVMGen& cg, const std::vector<Value*>& args) {
-    CallInst* rv = nullptr;
+    llvm::CallInst* rv = nullptr;
     if (IRValue) {
         const auto funcTypeIR = funcType->getIRType(cg);
         const auto IRFuncType = llvm::cast<FunctionType>(funcTypeIR);
@@ -57,7 +57,7 @@ Function* LgsFunc::getIRFunc(LgsLLVMGen& cg) {
     const auto type = funcType->getIRType(cg);
     const auto funcTy = llvm::cast<FunctionType>(type);
     IRFunc = cg.getFunc(funcName, funcTy);
-    IRFunc->addFnAttr(Attribute::NoUnwind);
+    IRFunc->addFnAttr(llvm::Attribute::NoUnwind);
     if (funcType->params.empty()) return IRFunc;
     auto args = IRFunc->arg_begin();
     for (size_t i = 0; i < funcType->params.size(); ++i) {
@@ -117,7 +117,7 @@ std::string LgsFunc::getIRName() const {
     return funcName;
 }
 
-void LgsFunc::hashValue(size_t& oldHash) {
+void LgsFunc::hashNode(size_t& oldHash) {
     hashString(oldHash, funcType->name);
 }
 
@@ -134,7 +134,7 @@ void LgsFunc::setDebugValue(LgsLLVMGen& cg) {
         location.lineStart,
         subroutine,
         location.lineStart,
-        DINode::FlagPrototyped,
+        llvm::DINode::FlagPrototyped,
         DISubprogram::SPFlagDefinition
     );
     getIRFunc(cg)->setSubprogram(cg.debugger.diProgram);

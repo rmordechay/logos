@@ -39,10 +39,12 @@ void LgsVarDec::setDebugValue(LgsLLVMGen& cg) {
 
 LgsVarDec::~LgsVarDec() {
     if (expr) {
+        if (type == expr->type) {
+            expr->type = nullptr;
+        }
         freeExpr(expr);
         expr = nullptr;
-    } else if (type) {
-        freeType(type);
-        type = nullptr;
     }
+    freeType(type);
+    type = nullptr;
 }

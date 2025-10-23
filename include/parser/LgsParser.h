@@ -55,18 +55,18 @@ class LgsExpr;
 class LgsParser {
 public:
     size_t fileID;
+    fs::path filePath;
     LgsPaths& paths;
     LgsToken currentToken;
     size_t currentIndex = 0;
     LgsSymbolTable& globals;
     LgsErrHandler errHandler;
-    const fs::path& filePath;
     size_t recursionCount = 0;
     std::vector<LgsToken> tokens;
     LgsFunc* currentFunc = nullptr;
 
-    LgsParser(const size_t fileId, const fs::path& filePath, LgsPaths& paths, LgsSymbolTable& globals, const std::vector<LgsToken>& tokens) :
-        fileID(fileId), paths(paths), globals(globals), filePath(filePath), tokens(tokens) {
+    LgsParser(const size_t fileID, const fs::path& filePath, LgsPaths& paths, LgsSymbolTable& globals, const std::vector<LgsToken>& tokens) :
+        fileID(fileID), filePath(filePath), paths(paths), globals(globals), tokens(tokens) {
         if (!tokens.empty()) {
             currentToken = tokens[0];
         }

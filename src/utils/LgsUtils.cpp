@@ -112,11 +112,10 @@ bool fileExists(const fs::path& entry, const std::vector<LgsFileMetadata>& files
     return false;
 }
 
-void freeType(LgsType* type) {
+void freeType(const LgsType* type) {
     if (!type) return;
     if (type->isPrimitive) return;
-    if (type->isUnknown()) return;
-    // delete type;
+    delete type;
 }
 
 void freeTypes(std::vector<LgsType*>& types) {

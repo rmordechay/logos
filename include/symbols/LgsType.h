@@ -8,13 +8,6 @@ class LgsSet;
 class LgsAny;
 class LgsSubType;
 class LgsByte;
-
-namespace llvm {
-    class DIBasicType;
-    class Value;
-    class Type;
-}
-
 class LgsSize;
 class LgsPtr;
 class LgsDouble;
@@ -46,8 +39,6 @@ class LgsFuncCall;
 class LgsField;
 class LgsFunc;
 class LgsLLVMGen;
-
-using namespace llvm;
 
 class LgsType {
 public:
@@ -116,22 +107,22 @@ public:
     LgsTypePair* asPair();
 
     virtual Value* addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
-    virtual Value* subIR(LgsLLVMGen& cg, Value* self, Value* other);
-    virtual Value* mulIR(LgsLLVMGen& cg, Value* self, Value* other);
-    virtual Value* divIR(LgsLLVMGen& cg, Value* self, Value* other);
-    virtual Value* modIR(LgsLLVMGen& cg, Value* self, Value* other);
-    virtual Value* bitAndIR(LgsLLVMGen& cg, Value* self, Value* other);
-    virtual Value* bitOrIR(LgsLLVMGen& cg, Value* self, Value* other);
-    virtual Value* bitXorIR(LgsLLVMGen& cg, Value* self, Value* other);
-    virtual Value* lshiftIR(LgsLLVMGen& cg, Value* self, Value* other);
-    virtual Value* rshiftIR(LgsLLVMGen& cg, Value* self, Value* other);
-    virtual Value* eqIR(LgsLLVMGen& cg, Value* self, Value* other);
-    virtual Value* neIR(LgsLLVMGen& cg, Value* self, Value* other);
-    virtual Value* ltIR(LgsLLVMGen& cg, Value* self, Value* other);
-    virtual Value* gtIR(LgsLLVMGen& cg, Value* self, Value* other);
-    virtual Value* geIR(LgsLLVMGen& cg, Value* self, Value* other);
-    virtual Value* leIR(LgsLLVMGen& cg, Value* self, Value* other);
-    virtual Value* andIR(LgsLLVMGen& cg, Value* self, Value* other);
-    virtual Value* orIR(LgsLLVMGen& cg, Value* self, Value* other);
+    virtual Value* subIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
+    virtual Value* mulIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
+    virtual Value* divIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
+    virtual Value* modIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
+    virtual Value* bitAndIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
+    virtual Value* bitOrIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
+    virtual Value* bitXorIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
+    virtual Value* lshiftIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
+    virtual Value* rshiftIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
+    virtual Value* eqIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
+    virtual Value* neIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
+    virtual Value* ltIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
+    virtual Value* gtIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
+    virtual Value* geIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
+    virtual Value* leIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
+    virtual Value* andIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
+    virtual Value* orIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
     virtual ~LgsType() = default;
 };

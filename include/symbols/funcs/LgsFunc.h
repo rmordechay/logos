@@ -50,6 +50,6 @@ public:
     bool needsCleanup() const;
     std::string asText() override;
     std::string getIRName() const;
-    void hashValue(size_t& oldHash) override;
+    void hashNode(size_t& oldHash) override;
     ~LgsFunc() override;
 };

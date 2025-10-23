@@ -2,10 +2,6 @@
 #include "LgsType.h"
 #include "funcs/LgsParam.h"
 
-namespace llvm {
-    class FunctionType;
-}
-
 enum LgsFuncFlags : uint32_t {
     PUBLIC = 1 << 0,
     BUILTIN = 1 << 1,

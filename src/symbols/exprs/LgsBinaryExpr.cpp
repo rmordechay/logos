@@ -10,12 +10,10 @@ std::string LgsBinaryExpr::asText() {
 }
 
 LgsBinaryExpr::~LgsBinaryExpr() {
-    if (left) {
-        freeExpr(left);
-        right = nullptr;
-    }
-    if (right) {
-        freeExpr(right);
-        left = nullptr;
-    }
+    freeExpr(left);
+    freeExpr(right);
+    freeExpr(results);
+    left = nullptr;
+    right = nullptr;
+    results = nullptr;
 }

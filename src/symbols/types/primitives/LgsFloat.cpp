@@ -4,16 +4,14 @@
 #include "types/LgsAny.h"
 #include "types/primitives/LgsDouble.h"
 
-std::pair<Value*, Value*> loadOperands(LgsLLVMGen& cg, Value* self, Value* other) {
-    auto l = self;
-    auto r = other;
-    if (l->getType()->isIntegerTy()) {
-        l = cg.builder.CreateSIToFP(l, cg.floatTy());
+std::pair<Value*, Value*> loadOperands(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    if (self->IRValue->getType()->isIntegerTy()) {
+        self->IRValue = cg.builder.CreateSIToFP(self->IRValue, cg.floatTy());
     }
-    if (r->getType()->isIntegerTy()) {
-        r = cg.builder.CreateSIToFP(r, cg.floatTy());
+    if (other->IRValue->getType()->isIntegerTy()) {
+        other->IRValue = cg.builder.CreateSIToFP(other->IRValue, cg.floatTy());
     }
-    return {l, r};
+    return {self->IRValue, other->IRValue};
 }
 
 std::string LgsFloat::getName() {
@@ -56,21 +54,21 @@ LgsType* LgsFloat::applyBinOp(const LgsBinOpType op, LgsType* other) {
 }
 
 Value* LgsFloat::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    const auto [l, r] = loadOperands(cg, self->IRValue, other->IRValue);
+    const auto [l, r] = loadOperands(cg, self, other);
     return cg.builder.CreateFAdd(l, r);
 }
 
-Value* LgsFloat::subIR(LgsLLVMGen& cg, Value* self, Value* other) {
+Value* LgsFloat::subIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     const auto [l, r] = loadOperands(cg, self, other);
     return cg.builder.CreateFSub(l, r);
 }
 
-Value* LgsFloat::mulIR(LgsLLVMGen& cg, Value* self, Value* other) {
+Value* LgsFloat::mulIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     const auto [l, r] = loadOperands(cg, self, other);
     return cg.builder.CreateFMul(l, r);
 }
 
-Value* LgsFloat::divIR(LgsLLVMGen& cg, Value* self, Value* other) {
+Value* LgsFloat::divIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     const auto [l, r] = loadOperands(cg, self, other);
     return cg.builder.CreateFDiv(l, r);
 }

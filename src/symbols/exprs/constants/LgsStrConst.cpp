@@ -5,6 +5,7 @@ LgsExpr* LgsStrConst::castTo(LgsType* toType, bool explicitCast) {
 }
 
 Value* LgsStrConst::castToIR(LgsLLVMGen& cg, LgsType* toType) {
+    if (toType->asStr()) return IRValue;
     return LgsExpr::castToIR(cg, toType);
 }
 

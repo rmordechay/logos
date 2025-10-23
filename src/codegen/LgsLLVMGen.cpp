@@ -13,14 +13,14 @@
 
 void LgsLLVMGen::setupModule(const LgsFile& file, const bool debugMode) {
     IRModule = new Module(file.filePath.filename().string(), context);
-    IRModule->setTargetTriple(sys::getDefaultTargetTriple());
+    IRModule->setTargetTriple(llvm::sys::getDefaultTargetTriple());
     IRModule->setDataLayout(targetMachine->createDataLayout());
     if (debugMode) {
         debugger.diBuilder = new DIBuilder(*IRModule);
         debugger.diFile = debugger.diBuilder->createFile(file.filePath.string(), "");
-        debugger.compileUnit = debugger.diBuilder->createCompileUnit(dwarf::DW_LANG_C, debugger.diFile, "Logos", false, "", 0);
+        debugger.compileUnit = debugger.diBuilder->createCompileUnit(llvm::dwarf::DW_LANG_C, debugger.diFile, "Logos", false, "", 0);
         IRModule->addModuleFlag(Module::Warning, "Dwarf Version", 5);
-        IRModule->addModuleFlag(Module::Warning, "Debug Info Version", DEBUG_METADATA_VERSION);
+        IRModule->addModuleFlag(Module::Warning, "Debug Info Version", llvm::DEBUG_METADATA_VERSION);
     }
 }
 
@@ -54,7 +54,7 @@ void LgsLLVMGen::loop(Value* loopLength, const std::function<void(Value*, BasicB
 Value* LgsLLVMGen::getIRStr(const std::string& value) {
     const auto str = stringCache.find(value);
     if (str != stringCache.end()) return str->second;
-    const auto strConstant = ConstantDataArray::getString(context, value, true);
+    const auto strConstant = llvm::ConstantDataArray::getString(context, value, true);
     const auto globalVar = new GlobalVariable(
         *IRModule,
         strConstant->getType(),
@@ -170,13 +170,20 @@ Value* LgsLLVMGen::callStrLen(Value* str) {
 
 void LgsLLVMGen::callMemCpy(Value* dest, Value* src, Value* size) {
     const auto dataLayout = targetMachine->createDataLayout();
-    const auto memCpy = Intrinsic::getDeclaration(IRModule, Intrinsic::memcpy, {ptrTy(), ptrTy(), sizeTy()});
+    const auto memCpy =llvm:: Intrinsic::getDeclaration(IRModule, llvm::Intrinsic::memcpy, {ptrTy(), ptrTy(), sizeTy()});
     builder.CreateCall(memCpy, {dest, src, size, false_()});
 }
 
 Value* LgsLLVMGen::callMalloc(const size_t size, const bool isOwner, const Lgs_rttype type) {
     assert(type != RTT_UNKNOWN);
     const auto ptr = builder.CreateMalloc(sizeTy(), sizeTy(), usize(size), nullptr);
+    addHeap(isOwner, type, ptr);
+    return ptr;
+}
+
+Value* LgsLLVMGen::callMalloc(Value* size, const bool isOwner, const Lgs_rttype type) {
+    assert(type != RTT_UNKNOWN);
+    const auto ptr = builder.CreateMalloc(sizeTy(), sizeTy(), size, nullptr);
     addHeap(isOwner, type, ptr);
     return ptr;
 }
@@ -251,7 +258,7 @@ PointerType* LgsLLVMGen::ptrTy() {
 }
 
 Value* LgsLLVMGen::null() {
-    return ConstantPointerNull::get(ptrTy());
+    return llvm::ConstantPointerNull::get(ptrTy());
 }
 
 ConstantInt* LgsLLVMGen::true_() {
@@ -303,11 +310,11 @@ Value* LgsLLVMGen::extendToSize(Value* v) {
 }
 
 Constant* LgsLLVMGen::floatv(const float_t v) {
-    return ConstantFP::get(floatTy(), v);
+    return llvm::ConstantFP::get(floatTy(), v);
 }
 
 Constant* LgsLLVMGen::doublev(const double_t v) {
-    return ConstantFP::get(doubleTy(), v);
+    return llvm::ConstantFP::get(doubleTy(), v);
 }
 
 TypeSize LgsLLVMGen::typeSize(Type* v) const {
@@ -332,23 +339,23 @@ void LgsLLVMGen::finalizeDebugger(const fs::path& buildPath) const {
     if (!debugger.diBuilder) return;
     debugger.diBuilder->finalize();
     std::error_code EC;
-    raw_fd_ostream file((buildPath / "logosdbg.bc").string(), EC, sys::fs::OF_None);
+    llvm::raw_fd_ostream file((buildPath / "logosdbg.bc").string(), EC, llvm::sys::fs::OF_None);
     WriteBitcodeToFile(*IRModule, file);
     file.flush();
 }
 
 void LgsLLVMGen::initLLVM() {
-    InitializeNativeTarget();
-    InitializeNativeTargetAsmPrinter();
-    InitializeNativeTargetAsmParser();
+    llvm::InitializeNativeTarget();
+    llvm::InitializeNativeTargetAsmPrinter();
+    llvm::InitializeNativeTargetAsmParser();
     LLVMInitializeAArch64TargetInfo();
 }
 
 TargetMachine* LgsLLVMGen::getTargetMachine() {
     std::string error;
-    const auto targetTriple = sys::getDefaultTargetTriple();
-    const auto target = TargetRegistry::lookupTarget(targetTriple, error);
-    return target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), std::nullopt);
+    const auto targetTriple =llvm:: sys::getDefaultTargetTriple();
+    const auto target = llvm::TargetRegistry::lookupTarget(targetTriple, error);
+    return target->createTargetMachine(targetTriple, "generic", "", llvm::TargetOptions(), std::nullopt);
 }
 
 LgsLLVMGen::~LgsLLVMGen() {

@@ -12,7 +12,7 @@
 #include <llvm/Target/TargetMachine.h>
 
 std::unique_ptr<Module> parseModule(LLVMContext& context, const std::string& path) {
-    SMDiagnostic diag;
+    llvm::SMDiagnostic diag;
     auto parsedModule = parseIRFile(path, diag, context);
     if (!parsedModule) {
         std::stringstream errMsg;
@@ -62,31 +62,31 @@ bool LgsLinker::link() const {
 }
 
 bool LgsLinker::generateObjFile(std::unique_ptr<Module> module, TargetMachine* targetMachine, const std::string& outputPath) const {
-    PassBuilder passBuilder(targetMachine);
-    LoopAnalysisManager loopAnalyser;
-    FunctionAnalysisManager funcAnalyser;
-    CGSCCAnalysisManager CGAnalyser;
-    ModuleAnalysisManager analysisManager;
+    llvm::PassBuilder passBuilder(targetMachine);
+    llvm::LoopAnalysisManager loopAnalyser;
+    llvm::FunctionAnalysisManager funcAnalyser;
+    llvm::CGSCCAnalysisManager CGAnalyser;
+    llvm::ModuleAnalysisManager analysisManager;
     passBuilder.registerModuleAnalyses(analysisManager);
     passBuilder.registerFunctionAnalyses(funcAnalyser);
     passBuilder.registerLoopAnalyses(loopAnalyser);
     passBuilder.registerCGSCCAnalyses(CGAnalyser);
     passBuilder.crossRegisterProxies(loopAnalyser, funcAnalyser, CGAnalyser, analysisManager);
-    PassManager<Module, AnalysisManager<Module>> passManager;
+    llvm::PassManager<Module, llvm::AnalysisManager<Module>> passManager;
     const auto optLevel = getOptLevel(appConfigs.optLevel);
     passManager.addPass(passBuilder.buildPerModuleDefaultPipeline(optLevel));
     passManager.run(*module, analysisManager);
 
     std::error_code ec;
-    legacy::PassManager pass;
-    raw_fd_ostream outputStream(outputPath.c_str(), ec, sys::fs::OF_None);
+    llvm::legacy::PassManager pass;
+    raw_fd_ostream outputStream(outputPath.c_str(), ec, llvm::sys::fs::OF_None);
     if (ec) {
         logError("Failed to open output file: " + ec.message() + '\n');
         return false;
     }
 
     const auto addedPassFailed = targetMachine->addPassesToEmitFile(
-        pass, outputStream, nullptr, CodeGenFileType::ObjectFile
+        pass, outputStream, nullptr, llvm::CodeGenFileType::ObjectFile
     );
     if (addedPassFailed) {
         logError("Failed to add passes to emit file\n");
@@ -107,10 +107,10 @@ std::string LgsLinker::findLgsLib() const {
 #endif
 }
 
-OptimizationLevel LgsLinker::getOptLevel(const uint8_t level) const {
-    if (appConfigs.optLevel == level) return OptimizationLevel::O0;
-    if (appConfigs.optLevel == level) return OptimizationLevel::O1;
-    if (appConfigs.optLevel == level) return OptimizationLevel::O2;
-    if (appConfigs.optLevel == level) return OptimizationLevel::O3;
+llvm::OptimizationLevel LgsLinker::getOptLevel(const uint8_t level) const {
+    if (appConfigs.optLevel == level) return llvm::OptimizationLevel::O0;
+    if (appConfigs.optLevel == level) return llvm::OptimizationLevel::O1;
+    if (appConfigs.optLevel == level) return llvm::OptimizationLevel::O2;
+    if (appConfigs.optLevel == level) return llvm::OptimizationLevel::O3;
     assert(0);
 }

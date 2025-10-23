@@ -13,7 +13,6 @@ struct LgsPaths {
     fs::path filesMetadata;
     fs::path lgsStdlibDir;
     fs::path appFilePath;
-    fs::path objFilePath;
     fs::path execFilePath;
     fs::path cLibRoot;
     fs::path cLibHeadersDir;

@@ -141,7 +141,7 @@ void LgsCodeGen::visitField(LgsField* field) const {
         for (int8_t i = 0; i < vec->vectorDim; i++) {
             mask[i] = LgsVec::getComponentIndex(field->name[i]);
         }
-        const ArrayRef maskRef(mask);
+        const llvm::ArrayRef maskRef(mask);
         const auto vecType = field->type->getIRType(cg);
         field->IRValue = cg.builder.CreateAlloca(vecType);
         const auto l = cg.builder.CreateLoad(field->parentIRType, field->parentIRValue);
@@ -164,7 +164,7 @@ void LgsCodeGen::visitParam(LgsParam* param) {
             return;
         }
         param->vaList = cg.builder.CreateAlloca(cg.builder.getPtrTy());
-        const auto vaStart = Intrinsic::getDeclaration(cg.IRModule, Intrinsic::vastart, {cg.builder.getPtrTy()});
+        const auto vaStart = llvm::Intrinsic::getDeclaration(cg.IRModule, llvm::Intrinsic::vastart, {cg.builder.getPtrTy()});
         cg.builder.CreateCall(vaStart, {param->vaList});
         param->IRValue = param->vaList;
     }
@@ -329,15 +329,15 @@ void LgsCodeGen::visitAssignment(const LgsAssignment* assignment) {
     switch (assignment->assignmentType) {
     case ASSIGN: lValue->assign(cg, rValue); return;
     case ASSIGN_ADD: results = lValue->type->addIR(cg, lValue, rValue); break;
-    case ASSIGN_SUB: results = lValue->type->subIR(cg, lValue->loadIR(cg), rValue->loadIR(cg)); break;
-    case ASSIGN_MUL: results = lValue->type->mulIR(cg, lValue->loadIR(cg), rValue->loadIR(cg)); break;
-    case ASSIGN_DIV: results = lValue->type->divIR(cg, lValue->loadIR(cg), rValue->loadIR(cg)); break;
-    case ASSIGN_MOD: results = lValue->type->modIR(cg, lValue->loadIR(cg), rValue->loadIR(cg)); break;
-    case ASSIGN_AND: results = lValue->type->bitAndIR(cg, lValue->loadIR(cg), rValue->loadIR(cg)); break;
-    case ASSIGN_OR: results = lValue->type->bitOrIR(cg, lValue->loadIR(cg), rValue->loadIR(cg)); break;
-    case ASSIGN_XOR: results = lValue->type->bitXorIR(cg, lValue->loadIR(cg), rValue->loadIR(cg)); break;
-    case ASSIGN_LSHIFT: results = lValue->type->lshiftIR(cg, lValue->loadIR(cg), rValue->loadIR(cg)); break;
-    case ASSIGN_RSHIFT: results = lValue->type->rshiftIR(cg, lValue->loadIR(cg), rValue->loadIR(cg)); break;
+    case ASSIGN_SUB: results = lValue->type->subIR(cg, lValue, rValue); break;
+    case ASSIGN_MUL: results = lValue->type->mulIR(cg, lValue, rValue); break;
+    case ASSIGN_DIV: results = lValue->type->divIR(cg, lValue, rValue); break;
+    case ASSIGN_MOD: results = lValue->type->modIR(cg, lValue, rValue); break;
+    case ASSIGN_AND: results = lValue->type->bitAndIR(cg, lValue, rValue); break;
+    case ASSIGN_OR: results = lValue->type->bitOrIR(cg, lValue, rValue); break;
+    case ASSIGN_XOR: results = lValue->type->bitXorIR(cg, lValue, rValue); break;
+    case ASSIGN_LSHIFT: results = lValue->type->lshiftIR(cg, lValue, rValue); break;
+    case ASSIGN_RSHIFT: results = lValue->type->rshiftIR(cg, lValue, rValue); break;
     }
     assert(results);
     cg.builder.CreateStore(results, lValue->IRValue);
@@ -442,7 +442,7 @@ void LgsCodeGen::visitSwitch(LgsSwitch* pm) {
     const auto exitBlock = cg.createBlock(BLOCK_NAME_EXIT_PATTERN);
     visitExpr(pm->cond);
     const auto exprIRValue = pm->cond->hash(cg);
-    SwitchInst* switchInst;
+    llvm::SwitchInst* switchInst;
     if (pm->elseBlock) {
         const auto numOfCases = pm->patterns.size() + !!pm->elseBlock;
         switchInst = cg.builder.CreateSwitch(exprIRValue, defaultBlock, numOfCases);
@@ -457,7 +457,7 @@ void LgsCodeGen::visitSwitch(LgsSwitch* pm) {
         visitExpr(expr);
         const auto patterIRValue = expr->hash(cg);
         const auto patternBlock = cg.createBlock(BLOCK_NAME_CASE_PREFIX + std::to_string(i), currentIRFunc);
-        switchInst->addCase(dyn_cast<ConstantInt>(patterIRValue), patternBlock);
+        switchInst->addCase(llvm::dyn_cast<ConstantInt>(patterIRValue), patternBlock);
         cg.startBlock(patternBlock);
         visitStmtsBlock(stmtsBlock);
         cg.builder.CreateBr(exitBlock);
@@ -586,46 +586,44 @@ void LgsCodeGen::visitBinaryExpr(LgsBinaryExpr* binExpr) {
     const auto r = binExpr->right;
     visitExpr(l);
     visitExpr(r);
-    const auto selfLoad = l->loadIR(cg);
-    const auto otherLoad = r->loadIR(cg);
-    const auto ltype = l->type;
+    const auto type = binExpr->type;
     switch (binExpr->op.opType) {
     case ADD:
-        binExpr->IRValue = ltype->addIR(cg, l, r); break;
+        binExpr->IRValue = type->addIR(cg, l, r); break;
     case SUB:
-        binExpr->IRValue = ltype->subIR(cg, selfLoad, otherLoad); break;
+        binExpr->IRValue = type->subIR(cg, l, r); break;
     case MUL:
-        binExpr->IRValue = ltype->mulIR(cg, selfLoad, otherLoad); break;
+        binExpr->IRValue = type->mulIR(cg, l, r); break;
     case DIV:
-        binExpr->IRValue = ltype->divIR(cg, selfLoad, otherLoad); break;
+        binExpr->IRValue = type->divIR(cg, l, r); break;
     case MODULO:
-        binExpr->IRValue = ltype->modIR(cg, selfLoad, otherLoad); break;
+        binExpr->IRValue = type->modIR(cg, l, r); break;
     case BIT_AND:
-        binExpr->IRValue = ltype->bitAndIR(cg, selfLoad, otherLoad); break;
+        binExpr->IRValue = type->bitAndIR(cg, l, r); break;
     case BIT_OR:
-        binExpr->IRValue = ltype->bitOrIR(cg, selfLoad, otherLoad); break;
+        binExpr->IRValue = type->bitOrIR(cg, l, r); break;
     case BIT_XOR:
-        binExpr->IRValue = ltype->bitXorIR(cg, selfLoad, otherLoad); break;
+        binExpr->IRValue = type->bitXorIR(cg, l, r); break;
     case LSHIFT:
-        binExpr->IRValue = ltype->rshiftIR(cg, selfLoad, otherLoad); break;
+        binExpr->IRValue = type->rshiftIR(cg, l, r); break;
     case RSHIFT:
-        binExpr->IRValue = ltype->lshiftIR(cg, selfLoad, otherLoad); break;
+        binExpr->IRValue = type->lshiftIR(cg, l, r); break;
     case EQ:
-        binExpr->IRValue = ltype->eqIR(cg, selfLoad, otherLoad); break;
+        binExpr->IRValue = type->eqIR(cg, l, r); break;
     case NE:
-        binExpr->IRValue = ltype->neIR(cg, selfLoad, otherLoad); break;
+        binExpr->IRValue = type->neIR(cg, l, r); break;
     case LT:
-        binExpr->IRValue = ltype->ltIR(cg, selfLoad, otherLoad); break;
+        binExpr->IRValue = type->ltIR(cg, l, r); break;
     case GT:
-        binExpr->IRValue = ltype->gtIR(cg, selfLoad, otherLoad); break;
+        binExpr->IRValue = type->gtIR(cg, l, r); break;
     case GE:
-        binExpr->IRValue = ltype->geIR(cg, selfLoad, otherLoad); break;
+        binExpr->IRValue = type->geIR(cg, l, r); break;
     case LE:
-        binExpr->IRValue = ltype->leIR(cg, selfLoad, otherLoad); break;
+        binExpr->IRValue = type->leIR(cg, l, r); break;
     case AND:
-        binExpr->IRValue = ltype->andIR(cg, selfLoad, otherLoad); break;
+        binExpr->IRValue = type->andIR(cg, l, r); break;
     case OR:
-        binExpr->IRValue = ltype->orIR(cg, selfLoad, otherLoad); break;
+        binExpr->IRValue = type->orIR(cg, l, r); break;
     case IN:
         binExpr->IRValue = r->type->asIterable()->inIR(cg, r, l); break;
     case NOOP: assert(0);
@@ -1120,7 +1118,7 @@ void LgsCodeGen::createEpilogue(LgsFunc* func) {
             cg.callPopStack(func->hasDefers, func->needsCleanup());
             cg.builder.CreateRet(getIRValue(func->returnStmts.front()));
         } else {
-            PHINode *phi = nullptr;
+            llvm::PHINode *phi = nullptr;
             if (!func->funcType->rt->isVoid()) {
                 phi = cg.builder.CreatePHI(cg.ptrTy(), func->returnStmts.size());
             }
@@ -1153,7 +1151,7 @@ Value* LgsCodeGen::getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) const {
     const auto ctx = cg.builder.CreateAlloca(ctxTy);
     for (size_t i = 0; i < fc->args.size(); i++) {
         const auto v = fc->args[i]->IRValue;
-        const auto fieldPtr = cg.builder.CreateStructGEP(dyn_cast<StructType>(ctxTy), ctx, i);
+        const auto fieldPtr = cg.builder.CreateStructGEP(llvm::dyn_cast<StructType>(ctxTy), ctx, i);
         cg.builder.CreateStore(v, fieldPtr);
     }
     return ctx;
@@ -1299,7 +1297,7 @@ void LgsCodeGen::createMapFunc(LgsFunc* func) {
     // Body
     cg.startBlock(bodyBlock);
     const auto element = dArray->getIRElement(cg, originalArr.IRValue, iValue);
-    const auto ft = dyn_cast<FunctionType>(callback.type->getIRType(cg));
+    const auto ft = llvm::dyn_cast<FunctionType>(callback.type->getIRType(cg));
     const auto arg = cg.builder.CreateLoad(dArray->baseType->getIRType(cg), element);
     const auto v = cg.builder.CreateCall(ft, callback.IRValue, {arg});
     dArray->getAddFunc()->callIR(cg, {newArr.IRValue, cg.getPtrTo(v)});
@@ -1357,7 +1355,7 @@ void LgsCodeGen::createFilterFunc(LgsFunc* func) {
     // Body
     cg.startBlock(bodyBlock);
     const auto element = dArray->getIRElement(cg, originalArr.IRValue, iValue);
-    const auto ft = dyn_cast<FunctionType>(callback.type->getIRType(cg));
+    const auto ft = llvm::dyn_cast<FunctionType>(callback.type->getIRType(cg));
     const auto arg = cg.builder.CreateLoad(dArray->baseType->getIRType(cg), element);
     const auto v = cg.builder.CreateCall(ft, callback.IRValue, {arg});
 

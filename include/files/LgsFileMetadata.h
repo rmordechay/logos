@@ -5,6 +5,7 @@ using FileID = size_t;
 
 struct LgsFileMetadata {
     FileID id = 0;
+    size_t hash = 0;
     fs::path filePath = "";
     fs::file_time_type lastWriteTime;
 
