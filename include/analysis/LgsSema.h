@@ -7,6 +7,7 @@ class LgsTernaryExpr;
 class LgsVec;
 class LgsInterfaceFile;
 class LgsObjectFile;
+class LgsTestFile;
 class LgsPostfixExpr;
 class LgsDeferStmt;
 class LgsInfiniteLoop;
@@ -55,7 +56,9 @@ public:
     LgsSymbolTable& globals;
     LgsTypeResolver typeResolver;
 
-    explicit LgsSema(LgsFile* file, LgsSymbolTable& globals) : file(file), globals(globals), typeResolver(errHandler, globals) {}
+    explicit LgsSema(LgsFile* file, LgsSymbolTable& globals) : file(file), globals(globals), typeResolver(errHandler, globals) {
+        errHandler.filePath = file->filePath;
+    }
     void analyse();
     void visitMainFile(LgsMainFile* mainFile);
     void visitObject(LgsObject* obj);
@@ -64,7 +67,7 @@ public:
     void visitGeneric(LgsGeneric* generic);
     void visitField(LgsField* field);
     void visitFunc(LgsFunc* func);
-    void visitMainFunc(LgsMainFunc* mainFunc);
+    void visitMainFunc(const LgsMainFunc* mainFunc);
     void visitLambda(LgsFunc* lambda);
     void visitParam(LgsParam* param);
     void visitIOPair(LgsIOPair* ioPair, LgsObject* obj);

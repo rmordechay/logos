@@ -3,6 +3,7 @@
 #include "data/LgsErrors.h"
 #include "codegen/LgsLLVMGen.h"
 
+namespace fs = std::filesystem;
 class LgsStrConst;
 class LgsApp;
 

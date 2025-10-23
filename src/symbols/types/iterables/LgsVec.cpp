@@ -187,7 +187,7 @@ int8_t LgsVec::getComponentIndex(const char c) {
 std::string LgsVec::strFormatPart() const {
     std::stringstream str;
     str << '<';
-    for (int i = 0; i < vectorDim; i++) {
+    for (int8_t i = 0; i < vectorDim; i++) {
         str << baseType->strFormatPart();
         if (i < vectorDim - 1) str << ", ";
     }

@@ -33,7 +33,7 @@ Type* LgsObject::getIRType(LgsLLVMGen& cg) {
     if (type != cg.typesRegistry.end()) return type->second;
     std::vector<Type*> elementTypes;
     elementTypes.reserve(fields.size());
-    for (int i = 0; i < fields.size(); ++i) {
+    for (size_t i = 0; i < fields.size(); ++i) {
         const auto field = fields[i];
         field->position = i;
         Type* fieldType;

@@ -45,27 +45,23 @@ void LgsIterIndex::setIRElementPtr(LgsLLVMGen& cg, const bool inAssignment) {
     auto fromIR = index.from->IRValue;
     const auto baseExprType = baseExpr->type;
     const auto baseExprIR = baseExpr->IRValue;
+    const auto baseTyIR = baseExprType->getIRType(cg);
+    assert(baseExprIR);
     if (baseExprType->asSArray()) {
-        std::vector<Value*> indices;
-        auto nestedIterIndex = this;
-        while (true) {
-            indices.push_back(nestedIterIndex->index.from->IRValue);
-            if (const auto innerIterIndex = nestedIterIndex->baseExpr->asIterIndex()) {
-                nestedIterIndex = innerIterIndex;
-            } else {
-                indices.push_back(cg.i32Zero());
-                reverse(indices.begin(), indices.end());
-                IRValue = cg.builder.CreateGEP(nestedIterIndex->baseExpr->type->getIRType(cg), nestedIterIndex->baseExpr->IRValue, indices);
-                break;
-            }
+        IRValue = cg.builder.CreateInBoundsGEP(baseTyIR, baseExprIR, fromIR);
+        if (type->getIRType(cg)->isPointerTy()) {
+            IRValue = cg.builder.CreateLoad(cg.ptrTy(), IRValue);
         }
-    } else if (baseExprType->asStr()) {
-        IRValue = cg.builder.CreateGEP(cg.i8Ty(), baseExprIR, {cg.i32Zero(), fromIR});
-    } else if (inAssignment) {
         return;
-    } else if (const auto map = baseExpr->type->asMap()) {
+    }
+    if (baseExprType->asStr()) {
+        IRValue = cg.builder.CreateInBoundsGEP(cg.i8Ty(), baseExprIR, fromIR);
+        return;
+    }
+    if (inAssignment) return;
+    if (const auto map = baseExprType->asMap()) {
         IRValue = map->getIRElement(cg, baseExprIR, fromIR);
-    } else if (const auto iter = baseExpr->type->asIterable()) {
+    } else if (const auto iter = baseExprType->asIterable()) {
         fromIR = cg.builder.CreateZExt(fromIR, cg.i64Ty());
         IRValue = iter->getIRElement(cg, baseExprIR, fromIR);
     }

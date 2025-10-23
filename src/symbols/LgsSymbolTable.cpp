@@ -26,7 +26,7 @@ LgsSymbol* LgsSymbolTable::getSymbol(const std::string& name) {
 }
 
 void LgsSymbolTable::freeSymbols() {
-    for (const auto [_, symbol] : symbols) {
+    for (const auto& [_, symbol] : symbols) {
         switch (symbol.symbolType) {
         case VAR_DEC:
             delete symbol.varDec;

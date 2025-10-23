@@ -8,8 +8,10 @@ void LgsPaths::initPaths() {
     srcDir = rootPath / LGS_SRC_DIR;
     envsDir = rootPath / LGS_ENVS_DIR;
     buildDir = rootPath / LGS_BUILD_DIR;
-    buildIR = buildDir / LGS_BUILD_IR;
-    appFilePath = rootPath / LGS_APP_FILE_NAME;
+    buildDirIR = buildDir / LGS_BUILD_IR_DIR;
+    buildDirObjs = buildDir / LGS_BUILD_OBJECTS_DIR;
+    filesMetadata = buildDir / LGS_FILES_METADATA_FILE;
+    appFilePath = rootPath / LGS_APP_FILE;
     findCLibRoot();
     findCLibHeaders();
 }

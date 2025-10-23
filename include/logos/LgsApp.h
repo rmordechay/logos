@@ -5,16 +5,17 @@
 #include "utils/LgsErrHandler.h"
 #include "LgsPaths.h"
 #include "analysis/LgsLinter.h"
+#include "files/LgsFile.h"
+#include "files/LgsFileMetadata.h"
 #include "parser/LgsJsonParser.h"
 #include "utils/ThreadPool.h"
 #include <mutex>
 
-class LgsConfigFile;
+class LgsAppConfigFile;
 class LgsTestFile;
 class LogosParser;
 class LgsLLVMGen;
 class LgsStrConst;
-class LgsFile;
 class LgsEnvFile;
 class LgsObject;
 class LgsFuncType;
@@ -27,35 +28,32 @@ inline std::mutex mtx;
 
 class LgsApp final {
 public:
-    LgsAppConfigs appConfigs;
+    LgsPaths paths;
     LgsSymbolTable globals;
+    LgsAppConfigs appConfigs;
     LgsErrHandler errHandler;
     std::vector<LgsFile*> srcFiles;
     std::vector<LgsEnvFile*> envFiles;
     std::vector<LgsTestFile*> testsFiles;
-    std::map<size_t, fs::path> filePaths;
-    LgsConfigFile* configFile = nullptr;
-    std::atomic<size_t> nextFileID = 1;
-    std::vector<char*> mainArgs;
+    std::map<FileID, fs::path> filePaths;
+    std::vector<LgsFileMetadata> filesMetadata;
+    std::atomic<FileID> nextFileID = 1;
     ThreadPool threadPool;
-    LgsLinter linter;
-    LgsPaths paths;
 
-    void run();
+    void compile();
     bool setup();
     bool parse();
     bool analyse();
     bool generate();
     bool link();
-    void execute();
     void loadBuiltins();
-    void loadSrcFile(const std::string& code, const fs::path& filePath = "");
-    bool loadConfigFile();
+    void loadSrcFile(const LgsFileMetadata& metadata);
+    void loadSrcFile(const std::string& code, const std::string& filePath);
+    bool loadAppConfigFile();
     void loadEnvFiles();
     void initBuild();
     void writeIRFiles();
-    void loadConfigs();
-    void printConfigs() const;
-    void exitWithErrors() const;
+    void loadAppConfigs(const LgsAppConfigFile* configFile);
+    size_t getNextFileID();
     ~LgsApp();
 };

@@ -13,7 +13,7 @@ void LgsArrayExpr::completeType(LgsType* toType) {
     }
     if (toType->asSArray() || toType->asDArray() || toType->asSet()) {
         const auto otherBaseType = toType->asIterable()->baseType;
-        for (int i = 0; i < elements.size(); ++i) {
+        for (size_t i = 0; i < elements.size(); ++i) {
             const auto element = elements[i];
             if (!element->type) {
                 element->type = otherBaseType;

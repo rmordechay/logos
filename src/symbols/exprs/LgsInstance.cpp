@@ -33,7 +33,7 @@ bool LgsInstance::equals(LgsExpr* other) {
 }
 
 LgsInstance::~LgsInstance() {
-    for (const auto [_, arg] : args) {
+    for (const auto& [_, arg] : args) {
         delete arg;
     }
     args.clear();

@@ -36,7 +36,7 @@ void LgsSelection::assign(LgsLLVMGen& cg, LgsExpr* expr) {
 std::string LgsSelection::asText() {
     std::stringstream str;
     str << exprs[0]->asText();
-    for (int i = 1; i < exprs.size(); ++i) {
+    for (size_t i = 1; i < exprs.size(); ++i) {
         str << '.' << exprs[i]->asText();
     }
     return str.str();
@@ -50,7 +50,7 @@ bool LgsSelection::equals(LgsExpr* other) {
     const auto otherSelection = other->asSelection();
     if (!otherSelection) return false;
     if (exprs.size() != otherSelection->exprs.size()) return false;
-    for (int i = 0; i < exprs.size(); ++i) {
+    for (size_t i = 0; i < exprs.size(); ++i) {
         const auto expr = exprs[i];
         const auto otherExpr = otherSelection->exprs[i];
         if (!expr->equals(otherExpr)) return false;

@@ -17,7 +17,7 @@ void LgsFuncType::setFuncOptions(const uint32_t ops) {
 
 Type* LgsFuncType::getIRType(LgsLLVMGen& cg) {
     std::vector<Type*> IRParamsTypes;
-    for (int i = 0; i < params.size(); ++i) {
+    for (size_t i = 0; i < params.size(); ++i) {
         const auto param = params[i];
         const auto paramType = param.type;
         const auto isSelf = isMethod && i == 0;

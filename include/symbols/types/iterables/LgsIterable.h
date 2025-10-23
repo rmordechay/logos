@@ -31,8 +31,8 @@ public:
         addEmptyMethod(IS_EMPTY_FUNC_NAME);
         addEmptyMethod(IS_NOT_EMPTY_FUNC_NAME);
     }
-    size_t getDimension();
     LgsFunc* getMethod(const std::string& methodName) override;
+    size_t getDimension() const;
     virtual LgsFunc* getLenFunc();
     virtual LgsFunc* getIsEmptyFunc();
     virtual LgsFunc* getIsNotEmptyFunc();

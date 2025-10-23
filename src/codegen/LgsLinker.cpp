@@ -1,6 +1,7 @@
 #include "codegen/LgsLinker.h"
 #include "data/LgsDefinitions.h"
 #include "codegen/LgsLLVMGen.h"
+#include "logos/LgsAppConfigs.h"
 #include "utils/LgsUtils.h"
 #include "llvm/Linker/Linker.h"
 #include <llvm/Passes/PassBuilder.h>
@@ -26,35 +27,33 @@ std::unique_ptr<Module> parseModule(LLVMContext& context, const std::string& pat
     return parsedModule;
 }
 
-bool LgsLinker::link() {
+bool LgsLinker::link() const {
     LLVMContext context;
     std::unique_ptr<Module> mainModule = nullptr;
     std::vector<std::unique_ptr<Module>> modules;
     const auto targetMachine = LgsLLVMGen::getTargetMachine();
-    for (const auto& entry : fs::directory_iterator(paths.buildIR)) {
+    std::vector<std::string> objectFiles;
+    for (const auto& entry : fs::directory_iterator(paths.buildDirIR)) {
         if (!isLLVMFile(entry)) continue;
         auto module = parseModule(context, entry.path());
         if (!module) return false;
-        if (entry.path().filename().stem() == LGS_MAIN_FILE_NAME) {
-            mainModule = std::move(module);
-        } else {
-            modules.push_back(std::move(module));
+        auto objPath = paths.buildDirObjs / (entry.path().stem().string() + ".o");
+        if (!generateObjFile(std::move(module), targetMachine, objPath)) {
+            return false;
         }
-    }
-    Linker llvmLinker(*mainModule);
-    for (auto& module : modules) {
-        llvmLinker.linkInModule(std::move(module));
-    }
-    if (!generateObjFile(std::move(mainModule), targetMachine)) {
-        return false;
+        objectFiles.push_back(objPath.string());
     }
     const auto lgsLibPath = findLgsLib();
-    char linkCmd[1024];
+    std::string objFileList;
+    for (const auto& objFile : objectFiles) {
+        objFileList += objFile + " ";
+    }
+    char linkCmd[2048];
     std::snprintf(
         linkCmd,
         sizeof(linkCmd),
         LINK_STRING,
-        paths.objFilePath.c_str(),
+        objFileList.c_str(),
         lgsLibPath.c_str(),
         lgsLibPath.c_str(),
         paths.execFilePath.c_str()
@@ -62,7 +61,7 @@ bool LgsLinker::link() {
     return std::system(linkCmd) == 0;
 }
 
-bool LgsLinker::generateObjFile(std::unique_ptr<Module> mainModule, TargetMachine* targetMachine) const {
+bool LgsLinker::generateObjFile(std::unique_ptr<Module> module, TargetMachine* targetMachine, const std::string& outputPath) const {
     PassBuilder passBuilder(targetMachine);
     LoopAnalysisManager loopAnalyser;
     FunctionAnalysisManager funcAnalyser;
@@ -73,28 +72,34 @@ bool LgsLinker::generateObjFile(std::unique_ptr<Module> mainModule, TargetMachin
     passBuilder.registerLoopAnalyses(loopAnalyser);
     passBuilder.registerCGSCCAnalyses(CGAnalyser);
     passBuilder.crossRegisterProxies(loopAnalyser, funcAnalyser, CGAnalyser, analysisManager);
-
     PassManager<Module, AnalysisManager<Module>> passManager;
     const auto optLevel = getOptLevel(appConfigs.optLevel);
-    passManager.addPass(std::move(passBuilder.buildPerModuleDefaultPipeline(optLevel)));
-    passManager.run(*mainModule, analysisManager);
+    passManager.addPass(passBuilder.buildPerModuleDefaultPipeline(optLevel));
+    passManager.run(*module, analysisManager);
 
     std::error_code ec;
     legacy::PassManager pass;
-    raw_fd_ostream outputStream(paths.objFilePath.c_str(), ec, sys::fs::OF_None);
-    const auto addedPassFailed = targetMachine->addPassesToEmitFile(pass, outputStream, nullptr, CodeGenFileType::ObjectFile);
-    if (addedPassFailed) {
-        logError(ec.message() + '\n');
+    raw_fd_ostream outputStream(outputPath.c_str(), ec, sys::fs::OF_None);
+    if (ec) {
+        logError("Failed to open output file: " + ec.message() + '\n');
         return false;
     }
 
-    pass.run(*mainModule);
+    const auto addedPassFailed = targetMachine->addPassesToEmitFile(
+        pass, outputStream, nullptr, CodeGenFileType::ObjectFile
+    );
+    if (addedPassFailed) {
+        logError("Failed to add passes to emit file\n");
+        return false;
+    }
+
+    pass.run(*module);
     outputStream.flush();
     outputStream.close();
     return true;
 }
 
-std::string LgsLinker::findLgsLib() {
+std::string LgsLinker::findLgsLib() const {
 #ifdef __APPLE__
         return paths.rootPath.parent_path() / "cmake-build-debug";
 #elif defined(__linux__)

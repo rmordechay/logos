@@ -11,7 +11,7 @@
 Value* LgsFunc::call(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
     if (fn) return fn(cg, args);
     std::vector<Value*> IRArgs;
-    for (int i = 0; i < args.size(); ++i) {
+    for (size_t i = 0; i < args.size(); ++i) {
         const auto arg = args[i];
         const auto& param = funcType->params[i];
         const auto isSelf = funcType->isMethod && i == 0;
@@ -24,7 +24,7 @@ Value* LgsFunc::call(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
 
     if (funcType->hasDefaults()) {
         const auto diff = funcType->params.size() - args.size() - 1;
-        for (int i = diff; i < funcType->params.size(); ++i) {
+        for (size_t i = diff; i < funcType->params.size(); ++i) {
             const auto& param = funcType->params[i];
             IRArgs.emplace_back(param.expr->IRValue);
         }
@@ -60,7 +60,7 @@ Function* LgsFunc::getIRFunc(LgsLLVMGen& cg) {
     IRFunc->addFnAttr(Attribute::NoUnwind);
     if (funcType->params.empty()) return IRFunc;
     auto args = IRFunc->arg_begin();
-    for (int i = 0; i < funcType->params.size(); ++i) {
+    for (size_t i = 0; i < funcType->params.size(); ++i) {
         auto& param = funcType->params[i];
         args->setName(param.name);
         param.IRValue = args;
@@ -86,7 +86,7 @@ void LgsFunc::initFunc(const std::string& name, LgsType* rt, const std::vector<L
 void LgsFunc::completeType(LgsType* toType) {
     const auto otherFuncType = toType->asFuncType();
     if (!otherFuncType) return;
-    for (int i = 0; i < funcType->params.size(); ++i) {
+    for (size_t i = 0; i < funcType->params.size(); ++i) {
         if (funcType->params[i].type) continue;
         funcType->params[i].type = otherFuncType->params[i].type;
     }

@@ -19,47 +19,78 @@
 #include "llvm/IR/Verifier.h"
 #include <llvm/Target/TargetMachine.h>
 
-void LgsApp::run() {
-    if (!setup()) exitWithErrors();
-    if (!parse()) exitWithErrors();
-    if (!analyse()) exitWithErrors();
-    if (!generate()) exitWithErrors();
-    if (!link()) exitWithErrors();
-    execute();
+void LgsApp::compile() {
+    if (!setup()) errHandler.exitWithErrors();
+    if (!parse()) errHandler.exitWithErrors();
+    if (!analyse()) errHandler.exitWithErrors();
+    if (!generate()) errHandler.exitWithErrors();
+    if (!link()) errHandler.exitWithErrors();
 }
 
 bool LgsApp::setup() {
-    if (isLogosFile(paths.rootPath)) {
-        appConfigs.isFileMode = true;
-        return true;
-    }
-    paths.initPaths();
-    if (!is_directory(paths.rootPath) || !is_directory(paths.srcDir)) {
-        errHandler.addError(E10010, nullptr);
-        return false;
-    }
-    if (!appConfigs.isFileMode && !fs::exists(paths.appFilePath)) {
+    if (paths.rootPath == "") {
         errHandler.addError(E10086, nullptr, {paths.rootPath});
         return false;
     }
-    return true;
+    // File mode
+    if (isLogosFile(paths.rootPath)) {
+        appConfigs.isFileMode = true;
+        filesMetadata.emplace_back(LgsFileMetadata(getNextFileID(), fs::canonical(paths.rootPath)));
+        return true;
+    }
+
+    // Project mode
+    paths.initPaths();
+    if (!is_directory(paths.rootPath) || !is_directory(paths.srcDir) || !fs::exists(paths.appFilePath)) {
+        errHandler.addError(E10010, nullptr);
+        return false;
+    }
+
+    // App file
+    const auto appFileID = getNextFileID();
+    filesMetadata.emplace_back(LgsFileMetadata(
+        appFileID,
+        fs::canonical(paths.appFilePath),
+        fs::last_write_time(paths.appFilePath))
+    );
+
+    // Src files
+    auto isValid = true;
+    for (const auto& entry : fs::recursive_directory_iterator(paths.srcDir)) {
+        if (!isLogosFile(entry)) continue;
+        const auto fileName = entry.path().filename();
+        if (fileExists(entry, filesMetadata)) {
+            errHandler.addError(E10007, nullptr, {fileName});
+            isValid = false;
+            continue;
+        }
+        const auto fileID = getNextFileID();
+        filesMetadata.emplace_back(LgsFileMetadata(
+            fileID,
+            fs::canonical(entry.path()),
+            fs::last_write_time(entry)
+        ));
+    }
+
+    return isValid;
 }
 
 bool LgsApp::parse() {
-    loadBuiltins();
-    // if (!loadConfigFile()) return false;
+    assert(!appConfigs.isFileMode);
+    if (!loadAppConfigFile()) return false;
     // loadEnvFiles();
-    for (const auto& entry : fs::recursive_directory_iterator(paths.srcDir)) {
-        if (!isLogosFile(entry)) continue;
-        threadPool.runTask([entry, this] {
-            loadSrcFile(getFileText(entry), entry);
+    for (auto& metadata : filesMetadata) {
+        threadPool.runTask([&metadata, this] {
+            loadSrcFile(metadata);
         });
     }
     threadPool.wait();
+    saveMetadataVector(filesMetadata, paths.filesMetadata);
     return errHandler.successful;
 }
 
 bool LgsApp::analyse() {
+    loadBuiltins();
     LgsTypeResolver typeResolver(errHandler, globals);
     if (!typeResolver.resolveGlobalTypes(srcFiles, threadPool)) {
         return false;
@@ -84,8 +115,8 @@ bool LgsApp::generate() {
     const auto targetMachine = LgsLLVMGen::getTargetMachine();
     for (const auto& file : srcFiles) {
         threadPool.runTask([this, file, targetMachine] {
-            LgsCodeGen code(*file, appConfigs);
-            code.generate(appConfigs, *targetMachine);
+            LgsCodeGen code(*file, appConfigs, *targetMachine, paths);
+            code.generate();
         });
     }
     threadPool.wait();
@@ -98,17 +129,6 @@ bool LgsApp::link() {
     return linker.link();
 }
 
-void LgsApp::execute() {
-    const auto execPath = paths.execFilePath.c_str();
-    mainArgs.insert(mainArgs.begin(), const_cast<char*>(execPath));
-    if (mainArgs.empty() || mainArgs.back() != nullptr) {
-        mainArgs.push_back(nullptr);
-    }
-    execv(execPath, mainArgs.data());
-    perror("Logos execution failed.");
-    exit(EXIT_FAILURE);
-}
-
 void LgsApp::loadBuiltins() {
     globals.addSymbol(LgsSymbol(new LgsPrint(), false, true), &errHandler);
     globals.addSymbol(LgsSymbol(new LgsSystem(), false, true), &errHandler);
@@ -116,30 +136,46 @@ void LgsApp::loadBuiltins() {
     globals.addSymbol(LgsSymbol(new LgsReflect(), false, true), &errHandler);
 }
 
-void LgsApp::loadSrcFile(const std::string& code, const fs::path& filePath) {
-    const auto fileID = nextFileID.fetch_add(1, std::memory_order_relaxed);
-    LgsLexer lexer(fileID, code);
+void LgsApp::loadSrcFile(const LgsFileMetadata& metadata) {
+    const auto code = getFileText(metadata.filePath);
+    LgsLexer lexer(metadata.id, code);
     const auto tokens = lexer.tokenize();
     if (!lexer.errHandler.successful) {
         std::lock_guard lock(mtx);
-        filePaths[fileID] = filePath;
         errHandler.mergeErrors(lexer.errHandler);
         return;
     }
-
-    LgsParser parser(fileID, filePath, paths, globals, tokens);
+    LgsParser parser(metadata.id, metadata.filePath, paths, globals, tokens);
     const auto file = parser.parseSrcFile(appConfigs.isTestRun);
-    std::cout << file->hashFile() << '\n';
     std::lock_guard lock(mtx);
-    filePaths[fileID] = filePath;
     if (file) srcFiles.push_back(file);
     if (!parser.errHandler.successful) {
         errHandler.mergeErrors(parser.errHandler);
     }
 }
 
-bool LgsApp::loadConfigFile() {
-    const auto appFileID = nextFileID.fetch_add(1, std::memory_order_relaxed);
+void LgsApp::loadSrcFile(const std::string& code, const std::string& filePath) {
+    const auto fileID = getNextFileID();
+    LgsLexer lexer(fileID, code);
+    const auto tokens = lexer.tokenize();
+    if (!lexer.errHandler.successful) {
+        std::lock_guard lock(mtx);
+        errHandler.mergeErrors(lexer.errHandler);
+        return;
+    }
+    LgsParser parser(fileID, filePath, paths, globals, tokens);
+    const auto file = parser.parseSrcFile(appConfigs.isTestRun);
+    {
+        std::lock_guard lock(mtx);
+        if (file) srcFiles.push_back(file);
+        if (!parser.errHandler.successful) {
+            errHandler.mergeErrors(parser.errHandler);
+        }
+    }
+}
+
+bool LgsApp::loadAppConfigFile() {
+    constexpr auto appFileID = 1;
     LgsLexer lexer(appFileID, getFileText(paths.appFilePath));
     const auto tokens = lexer.tokenize();
     if (!lexer.errHandler.successful) {
@@ -147,17 +183,18 @@ bool LgsApp::loadConfigFile() {
         return false;
     }
     LgsParser parser(appFileID, paths.appFilePath, paths, globals, tokens);
-    configFile = parser.parseAppConfigFile();
+    const auto configFile = parser.parseAppConfigFile();
     errHandler.mergeErrors(parser.errHandler);
-    if (errHandler.successful) loadConfigs();
+    loadAppConfigs(configFile);
     return errHandler.successful;
 }
 
 void LgsApp::loadEnvFiles() {
+    if (appConfigs.isFileMode) return;
     for (const auto& filePath : fs::directory_iterator(paths.envsDir)) {
         if (!isLogosFile(filePath)) continue;
         threadPool.runTask([filePath, this] {
-            auto code = getFileText(filePath);
+            const auto code = getFileText(filePath);
             const auto fileID = nextFileID.fetch_add(1, std::memory_order_relaxed);
             LgsLexer lexer(fileID, code);
             const auto tokens = lexer.tokenize();
@@ -181,8 +218,11 @@ void LgsApp::initBuild() {
     if (!fs::exists(paths.buildDir)) {
         fs::create_directories(paths.buildDir);
     }
-    if (!fs::exists(paths.buildIR)) {
-        fs::create_directories(paths.buildIR);
+    if (!fs::exists(paths.buildDirIR)) {
+        fs::create_directories(paths.buildDirIR);
+    }
+    if (!fs::exists(paths.buildDirObjs)) {
+        fs::create_directories(paths.buildDirObjs);
     }
     LgsLLVMGen::initLLVM();
     paths.objFilePath = paths.buildDir / (appConfigs.name + ".o");
@@ -201,14 +241,15 @@ void LgsApp::writeIRFiles() {
             errHandler.setUnsuccessful();
             continue;
         }
-        const auto filePath = (paths.buildIR / module->getName().str()).string() + ".ll";
+        const auto filePath = (paths.buildDirIR / module->getName().str()).string() + ".ll";
         std::error_code EC;
         raw_fd_ostream textFile(filePath, EC, sys::fs::OF_None);
         module->print(textFile, nullptr);
     }
 }
 
-void LgsApp::loadConfigs() {
+void LgsApp::loadAppConfigs(const LgsAppConfigFile* configFile) {
+    if (!errHandler.successful) return;
     for (const auto config : configFile->configs) {
         const auto configNama = config->name;
         if (configNama == "name") {
@@ -221,56 +262,20 @@ void LgsApp::loadConfigs() {
             auto value = config->expr->asStrConst()->value;
             int consumed = 0;
             auto [major, minor, micro] = appConfigs.version;
-            const auto s = std::sscanf(value.c_str(), "%hu.%hu.%hu%n", &major, &minor, &micro, &consumed) == 3;
+            const auto s = std::sscanf(value.c_str(), "%lu.%lu.%lu%n", &major, &minor, &micro, &consumed) == 3;
             if (!s || value[consumed] != '\0') {
                 errHandler.addError(E10068, &config->location, {value});
             }
         }
     }
+    delete configFile;
 }
 
-void LgsApp::printConfigs() const {
-    std::cout << "name       = " << appConfigs.name << std::endl;
-    std::cout << "activeEnv  = " << appConfigs.activeEnv << std::endl;
-    std::cout << "logLevel   = " << appConfigs.logLevel << std::endl;
-    std::cout << "version    = " << std::to_string(appConfigs.version.major) << '.' << std::to_string(appConfigs.version.minor) << '.'<< std::to_string(appConfigs.version.micro) << std::endl;
-    std::cout << "debugMode  = " << appConfigs.debugMode << std::endl;
-    std::cout << "isTestRun  = " << appConfigs.isTestRun << std::endl;
-    std::cout << "isFileMode = " << appConfigs.isFileMode << std::endl;
-    std::cout << "optLevel   = " << std::to_string(appConfigs.optLevel) << std::endl;
-}
-
-void LgsApp::exitWithErrors() const {
-    for (int i = 0; i < errHandler.errors.size(); ++i) {
-        const auto err = errHandler.errors[i];
-        const auto filePath = filePaths.find(err.location.fileID);
-        assert(filePath != filePaths.end());
-        const auto column = err.location.columnStart;
-        const auto line = err.location.lineStart;
-        auto lineStr = getLine(filePath->second.string(), line);
-        const auto firstNonSpace = std::find_if(lineStr.begin(), lineStr.end(), [](const unsigned char c) { return !std::isspace(c); });
-        const auto trimmedCount = std::distance(lineStr.begin(), firstNonSpace);
-        auto errMsg = trim(lineStr);
-        errMsg += '\n' + std::string(column - trimmedCount - 2, '~');
-        errMsg += '^';
-        int rest = lineStr.size() - column + 1;
-        if (rest > 0) {
-            errMsg += std::string(rest, '~');
-        }
-        errMsg += '\n' + err.msg;
-        const auto path = "\n   at: " + getFullPath(err.location, filePath->second);
-        logError(errMsg, path);
-        if (i != errHandler.errors.size() - 1) logInfo(LGS_MSG_LINE_SEPERATOR);
-    }
-    if (!errHandler.errors.empty()) logInfo("\n");
-    exit(1);
+size_t LgsApp::getNextFileID() {
+    return nextFileID.fetch_add(1, std::memory_order_relaxed);
 }
 
 LgsApp::~LgsApp() {
-    if (configFile) {
-        delete configFile;
-        configFile = nullptr;
-    }
     for (const auto file : srcFiles) {
         delete file;
     }

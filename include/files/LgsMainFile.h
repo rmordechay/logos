@@ -13,7 +13,6 @@ class LgsEnum;
 
 class LgsMainFile final : public LgsFile {
 public:
-    std::vector<char*> appArgs;
     std::vector<LgsEnum*> enums;
     std::vector<LgsObject*> objects;
     std::map<std::string, LgsFunc*> funcs;
@@ -21,13 +20,14 @@ public:
     std::vector<LgsSubType*> subtypes;
 
     explicit LgsMainFile(const size_t fileID, const fs::path& path) : LgsFile(fileID, path) {}
-    inline size_t hashFile() override;
+    size_t hashFile() override;
+    LgsFunc* getMainFunc();
     ~LgsMainFile() override;
 };
 
 inline size_t LgsMainFile::hashFile() {
     size_t hash = 0;
-    hashString(hash, LGS_MAIN_FILE_NAME);
+    hashString(hash, LGS_MAIN_FILE);
     for (const auto& [funcName, func] : funcs) {
         func->hashValue(hash);
     }
@@ -44,6 +44,13 @@ inline size_t LgsMainFile::hashFile() {
         subtype->hashValue(hash);
     }
     return hash;
+}
+
+inline LgsFunc* LgsMainFile::getMainFunc() {
+    for (auto [name, func] : funcs) {
+        if (name == LGS_MAIN_FUNC) return func;
+    }
+    return nullptr;
 }
 
 inline LgsMainFile::~LgsMainFile() {

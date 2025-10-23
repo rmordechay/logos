@@ -27,7 +27,8 @@
 #include "data/LgsTokens.h"
 #include "exprs/LgsNull.h"
 #include "exprs/LgsTernaryExpr.h"
-#include "files/LgsConfigFile.h"
+#include "files/LgsAppConfigFile.h"
+#include "logos/LgsApp.h"
 #include "stmts/LgsBreak.h"
 #include "stmts/LgsContinue.h"
 #include "stmts/LgsDeferStmt.h"
@@ -70,7 +71,7 @@ LgsFile* LgsParser::parseSrcFile(const bool isTestRun) {
 }
 
 LgsMainFile* LgsParser::parseMainFile() {
-    if (filePath.filename() != LGS_MAIN_FILE_NAME) return nullptr;
+    if (filePath.filename() != LGS_MAIN_FILE) return nullptr;
     auto const file = new LgsMainFile(fileID, filePath);
     setLocation(file->location, &currentToken);
     parseExternalImports(file);
@@ -193,13 +194,13 @@ LgsEnvFile* LgsParser::parseEnvFile() {
     return file;
 }
 
-LgsConfigFile* LgsParser::parseAppConfigFile() {
-    const auto configFile = new LgsConfigFile(0, filePath);
+LgsAppConfigFile* LgsParser::parseAppConfigFile() {
+    const auto configFile = new LgsAppConfigFile(0, filePath);
     while (true) {
         const auto varDec = parseVarDec();
         if (!varDec) break;
         configFile->configs.push_back(varDec);
-        if (currentToken.type != T_EOF) break;
+        if (currentToken.type == T_EOF) break;
         if (currentToken.lexeme == "required") break;
     }
     if (currentToken.lexeme == "required" && peek().lexeme == "envs") {
@@ -207,33 +208,29 @@ LgsConfigFile* LgsParser::parseAppConfigFile() {
         consume();
         mustMatch(T_LBRACE);
         while (true) {
-            const auto strConst = parseStrConst();
-            if (!strConst) break;
-            LgsAppVersion version;
-            if (!parseVersion(version)) break;
+            const auto var = parseVariable();
+            if (!var) break;
+            configFile->requiredEnvs.push_back(var);
+            if (currentToken.type != T_RBRACE) break;
+        }
+        mustMatch(T_RBRACE);
+    }
+
+    if (currentToken.lexeme == "packages") {
+        consume();
+        mustMatch(T_LBRACE);
+        while (true) {
+            const auto name = currentToken.lexeme;
+            if (!matchAndConsume(T_STRING)) break;
+            const auto version = currentToken.lexeme;
+            if (!matchAndConsume(T_STRING)) break;
+            const auto alias = parseVariable();
+            configFile->packages.emplace_back(LgsImportPackage{name, version, alias});
             if (currentToken.type != T_RBRACE) break;
         }
         mustMatch(T_RBRACE);
     }
     return configFile;
-}
-
-bool LgsParser::parseVersion(LgsAppVersion& appVersion) {
-    const auto major = parseConstant();
-    if (mustParse(major)) return false;
-    if (mustParse(major)) return false;
-    const auto minor = parseConstant();
-    if (mustParse(major)) return false;
-    if (mustParse(major)) return false;
-    const auto micro = parseConstant();
-    if (mustParse(major)) return false;
-    appVersion.major = major->asIntConst()->value;
-    appVersion.minor = minor->asIntConst()->value;
-    appVersion.micro = micro->asIntConst()->value;
-    freeExpr(major);
-    freeExpr(minor);
-    freeExpr(micro);
-    return true;
 }
 
 void LgsParser::parseExternalImports(LgsFile* file) {
@@ -556,7 +553,7 @@ LgsFunc* LgsParser::parseFunc() {
 }
 
 LgsMainFunc* LgsParser::parseMainFunc() {
-    if (currentToken.lexeme != LGS_MAIN_FUNC_NAME) return nullptr;
+    if (currentToken.lexeme != LGS_MAIN_FUNC) return nullptr;
     const auto ft = parseFuncHeader();
     if (!ft) return nullptr;
     const auto func = new LgsMainFunc();
@@ -878,7 +875,7 @@ LgsForLoop* LgsParser::parseForLoop() {
         }
     }
 
-    for (const auto loopVar : loopVars) {
+    for (const auto& loopVar : loopVars) {
         forLoop->loopVars.emplace_back(new LgsVarDec(loopVar, nullptr));
     }
 
@@ -1414,6 +1411,7 @@ LgsIterIndex* LgsParser::parseIterIndex(LgsExpr* baseExpr) {
     mustMatch(T_RBRACK);
     const auto iterIndex = new LgsIterIndex(baseExpr, indexExpr, toExpr);
     iterIndex->location = baseExpr->location;
+    if (currentToken.type == T_LBRACK) return parseIterIndex(iterIndex);
     return iterIndex;
 }
 
@@ -1609,7 +1607,7 @@ void LgsParser::addParsingError() {
 void LgsParser::recursionGuard() {
     if (recursionCount++ >= MAX_TOKENS_NUMBER) {
         std::cout << "recursion" << '\n';
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 }
 

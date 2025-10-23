@@ -6,7 +6,7 @@
 class LgsRunCmd final : public LgsCliCmd {
 public:
     LgsRunCmd(const int argc, char** argv) : LgsCliCmd(argc, argv) {}
-    void parseArgs(LgsApp& app) const;
+    void parseArgs(LgsApp& app, std::vector<const char*>& appArgs) const;
     void run() override;
     LgsCliCmdHelp& getHelp() override;
 };

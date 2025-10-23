@@ -5,12 +5,19 @@
 #include "types/iterables/LgsStr.h"
 
 void LgsRunCmd::run() {
-    LgsApp app;
-    parseArgs(app);
-    app.run();
+    fs::path execPath = "";
+    std::vector<const char*> args;
+    {
+        LgsApp app;
+        parseArgs(app, args);
+        app.compile();
+        execPath = app.paths.execFilePath;
+    }
+    assert(execPath != "");
+    execute(args, execPath);
 }
 
-void LgsRunCmd::parseArgs(LgsApp& app) const {
+void LgsRunCmd::parseArgs(LgsApp& app, std::vector<const char*>& appArgs) const {
     if (argc < 3) exitWithError(E40001);
     auto argStart = -1;
     for (int i = 2; i < argc; ++i) {
@@ -27,16 +34,13 @@ void LgsRunCmd::parseArgs(LgsApp& app) const {
             app.appConfigs.optLevel = op;
         }
     }
-
     if (argStart < 0) exitWithError(E40001);
+    if (argStart >= argc) return;
+    app.paths.rootPath = fs::absolute(argv[argStart++]);
     for (int j = argStart; j < argc; ++j) {
         const auto v = argv[j];
-        app.mainArgs.push_back(v);
+        appArgs.push_back(v);
     }
-    if (app.mainArgs.size() == 0) exitWithError(E40001);
-
-    app.paths.rootPath = fs::absolute(app.mainArgs.front());
-    app.mainArgs.erase(app.mainArgs.begin());
 }
 
 LgsCliCmdHelp& LgsRunCmd::getHelp() {

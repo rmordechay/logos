@@ -2,6 +2,7 @@
 #include "LgsType.h"
 #include "data/LgsDefinitions.h"
 #include "data/LgsTokens.h"
+#include "files/LgsFileMetadata.h"
 #include "funcs/LgsParam.h"
 #include "types/iterables/LgsStr.h"
 #include <numeric>
@@ -9,6 +10,24 @@
 #define FNV_PRIME 16777619
 #define MAX_STR_HASH_LEN 1024
 #define MSG_PLACEHOLDER "%s"
+
+struct LgsFileMetadata;
+
+void execute(std::vector<const char*> mainArgs, const fs::path& execPath) {
+    const auto path = const_cast<char*>(execPath.c_str());
+    mainArgs.insert(mainArgs.begin(), path);
+    if (mainArgs.empty() || mainArgs.back() != nullptr) {
+        mainArgs.push_back(nullptr);
+    }
+    std::vector<char*> argv;
+    argv.reserve(mainArgs.size());
+    for (const auto arg : mainArgs) {
+        argv.push_back(const_cast<char*>(arg));
+    }
+    execv(path, argv.data());
+    perror("Logos execution failed.");
+    exit(EXIT_FAILURE);
+}
 
 void logInfo(const std::string& text) {
     std::cout << text;
@@ -27,12 +46,12 @@ void logWarning(const std::string& msg, const std::string& path) {
 void exitWithError(const LgsBaseError& err, const std::vector<std::string>& args) {
     const auto errMsg = formatErrorMsg(err.msg, args) + '\n';
     logError(errMsg);
-    exit(1);
+    exit(EXIT_FAILURE);
 }
 
 std::string formatErrorMsg(const std::string& msg, const std::vector<std::string>& args) {
-    auto pos = 0;
-    auto argIndex = 0;
+    size_t pos = 0;
+    size_t argIndex = 0;
     auto result = std::string(msg);
     while ((pos = result.find(MSG_PLACEHOLDER, pos)) != std::string::npos && argIndex < args.size()) {
         result.replace(pos, std::strlen(MSG_PLACEHOLDER), args[argIndex]);
@@ -84,6 +103,15 @@ std::string getFileText(const fs::path& filePath) {
     return fileContents.str();
 }
 
+bool fileExists(const fs::path& entry, const std::vector<LgsFileMetadata>& filesMetadata) {
+    for (auto metadata : filesMetadata) {
+        if (metadata.filePath == entry) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void freeType(LgsType* type) {
     if (!type) return;
     if (type->isPrimitive) return;
@@ -91,17 +119,17 @@ void freeType(LgsType* type) {
     // delete type;
 }
 
-void freeExpr(LgsExpr* expr) {
-    if (!expr) return;
-    expr->type = nullptr;
-    delete expr;
-}
-
 void freeTypes(std::vector<LgsType*>& types) {
     for (const auto type : types) {
         freeType(type);
     }
     types.clear();
+}
+
+void freeExpr(LgsExpr* expr) {
+    if (!expr) return;
+    expr->type = nullptr;
+    delete expr;
 }
 
 void freeExprs(std::vector<LgsExpr*>& exprs) {
@@ -112,7 +140,7 @@ void freeExprs(std::vector<LgsExpr*>& exprs) {
 }
 
 void freeParams(std::vector<LgsParam>& params) {
-    for (int i = 0; i < params.size(); ++i) {
+    for (size_t i = 0; i < params.size(); ++i) {
         const auto param = params[i];
         if (param.expr) {
             freeExpr(param.expr);
@@ -133,16 +161,18 @@ size_t hashStr(const char* key) {
     return hash;
 }
 
+
 bool startsWith(const std::string& str, const std::string& prefix) {
     return str.size() >= prefix.size() && str.compare(0, prefix.size(), prefix) == 0;
 }
+
 
 std::string getLine(const std::string& filename, const size_t lineNumber) {
     std::ifstream file(filename);
     std::string line;
     int currentLine = 1;
     while (std::getline(file, line)) {
-        if (currentLine == lineNumber) {
+        if (static_cast<size_t>(currentLine) == lineNumber) {
             break;
         }
         currentLine++;

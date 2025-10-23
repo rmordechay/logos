@@ -6,6 +6,7 @@
 #include "files/LgsObjectFile.h"
 #include "funcs/LgsFunc.h"
 #include "funcs/LgsMainFunc.h"
+#include "logos/LgsApp.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsIOPair.h"
 #include "types/LgsEnum.h"
@@ -102,7 +103,7 @@ void LgsTypeResolver::resolveMainFileTypes(LgsMainFile* mf) {
         subtype->subtype = resolveType(subtype->subtype, mf);
         subtype->isPrimitive = subtype->subtype->isPrimitive;
     }
-    for (const auto [_, func] : mf->funcs) {
+    for (const auto& [_, func] : mf->funcs) {
         if (dynamic_cast<LgsMainFunc*>(func)) continue;
         resolveFuncTypes(func->funcType, *mf);
     }

@@ -24,7 +24,7 @@ static void resizeSetIfNeeded(Lgs_set* set) {
     set->data = static_cast<char*>(realloc(set->data, set->capacity));
 }
 
-static bool elementsEqual(const void* elem1, const void* elem2, const size_t elementSize, const Lgs_rttype baseType) {
+static bool elementsEqual(const void* elem1, const void* elem2, const size_t elementSize) {
     return std::memcmp(elem1, elem2, elementSize) == 0;
 }
 
@@ -33,7 +33,7 @@ extern "C" bool Lgs_set_add(Lgs_set* set, const void* value) {
     const char* base = set->data;
     for (size_t i = 0; i < len; ++i) {
         const void* elem = base + i * set->elementSize;
-        if (elementsEqual(elem, value, set->elementSize, set->baseType)) {
+        if (elementsEqual(elem, value, set->elementSize)) {
             return false; // Element already exists
         }
     }
@@ -49,7 +49,7 @@ extern "C" bool Lgs_set_contains(const Lgs_set* set, const void* value) {
     const char* base = set->data;
     for (size_t i = 0; i < len; ++i) {
         const void* elem = base + i * set->elementSize;
-        if (elementsEqual(elem, value, set->elementSize, set->baseType)) {
+        if (elementsEqual(elem, value, set->elementSize)) {
             return true;
         }
     }
@@ -63,7 +63,7 @@ extern "C" bool Lgs_set_remove(Lgs_set* set, const void* value) {
     char* base = set->data;
     for (size_t i = 0; i < len; ++i) {
         char* elem = base + i * set->elementSize;
-        if (elementsEqual(elem, value, set->elementSize, set->baseType)) {
+        if (elementsEqual(elem, value, set->elementSize)) {
             // Shift remaining elements down
             const size_t remaining = set->size - (i + 1) * set->elementSize;
             if (remaining > 0) {

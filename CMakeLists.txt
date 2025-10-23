@@ -157,10 +157,22 @@ set_target_properties(lgs_lib PROPERTIES OUTPUT_NAME "lgs")
 target_link_libraries(lgs_lib PUBLIC LLVM clang-cpp)
 
 target_precompile_headers(lgs_lib PRIVATE include/pch.h)
+target_compile_options(lgs_lib PRIVATE
+    -Wall
+    -Wextra
+    -Wpedantic
+    -Wno-unused-parameter
+    -Wno-unused-variable
+)
+
 target_include_directories(lgs_lib PUBLIC
     ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_SOURCE_DIR}/include/symbols
     ${CMAKE_SOURCE_DIR}/runtime/include
+)
+
+target_include_directories(lgs_lib SYSTEM PUBLIC
+    ${LLVM_INCLUDE_DIRS}
     ${CLANG_INCLUDE_DIRS}
 )
 

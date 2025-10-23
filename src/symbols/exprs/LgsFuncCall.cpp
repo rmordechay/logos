@@ -65,14 +65,7 @@ std::string LgsFuncCall::asText() {
 }
 
 void LgsFuncCall::setDebugValue(LgsLLVMGen& cg) {
-    cg.builder.SetCurrentDebugLocation(
-        DILocation::get(
-            cg.context,
-            location.lineStart,
-            location.columnStart,
-            cg.debugger.diProgram
-        )
-    );
+    cg.builder.SetCurrentDebugLocation(getDebugLoc(cg));
 }
 
 LgsFuncCall::~LgsFuncCall() {

@@ -52,26 +52,22 @@ void LgsLLVMGen::loop(Value* loopLength, const std::function<void(Value*, BasicB
 }
 
 Value* LgsLLVMGen::getIRStr(const std::string& value) {
-    for (auto& globals : IRModule->globals()) {
-        if (!globals.hasInitializer()) continue;
-        const auto dataArray = dyn_cast<ConstantDataArray>(globals.getInitializer());
-        if (!dataArray || !dataArray->isCString() || dataArray->getAsCString() != value) continue;
-        return &globals;
-    }
+    const auto str = stringCache.find(value);
+    if (str != stringCache.end()) return str->second;
     const auto strConstant = ConstantDataArray::getString(context, value, true);
-    const auto globalVar = new GlobalVariable(*IRModule, strConstant->getType(), true, GlobalValue::PrivateLinkage, strConstant);
+    const auto globalVar = new GlobalVariable(
+        *IRModule,
+        strConstant->getType(),
+        true,
+        GlobalValue::PrivateLinkage,
+        strConstant
+    );
     globalVar->setUnnamedAddr(GlobalValue::UnnamedAddr::Global);
+    stringCache[value] = globalVar;
     return globalVar;
 }
 
 Value* LgsLLVMGen::getPtrTo(Value* v) {
-    if (const auto gepInst = dyn_cast<GetElementPtrInst>(v)) {
-        const auto elementType = gepInst->getResultElementType();
-        if (elementType && (elementType->isPointerTy() || elementType->isArrayTy())) {
-            return builder.CreateLoad(ptrTy(), gepInst);
-        }
-        return v;
-    }
     if (v->getType()->isPointerTy()) return v;
     if (v->getType()->isIntegerTy()) {
         const auto a = builder.CreateAlloca(v->getType());
@@ -332,17 +328,14 @@ void LgsLLVMGen::printInt(Value* number, const std::string& text) {
     callPrintf({getIRStr("%d\n"), number});
 }
 
-void LgsLLVMGen::finalizeDebugger() {
+void LgsLLVMGen::finalizeDebugger(const fs::path& buildPath) const {
     if (!debugger.diBuilder) return;
     debugger.diBuilder->finalize();
     std::error_code EC;
-    raw_fd_ostream file("logosdbg.bc", EC, sys::fs::OF_None);
+    raw_fd_ostream file((buildPath / "logosdbg.bc").string(), EC, sys::fs::OF_None);
     WriteBitcodeToFile(*IRModule, file);
     file.flush();
-    delete debugger.diBuilder;
-    debugger.diBuilder = nullptr;
 }
-
 
 void LgsLLVMGen::initLLVM() {
     InitializeNativeTarget();
@@ -356,4 +349,11 @@ TargetMachine* LgsLLVMGen::getTargetMachine() {
     const auto targetTriple = sys::getDefaultTargetTriple();
     const auto target = TargetRegistry::lookupTarget(targetTriple, error);
     return target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), std::nullopt);
+}
+
+LgsLLVMGen::~LgsLLVMGen() {
+    if (debugger.diBuilder) {
+        delete debugger.diBuilder;
+        debugger.diBuilder = nullptr;
+    }
 }

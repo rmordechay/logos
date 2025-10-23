@@ -1,5 +1,4 @@
 #include "funcs/LgsMainFunc.h"
-#include "exprs/LgsArrayExpr.h"
 #include <llvm/IR/Module.h>
 #include "types/iterables/LgsStr.h"
 #include "types/primitives/LgsInt.h"
@@ -12,7 +11,7 @@ Function* LgsMainFunc::getIRFunc(LgsLLVMGen& cg) {
     } else {
         mainFuncType = cg.getFT(cg.i32Ty(), {cg.i32Ty(), cg.builder.getPtrTy()});
     }
-    const auto IRFunc = cg.getFunc(LGS_MAIN_FUNC_NAME, mainFuncType);
+    const auto IRFunc = cg.getFunc(LGS_MAIN_FUNC, mainFuncType);
     if (funcType->params.empty()) return IRFunc;
     auto IRArgs = IRFunc->arg_begin();
     IRArgs->setName("argc");
@@ -39,9 +38,4 @@ void LgsMainFunc::setDebugValue(LgsLLVMGen& cg) {
     );
     getIRFunc(cg)->setSubprogram(cg.debugger.diProgram);
     cg.builder.SetCurrentDebugLocation(getDebugLoc(cg));
-}
-
-LgsMainFunc::~LgsMainFunc() {
-    freeExpr(args);
-    args = nullptr;
 }

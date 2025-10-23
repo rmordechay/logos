@@ -103,10 +103,10 @@ void Lgs_stack::removeOwner(const void* owner) {
         std::cout << "removing owner: " << owner << std::endl;
     }
     auto& stackFrame = frames[stackIndex];
-    for (int i = 0; i < stackFrame.ownersCount; i++) {
+    for (size_t i = 0; i < stackFrame.ownersCount; i++) {
         if (stackFrame.owners[i].ptr == owner) {
             freeType(stackFrame.owners[i].ptr, stackFrame.owners[i].type);
-            for (int j = i; j < stackFrame.ownersCount - 1; j++) {
+            for (size_t j = i; j < stackFrame.ownersCount - 1; j++) {
                 stackFrame.owners[j] = stackFrame.owners[j + 1];
             }
             break;
@@ -120,7 +120,7 @@ void Lgs_stack::funcCleanup() {
         if constexpr (PRINT_MEMORY) {
             std::cout << stackFrame.ownersCount << " owners:" << std::endl;
         }
-        for (int i = 0; i < stackFrame.ownersCount; i++) {
+        for (size_t i = 0; i < stackFrame.ownersCount; i++) {
             freeType(stackFrame.owners[i].ptr, stackFrame.owners[i].type);
         }
         stackFrame.ownersCount = 0;
@@ -129,7 +129,7 @@ void Lgs_stack::funcCleanup() {
         if constexpr (PRINT_MEMORY) {
             std::cout << stackFrame.orphansCount << " orphans:" << std::endl;
         }
-        for (int i = 0; i < stackFrame.orphansCount; i++) {
+        for (size_t i = 0; i < stackFrame.orphansCount; i++) {
             freeType(stackFrame.orphans[i].ptr, stackFrame.orphans[i].type);
         }
         stackFrame.orphansCount = 0;
@@ -138,7 +138,7 @@ void Lgs_stack::funcCleanup() {
 
 void Lgs_stack::callDefers() const {
     const auto& top = frames[stackIndex];
-    for (int i = 0; i < LOCALS_CAPACITY; ++i) {
+    for (size_t i = 0; i < LOCALS_CAPACITY; ++i) {
         const auto [func, ctx] = top.defers[i];
         if (!func) continue;
         func(ctx);

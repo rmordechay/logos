@@ -1,21 +1,25 @@
 #include "types/iterables/LgsSArray.h"
 #include "codegen/LgsLLVMGen.h"
-#include "data/LgsDefinitions.h"
 #include "exprs/LgsArrayExpr.h"
+#include "funcs/LgsFunc.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsBool.h"
-#include "types/primitives/LgsInt.h"
+#include "types/primitives/LgsSize.h"
 
 Type* LgsSArray::getIRType(LgsLLVMGen& cg) {
     if (IRType) return IRType;
-    const auto innerIRType = baseType->getIRType(cg);
-    IRType = ArrayType::get(innerIRType, size->getConstInt());
+    const auto numElements = size->getConstInt();
+    if (numElements <= 0) {
+        IRType = cg.ptrTy();
+    } else {
+        const auto innerIRType = baseType->getIRType(cg);
+        IRType = ArrayType::get(innerIRType, numElements);
+    }
     return IRType;
 }
 
 std::string LgsSArray::getName() {
-    const auto ty = baseType ? baseType->getName() : LGS_UNKNOWN_TYPE;
-    return ty + '[' + size->asText() + "]";
+    return name;
 }
 
 std::string LgsSArray::pname() {
@@ -53,10 +57,6 @@ LgsType* LgsSArray::applyBinOp(const LgsBinOpType op, LgsType* other) {
     return nullptr;
 }
 
-Value* LgsSArray::lengthIR(LgsLLVMGen& cg, Value* iterable) {
-    return size->IRValue;
-}
-
 Value* LgsSArray::inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) {
     const auto resultPtr = cg.builder.CreateAlloca(cg.builder.getInt1Ty());
     cg.builder.CreateStore(cg.false_(), resultPtr);
@@ -77,6 +77,19 @@ Value* LgsSArray::inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) {
 Value* LgsSArray::getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) {
     const auto gep = cg.builder.CreateGEP(getIRType(cg), iterable, {cg.i32Zero(), index});
     return cg.builder.CreateLoad(baseType->getIRType(cg), gep);
+}
+
+Value* LgsSArray::lengthIR(LgsLLVMGen& cg, Value* iterable) {
+    return size->IRValue;
+}
+
+LgsFunc* LgsSArray::getLenFunc() {
+    const auto lenFunc = LgsIterable::getLenFunc();
+    if (lenFunc->fn) return lenFunc;
+    lenFunc->fn = [this](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
+        return cg.extendToSize(size->IRValue);
+    };
+    return lenFunc;
 }
 
 bool LgsSArray::canCastTo(LgsType* other) {

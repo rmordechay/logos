@@ -79,33 +79,30 @@ Value* LgsStr::getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) {
 
 LgsFunc* LgsStr::getLenFunc() {
     const auto lenFunc = LgsIterable::getLenFunc();
-    if (!lenFunc->fn) {
-        lenFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
-            return cg.callStrLen(args[0]->IRValue);
-        };
-    }
+    if (lenFunc->fn) return lenFunc;
+    lenFunc->fn = [this](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
+        return lengthIR(cg, args.front()->IRValue);
+    };
     return lenFunc;
 }
 
 LgsFunc* LgsStr::getIsEmptyFunc() {
     const auto isEmptyFunc = LgsIterable::getIsEmptyFunc();
-    if (!isEmptyFunc->fn) {
-        isEmptyFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
-            const auto strLen = cg.callStrLen(args[0]->IRValue);
-            return cg.builder.CreateICmpEQ(strLen, cg.builder.getInt64(0));
-        };
-    }
+    if (isEmptyFunc->fn) return isEmptyFunc;
+    isEmptyFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
+        const auto strLen = cg.callStrLen(args[0]->IRValue);
+        return cg.builder.CreateICmpEQ(strLen, cg.builder.getInt64(0));
+    };
     return isEmptyFunc;
 }
 
 LgsFunc* LgsStr::getIsNotEmptyFunc() {
     const auto isNotEmptyFunc = LgsIterable::getIsNotEmptyFunc();
-    if (!isNotEmptyFunc->fn) {
-        isNotEmptyFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
-            const auto strLen = cg.callStrLen(args[0]->IRValue);
-            return cg.builder.CreateICmpNE(strLen, cg.builder.getInt64(0));
-        };
-    }
+    if (isNotEmptyFunc->fn) return isNotEmptyFunc;
+    isNotEmptyFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
+        const auto strLen = cg.callStrLen(args[0]->IRValue);
+        return cg.builder.CreateICmpNE(strLen, cg.builder.getInt64(0));
+    };
     return isNotEmptyFunc;
 }
 
@@ -114,7 +111,7 @@ std::string LgsStr::strFormatPart() const {
 }
 
 Value* LgsStr::lengthIR(LgsLLVMGen& cg, Value* iterable) {
-    return getLenFunc()->callIR(cg, {iterable});
+    return cg.callStrLen(iterable);
 }
 
 Value* LgsStr::inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) {

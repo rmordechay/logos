@@ -6,10 +6,10 @@ void createProjectStructure(const std::string& name);
 void LgsGenerateCmd::run() {
     if (argc != 3) exitWithError(E40001);
     const auto name = std::string(argv[2]);
-    if (std::isdigit(name[0])) exitWithError(E40006, {name});
+    if (std::isdigit(name[0])) exitWithError(E40005, {name});
     for (const char c : name) {
-        if (std::isupper(c)) exitWithError(E40006, {name});
-        if (!std::isalpha(c) && c != '-') exitWithError(E40006, {name});
+        if (std::isupper(c)) exitWithError(E40005, {name});
+        if (!std::isalpha(c) && c != '-') exitWithError(E40005, {name});
     }
     createProjectStructure(name);
 }
@@ -20,7 +20,7 @@ LgsCliCmdHelp& LgsGenerateCmd::getHelp() {
 
 void createProjectStructure(const std::string& name) {
     const auto projectDir = fs::current_path() / name;
-    if (fs::exists(projectDir)) exitWithError(E40007, {name});
+    if (fs::exists(projectDir)) exitWithError(E40006, {name});
     fs::create_directories(projectDir);
     const auto srcDir = projectDir / "src";
     fs::create_directories(srcDir);

@@ -84,7 +84,7 @@ void LgsFormatter::formatField(const LgsField* field) {
 
 void LgsFormatter::formatFuncHeader(const LgsFunc* func) {
     insert(func->funcType->name + '(');
-    for (int i = 0; i < func->funcType->params.size(); ++i) {
+    for (size_t i = 0; i < func->funcType->params.size(); ++i) {
         if (i > 0) insert(", ");
         formatParam(func->funcType->params[i]);
     }
@@ -284,7 +284,7 @@ void LgsFormatter::formatSelection(const LgsSelection* selection) {
 void LgsFormatter::formatFuncCall(LgsFuncCall* funcCall) {
     insert(funcCall->name);
     insert("(");
-    for (int i = 0; i < funcCall->args.size(); ++i) {
+    for (size_t i = 0; i < funcCall->args.size(); ++i) {
         if (i > 0) insert(", ");
         formatExpr(funcCall->args[i]);
     }

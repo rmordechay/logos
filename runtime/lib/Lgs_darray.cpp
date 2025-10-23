@@ -48,7 +48,7 @@ extern "C" void Lgs_darray_addLong(Lgs_darray* arr, const int64_t value) {
     arr->size += sizeof(int64_t);
 }
 
-extern "C" void Lgs_darray_put(const Lgs_darray* arr, const int index, const void* value) {
+extern "C" void Lgs_darray_put(const Lgs_darray* arr, const size_t index, const void* value) {
     if (!arr) return;
     const size_t arrLen = arr->size / arr->elementSize;
     if (index >= arrLen) return;
@@ -62,8 +62,10 @@ extern "C" void* Lgs_darray_get(const Lgs_darray* arr, const int64_t index) {
     if (index >= 0) {
         actualIndex = index;
     } else {
-        if (-index > arrLen) return nullptr;
-        actualIndex = arrLen + index;
+        // For negative index, cast to positive for comparison
+        const auto absIndex = static_cast<size_t>(-index);
+        if (absIndex > arrLen) return nullptr;
+        actualIndex = arrLen - absIndex;
     }
     if (actualIndex >= arrLen) return nullptr;
     return arr->data + actualIndex * arr->elementSize;

@@ -1,7 +1,7 @@
 #pragma once
 #include "../data/LgsTokens.h"
 #include "exprs/LgsTernaryExpr.h"
-#include "files/LgsConfigFile.h"
+#include "files/LgsAppConfigFile.h"
 #include "funcs/LgsMainFunc.h"
 #include "loops/LgsForeachLoop.h"
 #include "utils/LgsErrHandler.h"
@@ -56,20 +56,21 @@ class LgsParser {
 public:
     size_t fileID;
     LgsPaths& paths;
+    LgsToken currentToken;
+    size_t currentIndex = 0;
     LgsSymbolTable& globals;
     LgsErrHandler errHandler;
     const fs::path& filePath;
-    LgsToken currentToken;
-    size_t currentIndex = 0;
     size_t recursionCount = 0;
-    LgsFunc* currentFunc = nullptr;
     std::vector<LgsToken> tokens;
+    LgsFunc* currentFunc = nullptr;
 
     LgsParser(const size_t fileId, const fs::path& filePath, LgsPaths& paths, LgsSymbolTable& globals, const std::vector<LgsToken>& tokens) :
         fileID(fileId), paths(paths), globals(globals), filePath(filePath), tokens(tokens) {
         if (!tokens.empty()) {
             currentToken = tokens[0];
         }
+        errHandler.filePath = filePath;
     }
 
     // Files
@@ -79,8 +80,7 @@ public:
     LgsInterfaceFile* parseInterfaceFile();
     LgsTestFile* parseTestFile();
     LgsEnvFile* parseEnvFile();
-    LgsConfigFile* parseAppConfigFile();
-    bool parseVersion(LgsAppVersion& appVersion);
+    LgsAppConfigFile* parseAppConfigFile();
     void parseExternalImports(LgsFile* file);
 
     // Object

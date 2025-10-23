@@ -3,9 +3,11 @@
 #include "files/LgsFile.h"
 #include "logos/LgsStack.h"
 
+struct LgsPaths;
 class LgsTernaryExpr;
 class LgsMainFunc;
 class LgsInterfaceFile;
+class LgsTestFile;
 class LgsObjectFile;
 class LgsVectorExpr;
 class LgsPostfixExpr;
@@ -52,18 +54,24 @@ class LgsTypeExpr;
 class LgsIOStmt;
 struct LgsSymbol;
 struct LgsIndex;
+struct LgsAppConfigs;
 
 class LgsCodeGen {
 public:
     LgsFile& file;
     LgsStack stack;
     LgsLLVMGen& cg;
+    LgsPaths& paths;
     LgsAppConfigs& appConfigs;
+    TargetMachine& targetMachine;
     Function* currentIRFunc = nullptr;
     static std::atomic<size_t> namesCounter;
 
-    explicit LgsCodeGen(LgsFile& file, LgsAppConfigs& appConfigs) : file(file), cg(file.generator), appConfigs(appConfigs) {}
-    void generate(const LgsAppConfigs& appConfigs, TargetMachine& targetMachine);
+    explicit LgsCodeGen(LgsFile& file, LgsAppConfigs& appConfigs, TargetMachine& targetMachine, LgsPaths& paths)
+        : file(file), cg(file.generator), paths(paths), appConfigs(appConfigs), targetMachine(targetMachine) {
+    }
+
+    void generate();
     void visitMainFile(LgsMainFile* mainFile);
     void visitInterface(const LgsInterface* interface);
     void visitTestFile(const LgsTestFile* testFile);
@@ -124,7 +132,7 @@ public:
     // Funcs
     void createPrologue(LgsFunc* func);
     void createEpilogue(LgsFunc* func);
-    void initMainArgs(const LgsMainFunc* mainFunc);
+    void initMainArgs(const LgsMainFunc* mainFunc) const;
     Value* getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) const;
     Type* getThunkCtxType(const LgsFuncCall* fc) const;
     Function* getThunkFunc(const LgsFuncCall* fc, Type* ctxTy) const;

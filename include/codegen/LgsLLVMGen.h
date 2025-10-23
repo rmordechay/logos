@@ -1,11 +1,14 @@
 #pragma once
 #include "Lgs_types.h"
 #include "exprs/LgsExpr.h"
-#include "logos/LgsApp.h"
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/LLVMContext.h>
 #include <cstdint>
 #include <cmath>
+#include <map>
+#include <filesystem>
+
+class LgsFile;
 
 namespace llvm {
     class TargetMachine;
@@ -30,6 +33,8 @@ public:
     IRBuilder<> builder = IRBuilder(context);
     TargetMachine* targetMachine = nullptr;
     std::map<std::string, Type*> typesRegistry;
+    std::unordered_map<std::string, Value*> stringsRegistry;
+    std::unordered_map<std::string, GlobalVariable*> stringCache;
 
     void setupModule(const LgsFile& file, bool debugMode = false);
     void loop(Value* loopLength, const std::function<void(Value*, BasicBlock*)>& body);
@@ -105,7 +110,8 @@ public:
     void printPtr(Value* ptr, const std::string& text = "");
     void printInt(Value* number, const std::string& text = "");
 
-    void finalizeDebugger();
+    void finalizeDebugger(const fs::path& buildPath) const;
     static void initLLVM();
     static TargetMachine* getTargetMachine();
+    ~LgsLLVMGen();
 };

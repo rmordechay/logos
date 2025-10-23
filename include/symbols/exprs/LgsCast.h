@@ -10,7 +10,7 @@ public:
     LgsType* toType = nullptr;
     LgsExpr* value = nullptr;
 
-    LgsCast(LgsType* castToType, LgsExpr* castFromValue) : LgsExpr(castToType), toType(castToType), fromValue(castFromValue) {}
+    LgsCast(LgsType* castToType, LgsExpr* castFromValue) : LgsExpr(castToType), fromValue(castFromValue), toType(castToType) {}
     Value* loadIR(LgsLLVMGen& cg) override;
     std::string asText() override;
     ~LgsCast() override;

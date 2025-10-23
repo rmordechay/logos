@@ -512,7 +512,7 @@ TEST_CASE("SemaError10030A") {
         b = a.x
     }
     )";
-    app.loadSrcFile(code1, "Obj1.lgs");
+    app.loadSrcFile(code1, "Main.lgs");
     assert(app.errHandler.successful);
     app.loadSrcFile(code2, "Main.lgs");
     assert(app.errHandler.successful);
@@ -534,7 +534,7 @@ TEST_CASE("SemaError10030B") {
         a = Obj{x = 2}
     }
     )";
-    app.loadSrcFile(code1, "Obj1.lgs");
+    app.loadSrcFile(code1, "Main.lgs");
     assert(app.errHandler.successful);
     app.loadSrcFile(code2, "Main.lgs");
     assert(app.errHandler.successful);
@@ -557,7 +557,7 @@ TEST_CASE("SemaError10031") {
         a.func()
     }
     )";
-    app.loadSrcFile(code1, "Obj1.lgs");
+    app.loadSrcFile(code1, "Main.lgs");
     assert(app.errHandler.successful);
     app.loadSrcFile(code2, "Main.lgs");
     assert(app.errHandler.successful);
