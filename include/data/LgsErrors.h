@@ -45,7 +45,7 @@ inline LgsBaseError E10014{"Expression of type %s does not match base type %s.",
 inline LgsBaseError E10015{"Function %s was found but it doesnt match the parameters.\nGiven:\t  %s\nExpected:  %s", errCodeStart++};
 inline LgsBaseError E10016{"Object %s does not fully implement %s.\n%s", errCodeStart++};
 inline LgsBaseError E10017{"break must be inside a for loop.", errCodeStart++};
-inline LgsBaseError E10018{"Expression of type %s cannot cast to type %s.", errCodeStart++};
+inline LgsBaseError E10018{"%s cannot cast to type %s.", errCodeStart++};
 inline LgsBaseError E10019{"activeEnv %s could not be found in the envs directory.", errCodeStart++};
 inline LgsBaseError E10020{"Environment %s does not define the required field %s.", errCodeStart++};
 inline LgsBaseError E10021{"%s and %s must be the same type. Given: %s and %s.", errCodeStart++};

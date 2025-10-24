@@ -25,6 +25,7 @@
 #include "loops/LgsRangeLoop.h"
 #include "loops/LgsWhileLoop.h"
 #include "data/LgsTokens.h"
+#include "exprs/LgsCast.h"
 #include "exprs/LgsNull.h"
 #include "exprs/LgsTernaryExpr.h"
 #include "files/LgsAppConfigFile.h"
@@ -463,14 +464,28 @@ LgsEnum* LgsParser::parseEnum() {
 }
 
 LgsSubType* LgsParser::parseSubtype() {
-    const auto lType = currentToken;
-    if (currentToken.type != T_IDENTIFIER) return nullptr;
-    if (peek().type != T_EQUAL) return nullptr;
-    const auto rType = parseType();
-    mustParse(rType);
-    const auto subtype = new LgsSubType(lType.lexeme, rType);
-    setLocation(subtype->location, &lType);
-    return subtype;
+    if (matchAndConsume(T_TYPE)) {
+        const auto lType = currentToken;
+        mustMatch(T_IDENTIFIER);
+        mustMatch(T_EQUAL);
+        const auto rType = parseType();
+        mustParse(rType);
+        const auto subtype = new LgsSubType(lType.lexeme, rType);
+        setLocation(subtype->location, &lType);
+        return subtype;
+    }
+    if (currentToken.type == T_IDENTIFIER && peek().type == T_EQUAL) {
+        const auto lType = currentToken;
+        consume();
+        consume();
+        const auto rType = parseType();
+        mustParse(rType);
+        const auto subtype = new LgsSubType(lType.lexeme, rType);
+        setLocation(subtype->location, &lType);
+        subtype->isWeakType = true;
+        return subtype;
+    }
+    return nullptr;
 }
 
 LgsFuncType* LgsParser::parseFuncType() {
@@ -1018,6 +1033,28 @@ LgsJson* LgsParser::parseJson() {
     return nullptr;
 }
 
+LgsExpr* LgsParser::parseExpr(const bool withLambda) {
+    if (withLambda) {
+        if (const auto lambda = parseLambda()) return lambda;
+    }
+    const auto expr = parseExprWithPrecedence(0);
+    if (matchAndConsume(T_THEN)) {
+        const auto thenExpr = parseExpr();
+        mustMatch(T_ELSE);
+        const auto elseExpr = parseExpr();
+        mustParse(elseExpr);
+        return new LgsTernaryExpr(expr, thenExpr, elseExpr);
+    }
+    if (matchAndConsume(T_ARROW)) {
+        const auto toType = parseType();
+        mustParse(toType);
+        const auto cast = new LgsCast(expr, toType);
+        cast->location = expr->location;
+        return cast;
+    }
+    return expr;
+}
+
 LgsExpr* LgsParser::parseExprWithPrecedence(const int minPrecedence) {
     const auto oldIndex = currentIndex;
     auto left = parseUnary();
@@ -1038,21 +1075,6 @@ LgsExpr* LgsParser::parseExprWithPrecedence(const int minPrecedence) {
         left = new LgsBinaryExpr(left, right, op);
     }
     return left;
-}
-
-LgsExpr* LgsParser::parseExpr(const bool withLambda) {
-    if (withLambda) {
-        if (const auto lambda = parseLambda()) return lambda;
-    }
-    const auto expr = parseExprWithPrecedence(0);
-    if (matchAndConsume(T_THEN)) {
-        const auto thenExpr = parseExpr();
-        mustMatch(T_ELSE);
-        const auto elseExpr = parseExpr();
-        mustParse(elseExpr);
-        return new LgsTernaryExpr(expr, thenExpr, elseExpr);
-    }
-    return expr;
 }
 
 LgsExpr* LgsParser::parseUnary() {
@@ -1380,7 +1402,7 @@ LgsFunc* LgsParser::parseLambda() {
         return nullptr;
     }
 
-    if (!matchOrReset(T_ARROW, oldIndex)) {
+    if (!matchOrReset(T_DARROW, oldIndex)) {
         freeParams(params);
         freeType(rt);
         return nullptr;

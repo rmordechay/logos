@@ -1,9 +1,11 @@
 #include "types/LgsUnknown.h"
 
-#include "utils/LgsUtils.h"
-
 std::string LgsUnknown::getName() {
     return name;
+}
+
+std::string LgsUnknown::pname() {
+    return LGS_UNKNOWN_TYPE;
 }
 
 LgsExpr* LgsUnknown::getZeroValue() {
@@ -26,6 +28,6 @@ std::string LgsUnknown::strFormatPart() const {
     assert(0);
 }
 
-llvm::Type* LgsUnknown::getIRType(LgsLLVMGen& cg) {
+Type* LgsUnknown::getIRType(LgsLLVMGen& cg) {
     assert(0);
 }

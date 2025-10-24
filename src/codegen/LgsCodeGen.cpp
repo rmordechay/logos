@@ -294,17 +294,8 @@ void LgsCodeGen::visitWhileLoop(const LgsWhileLoop* loop) {
 }
 
 void LgsCodeGen::visitVarDec(LgsVarDec* varDec) {
-    if (varDec->shouldAllocate()) {
-        varDec->IRValue = cg.builder.CreateAlloca(varDec->type->getIRType(cg));
-        varDec->expr->destPtrValue = varDec->IRValue;
-        visitExpr(varDec->expr, true);
-        if (varDec->expr->IRValue != varDec->IRValue) {
-            cg.builder.CreateStore(varDec->expr->IRValue, varDec->IRValue);
-        }
-    } else {
-        visitExpr(varDec->expr, true);
-        varDec->IRValue = varDec->expr->IRValue;
-    }
+    visitExpr(varDec->expr, true);
+    varDec->IRValue = varDec->expr->IRValue;
     assert(varDec->IRValue);
     varDec->IRValue->setName(varDec->name);
     if (appConfigs.debugMode) varDec->setDebugValue(cg);

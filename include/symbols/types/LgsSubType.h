@@ -5,6 +5,7 @@ class LgsSubType final : public LgsType {
 public:
     std::string name;
     LgsType* subtype;
+    bool isWeakType = false;
 
     LgsSubType(const std::string& name, LgsType* baseType) : name(name), subtype(baseType) {}
     Type* getIRType(LgsLLVMGen& cg) override;

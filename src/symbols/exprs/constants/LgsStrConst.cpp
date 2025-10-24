@@ -1,7 +1,20 @@
 #include "exprs/constants/LgsStrConst.h"
+#include "types/LgsAny.h"
+#include "types/LgsSubType.h"
 
-LgsExpr* LgsStrConst::castTo(LgsType* toType, bool explicitCast) {
-    return LgsExpr::castTo(toType, explicitCast);
+LgsExpr* LgsStrConst::castTo(LgsType* toType, const bool explicitCast) {
+    const auto thiseName = type->getName();
+    const auto otherName = toType->getName();
+    if (otherName == LgsAny::name) return this;
+    if (const auto subtype = toType->asSubtype()) {
+        if (explicitCast && subtype->subtype->getName() == thiseName) {
+            freeType(type);
+            type = subtype;
+            return this;
+        }
+    }
+    if (thiseName == otherName) return this;
+    return nullptr;
 }
 
 Value* LgsStrConst::castToIR(LgsLLVMGen& cg, LgsType* toType) {

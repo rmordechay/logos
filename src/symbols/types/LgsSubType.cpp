@@ -1,5 +1,4 @@
 #include "types/LgsSubType.h"
-
 #include "types/LgsAny.h"
 
 Type* LgsSubType::getIRType(LgsLLVMGen& cg) {
@@ -15,7 +14,8 @@ LgsExpr* LgsSubType::getZeroValue() {
 }
 
 std::string LgsSubType::getName() {
-    return subtype->getName();
+    if (isWeakType) return subtype->getName();
+    return name;
 }
 
 std::string LgsSubType::pname() {

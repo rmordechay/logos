@@ -13,6 +13,7 @@ public:
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
     Lgs_rttype getRTType() override;
+    bool canCastTo(LgsType* other) override;
     LgsType* applyBinOp(LgsBinOpType op, LgsType* other) override;
     Value* getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) override;
     LgsFunc* getLenFunc() override;
@@ -24,6 +25,5 @@ public:
     Value* neIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
     Value* lengthIR(LgsLLVMGen& cg, Value* iterable) override;
     Value* inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
-    bool canCastTo(LgsType* other) override;
     LgsType* clone() override;
 };

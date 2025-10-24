@@ -86,6 +86,7 @@ LgsToken LgsLexer::nextToken() {
     case '=':
         advance();
         if (match('=')) return {T_DOUBLE_EQUAL, "==", location};
+        if (match('>')) return {T_DARROW, "=>", location};
         return {T_EQUAL, "=", location};
     case '!':
         advance();

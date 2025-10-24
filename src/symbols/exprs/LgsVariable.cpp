@@ -39,6 +39,10 @@ LgsExpr* LgsVariable::castTo(LgsType* toType, const bool explicitCast) {
         return ref.varDec->expr->castTo(toType);
     case FIELD:
         assert(0);
+    case SUBTYPE:
+        assert(0);
+    case UNKNOWN:
+        return nullptr;
     default:
         assert(0);
     }

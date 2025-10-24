@@ -18,6 +18,7 @@ enum LgsTokenType {
     T_DOT,
     T_COMMA,
     T_ARROW,
+    T_DARROW,
     T_COLON,
     T_EQUAL,
     T_QUEST_MARK,

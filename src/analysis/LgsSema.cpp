@@ -557,10 +557,11 @@ void LgsSema::visitTernaryExpr(LgsTernaryExpr* ternary) {
 
 void LgsSema::visitCast(LgsCast* cast) {
     visitExpr(cast->fromValue);
+    if (!cast->fromValue->type) return;
     cast->toType = typeResolver.resolveType(cast->toType, file);
     cast->value = cast->fromValue->castTo(cast->toType, true);
     if (!cast->value) {
-        errHandler.addError(E10018, &cast->location, {cast->fromValue->type->pname(), cast->toType->pname()});
+        errHandler.addError(E10018, &cast->location, {cast->fromValue->asText(), cast->toType->pname()});
         return;
     }
     cast->type = cast->value->type;
