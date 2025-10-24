@@ -1,0 +1,15 @@
+#include "files/LgsEnvFile.h"
+#include "utils/LgsUtils.h"
+
+size_t LgsEnvFile::hashFile() {
+    size_t hash = 0;
+    HASH_VECTOR(varDecs, hash);
+    return hash;
+}
+
+LgsEnvFile::~LgsEnvFile() {
+    for (const auto varDec : varDecs) {
+        delete varDec;
+    }
+    varDecs.clear();
+}

@@ -10,12 +10,7 @@ public:
     std::vector<LgsVarDec*> varDecs;
 
     LgsEnvFile(const size_t fileID, const fs::path& path) : LgsFile(fileID, path) {}
+    size_t hashFile() override;
     ~LgsEnvFile() override;
 };
 
-inline LgsEnvFile::~LgsEnvFile() {
-    for (const auto varDec : varDecs) {
-        delete varDec;
-    }
-    varDecs.clear();
-}

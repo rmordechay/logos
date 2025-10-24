@@ -21,6 +21,7 @@ public:
     Value* loadIR(LgsLLVMGen& cg) override;
     bool shouldAllocate() const;
     void setDebugValue(LgsLLVMGen& cg) override;
+    void hashNode(size_t& oldHash) override;
     ~LgsVarDec() override;
 };
 

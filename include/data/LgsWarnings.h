@@ -4,6 +4,9 @@ struct LgsWarning {
     std::string msg;
     size_t errCode;
     LgsLocation location;
+
+    LgsWarning(const std::string& msg, size_t errCode) : msg(msg), errCode(errCode) {}
+    LgsWarning(const std::string& msg, size_t errCode, const LgsLocation& location) : msg(msg), errCode(errCode), location(location) {}
 };
 
 /** Templates warnings. Should not be returned directly, but formatted and returned as a new LgsWarning */

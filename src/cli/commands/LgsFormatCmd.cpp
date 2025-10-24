@@ -11,9 +11,9 @@ void LgsFormatCmd::run() {
     LgsApp app;
     app.paths.rootPath = path;
     if (!app.setup()) app.errHandler.exitWithErrors();
-    const LgsFileMetadata metadata(1, path);
-    const auto code = getFileText(metadata.filePath);
-    app.loadSrcFile(code, metadata.filePath, metadata.id);
+    const LgsFileMetadata metadata(app.getNextFileID(), path);
+    const auto code = getFileText(metadata.path);
+    app.loadSrcFile(code, metadata.path, metadata.id);
     LgsFormatter formatter;
     formatter.formatFile(app.srcFiles.front());
 }

@@ -20,6 +20,9 @@ struct LgsError {
     size_t errCode;
     LgsLocation location;
     std::string filePath = "";
+
+    LgsError(const std::string& msg, const size_t errCode) : msg(msg), errCode(errCode) {}
+    LgsError(const std::string& msg, const size_t errCode, const LgsLocation& location) : msg(msg), errCode(errCode), location(location) {}
 };
 
 /** Templates errors. Should not be returned directly, but formatted and returned as a new LgsError */

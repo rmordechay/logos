@@ -14,7 +14,7 @@ void LgsValue::setDebugValue(LgsLLVMGen& cg) {
 }
 
 void LgsValue::hashNode(size_t& oldHash) {
-    assert(0);
+    // assert(0);
 }
 
 llvm::DILocation* LgsValue::getDebugLoc(LgsLLVMGen& cg) const {

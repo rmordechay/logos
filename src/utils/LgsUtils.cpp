@@ -2,7 +2,7 @@
 #include "LgsType.h"
 #include "data/LgsDefinitions.h"
 #include "data/LgsTokens.h"
-#include "files/LgsFileMetadata.h"
+#include "files/LgsFile.h"
 #include "funcs/LgsParam.h"
 #include "types/iterables/LgsStr.h"
 #include <numeric>
@@ -105,7 +105,7 @@ std::string getFileText(const fs::path& filePath) {
 
 bool fileExists(const fs::path& entry, const std::vector<LgsFileMetadata>& filesMetadata) {
     for (auto metadata : filesMetadata) {
-        if (metadata.filePath == entry) {
+        if (metadata.path == entry) {
             return true;
         }
     }
@@ -160,11 +160,9 @@ size_t hashStr(const char* key) {
     return hash;
 }
 
-
 bool startsWith(const std::string& str, const std::string& prefix) {
     return str.size() >= prefix.size() && str.compare(0, prefix.size(), prefix) == 0;
 }
-
 
 std::string getLine(const std::string& filename, const size_t lineNumber) {
     std::ifstream file(filename);
@@ -198,14 +196,15 @@ std::string getFullPath(const LgsLocation& location, const std::string& filePath
     return filePath + ":" + std::to_string(location.lineStart) + ":" + std::to_string(location.columnStart);
 }
 
-void combineHash(size_t& oldHash, const size_t newHash) {
+void combineNodeHash(size_t& oldHash, const size_t newHash) {
     oldHash ^= newHash + 0x9e3779b9 + (oldHash << 6) + (oldHash >> 2);
 }
 
-void hashString(size_t& oldHash, const std::string& str) {
-    combineHash(oldHash, std::hash<std::string>{}(str));
+void hashNodeString(size_t& oldHash, const std::string& str) {
+    combineNodeHash(oldHash, std::hash<std::string>{}(str));
 }
 
-void hashInt(size_t& oldHash, const size_t val) {
-    combineHash(oldHash, std::hash<size_t>{}(val));
+void hashNodeInt(size_t& oldHash, const size_t val) {
+    combineNodeHash(oldHash, std::hash<size_t>{}(val));
 }
+

@@ -12,6 +12,8 @@ struct LgsLocation;
 class LgsType;
 
 #define EXPECTED_ERR(E, code) "Expected error: '" << std::string(E.msg) << "'" << std::string(code)
+#define HASH_VECTOR(vec, hash) for (const auto e : vec) e->hashNode(hash)
+#define HASH_MAP(map, hash) for (const auto [_, v] : map) v->hashNode(hash)
 
 void execute(std::vector<const char*> mainArgs, const fs::path& execPath);
 void logInfo(const std::string& text = "");
@@ -35,6 +37,6 @@ bool startsWith(const std::string& str, const std::string& prefix);
 std::string getLine(const std::string& filename, size_t lineNumber);
 std::string trim(const std::string& str);
 std::string getFullPath(const LgsLocation& location, const std::string& filePath);
-void combineHash(size_t& oldHash, size_t newHash);
-void hashString(size_t& oldHash, const std::string& str);
-void hashInt(size_t& oldHash, size_t val);
+void combineNodeHash(size_t& oldHash, size_t newHash);
+void hashNodeString(size_t& oldHash, const std::string& str);
+void hashNodeInt(size_t& oldHash, size_t val);

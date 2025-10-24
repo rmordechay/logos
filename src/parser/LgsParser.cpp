@@ -52,7 +52,21 @@
 
 #define MAX_TOKENS_NUMBER 10000
 
+bool LgsParser::lex() {
+    LgsLexer lexer(fileID, code);
+    tokens = lexer.tokenize();
+    if (!lexer.errHandler.successful) {
+        errHandler.mergeErrors(lexer.errHandler);
+        return false;
+    }
+    if (!tokens.empty()) {
+        currentToken = tokens[0];
+    }
+    return true;
+}
+
 LgsFile* LgsParser::parseSrcFile(const bool isTestRun) {
+    if (!lex()) return nullptr;
     if (const auto mainFile = parseMainFile()) {
         return mainFile;
     }
@@ -68,6 +82,66 @@ LgsFile* LgsParser::parseSrcFile(const bool isTestRun) {
         }
     }
     return nullptr;
+}
+
+LgsAppConfigFile* LgsParser::parseAppConfigFile() {
+    if (!lex()) return nullptr;
+    const auto configFile = new LgsAppConfigFile(fileID, filePath);
+    while (true) {
+        const auto varDec = parseVarDec();
+        if (!varDec) break;
+        configFile->configs.push_back(varDec);
+        if (currentToken.type == T_EOF) break;
+        if (currentToken.lexeme == "required") break;
+    }
+    if (currentToken.lexeme == "required" && peek().lexeme == "envs") {
+        consume();
+        consume();
+        mustMatch(T_LBRACE);
+        while (true) {
+            const auto var = parseVariable();
+            if (!var) break;
+            configFile->requiredEnvs.push_back(var);
+            if (currentToken.type != T_RBRACE) break;
+        }
+        mustMatch(T_RBRACE);
+    }
+
+    if (currentToken.lexeme == "packages") {
+        consume();
+        mustMatch(T_LBRACE);
+        while (true) {
+            const auto name = currentToken.lexeme;
+            if (!matchAndConsume(T_STRING)) break;
+            const auto version = currentToken.lexeme;
+            if (!matchAndConsume(T_STRING)) break;
+            const auto alias = parseVariable();
+            configFile->packages.emplace_back(LgsImportPackage{name, version, alias});
+            if (currentToken.type != T_RBRACE) break;
+        }
+        mustMatch(T_RBRACE);
+    }
+    return configFile;
+}
+
+LgsEnvFile* LgsParser::parseEnvFile() {
+    if (!lex()) return nullptr;
+    if (currentToken.lexeme != "env") {
+        addParsingError();
+        return nullptr;
+    }
+    const auto nameToken = consume();
+    const auto file = new LgsEnvFile(fileID, filePath);
+    setLocation(file->location, &nameToken);
+    file->envName = nameToken.lexeme;
+    mustMatch(T_IDENTIFIER);
+    while (true) {
+        const auto varDec = parseVarDec();
+        if (!varDec) break;
+        file->varDecs.push_back(varDec);
+    }
+    if (currentToken.type != T_EOF) assert(0);
+    return file;
 }
 
 LgsMainFile* LgsParser::parseMainFile() {
@@ -175,64 +249,6 @@ LgsTestFile* LgsParser::parseTestFile() {
     return file;
 }
 
-LgsEnvFile* LgsParser::parseEnvFile() {
-    if (currentToken.lexeme != "env") {
-        addParsingError();
-        return nullptr;
-    }
-    const auto nameToken = consume();
-    const auto file = new LgsEnvFile(fileID, filePath);
-    setLocation(file->location, &nameToken);
-    file->envName = nameToken.lexeme;
-    mustMatch(T_IDENTIFIER);
-    while (true) {
-        const auto varDec = parseVarDec();
-        if (!varDec) break;
-        file->varDecs.push_back(varDec);
-    }
-    if (currentToken.type != T_EOF) assert(0);
-    return file;
-}
-
-LgsAppConfigFile* LgsParser::parseAppConfigFile() {
-    const auto configFile = new LgsAppConfigFile(0, filePath);
-    while (true) {
-        const auto varDec = parseVarDec();
-        if (!varDec) break;
-        configFile->configs.push_back(varDec);
-        if (currentToken.type == T_EOF) break;
-        if (currentToken.lexeme == "required") break;
-    }
-    if (currentToken.lexeme == "required" && peek().lexeme == "envs") {
-        consume();
-        consume();
-        mustMatch(T_LBRACE);
-        while (true) {
-            const auto var = parseVariable();
-            if (!var) break;
-            configFile->requiredEnvs.push_back(var);
-            if (currentToken.type != T_RBRACE) break;
-        }
-        mustMatch(T_RBRACE);
-    }
-
-    if (currentToken.lexeme == "packages") {
-        consume();
-        mustMatch(T_LBRACE);
-        while (true) {
-            const auto name = currentToken.lexeme;
-            if (!matchAndConsume(T_STRING)) break;
-            const auto version = currentToken.lexeme;
-            if (!matchAndConsume(T_STRING)) break;
-            const auto alias = parseVariable();
-            configFile->packages.emplace_back(LgsImportPackage{name, version, alias});
-            if (currentToken.type != T_RBRACE) break;
-        }
-        mustMatch(T_RBRACE);
-    }
-    return configFile;
-}
-
 void LgsParser::parseExternalImports(LgsFile* file) {
     if (!matchAndConsume(T_EXTERN)) return;
     const auto langName = currentToken;
@@ -260,6 +276,17 @@ LgsObject* LgsParser::parseObject() {
     mustMatch(T_RBRACE);
     validateTypeName(obj->name, &obj->location);
     return obj;
+}
+
+LgsInterface* LgsParser::parseInterface() {
+    if (!matchAndConsume(T_INTERFACE)) return nullptr;
+    const auto nameToken = currentToken;
+    mustMatch(T_IDENTIFIER);
+    mustMatch(T_LBRACE);
+    const auto interface = parseInterfaceBody(nameToken);
+    mustMatch(T_RBRACE);
+    validateTypeName(interface->name, &interface->location);
+    return interface;
 }
 
 LgsObject* LgsParser::parseObjectBody(const LgsToken& tokenName, const bool isSingleton) {
@@ -321,17 +348,6 @@ LgsObject* LgsParser::parseObjectBody(const LgsToken& tokenName, const bool isSi
 
     if (currentToken.type != T_EOF && currentToken.type != T_RBRACE) assert(0);
     return obj;
-}
-
-LgsInterface* LgsParser::parseInterface() {
-    if (!matchAndConsume(T_INTERFACE)) return nullptr;
-    const auto nameToken = currentToken;
-    mustMatch(T_IDENTIFIER);
-    mustMatch(T_LBRACE);
-    const auto interface = parseInterfaceBody(nameToken);
-    mustMatch(T_RBRACE);
-    validateTypeName(interface->name, &interface->location);
-    return interface;
 }
 
 LgsInterface* LgsParser::parseInterfaceBody(const LgsToken& tokenName) {
@@ -1496,8 +1512,7 @@ void LgsParser::extractStrParts(LgsStrConst& strConst) {
             return;
         }
         const auto part = replaced.substr(open + 2, close - 2);
-        LgsLexer lexer(fileID, part);
-        LgsParser parser(fileID, filePath, paths, globals, lexer.tokenize());
+        LgsParser parser(fileID, filePath, paths, globals, part);
         const auto expr = parser.parseExpr();
         strConst.parts.push_back(expr);
         replaced.replace(open, close + 1, LGS_STR_FMT_PLACEHOLDER);
@@ -1613,7 +1628,7 @@ void LgsParser::recursionGuard() {
 
 void LgsParser::validateTestFolder(const LgsFile* testFile) {
     bool foundTestsFolder = false;
-    auto currentPath = testFile->filePath.parent_path();
+    auto currentPath = testFile->absPath.parent_path();
     while (currentPath != paths.rootPath && currentPath.has_parent_path()) {
         if (currentPath.filename() == "tests") {
             foundTestsFolder = true;
@@ -1622,6 +1637,6 @@ void LgsParser::validateTestFolder(const LgsFile* testFile) {
         currentPath = currentPath.parent_path();
     }
     if (!foundTestsFolder) {
-        errHandler.addError(E10079, &testFile->location, {testFile->filePath.filename()});
+        errHandler.addError(E10079, &testFile->location, {testFile->absPath.filename()});
     }
 }

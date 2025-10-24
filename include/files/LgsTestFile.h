@@ -11,17 +11,6 @@ public:
     std::vector<LgsVarDec*> varDecs;
 
     LgsTestFile(const size_t fileID, const fs::path& path) : LgsFile(fileID, path) {}
+    size_t hashFile() override;
     ~LgsTestFile() override;
 };
-
-
-inline LgsTestFile::~LgsTestFile() {
-    for (const auto& test : tests) {
-        delete test;
-    }
-    tests.clear();
-    for (const auto& func : funcs) {
-        delete func;
-    }
-    funcs.clear();
-}

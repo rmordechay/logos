@@ -76,7 +76,7 @@ public:
     virtual LgsType* applyBinOp(LgsBinOpType op, LgsType* other);
     virtual std::string strFormatPart() const = 0;
     virtual DIBasicType* getDebugType(LgsLLVMGen& cg);
-    virtual void hashValue(size_t& oldHash);
+    virtual void hashNode(size_t& oldHash);
     virtual LgsType* clone();
 
     LgsAny* asAny();

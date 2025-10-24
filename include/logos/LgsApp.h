@@ -1,13 +1,12 @@
 #pragma once
 #include "LgsAppConfigs.h"
+#include "LgsAppMetadata.h"
 #include "codegen/LgsLinker.h"
 #include "LgsSymbolTable.h"
 #include "utils/LgsErrHandler.h"
 #include "LgsPaths.h"
 #include "analysis/LgsLinter.h"
 #include "files/LgsFile.h"
-#include "files/LgsFileMetadata.h"
-#include "parser/LgsJsonParser.h"
 #include "utils/ThreadPool.h"
 #include <mutex>
 
@@ -30,7 +29,7 @@ class LgsApp final {
 public:
     LgsPaths paths;
     LgsSymbolTable globals;
-    LgsAppMetadata metadata;
+    LgsAppMetadata appMetadata;
     LgsAppConfigs appConfigs;
     LgsErrHandler errHandler;
     std::vector<LgsFile*> srcFiles;
@@ -47,9 +46,9 @@ public:
     bool generate();
     bool link();
     void loadBuiltins();
-    void loadSrcFile(const std::string& code, const fs::path& filePath, size_t fileID = 0);
+    LgsFile* loadSrcFile(const std::string& code, const fs::path& filePath, size_t fileID = 0);
     bool loadAppConfigFile();
-    void loadEnvFiles();
+    bool loadEnvFiles();
     void initBuild();
     void writeIRFiles();
     void loadAppConfigs(const LgsAppConfigFile* configFile);

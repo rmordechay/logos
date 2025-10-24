@@ -10,7 +10,7 @@ struct LgsPaths {
     fs::path buildDir;
     fs::path buildDirIR;
     fs::path buildDirObjs;
-    fs::path filesMetadata;
+    fs::path cacheFile;
     fs::path lgsStdlibDir;
     fs::path appFilePath;
     fs::path execFilePath;

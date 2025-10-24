@@ -41,31 +41,39 @@ LgsExpr* LgsIterIndex::getBaseExpr() const {
     }
 }
 
-void LgsIterIndex::setIRElementPtr(LgsLLVMGen& cg, const bool inAssignment) {
+void LgsIterIndex::setIRElementPtr(LgsLLVMGen& cg, const bool assign) {
     auto fromIR = index.from->IRValue;
-    const auto baseExprType = baseExpr->type;
-    const auto baseExprIR = baseExpr->IRValue;
-    const auto baseTyIR = baseExprType->getIRType(cg);
-    assert(baseExprIR);
-    if (baseExprType->asSArray()) {
-        IRValue = cg.builder.CreateInBoundsGEP(baseTyIR, baseExprIR, fromIR);
+    const auto baseTyIR = baseExpr->type->getIRType(cg);
+    assert(baseExpr->IRValue);
+    if (baseExpr->type->asSArray()) {
+        IRValue = cg.builder.CreateInBoundsGEP(baseTyIR, baseExpr->IRValue, fromIR);
         if (type->getIRType(cg)->isPointerTy()) {
             IRValue = cg.builder.CreateLoad(cg.ptrTy(), IRValue);
         }
         return;
     }
-    if (baseExprType->asStr()) {
-        IRValue = cg.builder.CreateInBoundsGEP(cg.i8Ty(), baseExprIR, fromIR);
+    if (baseExpr->type->asStr()) {
+        IRValue = cg.builder.CreateInBoundsGEP(cg.i8Ty(), baseExpr->IRValue, fromIR);
         return;
     }
-    if (inAssignment) return;
-    if (const auto map = baseExprType->asMap()) {
-        IRValue = map->getIRElement(cg, baseExprIR, fromIR);
-    } else if (const auto iter = baseExprType->asIterable()) {
+    if (assign) return;
+    if (const auto map = baseExpr->type->asMap()) {
+        IRValue = map->getIRElement(cg, baseExpr->IRValue, fromIR);
+    } else if (const auto iter = baseExpr->type->asIterable()) {
         fromIR = cg.builder.CreateZExt(fromIR, cg.i64Ty());
-        IRValue = iter->getIRElement(cg, baseExprIR, fromIR);
+        IRValue = iter->getIRElement(cg, baseExpr->IRValue, fromIR);
     }
-    assert(IRValue);
+}
+
+void LgsIterIndex::setRangeIRElementPtr(LgsLLVMGen& cg, bool assign) {
+    const auto fromIR = index.from->IRValue;
+    const auto toIR = index.to->IRValue;
+    const auto baseTyIR = baseExpr->type->getIRType(cg);
+    assert(baseExpr->IRValue);
+    if (type->asSArray() || type->asStr()) {
+        const auto size = cg.builder.CreateSub(toIR, fromIR);
+        IRValue = cg.builder.CreateAlloca(baseTyIR, size);
+    }
 }
 
 void LgsIterIndex::assign(LgsLLVMGen& cg, LgsExpr* expr) {

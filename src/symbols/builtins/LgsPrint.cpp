@@ -3,6 +3,7 @@
 
 Value* LgsPrint::call(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
     const auto arg = args.front();
+    assert(arg->IRValue);
     const std::vector<Value*> IRArgs = {
         cg.i32(arg->type->getRTType()),
         cg.getPtrTo(arg->IRValue),

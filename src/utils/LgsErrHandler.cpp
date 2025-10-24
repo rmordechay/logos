@@ -9,7 +9,7 @@ void LgsErrHandler::setUnsuccessful() {
 
 void LgsErrHandler::addError(const LgsBaseError& lgsErr, const LgsLocation* location, const std::vector<std::string>& args) {
     setUnsuccessful();
-    LgsError err{.msg = formatErrorMsg(lgsErr.msg, args), .errCode = lgsErr.code};
+    LgsError err(formatErrorMsg(lgsErr.msg, args), lgsErr.code);
     if (location) {
         assert(location->fileID != 0);
         err.location = *location;
@@ -23,9 +23,9 @@ void LgsErrHandler::addError(const LgsBaseError& lgsErr, const LgsLocation* loca
 void LgsErrHandler::addWarning(const LgsBaseError& lgsErr, const LgsLocation* location, const std::vector<std::string>& args) {
     const auto result = formatErrorMsg(lgsErr.msg, args);
     if (location) {
-        warnings.emplace_back(LgsWarning{.msg = result, .errCode = lgsErr.code, .location = *location});
+        warnings.emplace_back(LgsWarning(result, lgsErr.code, *location));
     } else {
-        warnings.emplace_back(LgsWarning{.msg = result, .errCode = lgsErr.code});
+        warnings.emplace_back(LgsWarning(result, lgsErr.code));
     }
 }
 

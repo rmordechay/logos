@@ -37,6 +37,15 @@ void LgsVarDec::setDebugValue(LgsLLVMGen& cg) {
     );
 }
 
+void LgsVarDec::hashNode(size_t& oldHash) {
+    hashNodeInt(oldHash, isNullable);
+    hashNodeInt(oldHash, isConst);
+    hashNodeInt(oldHash, isOwner);
+    hashNodeString(oldHash, name);
+    if (type) type->hashNode(oldHash);
+    expr->hashNode(oldHash);
+}
+
 LgsVarDec::~LgsVarDec() {
     if (expr) {
         if (type == expr->type) {

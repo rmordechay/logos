@@ -137,3 +137,10 @@ bool LgsStr::canCastTo(LgsType* other) {
     }
     return name == other->getName();
 }
+
+LgsType* LgsStr::clone() {
+    const auto newStr = new LgsStr();
+    newStr->size = size->clone();
+    newStr->baseType = baseType->clone();
+    return newStr;
+}

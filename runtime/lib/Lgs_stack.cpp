@@ -5,38 +5,38 @@
 
 #define PRINT_MEMORY false
 
-// std::string getTypeName(const Lgs_rttype type) {
-//     switch (type) {
-//     case RTT_UNKNOWN: return "<Unknown>";
-//     case RTT_VOID: return "Void";
-//     case RTT_BOOL: return "Bool";
-//     case RTT_CHAR: return "Char";
-//     case RTT_STR: return "Str";
-//     case RTT_BYTE: return "Byte";
-//     case RTT_SHORT: return "Short";
-//     case RTT_INT: return "Int";
-//     case RTT_LONG: return "Long";
-//     case RTT_SIZE: return "Size";
-//     case RTT_UBYTE: return "UByte";
-//     case RTT_USHORT: return "UShort";
-//     case RTT_UINT: return "UInt";
-//     case RTT_ULONG: return "ULong";
-//     case RTT_FLOAT: return "Float";
-//     case RTT_DOUBLE: return "Double";
-//     case RTT_VEC2: return "Vec2";
-//     case RTT_VEC3: return "Vec3";
-//     case RTT_VEC4: return "Vec4";
-//     case RTT_SARRAY: return "SArray";
-//     case RTT_DARRAY: return "DArray";
-//     case RTT_SET: return "Set";
-//     case RTT_MAP: return "Map";
-//     case RTT_OBJECT: return "Object";
-//     case RTT_TYPE: return "Type";
-//     case RTT_ANY: return "Any";
-//     case RTT_NULLABLE: return "Any?";
-//     }
-//     assert(0);
-// }
+static std::string getTypeName(const Lgs_rttype type) {
+    switch (type) {
+    case RTT_UNKNOWN: return "<Unknown>";
+    case RTT_VOID: return "Void";
+    case RTT_BOOL: return "Bool";
+    case RTT_CHAR: return "Char";
+    case RTT_STR: return "Str";
+    case RTT_BYTE: return "Byte";
+    case RTT_SHORT: return "Short";
+    case RTT_INT: return "Int";
+    case RTT_LONG: return "Long";
+    case RTT_SIZE: return "Size";
+    case RTT_UBYTE: return "UByte";
+    case RTT_USHORT: return "UShort";
+    case RTT_UINT: return "UInt";
+    case RTT_ULONG: return "ULong";
+    case RTT_FLOAT: return "Float";
+    case RTT_DOUBLE: return "Double";
+    case RTT_VEC2: return "Vec2";
+    case RTT_VEC3: return "Vec3";
+    case RTT_VEC4: return "Vec4";
+    case RTT_SARRAY: return "SArray";
+    case RTT_DARRAY: return "DArray";
+    case RTT_SET: return "Set";
+    case RTT_MAP: return "Map";
+    case RTT_OBJECT: return "Object";
+    case RTT_TYPE: return "Type";
+    case RTT_ANY: return "Any";
+    case RTT_NULLABLE: return "Any?";
+    }
+    assert(0);
+}
 
 static void freeType(void* ptr, const Lgs_rttype type) {
     if constexpr (PRINT_MEMORY) {

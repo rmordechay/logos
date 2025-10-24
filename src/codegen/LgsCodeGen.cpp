@@ -982,10 +982,14 @@ void LgsCodeGen::visitInstance(LgsInstance* instance) {
 }
 
 void LgsCodeGen::visitIterIndex(LgsIterIndex* iterIndex, const bool assign) {
-    assert(!iterIndex->index.to);
     visitExpr(iterIndex->baseExpr);
     visitExpr(iterIndex->index.from);
-    iterIndex->setIRElementPtr(cg, assign);
+    if(iterIndex->index.to) {
+        visitExpr(iterIndex->index.to);
+        iterIndex->setRangeIRElementPtr(cg, assign);
+    } else {
+        iterIndex->setIRElementPtr(cg, assign);
+    }
 }
 
 void LgsCodeGen::visitNull(LgsNull* null) const {

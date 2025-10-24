@@ -17,20 +17,7 @@ public:
     std::vector<LgsVariable*> requiredEnvs;
 
     explicit LgsAppConfigFile(const size_t fileID, const fs::path& path) : LgsFile(fileID, path) {}
+    size_t hashFile() override;
     ~LgsAppConfigFile() override;
 };
 
-inline LgsAppConfigFile::~LgsAppConfigFile() {
-    for (const auto varDec : configs) {
-        delete varDec;
-    }
-    configs.clear();
-    for (const auto& package : packages) {
-        freeExpr(package.alias);
-    }
-    packages.clear();
-    for (const auto requiredEnv : requiredEnvs) {
-        freeExpr(requiredEnv);
-    }
-    requiredEnvs.clear();
-}

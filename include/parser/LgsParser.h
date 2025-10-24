@@ -55,9 +55,10 @@ class LgsExpr;
 class LgsParser {
 public:
     size_t fileID;
-    fs::path filePath;
     LgsPaths& paths;
+    fs::path filePath;
     LgsToken currentToken;
+    std::string code = "";
     size_t currentIndex = 0;
     LgsSymbolTable& globals;
     LgsErrHandler errHandler;
@@ -65,22 +66,19 @@ public:
     std::vector<LgsToken> tokens;
     LgsFunc* currentFunc = nullptr;
 
-    LgsParser(const size_t fileID, const fs::path& filePath, LgsPaths& paths, LgsSymbolTable& globals, const std::vector<LgsToken>& tokens) :
-        fileID(fileID), filePath(filePath), paths(paths), globals(globals), tokens(tokens) {
-        if (!tokens.empty()) {
-            currentToken = tokens[0];
-        }
+    LgsParser(const size_t fileID, const fs::path& filePath, LgsPaths& paths, LgsSymbolTable& globals, const std::string& code) : fileID(fileID), paths(paths), filePath(filePath), code(code), globals(globals) {
         errHandler.filePath = filePath;
     }
 
     // Files
+    bool lex();
     LgsFile* parseSrcFile(bool isTestRun);
+    LgsAppConfigFile* parseAppConfigFile();
+    LgsEnvFile* parseEnvFile();
     LgsMainFile* parseMainFile();
     LgsObjectFile* parseObjectFile();
     LgsInterfaceFile* parseInterfaceFile();
     LgsTestFile* parseTestFile();
-    LgsEnvFile* parseEnvFile();
-    LgsAppConfigFile* parseAppConfigFile();
     void parseExternalImports(LgsFile* file);
 
     // Object

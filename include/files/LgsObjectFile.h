@@ -8,11 +8,7 @@ public:
     LgsObject *obj = nullptr;
 
     explicit LgsObjectFile(const size_t fileID, const fs::path& path) : LgsFile(fileID, path) {}
+    size_t hashFile() override;
     ~LgsObjectFile() override;
 };
-
-inline LgsObjectFile::~LgsObjectFile() {
-    freeType(obj);
-    obj = nullptr;
-}
 

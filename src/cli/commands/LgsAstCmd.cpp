@@ -1,5 +1,6 @@
 #include "cli/commands/LgsAstCmd.h"
 #include "data/LgsCliErrors.h"
+#include "parser/LgsJsonParser.h"
 
 struct LgsCliCmdHelp;
 
@@ -11,9 +12,9 @@ void LgsAstCmd::run() {
     LgsApp app;
     app.paths.rootPath = path;
     if (!app.setup()) app.errHandler.exitWithErrors();
-    const LgsFileMetadata metadata(1, path);
-    const auto code = getFileText(metadata.filePath);
-    app.loadSrcFile(code, metadata.filePath, metadata.id);
+    const LgsFileMetadata metadata(app.getNextFileID(), path);
+    const auto code = getFileText(metadata.path);
+    app.loadSrcFile(code, metadata.path, metadata.id);
     LgsJsonParser parser;
     parser.parseFile(app.srcFiles.front());
     std::cout << parser.json.str();

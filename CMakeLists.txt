@@ -36,6 +36,13 @@ set(CORE_SOURCES
     src/logos/LgsApp.cpp
     src/logos/LgsStack.cpp
     src/logos/LgsPaths.cpp
+    src/logos/LgsAppMetadata.cpp
+    src/files/LgsMainFile.cpp
+    src/files/LgsObjectFile.cpp
+    src/files/LgsInterfaceFile.cpp
+    src/files/LgsTestFile.cpp
+    src/files/LgsEnvFile.cpp
+    src/files/LgsAppConfigFile.cpp
     src/codegen/LgsLinker.cpp
     src/codegen/LgsCodeGen.cpp
     src/codegen/LgsLLVMGen.cpp

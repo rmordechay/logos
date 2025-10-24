@@ -1,4 +1,5 @@
 #pragma once
+#include "codegen/LgsCodeGen.h"
 #include "exprs/LgsExpr.h"
 
 class LgsStr;
@@ -22,7 +23,8 @@ public:
     }
     Value* loadIR(LgsLLVMGen& cg) override;
     LgsExpr* getBaseExpr() const;
-    void setIRElementPtr(LgsLLVMGen& cg, bool inAssignment = false);
+    void setIRElementPtr(LgsLLVMGen& cg, bool assign = false);
+    void setRangeIRElementPtr(LgsLLVMGen& cg, bool assign = false);
     void assign(LgsLLVMGen& cg, LgsExpr* expr) override;
     void assignScalar(LgsLLVMGen& cg, LgsExpr* expr) const;
     std::string asText() override;

@@ -7,7 +7,7 @@
 #define LGS_BUILD_DIR "build"
 #define LGS_BUILD_IR_DIR "IR"
 #define LGS_BUILD_OBJECTS_DIR "objects"
-#define LGS_FILES_METADATA_FILE "metadata"
+#define LGS_FILES_CACHE_FILE "metadata.bin"
 #define LGS_MAIN_FILE "Main.lgs"
 #define LGS_APP_FILE "App.lgs"
 #define LGS_DEBUG_CONFIG_FILE "logosdbg.bc"

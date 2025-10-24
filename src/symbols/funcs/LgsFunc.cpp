@@ -118,7 +118,7 @@ std::string LgsFunc::getIRName() const {
 }
 
 void LgsFunc::hashNode(size_t& oldHash) {
-    hashString(oldHash, funcType->name);
+    hashNodeString(oldHash, funcType->name);
 }
 
 void LgsFunc::setDebugValue(LgsLLVMGen& cg) {

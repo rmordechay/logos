@@ -1012,7 +1012,7 @@ void LgsSema::visitIndex(LgsIterIndex* iterIndex) {
     if (exprTo) {
         visitExpr(exprTo);
         visitSlice(iterIndex);
-        iterIndex->setType(iterable);
+        iterIndex->setType(iterable->clone());
     } else {
         if (!exprFrom->type->canCastTo(iterable->getIndexType())) {
             return errHandler.addError(E10036, &iterIndex->location, {iterIndex->asText(), exprFrom->type->pname()});
@@ -1020,7 +1020,7 @@ void LgsSema::visitIndex(LgsIterIndex* iterIndex) {
         if (iterable->isStatic) {
             const auto index = exprFrom->getConstInt();
             const auto bounds = iterable->size->getConstInt();
-            if (index && bounds && index >= bounds) {
+            if (index && bounds && *index >= *bounds) {
                 errHandler.addError(E10048, &iterIndex->location, {iterIndex->asText(), std::to_string(*bounds)});
             }
         }
@@ -1165,7 +1165,7 @@ void LgsSema::validateIndex(LgsIterIndex* iterIndex) {
         const auto i = exprFrom->getConstInt();
         const auto bounds = sArr->size->getConstInt();
         if (!i || !bounds) return;
-        if (i >= bounds) {
+        if (*i >= *bounds) {
             return errHandler.addError(E10048, &iterIndex->location, {iterIndex->asText(), std::to_string(*bounds)});
         }
     }
