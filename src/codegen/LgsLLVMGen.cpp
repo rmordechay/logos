@@ -168,10 +168,12 @@ Value* LgsLLVMGen::callStrLen(Value* str) {
     return callFunc("strlen", i64Ty(), {ptrTy()}, {str});
 }
 
+void LgsLLVMGen::callMemSet(Value* dest, Value* src, Value* size) {
+    builder.CreateMemSet(dest, src, size, llvm::MaybeAlign());
+}
+
 void LgsLLVMGen::callMemCpy(Value* dest, Value* src, Value* size) {
-    const auto dataLayout = targetMachine->createDataLayout();
-    const auto memCpy =llvm:: Intrinsic::getDeclaration(IRModule, llvm::Intrinsic::memcpy, {ptrTy(), ptrTy(), sizeTy()});
-    builder.CreateCall(memCpy, {dest, src, size, false_()});
+    builder.CreateMemCpy(dest, llvm::MaybeAlign(), src, llvm::MaybeAlign(), size);
 }
 
 Value* LgsLLVMGen::callMalloc(const size_t size, const bool isOwner, const Lgs_rttype type) {
@@ -206,6 +208,10 @@ void LgsLLVMGen::callAddToVTable(Value* instance, Value* key, Value* ptr) {
 
 Value* LgsLLVMGen::callGetFromVTable(Value* instance, Value* key) {
     return callLgsFunc("vtable_get", ptrTy(), {ptrTy(), ptrTy()}, {instance, key});
+}
+
+void LgsLLVMGen::addNullTerminate(Value* strPtr, Value* pos) {
+    builder.CreateStore(i8Zero(), builder.CreateGEP(i8Ty(), strPtr, pos));
 }
 
 void LgsLLVMGen::addHeap(const bool isOwner, const Lgs_rttype type, Value* ptr) {
@@ -291,6 +297,10 @@ ConstantInt* LgsLLVMGen::i64(const int64_t v) {
 
 ConstantInt* LgsLLVMGen::usize(const size_t v) {
     return ConstantInt::get(sizeTy(), v);
+}
+
+ConstantInt* LgsLLVMGen::i8Zero() {
+    return builder.getInt8(0);
 }
 
 ConstantInt* LgsLLVMGen::i32Zero() {

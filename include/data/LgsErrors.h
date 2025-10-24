@@ -64,7 +64,7 @@ inline LgsBaseError E10033{"Type name must be capitalized. Given: %s.", errCodeS
 inline LgsBaseError E10034{"%s has a method with name %s but it doesnt match the parameters.\nGiven:\t  %s\nExpected:  %s", errCodeStart++};
 inline LgsBaseError E10035{"Index of %s has %s level which is too deep. Max level: %s.", errCodeStart++};
 inline LgsBaseError E10036{"%s cannot be indexed with type %s.", errCodeStart++};
-inline LgsBaseError E10037{"Left index of slice must be less or equal than the right index. Given: %s.", errCodeStart++};
+inline LgsBaseError E10037{"Left index of slice must be less or equal than the right index.", errCodeStart++};
 inline LgsBaseError E10038{"continue must be inside a for loop.", errCodeStart++};
 inline LgsBaseError E10039{"main() function accepts only one optional parameter of type Str[].", errCodeStart++};
 inline LgsBaseError E10040{"The number of variables in the for loop (%s) do not match the number of the iterables returned values (%s).", errCodeStart++};
@@ -75,7 +75,7 @@ inline LgsBaseError E10044{"Variadic argument must be the last argument.", errCo
 inline LgsBaseError E10045{"Variadic argument cannot have default arguments.", errCodeStart++};
 inline LgsBaseError E10046{"%s is not callable.", errCodeStart++};
 inline LgsBaseError E10047{"External file %s was not found.", errCodeStart++};
-inline LgsBaseError E10048{"Index %s is out of bounds. Max expected size: %s", errCodeStart++};
+inline LgsBaseError E10048{"Index %s is out of bounds. Max expected index: %s", errCodeStart++};
 inline LgsBaseError E10049{"Not enough information to infer type of %s.", errCodeStart++};
 inline LgsBaseError E10050{"Only integer values can be incremented (++) or decremented (--). Given: %s.", errCodeStart++};
 inline LgsBaseError E10051{"%s is constant and cannot be overwritten.", errCodeStart++};

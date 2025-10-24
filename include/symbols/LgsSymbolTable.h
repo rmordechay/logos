@@ -1,5 +1,6 @@
 #pragma once
 #include "LgsSymbol.h"
+#include <map>
 
 class LgsErrHandler;
 

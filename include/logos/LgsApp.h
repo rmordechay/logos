@@ -1,6 +1,6 @@
 #pragma once
-#include "LgsAppConfigs.h"
 #include "LgsAppMetadata.h"
+#include "LgsAppConfigs.h"
 #include "codegen/LgsLinker.h"
 #include "LgsSymbolTable.h"
 #include "utils/LgsErrHandler.h"

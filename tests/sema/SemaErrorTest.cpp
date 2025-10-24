@@ -2,6 +2,7 @@
 #include "external/doctest.h"
 #include "logos/LgsApp.h"
 #include "utils/LgsUtils.h"
+#include <string>
 
 TEST_CASE("SemaError10000") {
     LgsApp app;
@@ -64,23 +65,6 @@ TEST_CASE("SemaError10002B") {
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10002, code));
     if (app.errHandler.errors.size() > 0) {
         CHECK_EQ(app.errHandler.errors[0].errCode, E10002.code);
-    }
-}
-
-TEST_CASE("SemaError10003") {
-    LgsApp app;
-    const auto code = R"(
-    main() {
-        arr: Int[2]
-        arr[3] := 2
-    }
-    )";
-    app.loadSrcFile(code, "Main.lgs");
-    assert(app.errHandler.successful);
-    app.analyse();
-    CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10048, code));
-    if (app.errHandler.errors.size() > 0) {
-        CHECK_EQ(app.errHandler.errors[0].errCode, E10048.code);
     }
 }
 
@@ -587,6 +571,23 @@ TEST_CASE("SemaError10032") {
     }
 }
 
+TEST_CASE("SemaError10037") {
+    LgsApp app;
+    const auto code = R"(
+    main() {
+        a = "Roi bla"
+        b = a[2:1]
+    }
+    )";
+    app.loadSrcFile(code, "Main.lgs");
+    assert(app.errHandler.successful);
+    app.analyse();
+    CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10037, code));
+    if (app.errHandler.errors.size() > 0) {
+        CHECK_EQ(app.errHandler.errors[0].errCode, E10037.code);
+    }
+}
+
 TEST_CASE("SemaError10038") {
     LgsApp app;
     const auto code = R"(
@@ -636,6 +637,40 @@ TEST_CASE("SemaError10046") {
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10046, code));
     if (app.errHandler.errors.size() > 0) {
         CHECK_EQ(app.errHandler.errors[0].errCode, E10046.code);
+    }
+}
+
+TEST_CASE("SemaError10048A") {
+    LgsApp app;
+    const auto code = R"(
+    main() {
+        arr: Int[2]
+        arr[3] := 2
+    }
+    )";
+    app.loadSrcFile(code, "Main.lgs");
+    assert(app.errHandler.successful);
+    app.analyse();
+    CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10048, code));
+    if (app.errHandler.errors.size() > 0) {
+        CHECK_EQ(app.errHandler.errors[0].errCode, E10048.code);
+    }
+}
+
+TEST_CASE("SemaError10048B") {
+    LgsApp app;
+    const auto code = R"(
+    main() {
+        a = "Roi bla"
+        b = a[1:7]
+    }
+    )";
+    app.loadSrcFile(code, "Main.lgs");
+    assert(app.errHandler.successful);
+    app.analyse();
+    CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10048, code));
+    if (app.errHandler.errors.size() > 0) {
+        CHECK_EQ(app.errHandler.errors[0].errCode, E10048.code);
     }
 }
 

@@ -6,6 +6,8 @@
 #include "types/iterables/LgsMap.h"
 #include "types/iterables/LgsVec.h"
 
+#include <llvm/IR/Module.h>
+
 Value* LgsIterIndex::loadIR(LgsLLVMGen& cg) {
     const auto baseExprType = baseExpr->type;
     if (baseExprType->asMap() || baseExprType->asDArray() || baseExprType->asSet()) {
@@ -66,13 +68,28 @@ void LgsIterIndex::setIRElementPtr(LgsLLVMGen& cg, const bool assign) {
 }
 
 void LgsIterIndex::setRangeIRElementPtr(LgsLLVMGen& cg, bool assign) {
+    assert(!assign);
     const auto fromIR = index.from->IRValue;
     const auto toIR = index.to->IRValue;
-    const auto baseTyIR = baseExpr->type->getIRType(cg);
-    assert(baseExpr->IRValue);
-    if (type->asSArray() || type->asStr()) {
+    assert(baseExpr->IRValue && fromIR && toIR);
+    if (type->asStr()) {
         const auto size = cg.builder.CreateSub(toIR, fromIR);
-        IRValue = cg.builder.CreateAlloca(baseTyIR, size);
+        const auto sizeWithNull = cg.builder.CreateAdd(size, cg.i32(1));
+        IRValue = cg.builder.CreateAlloca(cg.i8Ty(), sizeWithNull);
+        const auto src = cg.builder.CreateInBoundsGEP(cg.i8Ty(), baseExpr->IRValue, fromIR);
+        cg.callMemCpy(IRValue, src, size);
+        cg.addNullTerminate(IRValue, size);
+    } else if (const auto sArray = type->asSArray()) {
+        const auto size = cg.builder.CreateSub(toIR, fromIR);
+        const auto ty = sArray->baseType->getIRType(cg);
+        IRValue = cg.builder.CreateAlloca(ty, size);
+        const auto src = cg.builder.CreateInBoundsGEP(ty, baseExpr->IRValue, fromIR);
+        const auto elementSize = cg.IRModule->getDataLayout().getTypeAllocSize(ty);
+        const auto elementSizeVal = cg.builder.getInt32(elementSize);
+        const auto sizeInBytes = cg.builder.CreateMul(size, elementSizeVal);
+        cg.callMemCpy(IRValue, src, sizeInBytes);
+    } else {
+        assert(0);
     }
 }
 

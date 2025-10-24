@@ -63,6 +63,7 @@ public:
     Value* callPrintf(const std::vector<Value*>& args);
     Value* callSprintf(const std::vector<Value*>& args);
     Value* callStrLen(Value* str);
+    void callMemSet(Value* dest, Value* src, Value* size);
     void callMemCpy(Value* dest, Value* src, Value* size);
     Value* callMalloc(size_t size, bool isOwner, Lgs_rttype type);
     Value* callMalloc(Value* size, bool isOwner, Lgs_rttype type);
@@ -72,6 +73,7 @@ public:
     void callPopStack(bool hasDefers, bool needsCleanup = false);
     void callAddToVTable(Value* instance, Value* key, Value* ptr);
     Value* callGetFromVTable(Value* instance, Value* key);
+    void addNullTerminate(Value* strPtr, Value* pos);
     void addHeap(bool isOwner, Lgs_rttype type, Value* ptr);
 
     // Types
@@ -97,6 +99,7 @@ public:
     ConstantInt* i32(int32_t v);
     ConstantInt* i64(int64_t v);
     ConstantInt* usize(size_t v);
+    ConstantInt* i8Zero();
     ConstantInt* i32Zero();
     ConstantInt* i64Zero();
     ConstantInt* sizeZero();

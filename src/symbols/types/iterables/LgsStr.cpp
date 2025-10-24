@@ -8,6 +8,7 @@
 #include "types/primitives/LgsChar.h"
 
 Type* LgsStr::getIRType(LgsLLVMGen& cg) {
+    if (isStatic) return ArrayType::get(cg.i8Ty(), *size->getConstInt() + 1);
     return cg.ptrTy();
 }
 
@@ -68,19 +69,18 @@ Value* LgsStr::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     cg.callMemCpy(newStrPtr, self->IRValue, selfSize);
     const auto dstPtr = cg.builder.CreateInBoundsGEP(cg.i8Ty(), newStrPtr, selfSize);
     cg.callMemCpy(dstPtr, other->IRValue, otherSize);
-    const auto nullPos = cg.builder.CreateGEP(cg.i8Ty(), newStrPtr, totalSize);
-    cg.builder.CreateStore(cg.i8(0), nullPos);
+    cg.addNullTerminate(newStrPtr, totalSize);
     return newStrPtr;
 }
 
 Value* LgsStr::eqIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     const auto rt = cg.callFunc("strcmp", cg.i32Ty(), {cg.ptrTy(), cg.ptrTy()}, {self->IRValue, other->IRValue});
-    return cg.builder.CreateICmpEQ(rt, cg.i32(0));
+    return cg.builder.CreateICmpEQ(rt, cg.i32Zero());
 }
 
 Value* LgsStr::neIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     const auto rt = cg.callFunc("strcmp", cg.i32Ty(), {cg.ptrTy(), cg.ptrTy()}, {self->IRValue, other->IRValue});
-    return cg.builder.CreateICmpNE(rt, cg.i32(0));
+    return cg.builder.CreateICmpNE(rt, cg.i32Zero());
 }
 
 Value* LgsStr::getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) {
@@ -140,7 +140,9 @@ bool LgsStr::canCastTo(LgsType* other) {
 
 LgsType* LgsStr::clone() {
     const auto newStr = new LgsStr();
-    newStr->size = size->clone();
-    newStr->baseType = baseType->clone();
+    if (size) {
+        newStr->size = size->clone();
+    }
+    newStr->baseType = baseType;
     return newStr;
 }

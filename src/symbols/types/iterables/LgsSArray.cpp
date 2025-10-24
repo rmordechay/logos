@@ -102,3 +102,7 @@ bool LgsSArray::canCastTo(LgsType* other) {
     if (!otherArr) return false;
     return baseType->canCastTo(otherArr->baseType);
 }
+
+LgsType* LgsSArray::clone() {
+    return new LgsSArray(baseType->clone(), size->clone());
+}

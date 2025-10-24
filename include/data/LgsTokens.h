@@ -48,6 +48,7 @@ enum LgsTokenType {
     T_CARET,
     T_DOUBLE_LANGLE,
     T_DOUBLE_RANGLE,
+    T_TYPE,
     T_OBJECT,
     T_SINGLETON,
     T_SELF_INSTANCE,
@@ -100,6 +101,7 @@ enum LgsTokenType {
 };
 
 const std::unordered_map<std::string, LgsTokenType> LGS_KEYWORDS = {
+    {"type", T_TYPE},
     {"object", T_OBJECT},
     {"single", T_SINGLETON},
     {"self", T_SELF_INSTANCE},

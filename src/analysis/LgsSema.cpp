@@ -1042,16 +1042,20 @@ void LgsSema::visitSlice(LgsIterIndex* iterIndex) {
     if (!iterable->getIndexType()->canCastTo(exprTo->type)) {
         return errHandler.addError(E10036, &iterIndex->location, {iterIndex->asText(), exprTo->type->pname()});
     }
-    if (const auto sArr = iterable->asSArray()) {
+    if (iterable->isStatic) {
         const auto sizeFrom = exprFrom->getConstInt();
         const auto sizeTo = exprTo->getConstInt();
         if (!sizeFrom || !sizeTo) return;
-        if (sizeFrom > sizeTo) {
-            return errHandler.addError(E10037, &iterIndex->location, {iterIndex->asText()});
+        if (*sizeFrom > *sizeTo) {
+            return errHandler.addError(E10037, &iterIndex->location);
         }
-        const auto bounds = sArr->size->getConstInt();
-        if (bounds && (sizeFrom >= bounds || sizeTo >= bounds)) {
-            return errHandler.addError(E10003, &iterIndex->location, {iterIndex->asText(), std::to_string(*bounds)});
+        const auto bounds = iterable->size->getConstInt();
+        if (!bounds) return;
+        if (*sizeFrom >= *bounds) {
+            return errHandler.addError(E10048, &exprFrom->location, {std::to_string(*sizeFrom), std::to_string(*bounds - 1)});
+        }
+        if (*sizeTo >= *bounds) {
+            return errHandler.addError(E10048, &exprTo->location, {std::to_string(*sizeTo), std::to_string(*bounds - 1)});
         }
     }
 }

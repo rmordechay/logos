@@ -21,4 +21,5 @@ public:
     Value* lengthIR(LgsLLVMGen& cg, Value* iterable) override;
     LgsFunc* getLenFunc() override;
     bool canCastTo(LgsType* other) override;
+    LgsType* clone() override;
 };
