@@ -110,6 +110,7 @@ LgsType* LgsType::applyIntBinOp(const LgsBinOpType op, LgsType* other) {
     case BIT_XOR:
     case LSHIFT:
     case RSHIFT:
+        if (other->asFloat()) return other;
         if (other->canCastTo(this)) return this;
         break;
     case DIV:

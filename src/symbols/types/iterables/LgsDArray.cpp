@@ -101,7 +101,7 @@ Value* LgsDArray::lengthIR(LgsLLVMGen& cg, Value* iterable) {
 }
 
 Value* LgsDArray::inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) {
-    return cg.callLgsFunc("DArray_contains", cg.i1Ty(), {cg.ptrTy(), cg.ptrTy()}, {iterableExpr->IRValue, cg.getPtrTo(value->IRValue)});
+    return cg.callLgsFunc(std::string(name) + "_contains", cg.i1Ty(), {cg.ptrTy(), cg.ptrTy()}, {iterableExpr->IRValue, cg.getPtrTo(value->IRValue)});
 }
 
 Value* LgsDArray::getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) {

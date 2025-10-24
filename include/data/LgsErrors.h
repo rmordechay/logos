@@ -100,7 +100,7 @@ inline LgsBaseError E10072{"Type %s has multiple methods with the same name %s."
 inline LgsBaseError E10073{"Only numbers or vectors can be elements of a vector. Given: %s.", errCodeStart++};
 inline LgsBaseError E10074{"Vector mismatch. Vector dimension: %s. Given: %s.", errCodeStart++};
 inline LgsBaseError E10075{"Expression %s already has an owner.", errCodeStart++};
-inline LgsBaseError E10076{"%s is not defined between %s and %s.", errCodeStart++}; // operation, left-expr, right-expr
+inline LgsBaseError E10076{"'%s' is not defined between %s and %s.", errCodeStart++}; // operation, left-expr, right-expr
 inline LgsBaseError E10077{"Expression %s has no owner.", errCodeStart++};
 inline LgsBaseError E10078{"Defer functions must return Void. Given: %s.", errCodeStart++};
 inline LgsBaseError E10079{"Test file %s must be inside tests directory.", errCodeStart++};

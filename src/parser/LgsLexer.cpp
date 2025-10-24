@@ -308,7 +308,7 @@ LgsToken LgsLexer::scanNumber(LgsLocation& location) {
         advance();
         location.columnStart++;
     }
-    if (currentChar == '.' && std::isdigit(peek())) {
+    if (currentChar == '.') {
         lexeme += currentChar;
         advance();
         location.columnStart++;
