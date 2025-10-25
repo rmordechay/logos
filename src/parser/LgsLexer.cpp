@@ -158,7 +158,7 @@ LgsToken LgsLexer::nextToken() {
         if (match('=')) return {T_EQUAL_CARET, "^=", location};
         return {T_CARET, "^", location};
     default:
-        errHandler.addError(E10088, &location);
+        errHandler.addError(E10088, &location, filePath, {});
         return {T_EOF, "", location};
     }
 }
@@ -214,7 +214,7 @@ LgsToken LgsLexer::scanVarOrKeyword(LgsLocation& location) {
             if (metaVar == "isFirst") return {T_FOR_IS_FIRST, combined, location};
             if (metaVar == "isLast") return {T_FOR_IS_LAST, combined, location};
             if (metaVar == "ever") return {T_FOR_EVER, combined, location};
-            errHandler.addError(E10088, &location);
+            errHandler.addError(E10088, &location, filePath, {});
             return {T_EOF, "", location};
         }
         return {T_FOR, lexeme, location};

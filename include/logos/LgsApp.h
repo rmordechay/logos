@@ -6,6 +6,7 @@
 #include "utils/LgsErrHandler.h"
 #include "LgsPaths.h"
 #include "analysis/LgsLinter.h"
+#include "analysis/LgsTypeResolver.h"
 #include "files/LgsFile.h"
 #include "utils/ThreadPool.h"
 #include <mutex>
@@ -38,7 +39,7 @@ public:
     std::map<FileID, fs::path> filePaths;
     std::atomic<FileID> nextFileID = 1;
     ThreadPool threadPool;
-
+    
     void compile();
     bool setup();
     bool parse();

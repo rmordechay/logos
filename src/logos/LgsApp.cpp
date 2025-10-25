@@ -244,7 +244,7 @@ void LgsApp::loadAppConfigs(const LgsAppConfigFile* configFile) {
             auto [major, minor, micro] = appConfigs.version;
             const auto s = std::sscanf(value.c_str(), "%lu.%lu.%lu%n", &major, &minor, &micro, &consumed) == 3;
             if (!s || value[consumed] != '\0') {
-                errHandler.addError(E10068, &config->location, {value});
+                errHandler.addError(E10068, &config->location, configFile->absPath, {value});
             }
         }
     }

@@ -56,8 +56,8 @@ LgsType* LgsTypeResolver::resolveType(LgsType* type, LgsFile* file) {
             symbol = file->symbolTable.getSymbol(typeName);
         }
         if (!symbol) {
-            errHandler.addError(E10006, &type->location, {typeName});
-            return nullptr;
+            errHandler.addError(E10006, &type->location, file->absPath, {typeName});
+            return type;
         }
         LgsType* newType = nullptr;
         switch (symbol->symbolType) {

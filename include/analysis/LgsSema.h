@@ -56,9 +56,7 @@ public:
     LgsSymbolTable& globals;
     LgsTypeResolver typeResolver;
 
-    explicit LgsSema(LgsFile* file, LgsSymbolTable& globals) : file(file), globals(globals), typeResolver(errHandler, globals) {
-        errHandler.filePath = file->absPath;
-    }
+    explicit LgsSema(LgsFile* file, LgsSymbolTable& globals) : file(file), globals(globals), typeResolver(errHandler, globals) {}
     void analyse();
     void visitMainFile(LgsMainFile* mainFile);
     void visitObject(LgsObject* obj);

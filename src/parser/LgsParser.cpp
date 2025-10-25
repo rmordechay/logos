@@ -54,7 +54,7 @@
 #define MAX_TOKENS_NUMBER 10000
 
 bool LgsParser::lex() {
-    LgsLexer lexer(fileID, code);
+    LgsLexer lexer(fileID, filePath, code);
     tokens = lexer.tokenize();
     if (!lexer.errHandler.successful) {
         errHandler.mergeErrors(lexer.errHandler);
@@ -295,7 +295,8 @@ LgsObject* LgsParser::parseObjectBody(const LgsToken& tokenName, const bool isSi
     setLocation(obj->location, &tokenName);
 
     // Generic types
-    if (matchAndConsume(T_COLON)) {
+    if (matchAndConsume(T_TYPE)) {
+        mustMatch(T_COLON);
         while (true) {
             const auto type = parseGeneric();
             if (!type) break;
@@ -1168,7 +1169,7 @@ LgsInstance* LgsParser::parseInstance() {
             if (instance->args.find(argNameToken.lexeme) == instance->args.end()) {
                 instance->args[argNameToken.lexeme] = expr;
             } else {
-                errHandler.addError(E10054, &expr->location, {argNameToken.lexeme});
+                errHandler.addError(E10054, &expr->location, filePath, {argNameToken.lexeme});
             }
             if (currentToken.type == T_RBRACE) break;
             mustMatch(T_COMMA);
@@ -1497,7 +1498,7 @@ LgsSelection* LgsParser::parseSelection(LgsExpr* firstExpr) {
 
 bool LgsParser::validateTypeName(const std::string& typeName, const LgsLocation* location) {
     if (islower(typeName[0])) {
-        errHandler.addError(E10033, location, {typeName});
+        errHandler.addError(E10033, location, filePath, {typeName});
         return false;
     }
     return true;
@@ -1508,9 +1509,9 @@ void LgsParser::addFileSymbol(LgsMainFile* file, const LgsSymbol& newSymbol) {
     const auto globalSymbol = globals.getSymbol(symbolName);
     if (globalSymbol) {
         if (globalSymbol->isBuiltin) {
-            return errHandler.addError(E10053, newSymbol.location, {symbolName});
+            return errHandler.addError(E10053, newSymbol.location, filePath, {symbolName});
         }
-        return errHandler.addError(E10011, newSymbol.location, {symbolName});
+        return errHandler.addError(E10011, newSymbol.location, filePath, {symbolName});
     }
     file->symbolTable.addSymbol(newSymbol, &errHandler);
 }
@@ -1638,7 +1639,7 @@ bool LgsParser::parsedOrReset(const void* value, const size_t resetIndex) {
 
 void LgsParser::addParsingError() {
     const auto token = tokens[currentIndex];
-    return errHandler.addError(E10085, &token.location);
+    return errHandler.addError(E10085, &token.location, filePath, {});
 }
 
 void LgsParser::recursionGuard() {
@@ -1659,6 +1660,6 @@ void LgsParser::validateTestFolder(const LgsFile* testFile) {
         currentPath = currentPath.parent_path();
     }
     if (!foundTestsFolder) {
-        errHandler.addError(E10079, &testFile->location, {testFile->absPath.filename()});
+        errHandler.addError(E10079, &testFile->location, filePath, {testFile->absPath.filename()});
     }
 }

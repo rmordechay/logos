@@ -11,7 +11,17 @@ void LgsErrHandler::addError(const LgsBaseError& lgsErr, const LgsLocation* loca
     setUnsuccessful();
     LgsError err(formatErrorMsg(lgsErr.msg, args), lgsErr.code);
     if (location) {
-        assert(location->fileID != 0);
+        err.location = *location;
+        errors.emplace_back(err);
+    } else {
+        errors.emplace_back(err);
+    }
+}
+
+void LgsErrHandler::addError(const LgsBaseError& lgsErr, const LgsLocation* location, const std::string& filePath, const std::vector<std::string>& args) {
+    setUnsuccessful();
+    LgsError err(formatErrorMsg(lgsErr.msg, args), lgsErr.code);
+    if (location) {
         err.location = *location;
         err.filePath = filePath;
         errors.emplace_back(err);

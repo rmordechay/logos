@@ -66,9 +66,7 @@ public:
     std::vector<LgsToken> tokens;
     LgsFunc* currentFunc = nullptr;
 
-    LgsParser(const size_t fileID, const fs::path& filePath, LgsPaths& paths, LgsSymbolTable& globals, const std::string& code) : fileID(fileID), paths(paths), filePath(filePath), code(code), globals(globals) {
-        errHandler.filePath = filePath;
-    }
+    LgsParser(const size_t fileID, const fs::path& filePath, LgsPaths& paths, LgsSymbolTable& globals, const std::string& code) : fileID(fileID), paths(paths), filePath(filePath), code(code), globals(globals) {}
 
     // Files
     bool lex();
