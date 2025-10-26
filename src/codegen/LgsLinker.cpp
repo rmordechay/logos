@@ -9,11 +9,13 @@ bool LgsLinker::link() const {
     LLVMContext context;
     std::unique_ptr<Module> mainModule = nullptr;
     std::vector<std::unique_ptr<Module>> modules;
-    const auto lgsLibPath = findLgsLib();
+    // TODO lgs lib should be global
+    const auto lgsLibPath = fs::current_path();
     std::string objFileList;
     for (const auto& objPath : fs::directory_iterator(paths.buildDirObjs)) {
         objFileList += objPath.path().string() + " ";
     }
+    assert(objFileList != "");
     char cmd[1024*4];
     std::snprintf(
         cmd,
@@ -25,14 +27,6 @@ bool LgsLinker::link() const {
         paths.execFilePath.c_str()
     );
     return std::system(cmd) == 0;
-}
-
-std::string LgsLinker::findLgsLib() const {
-#ifdef __APPLE__
-        return paths.rootPath.parent_path() / "cmake-build-debug";
-#elif defined(__linux__)
-        return paths.rootPath.parent_path() / "build";
-#endif
 }
 
 llvm::OptimizationLevel LgsLinker::getOptLevel(const LgsAppConfigs& appConfigs, const uint8_t level) {

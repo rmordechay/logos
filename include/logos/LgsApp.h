@@ -39,10 +39,14 @@ public:
     std::vector<LgsEnvFile*> envFiles;
     std::vector<LgsTestFile*> testsFiles;
     std::map<FileID, fs::path> filePaths;
-    LgsLLVMPassBuilder passBuilder;
     std::atomic<FileID> nextFileID = 1;
+    LgsLLVMPassBuilder passBuilder;
     ThreadPool threadPool;
-    
+    // Used when passing code directly.
+    std::string code = "";
+
+    LgsApp() = default;
+    explicit LgsApp(const std::string& code) : code(code) {}
     void compile();
     bool setup();
     bool parse();
@@ -50,10 +54,9 @@ public:
     bool generate();
     bool link();
     void loadBuiltins();
-    LgsFile* loadSrcFile(const std::string& code, const fs::path& filePath = LGS_MAIN_FILE, size_t fileID = 0);
+    LgsFile* loadSrcFile(const std::string& fileCode, const fs::path& filePath = LGS_MAIN_FILE, size_t fileID = 0);
     bool loadAppConfigFile();
     bool loadEnvFiles();
-    void initBuild();
     void loadAppConfigs(const LgsAppConfigFile* configFile);
     size_t getNextFileID();
     ~LgsApp();

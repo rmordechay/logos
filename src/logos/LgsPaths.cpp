@@ -12,13 +12,9 @@ void LgsPaths::initPaths() {
     buildDirObjs = buildDir / LGS_BUILD_OBJECTS_DIR;
     cacheFile = buildDir / LGS_FILES_CACHE_FILE;
     appFilePath = rootPath / LGS_APP_FILE;
-    if (fs::exists(srcDir)) srcDir = fs::canonical(srcDir);
-    if (fs::exists(envsDir)) envsDir = fs::canonical(envsDir);
-    if (fs::exists(buildDir)) buildDir = fs::canonical(buildDir);
-    if (fs::exists(buildDirIR)) buildDirIR = fs::canonical(buildDirIR);
-    if (fs::exists(buildDirObjs)) buildDirObjs = fs::canonical(buildDirObjs);
-    if (fs::exists(cacheFile)) cacheFile = fs::canonical(cacheFile);
-    if (fs::exists(appFilePath)) appFilePath = fs::canonical(appFilePath);
+    if (!fs::exists(buildDir)) fs::create_directories(buildDir);
+    if (!fs::exists(buildDirIR)) fs::create_directories(buildDirIR);
+    if (!fs::exists(buildDirObjs)) fs::create_directories(buildDirObjs);
     findCLibRoot();
     findCLibHeaders();
 }

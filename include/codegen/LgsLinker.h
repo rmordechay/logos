@@ -19,7 +19,6 @@ public:
     LgsAppConfigs& appConfigs;
 
     LgsLinker(LgsAppConfigs& appConfigs, LgsPaths& paths, const std::vector<LgsFile*>& modules) : paths(paths), files(modules), appConfigs(appConfigs) {}
-    std::string findLgsLib() const;
     bool link() const;
     static llvm::OptimizationLevel getOptLevel(const LgsAppConfigs& appConfigs, uint8_t level);
 };

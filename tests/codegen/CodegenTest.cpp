@@ -1,16 +1,13 @@
 #include "external/doctest.h"
 #include "logos/LgsApp.h"
-#include "utils/LgsUtils.h"
 
 TEST_CASE("TestCodeGen1") {
-    LgsApp app;
     const auto code = R"(
-    object Obj {
-        a: Int
-        a() {}
-    }
     main() {}
+        print("Hello world")
+    }
     )";
+    LgsApp app;
     app.loadSrcFile(code);
     assert(app.errHandler.successful);
     app.analyse();
