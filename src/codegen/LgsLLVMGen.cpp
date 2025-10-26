@@ -349,7 +349,7 @@ void LgsLLVMGen::finalizeDebugger(const fs::path& buildPath) const {
     if (!debugger.diBuilder) return;
     debugger.diBuilder->finalize();
     std::error_code EC;
-    llvm::raw_fd_ostream file((buildPath / "logosdbg.bc").string(), EC, llvm::sys::fs::OF_None);
+    raw_fd_ostream file((buildPath / "logosdbg.bc").string(), EC, llvm::sys::fs::OF_None);
     WriteBitcodeToFile(*IRModule, file);
     file.flush();
 }
@@ -359,13 +359,19 @@ void LgsLLVMGen::initLLVM() {
     llvm::InitializeNativeTargetAsmPrinter();
     llvm::InitializeNativeTargetAsmParser();
     LLVMInitializeAArch64TargetInfo();
-}
 
-TargetMachine* LgsLLVMGen::getTargetMachine() {
     std::string error;
     const auto targetTriple =llvm:: sys::getDefaultTargetTriple();
     const auto target = llvm::TargetRegistry::lookupTarget(targetTriple, error);
-    return target->createTargetMachine(targetTriple, "generic", "", llvm::TargetOptions(), std::nullopt);
+    targetMachine = target->createTargetMachine(targetTriple, "generic", "", llvm::TargetOptions(), std::nullopt);
+}
+
+llvm::OptimizationLevel LgsLLVMGen::getOptLevel(const uint8_t optLevel) {
+    if (optLevel == 0) return llvm::OptimizationLevel::O0;
+    if (optLevel == 1) return llvm::OptimizationLevel::O1;
+    if (optLevel == 2) return llvm::OptimizationLevel::O2;
+    if (optLevel == 3) return llvm::OptimizationLevel::O3;
+    assert(0);
 }
 
 LgsLLVMGen::~LgsLLVMGen() {

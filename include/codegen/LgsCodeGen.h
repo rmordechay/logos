@@ -3,6 +3,7 @@
 #include "files/LgsFile.h"
 #include "logos/LgsStack.h"
 
+class LgsLLVMPassBuilder;
 struct LgsPaths;
 class LgsTernaryExpr;
 class LgsMainFunc;
@@ -63,12 +64,12 @@ public:
     LgsLLVMGen& cg;
     LgsPaths& paths;
     LgsAppConfigs& appConfigs;
-    TargetMachine& targetMachine;
+    LgsLLVMPassBuilder& passBuilder;
     Function* currentIRFunc = nullptr;
     static std::atomic<size_t> namesCounter;
 
-    explicit LgsCodeGen(LgsFile& file, LgsAppConfigs& appConfigs, TargetMachine& targetMachine, LgsPaths& paths)
-        : file(file), cg(file.generator), paths(paths), appConfigs(appConfigs), targetMachine(targetMachine) {
+    explicit LgsCodeGen(LgsFile& file, LgsAppConfigs& appConfigs, LgsLLVMPassBuilder& passBuilder, LgsPaths& paths)
+        : file(file), cg(file.generator), paths(paths), appConfigs(appConfigs), passBuilder(passBuilder) {
     }
 
     void generate();
@@ -147,4 +148,5 @@ public:
 
     Value* getIRValue(LgsValue* value);
     bool allArgsAreConst(const std::vector<LgsExpr*>& args);
+    void writeIRModule() const;
 };

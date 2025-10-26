@@ -1,5 +1,6 @@
 #include "codegen/LgsCodeGen.h"
 #include "builtins/LgsTest.h"
+#include "data/LgsConfigs.h"
 #include "exprs/LgsArrayExpr.h"
 #include "funcs/LgsCoroutine.h"
 #include "files/LgsInterfaceFile.h"
@@ -26,6 +27,7 @@
 #include "files/LgsMainFile.h"
 #include "files/LgsTestFile.h"
 #include "funcs/LgsMainFunc.h"
+#include "logos/LgsApp.h"
 #include "logos/LgsAppConfigs.h"
 #include "logos/LgsPaths.h"
 #include "stmts/LgsBreak.h"
@@ -45,14 +47,15 @@
 #include "types/iterables/LgsSArray.h"
 #include "types/iterables/LgsVec.h"
 #include "types/primitives/LgsSize.h"
-#include <llvm/IR/InlineAsm.h>
 #include <llvm/IR/Module.h>
-#include <llvm/Target/TargetMachine.h>
+#include "llvm/IR/Verifier.h"
+#include <llvm/Support/FileSystem.h>
+#include <llvm/Passes/PassBuilder.h>
+#include "llvm/Bitcode/BitcodeWriter.h"
 
 std::atomic<size_t> LgsCodeGen::namesCounter{0};
 
 void LgsCodeGen::generate() {
-    cg.targetMachine = &targetMachine;
     cg.setupModule(file, appConfigs.debugMode);
     if (const auto mainFile = dynamic_cast<LgsMainFile*>(&file)) {
         visitMainFile(mainFile);
@@ -63,7 +66,8 @@ void LgsCodeGen::generate() {
     } else if (const auto testFile = dynamic_cast<LgsTestFile*>(&file)) {
         visitTestFile(testFile);
     }
-    if (appConfigs.debugMode) cg.finalizeDebugger(paths.buildDir);
+    if (appConfigs.debugMode) cg.finalizeDebugger(paths.buildDir);;
+    writeIRModule();
 }
 
 void LgsCodeGen::visitMainFile(LgsMainFile* mainFile) {
@@ -1409,4 +1413,42 @@ bool LgsCodeGen::allArgsAreConst(const std::vector<LgsExpr*>& args) {
         }
     }
     return allElementsConst;
+}
+
+void LgsCodeGen::writeIRModule() const {
+    // Print IR to stdout even with failure.
+    if constexpr (DEBUG) {
+        std::lock_guard lock(mtx);
+        cg.IRModule->print(llvm::outs(), nullptr);
+        logInfo(LGS_MSG_LINE_SEPERATOR);
+    }
+
+    // Verify
+    if (verifyModule(*cg.IRModule, &llvm::errs())) return;
+
+    // Print IR to file
+    if constexpr (WRITE_IR_FILES) {
+        const auto filePath = (paths.buildDirIR / cg.IRModule->getName().str()).string() + ".ll";
+        std::error_code EC;
+        raw_fd_ostream textFile(filePath, EC, llvm::sys::fs::OF_None);
+        cg.IRModule->print(textFile, nullptr);
+    }
+
+    // Run pass
+    llvm::ModulePassManager passManager = passBuilder.builder.buildPerModuleDefaultPipeline(cg.getOptLevel(appConfigs.optLevel));
+    passManager.run(*cg.IRModule, passBuilder.analysisManager);
+
+    // Create bc file
+    std::error_code ec;
+    std::string outputPath = paths.buildDirObjs / (file.absPath.stem().string() + ".o");
+    raw_fd_ostream bitcodeStream(outputPath + ".bc", ec, llvm::sys::fs::OF_None);
+    assert(!ec);
+    llvm::WriteBitcodeToFile(*cg.IRModule, bitcodeStream);
+    bitcodeStream.flush();
+    bitcodeStream.close();
+
+    // Create object
+    auto llcCmd = "llc -filetype=obj -o " + outputPath + " " + outputPath + ".bc";
+    if (std::system(llcCmd.c_str()) != 0) assert(0);
+    fs::remove(outputPath + ".bc");
 }

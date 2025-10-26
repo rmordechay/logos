@@ -7,6 +7,7 @@
 #include "LgsPaths.h"
 #include "analysis/LgsLinter.h"
 #include "analysis/LgsTypeResolver.h"
+#include "codegen/LgsLLVMPassBuilder.h"
 #include "files/LgsFile.h"
 #include "utils/ThreadPool.h"
 #include <mutex>
@@ -37,6 +38,7 @@ public:
     std::vector<LgsEnvFile*> envFiles;
     std::vector<LgsTestFile*> testsFiles;
     std::map<FileID, fs::path> filePaths;
+    LgsLLVMPassBuilder passBuilder;
     std::atomic<FileID> nextFileID = 1;
     ThreadPool threadPool;
     
@@ -51,7 +53,6 @@ public:
     bool loadAppConfigFile();
     bool loadEnvFiles();
     void initBuild();
-    void writeIRFiles();
     void loadAppConfigs(const LgsAppConfigFile* configFile);
     size_t getNextFileID();
     ~LgsApp();

@@ -11,12 +11,10 @@
 #include "files/LgsEnvFile.h"
 #include "codegen/LgsCodeGen.h"
 #include "codegen/LgsLinker.h"
-#include "data/LgsConfigs.h"
 #include "files/LgsTestFile.h"
 #include "parser/LgsParser.h"
 #include "utils/LgsUtils.h"
-#include "llvm/IR/Verifier.h"
-#include <llvm/Target/TargetMachine.h>
+
 
 void LgsApp::compile() {
     if (!setup()) errHandler.exitWithErrors();
@@ -121,15 +119,13 @@ bool LgsApp::analyse() {
 
 bool LgsApp::generate() {
     initBuild();
-    const auto targetMachine = LgsLLVMGen::getTargetMachine();
     for (const auto& file : srcFiles) {
-        threadPool.runTask([this, file, targetMachine] {
-            LgsCodeGen generator(*file, appConfigs, *targetMachine, paths);
+        threadPool.runTask([this, file] {
+            LgsCodeGen generator(*file, appConfigs, passBuilder, paths);
             generator.generate();
         });
     }
     threadPool.wait();
-    writeIRFiles();
     return errHandler.successful;
 }
 
@@ -206,26 +202,8 @@ void LgsApp::initBuild() {
         fs::create_directories(paths.buildDirObjs);
     }
     LgsLLVMGen::initLLVM();
+    passBuilder.init();
     paths.execFilePath = paths.buildDir / appConfigs.name;
-}
-
-void LgsApp::writeIRFiles() {
-    for (const auto file : srcFiles) {
-        const auto module = file->generator.IRModule;
-        if (!module) continue;
-        if constexpr (DEBUG) {
-            module->print(llvm::outs(), nullptr);
-            logInfo(LGS_MSG_LINE_SEPERATOR);
-        }
-        if (verifyModule(*module, &llvm::errs())) {
-            errHandler.setUnsuccessful();
-            continue;
-        }
-        const auto filePath = (paths.buildDirIR / module->getName().str()).string() + ".ll";
-        std::error_code EC;
-        raw_fd_ostream textFile(filePath, EC, llvm::sys::fs::OF_None);
-        module->print(textFile, nullptr);
-    }
 }
 
 void LgsApp::loadAppConfigs(const LgsAppConfigFile* configFile) {

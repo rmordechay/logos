@@ -3,15 +3,17 @@
 #include "exprs/LgsExpr.h"
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/DIBuilder.h>
-#include <cstdint>
 #include <cmath>
 #include <map>
 #include <filesystem>
+#include <llvm/Passes/OptimizationLevel.h>
 
 class LgsFile;
 namespace llvm {
+    class PassBuilder;
     class TargetMachine;
 }
+
 using llvm::DIBuilder;
 using llvm::IRBuilderBase;
 using llvm::IRBuilder;
@@ -30,7 +32,6 @@ public:
     Module* IRModule = nullptr;
     IRBuilderBase::InsertPoint savedIP;
     IRBuilder<> builder = IRBuilder(context);
-    TargetMachine* targetMachine = nullptr;
     std::map<std::string, Type*> typesRegistry;
     std::unordered_map<std::string, Value*> stringsRegistry;
     std::unordered_map<std::string, GlobalVariable*> stringCache;
@@ -115,6 +116,8 @@ public:
 
     void finalizeDebugger(const std::filesystem::path& buildPath) const;
     static void initLLVM();
-    static TargetMachine* getTargetMachine();
+    static llvm::OptimizationLevel getOptLevel(uint8_t optLevel);
     ~LgsLLVMGen();
 };
+
+inline TargetMachine* targetMachine;
