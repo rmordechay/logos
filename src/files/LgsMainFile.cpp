@@ -1,5 +1,8 @@
 #include "files/LgsMainFile.h"
 
+#include "data/LgsDefinitions.h"
+#include "utils/LgsUtils.h"
+
 size_t LgsMainFile::hashFile() {
     size_t hash = 0;
     HASH_MAP(funcs, hash);
@@ -26,8 +29,16 @@ LgsMainFile::~LgsMainFile() {
         freeType(object);
     }
     objects.clear();
+    for (const auto& interface : interfaces) {
+        freeType(interface);
+    }
+    interfaces.clear();
     for (const auto lgsEnum : enums) {
         freeType(lgsEnum);
     }
     enums.clear();
+    for (const auto subtype : subtypes) {
+        freeType(subtype);
+    }
+    subtypes.clear();
 }

@@ -791,7 +791,7 @@ LgsStmt* LgsParser::parseAssignment() {
         return nullptr;
     }
     consume();
-    const auto r = parseUnary();
+    const auto r = parseExpr();
     if (!r) {
         freeExpr(l);
         reset(oldIndex);

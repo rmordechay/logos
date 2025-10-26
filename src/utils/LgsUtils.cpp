@@ -6,6 +6,9 @@
 #include "funcs/LgsParam.h"
 #include "types/iterables/LgsStr.h"
 #include <numeric>
+#include <typeinfo>
+#include <cxxabi.h>
+#include <memory>
 
 #define FNV_PRIME 16777619
 #define MAX_STR_HASH_LEN 1024
@@ -115,7 +118,7 @@ bool fileExists(const fs::path& entry, const std::vector<LgsFileMetadata>& files
 void freeType(const LgsType* type) {
     if (!type) return;
     if (type->isPrimitive) return;
-    // delete type;
+    delete type;
 }
 
 void freeTypes(std::vector<LgsType*>& types) {

@@ -30,10 +30,11 @@ void LgsAppMetadata::load() {
 }
 
 void LgsAppMetadata::save() const {
-    std::ofstream outFile(cacheFilePath, std::ios::binary);
-    const auto count = cached.size();
+    if (fs::exists(cacheFilePath)) fs::remove(cacheFilePath);
+    std::ofstream outFile(cacheFilePath, std::ios::binary | std::ios::trunc);
+    const auto count = files.size();
     outFile.write(reinterpret_cast<const char*>(&count), sizeof(count));
-    for (const auto& file : cached) {
+    for (const auto& file : files) {
         outFile.write(reinterpret_cast<const char*>(&file.id), sizeof(file.id));
         outFile.write(reinterpret_cast<const char*>(&file.hash), sizeof(file.hash));
         outFile.write(reinterpret_cast<const char*>(&file.type), sizeof(file.type));

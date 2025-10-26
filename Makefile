@@ -20,6 +20,7 @@ install_alpine:
     	  -net nic -net user \
     	  -nographic
 	setup-alpine -q
-	apk add git make cmake curl clang19 llvm19-dev curl-dev libxml2-dev dpkg
+	apk add git make cmake curl curl-dev libxml2-dev dpkg
+	apk add clang19 llvm19-dev
 	update-alternatives --install /usr/bin/cc cc /usr/lib/llvm19/bin/clang 100
 	update-alternatives --install /usr/bin/c++ c++ /usr/lib/llvm19/bin/clang++ 100

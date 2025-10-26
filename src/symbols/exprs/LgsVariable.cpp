@@ -64,7 +64,7 @@ Value* LgsVariable::castToIR(LgsLLVMGen& cg, LgsType* toType) {
 void LgsVariable::assign(LgsLLVMGen& cg, LgsExpr* expr) {
     freeOwner(cg);
     owner = expr->owner;
-    IRValue = expr->IRValue;
+    cg.builder.CreateStore(expr->IRValue, ref.varDec->IRValue);
 }
 
 Value* LgsVariable::hash(LgsLLVMGen& cg) {

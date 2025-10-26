@@ -10,13 +10,13 @@
 #include "files/LgsObjectFile.h"
 #include "files/LgsTestFile.h"
 #include "funcs/LgsFunc.h"
+#include "stmts/LgsAssignment.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsIfStmt.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsEnum.h"
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
-#include "types/LgsSubType.h"
 
 void LgsJsonParser::parseFile(LgsFile* file) {
     if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
@@ -38,7 +38,7 @@ void LgsJsonParser::parseMainFile(LgsMainFile* mainFile) {
     openKeyArray("funcs");
     bool isFirst = true;
     for (const auto& [funcName, func] : mainFile->funcs) {
-        if (!isFirst) json << ',';
+        if (!isFirst) addComma();
         isFirst = false;
         parseFunc(func);
     }
@@ -46,28 +46,28 @@ void LgsJsonParser::parseMainFile(LgsMainFile* mainFile) {
 
     openKeyArray("object");
     for (size_t i = 0; i < mainFile->objects.size(); ++i) {
-        if (i > 0) json << ',';
+        if (i > 0) addComma();
         parseObject(mainFile->objects[i]);
     }
     closeArray(true);
 
     openKeyArray("interfaces");
     for (size_t i = 0; i < mainFile->interfaces.size(); ++i) {
-        if (i > 0) json << ',';
+        if (i > 0) addComma();
         parseInterface(mainFile->interfaces[i]);
     }
     closeArray(true);
 
     openKeyArray("enums");
     for (size_t i = 0; i < mainFile->enums.size(); ++i) {
-        if (i > 0) json << ',';
+        if (i > 0) addComma();
         parseEnum(mainFile->enums[i]);
     }
     closeArray(true);
 
     openKeyArray("subtypes");
     for (size_t i = 0; i < mainFile->subtypes.size(); ++i) {
-        if (i > 0) json << ',';
+        if (i > 0) addComma();
         parseSubtype(mainFile->subtypes[i]);
     }
     closeArray();
@@ -85,7 +85,7 @@ void LgsJsonParser::parseObject(LgsObject* obj) {
 
     openKeyArray("fields");
     for (size_t i = 0; i < obj->fields.size(); ++i) {
-        if (i > 0) json << ',';
+        if (i > 0) addComma();
         parseField(obj->fields[i]);
     }
     closeArray(true);
@@ -93,7 +93,7 @@ void LgsJsonParser::parseObject(LgsObject* obj) {
     openKeyArray("methods");
     bool isFirst = true;
     for (const auto& [funcName, method] : obj->methods) {
-        if (!isFirst) json << ',';
+        if (!isFirst) addComma();
         isFirst = false;
         parseFunc(method);
     }
@@ -108,7 +108,7 @@ void LgsJsonParser::parseInterface(LgsInterface* interface) {
 
     openKeyArray("fields");
     for (size_t i = 0; i < interface->fields.size(); ++i) {
-        if (i > 0) json << ',';
+        if (i > 0) addComma();
         parseField(interface->fields[i]);
     }
     closeArray(true);
@@ -116,7 +116,7 @@ void LgsJsonParser::parseInterface(LgsInterface* interface) {
     openKeyArray("methods");
     bool isFirst = true;
     for (const auto& [funcName, method] : interface->methods) {
-        if (!isFirst) json << ',';
+        if (!isFirst) addComma();
         isFirst = false;
         parseFunc(method);
     }
@@ -128,10 +128,10 @@ void LgsJsonParser::parseInterface(LgsInterface* interface) {
 void LgsJsonParser::parseEnum(const LgsEnum* enum_) {
     openObject();
     addKeyValueStr("name", enum_->name);
-    json << ',';
+    addComma();
     openKeyArray("fields");
     for (size_t i = 0; i < enum_->fields.size(); ++i) {
-        if (i > 0) json << ',';
+        if (i > 0) addComma();
         openObject();
         addKeyValueStr("name", enum_->fields[i]->name);
         closeObject();
@@ -160,7 +160,7 @@ void LgsJsonParser::parseFunc(const LgsFunc* func) {
     addKeyValueStr("rt", func->funcType->rt->getName(), true);
     openKeyArray("params");
     for (size_t i = 0; i < func->funcType->params.size(); ++i) {
-        if (i > 0) json << ',';
+        if (i > 0) addComma();
         parseParam(&func->funcType->params[i]);
     }
     closeArray(true);
@@ -196,15 +196,14 @@ void LgsJsonParser::parseStmt(LgsStmt* stmt) {
     else if (const auto ioStmt = stmt->asIOStmt()) parseIOStmt(ioStmt);
     else if (const auto breakStmt = stmt->asBreak()) parseBreakStmt(breakStmt);
     else if (auto expr = stmt->asExpr()) parseExpr(expr);
-    else
-        assert(0);
+    else assert(0);
 }
 
 void LgsJsonParser::parseStmtsBlock(const LgsStmtsBlock* stmtsBlock) {
     openArray();
     if (stmtsBlock) {
         for (size_t i = 0; i < stmtsBlock->stmts.size(); ++i) {
-            if (i > 0) json << ',';
+            if (i > 0) addComma();
             parseStmt(stmtsBlock->stmts[i]);
         }
     }
@@ -219,7 +218,16 @@ void LgsJsonParser::parseVarDec(const LgsVarDec* varDec) {
 }
 
 void LgsJsonParser::parseAssignment(LgsAssignment* assignment) {
-    assert(0);
+    openObject();
+    addKeyValueStr("kind", "assignment", true);
+    openKey("leftExpr");
+    parseExpr(assignment->lValue);
+    addComma();
+    openKey("rightExpr");
+    parseExpr(assignment->rValue);
+    addComma();
+    addKeyValueStr("op", assignment->getAssignTypeStr());
+    closeObject();
 }
 
 void LgsJsonParser::parseIfStmt(LgsIfStmt* ifStmt) {
@@ -227,7 +235,7 @@ void LgsJsonParser::parseIfStmt(LgsIfStmt* ifStmt) {
     addKeyValueStr("kind", "ifStmt", true);
     openKey("ifCond");
     parseExpr(ifStmt->ifCond);
-    json << ',';
+    addComma();
     openKey("ifStmtsBlock");
     parseStmtsBlock(ifStmt->ifBlock);
     closeObject();
@@ -362,7 +370,7 @@ void LgsJsonParser::parseSelection(LgsSelection* selection) {
     addKeyValueStr("kind", "selection", true);
     openKeyArray("exprs");
     for (size_t i = 0; i < selection->exprs.size(); ++i) {
-        if (i > 0) json << ',';
+        if (i > 0) addComma();
         parseExpr(selection->exprs[i]);
     }
     closeArray();
@@ -376,7 +384,7 @@ void LgsJsonParser::parseFuncCall(LgsFuncCall* funcCall) {
     openKey("args");
     openArray();
     for (size_t i = 0; i < funcCall->args.size(); ++i) {
-        if (i > 0) json << ',';
+        if (i > 0) addComma();
         parseExpr(funcCall->args[i]);
     }
     closeArray();
@@ -484,17 +492,21 @@ void LgsJsonParser::openKeyObject(const std::string& v) {
 void LgsJsonParser::addKeyValueStr(const std::string& k, const std::string& v, const bool withComma) {
     openKey(k);
     addString(v);
-    if (withComma) json << ',';
+    if (withComma) addComma();
 }
 
 void LgsJsonParser::addKeyValueInt(const std::string& k, const size_t v, const bool withComma) {
     openKey(k);
     json << v;
-    if (withComma) json << ',';
+    if (withComma) addComma();
 }
 
 void LgsJsonParser::addKeyValueBool(const std::string& k, const bool v, const bool withComma) {
     openKey(k);
     addBool(v);
-    if (withComma) json << ',';
+    if (withComma) addComma();
+}
+
+void LgsJsonParser::addComma() {
+    json << ',';
 }

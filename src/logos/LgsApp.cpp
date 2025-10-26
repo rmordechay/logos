@@ -139,8 +139,8 @@ bool LgsApp::link() {
 }
 
 void LgsApp::loadBuiltins() {
-    globals.addSymbol(LgsSymbol(new LgsPrint(), false, true), &errHandler);
     globals.addSymbol(LgsSymbol(new LgsSystem(), false, true), &errHandler);
+    globals.addSymbol(LgsSymbol(new LgsPrint(), false, true), &errHandler);
     globals.addSymbol(LgsSymbol(new LgsTest(), false, true), &errHandler);
     globals.addSymbol(LgsSymbol(new LgsReflect(), false, true), &errHandler);
 }
@@ -260,12 +260,12 @@ LgsApp::~LgsApp() {
         delete file;
     }
     srcFiles.clear();
-    // for (const auto envFile : envFiles) {
-    //     delete envFile;
-    // }
-    // envFiles.clear();
-    // for (const auto testFile : testsFiles) {
-    //     delete testFile;
-    // }
-    // testsFiles.clear();
+    for (const auto envFile : envFiles) {
+        delete envFile;
+    }
+    envFiles.clear();
+    for (const auto testFile : testsFiles) {
+        delete testFile;
+    }
+    testsFiles.clear();
 }

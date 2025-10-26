@@ -2,12 +2,11 @@
 #include "exprs/LgsArrayExpr.h"
 #include "exprs/LgsHashMap.h"
 #include "exprs/LgsVariable.h"
-#include "types/iterables/LgsVec.h"
 
 std::string LgsAssignment::getAssignTypeStr() const {
     switch (assignmentType) {
     case ASSIGN:
-        return "re";
+        return "assign";
     case ASSIGN_ADD:
         return "add";
     case ASSIGN_SUB:

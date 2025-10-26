@@ -7,7 +7,6 @@ add_definitions(-DLOGOS_VERSION="${CMAKE_PROJECT_VERSION}")
 
 find_package(LLVM REQUIRED CONFIG)
 find_package(Clang REQUIRED CONFIG)
-
 set(LLVM_LINK_LLVM_DYLIB ON)
 set(CLANG_LINK_CLANG_DYLIB ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
@@ -17,20 +16,6 @@ if (CCACHE_PROGRAM)
     set(CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
     set(CMAKE_C_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
 endif()
-
-llvm_map_components_to_libnames(LLVM_LIBS
-    support
-    core
-    irreader
-    linker
-    aarch64codegen
-    asmparser
-    asmprinter
-    coroutines
-    passes
-    aarch64asmparser
-    option
-)
 
 set(CORE_SOURCES
     src/logos/LgsApp.cpp

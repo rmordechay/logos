@@ -5,6 +5,8 @@
 #include "utils/LgsUtils.h"
 #include <external/doctest.h>
 
+const std::string expectedDir = "../../tests/parser/expected";
+
 TEST_CASE("Parser1") {
     LgsApp app;
     const auto code = R"(
@@ -22,12 +24,11 @@ TEST_CASE("Parser1") {
         AR = "Roi"
     }
     )";
-    const auto expectedTree = getFileText("../../tests/parser/ParserTest1.json");
+    const auto expectedTree = getFileText(expectedDir + "/ParserTest1.json");
     app.loadSrcFile(code, "Main.lgs");
     const auto mainFile = static_cast<LgsMainFile*>(app.srcFiles.front());
     LgsJsonParser parser;
     parser.parseMainFile(mainFile);
-    std::ofstream("../../test.json") << parser.json.str();
     CHECK(app.errHandler.errors.size() == 0);
     CHECK_EQ(parser.json.str(), expectedTree);
 }
@@ -53,7 +54,7 @@ TEST_CASE("Parser2") {
         }
     }
     )";
-    const auto expectedTree = getFileText("../../tests/parser/ParserTest2.json");
+    const auto expectedTree = getFileText(expectedDir + "/ParserTest2.json");
     app.loadSrcFile(code, "Main.lgs");
     const auto mainFile = static_cast<LgsMainFile*>(app.srcFiles.front());
     LgsJsonParser parser;
@@ -66,7 +67,7 @@ TEST_CASE("Parser3") {
     LgsApp app;
     const auto code = R"(
     main() {
-        a = {"roi": "roi"}
+        a = {"key": "value"}
         f(1, 2)
         f: (Int): Int = it -> {
             print("Hello")
@@ -82,11 +83,51 @@ TEST_CASE("Parser3") {
         }
     }
     )";
-    const auto expectedTree = getFileText("../../tests/parser/ParserTest3.json");
+    const auto expectedTree = getFileText(expectedDir + "/ParserTest3.json");
     app.loadSrcFile(code, "Main.lgs");
     const auto mainFile = static_cast<LgsMainFile*>(app.srcFiles.front());
     LgsJsonParser parser;
     parser.parseMainFile(mainFile);
+    CHECK(app.errHandler.errors.size() == 0);
+    CHECK_EQ(parser.json.str(), expectedTree);
+}
+
+TEST_CASE("Parser4") {
+    LgsApp app;
+    const auto code = R"(
+    main() {
+        a = 2 + 2
+        print(a)
+        a := 4 + 2
+        print(a)
+        a += 2
+        print(a)
+        a -= 2
+        print(a)
+        a *= 2
+        print(a)
+        a /= 2
+        print(a)
+        a %= 2
+        print(a)
+        a ^= 2
+        print(a)
+        a &= 2
+        print(a)
+        a |= 2
+        print(a)
+        a <<= 2
+        print(a)
+        a >>= 2
+        print(a)
+    }
+    )";
+    const auto expectedTree = getFileText(expectedDir + "/ParserTest4.json");
+    app.loadSrcFile(code, "Main.lgs");
+    const auto mainFile = static_cast<LgsMainFile*>(app.srcFiles.front());
+    LgsJsonParser parser;
+    parser.parseMainFile(mainFile);
+    std::ofstream("../../test.json") << parser.json.str();
     CHECK(app.errHandler.errors.size() == 0);
     CHECK_EQ(parser.json.str(), expectedTree);
 }

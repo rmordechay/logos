@@ -130,4 +130,5 @@ public:
     void addKeyValueStr(const std::string& k, const std::string& v, bool withComma = false);
     void addKeyValueInt(const std::string& k, size_t v, bool withComma = false);
     void addKeyValueBool(const std::string& k, bool v, bool withComma = false);
+    void addComma();
 };

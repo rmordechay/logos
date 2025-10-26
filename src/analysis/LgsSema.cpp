@@ -81,16 +81,16 @@ void LgsSema::visitMainFile(LgsMainFile* mainFile) {
 }
 
 void LgsSema::visitObject(LgsObject* obj) {
-    for (const auto& generic : obj->generics) {
+    for (const auto generic : obj->generics) {
         visitGeneric(generic);
     }
-    for (const auto& field : obj->fields) {
+    for (const auto field : obj->fields) {
         visitField(field);
     }
     for (const auto& [_, method] : obj->methods) {
         visitFunc(method);
     }
-    for (const auto& ioPair : obj->ioPairs) {
+    for (const auto ioPair : obj->ioPairs) {
         visitIOPair(ioPair, obj);
     }
     validateObjImplements(obj, obj->implements);
