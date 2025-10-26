@@ -4,6 +4,7 @@
 #include "funcs/LgsFunc.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsBool.h"
+#include "utils/LgsUtils.h"
 
 Type* LgsSArray::getIRType(LgsLLVMGen& cg) {
     if (IRType) return IRType;

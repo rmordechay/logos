@@ -1,5 +1,4 @@
 #include "files/LgsMainFile.h"
-
 #include "data/LgsDefinitions.h"
 #include "utils/LgsUtils.h"
 

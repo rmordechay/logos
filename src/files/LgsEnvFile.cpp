@@ -9,7 +9,7 @@ size_t LgsEnvFile::hashFile() {
 
 LgsEnvFile::~LgsEnvFile() {
     for (const auto varDec : varDecs) {
-        delete varDec;
+        freeStmt(varDec);
     }
     varDecs.clear();
 }

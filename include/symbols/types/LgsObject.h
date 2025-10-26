@@ -16,22 +16,22 @@ public:
     std::vector<LgsEnum*> enums;
     std::vector<LgsObject*> objects;
     std::vector<LgsGeneric*> generics;
-    std::vector<LgsIOPair*> ioPairs;
     std::vector<LgsSubType*> subtypes;
+    std::vector<LgsIOPair*> ioPairs;
     LgsInstance* singleton = nullptr;
 
     explicit LgsObject(std::string  name) : name(std::move(name)) {
         isHeapAlloc = true;
     }
     LgsFunc* getMethod(const std::string& methodName) override;
+    std::string getName() override;
     Type* getIRType(LgsLLVMGen& cg) override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
     Lgs_rttype getRTType() override;
-    std::string strFormatPart() const override;
     bool hasVirtuals() const;
-    LgsObject* clone() override;
-    std::string getName() override;
     bool canCastTo(LgsType* other) override;
+    std::string strFormatPart() const override;
+    LgsObject* clone() override;
     ~LgsObject() override;
 };

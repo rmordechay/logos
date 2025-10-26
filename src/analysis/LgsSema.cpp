@@ -124,7 +124,6 @@ void LgsSema::visitField(LgsField* field) {
         errHandler.addError(E10013, &field->location, file->absPath, {field->name});
     }
     if (!field->type->isHeapAlloc && field->isOwner) {
-        errHandler.addWarning(W50001, &field->location, {field->type->pname()});
         field->isOwner = false;
     }
 }
@@ -173,7 +172,7 @@ void LgsSema::visitMainFunc(const LgsMainFunc* mainFunc) {
 
 void LgsSema::visitLambda(LgsFunc* lambda) {
     const auto stmtsBlock = lambda->stmtsBlock;
-    // Wraps in return if its the last statement
+    // Wraps in return if it's the last statement
     if (!lambda->funcType->rt->isVoid()) {
         const auto expr = stmtsBlock->stmts.back()->asExpr();
         if (expr) {
@@ -275,8 +274,8 @@ void LgsSema::visitVarDec(LgsVarDec* varDec) {
             varDec->expr->owner = varDec;
         }
     }
+
     if (varDec->type && !varDec->type->isHeapAlloc && varDec->isOwner) {
-        errHandler.addWarning(W50001, &varDec->location, {varDec->type->pname()});
         varDec->isOwner = false;
     }
     addLocalSymbol(LgsSymbol(varDec));

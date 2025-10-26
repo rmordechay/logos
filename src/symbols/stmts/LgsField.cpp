@@ -3,6 +3,7 @@
 #include "exprs/LgsExpr.h"
 #include "exprs/LgsHashMap.h"
 #include "types/iterables/LgsDArray.h"
+#include "utils/LgsUtils.h"
 
 Value* LgsField::loadIR(LgsLLVMGen& cg) {
     if (!IRValue) {
@@ -22,8 +23,8 @@ Value* LgsField::resolveVirtualField(LgsLLVMGen* cg, const LgsHashMap* vtable) c
 }
 
 LgsField::~LgsField() {
-    if (expr) {
-        freeExpr(expr);
-        expr = nullptr;
-    }
+    freeExpr(expr);
+    freeType(type);
+    expr = nullptr;
+    type = nullptr;
 }

@@ -69,7 +69,7 @@ public:
     void parseTestFile(LgsTestFile* testFile);
     void parseObject(LgsObject* obj);
     void parseInterface(LgsInterface* interface);
-    void parseEnum(const LgsEnum* enum_);
+    void parseEnum(LgsEnum* enum_);
     void parseSubtype(LgsSubType* subtype);
     void parseField(const LgsField* field);
     void parseFunc(const LgsFunc* func);

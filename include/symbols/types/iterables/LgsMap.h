@@ -11,7 +11,6 @@ class LgsPair;
 class LgsMap final : public LgsIterable {
 public:
     static constexpr auto name = "map";
-    StructType* mapStruct = nullptr;
     LgsTypePair* typePair = nullptr;
 
     explicit LgsMap(LgsType* keyType = nullptr, LgsType* valueType = nullptr) {
@@ -40,5 +39,6 @@ public:
     Value* getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) override;
     bool canCastTo(LgsType* other) override;
     std::string strFormatPart() const override;
+    LgsType* clone() override;
     ~LgsMap() override;
 };

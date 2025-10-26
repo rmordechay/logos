@@ -38,15 +38,16 @@ LgsToken LgsLexer::nextToken() {
 
     // Dot, range or spread
     if (currentChar == '.') {
-        if (std::isdigit(peek())) return scanNumber(location);
         advance();
         if (currentChar == '.') {
+            advance();
             if (advance() == '.') {
                 advance();
                 return {T_TRIPLE_DOT, "...", location};
             }
             return {T_DOUBLE_DOT, "..", location};
         }
+        if (std::isdigit(currentChar)) return scanNumber(location);
         return {T_DOT, ".", location};
     }
 
@@ -309,7 +310,7 @@ LgsToken LgsLexer::scanNumber(LgsLocation& location) {
         advance();
         location.columnStart++;
     }
-    if (currentChar == '.') {
+    if (currentChar == '.' && peek() != '.') {
         lexeme += currentChar;
         advance();
         location.columnStart++;

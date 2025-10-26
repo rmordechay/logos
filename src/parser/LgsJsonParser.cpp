@@ -104,15 +104,13 @@ void LgsJsonParser::parseObject(LgsObject* obj) {
 
 void LgsJsonParser::parseInterface(LgsInterface* interface) {
     openObject();
-    addKeyValueStr("name", interface->name, true);
-
+    addKeyValueStr("name", interface->getName(), true);
     openKeyArray("fields");
     for (size_t i = 0; i < interface->fields.size(); ++i) {
         if (i > 0) addComma();
         parseField(interface->fields[i]);
     }
     closeArray(true);
-
     openKeyArray("methods");
     bool isFirst = true;
     for (const auto& [funcName, method] : interface->methods) {
@@ -121,13 +119,12 @@ void LgsJsonParser::parseInterface(LgsInterface* interface) {
         parseFunc(method);
     }
     closeArray();
-
     closeObject();
 }
 
-void LgsJsonParser::parseEnum(const LgsEnum* enum_) {
+void LgsJsonParser::parseEnum(LgsEnum* enum_) {
     openObject();
-    addKeyValueStr("name", enum_->name);
+    addKeyValueStr("name", enum_->getName());
     addComma();
     openKeyArray("fields");
     for (size_t i = 0; i < enum_->fields.size(); ++i) {

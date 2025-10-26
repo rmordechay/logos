@@ -5,7 +5,7 @@ std::string LgsUnknown::getName() {
 }
 
 std::string LgsUnknown::pname() {
-    return LGS_UNKNOWN_TYPE;
+    return name;
 }
 
 LgsExpr* LgsUnknown::getZeroValue() {

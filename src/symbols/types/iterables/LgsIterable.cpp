@@ -7,6 +7,7 @@
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsInt.h"
 #include "types/primitives/LgsSize.h"
+#include "utils/LgsUtils.h"
 
 LgsFunc* LgsIterable::getMethod(const std::string& methodName) {
     const auto method = methods.find(methodName);

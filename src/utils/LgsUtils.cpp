@@ -121,16 +121,8 @@ void freeType(const LgsType* type) {
     delete type;
 }
 
-void freeTypes(std::vector<LgsType*>& types) {
-    for (const auto type : types) {
-        freeType(type);
-    }
-    types.clear();
-}
-
-void freeExpr(LgsExpr* expr) {
+void freeExpr(const LgsExpr* expr) {
     if (!expr) return;
-    expr->type = nullptr;
     delete expr;
 }
 
@@ -139,6 +131,11 @@ void freeExprs(std::vector<LgsExpr*>& exprs) {
         freeExpr(expr);
     }
     exprs.clear();
+}
+
+void freeStmt(const LgsStmt* stmt) {
+    if (!stmt) return;
+    delete stmt;
 }
 
 void freeParams(std::vector<LgsParam>& params) {

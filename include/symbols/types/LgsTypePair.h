@@ -6,7 +6,6 @@ public:
     static constexpr auto name = "Pair";
     LgsType* key;
     LgsType* value;
-    StructType* pairIRType = nullptr;
 
     explicit LgsTypePair(LgsType* keyType = nullptr, LgsType* valueType = nullptr) : key(keyType), value(valueType) {}
     Type* getIRType(LgsLLVMGen& cg) override;
@@ -17,4 +16,6 @@ public:
     std::string pname() override;
     bool canCastTo(LgsType* other) override;
     std::string strFormatPart() const override;
+    LgsType* clone() override;
+    ~LgsTypePair() override;
 };

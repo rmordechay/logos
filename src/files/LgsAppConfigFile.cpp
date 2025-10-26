@@ -9,7 +9,7 @@ size_t LgsAppConfigFile::hashFile() {
 
 LgsAppConfigFile::~LgsAppConfigFile() {
     for (const auto varDec : configs) {
-        delete varDec;
+        freeStmt(varDec);
     }
     configs.clear();
     for (const auto& package : packages) {

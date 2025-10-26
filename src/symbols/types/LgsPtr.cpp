@@ -5,6 +5,7 @@
 #include "types/iterables/LgsDArray.h"
 #include "types/iterables/LgsSArray.h"
 #include "types/primitives/LgsLong.h"
+#include "utils/LgsUtils.h"
 
 std::string LgsPtr::getName() {
     return name;
@@ -44,8 +45,6 @@ std::string LgsPtr::strFormatPart() const {
 }
 
 LgsPtr::~LgsPtr() {
-    if (baseType) {
-        freeType(baseType);
-        baseType = nullptr;
-    }
+    freeType(baseType);
+    baseType = nullptr;
 }

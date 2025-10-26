@@ -59,6 +59,7 @@ TEST_CASE("Parser2") {
     const auto mainFile = static_cast<LgsMainFile*>(app.srcFiles.front());
     LgsJsonParser parser;
     parser.parseMainFile(mainFile);
+    std::ofstream("../../test.json") << parser.json.str();
     CHECK(app.errHandler.errors.size() == 0);
     CHECK_EQ(parser.json.str(), expectedTree);
 }
@@ -69,7 +70,7 @@ TEST_CASE("Parser3") {
     main() {
         a = {"key": "value"}
         f(1, 2)
-        f: (Int): Int = it -> {
+        f: (Int): Int = it => {
             print("Hello")
             return 2 + it
         }
@@ -127,7 +128,6 @@ TEST_CASE("Parser4") {
     const auto mainFile = static_cast<LgsMainFile*>(app.srcFiles.front());
     LgsJsonParser parser;
     parser.parseMainFile(mainFile);
-    std::ofstream("../../test.json") << parser.json.str();
     CHECK(app.errHandler.errors.size() == 0);
     CHECK_EQ(parser.json.str(), expectedTree);
 }

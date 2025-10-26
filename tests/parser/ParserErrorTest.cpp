@@ -22,7 +22,7 @@ TEST_CASE("ParserErrorError10033A") {
         object obj
         x: Int
     )";
-    app.loadSrcFile(code, "Main.lgs");
+    app.loadSrcFile(code, "Obj.lgs");
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10033, code));
     CHECK_EQ(app.errHandler.errors[0].errCode, E10033.code);
 }
@@ -33,7 +33,7 @@ TEST_CASE("ParserError10033B") {
         interface inter
         x: Int
     )";
-    app.loadSrcFile(code, "Main.lgs");
+    app.loadSrcFile(code, "Interface.lgs");
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10033, code));
     CHECK_EQ(app.errHandler.errors[0].errCode, E10033.code);
 }

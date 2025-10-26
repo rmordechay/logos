@@ -1,5 +1,6 @@
 #pragma once
 
+class LgsStmt;
 struct LgsFileMetadata;
 struct LgsAppConfigs;
 class LgsParam;
@@ -27,11 +28,6 @@ bool isLLVMFile(const fs::directory_entry& entry);
 bool isLogosKeyword(const std::string& s);
 std::string getFileText(const fs::path& filePath);
 bool fileExists(const fs::path& entry, const std::vector<LgsFileMetadata>& filesMetadata);
-void freeType(const LgsType* type);
-void freeTypes(std::vector<LgsType*>& types);
-void freeExpr(LgsExpr* expr);
-void freeExprs(std::vector<LgsExpr*>& exprs);
-void freeParams(std::vector<LgsParam>& params);
 size_t hashStr(const char* key);
 bool startsWith(const std::string& str, const std::string& prefix);
 std::string getLine(const std::string& filename, size_t lineNumber);
@@ -40,3 +36,16 @@ std::string getFullPath(const LgsLocation& location, const std::string& filePath
 void combineNodeHash(size_t& oldHash, size_t newHash);
 void hashNodeString(size_t& oldHash, const std::string& str);
 void hashNodeInt(size_t& oldHash, size_t val);
+
+void freeExpr(const LgsExpr* expr);
+void freeExprs(std::vector<LgsExpr*>& exprs);
+void freeStmt(const LgsStmt* stmt);
+void freeParams(std::vector<LgsParam>& params);
+void freeType(const LgsType* type);
+template<typename T>
+void freeTypes(std::vector<T*>& types) {
+    for (const auto type : types) {
+        freeType(static_cast<LgsType*>(type));
+    }
+    types.clear();
+}

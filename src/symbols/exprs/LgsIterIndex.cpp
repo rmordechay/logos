@@ -5,6 +5,7 @@
 #include <exprs/LgsArrayExpr.h>
 #include "types/iterables/LgsMap.h"
 #include "types/iterables/LgsVec.h"
+#include "utils/LgsUtils.h"
 
 #include <llvm/IR/Module.h>
 

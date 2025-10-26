@@ -1,5 +1,7 @@
 #include "exprs/LgsVectorExpr.h"
 
+#include "utils/LgsUtils.h"
+
 Value* LgsVectorExpr::loadIR(LgsLLVMGen& cg) {
     return cg.builder.CreateLoad(vecType->getIRType(cg), IRValue);
 }
@@ -10,7 +12,7 @@ std::string LgsVectorExpr::asText() {
 
 LgsVectorExpr::~LgsVectorExpr() {
     for (const auto & arg : args) {
-        delete arg;
+        freeExpr(arg);
     }
     args.clear();
 }

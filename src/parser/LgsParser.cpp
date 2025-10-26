@@ -1352,10 +1352,10 @@ LgsHashMap* LgsParser::parseHashMap() {
     if (!matchAndConsume(T_RBRACE)) {
         while (true) {
             const auto key = parseExpr();
-            mustParse(key);
-            mustMatch(T_COLON);
+            if (!mustParse(key)) break;
+            if (!mustMatch(T_COLON)) break;
             const auto value = parseExpr();
-            mustParse(value);
+            if (!mustParse(value)) break;
             pairs.push_back(LgsPair{key, value});
             if (currentToken.type == T_RBRACE) break;
             mustMatch(T_COMMA);

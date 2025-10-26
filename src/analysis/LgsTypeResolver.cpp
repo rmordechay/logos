@@ -62,22 +62,22 @@ LgsType* LgsTypeResolver::resolveType(LgsType* type, LgsFile* file) {
         LgsType* newType = nullptr;
         switch (symbol->symbolType) {
         case FUNC:
-            newType = symbol->func->funcType;
+            newType = symbol->func->funcType->clone();
             break;
         case OBJECT:
-            newType = symbol->object;
+            newType = symbol->object->clone();
             break;
         case INTERFACE:
-            newType = symbol->interface;
+            newType = symbol->interface->clone();
             break;
         case ENUM:
-            newType = symbol->enum_;
+            newType = symbol->enum_->clone();
             break;
         case SUBTYPE:
-            newType = symbol->subtype;
+            newType = symbol->subtype->clone();
             break;
         case GENERIC:
-            newType = symbol->generic;
+            newType = symbol->generic->clone();
             break;
         case VAR_DEC:
         case PARAM:
@@ -110,6 +110,14 @@ void LgsTypeResolver::resolveMainFileTypes(LgsMainFile* mf) {
 }
 
 void LgsTypeResolver::resolveObjTypes(LgsObject* obj, LgsFile& file) {
+    for (auto& interface : obj->implements) {
+        interface = resolveType(interface, &file);
+    }
+
+    for (const auto generic : obj->generics) {
+        file.symbolTable.addSymbol(LgsSymbol(generic), &errHandler);
+    }
+
     for (const auto& enum_ : obj->enums) {
         file.symbolTable.addSymbol(LgsSymbol(enum_), &errHandler);
         for (const auto field : enum_->fields) {
@@ -117,22 +125,17 @@ void LgsTypeResolver::resolveObjTypes(LgsObject* obj, LgsFile& file) {
         }
     }
 
-    for (const auto generic : obj->generics) {
-        file.symbolTable.addSymbol(LgsSymbol(generic), &errHandler);
-    }
-
     for (const auto& field : obj->fields) {
         field->type = resolveType(field->type, &file);
     }
+
     for (const auto& [_, method] : obj->methods) {
         method->funcType->rt = resolveType(method->funcType->rt, &file);
         for (auto& param : method->funcType->params) {
             param.type = resolveType(param.type, &file);
         }
     }
-    for (auto& interface : obj->implements) {
-        interface = resolveType(interface, &file);
-    }
+
     for (const auto& ioPair : obj->ioPairs) {
         resolveIOPair(ioPair, obj);
     }

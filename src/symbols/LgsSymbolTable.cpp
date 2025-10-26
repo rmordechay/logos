@@ -6,9 +6,11 @@
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsEnum.h"
+#include "types/LgsGeneric.h"
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
 #include "types/LgsSubType.h"
+#include "utils/LgsUtils.h"
 
 void LgsSymbolTable::addSymbol(const LgsSymbol& symbol, LgsErrHandler* errHandler) {
     const auto symbolName = *symbol.name;
@@ -29,7 +31,7 @@ void LgsSymbolTable::freeSymbols() {
     for (const auto& [_, symbol] : symbols) {
         switch (symbol.symbolType) {
         case VAR_DEC:
-            delete symbol.varDec;
+            freeStmt(symbol.varDec);
             break;
         case PARAM:
             delete symbol.param;
@@ -53,6 +55,7 @@ void LgsSymbolTable::freeSymbols() {
             freeType(symbol.subtype);
             break;
         case GENERIC:
+            freeType(symbol.generic);
         case UNKNOWN:
             break;
         }

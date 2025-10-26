@@ -49,12 +49,15 @@ void LgsVarDec::hashNode(size_t& oldHash) {
 
 LgsVarDec::~LgsVarDec() {
     if (expr) {
-        if (type == expr->type) {
-            expr->type = nullptr;
+        if (type && expr->type && type == expr->type) {
+            freeExpr(expr);
+        } else {
+            freeType(type);
+            freeExpr(expr);
         }
-        freeExpr(expr);
-        expr = nullptr;
+    } else {
+        freeType(type);
     }
-    freeType(type);
     type = nullptr;
+    expr = nullptr;
 }

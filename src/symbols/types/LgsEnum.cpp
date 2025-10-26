@@ -30,3 +30,7 @@ std::string LgsEnum::strFormatPart() const {
 size_t LgsEnum::getSizeBytes() {
     return sizeof(void*);
 }
+
+LgsType* LgsEnum::clone() {
+    return new LgsEnum(*this);
+}

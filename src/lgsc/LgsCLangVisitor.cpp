@@ -13,6 +13,7 @@
 #include "types/LgsVoid.h"
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsChar.h"
+#include "utils/LgsUtils.h"
 
 void LgsCLangVisitor::HandleTranslationUnit(clang::ASTContext& clangContext){
     context = &clangContext;

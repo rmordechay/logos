@@ -1,6 +1,7 @@
 #include "exprs/constants/LgsStrConst.h"
 #include "types/LgsAny.h"
 #include "types/LgsSubType.h"
+#include "utils/LgsUtils.h"
 
 LgsExpr* LgsStrConst::castTo(LgsType* toType, const bool explicitCast) {
     const auto thiseName = type->getName();

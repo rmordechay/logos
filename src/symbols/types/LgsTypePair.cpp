@@ -1,5 +1,7 @@
 #include "types/LgsTypePair.h"
 
+#include "utils/LgsUtils.h"
+
 Type* LgsTypePair::getIRType(LgsLLVMGen& cg) {
     assert(0);
 }
@@ -32,4 +34,13 @@ bool LgsTypePair::canCastTo(LgsType* other) {
 
 std::string LgsTypePair::strFormatPart() const {
     return "%s";
+}
+
+LgsType* LgsTypePair::clone() {
+    return new LgsTypePair(key->clone(), value->clone());
+}
+
+LgsTypePair::~LgsTypePair() {
+    freeType(key);
+    freeType(value);
 }

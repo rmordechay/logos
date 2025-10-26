@@ -2,6 +2,7 @@
 #include "exprs/LgsIterIndex.h"
 #include "exprs/LgsVectorExpr.h"
 #include "types/primitives/LgsSize.h"
+#include "utils/LgsUtils.h"
 
 Type* LgsVec::getIRType(LgsLLVMGen& cg) {
     IRType = llvm::FixedVectorType::get(baseType->getIRType(cg), vectorDim);

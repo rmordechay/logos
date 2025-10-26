@@ -1,5 +1,7 @@
 #include "exprs/LgsHashMap.h"
 
+#include "utils/LgsUtils.h"
+
 void LgsHashMap::completeType(LgsType* toType) {
     if (!toType->asMap()) return;
     if (!type) {

@@ -9,7 +9,7 @@ LgsStmt* LgsStmtsBlock::lastStmt() const {
 
 LgsStmtsBlock::~LgsStmtsBlock() {
     for (const auto& stmt : stmts) {
-        delete stmt;
+        freeStmt(stmt);
     }
     stmts.clear();
 }

@@ -1,6 +1,5 @@
 #pragma once
 #include "LgsType.h"
-#include "utils/LgsUtils.h"
 
 class LgsForeachLoop;
 class LgsLLVMGen;

@@ -4,6 +4,7 @@
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsObject.h"
+#include "utils/LgsUtils.h"
 
 std::string LgsInstance::asText() {
     return name + "{}";
@@ -34,15 +35,10 @@ bool LgsInstance::equals(LgsExpr* other) {
 
 LgsInstance::~LgsInstance() {
     for (const auto& [_, arg] : args) {
-        delete arg;
+        freeExpr(arg);
     }
     args.clear();
-    if (obj) {
-        for (const auto& field : obj->fields) {
-            delete field;
-        }
-        delete obj;
-        obj = nullptr;
-        type = nullptr;
-    }
+    freeType(obj);
+    obj = nullptr;
+    type = nullptr;
 }

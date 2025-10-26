@@ -7,6 +7,7 @@
 #include "stmts/LgsVarDec.h"
 #include "types/LgsVoid.h"
 #include "types/iterables/LgsDArray.h"
+#include "utils/LgsUtils.h"
 
 Type* LgsMap::getIRType(LgsLLVMGen& cg) {
     if (IRType) return IRType;
@@ -125,6 +126,12 @@ bool LgsMap::canCastTo(LgsType* other) {
 
 std::string LgsMap::strFormatPart() const {
     return "%s";
+}
+
+LgsType* LgsMap::clone() {
+    const auto map = new LgsMap(*this);
+    map->typePair = static_cast<LgsTypePair*>(typePair->clone());
+    return map;
 }
 
 LgsMap::~LgsMap() {

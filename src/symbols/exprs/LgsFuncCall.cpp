@@ -5,6 +5,7 @@
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
 #include "types/LgsObject.h"
+#include "utils/LgsUtils.h"
 
 Value* LgsFuncCall::loadIR(LgsLLVMGen& cg) {
     return IRValue;
@@ -70,6 +71,6 @@ void LgsFuncCall::setDebugValue(LgsLLVMGen& cg) {
 
 LgsFuncCall::~LgsFuncCall() {
     for (const auto& arg : args) {
-        delete arg;
+        freeExpr(arg);
     }
 }

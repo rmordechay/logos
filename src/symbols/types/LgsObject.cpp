@@ -1,11 +1,13 @@
 #include "types/LgsObject.h"
 #include "exprs/LgsInstance.h"
 #include "stmts/LgsField.h"
+#include "stmts/LgsIOPair.h"
 #include "types/LgsEnum.h"
 #include "types/LgsInterface.h"
 #include "types/LgsNullable.h"
 #include "types/LgsSubType.h"
-
+#include "types/LgsGeneric.h"
+#include "utils/LgsUtils.h"
 #include <llvm/IR/Module.h>
 
 LgsFunc* LgsObject::getMethod(const std::string& methodName) {
@@ -26,6 +28,10 @@ LgsFunc* LgsObject::getMethod(const std::string& methodName) {
         }
     }
     return nullptr;
+}
+
+std::string LgsObject::getName() {
+    return name;
 }
 
 Type* LgsObject::getIRType(LgsLLVMGen& cg) {
@@ -69,6 +75,33 @@ LgsExpr* LgsObject::getZeroValue() {
     return new LgsInstance(clone());
 }
 
+Lgs_rttype LgsObject::getRTType() {
+    return RTT_OBJECT;
+}
+
+bool LgsObject::hasVirtuals() const {
+    return std::any_of(methods.begin(), methods.end(), [](const auto& pair) {
+        return pair.second->funcType->isVirtual;
+    });
+}
+
+bool LgsObject::canCastTo(LgsType* other) {
+    if (other->getName() == LgsAny::name) return true;
+    auto otherType = other;
+    if (const auto nullable = other->asNullable()) {
+        otherType = nullable->baseType;
+    }
+    if (const auto otherInterface = otherType->asInterface()) {
+        for (const auto objInterface : implements) {
+            if (objInterface->getName() == otherInterface->name) {
+                return true;
+            }
+        }
+        return false;
+    }
+    return name == otherType->getName();
+}
+
 std::string LgsObject::strFormatPart() const {
     std::stringstream str;
     str << '{';
@@ -80,16 +113,6 @@ std::string LgsObject::strFormatPart() const {
     }
     str << '}';
     return str.str();
-}
-
-Lgs_rttype LgsObject::getRTType() {
-    return RTT_OBJECT;
-}
-
-bool LgsObject::hasVirtuals() const {
-    return std::any_of(methods.begin(), methods.end(), [](const auto& pair) {
-        return pair.second->funcType->isVirtual;
-    });
 }
 
 LgsObject* LgsObject::clone() {
@@ -110,43 +133,17 @@ LgsObject* LgsObject::clone() {
     return cloned;
 }
 
-std::string LgsObject::getName() {
-    return name;
-}
-
-bool LgsObject::canCastTo(LgsType* other) {
-    if (other->getName() == LgsAny::name) return true;
-    auto otherType = other;
-    if (const auto nullable = other->asNullable()) {
-        otherType = nullable->baseType;
-    }
-    if (const auto otherInterface = otherType->asInterface()) {
-        for (const auto objInterface : implements) {
-            if (objInterface->getName() == otherInterface->name) {
-                return true;
-            }
-        }
-        return false;
-    }
-    return name == otherType->getName();
-}
-
 LgsObject::~LgsObject() {
-    for (const auto interface : implements) {
-        freeType(interface);
+    freeTypes(enums);
+    freeTypes(objects);
+    freeTypes(generics);
+    freeTypes(subtypes);
+    if (singleton) {
+        singleton->type = nullptr;
+        singleton->obj = nullptr;
+        freeExpr(singleton);
     }
-    implements.clear();
-    for (const auto enum_ : enums) {
-        freeType(enum_);
+    for (const auto ioPair : ioPairs) {
+        delete ioPair;
     }
-    enums.clear();
-    for (const auto subtype : subtypes) {
-        freeType(subtype);
-    }
-    subtypes.clear();
-    for (const auto object : objects) {
-        freeType(object);
-    }
-    objects.clear();
 }
-

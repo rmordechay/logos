@@ -1,5 +1,4 @@
 #include "types/LgsInterface.h"
-#include "funcs/LgsFunc.h"
 #include "codegen/LgsLLVMGen.h"
 #include "stmts/LgsField.h"
 #include "types/LgsObject.h"
@@ -42,8 +41,19 @@ size_t LgsInterface::getSizeBytes() {
     return 0;
 }
 
-LgsInterface::~LgsInterface() {
-    for (const auto interface : implements) {
-        delete interface;
+LgsObject* LgsInterface::clone() {
+    const auto cloned = new LgsInterface(*this);
+    for (const auto& field : fields) {
+        const auto newField = new LgsField(*field);
+        if (field->expr) {
+            newField->expr = field->expr->clone();
+        }
+        cloned->addField(newField);
     }
+    cloned->methods.clear();
+    for (const auto& [_, method] : methods) {
+        const auto newField = new LgsFunc(*method);
+        cloned->addMethod(newField);
+    }
+    return cloned;
 }

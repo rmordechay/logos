@@ -7,6 +7,7 @@
 #include "loops/LgsWhileLoop.h"
 #include "stmts/LgsStmtsBlock.h"
 #include "stmts/LgsVarDec.h"
+#include "utils/LgsUtils.h"
 
 LgsForeachLoop* LgsForLoop::asForeachLoop() { return dynamic_cast<LgsForeachLoop*>(this);}
 LgsRangeLoop* LgsForLoop::asRangeLoop() { return dynamic_cast<LgsRangeLoop*>(this);}
@@ -32,12 +33,12 @@ void LgsForLoop::incAndJumpToCond(LgsLLVMGen& cg) {
 }
 
 LgsForLoop::~LgsForLoop() {
+    for (const auto& loopVar : loopVars) {
+        freeStmt(loopVar);
+    }
     if (stmtsBlock) {
         delete stmtsBlock;
         stmtsBlock = nullptr;
-    }
-    for (const auto& loopVar : loopVars) {
-        // delete loopVar;
     }
     loopVars.clear();
 }
