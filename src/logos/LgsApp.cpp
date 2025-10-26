@@ -24,13 +24,13 @@ void LgsApp::compile() {
 }
 
 bool LgsApp::setup() {
-    if (paths.rootPath == "" && code == "") {
+    if (paths.rootPath == "" && lgsCode.empty()) {
         errHandler.addError(E10086, nullptr, {paths.rootPath});
         return false;
     }
 
     // Code mode
-    if (code != "") {
+    if (!lgsCode.empty()) {
         paths.rootPath = fs::temp_directory_path();
         paths.initPaths();
         return true;
@@ -87,6 +87,14 @@ bool LgsApp::setup() {
 }
 
 bool LgsApp::parse() {
+    // Code mode
+    if (!lgsCode.empty()) {
+        for (auto [path, code] : lgsCode) {
+            loadSrcFile(code, path);
+        }
+        return errHandler.successful;
+    }
+    // File mode
     if (appConfigs.isFileMode) {
         const auto filePath = appMetadata.files.front().path;
         const auto fileCode = getFileText(filePath);

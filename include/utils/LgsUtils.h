@@ -16,7 +16,7 @@ class LgsType;
 #define HASH_VECTOR(vec, hash) for (const auto e : vec) e->hashNode(hash)
 #define HASH_MAP(map, hash) for (const auto [_, v] : map) v->hashNode(hash)
 
-void execute(std::vector<const char*> mainArgs, const fs::path& execPath);
+void execute(const fs::path& execPath, std::vector<const char*> mainArgs = {});
 void logInfo(const std::string& text = "");
 void logError(const std::string& errMsg, const std::string& suffix = "");
 void logWarning(const std::string& msg, const std::string& path);

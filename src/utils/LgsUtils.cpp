@@ -16,7 +16,7 @@
 
 struct LgsFileMetadata;
 
-void execute(std::vector<const char*> mainArgs, const fs::path& execPath) {
+void execute(const fs::path& execPath, std::vector<const char*> mainArgs) {
     const auto path = const_cast<char*>(execPath.c_str());
     mainArgs.insert(mainArgs.begin(), path);
     if (mainArgs.empty() || mainArgs.back() != nullptr) {

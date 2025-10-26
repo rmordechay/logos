@@ -1418,7 +1418,7 @@ bool LgsCodeGen::allArgsAreConst(const std::vector<LgsExpr*>& args) {
 
 void LgsCodeGen::writeIRModule() const {
     // Print IR to stdout even with failure.
-    if constexpr (DEBUG) {
+    if (lgsConfigs.debug) {
         std::lock_guard lock(mtx);
         cg.IRModule->print(llvm::outs(), nullptr);
         logInfo(LGS_MSG_LINE_SEPERATOR);
@@ -1428,7 +1428,7 @@ void LgsCodeGen::writeIRModule() const {
     if (verifyModule(*cg.IRModule, &llvm::errs())) return;
 
     // Print IR to file
-    if constexpr (WRITE_IR_FILES) {
+    if (lgsConfigs.writeIRFiles) {
         const auto filePath = (paths.buildDirIR / cg.IRModule->getName().str()).string() + ".ll";
         std::error_code EC;
         raw_fd_ostream textFile(filePath, EC, llvm::sys::fs::OF_None);

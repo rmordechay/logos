@@ -2,6 +2,7 @@
 #include "logos/LgsPaths.h"
 #include <llvm/Passes/OptimizationLevel.h>
 #include <vector>
+
 namespace llvm {
     class Module;
     class TargetMachine;
@@ -9,8 +10,6 @@ namespace llvm {
 struct LgsAppConfigs;
 class LgsFile;
 class LgsLLVMGen;
-
-#define LINK_CMD_STRING "clang++ -flto %s -L%s -llgs -Wl,-rpath,%s -o %s"
 
 class LgsLinker {
 public:

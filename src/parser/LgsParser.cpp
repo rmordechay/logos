@@ -636,8 +636,8 @@ void LgsParser::parseParams(LgsFuncType* funcType) {
     if (currentToken.type == T_RPAREN) return;
     while (true) {
         const auto paramName = currentToken;
-        mustMatch(T_IDENTIFIER);
-        mustMatch(T_COLON);
+        if (!mustMatch(T_IDENTIFIER)) break;
+        if (!mustMatch(T_COLON)) break;
         const auto type = parseType();
         mustParse(type);
         LgsParam param(type, paramName.lexeme);

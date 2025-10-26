@@ -1,7 +1,30 @@
 #pragma once
 
-#define BIG_SIZE_THRESHOLD 4
 #define STACK_CAPACITY 1024
 #define LOCALS_CAPACITY 8
-#define DEBUG true
-#define WRITE_IR_FILES false
+#define BIG_SIZE_THRESHOLD 4
+
+enum LgsOS {
+    UnknownOS,
+    MacOS,
+    Linux,
+    Windows,
+};
+
+struct LgsConfigs {
+    LgsOS os = UnknownOS;
+    bool debug = true;
+    bool writeIRFiles = false;
+
+    LgsConfigs() {
+#ifdef __APPLE__
+        os = MacOS;
+#elif defined(_WIN32)
+        os = Linux;
+#elif defined(__linux__)
+        os = Windows;
+#endif
+    }
+};
+
+inline LgsConfigs lgsConfigs;

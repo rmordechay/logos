@@ -14,7 +14,7 @@ void LgsRunCmd::run() {
         execPath = app.paths.execFilePath;
     }
     assert(execPath != "");
-    execute(args, execPath);
+    execute(execPath, args);
 }
 
 void LgsRunCmd::parseArgs(LgsApp& app, std::vector<const char*>& appArgs) const {

@@ -8,6 +8,7 @@
 #include "analysis/LgsLinter.h"
 #include "analysis/LgsTypeResolver.h"
 #include "codegen/LgsLLVMPassBuilder.h"
+#include "data/LgsConfigs.h"
 #include "data/LgsDefinitions.h"
 #include "files/LgsFile.h"
 #include "utils/ThreadPool.h"
@@ -43,10 +44,8 @@ public:
     LgsLLVMPassBuilder passBuilder;
     ThreadPool threadPool;
     // Used when passing code directly.
-    std::string code = "";
+    std::unordered_map<std::string, std::string> lgsCode;
 
-    LgsApp() = default;
-    explicit LgsApp(const std::string& code) : code(code) {}
     void compile();
     bool setup();
     bool parse();

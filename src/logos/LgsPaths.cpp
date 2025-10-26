@@ -1,4 +1,6 @@
 #include "logos/LgsPaths.h"
+
+#include "data/LgsConfigs.h"
 #include "data/LgsDefinitions.h"
 #include <llvm/TargetParser/Host.h>
 #include <llvm/TargetParser/Triple.h>
@@ -15,19 +17,45 @@ void LgsPaths::initPaths() {
     if (!fs::exists(buildDir)) fs::create_directories(buildDir);
     if (!fs::exists(buildDirIR)) fs::create_directories(buildDirIR);
     if (!fs::exists(buildDirObjs)) fs::create_directories(buildDirObjs);
+    findLgsLib();
     findCLibRoot();
     findCLibHeaders();
 }
 
+void LgsPaths::findLgsLib() {
+    lgsLibPath = fs::current_path();
+    switch (lgsConfigs.os) {
+    case MacOS:
+        if (!fs::exists(lgsLibPath / "liblgs.dylib")) {
+            lgsLibPath = lgsLibPath.parent_path();
+            assert(fs::exists(lgsLibPath / "liblgs.dylib"));
+        }
+        break;
+    case Linux:
+        if (!fs::exists(lgsLibPath / "liblgs.so")) {
+            lgsLibPath = lgsLibPath.parent_path();
+            assert(fs::exists(lgsLibPath / "liblgs.so"));
+        }
+        break;
+    case Windows:
+        if (!fs::exists(lgsLibPath / "liblgs.dll")) {
+            lgsLibPath = lgsLibPath.parent_path();
+            assert(fs::exists(lgsLibPath / "liblgs.dll"));
+        }
+        break;
+    default:
+        assert(0);
+    }
+}
+
 void LgsPaths::findCLibRoot() {
-    const llvm::Triple triple(llvm::sys::getDefaultTargetTriple());
     FILE* pipe = nullptr;
     char buffer[512];
-    switch (triple.getOS()) {
-    case llvm::Triple::Darwin:
+    switch (lgsConfigs.os) {
+    case MacOS:
         pipe = popen("xcrun --show-sdk-path 2>/dev/null", "r");
         break;
-    case llvm::Triple::Linux:
+    case Linux:
         pipe = popen("clang -print-resource-dir 2>/dev/null", "r");
         break;
     default:
@@ -42,7 +70,7 @@ void LgsPaths::findCLibRoot() {
 }
 
 void LgsPaths::findCLibHeaders() {
-    const auto pipe = popen("cc -E -Wp,-v -xc /dev/null 2>&1", "r");
+    const auto pipe = popen("clang -E -Wp,-v -xc /dev/null 2>&1", "r");
     if (!pipe) assert(0);
     char buffer[512];
     while (fgets(buffer, sizeof(buffer), pipe)) {

@@ -1,17 +1,32 @@
 #include "external/doctest.h"
 #include "logos/LgsApp.h"
 
+#include <iostream>
+
 TEST_CASE("TestCodeGen1") {
     const auto code = R"(
-    main() {}
+    main() {
         print("Hello world")
     }
     )";
-    LgsApp app;
-    app.loadSrcFile(code);
-    assert(app.errHandler.successful);
-    app.analyse();
-    assert(app.errHandler.successful);
+    fs::path execPath = "";
+    {
+        LgsApp app;
+        lgsConfigs.debug = false;
+        lgsConfigs.writeIRFiles = false;
+        app.lgsCode[LGS_MAIN_FILE] = code;
+        assert(app.setup());
+        app.compile();
+        execPath = app.paths.execFilePath;
+    }
+    assert(execPath != "");
+    const auto pipe = popen(execPath.c_str(), "r");
+    if (!pipe) assert(0);
+    char buffer[512];
+    fgets(buffer, sizeof(buffer), pipe);
+    std::string output(buffer);
+    if (!output.empty() && output.back() == '\n') output.pop_back();
+    CHECK(output == "Hello world");
 }
 
 TEST_CASE("TestCodeGen2") {
