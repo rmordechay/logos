@@ -9,7 +9,7 @@ TEST_CASE("ParserError10011B") {
     func() {}
     main() {}
     )";
-    app.loadSrcFile(code, "Main.lgs");
+    app.loadSrcFile(code);
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10011, code));
     if (app.errHandler.errors.size() > 0) {
         CHECK_EQ(app.errHandler.errors[0].errCode, E10011.code);
@@ -45,7 +45,7 @@ TEST_CASE("ParserError10033C") {
         object obj {}
         main() {}
     )";
-    app.loadSrcFile(code, "Main.lgs");
+    app.loadSrcFile(code);
     CHECK_EQ(app.errHandler.errors.size(), 2);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10033.code);
     CHECK_EQ(app.errHandler.errors[1].errCode, E10033.code);
@@ -63,7 +63,7 @@ TEST_CASE("ParserError10054") {
         obj1 = Obj{x = 2, z = "Test", z = 3.23}
     }
     )";
-    app.loadSrcFile(code, "Main.lgs");
+    app.loadSrcFile(code);
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10054, code));
     if (app.errHandler.errors.size() > 0) {
         CHECK_EQ(app.errHandler.errors[0].errCode, E10054.code);

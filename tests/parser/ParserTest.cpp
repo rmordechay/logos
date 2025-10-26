@@ -25,7 +25,7 @@ TEST_CASE("Parser1") {
     }
     )";
     const auto expectedTree = getFileText(expectedDir + "/ParserTest1.json");
-    app.loadSrcFile(code, "Main.lgs");
+    app.loadSrcFile(code);
     const auto mainFile = static_cast<LgsMainFile*>(app.srcFiles.front());
     LgsJsonParser parser;
     parser.parseMainFile(mainFile);
@@ -55,7 +55,7 @@ TEST_CASE("Parser2") {
     }
     )";
     const auto expectedTree = getFileText(expectedDir + "/ParserTest2.json");
-    app.loadSrcFile(code, "Main.lgs");
+    app.loadSrcFile(code);
     const auto mainFile = static_cast<LgsMainFile*>(app.srcFiles.front());
     LgsJsonParser parser;
     parser.parseMainFile(mainFile);
@@ -85,7 +85,7 @@ TEST_CASE("Parser3") {
     }
     )";
     const auto expectedTree = getFileText(expectedDir + "/ParserTest3.json");
-    app.loadSrcFile(code, "Main.lgs");
+    app.loadSrcFile(code);
     const auto mainFile = static_cast<LgsMainFile*>(app.srcFiles.front());
     LgsJsonParser parser;
     parser.parseMainFile(mainFile);
@@ -124,7 +124,7 @@ TEST_CASE("Parser4") {
     }
     )";
     const auto expectedTree = getFileText(expectedDir + "/ParserTest4.json");
-    app.loadSrcFile(code, "Main.lgs");
+    app.loadSrcFile(code);
     const auto mainFile = static_cast<LgsMainFile*>(app.srcFiles.front());
     LgsJsonParser parser;
     parser.parseMainFile(mainFile);

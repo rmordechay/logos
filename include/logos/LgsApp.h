@@ -8,6 +8,7 @@
 #include "analysis/LgsLinter.h"
 #include "analysis/LgsTypeResolver.h"
 #include "codegen/LgsLLVMPassBuilder.h"
+#include "data/LgsDefinitions.h"
 #include "files/LgsFile.h"
 #include "utils/ThreadPool.h"
 #include <mutex>
@@ -49,7 +50,7 @@ public:
     bool generate();
     bool link();
     void loadBuiltins();
-    LgsFile* loadSrcFile(const std::string& code, const fs::path& filePath, size_t fileID = 0);
+    LgsFile* loadSrcFile(const std::string& code, const fs::path& filePath = LGS_MAIN_FILE, size_t fileID = 0);
     bool loadAppConfigFile();
     bool loadEnvFiles();
     void initBuild();
