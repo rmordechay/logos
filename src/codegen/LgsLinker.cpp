@@ -14,17 +14,17 @@ bool LgsLinker::link() const {
     for (const auto& objPath : fs::directory_iterator(paths.buildDirObjs)) {
         objFileList += objPath.path().string() + " ";
     }
-    char linkCmd[2048];
+    char cmd[1024*4];
     std::snprintf(
-        linkCmd,
-        sizeof(linkCmd),
-        LINK_STRING,
+        cmd,
+        sizeof(cmd),
+        LINK_CMD_STRING,
         objFileList.c_str(),
         lgsLibPath.c_str(),
         lgsLibPath.c_str(),
         paths.execFilePath.c_str()
     );
-    return std::system(linkCmd) == 0;
+    return std::system(cmd) == 0;
 }
 
 std::string LgsLinker::findLgsLib() const {

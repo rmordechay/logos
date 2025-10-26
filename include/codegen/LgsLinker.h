@@ -10,7 +10,7 @@ struct LgsAppConfigs;
 class LgsFile;
 class LgsLLVMGen;
 
-const auto LINK_STRING = "clang++ -flto %s -L%s -llgs -Wl,-rpath,%s -o %s";
+#define LINK_CMD_STRING "clang++ -flto %s -L%s -llgs -Wl,-rpath,%s -o %s"
 
 class LgsLinker {
 public:

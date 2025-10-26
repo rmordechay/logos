@@ -15,7 +15,6 @@
 #include "parser/LgsParser.h"
 #include "utils/LgsUtils.h"
 
-
 void LgsApp::compile() {
     if (!setup()) errHandler.exitWithErrors();
     if (!parse()) errHandler.exitWithErrors();
@@ -78,6 +77,11 @@ bool LgsApp::setup() {
 }
 
 bool LgsApp::parse() {
+    if (appConfigs.isFileMode) {
+        const auto code = getFileText(paths.rootPath);
+        loadSrcFile(code, paths.rootPath);
+        return errHandler.successful;
+    }
     appMetadata.load();
     if (!loadAppConfigFile()) return false;
     if (!loadEnvFiles()) return false;
@@ -191,6 +195,9 @@ bool LgsApp::loadEnvFiles() {
 }
 
 void LgsApp::initBuild() {
+    LgsLLVMGen::initLLVM();
+    passBuilder.init();
+    if (appConfigs.isFileMode) return;
     assert(paths.buildDir != "");
     if (!fs::exists(paths.buildDir)) {
         fs::create_directories(paths.buildDir);
@@ -201,8 +208,6 @@ void LgsApp::initBuild() {
     if (!fs::exists(paths.buildDirObjs)) {
         fs::create_directories(paths.buildDirObjs);
     }
-    LgsLLVMGen::initLLVM();
-    passBuilder.init();
     paths.execFilePath = paths.buildDir / appConfigs.name;
 }
 

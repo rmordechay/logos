@@ -54,6 +54,7 @@
 #include "llvm/Bitcode/BitcodeWriter.h"
 
 std::atomic<size_t> LgsCodeGen::namesCounter{0};
+#define GENERATE_OBJ_CMD_STRING "llc -filetype=obj -o %s %s.bc"
 
 void LgsCodeGen::generate() {
     cg.setupModule(file, appConfigs.debugMode);
@@ -1440,7 +1441,7 @@ void LgsCodeGen::writeIRModule() const {
 
     // Create bc file
     std::error_code ec;
-    std::string outputPath = paths.buildDirObjs / (file.absPath.stem().string() + ".o");
+    const std::string outputPath = paths.buildDirObjs / (file.absPath.stem().string() + ".o");
     raw_fd_ostream bitcodeStream(outputPath + ".bc", ec, llvm::sys::fs::OF_None);
     assert(!ec);
     llvm::WriteBitcodeToFile(*cg.IRModule, bitcodeStream);
@@ -1448,7 +1449,8 @@ void LgsCodeGen::writeIRModule() const {
     bitcodeStream.close();
 
     // Create object
-    auto llcCmd = "llc -filetype=obj -o " + outputPath + " " + outputPath + ".bc";
-    if (std::system(llcCmd.c_str()) != 0) assert(0);
+    char cmd[1024*4];
+    std::snprintf(cmd, sizeof(cmd), GENERATE_OBJ_CMD_STRING, outputPath.c_str(), outputPath.c_str());
+    if (std::system(cmd) != 0) assert(0);
     fs::remove(outputPath + ".bc");
 }
