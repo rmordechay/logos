@@ -40,6 +40,7 @@ enum LgsAssignType {
     ASSIGN_XOR,
     ASSIGN_LSHIFT,
     ASSIGN_RSHIFT,
+    ASSIGN_UNKNOWN,
 };
 
 class LgsExpr : virtual public LgsStmt {

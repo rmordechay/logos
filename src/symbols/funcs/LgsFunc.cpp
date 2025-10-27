@@ -6,7 +6,6 @@
 #include "types/LgsFuncType.h"
 #include "types/LgsVoid.h"
 #include "utils/LgsUtils.h"
-
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/Module.h>
 

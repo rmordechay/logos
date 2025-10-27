@@ -344,6 +344,7 @@ void LgsCodeGen::visitAssignment(const LgsAssignment* assignment) {
     case ASSIGN_XOR: results = lValue->type->bitXorIR(cg, lValue, rValue); break;
     case ASSIGN_LSHIFT: results = lValue->type->lshiftIR(cg, lValue, rValue); break;
     case ASSIGN_RSHIFT: results = lValue->type->rshiftIR(cg, lValue, rValue); break;
+    case ASSIGN_UNKNOWN: break;
     }
     assert(results);
     cg.builder.CreateStore(results, lValue->IRValue);
