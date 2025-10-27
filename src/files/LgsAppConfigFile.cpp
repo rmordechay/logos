@@ -17,7 +17,7 @@ LgsAppConfigFile::~LgsAppConfigFile() {
     }
     packages.clear();
     for (const auto requiredEnv : requiredEnvs) {
-        freeExpr(requiredEnv);
+        freeStmt(requiredEnv);
     }
     requiredEnvs.clear();
 }

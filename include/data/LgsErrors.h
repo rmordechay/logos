@@ -47,7 +47,7 @@ inline LgsBaseError E10016{"Object %s does not fully implement %s.\n%s", errCode
 inline LgsBaseError E10017{"break must be inside a for loop.", errCodeStart++};
 inline LgsBaseError E10018{"%s cannot cast to type %s.", errCodeStart++};
 inline LgsBaseError E10019{"activeEnv %s could not be found in the envs directory.", errCodeStart++};
-inline LgsBaseError E10020{"Environment %s does not define the required field %s.", errCodeStart++};
+inline LgsBaseError E10020{"Environment '%s' must declare the required variable '%s' of type '%s'.", errCodeStart++};
 inline LgsBaseError E10021{"%s and %s must be the same type. Given: %s and %s.", errCodeStart++};
 inline LgsBaseError E10022{"%s cannot be instantiated.", errCodeStart++};
 inline LgsBaseError E10023{"Expression with type %s must be nullable.", errCodeStart++};

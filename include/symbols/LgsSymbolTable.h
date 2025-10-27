@@ -8,6 +8,6 @@ struct LgsSymbolTable {
    std::map<std::string, LgsSymbol> symbols;
 
     LgsSymbol* getSymbol(const std::string& name);
-    void addSymbol(const LgsSymbol& symbol, LgsErrHandler* errHandler);
+    void addSymbol(const LgsSymbol& symbol, LgsErrHandler* errHandler, const std::string& filePath = "");
     void freeSymbols();
 };

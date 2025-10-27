@@ -44,7 +44,7 @@ void LgsVarDec::hashNode(size_t& oldHash) {
     hashNodeInt(oldHash, isOwner);
     hashNodeString(oldHash, name);
     if (type) type->hashNode(oldHash);
-    expr->hashNode(oldHash);
+    if (expr) expr->hashNode(oldHash);
 }
 
 LgsVarDec::~LgsVarDec() {

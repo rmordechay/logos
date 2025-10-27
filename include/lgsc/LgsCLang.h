@@ -14,6 +14,6 @@ public:
     void parseFile(const fs::path& fileName, LgsFile* lgsFile) const;
     void compile(const std::vector<LgsStrConst*>& files) const;
     std::vector<const char*> getCompileArgs(const std::vector<LgsStrConst*>& files) const;
-    fs::path resolveExternalFile(LgsStrConst* filePath);
-    void resolveCPaths(LgsFile* lgsFile);
+    fs::path resolveExternalFile(LgsStrConst* filePath, const LgsFile& file);
+    void resolveCPaths(LgsFile& lgsFile);
 };

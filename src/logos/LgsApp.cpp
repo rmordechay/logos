@@ -25,7 +25,7 @@ void LgsApp::compile() {
 
 bool LgsApp::setup() {
     if (paths.rootPath == "" && lgsCode.empty()) {
-        errHandler.addError(E10086, nullptr, {paths.rootPath});
+        errHandler.addError(E10086, {paths.rootPath});
         return false;
     }
 
@@ -49,7 +49,7 @@ bool LgsApp::setup() {
     // Project mode
     paths.initPaths();
     if (!is_directory(paths.rootPath) || !is_directory(paths.srcDir) || !fs::exists(paths.appFilePath)) {
-        errHandler.addError(E10010, nullptr);
+        errHandler.addError(E10010);
         return false;
     }
     appMetadata.cacheFilePath = paths.cacheFile;
@@ -76,7 +76,7 @@ bool LgsApp::setup() {
         if (!isLogosFile(entry)) continue;
         const auto fileName = entry.path().filename();
         if (fileExists(entry, appMetadata.files)) {
-            errHandler.addError(E10007, nullptr, {fileName});
+            errHandler.addError(E10007, {fileName});
             isValid = false;
             continue;
         }
@@ -90,7 +90,7 @@ bool LgsApp::parse() {
     // Code mode
     if (!lgsCode.empty()) {
         for (auto [path, code] : lgsCode) {
-            loadSrcFile(code, path);
+            loadSrcFile(code, fs::canonical(path));
         }
         return errHandler.successful;
     }
@@ -99,7 +99,7 @@ bool LgsApp::parse() {
     if (appConfigs.isFileMode) {
         const auto filePath = appMetadata.files.front().path;
         const auto fileCode = getFileText(filePath);
-        loadSrcFile(fileCode, filePath);
+        loadSrcFile(fileCode, fs::canonical(filePath));
         return errHandler.successful;
     }
 
@@ -111,7 +111,7 @@ bool LgsApp::parse() {
         if (fileMetadata.type != LGS_SRC_FILE) continue;
         threadPool.runTask([&fileMetadata, this] {
             const auto fileCode = getFileText(fileMetadata.path);
-            const auto file = loadSrcFile(fileCode, fileMetadata.path, fileMetadata.id);
+            const auto file = loadSrcFile(fileCode, fs::canonical(fileMetadata.path), fileMetadata.id);
             const auto hash = appMetadata.getHashByPath(file->absPath);
             fileMetadata.hash = file->hashFile();
             if (fileMetadata.hash != hash) {
@@ -126,7 +126,7 @@ bool LgsApp::parse() {
 
 bool LgsApp::analyse() {
     loadBuiltins();
-    validateEnvs();
+    analyseEnvs();
     LgsTypeResolver typeResolver(errHandler, globals);
     if (!typeResolver.resolveGlobals(srcFiles, threadPool)) return false;
     for (const auto file : srcFiles) {
@@ -142,6 +142,31 @@ bool LgsApp::analyse() {
     }
     threadPool.wait();
     return errHandler.successful;
+}
+
+void LgsApp::analyseEnvs() {
+    for (const auto file : envFiles) {
+        LgsSema semaAnalyser(file, globals);
+        for (const auto varDec : file->varDecs) {
+            varDec->type = varDec->expr->type;
+        }
+    }
+    for (const auto requiredEnv : appConfigFile->requiredEnvs) {
+        for (const auto envFile : envFiles) {
+            auto found = false;
+            for (const auto varDec : envFile->varDecs) {
+                if (varDec->name != requiredEnv->name) continue;
+                if (!varDec->type || !requiredEnv->type) continue;
+                if (!varDec->type->canCastTo(requiredEnv->type)) {
+                    errHandler.addError(E10001, &varDec->location, envFile->absPath, {varDec->type->pname(), requiredEnv->type->pname()});
+                }
+                found = true;
+                break;
+            }
+            if (found) continue;
+            errHandler.addError(E10020, &requiredEnv->location, appConfigFile->absPath, {envFile->envName, requiredEnv->name, requiredEnv->type->pname()});
+        }
+    }
 }
 
 bool LgsApp::generate() {
@@ -169,11 +194,9 @@ void LgsApp::loadBuiltins() {
     globals.addSymbol(LgsSymbol(new LgsReflect(), false, true), &errHandler);
 }
 
-void LgsApp::validateEnvs() {
-}
-
 bool LgsApp::loadAppConfigFile() {
     const auto appFileID = getNextFileID();
+    paths.appFilePath = fs::canonical(paths.appFilePath);
     const auto fileCode = getFileText(paths.appFilePath);
     LgsParser parser(appFileID, paths.appFilePath, paths, globals, fileCode);
     appConfigFile = parser.parseAppConfigFile();
@@ -208,7 +231,7 @@ bool LgsApp::loadEnvFiles() {
         threadPool.runTask([filePath, this, &fileMetadata] {
             const auto fileCode = getFileText(filePath);
             const auto fileID = getNextFileID();
-            LgsParser parser(fileID, filePath, paths, globals, fileCode);
+            LgsParser parser(fileID, fs::canonical(filePath), paths, globals, fileCode);
             const auto envFile = parser.parseEnvFile();
             if (!envFile) return;
             fileMetadata.hash = envFile->hashFile();

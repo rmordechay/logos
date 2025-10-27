@@ -97,15 +97,21 @@ LgsAppConfigFile* LgsParser::parseAppConfigFile() {
         if (currentToken.type == T_EOF) break;
         if (currentToken.lexeme == "required") break;
     }
+
     if (currentToken.lexeme == "required" && peek().lexeme == "envs") {
         consume();
         consume();
         mustMatch(T_LBRACE);
         while (true) {
-            const auto var = parseVariable();
-            if (!var) break;
-            configFile->requiredEnvs.push_back(var);
-            if (currentToken.type != T_RBRACE) break;
+            const auto var = currentToken;
+            if (!mustMatch(T_IDENTIFIER)) break;
+            if (!mustMatch(T_COLON)) break;
+            const auto type = parseType();
+            mustParse(type);
+            auto varDec = new LgsVarDec(var.lexeme, type, nullptr);
+            setLocation(varDec->location, &var);
+            configFile->requiredEnvs.push_back(varDec);
+            if (currentToken.type == T_RBRACE) break;
         }
         mustMatch(T_RBRACE);
     }
@@ -196,7 +202,7 @@ LgsObjectFile* LgsParser::parseObjectFile() {
     validateTypeName(obj->name, &obj->location);
     {
         std::lock_guard lock(mtx);
-        globals.addSymbol(LgsSymbol(file->obj), &errHandler);
+        globals.addSymbol(LgsSymbol(file->obj), &errHandler, filePath);
     }
     return file;
 }
@@ -214,7 +220,7 @@ LgsInterfaceFile* LgsParser::parseInterfaceFile() {
     validateTypeName(interface->name, &interface->location);
     {
         std::lock_guard lock(mtx);
-        globals.addSymbol(LgsSymbol(file->interface), &errHandler);
+        globals.addSymbol(LgsSymbol(file->interface), &errHandler, filePath);
     }
     return file;
 }
@@ -265,7 +271,7 @@ void LgsParser::parseExternalImports(LgsFile* file) {
     }
     mustMatch(T_RBRACE);
     LgsCLang lgsCLang(paths);
-    lgsCLang.resolveCPaths(file);
+    lgsCLang.resolveCPaths(*file);
     errHandler.mergeErrors(lgsCLang.errHandler);
 }
 
@@ -1524,7 +1530,7 @@ void LgsParser::addFileSymbol(LgsMainFile* file, const LgsSymbol& newSymbol) {
         }
         return errHandler.addError(E10011, newSymbol.location, filePath, {symbolName});
     }
-    file->symbolTable.addSymbol(newSymbol, &errHandler);
+    file->symbolTable.addSymbol(newSymbol, &errHandler, filePath);
 }
 
 void LgsParser::setLocation(LgsLocation& location, const LgsToken* token) const {

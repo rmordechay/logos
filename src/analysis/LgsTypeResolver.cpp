@@ -115,13 +115,13 @@ void LgsTypeResolver::resolveObjTypes(LgsObject* obj, LgsFile& file) {
     }
 
     for (const auto generic : obj->generics) {
-        file.symbolTable.addSymbol(LgsSymbol(generic), &errHandler);
+        file.symbolTable.addSymbol(LgsSymbol(generic), &errHandler, file.absPath);
     }
 
     for (const auto& enum_ : obj->enums) {
-        file.symbolTable.addSymbol(LgsSymbol(enum_), &errHandler);
+        file.symbolTable.addSymbol(LgsSymbol(enum_), &errHandler, file.absPath);
         for (const auto field : enum_->fields) {
-            file.symbolTable.addSymbol(LgsSymbol(field), &errHandler);
+            file.symbolTable.addSymbol(LgsSymbol(field), &errHandler, file.absPath);
         }
     }
 
@@ -137,7 +137,7 @@ void LgsTypeResolver::resolveObjTypes(LgsObject* obj, LgsFile& file) {
     }
 
     for (const auto& ioPair : obj->ioPairs) {
-        resolveIOPair(ioPair, obj);
+        resolveIOPair(ioPair, obj, file);
     }
 }
 
@@ -164,15 +164,15 @@ void LgsTypeResolver::resolveFuncTypes(LgsFuncType* funcType, LgsFile& file) {
     funcType->rt = !funcType->rt ? &LGS_VOID : resolveType(funcType->rt, &file);
 }
 
-void LgsTypeResolver::resolveIOPair(LgsIOPair* ioPair, LgsObject* obj) const {
+void LgsTypeResolver::resolveIOPair(LgsIOPair* ioPair, LgsObject* obj, LgsFile& file) const {
     ioPair->openFunc = obj->getMethod(ioPair->openFuncName);
     ioPair->openFunc->funcType->isInIOPair = true;
     if (!ioPair->openFunc) {
-        errHandler.addError(E10005, &ioPair->openFunc->location, {ioPair->openFuncName, obj->pname()});
+        errHandler.addError(E10005, &ioPair->openFunc->location, file.absPath, {ioPair->openFuncName, obj->pname()});
     }
     ioPair->closeFunc = obj->getMethod(ioPair->closeFuncName);
     ioPair->closeFunc->funcType->isInIOPair = true;
     if (!ioPair->closeFunc) {
-        errHandler.addError(E10005, &ioPair->closeFunc->location, {ioPair->closeFuncName, obj->pname()});
+        errHandler.addError(E10005, &ioPair->closeFunc->location, file.absPath, {ioPair->closeFuncName, obj->pname()});
     }
 }

@@ -20,9 +20,9 @@ struct LgsConfigs {
 #ifdef __APPLE__
         os = MacOS;
 #elif defined(_WIN32)
-        os = Linux;
-#elif defined(__linux__)
         os = Windows;
+#elif defined(__linux__)
+        os = Linux;
 #endif
     }
 };

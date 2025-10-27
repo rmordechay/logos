@@ -46,11 +46,11 @@ public:
     void compile();
     bool setup();
     bool parse();
+    void analyseEnvs();
     bool analyse();
     bool generate();
     bool link();
     void loadBuiltins();
-    void validateEnvs();
     LgsFile* loadSrcFile(const std::string& fileCode, const fs::path& filePath = LGS_MAIN_FILE, size_t fileID = 0);
     bool loadAppConfigFile();
     bool loadEnvFiles();

@@ -2,7 +2,9 @@
 #include "logos/LgsStack.h"
 #include "utils/LgsErrHandler.h"
 #include "analysis/LgsTypeResolver.h"
+#include "files/LgsEnvFile.h"
 
+class LgsAppConfigFile;
 class LgsTernaryExpr;
 class LgsVec;
 class LgsInterfaceFile;

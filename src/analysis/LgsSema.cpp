@@ -24,6 +24,7 @@
 #include "exprs/LgsTypeExpr.h"
 #include "exprs/LgsVectorExpr.h"
 #include "exprs/constants/LgsStrConst.h"
+#include "files/LgsEnvFile.h"
 #include "files/LgsMainFile.h"
 #include "files/LgsTestFile.h"
 #include "funcs/LgsMainFunc.h"
@@ -1310,5 +1311,5 @@ void LgsSema::addLocalSymbol(const LgsSymbol& newSymbol) {
     if (file->symbolTable.getSymbol(symbolName)) {
         return errHandler.addError(E10011, newSymbol.location, file->absPath, {symbolName});
     }
-    stack.getSymbolTable().addSymbol(newSymbol, &errHandler);
+    stack.getSymbolTable().addSymbol(newSymbol, &errHandler, file->absPath);
 }
