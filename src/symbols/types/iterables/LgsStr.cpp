@@ -98,15 +98,20 @@ std::string LgsStr::strFormatPart() const {
     return "%s";
 }
 
-Value* LgsStr::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    const auto otherStr = other->type->asStr();
-    if (isStatic && otherStr->isStatic) {
-        const auto selfConstStr = self->getConstStr();
+LgsExpr* LgsStr::addConst(LgsExpr* self, LgsExpr* other) {
+    const auto selfConstStr = self->getConstStr();
+    if (other->type->asStr()) {
         const auto otherConstStr = other->getConstStr();
-        if (selfConstStr && otherConstStr) {
-            return cg.getIRStr(*selfConstStr + *otherConstStr);
-        }
+        return new LgsStrConst(*selfConstStr + *otherConstStr);
     }
+    if (other->type->asInt()) {
+        const auto otherConstStr = other->getConstInt();
+        return new LgsStrConst(*selfConstStr + std::to_string(*otherConstStr));
+    }
+    assert(0);
+}
+
+Value* LgsStr::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     const auto selfSize = lengthIR(cg, self->IRValue);
     const auto otherSize = lengthIR(cg, other->IRValue);
     const auto totalSize = cg.builder.CreateAdd(selfSize, otherSize);

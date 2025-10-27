@@ -47,6 +47,7 @@ public:
     LgsType* type = nullptr;
     bool isSpread = false;
     bool isMutable = false;
+    bool isValueKnown = false;
     LgsValue* owner = nullptr;
     Value* destPtrValue = nullptr;
     bool isNullable = false;

@@ -538,6 +538,10 @@ void LgsSema::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
         return errHandler.addError(E10076, &l->location, file->absPath, {binaryExpr->op.name, ltype->pname(), rtype->pname()});
     }
     binaryExpr->setType(type);
+    if (binaryExpr->left->isValueKnown && binaryExpr->right->isValueKnown) {
+        binaryExpr->isValueKnown = true;
+        binaryExpr->results = binaryExpr->left->type->addConst(binaryExpr->left, binaryExpr->right);
+    }
 }
 
 void LgsSema::visitTernaryExpr(LgsTernaryExpr* ternary) {
@@ -655,6 +659,7 @@ void LgsSema::visitVariable(LgsVariable* variable) {
     case VAR_DEC: {
         variable->ref.varDec = symbol->varDec;
         variable->isMutable = !symbol->varDec->isConst;
+        variable->isValueKnown = symbol->varDec->expr->isValueKnown;
         variable->setType(symbol->varDec->type);
         if (symbol->varDec->isOwner) {
             variable->owner = symbol->varDec;
@@ -668,6 +673,7 @@ void LgsSema::visitVariable(LgsVariable* variable) {
     }
     case ENUM: {
         variable->ref.enum_ = symbol->enum_;
+        variable->isValueKnown = true;
         variable->setType(symbol->enum_);
         break;
     }

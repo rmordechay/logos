@@ -4,17 +4,17 @@
 #include "utils/LgsUtils.h"
 
 LgsExpr* LgsStrConst::castTo(LgsType* toType, const bool explicitCast) {
-    const auto thiseName = type->getName();
+    const auto thisName = type->getName();
     const auto otherName = toType->getName();
     if (otherName == LgsAny::name) return this;
     if (const auto subtype = toType->asSubtype()) {
-        if (explicitCast && subtype->subtype->getName() == thiseName) {
+        if (explicitCast && subtype->subtype->getName() == thisName) {
             freeType(type);
             type = subtype;
             return this;
         }
     }
-    if (thiseName == otherName) return this;
+    if (thisName == otherName) return this;
     return nullptr;
 }
 

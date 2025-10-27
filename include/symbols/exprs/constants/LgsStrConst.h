@@ -10,6 +10,7 @@ public:
     std::vector<LgsExpr*> parts;
 
     explicit LgsStrConst(const std::string& value) : value(value) {
+        isValueKnown = true;
         const auto lgsStr = new LgsStr();
         lgsStr->isStatic = true;
         lgsStr->size = new LgsIntConst(&LGS_INT, value.size());

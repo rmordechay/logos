@@ -78,12 +78,7 @@ std::string* LgsExpr::getConstStr() {
     }
     if (const auto bin = asBinExpr()) {
         if (bin->op.opType == ADD) {
-            const auto leftConstStr = bin->left->getConstStr();
-            const auto rightConstStr = bin->right->getConstStr();
-            if (!leftConstStr || !rightConstStr) return nullptr;
-            const auto concatStrConst = new LgsStrConst(*leftConstStr + *rightConstStr);
-            bin->results = concatStrConst;
-            return &concatStrConst->value;
+            return &bin->results->asStrConst()->value;
         }
     }
     return nullptr;

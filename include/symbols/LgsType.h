@@ -106,6 +106,7 @@ public:
     LgsSubType* asSubtype();
     LgsTypePair* asPair();
 
+    virtual LgsExpr* addConst(LgsExpr* self, LgsExpr* other);
     virtual Value* addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
     virtual Value* subIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
     virtual Value* mulIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);

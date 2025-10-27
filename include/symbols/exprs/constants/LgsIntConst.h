@@ -6,7 +6,9 @@ class LgsIntConst final : public LgsExpr {
 public:
     int64_t value;
 
-    LgsIntConst(LgsType* type, const size_t value) : LgsExpr(type), value(value) {}
+    LgsIntConst(LgsType* type, const size_t value) : LgsExpr(type), value(value) {
+        isValueKnown = true;
+    }
     Value* loadIR(LgsLLVMGen& cg) override;
     LgsExpr* castTo(LgsType* toType, bool explicitCast = false) override;
     Value* castToIR(LgsLLVMGen& cg, LgsType* toType) override;
