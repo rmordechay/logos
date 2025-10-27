@@ -43,7 +43,7 @@ std::string LgsSelection::asText() {
 }
 
 Value* LgsSelection::hash(LgsLLVMGen& cg) {
-    assert(0);
+    return lastExpr()->hash(cg);
 }
 
 bool LgsSelection::equals(LgsExpr* other) {

@@ -6,9 +6,6 @@
 #include "utils/LgsErrHandler.h"
 #include "LgsPaths.h"
 #include "analysis/LgsLinter.h"
-#include "analysis/LgsTypeResolver.h"
-#include "codegen/LgsLLVMPassBuilder.h"
-#include "data/LgsConfigs.h"
 #include "data/LgsDefinitions.h"
 #include "files/LgsFile.h"
 #include "utils/ThreadPool.h"
@@ -41,7 +38,6 @@ public:
     std::vector<LgsTestFile*> testsFiles;
     std::map<FileID, fs::path> filePaths;
     std::atomic<FileID> nextFileID = 1;
-    LgsLLVMPassBuilder passBuilder;
     ThreadPool threadPool;
     // Used when passing code directly.
     std::unordered_map<std::string, std::string> lgsCode;

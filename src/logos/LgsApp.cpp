@@ -143,11 +143,10 @@ bool LgsApp::analyse() {
 
 bool LgsApp::generate() {
     LgsLLVMGen::initLLVM();
-    passBuilder.init();
     paths.execFilePath = paths.buildDir / appConfigs.name;
     for (const auto& file : srcFiles) {
         threadPool.runTask([this, file] {
-            LgsCodeGen generator(*file, appConfigs, passBuilder, paths);
+            LgsCodeGen generator(*file, appConfigs, paths);
             generator.generate();
         });
     }

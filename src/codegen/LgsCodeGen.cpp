@@ -752,7 +752,6 @@ void LgsCodeGen::visitVariable(LgsVariable* variable) {
     case OBJECT:
         variable->IRValue = getIRValue(variable->ref.object->singleton);
         break;
-    case ENUM:
     case FIELD:
         if (variable->ref.field->type->asEnum()) {
             variable->IRValue = cg.getIRStr(variable->name);
@@ -762,8 +761,10 @@ void LgsCodeGen::visitVariable(LgsVariable* variable) {
         break;
     case GENERIC:
         assert(0);
+    case ENUM:
     case INTERFACE:
     case SUBTYPE:
+        return;
     case UNKNOWN:
         break;
     }
@@ -814,6 +815,10 @@ void LgsCodeGen::visitFieldSelection(LgsVariable* var, LgsExpr* parent) const {
             var->IRValue = field->IRValue;
             return;
         }
+    }
+    if (field->type->asEnum()) {
+        var->IRValue = cg.getIRStr(field->name);
+        return;
     }
     field->parentIRValue = parent->IRValue;
     field->parentIRType = parent->type->getIRType(cg);
@@ -1436,8 +1441,19 @@ void LgsCodeGen::writeIRModule() const {
     }
 
     // Run pass
-    llvm::ModulePassManager passManager = passBuilder.builder.buildPerModuleDefaultPipeline(cg.getOptLevel(appConfigs.optLevel));
-    passManager.run(*cg.IRModule, passBuilder.analysisManager);
+    llvm::PassBuilder builder(targetMachine);
+    llvm::LoopAnalysisManager loopAnalyser;
+    llvm::FunctionAnalysisManager funcAnalyser;
+    llvm::CGSCCAnalysisManager CGAnalyser;
+    llvm::ModuleAnalysisManager analysisManager;
+    builder.registerModuleAnalyses(analysisManager);
+    builder.registerFunctionAnalyses(funcAnalyser);
+    builder.registerLoopAnalyses(loopAnalyser);
+    builder.registerCGSCCAnalyses(CGAnalyser);
+    builder.crossRegisterProxies(loopAnalyser, funcAnalyser, CGAnalyser, analysisManager);
+
+    llvm::ModulePassManager passManager = builder.buildPerModuleDefaultPipeline(cg.getOptLevel(appConfigs.optLevel));
+    passManager.run(*cg.IRModule, analysisManager);
 
     // Create bc file
     std::error_code ec;

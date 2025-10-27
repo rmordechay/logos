@@ -361,7 +361,7 @@ void LgsLLVMGen::initLLVM() {
     LLVMInitializeAArch64TargetInfo();
 
     std::string error;
-    const auto targetTriple =llvm:: sys::getDefaultTargetTriple();
+    const auto targetTriple = llvm:: sys::getDefaultTargetTriple();
     const auto target = llvm::TargetRegistry::lookupTarget(targetTriple, error);
     targetMachine = target->createTargetMachine(targetTriple, "generic", "", llvm::TargetOptions(), std::nullopt);
 }
