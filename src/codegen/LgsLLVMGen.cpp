@@ -173,14 +173,14 @@ void LgsLLVMGen::callMemCpy(Value* dest, Value* src, Value* size) {
     builder.CreateMemCpy(dest, llvm::MaybeAlign(), src, llvm::MaybeAlign(), size);
 }
 
-Value* LgsLLVMGen::callMalloc(const size_t size, const bool isOwner, const Lgs_rttype type) {
+Value* LgsLLVMGen::callMalloc(const size_t size, const bool isOwner, const Lgs_RTType type) {
     assert(type != RTT_UNKNOWN);
     const auto ptr = builder.CreateMalloc(sizeTy(), sizeTy(), usize(size), nullptr);
     addHeap(isOwner, type, ptr);
     return ptr;
 }
 
-Value* LgsLLVMGen::callMalloc(Value* size, const bool isOwner, const Lgs_rttype type) {
+Value* LgsLLVMGen::callMalloc(Value* size, const bool isOwner, const Lgs_RTType type) {
     assert(type != RTT_UNKNOWN);
     const auto ptr = builder.CreateMalloc(sizeTy(), sizeTy(), size, nullptr);
     addHeap(isOwner, type, ptr);
@@ -211,7 +211,7 @@ void LgsLLVMGen::addNullTerminate(Value* strPtr, Value* pos) {
     builder.CreateStore(i8Zero(), builder.CreateGEP(i8Ty(), strPtr, pos));
 }
 
-void LgsLLVMGen::addHeap(const bool isOwner, const Lgs_rttype type, Value* ptr) {
+void LgsLLVMGen::addHeap(const bool isOwner, const Lgs_RTType type, Value* ptr) {
     if (isOwner) callLgsFunc("Stack_addOwner", voidTy(), {ptrTy(), i32Ty()}, {ptr, i32(type)});
     else callLgsFunc("Stack_addOrphan", voidTy(), {ptrTy(), i32Ty()}, {ptr, i32(type)});
 }

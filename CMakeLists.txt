@@ -156,19 +156,8 @@ set(RUNTIME_SOURCES
 
 add_library(lgs_lib SHARED ${CORE_SOURCES} ${RUNTIME_SOURCES})
 set_target_properties(lgs_lib PROPERTIES OUTPUT_NAME "lgs")
-target_link_libraries(lgs_lib PUBLIC
-    -L${LLVM_LIBRARY_DIRS}
-    -lLLVM-19
-    -lclang-cpp
-)
-
-target_compile_options(lgs_lib PRIVATE
-    -Wall
-    -Wextra
-    -Wpedantic
-    -Wno-unused-parameter
-    -Wno-unused-variable
-)
+target_link_libraries(lgs_lib PUBLIC -L${LLVM_LIBRARY_DIRS} -lLLVM-19 -lclang-cpp)
+target_compile_options(lgs_lib PRIVATE -Wall -Wextra -Wpedantic -Wno-unused-parameter -Wno-unused-variable)
 
 target_include_directories(lgs_lib PUBLIC
     ${CMAKE_SOURCE_DIR}/include
@@ -177,7 +166,6 @@ target_include_directories(lgs_lib PUBLIC
 )
 
 target_include_directories(lgs_lib SYSTEM PUBLIC ${LLVM_INCLUDE_DIRS})
-
 add_executable(lgs main.cpp)
 target_link_libraries(lgs PRIVATE lgs_lib)
 

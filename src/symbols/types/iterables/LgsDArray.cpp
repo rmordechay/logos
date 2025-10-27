@@ -45,7 +45,7 @@ LgsExpr* LgsDArray::getZeroValue() {
     return new LgsArrayExpr(this);
 }
 
-Lgs_rttype LgsDArray::getRTType() {
+Lgs_RTType LgsDArray::getRTType() {
     return RTT_DARRAY;
 }
 

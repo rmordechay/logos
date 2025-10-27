@@ -142,7 +142,7 @@ LgsType* LgsType::applyIntBinOp(const LgsBinOpType op, LgsType* other) {
     return nullptr;
 }
 
-Lgs_rttype LgsType::getRTType() {
+Lgs_RTType LgsType::getRTType() {
     assert(0);
 }
 

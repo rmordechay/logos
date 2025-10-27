@@ -1,5 +1,5 @@
 #pragma once
-#include "Lgs_types.h"
+#include "Lgs_Types.h"
 #include "data/LgsErrors.h"
 #include "exprs/LgsBinaryExpr.h"
 #include <map>
@@ -68,7 +68,7 @@ public:
     virtual Type* getIRType(LgsLLVMGen& cg) = 0;
     virtual size_t getSizeBytes() = 0;
     virtual LgsExpr* getZeroValue() = 0;
-    virtual Lgs_rttype getRTType() = 0;
+    virtual Lgs_RTType getRTType() = 0;
     virtual std::string getName() = 0;
     virtual std::string pname(); // pretty name
     virtual bool equals(LgsType* other);

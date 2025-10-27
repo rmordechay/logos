@@ -1,6 +1,7 @@
 #pragma once
 #include "LgsDefinitions.h"
 #include "data/LgsErrors.h"
+#include <unordered_map>
 
 enum LgsTokenType {
     T_DOUBLE_EQUAL,

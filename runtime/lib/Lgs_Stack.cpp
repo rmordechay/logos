@@ -8,7 +8,7 @@
 
 #define PRINT_MEMORY false
 
-static std::string getTypeName(const Lgs_rttype type) {
+static std::string getTypeName(const Lgs_RTType type) {
     switch (type) {
     case RTT_UNKNOWN: return "<Unknown>";
     case RTT_VOID: return "Void";
@@ -41,7 +41,7 @@ static std::string getTypeName(const Lgs_rttype type) {
     assert(0);
 }
 
-static void freeType(void* ptr, const Lgs_rttype type) {
+static void freeType(void* ptr, const Lgs_RTType type) {
     if constexpr (PRINT_MEMORY) {
         std::cout << "\tFreeing: " << ptr << std::endl;
     }
@@ -88,7 +88,7 @@ void Lgs_Stack::addDefer(void* funcPtr, void* ctx) {
     frames[stackIndex].defers[deferIndex] = func_entry;
 }
 
-void Lgs_Stack::addOwner(void* ptr, const Lgs_rttype type) {
+void Lgs_Stack::addOwner(void* ptr, const Lgs_RTType type) {
     if constexpr (PRINT_MEMORY) {
         std::cout << "alloc owner " << getTypeName(type) << ": " << ptr << std::endl;
     }
@@ -96,7 +96,7 @@ void Lgs_Stack::addOwner(void* ptr, const Lgs_rttype type) {
     frames[stackIndex].owners[ownerIndex] = Lgs_Alloc{ptr, type};
 }
 
-void Lgs_Stack::addOrphan(void* ptr, const Lgs_rttype type) {
+void Lgs_Stack::addOrphan(void* ptr, const Lgs_RTType type) {
     if constexpr (PRINT_MEMORY) {
         std::cout << "alloc orphan " << getTypeName(type) << ": " << ptr << std::endl;
     }

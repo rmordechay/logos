@@ -27,7 +27,7 @@ LgsExpr* LgsPtr::getZeroValue() {
     return new LgsNull();
 }
 
-Lgs_rttype LgsPtr::getRTType() {
+Lgs_RTType LgsPtr::getRTType() {
     assert(0);
 }
 

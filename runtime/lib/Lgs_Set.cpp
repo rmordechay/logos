@@ -1,11 +1,11 @@
 #include "Lgs_Set.h"
-#include "Lgs_types.h"
+#include "Lgs_Types.h"
 
 #include <cassert>
 #include <cstdlib>
 #include <cstring>
 
-extern "C" void Lgs_set_init(Lgs_Set* set, const size_t elementSize, const Lgs_rttype baseType) {
+extern "C" void Lgs_set_init(Lgs_Set* set, const size_t elementSize, const Lgs_RTType baseType) {
     assert(baseType != RTT_UNKNOWN);
     set->elementSize = elementSize;
     set->baseType = baseType;

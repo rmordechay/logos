@@ -21,7 +21,7 @@ LgsExpr* LgsSet::getZeroValue() {
     assert(0);
 }
 
-Lgs_rttype LgsSet::getRTType() {
+Lgs_RTType LgsSet::getRTType() {
     return RTT_SET;
 }
 

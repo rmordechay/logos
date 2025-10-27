@@ -52,8 +52,7 @@
 #include <llvm/Support/FileSystem.h>
 #include <llvm/Passes/PassBuilder.h>
 #include "llvm/Bitcode/BitcodeWriter.h"
-
-#include <iostream>
+#include <unordered_set>
 
 std::atomic<size_t> LgsCodeGen::namesCounter{0};
 #define GENERATE_OBJ_CMD_STRING "llc -filetype=obj -o %s %s.bc"
@@ -449,13 +448,7 @@ void LgsCodeGen::visitSwitch(LgsSwitch* pm) {
     const auto exitBlock = cg.createBlock(BLOCK_NAME_EXIT_PATTERN);
     visitExpr(pm->cond);
 
-    Value* exprIRValue;
-    if (pm->cond->type->asStr()) {
-        exprIRValue = cg.callHash(pm->cond->IRValue);
-    } else {
-        exprIRValue = pm->cond->IRValue;
-    }
-
+    const auto exprIRValue = pm->cond->hash(cg);
     llvm::SwitchInst* switchInst;
     if (pm->elseBlock) {
         const auto numOfCases = pm->patterns.size();

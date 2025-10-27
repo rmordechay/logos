@@ -23,7 +23,7 @@ LgsExpr* LgsShort::getZeroValue() {
     return new LgsIntConst(&LGS_SHORT, 0);
 }
 
-Lgs_rttype LgsShort::getRTType() {
+Lgs_RTType LgsShort::getRTType() {
     return RTT_SHORT;
 }
 

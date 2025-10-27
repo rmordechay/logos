@@ -135,7 +135,7 @@ Value* LgsSize::orIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     return phi;
 }
 
-Lgs_rttype LgsSize::getRTType() {
+Lgs_RTType LgsSize::getRTType() {
     return RTT_SIZE;
 }
 

@@ -21,7 +21,7 @@ LgsExpr* LgsNullable::getZeroValue() {
     return new LgsNull();
 }
 
-Lgs_rttype LgsNullable::getRTType() {
+Lgs_RTType LgsNullable::getRTType() {
     return RTT_NULLABLE;
 }
 

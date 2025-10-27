@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdint>
 
-enum Lgs_rttype {
+enum Lgs_RTType {
     RTT_UNKNOWN,
     RTT_VOID,
     RTT_BOOL,
@@ -31,19 +31,19 @@ enum Lgs_rttype {
     RTT_NULLABLE,
 };
 
-struct Lgs_vec2 {
+struct Lgs_Vec2 {
     float x, y;
 };
 
-struct Lgs_vec3 {
+struct Lgs_Vec3 {
     float x, y, z;
 };
 
-struct Lgs_vec4 {
+struct Lgs_Vec4 {
     float x, y, z, w;
 };
 
-struct Lgs_nullableInt {
+struct Lgs_NullableInt {
     int32_t v;
     bool isSet;
 };

@@ -13,7 +13,7 @@ public:
     LgsFunc* getMethod(const std::string& methodName) override;
     Type* getIRType(LgsLLVMGen& cg) override;
     LgsExpr* getZeroValue() override;
-    Lgs_rttype getRTType() override;
+    Lgs_RTType getRTType() override;
     std::string getName() override;
     std::string pname() override;
     bool canCastTo(LgsType* other) override;

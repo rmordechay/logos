@@ -1,19 +1,19 @@
 #include "Lgs_DArray.h"
-#include "Lgs_types.h"
+#include "Lgs_Types.h"
 #include "data/LgsDefinitions.h"
 #include "exprs/LgsNull.h"
 #include "types/primitives/LgsBool.h"
 #include <sstream>
-
+#include <cmath>
 std::string formatArray(Lgs_DArray* arr);
-std::string formatElement(Lgs_rttype type, void* elem);
+std::string formatElement(Lgs_RTType type, void* elem);
 
-extern "C" void Lgs_print(const Lgs_rttype rtt, void* v) {
+extern "C" void Lgs_print(const Lgs_RTType rtt, void* v) {
     if (v) printf("%s\n", formatElement(rtt, v).c_str());
     else printf("%s\n", LGS_NULL_LITERAL);
 }
 
-std::string formatElement(const Lgs_rttype type, void* elem) {
+std::string formatElement(const Lgs_RTType type, void* elem) {
     std::ostringstream oss;
     switch (type) {
     case RTT_TYPE:
@@ -60,17 +60,17 @@ std::string formatElement(const Lgs_rttype type, void* elem) {
         oss << *static_cast<const double_t*>(elem);
         break;
     case RTT_VEC2: {
-        const auto vec = static_cast<const Lgs_vec2*>(elem);
+        const auto vec = static_cast<const Lgs_Vec2*>(elem);
         oss << '<' << vec->x << ", " << vec->y << '>';
         break;
     }
     case RTT_VEC3: {
-        const auto vec = static_cast<const Lgs_vec3*>(elem);
+        const auto vec = static_cast<const Lgs_Vec3*>(elem);
         oss << '<' << vec->x << ", " << vec->y << ", " << vec->z << '>';
         break;
     }
     case RTT_VEC4: {
-        const auto vec = static_cast<const Lgs_vec4*>(elem);
+        const auto vec = static_cast<const Lgs_Vec4*>(elem);
         oss << '<' << vec->x << ", " << vec->y << ", " << vec->z << ", " << vec->w << '>';
         break;
     }
@@ -81,7 +81,7 @@ std::string formatElement(const Lgs_rttype type, void* elem) {
         break;
     }
     case RTT_NULLABLE: {
-        const auto nullable = static_cast<Lgs_nullableInt*>(elem);
+        const auto nullable = static_cast<Lgs_NullableInt*>(elem);
         if (nullable->isSet) {
             oss << nullable->v;
         } else {

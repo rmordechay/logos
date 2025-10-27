@@ -94,6 +94,7 @@ bool LgsApp::parse() {
         }
         return errHandler.successful;
     }
+
     // File mode
     if (appConfigs.isFileMode) {
         const auto filePath = appMetadata.files.front().path;
@@ -101,6 +102,7 @@ bool LgsApp::parse() {
         loadSrcFile(fileCode, filePath);
         return errHandler.successful;
     }
+
     // Project mode
     appMetadata.load();
     if (!loadAppConfigFile()) return false;
@@ -124,6 +126,7 @@ bool LgsApp::parse() {
 
 bool LgsApp::analyse() {
     loadBuiltins();
+    validateEnvs();
     LgsTypeResolver typeResolver(errHandler, globals);
     if (!typeResolver.resolveGlobals(srcFiles, threadPool)) return false;
     for (const auto file : srcFiles) {
@@ -166,16 +169,19 @@ void LgsApp::loadBuiltins() {
     globals.addSymbol(LgsSymbol(new LgsReflect(), false, true), &errHandler);
 }
 
+void LgsApp::validateEnvs() {
+}
+
 bool LgsApp::loadAppConfigFile() {
     const auto appFileID = getNextFileID();
     const auto fileCode = getFileText(paths.appFilePath);
     LgsParser parser(appFileID, paths.appFilePath, paths, globals, fileCode);
-    const auto configFile = parser.parseAppConfigFile();
+    appConfigFile = parser.parseAppConfigFile();
     auto appConfigMetadata = appMetadata.files.front();
     assert(appConfigMetadata.type == LGS_APP_CONFIG_FILE);
-    appConfigMetadata.hash = configFile->hashFile();
+    appConfigMetadata.hash = appConfigFile->hashFile();
     errHandler.mergeErrors(parser.errHandler);
-    loadAppConfigs(configFile);
+    loadAppConfigs();
     return errHandler.successful;
 }
 
@@ -215,9 +221,9 @@ bool LgsApp::loadEnvFiles() {
     return errHandler.successful;
 }
 
-void LgsApp::loadAppConfigs(const LgsAppConfigFile* configFile) {
+void LgsApp::loadAppConfigs() {
     if (!errHandler.successful) return;
-    for (const auto config : configFile->configs) {
+    for (const auto config : appConfigFile->configs) {
         const auto configNama = config->name;
         if (configNama == "name") {
             appConfigs.name = config->expr->asStrConst()->value;
@@ -231,11 +237,10 @@ void LgsApp::loadAppConfigs(const LgsAppConfigFile* configFile) {
             auto [major, minor, micro] = appConfigs.version;
             const auto s = std::sscanf(value.c_str(), "%lu.%lu.%lu%n", &major, &minor, &micro, &consumed) == 3;
             if (!s || value[consumed] != '\0') {
-                errHandler.addError(E10068, &config->location, configFile->absPath, {value});
+                errHandler.addError(E10068, &config->location, appConfigFile->absPath, {value});
             }
         }
     }
-    delete configFile;
 }
 
 size_t LgsApp::getNextFileID() {
@@ -243,6 +248,10 @@ size_t LgsApp::getNextFileID() {
 }
 
 LgsApp::~LgsApp() {
+    if (appConfigFile) {
+        delete appConfigFile;
+        appConfigFile = nullptr;
+    }
     for (const auto file : srcFiles) {
         delete file;
     }

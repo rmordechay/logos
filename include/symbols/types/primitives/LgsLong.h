@@ -14,7 +14,7 @@ public:
     Type* getIRType(LgsLLVMGen& cg) override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
-    Lgs_rttype getRTType() override;
+    Lgs_RTType getRTType() override;
     LgsType* applyBinOp(LgsBinOpType op, LgsType* other) override;
     Value* addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
     Value* subIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;

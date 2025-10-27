@@ -1,5 +1,5 @@
 #include "Lgs_DArray.h"
-#include "Lgs_types.h"
+#include "Lgs_Types.h"
 #include <cassert>
 #include <cstdlib>
 #include <cstring>
@@ -7,7 +7,7 @@
 static void resizeArrIfNeeded(Lgs_DArray* arr);
 static bool compare_arrays(const Lgs_DArray* arr1, const Lgs_DArray* arr2);
 
-extern "C" Lgs_DArray* Lgs_DArray_init(const size_t elementSize, const Lgs_rttype baseType) {
+extern "C" Lgs_DArray* Lgs_DArray_init(const size_t elementSize, const Lgs_RTType baseType) {
     assert(baseType != RTT_UNKNOWN);
     const auto arr = new Lgs_DArray();
     arr->elementSize = elementSize;

@@ -1,15 +1,11 @@
 #include "funcs/LgsCoroutine.h"
-#include "builtins/LgsPrint.h"
 #include "exprs/LgsFuncCall.h"
 #include "exprs/LgsSelection.h"
+#include "utils/LgsUtils.h"
 
 LgsCoroutine::~LgsCoroutine() {
-    if (funcCall) {
-        delete funcCall;
-        funcCall = nullptr;
-    }
-    if (selection) {
-        delete selection;
-        selection = nullptr;
-    }
+    freeExpr(funcCall);
+    funcCall = nullptr;
+    freeExpr(selection);
+    selection = nullptr;
 }

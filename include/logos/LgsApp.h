@@ -37,6 +37,7 @@ public:
     std::vector<LgsEnvFile*> envFiles;
     std::vector<LgsTestFile*> testsFiles;
     std::map<FileID, fs::path> filePaths;
+    LgsAppConfigFile* appConfigFile = nullptr;
     std::atomic<FileID> nextFileID = 1;
     ThreadPool threadPool;
     // Used when passing code directly.
@@ -49,10 +50,11 @@ public:
     bool generate();
     bool link();
     void loadBuiltins();
+    void validateEnvs();
     LgsFile* loadSrcFile(const std::string& fileCode, const fs::path& filePath = LGS_MAIN_FILE, size_t fileID = 0);
     bool loadAppConfigFile();
     bool loadEnvFiles();
-    void loadAppConfigs(const LgsAppConfigFile* configFile);
+    void loadAppConfigs();
     size_t getNextFileID();
     ~LgsApp();
 };

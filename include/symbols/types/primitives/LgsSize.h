@@ -32,7 +32,7 @@ public:
     Value* leIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
     Value* andIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
     Value* orIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
-    Lgs_rttype getRTType() override;
+    Lgs_RTType getRTType() override;
     bool canCastTo(LgsType* other) override;
     std::string strFormatPart() const override;
 };

@@ -16,7 +16,7 @@ public:
     std::string pname() override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
-    Lgs_rttype getRTType() override;
+    Lgs_RTType getRTType() override;
     std::string strFormatPart() const override;
     LgsType* applyBinOp(LgsBinOpType op, LgsType* other) override;
     LgsFunc* getAddFunc() override;

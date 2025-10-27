@@ -2,6 +2,7 @@
 #include "exprs/LgsArrayExpr.h"
 #include "exprs/LgsHashMap.h"
 #include "exprs/LgsVariable.h"
+#include "utils/LgsUtils.h"
 
 std::string LgsAssignment::getAssignTypeStr() const {
     switch (assignmentType) {
@@ -34,6 +35,8 @@ std::string LgsAssignment::getAssignTypeStr() const {
 }
 
 LgsAssignment::~LgsAssignment() {
-    delete lValue;
-    delete rValue;
+    freeExpr(lValue);
+    freeExpr(rValue);
+    lValue = nullptr;
+    rValue = nullptr;
 }

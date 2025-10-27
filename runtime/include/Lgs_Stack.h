@@ -1,6 +1,6 @@
 #pragma once
 #include "Lgs_Stack.h"
-#include "Lgs_types.h"
+#include "Lgs_Types.h"
 #include "data/LgsConfigs.h"
 #include <cstddef>
 typedef void (*Lgs_DeferFunc)(void*);
@@ -12,7 +12,7 @@ struct Lgs_ThunkFunc {
 
 struct Lgs_Alloc {
     void* ptr;
-    Lgs_rttype type;
+    Lgs_RTType type;
 };
 
 struct Lgs_StackFrame {
@@ -32,8 +32,8 @@ struct Lgs_Stack {
     void pop(bool cleanup);
     void callDefers() const;
     void addDefer(void* funcPtr, void* ctx);
-    void addOwner(void* ptr, Lgs_rttype type);
-    void addOrphan(void* ptr, Lgs_rttype type);
+    void addOwner(void* ptr, Lgs_RTType type);
+    void addOrphan(void* ptr, Lgs_RTType type);
     void removeOwner(const void* owner);
     void funcCleanup();
 };

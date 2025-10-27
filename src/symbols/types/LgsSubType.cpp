@@ -28,7 +28,7 @@ bool LgsSubType::canCastTo(LgsType* other) {
     return getName() == otherName;
 }
 
-Lgs_rttype LgsSubType::getRTType() {
+Lgs_RTType LgsSubType::getRTType() {
     return subtype->getRTType();
 }
 

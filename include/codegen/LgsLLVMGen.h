@@ -1,5 +1,5 @@
 #pragma once
-#include "Lgs_types.h"
+#include "Lgs_Types.h"
 #include "exprs/LgsExpr.h"
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/DIBuilder.h>
@@ -65,8 +65,8 @@ public:
     Value* callStrLen(Value* str);
     void callMemSet(Value* dest, Value* src, Value* size);
     void callMemCpy(Value* dest, Value* src, Value* size);
-    Value* callMalloc(size_t size, bool isOwner, Lgs_rttype type);
-    Value* callMalloc(Value* size, bool isOwner, Lgs_rttype type);
+    Value* callMalloc(size_t size, bool isOwner, Lgs_RTType type);
+    Value* callMalloc(Value* size, bool isOwner, Lgs_RTType type);
 
     // Stack
     void callStackPush(bool hasDefers, bool needsCleanup);
@@ -74,7 +74,7 @@ public:
     void callAddToVTable(Value* instance, Value* key, Value* ptr);
     Value* callGetFromVTable(Value* instance, Value* key);
     void addNullTerminate(Value* strPtr, Value* pos);
-    void addHeap(bool isOwner, Lgs_rttype type, Value* ptr);
+    void addHeap(bool isOwner, Lgs_RTType type, Value* ptr);
 
     // Types
     Type* i1Ty();

@@ -1,9 +1,9 @@
 #include "Lgs_Stack.h"
-#include "Lgs_types.h"
+#include "Lgs_Types.h"
 
 #include <cassert>
 #include <map>
-
+#include <string>
 struct Lgs_DArray;
 
 struct Lgs_Runtime {
@@ -19,11 +19,11 @@ extern "C" void Lgs_Runtime_init() {
 extern "C" void Lgs_Runtime_close() {
 }
 
-extern "C" void Lgs_Stack_addOwner(void* ptr, const Lgs_rttype type) {
+extern "C" void Lgs_Stack_addOwner(void* ptr, const Lgs_RTType type) {
     runtime.stack.addOwner(ptr, type);
 }
 
-extern "C" void Lgs_Stack_addOrphan(void* ptr, const Lgs_rttype type) {
+extern "C" void Lgs_Stack_addOrphan(void* ptr, const Lgs_RTType type) {
     runtime.stack.addOrphan(ptr, type);
 }
 

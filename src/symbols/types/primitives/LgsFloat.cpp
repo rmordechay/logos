@@ -26,7 +26,7 @@ LgsExpr* LgsFloat::getZeroValue() {
     return new LgsFloatConst(this, 0.0);
 }
 
-Lgs_rttype LgsFloat::getRTType() {
+Lgs_RTType LgsFloat::getRTType() {
     return RTT_FLOAT;
 }
 

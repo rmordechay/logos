@@ -21,7 +21,7 @@ LgsExpr* LgsInterface::getZeroValue() {
     assert(0);
 }
 
-Lgs_rttype LgsInterface::getRTType() {
+Lgs_RTType LgsInterface::getRTType() {
     return LgsObject::getRTType();
 }
 

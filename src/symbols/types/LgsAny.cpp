@@ -17,7 +17,7 @@ LgsExpr* LgsAny::getZeroValue() {
     assert(0);
 }
 
-Lgs_rttype LgsAny::getRTType() {
+Lgs_RTType LgsAny::getRTType() {
     return RTT_ANY;
 }
 

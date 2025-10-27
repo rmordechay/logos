@@ -32,7 +32,7 @@ LgsExpr* LgsMap::getZeroValue() {
     return new LgsHashMap(this);
 }
 
-Lgs_rttype LgsMap::getRTType() {
+Lgs_RTType LgsMap::getRTType() {
     return RTT_MAP;
 }
 

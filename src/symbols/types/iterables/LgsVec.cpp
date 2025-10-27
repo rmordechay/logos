@@ -22,7 +22,7 @@ LgsExpr* LgsVec::getZeroValue() {
     return new LgsVectorExpr(this);
 }
 
-Lgs_rttype LgsVec::getRTType() {
+Lgs_RTType LgsVec::getRTType() {
     if (vectorDim == 2) return RTT_VEC2;
     if (vectorDim == 3) return RTT_VEC3;
     if (vectorDim == 4) return RTT_VEC4;

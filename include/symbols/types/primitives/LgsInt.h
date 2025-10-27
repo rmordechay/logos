@@ -12,7 +12,7 @@ public:
     size_t getSizeBytes() override;
     Type* getIRType(LgsLLVMGen& cg) override;
     LgsExpr* getZeroValue() override;
-    Lgs_rttype getRTType() override;
+    Lgs_RTType getRTType() override;
     bool canCastTo(LgsType* other) override;
     LgsType* applyBinOp(LgsBinOpType op, LgsType* other) override;
     Value* addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;

@@ -12,7 +12,7 @@ LgsExpr* LgsUnknown::getZeroValue() {
     assert(0);
 }
 
-Lgs_rttype LgsUnknown::getRTType() {
+Lgs_RTType LgsUnknown::getRTType() {
     return RTT_UNKNOWN;
 }
 

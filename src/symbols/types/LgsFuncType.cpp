@@ -38,7 +38,7 @@ LgsExpr* LgsFuncType::getZeroValue() {
     assert(0);
 }
 
-Lgs_rttype LgsFuncType::getRTType() {
+Lgs_RTType LgsFuncType::getRTType() {
     assert(0);
 }
 

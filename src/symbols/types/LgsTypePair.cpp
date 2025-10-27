@@ -6,7 +6,7 @@ Type* LgsTypePair::getIRType(LgsLLVMGen& cg) {
     assert(0);
 }
 
-Lgs_rttype LgsTypePair::getRTType() {
+Lgs_RTType LgsTypePair::getRTType() {
     assert(0);
 }
 

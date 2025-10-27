@@ -77,7 +77,7 @@ LgsExpr* LgsByte::getZeroValue() {
     return new LgsIntConst(&LGS_BYTE, false);
 }
 
-Lgs_rttype LgsByte::getRTType() {
+Lgs_RTType LgsByte::getRTType() {
     return RTT_BYTE;
 }
 

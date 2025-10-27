@@ -77,7 +77,7 @@ LgsExpr* LgsObject::getZeroValue() {
     return new LgsInstance(clone());
 }
 
-Lgs_rttype LgsObject::getRTType() {
+Lgs_RTType LgsObject::getRTType() {
     return RTT_OBJECT;
 }
 
