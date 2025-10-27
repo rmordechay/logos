@@ -48,7 +48,6 @@
 #include "stmts/LgsIfStmt.h"
 #include "stmts/LgsSwitch.h"
 #include "types/primitives/LgsDouble.h"
-
 #include <unordered_set>
 
 void LgsSema::analyse() {
@@ -141,6 +140,7 @@ void LgsSema::visitFunc(LgsFunc* func) {
             break;
         }
         defaultParamsStarted = !!param.expr;
+        func->funcType->isGeneric = func->funcType->isGeneric || param.type->isGeneric;
     }
     visitStmtsBlock(func->stmtsBlock);
     if (func->funcType->isVariadic && func->funcType->hasDefaults()) {

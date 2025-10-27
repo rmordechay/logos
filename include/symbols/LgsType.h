@@ -4,9 +4,9 @@
 #include "exprs/LgsBinaryExpr.h"
 #include <map>
 
+class LgsSubType;
 class LgsSet;
 class LgsAny;
-class LgsSubType;
 class LgsByte;
 class LgsSize;
 class LgsPtr;
@@ -47,6 +47,7 @@ public:
     bool isPrimitive = false;
     bool isUnsigned = false;
     bool isHeapAlloc = false;
+    bool isGeneric = false;
     Type* IRType = nullptr;
     LgsLocation location;
     std::vector<LgsField*> fields;

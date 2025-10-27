@@ -1,0 +1,12 @@
+object Obj {
+    type: T
+
+    func(x: T) {
+        //print(x)
+    }
+}
+
+main() {
+    e = 2
+    obj = Obj<Int>{}
+}

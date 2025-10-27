@@ -102,18 +102,20 @@ LgsAppConfigFile* LgsParser::parseAppConfigFile() {
         consume();
         consume();
         mustMatch(T_LBRACE);
-        while (true) {
-            const auto var = currentToken;
-            if (!mustMatch(T_IDENTIFIER)) break;
-            if (!mustMatch(T_COLON)) break;
-            const auto type = parseType();
-            mustParse(type);
-            auto varDec = new LgsVarDec(var.lexeme, type, nullptr);
-            setLocation(varDec->location, &var);
-            configFile->requiredEnvs.push_back(varDec);
-            if (currentToken.type == T_RBRACE) break;
+        if (!matchAndConsume(T_RBRACE)) {
+            while (true) {
+                const auto var = currentToken;
+                if (!mustMatch(T_IDENTIFIER)) break;
+                if (!mustMatch(T_COLON)) break;
+                const auto type = parseType();
+                mustParse(type);
+                auto varDec = new LgsVarDec(var.lexeme, type, nullptr);
+                setLocation(varDec->location, &var);
+                configFile->requiredEnvs.push_back(varDec);
+                if (currentToken.type == T_RBRACE) break;
+            }
+            mustMatch(T_RBRACE);
         }
-        mustMatch(T_RBRACE);
     }
 
     if (currentToken.lexeme == "packages") {
@@ -682,13 +684,15 @@ LgsStmtsBlock* LgsParser::parseStmtsBlock(const bool withSingleStmt) {
     if (matchAndConsume(T_LBRACE)) {
         stmtsBlock = new LgsStmtsBlock();
         setLocation(stmtsBlock->location, &currentToken);
-        while (true) {
-            const auto stmt = parseStmt();
-            if (!stmt) break;
-            stmtsBlock->stmts.push_back(stmt);
-            if (currentToken.type == T_RBRACE) break;
+        if (!matchAndConsume(T_RBRACE)) {
+            while (true) {
+                const auto stmt = parseStmt();
+                if (!stmt) break;
+                stmtsBlock->stmts.push_back(stmt);
+                if (currentToken.type == T_RBRACE) break;
+            }
+            mustMatch(T_RBRACE);
         }
-        mustMatch(T_RBRACE);
     } else if (withSingleStmt) {
         if (const auto stmt = parseStmt()) {
             stmtsBlock = new LgsStmtsBlock();
@@ -1167,14 +1171,23 @@ LgsVariable* LgsParser::parseVariable() {
 
 
 LgsInstance* LgsParser::parseInstance() {
-    if (currentToken.type != T_INSTANCE) return nullptr;
     const auto tokenName = currentToken;
-    if (peek().type != T_LBRACE) return nullptr;
-    consume();
-    consume();
+    std::vector<LgsType*> types;
+    if (currentToken.type == T_IDENTIFIER && peek().type == T_LANGLE) {
+        consume();
+        consume();
+        const auto type = parseType();
+        mustParse(type);
+        types.push_back(type);
+        mustMatch(T_RANGLE);
+    } else if (!matchAndConsume(T_INSTANCE)) {
+        return nullptr;
+    }
+    mustMatch(T_LBRACE);
     const auto instance = new LgsInstance(tokenName.lexeme);
     setLocation(instance->location, &tokenName);
     instance->type = new LgsUnknown(instance->name);
+    instance->generics = types;
 
     if (!matchAndConsume(T_RBRACE)) {
         while (true) {

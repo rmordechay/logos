@@ -130,6 +130,7 @@ void LgsCodeGen::visitMainFunc(LgsMainFunc* func) {
 }
 
 void LgsCodeGen::visitFunc(LgsFunc* func) {
+    if (func->funcType->isGeneric) return;
     stack.enterScope(func);
     createPrologue(func);
     visitStmtsBlock(func->stmtsBlock);

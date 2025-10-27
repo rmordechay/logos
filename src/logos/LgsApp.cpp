@@ -105,8 +105,8 @@ bool LgsApp::parse() {
 
     // Project mode
     appMetadata.load();
-    if (!loadAppConfigFile()) return false;
-    if (!loadEnvFiles()) return false;
+    // if (!loadAppConfigFile()) return false;
+    // if (!loadEnvFiles()) return false;
     for (auto& fileMetadata : appMetadata.files) {
         if (fileMetadata.type != LGS_SRC_FILE) continue;
         threadPool.runTask([&fileMetadata, this] {
@@ -145,6 +145,7 @@ bool LgsApp::analyse() {
 }
 
 void LgsApp::analyseEnvs() {
+    if (!appConfigFile) return;
     for (const auto file : envFiles) {
         LgsSema semaAnalyser(file, globals);
         for (const auto varDec : file->varDecs) {

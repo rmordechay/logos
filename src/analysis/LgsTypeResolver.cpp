@@ -78,6 +78,7 @@ LgsType* LgsTypeResolver::resolveType(LgsType* type, LgsFile* file) {
             break;
         case GENERIC:
             newType = symbol->generic->clone();
+            newType->isGeneric = true;
             break;
         case VAR_DEC:
         case PARAM:

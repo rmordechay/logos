@@ -5,10 +5,9 @@
 #include "types/LgsEnum.h"
 #include "types/LgsInterface.h"
 #include "types/LgsNullable.h"
-#include "types/LgsSubType.h"
 #include "types/LgsGeneric.h"
 #include "utils/LgsUtils.h"
-
+#include "types/LgsSubType.h"
 #include <sstream>
 #include <llvm/IR/Module.h>
 
@@ -120,6 +119,10 @@ std::string LgsObject::strFormatPart() const {
 LgsObject* LgsObject::clone() {
     const auto cloned = new LgsObject(*this);
     cloned->fields.clear();
+    cloned->generics.clear();
+    for (const auto& generic : generics) {
+        cloned->generics.emplace_back(new LgsGeneric(*generic));
+    }
     for (const auto& field : fields) {
         const auto newField = new LgsField(*field);
         if (field->expr) {

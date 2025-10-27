@@ -31,6 +31,7 @@ public:
     bool isMethod = false;
     bool isInIOPair = false;
     bool isSysCall = false;
+    bool isGeneric = false;
     FunctionType* IRType = nullptr;
 
     LgsFuncType() = default;

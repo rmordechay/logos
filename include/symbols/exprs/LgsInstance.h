@@ -7,6 +7,7 @@ public:
     std::string name;
     LgsObject* obj = nullptr;
     std::map<std::string, LgsExpr*> args;
+    std::vector<LgsType*> generics;
 
     explicit LgsInstance(const std::string& name): name(name) {}
     explicit LgsInstance(LgsObject* obj) : LgsExpr(obj), name(obj->name), obj(obj) {}
