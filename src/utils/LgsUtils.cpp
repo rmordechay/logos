@@ -5,13 +5,10 @@
 #include "files/LgsFile.h"
 #include "funcs/LgsParam.h"
 #include "types/iterables/LgsStr.h"
-#include <numeric>
-#include <typeinfo>
-#include <cxxabi.h>
-#include <memory>
+#include <iostream>
+#include <sstream>
+#include <unistd.h>
 
-#define FNV_PRIME 16777619
-#define MAX_STR_HASH_LEN 1024
 #define MSG_PLACEHOLDER "%s"
 
 struct LgsFileMetadata;
@@ -151,13 +148,7 @@ void freeParams(std::vector<LgsParam>& params) {
 }
 
 size_t hashStr(const char* key) {
-    size_t hash = 2166136261u;
-    while (*key) {
-        hash ^= static_cast<unsigned char>(*key++);
-        hash *= FNV_PRIME;
-        hash %= MAX_STR_HASH_LEN;
-    }
-    return hash;
+    return std::hash<std::string_view>{}(key);
 }
 
 bool startsWith(const std::string& str, const std::string& prefix) {

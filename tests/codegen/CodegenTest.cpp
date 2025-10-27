@@ -1,7 +1,7 @@
 #include "external/doctest.h"
 #include "logos/LgsApp.h"
-
 #include <iostream>
+#include <sstream>
 
 TEST_CASE("TestCodeGen1") {
     const auto code = R"(
@@ -12,35 +12,87 @@ TEST_CASE("TestCodeGen1") {
     fs::path execPath = "";
     {
         LgsApp app;
-        lgsConfigs.debug = false;
-        lgsConfigs.writeIRFiles = false;
         app.lgsCode[LGS_MAIN_FILE] = code;
-        assert(app.setup());
         app.compile();
         execPath = app.paths.execFilePath;
     }
-    assert(execPath != "");
     const auto pipe = popen(execPath.c_str(), "r");
-    if (!pipe) assert(0);
-    char buffer[512];
-    fgets(buffer, sizeof(buffer), pipe);
-    std::string output(buffer);
-    if (!output.empty() && output.back() == '\n') output.pop_back();
-    CHECK(output == "Hello world");
+    assert(pipe);
+    std::string output;
+    char buffer[64];
+    while (fgets(buffer, sizeof(buffer), pipe)) {
+        output += buffer;
+    }
+    pclose(pipe);
+    std::istringstream stream(output);
+    std::string line1;
+    std::getline(stream, line1);
+    CHECK(line1 == "Hello world");
 }
 
 TEST_CASE("TestCodeGen2") {
-    // LgsApp app("./");
-    // app.appConfigs.logLevel = INFO;
-    // const auto code = R"(
-    // main() {
-    //     print(_/4 + _/4)
-    // }
-    // )";
-    // app.loadBuiltins();
-    // app.parseSrcFile(code);
-    // app.analyse();
-    // app.generate();
-    // app.link();
-    // app.execute();
+    const auto code = R"(
+    main() {
+        a = 23 + 34 - 235
+        print(a)
+    }
+    )";
+    fs::path execPath = "";
+    {
+        LgsApp app;
+        app.lgsCode[LGS_MAIN_FILE] = code;
+        app.compile();
+        execPath = app.paths.execFilePath;
+    }
+    const auto pipe = popen(execPath.c_str(), "r");
+    assert(pipe);
+    std::string output;
+    char buffer[64];
+    while (fgets(buffer, sizeof(buffer), pipe)) {
+        output += buffer;
+    }
+    pclose(pipe);
+    std::istringstream stream(output);
+    std::string line1;
+    std::getline(stream, line1);
+    CHECK(line1 == "-178");
+}
+
+TEST_CASE("TestCodeGen3") {
+    const auto code = R"(
+    main() {
+        a = 5
+        if a > 5 {
+            print(false)
+        } else {
+            print(true)
+        }
+        if a < 5 {
+            print(true)
+        } else {
+            print(false)
+        }
+    }
+    )";
+    fs::path execPath = "";
+    {
+        LgsApp app;
+        app.lgsCode[LGS_MAIN_FILE] = code;
+        app.compile();
+        execPath = app.paths.execFilePath;
+    }
+    const auto pipe = popen(execPath.c_str(), "r");
+    assert(pipe);
+    std::string output;
+    char buffer[64];
+    while (fgets(buffer, sizeof(buffer), pipe)) {
+        output += buffer;
+    }
+    pclose(pipe);
+    std::istringstream stream(output);
+    std::string line1, line2;
+    std::getline(stream, line1);
+    std::getline(stream, line2);
+    CHECK(line1 == "true");
+    CHECK(line2 == "false");
 }

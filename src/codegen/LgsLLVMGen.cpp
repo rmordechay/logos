@@ -52,18 +52,15 @@ void LgsLLVMGen::loop(Value* loopLength, const std::function<void(Value*, BasicB
 }
 
 Value* LgsLLVMGen::getIRStr(const std::string& value) {
-    const auto str = stringCache.find(value);
-    if (str != stringCache.end()) return str->second;
+    for (auto& globals : IRModule->globals()) {
+        if (!globals.hasInitializer()) continue;
+        const auto dataArray = llvm::dyn_cast<llvm::ConstantDataArray>(globals.getInitializer());
+        if (!dataArray || !dataArray->isCString() || dataArray->getAsCString() != value) continue;
+        return &globals;
+    }
     const auto strConstant = llvm::ConstantDataArray::getString(context, value, true);
-    const auto globalVar = new GlobalVariable(
-        *IRModule,
-        strConstant->getType(),
-        true,
-        GlobalValue::PrivateLinkage,
-        strConstant
-    );
+    const auto globalVar = new GlobalVariable(*IRModule, strConstant->getType(), true, GlobalValue::PrivateLinkage, strConstant);
     globalVar->setUnnamedAddr(GlobalValue::UnnamedAddr::Global);
-    stringCache[value] = globalVar;
     return globalVar;
 }
 
@@ -153,7 +150,7 @@ Value* LgsLLVMGen::callLgsFunc(const std::string& funcName, Type* rt, const std:
 }
 
 Value* LgsLLVMGen::callHash(Value* v) {
-    return callLgsFunc("hash", i32Ty(), {ptrTy()}, {v});
+    return callLgsFunc("hash", sizeTy(), {ptrTy()}, {v});
 }
 
 Value* LgsLLVMGen::callPrintf(const std::vector<Value*>& args) {
@@ -192,22 +189,22 @@ Value* LgsLLVMGen::callMalloc(Value* size, const bool isOwner, const Lgs_rttype 
 
 void LgsLLVMGen::callStackPush(const bool hasDefers, const bool needsCleanup) {
     if (needsCleanup || hasDefers) {
-        callLgsFunc("stack_push", voidTy());
+        callLgsFunc("Stack_push", voidTy());
     }
 }
 
 void LgsLLVMGen::callPopStack(const bool hasDefers, const bool needsCleanup) {
     if (needsCleanup || hasDefers) {
-        callLgsFunc("stack_pop", voidTy(), {i1Ty()}, {i1(needsCleanup)});
+        callLgsFunc("Stack_pop", voidTy(), {i1Ty()}, {i1(needsCleanup)});
     }
 }
 
 void LgsLLVMGen::callAddToVTable(Value* instance, Value* key, Value* ptr) {
-    callLgsFunc("vtable_add", voidTy(), {ptrTy(), ptrTy(), ptrTy()}, {instance, key, ptr});
+    callLgsFunc("VTable_add", voidTy(), {ptrTy(), ptrTy(), ptrTy()}, {instance, key, ptr});
 }
 
 Value* LgsLLVMGen::callGetFromVTable(Value* instance, Value* key) {
-    return callLgsFunc("vtable_get", ptrTy(), {ptrTy(), ptrTy()}, {instance, key});
+    return callLgsFunc("VTable_get", ptrTy(), {ptrTy(), ptrTy()}, {instance, key});
 }
 
 void LgsLLVMGen::addNullTerminate(Value* strPtr, Value* pos) {
@@ -215,8 +212,8 @@ void LgsLLVMGen::addNullTerminate(Value* strPtr, Value* pos) {
 }
 
 void LgsLLVMGen::addHeap(const bool isOwner, const Lgs_rttype type, Value* ptr) {
-    if (isOwner) callLgsFunc("stack_addOwner", voidTy(), {ptrTy(), i32Ty()}, {ptr, i32(type)});
-    else callLgsFunc("stack_addOrphan", voidTy(), {ptrTy(), i32Ty()}, {ptr, i32(type)});
+    if (isOwner) callLgsFunc("Stack_addOwner", voidTy(), {ptrTy(), i32Ty()}, {ptr, i32(type)});
+    else callLgsFunc("Stack_addOrphan", voidTy(), {ptrTy(), i32Ty()}, {ptr, i32(type)});
 }
 
 Type* LgsLLVMGen::i1Ty() {

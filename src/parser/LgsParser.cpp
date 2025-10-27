@@ -51,6 +51,8 @@
 #include "types/primitives/LgsSize.h"
 #include "types/primitives/LgsUInt.h"
 
+#include <iostream>
+
 #define MAX_TOKENS_NUMBER 10000
 
 bool LgsParser::lex() {

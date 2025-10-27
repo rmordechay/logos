@@ -2,6 +2,8 @@
 #include "data/LgsCliErrors.h"
 #include "parser/LgsJsonParser.h"
 
+#include <iostream>
+
 struct LgsCliCmdHelp;
 
 void LgsAstCmd::run() {

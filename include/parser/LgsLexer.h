@@ -2,6 +2,8 @@
 #include "../data/LgsTokens.h"
 #include "utils/LgsErrHandler.h"
 
+namespace fs = std::filesystem;
+
 class LgsLexer {
 public:
     size_t fileID;

@@ -53,6 +53,8 @@
 #include <llvm/Passes/PassBuilder.h>
 #include "llvm/Bitcode/BitcodeWriter.h"
 
+#include <iostream>
+
 std::atomic<size_t> LgsCodeGen::namesCounter{0};
 #define GENERATE_OBJ_CMD_STRING "llc -filetype=obj -o %s %s.bc"
 
@@ -123,7 +125,7 @@ void LgsCodeGen::visitMainFunc(LgsMainFunc* func) {
     initMainArgs(func);
     visitStmtsBlock(func->stmtsBlock);
     createEpilogue(func);
-    cg.callLgsFunc("runtime_close", cg.voidTy());
+    cg.callLgsFunc("Runtime_close", cg.voidTy());
     cg.builder.CreateRet(cg.i32(EXIT_SUCCESS));
     stack.exitScope();
 }
@@ -216,7 +218,6 @@ void LgsCodeGen::visitLoop(LgsForLoop* loop) {
         assert(0);
     }
     visitStmtsBlock(loop->stmtsBlock);
-    if (stack.inCoroutine()) yield();
     loop->incAndJumpToCond(cg);
     cg.startBlock(loop->IRExitBlock);
     stack.exitScope();
@@ -446,23 +447,28 @@ void LgsCodeGen::visitSwitch(LgsSwitch* pm) {
     const auto defaultBlock = cg.createBlock(BLOCK_NAME_ELSE);
     const auto exitBlock = cg.createBlock(BLOCK_NAME_EXIT_PATTERN);
     visitExpr(pm->cond);
-    const auto exprIRValue = pm->cond->hash(cg);
+
+    Value* exprIRValue;
+    if (pm->cond->type->asStr()) {
+        exprIRValue = cg.callHash(pm->cond->IRValue);
+    } else {
+        exprIRValue = pm->cond->IRValue;
+    }
+
     llvm::SwitchInst* switchInst;
     if (pm->elseBlock) {
-        const auto numOfCases = pm->patterns.size() + !!pm->elseBlock;
+        const auto numOfCases = pm->patterns.size();
         switchInst = cg.builder.CreateSwitch(exprIRValue, defaultBlock, numOfCases);
     } else {
         switchInst = cg.builder.CreateSwitch(exprIRValue, exitBlock, pm->patterns.size());
     }
 
-    std::vector<BasicBlock*> blocks;
     for (size_t i = 0; i < pm->patterns.size(); ++i) {
         stack.enterScope(pm);
         const auto [expr, stmtsBlock] = pm->patterns[i];
         visitExpr(expr);
-        const auto patterIRValue = expr->hash(cg);
         const auto patternBlock = cg.createBlock(BLOCK_NAME_CASE_PREFIX + std::to_string(i), currentIRFunc);
-        switchInst->addCase(llvm::dyn_cast<ConstantInt>(patterIRValue), patternBlock);
+        switchInst->addCase(llvm::dyn_cast<ConstantInt>(expr->hash(cg)), patternBlock);
         cg.startBlock(patternBlock);
         visitStmtsBlock(stmtsBlock);
         cg.builder.CreateBr(exitBlock);
@@ -524,7 +530,7 @@ void LgsCodeGen::visitCoroutine(const LgsCoroutine* coroutine) {
     const auto ctxTy = getThunkCtxType(fc);
     const auto ctx = getThunkCtx(fc, ctxTy);
     const auto func = getThunkFunc(fc, ctxTy);
-    cg.callLgsFunc("stack_addCoro", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {func, ctx});
+    cg.callLgsFunc("Stack_addCoro", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {func, ctx});
 }
 
 void LgsCodeGen::visitDeferStmt(const LgsDeferStmt* deferStmt) {
@@ -542,7 +548,7 @@ void LgsCodeGen::visitDeferStmt(const LgsDeferStmt* deferStmt) {
     const auto ctxTy = getThunkCtxType(fc);
     const auto ctx = getThunkCtx(fc, ctxTy);
     const auto func = getThunkFunc(fc, ctxTy);
-    cg.callLgsFunc("stack_addDefer", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {func, ctx});
+    cg.callLgsFunc("Stack_addDefer", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {func, ctx});
 }
 
 void LgsCodeGen::visitIOStmt(const LgsIOStmt* ioStmt) {
@@ -1084,16 +1090,6 @@ bool LgsCodeGen::checkMock(LgsExpr* expr) {
     return false;
 }
 
-void LgsCodeGen::yield() const {
-    const auto doYieldBlock = cg.createBlock("do_yield_block");
-    const auto continueBlock = cg.createBlock("continue_block");
-    const auto shouldYield = cg.callLgsFunc("scheduler_shouldYield", cg.i1Ty());
-    cg.builder.CreateCondBr(shouldYield, doYieldBlock, continueBlock);
-    cg.startBlock(doYieldBlock);
-    cg.callLgsFunc("scheduler_yield", cg.voidTy());
-    cg.branchAndStartBlock(continueBlock);
-}
-
 void LgsCodeGen::createPrologue(LgsFunc* func) {
     if (func->isTest) for (auto [_, then] : func->mocks) visitExpr(then);
     if (appConfigs.debugMode) func->setDebugValue(cg);
@@ -1101,7 +1097,7 @@ void LgsCodeGen::createPrologue(LgsFunc* func) {
     const auto entryBlock = cg.createBlock(BLOCK_NAME_ENTRY, currentIRFunc);
     cg.builder.SetInsertPoint(entryBlock);
     if (func->funcType->name == LGS_MAIN_FUNC) {
-        cg.callLgsFunc("runtime_init", cg.voidTy());
+        // cg.callLgsFunc("Runtime_init", cg.voidTy());
     }
     cg.callStackPush(func->hasDefers, func->needsCleanup());
 }
@@ -1113,7 +1109,7 @@ void LgsCodeGen::createEpilogue(LgsFunc* func) {
         return;
     }
     cg.branchAndStartBlock(func->getCleanupBlock(cg));
-    if (func->hasDefers) cg.callLgsFunc("stack_callDefers", cg.voidTy());
+    if (func->hasDefers) cg.callLgsFunc("Stack_callDefers", cg.voidTy());
     currentIRFunc = nullptr;
 
     if (needsCleanup) {
@@ -1250,7 +1246,7 @@ void LgsCodeGen::setDynamicArray(LgsArrayExpr* arrayExpr) {
     const auto size = arr->baseType->getSizeBytes();
     if (!arrayExpr->IRValue) {
         const auto rtt = arr->baseType->getRTType();
-        arrayExpr->IRValue = cg.callLgsFunc("darray_init", cg.ptrTy(), {cg.sizeTy(), cg.sizeTy()}, {cg.i64(size), cg.usize(rtt)});
+        arrayExpr->IRValue = cg.callLgsFunc("DArray_init", cg.ptrTy(), {cg.sizeTy(), cg.sizeTy()}, {cg.i64(size), cg.usize(rtt)});
         cg.addHeap(arrayExpr->owner, rtt, arrayExpr->IRValue);
     }
     for (size_t i = 0; i < arrayExpr->elements.size(); ++i) {
@@ -1433,8 +1429,10 @@ void LgsCodeGen::writeIRModule() const {
     if (verifyModule(*cg.IRModule, &llvm::errs())) return;
 
     // Print IR to file
+    auto moduleName = cg.IRModule->getName().str();
     if (lgsConfigs.writeIRFiles) {
-        const auto filePath = (paths.buildDirIR / cg.IRModule->getName().str()).string() + ".ll";
+        const auto filePath = (paths.buildDirIR / moduleName).string() + ".ll";
+        if (fs::exists(filePath)) fs::remove(filePath);
         std::error_code EC;
         raw_fd_ostream textFile(filePath, EC, llvm::sys::fs::OF_None);
         cg.IRModule->print(textFile, nullptr);
@@ -1452,12 +1450,14 @@ void LgsCodeGen::writeIRModule() const {
     builder.registerCGSCCAnalyses(CGAnalyser);
     builder.crossRegisterProxies(loopAnalyser, funcAnalyser, CGAnalyser, analysisManager);
 
-    llvm::ModulePassManager passManager = builder.buildPerModuleDefaultPipeline(cg.getOptLevel(appConfigs.optLevel));
+    const auto optLevel = cg.getOptLevel(appConfigs.optLevel);
+    auto passManager = builder.buildPerModuleDefaultPipeline(optLevel);
     passManager.run(*cg.IRModule, analysisManager);
 
     // Create bc file
     std::error_code ec;
-    const std::string outputPath = paths.buildDirObjs / (file.absPath.stem().string() + ".o");
+    const std::string outputPath = paths.buildDirObjs / (moduleName + ".o");
+    if (fs::exists(outputPath)) fs::remove(outputPath);
     raw_fd_ostream bitcodeStream(outputPath + ".bc", ec, llvm::sys::fs::OF_None);
     assert(!ec);
     llvm::WriteBitcodeToFile(*cg.IRModule, bitcodeStream);

@@ -1,7 +1,10 @@
-#include "Lgs_stack.h"
-#include "Lgs_darray.h"
-#include "Lgs_set.h"
-#include "Lgs_hashmap.h"
+#include "Lgs_Stack.h"
+#include "Lgs_DArray.h"
+#include "Lgs_Set.h"
+#include "Lgs_Map.h"
+
+#include <cassert>
+#include <iostream>
 
 #define PRINT_MEMORY false
 
@@ -48,18 +51,18 @@ static void freeType(void* ptr, const Lgs_rttype type) {
         break;
     }
     case RTT_DARRAY: {
-        const auto arr = static_cast<Lgs_darray*>(ptr);
+        const auto arr = static_cast<Lgs_DArray*>(ptr);
         free(arr->data);
         break;
     }
     case RTT_SET: {
-        const auto arr = static_cast<Lgs_set*>(ptr);
+        const auto arr = static_cast<Lgs_Set*>(ptr);
         delete arr->data;
         std::free(arr);
         break;
     }
     case RTT_MAP: {
-        const auto map = static_cast<Lgs_hashmap*>(ptr);
+        const auto map = static_cast<Lgs_Map*>(ptr);
         delete map->data;
         std::free(map);
         break;
@@ -69,39 +72,39 @@ static void freeType(void* ptr, const Lgs_rttype type) {
     }
 }
 
-void Lgs_stack::push() {
+void Lgs_Stack::push() {
     stackIndex++;
 }
 
-void Lgs_stack::pop(const bool cleanup) {
+void Lgs_Stack::pop(const bool cleanup) {
     if (cleanup) funcCleanup();
     stackIndex--;
 }
 
-void Lgs_stack::addDefer(void* funcPtr, void* ctx) {
-    const auto deferFunc = reinterpret_cast<Lgs_Defer_Func>(funcPtr);
-    const Lgs_Thunk_Func func_entry{deferFunc, ctx};
+void Lgs_Stack::addDefer(void* funcPtr, void* ctx) {
+    const auto deferFunc = reinterpret_cast<Lgs_DeferFunc>(funcPtr);
+    const Lgs_ThunkFunc func_entry{deferFunc, ctx};
     const auto deferIndex = frames[stackIndex].defersCount++;
     frames[stackIndex].defers[deferIndex] = func_entry;
 }
 
-void Lgs_stack::addOwner(void* ptr, const Lgs_rttype type) {
+void Lgs_Stack::addOwner(void* ptr, const Lgs_rttype type) {
     if constexpr (PRINT_MEMORY) {
         std::cout << "alloc owner " << getTypeName(type) << ": " << ptr << std::endl;
     }
     const auto ownerIndex = frames[stackIndex].ownersCount++;
-    frames[stackIndex].owners[ownerIndex] = Lgs_alloc{ptr, type};
+    frames[stackIndex].owners[ownerIndex] = Lgs_Alloc{ptr, type};
 }
 
-void Lgs_stack::addOrphan(void* ptr, const Lgs_rttype type) {
+void Lgs_Stack::addOrphan(void* ptr, const Lgs_rttype type) {
     if constexpr (PRINT_MEMORY) {
         std::cout << "alloc orphan " << getTypeName(type) << ": " << ptr << std::endl;
     }
     const auto ownerIndex = frames[stackIndex].orphansCount++;
-    frames[stackIndex].orphans[ownerIndex] = Lgs_alloc{ptr, type};
+    frames[stackIndex].orphans[ownerIndex] = Lgs_Alloc{ptr, type};
 }
 
-void Lgs_stack::removeOwner(const void* owner) {
+void Lgs_Stack::removeOwner(const void* owner) {
     if constexpr (PRINT_MEMORY) {
         std::cout << "removing owner: " << owner << std::endl;
     }
@@ -117,7 +120,7 @@ void Lgs_stack::removeOwner(const void* owner) {
     }
 }
 
-void Lgs_stack::funcCleanup() {
+void Lgs_Stack::funcCleanup() {
     auto& stackFrame = frames[stackIndex];
     if (stackFrame.ownersCount > 0) {
         if constexpr (PRINT_MEMORY) {
@@ -139,7 +142,7 @@ void Lgs_stack::funcCleanup() {
     }
 }
 
-void Lgs_stack::callDefers() const {
+void Lgs_Stack::callDefers() const {
     const auto& top = frames[stackIndex];
     for (size_t i = 0; i < LOCALS_CAPACITY; ++i) {
         const auto [func, ctx] = top.defers[i];

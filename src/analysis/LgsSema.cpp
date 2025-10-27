@@ -48,6 +48,8 @@
 #include "stmts/LgsSwitch.h"
 #include "types/primitives/LgsDouble.h"
 
+#include <unordered_set>
+
 void LgsSema::analyse() {
     if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
         visitMainFile(mainFile);

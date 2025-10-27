@@ -1,7 +1,10 @@
 #pragma once
 #include "Lgs_types.h"
 
-struct Lgs_hashmap {
+#include <unordered_map>
+#include <vector>
+
+struct Lgs_Map {
     size_t valueSize;
     Lgs_rttype keyType;
     Lgs_rttype valueType;

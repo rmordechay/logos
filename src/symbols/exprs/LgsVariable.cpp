@@ -5,7 +5,6 @@
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
 #include "utils/LgsUtils.h"
-
 #include <codegen/LgsLLVMGen.h>
 
 Value* LgsVariable::loadIR(LgsLLVMGen& cg) {
@@ -72,12 +71,12 @@ void LgsVariable::assign(LgsLLVMGen& cg, LgsExpr* expr) {
 Value* LgsVariable::hash(LgsLLVMGen& cg) {
     switch (ref.symbolType) {
     case PARAM:
-        return cg.callLgsFunc("hash", cg.i32Ty(), {cg.ptrTy()}, {ref.param->IRValue});
+        return cg.callLgsFunc("hash", cg.sizeTy(), {cg.ptrTy()}, {ref.param->IRValue});
     case VAR_DEC:
         return ref.varDec->expr->hash(cg);
     case FIELD:
-        if (type->asEnum()) return cg.i32(hashStr(ref.field->name.c_str()));
-        return cg.callLgsFunc("hash", cg.i32Ty(), {cg.ptrTy()}, {ref.field->IRValue});
+        if (type->asEnum()) return cg.usize(hashStr(ref.field->name.c_str()));
+        return cg.callLgsFunc("hash", cg.sizeTy(), {cg.ptrTy()}, {ref.field->IRValue});
     default:
         assert(0);
     }

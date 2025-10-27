@@ -34,7 +34,6 @@ public:
     IRBuilder<> builder = IRBuilder(context);
     std::map<std::string, Type*> typesRegistry;
     std::unordered_map<std::string, Value*> stringsRegistry;
-    std::unordered_map<std::string, GlobalVariable*> stringCache;
 
     void setupModule(const LgsFile& file, bool debugMode = false);
     void loop(Value* loopLength, const std::function<void(Value*, BasicBlock*)>& body);

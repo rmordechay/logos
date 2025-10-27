@@ -4,12 +4,22 @@ project(logos VERSION 0.0.1)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_definitions(-DLOGOS_VERSION="${CMAKE_PROJECT_VERSION}")
+find_program(LLVM_CONFIG_EXECUTABLE NAMES llvm-config llvm-config-19)
 
-find_package(LLVM REQUIRED CONFIG)
-find_package(Clang REQUIRED CONFIG)
-set(LLVM_LINK_LLVM_DYLIB ON)
-set(CLANG_LINK_CLANG_DYLIB ON)
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+execute_process(
+    COMMAND ${LLVM_CONFIG_EXECUTABLE} --includedir
+    OUTPUT_VARIABLE LLVM_INCLUDE_DIRS
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+execute_process(
+    COMMAND ${LLVM_CONFIG_EXECUTABLE} --libdir
+    OUTPUT_VARIABLE LLVM_LIBRARY_DIRS
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+message("LLVM include include: ${LLVM_INCLUDE_DIRS}")
+message("LLVM include lib: ${LLVM_LIBRARY_DIRS}")
 
 find_program(CCACHE_PROGRAM ccache)
 if (CCACHE_PROGRAM)
@@ -134,21 +144,24 @@ set(CORE_SOURCES
 )
 
 set(RUNTIME_SOURCES
-    ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_hashmap.cpp
-    ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_darray.cpp
-    ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_system.cpp
-    ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_runtime.cpp
-    ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_stack.cpp
-    ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_print.cpp
-    ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_arena.cpp
-    ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_set.cpp
+    ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_Map.cpp
+    ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_DArray.cpp
+    ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_System.cpp
+    ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_Runtime.cpp
+    ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_Stack.cpp
+    ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_Print.cpp
+    ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_Arena.cpp
+    ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_Set.cpp
 )
 
 add_library(lgs_lib SHARED ${CORE_SOURCES} ${RUNTIME_SOURCES})
 set_target_properties(lgs_lib PROPERTIES OUTPUT_NAME "lgs")
-target_link_libraries(lgs_lib PUBLIC LLVM clang-cpp)
+target_link_libraries(lgs_lib PUBLIC
+    -L${LLVM_LIBRARY_DIRS}
+    -lLLVM-19
+    -lclang-cpp
+)
 
-target_precompile_headers(lgs_lib PRIVATE include/pch.h)
 target_compile_options(lgs_lib PRIVATE
     -Wall
     -Wextra
@@ -163,10 +176,7 @@ target_include_directories(lgs_lib PUBLIC
     ${CMAKE_SOURCE_DIR}/runtime/include
 )
 
-target_include_directories(lgs_lib SYSTEM PUBLIC
-    ${LLVM_INCLUDE_DIRS}
-    ${CLANG_INCLUDE_DIRS}
-)
+target_include_directories(lgs_lib SYSTEM PUBLIC ${LLVM_INCLUDE_DIRS})
 
 add_executable(lgs main.cpp)
 target_link_libraries(lgs PRIVATE lgs_lib)

@@ -69,6 +69,61 @@ Value* LgsBool::lshiftIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     return cg.builder.CreateLShr(self->loadIR(cg), other->loadIR(cg));
 }
 
+Value* LgsBool::eqIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    return cg.builder.CreateICmpEQ(self->loadIR(cg), other->loadIR(cg));
+}
+
+Value* LgsBool::neIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    return cg.builder.CreateICmpNE(self->loadIR(cg), other->loadIR(cg));
+}
+
+Value* LgsBool::ltIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    return cg.builder.CreateICmpSLT(self->loadIR(cg), other->loadIR(cg));
+}
+
+Value* LgsBool::gtIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    return cg.builder.CreateICmpSGT(self->loadIR(cg), other->loadIR(cg));
+}
+
+Value* LgsBool::geIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    return cg.builder.CreateICmpSGE(self->loadIR(cg), other->loadIR(cg));
+}
+
+Value* LgsBool::leIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    return cg.builder.CreateICmpSLE(self->loadIR(cg), other->loadIR(cg));
+}
+
+Value* LgsBool::andIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    const auto currentBlock = cg.builder.GetInsertBlock();
+    const auto func = currentBlock->getParent();
+    const auto rightBlock = cg.createBlock("and_right", func);
+    const auto endBlock = cg.createBlock("and_end", func);
+    cg.builder.CreateCondBr(other->IRValue, rightBlock, endBlock);
+    cg.builder.SetInsertPoint(rightBlock);
+    cg.builder.CreateBr(endBlock);
+    cg.builder.SetInsertPoint(endBlock);
+    auto* phi = cg.builder.CreatePHI(cg.builder.getInt1Ty(), 2);
+    phi->addIncoming(cg.false_(), currentBlock);
+    phi->addIncoming(other->IRValue, rightBlock);
+    return phi;
+}
+
+Value* LgsBool::orIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    const auto currentBlock = cg.builder.GetInsertBlock();
+    const auto func = currentBlock->getParent();
+    const auto rightBlock = cg.createBlock("or_right", func);
+    const auto endBlock = cg.createBlock("or_end", func);
+    cg.builder.CreateCondBr(self->IRValue, endBlock, rightBlock);
+    cg.builder.SetInsertPoint(rightBlock);
+    cg.builder.CreateBr(endBlock);
+    cg.builder.SetInsertPoint(endBlock);
+    auto* phi = cg.builder.CreatePHI(cg.builder.getInt1Ty(), 2);
+    phi->addIncoming(cg.true_(), currentBlock);
+    phi->addIncoming(other->IRValue, rightBlock);
+    return phi;
+}
+
+
 std::string LgsBool::getName() {
     return name;
 }

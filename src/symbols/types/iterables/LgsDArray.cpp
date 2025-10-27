@@ -1,5 +1,5 @@
 #include "types/iterables/LgsDArray.h"
-#include "Lgs_darray.h"
+#include "Lgs_DArray.h"
 #include "codegen/LgsLLVMGen.h"
 #include "exprs/LgsArrayExpr.h"
 #include "funcs/LgsFunc.h"
@@ -38,7 +38,7 @@ std::string LgsDArray::pname() {
 }
 
 size_t LgsDArray::getSizeBytes() {
-    return sizeof(Lgs_darray);
+    return sizeof(Lgs_DArray);
 }
 
 LgsExpr* LgsDArray::getZeroValue() {

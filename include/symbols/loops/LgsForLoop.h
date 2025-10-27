@@ -16,7 +16,7 @@ class LgsStmtsBlock;
 class LgsForLoop : public LgsStmt {
 public:
     std::vector<LgsVarDec*> loopVars;
-    std::map<LgsLoopMetaVarType, LgsLoopMetaVar*> metaVars;
+    std::unordered_map<LgsLoopMetaVarType, LgsLoopMetaVar*> metaVars;
     llvm::AllocaInst* iPtr = nullptr;
     Value* iValue = nullptr;
 

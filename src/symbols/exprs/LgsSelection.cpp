@@ -5,6 +5,8 @@
 #include "types/LgsInterface.h"
 #include "types/iterables/LgsVec.h"
 
+#include <sstream>
+
 Value* LgsSelection::loadIR(LgsLLVMGen& cg) {
     assert(0);
 }

@@ -23,6 +23,14 @@ public:
     Value* bitXorIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
     Value* rshiftIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
     Value* lshiftIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
+    Value* eqIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
+    Value* neIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
+    Value* ltIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
+    Value* gtIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
+    Value* geIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
+    Value* leIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
+    Value* andIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
+    Value* orIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
     std::string getName() override;
     LgsExpr* getZeroValue() override;
     Lgs_rttype getRTType() override;

@@ -1,5 +1,5 @@
 #include "types/iterables/LgsMap.h"
-#include "Lgs_hashmap.h"
+#include "Lgs_Map.h"
 #include "data/LgsDefinitions.h"
 #include "exprs/LgsHashMap.h"
 #include "exprs/LgsIterIndex.h"
@@ -25,7 +25,7 @@ std::string LgsMap::pname() {
 }
 
 size_t LgsMap::getSizeBytes() {
-    return sizeof(Lgs_hashmap);
+    return sizeof(Lgs_Map);
 }
 
 LgsExpr* LgsMap::getZeroValue() {
@@ -58,10 +58,10 @@ bool LgsMap::unpackLoopVarsTypes(LgsForeachLoop* loop) const {
 }
 
 void LgsMap::unpackLoopIR(LgsLLVMGen& cg, LgsForeachLoop* loop) const {
-    const auto keyPtr = cg.callLgsFunc("Map_getKeyAt", cg.ptrTy(), {cg.ptrTy(), cg.sizeTy()}, {loop->iterExpr->IRValue, loop->iValue});
+    const auto keyPtr = cg.callLgsFunc("Hashmap_getKeyAt", cg.ptrTy(), {cg.ptrTy(), cg.sizeTy()}, {loop->iterExpr->IRValue, loop->iValue});
     loop->loopVars[0]->IRValue = keyPtr;
     if (loop->loopVars.size() == 2) {
-        const auto valuePtr = cg.callLgsFunc("Map_getValueAt", cg.ptrTy(), {cg.ptrTy(), cg.sizeTy()}, {loop->iterExpr->IRValue, loop->iValue});
+        const auto valuePtr = cg.callLgsFunc("Hashmap_getValueAt", cg.ptrTy(), {cg.ptrTy(), cg.sizeTy()}, {loop->iterExpr->IRValue, loop->iValue});
         loop->loopVars[1]->IRValue = valuePtr;
     }
 }

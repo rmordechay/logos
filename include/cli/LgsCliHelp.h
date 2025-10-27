@@ -1,5 +1,6 @@
 #pragma once
-#include "pch.h"
+#include <string>
+#include <vector>
 
 struct LgsCliCmdArgHelp {
     std::string name = "";

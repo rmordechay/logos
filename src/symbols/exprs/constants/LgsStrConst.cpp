@@ -32,7 +32,7 @@ std::string LgsStrConst::asText() {
 }
 
 Value* LgsStrConst::hash(LgsLLVMGen& cg) {
-    return cg.i32(hashStr(value.c_str()));
+    return cg.usize(hashStr(value.c_str()));
 }
 
 LgsStrConst::~LgsStrConst() {

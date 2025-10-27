@@ -10,7 +10,7 @@ class LgsPair;
 
 class LgsMap final : public LgsIterable {
 public:
-    static constexpr auto name = "map";
+    static constexpr auto name = "Map";
     LgsTypePair* typePair = nullptr;
 
     explicit LgsMap(LgsType* keyType = nullptr, LgsType* valueType = nullptr) {

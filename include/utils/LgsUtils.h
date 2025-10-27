@@ -1,4 +1,5 @@
 #pragma once
+#include <filesystem>
 
 class LgsStmt;
 struct LgsFileMetadata;
@@ -11,6 +12,7 @@ class LgsFile;
 class LgsErrHandler;
 struct LgsLocation;
 class LgsType;
+namespace fs = std::filesystem;
 
 #define EXPECTED_ERR(E, code) "Expected error: '" << std::string(E.msg) << "'" << std::string(code)
 #define HASH_VECTOR(vec, hash) for (const auto e : vec) e->hashNode(hash)

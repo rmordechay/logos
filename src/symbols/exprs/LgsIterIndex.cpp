@@ -7,6 +7,7 @@
 #include "types/iterables/LgsVec.h"
 #include "utils/LgsUtils.h"
 
+#include <sstream>
 #include <llvm/IR/Module.h>
 
 Value* LgsIterIndex::loadIR(LgsLLVMGen& cg) {

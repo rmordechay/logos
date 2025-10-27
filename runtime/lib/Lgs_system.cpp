@@ -1,4 +1,6 @@
+#include <cstdlib>
 #include <stdlib.h>
+#include <thread>
 
 extern "C" const char* Lgs_System_getEnv(const char* key, const char* defaultKey) {
     const auto env = std::getenv(key);

@@ -1,5 +1,7 @@
 #include "parser/LgsLexer.h"
 
+#include <cassert>
+
 std::vector<LgsToken> LgsLexer::tokenize() {
     if (source.empty()) return {};
     currentChar = source[0];

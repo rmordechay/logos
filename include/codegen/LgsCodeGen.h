@@ -126,7 +126,6 @@ public:
     void setNullableValue(LgsExpr* expr);
     void resolveVirtuals(const LgsInstance* instance) const;
     bool checkMock(LgsExpr* expr);
-    void yield() const;
 
     // Funcs
     void createPrologue(LgsFunc* func);

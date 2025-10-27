@@ -8,6 +8,8 @@
 #include "types/LgsSubType.h"
 #include "types/LgsGeneric.h"
 #include "utils/LgsUtils.h"
+
+#include <sstream>
 #include <llvm/IR/Module.h>
 
 LgsFunc* LgsObject::getMethod(const std::string& methodName) {

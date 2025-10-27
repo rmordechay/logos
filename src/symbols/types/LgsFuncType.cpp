@@ -3,6 +3,8 @@
 #include "codegen/LgsLLVMGen.h"
 #include "utils/LgsUtils.h"
 
+#include <sstream>
+
 void LgsFuncType::setFuncOptions(const uint32_t ops) {
     isPublic = ops & PUBLIC;
     isBuiltin = ops & BUILTIN;

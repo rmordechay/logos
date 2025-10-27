@@ -7,6 +7,8 @@
 #include "types/LgsObject.h"
 #include "utils/LgsUtils.h"
 
+#include <sstream>
+
 Value* LgsFuncCall::loadIR(LgsLLVMGen& cg) {
     return IRValue;
 }

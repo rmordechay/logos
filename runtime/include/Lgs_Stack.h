@@ -1,32 +1,32 @@
 #pragma once
-#include "Lgs_stack.h"
+#include "Lgs_Stack.h"
 #include "Lgs_types.h"
 #include "data/LgsConfigs.h"
+#include <cstddef>
+typedef void (*Lgs_DeferFunc)(void*);
 
-typedef void (*Lgs_Defer_Func)(void*);
-
-struct Lgs_Thunk_Func {
-    Lgs_Defer_Func func;
+struct Lgs_ThunkFunc {
+    Lgs_DeferFunc func;
     void* ctx;
 };
 
-struct Lgs_alloc {
+struct Lgs_Alloc {
     void* ptr;
     Lgs_rttype type;
 };
 
-struct Lgs_stack_frame {
-    Lgs_alloc owners[LOCALS_CAPACITY];
-    Lgs_alloc orphans[LOCALS_CAPACITY];
-    Lgs_Thunk_Func defers[LOCALS_CAPACITY];
+struct Lgs_StackFrame {
+    Lgs_Alloc owners[LOCALS_CAPACITY];
+    Lgs_Alloc orphans[LOCALS_CAPACITY];
+    Lgs_ThunkFunc defers[LOCALS_CAPACITY];
     size_t defersCount = 0;
     size_t ownersCount = 0;
     size_t orphansCount = 0;
 };
 
-struct Lgs_stack {
+struct Lgs_Stack {
     int stackIndex;
-    Lgs_stack_frame frames[STACK_CAPACITY];
+    Lgs_StackFrame frames[STACK_CAPACITY];
 
     void push();
     void pop(bool cleanup);

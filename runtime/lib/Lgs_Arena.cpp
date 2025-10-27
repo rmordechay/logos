@@ -1,11 +1,12 @@
 #define BLOCK_SIZE 1024*4
+#include <vector>
 
-class Lgd_arena {
-    std::size_t currentOffset = 0;
+class Lgd_Arena {
+public:
+    size_t currentOffset = 0;
     void* currentBlock = nullptr;
     std::vector<void*> blocks;
 
-public:
     void* allocate(const std::size_t size, const std::size_t align = alignof(std::max_align_t)) {
         auto offset = currentOffset + (align - 1) & ~(align - 1);
         if (!currentBlock || offset + size > BLOCK_SIZE) {
@@ -27,7 +28,7 @@ public:
         blocks.clear();
     }
 
-    ~Lgd_arena() {
+    ~Lgd_Arena() {
         reset();
     }
 };
