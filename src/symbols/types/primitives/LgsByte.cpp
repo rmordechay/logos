@@ -14,10 +14,10 @@ Type* LgsByte::getIRType(LgsLLVMGen& cg) {
     return cg.i8Ty();
 }
 
-LgsType* LgsByte::applyBinOp(const LgsBinOpType op, LgsType* other) {
-    const auto IRName = other->getName();
+LgsType* LgsByte::applyBinOp(LgsBinaryExpr* binExpr) {
+    const auto IRName = binExpr->right->type->getName();
     if (name != IRName) return nullptr;
-    if (op == ADD) return extendInt();
+    if (binExpr->op == ADD) return extendInt();
     return this;
 }
 

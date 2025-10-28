@@ -1,42 +1,16 @@
 #pragma once
+#include "data/LgsTokens.h"
 #include "exprs/LgsExpr.h"
-
-enum LgsBinOpType {
-    ADD,
-    SUB,
-    MUL,
-    DIV,
-    MODULO,
-    BIT_AND,
-    BIT_OR,
-    BIT_XOR,
-    LSHIFT,
-    RSHIFT,
-    EQ,
-    NE,
-    LT,
-    GT,
-    GE,
-    LE,
-    AND,
-    OR,
-    IN,
-    NOOP,
-};
-
-struct LgsBinOp {
-    LgsBinOpType opType;
-    std::string name;
-};
 
 class LgsBinaryExpr final : public LgsExpr {
 public:
     LgsExpr* left;
     LgsExpr* right;
     LgsExpr* results = nullptr;
-    LgsBinOp op = LgsBinOp{NOOP, ""};
+    LgsBinOpType op = NOOP;
+    std::string opText = "";
 
-    explicit LgsBinaryExpr(LgsExpr* left, LgsExpr* right, const LgsBinOp& op) : left(left), right(right), op(op) {}
+    LgsBinaryExpr(LgsExpr* left, LgsExpr* right, const LgsBinOp op) : left(left), right(right), op(op.opType), opText(op.text) {}
     Value* loadIR(LgsLLVMGen& cg) override;
     std::string asText() override;
     ~LgsBinaryExpr() override;

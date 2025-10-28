@@ -28,21 +28,6 @@ class LgsFloatConst;
 class LgsStrConst;
 class LgsTypeConst;
 
-enum LgsAssignType {
-    ASSIGN,
-    ASSIGN_ADD,
-    ASSIGN_SUB,
-    ASSIGN_MUL,
-    ASSIGN_DIV,
-    ASSIGN_MOD,
-    ASSIGN_AND,
-    ASSIGN_OR,
-    ASSIGN_XOR,
-    ASSIGN_LSHIFT,
-    ASSIGN_RSHIFT,
-    ASSIGN_UNKNOWN,
-};
-
 class LgsExpr : virtual public LgsStmt {
 public:
     LgsType* type = nullptr;

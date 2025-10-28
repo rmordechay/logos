@@ -14,11 +14,8 @@ Type* LgsBool::getIRType(LgsLLVMGen& cg) {
     return cg.i1Ty();
 }
 
-LgsType* LgsBool::applyBinOp(const LgsBinOpType op, LgsType* other) {
-    const auto IRName = other->getName();
-    if (name != IRName) return nullptr;
-    if (op == ADD) return extendInt();
-    return this;
+LgsType* LgsBool::applyBinOp(LgsBinaryExpr* binExpr) {
+    return applyIntBinOp(binExpr->op, binExpr->left->type);
 }
 
 Value* LgsBool::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {

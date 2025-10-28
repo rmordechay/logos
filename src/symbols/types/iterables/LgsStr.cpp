@@ -36,9 +36,10 @@ bool LgsStr::canCastTo(LgsType* other) {
     return name == other->getName();
 }
 
-LgsType* LgsStr::applyBinOp(const LgsBinOpType op, LgsType* other) {
+LgsType* LgsStr::applyBinOp(LgsBinaryExpr* binExpr) {
+    const auto other = binExpr->right->type;
     const auto IRName = other->getName();
-    switch (op) {
+    switch (binExpr->op) {
     case ADD: {
         if (other->isNumber() || name == IRName) {
             isHeapAlloc = true;

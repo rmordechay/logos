@@ -1078,9 +1078,11 @@ LgsExpr* LgsParser::parseExprWithPrecedence(const int minPrecedence) {
     auto left = parseUnary();
     if (!parsedOrReset(left, oldIndex)) return nullptr;
     while (true) {
-        const auto op = parseBinaryOp();
-        if (op.opType == NOOP) break;
-        const auto precedence = getBinOpPrecedence(op.opType);
+        auto const it = LGS_BINARY_OPS.find(currentToken.type);
+        if (it == LGS_BINARY_OPS.end()) break;
+        consume();
+        const auto& [opType, _] = it->second;
+        const auto precedence = getBinOpPrecedence(opType);
         if (precedence < minPrecedence) {
             currentToken = tokens[--currentIndex];
             break;
@@ -1090,7 +1092,7 @@ LgsExpr* LgsParser::parseExprWithPrecedence(const int minPrecedence) {
             addParsingError();
             return left;
         }
-        left = new LgsBinaryExpr(left, right, op);
+        left = new LgsBinaryExpr(left, right, it->second);
     }
     return left;
 }
@@ -1123,35 +1125,6 @@ LgsExpr* LgsParser::parseUnary() {
         expr->isNullable = true;
     }
     return expr;
-}
-
-LgsBinOp LgsParser::parseBinaryOp() {
-    LgsBinOp binOp{NOOP, ""};
-    switch (currentToken.type) {
-    case T_DOUBLE_EQUAL: binOp.opType = EQ; break;
-    case T_NOT_EQUAL: binOp.opType = NE; break;
-    case T_GE: binOp.opType = GE; break;
-    case T_LE: binOp.opType = LE; break;
-    case T_LANGLE: binOp.opType = LT; break;
-    case T_RANGLE: binOp.opType = GT; break;
-    case T_PLUS: binOp.opType = ADD; break;
-    case T_MINUS: binOp.opType = SUB; break;
-    case T_STAR: binOp.opType = MUL; break;
-    case T_SLASH: binOp.opType = DIV; break;
-    case T_PERCENT: binOp.opType = MODULO; break;
-    case T_AMPERSAND: binOp.opType = BIT_AND; break;
-    case T_PIPE: binOp.opType = BIT_OR; break;
-    case T_CARET: binOp.opType = BIT_XOR; break;
-    case T_DOUBLE_LANGLE: binOp.opType = LSHIFT; break;
-    case T_DOUBLE_RANGLE: binOp.opType = RSHIFT; break;
-    case T_IN: binOp.opType = IN; break;
-    default: break;
-    }
-    if (binOp.opType != NOOP) {
-        binOp.name = currentToken.lexeme;
-        consume();
-    }
-    return binOp;
 }
 
 LgsVariable* LgsParser::parseVariable() {

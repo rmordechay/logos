@@ -54,10 +54,10 @@ std::string LgsDArray::strFormatPart() const {
     return "%p";
 }
 
-LgsType* LgsDArray::applyBinOp(const LgsBinOpType op, LgsType* other) {
-    switch (op) {
+LgsType* LgsDArray::applyBinOp(LgsBinaryExpr* binExpr) {
+    switch (binExpr->op) {
     case IN: {
-        const auto otherIter = other->asIterable();
+        const auto otherIter = binExpr->right->type->asIterable();
         if (!otherIter) return nullptr;
         if (otherIter->getDimension() - 1 == getDimension()) return &LGS_BOOL;
         break;

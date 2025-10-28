@@ -1,5 +1,6 @@
 #pragma once
 #include "LgsStmt.h"
+#include "data/LgsTokens.h"
 #include "exprs/LgsExpr.h"
 
 class LgsArrayExpr;

@@ -15,7 +15,9 @@ public:
     LgsExpr* getZeroValue() override;
     Lgs_RTType getRTType() override;
     std::string strFormatPart() const override;
-    LgsType* applyBinOp(LgsBinOpType op, LgsType* other) override;
+    LgsType* applyBinOp(LgsBinaryExpr* binExpr) override;
+    Value* addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
+    Value* mulIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
     Value* inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
     Value* getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) override;
     Value* lengthIR(LgsLLVMGen& cg, Value* iterable) override;

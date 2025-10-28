@@ -36,10 +36,11 @@ bool LgsVec::canCastTo(LgsType* other) {
     return vectorDim == otherVec->vectorDim && baseType->canCastTo(otherVec->baseType);
 }
 
-LgsType* LgsVec::applyBinOp(const LgsBinOpType op, LgsType* other) {
+LgsType* LgsVec::applyBinOp(LgsBinaryExpr* binExpr) {
     const auto thisNme = getName();
+    const auto other = binExpr->right->type;
     const auto otherName = other->getName();
-    switch (op) {
+    switch (binExpr->op) {
     case ADD:
     case SUB:
     case DIV: {

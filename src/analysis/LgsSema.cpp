@@ -534,9 +534,9 @@ void LgsSema::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
     const auto ltype = l->type;
     const auto rtype = r->type;
     if (!ltype || !rtype) return;
-    const auto type = ltype->applyBinOp(binaryExpr->op.opType, rtype);
+    const auto type = ltype->applyBinOp(binaryExpr);
     if (!type) {
-        return errHandler.addError(E10076, &l->location, file->absPath, {binaryExpr->op.name, ltype->pname(), rtype->pname()});
+        return errHandler.addError(E10076, &l->location, file->absPath, {binaryExpr->opText, ltype->pname(), rtype->pname()});
     }
     binaryExpr->setType(type);
     if (binaryExpr->left->isValueKnown && binaryExpr->right->isValueKnown) {

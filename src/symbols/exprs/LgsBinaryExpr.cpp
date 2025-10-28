@@ -6,7 +6,7 @@ Value* LgsBinaryExpr::loadIR(LgsLLVMGen& cg) {
 }
 
 std::string LgsBinaryExpr::asText() {
-    return left->asText() + ' ' + op.name + ' ' + right->asText();
+    return left->asText() + ' ' + opText + ' ' + right->asText();
 }
 
 LgsBinaryExpr::~LgsBinaryExpr() {

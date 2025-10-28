@@ -102,6 +102,58 @@ enum LgsTokenType {
     T_UNKNOWN,
 };
 
+enum LgsBinOpType {
+    ADD,
+    SUB,
+    MUL,
+    DIV,
+    MODULO,
+    BIT_AND,
+    BIT_OR,
+    BIT_XOR,
+    LSHIFT,
+    RSHIFT,
+    EQ,
+    NE,
+    LT,
+    GT,
+    GE,
+    LE,
+    AND,
+    OR,
+    IN,
+    NOOP,
+};
+
+enum LgsAssignType {
+    ASSIGN,
+    ASSIGN_ADD,
+    ASSIGN_SUB,
+    ASSIGN_MUL,
+    ASSIGN_DIV,
+    ASSIGN_MOD,
+    ASSIGN_AND,
+    ASSIGN_OR,
+    ASSIGN_XOR,
+    ASSIGN_LSHIFT,
+    ASSIGN_RSHIFT,
+    ASSIGN_UNKNOWN,
+};
+
+struct LgsBinOp {
+    LgsBinOpType opType;
+    std::string text;
+};
+
+struct LgsToken {
+    LgsTokenType type = T_UNKNOWN;
+    std::string lexeme = "";
+    LgsLocation location;
+
+    LgsToken() = default;
+    LgsToken(const LgsTokenType type, const std::string& lexeme, const LgsLocation& location) : type(type), lexeme(lexeme), location(location) {}
+};
+
 const std::unordered_map<std::string, LgsTokenType> LGS_KEYWORDS = {
     {"type", T_TYPE},
     {"object", T_OBJECT},
@@ -145,15 +197,46 @@ const std::unordered_map<std::string, LgsTokenType> LGS_KEYWORDS = {
     {LGS_NULL_LITERAL, T_NULL}
 };
 
-struct LgsToken {
-    LgsTokenType type = T_UNKNOWN;
-    std::string lexeme = "";
-    LgsLocation location;
+const auto ADD_OP = LgsBinOp{ADD, "+"};
+const auto SUB_OP = LgsBinOp{SUB, "-"};
+const auto MUL_OP = LgsBinOp{MUL, "*"};
+const auto DIV_OP = LgsBinOp{DIV, "/"};
+const auto MODULO_OP = LgsBinOp{MODULO, "%"};
+const auto BIT_AND_OP = LgsBinOp{BIT_AND, "&"};
+const auto BIT_OR_OP = LgsBinOp{BIT_OR, "|"};
+const auto BIT_XOR_OP = LgsBinOp{BIT_XOR, "^"};
+const auto LSHIFT_OP = LgsBinOp{LSHIFT, "<<"};
+const auto RSHIFT_OP = LgsBinOp{RSHIFT, ">>"};
+const auto EQ_OP = LgsBinOp{EQ, "=="};
+const auto NE_OP = LgsBinOp{NE, "!="};
+const auto LT_OP = LgsBinOp{LT, "<"};
+const auto GT_OP = LgsBinOp{GT, ">"};
+const auto GE_OP = LgsBinOp{GE, "<="};
+const auto LE_OP = LgsBinOp{LE, ">="};
+const auto AND_OP = LgsBinOp{AND, "and"};
+const auto OR_OP = LgsBinOp{OR, "or"};
+const auto IN_OP = LgsBinOp{IN, "in"};
+const auto NOOP_OP = LgsBinOp{NOOP, ""};
 
-    LgsToken() = default;
-    LgsToken(const LgsTokenType type, const std::string& lexeme, const LgsLocation& location)
-        : type(type),
-          lexeme(lexeme),
-          location(location) {
-    }
+const std::unordered_map<LgsTokenType, LgsBinOp> LGS_BINARY_OPS = {
+    {T_PLUS, ADD_OP},
+    {T_MINUS, SUB_OP},
+    {T_STAR, MUL_OP},
+    {T_SLASH, DIV_OP},
+    {T_PERCENT, MODULO_OP},
+    {T_DOUBLE_EQUAL, BIT_AND_OP},
+    {T_NOT_EQUAL, BIT_OR_OP},
+    {T_LANGLE, BIT_XOR_OP},
+    {T_RANGLE, LSHIFT_OP},
+    {T_GE, RSHIFT_OP},
+    {T_LE, EQ_OP},
+    {T_AMPERSAND, NE_OP},
+    {T_PIPE, LT_OP},
+    {T_CARET, GT_OP},
+    {T_DOUBLE_LANGLE, GE_OP},
+    {T_DOUBLE_RANGLE, LE_OP},
+    {T_AND, AND_OP},
+    {T_OR, OR_OP},
+    {T_IN, IN_OP},
+    {T_UNKNOWN, NOOP_OP},
 };

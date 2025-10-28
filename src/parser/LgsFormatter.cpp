@@ -239,7 +239,7 @@ void LgsFormatter::formatExpr(LgsExpr*& expr) {
 
 void LgsFormatter::formatBinaryExpr(LgsBinaryExpr* binaryExpr) {
     formatExpr(binaryExpr->left);
-    insert(' ' + binaryExpr->op.name + ' ');
+    insert(' ' + binaryExpr->opText + ' ');
     formatExpr(binaryExpr->right);
 }
 

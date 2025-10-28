@@ -1,12 +1,8 @@
 #include "exprs/LgsIterIndex.h"
-#include "exprs/LgsVariable.h"
-#include "exprs/constants/LgsIntConst.h"
-#include "types/LgsVoid.h"
 #include <exprs/LgsArrayExpr.h>
 #include "types/iterables/LgsMap.h"
 #include "types/iterables/LgsVec.h"
 #include "utils/LgsUtils.h"
-
 #include <sstream>
 #include <llvm/IR/Module.h>
 
@@ -47,10 +43,9 @@ LgsExpr* LgsIterIndex::getBaseExpr() const {
 
 void LgsIterIndex::setIRElementPtr(LgsLLVMGen& cg, const bool assign) {
     auto fromIR = index.from->IRValue;
-    const auto baseTyIR = baseExpr->type->getIRType(cg);
     assert(baseExpr->IRValue);
     if (baseExpr->type->asSArray()) {
-        IRValue = cg.builder.CreateInBoundsGEP(baseTyIR, baseExpr->IRValue, fromIR);
+        IRValue = cg.builder.CreateInBoundsGEP(type->getIRType(cg), baseExpr->IRValue, fromIR);
         if (type->getIRType(cg)->isPointerTy()) {
             IRValue = cg.builder.CreateLoad(cg.ptrTy(), IRValue);
         }
@@ -146,9 +141,8 @@ Type* LgsIterIndex::getSArrayType(LgsLLVMGen& cg) const {
 }
 
 LgsIterIndex::~LgsIterIndex() {
-    if (!baseExpr->asVariable()) {
-        freeExpr(baseExpr);
-    }
+    // TODO free baseExpr
+    // freeExpr(baseExpr);
     freeExpr(index.from);
     freeExpr(index.to);
     baseExpr = nullptr;

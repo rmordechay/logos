@@ -321,7 +321,7 @@ void LgsJsonParser::parseExpr(LgsExpr*& expr) {
 void LgsJsonParser::parseBinaryExpr(const LgsBinaryExpr* binaryExpr) {
     openObject();
     addKeyValueStr("kind", "binaryExpr", true);
-    addKeyValueStr("operator", binaryExpr->op.name);
+    addKeyValueStr("operator", binaryExpr->opText);
     closeObject();
 }
 

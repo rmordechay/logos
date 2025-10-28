@@ -70,7 +70,7 @@ public:
         : file(file), cg(file.generator), paths(paths), appConfigs(appConfigs) {
     }
 
-    void generate();
+    bool generate();
     void visitMainFile(LgsMainFile* mainFile);
     void visitInterface(const LgsInterface* interface);
     void visitTestFile(const LgsTestFile* testFile);
@@ -145,5 +145,5 @@ public:
 
     Value* getIRValue(LgsValue* value);
     bool allArgsAreConst(const std::vector<LgsExpr*>& args);
-    void writeIRModule() const;
+    bool writeIRModule() const;
 };

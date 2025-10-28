@@ -46,9 +46,9 @@ bool LgsFloat::canCastTo(LgsType* other) {
     return false;
 }
 
-LgsType* LgsFloat::applyBinOp(const LgsBinOpType op, LgsType* other) {
-    if (other->asInt()) return this;
-    const auto IRName = other->getName();
+LgsType* LgsFloat::applyBinOp(LgsBinaryExpr* binExpr) {
+    if (binExpr->right->type->asInt()) return this;
+    const auto IRName = binExpr->right->type->getName();
     if (name == IRName) return this;
     return nullptr;
 }

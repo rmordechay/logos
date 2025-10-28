@@ -46,17 +46,59 @@ std::string LgsSArray::strFormatPart() const {
     return "%p";
 }
 
-LgsType* LgsSArray::applyBinOp(const LgsBinOpType op, LgsType* other) {
-    const auto IRName = other->getName();
+LgsType* LgsSArray::applyBinOp(LgsBinaryExpr* binExpr) {
+    const auto r = binExpr->right;
+    const auto op = binExpr->op;
+    const auto IRName = r->type->getName();
     switch (op) {
     case IN: {
-        if (other->canCastTo(baseType)) return &LGS_BOOL;
+        if (r->type->canCastTo(baseType)) return &LGS_BOOL;
         break;
+    }
+    case ADD: {
+        const auto otherSArr = r->type->asIterable();
+        if (baseType->canCastTo(otherSArr->baseType)) {
+            const auto sumSize = new LgsBinaryExpr(size, otherSArr->size, ADD_OP);
+            return new LgsSArray(baseType, sumSize);
+        }
+    }
+    case MUL: {
+        if (r->type->isInt) {
+            const auto mulSize = new LgsBinaryExpr(size, r, MUL_OP);
+            return new LgsSArray(baseType, mulSize);
+        }
     }
     default:
         break;
     }
     return nullptr;
+}
+
+Value* LgsSArray::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    const auto otherSArr = other->type->asSArray();
+    const auto sizeNewArr = cg.builder.CreateAdd(size->IRValue, otherSArr->size->IRValue);
+    const auto newArr = cg.builder.CreateAlloca(baseType->getIRType(cg), sizeNewArr);
+    const auto size1 = cg.builder.CreateMul(size->IRValue, cg.i32(baseType->getSizeBytes()));
+    const auto size2 = cg.builder.CreateMul(otherSArr->size->IRValue, cg.i32(baseType->getSizeBytes()));
+    cg.callMemCpy(newArr, self->IRValue, size1);
+    const auto offset = cg.builder.CreateInBoundsGEP(baseType->getIRType(cg), newArr, size->IRValue);
+    cg.callMemCpy(offset, other->IRValue, size2);
+    return newArr;
+}
+
+Value* LgsSArray::mulIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    const auto arrPtr = self->IRValue;
+    const auto arrSize = cg.extendToSize(self->type->asSArray()->size->IRValue);
+    const auto multiplier = cg.extendToSize(other->IRValue);
+    const auto newSize = cg.builder.CreateMul(arrSize, multiplier);
+    const auto newArr = cg.builder.CreateAlloca(baseType->getIRType(cg), newSize);
+    const auto bytesPerCopy = cg.builder.CreateMul(arrSize, cg.usize(baseType->getSizeBytes()));
+    cg.loop(multiplier, [&](Value* i, BasicBlock*) {
+        const auto offset = cg.builder.CreateMul(i, arrSize);
+        const auto destPtr = cg.builder.CreateInBoundsGEP(baseType->getIRType(cg), newArr, offset);
+        cg.callMemCpy(destPtr, arrPtr, bytesPerCopy);
+    });
+    return newArr;
 }
 
 Value* LgsSArray::inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) {
@@ -90,7 +132,7 @@ Value* LgsSArray::lengthIR(LgsLLVMGen& cg, Value* iterable) {
 LgsFunc* LgsSArray::getLenFunc() {
     const auto lenFunc = LgsIterable::getLenFunc();
     if (lenFunc->fn) return lenFunc;
-    lenFunc->fn = [this](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
+    lenFunc->fn = [this](LgsLLVMGen& cg, const std::vector<LgsExpr*>&) {
         return cg.extendToSize(size->IRValue);
     };
     return lenFunc;

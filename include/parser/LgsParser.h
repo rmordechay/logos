@@ -125,7 +125,6 @@ public:
     // Exprs
     LgsExpr* parseExpr(bool withLambda = true);
     LgsExpr* parseUnary();
-    LgsBinOp parseBinaryOp();
     LgsVariable* parseVariable();
     LgsInstance* parseInstance();
     LgsFuncCall* parseFuncCall();

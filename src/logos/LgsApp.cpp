@@ -176,7 +176,11 @@ bool LgsApp::generate() {
     for (const auto& file : srcFiles) {
         threadPool.runTask([this, file] {
             LgsCodeGen generator(*file, appConfigs, paths);
-            generator.generate();
+            const auto successful = generator.generate();
+            if (!successful) {
+                std::lock_guard lock(mtx);
+                errHandler.setUnsuccessful();
+            }
         });
     }
     threadPool.wait();

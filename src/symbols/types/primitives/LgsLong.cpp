@@ -25,19 +25,8 @@ Lgs_RTType LgsLong::getRTType() {
     return RTT_LONG;
 }
 
-LgsType* LgsLong::applyBinOp(const LgsBinOpType op, LgsType* other) {
-    if (op == DIV) {
-        return &LGS_DOUBLE;
-    }
-    if (other->asFloat()) {
-        return &LGS_DOUBLE;
-    }
-    if (other->asDouble()) {
-        assert(0);
-    }
-    const auto IRName = other->getName();
-    if (name == IRName) return this;
-    return nullptr;
+LgsType* LgsLong::applyBinOp(LgsBinaryExpr* binExpr) {
+    return applyIntBinOp(binExpr->op, binExpr->left->type);
 }
 
 Value* LgsLong::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {

@@ -35,8 +35,8 @@ bool LgsInt::canCastTo(LgsType* other) {
     return false;
 }
 
-LgsType* LgsInt::applyBinOp(const LgsBinOpType op, LgsType* other) {
-    return applyIntBinOp(op, other);
+LgsType* LgsInt::applyBinOp(LgsBinaryExpr* binExpr) {
+    return applyIntBinOp(binExpr->op, binExpr->left->type);
 }
 
 Value* LgsInt::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {

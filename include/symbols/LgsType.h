@@ -74,7 +74,7 @@ public:
     virtual std::string pname(); // pretty name
     virtual bool equals(LgsType* other);
     virtual bool canCastTo(LgsType* other) = 0;
-    virtual LgsType* applyBinOp(LgsBinOpType op, LgsType* other);
+    virtual LgsType* applyBinOp(LgsBinaryExpr* binExpr);
     virtual std::string strFormatPart() const = 0;
     virtual DIBasicType* getDebugType(LgsLLVMGen& cg);
     virtual void hashNode(size_t& oldHash);

@@ -150,7 +150,7 @@ std::string LgsType::pname() {
     return getName();
 }
 
-LgsType* LgsType::applyBinOp(const LgsBinOpType op, LgsType* other) {
+LgsType* LgsType::applyBinOp(LgsBinaryExpr* binExpr) {
     assert(0);
 }
 

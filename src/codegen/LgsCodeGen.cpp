@@ -57,7 +57,7 @@
 std::atomic<size_t> LgsCodeGen::namesCounter{0};
 #define GENERATE_OBJ_CMD_STRING "llc -filetype=obj -o %s %s.bc"
 
-void LgsCodeGen::generate() {
+bool LgsCodeGen::generate() {
     cg.setupModule(file, appConfigs.debugMode);
     if (const auto mainFile = dynamic_cast<LgsMainFile*>(&file)) {
         visitMainFile(mainFile);
@@ -69,7 +69,7 @@ void LgsCodeGen::generate() {
         visitTestFile(testFile);
     }
     if (appConfigs.debugMode) cg.finalizeDebugger(paths.buildDir);;
-    writeIRModule();
+    return writeIRModule();
 }
 
 void LgsCodeGen::visitMainFile(LgsMainFile* mainFile) {
@@ -599,43 +599,43 @@ void LgsCodeGen::visitBinaryExpr(LgsBinaryExpr* binExpr) {
         return;
     }
     const auto type = binExpr->type;
-    switch (binExpr->op.opType) {
+    switch (binExpr->op) {
     case ADD:
-        binExpr->IRValue = type->addIR(cg, l, r); break;
+        binExpr->IRValue = l->type->addIR(cg, l, r); break;
     case SUB:
-        binExpr->IRValue = type->subIR(cg, l, r); break;
+        binExpr->IRValue = l->type->subIR(cg, l, r); break;
     case MUL:
-        binExpr->IRValue = type->mulIR(cg, l, r); break;
+        binExpr->IRValue = l->type->mulIR(cg, l, r); break;
     case DIV:
-        binExpr->IRValue = type->divIR(cg, l, r); break;
+        binExpr->IRValue = l->type->divIR(cg, l, r); break;
     case MODULO:
-        binExpr->IRValue = type->modIR(cg, l, r); break;
+        binExpr->IRValue = l->type->modIR(cg, l, r); break;
     case BIT_AND:
-        binExpr->IRValue = type->bitAndIR(cg, l, r); break;
+        binExpr->IRValue = l->type->bitAndIR(cg, l, r); break;
     case BIT_OR:
-        binExpr->IRValue = type->bitOrIR(cg, l, r); break;
+        binExpr->IRValue = l->type->bitOrIR(cg, l, r); break;
     case BIT_XOR:
-        binExpr->IRValue = type->bitXorIR(cg, l, r); break;
+        binExpr->IRValue = l->type->bitXorIR(cg, l, r); break;
     case LSHIFT:
-        binExpr->IRValue = type->rshiftIR(cg, l, r); break;
+        binExpr->IRValue = l->type->rshiftIR(cg, l, r); break;
     case RSHIFT:
-        binExpr->IRValue = type->lshiftIR(cg, l, r); break;
+        binExpr->IRValue = l->type->lshiftIR(cg, l, r); break;
     case EQ:
-        binExpr->IRValue = type->eqIR(cg, l, r); break;
+        binExpr->IRValue = l->type->eqIR(cg, l, r); break;
     case NE:
-        binExpr->IRValue = type->neIR(cg, l, r); break;
+        binExpr->IRValue = l->type->neIR(cg, l, r); break;
     case LT:
-        binExpr->IRValue = type->ltIR(cg, l, r); break;
+        binExpr->IRValue = l->type->ltIR(cg, l, r); break;
     case GT:
-        binExpr->IRValue = type->gtIR(cg, l, r); break;
+        binExpr->IRValue = l->type->gtIR(cg, l, r); break;
     case GE:
-        binExpr->IRValue = type->geIR(cg, l, r); break;
+        binExpr->IRValue = l->type->geIR(cg, l, r); break;
     case LE:
-        binExpr->IRValue = type->leIR(cg, l, r); break;
+        binExpr->IRValue = l->type->leIR(cg, l, r); break;
     case AND:
-        binExpr->IRValue = type->andIR(cg, l, r); break;
+        binExpr->IRValue = l->type->andIR(cg, l, r); break;
     case OR:
-        binExpr->IRValue = type->orIR(cg, l, r); break;
+        binExpr->IRValue = l->type->orIR(cg, l, r); break;
     case IN:
         binExpr->IRValue = r->type->asIterable()->inIR(cg, r, l); break;
     case NOOP: assert(0);
@@ -1418,7 +1418,7 @@ bool LgsCodeGen::allArgsAreConst(const std::vector<LgsExpr*>& args) {
     return allElementsConst;
 }
 
-void LgsCodeGen::writeIRModule() const {
+bool LgsCodeGen::writeIRModule() const {
     // Print IR to stdout even with failure.
     if (lgsConfigs.debug) {
         std::lock_guard lock(mtx);
@@ -1427,7 +1427,7 @@ void LgsCodeGen::writeIRModule() const {
     }
 
     // Verify
-    if (verifyModule(*cg.IRModule, &llvm::errs())) return;
+    if (verifyModule(*cg.IRModule, &llvm::errs())) return false;
 
     // Print IR to file
     auto moduleName = cg.IRModule->getName().str();
@@ -1470,4 +1470,5 @@ void LgsCodeGen::writeIRModule() const {
     std::snprintf(cmd, sizeof(cmd), GENERATE_OBJ_CMD_STRING, outputPath.c_str(), outputPath.c_str());
     if (std::system(cmd) != 0) assert(0);
     fs::remove(outputPath + ".bc");
+    return true;
 }
