@@ -120,3 +120,4 @@ inline LgsBaseError E10089{"%s can only be assigned to an instance of %s, not th
 inline LgsBaseError E10090{"%s can only prefix numbers. Given: %s.", errCodeStart++};
 inline LgsBaseError E10091{"not can only prefix Bool. Given: %s.", errCodeStart++};
 inline LgsBaseError E10092{"Condition %s must be of type Bool. Given: %s.", errCodeStart++};
+inline LgsBaseError E10093{"Cannot assign variable to Void type.", errCodeStart++};

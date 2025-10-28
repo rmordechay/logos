@@ -1,5 +1,6 @@
 #pragma once
 #include "../data/LgsTokens.h"
+#include "exprs/LgsJson.h"
 #include "exprs/LgsTernaryExpr.h"
 #include "files/LgsAppConfigFile.h"
 #include "funcs/LgsMainFunc.h"
@@ -119,11 +120,10 @@ public:
     LgsCoroutine* parseCoroutine();
     LgsDeferStmt* parseDeferStmt();
     LgsIOStmt* parseIOStmt();
-    LgsJson* parseJson();
 
-    LgsExpr* parseExprWithPrecedence(int minPrecedence);
     // Exprs
     LgsExpr* parseExpr(bool withLambda = true);
+    LgsExpr* parseExprWithPrecedence(int minPrecedence);
     LgsExpr* parseUnary();
     LgsVariable* parseVariable();
     LgsInstance* parseInstance();
@@ -139,6 +139,11 @@ public:
     LgsIterIndex* parseIterIndex(LgsExpr* baseExpr);
     LgsPostfixExpr* parsePostfixExpr(LgsExpr* baseExpr);
     LgsSelection* parseSelection(LgsExpr* firstExpr = nullptr);
+    LgsJson* parseJson();
+    LgsJsonObject* parseJsonObject();
+    LgsJsonArray* parseJsonArray();
+    LgsJson* parseJsonValue();
+    void parseJsonPrimitive(LgsJson* json);
 
     // Helpers
     bool validateTypeName(const std::string& typeName, const LgsLocation* location);

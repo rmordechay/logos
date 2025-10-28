@@ -41,4 +41,3 @@ LgsStrConst::~LgsStrConst() {
     }
     parts.clear();
 }
-

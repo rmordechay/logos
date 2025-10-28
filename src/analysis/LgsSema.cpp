@@ -277,7 +277,9 @@ void LgsSema::visitVarDec(LgsVarDec* varDec) {
             varDec->expr->owner = varDec;
         }
     }
-
+    if (varDec->expr->type->isVoid()) {
+        errHandler.addError(E10093, &varDec->location, file->absPath, {});
+    }
     if (varDec->type && !varDec->type->isHeapAlloc && varDec->isOwner) {
         varDec->isOwner = false;
     }
@@ -918,11 +920,7 @@ void LgsSema::visitTypeExpr(LgsTypeExpr* typeExpr) {
 }
 
 void LgsSema::visitJson(const LgsJson* json) {
-    if (const auto arr = json->arr) {
-        visitArrayExpr(arr);
-    } else if (const auto strConst = json->strConst) {
-        visitStrConst(strConst);
-    }
+    assert(0);
 }
 
 void LgsSema::visitInstance(LgsInstance* instance) {

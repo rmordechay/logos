@@ -1014,30 +1014,7 @@ void LgsCodeGen::visitNull(LgsNull* null) const {
 }
 
 void LgsCodeGen::visitJson(LgsJson* json) {
-    if (const auto instance = json->instance) {
-        json->instance->destPtrValue = json->destPtrValue;
-        instance->obj->getIRType(cg);
-    } else if (const auto arr = json->arr) {
-        json->arr->destPtrValue = json->destPtrValue;
-        visitArrayExpr(arr);
-        json->IRValue = arr->IRValue;
-    } else if (const auto strConst = json->strConst) {
-        json->strConst->destPtrValue = json->destPtrValue;
-        visitStrConst(strConst);
-        json->IRValue = strConst->IRValue;
-    } else if (const auto intConst = json->intConst) {
-        json->intConst->destPtrValue = json->destPtrValue;
-        visitIntConst(intConst);
-        json->IRValue = intConst->IRValue;
-    } else if (const auto floatConst = json->floatConst) {
-        json->floatConst->destPtrValue = json->destPtrValue;
-        visitFloatConst(floatConst);
-        json->IRValue = floatConst->IRValue;
-    } else if (const auto null = json->null) {
-        json->null->destPtrValue = json->destPtrValue;
-        null->IRValue = cg.null();
-        json->IRValue = null->IRValue;
-    }
+    assert(0);
 }
 
 void LgsCodeGen::setNullableValue(LgsExpr* expr) {

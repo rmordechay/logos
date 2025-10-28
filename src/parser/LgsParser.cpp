@@ -750,31 +750,6 @@ LgsVarDec* LgsParser::parseVarDec() {
     return varDec;
 }
 
-LgsStmt* LgsParser::parseAssignOrExpr() {
-    const auto oldIndex = currentIndex;
-    const auto varDec = parseVarDec();
-    if (varDec) return varDec;
-
-    // Assignment
-    const auto l = parseExpr();
-    if (!parsedOrReset(l, oldIndex)) return nullptr;
-    const auto opToken = currentToken;
-    const auto op = parseAssignType();
-    if (op != ASSIGN_UNKNOWN) {
-        const auto r = parseExpr();
-        if (!r) {
-            freeExpr(l);
-            reset(oldIndex);
-            return nullptr;
-        }
-        const auto assignment = new LgsAssignment(op, l, r);
-        setLocation(assignment->location, &opToken);
-        return assignment;
-    }
-    // Return expr
-    return l;
-}
-
 LgsAssignType LgsParser::parseAssignType() {
     const auto opToken = currentToken;
     LgsAssignType op = {};
@@ -817,6 +792,31 @@ LgsAssignType LgsParser::parseAssignType() {
     }
     consume();
     return op;
+}
+
+LgsStmt* LgsParser::parseAssignOrExpr() {
+    const auto oldIndex = currentIndex;
+    const auto varDec = parseVarDec();
+    if (varDec) return varDec;
+
+    // Assignment
+    const auto l = parseExpr();
+    if (!parsedOrReset(l, oldIndex)) return nullptr;
+    const auto opToken = currentToken;
+    const auto op = parseAssignType();
+    if (op != ASSIGN_UNKNOWN) {
+        const auto r = parseExpr();
+        if (!r) {
+            freeExpr(l);
+            reset(oldIndex);
+            return nullptr;
+        }
+        const auto assignment = new LgsAssignment(op, l, r);
+        setLocation(assignment->location, &opToken);
+        return assignment;
+    }
+    // Return expr
+    return l;
 }
 
 LgsStmt* LgsParser::parseIfStmt() {
@@ -1047,10 +1047,6 @@ LgsIOStmt* LgsParser::parseIOStmt() {
     return ioStmt;
 }
 
-LgsJson* LgsParser::parseJson() {
-    return nullptr;
-}
-
 LgsExpr* LgsParser::parseExpr(const bool withLambda) {
     if (withLambda) {
         if (const auto lambda = parseLambda()) return lambda;
@@ -1141,7 +1137,6 @@ LgsVariable* LgsParser::parseVariable() {
     setLocation(var->location, &currentToken);
     return var;
 }
-
 
 LgsInstance* LgsParser::parseInstance() {
     const auto tokenName = currentToken;
@@ -1254,6 +1249,7 @@ LgsStrConst* LgsParser::parseStrConst() {
     consume();
     return strConst;
 }
+
 
 LgsLoopMetaVar* LgsParser::parseLoopMetaVar() {
     const auto metaVarToken = currentToken;
@@ -1497,6 +1493,90 @@ LgsSelection* LgsParser::parseSelection(LgsExpr* firstExpr) {
     auto const selection = new LgsSelection(exprs);
     selection->location = selection->exprs.front()->location;
     return selection;
+}
+
+LgsJson* LgsParser::parseJson() {
+    const auto oldIndex = currentIndex;
+    if (!matchAndConsume(T_JSON)) return nullptr;
+    const auto json = new LgsJson();
+    setLocation(json->location, &tokens[oldIndex]);
+    if (currentToken.type == T_LBRACE) {
+        json->jsonType = JSON_OBJECT;
+        json->jsonObject = parseJsonObject();
+    } else if (currentToken.type == T_LBRACK) {
+        json->jsonType = JSON_ARRAY;
+        json->jsonArray = parseJsonArray();
+    } else {
+        parseJsonPrimitive(json);
+    }
+    return json;
+}
+
+LgsJson* LgsParser::parseJsonValue() {
+    const auto json = new LgsJson();
+    setLocation(json->location, &currentToken);
+    if (currentToken.type == T_LBRACE) {
+        json->jsonType = JSON_OBJECT;
+        json->jsonObject = parseJsonObject();
+    } else if (currentToken.type == T_LBRACK) {
+        json->jsonType = JSON_ARRAY;
+        json->jsonArray = parseJsonArray();
+    } else {
+        parseJsonPrimitive(json);
+    }
+    return json;
+}
+
+LgsJsonObject* LgsParser::parseJsonObject() {
+    mustMatch(T_LBRACE);
+    const auto jsonObject = new LgsJsonObject();
+    if (!matchAndConsume(T_RBRACE)) {
+        while (true) {
+            const auto keyToken = currentToken;
+            if (!mustMatch(T_STRING)) break;
+            if (!mustMatch(T_COLON)) break;
+            const auto valueJson = parseJsonValue();
+            jsonObject->entries[keyToken.lexeme] = valueJson;
+            if (currentToken.type == T_RBRACE) break;
+            mustMatch(T_COMMA);
+        }
+        if (currentToken.type == T_COMMA) consume();
+        mustMatch(T_RBRACE);
+    }
+    return jsonObject;
+}
+
+LgsJsonArray* LgsParser::parseJsonArray() {
+    mustMatch(T_LBRACK);
+    const auto jsonArray = new LgsJsonArray();
+    while (true) {
+        const auto valueJson = parseJsonValue();
+        if (!valueJson) break;
+        jsonArray->entries.push_back(valueJson);
+        if (currentToken.type == T_RBRACK) break;
+        mustMatch(T_COMMA);
+    }
+    if (currentToken.type == T_COMMA) consume();
+    mustMatch(T_RBRACK);
+    return jsonArray;
+}
+
+void LgsParser::parseJsonPrimitive(LgsJson* json) {
+    if (const auto strConst = parseStrConst()) {
+        json->jsonType = JSON_STRING;
+        json->strConst = strConst;
+    } else if (const auto constant = parseConstant()) {
+        if (const auto intConst = constant->asIntConst()) {
+            json->jsonType = JSON_INT;
+            json->intConst = intConst;
+        } else if (const auto floatConst = constant->asFloatConst()) {
+            json->jsonType = JSON_FLOAT;
+            json->floatConst = floatConst;
+        } else if (constant->asNull()) {
+            json->jsonType = JSON_NULL;
+            json->null = constant->asNull();
+        }
+    }
 }
 
 bool LgsParser::validateTypeName(const std::string& typeName, const LgsLocation* location) {

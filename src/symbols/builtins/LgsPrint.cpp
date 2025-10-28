@@ -2,7 +2,7 @@
 #include "exprs/constants/LgsStrConst.h"
 
 Value* LgsPrint::call(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
-    const auto arg = args.front();
+    const auto arg = args.empty() ? funcType->params.front().expr : args.front();
     assert(arg->IRValue);
     const std::vector<Value*> IRArgs = {
         cg.i32(arg->type->getRTType()),

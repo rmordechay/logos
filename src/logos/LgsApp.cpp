@@ -276,6 +276,7 @@ size_t LgsApp::getNextFileID() {
 }
 
 LgsApp::~LgsApp() {
+    globals.freeSymbols();
     if (appConfigFile) {
         delete appConfigFile;
         appConfigFile = nullptr;
