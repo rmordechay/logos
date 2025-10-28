@@ -55,4 +55,5 @@ struct LgsSymbol {
     explicit LgsSymbol(LgsEnum* lgsEnum, bool isExternal = false, bool isBuiltin = false);
     explicit LgsSymbol(LgsFunc* func, bool isExternal = false, bool isBuiltin = false);
     LgsType* getType() const;
+    LgsSymbol clone() const;
 };

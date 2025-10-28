@@ -33,6 +33,7 @@ bool LgsStr::canCastTo(LgsType* other) {
     if (const auto iter = other->asSArray()) {
         return iter->baseType && iter->baseType->asChar();
     }
+    if (other->asGeneric()) return true;
     return name == other->getName();
 }
 
@@ -147,7 +148,7 @@ Value* LgsStr::inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) {
 LgsType* LgsStr::clone() {
     const auto newStr = new LgsStr();
     if (size) {
-        newStr->size = size->clone();
+        newStr->size = size->cloneExpr();
     }
     newStr->baseType = baseType;
     return newStr;

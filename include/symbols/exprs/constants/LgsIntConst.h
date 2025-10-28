@@ -14,5 +14,5 @@ public:
     Value* castToIR(LgsLLVMGen& cg, LgsType* toType) override;
     std::string asText() override;
     Value* hash(LgsLLVMGen& cg) override;
-    LgsExpr* clone() override;
+    LgsExpr* cloneExpr() override;
 };

@@ -53,9 +53,9 @@
 
 #include <iostream>
 
-#define MAX_TOKENS_NUMBER 10000
+#define MAX_TOKENS_NUMBER 100000
 
-bool LgsParser::lex() {
+bool LgsParser::scanTokens() {
     LgsLexer lexer(fileID, filePath, code);
     tokens = lexer.tokenize();
     if (!lexer.errHandler.successful) {
@@ -69,7 +69,7 @@ bool LgsParser::lex() {
 }
 
 LgsFile* LgsParser::parseSrcFile(const bool isTestRun) {
-    if (!lex()) return nullptr;
+    if (!scanTokens()) return nullptr;
     if (const auto mainFile = parseMainFile()) {
         return mainFile;
     }
@@ -88,7 +88,7 @@ LgsFile* LgsParser::parseSrcFile(const bool isTestRun) {
 }
 
 LgsAppConfigFile* LgsParser::parseAppConfigFile() {
-    if (!lex()) return nullptr;
+    if (!scanTokens()) return nullptr;
     const auto configFile = new LgsAppConfigFile(fileID, filePath);
     while (true) {
         const auto varDec = parseVarDec();
@@ -136,7 +136,7 @@ LgsAppConfigFile* LgsParser::parseAppConfigFile() {
 }
 
 LgsEnvFile* LgsParser::parseEnvFile() {
-    if (!lex()) return nullptr;
+    if (!scanTokens()) return nullptr;
     if (currentToken.lexeme != "env") {
         addParsingError();
         return nullptr;
@@ -308,7 +308,7 @@ LgsObject* LgsParser::parseObjectBody(const LgsToken& tokenName, const bool isSi
     if (matchAndConsume(T_TYPE)) {
         mustMatch(T_COLON);
         while (true) {
-            const auto type = parseGeneric();
+            const auto type = parseBaseGeneric();
             if (!type) break;
             obj->generics.push_back(type);
             const auto ct = currentToken.type;
@@ -387,7 +387,7 @@ LgsInterface* LgsParser::parseInterfaceBody(const LgsToken& tokenName) {
     return interface;
 }
 
-LgsGeneric* LgsParser::parseGeneric() {
+LgsGeneric* LgsParser::parseBaseGeneric() {
     if (currentToken.type != T_IDENTIFIER) return nullptr;
     const auto generic = new LgsGeneric(currentToken.lexeme);
     setLocation(generic->location, &currentToken);
@@ -429,7 +429,7 @@ LgsField* LgsParser::parseField() {
 
     const auto field = new LgsField(nameToken.lexeme, type, expr);
     setLocation(field->location, &nameToken);
-    field->type = type;
+    field->setType(type);
     field->isConst = isConst;
     field->isOwner = isOwner;
     field->isPublic = isPublic;
@@ -630,12 +630,28 @@ LgsFunc* LgsParser::parseMethod(LgsObject* obj) {
 LgsFuncType* LgsParser::parseFuncHeader() {
     const auto nameToken = currentToken;
     if (currentToken.type != T_IDENTIFIER) return nullptr;
-    if (peek().type != T_LPAREN) return nullptr;
-    consume();
-    consume();
+    std::vector<LgsGeneric*> generics;
+    if (peek().type == T_LANGLE) {
+        consume();
+        consume();
+        while (true) {
+            const auto type = parseBaseGeneric();
+            if (!type) break;
+            generics.push_back(type);
+            if (currentToken.type == T_RANGLE) break;
+        }
+        mustMatch(T_RANGLE);
+        mustMatch(T_LPAREN);
+    } else if (peek().type != T_LPAREN) {
+        return nullptr;
+    } else {
+        consume();
+        consume();
+    }
     const auto funcType = new LgsFuncType();
     setLocation(funcType->location, &nameToken);
     funcType->name = nameToken.lexeme;
+    funcType->generics = generics;
     parseParams(funcType);
     mustMatch(T_RPAREN);
     funcType->rt = matchAndConsume(T_COLON) ? parseType() : &LGS_VOID;
@@ -1033,7 +1049,7 @@ LgsIOStmt* LgsParser::parseIOStmt() {
     if (const auto var = firstExpr->asVariable()) {
         ioStmt->varDec->name = var->name;
         if (matchAndConsume(T_COLON)) {
-            ioStmt->varDec->type = parseType();
+            ioStmt->varDec->setType(parseType());
             mustParse(ioStmt->varDec->type);
         }
         mustMatch(T_EQUAL);
@@ -1138,24 +1154,32 @@ LgsVariable* LgsParser::parseVariable() {
     return var;
 }
 
+void LgsParser::parseGenerics(std::vector<LgsType*>& types) {
+    if (matchAndConsume(T_LANGLE)) {
+        while (true) {
+            const auto type = parseType();
+            if (mustParse(type)) break;
+            types.push_back(type);
+            if (currentToken.type == T_RANGLE) break;
+        }
+        mustMatch(T_RANGLE);
+    }
+}
+
 LgsInstance* LgsParser::parseInstance() {
     const auto tokenName = currentToken;
-    std::vector<LgsType*> types;
+    std::vector<LgsType*> generics;
     if (currentToken.type == T_IDENTIFIER && peek().type == T_LANGLE) {
         consume();
-        consume();
-        const auto type = parseType();
-        mustParse(type);
-        types.push_back(type);
-        mustMatch(T_RANGLE);
+        parseGenerics(generics);
     } else if (!matchAndConsume(T_INSTANCE)) {
         return nullptr;
     }
     mustMatch(T_LBRACE);
     const auto instance = new LgsInstance(tokenName.lexeme);
     setLocation(instance->location, &tokenName);
-    instance->type = new LgsUnknown(instance->name);
-    instance->generics = types;
+    instance->setType(new LgsUnknown(instance->name));
+    instance->generics = generics;
 
     if (!matchAndConsume(T_RBRACE)) {
         while (true) {
@@ -1182,11 +1206,20 @@ LgsInstance* LgsParser::parseInstance() {
 LgsFuncCall* LgsParser::parseFuncCall() {
     if (currentToken.type != T_IDENTIFIER) return nullptr;
     const auto nameToken = currentToken;
-    if (peek().type != T_LPAREN) return nullptr;
-    consume();
-    consume();
+    std::vector<LgsType*> generics;
+    if (peek().type == T_LANGLE) {
+        consume();
+        parseGenerics(generics);
+        mustMatch(T_RBRACE);
+    } else if (peek().type != T_LPAREN) {
+        return nullptr;
+    } else {
+        consume();
+        consume();
+    }
     const auto funcCall = new LgsFuncCall(nameToken.lexeme);
     setLocation(funcCall->location, &nameToken);
+    funcCall->generics = generics;
 
     if (!matchAndConsume(T_RPAREN)) {
         while (true) {
@@ -1256,19 +1289,19 @@ LgsLoopMetaVar* LgsParser::parseLoopMetaVar() {
     if (matchAndConsume(T_FOR_I)) {
         const auto metaVar = new LgsLoopMetaVar(metaVarToken.lexeme, FOR_I);
         setLocation(metaVar->location, &metaVarToken);
-        metaVar->type = &LGS_SIZE;
+        metaVar->setType(&LGS_SIZE);
         return metaVar;
     }
     if (matchAndConsume(T_FOR_IS_FIRST)) {
         const auto metaVar = new LgsLoopMetaVar(metaVarToken.lexeme, FOR_IS_FIRST);
         setLocation(metaVar->location, &metaVarToken);
-        metaVar->type = &LGS_BOOL;
+        metaVar->setType(&LGS_BOOL);
         return metaVar;
     }
     if (matchAndConsume(T_FOR_IS_LAST)) {
         const auto metaVar = new LgsLoopMetaVar(metaVarToken.lexeme, FOR_IS_LAST);
         setLocation(metaVar->location, &metaVarToken);
-        metaVar->type = &LGS_BOOL;
+        metaVar->setType(&LGS_BOOL);
         return metaVar;
     }
     return nullptr;
@@ -1334,9 +1367,9 @@ LgsArrayExpr* LgsParser::parseArrayExpr() {
 
     auto const arrExpr = new LgsArrayExpr();
     if (isSet) {
-        arrExpr->type = new LgsSet();
+        arrExpr->setType(new LgsSet());
     } else {
-        arrExpr->type = new LgsDArray();
+        arrExpr->setType(new LgsDArray());
     }
     arrExpr->elements = args;
     setLocation(arrExpr->location, &tokens[oldIndex]);
@@ -1378,7 +1411,7 @@ LgsFunc* LgsParser::parseLambda() {
         LgsParam param(nullptr, currentToken.lexeme);
         consume();
         if (matchAndConsume(T_COLON)) {
-            param.type = parseType();
+            param.setType(parseType());
             mustParse(param.type);
         }
         params.emplace_back(param);

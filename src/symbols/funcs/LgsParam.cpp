@@ -1,7 +1,5 @@
 #include "funcs/LgsParam.h"
-
 #include "LgsType.h"
-#include "utils/LgsUtils.h"
 
 Value* LgsParam::loadIR(LgsLLVMGen& cg) {
     return IRValue;
@@ -9,4 +7,8 @@ Value* LgsParam::loadIR(LgsLLVMGen& cg) {
 
 std::string LgsParam::asText() {
     return name;
+}
+
+void LgsParam::setType(LgsType* newType) {
+    type = newType;
 }

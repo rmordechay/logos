@@ -6,7 +6,6 @@
 #include "stmts/LgsField.h"
 #include "types/LgsObject.h"
 #include "utils/LgsUtils.h"
-
 #include <sstream>
 
 Value* LgsFuncCall::loadIR(LgsLLVMGen& cg) {
@@ -20,34 +19,19 @@ bool LgsFuncCall::equals(LgsExpr* other) {
 }
 
 bool LgsFuncCall::equals(const LgsFuncType* other) const {
-    if (other->hasDefaults()) return equalsDefaultParams(other);
     if (other->isVariadic) return equalsVariadic(other);
     if (args.size() > other->params.size()) return false;
-    for (size_t i = 0; i < other->params.size(); ++i) {
-        if (i >= args.size()) break;
-        const auto arg = args[i];
+    for (size_t i = other->isMethod; i < other->params.size(); ++i) {
+        if (i >= args.size()) continue;
         const auto param = other->params[i];
-        const auto argType = arg->type;
-        const auto paramType = param.type;
-        if (!paramType || !argType) return false;
-        if (!argType->canCastTo(paramType)) return false;
+        const auto arg = args[i];
+        if (!arg->type->canCastTo(param.type)) return false;
     }
     return true;
 }
 
 bool LgsFuncCall::equalsVariadic(const LgsFuncType* funcType) const {
-    return true;
-}
-
-bool LgsFuncCall::equalsDefaultParams(const LgsFuncType* funcType) const {
-    const auto argsSize = args.size();
-    for (size_t i = funcType->isMethod; i < funcType->params.size(); ++i) {
-        const auto param = funcType->params[i];
-        if (i >= argsSize) continue;
-        const auto arg = args[i];
-        if (!param.type->canCastTo(arg->type)) return false;
-    }
-    return true;
+    assert(0);
 }
 
 std::string LgsFuncCall::asText() {
@@ -69,6 +53,16 @@ std::string LgsFuncCall::asText() {
 
 void LgsFuncCall::setDebugValue(LgsLLVMGen& cg) {
     cg.builder.SetCurrentDebugLocation(getDebugLoc(cg));
+}
+
+LgsStmt* LgsFuncCall::cloneStmt() {
+    const auto newFuncCall = new LgsFuncCall(*this);
+    newFuncCall->args.clear();
+    for (const auto arg : args) {
+        newFuncCall->args.emplace_back(arg->cloneExpr());
+    }
+    if (type) newFuncCall->type = type->clone();
+    return newFuncCall;
 }
 
 LgsFuncCall::~LgsFuncCall() {

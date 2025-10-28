@@ -27,6 +27,7 @@ Lgs_RTType LgsInt::getRTType() {
 bool LgsInt::canCastTo(LgsType* other) {
     const auto otherName = other->getName();
     if (name == otherName) return true;
+    if (other->asGeneric()) return true;
     if (otherName == LgsAny::name) return true;
     if (otherName == LgsSize::name) return true;
     if (otherName == LgsLong::name) return true;
@@ -112,33 +113,11 @@ Value* LgsInt::leIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
 }
 
 Value* LgsInt::andIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    const auto currentBlock = cg.builder.GetInsertBlock();
-    const auto func = currentBlock->getParent();
-    const auto rightBlock = cg.createBlock("and_right", func);
-    const auto endBlock = cg.createBlock("and_end", func);
-    cg.builder.CreateCondBr(other->IRValue, rightBlock, endBlock);
-    cg.builder.SetInsertPoint(rightBlock);
-    cg.builder.CreateBr(endBlock);
-    cg.builder.SetInsertPoint(endBlock);
-    auto* phi = cg.builder.CreatePHI(cg.builder.getInt1Ty(), 2);
-    phi->addIncoming(cg.false_(), currentBlock);
-    phi->addIncoming(other->IRValue, rightBlock);
-    return phi;
+    return andInt(cg, self, other);
 }
 
 Value* LgsInt::orIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    const auto currentBlock = cg.builder.GetInsertBlock();
-    const auto func = currentBlock->getParent();
-    const auto rightBlock = cg.createBlock("or_right", func);
-    const auto endBlock = cg.createBlock("or_end", func);
-    cg.builder.CreateCondBr(self->IRValue, endBlock, rightBlock);
-    cg.builder.SetInsertPoint(rightBlock);
-    cg.builder.CreateBr(endBlock);
-    cg.builder.SetInsertPoint(endBlock);
-    auto* phi = cg.builder.CreatePHI(cg.builder.getInt1Ty(), 2);
-    phi->addIncoming(cg.true_(), currentBlock);
-    phi->addIncoming(other->IRValue, rightBlock);
-    return phi;
+    return orInt(cg, self, other);
 }
 
 std::string LgsInt::strFormatPart() const {

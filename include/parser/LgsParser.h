@@ -70,7 +70,7 @@ public:
     LgsParser(const size_t fileID, const fs::path& filePath, LgsPaths& paths, LgsSymbolTable& globals, const std::string& code) : fileID(fileID), paths(paths), filePath(filePath), code(code), globals(globals) {}
 
     // Files
-    bool lex();
+    bool scanTokens();
     LgsFile* parseSrcFile(bool isTestRun);
     LgsAppConfigFile* parseAppConfigFile();
     LgsEnvFile* parseEnvFile();
@@ -85,7 +85,7 @@ public:
     LgsInterface* parseInterface();
     LgsObject* parseObjectBody(const LgsToken& tokenName, bool isSingleton);
     LgsInterface* parseInterfaceBody(const LgsToken& tokenName);
-    LgsGeneric* parseGeneric();
+    LgsGeneric* parseBaseGeneric();
     LgsField* parseField();
     LgsIOPair* parseIOPair();
 
@@ -126,6 +126,7 @@ public:
     LgsExpr* parseExprWithPrecedence(int minPrecedence);
     LgsExpr* parseUnary();
     LgsVariable* parseVariable();
+    void parseGenerics(std::vector<LgsType*>& types);
     LgsInstance* parseInstance();
     LgsFuncCall* parseFuncCall();
     LgsVectorExpr* parseVectorExpr();

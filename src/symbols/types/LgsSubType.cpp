@@ -35,3 +35,7 @@ Lgs_RTType LgsSubType::getRTType() {
 std::string LgsSubType::strFormatPart() const {
     return subtype->strFormatPart();
 }
+
+LgsSubType* LgsSubType::clone() {
+    assert(0);
+}

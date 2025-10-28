@@ -17,6 +17,8 @@
 #include "exprs/LgsTypeExpr.h"
 #include "loops/LgsLoopMetaVar.h"
 
+#include <iostream>
+
 LgsExpr* LgsExpr::castTo(LgsType* toType, const bool explicitCast) {
     assert(0);
 }
@@ -93,7 +95,7 @@ bool LgsExpr::equals(LgsExpr* other) {
     assert(0);
 }
 
-LgsExpr* LgsExpr::clone() {
+LgsExpr* LgsExpr::cloneExpr() {
     assert(0);
 }
 

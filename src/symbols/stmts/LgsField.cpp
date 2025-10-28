@@ -2,8 +2,11 @@
 #include "LgsType.h"
 #include "exprs/LgsExpr.h"
 #include "exprs/LgsHashMap.h"
-#include "types/iterables/LgsDArray.h"
 #include "utils/LgsUtils.h"
+
+void LgsField::setType(LgsType* newType) {
+    type = newType;
+}
 
 Value* LgsField::loadIR(LgsLLVMGen& cg) {
     if (!IRValue) {
@@ -26,5 +29,9 @@ LgsField::~LgsField() {
     freeExpr(expr);
     freeType(type);
     expr = nullptr;
-    type = nullptr;
+    setType(nullptr);
+}
+
+LgsField* LgsField::clone() {
+    assert(0);
 }

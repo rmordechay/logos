@@ -20,6 +20,7 @@ class LgsAssignment;
 class LgsStmt : virtual public LgsValue {
 public:
     bool isTerminator();
+    virtual LgsStmt* cloneStmt();
     LgsForLoop* asLoop();
     LgsCoroutine* asCoroutine();
     LgsDeferStmt* asDefer();

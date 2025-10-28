@@ -149,7 +149,7 @@ void LgsApp::analyseEnvs() {
     for (const auto file : envFiles) {
         LgsSema semaAnalyser(file, globals);
         for (const auto varDec : file->varDecs) {
-            varDec->type = varDec->expr->type;
+            varDec->setType(varDec->expr->type);
         }
     }
     for (const auto requiredEnv : appConfigFile->requiredEnvs) {

@@ -48,6 +48,8 @@
 #include "stmts/LgsIfStmt.h"
 #include "stmts/LgsSwitch.h"
 #include "types/primitives/LgsDouble.h"
+
+#include <iostream>
 #include <unordered_set>
 
 void LgsSema::analyse() {
@@ -149,9 +151,6 @@ void LgsSema::visitFunc(LgsFunc* func) {
     if (!validateBlockControlFlow(func->stmtsBlock, func)) {
         errHandler.addError(E10055, &func->location, file->absPath, {func->asText()});
     }
-    // for (const auto& orphan : func->orphans) {
-    //     errHandler.addError(E10077, &orphan->location, file->absPath, {orphan->pname()});
-    // }
     stack.exitScope();
 }
 
@@ -169,7 +168,7 @@ void LgsSema::visitMainFunc(const LgsMainFunc* mainFunc) {
     }
     freeType(ft->params.front().type);
     const auto sArray = new LgsSArray(new LgsStr(), LGS_INT.getZeroValue());
-    ft->params.front().type = sArray;
+    ft->params.front().setType(sArray);
     ft->params.front().expr = new LgsArrayExpr(sArray);
 }
 
@@ -238,7 +237,7 @@ void LgsSema::visitStmtsBlock(LgsStmtsBlock* stmtsBlock) {
         visitStmt(stmt);
     }
     const auto lastStmt = stmtsBlock->lastStmt();
-    stmtsBlock->returnExpr = lastStmt->asReturn();
+    stmtsBlock->returnStmt = lastStmt->asReturn();
     for (size_t i = 0; i < stmtsBlock->stmts.size() - 1; ++i) {
         if (stmtsBlock->stmts[i]->isTerminator()) {
             return errHandler.addError(E10059, &lastStmt->location, file->absPath, {});
@@ -252,23 +251,23 @@ void LgsSema::visitVarDec(LgsVarDec* varDec) {
         if (varDec->isOwner) {
             varDec->expr->owner = varDec;
         }
-        varDec->type = typeResolver.resolveType(varDec->type, file);
+        varDec->setType(typeResolver.resolveType(varDec->type, file));
         varDec->expr->completeType(varDec->type);
         visitExpr(varDec->expr);
         validateExprType(varDec->expr, varDec->type);
         if (varDec->type != varDec->expr->type) {
             freeType(varDec->expr->type);
         }
-        varDec->expr->type = varDec->type;
+        varDec->expr->setType(varDec->type);
     } else if (varDec->expr) {
         visitExpr(varDec->expr);
         if (varDec->isOwner) {
             varDec->expr->owner = varDec;
         }
-        varDec->type = varDec->expr->type;
+        varDec->setType(varDec->expr->type);
         validateExprType(varDec->expr, varDec->type);
     } else {
-        varDec->type = typeResolver.resolveType(varDec->type, file);
+        varDec->setType(typeResolver.resolveType(varDec->type, file));
         if (!varDec->type) return;
         varDec->expr = varDec->type->getZeroValue();
         varDec->expr->location = varDec->location;
@@ -407,7 +406,7 @@ void LgsSema::visitRangeLoop(LgsRangeLoop* rangeLoop) {
 
     // Range loop can have only one var
     if (!rangeLoop->loopVars.empty()) {
-        rangeLoop->loopVars.front()->type = endRange->type;
+        rangeLoop->loopVars.front()->setType(endRange->type);
         addLocalSymbol(LgsSymbol(rangeLoop->loopVars.front()));
     }
     visitStmtsBlock(rangeLoop->stmtsBlock);
@@ -523,7 +522,7 @@ void LgsSema::visitExpr(LgsExpr*& expr) {
         else if (const auto castExpr = expr->asCast()) visitCast(castExpr);
         else if (const auto json = expr->asJson()) visitJson(json);
         if (expr->isNullable) {
-            expr->type = new LgsNullable(expr->type);
+            expr->setType(new LgsNullable(expr->type));
         }
     }
 }
@@ -560,7 +559,7 @@ void LgsSema::visitTernaryExpr(LgsTernaryExpr* ternary) {
     if (!thenExpr->type->canCastTo(elseExpr->type)) {
         errHandler.addError(E10021, &ternary->location, file->absPath, {thenExpr->asText(), elseExpr->asText(), thenExpr->type->pname(), elseExpr->type->pname()});
     }
-    ternary->type = thenExpr->type;
+    ternary->setType(thenExpr->type);
 }
 
 void LgsSema::visitCast(LgsCast* cast) {
@@ -572,7 +571,7 @@ void LgsSema::visitCast(LgsCast* cast) {
         errHandler.addError(E10018, &cast->location, file->absPath, {cast->fromValue->asText(), cast->toType->pname()});
         return;
     }
-    cast->type = cast->value->type;
+    cast->setType(cast->value->type);
 }
 
 void LgsSema::visitArrayExpr(LgsArrayExpr* arrayExpr) {
@@ -633,7 +632,7 @@ void LgsSema::visitHashMap(LgsHashMap* hashMap) {
         return errHandler.addError(E10049, &hashMap->location, file->absPath, {LgsMap::name});
     }
     const auto [key, value] = hashMap->pairs.front();
-    hashMap->type = new LgsMap(key->type, value->type);
+    hashMap->setType(new LgsMap(key->type, value->type));
 }
 
 void LgsSema::visitVectorExpr(const LgsVectorExpr* vectorExpr) {
@@ -722,10 +721,10 @@ void LgsSema::visitSelection(LgsSelection* selection) {
 
     const auto lastExpr = selection->lastExpr();
     if (selection->hasNullables && !lastExpr->type->asNullable()) {
-        lastExpr->type = new LgsNullable(lastExpr->type);
+        lastExpr->setType(new LgsNullable(lastExpr->type));
     }
 
-    selection->type = lastExpr->type;
+    selection->setType(lastExpr->type);
     selection->isMutable = lastExpr->isMutable;
     selection->owner = lastExpr->owner;
 }
@@ -797,7 +796,7 @@ void LgsSema::visitIterIndexSelection(LgsIterIndex* iterIndex, LgsType* parentTy
         if (!field) {
             return errHandler.addError(E10005, &iterIndex->location, file->absPath, {baseExpr->name, parentType->pname()});
         }
-        baseExpr->type = field->type;
+        baseExpr->setType(field->type);
         baseExpr->ref = LgsSymbol(field);
     }
     visitIndex(iterIndex);
@@ -852,11 +851,16 @@ void LgsSema::visitFuncCall(LgsFuncCall* funcCall) {
         arg->completeType(param.type);
         visitExpr(arg);
     }
+
     if (funcCall->equals(ft)) {
         if (symbol->symbolType == FUNC) {
             const auto func = symbol->func;
-            funcCall->func = func;
-            funcCall->setType(func->funcType->rt);
+            if (func->funcType->isGeneric) {
+                createGenericFunc(funcCall, func);
+            } else {
+                funcCall->func = func;
+                funcCall->setType(func->funcType->rt);
+            }
         } else {
             funcCall->ref = *symbol;
             funcCall->setType(ft->rt);
@@ -865,6 +869,19 @@ void LgsSema::visitFuncCall(LgsFuncCall* funcCall) {
         for (const auto arg : funcCall->args) if (!arg->type) return;
         errHandler.addError(E10015, &funcCall->location, file->absPath, {funcCall->name, funcCall->asText(), ft->pname()});
     }
+}
+
+void LgsSema::createGenericFunc(LgsFuncCall* funcCall, LgsFunc* const func) {
+    const auto newFunc = func->cloneExpr()->asFunc();
+    for (size_t i = 0; i < newFunc->funcType->params.size(); ++i) {
+        const auto param = newFunc->funcType->params[i];
+        if (!param.type->isGeneric) continue;
+        const auto arg = funcCall->args[i];
+        newFunc->funcType->genericSuffix += arg->type->getName();
+        newFunc->funcType->params[i] = LgsParam(arg->type, param.name, param.expr);
+    }
+    visitFunc(newFunc);
+    funcCall->func = newFunc;
 }
 
 void LgsSema::visitPrefixExpr(LgsPrefixExpr* prefixExpr) {
@@ -916,7 +933,7 @@ void LgsSema::visitStrConst(const LgsStrConst* strConst) {
 }
 
 void LgsSema::visitTypeExpr(LgsTypeExpr* typeExpr) {
-    typeExpr->type = typeResolver.resolveType(typeExpr->type, file);
+    typeExpr->setType(typeResolver.resolveType(typeExpr->type, file));
 }
 
 void LgsSema::visitJson(const LgsJson* json) {
@@ -1254,7 +1271,7 @@ bool LgsSema::validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const Lgs
     assert(func->funcType->rt);
     if (func->funcType->rt->isVoid()) return true;
     if (!stmtBlock) return true;
-    if (stmtBlock->returnExpr) return true;
+    if (stmtBlock->returnStmt) return true;
     auto isValid = false;
     for (const auto stmt : stmtBlock->stmts) {
         if (const auto ifStmt = stmt->asIfStmt()) {

@@ -9,7 +9,7 @@
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/Module.h>
 
-Value* LgsFunc::call(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
+Value* LgsFunc::call(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args, const std::vector<LgsType*>& generics) {
     if (fn) return fn(cg, args);
     std::vector<Value*> IRArgs;
     for (size_t i = 0; i < args.size(); ++i) {
@@ -81,7 +81,7 @@ void LgsFunc::initFunc(const std::string& name, LgsType* rt, const std::vector<L
     for (const auto& param : params) {
         funcType->params.push_back(param);
     }
-    type = funcType;
+    setType(funcType);
 }
 
 void LgsFunc::completeType(LgsType* toType) {
@@ -89,7 +89,7 @@ void LgsFunc::completeType(LgsType* toType) {
     if (!otherFuncType) return;
     for (size_t i = 0; i < funcType->params.size(); ++i) {
         if (funcType->params[i].type) continue;
-        funcType->params[i].type = otherFuncType->params[i].type;
+        funcType->params[i].setType(otherFuncType->params[i].type);
     }
     if (!funcType->rt) {
         funcType->rt = otherFuncType->rt;
@@ -120,6 +120,13 @@ std::string LgsFunc::getIRName() const {
 
 void LgsFunc::hashNode(size_t& oldHash) {
     hashNodeString(oldHash, funcType->name);
+}
+
+LgsFunc* LgsFunc::cloneExpr() {
+    const auto newFunc = new LgsFunc(*this);
+    newFunc->funcType = funcType->clone()->asFuncType();
+    newFunc->stmtsBlock = stmtsBlock->clone();
+    return newFunc;
 }
 
 void LgsFunc::setDebugValue(LgsLLVMGen& cg) {

@@ -4,6 +4,13 @@ project(logos VERSION 0.0.1)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_definitions(-DLOGOS_VERSION="${CMAKE_PROJECT_VERSION}")
+
+find_program(CCACHE_PROGRAM ccache)
+if (CCACHE_PROGRAM)
+    set(CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
+    set(CMAKE_C_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
+endif()
+
 find_program(LLVM_CONFIG_EXECUTABLE NAMES llvm-config llvm-config-19)
 
 execute_process(
@@ -18,14 +25,14 @@ execute_process(
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
+execute_process(
+    COMMAND ${LLVM_CONFIG_EXECUTABLE} --libs
+    OUTPUT_VARIABLE LLVM_LIBS
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
 message("LLVM include include: ${LLVM_INCLUDE_DIRS}")
 message("LLVM include lib: ${LLVM_LIBRARY_DIRS}")
-
-find_program(CCACHE_PROGRAM ccache)
-if (CCACHE_PROGRAM)
-    set(CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
-    set(CMAKE_C_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
-endif()
 
 set(CORE_SOURCES
     src/logos/LgsApp.cpp
@@ -156,7 +163,9 @@ set(RUNTIME_SOURCES
 
 add_library(lgs_lib SHARED ${CORE_SOURCES} ${RUNTIME_SOURCES})
 set_target_properties(lgs_lib PROPERTIES OUTPUT_NAME "lgs")
-target_link_libraries(lgs_lib PUBLIC -L${LLVM_LIBRARY_DIRS} -lLLVM-19 -lclang-cpp)
+separate_arguments(LLVM_LIBS)
+target_link_libraries(lgs_lib PUBLIC ${LLVM_LIBS} clang-cpp)
+target_link_directories(lgs_lib PUBLIC ${LLVM_LIBRARY_DIRS})
 target_compile_options(lgs_lib PRIVATE -Wall -Wextra -Wpedantic -Wno-unused-parameter -Wno-unused-variable)
 
 target_include_directories(lgs_lib PUBLIC

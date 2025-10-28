@@ -2,6 +2,8 @@
 #include "LgsType.h"
 #include "funcs/LgsParam.h"
 
+class LgsGeneric;
+
 enum LgsFuncFlags : uint32_t {
     PUBLIC = 1 << 0,
     BUILTIN = 1 << 1,
@@ -19,8 +21,10 @@ public:
     std::string name;
     std::string IRName;
     std::string parentName;
+    std::string genericSuffix;
     LgsType* rt = nullptr;
     std::vector<LgsParam> params;
+    std::vector<LgsGeneric*> generics;
     bool isPublic = false;
     bool isBuiltin = false;
     bool isVirtual = false;
@@ -31,7 +35,6 @@ public:
     bool isMethod = false;
     bool isInIOPair = false;
     bool isSysCall = false;
-    bool isGeneric = false;
     FunctionType* IRType = nullptr;
 
     LgsFuncType() = default;

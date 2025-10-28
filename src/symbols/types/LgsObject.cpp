@@ -8,6 +8,8 @@
 #include "types/LgsGeneric.h"
 #include "utils/LgsUtils.h"
 #include "types/LgsSubType.h"
+
+#include <iostream>
 #include <sstream>
 #include <llvm/IR/Module.h>
 
@@ -126,7 +128,7 @@ LgsObject* LgsObject::clone() {
     for (const auto& field : fields) {
         const auto newField = new LgsField(*field);
         if (field->expr) {
-            newField->expr = field->expr->clone();
+            newField->expr = field->expr->cloneExpr();
         }
         cloned->addField(newField);
     }
@@ -144,7 +146,7 @@ LgsObject::~LgsObject() {
     freeTypes(generics);
     freeTypes(subtypes);
     if (singleton) {
-        singleton->type = nullptr;
+        singleton->setType(nullptr);
         singleton->obj = nullptr;
         freeExpr(singleton);
     }

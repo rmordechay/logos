@@ -10,7 +10,7 @@ public:
     explicit LgsVectorExpr(const int8_t dim) {
         isMutable = true;
         vecType = new LgsVec(dim);
-        type = vecType;
+        setType(vecType);
     }
 
     explicit LgsVectorExpr(LgsVec* vecType): vecType(vecType) {}

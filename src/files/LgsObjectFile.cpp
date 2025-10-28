@@ -22,6 +22,6 @@ size_t LgsObjectFile::hashFile() {
 }
 
 LgsObjectFile::~LgsObjectFile() {
-    freeType(obj);
+    // Released in global table
     obj = nullptr;
 }

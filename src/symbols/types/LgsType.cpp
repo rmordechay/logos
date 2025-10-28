@@ -6,6 +6,7 @@
 #include "types/LgsObject.h"
 #include "types/iterables/LgsDArray.h"
 #include "types/LgsEnum.h"
+#include "types/LgsGeneric.h"
 #include "types/iterables/LgsMap.h"
 #include "types/LgsNullable.h"
 #include "types/LgsSubType.h"
@@ -142,6 +143,36 @@ LgsType* LgsType::applyIntBinOp(const LgsBinOpType op, LgsType* other) {
     return nullptr;
 }
 
+Value* LgsType::orInt(LgsLLVMGen& cg, const LgsExpr* self, const LgsExpr* other) {
+    const auto currentBlock = cg.builder.GetInsertBlock();
+    const auto func = currentBlock->getParent();
+    const auto rightBlock = cg.createBlock("or_right", func);
+    const auto endBlock = cg.createBlock("or_end", func);
+    cg.builder.CreateCondBr(self->IRValue, endBlock, rightBlock);
+    cg.builder.SetInsertPoint(rightBlock);
+    cg.builder.CreateBr(endBlock);
+    cg.builder.SetInsertPoint(endBlock);
+    auto* phi = cg.builder.CreatePHI(cg.builder.getInt1Ty(), 2);
+    phi->addIncoming(cg.true_(), currentBlock);
+    phi->addIncoming(other->IRValue, rightBlock);
+    return phi;
+}
+
+Value* LgsType::andInt(LgsLLVMGen& cg, LgsExpr* self, const LgsExpr* other) {
+    const auto currentBlock = cg.builder.GetInsertBlock();
+    const auto func = currentBlock->getParent();
+    const auto rightBlock = cg.createBlock("and_right", func);
+    const auto endBlock = cg.createBlock("and_end", func);
+    cg.builder.CreateCondBr(self->IRValue, rightBlock, endBlock);
+    cg.builder.SetInsertPoint(rightBlock);
+    cg.builder.CreateBr(endBlock);
+    cg.builder.SetInsertPoint(endBlock);
+    auto* phi = cg.builder.CreatePHI(cg.builder.getInt1Ty(), 2);
+    phi->addIncoming(cg.false_(), currentBlock);
+    phi->addIncoming(other->IRValue, rightBlock);
+    return phi;
+}
+
 Lgs_RTType LgsType::getRTType() {
     assert(0);
 }
@@ -221,6 +252,10 @@ LgsMap* LgsType::asMap() {
 
 LgsEnum* LgsType::asEnum() {
     return dynamic_cast<LgsEnum*>(this);
+}
+
+LgsGeneric* LgsType::asGeneric() {
+    return dynamic_cast<LgsGeneric*>(this);
 }
 
 LgsNullable* LgsType::asNullable() {

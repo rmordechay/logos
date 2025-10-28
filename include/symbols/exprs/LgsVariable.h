@@ -16,4 +16,5 @@ public:
     Value* hash(LgsLLVMGen& cg) override;
     void assign(LgsLLVMGen& cg, LgsExpr* expr) override;
     std::string asText() override;
+    LgsExpr* cloneExpr() override;
 };

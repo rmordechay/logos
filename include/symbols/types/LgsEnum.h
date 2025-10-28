@@ -14,7 +14,7 @@ public:
     bool canCastTo(LgsType* other) override;
     std::string strFormatPart() const override;
     size_t getSizeBytes() override;
-    LgsType* clone() override;
+    LgsEnum* clone() override;
     ~LgsEnum() override = default;
 };
 

@@ -1,9 +1,12 @@
 #include "stmts/LgsVarDec.h"
 #include "codegen/LgsLLVMGen.h"
-#include "types/LgsPtr.h"
 #include "types/iterables/LgsStr.h"
 #include "utils/LgsUtils.h"
 #include <llvm/IR/DIBuilder.h>
+
+void LgsVarDec::setType(LgsType* newType) {
+    type = newType;
+}
 
 std::string LgsVarDec::asText() {
     return name;
@@ -58,6 +61,10 @@ LgsVarDec::~LgsVarDec() {
     } else {
         freeType(type);
     }
-    type = nullptr;
+    setType(nullptr);
     expr = nullptr;
+}
+
+LgsVarDec* LgsVarDec::clone() {
+    assert(0);
 }

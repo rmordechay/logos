@@ -5,7 +5,7 @@
 void LgsHashMap::completeType(LgsType* toType) {
     if (!toType->asMap()) return;
     if (!type) {
-        type = toType;
+        setType(toType);
     }
 }
 

@@ -14,18 +14,18 @@ LgsExpr* LgsGeneric::getZeroValue() {
 }
 
 Lgs_RTType LgsGeneric::getRTType() {
-    assert(0);
+    return RTT_STR;
 }
 
 std::string LgsGeneric::getName() {
-    assert(0);
+    return name;
 }
 
 bool LgsGeneric::canCastTo(LgsType* other) {
-    assert(0);
+    return true;
 }
 
-LgsType* LgsGeneric::clone() {
+LgsGeneric* LgsGeneric::clone() {
     return new LgsGeneric(*this);
 }
 

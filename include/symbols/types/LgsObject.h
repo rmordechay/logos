@@ -13,9 +13,9 @@ class LgsObject : public LgsType {
 public:
     std::string name;
     std::vector<LgsType*> implements;
+    std::vector<LgsGeneric*> generics;
     std::vector<LgsEnum*> enums;
     std::vector<LgsObject*> objects;
-    std::vector<LgsGeneric*> generics;
     std::vector<LgsSubType*> subtypes;
     std::vector<LgsIOPair*> ioPairs;
     LgsInstance* singleton = nullptr;

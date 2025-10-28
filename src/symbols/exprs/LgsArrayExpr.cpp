@@ -9,14 +9,14 @@ Value* LgsArrayExpr::loadIR(LgsLLVMGen& cg) {
 void LgsArrayExpr::completeType(LgsType* toType) {
     if (type && type->asDArray() && toType->asSArray()) {
         freeType(type);
-        type = toType;
+        setType(toType);
     }
     if (toType->asSArray() || toType->asDArray() || toType->asSet()) {
         const auto otherBaseType = toType->asIterable()->baseType;
         for (size_t i = 0; i < elements.size(); ++i) {
             const auto element = elements[i];
             if (!element->type) {
-                element->type = otherBaseType;
+                element->setType(otherBaseType);
             } else {
                 if (element->type->equals(otherBaseType)) continue;
                 if (element->type->canCastTo(otherBaseType)) {

@@ -16,4 +16,5 @@ public:
     std::string pname() override;
     bool canCastTo(LgsType* other) override;
     std::string strFormatPart() const override;
+    LgsSubType* clone() override;
 };

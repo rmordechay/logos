@@ -24,7 +24,9 @@ public:
     Value* parentIRValue = nullptr;
 
     LgsField(std::string name, LgsType* type, LgsExpr* expr = nullptr) : name(std::move(name)), type(type), expr(expr) {}
+    void setType(LgsType* newType);
     Value* loadIR(LgsLLVMGen& cg) override;
     Value* resolveVirtualField(LgsLLVMGen* cg, const LgsHashMap* vtable) const;
     ~LgsField() override;
+    LgsField* clone();
 };

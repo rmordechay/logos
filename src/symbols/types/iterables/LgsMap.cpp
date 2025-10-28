@@ -46,12 +46,12 @@ LgsType* LgsMap::getValueType() {
 
 bool LgsMap::unpackLoopVarsTypes(LgsForeachLoop* loop) const {
     if (loop->loopVars.size() == 1) {
-        loop->loopVars[0]->type = typePair->key;
+        loop->loopVars[0]->setType(typePair->key);
         return true;
     }
     if (loop->loopVars.size() == 2) {
-        loop->loopVars[0]->type = typePair->key;
-        loop->loopVars[1]->type = typePair->value;
+        loop->loopVars[0]->setType(typePair->key);
+        loop->loopVars[1]->setType(typePair->value);
         return true;
     }
     return false;

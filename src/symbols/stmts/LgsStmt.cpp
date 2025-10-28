@@ -28,6 +28,10 @@ bool LgsStmt::isTerminator() {
     return methodCall->func && methodCall->func->funcType->isTerminator;
 }
 
+LgsStmt* LgsStmt::cloneStmt() {
+    assert(0);
+}
+
 LgsForLoop* LgsStmt::asLoop() { return dynamic_cast<LgsForLoop*>(this); }
 LgsCoroutine* LgsStmt::asCoroutine() { return dynamic_cast<LgsCoroutine*>(this); }
 LgsDeferStmt* LgsStmt::asDefer() { return dynamic_cast<LgsDeferStmt*>(this); }

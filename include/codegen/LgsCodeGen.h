@@ -77,6 +77,7 @@ public:
     void visitObject(LgsObject* obj);
     void visitMainFunc(LgsMainFunc* func);
     void visitFunc(LgsFunc* func);
+    void visitGenericFunc(LgsFunc* func);
     void visitField(LgsField* field) const;
     void visitParam(LgsParam* param);
     void visitStmt(LgsStmt* stmt);

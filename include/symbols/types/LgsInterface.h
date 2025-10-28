@@ -13,5 +13,5 @@ public:
     Lgs_RTType getRTType() override;
     bool canCastTo(LgsType* other) override;
     size_t getSizeBytes() override;
-    LgsObject* clone() override;
+    LgsInterface* clone() override;
 };

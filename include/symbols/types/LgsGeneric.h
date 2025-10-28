@@ -14,6 +14,6 @@ public:
     Lgs_RTType getRTType() override;
     std::string getName() override;
     bool canCastTo(LgsType* other) override;
-    LgsType* clone() override;
+    LgsGeneric* clone() override;
     std::string strFormatPart() const override;
 };

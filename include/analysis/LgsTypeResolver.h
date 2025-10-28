@@ -18,7 +18,7 @@ public:
     LgsSymbolTable& globals;
 
     LgsTypeResolver(LgsErrHandler& errHandler, LgsSymbolTable& globals) : errHandler(errHandler), globals(globals) {}
-    bool resolveGlobals(const std::vector<LgsFile*>& ast, ThreadPool& pool);
+    bool resolveGlobals(const std::vector<LgsFile*>& srcFiles, ThreadPool& pool);
     LgsType* resolveType(LgsType* type, LgsFile* file);
     void resolveMainFileTypes(LgsMainFile* mf);
     void resolveObjTypes(LgsObject* obj, LgsFile& file);

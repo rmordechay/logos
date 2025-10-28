@@ -8,5 +8,5 @@ class LgsPrint final : public LgsFunc {
 public:
     static constexpr auto name = "print";
     explicit LgsPrint(): LgsFunc(name, &LGS_VOID, {LgsParam(&LGS_ANY, "", new LgsStrConst("\n"))}, PUBLIC | BUILTIN) {}
-    Value* call(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) override;
+    Value* call(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args, const std::vector<LgsType*>& generics = {}) override;
 };

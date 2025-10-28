@@ -10,7 +10,7 @@ LgsExpr* LgsStrConst::castTo(LgsType* toType, const bool explicitCast) {
     if (const auto subtype = toType->asSubtype()) {
         if (explicitCast && subtype->subtype->getName() == thisName) {
             freeType(type);
-            type = subtype;
+            setType(subtype);
             return this;
         }
     }
@@ -20,6 +20,7 @@ LgsExpr* LgsStrConst::castTo(LgsType* toType, const bool explicitCast) {
 
 Value* LgsStrConst::castToIR(LgsLLVMGen& cg, LgsType* toType) {
     if (toType->asStr()) return IRValue;
+    if (toType->asGeneric()) return IRValue;
     return LgsExpr::castToIR(cg, toType);
 }
 

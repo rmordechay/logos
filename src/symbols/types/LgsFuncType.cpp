@@ -1,8 +1,8 @@
 #include "types/LgsFuncType.h"
 #include "data/LgsDefinitions.h"
 #include "codegen/LgsLLVMGen.h"
+#include "types/LgsGeneric.h"
 #include "utils/LgsUtils.h"
-
 #include <sstream>
 
 void LgsFuncType::setFuncOptions(const uint32_t ops) {
@@ -56,8 +56,27 @@ std::string LgsFuncType::getName() {
         strStream << parentName << "_";
     }
     strStream << name;
+    if (isGeneric) {
+        strStream << '_' << genericSuffix;
+    }
     IRName = strStream.str();
     return IRName;
+}
+
+bool LgsFuncType::canCastTo(LgsType* other) {
+    const auto otherFuncType = other->asFuncType();
+    if (!otherFuncType) return false;
+    const auto otherParams = otherFuncType->params;
+    if (params.size() != otherParams.size()) return false;
+    if (params.size() == 0 && otherParams.size() == 0) return true;
+    if (otherFuncType->rt && !rt->canCastTo(otherFuncType->rt)) return false;
+    for (size_t i = isMethod; i < params.size(); ++i) {
+        const auto thisType = params[i].type;
+        const auto otherType = otherFuncType->params[i].type;
+        if (!thisType || !otherType) return false;
+        if (!thisType->canCastTo(otherType)) return false;
+    }
+    return true;
 }
 
 std::string LgsFuncType::pname() {
@@ -89,22 +108,6 @@ std::string LgsFuncType::strFormatPart() const {
     return "%p";
 }
 
-bool LgsFuncType::canCastTo(LgsType* other) {
-    const auto otherFuncType = other->asFuncType();
-    if (!otherFuncType) return false;
-    const auto otherParams = otherFuncType->params;
-    if (params.size() != otherParams.size()) return false;
-    if (params.size() == 0 && otherParams.size() == 0) return true;
-    if (otherFuncType->rt && !rt->canCastTo(otherFuncType->rt)) return false;
-    for (size_t i = isMethod; i < params.size(); ++i) {
-        const auto thisType = params[i].type;
-        const auto otherType = otherFuncType->params[i].type;
-        if (!thisType || !otherType) return false;
-        if (!thisType->canCastTo(otherType)) return false;
-    }
-    return true;
-}
-
 bool LgsFuncType::equals(LgsType* other) {
     const auto otherFuncType = other->asFuncType();
     if (!otherFuncType) return false;
@@ -120,24 +123,7 @@ bool LgsFuncType::equals(LgsType* other) {
 }
 
 LgsType* LgsFuncType::clone() {
-    const auto copy = new LgsFuncType();
-    copy->name = name;
-    copy->IRName = IRName;
-    copy->parentName = parentName;
-    if (rt) copy->rt = rt->clone();
-    copy->params.reserve(params.size());
-    for (auto p : params) {
-        assert(0);
-    }
-    copy->isMethod = isMethod;
-    copy->isPublic = isPublic;
-    copy->isBuiltin = isBuiltin;
-    copy->isVirtual = isVirtual;
-    copy->isVariadic = isVariadic;
-    copy->isOptional = isOptional;
-    copy->isTerminator = isTerminator;
-    copy->isInIOPair = isInIOPair;
-    return copy;
+    return new LgsFuncType(*this);
 }
 
 bool LgsFuncType::hasDefaults() const {

@@ -111,7 +111,7 @@ bool LgsIterable::unpackLoopVarsTypes(LgsForeachLoop* loop) const {
     const auto iterIndex = new LgsIterIndex(loop->iterExpr, LGS_SIZE.getZeroValue());
     iterIndex->setType(baseType);
     loop->loopVars[0]->expr = iterIndex;
-    loop->loopVars[0]->type = iterIndex->type;
+    loop->loopVars[0]->setType(iterIndex->type);
     return true;
 }
 

@@ -5,7 +5,7 @@
 class LgsNull final : public LgsExpr {
 public:
     explicit LgsNull() {
-        type = new LgsNullable(nullptr);
+        setType(new LgsNullable(nullptr));
         isMutable = false;
     }
 

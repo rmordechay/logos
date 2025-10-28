@@ -65,3 +65,29 @@ LgsType* LgsSymbol::getType() const {
     }
     return nullptr;
 }
+
+LgsSymbol LgsSymbol::clone() const {
+    switch (symbolType) {
+    case VAR_DEC:
+        return LgsSymbol(varDec->clone());
+    case PARAM:
+        return LgsSymbol(param);
+    case FIELD:
+        return LgsSymbol(field->clone());
+    case FUNC:
+        return LgsSymbol(func->cloneExpr());
+    case OBJECT:
+        return LgsSymbol(object->clone());
+    case INTERFACE:
+        return LgsSymbol(interface->clone());
+    case SUBTYPE:
+        return LgsSymbol(subtype->clone());
+    case GENERIC:
+        return LgsSymbol(generic->clone());
+    case ENUM:
+        return LgsSymbol(enum_->clone());
+    case UNKNOWN:
+        break;
+    }
+    assert(0);
+}

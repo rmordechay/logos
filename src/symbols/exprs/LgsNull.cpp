@@ -16,5 +16,5 @@ std::string LgsNull::asText() {
 
 LgsNull::~LgsNull() {
     freeType(type);
-    type = nullptr;
+    setType(nullptr);
 }

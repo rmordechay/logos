@@ -40,7 +40,7 @@ public:
     }
 
     virtual Function* getIRFunc(LgsLLVMGen& cg);
-    virtual Value* call(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args);
+    virtual Value* call(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args, const std::vector<LgsType*>& generics = {});
     Value* callIR(LgsLLVMGen& cg, const std::vector<Value*>& args = {});
     Value* loadIR(LgsLLVMGen& cg) override;
     void initFunc(const std::string& name, LgsType* rt, const std::vector<LgsParam>& params, uint32_t ops);
@@ -51,5 +51,6 @@ public:
     std::string asText() override;
     std::string getIRName() const;
     void hashNode(size_t& oldHash) override;
+    LgsFunc* cloneExpr() override;
     ~LgsFunc() override;
 };

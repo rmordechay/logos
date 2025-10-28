@@ -18,9 +18,9 @@
 #include "types/LgsSubType.h"
 #include "utils/LgsErrHandler.h"
 
-bool LgsTypeResolver::resolveGlobals(const std::vector<LgsFile*>& ast, ThreadPool& pool) {
+bool LgsTypeResolver::resolveGlobals(const std::vector<LgsFile*>& srcFiles, ThreadPool& pool) {
     std::atomic successful = true;
-    for (const auto& file : ast) {
+    for (const auto& file : srcFiles) {
         pool.runTask([this, file, &successful] {
             if (const auto mf = dynamic_cast<LgsMainFile*>(file)) {
                 resolveMainFileTypes(mf);
@@ -35,6 +35,7 @@ bool LgsTypeResolver::resolveGlobals(const std::vector<LgsFile*>& ast, ThreadPoo
         });
     }
     pool.wait();
+    errHandler.successful = successful;
     return successful;
 }
 
@@ -127,13 +128,13 @@ void LgsTypeResolver::resolveObjTypes(LgsObject* obj, LgsFile& file) {
     }
 
     for (const auto& field : obj->fields) {
-        field->type = resolveType(field->type, &file);
+        field->setType(resolveType(field->type, &file));
     }
 
     for (const auto& [_, method] : obj->methods) {
         method->funcType->rt = resolveType(method->funcType->rt, &file);
         for (auto& param : method->funcType->params) {
-            param.type = resolveType(param.type, &file);
+            param.setType(resolveType(param.type, &file));
         }
     }
 
@@ -144,7 +145,7 @@ void LgsTypeResolver::resolveObjTypes(LgsObject* obj, LgsFile& file) {
 
 void LgsTypeResolver::resolveInterfaceTypes(LgsInterface* interface, LgsFile& file) {
     for (const auto& field : interface->fields) {
-        field->type = resolveType(field->type, &file);
+        field->setType(resolveType(field->type, &file));
     }
     for (const auto& [_, method] : interface->methods) {
         resolveFuncTypes(method->funcType, file);
@@ -159,10 +160,17 @@ void LgsTypeResolver::resolveIterable(LgsIterable* iterable, LgsFile& file) {
 }
 
 void LgsTypeResolver::resolveFuncTypes(LgsFuncType* funcType, LgsFile& file) {
+    auto resolveTypeOrGeneric = [&](LgsType* type) -> LgsType* {
+        if (!type) return &LGS_VOID;
+        for (const auto generic : funcType->generics) {
+            if (type->equals(generic)) return generic->clone();
+        }
+        return resolveType(type, &file);
+    };
     for (auto& param : funcType->params) {
-        param.type = resolveType(param.type, &file);
+        param.setType(resolveTypeOrGeneric(param.type));
     }
-    funcType->rt = !funcType->rt ? &LGS_VOID : resolveType(funcType->rt, &file);
+    funcType->rt = resolveTypeOrGeneric(funcType->rt);
 }
 
 void LgsTypeResolver::resolveIOPair(LgsIOPair* ioPair, LgsObject* obj, LgsFile& file) const {

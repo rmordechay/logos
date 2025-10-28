@@ -10,6 +10,7 @@ class LgsFuncCall final : public LgsExpr {
 public:
     std::string name;
     std::vector<LgsExpr*> args;
+    std::vector<LgsType*> generics;
     LgsFunc* func = nullptr;
     bool isMethodCall = false;
     bool isCoroutine = false;
@@ -22,8 +23,8 @@ public:
     bool equals(LgsExpr* other) override;
     bool equals(const LgsFuncType* other) const;
     bool equalsVariadic(const LgsFuncType* funcType) const;
-    bool equalsDefaultParams(const LgsFuncType* funcType) const;
     std::string asText() override;
     void setDebugValue(LgsLLVMGen& cg) override;
+    LgsStmt* cloneStmt() override;
     ~LgsFuncCall() override;
 };

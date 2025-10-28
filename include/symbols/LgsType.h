@@ -4,6 +4,7 @@
 #include "exprs/LgsBinaryExpr.h"
 #include <map>
 
+class LgsGeneric;
 class LgsSubType;
 class LgsSet;
 class LgsAny;
@@ -65,6 +66,8 @@ public:
     bool isSliceable();
     LgsType* extendInt();
     LgsType* applyIntBinOp(LgsBinOpType op, LgsType* other);
+    static Value* orInt(LgsLLVMGen& cg, const LgsExpr* self, const LgsExpr* other);
+    static Value* andInt(LgsLLVMGen& cg, LgsExpr* self, const LgsExpr* other);
 
     virtual Type* getIRType(LgsLLVMGen& cg) = 0;
     virtual size_t getSizeBytes() = 0;
@@ -92,20 +95,21 @@ public:
     LgsUInt* asUInt();
     LgsFloat* asFloat();
     LgsDouble* asDouble();
-    LgsMap* asMap();
-    LgsEnum* asEnum();
-    LgsNullable* asNullable();
+    LgsFuncType* asFuncType();
     LgsObject* asObject();
     LgsInterface* asInterface();
+    LgsEnum* asEnum();
+    LgsGeneric* asGeneric();
     LgsIterable* asIterable();
     LgsSArray* asSArray();
     LgsDArray* asDArray();
     LgsSet* asSet();
     LgsVec* asVec();
-    LgsFuncType* asFuncType();
     LgsPtr* asPtr();
-    LgsSubType* asSubtype();
+    LgsMap* asMap();
     LgsTypePair* asPair();
+    LgsSubType* asSubtype();
+    LgsNullable* asNullable();
 
     virtual LgsExpr* addConst(LgsExpr* self, LgsExpr* other);
     virtual Value* addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);

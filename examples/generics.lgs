@@ -6,7 +6,13 @@ object Obj {
     }
 }
 
+func<T>(x: T) {
+    print(x)
+}
+
 main() {
     e = 2
     obj = Obj<Int>{}
+    func("roi")
+    func("roiew")
 }

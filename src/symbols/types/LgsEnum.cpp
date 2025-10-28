@@ -31,6 +31,6 @@ size_t LgsEnum::getSizeBytes() {
     return sizeof(void*);
 }
 
-LgsType* LgsEnum::clone() {
+LgsEnum* LgsEnum::clone() {
     return new LgsEnum(*this);
 }

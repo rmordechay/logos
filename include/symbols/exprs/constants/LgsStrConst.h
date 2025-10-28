@@ -14,7 +14,7 @@ public:
         const auto lgsStr = new LgsStr();
         lgsStr->isStatic = true;
         lgsStr->size = new LgsIntConst(&LGS_INT, value.size());
-        type = lgsStr;
+        setType(lgsStr);
     }
     LgsExpr* castTo(LgsType* toType, bool explicitCast) override;
     Value* castToIR(LgsLLVMGen& cg, LgsType* toType) override;

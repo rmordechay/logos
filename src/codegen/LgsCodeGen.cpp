@@ -141,6 +141,21 @@ void LgsCodeGen::visitFunc(LgsFunc* func) {
     stack.exitScope();
 }
 
+void LgsCodeGen::visitGenericFunc(LgsFunc* func) {
+    cg.savedIP = cg.builder.saveIP();
+    const auto originalFunc = currentIRFunc;
+    stack.enterScope(func);
+    createPrologue(func);
+    visitStmtsBlock(func->stmtsBlock);
+    createEpilogue(func);
+    if (func->funcType->rt->isVoid() && !cg.lastInstTerminator()) {
+        cg.builder.CreateRetVoid();
+    }
+    stack.exitScope();
+    currentIRFunc = originalFunc;
+    cg.builder.restoreIP(cg.savedIP);
+}
+
 void LgsCodeGen::visitField(LgsField* field) const {
     if (field->IRValue) return;
     if (const auto vec = field->type->asVec()) {
@@ -767,7 +782,6 @@ void LgsCodeGen::visitVariable(LgsVariable* variable) {
         }
         break;
     case GENERIC:
-        assert(0);
     case ENUM:
     case INTERFACE:
     case SUBTYPE:
@@ -842,25 +856,22 @@ void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
         visitExpr(funcCall->args[i]);
     }
 
+    LgsFunc func(nullptr);
     if (funcCall->ref.symbolType == PARAM) {
-        LgsFunc f(funcCall->ref.param->type->asFuncType());
-        f.IRValue = getIRValue(funcCall->ref.param);
-        if (!funcCall->isCoroutine && !funcCall->isDeferred) {
-            funcCall->IRValue = f.call(cg, funcCall->args);
-        }
-        return;
+        func.funcType = funcCall->ref.param->type->asFuncType();
+        func.setType(func.funcType);
+        func.IRValue = getIRValue(funcCall->ref.param);
+        funcCall->func = &func;
+    } else if (funcCall->ref.symbolType == VAR_DEC) {
+        func.funcType = funcCall->ref.varDec->type->asFuncType();
+        func.setType(func.funcType);
+        func.IRValue = getIRValue(funcCall->ref.varDec);
+        funcCall->func = &func;
+    } else if (!funcCall->func) {
+        assert(0);
     }
-
-    if (funcCall->ref.symbolType == VAR_DEC) {
-        LgsFunc f(funcCall->ref.varDec->type->asFuncType());
-        f.IRValue = getIRValue(funcCall->ref.varDec);
-        if (!funcCall->isCoroutine && !funcCall->isDeferred) {
-            funcCall->IRValue = f.call(cg, funcCall->args);
-        }
-        return;
-    }
-
-    auto ft = funcCall->func->funcType;
+    
+    const auto ft = funcCall->func->funcType;
     if (ft->hasDefaults()) {
         const auto diff = ft->params.size() - funcCall->args.size() - 1;
         for (size_t i = diff; i < ft->params.size(); ++i) {
@@ -877,7 +888,10 @@ void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
     }
 
     if (!funcCall->isCoroutine && !funcCall->isDeferred) {
-        funcCall->IRValue = funcCall->func->call(cg, funcCall->args);
+        if (funcCall->func->funcType->isGeneric) {
+            visitGenericFunc(funcCall->func);
+        }
+        funcCall->IRValue = funcCall->func->call(cg, funcCall->args, funcCall->generics);
         if (appConfigs.debugMode) funcCall->setDebugValue(cg);
     }
 }

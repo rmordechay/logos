@@ -85,3 +85,10 @@ Value* LgsVariable::hash(LgsLLVMGen& cg) {
 std::string LgsVariable::asText() {
     return name;
 }
+
+LgsExpr* LgsVariable::cloneExpr() {
+    const auto newVariable = new LgsVariable(*this);
+    newVariable->ref = ref.clone();
+    if (type) newVariable->type = type->clone();
+    return newVariable;
+}

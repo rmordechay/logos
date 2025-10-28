@@ -16,11 +16,11 @@ LgsExpr* LgsIntConst::castTo(LgsType* toType, const bool explicitCast) {
     if (toType->getName() == LgsAny::name) return this;
     if (type->getName() == toType->getName()) return this;
     if (toType->asLong()) {
-        type = &LGS_LONG;
+        setType(&LGS_LONG);
         return this;
     }
     if (toType->asSize()) {
-        type = &LGS_SIZE;
+        setType(&LGS_SIZE);
         return this;
     }
     if (toType->asFloat()) {
@@ -38,6 +38,7 @@ LgsExpr* LgsIntConst::castTo(LgsType* toType, const bool explicitCast) {
 Value* LgsIntConst::castToIR(LgsLLVMGen& cg, LgsType* toType) {
     assert(IRValue);
     if (type->getName() == toType->getName()) return IRValue;
+    if (toType->asGeneric()) return IRValue;
     if (toType->asLong()) {
         return cg.i64(value);
     }
@@ -64,6 +65,6 @@ Value* LgsIntConst::hash(LgsLLVMGen& cg) {
     return IRValue;
 }
 
-LgsExpr* LgsIntConst::clone() {
+LgsExpr* LgsIntConst::cloneExpr() {
     return new LgsIntConst(type->clone(), value);
 }
