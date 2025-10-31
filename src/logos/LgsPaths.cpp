@@ -1,8 +1,6 @@
 #include "logos/LgsPaths.h"
-
 #include "data/LgsConfigs.h"
 #include "data/LgsDefinitions.h"
-#include <llvm/TargetParser/Host.h>
 #include <llvm/TargetParser/Triple.h>
 
 void LgsPaths::initPaths() {
@@ -23,39 +21,55 @@ void LgsPaths::initPaths() {
 }
 
 void LgsPaths::findLgsLib() {
-    lgsLibPath = fs::current_path();
+    const char* libName = nullptr;
     switch (lgsConfigs.os) {
-    case MacOS:
-        if (!fs::exists(lgsLibPath / "liblgs.dylib")) {
-            lgsLibPath = lgsLibPath.parent_path();
-            assert(fs::exists(lgsLibPath / "liblgs.dylib"));
-        }
+    case MAC_OS:
+        libName = LIB_NAME_MACOS;
         break;
-    case Linux:
-        if (!fs::exists(lgsLibPath / "liblgs.so")) {
-            lgsLibPath = lgsLibPath.parent_path();
-            assert(fs::exists(lgsLibPath / "liblgs.so"));
-        }
+    case LINUX:
+        libName = LIB_NAME_LINUX;
         break;
-    case Windows:
-        if (!fs::exists(lgsLibPath / "liblgs.dll")) {
-            lgsLibPath = lgsLibPath.parent_path();
-            assert(fs::exists(lgsLibPath / "liblgs.dll"));
-        }
+    case WINDOWS:
+        libName = LIB_NAME_WIN;
         break;
     default:
         assert(0);
     }
+
+    std::vector<fs::path> searchPaths;
+
+    if (lgsConfigs.devMode) {
+        searchPaths.push_back(fs::current_path());
+        searchPaths.push_back(fs::current_path().parent_path());
+    } else {
+        searchPaths.push_back("/usr/local/lib");
+        searchPaths.push_back("/usr/lib");
+        if (const char* home = std::getenv("HOME")) {
+            searchPaths.push_back(fs::path(home) / ".local/lib");
+        }
+        if (const char* localAppData = std::getenv("LOCALAPPDATA")) {
+            searchPaths.push_back(fs::path(localAppData) / "Logos" / "lib");
+        }
+    }
+
+    for (const auto& path : searchPaths) {
+        if (fs::exists(path / libName)) {
+            lgsLibPath = path;
+            return;
+        }
+    }
+
+    assert(0 && "Could not find Logos runtime library");
 }
 
 void LgsPaths::findCLibRoot() {
     FILE* pipe = nullptr;
     char buffer[512];
     switch (lgsConfigs.os) {
-    case MacOS:
+    case MAC_OS:
         pipe = popen("xcrun --show-sdk-path 2>/dev/null", "r");
         break;
-    case Linux:
+    case LINUX:
         pipe = popen("clang -print-resource-dir 2>/dev/null", "r");
         break;
     default:

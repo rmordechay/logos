@@ -5,36 +5,23 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_definitions(-DLOGOS_VERSION="${CMAKE_PROJECT_VERSION}")
 
+find_package(LLVM REQUIRED CONFIG)
+find_package(Clang REQUIRED CONFIG)
+set(LLVM_LINK_LLVM_DYLIB ON)
+set(CLANG_LINK_CLANG_DYLIB ON)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
+if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+    set(CMAKE_INSTALL_PREFIX "/usr/local" CACHE PATH "Install prefix" FORCE)
+endif()
+
 find_program(CCACHE_PROGRAM ccache)
 if (CCACHE_PROGRAM)
     set(CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
     set(CMAKE_C_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
 endif()
 
-find_program(LLVM_CONFIG_EXECUTABLE NAMES llvm-config llvm-config-19)
-
-execute_process(
-    COMMAND ${LLVM_CONFIG_EXECUTABLE} --includedir
-    OUTPUT_VARIABLE LLVM_INCLUDE_DIRS
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-
-execute_process(
-    COMMAND ${LLVM_CONFIG_EXECUTABLE} --libdir
-    OUTPUT_VARIABLE LLVM_LIBRARY_DIRS
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-
-execute_process(
-    COMMAND ${LLVM_CONFIG_EXECUTABLE} --libs
-    OUTPUT_VARIABLE LLVM_LIBS
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-
-message("LLVM include include: ${LLVM_INCLUDE_DIRS}")
-message("LLVM include lib: ${LLVM_LIBRARY_DIRS}")
-
-set(CORE_SOURCES
+set(COMPILER_SOURCE
     src/logos/LgsApp.cpp
     src/logos/LgsStack.cpp
     src/logos/LgsPaths.cpp
@@ -150,32 +137,58 @@ set(CORE_SOURCES
     src/symbols/types/primitives/LgsByte.cpp
 )
 
-set(RUNTIME_SOURCES
-    ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_Map.cpp
-    ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_DArray.cpp
-    ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_System.cpp
-    ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_Runtime.cpp
-    ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_Stack.cpp
-    ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_Print.cpp
-    ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_Arena.cpp
-    ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_Set.cpp
+set(RUNTIME_SOURCE
+    runtime/lib/Lgs_Map.cpp
+    runtime/lib/Lgs_DArray.cpp
+    runtime/lib/Lgs_System.cpp
+    runtime/lib/Lgs_Runtime.cpp
+    runtime/lib/Lgs_Stack.cpp
+    runtime/lib/Lgs_Print.cpp
+    runtime/lib/Lgs_Arena.cpp
+    runtime/lib/Lgs_Set.cpp
 )
 
-add_library(lgs_lib SHARED ${CORE_SOURCES} ${RUNTIME_SOURCES})
-set_target_properties(lgs_lib PROPERTIES OUTPUT_NAME "lgs")
-separate_arguments(LLVM_LIBS)
-target_link_libraries(lgs_lib PUBLIC ${LLVM_LIBS} clang-cpp)
-target_link_directories(lgs_lib PUBLIC ${LLVM_LIBRARY_DIRS})
-target_compile_options(lgs_lib PRIVATE -Wall -Wextra -Wpedantic -Wno-unused-parameter -Wno-unused-variable)
-
-target_include_directories(lgs_lib PUBLIC
+# Runtime
+add_library(lgs_runtime SHARED ${RUNTIME_SOURCE})
+set_target_properties(lgs_runtime PROPERTIES OUTPUT_NAME "lgs_runtime")
+target_include_directories(lgs_runtime PUBLIC
     ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_SOURCE_DIR}/include/symbols
     ${CMAKE_SOURCE_DIR}/runtime/include
 )
 
-target_include_directories(lgs_lib SYSTEM PUBLIC ${LLVM_INCLUDE_DIRS})
-add_executable(lgs main.cpp)
-target_link_libraries(lgs PRIVATE lgs_lib)
+# Compiler
+add_library(lgs_compiler SHARED ${COMPILER_SOURCE})
+set_target_properties(lgs_compiler PROPERTIES OUTPUT_NAME "lgs_compiler")
+target_link_libraries(lgs_compiler PUBLIC LLVM clang-cpp lgs_runtime)
 
+# Options
+target_compile_options(lgs_compiler PRIVATE
+    -Wall
+    -Wextra
+    -Wpedantic
+    -Wno-unused-parameter
+    -Wno-unused-variable
+)
+
+# Include
+target_include_directories(lgs_compiler PUBLIC
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/include/symbols
+    ${CMAKE_SOURCE_DIR}/runtime/include
+)
+target_include_directories(lgs_compiler SYSTEM PUBLIC
+    ${LLVM_INCLUDE_DIRS}
+    ${CLANG_INCLUDE_DIRS}
+)
+
+# Link
+add_executable(lgs main.cpp)
+target_link_libraries(lgs PRIVATE lgs_compiler)
+
+# Tests
 add_subdirectory(tests)
+
+# Install
+install(TARGETS lgs RUNTIME DESTINATION bin)
+install(TARGETS lgs_compiler lgs_runtime LIBRARY DESTINATION lib ARCHIVE DESTINATION lib)

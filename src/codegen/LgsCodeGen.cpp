@@ -52,6 +52,9 @@
 #include <llvm/Support/FileSystem.h>
 #include <llvm/Passes/PassBuilder.h>
 #include "llvm/Bitcode/BitcodeWriter.h"
+
+#include <iostream>
+#include <unistd.h>
 #include <unordered_set>
 
 std::atomic<size_t> LgsCodeGen::namesCounter{0};
@@ -157,7 +160,6 @@ void LgsCodeGen::visitGenericFunc(LgsFunc* func) {
 }
 
 void LgsCodeGen::visitField(LgsField* field) const {
-    if (field->IRValue) return;
     if (const auto vec = field->type->asVec()) {
         std::vector<int> mask(vec->vectorDim);
         for (int8_t i = 0; i < vec->vectorDim; i++) {
@@ -808,7 +810,6 @@ void LgsCodeGen::visitSelection(LgsSelection* selection, const bool assign) {
             const auto field = parent->type->getField(baseExpr->name);
             field->parentIRValue = parent->IRValue;
             field->parentIRType = parent->type->getIRType(cg);
-            visitField(field);
             iterIndex->destPtrValue = field->IRValue;
             visitIterIndex(iterIndex, false);
         } else {
@@ -998,7 +999,6 @@ void LgsCodeGen::visitInstance(LgsInstance* instance) {
         field->parentIRType = instance->obj->getIRType(cg);
         if (!field->expr) {
             field->expr = field->type->getZeroValue();
-            field->expr->destPtrValue = field->IRValue;
             if (field->isOwner && field->type->isHeapAlloc) {
                 field->expr->owner = field;
             }
@@ -1235,12 +1235,11 @@ void LgsCodeGen::setNestedSArr(const LgsArrayExpr* arrayExpr, Type* parentType, 
 
 void LgsCodeGen::setDynamicArray(LgsArrayExpr* arrayExpr) {
     const auto arr = arrayExpr->type->asDArray();
-    const auto size = arr->baseType->getSizeBytes();
-    if (!arrayExpr->IRValue) {
-        const auto rtt = arr->baseType->getRTType();
-        arrayExpr->IRValue = cg.callLgsFunc("DArray_init", cg.ptrTy(), {cg.sizeTy(), cg.sizeTy()}, {cg.i64(size), cg.usize(rtt)});
-        cg.addHeap(arrayExpr->owner, rtt, arrayExpr->IRValue);
-    }
+    const auto baseSize = arr->baseType->getSizeBytes();
+    assert(!arrayExpr->IRValue);
+    const auto rtt = arr->baseType->getRTType();
+    arrayExpr->IRValue = cg.callLgsFunc("DArray_init", cg.ptrTy(), {cg.sizeTy(), cg.sizeTy()}, {cg.i64(baseSize), cg.usize(rtt)});
+    cg.addHeap(arrayExpr->owner, rtt, arrayExpr->IRValue);
     for (size_t i = 0; i < arrayExpr->elements.size(); ++i) {
         const auto element = arrayExpr->elements[i];
         element->destPtrValue = arrayExpr->IRValue;
@@ -1411,7 +1410,7 @@ bool LgsCodeGen::allArgsAreConst(const std::vector<LgsExpr*>& args) {
 
 bool LgsCodeGen::writeIRModule() const {
     // Print IR to stdout even with failure.
-    if (lgsConfigs.debug) {
+    if (lgsConfigs.devMode && lgsConfigs.printIR) {
         std::lock_guard lock(mtx);
         cg.IRModule->print(llvm::outs(), nullptr);
         logInfo(LGS_MSG_LINE_SEPERATOR);

@@ -2,13 +2,10 @@
 #include "Lgs_DArray.h"
 #include "Lgs_Set.h"
 #include "Lgs_Map.h"
-
 #include <cassert>
 #include <iostream>
 
-#define PRINT_MEMORY false
-
-static std::string getTypeName(const Lgs_RTType type) {
+std::string getTypeName(const Lgs_RTType type) {
     switch (type) {
     case RTT_UNKNOWN: return "<Unknown>";
     case RTT_VOID: return "Void";
@@ -42,9 +39,6 @@ static std::string getTypeName(const Lgs_RTType type) {
 }
 
 static void freeType(void* ptr, const Lgs_RTType type) {
-    if constexpr (PRINT_MEMORY) {
-        std::cout << "\tFreeing: " << ptr << std::endl;
-    }
     switch (type) {
     case RTT_OBJECT: {
         std::free(ptr);
@@ -89,25 +83,16 @@ void Lgs_Stack::addDefer(void* funcPtr, void* ctx) {
 }
 
 void Lgs_Stack::addOwner(void* ptr, const Lgs_RTType type) {
-    if constexpr (PRINT_MEMORY) {
-        std::cout << "alloc owner " << getTypeName(type) << ": " << ptr << std::endl;
-    }
     const auto ownerIndex = frames[stackIndex].ownersCount++;
     frames[stackIndex].owners[ownerIndex] = Lgs_Alloc{ptr, type};
 }
 
 void Lgs_Stack::addOrphan(void* ptr, const Lgs_RTType type) {
-    if constexpr (PRINT_MEMORY) {
-        std::cout << "alloc orphan " << getTypeName(type) << ": " << ptr << std::endl;
-    }
     const auto ownerIndex = frames[stackIndex].orphansCount++;
     frames[stackIndex].orphans[ownerIndex] = Lgs_Alloc{ptr, type};
 }
 
 void Lgs_Stack::removeOwner(const void* owner) {
-    if constexpr (PRINT_MEMORY) {
-        std::cout << "removing owner: " << owner << std::endl;
-    }
     auto& stackFrame = frames[stackIndex];
     for (size_t i = 0; i < stackFrame.ownersCount; i++) {
         if (stackFrame.owners[i].ptr == owner) {
@@ -123,18 +108,12 @@ void Lgs_Stack::removeOwner(const void* owner) {
 void Lgs_Stack::funcCleanup() {
     auto& stackFrame = frames[stackIndex];
     if (stackFrame.ownersCount > 0) {
-        if constexpr (PRINT_MEMORY) {
-            std::cout << stackFrame.ownersCount << " owners:" << std::endl;
-        }
         for (size_t i = 0; i < stackFrame.ownersCount; i++) {
             freeType(stackFrame.owners[i].ptr, stackFrame.owners[i].type);
         }
         stackFrame.ownersCount = 0;
     }
     if (stackFrame.orphansCount > 0) {
-        if constexpr (PRINT_MEMORY) {
-            std::cout << stackFrame.orphansCount << " orphans:" << std::endl;
-        }
         for (size_t i = 0; i < stackFrame.orphansCount; i++) {
             freeType(stackFrame.orphans[i].ptr, stackFrame.orphans[i].type);
         }

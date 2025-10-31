@@ -20,7 +20,7 @@ bool LgsFuncCall::equals(LgsExpr* other) {
 
 bool LgsFuncCall::equals(const LgsFuncType* other) const {
     if (other->isVariadic) return equalsVariadic(other);
-    if (args.size() > other->params.size()) return false;
+    if (args.size() - other->isMethod > other->params.size()) return false;
     for (size_t i = other->isMethod; i < other->params.size(); ++i) {
         if (i >= args.size()) continue;
         const auto param = other->params[i];

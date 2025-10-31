@@ -35,7 +35,7 @@ void LgsCli::execute() const {
     } else if (cmdStr == helpCmdHelp.name) {
         printLgsHelp();
     } else if (cmdStr == versionCmdHelp.name) {
-        logInfo(std::string(LOGOS_VERSION));
+        logInfo(std::string(LOGOS_VERSION) + '\n');
     } else {
         logError(E40000.msg);
         printLgsHelp();

@@ -15,6 +15,7 @@
 #include "exprs/LgsJson.h"
 #include "exprs/LgsNull.h"
 #include "exprs/LgsTypeExpr.h"
+#include "funcs/LgsFunc.h"
 #include "loops/LgsLoopMetaVar.h"
 
 #include <iostream>

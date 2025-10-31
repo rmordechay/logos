@@ -75,12 +75,21 @@ void LgsCliCmd::printArg(std::ostringstream& txt, LgsCliCmdArgHelp& arg) const {
     }
 }
 
-int32_t LgsCliCmd::parseInt(int& i, const std::string& name) const {
-    if (name.size() == 1 && i + 1 < argc) {
+int32_t LgsCliCmd::parseInt(int& i, const std::string& cmd) const {
+    if (cmd.size() == 1) {
         return argv[++i][0] - '0';
     }
-    if (name.size() == 2) {
-        return name[1] - '0';
+    if (cmd.size() == 2) {
+        return cmd[1] - '0';
     }
     return -1;
+}
+
+std::string LgsCliCmd::parseString(int& i, const std::string& cmd) const {
+    const auto code = argv[++i];
+    const auto firstChar = code[0];
+    if (firstChar == '"' || firstChar == '\'') {
+        return cmd.substr(1, cmd.size() - 2);
+    }
+    return "";
 }

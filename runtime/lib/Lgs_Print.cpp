@@ -1,10 +1,10 @@
 #include "Lgs_DArray.h"
 #include "Lgs_Types.h"
 #include "data/LgsDefinitions.h"
-#include "exprs/LgsNull.h"
-#include "types/primitives/LgsBool.h"
+#include <cassert>
 #include <sstream>
 #include <cmath>
+
 std::string formatArray(Lgs_DArray* arr);
 std::string formatElement(Lgs_RTType type, void* elem);
 
@@ -24,7 +24,7 @@ std::string formatElement(const Lgs_RTType type, void* elem) {
         oss << *static_cast<const char*>(elem);
         break;
     case RTT_BOOL:
-        oss << (*static_cast<bool*>(elem) ? LgsBool::trueLiteral : LgsBool::falseLiteral);
+        oss << (*static_cast<bool*>(elem) ? "true" : "false");
         break;
     case RTT_BYTE:
         oss << *static_cast<int8_t*>(elem);

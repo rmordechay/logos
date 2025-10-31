@@ -47,6 +47,13 @@ extern "C" void Lgs_DArray_addLong(Lgs_DArray* arr, const int64_t value) {
     arr->size += sizeof(int64_t);
 }
 
+extern "C" void Lgs_DArray_addSize(Lgs_DArray* arr, const size_t value) {
+    assert(arr);
+    resizeArrIfNeeded(arr);
+    *reinterpret_cast<size_t*>(arr->data + arr->size) = value;
+    arr->size += sizeof(size_t);
+}
+
 extern "C" void Lgs_DArray_put(const Lgs_DArray* arr, const size_t index, const void* value) {
     if (!arr) return;
     const size_t arrLen = arr->size / arr->elementSize;

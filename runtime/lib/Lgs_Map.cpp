@@ -1,10 +1,10 @@
 #include "Lgs_Map.h"
 #include "Lgs_DArray.h"
-#include "types/iterables/LgsMap.h"
-#include "utils/LgsUtils.h"
+#include "data/LgsErrors.h"
+#include <cassert>
 
 extern "C" size_t Lgs_hash(const char* s) {
-    return hashStr(s);
+    return std::hash<std::string_view>{}(s);
 }
 
 extern "C" void Lgs_Map_init(Lgs_Map* map, const size_t valueSize, const Lgs_RTType keyType, const Lgs_RTType valueType) {
@@ -28,7 +28,7 @@ extern "C" void* Lgs_Map_get(const Lgs_Map* map, const char* key) {
     if (!map || !key || !map->data) assert(0);
     const auto v = map->data->find(key);
     if (v == map->data->end()) {
-        exitWithError(E10067, {key});
+        // exitWithError(E10067, {key});
         return nullptr;
     }
     return v->second.data();

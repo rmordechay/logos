@@ -2,7 +2,6 @@
 #include "Lgs_Stack.h"
 #include "Lgs_Types.h"
 #include "data/LgsConfigs.h"
-#include <cstddef>
 typedef void (*Lgs_DeferFunc)(void*);
 
 struct Lgs_ThunkFunc {

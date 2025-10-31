@@ -1506,8 +1506,12 @@ LgsSelection* LgsParser::parseSelection(LgsExpr* firstExpr) {
     if (firstExpr) exprs.push_back(firstExpr);
     while (true) {
         LgsExpr* expr = nullptr;
-        if (const auto funcCall = parseFuncCall()) expr = funcCall;
-        else if (const auto variable = parseVariable()) expr = variable;
+        if (const auto funcCall = parseFuncCall()) {
+            funcCall->isMethodCall = true;
+            expr = funcCall;
+        } else if (const auto variable = parseVariable()) {
+            expr = variable;
+        }
         if (expr) {
             if (const auto iterIndex = parseIterIndex(expr)) expr = iterIndex;
         }

@@ -82,6 +82,9 @@ LgsFunc* LgsDArray::getAddFunc() {
         if (baseType->asLong()) {
             return cg.callLgsFunc(std::string(name) + "_addLong", cg.voidTy(), {cg.ptrTy(), cg.i64Ty()}, {cg.getPtrTo(args[0]->IRValue), args[1]->IRValue});
         }
+        if (baseType->asSize()) {
+            return cg.callLgsFunc(std::string(name) + "_addSize", cg.voidTy(), {cg.ptrTy(), cg.i64Ty()}, {cg.getPtrTo(args[0]->IRValue), args[1]->IRValue});
+        }
         assert(0);
     };
     methods[func->second->funcType->name] = func->second;

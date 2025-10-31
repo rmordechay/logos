@@ -14,6 +14,7 @@
 #include "files/LgsTestFile.h"
 #include "parser/LgsParser.h"
 #include "utils/LgsUtils.h"
+#include <iostream>
 
 void LgsApp::compile() {
     if (!setup()) errHandler.exitWithErrors();
@@ -31,7 +32,10 @@ bool LgsApp::setup() {
 
     // Code mode
     if (!lgsCode.empty()) {
-        paths.rootPath = fs::temp_directory_path();
+        const auto dirName = "lgs_" + std::to_string(std::chrono::system_clock::now().time_since_epoch().count());
+        const auto fullPath = fs::temp_directory_path() / dirName;
+        fs::create_directories(fullPath);
+        paths.rootPath = fullPath;
         paths.initPaths();
         return true;
     }
@@ -62,12 +66,14 @@ bool LgsApp::setup() {
     ));
 
     // Env files
-    for (const auto& entry : fs::recursive_directory_iterator(paths.envsDir)) {
-        appMetadata.files.emplace_back(LgsFileMetadata(
-            getNextFileID(),
-            entry.path(),
-            LGS_ENV_FILE
-        ));
+    if (fs::exists(paths.envsDir)) {
+        for (const auto& entry : fs::recursive_directory_iterator(paths.envsDir)) {
+            appMetadata.files.emplace_back(LgsFileMetadata(
+                getNextFileID(),
+                entry.path(),
+                LGS_ENV_FILE
+            ));
+        }
     }
 
     // Src files
@@ -90,7 +96,7 @@ bool LgsApp::parse() {
     // Code mode
     if (!lgsCode.empty()) {
         for (auto [path, code] : lgsCode) {
-            loadSrcFile(code, fs::canonical(path));
+            loadSrcFile(code, path);
         }
         return errHandler.successful;
     }
@@ -105,8 +111,8 @@ bool LgsApp::parse() {
 
     // Project mode
     appMetadata.load();
-    // if (!loadAppConfigFile()) return false;
-    // if (!loadEnvFiles()) return false;
+    if (!loadAppConfigFile()) return false;
+    if (!loadEnvFiles()) return false;
     for (auto& fileMetadata : appMetadata.files) {
         if (fileMetadata.type != LGS_SRC_FILE) continue;
         threadPool.runTask([&fileMetadata, this] {

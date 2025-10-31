@@ -17,6 +17,7 @@ public:
     void getLongestArg(const LgsCliCmdHelp& help);
     std::string padString(const std::string& str = "") const;
     void printArg(std::ostringstream& txt, LgsCliCmdArgHelp& arg) const;
-    int32_t parseInt(int& i, const std::string& name) const;
+    int32_t parseInt(int& i, const std::string& cmd) const;
+    std::string parseString(int& i, const std::string& cmd) const;
     virtual ~LgsCliCmd() = default;
 };

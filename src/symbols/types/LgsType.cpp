@@ -1,5 +1,6 @@
 #include "data/LgsConfigs.h"
 #include "exprs/LgsVectorExpr.h"
+#include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
 #include "types/LgsPtr.h"
 #include "types/LgsInterface.h"

@@ -5,16 +5,15 @@
 #include "llvm/Bitcode/BitcodeWriter.h"
 #include <llvm/Support/FileSystem.h>
 
-#define LINK_CMD_STRING "clang++ -flto %s -L%s -llgs -Wl,-rpath,%s -o %s"
+#define LINK_CMD_STRING "clang %s -L%s -llgs_runtime -Wl,-rpath,%s -o %s"
 
 bool LgsLinker::link() const {
     assert(paths.lgsLibPath != "" && paths.execFilePath != "");
-    LLVMContext context;
-    std::unique_ptr<Module> mainModule = nullptr;
-    std::vector<std::unique_ptr<Module>> modules;
     std::string objFileList;
     for (const auto& objPath : fs::directory_iterator(paths.buildDirObjs)) {
-        objFileList += objPath.path().string() + " ";
+        if (objPath.path().extension() == ".o") {
+            objFileList += objPath.path().string() + " ";
+        }
     }
     assert(objFileList != "");
     char cmd[1024*4];

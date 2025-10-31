@@ -1,4 +1,7 @@
 #include "exprs/LgsIterIndex.h"
+
+#include "funcs/LgsFunc.h"
+
 #include <exprs/LgsArrayExpr.h>
 #include "types/iterables/LgsMap.h"
 #include "types/iterables/LgsVec.h"

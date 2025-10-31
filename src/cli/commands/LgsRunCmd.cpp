@@ -28,15 +28,21 @@ void LgsRunCmd::parseArgs(LgsApp& app, std::vector<const char*>& appArgs) const 
         }
         const auto name = std::string(arg).substr(1);
         if (name[0] == 'o') {
-            const auto op = parseInt(i, name);
-            if (op < 0) exitWithError(E40002, {"-o"});
-            else if (op > 3) exitWithError(E40003, {std::to_string(op)});
-            app.appConfigs.optLevel = op;
+            const auto optLevel = parseInt(i, name);
+            if (optLevel < 0) exitWithError(E40002, {"-o"});
+            else if (optLevel > 3) exitWithError(E40003, {std::to_string(optLevel)});
+            app.appConfigs.optLevel = optLevel;
+        }
+        if (name[0] == 'c') {
+            const auto code = argv[++i];
+            argStart = i;
+            app.lgsCode[LGS_MAIN_FILE] = code;
+            return;
         }
     }
     if (argStart < 0) exitWithError(E40001);
     if (argStart >= argc) return;
-    app.paths.rootPath = fs::absolute(argv[argStart++]);
+    app.paths.rootPath = fs::canonical(argv[argStart++]);
     for (int j = argStart; j < argc; ++j) {
         const auto v = argv[j];
         appArgs.push_back(v);

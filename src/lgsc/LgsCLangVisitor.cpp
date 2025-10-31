@@ -1,6 +1,7 @@
 #include "lgsc/LgsCLangVisitor.h"
 #include "exprs/constants/LgsIntConst.h"
 #include "files/LgsFile.h"
+#include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
 #include "types/iterables/LgsDArray.h"
 #include "types/LgsObject.h"
