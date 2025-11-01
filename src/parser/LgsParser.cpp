@@ -335,6 +335,7 @@ LgsObject* LgsParser::parseObjectBody(const LgsToken& tokenName, const bool isSi
     while (true) {
         if (const auto field = parseField()) {
             obj->addField(field);
+            field->parent = obj;
         } else if (const auto enum_ = parseEnum()) {
             obj->enums.push_back(enum_);
         } else if (const auto subtype = parseSubtype()) {
@@ -622,6 +623,7 @@ LgsFunc* LgsParser::parseMethod(LgsObject* obj) {
     func->funcType->isPublic = isPublic;
     if (func->funcType->isMethod) {
         func->funcType->params.insert(func->funcType->params.begin(), LgsParam(obj, LGS_SELF));
+        func->funcType->params.front().isSelf = true;
     }
     currentFunc = nullptr;
     return func;

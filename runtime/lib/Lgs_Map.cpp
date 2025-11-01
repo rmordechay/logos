@@ -1,7 +1,11 @@
 #include "Lgs_Map.h"
 #include "Lgs_DArray.h"
 #include "data/LgsErrors.h"
+#include <cstring>
+#include <cstdlib>
 #include <cassert>
+#include <string>
+#include <iostream>
 
 extern "C" size_t Lgs_hash(const char* s) {
     return std::hash<std::string_view>{}(s);
@@ -67,19 +71,21 @@ extern "C" void* Lgs_Map_getValueAt(const Lgs_Map* map, const size_t index) {
 
 extern "C" Lgs_DArray* Lgs_Map_keys(const Lgs_Map* map) {
     if (!map) return nullptr;
-    const auto keys = Lgs_DArray_init(sizeof(char*), map->keyType);
+    const auto arr = new Lgs_DArray();
+    Lgs_DArray_init(arr, sizeof(char*), map->keyType);
     for (const auto& [k, v] : *map->data) {
         const auto keyStr = strdup(k.c_str());
-        Lgs_DArray_add(keys, keyStr);
+        Lgs_DArray_add(arr, keyStr);
     }
-    return keys;
+    return arr;
 }
 
 extern "C" Lgs_DArray* Lgs_Map_values(const Lgs_Map* map) {
     if (!map) return nullptr;
-    const auto values = Lgs_DArray_init(map->valueSize, map->valueType);
+    const auto arr = new Lgs_DArray();
+    Lgs_DArray_init(arr, map->valueSize, map->valueType);
     for (const auto& [k, v] : *map->data) {
-        Lgs_DArray_add(values, v.data());
+        Lgs_DArray_add(arr, v.data());
     }
-    return values;
+    return arr;
 }

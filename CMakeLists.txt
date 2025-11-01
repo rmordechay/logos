@@ -4,6 +4,7 @@ project(logos VERSION 0.0.1)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_definitions(-DLOGOS_VERSION="${CMAKE_PROJECT_VERSION}")
+option(LOGOS_RELEASE "Build release version" OFF)
 
 find_package(LLVM REQUIRED CONFIG)
 find_package(Clang REQUIRED CONFIG)
@@ -15,8 +16,8 @@ if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     set(CMAKE_INSTALL_PREFIX "/usr/local" CACHE PATH "Install prefix" FORCE)
 endif()
 
-find_program(CCACHE_PROGRAM ccache)
-if (CCACHE_PROGRAM)
+find_program(CCACHE_PROGRAM ccache )
+if (CCACHE_PROGRAM AND NOT LOGOS_RELEASE)
     set(CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
     set(CMAKE_C_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
 endif()
@@ -163,19 +164,30 @@ set_target_properties(lgs_compiler PROPERTIES OUTPUT_NAME "lgs_compiler")
 target_link_libraries(lgs_compiler PUBLIC LLVM clang-cpp lgs_runtime)
 
 # Options
-target_compile_options(lgs_compiler PRIVATE
-    -Wall
-    -Wextra
-    -Wpedantic
-    -Wno-unused-parameter
-    -Wno-unused-variable
-)
+if(LOGOS_RELEASE)
+    target_compile_options(lgs_compiler PRIVATE -O3 -DNDEBUG)
+    target_compile_options(lgs_runtime PRIVATE -O3 -DNDEBUG)
+    set_target_properties(lgs_compiler PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
+    set_target_properties(lgs_runtime PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
+else()
+    foreach(target lgs_compiler lgs_runtime)
+        target_compile_options(${target} PRIVATE
+            -Wall
+            -Wextra
+            -Wpedantic
+            -Werror
+            -Wreturn-type
+            -Wno-unused-parameter
+            -Wno-unused-variable
+        )
+    endforeach()
+endif()
 
 # Include
 target_include_directories(lgs_compiler PUBLIC
     ${CMAKE_SOURCE_DIR}/include
-    ${CMAKE_SOURCE_DIR}/include/symbols
-    ${CMAKE_SOURCE_DIR}/runtime/include
+    ${LLVM_INCLUDE_DIRS}
+    ${CLANG_INCLUDE_DIRS}
 )
 target_include_directories(lgs_compiler SYSTEM PUBLIC
     ${LLVM_INCLUDE_DIRS}
@@ -186,8 +198,13 @@ target_include_directories(lgs_compiler SYSTEM PUBLIC
 add_executable(lgs main.cpp)
 target_link_libraries(lgs PRIVATE lgs_compiler)
 
-# Tests
-add_subdirectory(tests)
+if(NOT LOGOS_RELEASE)
+    set_target_properties(lgs PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
+    if(UNIX AND NOT APPLE)
+        target_link_options(lgs PRIVATE -s)
+    endif()
+    add_subdirectory(tests)
+endif()
 
 # Install
 install(TARGETS lgs RUNTIME DESTINATION bin)

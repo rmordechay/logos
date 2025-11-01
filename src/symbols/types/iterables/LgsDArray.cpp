@@ -108,8 +108,11 @@ Value* LgsDArray::inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) {
 }
 
 Value* LgsDArray::getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) {
-    LgsFunc f("get", &LGS_ANY, {this, &LGS_LONG}, BUILTIN | PUBLIC | METHOD);
-    return f.callIR(cg, {iterable, index});
+    return cg.callLgsFunc("DArray_get", cg.ptrTy(), {cg.ptrTy(), cg.sizeTy()}, {iterable, index});;
+}
+
+void LgsDArray::initArr(LgsLLVMGen& cg, Value* iterable) {
+    cg.callLgsFunc("DArray_init", cg.voidTy(), {cg.ptrTy(), cg.sizeTy(), cg.i32Ty()}, {iterable, cg.usize(baseType->getSizeBytes()), cg.i32(getRTType())});
 }
 
 bool LgsDArray::canCastTo(LgsType* other) {

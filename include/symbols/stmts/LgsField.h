@@ -1,7 +1,7 @@
 #pragma once
 #include <utility>
 #include "LgsValue.h"
-#include "../exprs/LgsHashMap.h"
+#include "exprs/LgsHashMap.h"
 
 class LgsEnum;
 class LgsObject;
@@ -20,11 +20,12 @@ public:
     bool isVirtual = false;
     bool isOptional = false;
     bool isOwner = false;
-    Type* parentIRType = nullptr;
     Value* parentIRValue = nullptr;
+    LgsType* parent = nullptr;
 
     LgsField(std::string name, LgsType* type, LgsExpr* expr = nullptr) : name(std::move(name)), type(type), expr(expr) {}
     void setType(LgsType* newType);
+    Value* getGEP(LgsLLVMGen& cg) const;
     Value* loadIR(LgsLLVMGen& cg) override;
     Value* resolveVirtualField(LgsLLVMGen* cg, const LgsHashMap* vtable) const;
     ~LgsField() override;

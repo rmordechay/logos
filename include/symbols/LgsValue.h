@@ -1,6 +1,7 @@
 #pragma once
 #include "data/LgsErrors.h"
-#include <llvm/IR/DebugInfoMetadata.h>
+#include <llvm/IR/Value.h>
+#include <llvm/IR/DIBuilder.h>
 
 namespace llvm {
     class TargetMachine;

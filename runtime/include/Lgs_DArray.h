@@ -12,7 +12,7 @@ struct Lgs_DArray {
     Lgs_RTType baseType;
 };
 
-extern "C" Lgs_DArray* Lgs_DArray_init(size_t elementSize, Lgs_RTType baseType);
+extern "C" void Lgs_DArray_init(Lgs_DArray* arr, size_t elementSize, Lgs_RTType baseType);
 extern "C" void Lgs_DArray_add(Lgs_DArray* arr, const void* value);
 extern "C" size_t Lgs_DArray_len(const Lgs_DArray* arr);
 extern "C" void* Lgs_DArray_get(const Lgs_DArray* arr, int64_t index);

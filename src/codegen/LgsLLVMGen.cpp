@@ -12,7 +12,7 @@
 #include <string>
 
 void LgsLLVMGen::setupModule(const LgsFile& file, const bool debugMode) {
-    IRModule = new Module(file.absPath.filename().string(), context);
+    IRModule = new Module(file.absPath.stem().string(), context);
     IRModule->setTargetTriple(llvm::sys::getDefaultTargetTriple());
     IRModule->setDataLayout(targetMachine->createDataLayout());
     if (debugMode) {

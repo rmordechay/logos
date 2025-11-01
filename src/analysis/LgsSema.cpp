@@ -669,7 +669,7 @@ void LgsSema::visitVariable(LgsVariable* variable) {
         break;
     }
     case PARAM: {
-        variable->ref.param = symbol->param;
+        variable->ref.param = symbol->param->clone();
         variable->setType(symbol->param->type);
         break;
     }
@@ -1004,6 +1004,7 @@ void LgsSema::visitInterfaceInstance(LgsInstance* instance, LgsInterface* interf
             const auto newMethod = arg->asFunc();
             newMethod->funcType->name = method->funcType->name;
             newMethod->funcType->params.insert(newMethod->funcType->params.begin(), LgsParam(interface, LGS_SELF));
+            newMethod->funcType->params.front().isSelf = true;
             instance->obj->addMethod(newMethod);
             continue;
         }

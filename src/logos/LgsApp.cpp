@@ -11,6 +11,7 @@
 #include "files/LgsEnvFile.h"
 #include "codegen/LgsCodeGen.h"
 #include "codegen/LgsLinker.h"
+#include "data/LgsConfigs.h"
 #include "files/LgsTestFile.h"
 #include "parser/LgsParser.h"
 #include "utils/LgsUtils.h"
@@ -190,6 +191,13 @@ bool LgsApp::generate() {
         });
     }
     threadPool.wait();
+    if (lgsConfigs.devMode && lgsConfigs.printIR) {
+        for (const auto& file : srcFiles) {
+            std::lock_guard lock(mtx);
+            file->cg.IRModule->print(llvm::outs(), nullptr);
+            logInfo(LGS_MSG_LINE_SEPERATOR);
+        }
+    }
     return errHandler.successful;
 }
 

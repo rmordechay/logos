@@ -22,8 +22,7 @@ Type* LgsFuncType::getIRType(LgsLLVMGen& cg) {
     for (size_t i = 0; i < params.size(); ++i) {
         const auto param = params[i];
         const auto paramType = param.type;
-        const auto isSelf = isMethod && i == 0;
-        if (isSelf || !paramType->isPrimitive) {
+        if (param.isSelf || !paramType->isPrimitive) {
             IRParamsTypes.emplace_back(cg.ptrTy());
         } else {
             IRParamsTypes.emplace_back(paramType->getIRType(cg));

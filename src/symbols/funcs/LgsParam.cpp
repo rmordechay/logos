@@ -12,3 +12,14 @@ std::string LgsParam::asText() {
 void LgsParam::setType(LgsType* newType) {
     type = newType;
 }
+
+LgsParam* LgsParam::clone() const {
+    const auto cloned = new LgsParam(type, name);
+    cloned->location = location;
+    if (expr) {
+        cloned->expr = expr->cloneExpr();
+    }
+    cloned->isSelf = isSelf;
+    cloned->isVariadic = isVariadic;
+    return cloned;
+}

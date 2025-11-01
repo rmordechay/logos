@@ -19,7 +19,7 @@ class LgsFile {
 public:
     size_t id = 0;
     fs::path absPath;
-    LgsLLVMGen generator;
+    LgsLLVMGen cg;
     LgsLocation location;
     LgsSymbolTable symbolTable;
     std::vector<LgsStrConst*> externalCPaths;

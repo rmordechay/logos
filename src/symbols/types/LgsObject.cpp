@@ -56,9 +56,6 @@ Type* LgsObject::getIRType(LgsLLVMGen& cg) {
         elementTypes.push_back(fieldType);
     }
     IRType = StructType::create(cg.context, elementTypes, name);
-    for (const auto& field : fields) {
-        field->parentIRType = IRType;
-    }
     cg.typesRegistry[name] = IRType;
     return IRType;
 }

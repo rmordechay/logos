@@ -7,15 +7,13 @@
 static void resizeArrIfNeeded(Lgs_DArray* arr);
 static bool compare_arrays(const Lgs_DArray* arr1, const Lgs_DArray* arr2);
 
-extern "C" Lgs_DArray* Lgs_DArray_init(const size_t elementSize, const Lgs_RTType baseType) {
+extern "C" void Lgs_DArray_init(Lgs_DArray* arr, const size_t elementSize, const Lgs_RTType baseType) {
     assert(baseType != RTT_UNKNOWN);
-    const auto arr = new Lgs_DArray();
     arr->elementSize = elementSize;
     arr->baseType = baseType;
     arr->capacity = elementSize * 10;
     arr->data = static_cast<char*>(std::malloc(arr->capacity));
     arr->size = 0;
-    return arr;
 }
 
 extern "C" void Lgs_DArray_reserve(Lgs_DArray* arr, const size_t numElements) {

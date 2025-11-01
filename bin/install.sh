@@ -17,12 +17,15 @@ detect_os() {
     . /etc/os-release
     OS=$ID
     WORKERS=$(nproc)
+    LGS_LIB="lgslib.so"
   elif [ -f /etc/os-alpine ]; then
     OS="alpine"
     WORKERS=$(nproc)
+    LGS_LIB="lgslib.so"
   elif [[ "$OSTYPE" = "darwin"* ]]; then
     OS="macos"
     WORKERS=$(sysctl -n hw.ncpu)
+    LGS_LIB="lgslib.dylib"
   else
     echo "Operating system could not be detected."
     exit 1
@@ -31,7 +34,9 @@ detect_os() {
 
 install_debian() {
   apt-get update > /dev/null 2>&1
-  DEBIAN_FRONTEND=noninteractive apt-get update && apt-get install -y git cmake clang-19 libclang-19-dev libclang-cpp19-dev
+  DEBIAN_FRONTEND=noninteractive \
+    apt-get update && \
+    apt-get install -y git cmake clang-19 libclang-19-dev libclang-cpp19-dev
   update-alternatives --install /usr/bin/clang clang /usr/lib/llvm-19/bin/clang 100 > /dev/null 2>&1
   update-alternatives --install /usr/bin/clang++ clang++ /usr/lib/llvm-19/bin/clang++ 100 > /dev/null 2>&1
   update-alternatives --install /usr/bin/llc llc /usr/lib/llvm-19/bin/llc 100 > /dev/null 2>&1
@@ -74,7 +79,7 @@ install_logos() {
   git clone --depth 1 -b dev https://github.com/rmordechay/logos
   cd logos
 
-  cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local
+  cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local -DLOGOS_RELEASE=ON
   cmake --build build -j"$WORKERS"
   cmake --install build
 
@@ -91,4 +96,4 @@ install_logos
 echo "Installation done."
 echo "Files installed:"
 echo "- $INSTALL_PREFIX/bin/lgs"
-echo "- $INSTALL_PREFIX/lib/liblgs.so"
+echo "- $INSTALL_PREFIX/lib/$LGS_LIB"

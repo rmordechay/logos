@@ -33,15 +33,17 @@ struct LgsSymbol {
     bool isExternal = false;
     bool isBuiltin = false;
 
-    LgsVarDec* varDec = nullptr;
-    LgsParam* param = nullptr;
-    LgsObject* object = nullptr;
-    LgsInterface* interface = nullptr;
-    LgsSubType* subtype = nullptr;
-    LgsGeneric* generic = nullptr;
-    LgsField* field = nullptr;
-    LgsEnum* enum_ = nullptr;
-    LgsFunc* func = nullptr;
+    union {
+        LgsVarDec* varDec;
+        LgsParam* param;
+        LgsObject* object;
+        LgsInterface* interface;
+        LgsSubType* subtype;
+        LgsGeneric* generic;
+        LgsField* field;
+        LgsEnum* enum_;
+        LgsFunc* func;
+    };
     LgsLocation* location;
 
     explicit LgsSymbol();

@@ -37,7 +37,6 @@ void LgsPaths::findLgsLib() {
     }
 
     std::vector<fs::path> searchPaths;
-
     if (lgsConfigs.devMode) {
         searchPaths.push_back(fs::current_path());
         searchPaths.push_back(fs::current_path().parent_path());
@@ -53,12 +52,10 @@ void LgsPaths::findLgsLib() {
     }
 
     for (const auto& path : searchPaths) {
-        if (fs::exists(path / libName)) {
-            lgsLibPath = path;
-            return;
-        }
+        if (!fs::exists(path / libName)) continue;
+        lgsLibPath = path;
+        return;
     }
-
     assert(0 && "Could not find Logos runtime library");
 }
 

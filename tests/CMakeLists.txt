@@ -8,7 +8,11 @@ add_executable(lgs_tests
     parser/ParserTest.cpp
 )
 
-set_target_properties(lgs_tests PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
-
-target_include_directories(lgs_tests PRIVATE ${CMAKE_SOURCE_DIR}/tests)
-target_link_libraries(lgs_tests PRIVATE lgs_lib)
+target_include_directories(lgs_tests PRIVATE
+    ${CMAKE_SOURCE_DIR}/tests
+    ${CMAKE_SOURCE_DIR}/external
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/include/symbols
+    ${CMAKE_SOURCE_DIR}/runtime/include
+)
+target_link_libraries(lgs_tests PRIVATE lgs_compiler)

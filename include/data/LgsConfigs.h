@@ -12,14 +12,22 @@ enum LgsOS {
     WINDOWS,
 };
 
+enum LgsArch {
+    UNKNOWN_ARCH,
+    X86_64,
+    AARCH64,
+};
+
 struct LgsConfigs {
     LgsOS os;
+    LgsArch arch;
     bool devMode = false;
-    bool printIR = true;
+    bool printIR = false;
     bool writeIRFiles = false;
 
     LgsConfigs() {
         setOS();
+        setArch();
         if (const char* env = std::getenv("LGS_DEV_MODE")) {
             devMode = std::string(env) == "1" || std::string(env) == "true";
         }
@@ -34,6 +42,14 @@ struct LgsConfigs {
         os = LINUX;
 #else
         assert(0)
+#endif
+    }
+
+    void setArch() {
+#if defined(__x86_64__) || defined(_M_X64)
+        arch = X86_64;
+#elif defined(__aarch64__)
+        arch = AARCH64;
 #endif
     }
 };

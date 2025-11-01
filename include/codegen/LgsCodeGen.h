@@ -67,7 +67,7 @@ public:
     static std::atomic<size_t> namesCounter;
 
     explicit LgsCodeGen(LgsFile& file, LgsAppConfigs& appConfigs, LgsPaths& paths)
-        : file(file), cg(file.generator), paths(paths), appConfigs(appConfigs) {
+        : file(file), cg(file.cg), paths(paths), appConfigs(appConfigs) {
     }
 
     bool generate();

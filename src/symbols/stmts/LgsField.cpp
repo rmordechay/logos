@@ -10,9 +10,14 @@ void LgsField::setType(LgsType* newType) {
 
 Value* LgsField::loadIR(LgsLLVMGen& cg) {
     if (!IRValue) {
-        IRValue = cg.builder.CreateStructGEP(parentIRType, parentIRValue, position);
+        IRValue = getGEP(cg);
     }
     return cg.builder.CreateLoad(type->getIRType(cg), IRValue);
+}
+
+Value* LgsField::getGEP(LgsLLVMGen& cg) const {
+    assert(parentIRValue);
+    return cg.builder.CreateStructGEP(parent->getIRType(cg), parentIRValue, position);
 }
 
 Value* LgsField::resolveVirtualField(LgsLLVMGen* cg, const LgsHashMap* vtable) const {

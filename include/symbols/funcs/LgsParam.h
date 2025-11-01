@@ -14,11 +14,13 @@ public:
     LgsType* type = nullptr;
     LgsExpr* expr = nullptr;
     Value* vaList = nullptr;
+    bool isSelf = false;
     bool isVariadic = false;
 
     explicit LgsParam(LgsType* type, const std::string& name, LgsExpr* expr = nullptr) : name(name), type(type), expr(expr) {}
     Value* loadIR(LgsLLVMGen& cg) override;
     std::string asText() override;
     void setType(LgsType* newType);
+    LgsParam* clone() const;
     ~LgsParam() override = default;
 };
