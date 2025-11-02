@@ -50,6 +50,7 @@ install_alpine() {
 
 install_macos() {
   echo "Installing for Mac..."
+  apt-get install -y git cmake llvm@19
 }
 
 install_fedora() {

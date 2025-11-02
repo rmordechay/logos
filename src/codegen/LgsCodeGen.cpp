@@ -70,7 +70,7 @@ bool LgsCodeGen::generate() {
     } else if (const auto testFile = dynamic_cast<LgsTestFile*>(&file)) {
         visitTestFile(testFile);
     }
-    if (appConfigs.debugMode) cg.finalizeDebugger(paths.buildDir);;
+    if (appConfigs.debugMode) cg.finalizeDebugger(paths.buildDir);
     return writeIRModule();
 }
 
@@ -616,7 +616,6 @@ void LgsCodeGen::visitBinaryExpr(LgsBinaryExpr* binExpr) {
         binExpr->IRValue = binExpr->results->IRValue;
         return;
     }
-    const auto type = binExpr->type;
     switch (binExpr->op) {
     case ADD:
         binExpr->IRValue = l->type->addIR(cg, l, r); break;
@@ -1412,7 +1411,7 @@ bool LgsCodeGen::allArgsAreConst(const std::vector<LgsExpr*>& args) {
 bool LgsCodeGen::writeIRModule() const {
     if (verifyModule(*cg.IRModule, &llvm::errs())) assert(0);
 
-    // Print IR to file
+    // Write IR to file
     auto moduleName = cg.IRModule->getName().str();
     if (lgsConfigs.writeIRFiles) {
         const auto filePath = (paths.buildDirIR / moduleName).string() + ".ll";

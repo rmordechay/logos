@@ -22,7 +22,7 @@ struct LgsConfigs {
     LgsOS os;
     LgsArch arch;
     bool devMode = false;
-    bool printIR = false;
+    bool printIR = true;
     bool writeIRFiles = false;
 
     LgsConfigs() {
@@ -41,7 +41,7 @@ struct LgsConfigs {
 #elif defined(__linux__)
         os = LINUX;
 #else
-        assert(0)
+        assert(0);
 #endif
     }
 
