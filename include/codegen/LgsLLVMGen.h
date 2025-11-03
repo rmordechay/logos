@@ -54,10 +54,9 @@ public:
     // Funcs
     static FunctionType* getFT(Type* rt, const std::vector<Type*>& params = {}, bool isVariadic = false);
     Function* getFunc(const std::string& funcName, FunctionType* ft, GlobalValue::LinkageTypes linkage = GlobalValue::ExternalLinkage) const;
-    Value* callFunc(const std::string& funcName, FunctionType* ft, const std::vector<Value*>& args = {});
-    Value* callFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes = {}, const std::vector<Value*>& args = {});
+    Value* callFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes = {}, const std::vector<Value*>& args = {}, bool isVariadic = false);
+    Value* callIntrinsics(llvm::Intrinsic::ID name, const std::vector<Value*>& args, const std::vector<Type*>& types = {});
     Value* callLgsFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes = {}, const std::vector<Value*>& args = {});
-    Value* callHash(Value* v);
 
     // System
     Value* callPrintf(const std::vector<Value*>& args);

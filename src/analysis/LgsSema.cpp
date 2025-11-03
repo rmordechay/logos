@@ -24,7 +24,6 @@
 #include "exprs/LgsTypeExpr.h"
 #include "exprs/LgsVectorExpr.h"
 #include "exprs/constants/LgsStrConst.h"
-#include "files/LgsEnvFile.h"
 #include "files/LgsMainFile.h"
 #include "files/LgsTestFile.h"
 #include "funcs/LgsMainFunc.h"
@@ -48,7 +47,6 @@
 #include "stmts/LgsIfStmt.h"
 #include "stmts/LgsSwitch.h"
 #include "types/primitives/LgsDouble.h"
-
 #include <iostream>
 #include <unordered_set>
 
@@ -145,7 +143,7 @@ void LgsSema::visitFunc(LgsFunc* func) {
         func->funcType->isGeneric = func->funcType->isGeneric || param.type->isGeneric;
     }
     visitStmtsBlock(func->stmtsBlock);
-    if (func->funcType->isVariadic && func->funcType->hasDefaults()) {
+    if (func->funcType->isVariadic && func->funcType->hasDefaults) {
         errHandler.addError(E10043, &func->location, file->absPath, {});
     }
     if (!validateBlockControlFlow(func->stmtsBlock, func)) {
@@ -195,7 +193,6 @@ void LgsSema::visitParam(LgsParam* param) {
         if (param->expr) {
             errHandler.addError(E10045, &param->location, file->absPath, {});
         }
-        assert(0);
     }
     addLocalSymbol(LgsSymbol(param));
     assert(param->type);
@@ -417,9 +414,8 @@ void LgsSema::visitForeachLoop(LgsForeachLoop* foreachLoop) {
     visitExpr(iterExpr);
     const auto iterable = iterExpr->type->asIterable();
     if (!iterable) {
-        if (iterExpr->type) {
-            errHandler.addError(E10002, &iterExpr->location, file->absPath, {iterExpr->asText(), iterExpr->type->pname()});
-        }
+        const auto typeName = iterExpr->type ? iterExpr->type->pname() : LGS_UNKNOWN_TYPE;
+        errHandler.addError(E10002, &iterExpr->location, file->absPath, {iterExpr->asText(), iterExpr->type->pname()});
         return;
     }
 
@@ -490,7 +486,7 @@ void LgsSema::visitIOStmt(const LgsIOStmt* ioStmt) {
     visitVarDec(ioStmt->varDec);
     const auto expr = ioStmt->varDec->expr;
     const auto funcCall = expr->asFuncCall() ? expr->asFuncCall() : expr->asSelection()->asMethodCall();
-    if (!funcCall->func->funcType->isInIOPair) {
+    if (!funcCall->func->funcType->isIOMember) {
         errHandler.addError(E10084, &funcCall->location, file->absPath, {funcCall->asText()});
     }
     visitStmtsBlock(ioStmt->stmtsBlock);
@@ -727,7 +723,7 @@ void LgsSema::visitVariable(LgsVariable* variable) {
         break;
     }
     case PARAM: {
-        variable->ref.param = symbol->param->clone();
+        variable->ref.param = symbol->param;
         variable->setType(symbol->param->type);
         break;
     }

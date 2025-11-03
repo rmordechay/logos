@@ -43,7 +43,7 @@ LgsToken LgsLexer::nextToken() {
         advance();
         if (currentChar == '.') {
             advance();
-            if (advance() == '.') {
+            if (currentChar == '.') {
                 advance();
                 return {T_TRIPLE_DOT, "...", location};
             }

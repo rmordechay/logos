@@ -859,13 +859,14 @@ void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
         visitExpr(funcCall->args[i]);
     }
 
-    LgsFunc func(nullptr);
     if (funcCall->ref.symbolType == PARAM) {
+        LgsFunc func(nullptr);
         func.funcType = funcCall->ref.param->type->asFuncType();
         func.setType(func.funcType);
         func.IRValue = getIRValue(funcCall->ref.param);
         funcCall->func = &func;
     } else if (funcCall->ref.symbolType == VAR_DEC) {
+        LgsFunc func(nullptr);
         func.funcType = funcCall->ref.varDec->type->asFuncType();
         func.setType(func.funcType);
         func.IRValue = getIRValue(funcCall->ref.varDec);
@@ -875,7 +876,7 @@ void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
     }
     
     const auto ft = funcCall->func->funcType;
-    if (ft->hasDefaults()) {
+    if (ft->hasDefaults) {
         const auto diff = ft->params.size() - funcCall->args.size() - 1;
         for (size_t i = diff; i < ft->params.size(); ++i) {
             visitExpr(ft->params[i].expr);
@@ -886,27 +887,27 @@ void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
         const auto self = funcCall->selfPtr;
         const auto keyIR = cg.getIRStr(ft->name);
         funcCall->func->IRValue = cg.callGetFromVTable(self->IRValue, keyIR);
-    } else {
+    } else if (funcCall->func->funcType->isArrFunc) {
         visitIterFunc(funcCall);
     }
 
-    if (!funcCall->isCoroutine && !funcCall->isDeferred) {
-        if (funcCall->func->funcType->isGeneric) {
-            visitGenericFunc(funcCall->func);
-        }
-        funcCall->IRValue = funcCall->func->call(cg, funcCall->args, funcCall->generics);
-        if (appConfigs.debugMode) funcCall->setDebugValue(cg);
-    }
+    if (funcCall->isCoroutine || funcCall->isDeferred) return;
+    if (funcCall->func->funcType->isGeneric) visitGenericFunc(funcCall->func);
+    funcCall->IRValue = funcCall->func->call(cg, funcCall->args, funcCall->generics);
+    if (appConfigs.debugMode) funcCall->setDebugValue(cg);
 }
 
 void LgsCodeGen::visitIterFunc(const LgsFuncCall* funcCall) {
     if (funcCall->name == MAP_FUNC_NAME) {
-        createMapFunc(funcCall->func);
-    } else if (funcCall->name == FILTER_FUNC_NAME) {
-        createFilterFunc(funcCall->func);
-    } else if (funcCall->name == FOREACH_FUNC_NAME) {
+        return createMapFunc(funcCall->func);
+    }
+    if (funcCall->name == FILTER_FUNC_NAME) {
+        return createFilterFunc(funcCall->func);
+    }
+    if (funcCall->name == FOREACH_FUNC_NAME) {
         assert(0);
     }
+    assert(0);
 }
 
 void LgsCodeGen::visitPrefixExpr(LgsPrefixExpr* prefixExpr) {
@@ -1092,6 +1093,17 @@ void LgsCodeGen::createPrologue(LgsFunc* func) {
         cg.callLgsFunc("Runtime_init", cg.voidTy());
     }
     cg.callStackPush(func->hasDefers, func->needsCleanup());
+    if (func->funcType->isVariadic) {
+        const auto& variadicParam = func->funcType->params.back();
+        const auto valist = cg.builder.CreateAlloca(cg.ptrTy());
+        const auto ty = variadicParam.type->getIRType(cg);
+        cg.callIntrinsics(llvm::Intrinsic::vastart, {valist}, {cg.ptrTy()});
+        cg.loop(func->variadicCount, [this, ty, valist](Value*, BasicBlock*) {
+            const auto v = cg.builder.CreateVAArg(valist, ty);
+            cg.printInt(v);
+        });
+        cg.callIntrinsics(llvm::Intrinsic::vaend, {valist}, {cg.ptrTy()});
+    }
 }
 
 void LgsCodeGen::createEpilogue(LgsFunc* func) {

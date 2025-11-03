@@ -12,8 +12,10 @@ enum LgsFuncFlags : uint32_t {
     OPTIONAL = 1 << 4,
     TERMINATOR = 1 << 5,
     METHOD = 1 << 6,
-    IO = 1 << 7,
+    IO_MEMBER = 1 << 7,
     SYSCALL = 1 << 8,
+    ARR_FUNC = 1 << 9,
+    HAS_DEFAULTS = 1 << 10,
 };
 
 class LgsFuncType final : public LgsType {
@@ -33,8 +35,10 @@ public:
     bool isOptional = false;
     bool isTerminator = false;
     bool isMethod = false;
-    bool isInIOPair = false;
+    bool isIOMember = false;
     bool isSysCall = false;
+    bool isArrFunc = false;
+    bool hasDefaults = false;
     FunctionType* IRType = nullptr;
 
     LgsFuncType() = default;
@@ -50,6 +54,5 @@ public:
     bool canCastTo(LgsType* other) override;
     bool equals(LgsType* other) override;
     LgsType* clone() override;
-    bool hasDefaults() const;
     ~LgsFuncType() override;
 };

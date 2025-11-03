@@ -12,7 +12,7 @@
 #include "types/LgsSubType.h"
 #include "utils/LgsUtils.h"
 
-void LgsSymbolTable::addSymbol(const LgsSymbol& symbol, LgsErrHandler* errHandler, const std::string& filePath) {
+void LgsSymbolTable::   addSymbol(const LgsSymbol& symbol, LgsErrHandler* errHandler, const std::string& filePath) {
     const auto symbolName = *symbol.name;
     if (symbols.find(symbolName) != symbols.end()) {
         return errHandler->addError(E10011, symbol.location, filePath, {symbolName});

@@ -135,30 +135,26 @@ Function* LgsLLVMGen::getFunc(const std::string& funcName, FunctionType* ft, con
     return Function::Create(ft, linkage, funcName, IRModule);
 }
 
-Value* LgsLLVMGen::callFunc(const std::string& funcName, FunctionType* ft, const std::vector<Value*>& args) {
-    const auto func = IRModule->getOrInsertFunction(funcName, ft);
+Value* LgsLLVMGen::callFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes, const std::vector<Value*>& args, const bool isVariadic) {
+    const auto func = IRModule->getOrInsertFunction(funcName, FunctionType::get(rt, paramTypes, isVariadic));
     return builder.CreateCall(func, args);
 }
 
-Value* LgsLLVMGen::callFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes, const std::vector<Value*>& args) {
-    const auto func = IRModule->getOrInsertFunction(funcName, FunctionType::get(rt, paramTypes, false));
-    return builder.CreateCall(func, args);
+Value* LgsLLVMGen::callIntrinsics(const llvm::Intrinsic::ID name, const std::vector<Value*>& args, const std::vector<Type*>& types) {
+    const auto declaration = llvm::Intrinsic::getDeclaration(IRModule, name, types);
+    return builder.CreateCall(declaration, args);
 }
 
 Value* LgsLLVMGen::callLgsFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes, const std::vector<Value*>& args) {
     return callFunc(LGS_RUNTIME_NAMES_PREFIX + funcName, rt, paramTypes, args);
 }
 
-Value* LgsLLVMGen::callHash(Value* v) {
-    return callLgsFunc("hash", sizeTy(), {ptrTy()}, {v});
-}
-
 Value* LgsLLVMGen::callPrintf(const std::vector<Value*>& args) {
-    return callFunc("printf", getFT(i32Ty(), {ptrTy()}, true), args);
+    return callFunc("printf", i32Ty(), {ptrTy()}, args, true);
 }
 
 Value* LgsLLVMGen::callSprintf(const std::vector<Value*>& args) {
-    return callFunc("sprintf", getFT(i32Ty(), {ptrTy()}, true), args);
+    return callFunc("sprintf", i32Ty(), {ptrTy()}, args, true);
 }
 
 Value* LgsLLVMGen::callStrLen(Value* str) {

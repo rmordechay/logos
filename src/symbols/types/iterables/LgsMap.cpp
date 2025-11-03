@@ -23,7 +23,9 @@ std::string LgsMap::getName() {
 }
 
 std::string LgsMap::pname() {
-    return '{' + (typePair->key ? typePair->key->pname() : LGS_UNKNOWN_TYPE) + ": " + (typePair->value ? typePair->value->pname() : LGS_UNKNOWN_TYPE) + '}';
+    const auto keyName = typePair->key ? typePair->key->pname() : LGS_UNKNOWN_TYPE;
+    const auto valueName = typePair->value ? typePair->value->pname() : LGS_UNKNOWN_TYPE;
+    return '{' + keyName + ": " + valueName + '}';
 }
 
 size_t LgsMap::getSizeBytes() {

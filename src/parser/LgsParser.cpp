@@ -669,11 +669,19 @@ void LgsParser::parseParams(LgsFuncType* funcType) {
         const auto type = parseType();
         mustParse(type);
         LgsParam param(type, paramName.lexeme);
-        if (matchAndConsume(T_EQUAL)) {
+        setLocation(param.location, &paramName);
+        if (matchAndConsume(T_TRIPLE_DOT)) {
+            if (funcType->isVariadic) addParsingError();
+            param.isVariadic = true;
+            funcType->isVariadic = true;
+        } else if (funcType->isVariadic) {
+            // Normal param cannot come after variadic param
+            addParsingError();
+        } else if (matchAndConsume(T_EQUAL)) {
             param.expr = parseExpr();
             mustParse(param.expr);
+            funcType->hasDefaults = true;
         }
-        setLocation(param.location, &paramName);
         funcType->params.push_back(param);
         if (currentToken.type == T_RPAREN) break;
         mustMatch(T_COMMA);

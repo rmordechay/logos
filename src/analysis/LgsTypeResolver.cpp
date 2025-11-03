@@ -175,12 +175,12 @@ void LgsTypeResolver::resolveFuncTypes(LgsFuncType* funcType, LgsFile& file) {
 
 void LgsTypeResolver::resolveIOPair(LgsIOPair* ioPair, LgsObject* obj, LgsFile& file) const {
     ioPair->openFunc = obj->getMethod(ioPair->openFuncName);
-    ioPair->openFunc->funcType->isInIOPair = true;
+    ioPair->openFunc->funcType->isIOMember = true;
     if (!ioPair->openFunc) {
         errHandler.addError(E10005, &ioPair->openFunc->location, file.absPath, {ioPair->openFuncName, obj->pname()});
     }
     ioPair->closeFunc = obj->getMethod(ioPair->closeFuncName);
-    ioPair->closeFunc->funcType->isInIOPair = true;
+    ioPair->closeFunc->funcType->isIOMember = true;
     if (!ioPair->closeFunc) {
         errHandler.addError(E10005, &ioPair->closeFunc->location, file.absPath, {ioPair->closeFuncName, obj->pname()});
     }

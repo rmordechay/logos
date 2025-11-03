@@ -71,7 +71,7 @@ inline LgsBaseError E10040{"The number of variables in the for loop (%s) do not 
 inline LgsBaseError E10041{"Could not unpack iterable %s of type %s with %s variables.", errCodeStart++};
 inline LgsBaseError E10042{"Expression %s of type %s cannot be sliced.", errCodeStart++};
 inline LgsBaseError E10043{"Default parameters and variadic arguments are not allowed in the same function.", errCodeStart++};
-inline LgsBaseError E10044{"Variadic argument must be the last argument.", errCodeStart++};
+inline LgsBaseError E10044{"", errCodeStart++};
 inline LgsBaseError E10045{"Variadic argument cannot have default arguments.", errCodeStart++};
 inline LgsBaseError E10046{"%s is not callable.", errCodeStart++};
 inline LgsBaseError E10047{"External file %s was not found.", errCodeStart++};
@@ -114,7 +114,7 @@ inline LgsBaseError E10083{"Method %s is an object method but was called as a cl
 inline LgsBaseError E10084{"%s does not belong to an IO pair.", errCodeStart++};
 inline LgsBaseError E10085{"Parsing error.", errCodeStart++};
 inline LgsBaseError E10086{"Invalid Logos file path: %s.", errCodeStart++};
-inline LgsBaseError E10087{"Lexing error.", errCodeStart++};
+inline LgsBaseError E10087{"", errCodeStart++};
 inline LgsBaseError E10088{"Bad character.", errCodeStart++};
 inline LgsBaseError E10089{"%s can only be assigned to an instance of %s, not the object itself.", errCodeStart++};
 inline LgsBaseError E10090{"%s can only prefix numbers. Given: %s.", errCodeStart++};

@@ -13,8 +13,10 @@ void LgsFuncType::setFuncOptions(const uint32_t ops) {
     isOptional = ops & OPTIONAL;
     isTerminator = ops & TERMINATOR;
     isMethod = ops & METHOD;
-    isInIOPair = ops & IO;
+    isIOMember = ops & IO_MEMBER;
     isSysCall = ops & SYSCALL;
+    isArrFunc = ops & ARR_FUNC;
+    hasDefaults = ops & HAS_DEFAULTS;
 }
 
 Type* LgsFuncType::getIRType(LgsLLVMGen& cg) {
@@ -25,7 +27,11 @@ Type* LgsFuncType::getIRType(LgsLLVMGen& cg) {
         if (param.isSelf || !paramType->isPrimitive) {
             IRParamsTypes.emplace_back(cg.ptrTy());
         } else {
-            IRParamsTypes.emplace_back(paramType->getIRType(cg));
+            if (param.isVariadic) {
+                IRParamsTypes.emplace_back(cg.sizeTy());
+            } else {
+                IRParamsTypes.emplace_back(paramType->getIRType(cg));
+            }
         }
     }
     const auto returnType = rt->isBig() ? cg.ptrTy() : rt->getIRType(cg);
@@ -123,13 +129,6 @@ bool LgsFuncType::equals(LgsType* other) {
 
 LgsType* LgsFuncType::clone() {
     return new LgsFuncType(*this);
-}
-
-bool LgsFuncType::hasDefaults() const {
-    for (const auto& param : params) {
-        if (param.expr) return true;
-    }
-    return false;
 }
 
 LgsFuncType::~LgsFuncType() {

@@ -25,13 +25,13 @@ bool LgsFuncCall::equals(const LgsFuncType* other) const {
         if (i >= args.size()) continue;
         const auto param = other->params[i];
         const auto arg = args[i];
-        if (!arg->type->canCastTo(param.type)) return false;
+        if (!arg->type || !arg->type->canCastTo(param.type)) return false;
     }
     return true;
 }
 
 bool LgsFuncCall::equalsVariadic(const LgsFuncType* funcType) const {
-    assert(0);
+    return true;
 }
 
 std::string LgsFuncCall::asText() {
