@@ -1,20 +1,25 @@
+#include "Lgs_Scheduler.h"
 #include "Lgs_Stack.h"
 #include "Lgs_Types.h"
 #include <cassert>
 #include <map>
 #include <string>
+#include <unistd.h>
 
 struct Lgs_Runtime {
     Lgs_Stack stack;
+    Lgs_Scheduler scheduler;
     std::map<void*, std::map<std::string, void*>> vtable;
 };
 
 static inline Lgs_Runtime runtime;
 
 extern "C" void Lgs_Runtime_init() {
+    // runtime.scheduler.start();
 }
 
 extern "C" void Lgs_Runtime_close() {
+    // runtime.scheduler.shutdown();
 }
 
 extern "C" void Lgs_Stack_addOwner(void* ptr, const Lgs_RTType type) {

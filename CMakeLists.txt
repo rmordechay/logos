@@ -147,6 +147,7 @@ set(RUNTIME_SOURCE
     runtime/lib/Lgs_Print.cpp
     runtime/lib/Lgs_Arena.cpp
     runtime/lib/Lgs_Set.cpp
+    runtime/lib/Lgs_Scheduler.cpp
 )
 
 # Runtime
@@ -184,11 +185,12 @@ target_include_directories(lgs SYSTEM PUBLIC
 )
 
 # Link
-if(NOT LOGOS_RELEASE)
+if(LOGOS_RELEASE)
     set_target_properties(lgs PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
     if(UNIX AND NOT APPLE)
         target_link_options(lgs PRIVATE -s)
     endif()
+else()
     add_subdirectory(tests)
 endif()
 

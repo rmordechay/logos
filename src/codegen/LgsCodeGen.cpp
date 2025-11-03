@@ -1088,7 +1088,7 @@ void LgsCodeGen::createPrologue(LgsFunc* func) {
     const auto entryBlock = cg.createBlock(BLOCK_NAME_ENTRY, currentIRFunc);
     cg.builder.SetInsertPoint(entryBlock);
     if (func->funcType->name == LGS_MAIN_FUNC) {
-        // cg.callLgsFunc("Runtime_init", cg.voidTy());
+        cg.callLgsFunc("Runtime_init", cg.voidTy());
     }
     cg.callStackPush(func->hasDefers, func->needsCleanup());
 }
