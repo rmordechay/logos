@@ -92,6 +92,9 @@ std::string formatElement(const Lgs_RTType type, void* elem) {
     case RTT_ANY:
         oss << elem;
         break;
+    case RTT_ENUM:
+        oss << static_cast<const char*>(elem);
+        break;
     case RTT_SARRAY:
     case RTT_MAP:
     case RTT_OBJECT:

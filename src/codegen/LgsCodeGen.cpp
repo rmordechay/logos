@@ -799,8 +799,9 @@ void LgsCodeGen::visitVariable(LgsVariable* variable) {
 }
 
 void LgsCodeGen::visitSelection(LgsSelection* selection, const bool assign) {
-    visitExpr(selection->exprs.front());
-    assert(&selection->exprs.front()->IRValue->getContext() == &cg.IRModule->getContext());
+    const auto firstExpr = selection->exprs.front();
+    visitExpr(firstExpr);
+    assert(!firstExpr->IRValue || (&firstExpr->IRValue->getContext() == &cg.IRModule->getContext()));
     for (size_t i = 0; i < selection->exprs.size() - 1; ++i) {
         const auto parent = selection->exprs[i];
         const auto child = selection->exprs[i + 1];

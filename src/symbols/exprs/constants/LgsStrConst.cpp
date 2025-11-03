@@ -29,7 +29,22 @@ Value* LgsStrConst::loadIR(LgsLLVMGen& cg) {
 }
 
 std::string LgsStrConst::asText() {
-    return '"' + value + '"';
+    std::string escaped;
+    escaped.reserve(value.size());
+    for (const char c : value) {
+        if (c == '\n') {
+            escaped += "\\n";
+        } else if (c == '\t') {
+            escaped += "\\t";
+        } else if (c == '"') {
+            escaped += "\\\"";
+        } else if (c == '\\') {
+            escaped += "\\\\";
+        } else {
+            escaped += c;
+        }
+    }
+    return '"' + escaped + '"';
 }
 
 Value* LgsStrConst::hash(LgsLLVMGen& cg) {

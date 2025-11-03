@@ -31,6 +31,7 @@ std::string getTypeName(const Lgs_RTType type) {
     case RTT_SET: return "Set";
     case RTT_MAP: return "Map";
     case RTT_OBJECT: return "Object";
+    case RTT_ENUM: return "Enum";
     case RTT_TYPE: return "Type";
     case RTT_ANY: return "Any";
     case RTT_NULLABLE: return "Any?";
@@ -95,13 +96,12 @@ void Lgs_Stack::addOrphan(void* ptr, const Lgs_RTType type) {
 void Lgs_Stack::removeOwner(const void* owner) {
     auto& stackFrame = frames[stackIndex];
     for (size_t i = 0; i < stackFrame.ownersCount; i++) {
-        if (stackFrame.owners[i].ptr == owner) {
-            freeType(stackFrame.owners[i].ptr, stackFrame.owners[i].type);
-            for (size_t j = i; j < stackFrame.ownersCount - 1; j++) {
-                stackFrame.owners[j] = stackFrame.owners[j + 1];
-            }
-            break;
+        if (stackFrame.owners[i].ptr != owner) continue;
+        freeType(stackFrame.owners[i].ptr, stackFrame.owners[i].type);
+        for (size_t j = i; j < stackFrame.ownersCount - 1; j++) {
+            stackFrame.owners[j] = stackFrame.owners[j + 1];
         }
+        break;
     }
 }
 

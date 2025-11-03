@@ -1,6 +1,7 @@
 #include "types/LgsEnum.h"
 #include "codegen/LgsLLVMGen.h"
 #include "stmts/LgsField.h"
+#include "types/LgsAny.h"
 #include "utils/LgsUtils.h"
 
 LgsExpr* LgsEnum::getZeroValue() {
@@ -8,7 +9,7 @@ LgsExpr* LgsEnum::getZeroValue() {
 }
 
 Lgs_RTType LgsEnum::getRTType() {
-    assert(0);
+    return RTT_ENUM;
 }
 
 Type* LgsEnum::getIRType(LgsLLVMGen& cg) {
@@ -20,7 +21,9 @@ std::string LgsEnum::getName() {
 }
 
 bool LgsEnum::canCastTo(LgsType* other) {
-    return name == other->getName();
+    const auto otherName = other->getName();
+    if (otherName == LgsAny::name) return true;
+    return name == otherName;
 }
 
 std::string LgsEnum::strFormatPart() const {

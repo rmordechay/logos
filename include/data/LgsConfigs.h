@@ -22,7 +22,7 @@ struct LgsConfigs {
     LgsOS os;
     LgsArch arch;
     bool devMode = false;
-    bool printIR = true;
+    bool printIR = false;
     bool writeIRFiles = false;
 
     LgsConfigs() {

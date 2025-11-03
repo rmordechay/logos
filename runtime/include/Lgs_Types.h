@@ -26,6 +26,7 @@ enum Lgs_RTType {
     RTT_SET,
     RTT_MAP,
     RTT_OBJECT,
+    RTT_ENUM,
     RTT_TYPE,
     RTT_ANY,
     RTT_NULLABLE,
