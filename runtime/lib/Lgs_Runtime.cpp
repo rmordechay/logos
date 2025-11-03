@@ -1,10 +1,8 @@
 #include "Lgs_Stack.h"
 #include "Lgs_Types.h"
-
 #include <cassert>
 #include <map>
 #include <string>
-struct Lgs_DArray;
 
 struct Lgs_Runtime {
     Lgs_Stack stack;

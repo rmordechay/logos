@@ -311,6 +311,75 @@ LgsExpr* LgsType::addConst(LgsExpr* self, LgsExpr* other) {
     assert(0);
 }
 
+LgsExpr* LgsType::subConst(LgsExpr* self, LgsExpr* other) {
+    assert(0);
+}
+
+LgsExpr* LgsType::mulConst(LgsExpr* self, LgsExpr* other) {
+    assert(0);
+}
+
+LgsExpr* LgsType::divConst(LgsExpr* self, LgsExpr* other) {
+    assert(0);
+}
+
+LgsExpr* LgsType::modConst(LgsExpr* self, LgsExpr* other) {
+    assert(0);
+}
+
+LgsExpr* LgsType::bitAndConst(LgsExpr* self, LgsExpr* other) {
+    assert(0);
+}
+
+LgsExpr* LgsType::bitOrConst(LgsExpr* self, LgsExpr* other) {
+    assert(0);
+}
+
+LgsExpr* LgsType::bitXorConst(LgsExpr* self, LgsExpr* other) {
+    assert(0);
+}
+
+LgsExpr* LgsType::lshiftConst(LgsExpr* self, LgsExpr* other) {
+    assert(0);
+}
+
+LgsExpr* LgsType::rshiftConst(LgsExpr* self, LgsExpr* other) {
+    assert(0);
+}
+
+LgsExpr* LgsType::eqConst(LgsExpr* self, LgsExpr* other) {
+    assert(0);
+}
+
+LgsExpr* LgsType::neConst(LgsExpr* self, LgsExpr* other) {
+    assert(0);
+}
+
+LgsExpr* LgsType::ltConst(LgsExpr* self, LgsExpr* other) {
+    assert(0);
+}
+
+LgsExpr* LgsType::gtConst(LgsExpr* self, LgsExpr* other) {
+    assert(0);
+}
+
+LgsExpr* LgsType::geConst(LgsExpr* self, LgsExpr* other) {
+    assert(0);
+}
+
+LgsExpr* LgsType::leConst(LgsExpr* self, LgsExpr* other) {
+    assert(0);
+}
+
+LgsExpr* LgsType::andConst(LgsExpr* self, LgsExpr* other) {
+    assert(0);
+}
+
+LgsExpr* LgsType::orConst(LgsExpr* self, LgsExpr* other) {
+    assert(0);
+}
+
+
 Value* LgsType::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     assert(0);
 }

@@ -140,20 +140,6 @@ enum LgsAssignType {
     ASSIGN_UNKNOWN,
 };
 
-struct LgsBinOp {
-    LgsBinOpType opType;
-    std::string text;
-};
-
-struct LgsToken {
-    LgsTokenType type = T_UNKNOWN;
-    std::string lexeme = "";
-    LgsLocation location;
-
-    LgsToken() = default;
-    LgsToken(const LgsTokenType type, const std::string& lexeme, const LgsLocation& location) : type(type), lexeme(lexeme), location(location) {}
-};
-
 const std::unordered_map<std::string, LgsTokenType> LGS_KEYWORDS = {
     {"type", T_TYPE},
     {"object", T_OBJECT},
@@ -197,6 +183,20 @@ const std::unordered_map<std::string, LgsTokenType> LGS_KEYWORDS = {
     {LGS_NULL_LITERAL, T_NULL}
 };
 
+struct LgsBinOp {
+    LgsBinOpType opType;
+    std::string text;
+};
+
+struct LgsToken {
+    LgsTokenType type = T_UNKNOWN;
+    std::string lexeme = "";
+    LgsLocation location;
+
+    LgsToken() = default;
+    LgsToken(const LgsTokenType type, const std::string& lexeme, const LgsLocation& location) : type(type), lexeme(lexeme), location(location) {}
+};
+
 const auto ADD_OP = LgsBinOp{ADD, "+"};
 const auto SUB_OP = LgsBinOp{SUB, "-"};
 const auto MUL_OP = LgsBinOp{MUL, "*"};
@@ -224,17 +224,17 @@ const std::unordered_map<LgsTokenType, LgsBinOp> LGS_BINARY_OPS = {
     {T_STAR, MUL_OP},
     {T_SLASH, DIV_OP},
     {T_PERCENT, MODULO_OP},
-    {T_DOUBLE_EQUAL, BIT_AND_OP},
-    {T_NOT_EQUAL, BIT_OR_OP},
-    {T_LANGLE, BIT_XOR_OP},
-    {T_RANGLE, LSHIFT_OP},
-    {T_GE, RSHIFT_OP},
-    {T_LE, EQ_OP},
-    {T_AMPERSAND, NE_OP},
-    {T_PIPE, LT_OP},
-    {T_CARET, GT_OP},
-    {T_DOUBLE_LANGLE, GE_OP},
-    {T_DOUBLE_RANGLE, LE_OP},
+    {T_AMPERSAND, BIT_AND_OP},
+    {T_PIPE, BIT_OR_OP},
+    {T_CARET, BIT_XOR_OP},
+    {T_DOUBLE_LANGLE, LSHIFT_OP},
+    {T_DOUBLE_RANGLE, RSHIFT_OP},
+    {T_DOUBLE_EQUAL, EQ_OP},
+    {T_NOT_EQUAL, NE_OP},
+    {T_RANGLE, LT_OP},
+    {T_LANGLE, GT_OP},
+    {T_GE, GE_OP},
+    {T_LE, LE_OP},
     {T_AND, AND_OP},
     {T_OR, OR_OP},
     {T_IN, IN_OP},

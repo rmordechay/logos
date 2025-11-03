@@ -1156,24 +1156,36 @@ LgsVariable* LgsParser::parseVariable() {
     return var;
 }
 
-void LgsParser::parseGenerics(std::vector<LgsType*>& types) {
-    if (matchAndConsume(T_LANGLE)) {
-        while (true) {
-            const auto type = parseType();
-            if (mustParse(type)) break;
-            types.push_back(type);
-            if (currentToken.type == T_RANGLE) break;
-        }
-        mustMatch(T_RANGLE);
+bool LgsParser::parseGenericArgs(std::vector<LgsType*>& types) {
+    const auto oldIndex = currentIndex;
+    if (!matchAndConsume(T_LANGLE)) return false;
+    while (true) {
+        const auto type = parseType();
+        if (!type) break;
+        types.push_back(type);
+        if (currentToken.type == T_RANGLE) break;
     }
+    if (types.empty()) {
+        reset(oldIndex);
+        return false;
+    }
+    if (!matchOrReset(T_RANGLE, oldIndex)) {
+        freeTypes(types);
+        return false;
+    }
+    return true;
 }
 
 LgsInstance* LgsParser::parseInstance() {
     const auto tokenName = currentToken;
+    const auto oldIndex = currentIndex;
     std::vector<LgsType*> generics;
     if (currentToken.type == T_IDENTIFIER && peek().type == T_LANGLE) {
         consume();
-        parseGenerics(generics);
+        if (!parseGenericArgs(generics)) {
+            reset(oldIndex);
+            return nullptr;
+        }
     } else if (!matchAndConsume(T_INSTANCE)) {
         return nullptr;
     }
@@ -1206,13 +1218,16 @@ LgsInstance* LgsParser::parseInstance() {
 }
 
 LgsFuncCall* LgsParser::parseFuncCall() {
+    const auto oldIndex = currentIndex;
     if (currentToken.type != T_IDENTIFIER) return nullptr;
     const auto nameToken = currentToken;
     std::vector<LgsType*> generics;
     if (peek().type == T_LANGLE) {
         consume();
-        parseGenerics(generics);
-        mustMatch(T_RBRACE);
+        if (!parseGenericArgs(generics)) {
+            reset(oldIndex);
+            return nullptr;
+        }
     } else if (peek().type != T_LPAREN) {
         return nullptr;
     } else {

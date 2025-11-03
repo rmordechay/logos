@@ -26,39 +26,3 @@ LgsSymbol* LgsSymbolTable::getSymbol(const std::string& name) {
     }
     return nullptr;
 }
-
-void LgsSymbolTable::freeSymbols() {
-    for (const auto& [_, symbol] : symbols) {
-        switch (symbol.symbolType) {
-        case VAR_DEC:
-            freeStmt(symbol.varDec);
-            break;
-        case PARAM:
-            delete symbol.param;
-            break;
-        case FIELD:
-            delete symbol.field;
-            break;
-        case FUNC:
-            delete symbol.func;
-            break;
-        case OBJECT:
-            freeType(symbol.object);
-            break;
-        case INTERFACE:
-            freeType(symbol.interface);
-            break;
-        case ENUM:
-            freeType(symbol.enum_);
-            break;
-        case SUBTYPE:
-            freeType(symbol.subtype);
-            break;
-        case GENERIC:
-            freeType(symbol.generic);
-        case UNKNOWN:
-            break;
-        }
-    }
-    symbols.clear();
-}

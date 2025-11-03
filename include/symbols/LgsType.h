@@ -112,6 +112,23 @@ public:
     LgsNullable* asNullable();
 
     virtual LgsExpr* addConst(LgsExpr* self, LgsExpr* other);
+    virtual LgsExpr* subConst(LgsExpr* self, LgsExpr* other);
+    virtual LgsExpr* mulConst(LgsExpr* self, LgsExpr* other);
+    virtual LgsExpr* divConst(LgsExpr* self, LgsExpr* other);
+    virtual LgsExpr* modConst(LgsExpr* self, LgsExpr* other);
+    virtual LgsExpr* bitAndConst(LgsExpr* self, LgsExpr* other);
+    virtual LgsExpr* bitOrConst(LgsExpr* self, LgsExpr* other);
+    virtual LgsExpr* bitXorConst(LgsExpr* self, LgsExpr* other);
+    virtual LgsExpr* lshiftConst(LgsExpr* self, LgsExpr* other);
+    virtual LgsExpr* rshiftConst(LgsExpr* self, LgsExpr* other);
+    virtual LgsExpr* eqConst(LgsExpr* self, LgsExpr* other);
+    virtual LgsExpr* neConst(LgsExpr* self, LgsExpr* other);
+    virtual LgsExpr* ltConst(LgsExpr* self, LgsExpr* other);
+    virtual LgsExpr* gtConst(LgsExpr* self, LgsExpr* other);
+    virtual LgsExpr* geConst(LgsExpr* self, LgsExpr* other);
+    virtual LgsExpr* leConst(LgsExpr* self, LgsExpr* other);
+    virtual LgsExpr* andConst(LgsExpr* self, LgsExpr* other);
+    virtual LgsExpr* orConst(LgsExpr* self, LgsExpr* other);
     virtual Value* addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
     virtual Value* subIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
     virtual Value* mulIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);

@@ -62,6 +62,15 @@ int64_t* LgsExpr::getConstInt() {
             break;
         }
     }
+    if (const auto binExpr = asBinExpr()) {
+        const auto const1 = binExpr->left->getConstInt();
+        if (!const1) return nullptr;
+        const auto const2 = binExpr->right->getConstInt();
+        if (!const2) return nullptr;
+        const auto malloc = static_cast<int64_t*>(std::malloc(sizeof(int64_t)));
+        *malloc = *const1 + *const2;
+        return malloc;
+    }
     return nullptr;
 }
 

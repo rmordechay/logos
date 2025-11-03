@@ -126,7 +126,7 @@ public:
     LgsExpr* parseExprWithPrecedence(int minPrecedence);
     LgsExpr* parseUnary();
     LgsVariable* parseVariable();
-    void parseGenerics(std::vector<LgsType*>& types);
+    bool parseGenericArgs(std::vector<LgsType*>& types);
     LgsInstance* parseInstance();
     LgsFuncCall* parseFuncCall();
     LgsVectorExpr* parseVectorExpr();

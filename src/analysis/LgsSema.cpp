@@ -542,7 +542,65 @@ void LgsSema::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
     binaryExpr->setType(type);
     if (binaryExpr->left->isValueKnown && binaryExpr->right->isValueKnown) {
         binaryExpr->isValueKnown = true;
-        binaryExpr->results = binaryExpr->left->type->addConst(binaryExpr->left, binaryExpr->right);
+        switch (binaryExpr->op) {
+        case ADD:
+            binaryExpr->results = binaryExpr->left->type->addConst(binaryExpr->left, binaryExpr->right);
+            break;
+        case SUB:
+            binaryExpr->results = binaryExpr->left->type->subConst(binaryExpr->left, binaryExpr->right);
+            break;
+        case MUL:
+            binaryExpr->results = binaryExpr->left->type->mulConst(binaryExpr->left, binaryExpr->right);
+            break;
+        case DIV:
+            binaryExpr->results = binaryExpr->left->type->divConst(binaryExpr->left, binaryExpr->right);
+            break;
+        case MODULO:
+            binaryExpr->results = binaryExpr->left->type->modConst(binaryExpr->left, binaryExpr->right);
+            break;
+        case BIT_AND:
+            binaryExpr->results = binaryExpr->left->type->bitAndConst(binaryExpr->left, binaryExpr->right);
+            break;
+        case BIT_OR:
+            binaryExpr->results = binaryExpr->left->type->bitOrConst(binaryExpr->left, binaryExpr->right);
+            break;
+        case BIT_XOR:
+            binaryExpr->results = binaryExpr->left->type->bitXorConst(binaryExpr->left, binaryExpr->right);
+            break;
+        case LSHIFT:
+            binaryExpr->results = binaryExpr->left->type->lshiftConst(binaryExpr->left, binaryExpr->right);
+            break;
+        case RSHIFT:
+            binaryExpr->results = binaryExpr->left->type->rshiftConst(binaryExpr->left, binaryExpr->right);
+            break;
+        case EQ:
+            binaryExpr->results = binaryExpr->left->type->eqConst(binaryExpr->left, binaryExpr->right);
+            break;
+        case NE:
+            binaryExpr->results = binaryExpr->left->type->neConst(binaryExpr->left, binaryExpr->right);
+            break;
+        case LT:
+            binaryExpr->results = binaryExpr->left->type->ltConst(binaryExpr->left, binaryExpr->right);
+            break;
+        case GT:
+            binaryExpr->results = binaryExpr->left->type->gtConst(binaryExpr->left, binaryExpr->right);
+            break;
+        case GE:
+            binaryExpr->results = binaryExpr->left->type->geConst(binaryExpr->left, binaryExpr->right);
+            break;
+        case LE:
+            binaryExpr->results = binaryExpr->left->type->leConst(binaryExpr->left, binaryExpr->right);
+            break;
+        case AND:
+            binaryExpr->results = binaryExpr->left->type->andConst(binaryExpr->left, binaryExpr->right);
+            break;
+        case OR:
+            binaryExpr->results = binaryExpr->left->type->orConst(binaryExpr->left, binaryExpr->right);
+            break;
+        case IN:
+        case NOOP:
+            break;
+        }
     }
 }
 
@@ -661,7 +719,7 @@ void LgsSema::visitVariable(LgsVariable* variable) {
     case VAR_DEC: {
         variable->ref.varDec = symbol->varDec;
         variable->isMutable = !symbol->varDec->isConst;
-        variable->isValueKnown = symbol->varDec->expr->isValueKnown;
+        variable->isValueKnown = symbol->varDec->expr && symbol->varDec->expr->isValueKnown;
         variable->setType(symbol->varDec->type);
         if (symbol->varDec->isOwner) {
             variable->owner = symbol->varDec;
