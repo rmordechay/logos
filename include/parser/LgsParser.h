@@ -72,19 +72,19 @@ public:
     // Files
     bool scanTokens();
     LgsFile* parseSrcFile(bool isTestRun);
+    LgsFile* parseSrcFileHeaders();
     LgsAppConfigFile* parseAppConfigFile();
     LgsEnvFile* parseEnvFile();
     LgsMainFile* parseMainFile();
-    LgsObjectFile* parseObjectFile();
-    LgsInterfaceFile* parseInterfaceFile();
+    LgsObjectFile* parseObjectFile(bool onlyHeaders);
+    LgsInterfaceFile* parseInterfaceFile(bool onlyHeaders);
     LgsTestFile* parseTestFile();
-    void parseExternalImports(LgsFile* file);
 
     // Object
     LgsObject* parseObject();
     LgsInterface* parseInterface();
-    LgsObject* parseObjectBody(const LgsToken& tokenName, bool isSingleton);
-    LgsInterface* parseInterfaceBody(const LgsToken& tokenName);
+    LgsObject* parseObjectBody(const LgsToken& tokenName, bool isSingleton, bool onlyHeaders);
+    LgsInterface* parseInterfaceBody(const LgsToken& tokenName, bool onlyHeaders);
     LgsGeneric* parseBaseGeneric();
     LgsField* parseField(size_t fieldPosition);
     LgsIOPair* parseIOPair();
@@ -99,7 +99,7 @@ public:
     // Funcs
     LgsFunc* parseFunc();
     LgsMainFunc* parseMainFunc();
-    LgsFunc* parseMethod(LgsObject* obj);
+    LgsFunc* parseMethod(LgsObject* obj, bool onlyHeaders);
     LgsFuncType* parseFuncHeader();
     void parseParams(LgsFuncType* funcType);
 
@@ -145,6 +145,7 @@ public:
     LgsJsonArray* parseJsonArray();
     LgsJson* parseJsonValue();
     void parseJsonPrimitive(LgsJson* json);
+    void parseExternalImports(LgsFile* file);
 
     // Helpers
     bool validateTypeName(const std::string& typeName, const LgsLocation* location);

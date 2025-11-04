@@ -2,6 +2,7 @@
 #include "LgsSymbol.h"
 #include <map>
 
+class LgsApp;
 class LgsErrHandler;
 
 struct LgsSymbolTable {
@@ -9,4 +10,9 @@ struct LgsSymbolTable {
 
     LgsSymbol* getSymbol(const std::string& name);
     void addSymbol(const LgsSymbol& symbol, LgsErrHandler* errHandler, const std::string& filePath = "");
+};
+
+struct LgsGlobals {
+    LgsSymbolTable symbols;
+    std::vector<LgsApp*> imports;
 };

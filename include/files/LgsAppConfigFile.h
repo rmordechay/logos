@@ -13,8 +13,8 @@ struct LgsImportPackage {
 class LgsAppConfigFile final : public LgsFile {
 public:
     std::vector<LgsVarDec*> configs;
-    std::vector<LgsImportPackage> packages;
     std::vector<LgsVarDec*> requiredEnvs;
+    std::vector<LgsImportPackage> packages;
 
     explicit LgsAppConfigFile(const size_t fileID, const fs::path& path) : LgsFile(fileID, path) {}
     size_t hashFile() override;

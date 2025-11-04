@@ -1360,7 +1360,7 @@ void LgsSema::addHeapExpr(LgsExpr* expr) {
 }
 
 LgsSymbol* LgsSema::getSymbol(const std::string& name, const LgsLocation* location) {
-    if (const auto globalSymbol = globals.getSymbol(name)) {
+    if (const auto globalSymbol = globals.symbols.getSymbol(name)) {
         return globalSymbol;
     }
     if (const auto fileSymbol = file->symbolTable.getSymbol(name)) {
@@ -1375,7 +1375,7 @@ LgsSymbol* LgsSema::getSymbol(const std::string& name, const LgsLocation* locati
 
 void LgsSema::addLocalSymbol(const LgsSymbol& newSymbol) {
     auto symbolName = *newSymbol.name;
-    const auto symbol = globals.getSymbol(symbolName);
+    const auto symbol = globals.symbols.getSymbol(symbolName);
     if (symbol && symbol->isBuiltin) {
         return errHandler.addError(E10053, newSymbol.location, file->absPath, {symbolName});
     }

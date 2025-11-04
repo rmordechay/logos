@@ -52,7 +52,7 @@ LgsType* LgsTypeResolver::resolveType(LgsType* type, LgsFile* file) {
     }
     if (type->isUnknown()) {
         auto typeName = type->getName();
-        auto symbol = globals.getSymbol(typeName);
+        auto symbol = globals.symbols.getSymbol(typeName);
         if (!symbol) {
             symbol = file->symbolTable.getSymbol(typeName);
         }

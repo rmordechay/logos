@@ -1,8 +1,8 @@
-#include "logos/LgsAppMetadata.h"
+#include "logos/LgsAppCache.h"
 #include "files/LgsFile.h"
 #include "utils/LgsUtils.h"
 
-void LgsAppMetadata::load() {
+void LgsAppCache::load() {
     if (!fs::exists(cacheFilePath)) return;
     std::ifstream inFile(cacheFilePath, std::ios::binary);
     if (!inFile) return;
@@ -29,7 +29,7 @@ void LgsAppMetadata::load() {
     }
 }
 
-void LgsAppMetadata::save() const {
+void LgsAppCache::save() const {
     if (fs::exists(cacheFilePath)) fs::remove(cacheFilePath);
     std::ofstream outFile(cacheFilePath, std::ios::binary | std::ios::trunc);
     const auto count = files.size();
@@ -46,7 +46,7 @@ void LgsAppMetadata::save() const {
     }
 }
 
-void LgsAppMetadata::print() const {
+void LgsAppCache::print() const {
     for (size_t i = 0; i < cached.size(); ++i) {
         logInfo("id          = " + std::to_string(cached[i].id) + '\n');
         logInfo("type        = " + std::to_string(cached[i].type) + '\n');
@@ -57,7 +57,7 @@ void LgsAppMetadata::print() const {
     }
 }
 
-size_t LgsAppMetadata::getHashByPath(const fs::path& path) const {
+size_t LgsAppCache::getHashByPath(const fs::path& path) const {
     for (auto fileMetadata : cached) {
         if (fileMetadata.path == path) return fileMetadata.hash;
     }

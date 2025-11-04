@@ -17,9 +17,12 @@
 #include "utils/LgsUtils.h"
 #include <iostream>
 
+inline ThreadPool threadPool;
+
 void LgsApp::compile() {
     if (!setup()) errHandler.exitWithErrors();
     if (!parse()) errHandler.exitWithErrors();
+    if (!loadDeps()) errHandler.exitWithErrors();
     if (!analyse()) errHandler.exitWithErrors();
     if (!generate()) errHandler.exitWithErrors();
     if (!link()) errHandler.exitWithErrors();
@@ -44,10 +47,11 @@ bool LgsApp::setup() {
     // File mode
     if (isLogosFile(paths.rootPath)) {
         appConfigs.isFileMode = true;
+        // rootPath is replaced with temp dir and the file pass is stored in metadata
         const auto filePath = paths.rootPath;
         paths.rootPath = fs::temp_directory_path();
         paths.initPaths();
-        appMetadata.files.emplace_back(LgsFileMetadata(getNextFileID(), filePath));
+        appCache.files.emplace_back(LgsFileMetadata(getNextFileID(), filePath));
         return true;
     }
 
@@ -57,23 +61,23 @@ bool LgsApp::setup() {
         errHandler.addError(E10010);
         return false;
     }
-    appMetadata.cacheFilePath = paths.cacheFile;
+    appCache.cacheFilePath = paths.cacheFile;
 
     // App config file
-    appMetadata.files.emplace_back(LgsFileMetadata(
+    appCache.files.emplace_back(LgsFileMetadata(
         getNextFileID(),
         paths.appFilePath,
         LGS_APP_CONFIG_FILE
-    ));
+        ));
 
     // Env files
     if (fs::exists(paths.envsDir)) {
         for (const auto& entry : fs::recursive_directory_iterator(paths.envsDir)) {
-            appMetadata.files.emplace_back(LgsFileMetadata(
+            appCache.files.emplace_back(LgsFileMetadata(
                 getNextFileID(),
                 entry.path(),
                 LGS_ENV_FILE
-            ));
+                ));
         }
     }
 
@@ -82,12 +86,12 @@ bool LgsApp::setup() {
     for (const auto& entry : fs::recursive_directory_iterator(paths.srcDir)) {
         if (!isLogosFile(entry)) continue;
         const auto fileName = entry.path().filename();
-        if (fileExists(entry, appMetadata.files)) {
+        if (fileExists(entry, appCache.files)) {
             errHandler.addError(E10007, {fileName});
             isValid = false;
             continue;
         }
-        appMetadata.files.emplace_back(LgsFileMetadata(getNextFileID(), entry.path()));
+        appCache.files.emplace_back(LgsFileMetadata(getNextFileID(), entry.path()));
     }
 
     return isValid;
@@ -104,50 +108,44 @@ bool LgsApp::parse() {
 
     // File mode
     if (appConfigs.isFileMode) {
-        const auto filePath = appMetadata.files.front().path;
+        const auto filePath = appCache.files.front().path;
         const auto fileCode = getFileText(filePath);
         loadSrcFile(fileCode, fs::canonical(filePath));
         return errHandler.successful;
     }
 
     // Project mode
-    appMetadata.load();
+    appCache.load();
     if (!loadAppConfigFile()) return false;
     if (!loadEnvFiles()) return false;
-    for (auto& fileMetadata : appMetadata.files) {
+    for (auto& fileMetadata : appCache.files) {
         if (fileMetadata.type != LGS_SRC_FILE) continue;
         threadPool.runTask([&fileMetadata, this] {
             const auto fileCode = getFileText(fileMetadata.path);
             const auto file = loadSrcFile(fileCode, fs::canonical(fileMetadata.path), fileMetadata.id);
-            const auto hash = appMetadata.getHashByPath(file->absPath);
+            const auto hash = appCache.getHashByPath(file->absPath);
             fileMetadata.hash = file->hashFile();
             if (fileMetadata.hash != hash) {
-                appMetadata.dirtyFiles.push_back(fileMetadata);
+                appCache.dirtyFiles.push_back(fileMetadata);
             }
         });
     }
     threadPool.wait();
-    if (errHandler.successful) appMetadata.save();
+    if (errHandler.successful) appCache.save();
     return errHandler.successful;
 }
 
-bool LgsApp::analyse() {
-    loadBuiltins();
-    analyseEnvs();
-    LgsTypeResolver typeResolver(errHandler, globals);
-    if (!typeResolver.resolveGlobals(srcFiles, threadPool)) return false;
-    for (const auto file : srcFiles) {
-        threadPool.runTask([this, file] {
-            LgsSema semaAnalyser(file, globals);
-            semaAnalyser.analyse();
-            if (semaAnalyser.errHandler.successful) return;
-            {
-                std::lock_guard lock(mtx);
-                errHandler.mergeErrors(semaAnalyser.errHandler);
-            }
+
+bool LgsApp::parseHeaders() {
+    for (auto& fileMetadata : appCache.files) {
+        if (fileMetadata.type != LGS_SRC_FILE) continue;
+        threadPool.runTask([&fileMetadata, this] {
+            const auto fileCode = getFileText(fileMetadata.path);
+            loadSrcFile(fileCode, fs::canonical(fileMetadata.path), fileMetadata.id);
         });
     }
     threadPool.wait();
+    if (errHandler.successful) appCache.save();
     return errHandler.successful;
 }
 
@@ -175,6 +173,26 @@ void LgsApp::analyseEnvs() {
             errHandler.addError(E10020, &requiredEnv->location, appConfigFile->absPath, {envFile->envName, requiredEnv->name, requiredEnv->type->pname()});
         }
     }
+}
+
+bool LgsApp::analyse() {
+    loadBuiltins();
+    analyseEnvs();
+    LgsTypeResolver typeResolver(errHandler, globals);
+    if (!typeResolver.resolveGlobals(srcFiles, threadPool)) return false;
+    for (const auto file : srcFiles) {
+        threadPool.runTask([this, file] {
+            LgsSema semaAnalyser(file, globals);
+            semaAnalyser.analyse();
+            if (semaAnalyser.errHandler.successful) return;
+            {
+                std::lock_guard lock(mtx);
+                errHandler.mergeErrors(semaAnalyser.errHandler);
+            }
+        });
+    }
+    threadPool.wait();
+    return errHandler.successful;
 }
 
 bool LgsApp::generate() {
@@ -206,30 +224,9 @@ bool LgsApp::link() {
     return linker.link();
 }
 
-void LgsApp::loadBuiltins() {
-    globals.addSymbol(LgsSymbol(new LgsSystem(), false, true), &errHandler);
-    globals.addSymbol(LgsSymbol(new LgsPrint(), false, true), &errHandler);
-    globals.addSymbol(LgsSymbol(new LgsTest(), false, true), &errHandler);
-    globals.addSymbol(LgsSymbol(new LgsReflect(), false, true), &errHandler);
-}
-
-bool LgsApp::loadAppConfigFile() {
-    const auto appFileID = getNextFileID();
-    paths.appFilePath = fs::canonical(paths.appFilePath);
-    const auto fileCode = getFileText(paths.appFilePath);
-    LgsParser parser(appFileID, paths.appFilePath, paths, globals, fileCode);
-    appConfigFile = parser.parseAppConfigFile();
-    auto appConfigMetadata = appMetadata.files.front();
-    assert(appConfigMetadata.type == LGS_APP_CONFIG_FILE);
-    appConfigMetadata.hash = appConfigFile->hashFile();
-    errHandler.mergeErrors(parser.errHandler);
-    loadAppConfigs();
-    return errHandler.successful;
-}
-
 LgsFile* LgsApp::loadSrcFile(const std::string& fileCode, const fs::path& filePath, size_t fileID) {
     if (fileID == 0) fileID = getNextFileID();
-    LgsParser parser(fileID, filePath, paths, globals, fileCode);
+    LgsParser parser(fileID, filePath, paths, globals.symbols, fileCode);
     const auto file = parser.parseSrcFile(appConfigs.isTestRun);
     {
         std::lock_guard lock(mtx);
@@ -241,16 +238,43 @@ LgsFile* LgsApp::loadSrcFile(const std::string& fileCode, const fs::path& filePa
     return file;
 }
 
+LgsFile* LgsApp::loadSrcFileHeaders(const std::string& fileCode, const fs::path& filePath, const size_t fileID) {
+    LgsParser parser(fileID, filePath, paths, globals.symbols, fileCode);
+    const auto file = parser.parseSrcFileHeaders();
+    {
+        std::lock_guard lock(mtx);
+        if (file) srcFiles.push_back(file);
+        if (!parser.errHandler.successful) {
+            errHandler.mergeErrors(parser.errHandler);
+        }
+    }
+    return file;
+}
+
+bool LgsApp::loadAppConfigFile() {
+    const auto appFileID = getNextFileID();
+    paths.appFilePath = fs::canonical(paths.appFilePath);
+    const auto fileCode = getFileText(paths.appFilePath);
+    LgsParser parser(appFileID, paths.appFilePath, paths, globals.symbols, fileCode);
+    appConfigFile = parser.parseAppConfigFile();
+    auto appConfigMetadata = appCache.files.front();
+    assert(appConfigMetadata.type == LGS_APP_CONFIG_FILE);
+    appConfigMetadata.hash = appConfigFile->hashFile();
+    errHandler.mergeErrors(parser.errHandler);
+    loadAppConfigs();
+    return errHandler.successful;
+}
+
 bool LgsApp::loadEnvFiles() {
     if (appConfigs.isFileMode) return true;
-    for (auto& fileMetadata : appMetadata.files) {
+    for (auto& fileMetadata : appCache.files) {
         if (fileMetadata.type != LGS_ENV_FILE) continue;
         const auto filePath = fileMetadata.path;
         if (!isLogosFile(filePath)) continue;
         threadPool.runTask([filePath, this, &fileMetadata] {
             const auto fileCode = getFileText(filePath);
             const auto fileID = getNextFileID();
-            LgsParser parser(fileID, fs::canonical(filePath), paths, globals, fileCode);
+            LgsParser parser(fileID, fs::canonical(filePath), paths, globals.symbols, fileCode);
             const auto envFile = parser.parseEnvFile();
             if (!envFile) return;
             fileMetadata.hash = envFile->hashFile();
@@ -285,6 +309,26 @@ void LgsApp::loadAppConfigs() {
     }
 }
 
+bool LgsApp::loadDeps() {
+    for (auto package : appConfigFile->packages) {
+        const auto app = new LgsApp("/Users/r.mordechay/Desktop/Programming/logos-test");
+        loadAppGlobals(*app);
+    }
+    return true;
+}
+
+bool LgsApp::loadAppGlobals(LgsApp& app) {
+    globals.imports.push_back(&app);
+    return true;
+}
+
+void LgsApp::loadBuiltins() {
+    globals.symbols.addSymbol(LgsSymbol(new LgsSystem(), false, true), &errHandler);
+    globals.symbols.addSymbol(LgsSymbol(new LgsPrint(), false, true), &errHandler);
+    globals.symbols.addSymbol(LgsSymbol(new LgsTest(), false, true), &errHandler);
+    globals.symbols.addSymbol(LgsSymbol(new LgsReflect(), false, true), &errHandler);
+}
+
 size_t LgsApp::getNextFileID() {
     return nextFileID.fetch_add(1, std::memory_order_relaxed);
 }
@@ -306,4 +350,8 @@ LgsApp::~LgsApp() {
         delete testFile;
     }
     testsFiles.clear();
+    for (const auto app : globals.imports) {
+        delete app;
+    }
+    globals.imports.clear();
 }

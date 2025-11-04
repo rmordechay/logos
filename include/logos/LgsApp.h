@@ -1,5 +1,5 @@
 #pragma once
-#include "LgsAppMetadata.h"
+#include "LgsAppCache.h"
 #include "LgsAppConfigs.h"
 #include "codegen/LgsLinker.h"
 #include "LgsSymbolTable.h"
@@ -29,32 +29,39 @@ inline std::mutex mtx;
 class LgsApp final {
 public:
     LgsPaths paths;
-    LgsSymbolTable globals;
-    LgsAppMetadata appMetadata;
+    LgsGlobals globals;
+    LgsAppCache appCache;
     LgsAppConfigs appConfigs;
     LgsErrHandler errHandler;
     std::vector<LgsFile*> srcFiles;
     std::vector<LgsEnvFile*> envFiles;
     std::vector<LgsTestFile*> testsFiles;
-    std::map<FileID, fs::path> filePaths;
     LgsAppConfigFile* appConfigFile = nullptr;
-    std::atomic<FileID> nextFileID = 1;
-    ThreadPool threadPool;
     // Used when passing code directly.
     std::unordered_map<std::string, std::string> lgsCode;
+    std::atomic<FileID> nextFileID = 1;
+
+    LgsApp() = default;
+    explicit LgsApp(const fs::path& rootPath) {
+        paths.rootPath = rootPath;
+    }
 
     void compile();
     bool setup();
     bool parse();
+    bool parseHeaders();
     void analyseEnvs();
     bool analyse();
     bool generate();
     bool link();
-    void loadBuiltins();
     LgsFile* loadSrcFile(const std::string& fileCode, const fs::path& filePath = LGS_MAIN_FILE, size_t fileID = 0);
+    LgsFile* loadSrcFileHeaders(const std::string& fileCode, const fs::path& filePath, size_t fileID);
     bool loadAppConfigFile();
     bool loadEnvFiles();
     void loadAppConfigs();
+    bool loadDeps();
+    bool loadAppGlobals(LgsApp& app);
+    void loadBuiltins();
     size_t getNextFileID();
     ~LgsApp();
 };

@@ -11,8 +11,7 @@ void LgsAstCmd::run() {
     const auto path = argv[2];
     if (!fs::exists(path)) exitWithError(E40004, {path});
     if (!isLogosFile(path)) exitWithError(E40003, {path});
-    LgsApp app;
-    app.paths.rootPath = path;
+    LgsApp app(path);
     if (!app.setup()) app.errHandler.exitWithErrors();
     const LgsFileMetadata metadata(app.getNextFileID(), path);
     const auto code = getFileText(metadata.path);

@@ -54,11 +54,11 @@ class LgsSema final {
 public:
     LgsStack stack;
     LgsFile* file = nullptr;
+    LgsGlobals& globals;
     LgsErrHandler errHandler;
-    LgsSymbolTable& globals;
     LgsTypeResolver typeResolver;
 
-    explicit LgsSema(LgsFile* file, LgsSymbolTable& globals) : file(file), globals(globals), typeResolver(errHandler, globals) {}
+    explicit LgsSema(LgsFile* file, LgsGlobals& globals) : file(file), globals(globals), typeResolver(errHandler, globals) {}
     void analyse();
     void visitMainFile(LgsMainFile* mainFile);
     void visitObject(LgsObject* obj);

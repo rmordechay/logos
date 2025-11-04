@@ -50,7 +50,6 @@
 #include "types/primitives/LgsShort.h"
 #include "types/primitives/LgsSize.h"
 #include "types/primitives/LgsUInt.h"
-
 #include <iostream>
 
 #define MAX_TOKENS_NUMBER 100000
@@ -73,16 +72,27 @@ LgsFile* LgsParser::parseSrcFile(const bool isTestRun) {
     if (const auto mainFile = parseMainFile()) {
         return mainFile;
     }
-    if (const auto objFile = parseObjectFile()) {
+    if (const auto objFile = parseObjectFile(false)) {
         return objFile;
     }
-    if (const auto interfaceFile = parseInterfaceFile()) {
+    if (const auto interfaceFile = parseInterfaceFile(false)) {
         return interfaceFile;
     }
     if (isTestRun) {
         if (const auto testFile = parseTestFile()) {
             return testFile;
         }
+    }
+    return nullptr;
+}
+
+LgsFile* LgsParser::parseSrcFileHeaders() {
+    if (!scanTokens()) return nullptr;
+    if (const auto objFile = parseObjectFile(true)) {
+        return objFile;
+    }
+    if (const auto interfaceFile = parseInterfaceFile(true)) {
+        return interfaceFile;
     }
     return nullptr;
 }
@@ -186,7 +196,7 @@ LgsMainFile* LgsParser::parseMainFile() {
     return file;
 }
 
-LgsObjectFile* LgsParser::parseObjectFile() {
+LgsObjectFile* LgsParser::parseObjectFile(const bool onlyHeaders) {
     const auto isSingleton = currentToken.type == T_SINGLETON;
     if (currentToken.type != T_OBJECT && !isSingleton) return nullptr;
     const auto nameToken = consume();
@@ -194,33 +204,33 @@ LgsObjectFile* LgsParser::parseObjectFile() {
     mustMatch(T_IDENTIFIER);
     const auto withBraces = matchAndConsume(T_LBRACE);
     parseExternalImports(file);
-    const auto obj = parseObjectBody(nameToken, isSingleton);
-    if (isSingleton) {
+    const auto obj = parseObjectBody(nameToken, isSingleton, onlyHeaders);
+    if (withBraces) mustMatch(T_RBRACE);
+    if (isSingleton && !onlyHeaders) {
         obj->singleton = new LgsInstance(obj);
     }
-    if (withBraces) mustMatch(T_RBRACE);
-    file->location = obj->location;
     file->obj = obj;
+    file->location = obj->location;
     validateTypeName(obj->name, &obj->location);
-    {
+    if (!onlyHeaders) {
         std::lock_guard lock(mtx);
         globals.addSymbol(LgsSymbol(file->obj), &errHandler, filePath);
     }
     return file;
 }
 
-LgsInterfaceFile* LgsParser::parseInterfaceFile() {
+LgsInterfaceFile* LgsParser::parseInterfaceFile(const bool onlyHeaders) {
     if (!matchAndConsume(T_INTERFACE)) return nullptr;
     const auto nameToken = currentToken;
     mustMatch(T_IDENTIFIER);
     const auto withBraces = matchAndConsume(T_LBRACE);
-    const auto interface = parseInterfaceBody(nameToken);
+    const auto interface = parseInterfaceBody(nameToken, onlyHeaders);
     if (withBraces) mustMatch(T_RBRACE);
     auto const file = new LgsInterfaceFile(fileID, filePath);
     file->location = interface->location;
     file->interface = interface;
     validateTypeName(interface->name, &interface->location);
-    {
+    if (!onlyHeaders) {
         std::lock_guard lock(mtx);
         globals.addSymbol(LgsSymbol(file->interface), &errHandler, filePath);
     }
@@ -260,30 +270,13 @@ LgsTestFile* LgsParser::parseTestFile() {
     return file;
 }
 
-void LgsParser::parseExternalImports(LgsFile* file) {
-    if (!matchAndConsume(T_EXTERN)) return;
-    const auto langName = currentToken;
-    mustMatch(T_IDENTIFIER);
-    mustMatch(T_LBRACE);
-    while (true) {
-        const auto strConst = parseStrConst();
-        if (!strConst) break;
-        file->externalCPaths.push_back(strConst);
-        if (currentToken.type == T_RBRACE) break;
-    }
-    mustMatch(T_RBRACE);
-    LgsCLang lgsCLang(paths);
-    lgsCLang.resolveCPaths(*file);
-    errHandler.mergeErrors(lgsCLang.errHandler);
-}
-
 LgsObject* LgsParser::parseObject() {
     const auto isSingleton = currentToken.type == T_SINGLETON;
     if (currentToken.type != T_OBJECT && !isSingleton) return nullptr;
     const auto nameToken = consume();
     mustMatch(T_IDENTIFIER);
     mustMatch(T_LBRACE);
-    const auto obj = parseObjectBody(nameToken, isSingleton);
+    const auto obj = parseObjectBody(nameToken, isSingleton, false);
     mustMatch(T_RBRACE);
     validateTypeName(obj->name, &obj->location);
     return obj;
@@ -294,13 +287,13 @@ LgsInterface* LgsParser::parseInterface() {
     const auto nameToken = currentToken;
     mustMatch(T_IDENTIFIER);
     mustMatch(T_LBRACE);
-    const auto interface = parseInterfaceBody(nameToken);
+    const auto interface = parseInterfaceBody(nameToken, false);
     mustMatch(T_RBRACE);
     validateTypeName(interface->name, &interface->location);
     return interface;
 }
 
-LgsObject* LgsParser::parseObjectBody(const LgsToken& tokenName, const bool isSingleton) {
+LgsObject* LgsParser::parseObjectBody(const LgsToken& tokenName, const bool isSingleton, bool onlyHeaders) {
     auto const obj = new LgsObject(tokenName.lexeme);
     setLocation(obj->location, &tokenName);
 
@@ -351,7 +344,7 @@ LgsObject* LgsParser::parseObjectBody(const LgsToken& tokenName, const bool isSi
 
     // Methods
     while (true) {
-        const auto method = parseMethod(obj);
+        const auto method = parseMethod(obj, onlyHeaders);
         if (!method) break;
         obj->addMethod(method);
         if (currentToken.type == T_RBRACE || currentToken.type == T_EOF) break;
@@ -365,7 +358,7 @@ LgsObject* LgsParser::parseObjectBody(const LgsToken& tokenName, const bool isSi
     return obj;
 }
 
-LgsInterface* LgsParser::parseInterfaceBody(const LgsToken& tokenName) {
+LgsInterface* LgsParser::parseInterfaceBody(const LgsToken& tokenName, bool onlyHeaders) {
     auto const interface = new LgsInterface(tokenName.lexeme);
     setLocation(interface->location, &tokenName);
 
@@ -400,7 +393,7 @@ LgsGeneric* LgsParser::parseBaseGeneric() {
     return generic;
 }
 
-LgsField* LgsParser::parseField(size_t fieldPosition) {
+LgsField* LgsParser::parseField(const size_t fieldPosition) {
     const auto oldIndex = currentIndex;
     auto isConst = false;
     auto isOwner = false;
@@ -616,7 +609,7 @@ LgsMainFunc* LgsParser::parseMainFunc() {
     return func;
 }
 
-LgsFunc* LgsParser::parseMethod(LgsObject* obj) {
+LgsFunc* LgsParser::parseMethod(LgsObject* obj, const bool onlyHeaders) {
     auto isPublic = false;
     if (matchAndConsume(T_PUBLIC)) {
         isPublic = true;
@@ -627,7 +620,9 @@ LgsFunc* LgsParser::parseMethod(LgsObject* obj) {
     const auto func = new LgsFunc(funcHeader);
     currentFunc = func;
     func->location = func->funcType->location;
-    func->stmtsBlock = parseStmtsBlock();
+    if (!onlyHeaders) {
+        func->stmtsBlock = parseStmtsBlock();
+    }
     func->funcType->isPublic = isPublic;
     if (func->funcType->isMethod) {
         func->funcType->params.insert(func->funcType->params.begin(), LgsParam(obj, LGS_SELF));
@@ -1316,7 +1311,6 @@ LgsStrConst* LgsParser::parseStrConst() {
     return strConst;
 }
 
-
 LgsLoopMetaVar* LgsParser::parseLoopMetaVar() {
     const auto metaVarToken = currentToken;
     if (matchAndConsume(T_FOR_I)) {
@@ -1339,6 +1333,7 @@ LgsLoopMetaVar* LgsParser::parseLoopMetaVar() {
     }
     return nullptr;
 }
+
 
 LgsExpr* LgsParser::parseConstant() {
     const auto tokenStr = currentToken.lexeme;
@@ -1582,21 +1577,6 @@ LgsJson* LgsParser::parseJson() {
     return json;
 }
 
-LgsJson* LgsParser::parseJsonValue() {
-    const auto json = new LgsJson();
-    setLocation(json->location, &currentToken);
-    if (currentToken.type == T_LBRACE) {
-        json->jsonType = JSON_OBJECT;
-        json->jsonObject = parseJsonObject();
-    } else if (currentToken.type == T_LBRACK) {
-        json->jsonType = JSON_ARRAY;
-        json->jsonArray = parseJsonArray();
-    } else {
-        parseJsonPrimitive(json);
-    }
-    return json;
-}
-
 LgsJsonObject* LgsParser::parseJsonObject() {
     mustMatch(T_LBRACE);
     const auto jsonObject = new LgsJsonObject();
@@ -1631,6 +1611,21 @@ LgsJsonArray* LgsParser::parseJsonArray() {
     return jsonArray;
 }
 
+LgsJson* LgsParser::parseJsonValue() {
+    const auto json = new LgsJson();
+    setLocation(json->location, &currentToken);
+    if (currentToken.type == T_LBRACE) {
+        json->jsonType = JSON_OBJECT;
+        json->jsonObject = parseJsonObject();
+    } else if (currentToken.type == T_LBRACK) {
+        json->jsonType = JSON_ARRAY;
+        json->jsonArray = parseJsonArray();
+    } else {
+        parseJsonPrimitive(json);
+    }
+    return json;
+}
+
 void LgsParser::parseJsonPrimitive(LgsJson* json) {
     if (const auto strConst = parseStrConst()) {
         json->jsonType = JSON_STRING;
@@ -1647,6 +1642,23 @@ void LgsParser::parseJsonPrimitive(LgsJson* json) {
             json->null = constant->asNull();
         }
     }
+}
+
+void LgsParser::parseExternalImports(LgsFile* file) {
+    if (!matchAndConsume(T_EXTERN)) return;
+    const auto langName = currentToken;
+    mustMatch(T_IDENTIFIER);
+    mustMatch(T_LBRACE);
+    while (true) {
+        const auto strConst = parseStrConst();
+        if (!strConst) break;
+        file->externalCPaths.push_back(strConst);
+        if (currentToken.type == T_RBRACE) break;
+    }
+    mustMatch(T_RBRACE);
+    LgsCLang lgsCLang(paths);
+    lgsCLang.resolveCPaths(*file);
+    errHandler.mergeErrors(lgsCLang.errHandler);
 }
 
 bool LgsParser::validateTypeName(const std::string& typeName, const LgsLocation* location) {

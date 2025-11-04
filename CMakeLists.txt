@@ -26,7 +26,7 @@ set(LGS_SOURCE
     ${CMAKE_SOURCE_DIR}/src/logos/LgsApp.cpp
     ${CMAKE_SOURCE_DIR}/src/logos/LgsStack.cpp
     ${CMAKE_SOURCE_DIR}/src/logos/LgsPaths.cpp
-    ${CMAKE_SOURCE_DIR}/src/logos/LgsAppMetadata.cpp
+    ${CMAKE_SOURCE_DIR}/src/logos/LgsAppCache.cpp
     ${CMAKE_SOURCE_DIR}/src/files/LgsMainFile.cpp
     ${CMAKE_SOURCE_DIR}/src/files/LgsObjectFile.cpp
     ${CMAKE_SOURCE_DIR}/src/files/LgsInterfaceFile.cpp

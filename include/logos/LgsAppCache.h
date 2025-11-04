@@ -1,7 +1,7 @@
 #pragma once
 #include "files/LgsFile.h"
 
-struct LgsAppMetadata {
+struct LgsAppCache {
     fs::path cacheFilePath;
     std::vector<LgsFileMetadata> files;
     std::vector<LgsFileMetadata> cached;

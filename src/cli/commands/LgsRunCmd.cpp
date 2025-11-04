@@ -9,6 +9,7 @@ void LgsRunCmd::run() {
     std::vector<const char*> args;
     {
         LgsApp app;
+        app.appConfigs.isRoot = true;
         parseArgs(app, args);
         app.compile();
         execPath = app.paths.execFilePath;
