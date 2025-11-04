@@ -621,6 +621,22 @@ TEST_CASE("SemaError10042") {
     }
 }
 
+TEST_CASE("SemaError10043") {
+    LgsApp app;
+    const auto code = R"(
+        func(a: Int = 2, b: Int...) {}
+        main() {}
+    )";
+    app.loadSrcFile(code);
+    assert(app.errHandler.successful);
+    app.analyse();
+    CHECK_MESSAGE(app.errHandler.errors.size() == 2, EXPECTED_ERR(E10043, code));
+    if (app.errHandler.errors.size() > 1) {
+        CHECK_EQ(app.errHandler.errors[0].errCode, E10028.code);
+        CHECK_EQ(app.errHandler.errors[1].errCode, E10043.code);
+    }
+}
+
 TEST_CASE("SemaError10046") {
     LgsApp app;
     const auto code = R"(

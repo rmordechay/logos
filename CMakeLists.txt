@@ -159,7 +159,7 @@ target_include_directories(lgs_runtime PUBLIC
     ${CMAKE_SOURCE_DIR}/runtime/include
 )
 
-# Executable
+# Create executable
 add_executable(lgs main.cpp ${LGS_SOURCE})
 target_link_libraries(lgs PRIVATE lgs_runtime LLVM clang-cpp)
 
@@ -169,11 +169,15 @@ if(LOGOS_RELEASE)
     target_compile_options(lgs_runtime PRIVATE -O3 -DNDEBUG)
     set_target_properties(lgs PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
     set_target_properties(lgs_runtime PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
+    if(UNIX AND NOT APPLE)
+        target_link_options(lgs PRIVATE -s)
+    endif()
 else()
     target_compile_options(lgs PRIVATE -Wall -Wextra -Wpedantic -Werror -Wreturn-type -Wno-unused-parameter -Wno-unused-variable)
+    add_subdirectory(tests)
 endif()
 
-# Include
+# Add includes to executable
 target_include_directories(lgs PUBLIC
     ${CMAKE_SOURCE_DIR}/include
     ${LLVM_INCLUDE_DIRS}
@@ -183,16 +187,6 @@ target_include_directories(lgs SYSTEM PUBLIC
     ${LLVM_INCLUDE_DIRS}
     ${CLANG_INCLUDE_DIRS}
 )
-
-# Link
-if(LOGOS_RELEASE)
-    set_target_properties(lgs PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
-    if(UNIX AND NOT APPLE)
-        target_link_options(lgs PRIVATE -s)
-    endif()
-else()
-    add_subdirectory(tests)
-endif()
 
 # Install
 install(TARGETS lgs RUNTIME DESTINATION bin)

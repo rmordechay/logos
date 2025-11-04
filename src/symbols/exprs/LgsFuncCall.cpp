@@ -31,7 +31,7 @@ bool LgsFuncCall::equals(const LgsFuncType* other) const {
 }
 
 bool LgsFuncCall::equalsVariadic(const LgsFuncType* funcType) const {
-    return true;
+    assert(0);
 }
 
 std::string LgsFuncCall::asText() {

@@ -18,7 +18,8 @@ function Install-Dependencies {
     $packages = @(
         "Git.Git",
         "Kitware.CMake",
-        "LLVM.LLVM"
+        "LLVM.LLVM",
+        "ninja-build.ninja"
     )
 
     foreach ($pkg in $packages) {
@@ -26,12 +27,11 @@ function Install-Dependencies {
         winget install --id $pkg --accept-package-agreements --accept-source-agreements --silent
     }
 
-    $env:Path = "C:\Program Files\Git\bin;C:\Program Files\CMake\bin;C:\Program Files\LLVM\bin;" + $env:Path
+    $env:Path += "C:\Program Files\Git\bin;C:\Program Files\CMake\bin;C:\Program Files\LLVM\bin;C:\Program Files\Ninja;"
 }
 
 function Install-Logos {
     Write-Host "Installing Logos..."
-
     Push-Location $TEMP_DIR
 
     git clone -q --depth 1 -b dev https://github.com/rmordechay/logos.git
@@ -40,14 +40,20 @@ function Install-Logos {
     $buildDir = Join-Path $PWD "build"
     $workers = [Environment]::ProcessorCount
 
-    cmake -S . -B $buildDir -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$INSTALL_PREFIX" -DLOGOS_RELEASE=ON
+    cmake -S . -B $buildDir `
+      -G "Ninja" `
+      -DCMAKE_C_COMPILER="C:/Program Files/LLVM/bin/clang.exe" `
+      -DCMAKE_CXX_COMPILER="C:/Program Files/LLVM/bin/clang++.exe" `
+      -DCMAKE_BUILD_TYPE=Release `
+      -DCMAKE_INSTALL_PREFIX="$INSTALL_PREFIX" `
+      -DLOGOS_RELEASE=ON
     cmake --build $buildDir --parallel $workers
     cmake --install $buildDir
 
     Pop-Location
 }
 
-#Install-Dependencies
+Install-Dependencies
 Install-Logos
 
 Write-Host ""

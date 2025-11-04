@@ -1093,17 +1093,17 @@ void LgsCodeGen::createPrologue(LgsFunc* func) {
         cg.callLgsFunc("Runtime_init", cg.voidTy());
     }
     cg.callStackPush(func->hasDefers, func->needsCleanup());
-    if (func->funcType->isVariadic) {
-        const auto& variadicParam = func->funcType->params.back();
-        const auto valist = cg.builder.CreateAlloca(cg.ptrTy());
-        const auto ty = variadicParam.type->getIRType(cg);
-        cg.callIntrinsics(llvm::Intrinsic::vastart, {valist}, {cg.ptrTy()});
-        cg.loop(func->variadicCount, [this, ty, valist](Value*, BasicBlock*) {
-            const auto v = cg.builder.CreateVAArg(valist, ty);
-            cg.printInt(v);
-        });
-        cg.callIntrinsics(llvm::Intrinsic::vaend, {valist}, {cg.ptrTy()});
-    }
+    // if (func->funcType->isVariadic) {
+    //     const auto& variadicParam = func->funcType->params.back();
+    //     const auto valist = cg.builder.CreateAlloca(cg.ptrTy());
+    //     const auto ty = variadicParam.type->getIRType(cg);
+    //     cg.callIntrinsics(llvm::Intrinsic::vastart, {valist}, {cg.ptrTy()});
+    //     cg.loop(func->variadicCount, [this, ty, valist](Value*, BasicBlock*) {
+    //         const auto v = cg.builder.CreateVAArg(valist, ty);
+    //         cg.printInt(v);
+    //     });
+    //     cg.callIntrinsics(llvm::Intrinsic::vaend, {valist}, {cg.ptrTy()});
+    // }
 }
 
 void LgsCodeGen::createEpilogue(LgsFunc* func) {

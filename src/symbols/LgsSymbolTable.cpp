@@ -1,18 +1,9 @@
 #include "LgsSymbolTable.h"
 #include "data/LgsErrors.h"
-#include "funcs/LgsParam.h"
 #include "utils/LgsErrHandler.h"
-#include "funcs/LgsFunc.h"
-#include "stmts/LgsField.h"
-#include "stmts/LgsVarDec.h"
 #include "types/LgsEnum.h"
-#include "types/LgsGeneric.h"
-#include "types/LgsInterface.h"
-#include "types/LgsObject.h"
-#include "types/LgsSubType.h"
-#include "utils/LgsUtils.h"
 
-void LgsSymbolTable::   addSymbol(const LgsSymbol& symbol, LgsErrHandler* errHandler, const std::string& filePath) {
+void LgsSymbolTable::addSymbol(const LgsSymbol& symbol, LgsErrHandler* errHandler, const std::string& filePath) {
     const auto symbolName = *symbol.name;
     if (symbols.find(symbolName) != symbols.end()) {
         return errHandler->addError(E10011, symbol.location, filePath, {symbolName});
