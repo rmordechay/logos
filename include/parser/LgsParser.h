@@ -86,7 +86,7 @@ public:
     LgsObject* parseObjectBody(const LgsToken& tokenName, bool isSingleton);
     LgsInterface* parseInterfaceBody(const LgsToken& tokenName);
     LgsGeneric* parseBaseGeneric();
-    LgsField* parseField();
+    LgsField* parseField(size_t fieldPosition);
     LgsIOPair* parseIOPair();
 
     // Types

@@ -20,6 +20,7 @@ public:
     bool isVirtual = false;
     bool isOptional = false;
     bool isOwner = false;
+    bool isEnum = false;
     Value* parentIRValue = nullptr;
     LgsType* parent = nullptr;
 

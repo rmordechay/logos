@@ -342,7 +342,7 @@ void LgsCodeGen::visitAssignment(const LgsAssignment* assignment) {
     } else if (const auto var = lValue->asVariable()) {
         visitVariable(var);
     } else if (const auto selection = lValue->asSelection()) {
-        visitSelection(selection);
+        visitSelection(selection, true);
     } else {
         assert(0);
     }
@@ -463,8 +463,8 @@ void LgsCodeGen::visitElseIf(LgsIfStmt* ifStmt) {
 
 void LgsCodeGen::visitSwitch(LgsSwitch* pm) {
     assert(pm->cond);
-    const auto defaultBlock = cg.createBlock(BLOCK_NAME_ELSE);
-    const auto exitBlock = cg.createBlock(BLOCK_NAME_EXIT_PATTERN);
+    const auto defaultBlock = cg.createBlock("", currentIRFunc);
+    const auto exitBlock = cg.createBlock("", currentIRFunc);
     visitExpr(pm->cond);
 
     const auto exprIRValue = pm->cond->hash(cg);
@@ -482,7 +482,7 @@ void LgsCodeGen::visitSwitch(LgsSwitch* pm) {
         visitExpr(expr);
         const auto patternBlock = cg.createBlock(BLOCK_NAME_CASE_PREFIX + std::to_string(i), currentIRFunc);
         switchInst->addCase(llvm::dyn_cast<ConstantInt>(expr->hash(cg)), patternBlock);
-        cg.startBlock(patternBlock);
+        cg.builder.SetInsertPoint(patternBlock);
         visitStmtsBlock(stmtsBlock);
         cg.builder.CreateBr(exitBlock);
         stack.exitScope();
@@ -490,12 +490,12 @@ void LgsCodeGen::visitSwitch(LgsSwitch* pm) {
 
     if (pm->elseBlock) {
         stack.enterScope(pm);
-        cg.startBlock(defaultBlock);
+        cg.builder.SetInsertPoint(defaultBlock);
         visitStmtsBlock(pm->elseBlock);
         cg.builder.CreateBr(exitBlock);
         stack.exitScope();
     }
-    cg.startBlock(exitBlock);
+    cg.builder.SetInsertPoint(exitBlock);
 }
 
 void LgsCodeGen::visitContinueStmt() {
@@ -801,12 +801,12 @@ void LgsCodeGen::visitVariable(LgsVariable* variable) {
 void LgsCodeGen::visitSelection(LgsSelection* selection, const bool assign) {
     const auto firstExpr = selection->exprs.front();
     visitExpr(firstExpr);
-    assert(!firstExpr->IRValue || (&firstExpr->IRValue->getContext() == &cg.IRModule->getContext()));
+    assert(!firstExpr->IRValue || &firstExpr->IRValue->getContext() == &cg.IRModule->getContext());
     for (size_t i = 0; i < selection->exprs.size() - 1; ++i) {
         const auto parent = selection->exprs[i];
         const auto child = selection->exprs[i + 1];
         if (const auto var = child->asVariable()) {
-            visitFieldSelection(var, parent);
+            visitFieldSelection(var, parent, assign);
         } else if (const auto methodCall = child->asFuncCall()) {
             const bool isTest = stack.currentFunc()->isTest && parent->type->getName() == LgsTest::name && methodCall->name == "mock";
             if (isTest) continue;
@@ -826,7 +826,7 @@ void LgsCodeGen::visitSelection(LgsSelection* selection, const bool assign) {
     }
 }
 
-void LgsCodeGen::visitFieldSelection(LgsVariable* var, LgsExpr* parent) const {
+void LgsCodeGen::visitFieldSelection(LgsVariable* var, LgsExpr* parent, const bool assign) const {
     if (var->ref.symbolType == FUNC) {
         var->IRValue = var->ref.func->getIRFunc(cg);
         return;
@@ -840,14 +840,14 @@ void LgsCodeGen::visitFieldSelection(LgsVariable* var, LgsExpr* parent) const {
             return;
         }
     }
-    if (field->type->asEnum()) {
+    if (field->isEnum) {
         var->IRValue = cg.getIRStr(field->name);
         return;
     }
     assert(&parent->IRValue->getContext() == &cg.IRModule->getContext());
     field->parentIRValue = parent->IRValue;
     field->IRValue = field->getGEP(cg);
-    if (field->type->asObject()) {
+    if (field->type->asObject() || (field->type->asEnum() && !assign)) {
         var->IRValue = cg.builder.CreateLoad(cg.ptrTy(), field->IRValue);
     } else {
         var->IRValue = field->IRValue;
@@ -1004,7 +1004,10 @@ void LgsCodeGen::visitInstance(LgsInstance* instance) {
                 field->expr->owner = field;
             }
         }
-        visitField(field);
+        field->IRValue = field->getGEP(cg);
+        if (field->expr) {
+            field->expr->destPtrValue = field->IRValue;
+        }
         visitExpr(field->expr, true);
         if (field->expr->IRValue == field->IRValue) continue;
         cg.builder.CreateStore(field->expr->IRValue, field->IRValue);

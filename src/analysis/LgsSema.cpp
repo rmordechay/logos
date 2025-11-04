@@ -86,6 +86,9 @@ void LgsSema::visitObject(LgsObject* obj) {
     for (const auto generic : obj->generics) {
         visitGeneric(generic);
     }
+    for (const auto enum_ : obj->enums) {
+        visitEnum(enum_);
+    }
     for (const auto field : obj->fields) {
         visitField(field);
     }
@@ -115,6 +118,9 @@ void LgsSema::visitTestFile(const LgsTestFile* testFile) {
 }
 
 void LgsSema::visitGeneric(LgsGeneric* generic) {
+}
+
+void LgsSema::visitEnum(LgsEnum* enum_) {
 }
 
 void LgsSema::visitField(LgsField* field) {
@@ -331,12 +337,6 @@ void LgsSema::visitSwitch(LgsSwitch* switchStmt) {
     visitExpr(switchStmt->cond);
     stack.enterScope(switchStmt);
     const auto condType = switchStmt->cond->type;
-    // Allows local enum fields to not have a qualifier inside the block
-    if (condType && condType->asEnum()) {
-        for (const auto& field : condType->fields) {
-            addLocalSymbol(LgsSymbol(field));
-        }
-    }
     for (auto [expr, block] : switchStmt->patterns) {
         if (!condType || expr->type->isUnknown()) continue;
         stack.enterScope(switchStmt);
@@ -771,6 +771,7 @@ void LgsSema::visitSelection(LgsSelection* selection) {
             selection->exprs[0] = typeExpr;
         }
     }
+
     visitInnerSelections(selection);
 
     const auto lastExpr = selection->lastExpr();

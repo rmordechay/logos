@@ -147,7 +147,7 @@ void freeParams(std::vector<LgsParam>& params) {
     params.clear();
 }
 
-size_t hashStr(const char* key) {
+size_t hashStr(const std::string& key) {
     return std::hash<std::string_view>{}(key);
 }
 

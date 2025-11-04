@@ -113,7 +113,7 @@ public:
     void visitVectorExpr(LgsVectorExpr* vectorExpr);
     void visitVariable(LgsVariable* variable);
     void visitSelection(LgsSelection* selection, bool assign = false);
-    void visitFieldSelection(LgsVariable* var, LgsExpr* parent) const;
+    void visitFieldSelection(LgsVariable* var, LgsExpr* parent, bool assign) const;
     void visitFuncCall(LgsFuncCall* funcCall);
     void visitIterFunc(const LgsFuncCall* funcCall);
     void visitPrefixExpr(LgsPrefixExpr* prefixExpr);

@@ -31,7 +31,7 @@ bool isLLVMFile(const fs::directory_entry& entry);
 bool isLogosKeyword(const std::string& s);
 std::string getFileText(const fs::path& filePath);
 bool fileExists(const fs::path& entry, const std::vector<LgsFileMetadata>& filesMetadata);
-size_t hashStr(const char* key);
+size_t hashStr(const std::string& key);
 bool startsWith(const std::string& str, const std::string& prefix);
 std::string getLine(const std::string& filename, size_t lineNumber);
 std::string trim(const std::string& str);

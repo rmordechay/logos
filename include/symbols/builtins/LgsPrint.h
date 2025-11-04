@@ -2,7 +2,7 @@
 #include "exprs/constants/LgsStrConst.h"
 #include "funcs/LgsFunc.h"
 #include "types/LgsAny.h"
-#include "types/LgsVoid.h"
+#include "../types/primitives/LgsVoid.h"
 
 class LgsPrint final : public LgsFunc {
 public:

@@ -4,7 +4,7 @@
 #include "exprs/LgsArrayExpr.h"
 #include "funcs/LgsFunc.h"
 #include "types/LgsAny.h"
-#include "types/LgsVoid.h"
+#include "../../../../include/symbols/types/primitives/LgsVoid.h"
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsLong.h"
 #include "types/primitives/LgsSize.h"

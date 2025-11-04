@@ -332,8 +332,10 @@ LgsObject* LgsParser::parseObjectBody(const LgsToken& tokenName, const bool isSi
         }
     }
 
+    auto fieldPosition = 0;
     while (true) {
-        if (const auto field = parseField()) {
+        if (const auto field = parseField(fieldPosition)) {
+            fieldPosition++;
             obj->addField(field);
             field->parent = obj;
         } else if (const auto enum_ = parseEnum()) {
@@ -367,8 +369,10 @@ LgsInterface* LgsParser::parseInterfaceBody(const LgsToken& tokenName) {
     auto const interface = new LgsInterface(tokenName.lexeme);
     setLocation(interface->location, &tokenName);
 
+    auto fieldPosition = 0;
     while (true) {
-        const auto field = parseField();
+        const auto field = parseField(fieldPosition);
+        fieldPosition++;
         if (field) interface->addField(field);
         else break;
     }
@@ -396,7 +400,7 @@ LgsGeneric* LgsParser::parseBaseGeneric() {
     return generic;
 }
 
-LgsField* LgsParser::parseField() {
+LgsField* LgsParser::parseField(size_t fieldPosition) {
     const auto oldIndex = currentIndex;
     auto isConst = false;
     auto isOwner = false;
@@ -431,6 +435,7 @@ LgsField* LgsParser::parseField() {
     const auto field = new LgsField(nameToken.lexeme, type, expr);
     setLocation(field->location, &nameToken);
     field->setType(type);
+    field->position = fieldPosition;
     field->isConst = isConst;
     field->isOwner = isOwner;
     field->isPublic = isPublic;
@@ -458,6 +463,7 @@ LgsEnum* LgsParser::parseEnum() {
     mustMatch(T_LBRACE);
     const auto enum_ = new LgsEnum(nameToken.lexeme);
     setLocation(enum_->location, &nameToken);
+    auto position = 0;
     while (true) {
         const auto enumField = currentToken;
         if (!mustMatch(T_IDENTIFIER)) break;
@@ -467,6 +473,8 @@ LgsEnum* LgsParser::parseEnum() {
             mustParse(strConst);
         }
         const auto field = new LgsField(enumField.lexeme, enum_, strConst);
+        field->isEnum = true;
+        field->position = position++;
         setLocation(field->location, &enumField);
         enum_->addField(field);
         if (currentToken.type == T_RBRACE) break;

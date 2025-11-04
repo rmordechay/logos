@@ -45,7 +45,6 @@ Type* LgsObject::getIRType(LgsLLVMGen& cg) {
     elementTypes.reserve(fields.size());
     for (size_t i = 0; i < fields.size(); ++i) {
         const auto field = fields[i];
-        field->position = i;
         Type* fieldType;
         const auto ptr = field->type->asObject() || field->type->asFuncType() || field->type->asInterface() || field->type->asDArray();
         if (ptr) {
@@ -122,6 +121,9 @@ LgsObject* LgsObject::clone() {
     cloned->generics.clear();
     for (const auto& generic : generics) {
         cloned->generics.emplace_back(new LgsGeneric(*generic));
+    }
+    for (const auto& enum_ : enums) {
+        cloned->enums.emplace_back(new LgsEnum(*enum_));
     }
     for (const auto& field : fields) {
         const auto newField = new LgsField(*field);

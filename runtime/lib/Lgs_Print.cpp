@@ -17,6 +17,7 @@ std::string formatElement(const Lgs_RTType type, void* elem) {
     std::ostringstream oss;
     switch (type) {
     case RTT_TYPE:
+    case RTT_ENUM:
     case RTT_STR:
         oss << static_cast<const char*>(elem);
         break;
@@ -91,9 +92,6 @@ std::string formatElement(const Lgs_RTType type, void* elem) {
     }
     case RTT_ANY:
         oss << elem;
-        break;
-    case RTT_ENUM:
-        oss << static_cast<const char*>(elem);
         break;
     case RTT_SARRAY:
     case RTT_MAP:

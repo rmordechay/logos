@@ -12,7 +12,7 @@
 #include "types/LgsNullable.h"
 #include "types/LgsSubType.h"
 #include "types/LgsUnknown.h"
-#include "types/LgsVoid.h"
+#include "../../../include/symbols/types/primitives/LgsVoid.h"
 #include "types/iterables/LgsSArray.h"
 #include "types/iterables/LgsSet.h"
 #include "types/primitives/LgsBool.h"

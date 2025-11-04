@@ -1,4 +1,4 @@
-#include "symbols/types/LgsVoid.h"
+#include "../../../../include/symbols/types/primitives/LgsVoid.h"
 #include "codegen/LgsLLVMGen.h"
 #include <llvm/IR/DIBuilder.h>
 

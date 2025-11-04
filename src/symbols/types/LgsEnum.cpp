@@ -1,8 +1,6 @@
 #include "types/LgsEnum.h"
 #include "codegen/LgsLLVMGen.h"
-#include "stmts/LgsField.h"
 #include "types/LgsAny.h"
-#include "utils/LgsUtils.h"
 
 LgsExpr* LgsEnum::getZeroValue() {
     return nullptr;

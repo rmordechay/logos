@@ -107,7 +107,6 @@ set(LGS_SOURCE
     ${CMAKE_SOURCE_DIR}/src/symbols/stmts/LgsSwitch.cpp
 
     ${CMAKE_SOURCE_DIR}/src/symbols/types/LgsType.cpp
-    ${CMAKE_SOURCE_DIR}/src/symbols/types/LgsVoid.cpp
     ${CMAKE_SOURCE_DIR}/src/symbols/types/LgsUnknown.cpp
     ${CMAKE_SOURCE_DIR}/src/symbols/types/LgsAny.cpp
     ${CMAKE_SOURCE_DIR}/src/symbols/types/LgsPtr.cpp
@@ -136,6 +135,7 @@ set(LGS_SOURCE
     ${CMAKE_SOURCE_DIR}/src/symbols/types/primitives/LgsSize.cpp
     ${CMAKE_SOURCE_DIR}/src/symbols/types/primitives/LgsUInt.cpp
     ${CMAKE_SOURCE_DIR}/src/symbols/types/primitives/LgsByte.cpp
+    ${CMAKE_SOURCE_DIR}/src/symbols/types/primitives/LgsVoid.cpp
 )
 
 set(RUNTIME_SOURCE
@@ -190,4 +190,4 @@ target_include_directories(lgs SYSTEM PUBLIC
 
 # Install
 install(TARGETS lgs RUNTIME DESTINATION bin)
-install(TARGETS lgs_runtime LIBRARY DESTINATION lib ARCHIVE DESTINATION lib)
+install(TARGETS lgs_runtime LIBRARY DESTINATION lib)
