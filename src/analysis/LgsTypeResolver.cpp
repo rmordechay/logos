@@ -122,9 +122,9 @@ void LgsTypeResolver::resolveObjTypes(LgsObject* obj, LgsFile& file) {
 
     for (const auto& enum_ : obj->enums) {
         file.symbolTable.addSymbol(LgsSymbol(enum_), &errHandler, file.absPath);
-        for (const auto field : enum_->fields) {
-            file.symbolTable.addSymbol(LgsSymbol(field), &errHandler, file.absPath);
-        }
+        // for (const auto field : enum_->fields) {
+        //     file.symbolTable.addSymbol(LgsSymbol(field), &errHandler, file.absPath);
+        // }
     }
 
     for (const auto& field : obj->fields) {

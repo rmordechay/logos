@@ -2,14 +2,12 @@
 #include "cli/LgsCliHelp.h"
 #include "data/LgsCliErrors.h"
 #include "logos/LgsApp.h"
-#include "types/iterables/LgsStr.h"
 
 void LgsRunCmd::run() {
     fs::path execPath = "";
     std::vector<const char*> args;
     {
         LgsApp app;
-        app.appConfigs.isRoot = true;
         parseArgs(app, args);
         app.compile();
         execPath = app.paths.execFilePath;

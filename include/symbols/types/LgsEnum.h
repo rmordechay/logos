@@ -5,8 +5,9 @@
 class LgsEnum final : public LgsType {
 public:
     std::string name;
+    bool isRoot = false;
 
-    explicit LgsEnum(const std::string& enumName) : name(enumName) {}
+    explicit LgsEnum(const std::string& enumName) : name(enumName), isRoot(true) {}
     Type* getIRType(LgsLLVMGen& cg) override;
     std::string getName() override;
     LgsExpr* getZeroValue() override;

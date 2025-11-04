@@ -3,14 +3,12 @@
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsIOPair.h"
+#include "types/LgsSubType.h"
 #include "types/LgsEnum.h"
 #include "types/LgsInterface.h"
 #include "types/LgsNullable.h"
 #include "types/LgsGeneric.h"
 #include "utils/LgsUtils.h"
-#include "types/LgsSubType.h"
-
-#include <iostream>
 #include <sstream>
 #include <llvm/IR/Module.h>
 
@@ -116,28 +114,18 @@ std::string LgsObject::strFormatPart() const {
 }
 
 LgsObject* LgsObject::clone() {
-    const auto cloned = new LgsObject(*this);
-    cloned->fields.clear();
-    cloned->generics.clear();
+    const auto newObj = new LgsObject(*this);
+    newObj->fields.clear();
+    newObj->generics.clear();
     for (const auto& generic : generics) {
-        cloned->generics.emplace_back(new LgsGeneric(*generic));
+        newObj->generics.emplace_back(new LgsGeneric(*generic));
     }
     for (const auto& enum_ : enums) {
-        cloned->enums.emplace_back(new LgsEnum(*enum_));
+        newObj->enums.emplace_back(new LgsEnum(*enum_));
     }
-    for (const auto& field : fields) {
-        const auto newField = new LgsField(*field);
-        if (field->expr) {
-            newField->expr = field->expr->cloneExpr();
-        }
-        cloned->addField(newField);
-    }
-    cloned->methods.clear();
-    for (const auto& [_, method] : methods) {
-        const auto newField = new LgsFunc(*method);
-        cloned->addMethod(newField);
-    }
-    return cloned;
+    cloneFields(newObj);
+    cloneMethods(newObj);
+    return newObj;
 }
 
 LgsObject::~LgsObject() {
@@ -154,3 +142,4 @@ LgsObject::~LgsObject() {
         delete ioPair;
     }
 }
+

@@ -1,6 +1,5 @@
 #include "exprs/constants/LgsFloatConst.h"
 
-#include "LgsType.h"
 #include "codegen/LgsLLVMGen.h"
 
 Value* LgsFloatConst::loadIR(LgsLLVMGen& cg) {

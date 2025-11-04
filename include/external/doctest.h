@@ -496,7 +496,6 @@ DOCTEST_GCC_SUPPRESS_WARNING_POP
 // https://github.com/doctest/doctest/issues/126
 // https://github.com/doctest/doctest/issues/356
 #if DOCTEST_CLANG
-#include <ciso646>
 #endif // clang
 
 #ifdef _LIBCPP_VERSION

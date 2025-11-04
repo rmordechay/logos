@@ -1,7 +1,6 @@
 #include "loops/LgsInfiniteLoop.h"
 #include "data/LgsDefinitions.h"
 #include "codegen/LgsLLVMGen.h"
-#include "stmts/LgsVarDec.h"
 
 void LgsInfiniteLoop::incAndJumpToCond(LgsLLVMGen& cg) {
     if (cg.lastInstTerminator()) return;

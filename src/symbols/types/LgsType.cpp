@@ -199,6 +199,25 @@ LgsType* LgsType::clone() {
     assert(0);
 }
 
+void LgsType::cloneFields(LgsType* newType) const {
+    newType->fields.clear();
+    for (const auto& field : fields) {
+        const auto newField = new LgsField(*field);
+        if (field->expr) {
+            newField->expr = field->expr->cloneExpr();
+        }
+        newType->addField(newField);
+    }
+}
+
+void LgsType::cloneMethods(LgsType* newType) const {
+    newType->methods.clear();
+    for (const auto& [_, method] : methods) {
+        const auto newField = new LgsFunc(*method);
+        newType->addMethod(newField);
+    }
+}
+
 LgsAny* LgsType::asAny() {
     return dynamic_cast<LgsAny*>(this);
 }

@@ -56,11 +56,10 @@ public:
     bool link();
     LgsFile* loadSrcFile(const std::string& fileCode, const fs::path& filePath = LGS_MAIN_FILE, size_t fileID = 0);
     LgsFile* loadSrcFileHeaders(const std::string& fileCode, const fs::path& filePath, size_t fileID);
-    bool loadAppConfigFile();
+    bool loadConfigFile();
     bool loadEnvFiles();
     void loadAppConfigs();
     bool loadDeps();
-    bool loadAppGlobals(LgsApp& app);
     void loadBuiltins();
     size_t getNextFileID();
     ~LgsApp();

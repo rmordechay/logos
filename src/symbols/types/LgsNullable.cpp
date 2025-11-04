@@ -34,6 +34,7 @@ std::string LgsNullable::pname() {
 }
 
 bool LgsNullable::canCastTo(LgsType* other) {
+    if (baseType->isVoid() && !other->isVoid()) return false;
     if (other->getName() == LgsAny::name) return true;
     const auto otherNullable = other->asNullable();
     if (!otherNullable) return false;

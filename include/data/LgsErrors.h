@@ -1,4 +1,6 @@
 #pragma once
+#include "LgsDefinitions.h"
+
 #include <fstream>
 #include <string>
 
@@ -27,7 +29,7 @@ struct LgsError {
 
 /** Templates errors. Should not be returned directly, but formatted and returned as a new LgsError */
 inline size_t errCodeStart = 10000;
-inline LgsBaseError E10000{"main() function is not defined in Main.lgs file.", errCodeStart++};
+inline LgsBaseError E10000{"main() function is not defined in" LGS_MAIN_FILE " file.", errCodeStart++};
 inline LgsBaseError E10001{"Expected type %s does not match the given type %s.", errCodeStart++};
 inline LgsBaseError E10002{"Expression %s of type %s must be an iterable.", errCodeStart++};
 inline LgsBaseError E10003{"Index is out of bounds.", errCodeStart++};
@@ -35,7 +37,7 @@ inline LgsBaseError E10004{"Function %s must return an expression of type %s. Gi
 inline LgsBaseError E10005{"%s is not a member of %s.", errCodeStart++};
 inline LgsBaseError E10006{"%s is not defined.", errCodeStart++};
 inline LgsBaseError E10007{"File %s is duplicate. All files in a project must be unique.", errCodeStart++};
-inline LgsBaseError E10008{"Main.lgs could not be found in src directory.", errCodeStart++};
+inline LgsBaseError E10008{LGS_MAIN_FILE " could not be found in src directory.", errCodeStart++};
 inline LgsBaseError E10009{"Duplicate Main files were found in the project. Locations:%s", errCodeStart++};
 inline LgsBaseError E10010{"Not a root path of a Logos project.", errCodeStart++};
 inline LgsBaseError E10011{"%s is already declared.", errCodeStart++};

@@ -27,6 +27,7 @@
 #include "files/LgsMainFile.h"
 #include "files/LgsTestFile.h"
 #include "funcs/LgsMainFunc.h"
+#include "logos/LgsApp.h"
 #include "utils/LgsErrHandler.h"
 #include "loops/LgsInfiniteLoop.h"
 #include "loops/LgsWhileLoop.h"
@@ -337,6 +338,12 @@ void LgsSema::visitSwitch(LgsSwitch* switchStmt) {
     visitExpr(switchStmt->cond);
     stack.enterScope(switchStmt);
     const auto condType = switchStmt->cond->type;
+    // Allows local enum fields to not have a qualifier inside the block
+    if (condType && condType->asEnum()) {
+        for (const auto& field : condType->fields) {
+            addLocalSymbol(LgsSymbol(field));
+        }
+    }
     for (auto [expr, block] : switchStmt->patterns) {
         if (!condType || expr->type->isUnknown()) continue;
         stack.enterScope(switchStmt);
@@ -778,7 +785,6 @@ void LgsSema::visitSelection(LgsSelection* selection) {
     if (selection->hasNullables && !lastExpr->type->asNullable()) {
         lastExpr->setType(new LgsNullable(lastExpr->type));
     }
-
     selection->setType(lastExpr->type);
     selection->isMutable = lastExpr->isMutable;
     selection->owner = lastExpr->owner;
@@ -1360,6 +1366,9 @@ void LgsSema::addHeapExpr(LgsExpr* expr) {
 }
 
 LgsSymbol* LgsSema::getSymbol(const std::string& name, const LgsLocation* location) {
+    for (const auto& import : globals.imports) {
+        assert(name != import->appConfigs.name);
+    }
     if (const auto globalSymbol = globals.symbols.getSymbol(name)) {
         return globalSymbol;
     }

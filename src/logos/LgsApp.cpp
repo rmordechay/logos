@@ -21,8 +21,9 @@ inline ThreadPool threadPool;
 
 void LgsApp::compile() {
     if (!setup()) errHandler.exitWithErrors();
-    if (!parse()) errHandler.exitWithErrors();
+    if (!loadConfigFile()) errHandler.exitWithErrors();
     if (!loadDeps()) errHandler.exitWithErrors();
+    if (!parse()) errHandler.exitWithErrors();
     if (!analyse()) errHandler.exitWithErrors();
     if (!generate()) errHandler.exitWithErrors();
     if (!link()) errHandler.exitWithErrors();
@@ -64,20 +65,12 @@ bool LgsApp::setup() {
     appCache.cacheFilePath = paths.cacheFile;
 
     // App config file
-    appCache.files.emplace_back(LgsFileMetadata(
-        getNextFileID(),
-        paths.appFilePath,
-        LGS_APP_CONFIG_FILE
-        ));
+    appCache.files.emplace_back(LgsFileMetadata(getNextFileID(), paths.appFilePath, LGS_APP_CONFIG_FILE));
 
     // Env files
     if (fs::exists(paths.envsDir)) {
         for (const auto& entry : fs::recursive_directory_iterator(paths.envsDir)) {
-            appCache.files.emplace_back(LgsFileMetadata(
-                getNextFileID(),
-                entry.path(),
-                LGS_ENV_FILE
-                ));
+            appCache.files.emplace_back(LgsFileMetadata(getNextFileID(), entry.path(), LGS_ENV_FILE));
         }
     }
 
@@ -116,7 +109,6 @@ bool LgsApp::parse() {
 
     // Project mode
     appCache.load();
-    if (!loadAppConfigFile()) return false;
     if (!loadEnvFiles()) return false;
     for (auto& fileMetadata : appCache.files) {
         if (fileMetadata.type != LGS_SRC_FILE) continue;
@@ -131,7 +123,7 @@ bool LgsApp::parse() {
         });
     }
     threadPool.wait();
-    if (errHandler.successful) appCache.save();
+    appCache.save();
     return errHandler.successful;
 }
 
@@ -141,7 +133,7 @@ bool LgsApp::parseHeaders() {
         if (fileMetadata.type != LGS_SRC_FILE) continue;
         threadPool.runTask([&fileMetadata, this] {
             const auto fileCode = getFileText(fileMetadata.path);
-            loadSrcFile(fileCode, fs::canonical(fileMetadata.path), fileMetadata.id);
+            loadSrcFileHeaders(fileCode, fs::canonical(fileMetadata.path), fileMetadata.id);
         });
     }
     threadPool.wait();
@@ -251,7 +243,7 @@ LgsFile* LgsApp::loadSrcFileHeaders(const std::string& fileCode, const fs::path&
     return file;
 }
 
-bool LgsApp::loadAppConfigFile() {
+bool LgsApp::loadConfigFile() {
     const auto appFileID = getNextFileID();
     paths.appFilePath = fs::canonical(paths.appFilePath);
     const auto fileCode = getFileText(paths.appFilePath);
@@ -312,13 +304,11 @@ void LgsApp::loadAppConfigs() {
 bool LgsApp::loadDeps() {
     for (auto package : appConfigFile->packages) {
         const auto app = new LgsApp("/Users/r.mordechay/Desktop/Programming/logos-test");
-        loadAppGlobals(*app);
+        if (!app->setup()) return false;
+        if (!app->loadConfigFile()) return false;
+        if (!app->parseHeaders()) return false;
+        globals.imports.push_back(app);
     }
-    return true;
-}
-
-bool LgsApp::loadAppGlobals(LgsApp& app) {
-    globals.imports.push_back(&app);
     return true;
 }
 

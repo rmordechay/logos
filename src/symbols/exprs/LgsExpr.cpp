@@ -18,8 +18,6 @@
 #include "funcs/LgsFunc.h"
 #include "loops/LgsLoopMetaVar.h"
 
-#include <iostream>
-
 LgsExpr* LgsExpr::castTo(LgsType* toType, const bool explicitCast) {
     assert(0);
 }

@@ -6,6 +6,7 @@ class LgsStmt;
 struct LgsFileMetadata;
 struct LgsAppConfigs;
 class LgsParam;
+class LgsSubType;
 class LgsExpr;
 struct LgsError;
 struct LgsBaseError;

@@ -1,6 +1,5 @@
 #include "stmts/LgsIOStmt.h"
 
-#include "stmts/LgsIOPair.h"
 #include "stmts/LgsStmtsBlock.h"
 
 LgsIOStmt::~LgsIOStmt() {

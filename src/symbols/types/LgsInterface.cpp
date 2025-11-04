@@ -43,18 +43,8 @@ size_t LgsInterface::getSizeBytes() {
 }
 
 LgsInterface* LgsInterface::clone() {
-    const auto cloned = new LgsInterface(*this);
-    for (const auto& field : fields) {
-        const auto newField = new LgsField(*field);
-        if (field->expr) {
-            newField->expr = field->expr->cloneExpr();
-        }
-        cloned->addField(newField);
-    }
-    cloned->methods.clear();
-    for (const auto& [_, method] : methods) {
-        const auto newField = new LgsFunc(*method);
-        cloned->addMethod(newField);
-    }
-    return cloned;
+    const auto newInterface = new LgsInterface(*this);
+    cloneFields(newInterface);
+    cloneMethods(newInterface);
+    return newInterface;
 }

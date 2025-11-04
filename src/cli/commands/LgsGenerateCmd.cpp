@@ -23,18 +23,18 @@ void createProjectStructure(const std::string& name) {
     const auto projectDir = fs::current_path() / name;
     if (fs::exists(projectDir)) exitWithError(E40006, {name});
     fs::create_directories(projectDir);
-    const auto srcDir = projectDir / "src";
+    const auto srcDir = projectDir / LGS_SRC_DIR;
     fs::create_directories(srcDir);
-    const auto envsDir = projectDir / "envs";
+    const auto envsDir = projectDir / LGS_ENVS_DIR;
     fs::create_directories(envsDir);
 
-    const auto mainFile = srcDir / "Main.lgs";
+    const auto mainFile = srcDir / LGS_MAIN_FILE;
     std::ofstream mainStream(mainFile);
     if (!mainStream) assert(0);
     mainStream << MAIN_FILE_TEMPLATE;
     mainStream.close();
 
-    const auto appFile = projectDir / "App.lgs";
+    const auto appFile = projectDir / LGS_APP_FILE;
     std::ofstream appStream(appFile);
     if (!appStream) assert(0);
     char buffer[1024];

@@ -14,31 +14,31 @@ LgsSymbol::LgsSymbol()
     : name(nullptr), symbolType(UNKNOWN), location(nullptr) {}
 
 LgsSymbol::LgsSymbol(LgsParam* param)
-    : name(&param->name), symbolType(PARAM), param(param), location(&param->location) {}
+    : name(&param->name), symbolType(PARAM), location(&param->location), param(param) {}
 
 LgsSymbol::LgsSymbol(LgsField* field)
-    : name(&field->name), symbolType(FIELD), field(field), location(&field->location) {}
+    : name(&field->name), symbolType(FIELD), location(&field->location), field(field) {}
 
 LgsSymbol::LgsSymbol(LgsInterface* interface)
-    : name(&interface->name), symbolType(INTERFACE), interface(interface), location(&interface->location) {}
+    : name(&interface->name), symbolType(INTERFACE), location(&interface->location), interface(interface) {}
 
 LgsSymbol::LgsSymbol(LgsSubType* subtype)
-    : name(&subtype->name), symbolType(SUBTYPE), subtype(subtype), location(&subtype->location) {}
+    : name(&subtype->name), symbolType(SUBTYPE), location(&subtype->location), subtype(subtype) {}
 
 LgsSymbol::LgsSymbol(LgsGeneric* generic)
-    : name(&generic->name), symbolType(GENERIC), generic(generic), location(&generic->location) {}
+    : name(&generic->name), symbolType(GENERIC), location(&generic->location), generic(generic) {}
 
 LgsSymbol::LgsSymbol(LgsObject* object, const bool isExternal, const bool isBuiltin)
-    : name(&object->name), symbolType(OBJECT), isExternal(isExternal), isBuiltin(isBuiltin), object(object), location(&object->location) {}
+    : name(&object->name), symbolType(OBJECT), location(&object->location), isExternal(isExternal), isBuiltin(isBuiltin), object(object) {}
 
 LgsSymbol::LgsSymbol(LgsEnum* lgsEnum, const bool isExternal, const bool isBuiltin)
-    : name(&lgsEnum->name), symbolType(ENUM), isExternal(isExternal), isBuiltin(isBuiltin), enum_(lgsEnum), location(&lgsEnum->location) {}
+    : name(&lgsEnum->name), symbolType(ENUM), location(&lgsEnum->location), isExternal(isExternal), isBuiltin(isBuiltin), enum_(lgsEnum) {}
 
 LgsSymbol::LgsSymbol(LgsFunc* func, const bool isExternal, const bool isBuiltin)
-    : name(&func->funcType->name), symbolType(FUNC), isExternal(isExternal), isBuiltin(isBuiltin), func(func), location(&func->location) {}
+    : name(&func->funcType->name), symbolType(FUNC), location(&func->location), isExternal(isExternal), isBuiltin(isBuiltin), func(func) {}
 
 LgsSymbol::LgsSymbol(LgsVarDec* varDec)
-    : name(&varDec->name), symbolType(VAR_DEC), varDec(varDec), location(&varDec->location) {}
+    : name(&varDec->name), symbolType(VAR_DEC), location(&varDec->location), varDec(varDec) {}
 
 LgsType* LgsSymbol::getType() const {
     switch (symbolType) {

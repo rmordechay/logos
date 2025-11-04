@@ -11,7 +11,7 @@ Lgs_RTType LgsEnum::getRTType() {
 }
 
 Type* LgsEnum::getIRType(LgsLLVMGen& cg) {
-    return cg.ptrTy();
+    return cg.getStructType({cg.sizeTy(), cg.ptrTy()});
 }
 
 std::string LgsEnum::getName() {
@@ -33,5 +33,7 @@ size_t LgsEnum::getSizeBytes() {
 }
 
 LgsEnum* LgsEnum::clone() {
-    return new LgsEnum(*this);
+    const auto newEnum = new LgsEnum(*this);
+    newEnum->isRoot = false;
+    return newEnum;
 }

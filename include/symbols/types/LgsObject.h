@@ -7,7 +7,6 @@ class LgsInstance;
 class LgsLLVMGen;
 class LgsField;
 class LgsIOPair;
-class LgsSubType;
 
 class LgsObject : public LgsType {
 public:

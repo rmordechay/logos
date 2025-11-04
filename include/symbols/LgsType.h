@@ -4,8 +4,8 @@
 #include "exprs/LgsBinaryExpr.h"
 #include <map>
 
-class LgsGeneric;
 class LgsSubType;
+class LgsGeneric;
 class LgsSet;
 class LgsAny;
 class LgsByte;
@@ -82,6 +82,8 @@ public:
     virtual DIBasicType* getDebugType(LgsLLVMGen& cg);
     virtual void hashNode(size_t& oldHash);
     virtual LgsType* clone();
+    void cloneFields(LgsType* newType) const;
+    void cloneMethods(LgsType* newType) const;
 
     LgsAny* asAny();
     LgsChar* asChar();

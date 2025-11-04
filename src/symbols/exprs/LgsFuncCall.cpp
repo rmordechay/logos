@@ -4,7 +4,6 @@
 #include "exprs/LgsVariable.h"
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
-#include "types/LgsObject.h"
 #include "utils/LgsUtils.h"
 #include <sstream>
 
@@ -23,8 +22,8 @@ bool LgsFuncCall::equals(const LgsFuncType* other) const {
     if (args.size() - other->isMethod > other->params.size()) return false;
     for (size_t i = other->isMethod; i < other->params.size(); ++i) {
         if (i >= args.size()) continue;
-        const auto param = other->params[i];
         const auto arg = args[i];
+        const auto param = other->params[i];
         if (!arg->type || !arg->type->canCastTo(param.type)) return false;
     }
     return true;

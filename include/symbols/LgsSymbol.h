@@ -30,9 +30,9 @@ enum LgsSymbolType {
 struct LgsSymbol {
     std::string* name;
     LgsSymbolType symbolType;
+    LgsLocation* location;
     bool isExternal = false;
     bool isBuiltin = false;
-
     union {
         LgsVarDec* varDec;
         LgsParam* param;
@@ -44,7 +44,6 @@ struct LgsSymbol {
         LgsEnum* enum_;
         LgsFunc* func;
     };
-    LgsLocation* location;
 
     explicit LgsSymbol();
     explicit LgsSymbol(LgsParam* param);

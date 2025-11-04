@@ -5,7 +5,6 @@
 #include "types/LgsFuncType.h"
 #include "../../../../include/symbols/types/primitives/LgsVoid.h"
 #include "types/iterables/LgsDArray.h"
-#include "types/primitives/LgsInt.h"
 #include "types/primitives/LgsLong.h"
 
 Type* LgsSet::getIRType(LgsLLVMGen& cg) {

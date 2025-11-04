@@ -781,8 +781,9 @@ void LgsCodeGen::visitVariable(LgsVariable* variable) {
         variable->IRValue = getIRValue(variable->ref.object->singleton);
         break;
     case FIELD:
-        if (variable->ref.field->type->asEnum()) {
-            variable->IRValue = cg.getIRStr(variable->name);
+        if (const auto enum_ = variable->ref.field->type->asEnum()) {
+            const auto f = enum_->getField(variable->name);
+            variable->IRValue = cg.usize(variable->ref.field->position);
         } else {
             variable->IRValue = variable->ref.field->getGEP(cg);
         }
@@ -831,20 +832,30 @@ void LgsCodeGen::visitFieldSelection(LgsVariable* var, LgsExpr* parent, const bo
         var->IRValue = var->ref.func->getIRFunc(cg);
         return;
     }
-    const auto field = parent->type->getField(var->name);
+    const auto field = var->ref.field;
     if (parent->asTypeExpr()) {
         const auto object = parent->type->asObject();
         if (object && object->singleton) {
-            visitField(field);
+            field->IRValue = field->getGEP(cg);
             var->IRValue = field->IRValue;
             return;
         }
     }
-    if (field->isEnum) {
-        var->IRValue = cg.getIRStr(field->name);
+
+    if (const auto enum_ = parent->type->asEnum()) {
+        assert(enum_->isRoot);
+        var->IRValue = cg.usize(field->position);
         return;
     }
-    assert(&parent->IRValue->getContext() == &cg.IRModule->getContext());
+
+    if (const auto enum_ = field->type->asEnum()) {
+        assert(!enum_->isRoot);
+        const auto a = cg.builder.CreateAlloca(cg.sizeTy());
+        cg.builder.CreateStore(cg.usize(field->position), a);
+        var->IRValue = a;
+        return;
+    }
+
     field->parentIRValue = parent->IRValue;
     field->IRValue = field->getGEP(cg);
     if (field->type->asObject() || (field->type->asEnum() && !assign)) {
@@ -852,10 +863,11 @@ void LgsCodeGen::visitFieldSelection(LgsVariable* var, LgsExpr* parent, const bo
     } else {
         var->IRValue = field->IRValue;
     }
+    assert(&parent->IRValue->getContext() == &cg.IRModule->getContext());
 }
 
 void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
-    for (size_t i = 0; i < funcCall->args.size(); ++i) {
+    for (size_t i = funcCall->isMethodCall; i < funcCall->args.size(); ++i) {
         visitExpr(funcCall->args[i]);
     }
 
@@ -890,10 +902,11 @@ void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
     } else if (funcCall->func->funcType->isArrFunc) {
         visitIterFunc(funcCall);
     }
-
     if (funcCall->isCoroutine || funcCall->isDeferred) return;
+
     if (funcCall->func->funcType->isGeneric) visitGenericFunc(funcCall->func);
     funcCall->IRValue = funcCall->func->call(cg, funcCall->args, funcCall->generics);
+
     if (appConfigs.debugMode) funcCall->setDebugValue(cg);
 }
 
@@ -1008,7 +1021,7 @@ void LgsCodeGen::visitInstance(LgsInstance* instance) {
         if (field->expr) {
             field->expr->destPtrValue = field->IRValue;
         }
-        visitExpr(field->expr, true);
+        visitExpr(field->expr);
         if (field->expr->IRValue == field->IRValue) continue;
         cg.builder.CreateStore(field->expr->IRValue, field->IRValue);
     }

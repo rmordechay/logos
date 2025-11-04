@@ -16,15 +16,15 @@ struct LgsAppVersion {
 };
 
 struct LgsAppConfigs {
-    std::string name = "App";
+    std::string name = "";
     std::string activeEnv = "";
     LgsAppVersion version{1, 0, 0};
     LgsAppLogLevel logLevel = APP_INFO;
-    bool isRoot = false;
     bool debugMode = false;
     bool isTestRun = false;
     bool isFileMode = false;
     uint8_t optLevel = 2;
+
     void print() const;
 };
 

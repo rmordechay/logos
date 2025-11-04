@@ -108,7 +108,7 @@ LgsAppConfigFile* LgsParser::parseAppConfigFile() {
         if (currentToken.lexeme == "required") break;
     }
 
-    if (currentToken.lexeme == "required" && peek().lexeme == "envs") {
+    if (currentToken.lexeme == "required" && peek().lexeme == LGS_ENVS_DIR) {
         consume();
         consume();
         mustMatch(T_LBRACE);
@@ -212,7 +212,7 @@ LgsObjectFile* LgsParser::parseObjectFile(const bool onlyHeaders) {
     file->obj = obj;
     file->location = obj->location;
     validateTypeName(obj->name, &obj->location);
-    if (!onlyHeaders) {
+    {
         std::lock_guard lock(mtx);
         globals.addSymbol(LgsSymbol(file->obj), &errHandler, filePath);
     }
@@ -230,7 +230,7 @@ LgsInterfaceFile* LgsParser::parseInterfaceFile(const bool onlyHeaders) {
     file->location = interface->location;
     file->interface = interface;
     validateTypeName(interface->name, &interface->location);
-    if (!onlyHeaders) {
+    {
         std::lock_guard lock(mtx);
         globals.addSymbol(LgsSymbol(file->interface), &errHandler, filePath);
     }
@@ -354,7 +354,7 @@ LgsObject* LgsParser::parseObjectBody(const LgsToken& tokenName, const bool isSi
         obj->singleton = new LgsInstance(obj);
     }
 
-    if (currentToken.type != T_EOF && currentToken.type != T_RBRACE) assert(0);
+    if (!onlyHeaders && currentToken.type != T_EOF && currentToken.type != T_RBRACE) assert(0);
     return obj;
 }
 
@@ -465,8 +465,7 @@ LgsEnum* LgsParser::parseEnum() {
             strConst = parseStrConst();
             mustParse(strConst);
         }
-        const auto field = new LgsField(enumField.lexeme, enum_, strConst);
-        field->isEnum = true;
+        const auto field = new LgsField(enumField.lexeme, enum_->clone(), strConst);
         field->position = position++;
         setLocation(field->location, &enumField);
         enum_->addField(field);
