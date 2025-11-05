@@ -906,9 +906,8 @@ void LgsSema::visitFuncCall(LgsFuncCall* funcCall) {
     const auto symbol = getSymbol(funcCall->name, &funcCall->location);
     if (!symbol) return;
     const auto ft = symbol->getType()->asFuncType();
-    if (!ft) {
-        return errHandler.addError(E10046, &funcCall->location, file->absPath, {funcCall->name});
-    }
+    if (!ft) return errHandler.addError(E10046, &funcCall->location, file->absPath, {funcCall->name});
+
     for (size_t i = ft->isMethod; i < ft->params.size(); ++i) {
         if (i >= funcCall->args.size()) break;
         auto& arg = funcCall->args[i];
@@ -921,7 +920,13 @@ void LgsSema::visitFuncCall(LgsFuncCall* funcCall) {
         if (symbol->symbolType == FUNC) {
             const auto func = symbol->func;
             if (func->funcType->isGeneric) {
-                createGenericFunc(funcCall, func);
+                const auto funcName = funcCall->getGenericName();
+                const auto generics = genericsRegistry.find(funcName);
+                if (generics != genericsRegistry.end()) {
+                    funcCall->func = generics->second;
+                } else {
+                    genericsRegistry[funcName] = createGenericFunc(funcCall, func);
+                }
             } else {
                 funcCall->func = func;
                 funcCall->setType(func->funcType->rt);
@@ -936,7 +941,7 @@ void LgsSema::visitFuncCall(LgsFuncCall* funcCall) {
     }
 }
 
-void LgsSema::createGenericFunc(LgsFuncCall* funcCall, LgsFunc* const func) {
+LgsFunc* LgsSema::createGenericFunc(LgsFuncCall* funcCall, LgsFunc* const func) {
     const auto newFunc = func->cloneExpr()->asFunc();
     for (size_t i = 0; i < newFunc->funcType->params.size(); ++i) {
         const auto param = newFunc->funcType->params[i];
@@ -947,6 +952,7 @@ void LgsSema::createGenericFunc(LgsFuncCall* funcCall, LgsFunc* const func) {
     }
     visitFunc(newFunc);
     funcCall->func = newFunc;
+    return newFunc;
 }
 
 void LgsSema::visitPrefixExpr(LgsPrefixExpr* prefixExpr) {
@@ -1370,9 +1376,6 @@ void LgsSema::addHeapExpr(LgsExpr* expr) {
 }
 
 LgsSymbol* LgsSema::getSymbol(const std::string& name, const LgsLocation* location) {
-    for (const auto& import : globals.imports) {
-        assert(name != import->appConfigs.name);
-    }
     if (const auto globalSymbol = globals.symbols.getSymbol(name)) {
         return globalSymbol;
     }

@@ -33,6 +33,16 @@ bool LgsFuncCall::equalsVariadic(const LgsFuncType* funcType) const {
     assert(0);
 }
 
+std::string LgsFuncCall::getGenericName() const {
+    std::stringstream str;
+    str << "u_" << name;
+    for (size_t i = isMethodCall; i < args.size(); ++i) {
+        const auto arg = args[i];
+        str << '_' << arg->type->getName();
+    }
+    return str.str();
+}
+
 std::string LgsFuncCall::asText() {
     std::stringstream str;
     str << name << '(';

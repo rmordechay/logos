@@ -14,5 +14,5 @@ main() {
     e = 2
     obj = Obj<Int>{}
     func("roi")
-    func("roiew")
+    func(2)
 }

@@ -57,6 +57,7 @@ public:
     LgsGlobals& globals;
     LgsErrHandler errHandler;
     LgsTypeResolver typeResolver;
+    std::map<std::string, LgsFunc*> genericsRegistry;
 
     explicit LgsSema(LgsFile* file, LgsGlobals& globals) : file(file), globals(globals), typeResolver(errHandler, globals) {}
     void analyse();
@@ -105,7 +106,7 @@ public:
     void visitFieldSelection(LgsVariable* child, LgsType* parentType);
     void visitIterIndexSelection(LgsIterIndex* iterIndex, LgsType* parentType);
     void visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent);
-    void createGenericFunc(LgsFuncCall* funcCall, LgsFunc* func);
+    LgsFunc* createGenericFunc(LgsFuncCall* funcCall, LgsFunc* func);
     void visitFuncCall(LgsFuncCall* funcCall);
     void visitPrefixExpr(LgsPrefixExpr* prefixExpr);
     void visitPostfixExpr(LgsPostfixExpr* postfixExpr);
