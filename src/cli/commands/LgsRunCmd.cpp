@@ -41,6 +41,7 @@ void LgsRunCmd::parseArgs(LgsApp& app, std::vector<const char*>& appArgs) const 
     }
     if (argStart < 0) exitWithError(E40001);
     if (argStart >= argc) return;
+    assert(fs::exists(argv[argStart]));
     app.paths.rootPath = fs::canonical(argv[argStart++]);
     for (int j = argStart; j < argc; ++j) {
         const auto v = argv[j];

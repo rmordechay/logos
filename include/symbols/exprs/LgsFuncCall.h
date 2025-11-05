@@ -2,7 +2,6 @@
 #include "LgsSymbol.h"
 #include "exprs/LgsExpr.h"
 
-
 class LgsFuncType;
 struct LgsSymbol;
 

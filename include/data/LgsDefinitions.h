@@ -1,7 +1,8 @@
 #pragma once
 
 #define LGS_FILE_EXTENSION ".lgs"
-#define LGS_RUNTIME_NAMES_PREFIX "Lgs_"
+#define LGS_NAME_PREFIX "Lgs_"
+#define LGS_CORO_SUFFIX "_co"
 #define LGS_SRC_DIR "src"
 #define LGS_ENVS_DIR "envs"
 #define LGS_BUILD_DIR "build"
@@ -44,3 +45,5 @@
 #define LGS_ERROR_TEXT "Error: "
 #define LGS_PADDING_SIZE std::strlen(LGS_ERROR_TEXT)
 #define LGS_ERROR_PADDING '\n' + std::string(LGS_PADDING_SIZE, ' ')
+
+#define nakedf __attribute__((naked))

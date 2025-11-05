@@ -51,6 +51,8 @@
 #include <iostream>
 #include <unordered_set>
 
+std::string getMissingImplementsStr(const std::vector<LgsField*>& fields, const std::vector<LgsFunc*>& methods);
+
 void LgsSema::analyse() {
     if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
         visitMainFile(mainFile);
@@ -480,9 +482,27 @@ void LgsSema::visitBreakStmt(const LgsBreak* breakStmt) {
 }
 
 void LgsSema::visitCoroutine(const LgsCoroutine* coroutine) {
-    if (coroutine->funcCall) visitFuncCall(coroutine->funcCall);
-    else if (coroutine->selection) visitSelection(coroutine->selection);
-    else assert(0);
+    LgsFuncCall* fc = nullptr;
+    if (coroutine->funcCall) {
+        visitFuncCall(coroutine->funcCall);
+        fc = coroutine->funcCall;
+    } else if (coroutine->selection) {
+        visitSelection(coroutine->selection);
+        fc = coroutine->selection->asMethodCall();
+    } else {
+        assert(0);
+    }
+    const auto funcName = fc->func->funcType->getName() + LGS_CORO_SUFFIX;
+    const auto coro = corosRegistry.find(funcName);
+    if (coro != corosRegistry.end()) {
+        coroutine->funcCall->func = coro->second;
+    } else {
+        const auto f = fc->func->cloneExpr();
+        f->funcType->isCoroutine = true;
+        coroutine->funcCall->func = f;
+        corosRegistry[funcName] = f;
+    }
+
 }
 
 void LgsSema::visitDeferStmt(const LgsDeferStmt* deferStmt) {
@@ -725,7 +745,6 @@ void LgsSema::visitVariable(LgsVariable* variable) {
     case VAR_DEC: {
         variable->ref.varDec = symbol->varDec;
         variable->isMutable = !symbol->varDec->isConst;
-        variable->isValueKnown = symbol->varDec->expr && symbol->varDec->expr->isValueKnown;
         variable->setType(symbol->varDec->type);
         if (symbol->varDec->isOwner) {
             variable->owner = symbol->varDec;
@@ -1162,7 +1181,6 @@ void LgsSema::visitLoopMetaVar(LgsLoopMetaVar* metaVar) {
         return errHandler.addError(E10060, &metaVar->location, file->absPath, {});
     }
 
-    metaVar->forLoop = loop;
     const auto name = metaVar->asText();
     if (loop->asWhileLoop() || loop->asWhileLoop()) {
         return errHandler.addError(E10061, &metaVar->location, file->absPath, {name});
@@ -1193,22 +1211,6 @@ bool LgsSema::validateExprType(LgsExpr* expr, LgsType* type) {
         return false;
     }
     return true;
-}
-
-std::string getMissingImplementsStr(const std::vector<LgsField*>& fields, const std::vector<LgsFunc*>& methods) {
-    std::stringstream str;
-    str << "Missing fields/methods:";
-    if (!fields.empty()) {
-        for (const auto& field : fields) {
-            str << "\n - " << field->name << ": " << field->type->pname();
-        }
-    }
-    if (!methods.empty()) {
-        for (const auto& func : methods) {
-            str << "\n - " << func->asText();
-        }
-    }
-    return str.str();
 }
 
 void LgsSema::validateObjImplements(LgsObject* obj, const std::vector<LgsType*>& interfaces) {
@@ -1399,4 +1401,20 @@ void LgsSema::addLocalSymbol(const LgsSymbol& newSymbol) {
         return errHandler.addError(E10011, newSymbol.location, file->absPath, {symbolName});
     }
     stack.getSymbolTable().addSymbol(newSymbol, &errHandler, file->absPath);
+}
+
+std::string getMissingImplementsStr(const std::vector<LgsField*>& fields, const std::vector<LgsFunc*>& methods) {
+    std::stringstream str;
+    str << "Missing fields/methods:";
+    if (!fields.empty()) {
+        for (const auto& field : fields) {
+            str << "\n - " << field->name << ": " << field->type->pname();
+        }
+    }
+    if (!methods.empty()) {
+        for (const auto& func : methods) {
+            str << "\n - " << func->asText();
+        }
+    }
+    return str.str();
 }

@@ -69,7 +69,7 @@ LgsType* LgsSymbol::getType() const {
 LgsSymbol LgsSymbol::clone() const {
     switch (symbolType) {
     case VAR_DEC:
-        return LgsSymbol(varDec->clone());
+        return LgsSymbol(varDec->cloneStmt());
     case PARAM:
         return LgsSymbol(param);
     case FIELD:

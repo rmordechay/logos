@@ -86,7 +86,7 @@ public:
     void visitRangeLoop(LgsRangeLoop* loop);
     void visitForeachLoop(LgsForeachLoop* loop);
     void visitInfiniteLoop(const LgsInfiniteLoop* loop) const;
-    void visitLoopMetaVar(LgsLoopMetaVar* metaVar) const;
+    void visitLoopMetaVar(LgsLoopMetaVar* metaVar);
     void visitWhileLoop(const LgsWhileLoop* loop);
     void visitVarDec(LgsVarDec* varDec);
     void visitAssignment(const LgsAssignment* assignment);

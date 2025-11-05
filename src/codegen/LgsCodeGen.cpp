@@ -233,6 +233,16 @@ void LgsCodeGen::visitLoop(LgsForLoop* loop) {
         assert(0);
     }
     visitStmtsBlock(loop->stmtsBlock);
+    if (stack.currentFunc()->funcType->isCoroutine) {
+        const auto doYieldBlock = cg.createBlock("do_yield_block", currentIRFunc);
+        const auto continueBlock = cg.createBlock("continue_block", currentIRFunc);
+        const auto shouldYield = cg.callLgsFunc("Scheduler_shouldYield", cg.i1Ty());
+        cg.builder.CreateCondBr(shouldYield, doYieldBlock, continueBlock);
+        cg.builder.SetInsertPoint(doYieldBlock);
+        cg.callLgsFunc("Scheduler_yield", cg.voidTy());
+        cg.branchIfNeeded(continueBlock);
+        cg.builder.SetInsertPoint(continueBlock);
+    }
     loop->incAndJumpToCond(cg);
     cg.startBlock(loop->IRExitBlock);
     stack.exitScope();
@@ -261,9 +271,6 @@ void LgsCodeGen::visitRangeLoop(LgsRangeLoop* loop) {
 }
 
 void LgsCodeGen::visitForeachLoop(LgsForeachLoop* loop) {
-    assert(currentIRFunc && "No current function!");
-    assert(cg.builder.GetInsertBlock() && "No insertion block!");
-    assert(cg.builder.GetInsertBlock()->getParent() == currentIRFunc);
     visitExpr(loop->iterExpr);
     loop->iPtr = cg.builder.CreateAlloca(cg.sizeTy());
     cg.builder.CreateStore(cg.sizeZero(), loop->iPtr);
@@ -283,8 +290,8 @@ void LgsCodeGen::visitInfiniteLoop(const LgsInfiniteLoop* loop) const {
     cg.branchAndStartBlock(loop->IRBodyBlock);
 }
 
-void LgsCodeGen::visitLoopMetaVar(LgsLoopMetaVar* metaVar) const {
-    const auto loop = metaVar->forLoop;
+void LgsCodeGen::visitLoopMetaVar(LgsLoopMetaVar* metaVar) {
+    const auto loop = stack.currentLoop();
     const auto iValue = loop->iValue;
     switch (metaVar->varType) {
     case FOR_I: {
@@ -370,10 +377,10 @@ void LgsCodeGen::visitAssignment(const LgsAssignment* assignment) {
 
 void LgsCodeGen::visitIfStmt(LgsIfStmt* ifStmt) {
     if (ifStmt->elseIfs.empty()) {
-        if (!ifStmt->elseBlock) {
-            visitSimpleIf(ifStmt);
-        } else {
+        if (ifStmt->elseBlock) {
             visitIfWithElse(ifStmt);
+        } else {
+            visitSimpleIf(ifStmt);
         }
     } else {
         visitElseIf(ifStmt);
@@ -541,10 +548,20 @@ void LgsCodeGen::visitCoroutine(const LgsCoroutine* coroutine) {
         visitSelection(coroutine->selection);
         fc = coroutine->selection->asMethodCall();
     }
+
+    const auto funcName = fc->func->getIRName();
+    if (!cg.IRModule->getFunction(funcName)) {
+        cg.savedIP = cg.builder.saveIP();
+        const auto originalFunc = currentIRFunc;
+        visitFunc(fc->func);
+        currentIRFunc = originalFunc;
+        cg.builder.restoreIP(cg.savedIP);
+    }
+
     const auto ctxTy = getThunkCtxType(fc);
     const auto ctx = getThunkCtx(fc, ctxTy);
     const auto func = getThunkFunc(fc, ctxTy);
-    cg.callLgsFunc("Stack_addCoro", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {func, ctx});
+    cg.callLgsFunc("Scheduler_addCoro", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {func, ctx});
 }
 
 void LgsCodeGen::visitDeferStmt(const LgsDeferStmt* deferStmt) {
@@ -555,9 +572,6 @@ void LgsCodeGen::visitDeferStmt(const LgsDeferStmt* deferStmt) {
     } else if (deferStmt->selection) {
         visitSelection(deferStmt->selection);
         fc = deferStmt->selection->asMethodCall();
-    }
-    for (const auto& arg : fc->args) {
-        visitExpr(arg);
     }
     const auto ctxTy = getThunkCtxType(fc);
     const auto ctx = getThunkCtx(fc, ctxTy);
@@ -618,45 +632,26 @@ void LgsCodeGen::visitBinaryExpr(LgsBinaryExpr* binExpr) {
         return;
     }
     switch (binExpr->op) {
-    case ADD:
-        binExpr->IRValue = l->type->addIR(cg, l, r); break;
-    case SUB:
-        binExpr->IRValue = l->type->subIR(cg, l, r); break;
-    case MUL:
-        binExpr->IRValue = l->type->mulIR(cg, l, r); break;
-    case DIV:
-        binExpr->IRValue = l->type->divIR(cg, l, r); break;
-    case MODULO:
-        binExpr->IRValue = l->type->modIR(cg, l, r); break;
-    case BIT_AND:
-        binExpr->IRValue = l->type->bitAndIR(cg, l, r); break;
-    case BIT_OR:
-        binExpr->IRValue = l->type->bitOrIR(cg, l, r); break;
-    case BIT_XOR:
-        binExpr->IRValue = l->type->bitXorIR(cg, l, r); break;
-    case LSHIFT:
-        binExpr->IRValue = l->type->rshiftIR(cg, l, r); break;
-    case RSHIFT:
-        binExpr->IRValue = l->type->lshiftIR(cg, l, r); break;
-    case EQ:
-        binExpr->IRValue = l->type->eqIR(cg, l, r); break;
-    case NE:
-        binExpr->IRValue = l->type->neIR(cg, l, r); break;
-    case LT:
-        binExpr->IRValue = l->type->ltIR(cg, l, r); break;
-    case GT:
-        binExpr->IRValue = l->type->gtIR(cg, l, r); break;
-    case GE:
-        binExpr->IRValue = l->type->geIR(cg, l, r); break;
-    case LE:
-        binExpr->IRValue = l->type->leIR(cg, l, r); break;
-    case AND:
-        binExpr->IRValue = l->type->andIR(cg, l, r); break;
-    case OR:
-        binExpr->IRValue = l->type->orIR(cg, l, r); break;
-    case IN:
-        binExpr->IRValue = r->type->asIterable()->inIR(cg, r, l); break;
-    case NOOP: assert(0);
+        case ADD: binExpr->IRValue = l->type->addIR(cg, l, r); break;
+        case SUB: binExpr->IRValue = l->type->subIR(cg, l, r); break;
+        case MUL: binExpr->IRValue = l->type->mulIR(cg, l, r); break;
+        case DIV: binExpr->IRValue = l->type->divIR(cg, l, r); break;
+        case MODULO: binExpr->IRValue = l->type->modIR(cg, l, r); break;
+        case BIT_AND: binExpr->IRValue = l->type->bitAndIR(cg, l, r); break;
+        case BIT_OR: binExpr->IRValue = l->type->bitOrIR(cg, l, r); break;
+        case BIT_XOR: binExpr->IRValue = l->type->bitXorIR(cg, l, r); break;
+        case LSHIFT: binExpr->IRValue = l->type->rshiftIR(cg, l, r); break;
+        case RSHIFT: binExpr->IRValue = l->type->lshiftIR(cg, l, r); break;
+        case EQ: binExpr->IRValue = l->type->eqIR(cg, l, r); break;
+        case NE: binExpr->IRValue = l->type->neIR(cg, l, r); break;
+        case LT: binExpr->IRValue = l->type->ltIR(cg, l, r); break;
+        case GT: binExpr->IRValue = l->type->gtIR(cg, l, r); break;
+        case GE: binExpr->IRValue = l->type->geIR(cg, l, r); break;
+        case LE: binExpr->IRValue = l->type->leIR(cg, l, r); break;
+        case AND: binExpr->IRValue = l->type->andIR(cg, l, r); break;
+        case OR: binExpr->IRValue = l->type->orIR(cg, l, r); break;
+        case IN: binExpr->IRValue = r->type->asIterable()->inIR(cg, r, l); break;
+        case NOOP: assert(0);
     }
 }
 

@@ -52,7 +52,6 @@ size_t LgsFuncType::getSizeBytes() {
 }
 
 std::string LgsFuncType::getName() {
-    if (IRName != "") return IRName;
     std::stringstream strStream;
     if (!isBuiltin) {
         strStream << "u_";
@@ -63,6 +62,9 @@ std::string LgsFuncType::getName() {
     strStream << name;
     if (isGeneric) {
         strStream << '_' << genericSuffix;
+    }
+    if (isCoroutine) {
+        strStream << LGS_CORO_SUFFIX;
     }
     IRName = strStream.str();
     return IRName;

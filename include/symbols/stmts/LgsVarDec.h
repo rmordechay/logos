@@ -24,8 +24,8 @@ public:
     bool shouldAllocate() const;
     void setDebugValue(LgsLLVMGen& cg) override;
     void hashNode(size_t& oldHash) override;
+    LgsVarDec* cloneStmt() override;
     ~LgsVarDec() override;
-    LgsVarDec* clone();
 };
 
 

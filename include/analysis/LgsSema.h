@@ -52,11 +52,12 @@ struct LgsIndex;
 
 class LgsSema final {
 public:
+    LgsFile* file;
     LgsStack stack;
-    LgsFile* file = nullptr;
     LgsGlobals& globals;
     LgsErrHandler errHandler;
     LgsTypeResolver typeResolver;
+    std::map<std::string, LgsFunc*> corosRegistry;
     std::map<std::string, LgsFunc*> genericsRegistry;
 
     explicit LgsSema(LgsFile* file, LgsGlobals& globals) : file(file), globals(globals), typeResolver(errHandler, globals) {}

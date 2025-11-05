@@ -139,15 +139,16 @@ set(LGS_SOURCE
 )
 
 set(RUNTIME_SOURCE
-    runtime/lib/Lgs_Map.cpp
-    runtime/lib/Lgs_DArray.cpp
-    runtime/lib/Lgs_System.cpp
-    runtime/lib/Lgs_Runtime.cpp
-    runtime/lib/Lgs_Stack.cpp
-    runtime/lib/Lgs_Print.cpp
-    runtime/lib/Lgs_Arena.cpp
-    runtime/lib/Lgs_Set.cpp
-    runtime/lib/Lgs_Scheduler.cpp
+    ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_Map.cpp
+    ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_DArray.cpp
+    ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_System.cpp
+    ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_Runtime.cpp
+    ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_Stack.cpp
+    ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_Print.cpp
+    ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_Arena.cpp
+    ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_Set.cpp
+    ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_Scheduler.cpp
+    ${CMAKE_SOURCE_DIR}/runtime/lib/context/Lgs_Aarch64.cpp
 )
 
 # Runtime

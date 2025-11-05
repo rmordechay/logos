@@ -19,10 +19,10 @@ class LgsLoopMetaVar final : public LgsExpr {
 public:
     std::string name;
     LgsLoopMetaVarType varType;
-    LgsForLoop* forLoop = nullptr;
 
     explicit LgsLoopMetaVar(const std::string& name, const LgsLoopMetaVarType forType) : name(name), varType(forType) {}
     Value* loadIR(LgsLLVMGen& cg) override;
+    LgsLoopMetaVar* cloneExpr() override;
     std::string asText() override;
 };
 

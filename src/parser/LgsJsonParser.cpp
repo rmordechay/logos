@@ -245,31 +245,45 @@ void LgsJsonParser::parseSwitch(LgsSwitch* switchStmt) {
 }
 
 void LgsJsonParser::parseWhileLoop(LgsWhileLoop* whileLoop) {
-    assert(0);
+    openObject();
+    addKeyValueStr("kind", "whileLoop");
+    closeObject();
 }
 
 void LgsJsonParser::parseLoopStmt(LgsForLoop* loopStmt) {
-    assert(0);
+    openObject();
+    addKeyValueStr("kind", "loopStmt");
+    closeObject();
 }
 
 void LgsJsonParser::parseRangeLoop(LgsRangeLoop* rangeLoop) {
-    assert(0);
+    openObject();
+    addKeyValueStr("kind", "rangeLoop");
+    closeObject();
 }
 
 void LgsJsonParser::parseForeachLoop(LgsForeachLoop* foreachLoop) {
-    assert(0);
+    openObject();
+    addKeyValueStr("kind", "foreachLoop");
+    closeObject();
 }
 
 void LgsJsonParser::parseInfiniteLoop(const LgsInfiniteLoop* infiniteLoop) {
-    assert(0);
+    openObject();
+    addKeyValueStr("kind", "infiniteLoop");
+    closeObject();
 }
 
 void LgsJsonParser::parseReturnStmt(LgsReturn* returnStmt) {
-    assert(0);
+    openObject();
+    addKeyValueStr("kind", "returnStmt");
+    closeObject();
 }
 
 void LgsJsonParser::parseContinueStmt(const LgsContinue* continueStmt) {
-    assert(0);
+    openObject();
+    addKeyValueStr("kind", "continueStmt");
+    closeObject();
 }
 
 void LgsJsonParser::parseBreakStmt(const LgsBreak* breakStmt) {
@@ -279,15 +293,21 @@ void LgsJsonParser::parseBreakStmt(const LgsBreak* breakStmt) {
 }
 
 void LgsJsonParser::parseCoroutine(const LgsCoroutine* coroutine) {
-    assert(0);
+    openObject();
+    addKeyValueStr("kind", "coroutine");
+    closeObject();
 }
 
 void LgsJsonParser::parseDeferStmt(const LgsDeferStmt* deferStmt) {
-    assert(0);
+    openObject();
+    addKeyValueStr("kind", "deferStmt");
+    closeObject();
 }
 
 void LgsJsonParser::parseIOStmt(const LgsIOStmt* ioStmt) {
-    assert(0);
+    openObject();
+    addKeyValueStr("kind", "ioStmt");
+    closeObject();
 }
 
 void LgsJsonParser::parseExpr(LgsExpr*& expr) {
@@ -332,27 +352,39 @@ void LgsJsonParser::parseTernaryExpr(LgsTernaryExpr* ternary) {
 }
 
 void LgsJsonParser::parseCast(LgsCast* cast) {
-    assert(0);
+    openObject();
+    addKeyValueStr("kind", "cast");
+    closeObject();
 }
 
 void LgsJsonParser::parseArrayExpr(LgsArrayExpr* arrayExpr) {
-    assert(0);
+    openObject();
+    addKeyValueStr("kind", "arrayExpr");
+    closeObject();
 }
 
 void LgsJsonParser::parseStaticArray(const LgsArrayExpr* arrayExpr) {
-    assert(0);
+    openObject();
+    addKeyValueStr("kind", "arrayExpr");
+    closeObject();
 }
 
 void LgsJsonParser::parseDynamicArray(LgsArrayExpr* arrayExpr) {
-    assert(0);
+    openObject();
+    addKeyValueStr("kind", "arrayExpr");
+    closeObject();
 }
 
 void LgsJsonParser::parseHashMap(LgsHashMap* hashMap) {
-    assert(0);
+    openObject();
+    addKeyValueStr("kind", "hashMap");
+    closeObject();
 }
 
 void LgsJsonParser::parseVectorExpr(const LgsVectorExpr* vectorExpr) {
-    assert(0);
+    openObject();
+    addKeyValueStr("kind", "variable");
+    closeObject();
 }
 
 void LgsJsonParser::parseVariable(const LgsVariable* variable) {

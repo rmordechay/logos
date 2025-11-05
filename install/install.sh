@@ -37,9 +37,9 @@ install_debian() {
   DEBIAN_FRONTEND=noninteractive \
     apt-get update && \
     apt-get install -y git cmake clang-19 libclang-19-dev libclang-cpp19-dev
-  update-alternatives --install /usr/bin/clang clang /usr/lib/llvm-19/bin/clang 100 > /dev/null 2>&1
-  update-alternatives --install /usr/bin/clang++ clang++ /usr/lib/llvm-19/bin/clang++ 100 > /dev/null 2>&1
-  update-alternatives --install /usr/bin/llc llc /usr/lib/llvm-19/bin/llc 100 > /dev/null 2>&1
+  update-alternatives --install /usr/bin/clang clang /usr/lib/llvm-19/bin/clang 100
+  update-alternatives --install /usr/bin/clang++ clang++ /usr/lib/llvm-19/bin/clang++ 100
+  update-alternatives --install /usr/bin/llc llc /usr/lib/llvm-19/bin/llc 100
 }
 
 install_alpine() {

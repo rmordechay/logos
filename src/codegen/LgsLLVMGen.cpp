@@ -146,7 +146,7 @@ Value* LgsLLVMGen::callIntrinsics(const llvm::Intrinsic::ID name, const std::vec
 }
 
 Value* LgsLLVMGen::callLgsFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes, const std::vector<Value*>& args) {
-    return callFunc(LGS_RUNTIME_NAMES_PREFIX + funcName, rt, paramTypes, args);
+    return callFunc(LGS_NAME_PREFIX + funcName, rt, paramTypes, args);
 }
 
 Value* LgsLLVMGen::callPrintf(const std::vector<Value*>& args) {

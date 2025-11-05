@@ -209,8 +209,8 @@ const auto LSHIFT_OP = LgsBinOp{LSHIFT, "<<"};
 const auto RSHIFT_OP = LgsBinOp{RSHIFT, ">>"};
 const auto EQ_OP = LgsBinOp{EQ, "=="};
 const auto NE_OP = LgsBinOp{NE, "!="};
-const auto LT_OP = LgsBinOp{LT, "<"};
 const auto GT_OP = LgsBinOp{GT, ">"};
+const auto LT_OP = LgsBinOp{LT, "<"};
 const auto GE_OP = LgsBinOp{GE, "<="};
 const auto LE_OP = LgsBinOp{LE, ">="};
 const auto AND_OP = LgsBinOp{AND, "and"};
@@ -231,8 +231,8 @@ const std::unordered_map<LgsTokenType, LgsBinOp> LGS_BINARY_OPS = {
     {T_DOUBLE_RANGLE, RSHIFT_OP},
     {T_DOUBLE_EQUAL, EQ_OP},
     {T_NOT_EQUAL, NE_OP},
-    {T_RANGLE, LT_OP},
-    {T_LANGLE, GT_OP},
+    {T_LANGLE, LT_OP},
+    {T_RANGLE, GT_OP},
     {T_GE, GE_OP},
     {T_LE, LE_OP},
     {T_AND, AND_OP},

@@ -15,11 +15,21 @@ struct Lgs_Runtime {
 static inline Lgs_Runtime runtime;
 
 extern "C" void Lgs_Runtime_init() {
-    // runtime.scheduler.start();
+    runtime.scheduler.start();
 }
 
 extern "C" void Lgs_Runtime_close() {
-    // runtime.scheduler.shutdown();
+    volatile bool waiting = true;
+    while (waiting) {
+        bool hasWork = false;
+        {
+            std::lock_guard lock(runtime.scheduler.mtx);
+            hasWork = !runtime.scheduler.pending.empty() || !runtime.scheduler.running.empty();
+        }
+        if (!hasWork) waiting = false;
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+    runtime.scheduler.shutdown();
 }
 
 extern "C" void Lgs_Stack_addOwner(void* ptr, const Lgs_RTType type) {
@@ -28,6 +38,10 @@ extern "C" void Lgs_Stack_addOwner(void* ptr, const Lgs_RTType type) {
 
 extern "C" void Lgs_Stack_addOrphan(void* ptr, const Lgs_RTType type) {
     runtime.stack.addOrphan(ptr, type);
+}
+
+extern "C" void Lgs_Stack_addDefer(void* funcPtr, void* ctx) {
+    runtime.stack.addDefer(funcPtr, ctx);
 }
 
 extern "C" void Lgs_Stack_removeOwner(const void* owner) {
@@ -42,12 +56,20 @@ extern "C" void Lgs_Stack_pop(const bool cleanup) {
     runtime.stack.pop(cleanup);
 }
 
-extern "C" void Lgs_Stack_addDefer(void* funcPtr, void* ctx) {
-    runtime.stack.addDefer(funcPtr, ctx);
-}
-
 extern "C" void Lgs_Stack_callDefers() {
     runtime.stack.callDefers();
+}
+
+extern "C" void Lgs_Scheduler_addCoro(void* funcPtr, void* ctx) {
+    runtime.scheduler.spawn(reinterpret_cast<Func>(funcPtr), ctx);
+}
+
+extern "C" void Lgs_Scheduler_yield() {
+    runtime.scheduler.yield();
+}
+
+extern "C" bool Lgs_Scheduler_shouldYield() {
+    return runtime.scheduler.shouldYield();
 }
 
 extern "C" void Lgs_VTable_add(void* instancePtr, const char* name, void* ptr) {

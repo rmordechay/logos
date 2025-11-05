@@ -35,6 +35,7 @@ public:
     bool isOptional = false;
     bool isTerminator = false;
     bool isMethod = false;
+    bool isCoroutine = false;
     bool isIOMember = false;
     bool isSysCall = false;
     bool isArrFunc = false;

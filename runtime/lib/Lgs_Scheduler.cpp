@@ -6,6 +6,7 @@
 #include <mutex>
 #include <chrono>
 #include <iostream>
+#include <unistd.h>
 
 #define STACK_SIZE 2048
 #define QUANTUM 10000
@@ -37,19 +38,7 @@ static void coroutineEntry() {
     if (tlsCurrent == nullptr) return;
     tlsCurrent->fn(tlsCurrent->arg);
     tlsCurrent->finished = true;
-    tlsCurrent->ctx.switchContext(schedulerCtx);
-}
-
-static Lgs_Coroutine* makeCoroutine(void (*fn)(void*), void* arg) {
-    auto* co = new Lgs_Coroutine();
-    co->stackSize = STACK_SIZE;
-    co->stack = std::malloc(co->stackSize);
-    co->fn = fn;
-    co->arg = arg;
-    co->finished = false;
-    auto* top = static_cast<std::byte*>(co->stack) + co->stackSize;
-    co->ctx.reset(top, reinterpret_cast<void*>(coroutineEntry));
-    return co;
+    switchContext(&tlsCurrent->ctx, &schedulerCtx);
 }
 
 void Lgs_Scheduler::start() {
@@ -62,7 +51,7 @@ void Lgs_Scheduler::loop() {
     while (active) {
         Lgs_Coroutine* coroutine = nullptr;
         {
-            std::lock_guard lk(mtx);
+            std::lock_guard lock(mtx);
             if (!pending.empty()) {
                 coroutine = pending.front();
                 pending.pop_front();
@@ -75,28 +64,40 @@ void Lgs_Scheduler::loop() {
         }
         tlsCurrent = coroutine;
         current = coroutine;
-        schedulerCtx.switchContext(coroutine->ctx);
+        switchContext(&schedulerCtx, &coroutine->ctx);
         tlsCurrent = nullptr;
         current = nullptr;
         if (coroutine->finished) {
             std::free(coroutine->stack);
             delete coroutine;
         } else {
-            std::lock_guard lk(mtx);
+            std::lock_guard lock(mtx);
             pending.push_back(coroutine);
         }
     }
 }
 
 void Lgs_Scheduler::spawn(void (*fn)(void*), void* arg) {
-    auto* co = makeCoroutine(fn, arg);
+    const auto co = new Lgs_Coroutine();
+    co->stackSize = STACK_SIZE;
+    co->stack = std::malloc(co->stackSize);
+    co->fn = fn;
+    co->arg = arg;
+    co->finished = false;
+    const auto top = static_cast<std::byte*>(co->stack) + co->stackSize;
+    reset(&co->ctx, top, reinterpret_cast<void*>(coroutineEntry));
     std::lock_guard lk(mtx);
     pending.push_back(co);
 }
 
-void yield() {
+bool Lgs_Scheduler::shouldYield() {
+    return preempt.load(std::memory_order_relaxed);
+}
+
+void Lgs_Scheduler::yield() {
     if (tlsCurrent == nullptr) return;
-    tlsCurrent->ctx.switchContext(schedulerCtx);
+    preempt.store(false, std::memory_order_relaxed);
+    switchContext(&tlsCurrent->ctx, &schedulerCtx);
 }
 
 void Lgs_Scheduler::shutdown() {

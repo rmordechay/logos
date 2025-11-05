@@ -76,13 +76,6 @@ void Lgs_Stack::pop(const bool cleanup) {
     stackIndex--;
 }
 
-void Lgs_Stack::addDefer(void* funcPtr, void* ctx) {
-    const auto deferFunc = reinterpret_cast<Lgs_DeferFunc>(funcPtr);
-    const Lgs_ThunkFunc func_entry{deferFunc, ctx};
-    const auto deferIndex = frames[stackIndex].defersCount++;
-    frames[stackIndex].defers[deferIndex] = func_entry;
-}
-
 void Lgs_Stack::addOwner(void* ptr, const Lgs_RTType type) {
     const auto ownerIndex = frames[stackIndex].ownersCount++;
     frames[stackIndex].owners[ownerIndex] = Lgs_Alloc{ptr, type};
@@ -91,6 +84,18 @@ void Lgs_Stack::addOwner(void* ptr, const Lgs_RTType type) {
 void Lgs_Stack::addOrphan(void* ptr, const Lgs_RTType type) {
     const auto ownerIndex = frames[stackIndex].orphansCount++;
     frames[stackIndex].orphans[ownerIndex] = Lgs_Alloc{ptr, type};
+}
+
+void Lgs_Stack::addCoro(void* funcPtr, void* ctx) {
+    const auto deferFunc = reinterpret_cast<Func>(funcPtr);
+    const auto deferIndex = frames[stackIndex].corosCount++;
+    frames[stackIndex].coros[deferIndex] = Lgs_ThunkFunc{deferFunc, ctx};
+}
+
+void Lgs_Stack::addDefer(void* funcPtr, void* ctx) {
+    const auto deferFunc = reinterpret_cast<Func>(funcPtr);
+    const auto deferIndex = frames[stackIndex].defersCount++;
+    frames[stackIndex].defers[deferIndex] = Lgs_ThunkFunc{deferFunc, ctx};
 }
 
 void Lgs_Stack::removeOwner(const void* owner) {

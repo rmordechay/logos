@@ -1,5 +1,5 @@
 #pragma once
-#include "Lgs_Context.h"
+#include "context/Lgs_Context.h"
 #include <deque>
 #include <thread>
 #include <vector>
@@ -22,5 +22,7 @@ struct Lgs_Scheduler {
     void start();
     void loop();
     void spawn(void (*fn)(void*), void* arg);
+    static bool shouldYield();
+    static void yield();
     void shutdown();
 };

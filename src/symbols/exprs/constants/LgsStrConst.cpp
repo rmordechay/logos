@@ -51,6 +51,10 @@ Value* LgsStrConst::hash(LgsLLVMGen& cg) {
     return cg.usize(hashStr(value.c_str()));
 }
 
+LgsExpr* LgsStrConst::cloneExpr() {
+    return new LgsStrConst(*this);
+}
+
 LgsStrConst::~LgsStrConst() {
     for (const auto part : parts) {
         freeExpr(part);
