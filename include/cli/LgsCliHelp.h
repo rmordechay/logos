@@ -16,7 +16,7 @@ struct LgsCliCmdHelp {
     std::string summary = "";
     std::string desc = "";
     std::string error = "";
-    std::vector<LgsCliCmdArgHelp> requiredArgs;
-    std::vector<LgsCliCmdArgHelp> optionalArgs;
-    std::vector<std::string> examples;
+    std::vector<LgsCliCmdArgHelp> requiredArgs = {};
+    std::vector<LgsCliCmdArgHelp> optionalArgs = {};
+    std::vector<std::string> examples = {};
 };

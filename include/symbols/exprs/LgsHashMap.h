@@ -12,10 +12,5 @@ public:
     ~LgsHashMap() override;
 };
 
-class LgsPair final {
-public:
-    LgsExpr* key;
-    LgsExpr* value;
-};
 
 

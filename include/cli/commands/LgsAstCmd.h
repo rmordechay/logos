@@ -1,5 +1,5 @@
 #pragma once
-#include "../LgsCliCmd.h"
+#include "cli/LgsCliCmd.h"
 #include "types/iterables/LgsStr.h"
 
 class LgsAstCmd final : public LgsCliCmd {
@@ -26,5 +26,5 @@ inline LgsCliCmdHelp astCmdHelp{
     .examples = {
         "lgs ast app.lgs",
         "lgs ast app.lgs --no-errors",
-    }
+    },
 };

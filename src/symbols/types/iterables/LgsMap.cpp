@@ -7,7 +7,7 @@
 #include "loops/LgsForeachLoop.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsAny.h"
-#include "../../../../include/symbols/types/primitives/LgsVoid.h"
+#include "types/primitives/LgsVoid.h"
 #include "types/iterables/LgsDArray.h"
 #include "utils/LgsUtils.h"
 

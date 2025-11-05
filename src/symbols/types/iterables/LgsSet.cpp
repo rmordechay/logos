@@ -3,7 +3,7 @@
 #include "funcs/LgsFunc.h"
 #include "types/LgsAny.h"
 #include "types/LgsFuncType.h"
-#include "../../../../include/symbols/types/primitives/LgsVoid.h"
+#include "types/primitives/LgsVoid.h"
 #include "types/iterables/LgsDArray.h"
 #include "types/primitives/LgsLong.h"
 

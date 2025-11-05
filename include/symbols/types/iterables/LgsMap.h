@@ -1,7 +1,6 @@
 #pragma once
 #include "LgsStr.h"
 #include "types/LgsTypePair.h"
-class LgsPair;
 
 #define KEYS_FUNC_NAME "keys"
 #define VALUES_FUNC_NAME "values"
@@ -39,4 +38,10 @@ public:
     std::string strFormatPart() const override;
     LgsType* clone() override;
     ~LgsMap() override;
+};
+
+class LgsPair final {
+public:
+    LgsExpr* key;
+    LgsExpr* value;
 };

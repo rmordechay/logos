@@ -827,10 +827,12 @@ void LgsCodeGen::visitFieldSelection(LgsVariable* var, LgsExpr* parent, const bo
         var->IRValue = var->ref.func->getIRFunc(cg);
         return;
     }
+
     const auto field = var->ref.field;
     if (parent->asTypeExpr()) {
         const auto object = parent->type->asObject();
         if (object && object->singleton) {
+            field->parentIRValue = object->singleton->IRValue;
             field->IRValue = field->getGEP(cg);
             var->IRValue = field->IRValue;
             return;

@@ -11,7 +11,7 @@
 #include "types/primitives/LgsInt.h"
 #include "types/primitives/LgsShort.h"
 #include "types/primitives/LgsUInt.h"
-#include "../../include/symbols/types/primitives/LgsVoid.h"
+#include "types/primitives/LgsVoid.h"
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsChar.h"
 #include "utils/LgsUtils.h"

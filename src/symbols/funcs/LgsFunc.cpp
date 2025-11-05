@@ -4,7 +4,7 @@
 #include "exprs/LgsExpr.h"
 #include "exprs/constants/LgsStrConst.h"
 #include "types/LgsFuncType.h"
-#include "../../../include/symbols/types/primitives/LgsVoid.h"
+#include "types/primitives/LgsVoid.h"
 #include "utils/LgsUtils.h"
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/Module.h>
