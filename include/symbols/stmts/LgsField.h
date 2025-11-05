@@ -20,6 +20,8 @@ public:
     bool isVirtual = false;
     bool isOptional = false;
     bool isOwner = false;
+    // Not to be confused with type enum. This flag is for direct fields.
+    bool isEnumField = false;
     Value* parentIRValue = nullptr;
     LgsType* parent = nullptr;
 

@@ -460,12 +460,13 @@ LgsEnum* LgsParser::parseEnum() {
     while (true) {
         const auto enumField = currentToken;
         if (!mustMatch(T_IDENTIFIER)) break;
-        LgsExpr* strConst = nullptr;
+        LgsExpr* expr = nullptr;
         if (matchAndConsume(T_EQUAL)) {
-            strConst = parseStrConst();
-            mustParse(strConst);
+            expr = parseExpr();
+            mustParse(expr);
         }
-        const auto field = new LgsField(enumField.lexeme, enum_->clone(), strConst);
+        const auto field = new LgsField(enumField.lexeme, enum_, expr);
+        field->isEnumField = true;
         field->position = position++;
         setLocation(field->location, &enumField);
         enum_->addField(field);

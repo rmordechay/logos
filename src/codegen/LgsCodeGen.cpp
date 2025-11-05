@@ -321,12 +321,12 @@ void LgsCodeGen::visitVarDec(LgsVarDec* varDec) {
     if (varDec->shouldAllocate()) {
         varDec->IRValue = cg.builder.CreateAlloca(varDec->type->getIRType(cg));
         varDec->expr->destPtrValue = varDec->IRValue;
-        visitExpr(varDec->expr, true);
+        visitExpr(varDec->expr);
         if (varDec->expr->IRValue != varDec->IRValue) {
             cg.builder.CreateStore(varDec->expr->IRValue, varDec->IRValue);
         }
     } else {
-        visitExpr(varDec->expr, true);
+        visitExpr(varDec->expr);
         varDec->IRValue = varDec->expr->IRValue;
     }
     assert(varDec->IRValue);
@@ -481,7 +481,8 @@ void LgsCodeGen::visitSwitch(LgsSwitch* pm) {
         const auto [expr, stmtsBlock] = pm->patterns[i];
         visitExpr(expr);
         const auto patternBlock = cg.createBlock(BLOCK_NAME_CASE_PREFIX + std::to_string(i), currentIRFunc);
-        switchInst->addCase(llvm::dyn_cast<ConstantInt>(expr->hash(cg)), patternBlock);
+        const auto hashed = expr->hash(cg);
+        switchInst->addCase(llvm::dyn_cast<ConstantInt>(hashed), patternBlock);
         cg.builder.SetInsertPoint(patternBlock);
         visitStmtsBlock(stmtsBlock);
         cg.builder.CreateBr(exitBlock);
@@ -781,8 +782,7 @@ void LgsCodeGen::visitVariable(LgsVariable* variable) {
         variable->IRValue = getIRValue(variable->ref.object->singleton);
         break;
     case FIELD:
-        if (const auto enum_ = variable->ref.field->type->asEnum()) {
-            const auto f = enum_->getField(variable->name);
+        if (variable->ref.field->type->asEnum()) {
             variable->IRValue = cg.usize(variable->ref.field->position);
         } else {
             variable->IRValue = variable->ref.field->getGEP(cg);
@@ -842,17 +842,18 @@ void LgsCodeGen::visitFieldSelection(LgsVariable* var, LgsExpr* parent, const bo
         }
     }
 
-    if (const auto enum_ = parent->type->asEnum()) {
-        assert(enum_->isRoot);
+    if (parent->type->asEnum()) {
         var->IRValue = cg.usize(field->position);
         return;
     }
 
-    if (const auto enum_ = field->type->asEnum()) {
-        assert(!enum_->isRoot);
-        const auto a = cg.builder.CreateAlloca(cg.sizeTy());
-        cg.builder.CreateStore(cg.usize(field->position), a);
-        var->IRValue = a;
+    if (field->type->asEnum()) {
+        if (assign) {
+            field->parentIRValue = parent->IRValue;
+            var->IRValue = field->getGEP(cg);
+        } else {
+            var->IRValue = cg.builder.CreateLoad(cg.sizeTy(), field->getGEP(cg));
+        }
         return;
     }
 
@@ -1438,8 +1439,7 @@ bool LgsCodeGen::allArgsAreConst(const std::vector<LgsExpr*>& args) {
 }
 
 bool LgsCodeGen::writeIRModule() const {
-    if (verifyModule(*cg.IRModule, &llvm::errs())) assert(0);
-
+    if (verifyModule(*cg.IRModule, &llvm::errs())) return false;
     // Write IR to file
     auto moduleName = cg.IRModule->getName().str();
     if (lgsConfigs.writeIRFiles) {

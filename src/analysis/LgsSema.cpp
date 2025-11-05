@@ -348,6 +348,9 @@ void LgsSema::visitSwitch(LgsSwitch* switchStmt) {
         if (!condType || expr->type->isUnknown()) continue;
         stack.enterScope(switchStmt);
         visitExpr(expr);
+        if (!expr->isValueKnown) {
+            errHandler.addError(E10044, &expr->location, file->absPath, {expr->asText()});
+        }
         visitStmtsBlock(block);
         if (expr->type && !expr->type->canCastTo(condType)) {
             errHandler.addError(E10014, &expr->location, file->absPath, {expr->type->pname(), condType->pname()});
@@ -752,6 +755,7 @@ void LgsSema::visitVariable(LgsVariable* variable) {
     }
     case FIELD: {
         variable->ref.field = symbol->field;
+        variable->isValueKnown = symbol->field->isEnumField;
         variable->setType(symbol->field->type);
         variable->isMutable = !symbol->field->isConst;
         if (symbol->field->isOwner) {

@@ -1,5 +1,6 @@
 #include "types/LgsEnum.h"
 #include "codegen/LgsLLVMGen.h"
+#include "stmts/LgsField.h"
 #include "types/LgsAny.h"
 
 LgsExpr* LgsEnum::getZeroValue() {
@@ -11,6 +12,9 @@ Lgs_RTType LgsEnum::getRTType() {
 }
 
 Type* LgsEnum::getIRType(LgsLLVMGen& cg) {
+    if (const auto expr = fields.front()->expr) {
+        return cg.getStructType({cg.sizeTy(), expr->type->getIRType(cg)});
+    }
     return cg.getStructType({cg.sizeTy(), cg.ptrTy()});
 }
 
@@ -33,7 +37,5 @@ size_t LgsEnum::getSizeBytes() {
 }
 
 LgsEnum* LgsEnum::clone() {
-    const auto newEnum = new LgsEnum(*this);
-    newEnum->isRoot = false;
-    return newEnum;
+    return new LgsEnum(*this);
 }
