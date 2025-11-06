@@ -23,9 +23,6 @@ void LgsPaths::initPaths() {
     buildDirIR = buildDir / LGS_BUILD_IR_DIR;
     buildDirObjs = buildDir / LGS_BUILD_OBJECTS_DIR;
     cacheFile = buildDir / LGS_FILES_CACHE_FILE;
-    if (!fs::exists(buildDir)) fs::create_directories(buildDir);
-    if (!fs::exists(buildDirIR)) fs::create_directories(buildDirIR);
-    if (!fs::exists(buildDirObjs)) fs::create_directories(buildDirObjs);
     findLgsRuntime();
     findCLibRoot();
     findCLibHeaders();

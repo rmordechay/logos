@@ -69,37 +69,112 @@ bool LgsParser::scanTokens() {
 
 LgsFile* LgsParser::parseSrcFile(const bool isTestRun) {
     if (!scanTokens()) return nullptr;
+    std::unordered_map<std::string, LgsApp*> imports;
+    parseImports(imports);
+    LgsFile* file = nullptr;
     if (const auto mainFile = parseMainFile()) {
-        return mainFile;
+        file = mainFile;
     }
-    if (const auto objFile = parseObjectFile(false)) {
-        return objFile;
+    if (const auto objFile = parseObjectFile()) {
+        file = objFile;
     }
-    if (const auto interfaceFile = parseInterfaceFile(false)) {
-        return interfaceFile;
+    if (const auto interfaceFile = parseInterfaceFile()) {
+        file = interfaceFile;
     }
     if (isTestRun) {
         if (const auto testFile = parseTestFile()) {
-            return testFile;
+            file = testFile;
         }
     }
-    return nullptr;
+    assert(file);
+    file->symbolTable.imports = imports;
+    return file;
 }
 
 LgsFile* LgsParser::parseSrcFileHeaders() {
     if (!scanTokens()) return nullptr;
-    if (const auto objFile = parseObjectFile(true)) {
+    if (const auto objFile = parseObjectFile()) {
         return objFile;
     }
-    if (const auto interfaceFile = parseInterfaceFile(true)) {
+    if (const auto interfaceFile = parseInterfaceFile()) {
         return interfaceFile;
     }
     return nullptr;
+}
+
+void LgsParser::parseImports(std::unordered_map<std::string, LgsApp*>& imports) {
+    const auto importToken = currentToken;
+    if (!matchAndConsume(T_IMPORT)) return;
+    while (true) {
+        const auto var = currentToken;
+        if (!mustMatch(T_IDENTIFIER)) break;
+        imports[var.lexeme] = nullptr;
+        if (importToken.location.lineStart != peek().location.lineStart) break;
+        mustMatch(T_COMMA);
+    }
+}
+
+LgsEnvFile* LgsParser::parseEnvFile() {
+    if (!scanTokens()) return nullptr;
+    if (currentToken.lexeme != "env") {
+        addParsingError();
+        return nullptr;
+    }
+    const auto nameToken = consume();
+    const auto file = new LgsEnvFile(fileID, filePath);
+    setLocation(file->location, &nameToken);
+    file->envName = nameToken.lexeme;
+    mustMatch(T_IDENTIFIER);
+    while (true) {
+        const auto varDec = parseVarDec();
+        if (!varDec) break;
+        file->varDecs.push_back(varDec);
+    }
+    if (currentToken.type != T_EOF) assert(0);
+    return file;
+}
+
+LgsMainFile* LgsParser::parseMainFile() {
+    if (filePath.filename() != LGS_MAIN_FILE) return nullptr;
+    const auto file = new LgsMainFile(fileID, filePath);
+    currentFile = file;
+    setLocation(file->location, &currentToken);
+    parseExternalImports(file);
+    while (!isEOF()) {
+        if (const auto obj = parseObject()) {
+            file->objects.push_back(obj);
+            if (obj->singleton) {
+                std::lock_guard lock(mtx);
+                globals.addSymbol(LgsSymbol(obj), &errHandler, filePath);
+            } else {
+                addFileSymbol(file, LgsSymbol(obj));
+            }
+        } else if (const auto interface = parseInterface()) {
+            file->interfaces.push_back(interface);
+            addFileSymbol(file, LgsSymbol(interface));
+        } else if (auto lgsEnum = parseEnum()) {
+            file->enums.push_back(lgsEnum);
+            addFileSymbol(file, LgsSymbol(lgsEnum));
+        } else if (const auto mainFunc = parseMainFunc()) {
+            file->funcs[mainFunc->funcType->name] = mainFunc;
+        } else if (const auto func = parseFunc()) {
+            file->funcs[func->funcType->name] = func;
+            addFileSymbol(file, LgsSymbol(func));
+        } else if (const auto subType = parseSubtype()) {
+            file->subtypes.emplace_back(subType);
+            addFileSymbol(file, LgsSymbol(subType));
+        } else {
+            addParsingError();
+            break;
+        }
+    }
+    return file;
 }
 
 LgsAppConfigFile* LgsParser::parseAppConfigFile() {
     if (!scanTokens()) return nullptr;
     const auto configFile = new LgsAppConfigFile(fileID, filePath);
+    currentFile = configFile;
     while (true) {
         const auto varDec = parseVarDec();
         if (!varDec) break;
@@ -145,71 +220,16 @@ LgsAppConfigFile* LgsParser::parseAppConfigFile() {
     return configFile;
 }
 
-LgsEnvFile* LgsParser::parseEnvFile() {
-    if (!scanTokens()) return nullptr;
-    if (currentToken.lexeme != "env") {
-        addParsingError();
-        return nullptr;
-    }
-    const auto nameToken = consume();
-    const auto file = new LgsEnvFile(fileID, filePath);
-    setLocation(file->location, &nameToken);
-    file->envName = nameToken.lexeme;
-    mustMatch(T_IDENTIFIER);
-    while (true) {
-        const auto varDec = parseVarDec();
-        if (!varDec) break;
-        file->varDecs.push_back(varDec);
-    }
-    if (currentToken.type != T_EOF) assert(0);
-    return file;
-}
-
-LgsMainFile* LgsParser::parseMainFile() {
-    if (filePath.filename() != LGS_MAIN_FILE) return nullptr;
-    auto const file = new LgsMainFile(fileID, filePath);
-    setLocation(file->location, &currentToken);
-    parseExternalImports(file);
-    while (!isEOF()) {
-        if (const auto obj = parseObject()) {
-            file->objects.push_back(obj);
-            if (obj->singleton) {
-                std::lock_guard lock(mtx);
-                globals.addSymbol(LgsSymbol(obj), &errHandler, filePath);
-            } else {
-                addFileSymbol(file, LgsSymbol(obj));
-            }
-        } else if (const auto interface = parseInterface()) {
-            file->interfaces.push_back(interface);
-            addFileSymbol(file, LgsSymbol(interface));
-        } else if (auto lgsEnum = parseEnum()) {
-            file->enums.push_back(lgsEnum);
-            addFileSymbol(file, LgsSymbol(lgsEnum));
-        } else if (const auto mainFunc = parseMainFunc()) {
-            file->funcs[mainFunc->funcType->name] = mainFunc;
-        } else if (const auto func = parseFunc()) {
-            file->funcs[func->funcType->name] = func;
-            addFileSymbol(file, LgsSymbol(func));
-        } else if (const auto subType = parseSubtype()) {
-            file->subtypes.emplace_back(subType);
-            addFileSymbol(file, LgsSymbol(subType));
-        } else {
-            addParsingError();
-            break;
-        }
-    }
-    return file;
-}
-
-LgsObjectFile* LgsParser::parseObjectFile(const bool onlyHeaders) {
+LgsObjectFile* LgsParser::parseObjectFile() {
     const auto isSingleton = currentToken.type == T_SINGLETON;
     if (currentToken.type != T_OBJECT && !isSingleton) return nullptr;
     const auto nameToken = consume();
-    auto const file = new LgsObjectFile(fileID, filePath);
+    const auto file = new LgsObjectFile(fileID, filePath);
+    currentFile = file;
     mustMatch(T_IDENTIFIER);
     const auto withBraces = matchAndConsume(T_LBRACE);
     parseExternalImports(file);
-    const auto obj = parseObjectBody(nameToken, isSingleton, onlyHeaders);
+    const auto obj = parseObjectBody(nameToken, isSingleton);
     if (withBraces) mustMatch(T_RBRACE);
     file->obj = obj;
     file->location = obj->location;
@@ -221,14 +241,15 @@ LgsObjectFile* LgsParser::parseObjectFile(const bool onlyHeaders) {
     return file;
 }
 
-LgsInterfaceFile* LgsParser::parseInterfaceFile(const bool onlyHeaders) {
+LgsInterfaceFile* LgsParser::parseInterfaceFile() {
     if (!matchAndConsume(T_INTERFACE)) return nullptr;
     const auto nameToken = currentToken;
     mustMatch(T_IDENTIFIER);
     const auto withBraces = matchAndConsume(T_LBRACE);
-    const auto interface = parseInterfaceBody(nameToken, onlyHeaders);
+    const auto interface = parseInterfaceBody(nameToken);
     if (withBraces) mustMatch(T_RBRACE);
-    auto const file = new LgsInterfaceFile(fileID, filePath);
+    const auto file = new LgsInterfaceFile(fileID, filePath);
+    currentFile = file;
     file->location = interface->location;
     file->interface = interface;
     validateTypeName(interface->name, &interface->location);
@@ -246,6 +267,7 @@ LgsTestFile* LgsParser::parseTestFile() {
     }
     const auto nameToken = consume();
     auto const file = new LgsTestFile(fileID, filePath);
+    currentFile = file;
     setLocation(file->location, &currentToken);
     mustMatch(T_IDENTIFIER);
 
@@ -278,7 +300,7 @@ LgsObject* LgsParser::parseObject() {
     const auto nameToken = consume();
     mustMatch(T_IDENTIFIER);
     mustMatch(T_LBRACE);
-    const auto obj = parseObjectBody(nameToken, isSingleton, false);
+    const auto obj = parseObjectBody(nameToken, isSingleton);
     mustMatch(T_RBRACE);
     validateTypeName(obj->name, &obj->location);
     return obj;
@@ -289,13 +311,13 @@ LgsInterface* LgsParser::parseInterface() {
     const auto nameToken = currentToken;
     mustMatch(T_IDENTIFIER);
     mustMatch(T_LBRACE);
-    const auto interface = parseInterfaceBody(nameToken, false);
+    const auto interface = parseInterfaceBody(nameToken);
     mustMatch(T_RBRACE);
     validateTypeName(interface->name, &interface->location);
     return interface;
 }
 
-LgsObject* LgsParser::parseObjectBody(const LgsToken& tokenName, const bool isSingleton, bool onlyHeaders) {
+LgsObject* LgsParser::parseObjectBody(const LgsToken& tokenName, const bool isSingleton) {
     auto const obj = new LgsObject(tokenName.lexeme);
     setLocation(obj->location, &tokenName);
 
@@ -331,8 +353,9 @@ LgsObject* LgsParser::parseObjectBody(const LgsToken& tokenName, const bool isSi
     while (true) {
         if (const auto field = parseField(fieldPosition)) {
             fieldPosition++;
-            obj->addField(field);
+            if (headersOnly && !field->isPublic) continue;
             field->parent = obj;
+            obj->addField(field);
         } else if (const auto enum_ = parseEnum()) {
             obj->enums.push_back(enum_);
         } else if (const auto subtype = parseSubtype()) {
@@ -346,8 +369,9 @@ LgsObject* LgsParser::parseObjectBody(const LgsToken& tokenName, const bool isSi
 
     // Methods
     while (true) {
-        const auto method = parseMethod(obj, onlyHeaders);
+        const auto method = parseMethod(obj);
         if (!method) break;
+        if (headersOnly && !method->funcType->isPublic) continue;
         obj->addMethod(method);
         if (currentToken.type == T_RBRACE || currentToken.type == T_EOF) break;
     }
@@ -356,11 +380,11 @@ LgsObject* LgsParser::parseObjectBody(const LgsToken& tokenName, const bool isSi
         obj->singleton = new LgsInstance(obj);
     }
 
-    if (!onlyHeaders && currentToken.type != T_EOF && currentToken.type != T_RBRACE) assert(0);
+    if (!headersOnly && currentToken.type != T_EOF && currentToken.type != T_RBRACE) assert(0);
     return obj;
 }
 
-LgsInterface* LgsParser::parseInterfaceBody(const LgsToken& tokenName, bool onlyHeaders) {
+LgsInterface* LgsParser::parseInterfaceBody(const LgsToken& tokenName) {
     auto const interface = new LgsInterface(tokenName.lexeme);
     setLocation(interface->location, &tokenName);
 
@@ -611,7 +635,7 @@ LgsMainFunc* LgsParser::parseMainFunc() {
     return func;
 }
 
-LgsFunc* LgsParser::parseMethod(LgsObject* obj, const bool onlyHeaders) {
+LgsFunc* LgsParser::parseMethod(LgsObject* obj) {
     auto isPublic = false;
     if (matchAndConsume(T_PUBLIC)) {
         isPublic = true;
@@ -622,7 +646,7 @@ LgsFunc* LgsParser::parseMethod(LgsObject* obj, const bool onlyHeaders) {
     const auto func = new LgsFunc(funcHeader);
     currentFunc = func;
     func->location = func->funcType->location;
-    if (!onlyHeaders) {
+    if (!headersOnly) {
         func->stmtsBlock = parseStmtsBlock();
     }
     func->funcType->isPublic = isPublic;
@@ -1531,9 +1555,16 @@ LgsPostfixExpr* LgsParser::parsePostfixExpr(LgsExpr* baseExpr) {
 }
 
 LgsSelection* LgsParser::parseSelection(LgsExpr* firstExpr) {
+    assert(firstExpr);
     const auto oldIndex = currentIndex;
     std::vector<LgsExpr*> exprs;
-    if (firstExpr) exprs.push_back(firstExpr);
+    LgsVariable* importVar = nullptr;
+    if (isImportName(firstExpr)) {
+        importVar = firstExpr->asVariable();
+    } else {
+        exprs.push_back(firstExpr);
+    }
+
     while (true) {
         LgsExpr* expr = nullptr;
         if (const auto funcCall = parseFuncCall()) {
@@ -1548,17 +1579,22 @@ LgsSelection* LgsParser::parseSelection(LgsExpr* firstExpr) {
         exprs.push_back(expr);
         if (!matchAndConsume(T_DOT)) break;
     }
+
     if (exprs.empty()) {
         reset(oldIndex);
         return nullptr;
     }
+
     if (exprs.size() == 1) {
-        if (!firstExpr) freeExpr(exprs.front());
+        assert(exprs.front() == firstExpr);
+        freeExpr(exprs.front());
         reset(oldIndex);
         return nullptr;
     }
+
     auto const selection = new LgsSelection(exprs);
-    selection->location = selection->exprs.front()->location;
+    selection->location = firstExpr->location;
+    selection->importVar = importVar;
     return selection;
 }
 
@@ -1811,7 +1847,7 @@ void LgsParser::addParsingError() {
 
 void LgsParser::recursionGuard() {
     if (recursionCount++ >= MAX_TOKENS_NUMBER) {
-        std::cout << "recursion" << '\n';
+        std::cerr << "recursion" << '\n';
         exit(EXIT_FAILURE);
     }
 }
@@ -1829,4 +1865,13 @@ void LgsParser::validateTestFolder(const LgsFile* testFile) {
     if (!foundTestsFolder) {
         errHandler.addError(E10079, &testFile->location, filePath, {testFile->absPath.filename()});
     }
+}
+
+bool LgsParser::isImportName(LgsExpr* expr) const {
+    if (const auto variable = expr->asVariable()) {
+        if (!globals.imports.contains(variable->name)) return false;
+        variable->isImportName = true;
+        return true;
+    }
+    return false;
 }

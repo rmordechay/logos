@@ -4,6 +4,7 @@
 #include "stmts/LgsField.h"
 #include "types/LgsInterface.h"
 #include "types/iterables/LgsVec.h"
+#include "utils/LgsUtils.h"
 
 #include <sstream>
 #include <llvm/IR/InlineAsm.h>
@@ -67,9 +68,10 @@ bool LgsSelection::equals(LgsExpr* other) {
 }
 
 LgsSelection::~LgsSelection() {
+    freeExpr(importVar);
+    importVar = nullptr;
     for (const auto& expr : exprs) {
-        // TODO delete
-        // freeExpr(expr);
+        freeExpr(expr);
     }
     exprs.clear();
 }

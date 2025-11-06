@@ -8,6 +8,7 @@
 #include "analysis/LgsLinter.h"
 #include "data/LgsDefinitions.h"
 #include "files/LgsFile.h"
+#include "files/LgsFileMetadata.h"
 #include "utils/ThreadPool.h"
 #include <mutex>
 
@@ -29,9 +30,9 @@ inline std::mutex mtx;
 class LgsApp final {
 public:
     LgsPaths paths;
-    LgsGlobals globals;
     LgsAppCache appCache;
-    LgsAppConfigs appConfigs;
+    LgsSymbolTable globals;
+    LgsAppConfigs configs;
     LgsErrHandler errHandler;
     std::vector<LgsFile*> srcFiles;
     std::vector<LgsEnvFile*> envFiles;
@@ -56,12 +57,12 @@ public:
     bool generate();
     bool link();
     LgsFile* loadSrcFile(const std::string& fileCode, const fs::path& filePath = LGS_MAIN_FILE, size_t fileID = 0);
-    LgsFile* loadSrcFileHeaders(const std::string& fileCode, const fs::path& filePath, size_t fileID);
     bool loadConfigFile();
     bool loadEnvFiles();
     void loadAppConfigs();
     bool loadDeps();
     void loadBuiltins();
     size_t getNextFileID();
+    void createBuildDirs() const;
     ~LgsApp();
 };

@@ -886,8 +886,6 @@ void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
         func.setType(func.funcType);
         func.IRValue = getIRValue(funcCall->ref.varDec);
         funcCall->func = &func;
-    } else if (!funcCall->func) {
-        assert(0);
     }
     
     const auto ft = funcCall->func->funcType;

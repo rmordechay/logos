@@ -1,8 +1,8 @@
 #include "logos/LgsAppCache.h"
-#include "files/LgsFile.h"
+#include "files/LgsFileMetadata.h"
 #include "utils/LgsUtils.h"
 
-void LgsAppCache::load() {
+void LgsAppCache::load(const fs::path& cacheFilePath) {
     if (!fs::exists(cacheFilePath)) return;
     std::ifstream inFile(cacheFilePath, std::ios::binary);
     if (!inFile) return;
@@ -29,7 +29,7 @@ void LgsAppCache::load() {
     }
 }
 
-void LgsAppCache::save() const {
+void LgsAppCache::save(const fs::path& cacheFilePath) const {
     if (fs::exists(cacheFilePath)) fs::remove(cacheFilePath);
     std::ofstream outFile(cacheFilePath, std::ios::binary | std::ios::trunc);
     const auto count = files.size();

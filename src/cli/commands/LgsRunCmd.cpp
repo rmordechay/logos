@@ -30,7 +30,7 @@ void LgsRunCmd::parseArgs(LgsApp& app, std::vector<const char*>& appArgs) const 
             const auto optLevel = parseInt(i, name);
             if (optLevel < 0) exitWithError(E40002, {"-o"});
             else if (optLevel > 3) exitWithError(E40003, {std::to_string(optLevel)});
-            app.appConfigs.optLevel = optLevel;
+            app.configs.optLevel = optLevel;
         }
         if (name[0] == 'c') {
             const auto code = argv[++i];
