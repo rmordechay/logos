@@ -173,7 +173,12 @@ LgsMainFile* LgsParser::parseMainFile() {
     while (!isEOF()) {
         if (const auto obj = parseObject()) {
             file->objects.push_back(obj);
-            addFileSymbol(file, LgsSymbol(obj));
+            if (obj->singleton) {
+                std::lock_guard lock(mtx);
+                globals.addSymbol(LgsSymbol(obj), &errHandler, filePath);
+            } else {
+                addFileSymbol(file, LgsSymbol(obj));
+            }
         } else if (const auto interface = parseInterface()) {
             file->interfaces.push_back(interface);
             addFileSymbol(file, LgsSymbol(interface));
@@ -206,9 +211,6 @@ LgsObjectFile* LgsParser::parseObjectFile(const bool onlyHeaders) {
     parseExternalImports(file);
     const auto obj = parseObjectBody(nameToken, isSingleton, onlyHeaders);
     if (withBraces) mustMatch(T_RBRACE);
-    if (isSingleton && !onlyHeaders) {
-        obj->singleton = new LgsInstance(obj);
-    }
     file->obj = obj;
     file->location = obj->location;
     validateTypeName(obj->name, &obj->location);

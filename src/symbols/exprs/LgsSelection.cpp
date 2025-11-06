@@ -6,6 +6,7 @@
 #include "types/iterables/LgsVec.h"
 
 #include <sstream>
+#include <llvm/IR/InlineAsm.h>
 
 Value* LgsSelection::loadIR(LgsLLVMGen& cg) {
     assert(0);
@@ -31,7 +32,12 @@ void LgsSelection::assign(LgsLLVMGen& cg, LgsExpr* expr) {
         cg.builder.CreateStore(insert, lExpr->IRValue);
     } else {
         freeOwner(cg);
-        cg.builder.CreateStore(rIR, IRValue);
+        if (const auto gv = llvm::dyn_cast<GlobalVariable>(rIR)) {
+            const auto gep = cg.builder.CreateInBoundsGEP(gv->getType(), gv, {cg.i32(0), cg.i32(0)});
+            cg.builder.CreateStore(gep, IRValue);
+        } else {
+            cg.builder.CreateStore(rIR, IRValue);
+        }
     }
 }
 

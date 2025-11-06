@@ -829,17 +829,7 @@ void LgsCodeGen::visitFieldSelection(LgsVariable* var, LgsExpr* parent, const bo
     }
 
     const auto field = var->ref.field;
-    if (parent->asTypeExpr()) {
-        const auto object = parent->type->asObject();
-        if (object && object->singleton) {
-            field->parentIRValue = object->singleton->IRValue;
-            field->IRValue = field->getGEP(cg);
-            var->IRValue = field->IRValue;
-            return;
-        }
-    }
-
-    if (parent->type->asEnum()) {
+    if (field->isEnumField) {
         var->IRValue = cg.usize(field->position);
         return;
     }
@@ -854,14 +844,27 @@ void LgsCodeGen::visitFieldSelection(LgsVariable* var, LgsExpr* parent, const bo
         return;
     }
 
-    field->parentIRValue = parent->IRValue;
-    field->IRValue = field->getGEP(cg);
+    if (parent->asTypeExpr()) {
+        const auto object = parent->type->asObject();
+        if (object && object->singleton) {
+            if (cg.IRModule->getName().str() == LGS_MAIN_FILE) {
+                field->parentIRValue = object->singleton->IRValue;
+            } else {
+                field->parentIRValue = cg.IRModule->getOrInsertGlobal(object->name, object->getIRType(cg));
+            }
+            field->IRValue = field->getGEP(cg);
+        }
+    } else {
+        field->parentIRValue = parent->IRValue;
+        field->IRValue = field->getGEP(cg);
+        assert(parent->IRValue && &parent->IRValue->getContext() == &cg.IRModule->getContext());
+    }
+
     if (field->type->asObject() || (field->type->asEnum() && !assign)) {
         var->IRValue = cg.builder.CreateLoad(cg.ptrTy(), field->IRValue);
     } else {
         var->IRValue = field->IRValue;
     }
-    assert(&parent->IRValue->getContext() == &cg.IRModule->getContext());
 }
 
 void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {

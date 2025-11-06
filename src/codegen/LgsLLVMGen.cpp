@@ -1,5 +1,7 @@
 #include "data/LgsDefinitions.h"
 #include "files/LgsFile.h"
+
+#include <iostream>
 #include <llvm/Support/FileSystem.h>
 #include <llvm/Bitcode/BitcodeWriter.h>
 #include <llvm/IR/Module.h>
@@ -65,6 +67,18 @@ Value* LgsLLVMGen::getIRStr(const std::string& value) {
 }
 
 Value* LgsLLVMGen::getPtrTo(Value* v) {
+    if (const auto gepInst = dyn_cast<llvm::GetElementPtrInst>(v)) {
+        const auto elementType = gepInst->getResultElementType();
+        if (elementType && (elementType->isPointerTy() || elementType->isArrayTy())) {
+            return builder.CreateLoad(ptrTy(), gepInst);
+        }
+        return v;
+    }
+    if (const auto ce = llvm::dyn_cast<llvm::ConstantExpr>(v)) {
+        if (ce->getOpcode() == llvm::Instruction::GetElementPtr) {
+            return builder.CreateLoad(ptrTy(), ce);
+        }
+    }
     if (v->getType()->isPointerTy()) return v;
     if (v->getType()->isIntegerTy() || v->getType()->isFloatingPointTy()) {
         const auto a = builder.CreateAlloca(v->getType());

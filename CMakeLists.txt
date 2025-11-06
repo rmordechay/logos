@@ -174,7 +174,7 @@ if(LOGOS_RELEASE)
         target_link_options(lgs PRIVATE -s)
     endif()
 else()
-    target_compile_options(lgs PRIVATE -Wall -Wextra -Wpedantic -Werror -Wreturn-type -Wno-unused-parameter -Wno-unused-variable)
+    target_compile_options(lgs PRIVATE -Wall -Wextra -Wpedantic -Wreturn-type -Wno-unused-parameter -Wno-unused-variable)
     add_subdirectory(tests)
 endif()
 

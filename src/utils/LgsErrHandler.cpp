@@ -1,7 +1,10 @@
 #include "utils/LgsErrHandler.h"
 #include "codegen/LgsLLVMGen.h"
 #include "data/LgsDefinitions.h"
+#include "logos/LgsApp.h"
 #include "utils/LgsUtils.h"
+
+#include <iostream>
 
 void LgsErrHandler::setUnsuccessful() {
     successful = false;
@@ -46,6 +49,13 @@ void LgsErrHandler::mergeErrors(LgsErrHandler& other) {
     }
 }
 
+void LgsErrHandler::mergeErrorsWithLock(LgsErrHandler& other) {
+    {
+        std::lock_guard lock(mtx);
+        mergeErrors(other);
+    }
+}
+
 void LgsErrHandler::exitWithErrors() const {
     for (size_t i = 0; i < errors.size(); ++i) {
         const auto err = errors[i];
@@ -55,7 +65,11 @@ void LgsErrHandler::exitWithErrors() const {
         const auto firstNonSpace = std::find_if(lineStr.begin(), lineStr.end(), [](const unsigned char c) { return !std::isspace(c); });
         const auto trimmedCount = std::distance(lineStr.begin(), firstNonSpace);
         auto errMsg = trim(lineStr);
-        errMsg += '\n' + std::string(column - trimmedCount - 2, '~');
+        int indent = column - trimmedCount - 2;
+        if (indent < 0) {
+            indent = 0;
+        }
+        errMsg += '\n' + std::string(indent, '~');
         errMsg += '^';
         int rest = lineStr.size() - column + 1;
         if (rest > 0) {

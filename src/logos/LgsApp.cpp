@@ -30,7 +30,7 @@ void LgsApp::compile() {
 }
 
 bool LgsApp::setup() {
-    if (paths.rootPath == "" && lgsCode.empty()) {
+    if (lgsCode.empty() && (paths.rootPath == "" || !fs::exists(paths.rootPath))) {
         errHandler.addError(E10086, {paths.rootPath});
         return false;
     }
@@ -177,10 +177,7 @@ bool LgsApp::analyse() {
             LgsSema semaAnalyser(file, globals);
             semaAnalyser.analyse();
             if (semaAnalyser.errHandler.successful) return;
-            {
-                std::lock_guard lock(mtx);
-                errHandler.mergeErrors(semaAnalyser.errHandler);
-            }
+            errHandler.mergeErrorsWithLock(semaAnalyser.errHandler);
         });
     }
     threadPool.wait();
@@ -303,10 +300,19 @@ void LgsApp::loadAppConfigs() {
 
 bool LgsApp::loadDeps() {
     for (auto package : appConfigFile->packages) {
-        const auto app = new LgsApp("/Users/r.mordechay/Desktop/Programming/logos-test");
-        if (!app->setup()) return false;
-        if (!app->loadConfigFile()) return false;
-        if (!app->parseHeaders()) return false;
+        const auto app = new LgsApp(paths.lgsPackagePath / "logos-tests");
+        if (!app->setup()) {
+            errHandler.mergeErrorsWithLock(app->errHandler);
+            return false;
+        }
+        if (!app->loadConfigFile()) {
+            errHandler.mergeErrorsWithLock(app->errHandler);
+            return false;
+        }
+        if (!app->parseHeaders()) {
+            errHandler.mergeErrorsWithLock(app->errHandler);
+            return false;
+        }
         globals.imports.push_back(app);
     }
     return true;

@@ -115,7 +115,7 @@ inline LgsBaseError E10082{"Loop range %s must be a number. Given: %s.", errCode
 inline LgsBaseError E10083{"Method %s is an object method but was called as a class method.", errCodeStart++};
 inline LgsBaseError E10084{"%s does not belong to an IO pair.", errCodeStart++};
 inline LgsBaseError E10085{"Parsing error.", errCodeStart++};
-inline LgsBaseError E10086{"Invalid Logos file path: %s.", errCodeStart++};
+inline LgsBaseError E10086{"Invalid Logos path: %s.", errCodeStart++};
 inline LgsBaseError E10087{"", errCodeStart++};
 inline LgsBaseError E10088{"Bad character.", errCodeStart++};
 inline LgsBaseError E10089{"%s can only be assigned to an instance of %s, not the object itself.", errCodeStart++};

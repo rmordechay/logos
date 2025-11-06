@@ -8,10 +8,11 @@ void LgsPaths::initPaths() {
     srcDir = rootPath / LGS_SRC_DIR;
     envsDir = rootPath / LGS_ENVS_DIR;
     buildDir = rootPath / LGS_BUILD_DIR;
+    appFilePath = rootPath / LGS_APP_FILE;
+    lgsPackagePath = rootPath / "../../lgs-packages";
     buildDirIR = buildDir / LGS_BUILD_IR_DIR;
     buildDirObjs = buildDir / LGS_BUILD_OBJECTS_DIR;
     cacheFile = buildDir / LGS_FILES_CACHE_FILE;
-    appFilePath = rootPath / LGS_APP_FILE;
     if (!fs::exists(buildDir)) fs::create_directories(buildDir);
     if (!fs::exists(buildDirIR)) fs::create_directories(buildDirIR);
     if (!fs::exists(buildDirObjs)) fs::create_directories(buildDirObjs);

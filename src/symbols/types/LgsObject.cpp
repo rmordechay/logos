@@ -78,7 +78,7 @@ Lgs_RTType LgsObject::getRTType() {
 }
 
 bool LgsObject::hasVirtuals() const {
-    return std::any_of(methods.begin(), methods.end(), [](const auto& pair) {
+    return std::ranges::any_of(methods, [](const auto& pair) {
         return pair.second->funcType->isVirtual;
     });
 }
@@ -114,6 +114,7 @@ std::string LgsObject::strFormatPart() const {
 }
 
 LgsObject* LgsObject::clone() {
+    assert(!singleton);
     const auto newObj = new LgsObject(*this);
     newObj->fields.clear();
     newObj->generics.clear();
