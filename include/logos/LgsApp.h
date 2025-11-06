@@ -43,7 +43,8 @@ public:
 
     LgsApp() = default;
     explicit LgsApp(const fs::path& rootPath) {
-        paths.rootPath = rootPath;
+        assert(fs::exists(rootPath));
+        paths.rootPath = fs::canonical(rootPath);
     }
 
     void compile();

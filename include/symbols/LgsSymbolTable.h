@@ -13,6 +13,6 @@ struct LgsSymbolTable {
 };
 
 struct LgsGlobals {
-    LgsSymbolTable symbols;
-    std::vector<LgsApp*> imports;
+    LgsSymbolTable symbolTable;
+    std::map<std::string, LgsApp*> imports;
 };

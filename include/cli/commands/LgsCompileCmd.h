@@ -1,21 +1,21 @@
 #pragma once
+#include "LgsRunCmd.h"
 #include "cli/LgsCliCmd.h"
 #include "types/iterables/LgsStr.h"
 #include "types/primitives/LgsInt.h"
 
-class LgsRunCmd : public LgsCliCmd {
+class LgsCompileCmd final : public LgsRunCmd {
 public:
-    LgsRunCmd(const int argc, char** argv) : LgsCliCmd(argc, argv) {}
-    void parseArgs(LgsApp& app, std::vector<const char*>& appArgs) const;
+    LgsCompileCmd(const int argc, char** argv) : LgsRunCmd(argc, argv) {}
     void run() override;
     LgsCliCmdHelp& getHelp() override;
 };
 
-inline LgsCliCmdHelp runCmdHelp{
-    .name = "run",
-    .usage = "lgs run <path> <options>",
-    .summary = "Runs Logos code.",
-    .desc = "The run command runs a Logos project or a single file.",
+inline LgsCliCmdHelp compileCmdHelp{
+    .name = "compile",
+    .usage = "lgs compile <path> <options>",
+    .summary = "Compiles Logos code.",
+    .desc = "The compile command compiles a Logos project or a single file.",
     .requiredArgs = {
         {
             .name = "<path>",
@@ -33,8 +33,8 @@ inline LgsCliCmdHelp runCmdHelp{
         },
     },
     .examples = {
-        "lgs run path/to/root",
-        "lgs run app.lgs",
-        "lgs run app.lgs -o3",
+        "lgs compile path/to/root",
+        "lgs compile app.lgs",
+        "lgs compile app.lgs -o3",
     }
 };

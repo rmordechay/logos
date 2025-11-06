@@ -80,7 +80,7 @@ void LgsSema::visitMainFile(LgsMainFile* mainFile) {
         }
         visitFunc(func);
     }
-    if (mainFile->funcs.find(LGS_MAIN_FUNC) == mainFile->funcs.end()) {
+    if (!mainFile->funcs.contains(LGS_MAIN_FUNC)) {
         errHandler.addError(E10000, &file->location, file->absPath, {});
     }
 }
@@ -790,20 +790,23 @@ void LgsSema::visitVariable(LgsVariable* variable) {
 
 void LgsSema::visitSelection(LgsSelection* selection) {
     const auto exprs = selection->exprs;
-    const auto firstExpr = exprs.front();
+    auto firstExpr = exprs.front();
     visitFirstSelection(firstExpr);
-    if (!firstExpr->type || firstExpr->type->isUnknown()) return;
-
+    const bool isImportName = firstExpr->isImportName;
+    if (!isImportName && !firstExpr->type) return;
+    if (isImportName) {
+        firstExpr = exprs[1];
+        visitFirstSelection(firstExpr);
+    }
     if (const auto var = firstExpr->asVariable()) {
         if (var->ref.symbolType == OBJECT) {
             const auto typeExpr = new LgsTypeExpr(var->ref.object);
             freeExpr(firstExpr);
-            selection->exprs[0] = typeExpr;
+            selection->exprs[isImportName] = typeExpr;
         }
     }
 
     visitInnerSelections(selection);
-
     const auto lastExpr = selection->lastExpr();
     if (selection->hasNullables && !lastExpr->type->asNullable()) {
         lastExpr->setType(new LgsNullable(lastExpr->type));
@@ -815,7 +818,18 @@ void LgsSema::visitSelection(LgsSelection* selection) {
 
 void LgsSema::visitFirstSelection(LgsExpr* firstExpr) {
     if (const auto variable = firstExpr->asVariable()) {
-        visitVariable(variable);
+        if (globals.imports.contains(variable->name)) {
+            variable->isImportName = true;
+            const auto importApp = globals.imports[variable->name];
+            auto& thisAppSymbols = globals.symbolTable.symbols;
+            auto& importAppSymbols = importApp->globals.symbolTable.symbols;
+            for (auto& [k, v] : importAppSymbols) {
+                assert(!thisAppSymbols.contains(k));
+                thisAppSymbols.insert_or_assign(k, v);
+            }
+        } else {
+            visitVariable(variable);
+        }
     } else if (const auto funcCall = firstExpr->asFuncCall()) {
         visitFuncCall(funcCall);
     } else if (const auto iterIndex = firstExpr->asIterIndex()) {
@@ -830,7 +844,7 @@ void LgsSema::visitFirstSelection(LgsExpr* firstExpr) {
 void LgsSema::visitInnerSelections(LgsSelection* selection) {
     const auto exprs = selection->exprs;
     selection->hasNullables = exprs.front()->type->asNullable();
-    for (size_t i = 0; i < exprs.size() - 1; ++i) {
+    for (size_t i = exprs.front()->isImportName; i < exprs.size() - 1; ++i) {
         const auto parentExpr = exprs[i];
         const auto childExpr = exprs[i + 1];
         if (const auto var = childExpr->asVariable()) {
@@ -1050,7 +1064,7 @@ void LgsSema::visitInstance(LgsInstance* instance) {
     // Args
     std::unordered_set<std::string> visited;
     for (auto& [argName, arg] : instance->args) {
-        if (visited.count(argName)) {
+        if (visited.contains(argName)) {
             errHandler.addError(E10054, &arg->location, file->absPath, {argName});
         }
         visited.insert(argName);
@@ -1069,7 +1083,7 @@ void LgsSema::visitInstance(LgsInstance* instance) {
 
     // Missing required fields
     for (const auto& field : instance->obj->fields) {
-        if (field->isConst && instance->args.find(field->name) == instance->args.end()) {
+        if (field->isConst && !instance->args.contains(field->name)) {
             errHandler.addError(E10029, &field->location, file->absPath, {field->name});
         }
     }
@@ -1186,7 +1200,7 @@ void LgsSema::visitLoopMetaVar(LgsLoopMetaVar* metaVar) {
         return errHandler.addError(E10061, &metaVar->location, file->absPath, {name});
     }
 
-    if (loop->metaVars.find(metaVar->varType) == loop->metaVars.end()) {
+    if (!loop->metaVars.contains(metaVar->varType)) {
         loop->metaVars[metaVar->varType] = metaVar;
     }
 }
@@ -1326,14 +1340,14 @@ void LgsSema::validateObjDuplicates(LgsType* type){
     for (const auto* f : type->fields) {
         if (!f) continue;
         const auto& name = f->name;
-        if (names.count(name)) {
+        if (names.contains(name)) {
             errHandler.addError(E10056, &type->location, file->absPath, {type->pname(), name});
             break;
         }
         names.insert(name);
     }
     for (const auto& [name, func] : type->methods) {
-        if (names.count(name)) {
+        if (names.contains(name)) {
             errHandler.addError(E10056, &type->location, file->absPath, {type->pname(), name});
             break;
         }
@@ -1378,7 +1392,7 @@ void LgsSema::addHeapExpr(LgsExpr* expr) {
 }
 
 LgsSymbol* LgsSema::getSymbol(const std::string& name, const LgsLocation* location) {
-    if (const auto globalSymbol = globals.symbols.getSymbol(name)) {
+    if (const auto globalSymbol = globals.symbolTable.getSymbol(name)) {
         return globalSymbol;
     }
     if (const auto fileSymbol = file->symbolTable.getSymbol(name)) {
@@ -1393,7 +1407,7 @@ LgsSymbol* LgsSema::getSymbol(const std::string& name, const LgsLocation* locati
 
 void LgsSema::addLocalSymbol(const LgsSymbol& newSymbol) {
     auto symbolName = *newSymbol.name;
-    const auto symbol = globals.symbols.getSymbol(symbolName);
+    const auto symbol = globals.symbolTable.getSymbol(symbolName);
     if (symbol && symbol->isBuiltin) {
         return errHandler.addError(E10053, newSymbol.location, file->absPath, {symbolName});
     }

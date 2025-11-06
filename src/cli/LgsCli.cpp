@@ -1,5 +1,6 @@
 #include "cli/LgsCli.h"
 #include "cli/commands/LgsAstCmd.h"
+#include "cli/commands/LgsCompileCmd.h"
 #include "cli/commands/LgsFormatCmd.h"
 #include "cli/commands/LgsGenerateCmd.h"
 #include "cli/commands/LgsLinterCmd.h"
@@ -14,7 +15,10 @@ void printLgsHelp();
 void LgsCli::execute() const {
     if (argc < 2) exitWithError(E40001);
     const std::string cmdStr = argv[1];
-    if (cmdStr == runCmdHelp.name) {
+    if (cmdStr == compileCmdHelp.name) {
+        LgsCompileCmd cmd(argc, argv);
+        runCmd(cmd);
+    } else if (cmdStr == runCmdHelp.name) {
         LgsRunCmd cmd(argc, argv);
         runCmd(cmd);
     } else if (cmdStr == testCmdHelp.name) {
@@ -51,6 +55,7 @@ void LgsCli::runCmd(LgsCliCmd& cmd) const {
 void printLgsHelp() {
     const std::string commands[][2] = {
         {runCmdHelp.name, runCmdHelp.summary},
+        {runCmdHelp.name, compileCmdHelp.summary},
         {testCmdHelp.name, testCmdHelp.summary},
         {astCmdHelp.name, astCmdHelp.summary},
         {formatCmdHelp.name, formatCmdHelp.summary},

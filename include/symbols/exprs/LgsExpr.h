@@ -34,9 +34,10 @@ public:
     bool isSpread = false;
     bool isMutable = false;
     bool isValueKnown = false;
+    bool isNullable = false;
+    bool isImportName = false;
     LgsValue* owner = nullptr;
     Value* destPtrValue = nullptr;
-    bool isNullable = false;
 
     explicit LgsExpr(LgsType* type = nullptr) : type(type) {}
     virtual LgsExpr* castTo(LgsType* toType, bool explicitCast = false);

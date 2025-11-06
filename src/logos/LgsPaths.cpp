@@ -1,7 +1,17 @@
 #include "logos/LgsPaths.h"
 #include "data/LgsConfigs.h"
 #include "data/LgsDefinitions.h"
+#include <iostream>
+#include <unistd.h>
 #include <llvm/TargetParser/Triple.h>
+#if defined(_WIN32)
+#include <windows.h>
+#elif defined(__APPLE__)
+#include <mach-o/dyld.h>
+#else
+#include <unistd.h>
+#include <limits.h>
+#endif
 
 void LgsPaths::initPaths() {
     assert(rootPath != "");
@@ -16,48 +26,25 @@ void LgsPaths::initPaths() {
     if (!fs::exists(buildDir)) fs::create_directories(buildDir);
     if (!fs::exists(buildDirIR)) fs::create_directories(buildDirIR);
     if (!fs::exists(buildDirObjs)) fs::create_directories(buildDirObjs);
-    findLgsLib();
+    findLgsRuntime();
     findCLibRoot();
     findCLibHeaders();
 }
 
-void LgsPaths::findLgsLib() {
-    const char* libName = nullptr;
-    switch (lgsConfigs.os) {
-    case MAC_OS:
-        libName = LIB_NAME_MACOS;
-        break;
-    case LINUX:
-        libName = LIB_NAME_LINUX;
-        break;
-    case WINDOWS:
-        libName = LIB_NAME_WIN;
-        break;
-    default:
-        assert(0);
-    }
-
-    std::vector<fs::path> searchPaths;
-    if (lgsConfigs.devMode) {
-        searchPaths.push_back(fs::current_path());
-        searchPaths.push_back(fs::current_path().parent_path());
-    } else {
-        searchPaths.push_back("/usr/local/lib");
-        searchPaths.push_back("/usr/lib");
-        if (const char* home = std::getenv("HOME")) {
-            searchPaths.push_back(fs::path(home) / ".local/lib");
-        }
-        if (const char* localAppData = std::getenv("LOCALAPPDATA")) {
-            searchPaths.push_back(fs::path(localAppData) / "Logos" / "lib");
-        }
-    }
-
-    for (const auto& path : searchPaths) {
-        if (!fs::exists(path / libName)) continue;
-        lgsLibPath = path;
-        return;
-    }
-    assert(0 && "Could not find Logos runtime library");
+void LgsPaths::findLgsRuntime() {
+char buf[1024];
+#if defined(_WIN32)
+    DWORD len = GetModuleFileNameA(NULL, buf, MAX_PATH);
+    if (len == 0 || len == MAX_PATH) assert(0);
+#elif defined(__APPLE__)
+    uint32_t size = sizeof(buf);
+    if (_NSGetExecutablePath(buf, &size) != 0) assert(0);
+#else
+    ssize_t len = readlink("/proc/self/exe", buf, sizeof(buf)-1);
+    if (len == -1) assert(0);
+    buf[len] = '\0';
+#endif
+    lgsRuntimePath = fs::path(buf).parent_path();
 }
 
 void LgsPaths::findCLibRoot() {

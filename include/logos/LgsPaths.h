@@ -11,14 +11,14 @@ struct LgsPaths {
     fs::path buildDirIR;
     fs::path buildDirObjs;
     fs::path cacheFile;
-    fs::path lgsLibPath;
+    fs::path lgsRuntimePath;
     fs::path lgsPackagePath;
     fs::path appFilePath;
     fs::path execFilePath;
     fs::path cLibRoot;
     fs::path cLibHeadersDir;
     void initPaths();
-    void findLgsLib();
+    void findLgsRuntime();
     void findCLibRoot();
     void findCLibHeaders();
 };

@@ -23,6 +23,7 @@ struct LgsAppConfigs {
     bool debugMode = false;
     bool isTestRun = false;
     bool isFileMode = false;
+    bool isLibrary = false;
     uint8_t optLevel = 2;
 
     void print() const;

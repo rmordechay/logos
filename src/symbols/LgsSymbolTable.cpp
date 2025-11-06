@@ -5,14 +5,14 @@
 
 void LgsSymbolTable::addSymbol(const LgsSymbol& symbol, LgsErrHandler* errHandler, const std::string& filePath) {
     const auto symbolName = *symbol.name;
-    if (symbols.find(symbolName) != symbols.end()) {
+    if (symbols.contains(symbolName)) {
         return errHandler->addError(E10011, symbol.location, filePath, {symbolName});
     }
     symbols[symbolName] = symbol;
 }
 
 LgsSymbol* LgsSymbolTable::getSymbol(const std::string& name) {
-    if (symbols.find(name) != symbols.end()) {
+    if (symbols.contains(name)) {
         return &symbols[name];
     }
     return nullptr;

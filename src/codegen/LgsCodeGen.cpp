@@ -796,9 +796,11 @@ void LgsCodeGen::visitVariable(LgsVariable* variable) {
 
 void LgsCodeGen::visitSelection(LgsSelection* selection, const bool assign) {
     const auto firstExpr = selection->exprs.front();
-    visitExpr(firstExpr);
-    assert(!firstExpr->IRValue || &firstExpr->IRValue->getContext() == &cg.IRModule->getContext());
-    for (size_t i = 0; i < selection->exprs.size() - 1; ++i) {
+    if (!firstExpr->isImportName) {
+        visitExpr(firstExpr);
+        assert(!firstExpr->IRValue || &firstExpr->IRValue->getContext() == &cg.IRModule->getContext());
+    }
+    for (size_t i = firstExpr->isImportName; i < selection->exprs.size() - 1; ++i) {
         const auto parent = selection->exprs[i];
         const auto child = selection->exprs[i + 1];
         if (const auto var = child->asVariable()) {
@@ -1010,7 +1012,7 @@ void LgsCodeGen::visitInstance(LgsInstance* instance) {
 
     // Zero values
     for (const auto field : instance->obj->fields) {
-        if (visited.count(field->name) || field->type->asEnum()) continue;
+        if (visited.contains(field->name) || field->type->asEnum()) continue;
         field->parentIRValue = instance->IRValue;
         if (!field->expr) {
             field->expr = field->type->getZeroValue();

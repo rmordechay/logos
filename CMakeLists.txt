@@ -51,6 +51,7 @@ set(LGS_SOURCE
     ${CMAKE_SOURCE_DIR}/src/cli/LgsCli.cpp
     ${CMAKE_SOURCE_DIR}/src/cli/LgsCliCmd.cpp
     ${CMAKE_SOURCE_DIR}/src/cli/commands/LgsRunCmd.cpp
+    ${CMAKE_SOURCE_DIR}/src/cli/commands/LgsCompileCmd.cpp
     ${CMAKE_SOURCE_DIR}/src/cli/commands/LgsAstCmd.cpp
     ${CMAKE_SOURCE_DIR}/src/cli/commands/LgsTestCmd.cpp
     ${CMAKE_SOURCE_DIR}/src/cli/commands/LgsLinterCmd.cpp

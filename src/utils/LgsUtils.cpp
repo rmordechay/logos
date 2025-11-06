@@ -91,7 +91,7 @@ bool isLLVMFile(const fs::directory_entry& entry) {
 }
 
 bool isLogosKeyword(const std::string& s) {
-    return LGS_KEYWORDS.find(s) != LGS_KEYWORDS.end();
+    return LGS_KEYWORDS.contains(s);
 }
 
 std::string getFileText(const fs::path& filePath) {

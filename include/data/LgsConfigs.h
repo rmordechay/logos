@@ -21,7 +21,7 @@ enum LgsArch {
 struct LgsConfigs {
     LgsOS os;
     LgsArch arch;
-    bool devMode = false;
+    bool devMode = true;
     bool printIR = true;
     bool writeIRFiles = false;
 

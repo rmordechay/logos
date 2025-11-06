@@ -209,13 +209,16 @@ bool LgsApp::generate() {
 }
 
 bool LgsApp::link() {
-    const LgsLinker linker(appConfigs, paths, srcFiles);
+    LgsLinker linker(appConfigs, paths, srcFiles);
+    for (auto& [_, app] : globals.imports) {
+        linker.externalLibs.push_back(app->paths.rootPath);
+    }
     return linker.link();
 }
 
 LgsFile* LgsApp::loadSrcFile(const std::string& fileCode, const fs::path& filePath, size_t fileID) {
     if (fileID == 0) fileID = getNextFileID();
-    LgsParser parser(fileID, filePath, paths, globals.symbols, fileCode);
+    LgsParser parser(fileID, filePath, paths, globals.symbolTable, fileCode);
     const auto file = parser.parseSrcFile(appConfigs.isTestRun);
     {
         std::lock_guard lock(mtx);
@@ -228,7 +231,7 @@ LgsFile* LgsApp::loadSrcFile(const std::string& fileCode, const fs::path& filePa
 }
 
 LgsFile* LgsApp::loadSrcFileHeaders(const std::string& fileCode, const fs::path& filePath, const size_t fileID) {
-    LgsParser parser(fileID, filePath, paths, globals.symbols, fileCode);
+    LgsParser parser(fileID, filePath, paths, globals.symbolTable, fileCode);
     const auto file = parser.parseSrcFileHeaders();
     {
         std::lock_guard lock(mtx);
@@ -244,7 +247,7 @@ bool LgsApp::loadConfigFile() {
     const auto appFileID = getNextFileID();
     paths.appFilePath = fs::canonical(paths.appFilePath);
     const auto fileCode = getFileText(paths.appFilePath);
-    LgsParser parser(appFileID, paths.appFilePath, paths, globals.symbols, fileCode);
+    LgsParser parser(appFileID, paths.appFilePath, paths, globals.symbolTable, fileCode);
     appConfigFile = parser.parseAppConfigFile();
     auto appConfigMetadata = appCache.files.front();
     assert(appConfigMetadata.type == LGS_APP_CONFIG_FILE);
@@ -263,7 +266,7 @@ bool LgsApp::loadEnvFiles() {
         threadPool.runTask([filePath, this, &fileMetadata] {
             const auto fileCode = getFileText(filePath);
             const auto fileID = getNextFileID();
-            LgsParser parser(fileID, fs::canonical(filePath), paths, globals.symbols, fileCode);
+            LgsParser parser(fileID, fs::canonical(filePath), paths, globals.symbolTable, fileCode);
             const auto envFile = parser.parseEnvFile();
             if (!envFile) return;
             fileMetadata.hash = envFile->hashFile();
@@ -286,6 +289,9 @@ void LgsApp::loadAppConfigs() {
         if (configNama == "activeEnv") {
             appConfigs.activeEnv = config->expr->asStrConst()->value;
         }
+        if (configNama == "library") {
+            appConfigs.isLibrary = config->expr->asIntConst()->value;
+        }
         if (configNama == "version") {
             auto value = config->expr->asStrConst()->value;
             int consumed = 0;
@@ -300,7 +306,7 @@ void LgsApp::loadAppConfigs() {
 
 bool LgsApp::loadDeps() {
     for (auto package : appConfigFile->packages) {
-        const auto app = new LgsApp(paths.lgsPackagePath / "logos-tests");
+        const auto app = new LgsApp(paths.lgsPackagePath / "logos-test");
         if (!app->setup()) {
             errHandler.mergeErrorsWithLock(app->errHandler);
             return false;
@@ -313,16 +319,21 @@ bool LgsApp::loadDeps() {
             errHandler.mergeErrorsWithLock(app->errHandler);
             return false;
         }
-        globals.imports.push_back(app);
+        LgsTypeResolver typeResolver(app->errHandler, app->globals);
+        if (!typeResolver.resolveGlobals(app->srcFiles, threadPool)) {
+            errHandler.mergeErrorsWithLock(typeResolver.errHandler);
+            return false;
+        }
+        globals.imports[app->appConfigs.name] = app;
     }
     return true;
 }
 
 void LgsApp::loadBuiltins() {
-    globals.symbols.addSymbol(LgsSymbol(new LgsSystem(), false, true), &errHandler);
-    globals.symbols.addSymbol(LgsSymbol(new LgsPrint(), false, true), &errHandler);
-    globals.symbols.addSymbol(LgsSymbol(new LgsTest(), false, true), &errHandler);
-    globals.symbols.addSymbol(LgsSymbol(new LgsReflect(), false, true), &errHandler);
+    globals.symbolTable.addSymbol(LgsSymbol(new LgsSystem(), false, true), &errHandler);
+    globals.symbolTable.addSymbol(LgsSymbol(new LgsPrint(), false, true), &errHandler);
+    globals.symbolTable.addSymbol(LgsSymbol(new LgsTest(), false, true), &errHandler);
+    globals.symbolTable.addSymbol(LgsSymbol(new LgsReflect(), false, true), &errHandler);
 }
 
 size_t LgsApp::getNextFileID() {
@@ -346,7 +357,7 @@ LgsApp::~LgsApp() {
         delete testFile;
     }
     testsFiles.clear();
-    for (const auto app : globals.imports) {
+    for (const auto& [_, app] : globals.imports) {
         delete app;
     }
     globals.imports.clear();

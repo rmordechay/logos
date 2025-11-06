@@ -1215,7 +1215,7 @@ LgsInstance* LgsParser::parseInstance() {
             if (!mustMatch(T_EQUAL)) break;
             const auto expr = parseExpr();
             if (!mustParse(expr)) continue;
-            if (instance->args.find(argNameToken.lexeme) == instance->args.end()) {
+            if (!instance->args.contains(argNameToken.lexeme)) {
                 instance->args[argNameToken.lexeme] = expr;
             } else {
                 errHandler.addError(E10054, &expr->location, filePath, {argNameToken.lexeme});
