@@ -1337,22 +1337,22 @@ LgsStrConst* LgsParser::parseStrConst() {
     return strConst;
 }
 
-LgsLoopMetaVar* LgsParser::parseLoopMetaVar() {
+LgsMetaVar* LgsParser::parseLoopMetaVar() {
     const auto metaVarToken = currentToken;
     if (matchAndConsume(T_FOR_I)) {
-        const auto metaVar = new LgsLoopMetaVar(metaVarToken.lexeme, FOR_I);
+        const auto metaVar = new LgsMetaVar(metaVarToken.lexeme, FOR_I);
         setLocation(metaVar->location, &metaVarToken);
         metaVar->setType(&LGS_SIZE);
         return metaVar;
     }
     if (matchAndConsume(T_FOR_IS_FIRST)) {
-        const auto metaVar = new LgsLoopMetaVar(metaVarToken.lexeme, FOR_IS_FIRST);
+        const auto metaVar = new LgsMetaVar(metaVarToken.lexeme, FOR_IS_FIRST);
         setLocation(metaVar->location, &metaVarToken);
         metaVar->setType(&LGS_BOOL);
         return metaVar;
     }
     if (matchAndConsume(T_FOR_IS_LAST)) {
-        const auto metaVar = new LgsLoopMetaVar(metaVarToken.lexeme, FOR_IS_LAST);
+        const auto metaVar = new LgsMetaVar(metaVarToken.lexeme, FOR_IS_LAST);
         setLocation(metaVar->location, &metaVarToken);
         metaVar->setType(&LGS_BOOL);
         return metaVar;

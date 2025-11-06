@@ -135,7 +135,7 @@ public:
     LgsFuncCall* parseFuncCall();
     LgsVectorExpr* parseVectorExpr();
     LgsStrConst* parseStrConst();
-    LgsLoopMetaVar* parseLoopMetaVar();
+    LgsMetaVar* parseLoopMetaVar();
     LgsExpr* parseConstant();
     LgsArrayExpr* parseArrayExpr();
     LgsHashMap* parseHashMap();

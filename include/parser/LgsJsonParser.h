@@ -2,7 +2,7 @@
 #include "types/LgsEnum.h"
 #include <sstream>
 
-class LgsLoopMetaVar;
+class LgsMetaVar;
 class LgsJson;
 class LgsTypeExpr;
 class LgsVectorExpr;
@@ -116,7 +116,7 @@ public:
     void parseIterIndex(LgsIterIndex* iterIndex);
     void parseIndex(LgsIterIndex* iterIndex);
     void parseSlice(LgsIterIndex* iterIndex);
-    void parseLoopMetaVar(LgsLoopMetaVar* metaVar);
+    void parseLoopMetaVar(LgsMetaVar* metaVar);
 
     void addString(const std::string& v);
     void addBool(bool v);

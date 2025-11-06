@@ -92,7 +92,7 @@ set(LGS_SOURCE
     ${CMAKE_SOURCE_DIR}/src/symbols/loops/LgsInfiniteLoop.cpp
     ${CMAKE_SOURCE_DIR}/src/symbols/loops/LgsRangeLoop.cpp
     ${CMAKE_SOURCE_DIR}/src/symbols/loops/LgsWhileLoop.cpp
-    ${CMAKE_SOURCE_DIR}/src/symbols/loops/LgsLoopMetaVar.cpp
+    ${CMAKE_SOURCE_DIR}/src/symbols/loops/LgsMetaVar.cpp
     ${CMAKE_SOURCE_DIR}/src/symbols/stmts/LgsIOPair.cpp
     ${CMAKE_SOURCE_DIR}/src/symbols/stmts/LgsIOStmt.cpp
     ${CMAKE_SOURCE_DIR}/src/symbols/stmts/LgsAssignment.cpp
@@ -144,7 +144,6 @@ set(RUNTIME_SOURCE
     ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_DArray.cpp
     ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_System.cpp
     ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_Runtime.cpp
-    ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_Stack.cpp
     ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_Print.cpp
     ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_Arena.cpp
     ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_Set.cpp

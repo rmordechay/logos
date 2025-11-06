@@ -40,7 +40,7 @@
 #include "types/LgsNullable.h"
 #include "loops/LgsForeachLoop.h"
 #include "loops/LgsForLoop.h"
-#include "loops/LgsLoopMetaVar.h"
+#include "loops/LgsMetaVar.h"
 #include "loops/LgsRangeLoop.h"
 #include "stmts/LgsAssignment.h"
 #include "stmts/LgsIOPair.h"
@@ -574,67 +574,66 @@ void LgsSema::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
         return errHandler.addError(E10076, &l->location, file->absPath, {binaryExpr->opText, ltype->pname(), rtype->pname()});
     }
     binaryExpr->setType(type);
-    if (binaryExpr->left->isValueKnown && binaryExpr->right->isValueKnown) {
-        binaryExpr->isValueKnown = true;
-        switch (binaryExpr->op) {
-        case ADD:
-            binaryExpr->results = binaryExpr->left->type->addConst(binaryExpr->left, binaryExpr->right);
-            break;
-        case SUB:
-            binaryExpr->results = binaryExpr->left->type->subConst(binaryExpr->left, binaryExpr->right);
-            break;
-        case MUL:
-            binaryExpr->results = binaryExpr->left->type->mulConst(binaryExpr->left, binaryExpr->right);
-            break;
-        case DIV:
-            binaryExpr->results = binaryExpr->left->type->divConst(binaryExpr->left, binaryExpr->right);
-            break;
-        case MODULO:
-            binaryExpr->results = binaryExpr->left->type->modConst(binaryExpr->left, binaryExpr->right);
-            break;
-        case BIT_AND:
-            binaryExpr->results = binaryExpr->left->type->bitAndConst(binaryExpr->left, binaryExpr->right);
-            break;
-        case BIT_OR:
-            binaryExpr->results = binaryExpr->left->type->bitOrConst(binaryExpr->left, binaryExpr->right);
-            break;
-        case BIT_XOR:
-            binaryExpr->results = binaryExpr->left->type->bitXorConst(binaryExpr->left, binaryExpr->right);
-            break;
-        case LSHIFT:
-            binaryExpr->results = binaryExpr->left->type->lshiftConst(binaryExpr->left, binaryExpr->right);
-            break;
-        case RSHIFT:
-            binaryExpr->results = binaryExpr->left->type->rshiftConst(binaryExpr->left, binaryExpr->right);
-            break;
-        case EQ:
-            binaryExpr->results = binaryExpr->left->type->eqConst(binaryExpr->left, binaryExpr->right);
-            break;
-        case NE:
-            binaryExpr->results = binaryExpr->left->type->neConst(binaryExpr->left, binaryExpr->right);
-            break;
-        case LT:
-            binaryExpr->results = binaryExpr->left->type->ltConst(binaryExpr->left, binaryExpr->right);
-            break;
-        case GT:
-            binaryExpr->results = binaryExpr->left->type->gtConst(binaryExpr->left, binaryExpr->right);
-            break;
-        case GE:
-            binaryExpr->results = binaryExpr->left->type->geConst(binaryExpr->left, binaryExpr->right);
-            break;
-        case LE:
-            binaryExpr->results = binaryExpr->left->type->leConst(binaryExpr->left, binaryExpr->right);
-            break;
-        case AND:
-            binaryExpr->results = binaryExpr->left->type->andConst(binaryExpr->left, binaryExpr->right);
-            break;
-        case OR:
-            binaryExpr->results = binaryExpr->left->type->orConst(binaryExpr->left, binaryExpr->right);
-            break;
-        case IN:
-        case NOOP:
-            break;
-        }
+    if (!binaryExpr->left->isValueKnown || !binaryExpr->right->isValueKnown) return;
+    binaryExpr->isValueKnown = true;
+    switch (binaryExpr->op) {
+    case ADD:
+        binaryExpr->results = binaryExpr->type->addConst(binaryExpr->left, binaryExpr->right);
+        break;
+    case SUB:
+        binaryExpr->results = binaryExpr->type->subConst(binaryExpr->left, binaryExpr->right);
+        break;
+    case MUL:
+        binaryExpr->results = binaryExpr->type->mulConst(binaryExpr->left, binaryExpr->right);
+        break;
+    case DIV:
+        binaryExpr->results = binaryExpr->type->divConst(binaryExpr->left, binaryExpr->right);
+        break;
+    case MODULO:
+        binaryExpr->results = binaryExpr->type->modConst(binaryExpr->left, binaryExpr->right);
+        break;
+    case BIT_AND:
+        binaryExpr->results = binaryExpr->type->bitAndConst(binaryExpr->left, binaryExpr->right);
+        break;
+    case BIT_OR:
+        binaryExpr->results = binaryExpr->type->bitOrConst(binaryExpr->left, binaryExpr->right);
+        break;
+    case BIT_XOR:
+        binaryExpr->results = binaryExpr->type->bitXorConst(binaryExpr->left, binaryExpr->right);
+        break;
+    case LSHIFT:
+        binaryExpr->results = binaryExpr->type->lshiftConst(binaryExpr->left, binaryExpr->right);
+        break;
+    case RSHIFT:
+        binaryExpr->results = binaryExpr->type->rshiftConst(binaryExpr->left, binaryExpr->right);
+        break;
+    case EQ:
+        binaryExpr->results = binaryExpr->type->eqConst(binaryExpr->left, binaryExpr->right);
+        break;
+    case NE:
+        binaryExpr->results = binaryExpr->type->neConst(binaryExpr->left, binaryExpr->right);
+        break;
+    case LT:
+        binaryExpr->results = binaryExpr->type->ltConst(binaryExpr->left, binaryExpr->right);
+        break;
+    case GT:
+        binaryExpr->results = binaryExpr->type->gtConst(binaryExpr->left, binaryExpr->right);
+        break;
+    case GE:
+        binaryExpr->results = binaryExpr->type->geConst(binaryExpr->left, binaryExpr->right);
+        break;
+    case LE:
+        binaryExpr->results = binaryExpr->type->leConst(binaryExpr->left, binaryExpr->right);
+        break;
+    case AND:
+        binaryExpr->results = binaryExpr->type->andConst(binaryExpr->left, binaryExpr->right);
+        break;
+    case OR:
+        binaryExpr->results = binaryExpr->type->orConst(binaryExpr->left, binaryExpr->right);
+        break;
+    case IN:
+    case NOOP:
+        break;
     }
 }
 
@@ -1169,7 +1168,7 @@ void LgsSema::visitSlice(LgsIterIndex* iterIndex) {
     }
 }
 
-void LgsSema::visitLoopMetaVar(LgsLoopMetaVar* metaVar) {
+void LgsSema::visitLoopMetaVar(LgsMetaVar* metaVar) {
     const auto loop = stack.currentLoop();
     if (!loop) {
         return errHandler.addError(E10060, &metaVar->location, file->absPath, {});

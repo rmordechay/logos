@@ -341,7 +341,7 @@ void LgsFormatter::formatSlice(LgsIterIndex* iterIndex) {
     assert(0);
 }
 
-void LgsFormatter::formatLoopMetaVar(LgsLoopMetaVar* metaVar) {
+void LgsFormatter::formatLoopMetaVar(LgsMetaVar* metaVar) {
     assert(0);
 }
 

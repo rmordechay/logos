@@ -57,6 +57,7 @@ public:
     Value* callFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes = {}, const std::vector<Value*>& args = {}, bool isVariadic = false);
     Value* callIntrinsics(llvm::Intrinsic::ID name, const std::vector<Value*>& args, const std::vector<Type*>& types = {});
     Value* callLgsFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes = {}, const std::vector<Value*>& args = {});
+    Value* callRuntimeFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes = {}, const std::vector<Value*>& args = {});
 
     // System
     Value* callPrintf(const std::vector<Value*>& args);
@@ -84,7 +85,6 @@ public:
     Type* floatTy();
     Type* doubleTy();
     Type* voidTy();
-    Type* iNTy(unsigned n);
     IntegerType* sizeTy();
     PointerType* ptrTy();
 

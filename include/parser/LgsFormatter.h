@@ -6,7 +6,7 @@ class LgsSubType;
 class LgsEnum;
 class LgsIntConst;
 class LgsNull;
-class LgsLoopMetaVar;
+class LgsMetaVar;
 class LgsJson;
 class LgsTypeExpr;
 class LgsVectorExpr;
@@ -123,7 +123,7 @@ public:
     void formatIterIndex(LgsIterIndex* iterIndex);
     void formatIndex(LgsIterIndex* iterIndex);
     void formatSlice(LgsIterIndex* iterIndex);
-    void formatLoopMetaVar(LgsLoopMetaVar* metaVar);
+    void formatLoopMetaVar(LgsMetaVar* metaVar);
     void insert(const std::string& text);
     void newLine(bool withIndent = false, uint8_t lines = 1);
 };

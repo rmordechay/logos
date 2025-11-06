@@ -1,0 +1,21 @@
+stages:
+  - build
+
+variables:
+  BUILD_DIR: build
+  DIST_DIR: dist
+
+build_x86_64:
+  stage: build
+  image: ubuntu:24.04
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev"'
+      when: always
+    - when: never
+  script:
+    - mkdir -p $DIST_DIR
+    - bash install/install.sh -B $BUILD_DIR -D $DIST_DIR
+  artifacts:
+    paths:
+      - dist/
+

@@ -7,7 +7,7 @@ class LgsNull;
 class LgsJson;
 class LgsCast;
 class LgsTypeExpr;
-class LgsLoopMetaVar;
+class LgsMetaVar;
 class LgsIntConst;
 class LgsVectorExpr;
 class LgsPrefixExpr;
@@ -69,7 +69,7 @@ public:
     LgsStrConst* asStrConst();
     LgsVectorExpr* asVectorExpr();
     LgsIntConst* asIntConst();
-    LgsLoopMetaVar* asLoopMetaVar();
+    LgsMetaVar* asLoopMetaVar();
     LgsBinaryExpr* asBinExpr();
     ~LgsExpr() override = default;
 };

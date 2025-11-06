@@ -162,6 +162,10 @@ Value* LgsLLVMGen::callLgsFunc(const std::string& funcName, Type* rt, const std:
     return callFunc(LGS_NAME_PREFIX + funcName, rt, paramTypes, args);
 }
 
+Value* LgsLLVMGen::callRuntimeFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes, const std::vector<Value*>& args) {
+    return callFunc(LGS_RUNTIME_PREFIX + funcName, rt, paramTypes, args);
+}
+
 Value* LgsLLVMGen::callPrintf(const std::vector<Value*>& args) {
     return callFunc("printf", i32Ty(), {ptrTy()}, args, true);
 }
@@ -197,23 +201,21 @@ Value* LgsLLVMGen::callMalloc(Value* size, const bool isOwner, const Lgs_RTType 
 }
 
 void LgsLLVMGen::callStackPush(const bool hasDefers, const bool needsCleanup) {
-    if (needsCleanup || hasDefers) {
-        callLgsFunc("Stack_push", voidTy());
-    }
+    if (!needsCleanup && !hasDefers) return;
+    callRuntimeFunc("push", voidTy());
 }
 
 void LgsLLVMGen::callPopStack(const bool hasDefers, const bool needsCleanup) {
-    if (needsCleanup || hasDefers) {
-        callLgsFunc("Stack_pop", voidTy(), {i1Ty()}, {i1(needsCleanup)});
-    }
+    if (!needsCleanup && !hasDefers) return;
+    callRuntimeFunc("pop", voidTy(), {i1Ty()}, {i1(needsCleanup)});
 }
 
 void LgsLLVMGen::callAddToVTable(Value* instance, Value* key, Value* ptr) {
-    callLgsFunc("VTable_add", voidTy(), {ptrTy(), ptrTy(), ptrTy()}, {instance, key, ptr});
+    callRuntimeFunc("addToVTable", voidTy(), {ptrTy(), ptrTy(), ptrTy()}, {instance, key, ptr});
 }
 
 Value* LgsLLVMGen::callGetFromVTable(Value* instance, Value* key) {
-    return callLgsFunc("VTable_get", ptrTy(), {ptrTy(), ptrTy()}, {instance, key});
+    return callRuntimeFunc("getFromVTable", ptrTy(), {ptrTy(), ptrTy()}, {instance, key});
 }
 
 void LgsLLVMGen::addNullTerminate(Value* strPtr, Value* pos) {
@@ -221,8 +223,8 @@ void LgsLLVMGen::addNullTerminate(Value* strPtr, Value* pos) {
 }
 
 void LgsLLVMGen::addHeap(const bool isOwner, const Lgs_RTType type, Value* ptr) {
-    if (isOwner) callLgsFunc("Stack_addOwner", voidTy(), {ptrTy(), i32Ty()}, {ptr, i32(type)});
-    else callLgsFunc("Stack_addOrphan", voidTy(), {ptrTy(), i32Ty()}, {ptr, i32(type)});
+    if (isOwner) callRuntimeFunc("addOwner", voidTy(), {ptrTy(), i32Ty()}, {ptr, i32(type)});
+    else callRuntimeFunc("addOrphan", voidTy(), {ptrTy(), i32Ty()}, {ptr, i32(type)});
 }
 
 Type* LgsLLVMGen::i1Ty() {
@@ -255,10 +257,6 @@ Type* LgsLLVMGen::doubleTy() {
 
 Type* LgsLLVMGen::voidTy() {
     return Type::getVoidTy(context);
-}
-
-Type* LgsLLVMGen::iNTy(const unsigned n) {
-    return IntegerType::getIntNTy(context, n);
 }
 
 IntegerType* LgsLLVMGen::sizeTy() {
