@@ -144,7 +144,6 @@ set(RUNTIME_SOURCE
     ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_DArray.cpp
     ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_System.cpp
     ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_Runtime.cpp
-    ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_Stack.cpp
     ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_Print.cpp
     ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_Arena.cpp
     ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_Set.cpp

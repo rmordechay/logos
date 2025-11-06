@@ -3,9 +3,10 @@
 #include "Lgs_Types.h"
 #include "data/LgsConfigs.h"
 
-typedef void (*Func)(void*);
+typedef void (*Thunk)(void*);
+
 struct Lgs_ThunkFunc {
-    Func func;
+    Thunk func;
     void* ctx;
 };
 
@@ -28,14 +29,4 @@ struct Lgs_StackFrame {
 struct Lgs_Stack {
     int stackIndex;
     Lgs_StackFrame frames[STACK_CAPACITY];
-
-    void push();
-    void pop(bool cleanup);
-    void callDefers() const;
-    void addCoro(void* funcPtr, void* ctx);
-    void addDefer(void* funcPtr, void* ctx);
-    void addOwner(void* ptr, Lgs_RTType type);
-    void addOrphan(void* ptr, Lgs_RTType type);
-    void removeOwner(const void* owner);
-    void funcCleanup();
 };

@@ -2,6 +2,7 @@
 
 #define LGS_FILE_EXTENSION ".lgs"
 #define LGS_NAME_PREFIX "Lgs_"
+#define LGS_RUNTIME_PREFIX "Lgs_Runtime_"
 #define LGS_CORO_SUFFIX "_co"
 #define LGS_SRC_DIR "src"
 #define LGS_ENVS_DIR "envs"

@@ -126,7 +126,7 @@ void LgsCodeGen::visitMainFunc(LgsMainFunc* func) {
     initMainArgs(func);
     visitStmtsBlock(func->stmtsBlock);
     createEpilogue(func);
-    cg.callLgsFunc("Runtime_close", cg.voidTy());
+    cg.callRuntimeFunc("close", cg.voidTy());
     cg.builder.CreateRet(cg.i32(EXIT_SUCCESS));
     stack.exitScope();
 }
@@ -1109,7 +1109,7 @@ void LgsCodeGen::createPrologue(LgsFunc* func) {
     const auto entryBlock = cg.createBlock(BLOCK_NAME_ENTRY, currentIRFunc);
     cg.builder.SetInsertPoint(entryBlock);
     if (func->funcType->name == LGS_MAIN_FUNC) {
-        cg.callLgsFunc("Runtime_init", cg.voidTy());
+        cg.callRuntimeFunc("init", cg.voidTy());
     }
     cg.callStackPush(func->hasDefers, func->needsCleanup());
     // if (func->funcType->isVariadic) {

@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include <cstddef>
 
 enum Lgs_RTType {
     RTT_UNKNOWN,

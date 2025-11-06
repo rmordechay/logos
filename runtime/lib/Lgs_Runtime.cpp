@@ -1,8 +1,11 @@
+#include "Lgs_DArray.h"
 #include "Lgs_Scheduler.h"
 #include "Lgs_Stack.h"
 #include "Lgs_Types.h"
 #include <cassert>
 #include <map>
+#include "Lgs_Map.h"
+#include "Lgs_helpers.h"
 #include <string>
 #include <unistd.h>
 
@@ -22,51 +25,69 @@ extern "C" void Lgs_Runtime_close() {
     // runtime.scheduler.shutdown();
 }
 
-extern "C" void Lgs_Stack_addOwner(void* ptr, const Lgs_RTType type) {
-    runtime.stack.addOwner(ptr, type);
+extern "C" void Lgs_Runtime_addOwner(void* ptr, const Lgs_RTType type) {
+    const auto ownerIndex = runtime.stack.frames[runtime.stack.stackIndex].ownersCount++;
+    runtime.stack.frames[runtime.stack.stackIndex].owners[ownerIndex] = Lgs_Alloc{ptr, type};
 }
 
-extern "C" void Lgs_Stack_addOrphan(void* ptr, const Lgs_RTType type) {
-    runtime.stack.addOrphan(ptr, type);
+extern "C" void Lgs_Runtime_addOrphan(void* ptr, const Lgs_RTType type) {
+    const auto ownerIndex = runtime.stack.frames[runtime.stack.stackIndex].orphansCount++;
+    runtime.stack.frames[runtime.stack.stackIndex].orphans[ownerIndex] = Lgs_Alloc{ptr, type};
 }
 
-extern "C" void Lgs_Stack_addDefer(void* funcPtr, void* ctx) {
-    runtime.stack.addDefer(funcPtr, ctx);
+extern "C" void Lgs_Runtime_addDefer(void* funcPtr, void* ctx) {
+    const auto deferFunc = reinterpret_cast<Thunk>(funcPtr);
+    const auto deferIndex = runtime.stack.frames[runtime.stack.stackIndex].defersCount++;
+    runtime.stack.frames[runtime.stack.stackIndex].defers[deferIndex] = Lgs_ThunkFunc{deferFunc, ctx};
 }
 
-extern "C" void Lgs_Stack_removeOwner(const void* owner) {
-    runtime.stack.removeOwner(owner);
+extern "C" void Lgs_Runtime_removeOwner(const void* owner) {
+    auto& stackFrame = runtime.stack.frames[runtime.stack.stackIndex];
+    for (size_t i = 0; i < stackFrame.ownersCount; i++) {
+        if (stackFrame.owners[i].ptr != owner) continue;
+        freeRTType(stackFrame.owners[i].ptr, stackFrame.owners[i].type);
+        for (size_t j = i; j < stackFrame.ownersCount - 1; j++) {
+            stackFrame.owners[j] = stackFrame.owners[j + 1];
+        }
+        break;
+    }
 }
 
-extern "C" void Lgs_Stack_push() {
+extern "C" void Lgs_Runtime_push() {
     runtime.stack.stackIndex++;
 }
 
-extern "C" void Lgs_Stack_pop(const bool cleanup) {
-    runtime.stack.pop(cleanup);
+extern "C" void Lgs_Runtime_pop(const bool cleanup) {
+    if (cleanup) funcCleanup(runtime.stack);
+    runtime.stack.stackIndex--;
 }
 
-extern "C" void Lgs_Stack_callDefers() {
-    runtime.stack.callDefers();
+extern "C" void Lgs_Runtime_callDefers() {
+    const auto& top = runtime.stack.frames[runtime.stack.stackIndex];
+    for (size_t i = 0; i < LOCALS_CAPACITY; ++i) {
+        const auto [func, ctx] = top.defers[i];
+        if (!func) continue;
+        func(ctx);
+    }
 }
 
-extern "C" void Lgs_Scheduler_addCoro(void* funcPtr, void* ctx) {
-    runtime.scheduler.spawn(reinterpret_cast<Func>(funcPtr), ctx);
+extern "C" void Lgs_Runtime_addCoro(void* funcPtr, void* ctx) {
+    runtime.scheduler.spawn(reinterpret_cast<Thunk>(funcPtr), ctx);
 }
 
-extern "C" void Lgs_Scheduler_yield() {
+extern "C" void Lgs_Runtime_yield() {
     runtime.scheduler.yield();
 }
 
-extern "C" bool Lgs_Scheduler_shouldYield() {
+extern "C" bool Lgs_Runtime_shouldYield() {
     return runtime.scheduler.shouldYield();
 }
 
-extern "C" void Lgs_VTable_add(void* instancePtr, const char* name, void* ptr) {
+extern "C" void Lgs_Runtime_addToVTable(void* instancePtr, const char* name, void* ptr) {
     runtime.vtable[instancePtr].emplace(name, ptr);
 }
 
-extern "C" void* Lgs_VTable_get(void* instancePtr, const char* name) {
+extern "C" void* Lgs_Runtime_getFromVTable(void* instancePtr, const char* name) {
     const auto instance = runtime.vtable.find(instancePtr);
     if (instance == runtime.vtable.end()) assert(0);
     const auto method = instance->second.find(name);
