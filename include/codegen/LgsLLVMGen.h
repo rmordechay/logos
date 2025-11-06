@@ -84,7 +84,6 @@ public:
     Type* floatTy();
     Type* doubleTy();
     Type* voidTy();
-    Type* iNTy(unsigned n);
     IntegerType* sizeTy();
     PointerType* ptrTy();
 

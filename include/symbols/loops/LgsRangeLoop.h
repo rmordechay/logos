@@ -1,4 +1,5 @@
 #pragma once
+#include "codegen/LgsCodeGen.h"
 #include "loops/LgsForLoop.h"
 
 class LgsRangeLoop final : public LgsForLoop {

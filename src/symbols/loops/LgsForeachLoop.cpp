@@ -3,7 +3,7 @@
 #include "utils/LgsUtils.h"
 
 Value* LgsForeachLoop::loopStart(LgsLLVMGen& cg) {
-    return cg.sizeZero();
+    return cg.i64Zero();
 }
 
 Value* LgsForeachLoop::loopEnd(LgsLLVMGen& cg) {

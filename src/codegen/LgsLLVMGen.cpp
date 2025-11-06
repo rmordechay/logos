@@ -257,10 +257,6 @@ Type* LgsLLVMGen::voidTy() {
     return Type::getVoidTy(context);
 }
 
-Type* LgsLLVMGen::iNTy(const unsigned n) {
-    return IntegerType::getIntNTy(context, n);
-}
-
 IntegerType* LgsLLVMGen::sizeTy() {
     return IRModule->getDataLayout().getIntPtrType(context);
 }

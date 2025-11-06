@@ -19,22 +19,19 @@ public:
     std::unordered_map<LgsLoopMetaVarType, LgsLoopMetaVar*> metaVars;
     llvm::AllocaInst* iPtr = nullptr;
     Value* iValue = nullptr;
-
+    Value* isReversed = nullptr;
     LgsStmtsBlock* stmtsBlock = nullptr;
     BasicBlock* IRCondBlock = nullptr;
     BasicBlock* IRBodyBlock = nullptr;
     BasicBlock* IRExitBlock = nullptr;
 
-    LgsForeachLoop* asForeachLoop();
-    LgsRangeLoop* asRangeLoop();
-    LgsInfiniteLoop* asInfiniteLoop();
-    LgsWhileLoop* asWhileLoop();
-
     virtual void setBlocks(LgsLLVMGen& cg);
     virtual void incAndJumpToCond(LgsLLVMGen& cg);
     virtual Value* loopStart(LgsLLVMGen& cg) = 0;
     virtual Value* loopEnd(LgsLLVMGen& cg) = 0;
-    Value* loadIndex(LgsLLVMGen& cg) const;
-
+    LgsForeachLoop* asForeachLoop();
+    LgsRangeLoop* asRangeLoop();
+    LgsInfiniteLoop* asInfiniteLoop();
+    LgsWhileLoop* asWhileLoop();
     ~LgsForLoop() override;
 };

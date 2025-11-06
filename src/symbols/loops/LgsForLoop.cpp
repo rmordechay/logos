@@ -9,15 +9,6 @@
 #include "stmts/LgsVarDec.h"
 #include "utils/LgsUtils.h"
 
-LgsForeachLoop* LgsForLoop::asForeachLoop() { return dynamic_cast<LgsForeachLoop*>(this);}
-LgsRangeLoop* LgsForLoop::asRangeLoop() { return dynamic_cast<LgsRangeLoop*>(this);}
-LgsInfiniteLoop* LgsForLoop::asInfiniteLoop() { return dynamic_cast<LgsInfiniteLoop*>(this);}
-LgsWhileLoop* LgsForLoop::asWhileLoop() { return dynamic_cast<LgsWhileLoop*>(this);}
-
-Value* LgsForLoop::loadIndex(LgsLLVMGen& cg) const {
-    return cg.builder.CreateLoad(cg.sizeTy(), iPtr);
-}
-
 void LgsForLoop::setBlocks(LgsLLVMGen& cg) {
     IRCondBlock = cg.createBlock(BLOCK_NAME_LOOP_COND);
     IRBodyBlock = cg.createBlock(BLOCK_NAME_LOOP_BODY);
@@ -25,11 +16,29 @@ void LgsForLoop::setBlocks(LgsLLVMGen& cg) {
 }
 
 void LgsForLoop::incAndJumpToCond(LgsLLVMGen& cg) {
-    if (cg.lastInstTerminator()) return;
-    iValue = loadIndex(cg);
-    const auto inc = cg.builder.CreateAdd(iValue, cg.usize(1));
-    cg.builder.CreateStore(inc, iPtr);
+    const auto currentValue = cg.builder.CreateLoad(cg.i32Ty(), iPtr);
+    const auto constOne = ConstantInt::get(currentValue->getType(), 1);
+    const auto incValue = cg.builder.CreateAdd(currentValue, constOne);
+    const auto decValue = cg.builder.CreateSub(currentValue, constOne);
+    const auto newValue = cg.builder.CreateSelect(isReversed, incValue, decValue);
+    cg.builder.CreateStore(newValue, iPtr);
     cg.builder.CreateBr(IRCondBlock);
+}
+
+LgsForeachLoop* LgsForLoop::asForeachLoop() {
+    return dynamic_cast<LgsForeachLoop*>(this);
+}
+
+LgsRangeLoop* LgsForLoop::asRangeLoop() {
+    return dynamic_cast<LgsRangeLoop*>(this);
+}
+
+LgsInfiniteLoop* LgsForLoop::asInfiniteLoop() {
+    return dynamic_cast<LgsInfiniteLoop*>(this);
+}
+
+LgsWhileLoop* LgsForLoop::asWhileLoop() {
+    return dynamic_cast<LgsWhileLoop*>(this);
 }
 
 LgsForLoop::~LgsForLoop() {
