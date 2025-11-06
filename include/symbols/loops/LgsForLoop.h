@@ -1,5 +1,5 @@
 #pragma once
-#include "loops/LgsLoopMetaVar.h"
+#include "loops/LgsMetaVar.h"
 #include "stmts/LgsStmt.h"
 
 namespace llvm {
@@ -16,7 +16,6 @@ class LgsStmtsBlock;
 class LgsForLoop : public LgsStmt {
 public:
     std::vector<LgsVarDec*> loopVars;
-    std::unordered_map<LgsLoopMetaVarType, LgsLoopMetaVar*> metaVars;
     llvm::AllocaInst* iPtr = nullptr;
     Value* iValue = nullptr;
     Value* isReversed = nullptr;
@@ -24,6 +23,7 @@ public:
     BasicBlock* IRCondBlock = nullptr;
     BasicBlock* IRBodyBlock = nullptr;
     BasicBlock* IRExitBlock = nullptr;
+    std::unordered_map<LgsMetaVarType, LgsMetaVar*> metaVars;
 
     virtual void setBlocks(LgsLLVMGen& cg);
     virtual void incAndJumpToCond(LgsLLVMGen& cg);

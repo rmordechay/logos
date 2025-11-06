@@ -475,7 +475,7 @@ void LgsJsonParser::parseSlice(LgsIterIndex* iterIndex) {
     assert(0);
 }
 
-void LgsJsonParser::parseLoopMetaVar(LgsLoopMetaVar* metaVar) {
+void LgsJsonParser::parseLoopMetaVar(LgsMetaVar* metaVar) {
     assert(0);
 }
 

@@ -34,7 +34,7 @@ class LgsReturn;
 class LgsForeachLoop;
 class LgsRangeLoop;
 class LgsStmtsBlock;
-class LgsLoopMetaVar;
+class LgsMetaVar;
 class LgsStmt;
 class LgsMainFile;
 class LgsApp;
@@ -64,7 +64,6 @@ public:
     LgsPaths& paths;
     LgsAppConfigs& appConfigs;
     Function* currentIRFunc = nullptr;
-    static std::atomic<size_t> namesCounter;
 
     explicit LgsCodeGen(LgsFile& file, LgsAppConfigs& appConfigs, LgsPaths& paths)
         : file(file), cg(file.cg), paths(paths), appConfigs(appConfigs) {
@@ -86,7 +85,7 @@ public:
     void visitRangeLoop(LgsRangeLoop* loop);
     void visitForeachLoop(LgsForeachLoop* loop);
     void visitInfiniteLoop(const LgsInfiniteLoop* loop) const;
-    void visitLoopMetaVar(LgsLoopMetaVar* metaVar);
+    void visitLoopMetaVar(LgsMetaVar* metaVar);
     void visitWhileLoop(const LgsWhileLoop* loop);
     void visitVarDec(LgsVarDec* varDec);
     void visitAssignment(const LgsAssignment* assignment);

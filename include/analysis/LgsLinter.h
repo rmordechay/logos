@@ -4,7 +4,7 @@ class LgsSubType;
 class LgsEnum;
 class LgsIntConst;
 class LgsNull;
-class LgsLoopMetaVar;
+class LgsMetaVar;
 class LgsJson;
 class LgsTypeExpr;
 class LgsVectorExpr;
@@ -113,5 +113,5 @@ public:
     void visitIterIndex(LgsIterIndex* iterIndex);
     void visitIndex(LgsIterIndex* iterIndex);
     void visitSlice(LgsIterIndex* iterIndex);
-    void visitLoopMetaVar(LgsLoopMetaVar* metaVar);
+    void visitLoopMetaVar(LgsMetaVar* metaVar);
 };

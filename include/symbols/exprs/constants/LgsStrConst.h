@@ -11,10 +11,14 @@ public:
 
     explicit LgsStrConst(const std::string& value) : value(value) {
         isValueKnown = true;
-        const auto lgsStr = new LgsStr();
-        lgsStr->isStatic = true;
-        lgsStr->size = new LgsIntConst(&LGS_INT, value.size());
-        setType(lgsStr);
+        if (value.size() == 1) {
+            setType(&LGS_CHAR);
+        } else {
+            const auto lgsStr = new LgsStr();
+            lgsStr->isStatic = true;
+            lgsStr->size = new LgsIntConst(&LGS_INT, value.size());
+            setType(lgsStr);
+        }
     }
     LgsExpr* castTo(LgsType* toType, bool explicitCast) override;
     Value* castToIR(LgsLLVMGen& cg, LgsType* toType) override;

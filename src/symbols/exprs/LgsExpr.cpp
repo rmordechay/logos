@@ -16,7 +16,7 @@
 #include "exprs/LgsNull.h"
 #include "exprs/LgsTypeExpr.h"
 #include "funcs/LgsFunc.h"
-#include "loops/LgsLoopMetaVar.h"
+#include "loops/LgsMetaVar.h"
 
 LgsExpr* LgsExpr::castTo(LgsType* toType, const bool explicitCast) {
     assert(0);
@@ -124,5 +124,5 @@ LgsFloatConst* LgsExpr::asFloatConst() { return dynamic_cast<LgsFloatConst*>(thi
 LgsStrConst* LgsExpr::asStrConst() { return dynamic_cast<LgsStrConst*>(this); }
 LgsVectorExpr* LgsExpr::asVectorExpr() { return dynamic_cast<LgsVectorExpr*>(this); }
 LgsIntConst* LgsExpr::asIntConst() { return dynamic_cast<LgsIntConst*>(this); }
-LgsLoopMetaVar* LgsExpr::asLoopMetaVar() { return dynamic_cast<LgsLoopMetaVar*>(this); }
+LgsMetaVar* LgsExpr::asLoopMetaVar() { return dynamic_cast<LgsMetaVar*>(this); }
 LgsBinaryExpr* LgsExpr::asBinExpr() { return dynamic_cast<LgsBinaryExpr*>(this); }

@@ -201,6 +201,6 @@ void LgsLinter::visitSlice(LgsIterIndex* iterIndex) {
     assert(0);
 }
 
-void LgsLinter::visitLoopMetaVar(LgsLoopMetaVar* metaVar) {
+void LgsLinter::visitLoopMetaVar(LgsMetaVar* metaVar) {
     assert(0);
 }

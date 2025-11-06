@@ -23,7 +23,8 @@ std::string LgsSArray::getName() {
 }
 
 std::string LgsSArray::pname() {
-    return getName();
+    if (baseType) return baseType->pname() + "[]";
+    return "[]";;
 }
 
 size_t LgsSArray::getSizeBytes() {

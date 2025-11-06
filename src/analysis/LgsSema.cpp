@@ -40,7 +40,7 @@
 #include "types/LgsNullable.h"
 #include "loops/LgsForeachLoop.h"
 #include "loops/LgsForLoop.h"
-#include "loops/LgsLoopMetaVar.h"
+#include "loops/LgsMetaVar.h"
 #include "loops/LgsRangeLoop.h"
 #include "stmts/LgsAssignment.h"
 #include "stmts/LgsIOPair.h"
@@ -1168,7 +1168,7 @@ void LgsSema::visitSlice(LgsIterIndex* iterIndex) {
     }
 }
 
-void LgsSema::visitLoopMetaVar(LgsLoopMetaVar* metaVar) {
+void LgsSema::visitLoopMetaVar(LgsMetaVar* metaVar) {
     const auto loop = stack.currentLoop();
     if (!loop) {
         return errHandler.addError(E10060, &metaVar->location, file->absPath, {});

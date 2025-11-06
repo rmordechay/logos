@@ -119,7 +119,7 @@ public:
     void visitIterIndex(LgsIterIndex* iterIndex);
     void visitIndex(LgsIterIndex* iterIndex);
     void visitSlice(LgsIterIndex* iterIndex);
-    void visitLoopMetaVar(LgsLoopMetaVar* metaVar);
+    void visitLoopMetaVar(LgsMetaVar* metaVar);
 
     bool validateExprType(LgsExpr* expr, LgsType* type);
     void validateObjImplements(LgsObject* obj, const std::vector<LgsType*>& interfaces);

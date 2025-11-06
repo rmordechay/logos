@@ -56,7 +56,7 @@
 #include <unistd.h>
 #include <unordered_set>
 
-std::atomic<size_t> LgsCodeGen::namesCounter{0};
+std::atomic<size_t> lambdasNameCounter{0};
 #define GENERATE_OBJ_CMD_STRING "llc -filetype=obj -o %s %s.bc"
 
 bool LgsCodeGen::generate() {
@@ -292,7 +292,7 @@ void LgsCodeGen::visitInfiniteLoop(const LgsInfiniteLoop* loop) const {
     cg.branchAndStartBlock(loop->IRBodyBlock);
 }
 
-void LgsCodeGen::visitLoopMetaVar(LgsLoopMetaVar* metaVar) {
+void LgsCodeGen::visitLoopMetaVar(LgsMetaVar* metaVar) {
     const auto loop = stack.currentLoop();
     const auto iValue = loop->iValue;
     switch (metaVar->varType) {
@@ -676,7 +676,7 @@ void LgsCodeGen::visitCast(LgsCast* cast) {
 void LgsCodeGen::visitLambda(LgsFunc* func) {
     cg.savedIP = cg.builder.saveIP();
     const auto originalFunc = currentIRFunc;
-    const auto lambdaID = namesCounter.fetch_add(1);
+    const auto lambdaID = lambdasNameCounter.fetch_add(1);
     func->funcType->IRName = LGS_ANONYMOUS_STR + std::to_string(lambdaID);
     func->IRValue = func->getIRFunc(cg);
     visitFunc(func);
