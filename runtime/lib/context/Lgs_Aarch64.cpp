@@ -30,6 +30,7 @@ nakedf void switchContext(Lgs_Aarch64Context* from, Lgs_Aarch64Context* to) {
         "br x9\n"
         "1:\n"
         "ret\n"
+        : : : "memory"
     );
 }
 

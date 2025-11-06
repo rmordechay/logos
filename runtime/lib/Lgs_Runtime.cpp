@@ -15,21 +15,11 @@ struct Lgs_Runtime {
 static inline Lgs_Runtime runtime;
 
 extern "C" void Lgs_Runtime_init() {
-    runtime.scheduler.start();
+    // runtime.scheduler.start();
 }
 
 extern "C" void Lgs_Runtime_close() {
-    volatile bool waiting = true;
-    while (waiting) {
-        bool hasWork = false;
-        {
-            std::lock_guard lock(runtime.scheduler.mtx);
-            hasWork = !runtime.scheduler.pending.empty() || !runtime.scheduler.running.empty();
-        }
-        if (!hasWork) waiting = false;
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
-    }
-    runtime.scheduler.shutdown();
+    // runtime.scheduler.shutdown();
 }
 
 extern "C" void Lgs_Stack_addOwner(void* ptr, const Lgs_RTType type) {

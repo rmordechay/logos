@@ -15,9 +15,9 @@ struct Lgs_Aarch64Context {
     void* x29;
     void* x30;
     void* pc;
-
 };
 
 void switchContext(Lgs_Aarch64Context* from, Lgs_Aarch64Context* to);
 void reset(Lgs_Aarch64Context* ctx, void* stackTop, void* entryPoint);
+
 using Lgs_Context = Lgs_Aarch64Context;

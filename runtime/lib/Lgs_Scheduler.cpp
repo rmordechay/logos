@@ -8,16 +8,56 @@
 #include <iostream>
 #include <unistd.h>
 
-#define STACK_SIZE 2048
+#define STACK_INIT_SIZE 4096
 #define QUANTUM 10000
 
-thread_local Lgs_Coroutine* tlsCurrent = nullptr;
 Lgs_Context schedulerCtx{};
 std::atomic preempt{false};
 Lgs_Coroutine* current = nullptr;
+thread_local Lgs_Coroutine* tlsCurrent = nullptr;
 
 static void onTick(int) {
     preempt.store(true, std::memory_order_relaxed);
+}
+
+void growStack(Lgs_Coroutine* co) {
+    const auto newSize = co->stackSize * 2;
+    const auto newStack = std::malloc(newSize + STACK_INIT_SIZE);
+    std::memcpy(
+        static_cast<char*>(newStack) + STACK_INIT_SIZE,
+        static_cast<char*>(co->stack) + STACK_INIT_SIZE,
+        co->stackSize
+        );
+    const auto oldBase = reinterpret_cast<uintptr_t>(co->stack) + STACK_INIT_SIZE;
+    const auto newBase = reinterpret_cast<uintptr_t>(newStack) + STACK_INIT_SIZE;
+    const auto spOffset = reinterpret_cast<uintptr_t>(co->ctx.sp) - oldBase;
+    co->ctx.sp = reinterpret_cast<void*>(newBase + spOffset);
+
+    std::free(co->stack);
+    co->stack = newStack;
+    co->stackSize = newSize;
+}
+
+static void handleSig(const int sig, siginfo_t* info, void* ctx) {
+    if (sig == SIGSEGV && tlsCurrent != nullptr) {
+        const auto addr = reinterpret_cast<uintptr_t>(info->si_addr);
+        const auto stackBase = reinterpret_cast<uintptr_t>(tlsCurrent->stack);
+        // Check if fault is in guard page
+        if (addr >= stackBase && addr < stackBase + STACK_INIT_SIZE) {
+            growStack(tlsCurrent);
+            return;
+        }
+    }
+    signal(sig, SIG_DFL);
+    raise(sig);
+}
+
+static void initSigHandler() {
+    struct sigaction sa {};
+    sa.sa_sigaction = handleSig;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = SA_SIGINFO | SA_ONSTACK;
+    sigaction(SIGSEGV, &sa, nullptr);
 }
 
 static void initTimer() {
@@ -48,6 +88,7 @@ void Lgs_Scheduler::start() {
 
 void Lgs_Scheduler::loop() {
     initTimer();
+    initSigHandler();
     while (active) {
         Lgs_Coroutine* coroutine = nullptr;
         {
@@ -79,7 +120,7 @@ void Lgs_Scheduler::loop() {
 
 void Lgs_Scheduler::spawn(void (*fn)(void*), void* arg) {
     const auto co = new Lgs_Coroutine();
-    co->stackSize = STACK_SIZE;
+    co->stackSize = STACK_INIT_SIZE;
     co->stack = std::malloc(co->stackSize);
     co->fn = fn;
     co->arg = arg;

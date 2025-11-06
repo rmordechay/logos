@@ -21,7 +21,7 @@ LgsStmt* LgsRangeLoop::cloneStmt() {
         newLoop->metaVars[key] = loopVar->cloneExpr();
     }
     newLoop->startRange = startRange->cloneExpr();
-    newLoop->endRange = startRange->cloneExpr();
+    newLoop->endRange = endRange->cloneExpr();
     newLoop->stmtsBlock = stmtsBlock->clone();
     return newLoop;
 }
