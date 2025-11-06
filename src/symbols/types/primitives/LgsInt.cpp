@@ -192,9 +192,8 @@ Value* LgsInt::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
 }
 
 Value* LgsInt::subIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    auto v = self->loadIR(cg);
-    const auto l = cg.builder.CreateZExt(v, getIRType(cg), "roij");
-    const auto r = cg.builder.CreateZExt(other->loadIR(cg), getIRType(cg), "roi2");
+    const auto l = cg.builder.CreateZExt(self->loadIR(cg), getIRType(cg));
+    const auto r = cg.builder.CreateZExt(other->loadIR(cg), getIRType(cg));
     return cg.builder.CreateSub(l, r);
 }
 

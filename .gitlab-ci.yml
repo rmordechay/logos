@@ -18,4 +18,3 @@ build_x86_64:
   artifacts:
     paths:
       - dist/
-

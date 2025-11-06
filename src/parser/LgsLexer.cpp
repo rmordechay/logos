@@ -1,6 +1,7 @@
 #include "parser/LgsLexer.h"
 
 #include <cassert>
+#include <iostream>
 
 std::vector<LgsToken> LgsLexer::tokenize() {
     if (source.empty()) return {};
@@ -52,7 +53,6 @@ LgsToken LgsLexer::nextToken() {
         if (std::isdigit(currentChar)) return scanNumber(location);
         return {T_DOT, ".", location};
     }
-
     // Number
     if (std::isdigit(currentChar)) {
         return scanNumber(location);
@@ -302,16 +302,33 @@ char LgsLexer::scanEscapeChar() {
 
 LgsToken LgsLexer::scanNumber(LgsLocation& location) {
     std::string lexeme;
+    // Minus
     if (currentChar == '-') {
         lexeme += currentChar;
         advance();
         location.columnStart++;
     }
+    // Hexadecimal
+    if (currentChar == '0' && (peek() == 'x' || peek() == 'X')) {
+        lexeme += currentChar;
+        advance();
+        lexeme += currentChar;
+        advance();
+        location.columnStart += 2;
+        while (std::isxdigit(currentChar) || currentChar == '_') {
+            lexeme += currentChar;
+            advance();
+            location.columnStart++;
+        }
+        return {T_HEX, lexeme, location};
+    }
+    // Int
     while (std::isdigit(currentChar) || currentChar == '_') {
         lexeme += currentChar;
         advance();
         location.columnStart++;
     }
+    // Float
     if (currentChar == '.' && peek() != '.') {
         lexeme += currentChar;
         advance();
@@ -323,13 +340,14 @@ LgsToken LgsLexer::scanNumber(LgsLocation& location) {
         }
         return {T_FLOAT, lexeme, location};
     }
+    // Long
     if (currentChar == 'L') {
         lexeme += currentChar;
         advance();
         location.columnStart++;
         return {T_LONG, lexeme, location};
     }
-    return {T_INTEGER, lexeme, location};
+    return {T_INT, lexeme, location};
 }
 
 void LgsLexer::skipWhitespace() {

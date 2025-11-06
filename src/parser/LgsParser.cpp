@@ -1365,11 +1365,24 @@ LgsExpr* LgsParser::parseConstant() {
     const auto tokenStr = currentToken.lexeme;
     LgsExpr* constant = nullptr;
     switch (currentToken.type) {
-    case T_INTEGER: {
+    case T_INT: {
         std::string result = tokenStr;
-        result.erase(remove(result.begin(), result.end(), '_'), result.end());
+        result.erase(std::ranges::remove(result, '_').begin(), result.end());
         char* end;
         const auto longValue = strtol(result.c_str(), &end, 10);
+        if (longValue >= INT_MIN && longValue <= INT_MAX) {
+            const auto intValue = static_cast<int>(longValue);
+            constant = new LgsIntConst(&LGS_INT, intValue);
+        } else {
+            constant = new LgsIntConst(&LGS_LONG, longValue);
+        }
+        break;
+    }
+    case T_HEX: {
+        std::string result = tokenStr;
+        result.erase(std::ranges::remove(result, '_').begin(), result.end());
+        char* end;
+        const auto longValue = strtol(result.c_str(), &end, 16);
         if (longValue >= INT_MIN && longValue <= INT_MAX) {
             const auto intValue = static_cast<int>(longValue);
             constant = new LgsIntConst(&LGS_INT, intValue);
