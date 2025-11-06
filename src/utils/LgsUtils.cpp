@@ -3,8 +3,8 @@
 #include "data/LgsDefinitions.h"
 #include "data/LgsTokens.h"
 #include "files/LgsFile.h"
+#include "files/LgsFileMetadata.h"
 #include "funcs/LgsParam.h"
-#include "types/iterables/LgsStr.h"
 #include <iostream>
 #include <sstream>
 #include <unistd.h>

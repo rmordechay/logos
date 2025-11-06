@@ -57,34 +57,38 @@ class LgsParser {
 public:
     size_t fileID;
     LgsPaths& paths;
+    bool headersOnly;
     fs::path filePath;
-    LgsToken currentToken;
-    std::string code = "";
-    size_t currentIndex = 0;
     LgsSymbolTable& globals;
-    LgsErrHandler errHandler;
+    std::string code = "";
+    LgsToken currentToken;
+    size_t currentIndex = 0;
     size_t recursionCount = 0;
+    LgsErrHandler errHandler;
     std::vector<LgsToken> tokens;
     LgsFunc* currentFunc = nullptr;
+    LgsFile* currentFile = nullptr;
 
-    LgsParser(const size_t fileID, const fs::path& filePath, LgsPaths& paths, LgsSymbolTable& globals, const std::string& code) : fileID(fileID), paths(paths), filePath(filePath), code(code), globals(globals) {}
+    LgsParser(const size_t fileID, const fs::path& filePath, LgsPaths& paths, LgsSymbolTable& globals, const std::string& code, const bool headersOnly = false)
+        : fileID(fileID), paths(paths), headersOnly(headersOnly), filePath(filePath), globals(globals), code(code) {}
 
     // Files
     bool scanTokens();
     LgsFile* parseSrcFile(bool isTestRun);
     LgsFile* parseSrcFileHeaders();
-    LgsAppConfigFile* parseAppConfigFile();
+    void parseImports(std::unordered_map<std::string, LgsApp*>& imports);
     LgsEnvFile* parseEnvFile();
     LgsMainFile* parseMainFile();
-    LgsObjectFile* parseObjectFile(bool onlyHeaders);
-    LgsInterfaceFile* parseInterfaceFile(bool onlyHeaders);
+    LgsAppConfigFile* parseAppConfigFile();
+    LgsObjectFile* parseObjectFile();
+    LgsInterfaceFile* parseInterfaceFile();
     LgsTestFile* parseTestFile();
 
     // Object
     LgsObject* parseObject();
     LgsInterface* parseInterface();
-    LgsObject* parseObjectBody(const LgsToken& tokenName, bool isSingleton, bool onlyHeaders);
-    LgsInterface* parseInterfaceBody(const LgsToken& tokenName, bool onlyHeaders);
+    LgsObject* parseObjectBody(const LgsToken& tokenName, bool isSingleton);
+    LgsInterface* parseInterfaceBody(const LgsToken& tokenName);
     LgsGeneric* parseBaseGeneric();
     LgsField* parseField(size_t fieldPosition);
     LgsIOPair* parseIOPair();
@@ -99,7 +103,7 @@ public:
     // Funcs
     LgsFunc* parseFunc();
     LgsMainFunc* parseMainFunc();
-    LgsFunc* parseMethod(LgsObject* obj, bool onlyHeaders);
+    LgsFunc* parseMethod(LgsObject* obj);
     LgsFuncType* parseFuncHeader();
     void parseParams(LgsFuncType* funcType);
 
@@ -139,7 +143,7 @@ public:
     LgsExpr* parsePrefixExpr();
     LgsIterIndex* parseIterIndex(LgsExpr* baseExpr);
     LgsPostfixExpr* parsePostfixExpr(LgsExpr* baseExpr);
-    LgsSelection* parseSelection(LgsExpr* firstExpr = nullptr);
+    LgsSelection* parseSelection(LgsExpr* firstExpr);
     LgsJson* parseJson();
     LgsJsonObject* parseJsonObject();
     LgsJsonArray* parseJsonArray();
@@ -167,4 +171,5 @@ public:
     void addParsingError();
     void recursionGuard();
     void validateTestFolder(const LgsFile* testFile);
+    bool isImportName(LgsExpr* expr) const;
 };

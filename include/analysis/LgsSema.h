@@ -54,14 +54,15 @@ class LgsSema final {
 public:
     LgsFile* file;
     LgsStack stack;
-    LgsGlobals& globals;
+    LgsSymbolTable& globals;
     LgsErrHandler errHandler;
     LgsTypeResolver typeResolver;
     std::map<std::string, LgsFunc*> corosRegistry;
     std::map<std::string, LgsFunc*> genericsRegistry;
 
-    explicit LgsSema(LgsFile* file, LgsGlobals& globals) : file(file), globals(globals), typeResolver(errHandler, globals) {}
+    explicit LgsSema(LgsFile* file, LgsSymbolTable& globals) : file(file), globals(globals), typeResolver(errHandler, globals) {}
     void analyse();
+    void resolveImports() const;
     void visitMainFile(LgsMainFile* mainFile);
     void visitObject(LgsObject* obj);
     void visitInterface(LgsInterface* interface);
@@ -107,7 +108,6 @@ public:
     void visitFieldSelection(LgsVariable* child, LgsType* parentType);
     void visitIterIndexSelection(LgsIterIndex* iterIndex, LgsType* parentType);
     void visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent);
-    LgsFunc* createGenericFunc(LgsFuncCall* funcCall, LgsFunc* func);
     void visitFuncCall(LgsFuncCall* funcCall);
     void visitPrefixExpr(LgsPrefixExpr* prefixExpr);
     void visitPostfixExpr(LgsPostfixExpr* postfixExpr);
@@ -130,8 +130,9 @@ public:
     void validateObjDuplicates(LgsType* type);
     static bool validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const LgsFunc* func);
 
+    LgsFunc* createGenericFunc(LgsFuncCall* funcCall, LgsFunc* func);
     void addHeapExpr(LgsExpr* expr);
-    LgsSymbol* getSymbol(const std::string& name, const LgsLocation* location);
     void addLocalSymbol(const LgsSymbol& newSymbol);
+    LgsSymbol* getSymbol(const std::string& name, const LgsLocation* location);
 };
 

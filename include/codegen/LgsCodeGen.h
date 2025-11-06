@@ -135,6 +135,7 @@ public:
     Value* getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) const;
     Type* getThunkCtxType(const LgsFuncCall* fc) const;
     Function* getThunkFunc(const LgsFuncCall* fc, Type* ctxTy) const;
+    void yield() const;
 
     // Iterables
     void setStaticArray(LgsArrayExpr* arrayExpr);

@@ -22,8 +22,8 @@ bool LgsTypeResolver::resolveGlobals(const std::vector<LgsFile*>& srcFiles, Thre
     std::atomic successful = true;
     for (const auto& file : srcFiles) {
         pool.runTask([this, file, &successful] {
-            if (const auto mf = dynamic_cast<LgsMainFile*>(file)) {
-                resolveMainFileTypes(mf);
+            if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
+                resolveMainFileTypes(mainFile);
             } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
                 resolveObjTypes(objFile->obj, *objFile);
             } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
@@ -52,7 +52,7 @@ LgsType* LgsTypeResolver::resolveType(LgsType* type, LgsFile* file) {
     }
     if (type->isUnknown()) {
         auto typeName = type->getName();
-        auto symbol = globals.symbolTable.getSymbol(typeName);
+        auto symbol = globals.getSymbol(typeName);
         if (!symbol) {
             symbol = file->symbolTable.getSymbol(typeName);
         }
@@ -122,13 +122,14 @@ void LgsTypeResolver::resolveObjTypes(LgsObject* obj, LgsFile& file) {
 
     for (const auto& enum_ : obj->enums) {
         file.symbolTable.addSymbol(LgsSymbol(enum_), &errHandler, file.absPath);
-        // for (const auto field : enum_->fields) {
-        //     file.symbolTable.addSymbol(LgsSymbol(field), &errHandler, file.absPath);
-        // }
     }
 
     for (const auto& field : obj->fields) {
         field->setType(resolveType(field->type, &file));
+    }
+
+    for (const auto& ioPair : obj->ioPairs) {
+        resolveIOPair(ioPair, obj, file);
     }
 
     for (const auto& [_, method] : obj->methods) {
@@ -136,10 +137,6 @@ void LgsTypeResolver::resolveObjTypes(LgsObject* obj, LgsFile& file) {
         for (auto& param : method->funcType->params) {
             param.setType(resolveType(param.type, &file));
         }
-    }
-
-    for (const auto& ioPair : obj->ioPairs) {
-        resolveIOPair(ioPair, obj, file);
     }
 }
 

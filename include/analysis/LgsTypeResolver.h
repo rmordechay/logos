@@ -15,9 +15,9 @@ class LgsErrHandler;
 class LgsTypeResolver {
 public:
     LgsErrHandler& errHandler;
-    LgsGlobals& globals;
+    LgsSymbolTable& globals;
 
-    LgsTypeResolver(LgsErrHandler& errHandler, LgsGlobals& globals) : errHandler(errHandler), globals(globals) {}
+    LgsTypeResolver(LgsErrHandler& errHandler, LgsSymbolTable& globals) : errHandler(errHandler), globals(globals) {}
     bool resolveGlobals(const std::vector<LgsFile*>& srcFiles, ThreadPool& pool);
     LgsType* resolveType(LgsType* type, LgsFile* file);
     void resolveMainFileTypes(LgsMainFile* mf);

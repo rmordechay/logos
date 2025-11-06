@@ -50,10 +50,10 @@
 #include "types/primitives/LgsDouble.h"
 #include <iostream>
 #include <unordered_set>
-
 std::string getMissingImplementsStr(const std::vector<LgsField*>& fields, const std::vector<LgsFunc*>& methods);
 
 void LgsSema::analyse() {
+    resolveImports();
     if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
         visitMainFile(mainFile);
     } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
@@ -64,6 +64,14 @@ void LgsSema::analyse() {
         visitTestFile(testFile);
     } else {
         assert(0);
+    }
+}
+
+void LgsSema::resolveImports() const {
+    for (auto& [name, app] : file->symbolTable.imports) {
+        const auto it = globals.imports.find(name);
+        if (it == globals.imports.end()) continue;
+        app = it->second;
     }
 }
 
@@ -783,29 +791,25 @@ void LgsSema::visitVariable(LgsVariable* variable) {
         break;
     }
     default:
-        assert(false);
+        assert(0);
     }
     assert(variable->ref.symbolType != UNKNOWN);
 }
 
 void LgsSema::visitSelection(LgsSelection* selection) {
     const auto exprs = selection->exprs;
-    auto firstExpr = exprs.front();
+    const auto firstExpr = exprs.front();
     visitFirstSelection(firstExpr);
-    const bool isImportName = firstExpr->isImportName;
-    if (!isImportName && !firstExpr->type) return;
-    if (isImportName) {
-        firstExpr = exprs[1];
-        visitFirstSelection(firstExpr);
-    }
+    if (!firstExpr->type) return;
     if (const auto var = firstExpr->asVariable()) {
         if (var->ref.symbolType == OBJECT) {
             const auto typeExpr = new LgsTypeExpr(var->ref.object);
             freeExpr(firstExpr);
-            selection->exprs[isImportName] = typeExpr;
+            selection->exprs[0] = typeExpr;
         }
     }
 
+    if (!firstExpr->type) return;
     visitInnerSelections(selection);
     const auto lastExpr = selection->lastExpr();
     if (selection->hasNullables && !lastExpr->type->asNullable()) {
@@ -818,18 +822,7 @@ void LgsSema::visitSelection(LgsSelection* selection) {
 
 void LgsSema::visitFirstSelection(LgsExpr* firstExpr) {
     if (const auto variable = firstExpr->asVariable()) {
-        if (globals.imports.contains(variable->name)) {
-            variable->isImportName = true;
-            const auto importApp = globals.imports[variable->name];
-            auto& thisAppSymbols = globals.symbolTable.symbols;
-            auto& importAppSymbols = importApp->globals.symbolTable.symbols;
-            for (auto& [k, v] : importAppSymbols) {
-                assert(!thisAppSymbols.contains(k));
-                thisAppSymbols.insert_or_assign(k, v);
-            }
-        } else {
-            visitVariable(variable);
-        }
+        visitVariable(variable);
     } else if (const auto funcCall = firstExpr->asFuncCall()) {
         visitFuncCall(funcCall);
     } else if (const auto iterIndex = firstExpr->asIterIndex()) {
@@ -843,8 +836,9 @@ void LgsSema::visitFirstSelection(LgsExpr* firstExpr) {
 
 void LgsSema::visitInnerSelections(LgsSelection* selection) {
     const auto exprs = selection->exprs;
-    selection->hasNullables = exprs.front()->type->asNullable();
-    for (size_t i = exprs.front()->isImportName; i < exprs.size() - 1; ++i) {
+    const auto firstExpr = exprs.front();
+    selection->hasNullables = firstExpr->type->asNullable();
+    for (size_t i = 0; i < exprs.size() - 1; ++i) {
         const auto parentExpr = exprs[i];
         const auto childExpr = exprs[i + 1];
         if (const auto var = childExpr->asVariable()) {
@@ -972,20 +966,6 @@ void LgsSema::visitFuncCall(LgsFuncCall* funcCall) {
         for (const auto arg : funcCall->args) if (!arg->type) return;
         errHandler.addError(E10015, &funcCall->location, file->absPath, {funcCall->name, funcCall->asText(), ft->pname()});
     }
-}
-
-LgsFunc* LgsSema::createGenericFunc(LgsFuncCall* funcCall, LgsFunc* const func) {
-    const auto newFunc = func->cloneExpr()->asFunc();
-    for (size_t i = 0; i < newFunc->funcType->params.size(); ++i) {
-        const auto param = newFunc->funcType->params[i];
-        if (!param.type->isGeneric) continue;
-        const auto arg = funcCall->args[i];
-        newFunc->funcType->genericSuffix += arg->type->getName();
-        newFunc->funcType->params[i] = LgsParam(arg->type, param.name, param.expr);
-    }
-    visitFunc(newFunc);
-    funcCall->func = newFunc;
-    return newFunc;
 }
 
 void LgsSema::visitPrefixExpr(LgsPrefixExpr* prefixExpr) {
@@ -1380,6 +1360,20 @@ bool LgsSema::validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const Lgs
     return isValid;
 }
 
+LgsFunc* LgsSema::createGenericFunc(LgsFuncCall* funcCall, LgsFunc* const func) {
+    const auto newFunc = func->cloneExpr()->asFunc();
+    for (size_t i = 0; i < newFunc->funcType->params.size(); ++i) {
+        const auto param = newFunc->funcType->params[i];
+        if (!param.type->isGeneric) continue;
+        const auto arg = funcCall->args[i];
+        newFunc->funcType->genericSuffix += arg->type->getName();
+        newFunc->funcType->params[i] = LgsParam(arg->type, param.name, param.expr);
+    }
+    visitFunc(newFunc);
+    funcCall->func = newFunc;
+    return newFunc;
+}
+
 void LgsSema::addHeapExpr(LgsExpr* expr) {
     if (!expr->type) return;
     if (!expr->type->isHeapAlloc) return;
@@ -1391,23 +1385,9 @@ void LgsSema::addHeapExpr(LgsExpr* expr) {
     }
 }
 
-LgsSymbol* LgsSema::getSymbol(const std::string& name, const LgsLocation* location) {
-    if (const auto globalSymbol = globals.symbolTable.getSymbol(name)) {
-        return globalSymbol;
-    }
-    if (const auto fileSymbol = file->symbolTable.getSymbol(name)) {
-        return fileSymbol;
-    }
-    if (const auto symbol = stack.getSymbolTable().getSymbol(name)) {
-        return symbol;
-    }
-    errHandler.addError(E10006, location, file->absPath, {name});
-    return nullptr;
-}
-
 void LgsSema::addLocalSymbol(const LgsSymbol& newSymbol) {
     auto symbolName = *newSymbol.name;
-    const auto symbol = globals.symbolTable.getSymbol(symbolName);
+    const auto symbol = globals.getSymbol(symbolName);
     if (symbol && symbol->isBuiltin) {
         return errHandler.addError(E10053, newSymbol.location, file->absPath, {symbolName});
     }
@@ -1415,6 +1395,25 @@ void LgsSema::addLocalSymbol(const LgsSymbol& newSymbol) {
         return errHandler.addError(E10011, newSymbol.location, file->absPath, {symbolName});
     }
     stack.getSymbolTable().addSymbol(newSymbol, &errHandler, file->absPath);
+}
+
+LgsSymbol* LgsSema::getSymbol(const std::string& name, const LgsLocation* location) {
+    if (const auto globalSymbol = globals.getSymbol(name)) {
+        return globalSymbol;
+    }
+    if (const auto fileSymbol = file->symbolTable.getSymbol(name)) {
+        return fileSymbol;
+    }
+    for (auto [_, app] : file->symbolTable.imports) {
+        if (const auto s = app->globals.getSymbol(name)) {
+            return s;
+        }
+    }
+    if (const auto symbol = stack.getSymbolTable().getSymbol(name)) {
+        return symbol;
+    }
+    errHandler.addError(E10006, location, file->absPath, {name});
+    return nullptr;
 }
 
 std::string getMissingImplementsStr(const std::vector<LgsField*>& fields, const std::vector<LgsFunc*>& methods) {

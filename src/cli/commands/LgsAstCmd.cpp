@@ -13,9 +13,8 @@ void LgsAstCmd::run() {
     if (!isLogosFile(path)) exitWithError(E40003, {path});
     LgsApp app(path);
     if (!app.setup()) app.errHandler.exitWithErrors();
-    const LgsFileMetadata metadata(app.getNextFileID(), path);
-    const auto code = getFileText(metadata.path);
-    app.loadSrcFile(code, metadata.path, metadata.id);
+    const auto code = getFileText(path);
+    app.loadSrcFile(code, path, app.getNextFileID());
     LgsJsonParser parser;
     parser.parseFile(app.srcFiles.front());
     std::cout << parser.json.str();

@@ -1,5 +1,6 @@
 #include "LgsSymbolTable.h"
 #include "data/LgsErrors.h"
+#include "logos/LgsApp.h"
 #include "utils/LgsErrHandler.h"
 #include "types/LgsEnum.h"
 
