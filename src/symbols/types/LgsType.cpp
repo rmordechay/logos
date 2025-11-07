@@ -1,4 +1,4 @@
-#include "data/LgsConfigs.h"
+#include "../../../include/logos/LgsConfigs.h"
 #include "exprs/LgsVectorExpr.h"
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"

@@ -61,6 +61,15 @@ void LgsAppCache::addFileMetadata(const size_t fileID, const fs::path& filePath,
     files.emplace_back(LgsFileMetadata(fileID, filePath, getLastWritten(filePath), fileType));
 }
 
+LgsFileMetadata* LgsAppCache::getAppConfigFile() {
+    for (auto& metadata : files) {
+        if (metadata.type == LGS_APP_CONFIG_FILE) {
+            return &metadata;
+        }
+    }
+    return nullptr;
+}
+
 bool LgsAppCache::fileExists(const std::filesystem::directory_entry& entry) const {
     for (auto metadata : files) {
         if (metadata.path == entry) {

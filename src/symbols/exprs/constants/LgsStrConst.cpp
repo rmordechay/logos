@@ -48,7 +48,8 @@ std::string LgsStrConst::asText() {
 }
 
 Value* LgsStrConst::hash(LgsLLVMGen& cg) {
-    return cg.usize(hashStr(value.c_str()));
+    const auto hashed = std::hash<std::string_view>{}(value.c_str());
+    return cg.usize(hashed);
 }
 
 LgsExpr* LgsStrConst::cloneExpr() {

@@ -1,6 +1,7 @@
 #include "Lgs_Map.h"
+#include <cstring>
 #include "Lgs_DArray.h"
-#include "data/LgsErrors.h"
+#include "LgsErrors.h"
 #include <cassert>
 #include <string>
 #include <iostream>

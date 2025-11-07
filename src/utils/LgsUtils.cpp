@@ -1,15 +1,13 @@
 #include "utils/LgsUtils.h"
+#include "logos/LgsConfigs.h"
 #include "LgsType.h"
 #include "data/LgsDefinitions.h"
 #include "data/LgsTokens.h"
 #include "files/LgsFile.h"
-#include "files/LgsFileMetadata.h"
 #include "funcs/LgsParam.h"
 #include <iostream>
 #include <sstream>
 #include <unistd.h>
-
-#define MSG_PLACEHOLDER "%s"
 
 struct LgsFileMetadata;
 
@@ -29,52 +27,27 @@ void execute(const fs::path& execPath, std::vector<const char*> mainArgs) {
     exit(EXIT_FAILURE);
 }
 
-void logInfo(const std::string& text) {
-    std::cout << text;
+void logInfo(const std::string& text, const bool withNewLine) {
+    if (withNewLine) std::cout << text << '\n';
+    else std::cout << text;
 }
 
-void logError(const std::string& errMsg, const std::string& suffix) {
-    logInfo(prefixErrorLines(errMsg));
-    if (suffix != "") logInfo(suffix);
+void logDebug(const std::string& text, const bool withNewLine) {
+    if (lgsConfigs.logLevel != LGS_DEBUG) return;
+    if (withNewLine) std::cout << text << '\n';
+    else std::cout << text;
 }
 
-void logWarning(const std::string& msg, const std::string& path) {
-    logInfo(LGS_COLORIZE("Warning: ", LGS_MSG_COLOR_YELLOW));
-    if (path != "") logInfo(path);
-}
-
-void exitWithError(const LgsBaseError& err, const std::vector<std::string>& args) {
-    const auto errMsg = formatErrorMsg(err.msg, args) + '\n';
-    logError(errMsg);
-    exit(EXIT_FAILURE);
-}
-
-std::string formatErrorMsg(const std::string& msg, const std::vector<std::string>& args) {
-    size_t pos = 0;
-    size_t argIndex = 0;
-    auto result = std::string(msg);
-    while ((pos = result.find(MSG_PLACEHOLDER, pos)) != std::string::npos && argIndex < args.size()) {
-        result.replace(pos, std::strlen(MSG_PLACEHOLDER), args[argIndex]);
-        pos += args[argIndex].length();
-        argIndex++;
-    }
-    return result;
-}
-
-std::string prefixErrorLines(const std::string& text) {
+std::string padErrorMsg(const std::string& text) {
     if (text.empty()) return LGS_ERROR_TEXT;
     std::string padding(std::strlen(LGS_ERROR_TEXT), ' ');
     std::stringstream input(text);
     std::stringstream result;
     std::string line;
-    bool first = true;
+    std::getline(input, line);
+    result << LGS_COLORIZE_ERROR(LGS_ERROR_TEXT) << line;
     while (std::getline(input, line)) {
-        if (first) {
-            result << LGS_COLORIZE_ERROR(LGS_ERROR_TEXT) << line;
-            first = false;
-        } else {
-            result << '\n' << padding << line;
-        }
+        result << '\n' << padding << line;
     }
     if (!text.empty() && text.back() == '\n') {
         result << '\n';
@@ -82,12 +55,19 @@ std::string prefixErrorLines(const std::string& text) {
     return result.str();
 }
 
-bool isLogosFile(const fs::path& filePath) {
-    return fs::exists(filePath) && is_regular_file(filePath) && filePath.extension().string() == LGS_FILE_EXTENSION;
+void logError(const std::string& errMsg, const std::string& epilogue) {
+    const auto textWithErrors = padErrorMsg(errMsg);
+    logInfo(textWithErrors);
+    if (epilogue != "") logInfo(epilogue);
 }
 
-bool isLLVMFile(const fs::directory_entry& entry) {
-    return entry.is_regular_file() && entry.path().extension().string() == ".ll";
+void logWarning(const std::string& msg, const std::string& path) {
+    logInfo(LGS_COLORIZE("Warning: ", LGS_MSG_COLOR_YELLOW));
+    if (path != "") logInfo(path);
+}
+
+bool isLogosFile(const fs::path& filePath) {
+    return fs::exists(filePath) && is_regular_file(filePath) && filePath.extension().string() == LGS_FILE_EXTENSION;
 }
 
 bool isLogosKeyword(const std::string& s) {
@@ -101,14 +81,6 @@ std::string getFileText(const fs::path& filePath) {
     std::stringstream fileContents;
     fileContents << file.rdbuf();
     return fileContents.str();
-}
-
-size_t hashStr(const std::string& key) {
-    return std::hash<std::string_view>{}(key);
-}
-
-bool startsWith(const std::string& str, const std::string& prefix) {
-    return str.size() >= prefix.size() && str.compare(0, prefix.size(), prefix) == 0;
 }
 
 std::string getLine(const std::string& filename, const size_t lineNumber) {
@@ -143,6 +115,40 @@ std::string getFullPath(const LgsLocation& location, const std::string& filePath
     return filePath + ":" + std::to_string(location.lineStart) + ":" + std::to_string(location.columnStart);
 }
 
+time_t getLastWritten(const fs::path& filePath) {
+    assert(fs::exists(filePath));
+    const auto ftime = fs::last_write_time(filePath);
+    const auto sctp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(
+        ftime - fs::file_time_type::clock::now() + std::chrono::system_clock::now()
+        );
+    return std::chrono::system_clock::to_time_t(sctp);
+}
+
+bool validateFilePath(fs::path& filePath) {
+    if (!fs::exists(filePath)) return false;
+    filePath = fs::canonical(filePath);
+    return true;
+}
+
+bool createDir(fs::path& dirPath) {
+    if (fs::exists(dirPath)) return true;
+    if (!fs::create_directory(dirPath)) return false;
+    dirPath = fs::canonical(dirPath);
+    return true;
+}
+
+bool runCmd(const char* cmd) {
+    switch (lgsConfigs.os) {
+    case MAC_OS:
+    case LINUX:
+        return std::system(cmd) == 0;
+    case WINDOWS:
+    case UNKNOWN_OS:
+        break;
+    }
+    assert(0);
+}
+
 void combineNodeHash(size_t& oldHash, const size_t newHash) {
     oldHash ^= newHash + 0x9e3779b9 + (oldHash << 6) + (oldHash >> 2);
 }
@@ -153,14 +159,6 @@ void hashNodeString(size_t& oldHash, const std::string& str) {
 
 void hashNodeInt(size_t& oldHash, const size_t val) {
     combineNodeHash(oldHash, std::hash<size_t>{}(val));
-}
-
-time_t getLastWritten(const fs::path& filePath) {
-    const auto ftime = fs::last_write_time(filePath);
-    const auto sctp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(
-        ftime - fs::file_time_type::clock::now() + std::chrono::system_clock::now()
-        );
-    return std::chrono::system_clock::to_time_t(sctp);
 }
 
 void freeExpr(const LgsExpr* expr) {

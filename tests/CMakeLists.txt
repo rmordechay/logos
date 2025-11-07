@@ -19,4 +19,9 @@ target_include_directories(lgs_tests PRIVATE
     ${CLANG_INCLUDE_DIRS}
 )
 
-target_link_libraries(lgs_tests PRIVATE lgs_runtime LLVM clang-cpp)
+target_link_libraries(lgs_tests PRIVATE
+    lgs_runtime
+    LLVM
+    clang-cpp
+    ${CURL_LIBRARIES}
+)

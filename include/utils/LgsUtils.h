@@ -21,25 +21,23 @@ namespace fs = std::filesystem;
 #define HASH_MAP(map, hash) for (const auto [_, v] : map) v->hashNode(hash)
 
 void execute(const fs::path& execPath, std::vector<const char*> mainArgs = {});
-void logInfo(const std::string& text = "");
-void logError(const std::string& errMsg, const std::string& suffix = "");
-void logWarning(const std::string& msg, const std::string& path);
-void exitWithError(const LgsBaseError& err, const std::vector<std::string>& args = {});
-std::string formatErrorMsg(const std::string& msg, const std::vector<std::string>& args);
-std::string prefixErrorLines(const std::string& text);
+void logInfo(const std::string& text = "", bool withNewLine = false);
+void logDebug(const std::string& text, bool withNewLine = false);
+void logError(const std::string& errMsg, const std::string& epilogue = "");
 bool isLogosFile(const fs::path& filePath);
-bool isLLVMFile(const fs::directory_entry& entry);
 bool isLogosKeyword(const std::string& s);
 std::string getFileText(const fs::path& filePath);
-size_t hashStr(const std::string& key);
-bool startsWith(const std::string& str, const std::string& prefix);
 std::string getLine(const std::string& filename, size_t lineNumber);
 std::string trim(const std::string& str);
 std::string getFullPath(const LgsLocation& location, const std::string& filePath);
+time_t getLastWritten(const fs::path& filePath);
+bool validateFilePath(fs::path& filePath);
+bool createDir(fs::path& dirPath);
+bool runCmd(const char* cmd);
+
 void combineNodeHash(size_t& oldHash, size_t newHash);
 void hashNodeString(size_t& oldHash, const std::string& str);
 void hashNodeInt(size_t& oldHash, size_t val);
-time_t getLastWritten(const fs::path& filePath);
 
 void freeExpr(const LgsExpr* expr);
 void freeExprs(std::vector<LgsExpr*>& exprs);

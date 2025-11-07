@@ -7,6 +7,7 @@ public:
     LgsGenerateCmd(const int argc, char** argv) : LgsCliCmd(argc, argv) {}
     void run() override;
     LgsCliCmdHelp& getHelp() override;
+    void createProjectStructure(const std::string& name) const;
 };
 
 inline LgsCliCmdHelp generateCmdHelp{

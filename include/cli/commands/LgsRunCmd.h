@@ -13,7 +13,7 @@ public:
 
 inline LgsCliCmdHelp runCmdHelp{
     .name = "run",
-    .usage = "lgs run <path> <options>",
+    .usage = "lgs run <options> <path>",
     .summary = "Runs Logos code.",
     .desc = "The run command runs a Logos project or a single file.",
     .requiredArgs = {

@@ -1,6 +1,7 @@
 #pragma once
 #include <iosfwd>
 #include <sstream>
+#include <cstdint>
 
 class LgsSubType;
 class LgsEnum;

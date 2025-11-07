@@ -29,7 +29,7 @@ struct LgsError {
 
 /** Templates errors. Should not be returned directly, but formatted and returned as a new LgsError */
 inline size_t errCodeStart = 10000;
-inline LgsBaseError E10000{"main() function is not defined in" LGS_MAIN_FILE " file.", errCodeStart++};
+inline LgsBaseError E10000{"main() function is not defined in main.lgs file.", errCodeStart++};
 inline LgsBaseError E10001{"Expected type %s does not match the given type %s.", errCodeStart++};
 inline LgsBaseError E10002{"Expression %s of type %s must be an iterable.", errCodeStart++};
 inline LgsBaseError E10003{"Index is out of bounds.", errCodeStart++};
@@ -37,7 +37,7 @@ inline LgsBaseError E10004{"Function %s must return an expression of type %s. Gi
 inline LgsBaseError E10005{"%s is not a member of %s.", errCodeStart++};
 inline LgsBaseError E10006{"%s is not defined.", errCodeStart++};
 inline LgsBaseError E10007{"File %s is duplicate. All files in a project must be unique.", errCodeStart++};
-inline LgsBaseError E10008{LGS_MAIN_FILE " could not be found in src directory.", errCodeStart++};
+inline LgsBaseError E10008{"main.lgs could not be found in src directory.", errCodeStart++};
 inline LgsBaseError E10009{"Duplicate Main files were found in the project. Locations:%s", errCodeStart++};
 inline LgsBaseError E10010{"Not a root path of a Logos project.", errCodeStart++};
 inline LgsBaseError E10011{"%s is already declared.", errCodeStart++};
@@ -115,8 +115,8 @@ inline LgsBaseError E10082{"Loop range %s must be a number. Given: %s.", errCode
 inline LgsBaseError E10083{"Method %s is an object method but was called as a class method.", errCodeStart++};
 inline LgsBaseError E10084{"%s does not belong to an IO pair.", errCodeStart++};
 inline LgsBaseError E10085{"Parsing error.", errCodeStart++};
-inline LgsBaseError E10086{"Invalid Logos path: %s.", errCodeStart++};
-inline LgsBaseError E10087{"", errCodeStart++};
+inline LgsBaseError E10086{"Invalid Logos path: %s", errCodeStart++};
+inline LgsBaseError E10087{"Logos library cannot define a main() function.", errCodeStart++};
 inline LgsBaseError E10088{"Bad character.", errCodeStart++};
 inline LgsBaseError E10089{"%s can only be assigned to an instance of %s, not the object itself.", errCodeStart++};
 inline LgsBaseError E10090{"%s can only prefix numbers. Given: %s.", errCodeStart++};

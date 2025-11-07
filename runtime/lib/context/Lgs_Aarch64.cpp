@@ -1,7 +1,7 @@
 #if defined(__aarch64__) || defined(_M_ARM64)
 
 #include "context/Lgs_Aarch64.h"
-#include "data/LgsDefinitions.h"
+#include "LgsDefinitions.h"
 
 #include <cstdint>
 

@@ -1,6 +1,8 @@
 #pragma once
 #include "LgsSymbol.h"
 #include <map>
+#include <vector>
+#include <unordered_map>
 
 class LgsStrConst;
 class LgsApp;

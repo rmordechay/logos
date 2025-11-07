@@ -97,7 +97,11 @@ void LgsSema::visitMainFile(LgsMainFile* mainFile) {
         }
         visitFunc(func);
     }
-    if (!mainFile->funcs.contains(LGS_MAIN_FUNC)) {
+    if (mainFile->funcs.contains(LGS_MAIN_FUNC)) {
+        if (appConfigs.isLibrary) {
+            errHandler.addError(E10087, &file->location, file->path, {});
+        }
+    } else if (!appConfigs.isLibrary) {
         errHandler.addError(E10000, &file->location, file->path, {});
     }
 }

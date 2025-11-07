@@ -29,7 +29,7 @@ inline std::mutex mtx;
 
 class LgsApp final {
 public:
-    LgsPaths paths;
+    LgsPaths appPaths;
     LgsAppCache appCache;
     LgsSymbolTable globals;
     LgsAppConfigs configs;
@@ -43,11 +43,8 @@ public:
     std::unordered_map<std::string, std::string> lgsCode;
 
     explicit LgsApp(const fs::path& rootPath = "") {
-        if (rootPath == "") return;
-        assert(fs::exists(rootPath));
-        paths.rootPath = fs::canonical(rootPath);
+        appPaths.rootPath = rootPath;
     }
-
     void compile();
     bool setup();
     bool parse();
@@ -56,14 +53,16 @@ public:
     bool analyse();
     bool generate();
     bool link();
-    void loadSrcFile(const std::string& fileCode, const fs::path& filePath = LGS_MAIN_FILE, size_t fileID = 0);
+    void loadSrcFile(const std::string& fileCode, const fs::path& filePath = LGS_MAIN_FILE);
+    void loadSrcFile(LgsFileMetadata& metadata);
     bool loadConfigFile();
     bool loadEnvFiles();
-    void loadAppConfigs();
+    bool loadConfigs();
     void compareHash() const;
     bool loadDeps();
     void loadBuiltins();
     size_t getNextFileID();
-    void createBuildDirs() const;
+    void createBuildDirs();
+    bool initPaths(const fs::path& root);
     ~LgsApp();
 };

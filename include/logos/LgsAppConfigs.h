@@ -1,41 +1,39 @@
 #pragma once
+#include "LgsConfigs.h"
+#include "data/LgsVersion.h"
 #include "utils/LgsUtils.h"
 #include <cstdint>
 #include <string>
 
-enum LgsAppLogLevel {
-    APP_INFO,
-    APP_DEBUG,
-    APP_ERROR,
-};
-
-struct LgsAppVersion {
-    size_t major;
-    size_t minor;
-    size_t micro;
+enum LgsAppMode {
+    CODE_MODE,
+    FILE_MODE,
+    PROJECT_MODE,
+    PKG_MANAGER_MODE,
+    UNKNOWN_MODE,
 };
 
 struct LgsAppConfigs {
     std::string name = "";
     std::string activeEnv = "";
-    LgsAppVersion version{1, 0, 0};
-    LgsAppLogLevel logLevel = APP_INFO;
+    LgsVersion version{0, 0, 0};
+    LgsLogLevel logLevel = LGS_INFO;
+    LgsAppMode appMode = UNKNOWN_MODE;
+    uint8_t optLevel = 0;
     bool debugMode = false;
     bool isTestRun = false;
-    bool isFileMode = false;
     bool isLibrary = false;
-    uint8_t optLevel = 2;
-
-    void print() const;
 };
 
-inline void LgsAppConfigs::print() const {
-    logInfo("name       = " + name + '\n');
-    logInfo("activeEnv  = " + activeEnv + '\n');
-    logInfo("logLevel   = " + std::to_string(logLevel) + '\n');
-    logInfo("version    = " + std::to_string(version.major) + '.' + std::to_string(version.minor) + '.'+ std::to_string(version.micro) + '\n');
-    logInfo("debugMode  = " + std::to_string(debugMode) + '\n');
-    logInfo("isTestRun  = " + std::to_string(isTestRun) + '\n');
-    logInfo("isFileMode = " + std::to_string(isFileMode) + '\n');
-    logInfo("optLevel   = " + std::to_string(optLevel) + '\n');
+inline void print(const LgsAppConfigs& configs) {
+    logInfo("name       = " + configs.name + '\n');
+    logInfo("activeEnv  = " + configs.activeEnv + '\n');
+    logInfo("logLevel   = " + std::to_string(configs.logLevel) + '\n');
+    logInfo("version    = " + configs.version.asStr() + '\n');
+    logInfo("debugMode  = " + std::to_string(configs.debugMode) + '\n');
+    logInfo("isTestRun  = " + std::to_string(configs.isTestRun) + '\n');
+    logInfo("isLibrary  = " + std::to_string(configs.isLibrary) + '\n');
+    logInfo("fileMode   = " + std::to_string(configs.appMode) + '\n');
+    logInfo("optLevel   = " + std::to_string(configs.optLevel) + '\n');
 }
+

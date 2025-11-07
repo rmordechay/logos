@@ -7,6 +7,8 @@
 #include <chrono>
 #include <iostream>
 #include <unistd.h>
+#include <cstdlib>
+#include <cstring>
 
 #define STACK_INIT_SIZE 4096
 #define QUANTUM 10000

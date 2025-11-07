@@ -1,6 +1,6 @@
 #include "Lgs_DArray.h"
 #include "Lgs_Types.h"
-#include "data/LgsDefinitions.h"
+#include "LgsDefinitions.h"
 #include <cassert>
 #include <sstream>
 #include <cmath>

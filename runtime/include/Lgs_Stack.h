@@ -1,7 +1,7 @@
 #pragma once
 #include "Lgs_Stack.h"
 #include "Lgs_Types.h"
-#include "data/LgsConfigs.h"
+#include "../../include/logos/LgsConfigs.h"
 
 typedef void (*Thunk)(void*);
 

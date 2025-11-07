@@ -1,13 +1,15 @@
 #pragma once
 #include "LgsFile.h"
 #include "exprs/LgsVariable.h"
+#include "logos/LgsAppConfigs.h"
 #include "stmts/LgsVarDec.h"
 #include "utils/LgsUtils.h"
 
 struct LgsImportPackage {
-    std::string name;
-    std::string version;
-    LgsVariable* alias;
+    std::string name = "";
+    std::string url = "";
+    LgsVersion version = {0, 0, 0};
+    LgsVariable* alias = nullptr;
 };
 
 class LgsAppConfigFile final : public LgsFile {
@@ -20,4 +22,3 @@ public:
     size_t hashFile() override;
     ~LgsAppConfigFile() override;
 };
-

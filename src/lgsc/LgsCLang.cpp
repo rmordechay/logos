@@ -16,7 +16,7 @@ void LgsCLang::parseFile(const fs::path& fileName, LgsFile* lgsFile) const {
     if (fileName == "") return;
     const auto filePath = paths.cLibHeadersDir / fileName;
     const auto code = getFileText(filePath);
-    clang::tooling::runToolOnCodeWithArgs(std::make_unique<LgsCLangFeAction>(lgsFile), code, {"-isysroot", paths.cLibRoot.c_str()});
+    clang::tooling::runToolOnCodeWithArgs(std::make_unique<LgsCLangFeAction>(lgsFile), code, {"-isysroot", paths.cLibRootDir.c_str()});
 }
 
 void LgsCLang::compile(const std::vector<LgsStrConst*>& files) const {
@@ -47,7 +47,7 @@ void LgsCLang::compile(const std::vector<LgsStrConst*>& files) const {
 }
 
 std::vector<const char*> LgsCLang::getCompileArgs(const std::vector<LgsStrConst*>& files) const {
-    std::vector compileArgs{"clang", "-c", "-isysroot", paths.cLibRoot.c_str()};
+    std::vector compileArgs{"clang", "-c", "-isysroot", paths.cLibRootDir.c_str()};
     for (const auto& file : files) {
         compileArgs.push_back(file->value.c_str());
     }

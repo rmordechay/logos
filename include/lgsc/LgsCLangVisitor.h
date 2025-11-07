@@ -12,7 +12,7 @@ struct LgsSymbol;
 class LgsCLangVisitor final : public clang::RecursiveASTVisitor<LgsCLangVisitor>, public clang::ASTConsumer {
 public:
     LgsFile* file;
-    LgsErrHandler errHandler;
+   LgsErrHandler errHandler;
     clang::ASTContext* context = nullptr;
     int recursionDepth = 0;
 

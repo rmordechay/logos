@@ -8,7 +8,7 @@ class LgsFile;
 class LgsCLang {
 public:
     LgsPaths& paths;
-    LgsErrHandler errHandler;
+   LgsErrHandler errHandler;
 
     explicit LgsCLang(LgsPaths& paths) : paths(paths) {}
     void parseFile(const fs::path& fileName, LgsFile* lgsFile) const;

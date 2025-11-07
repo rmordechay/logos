@@ -1,6 +1,6 @@
 #include "codegen/LgsCodeGen.h"
 #include "builtins/LgsTest.h"
-#include "data/LgsConfigs.h"
+#include "../../include/logos/LgsConfigs.h"
 #include "exprs/LgsArrayExpr.h"
 #include "funcs/LgsCoroutine.h"
 #include "files/LgsInterfaceFile.h"
@@ -1492,7 +1492,7 @@ bool LgsCodeGen::writeIRModule() const {
     // Create object
     char cmd[1024*4];
     std::snprintf(cmd, sizeof(cmd), GENERATE_OBJ_CMD_STRING, outputPath.c_str(), outputPath.c_str());
-    if (std::system(cmd) != 0) assert(0);
+    if (!runCmd(cmd)) assert(0);
     fs::remove(outputPath + ".bc");
     return true;
 }

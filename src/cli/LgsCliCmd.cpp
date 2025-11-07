@@ -3,15 +3,13 @@
 #include "data/LgsDefinitions.h"
 #include "utils/LgsUtils.h"
 
-#define PADDING 6
-#define USAGE_STR "Usage:"
-
 void LgsCliCmd::printHelp() {
     const auto h = getHelp();
     assert(h.name != "" && h.usage != "" && h.desc != "" && !h.examples.empty());
-    std::ostringstream txt;
     getLongestArg(h);
-    txt << padString(USAGE_STR) << h.usage << "\n";
+    std::ostringstream txt;
+    txt << LGS_COLORIZE("Help\n", LGS_MSG_COLOR_WHITE);
+    txt << LGS_USAGE_STR << h.usage << "\n";
 
     // Required
     if (!h.requiredArgs.empty()) {
@@ -49,29 +47,23 @@ void LgsCliCmd::getLongestArg(const LgsCliCmdHelp& help) {
     for (const auto& arg : help.requiredArgs) {
         longestStr = std::max(longestStr, arg.name.length());
     }
-    const auto minSize = std::strlen(USAGE_STR);
+    const auto minSize = std::strlen(LGS_USAGE_STR);
     if (longestStr < minSize) longestStr = minSize;
     maxStr = longestStr;
 }
 
-std::string LgsCliCmd::padString(const std::string& str) const {
-    int diff = maxStr - str.length();
-    if (diff < 0) diff = -diff;
-    return str + std::string(diff + PADDING, ' ');
-}
-
 void LgsCliCmd::printArg(std::ostringstream& txt, LgsCliCmdArgHelp& arg) const {
     auto [name, type, defaultVal, possibleValues, desc] = arg;
-    txt << padString(name);
-    txt << padString(desc) << '\n';
+    txt << padString(maxStr, name);
+    txt << padString(maxStr, desc) << '\n';
     if (!type.empty()) {
-        txt << padString() + "Type: " << type << ".\n";
+        txt << padString(maxStr) + "Type: " << type << ".\n";
     }
     if (!defaultVal.empty()) {
-        txt << padString() + "Default: " << defaultVal << ".\n";
+        txt << padString(maxStr) + "Default: " << defaultVal << ".\n";
     }
     if (!possibleValues.empty()) {
-        txt << padString() + "Possible value: " << possibleValues << ".\n";
+        txt << padString(maxStr) + "Possible value: " << possibleValues << ".\n";
     }
 }
 
@@ -92,4 +84,13 @@ std::string LgsCliCmd::parseString(int& i, const std::string& cmd) const {
         return cmd.substr(1, cmd.size() - 2);
     }
     return "";
+}
+
+std::string LgsCliCmd::mergeArgs() const {
+    std::stringstream str;
+    str << "lgs ";
+    for (int i = 1; i < argc; ++i) {
+        str << argv[i] << ' ';
+    }
+    return str.str();
 }

@@ -7,7 +7,7 @@
 #define LINK_CMD_STRING "clang %s -L%s -llgs_runtime %s -Wl,-rpath,%s %s -o %s"
 
 bool LgsLinker::link() const {
-    assert(paths.lgsRuntimePath != "");
+    assert(paths.lgsRuntimeLib != "" && paths.execFile != "");
     std::string objFileList;
     for (const auto& objPath : fs::directory_iterator(paths.buildDirObjs)) {
         if (objPath.path().extension() == ".o") {
@@ -19,7 +19,6 @@ bool LgsLinker::link() const {
     for (const auto& appPath : externalLibs) {
         additionalLibs += appPath + "/build/app ";
     }
-
     const auto flags = appConfigs.isLibrary ? "-shared -fPIC" : "";
     char cmd[1024*4];
     std::snprintf(
@@ -27,11 +26,11 @@ bool LgsLinker::link() const {
         sizeof(cmd),
         LINK_CMD_STRING,
         objFileList.c_str(),
-        paths.lgsRuntimePath.c_str(),
+        paths.lgsRuntimeLib.c_str(),
         additionalLibs.c_str(),
-        paths.lgsRuntimePath.c_str(),
+        paths.lgsRuntimeLib.c_str(),
         flags,
-        paths.execFilePath.c_str()
+        paths.execFile.c_str()
     );
-    return std::system(cmd) == 0;
+    return runCmd(cmd);
 }

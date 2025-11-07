@@ -3,8 +3,9 @@
 #include "data/LgsDefinitions.h"
 #include "logos/LgsApp.h"
 #include "utils/LgsUtils.h"
-
 #include <iostream>
+
+std::string formatErrorMsg(const std::string& msg, const std::vector<std::string>& args);
 
 void LgsErrHandler::setUnsuccessful() {
     successful = false;
@@ -50,10 +51,8 @@ void LgsErrHandler::mergeErrors(LgsErrHandler& other) {
 }
 
 void LgsErrHandler::mergeErrorsWithLock(LgsErrHandler& other) {
-    {
-        std::lock_guard lock(mtx);
-        mergeErrors(other);
-    }
+    std::lock_guard lock(mtx);
+    mergeErrors(other);
 }
 
 void LgsErrHandler::exitWithErrors() const {
@@ -62,24 +61,46 @@ void LgsErrHandler::exitWithErrors() const {
         const auto column = err.location.columnStart;
         const auto line = err.location.lineStart;
         auto lineStr = getLine(err.filePath, line);
-        const auto firstNonSpace = std::find_if(lineStr.begin(), lineStr.end(), [](const unsigned char c) { return !std::isspace(c); });
+        const auto firstNonSpace = std::ranges::find_if(lineStr, [](const unsigned char c) { return !std::isspace(c); });
         const auto trimmedCount = std::distance(lineStr.begin(), firstNonSpace);
-        auto errMsg = trim(lineStr);
-        int indent = column - trimmedCount - 2;
-        if (indent < 0) {
-            indent = 0;
+        if (err.filePath != "") {
+            auto errMsg = trim(lineStr);
+            int indent = column - trimmedCount - 2;
+            if (indent < 0) {
+                indent = 0;
+            }
+            errMsg += '\n' + std::string(indent, '~');
+            errMsg += '^';
+            int rest = lineStr.size() - column + 1;
+            if (rest > 0) {
+                errMsg += std::string(rest, '~');
+            }
+            errMsg += '\n' + err.msg;
+            const auto path = "\n   at: " + getFullPath(err.location, err.filePath);
+            logError(errMsg, path);
+        } else {
+            logError(err.msg);
         }
-        errMsg += '\n' + std::string(indent, '~');
-        errMsg += '^';
-        int rest = lineStr.size() - column + 1;
-        if (rest > 0) {
-            errMsg += std::string(rest, '~');
-        }
-        errMsg += '\n' + err.msg;
-        const auto path = "\n   at: " + getFullPath(err.location, err.filePath);
-        logError(errMsg, path);
         if (i != errors.size() - 1) logInfo(LGS_MSG_LINE_SEPERATOR);
     }
     if (!errors.empty()) logInfo("\n");
     exit(EXIT_FAILURE);
+}
+
+void LgsErrHandler::exitWithError(const LgsBaseError& err, const std::vector<std::string>& args) {
+    const auto errMsg = formatErrorMsg(err.msg, args) + '\n';
+    logError(errMsg);
+    exit(EXIT_FAILURE);
+}
+
+std::string formatErrorMsg(const std::string& msg, const std::vector<std::string>& args) {
+    size_t pos = 0;
+    size_t argIndex = 0;
+    auto result = std::string(msg);
+    while ((pos = result.find(MSG_PLACEHOLDER, pos)) != std::string::npos && argIndex < args.size()) {
+        result.replace(pos, std::strlen(MSG_PLACEHOLDER), args[argIndex]);
+        pos += args[argIndex].length();
+        argIndex++;
+    }
+    return result;
 }

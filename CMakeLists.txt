@@ -6,8 +6,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_definitions(-DLOGOS_VERSION="${CMAKE_PROJECT_VERSION}")
 option(LOGOS_RELEASE "Build release version" OFF)
 
+list(APPEND CMAKE_LIBRARY_PATH "/usr/lib/aarch64-linux-gnu")
+set(CURL_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include/external)
 find_package(LLVM REQUIRED CONFIG)
 find_package(Clang REQUIRED CONFIG)
+find_package(OpenSSL REQUIRED)
+find_package(CURL REQUIRED)
 set(LLVM_LINK_LLVM_DYLIB ON)
 set(CLANG_LINK_CLANG_DYLIB ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
@@ -16,13 +20,14 @@ if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     set(CMAKE_INSTALL_PREFIX "/usr/local" CACHE PATH "Install prefix" FORCE)
 endif()
 
-find_program(CCACHE_PROGRAM ccache )
+find_program(CCACHE_PROGRAM ccache)
 if (CCACHE_PROGRAM AND NOT LOGOS_RELEASE)
     set(CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
     set(CMAKE_C_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
 endif()
 
 set(LGS_SOURCE
+    # Logos
     ${CMAKE_SOURCE_DIR}/src/logos/LgsApp.cpp
     ${CMAKE_SOURCE_DIR}/src/logos/LgsStack.cpp
     ${CMAKE_SOURCE_DIR}/src/logos/LgsPaths.cpp
@@ -48,6 +53,7 @@ set(LGS_SOURCE
     ${CMAKE_SOURCE_DIR}/src/utils/LgsUtils.cpp
     ${CMAKE_SOURCE_DIR}/src/utils/LgsErrHandler.cpp
 
+    # CLI
     ${CMAKE_SOURCE_DIR}/src/cli/LgsCli.cpp
     ${CMAKE_SOURCE_DIR}/src/cli/LgsCliCmd.cpp
     ${CMAKE_SOURCE_DIR}/src/cli/commands/LgsRunCmd.cpp
@@ -58,6 +64,12 @@ set(LGS_SOURCE
     ${CMAKE_SOURCE_DIR}/src/cli/commands/LgsFormatCmd.cpp
     ${CMAKE_SOURCE_DIR}/src/cli/commands/LgsGenerateCmd.cpp
 
+    # Package manager
+    ${CMAKE_SOURCE_DIR}/src/cli/lpm/LgsPkgCmd.cpp
+    ${CMAKE_SOURCE_DIR}/src/cli/lpm/LgsInstallCmd.cpp
+    ${CMAKE_SOURCE_DIR}/src/logos/LgsPkgManager.cpp
+
+    # Symbols
     ${CMAKE_SOURCE_DIR}/src/symbols/LgsSymbol.cpp
     ${CMAKE_SOURCE_DIR}/src/symbols/LgsSymbolTable.cpp
     ${CMAKE_SOURCE_DIR}/src/symbols/LgsValue.cpp
@@ -107,6 +119,7 @@ set(LGS_SOURCE
     ${CMAKE_SOURCE_DIR}/src/symbols/stmts/LgsVarDec.cpp
     ${CMAKE_SOURCE_DIR}/src/symbols/stmts/LgsSwitch.cpp
 
+    # Types
     ${CMAKE_SOURCE_DIR}/src/symbols/types/LgsType.cpp
     ${CMAKE_SOURCE_DIR}/src/symbols/types/LgsUnknown.cpp
     ${CMAKE_SOURCE_DIR}/src/symbols/types/LgsAny.cpp
@@ -154,15 +167,26 @@ set(RUNTIME_SOURCE
 # Runtime
 add_library(lgs_runtime SHARED ${RUNTIME_SOURCE})
 set_target_properties(lgs_runtime PROPERTIES OUTPUT_NAME "lgs_runtime")
+
+# Executable
+add_executable(lgs main.cpp ${LGS_SOURCE})
+
+# Includes
 target_include_directories(lgs_runtime PUBLIC
-    ${CMAKE_SOURCE_DIR}/include
-    ${CMAKE_SOURCE_DIR}/include/symbols
+    ${CMAKE_SOURCE_DIR}/include/data
     ${CMAKE_SOURCE_DIR}/runtime/include
 )
-
-# Create executable
-add_executable(lgs main.cpp ${LGS_SOURCE})
-target_link_libraries(lgs PRIVATE lgs_runtime LLVM clang-cpp)
+target_include_directories(lgs PUBLIC
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/include/symbols
+    ${LLVM_INCLUDE_DIRS}
+    ${CLANG_INCLUDE_DIRS}
+)
+target_include_directories(lgs SYSTEM PUBLIC
+    ${OPENSSL_INCLUDE_DIR}
+    ${LLVM_INCLUDE_DIRS}
+    ${CLANG_INCLUDE_DIRS}
+)
 
 # Options
 if(LOGOS_RELEASE)
@@ -174,20 +198,12 @@ if(LOGOS_RELEASE)
         target_link_options(lgs PRIVATE -s)
     endif()
 else()
-    target_compile_options(lgs PRIVATE -Wall -Wextra -Wpedantic -Wreturn-type -Wno-unused-parameter -Wno-unused-variable)
+    target_compile_options(lgs PRIVATE -Wall -Wextra -Wpedantic -Wreturn-type -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function)
     add_subdirectory(tests)
 endif()
 
-# Add includes to executable
-target_include_directories(lgs PUBLIC
-    ${CMAKE_SOURCE_DIR}/include
-    ${LLVM_INCLUDE_DIRS}
-    ${CLANG_INCLUDE_DIRS}
-)
-target_include_directories(lgs SYSTEM PUBLIC
-    ${LLVM_INCLUDE_DIRS}
-    ${CLANG_INCLUDE_DIRS}
-)
+# Link
+target_link_libraries(lgs PRIVATE lgs_runtime CURL::libcurl LLVM clang-cpp OpenSSL::SSL OpenSSL::Crypto)
 
 # Install
 install(TARGETS lgs RUNTIME DESTINATION bin)

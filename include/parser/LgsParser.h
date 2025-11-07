@@ -1,12 +1,11 @@
 #pragma once
-#include "../data/LgsTokens.h"
-#include "exprs/LgsJson.h"
-#include "exprs/LgsTernaryExpr.h"
+#include "parser/LgsLexer.h"
 #include "files/LgsAppConfigFile.h"
-#include "funcs/LgsMainFunc.h"
+#include "exprs/LgsJson.h"
 #include "loops/LgsForeachLoop.h"
 #include "utils/LgsErrHandler.h"
-#include "parser/LgsLexer.h"
+#include "data/LgsPlmErrors.h"
+#include "funcs/LgsMainFunc.h"
 
 class LgsGeneric;
 struct LgsPaths;
@@ -55,23 +54,22 @@ class LgsExpr;
 
 class LgsParser {
 public:
-    size_t fileID;
-    LgsPaths& paths;
-    bool headersOnly;
-    fs::path filePath;
-    std::string code = "";
     LgsToken currentToken;
     size_t currentIndex = 0;
     size_t recursionCount = 0;
     std::vector<LgsToken> tokens;
-    LgsErrHandler errHandler;
+    LgsFileMetadata& metadata;
+    LgsPaths& paths;
+    bool headersOnly;
+    std::string code = "";
     LgsSymbolTable& globals;
+    LgsErrHandler errHandler;
     LgsFunc* currentFunc = nullptr;
     std::vector<LgsStrConst*> cImports;
     std::unordered_map<std::string, LgsApp*> fileImports;
 
-    LgsParser(const size_t fileID, const fs::path& filePath, LgsPaths& paths, LgsSymbolTable& globals, const std::string& code, const bool headersOnly = false)
-        : fileID(fileID), paths(paths), headersOnly(headersOnly), filePath(filePath), code(code), globals(globals) {}
+    LgsParser(LgsFileMetadata& metadata, LgsPaths& paths, LgsSymbolTable& globals, const bool headersOnly = false)
+        : metadata(metadata), paths(paths), headersOnly(headersOnly), globals(globals) {}
 
     // Files
     bool scanTokens();
@@ -130,7 +128,6 @@ public:
     LgsExpr* parseExprWithPrecedence(int minPrecedence);
     LgsExpr* parseUnary();
     LgsVariable* parseVariable();
-    bool parseGenericArgs(std::vector<LgsType*>& types);
     LgsInstance* parseInstance();
     LgsFuncCall* parseFuncCall();
     LgsVectorExpr* parseVectorExpr();
@@ -148,6 +145,8 @@ public:
     LgsJsonObject* parseJsonObject();
     LgsJsonArray* parseJsonArray();
     LgsJson* parseJsonValue();
+    bool parseGenericArgs(std::vector<LgsType*>& types);
+    void parsePackageString(LgsImportPackage& pkg, const LgsToken& importToken);
     void parseJsonPrimitive(LgsJson* json);
     void parseImports();
     void parseCImports();
@@ -158,6 +157,8 @@ public:
     void setLocation(LgsLocation& location, const LgsToken* token) const;
     void extractStrParts(LgsStrConst& strConst);
     static int getBinOpPrecedence(LgsBinOpType opType);
+    void validateTestFolder(const LgsFile* testFile);
+    bool isImportName(LgsExpr* expr) const;
 
     // Parser
     bool isEOF();
@@ -171,6 +172,4 @@ public:
     bool parsedOrReset(const void* value, size_t resetIndex);
     void addParsingError();
     void recursionGuard();
-    void validateTestFolder(const LgsFile* testFile);
-    bool isImportName(LgsExpr* expr) const;
 };

@@ -1,9 +1,11 @@
 #include "logos/LgsPaths.h"
-#include "data/LgsConfigs.h"
+#include "logos/LgsConfigs.h"
 #include "data/LgsDefinitions.h"
+#include "utils/LgsUtils.h"
 #include <iostream>
 #include <unistd.h>
 #include <llvm/TargetParser/Triple.h>
+
 #if defined(_WIN32)
 #include <windows.h>
 #elif defined(__APPLE__)
@@ -13,38 +15,42 @@
 #include <limits.h>
 #endif
 
-void LgsPaths::initPaths() {
-    assert(rootPath != "");
-    srcDir = rootPath / LGS_SRC_DIR;
-    envsDir = rootPath / LGS_ENVS_DIR;
-    buildDir = rootPath / LGS_BUILD_DIR;
-    appFilePath = rootPath / LGS_APP_FILE;
-    lgsPackagePath = rootPath / "../../lgs-packages";
-    buildDirIR = buildDir / LGS_BUILD_IR_DIR;
-    buildDirObjs = buildDir / LGS_BUILD_OBJECTS_DIR;
-    cacheFile = buildDir / LGS_FILES_CACHE_FILE;
-    findLgsRuntime();
-    findCLibRoot();
-    findCLibHeaders();
-}
-
-void LgsPaths::findLgsRuntime() {
-char buf[1024];
+bool LgsPaths::findLgsRuntime() {
+    char buf[1024];
 #if defined(_WIN32)
     DWORD len = GetModuleFileNameA(NULL, buf, MAX_PATH);
-    if (len == 0 || len == MAX_PATH) assert(0);
+    if (len == 0 || len == MAX_PATH) return false;
 #elif defined(__APPLE__)
     uint32_t size = sizeof(buf);
-    if (_NSGetExecutablePath(buf, &size) != 0) assert(0);
+    if (_NSGetExecutablePath(buf, &size) != 0) return false;
 #else
     ssize_t len = readlink("/proc/self/exe", buf, sizeof(buf)-1);
-    if (len == -1) assert(0);
+    if (len == -1) return false;
     buf[len] = '\0';
 #endif
-    lgsRuntimePath = fs::path(buf).parent_path();
+    lgsRuntimeLib = fs::path(buf).parent_path();
+    validateFilePath(lgsRuntimeLib);
+    return true;
 }
 
-void LgsPaths::findCLibRoot() {
+bool LgsPaths::findLgsRootDir() {
+    fs::path root = "";
+    switch (lgsConfigs.os) {
+    case MAC_OS:
+    case LINUX:
+        root = "../..";
+        break;
+    case WINDOWS:
+    case UNKNOWN_OS:
+        assert(0);
+    }
+    lgsRootDir = root / LGS_ROOT_DIR;
+    lgsPackagesDir = lgsRootDir / LGS_PACKAGES_DIR;
+    validateFilePath(lgsRootDir);
+    return true;
+}
+
+bool LgsPaths::findCLibRoot() {
     FILE* pipe = nullptr;
     char buffer[512];
     switch (lgsConfigs.os) {
@@ -55,19 +61,26 @@ void LgsPaths::findCLibRoot() {
         pipe = popen("clang -print-resource-dir 2>/dev/null", "r");
         break;
     default:
-        assert(0);
+        break;
     }
+    if(!pipe) return false;
+
     fgets(buffer, sizeof(buffer), pipe);
     std::string clibRoot = buffer;
-    assert(clibRoot != "");
+    if (clibRoot == "") {
+        pclose(pipe);
+        return false;
+    }
     clibRoot.pop_back();
-    cLibRoot = fs::path(clibRoot);
-    if (pipe) pclose(pipe);
+    cLibRootDir = fs::path(clibRoot);
+    pclose(pipe);
+    validateFilePath(cLibRootDir);
+    return true;
 }
 
-void LgsPaths::findCLibHeaders() {
+bool LgsPaths::findCLibHeaders() {
     const auto pipe = popen("clang -E -Wp,-v -xc /dev/null 2>&1", "r");
-    if (!pipe) assert(0);
+    if (!pipe) return false;
     char buffer[512];
     while (fgets(buffer, sizeof(buffer), pipe)) {
         std::string line = buffer;
@@ -85,6 +98,8 @@ void LgsPaths::findCLibHeaders() {
             break;
         }
     }
-    assert(cLibHeadersDir != "");
+    if (cLibHeadersDir == "") return false;
     pclose(pipe);
+    validateFilePath(cLibHeadersDir);
+    return true;
 }
