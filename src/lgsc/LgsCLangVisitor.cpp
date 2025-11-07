@@ -35,7 +35,7 @@ bool LgsCLangVisitor::VisitFunctionDecl(const clang::FunctionDecl* func) {
         funcImpl->funcType->params.push_back(lgsParam);
     }
     funcImpl->funcType->isVariadic = func->isVariadic();
-    file->symbolTable.addSymbol(LgsSymbol(funcImpl, true), &errHandler);
+    file->symbolTable.addSymbol(LgsSymbol(funcImpl, false, true), &errHandler);
     return true;
 }
 
@@ -49,7 +49,7 @@ bool LgsCLangVisitor::VisitRecordDecl(const clang::RecordDecl* record) {
     const auto objSymbol = file->symbolTable.getSymbol(name);
     if (objSymbol) return true;
     const auto obj = mapCRecord(record);
-    file->symbolTable.addSymbol(LgsSymbol(obj, true), &errHandler);
+    file->symbolTable.addSymbol(LgsSymbol(obj, false, true), &errHandler);
     return true;
 }
 
@@ -152,7 +152,7 @@ LgsType* LgsCLangVisitor::mapCStruct(const clang::QualType type) {
     const auto objSymbol = file->symbolTable.getSymbol(name);
     if (objSymbol) return objSymbol->object;
     const auto obj = mapCRecord(decl);
-    file->symbolTable.addSymbol(LgsSymbol(obj, true), &errHandler);
+    file->symbolTable.addSymbol(LgsSymbol(obj, false, true), &errHandler);
     return obj;
 }
 

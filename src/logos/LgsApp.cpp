@@ -52,7 +52,7 @@ bool LgsApp::setup() {
         const auto filePath = paths.rootPath;
         paths.rootPath = fs::temp_directory_path();
         paths.initPaths();
-        appCache.files.emplace_back(LgsFileMetadata(getNextFileID(), filePath));
+        appCache.addFileMetadata(getNextFileID(), filePath);
         return true;
     }
 
@@ -64,28 +64,28 @@ bool LgsApp::setup() {
     }
 
     // App config file
-    appCache.files.emplace_back(LgsFileMetadata(getNextFileID(), paths.appFilePath, LGS_APP_CONFIG_FILE));
+    appCache.addFileMetadata(getNextFileID(), paths.appFilePath, LGS_APP_CONFIG_FILE);
 
     // Env files
     if (fs::exists(paths.envsDir)) {
         for (const auto& entry : fs::recursive_directory_iterator(paths.envsDir)) {
-            appCache.files.emplace_back(LgsFileMetadata(getNextFileID(), entry.path(), LGS_ENV_FILE));
+            appCache.addFileMetadata(getNextFileID(), entry.path(), LGS_ENV_FILE);
         }
     }
 
     // Src files
     auto isValid = true;
+    appCache.cacheFile = paths.cacheFile;
     for (const auto& entry : fs::recursive_directory_iterator(paths.srcDir)) {
         if (!isLogosFile(entry)) continue;
         const auto fileName = entry.path().filename();
-        if (fileExists(entry, appCache.files)) {
+        if (appCache.fileExists(entry)) {
             errHandler.addError(E10007, {fileName});
             isValid = false;
             continue;
         }
-        appCache.files.emplace_back(LgsFileMetadata(getNextFileID(), entry.path()));
+        appCache.addFileMetadata(getNextFileID(), entry.path());
     }
-
     return isValid;
 }
 
@@ -107,22 +107,16 @@ bool LgsApp::parse() {
     }
 
     // Project mode
-    appCache.load(paths.cacheFile);
     if (!loadEnvFiles()) return false;
     for (auto& fileMetadata : appCache.files) {
         if (fileMetadata.type != LGS_SRC_FILE) continue;
         threadPool.runTask([&fileMetadata, this] {
             const auto fileCode = getFileText(fileMetadata.path);
-            const auto file = loadSrcFile(fileCode, fs::canonical(fileMetadata.path), fileMetadata.id);
-            const auto hash = appCache.getHashByPath(file->absPath);
-            fileMetadata.hash = file->hashFile();
-            if (fileMetadata.hash != hash) {
-                appCache.dirtyFiles.push_back(fileMetadata);
-            }
+            loadSrcFile(fileCode, fs::canonical(fileMetadata.path), fileMetadata.id);
         });
     }
+
     threadPool.wait();
-    appCache.save(paths.cacheFile);
     return errHandler.successful;
 }
 
@@ -137,7 +131,6 @@ bool LgsApp::parseHeaders() {
         });
     }
     threadPool.wait();
-    if (errHandler.successful) appCache.save(paths.cacheFile);
     return errHandler.successful;
 }
 
@@ -156,13 +149,13 @@ void LgsApp::analyseEnvs() {
                 if (varDec->name != requiredEnv->name) continue;
                 if (!varDec->type || !requiredEnv->type) continue;
                 if (!varDec->type->canCastTo(requiredEnv->type)) {
-                    errHandler.addError(E10001, &varDec->location, envFile->absPath, {varDec->type->pname(), requiredEnv->type->pname()});
+                    errHandler.addError(E10001, &varDec->location, envFile->path, {varDec->type->pname(), requiredEnv->type->pname()});
                 }
                 found = true;
                 break;
             }
             if (found) continue;
-            errHandler.addError(E10020, &requiredEnv->location, appConfigFile->absPath, {envFile->envName, requiredEnv->name, requiredEnv->type->pname()});
+            errHandler.addError(E10020, &requiredEnv->location, appConfigFile->path, {envFile->envName, requiredEnv->name, requiredEnv->type->pname()});
         }
     }
 }
@@ -218,7 +211,7 @@ bool LgsApp::link() {
     return linker.link();
 }
 
-LgsFile* LgsApp::loadSrcFile(const std::string& fileCode, const fs::path& filePath, size_t fileID) {
+void LgsApp::loadSrcFile(const std::string& fileCode, const fs::path& filePath, size_t fileID) {
     if (fileID == 0) fileID = getNextFileID();
     LgsParser parser(fileID, filePath, paths, globals, fileCode);
     const auto file = parser.parseSrcFile(configs.isTestRun);
@@ -229,7 +222,6 @@ LgsFile* LgsApp::loadSrcFile(const std::string& fileCode, const fs::path& filePa
             errHandler.mergeErrors(parser.errHandler);
         }
     }
-    return file;
 }
 
 bool LgsApp::loadConfigFile() {
@@ -288,9 +280,18 @@ void LgsApp::loadAppConfigs() {
             auto [major, minor, micro] = configs.version;
             const auto s = std::sscanf(value.c_str(), "%lu.%lu.%lu%n", &major, &minor, &micro, &consumed) == 3;
             if (!s || value[consumed] != '\0') {
-                errHandler.addError(E10068, &config->location, appConfigFile->absPath, {value});
+                errHandler.addError(E10068, &config->location, appConfigFile->path, {value});
             }
         }
+    }
+}
+
+void LgsApp::compareHash() const {
+    for (const auto& file : srcFiles) {
+        const auto oldHash = appCache.getHashByPath(file->path);
+        const auto newHash = file->hashFile();
+        if (newHash == oldHash) continue;
+        assert(0);
     }
 }
 
@@ -320,10 +321,10 @@ bool LgsApp::loadDeps() {
 }
 
 void LgsApp::loadBuiltins() {
-    globals.addSymbol(LgsSymbol(new LgsSystem(), false, true), &errHandler);
-    globals.addSymbol(LgsSymbol(new LgsPrint(), false, true), &errHandler);
-    globals.addSymbol(LgsSymbol(new LgsTest(), false, true), &errHandler);
-    globals.addSymbol(LgsSymbol(new LgsReflect(), false, true), &errHandler);
+    globals.addSymbol(LgsSymbol(new LgsSystem(), true, false), &errHandler);
+    globals.addSymbol(LgsSymbol(new LgsPrint(), true, false), &errHandler);
+    globals.addSymbol(LgsSymbol(new LgsTest(), true, false), &errHandler);
+    globals.addSymbol(LgsSymbol(new LgsReflect(), true, false), &errHandler);
 }
 
 size_t LgsApp::getNextFileID() {
@@ -355,10 +356,10 @@ LgsApp::~LgsApp() {
         delete envFile;
     }
     envFiles.clear();
-    for (const auto testFile : testsFiles) {
+    for (const auto testFile : testFiles) {
         delete testFile;
     }
-    testsFiles.clear();
+    testFiles.clear();
     for (const auto& [_, app] : globals.imports) {
         delete app;
     }

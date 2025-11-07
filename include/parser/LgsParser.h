@@ -59,24 +59,24 @@ public:
     LgsPaths& paths;
     bool headersOnly;
     fs::path filePath;
-    LgsSymbolTable& globals;
     std::string code = "";
     LgsToken currentToken;
     size_t currentIndex = 0;
     size_t recursionCount = 0;
-    LgsErrHandler errHandler;
     std::vector<LgsToken> tokens;
+    LgsErrHandler errHandler;
+    LgsSymbolTable& globals;
     LgsFunc* currentFunc = nullptr;
-    LgsFile* currentFile = nullptr;
+    std::vector<LgsStrConst*> cImports;
+    std::unordered_map<std::string, LgsApp*> fileImports;
 
     LgsParser(const size_t fileID, const fs::path& filePath, LgsPaths& paths, LgsSymbolTable& globals, const std::string& code, const bool headersOnly = false)
-        : fileID(fileID), paths(paths), headersOnly(headersOnly), filePath(filePath), globals(globals), code(code) {}
+        : fileID(fileID), paths(paths), headersOnly(headersOnly), filePath(filePath), code(code), globals(globals) {}
 
     // Files
     bool scanTokens();
     LgsFile* parseSrcFile(bool isTestRun);
     LgsFile* parseSrcFileHeaders();
-    void parseImports(std::unordered_map<std::string, LgsApp*>& imports);
     LgsEnvFile* parseEnvFile();
     LgsMainFile* parseMainFile();
     LgsAppConfigFile* parseAppConfigFile();
@@ -149,7 +149,8 @@ public:
     LgsJsonArray* parseJsonArray();
     LgsJson* parseJsonValue();
     void parseJsonPrimitive(LgsJson* json);
-    void parseExternalImports(LgsFile* file);
+    void parseImports();
+    void parseCImports();
 
     // Helpers
     bool validateTypeName(const std::string& typeName, const LgsLocation* location);

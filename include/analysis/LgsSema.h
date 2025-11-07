@@ -57,6 +57,7 @@ public:
     LgsSymbolTable& globals;
     LgsErrHandler errHandler;
     LgsTypeResolver typeResolver;
+    std::map<std::string, size_t> refCount;
     std::map<std::string, LgsFunc*> corosRegistry;
     std::map<std::string, LgsFunc*> genericsRegistry;
 

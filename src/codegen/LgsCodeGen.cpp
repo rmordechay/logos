@@ -56,7 +56,7 @@
 #include <unistd.h>
 #include <unordered_set>
 
-std::atomic<size_t> lambdasNameCounter{0};
+std::atomic<size_t> LgsCodeGen::lambdasNameCounter{0};
 #define GENERATE_OBJ_CMD_STRING "llc -filetype=obj -o %s %s.bc"
 
 bool LgsCodeGen::generate() {

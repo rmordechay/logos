@@ -1,8 +1,8 @@
-#include "external/doctest.h"
 #include "logos/LgsApp.h"
 #include <cassert>
 #include <iostream>
 #include <sstream>
+#include "external/doctest.h"
 
 TEST_CASE("TestCodeGen1") {
     const auto code = R"(

@@ -31,7 +31,6 @@ bool isLogosFile(const fs::path& filePath);
 bool isLLVMFile(const fs::directory_entry& entry);
 bool isLogosKeyword(const std::string& s);
 std::string getFileText(const fs::path& filePath);
-bool fileExists(const fs::path& entry, const std::vector<LgsFileMetadata>& filesMetadata);
 size_t hashStr(const std::string& key);
 bool startsWith(const std::string& str, const std::string& prefix);
 std::string getLine(const std::string& filename, size_t lineNumber);
@@ -40,6 +39,7 @@ std::string getFullPath(const LgsLocation& location, const std::string& filePath
 void combineNodeHash(size_t& oldHash, size_t newHash);
 void hashNodeString(size_t& oldHash, const std::string& str);
 void hashNodeInt(size_t& oldHash, size_t val);
+time_t getLastWritten(const fs::path& filePath);
 
 void freeExpr(const LgsExpr* expr);
 void freeExprs(std::vector<LgsExpr*>& exprs);

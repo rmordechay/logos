@@ -12,14 +12,6 @@
 #include <clang/Frontend/CompilerInstance.h>
 #include <llvm/TargetParser/Host.h>
 
-void LgsCLang::resolveCPaths(LgsFile& lgsFile) {
-    for (const auto externalCPath : lgsFile.externalCPaths) {
-        const auto entryPath = resolveExternalFile(externalCPath, lgsFile);
-        if (entryPath == "") continue;
-        parseFile(entryPath, &lgsFile);
-    }
-}
-
 void LgsCLang::parseFile(const fs::path& fileName, LgsFile* lgsFile) const {
     if (fileName == "") return;
     const auto filePath = paths.cLibHeadersDir / fileName;
@@ -68,6 +60,6 @@ fs::path LgsCLang::resolveExternalFile(LgsStrConst* filePath, const LgsFile& fil
     if (fs::exists(filePath->value)) return filePath->value;
     const auto cLibHeaderFile = paths.cLibHeadersDir / filePath->value;
     if (fs::exists(cLibHeaderFile)) return cLibHeaderFile;
-    errHandler.addError(E10047, &filePath->location, file.absPath, {filePath->value});
+    errHandler.addError(E10047, &filePath->location, file.path, {filePath->value});
     return "";
 }

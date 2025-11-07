@@ -1,6 +1,5 @@
 #pragma once
 #include "data/LgsErrors.h"
-#include <llvm/IR/Value.h>
 #include <llvm/IR/DIBuilder.h>
 
 namespace llvm {
@@ -12,9 +11,7 @@ class LgsVariable;
 class LgsExpr;
 class LgsLLVMGen;
 class LgsFunc;
-
 using llvm::Value;
-using llvm::Type;
 using llvm::Type;
 
 using llvm::DIFile;

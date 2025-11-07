@@ -8,7 +8,7 @@ void LgsAppCache::load(const fs::path& cacheFilePath) {
     if (!inFile) return;
     size_t count;
     inFile.read(reinterpret_cast<char*>(&count), sizeof(count));
-    cached.reserve(count);
+    files.reserve(count);
     for (size_t i = 0; i < count; ++i) {
         FileID id;
         inFile.read(reinterpret_cast<char*>(&id), sizeof(id));
@@ -25,7 +25,7 @@ void LgsAppCache::load(const fs::path& cacheFilePath) {
         inFile.read(reinterpret_cast<char*>(&lastWriteTime), sizeof(lastWriteTime));
         LgsFileMetadata fileMetadata(id, filePath, lastWriteTime, type);
         fileMetadata.hash = hash;
-        cached.push_back(fileMetadata);
+        files.push_back(fileMetadata);
     }
 }
 
@@ -47,18 +47,31 @@ void LgsAppCache::save(const fs::path& cacheFilePath) const {
 }
 
 void LgsAppCache::print() const {
-    for (size_t i = 0; i < cached.size(); ++i) {
-        logInfo("id          = " + std::to_string(cached[i].id) + '\n');
-        logInfo("type        = " + std::to_string(cached[i].type) + '\n');
-        logInfo("hash        = " + std::to_string(cached[i].hash) + '\n');
-        logInfo("lastWritten = " + std::to_string(cached[i].lastWritten) + '\n');
-        logInfo("filePath    = " + cached[i].path.string() + '\n');
+    for (size_t i = 0; i < files.size(); ++i) {
+        logInfo("id          = " + std::to_string(files[i].id) + '\n');
+        logInfo("type        = " + std::to_string(files[i].type) + '\n');
+        logInfo("hash        = " + std::to_string(files[i].hash) + '\n');
+        logInfo("lastWritten = " + std::to_string(files[i].lastWritten) + '\n');
+        logInfo("filePath    = " + files[i].path.string() + '\n');
         logInfo("---\n");
     }
 }
 
+void LgsAppCache::addFileMetadata(const size_t fileID, const fs::path& filePath, const LgsFileType fileType) {
+    files.emplace_back(LgsFileMetadata(fileID, filePath, getLastWritten(filePath), fileType));
+}
+
+bool LgsAppCache::fileExists(const std::filesystem::directory_entry& entry) const {
+    for (auto metadata : files) {
+        if (metadata.path == entry) {
+            return true;
+        }
+    }
+    return false;
+}
+
 size_t LgsAppCache::getHashByPath(const fs::path& path) const {
-    for (auto fileMetadata : cached) {
+    for (auto fileMetadata : files) {
         if (fileMetadata.path == path) return fileMetadata.hash;
     }
     return 0;

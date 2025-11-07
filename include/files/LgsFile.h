@@ -10,13 +10,12 @@ class LgsApp;
 class LgsFile {
 public:
     size_t id = 0;
-    fs::path absPath;
+    fs::path path;
     LgsLLVMGen cg;
     LgsLocation location;
     LgsSymbolTable symbolTable;
-    std::vector<LgsStrConst*> externalCPaths;
 
-    explicit LgsFile(const size_t fileID, const fs::path& path) : id(fileID), absPath(path) {}
+    explicit LgsFile(const size_t fileID, const fs::path& path) : id(fileID), path(path) {}
     virtual size_t hashFile() = 0;
     virtual ~LgsFile() = default;
 };

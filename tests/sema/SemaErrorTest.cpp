@@ -1,8 +1,7 @@
-#define DOCTEST_CONFIG_IMPLEMENT
-#include "external/doctest.h"
 #include "logos/LgsApp.h"
 #include "utils/LgsUtils.h"
 #include <string>
+#include "external/doctest.h"
 
 TEST_CASE("SemaError10000") {
     LgsApp app;
@@ -358,7 +357,7 @@ TEST_CASE("SemaError10021") {
     LgsApp app;
     const auto code = R"(
     main() {
-        a = true then "3" else 6
+        a = true then "36" else 6
     }
     )";
     app.loadSrcFile(code);

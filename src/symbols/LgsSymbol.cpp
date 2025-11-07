@@ -11,7 +11,8 @@
 class LgsTable;
 
 LgsSymbol::LgsSymbol()
-    : name(nullptr), symbolType(UNKNOWN), location(nullptr) {}
+    : name(nullptr), symbolType(UNKNOWN), location(nullptr), unknown(nullptr) {
+}
 
 LgsSymbol::LgsSymbol(LgsParam* param)
     : name(&param->name), symbolType(PARAM), location(&param->location), param(param) {}
@@ -28,13 +29,13 @@ LgsSymbol::LgsSymbol(LgsSubType* subtype)
 LgsSymbol::LgsSymbol(LgsGeneric* generic)
     : name(&generic->name), symbolType(GENERIC), location(&generic->location), generic(generic) {}
 
-LgsSymbol::LgsSymbol(LgsObject* object, const bool isExternal, const bool isBuiltin)
+LgsSymbol::LgsSymbol(LgsObject* object, const bool isBuiltin, const bool isExternal)
     : name(&object->name), symbolType(OBJECT), location(&object->location), isExternal(isExternal), isBuiltin(isBuiltin), object(object) {}
 
-LgsSymbol::LgsSymbol(LgsEnum* lgsEnum, const bool isExternal, const bool isBuiltin)
+LgsSymbol::LgsSymbol(LgsEnum* lgsEnum, const bool isBuiltin, const bool isExternal)
     : name(&lgsEnum->name), symbolType(ENUM), location(&lgsEnum->location), isExternal(isExternal), isBuiltin(isBuiltin), enum_(lgsEnum) {}
 
-LgsSymbol::LgsSymbol(LgsFunc* func, const bool isExternal, const bool isBuiltin)
+LgsSymbol::LgsSymbol(LgsFunc* func, const bool isBuiltin, const bool isExternal)
     : name(&func->funcType->name), symbolType(FUNC), location(&func->location), isExternal(isExternal), isBuiltin(isBuiltin), func(func) {}
 
 LgsSymbol::LgsSymbol(LgsVarDec* varDec)

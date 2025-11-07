@@ -36,14 +36,14 @@ public:
     LgsErrHandler errHandler;
     std::vector<LgsFile*> srcFiles;
     std::vector<LgsEnvFile*> envFiles;
-    std::vector<LgsTestFile*> testsFiles;
+    std::vector<LgsTestFile*> testFiles;
     LgsAppConfigFile* appConfigFile = nullptr;
+    std::atomic<FileID> nextFileID = 1;
     // Used when passing code directly.
     std::unordered_map<std::string, std::string> lgsCode;
-    std::atomic<FileID> nextFileID = 1;
 
-    LgsApp() = default;
-    explicit LgsApp(const fs::path& rootPath) {
+    explicit LgsApp(const fs::path& rootPath = "") {
+        if (rootPath == "") return;
         assert(fs::exists(rootPath));
         paths.rootPath = fs::canonical(rootPath);
     }
@@ -56,10 +56,11 @@ public:
     bool analyse();
     bool generate();
     bool link();
-    LgsFile* loadSrcFile(const std::string& fileCode, const fs::path& filePath = LGS_MAIN_FILE, size_t fileID = 0);
+    void loadSrcFile(const std::string& fileCode, const fs::path& filePath = LGS_MAIN_FILE, size_t fileID = 0);
     bool loadConfigFile();
     bool loadEnvFiles();
     void loadAppConfigs();
+    void compareHash() const;
     bool loadDeps();
     void loadBuiltins();
     size_t getNextFileID();

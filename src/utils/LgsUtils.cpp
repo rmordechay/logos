@@ -103,50 +103,6 @@ std::string getFileText(const fs::path& filePath) {
     return fileContents.str();
 }
 
-bool fileExists(const fs::path& entry, const std::vector<LgsFileMetadata>& filesMetadata) {
-    for (auto metadata : filesMetadata) {
-        if (metadata.path == entry) {
-            return true;
-        }
-    }
-    return false;
-}
-
-void freeType(const LgsType* type) {
-    if (!type) return;
-    if (type->isPrimitive) return;
-    delete type;
-}
-
-void freeExpr(const LgsExpr* expr) {
-    if (!expr) return;
-    delete expr;
-}
-
-void freeExprs(std::vector<LgsExpr*>& exprs) {
-    for (const auto expr : exprs) {
-        freeExpr(expr);
-    }
-    exprs.clear();
-}
-
-void freeStmt(const LgsStmt* stmt) {
-    if (!stmt) return;
-    delete stmt;
-}
-
-void freeParams(std::vector<LgsParam>& params) {
-    for (size_t i = 0; i < params.size(); ++i) {
-        const auto param = params[i];
-        if (param.expr) {
-            freeExpr(param.expr);
-        } else if (param.type) {
-            freeType(param.type);
-        }
-    }
-    params.clear();
-}
-
 size_t hashStr(const std::string& key) {
     return std::hash<std::string_view>{}(key);
 }
@@ -199,3 +155,45 @@ void hashNodeInt(size_t& oldHash, const size_t val) {
     combineNodeHash(oldHash, std::hash<size_t>{}(val));
 }
 
+time_t getLastWritten(const fs::path& filePath) {
+    const auto ftime = fs::last_write_time(filePath);
+    const auto sctp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(
+        ftime - fs::file_time_type::clock::now() + std::chrono::system_clock::now()
+        );
+    return std::chrono::system_clock::to_time_t(sctp);
+}
+
+void freeExpr(const LgsExpr* expr) {
+    if (!expr) return;
+    delete expr;
+}
+
+void freeExprs(std::vector<LgsExpr*>& exprs) {
+    for (const auto expr : exprs) {
+        freeExpr(expr);
+    }
+    exprs.clear();
+}
+
+void freeStmt(const LgsStmt* stmt) {
+    if (!stmt) return;
+    delete stmt;
+}
+
+void freeParams(std::vector<LgsParam>& params) {
+    for (size_t i = 0; i < params.size(); ++i) {
+        const auto param = params[i];
+        if (param.expr) {
+            freeExpr(param.expr);
+        } else if (param.type) {
+            freeType(param.type);
+        }
+    }
+    params.clear();
+}
+
+void freeType(const LgsType* type) {
+    if (!type) return;
+    if (type->isPrimitive) return;
+    delete type;
+}

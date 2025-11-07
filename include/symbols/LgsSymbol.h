@@ -27,10 +27,12 @@ enum LgsSymbolType {
     UNKNOWN,
 };
 
+
 struct LgsSymbol {
     std::string* name;
     LgsSymbolType symbolType;
     LgsLocation* location;
+    size_t refCount = 0;
     bool isExternal = false;
     bool isBuiltin = false;
     union {
@@ -43,6 +45,7 @@ struct LgsSymbol {
         LgsField* field;
         LgsEnum* enum_;
         LgsFunc* func;
+        void* unknown;
     };
 
     explicit LgsSymbol();
@@ -52,9 +55,9 @@ struct LgsSymbol {
     explicit LgsSymbol(LgsInterface* interface);
     explicit LgsSymbol(LgsGeneric* generic);
     explicit LgsSymbol(LgsSubType* subtype);
-    explicit LgsSymbol(LgsObject* object, bool isExternal = false, bool isBuiltin = false);
-    explicit LgsSymbol(LgsEnum* lgsEnum, bool isExternal = false, bool isBuiltin = false);
-    explicit LgsSymbol(LgsFunc* func, bool isExternal = false, bool isBuiltin = false);
+    explicit LgsSymbol(LgsObject* object, bool isBuiltin = false, bool isExternal = false);
+    explicit LgsSymbol(LgsEnum* lgsEnum, bool isBuiltin = false, bool isExternal = false);
+    explicit LgsSymbol(LgsFunc* func, bool isBuiltin = false, bool isExternal = false);
     LgsType* getType() const;
     LgsSymbol clone() const;
 };

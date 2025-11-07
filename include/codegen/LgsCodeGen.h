@@ -64,6 +64,7 @@ public:
     LgsPaths& paths;
     LgsAppConfigs& appConfigs;
     Function* currentIRFunc = nullptr;
+    static std::atomic<size_t> lambdasNameCounter;
 
     explicit LgsCodeGen(LgsFile& file, LgsAppConfigs& appConfigs, LgsPaths& paths)
         : file(file), cg(file.cg), paths(paths), appConfigs(appConfigs) {
