@@ -1,6 +1,4 @@
 #pragma once
-#include "LgsDefinitions.h"
-
 #include <fstream>
 #include <string>
 
@@ -76,7 +74,7 @@ inline LgsBaseError E10043{"Default parameters and variadic arguments are not al
 inline LgsBaseError E10044{"Value of switch case must be known at compile time. Given: %s.", errCodeStart++};
 inline LgsBaseError E10045{"Variadic argument cannot have default arguments.", errCodeStart++};
 inline LgsBaseError E10046{"%s is not callable.", errCodeStart++};
-inline LgsBaseError E10047{"External file %s was not found.", errCodeStart++};
+inline LgsBaseError E10047{"External %s file '%s' was not found.", errCodeStart++};
 inline LgsBaseError E10048{"Index %s is out of bounds. Max expected index: %s", errCodeStart++};
 inline LgsBaseError E10049{"Not enough information to infer type of %s.", errCodeStart++};
 inline LgsBaseError E10050{"Only integer values can be incremented (++) or decremented (--). Given: %s.", errCodeStart++};

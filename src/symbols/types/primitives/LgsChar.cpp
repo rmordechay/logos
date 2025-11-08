@@ -1,6 +1,7 @@
 #include "codegen/LgsLLVMGen.h"
 #include "exprs/constants/LgsCharConst.h"
 #include "types/LgsAny.h"
+#include "types/iterables/LgsStr.h"
 #include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsInt.h"
 #include "types/primitives/LgsLong.h"
@@ -36,6 +37,7 @@ std::string LgsChar::strFormatPart() const {
 bool LgsChar::canCastTo(LgsType* other) {
     const auto IRName = other->getName();
     if (IRName == LgsAny::name) return true;
+    if (IRName == LgsStr::name) return true;
     if (IRName == LgsShort::name) return true;
     if (IRName == LgsInt::name) return true;
     if (IRName == LgsSize::name) return true;

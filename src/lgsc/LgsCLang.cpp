@@ -1,65 +1,79 @@
 #include "lgsc/LgsCLang.h"
-#include "exprs/constants/LgsStrConst.h"
+#include "LgsDefinitions.h"
 #include "files/LgsFile.h"
-#include "lgsc/LgsCLangVisitor.h"
-#include "logos/LgsPaths.h"
+#include "lgsc/LgsCLangParser.h"
+#include "logos/LgsConfigs.h"
 #include "utils/LgsUtils.h"
-#include <clang/Driver/Compilation.h>
+#include <iostream>
 #include <clang/Driver/Driver.h>
-#include <clang/Tooling/Tooling.h>
-#include <clang/CodeGen/CodeGenAction.h>
-#include <clang/Frontend/CompilerInvocation.h>
-#include <clang/Frontend/CompilerInstance.h>
 #include <llvm/TargetParser/Host.h>
+#include <clang/AST/ASTConsumer.h>
+#include <clang/Frontend/CompilerInstance.h>
+#include <clang/Parse/ParseAST.h>
+#include <clang/Lex/PreprocessorOptions.h>
+#include <clang/Basic/TargetInfo.h>
+#include <clang/Basic/SourceManager.h>
+#include <llvm/Support/MemoryBuffer.h>
 
-void LgsCLang::parseFile(const fs::path& fileName, LgsFile* lgsFile) const {
-    if (fileName == "") return;
-    const auto filePath = paths.cLibHeadersDir / fileName;
-    const auto code = getFileText(filePath);
-    clang::tooling::runToolOnCodeWithArgs(std::make_unique<LgsCLangFeAction>(lgsFile), code, {"-isysroot", paths.cLibRootDir.c_str()});
+using namespace clang;
+
+bool LgsCLang::parseFile(const fs::path& fileName, LgsFile* lgsFile) {
+    const auto cCode = getFileText(fileName);
+    if (cCode.empty()) {
+        errHandler.addError(E10047, {LGS_C, fileName});
+        return false;
+    }
+
+    CompilerInstance compiler;
+    auto diagConsumer = std::make_unique<LgsDiagnosticConsumer>();
+    compiler.createDiagnostics(diagConsumer.release());
+    compiler.getInvocation().getTargetOpts().Triple = llvm::sys::getDefaultTargetTriple();
+    compiler.getHeaderSearchOpts().AddPath(paths.cLibHeadersDir.c_str(), frontend::System, false, false);
+    const auto targetOptions = std::make_shared<TargetOptions>(compiler.getInvocation().getTargetOpts());
+    compiler.setTarget(TargetInfo::CreateTargetInfo(compiler.getDiagnostics(), targetOptions));
+    compiler.createFileManager();
+    compiler.createSourceManager(compiler.getFileManager());
+
+    auto buffer = llvm::MemoryBuffer::getMemBuffer(cCode);
+    const auto fileID = compiler.getSourceManager().createFileID(std::move(buffer));
+    compiler.getSourceManager().setMainFileID(fileID);
+
+    compiler.getPreprocessorOpts().UsePredefines = true;
+    compiler.createPreprocessor(TU_Complete);
+
+    compiler.createASTContext();
+    if (compiler.getDiagnostics().hasErrorOccurred()) return false;
+
+    LgsCLangParser consumer(lgsFile);
+    ParseAST(compiler.getPreprocessor(), &consumer, compiler.getASTContext());
+    return !compiler.getDiagnostics().hasErrorOccurred();
 }
 
-void LgsCLang::compile(const std::vector<LgsStrConst*>& files) const {
-    const auto targetTriple = llvm::sys::getDefaultTargetTriple();
-    clang::DiagnosticsEngine diags(new clang::DiagnosticIDs(), new clang::DiagnosticOptions(), new clang::DiagnosticConsumer());
-    clang::driver::Driver driver("clang", targetTriple, diags);
-    auto invocation = std::make_unique<clang::CompilerInvocation>();
-    const auto args = getCompileArgs(files);
-    clang::CompilerInvocation::CreateFromArgs(*invocation, args, diags);
-    auto compilerInstance = std::make_unique<clang::CompilerInstance>();
-    compilerInstance->setInvocation(std::move(invocation));
-    compilerInstance->createFileManager();
-    compilerInstance->createSourceManager(compilerInstance->getFileManager());
-
-    switch (compilerInstance->getFrontendOpts().ProgramAction) {
-    case clang::frontend::ActionKind::EmitObj: {
-        clang::EmitObjAction action;
-        compilerInstance->ExecuteAction(action);
+void LgsDiagnosticConsumer::HandleDiagnostic(const DiagnosticsEngine::Level level, const Diagnostic& info) {
+    SmallString<128> message;
+    info.FormatDiagnostic(message);
+    std::stringstream msg;
+    switch (level) {
+    case DiagnosticsEngine::Error:
+    case DiagnosticsEngine::Fatal: {
+        SourceLocation loc = info.getLocation();
+        if (loc.isValid()) {
+            const auto &SM = info.getSourceManager();
+            PresumedLoc PLoc = SM.getPresumedLoc(loc);
+            if (PLoc.isValid()) {
+                const auto b = std::string(PLoc.getFilename()) + ':' + std::to_string(PLoc.getLine()) + ':' +  std::to_string(PLoc.getColumn());
+                const auto a = message.str().str();
+                std::cout << a << '\n';
+                std::cout << b << '\n';
+            }
+        }
+        msg << message.str().str() << "\n";
         break;
     }
-    case clang::frontend::ActionKind::EmitAssembly: {
-        clang::EmitAssemblyAction action;
-        compilerInstance->ExecuteAction(action);
+    case DiagnosticsEngine::Warning:
+        if (lgsConfigs.devMode) logWarning(message.str().str() + "\n");
+        break;
+    default:
         break;
     }
-    default: break;
-    }
-}
-
-std::vector<const char*> LgsCLang::getCompileArgs(const std::vector<LgsStrConst*>& files) const {
-    std::vector compileArgs{"clang", "-c", "-isysroot", paths.cLibRootDir.c_str()};
-    for (const auto& file : files) {
-        compileArgs.push_back(file->value.c_str());
-    }
-    compileArgs.push_back("-o");
-    compileArgs.push_back((paths.buildDir / "external_c.o").c_str());
-    return compileArgs;
-}
-
-fs::path LgsCLang::resolveExternalFile(LgsStrConst* filePath, const LgsFile& file) {
-    if (fs::exists(filePath->value)) return filePath->value;
-    const auto cLibHeaderFile = paths.cLibHeadersDir / filePath->value;
-    if (fs::exists(cLibHeaderFile)) return cLibHeaderFile;
-    errHandler.addError(E10047, &filePath->location, file.path, {filePath->value});
-    return "";
 }

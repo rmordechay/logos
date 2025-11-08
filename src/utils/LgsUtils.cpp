@@ -27,25 +27,14 @@ void execute(const fs::path& execPath, std::vector<const char*> mainArgs) {
     exit(EXIT_FAILURE);
 }
 
-void logInfo(const std::string& text, const bool withNewLine) {
-    if (withNewLine) std::cout << text << '\n';
-    else std::cout << text;
-}
-
-void logDebug(const std::string& text, const bool withNewLine) {
-    if (lgsConfigs.logLevel != LGS_DEBUG) return;
-    if (withNewLine) std::cout << text << '\n';
-    else std::cout << text;
-}
-
-std::string padErrorMsg(const std::string& text) {
+std::string padAndColorErrorMsg(const std::string& text) {
     if (text.empty()) return LGS_ERROR_TEXT;
     std::string padding(std::strlen(LGS_ERROR_TEXT), ' ');
     std::stringstream input(text);
     std::stringstream result;
     std::string line;
     std::getline(input, line);
-    result << LGS_COLORIZE_ERROR(LGS_ERROR_TEXT) << line;
+    result << LGS_COLORIZE(LGS_ERROR_TEXT, LGS_MSG_COLOR_RED) << line;
     while (std::getline(input, line)) {
         result << '\n' << padding << line;
     }
@@ -55,15 +44,25 @@ std::string padErrorMsg(const std::string& text) {
     return result.str();
 }
 
-void logError(const std::string& errMsg, const std::string& epilogue) {
-    const auto textWithErrors = padErrorMsg(errMsg);
+void logInfo(const std::string& mgs, const bool withNewLine) {
+    if (withNewLine) std::cout << mgs << '\n';
+    else std::cout << mgs;
+}
+
+void logDebug(const std::string& msg, const bool withNewLine) {
+    if (lgsConfigs.logLevel != LGS_DEBUG) return;
+    if (withNewLine) std::cout << msg << '\n';
+    else std::cout << msg;
+}
+
+void logError(const std::string& msg, const std::string& epilogue) {
+    const auto textWithErrors = padAndColorErrorMsg(msg);
     logInfo(textWithErrors);
     if (epilogue != "") logInfo(epilogue);
 }
 
-void logWarning(const std::string& msg, const std::string& path) {
-    logInfo(LGS_COLORIZE("Warning: ", LGS_MSG_COLOR_YELLOW));
-    if (path != "") logInfo(path);
+void logWarning(const std::string& msg) {
+    logInfo(LGS_COLORIZE(LGS_WARNING_TEXT, LGS_MSG_COLOR_YELLOW) + msg);
 }
 
 bool isLogosFile(const fs::path& filePath) {

@@ -1,18 +1,21 @@
 #pragma once
 #include "logos/LgsPaths.h"
 #include "utils/LgsErrHandler.h"
+#include <clang/Basic/Diagnostic.h>
 
 class LgsStrConst;
 class LgsFile;
 
-class LgsCLang {
+class LgsDiagnosticConsumer final : public clang::DiagnosticConsumer {
+public:
+    void HandleDiagnostic(clang::DiagnosticsEngine::Level level, const clang::Diagnostic& info) override;
+};
+
+class LgsCLang final {
 public:
     LgsPaths& paths;
-   LgsErrHandler errHandler;
+    LgsErrHandler errHandler;
 
     explicit LgsCLang(LgsPaths& paths) : paths(paths) {}
-    void parseFile(const fs::path& fileName, LgsFile* lgsFile) const;
-    void compile(const std::vector<LgsStrConst*>& files) const;
-    std::vector<const char*> getCompileArgs(const std::vector<LgsStrConst*>& files) const;
-    fs::path resolveExternalFile(LgsStrConst* filePath, const LgsFile& file);
+    bool parseFile(const fs::path& fileName, LgsFile* lgsFile);
 };

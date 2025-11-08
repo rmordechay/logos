@@ -20,10 +20,8 @@ namespace fs = std::filesystem;
 #define HASH_VECTOR(vec, hash) for (const auto e : vec) e->hashNode(hash)
 #define HASH_MAP(map, hash) for (const auto [_, v] : map) v->hashNode(hash)
 
+
 void execute(const fs::path& execPath, std::vector<const char*> mainArgs = {});
-void logInfo(const std::string& text = "", bool withNewLine = false);
-void logDebug(const std::string& text, bool withNewLine = false);
-void logError(const std::string& errMsg, const std::string& epilogue = "");
 bool isLogosFile(const fs::path& filePath);
 bool isLogosKeyword(const std::string& s);
 std::string getFileText(const fs::path& filePath);
@@ -34,6 +32,11 @@ time_t getLastWritten(const fs::path& filePath);
 bool validateFilePath(fs::path& filePath);
 bool createDir(fs::path& dirPath);
 bool runCmd(const char* cmd);
+
+void logInfo(const std::string& mgs = "", bool withNewLine = false);
+void logDebug(const std::string& msg, bool withNewLine = false);
+void logError(const std::string& msg, const std::string& epilogue = "");
+void logWarning(const std::string& msg);
 
 void combineNodeHash(size_t& oldHash, size_t newHash);
 void hashNodeString(size_t& oldHash, const std::string& str);

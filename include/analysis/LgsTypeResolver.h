@@ -14,7 +14,7 @@ class LgsErrHandler;
 
 class LgsTypeResolver {
 public:
-   LgsErrHandler& errHandler;
+    LgsErrHandler& errHandler;
     LgsSymbolTable& globals;
 
     LgsTypeResolver(LgsErrHandler& errHandler, LgsSymbolTable& globals) : errHandler(errHandler), globals(globals) {}

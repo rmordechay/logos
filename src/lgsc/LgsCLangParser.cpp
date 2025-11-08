@@ -1,4 +1,4 @@
-#include "lgsc/LgsCLangVisitor.h"
+#include "lgsc/LgsCLangParser.h"
 #include "exprs/constants/LgsIntConst.h"
 #include "files/LgsFile.h"
 #include "funcs/LgsFunc.h"
@@ -16,12 +16,12 @@
 #include "types/primitives/LgsChar.h"
 #include "utils/LgsUtils.h"
 
-void LgsCLangVisitor::HandleTranslationUnit(clang::ASTContext& clangContext){
+void LgsCLangParser::HandleTranslationUnit(clang::ASTContext& clangContext){
     context = &clangContext;
     TraverseDecl(clangContext.getTranslationUnitDecl());
 }
 
-bool LgsCLangVisitor::VisitFunctionDecl(const clang::FunctionDecl* func) {
+bool LgsCLangParser::VisitFunctionDecl(const clang::FunctionDecl* func) {
     auto name = func->getNameAsString();
     if (isLogosKeyword(name)) {
         name = name + '_';
@@ -35,25 +35,26 @@ bool LgsCLangVisitor::VisitFunctionDecl(const clang::FunctionDecl* func) {
         funcImpl->funcType->params.push_back(lgsParam);
     }
     funcImpl->funcType->isVariadic = func->isVariadic();
-    file->symbolTable.addSymbol(LgsSymbol(funcImpl, false, true), &errHandler);
+    funcImpl->funcType->isExternal = true;
+    lgsFile->symbolTable.addSymbol(LgsSymbol(funcImpl, false, true), &errHandler);
     return true;
 }
 
-bool LgsCLangVisitor::VisitRecordDecl(const clang::RecordDecl* record) {
+bool LgsCLangParser::VisitRecordDecl(const clang::RecordDecl* record) {
     auto name = record->getNameAsString();
     if (!name.empty() && name[0] == '_') return true;
     if (isLogosKeyword(name)) {
         name = name + '_';
     }
     if (!record->isStruct() || !record->isThisDeclarationADefinition()) return true;
-    const auto objSymbol = file->symbolTable.getSymbol(name);
+    const auto objSymbol = lgsFile->symbolTable.getSymbol(name);
     if (objSymbol) return true;
     const auto obj = mapCRecord(record);
-    file->symbolTable.addSymbol(LgsSymbol(obj, false, true), &errHandler);
+    lgsFile->symbolTable.addSymbol(LgsSymbol(obj, false, true), &errHandler);
     return true;
 }
 
-LgsType* LgsCLangVisitor::mapCType(const clang::QualType type) {
+LgsType* LgsCLangParser::mapCType(const clang::QualType type) {
     if (recursionDepth++ > 2000) assert(0);
     if (type->isPointerType() && type->getPointeeType()->isCharType()) {
         return new LgsStr();
@@ -130,7 +131,7 @@ LgsType* LgsCLangVisitor::mapCType(const clang::QualType type) {
     assert(0);
 }
 
-LgsObject* LgsCLangVisitor::mapCRecord(const clang::RecordDecl* record) {
+LgsObject* LgsCLangParser::mapCRecord(const clang::RecordDecl* record) {
     const auto name = record->getNameAsString();
     const auto obj = new LgsObject(name);
     for (const clang::FieldDecl* field : record->fields()) {
@@ -142,22 +143,23 @@ LgsObject* LgsCLangVisitor::mapCRecord(const clang::RecordDecl* record) {
     return obj;
 }
 
-LgsType* LgsCLangVisitor::mapCStruct(const clang::QualType type) {
+LgsType* LgsCLangParser::mapCStruct(const clang::QualType type) {
     const auto recordType = type->getAsStructureType();
     const auto decl = recordType->getDecl();
     auto name = decl->getNameAsString();
     if (name == "") {
         name = decl->getQualifiedNameAsString();
     }
-    const auto objSymbol = file->symbolTable.getSymbol(name);
+    const auto objSymbol = lgsFile->symbolTable.getSymbol(name);
     if (objSymbol) return objSymbol->object;
     const auto obj = mapCRecord(decl);
-    file->symbolTable.addSymbol(LgsSymbol(obj, false, true), &errHandler);
+    lgsFile->symbolTable.addSymbol(LgsSymbol(obj, false, true), &errHandler);
     return obj;
 }
 
-LgsType* LgsCLangVisitor::mapCFunc(const clang::QualType type) {
+LgsType* LgsCLangParser::mapCFunc(const clang::QualType type) {
     const auto lgsFuncType = new LgsFuncType();
+    lgsFuncType->isExternal = true;
     const auto cFuncType = type->getAs<clang::FunctionProtoType>();
     lgsFuncType->rt = mapCType(cFuncType->getReturnType());
     for (const clang::QualType param : cFuncType->getParamTypes()) {
@@ -167,11 +169,7 @@ LgsType* LgsCLangVisitor::mapCFunc(const clang::QualType type) {
     return lgsFuncType;
 }
 
-std::unique_ptr<clang::ASTConsumer> LgsCLangFeAction::CreateASTConsumer(clang::CompilerInstance& compilerInstance, llvm::StringRef inFile) {
-    return std::make_unique<LgsCLangVisitor>(file);
-}
-
-LgsType* LgsCLangVisitor::mapCArray(const clang::QualType type) {
+LgsType* LgsCLangParser::mapCArray(const clang::QualType type) {
     const auto arrayType = llvm::cast<clang::ConstantArrayType>(type.getTypePtr());
     const auto baseType = mapCType(arrayType->getElementType());
     const auto size = arrayType->getSize().getZExtValue();

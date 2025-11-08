@@ -6,7 +6,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_definitions(-DLOGOS_VERSION="${CMAKE_PROJECT_VERSION}")
 option(LOGOS_RELEASE "Build release version" OFF)
 
-list(APPEND CMAKE_LIBRARY_PATH "/usr/lib/aarch64-linux-gnu")
 set(CURL_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include/external)
 find_package(LLVM REQUIRED CONFIG)
 find_package(Clang REQUIRED CONFIG)
@@ -49,7 +48,7 @@ set(LGS_SOURCE
     ${CMAKE_SOURCE_DIR}/src/parser/LgsJsonParser.cpp
     ${CMAKE_SOURCE_DIR}/src/parser/LgsFormatter.cpp
     ${CMAKE_SOURCE_DIR}/src/lgsc/LgsCLang.cpp
-    ${CMAKE_SOURCE_DIR}/src/lgsc/LgsCLangVisitor.cpp
+    ${CMAKE_SOURCE_DIR}/src/lgsc/LgsCLangParser.cpp
     ${CMAKE_SOURCE_DIR}/src/utils/LgsUtils.cpp
     ${CMAKE_SOURCE_DIR}/src/utils/LgsErrHandler.cpp
 

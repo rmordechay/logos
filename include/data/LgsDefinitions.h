@@ -17,6 +17,7 @@
 #define LGS_APP_FILE_NAME "app.lgs"
 #define LGS_DEBUG_CONFIG_FILE "logosdbg.bc"
 #define LGS_DEFAULT_EXEC_FILE "out"
+#define LGS_C "C"
 #define LGS_MAIN_FUNC "main"
 #define LGS_SELF "self"
 #define LGS_ANONYMOUS_STR "anonymous"
@@ -24,7 +25,7 @@
 #define LGS_UNKNOWN_TYPE "<Unknown>"
 #define MSG_PLACEHOLDER "%s"
 #define LGS_STR_FMT_PLACEHOLDER "<!v!>"
-#define LGS_EMPTY_STRING_LITERAL "\"\""
+#define LGS_EMPTY_STR "\"\""
 
 #define BLOCK_NAME_IF_TRUE "if_true"
 #define BLOCK_NAME_IF_FALSE "if_false"
@@ -45,8 +46,8 @@
 #define LGS_MSG_COLOR_WHITE "\033[1;37m"
 #define LGS_MSG_COLOR_RESET "\033[0m"
 #define LGS_COLORIZE(text, color) color text LGS_MSG_COLOR_RESET
-#define LGS_COLORIZE_ERROR(text) LGS_MSG_COLOR_RED text LGS_MSG_COLOR_RESET
 #define LGS_ERROR_TEXT "Error: "
+#define LGS_WARNING_TEXT "Warning: "
 #define LGS_PADDING_SIZE std::strlen(LGS_ERROR_TEXT)
 #define LGS_ERROR_PADDING '\n' + std::string(LGS_PADDING_SIZE, ' ')
 

@@ -54,22 +54,22 @@ class LgsExpr;
 
 class LgsParser {
 public:
-    LgsToken currentToken;
-    size_t currentIndex = 0;
-    size_t recursionCount = 0;
-    std::vector<LgsToken> tokens;
-    LgsFileMetadata& metadata;
     LgsPaths& paths;
     bool headersOnly;
-    std::string code = "";
+    LgsToken currentToken;
     LgsSymbolTable& globals;
+    LgsFileMetadata& metadata;
+    std::vector<LgsToken> tokens;
+    size_t currentIndex = 0;
+    size_t recursionCount = 0;
+    std::string code = "";
     LgsErrHandler errHandler;
     LgsFunc* currentFunc = nullptr;
     std::vector<LgsStrConst*> cImports;
     std::unordered_map<std::string, LgsApp*> fileImports;
 
     LgsParser(LgsFileMetadata& metadata, LgsPaths& paths, LgsSymbolTable& globals, const bool headersOnly = false)
-        : metadata(metadata), paths(paths), headersOnly(headersOnly), globals(globals) {}
+        : paths(paths), headersOnly(headersOnly), globals(globals), metadata(metadata) {}
 
     // Files
     bool scanTokens();

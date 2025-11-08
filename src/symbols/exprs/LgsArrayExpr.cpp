@@ -6,28 +6,32 @@ Value* LgsArrayExpr::loadIR(LgsLLVMGen& cg) {
     return IRValue;
 }
 
+Value* LgsArrayExpr::castToIR(LgsLLVMGen& cg, LgsType* toType) {
+    assert(0);
+}
+
 void LgsArrayExpr::completeType(LgsType* toType) {
     if (type && type->asDArray() && toType->asSArray()) {
         freeType(type);
         setType(toType);
     }
-    if (toType->asSArray() || toType->asDArray() || toType->asSet()) {
-        const auto otherBaseType = toType->asIterable()->baseType;
-        for (size_t i = 0; i < elements.size(); ++i) {
-            const auto element = elements[i];
-            if (!element->type) {
-                element->setType(otherBaseType);
-            } else {
-                if (element->type->equals(otherBaseType)) continue;
-                if (element->type->canCastTo(otherBaseType)) {
-                    const auto castTo = element->castTo(otherBaseType);
-                    if (element != castTo) freeExpr(element);
-                    elements[i] = castTo;
-                }
-            }
+    if (!toType->asSArray() && !toType->asDArray() && !toType->asSet()) return;
+    const auto otherBaseType = toType->asIterable()->baseType;
+    for (size_t i = 0; i < elements.size(); ++i) {
+        const auto element = elements[i];
+        if (!element->type) {
+            element->setType(otherBaseType);
+            continue;
         }
-        type->asIterable()->baseType = otherBaseType;
+        if (element->type->equals(otherBaseType)) continue;
+        if (!element->type->canCastTo(otherBaseType)) continue;
+        const auto castTo = element->castTo(otherBaseType);
+        if (element != castTo) {
+            freeExpr(element);
+        }
+        elements[i] = castTo;
     }
+    type->asIterable()->baseType = otherBaseType;
 }
 
 std::string LgsArrayExpr::asText() {

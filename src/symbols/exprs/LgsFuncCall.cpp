@@ -43,6 +43,11 @@ std::string LgsFuncCall::getGenericName() const {
     return str.str();
 }
 
+Value* LgsFuncCall::castToIR(LgsLLVMGen& cg, LgsType* toType) {
+    if (type->getName() == toType->getName()) return IRValue;
+    assert(0);
+}
+
 std::string LgsFuncCall::asText() {
     std::stringstream str;
     str << name << '(';

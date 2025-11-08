@@ -9,14 +9,14 @@ class LgsObject;
 class LgsType;
 struct LgsSymbol;
 
-class LgsCLangVisitor final : public clang::RecursiveASTVisitor<LgsCLangVisitor>, public clang::ASTConsumer {
+class LgsCLangParser final : public clang::RecursiveASTVisitor<LgsCLangParser>, public clang::ASTConsumer {
 public:
-    LgsFile* file;
-   LgsErrHandler errHandler;
+    LgsFile* lgsFile;
+    LgsErrHandler errHandler;
     clang::ASTContext* context = nullptr;
     int recursionDepth = 0;
 
-    explicit LgsCLangVisitor(LgsFile* file) : file(file) {}
+    explicit LgsCLangParser(LgsFile* lgsFile) : lgsFile(lgsFile) {}
     void HandleTranslationUnit(clang::ASTContext& clangContext) override;
     bool VisitFunctionDecl(const clang::FunctionDecl* func);
     bool VisitRecordDecl(const clang::RecordDecl* record);
@@ -27,10 +27,3 @@ public:
     LgsType* mapCFunc(clang::QualType type);
 };
 
-class LgsCLangFeAction final : public clang::ASTFrontendAction {
-public:
-    LgsFile* file;
-
-    explicit LgsCLangFeAction(LgsFile* file) : file(file) {}
-    std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(clang::CompilerInstance& compilerInstance, llvm::StringRef inFile) override;
-};

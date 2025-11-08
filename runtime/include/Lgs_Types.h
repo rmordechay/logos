@@ -1,6 +1,5 @@
 #pragma once
-#include <cstdint>
-#include <cstddef>
+#include <cmath>
 
 enum Lgs_RTType {
     RTT_UNKNOWN,
@@ -33,11 +32,6 @@ enum Lgs_RTType {
     RTT_NULLABLE,
 };
 
-struct Lgs_RTTypeInfo {
-    Lgs_RTType kind;
-    void* metadata;
-};
-
 struct Lgs_Object {
     const char* name;
     size_t fieldCount;
@@ -56,13 +50,13 @@ struct Lgs_NullableInt {
 };
 
 struct Lgs_Vec2 {
-    float x, y;
+    float_t x, y;
 };
 
 struct Lgs_Vec3 {
-    float x, y, z;
+    float_t x, y, z;
 };
 
 struct Lgs_Vec4 {
-    float x, y, z, w;
+    float_t x, y, z, w;
 };

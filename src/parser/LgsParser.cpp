@@ -1,5 +1,4 @@
 #include "parser/LgsParser.h"
-
 #include "data/LgsCliErrors.h"
 #include "exprs/LgsArrayExpr.h"
 #include "stmts/LgsAssignment.h"
@@ -30,6 +29,7 @@
 #include "exprs/LgsNull.h"
 #include "exprs/LgsTernaryExpr.h"
 #include "files/LgsAppConfigFile.h"
+#include "lgsc/LgsCLang.h"
 #include "logos/LgsApp.h"
 #include "stmts/LgsBreak.h"
 #include "stmts/LgsContinue.h"
@@ -95,8 +95,19 @@ LgsFile* LgsParser::parseSrcFile(const bool isTestRun) {
         }
     }
     assert(file);
-    file->symbolTable.imports = fileImports;
-    file->symbolTable.cImports = cImports;
+
+    if (!cImports.empty()) {
+        std::unordered_map<std::string, fs::path> files;
+        LgsCLang clang(paths);
+        clang.parseFile("/Library/Developer/CommandLineTools/SDKs/MacOSX15.5.sdk/usr/include/stdio.h", file);
+        // for (auto cLibHeadersDir : fs::directory_iterator(paths.cLibHeadersDir)) {
+        //     logInfo(cLibHeadersDir.path(), true);
+        // }
+        // for (const auto cImport : cImports) {
+        //     if (clang.parseFile(cImport->value, file)) continue;
+        //     errHandler.mergeErrorsWithLock(clang.errHandler);
+        // }
+    }
     return file;
 }
 
@@ -1727,7 +1738,7 @@ void LgsParser::parseJsonPrimitive(LgsJson* json) {
 void LgsParser::parseImports() {
     const auto importToken = currentToken;
     if (!matchAndConsume(T_IMPORT)) return;
-    if (currentToken.lexeme == "C") {
+    if (currentToken.lexeme == LGS_C) {
         return parseCImports();
     }
     while (true) {

@@ -37,7 +37,7 @@ public:
     bool isMethod = false;
     bool isCoroutine = false;
     bool isIOMember = false;
-    bool isSysCall = false;
+    bool isExternal = false;
     bool isArrFunc = false;
     bool hasDefaults = false;
     FunctionType* IRType = nullptr;

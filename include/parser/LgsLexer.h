@@ -14,7 +14,7 @@ public:
     size_t position = 0;
     char currentChar = '\0';
     std::string const source;
-   LgsErrHandler errHandler;
+    LgsErrHandler errHandler;
     std::vector<LgsToken> tokens;
 
     explicit LgsLexer(const size_t fileID, const fs::path& filePath, std::string src) : fileID(fileID), filePath(filePath), source(std::move(src)) {}

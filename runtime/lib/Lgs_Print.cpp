@@ -5,7 +5,7 @@
 #include <sstream>
 #include <cmath>
 
-std::string formatArray(Lgs_DArray* arr);
+std::string formatArray(const Lgs_DArray* arr);
 std::string formatElement(Lgs_RTType type, void* elem);
 
 extern "C" void Lgs_print(const Lgs_RTType rtt, void* v) {
@@ -103,7 +103,7 @@ std::string formatElement(const Lgs_RTType type, void* elem) {
     return oss.str();
 }
 
-std::string formatArray(Lgs_DArray* arr) {
+std::string formatArray(const Lgs_DArray* arr) {
     std::ostringstream oss;
     oss << "[";
     const size_t len = Lgs_DArray_len(arr);

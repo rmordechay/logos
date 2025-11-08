@@ -14,7 +14,7 @@ void LgsFuncType::setFuncOptions(const uint32_t ops) {
     isTerminator = ops & TERMINATOR;
     isMethod = ops & METHOD;
     isIOMember = ops & IO_MEMBER;
-    isSysCall = ops & SYSCALL;
+    isExternal = ops & SYSCALL;
     isArrFunc = ops & ARR_FUNC;
     hasDefaults = ops & HAS_DEFAULTS;
 }
@@ -53,7 +53,7 @@ size_t LgsFuncType::getSizeBytes() {
 
 std::string LgsFuncType::getName() {
     std::stringstream strStream;
-    if (!isBuiltin) {
+    if (!isBuiltin && !isExternal) {
         strStream << "u_";
     }
     if (parentName != "") {

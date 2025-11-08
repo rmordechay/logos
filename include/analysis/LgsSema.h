@@ -57,7 +57,7 @@ public:
     LgsStack stack;
     LgsAppConfigs& appConfigs;
     LgsSymbolTable& globals;
-   LgsErrHandler errHandler;
+    LgsErrHandler errHandler;
     LgsTypeResolver typeResolver;
     std::map<std::string, size_t> refCount;
     std::map<std::string, LgsFunc*> corosRegistry;

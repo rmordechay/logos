@@ -31,7 +31,7 @@ void LgsApp::compile() {
 
 bool LgsApp::setup() {
     if (lgsCode.empty() && (appPaths.rootPath == "" || !fs::exists(appPaths.rootPath))) {
-        errHandler.addError(E10086, {(appPaths.rootPath == "" ? LGS_EMPTY_STRING_LITERAL : appPaths.rootPath)});
+        errHandler.addError(E10086, {(appPaths.rootPath == "" ? LGS_EMPTY_STR : appPaths.rootPath)});
         return false;
     }
 
@@ -238,7 +238,7 @@ void LgsApp::loadSrcFile(LgsFileMetadata& metadata) {
 bool LgsApp::loadConfigFile() {
     if (configs.appMode != PROJECT_MODE && configs.appMode != PKG_MANAGER_MODE) return true;
     if (appPaths.appConfigFile == "") {
-        errHandler.addError(E10086, {LGS_EMPTY_STRING_LITERAL});
+        errHandler.addError(E10086, {LGS_EMPTY_STR});
         return false;
     }
     if (!fs::exists(appPaths.appConfigFile)) {

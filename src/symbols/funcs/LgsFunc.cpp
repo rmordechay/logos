@@ -133,7 +133,7 @@ std::string LgsFunc::asText() {
 
 std::string LgsFunc::getIRName() const {
     auto funcName = funcType->getName();
-    if (funcType->isBuiltin && !funcType->isSysCall) {
+    if (funcType->isBuiltin && !funcType->isExternal) {
         funcName = LGS_NAME_PREFIX + funcName;
     }
     return funcName;
