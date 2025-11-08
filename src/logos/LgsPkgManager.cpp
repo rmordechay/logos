@@ -97,11 +97,9 @@ void LgsPkgManager::install() {
 std::string calculateSHA256(const std::string& filePath) {
     std::ifstream file(filePath, std::ios::binary);
     if (!file.is_open()) assert(0);
-
     // Initialize OpenSSL hash context
     auto context = EVP_MD_CTX_new();
     if (!context) assert(0);
-
     if (EVP_DigestInit_ex(context, EVP_sha256(), nullptr) != 1) {
         EVP_MD_CTX_free(context);
         assert(0);
@@ -128,10 +126,9 @@ std::string calculateSHA256(const std::string& filePath) {
     EVP_MD_CTX_free(context);
 
     // Convert to hexadecimal string
-    std::stringstream ss;
+    std::stringstream str;
     for (unsigned int i = 0; i < hashLen; i++) {
-        ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(hash[i]);
+        str << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(hash[i]);
     }
-
-    return ss.str();
+    return str.str();
 }
