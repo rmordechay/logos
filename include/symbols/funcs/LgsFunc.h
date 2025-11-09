@@ -41,18 +41,19 @@ public:
     }
 
     virtual Function* getIRFunc(LgsLLVMGen& cg);
-    Value* callWithVariadic(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args);
+    void initFunc(const std::string& name, LgsType* rt, const std::vector<LgsParam>& params, uint32_t ops);
     virtual Value* call(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args, const std::vector<LgsType*>& generics = {});
+    Value* callWithVariadic(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args);
     Value* callIR(LgsLLVMGen& cg, const std::vector<Value*>& args = {});
     Value* loadIR(LgsLLVMGen& cg) override;
-    void initFunc(const std::string& name, LgsType* rt, const std::vector<LgsParam>& params, uint32_t ops);
-    void setDebugValue(LgsLLVMGen& cg) override;
+    Value* castToIR(LgsLLVMGen& cg, LgsType* toType) override;
     void completeType(LgsType* toType) override;
-    BasicBlock* getCleanupBlock(LgsLLVMGen& cg);
     bool needsCleanup() const;
     std::string asText() override;
     std::string getIRName() const;
-    void hashNode(size_t& oldHash) override;
     LgsFunc* cloneExpr() override;
+    void hashNode(size_t& oldHash) override;
+    BasicBlock* getCleanupBlock(LgsLLVMGen& cg);
+    void setDebugValue(LgsLLVMGen& cg) override;
     ~LgsFunc() override;
 };

@@ -9,12 +9,52 @@ std::string formatArray(const Lgs_DArray* arr);
 std::string formatElement(Lgs_RTType type, void* elem);
 
 extern "C" void Lgs_print(const Lgs_RTType rtt, void* v) {
-    if (v) printf("%s\n", formatElement(rtt, v).c_str());
-    else printf("%s\n", LGS_NULL_LITERAL);
+    printf("%s\n", formatElement(rtt, v).c_str());
 }
 
 std::string formatElement(const Lgs_RTType type, void* elem) {
     std::ostringstream oss;
+    switch (type) {
+    case RTT_BOOL:
+        oss << (reinterpret_cast<intptr_t>(elem) ? "true" : "false");
+        return oss.str();
+    case RTT_BYTE:
+        oss << reinterpret_cast<intptr_t>(elem);
+        return oss.str();
+    case RTT_SHORT:
+        oss << reinterpret_cast<intptr_t>(elem);
+        return oss.str();
+    case RTT_INT:
+        oss << reinterpret_cast<intptr_t>(elem);
+        return oss.str();
+    case RTT_LONG:
+        oss << reinterpret_cast<intptr_t>(elem);
+        return oss.str();
+    case RTT_SIZE:
+        oss << reinterpret_cast<intptr_t>(elem);
+        return oss.str();
+    case RTT_UBYTE:
+        oss << reinterpret_cast<intptr_t>(elem);
+        return oss.str();
+    case RTT_USHORT:
+        oss << reinterpret_cast<intptr_t>(elem);
+        return oss.str();
+    case RTT_UINT:
+        oss << reinterpret_cast<intptr_t>(elem);
+        return oss.str();
+    case RTT_ULONG:
+        oss << reinterpret_cast<intptr_t>(elem);
+        return oss.str();
+    case RTT_FLOAT:
+        oss << reinterpret_cast<float&>(elem);
+        return oss.str();
+    case RTT_DOUBLE:
+        oss << reinterpret_cast<double&>(elem);
+        return oss.str();
+    default:
+        break;
+    }
+    if (!elem) printf("%s\n", LGS_NULL_LITERAL);
     switch (type) {
     case RTT_TYPE:
     case RTT_ENUM:
@@ -23,42 +63,6 @@ std::string formatElement(const Lgs_RTType type, void* elem) {
         break;
     case RTT_CHAR:
         oss << *static_cast<const char*>(elem);
-        break;
-    case RTT_BOOL:
-        oss << (*static_cast<bool*>(elem) ? "true" : "false");
-        break;
-    case RTT_BYTE:
-        oss << *static_cast<int8_t*>(elem);
-        break;
-    case RTT_SHORT:
-        oss << *static_cast<int16_t*>(elem);
-        break;
-    case RTT_INT:
-        oss << *static_cast<int32_t*>(elem);
-        break;
-    case RTT_LONG:
-        oss << *static_cast<int64_t*>(elem);
-        break;
-    case RTT_SIZE:
-        oss << *static_cast<size_t*>(elem);
-        break;
-    case RTT_UBYTE:
-        oss << *static_cast<uint8_t*>(elem);
-        break;
-    case RTT_USHORT:
-        oss << *static_cast<uint16_t*>(elem);
-        break;
-    case RTT_UINT:
-        oss << *static_cast<uint32_t*>(elem);
-        break;
-    case RTT_ULONG:
-        oss << *static_cast<uint64_t*>(elem);
-        break;
-    case RTT_FLOAT:
-        oss << *static_cast<const float_t*>(elem);
-        break;
-    case RTT_DOUBLE:
-        oss << *static_cast<const double_t*>(elem);
         break;
     case RTT_VEC2: {
         const auto vec = static_cast<const Lgs_Vec2*>(elem);
@@ -98,6 +102,7 @@ std::string formatElement(const Lgs_RTType type, void* elem) {
     case RTT_OBJECT:
     case RTT_VOID:
     case RTT_UNKNOWN:
+    default:
         assert(0);
     }
     return oss.str();

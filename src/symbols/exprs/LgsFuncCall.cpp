@@ -11,12 +11,6 @@ Value* LgsFuncCall::loadIR(LgsLLVMGen& cg) {
     return IRValue;
 }
 
-bool LgsFuncCall::equals(LgsExpr* other) {
-    const auto otherFuncCall = other->asFuncCall();
-    if (!otherFuncCall) return false;
-    return name == otherFuncCall->name;
-}
-
 bool LgsFuncCall::equals(const LgsFuncType* other) const {
     if (other->isVariadic) return equalsVariadic(other);
     if (args.size() - other->isMethod > other->params.size()) return false;
@@ -30,6 +24,10 @@ bool LgsFuncCall::equals(const LgsFuncType* other) const {
 }
 
 bool LgsFuncCall::equalsVariadic(const LgsFuncType* funcType) const {
+    assert(0);
+}
+
+bool LgsFuncCall::equals(LgsExpr* other) {
     assert(0);
 }
 

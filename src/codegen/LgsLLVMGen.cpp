@@ -79,10 +79,16 @@ Value* LgsLLVMGen::getPtrTo(Value* v) {
         }
     }
     if (v->getType()->isPointerTy()) return v;
-    if (v->getType()->isIntegerTy() || v->getType()->isFloatingPointTy()) {
-        const auto a = builder.CreateAlloca(v->getType());
-        builder.CreateStore(v, a);
-        return a;
+    if (v->getType()->isIntegerTy()) {
+        return builder.CreateIntToPtr(v, ptrTy());
+    }
+    if (v->getType()->isFloatTy()) {
+        const auto bitCast = builder.CreateBitCast(v, i32Ty());
+        return builder.CreateIntToPtr(bitCast, ptrTy());
+    }
+    if (v->getType()->isDoubleTy()) {
+        const auto bitCast = builder.CreateBitCast(v, i64Ty());
+        return builder.CreateIntToPtr(bitCast, ptrTy());
     }
     assert(0);
 }

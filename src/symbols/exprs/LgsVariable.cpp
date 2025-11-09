@@ -1,6 +1,7 @@
 #include "exprs/LgsVariable.h"
 #include "exprs/LgsInstance.h"
 #include "exprs/LgsNull.h"
+#include "funcs/LgsFunc.h"
 #include "funcs/LgsParam.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
@@ -57,6 +58,8 @@ Value* LgsVariable::castToIR(LgsLLVMGen& cg, LgsType* toType) {
         return ref.varDec->expr->castToIR(cg, toType);
     case FIELD:
         assert(0);
+    case FUNC:
+        return IRValue;
     default:
         assert(0);
     }

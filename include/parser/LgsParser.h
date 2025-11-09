@@ -57,11 +57,11 @@ public:
     LgsPaths& paths;
     bool headersOnly;
     LgsToken currentToken;
+    size_t currentIndex = 0;
+    size_t recursionCount = 0;
     LgsSymbolTable& globals;
     LgsFileMetadata& metadata;
     std::vector<LgsToken> tokens;
-    size_t currentIndex = 0;
-    size_t recursionCount = 0;
     std::string code = "";
     LgsErrHandler errHandler;
     LgsFunc* currentFunc = nullptr;

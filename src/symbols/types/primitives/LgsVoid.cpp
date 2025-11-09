@@ -1,5 +1,7 @@
 #include "types/primitives/LgsVoid.h"
 #include "codegen/LgsLLVMGen.h"
+#include "types/LgsFuncType.h"
+
 #include <llvm/IR/DIBuilder.h>
 
 Type* LgsVoid::getIRType(LgsLLVMGen& cg) {
@@ -27,6 +29,9 @@ std::string LgsVoid::strFormatPart() const {
 }
 
 bool LgsVoid::canCastTo(LgsType* other) {
+    if (const auto funcType = other->asFuncType()) {
+        return funcType->params.empty() && funcType->rt->isVoid();
+    }
     return name == other->getName();
 }
 

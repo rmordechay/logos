@@ -9,6 +9,43 @@
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/Module.h>
 
+Function* LgsFunc::getIRFunc(LgsLLVMGen& cg) {
+    const auto funcName = getIRName();
+    auto IRFunc = cg.IRModule->getFunction(funcName);
+    if (IRFunc) return IRFunc;
+    const auto type = funcType->getIRType(cg);
+    const auto funcTy = llvm::cast<FunctionType>(type);
+    IRFunc = cg.getFunc(funcName, funcTy);
+    IRFunc->addFnAttr(llvm::Attribute::NoUnwind);
+    if (funcType->params.empty()) return IRFunc;
+    auto args = IRFunc->arg_begin();
+    for (size_t i = 0; i < funcType->params.size(); ++i) {
+        auto& param = funcType->params[i];
+        if (param.isVariadic && !funcType->isExternal) {
+            variadicCount = args;
+            break;
+        }
+        args->setName(param.name);
+        param.IRValue = args;
+        args++;
+    }
+    return IRFunc;
+}
+
+void LgsFunc::initFunc(const std::string& name, LgsType* rt, const std::vector<LgsParam>& params, const uint32_t ops) {
+    funcType = new LgsFuncType();
+    funcType->name = name;
+    funcType->rt = rt;
+    funcType->setFuncOptions(ops);
+    if (funcType->isMethod) {
+        funcType->parentName = params.front().type->getName();
+    }
+    for (const auto& param : params) {
+        funcType->params.push_back(param);
+    }
+    setType(funcType);
+}
+
 Value* LgsFunc::call(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args, const std::vector<LgsType*>& generics) {
     if (fn) return fn(cg, args);
     if (funcType->isVariadic) return callWithVariadic(cg, args);
@@ -71,41 +108,8 @@ Value* LgsFunc::loadIR(LgsLLVMGen& cg) {
     return IRValue;
 }
 
-Function* LgsFunc::getIRFunc(LgsLLVMGen& cg) {
-    const auto funcName = getIRName();
-    auto IRFunc = cg.IRModule->getFunction(funcName);
-    if (IRFunc) return IRFunc;
-    const auto type = funcType->getIRType(cg);
-    const auto funcTy = llvm::cast<FunctionType>(type);
-    IRFunc = cg.getFunc(funcName, funcTy);
-    IRFunc->addFnAttr(llvm::Attribute::NoUnwind);
-    if (funcType->params.empty()) return IRFunc;
-    auto args = IRFunc->arg_begin();
-    for (size_t i = 0; i < funcType->params.size(); ++i) {
-        auto& param = funcType->params[i];
-        if (param.isVariadic && !funcType->isExternal) {
-            variadicCount = args;
-            break;
-        }
-        args->setName(param.name);
-        param.IRValue = args;
-        args++;
-    }
-    return IRFunc;
-}
-
-void LgsFunc::initFunc(const std::string& name, LgsType* rt, const std::vector<LgsParam>& params, const uint32_t ops) {
-    funcType = new LgsFuncType();
-    funcType->name = name;
-    funcType->rt = rt;
-    funcType->setFuncOptions(ops);
-    if (funcType->isMethod) {
-        funcType->parentName = params.front().type->getName();
-    }
-    for (const auto& param : params) {
-        funcType->params.push_back(param);
-    }
-    setType(funcType);
+Value* LgsFunc::castToIR(LgsLLVMGen& cg, LgsType* toType) {
+    return IRValue;
 }
 
 void LgsFunc::completeType(LgsType* toType) {
@@ -118,12 +122,6 @@ void LgsFunc::completeType(LgsType* toType) {
     if (!funcType->rt) {
         funcType->rt = otherFuncType->rt;
     }
-}
-
-BasicBlock* LgsFunc::getCleanupBlock(LgsLLVMGen& cg) {
-    if (cleanupBlock) return cleanupBlock;
-    cleanupBlock = cg.createBlock(BLOCK_NAME_CLEANUP);
-    return cleanupBlock;
 }
 
 bool LgsFunc::needsCleanup() const {
@@ -142,15 +140,21 @@ std::string LgsFunc::getIRName() const {
     return funcName;
 }
 
-void LgsFunc::hashNode(size_t& oldHash) {
-    hashNodeString(oldHash, funcType->name);
-}
-
 LgsFunc* LgsFunc::cloneExpr() {
     const auto newFunc = new LgsFunc(*this);
     newFunc->funcType = funcType->clone()->asFuncType();
     newFunc->stmtsBlock = stmtsBlock->clone();
     return newFunc;
+}
+
+void LgsFunc::hashNode(size_t& oldHash) {
+    hashNodeString(oldHash, funcType->name);
+}
+
+BasicBlock* LgsFunc::getCleanupBlock(LgsLLVMGen& cg) {
+    if (cleanupBlock) return cleanupBlock;
+    cleanupBlock = cg.createBlock(BLOCK_NAME_CLEANUP);
+    return cleanupBlock;
 }
 
 void LgsFunc::setDebugValue(LgsLLVMGen& cg) {
@@ -168,7 +172,7 @@ void LgsFunc::setDebugValue(LgsLLVMGen& cg) {
         location.lineStart,
         llvm::DINode::FlagPrototyped,
         DISubprogram::SPFlagDefinition
-    );
+        );
     getIRFunc(cg)->setSubprogram(cg.debugger.diProgram);
     cg.builder.SetCurrentDebugLocation(getDebugLoc(cg));
 }
