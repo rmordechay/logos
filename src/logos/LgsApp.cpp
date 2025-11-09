@@ -11,7 +11,7 @@
 #include "files/LgsEnvFile.h"
 #include "codegen/LgsCodeGen.h"
 #include "codegen/LgsLinker.h"
-#include "../../include/logos/LgsConfigs.h"
+#include "logos/LgsConfigs.h"
 #include "files/LgsTestFile.h"
 #include "parser/LgsParser.h"
 #include "utils/LgsUtils.h"
@@ -22,7 +22,7 @@ inline ThreadPool threadPool;
 bool LgsApp::compile() {
     if (!setup()) return false;
     if (!loadConfigs()) return false;
-    // if (!loadDepsreturn false;
+    // if (!loadDeps()) return false;
     if (!parse()) return false;
     if (!analyse()) return false;
     if (!generate()) return false;
@@ -43,7 +43,7 @@ bool LgsApp::setup() {
         const auto dirName = "lgs_" + std::to_string(now);
         auto fullPath = fs::temp_directory_path() / dirName;
         createDir(fullPath);
-        if (!initPaths(fullPath)) exitWithErrors(errHandler);
+        if (!initPaths(fullPath)) return false;
         return true;
     }
 
@@ -53,14 +53,14 @@ bool LgsApp::setup() {
         // rootPath is replaced with temp dir and the file path is stored in metadata
         const auto filePath = appPaths.rootPath;
         const auto rootPath = fs::temp_directory_path();
-        if (!initPaths(rootPath)) exitWithErrors(errHandler);
+        if (!initPaths(rootPath)) return false;
         appCache.addFileMetadata(getNextFileID(), filePath, LGS_SRC_FILE);
         return true;
     }
 
     // Project mode
     configs.appMode = PROJECT_MODE;
-    if (!initPaths(appPaths.rootPath)) exitWithErrors(errHandler);
+    if (!initPaths(appPaths.rootPath)) return false;
     if (!is_directory(appPaths.rootPath) || !is_directory(appPaths.srcDir) || !fs::exists(appPaths.appConfigFile)) {
         errHandler.addError(E10010);
         return false;
@@ -379,6 +379,37 @@ bool LgsApp::initPaths(const fs::path& root) {
         return false;
     }
     return true;
+}
+
+void LgsApp::printErrors() const {
+    for (size_t i = 0; i < errHandler.errors.size(); ++i) {
+        const auto err = errHandler.errors[i];
+        const auto column = err.location.columnStart;
+        const auto line = err.location.lineStart;
+        auto lineStr = getLine(err.filePath, line);
+        const auto firstNonSpace = std::ranges::find_if(lineStr, [](const unsigned char c) { return !std::isspace(c); });
+        const auto trimmedCount = std::distance(lineStr.begin(), firstNonSpace);
+        if (err.filePath != "") {
+            auto errMsg = trim(lineStr);
+            int indent = column - trimmedCount - 2;
+            if (indent < 0) {
+                indent = 0;
+            }
+            errMsg += '\n' + std::string(indent, '~');
+            errMsg += '^';
+            int rest = lineStr.size() - column + 1;
+            if (rest > 0) {
+                errMsg += std::string(rest, '~');
+            }
+            errMsg += '\n' + err.msg;
+            const auto path = "\n   at: " + getFullPath(err.location, err.filePath);
+            logError(errMsg, path);
+        } else {
+            logError(err.msg);
+        }
+        if (i != errHandler.errors.size() - 1) logInfo(LGS_MSG_LINE_SEPERATOR);
+    }
+    if (!errHandler.errors.empty()) logInfo("\n");
 }
 
 LgsApp::~LgsApp() {

@@ -1954,8 +1954,6 @@ void LgsParser::addParsingError() {
 }
 
 void LgsParser::recursionGuard() {
-    if (recursionCount++ >= MAX_TOKENS_NUMBER) {
-        std::cerr << "recursion" << '\n';
-        exit(EXIT_FAILURE);
-    }
+    if (recursionCount++ < MAX_TOKENS_NUMBER) return;
+    assert(0);
 }

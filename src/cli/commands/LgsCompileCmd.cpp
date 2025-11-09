@@ -6,7 +6,7 @@ void LgsCompileCmd::run() {
     LgsApp app;
     std::vector<const char*> args;
     parseArgs(app, args);
-    app.compile();
+    if (!app.compile()) app.printErrors();
 }
 
 LgsCliCmdHelp& LgsCompileCmd::getHelp() {

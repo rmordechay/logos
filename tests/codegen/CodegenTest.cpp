@@ -3,7 +3,6 @@
 #include <iostream>
 #include <sstream>
 #include "external/doctest.h"
-
 #include <unistd.h>
 
 TEST_CASE("TestCodeGen1") {
@@ -13,11 +12,10 @@ TEST_CASE("TestCodeGen1") {
     }
     )";
     fs::path execPath = "";
-    auto valid = false;
     {
         LgsApp app;
         app.lgsCode[LGS_MAIN_FILE] = code;
-        valid = app.compile();
+        if (!app.compile()) return app.printErrors();
         execPath = app.appPaths.execFile;
     }
     const auto pipe = popen(execPath.c_str(), "r");
@@ -45,7 +43,7 @@ TEST_CASE("TestCodeGen2") {
     {
         LgsApp app;
         app.lgsCode[LGS_MAIN_FILE] = code;
-        app.compile();
+        if (!app.compile()) return app.printErrors();
         execPath = app.appPaths.execFile;
     }
     const auto pipe = popen(execPath.c_str(), "r");
@@ -82,7 +80,7 @@ TEST_CASE("TestCodeGen3") {
     {
         LgsApp app;
         app.lgsCode[LGS_MAIN_FILE] = code;
-        app.compile();
+        if (!app.compile()) return app.printErrors();
         execPath = app.appPaths.execFile;
     }
     const auto pipe = popen(execPath.c_str(), "r");

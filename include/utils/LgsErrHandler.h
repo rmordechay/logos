@@ -3,6 +3,7 @@
 #include "data/LgsWarnings.h"
 #include <vector>
 
+class LgsApp;
 struct LgsLocation;
 
 class LgsErrHandler {
@@ -18,6 +19,3 @@ public:
     void mergeErrors(LgsErrHandler& other);
     void mergeErrorsWithLock(LgsErrHandler& other);
 };
-
-void exitWithError(const LgsBaseError& err, const std::vector<std::string>& args = {});
-void exitWithErrors(LgsErrHandler& errHandler);

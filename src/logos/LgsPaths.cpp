@@ -6,34 +6,17 @@
 #include <unistd.h>
 #include <llvm/TargetParser/Triple.h>
 
-#if defined(_WIN32)
-#include <windows.h>
-#elif defined(__APPLE__)
-#include <mach-o/dyld.h>
-#else
-#include <unistd.h>
-#include <limits.h>
-#endif
-
 bool LgsPaths::findLgsRootDir() {
-    if (lgsConfigs.isDevMode) {
-        return false;
+    assert(lgsConfigs.isDevMode);
+    const auto current = fs::current_path();
+    if (fs::exists(current / LGS_LIB_NAME)) {
+        lgsRootDir = current;
+    } else {
+        const auto parent = current.parent_path();
+        if (!fs::exists(parent / LGS_LIB_NAME)) return false;
+        lgsRootDir = current;
     }
-    char buf[1024];
-#if defined(_WIN32)
-    DWORD len = GetModuleFileNameA(NULL, buf, MAX_PATH);
-    if (len == 0 || len == MAX_PATH) return false;
-#elif defined(__APPLE__)
-    uint32_t size = sizeof(buf);
-    if (_NSGetExecutablePath(buf, &size) != 0) return false;
-#else
-    ssize_t len = readlink("/proc/self/exe", buf, sizeof(buf)-1);
-    if (len == -1) return false;
-    buf[len] = '\0';
-#endif
-    lgsRootDir = fs::path(buf).parent_path();
     lgsPackagesDir = lgsRootDir / LGS_PACKAGES_DIR;
-    validateFilePath(lgsRootDir);
     return true;
 }
 
@@ -48,9 +31,9 @@ bool LgsPaths::findCLibRoot() {
         pipe = popen("clang -print-resource-dir 2>/dev/null", "r");
         break;
     default:
-        break;
+        assert(0);
     }
-    if(!pipe) return false;
+    if (!pipe) return false;
 
     fgets(buffer, sizeof(buffer), pipe);
     std::string clibRoot = buffer;
@@ -61,7 +44,7 @@ bool LgsPaths::findCLibRoot() {
     clibRoot.pop_back();
     cLibRootDir = fs::path(clibRoot);
     pclose(pipe);
-    validateFilePath(cLibRootDir);
+    assert(fs::exists(cLibRootDir));
     return true;
 }
 
@@ -87,6 +70,6 @@ bool LgsPaths::findCLibHeaders() {
     }
     if (cLibHeadersDir == "") return false;
     pclose(pipe);
-    validateFilePath(cLibHeadersDir);
+    assert(fs::exists(cLibHeadersDir));
     return true;
 }

@@ -65,5 +65,6 @@ public:
     size_t getNextFileID();
     void createBuildDirs();
     bool initPaths(const fs::path& root);
+    void printErrors() const;
     ~LgsApp();
 };

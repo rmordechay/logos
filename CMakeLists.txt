@@ -165,14 +165,14 @@ set(RUNTIME_SOURCE
 )
 
 # Runtime
-add_library(lgs_runtime SHARED ${RUNTIME_SOURCE})
-set_target_properties(lgs_runtime PROPERTIES OUTPUT_NAME "lgs_runtime")
+add_library(lgs_lib SHARED ${RUNTIME_SOURCE})
+set_target_properties(lgs_lib PROPERTIES OUTPUT_NAME "lgs")
 
 # Executable
 add_executable(lgs main.cpp ${LGS_SOURCE})
 
 # Includes
-target_include_directories(lgs_runtime PUBLIC
+target_include_directories(lgs_lib PUBLIC
     ${CMAKE_SOURCE_DIR}/include/data
     ${CMAKE_SOURCE_DIR}/runtime/include
 )
@@ -191,9 +191,9 @@ target_include_directories(lgs SYSTEM PUBLIC
 # Options
 if (LOGOS_RELEASE)
     target_compile_options(lgs PRIVATE -O3 -DNDEBUG)
-    target_compile_options(lgs_runtime PRIVATE -O3 -DNDEBUG)
+    target_compile_options(lgs_lib PRIVATE -O3 -DNDEBUG)
     set_target_properties(lgs PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
-    set_target_properties(lgs_runtime PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
+    set_target_properties(lgs_lib PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
     if (UNIX AND NOT APPLE)
         target_link_options(lgs PRIVATE -s)
     endif ()
@@ -203,7 +203,7 @@ else ()
 endif ()
 
 # Link
-target_link_libraries(lgs PRIVATE lgs_runtime
+target_link_libraries(lgs PRIVATE lgs_lib
     LLVM
     clang-cpp
     CURL::libcurl
@@ -213,4 +213,4 @@ target_link_libraries(lgs PRIVATE lgs_runtime
 
 # Install
 install(TARGETS lgs RUNTIME DESTINATION bin)
-install(TARGETS lgs_runtime LIBRARY DESTINATION lib)
+install(TARGETS lgs_lib LIBRARY DESTINATION lib)

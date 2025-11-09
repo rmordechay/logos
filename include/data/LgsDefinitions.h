@@ -52,3 +52,17 @@
 #define LGS_ERROR_PADDING '\n' + std::string(LGS_PADDING_SIZE, ' ')
 
 #define nakedf __attribute__((naked))
+
+#if defined(_WIN32)
+#include <windows.h>
+#define LGS_LIB_NAME "liblgs.dll"
+#elif defined(__APPLE__)
+#include <mach-o/dyld.h>
+#define LGS_LIB_NAME "liblgs.dylib"
+#elif defined(__linux__)
+#include <unistd.h>
+#include <limits.h>
+#define LGS_LIB_NAME "liblgs.so"
+#else
+    assert(0);
+#endif

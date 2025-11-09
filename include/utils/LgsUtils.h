@@ -28,12 +28,13 @@ std::string getFileText(const fs::path& filePath);
 std::string getLine(const std::string& filename, size_t lineNumber);
 std::string trim(const std::string& str);
 std::string getFullPath(const LgsLocation& location, const std::string& filePath);
+std::string formatErrorMsg(const std::string& msg, const std::vector<std::string>& args);
 time_t getLastWritten(const fs::path& filePath);
-bool validateFilePath(fs::path& filePath);
 bool createDir(fs::path& dirPath);
 bool runCmd(const char* cmd);
+void printCliError(const LgsBaseError& err, const std::vector<std::string>& args = {});
 
-void logInfo(const std::string& mgs = "", bool withNewLine = false);
+void logInfo(const std::string& msg = "", bool withNewLine = false);
 void logDebug(const std::string& msg, bool withNewLine = false);
 void logError(const std::string& msg, const std::string& epilogue = "");
 void logWarning(const std::string& msg);

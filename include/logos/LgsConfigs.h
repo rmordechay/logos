@@ -33,14 +33,12 @@ struct LgsConfigs {
 
     LgsConfigs() {
         setOS();
-        setArch();
         init();
     }
     void init();
     LgsConfigs(const LgsConfigs&) = delete;
     LgsConfigs& operator=(const LgsConfigs&) = delete;
     void setOS();
-    void setArch();
 };
 
 inline void LgsConfigs::init() {
@@ -58,14 +56,6 @@ inline void LgsConfigs::setOS() {
     os = LINUX;
 #else
     assert(0);
-#endif
-}
-
-inline void LgsConfigs::setArch() {
-#if defined(__x86_64__) || defined(_M_X64)
-    arch = X86_64;
-#elif defined(__aarch64__)
-    arch = AARCH64;
 #endif
 }
 

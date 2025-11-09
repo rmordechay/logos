@@ -44,27 +44,6 @@ std::string padAndColorErrorMsg(const std::string& text) {
     return result.str();
 }
 
-void logInfo(const std::string& mgs, const bool withNewLine) {
-    if (withNewLine) std::cout << mgs << '\n';
-    else std::cout << mgs;
-}
-
-void logDebug(const std::string& msg, const bool withNewLine) {
-    if (lgsConfigs.logLevel != LGS_DEBUG) return;
-    if (withNewLine) std::cout << msg << '\n';
-    else std::cout << msg;
-}
-
-void logError(const std::string& msg, const std::string& epilogue) {
-    const auto textWithErrors = padAndColorErrorMsg(msg);
-    logInfo(textWithErrors);
-    if (epilogue != "") logInfo(epilogue);
-}
-
-void logWarning(const std::string& msg) {
-    logInfo(LGS_COLORIZE(LGS_WARNING_TEXT, LGS_MSG_COLOR_YELLOW) + msg);
-}
-
 bool isLogosFile(const fs::path& filePath) {
     return fs::exists(filePath) && is_regular_file(filePath) && filePath.extension().string() == LGS_FILE_EXTENSION;
 }
@@ -114,19 +93,25 @@ std::string getFullPath(const LgsLocation& location, const std::string& filePath
     return filePath + ":" + std::to_string(location.lineStart) + ":" + std::to_string(location.columnStart);
 }
 
+std::string formatErrorMsg(const std::string& msg, const std::vector<std::string>& args) {
+    size_t pos = 0;
+    size_t argIndex = 0;
+    auto result = std::string(msg);
+    while ((pos = result.find(MSG_PLACEHOLDER, pos)) != std::string::npos && argIndex < args.size()) {
+        result.replace(pos, std::strlen(MSG_PLACEHOLDER), args[argIndex]);
+        pos += args[argIndex].length();
+        argIndex++;
+    }
+    return result;
+}
+
 time_t getLastWritten(const fs::path& filePath) {
     assert(fs::exists(filePath));
     const auto ftime = fs::last_write_time(filePath);
     const auto sctp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(
         ftime - fs::file_time_type::clock::now() + std::chrono::system_clock::now()
-        );
+    );
     return std::chrono::system_clock::to_time_t(sctp);
-}
-
-bool validateFilePath(fs::path& filePath) {
-    if (!fs::exists(filePath)) return false;
-    filePath = fs::canonical(filePath);
-    return true;
 }
 
 bool createDir(fs::path& dirPath) {
@@ -146,6 +131,33 @@ bool runCmd(const char* cmd) {
         break;
     }
     assert(0);
+}
+
+void printCliError(const LgsBaseError& err, const std::vector<std::string>& args) {
+    const auto errMsg = formatErrorMsg(err.msg, args) + '\n';
+    logError(errMsg);
+}
+
+void logInfo(const std::string& msg, const bool withNewLine) {
+    if (withNewLine) std::cout << msg << '\n';
+    else std::cout << msg;
+}
+
+void logDebug(const std::string& msg, const bool withNewLine) {
+    if (lgsConfigs.logLevel != LGS_DEBUG) return;
+    if (withNewLine) std::cout << msg << '\n';
+    else std::cout << msg;
+}
+
+void logError(const std::string& msg, const std::string& epilogue) {
+    const auto textWithErrors = padAndColorErrorMsg(msg);
+    logInfo(textWithErrors);
+    if (epilogue != "") logInfo(epilogue);
+}
+
+
+void logWarning(const std::string& msg) {
+    logInfo(LGS_COLORIZE(LGS_WARNING_TEXT, LGS_MSG_COLOR_YELLOW) + msg);
 }
 
 void combineNodeHash(size_t& oldHash, const size_t newHash) {

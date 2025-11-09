@@ -60,11 +60,11 @@ bool downloadFile(const std::string& url, const std::string& outPath) {
 
 void LgsPkgManager::install() {
     paths.findLgsRootDir();
-    if (!validateFilePath(paths.lgsPackagesDir)) assert(0);
+    assert(fs::exists(paths.lgsPackagesDir));
     LgsApp app;
     app.configs.appMode = PKG_MANAGER_MODE;
     app.appPaths.appConfigFile = paths.appConfigFile;
-    if (!app.loadConfigFile()) exitWithErrors(app.errHandler);
+    if (!app.loadConfigFile()) return app.printErrors();
     for (const auto& package : app.appConfigFile->packages) {
         const auto packageDir = paths.lgsPackagesDir / package.name;
         const auto versionStr = package.version.asStr();

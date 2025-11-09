@@ -6,12 +6,12 @@
 struct LgsCliCmdHelp;
 
 void LgsAstCmd::run() {
-    if (argc != 3) exitWithError(E40001);
+    if (argc != 3) return printCliError(E40001);
     const auto path = argv[2];
-    if (!fs::exists(path)) exitWithError(E40004, {path});
-    if (!isLogosFile(path)) exitWithError(E40003, {path});
+    if (!fs::exists(path)) return printCliError(E40004, {path});
+    if (!isLogosFile(path)) return printCliError(E40003, {path});
     LgsApp app(path);
-    if (!app.setup()) exitWithErrors(app.errHandler);
+    if (!app.setup()) return app.printErrors();
     LgsFileMetadata metadata(app.getNextFileID(), path, 0);
     app.loadSrcFile(metadata);
     LgsJsonParser parser;

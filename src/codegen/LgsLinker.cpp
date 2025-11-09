@@ -4,7 +4,7 @@
 #include "llvm/Bitcode/BitcodeWriter.h"
 #include <llvm/Support/FileSystem.h>
 
-#define LINK_CMD_STRING "clang %s -L%s -llgs_runtime %s -Wl,-rpath,%s %s -o %s"
+#define LINK_CMD_STRING "clang %s -L%s -llgs %s -Wl,-rpath,%s %s -o %s"
 
 bool LgsLinker::link() const {
     assert(paths.lgsRootDir != "" && paths.execFile != "");
