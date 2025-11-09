@@ -113,6 +113,7 @@ public:
     LgsStmt* parseAssignOrExpr();
     LgsStmt* parseIfStmt();
     LgsSwitch* parseSwitch();
+    LgsStmt* parseBoolSwitch();
     LgsForLoop* parseForLoop();
     LgsWhileLoop* parseWhileLoop();
     LgsInfiniteLoop* parseInfiniteLoop();

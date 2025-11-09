@@ -17,6 +17,150 @@ LgsType* LgsBool::applyBinOp(LgsBinaryExpr* binExpr) {
     return applyIntBinOp(binExpr->op, binExpr->left->type);
 }
 
+LgsExpr* LgsBool::addConst(LgsExpr* self, LgsExpr* other) {
+    const auto const1 = self->getConstInt();
+    if (!const1) return nullptr;
+    const auto const2 = other->getConstInt();
+    if (!const2) return nullptr;
+    return new LgsIntConst(&LGS_INT, *const1 + *const2);
+}
+
+LgsExpr* LgsBool::subConst(LgsExpr* self, LgsExpr* other) {
+    const auto const1 = self->getConstInt();
+    if (!const1) return nullptr;
+    const auto const2 = other->getConstInt();
+    if (!const2) return nullptr;
+    return new LgsIntConst(&LGS_INT, *const1 - *const2);
+}
+
+LgsExpr* LgsBool::mulConst(LgsExpr* self, LgsExpr* other) {
+    const auto const1 = self->getConstInt();
+    if (!const1) return nullptr;
+    const auto const2 = other->getConstInt();
+    if (!const2) return nullptr;
+    return new LgsIntConst(&LGS_INT, *const1 * *const2);
+}
+
+LgsExpr* LgsBool::divConst(LgsExpr* self, LgsExpr* other) {
+    const auto const1 = self->getConstInt();
+    if (!const1) return nullptr;
+    const auto const2 = other->getConstInt();
+    if (!const2) return nullptr;
+    return new LgsIntConst(&LGS_INT, *const1 / *const2);
+}
+
+LgsExpr* LgsBool::modConst(LgsExpr* self, LgsExpr* other) {
+    const auto const1 = self->getConstInt();
+    if (!const1) return nullptr;
+    const auto const2 = other->getConstInt();
+    if (!const2) return nullptr;
+    return new LgsIntConst(&LGS_INT, *const1 % *const2);
+}
+
+LgsExpr* LgsBool::bitAndConst(LgsExpr* self, LgsExpr* other) {
+    const auto const1 = self->getConstInt();
+    if (!const1) return nullptr;
+    const auto const2 = other->getConstInt();
+    if (!const2) return nullptr;
+    return new LgsIntConst(&LGS_INT, *const1 & *const2);
+}
+
+LgsExpr* LgsBool::bitOrConst(LgsExpr* self, LgsExpr* other) {
+    const auto const1 = self->getConstInt();
+    if (!const1) return nullptr;
+    const auto const2 = other->getConstInt();
+    if (!const2) return nullptr;
+    return new LgsIntConst(&LGS_INT, *const1 | *const2);
+}
+
+LgsExpr* LgsBool::bitXorConst(LgsExpr* self, LgsExpr* other) {
+    const auto const1 = self->getConstInt();
+    if (!const1) return nullptr;
+    const auto const2 = other->getConstInt();
+    if (!const2) return nullptr;
+    return new LgsIntConst(&LGS_INT, *const1 ^ *const2);
+}
+
+LgsExpr* LgsBool::lshiftConst(LgsExpr* self, LgsExpr* other) {
+    const auto const1 = self->getConstInt();
+    if (!const1) return nullptr;
+    const auto const2 = other->getConstInt();
+    if (!const2) return nullptr;
+    return new LgsIntConst(&LGS_INT, *const1 << *const2);
+}
+
+LgsExpr* LgsBool::rshiftConst(LgsExpr* self, LgsExpr* other) {
+    const auto const1 = self->getConstInt();
+    if (!const1) return nullptr;
+    const auto const2 = other->getConstInt();
+    if (!const2) return nullptr;
+    return new LgsIntConst(&LGS_INT, *const1 >> *const2);
+}
+
+LgsExpr* LgsBool::eqConst(LgsExpr* self, LgsExpr* other) {
+    const auto const1 = self->getConstInt();
+    if (!const1) return nullptr;
+    const auto const2 = other->getConstInt();
+    if (!const2) return nullptr;
+    return new LgsIntConst(&LGS_BOOL, *const1 == *const2);
+}
+
+LgsExpr* LgsBool::neConst(LgsExpr* self, LgsExpr* other) {
+    const auto const1 = self->getConstInt();
+    if (!const1) return nullptr;
+    const auto const2 = other->getConstInt();
+    if (!const2) return nullptr;
+    return new LgsIntConst(&LGS_BOOL, *const1 != *const2);
+}
+
+LgsExpr* LgsBool::ltConst(LgsExpr* self, LgsExpr* other) {
+    const auto const1 = self->getConstInt();
+    if (!const1) return nullptr;
+    const auto const2 = other->getConstInt();
+    if (!const2) return nullptr;
+    return new LgsIntConst(&LGS_BOOL, *const1 < *const2);
+}
+
+LgsExpr* LgsBool::gtConst(LgsExpr* self, LgsExpr* other) {
+    const auto const1 = self->getConstInt();
+    if (!const1) return nullptr;
+    const auto const2 = other->getConstInt();
+    if (!const2) return nullptr;
+    return new LgsIntConst(&LGS_BOOL, *const1 > *const2);
+}
+
+LgsExpr* LgsBool::geConst(LgsExpr* self, LgsExpr* other) {
+    const auto const1 = self->getConstInt();
+    if (!const1) return nullptr;
+    const auto const2 = other->getConstInt();
+    if (!const2) return nullptr;
+    return new LgsIntConst(&LGS_BOOL, *const1 >= *const2);
+}
+
+LgsExpr* LgsBool::leConst(LgsExpr* self, LgsExpr* other) {
+    const auto const1 = self->getConstInt();
+    if (!const1) return nullptr;
+    const auto const2 = other->getConstInt();
+    if (!const2) return nullptr;
+    return new LgsIntConst(&LGS_BOOL, *const1 <= *const2);
+}
+
+LgsExpr* LgsBool::andConst(LgsExpr* self, LgsExpr* other) {
+    const auto const1 = self->getConstInt();
+    if (!const1) return nullptr;
+    const auto const2 = other->getConstInt();
+    if (!const2) return nullptr;
+    return new LgsIntConst(&LGS_BOOL, *const1 > 0 && *const2 > 0);
+}
+
+LgsExpr* LgsBool::orConst(LgsExpr* self, LgsExpr* other) {
+    const auto const1 = self->getConstInt();
+    if (!const1) return nullptr;
+    const auto const2 = other->getConstInt();
+    if (!const2) return nullptr;
+    return new LgsIntConst(&LGS_BOOL, *const1 > 0 || *const2 > 0);
+}
+
 Value* LgsBool::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     const auto l = cg.builder.CreateZExt(self->loadIR(cg), getIRType(cg));
     const auto r = cg.builder.CreateZExt(other->loadIR(cg), getIRType(cg));
@@ -96,7 +240,6 @@ Value* LgsBool::andIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
 Value* LgsBool::orIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     return orInt(cg, self, other);
 }
-
 
 std::string LgsBool::getName() {
     return name;

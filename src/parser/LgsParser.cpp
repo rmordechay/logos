@@ -97,16 +97,7 @@ LgsFile* LgsParser::parseSrcFile(const bool isTestRun) {
     assert(file);
 
     if (!cImports.empty()) {
-        std::unordered_map<std::string, fs::path> files;
-        LgsCLang clang(paths);
-        clang.parseFile("/Library/Developer/CommandLineTools/SDKs/MacOSX15.5.sdk/usr/include/stdio.h", file);
-        // for (auto cLibHeadersDir : fs::directory_iterator(paths.cLibHeadersDir)) {
-        //     logInfo(cLibHeadersDir.path(), true);
-        // }
-        // for (const auto cImport : cImports) {
-        //     if (clang.parseFile(cImport->value, file)) continue;
-        //     errHandler.mergeErrorsWithLock(clang.errHandler);
-        // }
+        assert(0);
     }
     return file;
 }
@@ -877,6 +868,7 @@ LgsStmt* LgsParser::parseAssignOrExpr() {
 
 LgsStmt* LgsParser::parseIfStmt() {
     if (!matchAndConsume(T_IF)) return nullptr;
+    if (currentToken.type == T_LBRACE) return parseBoolSwitch();
     const auto condExpr = parseExpr(false);
     mustParse(condExpr);
     const auto ifBlock = parseStmtsBlock();
@@ -923,6 +915,28 @@ LgsSwitch* LgsParser::parseSwitch() {
     }
     mustMatch(T_RBRACE);
     return switchStmt;
+}
+
+LgsStmt* LgsParser::parseBoolSwitch() {
+    const auto startToken = currentToken;
+    mustMatch(T_LBRACE);
+    const auto condExpr = parseExpr(false);
+    mustParse(condExpr);
+    mustMatch(T_COLON);
+    const auto ifBlock = parseStmtsBlock();
+    mustParse(ifBlock);
+    const auto ifStmt = new LgsIfStmt(condExpr, ifBlock);
+    setLocation(ifStmt->location, &startToken);
+    while (true) {
+        const auto pattern = parseExpr(false);
+        if (!pattern) break;
+        mustMatch(T_COLON);
+        const auto stmtsBlock = parseStmtsBlock();
+        mustParse(stmtsBlock);
+        if (currentToken.type == T_RBRACE) break;
+    }
+    mustMatch(T_RBRACE);
+    return ifStmt;
 }
 
 LgsForLoop* LgsParser::parseForLoop() {

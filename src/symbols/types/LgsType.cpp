@@ -398,7 +398,6 @@ LgsExpr* LgsType::orConst(LgsExpr* self, LgsExpr* other) {
     assert(0);
 }
 
-
 Value* LgsType::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     assert(0);
 }
