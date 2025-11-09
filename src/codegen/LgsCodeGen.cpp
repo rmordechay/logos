@@ -878,21 +878,22 @@ void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
         visitExpr(funcCall->args[i]);
     }
 
-    if (funcCall->ref.symbolType == PARAM) {
-        LgsFunc func(nullptr);
-        func.funcType = funcCall->ref.param->type->asFuncType();
-        func.setType(func.funcType);
-        func.IRValue = getIRValue(funcCall->ref.param);
-        funcCall->func = &func;
-    } else if (funcCall->ref.symbolType == VAR_DEC) {
-        LgsFunc func(nullptr);
-        func.funcType = funcCall->ref.varDec->type->asFuncType();
-        func.setType(func.funcType);
-        func.IRValue = getIRValue(funcCall->ref.varDec);
-        funcCall->func = &func;
+    if (funcCall->ref.symbolType != UNKNOWN) {
+        LgsType* type = nullptr;
+        LgsValue* value = nullptr;
+        if (funcCall->ref.symbolType == PARAM) {
+            type = funcCall->ref.param->type;
+            value = funcCall->ref.param;
+        } else if (funcCall->ref.symbolType == VAR_DEC) {
+            type = funcCall->ref.varDec->type;
+            value = funcCall->ref.varDec;
+        }
+        funcCall->func = new LgsFunc(type->asFuncType());
+        funcCall->func->IRValue = getIRValue(value);
     }
 
     const auto ft = funcCall->func->funcType;
+    assert(ft);
     if (ft->hasDefaults) {
         const auto diff = ft->params.size() - funcCall->args.size() - 1;
         for (size_t i = diff; i < ft->params.size(); ++i) {

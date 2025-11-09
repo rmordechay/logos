@@ -42,8 +42,10 @@ public:
     bool hasDefaults = false;
     FunctionType* IRType = nullptr;
 
-    LgsFuncType() = default;
-    explicit LgsFuncType(LgsType* rt, const std::vector<LgsParam>& params = {}) : rt(rt), params(params) {}
+    LgsFuncType(): LgsFuncType(nullptr) {}
+    explicit LgsFuncType(LgsType* rt, const std::vector<LgsParam>& params = {}) : rt(rt), params(params) {
+        passByRef = true;
+    }
     void setFuncOptions(uint32_t ops);
     Type* getIRType(LgsLLVMGen& cg) override;
     LgsExpr* getZeroValue() override;

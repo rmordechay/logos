@@ -9,6 +9,7 @@ public:
     StructType* arrStruct = nullptr;
 
     explicit LgsSet(LgsType* baseType = nullptr) : LgsIterable(baseType) {
+        passByRef = true;
         isHeapAlloc = true;
     }
     Type* getIRType(LgsLLVMGen& cg) override;

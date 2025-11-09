@@ -21,6 +21,7 @@ public:
 
     explicit LgsObject(std::string  name) : name(std::move(name)) {
         isHeapAlloc = true;
+        passByRef = true;
     }
     LgsFunc* getMethod(const std::string& methodName) override;
     std::string getName() override;

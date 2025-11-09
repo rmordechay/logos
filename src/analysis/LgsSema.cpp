@@ -773,7 +773,7 @@ void LgsSema::visitVariable(LgsVariable* variable) {
     }
     case PARAM: {
         variable->ref.param = symbol->param;
-        variable->setType(symbol->param->type);
+        variable->setType(symbol->param->type->clone());
         break;
     }
     case ENUM: {

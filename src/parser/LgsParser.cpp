@@ -927,6 +927,7 @@ LgsStmt* LgsParser::parseBoolSwitch() {
     mustParse(ifBlock);
     const auto ifStmt = new LgsIfStmt(condExpr, ifBlock);
     setLocation(ifStmt->location, &startToken);
+    ifStmt->isSwitchBool = true;
     while (true) {
         const auto pattern = parseExpr(false);
         if (!pattern) break;

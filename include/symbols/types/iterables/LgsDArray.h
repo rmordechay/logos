@@ -8,6 +8,7 @@ public:
 
     explicit LgsDArray(LgsType* baseType = nullptr) : LgsIterable(baseType) {
         addEmptyMethod(RESERVE_FUNC_NAME);
+        passByRef = true;
         isHeapAlloc = true;
     }
     LgsFunc* getMethod(const std::string& methodName) override;

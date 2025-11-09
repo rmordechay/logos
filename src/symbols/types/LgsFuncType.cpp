@@ -20,22 +20,19 @@ void LgsFuncType::setFuncOptions(const uint32_t ops) {
 }
 
 Type* LgsFuncType::getIRType(LgsLLVMGen& cg) {
-    std::vector<Type*> IRParamsTypes;
+    std::vector<Type*> types;
     for (size_t i = 0; i < params.size(); ++i) {
         const auto param = params[i];
         const auto paramType = param.type;
-        if (param.isSelf || !paramType->isPrimitive) {
-            IRParamsTypes.emplace_back(cg.ptrTy());
+        if (param.type->passByRef) {
+            types.emplace_back(cg.ptrTy());
         } else {
-            if (param.isVariadic) {
-                IRParamsTypes.emplace_back(cg.sizeTy());
-            } else {
-                IRParamsTypes.emplace_back(paramType->getIRType(cg));
-            }
+            if (param.isVariadic) types.emplace_back(cg.sizeTy());
+            types.emplace_back(paramType->getIRType(cg));
         }
     }
     const auto returnType = rt->isBig() ? cg.ptrTy() : rt->getIRType(cg);
-    IRType = cg.getFT(returnType, IRParamsTypes, this->isVariadic);
+    IRType = cg.getFT(returnType, types, this->isVariadic);
     return IRType;
 }
 
@@ -130,7 +127,33 @@ bool LgsFuncType::equals(LgsType* other) {
 }
 
 LgsType* LgsFuncType::clone() {
-    return new LgsFuncType(*this);
+    const auto lgsFunc = new LgsFuncType();
+    lgsFunc->name = name;
+    lgsFunc->IRName = IRName;
+    lgsFunc->parentName = parentName;
+    lgsFunc->genericSuffix = genericSuffix;
+    lgsFunc->rt = rt ? rt->clone() : nullptr;
+    for (const auto& param : params) {
+        lgsFunc->params.push_back(LgsParam(param));
+    }
+    for (const auto generic : generics) {
+        lgsFunc->generics.push_back(generic->clone());
+    }
+    lgsFunc->isPublic = isPublic;
+    lgsFunc->isBuiltin = isBuiltin;
+    lgsFunc->isVirtual = isVirtual;
+    lgsFunc->isVariadic = isVariadic;
+    lgsFunc->isLambda = isLambda;
+    lgsFunc->isOptional = isOptional;
+    lgsFunc->isTerminator = isTerminator;
+    lgsFunc->isMethod = isMethod;
+    lgsFunc->isCoroutine = isCoroutine;
+    lgsFunc->isIOMember = isIOMember;
+    lgsFunc->isExternal = isExternal;
+    lgsFunc->isArrFunc = isArrFunc;
+    lgsFunc->hasDefaults = hasDefaults;
+    lgsFunc->IRType = nullptr;
+    return lgsFunc;
 }
 
 LgsFuncType::~LgsFuncType() {

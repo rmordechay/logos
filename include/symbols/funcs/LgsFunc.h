@@ -41,6 +41,7 @@ public:
     }
 
     virtual Function* getIRFunc(LgsLLVMGen& cg);
+    Value* callWithVariadic(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args);
     virtual Value* call(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args, const std::vector<LgsType*>& generics = {});
     Value* callIR(LgsLLVMGen& cg, const std::vector<Value*>& args = {});
     Value* loadIR(LgsLLVMGen& cg) override;

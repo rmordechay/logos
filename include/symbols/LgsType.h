@@ -46,9 +46,9 @@ public:
     bool isInt = false;
     bool isFloat = false;
     bool isPrimitive = false;
-    bool isUnsigned = false;
     bool isHeapAlloc = false;
     bool isGeneric = false;
+    bool passByRef = false;
     Type* IRType = nullptr;
     LgsLocation location;
     std::vector<LgsField*> fields;

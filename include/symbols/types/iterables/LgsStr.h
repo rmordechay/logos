@@ -7,7 +7,9 @@ class LgsStr final : public LgsIterable {
 public:
     static constexpr auto name = "Str";
 
-    LgsStr(): LgsIterable(&LGS_CHAR) {}
+    LgsStr(): LgsIterable(&LGS_CHAR) {
+        passByRef = true;
+    }
     Type* getIRType(LgsLLVMGen& cg) override;
     std::string getName() override;
     size_t getSizeBytes() override;

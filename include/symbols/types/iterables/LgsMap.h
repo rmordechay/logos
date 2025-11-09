@@ -14,6 +14,7 @@ public:
         typePair = new LgsTypePair(keyType, valueType);
         baseType = typePair;
         isHeapAlloc = true;
+        passByRef = true;
         addEmptyMethod(KEYS_FUNC_NAME);
         addEmptyMethod(VALUES_FUNC_NAME);
     }

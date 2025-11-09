@@ -11,42 +11,45 @@
 
 Value* LgsFunc::call(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args, const std::vector<LgsType*>& generics) {
     if (fn) return fn(cg, args);
+    if (funcType->isVariadic) return callWithVariadic(cg, args);
     std::vector<Value*> IRArgs;
-    if (funcType->isVariadic) {
-        const auto variadicOffset = funcType->params.size() - 1;
-        for (size_t i = 0; i < variadicOffset; ++i) {
-            const auto arg = args[i];
-            const auto& param = funcType->params[i];
-            if (param.isSelf) {
-                IRArgs.emplace_back(arg->IRValue);
-            } else {
-                IRArgs.emplace_back(arg->castToIR(cg, param.type));
-            }
+    for (size_t i = 0; i < args.size(); ++i) {
+        const auto arg = args[i];
+        const auto& param = funcType->params[i];
+        if (param.isSelf) {
+            IRArgs.emplace_back(arg->IRValue);
+        } else {
+            IRArgs.emplace_back(arg->castToIR(cg, param.type));
         }
-        const auto& variadicParam = funcType->params[variadicOffset];
-        IRArgs.emplace_back(cg.usize(args.size()));
-        for (size_t i = variadicOffset; i < args.size(); ++i) {
-            const auto arg = args[i];
-            IRArgs.emplace_back(arg->castToIR(cg, variadicParam.type));
-        }
-    } else {
-        for (size_t i = 0; i < args.size(); ++i) {
-            const auto arg = args[i];
-            const auto& param = funcType->params[i];
-            if (param.isSelf) {
-                IRArgs.emplace_back(arg->IRValue);
-            } else {
-                IRArgs.emplace_back(arg->castToIR(cg, param.type));
-            }
-        }
+    }
 
-        if (funcType->hasDefaults) {
-            const auto diff = funcType->params.size() - args.size() - 1;
-            for (size_t i = diff; i < funcType->params.size(); ++i) {
-                const auto& param = funcType->params[i];
-                IRArgs.emplace_back(param.expr->IRValue);
-            }
+    if (funcType->hasDefaults) {
+        const auto diff = funcType->params.size() - args.size() - 1;
+        for (size_t i = diff; i < funcType->params.size(); ++i) {
+            const auto& param = funcType->params[i];
+            IRArgs.emplace_back(param.expr->IRValue);
         }
+    }
+    return callIR(cg, IRArgs);
+}
+
+Value* LgsFunc::callWithVariadic(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
+    std::vector<Value*> IRArgs;
+    const auto variadicOffset = funcType->params.size() - 1;
+    for (size_t i = 0; i < variadicOffset; ++i) {
+        const auto arg = args[i];
+        const auto& param = funcType->params[i];
+        if (param.isSelf) {
+            IRArgs.emplace_back(arg->IRValue);
+        } else {
+            IRArgs.emplace_back(arg->castToIR(cg, param.type));
+        }
+    }
+    const auto& variadicParam = funcType->params[variadicOffset];
+    IRArgs.emplace_back(cg.usize(args.size()));
+    for (size_t i = variadicOffset; i < args.size(); ++i) {
+        const auto arg = args[i];
+        IRArgs.emplace_back(arg->castToIR(cg, variadicParam.type));
     }
     return callIR(cg, IRArgs);
 }
@@ -80,7 +83,7 @@ Function* LgsFunc::getIRFunc(LgsLLVMGen& cg) {
     auto args = IRFunc->arg_begin();
     for (size_t i = 0; i < funcType->params.size(); ++i) {
         auto& param = funcType->params[i];
-        if (param.isVariadic) {
+        if (param.isVariadic && !funcType->isExternal) {
             variadicCount = args;
             break;
         }
