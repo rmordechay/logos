@@ -13,6 +13,7 @@ public:
     LgsExpr* castTo(LgsType* toType, bool explicitCast = false) override;
     Value* castToIR(LgsLLVMGen& cg, LgsType* toType) override;
     std::string asText() override;
+    void hashNode(size_t& oldHash) override;
     Value* hash(LgsLLVMGen& cg) override;
     LgsExpr* cloneExpr() override;
 };

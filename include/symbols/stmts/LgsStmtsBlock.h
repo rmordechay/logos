@@ -13,5 +13,6 @@ public:
     explicit LgsStmtsBlock(const std::vector<LgsStmt*>& stmts = {}) : stmts(stmts) {}
     LgsStmt* lastStmt() const;
     LgsStmtsBlock* clone() const;
+    void hashNode(size_t& oldHash) override;
     ~LgsStmtsBlock() override;
 };

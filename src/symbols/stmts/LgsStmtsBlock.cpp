@@ -18,6 +18,12 @@ LgsStmtsBlock* LgsStmtsBlock::clone() const {
     return cloned;
 }
 
+void LgsStmtsBlock::hashNode(size_t& oldHash) {
+    for (const auto stmt : stmts) {
+        stmt->hashNode(oldHash);
+    }
+}
+
 LgsStmtsBlock::~LgsStmtsBlock() {
     for (const auto& stmt : stmts) {
         freeStmt(stmt);

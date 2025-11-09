@@ -15,6 +15,7 @@ public:
     LgsExpr* castTo(LgsType* toType, bool explicitCast) override;
     Value* castToIR(LgsLLVMGen& cg, LgsType* toType) override;
     Value* loadIR(LgsLLVMGen& cg) override;
+    void hashNode(size_t& oldHash) override;
     void setObject(LgsObject* newObj);
     bool equals(LgsExpr* other) override;
     ~LgsInstance() override;

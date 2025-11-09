@@ -2,10 +2,12 @@
 #include "exprs/constants/LgsFloatConst.h"
 #include "exprs/constants/LgsStrConst.h"
 #include "types/LgsAny.h"
+#include "types/iterables/LgsDArray.h"
 #include "types/primitives/LgsDouble.h"
 #include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsLong.h"
 #include "types/primitives/LgsSize.h"
+#include "utils/LgsUtils.h"
 
 Value* LgsIntConst::loadIR(LgsLLVMGen& cg) {
     return IRValue;
@@ -58,6 +60,10 @@ Value* LgsIntConst::castToIR(LgsLLVMGen& cg, LgsType* toType) {
 
 std::string LgsIntConst::asText() {
     return std::to_string(value);
+}
+
+void LgsIntConst::hashNode(size_t& oldHash) {
+    hashNodeInt(oldHash, value);
 }
 
 Value* LgsIntConst::hash(LgsLLVMGen& cg) {

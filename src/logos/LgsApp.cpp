@@ -208,8 +208,7 @@ bool LgsApp::link() {
 }
 
 void LgsApp::loadSrcFile(const std::string& fileCode, const fs::path& filePath) {
-    const auto fileID = getNextFileID();
-    LgsFileMetadata metadata(fileID, filePath);
+    LgsFileMetadata metadata(getNextFileID(), filePath);
     LgsParser parser(metadata, appPaths, globals);
     parser.code = fileCode;
     const auto file = parser.parseSrcFile(configs.isTestRun);

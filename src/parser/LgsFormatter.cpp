@@ -1,6 +1,7 @@
 #include "parser/LgsFormatter.h"
 #include "exprs/LgsArrayExpr.h"
 #include "exprs/LgsFuncCall.h"
+#include "exprs/LgsInstance.h"
 #include "exprs/LgsTernaryExpr.h"
 #include "exprs/LgsVariable.h"
 #include "exprs/constants/LgsStrConst.h"
@@ -8,10 +9,9 @@
 #include "files/LgsMainFile.h"
 #include "files/LgsObjectFile.h"
 #include "files/LgsTestFile.h"
+#include "logos/LgsApp.h"
 #include "stmts/LgsVarDec.h"
-
 #include <iostream>
-
 #define TAB_SIZE 4
 
 void LgsFormatter::formatFile(LgsFile* file) {
@@ -26,7 +26,14 @@ void LgsFormatter::formatFile(LgsFile* file) {
     } else {
         assert(0);
     }
-    std::cout << formatted.str();
+    LgsApp app;
+    app.loadSrcFile(formatted.str());
+    const auto oldFileHash = file->hashFile();
+    const auto newFileSize = app.srcFiles.front()->hashFile();
+    assert(oldFileHash == newFileSize);
+    std::ofstream outFile(file->path, std::ios::out | std::ios::trunc);
+    outFile << formatted.str();
+    outFile.close();
 }
 
 void LgsFormatter::formatMainFile(LgsMainFile* mainFile) {
@@ -314,7 +321,16 @@ void LgsFormatter::formatJson(const LgsJson* jsonStmt) {
 }
 
 void LgsFormatter::formatInstance(LgsInstance* instance) {
-    assert(0);
+    insert(instance->name);
+    insert("{");
+    auto isFirst = true;
+    for (auto [name, expr] : instance->args) {
+        if (!isFirst) insert(", ");
+        isFirst = false;
+        insert(name + "=");
+        formatExpr(expr);
+    }
+    insert("}");
 }
 
 void LgsFormatter::formatNull(LgsNull* null) {

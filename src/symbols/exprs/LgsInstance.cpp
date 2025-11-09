@@ -22,6 +22,14 @@ Value* LgsInstance::loadIR(LgsLLVMGen& cg) {
     return IRValue;
 }
 
+void LgsInstance::hashNode(size_t& oldHash) {
+    hashNodeString(oldHash, name);
+    for (auto [argName, arg] : args) {
+        hashNodeString(oldHash, argName);
+        arg->hashNode(oldHash);
+    }
+}
+
 void LgsInstance::setObject(LgsObject* newObj) {
     obj = newObj;
     setType(obj);

@@ -148,7 +148,8 @@ LgsFunc* LgsFunc::cloneExpr() {
 }
 
 void LgsFunc::hashNode(size_t& oldHash) {
-    hashNodeString(oldHash, funcType->name);
+    funcType->hashNode(oldHash);
+    stmtsBlock->hashNode(oldHash);
 }
 
 BasicBlock* LgsFunc::getCleanupBlock(LgsLLVMGen& cg) {
