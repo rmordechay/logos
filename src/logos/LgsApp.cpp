@@ -178,8 +178,8 @@ bool LgsApp::generate() {
     appPaths.execFile = appPaths.buildDir / (configs.name == "" ? LGS_DEFAULT_EXEC_FILE : configs.name);
     for (const auto& file : srcFiles) {
         threadPool.runTask([this, file] {
-            LgsCodeGen generator(*file, configs, appPaths);
-            const auto successful = generator.generate();
+            LgsCodeGen cg(*file, configs, globals, appPaths);
+            const auto successful = cg.generate();
             if (!successful) {
                 std::lock_guard lock(mtx);
                 errHandler.setUnsuccessful();
@@ -191,7 +191,7 @@ bool LgsApp::generate() {
     if (lgsConfigs.devMode && lgsConfigs.printIR) {
         for (const auto& file : srcFiles) {
             std::lock_guard lock(mtx);
-            file->cg.IRModule->print(llvm::outs(), nullptr);
+            file->llvmCodeGen.IRModule->print(llvm::outs(), nullptr);
             logInfo(LGS_MSG_LINE_SEPERATOR);
         }
     }

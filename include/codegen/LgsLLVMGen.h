@@ -37,10 +37,9 @@ public:
 
     void setupModule(const LgsFile& file, bool debugMode = false);
     void loop(Value* loopLength, const std::function<void(Value*, BasicBlock*)>& body);
-    Value* getIRStr(const std::string& value);
+    Constant* getIRStr(const std::string& value);
     Value* getPtrTo(Value* v);
-    GlobalVariable* createGlobal(Type* type, ConstantAggregateZero* zeroInit, const std::string& name = "") const;
-    GlobalVariable* createConstGlobal(Type* type, Constant* zeroInit, const std::string& name = "") const;
+    GlobalVariable* createGlobal(Type* type, Constant* args, const std::string& name) const;
     StructType* getStructType(const std::vector<Type*>& fields, const std::string& name = "");
 
     // Blocks

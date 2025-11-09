@@ -62,12 +62,13 @@ public:
     LgsStack stack;
     LgsLLVMGen& cg;
     LgsPaths& paths;
+    LgsSymbolTable& globals;
     LgsAppConfigs& appConfigs;
     Function* currentIRFunc = nullptr;
     static std::atomic<size_t> lambdasNameCounter;
 
-    explicit LgsCodeGen(LgsFile& file, LgsAppConfigs& appConfigs, LgsPaths& paths)
-        : file(file), cg(file.cg), paths(paths), appConfigs(appConfigs) {
+    explicit LgsCodeGen(LgsFile& file, LgsAppConfigs& appConfigs, LgsSymbolTable& globals, LgsPaths& paths)
+        : file(file), cg(file.llvmCodeGen), paths(paths), globals(globals), appConfigs(appConfigs) {
     }
 
     bool generate();
@@ -127,6 +128,8 @@ public:
     void setNullableValue(LgsExpr* expr);
     void resolveVirtuals(const LgsInstance* instance) const;
     bool checkMock(LgsExpr* expr);
+    void createRTTypes() const;
+    Value* getRTType(Value* typeID) const;
 
     // Funcs
     void createPrologue(LgsFunc* func);

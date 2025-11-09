@@ -36,7 +36,6 @@ struct Lgs_Object {
     const char* name;
     size_t fieldCount;
     Lgs_RTType* fieldTypes;
-    size_t* fieldOffsets;
 };
 
 struct Lgs_SArray {

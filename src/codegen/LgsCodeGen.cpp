@@ -1,6 +1,6 @@
 #include "codegen/LgsCodeGen.h"
 #include "builtins/LgsTest.h"
-#include "../../include/logos/LgsConfigs.h"
+#include "logos/LgsConfigs.h"
 #include "exprs/LgsArrayExpr.h"
 #include "funcs/LgsCoroutine.h"
 #include "files/LgsInterfaceFile.h"
@@ -58,6 +58,7 @@
 
 std::atomic<size_t> LgsCodeGen::lambdasNameCounter{0};
 #define GENERATE_OBJ_CMD_STRING "llc -filetype=obj -o %s %s.bc"
+#define LGS_RT_TYPES_ARR_NAME "Lgs_RTTypes"
 
 bool LgsCodeGen::generate() {
     cg.setupModule(file, appConfigs.debugMode);
@@ -75,6 +76,7 @@ bool LgsCodeGen::generate() {
 }
 
 void LgsCodeGen::visitMainFile(LgsMainFile* mainFile) {
+    // createRTTypes();
     for (const auto interface : mainFile->interfaces) {
         visitInterface(interface);
     }
@@ -987,7 +989,7 @@ void LgsCodeGen::visitStrConst(LgsStrConst* strConst) {
         const auto arrTyp = ArrayType::get(cg.i8Ty(), 1024);
         const auto buffer = cg.builder.CreateAlloca(arrTyp);
         strConst->IRValue = buffer;
-        std::vector IRArgs = {strConst->IRValue, cg.getIRStr(formatted + "\n")};
+        std::vector<Value*> IRArgs = {strConst->IRValue, cg.getIRStr(formatted + "\n")};
         IRArgs.insert(IRArgs.end(), values.begin(), values.end());
         // cg.callSprintf(IRArgs);
     }
@@ -1100,6 +1102,43 @@ bool LgsCodeGen::checkMock(LgsExpr* expr) {
         }
     }
     return false;
+}
+
+void LgsCodeGen::createRTTypes() const {
+    const auto rtTypeStruct = cg.getStructType({cg.ptrTy(), cg.sizeTy(), cg.ptrTy()}, LGS_RT_TYPES_ARR_NAME);
+    size_t currentID = 0;
+    std::vector<Constant*> allRTTypes;
+    std::unordered_map<std::string, size_t> typeToID;
+    for (auto [name, symbol] : globals.symbols) {
+        if (symbol.isBuiltin) continue;
+        if (symbol.symbolType != OBJECT) continue;
+
+        const auto obj = symbol.object;
+        const auto fieldCount = obj->fields.size();
+        typeToID[name] = currentID++;
+
+        std::vector<Constant*> fieldTypeValues;
+        for (const auto field : obj->fields) {
+            fieldTypeValues.push_back(cg.i32(field->type->getRTType()));
+        }
+        const auto fieldTypesArrayType = ArrayType::get(cg.i32Ty(), fieldCount);
+        const auto fieldTypesArray = llvm::ConstantArray::get(fieldTypesArrayType, fieldTypeValues);
+        const auto fieldTypesGlobal = cg.createGlobal(fieldTypesArrayType, fieldTypesArray, obj->name + "_field_types");
+
+        std::vector<Constant*> structFields = {cg.getIRStr(obj->name), cg.usize(fieldCount), fieldTypesGlobal};
+        const auto objectStruct = llvm::ConstantStruct::get(rtTypeStruct, structFields);
+        allRTTypes.push_back(objectStruct);
+    }
+
+    const auto rtTypeArrayType = ArrayType::get(rtTypeStruct, allRTTypes.size());
+    const auto rtTypeArray = llvm::ConstantArray::get(rtTypeArrayType, allRTTypes);
+    cg.createGlobal(rtTypeArrayType, rtTypeArray, LGS_RT_TYPES_ARR_NAME);
+}
+
+Value* LgsCodeGen::getRTType(Value* typeID) const {
+    const auto rtTypesGlobal = cg.IRModule->getGlobalVariable(LGS_RT_TYPES_ARR_NAME);
+    const auto rtTypesArrayType = rtTypesGlobal->getValueType();
+    return cg.builder.CreateInBoundsGEP(rtTypesArrayType, rtTypesGlobal, {cg.i32Zero(), typeID});
 }
 
 void LgsCodeGen::createPrologue(LgsFunc* func) {

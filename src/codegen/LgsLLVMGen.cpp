@@ -52,7 +52,7 @@ void LgsLLVMGen::loop(Value* loopLength, const std::function<void(Value*, BasicB
     startBlock(exitBlock);
 }
 
-Value* LgsLLVMGen::getIRStr(const std::string& value) {
+Constant* LgsLLVMGen::getIRStr(const std::string& value) {
     for (auto& globals : IRModule->globals()) {
         if (!globals.hasInitializer()) continue;
         const auto dataArray = llvm::dyn_cast<llvm::ConstantDataArray>(globals.getInitializer());
@@ -87,12 +87,8 @@ Value* LgsLLVMGen::getPtrTo(Value* v) {
     assert(0);
 }
 
-GlobalVariable* LgsLLVMGen::createGlobal(Type* type, ConstantAggregateZero* zeroInit, const std::string& name) const {
-    return new GlobalVariable(*IRModule, type, false, GlobalValue::ExternalLinkage, zeroInit, name);
-}
-
-GlobalVariable* LgsLLVMGen::createConstGlobal(Type* type, Constant* zeroInit, const std::string& name) const {
-    return new GlobalVariable(*IRModule, type, true, GlobalValue::PrivateLinkage, zeroInit, name);
+GlobalVariable* LgsLLVMGen::createGlobal(Type* type, Constant* args, const std::string& name) const {
+    return new GlobalVariable(*IRModule, type, false, GlobalValue::ExternalLinkage, args, name);
 }
 
 StructType* LgsLLVMGen::getStructType(const std::vector<Type*>& fields, const std::string& name) {

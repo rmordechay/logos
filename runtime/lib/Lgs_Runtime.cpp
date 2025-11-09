@@ -6,8 +6,11 @@
 #include <map>
 #include "Lgs_Map.h"
 #include "Lgs_helpers.h"
+
+#include <iostream>
 #include <string>
 #include <unistd.h>
+
 
 struct Lgs_Runtime {
     Lgs_Stack stack;
@@ -16,6 +19,7 @@ struct Lgs_Runtime {
 };
 
 static inline Lgs_Runtime runtime;
+__attribute__((weak)) Lgs_Object Lgs_RTTypes[] = {};
 
 extern "C" void Lgs_Runtime_init() {
     // runtime.scheduler.start();
@@ -23,6 +27,15 @@ extern "C" void Lgs_Runtime_init() {
 
 extern "C" void Lgs_Runtime_close() {
     // runtime.scheduler.shutdown();
+}
+
+extern "C" void Lgs_rttest(const size_t index) {
+    const auto a = &Lgs_RTTypes[index];
+    for (int i = 0; i < a->fieldCount; ++i) {
+        const auto v = a->fieldTypes[i];
+        std::cout << getTypeName(v) << '\n';
+    }
+    assert(0);
 }
 
 extern "C" void Lgs_Runtime_addOwner(void* ptr, const Lgs_RTType type) {

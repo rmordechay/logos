@@ -11,8 +11,8 @@ class LgsFile {
 public:
     size_t id = 0;
     fs::path path;
-    LgsLLVMGen cg;
     LgsLocation location;
+    LgsLLVMGen llvmCodeGen;
     LgsSymbolTable symbolTable;
 
     explicit LgsFile(const size_t fileID, const fs::path& path) : id(fileID), path(path) {}
