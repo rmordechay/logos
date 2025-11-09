@@ -118,7 +118,7 @@ Value* LgsStr::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     const auto otherSize = lengthIR(cg, other->IRValue);
     const auto totalSize = cg.builder.CreateAdd(selfSize, otherSize);
     const auto newStrSize = cg.builder.CreateAdd(totalSize, cg.i64(1));
-    const auto newStrPtr = cg.callMalloc(newStrSize, true, getRTType());
+    const auto newStrPtr = cg.callAllocate(newStrSize, true, getRTType());
     cg.callMemCpy(newStrPtr, self->IRValue, selfSize);
     const auto dstPtr = cg.builder.CreateInBoundsGEP(cg.i8Ty(), newStrPtr, selfSize);
     cg.callMemCpy(dstPtr, other->IRValue, otherSize);

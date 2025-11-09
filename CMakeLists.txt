@@ -15,15 +15,15 @@ set(LLVM_LINK_LLVM_DYLIB ON)
 set(CLANG_LINK_CLANG_DYLIB ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     set(CMAKE_INSTALL_PREFIX "/usr/local" CACHE PATH "Install prefix" FORCE)
-endif()
+endif ()
 
 find_program(CCACHE_PROGRAM ccache)
 if (CCACHE_PROGRAM AND NOT LOGOS_RELEASE)
     set(CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
     set(CMAKE_C_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
-endif()
+endif ()
 
 set(LGS_SOURCE
     # Logos
@@ -161,6 +161,7 @@ set(RUNTIME_SOURCE
     ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_Set.cpp
     ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_Scheduler.cpp
     ${CMAKE_SOURCE_DIR}/runtime/lib/context/Lgs_Aarch64.cpp
+    runtime/lib/Lgs_Helpers.cpp
 )
 
 # Runtime
@@ -188,21 +189,27 @@ target_include_directories(lgs SYSTEM PUBLIC
 )
 
 # Options
-if(LOGOS_RELEASE)
+if (LOGOS_RELEASE)
     target_compile_options(lgs PRIVATE -O3 -DNDEBUG)
     target_compile_options(lgs_runtime PRIVATE -O3 -DNDEBUG)
     set_target_properties(lgs PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
     set_target_properties(lgs_runtime PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
-    if(UNIX AND NOT APPLE)
+    if (UNIX AND NOT APPLE)
         target_link_options(lgs PRIVATE -s)
-    endif()
-else()
+    endif ()
+else ()
     target_compile_options(lgs PRIVATE -Wall -Wextra -Wpedantic -Wreturn-type -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function)
     add_subdirectory(tests)
-endif()
+endif ()
 
 # Link
-target_link_libraries(lgs PRIVATE lgs_runtime CURL::libcurl LLVM clang-cpp OpenSSL::SSL OpenSSL::Crypto)
+target_link_libraries(lgs PRIVATE lgs_runtime
+    LLVM
+    clang-cpp
+    CURL::libcurl
+    OpenSSL::SSL
+    OpenSSL::Crypto
+)
 
 # Install
 install(TARGETS lgs RUNTIME DESTINATION bin)

@@ -26,7 +26,7 @@ enum LgsArch {
 struct LgsConfigs {
     LgsOS os;
     LgsArch arch;
-    bool devMode = true;
+    bool isDevMode = true;
     bool printIR = true;
     bool writeIRFiles = false;
     LgsLogLevel logLevel = LGS_INFO;
@@ -46,7 +46,7 @@ struct LgsConfigs {
 inline void LgsConfigs::init() {
     const char* env = std::getenv("LGS_DEV_MODE");
     if (!env) return;
-    devMode = std::string(env) == "1" || std::string(env) == "true";
+    isDevMode = std::string(env) == "1" || std::string(env) == "true";
 }
 
 inline void LgsConfigs::setOS() {

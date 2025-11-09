@@ -1,9 +1,9 @@
 #include "Lgs_DArray.h"
 #include "Lgs_Types.h"
 #include "LgsDefinitions.h"
+#include "Lgs_Values.h"
 #include <cassert>
 #include <sstream>
-#include <cmath>
 
 std::string formatArray(const Lgs_DArray* arr);
 std::string formatElement(Lgs_RTType type, void* elem);

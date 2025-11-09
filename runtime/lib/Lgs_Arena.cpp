@@ -1,8 +1,8 @@
 #include "Lgs_Arena.h"
 #include <cstdlib>
 
-void* Lgd_Arena::allocate(const std::size_t size, const std::size_t align) {
-    auto offset = currentOffset + (align - 1) & ~(align - 1);
+void* Lgs_Arena::allocate(const size_t size) {
+    auto offset = currentOffset + (ALIGN - 1) & ~(ALIGN - 1);
     if (!currentBlock || offset + size > BLOCK_SIZE) {
         currentBlock = std::malloc(BLOCK_SIZE);
         blocks.push_back(currentBlock);
@@ -13,15 +13,11 @@ void* Lgd_Arena::allocate(const std::size_t size, const std::size_t align) {
     return ptr;
 }
 
-void Lgd_Arena::reset() {
+Lgs_Arena::~Lgs_Arena() {
     currentBlock = nullptr;
     currentOffset = 0;
     for (void* block : blocks) {
         std::free(block);
     }
     blocks.clear();
-}
-
-Lgd_Arena::~Lgd_Arena() {
-    reset();
 }

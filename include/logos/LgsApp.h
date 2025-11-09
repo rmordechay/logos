@@ -45,7 +45,8 @@ public:
     explicit LgsApp(const fs::path& rootPath = "") {
         appPaths.rootPath = rootPath;
     }
-    void compile();
+
+    bool compile();
     bool setup();
     bool parse();
     bool parseHeaders();

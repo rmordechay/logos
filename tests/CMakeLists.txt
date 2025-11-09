@@ -17,11 +17,14 @@ target_include_directories(lgs_tests PRIVATE
     ${CMAKE_SOURCE_DIR}/runtime/include
     ${LLVM_INCLUDE_DIRS}
     ${CLANG_INCLUDE_DIRS}
+    ${OPENSSL_INCLUDE_DIR}
 )
 
 target_link_libraries(lgs_tests PRIVATE
     lgs_runtime
     LLVM
     clang-cpp
-    ${CURL_LIBRARIES}
+    CURL::libcurl
+    OpenSSL::SSL
+    OpenSSL::Crypto
 )

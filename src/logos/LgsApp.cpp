@@ -19,14 +19,15 @@
 
 inline ThreadPool threadPool;
 
-void LgsApp::compile() {
-    if (!setup()) errHandler.exitWithErrors();
-    if (!loadConfigs()) errHandler.exitWithErrors();
-    // if (!loadDeps()) errHandler.exitWithErrors();
-    if (!parse()) errHandler.exitWithErrors();
-    if (!analyse()) errHandler.exitWithErrors();
-    if (!generate()) errHandler.exitWithErrors();
-    if (!link()) errHandler.exitWithErrors();
+bool LgsApp::compile() {
+    if (!setup()) return false;
+    if (!loadConfigs()) return false;
+    // if (!loadDepsreturn false;
+    if (!parse()) return false;
+    if (!analyse()) return false;
+    if (!generate()) return false;
+    if (!link()) return false;
+    return true;
 }
 
 bool LgsApp::setup() {
@@ -42,7 +43,7 @@ bool LgsApp::setup() {
         const auto dirName = "lgs_" + std::to_string(now);
         auto fullPath = fs::temp_directory_path() / dirName;
         createDir(fullPath);
-        initPaths(fullPath);
+        if (!initPaths(fullPath)) exitWithErrors(errHandler);
         return true;
     }
 
@@ -52,14 +53,14 @@ bool LgsApp::setup() {
         // rootPath is replaced with temp dir and the file path is stored in metadata
         const auto filePath = appPaths.rootPath;
         const auto rootPath = fs::temp_directory_path();
-        initPaths(rootPath);
+        if (!initPaths(rootPath)) exitWithErrors(errHandler);
         appCache.addFileMetadata(getNextFileID(), filePath, LGS_SRC_FILE);
         return true;
     }
 
     // Project mode
     configs.appMode = PROJECT_MODE;
-    initPaths(appPaths.rootPath);
+    if (!initPaths(appPaths.rootPath)) exitWithErrors(errHandler);
     if (!is_directory(appPaths.rootPath) || !is_directory(appPaths.srcDir) || !fs::exists(appPaths.appConfigFile)) {
         errHandler.addError(E10010);
         return false;
@@ -188,7 +189,7 @@ bool LgsApp::generate() {
     }
     threadPool.wait();
 
-    if (lgsConfigs.devMode && lgsConfigs.printIR) {
+    if (lgsConfigs.isDevMode && lgsConfigs.printIR) {
         for (const auto& file : srcFiles) {
             std::lock_guard lock(mtx);
             file->llvmCodeGen.IRModule->print(llvm::outs(), nullptr);
@@ -350,7 +351,7 @@ void LgsApp::createBuildDirs() {
     if (!fs::exists(appPaths.buildDirObjs)) {
         createDir(appPaths.buildDirObjs);
     }
-    if (lgsConfigs.devMode && lgsConfigs.writeIRFiles && !fs::exists(appPaths.buildDirIR)) {
+    if (lgsConfigs.isDevMode && lgsConfigs.writeIRFiles && !fs::exists(appPaths.buildDirIR)) {
         createDir(appPaths.buildDirIR);
     }
 }
@@ -365,10 +366,18 @@ bool LgsApp::initPaths(const fs::path& root) {
     appPaths.buildDirIR = appPaths.buildDir / LGS_BUILD_IR_DIR;
     appPaths.buildDirObjs = appPaths.buildDir / LGS_BUILD_OBJECTS_DIR;
     appPaths.cacheFile = appPaths.buildDir / LGS_FILES_CACHE_FILE;
-    if (!appPaths.findLgsRuntime()) return false;
-    if (!appPaths.findCLibRoot()) return false;
-    if (!appPaths.findCLibHeaders()) return false;
-    if (!appPaths.findLgsRootDir()) return false;
+    if (!appPaths.findLgsRootDir()) {
+        errHandler.addError(E10094, {"Logos root directory"});
+        return false;
+    }
+    if (!appPaths.findCLibRoot()) {
+        errHandler.addError(E10094, {"C library"});
+        return false;
+    }
+    if (!appPaths.findCLibHeaders()) {
+        errHandler.addError(E10094, {"C headers directory"});
+        return false;
+    }
     return true;
 }
 

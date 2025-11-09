@@ -64,7 +64,7 @@ void LgsPkgManager::install() {
     LgsApp app;
     app.configs.appMode = PKG_MANAGER_MODE;
     app.appPaths.appConfigFile = paths.appConfigFile;
-    if (!app.loadConfigFile()) app.errHandler.exitWithErrors();
+    if (!app.loadConfigFile()) exitWithErrors(app.errHandler);
     for (const auto& package : app.appConfigFile->packages) {
         const auto packageDir = paths.lgsPackagesDir / package.name;
         const auto versionStr = package.version.asStr();

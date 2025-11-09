@@ -15,7 +15,10 @@
 #include <limits.h>
 #endif
 
-bool LgsPaths::findLgsRuntime() {
+bool LgsPaths::findLgsRootDir() {
+    if (lgsConfigs.isDevMode) {
+        return false;
+    }
     char buf[1024];
 #if defined(_WIN32)
     DWORD len = GetModuleFileNameA(NULL, buf, MAX_PATH);
@@ -28,23 +31,7 @@ bool LgsPaths::findLgsRuntime() {
     if (len == -1) return false;
     buf[len] = '\0';
 #endif
-    lgsRuntimeLib = fs::path(buf).parent_path();
-    validateFilePath(lgsRuntimeLib);
-    return true;
-}
-
-bool LgsPaths::findLgsRootDir() {
-    fs::path root = "";
-    switch (lgsConfigs.os) {
-    case MAC_OS:
-    case LINUX:
-        root = "../..";
-        break;
-    case WINDOWS:
-    case UNKNOWN_OS:
-        assert(0);
-    }
-    lgsRootDir = root / LGS_ROOT_DIR;
+    lgsRootDir = fs::path(buf).parent_path();
     lgsPackagesDir = lgsRootDir / LGS_PACKAGES_DIR;
     validateFilePath(lgsRootDir);
     return true;

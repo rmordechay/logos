@@ -3,12 +3,12 @@
 #include "data/LgsFileTemplates.h"
 
 void LgsGenerateCmd::run() {
-    if (argc != 3) LgsErrHandler::exitWithError(E40001);
+    if (argc != 3) exitWithError(E40001);
     const auto name = std::string(argv[2]);
-    if (std::isdigit(name[0])) LgsErrHandler::exitWithError(E40005, {name});
+    if (std::isdigit(name[0])) exitWithError(E40005, {name});
     for (const char c : name) {
-        if (std::isupper(c)) LgsErrHandler::exitWithError(E40005, {name});
-        if (!std::isalpha(c) && c != '-') LgsErrHandler::exitWithError(E40005, {name});
+        if (std::isupper(c)) exitWithError(E40005, {name});
+        if (!std::isalpha(c) && c != '-') exitWithError(E40005, {name});
     }
     createProjectStructure(name);
 }
@@ -19,7 +19,7 @@ LgsCliCmdHelp& LgsGenerateCmd::getHelp() {
 
 void LgsGenerateCmd::createProjectStructure(const std::string& name) const {
     auto projectDir = fs::current_path() / name;
-    if (fs::exists(projectDir)) LgsErrHandler::exitWithError(E40006, {name});
+    if (fs::exists(projectDir)) exitWithError(E40006, {name});
     createDir(projectDir);
     auto srcDir = projectDir / LGS_SRC_DIR;
     createDir(srcDir);

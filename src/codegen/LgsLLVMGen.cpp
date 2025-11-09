@@ -188,14 +188,14 @@ void LgsLLVMGen::callMemCpy(Value* dest, Value* src, Value* size) {
     builder.CreateMemCpy(dest, llvm::MaybeAlign(), src, llvm::MaybeAlign(), size);
 }
 
-Value* LgsLLVMGen::callMalloc(const size_t size, const bool isOwner, const Lgs_RTType type) {
+Value* LgsLLVMGen::callAllocate(const size_t size, const bool isOwner, const Lgs_RTType type) {
     assert(type != RTT_UNKNOWN);
-    const auto ptr = builder.CreateMalloc(sizeTy(), sizeTy(), usize(size), nullptr);
+    const auto ptr = callRuntimeFunc("allocate", ptrTy(), {sizeTy()}, {usize(size)});
     addHeap(isOwner, type, ptr);
     return ptr;
 }
 
-Value* LgsLLVMGen::callMalloc(Value* size, const bool isOwner, const Lgs_RTType type) {
+Value* LgsLLVMGen::callAllocate(Value* size, const bool isOwner, const Lgs_RTType type) {
     assert(type != RTT_UNKNOWN);
     const auto ptr = builder.CreateMalloc(sizeTy(), sizeTy(), size, nullptr);
     addHeap(isOwner, type, ptr);

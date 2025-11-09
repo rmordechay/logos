@@ -1,3 +1,4 @@
+#include "Lgs_Arena.h"
 #include "Lgs_DArray.h"
 #include "Lgs_Scheduler.h"
 #include "Lgs_Stack.h"
@@ -5,21 +6,19 @@
 #include <cassert>
 #include <map>
 #include "Lgs_Map.h"
-#include "Lgs_helpers.h"
-
+#include "Lgs_Helpers.h"
 #include <iostream>
 #include <string>
 #include <unistd.h>
 
-
 struct Lgs_Runtime {
     Lgs_Stack stack;
+    Lgs_Arena arena;
     Lgs_Scheduler scheduler;
     std::map<void*, std::map<std::string, void*>> vtable;
 };
 
 static inline Lgs_Runtime runtime;
-__attribute__((weak)) Lgs_Object Lgs_RTTypes[] = {};
 
 extern "C" void Lgs_Runtime_init() {
     // runtime.scheduler.start();
@@ -27,15 +26,6 @@ extern "C" void Lgs_Runtime_init() {
 
 extern "C" void Lgs_Runtime_close() {
     // runtime.scheduler.shutdown();
-}
-
-extern "C" void Lgs_rttest(const size_t index) {
-    const auto a = &Lgs_RTTypes[index];
-    for (int i = 0; i < a->fieldCount; ++i) {
-        const auto v = a->fieldTypes[i];
-        std::cout << getTypeName(v) << '\n';
-    }
-    assert(0);
 }
 
 extern "C" void Lgs_Runtime_addOwner(void* ptr, const Lgs_RTType type) {
@@ -106,4 +96,17 @@ extern "C" void* Lgs_Runtime_getFromVTable(void* instancePtr, const char* name) 
     const auto method = instance->second.find(name);
     if (method == instance->second.end()) assert(0);
     return method->second;
+}
+
+extern "C" void* Lgs_Runtime_allocate(const size_t size) {
+    return runtime.arena.allocate(size);
+}
+
+extern "C" void Lgs_rttest(const size_t index) {
+    // const auto a = &Lgs_RTTypes[index];
+    // for (int i = 0; i < a->fieldCount; ++i) {
+    //     const auto v = a->fieldTypes[i];
+    //     std::cout << getTypeName(v) << '\n';
+    // }
+    // assert(0);
 }

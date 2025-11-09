@@ -4,6 +4,8 @@
 #include <sstream>
 #include "external/doctest.h"
 
+#include <unistd.h>
+
 TEST_CASE("TestCodeGen1") {
     const auto code = R"(
     main() {
@@ -11,10 +13,11 @@ TEST_CASE("TestCodeGen1") {
     }
     )";
     fs::path execPath = "";
+    auto valid = false;
     {
         LgsApp app;
         app.lgsCode[LGS_MAIN_FILE] = code;
-        app.compile();
+        valid = app.compile();
         execPath = app.appPaths.execFile;
     }
     const auto pipe = popen(execPath.c_str(), "r");

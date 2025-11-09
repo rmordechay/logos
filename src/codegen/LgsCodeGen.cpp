@@ -733,7 +733,7 @@ void LgsCodeGen::visitHashMap(LgsHashMap* hashMap) {
     const auto map = hashMap->type->asMap();
     const auto valueType = map->typePair->value;
     const auto elementSize = cg.usize(valueType->getSizeBytes());
-    hashMap->IRValue = cg.callMalloc(map->getSizeBytes(), hashMap->owner, hashMap->type->getRTType());
+    hashMap->IRValue = cg.callAllocate(map->getSizeBytes(), hashMap->owner, hashMap->type->getRTType());
     LgsFunc initFunc("init", &LGS_VOID, {map, &LGS_LONG}, BUILTIN | METHOD);
     initFunc.callIR(cg, {getIRValue(hashMap), elementSize});
     for (const auto [key, value] : hashMap->pairs) {
@@ -999,7 +999,7 @@ void LgsCodeGen::visitStrConst(LgsStrConst* strConst) {
 void LgsCodeGen::visitInstance(LgsInstance* instance) {
     if (instance->IRValue) return;
     const auto obj = instance->obj;
-    instance->IRValue = cg.callMalloc(obj->getSizeBytes(), instance->owner, obj->getRTType());
+    instance->IRValue = cg.callAllocate(obj->getSizeBytes(), instance->owner, obj->getRTType());
 
     std::unordered_set<std::string> visited;
     for (const auto& [argName, arg] : instance->args) {
@@ -1318,7 +1318,7 @@ void LgsCodeGen::setNestedSArr(const LgsArrayExpr* arrayExpr, Type* parentType, 
 void LgsCodeGen::setDynamicArray(LgsArrayExpr* arrayExpr) {
     const auto arr = arrayExpr->type->asDArray();
     if (!arrayExpr->IRValue) {
-        arrayExpr->IRValue = cg.callMalloc(arr->getSizeBytes(), arrayExpr->owner, arr->getRTType());
+        arrayExpr->IRValue = cg.callAllocate(arr->getSizeBytes(), arrayExpr->owner, arr->getRTType());
     }
     arr->initArr(cg, arrayExpr->IRValue);
     const auto rtt = arr->baseType->getRTType();
@@ -1334,7 +1334,7 @@ void LgsCodeGen::setDynamicArray(LgsArrayExpr* arrayExpr) {
 void LgsCodeGen::setSetExpr(LgsArrayExpr* arrayExpr) {
     const auto arr = arrayExpr->type->asSet();
     const auto size = arr->baseType->getSizeBytes();
-    arrayExpr->IRValue = cg.callMalloc(arr->getSizeBytes(), arrayExpr->owner, arr->getRTType());
+    arrayExpr->IRValue = cg.callAllocate(arr->getSizeBytes(), arrayExpr->owner, arr->getRTType());
     LgsFunc initFunc("init", &LGS_VOID, {arr, &LGS_SIZE, &LGS_SIZE}, BUILTIN | METHOD);
     initFunc.callIR(cg, {arrayExpr->IRValue, cg.i64(size), cg.usize(arr->baseType->getRTType())});
 

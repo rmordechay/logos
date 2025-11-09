@@ -7,7 +7,7 @@
 #define LINK_CMD_STRING "clang %s -L%s -llgs_runtime %s -Wl,-rpath,%s %s -o %s"
 
 bool LgsLinker::link() const {
-    assert(paths.lgsRuntimeLib != "" && paths.execFile != "");
+    assert(paths.lgsRootDir != "" && paths.execFile != "");
     std::string objFileList;
     for (const auto& objPath : fs::directory_iterator(paths.buildDirObjs)) {
         if (objPath.path().extension() == ".o") {
@@ -26,9 +26,9 @@ bool LgsLinker::link() const {
         sizeof(cmd),
         LINK_CMD_STRING,
         objFileList.c_str(),
-        paths.lgsRuntimeLib.c_str(),
+        paths.lgsRootDir.c_str(),
         additionalLibs.c_str(),
-        paths.lgsRuntimeLib.c_str(),
+        paths.lgsRootDir.c_str(),
         flags,
         paths.execFile.c_str()
     );

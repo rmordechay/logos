@@ -121,3 +121,4 @@ inline LgsBaseError E10090{"%s can only prefix numbers. Given: %s.", errCodeStar
 inline LgsBaseError E10091{"not can only prefix Bool. Given: %s.", errCodeStart++};
 inline LgsBaseError E10092{"Condition %s must be of type Bool. Given: %s.", errCodeStart++};
 inline LgsBaseError E10093{"Cannot assign variable to Void type.", errCodeStart++};
+inline LgsBaseError E10094{"Could not find %s.", errCodeStart++};

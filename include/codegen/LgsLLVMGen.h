@@ -64,8 +64,8 @@ public:
     Value* callStrLen(Value* str);
     void callMemSet(Value* dest, Value* src, Value* size);
     void callMemCpy(Value* dest, Value* src, Value* size);
-    Value* callMalloc(size_t size, bool isOwner, Lgs_RTType type);
-    Value* callMalloc(Value* size, bool isOwner, Lgs_RTType type);
+    Value* callAllocate(size_t size, bool isOwner, Lgs_RTType type);
+    Value* callAllocate(Value* size, bool isOwner, Lgs_RTType type);
 
     // Stack
     void callStackPush(bool hasDefers, bool needsCleanup);

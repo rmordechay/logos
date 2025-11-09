@@ -17,6 +17,7 @@ public:
     void addWarning(const LgsBaseError& lgsErr, const LgsLocation* location, const std::vector<std::string>& args = {});
     void mergeErrors(LgsErrHandler& other);
     void mergeErrorsWithLock(LgsErrHandler& other);
-    void exitWithErrors() const;
-    static void exitWithError(const LgsBaseError& err, const std::vector<std::string>& args = {});
 };
+
+void exitWithError(const LgsBaseError& err, const std::vector<std::string>& args = {});
+void exitWithErrors(LgsErrHandler& errHandler);

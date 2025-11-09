@@ -55,9 +55,9 @@ void LgsErrHandler::mergeErrorsWithLock(LgsErrHandler& other) {
     mergeErrors(other);
 }
 
-void LgsErrHandler::exitWithErrors() const {
-    for (size_t i = 0; i < errors.size(); ++i) {
-        const auto err = errors[i];
+void exitWithErrors(LgsErrHandler& errHandler) {
+    for (size_t i = 0; i < errHandler.errors.size(); ++i) {
+        const auto err = errHandler.errors[i];
         const auto column = err.location.columnStart;
         const auto line = err.location.lineStart;
         auto lineStr = getLine(err.filePath, line);
@@ -81,13 +81,13 @@ void LgsErrHandler::exitWithErrors() const {
         } else {
             logError(err.msg);
         }
-        if (i != errors.size() - 1) logInfo(LGS_MSG_LINE_SEPERATOR);
+        if (i != errHandler.errors.size() - 1) logInfo(LGS_MSG_LINE_SEPERATOR);
     }
-    if (!errors.empty()) logInfo("\n");
+    if (!errHandler.errors.empty()) logInfo("\n");
     exit(EXIT_FAILURE);
 }
 
-void LgsErrHandler::exitWithError(const LgsBaseError& err, const std::vector<std::string>& args) {
+void exitWithError(const LgsBaseError& err, const std::vector<std::string>& args) {
     const auto errMsg = formatErrorMsg(err.msg, args) + '\n';
     logError(errMsg);
     exit(EXIT_FAILURE);

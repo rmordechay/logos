@@ -1,14 +1,14 @@
-#pragma once
+#include "Lgs_Helpers.h"
 #include "Lgs_DArray.h"
 #include "Lgs_Map.h"
 #include "Lgs_Set.h"
-#include "Lgs_Types.h"
+#include "Lgs_Stack.h"
 #include <cassert>
 
-inline void freeRTType(void* ptr, const Lgs_RTType type) {
+void freeRTType(void* ptr, const Lgs_RTType type) {
     switch (type) {
     case RTT_OBJECT: {
-        std::free(ptr);
+        // std::free(ptr);
         break;
     }
     case RTT_DARRAY: {
@@ -33,7 +33,7 @@ inline void freeRTType(void* ptr, const Lgs_RTType type) {
     }
 }
 
-inline void funcCleanup(Lgs_Stack& stack) {
+void funcCleanup(Lgs_Stack& stack) {
     auto& stackFrame = stack.frames[stack.stackIndex];
     if (stackFrame.ownersCount > 0) {
         for (size_t i = 0; i < stackFrame.ownersCount; i++) {
@@ -49,7 +49,7 @@ inline void funcCleanup(Lgs_Stack& stack) {
     }
 }
 
-inline std::string getTypeName(const Lgs_RTType type) {
+std::string getTypeName(const Lgs_RTType type) {
     switch (type) {
     case RTT_UNKNOWN: return "<Unknown>";
     case RTT_VOID: return "Void";

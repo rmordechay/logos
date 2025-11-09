@@ -1,6 +1,7 @@
 #pragma once
 #include "LgsCliHelp.h"
 #include "logos/LgsApp.h"
+#include "utils/LgsErrHandler.h"
 
 #include <iostream>
 struct LgsCliCmdHelp;

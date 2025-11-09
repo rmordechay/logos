@@ -71,7 +71,7 @@ void LgsDiagnosticConsumer::HandleDiagnostic(const DiagnosticsEngine::Level leve
         break;
     }
     case DiagnosticsEngine::Warning:
-        if (lgsConfigs.devMode) logWarning(message.str().str() + "\n");
+        if (lgsConfigs.isDevMode) logWarning(message.str().str() + "\n");
         break;
     default:
         break;

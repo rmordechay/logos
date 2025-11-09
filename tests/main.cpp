@@ -5,7 +5,7 @@
 
 int main(const int argc, char** argv) {
     LgsLLVMGen::initLLVM();
-    lgsConfigs.devMode = true;
+    lgsConfigs.isDevMode = true;
     lgsConfigs.printIR = false;
     lgsConfigs.writeIRFiles = false;
     return doctest::Context(argc, argv).run();
