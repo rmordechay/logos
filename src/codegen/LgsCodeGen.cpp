@@ -137,6 +137,7 @@ void LgsCodeGen::visitFunc(LgsFunc* func) {
     if (func->funcType->isGeneric) return;
     stack.enterScope(func);
     createPrologue(func);
+    if (func->funcType->isVariadic)
     visitStmtsBlock(func->stmtsBlock);
     createEpilogue(func);
     if (func->funcType->rt->isVoid() && !cg.lastInstTerminator()) {

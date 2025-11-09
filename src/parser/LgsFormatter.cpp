@@ -2,6 +2,7 @@
 #include "exprs/LgsArrayExpr.h"
 #include "exprs/LgsFuncCall.h"
 #include "exprs/LgsInstance.h"
+#include "exprs/LgsIterIndex.h"
 #include "exprs/LgsTernaryExpr.h"
 #include "exprs/LgsVariable.h"
 #include "exprs/constants/LgsStrConst.h"
@@ -10,6 +11,7 @@
 #include "files/LgsObjectFile.h"
 #include "files/LgsTestFile.h"
 #include "logos/LgsApp.h"
+#include "loops/LgsMetaVar.h"
 #include "stmts/LgsVarDec.h"
 #include <iostream>
 #define TAB_SIZE 4
@@ -237,9 +239,9 @@ void LgsFormatter::formatExpr(LgsExpr*& expr) {
         if (const auto prefixExpr = expr->asPrefixExpr()) return formatPrefixExpr(prefixExpr);
         if (const auto forVar = expr->asLoopMetaVar()) return formatLoopMetaVar(forVar);
         if (const auto vecExpr = expr->asVectorExpr()) return formatVectorExpr(vecExpr);
-        if (const auto null = expr->asNull()) return formatNull(null);
         if (const auto castExpr = expr->asCast()) return formatCast(castExpr);
         if (const auto jsonExpr = expr->asJson()) return formatJson(jsonExpr);
+        if (expr->asNull()) return insert(LGS_NULL_LITERAL);
         assert(0);
     }
 }
@@ -333,10 +335,6 @@ void LgsFormatter::formatInstance(LgsInstance* instance) {
     insert("}");
 }
 
-void LgsFormatter::formatNull(LgsNull* null) {
-    assert(0);
-}
-
 void LgsFormatter::formatIntConst(const LgsIntConst* intConst) {
     insert(std::to_string(intConst->value));
 }
@@ -346,19 +344,18 @@ void LgsFormatter::formatInterfaceInstance(LgsInstance* instance, LgsInterface* 
 }
 
 void LgsFormatter::formatIterIndex(LgsIterIndex* iterIndex) {
-    assert(0);
+    formatExpr(iterIndex->baseExpr);
+    insert("[");
+    formatExpr(iterIndex->index.from);
+    if (iterIndex->index.to) {
+        insert(":");
+        formatExpr(iterIndex->index.to);
+    }
+    insert("]");
 }
 
-void LgsFormatter::formatIndex(LgsIterIndex* iterIndex) {
-    assert(0);
-}
-
-void LgsFormatter::formatSlice(LgsIterIndex* iterIndex) {
-    assert(0);
-}
-
-void LgsFormatter::formatLoopMetaVar(LgsMetaVar* metaVar) {
-    assert(0);
+void LgsFormatter::formatLoopMetaVar(const LgsMetaVar* metaVar) {
+    insert(metaVar->name);
 }
 
 void LgsFormatter::insert(const std::string& text) {
@@ -371,4 +368,3 @@ void LgsFormatter::newLine(const bool withIndent, const uint8_t lines) {
         formatted << std::string(indentLevel * TAB_SIZE, ' ');
     }
 }
-

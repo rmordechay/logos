@@ -27,6 +27,7 @@ public:
     LgsType* rt = nullptr;
     std::vector<LgsParam> params;
     std::vector<LgsGeneric*> generics;
+    FunctionType* IRType = nullptr;
     bool isPublic = false;
     bool isBuiltin = false;
     bool isVirtual = false;
@@ -40,7 +41,7 @@ public:
     bool isExternal = false;
     bool isArrFunc = false;
     bool hasDefaults = false;
-    FunctionType* IRType = nullptr;
+    uint32_t variadicIndex = 0;
 
     LgsFuncType(): LgsFuncType(nullptr) {}
     explicit LgsFuncType(LgsType* rt, const std::vector<LgsParam>& params = {}) : rt(rt), params(params) {

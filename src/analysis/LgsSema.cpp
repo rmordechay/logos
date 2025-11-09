@@ -189,15 +189,16 @@ void LgsSema::visitMainFunc(const LgsMainFunc* mainFunc) {
     if (paramSize != 1) {
         return errHandler.addError(E10039, &mainFunc->location, file->path, {});
     }
-    const auto firstParam = ft->params.front();
+    auto& firstParam = ft->params.front();
     const auto iterable = firstParam.type->asIterable();
     if (!iterable || !iterable->baseType->asStr()) {
         return errHandler.addError(E10039, &mainFunc->location, file->path, {});
     }
-    freeType(ft->params.front().type);
+    // Replaces dyn array to static array
+    freeType(firstParam.type);
     const auto sArray = new LgsSArray(new LgsStr(), LGS_INT.getZeroValue());
-    ft->params.front().setType(sArray);
-    ft->params.front().expr = new LgsArrayExpr(sArray);
+    firstParam.setType(sArray);
+    firstParam.expr = new LgsArrayExpr(sArray);
 }
 
 void LgsSema::visitLambda(LgsFunc* lambda) {
@@ -448,7 +449,7 @@ void LgsSema::visitForeachLoop(LgsForeachLoop* foreachLoop) {
     const auto iterable = iterExpr->type->asIterable();
     if (!iterable) {
         const auto typeName = iterExpr->type ? iterExpr->type->pname() : LGS_UNKNOWN_TYPE;
-        errHandler.addError(E10002, &iterExpr->location, file->path, {iterExpr->asText(), iterExpr->type->pname()});
+        errHandler.addError(E10002, &iterExpr->location, file->path, {iterExpr->asText()});
         return;
     }
 
@@ -1119,8 +1120,7 @@ void LgsSema::visitIterIndex(LgsIterIndex* iterIndex) {
     if (!baseExpr->type) return;
     const auto iterable = baseExpr->type->asIterable();
     if (!iterable) {
-        const auto typeName = baseExpr->type ? baseExpr->type->pname() : LGS_UNKNOWN_TYPE;
-        return errHandler.addError(E10002, &iterIndex->location, file->path, {baseExpr->asText(), typeName});
+        return errHandler.addError(E10002, &iterIndex->location, file->path, {baseExpr->asText()});
     }
     visitIndex(iterIndex);
 }

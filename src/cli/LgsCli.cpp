@@ -18,31 +18,35 @@ static std::vector COMMANDS = {
     &astCmdHelp,
     &formatCmdHelp,
     &linterCmdHelp,
-    &versionCmdHelp,
-    &helpCmdHelp,
+    &lgsVersionCmdHelp,
+    &lgsHelpCmdHelp,
 };
 
-void LgsCli::execute() const {
-    if (argc < 2) return printCliError(E40001);
-    const std::string cmdStr = argv[1];
-    if (cmdStr == helpCmdHelp.name) {
-        printParentCmdHelp(COMMANDS);
-        return;
+bool LgsCli::execute() const {
+    if (argc < 2) {
+        printCliError(E40001);
+        return false;
     }
-    if (cmdStr == versionCmdHelp.name) {
+    const std::string cmdStr = argv[1];
+    if (cmdStr == lgsHelpCmdHelp.name) {
+        printParentCmdHelp(COMMANDS);
+        return false;
+    }
+    if (cmdStr == lgsVersionCmdHelp.name) {
         logInfo(std::string(LOGOS_VERSION) + '\n');
-        return;
+        return false;
     }
     const auto cmd = getCmd();
     if (!cmd) {
         logError(E40000.msg);
         printParentCmdHelp(COMMANDS);
-        return;
+        return false;
     }
-    const auto isHelp = argc == 3 && std::string(argv[2]) == helpCmdHelp.name;
+    const auto isHelp = argc == 3 && std::string(argv[2]) == lgsHelpCmdHelp.name;
     if (isHelp) cmd->printHelp();
     else cmd->run();
     delete cmd;
+    return true;
 }
 
 LgsCliCmd* LgsCli::getCmd() const {

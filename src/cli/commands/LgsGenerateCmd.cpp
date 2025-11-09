@@ -2,15 +2,28 @@
 #include "data/LgsCliErrors.h"
 #include "data/LgsFileTemplates.h"
 
-void LgsGenerateCmd::run() {
-    if (argc != 3) return printCliError(E40001);
+bool LgsGenerateCmd::run() {
+    if (argc != 3) {
+        printCliError(E40001);
+        return false;
+    }
     const auto name = std::string(argv[2]);
-    if (std::isdigit(name[0])) return printCliError(E40005, {name});
+    if (std::isdigit(name[0])) {
+        printCliError(E40005, {name});
+        return false;
+    }
     for (const char c : name) {
-        if (std::isupper(c)) return printCliError(E40005, {name});
-        if (!std::isalpha(c) && c != '-') return printCliError(E40005, {name});
+        if (std::isupper(c)) {
+            printCliError(E40005, {name});
+            return false;
+        }
+        if (!std::isalpha(c) && c != '-') {
+            printCliError(E40005, {name});
+            return false;
+        }
     }
     createProjectStructure(name);
+    return true;
 }
 
 LgsCliCmdHelp& LgsGenerateCmd::getHelp() {

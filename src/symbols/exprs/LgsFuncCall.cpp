@@ -5,26 +5,48 @@
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
 #include "utils/LgsUtils.h"
+
+#include <iostream>
 #include <sstream>
 
 Value* LgsFuncCall::loadIR(LgsLLVMGen& cg) {
     return IRValue;
 }
 
-bool LgsFuncCall::equals(const LgsFuncType* other) const {
-    if (other->isVariadic) return equalsVariadic(other);
-    if (args.size() - other->isMethod > other->params.size()) return false;
-    for (size_t i = other->isMethod; i < other->params.size(); ++i) {
+bool LgsFuncCall::equals(const LgsFuncType* funcType) const {
+    if (funcType->isVariadic) return equalsVariadic(funcType);
+    if (args.size() - funcType->isMethod > funcType->params.size()) return false;
+    for (size_t i = funcType->isMethod; i < funcType->params.size(); ++i) {
         if (i >= args.size()) continue;
         const auto arg = args[i];
-        const auto param = other->params[i];
-        if (!arg->type || !arg->type->canCastTo(param.type)) return false;
+        const auto param = funcType->params[i];
+        if (!arg->type || !arg->type->canCastTo(param.type)) {
+            return false;
+        }
     }
     return true;
 }
 
 bool LgsFuncCall::equalsVariadic(const LgsFuncType* funcType) const {
-    assert(0);
+    if (args.size() - funcType->isMethod <= funcType->params.size()) return false;
+    // Check all args until the variadic param
+    for (size_t i = funcType->isMethod; i < funcType->params.size() - 1; ++i) {
+        if (i >= args.size()) continue;
+        const auto arg = args[i];
+        const auto param = funcType->params[i];
+        if (!arg->type || !arg->type->canCastTo(param.type)) {
+            return false;
+        }
+    }
+    // Check the variadic arguments
+    const auto& variadicParam = funcType->params.back();
+    for (uint32_t i = variadicParam.index; i < args.size(); ++i) {
+        const auto arg = args[i];
+        if (!arg->type || !arg->type->canCastTo(variadicParam.type)) {
+            return false;
+        }
+    }
+    return true;
 }
 
 bool LgsFuncCall::equals(LgsExpr* other) {

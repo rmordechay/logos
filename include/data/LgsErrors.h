@@ -29,7 +29,7 @@ struct LgsError {
 inline size_t errCodeStart = 10000;
 inline LgsBaseError E10000{"main() function is not defined in main.lgs file.", errCodeStart++};
 inline LgsBaseError E10001{"Expected type %s does not match the given type %s.", errCodeStart++};
-inline LgsBaseError E10002{"Expression %s of type %s must be an iterable.", errCodeStart++};
+inline LgsBaseError E10002{"%s must be an iterable.", errCodeStart++};
 inline LgsBaseError E10003{"Index is out of bounds.", errCodeStart++};
 inline LgsBaseError E10004{"Function %s must return an expression of type %s. Given: %s.", errCodeStart++};
 inline LgsBaseError E10005{"%s is not a member of %s.", errCodeStart++};

@@ -118,13 +118,10 @@ public:
     void formatTypeExpr(LgsTypeExpr* typeExpr);
     void formatJson(const LgsJson* jsonStmt);
     void formatInstance(LgsInstance* instance);
-    void formatNull(LgsNull* null);
     void formatIntConst(const LgsIntConst* intConst);
     void formatInterfaceInstance(LgsInstance* instance, LgsInterface* interface);
     void formatIterIndex(LgsIterIndex* iterIndex);
-    void formatIndex(LgsIterIndex* iterIndex);
-    void formatSlice(LgsIterIndex* iterIndex);
-    void formatLoopMetaVar(LgsMetaVar* metaVar);
+    void formatLoopMetaVar(const LgsMetaVar* metaVar);
     void insert(const std::string& text);
     void newLine(bool withIndent = false, uint8_t lines = 1);
 };

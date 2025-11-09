@@ -22,7 +22,7 @@ public:
     Value* castToIR(LgsLLVMGen& cg, LgsType* toType) override;
     Value* loadIR(LgsLLVMGen& cg) override;
     bool equals(LgsExpr* other) override;
-    bool equals(const LgsFuncType* other) const;
+    bool equals(const LgsFuncType* funcType) const;
     bool equalsVariadic(const LgsFuncType* funcType) const;
     std::string asText() override;
     void setDebugValue(LgsLLVMGen& cg) override;

@@ -2,6 +2,6 @@
 
 int main(const int argc, char** argv) {
     const LgsCli cli(argc, argv);
-    cli.execute();
+    if (!cli.execute()) return 1;
     return 0;
 }

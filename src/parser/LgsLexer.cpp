@@ -198,27 +198,24 @@ LgsToken LgsLexer::scanVarOrKeyword(LgsLocation& location) {
         lexeme += currentChar;
         advance();
         location.columnStart++;
-        if (currentChar == '{') return {T_INSTANCE, lexeme, location};
         if (std::isspace(currentChar)) break;
     }
     if (lexeme == "for") {
-        if (match('.')) {
-            std::string metaVar;
-            while (std::isalnum(currentChar)) {
-                metaVar += currentChar;
-                advance();
-                location.columnStart++;
-                if (std::isspace(currentChar)) break;
-            }
-            const auto combined = lexeme + '.' + metaVar;
-            if (metaVar == "i") return {T_FOR_I, combined, location};
-            if (metaVar == "isFirst") return {T_FOR_IS_FIRST, combined, location};
-            if (metaVar == "isLast") return {T_FOR_IS_LAST, combined, location};
-            if (metaVar == "ever") return {T_FOR_EVER, combined, location};
-            errHandler.addError(E10088, &location, filePath, {});
-            return {T_EOF, "", location};
+        if (!match('.')) return {T_FOR, lexeme, location};
+        std::string metaVar;
+        while (std::isalnum(currentChar)) {
+            metaVar += currentChar;
+            advance();
+            location.columnStart++;
+            if (std::isspace(currentChar)) break;
         }
-        return {T_FOR, lexeme, location};
+        const auto combined = lexeme + '.' + metaVar;
+        if (metaVar == "i") return {T_FOR_I, combined, location};
+        if (metaVar == "isFirst") return {T_FOR_IS_FIRST, combined, location};
+        if (metaVar == "isLast") return {T_FOR_IS_LAST, combined, location};
+        if (metaVar == "ever") return {T_FOR_EVER, combined, location};
+        errHandler.addError(E10088, &location, filePath, {});
+        return {T_EOF, "", location};
     }
 
     auto const it = LGS_KEYWORDS.find(lexeme);

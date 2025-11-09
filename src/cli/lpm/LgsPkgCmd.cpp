@@ -3,11 +3,11 @@
 #include "cli/LgsCli.h"
 #include "cli/lpm/LgsInstallCmd.h"
 
-void LgsPkgCmd::run() {
+bool LgsPkgCmd::run() {
     const std::string subcmd = argv[2];
-    if (subcmd == helpCmdHelp.name) {
+    if (subcmd == lgsHelpCmdHelp.name) {
         printHelp();
-        return;
+        return false;
     }
     LgsCliCmd* cmd = nullptr;
     if (subcmd == pkgInstallCmdHelp.name) {
@@ -15,12 +15,13 @@ void LgsPkgCmd::run() {
     } else {
         logError(E40000.msg);
         printParentCmdHelp(LPM_COMMANDS);
-        return;
+        return false;
     }
-    const auto isHelp = argc == 4 && std::string(argv[3]) == helpCmdHelp.name;
+    const auto isHelp = argc == 4 && std::string(argv[3]) == lgsHelpCmdHelp.name;
     if (isHelp) cmd->printHelp();
     else cmd->run();
     delete cmd;
+    return true;
 }
 
 LgsCliCmdHelp& LgsPkgCmd::getHelp() {

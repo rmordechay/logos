@@ -11,6 +11,7 @@ class LgsType;
 class LgsParam final : public LgsValue {
 public:
     std::string name;
+    uint32_t index = 0;
     LgsType* type = nullptr;
     LgsExpr* expr = nullptr;
     Value* vaList = nullptr;

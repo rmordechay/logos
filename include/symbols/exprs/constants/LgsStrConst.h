@@ -25,6 +25,7 @@ public:
     Value* loadIR(LgsLLVMGen& cg) override;
     std::string asText() override;
     Value* hash(LgsLLVMGen& cg) override;
+    void hashNode(size_t& oldHash) override;
     LgsExpr* cloneExpr() override;
     ~LgsStrConst() override;
 };

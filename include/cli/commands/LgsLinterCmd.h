@@ -5,7 +5,7 @@
 class LgsLinterCmd final : public LgsCliCmd {
 public:
     LgsLinterCmd(const int argc, char** argv) : LgsCliCmd(argc, argv) {}
-    void run() override;
+    bool run() override;
     LgsCliCmdHelp& getHelp() override;
 };
 

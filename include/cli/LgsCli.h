@@ -7,11 +7,11 @@ public:
     char** argv;
 
     LgsCli(const int argc, char** argv) : argc(argc), argv(argv) {}
-    void execute() const;
+    bool execute() const;
     LgsCliCmd* getCmd() const;
 };
 
-inline LgsCliCmdHelp versionCmdHelp{
+inline LgsCliCmdHelp lgsVersionCmdHelp{
     .name = "version",
     .usage = "lgs version",
     .summary = "Prints Logos version.",
@@ -21,7 +21,7 @@ inline LgsCliCmdHelp versionCmdHelp{
     }
 };
 
-inline LgsCliCmdHelp helpCmdHelp{
+inline LgsCliCmdHelp lgsHelpCmdHelp{
     .name = "help",
     .usage = "lgs help",
     .summary = "Prints Logos help.",

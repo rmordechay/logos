@@ -77,7 +77,6 @@ enum LgsTokenType {
     T_CONTINUE,
     T_RETURN,
     T_IMPORT,
-    T_INSTANCE,
     T_VEC2,
     T_VEC3,
     T_VEC4,

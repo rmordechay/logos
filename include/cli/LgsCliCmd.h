@@ -15,7 +15,7 @@ public:
     size_t maxStr = 0;
 
     LgsCliCmd(const int argc, char** argv) : argc(argc), argv(argv) {}
-    virtual void run() = 0;
+    virtual bool run() = 0;
     virtual LgsCliCmdHelp& getHelp() = 0;
     virtual void printHelp();
     void getLongestArg(const LgsCliCmdHelp& help);

@@ -2,17 +2,30 @@
 #include "data/LgsCliErrors.h"
 #include "parser/LgsFormatter.h"
 
-void LgsFormatCmd::run() {
-    if (argc != 3) return printCliError(E40001);
+bool LgsFormatCmd::run() {
+    if (argc != 3) {
+        printCliError(E40001);
+        return false;
+    }
     const auto path = argv[2];
-    if (!fs::exists(path)) return printCliError(E40004, {path});
-    if (!isLogosFile(path)) return printCliError(E40003, {path});
+    if (!fs::exists(path)) {
+        printCliError(E40004, {path});
+        return false;
+    }
+    if (!isLogosFile(path)) {
+        printCliError(E40003, {path});
+        return false;
+    }
     LgsApp app(path);
-    if (!app.setup()) return app.printErrors();
+    if (!app.setup()) {
+        app.printErrors();
+        return false;
+    }
     LgsFileMetadata metadata(app.getNextFileID(), path);
     app.loadSrcFile(metadata);
     LgsFormatter formatter;
     formatter.formatFile(app.srcFiles.front());
+    return true;
 }
 
 LgsCliCmdHelp& LgsFormatCmd::getHelp() {

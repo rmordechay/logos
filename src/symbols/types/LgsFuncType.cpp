@@ -24,10 +24,10 @@ Type* LgsFuncType::getIRType(LgsLLVMGen& cg) {
     for (size_t i = 0; i < params.size(); ++i) {
         const auto param = params[i];
         const auto paramType = param.type;
+        if (param.isVariadic) types.emplace_back(cg.sizeTy());
         if (param.type->passByRef) {
             types.emplace_back(cg.ptrTy());
         } else {
-            if (param.isVariadic) types.emplace_back(cg.sizeTy());
             types.emplace_back(paramType->getIRType(cg));
         }
     }
@@ -67,22 +67,6 @@ std::string LgsFuncType::getName() {
     return IRName;
 }
 
-bool LgsFuncType::canCastTo(LgsType* other) {
-    const auto otherFuncType = other->asFuncType();
-    if (!otherFuncType) return false;
-    const auto otherParams = otherFuncType->params;
-    if (params.size() != otherParams.size()) return false;
-    if (params.size() == 0 && otherParams.size() == 0) return true;
-    if (otherFuncType->rt && !rt->canCastTo(otherFuncType->rt)) return false;
-    for (size_t i = isMethod; i < params.size(); ++i) {
-        const auto thisType = params[i].type;
-        const auto otherType = otherFuncType->params[i].type;
-        if (!thisType || !otherType) return false;
-        if (!thisType->canCastTo(otherType)) return false;
-    }
-    return true;
-}
-
 std::string LgsFuncType::pname() {
     std::stringstream str;
     str << name << '(';
@@ -90,6 +74,7 @@ std::string LgsFuncType::pname() {
         const auto param = params[i];
         if (param.type) {
             str << param.type->pname();
+            if (param.isVariadic) str << "...";
         } else if (param.name != ""){
             str << param.name;
         } else {
@@ -106,6 +91,22 @@ std::string LgsFuncType::pname() {
         str << ')';
     }
     return str.str();
+}
+
+bool LgsFuncType::canCastTo(LgsType* other) {
+    const auto otherFuncType = other->asFuncType();
+    if (!otherFuncType) return false;
+    const auto otherParams = otherFuncType->params;
+    if (params.size() != otherParams.size()) return false;
+    if (params.size() == 0 && otherParams.size() == 0) return true;
+    if (otherFuncType->rt && !rt->canCastTo(otherFuncType->rt)) return false;
+    for (size_t i = isMethod; i < params.size(); ++i) {
+        const auto thisType = params[i].type;
+        const auto otherType = otherFuncType->params[i].type;
+        if (!thisType || !otherType) return false;
+        if (!thisType->canCastTo(otherType)) return false;
+    }
+    return true;
 }
 
 std::string LgsFuncType::strFormatPart() const {

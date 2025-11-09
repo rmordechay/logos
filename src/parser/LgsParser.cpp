@@ -584,7 +584,7 @@ LgsType* LgsParser::parseType() {
     if (type && currentToken.type == T_LBRACK) {
         while (true) {
             if (!matchAndConsume(T_LBRACK)) break;
-            if (const auto size = parseUnary()) {
+            if (const auto size = parseUnary(false)) {
                 type = new LgsSArray(type, size);
             } else {
                 type = new LgsDArray(type);
@@ -683,6 +683,7 @@ LgsFuncType* LgsParser::parseFuncHeader() {
 
 void LgsParser::parseParams(LgsFuncType* funcType) {
     if (currentToken.type == T_RPAREN) return;
+    auto paramIndex = 0;
     while (true) {
         const auto paramName = currentToken;
         if (!mustMatch(T_IDENTIFIER)) break;
@@ -695,6 +696,7 @@ void LgsParser::parseParams(LgsFuncType* funcType) {
         const auto type = parseType();
         mustParse(type);
         LgsParam param(type, paramName.lexeme);
+        param.index = paramIndex;
         setLocation(param.location, &paramName);
         if (matchAndConsume(T_TRIPLE_DOT)) {
             if (funcType->isVariadic) addParsingError();
@@ -708,6 +710,7 @@ void LgsParser::parseParams(LgsFuncType* funcType) {
             mustParse(param.expr);
             funcType->hasDefaults = true;
         }
+        paramIndex++;
         funcType->params.push_back(param);
         if (currentToken.type == T_RPAREN) break;
         mustMatch(T_COMMA);
@@ -954,7 +957,7 @@ LgsForLoop* LgsParser::parseForLoop() {
     // 1. Next token is T_LBRACE -> for expr {...} (expr can be anything)
     // 2. Next token is T_IN -> for var in iter {...} (var must be a variable)
     // 3. Next token is T_COMMA -> for expr1, expr2, ... in iter {...} (expr1, expr2... must be variables)
-    const auto firstExpr = parseUnary();
+    const auto firstExpr = parseUnary(false);
     mustParse(firstExpr);
     if (currentToken.type == T_LBRACE) {
         // This may turn to ForEachLoop in the sema stage depending on the type of firstExpr.
@@ -988,12 +991,14 @@ LgsForLoop* LgsParser::parseForLoop() {
     LgsForLoop* forLoop = nullptr;
     // Determines if it's a range loop or foreach loop
     if (matchAndConsume(T_DOUBLE_DOT)) {
-        const auto toExpr = parseUnary();
+        const auto toExpr = parseUnary(false);
+        assert(!toExpr->asInstance());
         forLoop = new LgsRangeLoop(nullptr, toExpr);
     } else {
-        const auto fromExpr = parseUnary();
+        const auto fromExpr = parseUnary(false);
+        assert(!fromExpr->asInstance());
         if (matchAndConsume(T_DOUBLE_DOT)) {
-            const auto toExpr = parseUnary();
+            const auto toExpr = parseUnary(false);
             forLoop = new LgsRangeLoop(fromExpr, toExpr);
         } else {
             forLoop = new LgsForeachLoop(fromExpr);
@@ -1059,7 +1064,7 @@ LgsBreak* LgsParser::parseBreakStmt() {
 
 LgsCoroutine* LgsParser::parseCoroutine() {
     if (!matchAndConsume(T_GO)) return nullptr;
-    const auto expr = parseUnary();
+    const auto expr = parseUnary(false);
     mustParse(expr);
     const auto coroutine = new LgsCoroutine();
     coroutine->location = expr->location;
@@ -1079,7 +1084,7 @@ LgsCoroutine* LgsParser::parseCoroutine() {
 
 LgsDeferStmt* LgsParser::parseDeferStmt() {
     if (!matchAndConsume(T_DEFER)) return nullptr;
-    const auto expr = parseUnary();
+    const auto expr = parseUnary(false);
     mustParse(expr);
     const auto deferStmt = new LgsDeferStmt();
     deferStmt->location = expr->location;
@@ -1172,7 +1177,7 @@ LgsExpr* LgsParser::parseExprWithPrecedence(const int minPrecedence) {
     return left;
 }
 
-LgsExpr* LgsParser::parseUnary() {
+LgsExpr* LgsParser::parseUnary(const bool withInstance) {
     LgsExpr* expr = nullptr;
     if (matchAndConsume(T_LPAREN)) {
         expr = parseExprWithPrecedence(0);
@@ -1188,7 +1193,7 @@ LgsExpr* LgsParser::parseUnary() {
     else if (const auto json = parseJson()) expr = json;
     else if (const auto prefixExpr = parsePrefixExpr()) expr = prefixExpr;
     else if (const auto funcCall = parseFuncCall()) expr = funcCall;
-    else if (const auto instance = parseInstance()) expr = instance;
+    else if (withInstance && ((expr = parseInstance()))) {}
     else if (const auto variable = parseVariable()) expr = variable;
     else return nullptr;
 
@@ -1220,17 +1225,16 @@ LgsVariable* LgsParser::parseVariable() {
 LgsInstance* LgsParser::parseInstance() {
     const auto tokenName = currentToken;
     const auto oldIndex = currentIndex;
+    if (!matchAndConsume(T_IDENTIFIER)) return nullptr;
     std::vector<LgsType*> generics;
-    if (currentToken.type == T_IDENTIFIER && peek().type == T_LANGLE) {
-        consume();
+    if (matchAndConsume(T_LANGLE)) {
         if (!parseGenericArgs(generics)) {
             reset(oldIndex);
             return nullptr;
         }
-    } else if (!matchAndConsume(T_INSTANCE)) {
-        return nullptr;
     }
-    mustMatch(T_LBRACE);
+
+    if (!matchOrReset(T_LBRACE, oldIndex)) return nullptr;
     const auto instance = new LgsInstance(tokenName.lexeme);
     setLocation(instance->location, &tokenName);
     instance->setType(new LgsUnknown(instance->name));

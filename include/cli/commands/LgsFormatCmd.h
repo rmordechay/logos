@@ -4,7 +4,7 @@
 class LgsFormatCmd final : public LgsCliCmd {
 public:
     LgsFormatCmd(const int argc, char** argv): LgsCliCmd(argc, argv) {}
-    void run() override;
+    bool run() override;
     LgsCliCmdHelp& getHelp() override;
 };
 

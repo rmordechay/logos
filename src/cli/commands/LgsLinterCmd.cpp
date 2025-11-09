@@ -1,6 +1,6 @@
 #include "cli/commands/LgsLinterCmd.h"
 
-void LgsLinterCmd::run() {
+bool LgsLinterCmd::run() {
     assert(0);
 }
 

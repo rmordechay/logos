@@ -52,6 +52,10 @@ Value* LgsStrConst::hash(LgsLLVMGen& cg) {
     return cg.usize(hashed);
 }
 
+void LgsStrConst::hashNode(size_t& oldHash) {
+    hashNodeString(oldHash, value);
+}
+
 LgsExpr* LgsStrConst::cloneExpr() {
     return new LgsStrConst(*this);
 }
