@@ -122,7 +122,7 @@ LgsEnvFile* LgsParser::parseEnvFile() {
     const auto nameToken = consume();
     const auto file = new LgsEnvFile(metadata.id, metadata.path);
     setLocation(file->location, &nameToken);
-    file->envName = nameToken.lexeme;
+    file->name = nameToken.lexeme;
     mustMatch(T_IDENTIFIER);
     while (true) {
         const auto varDec = parseVarDec();

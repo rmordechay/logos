@@ -130,35 +130,9 @@ bool LgsApp::parseHeaders() {
     return errHandler.successful;
 }
 
-void LgsApp::analyseEnvs() {
-    if (!appConfigFile) return;
-    for (const auto file : envFiles) {
-        LgsSema semaAnalyser(configs, file, globals);
-        for (const auto varDec : file->varDecs) {
-            varDec->setType(varDec->expr->type);
-        }
-    }
-    for (const auto requiredEnv : appConfigFile->requiredEnvs) {
-        for (const auto envFile : envFiles) {
-            auto found = false;
-            for (const auto varDec : envFile->varDecs) {
-                if (varDec->name != requiredEnv->name) continue;
-                if (!varDec->type || !requiredEnv->type) continue;
-                if (!varDec->type->canCastTo(requiredEnv->type)) {
-                    errHandler.addError(E10001, &varDec->location, envFile->path, {varDec->type->pname(), requiredEnv->type->pname()});
-                }
-                found = true;
-                break;
-            }
-            if (found) continue;
-            errHandler.addError(E10020, &requiredEnv->location, appConfigFile->path, {envFile->envName, requiredEnv->name, requiredEnv->type->pname()});
-        }
-    }
-}
-
 bool LgsApp::analyse() {
     loadBuiltins();
-    analyseEnvs();
+    if (!validateEnvs()) return false;
     if (!typeResolver.resolveGlobals(srcFiles, threadPool)) return false;
     for (const auto file : srcFiles) {
         threadPool.runTask([this, file] {
@@ -213,6 +187,10 @@ bool LgsApp::link() {
     return linker.link();
 }
 
+size_t LgsApp::getNextFileID() {
+    return nextFileID.fetch_add(1, std::memory_order_relaxed);
+}
+
 void LgsApp::loadSrcFile(const std::string& fileCode, const fs::path& filePath) {
     LgsFileMetadata metadata(getNextFileID(), filePath);
     LgsParser parser(metadata, appPaths, globals);
@@ -256,6 +234,9 @@ bool LgsApp::loadConfigFile() {
     LgsFileMetadata metadata(getNextFileID(), appPaths.appConfigFile, LGS_APP_CONFIG_FILE);
     LgsParser parser(metadata, appPaths, globals);
     appConfigFile = parser.parseAppConfigFile();
+    if (!parser.errHandler.successful) {
+        errHandler.mergeErrors(parser.errHandler);
+    }
     return errHandler.successful;
 }
 
@@ -273,6 +254,9 @@ bool LgsApp::loadEnvFiles() {
             {
                 std::lock_guard lock(mtx);
                 envFiles.push_back(envFile);
+                if (!parser.errHandler.successful) {
+                    errHandler.mergeErrors(parser.errHandler);
+                }
             }
         });
     }
@@ -281,7 +265,7 @@ bool LgsApp::loadEnvFiles() {
 }
 
 bool LgsApp::loadConfigs() {
-    if (!errHandler.successful) return false;
+    assert(errHandler.successful);
     if (configs.appMode != PROJECT_MODE) return true;
     if (!loadConfigFile()) return false;
     for (const auto config : appConfigFile->configs) {
@@ -304,15 +288,6 @@ bool LgsApp::loadConfigs() {
         }
     }
     return true;
-}
-
-void LgsApp::compareHash() const {
-    for (const auto& file : srcFiles) {
-        const auto oldHash = appCache.getHashByPath(file->path);
-        const auto newHash = file->hashFile();
-        if (newHash == oldHash) continue;
-        assert(0);
-    }
 }
 
 bool LgsApp::loadDeps() {
@@ -347,10 +322,6 @@ void LgsApp::loadBuiltins() {
     globals.addSymbol(LgsSymbol(new LgsReflect(), true, false), &errHandler);
 }
 
-size_t LgsApp::getNextFileID() {
-    return nextFileID.fetch_add(1, std::memory_order_relaxed);
-}
-
 void LgsApp::createBuildDirs() {
     if (!fs::exists(appPaths.buildDir)) {
         createDir(appPaths.buildDir);
@@ -363,29 +334,35 @@ void LgsApp::createBuildDirs() {
     }
 }
 
-bool LgsApp::initPaths(const fs::path& root) {
-    assert(root != "");
-    appPaths.rootPath = root;
-    appPaths.srcDir = appPaths.rootPath / LGS_SRC_DIR;
-    appPaths.envsDir = appPaths.rootPath / LGS_ENVS_DIR;
-    appPaths.buildDir = appPaths.rootPath / LGS_BUILD_DIR;
-    appPaths.appConfigFile = appPaths.rootPath / LGS_APP_FILE_NAME;
-    appPaths.buildDirIR = appPaths.buildDir / LGS_BUILD_IR_DIR;
-    appPaths.buildDirObjs = appPaths.buildDir / LGS_BUILD_OBJECTS_DIR;
-    appPaths.cacheFile = appPaths.buildDir / LGS_FILES_CACHE_FILE;
-    if (!appPaths.findLgsRootDir()) {
-        errHandler.addError(E10094, {"Logos root directory"});
-        return false;
+bool LgsApp::validateEnvs() {
+    if (!appConfigFile) return false;
+    for (const auto file : envFiles) {
+        LgsSema semaAnalyser(configs, file, globals);
+        for (const auto varDec : file->varDecs) {
+            varDec->setType(varDec->expr->type);
+        }
     }
-    if (!appPaths.findCLibRoot()) {
-        errHandler.addError(E10094, {"C library"});
-        return false;
+    return validateRequiredEnvs();
+}
+
+bool LgsApp::validateRequiredEnvs() {
+    for (const auto requiredEnv : appConfigFile->requiredEnvs) {
+        for (const auto envFile : envFiles) {
+            auto found = false;
+            for (const auto varDec : envFile->varDecs) {
+                if (varDec->name != requiredEnv->name) continue;
+                if (!varDec->type || !requiredEnv->type) continue;
+                if (!varDec->type->canCastTo(requiredEnv->type)) {
+                    errHandler.addError(E10001, &varDec->location, envFile->path, {varDec->type->pname(), requiredEnv->type->pname()});
+                }
+                found = true;
+                break;
+            }
+            if (found) continue;
+            errHandler.addError(E10020, &requiredEnv->location, appConfigFile->path, {envFile->name, requiredEnv->name, requiredEnv->type->pname()});
+        }
     }
-    if (!appPaths.findCLibHeaders()) {
-        errHandler.addError(E10094, {"C headers directory"});
-        return false;
-    }
-    return true;
+    return errHandler.successful;
 }
 
 void LgsApp::printErrors() const {
@@ -417,6 +394,40 @@ void LgsApp::printErrors() const {
         if (i != errHandler.errors.size() - 1) logInfo(LGS_MSG_LINE_SEPERATOR);
     }
     if (!errHandler.errors.empty()) logInfo("\n");
+}
+
+void LgsApp::compareHash() const {
+    for (const auto& file : srcFiles) {
+        const auto oldHash = appCache.getHashByPath(file->path);
+        const auto newHash = file->hashFile();
+        if (newHash == oldHash) continue;
+        assert(0);
+    }
+}
+
+bool LgsApp::initPaths(const fs::path& root) {
+    assert(root != "");
+    appPaths.rootPath = root;
+    appPaths.srcDir = appPaths.rootPath / LGS_SRC_DIR;
+    appPaths.envsDir = appPaths.rootPath / LGS_ENVS_DIR;
+    appPaths.buildDir = appPaths.rootPath / LGS_BUILD_DIR;
+    appPaths.appConfigFile = appPaths.rootPath / LGS_APP_FILE_NAME;
+    appPaths.buildDirIR = appPaths.buildDir / LGS_BUILD_IR_DIR;
+    appPaths.buildDirObjs = appPaths.buildDir / LGS_BUILD_OBJECTS_DIR;
+    appPaths.cacheFile = appPaths.buildDir / LGS_FILES_CACHE_FILE;
+    if (!appPaths.findLgsRootDir()) {
+        errHandler.addError(E10094, {"Logos root directory"});
+        return false;
+    }
+    if (!appPaths.findCLibRoot()) {
+        errHandler.addError(E10094, {"C library"});
+        return false;
+    }
+    if (!appPaths.findCLibHeaders()) {
+        errHandler.addError(E10094, {"C headers directory"});
+        return false;
+    }
+    return true;
 }
 
 LgsMainFile* LgsApp::getMainFile() const {

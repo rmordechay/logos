@@ -6,7 +6,7 @@ class LgsVarDec;
 
 class LgsEnvFile final : public LgsFile {
 public:
-    std::string envName;
+    std::string name;
     std::vector<LgsVarDec*> varDecs;
 
     LgsEnvFile(const size_t fileID, const fs::path& path) : LgsFile(fileID, path) {}
