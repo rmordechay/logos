@@ -1,7 +1,7 @@
 #include "files/LgsFile.h"
 #include "files/LgsMainFile.h"
 #include "logos/LgsApp.h"
-#include "parser/LgsJsonParser.h"
+#include "../../include/tools/LgsJsonParser.h"
 #include "utils/LgsUtils.h"
 #include <external/doctest.h>
 

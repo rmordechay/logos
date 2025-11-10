@@ -139,6 +139,7 @@ public:
     LgsHashMap* parseHashMap();
     LgsFunc* parseLambda();
     LgsExpr* parsePrefixExpr();
+    LgsExpr* parseEnvVar();
     LgsIterIndex* parseIterIndex(LgsExpr* baseExpr);
     LgsPostfixExpr* parsePostfixExpr(LgsExpr* baseExpr);
     LgsSelection* parseSelection(LgsExpr* firstExpr);

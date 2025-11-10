@@ -51,6 +51,7 @@ LgsToken LgsLexer::nextToken() {
         if (std::isdigit(currentChar)) return scanNumber(location);
         return {T_DOT, ".", location};
     }
+
     // Number
     if (std::isdigit(currentChar)) {
         return scanNumber(location);
@@ -60,7 +61,7 @@ LgsToken LgsLexer::nextToken() {
     }
 
     // Var or keyword
-    if (std::isalpha(currentChar)) {
+    if (currentChar == '$' || std::isalpha(currentChar)) {
         return scanVarOrKeyword(location);
     }
 
@@ -194,12 +195,21 @@ char LgsLexer::peek(const size_t offset) const {
 
 LgsToken LgsLexer::scanVarOrKeyword(LgsLocation& location) {
     std::string lexeme;
+    auto isDollared = false;
+    if (currentChar == '$') {
+        lexeme = "$";
+        isDollared = true;
+        advance();
+    }
+
     while (std::isalnum(currentChar) || currentChar == '_') {
         lexeme += currentChar;
         advance();
         location.columnStart++;
         if (std::isspace(currentChar)) break;
     }
+
+    if (isDollared) return {T_DOLLAR_IDENTIFIER, lexeme, location};
     if (lexeme == "for") {
         if (!match('.')) return {T_FOR, lexeme, location};
         std::string metaVar;

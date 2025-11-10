@@ -1,6 +1,7 @@
 #include "exprs/LgsExpr.h"
 #include "exprs/LgsArrayExpr.h"
 #include "exprs/LgsCast.h"
+#include "exprs/LgsEnvVar.h"
 #include "exprs/LgsIterIndex.h"
 #include "exprs/LgsHashMap.h"
 #include "exprs/LgsInstance.h"
@@ -108,21 +109,78 @@ LgsExpr* LgsExpr::cloneExpr() {
 }
 
 // Casting
-LgsNull* LgsExpr::asNull() { return dynamic_cast<LgsNull*>(this); }
-LgsFunc* LgsExpr::asFunc() { return dynamic_cast<LgsFunc*>(this); }
-LgsVariable* LgsExpr::asVariable() { return dynamic_cast<LgsVariable*>(this); }
-LgsPrefixExpr* LgsExpr::asPrefixExpr() { return dynamic_cast<LgsPrefixExpr*>(this); }
-LgsIterIndex* LgsExpr::asIterIndex() { return dynamic_cast<LgsIterIndex*>(this); }
-LgsTypeExpr* LgsExpr::asTypeExpr() { return dynamic_cast<LgsTypeExpr*>(this); }
-LgsJson* LgsExpr::asJson() { return dynamic_cast<LgsJson*>(this); }
-LgsCast* LgsExpr::asCast() { return dynamic_cast<LgsCast*>(this); }
-LgsInstance* LgsExpr::asInstance() { return dynamic_cast<LgsInstance*>(this); }
-LgsArrayExpr* LgsExpr::asArrayExpr() { return dynamic_cast<LgsArrayExpr*>(this); }
-LgsHashMap* LgsExpr::asHashMap() { return dynamic_cast<LgsHashMap*>(this); }
-LgsCharConst* LgsExpr::asCharConst() { return dynamic_cast<LgsCharConst*>(this); }
-LgsFloatConst* LgsExpr::asFloatConst() { return dynamic_cast<LgsFloatConst*>(this); }
-LgsStrConst* LgsExpr::asStrConst() { return dynamic_cast<LgsStrConst*>(this); }
-LgsVectorExpr* LgsExpr::asVectorExpr() { return dynamic_cast<LgsVectorExpr*>(this); }
-LgsIntConst* LgsExpr::asIntConst() { return dynamic_cast<LgsIntConst*>(this); }
-LgsMetaVar* LgsExpr::asLoopMetaVar() { return dynamic_cast<LgsMetaVar*>(this); }
-LgsBinaryExpr* LgsExpr::asBinExpr() { return dynamic_cast<LgsBinaryExpr*>(this); }
+LgsNull* LgsExpr::asNull() {
+    return dynamic_cast<LgsNull*>(this);
+}
+
+LgsFunc* LgsExpr::asFunc() {
+    return dynamic_cast<LgsFunc*>(this);
+}
+
+LgsVariable* LgsExpr::asVariable() {
+    return dynamic_cast<LgsVariable*>(this);
+}
+
+LgsPrefixExpr* LgsExpr::asPrefixExpr() {
+    return dynamic_cast<LgsPrefixExpr*>(this);
+}
+
+LgsIterIndex* LgsExpr::asIterIndex() {
+    return dynamic_cast<LgsIterIndex*>(this);
+}
+
+LgsTypeExpr* LgsExpr::asTypeExpr() {
+    return dynamic_cast<LgsTypeExpr*>(this);
+}
+
+LgsJson* LgsExpr::asJson() {
+    return dynamic_cast<LgsJson*>(this);
+}
+
+LgsCast* LgsExpr::asCast() {
+    return dynamic_cast<LgsCast*>(this);
+}
+
+LgsInstance* LgsExpr::asInstance() {
+    return dynamic_cast<LgsInstance*>(this);
+}
+
+LgsArrayExpr* LgsExpr::asArrayExpr() {
+    return dynamic_cast<LgsArrayExpr*>(this);
+}
+
+LgsHashMap* LgsExpr::asHashMap() {
+    return dynamic_cast<LgsHashMap*>(this);
+}
+
+LgsEnvVar* LgsExpr::asEnvVar() {
+    return dynamic_cast<LgsEnvVar*>(this);
+}
+
+LgsCharConst* LgsExpr::asCharConst() {
+    return dynamic_cast<LgsCharConst*>(this);
+}
+
+LgsFloatConst* LgsExpr::asFloatConst() {
+    return dynamic_cast<LgsFloatConst*>(this);
+}
+
+LgsStrConst* LgsExpr::asStrConst() {
+    return dynamic_cast<LgsStrConst*>(this);
+}
+
+LgsVectorExpr* LgsExpr::asVectorExpr() {
+    return dynamic_cast<LgsVectorExpr*>(this);
+}
+
+LgsIntConst* LgsExpr::asIntConst() {
+    return dynamic_cast<LgsIntConst*>(this);
+}
+
+LgsMetaVar* LgsExpr::asLoopMetaVar() {
+    return dynamic_cast<LgsMetaVar*>(this);
+}
+
+LgsBinaryExpr* LgsExpr::asBinExpr() {
+    return dynamic_cast<LgsBinaryExpr*>(this);
+}

@@ -41,12 +41,12 @@ set(LGS_SOURCE
     ${CMAKE_SOURCE_DIR}/src/codegen/LgsCodeGen.cpp
     ${CMAKE_SOURCE_DIR}/src/codegen/LgsLLVMGen.cpp
     ${CMAKE_SOURCE_DIR}/src/analysis/LgsSema.cpp
-    ${CMAKE_SOURCE_DIR}/src/analysis/LgsLinter.cpp
     ${CMAKE_SOURCE_DIR}/src/analysis/LgsTypeResolver.cpp
+    ${CMAKE_SOURCE_DIR}/src/tools/LgsLinter.cpp
+    ${CMAKE_SOURCE_DIR}/src/tools/LgsFormatter.cpp
+    ${CMAKE_SOURCE_DIR}/src/tools/LgsJsonParser.cpp
     ${CMAKE_SOURCE_DIR}/src/parser/LgsLexer.cpp
     ${CMAKE_SOURCE_DIR}/src/parser/LgsParser.cpp
-    ${CMAKE_SOURCE_DIR}/src/parser/LgsJsonParser.cpp
-    ${CMAKE_SOURCE_DIR}/src/parser/LgsFormatter.cpp
     ${CMAKE_SOURCE_DIR}/src/lgsc/LgsCLang.cpp
     ${CMAKE_SOURCE_DIR}/src/lgsc/LgsCLangParser.cpp
     ${CMAKE_SOURCE_DIR}/src/utils/LgsUtils.cpp
@@ -86,6 +86,7 @@ set(LGS_SOURCE
     ${CMAKE_SOURCE_DIR}/src/symbols/exprs/LgsPrefixExpr.cpp
     ${CMAKE_SOURCE_DIR}/src/symbols/exprs/LgsSelection.cpp
     ${CMAKE_SOURCE_DIR}/src/symbols/exprs/LgsVariable.cpp
+    ${CMAKE_SOURCE_DIR}/src/symbols/exprs/LgsEnvVar.cpp
     ${CMAKE_SOURCE_DIR}/src/symbols/exprs/LgsVectorExpr.cpp
     ${CMAKE_SOURCE_DIR}/src/symbols/exprs/LgsTypeExpr.cpp
     ${CMAKE_SOURCE_DIR}/src/symbols/exprs/LgsNull.cpp
@@ -161,7 +162,7 @@ set(RUNTIME_SOURCE
     ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_Set.cpp
     ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_Scheduler.cpp
     ${CMAKE_SOURCE_DIR}/runtime/lib/context/Lgs_Aarch64.cpp
-    runtime/lib/Lgs_Helpers.cpp
+    ${CMAKE_SOURCE_DIR}/runtime/lib/Lgs_Helpers.cpp
 )
 
 # Runtime

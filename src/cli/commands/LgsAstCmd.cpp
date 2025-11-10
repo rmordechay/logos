@@ -1,6 +1,6 @@
 #include "cli/commands/LgsAstCmd.h"
 #include "data/LgsCliErrors.h"
-#include "parser/LgsJsonParser.h"
+#include "../../../include/tools/LgsJsonParser.h"
 #include <iostream>
 
 struct LgsCliCmdHelp;

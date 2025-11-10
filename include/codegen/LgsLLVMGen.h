@@ -105,6 +105,7 @@ public:
     Constant* floatv(float_t v);
     Constant* doublev(double_t v);
     TypeSize typeSize(Type* v) const;
+    Value* emptyStr();
 
     // Debugging
     void printStr(const std::string& str);

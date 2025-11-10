@@ -21,7 +21,7 @@ target_include_directories(lgs_tests PRIVATE
 )
 
 target_link_libraries(lgs_tests PRIVATE
-    lgs_runtime
+    lgs_lib
     LLVM
     clang-cpp
     CURL::libcurl

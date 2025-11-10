@@ -88,6 +88,7 @@ Value* LgsLLVMGen::getPtrTo(Value* v) {
 }
 
 GlobalVariable* LgsLLVMGen::createGlobal(Type* type, Constant* args, const std::string& name) const {
+    if (const auto var = IRModule->getGlobalVariable(name)) return var;
     return new GlobalVariable(*IRModule, type, false, GlobalValue::ExternalLinkage, args, name);
 }
 
@@ -329,6 +330,11 @@ Constant* LgsLLVMGen::doublev(const double_t v) {
 
 TypeSize LgsLLVMGen::typeSize(Type* v) const {
     return IRModule->getDataLayout().getTypeStoreSize(v);
+}
+
+Value* LgsLLVMGen::emptyStr() {
+    const auto ty = ArrayType::get(i8Ty(), 1);
+    return createGlobal(ty, ConstantAggregateZero::get(ty), "empty_string");
 }
 
 void LgsLLVMGen::printStr(const std::string& str) {

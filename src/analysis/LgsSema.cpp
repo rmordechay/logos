@@ -69,7 +69,7 @@ void LgsSema::analyse() {
     {
         std::lock_guard lock(mtx);
         auto& thisRegistry = typeResolver.rtTypesRegistry;
-        auto& globalsRegistry = globals.rtTypesRegistry;
+        auto& globalsRegistry = globals.rtTypes;
         globalsRegistry.insert(globalsRegistry.end(), thisRegistry.begin(), thisRegistry.end());
         for (auto [name, count] : refCount) {
             const auto symbol = globals.getSymbol(name);

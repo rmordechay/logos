@@ -1,6 +1,6 @@
 #include "cli/commands/LgsFormatCmd.h"
 #include "data/LgsCliErrors.h"
-#include "parser/LgsFormatter.h"
+#include "../../../include/tools/LgsFormatter.h"
 
 bool LgsFormatCmd::run() {
     if (argc != 3) {

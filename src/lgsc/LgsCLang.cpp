@@ -1,5 +1,5 @@
 #include "lgsc/LgsCLang.h"
-#include "LgsDefinitions.h"
+#include "data/LgsDefinitions.h"
 #include "files/LgsFile.h"
 #include "lgsc/LgsCLangParser.h"
 #include "logos/LgsConfigs.h"

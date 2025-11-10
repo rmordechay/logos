@@ -4,10 +4,6 @@
 #include <unordered_map>
 
 enum LgsTokenType {
-    T_DOUBLE_EQUAL,
-    T_NOT_EQUAL,
-    T_GE,
-    T_LE,
     T_LANGLE,
     T_RANGLE,
     T_LPAREN,
@@ -22,6 +18,10 @@ enum LgsTokenType {
     T_DARROW,
     T_COLON,
     T_EQUAL,
+    T_DOUBLE_EQUAL,
+    T_NOT_EQUAL,
+    T_GE,
+    T_LE,
     T_QUEST_MARK,
     T_EXCLA_MARK,
     T_TRIPLE_DOT,
@@ -94,6 +94,7 @@ enum LgsTokenType {
     T_FLOAT,
     T_NULL,
     T_IDENTIFIER,
+    T_DOLLAR_IDENTIFIER,
     T_STRING,
     T_TAG,
     T_LINE_COMMENT,

@@ -9,6 +9,7 @@
 #include "stmts/LgsReturn.h"
 #include "exprs/LgsBinaryExpr.h"
 #include "exprs/LgsCast.h"
+#include "exprs/LgsEnvVar.h"
 #include "exprs/LgsFuncCall.h"
 #include "exprs/LgsInstance.h"
 #include "exprs/LgsIterIndex.h"
@@ -611,6 +612,7 @@ void LgsCodeGen::visitExpr(LgsExpr* expr, const bool assign) {
         if (const auto hashMap = expr->asHashMap()) return visitHashMap(hashMap);
         if (const auto iterIndex = expr->asIterIndex()) return visitIterIndex(iterIndex, assign);
         if (const auto variable = expr->asVariable()) return visitVariable(variable);
+        if (const auto envVar = expr->asEnvVar()) return visitEnvVar(envVar);
         if (const auto postfixExpr = expr->asPostfixExpr()) return visitPostfixExpr(postfixExpr);
         if (const auto prefixExpr = expr->asPrefixExpr()) return visitPrefixExpr(prefixExpr);
         if (const auto vecExpr = expr->asVectorExpr()) return visitVectorExpr(vecExpr);
@@ -742,6 +744,10 @@ void LgsCodeGen::visitHashMap(LgsHashMap* hashMap) {
         visitExpr(value);
         map->getAddFunc()->callIR(cg, {hashMap->IRValue, key->IRValue, value->IRValue});
     }
+}
+
+void LgsCodeGen::visitEnvVar(LgsEnvVar* envVar) const {
+    envVar->IRValue = cg.callLgsFunc("System_getEnv", cg.ptrTy(), {cg.ptrTy(), cg.ptrTy()}, {cg.getIRStr(envVar->name), cg.emptyStr()});
 }
 
 void LgsCodeGen::visitVectorExpr(LgsVectorExpr* vectorExpr) {
@@ -1413,7 +1419,6 @@ Value* LgsCodeGen::getIRValue(LgsValue* value) {
 
 void LgsCodeGen::createRTTypes() const {
     size_t currentID = 0;
-    auto tr = globals.rtTypesRegistry;
     for (auto [name, symbol] : globals.symbols) {
         if (symbol.isBuiltin) continue;
         LgsType* c = nullptr;
@@ -1426,11 +1431,11 @@ void LgsCodeGen::createRTTypes() const {
         default:
             continue;
         }
-        tr.push_back(c);
+        globals.rtTypes.push_back(c);
     }
 
     std::vector<Constant*> sarrTypes;
-    for (const auto type : tr) {
+    for (const auto type : globals.rtTypes) {
         if (const auto sarr = type->asSArray()) {
             const auto constSize = sarr->size->getConstInt();
             sarr->size->IRValue = cg.usize(*constSize);

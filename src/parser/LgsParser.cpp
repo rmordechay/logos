@@ -26,6 +26,7 @@
 #include "loops/LgsWhileLoop.h"
 #include "data/LgsTokens.h"
 #include "exprs/LgsCast.h"
+#include "exprs/LgsEnvVar.h"
 #include "exprs/LgsNull.h"
 #include "exprs/LgsTernaryExpr.h"
 #include "files/LgsAppConfigFile.h"
@@ -95,7 +96,6 @@ LgsFile* LgsParser::parseSrcFile(const bool isTestRun) {
         }
     }
     assert(file);
-
     if (!cImports.empty()) {
         assert(0);
     }
@@ -902,7 +902,7 @@ LgsStmt* LgsParser::parseIfStmt() {
 LgsSwitch* LgsParser::parseSwitch() {
     const auto oldIndex = currentIndex;
     if (!matchAndConsume(T_SWITCH)) return nullptr;
-    const auto condExpr = parseExpr(false);
+    const auto condExpr = parseUnary(false);
     mustParse(condExpr);
     mustMatch(T_LBRACE);
     const auto switchStmt = new LgsSwitch(condExpr);
@@ -1020,7 +1020,7 @@ LgsWhileLoop* LgsParser::parseWhileLoop() {
     if (!matchAndConsume(T_WHILE)) return nullptr;
     auto const whileLoop = new LgsWhileLoop();
     setLocation(whileLoop->location, &currentToken);
-    whileLoop->condExpr = parseExpr(false);
+    whileLoop->condExpr = parseUnary(false);
     mustParse(whileLoop->condExpr);
     const auto stmtsBlock = parseStmtsBlock();
     mustParse(stmtsBlock);
@@ -1188,6 +1188,7 @@ LgsExpr* LgsParser::parseUnary(const bool withInstance) {
     else if (const auto metaVar = parseLoopMetaVar()) return metaVar;
     else if (const auto strConst = parseStrConst()) expr = strConst;
     else if (const auto vector = parseVectorExpr()) expr = vector;
+    else if (const auto envVar = parseEnvVar()) expr = envVar;
     else if (const auto arrayExpr = parseArrayExpr()) expr = arrayExpr;
     else if (const auto hashMap = parseHashMap()) expr = hashMap;
     else if (const auto json = parseJson()) expr = json;
@@ -1544,6 +1545,14 @@ LgsExpr* LgsParser::parsePrefixExpr() {
     auto const prefixExpr = new LgsPrefixExpr(expr, op);
     setLocation(prefixExpr->location, &opToken);
     return prefixExpr;
+}
+
+LgsExpr* LgsParser::parseEnvVar() {
+    const auto name = currentToken;
+    if (!matchAndConsume(T_DOLLAR_IDENTIFIER)) return nullptr;
+    const auto envVar = new LgsEnvVar(name.lexeme.substr(1));
+    setLocation(envVar->location, &name);
+    return envVar;
 }
 
 LgsIterIndex* LgsParser::parseIterIndex(LgsExpr* baseExpr) {

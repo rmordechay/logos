@@ -1,4 +1,4 @@
-#include "analysis/LgsLinter.h"
+#include "../../include/tools/LgsLinter.h"
 #include "files/LgsMainFile.h"
 
 void LgsLinter::visitMainFile(LgsMainFile* mainFile) {

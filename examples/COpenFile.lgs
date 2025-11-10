@@ -26,7 +26,7 @@ import C "stdio.h"
 
 main() {
     file = fopen("../.gitignore", "r")
-    buffer: Char[1024]!
+    buffer: Char[1024]
     lineRead = fgets(buffer, 1024, file)
     print(buffer)
     fclose(file)

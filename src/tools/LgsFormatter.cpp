@@ -1,4 +1,4 @@
-#include "parser/LgsFormatter.h"
+#include "../../include/tools/LgsFormatter.h"
 #include "exprs/LgsArrayExpr.h"
 #include "exprs/LgsFuncCall.h"
 #include "exprs/LgsInstance.h"

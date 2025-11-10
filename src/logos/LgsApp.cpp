@@ -187,24 +187,6 @@ bool LgsApp::link() {
     return linker.link();
 }
 
-size_t LgsApp::getNextFileID() {
-    return nextFileID.fetch_add(1, std::memory_order_relaxed);
-}
-
-void LgsApp::loadSrcFile(const std::string& fileCode, const fs::path& filePath) {
-    LgsFileMetadata metadata(getNextFileID(), filePath);
-    LgsParser parser(metadata, appPaths, globals);
-    parser.code = fileCode;
-    const auto file = parser.parseSrcFile(configs.isTestRun);
-    {
-        std::lock_guard lock(mtx);
-        if (file) srcFiles.push_back(file);
-        if (!parser.errHandler.successful) {
-            errHandler.mergeErrors(parser.errHandler);
-        }
-    }
-}
-
 void LgsApp::loadSrcFile(LgsFileMetadata& metadata) {
     if (metadata.id == 0) metadata.id = getNextFileID();
     const auto fileCode = getFileText(metadata.path);
@@ -215,6 +197,20 @@ void LgsApp::loadSrcFile(LgsFileMetadata& metadata) {
         if (file) {
             srcFiles.push_back(file);
         }
+        if (!parser.errHandler.successful) {
+            errHandler.mergeErrors(parser.errHandler);
+        }
+    }
+}
+
+void LgsApp::loadSrcFile(const std::string& fileCode, const fs::path& filePath) {
+    LgsFileMetadata metadata(getNextFileID(), filePath);
+    LgsParser parser(metadata, appPaths, globals);
+    parser.code = fileCode;
+    const auto file = parser.parseSrcFile(configs.isTestRun);
+    {
+        std::lock_guard lock(mtx);
+        if (file) srcFiles.push_back(file);
         if (!parser.errHandler.successful) {
             errHandler.mergeErrors(parser.errHandler);
         }
@@ -335,7 +331,7 @@ void LgsApp::createBuildDirs() {
 }
 
 bool LgsApp::validateEnvs() {
-    if (!appConfigFile) return false;
+    if (configs.appMode != PROJECT_MODE) return true;
     for (const auto file : envFiles) {
         LgsSema semaAnalyser(configs, file, globals);
         for (const auto varDec : file->varDecs) {
@@ -403,6 +399,10 @@ void LgsApp::compareHash() const {
         if (newHash == oldHash) continue;
         assert(0);
     }
+}
+
+size_t LgsApp::getNextFileID() {
+    return nextFileID.fetch_add(1, std::memory_order_relaxed);
 }
 
 bool LgsApp::initPaths(const fs::path& root) {

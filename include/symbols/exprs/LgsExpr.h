@@ -2,6 +2,7 @@
 #include <stmts/LgsStmt.h>
 #include "LgsValue.h"
 
+class LgsEnvVar;
 class LgsBinaryExpr;
 class LgsNull;
 class LgsJson;
@@ -64,6 +65,7 @@ public:
     LgsInstance* asInstance();
     LgsArrayExpr* asArrayExpr();
     LgsHashMap* asHashMap();
+    LgsEnvVar* asEnvVar();
     LgsCharConst* asCharConst();
     LgsFloatConst* asFloatConst();
     LgsStrConst* asStrConst();

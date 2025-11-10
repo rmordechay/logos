@@ -111,6 +111,7 @@ public:
     void visitFloatConst(LgsFloatConst* floatConst) const;
     void visitArrayExpr(LgsArrayExpr* array);
     void visitHashMap(LgsHashMap* hashMap);
+    void visitEnvVar(LgsEnvVar* envVar) const;
     void visitVectorExpr(LgsVectorExpr* vectorExpr);
     void visitVariable(LgsVariable* variable);
     void visitSelection(LgsSelection* selection, bool assign = false);

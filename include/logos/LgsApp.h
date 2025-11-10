@@ -5,7 +5,7 @@
 #include "LgsSymbolTable.h"
 #include "utils/LgsErrHandler.h"
 #include "LgsPaths.h"
-#include "analysis/LgsLinter.h"
+#include "../tools/LgsLinter.h"
 #include "analysis/LgsTypeResolver.h"
 #include "data/LgsDefinitions.h"
 #include "files/LgsFile.h"
@@ -55,9 +55,8 @@ public:
     bool analyse();
     bool generate();
     bool link();
-    size_t getNextFileID();
-    void loadSrcFile(const std::string& fileCode, const fs::path& filePath = LGS_MAIN_FILE);
     void loadSrcFile(LgsFileMetadata& metadata);
+    void loadSrcFile(const std::string& fileCode, const fs::path& filePath = LGS_MAIN_FILE);
     bool loadConfigFile();
     bool loadEnvFiles();
     bool loadConfigs();
@@ -68,6 +67,7 @@ public:
     bool validateRequiredEnvs();
     void printErrors() const;
     void compareHash() const;
+    size_t getNextFileID();
     bool initPaths(const fs::path& root);
     LgsMainFile* getMainFile() const;
     ~LgsApp();
