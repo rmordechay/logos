@@ -13,7 +13,7 @@ LgsExpr* LgsGeneric::getZeroValue() {
     assert(0);
 }
 
-Lgs_RTType LgsGeneric::getRTType() {
+Lgs_TypeKind LgsGeneric::getRTTypeKind() {
     return RTT_STR;
 }
 

@@ -26,7 +26,7 @@ LgsExpr* LgsChar::getZeroValue() {
     return new LgsCharConst('0');
 }
 
-Lgs_RTType LgsChar::getRTType() {
+Lgs_TypeKind LgsChar::getRTTypeKind() {
     return RTT_CHAR;
 }
 

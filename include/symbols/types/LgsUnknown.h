@@ -11,7 +11,7 @@ public:
     std::string getName() override;
     std::string pname() override;
     LgsExpr* getZeroValue() override;
-    Lgs_RTType getRTType() override;
+    Lgs_TypeKind getRTTypeKind() override;
     size_t getSizeBytes() override;
     bool canCastTo(LgsType* other) override;
     std::string strFormatPart() const override;

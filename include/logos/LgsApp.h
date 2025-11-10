@@ -6,6 +6,7 @@
 #include "utils/LgsErrHandler.h"
 #include "LgsPaths.h"
 #include "analysis/LgsLinter.h"
+#include "analysis/LgsTypeResolver.h"
 #include "data/LgsDefinitions.h"
 #include "files/LgsFile.h"
 #include "files/LgsFileMetadata.h"
@@ -34,6 +35,7 @@ public:
     LgsSymbolTable globals;
     LgsAppConfigs configs;
     LgsErrHandler errHandler;
+    LgsTypeResolver typeResolver;
     std::vector<LgsFile*> srcFiles;
     std::vector<LgsEnvFile*> envFiles;
     std::vector<LgsTestFile*> testFiles;
@@ -42,7 +44,7 @@ public:
     // Used when passing code directly.
     std::unordered_map<std::string, std::string> lgsCode;
 
-    explicit LgsApp(const fs::path& rootPath = "") {
+    explicit LgsApp(const fs::path& rootPath = ""): typeResolver(errHandler, globals) {
         appPaths.rootPath = rootPath;
     }
 
@@ -66,5 +68,6 @@ public:
     void createBuildDirs();
     bool initPaths(const fs::path& root);
     void printErrors() const;
+    LgsMainFile* getMainFile() const;
     ~LgsApp();
 };

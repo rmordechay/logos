@@ -113,7 +113,7 @@ Value* LgsSize::orIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     return orInt(cg, self, other);
 }
 
-Lgs_RTType LgsSize::getRTType() {
+Lgs_TypeKind LgsSize::getRTTypeKind() {
     return RTT_SIZE;
 }
 

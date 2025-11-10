@@ -33,8 +33,9 @@ bool LgsRunCmd::parseArgs(LgsApp& app, std::vector<const char*>& appArgs) const 
             argStart = i;
             break;
         }
-        const auto name = std::string(arg).substr(1);
-        if (name[0] == 'o') {
+        const auto textStart = arg[1] == '-' ? 1 : 2;
+        const auto name = std::string(arg).substr(textStart);
+        if (name[0] == 'o' || name == "optimize") {
             const auto optLevel = parseInt(i, name);
             if (optLevel < 0) {
                 printCliError(E40002, {"-o"});
@@ -46,11 +47,8 @@ bool LgsRunCmd::parseArgs(LgsApp& app, std::vector<const char*>& appArgs) const 
             }
             app.configs.optLevel = optLevel;
         }
-        if (name[0] == 'c') {
-            const auto code = argv[++i];
-            app.lgsCode[LGS_MAIN_FILE] = code;
+        if (name[0] == 'c' || name == "code") {
             app.configs.appMode = FILE_MODE;
-            return true;
         }
     }
 
@@ -58,12 +56,18 @@ bool LgsRunCmd::parseArgs(LgsApp& app, std::vector<const char*>& appArgs) const 
         printCliError(E40001);
         return false;
     }
-    auto path = argv[argStart++];
-    if (!fs::exists(path)) {
-        printCliError(E40004, {path});
-        return false;
+
+    if (app.configs.appMode == FILE_MODE) {
+        app.lgsCode[LGS_MAIN_FILE] = argv[argStart++];
+    } else {
+        auto path = argv[argStart++];
+        if (!fs::exists(path)) {
+            printCliError(E40004, {path});
+            return false;
+        }
+        app.appPaths.rootPath = path;
     }
-    app.appPaths.rootPath = path;
+
     for (int j = argStart; j < argc; ++j) {
         const auto v = argv[j];
         appArgs.push_back(v);

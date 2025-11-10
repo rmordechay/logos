@@ -51,7 +51,7 @@ public:
     Value* orIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
     std::string getName() override;
     LgsExpr* getZeroValue() override;
-    Lgs_RTType getRTType() override;
+    Lgs_TypeKind getRTTypeKind() override;
     std::string strFormatPart() const override;
     size_t getSizeBytes() override;
     bool canCastTo(LgsType* other) override;

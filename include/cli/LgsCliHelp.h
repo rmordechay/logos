@@ -4,6 +4,7 @@
 
 struct LgsCliCmdArgHelp {
     std::string name = "";
+    std::string name2 = "";
     std::string type = "";
     std::string defaultVal = "";
     std::string possibleValues = "";

@@ -174,7 +174,11 @@ Value* LgsType::andInt(LgsLLVMGen& cg, LgsExpr* self, const LgsExpr* other) {
     return phi;
 }
 
-Lgs_RTType LgsType::getRTType() {
+Lgs_TypeKind LgsType::getRTTypeKind() {
+    assert(0);
+}
+
+Constant* LgsType::initRTType(LgsLLVMGen& cg) {
     assert(0);
 }
 
@@ -191,7 +195,7 @@ DIBasicType* LgsType::getDebugType(LgsLLVMGen& cg) {
 }
 
 void LgsType::hashNode(size_t& oldHash) {
-    // assert(0);
+    assert(0);
 }
 
 LgsType* LgsType::clone() {

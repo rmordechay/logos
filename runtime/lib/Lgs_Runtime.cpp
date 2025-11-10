@@ -19,6 +19,7 @@ struct Lgs_Runtime {
 };
 
 static inline Lgs_Runtime runtime;
+__attribute__((weak)) Lgs_SArray Lgs_RTTypes_Arrays[] = {};
 
 extern "C" void Lgs_Runtime_init() {
     // runtime.scheduler.start();
@@ -28,12 +29,12 @@ extern "C" void Lgs_Runtime_close() {
     // runtime.scheduler.shutdown();
 }
 
-extern "C" void Lgs_Runtime_addOwner(void* ptr, const Lgs_RTType type) {
+extern "C" void Lgs_Runtime_addOwner(void* ptr, const Lgs_TypeKind type) {
     const auto ownerIndex = runtime.stack.frames[runtime.stack.stackIndex].ownersCount++;
     runtime.stack.frames[runtime.stack.stackIndex].owners[ownerIndex] = Lgs_Alloc{ptr, type};
 }
 
-extern "C" void Lgs_Runtime_addOrphan(void* ptr, const Lgs_RTType type) {
+extern "C" void Lgs_Runtime_addOrphan(void* ptr, const Lgs_TypeKind type) {
     const auto ownerIndex = runtime.stack.frames[runtime.stack.stackIndex].orphansCount++;
     runtime.stack.frames[runtime.stack.stackIndex].orphans[ownerIndex] = Lgs_Alloc{ptr, type};
 }
@@ -100,13 +101,4 @@ extern "C" void* Lgs_Runtime_getFromVTable(void* instancePtr, const char* name) 
 
 extern "C" void* Lgs_Runtime_allocate(const size_t size) {
     return runtime.arena.allocate(size);
-}
-
-extern "C" void Lgs_rttest(const size_t index) {
-    // const auto a = &Lgs_RTTypes[index];
-    // for (int i = 0; i < a->fieldCount; ++i) {
-    //     const auto v = a->fieldTypes[i];
-    //     std::cout << getTypeName(v) << '\n';
-    // }
-    // assert(0);
 }

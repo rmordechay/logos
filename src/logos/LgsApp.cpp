@@ -159,14 +159,13 @@ void LgsApp::analyseEnvs() {
 bool LgsApp::analyse() {
     loadBuiltins();
     analyseEnvs();
-    LgsTypeResolver typeResolver(errHandler, globals);
     if (!typeResolver.resolveGlobals(srcFiles, threadPool)) return false;
     for (const auto file : srcFiles) {
         threadPool.runTask([this, file] {
-            LgsSema semaAnalyser(configs, file, globals);
-            semaAnalyser.analyse();
-            if (semaAnalyser.errHandler.successful) return;
-            errHandler.mergeErrorsWithLock(semaAnalyser.errHandler);
+            LgsSema sema(configs, file, globals);
+            sema.analyse();
+            if (sema.errHandler.successful) return;
+            errHandler.mergeErrorsWithLock(sema.errHandler);
         });
     }
     threadPool.wait();
@@ -177,10 +176,17 @@ bool LgsApp::generate() {
     createBuildDirs();
     LgsLLVMGen::initLLVM();
     appPaths.execFile = appPaths.buildDir / (configs.name == "" ? LGS_DEFAULT_EXEC_FILE : configs.name);
+    const auto mainFile = getMainFile();
+    LgsCodeGen mainCodeGen(*mainFile, configs, globals, appPaths);
+    if (!mainCodeGen.generate()) {
+        errHandler.setUnsuccessful();
+        return false;
+    }
     for (const auto& file : srcFiles) {
+        if (file->isMain()) continue;
         threadPool.runTask([this, file] {
-            LgsCodeGen cg(*file, configs, globals, appPaths);
-            const auto successful = cg.generate();
+            LgsCodeGen fileCodeCode(*file, configs, globals, appPaths);
+            const auto successful = fileCodeCode.generate();
             if (!successful) {
                 std::lock_guard lock(mtx);
                 errHandler.setUnsuccessful();
@@ -228,7 +234,9 @@ void LgsApp::loadSrcFile(LgsFileMetadata& metadata) {
     const auto file = parser.parseSrcFile(configs.isTestRun);
     {
         std::lock_guard lock(mtx);
-        if (file) srcFiles.push_back(file);
+        if (file) {
+            srcFiles.push_back(file);
+        }
         if (!parser.errHandler.successful) {
             errHandler.mergeErrors(parser.errHandler);
         }
@@ -409,6 +417,13 @@ void LgsApp::printErrors() const {
         if (i != errHandler.errors.size() - 1) logInfo(LGS_MSG_LINE_SEPERATOR);
     }
     if (!errHandler.errors.empty()) logInfo("\n");
+}
+
+LgsMainFile* LgsApp::getMainFile() const {
+    for (const auto srcFile : srcFiles) {
+        if (srcFile->isMain()) return dynamic_cast<LgsMainFile*>(srcFile);
+    }
+    return nullptr;
 }
 
 LgsApp::~LgsApp() {

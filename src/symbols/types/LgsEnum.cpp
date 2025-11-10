@@ -7,7 +7,7 @@ LgsExpr* LgsEnum::getZeroValue() {
     return nullptr;
 }
 
-Lgs_RTType LgsEnum::getRTType() {
+Lgs_TypeKind LgsEnum::getRTTypeKind() {
     return RTT_ENUM;
 }
 

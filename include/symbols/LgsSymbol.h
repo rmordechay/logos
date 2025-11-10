@@ -1,4 +1,6 @@
 #pragma once
+#include "codegen/LgsLLVMGen.h"
+
 #include <string>
 
 class LgsGeneric;

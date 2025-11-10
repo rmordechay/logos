@@ -10,7 +10,7 @@ extern "C" size_t Lgs_hash(const char* s) {
     return std::hash<std::string_view>{}(s);
 }
 
-extern "C" void Lgs_Map_init(Lgs_Map* map, const size_t valueSize, const Lgs_RTType keyType, const Lgs_RTType valueType) {
+extern "C" void Lgs_Map_init(Lgs_Map* map, const size_t valueSize, const Lgs_TypeKind keyType, const Lgs_TypeKind valueType) {
     assert(keyType != RTT_UNKNOWN && valueType != RTT_UNKNOWN);
     if (!map || valueSize == 0 || valueSize > 4096) std::exit(1);
     map->valueSize = valueSize;

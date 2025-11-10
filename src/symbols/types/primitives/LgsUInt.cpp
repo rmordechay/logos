@@ -21,7 +21,7 @@ LgsExpr* LgsUInt::getZeroValue() {
     return new LgsIntConst(this, 0);
 }
 
-Lgs_RTType LgsUInt::getRTType() {
+Lgs_TypeKind LgsUInt::getRTTypeKind() {
     return RTT_UINT;
 }
 

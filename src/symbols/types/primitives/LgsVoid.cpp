@@ -20,7 +20,7 @@ LgsExpr* LgsVoid::getZeroValue() {
     return nullptr;
 }
 
-Lgs_RTType LgsVoid::getRTType() {
+Lgs_TypeKind LgsVoid::getRTTypeKind() {
     return RTT_VOID;
 }
 

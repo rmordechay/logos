@@ -27,6 +27,11 @@
 #define LGS_STR_FMT_PLACEHOLDER "<!v!>"
 #define LGS_EMPTY_STR "\"\""
 
+#define LGS_RT_OBJECTS_ARR "Lgs_RTTypes_Objects"
+#define LGS_RT_ARRAYS_ARR "Lgs_RTTypes_Arrays"
+#define LGS_RT_OBJECT "Lgs_RTTypes_Object"
+#define LGS_RT_ARRAY "Lgs_RTTypes_Array"
+
 #define BLOCK_NAME_IF_TRUE "if_true"
 #define BLOCK_NAME_IF_FALSE "if_false"
 #define BLOCK_NAME_ELSE "else"
@@ -40,7 +45,7 @@
 #define BLOCK_NAME_LOOP_EXIT "loop_exit"
 #define BLOCK_NAME_CLEANUP "cleanup"
 
-#define LGS_MSG_LINE_SEPERATOR "\n\n------\n\n"
+#define LGS_MSG_LINE_SEPERATOR "\n\n──────\n\n"
 #define LGS_MSG_COLOR_RED "\033[1;31m"
 #define LGS_MSG_COLOR_YELLOW "\033[1;33m"
 #define LGS_MSG_COLOR_WHITE "\033[1;37m"

@@ -5,7 +5,7 @@
 #include "Lgs_Stack.h"
 #include <cassert>
 
-void freeRTType(void* ptr, const Lgs_RTType type) {
+void freeRTType(void* ptr, const Lgs_TypeKind type) {
     switch (type) {
     case RTT_OBJECT: {
         // std::free(ptr);
@@ -49,7 +49,7 @@ void funcCleanup(Lgs_Stack& stack) {
     }
 }
 
-std::string getTypeName(const Lgs_RTType type) {
+std::string getTypeName(const Lgs_TypeKind type) {
     switch (type) {
     case RTT_UNKNOWN: return "<Unknown>";
     case RTT_VOID: return "Void";

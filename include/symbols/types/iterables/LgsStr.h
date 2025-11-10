@@ -14,7 +14,7 @@ public:
     std::string getName() override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
-    Lgs_RTType getRTType() override;
+    Lgs_TypeKind getRTTypeKind() override;
     bool canCastTo(LgsType* other) override;
     LgsType* applyBinOp(LgsBinaryExpr* binExpr) override;
     Value* getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) override;

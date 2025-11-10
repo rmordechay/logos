@@ -64,8 +64,8 @@ public:
     Value* callStrLen(Value* str);
     void callMemSet(Value* dest, Value* src, Value* size);
     void callMemCpy(Value* dest, Value* src, Value* size);
-    Value* callAllocate(size_t size, bool isOwner, Lgs_RTType type);
-    Value* callAllocate(Value* size, bool isOwner, Lgs_RTType type);
+    Value* callAllocate(size_t size, bool isOwner, Lgs_TypeKind type);
+    Value* callAllocate(Value* size, bool isOwner, Lgs_TypeKind type);
 
     // Stack
     void callStackPush(bool hasDefers, bool needsCleanup);
@@ -73,7 +73,7 @@ public:
     void callAddToVTable(Value* instance, Value* key, Value* ptr);
     Value* callGetFromVTable(Value* instance, Value* key);
     void addNullTerminate(Value* strPtr, Value* pos);
-    void addHeap(bool isOwner, Lgs_RTType type, Value* ptr);
+    void addHeap(bool isOwner, Lgs_TypeKind type, Value* ptr);
 
     // Types
     Type* i1Ty();

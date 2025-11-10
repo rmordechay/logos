@@ -15,7 +15,7 @@ LgsExpr* LgsDouble::getZeroValue() {
     return new LgsFloatConst(this, 0.0);
 }
 
-Lgs_RTType LgsDouble::getRTType() {
+Lgs_TypeKind LgsDouble::getRTTypeKind() {
     return RTT_DOUBLE;
 }
 

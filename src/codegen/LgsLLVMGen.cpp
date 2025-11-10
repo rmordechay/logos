@@ -79,16 +79,10 @@ Value* LgsLLVMGen::getPtrTo(Value* v) {
         }
     }
     if (v->getType()->isPointerTy()) return v;
-    if (v->getType()->isIntegerTy()) {
-        return builder.CreateIntToPtr(v, ptrTy());
-    }
-    if (v->getType()->isFloatTy()) {
-        const auto bitCast = builder.CreateBitCast(v, i32Ty());
-        return builder.CreateIntToPtr(bitCast, ptrTy());
-    }
-    if (v->getType()->isDoubleTy()) {
-        const auto bitCast = builder.CreateBitCast(v, i64Ty());
-        return builder.CreateIntToPtr(bitCast, ptrTy());
+    if (v->getType()->isIntegerTy() || v->getType()->isFloatingPointTy()) {
+        const auto a = builder.CreateAlloca(v->getType());
+        builder.CreateStore(v, a);
+        return a;
     }
     assert(0);
 }
@@ -188,14 +182,14 @@ void LgsLLVMGen::callMemCpy(Value* dest, Value* src, Value* size) {
     builder.CreateMemCpy(dest, llvm::MaybeAlign(), src, llvm::MaybeAlign(), size);
 }
 
-Value* LgsLLVMGen::callAllocate(const size_t size, const bool isOwner, const Lgs_RTType type) {
+Value* LgsLLVMGen::callAllocate(const size_t size, const bool isOwner, const Lgs_TypeKind type) {
     assert(type != RTT_UNKNOWN);
     const auto ptr = callRuntimeFunc("allocate", ptrTy(), {sizeTy()}, {usize(size)});
     addHeap(isOwner, type, ptr);
     return ptr;
 }
 
-Value* LgsLLVMGen::callAllocate(Value* size, const bool isOwner, const Lgs_RTType type) {
+Value* LgsLLVMGen::callAllocate(Value* size, const bool isOwner, const Lgs_TypeKind type) {
     assert(type != RTT_UNKNOWN);
     const auto ptr = builder.CreateMalloc(sizeTy(), sizeTy(), size, nullptr);
     addHeap(isOwner, type, ptr);
@@ -224,7 +218,7 @@ void LgsLLVMGen::addNullTerminate(Value* strPtr, Value* pos) {
     builder.CreateStore(i8Zero(), builder.CreateGEP(i8Ty(), strPtr, pos));
 }
 
-void LgsLLVMGen::addHeap(const bool isOwner, const Lgs_RTType type, Value* ptr) {
+void LgsLLVMGen::addHeap(const bool isOwner, const Lgs_TypeKind type, Value* ptr) {
     if (isOwner) callRuntimeFunc("addOwner", voidTy(), {ptrTy(), i32Ty()}, {ptr, i32(type)});
     else callRuntimeFunc("addOrphan", voidTy(), {ptrTy(), i32Ty()}, {ptr, i32(type)});
 }

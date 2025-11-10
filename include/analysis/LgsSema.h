@@ -4,6 +4,7 @@
 #include "analysis/LgsTypeResolver.h"
 #include "files/LgsEnvFile.h"
 #include "logos/LgsAppConfigs.h"
+#include <unordered_map>
 
 class LgsAppConfigFile;
 class LgsTernaryExpr;
@@ -59,11 +60,12 @@ public:
     LgsSymbolTable& globals;
     LgsErrHandler errHandler;
     LgsTypeResolver typeResolver;
-    std::map<std::string, size_t> refCount;
-    std::map<std::string, LgsFunc*> corosRegistry;
-    std::map<std::string, LgsFunc*> genericsRegistry;
+    std::unordered_map<std::string, size_t> refCount;
+    std::unordered_map<std::string, LgsFunc*> corosRegistry;
+    std::unordered_map<std::string, LgsFunc*> genericsRegistry;
 
-    explicit LgsSema(LgsAppConfigs& appConfigs, LgsFile* file, LgsSymbolTable& globals) : file(file), appConfigs(appConfigs), globals(globals), typeResolver(errHandler, globals) {}
+    explicit LgsSema(LgsAppConfigs& appConfigs, LgsFile* file, LgsSymbolTable& globals)
+        : file(file), appConfigs(appConfigs), globals(globals), typeResolver(errHandler, globals) {}
     void analyse();
     void resolveImports() const;
     void visitMainFile(LgsMainFile* mainFile);

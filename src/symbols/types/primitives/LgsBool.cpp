@@ -249,7 +249,7 @@ LgsExpr* LgsBool::getZeroValue() {
     return new LgsIntConst(&LGS_BOOL, false);
 }
 
-Lgs_RTType LgsBool::getRTType() {
+Lgs_TypeKind LgsBool::getRTTypeKind() {
     return RTT_BOOL;
 }
 

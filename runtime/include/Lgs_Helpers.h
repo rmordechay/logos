@@ -4,6 +4,6 @@
 
 struct Lgs_Stack;
 
-void freeRTType(void* ptr, Lgs_RTType type);
+void freeRTType(void* ptr, Lgs_TypeKind type);
 void funcCleanup(Lgs_Stack& stack);
-std::string getTypeName(Lgs_RTType type);
+std::string getTypeName(Lgs_TypeKind type);

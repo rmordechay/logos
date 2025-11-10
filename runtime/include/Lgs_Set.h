@@ -9,5 +9,5 @@ struct Lgs_Set {
     size_t size;
     size_t capacity;
     size_t elementSize;
-    Lgs_RTType baseType;
+    Lgs_TypeKind baseType;
 };

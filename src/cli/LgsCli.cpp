@@ -25,8 +25,10 @@ static std::vector COMMANDS = {
 bool LgsCli::execute() const {
     if (argc < 2) {
         printCliError(E40001);
+        printParentCmdHelp(COMMANDS);
         return false;
     }
+
     const std::string cmdStr = argv[1];
     if (cmdStr == lgsHelpCmdHelp.name) {
         printParentCmdHelp(COMMANDS);

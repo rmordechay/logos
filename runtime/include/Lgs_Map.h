@@ -6,7 +6,7 @@
 
 struct Lgs_Map {
     size_t valueSize;
-    Lgs_RTType keyType;
-    Lgs_RTType valueType;
+    Lgs_TypeKind keyType;
+    Lgs_TypeKind valueType;
     std::unordered_map<std::string, std::vector<char>>* data;
 };

@@ -1,6 +1,7 @@
 #pragma once
 #include "cli/LgsCliCmd.h"
 #include "types/iterables/LgsStr.h"
+#include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsInt.h"
 
 class LgsRunCmd : public LgsCliCmd {
@@ -13,7 +14,7 @@ public:
 
 inline LgsCliCmdHelp runCmdHelp{
     .name = "run",
-    .usage = "lgs run <options> <path>",
+    .usage = "lgs run <options> <path/code>",
     .summary = "Runs Logos code.",
     .desc = "The run command runs a Logos project or a single file.",
     .requiredArgs = {
@@ -26,15 +27,24 @@ inline LgsCliCmdHelp runCmdHelp{
     .optionalArgs = {
         {
             .name = "-o",
+            .name2 = "--optimize",
             .type = LgsInt::name,
             .defaultVal = "2",
             .possibleValues = "[0, 1, 2, 3]",
             .desc = "Optimization level."
         },
+        {
+            .name = "-c",
+            .name2 = "--code",
+            .type = LgsBool::name,
+            .defaultVal = "false",
+            .desc = "Code mode. Run Logos code by passing code directly."
+        },
     },
     .examples = {
-        "lgs run path/to/root",
         "lgs run app.lgs",
+        "lgs run path/to/root",
         "lgs run app.lgs -o3",
+        "lgs run app.lgs -c \"main() { print('Hello world') }\"",
     }
 };

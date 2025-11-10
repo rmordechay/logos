@@ -42,8 +42,9 @@ bool LgsTypeResolver::resolveGlobals(const std::vector<LgsFile*>& srcFiles, Thre
 LgsType* LgsTypeResolver::resolveType(LgsType* type, LgsFile* file) {
     if (const auto nullable = type->asNullable()) {
         nullable->baseType = resolveType(nullable->baseType, file);
-    } else if (const auto iter = type->asIterable()) {
-        resolveIterable(iter, *file);
+    } else if (const auto iterable = type->asIterable()) {
+        iterable->baseType = resolveType(iterable->baseType, file);
+        rtTypesRegistry.push_back(iterable);
     } else if (const auto pair = type->asPair()) {
         pair->key = resolveType(pair->key, file);
         pair->value = resolveType(pair->value, file);
@@ -150,10 +151,6 @@ void LgsTypeResolver::resolveInterfaceTypes(LgsInterface* interface, LgsFile& fi
     for (auto& i : interface->implements) {
         i = resolveType(i, &file);
     }
-}
-
-void LgsTypeResolver::resolveIterable(LgsIterable* iterable, LgsFile& file) {
-    iterable->baseType = resolveType(iterable->baseType, &file);
 }
 
 void LgsTypeResolver::resolveFuncTypes(LgsFuncType* funcType, LgsFile& file) {

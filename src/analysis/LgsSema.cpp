@@ -68,6 +68,9 @@ void LgsSema::analyse() {
     }
     {
         std::lock_guard lock(mtx);
+        auto& thisRegistry = typeResolver.rtTypesRegistry;
+        auto& globalsRegistry = globals.rtTypesRegistry;
+        globalsRegistry.insert(globalsRegistry.end(), thisRegistry.begin(), thisRegistry.end());
         for (auto [name, count] : refCount) {
             const auto symbol = globals.getSymbol(name);
             if (!symbol) continue;
@@ -959,7 +962,7 @@ void LgsSema::visitFuncCall(LgsFuncCall* funcCall) {
     if (funcCall->equals(ft)) {
         if (symbol->symbolType == FUNC) {
             const auto func = symbol->func;
-            if (func->funcType->isGeneric) {
+            if (ft->isGeneric) {
                 const auto funcName = funcCall->getGenericName();
                 const auto generics = genericsRegistry.find(funcName);
                 if (generics != genericsRegistry.end()) {
@@ -969,7 +972,7 @@ void LgsSema::visitFuncCall(LgsFuncCall* funcCall) {
                 }
             } else {
                 funcCall->func = func;
-                funcCall->setType(func->funcType->rt);
+                funcCall->setType(ft->rt);
             }
         } else {
             funcCall->ref = *symbol;

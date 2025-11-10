@@ -12,7 +12,7 @@ struct Lgs_ThunkFunc {
 
 struct Lgs_Alloc {
     void* ptr;
-    Lgs_RTType type;
+    Lgs_TypeKind type;
 };
 
 struct Lgs_StackFrame {

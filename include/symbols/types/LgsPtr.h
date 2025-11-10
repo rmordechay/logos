@@ -12,7 +12,7 @@ public:
     Type* getIRType(LgsLLVMGen& cg) override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
-    Lgs_RTType getRTType() override;
+    Lgs_TypeKind getRTTypeKind() override;
     bool canCastTo(LgsType* other) override;
     std::string strFormatPart() const override;
     ~LgsPtr() override;

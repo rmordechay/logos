@@ -45,7 +45,7 @@ LgsExpr* LgsDArray::getZeroValue() {
     return new LgsArrayExpr(this);
 }
 
-Lgs_RTType LgsDArray::getRTType() {
+Lgs_TypeKind LgsDArray::getRTTypeKind() {
     return RTT_DARRAY;
 }
 
@@ -104,7 +104,10 @@ Value* LgsDArray::lengthIR(LgsLLVMGen& cg, Value* iterable) {
 }
 
 Value* LgsDArray::inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) {
-    return cg.callLgsFunc(std::string(name) + "_contains", cg.i1Ty(), {cg.ptrTy(), cg.ptrTy()}, {iterableExpr->IRValue, cg.getPtrTo(value->IRValue)});
+    return cg.callLgsFunc(std::string(name) + "_contains", cg.i1Ty(), {cg.ptrTy(), cg.ptrTy()}, {
+        iterableExpr->IRValue,
+        cg.getPtrTo(value->IRValue),
+    });
 }
 
 Value* LgsDArray::getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) {
@@ -112,7 +115,11 @@ Value* LgsDArray::getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) {
 }
 
 void LgsDArray::initArr(LgsLLVMGen& cg, Value* iterable) {
-    cg.callLgsFunc("DArray_init", cg.voidTy(), {cg.ptrTy(), cg.sizeTy(), cg.i32Ty()}, {iterable, cg.usize(baseType->getSizeBytes()), cg.i32(getRTType())});
+    cg.callLgsFunc("DArray_init", cg.voidTy(), {cg.ptrTy(), cg.sizeTy(), cg.i32Ty()}, {
+        iterable,
+        cg.usize(baseType->getSizeBytes()),
+        cg.i32(getRTTypeKind()),
+    });
 }
 
 bool LgsDArray::canCastTo(LgsType* other) {

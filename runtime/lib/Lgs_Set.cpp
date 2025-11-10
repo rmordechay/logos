@@ -5,7 +5,7 @@
 #include <cstdlib>
 #include <cstring>
 
-extern "C" void Lgs_set_init(Lgs_Set* set, const size_t elementSize, const Lgs_RTType baseType) {
+extern "C" void Lgs_set_init(Lgs_Set* set, const size_t elementSize, const Lgs_TypeKind baseType) {
     assert(baseType != RTT_UNKNOWN);
     set->elementSize = elementSize;
     set->baseType = baseType;

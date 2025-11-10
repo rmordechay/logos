@@ -20,7 +20,7 @@ LgsExpr* LgsLong::getZeroValue() {
     return new LgsIntConst(&LGS_LONG, 0);
 }
 
-Lgs_RTType LgsLong::getRTType() {
+Lgs_TypeKind LgsLong::getRTTypeKind() {
     return RTT_LONG;
 }
 

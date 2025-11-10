@@ -12,7 +12,7 @@ public:
     size_t getSizeBytes() override;
     std::string getName() override;
     LgsExpr* getZeroValue() override;
-    Lgs_RTType getRTType() override;
+    Lgs_TypeKind getRTTypeKind() override;
     std::string strFormatPart() const override;
     bool canCastTo(LgsType* other) override;
     DIBasicType* getDebugType(LgsLLVMGen& cg) override;

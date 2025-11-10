@@ -73,8 +73,24 @@ LgsExpr* LgsObject::getZeroValue() {
     return new LgsInstance(clone());
 }
 
-Lgs_RTType LgsObject::getRTType() {
+Lgs_TypeKind LgsObject::getRTTypeKind() {
     return RTT_OBJECT;
+}
+
+Constant* LgsObject::initRTType(LgsLLVMGen& cg) {
+    const auto objRTStruct = cg.getStructType({cg.ptrTy(), cg.sizeTy(), cg.ptrTy()}, LGS_RT_OBJECT);
+    const auto fieldCount = fields.size();
+    std::vector<Constant*> fieldTypeValues;
+    for (const auto field : fields) {
+        fieldTypeValues.push_back(cg.i32(field->type->getRTTypeKind()));
+    }
+    const auto fieldTypesArrayType = ArrayType::get(cg.i32Ty(), fieldCount);
+    const auto fieldTypesArray = llvm::ConstantArray::get(fieldTypesArrayType, fieldTypeValues);
+    const auto fieldTypesGlobal = cg.createGlobal(fieldTypesArrayType, fieldTypesArray, name + "_field_types");
+    const std::vector<Constant*> structFields = {
+        cg.getIRStr(name), cg.usize(fieldCount), fieldTypesGlobal
+    };
+    return llvm::ConstantStruct::get(objRTStruct, structFields);
 }
 
 bool LgsObject::hasVirtuals() const {

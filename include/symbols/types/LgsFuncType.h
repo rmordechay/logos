@@ -50,7 +50,7 @@ public:
     void setFuncOptions(uint32_t ops);
     Type* getIRType(LgsLLVMGen& cg) override;
     LgsExpr* getZeroValue() override;
-    Lgs_RTType getRTType() override;
+    Lgs_TypeKind getRTTypeKind() override;
     size_t getSizeBytes() override;
     std::string getName() override;
     std::string pname() override;

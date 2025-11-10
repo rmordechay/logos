@@ -38,8 +38,16 @@ LgsExpr* LgsSArray::getZeroValue() {
     return new LgsArrayExpr(this);
 }
 
-Lgs_RTType LgsSArray::getRTType() {
+Lgs_TypeKind LgsSArray::getRTTypeKind() {
     return RTT_SARRAY;
+}
+
+Constant* LgsSArray::initRTType(LgsLLVMGen& cg) {
+    const auto arrRTStruct = cg.getStructType({cg.i32Ty(), cg.sizeTy()}, LGS_RT_ARRAY);
+    const std::vector<Constant*> structFields = {
+        cg.i32(baseType->getRTTypeKind()), llvm::dyn_cast<Constant>(size->loadIR(cg))
+    };
+    return llvm::ConstantStruct::get(arrRTStruct, structFields);
 }
 
 std::string LgsSArray::strFormatPart() const {

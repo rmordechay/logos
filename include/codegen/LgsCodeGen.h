@@ -125,12 +125,6 @@ public:
     void visitNull(LgsNull* null) const;
     void visitJson(LgsJson* json);
 
-    void setNullableValue(LgsExpr* expr);
-    void resolveVirtuals(const LgsInstance* instance) const;
-    bool checkMock(LgsExpr* expr);
-    void createRTTypes() const;
-    Value* getRTType(Value* typeID) const;
-
     // Funcs
     void createPrologue(LgsFunc* func);
     void createEpilogue(LgsFunc* func);
@@ -148,7 +142,12 @@ public:
     void createMapFunc(LgsFunc* func);
     void createFilterFunc(LgsFunc* func);
 
+    bool checkMock(LgsExpr* expr);
     Value* getIRValue(LgsValue* value);
+    Value* getRTType(Value* typeID) const;
+    void createRTTypes() const;
+    void setNullableValue(LgsExpr* expr);
     bool allArgsAreConst(const std::vector<LgsExpr*>& args);
+    void resolveVirtuals(const LgsInstance* instance) const;
     bool writeIRModule() const;
 };

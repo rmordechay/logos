@@ -50,6 +50,7 @@ public:
     bool isGeneric = false;
     bool passByRef = false;
     Type* IRType = nullptr;
+    size_t runtimeID = 0;
     LgsLocation location;
     std::vector<LgsField*> fields;
     std::map<std::string, LgsFunc*> methods;
@@ -72,7 +73,8 @@ public:
     virtual Type* getIRType(LgsLLVMGen& cg) = 0;
     virtual size_t getSizeBytes() = 0;
     virtual LgsExpr* getZeroValue() = 0;
-    virtual Lgs_RTType getRTType() = 0;
+    virtual Lgs_TypeKind getRTTypeKind() = 0;
+    virtual Constant* initRTType(LgsLLVMGen& cg);
     virtual std::string getName() = 0;
     virtual std::string pname(); // pretty name
     virtual bool equals(LgsType* other);

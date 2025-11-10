@@ -14,19 +14,19 @@ void LgsCliCmd::printHelp() {
     // Required
     if (!h.requiredArgs.empty()) {
         txt << '\n' << LGS_COLORIZE("Required:", LGS_MSG_COLOR_WHITE) << '\n';
-    }
-    for (auto arg : h.requiredArgs) {
-        printArg(txt, arg);
-        txt << '\n';
+        for (auto arg : h.requiredArgs) {
+            printArg(txt, arg);
+        }
+        txt << "\n";
     }
 
-    // Optionals
+    // Options
     if (!h.optionalArgs.empty()) {
         txt << LGS_COLORIZE("Options:", LGS_MSG_COLOR_WHITE) << '\n';
-    }
-    for (auto arg : h.optionalArgs) {
-        printArg(txt, arg);
-        txt << '\n';
+        for (auto arg : h.optionalArgs) {
+            printArg(txt, arg);
+            txt << "\n";
+        }
     }
 
     // Description
@@ -47,17 +47,22 @@ void LgsCliCmd::getLongestArg(const LgsCliCmdHelp& help) {
     for (const auto& arg : help.requiredArgs) {
         longestStr = std::max(longestStr, arg.name.length());
     }
+    for (const auto& arg : help.optionalArgs) {
+        longestStr = std::max(longestStr, arg.name.length());
+        longestStr = std::max(longestStr, arg.name2.length());
+    }
     const auto minSize = std::strlen(LGS_USAGE_STR);
     if (longestStr < minSize) longestStr = minSize;
     maxStr = longestStr;
 }
 
 void LgsCliCmd::printArg(std::ostringstream& txt, LgsCliCmdArgHelp& arg) const {
-    auto [name, type, defaultVal, possibleValues, desc] = arg;
+    auto [name, name2, type, defaultVal, possibleValues, desc] = arg;
     txt << padString(maxStr, name);
     txt << padString(maxStr, desc) << '\n';
+    txt << padString(maxStr, name2);
     if (!type.empty()) {
-        txt << padString(maxStr) + "Type: " << type << ".\n";
+        txt << "Type: " << type << ".\n";
     }
     if (!defaultVal.empty()) {
         txt << padString(maxStr) + "Default: " << defaultVal << ".\n";

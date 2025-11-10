@@ -1,7 +1,7 @@
 #pragma once
 #include <cmath>
 
-enum Lgs_RTType {
+enum Lgs_TypeKind {
     RTT_UNKNOWN,
     RTT_VOID,
     RTT_BOOL,
@@ -35,11 +35,10 @@ enum Lgs_RTType {
 struct Lgs_Object {
     const char* name;
     size_t fieldCount;
-    Lgs_RTType* fieldTypes;
+    Lgs_TypeKind* fieldTypes;
 };
 
 struct Lgs_SArray {
-    Lgs_RTType baseType;
+    Lgs_TypeKind baseType;
     size_t length;
 };
-

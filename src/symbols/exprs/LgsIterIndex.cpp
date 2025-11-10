@@ -48,8 +48,9 @@ void LgsIterIndex::setIRElementPtr(LgsLLVMGen& cg, const bool assign) {
     auto fromIR = index.from->IRValue;
     assert(baseExpr->IRValue);
     if (baseExpr->type->asSArray()) {
-        IRValue = cg.builder.CreateInBoundsGEP(type->getIRType(cg), baseExpr->IRValue, fromIR);
-        if (type->getIRType(cg)->isPointerTy()) {
+        const auto ty = type->getIRType(cg);
+        IRValue = cg.builder.CreateInBoundsGEP(ty, baseExpr->IRValue, fromIR);
+        if (ty->isPointerTy()) {
             IRValue = cg.builder.CreateLoad(cg.ptrTy(), IRValue);
         }
         return;
@@ -67,7 +68,7 @@ void LgsIterIndex::setIRElementPtr(LgsLLVMGen& cg, const bool assign) {
     }
 }
 
-void LgsIterIndex::setRangeIRElementPtr(LgsLLVMGen& cg, bool assign) {
+void LgsIterIndex::setIRRangePtr(LgsLLVMGen& cg, bool assign) {
     assert(!assign);
     const auto fromIR = index.from->IRValue;
     const auto toIR = index.to->IRValue;
@@ -76,7 +77,7 @@ void LgsIterIndex::setRangeIRElementPtr(LgsLLVMGen& cg, bool assign) {
         const auto size = cg.builder.CreateSub(toIR, fromIR);
         const auto sizeWithNull = cg.builder.CreateAdd(size, cg.i32(1));
         IRValue = cg.builder.CreateAlloca(cg.i8Ty(), sizeWithNull);
-        const auto src = cg.builder.CreateInBoundsGEP(cg.i8Ty(), baseExpr->IRValue, fromIR);
+        const auto src = cg.builder.CreateInBoundsGEP(cg.i8Ty(), baseExpr->IRValue, {fromIR});
         cg.callMemCpy(IRValue, src, size);
         cg.addNullTerminate(IRValue, size);
     } else if (const auto sArray = type->asSArray()) {
