@@ -277,14 +277,13 @@ void LgsCodeGen::visitRangeLoop(LgsRangeLoop* loop) {
 
 void LgsCodeGen::visitForeachLoop(LgsForeachLoop* loop) {
     visitExpr(loop->iterExpr);
-    const auto indexTy = cg.i64Ty();
+    const auto indexTy = cg.i32Ty();
     loop->iPtr = cg.builder.CreateAlloca(indexTy);
-    cg.builder.CreateStore(cg.i64Zero(), loop->iPtr);
-    const auto loopEnd = cg.builder.CreateSExt(loop->loopEnd(cg), indexTy);
+    cg.builder.CreateStore(cg.i32Zero(), loop->iPtr);
     cg.branchAndStartBlock(loop->IRCondBlock);
 
-    loop->iValue = cg.builder.CreateLoad(cg.i32Ty(), loop->iPtr);
-    const auto condition = cg.builder.CreateICmpSLT(loop->iValue, loopEnd);
+    loop->iValue = cg.builder.CreateLoad(indexTy, loop->iPtr);
+    const auto condition = cg.builder.CreateICmpSLT(loop->iValue, loop->loopEnd(cg));
     cg.builder.CreateCondBr(condition, loop->IRBodyBlock, loop->IRExitBlock);
     cg.startBlock(loop->IRBodyBlock);
 

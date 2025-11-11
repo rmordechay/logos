@@ -31,4 +31,5 @@ public:
     void skipWhitespace();
     void skipLineComment();
     void skipBlockComment();
+    void scanEscapeChar(std::string& result);
 };

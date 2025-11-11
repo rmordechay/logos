@@ -35,6 +35,7 @@ bool LgsPaths::findCLibHeaders() {
         const auto end = line.find_last_not_of("\r\n");
         if (start == std::string::npos || end == std::string::npos) continue;
         auto dir = fs::path(line.substr(start, end - start + 1));
+        // Try to find c common files to make sure we are certainly in the right dir
         if (fs::exists(dir / "stdio.h") && fs::exists(dir / "stdlib.h")) {
             cLibHeadersDir = dir;
             break;

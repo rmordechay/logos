@@ -1,11 +1,9 @@
 #include "exprs/LgsFuncCall.h"
 #include "data/LgsDefinitions.h"
 #include "exprs/LgsHashMap.h"
-#include "exprs/LgsVariable.h"
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
 #include "utils/LgsUtils.h"
-
 #include <iostream>
 #include <sstream>
 
@@ -28,9 +26,12 @@ bool LgsFuncCall::equals(const LgsFuncType* funcType) const {
 }
 
 bool LgsFuncCall::equalsVariadic(const LgsFuncType* funcType) const {
-    if (args.size() - funcType->isMethod <= funcType->params.size()) return false;
+    const auto argsSize = args.size() - funcType->isMethod;
+    const auto paramsSize = funcType->params.size();
+    const auto minArgs = funcType->isExternal ? paramsSize - 1 : paramsSize + 1;
+    if (argsSize < minArgs) return false;
     // Check all args until the variadic param
-    for (size_t i = funcType->isMethod; i < funcType->params.size() - 1; ++i) {
+    for (size_t i = funcType->isMethod; i < paramsSize - 1; ++i) {
         if (i >= args.size()) continue;
         const auto arg = args[i];
         const auto param = funcType->params[i];

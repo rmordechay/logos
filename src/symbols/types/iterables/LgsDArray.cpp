@@ -22,6 +22,17 @@ LgsFunc* LgsDArray::getMethod(const std::string& methodName) {
     return LgsIterable::getMethod(methodName);
 }
 
+bool LgsDArray::inferBaseType(const std::vector<LgsExpr*>& args) {
+    assert(!args.empty() && !baseType);
+    const auto baseExprType = args.front()->type;
+    for (size_t i = 1; i < args.size(); ++i) {
+        const auto arg = args[i];
+        if (!baseExprType->canCastTo(arg->type)) return false;
+    }
+    baseType = baseExprType;
+    return true;
+}
+
 Type* LgsDArray::getIRType(LgsLLVMGen& cg) {
     if (IRType) return IRType;
     IRType = cg.getStructType({cg.ptrTy(), cg.sizeTy(), cg.sizeTy(), cg.ptrTy(), cg.i32Ty()}, name);
@@ -72,20 +83,11 @@ LgsFunc* LgsDArray::getAddFunc() {
     const auto func = methods.find(ADD_FUNC_NAME);
     if (func != methods.end() && func->second) return func->second;
     func->second = new LgsFunc(ADD_FUNC_NAME, &LGS_VOID, {this, baseType}, BUILTIN | PUBLIC | METHOD);
-    func->second->fn = [this](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
-        if (!baseType->isPrimitive) {
-            return cg.callLgsFunc(std::string(name) + "_add", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {cg.getPtrTo(args[0]->IRValue), args[1]->IRValue});
-        }
-        if (baseType->asInt()) {
-            return cg.callLgsFunc(std::string(name) + "_addInt", cg.voidTy(), {cg.ptrTy(), cg.i32Ty()}, {cg.getPtrTo(args[0]->IRValue), args[1]->IRValue});
-        }
-        if (baseType->asLong()) {
-            return cg.callLgsFunc(std::string(name) + "_addLong", cg.voidTy(), {cg.ptrTy(), cg.i64Ty()}, {cg.getPtrTo(args[0]->IRValue), args[1]->IRValue});
-        }
-        if (baseType->asSize()) {
-            return cg.callLgsFunc(std::string(name) + "_addSize", cg.voidTy(), {cg.ptrTy(), cg.i64Ty()}, {cg.getPtrTo(args[0]->IRValue), args[1]->IRValue});
-        }
-        assert(0);
+    func->second->fn = [](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
+        return cg.callLgsFunc(std::string(name) + "_add", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {
+            cg.getPtrTo(args[0]->IRValue),
+            cg.getPtrTo(args[1]->IRValue),
+        });
     };
     methods[func->second->funcType->name] = func->second;
     return func->second;

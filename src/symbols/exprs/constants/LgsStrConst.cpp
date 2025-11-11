@@ -30,7 +30,7 @@ Value* LgsStrConst::loadIR(LgsLLVMGen& cg) {
 
 std::string LgsStrConst::asText() {
     const auto quote = isSingleQuoted ? '\'' : '\"';
-    return quote + replaceStrEscapes(value) + quote;
+    return quote + scanEscapeStr(value) + quote;
 }
 
 Value* LgsStrConst::hash(LgsLLVMGen& cg) {

@@ -80,7 +80,7 @@ std::string getLine(const std::string& filename, const size_t lineNumber) {
 }
 
 std::string trim(const std::string& str) {
-    const auto start = std::find_if(str.begin(), str.end(), [](const unsigned char ch) {
+    const auto start = std::ranges::find_if(str, [](const unsigned char ch) {
         return !std::isspace(ch);
     });
     const auto end = std::find_if(str.rbegin(), str.rend(), [](const unsigned char ch) {
@@ -105,7 +105,7 @@ std::string formatErrorMsg(const std::string& msg, const std::vector<std::string
     return result;
 }
 
-std::string replaceStrEscapes(const std::string& value) {
+std::string scanEscapeStr(const std::string& value) {
     std::string escaped;
     escaped.reserve(value.size());
     for (const char c : value) {

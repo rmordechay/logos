@@ -33,7 +33,7 @@ std::string getFileText(const fs::path& filePath);
 std::string getLine(const std::string& filename, size_t lineNumber);
 std::string trim(const std::string& str);
 std::string getFullPath(const LgsLocation& location, const std::string& filePath);
-std::string replaceStrEscapes(const std::string& value);
+std::string scanEscapeStr(const std::string& value);
 time_t getLastWritten(const fs::path& filePath);
 
 void logInfo(const std::string& msg = "", bool withNewLine = false);
