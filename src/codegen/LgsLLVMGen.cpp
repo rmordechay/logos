@@ -1,5 +1,7 @@
 #include "data/LgsDefinitions.h"
 #include "files/LgsFile.h"
+#include "utils/LgsUtils.h"
+
 #include <llvm/Support/FileSystem.h>
 #include <llvm/Bitcode/BitcodeWriter.h>
 #include <llvm/IR/Module.h>
@@ -163,6 +165,10 @@ Value* LgsLLVMGen::callRuntimeFunc(const std::string& funcName, Type* rt, const 
     return callFunc(LGS_RUNTIME_PREFIX + funcName, rt, paramTypes, args);
 }
 
+Value* LgsLLVMGen::callHash(const std::string& str) {
+    return i32(hashString(str));
+}
+
 Value* LgsLLVMGen::callHash(Value* arg) {
     return callLgsFunc("hash", i32Ty(), {ptrTy()}, {arg});
 }
@@ -172,7 +178,7 @@ Value* LgsLLVMGen::callPrintf(const std::vector<Value*>& args) {
 }
 
 Value* LgsLLVMGen::callSprintf(const std::vector<Value*>& args) {
-    return callFunc("sprintf", i32Ty(), {ptrTy()}, args, true);
+    return callFunc("sprintf", i32Ty(), {ptrTy(), sizeTy(), ptrTy()}, args, true);
 }
 
 Value* LgsLLVMGen::callStrLen(Value* str) {
@@ -211,11 +217,11 @@ void LgsLLVMGen::callPopStack(const bool hasDefers, const bool needsCleanup) {
     callRuntimeFunc("pop", voidTy(), {i1Ty()}, {i1(needsCleanup)});
 }
 
-void LgsLLVMGen::callAddToVTable(Value* instance, Value* key, Value* ptr) {
+void LgsLLVMGen::addToVTable(Value* instance, Value* key, Value* ptr) {
     callRuntimeFunc("addToVTable", voidTy(), {ptrTy(), i32Ty(), ptrTy()}, {instance, key, ptr});
 }
 
-Value* LgsLLVMGen::callGetFromVTable(Value* instance, Value* key) {
+Value* LgsLLVMGen::getFromVTable(Value* instance, Value* key) {
     return callRuntimeFunc("getFromVTable", ptrTy(), {ptrTy(), i32Ty()}, {instance, key});
 }
 

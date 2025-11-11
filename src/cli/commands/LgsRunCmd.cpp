@@ -33,7 +33,7 @@ bool LgsRunCmd::parseArgs(LgsApp& app, std::vector<const char*>& appArgs) const 
             argStart = i;
             break;
         }
-        const auto textStart = arg[1] == '-' ? 1 : 2;
+        const auto textStart = arg[1] == '-' ? 2 : 1;
         const auto name = std::string(arg).substr(textStart);
         if (name[0] == 'o' || name == "optimize") {
             const auto optLevel = parseInt(i, name);
@@ -49,6 +49,9 @@ bool LgsRunCmd::parseArgs(LgsApp& app, std::vector<const char*>& appArgs) const 
         }
         if (name[0] == 'c' || name == "code") {
             app.configs.appMode = FILE_MODE;
+        }
+        if (name[0] == 'd' || name == "debug") {
+            app.configs.debugMode = true;
         }
     }
 

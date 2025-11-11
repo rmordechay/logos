@@ -150,7 +150,7 @@ std::string scanEscapeStr(const std::string& value) {
     return out;
 }
 
-std::size_t hashString(const std::string& str) {
+int32_t hashString(const std::string& str) {
     return std::hash<std::string_view>{}(str);
 }
 

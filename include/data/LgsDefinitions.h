@@ -56,7 +56,6 @@
 #define LGS_PADDING_SIZE std::strlen(LGS_ERROR_TEXT)
 #define LGS_ERROR_PADDING '\n' + std::string(LGS_PADDING_SIZE, ' ')
 
-#define nakedf __attribute__((naked))
 
 #if defined(_WIN32)
 #include <windows.h>
@@ -71,3 +70,6 @@
 #else
     assert(0);
 #endif
+
+#define nakedf __attribute__((naked))
+#define weakf __attribute__((weak))

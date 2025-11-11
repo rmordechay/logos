@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.22)
 project(logos VERSION 0.0.1)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_definitions(-DLOGOS_VERSION="${CMAKE_PROJECT_VERSION}")
 option(LOGOS_RELEASE "Build release version" OFF)

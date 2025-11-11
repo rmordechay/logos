@@ -37,18 +37,13 @@ size_t LgsFuncType::getSizeBytes() {
 std::string LgsFuncType::getName() {
     if (IRName != "") return IRName;
     std::stringstream strStream;
-    if (!isBuiltin && !isExternal) {
-        strStream << "u_";
-    } else {
-        strStream << LGS_NAME_PREFIX;
+    if (!isExternal) {
+        if (isBuiltin) strStream << LGS_NAME_PREFIX;
+        else strStream << "u_";
     }
-    if (parentName != "") {
-        strStream << parentName << "_";
-    }
+    if (!isVirtual && parentName != "") strStream << parentName << "_";
     strStream << name;
-    if (isCoroutine) {
-        strStream << LGS_CORO_SUFFIX;
-    }
+    if (isCoroutine) strStream << LGS_CORO_SUFFIX;
     IRName = strStream.str();
     return IRName;
 }
@@ -71,11 +66,8 @@ std::string LgsFuncType::pname() {
         }
         if (i != params.size() - 1) str << ", ";
     }
-    if (rt) {
-        str << "): " << rt->pname();
-    } else {
-        str << ')';
-    }
+    if (rt) str << "): " << rt->pname();
+    else str << ')';
     return str.str();
 }
 

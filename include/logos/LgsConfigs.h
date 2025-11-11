@@ -1,9 +1,12 @@
 #pragma once
 #include <string>
+#include <cstdlib>
 
 #define STACK_CAPACITY 1024
 #define LOCALS_CAPACITY 8
 #define BIG_SIZE_THRESHOLD 4
+#define STRING_BUFFER_SIZE 1024
+#define MAX_ELEMENT_SIZE 1024*100
 
 enum LgsLogLevel {
     LGS_INFO,

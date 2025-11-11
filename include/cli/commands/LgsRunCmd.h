@@ -40,6 +40,13 @@ inline LgsCliCmdHelp runCmdHelp{
             .defaultVal = "false",
             .desc = "Code mode. Run Logos code by passing code directly."
         },
+        {
+            .name = "-d",
+            .name2 = "--debug",
+            .type = LgsBool::name,
+            .defaultVal = "false",
+            .desc = "Run Logos code in debug mode."
+        },
     },
     .examples = {
         "lgs run app.lgs",

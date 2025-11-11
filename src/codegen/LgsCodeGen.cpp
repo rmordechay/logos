@@ -84,7 +84,6 @@ void LgsCodeGen::visitMainFile(LgsMainFile* mainFile) {
     for (const auto object : mainFile->objects) {
         visitObject(object);
     }
-
     for (auto [_, genericsCall] : file.symbolTable.genericCalls) {
         visitFunc(genericsCall);
     }
@@ -906,7 +905,8 @@ void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
         funcCall->func->IRValue = getIRValue(value);
     }
 
-    const auto ft = funcCall->func->funcType;
+    const auto func = funcCall->func;
+    const auto ft = func->funcType;
     assert(ft);
     if (ft->hasDefaults) {
         const auto diff = ft->params.size() - funcCall->args.size() - 1;
@@ -916,21 +916,19 @@ void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
     }
 
     if (ft->isVirtual) {
-        assert(!funcCall->args.empty());
-        const auto parentPtr = funcCall->args.front();
-        assert(parentPtr.isSelf);
-        const auto id = cg.i32(hashString(funcCall->name));
-        funcCall->func->IRValue = cg.callGetFromVTable(parentPtr.expr->IRValue, id);
-    } else if (funcCall->func->funcType->isArrFunc) {
+        const auto name = func->funcType->getName();
+        const auto id = cg.callHash(name);;
+        func->IRValue = cg.getFromVTable(funcCall->parentPtr->IRValue, id);
+    } else if (func->funcType->isArrFunc) {
         visitIterFunc(funcCall);
     }
-    if (!funcCall->func->funcType->generics.empty()) visitGenericFunc(funcCall->func);
+    if (!func->funcType->generics.empty()) visitGenericFunc(func);
     if (funcCall->isCoroutine || funcCall->isDeferred) return;
 
     std::vector<LgsExpr*> args;
     args.reserve(funcCall->args.size());
     for (const auto& arg : funcCall->args) args.emplace_back(arg.expr);
-    funcCall->IRValue = funcCall->func->call(cg, args, funcCall->generics);
+    funcCall->IRValue = func->call(cg, args, funcCall->generics);
     if (appConfigs.debugMode) funcCall->setDebugValue(cg);
 }
 
@@ -1005,12 +1003,12 @@ void LgsCodeGen::visitStrConst(LgsStrConst* strConst) {
                 formatted.replace(pos, strlen(LGS_STR_FMT_PLACEHOLDER), part->type->strFormatPart());
             }
         }
-        const auto arrTyp = ArrayType::get(cg.i8Ty(), 1024);
+        const auto arrTyp = ArrayType::get(cg.i8Ty(), STRING_BUFFER_SIZE);
         const auto buffer = cg.builder.CreateAlloca(arrTyp);
         strConst->IRValue = buffer;
         std::vector<Value*> IRArgs = {strConst->IRValue, cg.getIRStr(formatted + "\n")};
         IRArgs.insert(IRArgs.end(), values.begin(), values.end());
-        // cg.callSprintf(IRArgs);
+        cg.callSprintf(IRArgs);
     }
 }
 
@@ -1470,16 +1468,16 @@ bool LgsCodeGen::allArgsAreConst(const std::vector<LgsExpr*>& args) {
 
 void LgsCodeGen::addVirtuals(LgsType* type, Value* ptr) const {
     for (const auto& field : type->fields) {
-        const auto id = hashString(field->name);
+        const auto id = cg.callHash(field->name);
         const auto objIR = type->getIRType(cg);
         const auto fieldGEP = cg.builder.CreateStructGEP(objIR, ptr, field->position);
-        cg.callAddToVTable(ptr, cg.i32(id), fieldGEP);
+        cg.addToVTable(ptr, id, fieldGEP);
     }
 
-    for (const auto& [methodName, method] : type->methods) {
-        const auto id = hashString(methodName);
+    for (const auto& [_, method] : type->methods) {
+        const auto id = cg.callHash(method->funcType->getName());
         const auto IRFunc = method->getIRFunc(cg);
-        cg.callAddToVTable(ptr, cg.i32(id), IRFunc);
+        cg.addToVTable(ptr, id, IRFunc);
     }
 
     // Implemented interface methods
@@ -1490,9 +1488,9 @@ void LgsCodeGen::addVirtuals(LgsType* type, Value* ptr) const {
             if (!interfaceMethod->stmtsBlock) continue;
             const auto objMethod = obj->methods.find(methodName);
             if (objMethod != obj->methods.end()) continue;
-            const auto id = hashString(methodName);
+            const auto id = cg.callHash(methodName);
             const auto IRFunc = interfaceMethod->getIRFunc(cg);
-            cg.callAddToVTable(ptr, cg.i32(id), IRFunc);
+            cg.addToVTable(ptr, id, IRFunc);
         }
     }
 }

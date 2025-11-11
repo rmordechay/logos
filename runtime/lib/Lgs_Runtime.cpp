@@ -1,23 +1,23 @@
+#include "LgsDefinitions.h"
 #include "Lgs_Arena.h"
-#include "Lgs_DArray.h"
 #include "Lgs_Scheduler.h"
 #include "Lgs_Stack.h"
 #include "Lgs_Types.h"
+#include "Lgs_Helpers.h"
 #include <cassert>
 #include <map>
 #include "Lgs_Map.h"
-#include "Lgs_Helpers.h"
 #include <iostream>
 #include <string>
 #include <unistd.h>
 
-__attribute__((weak)) Lgs_SArray Lgs_RTTypes_Arrays[] = {};
+weakf Lgs_SArray Lgs_RTTypes_Arrays[] = {};
 
 struct Lgs_Runtime {
     Lgs_Stack stack;
     Lgs_Arena arena;
     Lgs_Scheduler scheduler;
-    std::map<void*, std::map<uint32_t, void*>> vtable;
+    std::unordered_map<VKey, void*, VKeyHash> vtable;
 };
 
 static inline Lgs_Runtime runtime;
@@ -88,18 +88,14 @@ extern "C" bool Lgs_Runtime_shouldYield() {
     return runtime.scheduler.shouldYield();
 }
 
-extern "C" void Lgs_Runtime_addToVTable(void* instancePtr, const uint32_t name, void* ptr) {
-    runtime.vtable[instancePtr].emplace(name, ptr);
-}
-
-extern "C" void* Lgs_Runtime_getFromVTable(void* instancePtr, const uint32_t name) {
-    const auto instance = runtime.vtable.find(instancePtr);
-    if (instance == runtime.vtable.end()) assert(0);
-    const auto method = instance->second.find(name);
-    if (method == instance->second.end()) assert(0);
-    return method->second;
-}
-
 extern "C" void* Lgs_Runtime_allocate(const size_t size) {
     return runtime.arena.allocate(size);
+}
+
+extern "C" void Lgs_Runtime_addToVTable(void* instance, const int32_t virtualID, void* ptr) {
+    runtime.vtable[{instance, virtualID}] = ptr;
+}
+
+extern "C" void* Lgs_Runtime_getFromVTable(void* instance, const int32_t virtualID) {
+    return runtime.vtable[VKey{instance, virtualID}];
 }

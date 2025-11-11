@@ -1,5 +1,4 @@
 #include "analysis/LgsSema.h"
-
 #include "builtins/LgsReflect.h"
 #include "builtins/LgsTest.h"
 #include "funcs/LgsCoroutine.h"
@@ -52,7 +51,6 @@
 #include "types/primitives/LgsDouble.h"
 #include <iostream>
 #include <unordered_set>
-
 std::string getMissingImplementsStr(const std::vector<LgsField*>& fields, const std::vector<LgsFunc*>& methods);
 
 void LgsSema::analyse() {
@@ -898,6 +896,7 @@ void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent) {
         return addError(E10083, &methodCall->location, {method->funcType->pname()});
     }
 
+    methodCall->parentPtr = parent;
     if (method->funcType->isMethod) {
         methodCall->args.insert(methodCall->args.begin(), LgsFuncCallArg(LGS_SELF, parent, true));
     }

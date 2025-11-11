@@ -57,13 +57,13 @@ class LgsParser {
 public:
     LgsPaths& paths;
     bool headersOnly;
+    std::string code = "";
     LgsToken currentToken;
     size_t currentIndex = 0;
     size_t recursionCount = 0;
+    std::vector<LgsToken> tokens;
     LgsGlobals& globals;
     LgsFileMetadata& metadata;
-    std::vector<LgsToken> tokens;
-    std::string code = "";
     LgsErrHandler errHandler;
     LgsFunc* currentFunc = nullptr;
     std::vector<LgsStrConst*> cImports;

@@ -1858,6 +1858,7 @@ void LgsParser::extractStrParts(LgsStrConst& strConst) {
         const auto part = replaced.substr(open + 2, close - 2);
         LgsParser parser(metadata, paths, globals);
         parser.code = part;
+        parser.scanTokens();
         const auto expr = parser.parseExpr();
         strConst.parts.push_back(expr);
         replaced.replace(open, close + 1, LGS_STR_FMT_PLACEHOLDER);

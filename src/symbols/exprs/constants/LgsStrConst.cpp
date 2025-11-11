@@ -34,8 +34,7 @@ std::string LgsStrConst::asText() {
 }
 
 Value* LgsStrConst::hash(LgsLLVMGen& cg) {
-    const auto hashed = hashString(value.c_str());
-    return cg.usize(hashed);
+    return cg.callHash(value);
 }
 
 void LgsStrConst::hashNode(size_t& oldHash) {

@@ -17,9 +17,7 @@ public:
         addMethod(getMethodFunc);
         getMethodFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) -> Value* {
             if (args.size() < 2) return nullptr;
-            const auto instance = args[0]->IRValue;
-            const auto id = args[1]->hash(cg);
-            return cg.callGetFromVTable(instance, id);
+            assert(0);
         };
     }
 };

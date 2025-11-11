@@ -52,6 +52,7 @@ class LgsForLoop;
 struct LgsSymbol;
 struct LgsIndex;
 
+
 class LgsSema final {
 public:
     LgsFile* file;
@@ -142,4 +143,3 @@ public:
     LgsFunc* createGenericFunc(LgsFuncCall* funcCall, LgsFunc* func);
     void addError(const LgsBaseError& lgsErr, const LgsLocation* location, const std::vector<std::string>& args = {});
 };
-

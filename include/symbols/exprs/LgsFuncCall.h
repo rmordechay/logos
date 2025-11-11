@@ -22,6 +22,7 @@ public:
     bool isCoroutine = false;
     bool isDeferred = false;
     bool isNamed = false;
+    LgsExpr* parentPtr = nullptr;
     LgsSymbol ref;
 
     explicit LgsFuncCall(const std::string& name) : name(name) {}

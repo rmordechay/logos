@@ -57,6 +57,7 @@ public:
     Value* callIntrinsics(llvm::Intrinsic::ID name, const std::vector<Value*>& args, const std::vector<Type*>& types = {});
     Value* callLgsFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes = {}, const std::vector<Value*>& args = {});
     Value* callRuntimeFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes = {}, const std::vector<Value*>& args = {});
+    Value* callHash(const std::string& str);
     Value* callHash(Value* arg);
 
     // System
@@ -71,8 +72,8 @@ public:
     // Stack
     void callStackPush(bool hasDefers, bool needsCleanup);
     void callPopStack(bool hasDefers, bool needsCleanup = false);
-    void callAddToVTable(Value* instance, Value* key, Value* ptr);
-    Value* callGetFromVTable(Value* instance, Value* key);
+    void addToVTable(Value* instance, Value* key, Value* ptr);
+    Value* getFromVTable(Value* instance, Value* key);
     void addNullTerminate(Value* strPtr, Value* pos);
     void addHeap(bool isOwner, Lgs_TypeKind type, Value* ptr);
 
