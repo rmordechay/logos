@@ -122,7 +122,7 @@ bool LgsApp::parseHeaders() {
         if (fileMetadata.type != LGS_SRC_FILE) continue;
         threadPool.runTask([&fileMetadata, this] {
             const auto fileCode = getFileText(fileMetadata.path);
-            LgsParser parser(fileMetadata, appPaths, globals, true);
+            LgsParser parser(fileMetadata, appPaths, globals.table, true);
             parser.parseSrcFileHeaders();
         });
     }
@@ -181,7 +181,7 @@ bool LgsApp::generate() {
 
 bool LgsApp::link() {
     LgsLinker linker(configs, appPaths, srcFiles);
-    for (auto& [_, app] : globals.imports) {
+    for (auto& [_, app] : globals.table.imports) {
         linker.externalLibs.push_back(app->appPaths.rootPath);
     }
     return linker.link();
@@ -190,7 +190,7 @@ bool LgsApp::link() {
 void LgsApp::loadSrcFile(LgsFileMetadata& metadata) {
     if (metadata.id == 0) metadata.id = getNextFileID();
     const auto fileCode = getFileText(metadata.path);
-    LgsParser parser(metadata, appPaths, globals);
+    LgsParser parser(metadata, appPaths, globals.table);
     const auto file = parser.parseSrcFile(configs.isTestRun);
     {
         std::lock_guard lock(mtx);
@@ -205,7 +205,7 @@ void LgsApp::loadSrcFile(LgsFileMetadata& metadata) {
 
 void LgsApp::loadSrcFile(const std::string& fileCode, const fs::path& filePath) {
     LgsFileMetadata metadata(getNextFileID(), filePath);
-    LgsParser parser(metadata, appPaths, globals);
+    LgsParser parser(metadata, appPaths, globals.table);
     parser.code = fileCode;
     const auto file = parser.parseSrcFile(configs.isTestRun);
     {
@@ -228,7 +228,7 @@ bool LgsApp::loadConfigFile() {
         return false;
     }
     LgsFileMetadata metadata(getNextFileID(), appPaths.appConfigFile, LGS_APP_CONFIG_FILE);
-    LgsParser parser(metadata, appPaths, globals);
+    LgsParser parser(metadata, appPaths, globals.table);
     appConfigFile = parser.parseAppConfigFile();
     if (!parser.errHandler.successful) {
         errHandler.mergeErrors(parser.errHandler);
@@ -243,7 +243,7 @@ bool LgsApp::loadEnvFiles() {
         const auto filePath = metadata.path;
         if (!isLogosFile(filePath)) continue;
         threadPool.runTask([this, &metadata] {
-            LgsParser parser(metadata, appPaths, globals);
+            LgsParser parser(metadata, appPaths, globals.table);
             const auto envFile = parser.parseEnvFile();
             if (!envFile) return;
             metadata.hash = envFile->hashFile();
@@ -301,21 +301,21 @@ bool LgsApp::loadDeps() {
     //         errHandler.mergeErrorsWithLock(app->errHandler);
     //         return false;
     //     }
-    //     LgsTypeResolver typeResolver(app->errHandler, app->globals);
+    //     LgsTypeResolver typeResolver(app->errHandler, app->globals.symbolTable);
     //     if (!typeResolver.resolveGlobals(app->srcFiles, threadPool)) {
     //         errHandler.mergeErrorsWithLock(typeResolver.errHandler);
     //         return false;
     //     }
-    //     globals.imports[app->configs.name] = app;
+    //     globals.symbolTable.imports[app->configs.name] = app;
     // }
     return true;
 }
 
 void LgsApp::loadBuiltins() {
-    globals.addSymbol(LgsSymbol(new LgsSystem(), true, false), &errHandler);
-    globals.addSymbol(LgsSymbol(new LgsPrint(), true, false), &errHandler);
-    globals.addSymbol(LgsSymbol(new LgsTest(), true, false), &errHandler);
-    globals.addSymbol(LgsSymbol(new LgsReflect(), true, false), &errHandler);
+    globals.table.addSymbol(LgsSymbol(new LgsSystem(), true, false), &errHandler);
+    globals.table.addSymbol(LgsSymbol(new LgsPrint(), true, false), &errHandler);
+    globals.table.addSymbol(LgsSymbol(new LgsTest(), true, false), &errHandler);
+    globals.table.addSymbol(LgsSymbol(new LgsReflect(), true, false), &errHandler);
 }
 
 void LgsApp::createBuildDirs() {
@@ -454,8 +454,8 @@ LgsApp::~LgsApp() {
         delete testFile;
     }
     testFiles.clear();
-    for (const auto& [_, app] : globals.imports) {
+    for (const auto& [_, app] : globals.table.imports) {
         delete app;
     }
-    globals.imports.clear();
+    globals.table.imports.clear();
 }

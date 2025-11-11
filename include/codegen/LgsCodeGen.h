@@ -62,12 +62,12 @@ public:
     LgsStack stack;
     LgsLLVMGen& cg;
     LgsPaths& paths;
-    LgsSymbolTable& globals;
+    LgsGlobals& globals;
     LgsAppConfigs& appConfigs;
     Function* currentIRFunc = nullptr;
     static std::atomic<size_t> lambdasNameCounter;
 
-    explicit LgsCodeGen(LgsFile& file, LgsAppConfigs& appConfigs, LgsSymbolTable& globals, LgsPaths& paths)
+    explicit LgsCodeGen(LgsFile& file, LgsAppConfigs& appConfigs, LgsGlobals& globals, LgsPaths& paths)
         : file(file), cg(file.llvmCodeGen), paths(paths), globals(globals), appConfigs(appConfigs) {
     }
 

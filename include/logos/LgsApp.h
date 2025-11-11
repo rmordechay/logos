@@ -31,18 +31,17 @@ inline std::mutex mtx;
 class LgsApp final {
 public:
     LgsPaths appPaths;
-    LgsAppCache appCache;
-    LgsSymbolTable globals;
     LgsAppConfigs configs;
+    LgsGlobals globals;
+    LgsAppCache appCache;
     LgsErrHandler errHandler;
     LgsTypeResolver typeResolver;
     std::vector<LgsFile*> srcFiles;
     std::vector<LgsEnvFile*> envFiles;
     std::vector<LgsTestFile*> testFiles;
-    LgsAppConfigFile* appConfigFile = nullptr;
     std::atomic<FileID> nextFileID = 1;
-    // Used when passing code directly.
-    std::unordered_map<std::string, std::string> lgsCode;
+    LgsAppConfigFile* appConfigFile = nullptr;
+    std::unordered_map<std::string, std::string> lgsCode; // Used when passing code directly.
 
     explicit LgsApp(const fs::path& rootPath = ""): typeResolver(errHandler, globals) {
         appPaths.rootPath = rootPath;

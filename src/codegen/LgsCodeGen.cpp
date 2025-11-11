@@ -1419,7 +1419,7 @@ Value* LgsCodeGen::getIRValue(LgsValue* value) {
 
 void LgsCodeGen::createRTTypes() const {
     size_t currentID = 0;
-    for (auto [name, symbol] : globals.symbols) {
+    for (auto [name, symbol] : globals.table.symbols) {
         if (symbol.isBuiltin) continue;
         LgsType* c = nullptr;
         switch (symbol.symbolType) {

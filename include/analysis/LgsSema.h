@@ -57,14 +57,14 @@ public:
     LgsFile* file;
     LgsStack stack;
     LgsAppConfigs& appConfigs;
-    LgsSymbolTable& globals;
+    LgsGlobals& globals;
     LgsErrHandler errHandler;
     LgsTypeResolver typeResolver;
     std::unordered_map<std::string, size_t> refCount;
     std::unordered_map<std::string, LgsFunc*> corosRegistry;
     std::unordered_map<std::string, LgsFunc*> genericsRegistry;
 
-    explicit LgsSema(LgsAppConfigs& appConfigs, LgsFile* file, LgsSymbolTable& globals)
+    explicit LgsSema(LgsAppConfigs& appConfigs, LgsFile* file, LgsGlobals& globals)
         : file(file), appConfigs(appConfigs), globals(globals), typeResolver(errHandler, globals) {}
     void analyse();
     void resolveImports() const;

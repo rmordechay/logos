@@ -72,7 +72,7 @@ void LgsSema::analyse() {
         auto& globalsRegistry = globals.rtTypes;
         globalsRegistry.insert(globalsRegistry.end(), thisRegistry.begin(), thisRegistry.end());
         for (auto [name, count] : refCount) {
-            const auto symbol = globals.getSymbol(name);
+            const auto symbol = globals.table.getSymbol(name);
             if (!symbol) continue;
             symbol->refCount += count;
         }
@@ -81,8 +81,8 @@ void LgsSema::analyse() {
 
 void LgsSema::resolveImports() const {
     for (auto& [name, app] : file->symbolTable.imports) {
-        const auto it = globals.imports.find(name);
-        if (it == globals.imports.end()) continue;
+        const auto it = globals.table.imports.find(name);
+        if (it == globals.table.imports.end()) continue;
         app = it->second;
     }
 }
@@ -1402,7 +1402,7 @@ void LgsSema::addHeapExpr(LgsExpr* expr) {
 
 void LgsSema::addLocalSymbol(const LgsSymbol& newSymbol) {
     auto symbolName = *newSymbol.name;
-    const auto symbol = globals.getSymbol(symbolName);
+    const auto symbol = globals.table.getSymbol(symbolName);
     if (symbol && symbol->isBuiltin) {
         return errHandler.addError(E10053, newSymbol.location, file->path, {symbolName});
     }
@@ -1413,7 +1413,7 @@ void LgsSema::addLocalSymbol(const LgsSymbol& newSymbol) {
 }
 
 LgsSymbol* LgsSema::getSymbol(const std::string& name, const LgsLocation* location) {
-    if (const auto globalSymbol = globals.getSymbol(name)) {
+    if (const auto globalSymbol = globals.table.getSymbol(name)) {
         if (!globalSymbol->isBuiltin) refCount[*globalSymbol->name]++;
         return globalSymbol;
     }
@@ -1421,7 +1421,7 @@ LgsSymbol* LgsSema::getSymbol(const std::string& name, const LgsLocation* locati
         return fileSymbol;
     }
     for (auto [_, app] : file->symbolTable.imports) {
-        if (const auto s = app->globals.getSymbol(name)) {
+        if (const auto s = app->globals.table.getSymbol(name)) {
             return s;
         }
     }
