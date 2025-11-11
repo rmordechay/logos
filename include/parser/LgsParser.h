@@ -5,9 +5,10 @@
 #include "loops/LgsForeachLoop.h"
 #include "utils/LgsErrHandler.h"
 #include "data/LgsPlmErrors.h"
+#include "exprs/LgsFuncCall.h"
 #include "funcs/LgsMainFunc.h"
 
-class LgsGeneric;
+class LgsGenericType;
 struct LgsPaths;
 struct LgsSymbol;
 struct LgsAppConfigs;
@@ -87,7 +88,7 @@ public:
     LgsInterface* parseInterface();
     LgsObject* parseObjectBody(const LgsToken& tokenName, bool isSingleton);
     LgsInterface* parseInterfaceBody(const LgsToken& tokenName);
-    LgsGeneric* parseBaseGeneric();
+    LgsGenericType* parseBaseGeneric();
     LgsField* parseField(size_t fieldPosition);
     LgsIOPair* parseIOPair();
 
@@ -129,6 +130,8 @@ public:
     LgsExpr* parseExprWithPrecedence(int minPrecedence);
     LgsExpr* parseUnary(bool withInstance = true);
     LgsVariable* parseVariable();
+    void parseArgs(LgsInstance* instance);
+    void parseArgs(LgsFuncCall* funcCall);
     LgsInstance* parseInstance();
     LgsFuncCall* parseFuncCall();
     LgsVectorExpr* parseVectorExpr();
@@ -165,7 +168,7 @@ public:
     // Parser
     bool isEOF();
     void reset(size_t index);
-    LgsToken consume();
+    LgsToken consume(size_t times = 1);
     LgsToken peek(size_t i = 1);
     bool matchAndConsume(LgsTokenType token);
     bool matchOrReset(LgsTokenType t2, size_t resetIndex);
@@ -174,4 +177,5 @@ public:
     bool parsedOrReset(const void* value, size_t resetIndex);
     void addParsingError();
     void recursionGuard();
+    void addError(const LgsBaseError& lgsErr, const LgsLocation* location, const std::vector<std::string>& args);
 };

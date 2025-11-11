@@ -59,7 +59,6 @@ Value* LgsFunc::call(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args, const st
             IRArgs.emplace_back(arg->castToIR(cg, param.type));
         }
     }
-
     if (funcType->hasDefaults) {
         const auto diff = funcType->params.size() - args.size() - 1;
         for (size_t i = diff; i < funcType->params.size(); ++i) {

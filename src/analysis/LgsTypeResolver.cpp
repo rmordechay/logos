@@ -11,7 +11,7 @@
 #include "stmts/LgsIOPair.h"
 #include "types/LgsEnum.h"
 #include "types/LgsFuncType.h"
-#include "types/LgsGeneric.h"
+#include "types/LgsGenericType.h"
 #include "types/LgsInterface.h"
 #include "types/iterables/LgsIterable.h"
 #include "types/LgsNullable.h"
@@ -80,7 +80,6 @@ LgsType* LgsTypeResolver::resolveType(LgsType* type, LgsFile* file) {
             break;
         case GENERIC:
             newType = symbol->generic->clone();
-            newType->isGeneric = true;
             break;
         case VAR_DEC:
         case PARAM:

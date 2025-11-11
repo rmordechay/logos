@@ -7,7 +7,7 @@
 #include "types/LgsObject.h"
 #include "types/iterables/LgsDArray.h"
 #include "types/LgsEnum.h"
-#include "types/LgsGeneric.h"
+#include "types/LgsGenericType.h"
 #include "types/iterables/LgsMap.h"
 #include "types/LgsNullable.h"
 #include "types/LgsSubType.h"
@@ -278,8 +278,8 @@ LgsEnum* LgsType::asEnum() {
     return dynamic_cast<LgsEnum*>(this);
 }
 
-LgsGeneric* LgsType::asGeneric() {
-    return dynamic_cast<LgsGeneric*>(this);
+LgsGenericType* LgsType::asGeneric() {
+    return dynamic_cast<LgsGenericType*>(this);
 }
 
 LgsNullable* LgsType::asNullable() {

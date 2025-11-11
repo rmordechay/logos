@@ -42,7 +42,7 @@
 #include "stmts/LgsReturn.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsEnum.h"
-#include "types/LgsGeneric.h"
+#include "types/LgsGenericType.h"
 #include "types/LgsInterface.h"
 #include "types/LgsSubType.h"
 #include "types/LgsUnknown.h"
@@ -180,8 +180,7 @@ LgsAppConfigFile* LgsParser::parseAppConfigFile() {
     }
 
     if (currentToken.lexeme == "required" && peek().lexeme == LGS_ENVS_DIR) {
-        consume();
-        consume();
+        consume(2);
         mustMatch(T_LBRACE);
         if (!matchAndConsume(T_RBRACE)) {
             while (true) {
@@ -408,9 +407,9 @@ LgsInterface* LgsParser::parseInterfaceBody(const LgsToken& tokenName) {
     return interface;
 }
 
-LgsGeneric* LgsParser::parseBaseGeneric() {
+LgsGenericType* LgsParser::parseBaseGeneric() {
     if (currentToken.type != T_IDENTIFIER) return nullptr;
-    const auto generic = new LgsGeneric(currentToken.lexeme);
+    const auto generic = new LgsGenericType(currentToken.lexeme);
     setLocation(generic->location, &currentToken);
     consume();
     return generic;
@@ -512,8 +511,7 @@ LgsSubType* LgsParser::parseSubtype() {
     }
     if (currentToken.type == T_IDENTIFIER && peek().type == T_EQUAL) {
         const auto lType = currentToken;
-        consume();
-        consume();
+        consume(2);
         const auto rType = parseType();
         mustParse(rType);
         const auto subtype = new LgsSubType(lType.lexeme, rType);
@@ -658,10 +656,9 @@ LgsFunc* LgsParser::parseMethod(LgsObject* obj) {
 LgsFuncType* LgsParser::parseFuncHeader() {
     const auto nameToken = currentToken;
     if (currentToken.type != T_IDENTIFIER) return nullptr;
-    std::vector<LgsGeneric*> generics;
+    std::vector<LgsGenericType*> generics;
     if (peek().type == T_LANGLE) {
-        consume();
-        consume();
+        consume(2);
         while (true) {
             const auto type = parseBaseGeneric();
             if (!type) break;
@@ -673,8 +670,7 @@ LgsFuncType* LgsParser::parseFuncHeader() {
     } else if (peek().type != T_LPAREN) {
         return nullptr;
     } else {
-        consume();
-        consume();
+        consume(2);
     }
     const auto funcType = new LgsFuncType();
     setLocation(funcType->location, &nameToken);
@@ -1228,6 +1224,54 @@ LgsVariable* LgsParser::parseVariable() {
     return var;
 }
 
+void LgsParser::parseArgs(LgsInstance* instance) {
+    if (currentToken.type == T_RBRACE) return;
+    std::unordered_set<std::string> seen;
+    while (true) {
+        const auto argNameToken = currentToken;
+        if (!mustMatch(T_IDENTIFIER)) break;
+        if (!mustMatch(T_EQUAL)) break;
+        const auto expr = parseExpr();
+        if (!mustParse(expr)) continue;
+        auto argName = argNameToken.lexeme;
+        if (!seen.insert(argName).second) {
+            addError(E10054, &expr->location, {argName});
+            break;
+        }
+        instance->args.emplace(argName, LgsInstanceArg{argName, expr});
+        if (currentToken.type == T_RBRACE) break;
+        mustMatch(T_COMMA);
+    }
+    if (currentToken.type == T_COMMA) consume();
+}
+
+void LgsParser::parseArgs(LgsFuncCall* funcCall) {
+    if (currentToken.type == T_RPAREN) return;
+    std::unordered_set<std::string> seen;
+    while (true) {
+        std::string argName = "";
+        if (currentToken.type == T_IDENTIFIER && peek().type == T_EQUAL) {
+            funcCall->isNamed = true;
+            argName = currentToken.lexeme;
+            consume(2);
+            const auto expr = parseExpr();
+            if (!mustParse(expr)) break;
+            if (!seen.insert(argName).second) {
+                addError(E10054, &expr->location, {argName});
+                break;
+            }
+            funcCall->args.emplace_back(LgsFuncCallArg{argName, expr});
+        } else {
+            const auto expr = parseExpr();
+            if (!mustParse(expr)) break;
+            funcCall->args.emplace_back(LgsFuncCallArg{argName, expr});
+        }
+        if (currentToken.type == T_RPAREN) break;
+        mustMatch(T_COMMA);
+    }
+    if (currentToken.type == T_COMMA) consume();
+}
+
 LgsInstance* LgsParser::parseInstance() {
     const auto tokenName = currentToken;
     const auto oldIndex = currentIndex;
@@ -1245,26 +1289,8 @@ LgsInstance* LgsParser::parseInstance() {
     setLocation(instance->location, &tokenName);
     instance->setType(new LgsUnknown(instance->name));
     instance->generics = generics;
-
-    if (!matchAndConsume(T_RBRACE)) {
-        while (true) {
-            const auto argNameToken = currentToken;
-            if (!mustMatch(T_IDENTIFIER)) break;
-            if (!mustMatch(T_EQUAL)) break;
-            const auto expr = parseExpr();
-            if (!mustParse(expr)) continue;
-            if (!instance->args.contains(argNameToken.lexeme)) {
-                instance->args[argNameToken.lexeme] = expr;
-            } else {
-                errHandler.addError(E10054, &expr->location, metadata.path, {argNameToken.lexeme});
-            }
-            if (currentToken.type == T_RBRACE) break;
-            mustMatch(T_COMMA);
-        }
-        if (currentToken.type == T_COMMA) consume();
-        mustMatch(T_RBRACE);
-    }
-
+    parseArgs(instance);
+    mustMatch(T_RBRACE);
     return instance;
 }
 
@@ -1282,24 +1308,13 @@ LgsFuncCall* LgsParser::parseFuncCall() {
     } else if (peek().type != T_LPAREN) {
         return nullptr;
     } else {
-        consume();
-        consume();
+        consume(2);
     }
     const auto funcCall = new LgsFuncCall(nameToken.lexeme);
     setLocation(funcCall->location, &nameToken);
     funcCall->generics = generics;
-
-    if (!matchAndConsume(T_RPAREN)) {
-        while (true) {
-            const auto expr = parseExpr();
-            if (!expr) break;
-            funcCall->args.push_back(expr);
-            if (currentToken.type == T_RPAREN) break;
-            mustMatch(T_COMMA);
-        }
-        if (currentToken.type == T_COMMA) consume();
-        mustMatch(T_RPAREN);
-    }
+    parseArgs(funcCall);
+    mustMatch(T_RPAREN);
     return funcCall;
 }
 
@@ -1605,7 +1620,7 @@ LgsSelection* LgsParser::parseSelection(LgsExpr* firstExpr) {
     while (true) {
         LgsExpr* expr = nullptr;
         if (const auto funcCall = parseFuncCall()) {
-            funcCall->isMethodCall = true;
+            funcCall->inSelection = true;
             expr = funcCall;
         } else if (const auto variable = parseVariable()) {
             expr = variable;
@@ -1897,7 +1912,7 @@ void LgsParser::validateTestFolder(const LgsFile* testFile) {
         currentPath = currentPath.parent_path();
     }
     if (!foundTestsFolder) {
-        errHandler.addError(E10079, &testFile->location, metadata.path, {testFile->path.filename()});
+        addError(E10079, &testFile->location, {testFile->path.filename()});
     }
 }
 
@@ -1920,10 +1935,12 @@ void LgsParser::reset(const size_t index) {
     currentToken = tokens[currentIndex];
 }
 
-LgsToken LgsParser::consume() {
+LgsToken LgsParser::consume(const size_t times) {
     if (!isEOF()) {
-        currentIndex++;
-        currentToken = tokens[currentIndex];
+        for (size_t i = 0; i < times; ++i) {
+            currentIndex++;
+            currentToken = tokens[currentIndex];
+        }
     }
     return tokens[currentIndex];
 }
@@ -1985,4 +2002,9 @@ void LgsParser::addParsingError() {
 void LgsParser::recursionGuard() {
     if (recursionCount++ < MAX_TOKENS_NUMBER) return;
     assert(0);
+}
+
+void LgsParser::addError(const LgsBaseError& lgsErr, const LgsLocation* location,
+    const std::vector<std::string>& args) {
+    errHandler.addError(lgsErr, location, metadata.path, args);
 }

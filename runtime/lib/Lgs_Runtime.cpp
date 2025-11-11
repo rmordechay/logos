@@ -11,15 +11,16 @@
 #include <string>
 #include <unistd.h>
 
+__attribute__((weak)) Lgs_SArray Lgs_RTTypes_Arrays[] = {};
+
 struct Lgs_Runtime {
     Lgs_Stack stack;
     Lgs_Arena arena;
     Lgs_Scheduler scheduler;
-    std::map<void*, std::map<std::string, void*>> vtable;
+    std::map<void*, std::map<uint32_t, void*>> vtable;
 };
 
 static inline Lgs_Runtime runtime;
-__attribute__((weak)) Lgs_SArray Lgs_RTTypes_Arrays[] = {};
 
 extern "C" void Lgs_Runtime_init() {
     // runtime.scheduler.start();
@@ -87,11 +88,11 @@ extern "C" bool Lgs_Runtime_shouldYield() {
     return runtime.scheduler.shouldYield();
 }
 
-extern "C" void Lgs_Runtime_addToVTable(void* instancePtr, const char* name, void* ptr) {
+extern "C" void Lgs_Runtime_addToVTable(void* instancePtr, const uint32_t name, void* ptr) {
     runtime.vtable[instancePtr].emplace(name, ptr);
 }
 
-extern "C" void* Lgs_Runtime_getFromVTable(void* instancePtr, const char* name) {
+extern "C" void* Lgs_Runtime_getFromVTable(void* instancePtr, const uint32_t name) {
     const auto instance = runtime.vtable.find(instancePtr);
     if (instance == runtime.vtable.end()) assert(0);
     const auto method = instance->second.find(name);

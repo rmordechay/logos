@@ -1,12 +1,19 @@
 #pragma once
+#include "LgsFuncCall.h"
 #include "exprs/LgsExpr.h"
 #include "types/LgsObject.h"
+
+struct LgsInstanceArg {
+    std::string name = "";
+    LgsExpr* expr = nullptr;
+    LgsInstanceArg(const std::string& name, LgsExpr* expr) : name(name), expr(expr) {}
+};
 
 class LgsInstance final : public LgsExpr {
 public:
     std::string name;
     LgsObject* obj = nullptr;
-    std::map<std::string, LgsExpr*> args;
+    std::map<std::string, LgsInstanceArg> args;
     std::vector<LgsType*> generics;
 
     explicit LgsInstance(const std::string& name): name(name) {}

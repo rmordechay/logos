@@ -73,13 +73,13 @@ void LgsVariable::assign(LgsLLVMGen& cg, LgsExpr* expr) {
 Value* LgsVariable::hash(LgsLLVMGen& cg) {
     switch (ref.symbolType) {
     case PARAM:
-        return cg.callLgsFunc("hash", cg.sizeTy(), {cg.ptrTy()}, {ref.param->IRValue});
+        return cg.callHash(ref.param->IRValue);
     case VAR_DEC:
         return ref.varDec->expr->hash(cg);
     case FIELD:
         if (ref.field->isEnumField) return cg.usize(ref.field->position);
         if (ref.field->type->asEnum()) return cg.builder.CreateLoad(cg.sizeTy(), ref.field->getGEP(cg));
-        return cg.callLgsFunc("hash", cg.sizeTy(), {cg.ptrTy()}, {ref.field->IRValue});
+        return cg.callHash(ref.field->IRValue);
     default:
         assert(0);
     }

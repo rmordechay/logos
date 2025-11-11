@@ -65,7 +65,7 @@ public:
     LgsGlobals& globals;
     LgsAppConfigs& appConfigs;
     Function* currentIRFunc = nullptr;
-    static std::atomic<size_t> lambdasNameCounter;
+    static std::atomic<size_t> lambdasIDGenerator;
 
     explicit LgsCodeGen(LgsFile& file, LgsAppConfigs& appConfigs, LgsGlobals& globals, LgsPaths& paths)
         : file(file), cg(file.llvmCodeGen), paths(paths), globals(globals), appConfigs(appConfigs) {
@@ -149,6 +149,6 @@ public:
     void createRTTypes() const;
     void setNullableValue(LgsExpr* expr);
     bool allArgsAreConst(const std::vector<LgsExpr*>& args);
-    void resolveVirtuals(const LgsInstance* instance) const;
+    void addVirtuals(LgsType* type, Value* ptr) const;
     bool writeIRModule() const;
 };

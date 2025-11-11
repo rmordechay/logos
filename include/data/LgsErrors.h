@@ -123,3 +123,4 @@ inline LgsBaseError E10092{"Condition %s must be of type Bool. Given: %s.", errC
 inline LgsBaseError E10093{"Cannot assign variable to Void type.", errCodeStart++};
 inline LgsBaseError E10094{"Could not find %s.", errCodeStart++};
 inline LgsBaseError E10095{"Could not infer the type of the iterable.", errCodeStart++};
+inline LgsBaseError E10096{"Mixed named und position arguments are not allowed.", errCodeStart++};

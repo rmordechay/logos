@@ -131,7 +131,7 @@ set(LGS_SOURCE
     ${CMAKE_SOURCE_DIR}/src/symbols/types/LgsObject.cpp
     ${CMAKE_SOURCE_DIR}/src/symbols/types/LgsSubType.cpp
     ${CMAKE_SOURCE_DIR}/src/symbols/types/LgsTypePair.cpp
-    ${CMAKE_SOURCE_DIR}/src/symbols/types/LgsGeneric.cpp
+    ${CMAKE_SOURCE_DIR}/src/symbols/types/LgsGenericType.cpp
     ${CMAKE_SOURCE_DIR}/src/symbols/types/iterables/LgsMap.cpp
     ${CMAKE_SOURCE_DIR}/src/symbols/types/iterables/LgsDArray.cpp
     ${CMAKE_SOURCE_DIR}/src/symbols/types/iterables/LgsSet.cpp

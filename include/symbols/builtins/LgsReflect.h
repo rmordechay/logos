@@ -1,4 +1,5 @@
 #pragma once
+#include "exprs/LgsInstance.h"
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
 #include "types/LgsAny.h"
@@ -9,17 +10,16 @@ class LgsReflect final : public LgsObject {
 public:
     static constexpr auto name = "Reflect";
     LgsFunc* getFieldFunc = new LgsFunc{"getField", &LGS_ANY, {&LGS_ANY, new LgsStr()}, PUBLIC | BUILTIN};
-    LgsFunc* getMethodFunc = new LgsFunc{"getMethod", new LgsFuncType(&LGS_ANY), {&LGS_ANY, new LgsStr()}, PUBLIC | BUILTIN};
+    LgsFunc* getMethodFunc = new LgsFunc{"getMethod", new LgsFuncType(&LGS_ANY, {}, VIRTUAL | METHOD), {&LGS_ANY, new LgsStr()}, PUBLIC | BUILTIN};
 
     explicit LgsReflect() : LgsObject(name) {
         addMethod(getFieldFunc);
         addMethod(getMethodFunc);
-        getMethodFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
-            assert(args.back()->type->asStr()->isStatic);
-            const auto obj = args.front()->type->asObject();
-            const auto name = *args.back()->getConstStr();
-            const auto method = obj->getMethod(name);
-            return method->getIRFunc(cg);
+        getMethodFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) -> Value* {
+            if (args.size() < 2) return nullptr;
+            const auto instance = args[0]->IRValue;
+            const auto id = args[1]->hash(cg);
+            return cg.callGetFromVTable(instance, id);
         };
     }
 };

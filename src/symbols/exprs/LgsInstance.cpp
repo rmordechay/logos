@@ -26,7 +26,7 @@ void LgsInstance::hashNode(size_t& oldHash) {
     hashNodeString(oldHash, name);
     for (auto [argName, arg] : args) {
         hashNodeString(oldHash, argName);
-        arg->hashNode(oldHash);
+        arg.expr->hashNode(oldHash);
     }
 }
 
@@ -43,7 +43,7 @@ bool LgsInstance::equals(LgsExpr* other) {
 
 LgsInstance::~LgsInstance() {
     for (const auto& [_, arg] : args) {
-        freeExpr(arg);
+        freeExpr(arg.expr);
     }
     args.clear();
     freeType(obj);

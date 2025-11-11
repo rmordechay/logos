@@ -5,7 +5,7 @@
 #include <map>
 
 class LgsSubType;
-class LgsGeneric;
+class LgsGenericType;
 class LgsSet;
 class LgsAny;
 class LgsByte;
@@ -47,7 +47,6 @@ public:
     bool isFloat = false;
     bool isPrimitive = false;
     bool isHeapAlloc = false;
-    bool isGeneric = false;
     bool passByRef = false;
     Type* IRType = nullptr;
     size_t runtimeID = 0;
@@ -103,7 +102,7 @@ public:
     LgsObject* asObject();
     LgsInterface* asInterface();
     LgsEnum* asEnum();
-    LgsGeneric* asGeneric();
+    LgsGenericType* asGeneric();
     LgsIterable* asIterable();
     LgsSArray* asSArray();
     LgsDArray* asDArray();

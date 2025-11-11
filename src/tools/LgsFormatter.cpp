@@ -295,9 +295,12 @@ void LgsFormatter::formatSelection(const LgsSelection* selection) {
 void LgsFormatter::formatFuncCall(LgsFuncCall* funcCall) {
     insert(funcCall->name);
     insert("(");
-    for (size_t i = 0; i < funcCall->args.size(); ++i) {
-        if (i > 0) insert(", ");
-        formatExpr(funcCall->args[i]);
+    auto isFirst = true;
+    for (auto arg : funcCall->args) {
+        if (!isFirst) insert(", ");
+        isFirst = false;
+        insert(arg.name + "=");
+        formatExpr(arg.expr);
     }
     insert(")");
 }
@@ -326,11 +329,11 @@ void LgsFormatter::formatInstance(LgsInstance* instance) {
     insert(instance->name);
     insert("{");
     auto isFirst = true;
-    for (auto [name, expr] : instance->args) {
+    for (auto [name, arg] : instance->args) {
         if (!isFirst) insert(", ");
         isFirst = false;
         insert(name + "=");
-        formatExpr(expr);
+        formatExpr(arg.expr);
     }
     insert("}");
 }

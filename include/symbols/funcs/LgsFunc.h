@@ -8,7 +8,7 @@ class LgsExpr;
 class LgsStmt;
 class LgsType;
 
-using CallFn = std::function<Value*(LgsLLVMGen&, const std::vector<LgsExpr*>&)>;
+typedef std::function<Value*(LgsLLVMGen&, const std::vector<LgsExpr*>&)> CallFn;
 
 class LgsFunc : public LgsExpr {
 public:

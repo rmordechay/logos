@@ -12,13 +12,21 @@ Value* LgsFuncCall::loadIR(LgsLLVMGen& cg) {
 }
 
 bool LgsFuncCall::equals(const LgsFuncType* funcType) const {
+    if (args.empty() && funcType->params.empty()) return true;
     if (funcType->isVariadic) return equalsVariadic(funcType);
-    if (args.size() - funcType->isMethod > funcType->params.size()) return false;
-    for (size_t i = funcType->isMethod; i < funcType->params.size(); ++i) {
-        if (i >= args.size()) continue;
+    if (funcType->hasDefaults) return equalsDefaults(funcType);
+
+    const auto argSize = args.size();
+    const auto paramsSize = funcType->params.size();
+    if (argSize != paramsSize) return false;
+    const auto argsSizeWithoutSelf = argSize - funcType->isMethod;
+    if (argsSizeWithoutSelf != paramsSize) return false;
+    if (argsSizeWithoutSelf > paramsSize) return false;
+    for (size_t i = funcType->isMethod; i < paramsSize; ++i) {
+        if (i >= argSize) continue;
         const auto arg = args[i];
         const auto param = funcType->params[i];
-        if (!arg->type || !arg->type->canCastTo(param.type)) {
+        if (!arg.expr->type || !arg.expr->type->canCastTo(param.type)) {
             return false;
         }
     }
@@ -26,8 +34,8 @@ bool LgsFuncCall::equals(const LgsFuncType* funcType) const {
 }
 
 bool LgsFuncCall::equalsVariadic(const LgsFuncType* funcType) const {
-    const auto argsSize = args.size() - funcType->isMethod;
     const auto paramsSize = funcType->params.size();
+    const auto argsSize = args.size() - funcType->isMethod;
     const auto minArgs = funcType->isExternal ? paramsSize - 1 : paramsSize + 1;
     if (argsSize < minArgs) return false;
     // Check all args until the variadic param
@@ -35,7 +43,7 @@ bool LgsFuncCall::equalsVariadic(const LgsFuncType* funcType) const {
         if (i >= args.size()) continue;
         const auto arg = args[i];
         const auto param = funcType->params[i];
-        if (!arg->type || !arg->type->canCastTo(param.type)) {
+        if (!arg.expr->type || !arg.expr->type->canCastTo(param.type)) {
             return false;
         }
     }
@@ -43,23 +51,29 @@ bool LgsFuncCall::equalsVariadic(const LgsFuncType* funcType) const {
     const auto& variadicParam = funcType->params.back();
     for (uint32_t i = variadicParam.index; i < args.size(); ++i) {
         const auto arg = args[i];
-        if (!arg->type || !arg->type->canCastTo(variadicParam.type)) {
+        if (!arg.expr->type || !arg.expr->type->canCastTo(variadicParam.type)) {
             return false;
         }
     }
     return true;
 }
 
+bool LgsFuncCall::equalsDefaults(const LgsFuncType* lgsFunc) const {
+    return true;
+}
+
 bool LgsFuncCall::equals(LgsExpr* other) {
-    assert(0);
+    const auto otherFuncCall = other->asFuncCall();
+    if (!otherFuncCall || !otherFuncCall->func) return false;
+    return equals(otherFuncCall->func->funcType);
 }
 
 std::string LgsFuncCall::getGenericName() const {
     std::stringstream str;
     str << "u_" << name;
-    for (size_t i = isMethodCall; i < args.size(); ++i) {
+    for (size_t i = inSelection; i < args.size(); ++i) {
         const auto arg = args[i];
-        str << '_' << arg->type->getName();
+        str << '_' << arg.expr->type->getName();
     }
     return str.str();
 }
@@ -72,9 +86,10 @@ Value* LgsFuncCall::castToIR(LgsLLVMGen& cg, LgsType* toType) {
 std::string LgsFuncCall::asText() {
     std::stringstream str;
     str << name << '(';
-    for (size_t i = isMethodCall; i < args.size(); ++i) {
+    for (size_t i = 0; i < args.size(); ++i) {
         const auto arg = args[i];
-        str << (arg->type ? arg->type->pname() : LGS_UNKNOWN_TYPE);
+        if (arg.isSelf) continue;
+        str << (arg.expr->type ? arg.expr->type->pname() : LGS_UNKNOWN_TYPE);
         if (i == args.size() - 1) continue;
         str << ", ";
     }
@@ -93,8 +108,8 @@ void LgsFuncCall::setDebugValue(LgsLLVMGen& cg) {
 LgsStmt* LgsFuncCall::cloneStmt() {
     const auto newFuncCall = new LgsFuncCall(*this);
     newFuncCall->args.clear();
-    for (const auto arg : args) {
-        newFuncCall->args.emplace_back(arg->cloneExpr());
+    for (const auto& arg : args) {
+        newFuncCall->args.emplace_back(LgsFuncCallArg(arg.name, arg.expr->cloneExpr()));
     }
     if (type) newFuncCall->type = type->clone();
     return newFuncCall;
@@ -102,6 +117,6 @@ LgsStmt* LgsFuncCall::cloneStmt() {
 
 LgsFuncCall::~LgsFuncCall() {
     for (const auto& arg : args) {
-        freeExpr(arg);
+        freeExpr(arg.expr);
     }
 }

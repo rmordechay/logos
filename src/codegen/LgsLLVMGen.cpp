@@ -163,6 +163,10 @@ Value* LgsLLVMGen::callRuntimeFunc(const std::string& funcName, Type* rt, const 
     return callFunc(LGS_RUNTIME_PREFIX + funcName, rt, paramTypes, args);
 }
 
+Value* LgsLLVMGen::callHash(Value* arg) {
+    return callLgsFunc("hash", i32Ty(), {ptrTy()}, {arg});
+}
+
 Value* LgsLLVMGen::callPrintf(const std::vector<Value*>& args) {
     return callFunc("printf", i32Ty(), {ptrTy()}, args, true);
 }
@@ -208,11 +212,11 @@ void LgsLLVMGen::callPopStack(const bool hasDefers, const bool needsCleanup) {
 }
 
 void LgsLLVMGen::callAddToVTable(Value* instance, Value* key, Value* ptr) {
-    callRuntimeFunc("addToVTable", voidTy(), {ptrTy(), ptrTy(), ptrTy()}, {instance, key, ptr});
+    callRuntimeFunc("addToVTable", voidTy(), {ptrTy(), i32Ty(), ptrTy()}, {instance, key, ptr});
 }
 
 Value* LgsLLVMGen::callGetFromVTable(Value* instance, Value* key) {
-    return callRuntimeFunc("getFromVTable", ptrTy(), {ptrTy(), ptrTy()}, {instance, key});
+    return callRuntimeFunc("getFromVTable", ptrTy(), {ptrTy(), i32Ty()}, {instance, key});
 }
 
 void LgsLLVMGen::addNullTerminate(Value* strPtr, Value* pos) {

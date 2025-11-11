@@ -44,12 +44,48 @@ std::string padAndColorErrorMsg(const std::string& text) {
     return result.str();
 }
 
+bool runCmd(const char* cmd) {
+    switch (lgsConfigs.os) {
+    case MAC_OS:
+    case LINUX:
+        return std::system(cmd) == 0;
+    case WINDOWS:
+    case UNKNOWN_OS:
+        break;
+    }
+    assert(0);
+}
+
+bool createDir(fs::path& dirPath) {
+    if (fs::exists(dirPath)) return true;
+    if (!fs::create_directory(dirPath)) return false;
+    dirPath = fs::canonical(dirPath);
+    return true;
+}
+
 bool isLogosFile(const fs::path& filePath) {
     return fs::exists(filePath) && is_regular_file(filePath) && filePath.extension().string() == LGS_FILE_EXTENSION;
 }
 
 bool isLogosKeyword(const std::string& s) {
     return LGS_KEYWORDS.contains(s);
+}
+
+void printCliError(const LgsBaseError& err, const std::vector<std::string>& args) {
+    const auto errMsg = formatErrorMsg(err.msg, args) + '\n';
+    logError(errMsg);
+}
+
+std::string formatErrorMsg(const std::string& msg, const std::vector<std::string>& args) {
+    size_t pos = 0;
+    size_t argIndex = 0;
+    auto result = std::string(msg);
+    while ((pos = result.find(MSG_PLACEHOLDER, pos)) != std::string::npos && argIndex < args.size()) {
+        result.replace(pos, std::strlen(MSG_PLACEHOLDER), args[argIndex]);
+        pos += args[argIndex].length();
+        argIndex++;
+    }
+    return result;
 }
 
 std::string getFileText(const fs::path& filePath) {
@@ -93,37 +129,29 @@ std::string getFullPath(const LgsLocation& location, const std::string& filePath
     return filePath + ":" + std::to_string(location.lineStart) + ":" + std::to_string(location.columnStart);
 }
 
-std::string formatErrorMsg(const std::string& msg, const std::vector<std::string>& args) {
-    size_t pos = 0;
-    size_t argIndex = 0;
-    auto result = std::string(msg);
-    while ((pos = result.find(MSG_PLACEHOLDER, pos)) != std::string::npos && argIndex < args.size()) {
-        result.replace(pos, std::strlen(MSG_PLACEHOLDER), args[argIndex]);
-        pos += args[argIndex].length();
-        argIndex++;
-    }
-    return result;
-}
-
 std::string scanEscapeStr(const std::string& value) {
-    std::string escaped;
-    escaped.reserve(value.size());
-    for (const char c : value) {
+    std::string out;
+    out.reserve(value.size());
+    for (unsigned char c : value) {
         switch (c) {
-        case 'n':  escaped += '\n'; break;
-        case 't':  escaped += '\t'; break;
-        case 'r':  escaped += '\r'; break;
-        case '\\': escaped += '\\'; break;
-        case '"':  escaped += '"'; break;
-        case '\'': escaped += '\''; break;
-        case '0':  escaped += '\0'; break;
-        case 'b':  escaped += '\b'; break;
-        case 'f':  escaped += '\f'; break;
-        case 'v':  escaped += '\v'; break;
-        default: assert(0);
+        case '\n': out += "\\n"; break;
+        case '\t': out += "\\t"; break;
+        case '\r': out += "\\r"; break;
+        case '\\': out += "\\\\"; break;
+        case '\"': out += "\\\""; break;
+        case '\'': out += "\\\'"; break;
+        case '\b': out += "\\b"; break;
+        case '\f': out += "\\f"; break;
+        case '\v': out += "\\v"; break;
+        case '\0': out += "\\0"; break;
+        default: out += c; break;
         }
     }
-    return escaped;
+    return out;
+}
+
+std::size_t hashString(const std::string& str) {
+    return std::hash<std::string_view>{}(str);
 }
 
 time_t getLastWritten(const fs::path& filePath) {
@@ -133,30 +161,6 @@ time_t getLastWritten(const fs::path& filePath) {
         ftime - fs::file_time_type::clock::now() + std::chrono::system_clock::now()
         );
     return std::chrono::system_clock::to_time_t(sctp);
-}
-
-bool createDir(fs::path& dirPath) {
-    if (fs::exists(dirPath)) return true;
-    if (!fs::create_directory(dirPath)) return false;
-    dirPath = fs::canonical(dirPath);
-    return true;
-}
-
-bool runCmd(const char* cmd) {
-    switch (lgsConfigs.os) {
-    case MAC_OS:
-    case LINUX:
-        return std::system(cmd) == 0;
-    case WINDOWS:
-    case UNKNOWN_OS:
-        break;
-    }
-    assert(0);
-}
-
-void printCliError(const LgsBaseError& err, const std::vector<std::string>& args) {
-    const auto errMsg = formatErrorMsg(err.msg, args) + '\n';
-    logError(errMsg);
 }
 
 void logInfo(const std::string& msg, const bool withNewLine) {
@@ -176,7 +180,6 @@ void logError(const std::string& msg, const std::string& epilogue) {
     if (epilogue != "") logInfo(epilogue);
 }
 
-
 void logWarning(const std::string& msg) {
     logInfo(LGS_COLORIZE(LGS_WARNING_TEXT, LGS_MSG_COLOR_YELLOW) + msg);
 }
@@ -186,11 +189,11 @@ void combineNodeHash(size_t& oldHash, const size_t newHash) {
 }
 
 void hashNodeString(size_t& oldHash, const std::string& str) {
-    combineNodeHash(oldHash, std::hash<std::string>{}(str));
+    combineNodeHash(oldHash, hashString(str));
 }
 
 void hashNodeInt(size_t& oldHash, const size_t val) {
-    combineNodeHash(oldHash, std::hash<size_t>{}(val));
+    combineNodeHash(oldHash, val);
 }
 
 void freeExpr(const LgsExpr* expr) {

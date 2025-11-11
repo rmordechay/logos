@@ -165,6 +165,7 @@ bool LgsApp::generate() {
     createBuildDirs();
     LgsLLVMGen::initLLVM();
     paths.execFile = paths.buildDir / (configs.name == "" ? LGS_DEFAULT_EXEC_FILE : configs.name);
+    // Main file is generated first non-concurrently
     const auto mainFile = getMainFile();
     LgsCodeGen mainCodeGen(*mainFile, configs, globals, paths);
     if (!mainCodeGen.generate()) {
@@ -336,7 +337,7 @@ void LgsApp::mergeCImports(const LgsParser& parser) {
         auto it = std::ranges::find_if(globals.cImports, [localImport](const LgsStrConst* g) {
             return g->value == localImport->value;
         });
-        if (it == globals.cImports.end()) {
+        if (it == std::ranges::end(globals.cImports)) {
             globals.cImports.push_back(localImport);
         } else {
             freeExpr(localImport);

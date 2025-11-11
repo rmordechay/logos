@@ -18,6 +18,8 @@
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
 
+#include <llvm/IR/InlineAsm.h>
+
 void LgsJsonParser::parseFile(LgsFile* file) {
     if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
         parseMainFile(mainFile);
@@ -414,7 +416,7 @@ void LgsJsonParser::parseFuncCall(LgsFuncCall* funcCall) {
     openArray();
     for (size_t i = 0; i < funcCall->args.size(); ++i) {
         if (i > 0) addComma();
-        parseExpr(funcCall->args[i]);
+        parseExpr(funcCall->args[i].expr);
     }
     closeArray();
     closeObject();

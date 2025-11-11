@@ -1,23 +1,9 @@
 #include "types/LgsFuncType.h"
 #include "data/LgsDefinitions.h"
 #include "codegen/LgsLLVMGen.h"
-#include "types/LgsGeneric.h"
+#include "types/LgsGenericType.h"
 #include "utils/LgsUtils.h"
 #include <sstream>
-
-void LgsFuncType::setFuncOptions(const uint32_t ops) {
-    isPublic = ops & PUBLIC;
-    isBuiltin = ops & BUILTIN;
-    isVirtual = ops & VIRTUAL;
-    isVariadic = ops & VARIADIC;
-    isOptional = ops & OPTIONAL;
-    isTerminator = ops & TERMINATOR;
-    isMethod = ops & METHOD;
-    isIOMember = ops & IO_MEMBER;
-    isExternal = ops & SYSCALL;
-    isArrFunc = ops & ARR_FUNC;
-    hasDefaults = ops & HAS_DEFAULTS;
-}
 
 Type* LgsFuncType::getIRType(LgsLLVMGen& cg) {
     std::vector<Type*> types;
@@ -57,9 +43,6 @@ std::string LgsFuncType::getName() {
         strStream << parentName << "_";
     }
     strStream << name;
-    if (isGeneric) {
-        strStream << '_' << genericSuffix;
-    }
     if (isCoroutine) {
         strStream << LGS_CORO_SUFFIX;
     }
@@ -93,6 +76,10 @@ std::string LgsFuncType::pname() {
     return str.str();
 }
 
+std::string LgsFuncType::strFormatPart() const {
+    return "%p";
+}
+
 bool LgsFuncType::canCastTo(LgsType* other) {
     const auto otherFuncType = other->asFuncType();
     if (!otherFuncType) return false;
@@ -109,10 +96,6 @@ bool LgsFuncType::canCastTo(LgsType* other) {
     return true;
 }
 
-std::string LgsFuncType::strFormatPart() const {
-    return "%p";
-}
-
 bool LgsFuncType::equals(LgsType* other) {
     const auto otherFuncType = other->asFuncType();
     if (!otherFuncType) return false;
@@ -127,12 +110,34 @@ bool LgsFuncType::equals(LgsType* other) {
     return true;
 }
 
+void LgsFuncType::setFuncOptions(const uint32_t ops) {
+    isPublic =  ops & PUBLIC;
+    isBuiltin =  ops & BUILTIN;
+    isVirtual =  ops & VIRTUAL;
+    isVariadic =  ops & VARIADIC;
+    isOptional =  ops & OPTIONAL;
+    isTerminator =  ops & TERMINATOR;
+    isMethod =  ops & METHOD;
+    isCoroutine =  ops & COROUTINE;
+    isIOMember =  ops & IO_MEMBER;
+    isSyscall =  ops & SYSCALL;
+    isExternal =  ops & EXTERNAL;
+    isArrFunc =  ops & ARR_FUNC;
+    hasDefaults =  ops & HAS_DEFAULTS;
+}
+
+LgsParam* LgsFuncType::getParamByName(const std::string& paramName) {
+    for (auto& param : params) {
+        if (param.name == paramName) return &param;
+    }
+    return nullptr;
+}
+
 LgsType* LgsFuncType::clone() {
     const auto lgsFunc = new LgsFuncType();
     lgsFunc->name = name;
     lgsFunc->IRName = IRName;
     lgsFunc->parentName = parentName;
-    lgsFunc->genericSuffix = genericSuffix;
     lgsFunc->rt = rt ? rt->clone() : nullptr;
     for (const auto& param : params) {
         lgsFunc->params.push_back(LgsParam(param));
@@ -148,6 +153,7 @@ LgsType* LgsFuncType::clone() {
     lgsFunc->isOptional = isOptional;
     lgsFunc->isTerminator = isTerminator;
     lgsFunc->isMethod = isMethod;
+    lgsFunc->isSyscall = isSyscall;
     lgsFunc->isCoroutine = isCoroutine;
     lgsFunc->isIOMember = isIOMember;
     lgsFunc->isExternal = isExternal;

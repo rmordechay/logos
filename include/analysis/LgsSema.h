@@ -61,8 +61,6 @@ public:
     LgsErrHandler errHandler;
     LgsTypeResolver typeResolver;
     std::unordered_map<std::string, size_t> refCount;
-    std::unordered_map<std::string, LgsFunc*> corosRegistry;
-    std::unordered_map<std::string, LgsFunc*> genericsRegistry;
 
     explicit LgsSema(LgsAppConfigs& appConfigs, LgsFile* file, LgsGlobals& globals)
         : file(file), appConfigs(appConfigs), globals(globals), typeResolver(errHandler, globals) {}
@@ -72,7 +70,7 @@ public:
     void visitObject(LgsObject* obj);
     void visitInterface(LgsInterface* interface);
     void visitTestFile(const LgsTestFile* testFile);
-    void visitGeneric(LgsGeneric* generic);
+    void visitGeneric(LgsGenericType* generic);
     void visitEnum(LgsEnum* enum_);
     void visitField(LgsField* field);
     void visitFunc(LgsFunc* func);

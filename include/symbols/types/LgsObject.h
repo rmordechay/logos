@@ -2,7 +2,7 @@
 #include <utility>
 #include "LgsType.h"
 
-class LgsGeneric;
+class LgsGenericType;
 class LgsInstance;
 class LgsLLVMGen;
 class LgsField;
@@ -12,12 +12,13 @@ class LgsObject : public LgsType {
 public:
     std::string name;
     std::vector<LgsType*> implements;
-    std::vector<LgsGeneric*> generics;
+    std::vector<LgsGenericType*> generics;
     std::vector<LgsEnum*> enums;
     std::vector<LgsObject*> objects;
     std::vector<LgsSubType*> subtypes;
     std::vector<LgsIOPair*> ioPairs;
     LgsInstance* singleton = nullptr;
+    bool hasGenerics = false;
 
     explicit LgsObject(std::string  name) : name(std::move(name)) {
         isHeapAlloc = true;

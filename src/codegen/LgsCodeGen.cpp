@@ -45,7 +45,7 @@
 #include "stmts/LgsIOStmt.h"
 #include "stmts/LgsIfStmt.h"
 #include "stmts/LgsSwitch.h"
-#include "types/LgsGeneric.h"
+#include "types/LgsGenericType.h"
 #include "types/iterables/LgsSArray.h"
 #include "types/iterables/LgsVec.h"
 #include "types/primitives/LgsSize.h"
@@ -57,9 +57,10 @@
 #include <iostream>
 #include <unistd.h>
 #include <unordered_set>
+#include <llvm/TargetParser/Host.h>
 
-std::atomic<size_t> LgsCodeGen::lambdasNameCounter{0};
-#define GENERATE_OBJ_CMD_STRING "llc -filetype=obj -o %s %s.bc"
+std::atomic<size_t> LgsCodeGen::lambdasIDGenerator{0};
+#define GENERATE_OBJ_CMD_STRING "clang -Wno-override-module -target %s -c -o %s %s.bc"
 
 bool LgsCodeGen::generate() {
     cg.setupModule(file, appConfigs.debugMode);
@@ -83,6 +84,11 @@ void LgsCodeGen::visitMainFile(LgsMainFile* mainFile) {
     for (const auto object : mainFile->objects) {
         visitObject(object);
     }
+
+    for (auto genericsCall : file.symbolTable.genericCalls) {
+        assert(0);
+    }
+
     createRTTypes();
     for (const auto& [name, func] : mainFile->funcs) {
         if (const auto mainFunc = dynamic_cast<LgsMainFunc*>(func)) {
@@ -135,11 +141,10 @@ void LgsCodeGen::visitMainFunc(LgsMainFunc* func) {
 }
 
 void LgsCodeGen::visitFunc(LgsFunc* func) {
-    if (func->funcType->isGeneric) return;
+    if (!func->funcType->generics.empty()) return;
     stack.enterScope(func);
     createPrologue(func);
-    if (func->funcType->isVariadic)
-        visitStmtsBlock(func->stmtsBlock);
+    visitStmtsBlock(func->stmtsBlock);
     createEpilogue(func);
     if (func->funcType->rt->isVoid() && !cg.lastInstTerminator()) {
         cg.builder.CreateRetVoid();
@@ -680,7 +685,7 @@ void LgsCodeGen::visitCast(LgsCast* cast) {
 void LgsCodeGen::visitLambda(LgsFunc* func) {
     cg.savedIP = cg.builder.saveIP();
     const auto originalFunc = currentIRFunc;
-    const auto lambdaID = lambdasNameCounter.fetch_add(1);
+    const auto lambdaID = lambdasIDGenerator.fetch_add(1);
     func->funcType->IRName = LGS_ANONYMOUS_STR + std::to_string(lambdaID);
     func->IRValue = func->getIRFunc(cg);
     visitFunc(func);
@@ -880,8 +885,9 @@ void LgsCodeGen::visitFieldSelection(LgsVariable* var, LgsExpr* parent, const bo
 }
 
 void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
-    for (size_t i = funcCall->isMethodCall; i < funcCall->args.size(); ++i) {
-        visitExpr(funcCall->args[i]);
+    for (const auto& arg : funcCall->args) {
+        if (arg.isSelf) continue;
+        visitExpr(arg.expr);
     }
 
     if (funcCall->ref.symbolType != UNKNOWN) {
@@ -908,17 +914,21 @@ void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
     }
 
     if (ft->isVirtual) {
-        const auto self = funcCall->selfPtr;
-        const auto keyIR = cg.getIRStr(ft->name);
-        funcCall->func->IRValue = cg.callGetFromVTable(self->IRValue, keyIR);
+        assert(!funcCall->args.empty());
+        const auto parentPtr = funcCall->args.front();
+        assert(parentPtr.isSelf);
+        const auto id = cg.i32(hashString(funcCall->name));
+        funcCall->func->IRValue = cg.callGetFromVTable(parentPtr.expr->IRValue, id);
     } else if (funcCall->func->funcType->isArrFunc) {
         visitIterFunc(funcCall);
     }
+    if (!funcCall->func->funcType->generics.empty()) visitGenericFunc(funcCall->func);
     if (funcCall->isCoroutine || funcCall->isDeferred) return;
 
-    if (funcCall->func->funcType->isGeneric) visitGenericFunc(funcCall->func);
-    funcCall->IRValue = funcCall->func->call(cg, funcCall->args, funcCall->generics);
-
+    std::vector<LgsExpr*> args;
+    args.reserve(funcCall->args.size());
+    for (const auto& arg : funcCall->args) args.emplace_back(arg.expr);
+    funcCall->IRValue = funcCall->func->call(cg, args, funcCall->generics);
     if (appConfigs.debugMode) funcCall->setDebugValue(cg);
 }
 
@@ -1010,9 +1020,9 @@ void LgsCodeGen::visitInstance(LgsInstance* instance) {
     std::unordered_set<std::string> visited;
     for (const auto& [argName, arg] : instance->args) {
         visited.insert(argName);
-        const auto exprIR = getIRValue(arg);
+        const auto exprIR = getIRValue(arg.expr);
         const auto field = instance->obj->getField(argName);
-        arg->destPtrValue = field->IRValue;
+        arg.expr->destPtrValue = field->IRValue;
         field->parentIRValue = instance->IRValue;
         visitField(field);
         visitExpr(field->expr);
@@ -1037,8 +1047,7 @@ void LgsCodeGen::visitInstance(LgsInstance* instance) {
         if (field->expr->IRValue == field->IRValue) continue;
         cg.builder.CreateStore(field->expr->IRValue, field->IRValue);
     }
-    if (obj->implements.empty()) return;
-    resolveVirtuals(instance);
+    addVirtuals(instance->obj, instance->IRValue);
 }
 
 void LgsCodeGen::visitIterIndex(LgsIterIndex* iterIndex, const bool assign) {
@@ -1141,7 +1150,7 @@ Value* LgsCodeGen::getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) const {
     if (fc->args.empty()) return cg.null();
     const auto ctx = cg.builder.CreateAlloca(ctxTy);
     for (size_t i = 0; i < fc->args.size(); i++) {
-        const auto v = fc->args[i]->IRValue;
+        const auto v = fc->args[i].expr->IRValue;
         const auto fieldPtr = cg.builder.CreateStructGEP(llvm::dyn_cast<StructType>(ctxTy), ctx, i);
         cg.builder.CreateStore(v, fieldPtr);
     }
@@ -1153,7 +1162,7 @@ Type* LgsCodeGen::getThunkCtxType(const LgsFuncCall* fc) const {
     std::vector<Value*> args;
     std::vector<Type*> types;
     for (const auto& arg : fc->args) {
-        types.push_back(arg->type->getIRType(cg));
+        types.push_back(arg.expr->type->getIRType(cg));
     }
     return cg.getStructType(types, fc->name + "_thunk_type");
 }
@@ -1427,18 +1436,16 @@ void LgsCodeGen::createRTTypes() const {
         case SUBTYPE:c = symbol.subtype; break;
         case GENERIC:c = symbol.generic; break;
         case ENUM:c = symbol.enum_; break;
-        default:
-            continue;
+        default: continue;
         }
         globals.rtTypes.push_back(c);
     }
 
-    std::vector<Constant*> sarrTypes;
+    std::vector<Constant*> sArrTypes;
     for (const auto type : globals.rtTypes) {
-        if (const auto sarr = type->asSArray()) {
-            const auto constSize = sarr->size->getConstInt();
-            sarr->size->IRValue = cg.usize(*constSize);
-            sarrTypes.emplace_back(type->initRTType(cg));
+        if (const auto sArr = type->asSArray()) {
+            sArr->size->IRValue = sArr->size->IRValue;
+            sArrTypes.emplace_back(type->initRTType(cg));
         } else {
             continue;
         }
@@ -1446,7 +1453,7 @@ void LgsCodeGen::createRTTypes() const {
     }
     const auto arrRTStruct = cg.getStructType({cg.i32Ty(), cg.sizeTy()}, LGS_RT_ARRAY);
     const auto rtTypeArrayType = ArrayType::get(arrRTStruct, currentID);
-    const auto rtTypeArray = llvm::ConstantArray::get(rtTypeArrayType, sarrTypes);
+    const auto rtTypeArray = llvm::ConstantArray::get(rtTypeArrayType, sArrTypes);
     cg.createGlobal(rtTypeArrayType, rtTypeArray, LGS_RT_ARRAYS_ARR);
 }
 
@@ -1470,33 +1477,32 @@ bool LgsCodeGen::allArgsAreConst(const std::vector<LgsExpr*>& args) {
     return allElementsConst;
 }
 
-void LgsCodeGen::resolveVirtuals(const LgsInstance* instance) const {
-    const auto obj = instance->obj;
-    for (const auto& field : obj->fields) {
-        if (!field->isVirtual) continue;
-        const auto keyIRStr = cg.getIRStr(field->name);
-        const auto objIR = obj->getIRType(cg);
-        const auto fieldGEP = cg.builder.CreateStructGEP(objIR, instance->IRValue, field->position);
-        cg.callAddToVTable(instance->IRValue, keyIRStr, fieldGEP);
+void LgsCodeGen::addVirtuals(LgsType* type, Value* ptr) const {
+    for (const auto& field : type->fields) {
+        const auto id = hashString(field->name);
+        const auto objIR = type->getIRType(cg);
+        const auto fieldGEP = cg.builder.CreateStructGEP(objIR, ptr, field->position);
+        cg.callAddToVTable(ptr, cg.i32(id), fieldGEP);
+    }
+
+    for (const auto& [methodName, method] : type->methods) {
+        const auto id = hashString(methodName);
+        const auto IRFunc = method->getIRFunc(cg);
+        cg.callAddToVTable(ptr, cg.i32(id), IRFunc);
     }
 
     // Implemented interface methods
-    for (const auto implement : instance->obj->implements) {
-        for (const auto& [name, interfaceMethod] : implement->methods) {
+    const auto obj = type->asObject();
+    if (!obj) return;
+    for (const auto implement : obj->implements) {
+        for (const auto& [methodName, interfaceMethod] : implement->methods) {
             if (!interfaceMethod->stmtsBlock) continue;
-            const auto objMethod = obj->methods.find(name);
+            const auto objMethod = obj->methods.find(methodName);
             if (objMethod != obj->methods.end()) continue;
-            const auto keyIRStr = cg.getIRStr(interfaceMethod->funcType->name);
+            const auto id = hashString(methodName);
             const auto IRFunc = interfaceMethod->getIRFunc(cg);
-            cg.callAddToVTable(instance->IRValue, keyIRStr, IRFunc);
+            cg.callAddToVTable(ptr, cg.i32(id), IRFunc);
         }
-    }
-
-    for (const auto& [methodName, method] : obj->methods) {
-        if (!method->funcType->isVirtual) continue;
-        const auto keyIRStr = cg.getIRStr(method->funcType->name);
-        const auto IRFunc = method->getIRFunc(cg);
-        cg.callAddToVTable(instance->IRValue, keyIRStr, IRFunc);
     }
 }
 
@@ -1540,7 +1546,15 @@ bool LgsCodeGen::writeIRModule() const {
 
     // Create object
     char cmd[1024*4];
-    std::snprintf(cmd, sizeof(cmd), GENERATE_OBJ_CMD_STRING, outputPath.c_str(), outputPath.c_str());
+    const auto triple = llvm::sys::getDefaultTargetTriple();
+    std::snprintf(
+        cmd,
+        sizeof(cmd),
+        GENERATE_OBJ_CMD_STRING,
+        triple.c_str(),
+        outputPath.c_str(),
+        outputPath.c_str()
+    );
     if (!runCmd(cmd)) assert(0);
     fs::remove(outputPath + ".bc");
     return true;

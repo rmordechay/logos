@@ -1,4 +1,6 @@
 #include "analysis/LgsSema.h"
+
+#include "builtins/LgsReflect.h"
 #include "builtins/LgsTest.h"
 #include "funcs/LgsCoroutine.h"
 #include "data/LgsErrors.h"
@@ -127,7 +129,7 @@ void LgsSema::visitTestFile(const LgsTestFile* testFile) {
     }
 }
 
-void LgsSema::visitGeneric(LgsGeneric* generic) {
+void LgsSema::visitGeneric(LgsGenericType* generic) {
 }
 
 void LgsSema::visitEnum(LgsEnum* enum_) {
@@ -156,7 +158,6 @@ void LgsSema::visitFunc(LgsFunc* func) {
             break;
         }
         defaultParamsStarted = !!param.expr;
-        func->funcType->isGeneric = func->funcType->isGeneric || param.type->isGeneric;
     }
     visitStmtsBlock(func->stmtsBlock);
     if (func->funcType->isVariadic && func->funcType->hasDefaults) {
@@ -501,14 +502,14 @@ void LgsSema::visitCoroutine(const LgsCoroutine* coroutine) {
         assert(0);
     }
     const auto funcName = fc->func->funcType->getName() + LGS_CORO_SUFFIX;
-    const auto coro = corosRegistry.find(funcName);
-    if (coro != corosRegistry.end()) {
+    const auto coro = file->symbolTable.coroutines.find(funcName);
+    if (coro != file->symbolTable.coroutines.end()) {
         coroutine->funcCall->func = coro->second;
     } else {
         const auto f = fc->func->cloneExpr();
         f->funcType->isCoroutine = true;
         coroutine->funcCall->func = f;
-        corosRegistry[funcName] = f;
+        file->symbolTable.coroutines[funcName] = f;
     }
 
 }
@@ -895,16 +896,17 @@ void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent) {
     if (parent->asTypeExpr() && method->funcType->isMethod) {
         return addError(E10083, &methodCall->location, {method->funcType->pname()});
     }
-    methodCall->selfPtr = parent;
+
     if (method->funcType->isMethod) {
-        methodCall->args.insert(methodCall->args.begin(), parent);
+        methodCall->args.insert(methodCall->args.begin(), LgsFuncCallArg(LGS_SELF, parent, true));
     }
+
     for (size_t i = method->funcType->isMethod; i < method->funcType->params.size(); ++i) {
         if (i >= methodCall->args.size()) continue;
         auto arg = methodCall->args[i];
         const auto& param = method->funcType->params[i];
-        arg->completeType(param.type);
-        visitExpr(arg);
+        arg.expr->completeType(param.type);
+        visitExpr(arg.expr);
     }
     if (methodCall->equals(method->funcType)) {
         methodCall->func = method;
@@ -917,7 +919,7 @@ void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent) {
     if (!validateMethodVisibility(method, parent->type, methodCall->location)) return;
     if (stack.currentFunc()->isTest && parent->type->pname() == LgsTest::name && methodCall->name == "mock") {
         const auto pair = std::make_pair(methodCall->args[0], methodCall->args[1]);
-        stack.currentFunc()->mocks.push_back(pair);
+        // TODO stack.currentFunc()->mocks.push_back(pair);
     }
 }
 
@@ -927,36 +929,54 @@ void LgsSema::visitFuncCall(LgsFuncCall* funcCall) {
     const auto ft = symbol->getType()->asFuncType();
     if (!ft) return addError(E10046, &funcCall->location, {funcCall->name});
 
-    for (size_t i = ft->isMethod; i < ft->params.size(); ++i) {
-        if (i >= funcCall->args.size()) break;
-        auto& arg = funcCall->args[i];
-        const auto& param = ft->params[i];
-        arg->completeType(param.type);
-        visitExpr(arg);
-    }
-
-    if (funcCall->equals(ft)) {
-        if (symbol->symbolType == FUNC) {
-            const auto func = symbol->func;
-            if (ft->isGeneric) {
-                const auto funcName = funcCall->getGenericName();
-                const auto generics = genericsRegistry.find(funcName);
-                if (generics != genericsRegistry.end()) {
-                    funcCall->func = generics->second;
-                } else {
-                    genericsRegistry[funcName] = createGenericFunc(funcCall, func);
-                }
-            } else {
-                funcCall->func = func;
-                funcCall->setType(ft->rt);
+    if (funcCall->isNamed) {
+        for (size_t i = 0; i < ft->params.size(); ++i) {
+            if (i >= funcCall->args.size()) break;
+            auto& arg = funcCall->args[i];
+            const auto& param = ft->getParamByName(arg.name);
+            arg.expr->completeType(param->type);
+            visitExpr(arg.expr);
+            if (arg.name == "") {
+                return addError(E10096, &funcCall->location);
             }
-        } else {
-            funcCall->ref = *symbol;
-            funcCall->setType(ft->rt);
         }
     } else {
-        for (const auto arg : funcCall->args) if (!arg->type) return;
+        for (size_t i = 0; i < ft->params.size(); ++i) {
+            if (i >= funcCall->args.size()) break;
+            auto& arg = funcCall->args[i];
+            const auto& param = ft->params[i];
+            arg.expr->completeType(param.type);
+            visitExpr(arg.expr);
+        }
+    }
+
+    // Validate
+    if (!funcCall->equals(ft)) {
+        for (const auto& arg : funcCall->args) if (!arg.expr->type) return;
         addError(E10015, &funcCall->location, {funcCall->name, funcCall->asText(), ft->pname()});
+        return;
+    }
+    if (symbol->symbolType != FUNC) {
+        funcCall->ref = *symbol;
+        funcCall->setType(ft->rt);
+        return;
+    }
+
+    const auto func = symbol->func;
+    if (!func->funcType->generics.empty()) {
+        const auto funcName = funcCall->getGenericName();
+        const auto generics = file->symbolTable.genericCalls.find(funcName);
+        LgsFunc* genericFunc = nullptr;
+        if (generics != file->symbolTable.genericCalls.end()) {
+            genericFunc = generics->second;
+        } else {
+            genericFunc = createGenericFunc(funcCall, func);
+            file->symbolTable.genericCalls[funcName] = genericFunc;
+        }
+        funcCall->func = genericFunc->cloneExpr();
+    } else {
+        funcCall->func = func;
+        funcCall->setType(ft->rt);
     }
 }
 
@@ -1037,17 +1057,17 @@ void LgsSema::visitInstance(LgsInstance* instance) {
     std::unordered_set<std::string> visited;
     for (auto& [argName, arg] : instance->args) {
         if (visited.contains(argName)) {
-            addError(E10054, &arg->location, {argName});
+            addError(E10054, &arg.expr->location, {argName});
         }
         visited.insert(argName);
         const auto field = instance->obj->getField(argName);
         if (!field) {
-            addError(E10005, &arg->location, {argName, objName});
+            addError(E10005, &arg.expr->location, {argName, objName});
             continue;
         }
         if (!validateFieldVisibility(field, instance->obj)) continue;
-        visitExpr(arg);
-        validateExprType(arg, field->type);
+        visitExpr(arg.expr);
+        validateExprType(arg.expr, field->type);
         if (field->isOwner && field->type->isHeapAlloc) {
             field->expr->owner = field;
         }
@@ -1067,24 +1087,25 @@ void LgsSema::visitInterfaceInstance(LgsInstance* instance, LgsInterface* interf
     instance->obj->implements.push_back(interface);
     auto isValid = true;
     for (auto& [name, arg] : instance->args) {
-        visitExpr(arg);
+        auto expr = arg.expr;
+        visitExpr(expr);
         const auto field = interface->getField(name);
         if (field) {
             const auto newField = new LgsField(*field);
-            newField->expr = arg;
+            newField->expr = expr;
             instance->obj->addField(newField);
             continue;
         }
         const auto method = interface->getMethod(name);
         if (method) {
-            const auto newMethod = arg->asFunc();
+            const auto newMethod = expr->asFunc();
             newMethod->funcType->name = method->funcType->name;
             newMethod->funcType->params.insert(newMethod->funcType->params.begin(), LgsParam(interface, LGS_SELF));
             newMethod->funcType->params.front().isSelf = true;
             instance->obj->addMethod(newMethod);
             continue;
         }
-        addError(E10005, &arg->location, {name, interface->name});
+        addError(E10005, &expr->location, {name, interface->name});
         isValid = false;
     }
     if (isValid) {
@@ -1361,8 +1382,8 @@ void LgsSema::resolveImports() const {
 
 void LgsSema::addCSymbols() {
     for (const auto cImport : file->cImports) {
-        const auto [symbols, _] = globals.cLibHeaders[cImport->value];
-        for (auto [name, symbol] : symbols) {
+        const auto& table = globals.cLibHeaders[cImport->value];
+        for (auto [name, symbol] : table.symbols) {
             file->symbolTable.addSymbol(symbol, &errHandler);
         }
     }
@@ -1428,10 +1449,9 @@ LgsFunc* LgsSema::createGenericFunc(LgsFuncCall* funcCall, LgsFunc* const func) 
     const auto newFunc = func->cloneExpr()->asFunc();
     for (size_t i = 0; i < newFunc->funcType->params.size(); ++i) {
         const auto param = newFunc->funcType->params[i];
-        if (!param.type->isGeneric) continue;
         const auto arg = funcCall->args[i];
-        newFunc->funcType->genericSuffix += arg->type->getName();
-        newFunc->funcType->params[i] = LgsParam(arg->type, param.name, param.expr);
+        newFunc->funcType->IRName += newFunc->funcType->getName() + arg.expr->type->getName();
+        newFunc->funcType->params[i] = LgsParam(arg.expr->type, param.name, param.expr);
     }
     visitFunc(newFunc);
     funcCall->func = newFunc;

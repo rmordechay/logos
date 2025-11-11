@@ -20,7 +20,6 @@ namespace fs = std::filesystem;
 #define HASH_VECTOR(vec, hash) for (const auto e : vec) e->hashNode(hash)
 #define HASH_MAP(map, hash) for (const auto [_, v] : map) v->hashNode(hash)
 
-
 void execute(const fs::path& execPath, std::vector<const char*> mainArgs = {});
 bool runCmd(const char* cmd);
 bool createDir(fs::path& dirPath);
@@ -34,6 +33,7 @@ std::string getLine(const std::string& filename, size_t lineNumber);
 std::string trim(const std::string& str);
 std::string getFullPath(const LgsLocation& location, const std::string& filePath);
 std::string scanEscapeStr(const std::string& value);
+std::size_t hashString(const std::string& str);
 time_t getLastWritten(const fs::path& filePath);
 
 void logInfo(const std::string& msg = "", bool withNewLine = false);
