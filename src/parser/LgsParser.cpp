@@ -53,6 +53,7 @@
 #include "types/primitives/LgsSize.h"
 #include "types/primitives/LgsUInt.h"
 #include <iostream>
+#include <unordered_set>
 
 #define MAX_TOKENS_NUMBER 100000
 
@@ -95,10 +96,8 @@ LgsFile* LgsParser::parseSrcFile(const bool isTestRun) {
             file = testFile;
         }
     }
+    file->cImports = cImports;
     assert(file);
-    if (!cImports.empty()) {
-        assert(0);
-    }
     return file;
 }
 
@@ -129,7 +128,8 @@ LgsEnvFile* LgsParser::parseEnvFile() {
         if (!varDec) break;
         file->varDecs.push_back(varDec);
     }
-    if (currentToken.type != T_EOF) assert(0);
+    if (currentToken.type != T_EOF)
+        assert(0);
     return file;
 }
 
@@ -142,7 +142,7 @@ LgsMainFile* LgsParser::parseMainFile() {
             file->objects.push_back(obj);
             if (obj->singleton) {
                 std::lock_guard lock(mtx);
-                globals.addSymbol(LgsSymbol(obj), &errHandler, metadata.path);
+                globals.table.addSymbol(LgsSymbol(obj), &errHandler, metadata.path);
             } else {
                 addFileSymbol(file, LgsSymbol(obj));
             }
@@ -230,7 +230,7 @@ LgsObjectFile* LgsParser::parseObjectFile() {
     validateTypeName(obj->name, &obj->location);
     {
         std::lock_guard lock(mtx);
-        globals.addSymbol(LgsSymbol(file->obj), &errHandler, metadata.path);
+        globals.table.addSymbol(LgsSymbol(file->obj), &errHandler, metadata.path);
     }
     return file;
 }
@@ -248,7 +248,7 @@ LgsInterfaceFile* LgsParser::parseInterfaceFile() {
     validateTypeName(interface->name, &interface->location);
     {
         std::lock_guard lock(mtx);
-        globals.addSymbol(LgsSymbol(file->interface), &errHandler, metadata.path);
+        globals.table.addSymbol(LgsSymbol(file->interface), &errHandler, metadata.path);
     }
     return file;
 }
@@ -281,7 +281,8 @@ LgsTestFile* LgsParser::parseTestFile() {
         if (currentToken.type == T_EOF) break;
     }
 
-    if (currentToken.type != T_EOF) assert(0);
+    if (currentToken.type != T_EOF)
+        assert(0);
     validateTestFolder(file);
     return file;
 }
@@ -322,7 +323,9 @@ LgsObject* LgsParser::parseObjectBody(const LgsToken& tokenName, const bool isSi
             obj->generics.push_back(type);
             const auto ct = currentToken.type;
             const auto nt = peek().type;
-            if (ct == T_EOF || ct == T_RBRACE || nt == T_COLON || nt == T_LPAREN || nt == T_ENUM || nt == T_INTERFACE || nt == T_IMPLEMENTS) break;
+            if (ct == T_EOF || ct == T_RBRACE || nt == T_COLON || nt == T_LPAREN || nt == T_ENUM || nt == T_INTERFACE ||
+                nt == T_IMPLEMENTS)
+                break;
             mustMatch(T_COMMA);
         }
     }
@@ -336,7 +339,8 @@ LgsObject* LgsParser::parseObjectBody(const LgsToken& tokenName, const bool isSi
             obj->implements.push_back(type);
             const auto ct = currentToken.type;
             const auto nt = peek().type;
-            if (ct == T_EOF || ct == T_RBRACE || nt == T_COLON || nt == T_LPAREN || nt == T_ENUM || nt == T_INTERFACE) break;
+            if (ct == T_EOF || ct == T_RBRACE || nt == T_COLON || nt == T_LPAREN || nt == T_ENUM || nt == T_INTERFACE)
+                break;
             mustMatch(T_COMMA);
         }
     }
@@ -372,7 +376,8 @@ LgsObject* LgsParser::parseObjectBody(const LgsToken& tokenName, const bool isSi
         obj->singleton = new LgsInstance(obj);
     }
 
-    if (!headersOnly && currentToken.type != T_EOF && currentToken.type != T_RBRACE) assert(0);
+    if (!headersOnly && currentToken.type != T_EOF && currentToken.type != T_RBRACE)
+        assert(0);
     return obj;
 }
 
@@ -1194,8 +1199,8 @@ LgsExpr* LgsParser::parseUnary(const bool withInstance) {
     else if (const auto json = parseJson()) expr = json;
     else if (const auto prefixExpr = parsePrefixExpr()) expr = prefixExpr;
     else if (const auto funcCall = parseFuncCall()) expr = funcCall;
-    else if (withInstance && ((expr = parseInstance()))) {}
-    else if (const auto variable = parseVariable()) expr = variable;
+    else if (withInstance && ((expr = parseInstance()))) {
+    } else if (const auto variable = parseVariable()) expr = variable;
     else return nullptr;
 
     if (matchAndConsume(T_DOT)) return parseSelection(expr);
@@ -1483,7 +1488,8 @@ LgsFunc* LgsParser::parseLambda() {
     LgsType* rt = nullptr;
     std::vector<LgsParam> params;
 
-    if (currentToken.type == T_IDENTIFIER) { // Single param
+    if (currentToken.type == T_IDENTIFIER) {
+        // Single param
         LgsParam param(nullptr, currentToken.lexeme);
         consume();
         if (matchAndConsume(T_COLON)) {
@@ -1491,7 +1497,8 @@ LgsFunc* LgsParser::parseLambda() {
             mustParse(param.type);
         }
         params.emplace_back(param);
-    } else if (matchAndConsume(T_LPAREN)) { // Multiple params
+    } else if (matchAndConsume(T_LPAREN)) {
+        // Multiple params
         if (!matchAndConsume(T_RPAREN)) {
             while (true) {
                 auto paramName = currentToken.lexeme;
@@ -1805,7 +1812,7 @@ bool LgsParser::validateTypeName(const std::string& typeName, const LgsLocation*
 
 void LgsParser::addFileSymbol(LgsMainFile* file, const LgsSymbol& newSymbol) {
     auto symbolName = *newSymbol.name;
-    const auto globalSymbol = globals.getSymbol(symbolName);
+    const auto globalSymbol = globals.table.getSymbol(symbolName);
     if (globalSymbol) {
         if (globalSymbol->isBuiltin) {
             errHandler.addError(E10053, newSymbol.location, metadata.path, {symbolName});
@@ -1848,25 +1855,34 @@ void LgsParser::extractStrParts(LgsStrConst& strConst) {
 
 int LgsParser::getBinOpPrecedence(const LgsBinOpType opType) {
     switch (opType) {
-    case BIT_OR: return 1;
-    case BIT_XOR: return 2;
-    case BIT_AND: return 3;
+    case BIT_OR:
+        return 1;
+    case BIT_XOR:
+        return 2;
+    case BIT_AND:
+        return 3;
     case EQ:
-    case NE: return 4;
+    case NE:
+        return 4;
     case LT:
     case GT:
     case LE:
     case GE:
-    case IN: return 5;
+    case IN:
+        return 5;
     case LSHIFT:
-    case RSHIFT: return 6;
+    case RSHIFT:
+        return 6;
     case ADD:
-    case SUB: return 7;
+    case SUB:
+        return 7;
     case MUL:
     case DIV:
-    case MODULO: return 8;
+    case MODULO:
+        return 8;
     case NOOP:
-    default: return 0;
+    default:
+        return 0;
     }
 }
 
@@ -1887,7 +1903,7 @@ void LgsParser::validateTestFolder(const LgsFile* testFile) {
 
 bool LgsParser::isImportName(LgsExpr* expr) const {
     if (const auto variable = expr->asVariable()) {
-        if (!globals.imports.contains(variable->name)) return false;
+        if (!globals.table.imports.contains(variable->name)) return false;
         variable->isImportName = true;
         return true;
     }

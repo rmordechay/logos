@@ -66,8 +66,8 @@ public:
 
     explicit LgsSema(LgsAppConfigs& appConfigs, LgsFile* file, LgsGlobals& globals)
         : file(file), appConfigs(appConfigs), globals(globals), typeResolver(errHandler, globals) {}
+
     void analyse();
-    void resolveImports() const;
     void visitMainFile(LgsMainFile* mainFile);
     void visitObject(LgsObject* obj);
     void visitInterface(LgsInterface* interface);
@@ -135,9 +135,12 @@ public:
     void validateObjDuplicates(LgsType* type);
     static bool validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const LgsFunc* func);
 
-    LgsFunc* createGenericFunc(LgsFuncCall* funcCall, LgsFunc* func);
+    void resolveImports() const;
+    void addCSymbols();
+    void mergeRTTypes();
     void addHeapExpr(LgsExpr* expr);
     void addLocalSymbol(const LgsSymbol& newSymbol);
     LgsSymbol* getSymbol(const std::string& name, const LgsLocation* location);
+    LgsFunc* createGenericFunc(LgsFuncCall* funcCall, LgsFunc* func);
 };
 

@@ -17,18 +17,12 @@
 
 using namespace clang;
 
-bool LgsCLang::parseFile(const fs::path& fileName, LgsFile* lgsFile) {
-    const auto cCode = getFileText(fileName);
-    if (cCode.empty()) {
-        errHandler.addError(E10047, {LGS_C, fileName});
-        return false;
-    }
-
+bool LgsCLang::parseFile(LgsCLangParser& parser, const std::string& cCode) {
     CompilerInstance compiler;
     auto diagConsumer = std::make_unique<LgsDiagnosticConsumer>();
     compiler.createDiagnostics(diagConsumer.release());
     compiler.getInvocation().getTargetOpts().Triple = llvm::sys::getDefaultTargetTriple();
-    compiler.getHeaderSearchOpts().AddPath(paths.cLibHeadersDir.c_str(), frontend::System, false, false);
+    compiler.getHeaderSearchOpts().AddPath(cLibHeadersDir.c_str(), frontend::System, false, false);
     const auto targetOptions = std::make_shared<TargetOptions>(compiler.getInvocation().getTargetOpts());
     compiler.setTarget(TargetInfo::CreateTargetInfo(compiler.getDiagnostics(), targetOptions));
     compiler.createFileManager();
@@ -40,13 +34,11 @@ bool LgsCLang::parseFile(const fs::path& fileName, LgsFile* lgsFile) {
 
     compiler.getPreprocessorOpts().UsePredefines = true;
     compiler.createPreprocessor(TU_Complete);
-
     compiler.createASTContext();
     if (compiler.getDiagnostics().hasErrorOccurred()) return false;
-
-    LgsCLangParser consumer(lgsFile);
-    ParseAST(compiler.getPreprocessor(), &consumer, compiler.getASTContext());
-    return !compiler.getDiagnostics().hasErrorOccurred();
+    ParseAST(compiler.getPreprocessor(), &parser, compiler.getASTContext());
+    if (compiler.getDiagnostics().hasErrorOccurred()) return false;
+    return true;
 }
 
 void LgsDiagnosticConsumer::HandleDiagnostic(const DiagnosticsEngine::Level level, const Diagnostic& info) {

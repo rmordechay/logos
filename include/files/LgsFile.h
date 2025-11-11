@@ -15,6 +15,7 @@ public:
     LgsLocation location;
     LgsLLVMGen llvmCodeGen;
     LgsSymbolTable symbolTable;
+    std::vector<LgsStrConst*> cImports;
 
     explicit LgsFile(const size_t fileID, const fs::path& path) : id(fileID), path(path) {}
     bool isMain() const;

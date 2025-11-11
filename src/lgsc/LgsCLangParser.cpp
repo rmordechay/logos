@@ -16,6 +16,8 @@
 #include "types/primitives/LgsChar.h"
 #include "utils/LgsUtils.h"
 
+#include <iostream>
+
 void LgsCLangParser::HandleTranslationUnit(clang::ASTContext& clangContext){
     context = &clangContext;
     TraverseDecl(clangContext.getTranslationUnitDecl());
@@ -36,7 +38,9 @@ bool LgsCLangParser::VisitFunctionDecl(const clang::FunctionDecl* func) {
     }
     funcImpl->funcType->isVariadic = func->isVariadic();
     funcImpl->funcType->isExternal = true;
-    lgsFile->symbolTable.addSymbol(LgsSymbol(funcImpl, false, true), &errHandler);
+    if (!name.starts_with("_")) {
+        table.addSymbol(LgsSymbol(funcImpl, false, true), &errHandler);
+    }
     return true;
 }
 
@@ -47,15 +51,17 @@ bool LgsCLangParser::VisitRecordDecl(const clang::RecordDecl* record) {
         name = name + '_';
     }
     if (!record->isStruct() || !record->isThisDeclarationADefinition()) return true;
-    const auto objSymbol = lgsFile->symbolTable.getSymbol(name);
+    const auto objSymbol = table.getSymbol(name);
     if (objSymbol) return true;
     const auto obj = mapCRecord(record);
-    lgsFile->symbolTable.addSymbol(LgsSymbol(obj, false, true), &errHandler);
+    if (!name.starts_with("_")) {
+        table.addSymbol(LgsSymbol(obj, false, true), &errHandler);
+    }
     return true;
 }
 
 LgsType* LgsCLangParser::mapCType(const clang::QualType type) {
-    if (recursionDepth++ > 2000) assert(0);
+    if (recursionDepth++ > 100000) assert(0);
     if (type->isPointerType() && type->getPointeeType()->isCharType()) {
         return new LgsStr();
     }
@@ -76,6 +82,8 @@ LgsType* LgsCLangParser::mapCType(const clang::QualType type) {
         if (pointee->isElaboratedTypeSpecifier()) {
             return new LgsPtr(new LgsVoid());
         }
+        if (std::string(pointee->getTypeClassName()) == "Elaborated") return nullptr;
+        if (std::string(pointee->getTypeClassName()) == "Paren") return nullptr;
         return new LgsPtr(mapCType(pointee));
     }
     if (type->isSpecificBuiltinType(clang::BuiltinType::Bool)) {
@@ -150,10 +158,12 @@ LgsType* LgsCLangParser::mapCStruct(const clang::QualType type) {
     if (name == "") {
         name = decl->getQualifiedNameAsString();
     }
-    const auto objSymbol = lgsFile->symbolTable.getSymbol(name);
+    const auto objSymbol = table.getSymbol(name);
     if (objSymbol) return objSymbol->object;
     const auto obj = mapCRecord(decl);
-    lgsFile->symbolTable.addSymbol(LgsSymbol(obj, false, true), &errHandler);
+    if (!name.starts_with("_")) {
+        table.addSymbol(LgsSymbol(obj, false, true), &errHandler);
+    }
     return obj;
 }
 
@@ -170,7 +180,8 @@ LgsType* LgsCLangParser::mapCFunc(const clang::QualType type) {
 }
 
 LgsType* LgsCLangParser::mapCArray(const clang::QualType type) {
-    const auto arrayType = llvm::cast<clang::ConstantArrayType>(type.getTypePtr());
+    const auto arrayType = llvm::dyn_cast<clang::ConstantArrayType>(type.getTypePtr());
+    if (!arrayType) return nullptr;
     const auto baseType = mapCType(arrayType->getElementType());
     const auto size = arrayType->getSize().getZExtValue();
     const auto arr = new LgsDArray(baseType);

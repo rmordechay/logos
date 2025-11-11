@@ -10,6 +10,7 @@
 #include "data/LgsDefinitions.h"
 #include "files/LgsFile.h"
 #include "files/LgsFileMetadata.h"
+#include "parser/LgsParser.h"
 #include "utils/ThreadPool.h"
 #include <mutex>
 
@@ -30,9 +31,9 @@ inline std::mutex mtx;
 
 class LgsApp final {
 public:
-    LgsPaths appPaths;
-    LgsAppConfigs configs;
+    LgsPaths paths;
     LgsGlobals globals;
+    LgsAppConfigs configs;
     LgsAppCache appCache;
     LgsErrHandler errHandler;
     LgsTypeResolver typeResolver;
@@ -44,7 +45,7 @@ public:
     std::unordered_map<std::string, std::string> lgsCode; // Used when passing code directly.
 
     explicit LgsApp(const fs::path& rootPath = ""): typeResolver(errHandler, globals) {
-        appPaths.rootPath = rootPath;
+        paths.rootPath = rootPath;
     }
 
     bool compile();
@@ -54,6 +55,7 @@ public:
     bool analyse();
     bool generate();
     bool link();
+    void mergeCImports(const LgsParser& parser);
     void loadSrcFile(LgsFileMetadata& metadata);
     void loadSrcFile(const std::string& fileCode, const fs::path& filePath = LGS_MAIN_FILE);
     bool loadConfigFile();

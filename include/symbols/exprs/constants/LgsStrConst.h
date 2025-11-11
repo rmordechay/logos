@@ -8,6 +8,7 @@ public:
     std::string value;
     std::string formatedStr = "";
     std::vector<LgsExpr*> parts;
+    bool isSingleQuoted;
 
     explicit LgsStrConst(const std::string& value) : value(value) {
         isValueKnown = true;

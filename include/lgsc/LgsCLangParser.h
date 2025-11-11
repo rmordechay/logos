@@ -1,8 +1,10 @@
 #pragma once
+#include "LgsSymbolTable.h"
 #include "utils/LgsErrHandler.h"
 #include <clang/AST/RecursiveASTVisitor.h>
 #include <clang/Tooling/Tooling.h>
 
+struct LgsSymbolTable;
 class LgsErrHandler;
 class LgsFile;
 class LgsObject;
@@ -11,12 +13,11 @@ struct LgsSymbol;
 
 class LgsCLangParser final : public clang::RecursiveASTVisitor<LgsCLangParser>, public clang::ASTConsumer {
 public:
-    LgsFile* lgsFile;
+    LgsSymbolTable table;
     LgsErrHandler errHandler;
     clang::ASTContext* context = nullptr;
     int recursionDepth = 0;
 
-    explicit LgsCLangParser(LgsFile* lgsFile) : lgsFile(lgsFile) {}
     void HandleTranslationUnit(clang::ASTContext& clangContext) override;
     bool VisitFunctionDecl(const clang::FunctionDecl* func);
     bool VisitRecordDecl(const clang::RecordDecl* record);

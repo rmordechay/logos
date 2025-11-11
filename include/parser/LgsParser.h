@@ -59,7 +59,7 @@ public:
     LgsToken currentToken;
     size_t currentIndex = 0;
     size_t recursionCount = 0;
-    LgsSymbolTable& globals;
+    LgsGlobals& globals;
     LgsFileMetadata& metadata;
     std::vector<LgsToken> tokens;
     std::string code = "";
@@ -68,7 +68,7 @@ public:
     std::vector<LgsStrConst*> cImports;
     std::unordered_map<std::string, LgsApp*> fileImports;
 
-    LgsParser(LgsFileMetadata& metadata, LgsPaths& paths, LgsSymbolTable& globals, const bool headersOnly = false)
+    LgsParser(LgsFileMetadata& metadata, LgsPaths& paths, LgsGlobals& globals, const bool headersOnly = false)
         : paths(paths), headersOnly(headersOnly), globals(globals), metadata(metadata) {}
 
     // Files

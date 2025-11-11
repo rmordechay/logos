@@ -239,12 +239,8 @@ std::string LgsLexer::scanDoubleQuotesString() {
     advance();
     std::string result;
     while (currentChar != '"' && currentChar != '\0') {
-        if (currentChar == '\\') {
-            result = scanEscapeChar();
-        } else {
-            result += currentChar;
-            advance();
-        }
+        result += currentChar;
+        advance();
     }
     if (currentChar == '"') advance();
     return result;
@@ -254,12 +250,8 @@ std::string LgsLexer::scanSingleQuotesString() {
     advance();
     std::string result;
     while (currentChar != '\'' && currentChar != '\0') {
-        if (currentChar == '\\') {
-            result = scanEscapeChar();
-        } else {
-            result += currentChar;
-            advance();
-        }
+        result += currentChar;
+        advance();
     }
     if (currentChar == '\'') advance();
     return result;
@@ -275,33 +267,9 @@ std::string LgsLexer::scanMultilineString() {
             advance();
             break;
         }
-        if (currentChar == '\\') {
-            result += scanEscapeChar();
-        } else {
-            result += currentChar;
-            advance();
-        }
+        result += currentChar;
+        advance();
     }
-    return result;
-}
-
-char LgsLexer::scanEscapeChar() {
-    advance();
-    char result;
-    switch (currentChar) {
-    case 'n':  result = '\n'; break;
-    case 't':  result = '\t'; break;
-    case 'r':  result = '\r'; break;
-    case '\\': result = '\\'; break;
-    case '"':  result = '"'; break;
-    case '\'': result = '\''; break;
-    case '0':  result = '\0'; break;
-    case 'b':  result = '\b'; break;
-    case 'f':  result = '\f'; break;
-    case 'v':  result = '\v'; break;
-    default: assert(0);
-    }
-    advance();
     return result;
 }
 

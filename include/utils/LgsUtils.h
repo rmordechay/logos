@@ -22,17 +22,19 @@ namespace fs = std::filesystem;
 
 
 void execute(const fs::path& execPath, std::vector<const char*> mainArgs = {});
+bool runCmd(const char* cmd);
+bool createDir(fs::path& dirPath);
 bool isLogosFile(const fs::path& filePath);
 bool isLogosKeyword(const std::string& s);
+void printCliError(const LgsBaseError& err, const std::vector<std::string>& args = {});
+std::string formatErrorMsg(const std::string& msg, const std::vector<std::string>& args);
+
 std::string getFileText(const fs::path& filePath);
 std::string getLine(const std::string& filename, size_t lineNumber);
 std::string trim(const std::string& str);
 std::string getFullPath(const LgsLocation& location, const std::string& filePath);
-std::string formatErrorMsg(const std::string& msg, const std::vector<std::string>& args);
+std::string replaceStrEscapes(const std::string& value);
 time_t getLastWritten(const fs::path& filePath);
-bool createDir(fs::path& dirPath);
-bool runCmd(const char* cmd);
-void printCliError(const LgsBaseError& err, const std::vector<std::string>& args = {});
 
 void logInfo(const std::string& msg = "", bool withNewLine = false);
 void logDebug(const std::string& msg, bool withNewLine = false);

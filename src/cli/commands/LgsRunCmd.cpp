@@ -13,7 +13,7 @@ bool LgsRunCmd::run() {
             app.printErrors();
             return false;
         }
-        execPath = app.appPaths.execFile;
+        execPath = app.paths.execFile;
     }
     assert(execPath != "");
     execute(execPath, args);
@@ -65,7 +65,7 @@ bool LgsRunCmd::parseArgs(LgsApp& app, std::vector<const char*>& appArgs) const 
             printCliError(E40004, {path});
             return false;
         }
-        app.appPaths.rootPath = path;
+        app.paths.rootPath = path;
     }
 
     for (int j = argStart; j < argc; ++j) {

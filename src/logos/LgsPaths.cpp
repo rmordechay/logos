@@ -20,34 +20,6 @@ bool LgsPaths::findLgsRootDir() {
     return true;
 }
 
-bool LgsPaths::findCLibRoot() {
-    FILE* pipe = nullptr;
-    char buffer[512];
-    switch (lgsConfigs.os) {
-    case MAC_OS:
-        pipe = popen("xcrun --show-sdk-path 2>/dev/null", "r");
-        break;
-    case LINUX:
-        pipe = popen("clang -print-resource-dir 2>/dev/null", "r");
-        break;
-    default:
-        assert(0);
-    }
-    if (!pipe) return false;
-
-    fgets(buffer, sizeof(buffer), pipe);
-    std::string clibRoot = buffer;
-    if (clibRoot == "") {
-        pclose(pipe);
-        return false;
-    }
-    clibRoot.pop_back();
-    cLibRootDir = fs::path(clibRoot);
-    pclose(pipe);
-    assert(fs::exists(cLibRootDir));
-    return true;
-}
-
 bool LgsPaths::findCLibHeaders() {
     const auto pipe = popen("clang -E -Wp,-v -xc /dev/null 2>&1", "r");
     if (!pipe) return false;

@@ -7,6 +7,11 @@ Value* LgsArrayExpr::loadIR(LgsLLVMGen& cg) {
 }
 
 Value* LgsArrayExpr::castToIR(LgsLLVMGen& cg, LgsType* toType) {
+    if (toType->asStr()) {
+        if (const auto sArr = type->asSArray()) {
+            if (sArr->baseType->asChar()) return IRValue;
+        }
+    }
     assert(0);
 }
 

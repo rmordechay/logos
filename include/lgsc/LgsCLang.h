@@ -1,4 +1,6 @@
 #pragma once
+#include "LgsCLangParser.h"
+#include "LgsSymbolTable.h"
 #include "logos/LgsPaths.h"
 #include "utils/LgsErrHandler.h"
 #include <clang/Basic/Diagnostic.h>
@@ -13,9 +15,9 @@ public:
 
 class LgsCLang final {
 public:
-    LgsPaths& paths;
-    LgsErrHandler errHandler;
+    LgsSymbolTable table;
+    fs::path cLibHeadersDir;
 
-    explicit LgsCLang(LgsPaths& paths) : paths(paths) {}
-    bool parseFile(const fs::path& fileName, LgsFile* lgsFile);
+    explicit LgsCLang(const fs::path& cLibHeadersDir): cLibHeadersDir(cLibHeadersDir) {}
+    bool parseFile(LgsCLangParser& parser, const std::string& cCode);
 };

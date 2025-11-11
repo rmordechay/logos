@@ -16,7 +16,7 @@ TEST_CASE("TestCodeGen1") {
         LgsApp app;
         app.lgsCode[LGS_MAIN_FILE] = code;
         if (!app.compile()) return app.printErrors();
-        execPath = app.appPaths.execFile;
+        execPath = app.paths.execFile;
     }
     const auto pipe = popen(execPath.c_str(), "r");
     assert(pipe);
@@ -44,7 +44,7 @@ TEST_CASE("TestCodeGen2") {
         LgsApp app;
         app.lgsCode[LGS_MAIN_FILE] = code;
         if (!app.compile()) return app.printErrors();
-        execPath = app.appPaths.execFile;
+        execPath = app.paths.execFile;
     }
     const auto pipe = popen(execPath.c_str(), "r");
     assert(pipe);
@@ -81,7 +81,7 @@ TEST_CASE("TestCodeGen3") {
         LgsApp app;
         app.lgsCode[LGS_MAIN_FILE] = code;
         if (!app.compile()) return app.printErrors();
-        execPath = app.appPaths.execFile;
+        execPath = app.paths.execFile;
     }
     const auto pipe = popen(execPath.c_str(), "r");
     assert(pipe);

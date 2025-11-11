@@ -55,6 +55,7 @@ std::string getMissingImplementsStr(const std::vector<LgsField*>& fields, const 
 
 void LgsSema::analyse() {
     resolveImports();
+    addCSymbols();
     if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
         visitMainFile(mainFile);
     } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
@@ -66,25 +67,7 @@ void LgsSema::analyse() {
     } else {
         assert(0);
     }
-    {
-        std::lock_guard lock(mtx);
-        auto& thisRegistry = typeResolver.rtTypesRegistry;
-        auto& globalsRegistry = globals.rtTypes;
-        globalsRegistry.insert(globalsRegistry.end(), thisRegistry.begin(), thisRegistry.end());
-        for (auto [name, count] : refCount) {
-            const auto symbol = globals.table.getSymbol(name);
-            if (!symbol) continue;
-            symbol->refCount += count;
-        }
-    }
-}
-
-void LgsSema::resolveImports() const {
-    for (auto& [name, app] : file->symbolTable.imports) {
-        const auto it = globals.table.imports.find(name);
-        if (it == globals.table.imports.end()) continue;
-        app = it->second;
-    }
+    mergeRTTypes();
 }
 
 void LgsSema::visitMainFile(LgsMainFile* mainFile) {
@@ -1375,18 +1358,33 @@ bool LgsSema::validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const Lgs
     return isValid;
 }
 
-LgsFunc* LgsSema::createGenericFunc(LgsFuncCall* funcCall, LgsFunc* const func) {
-    const auto newFunc = func->cloneExpr()->asFunc();
-    for (size_t i = 0; i < newFunc->funcType->params.size(); ++i) {
-        const auto param = newFunc->funcType->params[i];
-        if (!param.type->isGeneric) continue;
-        const auto arg = funcCall->args[i];
-        newFunc->funcType->genericSuffix += arg->type->getName();
-        newFunc->funcType->params[i] = LgsParam(arg->type, param.name, param.expr);
+void LgsSema::resolveImports() const {
+    for (auto& [name, app] : file->symbolTable.imports) {
+        const auto it = globals.table.imports.find(name);
+        if (it == globals.table.imports.end()) continue;
+        app = it->second;
     }
-    visitFunc(newFunc);
-    funcCall->func = newFunc;
-    return newFunc;
+}
+
+void LgsSema::addCSymbols() {
+    for (const auto cImport : file->cImports) {
+        const auto [symbols, _] = globals.cLibHeaders[cImport->value];
+        for (auto [name, symbol] : symbols) {
+            file->symbolTable.addSymbol(symbol, &errHandler);
+        }
+    }
+}
+
+void LgsSema::mergeRTTypes() {
+    std::lock_guard lock(mtx);
+    auto& thisRegistry = typeResolver.rtTypesRegistry;
+    auto& globalsRegistry = globals.rtTypes;
+    globalsRegistry.insert(globalsRegistry.end(), thisRegistry.begin(), thisRegistry.end());
+    for (auto [name, count] : refCount) {
+        const auto symbol = globals.table.getSymbol(name);
+        if (!symbol) continue;
+        symbol->refCount += count;
+    }
 }
 
 void LgsSema::addHeapExpr(LgsExpr* expr) {
@@ -1412,6 +1410,7 @@ void LgsSema::addLocalSymbol(const LgsSymbol& newSymbol) {
     stack.getSymbolTable().addSymbol(newSymbol, &errHandler, file->path);
 }
 
+
 LgsSymbol* LgsSema::getSymbol(const std::string& name, const LgsLocation* location) {
     if (const auto globalSymbol = globals.table.getSymbol(name)) {
         if (!globalSymbol->isBuiltin) refCount[*globalSymbol->name]++;
@@ -1430,6 +1429,20 @@ LgsSymbol* LgsSema::getSymbol(const std::string& name, const LgsLocation* locati
     }
     errHandler.addError(E10006, location, file->path, {name});
     return nullptr;
+}
+
+LgsFunc* LgsSema::createGenericFunc(LgsFuncCall* funcCall, LgsFunc* const func) {
+    const auto newFunc = func->cloneExpr()->asFunc();
+    for (size_t i = 0; i < newFunc->funcType->params.size(); ++i) {
+        const auto param = newFunc->funcType->params[i];
+        if (!param.type->isGeneric) continue;
+        const auto arg = funcCall->args[i];
+        newFunc->funcType->genericSuffix += arg->type->getName();
+        newFunc->funcType->params[i] = LgsParam(arg->type, param.name, param.expr);
+    }
+    visitFunc(newFunc);
+    funcCall->func = newFunc;
+    return newFunc;
 }
 
 std::string getMissingImplementsStr(const std::vector<LgsField*>& fields, const std::vector<LgsFunc*>& methods) {

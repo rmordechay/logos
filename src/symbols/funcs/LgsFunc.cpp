@@ -83,7 +83,9 @@ Value* LgsFunc::callWithVariadic(LgsLLVMGen& cg, const std::vector<LgsExpr*>& ar
         }
     }
     const auto& variadicParam = funcType->params[variadicOffset];
-    IRArgs.emplace_back(cg.usize(args.size()));
+    if (!funcType->isExternal) {
+        IRArgs.emplace_back(cg.usize(args.size()));
+    }
     for (size_t i = variadicOffset; i < args.size(); ++i) {
         const auto arg = args[i];
         IRArgs.emplace_back(arg->castToIR(cg, variadicParam.type));

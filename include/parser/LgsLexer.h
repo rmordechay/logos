@@ -27,7 +27,6 @@ public:
     std::string scanDoubleQuotesString();
     std::string scanSingleQuotesString();
     std::string scanMultilineString();
-    char scanEscapeChar();
     LgsToken scanNumber(LgsLocation& location);
     void skipWhitespace();
     void skipLineComment();

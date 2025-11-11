@@ -105,12 +105,33 @@ std::string formatErrorMsg(const std::string& msg, const std::vector<std::string
     return result;
 }
 
+std::string replaceStrEscapes(const std::string& value) {
+    std::string escaped;
+    escaped.reserve(value.size());
+    for (const char c : value) {
+        switch (c) {
+        case 'n':  escaped += '\n'; break;
+        case 't':  escaped += '\t'; break;
+        case 'r':  escaped += '\r'; break;
+        case '\\': escaped += '\\'; break;
+        case '"':  escaped += '"'; break;
+        case '\'': escaped += '\''; break;
+        case '0':  escaped += '\0'; break;
+        case 'b':  escaped += '\b'; break;
+        case 'f':  escaped += '\f'; break;
+        case 'v':  escaped += '\v'; break;
+        default: assert(0);
+        }
+    }
+    return escaped;
+}
+
 time_t getLastWritten(const fs::path& filePath) {
     assert(fs::exists(filePath));
     const auto ftime = fs::last_write_time(filePath);
     const auto sctp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(
         ftime - fs::file_time_type::clock::now() + std::chrono::system_clock::now()
-    );
+        );
     return std::chrono::system_clock::to_time_t(sctp);
 }
 

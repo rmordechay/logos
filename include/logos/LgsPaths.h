@@ -13,11 +13,9 @@ struct LgsPaths {
     fs::path cacheFile;
     fs::path appConfigFile;
     fs::path execFile;
-    fs::path cLibRootDir;
     fs::path cLibHeadersDir;
     fs::path lgsRootDir;
     fs::path lgsPackagesDir;
     bool findLgsRootDir();
-    bool findCLibRoot();
     bool findCLibHeaders();
 };

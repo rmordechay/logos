@@ -63,7 +63,7 @@ void LgsPkgManager::install() {
     assert(fs::exists(paths.lgsPackagesDir));
     LgsApp app;
     app.configs.appMode = PKG_MANAGER_MODE;
-    app.appPaths.appConfigFile = paths.appConfigFile;
+    app.paths.appConfigFile = paths.appConfigFile;
     if (!app.loadConfigFile()) return app.printErrors();
     for (const auto& package : app.appConfigFile->packages) {
         const auto packageDir = paths.lgsPackagesDir / package.name;

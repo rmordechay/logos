@@ -20,5 +20,5 @@ struct LgsGlobals {
     LgsSymbolTable table;
     std::vector<LgsType*> rtTypes;
     std::vector<LgsStrConst*> cImports;
-    std::vector<LgsType*> rtTypesRegistry;
+    std::map<std::string, LgsSymbolTable> cLibHeaders;
 };
