@@ -6,11 +6,12 @@
 #include "types/LgsFuncType.h"
 #include "types/primitives/LgsVoid.h"
 #include "utils/LgsUtils.h"
+#include <iostream>
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/Module.h>
 
 Function* LgsFunc::getIRFunc(LgsLLVMGen& cg) {
-    const auto funcName = getIRName();
+    const auto funcName = funcType->getName();
     auto IRFunc = cg.IRModule->getFunction(funcName);
     if (IRFunc) return IRFunc;
     const auto type = funcType->getIRType(cg);
@@ -131,14 +132,6 @@ bool LgsFunc::needsCleanup() const {
 
 std::string LgsFunc::asText() {
     return funcType->pname();
-}
-
-std::string LgsFunc::getIRName() const {
-    auto funcName = funcType->getName();
-    if (funcType->isBuiltin && !funcType->isExternal) {
-        funcName = LGS_NAME_PREFIX + funcName;
-    }
-    return funcName;
 }
 
 LgsFunc* LgsFunc::cloneExpr() {

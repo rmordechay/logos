@@ -85,8 +85,8 @@ void LgsCodeGen::visitMainFile(LgsMainFile* mainFile) {
         visitObject(object);
     }
 
-    for (auto genericsCall : file.symbolTable.genericCalls) {
-        assert(0);
+    for (auto [_, genericsCall] : file.symbolTable.genericCalls) {
+        visitFunc(genericsCall);
     }
 
     createRTTypes();
@@ -559,7 +559,7 @@ void LgsCodeGen::visitCoroutine(const LgsCoroutine* coroutine) {
         fc = coroutine->selection->asMethodCall();
     }
 
-    const auto funcName = fc->func->getIRName();
+    const auto funcName = fc->func->funcType->getName();
     if (!cg.IRModule->getFunction(funcName)) {
         cg.savedIP = cg.builder.saveIP();
         const auto originalFunc = currentIRFunc;
@@ -776,12 +776,14 @@ void LgsCodeGen::visitVectorExpr(LgsVectorExpr* vectorExpr) {
 void LgsCodeGen::visitVariable(LgsVariable* variable) {
     switch (variable->ref.symbolType) {
     case VAR_DEC:
+        assert(variable->ref.varDec->IRValue);
         variable->IRValue = variable->ref.varDec->IRValue;
         break;
     case PARAM:
         if (variable->ref.param->isSelf) {
             variable->IRValue = currentIRFunc->getArg(0);
         } else {
+            assert(variable->ref.param->IRValue);
             variable->IRValue = variable->ref.param->IRValue;
         }
         break;
@@ -1079,17 +1081,6 @@ void LgsCodeGen::createPrologue(LgsFunc* func) {
         cg.callRuntimeFunc("init", cg.voidTy());
     }
     cg.callStackPush(func->hasDefers, func->needsCleanup());
-    // if (func->funcType->isVariadic) {
-    //     const auto& variadicParam = func->funcType->params.back();
-    //     const auto valist = cg.builder.CreateAlloca(cg.ptrTy());
-    //     const auto ty = variadicParam.type->getIRType(cg);
-    //     cg.callIntrinsics(llvm::Intrinsic::vastart, {valist}, {cg.ptrTy()});
-    //     cg.loop(func->variadicCount, [this, ty, valist](Value*, BasicBlock*) {
-    //         const auto v = cg.builder.CreateVAArg(valist, ty);
-    //         cg.printInt(v);
-    //     });
-    //     cg.callIntrinsics(llvm::Intrinsic::vaend, {valist}, {cg.ptrTy()});
-    // }
 }
 
 void LgsCodeGen::createEpilogue(LgsFunc* func) {
@@ -1274,7 +1265,7 @@ void LgsCodeGen::setSetExpr(LgsArrayExpr* arrayExpr) {
 }
 
 void LgsCodeGen::createMapFunc(LgsFunc* func) {
-    if (cg.IRModule->getFunction(func->getIRName())) return;
+    if (cg.IRModule->getFunction(func->funcType->getName())) return;
     // Save state
     cg.savedIP = cg.builder.saveIP();
     const auto originalFunc = currentIRFunc;
@@ -1330,7 +1321,7 @@ void LgsCodeGen::createMapFunc(LgsFunc* func) {
 }
 
 void LgsCodeGen::createFilterFunc(LgsFunc* func) {
-    if (cg.IRModule->getFunction(func->getIRName())) return;
+    if (cg.IRModule->getFunction(func->funcType->getName())) return;
     // Save state
     cg.savedIP = cg.builder.saveIP();
     const auto originalFunc = currentIRFunc;

@@ -19,10 +19,10 @@ public:
     std::vector<LgsReturn*> returnStmts;
     BasicBlock* cleanupBlock = nullptr;
     Value* variadicCount = nullptr;
-    std::vector<std::pair<LgsExpr*, LgsExpr*>> mocks;
     bool hasDefers = false;
     bool isTest = false;
     bool isLambda = false;
+    std::vector<std::pair<LgsExpr*, LgsExpr*>> mocks;
     CallFn fn;
 
     explicit LgsFunc(LgsFuncType* funcType) : LgsExpr(funcType), funcType(funcType) {}
@@ -50,7 +50,6 @@ public:
     void completeType(LgsType* toType) override;
     bool needsCleanup() const;
     std::string asText() override;
-    std::string getIRName() const;
     LgsFunc* cloneExpr() override;
     void hashNode(size_t& oldHash) override;
     BasicBlock* getCleanupBlock(LgsLLVMGen& cg);

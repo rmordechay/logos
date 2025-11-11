@@ -149,6 +149,7 @@ void LgsSema::visitField(LgsField* field) {
 }
 
 void LgsSema::visitFunc(LgsFunc* func) {
+    if (!func->funcType->generics.empty()) return;
     stack.enterScope(func);
     auto defaultParamsStarted = false;
     for (auto& param : func->funcType->params) {
@@ -754,7 +755,7 @@ void LgsSema::visitVariable(LgsVariable* variable) {
     }
     case PARAM: {
         variable->ref.param = symbol->param;
-        variable->setType(symbol->param->type->clone());
+        variable->setType(symbol->param->type);
         break;
     }
     case ENUM: {
@@ -1450,7 +1451,7 @@ LgsFunc* LgsSema::createGenericFunc(LgsFuncCall* funcCall, LgsFunc* const func) 
     for (size_t i = 0; i < newFunc->funcType->params.size(); ++i) {
         const auto param = newFunc->funcType->params[i];
         const auto arg = funcCall->args[i];
-        newFunc->funcType->IRName += newFunc->funcType->getName() + arg.expr->type->getName();
+        newFunc->funcType->IRName = newFunc->funcType->getName() + arg.expr->type->getName();
         newFunc->funcType->params[i] = LgsParam(arg.expr->type, param.name, param.expr);
     }
     visitFunc(newFunc);
