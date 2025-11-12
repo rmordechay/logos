@@ -32,12 +32,12 @@ bool LgsVariable::equals(LgsExpr* other) {
     assert(0);
 }
 
-LgsExpr* LgsVariable::castTo(LgsType* toType, const bool explicitCast) {
+LgsExpr* LgsVariable::staticCast(LgsType* toType, const bool explicitCast) {
     switch (ref.symbolType) {
     case PARAM:
         assert(0);
     case VAR_DEC:
-        return ref.varDec->expr->castTo(toType);
+        return ref.varDec->expr->staticCast(toType);
     case FIELD:
         assert(0);
     case SUBTYPE:
@@ -49,12 +49,12 @@ LgsExpr* LgsVariable::castTo(LgsType* toType, const bool explicitCast) {
     }
 }
 
-Value* LgsVariable::castToIR(LgsLLVMGen& cg, LgsType* toType) {
+Value* LgsVariable::castIR(LgsLLVMGen& cg, LgsType* toType) {
     switch (ref.symbolType) {
     case PARAM:
         assert(0);
     case VAR_DEC:
-        return ref.varDec->expr->castToIR(cg, toType);
+        return ref.varDec->expr->castIR(cg, toType);
     case FIELD:
         assert(0);
     case FUNC:
@@ -70,12 +70,12 @@ void LgsVariable::assign(LgsLLVMGen& cg, LgsExpr* expr) {
     cg.builder.CreateStore(expr->IRValue, ref.varDec->IRValue);
 }
 
-Value* LgsVariable::hash(LgsLLVMGen& cg) {
+Value* LgsVariable::hashValue(LgsLLVMGen& cg) {
     switch (ref.symbolType) {
     case PARAM:
         return cg.callHash(ref.param->IRValue);
     case VAR_DEC:
-        return ref.varDec->expr->hash(cg);
+        return ref.varDec->expr->hashValue(cg);
     case FIELD:
         if (ref.field->isEnumField) return cg.usize(ref.field->position);
         if (ref.field->type->asEnum()) return cg.builder.CreateLoad(cg.sizeTy(), ref.field->getGEP(cg));
@@ -87,6 +87,23 @@ Value* LgsVariable::hash(LgsLLVMGen& cg) {
 
 std::string LgsVariable::asText() {
     return name;
+}
+
+void LgsVariable::setDebugValue(LgsLLVMGen& cg) {
+    const auto var = cg.debugger.diBuilder->createAutoVariable(
+        cg.debugger.blocks.back(),
+        name,
+        cg.debugger.diFile,
+        location.lineStart,
+        type->getDebugType(cg)
+    );
+    cg.debugger.diBuilder->insertDeclare(
+        IRValue,
+        var,
+        cg.debugger.diBuilder->createExpression(),
+        getDebugLoc(cg),
+        cg.builder.GetInsertBlock()
+    );
 }
 
 LgsExpr* LgsVariable::cloneExpr() {

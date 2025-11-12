@@ -29,9 +29,6 @@ std::string LgsVoid::strFormatPart() const {
 }
 
 bool LgsVoid::canCastTo(LgsType* other) {
-    if (const auto funcType = other->asFuncType()) {
-        return funcType->params.empty() && funcType->rt->isVoid();
-    }
     return name == other->getName();
 }
 

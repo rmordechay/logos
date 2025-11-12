@@ -3,10 +3,10 @@
 #include <string>
 
 struct LgsLocation {
-    size_t fileID = 0;
     size_t index = 0;
     size_t lineStart = 0;
     size_t columnStart = 0;
+    std::filesystem::path* filepath = nullptr;
 };
 
 /**

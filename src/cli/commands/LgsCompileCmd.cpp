@@ -2,17 +2,15 @@
 #include "cli/LgsCliHelp.h"
 #include "logos/LgsApp.h"
 
-bool LgsCompileCmd::run() {
+void LgsCompileCmd::run() {
     LgsApp app;
     std::vector<const char*> args;
-    parse(app, args);
-    if (!errHandler.successful) return false;
+    parseCompileArgs(app, args);
+    if (!errHandler.successful) return;
     if (!app.compile()) {
-        app.printErrors();
-        return false;
+        errHandler.mergeErrors(app.errHandler);
     }
     logInfo(app.srcFiles.front()->path);
-    return true;
 }
 
 LgsCliCmdHelp& LgsCompileCmd::getHelp() {

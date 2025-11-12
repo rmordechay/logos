@@ -77,7 +77,7 @@ Lgs_TypeKind LgsObject::getRTTypeKind() {
     return RTT_OBJECT;
 }
 
-Constant* LgsObject::initRTType(LgsLLVMGen& cg) {
+Constant* LgsObject::getRTType(LgsLLVMGen& cg) {
     const auto objRTStruct = cg.getStructType({cg.ptrTy(), cg.sizeTy(), cg.ptrTy()}, LGS_RT_OBJECT);
     const auto fieldCount = fields.size();
     std::vector<Constant*> fieldTypeValues;

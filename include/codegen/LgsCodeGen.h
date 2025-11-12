@@ -80,7 +80,6 @@ public:
     void visitFunc(LgsFunc* func);
     void visitGenericFunc(LgsFunc* func);
     void visitField(LgsField* field) const;
-    void visitParam(LgsParam* param);
     void visitStmt(LgsStmt* stmt);
     void visitStmtsBlock(const LgsStmtsBlock* stmtsBlock);
     void visitLoop(LgsForLoop* loop);

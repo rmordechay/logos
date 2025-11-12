@@ -18,7 +18,7 @@ public:
     std::vector<LgsVarDec*> requiredEnvs;
     std::vector<LgsImportPackage> packages;
 
-    explicit LgsAppConfigFile(const size_t fileID, const fs::path& path) : LgsFile(fileID, path) {}
+    explicit LgsAppConfigFile(const fs::path& path) : LgsFile(path) {}
     size_t hashFile() override;
     ~LgsAppConfigFile() override;
 };

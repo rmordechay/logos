@@ -66,7 +66,7 @@ Value* LgsFunc::call(LgsLLVMGen& cg, std::vector<LgsFuncArg>& args) {
             if (param.isSelf) {
                 IRArgs.emplace_back(arg->expr->IRValue);
             } else {
-                IRArgs.emplace_back(arg->expr->castToIR(cg, param.type));
+                IRArgs.emplace_back(arg->expr->castIR(cg, param.type));
             }
         }
     } else {
@@ -76,7 +76,7 @@ Value* LgsFunc::call(LgsLLVMGen& cg, std::vector<LgsFuncArg>& args) {
             if (param.isSelf) {
                 IRArgs.emplace_back(arg.expr->IRValue);
             } else {
-                IRArgs.emplace_back(arg.expr->castToIR(cg, param.type));
+                IRArgs.emplace_back(arg.expr->castIR(cg, param.type));
             }
         }
     }
@@ -101,7 +101,7 @@ Value* LgsFunc::callWithVariadic(LgsLLVMGen& cg, const std::vector<LgsFuncArg>& 
         if (param.isSelf) {
             IRArgs.emplace_back(arg.expr->IRValue);
         } else {
-            IRArgs.emplace_back(arg.expr->castToIR(cg, param.type));
+            IRArgs.emplace_back(arg.expr->castIR(cg, param.type));
         }
     }
     const auto& variadicParam = funcType->params[variadicOffset];
@@ -110,7 +110,7 @@ Value* LgsFunc::callWithVariadic(LgsLLVMGen& cg, const std::vector<LgsFuncArg>& 
     }
     for (size_t i = variadicOffset; i < args.size(); ++i) {
         const auto arg = args[i];
-        IRArgs.emplace_back(arg.expr->castToIR(cg, variadicParam.type));
+        IRArgs.emplace_back(arg.expr->castIR(cg, variadicParam.type));
     }
     return callIR(cg, IRArgs);
 }
@@ -132,7 +132,7 @@ Value* LgsFunc::loadIR(LgsLLVMGen& cg) {
     return IRValue;
 }
 
-Value* LgsFunc::castToIR(LgsLLVMGen& cg, LgsType* toType) {
+Value* LgsFunc::castIR(LgsLLVMGen& cg, LgsType* toType) {
     return IRValue;
 }
 
@@ -179,10 +179,10 @@ void LgsFunc::setDebugValue(LgsLLVMGen& cg) {
     const auto dbInt32 = funcType->rt->getDebugType(cg);
     const auto parameterTypes = diBuilder->getOrCreateTypeArray({dbInt32});
     const auto subroutine = diBuilder->createSubroutineType(parameterTypes);
-    cg.debugger.diProgram = diBuilder->createFunction(
+    cg.debugger.subprogram = diBuilder->createFunction(
         cg.debugger.compileUnit,
         funcType->name,
-        funcType->name,
+        funcType->getName(),
         cg.debugger.diFile,
         location.lineStart,
         subroutine,
@@ -190,7 +190,7 @@ void LgsFunc::setDebugValue(LgsLLVMGen& cg) {
         llvm::DINode::FlagPrototyped,
         DISubprogram::SPFlagDefinition
     );
-    getIRFunc(cg)->setSubprogram(cg.debugger.diProgram);
+    getIRFunc(cg)->setSubprogram(cg.debugger.subprogram);
     cg.builder.SetCurrentDebugLocation(getDebugLoc(cg));
 }
 

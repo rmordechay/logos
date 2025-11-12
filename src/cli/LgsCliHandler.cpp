@@ -45,10 +45,17 @@ bool LgsCliHandler::execute() const {
         return false;
     }
     const auto isHelp = argc == 3 && isHelpCommand(argv[2]);
-    if (isHelp) cmd->printHelp();
-    else cmd->run();
+    if (isHelp) {
+        cmd->printHelp();
+    } else {
+        cmd->run();
+    }
+    const auto successful = cmd->errHandler.successful;
+    if (!successful) {
+        cmd->errHandler.printErrors();
+    }
     delete cmd;
-    return true;
+    return successful;
 }
 
 LgsCliCmd* LgsCliHandler::getCmd() const {

@@ -55,7 +55,7 @@ bool LgsApp::setup() {
         const auto filePath = paths.rootPath;
         const auto rootPath = fs::temp_directory_path();
         initPaths(rootPath);
-        appCache.addFileMetadata(getNextFileID(), filePath, LGS_SRC_FILE);
+        appCache.addFileMetadata(filePath, LGS_SRC_FILE);
         return true;
     }
 
@@ -70,7 +70,7 @@ bool LgsApp::setup() {
     // Env files
     if (fs::exists(paths.envsDir)) {
         for (const auto& entry : fs::recursive_directory_iterator(paths.envsDir)) {
-            appCache.addFileMetadata(getNextFileID(), entry.path(), LGS_ENV_FILE);
+            appCache.addFileMetadata(entry.path(), LGS_ENV_FILE);
         }
     }
 
@@ -85,7 +85,7 @@ bool LgsApp::setup() {
             isValid = false;
             continue;
         }
-        appCache.addFileMetadata(getNextFileID(), entry.path(), LGS_SRC_FILE);
+        appCache.addFileMetadata(entry.path(), LGS_SRC_FILE);
     }
     return isValid;
 }
@@ -115,21 +115,7 @@ bool LgsApp::parse() {
         });
     }
     threadPool.wait();
-
-    LgsCLang clang(paths.cLibHeadersDir);
-    for (const auto cImport : globals.cImports) {
-        auto headerName = cImport->value;
-        if (globals.cLibHeaders.contains(headerName)) continue;
-        const auto headerPath = paths.cLibHeadersDir / headerName;
-        const auto cCode = getFileText(headerPath);
-        if (cCode.empty()) {
-            errHandler.addError(E10047, {LGS_C, cCode});
-            continue;
-        }
-        LgsCLangParser parser;
-        clang.parseFile(parser, cCode);
-        globals.cLibHeaders[headerName] = parser.table;
-    }
+    importCFiles();
     return errHandler.successful;
 }
 
@@ -138,7 +124,7 @@ bool LgsApp::parseHeaders() {
         if (fileMetadata.type != LGS_SRC_FILE) continue;
         threadPool.runTask([&fileMetadata, this] {
             const auto fileCode = getFileText(fileMetadata.path);
-            LgsParser parser(fileMetadata, paths, globals, true);
+            LgsParser parser(&fileMetadata, paths, globals, true);
             parser.parseSrcFileHeaders();
         });
     }
@@ -166,6 +152,7 @@ bool LgsApp::generate() {
     createBuildDirs();
     LgsLLVMGen::initLLVM();
     paths.execFile = paths.buildDir / (configs.name == "" ? LGS_DEFAULT_EXEC_FILE : configs.name);
+
     // Main file is generated first non-concurrently
     const auto mainFile = getMainFile();
     LgsCodeGen mainCodeGen(*mainFile, configs, globals, paths);
@@ -174,7 +161,6 @@ bool LgsApp::generate() {
         printIR();
         return false;
     }
-
     for (const auto& file : srcFiles) {
         if (file->isMain()) continue;
         threadPool.runTask([this, file] {
@@ -199,10 +185,22 @@ bool LgsApp::link() {
     return linker.link();
 }
 
+void LgsApp::mergeCImports(const LgsParser& parser) {
+    for (auto localImport : parser.cImports) {
+        auto it = std::ranges::find_if(globals.cImports, [localImport](const LgsStrConst* g) {
+            return g->value == localImport->value;
+        });
+        if (it == std::ranges::end(globals.cImports)) {
+            globals.cImports.push_back(localImport);
+        } else {
+            freeExpr(localImport);
+        }
+    }
+}
+
 void LgsApp::loadSrcFile(LgsFileMetadata& metadata) {
-    if (metadata.id == 0) metadata.id = getNextFileID();
     const auto fileCode = getFileText(metadata.path);
-    LgsParser parser(metadata, paths, globals);
+    LgsParser parser(&metadata, paths, globals);
     const auto file = parser.parseSrcFile(configs.isTestRun);
     {
         std::lock_guard lock(mtx);
@@ -214,8 +212,8 @@ void LgsApp::loadSrcFile(LgsFileMetadata& metadata) {
 }
 
 void LgsApp::loadSrcFile(const std::string& fileCode, const fs::path& filePath) {
-    LgsFileMetadata metadata(getNextFileID(), filePath);
-    LgsParser parser(metadata, paths, globals);
+    LgsFileMetadata metadata(filePath);
+    LgsParser parser(&metadata, paths, globals);
     parser.code = fileCode;
     const auto file = parser.parseSrcFile(configs.isTestRun);
     {
@@ -237,8 +235,8 @@ bool LgsApp::loadConfigFile() {
         errHandler.addError(E10086, {paths.appConfigFile});
         return false;
     }
-    LgsFileMetadata metadata(getNextFileID(), paths.appConfigFile, LGS_APP_CONFIG_FILE);
-    LgsParser parser(metadata, paths, globals);
+    LgsFileMetadata metadata(paths.appConfigFile, LGS_APP_CONFIG_FILE);
+    LgsParser parser(&metadata, paths, globals);
     appConfigFile = parser.parseAppConfigFile();
     if (!parser.errHandler.successful) {
         errHandler.mergeErrors(parser.errHandler);
@@ -253,7 +251,7 @@ bool LgsApp::loadEnvFiles() {
         const auto filePath = metadata.path;
         if (!isLogosFile(filePath)) continue;
         threadPool.runTask([this, &metadata] {
-            LgsParser parser(metadata, paths, globals);
+            LgsParser parser(&metadata, paths, globals);
             const auto envFile = parser.parseEnvFile();
             if (!envFile) return;
             metadata.hash = envFile->hashFile();
@@ -328,17 +326,28 @@ void LgsApp::loadBuiltins() {
     globals.table.addSymbol(LgsSymbol(new LgsReflect(), true, false), &errHandler);
 }
 
-void LgsApp::mergeCImports(const LgsParser& parser) {
-    for (auto localImport : parser.cImports) {
-        auto it = std::ranges::find_if(globals.cImports, [localImport](const LgsStrConst* g) {
-            return g->value == localImport->value;
+void LgsApp::importCFiles() {
+    LgsCLang clang(paths.cLibHeadersDir);
+    for (const auto cImport : globals.cImports) {
+        threadPool.runTask([&cImport, this, &clang] {
+            const auto headerName = cImport->value;
+            if (globals.cLibHeaders.contains(headerName)) return;
+            const auto headerPath = paths.cLibHeadersDir / headerName;
+            const auto cCode = getFileText(headerPath);
+            if (cCode.empty()) {
+                std::lock_guard lock(mtx);
+                errHandler.addError(E10047, {LGS_C, cCode});
+                return;
+            }
+            LgsCLangParser parser;
+            clang.parseFile(parser, cCode);
+            {
+                std::lock_guard lock(mtx);
+                globals.cLibHeaders[headerName] = parser.table;
+            }
         });
-        if (it == std::ranges::end(globals.cImports)) {
-            globals.cImports.push_back(localImport);
-        } else {
-            freeExpr(localImport);
-        }
     }
+    threadPool.wait();
 }
 
 void LgsApp::createBuildDirs() {
@@ -384,37 +393,6 @@ bool LgsApp::validateRequiredEnvs() {
     return errHandler.successful;
 }
 
-void LgsApp::printErrors() const {
-    for (size_t i = 0; i < errHandler.errors.size(); ++i) {
-        const auto err = errHandler.errors[i];
-        const auto column = err.location.columnStart;
-        const auto line = err.location.lineStart;
-        auto lineStr = getLine(err.filePath, line);
-        const auto firstNonSpace = std::ranges::find_if(lineStr, [](const unsigned char c) { return !std::isspace(c); });
-        const auto trimmedCount = std::distance(lineStr.begin(), firstNonSpace);
-        if (err.filePath != "") {
-            auto errMsg = trim(lineStr);
-            int indent = column - trimmedCount - 2;
-            if (indent < 0) {
-                indent = 0;
-            }
-            errMsg += '\n' + std::string(indent, '~');
-            errMsg += '^';
-            int rest = lineStr.size() - column + 1;
-            if (rest > 0) {
-                errMsg += std::string(rest, '~');
-            }
-            errMsg += '\n' + err.msg;
-            const auto path = "\n   at: " + getFullPath(err.location, err.filePath);
-            logError(errMsg, path);
-        } else {
-            logError(err.msg);
-        }
-        if (i != errHandler.errors.size() - 1) logInfo(LGS_MSG_LINE_SEPERATOR);
-    }
-    if (!errHandler.errors.empty()) logInfo("\n");
-}
-
 void LgsApp::compareHash() const {
     for (const auto& file : srcFiles) {
         const auto oldHash = appCache.getHashByPath(file->path);
@@ -422,10 +400,6 @@ void LgsApp::compareHash() const {
         if (newHash == oldHash) continue;
         assert(0);
     }
-}
-
-size_t LgsApp::getNextFileID() {
-    return nextFileID.fetch_add(1, std::memory_order_relaxed);
 }
 
 void LgsApp::printIR() const {
@@ -439,8 +413,8 @@ void LgsApp::printIR() const {
 }
 
 void LgsApp::initPaths(const fs::path& root) {
-    assert(root != "");
-    paths.rootPath = root;
+    assert(root != "" && fs::exists(root));
+    paths.rootPath = fs::canonical(root);
     paths.srcDir = paths.rootPath / LGS_SRC_DIR;
     paths.envsDir = paths.rootPath / LGS_ENVS_DIR;
     paths.buildDir = paths.rootPath / LGS_BUILD_DIR;

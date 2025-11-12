@@ -16,5 +16,6 @@ public:
     explicit LgsVectorExpr(LgsVec* vecType): vecType(vecType) {}
     Value* loadIR(LgsLLVMGen& cg) override;
     std::string asText() override;
+    bool equals(LgsExpr* other) override;
     ~LgsVectorExpr() override;
 };

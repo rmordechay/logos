@@ -25,7 +25,7 @@ void LgsMainFunc::setDebugValue(LgsLLVMGen& cg) {
     const auto dbInt32 = LGS_INT.getDebugType(cg);
     const auto parameterTypes = diBuilder->getOrCreateTypeArray({dbInt32});
     const auto subroutine = diBuilder->createSubroutineType(parameterTypes);
-    cg.debugger.diProgram = diBuilder->createFunction(
+    cg.debugger.subprogram = diBuilder->createFunction(
         cg.debugger.compileUnit,
         funcType->name,
         funcType->name,
@@ -36,6 +36,6 @@ void LgsMainFunc::setDebugValue(LgsLLVMGen& cg) {
         llvm::DINode::FlagPrototyped,
         DISubprogram::SPFlagDefinition
     );
-    getIRFunc(cg)->setSubprogram(cg.debugger.diProgram);
+    getIRFunc(cg)->setSubprogram(cg.debugger.subprogram);
     cg.builder.SetCurrentDebugLocation(getDebugLoc(cg));
 }

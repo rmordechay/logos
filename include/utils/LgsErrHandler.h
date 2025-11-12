@@ -18,4 +18,5 @@ public:
     void addWarning(const LgsBaseMsg& lgsErr, const LgsLocation* location, const std::vector<std::string>& args = {});
     void mergeErrors(LgsErrHandler& other);
     void mergeErrorsWithLock(LgsErrHandler& other);
+    void printErrors() const;
 };

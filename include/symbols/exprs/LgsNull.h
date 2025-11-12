@@ -11,6 +11,7 @@ public:
 
     void completeType(LgsType* toType) override;
     std::string asText() override;
+    bool equals(LgsExpr* other) override;
     ~LgsNull() override;
 };
 

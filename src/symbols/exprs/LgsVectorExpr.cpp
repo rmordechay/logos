@@ -10,6 +10,10 @@ std::string LgsVectorExpr::asText() {
     return vecType->pname();
 }
 
+bool LgsVectorExpr::equals(LgsExpr* other) {
+    assert(0);
+}
+
 LgsVectorExpr::~LgsVectorExpr() {
     for (const auto & arg : args) {
         freeExpr(arg);

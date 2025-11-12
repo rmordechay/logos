@@ -9,6 +9,10 @@ void LgsHashMap::completeType(LgsType* toType) {
     }
 }
 
+bool LgsHashMap::equals(LgsExpr* other) {
+    assert(0);
+}
+
 std::string LgsHashMap::asText() {
     return type->pname();
 }

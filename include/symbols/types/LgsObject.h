@@ -30,7 +30,7 @@ public:
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
     Lgs_TypeKind getRTTypeKind() override;
-    Constant* initRTType(LgsLLVMGen& cg) override;
+    Constant* getRTType(LgsLLVMGen& cg) override;
     bool hasVirtuals() const;
     bool canCastTo(LgsType* other) override;
     std::string strFormatPart() const override;

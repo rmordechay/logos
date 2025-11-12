@@ -5,7 +5,7 @@
 class LgsPkgCmd final : public LgsCliCmd {
 public:
     LgsPkgCmd(const int argc, char** argv): LgsCliCmd(argc, argv) {}
-    bool run() override;
+    void run() override;
     LgsCliCmdHelp& getHelp() override;
     void printHelp() override;
 };

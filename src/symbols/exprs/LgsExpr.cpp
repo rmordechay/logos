@@ -19,11 +19,11 @@
 #include "funcs/LgsFunc.h"
 #include "loops/LgsMetaVar.h"
 
-LgsExpr* LgsExpr::castTo(LgsType* toType, const bool explicitCast) {
+LgsExpr* LgsExpr::staticCast(LgsType* toType, const bool explicitCast) {
     assert(0);
 }
 
-Value* LgsExpr::castToIR(LgsLLVMGen& cg, LgsType* toType) {
+Value* LgsExpr::castIR(LgsLLVMGen& cg, LgsType* toType) {
     assert(0);
 }
 
@@ -31,7 +31,7 @@ void LgsExpr::completeType(LgsType* toType) {
 
 }
 
-Value* LgsExpr::hash(LgsLLVMGen& cg) {
+Value* LgsExpr::hashValue(LgsLLVMGen& cg) {
     assert(0);
 }
 
@@ -51,6 +51,7 @@ int64_t* LgsExpr::getConstInt() {
         return &intConst->value;
     }
     if (const auto var = asVariable()) {
+        if (!var->isValueKnown) return nullptr;
         switch (var->ref.symbolType) {
         case VAR_DEC:
             return var->ref.varDec->expr->getConstInt();
@@ -62,6 +63,7 @@ int64_t* LgsExpr::getConstInt() {
         }
     }
     if (const auto binExpr = asBinExpr()) {
+        if (!binExpr->isValueKnown) return nullptr;
         const auto const1 = binExpr->left->getConstInt();
         if (!const1) return nullptr;
         const auto const2 = binExpr->right->getConstInt();

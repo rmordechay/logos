@@ -49,8 +49,18 @@ public:
         LgsStrConst* strConst;
         LgsNull* null;
     };
+    bool equals(LgsExpr* other) override;
+    std::string asText() override;
     ~LgsJson() override;
 };
+
+inline bool LgsJson::equals(LgsExpr* other) {
+    assert(0);
+}
+
+inline std::string LgsJson::asText() {
+    assert(0);
+}
 
 inline LgsJson::~LgsJson() {
     switch (jsonType) {

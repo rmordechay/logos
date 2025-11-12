@@ -15,13 +15,13 @@ public:
     LgsErrHandler errHandler;
 
     LgsCliCmd(const int argc, char** argv) : argc(argc), argv(argv) {}
-    virtual bool run() = 0;
+    virtual void run() = 0;
     virtual LgsCliCmdHelp& getHelp() = 0;
     virtual void printHelp();
-    int32_t parseIntArg(int i, const std::string& cmd) const;
     std::string parseString(int& i, const std::string& cmd) const;
+    static bool isArgEqual(const std::string& arg1, const std::vector<std::string>& args);
     void printArg(std::ostringstream& txt, LgsCliCmdArgHelp& arg) const;
-    int parseArgs(int indexStart, const std::function<void(int, const std::string&)>& f) const;
+    int parseArgs(int indexStart, const std::function<void(const std::string&, int&)>& f) const;
     void getLongestArg(const LgsCliCmdHelp& help);
     std::string mergeArgs() const;
     virtual ~LgsCliCmd() = default;

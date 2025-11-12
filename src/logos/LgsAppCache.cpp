@@ -10,8 +10,6 @@ void LgsAppCache::load(const fs::path& cacheFilePath) {
     inFile.read(reinterpret_cast<char*>(&count), sizeof(count));
     files.reserve(count);
     for (size_t i = 0; i < count; ++i) {
-        FileID id;
-        inFile.read(reinterpret_cast<char*>(&id), sizeof(id));
         size_t hash;
         inFile.read(reinterpret_cast<char*>(&hash), sizeof(hash));
         LgsFileType type;
@@ -23,7 +21,7 @@ void LgsAppCache::load(const fs::path& cacheFilePath) {
         const fs::path filePath(pathStr);
         std::time_t lastWriteTime;
         inFile.read(reinterpret_cast<char*>(&lastWriteTime), sizeof(lastWriteTime));
-        LgsFileMetadata fileMetadata(id, filePath, lastWriteTime, type);
+        LgsFileMetadata fileMetadata(filePath, lastWriteTime, type);
         fileMetadata.hash = hash;
         files.push_back(fileMetadata);
     }
@@ -35,7 +33,6 @@ void LgsAppCache::save(const fs::path& cacheFilePath) const {
     const auto count = files.size();
     outFile.write(reinterpret_cast<const char*>(&count), sizeof(count));
     for (const auto& file : files) {
-        outFile.write(reinterpret_cast<const char*>(&file.id), sizeof(file.id));
         outFile.write(reinterpret_cast<const char*>(&file.hash), sizeof(file.hash));
         outFile.write(reinterpret_cast<const char*>(&file.type), sizeof(file.type));
         const auto pathStr = file.path.string();
@@ -48,7 +45,6 @@ void LgsAppCache::save(const fs::path& cacheFilePath) const {
 
 void LgsAppCache::print() const {
     for (size_t i = 0; i < files.size(); ++i) {
-        logInfo("id          = " + std::to_string(files[i].id) + '\n');
         logInfo("type        = " + std::to_string(files[i].type) + '\n');
         logInfo("hash        = " + std::to_string(files[i].hash) + '\n');
         logInfo("lastWritten = " + std::to_string(files[i].lastWritten) + '\n');
@@ -57,8 +53,8 @@ void LgsAppCache::print() const {
     }
 }
 
-void LgsAppCache::addFileMetadata(const size_t fileID, const fs::path& filePath, const LgsFileType fileType) {
-    files.emplace_back(LgsFileMetadata(fileID, filePath, getLastWritten(filePath), fileType));
+void LgsAppCache::addFileMetadata(const fs::path& filePath, const LgsFileType fileType) {
+    files.emplace_back(LgsFileMetadata(filePath, getLastWritten(filePath), fileType));
 }
 
 LgsFileMetadata* LgsAppCache::getAppConfigFile() {

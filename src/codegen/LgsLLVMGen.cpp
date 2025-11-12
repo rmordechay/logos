@@ -2,7 +2,6 @@
 #include "files/LgsFile.h"
 #include "logos/LgsConfigs.h"
 #include "utils/LgsUtils.h"
-
 #include <llvm/Support/FileSystem.h>
 #include <llvm/Bitcode/BitcodeWriter.h>
 #include <llvm/IR/Module.h>

@@ -12,7 +12,7 @@ Value* LgsIntConst::loadIR(LgsLLVMGen& cg) {
     return IRValue;
 }
 
-LgsExpr* LgsIntConst::castTo(LgsType* toType, const bool explicitCast) {
+LgsExpr* LgsIntConst::staticCast(LgsType* toType, const bool explicitCast) {
     if (toType->getName() == LgsAny::name) return this;
     if (type->getName() == toType->getName()) return this;
     if (toType->asLong()) {
@@ -35,7 +35,7 @@ LgsExpr* LgsIntConst::castTo(LgsType* toType, const bool explicitCast) {
     assert(0);
 }
 
-Value* LgsIntConst::castToIR(LgsLLVMGen& cg, LgsType* toType) {
+Value* LgsIntConst::castIR(LgsLLVMGen& cg, LgsType* toType) {
     assert(IRValue);
     if (type->getName() == toType->getName()) return IRValue;
     if (toType->asGeneric()) return IRValue;
@@ -61,14 +61,20 @@ std::string LgsIntConst::asText() {
     return std::to_string(value);
 }
 
+bool LgsIntConst::equals(LgsExpr* other) {
+    assert(0);
+}
+
 void LgsIntConst::hashNode(size_t& oldHash) {
     hashNodeInt(oldHash, value);
 }
 
-Value* LgsIntConst::hash(LgsLLVMGen& cg) {
+Value* LgsIntConst::hashValue(LgsLLVMGen& cg) {
     return IRValue;
 }
 
 LgsExpr* LgsIntConst::cloneExpr() {
     return new LgsIntConst(type->clone(), value);
 }
+
+void LgsIntConst::setDebugValue(LgsLLVMGen& cg) { /* do nothing */}

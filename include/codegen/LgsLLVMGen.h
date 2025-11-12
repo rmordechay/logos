@@ -22,7 +22,8 @@ struct LgsLLDBGen {
     DIFile* diFile = nullptr;
     DIBuilder* diBuilder = nullptr;
     DICompileUnit* compileUnit = nullptr;
-    DISubprogram* diProgram = nullptr;
+    DISubprogram* subprogram = nullptr;
+    std::vector<llvm::DIScope*> blocks = {};
 };
 
 class LgsLLVMGen {

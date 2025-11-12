@@ -6,7 +6,7 @@ Value* LgsArrayExpr::loadIR(LgsLLVMGen& cg) {
     return IRValue;
 }
 
-Value* LgsArrayExpr::castToIR(LgsLLVMGen& cg, LgsType* toType) {
+Value* LgsArrayExpr::castIR(LgsLLVMGen& cg, LgsType* toType) {
     if (toType->asStr()) {
         if (const auto sArr = type->asSArray()) {
             if (sArr->baseType->asChar()) return IRValue;
@@ -30,7 +30,7 @@ void LgsArrayExpr::completeType(LgsType* toType) {
         }
         if (element->type->equals(otherBaseType)) continue;
         if (!element->type->canCastTo(otherBaseType)) continue;
-        const auto castTo = element->castTo(otherBaseType);
+        const auto castTo = element->staticCast(otherBaseType);
         if (element != castTo) {
             freeExpr(element);
         }

@@ -148,10 +148,11 @@ void LgsSema::visitField(LgsField* field) {
 }
 
 void LgsSema::visitFunc(LgsFunc* func) {
-    if (!func->funcType->generics.empty()) return;
+    const auto ft = func->funcType;
+    if (!ft->generics.empty()) return;
     stack.enterScope(func);
     auto defaultParamsStarted = false;
-    for (auto& param : func->funcType->params) {
+    for (auto& param : ft->params) {
         visitParam(&param);
         if (defaultParamsStarted && !param.expr) {
             addError(E10028, param.location);
@@ -160,7 +161,7 @@ void LgsSema::visitFunc(LgsFunc* func) {
         defaultParamsStarted = !!param.expr;
     }
     visitStmtsBlock(func->stmtsBlock);
-    if (func->funcType->isVariadic && func->funcType->hasDefaults) {
+    if (ft->isVariadic && ft->hasDefaults) {
         addError(E10043, func->location);
     }
     if (!validateBlockControlFlow(func->stmtsBlock, func)) {
@@ -189,9 +190,13 @@ void LgsSema::visitMainFunc(const LgsMainFunc* mainFunc) {
 }
 
 void LgsSema::visitLambda(LgsFunc* lambda) {
+    const auto ft = lambda->funcType;
+    if (ft->params.empty()) {
+        ft->params.emplace_back(&LGS_INT, "it");
+    }
     const auto stmtsBlock = lambda->stmtsBlock;
     // Wraps in return if it's the last statement
-    if (!lambda->funcType->rt->isVoid()) {
+    if (!stmtsBlock->stmts.empty() && !lambda->funcType->rt->isVoid()) {
         const auto expr = stmtsBlock->stmts.back()->asExpr();
         if (expr) {
             const auto returnStmt = new LgsReturn(expr);
@@ -208,9 +213,7 @@ void LgsSema::visitParam(LgsParam* param) {
         visitExpr(param->expr);
         validateExprType(param->expr, param->type);
     } else if (param->isVariadic) {
-        if (param->expr) {
-            addError(E10045, param->location);
-        }
+        if (param->expr) addError(E10045, param->location);
     }
     addLocalSymbol(LgsSymbol(param));
     assert(param->type);
@@ -512,7 +515,7 @@ void LgsSema::visitBreakStmt(const LgsBreak* breakStmt) {
 }
 
 void LgsSema::visitCoroutine(const LgsCoroutine* coroutine) {
-    LgsFuncCall* fc = nullptr;
+    const LgsFuncCall* fc = nullptr;
     if (coroutine->funcCall) {
         visitFuncCall(coroutine->funcCall);
         fc = coroutine->funcCall;
@@ -597,9 +600,8 @@ void LgsSema::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
         return addError(E10076, l->location, {binaryExpr->opText, ltype->pname(), rtype->pname()});
     }
     binaryExpr->setType(type);
-    if (!l->isValueKnown || !r->isValueKnown) return;
-
-    binaryExpr->isValueKnown = true;
+    binaryExpr->isValueKnown = l->isValueKnown && r->isValueKnown;
+    if (!binaryExpr->isValueKnown) return;
     const auto resultsType = binaryExpr->type;
     switch (binaryExpr->op) {
     case ADD: binaryExpr->results = resultsType->addConst(l, r); break;
@@ -645,7 +647,7 @@ void LgsSema::visitCast(LgsCast* cast) {
     visitExpr(cast->fromValue);
     if (!cast->fromValue->type) return;
     cast->toType = typeResolver.resolveType(cast->toType, file);
-    cast->value = cast->fromValue->castTo(cast->toType, true);
+    cast->value = cast->fromValue->staticCast(cast->toType, true);
     if (!cast->value) {
         addError(E10018, cast->location, {cast->fromValue->asText(), cast->toType->pname()});
         return;
@@ -762,9 +764,9 @@ void LgsSema::visitVariable(LgsVariable* variable) {
     }
     case FIELD: {
         variable->ref.field = symbol->field;
+        variable->isMutable = !symbol->field->isConst;
         variable->isValueKnown = symbol->field->isEnumField;
         variable->setType(symbol->field->type);
-        variable->isMutable = !symbol->field->isConst;
         if (symbol->field->isOwner) {
             variable->owner = symbol->field;
         }
@@ -888,14 +890,7 @@ void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent) {
     if (method->funcType->isMethod) {
         methodCall->args.insert(methodCall->args.begin(), LgsFuncArg(LGS_SELF, parent, true));
     }
-
-    for (size_t i = method->funcType->isMethod; i < method->funcType->params.size(); ++i) {
-        if (i >= methodCall->args.size()) continue;
-        auto arg = methodCall->args[i];
-        const auto& param = method->funcType->params[i];
-        arg.expr->completeType(param.type);
-        visitExpr(arg.expr);
-    }
+    visitFuncArgs(methodCall, method->funcType);
     if (methodCall->equals(method->funcType)) {
         methodCall->func = method;
         methodCall->setType(method->funcType->rt);
@@ -906,8 +901,8 @@ void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent) {
 
     if (!validateMethodVisibility(method, parent->type, methodCall->location)) return;
     if (stack.currentFunc()->isTest && parent->type->pname() == LgsTest::name && methodCall->name == "mock") {
-        const auto pair = std::make_pair(methodCall->args[0], methodCall->args[1]);
-        // TODO stack.currentFunc()->mocks.push_back(pair);
+        const auto pair = std::make_pair(methodCall->args[0].expr, methodCall->args[1].expr);
+        stack.currentFunc()->mocks.push_back(pair);
     }
 }
 
@@ -916,41 +911,7 @@ void LgsSema::visitFuncCall(LgsFuncCall* funcCall) {
     if (!symbol) return;
     const auto ft = symbol->getType()->asFuncType();
     if (!ft) return addError(E10046, funcCall->location, {funcCall->name});
-
-    if (funcCall->isNamed) {
-        auto paramsByName = ft->getParamsByName();
-        std::unordered_set<std::string> visited;
-        for (auto arg : funcCall->args) {
-            if (visited.contains(arg.name)) {
-                addError(E10098, arg.expr->location, {arg.expr->asText()});
-            }
-            visited.insert(arg.name);
-            if (!paramsByName.contains(arg.name)) {
-                addError(E10094, arg.expr->location, {arg.expr->asText(), funcCall->name});
-                continue;
-            }
-            const auto param = paramsByName[arg.name];
-            arg.expr->completeType(param->type);
-            visitExpr(arg.expr);
-            if (arg.name == "") {
-                addError(E10096, funcCall->location);
-                break;
-            }
-        }
-    } else {
-        for (size_t i = 0; i < ft->params.size(); ++i) {
-            if (i >= funcCall->args.size()) break;
-            auto& arg = funcCall->args[i];
-            const auto& param = ft->params[i];
-            arg.expr->completeType(param.type);
-            visitExpr(arg.expr);
-            if (arg.name != "") {
-                addError(E10096, funcCall->location);
-                break;
-            }
-        }
-    }
-
+    visitFuncArgs(funcCall, ft);
     // Validate
     if (!funcCall->equals(ft)) {
         for (const auto& arg : funcCall->args) if (!arg.expr->type) return;
@@ -978,6 +939,42 @@ void LgsSema::visitFuncCall(LgsFuncCall* funcCall) {
     } else {
         funcCall->func = func;
         funcCall->setType(ft->rt);
+    }
+}
+
+void LgsSema::visitFuncArgs(LgsFuncCall* funcCall, LgsFuncType* ft) {
+    if (funcCall->isNamed) {
+        auto paramsByName = ft->getParamsByName();
+        std::unordered_set<std::string> visited;
+        for (auto arg : funcCall->args) {
+            if (visited.contains(arg.name)) {
+                addError(E10098, arg.expr->location, {arg.expr->asText()});
+            }
+            visited.insert(arg.name);
+            if (!paramsByName.contains(arg.name)) {
+                addError(E10094, arg.expr->location, {arg.expr->asText(), funcCall->name});
+                continue;
+            }
+            const auto param = paramsByName[arg.name];
+            arg.expr->completeType(param->type);
+            visitExpr(arg.expr);
+            if (arg.name == "") {
+                addError(E10096, funcCall->location);
+                break;
+            }
+        }
+    } else {
+        for (size_t i = ft->isMethod; i < ft->params.size(); ++i) {
+            if (i >= funcCall->args.size()) break;
+            auto& arg = funcCall->args[i];
+            const auto& param = ft->params[i];
+            arg.expr->completeType(param.type);
+            visitExpr(arg.expr);
+            if (arg.name != "") {
+                addError(E10096, funcCall->location);
+                break;
+            }
+        }
     }
 }
 
@@ -1283,7 +1280,7 @@ void LgsSema::validateIndex(LgsIterIndex* iterIndex) {
 bool LgsSema::validateFieldVisibility(LgsField* field, LgsType* parent) {
     if (parent && parent->asObject() && parent->asObject()->singleton) return true;
     if (!field || field->isVirtual) return false;
-    if (!field->isPublic && file->id != field->location.fileID && !stack.currentFunc()->isTest) {
+    if (!field->isPublic && file->path != *field->location.filepath && !stack.currentFunc()->isTest) {
         if (parent) addError(E10030, field->location, {field->name, parent->pname()});
         return false;
     }
@@ -1293,7 +1290,7 @@ bool LgsSema::validateFieldVisibility(LgsField* field, LgsType* parent) {
 bool LgsSema::validateMethodVisibility(const LgsFunc* method, LgsType* parent, const LgsLocation& location) {
     if (parent && parent->asObject() && parent->asObject()->singleton) return true;
     if (!method || method->funcType->isVirtual) return false;
-    if (!method->funcType->isPublic && file->id != method->location.fileID && !stack.currentFunc()->isTest) {
+    if (!method->funcType->isPublic && file->path != *method->location.filepath && !stack.currentFunc()->isTest) {
         addError(E10031, location, {method->funcType->name, method->funcType->parentName});
         return false;
     }

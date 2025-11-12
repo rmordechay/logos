@@ -1,0 +1,19 @@
+func(f(Int): Void) {
+    f(2)
+}
+
+main() {
+    f = (x: Int): Void => print(x + 2)
+    func(f)
+    func(x => print(x + 2))
+    func((x) => print(x + 2))
+    func((x: Int): Void => print(x + 2))
+    func((x: Int): Void => {
+        a = 3
+        print(x + a)
+    })
+    func(it => {
+        a = 3
+        print(it + a)
+    })
+}

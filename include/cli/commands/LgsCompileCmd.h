@@ -7,7 +7,7 @@
 class LgsCompileCmd final : public LgsRunCmd {
 public:
     LgsCompileCmd(const int argc, char** argv) : LgsRunCmd(argc, argv) {}
-    bool run() override;
+    void run() override;
     LgsCliCmdHelp& getHelp() override;
 };
 

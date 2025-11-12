@@ -7,7 +7,6 @@ namespace fs = std::filesystem;
 
 class LgsLexer {
 public:
-    size_t fileID;
     fs::path filePath;
     size_t line = 1;
     size_t column = 1;
@@ -17,7 +16,7 @@ public:
     LgsErrHandler errHandler;
     std::vector<LgsToken> tokens;
 
-    explicit LgsLexer(const size_t fileID, const fs::path& filePath, std::string src) : fileID(fileID), filePath(filePath), source(std::move(src)) {}
+    explicit LgsLexer(const fs::path& filePath, std::string src) : filePath(filePath), source(std::move(src)) {}
     std::vector<LgsToken> tokenize();
     LgsToken nextToken();
     char advance();

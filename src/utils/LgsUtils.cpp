@@ -196,7 +196,7 @@ void hashNodeInt(size_t& oldHash, const size_t val) {
     combineNodeHash(oldHash, val);
 }
 
-void freeExpr(const LgsExpr* expr) {
+void freeExpr(LgsExpr* expr) {
     if (!expr) return;
     delete expr;
 }

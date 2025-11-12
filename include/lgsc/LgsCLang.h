@@ -2,7 +2,6 @@
 #include "LgsCLangParser.h"
 #include "LgsSymbolTable.h"
 #include "logos/LgsPaths.h"
-#include "utils/LgsErrHandler.h"
 #include <clang/Basic/Diagnostic.h>
 
 class LgsStrConst;

@@ -20,7 +20,7 @@
 #define LGS_C "C"
 #define LGS_MAIN_FUNC "main"
 #define LGS_SELF "self"
-#define LGS_ANONYMOUS_STR "anonymous"
+#define LGS_ANONYMOUS_NAME "anonymous"
 #define LGS_NULL_LITERAL "null"
 #define LGS_UNKNOWN_TYPE "<Unknown>"
 #define MSG_PLACEHOLDER "%s"

@@ -57,7 +57,6 @@
 #include <iostream>
 #include <unistd.h>
 #include <unordered_set>
-#include <llvm/Target/TargetMachine.h>
 #include <llvm/TargetParser/Host.h>
 
 std::atomic<size_t> LgsCodeGen::lambdasIDGenerator{0};
@@ -187,44 +186,31 @@ void LgsCodeGen::visitField(LgsField* field) const {
     }
 }
 
-void LgsCodeGen::visitParam(LgsParam* param) {
-    visitExpr(param->expr);
-    if (param->isVariadic) {
-        if (param->vaList) {
-            param->IRValue = param->vaList;
-            return;
-        }
-        param->vaList = cg.builder.CreateAlloca(cg.builder.getPtrTy());
-        const auto vaStart = llvm::Intrinsic::getDeclaration(cg.IRModule, llvm::Intrinsic::vastart, {cg.builder.getPtrTy()});
-        cg.builder.CreateCall(vaStart, {param->vaList});
-        param->IRValue = param->vaList;
-    }
-}
-
 void LgsCodeGen::visitStmt(LgsStmt* stmt) {
-    if (const auto ifStmt = stmt->asIfStmt()) return visitIfStmt(ifStmt);
-    if (const auto pattern = stmt->asSwitch()) return visitSwitch(pattern);
-    if (const auto varDec = stmt->asVarDec()) return visitVarDec(varDec);
-    if (const auto loopStmt = stmt->asLoop()) return visitLoop(loopStmt);
-    if (const auto coroutine = stmt->asCoroutine()) return visitCoroutine(coroutine);
-    if (const auto deferStmt = stmt->asDefer()) return visitDeferStmt(deferStmt);
-    if (const auto assignment = stmt->asAssignment()) return visitAssignment(assignment);
-    if (const auto funcCall = stmt->asFuncCall()) return visitFuncCall(funcCall);
-    if (const auto postfixExpr = stmt->asPostfixExpr()) return visitPostfixExpr(postfixExpr);
-    if (const auto postfixExpr = stmt->asExpr()) return visitExpr(postfixExpr);
-    if (const auto selection = stmt->asSelection()) return visitSelection(selection);
-    if (const auto ioStmt = stmt->asIOStmt()) return visitIOStmt(ioStmt);
-    if (const auto returnStmt = stmt->asReturn()) return visitReturnStmt(returnStmt);
-    if (const auto breakStmt = stmt->asBreak()) return visitBreakStmt(breakStmt);
-    if (stmt->asContinue()) return visitContinueStmt();
-    assert(0);
+    if (const auto ifStmt = stmt->asIfStmt()) visitIfStmt(ifStmt);
+    else if (const auto pattern = stmt->asSwitch()) visitSwitch(pattern);
+    else if (const auto varDec = stmt->asVarDec()) visitVarDec(varDec);
+    else if (const auto loopStmt = stmt->asLoop()) visitLoop(loopStmt);
+    else if (const auto coroutine = stmt->asCoroutine()) visitCoroutine(coroutine);
+    else if (const auto deferStmt = stmt->asDefer()) visitDeferStmt(deferStmt);
+    else if (const auto assignment = stmt->asAssignment()) visitAssignment(assignment);
+    else if (const auto funcCall = stmt->asFuncCall()) visitFuncCall(funcCall);
+    else if (const auto postfixExpr = stmt->asPostfixExpr()) visitPostfixExpr(postfixExpr);
+    else if (const auto selection = stmt->asSelection()) visitSelection(selection);
+    else if (const auto ioStmt = stmt->asIOStmt()) visitIOStmt(ioStmt);
+    else if (const auto returnStmt = stmt->asReturn()) visitReturnStmt(returnStmt);
+    else if (const auto breakStmt = stmt->asBreak()) visitBreakStmt(breakStmt);
+    else if (stmt->asContinue()) visitContinueStmt();
+    if (appConfigs.debugMode) stmt->setDebugValue(cg);
 }
 
 void LgsCodeGen::visitStmtsBlock(const LgsStmtsBlock* stmtsBlock) {
     assert(stmtsBlock);
+    if (appConfigs.debugMode) cg.debugger.blocks.push_back(cg.debugger.subprogram);
     for (const auto stmt : stmtsBlock->stmts) {
         visitStmt(stmt);
     }
+    if (appConfigs.debugMode) cg.debugger.blocks.pop_back();
 }
 
 void LgsCodeGen::visitLoop(LgsForLoop* loop) {
@@ -348,7 +334,6 @@ void LgsCodeGen::visitVarDec(LgsVarDec* varDec) {
     }
     assert(varDec->IRValue);
     varDec->IRValue->setName(varDec->name);
-    if (appConfigs.debugMode) varDec->setDebugValue(cg);
 }
 
 void LgsCodeGen::visitAssignment(const LgsAssignment* assignment) {
@@ -484,7 +469,7 @@ void LgsCodeGen::visitSwitch(LgsSwitch* switchStmt) {
     const auto exitBlock = cg.createBlock("", currentIRFunc);
     visitExpr(switchStmt->cond);
 
-    const auto exprIRValue = switchStmt->cond->hash(cg);
+    const auto exprIRValue = switchStmt->cond->hashValue(cg);
     llvm::SwitchInst* switchInst;
     if (switchStmt->elseBlock) {
         const auto numOfCases = switchStmt->patterns.size();
@@ -498,7 +483,7 @@ void LgsCodeGen::visitSwitch(LgsSwitch* switchStmt) {
         const auto [expr, stmtsBlock] = switchStmt->patterns[i];
         visitExpr(expr);
         const auto patternBlock = cg.createBlock(BLOCK_NAME_CASE_PREFIX + std::to_string(i), currentIRFunc);
-        const auto hashed = expr->hash(cg);
+        const auto hashed = expr->hashValue(cg);
         switchInst->addCase(llvm::dyn_cast<ConstantInt>(hashed), patternBlock);
         cg.builder.SetInsertPoint(patternBlock);
         visitStmtsBlock(stmtsBlock);
@@ -607,28 +592,27 @@ void LgsCodeGen::visitExpr(LgsExpr* expr, const bool assign) {
         visitBinaryExpr(binaryExpr);
     } else {
         if (checkMock(expr)) return;
-        if (const auto func = expr->asFunc()) return visitLambda(func);
-        if (const auto instance = expr->asInstance()) return visitInstance(instance);
-        if (const auto funcCall = expr->asFuncCall()) return visitFuncCall(funcCall);
-        if (const auto strConst = expr->asStrConst()) return visitStrConst(strConst);
-        if (const auto selection = expr->asSelection()) return visitSelection(selection, assign);
-        if (const auto arrayExpr = expr->asArrayExpr()) return visitArrayExpr(arrayExpr);
-        if (const auto hashMap = expr->asHashMap()) return visitHashMap(hashMap);
-        if (const auto iterIndex = expr->asIterIndex()) return visitIterIndex(iterIndex, assign);
-        if (const auto variable = expr->asVariable()) return visitVariable(variable);
-        if (const auto envVar = expr->asEnvVar()) return visitEnvVar(envVar);
-        if (const auto postfixExpr = expr->asPostfixExpr()) return visitPostfixExpr(postfixExpr);
-        if (const auto prefixExpr = expr->asPrefixExpr()) return visitPrefixExpr(prefixExpr);
-        if (const auto vecExpr = expr->asVectorExpr()) return visitVectorExpr(vecExpr);
-        if (const auto intConst = expr->asIntConst()) return visitIntConst(intConst);
-        if (const auto floatConst = expr->asFloatConst()) return visitFloatConst(floatConst);
-        if (const auto loopMetaVar = expr->asLoopMetaVar()) return visitLoopMetaVar(loopMetaVar);
-        if (const auto null = expr->asNull()) return visitNull(null);
-        if (const auto cast = expr->asCast()) return visitCast(cast);
-        if (const auto json = expr->asJson()) return visitJson(json);
-        if (expr->asTypeExpr()) return;
-        assert(0);
+        if (const auto func = expr->asFunc()) visitLambda(func);
+        else if (const auto instance = expr->asInstance()) visitInstance(instance);
+        else if (const auto funcCall = expr->asFuncCall()) visitFuncCall(funcCall);
+        else if (const auto strConst = expr->asStrConst()) visitStrConst(strConst);
+        else if (const auto selection = expr->asSelection()) visitSelection(selection, assign);
+        else if (const auto arrayExpr = expr->asArrayExpr()) visitArrayExpr(arrayExpr);
+        else if (const auto hashMap = expr->asHashMap()) visitHashMap(hashMap);
+        else if (const auto iterIndex = expr->asIterIndex()) visitIterIndex(iterIndex, assign);
+        else if (const auto variable = expr->asVariable()) visitVariable(variable);
+        else if (const auto envVar = expr->asEnvVar()) visitEnvVar(envVar);
+        else if (const auto postfixExpr = expr->asPostfixExpr()) visitPostfixExpr(postfixExpr);
+        else if (const auto prefixExpr = expr->asPrefixExpr()) visitPrefixExpr(prefixExpr);
+        else if (const auto vecExpr = expr->asVectorExpr()) visitVectorExpr(vecExpr);
+        else if (const auto intConst = expr->asIntConst()) visitIntConst(intConst);
+        else if (const auto floatConst = expr->asFloatConst()) visitFloatConst(floatConst);
+        else if (const auto loopMetaVar = expr->asLoopMetaVar()) visitLoopMetaVar(loopMetaVar);
+        else if (const auto null = expr->asNull()) visitNull(null);
+        else if (const auto cast = expr->asCast()) visitCast(cast);
+        else if (const auto json = expr->asJson()) visitJson(json);
     }
+    if (appConfigs.debugMode) expr->setDebugValue(cg);
 }
 
 void LgsCodeGen::visitBinaryExpr(LgsBinaryExpr* binExpr) {
@@ -686,7 +670,7 @@ void LgsCodeGen::visitLambda(LgsFunc* func) {
     cg.savedIP = cg.builder.saveIP();
     const auto originalFunc = currentIRFunc;
     const auto lambdaID = lambdasIDGenerator.fetch_add(1);
-    func->funcType->IRName = LGS_ANONYMOUS_STR + std::to_string(lambdaID);
+    func->funcType->IRName = LGS_ANONYMOUS_NAME + std::to_string(lambdaID);
     func->IRValue = func->getIRFunc(cg);
     visitFunc(func);
     currentIRFunc = originalFunc;
@@ -930,7 +914,6 @@ void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
     args.reserve(funcCall->args.size());
     for (const auto& arg : funcCall->args) args.emplace_back(arg.expr);
     funcCall->IRValue = func->call(cg, funcCall->args);
-    if (appConfigs.debugMode) funcCall->setDebugValue(cg);
 }
 
 void LgsCodeGen::visitIterFunc(const LgsFuncCall* funcCall) {
@@ -1072,8 +1055,8 @@ void LgsCodeGen::visitJson(LgsJson* json) {
 
 void LgsCodeGen::createPrologue(LgsFunc* func) {
     if (func->isTest) for (auto [_, then] : func->mocks) visitExpr(then);
-    if (appConfigs.debugMode) func->setDebugValue(cg);
     currentIRFunc = func->getIRFunc(cg);
+    if (appConfigs.debugMode) func->setDebugValue(cg);
     const auto entryBlock = cg.createBlock(BLOCK_NAME_ENTRY, currentIRFunc);
     cg.builder.SetInsertPoint(entryBlock);
     if (func->funcType->name == LGS_MAIN_FUNC) {
@@ -1406,8 +1389,6 @@ Value* LgsCodeGen::getIRValue(LgsValue* value) {
         visitExpr(expr);
     } else if (const auto stmt = dynamic_cast<LgsStmt*>(value)) {
         visitStmt(stmt);
-    } else if (const auto param = dynamic_cast<LgsParam*>(value)) {
-        visitParam(param);
     } else {
         assert(0);
     }
@@ -1435,7 +1416,7 @@ void LgsCodeGen::createRTTypes() const {
     for (const auto type : globals.rtTypes) {
         if (const auto sArr = type->asSArray()) {
             sArr->size->IRValue = sArr->size->IRValue;
-            sArrTypes.emplace_back(type->initRTType(cg));
+            sArrTypes.emplace_back(type->getRTType(cg));
         } else {
             continue;
         }

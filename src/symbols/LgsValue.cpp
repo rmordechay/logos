@@ -5,10 +5,6 @@ Value* LgsValue::loadIR(LgsLLVMGen& cg) {
     assert(0);
 }
 
-std::string LgsValue::asText() {
-    assert(0);
-}
-
 void LgsValue::setDebugValue(LgsLLVMGen& cg) {
     assert(0);
 }
@@ -22,7 +18,7 @@ llvm::DILocation* LgsValue::getDebugLoc(LgsLLVMGen& cg) const {
         cg.context,
         location.lineStart,
         location.columnStart,
-        cg.debugger.diProgram,
-        cg.debugger.diProgram->getScope()
+        cg.debugger.subprogram,
+        cg.debugger.subprogram->getScope()
     );
 }

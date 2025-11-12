@@ -27,7 +27,7 @@ public:
 
     explicit LgsFuncCall(const std::string& name) : name(name) {}
     std::string getGenericName() const;
-    Value* castToIR(LgsLLVMGen& cg, LgsType* toType) override;
+    Value* castIR(LgsLLVMGen& cg, LgsType* toType) override;
     Value* loadIR(LgsLLVMGen& cg) override;
     bool equals(LgsExpr* other) override;
     bool equals(LgsFuncType* funcType) const;

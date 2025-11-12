@@ -13,7 +13,7 @@ public:
     LgsCast(LgsExpr* fromValue, LgsType* toType) : fromValue(fromValue), toType(toType) {}
     Value* loadIR(LgsLLVMGen& cg) override;
     std::string asText() override;
-    Value* castToIR(LgsLLVMGen& cg, LgsType* castToType) override;
+    Value* castIR(LgsLLVMGen& cg, LgsType* castToType) override;
     ~LgsCast() override;
 };
 

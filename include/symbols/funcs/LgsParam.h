@@ -20,7 +20,6 @@ public:
 
     explicit LgsParam(LgsType* type, const std::string& name, LgsExpr* expr = nullptr) : name(name), type(type), expr(expr) {}
     Value* loadIR(LgsLLVMGen& cg) override;
-    std::string asText() override;
     void setType(LgsType* newType);
     LgsParam* clone() const;
     ~LgsParam() override = default;

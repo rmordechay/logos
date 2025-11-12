@@ -1,6 +1,6 @@
 #include "cli/commands/LgsTestCmd.h"
 
-bool LgsTestCmd::run() {
+void LgsTestCmd::run() {
     assert(0);
 }
 

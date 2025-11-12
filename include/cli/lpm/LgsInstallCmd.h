@@ -7,7 +7,7 @@ public:
     LgsPkgManager pkgManager;
 
     LgsInstallCmd(const int argc, char** argv) : LgsCliCmd(argc, argv) {}
-    bool run() override;
+    void run() override;
     LgsCliCmdHelp& getHelp() override;
 };
 

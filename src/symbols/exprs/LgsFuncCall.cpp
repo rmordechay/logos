@@ -18,11 +18,6 @@ bool LgsFuncCall::equals(LgsFuncType* funcType) const {
 
     const auto argsSize = args.size();
     const auto paramsSize = funcType->params.size();
-    if (argsSize != paramsSize) return false;
-    const auto argsSizeWithoutSelf = argsSize - funcType->isMethod;
-    if (argsSizeWithoutSelf != paramsSize) return false;
-    if (argsSizeWithoutSelf > paramsSize) return false;
-
     if (isNamed) {
         auto paramsByName = funcType->getParamsByName();
         for (size_t i = funcType->isMethod; i < argsSize; ++i) {
@@ -90,7 +85,7 @@ std::string LgsFuncCall::getGenericName() const {
     return str.str();
 }
 
-Value* LgsFuncCall::castToIR(LgsLLVMGen& cg, LgsType* toType) {
+Value* LgsFuncCall::castIR(LgsLLVMGen& cg, LgsType* toType) {
     if (type->getName() == toType->getName()) return IRValue;
     assert(0);
 }
@@ -129,6 +124,7 @@ LgsStmt* LgsFuncCall::cloneStmt() {
 
 LgsFuncCall::~LgsFuncCall() {
     for (const auto& arg : args) {
+        if (arg.isSelf) continue;
         freeExpr(arg.expr);
     }
 }

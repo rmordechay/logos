@@ -8,10 +8,6 @@ void LgsVarDec::setType(LgsType* newType) {
     type = newType;
 }
 
-std::string LgsVarDec::asText() {
-    return name;
-}
-
 Value* LgsVarDec::loadIR(LgsLLVMGen& cg) {
     if (!IRValue->getType()->isPointerTy()) return IRValue;
     return cg.builder.CreateLoad(type->getIRType(cg), IRValue);
@@ -26,7 +22,7 @@ bool LgsVarDec::shouldAllocate() const {
 
 void LgsVarDec::setDebugValue(LgsLLVMGen& cg) {
     const auto var = cg.debugger.diBuilder->createAutoVariable(
-        cg.debugger.diProgram,
+        cg.debugger.subprogram,
         name,
         cg.debugger.diFile,
         location.lineStart,

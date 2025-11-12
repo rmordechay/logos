@@ -10,7 +10,7 @@ std::string LgsCast::asText() {
     return fromValue->asText() + "->" + toType->pname();
 }
 
-Value* LgsCast::castToIR(LgsLLVMGen& cg, LgsType* castToType) {
+Value* LgsCast::castIR(LgsLLVMGen& cg, LgsType* castToType) {
     assert(value->IRValue);
     return value->IRValue;
 }

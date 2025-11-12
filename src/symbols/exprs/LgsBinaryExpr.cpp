@@ -1,4 +1,6 @@
 #include "exprs/LgsBinaryExpr.h"
+
+#include "codegen/LgsLLVMGen.h"
 #include "utils/LgsUtils.h"
 
 Value* LgsBinaryExpr::loadIR(LgsLLVMGen& cg) {
@@ -7,6 +9,14 @@ Value* LgsBinaryExpr::loadIR(LgsLLVMGen& cg) {
 
 std::string LgsBinaryExpr::asText() {
     return left->asText() + ' ' + opText + ' ' + right->asText();
+}
+
+void LgsBinaryExpr::setDebugValue(LgsLLVMGen& cg) {
+    cg.builder.SetCurrentDebugLocation(getDebugLoc(cg));
+}
+
+bool LgsBinaryExpr::equals(LgsExpr* other) {
+    assert(0);
 }
 
 LgsBinaryExpr::~LgsBinaryExpr() {

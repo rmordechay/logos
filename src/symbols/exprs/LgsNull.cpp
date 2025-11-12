@@ -14,6 +14,10 @@ std::string LgsNull::asText() {
     return LGS_NULL_LITERAL;
 }
 
+bool LgsNull::equals(LgsExpr* other) {
+    assert(0);
+}
+
 LgsNull::~LgsNull() {
     freeType(type);
     setType(nullptr);

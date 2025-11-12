@@ -3,43 +3,41 @@
 #include "data/LgsCliErrors.h"
 #include "logos/LgsApp.h"
 
-bool LgsRunCmd::run() {
+void LgsRunCmd::run() {
     fs::path execPath = "";
     std::vector<const char*> args;
     {
         LgsApp app;
-        parse(app, args);
-        if (!errHandler.successful) return false;
+        parseCompileArgs(app, args);
+        if (!errHandler.successful) return;
         if (!app.compile()) {
-            app.printErrors();
-            return false;
+            return errHandler.mergeErrors(app.errHandler);
         }
         execPath = app.paths.execFile;
     }
     assert(execPath != "");
     execute(execPath, args);
-    return true;
 }
 
-void LgsRunCmd::parse(LgsApp& app, std::vector<const char*>& appArgs) {
+void LgsRunCmd::parseCompileArgs(LgsApp& app, std::vector<const char*>& appArgs) {
     if (argc < 3) return errHandler.addError(E40001);
-    auto f = [this, &app](const int i, const std::string& cmd) {
-        const auto isSingleDash = cmd.size() == 1;
-        if ((isSingleDash && cmd[0] == 'o') || cmd == "optimize") {
-            const auto optLevel = parseIntArg(i, cmd);
-            if (optLevel < 0) return errHandler.addError(E40002, {"-o"});
+    auto argStart = parseArgs(2, [this, &app](const std::string& cmd, int& i) {
+        if (isArgEqual(cmd, {"o", "optimize"})) {
+            int optLevel;
+            if (cmd.size() == 1) optLevel = argv[++i][0] - '0';
+            else if (cmd.size() == 2) optLevel = cmd[1] - '0';
+            else return errHandler.addError(E40002, {"-o"});
             if (optLevel > 3) return errHandler.addError(E40003, {std::to_string(optLevel)});
             app.configs.optLevel = optLevel;
-        } else if ((isSingleDash && cmd[0] == 'c') || cmd == "code") {
+        } else if (isArgEqual(cmd, {"c", "code"})) {
             app.configs.appMode = FILE_MODE;
-        } else if ((isSingleDash && cmd[0] == 'd') || cmd == "debug") {
+        } else if (isArgEqual(cmd, {"d", "debug"})) {
             app.configs.debugMode = true;
         } else {
             errHandler.addError(E40003, {cmd});
         }
-    };
+    });
 
-    auto argStart = parseArgs(2, f);
     if (argStart < 0) return errHandler.addError(E40001);
     if (app.configs.appMode == FILE_MODE) {
         app.lgsCode[LGS_MAIN_FILE] = argv[argStart++];

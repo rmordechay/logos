@@ -40,7 +40,6 @@ public:
     std::vector<LgsFile*> srcFiles;
     std::vector<LgsEnvFile*> envFiles;
     std::vector<LgsTestFile*> testFiles;
-    std::atomic<FileID> nextFileID = 1;
     LgsAppConfigFile* appConfigFile = nullptr;
     std::unordered_map<std::string, std::string> lgsCode; // Used when passing code directly.
 
@@ -63,12 +62,11 @@ public:
     bool loadConfigs();
     bool loadDeps();
     void loadBuiltins();
+    void importCFiles();
     void createBuildDirs();
     bool validateEnvs();
     bool validateRequiredEnvs();
-    void printErrors() const;
     void compareHash() const;
-    size_t getNextFileID();
     void printIR() const;
     void initPaths(const fs::path& root);
     LgsMainFile* getMainFile() const;

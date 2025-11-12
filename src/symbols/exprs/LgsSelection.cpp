@@ -5,7 +5,6 @@
 #include "types/LgsInterface.h"
 #include "types/iterables/LgsVec.h"
 #include "utils/LgsUtils.h"
-
 #include <sstream>
 #include <llvm/IR/InlineAsm.h>
 
@@ -51,8 +50,8 @@ std::string LgsSelection::asText() {
     return str.str();
 }
 
-Value* LgsSelection::hash(LgsLLVMGen& cg) {
-    return lastExpr()->hash(cg);
+Value* LgsSelection::hashValue(LgsLLVMGen& cg) {
+    return lastExpr()->hashValue(cg);
 }
 
 bool LgsSelection::equals(LgsExpr* other) {

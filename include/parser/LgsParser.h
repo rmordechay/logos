@@ -57,20 +57,23 @@ class LgsParser {
 public:
     LgsPaths& paths;
     bool headersOnly;
-    std::string code = "";
     LgsToken currentToken;
     size_t currentIndex = 0;
     size_t recursionCount = 0;
     std::vector<LgsToken> tokens;
+    LgsFileMetadata* metadata = nullptr;
     LgsGlobals& globals;
-    LgsFileMetadata& metadata;
+    std::string code = "";
     LgsErrHandler errHandler;
     LgsFunc* currentFunc = nullptr;
     std::vector<LgsStrConst*> cImports;
     std::unordered_map<std::string, LgsApp*> fileImports;
 
-    LgsParser(LgsFileMetadata& metadata, LgsPaths& paths, LgsGlobals& globals, const bool headersOnly = false)
-        : paths(paths), headersOnly(headersOnly), globals(globals), metadata(metadata) {}
+    LgsParser(LgsFileMetadata* metadata, LgsPaths& paths, LgsGlobals& globals, const bool headersOnly = false)
+        : paths(paths), headersOnly(headersOnly), metadata(metadata), globals(globals) {}
+
+    LgsParser(const std::string& code, LgsPaths& paths, LgsGlobals& globals, const bool headersOnly = false)
+        : paths(paths), headersOnly(headersOnly), globals(globals), code(code) {}
 
     // Files
     bool scanTokens();
@@ -135,6 +138,7 @@ public:
     LgsInstance* parseInstance();
     LgsFuncCall* parseFuncCall();
     LgsVectorExpr* parseVectorExpr();
+    LgsExpr* parseExprOrStmtsBlock();
     LgsStrConst* parseStrConst();
     LgsMetaVar* parseLoopMetaVar();
     LgsExpr* parseConstant();

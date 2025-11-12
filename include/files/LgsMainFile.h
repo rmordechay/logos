@@ -17,7 +17,7 @@ public:
     std::map<std::string, LgsFunc*> funcs;
     std::vector<LgsSubType*> subtypes;
 
-    explicit LgsMainFile(const size_t fileID, const fs::path& path) : LgsFile(fileID, path) {}
+    explicit LgsMainFile(const fs::path& path) : LgsFile(path) {}
     size_t hashFile() override;
     LgsFunc* getMainFunc();
     ~LgsMainFile() override;

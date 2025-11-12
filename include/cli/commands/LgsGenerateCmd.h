@@ -5,7 +5,7 @@
 class LgsGenerateCmd final : public LgsCliCmd {
 public:
     LgsGenerateCmd(const int argc, char** argv) : LgsCliCmd(argc, argv) {}
-    bool run() override;
+    void run() override;
     LgsCliCmdHelp& getHelp() override;
     void createProjectStructure(const std::string& name) const;
 };

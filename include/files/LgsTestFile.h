@@ -10,7 +10,7 @@ public:
     std::vector<LgsFunc*> funcs;
     std::vector<LgsVarDec*> varDecs;
 
-    LgsTestFile(const size_t fileID, const fs::path& path) : LgsFile(fileID, path) {}
+    LgsTestFile(const fs::path& path) : LgsFile(path) {}
     size_t hashFile() override;
     ~LgsTestFile() override;
 };

@@ -42,7 +42,6 @@ public:
     Value* IRValue = nullptr;
     LgsLocation location;
 
-    virtual std::string asText();
     virtual Value* loadIR(LgsLLVMGen& cg);
     virtual void setDebugValue(LgsLLVMGen& cg);
     virtual void hashNode(size_t& oldHash);

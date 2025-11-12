@@ -178,7 +178,7 @@ Lgs_TypeKind LgsType::getRTTypeKind() {
     assert(0);
 }
 
-Constant* LgsType::initRTType(LgsLLVMGen& cg) {
+Constant* LgsType::getRTType(LgsLLVMGen& cg) {
     assert(0);
 }
 

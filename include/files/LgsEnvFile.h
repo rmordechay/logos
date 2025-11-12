@@ -9,7 +9,7 @@ public:
     std::string name;
     std::vector<LgsVarDec*> varDecs;
 
-    LgsEnvFile(const size_t fileID, const fs::path& path) : LgsFile(fileID, path) {}
+    LgsEnvFile(const fs::path& path) : LgsFile(path) {}
     size_t hashFile() override;
     ~LgsEnvFile() override;
 };

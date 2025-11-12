@@ -49,3 +49,34 @@ void LgsErrHandler::mergeErrorsWithLock(LgsErrHandler& other) {
     std::lock_guard lock(mtx);
     mergeErrors(other);
 }
+
+void LgsErrHandler::printErrors() const {
+    for (size_t i = 0; i < errors.size(); ++i) {
+        const auto err = errors[i];
+        const auto column = err.location.columnStart;
+        const auto line = err.location.lineStart;
+        auto lineStr = getLine(err.filePath, line);
+        const auto firstNonSpace = std::ranges::find_if(lineStr, [](const unsigned char c) { return !std::isspace(c); });
+        const auto trimmedCount = std::distance(lineStr.begin(), firstNonSpace);
+        if (err.filePath != "") {
+            auto errMsg = trim(lineStr);
+            int indent = column - trimmedCount - 2;
+            if (indent < 0) {
+                indent = 0;
+            }
+            errMsg += '\n' + std::string(indent, '~');
+            errMsg += '^';
+            int rest = lineStr.size() - column + 1;
+            if (rest > 0) {
+                errMsg += std::string(rest, '~');
+            }
+            errMsg += '\n' + err.msg;
+            const auto path = "\n   at: " + getFullPath(err.location, err.filePath);
+            logError(errMsg, path);
+        } else {
+            logError(err.msg);
+        }
+        if (i != errors.size() - 1) logInfo(LGS_MSG_LINE_SEPERATOR);
+    }
+    if (!errors.empty()) logInfo("\n");
+}

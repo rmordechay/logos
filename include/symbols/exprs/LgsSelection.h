@@ -13,7 +13,7 @@ public:
     LgsFuncCall* asMethodCall() const;
     void assign(LgsLLVMGen& cg, LgsExpr* expr) override;
     std::string asText() override;
-    Value* hash(LgsLLVMGen& cg) override;
+    Value* hashValue(LgsLLVMGen& cg) override;
     bool equals(LgsExpr* other) override;
     ~LgsSelection() override;
 };

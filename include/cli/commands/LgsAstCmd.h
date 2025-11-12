@@ -7,7 +7,7 @@ public:
     bool withErrors = false;
 
     LgsAstCmd(const int argc, char** argv) : LgsCliCmd(argc, argv) {}
-    bool run() override;
+    void run() override;
     LgsCliCmdHelp& getHelp() override;
 };
 

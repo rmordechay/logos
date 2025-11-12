@@ -29,7 +29,7 @@ class LgsFloatConst;
 class LgsStrConst;
 class LgsTypeConst;
 
-class LgsExpr : virtual public LgsStmt {
+class LgsExpr : public LgsStmt {
 public:
     LgsType* type = nullptr;
     bool isSpread = false;
@@ -41,13 +41,14 @@ public:
     Value* destPtrValue = nullptr;
 
     explicit LgsExpr(LgsType* type = nullptr) : type(type) {}
-    virtual LgsExpr* castTo(LgsType* toType, bool explicitCast = false);
-    virtual Value* castToIR(LgsLLVMGen& cg, LgsType* toType);
+    virtual LgsExpr* staticCast(LgsType* toType, bool explicitCast = false);
+    virtual Value* castIR(LgsLLVMGen& cg, LgsType* toType);
+    virtual Value* hashValue(LgsLLVMGen& cg);
     virtual void completeType(LgsType* toType);
-    virtual Value* hash(LgsLLVMGen& cg);
     virtual void assign(LgsLLVMGen& cg, LgsExpr* expr);
     virtual bool equals(LgsExpr* other);
     virtual LgsExpr* cloneExpr();
+    virtual std::string asText() = 0;
 
     void freeOwner(LgsLLVMGen& cg);
     int64_t* getConstInt();

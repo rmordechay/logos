@@ -10,11 +10,11 @@ std::string LgsInstance::asText() {
     return name + "{}";
 }
 
-LgsExpr* LgsInstance::castTo(LgsType* toType, bool explicitCast) {
+LgsExpr* LgsInstance::staticCast(LgsType* toType, bool explicitCast) {
     assert(0);
 }
 
-Value* LgsInstance::castToIR(LgsLLVMGen& cg, LgsType* toType) {
+Value* LgsInstance::castIR(LgsLLVMGen& cg, LgsType* toType) {
     return IRValue;
 }
 

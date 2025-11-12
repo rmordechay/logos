@@ -14,7 +14,7 @@ std::vector<LgsToken> LgsLexer::tokenize() {
 
 LgsToken LgsLexer::nextToken() {
     skipWhitespace();
-    LgsLocation location{fileID, position, line, column};
+    LgsLocation location{position, line, column};
     if (currentChar == '\0') return {T_EOF, "", location};
 
     // Comments

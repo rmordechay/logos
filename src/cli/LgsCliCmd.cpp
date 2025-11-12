@@ -42,7 +42,7 @@ void LgsCliCmd::printHelp() {
     logInfo(txt.str());
 }
 
-int LgsCliCmd::parseArgs(const int indexStart, const std::function<void(int, const std::string&)>& f) const {
+int LgsCliCmd::parseArgs(const int indexStart, const std::function<void(const std::string&, int&)>& f) const {
     auto argStart = -1;
     for (int i = indexStart; i < argc; ++i) {
         const auto arg = argv[i];
@@ -51,9 +51,19 @@ int LgsCliCmd::parseArgs(const int indexStart, const std::function<void(int, con
             break;
         }
         const auto name = std::string(arg).substr(arg[1] == '-' ? 2 : 1);
-        f(i, name);
+        f(name, i);
     }
     return argStart;
+}
+
+bool LgsCliCmd::isArgEqual(const std::string& arg1, const std::vector<std::string>& args) {
+    for (auto arg2 : args) {
+        // -o 3 or -o3
+        const auto isSingleLetter = arg2.length() == 1 || (arg2.length() == 2 && isdigit(arg2[1]));
+        if (isSingleLetter && arg2 == arg1.substr(0, arg1.length() - 1)) return true;
+        if (arg1 == arg2) return true;
+    }
+    return false;
 }
 
 void LgsCliCmd::getLongestArg(const LgsCliCmdHelp& help) {
@@ -83,12 +93,6 @@ void LgsCliCmd::printArg(std::ostringstream& txt, LgsCliCmdArgHelp& arg) const {
     if (!arg.possibleValues.empty()) {
         txt << padString(maxStr) + "Possible value: " << arg.possibleValues << ".\n";
     }
-}
-
-int32_t LgsCliCmd::parseIntArg(const int i, const std::string& cmd) const {
-    if (cmd.size() == 1) return argv[i][0] - '0';
-    if (cmd.size() == 2) return cmd[1] - '0';
-    return -1;
 }
 
 std::string LgsCliCmd::parseString(int& i, const std::string& cmd) const {

@@ -45,7 +45,7 @@ void combineNodeHash(size_t& oldHash, size_t newHash);
 void hashNodeString(size_t& oldHash, const std::string& str);
 void hashNodeInt(size_t& oldHash, size_t val);
 
-void freeExpr(const LgsExpr* expr);
+void freeExpr(LgsExpr* expr);
 void freeExprs(std::vector<LgsExpr*>& exprs);
 void freeStmt(const LgsStmt* stmt);
 void freeParams(std::vector<LgsParam>& params);

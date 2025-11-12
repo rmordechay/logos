@@ -47,7 +47,7 @@ public:
     Value* callWithVariadic(LgsLLVMGen& cg, const std::vector<LgsFuncArg>& args);
     Value* callIR(LgsLLVMGen& cg, const std::vector<Value*>& args = {});
     Value* loadIR(LgsLLVMGen& cg) override;
-    Value* castToIR(LgsLLVMGen& cg, LgsType* toType) override;
+    Value* castIR(LgsLLVMGen& cg, LgsType* toType) override;
     void completeType(LgsType* toType) override;
     bool needsCleanup() const;
     std::string asText() override;
