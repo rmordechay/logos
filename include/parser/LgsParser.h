@@ -177,5 +177,5 @@ public:
     bool parsedOrReset(const void* value, size_t resetIndex);
     void addParsingError();
     void recursionGuard();
-    void addError(const LgsBaseError& lgsErr, const LgsLocation* location, const std::vector<std::string>& args);
+    void addError(const LgsBaseMsg& lgsErr, const LgsLocation* location, const std::vector<std::string>& args);
 };

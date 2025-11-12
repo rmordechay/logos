@@ -2,6 +2,7 @@
 #include "Lgs_DArray.h"
 #include "codegen/LgsLLVMGen.h"
 #include "exprs/LgsArrayExpr.h"
+#include "exprs/LgsFuncCall.h"
 #include "funcs/LgsFunc.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsVoid.h"
@@ -83,10 +84,10 @@ LgsFunc* LgsDArray::getAddFunc() {
     const auto func = methods.find(ADD_FUNC_NAME);
     if (func != methods.end() && func->second) return func->second;
     func->second = new LgsFunc(ADD_FUNC_NAME, &LGS_VOID, {this, baseType}, BUILTIN | PUBLIC | METHOD);
-    func->second->fn = [](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
+    func->second->fn = [](LgsLLVMGen& cg, const std::vector<LgsFuncArg>& args) {
         return cg.callLgsFunc(std::string(name) + "_add", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {
-            cg.getPtrTo(args[0]->IRValue),
-            cg.getPtrTo(args[1]->IRValue),
+            cg.getPtrTo(args[0].expr->IRValue),
+            cg.getPtrTo(args[1].expr->IRValue),
         });
     };
     methods[func->second->funcType->name] = func->second;

@@ -12,8 +12,8 @@ class LgsFile {
 public:
     size_t id = 0;
     fs::path path;
+    LgsLLVMGen cg;
     LgsLocation location;
-    LgsLLVMGen llvmCodeGen;
     LgsSymbolTable symbolTable;
     std::vector<LgsStrConst*> cImports;
 

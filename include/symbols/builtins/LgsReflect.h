@@ -15,7 +15,7 @@ public:
     explicit LgsReflect() : LgsObject(name) {
         addMethod(getFieldFunc);
         addMethod(getMethodFunc);
-        getMethodFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) -> Value* {
+        getMethodFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsFuncArg>& args) -> Value* {
             if (args.size() < 2) return nullptr;
             assert(0);
         };

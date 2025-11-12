@@ -71,7 +71,7 @@ bool isLogosKeyword(const std::string& s) {
     return LGS_KEYWORDS.contains(s);
 }
 
-void printCliError(const LgsBaseError& err, const std::vector<std::string>& args) {
+void printCliError(const LgsBaseMsg& err, const std::vector<std::string>& args) {
     const auto errMsg = formatErrorMsg(err.msg, args) + '\n';
     logError(errMsg);
 }

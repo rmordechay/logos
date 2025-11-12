@@ -141,5 +141,5 @@ public:
     void addLocalSymbol(const LgsSymbol& newSymbol);
     LgsSymbol* getSymbol(const std::string& name, const LgsLocation* location);
     LgsFunc* createGenericFunc(LgsFuncCall* funcCall, LgsFunc* func);
-    void addError(const LgsBaseError& lgsErr, const LgsLocation* location, const std::vector<std::string>& args = {});
+    void addError(const LgsBaseMsg& lgsErr, const LgsLocation& location, const std::vector<std::string>& args = {});
 };

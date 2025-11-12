@@ -1,5 +1,6 @@
 #include "types/iterables/LgsSet.h"
 #include "codegen/LgsLLVMGen.h"
+#include "exprs/LgsFuncCall.h"
 #include "funcs/LgsFunc.h"
 #include "types/LgsAny.h"
 #include "types/LgsFuncType.h"
@@ -56,8 +57,8 @@ LgsFunc* LgsSet::getAddFunc() {
     const auto func = methods.find(ADD_FUNC_NAME);
     if (func != methods.end() && func->second) return func->second;
     func->second = new LgsFunc(ADD_FUNC_NAME, &LGS_VOID, {this, &LGS_ANY}, BUILTIN | PUBLIC | METHOD);
-    func->second->fn = [func](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
-        return func->second->callIR(cg, {args[0]->IRValue, cg.getPtrTo(args[1]->IRValue)});
+    func->second->fn = [func](LgsLLVMGen& cg, const std::vector<LgsFuncArg>& args) {
+        return func->second->callIR(cg, {args[0].expr->IRValue, cg.getPtrTo(args[1].expr->IRValue)});
     };
     addMethod(func->second);
     return func->second;

@@ -115,6 +115,7 @@ bool LgsApp::parse() {
         });
     }
     threadPool.wait();
+
     LgsCLang clang(paths.cLibHeadersDir);
     for (const auto cImport : globals.cImports) {
         auto headerName = cImport->value;
@@ -170,8 +171,10 @@ bool LgsApp::generate() {
     LgsCodeGen mainCodeGen(*mainFile, configs, globals, paths);
     if (!mainCodeGen.generate()) {
         errHandler.setUnsuccessful();
+        printIR();
         return false;
     }
+
     for (const auto& file : srcFiles) {
         if (file->isMain()) continue;
         threadPool.runTask([this, file] {
@@ -184,14 +187,7 @@ bool LgsApp::generate() {
         });
     }
     threadPool.wait();
-
-    if (lgsConfigs.isDevMode && lgsConfigs.printIR) {
-        for (const auto& file : srcFiles) {
-            std::lock_guard lock(mtx);
-            file->llvmCodeGen.IRModule->print(llvm::outs(), nullptr);
-            logInfo(LGS_MSG_LINE_SEPERATOR);
-        }
-    }
+    printIR();
     return errHandler.successful;
 }
 
@@ -430,6 +426,16 @@ void LgsApp::compareHash() const {
 
 size_t LgsApp::getNextFileID() {
     return nextFileID.fetch_add(1, std::memory_order_relaxed);
+}
+
+void LgsApp::printIR() const {
+    if (!lgsConfigs.isDevMode || !lgsConfigs.printIR) return;
+    std::lock_guard lock(mtx);
+    for (const auto& file : srcFiles) {
+        if (!file->cg.IRModule) continue;
+        file->cg.IRModule->print(llvm::outs(), nullptr);
+        logInfo(LGS_MSG_LINE_SEPERATOR);
+    }
 }
 
 bool LgsApp::initPaths(const fs::path& root) {

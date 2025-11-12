@@ -141,7 +141,7 @@ Value* LgsSArray::lengthIR(LgsLLVMGen& cg, Value* iterable) {
 LgsFunc* LgsSArray::getLenFunc() {
     const auto lenFunc = LgsIterable::getLenFunc();
     if (lenFunc->fn) return lenFunc;
-    lenFunc->fn = [this](LgsLLVMGen& cg, const std::vector<LgsExpr*>&) {
+    lenFunc->fn = [this](LgsLLVMGen& cg, const std::vector<LgsFuncArg>&) {
         return cg.extendToSize(size->IRValue);
     };
     return lenFunc;

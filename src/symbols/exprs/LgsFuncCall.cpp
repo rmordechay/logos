@@ -11,23 +11,35 @@ Value* LgsFuncCall::loadIR(LgsLLVMGen& cg) {
     return IRValue;
 }
 
-bool LgsFuncCall::equals(const LgsFuncType* funcType) const {
+bool LgsFuncCall::equals(LgsFuncType* funcType) const {
     if (args.empty() && funcType->params.empty()) return true;
     if (funcType->isVariadic) return equalsVariadic(funcType);
     if (funcType->hasDefaults) return equalsDefaults(funcType);
 
-    const auto argSize = args.size();
+    const auto argsSize = args.size();
     const auto paramsSize = funcType->params.size();
-    if (argSize != paramsSize) return false;
-    const auto argsSizeWithoutSelf = argSize - funcType->isMethod;
+    if (argsSize != paramsSize) return false;
+    const auto argsSizeWithoutSelf = argsSize - funcType->isMethod;
     if (argsSizeWithoutSelf != paramsSize) return false;
     if (argsSizeWithoutSelf > paramsSize) return false;
-    for (size_t i = funcType->isMethod; i < paramsSize; ++i) {
-        if (i >= argSize) continue;
-        const auto arg = args[i];
-        const auto param = funcType->params[i];
-        if (!arg.expr->type || !arg.expr->type->canCastTo(param.type)) {
-            return false;
+
+    if (isNamed) {
+        auto paramsByName = funcType->getParamsByName();
+        for (size_t i = funcType->isMethod; i < argsSize; ++i) {
+            const auto arg = args[i];
+            const auto param = paramsByName[arg.name];
+            if (!arg.expr->type || !arg.expr->type->canCastTo(param->type)) {
+                return false;
+            }
+        }
+    } else {
+        for (size_t i = funcType->isMethod; i < paramsSize; ++i) {
+            if (i >= argsSize) continue;
+            const auto arg = args[i];
+            const auto param = funcType->params[i];
+            if (!arg.expr->type || !arg.expr->type->canCastTo(param.type)) {
+                return false;
+            }
         }
     }
     return true;
@@ -109,7 +121,7 @@ LgsStmt* LgsFuncCall::cloneStmt() {
     const auto newFuncCall = new LgsFuncCall(*this);
     newFuncCall->args.clear();
     for (const auto& arg : args) {
-        newFuncCall->args.emplace_back(LgsFuncCallArg(arg.name, arg.expr->cloneExpr()));
+        newFuncCall->args.emplace_back(LgsFuncArg(arg.name, arg.expr->cloneExpr()));
     }
     if (type) newFuncCall->type = type->clone();
     return newFuncCall;

@@ -2,13 +2,14 @@
 #include "stmts/LgsStmtsBlock.h"
 #include "types/LgsFuncType.h"
 
+struct LgsFuncArg;
 class LgsStmtsBlock;
 class LgsParam;
 class LgsExpr;
 class LgsStmt;
 class LgsType;
 
-typedef std::function<Value*(LgsLLVMGen&, const std::vector<LgsExpr*>&)> CallFn;
+typedef std::function<Value*(LgsLLVMGen&, const std::vector<LgsFuncArg>&)> CallFn;
 
 class LgsFunc : public LgsExpr {
 public:
@@ -42,8 +43,8 @@ public:
 
     virtual Function* getIRFunc(LgsLLVMGen& cg);
     void initFunc(const std::string& name, LgsType* rt, const std::vector<LgsParam>& params, uint32_t ops);
-    virtual Value* call(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args, const std::vector<LgsType*>& generics = {});
-    Value* callWithVariadic(LgsLLVMGen& cg, const std::vector<LgsExpr*>& args);
+    virtual Value* call(LgsLLVMGen& cg, std::vector<LgsFuncArg>& args);
+    Value* callWithVariadic(LgsLLVMGen& cg, const std::vector<LgsFuncArg>& args);
     Value* callIR(LgsLLVMGen& cg, const std::vector<Value*>& args = {});
     Value* loadIR(LgsLLVMGen& cg) override;
     Value* castToIR(LgsLLVMGen& cg, LgsType* toType) override;

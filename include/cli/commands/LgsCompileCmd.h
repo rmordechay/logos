@@ -15,7 +15,9 @@ inline LgsCliCmdHelp compileCmdHelp{
     .name = "compile",
     .usage = "lgs compile <path> <options>",
     .summary = "Compiles Logos code.",
-    .desc = "The compile command compiles a Logos project or a single file.",
+    .desc = "The compile command compiles a Logos project or a single file.\n"
+            "In project mode, the complied files will be saved in the build directory.\n"
+            "In file mode, the compiled file path will be printed after running the command.",
     .requiredArgs = {
         {
             .name = "<path>",
@@ -23,15 +25,7 @@ inline LgsCliCmdHelp compileCmdHelp{
             .desc = "Path to file or project root.",
         },
     },
-    .optionalArgs = {
-        {
-            .name = "-o",
-            .type = LgsInt::name,
-            .defaultVal = "2",
-            .possibleValues = "[0, 1, 2, 3]",
-            .desc = "Optimization level."
-        },
-    },
+    .optionalArgs = runCompileOptionalArgs,
     .examples = {
         "lgs compile path/to/root",
         "lgs compile app.lgs",

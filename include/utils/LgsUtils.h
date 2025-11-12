@@ -9,7 +9,7 @@ class LgsParam;
 class LgsSubType;
 class LgsExpr;
 struct LgsError;
-struct LgsBaseError;
+struct LgsBaseMsg;
 class LgsFile;
 class LgsErrHandler;
 struct LgsLocation;
@@ -25,7 +25,7 @@ bool runCmd(const char* cmd);
 bool createDir(fs::path& dirPath);
 bool isLogosFile(const fs::path& filePath);
 bool isLogosKeyword(const std::string& s);
-void printCliError(const LgsBaseError& err, const std::vector<std::string>& args = {});
+void printCliError(const LgsBaseMsg& err, const std::vector<std::string>& args = {});
 std::string formatErrorMsg(const std::string& msg, const std::vector<std::string>& args);
 
 std::string getFileText(const fs::path& filePath);

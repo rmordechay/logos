@@ -53,7 +53,7 @@ set(LGS_SOURCE
     ${CMAKE_SOURCE_DIR}/src/utils/LgsErrHandler.cpp
 
     # CLI
-    ${CMAKE_SOURCE_DIR}/src/cli/LgsCli.cpp
+    ${CMAKE_SOURCE_DIR}/src/cli/LgsCliHandler.cpp
     ${CMAKE_SOURCE_DIR}/src/cli/LgsCliCmd.cpp
     ${CMAKE_SOURCE_DIR}/src/cli/commands/LgsRunCmd.cpp
     ${CMAKE_SOURCE_DIR}/src/cli/commands/LgsCompileCmd.cpp

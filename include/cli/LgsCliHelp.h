@@ -13,6 +13,7 @@ struct LgsCliCmdArgHelp {
 
 struct LgsCliCmdHelp {
     std::string name = "";
+    std::string name2 = "";
     std::string usage = "";
     std::string summary = "";
     std::string desc = "";

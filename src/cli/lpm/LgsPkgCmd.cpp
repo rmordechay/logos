@@ -1,11 +1,11 @@
 #include "cli/lpm/LgsPkgCmd.h"
 #include "data/LgsCliErrors.h"
-#include "cli/LgsCli.h"
+#include "cli/LgsCliHandler.h"
 #include "cli/lpm/LgsInstallCmd.h"
 
 bool LgsPkgCmd::run() {
     const std::string subcmd = argv[2];
-    if (subcmd == lgsHelpCmdHelp.name) {
+    if (isHelpCommand(subcmd)) {
         printHelp();
         return false;
     }

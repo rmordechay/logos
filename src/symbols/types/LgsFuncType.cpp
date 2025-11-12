@@ -121,13 +121,6 @@ void LgsFuncType::setFuncOptions(const uint32_t ops) {
     hasDefaults =  ops & HAS_DEFAULTS;
 }
 
-LgsParam* LgsFuncType::getParamByName(const std::string& paramName) {
-    for (auto& param : params) {
-        if (param.name == paramName) return &param;
-    }
-    return nullptr;
-}
-
 LgsType* LgsFuncType::clone() {
     const auto lgsFunc = new LgsFuncType();
     lgsFunc->name = name;
@@ -156,6 +149,14 @@ LgsType* LgsFuncType::clone() {
     lgsFunc->hasDefaults = hasDefaults;
     lgsFunc->IRType = nullptr;
     return lgsFunc;
+}
+
+std::unordered_map<std::string, LgsParam*> LgsFuncType::getParamsByName() {
+    std::unordered_map<std::string, LgsParam*> paramsByName;
+    for (size_t i = 0; i < params.size(); ++i) {
+        paramsByName[params[i].name] = &params[i];
+    }
+    return paramsByName;
 }
 
 LgsFuncType::~LgsFuncType() {

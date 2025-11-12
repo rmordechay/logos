@@ -1,4 +1,4 @@
-#include "cli/LgsCli.h"
+#include "cli/LgsCliHandler.h"
 #include "cli/commands/LgsAstCmd.h"
 #include "cli/commands/LgsCompileCmd.h"
 #include "cli/commands/LgsFormatCmd.h"
@@ -22,7 +22,7 @@ static std::vector COMMANDS = {
     &lgsHelpCmdHelp,
 };
 
-bool LgsCli::execute() const {
+bool LgsCliHandler::execute() const {
     if (argc < 2) {
         printCliError(E40001);
         printParentCmdHelp(COMMANDS);
@@ -30,13 +30,13 @@ bool LgsCli::execute() const {
     }
 
     const std::string cmdStr = argv[1];
-    if (cmdStr == lgsHelpCmdHelp.name) {
+    if (isHelpCommand(cmdStr)) {
         printParentCmdHelp(COMMANDS);
-        return false;
+        return true;
     }
-    if (cmdStr == lgsVersionCmdHelp.name) {
+    if (isVersionCommand(cmdStr)) {
         logInfo(std::string(LOGOS_VERSION) + '\n');
-        return false;
+        return true;
     }
     const auto cmd = getCmd();
     if (!cmd) {
@@ -44,14 +44,14 @@ bool LgsCli::execute() const {
         printParentCmdHelp(COMMANDS);
         return false;
     }
-    const auto isHelp = argc == 3 && std::string(argv[2]) == lgsHelpCmdHelp.name;
+    const auto isHelp = argc == 3 && isHelpCommand(argv[2]);
     if (isHelp) cmd->printHelp();
     else cmd->run();
     delete cmd;
     return true;
 }
 
-LgsCliCmd* LgsCli::getCmd() const {
+LgsCliCmd* LgsCliHandler::getCmd() const {
     const std::string cmdStr = argv[1];
     if (cmdStr == compileCmdHelp.name) {
         return new LgsCompileCmd(argc, argv);

@@ -6,13 +6,13 @@ void LgsErrHandler::setUnsuccessful() {
     successful = false;
 }
 
-void LgsErrHandler::addError(const LgsBaseError& lgsErr, const std::vector<std::string>& args) {
+void LgsErrHandler::addError(const LgsBaseMsg& lgsErr, const std::vector<std::string>& args) {
     setUnsuccessful();
     LgsError err(formatErrorMsg(lgsErr.msg, args), lgsErr.code);
     errors.emplace_back(err);
 }
 
-void LgsErrHandler::addError(const LgsBaseError& lgsErr, const LgsLocation* location, const std::string& filePath, const std::vector<std::string>& args) {
+void LgsErrHandler::addError(const LgsBaseMsg& lgsErr, const LgsLocation* location, const std::string& filePath, const std::vector<std::string>& args) {
     setUnsuccessful();
     LgsError err(formatErrorMsg(lgsErr.msg, args), lgsErr.code);
     if (location) {
@@ -24,7 +24,7 @@ void LgsErrHandler::addError(const LgsBaseError& lgsErr, const LgsLocation* loca
     }
 }
 
-void LgsErrHandler::addWarning(const LgsBaseError& lgsErr, const LgsLocation* location, const std::vector<std::string>& args) {
+void LgsErrHandler::addWarning(const LgsBaseMsg& lgsErr, const LgsLocation* location, const std::vector<std::string>& args) {
     const auto result = formatErrorMsg(lgsErr.msg, args);
     if (location) {
         warnings.emplace_back(LgsWarning(result, lgsErr.code, *location));

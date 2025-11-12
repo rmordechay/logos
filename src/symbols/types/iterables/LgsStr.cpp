@@ -1,3 +1,4 @@
+#include "exprs/LgsFuncCall.h"
 #include "exprs/constants/LgsFloatConst.h"
 #include "exprs/constants/LgsStrConst.h"
 #include "funcs/LgsFunc.h"
@@ -70,8 +71,8 @@ Value* LgsStr::getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) {
 LgsFunc* LgsStr::getLenFunc() {
     const auto lenFunc = LgsIterable::getLenFunc();
     if (lenFunc->fn) return lenFunc;
-    lenFunc->fn = [this](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
-        return lengthIR(cg, args.front()->IRValue);
+    lenFunc->fn = [this](LgsLLVMGen& cg, const std::vector<LgsFuncArg>& args) {
+        return lengthIR(cg, args.front().expr->IRValue);
     };
     return lenFunc;
 }
@@ -79,8 +80,8 @@ LgsFunc* LgsStr::getLenFunc() {
 LgsFunc* LgsStr::getIsEmptyFunc() {
     const auto isEmptyFunc = LgsIterable::getIsEmptyFunc();
     if (isEmptyFunc->fn) return isEmptyFunc;
-    isEmptyFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
-        const auto strLen = cg.callStrLen(args[0]->IRValue);
+    isEmptyFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsFuncArg>& args) {
+        const auto strLen = cg.callStrLen(args.front().expr->IRValue);
         return cg.builder.CreateICmpEQ(strLen, cg.builder.getInt64(0));
     };
     return isEmptyFunc;
@@ -89,8 +90,8 @@ LgsFunc* LgsStr::getIsEmptyFunc() {
 LgsFunc* LgsStr::getIsNotEmptyFunc() {
     const auto isNotEmptyFunc = LgsIterable::getIsNotEmptyFunc();
     if (isNotEmptyFunc->fn) return isNotEmptyFunc;
-    isNotEmptyFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
-        const auto strLen = cg.callStrLen(args[0]->IRValue);
+    isNotEmptyFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsFuncArg>& args) {
+        const auto strLen = cg.callStrLen(args.front().expr->IRValue);
         return cg.builder.CreateICmpNE(strLen, cg.builder.getInt64(0));
     };
     return isNotEmptyFunc;

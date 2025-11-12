@@ -477,24 +477,24 @@ void LgsCodeGen::visitElseIf(LgsIfStmt* ifStmt) {
     cg.startBlock(ifStmt->IRExitBlock);
 }
 
-void LgsCodeGen::visitSwitch(LgsSwitch* pm) {
-    assert(pm->cond);
-    const auto defaultBlock = cg.createBlock("", currentIRFunc);
+void LgsCodeGen::visitSwitch(LgsSwitch* switchStmt) {
+    assert(switchStmt->cond);
+    const auto defaultBlock = cg.createBlock("");
     const auto exitBlock = cg.createBlock("", currentIRFunc);
-    visitExpr(pm->cond);
+    visitExpr(switchStmt->cond);
 
-    const auto exprIRValue = pm->cond->hash(cg);
+    const auto exprIRValue = switchStmt->cond->hash(cg);
     llvm::SwitchInst* switchInst;
-    if (pm->elseBlock) {
-        const auto numOfCases = pm->patterns.size();
+    if (switchStmt->elseBlock) {
+        const auto numOfCases = switchStmt->patterns.size();
         switchInst = cg.builder.CreateSwitch(exprIRValue, defaultBlock, numOfCases);
     } else {
-        switchInst = cg.builder.CreateSwitch(exprIRValue, exitBlock, pm->patterns.size());
+        switchInst = cg.builder.CreateSwitch(exprIRValue, exitBlock, switchStmt->patterns.size());
     }
 
-    for (size_t i = 0; i < pm->patterns.size(); ++i) {
-        stack.enterScope(pm);
-        const auto [expr, stmtsBlock] = pm->patterns[i];
+    for (size_t i = 0; i < switchStmt->patterns.size(); ++i) {
+        stack.enterScope(switchStmt);
+        const auto [expr, stmtsBlock] = switchStmt->patterns[i];
         visitExpr(expr);
         const auto patternBlock = cg.createBlock(BLOCK_NAME_CASE_PREFIX + std::to_string(i), currentIRFunc);
         const auto hashed = expr->hash(cg);
@@ -505,10 +505,10 @@ void LgsCodeGen::visitSwitch(LgsSwitch* pm) {
         stack.exitScope();
     }
 
-    if (pm->elseBlock) {
-        stack.enterScope(pm);
-        cg.builder.SetInsertPoint(defaultBlock);
-        visitStmtsBlock(pm->elseBlock);
+    if (switchStmt->elseBlock) {
+        stack.enterScope(switchStmt);
+        cg.startBlock(defaultBlock);
+        visitStmtsBlock(switchStmt->elseBlock);
         cg.builder.CreateBr(exitBlock);
         stack.exitScope();
     }
@@ -928,7 +928,7 @@ void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
     std::vector<LgsExpr*> args;
     args.reserve(funcCall->args.size());
     for (const auto& arg : funcCall->args) args.emplace_back(arg.expr);
-    funcCall->IRValue = func->call(cg, args, funcCall->generics);
+    funcCall->IRValue = func->call(cg, funcCall->args);
     if (appConfigs.debugMode) funcCall->setDebugValue(cg);
 }
 
@@ -1243,7 +1243,7 @@ void LgsCodeGen::setDynamicArray(LgsArrayExpr* arrayExpr) {
         const auto element = arrayExpr->elements[i];
         element->destPtrValue = arrayExpr->IRValue;
         visitExpr(element);
-        arr->getAddFunc()->call(cg, {arrayExpr, element});
+        arr->getAddFunc()->callIR(cg, {arrayExpr->IRValue, element->IRValue});
     }
 }
 
@@ -1258,7 +1258,7 @@ void LgsCodeGen::setSetExpr(LgsArrayExpr* arrayExpr) {
         const auto element = arrayExpr->elements[i];
         element->destPtrValue = arrayExpr->IRValue;
         visitExpr(element);
-        arr->getAddFunc()->call(cg, {arrayExpr, element});
+        arr->getAddFunc()->callIR(cg, {arrayExpr->IRValue, element->IRValue});
     }
 }
 

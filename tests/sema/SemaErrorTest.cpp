@@ -840,3 +840,19 @@ TEST_CASE("SemaError10092") {
         CHECK_EQ(app.errHandler.errors[0].errCode, E10092.code);
     }
 }
+
+TEST_CASE("SemaError10097") {
+    LgsApp app;
+    const auto code = R"(
+    main() {
+        switch 2 {}
+    }
+    )";
+    app.loadSrcFile(code);
+    assert(app.errHandler.successful);
+    app.analyse();
+    CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10097, code));
+    if (app.errHandler.errors.size() > 0) {
+        CHECK_EQ(app.errHandler.errors[0].errCode, E10097.code);
+    }
+}

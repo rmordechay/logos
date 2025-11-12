@@ -8,7 +8,7 @@ bool LgsRunCmd::run() {
     std::vector<const char*> args;
     {
         LgsApp app;
-        parseArgs(app, args);
+        if (!parseArgs(app, args)) return false;
         if (!app.compile()) {
             app.printErrors();
             return false;
@@ -34,9 +34,9 @@ bool LgsRunCmd::parseArgs(LgsApp& app, std::vector<const char*>& appArgs) const 
             break;
         }
         // Check if arg is in '-' or '--' form
-        const auto textStart = arg[1] == '-' ? 2 : 1;
-        const auto name = std::string(arg).substr(textStart);
-        if (name[0] == 'o' || name == "optimize") {
+        const auto isSingleDash = arg[1] != '-';
+        const auto name = std::string(arg).substr(arg[1] == '-' ? 2 : 1);
+        if ((isSingleDash && name[0] == 'o') || name == "optimize") {
             const auto optLevel = parseInt(i, name);
             if (optLevel < 0) {
                 printCliError(E40002, {"-o"});
@@ -47,12 +47,13 @@ bool LgsRunCmd::parseArgs(LgsApp& app, std::vector<const char*>& appArgs) const 
                 return false;
             }
             app.configs.optLevel = optLevel;
-        }
-        if (name[0] == 'c' || name == "code") {
+        } else if ((isSingleDash && name[0] == 'c') || name == "code") {
             app.configs.appMode = FILE_MODE;
-        }
-        if (name[0] == 'd' || name == "debug") {
+        } else if ((isSingleDash && name[0] == 'd') || name == "debug") {
             app.configs.debugMode = true;
+        } else {
+            printCliError(E40003, {name});
+            return false;
         }
     }
 

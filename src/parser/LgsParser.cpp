@@ -1260,11 +1260,11 @@ void LgsParser::parseArgs(LgsFuncCall* funcCall) {
                 addError(E10054, &expr->location, {argName});
                 break;
             }
-            funcCall->args.emplace_back(LgsFuncCallArg{argName, expr});
+            funcCall->args.emplace_back(LgsFuncArg{argName, expr});
         } else {
             const auto expr = parseExpr();
             if (!mustParse(expr)) break;
-            funcCall->args.emplace_back(LgsFuncCallArg{argName, expr});
+            funcCall->args.emplace_back(LgsFuncArg{argName, expr});
         }
         if (currentToken.type == T_RPAREN) break;
         mustMatch(T_COMMA);
@@ -2005,7 +2005,7 @@ void LgsParser::recursionGuard() {
     assert(0);
 }
 
-void LgsParser::addError(const LgsBaseError& lgsErr, const LgsLocation* location,
+void LgsParser::addError(const LgsBaseMsg& lgsErr, const LgsLocation* location,
     const std::vector<std::string>& args) {
     errHandler.addError(lgsErr, location, metadata.path, args);
 }

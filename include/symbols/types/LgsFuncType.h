@@ -60,7 +60,7 @@ public:
     bool canCastTo(LgsType* other) override;
     bool equals(LgsType* other) override;
     void setFuncOptions(uint32_t ops);
-    LgsParam* getParamByName(const std::string& paramName);
     LgsType* clone() override;
+    std::unordered_map<std::string, LgsParam*> getParamsByName();
     ~LgsFuncType() override;
 };

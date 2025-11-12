@@ -24,7 +24,7 @@ class LgsObject;
 class LgsFuncType;
 class ThreadPool;
 class LgsMainFile;
-struct LgsBaseError;
+struct LgsBaseMsg;
 struct LgsPaths;
 
 inline std::mutex mtx;
@@ -69,6 +69,7 @@ public:
     void printErrors() const;
     void compareHash() const;
     size_t getNextFileID();
+    void printIR() const;
     bool initPaths(const fs::path& root);
     LgsMainFile* getMainFile() const;
     ~LgsApp();

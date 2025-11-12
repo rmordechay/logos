@@ -68,7 +68,7 @@ public:
     static std::atomic<size_t> lambdasIDGenerator;
 
     explicit LgsCodeGen(LgsFile& file, LgsAppConfigs& appConfigs, LgsGlobals& globals, LgsPaths& paths)
-        : file(file), cg(file.llvmCodeGen), paths(paths), globals(globals), appConfigs(appConfigs) {
+        : file(file), cg(file.cg), paths(paths), globals(globals), appConfigs(appConfigs) {
     }
 
     bool generate();
@@ -95,7 +95,7 @@ public:
     void visitSimpleIf(LgsIfStmt* ifStmt);
     void visitIfWithElse(LgsIfStmt* ifStmt);
     void visitElseIf(LgsIfStmt* ifStmt);
-    void visitSwitch(LgsSwitch* pm);
+    void visitSwitch(LgsSwitch* switchStmt);
     void visitContinueStmt();
     void visitReturnStmt(LgsReturn* returnStmt);
     void visitBreakStmt(const LgsBreak* breakStmt);

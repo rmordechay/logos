@@ -1,6 +1,7 @@
 #include "types/iterables/LgsMap.h"
 #include "Lgs_Map.h"
 #include "data/LgsDefinitions.h"
+#include "exprs/LgsFuncCall.h"
 #include "exprs/LgsHashMap.h"
 #include "exprs/LgsIterIndex.h"
 #include "funcs/LgsFunc.h"
@@ -103,16 +104,16 @@ LgsFunc* LgsMap::getAddFunc() {
     const auto func = methods.find(ADD_FUNC_NAME);
     if (func != methods.end() && func->second) return func->second;
     func->second = new LgsFunc(ADD_FUNC_NAME, &LGS_VOID, {this, new LgsStr(), &LGS_ANY}, PUBLIC | BUILTIN | METHOD);
-    func->second->fn = [func](LgsLLVMGen& cg, const std::vector<LgsExpr*>& args) {
+    func->second->fn = [func](LgsLLVMGen& cg, const std::vector<LgsFuncArg>& args) {
         const auto key = args[1];
         const auto value = args[2];
-        const auto mapPtr = args[0]->IRValue;
-        if (value->type->asDArray()) {
-            return func->second->callIR(cg, {mapPtr, key->IRValue, value->IRValue});
+        const auto mapPtr = args[0].expr->IRValue;
+        if (value.expr->type->asDArray()) {
+            return func->second->callIR(cg, {mapPtr, key.expr->IRValue, value.expr->IRValue});
         }
-        const auto valurPtr = cg.builder.CreateAlloca(value->type->getIRType(cg));
-        cg.builder.CreateStore(value->IRValue, valurPtr);
-        return func->second->callIR(cg, {mapPtr, key->IRValue, valurPtr});
+        const auto valurPtr = cg.builder.CreateAlloca(value.expr->type->getIRType(cg));
+        cg.builder.CreateStore(value.expr->IRValue, valurPtr);
+        return func->second->callIR(cg, {mapPtr, key.expr->IRValue, valurPtr});
     };
     methods[ADD_FUNC_NAME] = func->second;
     return func->second;

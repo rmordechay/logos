@@ -12,6 +12,31 @@ public:
     LgsCliCmdHelp& getHelp() override;
 };
 
+inline std::vector<LgsCliCmdArgHelp> runCompileOptionalArgs = {
+    {
+        .name = "-o",
+        .name2 = "--optimize",
+        .type = LgsInt::name,
+        .defaultVal = "2",
+        .possibleValues = "[0, 1, 2, 3]",
+        .desc = "Optimization level."
+    },
+    {
+        .name = "-c",
+        .name2 = "--code",
+        .type = LgsBool::name,
+        .defaultVal = "false",
+        .desc = "Code mode. Run Logos code by passing code directly."
+    },
+    {
+        .name = "-d",
+        .name2 = "--debug",
+        .type = LgsBool::name,
+        .defaultVal = "false",
+        .desc = "Run Logos code in debug mode."
+    },
+};
+
 inline LgsCliCmdHelp runCmdHelp{
     .name = "run",
     .usage = "lgs run <options> <path/code>",
@@ -24,30 +49,7 @@ inline LgsCliCmdHelp runCmdHelp{
             .desc = "Path to file or project root.",
         },
     },
-    .optionalArgs = {
-        {
-            .name = "-o",
-            .name2 = "--optimize",
-            .type = LgsInt::name,
-            .defaultVal = "2",
-            .possibleValues = "[0, 1, 2, 3]",
-            .desc = "Optimization level."
-        },
-        {
-            .name = "-c",
-            .name2 = "--code",
-            .type = LgsBool::name,
-            .defaultVal = "false",
-            .desc = "Code mode. Run Logos code by passing code directly."
-        },
-        {
-            .name = "-d",
-            .name2 = "--debug",
-            .type = LgsBool::name,
-            .defaultVal = "false",
-            .desc = "Run Logos code in debug mode."
-        },
-    },
+    .optionalArgs = runCompileOptionalArgs,
     .examples = {
         "lgs run app.lgs",
         "lgs run path/to/root",
