@@ -15,7 +15,7 @@ Value* LgsField::loadIR(LgsLLVMGen& cg) {
 
 Value* LgsField::getGEP(LgsLLVMGen& cg) const {
     assert(parentIRValue);
-    return cg.builder.CreateInBoundsGEP(parent->getIRType(cg), parentIRValue, {cg.i32Zero(), cg.i32(position)});
+    return cg.builder.CreateConstInBoundsGEP1_32(parent->getIRType(cg), parentIRValue, position);
 }
 
 Value* LgsField::resolveVirtualField(LgsLLVMGen* cg, const LgsHashMap* vtable) const {

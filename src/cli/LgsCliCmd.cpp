@@ -57,18 +57,17 @@ void LgsCliCmd::getLongestArg(const LgsCliCmdHelp& help) {
 }
 
 void LgsCliCmd::printArg(std::ostringstream& txt, LgsCliCmdArgHelp& arg) const {
-    auto [name, name2, type, defaultVal, possibleValues, desc] = arg;
-    txt << padString(maxStr, name);
-    txt << padString(maxStr, desc) << '\n';
-    txt << padString(maxStr, name2);
-    if (!type.empty()) {
-        txt << "Type: " << type << ".\n";
+    txt << padString(maxStr, arg.name);
+    txt << padString(maxStr, arg.desc) << '\n';
+    txt << padString(maxStr, arg.name2);
+    if (!arg.type.empty()) {
+        txt << "Type: " << arg.type << ".\n";
     }
-    if (!defaultVal.empty()) {
-        txt << padString(maxStr) + "Default: " << defaultVal << ".\n";
+    if (!arg.defaultVal.empty()) {
+        txt << padString(maxStr) + "Default: " << arg.defaultVal << ".\n";
     }
-    if (!possibleValues.empty()) {
-        txt << padString(maxStr) + "Possible value: " << possibleValues << ".\n";
+    if (!arg.possibleValues.empty()) {
+        txt << padString(maxStr) + "Possible value: " << arg.possibleValues << ".\n";
     }
 }
 

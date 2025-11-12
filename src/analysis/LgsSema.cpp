@@ -348,12 +348,14 @@ void LgsSema::visitSwitch(LgsSwitch* switchStmt) {
     visitExpr(switchStmt->cond);
     stack.enterScope(switchStmt);
     const auto condType = switchStmt->cond->type;
+    const auto isEnum = condType && condType->asEnum();
     // Allows local enum fields to not have a qualifier inside the block
-    if (condType && condType->asEnum()) {
+    if (isEnum) {
         for (const auto& field : condType->fields) {
             addLocalSymbol(LgsSymbol(field));
         }
     }
+    std::unordered_set<std::string> handledCases;
     for (auto [expr, block] : switchStmt->patterns) {
         if (!condType || expr->type->isUnknown()) continue;
         stack.enterScope(switchStmt);
@@ -365,12 +367,26 @@ void LgsSema::visitSwitch(LgsSwitch* switchStmt) {
         if (expr->type && !expr->type->canCastTo(condType)) {
             addError(E10014, &expr->location, {expr->type->pname(), condType->pname()});
         }
+        if (isEnum) {
+            handledCases.insert(expr->asVariable()->name);
+        }
         stack.exitScope();
     }
     if (switchStmt->elseBlock) {
+        switchStmt->isExhausted = true;
         stack.enterScope(switchStmt);
         visitStmtsBlock(switchStmt->elseBlock);
         stack.exitScope();
+    }
+    if (isEnum && !switchStmt->elseBlock) {
+        std::vector<std::string> missingCases;
+        for (const auto& field : condType->fields) {
+            if (handledCases.contains(field->name)) continue;
+            missingCases.push_back(field->name);
+        }
+        if (missingCases.empty()) {
+            switchStmt->isExhausted = true;
+        }
     }
     stack.exitScope();
 }

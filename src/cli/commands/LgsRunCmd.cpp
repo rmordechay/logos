@@ -33,6 +33,7 @@ bool LgsRunCmd::parseArgs(LgsApp& app, std::vector<const char*>& appArgs) const 
             argStart = i;
             break;
         }
+        // Check if arg is in '-' or '--' form
         const auto textStart = arg[1] == '-' ? 2 : 1;
         const auto name = std::string(arg).substr(textStart);
         if (name[0] == 'o' || name == "optimize") {

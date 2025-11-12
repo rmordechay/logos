@@ -12,7 +12,6 @@ class LgsExpr;
 class LgsField final : public LgsValue {
 public:
     std::string name;
-    size_t virtualID = 0;
     size_t position = 0;
     LgsType* type = nullptr;
     LgsExpr* expr = nullptr;

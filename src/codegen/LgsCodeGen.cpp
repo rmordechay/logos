@@ -1207,7 +1207,7 @@ void LgsCodeGen::setStaticArray(LgsArrayExpr* arrayExpr) {
             const auto element = arrayExpr->elements[i];
             element->destPtrValue = arrayExpr->IRValue;
             visitExpr(element);
-            const auto gep = cg.builder.CreateInBoundsGEP(arrTypeIR, arrayExpr->IRValue, {cg.i32Zero(), cg.i32(i)});
+            const auto gep = cg.builder.CreateConstInBoundsGEP1_32(arrTypeIR, arrayExpr->IRValue, i);
             cg.builder.CreateStore(element->IRValue, gep);
         }
     }

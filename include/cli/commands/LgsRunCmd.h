@@ -52,6 +52,6 @@ inline LgsCliCmdHelp runCmdHelp{
         "lgs run app.lgs",
         "lgs run path/to/root",
         "lgs run app.lgs -o3",
-        "lgs run app.lgs -c \"main() { print('Hello world') }\"",
+        "lgs run -c \"main() { print('Hello world') }\"",
     }
 };

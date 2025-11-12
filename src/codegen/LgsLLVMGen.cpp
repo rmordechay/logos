@@ -1,5 +1,6 @@
 #include "data/LgsDefinitions.h"
 #include "files/LgsFile.h"
+#include "logos/LgsConfigs.h"
 #include "utils/LgsUtils.h"
 
 #include <llvm/Support/FileSystem.h>
@@ -178,7 +179,9 @@ Value* LgsLLVMGen::callPrintf(const std::vector<Value*>& args) {
 }
 
 Value* LgsLLVMGen::callSprintf(const std::vector<Value*>& args) {
-    return callFunc("sprintf", i32Ty(), {ptrTy(), sizeTy(), ptrTy()}, args, true);
+    auto tempArgs = args;
+    tempArgs.insert(tempArgs.begin() + 1, usize(STRING_BUFFER_SIZE));
+    return callFunc("snprintf", i32Ty(), {ptrTy(), sizeTy(), ptrTy()}, tempArgs, true);
 }
 
 Value* LgsLLVMGen::callStrLen(Value* str) {
