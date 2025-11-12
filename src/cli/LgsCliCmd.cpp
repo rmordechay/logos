@@ -42,6 +42,20 @@ void LgsCliCmd::printHelp() {
     logInfo(txt.str());
 }
 
+int LgsCliCmd::parseArgs(const int indexStart, const std::function<void(int, const std::string&)>& f) const {
+    auto argStart = -1;
+    for (int i = indexStart; i < argc; ++i) {
+        const auto arg = argv[i];
+        if (arg[0] != '-') {
+            argStart = i;
+            break;
+        }
+        const auto name = std::string(arg).substr(arg[1] == '-' ? 2 : 1);
+        f(i, name);
+    }
+    return argStart;
+}
+
 void LgsCliCmd::getLongestArg(const LgsCliCmdHelp& help) {
     size_t longestStr = 0;
     for (const auto& arg : help.requiredArgs) {
@@ -71,13 +85,9 @@ void LgsCliCmd::printArg(std::ostringstream& txt, LgsCliCmdArgHelp& arg) const {
     }
 }
 
-int32_t LgsCliCmd::parseInt(int& i, const std::string& cmd) const {
-    if (cmd.size() == 1) {
-        return argv[++i][0] - '0';
-    }
-    if (cmd.size() == 2) {
-        return cmd[1] - '0';
-    }
+int32_t LgsCliCmd::parseIntArg(const int i, const std::string& cmd) const {
+    if (cmd.size() == 1) return argv[i][0] - '0';
+    if (cmd.size() == 2) return cmd[1] - '0';
     return -1;
 }
 
@@ -97,4 +107,31 @@ std::string LgsCliCmd::mergeArgs() const {
         str << argv[i] << ' ';
     }
     return str.str();
+}
+
+std::string padString(const size_t maxLen, const std::string& str) {
+    int diff = maxLen - str.length();
+    if (diff < 0) diff = -diff;
+    return str + std::string(diff + PADDING, ' ');
+}
+
+void printParentCmdHelp(const std::vector<LgsCliCmdHelp*>& commands, const std::string& subCmd) {
+    size_t longestStr = 0;
+    std::ostringstream txt;
+    txt << LGS_COLORIZE("Help\n", LGS_MSG_COLOR_WHITE);
+    for (auto& help : commands) {
+        longestStr = std::max(longestStr, help->name.size());
+    }
+    txt << padString(longestStr, LGS_USAGE_STR);
+    if (subCmd == "") {
+        txt << "lgs <command> <options> <arguments>\n\n";
+    } else {
+        txt << "lgs " << subCmd << " <options> <arguments>\n\n";
+    }
+    txt << LGS_COLORIZE("Commands\n", LGS_MSG_COLOR_WHITE);
+    for (auto& help : commands) {
+        txt << std::left << std::setw(longestStr + 4) << help->name << help->summary << '\n';
+    }
+    txt << "\nFor more information run 'lgs <command> help'.\n";
+    logInfo(txt.str());
 }

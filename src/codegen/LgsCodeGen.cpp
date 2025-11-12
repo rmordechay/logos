@@ -57,10 +57,11 @@
 #include <iostream>
 #include <unistd.h>
 #include <unordered_set>
+#include <llvm/Target/TargetMachine.h>
 #include <llvm/TargetParser/Host.h>
 
 std::atomic<size_t> LgsCodeGen::lambdasIDGenerator{0};
-#define GENERATE_OBJ_CMD_STRING "clang -Wno-override-module -target %s -c -o %s %s.bc"
+#define GENERATE_OBJ_CMD "clang -Wno-override-module -target %s -c -o %s %s.bc"
 
 bool LgsCodeGen::generate() {
     cg.setupModule(file, appConfigs.debugMode);
@@ -996,7 +997,7 @@ void LgsCodeGen::visitStrConst(LgsStrConst* strConst) {
         auto formatted = strConst->formatedStr;
         std::vector<Value*> values;
         for (const auto part : strConst->parts) {
-            auto partIR = part->IRValue;
+            auto partIR = part->loadIR(cg);
             values.push_back(partIR);
             const auto pos = formatted.find(LGS_STR_FMT_PLACEHOLDER);
             if (pos != std::string::npos) {
@@ -1539,7 +1540,7 @@ bool LgsCodeGen::writeIRModule() const {
     std::snprintf(
         cmd,
         sizeof(cmd),
-        GENERATE_OBJ_CMD_STRING,
+        GENERATE_OBJ_CMD,
         triple.c_str(),
         outputPath.c_str(),
         outputPath.c_str()

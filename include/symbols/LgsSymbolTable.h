@@ -13,6 +13,7 @@ struct LgsSymbolTable {
     std::unordered_map<std::string, LgsApp*> imports;
     std::unordered_map<std::string, LgsFunc*> coroutines;
     std::unordered_map<std::string, LgsFunc*> genericCalls;
+    std::vector<LgsStrConst*> cImports;
 
     LgsSymbol* getSymbol(const std::string& name);
     void addSymbol(const LgsSymbol& symbol, LgsErrHandler* errHandler, const std::string& filePath = "");

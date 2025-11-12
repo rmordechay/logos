@@ -124,9 +124,8 @@ inline LgsBaseMsg E10090{"%s can only prefix numbers. Given: %s.", errCodeStart+
 inline LgsBaseMsg E10091{"not can only prefix Bool. Given: %s.", errCodeStart++};
 inline LgsBaseMsg E10092{"Condition %s must be of type Bool. Given: %s.", errCodeStart++};
 inline LgsBaseMsg E10093{"Cannot assign variable to Void type.", errCodeStart++};
-inline LgsBaseMsg E10094{"Could not find %s.", errCodeStart++};
+inline LgsBaseMsg E10094{"%s is not a parameter of '%s'.", errCodeStart++};
 inline LgsBaseMsg E10095{"Could not infer the type of the iterable.", errCodeStart++};
 inline LgsBaseMsg E10096{"Mixed named und position arguments are not allowed.", errCodeStart++};
 inline LgsBaseMsg E10097{"switch statement must have at least one pattern.", errCodeStart++};
 inline LgsBaseMsg E10098{"Argument %s is set more than one time.", errCodeStart++};
-inline LgsBaseMsg E10099{"%s is not a parameter of %s.", errCodeStart++};

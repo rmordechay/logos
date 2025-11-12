@@ -53,9 +53,8 @@ void LgsFunc::initFunc(const std::string& name, LgsType* rt, const std::vector<L
 Value* LgsFunc::call(LgsLLVMGen& cg, std::vector<LgsFuncArg>& args) {
     if (fn) return fn(cg, args);
     std::vector<Value*> IRArgs;
-    if (args.empty()) callIR(cg, IRArgs);
     if (funcType->isVariadic) return callWithVariadic(cg, args);
-    const auto isNamed = args.front().name != "";
+    const auto isNamed = !args.empty() && args.front().name != "";
     if (isNamed) {
         std::unordered_map<std::string, LgsFuncArg*> argsByName;
         for (size_t i = 0; i < args.size(); ++i) {
@@ -81,6 +80,7 @@ Value* LgsFunc::call(LgsLLVMGen& cg, std::vector<LgsFuncArg>& args) {
             }
         }
     }
+
     if (funcType->hasDefaults) {
         const auto diff = funcType->params.size() - args.size() - 1;
         for (size_t i = diff; i < funcType->params.size(); ++i) {

@@ -70,7 +70,7 @@ public:
     void compareHash() const;
     size_t getNextFileID();
     void printIR() const;
-    bool initPaths(const fs::path& root);
+    void initPaths(const fs::path& root);
     LgsMainFile* getMainFile() const;
     ~LgsApp();
 };

@@ -591,71 +591,37 @@ void LgsSema::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
     const auto ltype = l->type;
     const auto rtype = r->type;
     if (!ltype || !rtype) return;
+
     const auto type = ltype->applyBinOp(binaryExpr);
     if (!type) {
         return addError(E10076, l->location, {binaryExpr->opText, ltype->pname(), rtype->pname()});
     }
     binaryExpr->setType(type);
-    if (!binaryExpr->left->isValueKnown || !binaryExpr->right->isValueKnown) return;
+    if (!l->isValueKnown || !r->isValueKnown) return;
+
     binaryExpr->isValueKnown = true;
+    const auto resultsType = binaryExpr->type;
     switch (binaryExpr->op) {
-    case ADD:
-        binaryExpr->results = binaryExpr->type->addConst(binaryExpr->left, binaryExpr->right);
-        break;
-    case SUB:
-        binaryExpr->results = binaryExpr->type->subConst(binaryExpr->left, binaryExpr->right);
-        break;
-    case MUL:
-        binaryExpr->results = binaryExpr->type->mulConst(binaryExpr->left, binaryExpr->right);
-        break;
-    case DIV:
-        binaryExpr->results = binaryExpr->type->divConst(binaryExpr->left, binaryExpr->right);
-        break;
-    case MODULO:
-        binaryExpr->results = binaryExpr->type->modConst(binaryExpr->left, binaryExpr->right);
-        break;
-    case BIT_AND:
-        binaryExpr->results = binaryExpr->type->bitAndConst(binaryExpr->left, binaryExpr->right);
-        break;
-    case BIT_OR:
-        binaryExpr->results = binaryExpr->type->bitOrConst(binaryExpr->left, binaryExpr->right);
-        break;
-    case BIT_XOR:
-        binaryExpr->results = binaryExpr->type->bitXorConst(binaryExpr->left, binaryExpr->right);
-        break;
-    case LSHIFT:
-        binaryExpr->results = binaryExpr->type->lshiftConst(binaryExpr->left, binaryExpr->right);
-        break;
-    case RSHIFT:
-        binaryExpr->results = binaryExpr->type->rshiftConst(binaryExpr->left, binaryExpr->right);
-        break;
-    case EQ:
-        binaryExpr->results = binaryExpr->type->eqConst(binaryExpr->left, binaryExpr->right);
-        break;
-    case NE:
-        binaryExpr->results = binaryExpr->type->neConst(binaryExpr->left, binaryExpr->right);
-        break;
-    case LT:
-        binaryExpr->results = binaryExpr->type->ltConst(binaryExpr->left, binaryExpr->right);
-        break;
-    case GT:
-        binaryExpr->results = binaryExpr->type->gtConst(binaryExpr->left, binaryExpr->right);
-        break;
-    case GE:
-        binaryExpr->results = binaryExpr->type->geConst(binaryExpr->left, binaryExpr->right);
-        break;
-    case LE:
-        binaryExpr->results = binaryExpr->type->leConst(binaryExpr->left, binaryExpr->right);
-        break;
-    case AND:
-        binaryExpr->results = binaryExpr->type->andConst(binaryExpr->left, binaryExpr->right);
-        break;
-    case OR:
-        binaryExpr->results = binaryExpr->type->orConst(binaryExpr->left, binaryExpr->right);
-        break;
-    case IN:
-    case NOOP:
-        break;
+    case ADD: binaryExpr->results = resultsType->addConst(l, r); break;
+    case SUB: binaryExpr->results = resultsType->subConst(l, r); break;
+    case MUL: binaryExpr->results = resultsType->mulConst(l, r); break;
+    case DIV: binaryExpr->results = resultsType->divConst(l, r); break;
+    case MODULO: binaryExpr->results = resultsType->modConst(l, r); break;
+    case BIT_AND: binaryExpr->results = resultsType->bitAndConst(l, r); break;
+    case BIT_OR: binaryExpr->results = resultsType->bitOrConst(l, r); break;
+    case BIT_XOR: binaryExpr->results = resultsType->bitXorConst(l, r); break;
+    case LSHIFT: binaryExpr->results = resultsType->lshiftConst(l, r); break;
+    case RSHIFT: binaryExpr->results = resultsType->rshiftConst(l, r); break;
+    case EQ: binaryExpr->results = resultsType->eqConst(l, r); break;
+    case NE: binaryExpr->results = resultsType->neConst(l, r); break;
+    case LT: binaryExpr->results = resultsType->ltConst(l, r); break;
+    case GT: binaryExpr->results = resultsType->gtConst(l, r); break;
+    case GE: binaryExpr->results = resultsType->geConst(l, r); break;
+    case LE: binaryExpr->results = resultsType->leConst(l, r); break;
+    case AND: binaryExpr->results = resultsType->andConst(l, r); break;
+    case OR: binaryExpr->results = resultsType->orConst(l, r); break;
+    case IN: assert(0);
+    case NOOP: break;
     }
 }
 
@@ -956,11 +922,12 @@ void LgsSema::visitFuncCall(LgsFuncCall* funcCall) {
         std::unordered_set<std::string> visited;
         for (auto arg : funcCall->args) {
             if (visited.contains(arg.name)) {
-                addError(E10098, arg.expr->location, {arg.name});
+                addError(E10098, arg.expr->location, {arg.expr->asText()});
             }
             visited.insert(arg.name);
             if (!paramsByName.contains(arg.name)) {
-                addError(E10099, arg.expr->location, {arg.name, funcCall->name});
+                addError(E10094, arg.expr->location, {arg.expr->asText(), funcCall->name});
+                continue;
             }
             const auto param = paramsByName[arg.name];
             arg.expr->completeType(param->type);
@@ -1097,6 +1064,7 @@ void LgsSema::visitInstance(LgsInstance* instance) {
         const auto field = instance->obj->getField(argName);
         if (!field) {
             addError(E10005, arg.expr->location, {argName, objName});
+            continue;
         }
         if (!validateFieldVisibility(field, instance->obj)) continue;
         visitExpr(arg.expr);
@@ -1414,7 +1382,7 @@ void LgsSema::resolveImports() const {
 }
 
 void LgsSema::addCSymbols() {
-    for (const auto cImport : file->cImports) {
+    for (const auto cImport : file->symbolTable.cImports) {
         const auto& table = globals.cLibHeaders[cImport->value];
         for (auto [name, symbol] : table.symbols) {
             file->symbolTable.addSymbol(symbol, &errHandler);

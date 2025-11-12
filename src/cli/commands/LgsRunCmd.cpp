@@ -8,7 +8,8 @@ bool LgsRunCmd::run() {
     std::vector<const char*> args;
     {
         LgsApp app;
-        if (!parseArgs(app, args)) return false;
+        parse(app, args);
+        if (!errHandler.successful) return false;
         if (!app.compile()) {
             app.printErrors();
             return false;
@@ -20,64 +21,37 @@ bool LgsRunCmd::run() {
     return true;
 }
 
-bool LgsRunCmd::parseArgs(LgsApp& app, std::vector<const char*>& appArgs) const {
-    if (argc < 3) {
-        printCliError(E40001);
-        return false;
-    }
-
-    auto argStart = -1;
-    for (int i = 2; i < argc; ++i) {
-        const auto arg = argv[i];
-        if (arg[0] != '-') {
-            argStart = i;
-            break;
-        }
-        // Check if arg is in '-' or '--' form
-        const auto isSingleDash = arg[1] != '-';
-        const auto name = std::string(arg).substr(arg[1] == '-' ? 2 : 1);
-        if ((isSingleDash && name[0] == 'o') || name == "optimize") {
-            const auto optLevel = parseInt(i, name);
-            if (optLevel < 0) {
-                printCliError(E40002, {"-o"});
-                return false;
-            }
-            if (optLevel > 3) {
-                printCliError(E40003, {std::to_string(optLevel)});
-                return false;
-            }
+void LgsRunCmd::parse(LgsApp& app, std::vector<const char*>& appArgs) {
+    if (argc < 3) return errHandler.addError(E40001);
+    auto f = [this, &app](const int i, const std::string& cmd) {
+        const auto isSingleDash = cmd.size() == 1;
+        if ((isSingleDash && cmd[0] == 'o') || cmd == "optimize") {
+            const auto optLevel = parseIntArg(i, cmd);
+            if (optLevel < 0) return errHandler.addError(E40002, {"-o"});
+            if (optLevel > 3) return errHandler.addError(E40003, {std::to_string(optLevel)});
             app.configs.optLevel = optLevel;
-        } else if ((isSingleDash && name[0] == 'c') || name == "code") {
+        } else if ((isSingleDash && cmd[0] == 'c') || cmd == "code") {
             app.configs.appMode = FILE_MODE;
-        } else if ((isSingleDash && name[0] == 'd') || name == "debug") {
+        } else if ((isSingleDash && cmd[0] == 'd') || cmd == "debug") {
             app.configs.debugMode = true;
         } else {
-            printCliError(E40003, {name});
-            return false;
+            errHandler.addError(E40003, {cmd});
         }
-    }
+    };
 
-    if (argStart < 0) {
-        printCliError(E40001);
-        return false;
-    }
-
+    auto argStart = parseArgs(2, f);
+    if (argStart < 0) return errHandler.addError(E40001);
     if (app.configs.appMode == FILE_MODE) {
         app.lgsCode[LGS_MAIN_FILE] = argv[argStart++];
     } else {
         auto path = argv[argStart++];
-        if (!fs::exists(path)) {
-            printCliError(E40004, {path});
-            return false;
-        }
+        if (!fs::exists(path)) return errHandler.addError(E40004, {path});
         app.paths.rootPath = path;
     }
-
-    for (int j = argStart; j < argc; ++j) {
-        const auto v = argv[j];
+    for (int i = argStart; i < argc; ++i) {
+        const auto v = argv[i];
         appArgs.push_back(v);
     }
-    return true;
 }
 
 LgsCliCmdHelp& LgsRunCmd::getHelp() {

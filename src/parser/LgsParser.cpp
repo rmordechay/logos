@@ -96,7 +96,7 @@ LgsFile* LgsParser::parseSrcFile(const bool isTestRun) {
             file = testFile;
         }
     }
-    file->cImports = cImports;
+    file->symbolTable.cImports = cImports;
     assert(file);
     return file;
 }
@@ -1864,9 +1864,8 @@ void LgsParser::extractStrParts(LgsStrConst& strConst) {
         replaced.replace(open, close + 1, LGS_STR_FMT_PLACEHOLDER);
         start = open + strlen(LGS_STR_FMT_PLACEHOLDER);
     }
-    if (replaced != strConst.value) {
-        strConst.formatedStr = replaced;
-    }
+    if (replaced == strConst.value) return;
+    strConst.formatedStr = replaced;
 }
 
 int LgsParser::getBinOpPrecedence(const LgsBinOpType opType) {

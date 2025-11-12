@@ -27,7 +27,7 @@ inline LgsCliCmdHelp lgsHelpCmdHelp{
     .name2 = "--help",
     .usage = "lgs help",
     .summary = "Prints Logos help.",
-    .desc = "prints the main help of for lgs.",
+    .desc = "prints the main help For Logos.",
     .examples = {
         "lgs help",
     }

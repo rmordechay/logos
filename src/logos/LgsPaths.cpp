@@ -6,23 +6,22 @@
 #include <unistd.h>
 #include <llvm/TargetParser/Triple.h>
 
-bool LgsPaths::findLgsRootDir() {
+void LgsPaths::findLgsRootDir() {
     assert(lgsConfigs.isDevMode);
     const auto current = fs::current_path();
     if (fs::exists(current / LGS_LIB_NAME)) {
         lgsRootDir = current;
     } else {
         const auto parent = current.parent_path();
-        if (!fs::exists(parent / LGS_LIB_NAME)) return false;
+        if (!fs::exists(parent / LGS_LIB_NAME)) assert(0);
         lgsRootDir = current;
     }
     lgsPackagesDir = lgsRootDir / LGS_PACKAGES_DIR;
-    return true;
 }
 
-bool LgsPaths::findCLibHeaders() {
+void LgsPaths::findCLibHeaders() {
     const auto pipe = popen("clang -E -Wp,-v -xc /dev/null 2>&1", "r");
-    if (!pipe) return false;
+    if (!pipe) assert(0);
     char buffer[512];
     while (fgets(buffer, sizeof(buffer), pipe)) {
         std::string line = buffer;
@@ -41,8 +40,7 @@ bool LgsPaths::findCLibHeaders() {
             break;
         }
     }
-    if (cLibHeadersDir == "") return false;
+    if (cLibHeadersDir == "") assert(0);
     pclose(pipe);
     assert(fs::exists(cLibHeadersDir));
-    return true;
 }

@@ -35,7 +35,7 @@ bool LgsCliHandler::execute() const {
         return true;
     }
     if (isVersionCommand(cmdStr)) {
-        logInfo(std::string(LOGOS_VERSION) + '\n');
+        logInfo("Logos " + std::string(LOGOS_VERSION) + '\n');
         return true;
     }
     const auto cmd = getCmd();

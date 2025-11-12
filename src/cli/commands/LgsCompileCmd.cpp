@@ -5,11 +5,13 @@
 bool LgsCompileCmd::run() {
     LgsApp app;
     std::vector<const char*> args;
-    if (!parseArgs(app, args)) return false;
+    parse(app, args);
+    if (!errHandler.successful) return false;
     if (!app.compile()) {
         app.printErrors();
         return false;
     }
+    logInfo(app.srcFiles.front()->path);
     return true;
 }
 
