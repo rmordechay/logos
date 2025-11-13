@@ -70,7 +70,7 @@ public:
     static Value* andInt(LgsLLVMGen& cg, LgsExpr* self, const LgsExpr* other);
 
     virtual Type* getIRType(LgsLLVMGen& cg) = 0;
-    virtual size_t getSizeBytes() = 0;
+    virtual size_t sizeBytes() = 0;
     virtual LgsExpr* getZeroValue() = 0;
     virtual Lgs_TypeKind getRTTypeKind() = 0;
     virtual Constant* getRTType(LgsLLVMGen& cg);

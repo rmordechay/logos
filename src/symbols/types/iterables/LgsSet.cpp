@@ -13,7 +13,7 @@ Type* LgsSet::getIRType(LgsLLVMGen& cg) {
     return getArrStruct(cg);
 }
 
-size_t LgsSet::getSizeBytes() {
+size_t LgsSet::sizeBytes() {
     return sizeof(size_t) + sizeof(size_t) + sizeof(size_t) + sizeof(void*);
 }
 

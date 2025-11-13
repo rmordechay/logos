@@ -9,7 +9,7 @@ public:
         isPrimitive = true;
         isInt = true;
     }
-    size_t getSizeBytes() override;
+    size_t sizeBytes() override;
     Type* getIRType(LgsLLVMGen& cg) override;
     LgsExpr* getZeroValue() override;
     Lgs_TypeKind getRTTypeKind() override;

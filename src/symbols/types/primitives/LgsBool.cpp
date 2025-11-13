@@ -257,7 +257,7 @@ std::string LgsBool::strFormatPart() const {
     return "%s";
 }
 
-size_t LgsBool::getSizeBytes() {
+size_t LgsBool::sizeBytes() {
     return sizeof(bool);
 }
 

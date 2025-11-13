@@ -10,7 +10,7 @@
 #include "types/primitives/LgsUInt.h"
 
 
-size_t LgsChar::getSizeBytes() {
+size_t LgsChar::sizeBytes() {
     return sizeof(char);
 }
 

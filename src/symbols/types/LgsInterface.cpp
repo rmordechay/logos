@@ -38,7 +38,7 @@ bool LgsInterface::canCastTo(LgsType* other) {
     return false;
 }
 
-size_t LgsInterface::getSizeBytes() {
+size_t LgsInterface::sizeBytes() {
     return 0;
 }
 

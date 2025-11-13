@@ -198,3 +198,43 @@ Prints:
 ```
 inside nested if
 ```
+
+### IO
+#### Deferred Function
+Logos has two mechanisms to work with IO safely, for example closing files or connection.
+The first one is deferred functions. Similar to other languages, you can delay the exection of a function
+using the 'defer' keyword. For example
+```
+func(str: Str) {
+    print(str)
+}
+
+main() {
+    defer func("After")
+    func("Before")
+}
+```
+Prints:
+```
+Before
+After
+```
+
+#### The _io_ keyword
+The second mechanism to handle IO connections is with the _io_ keyword. With this mechanism you
+pass a pair of function names, like so: 
+```
+io(openFile, closeFile)
+```
+where the left function will be the opening
+function and the right function will be the closing function. Now, once the io is declared, you can call 
+the opening function (left-hand) with the io keyword, for example
+```
+io f = openFile() {
+    // Do something
+    // text = f.read()
+} 
+```
+And that's it. You don't need to call closeFile. Logos will do it for you. Everytime you call the opening function
+with the io keyword, the closing function will be called at the end of the scope, making sure your
+resources are being freed correctly. 

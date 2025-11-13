@@ -9,7 +9,7 @@ public:
 
     LgsSubType(const std::string& name, LgsType* baseType) : name(name), subtype(baseType) {}
     Type* getIRType(LgsLLVMGen& cg) override;
-    size_t getSizeBytes() override;
+    size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
     Lgs_TypeKind getRTTypeKind() override;
     std::string getName() override;

@@ -52,10 +52,13 @@
 #include "types/primitives/LgsShort.h"
 #include "types/primitives/LgsSize.h"
 #include "types/primitives/LgsUInt.h"
+#include "types/primitives/LgsULong.h"
 #include <iostream>
 #include <unordered_set>
 
 #define MAX_TOKENS_NUMBER 100000
+LgsExpr* determineIntConst(const std::string& tokenStr, int base);
+LgsFunc* wrapStmtsBlockWithFunc(LgsStmtsBlock* stmtsBlock);
 
 bool LgsParser::scanTokens() {
     if (code == "") {
@@ -1072,12 +1075,23 @@ LgsBreak* LgsParser::parseBreakStmt() {
 }
 
 LgsCoroutine* LgsParser::parseCoroutine() {
+    const auto goToken = currentToken;
     if (!matchAndConsume(T_GO)) return nullptr;
-    const auto expr = parseUnary(false);
+
+    LgsExpr* expr = nullptr;
+    if (const auto stmtsBlock = parseStmtsBlock(false)) {
+        const auto fc = new LgsFuncCall("");
+        setLocation(fc->location, &goToken);
+        fc->func = wrapStmtsBlockWithFunc(stmtsBlock);
+        fc->setType(&LGS_VOID);
+        expr = fc;
+    } else {
+        expr = parseUnary(false);
+    }
     mustParse(expr);
+
     const auto coroutine = new LgsCoroutine();
     coroutine->location = expr->location;
-
     if (const auto funcCall = expr->asFuncCall()) {
         coroutine->funcCall = funcCall;
         coroutine->funcCall->isCoroutine = true;
@@ -1092,12 +1106,23 @@ LgsCoroutine* LgsParser::parseCoroutine() {
 }
 
 LgsDeferStmt* LgsParser::parseDeferStmt() {
+    const auto deferToken = currentToken;
     if (!matchAndConsume(T_DEFER)) return nullptr;
-    const auto expr = parseUnary(false);
+
+    LgsExpr* expr = nullptr;
+    if (const auto stmtsBlock = parseStmtsBlock(false)) {
+        const auto fc = new LgsFuncCall("");
+        setLocation(fc->location, &deferToken);
+        fc->func = wrapStmtsBlockWithFunc(stmtsBlock);
+        fc->setType(&LGS_VOID);
+        expr = fc;
+    } else {
+        expr = parseUnary(false);
+    }
     mustParse(expr);
+
     const auto deferStmt = new LgsDeferStmt();
     deferStmt->location = expr->location;
-
     if (const auto funcCall = expr->asFuncCall()) {
         deferStmt->funcCall = funcCall;
         deferStmt->funcCall->isDeferred = true;
@@ -1362,17 +1387,10 @@ LgsVectorExpr* LgsParser::parseVectorExpr() {
 
     uint8_t dim = 0;
     switch (nameToken.type) {
-    case T_VEC2:
-        dim = 2;
-        break;
-    case T_VEC3:
-        dim = 3;
-        break;
-    case T_VEC4:
-        dim = 4;
-        break;
-    default:
-        break;
+    case T_VEC2: dim = 2; break;
+    case T_VEC3: dim = 3; break;
+    case T_VEC4: dim = 4; break;
+    default: break;
     }
 
     std::vector<LgsExpr*> args;
@@ -1394,19 +1412,15 @@ LgsExpr* LgsParser::parseExprOrStmtsBlock() {
     // The order is important. First check for empty block, then expr, then non-empty block.
     if (currentToken.type == T_LBRACE && peek().type == T_RBRACE) {
         consume(2);
-        const auto emptyFunc = new LgsFunc("", nullptr);
-        emptyFunc->stmtsBlock = new LgsStmtsBlock();
-        emptyFunc->isLambda = true;
-        return emptyFunc;
+        const auto func = wrapStmtsBlockWithFunc(new LgsStmtsBlock());
+        return func;
     }
     if (LgsExpr* expr = parseExpr()) {
         return expr;
     }
     if (const auto stmtsBlock = parseStmtsBlock()) {
-        const auto emptyFunc = new LgsFunc("", nullptr);
-        emptyFunc->stmtsBlock = stmtsBlock;
-        emptyFunc->isLambda = true;
-        return emptyFunc;
+        const auto func = wrapStmtsBlockWithFunc(stmtsBlock);
+        return func;
     }
     return nullptr;
 }
@@ -1451,27 +1465,11 @@ LgsExpr* LgsParser::parseConstant() {
     case T_INT: {
         std::string result = tokenStr;
         result.erase(std::ranges::remove(result, '_').begin(), result.end());
-        char* end;
-        const auto longValue = strtol(result.c_str(), &end, 10);
-        if (longValue >= INT_MIN && longValue <= INT_MAX) {
-            const auto intValue = static_cast<int>(longValue);
-            constant = new LgsIntConst(&LGS_INT, intValue);
-        } else {
-            constant = new LgsIntConst(&LGS_LONG, longValue);
-        }
+        constant = determineIntConst(result, 10);
         break;
     }
     case T_HEX: {
-        std::string result = tokenStr;
-        result.erase(std::ranges::remove(result, '_').begin(), result.end());
-        char* end;
-        const auto longValue = strtol(result.c_str(), &end, 16);
-        if (longValue >= INT_MIN && longValue <= INT_MAX) {
-            const auto intValue = static_cast<int>(longValue);
-            constant = new LgsIntConst(&LGS_INT, intValue);
-        } else {
-            constant = new LgsIntConst(&LGS_LONG, longValue);
-        }
+        constant = determineIntConst(tokenStr, 16);
         break;
     }
     case T_LONG: {
@@ -1939,6 +1937,52 @@ void LgsParser::extractStrParts(LgsStrConst& strConst) {
     strConst.formatedStr = replaced;
 }
 
+void LgsParser::validateTestFolder(const LgsFile* testFile) {
+    bool foundTestsFolder = false;
+    auto currentPath = testFile->path.parent_path();
+    while (currentPath != paths.rootPath && currentPath.has_parent_path()) {
+        if (currentPath.filename() == "tests") {
+            foundTestsFolder = true;
+            break;
+        }
+        currentPath = currentPath.parent_path();
+    }
+    if (!foundTestsFolder) {
+        addError(E10079, &testFile->location, {testFile->path.filename()});
+    }
+}
+
+bool LgsParser::isImportName(LgsExpr* expr) const {
+    if (const auto variable = expr->asVariable()) {
+        if (!globals.table.imports.contains(variable->name)) return false;
+        variable->isImportName = true;
+        return true;
+    }
+    return false;
+}
+
+LgsExpr* LgsParser::determineIntConst(const std::string& tokenStr, const int base) const {
+    char* end = nullptr;
+    errno = 0;
+    const auto v = strtoull(tokenStr.c_str(), &end, base);
+    LgsExpr* expr = nullptr;
+    if (errno == ERANGE) {
+        expr = new LgsIntConst(&LGS_ULONG, static_cast<int64_t>(UINT64_MAX));
+    }
+    if (v <= static_cast<unsigned long long>(INT_MAX)) {
+        expr = new LgsIntConst(&LGS_INT, static_cast<int64_t>(v));
+    }
+    if (v <= static_cast<unsigned long long>(UINT_MAX)) {
+        expr = new LgsIntConst(&LGS_UINT, static_cast<int64_t>(v));
+    }
+    if (v <= static_cast<unsigned long long>(LONG_MAX)) {
+        expr = new LgsIntConst(&LGS_LONG, static_cast<int64_t>(v));
+    }
+    expr = new LgsIntConst(&LGS_ULONG, static_cast<int64_t>(v));
+    setLocation(expr->location, &currentToken);
+    return expr;
+}
+
 int LgsParser::getBinOpPrecedence(const LgsBinOpType opType) {
     switch (opType) {
     case BIT_OR:
@@ -1970,30 +2014,6 @@ int LgsParser::getBinOpPrecedence(const LgsBinOpType opType) {
     default:
         return 0;
     }
-}
-
-void LgsParser::validateTestFolder(const LgsFile* testFile) {
-    bool foundTestsFolder = false;
-    auto currentPath = testFile->path.parent_path();
-    while (currentPath != paths.rootPath && currentPath.has_parent_path()) {
-        if (currentPath.filename() == "tests") {
-            foundTestsFolder = true;
-            break;
-        }
-        currentPath = currentPath.parent_path();
-    }
-    if (!foundTestsFolder) {
-        addError(E10079, &testFile->location, {testFile->path.filename()});
-    }
-}
-
-bool LgsParser::isImportName(LgsExpr* expr) const {
-    if (const auto variable = expr->asVariable()) {
-        if (!globals.table.imports.contains(variable->name)) return false;
-        variable->isImportName = true;
-        return true;
-    }
-    return false;
 }
 
 bool LgsParser::isEOF() {
@@ -2075,7 +2095,15 @@ void LgsParser::recursionGuard() {
     assert(0);
 }
 
-void LgsParser::addError(const LgsBaseMsg& lgsErr, const LgsLocation* location,
-    const std::vector<std::string>& args) {
+void LgsParser::addError(const LgsBaseMsg& lgsErr, const LgsLocation* location, const std::vector<std::string>& args) {
     errHandler.addError(lgsErr, location, metadata->path, args);
+}
+
+LgsFunc* wrapStmtsBlockWithFunc(LgsStmtsBlock* stmtsBlock) {
+    const auto func = new LgsFunc(LGS_ANONYMOUS_NAME, nullptr);
+    func->location = stmtsBlock->location;
+    func->stmtsBlock = stmtsBlock;
+    func->funcType->isLambda = true;
+    func->funcType->rt = &LGS_VOID;
+    return func;
 }

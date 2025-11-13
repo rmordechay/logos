@@ -33,20 +33,8 @@ bool LgsVariable::equals(LgsExpr* other) {
 }
 
 LgsExpr* LgsVariable::staticCast(LgsType* toType, const bool explicitCast) {
-    switch (ref.symbolType) {
-    case PARAM:
-        assert(0);
-    case VAR_DEC:
-        return ref.varDec->expr->staticCast(toType);
-    case FIELD:
-        assert(0);
-    case SUBTYPE:
-        assert(0);
-    case UNKNOWN:
-        return nullptr;
-    default:
-        assert(0);
-    }
+    if (explicitCast) return nullptr;
+    return this;
 }
 
 Value* LgsVariable::castIR(LgsLLVMGen& cg, LgsType* toType) {

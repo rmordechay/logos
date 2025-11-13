@@ -18,6 +18,7 @@ bool LgsFuncCall::equals(LgsFuncType* funcType) const {
 
     const auto argsSize = args.size();
     const auto paramsSize = funcType->params.size();
+    if (argsSize != paramsSize) return false;
     if (isNamed) {
         auto paramsByName = funcType->getParamsByName();
         for (size_t i = funcType->isMethod; i < argsSize; ++i) {
@@ -41,9 +42,9 @@ bool LgsFuncCall::equals(LgsFuncType* funcType) const {
 }
 
 bool LgsFuncCall::equalsVariadic(const LgsFuncType* funcType) const {
+    const auto argsSize = args.size();
     const auto paramsSize = funcType->params.size();
-    const auto argsSize = args.size() - funcType->isMethod;
-    const auto minArgs = funcType->isExternal ? paramsSize - 1 : paramsSize + 1;
+    const auto minArgs = funcType->isExternal ? paramsSize - 1 : paramsSize;
     if (argsSize < minArgs) return false;
     // Check all args until the variadic param
     for (size_t i = funcType->isMethod; i < paramsSize - 1; ++i) {

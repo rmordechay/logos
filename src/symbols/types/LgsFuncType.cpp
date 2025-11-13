@@ -30,7 +30,7 @@ Lgs_TypeKind LgsFuncType::getRTTypeKind() {
     assert(0);
 }
 
-size_t LgsFuncType::getSizeBytes() {
+size_t LgsFuncType::sizeBytes() {
     return sizeof(void*);
 }
 
@@ -41,7 +41,7 @@ std::string LgsFuncType::getName() {
         if (isBuiltin) strStream << LGS_NAME_PREFIX;
         else strStream << "u_";
     }
-    if (!isVirtual && parentName != "") strStream << parentName << "_";
+    if (parentName != "") strStream << parentName << "_";
     strStream << name;
     if (isCoroutine) strStream << LGS_CORO_SUFFIX;
     IRName = strStream.str();

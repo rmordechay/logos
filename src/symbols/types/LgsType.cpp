@@ -72,7 +72,7 @@ bool LgsType::isNumber() const {
 }
 
 bool LgsType::isBig() {
-    return (asObject() || asDArray()) && getSizeBytes() >= BIG_SIZE_THRESHOLD;
+    return (asObject() || asDArray()) && sizeBytes() >= BIG_SIZE_THRESHOLD;
 }
 
 bool LgsType::isUnknown() {

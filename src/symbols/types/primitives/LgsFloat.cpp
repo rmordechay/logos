@@ -30,7 +30,7 @@ Lgs_TypeKind LgsFloat::getRTTypeKind() {
     return RTT_FLOAT;
 }
 
-size_t LgsFloat::getSizeBytes() {
+size_t LgsFloat::sizeBytes() {
     return sizeof(float);
 }
 

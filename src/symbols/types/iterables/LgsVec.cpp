@@ -15,8 +15,8 @@ std::string LgsVec::getName() {
     return "vec" + std::to_string(vectorDim);
 }
 
-size_t LgsVec::getSizeBytes() {
-    return baseType->getSizeBytes() * 2;
+size_t LgsVec::sizeBytes() {
+    return baseType->sizeBytes() * 2;
 }
 
 LgsExpr* LgsVec::getZeroValue() {

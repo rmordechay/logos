@@ -1,7 +1,6 @@
 #pragma once
 #include "exprs/LgsExpr.h"
 #include "types/LgsInterface.h"
-
 #include <LgsValue.h>
 
 class LgsVariable;
@@ -14,7 +13,6 @@ public:
     uint32_t index = 0;
     LgsType* type = nullptr;
     LgsExpr* expr = nullptr;
-    Value* vaList = nullptr;
     bool isSelf = false;
     bool isVariadic = false;
 

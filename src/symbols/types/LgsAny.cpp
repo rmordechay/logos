@@ -1,7 +1,7 @@
 #include "types/LgsAny.h"
 #include "codegen/LgsLLVMGen.h"
 
-size_t LgsAny::getSizeBytes() {
+size_t LgsAny::sizeBytes() {
     return sizeof(void*);
 }
 

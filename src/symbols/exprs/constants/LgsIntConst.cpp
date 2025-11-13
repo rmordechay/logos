@@ -13,15 +13,16 @@ Value* LgsIntConst::loadIR(LgsLLVMGen& cg) {
 }
 
 LgsExpr* LgsIntConst::staticCast(LgsType* toType, const bool explicitCast) {
-    if (toType->getName() == LgsAny::name) return this;
     if (type->getName() == toType->getName()) return this;
-    if (toType->asLong()) {
-        setType(&LGS_LONG);
-        return this;
-    }
-    if (toType->asSize()) {
-        setType(&LGS_SIZE);
-        return this;
+    if (toType->getName() == LgsAny::name) return this;
+    const auto thisSize = type->sizeBytes();
+    const auto otherSize = toType->sizeBytes();
+    if (toType->isInt) {
+        // Widening is always allowed
+        if (otherSize >= thisSize) {
+            return new LgsIntConst(toType, value);
+        }
+        return nullptr;
     }
     if (toType->asFloat()) {
         return new LgsFloatConst(&LGS_FLOAT, value);
@@ -32,7 +33,7 @@ LgsExpr* LgsIntConst::staticCast(LgsType* toType, const bool explicitCast) {
     if (explicitCast && toType->asStr()) {
         return new LgsStrConst(std::to_string(value));
     }
-    assert(0);
+    return nullptr;
 }
 
 Value* LgsIntConst::castIR(LgsLLVMGen& cg, LgsType* toType) {

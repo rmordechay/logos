@@ -69,7 +69,7 @@ Value* LgsByte::lshiftIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     return cg.builder.CreateLShr(self->loadIR(cg), other->loadIR(cg));
 }
 
-size_t LgsByte::getSizeBytes() {
+size_t LgsByte::sizeBytes() {
     return sizeof(int8_t);
 }
 

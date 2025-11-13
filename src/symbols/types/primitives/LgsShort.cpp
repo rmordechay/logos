@@ -7,7 +7,7 @@
 #include "types/primitives/LgsSize.h"
 #include "types/primitives/LgsUInt.h"
 
-size_t LgsShort::getSizeBytes() {
+size_t LgsShort::sizeBytes() {
     return sizeof(short);
 }
 

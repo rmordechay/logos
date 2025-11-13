@@ -1,14 +1,13 @@
 #pragma once
 #include "LgsType.h"
 
-class LgsChar final : public LgsType {
+class LgsULong final : public LgsType {
 public:
-    static constexpr auto name = "Char";
+    static constexpr auto name = "ULong";
 
-    LgsChar() {
+    LgsULong() {
         isPrimitive = true;
     }
-
     size_t sizeBytes() override;
     Type* getIRType(LgsLLVMGen& cg) override;
     std::string getName() override;
@@ -18,6 +17,4 @@ public:
     bool canCastTo(LgsType* other) override;
 };
 
-inline LgsChar LGS_CHAR;
-
-
+inline LgsULong LGS_ULONG;

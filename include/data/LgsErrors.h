@@ -86,15 +86,15 @@ inline LgsBaseMsg E10052{"Spread operator in %s... must only be used with iterab
 inline LgsBaseMsg E10053{"%s is a Logos global name and cannot be redefined.", errCodeStart++};
 inline LgsBaseMsg E10054{"Field %s is set more than one time.", errCodeStart++};
 inline LgsBaseMsg E10055{"Function %s must return from all its paths.", errCodeStart++};
-inline LgsBaseMsg E10056{"Type %s has multiple fields with the same name %s.", errCodeStart++};
+inline LgsBaseMsg E10056{"%s has multiple fields with the same name %s.", errCodeStart++};
 inline LgsBaseMsg E10057{"Pattern matching expression %s must be of type Bool.", errCodeStart++};
-inline LgsBaseMsg E10058{"Field %s is defined in multiple interfaces: %s.", errCodeStart++};
+inline LgsBaseMsg E10058{"Field '%s' is defined in multiple interfaces.", errCodeStart++};
 inline LgsBaseMsg E10059{"Unreachable code.", errCodeStart++};
 inline LgsBaseMsg E10060{"for.isFirst and for.isLast are only allowed inside a for loop.", errCodeStart++};
 inline LgsBaseMsg E10061{"%s is not allowed in an infinite loop.", errCodeStart++};
 inline LgsBaseMsg E10062{"Interface %s implements all its methods which is not allowed. Make at least one of the methods abstract (without implementation) or change it to object", errCodeStart++};
 inline LgsBaseMsg E10063{"Interfaces must have at least one (abstract) method or field.", errCodeStart++};
-inline LgsBaseMsg E10064{"%s is already defined in %s.", errCodeStart++};
+inline LgsBaseMsg E10064{"Method '%s' is defined in multiple interfaces.", errCodeStart++};
 inline LgsBaseMsg E10065{"%s is not allowed in a while loop.", errCodeStart++};
 inline LgsBaseMsg E10066{"While loop condition %s must be of type Bool. Given: %s.", errCodeStart++};
 inline LgsBaseMsg E10067{"%s was not found.", errCodeStart++};
@@ -102,7 +102,7 @@ inline LgsBaseMsg E10068{"App version must be in the form of 1.0.0. Given: %s.",
 inline LgsBaseMsg E10069{"Too many scalars passed to %s.", errCodeStart++};
 inline LgsBaseMsg E10070{"Invalid scalars %s for %s.", errCodeStart++};
 inline LgsBaseMsg E10071{"break if must be inside an if statement.", errCodeStart++};
-inline LgsBaseMsg E10072{"Type %s has multiple methods with the same name %s.", errCodeStart++};
+inline LgsBaseMsg E10072{"%s has multiple methods with the same name %s.", errCodeStart++};
 inline LgsBaseMsg E10073{"Only numbers or vectors can be elements of a vector. Given: %s.", errCodeStart++};
 inline LgsBaseMsg E10074{"Vector mismatch. Vector dimension: %s. Given: %s.", errCodeStart++};
 inline LgsBaseMsg E10075{"Expression %s already has an owner.", errCodeStart++};

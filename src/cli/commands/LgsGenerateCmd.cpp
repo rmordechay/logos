@@ -25,7 +25,7 @@ LgsCliCmdHelp& LgsGenerateCmd::getHelp() {
     return generateCmdHelp;
 }
 
-void LgsGenerateCmd::createProjectStructure(const std::string& name) const {
+void LgsGenerateCmd::createProjectStructure(const std::string& name) {
     auto projectDir = fs::current_path() / name;
     if (fs::exists(projectDir)) return printCliError(E40006, {name});
     createDir(projectDir);
@@ -37,13 +37,14 @@ void LgsGenerateCmd::createProjectStructure(const std::string& name) const {
     const auto mainFile = srcDir / LGS_MAIN_FILE;
     std::ofstream mainStream(mainFile);
     if (!mainStream) assert(0);
-    mainStream << MAIN_FILE_TEMPLATE;
+    char buffer[1024];
+    std::snprintf(buffer, sizeof(buffer), MAIN_FILE_TEMPLATE, name.c_str());
+    mainStream << buffer;
     mainStream.close();
 
     const auto appFile = projectDir / LGS_APP_FILE_NAME;
     std::ofstream appStream(appFile);
     if (!appStream) assert(0);
-    char buffer[1024];
     std::snprintf(buffer, sizeof(buffer), APP_CONFIG_FILE_TEMPLATE, name.c_str());
     appStream << buffer;
     appStream.close();

@@ -11,7 +11,7 @@ public:
     Type* getIRType(LgsLLVMGen& cg) override;
     std::string getName() override;
     std::string pname() override;
-    size_t getSizeBytes() override;
+    size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
     Lgs_TypeKind getRTTypeKind() override;
     Constant* getRTType(LgsLLVMGen& cg) override;

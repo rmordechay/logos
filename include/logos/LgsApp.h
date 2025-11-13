@@ -33,8 +33,8 @@ class LgsApp final {
 public:
     LgsPaths paths;
     LgsGlobals globals;
-    LgsAppConfigs configs;
     LgsAppCache appCache;
+    LgsAppConfigs configs;
     LgsErrHandler errHandler;
     LgsTypeResolver typeResolver;
     std::vector<LgsFile*> srcFiles;
@@ -54,7 +54,6 @@ public:
     bool analyse();
     bool generate();
     bool link();
-    void mergeCImports(const LgsParser& parser);
     void loadSrcFile(LgsFileMetadata& metadata);
     void loadSrcFile(const std::string& fileCode, const fs::path& filePath = LGS_MAIN_FILE);
     bool loadConfigFile();
@@ -69,6 +68,7 @@ public:
     void compareHash() const;
     void printIR() const;
     void initPaths(const fs::path& root);
+    void mergeCImports(const LgsParser& parser);
     LgsMainFile* getMainFile() const;
     ~LgsApp();
 };

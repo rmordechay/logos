@@ -32,7 +32,7 @@ std::string LgsEnum::strFormatPart() const {
     return "%s";
 }
 
-size_t LgsEnum::getSizeBytes() {
+size_t LgsEnum::sizeBytes() {
     return sizeof(void*);
 }
 

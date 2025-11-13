@@ -31,6 +31,7 @@ set(LGS_SOURCE
     ${CMAKE_SOURCE_DIR}/src/logos/LgsStack.cpp
     ${CMAKE_SOURCE_DIR}/src/logos/LgsPaths.cpp
     ${CMAKE_SOURCE_DIR}/src/logos/LgsAppCache.cpp
+    ${CMAKE_SOURCE_DIR}/src/logos/LgsPkgManager.cpp
     ${CMAKE_SOURCE_DIR}/src/files/LgsMainFile.cpp
     ${CMAKE_SOURCE_DIR}/src/files/LgsObjectFile.cpp
     ${CMAKE_SOURCE_DIR}/src/files/LgsInterfaceFile.cpp
@@ -55,6 +56,8 @@ set(LGS_SOURCE
     # CLI
     ${CMAKE_SOURCE_DIR}/src/cli/LgsCliHandler.cpp
     ${CMAKE_SOURCE_DIR}/src/cli/LgsCliCmd.cpp
+    ${CMAKE_SOURCE_DIR}/src/cli/lpm/LgsPkgCmd.cpp
+    ${CMAKE_SOURCE_DIR}/src/cli/lpm/LgsInstallCmd.cpp
     ${CMAKE_SOURCE_DIR}/src/cli/commands/LgsRunCmd.cpp
     ${CMAKE_SOURCE_DIR}/src/cli/commands/LgsCompileCmd.cpp
     ${CMAKE_SOURCE_DIR}/src/cli/commands/LgsAstCmd.cpp
@@ -62,11 +65,6 @@ set(LGS_SOURCE
     ${CMAKE_SOURCE_DIR}/src/cli/commands/LgsLinterCmd.cpp
     ${CMAKE_SOURCE_DIR}/src/cli/commands/LgsFormatCmd.cpp
     ${CMAKE_SOURCE_DIR}/src/cli/commands/LgsGenerateCmd.cpp
-
-    # Package manager
-    ${CMAKE_SOURCE_DIR}/src/cli/lpm/LgsPkgCmd.cpp
-    ${CMAKE_SOURCE_DIR}/src/cli/lpm/LgsInstallCmd.cpp
-    ${CMAKE_SOURCE_DIR}/src/logos/LgsPkgManager.cpp
 
     # Symbols
     ${CMAKE_SOURCE_DIR}/src/symbols/LgsSymbol.cpp
@@ -148,6 +146,7 @@ set(LGS_SOURCE
     ${CMAKE_SOURCE_DIR}/src/symbols/types/primitives/LgsShort.cpp
     ${CMAKE_SOURCE_DIR}/src/symbols/types/primitives/LgsSize.cpp
     ${CMAKE_SOURCE_DIR}/src/symbols/types/primitives/LgsUInt.cpp
+    ${CMAKE_SOURCE_DIR}/src/symbols/types/primitives/LgsULong.cpp
     ${CMAKE_SOURCE_DIR}/src/symbols/types/primitives/LgsByte.cpp
     ${CMAKE_SOURCE_DIR}/src/symbols/types/primitives/LgsVoid.cpp
 )

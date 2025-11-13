@@ -14,8 +14,8 @@ LgsExpr* LgsTypePair::getZeroValue() {
     assert(false);
 }
 
-size_t LgsTypePair::getSizeBytes() {
-    return key->getSizeBytes() + value->getSizeBytes() ;
+size_t LgsTypePair::sizeBytes() {
+    return key->sizeBytes() + value->sizeBytes() ;
 }
 
 std::string LgsTypePair::getName() {

@@ -8,7 +8,7 @@ Type* LgsVoid::getIRType(LgsLLVMGen& cg) {
     return Type::getVoidTy(cg.context);
 }
 
-size_t LgsVoid::getSizeBytes() {
+size_t LgsVoid::sizeBytes() {
     return 0;
 }
 

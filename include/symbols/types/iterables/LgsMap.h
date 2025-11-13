@@ -25,7 +25,7 @@ public:
     LgsFunc* getAddFunc() override;
     std::string getName() override;
     std::string pname() override;
-    size_t getSizeBytes() override;
+    size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
     Lgs_TypeKind getRTTypeKind() override;
     LgsType* getIndexType() override;

@@ -19,7 +19,7 @@ Type* LgsPtr::getIRType(LgsLLVMGen& cg) {
     return cg.ptrTy();
 }
 
-size_t LgsPtr::getSizeBytes() {
+size_t LgsPtr::sizeBytes() {
     return sizeof(void*);
 }
 

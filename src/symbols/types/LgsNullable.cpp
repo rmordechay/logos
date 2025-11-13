@@ -42,8 +42,8 @@ bool LgsNullable::canCastTo(LgsType* other) {
     return baseType->canCastTo(otherNullable->baseType);
 }
 
-size_t LgsNullable::getSizeBytes() {
-    return baseType->getSizeBytes() + sizeof(bool);
+size_t LgsNullable::sizeBytes() {
+    return baseType->sizeBytes() + sizeof(bool);
 }
 
 std::string LgsNullable::strFormatPart() const {

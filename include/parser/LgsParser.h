@@ -165,9 +165,10 @@ public:
     void addFileSymbol(LgsMainFile* file, const LgsSymbol& newSymbol);
     void setLocation(LgsLocation& location, const LgsToken* token) const;
     void extractStrParts(LgsStrConst& strConst);
-    static int getBinOpPrecedence(LgsBinOpType opType);
     void validateTestFolder(const LgsFile* testFile);
     bool isImportName(LgsExpr* expr) const;
+    LgsExpr* determineIntConst(const std::string& tokenStr, int base) const;
+    static int getBinOpPrecedence(LgsBinOpType opType);
 
     // Parser
     bool isEOF();

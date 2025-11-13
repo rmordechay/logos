@@ -27,10 +27,10 @@ std::string LgsSArray::pname() {
     return "[]";;
 }
 
-size_t LgsSArray::getSizeBytes() {
+size_t LgsSArray::sizeBytes() {
     const auto constInt = size->getConstInt();
     if (!constInt) return 0;
-    return baseType->getSizeBytes() * *constInt;
+    return baseType->sizeBytes() * *constInt;
 }
 
 LgsExpr* LgsSArray::getZeroValue() {
@@ -87,8 +87,8 @@ Value* LgsSArray::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     const auto otherSArr = other->type->asSArray();
     const auto sizeNewArr = cg.builder.CreateAdd(size->IRValue, otherSArr->size->IRValue);
     const auto newArr = cg.builder.CreateAlloca(baseType->getIRType(cg), sizeNewArr);
-    const auto size1 = cg.builder.CreateMul(size->IRValue, cg.i32(baseType->getSizeBytes()));
-    const auto size2 = cg.builder.CreateMul(otherSArr->size->IRValue, cg.i32(baseType->getSizeBytes()));
+    const auto size1 = cg.builder.CreateMul(size->IRValue, cg.i32(baseType->sizeBytes()));
+    const auto size2 = cg.builder.CreateMul(otherSArr->size->IRValue, cg.i32(baseType->sizeBytes()));
     cg.callMemCpy(newArr, self->IRValue, size1);
     const auto offset = cg.builder.CreateInBoundsGEP(baseType->getIRType(cg), newArr, size->IRValue);
     cg.callMemCpy(offset, other->IRValue, size2);
@@ -101,7 +101,7 @@ Value* LgsSArray::mulIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     const auto multiplier = cg.extendToSize(other->IRValue);
     const auto newSize = cg.builder.CreateMul(arrSize, multiplier);
     const auto newArr = cg.builder.CreateAlloca(baseType->getIRType(cg), newSize);
-    const auto bytesPerCopy = cg.builder.CreateMul(arrSize, cg.usize(baseType->getSizeBytes()));
+    const auto bytesPerCopy = cg.builder.CreateMul(arrSize, cg.usize(baseType->sizeBytes()));
     cg.loop(multiplier, [&](Value* i, BasicBlock*) {
         const auto offset = cg.builder.CreateMul(i, arrSize);
         const auto destPtr = cg.builder.CreateInBoundsGEP(baseType->getIRType(cg), newArr, offset);

@@ -13,7 +13,7 @@ public:
     std::string getName() override;
     LgsExpr* getZeroValue() override;
     Lgs_TypeKind getRTTypeKind() override;
-    size_t getSizeBytes() override;
+    size_t sizeBytes() override;
     std::string strFormatPart() const override;
     bool canCastTo(LgsType* other) override;
     LgsType* applyBinOp(LgsBinaryExpr* binExpr) override;

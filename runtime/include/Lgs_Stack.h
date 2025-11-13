@@ -3,10 +3,10 @@
 #include "Lgs_Types.h"
 #include "../../include/logos/LgsConfigs.h"
 
-typedef void (*Thunk)(void*);
+typedef void (*ThunkFunc)(void*);
 
 struct Lgs_ThunkFunc {
-    Thunk func;
+    ThunkFunc func;
     void* ctx;
 };
 

@@ -740,6 +740,27 @@ TEST_CASE("SemaError10056B") {
     }
 }
 
+TEST_CASE("SemaError10058") {
+    LgsApp app;
+    const auto code = R"(
+        interface Inter { x: Int }
+        interface Inter2 { x: Int }
+        object Obj2 {
+            implements: Inter, Inter2
+            x: Int
+        }
+        main() {}
+    )";
+    app.loadSrcFile(code);
+    assert(app.errHandler.successful);
+    app.analyse();
+    CHECK_EQ(app.errHandler.errors.size(), 2);
+    if (app.errHandler.errors.size() > 0) {
+        CHECK_EQ(app.errHandler.errors[0].errCode, E10058.code);
+    }
+    CHECK_EQ(app.errHandler.errors[1].errCode, E10058.code);
+}
+
 TEST_CASE("SemaError10059") {
     LgsApp app;
     const auto code = R"(
@@ -764,6 +785,27 @@ TEST_CASE("SemaError10059") {
         CHECK_EQ(app.errHandler.errors[0].errCode, E10059.code);
     }
     CHECK_EQ(app.errHandler.errors[1].errCode, E10059.code);
+}
+
+TEST_CASE("SemaError10064") {
+    LgsApp app;
+    const auto code = R"(
+        interface Inter { func() }
+        interface Inter2 { func() }
+        object Obj2 {
+            implements: Inter, Inter2
+            func() {print("Hello world")}
+        }
+        main() {}
+    )";
+    app.loadSrcFile(code);
+    assert(app.errHandler.successful);
+    app.analyse();
+    CHECK_EQ(app.errHandler.errors.size(), 2);
+    if (app.errHandler.errors.size() > 0) {
+        CHECK_EQ(app.errHandler.errors[0].errCode, E10064.code);
+    }
+    CHECK_EQ(app.errHandler.errors[1].errCode, E10064.code);
 }
 
 TEST_CASE("SemaError10066") {

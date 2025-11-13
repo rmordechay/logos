@@ -57,13 +57,13 @@ Type* LgsObject::getIRType(LgsLLVMGen& cg) {
     return IRType;
 }
 
-size_t LgsObject::getSizeBytes() {
+size_t LgsObject::sizeBytes() {
     size_t sum = 0;
     for (const auto& field : fields) {
         if (field->type->asObject() || field->type->asFuncType() || field->type->asInterface() || field->type->asDArray()) {
             sum += sizeof(void*);
         } else {
-            sum += field->type->getSizeBytes();
+            sum += field->type->sizeBytes();
         }
     }
     return sum;

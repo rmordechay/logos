@@ -12,7 +12,7 @@ Type* LgsLong::getIRType(LgsLLVMGen& cg) {
     return cg.i64Ty();
 }
 
-size_t LgsLong::getSizeBytes() {
+size_t LgsLong::sizeBytes() {
     return sizeof(long);
 }
 

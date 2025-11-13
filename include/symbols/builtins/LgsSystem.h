@@ -24,10 +24,12 @@ public:
         };
         cwdFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsFuncArg>&) {
             const auto value = cg.builder.CreateAlloca(ArrayType::get(cg.i8Ty(), STRING_BUFFER_SIZE));
+            // TODO os?
             cg.callFunc("getcwd", cg.ptrTy(), {cg.ptrTy(), cg.sizeTy()}, {value, cg.usize(STRING_BUFFER_SIZE)});
             return value;
         };
         coresNumFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsFuncArg>&) {
+            // TODO os?
             return cg.callFunc("sysconf", cg.i64Ty(), {cg.i32Ty()}, {cg.i32(58)});
         };
         getEnvFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsFuncArg>& args) {

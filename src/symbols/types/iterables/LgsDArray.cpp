@@ -49,7 +49,7 @@ std::string LgsDArray::pname() {
     return "[]";
 }
 
-size_t LgsDArray::getSizeBytes() {
+size_t LgsDArray::sizeBytes() {
     return sizeof(Lgs_DArray);
 }
 
@@ -120,7 +120,7 @@ Value* LgsDArray::getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) {
 void LgsDArray::initArr(LgsLLVMGen& cg, Value* iterable) {
     cg.callLgsFunc("DArray_init", cg.voidTy(), {cg.ptrTy(), cg.sizeTy(), cg.i32Ty()}, {
         iterable,
-        cg.usize(baseType->getSizeBytes()),
+        cg.usize(baseType->sizeBytes()),
         cg.i32(getRTTypeKind()),
     });
 }

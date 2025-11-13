@@ -17,7 +17,7 @@ std::string LgsStr::getName() {
     return name;
 }
 
-size_t LgsStr::getSizeBytes() {
+size_t LgsStr::sizeBytes() {
     return sizeof(void*);
 }
 

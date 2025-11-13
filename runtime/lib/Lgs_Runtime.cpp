@@ -30,6 +30,21 @@ extern "C" void Lgs_Runtime_close() {
     // runtime.scheduler.shutdown();
 }
 
+extern "C" void Lgs_Runtime_addDefer(void* funcPtr, void* ctx) {
+    const auto deferFunc = reinterpret_cast<ThunkFunc>(funcPtr);
+    const auto deferIndex = runtime.stack.frames[runtime.stack.stackIndex].defersCount++;
+    runtime.stack.frames[runtime.stack.stackIndex].defers[deferIndex] = Lgs_ThunkFunc{deferFunc, ctx};
+}
+
+extern "C" void Lgs_Runtime_callDefers() {
+    const auto& top = runtime.stack.frames[runtime.stack.stackIndex];
+    for (size_t i = 0; i < LOCALS_CAPACITY; ++i) {
+        const auto [func, ctx] = top.defers[i];
+        if (!func) continue;
+        func(ctx);
+    }
+}
+
 extern "C" void Lgs_Runtime_addOwner(void* ptr, const Lgs_TypeKind type) {
     const auto ownerIndex = runtime.stack.frames[runtime.stack.stackIndex].ownersCount++;
     runtime.stack.frames[runtime.stack.stackIndex].owners[ownerIndex] = Lgs_Alloc{ptr, type};
@@ -38,12 +53,6 @@ extern "C" void Lgs_Runtime_addOwner(void* ptr, const Lgs_TypeKind type) {
 extern "C" void Lgs_Runtime_addOrphan(void* ptr, const Lgs_TypeKind type) {
     const auto ownerIndex = runtime.stack.frames[runtime.stack.stackIndex].orphansCount++;
     runtime.stack.frames[runtime.stack.stackIndex].orphans[ownerIndex] = Lgs_Alloc{ptr, type};
-}
-
-extern "C" void Lgs_Runtime_addDefer(void* funcPtr, void* ctx) {
-    const auto deferFunc = reinterpret_cast<Thunk>(funcPtr);
-    const auto deferIndex = runtime.stack.frames[runtime.stack.stackIndex].defersCount++;
-    runtime.stack.frames[runtime.stack.stackIndex].defers[deferIndex] = Lgs_ThunkFunc{deferFunc, ctx};
 }
 
 extern "C" void Lgs_Runtime_removeOwner(const void* owner) {
@@ -67,17 +76,8 @@ extern "C" void Lgs_Runtime_pop(const bool cleanup) {
     runtime.stack.stackIndex--;
 }
 
-extern "C" void Lgs_Runtime_callDefers() {
-    const auto& top = runtime.stack.frames[runtime.stack.stackIndex];
-    for (size_t i = 0; i < LOCALS_CAPACITY; ++i) {
-        const auto [func, ctx] = top.defers[i];
-        if (!func) continue;
-        func(ctx);
-    }
-}
-
 extern "C" void Lgs_Runtime_addCoro(void* funcPtr, void* ctx) {
-    runtime.scheduler.spawn(reinterpret_cast<Thunk>(funcPtr), ctx);
+    runtime.scheduler.spawn(reinterpret_cast<ThunkFunc>(funcPtr), ctx);
 }
 
 extern "C" void Lgs_Runtime_yield() {

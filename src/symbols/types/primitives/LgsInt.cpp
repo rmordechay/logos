@@ -8,7 +8,7 @@
 #include "types/primitives/LgsSize.h"
 #include <llvm/IR/DIBuilder.h>
 
-size_t LgsInt::getSizeBytes() {
+size_t LgsInt::sizeBytes() {
     return sizeof(int);
 }
 

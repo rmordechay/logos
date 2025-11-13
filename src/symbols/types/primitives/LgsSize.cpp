@@ -4,7 +4,7 @@
 #include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsLong.h"
 
-size_t LgsSize::getSizeBytes() {
+size_t LgsSize::sizeBytes() {
     return sizeof(size_t);
 }
 

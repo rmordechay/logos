@@ -5,8 +5,8 @@ Type* LgsSubType::getIRType(LgsLLVMGen& cg) {
     return subtype->getIRType(cg);
 }
 
-size_t LgsSubType::getSizeBytes() {
-    return subtype->getSizeBytes();
+size_t LgsSubType::sizeBytes() {
+    return subtype->sizeBytes();
 }
 
 LgsExpr* LgsSubType::getZeroValue() {

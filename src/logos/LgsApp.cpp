@@ -185,19 +185,6 @@ bool LgsApp::link() {
     return linker.link();
 }
 
-void LgsApp::mergeCImports(const LgsParser& parser) {
-    for (auto localImport : parser.cImports) {
-        auto it = std::ranges::find_if(globals.cImports, [localImport](const LgsStrConst* g) {
-            return g->value == localImport->value;
-        });
-        if (it == std::ranges::end(globals.cImports)) {
-            globals.cImports.push_back(localImport);
-        } else {
-            freeExpr(localImport);
-        }
-    }
-}
-
 void LgsApp::loadSrcFile(LgsFileMetadata& metadata) {
     const auto fileCode = getFileText(metadata.path);
     LgsParser parser(&metadata, paths, globals);
@@ -424,6 +411,19 @@ void LgsApp::initPaths(const fs::path& root) {
     paths.cacheFile = paths.buildDir / LGS_FILES_CACHE_FILE;
     paths.findLgsRootDir();
     paths.findCLibHeaders();
+}
+
+void LgsApp::mergeCImports(const LgsParser& parser) {
+    for (auto localImport : parser.cImports) {
+        auto it = std::ranges::find_if(globals.cImports, [localImport](const LgsStrConst* g) {
+            return g->value == localImport->value;
+        });
+        if (it == std::ranges::end(globals.cImports)) {
+            globals.cImports.push_back(localImport);
+        } else {
+            freeExpr(localImport);
+        }
+    }
 }
 
 LgsMainFile* LgsApp::getMainFile() const {

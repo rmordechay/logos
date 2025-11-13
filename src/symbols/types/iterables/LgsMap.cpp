@@ -29,7 +29,7 @@ std::string LgsMap::pname() {
     return '{' + keyName + ": " + valueName + '}';
 }
 
-size_t LgsMap::getSizeBytes() {
+size_t LgsMap::sizeBytes() {
     return sizeof(Lgs_Map);
 }
 

@@ -22,7 +22,7 @@ public:
     Value* bitXorIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
     Value* rshiftIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
     Value* lshiftIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
-    size_t getSizeBytes() override;
+    size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
     Lgs_TypeKind getRTTypeKind() override;
     std::string getName() override;

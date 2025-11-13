@@ -52,7 +52,7 @@
 #include <iostream>
 #include <ranges>
 #include <unordered_set>
-std::string getMissingImplementsStr(const std::vector<LgsField*>& fields, const std::vector<LgsFunc*>& methods);
+static std::string getMissingImplementsStr(const std::vector<LgsField*>& fields, const std::vector<LgsFunc*>& methods);
 
 void LgsSema::analyse() {
     resolveImports();
@@ -516,7 +516,9 @@ void LgsSema::visitBreakStmt(const LgsBreak* breakStmt) {
 
 void LgsSema::visitCoroutine(const LgsCoroutine* coroutine) {
     const LgsFuncCall* fc = nullptr;
-    if (coroutine->funcCall) {
+    if (coroutine->funcCall->name == "") { // Wrapped stmtsBlock
+        visitStmtsBlock(coroutine->funcCall->func->stmtsBlock);
+    } else if (coroutine->funcCall) {
         visitFuncCall(coroutine->funcCall);
         fc = coroutine->funcCall;
     } else if (coroutine->selection) {
@@ -539,9 +541,15 @@ void LgsSema::visitCoroutine(const LgsCoroutine* coroutine) {
 }
 
 void LgsSema::visitDeferStmt(const LgsDeferStmt* deferStmt) {
-    if (deferStmt->funcCall) visitFuncCall(deferStmt->funcCall);
-    else if (deferStmt->selection) visitSelection(deferStmt->selection);
-    else assert(0);
+    if (deferStmt->funcCall->name == "") { // Wrapped stmtsBlock
+        visitStmtsBlock(deferStmt->funcCall->func->stmtsBlock);
+    } else if (deferStmt->selection) {
+        visitSelection(deferStmt->selection);
+    } else if (deferStmt->funcCall) {
+        visitFuncCall(deferStmt->funcCall);
+    } else {
+        assert(0);
+    }
     stack.currentFunc()->hasDefers = true;
 }
 
@@ -911,8 +919,8 @@ void LgsSema::visitFuncCall(LgsFuncCall* funcCall) {
     if (!symbol) return;
     const auto ft = symbol->getType()->asFuncType();
     if (!ft) return addError(E10046, funcCall->location, {funcCall->name});
+
     visitFuncArgs(funcCall, ft);
-    // Validate
     if (!funcCall->equals(ft)) {
         for (const auto& arg : funcCall->args) if (!arg.expr->type) return;
         addError(E10015, funcCall->location, {funcCall->name, funcCall->asText(), ft->pname()});
@@ -1219,6 +1227,7 @@ bool LgsSema::validateExprType(LgsExpr* expr, LgsType* type) {
 
 void LgsSema::validateObjImplements(LgsObject* obj, const std::vector<LgsType*>& interfaces) {
     std::unordered_set<std::string> interfacesNames;
+    std::unordered_set<std::string> seenNames;
     for (const auto implementsInterface : interfaces) {
         const auto interface = implementsInterface->asInterface();
         if (!interface) {
@@ -1231,6 +1240,9 @@ void LgsSema::validateObjImplements(LgsObject* obj, const std::vector<LgsType*>&
         for (const auto& interfaceField : interface->fields) {
             const auto objField = obj->getField(interfaceField->name);
             if (objField && objField->type->equals(interfaceField->type)) {
+                if (!seenNames.insert(interfaceField->name).second) {
+                    addError(E10058, objField->location, {objField->name});
+                }
                 objField->isVirtual = true;
                 continue;
             }
@@ -1244,6 +1256,10 @@ void LgsSema::validateObjImplements(LgsObject* obj, const std::vector<LgsType*>&
         for (const auto& [name, interfaceMethod] : interface->methods) {
             const auto objMethod = obj->methods.find(name);
             if (objMethod != obj->methods.end() && objMethod->second->type->equals(interfaceMethod->type)) {
+                auto objMethodName = objMethod->first;
+                if (!seenNames.insert(objMethodName).second) {
+                    addError(E10064, objMethod->second->location, {objMethodName});
+                }
                 objMethod->second->funcType->isVirtual = true;
                 continue;
             }
@@ -1330,18 +1346,16 @@ void LgsSema::validateObjDuplicates(LgsType* type){
     for (const auto* f : type->fields) {
         if (!f) continue;
         const auto& name = f->name;
-        if (names.contains(name)) {
+        if (!names.insert(name).second) {
             addError(E10056, type->location, {type->pname(), name});
             break;
         }
-        names.insert(name);
     }
     for (const auto& [name, func] : type->methods) {
-        if (names.contains(name)) {
+        if (!names.insert(name).second) {
             addError(E10056, type->location, {type->pname(), name});
             break;
         }
-        names.insert(name);
     }
 }
 
@@ -1456,7 +1470,7 @@ LgsFunc* LgsSema::createGenericFunc(LgsFuncCall* funcCall, LgsFunc* const func) 
     return newFunc;
 }
 
-std::string getMissingImplementsStr(const std::vector<LgsField*>& fields, const std::vector<LgsFunc*>& methods) {
+static std::string getMissingImplementsStr(const std::vector<LgsField*>& fields, const std::vector<LgsFunc*>& methods) {
     std::stringstream str;
     str << "Missing fields/methods:";
     if (!fields.empty()) {

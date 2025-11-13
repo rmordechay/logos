@@ -5,7 +5,7 @@ Type* LgsGenericType::getIRType(LgsLLVMGen& cg) {
     assert(0);
 }
 
-size_t LgsGenericType::getSizeBytes() {
+size_t LgsGenericType::sizeBytes() {
     assert(0);
 }
 

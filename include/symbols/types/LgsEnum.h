@@ -13,7 +13,7 @@ public:
     Lgs_TypeKind getRTTypeKind() override;
     bool canCastTo(LgsType* other) override;
     std::string strFormatPart() const override;
-    size_t getSizeBytes() override;
+    size_t sizeBytes() override;
     LgsEnum* clone() override;
     ~LgsEnum() override = default;
 };

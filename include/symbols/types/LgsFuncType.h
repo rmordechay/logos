@@ -10,13 +10,13 @@ enum LgsFuncFlags : uint32_t {
     VIRTUAL = 1 << 2,
     VARIADIC = 1 << 3,
     OPTIONAL = 1 << 4,
-    TERMINATOR = 1 << 5,
-    METHOD = 1 << 6,
-    COROUTINE = 1 << 7,
-    IO_MEMBER = 1 << 8,
-    SYSCALL = 1 << 9,
-    EXTERNAL = 1 << 10,
-    ARR_FUNC = 1 << 11,
+    METHOD = 1 << 5,
+    COROUTINE = 1 << 6,
+    IO_MEMBER = 1 << 7,
+    SYSCALL = 1 << 8,
+    EXTERNAL = 1 << 9,
+    ARR_FUNC = 1 << 10,
+    TERMINATOR = 1 << 11,
     HAS_DEFAULTS = 1 << 12,
 };
 
@@ -35,13 +35,13 @@ public:
     bool isVariadic = false;
     bool isLambda = false;
     bool isOptional = false;
-    bool isTerminator = false;
     bool isMethod = false;
     bool isCoroutine = false;
     bool isIOMember = false;
     bool isSyscall = false;
     bool isExternal = false;
     bool isArrFunc = false;
+    bool isTerminator = false;
     bool hasDefaults = false;
     uint32_t variadicIndex = 0;
 
@@ -53,7 +53,7 @@ public:
     Type* getIRType(LgsLLVMGen& cg) override;
     LgsExpr* getZeroValue() override;
     Lgs_TypeKind getRTTypeKind() override;
-    size_t getSizeBytes() override;
+    size_t sizeBytes() override;
     std::string getName() override;
     std::string pname() override;
     std::string strFormatPart() const override;

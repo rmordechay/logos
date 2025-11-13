@@ -5,7 +5,7 @@
 #include "types/primitives/LgsInt.h"
 #include "types/primitives/LgsSize.h"
 
-size_t LgsUInt::getSizeBytes() {
+size_t LgsUInt::sizeBytes() {
     return sizeof(uint32_t);
 }
 

@@ -99,7 +99,7 @@ public:
     void visitReturnStmt(LgsReturn* returnStmt);
     void visitBreakStmt(const LgsBreak* breakStmt);
     void visitCoroutine(const LgsCoroutine* coroutine);
-    void visitDeferStmt(const LgsDeferStmt* deferStmt);
+    void visitDeferStmt(const LgsDeferStmt* defer);
     void visitIOStmt(const LgsIOStmt* ioStmt);
     void visitExpr(LgsExpr* expr, bool assign = false);
     void visitBinaryExpr(LgsBinaryExpr* binExpr);
@@ -129,8 +129,8 @@ public:
     void createPrologue(LgsFunc* func);
     void createEpilogue(LgsFunc* func);
     void initMainArgs(const LgsMainFunc* mainFunc) const;
+    StructType* getThunkCtxType(const LgsFuncCall* fc) const;
     Value* getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) const;
-    Type* getThunkCtxType(const LgsFuncCall* fc) const;
     Function* getThunkFunc(const LgsFuncCall* fc, Type* ctxTy) const;
     void yield() const;
 

@@ -27,7 +27,7 @@ public:
     LgsFunc* getMethod(const std::string& methodName) override;
     std::string getName() override;
     Type* getIRType(LgsLLVMGen& cg) override;
-    size_t getSizeBytes() override;
+    size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
     Lgs_TypeKind getRTTypeKind() override;
     Constant* getRTType(LgsLLVMGen& cg) override;

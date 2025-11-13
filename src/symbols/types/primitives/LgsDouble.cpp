@@ -7,7 +7,7 @@ std::string LgsDouble::getName() {
     return name;
 }
 
-size_t LgsDouble::getSizeBytes() {
+size_t LgsDouble::sizeBytes() {
     return sizeof(double_t);
 }
 
