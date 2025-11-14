@@ -57,7 +57,6 @@
 #include <unordered_set>
 
 #define MAX_TOKENS_NUMBER 100000
-LgsExpr* determineIntConst(const std::string& tokenStr, int base);
 LgsFunc* wrapStmtsBlockWithFunc(LgsStmtsBlock* stmtsBlock);
 
 bool LgsParser::scanTokens() {
@@ -355,7 +354,7 @@ LgsObject* LgsParser::parseObjectBody(const LgsToken& tokenName, const bool isSi
         if (const auto field = parseField(fieldPosition)) {
             fieldPosition++;
             if (headersOnly && !field->isPublic) continue;
-            field->parent = obj;
+            field->parentType = obj;
             obj->addField(field);
         } else if (const auto innerObj = parseObject()) {
             obj->objects.push_back(innerObj);
@@ -753,9 +752,11 @@ LgsStmtsBlock* LgsParser::parseStmtsBlock(const bool withSingleStmt) {
         setLocation(stmtsBlock->location, &currentToken);
         if (!matchAndConsume(T_RBRACE)) {
             while (true) {
-                const auto stmt = parseStmt();
-                if (!stmt) break;
-                stmtsBlock->stmts.push_back(stmt);
+                if (const auto stmt = parseStmt()) {
+                    stmtsBlock->stmts.push_back(stmt);
+                } else {
+                    break;
+                }
                 if (currentToken.type == T_RBRACE) break;
             }
             mustMatch(T_RBRACE);
@@ -1585,11 +1586,10 @@ LgsFunc* LgsParser::parseLambda() {
                     mustParse(paramType);
                 }
                 params.emplace_back(paramType, paramName);
-                if (currentToken.type == T_RPAREN) break;
-                mustMatch(T_COMMA);
+                if (currentToken.type == T_RPAREN || currentToken.type != T_COMMA) break;
             }
             if (currentToken.type == T_COMMA) consume();
-            mustMatch(T_RPAREN);
+            if (currentToken.type == T_RPAREN) consume();
         }
     } else {
         return nullptr;
@@ -1968,17 +1968,15 @@ LgsExpr* LgsParser::determineIntConst(const std::string& tokenStr, const int bas
     LgsExpr* expr = nullptr;
     if (errno == ERANGE) {
         expr = new LgsIntConst(&LGS_ULONG, static_cast<int64_t>(UINT64_MAX));
-    }
-    if (v <= static_cast<unsigned long long>(INT_MAX)) {
+    } else if (v <= static_cast<unsigned long long>(INT_MAX)) {
         expr = new LgsIntConst(&LGS_INT, static_cast<int64_t>(v));
-    }
-    if (v <= static_cast<unsigned long long>(UINT_MAX)) {
+    } else if (v <= static_cast<unsigned long long>(UINT_MAX)) {
         expr = new LgsIntConst(&LGS_UINT, static_cast<int64_t>(v));
-    }
-    if (v <= static_cast<unsigned long long>(LONG_MAX)) {
+    } else if (v <= static_cast<unsigned long long>(LONG_MAX)) {
         expr = new LgsIntConst(&LGS_LONG, static_cast<int64_t>(v));
+    } else {
+        expr = new LgsIntConst(&LGS_ULONG, static_cast<int64_t>(v));
     }
-    expr = new LgsIntConst(&LGS_ULONG, static_cast<int64_t>(v));
     setLocation(expr->location, &currentToken);
     return expr;
 }

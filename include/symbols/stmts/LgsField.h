@@ -20,12 +20,11 @@ public:
     bool isVirtual = false;
     bool isOptional = false;
     bool isOwner = false;
-    // Not to be confused with type enum. This flag is for direct fields.
-    bool isEnumField = false;
-    Value* parentIRValue = nullptr;
-    LgsType* parent = nullptr;
+    bool isEnumField = false; // Not to be confused with type enum.
+    LgsType* parentType = nullptr;
+    Value* parentIRPtr = nullptr;
 
-    LgsField(std::string name, LgsType* type, LgsExpr* expr = nullptr) : name(std::move(name)), type(type), expr(expr) {}
+    LgsField(const std::string& name, LgsType* type, LgsExpr* expr = nullptr) : name(name), type(type), expr(expr) {}
     void setType(LgsType* newType);
     Value* getGEP(LgsLLVMGen& cg) const;
     Value* loadIR(LgsLLVMGen& cg) override;

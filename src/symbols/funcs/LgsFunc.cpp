@@ -92,7 +92,6 @@ Value* LgsFunc::call(LgsLLVMGen& cg, std::vector<LgsFuncArg>& args) {
 }
 
 Value* LgsFunc::callWithVariadic(LgsLLVMGen& cg, const std::vector<LgsFuncArg>& args) {
-    assert(args.front().name != "");
     std::vector<Value*> IRArgs;
     const auto variadicOffset = funcType->params.size() - 1;
     for (size_t i = 0; i < variadicOffset; ++i) {

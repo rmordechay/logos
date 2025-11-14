@@ -152,8 +152,8 @@ Value* LgsLLVMGen::callFunc(const std::string& funcName, Type* rt, const std::ve
     return builder.CreateCall(func, args);
 }
 
-Value* LgsLLVMGen::callIntrinsics(const llvm::Intrinsic::ID name, const std::vector<Value*>& args, const std::vector<Type*>& types) {
-    const auto declaration = llvm::Intrinsic::getDeclaration(IRModule, name, types);
+Value* LgsLLVMGen::callIntrinsics(const llvm::Intrinsic::ID intrinsicID, const std::vector<Type*>& types, const std::vector<Value*>& args) {
+    const auto declaration = llvm::Intrinsic::getDeclaration(IRModule, intrinsicID, types);
     return builder.CreateCall(declaration, args);
 }
 

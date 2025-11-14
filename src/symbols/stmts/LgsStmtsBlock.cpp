@@ -2,11 +2,6 @@
 #include "stmts/LgsReturn.h"
 #include "utils/LgsUtils.h"
 
-LgsStmt* LgsStmtsBlock::lastStmt() const {
-    if (stmts.empty()) return nullptr;
-    return stmts[stmts.size() - 1];
-}
-
 LgsStmtsBlock* LgsStmtsBlock::clone() const {
     const auto cloned = new LgsStmtsBlock();
     cloned->location = location;

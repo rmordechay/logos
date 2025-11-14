@@ -140,12 +140,22 @@ void LgsCodeGen::visitMainFunc(LgsMainFunc* func) {
 }
 
 void LgsCodeGen::visitFunc(LgsFunc* func) {
-    if (!func->funcType->generics.empty()) return;
+    const auto ft = func->funcType;
+    if (!ft->generics.empty()) return;
     stack.enterScope(func);
     createPrologue(func);
+    if (func->isTest) for (auto [_, then] : func->mocks) visitExpr(then);
+    auto& params = ft->params;
+    if (ft->isVariadic) {
+        params.back().IRValue = cg.builder.CreateAlloca(cg.i8Ty(), nullptr, "va_list");
+        cg.callIntrinsics(llvm::Intrinsic::vastart, {cg.ptrTy()}, {params.back().IRValue});
+    }
     visitStmtsBlock(func->stmtsBlock);
+    if (ft->isVariadic) {
+        cg.callIntrinsics(llvm::Intrinsic::vaend, {cg.ptrTy()}, {params.back().IRValue});
+    }
     createEpilogue(func);
-    if (func->funcType->rt->isVoid() && !cg.lastInstTerminator()) {
+    if (ft->rt->isVoid() && !cg.lastInstTerminator()) {
         cg.builder.CreateRetVoid();
     }
     stack.exitScope();
@@ -175,8 +185,9 @@ void LgsCodeGen::visitField(LgsField* field) const {
         const llvm::ArrayRef maskRef(mask);
         const auto vecType = field->type->getIRType(cg);
         field->IRValue = cg.builder.CreateAlloca(vecType);
-        const auto l = cg.builder.CreateLoad(field->parent->getIRType(cg), field->parentIRValue);
-        const auto newVec = cg.builder.CreateShuffleVector(l, UndefValue::get(field->parent->getIRType(cg)), maskRef);
+        const auto parentTy = field->parentType->getIRType(cg);
+        const auto l = cg.builder.CreateLoad(parentTy, field->parentIRPtr);
+        const auto newVec = cg.builder.CreateShuffleVector(l, UndefValue::get(parentTy), maskRef);
         cg.builder.CreateStore(newVec, field->IRValue);
     } else {
         field->IRValue = field->getGEP(cg);
@@ -849,9 +860,10 @@ void LgsCodeGen::visitFieldSelection(LgsVariable* var, LgsExpr* parent, const bo
         return;
     }
 
+    field->parentType = parent->type;
     if (field->type->asEnum()) {
         if (assign) {
-            field->parentIRValue = parent->IRValue;
+            field->parentIRPtr = parent->IRValue;
             var->IRValue = field->getGEP(cg);
         } else {
             var->IRValue = cg.builder.CreateLoad(cg.sizeTy(), field->getGEP(cg));
@@ -863,14 +875,14 @@ void LgsCodeGen::visitFieldSelection(LgsVariable* var, LgsExpr* parent, const bo
         const auto object = parent->type->asObject();
         if (object && object->singleton) {
             if (file.isMain()) {
-                field->parentIRValue = object->singleton->IRValue;
+                field->parentIRPtr = object->singleton->IRValue;
             } else {
-                field->parentIRValue = cg.IRModule->getOrInsertGlobal(object->name, object->getIRType(cg));
+                field->parentIRPtr = cg.IRModule->getOrInsertGlobal(object->name, object->getIRType(cg));
             }
             field->IRValue = field->getGEP(cg);
         }
     } else {
-        field->parentIRValue = parent->IRValue;
+        field->parentIRPtr = parent->IRValue;
         field->IRValue = field->getGEP(cg);
         assert(parent->IRValue && &parent->IRValue->getContext() == &cg.IRModule->getContext());
     }
@@ -1019,7 +1031,7 @@ void LgsCodeGen::visitInstance(LgsInstance* instance) {
         const auto exprIR = getIRValue(arg.expr);
         const auto field = instance->obj->getField(argName);
         arg.expr->destPtrValue = field->IRValue;
-        field->parentIRValue = instance->IRValue;
+        field->parentIRPtr = instance->IRValue;
         visitField(field);
         visitExpr(field->expr);
         cg.builder.CreateStore(exprIR, field->IRValue);
@@ -1028,7 +1040,7 @@ void LgsCodeGen::visitInstance(LgsInstance* instance) {
     // Zero values
     for (const auto field : instance->obj->fields) {
         if (visited.contains(field->name) || field->type->asEnum()) continue;
-        field->parentIRValue = instance->IRValue;
+        field->parentIRPtr = instance->IRValue;
         if (!field->expr) {
             field->expr = field->type->getZeroValue();
             if (field->isOwner && field->type->isHeapAlloc) {
@@ -1066,7 +1078,6 @@ void LgsCodeGen::visitJson(LgsJson* json) {
 }
 
 void LgsCodeGen::createPrologue(LgsFunc* func) {
-    if (func->isTest) for (auto [_, then] : func->mocks) visitExpr(then);
     if (appConfigs.debugMode) func->setDebugValue(cg);
     currentIRFunc = func->getIRFunc(cg);
     const auto entryBlock = cg.createBlock(BLOCK_NAME_ENTRY, currentIRFunc);

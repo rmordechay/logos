@@ -254,7 +254,8 @@ void LgsSema::visitStmtsBlock(LgsStmtsBlock* stmtsBlock) {
     for (const auto& stmt : stmtsBlock->stmts) {
         visitStmt(stmt);
     }
-    const auto lastStmt = stmtsBlock->lastStmt();
+    if (stmtsBlock->stmts.empty()) return;
+    const auto lastStmt = stmtsBlock->stmts[stmtsBlock->stmts.size() - 1];
     stmtsBlock->returnStmt = lastStmt->asReturn();
     for (size_t i = 0; i < stmtsBlock->stmts.size() - 1; ++i) {
         if (stmtsBlock->stmts[i]->isTerminator()) {
@@ -527,6 +528,7 @@ void LgsSema::visitCoroutine(const LgsCoroutine* coroutine) {
     } else {
         assert(0);
     }
+
     const auto funcName = fc->func->funcType->getName() + LGS_CORO_SUFFIX;
     const auto coro = file->symbolTable.coroutines.find(funcName);
     if (coro != file->symbolTable.coroutines.end()) {
@@ -537,7 +539,6 @@ void LgsSema::visitCoroutine(const LgsCoroutine* coroutine) {
         coroutine->funcCall->func = f;
         file->symbolTable.coroutines[funcName] = f;
     }
-
 }
 
 void LgsSema::visitDeferStmt(const LgsDeferStmt* deferStmt) {
@@ -607,6 +608,7 @@ void LgsSema::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
     if (!type) {
         return addError(E10076, l->location, {binaryExpr->opText, ltype->pname(), rtype->pname()});
     }
+
     binaryExpr->setType(type);
     binaryExpr->isValueKnown = l->isValueKnown && r->isValueKnown;
     if (!binaryExpr->isValueKnown) return;

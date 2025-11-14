@@ -1,5 +1,6 @@
 #pragma once
 #include "stmts/LgsStmt.h"
+#include "types/LgsObject.h"
 
 namespace llvm {
     class BasicBlock;
@@ -11,7 +12,6 @@ public:
     LgsReturn* returnStmt = nullptr;
 
     explicit LgsStmtsBlock(const std::vector<LgsStmt*>& stmts = {}) : stmts(stmts) {}
-    LgsStmt* lastStmt() const;
     LgsStmtsBlock* clone() const;
     void hashNode(size_t& oldHash) override;
     ~LgsStmtsBlock() override;

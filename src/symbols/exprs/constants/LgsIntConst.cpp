@@ -24,15 +24,9 @@ LgsExpr* LgsIntConst::staticCast(LgsType* toType, const bool explicitCast) {
         }
         return nullptr;
     }
-    if (toType->asFloat()) {
-        return new LgsFloatConst(&LGS_FLOAT, value);
-    }
-    if (toType->asDouble()) {
-        return new LgsFloatConst(&LGS_DOUBLE, value);
-    }
-    if (explicitCast && toType->asStr()) {
-        return new LgsStrConst(std::to_string(value));
-    }
+    if (toType->asFloat()) return new LgsFloatConst(&LGS_FLOAT, value);
+    if (toType->asDouble()) return new LgsFloatConst(&LGS_DOUBLE, value);
+    if (explicitCast && toType->asStr()) return new LgsStrConst(std::to_string(value));
     return nullptr;
 }
 
