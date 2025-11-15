@@ -1,0 +1,29 @@
+#include "types/LgsSelf.h"
+
+Type* LgsSelf::getIRType(LgsLLVMGen& cg) {
+    assert(0);
+}
+
+size_t LgsSelf::sizeBytes() {
+    assert(0);
+}
+
+LgsExpr* LgsSelf::getZeroValue() {
+    return baseType->getZeroValue();
+}
+
+Lgs_TypeKind LgsSelf::getRTTypeKind() {
+    return baseType->getRTTypeKind();
+}
+
+std::string LgsSelf::getName() {
+    return name;
+}
+
+bool LgsSelf::canCastTo(LgsType* other) {
+    assert(0);
+}
+
+std::string LgsSelf::strFormatPart() const {
+    assert(0);
+}

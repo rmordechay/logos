@@ -1,0 +1,32 @@
+object Obj1 {
+    implements: Inter
+    x: Int
+    func() {
+        print("Hello from Obj1")
+    }
+}
+
+object Obj2 {
+    implements: Inter
+    x: Int
+    func() {
+        print("Hello from Obj1")
+    }
+}
+
+interface Inter {
+    x: Int
+    func()
+}
+
+f(o: Inter) {
+    o.func()
+    print(o.x)
+}
+
+main() {
+    obj1 = Obj1{x=12}
+    obj2 = Obj2{x=34}
+    f(obj1)
+    f(obj2)
+}

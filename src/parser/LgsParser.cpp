@@ -44,6 +44,7 @@
 #include "types/LgsEnum.h"
 #include "types/LgsGenericType.h"
 #include "types/LgsInterface.h"
+#include "types/LgsSelf.h"
 #include "types/LgsSubType.h"
 #include "types/LgsUnknown.h"
 #include "types/primitives/LgsBool.h"
@@ -327,9 +328,8 @@ LgsObject* LgsParser::parseObjectBody(const LgsToken& tokenName, const bool isSi
             obj->generics.push_back(type);
             const auto ct = currentToken.type;
             const auto nt = peek().type;
-            if (ct == T_EOF || ct == T_RBRACE || nt == T_COLON || nt == T_LPAREN || nt == T_ENUM || nt == T_INTERFACE ||
-                nt == T_IMPLEMENTS)
-                break;
+            if (ct == T_EOF || ct == T_RBRACE || nt == T_COLON || nt == T_LPAREN ||
+                nt == T_ENUM || nt == T_INTERFACE || nt == T_IMPLEMENTS) break;
             mustMatch(T_COMMA);
         }
     }
@@ -343,8 +343,8 @@ LgsObject* LgsParser::parseObjectBody(const LgsToken& tokenName, const bool isSi
             obj->implements.push_back(type);
             const auto ct = currentToken.type;
             const auto nt = peek().type;
-            if (ct == T_EOF || ct == T_RBRACE || nt == T_COLON || nt == T_LPAREN || nt == T_ENUM || nt == T_INTERFACE)
-                break;
+            if (ct == T_EOF || ct == T_RBRACE || nt == T_COLON ||
+                nt == T_LPAREN || nt == T_ENUM || nt == T_INTERFACE) break;
             mustMatch(T_COMMA);
         }
     }
@@ -568,14 +568,17 @@ LgsMap* LgsParser::parseMapType() {
 }
 
 LgsType* LgsParser::parseType() {
-    const auto firstToken = currentToken;
+    const auto startToken = currentToken;
     LgsType* type = nullptr;
-    if (firstToken.type == T_LBRACE) {
+    if (startToken.type == T_LBRACE) {
         type = parseMapType();
-    } else if (firstToken.type == T_LPAREN) {
+    } else if (startToken.type == T_LPAREN) {
         type = parseFuncType();
-    } else if (firstToken.type == T_IDENTIFIER) {
-        const auto typeText = firstToken.lexeme;
+    } else if (currentToken.type == T_SELF_CLASS) {
+        type = new LgsSelf(startToken.lexeme);
+        consume();
+    } else if (startToken.type == T_IDENTIFIER) {
+        const auto typeText = startToken.lexeme;
         if (typeText == LgsBool::name) type = &LGS_BOOL;
         else if (typeText == LgsChar::name) type = &LGS_CHAR;
         else if (typeText == LgsInt::name) type = &LGS_INT;
@@ -590,7 +593,7 @@ LgsType* LgsParser::parseType() {
         else if (typeText == LgsStr::name) type = new LgsStr();
         else if (typeText.length() == 4 && typeText.substr(0, 3) == "vec") type = new LgsVec(typeText[3] - '0');
         else type = new LgsUnknown(typeText);
-        setLocation(type->location, &firstToken);
+        setLocation(type->location, &startToken);
         consume();
     }
 
@@ -605,13 +608,13 @@ LgsType* LgsParser::parseType() {
             }
             mustMatch(T_RBRACK);
         }
-        setLocation(type->location, &firstToken);
+        setLocation(type->location, &startToken);
     }
 
     // Nullable
     if (type && matchAndConsume(T_QUEST_MARK)) {
         type = new LgsNullable(type);
-        setLocation(type->location, &firstToken);
+        setLocation(type->location, &startToken);
     }
 
     return type;
@@ -683,6 +686,7 @@ LgsFuncType* LgsParser::parseFuncHeader() {
     } else {
         consume(2);
     }
+
     const auto funcType = new LgsFuncType();
     setLocation(funcType->location, &nameToken);
     funcType->name = nameToken.lexeme;

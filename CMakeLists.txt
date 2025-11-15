@@ -120,6 +120,7 @@ set(LGS_SOURCE
     # Types
     ${CMAKE_SOURCE_DIR}/src/symbols/types/LgsType.cpp
     ${CMAKE_SOURCE_DIR}/src/symbols/types/LgsUnknown.cpp
+    ${CMAKE_SOURCE_DIR}/src/symbols/types/LgsSelf.cpp
     ${CMAKE_SOURCE_DIR}/src/symbols/types/LgsAny.cpp
     ${CMAKE_SOURCE_DIR}/src/symbols/types/LgsPtr.cpp
     ${CMAKE_SOURCE_DIR}/src/symbols/types/LgsEnum.cpp

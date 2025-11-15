@@ -1,0 +1,14 @@
+object Obj1 {
+    implements: Inter
+    getSelf(): Obj1 {
+        return self
+    }
+}
+
+interface Inter {
+    getSelf(): Self
+}
+
+main() {
+
+}
