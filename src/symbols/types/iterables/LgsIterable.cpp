@@ -105,6 +105,10 @@ LgsType* LgsIterable::getValueType() {
     return baseType;
 }
 
+bool LgsIterable::inferBaseType(const std::vector<LgsExpr*>& args) {
+    return baseType;
+}
+
 bool LgsIterable::unpackLoopVarsTypes(LgsForeachLoop* loop) const {
     if (loop->loopVars.size() != 1) return false;
     const auto iterIndex = new LgsIterIndex(loop->iterExpr, LGS_SIZE.getZeroValue());

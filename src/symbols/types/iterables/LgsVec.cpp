@@ -4,7 +4,19 @@
 #include "types/LgsAny.h"
 #include "types/primitives/LgsSize.h"
 #include "utils/LgsUtils.h"
+#include <iostream>
 #include <sstream>
+
+LgsField* LgsVec::getField(const std::string& fieldName) {
+    for (auto* f : fields) {
+        if (f->name == fieldName) return f;
+    }
+    const size_t newFieldDim = fieldName.size();
+    const auto scalarOrVector = newFieldDim == 1 ? baseType->clone() : new LgsVec(newFieldDim);
+    const auto field = new LgsField(fieldName, scalarOrVector);
+    addField(field);
+    return field;
+}
 
 Type* LgsVec::getIRType(LgsLLVMGen& cg) {
     IRType = llvm::FixedVectorType::get(baseType->getIRType(cg), vectorDim);
@@ -61,6 +73,17 @@ LgsType* LgsVec::applyBinOp(LgsBinaryExpr* binExpr) {
         break;
     }
     return nullptr;
+}
+
+bool LgsVec::inferBaseType(const std::vector<LgsExpr*>& args) {
+    const auto baseExprType = args.front()->type;
+    if (!baseExprType->isNumber() && !baseExprType->asVec()) return false;
+    for (size_t i = 1; i < args.size(); ++i) {
+        const auto arg = args[i];
+        if (!baseExprType->canCastTo(arg->type)) return false;
+    }
+    baseType = baseExprType;
+    return true;
 }
 
 Value* LgsVec::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
@@ -198,4 +221,8 @@ std::string LgsVec::strFormatPart() const {
     }
     str << '>';
     return str.str();
+}
+
+LgsType* LgsVec::clone() {
+    return new LgsVec(vectorDim, baseType->clone());
 }

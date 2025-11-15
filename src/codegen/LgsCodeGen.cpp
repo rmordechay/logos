@@ -768,10 +768,10 @@ void LgsCodeGen::visitVectorExpr(LgsVectorExpr* vectorExpr) {
     } else {
         vectorExpr->IRValue = cg.builder.CreateAlloca(ty);
     }
-    if (!vectorExpr->args.empty()) {
+    if (!vectorExpr->elements.empty()) {
         Value* vectorValue = UndefValue::get(ty);
-        for (size_t i = 0; i < vectorExpr->args.size(); ++i) {
-            const auto elementValue = getIRValue(vectorExpr->args[i]);
+        for (size_t i = 0; i < vectorExpr->elements.size(); ++i) {
+            const auto elementValue = getIRValue(vectorExpr->elements[i]);
             vectorValue = cg.builder.CreateInsertElement(vectorValue, elementValue, ConstantInt::get(Type::getInt32Ty(cg.context), i));
         }
         cg.builder.CreateStore(vectorValue, vectorExpr->IRValue);

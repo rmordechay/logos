@@ -49,7 +49,7 @@ void freeExpr(LgsExpr* expr);
 void freeExprs(std::vector<LgsExpr*>& exprs);
 void freeStmt(const LgsStmt* stmt);
 void freeParams(std::vector<LgsParam>& params);
-void freeType(const LgsType* type);
+void freeType(LgsType* type);
 template<typename T>
 void freeTypes(std::vector<T*>& types) {
     for (const auto type : types) {

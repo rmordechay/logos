@@ -22,18 +22,11 @@
 #include "types/primitives/LgsShort.h"
 #include "types/primitives/LgsSize.h"
 #include "types/primitives/LgsUInt.h"
+#include <iostream>
 
 LgsField* LgsType::getField(const std::string& fieldName) {
     for (auto* f : fields) {
         if (f->name == fieldName) return f;
-    }
-    if (const auto vec = asVec()) {
-        for (auto* f : fields) if (f->name == fieldName) return f;
-        const size_t newFieldDim = fieldName.size();
-        const auto scalarOrVector = newFieldDim == 1 ? vec->baseType : new LgsVec(newFieldDim);
-        const auto field = new LgsField(fieldName, scalarOrVector);
-        addField(field);
-        return field;
     }
     return nullptr;
 }
@@ -472,4 +465,16 @@ Value* LgsType::andIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
 
 Value* LgsType::orIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     assert(0);
+}
+
+LgsType::~LgsType() {
+    for (const auto [_, method] : methods) {
+        if (!method) continue;
+        delete method;
+    }
+    methods.clear();
+    for (const auto field : fields) {
+        delete field;
+    }
+    fields.clear();
 }

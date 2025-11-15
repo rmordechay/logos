@@ -150,5 +150,5 @@ public:
     virtual Value* leIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
     virtual Value* andIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
     virtual Value* orIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
-    virtual ~LgsType() = default;
+    virtual ~LgsType();
 };

@@ -720,8 +720,12 @@ void LgsSema::visitHashMap(LgsHashMap* hashMap) {
 }
 
 void LgsSema::visitVectorExpr(const LgsVectorExpr* vectorExpr) {
+    const auto vec = vectorExpr->type->asVec();
+    if (!vec->inferBaseType(vectorExpr->elements)) {
+        return addError(E10095, vectorExpr->location);
+    }
     auto sumDim = 0;
-    for (auto arg : vectorExpr->args) {
+    for (auto arg : vectorExpr->elements) {
         visitExpr(arg);
         if (arg->type->isNumber()) {
             sumDim++;
@@ -854,7 +858,7 @@ void LgsSema::visitFieldSelection(LgsVariable* child, LgsType* parentType) {
     if (parentType->asVec() && !validateVecElements(child, parentType->asVec())) return;
     auto childName = child->name;
     if (const auto field = parentType->getField(childName)) {
-        child->setType(field->type);
+        child->setType(field->type->clone());
         child->isMutable = !field->isConst;
         child->ref = LgsSymbol(field);
         if (field->isOwner && field->type->isHeapAlloc) {
@@ -1296,9 +1300,12 @@ void LgsSema::validateIndex(LgsIterIndex* iterIndex) {
 }
 
 bool LgsSema::validateFieldVisibility(LgsField* field, LgsType* parent) {
-    if (parent && parent->asObject() && parent->asObject()->singleton) return true;
+    assert(parent);
+    if (parent->asVec()) return true;
+    if (parent->asObject() && parent->asObject()->singleton) return true;
     if (!field || field->isVirtual) return false;
-    if (!field->isPublic && file->path != *field->location.filepath && !stack.currentFunc()->isTest) {
+    if (stack.currentFunc()->isTest) return true;
+    if (!field->isPublic && file->path != *field->location.filepath) {
         if (parent) addError(E10030, field->location, {field->name, parent->pname()});
         return false;
     }

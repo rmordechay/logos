@@ -198,6 +198,7 @@ void hashNodeInt(size_t& oldHash, const size_t val) {
 
 void freeExpr(LgsExpr* expr) {
     if (!expr) return;
+    if (!expr->asVariable()) freeType(expr->type);
     delete expr;
 }
 
@@ -225,7 +226,7 @@ void freeParams(std::vector<LgsParam>& params) {
     params.clear();
 }
 
-void freeType(const LgsType* type) {
+void freeType(LgsType* type) {
     if (!type) return;
     if (type->isPrimitive) return;
     delete type;

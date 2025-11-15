@@ -1410,7 +1410,7 @@ LgsVectorExpr* LgsParser::parseVectorExpr() {
     if (!matchOrReset(T_RPAREN, oldIndex)) return nullptr;
     auto const vecExpr = new LgsVectorExpr(dim);
     setLocation(vecExpr->location, &nameToken);
-    vecExpr->args = args;
+    vecExpr->elements = args;
     return vecExpr;
 }
 

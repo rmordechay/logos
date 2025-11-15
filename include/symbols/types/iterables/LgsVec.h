@@ -15,6 +15,7 @@ public:
         isStatic = true;
     }
 
+    LgsField* getField(const std::string& fieldName) override;
     Type* getIRType(LgsLLVMGen& cg) override;
     std::string getName() override;
     size_t sizeBytes() override;
@@ -22,6 +23,7 @@ public:
     Lgs_TypeKind getRTTypeKind() override;
     bool canCastTo(LgsType* other) override;
     LgsType* applyBinOp(LgsBinaryExpr* binExpr) override;
+    bool inferBaseType(const std::vector<LgsExpr*>& args) override;
     Value* addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
     Value* subIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
     Value* mulIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
@@ -33,4 +35,5 @@ public:
     static int8_t getSwizzleSet(char c);
     static int8_t getComponentIndex(char c);
     std::string strFormatPart() const override;
+    LgsType* clone() override;
 };

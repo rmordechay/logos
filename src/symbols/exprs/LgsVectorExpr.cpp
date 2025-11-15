@@ -15,8 +15,8 @@ bool LgsVectorExpr::equals(LgsExpr* other) {
 }
 
 LgsVectorExpr::~LgsVectorExpr() {
-    for (const auto & arg : args) {
+    for (const auto & arg : elements) {
         freeExpr(arg);
     }
-    args.clear();
+    elements.clear();
 }

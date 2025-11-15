@@ -5,7 +5,7 @@
 class LgsVectorExpr final : public LgsExpr {
 public:
     LgsVec* vecType;
-    std::vector<LgsExpr*> args;
+    std::vector<LgsExpr*> elements;
 
     explicit LgsVectorExpr(const int8_t dim) {
         isMutable = true;
