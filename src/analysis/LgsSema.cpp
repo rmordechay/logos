@@ -94,6 +94,7 @@ void LgsSema::visitMainFile(LgsMainFile* mainFile) {
 }
 
 void LgsSema::visitObject(LgsObject* obj) {
+    validateTypeName(obj->name, &obj->location);
     for (const auto generic : obj->generics) {
         visitGeneric(generic);
     }
@@ -114,6 +115,7 @@ void LgsSema::visitObject(LgsObject* obj) {
 }
 
 void LgsSema::visitInterface(LgsInterface* interface) {
+    validateTypeName(interface->name, &interface->location);
     for (const auto& [_, method] : interface->methods) {
         visitFunc(method);
     }
@@ -131,7 +133,8 @@ void LgsSema::visitTestFile(const LgsTestFile* testFile) {
 void LgsSema::visitGeneric(LgsGenericType* generic) {
 }
 
-void LgsSema::visitEnum(LgsEnum* enum_) {
+void LgsSema::visitEnum(const LgsEnum* enum_) {
+    validateTypeName(enum_->name, &enum_->location);
 }
 
 void LgsSema::visitField(LgsField* field) {
@@ -208,6 +211,7 @@ void LgsSema::visitLambda(LgsFunc* lambda) {
 }
 
 void LgsSema::visitParam(LgsParam* param) {
+    validateLocalName(param->name, &param->location);
     if (param->expr) {
         param->expr->completeType(param->type);
         visitExpr(param->expr);
@@ -265,6 +269,7 @@ void LgsSema::visitStmtsBlock(LgsStmtsBlock* stmtsBlock) {
 }
 
 void LgsSema::visitVarDec(LgsVarDec* varDec) {
+    validateLocalName(varDec->name, &varDec->location);
     if (const auto iter = varDec->type->asIterable()) visitExpr(iter->size);
     if (varDec->expr && varDec->type) {
         if (varDec->isOwner) {
@@ -460,7 +465,7 @@ void LgsSema::visitForeachLoop(LgsForeachLoop* foreachLoop) {
     visitExpr(iterExpr);
     const auto iterable = iterExpr->type->asIterable();
     if (!iterable) {
-        const auto typeName = iterExpr->type ? iterExpr->type->pname() : LGS_UNKNOWN_TYPE;
+        if (!iterExpr->type) return;
         addError(E10002, iterExpr->location, {iterExpr->asText()});
         return;
     }
@@ -697,11 +702,11 @@ void LgsSema::visitStaticArray(const LgsArrayExpr* arrayExpr) {
 }
 
 void LgsSema::visitDynamicArray(LgsArrayExpr* arrayExpr) {
-    const auto dArr = arrayExpr->type->asDArray();
-    if (!dArr->baseType && arrayExpr->elements.empty()) {
+    const auto iterable = arrayExpr->type->asIterable();
+    if (!iterable->baseType && arrayExpr->elements.empty()) {
         return addError(E10049, arrayExpr->location, {arrayExpr->asText()});
     }
-    if (!dArr->inferBaseType(arrayExpr->elements)) {
+    if (!iterable->inferBaseType(arrayExpr->elements)) {
         return addError(E10095, arrayExpr->location);
     }
 }
@@ -1226,6 +1231,22 @@ bool LgsSema::validateExprType(LgsExpr* expr, LgsType* type) {
     if (!type || !expr->type || type->isUnknown() || expr->type->isUnknown()) return false;
     if (!expr->type->canCastTo(type)) {
         addError(E10001, expr->location, {type->pname(), expr->type->pname()});
+        return false;
+    }
+    return true;
+}
+
+bool LgsSema::validateTypeName(const std::string& typeName, const LgsLocation* location) {
+    if (islower(typeName[0])) {
+        errHandler.addError(E10033, location, file->path, {typeName});
+        return false;
+    }
+    return true;
+}
+
+bool LgsSema::validateLocalName(const std::string& typeName, const LgsLocation* location) {
+    if (isupper(typeName[0])) {
+        errHandler.addError(E10099, location, file->path, {typeName});
         return false;
     }
     return true;

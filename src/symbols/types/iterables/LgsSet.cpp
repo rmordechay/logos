@@ -78,6 +78,18 @@ LgsType* LgsSet::applyBinOp(LgsBinaryExpr* binExpr) {
     return nullptr;
 }
 
+bool LgsSet::inferBaseType(const std::vector<LgsExpr*>& args) {
+    assert(!args.empty());
+    if (baseType) return true;
+    const auto baseExprType = args.front()->type;
+    for (size_t i = 1; i < args.size(); ++i) {
+        const auto arg = args[i];
+        if (!baseExprType->canCastTo(arg->type)) return false;
+    }
+    baseType = baseExprType;
+    return true;
+}
+
 Value* LgsSet::lengthIR(LgsLLVMGen& cg, Value* iterable) {
     return getLenFunc()->callIR(cg, {iterable});
 }

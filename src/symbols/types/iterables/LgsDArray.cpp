@@ -24,7 +24,8 @@ LgsFunc* LgsDArray::getMethod(const std::string& methodName) {
 }
 
 bool LgsDArray::inferBaseType(const std::vector<LgsExpr*>& args) {
-    assert(!args.empty() && !baseType);
+    assert(!args.empty());
+    if (baseType) return true;
     const auto baseExprType = args.front()->type;
     for (size_t i = 1; i < args.size(); ++i) {
         const auto arg = args[i];
@@ -83,7 +84,7 @@ LgsType* LgsDArray::applyBinOp(LgsBinaryExpr* binExpr) {
 LgsFunc* LgsDArray::getAddFunc() {
     const auto func = methods.find(ADD_FUNC_NAME);
     if (func != methods.end() && func->second) return func->second;
-    func->second = new LgsFunc(ADD_FUNC_NAME, &LGS_VOID, {this, baseType}, BUILTIN | PUBLIC | METHOD);
+    func->second = new LgsFunc(ADD_FUNC_NAME, &LGS_VOID, {this, &LGS_ANY}, BUILTIN | PUBLIC | METHOD);
     func->second->fn = [](LgsLLVMGen& cg, const std::vector<LgsFuncArg>& args) {
         return cg.callLgsFunc(std::string(name) + "_add", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {
             cg.getPtrTo(args[0].expr->IRValue),

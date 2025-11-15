@@ -91,7 +91,6 @@ public:
     LgsInterface* parseInterface();
     LgsObject* parseObjectBody(const LgsToken& tokenName, bool isSingleton);
     LgsInterface* parseInterfaceBody(const LgsToken& tokenName);
-    LgsGenericType* parseBaseGeneric();
     LgsField* parseField(size_t fieldPosition);
     LgsIOPair* parseIOPair();
 
@@ -101,6 +100,8 @@ public:
     LgsFuncType* parseFuncType();
     LgsMap* parseMapType();
     LgsType* parseType();
+    LgsGenericType* parseGenericType();
+    std::vector<LgsType*> parseGenericArgs();
 
     // Funcs
     LgsFunc* parseFunc();
@@ -154,14 +155,11 @@ public:
     LgsJsonObject* parseJsonObject();
     LgsJsonArray* parseJsonArray();
     LgsJson* parseJsonValue();
-    bool parseGenericArgs(std::vector<LgsType*>& types);
     void parsePackageString(LgsImportPackage& pkg, const LgsToken& importToken);
     void parseJsonPrimitive(LgsJson* json);
     void parseImports();
     void parseCImports();
 
-    // Helpers
-    bool validateTypeName(const std::string& typeName, const LgsLocation* location);
     void addFileSymbol(LgsMainFile* file, const LgsSymbol& newSymbol);
     void setLocation(LgsLocation& location, const LgsToken* token) const;
     void extractStrParts(LgsStrConst& strConst);

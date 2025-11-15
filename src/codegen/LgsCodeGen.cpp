@@ -88,7 +88,7 @@ void LgsCodeGen::visitMainFile(LgsMainFile* mainFile) {
         visitFunc(genericsCall);
     }
 
-    createRTTypes();
+    // createRTTypes();
     for (const auto& [name, func] : mainFile->funcs) {
         if (const auto mainFunc = dynamic_cast<LgsMainFunc*>(func)) {
             visitMainFunc(mainFunc);
@@ -1223,7 +1223,7 @@ void LgsCodeGen::setStaticArray(LgsArrayExpr* arrayExpr) {
             const auto element = arrayExpr->elements[i];
             element->destPtrValue = arrayExpr->IRValue;
             visitExpr(element);
-            const auto gep = cg.builder.CreateConstInBoundsGEP1_32(arrTypeIR, arrayExpr->IRValue, i);
+            const auto gep = cg.builder.CreateInBoundsGEP(arrTypeIR, arrayExpr->IRValue, {cg.i32Zero(), cg.i32(i)});
             cg.builder.CreateStore(element->IRValue, gep);
         }
     }
@@ -1259,22 +1259,23 @@ void LgsCodeGen::setDynamicArray(LgsArrayExpr* arrayExpr) {
         const auto element = arrayExpr->elements[i];
         element->destPtrValue = arrayExpr->IRValue;
         visitExpr(element);
-        arr->getAddFunc()->callIR(cg, {arrayExpr->IRValue, element->IRValue});
+        arr->getAddFunc()->callIR(cg, {arrayExpr->IRValue, cg.getPtrTo(element->IRValue)});
     }
 }
 
 void LgsCodeGen::setSetExpr(LgsArrayExpr* arrayExpr) {
     const auto arr = arrayExpr->type->asSet();
-    const auto size = arr->baseType->sizeBytes();
+    const auto baseType = arr->genericArgs.front();
+    const auto size = baseType->sizeBytes();
     arrayExpr->IRValue = cg.callAllocate(arr->sizeBytes(), arrayExpr->owner, arr->getRTTypeKind());
     LgsFunc initFunc("init", &LGS_VOID, {arr, &LGS_SIZE, &LGS_SIZE}, BUILTIN | METHOD);
-    initFunc.callIR(cg, {arrayExpr->IRValue, cg.i64(size), cg.usize(arr->baseType->getRTTypeKind())});
+    initFunc.callIR(cg, {arrayExpr->IRValue, cg.i64(size), cg.usize(baseType->getRTTypeKind())});
 
     for (size_t i = 0; i < arrayExpr->elements.size(); ++i) {
         const auto element = arrayExpr->elements[i];
         element->destPtrValue = arrayExpr->IRValue;
         visitExpr(element);
-        arr->getAddFunc()->callIR(cg, {arrayExpr->IRValue, element->IRValue});
+        arr->getAddFunc()->callIR(cg, {arrayExpr->IRValue, cg.getPtrTo(element->IRValue)});
     }
 }
 
@@ -1445,14 +1446,11 @@ void LgsCodeGen::createRTTypes() const {
     }
 
     std::vector<Constant*> sArrTypes;
-    for (const auto type : globals.rtTypes) {
-        if (const auto sArr = type->asSArray()) {
-            sArr->size->IRValue = sArr->size->IRValue;
-            sArrTypes.emplace_back(type->getRTType(cg));
-        } else {
-            continue;
-        }
-        type->runtimeID = currentID++;
+    for (const auto rtType : globals.rtTypes) {
+        const auto sArr = rtType->asSArray();
+        if (!sArr) continue;
+        rtType->runtimeID = currentID++;
+        sArrTypes.emplace_back(sArr->getRTType(cg));
     }
     const auto arrRTStruct = cg.getStructType({cg.i32Ty(), cg.sizeTy()}, LGS_RT_ARRAY);
     const auto rtTypeArrayType = ArrayType::get(arrRTStruct, currentID);

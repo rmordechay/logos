@@ -36,7 +36,10 @@ Value* LgsSize::subIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
 }
 
 Value* LgsSize::mulIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    const auto r = cg.builder.CreateZExt(other->loadIR(cg), getIRType(cg));
+    auto r = other->loadIR(cg);
+    if (!self->type->asVec()) {
+        r = cg.builder.CreateZExt(r, getIRType(cg));
+    }
     return cg.builder.CreateMul(self->loadIR(cg), r);
 }
 

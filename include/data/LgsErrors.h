@@ -63,7 +63,7 @@ inline LgsBaseMsg E10029{"Constant field %s must be initialized in the class or 
 inline LgsBaseMsg E10030{"Non-public field %s is used outside its parent object %s.", errCodeStart++};
 inline LgsBaseMsg E10031{"Non-public method %s is used outside its parent object %s.", errCodeStart++};
 inline LgsBaseMsg E10032{"Singleton object %s cannot be instantiated.", errCodeStart++};
-inline LgsBaseMsg E10033{"Type name must be capitalized. Given: %s.", errCodeStart++};
+inline LgsBaseMsg E10033{"Type name must start with an uppercase letter. Given: %s.", errCodeStart++};
 inline LgsBaseMsg E10034{"%s has a method with name %s but it doesnt match the parameters.\nGiven:\t  %s\nExpected:  %s", errCodeStart++};
 inline LgsBaseMsg E10035{"Index of %s has %s level which is too deep. Max level: %s.", errCodeStart++};
 inline LgsBaseMsg E10036{"%s cannot be indexed with type %s.", errCodeStart++};
@@ -129,3 +129,4 @@ inline LgsBaseMsg E10095{"Could not infer the type of the iterable.", errCodeSta
 inline LgsBaseMsg E10096{"Mixed named und position arguments are not allowed.", errCodeStart++};
 inline LgsBaseMsg E10097{"switch statement must have at least one pattern.", errCodeStart++};
 inline LgsBaseMsg E10098{"Argument %s is set more than one time.", errCodeStart++};
+inline LgsBaseMsg E10099{"Local names must start with a lowercase letter. Given: %s.", errCodeStart++};

@@ -106,7 +106,7 @@ LgsType* LgsIterable::getValueType() {
 }
 
 bool LgsIterable::inferBaseType(const std::vector<LgsExpr*>& args) {
-    return baseType;
+    assert(0);
 }
 
 bool LgsIterable::unpackLoopVarsTypes(LgsForeachLoop* loop) const {

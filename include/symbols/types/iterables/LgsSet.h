@@ -22,6 +22,7 @@ public:
     std::string strFormatPart() const override;
     StructType* getArrStruct(LgsLLVMGen& cg);
     LgsFunc* getAddFunc() override;
+    bool inferBaseType(const std::vector<LgsExpr*>& args) override;
     LgsType* applyBinOp(LgsBinaryExpr* binExpr) override;
     Value* lengthIR(LgsLLVMGen& cg, Value* iterable) override;
     Value* inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) override;

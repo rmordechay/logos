@@ -24,7 +24,7 @@ Type* LgsVec::getIRType(LgsLLVMGen& cg) {
 }
 
 std::string LgsVec::getName() {
-    return "vec" + std::to_string(vectorDim);
+    return baseName + std::to_string(vectorDim);
 }
 
 size_t LgsVec::sizeBytes() {
@@ -61,7 +61,7 @@ LgsType* LgsVec::applyBinOp(LgsBinaryExpr* binExpr) {
         break;
     }
     case MUL: {
-        if (thisNme == otherName) return &LGS_SIZE;
+        if (thisNme == otherName) return &LGS_FLOAT;
         if (other->isNumber()) return this;
         break;
     }

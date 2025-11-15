@@ -6,6 +6,7 @@
 
 class LgsVec final : public LgsIterable {
 public:
+    static constexpr auto baseName = "Vec";
     int8_t vectorDim = 0;
     std::vector<uint8_t> indices;
 

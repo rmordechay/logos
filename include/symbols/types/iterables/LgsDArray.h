@@ -1,5 +1,6 @@
 #pragma once
 #include "LgsIterable.h"
+
 #define RESERVE_FUNC_NAME "reserve"
 
 class LgsDArray final : public LgsIterable {

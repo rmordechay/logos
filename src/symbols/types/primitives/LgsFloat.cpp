@@ -11,7 +11,7 @@ std::pair<Value*, Value*> loadOperands(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* o
     if (other->IRValue->getType()->isIntegerTy()) {
         other->IRValue = cg.builder.CreateSIToFP(other->IRValue, cg.floatTy());
     }
-    return {self->IRValue, other->IRValue};
+    return {self->loadIR(cg), other->loadIR(cg)};
 }
 
 std::string LgsFloat::getName() {

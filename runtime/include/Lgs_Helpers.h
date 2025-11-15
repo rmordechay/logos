@@ -22,4 +22,3 @@ struct VKeyHash {
 
 void freeRTType(void* ptr, Lgs_TypeKind type);
 void funcCleanup(Lgs_Stack& stack);
-std::string getTypeName(Lgs_TypeKind type);

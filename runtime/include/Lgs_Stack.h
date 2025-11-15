@@ -1,7 +1,9 @@
 #pragma once
 #include "Lgs_Stack.h"
 #include "Lgs_Types.h"
-#include "../../include/logos/LgsConfigs.h"
+
+#define STACK_CAPACITY 1024
+#define LOCALS_CAPACITY 8
 
 typedef void (*ThunkFunc)(void*);
 

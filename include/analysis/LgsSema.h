@@ -72,7 +72,7 @@ public:
     void visitInterface(LgsInterface* interface);
     void visitTestFile(const LgsTestFile* testFile);
     void visitGeneric(LgsGenericType* generic);
-    void visitEnum(LgsEnum* enum_);
+    void visitEnum(const LgsEnum* enum_);
     void visitField(LgsField* field);
     void visitFunc(LgsFunc* func);
     void visitMainFunc(const LgsMainFunc* mainFunc);
@@ -127,6 +127,8 @@ public:
     void visitLoopMetaVar(LgsMetaVar* metaVar);
 
     bool validateExprType(LgsExpr* expr, LgsType* type);
+    bool validateTypeName(const std::string& typeName, const LgsLocation* location);
+    bool validateLocalName(const std::string& typeName, const LgsLocation* location);
     void validateObjImplements(LgsObject* obj, const std::vector<LgsType*>& interfaces);
     void validateIndex(LgsIterIndex* iterIndex);
     bool validateFieldVisibility(LgsField* field, LgsType* parent);
