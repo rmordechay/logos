@@ -93,12 +93,6 @@ Constant* LgsObject::getRTType(LgsLLVMGen& cg) {
     return llvm::ConstantStruct::get(objRTStruct, structFields);
 }
 
-bool LgsObject::hasVirtuals() const {
-    return std::ranges::any_of(methods, [](const auto& pair) {
-        return pair.second->funcType->isVirtual;
-    });
-}
-
 bool LgsObject::canCastTo(LgsType* other) {
     if (other->getName() == LgsAny::name) return true;
     auto otherType = other;

@@ -32,7 +32,7 @@ public:
     bool equals(LgsExpr* other) override;
     bool equals(LgsFuncType* funcType) const;
     bool equalsVariadic(const LgsFuncType* funcType) const;
-    bool equalsDefaults(const LgsFuncType* lgsFunc) const;
+    bool equalsDefaults(LgsFuncType* funcType) const;
     std::string asText() override;
     void setDebugValue(LgsLLVMGen& cg) override;
     LgsStmt* cloneStmt() override;

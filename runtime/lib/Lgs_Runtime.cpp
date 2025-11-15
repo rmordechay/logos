@@ -97,5 +97,6 @@ extern "C" void Lgs_Runtime_addToVTable(void* instance, const int32_t virtualID,
 }
 
 extern "C" void* Lgs_Runtime_getFromVTable(void* instance, const int32_t virtualID) {
+    assert(runtime.vtable.contains(VKey{instance, virtualID}));
     return runtime.vtable[VKey{instance, virtualID}];
 }

@@ -31,7 +31,6 @@ public:
     LgsExpr* getZeroValue() override;
     Lgs_TypeKind getRTTypeKind() override;
     Constant* getRTType(LgsLLVMGen& cg) override;
-    bool hasVirtuals() const;
     bool canCastTo(LgsType* other) override;
     std::string strFormatPart() const override;
     LgsObject* clone() override;

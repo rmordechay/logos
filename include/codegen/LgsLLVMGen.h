@@ -58,7 +58,7 @@ public:
     Value* callIntrinsics(llvm::Intrinsic::ID intrinsicID, const std::vector<Type*>& types = {}, const std::vector<Value*>& args = {});
     Value* callLgsFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes = {}, const std::vector<Value*>& args = {});
     Value* callRuntimeFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes = {}, const std::vector<Value*>& args = {});
-    Value* callHash(const std::string& str);
+    Value* hashConst(const std::string& str);
     Value* callHash(Value* arg);
 
     // System

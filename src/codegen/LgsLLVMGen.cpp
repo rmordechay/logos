@@ -165,7 +165,7 @@ Value* LgsLLVMGen::callRuntimeFunc(const std::string& funcName, Type* rt, const 
     return callFunc(LGS_RUNTIME_PREFIX + funcName, rt, paramTypes, args);
 }
 
-Value* LgsLLVMGen::callHash(const std::string& str) {
+Value* LgsLLVMGen::hashConst(const std::string& str) {
     return i32(hashString(str));
 }
 

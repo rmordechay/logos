@@ -887,6 +887,12 @@ void LgsCodeGen::visitFieldSelection(LgsVariable* var, LgsExpr* parent, const bo
         assert(parent->IRValue && &parent->IRValue->getContext() == &cg.IRModule->getContext());
     }
 
+    const auto p = parent->type->getField(field->name);
+    if (p && p->isVirtual) {
+        const auto id = cg.hashConst(field->name);
+        field->IRValue = cg.getFromVTable(field->parentIRPtr, id);
+    }
+
     if (field->type->asObject() || (field->type->asEnum() && !assign)) {
         var->IRValue = cg.builder.CreateLoad(cg.ptrTy(), field->IRValue);
     } else {
@@ -926,7 +932,7 @@ void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
 
     if (ft->isVirtual) {
         const auto name = func->funcType->getName();
-        const auto id = cg.callHash(name);;
+        const auto id = cg.hashConst(name);;
         func->IRValue = cg.getFromVTable(funcCall->parentPtr->IRValue, id);
     } else if (func->funcType->isArrFunc) {
         visitIterFunc(funcCall);
@@ -1474,33 +1480,42 @@ bool LgsCodeGen::allArgsAreConst(const std::vector<LgsExpr*>& args) {
     return allElementsConst;
 }
 
-void LgsCodeGen::addVirtuals(LgsType* type, Value* ptr) const {
-    for (const auto& field : type->fields) {
-        const auto id = cg.callHash(field->name);
-        const auto objIR = type->getIRType(cg);
+void LgsCodeGen::addVirtuals(LgsObject* obj, Value* ptr) const {
+    for (const auto& field : obj->fields) {
+        if (!field->isVirtual) continue;
+        const auto id = cg.hashConst(field->name);
+        const auto objIR = obj->getIRType(cg);
         const auto fieldGEP = cg.builder.CreateStructGEP(objIR, ptr, field->position);
         cg.addToVTable(ptr, id, fieldGEP);
     }
 
-    for (const auto& [_, method] : type->methods) {
-        const auto id = cg.callHash(method->funcType->getName());
-        const auto IRFunc = method->getIRFunc(cg);
-        cg.addToVTable(ptr, id, IRFunc);
-    }
-
-    // Implemented interface methods
-    const auto obj = type->asObject();
-    if (!obj) return;
-    for (const auto implement : obj->implements) {
-        for (const auto& [methodName, interfaceMethod] : implement->methods) {
-            if (!interfaceMethod->stmtsBlock) continue;
-            const auto objMethod = obj->methods.find(methodName);
-            if (objMethod != obj->methods.end()) continue;
-            const auto id = cg.callHash(methodName);
-            const auto IRFunc = interfaceMethod->getIRFunc(cg);
+    for (const auto& [_, method] : obj->methods) {
+        if (!method->funcType->isVirtual) continue;
+        auto methodName = method->funcType->name;
+        for (const auto implement : obj->implements) {
+            if (!implement->methods.contains(methodName)) continue;
+            const auto name = implement->methods[methodName]->funcType->getName();
+            const auto id = cg.hashConst(name);
+            const auto IRFunc = method->getIRFunc(cg);
             cg.addToVTable(ptr, id, IRFunc);
+            break;
         }
     }
+
+    // TODO make virtual only if the method was overridden
+    // Implemented interface methods
+    // const auto obj = type->asObject();
+    // if (!obj) return;
+    // for (const auto implement : obj->implements) {
+    //     for (const auto& [methodName, interfaceMethod] : implement->methods) {
+    //         if (!interfaceMethod->stmtsBlock) continue;
+    //         const auto objMethod = obj->methods.find(methodName);
+    //         if (objMethod != obj->methods.end()) continue;
+    //         const auto id = cg.hashConst(methodName);
+    //         const auto IRFunc = interfaceMethod->getIRFunc(cg);
+    //         cg.addToVTable(ptr, id, IRFunc);
+    //     }
+    // }
 }
 
 bool LgsCodeGen::writeIRModule() const {

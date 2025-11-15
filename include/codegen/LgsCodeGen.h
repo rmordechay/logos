@@ -148,6 +148,6 @@ public:
     void createRTTypes() const;
     void setNullableValue(LgsExpr* expr);
     bool allArgsAreConst(const std::vector<LgsExpr*>& args);
-    void addVirtuals(LgsType* type, Value* ptr) const;
+    void addVirtuals(LgsObject* obj, Value* ptr) const;
     bool writeIRModule() const;
 };

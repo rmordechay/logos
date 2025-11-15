@@ -6,6 +6,7 @@
 #include "utils/LgsUtils.h"
 #include <iostream>
 #include <sstream>
+bool argAndParamEqual(const LgsFuncArg* arg, const LgsParam* param);
 
 Value* LgsFuncCall::loadIR(LgsLLVMGen& cg) {
     return IRValue;
@@ -24,18 +25,16 @@ bool LgsFuncCall::equals(LgsFuncType* funcType) const {
         for (size_t i = funcType->isMethod; i < argsSize; ++i) {
             const auto arg = args[i];
             const auto param = paramsByName[arg.name];
-            if (!arg.expr->type || !arg.expr->type->canCastTo(param->type)) {
-                return false;
-            }
+            if (argAndParamEqual(&arg, param)) continue;
+            return false;
         }
     } else {
         for (size_t i = funcType->isMethod; i < paramsSize; ++i) {
             if (i >= argsSize) continue;
             const auto arg = args[i];
             const auto param = funcType->params[i];
-            if (!arg.expr->type || !arg.expr->type->canCastTo(param.type)) {
-                return false;
-            }
+            if (argAndParamEqual(&arg, &param)) continue;
+            return false;
         }
     }
     return true;
@@ -51,22 +50,39 @@ bool LgsFuncCall::equalsVariadic(const LgsFuncType* funcType) const {
         if (i >= args.size()) continue;
         const auto arg = args[i];
         const auto param = funcType->params[i];
-        if (!arg.expr->type || !arg.expr->type->canCastTo(param.type)) {
-            return false;
-        }
+        if (argAndParamEqual(&arg, &param)) continue;
+        return false;
     }
     // Check the variadic arguments
     const auto& variadicParam = funcType->params.back();
     for (uint32_t i = variadicParam.index; i < args.size(); ++i) {
         const auto arg = args[i];
-        if (!arg.expr->type || !arg.expr->type->canCastTo(variadicParam.type)) {
-            return false;
-        }
+        if (argAndParamEqual(&arg, &variadicParam)) continue;
+        return false;
     }
     return true;
 }
 
-bool LgsFuncCall::equalsDefaults(const LgsFuncType* lgsFunc) const {
+bool LgsFuncCall::equalsDefaults(LgsFuncType* funcType) const {
+    const auto argsSize = args.size();
+    const auto paramsSize = funcType->params.size();
+    if (isNamed) {
+        auto paramsByName = funcType->getParamsByName();
+        for (size_t i = funcType->isMethod; i < argsSize; ++i) {
+            const auto arg = args[i];
+            const auto param = paramsByName[arg.name];
+            if (argAndParamEqual(&arg, param)) continue;
+            return false;
+        }
+    } else {
+        for (size_t i = funcType->isMethod; i < paramsSize; ++i) {
+            if (i >= argsSize) continue;
+            const auto arg = args[i];
+            const auto param = funcType->params[i];
+            if (argAndParamEqual(&arg, &param)) continue;
+            return false;
+        }
+    }
     return true;
 }
 
@@ -121,6 +137,10 @@ LgsStmt* LgsFuncCall::cloneStmt() {
     }
     if (type) newFuncCall->type = type->clone();
     return newFuncCall;
+}
+
+bool argAndParamEqual(const LgsFuncArg* arg, const LgsParam* param) {
+    return arg->expr->type && arg->expr->type->canCastTo(param->type);
 }
 
 LgsFuncCall::~LgsFuncCall() {

@@ -396,6 +396,7 @@ LgsInterface* LgsParser::parseInterfaceBody(const LgsToken& tokenName) {
     while (true) {
         if (const auto field = parseField(fieldPosition)) {
             fieldPosition++;
+            field->isVirtual = true;
             interface->addField(field);
         } else {
             break;
