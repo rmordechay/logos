@@ -32,6 +32,7 @@ enum LgsTokenType {
     T_EQUAL_STAR,
     T_EQUAL_SLASH,
     T_EQUAL_PERCENT,
+    T_EQUAL_DOLLAR,
     T_EQUAL_AMPERSAND,
     T_EQUAL_PIPE,
     T_EQUAL_CARET,
@@ -48,6 +49,7 @@ enum LgsTokenType {
     T_AMPERSAND,
     T_PIPE,
     T_CARET,
+    T_DOLLAR,
     T_DOUBLE_LANGLE,
     T_DOUBLE_RANGLE,
     T_TYPE,
@@ -109,6 +111,7 @@ enum LgsBinOpType {
     MUL,
     DIV,
     MODULO,
+    POW,
     BIT_AND,
     BIT_OR,
     BIT_XOR,
@@ -133,6 +136,7 @@ enum LgsAssignType {
     ASSIGN_MUL,
     ASSIGN_DIV,
     ASSIGN_MOD,
+    ASSIGN_POW,
     ASSIGN_AND,
     ASSIGN_OR,
     ASSIGN_XOR,
@@ -203,9 +207,10 @@ const auto SUB_OP = LgsBinOp{SUB, "-"};
 const auto MUL_OP = LgsBinOp{MUL, "*"};
 const auto DIV_OP = LgsBinOp{DIV, "/"};
 const auto MODULO_OP = LgsBinOp{MODULO, "%"};
+const auto POW_OP = LgsBinOp{POW, "^"};
 const auto BIT_AND_OP = LgsBinOp{BIT_AND, "&"};
 const auto BIT_OR_OP = LgsBinOp{BIT_OR, "|"};
-const auto BIT_XOR_OP = LgsBinOp{BIT_XOR, "^"};
+const auto BIT_XOR_OP = LgsBinOp{BIT_XOR, "$"};
 const auto LSHIFT_OP = LgsBinOp{LSHIFT, "<<"};
 const auto RSHIFT_OP = LgsBinOp{RSHIFT, ">>"};
 const auto EQ_OP = LgsBinOp{EQ, "=="};
@@ -219,15 +224,16 @@ const auto OR_OP = LgsBinOp{OR, "or"};
 const auto IN_OP = LgsBinOp{IN, "in"};
 const auto NOOP_OP = LgsBinOp{NOOP, ""};
 
-const std::unordered_map<LgsTokenType, LgsBinOp> LGS_BINARY_OPS = {
+const std::unordered_map<LgsTokenType, LgsBinOp> LGS_BINARY_OPS_DICT = {
     {T_PLUS, ADD_OP},
     {T_MINUS, SUB_OP},
     {T_STAR, MUL_OP},
     {T_SLASH, DIV_OP},
     {T_PERCENT, MODULO_OP},
+    {T_CARET, POW_OP},
     {T_AMPERSAND, BIT_AND_OP},
     {T_PIPE, BIT_OR_OP},
-    {T_CARET, BIT_XOR_OP},
+    {T_DOLLAR, BIT_XOR_OP},
     {T_DOUBLE_LANGLE, LSHIFT_OP},
     {T_DOUBLE_RANGLE, RSHIFT_OP},
     {T_DOUBLE_EQUAL, EQ_OP},

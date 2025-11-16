@@ -370,6 +370,7 @@ void LgsCodeGen::visitAssignment(const LgsAssignment* assignment) {
     case ASSIGN_MUL: results = lValue->type->mulIR(cg, lValue, rValue); break;
     case ASSIGN_DIV: results = lValue->type->divIR(cg, lValue, rValue); break;
     case ASSIGN_MOD: results = lValue->type->modIR(cg, lValue, rValue); break;
+    case ASSIGN_POW: results = lValue->type->powIR(cg, lValue, rValue); break;
     case ASSIGN_AND: results = lValue->type->bitAndIR(cg, lValue, rValue); break;
     case ASSIGN_OR: results = lValue->type->bitOrIR(cg, lValue, rValue); break;
     case ASSIGN_XOR: results = lValue->type->bitXorIR(cg, lValue, rValue); break;
@@ -655,6 +656,7 @@ void LgsCodeGen::visitBinaryExpr(LgsBinaryExpr* binExpr) {
     case MUL: binExpr->IRValue = binExpr->type->mulIR(cg, l, r); break;
     case DIV: binExpr->IRValue = binExpr->type->divIR(cg, l, r); break;
     case MODULO: binExpr->IRValue = binExpr->type->modIR(cg, l, r); break;
+    case POW: binExpr->IRValue = binExpr->type->powIR(cg, l, r); break;
     case BIT_AND: binExpr->IRValue = binExpr->type->bitAndIR(cg, l, r); break;
     case BIT_OR: binExpr->IRValue = binExpr->type->bitOrIR(cg, l, r); break;
     case BIT_XOR: binExpr->IRValue = binExpr->type->bitXorIR(cg, l, r); break;

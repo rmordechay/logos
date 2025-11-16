@@ -61,7 +61,7 @@ LgsToken LgsLexer::nextToken() {
     }
 
     // Var or keyword
-    if (currentChar == '$' || std::isalpha(currentChar)) {
+    if ((currentChar == '$' && peek() != ' ') || std::isalpha(currentChar)) {
         return scanVarOrKeyword(location);
     }
 
@@ -146,6 +146,11 @@ LgsToken LgsLexer::nextToken() {
         advance();
         if (match('=')) return {T_EQUAL_PERCENT, "%=", location};
         return {T_PERCENT, "%", location};
+    }
+    case '$': {
+        advance();
+        if (match('=')) return {T_EQUAL_DOLLAR, "$=", location};
+        return {T_DOLLAR, "$", location};
     }
     case '&':
         advance();

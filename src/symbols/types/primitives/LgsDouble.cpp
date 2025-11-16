@@ -1,6 +1,7 @@
 #include "types/primitives/LgsDouble.h"
 #include "exprs/constants/LgsFloatConst.h"
 #include "../codegen/LgsLLVMGen.h"
+#include "exprs/constants/LgsIntConst.h"
 #include "types/LgsAny.h"
 
 std::string LgsDouble::getName() {
@@ -32,4 +33,16 @@ bool LgsDouble::canCastTo(LgsType* other) {
     if (name == IRName) return true;
     if (IRName == LgsAny::name) return true;
     return false;
+}
+
+LgsExpr* LgsDouble::powConst(LgsExpr* self, LgsExpr* other) {
+    const auto const1 = self->getConstInt();
+    if (!const1) return nullptr;
+    const auto const2 = other->getConstInt();
+    if (!const2) return nullptr;
+    return new LgsFloatConst(&LGS_DOUBLE, std::pow(*const1, *const2));
+}
+
+Value* LgsDouble::powIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    return LgsType::powIR(cg, self, other);
 }

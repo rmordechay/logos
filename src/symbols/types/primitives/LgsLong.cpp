@@ -3,6 +3,7 @@
 #include "types/LgsAny.h"
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsChar.h"
+#include "types/primitives/LgsDouble.h"
 #include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsInt.h"
 #include "types/primitives/LgsShort.h"
@@ -26,6 +27,10 @@ Lgs_TypeKind LgsLong::getRTTypeKind() {
 
 LgsType* LgsLong::applyBinOp(LgsBinaryExpr* binExpr) {
     return applyIntBinOp(binExpr->op, binExpr->left->type);
+}
+
+LgsExpr* LgsLong::powConst(LgsExpr* self, LgsExpr* other) {
+    assert(0);
 }
 
 Value* LgsLong::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {

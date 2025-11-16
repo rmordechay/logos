@@ -1231,8 +1231,8 @@ LgsExpr* LgsParser::parseExprWithPrecedence(const int minPrecedence) {
     auto left = parseUnary();
     if (!parsedOrReset(left, oldIndex)) return nullptr;
     while (true) {
-        auto const it = LGS_BINARY_OPS.find(currentToken.type);
-        if (it == LGS_BINARY_OPS.end()) break;
+        auto const it = LGS_BINARY_OPS_DICT.find(currentToken.type);
+        if (it == LGS_BINARY_OPS_DICT.end()) break;
         consume();
         const auto& [opType, _] = it->second;
         const auto precedence = getBinOpPrecedence(opType);
@@ -1560,7 +1560,7 @@ LgsHashMap* LgsParser::parseHashMap() {
     const auto oldIndex = currentIndex;
     if (!matchAndConsume(T_LBRACE)) return nullptr;
     std::vector<LgsPair> pairs;
-    const auto freePairs = [&pairs]() {
+    const auto freePairs = [&pairs] {
         for (auto [l, r] : pairs) {
             freeExpr(l);
             freeExpr(r);
@@ -1985,31 +1985,37 @@ LgsExpr* LgsParser::determineIntConst(const std::string& tokenStr, const int bas
 
 int LgsParser::getBinOpPrecedence(const LgsBinOpType opType) {
     switch (opType) {
-    case BIT_OR:
+    case OR:
         return 1;
-    case BIT_XOR:
+    case AND:
         return 2;
-    case BIT_AND:
+    case BIT_OR:
         return 3;
+    case BIT_XOR:
+        return 4;
+    case BIT_AND:
+        return 5;
     case EQ:
     case NE:
-        return 4;
+        return 6;
     case LT:
     case GT:
     case LE:
     case GE:
     case IN:
-        return 5;
+        return 7;
     case LSHIFT:
     case RSHIFT:
-        return 6;
+        return 8;
     case ADD:
     case SUB:
-        return 7;
+        return 9;
     case MUL:
     case DIV:
     case MODULO:
-        return 8;
+        return 10;
+    case POW:
+        return 11;
     case NOOP:
     default:
         return 0;

@@ -96,6 +96,9 @@ LgsType* LgsType::extendInt() {
 
 LgsType* LgsType::applyIntBinOp(const LgsBinOpType op, LgsType* other) {
     switch (op) {
+    case POW:
+        if (other->canCastTo(this)) return &LGS_DOUBLE;
+        break;
     case ADD:
     case SUB:
     case MUL:
@@ -128,10 +131,7 @@ LgsType* LgsType::applyIntBinOp(const LgsBinOpType op, LgsType* other) {
         }
         break;
     }
-    case AND:
-    case OR:
-        break;
-    case NOOP:
+    default:
         break;
     }
     return nullptr;
@@ -343,6 +343,10 @@ LgsExpr* LgsType::modConst(LgsExpr* self, LgsExpr* other) {
     assert(0);
 }
 
+LgsExpr* LgsType::powConst(LgsExpr* self, LgsExpr* other) {
+    assert(0);
+}
+
 LgsExpr* LgsType::bitAndConst(LgsExpr* self, LgsExpr* other) {
     assert(0);
 }
@@ -412,6 +416,10 @@ Value* LgsType::divIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
 }
 
 Value* LgsType::modIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    assert(0);
+}
+
+Value* LgsType::powIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     assert(0);
 }
 

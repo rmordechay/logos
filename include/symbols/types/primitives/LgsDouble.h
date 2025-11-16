@@ -15,6 +15,8 @@ public:
     Lgs_TypeKind getRTTypeKind() override;
     std::string strFormatPart() const override;
     bool canCastTo(LgsType* other) override;
+    LgsExpr* powConst(LgsExpr* self, LgsExpr* other) override;
+    Value* powIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
 };
 
 inline LgsDouble LGS_DOUBLE;

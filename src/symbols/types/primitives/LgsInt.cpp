@@ -80,6 +80,14 @@ LgsExpr* LgsInt::modConst(LgsExpr* self, LgsExpr* other) {
     return new LgsIntConst(&LGS_INT, *const1 % *const2);
 }
 
+LgsExpr* LgsInt::powConst(LgsExpr* self, LgsExpr* other) {
+    const auto const1 = self->getConstInt();
+    if (!const1) return nullptr;
+    const auto const2 = other->getConstInt();
+    if (!const2) return nullptr;
+    return new LgsIntConst(&LGS_INT, std::pow(*const1, *const2));
+}
+
 LgsExpr* LgsInt::bitAndConst(LgsExpr* self, LgsExpr* other) {
     const auto const1 = self->getConstInt();
     if (!const1) return nullptr;
@@ -184,7 +192,6 @@ LgsExpr* LgsInt::orConst(LgsExpr* self, LgsExpr* other) {
     return new LgsIntConst(&LGS_BOOL, *const1 > 0 || *const2 > 0);
 }
 
-
 Value* LgsInt::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     const auto l = cg.builder.CreateZExt(self->loadIR(cg), getIRType(cg));
     const auto r = cg.builder.CreateZExt(other->loadIR(cg), getIRType(cg));
@@ -211,6 +218,10 @@ Value* LgsInt::divIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
 
 Value* LgsInt::modIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     return cg.builder.CreateSRem(self->loadIR(cg), other->loadIR(cg));
+}
+
+Value* LgsInt::powIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+    return cg.callFunc("pow", cg.doubleTy(), {cg.doubleTy(), cg.doubleTy()}, {self->loadIR(cg), other->loadIR(cg)});
 }
 
 Value* LgsInt::bitAndIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {

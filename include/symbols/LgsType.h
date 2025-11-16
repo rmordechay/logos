@@ -120,6 +120,7 @@ public:
     virtual LgsExpr* mulConst(LgsExpr* self, LgsExpr* other);
     virtual LgsExpr* divConst(LgsExpr* self, LgsExpr* other);
     virtual LgsExpr* modConst(LgsExpr* self, LgsExpr* other);
+    virtual LgsExpr* powConst(LgsExpr* self, LgsExpr* other);
     virtual LgsExpr* bitAndConst(LgsExpr* self, LgsExpr* other);
     virtual LgsExpr* bitOrConst(LgsExpr* self, LgsExpr* other);
     virtual LgsExpr* bitXorConst(LgsExpr* self, LgsExpr* other);
@@ -138,6 +139,7 @@ public:
     virtual Value* mulIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
     virtual Value* divIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
     virtual Value* modIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
+    virtual Value* powIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
     virtual Value* bitAndIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
     virtual Value* bitOrIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
     virtual Value* bitXorIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);

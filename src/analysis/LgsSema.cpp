@@ -624,6 +624,7 @@ void LgsSema::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
     case MUL: binaryExpr->results = resultsType->mulConst(l, r); break;
     case DIV: binaryExpr->results = resultsType->divConst(l, r); break;
     case MODULO: binaryExpr->results = resultsType->modConst(l, r); break;
+    case POW: binaryExpr->results = resultsType->powConst(l, r); break;
     case BIT_AND: binaryExpr->results = resultsType->bitAndConst(l, r); break;
     case BIT_OR: binaryExpr->results = resultsType->bitOrConst(l, r); break;
     case BIT_XOR: binaryExpr->results = resultsType->bitXorConst(l, r); break;

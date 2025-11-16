@@ -20,6 +20,7 @@ public:
     LgsExpr* mulConst(LgsExpr* self, LgsExpr* other) override;
     LgsExpr* divConst(LgsExpr* self, LgsExpr* other) override;
     LgsExpr* modConst(LgsExpr* self, LgsExpr* other) override;
+    LgsExpr* powConst(LgsExpr* self, LgsExpr* other) override;
     LgsExpr* bitAndConst(LgsExpr* self, LgsExpr* other) override;
     LgsExpr* bitOrConst(LgsExpr* self, LgsExpr* other) override;
     LgsExpr* bitXorConst(LgsExpr* self, LgsExpr* other) override;
@@ -38,6 +39,7 @@ public:
     Value* mulIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
     Value* divIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
     Value* modIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
+    Value* powIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
     Value* bitAndIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
     Value* bitOrIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
     Value* bitXorIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;

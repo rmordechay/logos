@@ -28,6 +28,8 @@ std::string LgsAssignment::getAssignTypeStr() const {
         return "lshift";
     case ASSIGN_RSHIFT:
         return "rshift";
+    case ASSIGN_POW:
+        return "pow";
     case ASSIGN_UNKNOWN:
         break;
     }

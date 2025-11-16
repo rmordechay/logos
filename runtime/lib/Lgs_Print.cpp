@@ -38,7 +38,7 @@ std::string formatElement(const Lgs_TypeKind type, void* elem) {
         break;
     }
     case RTT_LONG: {
-        str << *static_cast<int32_t*>(elem);
+        str << *static_cast<int64_t*>(elem);
         break;
     }
     case RTT_SIZE: {
