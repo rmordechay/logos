@@ -198,7 +198,10 @@ void hashNodeInt(size_t& oldHash, const size_t val) {
 
 void freeExpr(LgsExpr* expr) {
     if (!expr) return;
-    if (!expr->asVariable()) freeType(expr->type);
+    if (!expr->asVariable()) {
+        freeType(expr->type);
+        expr->type = nullptr;
+    }
     delete expr;
 }
 

@@ -2,7 +2,6 @@
 #include "exprs/LgsIterIndex.h"
 #include "exprs/LgsVectorExpr.h"
 #include "types/LgsAny.h"
-#include "types/primitives/LgsSize.h"
 #include "utils/LgsUtils.h"
 #include <iostream>
 #include <sstream>
@@ -57,16 +56,16 @@ LgsType* LgsVec::applyBinOp(LgsBinaryExpr* binExpr) {
     case ADD:
     case SUB:
     case DIV: {
-        if (thisNme == otherName) return this;
+        if (thisNme == otherName) return clone();
         break;
     }
     case MUL: {
         if (thisNme == otherName) return &LGS_FLOAT;
-        if (other->isNumber()) return this;
+        if (other->isNumber()) return clone();
         break;
     }
     case IN: {
-        if (other->canCastTo(baseType)) return baseType;
+        if (other->canCastTo(baseType)) return baseType->clone();
         break;
     }
     default:
@@ -76,26 +75,29 @@ LgsType* LgsVec::applyBinOp(LgsBinaryExpr* binExpr) {
 }
 
 bool LgsVec::inferBaseType(const std::vector<LgsExpr*>& args) {
-    const auto baseExprType = args.front()->type;
-    if (!baseExprType->isNumber() && !baseExprType->asVec()) return false;
+    assert(!args.empty());
+    const auto firstArg = args.front();
+    const auto argsBaseType = firstArg->type->isNumber() ? firstArg->type : firstArg->type->asIterable()->baseType;
+    if (!argsBaseType) return false;
     for (size_t i = 1; i < args.size(); ++i) {
         const auto arg = args[i];
-        if (!baseExprType->canCastTo(arg->type)) return false;
+        const auto type = arg->type->isNumber() ? arg->type : arg->type->asIterable()->baseType;
+        if (!type->canCastTo(argsBaseType)) return false;
     }
-    baseType = baseExprType;
+    baseType = argsBaseType;
     return true;
 }
 
 Value* LgsVec::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     if (other->IRValue->getType()->isIntegerTy()) {
-        return cg.builder.CreateAdd(self->IRValue, other->IRValue);
+        return cg.builder.CreateFAdd(self->loadIR(cg), other->loadIR(cg));
     }
-    return cg.builder.CreateFAdd(self->IRValue, other->IRValue);
+    return cg.builder.CreateFAdd(self->loadIR(cg), other->loadIR(cg));
 }
 
 Value* LgsVec::subIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     if (other->IRValue->getType()->isIntegerTy()) {
-        return cg.builder.CreateSub(self->loadIR(cg), other->loadIR(cg));
+        return cg.builder.CreateFSub(self->loadIR(cg), other->loadIR(cg));
     }
     return cg.builder.CreateFSub(self->loadIR(cg), other->loadIR(cg));
 }

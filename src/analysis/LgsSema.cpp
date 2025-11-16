@@ -933,7 +933,6 @@ void LgsSema::visitFuncCall(LgsFuncCall* funcCall) {
 
     visitFuncArgs(funcCall, ft);
     if (!funcCall->equals(ft)) {
-        for (const auto& arg : funcCall->args) if (!arg.expr->type) return;
         addError(E10015, funcCall->location, {funcCall->name, funcCall->asText(), ft->pname()});
         return;
     }

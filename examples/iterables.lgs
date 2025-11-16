@@ -26,3 +26,25 @@ main() {
     print(c + vec2(1, 2))
     print(c - vec2(1, 2))
 }
+
+iter() {
+    arr: Float[] = [3.23, 6.543, 14.243]
+    for i in arr {
+        print(i)
+    }
+
+    sarr: Float[3] = [3.23, 6.543, 14.243]
+    for i in sarr {
+        print(i)
+    }
+
+    vec3: Vec3 = Vec3(3.23, 6.543, 14.243)
+    for i in vec3 {
+        print(i)
+    }
+
+    set: Set<Float> = Set[3.23, 6.543, 14.243, 14.243]
+    for i in set {
+        print(i)
+    }
+}

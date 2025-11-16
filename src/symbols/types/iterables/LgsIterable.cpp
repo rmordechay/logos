@@ -112,6 +112,7 @@ bool LgsIterable::inferBaseType(const std::vector<LgsExpr*>& args) {
 bool LgsIterable::unpackLoopVarsTypes(LgsForeachLoop* loop) const {
     if (loop->loopVars.size() != 1) return false;
     const auto iterIndex = new LgsIterIndex(loop->iterExpr, LGS_SIZE.getZeroValue());
+    assert(baseType);
     iterIndex->setType(baseType);
     loop->loopVars[0]->expr = iterIndex;
     loop->loopVars[0]->setType(iterIndex->type);

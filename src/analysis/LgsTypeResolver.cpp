@@ -40,10 +40,17 @@ bool LgsTypeResolver::resolveGlobals(const std::vector<LgsFile*>& srcFiles, Thre
 }
 
 LgsType* LgsTypeResolver::resolveType(LgsType* type, LgsFile* file) {
+    for (size_t i = 0; i < type->genericArgs.size(); ++i) {
+        type->genericArgs[i] = resolveType(type->genericArgs[i], file);
+    }
     if (const auto nullable = type->asNullable()) {
         nullable->baseType = resolveType(nullable->baseType, file);
     } else if (const auto iterable = type->asIterable()) {
-        iterable->baseType = resolveType(iterable->baseType, file);
+        if (!iterable->genericArgs.empty()) {
+            iterable->baseType = iterable->genericArgs.front();
+        } else {
+            iterable->baseType = resolveType(iterable->baseType, file);
+        }
         rtTypesRegistry.push_back(iterable);
     } else if (const auto pair = type->asPair()) {
         pair->key = resolveType(pair->key, file);

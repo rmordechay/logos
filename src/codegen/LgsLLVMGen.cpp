@@ -80,11 +80,8 @@ Value* LgsLLVMGen::getPtrTo(Value* v) {
             return builder.CreateLoad(ptrTy(), ce);
         }
     }
-    if (v->getType()->isVectorTy()) {
-        return v;
-    }
     if (v->getType()->isPointerTy()) return v;
-    if (v->getType()->isIntegerTy() || v->getType()->isFloatingPointTy()) {
+    if (v->getType()->isIntegerTy() || v->getType()->isFloatingPointTy() || v->getType()->isVectorTy()) {
         const auto a = builder.CreateAlloca(v->getType());
         builder.CreateStore(v, a);
         return a;

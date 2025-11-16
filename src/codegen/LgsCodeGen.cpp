@@ -1265,7 +1265,7 @@ void LgsCodeGen::setDynamicArray(LgsArrayExpr* arrayExpr) {
 
 void LgsCodeGen::setSetExpr(LgsArrayExpr* arrayExpr) {
     const auto arr = arrayExpr->type->asSet();
-    const auto baseType = arr->genericArgs.front();
+    const auto baseType = arr->baseType;
     const auto size = baseType->sizeBytes();
     arrayExpr->IRValue = cg.callAllocate(arr->sizeBytes(), arrayExpr->owner, arr->getRTTypeKind());
     LgsFunc initFunc("init", &LGS_VOID, {arr, &LGS_SIZE, &LGS_SIZE}, BUILTIN | METHOD);
