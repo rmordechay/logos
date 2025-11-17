@@ -1510,6 +1510,10 @@ LgsExpr* LgsParser::parseConstant() {
         constant = new LgsFloatConst(&LGS_FLOAT, value);
         break;
     }
+    case T_DOUBLE: {
+        constant = new LgsFloatConst(&LGS_DOUBLE, std::stol(tokenStr));
+        break;
+    }
     case T_BOOL: {
         const auto value = tokenStr == LgsBool::trueLiteral;
         constant = new LgsIntConst(&LGS_BOOL, value);

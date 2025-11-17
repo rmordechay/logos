@@ -92,6 +92,7 @@ enum LgsTokenType {
     T_BOOL,
     T_INT,
     T_LONG,
+    T_DOUBLE,
     T_HEX,
     T_FLOAT,
     T_NULL,

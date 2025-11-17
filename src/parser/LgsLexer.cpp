@@ -316,6 +316,13 @@ LgsToken LgsLexer::scanNumber(LgsLocation& location) {
             advance();
             location.columnStart++;
         }
+        // Double
+        if (currentChar == 'D') {
+            lexeme += currentChar;
+            advance();
+            location.columnStart++;
+            return {T_DOUBLE, lexeme, location};
+        }
         return {T_FLOAT, lexeme, location};
     }
     // Long
@@ -325,8 +332,16 @@ LgsToken LgsLexer::scanNumber(LgsLocation& location) {
         location.columnStart++;
         return {T_LONG, lexeme, location};
     }
+    // Double
+    if (currentChar == 'D') {
+        lexeme += currentChar;
+        advance();
+        location.columnStart++;
+        return {T_DOUBLE, lexeme, location};
+    }
     return {T_INT, lexeme, location};
 }
+
 
 void LgsLexer::skipWhitespace() {
     while (std::isspace(currentChar)) {
