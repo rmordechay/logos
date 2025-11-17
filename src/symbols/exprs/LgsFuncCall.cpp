@@ -126,14 +126,14 @@ std::string LgsFuncCall::asText() {
 }
 
 void LgsFuncCall::setDebugValue(LgsLLVMGen& cg) {
-    cg.builder.SetCurrentDebugLocation(getDebugLoc(cg));
+    cg.builder.SetCurrentDebugLocation(cg.getDebugLoc(location));
 }
 
-LgsStmt* LgsFuncCall::cloneStmt() {
+LgsFuncCall* LgsFuncCall::clone() {
     const auto newFuncCall = new LgsFuncCall(*this);
     newFuncCall->args.clear();
     for (const auto& arg : args) {
-        newFuncCall->args.emplace_back(LgsFuncArg(arg.name, arg.expr->cloneExpr()));
+        newFuncCall->args.emplace_back(LgsFuncArg(arg.name, arg.expr->clone()));
     }
     if (type) newFuncCall->type = type->clone();
     return newFuncCall;

@@ -155,7 +155,7 @@ std::string LgsFunc::asText() {
     return funcType->pname();
 }
 
-LgsFunc* LgsFunc::cloneExpr() {
+LgsFunc* LgsFunc::clone() {
     const auto newFunc = new LgsFunc(*this);
     newFunc->funcType = funcType->clone()->asFuncType();
     newFunc->stmtsBlock = stmtsBlock->clone();
@@ -190,7 +190,7 @@ void LgsFunc::setDebugValue(LgsLLVMGen& cg) {
         DISubprogram::SPFlagDefinition
     );
     getIRFunc(cg)->setSubprogram(cg.debugger.subprogram);
-    cg.builder.SetCurrentDebugLocation(getDebugLoc(cg));
+    cg.builder.SetCurrentDebugLocation(cg.getDebugLoc(location));
 }
 
 LgsFunc::~LgsFunc() {

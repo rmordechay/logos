@@ -149,7 +149,7 @@ Value* LgsStr::inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) {
 LgsType* LgsStr::clone() {
     const auto newStr = new LgsStr();
     if (size) {
-        newStr->size = size->cloneExpr();
+        newStr->size = size->clone();
     }
     newStr->baseType = baseType;
     return newStr;

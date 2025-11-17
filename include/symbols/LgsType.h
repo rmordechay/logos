@@ -43,20 +43,18 @@ class LgsLLVMGen;
 
 class LgsType {
 public:
-    bool isInt = false;
-    bool isFloat = false;
-    bool isPrimitive = false;
-    bool isHeapAlloc = false;
-    bool passByRef = false;
-    Type* IRType = nullptr;
     size_t runtimeID = 0;
     LgsLocation location;
     std::vector<LgsField*> fields;
     std::map<std::string, LgsFunc*> methods;
     std::vector<LgsType*> genericArgs;
+    Type* IRType = nullptr;
+    bool isInt = false;
+    bool isFloat = false;
+    bool isPrimitive = false;
+    bool isHeapAlloc = false;
+    bool passByRef = false;
 
-    virtual LgsField* getField(const std::string& fieldName);
-    virtual LgsFunc* getMethod(const std::string& methodName);
     bool addField(LgsField* field);
     bool addMethod(LgsFunc* method);
     bool addEmptyMethod(const std::string& name);
@@ -67,9 +65,13 @@ public:
     bool isSliceable();
     LgsType* extendInt();
     LgsType* applyIntBinOp(LgsBinOpType op, LgsType* other);
+    void cloneFields(LgsType* newType) const;
+    void cloneMethods(LgsType* newType) const;
     static Value* orInt(LgsLLVMGen& cg, const LgsExpr* self, const LgsExpr* other);
     static Value* andInt(LgsLLVMGen& cg, LgsExpr* self, const LgsExpr* other);
 
+    virtual LgsField* getField(const std::string& fieldName);
+    virtual LgsFunc* getMethod(const std::string& methodName);
     virtual Type* getIRType(LgsLLVMGen& cg) = 0;
     virtual size_t sizeBytes() = 0;
     virtual LgsExpr* getZeroValue() = 0;
@@ -84,36 +86,6 @@ public:
     virtual DIBasicType* getDebugType(LgsLLVMGen& cg);
     virtual void hashNode(size_t& oldHash);
     virtual LgsType* clone();
-    void cloneFields(LgsType* newType) const;
-    void cloneMethods(LgsType* newType) const;
-
-    LgsAny* asAny();
-    LgsChar* asChar();
-    LgsStr* asStr();
-    LgsBool* asBool();
-    LgsByte* asByte();
-    LgsInt* asInt();
-    LgsShort* asShort();
-    LgsLong* asLong();
-    LgsSize* asSize();
-    LgsUInt* asUInt();
-    LgsFloat* asFloat();
-    LgsDouble* asDouble();
-    LgsFuncType* asFuncType();
-    LgsObject* asObject();
-    LgsInterface* asInterface();
-    LgsEnum* asEnum();
-    LgsGenericType* asGeneric();
-    LgsIterable* asIterable();
-    LgsSArray* asSArray();
-    LgsDArray* asDArray();
-    LgsSet* asSet();
-    LgsVec* asVec();
-    LgsPtr* asPtr();
-    LgsMap* asMap();
-    LgsTypePair* asPair();
-    LgsSubType* asSubtype();
-    LgsNullable* asNullable();
 
     virtual LgsExpr* addConst(LgsExpr* self, LgsExpr* other);
     virtual LgsExpr* subConst(LgsExpr* self, LgsExpr* other);
@@ -153,5 +125,34 @@ public:
     virtual Value* leIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
     virtual Value* andIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
     virtual Value* orIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
+
+    LgsAny* asAny();
+    LgsChar* asChar();
+    LgsStr* asStr();
+    LgsBool* asBool();
+    LgsByte* asByte();
+    LgsInt* asInt();
+    LgsShort* asShort();
+    LgsLong* asLong();
+    LgsSize* asSize();
+    LgsUInt* asUInt();
+    LgsFloat* asFloat();
+    LgsDouble* asDouble();
+    LgsFuncType* asFuncType();
+    LgsObject* asObject();
+    LgsInterface* asInterface();
+    LgsEnum* asEnum();
+    LgsGenericType* asGeneric();
+    LgsIterable* asIterable();
+    LgsSArray* asSArray();
+    LgsDArray* asDArray();
+    LgsSet* asSet();
+    LgsVec* asVec();
+    LgsPtr* asPtr();
+    LgsMap* asMap();
+    LgsTypePair* asPair();
+    LgsSubType* asSubtype();
+    LgsNullable* asNullable();
+
     virtual ~LgsType();
 };

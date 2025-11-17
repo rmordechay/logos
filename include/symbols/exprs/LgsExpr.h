@@ -47,7 +47,6 @@ public:
     virtual void completeType(LgsType* toType);
     virtual void assign(LgsLLVMGen& cg, LgsExpr* expr);
     virtual bool equals(LgsExpr* other);
-    virtual LgsExpr* cloneExpr();
     virtual std::string asText() = 0;
 
     void freeOwner(LgsLLVMGen& cg);
@@ -74,5 +73,6 @@ public:
     LgsIntConst* asIntConst();
     LgsMetaVar* asLoopMetaVar();
     LgsBinaryExpr* asBinExpr();
+    LgsExpr* clone() override;
     ~LgsExpr() override = default;
 };

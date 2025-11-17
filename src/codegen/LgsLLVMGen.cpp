@@ -372,6 +372,16 @@ void LgsLLVMGen::finalizeDebugger(const fs::path& buildPath) const {
     file.flush();
 }
 
+llvm::DILocation* LgsLLVMGen::getDebugLoc(const LgsLocation& location) {
+    return llvm::DILocation::get(
+        context,
+        location.lineStart,
+        location.columnStart,
+        debugger.subprogram,
+        debugger.subprogram->getScope()
+    );
+}
+
 void LgsLLVMGen::initLLVM() {
     llvm::InitializeNativeTarget();
     llvm::InitializeNativeTargetAsmPrinter();

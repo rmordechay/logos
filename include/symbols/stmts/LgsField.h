@@ -30,5 +30,5 @@ public:
     Value* loadIR(LgsLLVMGen& cg) override;
     Value* resolveVirtualField(LgsLLVMGen* cg, const LgsHashMap* vtable) const;
     ~LgsField() override;
-    LgsField* clone();
+    LgsField* clone() override;
 };

@@ -28,7 +28,7 @@ bool LgsStmt::isTerminator() {
     return methodCall->func && methodCall->func->funcType->isTerminator;
 }
 
-LgsStmt* LgsStmt::cloneStmt() {
+LgsStmt* LgsStmt::clone() {
     assert(0);
 }
 

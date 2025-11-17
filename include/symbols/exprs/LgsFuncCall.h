@@ -35,6 +35,6 @@ public:
     bool equalsDefaults(LgsFuncType* funcType) const;
     std::string asText() override;
     void setDebugValue(LgsLLVMGen& cg) override;
-    LgsStmt* cloneStmt() override;
+    LgsFuncCall* clone() override;
     ~LgsFuncCall() override;
 };

@@ -539,7 +539,7 @@ void LgsSema::visitCoroutine(const LgsCoroutine* coroutine) {
     if (coro != file->symbolTable.coroutines.end()) {
         coroutine->funcCall->func = coro->second;
     } else {
-        const auto f = fc->func->cloneExpr();
+        const auto f = fc->func->clone();
         f->funcType->isCoroutine = true;
         coroutine->funcCall->func = f;
         file->symbolTable.coroutines[funcName] = f;
@@ -954,7 +954,7 @@ void LgsSema::visitFuncCall(LgsFuncCall* funcCall) {
             genericFunc = createGenericFunc(funcCall, func);
             file->symbolTable.genericCalls[funcName] = genericFunc;
         }
-        funcCall->func = genericFunc->cloneExpr();
+        funcCall->func = genericFunc->clone();
     } else {
         funcCall->func = func;
         funcCall->setType(ft->rt);
@@ -1488,7 +1488,7 @@ LgsSymbol* LgsSema::getSymbol(const std::string& name, const LgsLocation* locati
 }
 
 LgsFunc* LgsSema::createGenericFunc(LgsFuncCall* funcCall, LgsFunc* const func) {
-    const auto newFunc = func->cloneExpr()->asFunc();
+    const auto newFunc = func->clone()->asFunc();
     for (size_t i = 0; i < newFunc->funcType->params.size(); ++i) {
         const auto param = newFunc->funcType->params[i];
         const auto arg = funcCall->args[i];

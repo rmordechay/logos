@@ -51,7 +51,7 @@ public:
     void completeType(LgsType* toType) override;
     bool needsCleanup() const;
     std::string asText() override;
-    LgsFunc* cloneExpr() override;
+    LgsFunc* clone() override;
     void hashNode(size_t& oldHash) override;
     BasicBlock* getCleanupBlock(LgsLLVMGen& cg);
     void setDebugValue(LgsLLVMGen& cg) override;

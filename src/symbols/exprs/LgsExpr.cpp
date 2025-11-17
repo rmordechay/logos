@@ -39,6 +39,10 @@ void LgsExpr::assign(LgsLLVMGen& cg, LgsExpr* expr) {
     assert(0);
 }
 
+LgsExpr* LgsExpr::clone() {
+    assert(0);
+}
+
 void LgsExpr::freeOwner(LgsLLVMGen& cg) {
     if (type->isHeapAlloc && owner) {
         cg.callRuntimeFunc("removeOwner", cg.voidTy(), {cg.ptrTy()}, {owner->IRValue});
@@ -104,10 +108,6 @@ void LgsExpr::setType(LgsType* newType) {
 
 
 bool LgsExpr::equals(LgsExpr* other) {
-    assert(0);
-}
-
-LgsExpr* LgsExpr::cloneExpr() {
     assert(0);
 }
 

@@ -9,11 +9,11 @@ void LgsParam::setType(LgsType* newType) {
     type = newType;
 }
 
-LgsParam* LgsParam::clone() const {
+LgsParam* LgsParam::clone() {
     const auto cloned = new LgsParam(type, name);
     cloned->location = location;
     if (expr) {
-        cloned->expr = expr->cloneExpr();
+        cloned->expr = expr->clone();
     }
     cloned->isSelf = isSelf;
     cloned->isVariadic = isVariadic;

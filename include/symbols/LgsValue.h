@@ -45,6 +45,6 @@ public:
     virtual Value* loadIR(LgsLLVMGen& cg);
     virtual void setDebugValue(LgsLLVMGen& cg);
     virtual void hashNode(size_t& oldHash);
-    llvm::DILocation* getDebugLoc(LgsLLVMGen& cg) const;
+    virtual LgsValue* clone();
     virtual ~LgsValue() = default;
 };

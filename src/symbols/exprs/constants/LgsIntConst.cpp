@@ -68,7 +68,7 @@ Value* LgsIntConst::hashValue(LgsLLVMGen& cg) {
     return IRValue;
 }
 
-LgsExpr* LgsIntConst::cloneExpr() {
+LgsIntConst* LgsIntConst::clone() {
     return new LgsIntConst(type->clone(), value);
 }
 

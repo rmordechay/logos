@@ -11,17 +11,17 @@ Value* LgsRangeLoop::loopEnd(LgsLLVMGen& cg) {
     return endRange->loadIR(cg);
 }
 
-LgsStmt* LgsRangeLoop::cloneStmt() {
+LgsRangeLoop* LgsRangeLoop::clone() {
     const auto newLoop = new LgsRangeLoop(*this);
     newLoop->loopVars.clear();
     for (const auto loopVar : loopVars) {
-        newLoop->loopVars.push_back(loopVar->cloneStmt());
+        newLoop->loopVars.push_back(loopVar->clone());
     }
     for (const auto [key, loopVar] : metaVars) {
-        newLoop->metaVars[key] = loopVar->cloneExpr();
+        newLoop->metaVars[key] = loopVar->clone();
     }
-    newLoop->startRange = startRange->cloneExpr();
-    newLoop->endRange = endRange->cloneExpr();
+    newLoop->startRange = startRange->clone();
+    newLoop->endRange = endRange->clone();
     newLoop->stmtsBlock = stmtsBlock->clone();
     return newLoop;
 }

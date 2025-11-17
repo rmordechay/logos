@@ -4,7 +4,7 @@ Value* LgsMetaVar::loadIR(LgsLLVMGen& cg) {
     return IRValue;
 }
 
-LgsMetaVar* LgsMetaVar::cloneExpr() {
+LgsMetaVar* LgsMetaVar::clone() {
     return new LgsMetaVar(*this);
 }
 

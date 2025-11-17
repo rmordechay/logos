@@ -12,7 +12,7 @@ public:
     LgsReturn* returnStmt = nullptr;
 
     explicit LgsStmtsBlock(const std::vector<LgsStmt*>& stmts = {}) : stmts(stmts) {}
-    LgsStmtsBlock* clone() const;
+    LgsStmtsBlock* clone() override;
     void hashNode(size_t& oldHash) override;
     ~LgsStmtsBlock() override;
 };

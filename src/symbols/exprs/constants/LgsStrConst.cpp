@@ -47,12 +47,12 @@ bool LgsStrConst::equals(LgsExpr* other) {
     assert(0);
 }
 
-LgsExpr* LgsStrConst::cloneExpr() {
+LgsStrConst* LgsStrConst::clone() {
     return new LgsStrConst(*this);
 }
 
 void LgsStrConst::setDebugValue(LgsLLVMGen& cg) {
-    cg.builder.SetCurrentDebugLocation(getDebugLoc(cg));
+    cg.builder.SetCurrentDebugLocation(cg.getDebugLoc(location));
 }
 
 LgsStrConst::~LgsStrConst() {

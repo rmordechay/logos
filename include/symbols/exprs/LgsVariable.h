@@ -17,5 +17,5 @@ public:
     void assign(LgsLLVMGen& cg, LgsExpr* expr) override;
     std::string asText() override;
     void setDebugValue(LgsLLVMGen& cg) override;
-    LgsExpr* cloneExpr() override;
+    LgsVariable* clone() override;
 };

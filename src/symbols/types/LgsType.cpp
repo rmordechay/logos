@@ -24,17 +24,6 @@
 #include "types/primitives/LgsUInt.h"
 #include <iostream>
 
-LgsField* LgsType::getField(const std::string& fieldName) {
-    for (auto* f : fields) {
-        if (f->name == fieldName) return f;
-    }
-    return nullptr;
-}
-
-LgsFunc* LgsType::getMethod(const std::string& methodName) {
-    return nullptr;
-}
-
 bool LgsType::addField(LgsField* field) {
     fields.push_back(field);
     return true;
@@ -50,10 +39,6 @@ bool LgsType::addEmptyMethod(const std::string& name) {
     if (methods.contains(name)) return false;
     methods[name] = nullptr;
     return true;
-}
-
-bool LgsType::equals(LgsType* other) {
-    return getName() == other->getName();
 }
 
 bool LgsType::isVoid() {
@@ -137,6 +122,25 @@ LgsType* LgsType::applyIntBinOp(const LgsBinOpType op, LgsType* other) {
     return nullptr;
 }
 
+void LgsType::cloneFields(LgsType* newType) const {
+    newType->fields.clear();
+    for (const auto& field : fields) {
+        const auto newField = new LgsField(*field);
+        if (field->expr) {
+            newField->expr = field->expr->clone();
+        }
+        newType->addField(newField);
+    }
+}
+
+void LgsType::cloneMethods(LgsType* newType) const {
+    newType->methods.clear();
+    for (const auto& [_, method] : methods) {
+        const auto newField = new LgsFunc(*method);
+        newType->addMethod(newField);
+    }
+}
+
 Value* LgsType::orInt(LgsLLVMGen& cg, const LgsExpr* self, const LgsExpr* other) {
     const auto currentBlock = cg.builder.GetInsertBlock();
     const auto func = currentBlock->getParent();
@@ -167,6 +171,17 @@ Value* LgsType::andInt(LgsLLVMGen& cg, LgsExpr* self, const LgsExpr* other) {
     return phi;
 }
 
+LgsField* LgsType::getField(const std::string& fieldName) {
+    for (auto* f : fields) {
+        if (f->name == fieldName) return f;
+    }
+    return nullptr;
+}
+
+LgsFunc* LgsType::getMethod(const std::string& methodName) {
+    return nullptr;
+}
+
 Lgs_TypeKind LgsType::getRTTypeKind() {
     assert(0);
 }
@@ -177,6 +192,10 @@ Constant* LgsType::getRTType(LgsLLVMGen& cg) {
 
 std::string LgsType::pname() {
     return getName();
+}
+
+bool LgsType::equals(LgsType* other) {
+    return getName() == other->getName();
 }
 
 LgsType* LgsType::applyBinOp(LgsBinaryExpr* binExpr) {
@@ -194,133 +213,6 @@ void LgsType::hashNode(size_t& oldHash) {
 LgsType* LgsType::clone() {
     if (isPrimitive) return this;
     assert(0);
-}
-
-void LgsType::cloneFields(LgsType* newType) const {
-    newType->fields.clear();
-    for (const auto& field : fields) {
-        const auto newField = new LgsField(*field);
-        if (field->expr) {
-            newField->expr = field->expr->cloneExpr();
-        }
-        newType->addField(newField);
-    }
-}
-
-void LgsType::cloneMethods(LgsType* newType) const {
-    newType->methods.clear();
-    for (const auto& [_, method] : methods) {
-        const auto newField = new LgsFunc(*method);
-        newType->addMethod(newField);
-    }
-}
-
-LgsAny* LgsType::asAny() {
-    return dynamic_cast<LgsAny*>(this);
-}
-
-LgsChar* LgsType::asChar() {
-    return dynamic_cast<LgsChar*>(this);
-}
-
-LgsStr* LgsType::asStr() {
-    return dynamic_cast<LgsStr*>(this);
-}
-
-LgsBool* LgsType::asBool() {
-    return dynamic_cast<LgsBool*>(this);
-}
-
-LgsByte* LgsType::asByte() {
-    return dynamic_cast<LgsByte*>(this);
-}
-
-LgsInt* LgsType::asInt() {
-    return dynamic_cast<LgsInt*>(this);
-}
-
-LgsShort* LgsType::asShort() {
-    return dynamic_cast<LgsShort*>(this);
-}
-
-LgsLong* LgsType::asLong() {
-    return dynamic_cast<LgsLong*>(this);
-}
-
-LgsSize* LgsType::asSize() {
-    return dynamic_cast<LgsSize*>(this);
-}
-
-LgsUInt* LgsType::asUInt() {
-    return dynamic_cast<LgsUInt*>(this);
-}
-
-LgsFloat* LgsType::asFloat() {
-    return dynamic_cast<LgsFloat*>(this);
-}
-
-LgsDouble* LgsType::asDouble() {
-    return dynamic_cast<LgsDouble*>(this);
-}
-
-LgsMap* LgsType::asMap() {
-    return dynamic_cast<LgsMap*>(this);
-}
-
-LgsEnum* LgsType::asEnum() {
-    return dynamic_cast<LgsEnum*>(this);
-}
-
-LgsGenericType* LgsType::asGeneric() {
-    return dynamic_cast<LgsGenericType*>(this);
-}
-
-LgsNullable* LgsType::asNullable() {
-    return dynamic_cast<LgsNullable*>(this);
-}
-
-LgsObject* LgsType::asObject() {
-    return dynamic_cast<LgsObject*>(this);
-}
-
-LgsInterface* LgsType::asInterface() {
-    return dynamic_cast<LgsInterface*>(this);
-}
-
-LgsIterable* LgsType::asIterable() {
-    return dynamic_cast<LgsIterable*>(this);
-}
-
-LgsSArray* LgsType::asSArray() {
-    return dynamic_cast<LgsSArray*>(this);
-}
-
-LgsDArray* LgsType::asDArray() {
-    return dynamic_cast<LgsDArray*>(this);
-}
-
-LgsSet* LgsType::asSet() {
-    return dynamic_cast<LgsSet*>(this);
-}
-
-LgsVec* LgsType::asVec() {
-    return dynamic_cast<LgsVec*>(this);
-}
-
-LgsFuncType* LgsType::asFuncType() {
-    return dynamic_cast<LgsFuncType*>(this);
-}
-
-LgsPtr* LgsType::asPtr() {
-    return dynamic_cast<LgsPtr*>(this);
-}
-
-LgsSubType* LgsType::asSubtype() {
-    return dynamic_cast<LgsSubType*>(this);
-}
-
-LgsTypePair* LgsType::asPair() {
-    return dynamic_cast<LgsTypePair*>(this);
 }
 
 LgsExpr* LgsType::addConst(LgsExpr* self, LgsExpr* other) {
@@ -473,6 +365,114 @@ Value* LgsType::andIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
 
 Value* LgsType::orIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     assert(0);
+}
+
+LgsAny* LgsType::asAny() {
+    return dynamic_cast<LgsAny*>(this);
+}
+
+LgsChar* LgsType::asChar() {
+    return dynamic_cast<LgsChar*>(this);
+}
+
+LgsStr* LgsType::asStr() {
+    return dynamic_cast<LgsStr*>(this);
+}
+
+LgsBool* LgsType::asBool() {
+    return dynamic_cast<LgsBool*>(this);
+}
+
+LgsByte* LgsType::asByte() {
+    return dynamic_cast<LgsByte*>(this);
+}
+
+LgsInt* LgsType::asInt() {
+    return dynamic_cast<LgsInt*>(this);
+}
+
+LgsShort* LgsType::asShort() {
+    return dynamic_cast<LgsShort*>(this);
+}
+
+LgsLong* LgsType::asLong() {
+    return dynamic_cast<LgsLong*>(this);
+}
+
+LgsSize* LgsType::asSize() {
+    return dynamic_cast<LgsSize*>(this);
+}
+
+LgsUInt* LgsType::asUInt() {
+    return dynamic_cast<LgsUInt*>(this);
+}
+
+LgsFloat* LgsType::asFloat() {
+    return dynamic_cast<LgsFloat*>(this);
+}
+
+LgsDouble* LgsType::asDouble() {
+    return dynamic_cast<LgsDouble*>(this);
+}
+
+LgsFuncType* LgsType::asFuncType() {
+    return dynamic_cast<LgsFuncType*>(this);
+}
+
+LgsObject* LgsType::asObject() {
+    return dynamic_cast<LgsObject*>(this);
+}
+
+LgsInterface* LgsType::asInterface() {
+    return dynamic_cast<LgsInterface*>(this);
+}
+
+LgsEnum* LgsType::asEnum() {
+    return dynamic_cast<LgsEnum*>(this);
+}
+
+LgsGenericType* LgsType::asGeneric() {
+    return dynamic_cast<LgsGenericType*>(this);
+}
+
+LgsIterable* LgsType::asIterable() {
+    return dynamic_cast<LgsIterable*>(this);
+}
+
+LgsSArray* LgsType::asSArray() {
+    return dynamic_cast<LgsSArray*>(this);
+}
+
+LgsDArray* LgsType::asDArray() {
+    return dynamic_cast<LgsDArray*>(this);
+}
+
+LgsSet* LgsType::asSet() {
+    return dynamic_cast<LgsSet*>(this);
+}
+
+LgsVec* LgsType::asVec() {
+    return dynamic_cast<LgsVec*>(this);
+}
+
+LgsPtr* LgsType::asPtr() {
+    return dynamic_cast<LgsPtr*>(this);
+}
+
+LgsMap* LgsType::asMap() {
+    return dynamic_cast<LgsMap*>(this);
+}
+
+LgsTypePair* LgsType::asPair() {
+    return dynamic_cast<LgsTypePair*>(this);
+}
+
+LgsSubType* LgsType::asSubtype() {
+    return dynamic_cast<LgsSubType*>(this);
+}
+
+LgsNullable* LgsType::asNullable() {
+    return dynamic_cast<LgsNullable*>(this);
 }
 
 LgsType::~LgsType() {

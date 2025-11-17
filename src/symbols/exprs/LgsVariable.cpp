@@ -89,12 +89,12 @@ void LgsVariable::setDebugValue(LgsLLVMGen& cg) {
         IRValue,
         var,
         cg.debugger.diBuilder->createExpression(),
-        getDebugLoc(cg),
+        cg.getDebugLoc(location),
         cg.builder.GetInsertBlock()
     );
 }
 
-LgsExpr* LgsVariable::cloneExpr() {
+LgsVariable* LgsVariable::clone() {
     const auto newVariable = new LgsVariable(*this);
     newVariable->ref = ref.clone();
     if (type) newVariable->type = type->clone();

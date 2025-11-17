@@ -116,6 +116,7 @@ public:
     void printInt(Value* number, const std::string& text = "");
 
     void finalizeDebugger(const std::filesystem::path& buildPath) const;
+    llvm::DILocation* getDebugLoc(const LgsLocation& location);
     static void initLLVM();
     static llvm::OptimizationLevel getOptLevel(uint8_t optLevel);
     ~LgsLLVMGen();

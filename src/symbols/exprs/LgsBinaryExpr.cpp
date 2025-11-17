@@ -12,7 +12,7 @@ std::string LgsBinaryExpr::asText() {
 }
 
 void LgsBinaryExpr::setDebugValue(LgsLLVMGen& cg) {
-    cg.builder.SetCurrentDebugLocation(getDebugLoc(cg));
+    cg.builder.SetCurrentDebugLocation(cg.getDebugLoc(location));
 }
 
 bool LgsBinaryExpr::equals(LgsExpr* other) {

@@ -2,14 +2,14 @@
 #include "stmts/LgsReturn.h"
 #include "utils/LgsUtils.h"
 
-LgsStmtsBlock* LgsStmtsBlock::clone() const {
+LgsStmtsBlock* LgsStmtsBlock::clone() {
     const auto cloned = new LgsStmtsBlock();
     cloned->location = location;
     cloned->stmts.reserve(stmts.size());
     for (const auto stmt : stmts) {
-        cloned->stmts.push_back(stmt->cloneStmt());
+        cloned->stmts.push_back(stmt->clone());
     }
-    cloned->returnStmt = returnStmt ? dynamic_cast<LgsReturn*>(returnStmt->cloneStmt()) : nullptr;
+    cloned->returnStmt = returnStmt ? dynamic_cast<LgsReturn*>(returnStmt->clone()) : nullptr;
     return cloned;
 }
 

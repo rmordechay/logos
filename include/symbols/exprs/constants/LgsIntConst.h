@@ -17,5 +17,5 @@ public:
     void hashNode(size_t& oldHash) override;
     Value* hashValue(LgsLLVMGen& cg) override;
     void setDebugValue(LgsLLVMGen& cg) override;
-    LgsExpr* cloneExpr() override;
+    LgsIntConst* clone() override;
 };

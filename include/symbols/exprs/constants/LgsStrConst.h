@@ -28,7 +28,7 @@ public:
     Value* hashValue(LgsLLVMGen& cg) override;
     void hashNode(size_t& oldHash) override;
     bool equals(LgsExpr* other) override;
-    LgsExpr* cloneExpr() override;
+    LgsStrConst* clone() override;
     void setDebugValue(LgsLLVMGen& cg) override;
     ~LgsStrConst() override;
 };

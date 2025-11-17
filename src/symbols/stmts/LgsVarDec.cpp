@@ -32,7 +32,7 @@ void LgsVarDec::setDebugValue(LgsLLVMGen& cg) {
         IRValue,
         var,
         cg.debugger.diBuilder->createExpression(),
-        getDebugLoc(cg),
+        cg.getDebugLoc(location),
         cg.builder.GetInsertBlock()
     );
 }
@@ -46,10 +46,10 @@ void LgsVarDec::hashNode(size_t& oldHash) {
     if (expr) expr->hashNode(oldHash);
 }
 
-LgsVarDec* LgsVarDec::cloneStmt() {
+LgsVarDec* LgsVarDec::clone() {
     const auto newVarDec = new LgsVarDec(*this);
     newVarDec->type = type->clone();
-    newVarDec->expr = expr->cloneExpr();
+    newVarDec->expr = expr->clone();
     return newVarDec;
 }
 
