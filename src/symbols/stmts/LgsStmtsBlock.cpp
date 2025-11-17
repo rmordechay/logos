@@ -7,7 +7,14 @@ LgsStmtsBlock* LgsStmtsBlock::clone() {
     cloned->location = location;
     cloned->stmts.reserve(stmts.size());
     for (const auto stmt : stmts) {
-        cloned->stmts.push_back(stmt->clone());
+        switch (stmt.type) {
+        case LgsObjOrStmt::Type::Object:
+            cloned->stmts.push_back(LgsObjOrStmt(stmt.obj->clone()));
+            break;
+        case LgsObjOrStmt::Type::Stmt:
+            cloned->stmts.push_back(LgsObjOrStmt(stmt.stmt->clone()));
+            break;
+        }
     }
     cloned->returnStmt = returnStmt ? dynamic_cast<LgsReturn*>(returnStmt->clone()) : nullptr;
     return cloned;
@@ -15,13 +22,20 @@ LgsStmtsBlock* LgsStmtsBlock::clone() {
 
 void LgsStmtsBlock::hashNode(size_t& oldHash) {
     for (const auto stmt : stmts) {
-        stmt->hashNode(oldHash);
+        stmt.stmt->hashNode(oldHash);
     }
 }
 
 LgsStmtsBlock::~LgsStmtsBlock() {
     for (const auto& stmt : stmts) {
-        freeStmt(stmt);
+        switch (stmt.type) {
+        case LgsObjOrStmt::Type::Object:
+            freeType(stmt.obj);
+            break;
+        case LgsObjOrStmt::Type::Stmt:
+            freeStmt(stmt.stmt);
+            break;
+        }
     }
     stmts.clear();
 }

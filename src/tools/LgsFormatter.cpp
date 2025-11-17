@@ -144,7 +144,7 @@ void LgsFormatter::formatStmtsBlock(const LgsStmtsBlock* stmtsBlock) {
     indentLevel++;
     for (const auto stmt : stmtsBlock->stmts) {
         newLine(true);
-        formatStmt(stmt);
+        formatStmt(stmt.stmt);
     }
     newLine();
     indentLevel--;

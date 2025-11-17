@@ -790,7 +790,9 @@ LgsStmtsBlock* LgsParser::parseStmtsBlock(const bool withSingleStmt) {
         if (!matchAndConsume(T_RBRACE)) {
             while (true) {
                 if (const auto stmt = parseStmt()) {
-                    stmtsBlock->stmts.push_back(stmt);
+                    stmtsBlock->stmts.push_back(LgsObjOrStmt(stmt));
+                } else if (const auto obj = parseObject()) {
+                    stmtsBlock->stmts.push_back(LgsObjOrStmt(obj));
                 } else {
                     break;
                 }
@@ -802,7 +804,7 @@ LgsStmtsBlock* LgsParser::parseStmtsBlock(const bool withSingleStmt) {
         if (const auto stmt = parseStmt()) {
             stmtsBlock = new LgsStmtsBlock();
             stmtsBlock->location = stmt->location;
-            stmtsBlock->stmts.push_back(stmt);
+            stmtsBlock->stmts.push_back(LgsObjOrStmt(stmt));
             stmtsBlock->location = stmt->location;
         }
     }

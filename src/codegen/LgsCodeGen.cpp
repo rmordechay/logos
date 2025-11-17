@@ -218,8 +218,17 @@ void LgsCodeGen::visitStmt(LgsStmt* stmt) {
 void LgsCodeGen::visitStmtsBlock(const LgsStmtsBlock* stmtsBlock) {
     assert(stmtsBlock);
     if (appConfigs.debugMode) cg.debugger.blocks.push_back(cg.debugger.subprogram);
-    for (const auto stmt : stmtsBlock->stmts) {
-        visitStmt(stmt);
+    for (const auto& stmt : stmtsBlock->stmts) {
+        switch (stmt.type) {
+        case LgsObjOrStmt::Type::Object:
+            visitObject(stmt.obj);
+            break;
+        case LgsObjOrStmt::Type::Stmt:
+            visitStmt(stmt.stmt);
+             break;
+        default:
+            assert(0);
+        }
     }
     if (appConfigs.debugMode) cg.debugger.blocks.pop_back();
 }

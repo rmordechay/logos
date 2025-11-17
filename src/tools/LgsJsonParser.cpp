@@ -203,7 +203,7 @@ void LgsJsonParser::parseStmtsBlock(const LgsStmtsBlock* stmtsBlock) {
     if (stmtsBlock) {
         for (size_t i = 0; i < stmtsBlock->stmts.size(); ++i) {
             if (i > 0) addComma();
-            parseStmt(stmtsBlock->stmts[i]);
+            parseStmt(stmtsBlock->stmts[i].stmt);
         }
     }
     closeArray();

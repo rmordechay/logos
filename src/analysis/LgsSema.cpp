@@ -200,11 +200,11 @@ void LgsSema::visitLambda(LgsFunc* lambda) {
     const auto stmtsBlock = lambda->stmtsBlock;
     // Wraps in return if it's the last statement
     if (!stmtsBlock->stmts.empty() && !lambda->funcType->rt->isVoid()) {
-        const auto expr = stmtsBlock->stmts.back()->asExpr();
+        const auto expr = stmtsBlock->stmts.back().stmt->asExpr();
         if (expr) {
             const auto returnStmt = new LgsReturn(expr);
             returnStmt->location = expr->location;
-            stmtsBlock->stmts[0] = returnStmt;
+            stmtsBlock->stmts[0].stmt = returnStmt;
         }
     }
     visitFunc(lambda);
@@ -256,14 +256,22 @@ void LgsSema::visitStmt(LgsStmt* stmt) {
 void LgsSema::visitStmtsBlock(LgsStmtsBlock* stmtsBlock) {
     if (!stmtsBlock || stmtsBlock->stmts.empty()) return;
     for (const auto& stmt : stmtsBlock->stmts) {
-        visitStmt(stmt);
+        switch (stmt.type) {
+        case LgsObjOrStmt::Type::Object:
+            visitObject(stmt.obj);
+            addLocalSymbol(LgsSymbol(stmt.obj));
+            break;
+        case LgsObjOrStmt::Type::Stmt:
+            visitStmt(stmt.stmt);
+            break;
+        }
     }
     if (stmtsBlock->stmts.empty()) return;
     const auto lastStmt = stmtsBlock->stmts[stmtsBlock->stmts.size() - 1];
-    stmtsBlock->returnStmt = lastStmt->asReturn();
+    stmtsBlock->returnStmt = lastStmt.stmt->asReturn();
     for (size_t i = 0; i < stmtsBlock->stmts.size() - 1; ++i) {
-        if (stmtsBlock->stmts[i]->isTerminator()) {
-            return addError(E10059, lastStmt->location);
+        if (stmtsBlock->stmts[i].stmt->isTerminator()) {
+            return addError(E10059, lastStmt.stmt->location);
         }
     }
 }
@@ -1397,15 +1405,16 @@ bool LgsSema::validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const Lgs
     if (stmtBlock->returnStmt) return true;
     auto isValid = false;
     for (const auto stmt : stmtBlock->stmts) {
-        if (const auto ifStmt = stmt->asIfStmt()) {
+        if (stmt.type == LgsObjOrStmt::Type::Object) continue;
+        if (const auto ifStmt = stmt.stmt->asIfStmt()) {
             isValid = validateBlockControlFlow(ifStmt->ifBlock, func);
             for (const auto [_, elseIfStmt] : ifStmt->elseIfs) {
                 isValid = isValid && validateBlockControlFlow(elseIfStmt, func);
             }
             isValid = isValid && validateBlockControlFlow(ifStmt->elseBlock, func);
-        } else if (const auto loop = stmt->asLoop()) {
+        } else if (const auto loop = stmt.stmt->asLoop()) {
             isValid = isValid && validateBlockControlFlow(loop->stmtsBlock, func);
-        } else if (const auto switch_ = stmt->asIfStmt()) {
+        } else if (const auto switch_ = stmt.stmt->asIfStmt()) {
             for (const auto [_, patternsStmtBlock] : switch_->elseIfs) {
                 isValid = isValid && validateBlockControlFlow(patternsStmtBlock, func);
             }
