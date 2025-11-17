@@ -48,7 +48,7 @@ public:
     Value* callIR(LgsLLVMGen& cg, const std::vector<Value*>& args = {});
     Value* loadIR(LgsLLVMGen& cg) override;
     Value* castIR(LgsLLVMGen& cg, LgsType* toType) override;
-    void completeType(LgsType* toType) override;
+    void castImplicitly(LgsType* toType) override;
     bool needsCleanup() const;
     std::string asText() override;
     LgsFunc* clone() override;

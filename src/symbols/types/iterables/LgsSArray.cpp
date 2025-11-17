@@ -39,6 +39,7 @@ LgsExpr* LgsSArray::getZeroValue() {
 }
 
 Lgs_TypeKind LgsSArray::getRTTypeKind() {
+    if (baseType->asChar()) return RTT_STR;
     return RTT_SARRAY;
 }
 

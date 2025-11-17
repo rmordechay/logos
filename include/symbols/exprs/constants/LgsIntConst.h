@@ -10,7 +10,7 @@ public:
         isValueKnown = true;
     }
     Value* loadIR(LgsLLVMGen& cg) override;
-    LgsExpr* staticCast(LgsType* toType, bool explicitCast = false) override;
+    LgsExpr* castExplicitly(LgsType* toType) override;
     Value* castIR(LgsLLVMGen& cg, LgsType* toType) override;
     std::string asText() override;
     bool equals(LgsExpr* other) override;

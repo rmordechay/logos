@@ -9,7 +9,7 @@ public:
         isMutable = false;
     }
 
-    void completeType(LgsType* toType) override;
+    void castImplicitly(LgsType* toType) override;
     std::string asText() override;
     bool equals(LgsExpr* other) override;
     ~LgsNull() override;

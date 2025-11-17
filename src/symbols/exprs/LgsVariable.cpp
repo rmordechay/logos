@@ -32,9 +32,8 @@ bool LgsVariable::equals(LgsExpr* other) {
     assert(0);
 }
 
-LgsExpr* LgsVariable::staticCast(LgsType* toType, const bool explicitCast) {
-    if (explicitCast) return nullptr;
-    return this;
+LgsExpr* LgsVariable::castExplicitly(LgsType* toType) {
+    assert(0);
 }
 
 Value* LgsVariable::castIR(LgsLLVMGen& cg, LgsType* toType) {

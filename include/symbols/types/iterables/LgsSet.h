@@ -5,7 +5,7 @@ using llvm::StructType;
 
 class LgsSet final : public LgsIterable {
 public:
-    static constexpr auto name = "set";
+    static constexpr auto name = "Set";
     StructType* arrStruct = nullptr;
 
     explicit LgsSet(LgsType* baseType = nullptr) : LgsIterable(baseType) {

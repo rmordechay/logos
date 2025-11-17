@@ -15,8 +15,9 @@ Value* LgsArrayExpr::castIR(LgsLLVMGen& cg, LgsType* toType) {
     assert(0);
 }
 
-void LgsArrayExpr::completeType(LgsType* toType) {
-    if (type && type->asDArray() && toType->asSArray()) {
+void LgsArrayExpr::castImplicitly(LgsType* toType) {
+    if (!type) return;
+    if (type->asDArray() && (toType->asSArray() || toType->asSet())) {
         freeType(type);
         setType(toType);
     }
@@ -34,11 +35,7 @@ void LgsArrayExpr::completeType(LgsType* toType) {
         }
         if (element->type->equals(otherBaseType)) continue;
         if (!element->type->canCastTo(otherBaseType)) continue;
-        const auto castTo = element->staticCast(otherBaseType);
-        if (element != castTo) {
-            freeExpr(element);
-        }
-        elements[i] = castTo;
+        elements[i] = element;
     }
     type->asIterable()->baseType = otherBaseType;
 }

@@ -82,7 +82,7 @@ public:
     void visitStmt(LgsStmt* stmt);
     void visitStmtsBlock(LgsStmtsBlock* stmtsBlock);
     void visitVarDec(LgsVarDec* varDec);
-    void visitAssignment(LgsAssignment* assignment);
+    void visitAssignment(const LgsAssignment* assignment);
     void visitIfStmt(LgsIfStmt* ifStmt);
     void visitSwitch(LgsSwitch* switchStmt);
     void visitWhileLoop(LgsWhileLoop* whileLoop);

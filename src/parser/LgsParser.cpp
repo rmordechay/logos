@@ -745,7 +745,7 @@ void LgsParser::parseParams(LgsFuncType* funcType) {
         const auto type = parseType();
         mustParse(type);
         LgsParam param(type, paramName.lexeme);
-        param.index = paramIndex;
+        param.index = paramIndex++;
         setLocation(param.location, &paramName);
         if (matchAndConsume(T_TRIPLE_DOT)) {
             if (funcType->isVariadic) addParsingError();
@@ -759,7 +759,6 @@ void LgsParser::parseParams(LgsFuncType* funcType) {
             mustParse(param.expr);
             funcType->hasDefaults = true;
         }
-        paramIndex++;
         funcType->params.push_back(param);
         if (currentToken.type == T_RPAREN) break;
         mustMatch(T_COMMA);
@@ -1589,7 +1588,7 @@ LgsHashMap* LgsParser::parseHashMap() {
 
     auto const hashMap = new LgsHashMap();
     setLocation(hashMap->location, &tokens[oldIndex]);
-    hashMap->pairs = pairs;
+    hashMap->elements = pairs;
     return hashMap;
 }
 

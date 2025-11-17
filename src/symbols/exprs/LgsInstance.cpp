@@ -10,7 +10,7 @@ std::string LgsInstance::asText() {
     return name + "{}";
 }
 
-LgsExpr* LgsInstance::staticCast(LgsType* toType, bool explicitCast) {
+LgsExpr* LgsInstance::castExplicitly(LgsType* toType) {
     assert(0);
 }
 

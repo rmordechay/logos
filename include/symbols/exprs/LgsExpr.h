@@ -41,10 +41,10 @@ public:
     Value* destPtrValue = nullptr;
 
     explicit LgsExpr(LgsType* type = nullptr) : type(type) {}
-    virtual LgsExpr* staticCast(LgsType* toType, bool explicitCast = false);
+    virtual LgsExpr* castExplicitly(LgsType* toType);
+    virtual void castImplicitly(LgsType* toType);
     virtual Value* castIR(LgsLLVMGen& cg, LgsType* toType);
     virtual Value* hashValue(LgsLLVMGen& cg);
-    virtual void completeType(LgsType* toType);
     virtual void assign(LgsLLVMGen& cg, LgsExpr* expr);
     virtual bool equals(LgsExpr* other);
     virtual std::string asText() = 0;

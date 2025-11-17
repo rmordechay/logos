@@ -2,7 +2,7 @@
 
 #include "utils/LgsUtils.h"
 
-void LgsHashMap::completeType(LgsType* toType) {
+void LgsHashMap::castImplicitly(LgsType* toType) {
     if (!toType->asMap()) return;
     if (!type) {
         setType(toType);
@@ -18,10 +18,10 @@ std::string LgsHashMap::asText() {
 }
 
 LgsHashMap::~LgsHashMap() {
-    for (const auto initialElement : pairs) {
+    for (const auto initialElement : elements) {
         freeExpr(initialElement.key);
         freeExpr(initialElement.value);
     }
-    pairs.clear();
+    elements.clear();
 }
 

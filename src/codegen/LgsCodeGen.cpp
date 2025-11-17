@@ -747,12 +747,17 @@ void LgsCodeGen::visitArrayExpr(LgsArrayExpr* array) {
 
 void LgsCodeGen::visitHashMap(LgsHashMap* hashMap) {
     const auto map = hashMap->type->asMap();
+    const auto keyType = map->typePair->key;
     const auto valueType = map->typePair->value;
     const auto elementSize = cg.usize(valueType->sizeBytes());
     hashMap->IRValue = cg.callAllocate(map->sizeBytes(), hashMap->owner, hashMap->type->getRTTypeKind());
-    LgsFunc initFunc("init", &LGS_VOID, {map, &LGS_LONG}, BUILTIN | METHOD);
-    initFunc.callIR(cg, {getIRValue(hashMap), elementSize});
-    for (const auto [key, value] : hashMap->pairs) {
+    cg.callLgsFunc("Map_init", cg.voidTy(), {cg.ptrTy(), cg.sizeTy(), cg.i32Ty(), cg.i32Ty()}, {
+        hashMap->IRValue,
+        elementSize,
+        cg.i32(keyType->getRTTypeKind()),
+        cg.i32(valueType->getRTTypeKind()),
+    });
+    for (const auto [key, value] : hashMap->elements) {
         visitExpr(key);
         visitExpr(value);
         map->getAddFunc()->callIR(cg, {hashMap->IRValue, key->IRValue, value->IRValue});

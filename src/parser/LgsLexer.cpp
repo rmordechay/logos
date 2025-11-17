@@ -66,7 +66,7 @@ LgsToken LgsLexer::nextToken() {
     }
 
     // String
-    if (currentChar == '"' && peek() == '"') {
+    if (currentChar == '"' && peek() == '"' && peek(2) == '"') {
         return {T_STRING, scanMultilineString(), location};
     }
     if (currentChar == '"') {
@@ -263,9 +263,11 @@ std::string LgsLexer::scanSingleQuotesString() {
 std::string LgsLexer::scanMultilineString() {
     advance();
     advance();
+    advance();
     std::string result;
     while (currentChar != '\0') {
-        if (currentChar == '"' && peek() == '"') {
+        if (currentChar == '"' && peek() == '"' && peek(2) == '"') {
+            advance();
             advance();
             advance();
             break;

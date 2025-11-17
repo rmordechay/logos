@@ -3,11 +3,11 @@
 
 class LgsHashMap final : public LgsExpr {
 public:
-    std::vector<LgsPair> pairs;
+    std::vector<LgsPair> elements;
 
     LgsHashMap() = default;
     explicit LgsHashMap(LgsMap* mapType) : LgsExpr(mapType) {}
-    void completeType(LgsType* toType) override;
+    void castImplicitly(LgsType* toType) override;
     bool equals(LgsExpr* other) override;
     std::string asText() override;
     ~LgsHashMap() override;

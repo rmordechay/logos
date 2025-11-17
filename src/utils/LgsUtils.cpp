@@ -232,5 +232,5 @@ void freeParams(std::vector<LgsParam>& params) {
 void freeType(LgsType* type) {
     if (!type) return;
     if (type->isPrimitive) return;
-    delete type;
+    // delete type;
 }

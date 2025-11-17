@@ -47,4 +47,10 @@ iter() {
     for i in set {
         print(i)
     }
+
+    map2: {Str: {Str: {Str: Int[]}}}
+    map2["Roi"] := {"Roi1": {"Roi2": [1, 2]}}
+    for i in map2["Roi"]["Roi1"]["Roi2"] {
+        print(i)
+    }
 }

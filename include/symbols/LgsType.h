@@ -153,6 +153,5 @@ public:
     LgsTypePair* asPair();
     LgsSubType* asSubtype();
     LgsNullable* asNullable();
-
     virtual ~LgsType();
 };

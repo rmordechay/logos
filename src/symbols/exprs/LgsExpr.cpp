@@ -19,16 +19,16 @@
 #include "funcs/LgsFunc.h"
 #include "loops/LgsMetaVar.h"
 
-LgsExpr* LgsExpr::staticCast(LgsType* toType, const bool explicitCast) {
+LgsExpr* LgsExpr::castExplicitly(LgsType* toType) {
     assert(0);
+}
+
+void LgsExpr::castImplicitly(LgsType* toType) {
+
 }
 
 Value* LgsExpr::castIR(LgsLLVMGen& cg, LgsType* toType) {
     assert(0);
-}
-
-void LgsExpr::completeType(LgsType* toType) {
-
 }
 
 Value* LgsExpr::hashValue(LgsLLVMGen& cg) {
@@ -39,7 +39,7 @@ void LgsExpr::assign(LgsLLVMGen& cg, LgsExpr* expr) {
     assert(0);
 }
 
-LgsExpr* LgsExpr::clone() {
+bool LgsExpr::equals(LgsExpr* other) {
     assert(0);
 }
 
@@ -106,10 +106,6 @@ void LgsExpr::setType(LgsType* newType) {
     type = newType;
 }
 
-
-bool LgsExpr::equals(LgsExpr* other) {
-    assert(0);
-}
 
 // Casting
 LgsNull* LgsExpr::asNull() {
@@ -186,4 +182,8 @@ LgsMetaVar* LgsExpr::asLoopMetaVar() {
 
 LgsBinaryExpr* LgsExpr::asBinExpr() {
     return dynamic_cast<LgsBinaryExpr*>(this);
+}
+
+LgsExpr* LgsExpr::clone() {
+    assert(0);
 }

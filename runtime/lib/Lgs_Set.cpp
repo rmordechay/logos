@@ -5,7 +5,7 @@
 #include <cstdlib>
 #include <cstring>
 
-extern "C" void Lgs_set_init(Lgs_Set* set, const size_t elementSize, const Lgs_TypeKind baseType) {
+extern "C" void Lgs_Set_init(Lgs_Set* set, const size_t elementSize, const Lgs_TypeKind baseType) {
     assert(baseType != RTT_UNKNOWN);
     set->elementSize = elementSize;
     set->baseType = baseType;
@@ -14,7 +14,7 @@ extern "C" void Lgs_set_init(Lgs_Set* set, const size_t elementSize, const Lgs_T
     set->size = 0;
 }
 
-extern "C" void Lgs_set_reserve(Lgs_Set* set, const size_t numElements) {
+extern "C" void Lgs_Set_reserve(Lgs_Set* set, const size_t numElements) {
     const auto newCapacity = numElements * set->elementSize;
     if (newCapacity <= set->capacity) return;
     set->data = static_cast<char*>(std::realloc(set->data, newCapacity));
@@ -31,7 +31,7 @@ static bool elementsEqual(const void* elem1, const void* elem2, const size_t ele
     return std::memcmp(elem1, elem2, elementSize) == 0;
 }
 
-extern "C" bool Lgs_set_add(Lgs_Set* set, const void* value) {
+extern "C" bool Lgs_Set_add(Lgs_Set* set, const void* value) {
     const size_t len = set->size / set->elementSize;
     const char* base = set->data;
     for (size_t i = 0; i < len; ++i) {
@@ -46,7 +46,7 @@ extern "C" bool Lgs_set_add(Lgs_Set* set, const void* value) {
     return true;
 }
 
-extern "C" bool Lgs_set_contains(const Lgs_Set* set, const void* value) {
+extern "C" bool Lgs_Set_contains(const Lgs_Set* set, const void* value) {
     if (set->size == 0) return false;
     const size_t len = set->size / set->elementSize;
     const char* base = set->data;
@@ -59,7 +59,7 @@ extern "C" bool Lgs_set_contains(const Lgs_Set* set, const void* value) {
     return false;
 }
 
-extern "C" bool Lgs_set_remove(Lgs_Set* set, const void* value) {
+extern "C" bool Lgs_Set_remove(Lgs_Set* set, const void* value) {
     assert(set);
     if (set->size == 0) return false;
     const size_t len = set->size / set->elementSize;
@@ -79,25 +79,25 @@ extern "C" bool Lgs_set_remove(Lgs_Set* set, const void* value) {
     return false;
 }
 
-extern "C" void* Lgs_set_get(const Lgs_Set* set, const size_t index) {
+extern "C" void* Lgs_Set_get(const Lgs_Set* set, const size_t index) {
     if (!set || set->size == 0) return nullptr;
     const auto len = set->size / set->elementSize;
     if (index >= len) return nullptr;
     return set->data + index * set->elementSize;
 }
 
-extern "C" size_t Lgs_set_len(const Lgs_Set* set) {
+extern "C" size_t Lgs_Set_len(const Lgs_Set* set) {
     return set->size / set->elementSize;
 }
 
-extern "C" bool Lgs_set_isEmpty(const Lgs_Set* set) {
+extern "C" bool Lgs_Set_isEmpty(const Lgs_Set* set) {
     return set->size == 0;
 }
 
-extern "C" bool Lgs_set_isNotEmpty(const Lgs_Set* set) {
+extern "C" bool Lgs_Set_isNotEmpty(const Lgs_Set* set) {
     return set->size != 0;
 }
 
-extern "C" void Lgs_set_clear(Lgs_Set* set) {
+extern "C" void Lgs_Set_clear(Lgs_Set* set) {
     set->size = 0;
 }

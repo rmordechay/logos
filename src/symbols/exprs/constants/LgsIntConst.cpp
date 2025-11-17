@@ -12,7 +12,7 @@ Value* LgsIntConst::loadIR(LgsLLVMGen& cg) {
     return IRValue;
 }
 
-LgsExpr* LgsIntConst::staticCast(LgsType* toType, const bool explicitCast) {
+LgsExpr* LgsIntConst::castExplicitly(LgsType* toType) {
     if (type->getName() == toType->getName()) return this;
     if (toType->getName() == LgsAny::name) return this;
     const auto thisSize = type->sizeBytes();
@@ -26,7 +26,7 @@ LgsExpr* LgsIntConst::staticCast(LgsType* toType, const bool explicitCast) {
     }
     if (toType->asFloat()) return new LgsFloatConst(&LGS_FLOAT, value);
     if (toType->asDouble()) return new LgsFloatConst(&LGS_DOUBLE, value);
-    if (explicitCast && toType->asStr()) return new LgsStrConst(std::to_string(value));
+    if (toType->asStr()) return new LgsStrConst(std::to_string(value));
     return nullptr;
 }
 

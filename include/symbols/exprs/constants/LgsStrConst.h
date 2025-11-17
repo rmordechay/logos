@@ -21,7 +21,7 @@ public:
             setType(lgsStr);
         }
     }
-    LgsExpr* staticCast(LgsType* toType, bool explicitCast) override;
+    LgsExpr* castExplicitly(LgsType* toType) override;
     Value* castIR(LgsLLVMGen& cg, LgsType* toType) override;
     Value* loadIR(LgsLLVMGen& cg) override;
     std::string asText() override;

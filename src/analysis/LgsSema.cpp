@@ -213,7 +213,7 @@ void LgsSema::visitLambda(LgsFunc* lambda) {
 void LgsSema::visitParam(LgsParam* param) {
     validateLocalName(param->name, &param->location);
     if (param->expr) {
-        param->expr->completeType(param->type);
+        param->expr->castImplicitly(param->type);
         visitExpr(param->expr);
         validateExprType(param->expr, param->type);
     } else if (param->isVariadic) {
@@ -276,7 +276,7 @@ void LgsSema::visitVarDec(LgsVarDec* varDec) {
             varDec->expr->owner = varDec;
         }
         varDec->setType(typeResolver.resolveType(varDec->type, file));
-        varDec->expr->completeType(varDec->type);
+        varDec->expr->castImplicitly(varDec->type);
         visitExpr(varDec->expr);
         validateExprType(varDec->expr, varDec->type);
         if (varDec->type != varDec->expr->type) {
@@ -310,19 +310,20 @@ void LgsSema::visitVarDec(LgsVarDec* varDec) {
     addHeapExpr(varDec->expr);
 }
 
-void LgsSema::visitAssignment(LgsAssignment* assignment) {
-    visitExpr(assignment->lValue);
-    assignment->rValue->completeType(assignment->lValue->type);
-    visitExpr(assignment->rValue);
-    if (!validateExprType(assignment->rValue, assignment->lValue->type)) return;
-    if (!assignment->lValue->type || !assignment->rValue->type) return;
-    if (!assignment->lValue->isMutable) {
-        return addError(E10051, assignment->lValue->location, {assignment->lValue->asText()});
-    }
+void LgsSema::visitAssignment(const LgsAssignment* assignment) {
+    auto l = assignment->lValue;
+    auto r = assignment->rValue;
+    visitExpr(l);
+    visitExpr(r);
+    r->castImplicitly(l->type);
+    if (!validateExprType(r, l->type)) return;
+    if (!l->type || !r->type) return;
+    if (!l->isMutable) return addError(E10051, l->location, {l->asText()});
+
     auto canAssign = false;
-    if (assignment->lValue->asIterIndex() || assignment->lValue->asVariable() || assignment->lValue->asNull()) {
+    if (l->asIterIndex() || l->asVariable() || l->asNull()) {
         canAssign = true;
-    } else if (const auto selection = assignment->lValue->asSelection()) {
+    } else if (const auto selection = l->asSelection()) {
         const auto firstExpr = selection->exprs.front();
         const auto obj = firstExpr->type->asObject();
         if (obj && !obj->singleton && firstExpr->asTypeExpr()) {
@@ -332,7 +333,7 @@ void LgsSema::visitAssignment(LgsAssignment* assignment) {
         canAssign = true;
     }
     if (!canAssign) {
-        return addError(E10012, assignment->lValue->location, {assignment->lValue->asText(), assignment->getAssignTypeStr(), assignment->rValue->type->pname()});
+        return addError(E10012, l->location, {l->asText(), assignment->getAssignTypeStr(), r->type->pname()});
     }
 }
 
@@ -663,7 +664,7 @@ void LgsSema::visitCast(LgsCast* cast) {
     visitExpr(cast->fromValue);
     if (!cast->fromValue->type) return;
     cast->toType = typeResolver.resolveType(cast->toType, file);
-    cast->value = cast->fromValue->staticCast(cast->toType, true);
+    cast->value = cast->fromValue->castExplicitly(cast->toType);
     if (!cast->value) {
         addError(E10018, cast->location, {cast->fromValue->asText(), cast->toType->pname()});
         return;
@@ -713,15 +714,15 @@ void LgsSema::visitDynamicArray(LgsArrayExpr* arrayExpr) {
 }
 
 void LgsSema::visitHashMap(LgsHashMap* hashMap) {
-    for (auto [key, value] : hashMap->pairs) {
+    for (auto [key, value] : hashMap->elements) {
         visitExpr(key);
         visitExpr(value);
     }
     if (hashMap->type) return;
-    if (hashMap->pairs.empty()) {
+    if (hashMap->elements.empty()) {
         return addError(E10049, hashMap->location, {LgsMap::name});
     }
-    const auto [key, value] = hashMap->pairs.front();
+    const auto [key, value] = hashMap->elements.front();
     hashMap->setType(new LgsMap(key->type, value->type));
 }
 
@@ -975,7 +976,7 @@ void LgsSema::visitFuncArgs(LgsFuncCall* funcCall, LgsFuncType* ft) {
                 continue;
             }
             const auto param = paramsByName[arg.name];
-            arg.expr->completeType(param->type);
+            arg.expr->castImplicitly(param->type);
             visitExpr(arg.expr);
             if (arg.name == "") {
                 addError(E10096, funcCall->location);
@@ -987,7 +988,7 @@ void LgsSema::visitFuncArgs(LgsFuncCall* funcCall, LgsFuncType* ft) {
             if (i >= funcCall->args.size()) break;
             auto& arg = funcCall->args[i];
             const auto& param = ft->params[i];
-            arg.expr->completeType(param.type);
+            arg.expr->castImplicitly(param.type);
             visitExpr(arg.expr);
             if (arg.name != "") {
                 addError(E10096, funcCall->location);

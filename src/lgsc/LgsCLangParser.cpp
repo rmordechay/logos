@@ -33,7 +33,8 @@ bool LgsCLangParser::VisitFunctionDecl(const clang::FunctionDecl* func) {
     for (size_t i = 0; i < func->getNumParams(); ++i) {
         const auto paramDecl = func->getParamDecl(i);
         const auto paramType = paramDecl->getType();
-        const auto lgsParam = LgsParam(mapCType(paramType), paramDecl->getName().str());
+        auto lgsParam = LgsParam(mapCType(paramType), paramDecl->getName().str());
+        lgsParam.index = i;
         funcImpl->funcType->params.push_back(lgsParam);
     }
     funcImpl->funcType->isVariadic = func->isVariadic();
@@ -82,8 +83,8 @@ LgsType* LgsCLangParser::mapCType(const clang::QualType type) {
         if (pointee->isElaboratedTypeSpecifier()) {
             return new LgsPtr(new LgsVoid());
         }
-        if (std::string(pointee->getTypeClassName()) == "Elaborated") return nullptr;
-        if (std::string(pointee->getTypeClassName()) == "Paren") return nullptr;
+        if (std::string(pointee->getTypeClassName()) == "Elaborated") return new LgsPtr(new LgsVoid());;
+        if (std::string(pointee->getTypeClassName()) == "Paren") return new LgsPtr(new LgsVoid());;
         return new LgsPtr(mapCType(pointee));
     }
     if (type->isSpecificBuiltinType(clang::BuiltinType::Bool)) {

@@ -3,12 +3,12 @@
 #include "types/LgsSubType.h"
 #include "utils/LgsUtils.h"
 
-LgsExpr* LgsStrConst::staticCast(LgsType* toType, const bool explicitCast) {
+LgsExpr* LgsStrConst::castExplicitly(LgsType* toType) {
     const auto thisName = type->getName();
     const auto otherName = toType->getName();
     if (otherName == LgsAny::name) return this;
     if (const auto subtype = toType->asSubtype()) {
-        if (explicitCast && subtype->subtype->getName() == thisName) {
+        if (subtype->subtype->getName() == thisName) {
             freeType(type);
             setType(subtype);
             return this;

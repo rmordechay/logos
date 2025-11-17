@@ -134,9 +134,7 @@ std::string LgsMap::strFormatPart() const {
 }
 
 LgsType* LgsMap::clone() {
-    const auto map = new LgsMap(*this);
-    map->typePair = static_cast<LgsTypePair*>(typePair->clone());
-    return map;
+    return new LgsMap(typePair->key->clone(), typePair->value->clone());
 }
 
 LgsMap::~LgsMap() {

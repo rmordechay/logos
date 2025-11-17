@@ -19,7 +19,7 @@ public:
     explicit LgsInstance(const std::string& name): name(name) {}
     explicit LgsInstance(LgsObject* obj) : LgsExpr(obj), name(obj->name), obj(obj) {}
     std::string asText() override;
-    LgsExpr* staticCast(LgsType* toType, bool explicitCast) override;
+    LgsExpr* castExplicitly(LgsType* toType) override;
     Value* castIR(LgsLLVMGen& cg, LgsType* toType) override;
     Value* loadIR(LgsLLVMGen& cg) override;
     void hashNode(size_t& oldHash) override;

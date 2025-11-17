@@ -135,7 +135,7 @@ Value* LgsFunc::castIR(LgsLLVMGen& cg, LgsType* toType) {
     return IRValue;
 }
 
-void LgsFunc::completeType(LgsType* toType) {
+void LgsFunc::castImplicitly(LgsType* toType) {
     const auto otherFuncType = toType->asFuncType();
     if (!otherFuncType) return;
     for (size_t i = 0; i < funcType->params.size(); ++i) {

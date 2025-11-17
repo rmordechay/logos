@@ -30,7 +30,7 @@ std::string LgsSet::getName() {
 }
 
 std::string LgsSet::pname() {
-    return baseType->pname() + "{}";
+    return std::string(name) + "<" + (genericArgs.empty() ? "" : genericArgs.front()->pname()) + ">";
 }
 
 bool LgsSet::canCastTo(LgsType* other) {

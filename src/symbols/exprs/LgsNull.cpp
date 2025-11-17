@@ -4,7 +4,7 @@
 #include "utils/LgsUtils.h"
 #include <llvm/IR/Module.h>
 
-void LgsNull::completeType(LgsType* toType) {
+void LgsNull::castImplicitly(LgsType* toType) {
     const auto otherNullable = toType->asNullable();
     if (!otherNullable) return;
     type->asNullable()->baseType = otherNullable->baseType;
