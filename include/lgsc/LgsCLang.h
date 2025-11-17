@@ -18,5 +18,15 @@ public:
     fs::path cLibHeadersDir;
 
     explicit LgsCLang(const fs::path& cLibHeadersDir): cLibHeadersDir(cLibHeadersDir) {}
-    bool parseFile(LgsCLangParser& parser, const std::string& cCode);
+    bool parseFile(LgsCLangParser& parser, const std::string& cCode) const;
+};
+
+
+class LgsPPCallbacks final : public clang::PPCallbacks {
+public:
+    clang::LangOptions &LangOpts;
+    clang::SourceManager& sourceManager;
+
+    LgsPPCallbacks(clang::LangOptions& langOpts, clang::SourceManager& sourceManager): LangOpts(langOpts), sourceManager(sourceManager) {}
+    void MacroDefined(const clang::Token &macroNameToken, const clang::MacroDirective *macroDirective) override;
 };

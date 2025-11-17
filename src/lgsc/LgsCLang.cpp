@@ -17,7 +17,7 @@
 
 using namespace clang;
 
-bool LgsCLang::parseFile(LgsCLangParser& parser, const std::string& cCode) {
+bool LgsCLang::parseFile(LgsCLangParser& parser, const std::string& cCode) const {
     CompilerInstance compiler;
     auto diagConsumer = std::make_unique<LgsDiagnosticConsumer>();
     compiler.createDiagnostics(diagConsumer.release());
@@ -31,14 +31,30 @@ bool LgsCLang::parseFile(LgsCLangParser& parser, const std::string& cCode) {
     auto buffer = llvm::MemoryBuffer::getMemBuffer(cCode);
     const auto fileID = compiler.getSourceManager().createFileID(std::move(buffer));
     compiler.getSourceManager().setMainFileID(fileID);
-
-    compiler.getPreprocessorOpts().UsePredefines = true;
     compiler.createPreprocessor(TU_Complete);
+    compiler.getPreprocessorOpts().UsePredefines = true;
+    compiler.getPreprocessor().addPPCallbacks(std::make_unique<LgsPPCallbacks>(compiler.getLangOpts(), compiler.getSourceManager()));
     compiler.createASTContext();
     if (compiler.getDiagnostics().hasErrorOccurred()) return false;
     ParseAST(compiler.getPreprocessor(), &parser, compiler.getASTContext());
     if (compiler.getDiagnostics().hasErrorOccurred()) return false;
     return true;
+}
+
+void LgsPPCallbacks::MacroDefined(const Token& macroNameToken, const MacroDirective* macroDirective) {
+    const auto stringRef = macroNameToken.getIdentifierInfo()->getName();
+    if (stringRef.starts_with("SEEK")) {
+        const auto macroInfo = macroDirective->getMacroInfo();
+        if (!macroInfo) return;
+        const auto name = macroNameToken.getIdentifierInfo()->getName().str();
+        std::string value;
+        for (unsigned i = 0; i < macroInfo->getNumTokens(); ++i) {
+            const Token &tok = macroInfo->getReplacementToken(i);
+            value += Lexer::getSpelling(tok, sourceManager, LangOpts);
+            value += " ";
+        }
+        std::cout << value << '\n';
+    }
 }
 
 void LgsDiagnosticConsumer::HandleDiagnostic(const DiagnosticsEngine::Level level, const Diagnostic& info) {
