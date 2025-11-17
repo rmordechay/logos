@@ -49,9 +49,11 @@
 #include "stmts/LgsIfStmt.h"
 #include "stmts/LgsSwitch.h"
 #include "types/primitives/LgsDouble.h"
+#include "types/LgsGenericType.h"
 #include <iostream>
 #include <ranges>
 #include <unordered_set>
+
 static std::string getMissingImplementsStr(const std::vector<LgsField*>& fields, const std::vector<LgsFunc*>& methods);
 
 void LgsSema::analyse() {
@@ -504,6 +506,9 @@ void LgsSema::visitReturnStmt(LgsReturn* returnStmt) {
     if (retExpr) {
         stack.currentFunc()->returnStmts.push_back(returnStmt);
         visitExpr(retExpr);
+        const auto rt = stack.currentFunc()->funcType->rt;
+        retExpr->castImplicitly(rt);
+        validateExprType(returnStmt->expr, rt);
     }
     const auto rt = funcType->rt;
     if (rt->isVoid() && retExpr && retExpr->type && !retExpr->type->isVoid()) {
@@ -620,14 +625,14 @@ void LgsSema::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
 
     const auto type = ltype->applyBinOp(binaryExpr);
     if (!type) {
-        return addError(E10076, l->location, {binaryExpr->opText, ltype->pname(), rtype->pname()});
+        return addError(E10076, l->location, {binaryExpr->op.text, ltype->pname(), rtype->pname()});
     }
 
     binaryExpr->setType(type);
     binaryExpr->isValueKnown = l->isValueKnown && r->isValueKnown;
     if (!binaryExpr->isValueKnown) return;
     const auto resultsType = binaryExpr->type;
-    switch (binaryExpr->op) {
+    switch (binaryExpr->op.opType) {
     case ADD: binaryExpr->results = resultsType->addConst(l, r); break;
     case SUB: binaryExpr->results = resultsType->subConst(l, r); break;
     case MUL: binaryExpr->results = resultsType->mulConst(l, r); break;
@@ -929,7 +934,8 @@ void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent) {
     }
 
     if (!validateMethodVisibility(method, parent->type, methodCall->location)) return;
-    if (stack.currentFunc()->isTest && parent->type->pname() == LgsTest::name && methodCall->name == "mock") {
+    methodCall->isMock = stack.currentFunc()->isTest && parent->type->pname() == LgsTest::name && methodCall->name == "mock";
+    if (methodCall->isMock) {
         const auto pair = std::make_pair(methodCall->args[0].expr, methodCall->args[1].expr);
         stack.currentFunc()->mocks.push_back(pair);
     }
@@ -964,6 +970,7 @@ void LgsSema::visitFuncCall(LgsFuncCall* funcCall) {
             file->symbolTable.genericCalls[funcName] = genericFunc;
         }
         funcCall->func = genericFunc->clone();
+        funcCall->setType(genericFunc->funcType->rt);
     } else {
         funcCall->func = func;
         funcCall->setType(ft->rt);
@@ -1497,14 +1504,19 @@ LgsSymbol* LgsSema::getSymbol(const std::string& name, const LgsLocation* locati
     return nullptr;
 }
 
-LgsFunc* LgsSema::createGenericFunc(LgsFuncCall* funcCall, LgsFunc* const func) {
-    const auto newFunc = func->clone()->asFunc();
+LgsFunc* LgsSema::createGenericFunc(LgsFuncCall* funcCall, const LgsFunc* func) {
+    const auto newFunc = new LgsFunc(*func);
+    newFunc->funcType = func->funcType->clone()->asFuncType();
+    newFunc->funcType->rt = funcCall->args[0].expr->type->clone();
+    newFunc->funcType->IRName = newFunc->funcType->getName();
     for (size_t i = 0; i < newFunc->funcType->params.size(); ++i) {
         const auto param = newFunc->funcType->params[i];
         const auto arg = funcCall->args[i];
-        newFunc->funcType->IRName = newFunc->funcType->getName() + arg.expr->type->getName();
+        newFunc->funcType->IRName += "_" + arg.expr->type->getName();
         newFunc->funcType->params[i] = LgsParam(arg.expr->type, param.name, param.expr);
     }
+    freeTypes(newFunc->funcType->generics);
+    newFunc->stmtsBlock = func->stmtsBlock->clone();
     visitFunc(newFunc);
     funcCall->func = newFunc;
     return newFunc;

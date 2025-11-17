@@ -12,6 +12,7 @@ public:
     BasicBlock* parentBlock = nullptr;
 
     explicit LgsReturn(LgsExpr* expr) : expr(expr) {}
+    LgsStmt* clone() override;
     ~LgsReturn() override;
 };
 

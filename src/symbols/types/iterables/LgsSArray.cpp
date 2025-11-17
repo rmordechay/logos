@@ -62,9 +62,9 @@ std::string LgsSArray::strFormatPart() const {
 
 LgsType* LgsSArray::applyBinOp(LgsBinaryExpr* binExpr) {
     const auto r = binExpr->right;
-    const auto op = binExpr->op;
+    const auto [opType, text] = binExpr->op;
     const auto IRName = r->type->getName();
-    switch (op) {
+    switch (opType) {
     case IN: {
         if (r->type->canCastTo(baseType)) return &LGS_BOOL;
         break;

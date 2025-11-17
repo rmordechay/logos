@@ -287,7 +287,7 @@ LgsToken LgsLexer::scanNumber(LgsLocation& location) {
         location.columnStart++;
     }
     // Hexadecimal
-    if (currentChar == '0' && (peek() == 'x' || peek() == 'X')) {
+    if (currentChar == '0' && peek() == 'x') {
         lexeme += currentChar;
         advance();
         lexeme += currentChar;
@@ -301,7 +301,7 @@ LgsToken LgsLexer::scanNumber(LgsLocation& location) {
         return {T_HEX, lexeme, location};
     }
     // Binary
-    if (currentChar == '0' && (peek() == 'b' || peek() == 'B')) {
+    if (currentChar == '0' && peek() == 'b') {
         lexeme += currentChar;
         advance();
         lexeme += currentChar;

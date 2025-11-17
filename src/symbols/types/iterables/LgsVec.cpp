@@ -52,7 +52,7 @@ LgsType* LgsVec::applyBinOp(LgsBinaryExpr* binExpr) {
     const auto thisNme = getName();
     const auto other = binExpr->right->type;
     const auto otherName = other->getName();
-    switch (binExpr->op) {
+    switch (binExpr->op.opType) {
     case ADD:
     case SUB: {
         if (thisNme == otherName) return clone();

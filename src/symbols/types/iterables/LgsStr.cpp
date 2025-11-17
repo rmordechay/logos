@@ -1,15 +1,14 @@
 #include "exprs/LgsFuncCall.h"
-#include "exprs/constants/LgsFloatConst.h"
 #include "exprs/constants/LgsStrConst.h"
 #include "funcs/LgsFunc.h"
-#include "stmts/LgsVarDec.h"
+#include "logos/LgsConfigs.h"
 #include "types/LgsAny.h"
 #include "types/iterables/LgsSArray.h"
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsChar.h"
 
 Type* LgsStr::getIRType(LgsLLVMGen& cg) {
-    if (isStatic) return ArrayType::get(cg.i8Ty(), *size->getConstInt() + 1);
+    // if (isStatic) return ArrayType::get(cg.i8Ty(), *size->getConstInt() + 1);
     return cg.ptrTy();
 }
 
@@ -41,7 +40,7 @@ bool LgsStr::canCastTo(LgsType* other) {
 LgsType* LgsStr::applyBinOp(LgsBinaryExpr* binExpr) {
     const auto other = binExpr->right->type;
     const auto IRName = other->getName();
-    switch (binExpr->op) {
+    switch (binExpr->op.opType) {
     case ADD: {
         if (other->isNumber() || name == IRName) {
             isHeapAlloc = true;
@@ -116,13 +115,16 @@ LgsExpr* LgsStr::addConst(LgsExpr* self, LgsExpr* other) {
 
 Value* LgsStr::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
     const auto selfSize = lengthIR(cg, self->IRValue);
-    const auto otherSize = lengthIR(cg, other->IRValue);
+    const auto buffer = cg.builder.CreateAlloca(ArrayType::get(cg.i8Ty(), STRING_BUFFER_SIZE));
+    cg.callSnprintf(buffer, cg.getIRStr("%d"), {other->IRValue});
+    const auto otherSize = lengthIR(cg, buffer);
     const auto totalSize = cg.builder.CreateAdd(selfSize, otherSize);
     const auto newStrSize = cg.builder.CreateAdd(totalSize, cg.i64(1));
     const auto newStrPtr = cg.callAllocate(newStrSize, true, getRTTypeKind());
+
     cg.callMemCpy(newStrPtr, self->IRValue, selfSize);
     const auto dstPtr = cg.builder.CreateInBoundsGEP(cg.i8Ty(), newStrPtr, selfSize);
-    cg.callMemCpy(dstPtr, other->IRValue, otherSize);
+    cg.callMemCpy(dstPtr, buffer, otherSize);
     cg.addNullTerminate(newStrPtr, totalSize);
     return newStrPtr;
 }
@@ -147,7 +149,7 @@ Value* LgsStr::inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) {
 }
 
 LgsType* LgsStr::clone() {
-    const auto newStr = new LgsStr();
+    const auto newStr = new LgsStr(*this);
     if (size) {
         newStr->size = size->clone();
     }

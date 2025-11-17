@@ -5,7 +5,7 @@
 #include "Lgs_Stack.h"
 #include <cassert>
 
-void freeRTType(void* ptr, const Lgs_TypeKind type) {
+void freeValue(void* ptr, const Lgs_TypeKind type) {
     switch (type) {
     case RTT_OBJECT: {
         // std::free(ptr);
@@ -37,13 +37,13 @@ void funcCleanup(Lgs_Stack& stack) {
     auto& stackFrame = stack.frames[stack.stackIndex];
     if (stackFrame.ownersCount > 0) {
         for (size_t i = 0; i < stackFrame.ownersCount; i++) {
-            freeRTType(stackFrame.owners[i].ptr, stackFrame.owners[i].type);
+            freeValue(stackFrame.owners[i].ptr, stackFrame.owners[i].type);
         }
         stackFrame.ownersCount = 0;
     }
     if (stackFrame.orphansCount > 0) {
         for (size_t i = 0; i < stackFrame.orphansCount; i++) {
-            freeRTType(stackFrame.orphans[i].ptr, stackFrame.orphans[i].type);
+            freeValue(stackFrame.orphans[i].ptr, stackFrame.orphans[i].type);
         }
         stackFrame.orphansCount = 0;
     }

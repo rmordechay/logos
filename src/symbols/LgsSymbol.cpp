@@ -88,7 +88,7 @@ LgsSymbol LgsSymbol::clone() const {
     case ENUM:
         return LgsSymbol(enum_->clone());
     case UNKNOWN:
-        break;
+        return LgsSymbol();
     }
     assert(0);
 }

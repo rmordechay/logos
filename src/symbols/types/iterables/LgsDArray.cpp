@@ -68,7 +68,7 @@ std::string LgsDArray::strFormatPart() const {
 }
 
 LgsType* LgsDArray::applyBinOp(LgsBinaryExpr* binExpr) {
-    switch (binExpr->op) {
+    switch (binExpr->op.opType) {
     case IN: {
         const auto otherIter = binExpr->right->type->asIterable();
         if (!otherIter) return nullptr;

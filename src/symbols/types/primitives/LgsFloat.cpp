@@ -5,13 +5,15 @@
 #include "types/primitives/LgsDouble.h"
 
 std::pair<Value*, Value*> loadOperands(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    if (self->IRValue->getType()->isIntegerTy()) {
-        self->IRValue = cg.builder.CreateSIToFP(self->IRValue, cg.floatTy());
+    auto l = self->loadIR(cg);
+    auto r = other->loadIR(cg);
+    if (l->getType()->isIntegerTy()) {
+        l = cg.builder.CreateSIToFP(l, cg.floatTy());
     }
-    if (other->IRValue->getType()->isIntegerTy()) {
-        other->IRValue = cg.builder.CreateSIToFP(other->IRValue, cg.floatTy());
+    if (r->getType()->isIntegerTy()) {
+        r = cg.builder.CreateSIToFP(r, cg.floatTy());
     }
-    return {self->loadIR(cg), other->loadIR(cg)};
+    return {l, r};
 }
 
 std::string LgsFloat::getName() {

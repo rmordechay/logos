@@ -1090,10 +1090,11 @@ LgsInfiniteLoop* LgsParser::parseInfiniteLoop() {
 }
 
 LgsReturn* LgsParser::parseReturnStmt() {
+    const auto returnToken = currentToken;
     if (!matchAndConsume(T_RETURN)) return nullptr;
     const auto expr = parseExpr();
     auto const returnStmt = new LgsReturn(expr);
-    setLocation(returnStmt->location, &currentToken);
+    setLocation(returnStmt->location, &returnToken);
     return returnStmt;
 }
 
@@ -1235,7 +1236,7 @@ LgsExpr* LgsParser::parseExprWithPrecedence(const int minPrecedence) {
         auto const it = LGS_BINARY_OPS_DICT.find(currentToken.type);
         if (it == LGS_BINARY_OPS_DICT.end()) break;
         consume();
-        const auto& [opType, _] = it->second;
+        const auto [opType, _] = it->second;
         const auto precedence = getBinOpPrecedence(opType);
         if (precedence < minPrecedence) {
             currentToken = tokens[--currentIndex];

@@ -22,6 +22,7 @@ public:
     bool isCoroutine = false;
     bool isDeferred = false;
     bool isNamed = false;
+    bool isMock = false;
     LgsExpr* parentPtr = nullptr;
     LgsSymbol ref;
 

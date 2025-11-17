@@ -48,8 +48,8 @@ void LgsVarDec::hashNode(size_t& oldHash) {
 
 LgsVarDec* LgsVarDec::clone() {
     const auto newVarDec = new LgsVarDec(*this);
-    newVarDec->type = type->clone();
-    newVarDec->expr = expr->clone();
+    if (type) newVarDec->type = type->clone();
+    if (expr) newVarDec->expr = expr->clone();
     return newVarDec;
 }
 

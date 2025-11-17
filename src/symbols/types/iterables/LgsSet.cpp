@@ -67,7 +67,7 @@ LgsFunc* LgsSet::getAddFunc() {
 LgsType* LgsSet::applyBinOp(LgsBinaryExpr* binExpr) {
     const auto other = binExpr->right->type;
     const auto IRName = other->getName();
-    switch (binExpr->op) {
+    switch (binExpr->op.opType) {
     case IN: {
         if (other->canCastTo(baseType)) return baseType;
         break;

@@ -95,7 +95,7 @@ std::string* LgsExpr::getConstStr() {
         }
     }
     if (const auto bin = asBinExpr()) {
-        if (bin->op == ADD) {
+        if (bin->op.opType == ADD) {
             return &bin->results->asStrConst()->value;
         }
     }

@@ -82,9 +82,9 @@ Value* LgsLLVMGen::getPtrTo(Value* v) {
     }
     if (v->getType()->isPointerTy()) return v;
     if (v->getType()->isIntegerTy() || v->getType()->isFloatingPointTy() || v->getType()->isVectorTy()) {
-        const auto a = builder.CreateAlloca(v->getType());
-        builder.CreateStore(v, a);
-        return a;
+        const auto ptr = builder.CreateAlloca(v->getType());
+        builder.CreateStore(v, ptr);
+        return ptr;
     }
     assert(0);
 }
@@ -100,6 +100,10 @@ StructType* LgsLLVMGen::getStructType(const std::vector<Type*>& fields, const st
         return StructType::create(context, fields, name);
     }
     return structType;
+}
+
+llvm::AllocaInst* LgsLLVMGen::getEmptyBuffer() {
+    return builder.CreateAlloca(ArrayType::get(i8Ty(), STRING_BUFFER_SIZE));
 }
 
 BasicBlock* LgsLLVMGen::createBlock(const std::string& name, Function* parent) {
@@ -165,21 +169,21 @@ Value* LgsLLVMGen::callRuntimeFunc(const std::string& funcName, Type* rt, const 
     return callFunc(LGS_RUNTIME_PREFIX + funcName, rt, paramTypes, args);
 }
 
-Value* LgsLLVMGen::hashConst(const std::string& str) {
-    return i32(hashString(str));
-}
-
 Value* LgsLLVMGen::callHash(Value* arg) {
     return callLgsFunc("hash", i32Ty(), {ptrTy()}, {arg});
+}
+
+Value* LgsLLVMGen::hashConst(const std::string& str) {
+    return i32(hashString(str));
 }
 
 Value* LgsLLVMGen::callPrintf(const std::vector<Value*>& args) {
     return callFunc("printf", i32Ty(), {ptrTy()}, args, true);
 }
 
-Value* LgsLLVMGen::callSprintf(const std::vector<Value*>& args) {
-    auto tempArgs = args;
-    tempArgs.insert(tempArgs.begin() + 1, usize(STRING_BUFFER_SIZE));
+Value* LgsLLVMGen::callSnprintf(Value* buffer, Value* fmt, const std::vector<Value*>& args) {
+    std::vector<Value*> tempArgs = {buffer, usize(STRING_BUFFER_SIZE), fmt};
+    tempArgs.insert(tempArgs.end(), args.begin(), args.end());
     return callFunc("snprintf", i32Ty(), {ptrTy(), sizeTy(), ptrTy()}, tempArgs, true);
 }
 
@@ -195,18 +199,15 @@ void LgsLLVMGen::callMemCpy(Value* dest, Value* src, Value* size) {
     builder.CreateMemCpy(dest, llvm::MaybeAlign(), src, llvm::MaybeAlign(), size);
 }
 
-Value* LgsLLVMGen::callAllocate(const size_t size, const bool isOwner, const Lgs_TypeKind type) {
+Value* LgsLLVMGen::callAllocate(Value* size, const bool isOwner, const Lgs_TypeKind type) {
     assert(type != RTT_UNKNOWN);
-    const auto ptr = callRuntimeFunc("allocate", ptrTy(), {sizeTy()}, {usize(size)});
+    const auto ptr = callRuntimeFunc("allocate", ptrTy(), {sizeTy()}, {size});
     addHeap(isOwner, type, ptr);
     return ptr;
 }
 
-Value* LgsLLVMGen::callAllocate(Value* size, const bool isOwner, const Lgs_TypeKind type) {
-    assert(type != RTT_UNKNOWN);
-    const auto ptr = builder.CreateMalloc(sizeTy(), sizeTy(), size, nullptr);
-    addHeap(isOwner, type, ptr);
-    return ptr;
+Value* LgsLLVMGen::callAllocate(const size_t size, const bool isOwner, const Lgs_TypeKind type) {
+    return callAllocate(usize(size), isOwner, type);
 }
 
 void LgsLLVMGen::callStackPush(const bool hasDefers, const bool needsCleanup) {
@@ -379,7 +380,7 @@ llvm::DILocation* LgsLLVMGen::getDebugLoc(const LgsLocation& location) {
         location.columnStart,
         debugger.subprogram,
         debugger.subprogram->getScope()
-    );
+        );
 }
 
 void LgsLLVMGen::initLLVM() {

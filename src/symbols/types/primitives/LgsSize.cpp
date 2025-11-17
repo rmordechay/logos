@@ -21,7 +21,7 @@ LgsExpr* LgsSize::getZeroValue() {
 }
 
 LgsType* LgsSize::applyBinOp(LgsBinaryExpr* binExpr) {
-    return applyIntBinOp(binExpr->op, binExpr->left->type);
+    return applyIntBinOp(binExpr->op.opType, binExpr->left->type);
 }
 
 Value* LgsSize::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {

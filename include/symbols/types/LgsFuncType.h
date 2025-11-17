@@ -2,8 +2,6 @@
 #include "LgsType.h"
 #include "funcs/LgsParam.h"
 
-class LgsGenericType;
-
 enum LgsFuncFlags : uint32_t {
     PUBLIC = 1 << 0,
     BUILTIN = 1 << 1,
@@ -55,7 +53,6 @@ public:
     Lgs_TypeKind getRTTypeKind() override;
     size_t sizeBytes() override;
     std::string getName() override;
-    std::string getVirtualName();
     std::string pname() override;
     std::string strFormatPart() const override;
     bool canCastTo(LgsType* other) override;

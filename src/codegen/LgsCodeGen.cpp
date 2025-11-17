@@ -539,7 +539,7 @@ void LgsCodeGen::visitReturnStmt(LgsReturn* returnStmt) {
         if (currentFunc->funcType->rt->isVoid()) {
             cg.builder.CreateRetVoid();
         } else {
-            cg.builder.CreateRet(getIRValue(returnStmt));
+            cg.builder.CreateRet(returnStmt->IRValue);
         }
     }
 }
@@ -659,7 +659,7 @@ void LgsCodeGen::visitBinaryExpr(LgsBinaryExpr* binExpr) {
         binExpr->IRValue = binExpr->results->IRValue;
         return;
     }
-    switch (binExpr->op) {
+    switch (binExpr->op.opType) {
     case ADD: binExpr->IRValue = binExpr->type->addIR(cg, l, r); break;
     case SUB: binExpr->IRValue = binExpr->type->subIR(cg, l, r); break;
     case MUL: binExpr->IRValue = binExpr->type->mulIR(cg, l, r); break;
@@ -840,14 +840,14 @@ void LgsCodeGen::visitSelection(LgsSelection* selection, const bool assign) {
         visitExpr(firstExpr);
         assert(!firstExpr->IRValue || &firstExpr->IRValue->getContext() == &cg.IRModule->getContext());
     }
+
     for (size_t i = firstExpr->isImportName; i < selection->exprs.size() - 1; ++i) {
         const auto parent = selection->exprs[i];
         const auto child = selection->exprs[i + 1];
         if (const auto var = child->asVariable()) {
             visitFieldSelection(var, parent, assign);
         } else if (const auto methodCall = child->asFuncCall()) {
-            const bool isTest = stack.currentFunc()->isTest && parent->type->getName() == LgsTest::name && methodCall->name == "mock";
-            if (isTest) continue;
+            if (methodCall->isMock) continue;
             visitFuncCall(methodCall);
         } else if (const auto iterIndex = child->asIterIndex()) {
             const auto baseExpr = iterIndex->getBaseExpr()->asVariable();
@@ -1033,12 +1033,8 @@ void LgsCodeGen::visitStrConst(LgsStrConst* strConst) {
                 formatted.replace(pos, strlen(LGS_STR_FMT_PLACEHOLDER), part->type->strFormatPart());
             }
         }
-        const auto arrTyp = ArrayType::get(cg.i8Ty(), STRING_BUFFER_SIZE);
-        const auto buffer = cg.builder.CreateAlloca(arrTyp);
-        strConst->IRValue = buffer;
-        std::vector<Value*> IRArgs = {strConst->IRValue, cg.getIRStr(formatted + "\n")};
-        IRArgs.insert(IRArgs.end(), values.begin(), values.end());
-        cg.callSprintf(IRArgs);
+        strConst->IRValue = cg.getEmptyBuffer();
+        cg.callSnprintf(strConst->IRValue, cg.getIRStr(formatted + "\n"), values);
     }
 }
 

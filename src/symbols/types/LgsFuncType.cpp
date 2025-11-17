@@ -48,15 +48,6 @@ std::string LgsFuncType::getName() {
     return IRName;
 }
 
-std::string LgsFuncType::getVirtualName() {
-    std::stringstream strStream;
-    strStream << "u_";
-    strStream << parentName << "_" << name;
-    strStream << LGS_CORO_SUFFIX;
-    IRName = strStream.str();
-    return IRName;
-}
-
 std::string LgsFuncType::pname() {
     std::stringstream str;
     str << name << '(';

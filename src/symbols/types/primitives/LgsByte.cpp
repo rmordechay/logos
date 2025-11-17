@@ -17,7 +17,7 @@ Type* LgsByte::getIRType(LgsLLVMGen& cg) {
 LgsType* LgsByte::applyBinOp(LgsBinaryExpr* binExpr) {
     const auto IRName = binExpr->right->type->getName();
     if (name != IRName) return nullptr;
-    if (binExpr->op == ADD) return extendInt();
+    if (binExpr->op.opType == ADD) return extendInt();
     return this;
 }
 

@@ -5,14 +5,10 @@
 #include "Lgs_Types.h"
 #include "Lgs_Helpers.h"
 #include <cassert>
-#include <map>
 #include "Lgs_Map.h"
 #include <execinfo.h>
 #include <dlfcn.h>
-#include <cxxabi.h>
 #include <iostream>
-#include <vector>
-#include <string>
 
 weakf Lgs_SArray Lgs_RTTypes_Arrays[] = {};
 
@@ -62,7 +58,7 @@ extern "C" void Lgs_Runtime_removeOwner(const void* owner) {
     auto& stackFrame = runtime.stack.frames[runtime.stack.stackIndex];
     for (size_t i = 0; i < stackFrame.ownersCount; i++) {
         if (stackFrame.owners[i].ptr != owner) continue;
-        freeRTType(stackFrame.owners[i].ptr, stackFrame.owners[i].type);
+        freeValue(stackFrame.owners[i].ptr, stackFrame.owners[i].type);
         for (size_t j = i; j < stackFrame.ownersCount - 1; j++) {
             stackFrame.owners[j] = stackFrame.owners[j + 1];
         }

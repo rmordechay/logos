@@ -8,7 +8,7 @@ Value* LgsBinaryExpr::loadIR(LgsLLVMGen& cg) {
 }
 
 std::string LgsBinaryExpr::asText() {
-    return left->asText() + ' ' + opText + ' ' + right->asText();
+    return left->asText() + ' ' + op.text + ' ' + right->asText();
 }
 
 void LgsBinaryExpr::setDebugValue(LgsLLVMGen& cg) {
@@ -17,6 +17,10 @@ void LgsBinaryExpr::setDebugValue(LgsLLVMGen& cg) {
 
 bool LgsBinaryExpr::equals(LgsExpr* other) {
     assert(0);
+}
+
+LgsExpr* LgsBinaryExpr::clone() {
+    return new LgsBinaryExpr(left->clone(), right->clone(), op);
 }
 
 LgsBinaryExpr::~LgsBinaryExpr() {

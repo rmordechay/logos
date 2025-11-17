@@ -2,6 +2,12 @@
 #include "funcs/LgsFunc.h"
 #include "utils/LgsUtils.h"
 
+LgsStmt* LgsReturn::clone() {
+    const auto newReturn = new LgsReturn(*this);
+    newReturn->expr = expr->clone();
+    return newReturn;
+}
+
 LgsReturn::~LgsReturn() {
     freeExpr(expr);
     expr = nullptr;

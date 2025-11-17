@@ -42,6 +42,7 @@ public:
     Value* getPtrTo(Value* v);
     GlobalVariable* createGlobal(Type* type, Constant* args, const std::string& name) const;
     StructType* getStructType(const std::vector<Type*>& fields, const std::string& name = "");
+    llvm::AllocaInst* getEmptyBuffer();
 
     // Blocks
     BasicBlock* createBlock(const std::string& name = "", Function* parent = nullptr);
@@ -58,12 +59,12 @@ public:
     Value* callIntrinsics(llvm::Intrinsic::ID intrinsicID, const std::vector<Type*>& types = {}, const std::vector<Value*>& args = {});
     Value* callLgsFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes = {}, const std::vector<Value*>& args = {});
     Value* callRuntimeFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes = {}, const std::vector<Value*>& args = {});
-    Value* hashConst(const std::string& str);
     Value* callHash(Value* arg);
+    Value* hashConst(const std::string& str);
 
     // System
     Value* callPrintf(const std::vector<Value*>& args);
-    Value* callSprintf(const std::vector<Value*>& args);
+    Value* callSnprintf(Value* buffer, Value* fmt, const std::vector<Value*>& args);
     Value* callStrLen(Value* str);
     void callMemSet(Value* dest, Value* src, Value* size);
     void callMemCpy(Value* dest, Value* src, Value* size);
