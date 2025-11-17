@@ -189,7 +189,10 @@ void LgsFunc::setDebugValue(LgsLLVMGen& cg) {
         llvm::DINode::FlagPrototyped,
         DISubprogram::SPFlagDefinition
     );
-    getIRFunc(cg)->setSubprogram(cg.debugger.subprogram);
+    cg.IRModule->setFramePointer(llvm::FramePointerKind::All);
+    const auto irFunc = getIRFunc(cg);
+    irFunc->addFnAttr("frame-pointer", "all");
+    irFunc->setSubprogram(cg.debugger.subprogram);
     cg.builder.SetCurrentDebugLocation(cg.getDebugLoc(location));
 }
 

@@ -39,7 +39,7 @@ LgsExpr* LgsVariable::castExplicitly(LgsType* toType) {
 Value* LgsVariable::castIR(LgsLLVMGen& cg, LgsType* toType) {
     switch (ref.symbolType) {
     case PARAM:
-        assert(0);
+        return IRValue;
     case VAR_DEC:
         return ref.varDec->expr->castIR(cg, toType);
     case FIELD:

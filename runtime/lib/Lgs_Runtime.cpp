@@ -7,9 +7,12 @@
 #include <cassert>
 #include <map>
 #include "Lgs_Map.h"
+#include <execinfo.h>
+#include <dlfcn.h>
+#include <cxxabi.h>
 #include <iostream>
+#include <vector>
 #include <string>
-#include <unistd.h>
 
 weakf Lgs_SArray Lgs_RTTypes_Arrays[] = {};
 
@@ -99,4 +102,15 @@ extern "C" void Lgs_Runtime_addToVTable(void* instance, const int32_t virtualID,
 extern "C" void* Lgs_Runtime_getFromVTable(void* instance, const int32_t virtualID) {
     assert(runtime.vtable.contains(VKey{instance, virtualID}));
     return runtime.vtable[VKey{instance, virtualID}];
+}
+
+extern "C" void Lgs_Runtime_printStackTrace() {
+    void* frames[128];
+    const int count = backtrace(frames, 128);
+    for (int i = 1; i < count; i++) {
+        Dl_info info;
+        if (dladdr(frames[i], &info)) {
+            std::println(" - {}", info.dli_sname);
+        }
+    }
 }
