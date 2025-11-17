@@ -30,6 +30,10 @@ LgsExpr* LgsIntConst::castExplicitly(LgsType* toType) {
     return nullptr;
 }
 
+std::string LgsIntConst::asText() {
+    return std::to_string(value);
+}
+
 Value* LgsIntConst::castIR(LgsLLVMGen& cg, LgsType* toType) {
     assert(IRValue);
     if (type->getName() == toType->getName()) return IRValue;
@@ -50,10 +54,6 @@ Value* LgsIntConst::castIR(LgsLLVMGen& cg, LgsType* toType) {
         return cg.getIRStr(std::to_string(value));
     }
     assert(0);
-}
-
-std::string LgsIntConst::asText() {
-    return std::to_string(value);
 }
 
 bool LgsIntConst::equals(LgsExpr* other) {

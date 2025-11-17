@@ -135,7 +135,6 @@ public:
     LgsExpr* parseUnary(bool withInstance = true);
     LgsVariable* parseVariable();
     void parseArgs(LgsInstance* instance);
-    void parseArgs(LgsFuncCall* funcCall);
     LgsInstance* parseInstance();
     LgsFuncCall* parseFuncCall();
     LgsVectorExpr* parseVectorExpr();

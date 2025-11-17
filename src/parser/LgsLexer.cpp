@@ -300,6 +300,20 @@ LgsToken LgsLexer::scanNumber(LgsLocation& location) {
         }
         return {T_HEX, lexeme, location};
     }
+    // Binary
+    if (currentChar == '0' && (peek() == 'b' || peek() == 'B')) {
+        lexeme += currentChar;
+        advance();
+        lexeme += currentChar;
+        advance();
+        location.columnStart += 2;
+        while (currentChar == '0' || currentChar == '1' || currentChar == '_') {
+            lexeme += currentChar;
+            advance();
+            location.columnStart++;
+        }
+        return {T_BINARY, lexeme, location};
+    }
     // Int
     while (std::isdigit(currentChar) || currentChar == '_') {
         lexeme += currentChar;
@@ -341,7 +355,6 @@ LgsToken LgsLexer::scanNumber(LgsLocation& location) {
     }
     return {T_INT, lexeme, location};
 }
-
 
 void LgsLexer::skipWhitespace() {
     while (std::isspace(currentChar)) {

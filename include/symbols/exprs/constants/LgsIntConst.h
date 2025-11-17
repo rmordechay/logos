@@ -1,12 +1,13 @@
 #pragma once
 #include "exprs/LgsExpr.h"
 #include "types/primitives/LgsSize.h"
+#include <iostream>
 
 class LgsIntConst final : public LgsExpr {
 public:
     int64_t value;
 
-    LgsIntConst(LgsType* type, const size_t value) : LgsExpr(type), value(value) {
+    LgsIntConst(LgsType* type, const int64_t value) : LgsExpr(type), value(value) {
         isValueKnown = true;
     }
     Value* loadIR(LgsLLVMGen& cg) override;

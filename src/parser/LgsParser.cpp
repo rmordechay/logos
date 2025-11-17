@@ -731,7 +731,7 @@ LgsFuncType* LgsParser::parseFuncHeader() {
 }
 
 void LgsParser::parseParams(LgsFuncType* funcType) {
-    if (currentToken.type == T_RPAREN) return;
+    if (!matchAndConsume(T_LPAREN)) return;
     auto paramIndex = 0;
     while (true) {
         const auto paramName = currentToken;
@@ -1318,33 +1318,6 @@ void LgsParser::parseArgs(LgsInstance* instance) {
     if (currentToken.type == T_COMMA) consume();
 }
 
-void LgsParser::parseArgs(LgsFuncCall* funcCall) {
-    if (currentToken.type == T_RPAREN) return;
-    std::unordered_set<std::string> seen;
-    while (true) {
-        std::string argName = "";
-        if (currentToken.type == T_IDENTIFIER && peek().type == T_EQUAL) {
-            funcCall->isNamed = true;
-            argName = currentToken.lexeme;
-            consume(2);
-            const auto expr = parseExpr();
-            if (!mustParse(expr)) break;
-            if (!seen.insert(argName).second) {
-                addError(E10054, &expr->location, {argName});
-                break;
-            }
-            funcCall->args.emplace_back(LgsFuncArg{argName, expr});
-        } else {
-            const auto expr = parseExpr();
-            if (!mustParse(expr)) break;
-            funcCall->args.emplace_back(LgsFuncArg{argName, expr});
-        }
-        if (currentToken.type == T_RPAREN) break;
-        mustMatch(T_COMMA);
-    }
-    if (currentToken.type == T_COMMA) consume();
-}
-
 LgsInstance* LgsParser::parseInstance() {
     const auto tokenName = currentToken;
     const auto oldIndex = currentIndex;
@@ -1498,7 +1471,15 @@ LgsExpr* LgsParser::parseConstant() {
         break;
     }
     case T_HEX: {
-        constant = determineIntConst(tokenStr, 16);
+        std::string result = tokenStr;
+        result.erase(std::ranges::remove(result, '_').begin(), result.end());
+        constant = determineIntConst(result, 16);
+        break;
+    }
+    case T_BINARY: {
+        std::string result = tokenStr;
+        result.erase(std::ranges::remove(result, '_').begin(), result.end());
+        constant = determineIntConst(result, 2);
         break;
     }
     case T_LONG: {
@@ -1971,18 +1952,23 @@ bool LgsParser::isImportName(LgsExpr* expr) const {
 LgsExpr* LgsParser::determineIntConst(const std::string& tokenStr, const int base) const {
     char* end = nullptr;
     errno = 0;
-    const auto v = strtoull(tokenStr.c_str(), &end, base);
+    uint64_t v;
+    if (tokenStr.starts_with("0b") || tokenStr.starts_with("0x")) {
+        v = strtoull(tokenStr.substr(2).c_str(), &end, base);
+    } else {
+        v = strtoull(tokenStr.c_str(), &end, base);
+    }
     LgsExpr* expr = nullptr;
     if (errno == ERANGE) {
-        expr = new LgsIntConst(&LGS_ULONG, static_cast<int64_t>(UINT64_MAX));
-    } else if (v <= static_cast<unsigned long long>(INT_MAX)) {
-        expr = new LgsIntConst(&LGS_INT, static_cast<int64_t>(v));
-    } else if (v <= static_cast<unsigned long long>(UINT_MAX)) {
-        expr = new LgsIntConst(&LGS_UINT, static_cast<int64_t>(v));
-    } else if (v <= static_cast<unsigned long long>(LONG_MAX)) {
+        expr = new LgsIntConst(&LGS_ULONG, UINT64_MAX);
+    } else if (v <= INT_MAX) {
+        expr = new LgsIntConst(&LGS_INT, static_cast<int32_t>(v));
+    } else if (v <= UINT_MAX) {
+        expr = new LgsIntConst(&LGS_UINT, static_cast<uint32_t>(v));
+    } else if (v <= LONG_MAX) {
         expr = new LgsIntConst(&LGS_LONG, static_cast<int64_t>(v));
     } else {
-        expr = new LgsIntConst(&LGS_ULONG, static_cast<int64_t>(v));
+        expr = new LgsIntConst(&LGS_ULONG, v);
     }
     setLocation(expr->location, &currentToken);
     return expr;

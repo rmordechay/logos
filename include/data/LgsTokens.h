@@ -94,6 +94,7 @@ enum LgsTokenType {
     T_LONG,
     T_DOUBLE,
     T_HEX,
+    T_BINARY,
     T_FLOAT,
     T_NULL,
     T_IDENTIFIER,

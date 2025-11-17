@@ -326,9 +326,7 @@ void LgsApp::importCFiles() {
                 errHandler.addError(E10047, {LGS_C, cCode});
                 return;
             }
-            const auto a = getFileText(paths.cLibHeadersDir / "sys" / "_types");
             LgsCLangParser parser;
-            clang.parseFile(parser, a);
             clang.parseFile(parser, cCode);
             {
                 std::lock_guard lock(mtx);
