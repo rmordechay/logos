@@ -42,42 +42,42 @@ LgsType* LgsInt::applyBinOp(LgsBinaryExpr* binExpr) {
     return applyIntBinOp(binExpr->op.opType, binExpr->left->type);
 }
 
-LgsExpr* LgsInt::addConst(LgsExpr* self, LgsExpr* other) {
-    const auto const1 = self->getConstInt();
+LgsExpr* LgsInt::addConst(LgsExpr* left, LgsExpr* right) {
+    const auto const1 = left->getConstInt();
     if (!const1) return nullptr;
-    const auto const2 = other->getConstInt();
+    const auto const2 = right->getConstInt();
     if (!const2) return nullptr;
     return new LgsIntConst(&LGS_INT, *const1 + *const2);
 }
 
-LgsExpr* LgsInt::subConst(LgsExpr* self, LgsExpr* other) {
-    const auto const1 = self->getConstInt();
+LgsExpr* LgsInt::subConst(LgsExpr* left, LgsExpr* right) {
+    const auto const1 = left->getConstInt();
     if (!const1) return nullptr;
-    const auto const2 = other->getConstInt();
+    const auto const2 = right->getConstInt();
     if (!const2) return nullptr;
     return new LgsIntConst(&LGS_INT, *const1 - *const2);
 }
 
-LgsExpr* LgsInt::mulConst(LgsExpr* self, LgsExpr* other) {
-    const auto const1 = self->getConstInt();
+LgsExpr* LgsInt::mulConst(LgsExpr* left, LgsExpr* right) {
+    const auto const1 = left->getConstInt();
     if (!const1) return nullptr;
-    const auto const2 = other->getConstInt();
+    const auto const2 = right->getConstInt();
     if (!const2) return nullptr;
     return new LgsIntConst(&LGS_INT, *const1 * *const2);
 }
 
-LgsExpr* LgsInt::divConst(LgsExpr* self, LgsExpr* other) {
-    const auto const1 = self->getConstInt();
+LgsExpr* LgsInt::divConst(LgsExpr* left, LgsExpr* right) {
+    const auto const1 = left->getConstInt();
     if (!const1) return nullptr;
-    const auto const2 = other->getConstInt();
+    const auto const2 = right->getConstInt();
     if (!const2) return nullptr;
     return new LgsIntConst(&LGS_INT, *const1 / *const2);
 }
 
-LgsExpr* LgsInt::modConst(LgsExpr* self, LgsExpr* other) {
-    const auto const1 = self->getConstInt();
+LgsExpr* LgsInt::modConst(LgsExpr* left, LgsExpr* right) {
+    const auto const1 = left->getConstInt();
     if (!const1) return nullptr;
-    const auto const2 = other->getConstInt();
+    const auto const2 = right->getConstInt();
     if (!const2) return nullptr;
     return new LgsIntConst(&LGS_INT, *const1 % *const2);
 }
@@ -194,9 +194,9 @@ LgsExpr* LgsInt::orConst(LgsExpr* self, LgsExpr* other) {
     return new LgsIntConst(&LGS_BOOL, *const1 > 0 || *const2 > 0);
 }
 
-Value* LgsInt::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    const auto l = cg.builder.CreateZExt(self->loadIR(cg), getIRType(cg));
-    const auto r = cg.builder.CreateZExt(other->loadIR(cg), getIRType(cg));
+Value* LgsInt::addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+    const auto l = cg.builder.CreateZExt(left->loadIR(cg), getIRType(cg));
+    const auto r = cg.builder.CreateZExt(right->loadIR(cg), getIRType(cg));
     return cg.builder.CreateAdd(l, r);
 }
 

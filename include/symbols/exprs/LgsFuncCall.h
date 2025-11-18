@@ -16,7 +16,6 @@ class LgsFuncCall final : public LgsExpr {
 public:
     std::string name;
     std::vector<LgsFuncArg> args;
-    std::vector<LgsType*> genericsArgs;
     LgsFunc* func = nullptr;
     bool inSelection = false;
     bool isCoroutine = false;

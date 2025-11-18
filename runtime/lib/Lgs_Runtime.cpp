@@ -1,4 +1,6 @@
 #include "LgsDefinitions.h"
+#include "LgsErrHandler.h"
+#include "LgsErrors.h"
 #include "Lgs_Allocator.h"
 #include "Lgs_Scheduler.h"
 #include "Lgs_Stack.h"
@@ -29,6 +31,7 @@ struct Lgs_Runtime {
     Lgs_Stack stack;
     Lgs_Allocator arena;
     Lgs_Scheduler scheduler;
+    LgsErrHandler errHandler;
     std::unordered_map<VKey, void*, VKeyHash> vtable;
 };
 
@@ -95,6 +98,8 @@ extern "C" void* Lgs_Runtime_getFromVTable(void* instance, const int32_t virtual
     return runtime.vtable[VKey{instance, virtualID}];
 }
 
-extern "C" void Lgs_Runtime_printStackTrace() {
+extern "C" void Lgs_Runtime_throwError(const char* msg) {
+    std::cout << msg << '\n';
     runtime.stack.printStackTrace();
+    exit(1);
 }

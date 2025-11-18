@@ -2,11 +2,10 @@
 
 #include "context/Lgs_Aarch64.h"
 #include "LgsDefinitions.h"
-
 #include <cstdint>
 
-nakedf void switchContext(Lgs_Aarch64Context* from, Lgs_Aarch64Context* to) {
-    asm volatile(
+nakedf void Lgs_switchContext() {
+    asm(
         "mov x9, sp\n"
         "stp x9, x19, [x0, #0]\n"
         "stp x20, x21, [x0, #16]\n"
@@ -30,11 +29,11 @@ nakedf void switchContext(Lgs_Aarch64Context* from, Lgs_Aarch64Context* to) {
         "br x9\n"
         "1:\n"
         "ret\n"
-        : : : "memory"
+        ::: "memory"
     );
 }
 
-void reset(Lgs_Aarch64Context* ctx, void* stackTop, void* entryPoint) {
+void Lgs_reset(Lgs_Aarch64Context* ctx, void* stackTop, void* entryPoint) {
     auto* sp = static_cast<char*>(stackTop);
     sp = reinterpret_cast<char*>(reinterpret_cast<uintptr_t>(sp) & ~15ULL);
     sp -= 16;

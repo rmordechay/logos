@@ -100,29 +100,29 @@ std::string LgsStr::strFormatPart() const {
     return "%s";
 }
 
-LgsExpr* LgsStr::addConst(LgsExpr* self, LgsExpr* other) {
-    const auto selfConstStr = self->getConstStr();
-    if (other->type->asStr()) {
-        const auto otherConstStr = other->getConstStr();
+LgsExpr* LgsStr::addConst(LgsExpr* left, LgsExpr* right) {
+    const auto selfConstStr = left->getConstStr();
+    if (right->type->asStr()) {
+        const auto otherConstStr = right->getConstStr();
         return new LgsStrConst(*selfConstStr + *otherConstStr);
     }
-    if (other->type->asInt()) {
-        const auto otherConstStr = other->getConstInt();
+    if (right->type->asInt()) {
+        const auto otherConstStr = right->getConstInt();
         return new LgsStrConst(*selfConstStr + std::to_string(*otherConstStr));
     }
     assert(0);
 }
 
-Value* LgsStr::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    const auto selfSize = lengthIR(cg, self->IRValue);
+Value* LgsStr::addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+    const auto selfSize = lengthIR(cg, left->IRValue);
     const auto buffer = cg.builder.CreateAlloca(ArrayType::get(cg.i8Ty(), STRING_BUFFER_SIZE));
-    cg.callSnprintf(buffer, cg.getIRStr("%d"), {other->IRValue});
+    cg.callSnprintf(buffer, cg.getIRStr("%d"), {right->IRValue});
     const auto otherSize = lengthIR(cg, buffer);
     const auto totalSize = cg.builder.CreateAdd(selfSize, otherSize);
     const auto newStrSize = cg.builder.CreateAdd(totalSize, cg.i64(1));
     const auto newStrPtr = cg.callAllocate(newStrSize, true, getRTTypeKind());
 
-    cg.callMemCpy(newStrPtr, self->IRValue, selfSize);
+    cg.callMemCpy(newStrPtr, left->IRValue, selfSize);
     const auto dstPtr = cg.builder.CreateInBoundsGEP(cg.i8Ty(), newStrPtr, selfSize);
     cg.callMemCpy(dstPtr, buffer, otherSize);
     cg.addNullTerminate(newStrPtr, totalSize);

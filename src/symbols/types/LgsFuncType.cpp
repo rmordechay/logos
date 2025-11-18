@@ -1,7 +1,7 @@
 #include "types/LgsFuncType.h"
 #include "data/LgsDefinitions.h"
 #include "codegen/LgsLLVMGen.h"
-#include "types/LgsGenericType.h"
+#include "types/LgsGenericParam.h"
 #include "utils/LgsUtils.h"
 #include <sstream>
 

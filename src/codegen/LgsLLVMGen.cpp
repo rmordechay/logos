@@ -136,8 +136,7 @@ void LgsLLVMGen::createBoundsGuard(Value* len, Value* index) {
     const auto invalidBlock = createBlock();
     builder.CreateCondBr(condition, invalidBlock, validBlock);
     startBlock(invalidBlock);
-    callFunc("Lgs_printError", voidTy(), {ptrTy()}, {getIRStr(E10003.msg)});
-    callFunc("exit", voidTy(), {i32Ty()}, {i32(1)});
+    callRuntimeFunc("throwError", voidTy(), {ptrTy()}, {getIRStr(E10003.msg)});
     branchAndStartBlock(validBlock);
 }
 

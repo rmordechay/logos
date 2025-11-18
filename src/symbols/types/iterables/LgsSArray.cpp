@@ -48,10 +48,7 @@ Constant* LgsSArray::getRTType(LgsLLVMGen& cg) {
     const auto arrRTStruct = cg.getStructType({cg.i32Ty(), cg.sizeTy()}, LGS_RT_ARRAY);
     const auto sizeValue = size->loadIR(cg);
     const auto rttKind = baseType->getRTTypeKind();
-    const std::vector<Constant*> structFields = {
-        cg.i32(rttKind),
-        llvm::dyn_cast<Constant>(sizeValue)
-    };
+    const std::vector<Constant*> structFields = {cg.i32(rttKind), llvm::dyn_cast<Constant>(sizeValue)};
     return llvm::ConstantStruct::get(arrRTStruct, structFields);
 }
 
@@ -63,17 +60,15 @@ std::string LgsSArray::strFormatPart() const {
 LgsType* LgsSArray::applyBinOp(LgsBinaryExpr* binExpr) {
     const auto r = binExpr->right;
     const auto [opType, text] = binExpr->op;
-    const auto IRName = r->type->getName();
     switch (opType) {
     case IN: {
         if (r->type->canCastTo(baseType)) return &LGS_BOOL;
         break;
     }
     case ADD: {
-        const auto otherSArr = r->type->asIterable();
-        if (baseType->canCastTo(otherSArr->baseType)) {
-            const auto sumSize = new LgsBinaryExpr(size, otherSArr->size, ADD_OP);
-            return new LgsSArray(baseType, sumSize);
+        if (const auto otherSArr = r->type->asSArray()) {
+            if (!baseType->canCastTo(otherSArr->baseType)) break;
+            return new LgsSArray(baseType, new LgsBinaryExpr(size, otherSArr->size, ADD_OP));
         }
     }
     case MUL: {
@@ -88,15 +83,20 @@ LgsType* LgsSArray::applyBinOp(LgsBinaryExpr* binExpr) {
     return nullptr;
 }
 
-Value* LgsSArray::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    const auto otherSArr = other->type->asSArray();
-    const auto sizeNewArr = cg.builder.CreateAdd(size->IRValue, otherSArr->size->IRValue);
-    const auto newArr = cg.builder.CreateAlloca(baseType->getIRType(cg), sizeNewArr);
-    const auto size1 = cg.builder.CreateMul(size->IRValue, cg.i32(baseType->sizeBytes()));
-    const auto size2 = cg.builder.CreateMul(otherSArr->size->IRValue, cg.i32(baseType->sizeBytes()));
-    cg.callMemCpy(newArr, self->IRValue, size1);
-    const auto offset = cg.builder.CreateInBoundsGEP(baseType->getIRType(cg), newArr, size->IRValue);
-    cg.callMemCpy(offset, other->IRValue, size2);
+Value* LgsSArray::addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+    const auto baseIR = baseType->getIRType(cg);
+    const auto leftSArr = left->type->asSArray();
+    const auto rightSArr = right->type->asSArray();
+    const auto leftSize = leftSArr->size->loadIR(cg);
+    const auto rightSize = rightSArr->size->loadIR(cg);
+
+    const auto newSize = cg.builder.CreateAdd(leftSize, rightSize);
+    const auto newArr = cg.builder.CreateAlloca(baseIR, newSize);
+    const auto sizeLeft = cg.builder.CreateMul(leftSize, cg.i32(baseType->sizeBytes()));
+    cg.callMemCpy(newArr, left->IRValue, sizeLeft);
+    const auto sizeRight = cg.builder.CreateMul(rightSize, cg.i32(baseType->sizeBytes()));
+    const auto offset = cg.builder.CreateInBoundsGEP(baseIR, newArr, leftSize);
+    cg.callMemCpy(offset, right->IRValue, sizeRight);
     return newArr;
 }
 

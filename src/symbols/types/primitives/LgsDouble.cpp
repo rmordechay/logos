@@ -31,6 +31,7 @@ Type* LgsDouble::getIRType(LgsLLVMGen& cg) {
 bool LgsDouble::canCastTo(LgsType* other) {
     const auto IRName = other->getName();
     if (name == IRName) return true;
+    if (other->asGeneric()) return true;
     if (IRName == LgsAny::name) return true;
     return false;
 }

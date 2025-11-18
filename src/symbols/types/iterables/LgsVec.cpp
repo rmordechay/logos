@@ -82,17 +82,17 @@ bool LgsVec::inferBaseType(const std::vector<LgsExpr*>& args) {
     for (size_t i = 1; i < args.size(); ++i) {
         const auto arg = args[i];
         const auto type = arg->type->isNumber() ? arg->type : arg->type->asIterable()->baseType;
-        if (!type->canCastTo(argsBaseType)) return false;
+        if (!type->equals(argsBaseType)) return false;
     }
     baseType = argsBaseType;
     return true;
 }
 
-Value* LgsVec::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    if (other->IRValue->getType()->isIntegerTy()) {
-        return cg.builder.CreateFAdd(self->loadIR(cg), other->loadIR(cg));
+Value* LgsVec::addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+    if (right->IRValue->getType()->isIntegerTy()) {
+        return cg.builder.CreateFAdd(left->loadIR(cg), right->loadIR(cg));
     }
-    return cg.builder.CreateFAdd(self->loadIR(cg), other->loadIR(cg));
+    return cg.builder.CreateFAdd(left->loadIR(cg), right->loadIR(cg));
 }
 
 Value* LgsVec::subIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {

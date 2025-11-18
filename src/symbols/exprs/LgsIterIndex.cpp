@@ -47,8 +47,9 @@ LgsExpr* LgsIterIndex::getBaseExpr() const {
 void LgsIterIndex::setIRElementPtr(LgsLLVMGen& cg, const bool assign) {
     auto fromIR = index.from->IRValue;
     assert(baseExpr->IRValue);
-    if (baseExpr->type->asSArray()) {
+    if (const auto sArr = baseExpr->type->asSArray()) {
         const auto ty = type->getIRType(cg);
+        cg.createBoundsGuard(sArr->size->IRValue, fromIR);
         IRValue = cg.builder.CreateInBoundsGEP(ty, baseExpr->IRValue, fromIR);
         if (ty->isPointerTy()) {
             IRValue = cg.builder.CreateLoad(cg.ptrTy(), IRValue);

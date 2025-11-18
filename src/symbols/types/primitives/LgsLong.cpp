@@ -33,9 +33,9 @@ LgsExpr* LgsLong::powConst(LgsExpr* self, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsLong::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    const auto l = cg.builder.CreateZExt(self->loadIR(cg), getIRType(cg));
-    const auto r = cg.builder.CreateZExt(other->loadIR(cg), getIRType(cg));
+Value* LgsLong::addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+    const auto l = cg.builder.CreateZExt(left->loadIR(cg), getIRType(cg));
+    const auto r = cg.builder.CreateZExt(right->loadIR(cg), getIRType(cg));
     return cg.builder.CreateAdd(l, r);
 }
 

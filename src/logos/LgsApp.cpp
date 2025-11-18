@@ -141,7 +141,7 @@ bool LgsApp::analyse() {
             LgsSema sema(configs, file, globals);
             sema.analyse();
             if (sema.errHandler.successful) return;
-            errHandler.mergeErrorsWithLock(sema.errHandler);
+            errHandler.mergeErrorsWithLock(sema.errHandler, mtx);
         });
     }
     threadPool.wait();

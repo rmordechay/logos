@@ -25,7 +25,7 @@ public:
     bool canCastTo(LgsType* other) override;
     LgsType* applyBinOp(LgsBinaryExpr* binExpr) override;
     bool inferBaseType(const std::vector<LgsExpr*>& args) override;
-    Value* addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
+    Value* addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
     Value* subIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
     Value* mulIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
     Value* divIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;

@@ -44,7 +44,7 @@ static void handleSig(const int sig, siginfo_t* info, void* ctx) {
     if (sig == SIGSEGV && tlsCurrent != nullptr) {
         const auto addr = reinterpret_cast<uintptr_t>(info->si_addr);
         const auto stackBase = reinterpret_cast<uintptr_t>(tlsCurrent->stack);
-        // Check if fault is in guard page
+        // Check if the sigsegv is in guard page
         if (addr >= stackBase && addr < stackBase + STACK_INIT_SIZE) {
             growStack(tlsCurrent);
             return;
@@ -80,7 +80,7 @@ static void coroutineEntry() {
     if (tlsCurrent == nullptr) return;
     tlsCurrent->fn(tlsCurrent->arg);
     tlsCurrent->finished = true;
-    switchContext(&tlsCurrent->ctx, &schedulerCtx);
+    Lgs_switchContext();
 }
 
 void Lgs_Scheduler::start() {
@@ -107,7 +107,7 @@ void Lgs_Scheduler::loop() {
         }
         tlsCurrent = coroutine;
         current = coroutine;
-        switchContext(&schedulerCtx, &coroutine->ctx);
+        Lgs_switchContext();
         tlsCurrent = nullptr;
         current = nullptr;
         if (coroutine->finished) {
@@ -128,7 +128,7 @@ void Lgs_Scheduler::spawn(void (*fn)(void*), void* arg) {
     co->arg = arg;
     co->finished = false;
     const auto top = static_cast<std::byte*>(co->stack) + co->stackSize;
-    reset(&co->ctx, top, reinterpret_cast<void*>(coroutineEntry));
+    Lgs_reset(&co->ctx, top, reinterpret_cast<void*>(coroutineEntry));
     std::lock_guard lk(mtx);
     pending.push_back(co);
 }
@@ -140,7 +140,7 @@ bool Lgs_Scheduler::shouldYield() {
 void Lgs_Scheduler::yield() {
     if (tlsCurrent == nullptr) return;
     preempt.store(false, std::memory_order_relaxed);
-    switchContext(&tlsCurrent->ctx, &schedulerCtx);
+    Lgs_switchContext();
 }
 
 void Lgs_Scheduler::shutdown() {

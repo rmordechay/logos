@@ -648,6 +648,7 @@ void LgsCodeGen::visitExpr(LgsExpr* expr, const bool assign) {
 }
 
 void LgsCodeGen::visitBinaryExpr(LgsBinaryExpr* binExpr) {
+    assert(binExpr->type);
     const auto l = binExpr->left;
     const auto r = binExpr->right;
     visitExpr(l);

@@ -1,6 +1,7 @@
 #include "utils/LgsErrHandler.h"
-#include "codegen/LgsLLVMGen.h"
-#include "logos/LgsApp.h"
+#include "LgsDefinitions.h"
+#include "utils/LgsUtils.h"
+#include <algorithm>
 
 void LgsErrHandler::setUnsuccessful() {
     successful = false;
@@ -45,7 +46,7 @@ void LgsErrHandler::mergeErrors(LgsErrHandler& other) {
     }
 }
 
-void LgsErrHandler::mergeErrorsWithLock(LgsErrHandler& other) {
+void LgsErrHandler::mergeErrorsWithLock(LgsErrHandler& other, std::mutex& mtx) {
     std::lock_guard lock(mtx);
     mergeErrors(other);
 }

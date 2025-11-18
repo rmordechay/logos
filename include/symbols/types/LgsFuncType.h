@@ -25,7 +25,6 @@ public:
     std::string parentName;
     LgsType* rt = nullptr;
     std::vector<LgsParam> params;
-    std::vector<LgsType*> genericArgs;
     std::vector<LgsGenericParam*> genericParams;
     FunctionType* IRType = nullptr;
     bool isPublic = false;

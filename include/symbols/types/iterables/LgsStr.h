@@ -22,8 +22,8 @@ public:
     LgsFunc* getIsEmptyFunc() override;
     LgsFunc* getIsNotEmptyFunc() override;
     std::string strFormatPart() const override;
-    LgsExpr* addConst(LgsExpr* self, LgsExpr* other) override;
-    Value* addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
+    LgsExpr* addConst(LgsExpr* left, LgsExpr* right) override;
+    Value* addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
     Value* eqIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
     Value* neIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
     Value* lengthIR(LgsLLVMGen& cg, Value* iterable) override;

@@ -10,6 +10,8 @@ public:
         isValueKnown = true;
     }
     Value* loadIR(LgsLLVMGen& cg) override;
+    LgsExpr* castExplicitly(LgsType* toType) override;
+    Value* castIR(LgsLLVMGen& cg, LgsType* toType) override;
     std::string asText() override;
     ~LgsFloatConst() override = default;
 };

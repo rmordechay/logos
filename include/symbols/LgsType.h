@@ -53,7 +53,6 @@ public:
     bool isFloat = false;
     bool isPrimitive = false;
     bool isHeapAlloc = false;
-    bool isGenericParam = false;
     bool passByRef = false;
 
     bool addField(LgsField* field);
@@ -88,11 +87,11 @@ public:
     virtual void hashNode(size_t& oldHash);
     virtual LgsType* clone();
 
-    virtual LgsExpr* addConst(LgsExpr* self, LgsExpr* other);
-    virtual LgsExpr* subConst(LgsExpr* self, LgsExpr* other);
-    virtual LgsExpr* mulConst(LgsExpr* self, LgsExpr* other);
-    virtual LgsExpr* divConst(LgsExpr* self, LgsExpr* other);
-    virtual LgsExpr* modConst(LgsExpr* self, LgsExpr* other);
+    virtual LgsExpr* addConst(LgsExpr* left, LgsExpr* right);
+    virtual LgsExpr* subConst(LgsExpr* left, LgsExpr* right);
+    virtual LgsExpr* mulConst(LgsExpr* left, LgsExpr* right);
+    virtual LgsExpr* divConst(LgsExpr* left, LgsExpr* right);
+    virtual LgsExpr* modConst(LgsExpr* left, LgsExpr* right);
     virtual LgsExpr* powConst(LgsExpr* self, LgsExpr* other);
     virtual LgsExpr* bitAndConst(LgsExpr* self, LgsExpr* other);
     virtual LgsExpr* bitOrConst(LgsExpr* self, LgsExpr* other);
@@ -107,7 +106,7 @@ public:
     virtual LgsExpr* leConst(LgsExpr* self, LgsExpr* other);
     virtual LgsExpr* andConst(LgsExpr* self, LgsExpr* other);
     virtual LgsExpr* orConst(LgsExpr* self, LgsExpr* other);
-    virtual Value* addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
+    virtual Value* addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right);
     virtual Value* subIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
     virtual Value* mulIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);
     virtual Value* divIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other);

@@ -17,7 +17,7 @@ extern "C" void Lgs_print(const Lgs_TypeKind rtt, void* v) {
 }
 
 std::string formatElement(const Lgs_TypeKind type, void* elem) {
-    if (!elem) printf("%s\n", LGS_NULL_LITERAL);
+    if (!elem) return LGS_NULL_LITERAL;
     std::ostringstream str;
     switch (type) {
     case RTT_BOOL: {

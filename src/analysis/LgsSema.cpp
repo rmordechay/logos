@@ -622,12 +622,12 @@ void LgsSema::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
     const auto ltype = l->type;
     const auto rtype = r->type;
     if (!ltype || !rtype) return;
-
-    const auto type = ltype->applyBinOp(binaryExpr);
+    auto type = ltype->applyBinOp(binaryExpr);
     if (!type) {
         return addError(E10076, l->location, {binaryExpr->op.text, ltype->pname(), rtype->pname()});
     }
-
+    if (const auto iter = type->asIterable()) visitExpr(iter->size);
+    type = typeResolver.resolveType(type, file);
     binaryExpr->setType(type);
     binaryExpr->isValueKnown = l->isValueKnown && r->isValueKnown;
     if (!binaryExpr->isValueKnown) return;
@@ -1503,23 +1503,43 @@ LgsSymbol* LgsSema::getSymbol(const std::string& name, const LgsLocation* locati
     return nullptr;
 }
 
-LgsFunc* LgsSema::createGenericFunc(LgsFuncCall* funcCall, const LgsFunc* func) {
-    // Get positions from definition
-    //  - standalone, param, rt
-    // Get args from call
-    // Match and replace
-    // Add 'standalone' generic to local symbols
-    const auto newFunc = new LgsFunc(*func);
-    newFunc->funcType = func->funcType->clone();
-    newFunc->funcType->IRName = newFunc->funcType->getName();
-    const auto g = newFunc->funcType->genericParams[0];
-    for (size_t i = 0; i < newFunc->funcType->params.size(); ++i) {
-        const auto param = newFunc->funcType->params[i];
-        const auto arg = funcCall->args[i];
-        newFunc->funcType->IRName += "_" + arg.expr->type->getName();
-        newFunc->funcType->params[i] = LgsParam(arg.expr->type, param.name, param.expr);
+LgsFunc* LgsSema::createGenericFunc(LgsFuncCall* funcCall, const LgsFunc* originalFunc) {
+    const auto newFunc = new LgsFunc(originalFunc->funcType->name, nullptr);
+    const auto originalFT = originalFunc->funcType;
+    newFunc->location = originalFunc->location;
+    newFunc->funcType->location = originalFT->location;
+
+    // Params
+    std::unordered_map<std::string, LgsType*> genericArgs;
+    for (size_t i = 0; i < originalFT->params.size(); ++i) {
+        const auto& param = originalFT->params[i];
+        const auto& arg = funcCall->args[i];
+        if (!param.type->asGeneric()) continue;
+        const auto paramTypeName = param.type->getName();
+        if (genericArgs.contains(paramTypeName)) continue;
+        if (originalFT->rt->asGeneric()) {
+            const auto newType = arg.expr->type->clone();
+            genericArgs[paramTypeName] = newType;
+            newFunc->funcType->params.emplace_back(newType, param.name);
+        } else {
+            newFunc->funcType->params.emplace_back(param.type->clone(), param.name);
+        }
     }
-    newFunc->stmtsBlock = func->stmtsBlock->clone();
+
+    // Set generic IRName
+    newFunc->funcType->IRName = newFunc->funcType->getName();
+    for (const auto& t : std::views::values(genericArgs)) {
+        newFunc->funcType->IRName += "_" + t->getName();
+    }
+
+    // Return type
+    if (originalFT->rt->asGeneric()) {
+        newFunc->funcType->rt = genericArgs[originalFT->rt->getName()];
+    } else {
+        newFunc->funcType->rt = originalFT->rt->clone();
+    }
+
+    newFunc->stmtsBlock = originalFunc->stmtsBlock->clone();
     visitFunc(newFunc);
     funcCall->func = newFunc;
     return newFunc;

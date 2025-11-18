@@ -20,7 +20,8 @@ LgsExpr* LgsIntConst::castExplicitly(LgsType* toType) {
     if (toType->isInt) {
         // Widening is always allowed
         if (otherSize >= thisSize) {
-            return new LgsIntConst(toType, value);
+            type = toType;
+            return this;
         }
         return nullptr;
     }
@@ -30,12 +31,7 @@ LgsExpr* LgsIntConst::castExplicitly(LgsType* toType) {
     return nullptr;
 }
 
-std::string LgsIntConst::asText() {
-    return std::to_string(value);
-}
-
 Value* LgsIntConst::castIR(LgsLLVMGen& cg, LgsType* toType) {
-    assert(IRValue);
     if (type->getName() == toType->getName()) return IRValue;
     if (toType->asGeneric()) return IRValue;
     if (toType->asLong()) {
@@ -66,6 +62,10 @@ void LgsIntConst::hashNode(size_t& oldHash) {
 
 Value* LgsIntConst::hashValue(LgsLLVMGen& cg) {
     return IRValue;
+}
+
+std::string LgsIntConst::asText() {
+    return std::to_string(value);
 }
 
 LgsIntConst* LgsIntConst::clone() {

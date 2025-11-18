@@ -21,9 +21,9 @@ LgsType* LgsByte::applyBinOp(LgsBinaryExpr* binExpr) {
     return this;
 }
 
-Value* LgsByte::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    const auto l = cg.builder.CreateZExt(self->loadIR(cg), getIRType(cg));
-    const auto r = cg.builder.CreateZExt(other->loadIR(cg), getIRType(cg));
+Value* LgsByte::addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+    const auto l = cg.builder.CreateZExt(left->loadIR(cg), getIRType(cg));
+    const auto r = cg.builder.CreateZExt(right->loadIR(cg), getIRType(cg));
     return cg.builder.CreateAdd(l, r);
 }
 

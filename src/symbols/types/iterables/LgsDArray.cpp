@@ -29,7 +29,7 @@ bool LgsDArray::inferBaseType(const std::vector<LgsExpr*>& args) {
     const auto baseExprType = args.front()->type;
     for (size_t i = 1; i < args.size(); ++i) {
         const auto arg = args[i];
-        if (!baseExprType->canCastTo(arg->type)) return false;
+        if (!baseExprType->equals(arg->type)) return false;
     }
     baseType = baseExprType;
     return true;

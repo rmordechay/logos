@@ -728,10 +728,6 @@ LgsFuncType* LgsParser::parseFuncHeader() {
     mustMatch(T_RPAREN);
     if (matchAndConsume(T_COLON)) {
         funcType->rt = parseType();
-        for (const auto genericsParam : genericsParams) {
-            if (funcType->rt->getName() == genericsParam->getName()) continue;
-            funcType->rt->isGenericParam = true;
-        }
     } else {
         funcType->rt = &LGS_VOID;
     }
@@ -756,10 +752,6 @@ void LgsParser::parseParams(LgsFuncType* funcType) {
         // Type
         const auto type = parseType();
         mustParse(type);
-        for (const auto genericsParam : funcType->genericParams) {
-            if (type->getName() == genericsParam->getName()) continue;
-            type->isGenericParam = true;
-        }
         LgsParam param(type, paramName.lexeme);
         setLocation(param.location, &paramName);
         param.index = paramIndex++;
@@ -1247,9 +1239,9 @@ LgsExpr* LgsParser::parseExpr(const bool withLambda) {
 }
 
 LgsExpr* LgsParser::parseExprWithPrecedence(const int minPrecedence) {
-    const auto oldIndex = currentIndex;
+    const auto startToken = currentToken;
     auto left = parseUnary();
-    if (!parsedOrReset(left, oldIndex)) return nullptr;
+    if (!parsedOrReset(left, startToken.type)) return nullptr;
     while (true) {
         auto const it = LGS_BINARY_OPS_DICT.find(currentToken.type);
         if (it == LGS_BINARY_OPS_DICT.end()) break;
@@ -1266,6 +1258,7 @@ LgsExpr* LgsParser::parseExprWithPrecedence(const int minPrecedence) {
             return left;
         }
         left = new LgsBinaryExpr(left, right, it->second);
+        setLocation(left->location, &startToken);
     }
     return left;
 }
@@ -1367,7 +1360,6 @@ LgsFuncCall* LgsParser::parseFuncCall() {
 
     const auto funcCall = new LgsFuncCall(nameToken.lexeme);
     setLocation(funcCall->location, &nameToken);
-    funcCall->genericsArgs = generics;
     if (matchAndConsume(T_RPAREN)) return funcCall;
 
     std::unordered_set<std::string> seen;

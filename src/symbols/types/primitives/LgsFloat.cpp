@@ -55,8 +55,8 @@ LgsType* LgsFloat::applyBinOp(LgsBinaryExpr* binExpr) {
     return nullptr;
 }
 
-Value* LgsFloat::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    const auto [l, r] = loadOperands(cg, self, other);
+Value* LgsFloat::addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+    const auto [l, r] = loadOperands(cg, left, right);
     return cg.builder.CreateFAdd(l, r);
 }
 

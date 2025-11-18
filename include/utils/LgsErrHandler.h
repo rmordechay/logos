@@ -1,7 +1,8 @@
 #pragma once
-#include "data/LgsErrors.h"
-#include "data/LgsWarnings.h"
+#include "LgsErrors.h"
+#include "LgsWarnings.h"
 #include <vector>
+#include <mutex>
 
 class LgsApp;
 struct LgsLocation;
@@ -17,6 +18,6 @@ public:
     void addError(const LgsBaseMsg& lgsErr, const LgsLocation* location, const std::string& filePath, const std::vector<std::string>& args);
     void addWarning(const LgsBaseMsg& lgsErr, const LgsLocation* location, const std::vector<std::string>& args = {});
     void mergeErrors(LgsErrHandler& other);
-    void mergeErrorsWithLock(LgsErrHandler& other);
+    void mergeErrorsWithLock(LgsErrHandler& other, std::mutex& mtx);
     void printErrors() const;
 };

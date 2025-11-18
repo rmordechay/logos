@@ -7,6 +7,7 @@ public:
 
     explicit LgsSArray(LgsType* baseType, LgsExpr* size): LgsIterable(baseType, size) {
         isStatic = true;
+        passByRef = true;
     }
     Type* getIRType(LgsLLVMGen& cg) override;
     std::string getName() override;
@@ -17,7 +18,7 @@ public:
     Constant* getRTType(LgsLLVMGen& cg) override;
     std::string strFormatPart() const override;
     LgsType* applyBinOp(LgsBinaryExpr* binExpr) override;
-    Value* addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
+    Value* addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
     Value* mulIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
     Value* inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
     Value* getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) override;

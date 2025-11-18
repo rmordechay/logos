@@ -1,5 +1,6 @@
 #include "exprs/LgsBinaryExpr.h"
 
+#include "LgsType.h"
 #include "codegen/LgsLLVMGen.h"
 #include "utils/LgsUtils.h"
 
@@ -20,7 +21,12 @@ bool LgsBinaryExpr::equals(LgsExpr* other) {
 }
 
 LgsExpr* LgsBinaryExpr::clone() {
-    return new LgsBinaryExpr(left->clone(), right->clone(), op);
+    const auto newBinaryExpr = new LgsBinaryExpr(*this);
+    newBinaryExpr->left = left->clone();
+    newBinaryExpr->right = right->clone();
+    if (type) newBinaryExpr->type = type->clone();
+    if (results) newBinaryExpr->results = results->clone();
+    return newBinaryExpr;
 }
 
 LgsBinaryExpr::~LgsBinaryExpr() {

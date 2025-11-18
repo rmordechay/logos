@@ -13,11 +13,11 @@ public:
     }
     Type* getIRType(LgsLLVMGen& cg) override;
     LgsType* applyBinOp(LgsBinaryExpr* binExpr) override;
-    LgsExpr* addConst(LgsExpr* self, LgsExpr* other) override;
-    LgsExpr* subConst(LgsExpr* self, LgsExpr* other) override;
-    LgsExpr* mulConst(LgsExpr* self, LgsExpr* other) override;
-    LgsExpr* divConst(LgsExpr* self, LgsExpr* other) override;
-    LgsExpr* modConst(LgsExpr* self, LgsExpr* other) override;
+    LgsExpr* addConst(LgsExpr* left, LgsExpr* right) override;
+    LgsExpr* subConst(LgsExpr* left, LgsExpr* right) override;
+    LgsExpr* mulConst(LgsExpr* left, LgsExpr* right) override;
+    LgsExpr* divConst(LgsExpr* left, LgsExpr* right) override;
+    LgsExpr* modConst(LgsExpr* left, LgsExpr* right) override;
     LgsExpr* bitAndConst(LgsExpr* self, LgsExpr* other) override;
     LgsExpr* bitOrConst(LgsExpr* self, LgsExpr* other) override;
     LgsExpr* bitXorConst(LgsExpr* self, LgsExpr* other) override;
@@ -31,7 +31,7 @@ public:
     LgsExpr* leConst(LgsExpr* self, LgsExpr* other) override;
     LgsExpr* andConst(LgsExpr* self, LgsExpr* other) override;
     LgsExpr* orConst(LgsExpr* self, LgsExpr* other) override;
-    Value* addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
+    Value* addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
     Value* subIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
     Value* mulIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
     Value* divIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;

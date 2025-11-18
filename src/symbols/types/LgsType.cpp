@@ -215,23 +215,23 @@ LgsType* LgsType::clone() {
     assert(0);
 }
 
-LgsExpr* LgsType::addConst(LgsExpr* self, LgsExpr* other) {
+LgsExpr* LgsType::addConst(LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
-LgsExpr* LgsType::subConst(LgsExpr* self, LgsExpr* other) {
+LgsExpr* LgsType::subConst(LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
-LgsExpr* LgsType::mulConst(LgsExpr* self, LgsExpr* other) {
+LgsExpr* LgsType::mulConst(LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
-LgsExpr* LgsType::divConst(LgsExpr* self, LgsExpr* other) {
+LgsExpr* LgsType::divConst(LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
-LgsExpr* LgsType::modConst(LgsExpr* self, LgsExpr* other) {
+LgsExpr* LgsType::modConst(LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
@@ -291,7 +291,7 @@ LgsExpr* LgsType::orConst(LgsExpr* self, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsType::addIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+Value* LgsType::addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
