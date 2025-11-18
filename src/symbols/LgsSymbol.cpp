@@ -3,7 +3,7 @@
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
-#include "types/LgsGenericType.h"
+#include "types/LgsGenericParam.h"
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
 #include "types/LgsSubType.h"
@@ -26,7 +26,7 @@ LgsSymbol::LgsSymbol(LgsInterface* interface)
 LgsSymbol::LgsSymbol(LgsSubType* subtype)
     : name(&subtype->name), symbolType(SUBTYPE), location(&subtype->location), subtype(subtype) {}
 
-LgsSymbol::LgsSymbol(LgsGenericType* generic)
+LgsSymbol::LgsSymbol(LgsGenericParam* generic)
     : name(&generic->name), symbolType(GENERIC), location(&generic->location), generic(generic) {}
 
 LgsSymbol::LgsSymbol(LgsObject* object, const bool isBuiltin, const bool isExternal)

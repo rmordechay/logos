@@ -25,7 +25,8 @@ public:
     std::string parentName;
     LgsType* rt = nullptr;
     std::vector<LgsParam> params;
-    std::vector<LgsGenericType*> generics;
+    std::vector<LgsType*> genericArgs;
+    std::vector<LgsGenericParam*> genericParams;
     FunctionType* IRType = nullptr;
     bool isPublic = false;
     bool isBuiltin = false;
@@ -58,7 +59,7 @@ public:
     bool canCastTo(LgsType* other) override;
     bool equals(LgsType* other) override;
     void setFuncOptions(uint32_t ops);
-    LgsType* clone() override;
+    LgsFuncType* clone() override;
     std::unordered_map<std::string, LgsParam*> getParamsByName();
     ~LgsFuncType() override;
 };

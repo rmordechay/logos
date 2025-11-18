@@ -15,8 +15,8 @@ struct LgsFuncArg {
 class LgsFuncCall final : public LgsExpr {
 public:
     std::string name;
-    std::vector<LgsType*> generics;
     std::vector<LgsFuncArg> args;
+    std::vector<LgsType*> genericsArgs;
     LgsFunc* func = nullptr;
     bool inSelection = false;
     bool isCoroutine = false;

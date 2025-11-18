@@ -1,10 +1,16 @@
 #pragma once
 #include "Lgs_Stack.h"
 #include "Lgs_Types.h"
+#include <execinfo.h>
+#include <dlfcn.h>
+#include <ostream>
 
 #define STACK_CAPACITY 1024
 #define LOCALS_CAPACITY 8
 
+struct Lgs_Map;
+struct Lgs_Set;
+struct Lgs_DArray;
 typedef void (*ThunkFunc)(void*);
 
 struct Lgs_ThunkFunc {
@@ -31,4 +37,14 @@ struct Lgs_StackFrame {
 struct Lgs_Stack {
     int stackIndex;
     Lgs_StackFrame frames[STACK_CAPACITY];
+
+    void push();
+    void pop(bool cleanup);
+    void addDefer(void* funcPtr, void* ctx);
+    void callDefers() const;
+    void addOwner(void* ptr, Lgs_TypeKind type);
+    void addOrphan(void* ptr, Lgs_TypeKind type);
+    void removeOwner(const void* owner);
+    void funcCleanup();
+    static void printStackTrace();
 };

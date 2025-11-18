@@ -42,7 +42,7 @@
 #include "stmts/LgsReturn.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsEnum.h"
-#include "types/LgsGenericType.h"
+#include "types/LgsGenericParam.h"
 #include "types/LgsInterface.h"
 #include "types/LgsSelf.h"
 #include "types/LgsSubType.h"
@@ -625,9 +625,9 @@ LgsType* LgsParser::parseType() {
     return type;
 }
 
-LgsGenericType* LgsParser::parseGenericType() {
+LgsGenericParam* LgsParser::parseGenericType() {
     if (currentToken.type != T_IDENTIFIER) return nullptr;
-    const auto generic = new LgsGenericType(currentToken.lexeme);
+    const auto generic = new LgsGenericParam(currentToken.lexeme);
     setLocation(generic->location, &currentToken);
     consume();
     return generic;
@@ -704,36 +704,46 @@ LgsFunc* LgsParser::parseMethod(LgsObject* obj) {
 LgsFuncType* LgsParser::parseFuncHeader() {
     const auto nameToken = currentToken;
     if (currentToken.type != T_IDENTIFIER) return nullptr;
-    std::vector<LgsGenericType*> generics;
+    std::vector<LgsGenericParam*> genericsParams;
     if (peek().type == T_LANGLE) {
         consume(2);
         while (true) {
             const auto type = parseGenericType();
             if (!type) break;
-            generics.push_back(type);
+            genericsParams.push_back(type);
             if (currentToken.type == T_RANGLE) break;
         }
         mustMatch(T_RANGLE);
-    } else if (peek().type != T_LPAREN) {
-        return nullptr;
+    } else if (peek().type == T_LPAREN) {
+        consume();
     } else {
-        consume(2);
+        return nullptr;
     }
 
     const auto funcType = new LgsFuncType();
     setLocation(funcType->location, &nameToken);
     funcType->name = nameToken.lexeme;
-    funcType->generics = generics;
+    funcType->genericParams = genericsParams;
     parseParams(funcType);
     mustMatch(T_RPAREN);
-    funcType->rt = matchAndConsume(T_COLON) ? parseType() : &LGS_VOID;
+    if (matchAndConsume(T_COLON)) {
+        funcType->rt = parseType();
+        for (const auto genericsParam : genericsParams) {
+            if (funcType->rt->getName() == genericsParam->getName()) continue;
+            funcType->rt->isGenericParam = true;
+        }
+    } else {
+        funcType->rt = &LGS_VOID;
+    }
     return funcType;
 }
 
 void LgsParser::parseParams(LgsFuncType* funcType) {
     if (!matchAndConsume(T_LPAREN)) return;
+    if (currentToken.type == T_RPAREN) return;
     auto paramIndex = 0;
     while (true) {
+        // Name
         const auto paramName = currentToken;
         if (!mustMatch(T_IDENTIFIER)) break;
         if (currentToken.type == T_COLON) {
@@ -742,23 +752,31 @@ void LgsParser::parseParams(LgsFuncType* funcType) {
             addParsingError();
             break;
         }
+
+        // Type
         const auto type = parseType();
         mustParse(type);
+        for (const auto genericsParam : funcType->genericParams) {
+            if (type->getName() == genericsParam->getName()) continue;
+            type->isGenericParam = true;
+        }
         LgsParam param(type, paramName.lexeme);
-        param.index = paramIndex++;
         setLocation(param.location, &paramName);
+        param.index = paramIndex++;
+
+        // Variadic or expr
         if (matchAndConsume(T_TRIPLE_DOT)) {
             if (funcType->isVariadic) addParsingError();
             param.isVariadic = true;
             funcType->isVariadic = true;
-        } else if (funcType->isVariadic) {
-            // Normal param cannot come after variadic param
+        } else if (funcType->isVariadic) { // Normal param cannot come after variadic param
             addParsingError();
         } else if (matchAndConsume(T_EQUAL)) {
             param.expr = parseExpr();
             mustParse(param.expr);
             funcType->hasDefaults = true;
         }
+
         funcType->params.push_back(param);
         if (currentToken.type == T_RPAREN) break;
         mustMatch(T_COMMA);
@@ -1349,7 +1367,7 @@ LgsFuncCall* LgsParser::parseFuncCall() {
 
     const auto funcCall = new LgsFuncCall(nameToken.lexeme);
     setLocation(funcCall->location, &nameToken);
-    funcCall->generics = generics;
+    funcCall->genericsArgs = generics;
     if (matchAndConsume(T_RPAREN)) return funcCall;
 
     std::unordered_set<std::string> seen;
@@ -1583,7 +1601,6 @@ LgsHashMap* LgsParser::parseHashMap() {
 LgsFunc* LgsParser::parseLambda() {
     const auto oldIndex = currentIndex;
     std::vector<LgsParam> params;
-
     if (currentToken.type == T_IDENTIFIER) { // Single param
         LgsParam param(nullptr, currentToken.lexeme);
         consume();
@@ -1603,7 +1620,8 @@ LgsFunc* LgsParser::parseLambda() {
                     mustParse(paramType);
                 }
                 params.emplace_back(paramType, paramName);
-                if (currentToken.type == T_RPAREN || currentToken.type != T_COMMA) break;
+                if (currentToken.type == T_RPAREN) break;
+                if (!matchAndConsume(T_COMMA)) break;
             }
             if (currentToken.type == T_COMMA) consume();
             if (currentToken.type == T_RPAREN) consume();

@@ -5,7 +5,7 @@
 #include <map>
 
 class LgsSubType;
-class LgsGenericType;
+class LgsGenericParam;
 class LgsSet;
 class LgsAny;
 class LgsByte;
@@ -53,6 +53,7 @@ public:
     bool isFloat = false;
     bool isPrimitive = false;
     bool isHeapAlloc = false;
+    bool isGenericParam = false;
     bool passByRef = false;
 
     bool addField(LgsField* field);
@@ -142,7 +143,7 @@ public:
     LgsObject* asObject();
     LgsInterface* asInterface();
     LgsEnum* asEnum();
-    LgsGenericType* asGeneric();
+    LgsGenericParam* asGeneric();
     LgsIterable* asIterable();
     LgsSArray* asSArray();
     LgsDArray* asDArray();

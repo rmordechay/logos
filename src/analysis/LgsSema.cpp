@@ -49,7 +49,7 @@
 #include "stmts/LgsIfStmt.h"
 #include "stmts/LgsSwitch.h"
 #include "types/primitives/LgsDouble.h"
-#include "types/LgsGenericType.h"
+#include "types/LgsGenericParam.h"
 #include <iostream>
 #include <ranges>
 #include <unordered_set>
@@ -132,7 +132,7 @@ void LgsSema::visitTestFile(const LgsTestFile* testFile) {
     }
 }
 
-void LgsSema::visitGeneric(LgsGenericType* generic) {
+void LgsSema::visitGeneric(LgsGenericParam* generic) {
 }
 
 void LgsSema::visitEnum(const LgsEnum* enum_) {
@@ -154,7 +154,7 @@ void LgsSema::visitField(LgsField* field) {
 
 void LgsSema::visitFunc(LgsFunc* func) {
     const auto ft = func->funcType;
-    if (!ft->generics.empty()) return;
+    if (!ft->genericParams.empty()) return;
     stack.enterScope(func);
     auto defaultParamsStarted = false;
     for (auto& param : ft->params) {
@@ -959,7 +959,7 @@ void LgsSema::visitFuncCall(LgsFuncCall* funcCall) {
     }
 
     const auto func = symbol->func;
-    if (!func->funcType->generics.empty()) {
+    if (!func->funcType->genericParams.empty()) {
         const auto funcName = funcCall->getGenericName();
         const auto generics = file->symbolTable.genericCalls.find(funcName);
         LgsFunc* genericFunc = nullptr;
@@ -1483,7 +1483,6 @@ void LgsSema::addLocalSymbol(const LgsSymbol& newSymbol) {
     stack.getSymbolTable().addSymbol(newSymbol, &errHandler);
 }
 
-
 LgsSymbol* LgsSema::getSymbol(const std::string& name, const LgsLocation* location) {
     if (const auto globalSymbol = globals.table.getSymbol(name)) {
         if (!globalSymbol->isBuiltin) refCount[*globalSymbol->name]++;
@@ -1505,17 +1504,21 @@ LgsSymbol* LgsSema::getSymbol(const std::string& name, const LgsLocation* locati
 }
 
 LgsFunc* LgsSema::createGenericFunc(LgsFuncCall* funcCall, const LgsFunc* func) {
+    // Get positions from definition
+    //  - standalone, param, rt
+    // Get args from call
+    // Match and replace
+    // Add 'standalone' generic to local symbols
     const auto newFunc = new LgsFunc(*func);
-    newFunc->funcType = func->funcType->clone()->asFuncType();
-    newFunc->funcType->rt = funcCall->args[0].expr->type->clone();
+    newFunc->funcType = func->funcType->clone();
     newFunc->funcType->IRName = newFunc->funcType->getName();
+    const auto g = newFunc->funcType->genericParams[0];
     for (size_t i = 0; i < newFunc->funcType->params.size(); ++i) {
         const auto param = newFunc->funcType->params[i];
         const auto arg = funcCall->args[i];
         newFunc->funcType->IRName += "_" + arg.expr->type->getName();
         newFunc->funcType->params[i] = LgsParam(arg.expr->type, param.name, param.expr);
     }
-    freeTypes(newFunc->funcType->generics);
     newFunc->stmtsBlock = func->stmtsBlock->clone();
     visitFunc(newFunc);
     funcCall->func = newFunc;

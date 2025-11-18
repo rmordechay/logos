@@ -71,7 +71,7 @@ public:
     void visitObject(LgsObject* obj);
     void visitInterface(LgsInterface* interface);
     void visitTestFile(const LgsTestFile* testFile);
-    void visitGeneric(LgsGenericType* generic);
+    void visitGeneric(LgsGenericParam* generic);
     void visitEnum(const LgsEnum* enum_);
     void visitField(LgsField* field);
     void visitFunc(LgsFunc* func);

@@ -8,7 +8,7 @@
 #include "exprs/LgsFuncCall.h"
 #include "funcs/LgsMainFunc.h"
 
-class LgsGenericType;
+class LgsGenericParam;
 struct LgsPaths;
 struct LgsSymbol;
 struct LgsAppConfigs;
@@ -100,7 +100,7 @@ public:
     LgsFuncType* parseFuncType();
     LgsMap* parseMapType();
     LgsType* parseType();
-    LgsGenericType* parseGenericType();
+    LgsGenericParam* parseGenericType();
     std::vector<LgsType*> parseGenericArgs();
 
     // Funcs

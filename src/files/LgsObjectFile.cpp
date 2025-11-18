@@ -4,7 +4,7 @@
 #include "stmts/LgsField.h"
 #include "stmts/LgsIOPair.h"
 #include "types/LgsEnum.h"
-#include "types/LgsGenericType.h"
+#include "types/LgsGenericParam.h"
 #include "types/LgsSubType.h"
 
 size_t LgsObjectFile::hashFile() {

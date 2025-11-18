@@ -1,4 +1,4 @@
-#include "../include/logos/LgsConfigs.h"
+#include "logos/LgsConfigs.h"
 #include "codegen/LgsLLVMGen.h"
 #define DOCTEST_CONFIG_IMPLEMENT
 #include "external/doctest.h"

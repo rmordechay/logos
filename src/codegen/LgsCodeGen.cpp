@@ -45,7 +45,7 @@
 #include "stmts/LgsIOStmt.h"
 #include "stmts/LgsIfStmt.h"
 #include "stmts/LgsSwitch.h"
-#include "types/LgsGenericType.h"
+#include "types/LgsGenericParam.h"
 #include "types/iterables/LgsSArray.h"
 #include "types/iterables/LgsVec.h"
 #include "types/primitives/LgsSize.h"
@@ -141,7 +141,7 @@ void LgsCodeGen::visitMainFunc(LgsMainFunc* func) {
 
 void LgsCodeGen::visitFunc(LgsFunc* func) {
     const auto ft = func->funcType;
-    if (!ft->generics.empty()) return;
+    if (!ft->genericParams.empty()) return;
     stack.enterScope(func);
     createPrologue(func);
     if (func->isTest) for (auto [_, then] : func->mocks) visitExpr(then);
@@ -182,12 +182,11 @@ void LgsCodeGen::visitField(LgsField* field) const {
         for (int8_t i = 0; i < vec->vectorDim; i++) {
             mask[i] = LgsVec::getComponentIndex(field->name[i]);
         }
-        const llvm::ArrayRef maskRef(mask);
         const auto vecType = field->type->getIRType(cg);
         field->IRValue = cg.builder.CreateAlloca(vecType);
         const auto parentTy = field->parentType->getIRType(cg);
         const auto l = cg.builder.CreateLoad(parentTy, field->parentIRPtr);
-        const auto newVec = cg.builder.CreateShuffleVector(l, UndefValue::get(parentTy), maskRef);
+        const auto newVec = cg.builder.CreateShuffleVector(l, UndefValue::get(parentTy), mask);
         cg.builder.CreateStore(newVec, field->IRValue);
     } else {
         field->IRValue = field->getGEP(cg);
@@ -912,6 +911,7 @@ void LgsCodeGen::visitFieldSelection(LgsVariable* var, LgsExpr* parent, const bo
     if (field->type->asObject() || (field->type->asEnum() && !assign)) {
         var->IRValue = cg.builder.CreateLoad(cg.ptrTy(), field->IRValue);
     } else {
+        visitField(field);
         var->IRValue = field->IRValue;
     }
 }
@@ -953,7 +953,7 @@ void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
     } else if (func->funcType->isArrFunc) {
         visitIterFunc(funcCall);
     }
-    if (!func->funcType->generics.empty()) visitGenericFunc(func);
+    if (!func->funcType->genericParams.empty()) visitGenericFunc(func);
     if (funcCall->isCoroutine || funcCall->isDeferred) return;
 
     std::vector<LgsExpr*> args;

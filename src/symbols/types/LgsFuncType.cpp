@@ -121,7 +121,7 @@ void LgsFuncType::setFuncOptions(const uint32_t ops) {
     hasDefaults =  ops & HAS_DEFAULTS;
 }
 
-LgsType* LgsFuncType::clone() {
+LgsFuncType* LgsFuncType::clone() {
     const auto lgsFunc = new LgsFuncType();
     lgsFunc->name = name;
     lgsFunc->IRName = IRName;
@@ -130,8 +130,8 @@ LgsType* LgsFuncType::clone() {
     for (const auto& param : params) {
         lgsFunc->params.push_back(LgsParam(param));
     }
-    for (const auto generic : generics) {
-        lgsFunc->generics.push_back(generic->clone());
+    for (const auto generic : genericParams) {
+        lgsFunc->genericParams.push_back(generic->clone());
     }
     lgsFunc->isPublic = isPublic;
     lgsFunc->isBuiltin = isBuiltin;
