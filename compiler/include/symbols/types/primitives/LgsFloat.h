@@ -20,7 +20,7 @@ public:
     Value* addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
     Value* subIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
     Value* mulIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* divIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
+    Value* divIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
 };
 
 inline LgsFloat LGS_FLOAT;

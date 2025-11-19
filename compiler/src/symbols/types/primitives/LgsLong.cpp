@@ -51,34 +51,34 @@ Value* LgsLong::mulIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
     return cg.builder.CreateMul(l, r);
 }
 
-Value* LgsLong::divIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    const auto l = cg.builder.CreateZExt(self->loadIR(cg), getIRType(cg));
-    const auto r = cg.builder.CreateZExt(other->loadIR(cg), getIRType(cg));
+Value* LgsLong::divIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+    const auto l = cg.builder.CreateZExt(left->loadIR(cg), getIRType(cg));
+    const auto r = cg.builder.CreateZExt(right->loadIR(cg), getIRType(cg));
     return cg.builder.CreateSDiv(l, r);
 }
 
-Value* LgsLong::modIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    return cg.builder.CreateSRem(self->loadIR(cg), other->loadIR(cg));
+Value* LgsLong::modIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+    return cg.builder.CreateSRem(left->loadIR(cg), right->loadIR(cg));
 }
 
-Value* LgsLong::bitAndIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    return cg.builder.CreateAnd(self->loadIR(cg), other->loadIR(cg));
+Value* LgsLong::bitAndIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+    return cg.builder.CreateAnd(left->loadIR(cg), right->loadIR(cg));
 }
 
-Value* LgsLong::bitOrIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    return cg.builder.CreateOr(self->loadIR(cg), other->loadIR(cg));
+Value* LgsLong::bitOrIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+    return cg.builder.CreateOr(left->loadIR(cg), right->loadIR(cg));
 }
 
-Value* LgsLong::bitXorIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    return cg.builder.CreateXor(self->loadIR(cg), other->loadIR(cg));
+Value* LgsLong::bitXorIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+    return cg.builder.CreateXor(left->loadIR(cg), right->loadIR(cg));
 }
 
-Value* LgsLong::rshiftIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    return cg.builder.CreateShl(self->loadIR(cg), other->loadIR(cg));
+Value* LgsLong::rshiftIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+    return cg.builder.CreateShl(left->loadIR(cg), right->loadIR(cg));
 }
 
-Value* LgsLong::lshiftIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    return cg.builder.CreateLShr(self->loadIR(cg), other->loadIR(cg));
+Value* LgsLong::lshiftIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* other) {
+    return cg.builder.CreateLShr(left->loadIR(cg), other->loadIR(cg));
 }
 
 std::string LgsLong::getName() {

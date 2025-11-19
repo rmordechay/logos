@@ -55,7 +55,7 @@ int64_t* LgsExpr::getConstInt() {
         return &intConst->value;
     }
     if (const auto var = asVariable()) {
-        if (!var->isValueKnown) return nullptr;
+        if (var->isMutable) return nullptr;
         switch (var->ref.symbolType) {
         case VAR_DEC:
             return var->ref.varDec->expr->getConstInt();
@@ -67,7 +67,7 @@ int64_t* LgsExpr::getConstInt() {
         }
     }
     if (const auto binExpr = asBinExpr()) {
-        if (!binExpr->isValueKnown) return nullptr;
+        if (binExpr->isMutable) return nullptr;
         if (binExpr->results) return binExpr->results->getConstInt();
         const auto const1 = binExpr->left->getConstInt();
         if (!const1) return nullptr;

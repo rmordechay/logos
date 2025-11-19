@@ -17,7 +17,6 @@ public:
     LgsIndex index;
 
     explicit LgsIterIndex(LgsExpr* baseExpr, LgsExpr* from = nullptr, LgsExpr* to = nullptr) : baseExpr(baseExpr) {
-        isMutable = true;
         index.from = from;
         index.to = to;
     }

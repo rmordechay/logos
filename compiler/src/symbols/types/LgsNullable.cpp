@@ -50,6 +50,12 @@ std::string LgsNullable::strFormatPart() const {
     return baseType->strFormatPart();
 }
 
+LgsType* LgsNullable::clone() {
+    const auto newNullable = new LgsNullable(*this);
+    newNullable->baseType = baseType->clone();
+    return newNullable;
+}
+
 LgsNullable::~LgsNullable() {
     if (baseType) {
         freeType(baseType);

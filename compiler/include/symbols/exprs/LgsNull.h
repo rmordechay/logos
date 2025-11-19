@@ -6,7 +6,6 @@ class LgsNull final : public LgsExpr {
 public:
     explicit LgsNull() {
         setType(new LgsNullable(nullptr));
-        isMutable = false;
     }
 
     void castImplicitly(LgsType* toType) override;

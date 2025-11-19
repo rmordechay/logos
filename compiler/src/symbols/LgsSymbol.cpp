@@ -23,11 +23,14 @@ LgsSymbol::LgsSymbol(LgsField* field)
 LgsSymbol::LgsSymbol(LgsInterface* interface)
     : name(&interface->name), symbolType(INTERFACE), location(&interface->location), interface(interface) {}
 
+LgsSymbol::LgsSymbol(LgsGenericParam* generic)
+    : name(&generic->name), symbolType(GENERIC), location(&generic->location), generic(generic) {}
+
 LgsSymbol::LgsSymbol(LgsSubType* subtype)
     : name(&subtype->name), symbolType(SUBTYPE), location(&subtype->location), subtype(subtype) {}
 
-LgsSymbol::LgsSymbol(LgsGenericParam* generic)
-    : name(&generic->name), symbolType(GENERIC), location(&generic->location), generic(generic) {}
+LgsSymbol::LgsSymbol(LgsVarDec* varDec, const bool isBuiltin, const bool isExternal)
+    : name(&varDec->name), symbolType(VAR_DEC), location(&varDec->location), isExternal(isExternal), isBuiltin(isBuiltin), varDec(varDec) {}
 
 LgsSymbol::LgsSymbol(LgsObject* object, const bool isBuiltin, const bool isExternal)
     : name(&object->name), symbolType(OBJECT), location(&object->location), isExternal(isExternal), isBuiltin(isBuiltin), object(object) {}
@@ -37,9 +40,6 @@ LgsSymbol::LgsSymbol(LgsEnum* lgsEnum, const bool isBuiltin, const bool isExtern
 
 LgsSymbol::LgsSymbol(LgsFunc* func, const bool isBuiltin, const bool isExternal)
     : name(&func->funcType->name), symbolType(FUNC), location(&func->location), isExternal(isExternal), isBuiltin(isBuiltin), func(func) {}
-
-LgsSymbol::LgsSymbol(LgsVarDec* varDec)
-    : name(&varDec->name), symbolType(VAR_DEC), location(&varDec->location), varDec(varDec) {}
 
 LgsType* LgsSymbol::getType() const {
     switch (symbolType) {

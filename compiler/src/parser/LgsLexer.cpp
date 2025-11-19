@@ -61,7 +61,7 @@ LgsToken LgsLexer::nextToken() {
     }
 
     // Var or keyword
-    if ((currentChar == '$' && peek() != ' ') || std::isalpha(currentChar)) {
+    if ((currentChar == '$' && peek() != ' ') || std::isalpha(currentChar) || currentChar == '_') {
         return scanVarOrKeyword(location);
     }
 
@@ -79,12 +79,18 @@ LgsToken LgsLexer::nextToken() {
     switch (currentChar) {
     case '(': advance(); return {T_LPAREN, "(", location};
     case ')': advance(); return {T_RPAREN, ")", location};
-    case '{': advance(); return {T_LBRACE, "{", location};
-    case '}': advance(); return {T_RBRACE, "}", location};
     case '[': advance(); return {T_LBRACK, "[", location};
     case ']': advance(); return {T_RBRACK, "]", location};
     case ',': advance(); return {T_COMMA, ",", location};
     case '?': advance(); return {T_QUEST_MARK, "?", location};
+    case '{':
+        advance();
+        if (match('*')) return {T_STAR_LBRACE, "{*", location};
+        return {T_LBRACE, "{", location};
+    case '}': {
+        advance();
+        return {T_RBRACE, "}", location};
+    }
     case '=':
         advance();
         if (match('=')) return {T_DOUBLE_EQUAL, "==", location};
@@ -127,6 +133,7 @@ LgsToken LgsLexer::nextToken() {
         return {T_MINUS, "-", location};
     case '*':
         advance();
+        if (match('}')) return {T_STAR_RBRACE, "*}", location};
         if (match('=')) return {T_EQUAL_STAR, "*=", location};
         return {T_STAR, "*", location};
     case '_':

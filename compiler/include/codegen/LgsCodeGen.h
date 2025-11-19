@@ -107,6 +107,7 @@ public:
     void visitCast(LgsCast* cast);
     void visitLambda(LgsFunc* func);
     void visitIntConst(LgsIntConst* intConst) const;
+    void visitConstant(LgsExpr* expr);
     void visitFloatConst(LgsFloatConst* floatConst) const;
     void visitArrayExpr(LgsArrayExpr* array);
     void visitHashMap(LgsHashMap* hashMap);

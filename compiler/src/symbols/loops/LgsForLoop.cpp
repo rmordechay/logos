@@ -16,12 +16,10 @@ void LgsForLoop::setBlocks(LgsLLVMGen& cg) {
 }
 
 void LgsForLoop::incAndJumpToCond(LgsLLVMGen& cg) {
-    const auto currentValue = cg.builder.CreateLoad(cg.i32Ty(), iPtr);
-    const auto constOne = ConstantInt::get(currentValue->getType(), 1);
-    const auto incValue = cg.builder.CreateAdd(currentValue, constOne);
-    const auto decValue = cg.builder.CreateSub(currentValue, constOne);
-    const auto newValue = cg.builder.CreateSelect(isReversed, incValue, decValue);
-    cg.builder.CreateStore(newValue, iPtr);
+    if (cg.lastInstTerminator()) return;
+    iValue = cg.builder.CreateLoad(cg.i32Ty(), iPtr);
+    const auto inc = cg.builder.CreateAdd(iValue, cg.i32(1));
+    cg.builder.CreateStore(inc, iPtr);
     cg.builder.CreateBr(IRCondBlock);
 }
 

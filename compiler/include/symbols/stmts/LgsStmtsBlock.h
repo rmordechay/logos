@@ -23,6 +23,7 @@ class LgsStmtsBlock final : public LgsValue {
 public:
     std::vector<LgsObjOrStmt> stmts;
     LgsReturn* returnStmt = nullptr;
+    bool isMacro = false;
 
     explicit LgsStmtsBlock(const std::vector<LgsObjOrStmt>& stmts = {}) : stmts(stmts) {}
     LgsStmtsBlock* clone() override;

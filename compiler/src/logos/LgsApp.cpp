@@ -108,14 +108,13 @@ bool LgsApp::parse() {
 
     // Project mode
     if (!loadEnvFiles()) return false;
-    for (auto& fileMetadata : appCache.files) {
-        if (fileMetadata.type != LGS_SRC_FILE) continue;
-        threadPool.runTask([&fileMetadata, this] {
-            loadSrcFile(fileMetadata);
+    for (auto& metadata : appCache.files) {
+        if (metadata.type != LGS_SRC_FILE) continue;
+        threadPool.runTask([&metadata, this] {
+            loadSrcFile(metadata);
         });
     }
     threadPool.wait();
-    importCFiles();
     return errHandler.successful;
 }
 
@@ -194,7 +193,6 @@ void LgsApp::loadSrcFile(LgsFileMetadata& metadata) {
         if (!parser.errHandler.successful) return errHandler.mergeErrors(parser.errHandler);
         if (!file) return;
         srcFiles.push_back(file);
-        mergeCImports(parser);
     }
 }
 
@@ -206,9 +204,8 @@ void LgsApp::loadSrcFile(const std::string& fileCode, const fs::path& filePath) 
     {
         std::lock_guard lock(mtx);
         if (file) srcFiles.push_back(file);
-        if (!parser.errHandler.successful) {
-            errHandler.mergeErrors(parser.errHandler);
-        }
+        if (parser.errHandler.successful) return;
+        errHandler.mergeErrors(parser.errHandler);
     }
 }
 
@@ -311,30 +308,9 @@ void LgsApp::loadBuiltins() {
     globals.table.addSymbol(LgsSymbol(new LgsPrint(), true, false), &errHandler);
     globals.table.addSymbol(LgsSymbol(new LgsTest(), true, false), &errHandler);
     globals.table.addSymbol(LgsSymbol(new LgsReflect(), true, false), &errHandler);
-}
-
-void LgsApp::importCFiles() {
-    LgsCLang clang(paths.cLibHeadersDir);
-    for (const auto cImport : globals.cImports) {
-        threadPool.runTask([&cImport, this, &clang] {
-            const auto headerName = cImport->value;
-            if (globals.cLibHeaders.contains(headerName)) return;
-            const auto headerPath = paths.cLibHeadersDir / headerName;
-            const auto cCode = getFileText(headerPath);
-            if (cCode.empty()) {
-                std::lock_guard lock(mtx);
-                errHandler.addError(E10047, {LGS_C, cCode});
-                return;
-            }
-            LgsCLangParser parser;
-            clang.parseFile(parser, cCode);
-            {
-                std::lock_guard lock(mtx);
-                globals.cLibHeaders[headerName] = parser.table;
-            }
-        });
-    }
-    threadPool.wait();
+    globals.table.addSymbol(LgsSymbol(new LgsVarDec("_LINUX", &LGS_BOOL, new LgsIntConst(&LGS_BOOL, lgsConfigs.os == LINUX)), true, false), &errHandler);
+    globals.table.addSymbol(LgsSymbol(new LgsVarDec("_MACOS", &LGS_BOOL, new LgsIntConst(&LGS_BOOL, lgsConfigs.os == MAC_OS)), true, false), &errHandler);
+    globals.table.addSymbol(LgsSymbol(new LgsVarDec("_WINDOWS", &LGS_BOOL, new LgsIntConst(&LGS_BOOL, lgsConfigs.os == WINDOWS)), true, false), &errHandler);
 }
 
 void LgsApp::createBuildDirs() {
@@ -411,19 +387,6 @@ void LgsApp::initPaths(const fs::path& root) {
     paths.cacheFile = paths.buildDir / LGS_FILES_CACHE_FILE;
     paths.findLgsRootDir();
     paths.findCLibHeaders();
-}
-
-void LgsApp::mergeCImports(const LgsParser& parser) {
-    for (auto localImport : parser.cImports) {
-        auto it = std::ranges::find_if(globals.cImports, [localImport](const LgsStrConst* g) {
-            return g->value == localImport->value;
-        });
-        if (it == std::ranges::end(globals.cImports)) {
-            globals.cImports.push_back(localImport);
-        } else {
-            freeExpr(localImport);
-        }
-    }
 }
 
 LgsMainFile* LgsApp::getMainFile() const {

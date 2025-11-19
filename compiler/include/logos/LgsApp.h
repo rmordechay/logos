@@ -30,10 +30,9 @@ inline std::mutex mtx;
 
 class LgsApp final {
 public:
-    LgsPaths paths;
-    LgsGlobals globals;
-    LgsAppCache appCache;
     LgsAppConfigs configs;
+    LgsAppCache appCache;
+    LgsGlobals globals;
     LgsErrHandler errHandler;
     LgsTypeResolver typeResolver;
     std::vector<LgsFile*> srcFiles;
@@ -41,6 +40,7 @@ public:
     std::vector<LgsTestFile*> testFiles;
     LgsAppConfigFile* appConfigFile = nullptr;
     std::unordered_map<std::string, std::string> lgsCode; // Used when passing code directly.
+    LgsPaths paths;
 
     explicit LgsApp(const fs::path& rootPath = ""): typeResolver(errHandler, globals) {
         paths.rootPath = rootPath;
@@ -60,14 +60,12 @@ public:
     bool loadConfigs();
     bool loadDeps();
     void loadBuiltins();
-    void importCFiles();
     void createBuildDirs();
     bool validateEnvs();
     bool validateRequiredEnvs();
     void compareHash() const;
     void printIR() const;
     void initPaths(const fs::path& root);
-    void mergeCImports(const LgsParser& parser);
     LgsMainFile* getMainFile() const;
     ~LgsApp();
 };

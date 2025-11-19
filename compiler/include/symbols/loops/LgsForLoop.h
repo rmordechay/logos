@@ -18,7 +18,6 @@ public:
     std::vector<LgsVarDec*> loopVars;
     llvm::AllocaInst* iPtr = nullptr;
     Value* iValue = nullptr;
-    Value* isReversed = nullptr;
     LgsStmtsBlock* stmtsBlock = nullptr;
     BasicBlock* IRCondBlock = nullptr;
     BasicBlock* IRBodyBlock = nullptr;

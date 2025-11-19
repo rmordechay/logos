@@ -64,6 +64,12 @@ std::atomic<size_t> LgsCodeGen::lambdasIDGenerator{0};
 
 bool LgsCodeGen::generate() {
     cg.setupModule(file, appConfigs.debugMode);
+    for (auto [name, symbol] : file.symbolTable.symbols) {
+        if (symbol.symbolType == VAR_DEC && symbol.isExternal) {
+            visitConstant(symbol.varDec->expr);
+            symbol.varDec->IRValue = symbol.varDec->expr->IRValue;
+        }
+    }
     if (const auto mainFile = dynamic_cast<LgsMainFile*>(&file)) {
         visitMainFile(mainFile);
     } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(&file)) {
@@ -78,6 +84,15 @@ bool LgsCodeGen::generate() {
 }
 
 void LgsCodeGen::visitMainFile(LgsMainFile* mainFile) {
+    for (const auto varDec : mainFile->varDecs) {
+        visitConstant(varDec->expr);
+        varDec->IRValue = varDec->expr->IRValue;
+    }
+    for (const auto& [_, symbol] : globals.table.symbols) {
+        if (symbol.symbolType != VAR_DEC) continue;
+        visitConstant(symbol.varDec->expr);
+        symbol.varDec->IRValue = symbol.varDec->expr->IRValue;
+    }
     for (const auto interface : mainFile->interfaces) {
         visitInterface(interface);
     }
@@ -258,23 +273,16 @@ void LgsCodeGen::visitLoop(LgsForLoop* loop) {
 void LgsCodeGen::visitRangeLoop(LgsRangeLoop* loop) {
     visitExpr(loop->startRange);
     visitExpr(loop->endRange);
-    const auto indexType = loop->endRange->IRValue->getType();
-    loop->iPtr = cg.builder.CreateAlloca(indexType);
-
-    const auto loopStart = loop->loopStart(cg);
-    const auto loopEnd = loop->loopEnd(cg);
-
-    // Determine direction
-    const auto isReversed = cg.builder.CreateICmpSLT(loopStart, loopEnd);
+    loop->iPtr = cg.builder.CreateAlloca(cg.i32Ty());
+    const auto loopStart = cg.builder.CreateSExt(loop->loopStart(cg), cg.i32Ty());
     cg.builder.CreateStore(loopStart, loop->iPtr);
     cg.builder.CreateBr(loop->IRCondBlock);
 
     // Condition
     cg.startBlock(loop->IRCondBlock);
     loop->iValue = cg.builder.CreateLoad(cg.i32Ty(), loop->iPtr);
-    const auto condForward = cg.builder.CreateICmpSLT(loop->iValue, loopEnd);
-    const auto condReverse = cg.builder.CreateICmpSGT(loop->iValue, loopEnd);
-    const auto condition = cg.builder.CreateSelect(isReversed, condForward, condReverse);
+    const auto loopEnd = cg.builder.CreateSExt(loop->loopEnd(cg), cg.i32Ty());
+    const auto condition = cg.builder.CreateICmpSLT(loop->iValue, loopEnd);
     cg.builder.CreateCondBr(condition, loop->IRBodyBlock, loop->IRExitBlock);
 
     // Body
@@ -282,7 +290,6 @@ void LgsCodeGen::visitRangeLoop(LgsRangeLoop* loop) {
     if (!loop->loopVars.empty()) {
         loop->loopVars[0]->IRValue = loop->iValue;
     }
-    loop->isReversed = isReversed;
 }
 
 void LgsCodeGen::visitForeachLoop(LgsForeachLoop* loop) {
@@ -314,13 +321,13 @@ void LgsCodeGen::visitLoopMetaVar(LgsMetaVar* metaVar) {
         break;
     }
     case FOR_IS_FIRST: {
-        const auto loopStart = cg.builder.CreateSExt(loop->loopStart(cg), cg.i64Ty());
+        const auto loopStart = cg.builder.CreateSExt(loop->loopStart(cg), cg.i32Ty());
         metaVar->IRValue = cg.builder.CreateICmpEQ(iValue, loopStart);
         break;
     }
     case FOR_IS_LAST: {
-        const auto loopEnd = cg.builder.CreateSExt(loop->loopEnd(cg), cg.i64Ty());
-        const auto decremented = cg.builder.CreateSub(loopEnd, cg.i64(1));
+        const auto loopEnd = cg.builder.CreateSExt(loop->loopEnd(cg), cg.i32Ty());
+        const auto decremented = cg.builder.CreateSub(loopEnd, cg.i32(1));
         metaVar->IRValue = cg.builder.CreateICmpEQ(iValue, decremented);
         break;
     }
@@ -391,6 +398,10 @@ void LgsCodeGen::visitAssignment(const LgsAssignment* assignment) {
 }
 
 void LgsCodeGen::visitIfStmt(LgsIfStmt* ifStmt) {
+    if (ifStmt->macroTrueBlock) {
+        visitStmtsBlock(ifStmt->macroTrueBlock);
+        return;
+    }
     if (ifStmt->elseIfs.empty()) {
         if (ifStmt->elseBlock) {
             visitIfWithElse(ifStmt);
@@ -625,9 +636,11 @@ void LgsCodeGen::visitExpr(LgsExpr* expr, const bool assign) {
     } else {
         if (checkMock(expr)) return;
         if (const auto func = expr->asFunc()) visitLambda(func);
+        else if (const auto strConst = expr->asStrConst()) visitStrConst(strConst);
+        else if (const auto intConst = expr->asIntConst()) visitIntConst(intConst);
+        else if (const auto floatConst = expr->asFloatConst()) visitFloatConst(floatConst);
         else if (const auto instance = expr->asInstance()) visitInstance(instance);
         else if (const auto funcCall = expr->asFuncCall()) visitFuncCall(funcCall);
-        else if (const auto strConst = expr->asStrConst()) visitStrConst(strConst);
         else if (const auto selection = expr->asSelection()) visitSelection(selection, assign);
         else if (const auto arrayExpr = expr->asArrayExpr()) visitArrayExpr(arrayExpr);
         else if (const auto hashMap = expr->asHashMap()) visitHashMap(hashMap);
@@ -637,14 +650,13 @@ void LgsCodeGen::visitExpr(LgsExpr* expr, const bool assign) {
         else if (const auto postfixExpr = expr->asPostfixExpr()) visitPostfixExpr(postfixExpr);
         else if (const auto prefixExpr = expr->asPrefixExpr()) visitPrefixExpr(prefixExpr);
         else if (const auto vecExpr = expr->asVectorExpr()) visitVectorExpr(vecExpr);
-        else if (const auto intConst = expr->asIntConst()) visitIntConst(intConst);
-        else if (const auto floatConst = expr->asFloatConst()) visitFloatConst(floatConst);
         else if (const auto loopMetaVar = expr->asLoopMetaVar()) visitLoopMetaVar(loopMetaVar);
         else if (const auto null = expr->asNull()) visitNull(null);
         else if (const auto cast = expr->asCast()) visitCast(cast);
         else if (const auto json = expr->asJson()) visitJson(json);
     }
     if (appConfigs.debugMode) expr->setDebugValue(cg);
+    assert(expr->IRValue);
 }
 
 void LgsCodeGen::visitBinaryExpr(LgsBinaryExpr* binExpr) {
@@ -653,7 +665,7 @@ void LgsCodeGen::visitBinaryExpr(LgsBinaryExpr* binExpr) {
     const auto r = binExpr->right;
     visitExpr(l);
     visitExpr(r);
-    if (binExpr->isValueKnown) {
+    if (!binExpr->isMutable) {
         assert(binExpr->results);
         visitExpr(binExpr->results);
         binExpr->IRValue = binExpr->results->IRValue;
@@ -727,6 +739,13 @@ void LgsCodeGen::visitIntConst(LgsIntConst* intConst) const {
     } else {
         assert(0);
     }
+}
+
+void LgsCodeGen::visitConstant(LgsExpr* expr) {
+    if (const auto strConst = expr->asStrConst()) visitStrConst(strConst);
+    else if (const auto intConst = expr->asIntConst()) visitIntConst(intConst);
+    else if (const auto floatConst = expr->asFloatConst()) visitFloatConst(floatConst);
+    else assert(0);
 }
 
 void LgsCodeGen::visitFloatConst(LgsFloatConst* floatConst) const {
@@ -814,6 +833,7 @@ void LgsCodeGen::visitVariable(LgsVariable* variable) {
         variable->IRValue = variable->ref.func->getIRFunc(cg);
         break;
     case OBJECT:
+        assert(variable->ref.object->singleton);
         variable->IRValue = getIRValue(variable->ref.object->singleton);
         break;
     case FIELD:

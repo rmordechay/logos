@@ -28,7 +28,7 @@ public:
     Value* addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
     Value* subIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
     Value* mulIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* divIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
+    Value* divIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
     Value* inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
     Value* lengthIR(LgsLLVMGen& cg, Value* iterable) override;
     Value* getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) override;

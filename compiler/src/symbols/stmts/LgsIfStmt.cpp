@@ -4,10 +4,8 @@
 #include "LgsUtils.h"
 
 LgsIfStmt::~LgsIfStmt() {
-    if (ifCond) {
-        delete ifCond;
-        ifCond = nullptr;
-    }
+    freeExpr(ifCond);
+    ifCond = nullptr;
     if (ifBlock) {
         delete ifBlock;
         ifBlock = nullptr;

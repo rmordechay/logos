@@ -14,19 +14,24 @@ public:
 
 class LgsCLang final {
 public:
-    LgsSymbolTable table;
     fs::path cLibHeadersDir;
 
     explicit LgsCLang(const fs::path& cLibHeadersDir): cLibHeadersDir(cLibHeadersDir) {}
-    bool parseFile(LgsCLangParser& parser, const std::string& cCode) const;
+    bool parseFile(LgsCLangParser& parser, const fs::path& headerPath) const;
 };
 
 
 class LgsPPCallbacks final : public clang::PPCallbacks {
 public:
+    LgsSymbolTable& table;
+    LgsErrHandler errHandler;
     clang::LangOptions &LangOpts;
     clang::SourceManager& sourceManager;
+    clang::Preprocessor& preprocessor;
 
-    LgsPPCallbacks(clang::LangOptions& langOpts, clang::SourceManager& sourceManager): LangOpts(langOpts), sourceManager(sourceManager) {}
+    LgsPPCallbacks(LgsSymbolTable& table, clang::Preprocessor& preprocessor, clang::LangOptions& langOpts, clang::SourceManager& sourceManager) :
+        table(table), LangOpts(langOpts), sourceManager(sourceManager), preprocessor(preprocessor) {
+    }
+
     void MacroDefined(const clang::Token &macroNameToken, const clang::MacroDirective *macroDirective) override;
 };

@@ -43,39 +43,39 @@ Value* LgsSize::mulIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
     return cg.builder.CreateMul(left->loadIR(cg), r);
 }
 
-Value* LgsSize::divIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    const auto r = cg.builder.CreateZExt(other->loadIR(cg), getIRType(cg));
-    return cg.builder.CreateSDiv(self->loadIR(cg), r);
+Value* LgsSize::divIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+    const auto r = cg.builder.CreateZExt(right->loadIR(cg), getIRType(cg));
+    return cg.builder.CreateSDiv(left->loadIR(cg), r);
 }
 
-Value* LgsSize::modIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    const auto r = cg.builder.CreateZExt(other->loadIR(cg), getIRType(cg));
-    return cg.builder.CreateSRem(self->loadIR(cg), r);
+Value* LgsSize::modIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+    const auto r = cg.builder.CreateZExt(right->loadIR(cg), getIRType(cg));
+    return cg.builder.CreateSRem(left->loadIR(cg), r);
 }
 
-Value* LgsSize::bitAndIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    const auto r = cg.builder.CreateZExt(other->loadIR(cg), getIRType(cg));
-    return cg.builder.CreateAnd(self->loadIR(cg), r);
+Value* LgsSize::bitAndIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+    const auto r = cg.builder.CreateZExt(right->loadIR(cg), getIRType(cg));
+    return cg.builder.CreateAnd(left->loadIR(cg), r);
 }
 
-Value* LgsSize::bitOrIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    const auto r = cg.builder.CreateZExt(other->loadIR(cg), getIRType(cg));
-    return cg.builder.CreateOr(self->loadIR(cg), r);
+Value* LgsSize::bitOrIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+    const auto r = cg.builder.CreateZExt(right->loadIR(cg), getIRType(cg));
+    return cg.builder.CreateOr(left->loadIR(cg), r);
 }
 
-Value* LgsSize::bitXorIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    const auto r = cg.builder.CreateZExt(other->loadIR(cg), getIRType(cg));
-    return cg.builder.CreateXor(self->loadIR(cg), r);
+Value* LgsSize::bitXorIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+    const auto r = cg.builder.CreateZExt(right->loadIR(cg), getIRType(cg));
+    return cg.builder.CreateXor(left->loadIR(cg), r);
 }
 
-Value* LgsSize::rshiftIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    const auto r = cg.builder.CreateZExt(other->loadIR(cg), getIRType(cg));
-    return cg.builder.CreateShl(self->loadIR(cg), r);
+Value* LgsSize::rshiftIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+    const auto r = cg.builder.CreateZExt(right->loadIR(cg), getIRType(cg));
+    return cg.builder.CreateShl(left->loadIR(cg), r);
 }
 
-Value* LgsSize::lshiftIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+Value* LgsSize::lshiftIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* other) {
     const auto r = cg.builder.CreateZExt(other->loadIR(cg), getIRType(cg));
-    return cg.builder.CreateLShr(self->loadIR(cg), r);
+    return cg.builder.CreateLShr(left->loadIR(cg), r);
 }
 
 Value* LgsSize::eqIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {

@@ -16,7 +16,7 @@ public:
     std::string strFormatPart() const override;
     bool canCastTo(LgsType* other) override;
     LgsExpr* powConst(LgsExpr* left, LgsExpr* right) override;
-    Value* powIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) override;
+    Value* powIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
 };
 
 inline LgsDouble LGS_DOUBLE;

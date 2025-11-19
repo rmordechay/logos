@@ -1,6 +1,7 @@
 #pragma once
 #include <fstream>
 #include <string>
+#include <unordered_map>
 
 struct LgsLocation {
     size_t index = 0;
@@ -121,7 +122,7 @@ inline LgsBaseMsg E10087{"Logos library cannot define a main() function.", errCo
 inline LgsBaseMsg E10088{"Bad character.", errCodeStart++};
 inline LgsBaseMsg E10089{"%s can only be assigned to an instance of %s, not the object itself.", errCodeStart++};
 inline LgsBaseMsg E10090{"%s can only prefix numbers. Given: %s.", errCodeStart++};
-inline LgsBaseMsg E10091{"not can only prefix Bool. Given: %s.", errCodeStart++};
+inline LgsBaseMsg E10091{"'not' can only prefix Bool. Given: %s.", errCodeStart++};
 inline LgsBaseMsg E10092{"Condition %s must be of type Bool. Given: %s.", errCodeStart++};
 inline LgsBaseMsg E10093{"Cannot assign variable to Void type.", errCodeStart++};
 inline LgsBaseMsg E10094{"%s is not a parameter of '%s'.", errCodeStart++};
@@ -130,3 +131,6 @@ inline LgsBaseMsg E10096{"Mixed named und position arguments are not allowed.", 
 inline LgsBaseMsg E10097{"switch statement must have at least one pattern.", errCodeStart++};
 inline LgsBaseMsg E10098{"Argument %s is set more than one time.", errCodeStart++};
 inline LgsBaseMsg E10099{"Local names must start with a lowercase letter. Given: %s.", errCodeStart++};
+inline LgsBaseMsg E10100{"Global variable '%s' must be declared const.", errCodeStart++};
+inline LgsBaseMsg E10101{"Macro condition must be known at compile time.", errCodeStart++};
+inline LgsBaseMsg E10102{"Macro condition must be of type Bool. Given: %s.", errCodeStart++};

@@ -7,7 +7,7 @@ public:
     double_t value;
 
     explicit LgsFloatConst(LgsType* type, const double_t value) : LgsExpr(type), value(value) {
-        isValueKnown = true;
+        isMutable = false;
     }
     Value* loadIR(LgsLLVMGen& cg) override;
     LgsExpr* castExplicitly(LgsType* toType) override;

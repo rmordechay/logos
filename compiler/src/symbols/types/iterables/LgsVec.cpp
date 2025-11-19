@@ -120,22 +120,22 @@ Value* LgsVec::mulIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
     return cg.builder.CreateFMul(left->IRValue, right->IRValue);
 }
 
-Value* LgsVec::divIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    if (other->IRValue->getType()->isIntegerTy()) {
+Value* LgsVec::divIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+    if (right->IRValue->getType()->isIntegerTy()) {
         const auto vecTy = llvm::cast<llvm::VectorType>(getIRType(cg));
-        other->IRValue = cg.builder.CreateSIToFP(other->IRValue, vecTy->getElementType());
-        other->IRValue = cg.builder.CreateVectorSplat(vecTy->getElementCount(), other->IRValue);
-        return cg.builder.CreateFDiv(self->loadIR(cg), other->loadIR(cg));
+        right->IRValue = cg.builder.CreateSIToFP(right->IRValue, vecTy->getElementType());
+        right->IRValue = cg.builder.CreateVectorSplat(vecTy->getElementCount(), right->IRValue);
+        return cg.builder.CreateFDiv(left->loadIR(cg), right->loadIR(cg));
     }
-    if (other->IRValue->getType()->isVectorTy()) {
-        return dotProduct(cg, self, other);
+    if (right->IRValue->getType()->isVectorTy()) {
+        return dotProduct(cg, left, right);
     }
-    if (other->IRValue->getType()->isFloatingPointTy()) {
-        const auto vecTy = llvm::cast<llvm::VectorType>(self->IRValue->getType());
-        other->IRValue = cg.builder.CreateVectorSplat(vecTy->getElementCount(), other->IRValue);
-        return cg.builder.CreateFDiv(self->IRValue, other->IRValue);
+    if (right->IRValue->getType()->isFloatingPointTy()) {
+        const auto vecTy = llvm::cast<llvm::VectorType>(left->IRValue->getType());
+        right->IRValue = cg.builder.CreateVectorSplat(vecTy->getElementCount(), right->IRValue);
+        return cg.builder.CreateFDiv(left->IRValue, right->IRValue);
     }
-    return cg.builder.CreateFDiv(self->IRValue, other->IRValue);
+    return cg.builder.CreateFDiv(left->IRValue, right->IRValue);
 }
 
 Value* LgsVec::inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) {

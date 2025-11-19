@@ -66,8 +66,7 @@ public:
     std::string code = "";
     LgsErrHandler errHandler;
     LgsFunc* currentFunc = nullptr;
-    std::vector<LgsStrConst*> cImports;
-    std::unordered_map<std::string, LgsApp*> fileImports;
+    std::unordered_map<std::string, LgsApp*> imports;
 
     LgsParser(LgsFileMetadata* metadata, LgsPaths& paths, LgsGlobals& globals, const bool headersOnly = false)
         : paths(paths), headersOnly(headersOnly), metadata(metadata), globals(globals) {}
@@ -130,8 +129,8 @@ public:
     LgsIOStmt* parseIOStmt();
 
     // Exprs
-    LgsExpr* parseExpr(bool withLambda = true);
-    LgsExpr* parseExprWithPrecedence(int minPrecedence);
+    LgsExpr* parseExpr(bool withLambda = true, bool withInstance = true);
+    LgsExpr* parseExprWithPrecedence(int minPrecedence, bool withInstance = true);
     LgsExpr* parseUnary(bool withInstance = true);
     LgsVariable* parseVariable();
     void parseArgs(LgsInstance* instance);
@@ -156,8 +155,8 @@ public:
     LgsJson* parseJsonValue();
     void parsePackageString(LgsImportPackage& pkg, const LgsToken& importToken);
     void parseJsonPrimitive(LgsJson* json);
-    void parseImports();
-    void parseCImports();
+    void parseImports(std::unordered_set<std::string>& cImports);
+    void parseCImports(std::unordered_set<std::string>& cImports);
 
     void addFileSymbol(LgsMainFile* file, const LgsSymbol& newSymbol);
     void setLocation(LgsLocation& location, const LgsToken* token) const;

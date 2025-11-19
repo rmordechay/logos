@@ -11,7 +11,7 @@ public:
     bool isSingleQuoted;
 
     explicit LgsStrConst(const std::string& value) : value(value) {
-        isValueKnown = true;
+        isMutable = false;
         if (value.size() == 1) {
             setType(&LGS_CHAR);
         } else {

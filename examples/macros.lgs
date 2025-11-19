@@ -1,0 +1,11 @@
+main() {
+    if _WINDOWS {*
+        print("windows")
+    *} else if _MACOS {*
+        print("mac")
+    *} else if _LINUX {*
+        print("linux")
+    *} else {*
+        print("no OS")
+    *}
+}

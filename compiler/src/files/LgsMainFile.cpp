@@ -1,6 +1,7 @@
 #include "files/LgsMainFile.h"
 #include "LgsDefinitions.h"
 #include "LgsUtils.h"
+#include "stmts/LgsVarDec.h"
 
 size_t LgsMainFile::hashFile() {
     size_t hash = 0;
@@ -24,6 +25,10 @@ LgsMainFile::~LgsMainFile() {
         delete func;
     }
     funcs.clear();
+    for (const auto& varDec : varDecs) {
+        freeStmt(varDec);
+    }
+    varDecs.clear();
     for (const auto& object : objects) {
         freeType(object);
     }

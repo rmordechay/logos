@@ -44,6 +44,6 @@ LgsExpr* LgsDouble::powConst(LgsExpr* left, LgsExpr* right) {
     return new LgsFloatConst(&LGS_DOUBLE, std::pow(*const1, *const2));
 }
 
-Value* LgsDouble::powIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    return LgsType::powIR(cg, self, other);
+Value* LgsDouble::powIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+    return LgsType::powIR(cg, left, right);
 }

@@ -11,6 +11,7 @@ class LgsEnum;
 
 class LgsMainFile final : public LgsFile {
 public:
+    std::vector<LgsVarDec*> varDecs;
     std::map<std::string, LgsFunc*> funcs;
     std::vector<LgsObject*> objects;
     std::vector<LgsInterface*> interfaces;

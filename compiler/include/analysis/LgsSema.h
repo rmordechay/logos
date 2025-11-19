@@ -84,6 +84,7 @@ public:
     void visitVarDec(LgsVarDec* varDec);
     void visitAssignment(const LgsAssignment* assignment);
     void visitIfStmt(LgsIfStmt* ifStmt);
+    void visitMacroIf(LgsIfStmt* ifStmt);
     void visitSwitch(LgsSwitch* switchStmt);
     void visitWhileLoop(LgsWhileLoop* whileLoop);
     void visitLoopStmt(LgsForLoop* loopStmt);
@@ -138,7 +139,6 @@ public:
     static bool validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const LgsFunc* func);
 
     void resolveImports() const;
-    void addCSymbols();
     void mergeRTTypes();
     void addHeapExpr(LgsExpr* expr);
     void addLocalSymbol(const LgsSymbol& newSymbol);

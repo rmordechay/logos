@@ -70,7 +70,7 @@ Value* LgsFloat::mulIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
     return cg.builder.CreateFMul(l, r);
 }
 
-Value* LgsFloat::divIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
-    const auto [l, r] = loadOperands(cg, self, other);
+Value* LgsFloat::divIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+    const auto [l, r] = loadOperands(cg, left, right);
     return cg.builder.CreateFDiv(l, r);
 }

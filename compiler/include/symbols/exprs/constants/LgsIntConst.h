@@ -8,7 +8,7 @@ public:
     int64_t value;
 
     LgsIntConst(LgsType* type, const int64_t value) : LgsExpr(type), value(value) {
-        isValueKnown = true;
+        isMutable = false;
     }
     Value* loadIR(LgsLLVMGen& cg) override;
     LgsExpr* castExplicitly(LgsType* toType) override;

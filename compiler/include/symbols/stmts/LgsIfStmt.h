@@ -10,6 +10,7 @@ public:
     std::vector<std::pair<LgsExpr*, LgsStmtsBlock*>> elseIfs;
     LgsStmtsBlock* elseBlock = nullptr;
     BasicBlock* IRExitBlock = nullptr;
+    LgsStmtsBlock* macroTrueBlock = nullptr;
     bool isSwitchBool = false;
     std::string tag;
 

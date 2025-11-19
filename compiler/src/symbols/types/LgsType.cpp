@@ -303,35 +303,35 @@ Value* LgsType::mulIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
-Value* LgsType::divIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+Value* LgsType::divIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
-Value* LgsType::modIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+Value* LgsType::modIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
-Value* LgsType::powIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+Value* LgsType::powIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
-Value* LgsType::bitAndIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+Value* LgsType::bitAndIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
-Value* LgsType::bitOrIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+Value* LgsType::bitOrIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
-Value* LgsType::bitXorIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+Value* LgsType::bitXorIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
-Value* LgsType::lshiftIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+Value* LgsType::lshiftIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsType::rshiftIR(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+Value* LgsType::rshiftIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
@@ -490,5 +490,5 @@ LgsType::~LgsType() {
 void freeType(LgsType* type) {
     if (!type) return;
     if (type->isPrimitive) return;
-    // delete type;
+    delete type;
 }

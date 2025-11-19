@@ -51,11 +51,11 @@ struct LgsSymbol {
 
     explicit LgsSymbol();
     explicit LgsSymbol(LgsParam* param);
-    explicit LgsSymbol(LgsVarDec* varDec);
     explicit LgsSymbol(LgsField* field);
     explicit LgsSymbol(LgsInterface* interface);
     explicit LgsSymbol(LgsGenericParam* generic);
     explicit LgsSymbol(LgsSubType* subtype);
+    explicit LgsSymbol(LgsVarDec* varDec, bool isBuiltin = false, bool isExternal = false);
     explicit LgsSymbol(LgsObject* object, bool isBuiltin = false, bool isExternal = false);
     explicit LgsSymbol(LgsEnum* lgsEnum, bool isBuiltin = false, bool isExternal = false);
     explicit LgsSymbol(LgsFunc* func, bool isBuiltin = false, bool isExternal = false);

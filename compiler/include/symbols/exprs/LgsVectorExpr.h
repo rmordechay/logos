@@ -8,7 +8,6 @@ public:
     std::vector<LgsExpr*> elements;
 
     explicit LgsVectorExpr(const int8_t dim) {
-        isMutable = true;
         vecType = new LgsVec(dim);
         setType(vecType);
     }

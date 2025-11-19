@@ -5,8 +5,6 @@
 class LgsNullable final : public LgsType {
 public:
     LgsType* baseType;
-    Value* valueField = nullptr;
-    Value* isSetField = nullptr;
 
     explicit LgsNullable(LgsType* baseType) : baseType(baseType) {}
     LgsField* getField(const std::string& fieldName) override;
@@ -19,7 +17,6 @@ public:
     bool canCastTo(LgsType* other) override;
     size_t sizeBytes() override;
     std::string strFormatPart() const override;
+    LgsType* clone() override;
     ~LgsNullable() override;
 };
-
-inline LgsNullable LGS_ANY_NULLABLE(&LGS_ANY);
