@@ -1,7 +1,7 @@
 #include "logos/LgsApp.h"
-#include "utils/LgsUtils.h"
+#include "LgsUtils.h"
 #include <string>
-#include "external/doctest.h"
+#include "doctest.h"
 
 TEST_CASE("SemaError10000") {
     LgsApp app;

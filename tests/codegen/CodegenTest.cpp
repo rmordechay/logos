@@ -2,7 +2,7 @@
 #include <cassert>
 #include <iostream>
 #include <sstream>
-#include "external/doctest.h"
+#include "doctest.h"
 #include <unistd.h>
 
 TEST_CASE("TestCodeGen1") {

@@ -1,9 +1,8 @@
-#include "files/LgsFile.h"
 #include "files/LgsMainFile.h"
 #include "logos/LgsApp.h"
-#include "../../include/tools/LgsJsonParser.h"
-#include "utils/LgsUtils.h"
-#include <external/doctest.h>
+#include "tools/LgsJsonParser.h"
+#include "LgsUtils.h"
+#include <doctest.h>
 
 const std::string expectedDir = "../../tests/parser/expected";
 
@@ -26,7 +25,7 @@ TEST_CASE("Parser1") {
     )";
     const auto expectedTree = getFileText(expectedDir + "/ParserTest1.json");
     app.loadSrcFile(code);
-    const auto mainFile = static_cast<LgsMainFile*>(app.srcFiles.front());
+    const auto mainFile = dynamic_cast<LgsMainFile*>(app.srcFiles.front());
     LgsJsonParser parser;
     parser.parseMainFile(mainFile);
     CHECK(app.errHandler.errors.size() == 0);
@@ -56,7 +55,7 @@ TEST_CASE("Parser2") {
     )";
     const auto expectedTree = getFileText(expectedDir + "/ParserTest2.json");
     app.loadSrcFile(code);
-    const auto mainFile = static_cast<LgsMainFile*>(app.srcFiles.front());
+    const auto mainFile = dynamic_cast<LgsMainFile*>(app.srcFiles.front());
     LgsJsonParser parser;
     parser.parseMainFile(mainFile);
     std::ofstream("../../test.json") << parser.json.str();
@@ -86,7 +85,7 @@ TEST_CASE("Parser3") {
     )";
     const auto expectedTree = getFileText(expectedDir + "/ParserTest3.json");
     app.loadSrcFile(code);
-    const auto mainFile = static_cast<LgsMainFile*>(app.srcFiles.front());
+    const auto mainFile = dynamic_cast<LgsMainFile*>(app.srcFiles.front());
     LgsJsonParser parser;
     parser.parseMainFile(mainFile);
     CHECK(app.errHandler.errors.size() == 0);
@@ -125,7 +124,7 @@ TEST_CASE("Parser4") {
     )";
     const auto expectedTree = getFileText(expectedDir + "/ParserTest4.json");
     app.loadSrcFile(code);
-    const auto mainFile = static_cast<LgsMainFile*>(app.srcFiles.front());
+    const auto mainFile = dynamic_cast<LgsMainFile*>(app.srcFiles.front());
     LgsJsonParser parser;
     parser.parseMainFile(mainFile);
     CHECK(app.errHandler.errors.size() == 0);

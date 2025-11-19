@@ -1,7 +1,7 @@
-#include "logos/LgsConfigs.h"
+#include "LgsConfigs.h"
 #include "codegen/LgsLLVMGen.h"
 #define DOCTEST_CONFIG_IMPLEMENT
-#include "external/doctest.h"
+#include "doctest.h"
 
 int main(const int argc, char** argv) {
     LgsLLVMGen::initLLVM();

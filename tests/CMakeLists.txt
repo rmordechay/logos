@@ -12,15 +12,14 @@ add_executable(lgs_tests
 target_include_directories(lgs_tests PRIVATE
     ${CMAKE_SOURCE_DIR}/tests
     ${CMAKE_SOURCE_DIR}/external
-    ${CMAKE_SOURCE_DIR}/include
-    ${CMAKE_SOURCE_DIR}/include/symbols
-    ${CMAKE_SOURCE_DIR}/runtime/include
-    ${LLVM_INCLUDE_DIRS}
-    ${CLANG_INCLUDE_DIRS}
-    ${OPENSSL_INCLUDE_DIR}
+    ${CMAKE_SOURCE_DIR}/compiler/include
+    ${CMAKE_SOURCE_DIR}/compiler/include/symbols
+    ${CMAKE_SOURCE_DIR}/lib/include
+    ${CMAKE_SOURCE_DIR}/shared/include
 )
 
 target_link_libraries(lgs_tests PRIVATE
+    lgs_shared
     lgs_lib
     LLVM
     clang-cpp

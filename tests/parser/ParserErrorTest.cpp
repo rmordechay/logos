@@ -1,6 +1,6 @@
 #include "logos/LgsApp.h"
-#include "utils/LgsUtils.h"
-#include <external/doctest.h>
+#include "LgsUtils.h"
+#include <doctest.h>
 
 TEST_CASE("ParserError10011B") {
     LgsApp app;
