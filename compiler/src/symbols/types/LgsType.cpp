@@ -47,7 +47,7 @@ bool LgsType::isVoid() {
 }
 
 bool LgsType::isNumber() const {
-    return isInt || isFloat;
+    return isInt || isFloatingPoint;
 }
 
 bool LgsType::isBig() {

@@ -1,6 +1,8 @@
 #pragma once
 #include "LgsDefinitions.h"
 #include "errors/LgsErrors.h"
+
+#include <string>
 #include <unordered_map>
 
 enum LgsTokenType {
@@ -84,6 +86,7 @@ enum LgsTokenType {
     T_VEC2,
     T_VEC3,
     T_VEC4,
+    T_MATRIX,
     T_JSON,
     T_SET,
     T_FOR,
@@ -107,6 +110,14 @@ enum LgsTokenType {
     T_BLOCK_COMMENT,
     T_EOF,
     T_UNKNOWN,
+};
+
+struct LgsToken {
+    LgsTokenType type = T_UNKNOWN;
+    std::string lexeme = "";
+    LgsLocation location;
+    LgsToken() = default;
+    LgsToken(const LgsTokenType type, const std::string& lexeme, const LgsLocation& location) : type(type), lexeme(lexeme), location(location) {}
 };
 
 enum LgsBinOpType {
@@ -133,20 +144,9 @@ enum LgsBinOpType {
     NOOP,
 };
 
-enum LgsAssignType {
-    ASSIGN,
-    ASSIGN_ADD,
-    ASSIGN_SUB,
-    ASSIGN_MUL,
-    ASSIGN_DIV,
-    ASSIGN_MOD,
-    ASSIGN_POW,
-    ASSIGN_AND,
-    ASSIGN_OR,
-    ASSIGN_XOR,
-    ASSIGN_LSHIFT,
-    ASSIGN_RSHIFT,
-    ASSIGN_UNKNOWN,
+struct LgsBinOp {
+    LgsBinOpType opType;
+    std::string text;
 };
 
 const std::unordered_map<std::string, LgsTokenType> LGS_KEYWORDS = {
@@ -190,20 +190,6 @@ const std::unordered_map<std::string, LgsTokenType> LGS_KEYWORDS = {
     {"true", T_BOOL},
     {"false", T_BOOL},
     {LGS_NULL_LITERAL, T_NULL}
-};
-
-struct LgsBinOp {
-    LgsBinOpType opType;
-    std::string text;
-};
-
-struct LgsToken {
-    LgsTokenType type = T_UNKNOWN;
-    std::string lexeme = "";
-    LgsLocation location;
-
-    LgsToken() = default;
-    LgsToken(const LgsTokenType type, const std::string& lexeme, const LgsLocation& location) : type(type), lexeme(lexeme), location(location) {}
 };
 
 const auto ADD_OP = LgsBinOp{ADD, "+"};

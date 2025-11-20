@@ -7,7 +7,9 @@
 #include "errors/LgsPlmErrors.h"
 #include "exprs/LgsFuncCall.h"
 #include "funcs/LgsMainFunc.h"
+#include "stmts/LgsAssignment.h"
 
+class LgsMatrixExpr;
 class LgsGenericParam;
 struct LgsPaths;
 struct LgsSymbol;
@@ -132,12 +134,12 @@ public:
     LgsExpr* parseExpr(bool withLambda = true, bool withInstance = true);
     LgsExpr* parseExprWithPrecedence(int minPrecedence, bool withInstance = true);
     LgsExpr* parseUnary(bool withInstance = true);
+    LgsExpr* parseExprOrStmtsBlock();
     LgsVariable* parseVariable();
-    void parseArgs(LgsInstance* instance);
     LgsInstance* parseInstance();
     LgsFuncCall* parseFuncCall();
     LgsVectorExpr* parseVectorExpr();
-    LgsExpr* parseExprOrStmtsBlock();
+    LgsMatrixExpr* parseMatrixExpr();
     LgsStrConst* parseStrConst();
     LgsMetaVar* parseLoopMetaVar();
     LgsExpr* parseConstant();
@@ -153,6 +155,8 @@ public:
     LgsJsonObject* parseJsonObject();
     LgsJsonArray* parseJsonArray();
     LgsJson* parseJsonValue();
+
+    void parseArgs(LgsInstance* instance);
     void parsePackageString(LgsImportPackage& pkg, const LgsToken& importToken);
     void parseJsonPrimitive(LgsJson* json);
     void parseImports(std::unordered_set<std::string>& cImports);

@@ -27,6 +27,7 @@
 #include "LgsTokens.h"
 #include "exprs/LgsCast.h"
 #include "exprs/LgsEnvVar.h"
+#include "exprs/LgsMatrixExpr.h"
 #include "exprs/LgsNull.h"
 #include "exprs/LgsNullableExpr.h"
 #include "exprs/LgsTernaryExpr.h"
@@ -48,6 +49,7 @@
 #include "types/LgsSelf.h"
 #include "types/LgsSubType.h"
 #include "types/LgsUnknown.h"
+#include "types/iterables/LgsMatrix.h"
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsByte.h"
 #include "types/primitives/LgsDouble.h"
@@ -55,11 +57,28 @@
 #include "types/primitives/LgsSize.h"
 #include "types/primitives/LgsUInt.h"
 #include "types/primitives/LgsULong.h"
-#include <iostream>
 #include <unordered_set>
 
 #define MAX_TOKENS_NUMBER 100000
 LgsFunc* wrapStmtsBlockWithFunc(LgsStmtsBlock* stmtsBlock);
+
+bool LgsParser::scanTokens() {
+    if (code == "") {
+        assert(metadata->path != "");
+        code = getFileText(metadata->path);
+    }
+    assert(!code.empty());
+    LgsLexer lexer(metadata->path, code);
+    tokens = lexer.tokenize();
+    if (!lexer.errHandler.successful) {
+        errHandler.mergeErrors(lexer.errHandler);
+        return false;
+    }
+    if (!tokens.empty()) {
+        currentToken = tokens[0];
+    }
+    return true;
+}
 
 LgsFile* LgsParser::parseSrcFile(const bool isTestRun) {
     if (!scanTokens()) return nullptr;
@@ -101,24 +120,6 @@ LgsFile* LgsParser::parseSrcFileHeaders() {
         return interfaceFile;
     }
     return nullptr;
-}
-
-bool LgsParser::scanTokens() {
-    if (code == "") {
-        assert(metadata->path != "");
-        code = getFileText(metadata->path);
-    }
-    assert(!code.empty());
-    LgsLexer lexer(metadata->path, code);
-    tokens = lexer.tokenize();
-    if (!lexer.errHandler.successful) {
-        errHandler.mergeErrors(lexer.errHandler);
-        return false;
-    }
-    if (!tokens.empty()) {
-        currentToken = tokens[0];
-    }
-    return true;
 }
 
 LgsEnvFile* LgsParser::parseEnvFile() {
@@ -586,6 +587,11 @@ LgsType* LgsParser::parseType() {
     } else if (currentToken.type == T_VEC4) {
         type = new LgsVec(4);
         consume();
+    } else if (currentToken.type == T_MATRIX) {
+        const auto rows = currentToken.lexeme[3] - '0';
+        const auto columns = currentToken.lexeme[5] - '0';
+        type = new LgsMatrix(rows, columns);
+        consume();
     } else if (currentToken.type == T_SET) {
         type = new LgsSet(type);
         consume();
@@ -609,7 +615,7 @@ LgsType* LgsParser::parseType() {
     }
 
     if (type && currentToken.type == T_LANGLE) {
-         type->genericArgs = parseGenericArgs();
+        type->genericArgs = parseGenericArgs();
     }
 
     // Array
@@ -1295,10 +1301,11 @@ LgsExpr* LgsParser::parseUnary(const bool withInstance) {
         mustMatch(T_RPAREN);
         return expr;
     }
+    if (const auto metaVar = parseLoopMetaVar()) return metaVar;
     if (const auto constant = parseConstant()) expr = constant;
-    else if (const auto metaVar = parseLoopMetaVar()) return metaVar;
     else if (const auto strConst = parseStrConst()) expr = strConst;
     else if (const auto vector = parseVectorExpr()) expr = vector;
+    else if (const auto matrix = parseMatrixExpr()) expr = matrix;
     else if (const auto envVar = parseEnvVar()) expr = envVar;
     else if (const auto arrayExpr = parseArrayExpr()) expr = arrayExpr;
     else if (const auto hashMap = parseHashMap()) expr = hashMap;
@@ -1319,6 +1326,24 @@ LgsExpr* LgsParser::parseUnary(const bool withInstance) {
     return expr;
 }
 
+LgsExpr* LgsParser::parseExprOrStmtsBlock() {
+    // The order is important. First check for empty block, then expr, then non-empty block.
+    if (currentToken.type == T_LBRACE && peek().type == T_RBRACE) {
+        consume(2);
+        const auto func = wrapStmtsBlockWithFunc(new LgsStmtsBlock());
+        return func;
+    }
+    if (LgsExpr* expr = parseExpr()) {
+        return expr;
+    }
+    if (const auto stmtsBlock = parseStmtsBlock()) {
+        if (stmtsBlock->isMacro) addParsingError();
+        const auto func = wrapStmtsBlockWithFunc(stmtsBlock);
+        return func;
+    }
+    return nullptr;
+}
+
 LgsVariable* LgsParser::parseVariable() {
     LgsVariable* var = nullptr;
     if (currentToken.type == T_IDENTIFIER) {
@@ -1332,27 +1357,6 @@ LgsVariable* LgsParser::parseVariable() {
     consume();
     setLocation(var->location, &currentToken);
     return var;
-}
-
-void LgsParser::parseArgs(LgsInstance* instance) {
-    if (currentToken.type == T_RBRACE) return;
-    std::unordered_set<std::string> seen;
-    while (true) {
-        const auto argNameToken = currentToken;
-        if (!mustMatch(T_IDENTIFIER)) break;
-        if (!mustMatch(T_EQUAL)) break;
-        const auto expr = parseExpr();
-        if (!mustParse(expr)) continue;
-        auto argName = argNameToken.lexeme;
-        if (!seen.insert(argName).second) {
-            addError(E10054, &expr->location, {argName});
-            break;
-        }
-        instance->args.emplace(argName, LgsInstanceArg{argName, expr});
-        if (currentToken.type == T_RBRACE) break;
-        mustMatch(T_COMMA);
-    }
-    if (currentToken.type == T_COMMA) consume();
 }
 
 LgsInstance* LgsParser::parseInstance() {
@@ -1416,8 +1420,8 @@ LgsFuncCall* LgsParser::parseFuncCall() {
 }
 
 LgsVectorExpr* LgsParser::parseVectorExpr() {
-    const auto oldIndex = currentIndex;
     const auto nameToken = currentToken;
+    const auto oldIndex = currentIndex;
     if (nameToken.type != T_VEC2 && nameToken.type != T_VEC3 && nameToken.type != T_VEC4) return nullptr;
     const auto name = nameToken.lexeme;
     consume();
@@ -1436,32 +1440,39 @@ LgsVectorExpr* LgsParser::parseVectorExpr() {
         const auto expr = parseExpr();
         if (!expr) break;
         args.push_back(expr);
-        matchAndConsume(T_COMMA);
+        if (currentToken.type == T_RPAREN) break;
+        mustMatch(T_COMMA);
     }
 
-    if (!matchOrReset(T_RPAREN, oldIndex)) return nullptr;
+    mustMatch(T_RPAREN);
     auto const vecExpr = new LgsVectorExpr(dim);
     setLocation(vecExpr->location, &nameToken);
     vecExpr->elements = args;
     return vecExpr;
 }
 
-LgsExpr* LgsParser::parseExprOrStmtsBlock() {
-    // The order is important. First check for empty block, then expr, then non-empty block.
-    if (currentToken.type == T_LBRACE && peek().type == T_RBRACE) {
-        consume(2);
-        const auto func = wrapStmtsBlockWithFunc(new LgsStmtsBlock());
-        return func;
+LgsMatrixExpr* LgsParser::parseMatrixExpr() {
+    const auto nameToken = currentToken;
+    const auto name = nameToken.lexeme;
+    if (!matchAndConsume(T_MATRIX)) return nullptr;
+    if (!mustMatch(T_LPAREN)) return nullptr;
+
+    std::vector<LgsArrayExpr*> args;
+    while (true) {
+        const auto expr = parseArrayExpr();
+        if (!expr) break;
+        args.push_back(expr);
+        if (currentToken.type == T_RPAREN) break;
+        mustMatch(T_COMMA);
     }
-    if (LgsExpr* expr = parseExpr()) {
-        return expr;
-    }
-    if (const auto stmtsBlock = parseStmtsBlock()) {
-        if (stmtsBlock->isMacro) addParsingError();
-        const auto func = wrapStmtsBlockWithFunc(stmtsBlock);
-        return func;
-    }
-    return nullptr;
+
+    mustMatch(T_RPAREN);
+    const auto rows = nameToken.lexeme[3] - '0';
+    const auto columns = nameToken.lexeme[5] - '0';
+    auto const matExpr = new LgsMatrixExpr(rows, columns);
+    setLocation(matExpr->location, &nameToken);
+    matExpr->elements = args;
+    return matExpr;
 }
 
 LgsStrConst* LgsParser::parseStrConst() {
@@ -1549,7 +1560,6 @@ LgsExpr* LgsParser::parseConstant() {
     return constant;
 }
 
-
 LgsArrayExpr* LgsParser::parseArrayExpr() {
     const auto oldIndex = currentIndex;
     auto isSet = false;
@@ -1572,12 +1582,13 @@ LgsArrayExpr* LgsParser::parseArrayExpr() {
     if (isSet) {
         arrExpr = new LgsArrayExpr(new LgsSet());
     } else {
-        arrExpr = new LgsArrayExpr(new LgsDArray());
+        arrExpr = new LgsArrayExpr();
     }
     arrExpr->elements = args;
     setLocation(arrExpr->location, &tokens[oldIndex]);
     return arrExpr;
 }
+
 
 LgsHashMap* LgsParser::parseHashMap() {
     const auto oldIndex = currentIndex;
@@ -1839,6 +1850,27 @@ LgsJson* LgsParser::parseJsonValue() {
     return json;
 }
 
+void LgsParser::parseArgs(LgsInstance* instance) {
+    if (currentToken.type == T_RBRACE) return;
+    std::unordered_set<std::string> seen;
+    while (true) {
+        const auto argNameToken = currentToken;
+        if (!mustMatch(T_IDENTIFIER)) break;
+        if (!mustMatch(T_EQUAL)) break;
+        const auto expr = parseExpr();
+        if (!mustParse(expr)) continue;
+        auto argName = argNameToken.lexeme;
+        if (!seen.insert(argName).second) {
+            addError(E10054, &expr->location, {argName});
+            break;
+        }
+        instance->args.emplace(argName, LgsInstanceArg{argName, expr});
+        if (currentToken.type == T_RBRACE) break;
+        mustMatch(T_COMMA);
+    }
+    if (currentToken.type == T_COMMA) consume();
+}
+
 void LgsParser::parsePackageString(LgsImportPackage& pkg, const LgsToken& importToken) {
     const auto importName = importToken.lexeme;
     const auto colonPos = importName.find(':');
@@ -2062,6 +2094,7 @@ void LgsParser::reset(const size_t index) {
 }
 
 LgsToken LgsParser::consume(const size_t times) {
+    assert(currentIndex < tokens.size());
     if (!isEOF()) {
         for (size_t i = 0; i < times; ++i) {
             currentIndex++;
@@ -2125,13 +2158,13 @@ void LgsParser::addParsingError() {
     return errHandler.addError(E10085, &token.location, metadata->path, {});
 }
 
-void LgsParser::addError(const LgsBaseMsg& lgsErr, const LgsLocation* location, const std::vector<std::string>& args) {
-    errHandler.addError(lgsErr, location, metadata->path, args);
-}
-
 void LgsParser::recursionGuard() {
     if (recursionCount++ < MAX_TOKENS_NUMBER) return;
     assert(0);
+}
+
+void LgsParser::addError(const LgsBaseMsg& lgsErr, const LgsLocation* location, const std::vector<std::string>& args) {
+    errHandler.addError(lgsErr, location, metadata->path, args);
 }
 
 LgsFunc* wrapStmtsBlockWithFunc(LgsStmtsBlock* stmtsBlock) {

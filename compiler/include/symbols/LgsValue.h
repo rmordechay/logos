@@ -43,8 +43,8 @@ public:
     LgsLocation location;
 
     virtual Value* loadIR(LgsLLVMGen& cg);
-    virtual void setDebugValue(LgsLLVMGen& cg);
     virtual void hashNode(size_t& oldHash);
+    virtual void setDebugValue(LgsLLVMGen& cg);
     virtual LgsValue* clone();
     virtual ~LgsValue() = default;
 };

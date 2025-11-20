@@ -6,7 +6,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_definitions(-DLOGOS_VERSION="${CMAKE_PROJECT_VERSION}")
 option(LOGOS_RELEASE "Build release version" OFF)
 
-set(CURL_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external)
 find_package(LLVM REQUIRED CONFIG)
 find_package(Clang REQUIRED CONFIG)
 find_package(OpenSSL REQUIRED)
@@ -14,6 +13,7 @@ find_package(CURL REQUIRED)
 set(LLVM_LINK_LLVM_DYLIB ON)
 set(CLANG_LINK_CLANG_DYLIB ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(CURL_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external)
 
 if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     set(CMAKE_INSTALL_PREFIX "/usr/local" CACHE PATH "Install prefix" FORCE)
@@ -87,6 +87,7 @@ set(LGS_SOURCE
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/LgsTypeExpr.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/LgsNull.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/LgsNullableExpr.cpp
+    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/LgsMatrixExpr.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/constants/LgsCharConst.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/constants/LgsFloatConst.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/constants/LgsIntConst.cpp
@@ -137,6 +138,7 @@ set(LGS_SOURCE
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/iterables/LgsStr.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/iterables/LgsIterable.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/iterables/LgsVec.cpp
+    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/iterables/LgsMatrix.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsBool.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsChar.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsDouble.cpp
@@ -185,6 +187,7 @@ target_include_directories(lgs_lib PUBLIC
 target_include_directories(lgs PUBLIC
     ${CMAKE_SOURCE_DIR}/compiler/include
     ${CMAKE_SOURCE_DIR}/compiler/include/symbols
+    ${CMAKE_SOURCE_DIR}/external/include
     ${LLVM_INCLUDE_DIRS}
     ${CLANG_INCLUDE_DIRS}
 )
@@ -192,15 +195,14 @@ target_include_directories(lgs_shared PUBLIC
     ${CMAKE_SOURCE_DIR}/shared/include
 )
 target_include_directories(lgs SYSTEM PUBLIC
+    ${CMAKE_SOURCE_DIR}/external/include
     ${OPENSSL_INCLUDE_DIR}
     ${LLVM_INCLUDE_DIRS}
     ${CLANG_INCLUDE_DIRS}
 )
 
 # Link
-target_link_libraries(lgs_lib PRIVATE
-    lgs_shared
-)
+target_link_libraries(lgs_lib PRIVATE lgs_shared)
 target_link_libraries(lgs PRIVATE
     lgs_shared
     lgs_lib
@@ -209,6 +211,7 @@ target_link_libraries(lgs PRIVATE
     CURL::libcurl
     OpenSSL::SSL
     OpenSSL::Crypto
+    ${CMAKE_SOURCE_DIR}/external/libcblas.a
 )
 
 # Options

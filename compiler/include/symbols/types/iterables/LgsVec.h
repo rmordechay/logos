@@ -14,6 +14,7 @@ public:
         assert(dim > 1 && dim <= 4);
         size = new LgsIntConst(&LGS_INT, dim);
         isStatic = true;
+        passByRef = true;
     }
 
     LgsField* getField(const std::string& fieldName) override;

@@ -14,6 +14,7 @@
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
 #include "exprs/LgsJson.h"
+#include "exprs/LgsMatrixExpr.h"
 #include "exprs/LgsNull.h"
 #include "exprs/LgsNullableExpr.h"
 #include "exprs/LgsTypeExpr.h"
@@ -171,6 +172,10 @@ LgsStrConst* LgsExpr::asStrConst() {
 
 LgsVectorExpr* LgsExpr::asVectorExpr() {
     return dynamic_cast<LgsVectorExpr*>(this);
+}
+
+LgsMatrixExpr* LgsExpr::asMatrixExpr() {
+    return dynamic_cast<LgsMatrixExpr*>(this);
 }
 
 LgsIntConst* LgsExpr::asIntConst() {

@@ -2,6 +2,7 @@
 #include <stmts/LgsStmt.h>
 #include "LgsValue.h"
 
+class LgsMatrixExpr;
 class LgsNullableExpr;
 class LgsEnvVar;
 class LgsBinaryExpr;
@@ -33,8 +34,7 @@ class LgsTypeConst;
 class LgsExpr : public LgsStmt {
 public:
     LgsType* type = nullptr;
-    bool isSpread = false;
-    bool isMutable = false;
+    bool isMutable = true;
     bool isImportName = false;
     LgsValue* owner = nullptr;
     Value* destPtrValue = nullptr;
@@ -70,6 +70,7 @@ public:
     LgsFloatConst* asFloatConst();
     LgsStrConst* asStrConst();
     LgsVectorExpr* asVectorExpr();
+    LgsMatrixExpr* asMatrixExpr();
     LgsIntConst* asIntConst();
     LgsMetaVar* asLoopMetaVar();
     LgsBinaryExpr* asBinExpr();

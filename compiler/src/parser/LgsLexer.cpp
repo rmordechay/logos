@@ -205,6 +205,28 @@ char LgsLexer::peek(const size_t offset) const {
     return source[position + offset];
 }
 
+LgsToken LgsLexer::scanMatrix(const LgsLocation& location, std::string& lexeme) {
+    if (!std::isdigit(currentChar) || currentChar == '0') {
+        errHandler.addError(E10088, &location, filePath, {});
+        return {};
+    }
+    lexeme += currentChar;
+    advance();
+    if (currentChar != 'x') {
+        errHandler.addError(E10088, &location, filePath, {});
+        return {};
+    }
+    lexeme += currentChar;
+    advance();
+    if (!std::isdigit(currentChar) || currentChar == '0') {
+        errHandler.addError(E10088, &location, filePath, {});
+        return {};
+    }
+    lexeme += currentChar;
+    advance();
+    return {T_MATRIX, lexeme, location};
+}
+
 LgsToken LgsLexer::scanVarOrKeyword(LgsLocation& location) {
     std::string lexeme;
     auto isDollared = false;
@@ -215,13 +237,18 @@ LgsToken LgsLexer::scanVarOrKeyword(LgsLocation& location) {
     }
 
     while (std::isalnum(currentChar) || currentChar == '_') {
+        if (lexeme == "Mat") {
+            return scanMatrix(location, lexeme);
+        }
         lexeme += currentChar;
         advance();
         location.columnStart++;
         if (std::isspace(currentChar)) break;
     }
+    if (isDollared) {
+        return {T_DOLLAR_IDENTIFIER, lexeme, location};
+    }
 
-    if (isDollared) return {T_DOLLAR_IDENTIFIER, lexeme, location};
     if (lexeme == "for") {
         if (!match('.')) return {T_FOR, lexeme, location};
         std::string metaVar;

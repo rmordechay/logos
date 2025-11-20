@@ -59,6 +59,8 @@
 #include <unistd.h>
 #include <unordered_set>
 #include <llvm/TargetParser/Host.h>
+#include "cblas/cblas.h"
+#include "exprs/LgsMatrixExpr.h"
 
 std::atomic<size_t> LgsCodeGen::lambdasIDGenerator{0};
 #define GENERATE_OBJ_CMD "clang -Wno-override-module -target %s -c -o %s %s.bc"
@@ -659,11 +661,12 @@ void LgsCodeGen::visitExpr(LgsExpr* expr, const bool assign) {
         else if (const auto postfixExpr = expr->asPostfixExpr()) visitPostfixExpr(postfixExpr);
         else if (const auto prefixExpr = expr->asPrefixExpr()) visitPrefixExpr(prefixExpr);
         else if (const auto vecExpr = expr->asVectorExpr()) visitVectorExpr(vecExpr);
+        else if (const auto matrixExpr = expr->asMatrixExpr()) visitMatrixExpr(matrixExpr);
         else if (const auto loopMetaVar = expr->asLoopMetaVar()) visitLoopMetaVar(loopMetaVar);
+        else if (const auto nullableExpr = expr->asNullableExpr()) visitNullableExpr(nullableExpr);
         else if (const auto null = expr->asNull()) visitNull(null);
         else if (const auto cast = expr->asCast()) visitCast(cast);
         else if (const auto json = expr->asJson()) visitJson(json);
-        else if (const auto nullableExpr = expr->asNullableExpr()) visitNullableExpr(nullableExpr);
     }
     if (appConfigs.debugMode) expr->setDebugValue(cg);
     assert(expr->IRValue);
@@ -823,6 +826,10 @@ void LgsCodeGen::visitVectorExpr(LgsVectorExpr* vectorExpr) {
     } else {
         cg.builder.CreateStore(ConstantAggregateZero::get(ty), vectorExpr->IRValue);
     }
+}
+
+void LgsCodeGen::visitMatrixExpr(LgsMatrixExpr* matrixExpr) {
+    matrixExpr->IRValue = cg.null();
 }
 
 void LgsCodeGen::visitVariable(LgsVariable* variable) {

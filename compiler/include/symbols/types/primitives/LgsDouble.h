@@ -6,7 +6,7 @@ public:
     static constexpr auto name = "Double";
     LgsDouble() {
         isPrimitive = true;
-        isFloat = true;
+        isFloatingPoint = true;
     }
     Type* getIRType(LgsLLVMGen& cg) override;
     std::string getName() override;

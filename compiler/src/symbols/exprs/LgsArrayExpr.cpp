@@ -29,13 +29,8 @@ void LgsArrayExpr::castImplicitly(LgsType* toType) {
     }
     for (size_t i = 0; i < elements.size(); ++i) {
         const auto element = elements[i];
-        if (!element->type) {
-            element->setType(otherBaseType);
-            continue;
-        }
-        if (element->type->equals(otherBaseType)) continue;
-        if (!element->type->canCastTo(otherBaseType)) continue;
-        elements[i] = element;
+        if (element->type) continue;
+        element->setType(otherBaseType);
     }
     type->asIterable()->baseType = otherBaseType;
 }

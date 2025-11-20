@@ -1,7 +1,11 @@
 #include "funcs/LgsParam.h"
 #include "LgsType.h"
+#include "codegen/LgsLLVMGen.h"
 
 Value* LgsParam::loadIR(LgsLLVMGen& cg) {
+    if (IRValue->getType()->isPointerTy()) {
+        return cg.builder.CreateLoad(type->getIRType(cg), IRValue);
+    }
     return IRValue;
 }
 

@@ -30,6 +30,7 @@
 #include "funcs/LgsMainFunc.h"
 #include "logos/LgsApp.h"
 #include "errors/LgsErrHandler.h"
+#include "exprs/LgsMatrixExpr.h"
 #include "loops/LgsInfiniteLoop.h"
 #include "loops/LgsWhileLoop.h"
 #include "stmts/LgsBreak.h"
@@ -660,6 +661,7 @@ void LgsSema::visitExpr(LgsExpr*& expr) {
         else if (const auto prefixExpr = expr->asPrefixExpr()) visitPrefixExpr(prefixExpr);
         else if (const auto forVar = expr->asLoopMetaVar()) visitLoopMetaVar(forVar);
         else if (const auto vecExpr = expr->asVectorExpr()) visitVectorExpr(vecExpr);
+        else if (const auto matrixExpr = expr->asMatrixExpr()) visitMatrixExpr(matrixExpr);
         else if (const auto castExpr = expr->asCast()) visitCast(castExpr);
         else if (const auto json = expr->asJson()) visitJson(json);
     }
@@ -740,19 +742,24 @@ void LgsSema::visitArrayExpr(LgsArrayExpr* arrayExpr) {
     if (arrayExpr->elements.empty() && !arrayExpr->type) {
         return addError(E10049, arrayExpr->location, {arrayExpr->asText()});
     }
-    const auto iter = arrayExpr->type->asIterable();
     for (auto element : arrayExpr->elements) {
         visitExpr(element);
-        if (iter->baseType && !element->type->canCastTo(iter->baseType)) {
-            return addError(E10001, element->location, {iter->pname(), element->type->pname()});
-        }
     }
-    if (arrayExpr->type->asDArray() || arrayExpr->type->asSet()) {
+    if (!arrayExpr->type) {
+        arrayExpr->type = new LgsDArray();
+        visitDynamicArray(arrayExpr);
+    } if (arrayExpr->type->asSet()) {
         visitDynamicArray(arrayExpr);
     } else if (arrayExpr->type->asSArray()) {
         visitStaticArray(arrayExpr);
     } else {
         assert(0);
+    }
+    const auto iter = arrayExpr->type->asIterable();
+    if (!iter) return;
+    for (const auto element : arrayExpr->elements) {
+        if (element->type->canCastTo(iter->baseType)) continue;
+        return addError(E10001, element->location, {iter->pname(), element->type->pname()});
     }
 }
 
@@ -809,6 +816,17 @@ void LgsSema::visitVectorExpr(const LgsVectorExpr* vectorExpr) {
     }
     if (sumDim > vectorExpr->vecType->vectorDim) {
         addError(E10074, vectorExpr->location, {std::to_string(vectorExpr->vecType->vectorDim), std::to_string(sumDim)});
+    }
+}
+
+void LgsSema::visitMatrixExpr(const LgsMatrixExpr* matrixExpr) {
+    for (const auto element : matrixExpr->elements) {
+        for (auto innerElement : element->elements) {
+            visitExpr(innerElement);
+            innerElement->castImplicitly(matrixExpr->matType->baseType);
+        }
+        const auto columnsInt = new LgsIntConst(&LGS_SIZE, matrixExpr->matType->columns);
+        element->type = new LgsSArray(matrixExpr->matType->baseType, columnsInt);
     }
 }
 

@@ -50,7 +50,7 @@ public:
     std::vector<LgsType*> genericArgs;
     Type* IRType = nullptr;
     bool isInt = false;
-    bool isFloat = false;
+    bool isFloatingPoint = false;
     bool isPrimitive = false;
     bool isHeapAlloc = false;
     bool passByRef = false;

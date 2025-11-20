@@ -101,10 +101,10 @@ public:
     void visitCoroutine(const LgsCoroutine* coroutine);
     void visitDeferStmt(const LgsDeferStmt* defer);
     void visitIOStmt(const LgsIOStmt* ioStmt);
-    void visitNullableExpr(LgsNullableExpr* nullableExpr);
     void visitExpr(LgsExpr* expr, bool assign = false);
     void visitBinaryExpr(LgsBinaryExpr* binExpr);
     void visitTernaryExpr(LgsTernaryExpr* ternaryExpr);
+    void visitNullableExpr(LgsNullableExpr* nullableExpr);
     void visitCast(LgsCast* cast);
     void visitLambda(LgsFunc* func);
     void visitIntConst(LgsIntConst* intConst) const;
@@ -114,6 +114,7 @@ public:
     void visitHashMap(LgsHashMap* hashMap);
     void visitEnvVar(LgsEnvVar* envVar) const;
     void visitVectorExpr(LgsVectorExpr* vectorExpr);
+    void visitMatrixExpr(LgsMatrixExpr* matrixExpr);
     void visitVariable(LgsVariable* variable);
     void visitSelection(LgsSelection* selection, bool assign = false);
     void visitFieldSelection(LgsVariable* var, LgsExpr* parent, bool assign) const;
