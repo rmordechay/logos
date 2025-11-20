@@ -9,6 +9,8 @@
 #include "types/LgsNullable.h"
 #include "types/LgsGenericParam.h"
 #include "LgsUtils.h"
+#include "types/LgsAny.h"
+
 #include <sstream>
 #include <llvm/IR/Module.h>
 

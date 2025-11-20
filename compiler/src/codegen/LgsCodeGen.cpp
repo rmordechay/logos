@@ -15,6 +15,7 @@
 #include "exprs/LgsIterIndex.h"
 #include "exprs/LgsJson.h"
 #include "exprs/LgsNull.h"
+#include "exprs/LgsNullableExpr.h"
 #include "exprs/LgsPostfixExpr.h"
 #include "exprs/LgsPrefixExpr.h"
 #include "exprs/LgsSelection.h"
@@ -399,8 +400,7 @@ void LgsCodeGen::visitAssignment(const LgsAssignment* assignment) {
 
 void LgsCodeGen::visitIfStmt(LgsIfStmt* ifStmt) {
     if (ifStmt->macroTrueBlock) {
-        visitStmtsBlock(ifStmt->macroTrueBlock);
-        return;
+        return visitStmtsBlock(ifStmt->macroTrueBlock);
     }
     if (ifStmt->elseIfs.empty()) {
         if (ifStmt->elseBlock) {
@@ -622,6 +622,15 @@ void LgsCodeGen::visitIOStmt(const LgsIOStmt* ioStmt) {
     visitStmtsBlock(ioStmt->stmtsBlock);
 }
 
+void LgsCodeGen::visitNullableExpr(LgsNullableExpr* nullableExpr) {
+    const auto tyIR = nullableExpr->type->getIRType(cg);
+    const auto baseExpr = nullableExpr->baseExpr;
+    visitExpr(baseExpr);
+    nullableExpr->IRValue = cg.builder.CreateAlloca(tyIR);
+    const auto nullable = nullableExpr->type->asNullable();
+    nullable->setIRValue(cg, nullableExpr->IRValue, baseExpr->IRValue);
+}
+
 void LgsCodeGen::visitExpr(LgsExpr* expr, const bool assign) {
     if (!expr) return;
     if (const auto iter = expr->type->asIterable()) {
@@ -654,6 +663,7 @@ void LgsCodeGen::visitExpr(LgsExpr* expr, const bool assign) {
         else if (const auto null = expr->asNull()) visitNull(null);
         else if (const auto cast = expr->asCast()) visitCast(cast);
         else if (const auto json = expr->asJson()) visitJson(json);
+        else if (const auto nullableExpr = expr->asNullableExpr()) visitNullableExpr(nullableExpr);
     }
     if (appConfigs.debugMode) expr->setDebugValue(cg);
     assert(expr->IRValue);

@@ -52,9 +52,13 @@ Value* LgsVariable::castIR(LgsLLVMGen& cg, LgsType* toType) {
 }
 
 void LgsVariable::assign(LgsLLVMGen& cg, LgsExpr* expr) {
-    freeOwner(cg);
     owner = expr->owner;
-    cg.builder.CreateStore(expr->IRValue, ref.varDec->IRValue);
+    freeOwner(cg);
+    if (const auto nullable = type->asNullable()) {
+        nullable->setIRValue(cg, IRValue, expr->IRValue);
+    } else {
+        cg.builder.CreateStore(expr->IRValue, IRValue);
+    }
 }
 
 Value* LgsVariable::hashValue(LgsLLVMGen& cg) {

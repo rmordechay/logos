@@ -1,4 +1,5 @@
 #include "exprs/LgsNullableExpr.h"
+#include "codegen/LgsLLVMGen.h"
 
 std::string LgsNullableExpr::asText() {
     assert(0);
@@ -32,7 +33,7 @@ Value* LgsNullableExpr::hashValue(LgsLLVMGen& cg) {
     assert(0);
 }
 
-bool LgsNullableExpr::equals(LgsExpr* other) {
+ bool LgsNullableExpr::equals(LgsExpr* other) {
     assert(0);
 }
 

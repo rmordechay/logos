@@ -2,6 +2,7 @@
 #include <stmts/LgsStmt.h>
 #include "LgsValue.h"
 
+class LgsNullableExpr;
 class LgsEnvVar;
 class LgsBinaryExpr;
 class LgsNull;
@@ -51,6 +52,7 @@ public:
     int64_t* getConstInt();
     std::string* getConstStr();
     void setType(LgsType* newType);
+    LgsExpr* clone() override;
 
     LgsNull* asNull();
     LgsFunc* asFunc();
@@ -71,7 +73,7 @@ public:
     LgsIntConst* asIntConst();
     LgsMetaVar* asLoopMetaVar();
     LgsBinaryExpr* asBinExpr();
-    LgsExpr* clone() override;
+    LgsNullableExpr* asNullableExpr();
     ~LgsExpr() override = default;
 };
 

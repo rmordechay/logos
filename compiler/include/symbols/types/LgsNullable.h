@@ -1,6 +1,5 @@
 #pragma once
 #include "LgsType.h"
-#include "types/LgsAny.h"
 
 class LgsNullable final : public LgsType {
 public:
@@ -9,6 +8,7 @@ public:
     explicit LgsNullable(LgsType* baseType) : baseType(baseType) {}
     LgsField* getField(const std::string& fieldName) override;
     LgsFunc* getMethod(const std::string& methodName) override;
+    void setIRValue(LgsLLVMGen& cg, Value* nullablePtr, Value* value);
     Type* getIRType(LgsLLVMGen& cg) override;
     LgsExpr* getZeroValue() override;
     Lgs_TypeKind getRTTypeKind() override;

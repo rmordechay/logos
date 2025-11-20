@@ -3,6 +3,7 @@
 #include "LgsDefinitions.h"
 #include "exprs/LgsNull.h"
 #include "LgsUtils.h"
+#include "types/LgsAny.h"
 
 LgsField* LgsNullable::getField(const std::string& fieldName) {
     return baseType->getField(fieldName);
@@ -10,6 +11,13 @@ LgsField* LgsNullable::getField(const std::string& fieldName) {
 
 LgsFunc* LgsNullable::getMethod(const std::string& methodName) {
     return baseType->getMethod(methodName);
+}
+
+void LgsNullable::setIRValue(LgsLLVMGen& cg, Value* nullablePtr, Value* value) {
+    const auto valueField = cg.builder.CreateStructGEP(getIRType(cg), nullablePtr, 0);
+    const auto isSetField = cg.builder.CreateStructGEP(getIRType(cg), nullablePtr, 1);
+    cg.builder.CreateStore(cg.builder.CreateIsNull(value), isSetField);
+    cg.builder.CreateStore(value, valueField);
 }
 
 Type* LgsNullable::getIRType(LgsLLVMGen& cg) {

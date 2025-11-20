@@ -15,6 +15,7 @@
 #include "stmts/LgsVarDec.h"
 #include "exprs/LgsJson.h"
 #include "exprs/LgsNull.h"
+#include "exprs/LgsNullableExpr.h"
 #include "exprs/LgsTypeExpr.h"
 #include "funcs/LgsFunc.h"
 #include "loops/LgsMetaVar.h"
@@ -60,7 +61,7 @@ int64_t* LgsExpr::getConstInt() {
         case VAR_DEC:
             return var->ref.varDec->expr->getConstInt();
         case FIELD:
-            if (var->ref.field->expr) var->ref.field->expr->getConstInt();
+            if (var->ref.field->expr) return var->ref.field->expr->getConstInt();
             break;
         default:
             break;
@@ -182,6 +183,10 @@ LgsMetaVar* LgsExpr::asLoopMetaVar() {
 
 LgsBinaryExpr* LgsExpr::asBinExpr() {
     return dynamic_cast<LgsBinaryExpr*>(this);
+}
+
+LgsNullableExpr* LgsExpr::asNullableExpr() {
+    return dynamic_cast<LgsNullableExpr*>(this);
 }
 
 LgsExpr* LgsExpr::clone() {
