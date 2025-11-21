@@ -64,12 +64,11 @@ LgsFunc* LgsSet::getAddFunc() {
     return func->second;
 }
 
-LgsType* LgsSet::applyBinOp(LgsBinaryExpr* binExpr) {
-    const auto other = binExpr->right->type;
-    const auto IRName = other->getName();
-    switch (binExpr->op.opType) {
+LgsType* LgsSet::applyBinOp(LgsType* toType, LgsBinOp& op) {
+    const auto IRName = toType->getName();
+    switch (op.opType) {
     case IN: {
-        if (other->canCastTo(baseType)) return baseType;
+        if (toType->canCastTo(baseType)) return baseType;
         break;
     }
     default:

@@ -48,11 +48,10 @@ bool LgsVec::canCastTo(LgsType* other) {
     return vectorDim == otherVec->vectorDim && baseType->canCastTo(otherVec->baseType);
 }
 
-LgsType* LgsVec::applyBinOp(LgsBinaryExpr* binExpr) {
+LgsType* LgsVec::applyBinOp(LgsType* toType, LgsBinOp& op) {
     const auto thisNme = getName();
-    const auto other = binExpr->right->type;
-    const auto otherName = other->getName();
-    switch (binExpr->op.opType) {
+    const auto otherName = toType->getName();
+    switch (op.opType) {
     case ADD:
     case SUB: {
         if (thisNme == otherName) return clone();
@@ -61,11 +60,11 @@ LgsType* LgsVec::applyBinOp(LgsBinaryExpr* binExpr) {
     case DIV:
     case MUL: {
         if (thisNme == otherName) return &LGS_FLOAT;
-        if (other->isNumber()) return clone();
+        if (toType->isNumber()) return clone();
         break;
     }
     case IN: {
-        if (other->canCastTo(baseType)) return baseType->clone();
+        if (toType->canCastTo(baseType)) return baseType->clone();
         break;
     }
     default:

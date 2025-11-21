@@ -678,12 +678,6 @@ void LgsCodeGen::visitBinaryExpr(LgsBinaryExpr* binExpr) {
     const auto r = binExpr->right;
     visitExpr(l);
     visitExpr(r);
-    if (!binExpr->isMutable) {
-        assert(binExpr->results);
-        visitExpr(binExpr->results);
-        binExpr->IRValue = binExpr->results->IRValue;
-        return;
-    }
     switch (binExpr->op.opType) {
     case ADD: binExpr->IRValue = binExpr->type->addIR(cg, l, r); break;
     case SUB: binExpr->IRValue = binExpr->type->subIR(cg, l, r); break;

@@ -25,12 +25,8 @@ Lgs_TypeKind LgsLong::getRTTypeKind() {
     return RTT_LONG;
 }
 
-LgsType* LgsLong::applyBinOp(LgsBinaryExpr* binExpr) {
-    return applyIntBinOp(binExpr->op.opType, binExpr->left->type);
-}
-
-LgsExpr* LgsLong::powConst(LgsExpr* left, LgsExpr* right) {
-    assert(0);
+LgsType* LgsLong::applyBinOp(LgsType* toType, LgsBinOp& op) {
+    return applyIntBinOp(toType, op.opType);
 }
 
 Value* LgsLong::addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {

@@ -36,14 +36,6 @@ bool LgsDouble::canCastTo(LgsType* other) {
     return false;
 }
 
-LgsExpr* LgsDouble::powConst(LgsExpr* left, LgsExpr* right) {
-    const auto const1 = left->getConstInt();
-    if (!const1) return nullptr;
-    const auto const2 = right->getConstInt();
-    if (!const2) return nullptr;
-    return new LgsFloatConst(&LGS_DOUBLE, std::pow(*const1, *const2));
-}
-
 Value* LgsDouble::powIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
     return LgsType::powIR(cg, left, right);
 }

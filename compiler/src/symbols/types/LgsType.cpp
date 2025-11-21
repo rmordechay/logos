@@ -13,6 +13,7 @@
 #include "types/LgsNullable.h"
 #include "types/LgsSubType.h"
 #include "types/LgsUnknown.h"
+#include "types/iterables/LgsMatrix.h"
 #include "types/primitives/LgsVoid.h"
 #include "types/iterables/LgsSArray.h"
 #include "types/iterables/LgsSet.h"
@@ -80,10 +81,10 @@ LgsType* LgsType::extendInt() {
     return this;
 }
 
-LgsType* LgsType::applyIntBinOp(const LgsBinOpType op, LgsType* other) {
+LgsType* LgsType::applyIntBinOp(LgsType* toType, const LgsBinOpType op) {
     switch (op) {
     case POW:
-        if (other->canCastTo(this)) return &LGS_DOUBLE;
+        if (toType->canCastTo(this)) return &LGS_DOUBLE;
         break;
     case ADD:
     case SUB:
@@ -94,11 +95,11 @@ LgsType* LgsType::applyIntBinOp(const LgsBinOpType op, LgsType* other) {
     case BIT_XOR:
     case LSHIFT:
     case RSHIFT:
-        if (other->asFloat()) return other;
-        if (other->canCastTo(this)) return this;
+        if (toType->asFloat()) return toType;
+        if (toType->canCastTo(this)) return this;
         break;
     case DIV:
-        if (other->isNumber()) return &LGS_FLOAT;
+        if (toType->isNumber()) return &LGS_FLOAT;
         break;
     case EQ:
     case NE:
@@ -106,11 +107,11 @@ LgsType* LgsType::applyIntBinOp(const LgsBinOpType op, LgsType* other) {
     case GT:
     case GE:
     case LE: {
-        if (other->canCastTo(this)) return &LGS_BOOL;
+        if (toType->canCastTo(this)) return &LGS_BOOL;
         break;
     }
     case IN: {
-        const auto iter = other->asIterable();
+        const auto iter = toType->asIterable();
         if (!iter) break;
         if (iter->getDimension() == 1 && canCastTo(iter->baseType)) {
             return &LGS_BOOL;
@@ -199,7 +200,7 @@ bool LgsType::equals(LgsType* other) {
     return getName() == other->getName();
 }
 
-LgsType* LgsType::applyBinOp(LgsBinaryExpr* binExpr) {
+LgsType* LgsType::applyBinOp(LgsType* toType, LgsBinOp& op) {
     assert(0);
 }
 
@@ -213,82 +214,6 @@ void LgsType::hashNode(size_t& oldHash) {
 
 LgsType* LgsType::clone() {
     if (isPrimitive) return this;
-    assert(0);
-}
-
-LgsExpr* LgsType::addConst(LgsExpr* left, LgsExpr* right) {
-    assert(0);
-}
-
-LgsExpr* LgsType::subConst(LgsExpr* left, LgsExpr* right) {
-    assert(0);
-}
-
-LgsExpr* LgsType::mulConst(LgsExpr* left, LgsExpr* right) {
-    assert(0);
-}
-
-LgsExpr* LgsType::divConst(LgsExpr* left, LgsExpr* right) {
-    assert(0);
-}
-
-LgsExpr* LgsType::modConst(LgsExpr* left, LgsExpr* right) {
-    assert(0);
-}
-
-LgsExpr* LgsType::powConst(LgsExpr* left, LgsExpr* right) {
-    assert(0);
-}
-
-LgsExpr* LgsType::bitAndConst(LgsExpr* left, LgsExpr* right) {
-    assert(0);
-}
-
-LgsExpr* LgsType::bitOrConst(LgsExpr* left, LgsExpr* right) {
-    assert(0);
-}
-
-LgsExpr* LgsType::bitXorConst(LgsExpr* left, LgsExpr* right) {
-    assert(0);
-}
-
-LgsExpr* LgsType::lshiftConst(LgsExpr* left, LgsExpr* right) {
-    assert(0);
-}
-
-LgsExpr* LgsType::rshiftConst(LgsExpr* left, LgsExpr* right) {
-    assert(0);
-}
-
-LgsExpr* LgsType::eqConst(LgsExpr* left, LgsExpr* right) {
-    assert(0);
-}
-
-LgsExpr* LgsType::neConst(LgsExpr* left, LgsExpr* right) {
-    assert(0);
-}
-
-LgsExpr* LgsType::ltConst(LgsExpr* left, LgsExpr* right) {
-    assert(0);
-}
-
-LgsExpr* LgsType::gtConst(LgsExpr* left, LgsExpr* right) {
-    assert(0);
-}
-
-LgsExpr* LgsType::geConst(LgsExpr* left, LgsExpr* right) {
-    assert(0);
-}
-
-LgsExpr* LgsType::leConst(LgsExpr* left, LgsExpr* right) {
-    assert(0);
-}
-
-LgsExpr* LgsType::andConst(LgsExpr* left, LgsExpr* right) {
-    assert(0);
-}
-
-LgsExpr* LgsType::orConst(LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
@@ -454,6 +379,10 @@ LgsSet* LgsType::asSet() {
 
 LgsVec* LgsType::asVec() {
     return dynamic_cast<LgsVec*>(this);
+}
+
+LgsMatrix* LgsType::asMatrix() {
+    return dynamic_cast<LgsMatrix*>(this);
 }
 
 LgsPtr* LgsType::asPtr() {

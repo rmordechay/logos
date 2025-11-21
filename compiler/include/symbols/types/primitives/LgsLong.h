@@ -15,8 +15,7 @@ public:
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
     Lgs_TypeKind getRTTypeKind() override;
-    LgsType* applyBinOp(LgsBinaryExpr* binExpr) override;
-    LgsExpr* powConst(LgsExpr* left, LgsExpr* right) override;
+    LgsType* applyBinOp(LgsType* toType, LgsBinOp& op) override;
     Value* addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
     Value* subIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
     Value* mulIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;

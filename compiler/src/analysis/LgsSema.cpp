@@ -675,39 +675,14 @@ void LgsSema::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
     const auto ltype = l->type;
     const auto rtype = r->type;
     if (!ltype || !rtype) return;
-    auto type = ltype->applyBinOp(binaryExpr);
+    auto type = ltype->applyBinOp(rtype, binaryExpr->op);
     if (!type) {
         return addError(E10076, l->location, {binaryExpr->op.text, ltype->pname(), rtype->pname()});
     }
     if (const auto iter = type->asIterable()) visitExpr(iter->size);
     type = typeResolver.resolveType(type, file);
     binaryExpr->setType(type);
-    binaryExpr->isMutable = l->isMutable && r->isMutable;
-    if (binaryExpr->isMutable) return;
-    const auto resultsType = binaryExpr->type;
-    switch (binaryExpr->op.opType) {
-    case ADD: binaryExpr->results = resultsType->addConst(l, r); break;
-    case SUB: binaryExpr->results = resultsType->subConst(l, r); break;
-    case MUL: binaryExpr->results = resultsType->mulConst(l, r); break;
-    case DIV: binaryExpr->results = resultsType->divConst(l, r); break;
-    case MODULO: binaryExpr->results = resultsType->modConst(l, r); break;
-    case POW: binaryExpr->results = resultsType->powConst(l, r); break;
-    case BIT_AND: binaryExpr->results = resultsType->bitAndConst(l, r); break;
-    case BIT_OR: binaryExpr->results = resultsType->bitOrConst(l, r); break;
-    case BIT_XOR: binaryExpr->results = resultsType->bitXorConst(l, r); break;
-    case LSHIFT: binaryExpr->results = resultsType->lshiftConst(l, r); break;
-    case RSHIFT: binaryExpr->results = resultsType->rshiftConst(l, r); break;
-    case EQ: binaryExpr->results = resultsType->eqConst(l, r); break;
-    case NE: binaryExpr->results = resultsType->neConst(l, r); break;
-    case LT: binaryExpr->results = resultsType->ltConst(l, r); break;
-    case GT: binaryExpr->results = resultsType->gtConst(l, r); break;
-    case GE: binaryExpr->results = resultsType->geConst(l, r); break;
-    case LE: binaryExpr->results = resultsType->leConst(l, r); break;
-    case AND: binaryExpr->results = resultsType->andConst(l, r); break;
-    case OR: binaryExpr->results = resultsType->orConst(l, r); break;
-    case IN: assert(0);
-    case NOOP: break;
-    }
+    binaryExpr->isMutable = l->isMutable || r->isMutable;
 }
 
 void LgsSema::visitTernaryExpr(LgsTernaryExpr* ternary) {

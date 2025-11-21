@@ -21,7 +21,7 @@ public:
     LgsExpr* getZeroValue() override;
     Lgs_TypeKind getRTTypeKind() override;
     std::string strFormatPart() const override;
-    LgsType* applyBinOp(LgsBinaryExpr* binExpr) override;
+    LgsType* applyBinOp(LgsType* toType, LgsBinOp& op) override;
     LgsFunc* getAddFunc() override;
     LgsFunc* getReserveFunc();
     Value* lengthIR(LgsLLVMGen& cg, Value* iterable) override;

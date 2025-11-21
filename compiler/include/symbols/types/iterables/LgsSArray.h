@@ -17,7 +17,7 @@ public:
     Lgs_TypeKind getRTTypeKind() override;
     Constant* getRTType(LgsLLVMGen& cg) override;
     std::string strFormatPart() const override;
-    LgsType* applyBinOp(LgsBinaryExpr* binExpr) override;
+    LgsType* applyBinOp(LgsType* toType, LgsBinOp& op) override;
     Value* addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
     Value* mulIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
     Value* inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) override;

@@ -13,7 +13,7 @@ public:
     Type* getIRType(LgsLLVMGen& cg) override;
     std::string getName() override;
     LgsExpr* getZeroValue() override;
-    LgsType* applyBinOp(LgsBinaryExpr* binExpr) override;
+    LgsType* applyBinOp(LgsType* toType, LgsBinOp& op) override;
     Value* addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
     Value* subIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
     Value* mulIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;

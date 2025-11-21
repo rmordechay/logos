@@ -16,7 +16,7 @@ public:
     size_t sizeBytes() override;
     std::string strFormatPart() const override;
     bool canCastTo(LgsType* other) override;
-    LgsType* applyBinOp(LgsBinaryExpr* binExpr) override;
+    LgsType* applyBinOp(LgsType* toType, LgsBinOp& op) override;
     Value* addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
     Value* subIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
     Value* mulIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;

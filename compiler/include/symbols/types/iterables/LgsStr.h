@@ -16,13 +16,12 @@ public:
     LgsExpr* getZeroValue() override;
     Lgs_TypeKind getRTTypeKind() override;
     bool canCastTo(LgsType* other) override;
-    LgsType* applyBinOp(LgsBinaryExpr* binExpr) override;
+    LgsType* applyBinOp(LgsType* toType, LgsBinOp& op) override;
     Value* getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) override;
     LgsFunc* getLenFunc() override;
     LgsFunc* getIsEmptyFunc() override;
     LgsFunc* getIsNotEmptyFunc() override;
     std::string strFormatPart() const override;
-    LgsExpr* addConst(LgsExpr* left, LgsExpr* right) override;
     Value* addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
     Value* eqIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
     Value* neIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;

@@ -37,23 +37,22 @@ bool LgsStr::canCastTo(LgsType* other) {
     return name == other->getName();
 }
 
-LgsType* LgsStr::applyBinOp(LgsBinaryExpr* binExpr) {
-    const auto other = binExpr->right->type;
-    const auto IRName = other->getName();
-    switch (binExpr->op.opType) {
+LgsType* LgsStr::applyBinOp(LgsType* toType, LgsBinOp& op) {
+    const auto IRName = toType->getName();
+    switch (op.opType) {
     case ADD: {
-        if (other->isNumber() || name == IRName) {
+        if (toType->isNumber() || name == IRName) {
             isHeapAlloc = true;
             return this;
         }
         break;
     }
     case IN: {
-        if (equals(other)) return &LGS_BOOL;
-        if (other->asIterable() && canCastTo(other->asIterable()->baseType)) return &LGS_BOOL;
+        if (equals(toType)) return &LGS_BOOL;
+        if (toType->asIterable() && canCastTo(toType->asIterable()->baseType)) return &LGS_BOOL;
     }
     case EQ: {
-        if (equals(other)) return &LGS_BOOL;
+        if (equals(toType)) return &LGS_BOOL;
         break;
     }
     default:
@@ -98,19 +97,6 @@ LgsFunc* LgsStr::getIsNotEmptyFunc() {
 
 std::string LgsStr::strFormatPart() const {
     return "%s";
-}
-
-LgsExpr* LgsStr::addConst(LgsExpr* left, LgsExpr* right) {
-    const auto selfConstStr = left->getConstStr();
-    if (right->type->asStr()) {
-        const auto otherConstStr = right->getConstStr();
-        return new LgsStrConst(*selfConstStr + *otherConstStr);
-    }
-    if (right->type->asInt()) {
-        const auto otherConstStr = right->getConstInt();
-        return new LgsStrConst(*selfConstStr + std::to_string(*otherConstStr));
-    }
-    assert(0);
 }
 
 Value* LgsStr::addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {

@@ -4,6 +4,7 @@
 #include "exprs/LgsBinaryExpr.h"
 #include <map>
 
+class LgsMatrix;
 class LgsSubType;
 class LgsGenericParam;
 class LgsSet;
@@ -64,7 +65,7 @@ public:
     bool isUnknown();
     bool isSliceable();
     LgsType* extendInt();
-    LgsType* applyIntBinOp(LgsBinOpType op, LgsType* other);
+    LgsType* applyIntBinOp(LgsType* toType, LgsBinOpType op);
     void cloneFields(LgsType* newType) const;
     void cloneMethods(LgsType* newType) const;
     static Value* orInt(LgsLLVMGen& cg, const LgsExpr* self, const LgsExpr* other);
@@ -81,31 +82,12 @@ public:
     virtual std::string pname(); // pretty name
     virtual bool equals(LgsType* other);
     virtual bool canCastTo(LgsType* other) = 0;
-    virtual LgsType* applyBinOp(LgsBinaryExpr* binExpr);
+    virtual LgsType* applyBinOp(LgsType* toType, LgsBinOp& op);
     virtual std::string strFormatPart() const = 0;
     virtual DIBasicType* getDebugType(LgsLLVMGen& cg);
     virtual void hashNode(size_t& oldHash);
     virtual LgsType* clone();
 
-    virtual LgsExpr* addConst(LgsExpr* left, LgsExpr* right);
-    virtual LgsExpr* subConst(LgsExpr* left, LgsExpr* right);
-    virtual LgsExpr* mulConst(LgsExpr* left, LgsExpr* right);
-    virtual LgsExpr* divConst(LgsExpr* left, LgsExpr* right);
-    virtual LgsExpr* modConst(LgsExpr* left, LgsExpr* right);
-    virtual LgsExpr* powConst(LgsExpr* left, LgsExpr* right);
-    virtual LgsExpr* bitAndConst(LgsExpr* left, LgsExpr* right);
-    virtual LgsExpr* bitOrConst(LgsExpr* left, LgsExpr* right);
-    virtual LgsExpr* bitXorConst(LgsExpr* left, LgsExpr* right);
-    virtual LgsExpr* lshiftConst(LgsExpr* left, LgsExpr* right);
-    virtual LgsExpr* rshiftConst(LgsExpr* left, LgsExpr* right);
-    virtual LgsExpr* eqConst(LgsExpr* left, LgsExpr* right);
-    virtual LgsExpr* neConst(LgsExpr* left, LgsExpr* right);
-    virtual LgsExpr* ltConst(LgsExpr* left, LgsExpr* right);
-    virtual LgsExpr* gtConst(LgsExpr* left, LgsExpr* right);
-    virtual LgsExpr* geConst(LgsExpr* left, LgsExpr* right);
-    virtual LgsExpr* leConst(LgsExpr* left, LgsExpr* right);
-    virtual LgsExpr* andConst(LgsExpr* left, LgsExpr* right);
-    virtual LgsExpr* orConst(LgsExpr* left, LgsExpr* right);
     virtual Value* addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right);
     virtual Value* subIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right);
     virtual Value* mulIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right);
@@ -148,6 +130,7 @@ public:
     LgsDArray* asDArray();
     LgsSet* asSet();
     LgsVec* asVec();
+    LgsMatrix* asMatrix();
     LgsPtr* asPtr();
     LgsMap* asMap();
     LgsTypePair* asPair();

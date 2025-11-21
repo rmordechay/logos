@@ -57,24 +57,16 @@ std::string LgsSArray::strFormatPart() const {
     return "%p";
 }
 
-LgsType* LgsSArray::applyBinOp(LgsBinaryExpr* binExpr) {
-    const auto r = binExpr->right;
-    const auto [opType, text] = binExpr->op;
-    switch (opType) {
+LgsType* LgsSArray::applyBinOp(LgsType* toType, LgsBinOp& op) {
+    switch (op.opType) {
     case IN: {
-        if (r->type->canCastTo(baseType)) return &LGS_BOOL;
+        if (toType->canCastTo(baseType)) return &LGS_BOOL;
         break;
     }
     case ADD: {
-        if (const auto otherSArr = r->type->asSArray()) {
+        if (const auto otherSArr = toType->asSArray()) {
             if (!baseType->canCastTo(otherSArr->baseType)) break;
             return new LgsSArray(baseType, new LgsBinaryExpr(size, otherSArr->size, ADD_OP));
-        }
-    }
-    case MUL: {
-        if (r->type->isInt) {
-            const auto mulSize = new LgsBinaryExpr(size, r, MUL_OP);
-            return new LgsSArray(baseType, mulSize);
         }
     }
     default:
