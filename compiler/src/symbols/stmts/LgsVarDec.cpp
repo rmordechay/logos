@@ -14,9 +14,9 @@ Value* LgsVarDec::loadIR(LgsLLVMGen& cg) {
 }
 
 bool LgsVarDec::shouldAllocate() const {
-    if (type->isHeapAlloc || type->asFuncType()) return false;
+    if (type->isHeapAlloc) return false;
     if (type->asIterable() && type->asIterable()->isStatic) return false;
-    if (type->asSubtype() || type->asNullable()) return false;
+    if (type->asSubtype() || type->asNullable()  || type->asFuncType()) return false;
     return true;
 }
 

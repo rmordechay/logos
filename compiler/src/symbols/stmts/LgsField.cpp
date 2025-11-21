@@ -2,7 +2,7 @@
 #include "LgsType.h"
 #include "exprs/LgsExpr.h"
 #include "exprs/LgsHashMap.h"
-#include "LgsUtils.h"
+#include <iostream>
 
 void LgsField::setType(LgsType* newType) {
     type = newType;
@@ -13,9 +13,11 @@ Value* LgsField::loadIR(LgsLLVMGen& cg) {
     return cg.builder.CreateLoad(type->getIRType(cg), IRValue);
 }
 
-Value* LgsField::getGEP(LgsLLVMGen& cg) const {
+Value* LgsField::getGEP(LgsLLVMGen& cg) {
     assert(parentType && parentIRPtr);
-    return cg.builder.CreateConstInBoundsGEP1_32(parentType->getIRType(cg), parentIRPtr, position);
+    if (gep) return gep;
+    gep = cg.builder.CreateStructGEP(parentType->getIRType(cg), parentIRPtr, position);
+    return gep;
 }
 
 Value* LgsField::resolveVirtualField(LgsLLVMGen* cg, const LgsHashMap* vtable) const {
@@ -32,7 +34,7 @@ LgsField::~LgsField() {
     freeExpr(expr);
     freeType(type);
     expr = nullptr;
-    setType(nullptr);
+    type = nullptr;
 }
 
 LgsField* LgsField::clone() {

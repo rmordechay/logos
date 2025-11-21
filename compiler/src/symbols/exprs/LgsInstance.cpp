@@ -46,7 +46,6 @@ LgsInstance::~LgsInstance() {
         freeExpr(arg.expr);
     }
     args.clear();
-    freeType(obj);
     obj = nullptr;
     setType(nullptr);
 }

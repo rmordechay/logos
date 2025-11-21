@@ -128,6 +128,7 @@ void LgsType::cloneFields(LgsType* newType) const {
     newType->fields.clear();
     for (const auto& field : fields) {
         const auto newField = new LgsField(*field);
+        newField->type = field->type->clone();
         if (field->expr) {
             newField->expr = field->expr->clone();
         }

@@ -31,6 +31,7 @@
 #include "logos/LgsApp.h"
 #include "errors/LgsErrHandler.h"
 #include "exprs/LgsMatrixExpr.h"
+#include "exprs/LgsNullableExpr.h"
 #include "loops/LgsInfiniteLoop.h"
 #include "loops/LgsWhileLoop.h"
 #include "stmts/LgsBreak.h"
@@ -55,6 +56,7 @@
 #include <ranges>
 #include <unordered_set>
 
+void castExpr(LgsExpr*& expr, LgsType* toType);
 static std::string getMissingImplementsStr(const std::vector<LgsField*>& fields, const std::vector<LgsFunc*>& methods);
 
 void LgsSema::analyse() {
@@ -221,7 +223,7 @@ void LgsSema::visitLambda(LgsFunc* lambda) {
 void LgsSema::visitParam(LgsParam* param) {
     validateLocalName(param->name, &param->location);
     if (param->expr) {
-        param->expr->castImplicitly(param->type);
+        castExpr(param->expr, param->type);
         visitExpr(param->expr);
         validateExprType(param->expr, param->type);
     } else if (param->isVariadic) {
@@ -292,7 +294,7 @@ void LgsSema::visitVarDec(LgsVarDec* varDec) {
             varDec->expr->owner = varDec;
         }
         varDec->setType(typeResolver.resolveType(varDec->type, file));
-        varDec->expr->castImplicitly(varDec->type);
+        castExpr(varDec->expr, varDec->type);
         visitExpr(varDec->expr);
         validateExprType(varDec->expr, varDec->type);
         if (varDec->type != varDec->expr->type) {
@@ -331,7 +333,7 @@ void LgsSema::visitAssignment(const LgsAssignment* assignment) {
     auto r = assignment->rValue;
     visitExpr(l);
     visitExpr(r);
-    r->castImplicitly(l->type);
+    castExpr(r, l->type);
     if (!validateExprType(r, l->type)) return;
     if (!l->type || !r->type) return;
 
@@ -562,7 +564,7 @@ void LgsSema::visitReturnStmt(LgsReturn* returnStmt) {
         stack.currentFunc()->returnStmts.push_back(returnStmt);
         visitExpr(retExpr);
         const auto rt = stack.currentFunc()->funcType->rt;
-        retExpr->castImplicitly(rt);
+        castExpr(retExpr, rt);
         validateExprType(returnStmt->expr, rt);
     }
     const auto rt = funcType->rt;
@@ -662,6 +664,7 @@ void LgsSema::visitExpr(LgsExpr*& expr) {
         else if (const auto forVar = expr->asLoopMetaVar()) visitLoopMetaVar(forVar);
         else if (const auto vecExpr = expr->asVectorExpr()) visitVectorExpr(vecExpr);
         else if (const auto matrixExpr = expr->asMatrixExpr()) visitMatrixExpr(matrixExpr);
+        else if (const auto nullableExpr = expr->asNullableExpr()) visitNullableExpr(nullableExpr);
         else if (const auto castExpr = expr->asCast()) visitCast(castExpr);
         else if (const auto json = expr->asJson()) visitJson(json);
     }
@@ -711,6 +714,11 @@ void LgsSema::visitCast(LgsCast* cast) {
         return;
     }
     cast->setType(cast->value->type);
+}
+
+void LgsSema::visitNullableExpr(LgsNullableExpr* nullableExpr) {
+    visitExpr(nullableExpr->baseExpr);
+    nullableExpr->nullableType->baseType = nullableExpr->baseExpr->type->clone();
 }
 
 void LgsSema::visitArrayExpr(LgsArrayExpr* arrayExpr) {
@@ -798,7 +806,7 @@ void LgsSema::visitMatrixExpr(const LgsMatrixExpr* matrixExpr) {
     for (const auto element : matrixExpr->elements) {
         for (auto innerElement : element->elements) {
             visitExpr(innerElement);
-            innerElement->castImplicitly(matrixExpr->matType->baseType);
+            castExpr(innerElement, matrixExpr->matType->baseType);
         }
         const auto columnsInt = new LgsIntConst(&LGS_SIZE, matrixExpr->matType->columns);
         element->type = new LgsSArray(matrixExpr->matType->baseType, columnsInt);
@@ -1030,7 +1038,7 @@ void LgsSema::visitFuncArgs(LgsFuncCall* funcCall, LgsFuncType* ft) {
                 continue;
             }
             const auto param = paramsByName[arg.name];
-            arg.expr->castImplicitly(param->type);
+            castExpr(arg.expr, param->type);
             visitExpr(arg.expr);
             if (arg.name == "") {
                 addError(E10096, funcCall->location);
@@ -1042,7 +1050,7 @@ void LgsSema::visitFuncArgs(LgsFuncCall* funcCall, LgsFuncType* ft) {
             if (i >= funcCall->args.size()) break;
             auto& arg = funcCall->args[i];
             const auto& param = ft->params[i];
-            arg.expr->castImplicitly(param.type);
+            castExpr(arg.expr, param.type);
             visitExpr(arg.expr);
             if (arg.name != "") {
                 addError(E10096, funcCall->location);
@@ -1138,6 +1146,10 @@ void LgsSema::visitInstance(LgsInstance* instance) {
             continue;
         }
         if (!validateFieldVisibility(field, instance->obj)) continue;
+        castExpr(arg.expr, field->type);
+        if (field->type->asNullable() && !arg.expr->asNullableExpr()) {
+            arg.expr = new LgsNullableExpr(arg.expr);
+        }
         visitExpr(arg.expr);
         validateExprType(arg.expr, field->type);
         if (field->isOwner && field->type->isHeapAlloc) {
@@ -1592,4 +1604,11 @@ static std::string getMissingImplementsStr(const std::vector<LgsField*>& fields,
 
 void LgsSema::addError(const LgsBaseMsg& lgsErr, const LgsLocation& location, const std::vector<std::string>& args) {
     errHandler.addError(lgsErr, &location, file->path, args);
+}
+
+void castExpr(LgsExpr*& expr, LgsType* toType) {
+    expr->castImplicitly(toType);
+    if (toType->asNullable() && !expr->asNullableExpr()) {
+        expr = new LgsNullableExpr(expr);
+    }
 }

@@ -14,15 +14,19 @@ LgsFunc* LgsNullable::getMethod(const std::string& methodName) {
 }
 
 void LgsNullable::setIRValue(LgsLLVMGen& cg, Value* nullablePtr, Value* value) {
-    const auto valueField = cg.builder.CreateStructGEP(getIRType(cg), nullablePtr, 0);
-    const auto isSetField = cg.builder.CreateStructGEP(getIRType(cg), nullablePtr, 1);
-    cg.builder.CreateStore(cg.builder.CreateIsNull(value), isSetField);
-    cg.builder.CreateStore(value, valueField);
+    if (baseType->passByRef) {
+        cg.builder.CreateStore(value, nullablePtr);
+    } else {
+        const auto ty = getIRType(cg);
+        const auto valueField = cg.builder.CreateStructGEP(ty, nullablePtr, 0);
+        const auto isSetField = cg.builder.CreateStructGEP(ty, nullablePtr, 1);
+        cg.builder.CreateStore(cg.builder.CreateIsNotNull(value), isSetField);
+        cg.builder.CreateStore(value, valueField);
+    }
 }
 
 Type* LgsNullable::getIRType(LgsLLVMGen& cg) {
-    const auto type = baseType->isPrimitive ? baseType->getIRType(cg) : cg.ptrTy();
-    return cg.getStructType({type, cg.i1Ty()}, "nullable_" + baseType->getName());
+    return cg.getStructType({baseType->getIRType(cg), cg.i1Ty()}, "nullable_" + baseType->getName());
 }
 
 LgsExpr* LgsNullable::getZeroValue() {
@@ -34,7 +38,7 @@ Lgs_TypeKind LgsNullable::getRTTypeKind() {
 }
 
 std::string LgsNullable::getName() {
-    return baseType ? baseType->getName() : "Null";
+    return baseType ? baseType->getName() + '?' : "Null";
 }
 
 std::string LgsNullable::pname() {
