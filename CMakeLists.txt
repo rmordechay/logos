@@ -211,7 +211,6 @@ target_link_libraries(lgs PRIVATE
     CURL::libcurl
     OpenSSL::SSL
     OpenSSL::Crypto
-    ${CMAKE_SOURCE_DIR}/external/libcblas.a
 )
 
 # Options

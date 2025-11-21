@@ -7,7 +7,7 @@ main() {
     print(a)
     a := null
     print(a)
-
-    obj = Obj{x = 2}
-    x = obj.x
+    obj = Obj{x = 2}?
+    //obj = Obj{x = 2}
+    print(obj.x)
 }

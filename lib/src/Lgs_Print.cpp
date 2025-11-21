@@ -12,7 +12,7 @@ extern Lgs_SArray Lgs_RTTypes_Arrays[];
 extern Lgs_SArray Lgs_RTTypes_Objects[];
 
 extern "C" void Lgs_print(const Lgs_TypeKind rtt, void* v) {
-    printf("%s", formatElement(rtt, v).c_str());
+    printf("%s\n", formatElement(rtt, v).c_str());
 }
 
 std::string formatElement(const Lgs_TypeKind type, void* elem) {

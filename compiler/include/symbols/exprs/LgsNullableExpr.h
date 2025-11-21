@@ -5,8 +5,12 @@
 class LgsNullableExpr final : public LgsExpr {
 public:
     LgsExpr* baseExpr;
+    LgsNullable* nullableType;
 
-    explicit LgsNullableExpr(LgsExpr* baseExpr): LgsExpr(new LgsNullable(baseExpr->type)), baseExpr(baseExpr) {}
+    explicit LgsNullableExpr(LgsExpr* baseExpr): baseExpr(baseExpr) {
+        nullableType = new LgsNullable(nullptr);
+        type = nullableType;
+    }
     std::string asText() override;
     Value* loadIR(LgsLLVMGen& cg) override;
     void setDebugValue(LgsLLVMGen& cg) override;

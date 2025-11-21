@@ -2,9 +2,11 @@
 #include "codegen/LgsLLVMGen.h"
 #include "logos/LgsAppConfigs.h"
 #include "llvm/Bitcode/BitcodeWriter.h"
+
+#include <iostream>
 #include <llvm/Support/FileSystem.h>
 
-#define LINK_CMD_STRING "clang %s -L%s -llgs %s -Wl,-rpath,%s %s -o %s"
+#define LINK_CMD_STRING "clang %s -L%s -llgs %s %s -Wl,-rpath,%s %s -o %s"
 
 bool LgsLinker::link() const {
     assert(paths.lgsRootDir != "" && paths.execFile != "");
@@ -20,6 +22,7 @@ bool LgsLinker::link() const {
         additionalLibs += appPath + "/build/app ";
     }
     const auto flags = appConfigs.isLibrary ? "-shared -fPIC" : "";
+    const auto cblasDir = "/Users/r.mordechay/Desktop/Programming/logos/external/libcblas.a";
     char cmd[1024*4];
     std::snprintf(
         cmd,
@@ -27,6 +30,7 @@ bool LgsLinker::link() const {
         LINK_CMD_STRING,
         objFileList.c_str(),
         paths.lgsRootDir.c_str(),
+        cblasDir,
         additionalLibs.c_str(),
         paths.lgsRootDir.c_str(),
         flags,

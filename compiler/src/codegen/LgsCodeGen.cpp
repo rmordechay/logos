@@ -343,8 +343,8 @@ void LgsCodeGen::visitWhileLoop(const LgsWhileLoop* loop) {
     cg.builder.CreateBr(loop->IRCondBlock);
     // Condition
     cg.startBlock(loop->IRCondBlock);
-    const auto condition = getIRValue(loop->condExpr);
-    cg.builder.CreateCondBr(condition, loop->IRBodyBlock, loop->IRExitBlock);
+    visitExpr(loop->condExpr);
+    cg.builder.CreateCondBr(loop->condExpr->IRValue, loop->IRBodyBlock, loop->IRExitBlock);
     // Body
     cg.startBlock(loop->IRBodyBlock);
 }
@@ -625,12 +625,18 @@ void LgsCodeGen::visitIOStmt(const LgsIOStmt* ioStmt) {
 }
 
 void LgsCodeGen::visitNullableExpr(LgsNullableExpr* nullableExpr) {
-    const auto tyIR = nullableExpr->type->getIRType(cg);
     const auto baseExpr = nullableExpr->baseExpr;
     visitExpr(baseExpr);
-    nullableExpr->IRValue = cg.builder.CreateAlloca(tyIR);
-    const auto nullable = nullableExpr->type->asNullable();
-    nullable->setIRValue(cg, nullableExpr->IRValue, baseExpr->IRValue);
+    if (baseExpr->type->passByRef) {
+        nullableExpr->IRValue = baseExpr->IRValue;
+        return;
+    }
+    if (nullableExpr->destPtrValue) {
+        nullableExpr->IRValue = nullableExpr->destPtrValue;
+    } else {
+        nullableExpr->IRValue = cg.builder.CreateAlloca(nullableExpr->type->getIRType(cg));
+    }
+    nullableExpr->type->asNullable()->setIRValue(cg, nullableExpr->IRValue, baseExpr->IRValue);
 }
 
 void LgsCodeGen::visitExpr(LgsExpr* expr, const bool assign) {
@@ -934,10 +940,9 @@ void LgsCodeGen::visitFieldSelection(LgsVariable* var, LgsExpr* parent, const bo
         assert(parent->IRValue && &parent->IRValue->getContext() == &cg.IRModule->getContext());
     }
 
-    const auto p = parent->type->getField(field->name);
-    if (p && p->isVirtual) {
+    if (field && field->isVirtual) {
         const auto id = cg.hashConst(field->name);
-        field->IRValue = cg.getFromVTable(field->parentIRPtr, id);
+        var->IRValue = cg.getFromVTable(field->parentIRPtr, id);
     }
 
     if (field->type->asObject() || (field->type->asEnum() && !assign)) {
@@ -1078,13 +1083,14 @@ void LgsCodeGen::visitInstance(LgsInstance* instance) {
     std::unordered_set<std::string> visited;
     for (const auto& [argName, arg] : instance->args) {
         visited.insert(argName);
-        const auto exprIR = getIRValue(arg.expr);
         const auto field = instance->obj->getField(argName);
-        arg.expr->destPtrValue = field->IRValue;
         field->parentIRPtr = instance->IRValue;
         visitField(field);
-        visitExpr(field->expr);
-        cg.builder.CreateStore(exprIR, field->IRValue);
+        arg.expr->destPtrValue = field->IRValue;
+        visitExpr(arg.expr);
+        if (arg.expr->IRValue != field->IRValue) {
+            cg.builder.CreateStore(arg.expr->IRValue, field->IRValue);
+        }
     }
 
     // Zero values

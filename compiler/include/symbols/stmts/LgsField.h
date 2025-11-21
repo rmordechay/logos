@@ -23,10 +23,11 @@ public:
     bool isEnumField = false; // Not to be confused with type enum.
     LgsType* parentType = nullptr;
     Value* parentIRPtr = nullptr;
+    Value* gep = nullptr;
 
     LgsField(const std::string& name, LgsType* type, LgsExpr* expr = nullptr) : name(name), type(type), expr(expr) {}
     void setType(LgsType* newType);
-    Value* getGEP(LgsLLVMGen& cg) const;
+    Value* getGEP(LgsLLVMGen& cg);
     Value* loadIR(LgsLLVMGen& cg) override;
     Value* resolveVirtualField(LgsLLVMGen* cg, const LgsHashMap* vtable) const;
     ~LgsField() override;

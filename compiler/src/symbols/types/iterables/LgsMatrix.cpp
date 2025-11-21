@@ -1,5 +1,6 @@
 #include "types/iterables/LgsMatrix.h"
 #include "exprs/LgsMatrixExpr.h"
+#include "types/iterables/LgsVec.h"
 
 Type* LgsMatrix::getIRType(LgsLLVMGen& cg) {
     return ArrayType::get(baseType->getIRType(cg), rows * columns);
@@ -26,16 +27,10 @@ LgsType* LgsMatrix::applyMatScalarOp(LgsType* number, LgsBinOp& op) {
     return nullptr;
 }
 
-LgsType* LgsMatrix::applyMatVecOp(LgsVec* vec, LgsBinOp& op) {
-    switch (op.opType) {
-    case MUL:
-        break;
-    case DIV:
-        break;
-    default:
-        break;
-    }
-    return nullptr;
+LgsType* LgsMatrix::applyMatVecOp(const LgsVec* vec, const LgsBinOp& op) const {
+    if (op.opType != MUL) return nullptr;
+    if (vec->vectorDim != columns) return nullptr;
+    return new LgsVec(rows, baseType);
 }
 
 LgsType* LgsMatrix::applyMatMatOp(LgsMatrix* otherMat, LgsBinOp& op) {
