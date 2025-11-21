@@ -165,6 +165,13 @@ Value* LgsLLVMGen::callLgsFunc(const std::string& funcName, Type* rt, const std:
 }
 
 Value* LgsLLVMGen::callRuntimeFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes, const std::vector<Value*>& args) {
+    if (debugger.diBuilder) {
+        const auto savedDbg = builder.getCurrentDebugLocation();
+        builder.SetCurrentDebugLocation(llvm::DebugLoc());
+        const auto v = callFunc(LGS_RUNTIME_PREFIX + funcName, rt, paramTypes, args);
+        builder.SetCurrentDebugLocation(savedDbg);
+        return v;
+    }
     return callFunc(LGS_RUNTIME_PREFIX + funcName, rt, paramTypes, args);
 }
 

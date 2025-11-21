@@ -32,6 +32,6 @@ bool LgsVoid::canCastTo(LgsType* other) {
     return name == other->getName();
 }
 
-DIBasicType* LgsVoid::getDebugType(LgsLLVMGen& cg) {
+llvm::DIType* LgsVoid::getDebugType(LgsLLVMGen& cg) {
     return cg.debugger.diBuilder->createUnspecifiedType(name);
 }

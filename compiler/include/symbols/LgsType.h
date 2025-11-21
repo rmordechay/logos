@@ -84,7 +84,7 @@ public:
     virtual bool canCastTo(LgsType* other) = 0;
     virtual LgsType* applyBinOp(LgsType* toType, LgsBinOp& op);
     virtual std::string strFormatPart() const = 0;
-    virtual DIBasicType* getDebugType(LgsLLVMGen& cg);
+    virtual llvm::DIType* getDebugType(LgsLLVMGen& cg);
     virtual void hashNode(size_t& oldHash);
     virtual LgsType* clone();
 

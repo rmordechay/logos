@@ -17,7 +17,7 @@ bool LgsVarDec::shouldAllocate() const {
     if (type->isHeapAlloc) return false;
     if (type->asIterable() && type->asIterable()->isStatic) return false;
     if (type->asSubtype() || type->asNullable()  || type->asFuncType()) return false;
-    return true;
+    return false;
 }
 
 void LgsVarDec::setDebugValue(LgsLLVMGen& cg) {

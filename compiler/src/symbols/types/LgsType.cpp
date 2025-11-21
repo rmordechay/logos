@@ -205,7 +205,7 @@ LgsType* LgsType::applyBinOp(LgsType* toType, LgsBinOp& op) {
     assert(0);
 }
 
-DIBasicType* LgsType::getDebugType(LgsLLVMGen& cg) {
+llvm::DIType* LgsType::getDebugType(LgsLLVMGen& cg) {
     assert(0);
 }
 

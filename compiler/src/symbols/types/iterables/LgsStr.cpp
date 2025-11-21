@@ -134,6 +134,12 @@ Value* LgsStr::inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) {
     return cg.builder.CreateIsNotNull(rv);
 }
 
+llvm::DIType* LgsStr::getDebugType(LgsLLVMGen& cg) {
+    const auto& diBuilder = cg.debugger.diBuilder;
+    const auto charType = diBuilder->createBasicType("char", sizeof(char), llvm::dwarf::DW_ATE_signed_char);
+    return diBuilder->createPointerType(charType, sizeof(void*));
+}
+
 LgsType* LgsStr::clone() {
     const auto newStr = new LgsStr(*this);
     if (size) {
