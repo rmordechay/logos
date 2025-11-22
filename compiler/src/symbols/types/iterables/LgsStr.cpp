@@ -70,7 +70,7 @@ LgsFunc* LgsStr::getLenFunc() {
     const auto lenFunc = LgsIterable::getLenFunc();
     if (lenFunc->fn) return lenFunc;
     lenFunc->fn = [this](LgsLLVMGen& cg, const std::vector<LgsFuncArg>& args) {
-        return lengthIR(cg, args.front().expr->IRValue);
+        return lenIR(cg, args.front().expr->IRValue);
     };
     return lenFunc;
 }
@@ -100,10 +100,10 @@ std::string LgsStr::strFormatPart() const {
 }
 
 Value* LgsStr::addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
-    const auto selfSize = lengthIR(cg, left->IRValue);
+    const auto selfSize = lenIR(cg, left->IRValue);
     const auto buffer = cg.builder.CreateAlloca(ArrayType::get(cg.i8Ty(), STRING_BUFFER_SIZE));
     cg.callSnprintf(buffer, cg.getIRStr("%d"), {right->IRValue});
-    const auto otherSize = lengthIR(cg, buffer);
+    const auto otherSize = lenIR(cg, buffer);
     const auto totalSize = cg.builder.CreateAdd(selfSize, otherSize);
     const auto newStrSize = cg.builder.CreateAdd(totalSize, cg.i64(1));
     const auto newStrPtr = cg.callAllocate(newStrSize, true, getRTTypeKind());
@@ -125,7 +125,7 @@ Value* LgsStr::neIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
     return cg.builder.CreateICmpNE(rt, cg.i32Zero());
 }
 
-Value* LgsStr::lengthIR(LgsLLVMGen& cg, Value* iterable) {
+Value* LgsStr::lenIR(LgsLLVMGen& cg, Value* iterable) {
     return cg.callStrLen(iterable);
 }
 

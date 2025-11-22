@@ -197,7 +197,7 @@ void LgsCodeGen::visitGenericFunc(LgsFunc* func) {
 void LgsCodeGen::visitField(LgsField* field) const {
     if (const auto vec = field->type->asVec()) {
         std::vector<int> mask(vec->vectorDim);
-        for (int8_t i = 0; i < vec->vectorDim; i++) {
+        for (size_t i = 0; i < vec->vectorDim; i++) {
             mask[i] = LgsVec::getComponentIndex(field->name[i]);
         }
         const auto vecType = field->type->getIRType(cg);
@@ -829,7 +829,19 @@ void LgsCodeGen::visitVectorExpr(LgsVectorExpr* vectorExpr) {
 }
 
 void LgsCodeGen::visitMatrixExpr(LgsMatrixExpr* matrixExpr) {
-    matrixExpr->IRValue = cg.null();
+    if (!matrixExpr->destPtrValue) return;
+    matrixExpr->IRValue = matrixExpr->destPtrValue;
+    const auto matType = matrixExpr->matType->getIRType(cg);
+    for (size_t i = 0; i < matrixExpr->elements.size(); ++i) {
+        const auto vector = matrixExpr->elements[i];
+        for (size_t j = 0; j < vector->elements.size(); ++j) {
+            const auto index = i * matrixExpr->matType->columns + j;
+            const auto element = vector->elements[j];
+            visitExpr(element);
+            const auto gep = cg.builder.CreateInBoundsGEP(matType, matrixExpr->IRValue, {cg.i32Zero(), cg.i32(index)});
+            cg.builder.CreateStore(element->IRValue, gep);
+        }
+    }
 }
 
 void LgsCodeGen::visitVariable(LgsVariable* variable) {
@@ -972,10 +984,9 @@ void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
         funcCall->func = new LgsFunc(type->asFuncType());
         funcCall->func->IRValue = getIRValue(value);
     }
-
+    assert(funcCall->func);
     const auto func = funcCall->func;
     const auto ft = func->funcType;
-    assert(ft);
     if (ft->hasDefaults) {
         const auto diff = ft->params.size() - funcCall->args.size() - 1;
         for (size_t i = diff; i < ft->params.size(); ++i) {
@@ -1358,7 +1369,7 @@ void LgsCodeGen::createMapFunc(LgsFunc* func) {
     // Condition
     cg.startBlock(condBlock);
     const auto iValue = cg.builder.CreateLoad(cg.sizeTy(), iPtr);
-    const auto condition = cg.builder.CreateICmpSLT(iValue, dArray->lengthIR(cg, func->funcType->params[0].IRValue));
+    const auto condition = cg.builder.CreateICmpSLT(iValue, dArray->lenIR(cg, func->funcType->params[0].IRValue));
     cg.builder.CreateCondBr(condition, bodyBlock, exitBlock);
 
     // Body
@@ -1416,7 +1427,7 @@ void LgsCodeGen::createFilterFunc(LgsFunc* func) {
     // Condition
     cg.startBlock(condBlock);
     const auto iValue = cg.builder.CreateLoad(cg.sizeTy(), iPtr);
-    const auto condition = cg.builder.CreateICmpSLT(iValue, dArray->lengthIR(cg, func->funcType->params[0].IRValue));
+    const auto condition = cg.builder.CreateICmpSLT(iValue, dArray->lenIR(cg, func->funcType->params[0].IRValue));
     cg.builder.CreateCondBr(condition, bodyBlock, exitBlock);
 
     // Body

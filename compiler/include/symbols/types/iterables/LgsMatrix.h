@@ -5,10 +5,10 @@
 
 class LgsMatrix final : public LgsIterable {
 public:
-    int32_t rows;
-    int32_t columns;
+    size_t rows;
+    size_t columns;
 
-    LgsMatrix(const int32_t rows, const int32_t columns): LgsIterable(&LGS_FLOAT), rows(rows), columns(columns) {
+    LgsMatrix(const size_t rows, const size_t columns): LgsIterable(&LGS_FLOAT), rows(rows), columns(columns) {
         passByRef = true;
     }
     Type* getIRType(LgsLLVMGen& cg) override;
@@ -16,13 +16,13 @@ public:
     LgsType* applyBinOp(LgsType* toType, LgsBinOp& op) override;
     LgsType* applyMatScalarOp(LgsType* number, LgsBinOp& op);
     LgsType* applyMatVecOp(const LgsVec* vec, const LgsBinOp& op) const;
-    LgsType* applyMatMatOp(LgsMatrix* otherMat, LgsBinOp& op);
+    LgsType* applyMatMatOp(const LgsMatrix* otherMat, const LgsBinOp& op) const;
     Value* mulIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
     LgsExpr* getZeroValue() override;
     Lgs_TypeKind getRTTypeKind() override;
     std::string getName() override;
     bool canCastTo(LgsType* other) override;
     std::string strFormatPart() const override;
-    Value* lengthIR(LgsLLVMGen& cg, Value* iterable) override;
+    Value* lenIR(LgsLLVMGen& cg, Value* iterable) override;
     Value* inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
 };

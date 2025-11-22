@@ -25,7 +25,7 @@ public:
     Value* addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
     Value* eqIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
     Value* neIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* lengthIR(LgsLLVMGen& cg, Value* iterable) override;
+    Value* lenIR(LgsLLVMGen& cg, Value* iterable) override;
     Value* inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
     llvm::DIType* getDebugType(LgsLLVMGen& cg) override;
     LgsType* clone() override;

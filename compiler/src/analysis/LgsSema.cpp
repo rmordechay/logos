@@ -358,10 +358,12 @@ void LgsSema::visitIfStmt(LgsIfStmt* ifStmt) {
     if (ifStmt->ifBlock->isMacro) return visitMacroIf(ifStmt);
     stack.enterScope(ifStmt);
     visitExpr(ifStmt->ifCond);
+    visitStmtsBlock(ifStmt->ifBlock);
     stack.exitScope();
     for (auto& [expr, block] : ifStmt->elseIfs) {
         stack.enterScope(ifStmt);
         visitExpr(expr);
+        visitStmtsBlock(block);
         stack.exitScope();
     }
     if (ifStmt->elseBlock) {
@@ -785,7 +787,7 @@ void LgsSema::visitVectorExpr(const LgsVectorExpr* vectorExpr) {
     if (!vec->inferBaseType(vectorExpr->elements)) {
         return addError(E10095, vectorExpr->location);
     }
-    auto sumDim = 0;
+    size_t sumDim = 0;
     for (auto arg : vectorExpr->elements) {
         visitExpr(arg);
         if (arg->type->isNumber()) {
@@ -803,13 +805,21 @@ void LgsSema::visitVectorExpr(const LgsVectorExpr* vectorExpr) {
 }
 
 void LgsSema::visitMatrixExpr(const LgsMatrixExpr* matrixExpr) {
-    for (const auto element : matrixExpr->elements) {
-        for (auto innerElement : element->elements) {
+    if (matrixExpr->elements.size() != matrixExpr->matType->rows) {
+        addError(E10103, matrixExpr->location, {matrixExpr->matType->pname(), std::to_string(matrixExpr->elements.size())});
+        return;
+    }
+    for (const auto vector : matrixExpr->elements) {
+        if (vector->elements.size() != matrixExpr->matType->columns) {
+            addError(E10104, vector->location, {matrixExpr->matType->pname(), std::to_string(vector->elements.size())});
+            return;
+        }
+        for (auto innerElement : vector->elements) {
             visitExpr(innerElement);
             castExpr(innerElement, matrixExpr->matType->baseType);
         }
         const auto columnsInt = new LgsIntConst(&LGS_SIZE, matrixExpr->matType->columns);
-        element->type = new LgsSArray(matrixExpr->matType->baseType, columnsInt);
+        vector->type = new LgsSArray(matrixExpr->matType->baseType, columnsInt);
     }
 }
 
@@ -971,7 +981,7 @@ void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent) {
     if (method->funcType->isMethod) {
         methodCall->args.insert(methodCall->args.begin(), LgsFuncArg(LGS_SELF, parent, true));
     }
-    visitFuncArgs(methodCall, method->funcType);
+    if (!visitFuncArgs(methodCall, method->funcType)) return;
     if (methodCall->equals(method->funcType)) {
         methodCall->func = method;
         methodCall->setType(method->funcType->rt);
@@ -994,7 +1004,7 @@ void LgsSema::visitFuncCall(LgsFuncCall* funcCall) {
     const auto ft = symbol->getType()->asFuncType();
     if (!ft) return addError(E10046, funcCall->location, {funcCall->name});
 
-    visitFuncArgs(funcCall, ft);
+    if (!visitFuncArgs(funcCall, ft)) return;
     if (!funcCall->equals(ft)) {
         addError(E10015, funcCall->location, {funcCall->name, funcCall->asText(), ft->pname()});
         return;
@@ -1024,25 +1034,26 @@ void LgsSema::visitFuncCall(LgsFuncCall* funcCall) {
     }
 }
 
-void LgsSema::visitFuncArgs(LgsFuncCall* funcCall, LgsFuncType* ft) {
+bool LgsSema::visitFuncArgs(LgsFuncCall* funcCall, LgsFuncType* ft) {
     if (funcCall->isNamed) {
         auto paramsByName = ft->getParamsByName();
         std::unordered_set<std::string> visited;
         for (auto arg : funcCall->args) {
             if (visited.contains(arg.name)) {
                 addError(E10098, arg.expr->location, {arg.expr->asText()});
+                return false;
             }
             visited.insert(arg.name);
             if (!paramsByName.contains(arg.name)) {
                 addError(E10094, arg.expr->location, {arg.expr->asText(), funcCall->name});
-                continue;
+                return false;
             }
             const auto param = paramsByName[arg.name];
             castExpr(arg.expr, param->type);
             visitExpr(arg.expr);
             if (arg.name == "") {
                 addError(E10096, funcCall->location);
-                break;
+                return false;
             }
         }
     } else {
@@ -1054,10 +1065,11 @@ void LgsSema::visitFuncArgs(LgsFuncCall* funcCall, LgsFuncType* ft) {
             visitExpr(arg.expr);
             if (arg.name != "") {
                 addError(E10096, funcCall->location);
-                break;
+                return false;
             }
         }
     }
+    return true;
 }
 
 void LgsSema::visitPrefixExpr(LgsPrefixExpr* prefixExpr) {

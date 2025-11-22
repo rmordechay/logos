@@ -1,4 +1,5 @@
 #include "types/iterables/LgsMatrix.h"
+#include "cblas/cblas.h"
 #include "exprs/LgsMatrixExpr.h"
 #include "types/iterables/LgsVec.h"
 
@@ -33,12 +34,46 @@ LgsType* LgsMatrix::applyMatVecOp(const LgsVec* vec, const LgsBinOp& op) const {
     return new LgsVec(rows, baseType);
 }
 
-LgsType* LgsMatrix::applyMatMatOp(LgsMatrix* otherMat, LgsBinOp& op) {
-    return nullptr;
+LgsType* LgsMatrix::applyMatMatOp(const LgsMatrix* otherMat, const LgsBinOp& op) const {
+    if (op.opType != MUL) return nullptr;
+    if (columns != otherMat->rows) return nullptr;
+    return new LgsMatrix(rows, otherMat->columns);
 }
 
 Value* LgsMatrix::mulIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
-    return LgsIterable::mulIR(cg, left, right);
+    const auto leftMat = left->type->asMatrix();
+    const auto rightMat = right->type->asMatrix();
+    const auto order = cg.i32(CblasRowMajor);
+    const auto transpose = cg.i32(CblasNoTrans);
+    const auto M = cg.i32(leftMat->rows);
+    const auto N = cg.i32(rightMat->columns);
+    const auto K = cg.i32(leftMat->columns);
+    const auto alpha = cg.floatv(1);
+    const auto A = left->IRValue;
+    const auto B = right->IRValue;
+    const auto beta = cg.floatv(0);
+    const auto results = cg.builder.CreateAlloca(getIRType(cg));
+    const auto ft = cg.getFT(cg.voidTy(), {
+        cg.i32Ty(),
+        cg.i32Ty(),
+        cg.i32Ty(),
+        cg.i32Ty(),
+        cg.i32Ty(),
+        cg.i32Ty(),
+        cg.floatTy(),
+        cg.ptrTy(),
+        cg.i32Ty(),
+        cg.ptrTy(),
+        cg.i32Ty(),
+        cg.floatTy(),
+        cg.ptrTy(),
+        cg.i32Ty(),
+    });
+    const std::vector<Value*> args = {
+        order, transpose, transpose, M, N, K, alpha, A, K, B, N, beta, results, N
+    };
+    cg.builder.CreateCall(cg.getFunc("cblas_sgemm", ft), args);
+    return results;
 }
 
 LgsExpr* LgsMatrix::getZeroValue() {
@@ -62,7 +97,7 @@ std::string LgsMatrix::strFormatPart() const {
     assert(0);
 }
 
-Value* LgsMatrix::lengthIR(LgsLLVMGen& cg, Value* iterable) {
+Value* LgsMatrix::lenIR(LgsLLVMGen& cg, Value* iterable) {
     assert(0);
 }
 

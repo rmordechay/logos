@@ -1,5 +1,4 @@
 #include "exprs/LgsVectorExpr.h"
-
 #include "LgsUtils.h"
 
 Value* LgsVectorExpr::loadIR(LgsLLVMGen& cg) {
@@ -33,7 +32,6 @@ Value* LgsVectorExpr::hashValue(LgsLLVMGen& cg) {
 LgsExpr* LgsVectorExpr::clone() {
     assert(0);
 }
-
 
 std::string LgsVectorExpr::asText() {
     return vecType->pname();

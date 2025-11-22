@@ -24,7 +24,7 @@ public:
     LgsFunc* getAddFunc() override;
     bool inferBaseType(const std::vector<LgsExpr*>& args) override;
     LgsType* applyBinOp(LgsType* toType, LgsBinOp& op) override;
-    Value* lengthIR(LgsLLVMGen& cg, Value* iterable) override;
+    Value* lenIR(LgsLLVMGen& cg, Value* iterable) override;
     Value* inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
     Value* getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) override;
 };

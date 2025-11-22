@@ -24,7 +24,7 @@ public:
     LgsType* applyBinOp(LgsType* toType, LgsBinOp& op) override;
     LgsFunc* getAddFunc() override;
     LgsFunc* getReserveFunc();
-    Value* lengthIR(LgsLLVMGen& cg, Value* iterable) override;
+    Value* lenIR(LgsLLVMGen& cg, Value* iterable) override;
     Value* inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
     Value* getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) override;
     void initArr(LgsLLVMGen& cg, Value* iterable);

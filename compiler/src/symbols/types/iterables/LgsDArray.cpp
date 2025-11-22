@@ -103,7 +103,7 @@ LgsFunc* LgsDArray::getReserveFunc() {
     return func->second;
 }
 
-Value* LgsDArray::lengthIR(LgsLLVMGen& cg, Value* iterable) {
+Value* LgsDArray::lenIR(LgsLLVMGen& cg, Value* iterable) {
     return getLenFunc()->callIR(cg, {iterable});
 }
 

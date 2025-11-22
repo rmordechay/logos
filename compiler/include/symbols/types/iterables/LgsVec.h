@@ -7,10 +7,10 @@
 class LgsVec final : public LgsIterable {
 public:
     static constexpr auto baseName = "Vec";
-    int32_t vectorDim = 0;
+    size_t vectorDim = 0;
     std::vector<uint8_t> indices;
 
-    explicit LgsVec(const int32_t dim, LgsType* baseType = &LGS_FLOAT) : LgsIterable(baseType), vectorDim(dim) {
+    explicit LgsVec(const size_t dim, LgsType* baseType = &LGS_FLOAT) : LgsIterable(baseType), vectorDim(dim) {
         assert(dim > 1 && dim <= 4);
         size = new LgsIntConst(&LGS_INT, dim);
         isStatic = true;
@@ -31,12 +31,12 @@ public:
     Value* mulIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
     Value* divIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
     Value* inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
-    Value* lengthIR(LgsLLVMGen& cg, Value* iterable) override;
+    Value* lenIR(LgsLLVMGen& cg, Value* iterable) override;
     Value* getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) override;
     Value* dotProduct(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) const;
-    Value* matMul(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right);
-    static int32_t getSwizzleSet(char c);
-    static int32_t getComponentIndex(char c);
+    Value* matMul(LgsLLVMGen& cg, const LgsExpr* left, const LgsExpr* right) const;
+    static size_t getSwizzleSet(char c);
+    static size_t getComponentIndex(char c);
     std::string strFormatPart() const override;
     LgsType* clone() override;
 };

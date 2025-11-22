@@ -89,7 +89,7 @@ bool LgsSet::inferBaseType(const std::vector<LgsExpr*>& args) {
     return true;
 }
 
-Value* LgsSet::lengthIR(LgsLLVMGen& cg, Value* iterable) {
+Value* LgsSet::lenIR(LgsLLVMGen& cg, Value* iterable) {
     return getLenFunc()->callIR(cg, {iterable});
 }
 

@@ -162,7 +162,7 @@ Value* LgsVec::inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) {
     return cg.builder.CreateLoad(cg.i1Ty(), resultPtr);
 }
 
-Value* LgsVec::lengthIR(LgsLLVMGen& cg, Value* iterable) {
+Value* LgsVec::lenIR(LgsLLVMGen& cg, Value* iterable) {
     return cg.usize(2);
 }
 
@@ -204,35 +204,21 @@ Value* LgsVec::dotProduct(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) const {
     return cg.builder.CreateCall(dotFunc, {self->IRValue, other->IRValue});
 }
 
-void cblas_sgemv(
-    CBLAS_ORDER order,
-    CBLAS_TRANSPOSE trans,
-    int m,
-    int n,
-    float alpha,
-    const float* a,
-    int lda,
-    const float* x,
-    int incx,
-    float beta,
-    float* y,
-    int incy
-);
-
-Value* LgsVec::matMul(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsVec::matMul(LgsLLVMGen& cg, const LgsExpr* left, const LgsExpr* right) const {
     const auto mat = left->type->asMatrix();
     const auto order = cg.i32(CblasRowMajor);
     const auto transpose = cg.i32(CblasNoTrans);
     const auto m = cg.i32(mat->rows);
     const auto n = cg.i32(mat->columns);
     const auto alpha = cg.floatv(1);
-    const auto a = left->IRValue;
+    const auto matrixPtr = left->IRValue;
     const auto lda = cg.i32(mat->columns);
-    const auto x = right->IRValue;
+    const auto vectorPtr = right->IRValue;
     const auto incx = cg.i32(1);
     const auto beta = cg.floatv(0);
-    const auto y = cg.builder.CreateAlloca(cg.floatTy(), m);
+    const auto results = cg.builder.CreateAlloca(baseType->getIRType(cg), m);
     const auto incy = cg.i32(1);
+
     const auto ft = cg.getFT(cg.voidTy(), {
         cg.i32Ty(),
         cg.i32Ty(),
@@ -248,20 +234,20 @@ Value* LgsVec::matMul(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
         cg.i32Ty(),
     });
     const std::vector<Value*> args = {
-        order, transpose, m, n, alpha, a, lda, x, incx, beta, y, incy
+        order, transpose, m, n, alpha, matrixPtr, lda, vectorPtr, incx, beta, results, incy
     };
     cg.builder.CreateCall(cg.getFunc("cblas_sgemv", ft), args);
-    return y;
+    return results;
 }
 
-int32_t LgsVec::getSwizzleSet(const char c) {
+size_t LgsVec::getSwizzleSet(const char c) {
     if (strchr("xyzw", c)) return 0;
     if (strchr("rgba", c)) return 1;
     if (strchr("stpq", c)) return 2;
     return -1;
 }
 
-int32_t LgsVec::getComponentIndex(const char c) {
+size_t LgsVec::getComponentIndex(const char c) {
     switch (c) {
     case 'x': case 'r': case 's': return 0;
     case 'y': case 'g': case 't': return 1;
@@ -274,7 +260,7 @@ int32_t LgsVec::getComponentIndex(const char c) {
 std::string LgsVec::strFormatPart() const {
     std::stringstream str;
     str << '<';
-    for (int32_t i = 0; i < vectorDim; i++) {
+    for (size_t i = 0; i < vectorDim; i++) {
         str << baseType->strFormatPart();
         if (i < vectorDim - 1) str << ", ";
     }

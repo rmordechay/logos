@@ -32,7 +32,7 @@ public:
     LgsType* getValueType() override;
     bool unpackLoopVarsTypes(LgsForeachLoop* loop) const override;
     void unpackLoopIR(LgsLLVMGen& cg, LgsForeachLoop* loop) const override;
-    Value* lengthIR(LgsLLVMGen& cg, Value* iterable) override;
+    Value* lenIR(LgsLLVMGen& cg, Value* iterable) override;
     Value* inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
     Value* getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) override;
     bool canCastTo(LgsType* other) override;

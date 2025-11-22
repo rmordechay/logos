@@ -131,7 +131,7 @@ Value* LgsSArray::getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) {
     return cg.builder.CreateLoad(baseType->getIRType(cg), gep);
 }
 
-Value* LgsSArray::lengthIR(LgsLLVMGen& cg, Value* iterable) {
+Value* LgsSArray::lenIR(LgsLLVMGen& cg, Value* iterable) {
     return size->IRValue;
 }
 

@@ -71,7 +71,7 @@ void LgsMap::unpackLoopIR(LgsLLVMGen& cg, LgsForeachLoop* loop) const {
     }
 }
 
-Value* LgsMap::lengthIR(LgsLLVMGen& cg, Value* iterable) {
+Value* LgsMap::lenIR(LgsLLVMGen& cg, Value* iterable) {
     return getLenFunc()->callIR(cg, {iterable});
 }
 

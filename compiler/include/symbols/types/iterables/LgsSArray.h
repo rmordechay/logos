@@ -22,7 +22,7 @@ public:
     Value* mulIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
     Value* inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
     Value* getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) override;
-    Value* lengthIR(LgsLLVMGen& cg, Value* iterable) override;
+    Value* lenIR(LgsLLVMGen& cg, Value* iterable) override;
     LgsFunc* getLenFunc() override;
     bool canCastTo(LgsType* other) override;
     LgsType* clone() override;

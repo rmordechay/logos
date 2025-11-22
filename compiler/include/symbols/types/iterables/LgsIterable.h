@@ -43,7 +43,7 @@ public:
     virtual bool inferBaseType(const std::vector<LgsExpr*>& args);
     virtual bool unpackLoopVarsTypes(LgsForeachLoop* loop) const;
     virtual void unpackLoopIR(LgsLLVMGen& cg, LgsForeachLoop* loop) const;
-    virtual Value* lengthIR(LgsLLVMGen& cg, Value* iterable) = 0;
+    virtual Value* lenIR(LgsLLVMGen& cg, Value* iterable) = 0;
     virtual Value* inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) = 0;
     virtual Value* getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index);
     ~LgsIterable() override;

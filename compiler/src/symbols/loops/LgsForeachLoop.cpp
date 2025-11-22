@@ -8,7 +8,7 @@ Value* LgsForeachLoop::loopStart(LgsLLVMGen& cg) {
 
 Value* LgsForeachLoop::loopEnd(LgsLLVMGen& cg) {
     const auto iter = iterExpr->type->asIterable();
-    return cg.builder.CreateTrunc(iter->lengthIR(cg, iterExpr->IRValue), cg.i32Ty());
+    return cg.builder.CreateTrunc(iter->lenIR(cg, iterExpr->IRValue), cg.i32Ty());
 }
 
 void LgsForeachLoop::incAndJumpToCond(LgsLLVMGen& cg) {
