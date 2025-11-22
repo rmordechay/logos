@@ -189,10 +189,6 @@ Lgs_TypeKind LgsType::getRTTypeKind() {
     assert(0);
 }
 
-Constant* LgsType::getRTType(LgsLLVMGen& cg) {
-    assert(0);
-}
-
 std::string LgsType::pname() {
     return getName();
 }

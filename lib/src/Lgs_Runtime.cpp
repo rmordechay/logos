@@ -9,8 +9,6 @@
 
 #include <iostream>
 
-weakf Lgs_SArray Lgs_RTTypes_Arrays[] = {};
-
 struct VKey {
     void* instance;
     int32_t virtualID;

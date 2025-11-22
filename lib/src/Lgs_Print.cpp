@@ -8,8 +8,6 @@
 std::string formatArray(const Lgs_DArray* arr);
 std::string formatArray(const Lgs_SArray* arr, void* data);
 std::string formatElement(Lgs_TypeKind type, void* elem);
-extern Lgs_SArray Lgs_RTTypes_Arrays[];
-extern Lgs_SArray Lgs_RTTypes_Objects[];
 
 extern "C" void Lgs_print(const Lgs_TypeKind rtt, void* v) {
     printf("%s\n", formatElement(rtt, v).c_str());
@@ -97,7 +95,6 @@ std::string formatElement(const Lgs_TypeKind type, void* elem) {
         break;
     }
     case RTT_SARRAY: {
-        str << formatArray(&Lgs_RTTypes_Arrays[0], elem);
         assert(0);
     }
     case RTT_NULLABLE: {

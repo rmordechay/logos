@@ -15,7 +15,6 @@ public:
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
     Lgs_TypeKind getRTTypeKind() override;
-    Constant* getRTType(LgsLLVMGen& cg) override;
     std::string strFormatPart() const override;
     LgsType* applyBinOp(LgsType* toType, LgsBinOp& op) override;
     Value* addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;

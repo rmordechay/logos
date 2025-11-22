@@ -1490,35 +1490,6 @@ Value* LgsCodeGen::getIRValue(LgsValue* value) {
     return value->IRValue;
 }
 
-void LgsCodeGen::createRTTypes() const {
-    size_t currentID = 0;
-    for (auto [name, symbol] : globals.table.symbols) {
-        if (symbol.isBuiltin) continue;
-        LgsType* c = nullptr;
-        switch (symbol.symbolType) {
-        case OBJECT:c = symbol.object; break;
-        case INTERFACE:c = symbol.interface; break;
-        case SUBTYPE:c = symbol.subtype; break;
-        case GENERIC:c = symbol.generic; break;
-        case ENUM:c = symbol.enum_; break;
-        default: continue;
-        }
-        globals.rtTypes.push_back(c);
-    }
-
-    std::vector<Constant*> sArrTypes;
-    for (const auto rtType : globals.rtTypes) {
-        const auto sArr = rtType->asSArray();
-        if (!sArr) continue;
-        rtType->runtimeID = currentID++;
-        sArrTypes.emplace_back(sArr->getRTType(cg));
-    }
-    const auto arrRTStruct = cg.getStructType({cg.i32Ty(), cg.sizeTy()}, LGS_RT_ARRAY);
-    const auto rtTypeArrayType = ArrayType::get(arrRTStruct, currentID);
-    const auto rtTypeArray = llvm::ConstantArray::get(rtTypeArrayType, sArrTypes);
-    cg.createGlobal(rtTypeArrayType, rtTypeArray, LGS_RT_ARRAYS_ARR);
-}
-
 void LgsCodeGen::setNullableValue(LgsExpr* expr) {
     if (const auto var = expr->asVariable()) {
         visitVariable(var);

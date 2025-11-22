@@ -1,6 +1,7 @@
 #include "types/iterables/LgsMatrix.h"
 #include "cblas/cblas.h"
 #include "exprs/LgsMatrixExpr.h"
+#include "types/LgsAny.h"
 #include "types/iterables/LgsVec.h"
 
 Type* LgsMatrix::getIRType(LgsLLVMGen& cg) {
@@ -81,7 +82,7 @@ LgsExpr* LgsMatrix::getZeroValue() {
 }
 
 Lgs_TypeKind LgsMatrix::getRTTypeKind() {
-    assert(0);
+    return RTT_MATRIX;
 }
 
 std::string LgsMatrix::getName() {
@@ -89,6 +90,7 @@ std::string LgsMatrix::getName() {
 }
 
 bool LgsMatrix::canCastTo(LgsType* other) {
+    if (other->getName() == LgsAny::name) return true;
     if (getName() == other->getName()) return true;
     return false;
 }

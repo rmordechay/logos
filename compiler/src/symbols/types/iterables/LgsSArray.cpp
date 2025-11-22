@@ -43,15 +43,6 @@ Lgs_TypeKind LgsSArray::getRTTypeKind() {
     return RTT_SARRAY;
 }
 
-Constant* LgsSArray::getRTType(LgsLLVMGen& cg) {
-    assert(size->IRValue);
-    const auto arrRTStruct = cg.getStructType({cg.i32Ty(), cg.sizeTy()}, LGS_RT_ARRAY);
-    const auto sizeValue = size->loadIR(cg);
-    const auto rttKind = baseType->getRTTypeKind();
-    const std::vector<Constant*> structFields = {cg.i32(rttKind), llvm::dyn_cast<Constant>(sizeValue)};
-    return llvm::ConstantStruct::get(arrRTStruct, structFields);
-}
-
 std::string LgsSArray::strFormatPart() const {
     if (baseType->asChar()) return "%s";
     return "%p";

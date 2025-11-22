@@ -77,7 +77,6 @@ public:
     virtual size_t sizeBytes() = 0;
     virtual LgsExpr* getZeroValue() = 0;
     virtual Lgs_TypeKind getRTTypeKind() = 0;
-    virtual Constant* getRTType(LgsLLVMGen& cg);
     virtual std::string getName() = 0;
     virtual std::string pname(); // pretty name
     virtual bool equals(LgsType* other);

@@ -148,7 +148,6 @@ public:
     bool checkMock(LgsExpr* expr);
     Value* getIRValue(LgsValue* value);
     Value* getRTType(Value* typeID) const;
-    void createRTTypes() const;
     void setNullableValue(LgsExpr* expr);
     bool allArgsAreConst(const std::vector<LgsExpr*>& args);
     void addVirtuals(LgsObject* obj, Value* ptr) const;

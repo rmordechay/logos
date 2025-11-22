@@ -21,6 +21,7 @@ enum Lgs_TypeKind {
     RTT_VEC2,
     RTT_VEC3,
     RTT_VEC4,
+    RTT_MATRIX,
     RTT_SARRAY,
     RTT_DARRAY,
     RTT_SET,
