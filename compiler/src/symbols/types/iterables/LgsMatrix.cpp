@@ -25,8 +25,17 @@ LgsType* LgsMatrix::applyBinOp(LgsType* toType, LgsBinOp& op) {
     return nullptr;
 }
 
-LgsType* LgsMatrix::applyMatScalarOp(LgsType* number, LgsBinOp& op) {
-    return nullptr;
+LgsType* LgsMatrix::applyMatScalarOp(const LgsType* number, const LgsBinOp& op) const {
+    if (!number->isNumber()) return nullptr;
+    switch (op.opType) {
+    case ADD:
+    case SUB:
+    case MUL:
+    case DIV:
+        return new LgsMatrix(rows, columns);
+    default:
+        return nullptr;
+    }
 }
 
 LgsType* LgsMatrix::applyMatVecOp(const LgsVec* vec, const LgsBinOp& op) const {
@@ -36,9 +45,17 @@ LgsType* LgsMatrix::applyMatVecOp(const LgsVec* vec, const LgsBinOp& op) const {
 }
 
 LgsType* LgsMatrix::applyMatMatOp(const LgsMatrix* otherMat, const LgsBinOp& op) const {
-    if (op.opType != MUL) return nullptr;
     if (columns != otherMat->rows) return nullptr;
-    return new LgsMatrix(rows, otherMat->columns);
+    switch (op.opType) {
+    case ADD:
+    case SUB:
+        if (rows != otherMat->rows || columns != otherMat->columns) return nullptr;
+        return new LgsMatrix(rows, columns);
+    case MUL:
+        return new LgsMatrix(rows, otherMat->columns);
+    default:
+        return nullptr;
+    }
 }
 
 Value* LgsMatrix::mulIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
@@ -99,8 +116,13 @@ std::string LgsMatrix::strFormatPart() const {
     assert(0);
 }
 
+Value* LgsMatrix::getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) {
+    const auto gep = cg.builder.CreateGEP(getIRType(cg), iterable, {cg.i32Zero(), index});
+    return cg.builder.CreateLoad(baseType->getIRType(cg), gep);
+}
+
 Value* LgsMatrix::lenIR(LgsLLVMGen& cg, Value* iterable) {
-    assert(0);
+    return cg.i32(rows);
 }
 
 Value* LgsMatrix::inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) {

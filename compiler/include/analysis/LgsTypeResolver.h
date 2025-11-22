@@ -16,7 +16,6 @@ class LgsTypeResolver {
 public:
     LgsGlobals& globals;
     LgsErrHandler& errHandler;
-    std::vector<LgsType*> rtTypesRegistry;
 
     LgsTypeResolver(LgsErrHandler& errHandler, LgsGlobals& globals) : globals(globals), errHandler(errHandler) {}
     bool resolveGlobals(const std::vector<LgsFile*>& srcFiles, ThreadPool& pool);

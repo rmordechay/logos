@@ -22,6 +22,5 @@ struct LgsSymbolTable {
 
 struct LgsGlobals {
     LgsSymbolTable table;
-    std::vector<LgsType*> rtTypes;
     std::map<std::string, LgsSymbolTable> cImports;
 };

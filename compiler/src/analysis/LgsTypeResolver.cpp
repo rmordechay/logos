@@ -51,7 +51,6 @@ LgsType* LgsTypeResolver::resolveType(LgsType* type, LgsFile* file) {
         } else {
             iterable->baseType = resolveType(iterable->baseType, file);
         }
-        rtTypesRegistry.push_back(iterable);
     } else if (const auto pair = type->asPair()) {
         pair->key = resolveType(pair->key, file);
         pair->value = resolveType(pair->value, file);

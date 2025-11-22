@@ -1,12 +1,10 @@
 #include "Lgs_DArray.h"
 #include "Lgs_Types.h"
 #include "LgsDefinitions.h"
-#include "Lgs_Values.h"
 #include <cassert>
 #include <sstream>
 
 std::string formatArray(const Lgs_DArray* arr);
-std::string formatArray(const Lgs_SArray* arr, void* data);
 std::string formatElement(Lgs_TypeKind type, void* elem);
 
 extern "C" void Lgs_print(const Lgs_TypeKind rtt, void* v) {
@@ -17,6 +15,10 @@ std::string formatElement(const Lgs_TypeKind type, void* elem) {
     if (!elem) return LGS_NULL_LITERAL;
     std::ostringstream str;
     switch (type) {
+    case RTT_ANY: {
+        str << elem;
+        break;
+    }
     case RTT_BOOL: {
         str << (*static_cast<bool*>(elem) ? "true" : "false");
         break;
@@ -67,25 +69,12 @@ std::string formatElement(const Lgs_TypeKind type, void* elem) {
     }
     case RTT_TYPE:
     case RTT_ENUM:
-    case RTT_STR:
+    case RTT_STR: {
         str << static_cast<const char*>(elem);
         break;
-    case RTT_CHAR:
+    }
+    case RTT_CHAR: {
         str << *static_cast<const char*>(elem);
-        break;
-    case RTT_VEC2: {
-        const auto vec = static_cast<const Lgs_Vec2*>(elem);
-        str << '<' << vec->x << ", " << vec->y << '>';
-        break;
-    }
-    case RTT_VEC3: {
-        const auto vec = static_cast<const Lgs_Vec3*>(elem);
-        str << '<' << vec->x << ", " << vec->y << ", " << vec->z << '>';
-        break;
-    }
-    case RTT_VEC4: {
-        const auto vec = static_cast<const Lgs_Vec4*>(elem);
-        str << '<' << vec->x << ", " << vec->y << ", " << vec->z << ", " << vec->w << '>';
         break;
     }
     case RTT_SET:
@@ -94,41 +83,22 @@ std::string formatElement(const Lgs_TypeKind type, void* elem) {
         str << formatArray(nested);
         break;
     }
-    case RTT_SARRAY: {
-        assert(0);
-    }
-    case RTT_NULLABLE: {
-        const auto nullable = static_cast<Lgs_NullableInt*>(elem);
-        if (nullable->isSet) str << nullable->v;
-        else str << LGS_NULL_LITERAL;
-        break;
-    }
-    case RTT_ANY:
-        str << elem;
-        break;
+    case RTT_VEC2:
+    case RTT_VEC3:
+    case RTT_VEC4:
+    case RTT_MATRIX:
+    case RTT_SARRAY:
     case RTT_MAP:
-    case RTT_OBJECT:
-    case RTT_VOID:
-    case RTT_UNKNOWN:
-    default:
+    case RTT_NULLABLE:
+    case RTT_OBJECT: {
         assert(0);
+    }
+    case RTT_VOID:
+    case RTT_UNKNOWN: {
+        assert(0);
+    }
     }
     return str.str();
-}
-
-std::string formatArray(const Lgs_SArray* arr, void* data) {
-    std::ostringstream oss;
-    oss << "[";
-    const size_t len = arr->length;
-    for (size_t i = 0; i < len; ++i) {
-        void* elem = &static_cast<int*>(data)[i];
-        oss << formatElement(arr->baseType, elem);
-        if (i < len - 1) {
-            oss << ", ";
-        }
-    }
-    oss << "]";
-    return oss.str();
 }
 
 std::string formatArray(const Lgs_DArray* arr) {

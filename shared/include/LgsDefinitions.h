@@ -27,11 +27,6 @@
 #define LGS_STR_FMT_PLACEHOLDER "<!v!>"
 #define LGS_EMPTY_STR "\"\""
 
-#define LGS_RT_OBJECTS_ARR "Lgs_RTTypes_Objects"
-#define LGS_RT_ARRAYS_ARR "Lgs_RTTypes_Arrays"
-#define LGS_RT_OBJECT "Lgs_RTTypes_Object"
-#define LGS_RT_ARRAY "Lgs_RTTypes_Array"
-
 #define BLOCK_NAME_IF_TRUE "if_true"
 #define BLOCK_NAME_IF_FALSE "if_false"
 #define BLOCK_NAME_ELSE "else"

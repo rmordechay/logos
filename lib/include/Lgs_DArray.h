@@ -1,5 +1,6 @@
 #pragma once
 #include "Lgs_Types.h"
+#include <cstddef>
 
 struct Lgs_DArray {
     char* data;

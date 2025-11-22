@@ -1,5 +1,5 @@
 #pragma once
-#include <cmath>
+#include <stdint.h>
 
 enum Lgs_TypeKind {
     RTT_UNKNOWN,
@@ -33,13 +33,7 @@ enum Lgs_TypeKind {
     RTT_NULLABLE,
 };
 
-struct Lgs_Object {
-    const char* name;
-    size_t fieldCount;
-    Lgs_TypeKind* fieldTypes;
-};
-
-struct Lgs_SArray {
-    Lgs_TypeKind baseType;
-    size_t length;
+struct Lgs_BaseType {
+    Lgs_TypeKind kind;
+    const void* extra;
 };

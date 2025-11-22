@@ -1471,12 +1471,6 @@ bool LgsCodeGen::checkMock(LgsExpr* expr) {
     return false;
 }
 
-Value* LgsCodeGen::getRTType(Value* typeID) const {
-    const auto rtTypesGlobal = cg.IRModule->getGlobalVariable(LGS_RT_OBJECTS_ARR);
-    const auto rtTypesArrayType = rtTypesGlobal->getValueType();
-    return cg.builder.CreateInBoundsGEP(rtTypesArrayType, rtTypesGlobal, {cg.i32Zero(), typeID});
-}
-
 Value* LgsCodeGen::getIRValue(LgsValue* value) {
     if (value->IRValue) return value->IRValue;
     if (const auto expr = dynamic_cast<LgsExpr*>(value)) {

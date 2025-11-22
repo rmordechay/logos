@@ -72,7 +72,6 @@ void LgsSema::analyse() {
     } else {
         assert(0);
     }
-    mergeRTTypes();
 }
 
 void LgsSema::visitMainFile(LgsMainFile* mainFile) {
@@ -1498,18 +1497,6 @@ void LgsSema::resolveImports() const {
         const auto it = globals.table.imports.find(name);
         if (it == globals.table.imports.end()) continue;
         app = it->second;
-    }
-}
-
-void LgsSema::mergeRTTypes() {
-    std::lock_guard lock(mtx);
-    auto& thisRegistry = typeResolver.rtTypesRegistry;
-    auto& globalsRegistry = globals.rtTypes;
-    globalsRegistry.insert(globalsRegistry.end(), thisRegistry.begin(), thisRegistry.end());
-    for (auto [name, count] : refCount) {
-        const auto symbol = globals.table.getSymbol(name);
-        if (!symbol) continue;
-        symbol->refCount += count;
     }
 }
 

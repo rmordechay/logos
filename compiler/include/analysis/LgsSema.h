@@ -141,7 +141,6 @@ public:
     static bool validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const LgsFunc* func);
 
     void resolveImports() const;
-    void mergeRTTypes();
     void addHeapExpr(LgsExpr* expr);
     void addLocalSymbol(const LgsSymbol& newSymbol);
     LgsSymbol* getSymbol(const std::string& name, const LgsLocation* location);
