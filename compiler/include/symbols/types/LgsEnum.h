@@ -15,7 +15,7 @@ public:
     std::string strFormatPart() const override;
     size_t sizeBytes() override;
     LgsEnum* clone() override;
-    ~LgsEnum() override = default;
+    llvm::DIType* getDebugType(LgsLLVMGen& cg) override;
 };
 
 

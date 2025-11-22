@@ -39,3 +39,11 @@ bool LgsDouble::canCastTo(LgsType* other) {
 Value* LgsDouble::powIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
     return LgsType::powIR(cg, left, right);
 }
+
+llvm::DIType* LgsDouble::getDebugType(LgsLLVMGen& cg) {
+    assert(0);
+}
+
+LgsType* LgsDouble::clone() {
+    return this;
+}

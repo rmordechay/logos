@@ -29,4 +29,6 @@ public:
     Value* getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) override;
     void initArr(LgsLLVMGen& cg, Value* iterable);
     bool canCastTo(LgsType* other) override;
+    llvm::DIType* getDebugType(LgsLLVMGen& cg) override;
+    LgsType* clone() override;
 };

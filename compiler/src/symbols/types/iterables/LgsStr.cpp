@@ -99,6 +99,10 @@ std::string LgsStr::strFormatPart() const {
     return "%s";
 }
 
+bool LgsStr::inferBaseType(const std::vector<LgsExpr*>& args) {
+    assert(0);
+}
+
 Value* LgsStr::addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
     const auto selfSize = lenIR(cg, left->IRValue);
     const auto buffer = cg.builder.CreateAlloca(ArrayType::get(cg.i8Ty(), STRING_BUFFER_SIZE));

@@ -8,9 +8,9 @@
 #define STACK_CAPACITY 1024
 #define LOCALS_CAPACITY 8
 
-struct Lgs_Map;
-struct Lgs_Set;
-struct Lgs_DArray;
+struct Lgs_HashMap;
+struct Lgs_SetExpr;
+struct Lgs_DArrayExpr;
 typedef void (*ThunkFunc)(void*);
 
 struct Lgs_ThunkFunc {

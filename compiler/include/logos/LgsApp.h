@@ -58,7 +58,7 @@ public:
     bool loadConfigFile();
     bool loadEnvFiles();
     bool loadConfigs();
-    bool loadDeps();
+    bool loadDeps() const;
     void loadBuiltins();
     void createBuildDirs();
     bool validateEnvs();

@@ -28,6 +28,8 @@ public:
     std::string getName() override;
     bool canCastTo(LgsType* other) override;
     std::string strFormatPart() const override;
+    llvm::DIType* getDebugType(LgsLLVMGen& cg) override;
+    LgsType* clone() override;
 };
 
 inline LgsByte LGS_BYTE;

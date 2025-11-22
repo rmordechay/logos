@@ -93,6 +93,14 @@ bool LgsLong::canCastTo(LgsType* other) {
     return name == otherName;
 }
 
+llvm::DIType* LgsLong::getDebugType(LgsLLVMGen& cg) {
+    assert(0);
+}
+
+LgsType* LgsLong::clone() {
+    return this;
+}
+
 std::string LgsLong::strFormatPart() const {
     return "%lu";
 }

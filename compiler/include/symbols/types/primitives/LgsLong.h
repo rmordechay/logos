@@ -2,7 +2,6 @@
 #include "LgsType.h"
 #include "codegen/LgsLLVMGen.h"
 
-
 class LgsLong final : public LgsType {
 public:
     static constexpr auto name = "Long";
@@ -29,6 +28,8 @@ public:
     std::string strFormatPart() const override;
     std::string getName() override;
     bool canCastTo(LgsType* other) override;
+    llvm::DIType* getDebugType(LgsLLVMGen& cg) override;
+    LgsType* clone() override;
 };
 
 inline LgsLong LGS_LONG;

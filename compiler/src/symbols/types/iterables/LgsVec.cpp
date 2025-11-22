@@ -268,6 +268,10 @@ std::string LgsVec::strFormatPart() const {
     return str.str();
 }
 
+llvm::DIType* LgsVec::getDebugType(LgsLLVMGen& cg) {
+    assert(0);
+}
+
 LgsType* LgsVec::clone() {
     return new LgsVec(vectorDim, baseType->clone());
 }

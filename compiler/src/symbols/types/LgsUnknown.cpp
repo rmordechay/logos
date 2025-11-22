@@ -28,6 +28,14 @@ std::string LgsUnknown::strFormatPart() const {
     assert(0);
 }
 
+llvm::DIType* LgsUnknown::getDebugType(LgsLLVMGen& cg) {
+    assert(0);
+}
+
+LgsType* LgsUnknown::clone() {
+    assert(0);
+}
+
 Type* LgsUnknown::getIRType(LgsLLVMGen& cg) {
     assert(0);
 }

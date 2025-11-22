@@ -13,5 +13,6 @@ public:
     Lgs_TypeKind getRTTypeKind() override;
     bool canCastTo(LgsType* other) override;
     size_t sizeBytes() override;
+    llvm::DIType* getDebugType(LgsLLVMGen& cg) override;
     LgsInterface* clone() override;
 };

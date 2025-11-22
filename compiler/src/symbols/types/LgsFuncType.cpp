@@ -121,6 +121,18 @@ void LgsFuncType::setFuncOptions(const uint32_t ops) {
     hasDefaults =  ops & HAS_DEFAULTS;
 }
 
+std::unordered_map<std::string, LgsParam*> LgsFuncType::getParamsByName() {
+    std::unordered_map<std::string, LgsParam*> paramsByName;
+    for (size_t i = 0; i < params.size(); ++i) {
+        paramsByName[params[i].name] = &params[i];
+    }
+    return paramsByName;
+}
+
+llvm::DIType* LgsFuncType::getDebugType(LgsLLVMGen& cg) {
+    assert(0);
+}
+
 LgsFuncType* LgsFuncType::clone() {
     const auto lgsFunc = new LgsFuncType();
     lgsFunc->name = name;
@@ -149,14 +161,6 @@ LgsFuncType* LgsFuncType::clone() {
     lgsFunc->hasDefaults = hasDefaults;
     lgsFunc->IRType = nullptr;
     return lgsFunc;
-}
-
-std::unordered_map<std::string, LgsParam*> LgsFuncType::getParamsByName() {
-    std::unordered_map<std::string, LgsParam*> paramsByName;
-    for (size_t i = 0; i < params.size(); ++i) {
-        paramsByName[params[i].name] = &params[i];
-    }
-    return paramsByName;
 }
 
 LgsFuncType::~LgsFuncType() {

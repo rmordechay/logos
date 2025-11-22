@@ -28,3 +28,11 @@ std::string LgsAny::strFormatPart() const {
 bool LgsAny::canCastTo(LgsType*) {
     return true;
 }
+
+llvm::DIType* LgsAny::getDebugType(LgsLLVMGen& cg) {
+    assert(0);
+}
+
+LgsType* LgsAny::clone() {
+    return this;
+}

@@ -37,3 +37,7 @@ struct Lgs_BaseType {
     Lgs_TypeKind kind;
     const void* extra;
 };
+
+struct Lgs_SArr {
+    Lgs_TypeKind kind;
+};

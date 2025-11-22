@@ -23,7 +23,7 @@ inline ThreadPool threadPool;
 bool LgsApp::compile() {
     if (!setup()) return false;
     if (!loadConfigs()) return false;
-    // if (!loadDeps()) return false;
+    if (!loadDeps()) return false;
     if (!parse()) return false;
     if (!analyse()) return false;
     if (!generate()) return false;
@@ -150,7 +150,8 @@ bool LgsApp::analyse() {
 bool LgsApp::generate() {
     createBuildDirs();
     LgsLLVMGen::initLLVM();
-    paths.execFile = paths.buildDir / (configs.name == "" ? LGS_DEFAULT_EXEC_FILE : configs.name);
+    const auto execFileName = configs.name == "" ? LGS_DEFAULT_EXEC_FILE : configs.name;
+    paths.execFile = paths.buildDir / execFileName;
 
     // Main file is generated first non-concurrently
     const auto mainFile = getMainFile();
@@ -278,29 +279,8 @@ bool LgsApp::loadConfigs() {
     return true;
 }
 
-bool LgsApp::loadDeps() {
-    // for (auto package : appConfigFile->packages) {
-    //     const auto app = new LgsApp(path);
-    //     if (!app->setup()) {
-    //         errHandler.mergeErrorsWithLock(app->errHandler);
-    //         return false;
-    //     }
-    //     if (!app->loadConfigs()) {
-    //         errHandler.mergeErrorsWithLock(app->errHandler);
-    //         return false;
-    //     }
-    //     if (!app->parseHeaders()) {
-    //         errHandler.mergeErrorsWithLock(app->errHandler);
-    //         return false;
-    //     }
-    //     LgsTypeResolver typeResolver(app->errHandler, app->globals.symbolTable);
-    //     if (!typeResolver.resolveGlobals(app->srcFiles, threadPool)) {
-    //         errHandler.mergeErrorsWithLock(typeResolver.errHandler);
-    //         return false;
-    //     }
-    //     globals.symbolTable.imports[app->configs.name] = app;
-    // }
-    return true;
+bool LgsApp::loadDeps() const {
+    return errHandler.successful;
 }
 
 void LgsApp::loadBuiltins() {

@@ -38,5 +38,6 @@ public:
     static size_t getSwizzleSet(char c);
     static size_t getComponentIndex(char c);
     std::string strFormatPart() const override;
+    llvm::DIType* getDebugType(LgsLLVMGen& cg) override;
     LgsType* clone() override;
 };

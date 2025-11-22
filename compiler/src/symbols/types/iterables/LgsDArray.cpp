@@ -1,5 +1,5 @@
 #include "types/iterables/LgsDArray.h"
-#include "Lgs_DArray.h"
+#include "Lgs_DArrayExpr.h"
 #include "codegen/LgsLLVMGen.h"
 #include "exprs/LgsArrayExpr.h"
 #include "exprs/LgsFuncCall.h"
@@ -51,7 +51,7 @@ std::string LgsDArray::pname() {
 }
 
 size_t LgsDArray::sizeBytes() {
-    return sizeof(Lgs_DArray);
+    return sizeof(Lgs_DArrayExpr);
 }
 
 LgsExpr* LgsDArray::getZeroValue() {
@@ -108,18 +108,18 @@ Value* LgsDArray::lenIR(LgsLLVMGen& cg, Value* iterable) {
 }
 
 Value* LgsDArray::inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) {
-    return cg.callLgsFunc(std::string(name) + "_contains", cg.i1Ty(), {cg.ptrTy(), cg.ptrTy()}, {
+    return cg.callLgsFunc("DArrayExpr_contains", cg.i1Ty(), {cg.ptrTy(), cg.ptrTy()}, {
         iterableExpr->IRValue,
         cg.getPtrTo(value->IRValue),
     });
 }
 
 Value* LgsDArray::getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) {
-    return cg.callLgsFunc("DArray_get", cg.ptrTy(), {cg.ptrTy(), cg.sizeTy()}, {iterable, index});;
+    return cg.callLgsFunc("DArrayExpr_get", cg.ptrTy(), {cg.ptrTy(), cg.sizeTy()}, {iterable, index});;
 }
 
 void LgsDArray::initArr(LgsLLVMGen& cg, Value* iterable) {
-    cg.callLgsFunc("DArray_init", cg.voidTy(), {cg.ptrTy(), cg.sizeTy(), cg.i32Ty()}, {
+    cg.callLgsFunc("DArrayExpr_init", cg.voidTy(), {cg.ptrTy(), cg.sizeTy(), cg.i32Ty()}, {
         iterable,
         cg.usize(baseType->sizeBytes()),
         cg.i32(getRTTypeKind()),
@@ -133,4 +133,12 @@ bool LgsDArray::canCastTo(LgsType* other) {
     if (!baseType) return true;
     if (!otherArr->baseType) return true;
     return baseType->canCastTo(otherArr->baseType);
+}
+
+llvm::DIType* LgsDArray::getDebugType(LgsLLVMGen& cg) {
+    assert(0);
+}
+
+LgsType* LgsDArray::clone() {
+    assert(0);
 }

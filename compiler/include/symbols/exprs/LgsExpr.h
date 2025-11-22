@@ -40,6 +40,12 @@ public:
     Value* destPtrValue = nullptr;
 
     explicit LgsExpr(LgsType* type = nullptr) : type(type) {}
+    void freeOwner(LgsLLVMGen& cg);
+    int64_t* getConstInt();
+    std::string* getConstStr();
+    void setType(LgsType* newType);
+    LgsExpr* clone() override;
+
     virtual LgsExpr* castExplicitly(LgsType* toType);
     virtual void castImplicitly(LgsType* toType);
     virtual Value* castIR(LgsLLVMGen& cg, LgsType* toType);
@@ -47,12 +53,6 @@ public:
     virtual void assign(LgsLLVMGen& cg, LgsExpr* expr);
     virtual bool equals(LgsExpr* other);
     virtual std::string asText() = 0;
-
-    void freeOwner(LgsLLVMGen& cg);
-    int64_t* getConstInt();
-    std::string* getConstStr();
-    void setType(LgsType* newType);
-    LgsExpr* clone() override;
 
     LgsNull* asNull();
     LgsFunc* asFunc();
@@ -80,4 +80,3 @@ public:
 
 void freeExpr(LgsExpr* expr);
 void freeExprs(std::vector<LgsExpr*>& exprs);
-

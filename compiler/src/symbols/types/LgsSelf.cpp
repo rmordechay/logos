@@ -27,3 +27,11 @@ bool LgsSelf::canCastTo(LgsType* other) {
 std::string LgsSelf::strFormatPart() const {
     assert(0);
 }
+
+llvm::DIType* LgsSelf::getDebugType(LgsLLVMGen& cg) {
+    assert(0);
+}
+
+LgsType* LgsSelf::clone() {
+    assert(0);
+}

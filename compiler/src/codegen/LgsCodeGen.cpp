@@ -87,6 +87,9 @@ bool LgsCodeGen::generate() {
 }
 
 void LgsCodeGen::visitMainFile(LgsMainFile* mainFile) {
+    const auto baseRTType = cg.getStructType({cg.i32Ty(), cg.ptrTy()}, "baseRTType");
+    const auto init = llvm::ConstantStruct::get(baseRTType, {cg.i32Zero(), cg.null()});
+    g = cg.createGlobal("SArr_Int", baseRTType, init);
     for (const auto varDec : mainFile->varDecs) {
         visitConstant(varDec->expr);
         varDec->IRValue = varDec->expr->IRValue;
@@ -106,7 +109,6 @@ void LgsCodeGen::visitMainFile(LgsMainFile* mainFile) {
         visitFunc(genericsCall);
     }
 
-    // createRTTypes();
     for (const auto& [name, func] : mainFile->funcs) {
         if (const auto mainFunc = dynamic_cast<LgsMainFunc*>(func)) {
             visitMainFunc(mainFunc);
@@ -138,7 +140,7 @@ void LgsCodeGen::visitObject(LgsObject* obj) {
         singleton->IRValue = cg.IRModule->getGlobalVariable(obj->name);
         if (!singleton->IRValue) {
             const auto zeroInit = ConstantAggregateZero::get(objIRType);
-            singleton->IRValue = cg.createGlobal(objIRType, zeroInit, obj->name);
+            singleton->IRValue = cg.createGlobal(obj->name, objIRType, zeroInit);
         }
     }
     for (const auto& [_, method] : obj->methods) {
@@ -792,7 +794,7 @@ void LgsCodeGen::visitHashMap(LgsHashMap* hashMap) {
     const auto valueType = map->typePair->value;
     const auto elementSize = cg.usize(valueType->sizeBytes());
     hashMap->IRValue = cg.callAllocate(map->sizeBytes(), hashMap->owner, hashMap->type->getRTTypeKind());
-    cg.callLgsFunc("Map_init", cg.voidTy(), {cg.ptrTy(), cg.sizeTy(), cg.i32Ty(), cg.i32Ty()}, {
+    cg.callLgsFunc("HashMap_init", cg.voidTy(), {cg.ptrTy(), cg.sizeTy(), cg.i32Ty(), cg.i32Ty()}, {
         hashMap->IRValue,
         elementSize,
         cg.i32(keyType->getRTTypeKind()),

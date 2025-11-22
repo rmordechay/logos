@@ -1,13 +1,13 @@
-#include "Lgs_DArray.h"
+#include "Lgs_DArrayExpr.h"
 #include "Lgs_Types.h"
 #include <cassert>
 #include <cstdlib>
 #include <cstring>
 
-static void resizeArrIfNeeded(Lgs_DArray* arr);
-static bool compare_arrays(const Lgs_DArray* arr1, const Lgs_DArray* arr2);
+static void resizeArrIfNeeded(Lgs_DArrayExpr* arr);
+static bool compare_arrays(const Lgs_DArrayExpr* arr1, const Lgs_DArrayExpr* arr2);
 
-extern "C" void Lgs_DArray_init(Lgs_DArray* arr, const size_t elementSize, const Lgs_TypeKind baseType) {
+extern "C" void Lgs_DArrayExpr_init(Lgs_DArrayExpr* arr, const size_t elementSize, const Lgs_TypeKind baseType) {
     assert(baseType != RTT_UNKNOWN);
     arr->elementSize = elementSize;
     arr->baseType = baseType;
@@ -16,7 +16,7 @@ extern "C" void Lgs_DArray_init(Lgs_DArray* arr, const size_t elementSize, const
     arr->size = 0;
 }
 
-extern "C" void Lgs_DArray_reserve(Lgs_DArray* arr, const size_t numElements) {
+extern "C" void Lgs_DArrayExpr_reserve(Lgs_DArrayExpr* arr, const size_t numElements) {
     assert(arr);
     const auto newCapacity = numElements * arr->elementSize;
     if (newCapacity <= arr->capacity) return;
@@ -24,42 +24,42 @@ extern "C" void Lgs_DArray_reserve(Lgs_DArray* arr, const size_t numElements) {
     arr->capacity = newCapacity;
 }
 
-extern "C" void Lgs_DArray_add(Lgs_DArray* arr, const void* value) {
+extern "C" void Lgs_DArrayExpr_add(Lgs_DArrayExpr* arr, const void* value) {
     assert(arr);
     resizeArrIfNeeded(arr);
     std::memcpy(arr->data + arr->size, value, arr->elementSize);
     arr->size += arr->elementSize;
 }
 
-extern "C" void Lgs_DArray_addInt(Lgs_DArray* arr, const int32_t value) {
+extern "C" void Lgs_DArrayExpr_addInt(Lgs_DArrayExpr* arr, const int32_t value) {
     assert(arr);
     resizeArrIfNeeded(arr);
     *reinterpret_cast<int32_t*>(arr->data + arr->size) = value;
     arr->size += sizeof(int32_t);
 }
 
-extern "C" void Lgs_DArray_addLong(Lgs_DArray* arr, const int64_t value) {
+extern "C" void Lgs_DArrayExpr_addLong(Lgs_DArrayExpr* arr, const int64_t value) {
     assert(arr);
     resizeArrIfNeeded(arr);
     *reinterpret_cast<int64_t*>(arr->data + arr->size) = value;
     arr->size += sizeof(int64_t);
 }
 
-extern "C" void Lgs_DArray_addSize(Lgs_DArray* arr, const size_t value) {
+extern "C" void Lgs_DArrayExpr_addSize(Lgs_DArrayExpr* arr, const size_t value) {
     assert(arr);
     resizeArrIfNeeded(arr);
     *reinterpret_cast<size_t*>(arr->data + arr->size) = value;
     arr->size += sizeof(size_t);
 }
 
-extern "C" void Lgs_DArray_put(const Lgs_DArray* arr, const size_t index, const void* value) {
+extern "C" void Lgs_DArrayExpr_put(const Lgs_DArrayExpr* arr, const size_t index, const void* value) {
     if (!arr) return;
     const size_t arrLen = arr->size / arr->elementSize;
     if (index >= arrLen) return;
     std::memcpy(arr->data + index * arr->elementSize, value, arr->elementSize);
 }
 
-extern "C" void* Lgs_DArray_get(const Lgs_DArray* arr, const int64_t index) {
+extern "C" void* Lgs_DArrayExpr_get(const Lgs_DArrayExpr* arr, const int64_t index) {
     if (!arr || arr->size == 0) assert(0);
     const auto arrLen = arr->size / arr->elementSize;
     size_t actualIndex;
@@ -75,19 +75,19 @@ extern "C" void* Lgs_DArray_get(const Lgs_DArray* arr, const int64_t index) {
     return arr->data + actualIndex * arr->elementSize;
 }
 
-extern "C" size_t Lgs_DArray_len(const Lgs_DArray* arr) {
+extern "C" size_t Lgs_DArrayExpr_len(const Lgs_DArrayExpr* arr) {
     return arr->size / arr->elementSize;
 }
 
-extern "C" bool Lgs_DArray_isEmpty(const Lgs_DArray* arr) {
+extern "C" bool Lgs_DArrayExpr_isEmpty(const Lgs_DArrayExpr* arr) {
     return arr->size == 0;
 }
 
-extern "C" bool Lgs_DArray_isNotEmpty(const Lgs_DArray* arr) {
+extern "C" bool Lgs_DArrayExpr_isNotEmpty(const Lgs_DArrayExpr* arr) {
     return arr->size != 0;
 }
 
-extern "C" bool Lgs_DArray_contains(const Lgs_DArray* arr, const void* value) {
+extern "C" bool Lgs_DArrayExpr_contains(const Lgs_DArrayExpr* arr, const void* value) {
     assert(arr);
     if (arr->size == 0) return false;
     const size_t len = arr->size / arr->elementSize;
@@ -96,8 +96,8 @@ extern "C" bool Lgs_DArray_contains(const Lgs_DArray* arr, const void* value) {
         const void* elem = base + i * arr->elementSize;
         bool match = false;
         if (arr->baseType == RTT_DARRAY) {
-            const auto nested_elem = *static_cast<const Lgs_DArray* const*>(elem);
-            const auto nested_value = *static_cast<const Lgs_DArray* const*>(value);
+            const auto nested_elem = *static_cast<const Lgs_DArrayExpr* const*>(elem);
+            const auto nested_value = *static_cast<const Lgs_DArrayExpr* const*>(value);
             match = compare_arrays(nested_elem, nested_value);
         } else if (arr->baseType == RTT_STR) {
             const auto str1 = *static_cast<const char* const*>(elem);
@@ -111,18 +111,18 @@ extern "C" bool Lgs_DArray_contains(const Lgs_DArray* arr, const void* value) {
     return false;
 }
 
-static bool compare_arrays(const Lgs_DArray* arr1, const Lgs_DArray* arr2) {
+static bool compare_arrays(const Lgs_DArrayExpr* arr1, const Lgs_DArrayExpr* arr2) {
     if (arr1->elementSize != arr2->elementSize) return false;
     if (arr1->baseType != arr2->baseType) return false;
-    if (Lgs_DArray_len(arr1) != Lgs_DArray_len(arr2)) return false;
+    if (Lgs_DArrayExpr_len(arr1) != Lgs_DArrayExpr_len(arr2)) return false;
 
-    const size_t len = Lgs_DArray_len(arr1);
+    const size_t len = Lgs_DArrayExpr_len(arr1);
     for (size_t i = 0; i < len; ++i) {
-        const void* elem1 = Lgs_DArray_get(arr1, i);
-        const void* elem2 = Lgs_DArray_get(arr2, i);
+        const void* elem1 = Lgs_DArrayExpr_get(arr1, i);
+        const void* elem2 = Lgs_DArrayExpr_get(arr2, i);
         if (arr1->baseType == RTT_DARRAY) {
-            const auto nested1 = *static_cast<const Lgs_DArray* const*>(elem1);
-            const auto nested2 = *static_cast<const Lgs_DArray* const*>(elem2);
+            const auto nested1 = *static_cast<const Lgs_DArrayExpr* const*>(elem1);
+            const auto nested2 = *static_cast<const Lgs_DArrayExpr* const*>(elem2);
             if (!compare_arrays(nested1, nested2)) return false;
         } else if (arr1->baseType == RTT_STR) {
             const auto str1 = *static_cast<const char* const*>(elem1);
@@ -135,7 +135,7 @@ static bool compare_arrays(const Lgs_DArray* arr1, const Lgs_DArray* arr2) {
     return true;
 }
 
-static void resizeArrIfNeeded(Lgs_DArray* arr) {
+static void resizeArrIfNeeded(Lgs_DArrayExpr* arr) {
     if (arr->size + arr->elementSize <= arr->capacity) return;
     arr->capacity *= 2;
     arr->data = static_cast<char*>(realloc(arr->data, arr->capacity));

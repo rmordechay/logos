@@ -39,3 +39,7 @@ size_t LgsEnum::sizeBytes() {
 LgsEnum* LgsEnum::clone() {
     return new LgsEnum(*this);
 }
+
+llvm::DIType* LgsEnum::getDebugType(LgsLLVMGen& cg) {
+    assert(0);
+}

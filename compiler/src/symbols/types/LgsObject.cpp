@@ -125,6 +125,10 @@ LgsObject* LgsObject::clone() {
     return newObj;
 }
 
+llvm::DIType* LgsObject::getDebugType(LgsLLVMGen& cg) {
+    assert(0);
+}
+
 LgsObject::~LgsObject() {
     freeTypes(enums);
     freeTypes(objects);

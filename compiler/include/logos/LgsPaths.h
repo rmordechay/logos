@@ -16,6 +16,7 @@ struct LgsPaths {
     fs::path cLibHeadersDir;
     fs::path lgsRootDir;
     fs::path lgsPackagesDir;
+    fs::path cblasDir;
     void findLgsRootDir();
     void findCLibHeaders();
 };

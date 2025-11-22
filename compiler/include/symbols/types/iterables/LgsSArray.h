@@ -17,6 +17,7 @@ public:
     Lgs_TypeKind getRTTypeKind() override;
     std::string strFormatPart() const override;
     LgsType* applyBinOp(LgsType* toType, LgsBinOp& op) override;
+    bool inferBaseType(const std::vector<LgsExpr*>& args) override;
     Value* addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
     Value* mulIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
     Value* inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
@@ -24,5 +25,6 @@ public:
     Value* lenIR(LgsLLVMGen& cg, Value* iterable) override;
     LgsFunc* getLenFunc() override;
     bool canCastTo(LgsType* other) override;
+    llvm::DIType* getDebugType(LgsLLVMGen& cg) override;
     LgsType* clone() override;
 };

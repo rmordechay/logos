@@ -78,7 +78,7 @@ LgsFunc* LgsIterable::getIsNotEmptyFunc() {
 }
 
 LgsFunc* LgsIterable::getAddFunc() {
-    return nullptr;
+    assert(0);
 }
 
 LgsFunc* LgsIterable::getMapFunc() {
@@ -105,10 +105,6 @@ LgsType* LgsIterable::getValueType() {
     return baseType;
 }
 
-bool LgsIterable::inferBaseType(const std::vector<LgsExpr*>& args) {
-    assert(0);
-}
-
 bool LgsIterable::unpackLoopVarsTypes(LgsForeachLoop* loop) const {
     if (loop->loopVars.size() != 1) return false;
     const auto iterIndex = new LgsIterIndex(loop->iterExpr, LGS_SIZE.getZeroValue());
@@ -124,10 +120,6 @@ void LgsIterable::unpackLoopIR(LgsLLVMGen& cg, LgsForeachLoop* loop) const {
     iterIndex->index.from->IRValue = loop->iValue;
     iterIndex->setIRElementPtr(cg);
     loop->loopVars[0]->IRValue = iterIndex->IRValue;
-}
-
-Value* LgsIterable::getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) {
-    assert(0);
 }
 
 LgsIterable::~LgsIterable() {

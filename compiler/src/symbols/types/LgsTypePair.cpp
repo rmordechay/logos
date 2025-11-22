@@ -36,6 +36,10 @@ std::string LgsTypePair::strFormatPart() const {
     return "%s";
 }
 
+llvm::DIType* LgsTypePair::getDebugType(LgsLLVMGen& cg) {
+    assert(0);
+}
+
 LgsType* LgsTypePair::clone() {
     return new LgsTypePair(key->clone(), value->clone());
 }

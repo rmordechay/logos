@@ -129,3 +129,11 @@ bool LgsBool::canCastTo(LgsType* other) {
     if (otherName == LgsUInt::name) return true;
     return name == otherName;
 }
+
+llvm::DIType* LgsBool::getDebugType(LgsLLVMGen& cg) {
+    assert(0);
+}
+
+LgsType* LgsBool::clone() {
+    return this;
+}

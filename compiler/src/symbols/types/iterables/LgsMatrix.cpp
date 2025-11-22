@@ -116,6 +116,10 @@ std::string LgsMatrix::strFormatPart() const {
     assert(0);
 }
 
+bool LgsMatrix::inferBaseType(const std::vector<LgsExpr*>& args) {
+    assert(0);
+}
+
 Value* LgsMatrix::getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) {
     const auto gep = cg.builder.CreateGEP(getIRType(cg), iterable, {cg.i32Zero(), index});
     return cg.builder.CreateLoad(baseType->getIRType(cg), gep);
@@ -123,6 +127,14 @@ Value* LgsMatrix::getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) {
 
 Value* LgsMatrix::lenIR(LgsLLVMGen& cg, Value* iterable) {
     return cg.i32(rows);
+}
+
+llvm::DIType* LgsMatrix::getDebugType(LgsLLVMGen& cg) {
+    assert(0);
+}
+
+LgsType* LgsMatrix::clone() {
+    assert(0);
 }
 
 Value* LgsMatrix::inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) {

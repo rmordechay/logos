@@ -1,6 +1,5 @@
 #include "types/LgsInterface.h"
 #include "codegen/LgsLLVMGen.h"
-#include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
 #include "types/LgsObject.h"
 
@@ -40,6 +39,10 @@ bool LgsInterface::canCastTo(LgsType* other) {
 
 size_t LgsInterface::sizeBytes() {
     return 0;
+}
+
+llvm::DIType* LgsInterface::getDebugType(LgsLLVMGen& cg) {
+    assert(0);
 }
 
 LgsInterface* LgsInterface::clone() {

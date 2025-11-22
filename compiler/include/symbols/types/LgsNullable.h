@@ -17,6 +17,7 @@ public:
     bool canCastTo(LgsType* other) override;
     size_t sizeBytes() override;
     std::string strFormatPart() const override;
+    llvm::DIType* getDebugType(LgsLLVMGen& cg) override;
     LgsType* clone() override;
     ~LgsNullable() override;
 };

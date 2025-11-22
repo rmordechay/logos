@@ -40,7 +40,7 @@ public:
     void loop(Value* loopLength, const std::function<void(Value*, BasicBlock*)>& body);
     Constant* getIRStr(const std::string& value);
     Value* getPtrTo(Value* v);
-    GlobalVariable* createGlobal(Type* type, Constant* args, const std::string& name) const;
+    GlobalVariable* createGlobal(const std::string& name, Type* type, Constant* args, bool isConst = false, GlobalValue::LinkageTypes linkage = GlobalValue::ExternalLinkage) const;
     StructType* getStructType(const std::vector<Type*>& fields, const std::string& name = "");
     llvm::AllocaInst* getEmptyBuffer();
 
@@ -92,7 +92,7 @@ public:
     PointerType* ptrTy();
 
     // Values
-    Value* null();
+    Constant* null();
     ConstantInt* true_();
     ConstantInt* false_();
     ConstantInt* i1(bool v);

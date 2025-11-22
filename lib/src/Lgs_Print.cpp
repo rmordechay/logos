@@ -1,10 +1,10 @@
-#include "Lgs_DArray.h"
+#include "Lgs_DArrayExpr.h"
 #include "Lgs_Types.h"
 #include "LgsDefinitions.h"
 #include <cassert>
 #include <sstream>
 
-std::string formatArray(const Lgs_DArray* arr);
+std::string formatArray(const Lgs_DArrayExpr* arr);
 std::string formatElement(Lgs_TypeKind type, void* elem);
 
 extern "C" void Lgs_print(const Lgs_TypeKind rtt, void* v) {
@@ -79,7 +79,7 @@ std::string formatElement(const Lgs_TypeKind type, void* elem) {
     }
     case RTT_SET:
     case RTT_DARRAY: {
-        const auto nested = static_cast<Lgs_DArray*>(elem);
+        const auto nested = static_cast<Lgs_DArrayExpr*>(elem);
         str << formatArray(nested);
         break;
     }
@@ -101,12 +101,12 @@ std::string formatElement(const Lgs_TypeKind type, void* elem) {
     return str.str();
 }
 
-std::string formatArray(const Lgs_DArray* arr) {
+std::string formatArray(const Lgs_DArrayExpr* arr) {
     std::ostringstream oss;
     oss << "[";
-    const size_t len = Lgs_DArray_len(arr);
+    const size_t len = Lgs_DArrayExpr_len(arr);
     for (size_t i = 0; i < len; ++i) {
-        void* elem = Lgs_DArray_get(arr, i);
+        void* elem = Lgs_DArrayExpr_get(arr, i);
         oss << formatElement(arr->baseType, elem);
         if (i < len - 1) {
             oss << ", ";

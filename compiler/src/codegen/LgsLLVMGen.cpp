@@ -89,9 +89,9 @@ Value* LgsLLVMGen::getPtrTo(Value* v) {
     assert(0);
 }
 
-GlobalVariable* LgsLLVMGen::createGlobal(Type* type, Constant* args, const std::string& name) const {
+GlobalVariable* LgsLLVMGen::createGlobal(const std::string& name, Type* type, Constant* args, const bool isConst, GlobalValue::LinkageTypes linkage) const {
     if (const auto var = IRModule->getGlobalVariable(name)) return var;
-    return new GlobalVariable(*IRModule, type, false, GlobalValue::ExternalLinkage, args, name);
+    return new GlobalVariable(*IRModule, type, isConst, linkage, args, name);
 }
 
 StructType* LgsLLVMGen::getStructType(const std::vector<Type*>& fields, const std::string& name) {
@@ -283,7 +283,7 @@ PointerType* LgsLLVMGen::ptrTy() {
     return PointerType::getUnqual(context);
 }
 
-Value* LgsLLVMGen::null() {
+Constant* LgsLLVMGen::null() {
     return llvm::ConstantPointerNull::get(ptrTy());
 }
 
@@ -353,7 +353,7 @@ TypeSize LgsLLVMGen::typeSize(Type* v) const {
 
 Value* LgsLLVMGen::emptyStr() {
     const auto ty = ArrayType::get(i8Ty(), 1);
-    return createGlobal(ty, ConstantAggregateZero::get(ty), "empty_string");
+    return createGlobal("empty_string", ty, ConstantAggregateZero::get(ty));
 }
 
 void LgsLLVMGen::printStr(const std::string& str) {

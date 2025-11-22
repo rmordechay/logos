@@ -33,6 +33,14 @@ bool LgsUInt::canCastTo(LgsType* other) {
     return name == IRName;
 }
 
+llvm::DIType* LgsUInt::getDebugType(LgsLLVMGen& cg) {
+    assert(0);
+}
+
+LgsType* LgsUInt::clone() {
+    return this;
+}
+
 std::string LgsUInt::strFormatPart() const {
     return "%d";
 }

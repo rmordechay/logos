@@ -65,6 +65,7 @@ public:
     LgsGlobals& globals;
     LgsAppConfigs& appConfigs;
     Function* currentIRFunc = nullptr;
+    GlobalVariable* g = nullptr;
     static std::atomic<size_t> lambdasIDGenerator;
 
     explicit LgsCodeGen(LgsFile& file, LgsAppConfigs& appConfigs, LgsGlobals& globals, LgsPaths& paths)

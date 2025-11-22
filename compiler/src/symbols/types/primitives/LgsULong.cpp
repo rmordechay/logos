@@ -29,6 +29,14 @@ bool LgsULong::canCastTo(LgsType* other) {
     return name == IRName;
 }
 
+llvm::DIType* LgsULong::getDebugType(LgsLLVMGen& cg) {
+    assert(0);
+}
+
 std::string LgsULong::strFormatPart() const {
     return "%ul";
+}
+
+LgsType* LgsULong::clone() {
+    return this;
 }

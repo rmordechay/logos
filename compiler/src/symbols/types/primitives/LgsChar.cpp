@@ -46,3 +46,11 @@ bool LgsChar::canCastTo(LgsType* other) {
     if (IRName == LgsUInt::name) return true;
     return name == IRName;
 }
+
+llvm::DIType* LgsChar::getDebugType(LgsLLVMGen& cg) {
+    assert(0);
+}
+
+LgsType* LgsChar::clone() {
+    return this;
+}

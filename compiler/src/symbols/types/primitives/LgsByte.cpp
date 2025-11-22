@@ -98,3 +98,11 @@ bool LgsByte::canCastTo(LgsType* other) {
 std::string LgsByte::strFormatPart() const {
     return "%d";
 }
+
+llvm::DIType* LgsByte::getDebugType(LgsLLVMGen& cg) {
+    assert(0);
+}
+
+LgsType* LgsByte::clone() {
+    return this;
+}

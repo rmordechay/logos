@@ -12,6 +12,7 @@ public:
     Lgs_TypeKind getRTTypeKind() override;
     std::string getName() override;
     bool canCastTo(LgsType* other) override;
-    LgsGenericParam* clone() override;
     std::string strFormatPart() const override;
+    llvm::DIType* getDebugType(LgsLLVMGen& cg) override;
+    LgsGenericParam* clone() override;
 };

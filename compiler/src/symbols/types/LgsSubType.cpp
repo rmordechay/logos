@@ -36,6 +36,10 @@ std::string LgsSubType::strFormatPart() const {
     return subtype->strFormatPart();
 }
 
+llvm::DIType* LgsSubType::getDebugType(LgsLLVMGen& cg) {
+    assert(0);
+}
+
 LgsSubType* LgsSubType::clone() {
     assert(0);
 }

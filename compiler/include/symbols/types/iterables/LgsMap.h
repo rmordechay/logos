@@ -30,6 +30,7 @@ public:
     Lgs_TypeKind getRTTypeKind() override;
     LgsType* getIndexType() override;
     LgsType* getValueType() override;
+    bool inferBaseType(const std::vector<LgsExpr*>& args) override;
     bool unpackLoopVarsTypes(LgsForeachLoop* loop) const override;
     void unpackLoopIR(LgsLLVMGen& cg, LgsForeachLoop* loop) const override;
     Value* lenIR(LgsLLVMGen& cg, Value* iterable) override;
@@ -37,6 +38,7 @@ public:
     Value* getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) override;
     bool canCastTo(LgsType* other) override;
     std::string strFormatPart() const override;
+    llvm::DIType* getDebugType(LgsLLVMGen& cg) override;
     LgsType* clone() override;
     ~LgsMap() override;
 };

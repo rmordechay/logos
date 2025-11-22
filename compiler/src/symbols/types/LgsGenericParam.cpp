@@ -25,10 +25,14 @@ bool LgsGenericParam::canCastTo(LgsType* other) {
     return true;
 }
 
-LgsGenericParam* LgsGenericParam::clone() {
-    return new LgsGenericParam(*this);
-}
-
 std::string LgsGenericParam::strFormatPart() const {
     assert(0);
+}
+
+llvm::DIType* LgsGenericParam::getDebugType(LgsLLVMGen& cg) {
+    assert(0);
+}
+
+LgsGenericParam* LgsGenericParam::clone() {
+    return new LgsGenericParam(*this);
 }

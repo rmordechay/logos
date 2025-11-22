@@ -16,10 +16,13 @@ Value* LgsArrayExpr::castIR(LgsLLVMGen& cg, LgsType* toType) {
 }
 
 void LgsArrayExpr::castImplicitly(LgsType* toType) {
-    if (!type) return;
-    if (type->asDArray() && (toType->asSArray() || toType->asSet())) {
-        freeType(type);
-        setType(toType);
+    if (!type) {
+        if (toType->asSArray()) {
+            setType(toType);
+        } else if (type->asDArray() && (toType->asSArray() || toType->asSet())) {
+            freeType(type);
+            setType(toType);
+        }
     }
     LgsType* otherBaseType = nullptr;
     if (toType->asSet()) {

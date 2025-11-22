@@ -37,6 +37,7 @@ public:
     std::string strFormatPart() const override;
     std::string getName() override;
     llvm::DIType* getDebugType(LgsLLVMGen& cg) override;
+    LgsType* clone() override;
 };
 
 inline LgsInt LGS_INT;

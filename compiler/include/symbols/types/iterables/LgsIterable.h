@@ -40,11 +40,11 @@ public:
     virtual LgsFunc* getFilterFunc();
     virtual LgsType* getIndexType();
     virtual LgsType* getValueType();
-    virtual bool inferBaseType(const std::vector<LgsExpr*>& args);
     virtual bool unpackLoopVarsTypes(LgsForeachLoop* loop) const;
     virtual void unpackLoopIR(LgsLLVMGen& cg, LgsForeachLoop* loop) const;
+    virtual bool inferBaseType(const std::vector<LgsExpr*>& args) = 0;
     virtual Value* lenIR(LgsLLVMGen& cg, Value* iterable) = 0;
     virtual Value* inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) = 0;
-    virtual Value* getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index);
+    virtual Value* getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) = 0;
     ~LgsIterable() override;
 };

@@ -32,18 +32,18 @@ void freeValue(void* ptr, const Lgs_TypeKind type) {
         break;
     }
     case RTT_DARRAY: {
-        const auto arr = static_cast<Lgs_DArray*>(ptr);
+        const auto arr = static_cast<Lgs_DArrayExpr*>(ptr);
         // free(arr->data);
         break;
     }
     case RTT_SET: {
-        const auto arr = static_cast<Lgs_Set*>(ptr);
+        const auto arr = static_cast<Lgs_SetExpr*>(ptr);
         // delete arr->data;
         // std::free(arr);
         break;
     }
     case RTT_MAP: {
-        const auto map = static_cast<Lgs_Map*>(ptr);
+        const auto map = static_cast<Lgs_HashMap*>(ptr);
         // delete map->data;
         // std::free(map);
         break;

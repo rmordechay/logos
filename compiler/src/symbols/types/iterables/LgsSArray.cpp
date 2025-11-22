@@ -66,6 +66,10 @@ LgsType* LgsSArray::applyBinOp(LgsType* toType, LgsBinOp& op) {
     return nullptr;
 }
 
+bool LgsSArray::inferBaseType(const std::vector<LgsExpr*>& args) {
+    assert(0);
+}
+
 Value* LgsSArray::addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
     const auto baseIR = baseType->getIRType(cg);
     const auto leftSArr = left->type->asSArray();
@@ -141,6 +145,10 @@ bool LgsSArray::canCastTo(LgsType* other) {
     const auto otherArr = other->asIterable();
     if (!otherArr) return false;
     return baseType->canCastTo(otherArr->baseType);
+}
+
+llvm::DIType* LgsSArray::getDebugType(LgsLLVMGen& cg) {
+    assert(0);
 }
 
 LgsType* LgsSArray::clone() {

@@ -44,7 +44,6 @@ class LgsLLVMGen;
 
 class LgsType {
 public:
-    size_t runtimeID = 0;
     LgsLocation location;
     std::vector<LgsField*> fields;
     std::map<std::string, LgsFunc*> methods;
@@ -73,19 +72,19 @@ public:
 
     virtual LgsField* getField(const std::string& fieldName);
     virtual LgsFunc* getMethod(const std::string& methodName);
-    virtual Type* getIRType(LgsLLVMGen& cg) = 0;
     virtual size_t sizeBytes() = 0;
     virtual LgsExpr* getZeroValue() = 0;
+    virtual Type* getIRType(LgsLLVMGen& cg) = 0;
+    virtual bool canCastTo(LgsType* other) = 0;
     virtual Lgs_TypeKind getRTTypeKind() = 0;
+    virtual std::string strFormatPart() const = 0;
+    virtual llvm::DIType* getDebugType(LgsLLVMGen& cg) = 0;
+    virtual LgsType* applyBinOp(LgsType* toType, LgsBinOp& op);
+    virtual void hashNode(size_t& oldHash);
+    virtual LgsType* clone() = 0;
     virtual std::string getName() = 0;
     virtual std::string pname(); // pretty name
     virtual bool equals(LgsType* other);
-    virtual bool canCastTo(LgsType* other) = 0;
-    virtual LgsType* applyBinOp(LgsType* toType, LgsBinOp& op);
-    virtual std::string strFormatPart() const = 0;
-    virtual llvm::DIType* getDebugType(LgsLLVMGen& cg);
-    virtual void hashNode(size_t& oldHash);
-    virtual LgsType* clone();
 
     virtual Value* addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right);
     virtual Value* subIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right);

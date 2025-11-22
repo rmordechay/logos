@@ -71,3 +71,11 @@ Value* LgsFloat::divIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
     const auto [l, r] = loadOperands(cg, left, right);
     return cg.builder.CreateFDiv(l, r);
 }
+
+llvm::DIType* LgsFloat::getDebugType(LgsLLVMGen& cg) {
+    assert(0);
+}
+
+LgsType* LgsFloat::clone() {
+    return this;
+}

@@ -62,6 +62,10 @@ std::string LgsNullable::strFormatPart() const {
     return baseType->strFormatPart();
 }
 
+llvm::DIType* LgsNullable::getDebugType(LgsLLVMGen& cg) {
+    assert(0);
+}
+
 LgsType* LgsNullable::clone() {
     const auto newNullable = new LgsNullable(*this);
     newNullable->baseType = baseType->clone();

@@ -22,6 +22,7 @@ public:
     LgsFunc* getIsEmptyFunc() override;
     LgsFunc* getIsNotEmptyFunc() override;
     std::string strFormatPart() const override;
+    bool inferBaseType(const std::vector<LgsExpr*>& args) override;
     Value* addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
     Value* eqIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
     Value* neIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;

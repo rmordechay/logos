@@ -44,6 +44,14 @@ std::string LgsPtr::strFormatPart() const {
     return baseType->strFormatPart();
 }
 
+llvm::DIType* LgsPtr::getDebugType(LgsLLVMGen& cg) {
+    assert(0);
+}
+
+LgsType* LgsPtr::clone() {
+    assert(0);
+}
+
 LgsPtr::~LgsPtr() {
     freeType(baseType);
     baseType = nullptr;

@@ -41,3 +41,11 @@ bool LgsShort::canCastTo(LgsType* other) {
 std::string LgsShort::strFormatPart() const {
     return "%d";
 }
+
+llvm::DIType* LgsShort::getDebugType(LgsLLVMGen& cg) {
+    assert(0);
+}
+
+LgsType* LgsShort::clone() {
+    return this;
+}

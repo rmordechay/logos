@@ -23,7 +23,10 @@ public:
     std::string getName() override;
     bool canCastTo(LgsType* other) override;
     std::string strFormatPart() const override;
+    bool inferBaseType(const std::vector<LgsExpr*>& args) override;
     Value* getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) override;
     Value* inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
     Value* lenIR(LgsLLVMGen& cg, Value* iterable) override;
+    llvm::DIType* getDebugType(LgsLLVMGen& cg) override;
+    LgsType* clone() override;
 };

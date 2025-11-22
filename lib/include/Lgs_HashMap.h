@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 
-struct Lgs_Map {
+struct Lgs_HashMap {
     size_t valueSize;
     Lgs_TypeKind keyType;
     Lgs_TypeKind valueType;

@@ -189,19 +189,7 @@ Lgs_TypeKind LgsType::getRTTypeKind() {
     assert(0);
 }
 
-std::string LgsType::pname() {
-    return getName();
-}
-
-bool LgsType::equals(LgsType* other) {
-    return getName() == other->getName();
-}
-
 LgsType* LgsType::applyBinOp(LgsType* toType, LgsBinOp& op) {
-    assert(0);
-}
-
-llvm::DIType* LgsType::getDebugType(LgsLLVMGen& cg) {
     assert(0);
 }
 
@@ -209,9 +197,12 @@ void LgsType::hashNode(size_t& oldHash) {
     assert(0);
 }
 
-LgsType* LgsType::clone() {
-    if (isPrimitive) return this;
-    assert(0);
+std::string LgsType::pname() {
+    return getName();
+}
+
+bool LgsType::equals(LgsType* other) {
+    return getName() == other->getName();
 }
 
 Value* LgsType::addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {

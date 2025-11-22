@@ -37,6 +37,8 @@ public:
     std::string strFormatPart() const override;
     size_t sizeBytes() override;
     bool canCastTo(LgsType* other) override;
+    llvm::DIType* getDebugType(LgsLLVMGen& cg) override;
+    LgsType* clone() override;
 };
 
 inline LgsBool LGS_BOOL;

@@ -16,5 +16,6 @@ public:
     std::string pname() override;
     bool canCastTo(LgsType* other) override;
     std::string strFormatPart() const override;
+    llvm::DIType* getDebugType(LgsLLVMGen& cg) override;
     LgsSubType* clone() override;
 };

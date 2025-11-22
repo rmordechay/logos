@@ -131,3 +131,11 @@ bool LgsSize::canCastTo(LgsType* other) {
 std::string LgsSize::strFormatPart() const {
     return "%zu";
 }
+
+llvm::DIType* LgsSize::getDebugType(LgsLLVMGen& cg) {
+    assert(0);
+}
+
+LgsType* LgsSize::clone() {
+    assert(0);
+}

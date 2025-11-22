@@ -101,3 +101,11 @@ Value* LgsSet::getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) {
     LgsFunc f("get", &LGS_ANY, {this, &LGS_LONG}, BUILTIN | PUBLIC | METHOD);
     return f.callIR(cg, {iterable, index});
 }
+
+llvm::DIType* LgsSet::getDebugType(LgsLLVMGen& cg) {
+    assert(0);
+}
+
+LgsType* LgsSet::clone() {
+    assert(0);
+}

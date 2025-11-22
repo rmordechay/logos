@@ -4,7 +4,7 @@
 #include "Lgs_Stack.h"
 #include "Lgs_Types.h"
 #include <cassert>
-#include "Lgs_Map.h"
+#include "Lgs_HashMap.h"
 #include "LgsUtils.h"
 
 #include <iostream>
