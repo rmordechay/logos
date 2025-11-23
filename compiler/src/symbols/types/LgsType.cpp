@@ -185,7 +185,7 @@ LgsFunc* LgsType::getMethod(const std::string& methodName) {
     return nullptr;
 }
 
-Lgs_TypeKind LgsType::getRTTypeKind() {
+Constant* LgsType::getRTType(LgsLLVMGen& cg) {
     assert(0);
 }
 
@@ -195,6 +195,10 @@ LgsType* LgsType::applyBinOp(LgsType* toType, LgsBinOp& op) {
 
 void LgsType::hashNode(size_t& oldHash) {
     assert(0);
+}
+
+std::string LgsType::getGenericName() {
+    return getName();
 }
 
 std::string LgsType::pname() {
@@ -408,5 +412,6 @@ LgsType::~LgsType() {
 void freeType(LgsType* type) {
     if (!type) return;
     if (type->isPrimitive) return;
+    // std::cout << type->getName() << ' ' << type << '\n';
     delete type;
 }

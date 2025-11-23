@@ -21,10 +21,6 @@ LgsExpr* LgsLong::getZeroValue() {
     return new LgsIntConst(&LGS_LONG, 0);
 }
 
-Lgs_TypeKind LgsLong::getRTTypeKind() {
-    return RTT_LONG;
-}
-
 LgsType* LgsLong::applyBinOp(LgsType* toType, LgsBinOp& op) {
     return applyIntBinOp(toType, op.opType);
 }

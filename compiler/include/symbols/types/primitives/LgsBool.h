@@ -33,7 +33,6 @@ public:
     Value* orIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
     std::string getName() override;
     LgsExpr* getZeroValue() override;
-    Lgs_TypeKind getRTTypeKind() override;
     std::string strFormatPart() const override;
     size_t sizeBytes() override;
     bool canCastTo(LgsType* other) override;

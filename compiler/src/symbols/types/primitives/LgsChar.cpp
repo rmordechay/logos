@@ -26,10 +26,6 @@ LgsExpr* LgsChar::getZeroValue() {
     return new LgsCharConst('0');
 }
 
-Lgs_TypeKind LgsChar::getRTTypeKind() {
-    return RTT_CHAR;
-}
-
 std::string LgsChar::strFormatPart() const {
     return "%c";
 }

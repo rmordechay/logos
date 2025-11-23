@@ -9,7 +9,7 @@ struct LgsFuncArg {
     std::string name = "";
     LgsExpr* expr = nullptr;
     bool isSelf = false;
-    LgsFuncArg(const std::string& name, LgsExpr* expr, const bool isSelf = false) : name(name), expr(expr), isSelf(isSelf) {}
+    LgsFuncArg(LgsExpr* expr, const std::string& name = "", const bool isSelf = false) : name(name), expr(expr), isSelf(isSelf) {}
 };
 
 class LgsFuncCall final : public LgsExpr {

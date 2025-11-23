@@ -21,10 +21,6 @@ LgsExpr* LgsUInt::getZeroValue() {
     return new LgsIntConst(this, 0);
 }
 
-Lgs_TypeKind LgsUInt::getRTTypeKind() {
-    return RTT_UINT;
-}
-
 bool LgsUInt::canCastTo(LgsType* other) {
     const auto IRName = other->getName();
     if (IRName == LgsAny::name) return true;

@@ -12,10 +12,6 @@ LgsExpr* LgsSelf::getZeroValue() {
     return baseType->getZeroValue();
 }
 
-Lgs_TypeKind LgsSelf::getRTTypeKind() {
-    return baseType->getRTTypeKind();
-}
-
 std::string LgsSelf::getName() {
     return name;
 }

@@ -13,10 +13,6 @@ LgsExpr* LgsGenericParam::getZeroValue() {
     assert(0);
 }
 
-Lgs_TypeKind LgsGenericParam::getRTTypeKind() {
-    return RTT_STR;
-}
-
 std::string LgsGenericParam::getName() {
     return name;
 }

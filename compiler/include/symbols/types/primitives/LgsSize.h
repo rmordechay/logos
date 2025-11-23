@@ -13,6 +13,7 @@ public:
     Type* getIRType(LgsLLVMGen& cg) override;
     std::string getName() override;
     LgsExpr* getZeroValue() override;
+    Constant* getRTType(LgsLLVMGen& cg) override;
     LgsType* applyBinOp(LgsType* toType, LgsBinOp& op) override;
     Value* addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
     Value* subIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
@@ -32,7 +33,6 @@ public:
     Value* leIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
     Value* andIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
     Value* orIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
-    Lgs_TypeKind getRTTypeKind() override;
     bool canCastTo(LgsType* other) override;
     std::string strFormatPart() const override;
     llvm::DIType* getDebugType(LgsLLVMGen& cg) override;

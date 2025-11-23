@@ -55,6 +55,7 @@
 #include <iostream>
 #include <ranges>
 #include <unordered_set>
+#include <clang/AST/Expr.h>
 
 void castExpr(LgsExpr*& expr, LgsType* toType);
 static std::string getMissingImplementsStr(const std::vector<LgsField*>& fields, const std::vector<LgsFunc*>& methods);
@@ -732,7 +733,7 @@ void LgsSema::visitArrayExpr(LgsArrayExpr* arrayExpr) {
     if (!arrayExpr->type) {
         arrayExpr->type = new LgsDArray();
         visitDynamicArray(arrayExpr);
-    } if (arrayExpr->type->asSet()) {
+    } else if (arrayExpr->type->asSet()) {
         visitDynamicArray(arrayExpr);
     } else if (arrayExpr->type->asSArray()) {
         visitStaticArray(arrayExpr);
@@ -742,19 +743,15 @@ void LgsSema::visitArrayExpr(LgsArrayExpr* arrayExpr) {
     const auto iter = arrayExpr->type->asIterable();
     if (!iter) return;
     for (const auto element : arrayExpr->elements) {
-        if (element->type->canCastTo(iter->baseType)) continue;
+        if (iter->baseType && element->type->canCastTo(iter->baseType)) continue;
         return addError(E10001, element->location, {iter->pname(), element->type->pname()});
     }
 }
 
 void LgsSema::visitStaticArray(const LgsArrayExpr* arrayExpr) {
     const auto& initialElements = arrayExpr->elements;
-    const auto arr = arrayExpr->type->asSArray();
     for (auto element : initialElements) {
         visitExpr(element);
-    }
-    if (!arr->baseType) {
-        arr->baseType = initialElements.front()->type;
     }
 }
 
@@ -778,7 +775,7 @@ void LgsSema::visitHashMap(LgsHashMap* hashMap) {
         return addError(E10049, hashMap->location, {LgsMap::name});
     }
     const auto [key, value] = hashMap->elements.front();
-    hashMap->setType(new LgsMap(key->type, value->type));
+    hashMap->setType(new LgsMap(key->type->clone(), value->type->clone()));
 }
 
 void LgsSema::visitVectorExpr(const LgsVectorExpr* vectorExpr) {
@@ -978,7 +975,7 @@ void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent) {
 
     methodCall->parentPtr = parent;
     if (method->funcType->isMethod) {
-        methodCall->args.insert(methodCall->args.begin(), LgsFuncArg(LGS_SELF, parent, true));
+        methodCall->args.insert(methodCall->args.begin(), LgsFuncArg(parent, LGS_SELF, true));
     }
     if (!visitFuncArgs(methodCall, method->funcType)) return;
     if (methodCall->equals(method->funcType)) {

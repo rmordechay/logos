@@ -2,6 +2,8 @@
 
 #include "LgsUtils.h"
 
+#include <iostream>
+
 void LgsHashMap::castImplicitly(LgsType* toType) {
     if (!toType->asMap()) return;
     if (!type) {
@@ -18,9 +20,9 @@ std::string LgsHashMap::asText() {
 }
 
 LgsHashMap::~LgsHashMap() {
-    for (const auto initialElement : elements) {
-        freeExpr(initialElement.key);
-        freeExpr(initialElement.value);
+    for (const auto [key, value] : elements) {
+        freeExpr(key);
+        freeExpr(value);
     }
     elements.clear();
 }

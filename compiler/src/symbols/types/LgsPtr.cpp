@@ -27,10 +27,6 @@ LgsExpr* LgsPtr::getZeroValue() {
     return new LgsNull();
 }
 
-Lgs_TypeKind LgsPtr::getRTTypeKind() {
-    assert(0);
-}
-
 bool LgsPtr::canCastTo(LgsType* other) {
     const auto IRName = other->getName();
     if (IRName == LgsAny::name) return true;

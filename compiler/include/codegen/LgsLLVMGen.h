@@ -1,22 +1,46 @@
 #pragma once
 #include "Lgs_Types.h"
-#include "exprs/LgsExpr.h"
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/DIBuilder.h>
+#include <llvm/Passes/OptimizationLevel.h>
 #include <cmath>
 #include <map>
 #include <filesystem>
-#include <llvm/Passes/OptimizationLevel.h>
 
+struct LgsLocation;
 class LgsFile;
 namespace llvm {
     class PassBuilder;
     class TargetMachine;
 }
 
+using llvm::DIFile;
+using llvm::DICompileUnit;
+using llvm::DISubprogram;
+using llvm::LLVMContext;
+using llvm::Module;
+using llvm::GlobalVariable;
+using llvm::ConstantInt;
+using llvm::ConstantAggregateZero;
+using llvm::StructType;
+using llvm::Constant;
+using llvm::GlobalValue;
+using llvm::IntegerType;
+using llvm::PointerType;
+using llvm::TypeSize;
+using llvm::FunctionType;
+using llvm::Function;
+using llvm::BasicBlock;
+using llvm::UndefValue;
+using llvm::ArrayType;
+using llvm::TargetMachine;
+using llvm::raw_fd_ostream;
+using llvm::DIBasicType;
 using llvm::DIBuilder;
 using llvm::IRBuilderBase;
 using llvm::IRBuilder;
+using llvm::Type;
+using llvm::Value;
 
 struct LgsLLDBGen {
     DIFile* diFile = nullptr;
@@ -43,6 +67,8 @@ public:
     GlobalVariable* createGlobal(const std::string& name, Type* type, Constant* args, bool isConst = false, GlobalValue::LinkageTypes linkage = GlobalValue::ExternalLinkage) const;
     StructType* getStructType(const std::vector<Type*>& fields, const std::string& name = "");
     llvm::AllocaInst* getEmptyBuffer();
+    Constant* getRTTypeInfo(const std::string& name, size_t size, Lgs_TypeKind kind, Constant* extra);
+    StructType* getRTTypeInfo();
 
     // Blocks
     BasicBlock* createBlock(const std::string& name = "", Function* parent = nullptr);
@@ -68,8 +94,8 @@ public:
     Value* callStrLen(Value* str);
     void callMemSet(Value* dest, Value* src, Value* size);
     void callMemCpy(Value* dest, Value* src, Value* size);
-    Value* callAllocate(size_t size, bool isOwner, Lgs_TypeKind type);
-    Value* callAllocate(Value* size, bool isOwner, Lgs_TypeKind type);
+    Value* callAllocate(size_t size, bool isOwner, Constant* type);
+    Value* callAllocate(Value* size, bool isOwner, Constant* type);
 
     // Stack
     void callStackPush(bool hasDefers, bool needsCleanup);
@@ -77,7 +103,7 @@ public:
     void addToVTable(Value* instance, Value* key, Value* ptr);
     Value* getFromVTable(Value* instance, Value* key);
     void addNullTerminate(Value* strPtr, Value* pos);
-    void addHeap(bool isOwner, Lgs_TypeKind type, Value* ptr);
+    void addHeapVariable(bool isOwner, Constant* type, Value* ptr);
 
     // Types
     Type* i1Ty();

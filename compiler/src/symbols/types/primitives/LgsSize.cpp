@@ -116,8 +116,8 @@ Value* LgsSize::orIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
     return orInt(cg, left, right);
 }
 
-Lgs_TypeKind LgsSize::getRTTypeKind() {
-    return RTT_SIZE;
+Constant* LgsSize::getRTType(LgsLLVMGen& cg) {
+    return cg.getRTTypeInfo(getGenericName(), sizeBytes(), RTT_SIZE, cg.null());
 }
 
 bool LgsSize::canCastTo(LgsType* other) {
@@ -137,5 +137,5 @@ llvm::DIType* LgsSize::getDebugType(LgsLLVMGen& cg) {
 }
 
 LgsType* LgsSize::clone() {
-    assert(0);
+    return this;
 }

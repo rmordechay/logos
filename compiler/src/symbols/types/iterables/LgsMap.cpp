@@ -19,10 +19,17 @@ Type* LgsMap::getIRType(LgsLLVMGen& cg) {
     return IRType;
 }
 
+Constant* LgsMap::getRTType(LgsLLVMGen& cg) {
+    const auto genericName = getGenericName();
+    const auto st = cg.getStructType({cg.ptrTy(), cg.ptrTy()}, genericName);
+    const auto sv = llvm::ConstantStruct::get(st, {mapType->key->getRTType(cg), mapType->value->getRTType(cg)});
+    return cg.getRTTypeInfo(genericName, sizeBytes(), RTT_MAP, sv);
+}
+
 LgsFunc* LgsMap::getKeysFunc() {
     const auto func = methods.find(KEYS_FUNC_NAME);
     if (func != methods.end() && func->second) return func->second;
-    func->second = new LgsFunc(KEYS_FUNC_NAME, new LgsDArray(typePair->key), {this}, BUILTIN | PUBLIC | METHOD);
+    func->second = new LgsFunc(KEYS_FUNC_NAME, new LgsDArray(mapType->key), {this}, BUILTIN | PUBLIC | METHOD);
     methods[KEYS_FUNC_NAME] = func->second;
     return func->second;
 }
@@ -30,7 +37,7 @@ LgsFunc* LgsMap::getKeysFunc() {
 LgsFunc* LgsMap::getValuesFunc() {
     const auto func = methods.find(VALUES_FUNC_NAME);
     if (func != methods.end() && func->second) return func->second;
-    func->second = new LgsFunc(VALUES_FUNC_NAME, new LgsDArray(typePair->value), {this}, BUILTIN | PUBLIC | METHOD);
+    func->second = new LgsFunc(VALUES_FUNC_NAME, new LgsDArray(mapType->value), {this}, BUILTIN | PUBLIC | METHOD);
     methods[VALUES_FUNC_NAME] = func->second;
     return func->second;
 }
@@ -39,16 +46,13 @@ LgsFunc* LgsMap::getAddFunc() {
     const auto func = methods.find(ADD_FUNC_NAME);
     if (func != methods.end() && func->second) return func->second;
     func->second = new LgsFunc(ADD_FUNC_NAME, &LGS_VOID, {this, new LgsStr(), &LGS_ANY}, PUBLIC | BUILTIN | METHOD);
-    func->second->fn = [func](LgsLLVMGen& cg, const std::vector<LgsFuncArg>& args) {
+    func->second->fn = [](LgsLLVMGen& cg, const std::vector<LgsFuncArg>& args) {
         const auto key = args[1];
         const auto value = args[2];
         const auto mapPtr = args[0].expr->IRValue;
-        if (value.expr->type->asDArray()) {
-            return func->second->callIR(cg, {mapPtr, key.expr->IRValue, value.expr->IRValue});
-        }
-        const auto valurPtr = cg.builder.CreateAlloca(value.expr->type->getIRType(cg));
-        cg.builder.CreateStore(value.expr->IRValue, valurPtr);
-        return func->second->callIR(cg, {mapPtr, key.expr->IRValue, valurPtr});
+        return cg.callLgsFunc("HashMap_" + std::string(ADD_FUNC_NAME), cg.voidTy(), {cg.ptrTy(), cg.ptrTy(), cg.ptrTy()}, {
+            mapPtr, key.expr->IRValue, cg.getPtrTo(value.expr->IRValue)
+        });
     };
     methods[ADD_FUNC_NAME] = func->second;
     return func->second;
@@ -59,8 +63,8 @@ std::string LgsMap::getName() {
 }
 
 std::string LgsMap::pname() {
-    const auto keyName = typePair->key ? typePair->key->pname() : LGS_UNKNOWN_TYPE;
-    const auto valueName = typePair->value ? typePair->value->pname() : LGS_UNKNOWN_TYPE;
+    const auto keyName = mapType->key ? mapType->key->pname() : LGS_UNKNOWN_TYPE;
+    const auto valueName = mapType->value ? mapType->value->pname() : LGS_UNKNOWN_TYPE;
     return '{' + keyName + ": " + valueName + '}';
 }
 
@@ -72,16 +76,12 @@ LgsExpr* LgsMap::getZeroValue() {
     return new LgsHashMap(this);
 }
 
-Lgs_TypeKind LgsMap::getRTTypeKind() {
-    return RTT_MAP;
-}
-
 LgsType* LgsMap::getIndexType() {
-    return typePair->key;
+    return mapType->key;
 }
 
 LgsType* LgsMap::getValueType() {
-    return typePair->value;
+    return mapType->value;
 }
 
 bool LgsMap::inferBaseType(const std::vector<LgsExpr*>& args) {
@@ -90,22 +90,22 @@ bool LgsMap::inferBaseType(const std::vector<LgsExpr*>& args) {
 
 bool LgsMap::unpackLoopVarsTypes(LgsForeachLoop* loop) const {
     if (loop->loopVars.size() == 1) {
-        loop->loopVars[0]->setType(typePair->key);
+        loop->loopVars[0]->setType(mapType->key);
         return true;
     }
     if (loop->loopVars.size() == 2) {
-        loop->loopVars[0]->setType(typePair->key);
-        loop->loopVars[1]->setType(typePair->value);
+        loop->loopVars[0]->setType(mapType->key);
+        loop->loopVars[1]->setType(mapType->value);
         return true;
     }
     return false;
 }
 
 void LgsMap::unpackLoopIR(LgsLLVMGen& cg, LgsForeachLoop* loop) const {
-    const auto keyPtr = cg.callLgsFunc("Hashmap_getKeyAt", cg.ptrTy(), {cg.ptrTy(), cg.sizeTy()}, {loop->iterExpr->IRValue, loop->iValue});
+    const auto keyPtr = cg.callLgsFunc("HashMap_getKeyAt", cg.ptrTy(), {cg.ptrTy(), cg.sizeTy()}, {loop->iterExpr->IRValue, loop->iValue});
     loop->loopVars[0]->IRValue = keyPtr;
     if (loop->loopVars.size() == 2) {
-        const auto valuePtr = cg.callLgsFunc("Hashmap_getValueAt", cg.ptrTy(), {cg.ptrTy(), cg.sizeTy()}, {loop->iterExpr->IRValue, loop->iValue});
+        const auto valuePtr = cg.callLgsFunc("HashMap_getValueAt", cg.ptrTy(), {cg.ptrTy(), cg.sizeTy()}, {loop->iterExpr->IRValue, loop->iValue});
         loop->loopVars[1]->IRValue = valuePtr;
     }
 }
@@ -119,18 +119,17 @@ Value* LgsMap::inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) {
 }
 
 Value* LgsMap::getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) {
-    LgsFunc f("get", &LGS_ANY, {this, new LgsStr()}, PUBLIC | BUILTIN | METHOD);
-    return f.callIR(cg, {iterable, index});
+    return cg.callLgsFunc("HashMap_get", cg.ptrTy(), {cg.ptrTy(), cg.ptrTy()}, {iterable, index});
 }
 
 bool LgsMap::canCastTo(LgsType* other) {
     if (other->getName() == LgsAny::name) return true;
     const auto otherMap = other->asMap();
     if (!otherMap) return false;
-    const auto otherKvType = otherMap->typePair;
-    if (!typePair->key || !typePair->value) return false;
-    const auto keyEqual = typePair->key->canCastTo(otherKvType->key);
-    return keyEqual && typePair->value->canCastTo(otherKvType->value);
+    const auto otherKvType = otherMap->mapType;
+    if (!mapType->key || !mapType->value) return false;
+    const auto keyEqual = mapType->key->canCastTo(otherKvType->key);
+    return keyEqual && mapType->value->canCastTo(otherKvType->value);
 }
 
 std::string LgsMap::strFormatPart() const {
@@ -142,10 +141,5 @@ llvm::DIType* LgsMap::getDebugType(LgsLLVMGen& cg) {
 }
 
 LgsType* LgsMap::clone() {
-    return new LgsMap(typePair->key->clone(), typePair->value->clone());
-}
-
-LgsMap::~LgsMap() {
-    freeType(typePair);
-    typePair = nullptr;
+    return new LgsMap(mapType->key->clone(), mapType->value->clone());
 }

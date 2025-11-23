@@ -26,10 +26,6 @@ LgsExpr* LgsFuncType::getZeroValue() {
     assert(0);
 }
 
-Lgs_TypeKind LgsFuncType::getRTTypeKind() {
-    assert(0);
-}
-
 size_t LgsFuncType::sizeBytes() {
     return sizeof(void*);
 }
@@ -38,7 +34,7 @@ std::string LgsFuncType::getName() {
     if (IRName != "") return IRName;
     std::stringstream strStream;
     if (!isExternal) {
-        if (isBuiltin) strStream << LGS_NAME_PREFIX;
+        if (isBuiltin) strStream << LGS_RUNTIME_PREFIX;
         else strStream << "u_";
     }
     if (parentName != "") strStream << parentName << "_";

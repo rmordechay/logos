@@ -3,6 +3,11 @@
 #include "files/LgsFile.h"
 #include "logos/LgsStack.h"
 
+class LgsJson;
+class LgsNull;
+class LgsMatrixExpr;
+class LgsEnvVar;
+class LgsNullableExpr;
 struct LgsPaths;
 class LgsTernaryExpr;
 class LgsMainFunc;
@@ -65,7 +70,6 @@ public:
     LgsGlobals& globals;
     LgsAppConfigs& appConfigs;
     Function* currentIRFunc = nullptr;
-    GlobalVariable* g = nullptr;
     static std::atomic<size_t> lambdasIDGenerator;
 
     explicit LgsCodeGen(LgsFile& file, LgsAppConfigs& appConfigs, LgsGlobals& globals, LgsPaths& paths)
@@ -112,10 +116,13 @@ public:
     void visitConstant(LgsExpr* expr);
     void visitFloatConst(LgsFloatConst* floatConst) const;
     void visitArrayExpr(LgsArrayExpr* array);
+    void visitDynamicArray(LgsArrayExpr* arrayExpr);
     void visitHashMap(LgsHashMap* hashMap);
-    void visitEnvVar(LgsEnvVar* envVar) const;
+    void visitSetExpr(LgsArrayExpr* arrayExpr);
     void visitVectorExpr(LgsVectorExpr* vectorExpr);
     void visitMatrixExpr(LgsMatrixExpr* matrixExpr);
+    void visitStaticArray(LgsArrayExpr* arrayExpr);
+    void visitEnvVar(LgsEnvVar* envVar) const;
     void visitVariable(LgsVariable* variable);
     void visitSelection(LgsSelection* selection, bool assign = false);
     void visitFieldSelection(LgsVariable* var, LgsExpr* parent, bool assign) const;
@@ -139,17 +146,13 @@ public:
     void yield() const;
 
     // Iterables
-    void setStaticArray(LgsArrayExpr* arrayExpr);
-    void setNestedSArr(const LgsArrayExpr* arrayExpr, Type* parentType, Value* parentValue, const std::vector<Value*>& indices);
-    void setDynamicArray(LgsArrayExpr* arrayExpr);
-    void setSetExpr(LgsArrayExpr* arrayExpr);
+    void setSArrElements(const LgsArrayExpr* arrayExpr);
     void createMapFunc(LgsFunc* func);
     void createFilterFunc(LgsFunc* func);
 
     bool checkMock(LgsExpr* expr);
     Value* getIRValue(LgsValue* value);
     void setNullableValue(LgsExpr* expr);
-    bool allArgsAreConst(const std::vector<LgsExpr*>& args);
     void addVirtuals(LgsObject* obj, Value* ptr) const;
     bool writeIRModule() const;
 };

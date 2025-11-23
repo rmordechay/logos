@@ -96,11 +96,11 @@ public:
     LgsIOPair* parseIOPair();
 
     // Types
+    LgsType* parseType();
     LgsEnum* parseEnum();
     LgsSubType* parseSubtype();
     LgsFuncType* parseFuncType();
     LgsMap* parseMapType();
-    LgsType* parseType();
     LgsGenericParam* parseGenericType();
     std::vector<LgsType*> parseGenericArgs();
 
@@ -138,12 +138,12 @@ public:
     LgsVariable* parseVariable();
     LgsInstance* parseInstance();
     LgsFuncCall* parseFuncCall();
-    LgsVectorExpr* parseVectorExpr();
-    LgsMatrixExpr* parseMatrixExpr();
     LgsStrConst* parseStrConst();
     LgsMetaVar* parseLoopMetaVar();
     LgsExpr* parseConstant();
     LgsArrayExpr* parseArrayExpr();
+    LgsVectorExpr* parseVectorExpr();
+    LgsMatrixExpr* parseMatrixExpr();
     LgsHashMap* parseHashMap();
     LgsFunc* parseLambda();
     LgsExpr* parsePrefixExpr();
@@ -151,6 +151,8 @@ public:
     LgsIterIndex* parseIterIndex(LgsExpr* baseExpr);
     LgsPostfixExpr* parsePostfixExpr(LgsExpr* baseExpr);
     LgsSelection* parseSelection(LgsExpr* firstExpr);
+
+    // JSON
     LgsJson* parseJson();
     LgsJsonObject* parseJsonObject();
     LgsJsonArray* parseJsonArray();

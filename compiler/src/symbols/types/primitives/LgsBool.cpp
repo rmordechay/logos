@@ -105,10 +105,6 @@ LgsExpr* LgsBool::getZeroValue() {
     return new LgsIntConst(&LGS_BOOL, false);
 }
 
-Lgs_TypeKind LgsBool::getRTTypeKind() {
-    return RTT_BOOL;
-}
-
 std::string LgsBool::strFormatPart() const {
     return "%s";
 }

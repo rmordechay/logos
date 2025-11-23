@@ -76,13 +76,14 @@ public:
     virtual LgsExpr* getZeroValue() = 0;
     virtual Type* getIRType(LgsLLVMGen& cg) = 0;
     virtual bool canCastTo(LgsType* other) = 0;
-    virtual Lgs_TypeKind getRTTypeKind() = 0;
+    virtual Constant* getRTType(LgsLLVMGen& cg);
     virtual std::string strFormatPart() const = 0;
     virtual llvm::DIType* getDebugType(LgsLLVMGen& cg) = 0;
     virtual LgsType* applyBinOp(LgsType* toType, LgsBinOp& op);
     virtual void hashNode(size_t& oldHash);
     virtual LgsType* clone() = 0;
     virtual std::string getName() = 0;
+    virtual std::string getGenericName();
     virtual std::string pname(); // pretty name
     virtual bool equals(LgsType* other);
 

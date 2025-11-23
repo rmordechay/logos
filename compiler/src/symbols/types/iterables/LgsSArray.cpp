@@ -5,6 +5,7 @@
 #include "types/LgsAny.h"
 #include "types/primitives/LgsBool.h"
 #include "LgsUtils.h"
+#include "lgsc/LgsCLang.h"
 
 Type* LgsSArray::getIRType(LgsLLVMGen& cg) {
     if (IRType) return IRType;
@@ -16,6 +17,16 @@ Type* LgsSArray::getIRType(LgsLLVMGen& cg) {
         IRType = cg.ptrTy();
     }
     return IRType;
+}
+
+Constant* LgsSArray::getRTType(LgsLLVMGen& cg) {
+    const auto genericName = getGenericName();
+    const auto st = cg.getStructType({cg.sizeTy(), cg.ptrTy()}, genericName);
+    const auto constSize = size->getConstInt();
+    if (!constSize) return nullptr;
+    const auto sArrSize = cg.usize(*constSize);
+    const auto sv = llvm::ConstantStruct::get(st, {sArrSize, baseType->getRTType(cg)});
+    return cg.getRTTypeInfo(genericName, sizeBytes(), RTT_SARRAY, sv);
 }
 
 std::string LgsSArray::getName() {
@@ -36,11 +47,6 @@ size_t LgsSArray::sizeBytes() {
 LgsExpr* LgsSArray::getZeroValue() {
     assert(isStatic);
     return new LgsArrayExpr(this);
-}
-
-Lgs_TypeKind LgsSArray::getRTTypeKind() {
-    if (baseType->asChar()) return RTT_STR;
-    return RTT_SARRAY;
 }
 
 std::string LgsSArray::strFormatPart() const {

@@ -1,9 +1,6 @@
 #include "codegen/LgsLinker.h"
 #include "codegen/LgsLLVMGen.h"
 #include "logos/LgsAppConfigs.h"
-#include "llvm/Bitcode/BitcodeWriter.h"
-
-#include <iostream>
 #include <llvm/Support/FileSystem.h>
 
 #define LINK_CMD_STRING "clang %s -L%s -llgs %s -Wl,-rpath,%s %s -o %s"

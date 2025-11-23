@@ -10,12 +10,13 @@ extern "C" size_t Lgs_hash(const char* s) {
     return std::hash<std::string_view>{}(s);
 }
 
-extern "C" void Lgs_HashMap_init(Lgs_HashMap* map, const size_t valueSize, const Lgs_TypeKind keyType, const Lgs_TypeKind valueType) {
-    assert(keyType != RTT_UNKNOWN && valueType != RTT_UNKNOWN);
+extern "C" void Lgs_HashMap_init(Lgs_HashMap* map, Lgs_TypeInfo* keyType, Lgs_TypeInfo* valueType) {
+    assert(keyType->kind != RTT_UNKNOWN && valueType->kind != RTT_UNKNOWN);
+    const auto valueSize = valueType->size;
     if (!map || valueSize == 0 || valueSize > 4096) std::exit(1);
     map->valueSize = valueSize;
-    map->keyType = keyType;
-    map->valueType = valueType;
+    map->mapType.keyType = keyType;
+    map->mapType.valueType = valueType;
     map->data = new std::unordered_map<std::string, std::vector<char>>();
 }
 
@@ -71,7 +72,7 @@ extern "C" void* Lgs_HashMap_getValueAt(const Lgs_HashMap* map, const size_t ind
 extern "C" Lgs_DArrayExpr* Lgs_HashMap_keys(const Lgs_HashMap* map) {
     if (!map) return nullptr;
     const auto arr = new Lgs_DArrayExpr();
-    Lgs_DArrayExpr_init(arr, sizeof(char*), map->keyType);
+    Lgs_DArrayExpr_init(arr, map->mapType.keyType);
     for (const auto& [k, v] : *map->data) {
         const auto keyStr = strdup(k.c_str());
         Lgs_DArrayExpr_add(arr, keyStr);
@@ -82,7 +83,7 @@ extern "C" Lgs_DArrayExpr* Lgs_HashMap_keys(const Lgs_HashMap* map) {
 extern "C" Lgs_DArrayExpr* Lgs_HashMap_values(const Lgs_HashMap* map) {
     if (!map) return nullptr;
     const auto arr = new Lgs_DArrayExpr();
-    Lgs_DArrayExpr_init(arr, map->valueSize, map->valueType);
+    Lgs_DArrayExpr_init(arr, map->mapType.valueType);
     for (const auto& [k, v] : *map->data) {
         Lgs_DArrayExpr_add(arr, v.data());
     }

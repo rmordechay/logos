@@ -24,7 +24,6 @@ public:
     Value* lshiftIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* other) override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
-    Lgs_TypeKind getRTTypeKind() override;
     std::string getName() override;
     bool canCastTo(LgsType* other) override;
     std::string strFormatPart() const override;

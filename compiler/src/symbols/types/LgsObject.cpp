@@ -75,8 +75,19 @@ LgsExpr* LgsObject::getZeroValue() {
     return new LgsInstance(clone());
 }
 
-Lgs_TypeKind LgsObject::getRTTypeKind() {
-    return RTT_OBJECT;
+Constant* LgsObject::getRTType(LgsLLVMGen& cg) {
+    std::vector<Constant*> fieldRTTs;
+    fieldRTTs.reserve(fields.size());
+    for (const auto fields : fields) {
+        fieldRTTs.push_back(fields->type->getRTType(cg));
+    }
+    const auto fieldsArrType = ArrayType::get(cg.getRTTypeInfo(), fields.size());
+    const auto globalArr = cg.createGlobal("", fieldsArrType, llvm::ConstantArray::get(fieldsArrType, fieldRTTs));
+    const auto ptr = llvm::ConstantExpr::getBitCast(globalArr, cg.ptrTy());
+    const auto genericName = getGenericName();
+    const auto st = cg.getStructType({cg.sizeTy(), cg.ptrTy()}, genericName);
+    const auto sv = llvm::ConstantStruct::get(st, {cg.usize(fields.size()), ptr});
+    return cg.getRTTypeInfo(genericName, sizeBytes(), RTT_OBJECT, sv);
 }
 
 bool LgsObject::canCastTo(LgsType* other) {

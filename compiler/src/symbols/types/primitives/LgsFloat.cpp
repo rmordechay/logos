@@ -28,8 +28,8 @@ LgsExpr* LgsFloat::getZeroValue() {
     return new LgsFloatConst(this, 0.0);
 }
 
-Lgs_TypeKind LgsFloat::getRTTypeKind() {
-    return RTT_FLOAT;
+Constant* LgsFloat::getRTType(LgsLLVMGen& cg) {
+    return cg.getRTTypeInfo(getGenericName(), sizeBytes(), RTT_FLOAT, cg.null());
 }
 
 size_t LgsFloat::sizeBytes() {

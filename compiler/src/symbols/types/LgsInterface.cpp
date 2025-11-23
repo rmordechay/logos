@@ -21,10 +21,6 @@ LgsExpr* LgsInterface::getZeroValue() {
     assert(0);
 }
 
-Lgs_TypeKind LgsInterface::getRTTypeKind() {
-    return LgsObject::getRTTypeKind();
-}
-
 bool LgsInterface::canCastTo(LgsType* other) {
     if (const auto interface = other->asInterface()) {
         if (interface->name == getName()) return true;

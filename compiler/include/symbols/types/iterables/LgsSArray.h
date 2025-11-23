@@ -14,7 +14,7 @@ public:
     std::string pname() override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
-    Lgs_TypeKind getRTTypeKind() override;
+    Constant* getRTType(LgsLLVMGen& cg) override;
     std::string strFormatPart() const override;
     LgsType* applyBinOp(LgsType* toType, LgsBinOp& op) override;
     bool inferBaseType(const std::vector<LgsExpr*>& args) override;

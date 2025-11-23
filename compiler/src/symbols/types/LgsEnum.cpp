@@ -7,10 +7,6 @@ LgsExpr* LgsEnum::getZeroValue() {
     return nullptr;
 }
 
-Lgs_TypeKind LgsEnum::getRTTypeKind() {
-    return RTT_ENUM;
-}
-
 Type* LgsEnum::getIRType(LgsLLVMGen& cg) {
     if (const auto expr = fields.front()->expr) {
         return cg.getStructType({cg.sizeTy(), expr->type->getIRType(cg)});

@@ -24,8 +24,8 @@ LgsExpr* LgsStr::getZeroValue() {
     return new LgsStrConst("");
 }
 
-Lgs_TypeKind LgsStr::getRTTypeKind() {
-    return RTT_STR;
+Constant* LgsStr::getRTType(LgsLLVMGen& cg) {
+    return cg.getRTTypeInfo(getGenericName(), sizeBytes(), RTT_STR, cg.null());
 }
 
 bool LgsStr::canCastTo(LgsType* other) {
@@ -110,7 +110,7 @@ Value* LgsStr::addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
     const auto otherSize = lenIR(cg, buffer);
     const auto totalSize = cg.builder.CreateAdd(selfSize, otherSize);
     const auto newStrSize = cg.builder.CreateAdd(totalSize, cg.i64(1));
-    const auto newStrPtr = cg.callAllocate(newStrSize, true, getRTTypeKind());
+    const auto newStrPtr = cg.callAllocate(newStrSize, true, getRTType(cg));
 
     cg.callMemCpy(newStrPtr, left->IRValue, selfSize);
     const auto dstPtr = cg.builder.CreateInBoundsGEP(cg.i8Ty(), newStrPtr, selfSize);

@@ -1,8 +1,9 @@
 #pragma once
-#include <stdint.h>
+#include <unordered_map>
+
+struct Lgs_TypeInfo;
 
 enum Lgs_TypeKind {
-    RTT_UNKNOWN,
     RTT_VOID,
     RTT_BOOL,
     RTT_CHAR,
@@ -31,13 +32,63 @@ enum Lgs_TypeKind {
     RTT_TYPE,
     RTT_ANY,
     RTT_NULLABLE,
+    RTT_UNKNOWN,
 };
 
-struct Lgs_BaseType {
-    Lgs_TypeKind kind;
-    const void* extra;
+struct Lgs_Object {
+    size_t fieldsCount;
+    Lgs_TypeInfo** baseType;
 };
 
-struct Lgs_SArr {
+struct Lgs_SArray {
+    size_t len;
+    Lgs_TypeInfo* baseType;
+};
+
+struct Lgs_DArray {
+    Lgs_TypeInfo* baseType;
+};
+
+struct Lgs_Map {
+    Lgs_TypeInfo* keyType;
+    Lgs_TypeInfo* valueType;
+};
+
+struct Lgs_Vec2 {
+    Lgs_TypeInfo* baseType;
+};
+
+struct Lgs_Vec3 {
+    Lgs_TypeInfo* baseType;
+};
+
+struct Lgs_Vec4 {
+    Lgs_TypeInfo* baseType;
+};
+
+struct Lgs_Matrix {
+    size_t rows;
+    size_t columns;
+    Lgs_TypeInfo* baseType;
+};
+
+struct Lgs_Nullable {
+    Lgs_TypeInfo* baseType;
+};
+
+struct Lgs_TypeInfo {
+    size_t size;
     Lgs_TypeKind kind;
+    union {
+        Lgs_Object obj;
+        Lgs_SArray sArray;
+        Lgs_DArray dArray;
+        Lgs_Map map;
+        Lgs_Vec2 vec2;
+        Lgs_Vec3 vec3;
+        Lgs_Vec4 vec4;
+        Lgs_Matrix matrix;
+        Lgs_Nullable nullable;
+        void* dummy; // used for types that don't need extra information.
+    };
 };

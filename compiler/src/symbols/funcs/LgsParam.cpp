@@ -25,8 +25,8 @@ LgsParam* LgsParam::clone() {
 }
 
 void freeParams(std::vector<LgsParam>& params) {
-    for (size_t i = 0; i < params.size(); ++i) {
-        const auto param = params[i];
+    for (const auto& param : params) {
+        if (param.isSelf) continue;
         if (param.expr) {
             freeExpr(param.expr);
         } else if (param.type) {

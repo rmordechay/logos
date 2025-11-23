@@ -50,12 +50,12 @@ extern "C" void Lgs_Runtime_callDefers() {
     runtime.stack.callDefers();
 }
 
-extern "C" void Lgs_Runtime_addOwner(void* ptr, const Lgs_TypeKind type) {
-    runtime.stack.addOwner(ptr, type);
+extern "C" void Lgs_Runtime_addOwner(void* ptr, const Lgs_TypeInfo* type) {
+    runtime.stack.addOwner(ptr, type->kind);
 }
 
-extern "C" void Lgs_Runtime_addOrphan(void* ptr, const Lgs_TypeKind type) {
-    runtime.stack.addOrphan(ptr, type);
+extern "C" void Lgs_Runtime_addOrphan(void* ptr, const Lgs_TypeInfo* type) {
+    runtime.stack.addOrphan(ptr, type->kind);
 }
 
 extern "C" void Lgs_Runtime_removeOwner(const void* owner) {

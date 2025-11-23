@@ -29,12 +29,15 @@ Type* LgsNullable::getIRType(LgsLLVMGen& cg) {
     return cg.getStructType({baseType->getIRType(cg), cg.i1Ty()}, "nullable_" + baseType->getName());
 }
 
-LgsExpr* LgsNullable::getZeroValue() {
-    return new LgsNull();
+Constant* LgsNullable::getRTType(LgsLLVMGen& cg) {
+    const auto genericName = getGenericName();
+    const auto st = cg.getStructType({cg.ptrTy()}, genericName);
+    const auto sv = llvm::ConstantStruct::get(st, {baseType->getRTType(cg)});
+    return cg.getRTTypeInfo(genericName, sizeBytes(), RTT_NULLABLE, sv);
 }
 
-Lgs_TypeKind LgsNullable::getRTTypeKind() {
-    return RTT_NULLABLE;
+LgsExpr* LgsNullable::getZeroValue() {
+    return new LgsNull();
 }
 
 std::string LgsNullable::getName() {

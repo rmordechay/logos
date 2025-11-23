@@ -48,6 +48,9 @@ void LgsFunc::initFunc(const std::string& name, LgsType* rt, const std::vector<L
         funcType->params.push_back(param);
     }
     setType(funcType);
+    if (funcType->isMethod) {
+        funcType->params.front().isSelf = true;
+    }
 }
 
 Value* LgsFunc::call(LgsLLVMGen& cg, std::vector<LgsFuncArg>& args) {

@@ -19,10 +19,6 @@ LgsExpr* LgsULong::getZeroValue() {
     return new LgsIntConst(this, 0);
 }
 
-Lgs_TypeKind LgsULong::getRTTypeKind() {
-    return RTT_ULONG;
-}
-
 bool LgsULong::canCastTo(LgsType* other) {
     const auto IRName = other->getName();
     if (IRName == LgsAny::name) return true;

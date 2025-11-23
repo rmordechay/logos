@@ -106,6 +106,17 @@ llvm::AllocaInst* LgsLLVMGen::getEmptyBuffer() {
     return builder.CreateAlloca(ArrayType::get(i8Ty(), STRING_BUFFER_SIZE));
 }
 
+Constant* LgsLLVMGen::getRTTypeInfo(const std::string& name, const size_t size, const Lgs_TypeKind kind, Constant* extra) {
+    const auto typeInfo = getRTTypeInfo();
+    const auto v = llvm::ConstantStruct::get(typeInfo, {usize(size), usize(kind), extra});
+    return createGlobal("TypeInfo" + name, typeInfo, v);
+}
+
+StructType* LgsLLVMGen::getRTTypeInfo() {
+    const auto typeInfoMatrix = getStructType({sizeTy(), sizeTy(), sizeTy(), ptrTy()}, "Matrix");
+    return getStructType({i32Ty(), ptrTy(), typeInfoMatrix}, "TypeInfo");
+}
+
 BasicBlock* LgsLLVMGen::createBlock(const std::string& name, Function* parent) {
     return BasicBlock::Create(context, name, parent);
 }
@@ -161,18 +172,18 @@ Value* LgsLLVMGen::callIntrinsics(const llvm::Intrinsic::ID intrinsicID, const s
 }
 
 Value* LgsLLVMGen::callLgsFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes, const std::vector<Value*>& args) {
-    return callFunc(LGS_NAME_PREFIX + funcName, rt, paramTypes, args);
+    return callFunc(LGS_RUNTIME_PREFIX + funcName, rt, paramTypes, args);
 }
 
 Value* LgsLLVMGen::callRuntimeFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes, const std::vector<Value*>& args) {
     if (debugger.diBuilder) {
         const auto savedDbg = builder.getCurrentDebugLocation();
         builder.SetCurrentDebugLocation(llvm::DebugLoc());
-        const auto v = callFunc(LGS_RUNTIME_PREFIX + funcName, rt, paramTypes, args);
+        const auto v = callFunc(LGS_RUNTIME_PREFIX"Runtime_" + funcName, rt, paramTypes, args);
         builder.SetCurrentDebugLocation(savedDbg);
         return v;
     }
-    return callFunc(LGS_RUNTIME_PREFIX + funcName, rt, paramTypes, args);
+    return callFunc(LGS_RUNTIME_PREFIX"Runtime_" + funcName, rt, paramTypes, args);
 }
 
 Value* LgsLLVMGen::callHash(Value* arg) {
@@ -205,15 +216,14 @@ void LgsLLVMGen::callMemCpy(Value* dest, Value* src, Value* size) {
     builder.CreateMemCpy(dest, llvm::MaybeAlign(), src, llvm::MaybeAlign(), size);
 }
 
-Value* LgsLLVMGen::callAllocate(Value* size, const bool isOwner, const Lgs_TypeKind type) {
-    assert(type != RTT_UNKNOWN);
-    const auto ptr = callRuntimeFunc("allocate", ptrTy(), {sizeTy()}, {size});
-    addHeap(isOwner, type, ptr);
-    return ptr;
+Value* LgsLLVMGen::callAllocate(const size_t size, const bool isOwner, Constant* type) {
+    return callAllocate(usize(size), isOwner, type);
 }
 
-Value* LgsLLVMGen::callAllocate(const size_t size, const bool isOwner, const Lgs_TypeKind type) {
-    return callAllocate(usize(size), isOwner, type);
+Value* LgsLLVMGen::callAllocate(Value* size, const bool isOwner, Constant* type) {
+    const auto ptr = callRuntimeFunc("allocate", ptrTy(), {sizeTy()}, {size});
+    addHeapVariable(isOwner, type, ptr);
+    return ptr;
 }
 
 void LgsLLVMGen::callStackPush(const bool hasDefers, const bool needsCleanup) {
@@ -238,9 +248,9 @@ void LgsLLVMGen::addNullTerminate(Value* strPtr, Value* pos) {
     builder.CreateStore(i8Zero(), builder.CreateGEP(i8Ty(), strPtr, pos));
 }
 
-void LgsLLVMGen::addHeap(const bool isOwner, const Lgs_TypeKind type, Value* ptr) {
-    if (isOwner) callRuntimeFunc("addOwner", voidTy(), {ptrTy(), i32Ty()}, {ptr, i32(type)});
-    else callRuntimeFunc("addOrphan", voidTy(), {ptrTy(), i32Ty()}, {ptr, i32(type)});
+void LgsLLVMGen::addHeapVariable(const bool isOwner, Constant* type, Value* ptr) {
+    // if (isOwner) callRuntimeFunc("addOwner", voidTy(), {ptrTy(), ptrTy()}, {ptr, type});
+    // else callRuntimeFunc("addOrphan", voidTy(), {ptrTy(), ptrTy()}, {ptr, type});
 }
 
 Type* LgsLLVMGen::i1Ty() {

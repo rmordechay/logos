@@ -6,10 +6,6 @@ Type* LgsTypePair::getIRType(LgsLLVMGen& cg) {
     assert(0);
 }
 
-Lgs_TypeKind LgsTypePair::getRTTypeKind() {
-    assert(0);
-}
-
 LgsExpr* LgsTypePair::getZeroValue() {
     assert(false);
 }
@@ -19,7 +15,7 @@ size_t LgsTypePair::sizeBytes() {
 }
 
 std::string LgsTypePair::getName() {
-    return name;
+    return name + key->pname() + value->pname();
 }
 
 std::string LgsTypePair::pname() {

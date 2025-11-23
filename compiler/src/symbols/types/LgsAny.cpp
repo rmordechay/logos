@@ -17,10 +17,6 @@ LgsExpr* LgsAny::getZeroValue() {
     assert(0);
 }
 
-Lgs_TypeKind LgsAny::getRTTypeKind() {
-    return RTT_ANY;
-}
-
 std::string LgsAny::strFormatPart() const {
     return "%p";
 }

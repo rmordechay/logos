@@ -9,7 +9,7 @@ Type* LgsMatrix::getIRType(LgsLLVMGen& cg) {
 }
 
 size_t LgsMatrix::sizeBytes() {
-    assert(0);
+    return rows * columns * baseType->sizeBytes();
 }
 
 LgsType* LgsMatrix::applyBinOp(LgsType* toType, LgsBinOp& op) {
@@ -62,7 +62,7 @@ Value* LgsMatrix::mulIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
     const auto leftMat = left->type->asMatrix();
     const auto rightMat = right->type->asMatrix();
     const auto order = cg.i32(CblasRowMajor);
-    const auto transpose = cg.i32(CblasNoTrans);
+    const auto noTranspose = cg.i32(CblasNoTrans);
     const auto M = cg.i32(leftMat->rows);
     const auto N = cg.i32(rightMat->columns);
     const auto K = cg.i32(leftMat->columns);
@@ -88,7 +88,7 @@ Value* LgsMatrix::mulIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
         cg.i32Ty(),
     });
     const std::vector<Value*> args = {
-        order, transpose, transpose, M, N, K, alpha, A, K, B, N, beta, results, N
+        order, noTranspose, noTranspose, M, N, K, alpha, A, K, B, N, beta, results, N
     };
     cg.builder.CreateCall(cg.getFunc("cblas_sgemm", ft), args);
     return results;
@@ -98,8 +98,11 @@ LgsExpr* LgsMatrix::getZeroValue() {
     return new LgsMatrixExpr(rows, columns);
 }
 
-Lgs_TypeKind LgsMatrix::getRTTypeKind() {
-    return RTT_MATRIX;
+Constant* LgsMatrix::getRTType(LgsLLVMGen& cg) {
+    const auto genericName = getGenericName();
+    const auto st = cg.getStructType({cg.sizeTy(), cg.sizeTy(), cg.ptrTy()}, genericName);
+    const auto sv = llvm::ConstantStruct::get(st, {cg.usize(rows), cg.usize(columns), baseType->getRTType(cg)});
+    return cg.getRTTypeInfo(genericName, sizeBytes(), RTT_MATRIX, sv);
 }
 
 std::string LgsMatrix::getName() {
@@ -113,7 +116,7 @@ bool LgsMatrix::canCastTo(LgsType* other) {
 }
 
 std::string LgsMatrix::strFormatPart() const {
-    assert(0);
+    return "%s";
 }
 
 bool LgsMatrix::inferBaseType(const std::vector<LgsExpr*>& args) {

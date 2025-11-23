@@ -25,6 +25,22 @@ Type* LgsVec::getIRType(LgsLLVMGen& cg) {
     return IRType;
 }
 
+Constant* LgsVec::getRTType(LgsLLVMGen& cg) {
+    const auto genericName = getGenericName();
+    const auto st = cg.getStructType({cg.ptrTy()}, genericName);
+    const auto sv = llvm::ConstantStruct::get(st, {baseType->getRTType(cg)});
+    if (vectorDim == 2) {
+        return cg.getRTTypeInfo(genericName, sizeBytes(), RTT_VEC2, sv);
+    }
+    if (vectorDim == 3) {
+        return cg.getRTTypeInfo(genericName, sizeBytes(), RTT_VEC3, sv);
+    }
+    if (vectorDim == 4) {
+        return cg.getRTTypeInfo(genericName, sizeBytes(), RTT_VEC4, sv);
+    }
+    assert(0);
+}
+
 std::string LgsVec::getName() {
     return baseName + std::to_string(vectorDim);
 }
@@ -35,13 +51,6 @@ size_t LgsVec::sizeBytes() {
 
 LgsExpr* LgsVec::getZeroValue() {
     return new LgsVectorExpr(this);
-}
-
-Lgs_TypeKind LgsVec::getRTTypeKind() {
-    if (vectorDim == 2) return RTT_VEC2;
-    if (vectorDim == 3) return RTT_VEC3;
-    if (vectorDim == 4) return RTT_VEC4;
-    return RTT_UNKNOWN;
 }
 
 bool LgsVec::canCastTo(LgsType* other) {

@@ -21,10 +21,6 @@ LgsExpr* LgsSet::getZeroValue() {
     assert(0);
 }
 
-Lgs_TypeKind LgsSet::getRTTypeKind() {
-    return RTT_SET;
-}
-
 std::string LgsSet::getName() {
     return name;
 }

@@ -133,7 +133,7 @@ LgsFuncCall* LgsFuncCall::clone() {
     const auto newFuncCall = new LgsFuncCall(*this);
     newFuncCall->args.clear();
     for (const auto& arg : args) {
-        newFuncCall->args.emplace_back(LgsFuncArg(arg.name, arg.expr->clone()));
+        newFuncCall->args.emplace_back(LgsFuncArg(arg.expr->clone(), arg.name));
     }
     if (type) newFuncCall->type = type->clone();
     return newFuncCall;

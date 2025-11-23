@@ -8,11 +8,11 @@
 class LgsMap final : public LgsIterable {
 public:
     static constexpr auto name = "Map";
-    LgsTypePair* typePair = nullptr;
+    LgsTypePair* mapType = nullptr;
 
     explicit LgsMap(LgsType* keyType = nullptr, LgsType* valueType = nullptr) {
-        typePair = new LgsTypePair(keyType, valueType);
-        baseType = typePair;
+        mapType = new LgsTypePair(keyType, valueType);
+        baseType = mapType;
         isHeapAlloc = true;
         passByRef = true;
         addEmptyMethod(KEYS_FUNC_NAME);
@@ -20,6 +20,7 @@ public:
     }
 
     Type* getIRType(LgsLLVMGen& cg) override;
+    Constant* getRTType(LgsLLVMGen& cg) override;
     LgsFunc* getKeysFunc();
     LgsFunc* getValuesFunc();
     LgsFunc* getAddFunc() override;
@@ -27,7 +28,6 @@ public:
     std::string pname() override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
-    Lgs_TypeKind getRTTypeKind() override;
     LgsType* getIndexType() override;
     LgsType* getValueType() override;
     bool inferBaseType(const std::vector<LgsExpr*>& args) override;
@@ -40,7 +40,6 @@ public:
     std::string strFormatPart() const override;
     llvm::DIType* getDebugType(LgsLLVMGen& cg) override;
     LgsType* clone() override;
-    ~LgsMap() override;
 };
 
 class LgsPair final {

@@ -10,8 +10,8 @@ public:
     LgsFunc* getMethod(const std::string& methodName) override;
     void setIRValue(LgsLLVMGen& cg, Value* nullablePtr, Value* value);
     Type* getIRType(LgsLLVMGen& cg) override;
+    Constant* getRTType(LgsLLVMGen& cg) override;
     LgsExpr* getZeroValue() override;
-    Lgs_TypeKind getRTTypeKind() override;
     std::string getName() override;
     std::string pname() override;
     bool canCastTo(LgsType* other) override;

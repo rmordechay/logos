@@ -15,6 +15,7 @@ public:
     Value* loadIR(LgsLLVMGen& cg) override;
     Value* castIR(LgsLLVMGen& cg, LgsType* toType) override;
     void castImplicitly(LgsType* toType) override;
+    void setDebugValue(LgsLLVMGen& cg) override;
     std::string asText() override;
     ~LgsArrayExpr() override;
 };

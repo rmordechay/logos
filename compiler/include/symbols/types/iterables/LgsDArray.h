@@ -15,11 +15,12 @@ public:
     LgsFunc* getMethod(const std::string& methodName) override;
     bool inferBaseType(const std::vector<LgsExpr*>& args) override;
     Type* getIRType(LgsLLVMGen& cg) override;
+    Constant* getRTType(LgsLLVMGen& cg) override;
     std::string getName() override;
+    std::string getGenericName() override;
     std::string pname() override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
-    Lgs_TypeKind getRTTypeKind() override;
     std::string strFormatPart() const override;
     LgsType* applyBinOp(LgsType* toType, LgsBinOp& op) override;
     LgsFunc* getAddFunc() override;
@@ -27,7 +28,6 @@ public:
     Value* lenIR(LgsLLVMGen& cg, Value* iterable) override;
     Value* inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
     Value* getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) override;
-    void initArr(LgsLLVMGen& cg, Value* iterable);
     bool canCastTo(LgsType* other) override;
     llvm::DIType* getDebugType(LgsLLVMGen& cg) override;
     LgsType* clone() override;

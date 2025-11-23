@@ -10,7 +10,6 @@ public:
     std::string getName() override;
     Type* getIRType(LgsLLVMGen& cg) override;
     LgsExpr* getZeroValue() override;
-    Lgs_TypeKind getRTTypeKind() override;
     bool canCastTo(LgsType* other) override;
     size_t sizeBytes() override;
     llvm::DIType* getDebugType(LgsLLVMGen& cg) override;

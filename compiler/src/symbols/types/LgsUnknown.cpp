@@ -12,10 +12,6 @@ LgsExpr* LgsUnknown::getZeroValue() {
     assert(0);
 }
 
-Lgs_TypeKind LgsUnknown::getRTTypeKind() {
-    return RTT_UNKNOWN;
-}
-
 size_t LgsUnknown::sizeBytes() {
     return 0;
 }

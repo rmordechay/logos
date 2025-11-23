@@ -105,7 +105,7 @@ inline LgsBaseMsg E10070{"Invalid scalars %s for %s.", errCodeStart++};
 inline LgsBaseMsg E10071{"break if must be inside an if statement.", errCodeStart++};
 inline LgsBaseMsg E10072{"%s has multiple methods with the same name %s.", errCodeStart++};
 inline LgsBaseMsg E10073{"Only numbers or vectors can be elements of a vector. Given: %s.", errCodeStart++};
-inline LgsBaseMsg E10074{"Vector mismatch. Vector dimension: %s. Given: %s.", errCodeStart++};
+inline LgsBaseMsg E10074{"Vector dimensions mismatch. Dimension: %s. Given: %s.", errCodeStart++};
 inline LgsBaseMsg E10075{"Expression %s already has an owner.", errCodeStart++};
 inline LgsBaseMsg E10076{"'%s' is not defined between %s and %s.", errCodeStart++}; // operation, left-expr, right-expr
 inline LgsBaseMsg E10077{"Expression %s has no owner.", errCodeStart++};

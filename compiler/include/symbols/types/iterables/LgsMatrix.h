@@ -19,7 +19,7 @@ public:
     LgsType* applyMatMatOp(const LgsMatrix* otherMat, const LgsBinOp& op) const;
     Value* mulIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
     LgsExpr* getZeroValue() override;
-    Lgs_TypeKind getRTTypeKind() override;
+    Constant* getRTType(LgsLLVMGen& cg) override;
     std::string getName() override;
     bool canCastTo(LgsType* other) override;
     std::string strFormatPart() const override;
