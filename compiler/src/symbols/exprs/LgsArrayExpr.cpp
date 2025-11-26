@@ -4,7 +4,8 @@
 #include "codegen/LgsLLVMGen.h"
 
 Value* LgsArrayExpr::loadIR(LgsLLVMGen& cg) {
-    return IRValue;
+    if (type->asDArray() || type->asSet()) return IRValue;
+    return cg.builder.CreateLoad(type->getIRType(cg), IRValue);
 }
 
 Value* LgsArrayExpr::castIR(LgsLLVMGen& cg, LgsType* toType) {
@@ -19,10 +20,10 @@ Value* LgsArrayExpr::castIR(LgsLLVMGen& cg, LgsType* toType) {
 void LgsArrayExpr::castImplicitly(LgsType* toType) {
     // Replace static and dynamic if needed
     if (!type && toType->asSArray()) {
-        setType(toType);
+        setType(toType->clone());
     } else if (type->asDArray() && (toType->asSArray() || toType->asSet())) {
         freeType(type);
-        setType(toType);
+        setType(toType->clone());
     }
 
     LgsType* otherBaseType = nullptr;
@@ -59,6 +60,16 @@ void LgsArrayExpr::setDebugValue(LgsLLVMGen& cg) {
 
 std::string LgsArrayExpr::asText() {
     return type ? type->pname() : "[]";
+}
+
+LgsExpr* LgsArrayExpr::clone() {
+    const auto newArr = new LgsArrayExpr(*this);
+    newArr->type = type->clone();
+    newArr->elements.clear();
+    for (const auto element : elements) {
+        newArr->elements.push_back(element->clone());
+    }
+    return newArr;
 }
 
 LgsArrayExpr::~LgsArrayExpr() {

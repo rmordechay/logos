@@ -4,6 +4,7 @@
 #include <execinfo.h>
 #include <dlfcn.h>
 #include <ostream>
+#include <stack>
 
 #define STACK_CAPACITY 1024
 #define LOCALS_CAPACITY 8
@@ -24,10 +25,10 @@ struct Lgs_Alloc {
 };
 
 struct Lgs_StackFrame {
-    Lgs_Alloc owners[LOCALS_CAPACITY];
-    Lgs_Alloc orphans[LOCALS_CAPACITY];
-    Lgs_ThunkFunc coros[LOCALS_CAPACITY];
-    Lgs_ThunkFunc defers[LOCALS_CAPACITY];
+    std::array<Lgs_Alloc, LOCALS_CAPACITY> owners{};
+    std::array<Lgs_Alloc, LOCALS_CAPACITY> orphans{};
+    std::array<Lgs_ThunkFunc, LOCALS_CAPACITY> coros{};
+    std::array<Lgs_ThunkFunc, LOCALS_CAPACITY> defers{};
     size_t ownersCount = 0;
     size_t orphansCount = 0;
     size_t corosCount = 0;
@@ -35,12 +36,10 @@ struct Lgs_StackFrame {
 };
 
 struct Lgs_Stack {
-    int stackIndex;
-    Lgs_StackFrame frames[STACK_CAPACITY];
+    std::stack<Lgs_StackFrame> stack;
 
-    void push();
-    void pop(bool cleanup);
     void addDefer(void* funcPtr, void* ctx);
+    void addCoro(void* funcPtr, void* ctx);
     void callDefers() const;
     void addOwner(void* ptr, Lgs_TypeKind type);
     void addOrphan(void* ptr, Lgs_TypeKind type);

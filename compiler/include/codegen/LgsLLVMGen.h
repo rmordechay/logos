@@ -98,8 +98,8 @@ public:
     Value* callAllocate(Value* size, bool isOwner, Constant* type);
 
     // Stack
-    void callStackPush(bool hasDefers, bool needsCleanup);
-    void callPopStack(bool hasDefers, bool needsCleanup = false);
+    void callStackPush();
+    void callPopStack();
     void addToVTable(Value* instance, Value* key, Value* ptr);
     Value* getFromVTable(Value* instance, Value* key);
     void addNullTerminate(Value* strPtr, Value* pos);

@@ -1,15 +1,11 @@
 #include "types/iterables/LgsIterable.h"
 #include "exprs/LgsIterIndex.h"
-#include "funcs/LgsFunc.h"
 #include "loops/LgsForeachLoop.h"
 #include "stmts/LgsVarDec.h"
-#include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsInt.h"
 #include "types/primitives/LgsSize.h"
 #include "LgsUtils.h"
-#include "types/iterables/LgsDArray.h"
 #include "types/iterables/LgsMap.h"
-#include "types/iterables/LgsSet.h"
 
 size_t LgsIterable::getDimension() const {
     size_t dim = 1;

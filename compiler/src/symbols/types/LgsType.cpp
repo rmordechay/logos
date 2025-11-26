@@ -415,9 +415,8 @@ LgsType::~LgsType() {
     fields.clear();
 }
 
-void freeType(LgsType* type) {
+void freeType(const LgsType* type) {
     if (!type) return;
     if (type->isPrimitive) return;
-    // std::cout << type->getName() << ' ' << type << '\n';
-    // delete type;
+    delete type;
 }

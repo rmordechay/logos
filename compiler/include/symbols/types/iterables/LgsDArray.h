@@ -1,5 +1,6 @@
 #pragma once
 #include "LgsIterable.h"
+#include "exprs/LgsFuncCall.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsVoid.h"
 
@@ -8,7 +9,7 @@
 class LgsDArray final : public LgsIterable {
 public:
     static constexpr auto name = "DArray";
-    LgsFunc* addFunc = new LgsFunc(ADD_FUNC_NAME, name, &LGS_VOID, {this, &LGS_ANY}, BUILTIN | PUBLIC | METHOD);
+    LgsFunc* addFunc = new LgsFunc(ADD_FUNC_NAME, name, &LGS_VOID, {this, nullptr}, BUILTIN | PUBLIC | METHOD);
     LgsFunc* reserveFunc = new LgsFunc(RESERVE_FUNC_NAME, name, &LGS_VOID, {this, &LGS_SIZE}, BUILTIN | PUBLIC | METHOD);
 
     explicit LgsDArray(LgsType* baseType = nullptr) : LgsIterable(baseType) {
@@ -16,6 +17,12 @@ public:
         isHeapAlloc = true;
         addMethod(addFunc);
         addMethod(reserveFunc);
+        addFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsFuncArg>& args) {
+            const auto arr = args.front().expr->IRValue;
+            const auto arg = args[1].expr;
+            if (arg->type->asInt()) return cg.callLgsFunc(std::string(name) + "_addInt", cg.voidTy(), {cg.ptrTy(), cg.i32Ty()}, {arr, arg->IRValue});
+            return cg.callLgsFunc(std::string(name) + "_add", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {arr, arg->IRValue});
+        };
     }
     bool inferBaseType(const std::vector<LgsExpr*>& args) override;
     Type* getIRType(LgsLLVMGen& cg) override;

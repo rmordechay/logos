@@ -138,7 +138,7 @@ public:
     virtual ~LgsType();
 };
 
-void freeType(LgsType* type);
+void freeType(const LgsType* type);
 template<typename T>
 void freeTypes(std::vector<T*>& types) {
     for (const auto type : types) {

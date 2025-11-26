@@ -9,7 +9,7 @@ struct LgsFuncArg {
     std::string name = "";
     LgsExpr* expr = nullptr;
     bool isSelf = false;
-    LgsFuncArg(LgsExpr* expr, const std::string& name = "", const bool isSelf = false) : name(name), expr(expr), isSelf(isSelf) {}
+    explicit LgsFuncArg(LgsExpr* expr, const std::string& name = "", const bool isSelf = false) : name(name), expr(expr), isSelf(isSelf) {}
 };
 
 class LgsFuncCall final : public LgsExpr {
@@ -19,8 +19,6 @@ public:
     LgsFunc* func = nullptr;
     LgsFunc* coroutine = nullptr;
     bool inSelection = false;
-    bool isCoroutine = false;
-    bool isDeferred = false;
     bool isNamed = false;
     bool isMock = false;
     LgsExpr* parentPtr = nullptr;

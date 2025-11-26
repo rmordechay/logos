@@ -5,24 +5,8 @@
 #include <cassert>
 #include "Lgs_HashMap.h"
 #include "LgsUtils.h"
-
+#include "context/Lgs_Aarch64.h"
 #include <iostream>
-
-struct VKey {
-    void* instance;
-    int32_t virtualID;
-    bool operator==(const VKey& other) const noexcept {
-        return instance == other.instance && virtualID == other.virtualID;
-    }
-};
-
-struct VKeyHash {
-    size_t operator()(const VKey& k) const noexcept {
-        const auto h1 = std::hash<void*>{}(k.instance);
-        const auto h2 = std::hash<int32_t>{}(k.virtualID);
-        return h1 ^ h2 + 0x9e3779b9 + (h1 << 6) + (h1 >> 2);
-    }
-};
 
 struct Lgs_Runtime {
     Lgs_Stack stack;
@@ -33,11 +17,11 @@ struct Lgs_Runtime {
 static inline Lgs_Runtime runtime;
 
 extern "C" void Lgs_Runtime_init() {
-    // runtime.scheduler.start();
+
 }
 
 extern "C" void Lgs_Runtime_close() {
-    // runtime.scheduler.shutdown();
+
 }
 
 extern "C" void Lgs_Runtime_addDefer(void* funcPtr, void* ctx) {
@@ -61,23 +45,19 @@ extern "C" void Lgs_Runtime_removeOwner(const void* owner) {
 }
 
 extern "C" void Lgs_Runtime_push() {
-    runtime.stack.stackIndex++;
+    runtime.stack.stack.push(Lgs_StackFrame());
 }
 
-extern "C" void Lgs_Runtime_pop(const bool cleanup) {
-    runtime.stack.pop(cleanup);
+extern "C" void Lgs_Runtime_pop() {
+    runtime.stack.stack.pop();
 }
 
 extern "C" void Lgs_Runtime_addCoro(void* funcPtr, void* ctx) {
-
+    runtime.stack.addCoro(funcPtr, ctx);
 }
 
 extern "C" void Lgs_Runtime_yield() {
-
-}
-
-extern "C" bool Lgs_Runtime_shouldYield() {
-    return false;
+    Lgs_switchContext();
 }
 
 extern "C" void* Lgs_Runtime_allocate(const size_t size) {

@@ -1,5 +1,6 @@
 #pragma once
 #include "LgsType.h"
+#include "codegen/LgsLLVMGen.h"
 #include "funcs/LgsFunc.h"
 #include "types/LgsFuncType.h"
 #include "types/primitives/LgsBool.h"
@@ -21,23 +22,19 @@ public:
     LgsType* baseType;
     LgsExpr* size = nullptr;
     bool isStatic = false;
-    LgsFunc* lenFunc;
-    LgsFunc* isEmptyFunc;
-    LgsFunc* isNotEmptyFunc;
-    LgsFunc* mapFunc;
-    LgsFunc* filterFunc;
+    LgsFunc* lenFunc = new LgsFunc("len", &LGS_SIZE, {this}, BUILTIN | PUBLIC | METHOD);
+    LgsFunc* isEmptyFunc = new LgsFunc("isEmpty", &LGS_BOOL, {this}, BUILTIN | PUBLIC | METHOD);
+    LgsFunc* isNotEmptyFunc = new LgsFunc("isNotEmpty", &LGS_BOOL, {this}, BUILTIN | PUBLIC | METHOD);
+    LgsFunc* mapFunc = new LgsFunc(MAP_FUNC_NAME, this, {this, new LgsFuncType(baseType, {LgsParam(baseType)})}, BUILTIN | PUBLIC | METHOD);
+    LgsFunc* filterFunc = new LgsFunc(FILTER_FUNC_NAME, this, {this, new LgsFuncType(&LGS_BOOL, {LgsParam(baseType)})}, BUILTIN | PUBLIC | METHOD);
 
     explicit LgsIterable(LgsType* baseType = nullptr, LgsExpr* size = nullptr) : baseType(baseType), size(size) {
-        lenFunc = new LgsFunc("len", &LGS_SIZE, {this}, BUILTIN | PUBLIC | METHOD);
-        isEmptyFunc = new LgsFunc("isEmpty", &LGS_BOOL, {this}, BUILTIN | PUBLIC | METHOD);
-        isNotEmptyFunc = new LgsFunc("isNotEmpty", &LGS_BOOL, {this}, BUILTIN | PUBLIC | METHOD);
-        mapFunc = new LgsFunc(MAP_FUNC_NAME, this, {this, new LgsFuncType(baseType, {LgsParam(baseType)})}, BUILTIN | PUBLIC | METHOD);
-        filterFunc = new LgsFunc(FILTER_FUNC_NAME, this, {this, new LgsFuncType(&LGS_BOOL, {LgsParam(baseType)})}, BUILTIN | PUBLIC | METHOD);
         addMethod(lenFunc);
         addMethod(isEmptyFunc);
         addMethod(isNotEmptyFunc);
-        addMethod(mapFunc);
-        addMethod(filterFunc);
+        // addMethod(mapFunc);
+        // addMethod(filterFunc);
+
     }
     size_t getDimension() const;
     virtual LgsType* getIndexType();

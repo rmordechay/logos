@@ -265,7 +265,7 @@ void LgsCodeGen::visitLoop(LgsForLoop* loop) {
     }
     visitStmtsBlock(loop->stmtsBlock);
     if (stack.currentFunc()->funcType->isCoroutine) {
-        yield();
+        cg.callRuntimeFunc("yield", cg.voidTy());
     }
     loop->incAndJumpToCond(cg);
     cg.startBlock(loop->IRExitBlock);
@@ -546,11 +546,11 @@ void LgsCodeGen::visitReturnStmt(LgsReturn* returnStmt) {
         const auto cleanupBlock = currentFunc->getCleanupBlock(cg);
         cg.builder.CreateBr(cleanupBlock);
     } else {
-        cg.callPopStack(currentFunc->hasDefers, currentFunc->needsCleanup());
+        cg.callPopStack();
         if (currentFunc->funcType->rt->isVoid()) {
             cg.builder.CreateRetVoid();
         } else {
-            cg.builder.CreateRet(returnStmt->IRValue);
+            cg.builder.CreateRet(returnStmt->expr->loadIR(cg));
         }
     }
 }
@@ -579,6 +579,13 @@ void LgsCodeGen::visitCoroutine(const LgsCoroutine* coroutine) {
         visitSelection(coroutine->selection);
         fc = coroutine->selection->asMethodCall();
     }
+
+    if (!cg.IRModule->getFunction(fc->coroutine->funcType->getName())) {
+        cg.savedIP = cg.builder.saveIP();
+        visitFunc(fc->coroutine);
+        cg.builder.restoreIP(cg.savedIP);
+    }
+
     Type* ctxTy = nullptr;
     Value* ctx = nullptr;
     if (fc->args.empty()) {
@@ -588,8 +595,7 @@ void LgsCodeGen::visitCoroutine(const LgsCoroutine* coroutine) {
         ctxTy = getThunkCtxType(fc);
         ctx = getThunkCtx(fc, ctxTy);
     }
-    const auto func = getThunkFunc(fc, ctxTy);
-    cg.callRuntimeFunc("addCoro", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {func, ctx});
+    cg.callRuntimeFunc("addCoro", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {getThunkFunc(fc, ctxTy), ctx});
 }
 
 void LgsCodeGen::visitDeferStmt(const LgsDeferStmt* defer) {
@@ -1024,8 +1030,8 @@ void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
         funcCall->func = new LgsFunc(type->asFuncType());
         funcCall->func->IRValue = getIRValue(value);
     }
-    assert(funcCall->func);
-    const auto func = funcCall->func;
+    assert(funcCall->func || funcCall->coroutine);
+    const auto func = funcCall->func ? funcCall->func : funcCall->coroutine;;
     const auto ft = func->funcType;
     if (ft->hasDefaults) {
         const auto diff = ft->params.size() - funcCall->args.size() - 1;
@@ -1041,12 +1047,9 @@ void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
     } else if (func->funcType->isArrFunc) {
         visitIterFunc(funcCall);
     }
-    if (!func->funcType->genericTypes.empty()) visitGenericFunc(func);
-    if (funcCall->isCoroutine || funcCall->isDeferred) return;
 
-    std::vector<LgsExpr*> args;
-    args.reserve(funcCall->args.size());
-    for (const auto& arg : funcCall->args) args.emplace_back(arg.expr);
+    if (!func->funcType->genericTypes.empty()) visitGenericFunc(func);
+    if (funcCall->coroutine || func->funcType->isDeferred) return;
     funcCall->IRValue = func->call(cg, funcCall->args);
 }
 
@@ -1192,13 +1195,13 @@ void LgsCodeGen::createPrologue(LgsFunc* func) {
     if (func->funcType->name == LGS_MAIN_FUNC) {
         cg.callRuntimeFunc("init", cg.voidTy());
     }
-    cg.callStackPush(func->hasDefers, func->needsCleanup());
+    cg.callStackPush();
 }
 
 void LgsCodeGen::createEpilogue(LgsFunc* func) {
     const auto needsCleanup = func->needsCleanup();
     if (!func->hasDefers && !needsCleanup) {
-        cg.callPopStack(false, false);
+        if (!cg.lastInstTerminator()) cg.callPopStack();
         return;
     }
     cg.branchAndStartBlock(func->getCleanupBlock(cg));
@@ -1207,18 +1210,18 @@ void LgsCodeGen::createEpilogue(LgsFunc* func) {
 
     if (needsCleanup) {
         if (func->returnStmts.empty()) {
-            cg.callPopStack(func->hasDefers, func->needsCleanup());
+            cg.callPopStack();
         } else if (func->returnStmts.size() == 1) {
             if (func->owners.size() == 1) {
                 const auto returnRef = func->returnStmts.front()->expr;
                 const auto heapExprRef = func->owners.front();
                 if (returnRef->equals(heapExprRef)) {
-                    cg.callPopStack(func->hasDefers, func->needsCleanup());
+                    cg.callPopStack();
                     cg.builder.CreateRet(getIRValue(func->returnStmts.front()));
                     return;
                 }
             }
-            cg.callPopStack(func->hasDefers, func->needsCleanup());
+            cg.callPopStack();
             cg.builder.CreateRet(getIRValue(func->returnStmts.front()));
         } else {
             llvm::PHINode *phi = nullptr;
@@ -1231,11 +1234,11 @@ void LgsCodeGen::createEpilogue(LgsFunc* func) {
                     phi->addIncoming(retVal, stmt->parentBlock);
                 }
             }
-            cg.callPopStack(func->hasDefers, func->needsCleanup());
+            cg.callPopStack();
             cg.builder.CreateRet(phi);
         }
     } else {
-        cg.callPopStack(func->hasDefers, needsCleanup);
+        cg.callPopStack();
     }
 }
 
@@ -1271,8 +1274,8 @@ Value* LgsCodeGen::getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) const {
 Function* LgsCodeGen::getThunkFunc(const LgsFuncCall* fc, Type* ctxTy) const {
     auto func = cg.IRModule->getFunction(fc->name + "_thunk");
     if (func) return func;
-
     cg.savedIP = cg.builder.saveIP();
+
     const auto ft = cg.getFT(cg.voidTy(), {cg.ptrTy()});
     func = cg.getFunc(fc->name + "_thunk", ft, Function::PrivateLinkage);
     const auto entryBlock = cg.createBlock(BLOCK_NAME_ENTRY);
@@ -1290,24 +1293,11 @@ Function* LgsCodeGen::getThunkFunc(const LgsFuncCall* fc, Type* ctxTy) const {
         }
         args.push_back(v);
     }
-
-    const auto deferFunc = fc->func->getIRFunc(cg);
-    cg.builder.CreateCall(deferFunc, args);
+    cg.builder.CreateCall(fc->func ? fc->func->getIRFunc(cg) : fc->coroutine->getIRFunc(cg), args);
     cg.builder.CreateRetVoid();
 
     cg.builder.restoreIP(cg.savedIP);
     return func;
-}
-
-void LgsCodeGen::yield() const {
-    const auto doYieldBlock = cg.createBlock("do_yield_block", currentIRFunc);
-    const auto continueBlock = cg.createBlock("continue_block", currentIRFunc);
-    const auto shouldYield = cg.callRuntimeFunc("shouldYield", cg.i1Ty());
-    cg.builder.CreateCondBr(shouldYield, doYieldBlock, continueBlock);
-    cg.builder.SetInsertPoint(doYieldBlock);
-    cg.callRuntimeFunc("yield", cg.voidTy());
-    cg.branchIfNeeded(continueBlock);
-    cg.builder.SetInsertPoint(continueBlock);
 }
 
 void LgsCodeGen::setSArrElements(const LgsArrayExpr* arrayExpr) {
@@ -1354,7 +1344,7 @@ void LgsCodeGen::createMapFunc(LgsFunc* func) {
     const auto bodyBlock = cg.createBlock();
     const auto exitBlock = cg.createBlock();
     cg.builder.SetInsertPoint(entryBlock);
-    cg.callStackPush(func->hasDefers, func->needsCleanup());
+    cg.callStackPush();
 
     const auto dArray = originalArr.type->asDArray();
     LgsArrayExpr newArr(dArray);
@@ -1386,7 +1376,7 @@ void LgsCodeGen::createMapFunc(LgsFunc* func) {
 
     // End func
     cg.startBlock(exitBlock);
-    cg.callPopStack(func->hasDefers, func->needsCleanup());
+    cg.callPopStack();
     cg.builder.CreateRet(newArr.IRValue);
 
     // Restore state
@@ -1412,7 +1402,7 @@ void LgsCodeGen::createFilterFunc(LgsFunc* func) {
     const auto trueBlock = cg.createBlock();
     const auto falseBlock = cg.createBlock();
     cg.builder.SetInsertPoint(entryBlock);
-    cg.callStackPush(func->hasDefers, func->needsCleanup());
+    cg.callStackPush();
 
     const auto dArray = originalArr.type->asDArray();
     LgsArrayExpr newArr(dArray);
@@ -1449,7 +1439,7 @@ void LgsCodeGen::createFilterFunc(LgsFunc* func) {
 
     // End func
     cg.startBlock(exitBlock);
-    cg.callPopStack(func->hasDefers, func->needsCleanup());
+    cg.callPopStack();
     cg.builder.CreateRet(newArr.IRValue);
 
     // Restore state

@@ -143,7 +143,7 @@ public:
     void addHeapExpr(LgsExpr* expr);
     void addLocalSymbol(const LgsSymbol& newSymbol);
     LgsSymbol* getSymbol(const std::string& name, const LgsLocation* location);
-    LgsFunc* createCoroutineFunc(LgsFuncCall* funcCall);
+    void createCoroutineFunc(LgsFuncCall* funcCall);
     LgsFunc* createGenericFunc(LgsFuncCall* funcCall, const LgsFunc* originalFunc);
     void addError(const LgsBaseMsg& lgsErr, const LgsLocation& location, const std::vector<std::string>& args = {});
 };

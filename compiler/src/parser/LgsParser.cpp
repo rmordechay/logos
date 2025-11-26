@@ -1180,12 +1180,10 @@ LgsCoroutine* LgsParser::parseCoroutine() {
     coroutine->location = expr->location;
     if (const auto funcCall = expr->asFuncCall()) {
         coroutine->funcCall = funcCall;
-        coroutine->funcCall->isCoroutine = true;
     } else if (const auto selection = expr->asSelection()) {
         coroutine->selection = selection;
         const auto methodCall = coroutine->selection->asMethodCall();
-        if (methodCall) methodCall->isCoroutine = true;
-        else addParsingError();
+        if (!methodCall) addParsingError();
     }
 
     return coroutine;
@@ -1212,12 +1210,10 @@ LgsDeferStmt* LgsParser::parseDeferStmt() {
     deferStmt->location = expr->location;
     if (const auto funcCall = expr->asFuncCall()) {
         deferStmt->funcCall = funcCall;
-        deferStmt->funcCall->isDeferred = true;
     } else if (const auto selection = expr->asSelection()) {
         deferStmt->selection = selection;
         const auto methodCall = deferStmt->selection->asMethodCall();
-        if (methodCall) methodCall->isDeferred = true;
-        else addParsingError();
+        if (!methodCall) addParsingError();
     }
     return deferStmt;
 }

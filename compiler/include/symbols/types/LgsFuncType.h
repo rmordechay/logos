@@ -35,6 +35,7 @@ public:
     bool isOptional = false;
     bool isMethod = false;
     bool isCoroutine = false;
+    bool isDeferred = false;
     bool isIOMember = false;
     bool isSyscall = false;
     bool isExternal = false;

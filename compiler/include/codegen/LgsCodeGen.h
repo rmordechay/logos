@@ -143,7 +143,6 @@ public:
     StructType* getThunkCtxType(const LgsFuncCall* fc) const;
     Value* getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) const;
     Function* getThunkFunc(const LgsFuncCall* fc, Type* ctxTy) const;
-    void yield() const;
 
     // Iterables
     void setSArrElements(const LgsArrayExpr* arrayExpr);

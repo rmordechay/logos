@@ -155,7 +155,6 @@ void LgsSema::visitField(LgsField* field) {
 }
 
 void LgsSema::visitFunc(LgsFunc* func) {
-    assert(!func->funcType->isCoroutine);
     const auto ft = func->funcType;
     if (!ft->genericTypes.empty()) return;
     stack.enterScope(func);
@@ -559,9 +558,9 @@ void LgsSema::visitReturnStmt(LgsReturn* returnStmt) {
     auto retExpr = returnStmt->expr;
     if (retExpr) {
         stack.currentFunc()->returnStmts.push_back(returnStmt);
-        visitExpr(retExpr);
         const auto rt = stack.currentFunc()->funcType->rt;
         castExpr(retExpr, rt);
+        visitExpr(retExpr);
         validateExprType(returnStmt->expr, rt);
     }
     const auto rt = funcType->rt;
@@ -589,7 +588,7 @@ void LgsSema::visitBreakStmt(const LgsBreak* breakStmt) {
 }
 
 void LgsSema::visitCoroutine(const LgsCoroutine* coroutine) {
-    const LgsFuncCall* fc = nullptr;
+    LgsFuncCall* fc = nullptr;
     if (coroutine->funcCall->name == "") { // Wrapped stmtsBlock
         visitStmtsBlock(coroutine->funcCall->func->stmtsBlock);
     } else if (coroutine->funcCall) {
@@ -605,12 +604,10 @@ void LgsSema::visitCoroutine(const LgsCoroutine* coroutine) {
     const auto funcName = fc->func->funcType->getName() + LGS_CORO_SUFFIX;
     const auto coro = file->symbolTable.coroutines.find(funcName);
     if (coro != file->symbolTable.coroutines.end()) {
-        coroutine->funcCall->func = coro->second;
+        coroutine->funcCall->coroutine = coro->second;
     } else {
-        const auto f = fc->func->clone();
-        f->funcType->isCoroutine = true;
-        coroutine->funcCall->func = f;
-        file->symbolTable.coroutines[funcName] = f;
+        createCoroutineFunc(fc);
+        file->symbolTable.coroutines[funcName] = fc->coroutine;
     }
 }
 
@@ -744,20 +741,25 @@ void LgsSema::visitArrayExpr(LgsArrayExpr* arrayExpr) {
 }
 
 void LgsSema::visitStaticArray(const LgsArrayExpr* arrayExpr) {
-    const auto& initialElements = arrayExpr->elements;
-    for (auto element : initialElements) {
+    const auto sArr = arrayExpr->type->asSArray();
+    const auto size = sArr->size->getConstInt();
+    if (size && *size != static_cast<int64_t>(arrayExpr->elements.size())) {
+        addError(E10105, arrayExpr->location, {std::to_string(*size)});
+    }
+    for (auto element : arrayExpr->elements) {
         visitExpr(element);
     }
 }
 
 void LgsSema::visitDynamicArray(LgsArrayExpr* arrayExpr) {
-    const auto iterable = arrayExpr->type->asIterable();
-    if (!iterable->baseType && arrayExpr->elements.empty()) {
+    const auto dArr = arrayExpr->type->asDArray();
+    if (!dArr->baseType && arrayExpr->elements.empty()) {
         return addError(E10049, arrayExpr->location, {arrayExpr->asText()});
     }
-    if (!iterable->inferBaseType(arrayExpr->elements)) {
+    if (!dArr->inferBaseType(arrayExpr->elements)) {
         return addError(E10095, arrayExpr->location);
     }
+    dArr->addFunc->funcType->params[1].type = dArr->baseType;
 }
 
 void LgsSema::visitHashMap(LgsHashMap* hashMap) {
@@ -1021,10 +1023,7 @@ void LgsSema::visitFuncCall(LgsFuncCall* funcCall) {
         funcCall->setType(genericFunc->funcType->rt);
     } else {
         funcCall->func = func;
-        funcCall->setType(ft->rt);
-    }
-    if (funcCall->isCoroutine) {
-        funcCall->coroutine = createCoroutineFunc(funcCall);
+        funcCall->setType(ft->rt->clone());
     }
 }
 
@@ -1538,15 +1537,16 @@ LgsSymbol* LgsSema::getSymbol(const std::string& name, const LgsLocation* locati
     return nullptr;
 }
 
-LgsFunc* LgsSema::createCoroutineFunc(LgsFuncCall* funcCall) {
-    const auto originalFT = funcCall->func->funcType;
-    const auto newFunc = new LgsFunc(originalFT->name, nullptr);
+void LgsSema::createCoroutineFunc(LgsFuncCall* funcCall) {
+    const auto originalFT = funcCall->func->funcType->clone();
+    const auto newFunc = new LgsFunc(originalFT);
     newFunc->location = funcCall->func->location;
     newFunc->funcType->location = originalFT->location;
+    newFunc->funcType->isCoroutine = true;
     newFunc->stmtsBlock = funcCall->func->stmtsBlock->clone();
     visitFunc(newFunc);
     funcCall->coroutine = newFunc;
-    return newFunc;
+    funcCall->func = nullptr;
 }
 
 LgsFunc* LgsSema::createGenericFunc(LgsFuncCall* funcCall, const LgsFunc* originalFunc) {

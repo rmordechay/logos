@@ -24,7 +24,7 @@ public:
         };
         cwdFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsFuncArg>&) {
             const auto value = cg.builder.CreateAlloca(ArrayType::get(cg.i8Ty(), STRING_BUFFER_SIZE));
-            // TODO os?
+            // TODO os
             cg.callFunc("getcwd", cg.ptrTy(), {cg.ptrTy(), cg.sizeTy()}, {value, cg.usize(STRING_BUFFER_SIZE)});
             return value;
         };

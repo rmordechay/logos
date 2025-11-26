@@ -81,12 +81,9 @@ Value* LgsLLVMGen::getPtrTo(Value* v) {
         }
     }
     if (v->getType()->isPointerTy()) return v;
-    if (v->getType()->isIntegerTy() || v->getType()->isFloatingPointTy() || v->getType()->isVectorTy()) {
-        const auto ptr = builder.CreateAlloca(v->getType());
-        builder.CreateStore(v, ptr);
-        return ptr;
-    }
-    assert(0);
+    const auto ptr = builder.CreateAlloca(v->getType());
+    builder.CreateStore(v, ptr);
+    return ptr;
 }
 
 GlobalVariable* LgsLLVMGen::createGlobal(const std::string& name, Type* type, Constant* args, const bool isConst, GlobalValue::LinkageTypes linkage) const {
@@ -226,14 +223,12 @@ Value* LgsLLVMGen::callAllocate(Value* size, const bool isOwner, Constant* type)
     return ptr;
 }
 
-void LgsLLVMGen::callStackPush(const bool hasDefers, const bool needsCleanup) {
-    if (!needsCleanup && !hasDefers) return;
+void LgsLLVMGen::callStackPush() {
     callRuntimeFunc("push", voidTy());
 }
 
-void LgsLLVMGen::callPopStack(const bool hasDefers, const bool needsCleanup) {
-    if (!needsCleanup && !hasDefers) return;
-    callRuntimeFunc("pop", voidTy(), {i1Ty()}, {i1(needsCleanup)});
+void LgsLLVMGen::callPopStack() {
+    callRuntimeFunc("pop", voidTy());
 }
 
 void LgsLLVMGen::addToVTable(Value* instance, Value* key, Value* ptr) {

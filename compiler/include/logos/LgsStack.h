@@ -22,19 +22,16 @@ struct LgsStackFrame {
     LgsIfStmt* ifStmt = nullptr;
 };
 
-class LgsStack final : std::stack<LgsStackFrame> {
+class LgsStack final {
 public:
+    std::stack<LgsStackFrame> stack;
+
     void enterScope(LgsValue* value);
     void exitScope();
     LgsFunc* currentFunc();
     LgsForLoop* currentLoop();
     LgsIfStmt* currentIfStmt();
     LgsIfStmt* outermostIfStmt();
-    llvm::BasicBlock* findTagExitBlock(const std::string& tag);
+    BasicBlock* findTagExitBlock(const std::string& tag);
     LgsSymbolTable& getSymbolTable();
-
-    auto begin() { return c.begin(); }
-    auto end() { return c.end(); }
-    auto rbegin() { return c.rbegin(); }
-    auto rend() { return c.rend(); }
 };

@@ -9,60 +9,46 @@ void LgsStack::enterScope(LgsValue* value) {
     if (const auto func = dynamic_cast<LgsFunc*>(value)) {
         stackFrame.func = func;
     } else if (const auto loop = dynamic_cast<LgsForLoop*>(value)) {
-        stackFrame.func = top().func;
-        stackFrame.symbolTable = top().symbolTable;
+        stackFrame.func = stack.top().func;
+        stackFrame.symbolTable = stack.top().symbolTable;
         stackFrame.loop = loop;
     } else if (const auto ifStmt = dynamic_cast<LgsIfStmt*>(value)) {
-        stackFrame.func = top().func;
-        stackFrame.symbolTable = top().symbolTable;
+        stackFrame.func = stack.top().func;
+        stackFrame.symbolTable = stack.top().symbolTable;
         stackFrame.ifStmt = ifStmt;
     } else if (dynamic_cast<LgsSwitch*>(value)) {
-        stackFrame.func = top().func;
-        stackFrame.symbolTable = top().symbolTable;
+        stackFrame.func = stack.top().func;
+        stackFrame.symbolTable = stack.top().symbolTable;
     } else {
         assert(0);
     }
-    push(stackFrame);
+    stack.push(stackFrame);
 }
 
 void LgsStack::exitScope() {
-    pop();
+    stack.pop();
 }
 
 LgsFunc* LgsStack::currentFunc() {
-    return top().func;
+    return stack.top().func;
 }
 
 LgsForLoop* LgsStack::currentLoop() {
-    for (auto it = rbegin(); it != rend(); ++it) {
-        if (it->loop) return it->loop;
-    }
-    return nullptr;
+    return stack.top().loop;
 }
 
 LgsIfStmt* LgsStack::currentIfStmt() {
-    for (auto it = rbegin(); it != rend(); ++it) {
-        if (it->ifStmt) return it->ifStmt;
-    }
-    return nullptr;
+    return stack.top().ifStmt;
 }
 
 LgsIfStmt* LgsStack::outermostIfStmt() {
-    for (auto it = begin(); it != end(); ++it) {
-        if (it->ifStmt) return it->ifStmt;
-    }
-    return nullptr;
+    assert(0);
 }
 
 BasicBlock* LgsStack::findTagExitBlock(const std::string& tag) {
-    for (auto it = begin(); it != end(); ++it) {
-        if (it->ifStmt && it->ifStmt->tag == tag) {
-            return it->ifStmt->IRExitBlock;
-        }
-    }
     assert(0);
 }
 
 LgsSymbolTable& LgsStack::getSymbolTable() {
-    return top().symbolTable;
+    return stack.top().symbolTable;
 }
