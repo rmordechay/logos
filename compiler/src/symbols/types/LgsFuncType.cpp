@@ -1,7 +1,7 @@
 #include "types/LgsFuncType.h"
 #include "LgsDefinitions.h"
 #include "codegen/LgsLLVMGen.h"
-#include "types/LgsGenericParam.h"
+#include "types/LgsGenericType.h"
 #include "LgsUtils.h"
 #include <sstream>
 
@@ -22,6 +22,10 @@ Type* LgsFuncType::getIRType(LgsLLVMGen& cg) {
     return IRType;
 }
 
+Constant* LgsFuncType::getRTType(LgsLLVMGen& cg) {
+    assert(0);
+}
+
 LgsExpr* LgsFuncType::getZeroValue() {
     assert(0);
 }
@@ -37,7 +41,9 @@ std::string LgsFuncType::getName() {
         if (isBuiltin) strStream << LGS_RUNTIME_PREFIX;
         else strStream << "u_";
     }
-    if (parentName != "") strStream << parentName << "_";
+    if (isMethod) {
+        strStream << (parentName != "" ? parentName : params.front().type->getName()) << "_";
+    }
     strStream << name;
     if (isCoroutine) strStream << LGS_CORO_SUFFIX;
     IRName = strStream.str();
@@ -138,8 +144,8 @@ LgsFuncType* LgsFuncType::clone() {
     for (const auto& param : params) {
         lgsFunc->params.push_back(LgsParam(param));
     }
-    for (const auto generic : genericParams) {
-        lgsFunc->genericParams.push_back(generic->clone());
+    for (const auto generic : genericTypes) {
+        lgsFunc->genericTypes.push_back(generic->clone());
     }
     lgsFunc->isPublic = isPublic;
     lgsFunc->isBuiltin = isBuiltin;

@@ -136,15 +136,6 @@ Value* LgsSArray::lenIR(LgsLLVMGen& cg, Value* iterable) {
     return size->IRValue;
 }
 
-LgsFunc* LgsSArray::getLenFunc() {
-    const auto lenFunc = LgsIterable::getLenFunc();
-    if (lenFunc->fn) return lenFunc;
-    lenFunc->fn = [this](LgsLLVMGen& cg, const std::vector<LgsFuncArg>&) {
-        return cg.extendToSize(size->IRValue);
-    };
-    return lenFunc;
-}
-
 bool LgsSArray::canCastTo(LgsType* other) {
     if (!baseType) return false;
     if (other->getName() == LgsAny::name) return true;

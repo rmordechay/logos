@@ -5,6 +5,10 @@ Type* LgsSubType::getIRType(LgsLLVMGen& cg) {
     return subtype->getIRType(cg);
 }
 
+Constant* LgsSubType::getRTType(LgsLLVMGen& cg) {
+    assert(0);
+}
+
 size_t LgsSubType::sizeBytes() {
     return subtype->sizeBytes();
 }

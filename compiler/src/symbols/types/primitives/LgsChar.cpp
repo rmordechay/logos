@@ -18,6 +18,10 @@ Type* LgsChar::getIRType(LgsLLVMGen& cg) {
     return cg.i8Ty();
 }
 
+Constant* LgsChar::getRTType(LgsLLVMGen& cg) {
+    return cg.getRTTypeInfo(getGenericName(), sizeBytes(), RTT_CHAR, cg.null());
+}
+
 std::string LgsChar::getName() {
     return name;
 }

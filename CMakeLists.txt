@@ -130,7 +130,7 @@ set(LGS_SOURCE
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsObject.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsSubType.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsTypePair.cpp
-    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsGenericParam.cpp
+    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsGenericType.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/iterables/LgsMap.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/iterables/LgsDArray.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/iterables/LgsSet.cpp
@@ -156,11 +156,11 @@ set(LGS_SOURCE
 set(RUNTIME_SOURCE
     ${CMAKE_SOURCE_DIR}/lib/src/Lgs_HashMap.cpp
     ${CMAKE_SOURCE_DIR}/lib/src/Lgs_DArrayExpr.cpp
+    ${CMAKE_SOURCE_DIR}/lib/src/Lgs_StrExpr.cpp
     ${CMAKE_SOURCE_DIR}/lib/src/Lgs_System.cpp
     ${CMAKE_SOURCE_DIR}/lib/src/Lgs_Runtime.cpp
     ${CMAKE_SOURCE_DIR}/lib/src/Lgs_Allocator.cpp
     ${CMAKE_SOURCE_DIR}/lib/src/Lgs_SetExpr.cpp
-    ${CMAKE_SOURCE_DIR}/lib/src/Lgs_Scheduler.cpp
     ${CMAKE_SOURCE_DIR}/lib/src/Lgs_Stack.cpp
     ${CMAKE_SOURCE_DIR}/lib/src/Lgs_Helpers.cpp
     ${CMAKE_SOURCE_DIR}/lib/src/context/Lgs_Aarch64.cpp

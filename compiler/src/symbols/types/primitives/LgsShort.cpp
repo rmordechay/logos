@@ -15,6 +15,10 @@ Type* LgsShort::getIRType(LgsLLVMGen& cg) {
     return cg.i16Ty();
 }
 
+Constant* LgsShort::getRTType(LgsLLVMGen& cg) {
+    return cg.getRTTypeInfo(getGenericName(), sizeBytes(), RTT_SHORT, cg.null());
+}
+
 std::string LgsShort::getName() {
     return name;
 }

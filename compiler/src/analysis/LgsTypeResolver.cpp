@@ -11,7 +11,7 @@
 #include "stmts/LgsIOPair.h"
 #include "types/LgsEnum.h"
 #include "types/LgsFuncType.h"
-#include "types/LgsGenericParam.h"
+#include "types/LgsGenericType.h"
 #include "types/LgsInterface.h"
 #include "types/iterables/LgsIterable.h"
 #include "types/LgsNullable.h"
@@ -161,7 +161,7 @@ void LgsTypeResolver::resolveInterfaceTypes(LgsInterface* interface, LgsFile& fi
 void LgsTypeResolver::resolveFuncTypes(LgsFuncType* funcType, LgsFile& file) {
     auto resolveTypeOrGeneric = [&](LgsType* type) -> LgsType* {
         if (!type) return &LGS_VOID;
-        for (const auto generic : funcType->genericParams) {
+        for (const auto generic : funcType->genericTypes) {
             if (type->equals(generic)) return generic->clone();
         }
         return resolveType(type, &file);

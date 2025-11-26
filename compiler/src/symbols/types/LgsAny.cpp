@@ -9,6 +9,10 @@ Type* LgsAny::getIRType(LgsLLVMGen& cg) {
     return cg.ptrTy();
 }
 
+Constant* LgsAny::getRTType(LgsLLVMGen& cg) {
+    assert(0);
+}
+
 std::string LgsAny::getName() {
     return name;
 }

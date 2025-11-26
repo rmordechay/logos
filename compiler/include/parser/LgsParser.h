@@ -10,7 +10,7 @@
 #include "stmts/LgsAssignment.h"
 
 class LgsMatrixExpr;
-class LgsGenericParam;
+class LgsGenericType;
 struct LgsPaths;
 struct LgsSymbol;
 struct LgsAppConfigs;
@@ -101,7 +101,7 @@ public:
     LgsSubType* parseSubtype();
     LgsFuncType* parseFuncType();
     LgsMap* parseMapType();
-    LgsGenericParam* parseGenericType();
+    LgsGenericType* parseGenericType();
     std::vector<LgsType*> parseGenericArgs();
 
     // Funcs

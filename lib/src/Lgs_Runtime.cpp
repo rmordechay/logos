@@ -1,6 +1,5 @@
 #include "LgsDefinitions.h"
 #include "Lgs_Allocator.h"
-#include "Lgs_Scheduler.h"
 #include "Lgs_Stack.h"
 #include "Lgs_Types.h"
 #include <cassert>
@@ -28,7 +27,6 @@ struct VKeyHash {
 struct Lgs_Runtime {
     Lgs_Stack stack;
     Lgs_Allocator arena;
-    Lgs_Scheduler scheduler;
     std::unordered_map<VKey, void*, VKeyHash> vtable;
 };
 
@@ -71,15 +69,15 @@ extern "C" void Lgs_Runtime_pop(const bool cleanup) {
 }
 
 extern "C" void Lgs_Runtime_addCoro(void* funcPtr, void* ctx) {
-    runtime.scheduler.spawn(reinterpret_cast<ThunkFunc>(funcPtr), ctx);
+
 }
 
 extern "C" void Lgs_Runtime_yield() {
-    runtime.scheduler.yield();
+
 }
 
 extern "C" bool Lgs_Runtime_shouldYield() {
-    return runtime.scheduler.shouldYield();
+    return false;
 }
 
 extern "C" void* Lgs_Runtime_allocate(const size_t size) {

@@ -12,6 +12,7 @@ public:
         isInt = true;
     }
     Type* getIRType(LgsLLVMGen& cg) override;
+    Constant* getRTType(LgsLLVMGen& cg) override;
     LgsType* applyBinOp(LgsType* toType, LgsBinOp& op) override;
     Value* addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
     Value* subIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;

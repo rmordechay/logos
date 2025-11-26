@@ -21,7 +21,7 @@ LgsExpr* LgsStrConst::castExplicitly(LgsType* toType) {
 Value* LgsStrConst::castIR(LgsLLVMGen& cg, LgsType* toType) {
     if (toType->asStr()) return IRValue;
     if (toType->asGeneric()) return IRValue;
-    return LgsExpr::castIR(cg, toType);
+    return IRValue;
 }
 
 Value* LgsStrConst::loadIR(LgsLLVMGen& cg) {

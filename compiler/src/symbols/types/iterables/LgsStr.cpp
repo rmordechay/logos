@@ -66,35 +66,6 @@ Value* LgsStr::getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) {
     return cg.builder.CreateLoad(cg.i8Ty(), gep);
 }
 
-LgsFunc* LgsStr::getLenFunc() {
-    const auto lenFunc = LgsIterable::getLenFunc();
-    if (lenFunc->fn) return lenFunc;
-    lenFunc->fn = [this](LgsLLVMGen& cg, const std::vector<LgsFuncArg>& args) {
-        return lenIR(cg, args.front().expr->IRValue);
-    };
-    return lenFunc;
-}
-
-LgsFunc* LgsStr::getIsEmptyFunc() {
-    const auto isEmptyFunc = LgsIterable::getIsEmptyFunc();
-    if (isEmptyFunc->fn) return isEmptyFunc;
-    isEmptyFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsFuncArg>& args) {
-        const auto strLen = cg.callStrLen(args.front().expr->IRValue);
-        return cg.builder.CreateICmpEQ(strLen, cg.builder.getInt64(0));
-    };
-    return isEmptyFunc;
-}
-
-LgsFunc* LgsStr::getIsNotEmptyFunc() {
-    const auto isNotEmptyFunc = LgsIterable::getIsNotEmptyFunc();
-    if (isNotEmptyFunc->fn) return isNotEmptyFunc;
-    isNotEmptyFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsFuncArg>& args) {
-        const auto strLen = cg.callStrLen(args.front().expr->IRValue);
-        return cg.builder.CreateICmpNE(strLen, cg.builder.getInt64(0));
-    };
-    return isNotEmptyFunc;
-}
-
 std::string LgsStr::strFormatPart() const {
     return "%s";
 }

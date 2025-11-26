@@ -4,6 +4,10 @@ Type* LgsSelf::getIRType(LgsLLVMGen& cg) {
     assert(0);
 }
 
+Constant* LgsSelf::getRTType(LgsLLVMGen& cg) {
+    assert(0);
+}
+
 size_t LgsSelf::sizeBytes() {
     assert(0);
 }

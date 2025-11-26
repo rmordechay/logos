@@ -2,7 +2,7 @@
 #include <utility>
 #include "LgsType.h"
 
-class LgsGenericParam;
+class LgsGenericType;
 class LgsInstance;
 class LgsLLVMGen;
 class LgsField;
@@ -12,7 +12,7 @@ class LgsObject : public LgsType {
 public:
     std::string name;
     std::vector<LgsType*> implements;
-    std::vector<LgsGenericParam*> generics;
+    std::vector<LgsGenericType*> generics;
     std::vector<LgsEnum*> enums;
     std::vector<LgsObject*> objects;
     std::vector<LgsSubType*> subtypes;

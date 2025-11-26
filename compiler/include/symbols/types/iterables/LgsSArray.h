@@ -23,7 +23,6 @@ public:
     Value* inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
     Value* getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) override;
     Value* lenIR(LgsLLVMGen& cg, Value* iterable) override;
-    LgsFunc* getLenFunc() override;
     bool canCastTo(LgsType* other) override;
     llvm::DIType* getDebugType(LgsLLVMGen& cg) override;
     LgsType* clone() override;

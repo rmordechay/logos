@@ -25,7 +25,7 @@ public:
     std::string parentName;
     LgsType* rt = nullptr;
     std::vector<LgsParam> params;
-    std::vector<LgsGenericParam*> genericParams;
+    std::vector<LgsGenericType*> genericTypes;
     FunctionType* IRType = nullptr;
     bool isPublic = false;
     bool isBuiltin = false;
@@ -49,6 +49,7 @@ public:
         passByRef = true;
     }
     Type* getIRType(LgsLLVMGen& cg) override;
+    Constant* getRTType(LgsLLVMGen& cg) override;
     LgsExpr* getZeroValue() override;
     size_t sizeBytes() override;
     std::string getName() override;

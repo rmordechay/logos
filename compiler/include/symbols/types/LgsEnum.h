@@ -8,6 +8,7 @@ public:
 
     explicit LgsEnum(const std::string& enumName) : name(enumName) {}
     Type* getIRType(LgsLLVMGen& cg) override;
+    Constant* getRTType(LgsLLVMGen& cg) override;
     std::string getName() override;
     LgsExpr* getZeroValue() override;
     bool canCastTo(LgsType* other) override;

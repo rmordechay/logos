@@ -11,6 +11,7 @@ public:
         isInt = true;
     }
     Type* getIRType(LgsLLVMGen& cg) override;
+    Constant* getRTType(LgsLLVMGen& cg) override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
     LgsType* applyBinOp(LgsType* toType, LgsBinOp& op) override;

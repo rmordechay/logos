@@ -1,5 +1,9 @@
 #pragma once
 #include "LgsType.h"
+#include "funcs/LgsFunc.h"
+#include "types/LgsFuncType.h"
+#include "types/primitives/LgsBool.h"
+#include "types/primitives/LgsSize.h"
 
 class LgsForeachLoop;
 class LgsLLVMGen;
@@ -8,9 +12,6 @@ struct LgsIndex;
 struct CodegenMetadata;
 
 #define ADD_FUNC_NAME "add"
-#define LEN_FUNC_NAME "len"
-#define IS_EMPTY_FUNC_NAME "isEmpty"
-#define IS_NOT_EMPTY_FUNC_NAME "isNotEmpty"
 #define MAP_FUNC_NAME "map"
 #define FILTER_FUNC_NAME "filter"
 #define FOREACH_FUNC_NAME "forEach"
@@ -20,24 +21,25 @@ public:
     LgsType* baseType;
     LgsExpr* size = nullptr;
     bool isStatic = false;
+    LgsFunc* lenFunc;
+    LgsFunc* isEmptyFunc;
+    LgsFunc* isNotEmptyFunc;
+    LgsFunc* mapFunc;
+    LgsFunc* filterFunc;
 
     explicit LgsIterable(LgsType* baseType = nullptr, LgsExpr* size = nullptr) : baseType(baseType), size(size) {
-        addEmptyMethod(MAP_FUNC_NAME);
-        addEmptyMethod(FILTER_FUNC_NAME);
-        addEmptyMethod(FOREACH_FUNC_NAME);
-        addEmptyMethod(ADD_FUNC_NAME);
-        addEmptyMethod(LEN_FUNC_NAME);
-        addEmptyMethod(IS_EMPTY_FUNC_NAME);
-        addEmptyMethod(IS_NOT_EMPTY_FUNC_NAME);
+        lenFunc = new LgsFunc("len", &LGS_SIZE, {this}, BUILTIN | PUBLIC | METHOD);
+        isEmptyFunc = new LgsFunc("isEmpty", &LGS_BOOL, {this}, BUILTIN | PUBLIC | METHOD);
+        isNotEmptyFunc = new LgsFunc("isNotEmpty", &LGS_BOOL, {this}, BUILTIN | PUBLIC | METHOD);
+        mapFunc = new LgsFunc(MAP_FUNC_NAME, this, {this, new LgsFuncType(baseType, {LgsParam(baseType)})}, BUILTIN | PUBLIC | METHOD);
+        filterFunc = new LgsFunc(FILTER_FUNC_NAME, this, {this, new LgsFuncType(&LGS_BOOL, {LgsParam(baseType)})}, BUILTIN | PUBLIC | METHOD);
+        addMethod(lenFunc);
+        addMethod(isEmptyFunc);
+        addMethod(isNotEmptyFunc);
+        addMethod(mapFunc);
+        addMethod(filterFunc);
     }
-    LgsFunc* getMethod(const std::string& methodName) override;
     size_t getDimension() const;
-    virtual LgsFunc* getLenFunc();
-    virtual LgsFunc* getIsEmptyFunc();
-    virtual LgsFunc* getIsNotEmptyFunc();
-    virtual LgsFunc* getAddFunc();
-    virtual LgsFunc* getMapFunc();
-    virtual LgsFunc* getFilterFunc();
     virtual LgsType* getIndexType();
     virtual LgsType* getValueType();
     virtual bool unpackLoopVarsTypes(LgsForeachLoop* loop) const;

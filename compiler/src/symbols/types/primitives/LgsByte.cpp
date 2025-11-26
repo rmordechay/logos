@@ -14,6 +14,10 @@ Type* LgsByte::getIRType(LgsLLVMGen& cg) {
     return cg.i8Ty();
 }
 
+Constant* LgsByte::getRTType(LgsLLVMGen& cg) {
+    return cg.getRTTypeInfo(getGenericName(), sizeBytes(), RTT_BYTE, cg.null());
+}
+
 LgsType* LgsByte::applyBinOp(LgsType* toType, LgsBinOp& op) {
     return applyIntBinOp(toType, op.opType);
 }

@@ -26,38 +26,6 @@ Constant* LgsMap::getRTType(LgsLLVMGen& cg) {
     return cg.getRTTypeInfo(genericName, sizeBytes(), RTT_MAP, sv);
 }
 
-LgsFunc* LgsMap::getKeysFunc() {
-    const auto func = methods.find(KEYS_FUNC_NAME);
-    if (func != methods.end() && func->second) return func->second;
-    func->second = new LgsFunc(KEYS_FUNC_NAME, new LgsDArray(mapType->key), {this}, BUILTIN | PUBLIC | METHOD);
-    methods[KEYS_FUNC_NAME] = func->second;
-    return func->second;
-}
-
-LgsFunc* LgsMap::getValuesFunc() {
-    const auto func = methods.find(VALUES_FUNC_NAME);
-    if (func != methods.end() && func->second) return func->second;
-    func->second = new LgsFunc(VALUES_FUNC_NAME, new LgsDArray(mapType->value), {this}, BUILTIN | PUBLIC | METHOD);
-    methods[VALUES_FUNC_NAME] = func->second;
-    return func->second;
-}
-
-LgsFunc* LgsMap::getAddFunc() {
-    const auto func = methods.find(ADD_FUNC_NAME);
-    if (func != methods.end() && func->second) return func->second;
-    func->second = new LgsFunc(ADD_FUNC_NAME, &LGS_VOID, {this, new LgsStr(), &LGS_ANY}, PUBLIC | BUILTIN | METHOD);
-    func->second->fn = [](LgsLLVMGen& cg, const std::vector<LgsFuncArg>& args) {
-        const auto key = args[1];
-        const auto value = args[2];
-        const auto mapPtr = args[0].expr->IRValue;
-        return cg.callLgsFunc("HashMap_" + std::string(ADD_FUNC_NAME), cg.voidTy(), {cg.ptrTy(), cg.ptrTy(), cg.ptrTy()}, {
-            mapPtr, key.expr->IRValue, cg.getPtrTo(value.expr->IRValue)
-        });
-    };
-    methods[ADD_FUNC_NAME] = func->second;
-    return func->second;
-}
-
 std::string LgsMap::getName() {
     return name;
 }
@@ -102,16 +70,16 @@ bool LgsMap::unpackLoopVarsTypes(LgsForeachLoop* loop) const {
 }
 
 void LgsMap::unpackLoopIR(LgsLLVMGen& cg, LgsForeachLoop* loop) const {
-    const auto keyPtr = cg.callLgsFunc("HashMap_getKeyAt", cg.ptrTy(), {cg.ptrTy(), cg.sizeTy()}, {loop->iterExpr->IRValue, loop->iValue});
+    const auto keyPtr = cg.callLgsFunc("Map_getKeyAt", cg.ptrTy(), {cg.ptrTy(), cg.sizeTy()}, {loop->iterExpr->IRValue, loop->iValue});
     loop->loopVars[0]->IRValue = keyPtr;
     if (loop->loopVars.size() == 2) {
-        const auto valuePtr = cg.callLgsFunc("HashMap_getValueAt", cg.ptrTy(), {cg.ptrTy(), cg.sizeTy()}, {loop->iterExpr->IRValue, loop->iValue});
+        const auto valuePtr = cg.callLgsFunc("Map_getValueAt", cg.ptrTy(), {cg.ptrTy(), cg.sizeTy()}, {loop->iterExpr->IRValue, loop->iValue});
         loop->loopVars[1]->IRValue = valuePtr;
     }
 }
 
 Value* LgsMap::lenIR(LgsLLVMGen& cg, Value* iterable) {
-    return getLenFunc()->callIR(cg, {iterable});
+    return cg.callLgsFunc("Map_len", cg.sizeTy(), {cg.ptrTy()}, {iterable});
 }
 
 Value* LgsMap::inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) {
@@ -119,7 +87,7 @@ Value* LgsMap::inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) {
 }
 
 Value* LgsMap::getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) {
-    return cg.callLgsFunc("HashMap_get", cg.ptrTy(), {cg.ptrTy(), cg.ptrTy()}, {iterable, index});
+    return cg.callLgsFunc("Map_get", cg.ptrTy(), {cg.ptrTy(), cg.ptrTy()}, {iterable, index});
 }
 
 bool LgsMap::canCastTo(LgsType* other) {

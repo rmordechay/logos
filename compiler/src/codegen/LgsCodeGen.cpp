@@ -46,7 +46,7 @@
 #include "stmts/LgsIOStmt.h"
 #include "stmts/LgsIfStmt.h"
 #include "stmts/LgsSwitch.h"
-#include "types/LgsGenericParam.h"
+#include "types/LgsGenericType.h"
 #include "types/iterables/LgsSArray.h"
 #include "types/iterables/LgsVec.h"
 #include "types/primitives/LgsSize.h"
@@ -63,7 +63,7 @@
 #include "exprs/LgsMatrixExpr.h"
 
 std::atomic<size_t> LgsCodeGen::lambdasIDGenerator{0};
-#define GENERATE_OBJ_CMD "clang -Wno-override-module -target %s -c -o %s %s.bc"
+#define GENERATE_OBJ_CMD "clang -fstack-protector-strong -Wno-override-module -target %s -c -o %s %s.bc"
 
 bool LgsCodeGen::generate() {
     cg.setupModule(file, appConfigs.debugMode);
@@ -102,7 +102,7 @@ void LgsCodeGen::visitMainFile(LgsMainFile* mainFile) {
     for (const auto object : mainFile->objects) {
         visitObject(object);
     }
-    for (auto [_, genericsCall] : file.symbolTable.genericCalls) {
+    for (auto [_, genericsCall] : file.symbolTable.genericFuncCalls) {
         visitFunc(genericsCall);
     }
 
@@ -158,7 +158,7 @@ void LgsCodeGen::visitMainFunc(LgsMainFunc* func) {
 
 void LgsCodeGen::visitFunc(LgsFunc* func) {
     const auto ft = func->funcType;
-    if (!ft->genericParams.empty()) return;
+    if (!ft->genericTypes.empty()) return;
     stack.enterScope(func);
     createPrologue(func);
     if (func->isTest) for (auto [_, then] : func->mocks) visitExpr(then);
@@ -787,7 +787,7 @@ void LgsCodeGen::visitDynamicArray(LgsArrayExpr* arrayExpr) {
     if (!arrayExpr->IRValue) {
         arrayExpr->IRValue = cg.callAllocate(dArr->sizeBytes(), arrayExpr->owner, dArr->getRTType(cg));
     }
-    cg.callLgsFunc("DArrayExpr_init", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {
+    cg.callLgsFunc("DArray_init", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {
         arrayExpr->IRValue, dArr->getRTType(cg)
     });
     const auto rtt = dArr->baseType->getRTType(cg);
@@ -797,23 +797,7 @@ void LgsCodeGen::visitDynamicArray(LgsArrayExpr* arrayExpr) {
         element->destPtrValue = arrayExpr->IRValue;
         visitExpr(element);
         std::vector args = {LgsFuncArg(arrayExpr), LgsFuncArg(element)};
-        dArr->getAddFunc()->call(cg, args);
-    }
-}
-
-void LgsCodeGen::visitHashMap(LgsHashMap* hashMap) {
-    const auto map = hashMap->type->asMap();
-    const auto keyType = map->mapType->key;
-    const auto valueType = map->mapType->value;
-    hashMap->IRValue = cg.callAllocate(map->sizeBytes(), hashMap->owner, map->getRTType(cg));
-    cg.callLgsFunc("HashMap_init", cg.voidTy(), {cg.ptrTy(), cg.ptrTy(), cg.ptrTy()}, {
-        hashMap->IRValue, keyType->getRTType(cg), valueType->getRTType(cg)
-    });
-    for (const auto [key, value] : hashMap->elements) {
-        visitExpr(key);
-        visitExpr(value);
-        std::vector args = {LgsFuncArg(hashMap), LgsFuncArg(key), LgsFuncArg(value)};
-        map->getAddFunc()->call(cg, args);
+        dArr->addFunc->call(cg, args);
     }
 }
 
@@ -822,8 +806,8 @@ void LgsCodeGen::visitSetExpr(LgsArrayExpr* arrayExpr) {
     if (!arrayExpr->IRValue) {
         arrayExpr->IRValue = cg.callAllocate(set->sizeBytes(), arrayExpr->owner, set->getRTType(cg));
     }
-    cg.callLgsFunc("SetExpr_init", cg.voidTy(), {cg.ptrTy(), cg.sizeTy(), cg.i32Ty()}, {
-        arrayExpr->IRValue, cg.usize(set->baseType->sizeBytes()), cg.i32(RTT_DARRAY),
+    cg.callLgsFunc("Set_init", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {
+        arrayExpr->IRValue, set->getRTType(cg)
     });
     const auto rtt = set->baseType->getRTType(cg);
     cg.addHeapVariable(arrayExpr->owner, rtt, arrayExpr->IRValue);
@@ -831,7 +815,24 @@ void LgsCodeGen::visitSetExpr(LgsArrayExpr* arrayExpr) {
         const auto element = arrayExpr->elements[i];
         element->destPtrValue = arrayExpr->IRValue;
         visitExpr(element);
-        set->getAddFunc()->callIR(cg, {arrayExpr->IRValue, cg.getPtrTo(element->IRValue)});
+        std::vector args = {LgsFuncArg(arrayExpr), LgsFuncArg(element)};
+        set->addFunc->call(cg, args);
+    }
+}
+
+void LgsCodeGen::visitHashMap(LgsHashMap* hashMap) {
+    const auto map = hashMap->type->asMap();
+    const auto keyType = map->mapType->key;
+    const auto valueType = map->mapType->value;
+    hashMap->IRValue = cg.callAllocate(map->sizeBytes(), hashMap->owner, map->getRTType(cg));
+    cg.callLgsFunc("Map_init", cg.voidTy(), {cg.ptrTy(), cg.ptrTy(), cg.ptrTy()}, {
+        hashMap->IRValue, keyType->getRTType(cg), valueType->getRTType(cg)
+    });
+    for (const auto [key, value] : hashMap->elements) {
+        visitExpr(key);
+        visitExpr(value);
+        std::vector args = {LgsFuncArg(hashMap), LgsFuncArg(key), LgsFuncArg(value)};
+        map->addFunc->call(cg, args);
     }
 }
 
@@ -1040,7 +1041,7 @@ void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
     } else if (func->funcType->isArrFunc) {
         visitIterFunc(funcCall);
     }
-    if (!func->funcType->genericParams.empty()) visitGenericFunc(func);
+    if (!func->funcType->genericTypes.empty()) visitGenericFunc(func);
     if (funcCall->isCoroutine || funcCall->isDeferred) return;
 
     std::vector<LgsExpr*> args;
@@ -1376,7 +1377,7 @@ void LgsCodeGen::createMapFunc(LgsFunc* func) {
     const auto ft = llvm::dyn_cast<FunctionType>(callback.type->getIRType(cg));
     const auto arg = cg.builder.CreateLoad(dArray->baseType->getIRType(cg), element);
     const auto v = cg.builder.CreateCall(ft, callback.IRValue, {arg});
-    dArray->getAddFunc()->callIR(cg, {newArr.IRValue, cg.getPtrTo(v)});
+    dArray->addFunc->callIR(cg, {newArr.IRValue, cg.getPtrTo(v)});
 
     // Increment
     const auto inc = cg.builder.CreateAdd(iValue, cg.usize(1));
@@ -1437,7 +1438,7 @@ void LgsCodeGen::createFilterFunc(LgsFunc* func) {
 
     cg.builder.CreateCondBr(v, trueBlock, falseBlock);
     cg.startBlock(trueBlock);
-    dArray->getAddFunc()->callIR(cg, {newArr.IRValue, element});
+    dArray->addFunc->callIR(cg, {newArr.IRValue, element});
     cg.builder.CreateBr(falseBlock);
     cg.startBlock(falseBlock);
 

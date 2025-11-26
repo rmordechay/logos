@@ -6,7 +6,7 @@
 
 class LgsMatrix;
 class LgsSubType;
-class LgsGenericParam;
+class LgsGenericType;
 class LgsSet;
 class LgsAny;
 class LgsByte;
@@ -58,6 +58,23 @@ public:
     bool addField(LgsField* field);
     bool addMethod(LgsFunc* method);
     bool addEmptyMethod(const std::string& name);
+    virtual LgsField* getField(const std::string& fieldName);
+    virtual LgsFunc* getMethod(const std::string& methodName);
+    virtual size_t sizeBytes() = 0;
+    virtual LgsExpr* getZeroValue() = 0;
+    virtual Type* getIRType(LgsLLVMGen& cg) = 0;
+    virtual Constant* getRTType(LgsLLVMGen& cg) = 0;
+    virtual bool canCastTo(LgsType* other) = 0;
+    virtual std::string strFormatPart() const = 0;
+    virtual llvm::DIType* getDebugType(LgsLLVMGen& cg) = 0;
+    virtual LgsType* applyBinOp(LgsType* toType, LgsBinOp& op);
+    virtual void hashNode(size_t& oldHash);
+    virtual LgsType* clone() = 0;
+    virtual std::string getName() = 0;
+    virtual std::string pname(); // pretty name
+    virtual std::string getGenericName();
+    virtual bool equals(LgsType* other);
+
     bool isVoid();
     bool isNumber() const;
     bool isBig();
@@ -69,23 +86,6 @@ public:
     void cloneMethods(LgsType* newType) const;
     static Value* orInt(LgsLLVMGen& cg, const LgsExpr* self, const LgsExpr* other);
     static Value* andInt(LgsLLVMGen& cg, LgsExpr* self, const LgsExpr* other);
-
-    virtual LgsField* getField(const std::string& fieldName);
-    virtual LgsFunc* getMethod(const std::string& methodName);
-    virtual size_t sizeBytes() = 0;
-    virtual LgsExpr* getZeroValue() = 0;
-    virtual Type* getIRType(LgsLLVMGen& cg) = 0;
-    virtual bool canCastTo(LgsType* other) = 0;
-    virtual Constant* getRTType(LgsLLVMGen& cg);
-    virtual std::string strFormatPart() const = 0;
-    virtual llvm::DIType* getDebugType(LgsLLVMGen& cg) = 0;
-    virtual LgsType* applyBinOp(LgsType* toType, LgsBinOp& op);
-    virtual void hashNode(size_t& oldHash);
-    virtual LgsType* clone() = 0;
-    virtual std::string getName() = 0;
-    virtual std::string getGenericName();
-    virtual std::string pname(); // pretty name
-    virtual bool equals(LgsType* other);
 
     virtual Value* addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right);
     virtual Value* subIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right);
@@ -123,7 +123,7 @@ public:
     LgsObject* asObject();
     LgsInterface* asInterface();
     LgsEnum* asEnum();
-    LgsGenericParam* asGeneric();
+    LgsGenericType* asGeneric();
     LgsIterable* asIterable();
     LgsSArray* asSArray();
     LgsDArray* asDArray();

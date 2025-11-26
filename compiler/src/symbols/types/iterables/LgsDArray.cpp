@@ -3,25 +3,9 @@
 #include "codegen/LgsLLVMGen.h"
 #include "exprs/LgsArrayExpr.h"
 #include "exprs/LgsFuncCall.h"
-#include "funcs/LgsFunc.h"
 #include "types/LgsAny.h"
-#include "types/primitives/LgsVoid.h"
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsLong.h"
-#include "types/primitives/LgsSize.h"
-
-LgsFunc* LgsDArray::getMethod(const std::string& methodName) {
-    const auto method = methods.find(methodName);
-    if (method != methods.end()) {
-        if (method->second) {
-            return method->second;
-        }
-        if (methodName == RESERVE_FUNC_NAME) {
-            return getReserveFunc();
-        }
-    }
-    return LgsIterable::getMethod(methodName);
-}
 
 bool LgsDArray::inferBaseType(const std::vector<LgsExpr*>& args) {
     assert(!args.empty());
@@ -37,7 +21,7 @@ bool LgsDArray::inferBaseType(const std::vector<LgsExpr*>& args) {
 
 Type* LgsDArray::getIRType(LgsLLVMGen& cg) {
     if (IRType) return IRType;
-    IRType = cg.getStructType({cg.ptrTy(), cg.sizeTy(), cg.sizeTy(), cg.ptrTy(), cg.i32Ty()}, name);
+    IRType = cg.getStructType({cg.ptrTy(), cg.sizeTy(), cg.sizeTy(), cg.ptrTy()}, name);
     return IRType;
 }
 
@@ -53,7 +37,7 @@ std::string LgsDArray::getName() {
 }
 
 std::string LgsDArray::getGenericName() {
-    return "DArr" + baseType->getGenericName();
+    return name + baseType->getGenericName();
 }
 
 std::string LgsDArray::pname() {
@@ -88,41 +72,19 @@ LgsType* LgsDArray::applyBinOp(LgsType* toType, LgsBinOp& op) {
     return nullptr;
 }
 
-LgsFunc* LgsDArray::getAddFunc() {
-    const auto func = methods.find(ADD_FUNC_NAME);
-    if (func != methods.end() && func->second) return func->second;
-    func->second = new LgsFunc(ADD_FUNC_NAME, &LGS_VOID, {this, &LGS_ANY}, BUILTIN | PUBLIC | METHOD);
-    func->second->fn = [](LgsLLVMGen& cg, const std::vector<LgsFuncArg>& args) {
-        return cg.callLgsFunc("DArrayExpr_add", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {
-            cg.getPtrTo(args[0].expr->IRValue),
-            cg.getPtrTo(args[1].expr->IRValue),
-        });
-    };
-    methods[func->second->funcType->name] = func->second;
-    return func->second;
-}
-
-LgsFunc* LgsDArray::getReserveFunc() {
-    const auto func = methods.find(RESERVE_FUNC_NAME);
-    if (func != methods.end() && func->second) return func->second;
-    func->second = new LgsFunc(RESERVE_FUNC_NAME, &LGS_VOID, {this, &LGS_SIZE}, BUILTIN | PUBLIC | METHOD);
-    methods[func->second->funcType->name] = func->second;
-    return func->second;
-}
-
 Value* LgsDArray::lenIR(LgsLLVMGen& cg, Value* iterable) {
-    return getLenFunc()->callIR(cg, {iterable});
+    return cg.callLgsFunc("DArray_len", cg.sizeTy(), {cg.ptrTy()}, {iterable});
 }
 
 Value* LgsDArray::inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) {
-    return cg.callLgsFunc("DArrayExpr_contains", cg.i1Ty(), {cg.ptrTy(), cg.ptrTy()}, {
+    return cg.callLgsFunc("DArray_contains", cg.i1Ty(), {cg.ptrTy(), cg.ptrTy()}, {
         iterableExpr->IRValue,
         cg.getPtrTo(value->IRValue),
     });
 }
 
 Value* LgsDArray::getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) {
-    return cg.callLgsFunc("DArrayExpr_get", cg.ptrTy(), {cg.ptrTy(), cg.sizeTy()}, {iterable, index});;
+    return cg.callLgsFunc("DArray_get", cg.ptrTy(), {cg.ptrTy(), cg.sizeTy()}, {iterable, index});;
 }
 
 bool LgsDArray::canCastTo(LgsType* other) {

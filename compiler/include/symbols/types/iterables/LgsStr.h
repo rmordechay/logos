@@ -18,9 +18,6 @@ public:
     bool canCastTo(LgsType* other) override;
     LgsType* applyBinOp(LgsType* toType, LgsBinOp& op) override;
     Value* getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) override;
-    LgsFunc* getLenFunc() override;
-    LgsFunc* getIsEmptyFunc() override;
-    LgsFunc* getIsNotEmptyFunc() override;
     std::string strFormatPart() const override;
     bool inferBaseType(const std::vector<LgsExpr*>& args) override;
     Value* addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;

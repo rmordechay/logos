@@ -17,6 +17,7 @@ public:
     std::string name;
     std::vector<LgsFuncArg> args;
     LgsFunc* func = nullptr;
+    LgsFunc* coroutine = nullptr;
     bool inSelection = false;
     bool isCoroutine = false;
     bool isDeferred = false;

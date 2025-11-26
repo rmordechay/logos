@@ -7,7 +7,7 @@
 #include "types/LgsEnum.h"
 #include "types/LgsInterface.h"
 #include "types/LgsNullable.h"
-#include "types/LgsGenericParam.h"
+#include "types/LgsGenericType.h"
 #include "LgsUtils.h"
 #include "types/LgsAny.h"
 
@@ -126,7 +126,7 @@ LgsObject* LgsObject::clone() {
     newObj->fields.clear();
     newObj->generics.clear();
     for (const auto& generic : generics) {
-        newObj->generics.emplace_back(new LgsGenericParam(*generic));
+        newObj->generics.emplace_back(new LgsGenericType(*generic));
     }
     for (const auto& enum_ : enums) {
         newObj->enums.emplace_back(new LgsEnum(*enum_));

@@ -6,8 +6,7 @@
 
 struct Lgs_SetExpr {
     char* data;
-    size_t size;
+    size_t length;
     size_t capacity;
-    size_t elementSize;
-    Lgs_TypeKind baseType;
+    Lgs_TypeInfo* baseType;
 };

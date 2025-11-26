@@ -1,6 +1,9 @@
 #pragma once
+#include "LgsDArray.h"
 #include "LgsStr.h"
+#include "types/LgsAny.h"
 #include "types/LgsTypePair.h"
+#include "types/primitives/LgsVoid.h"
 
 #define KEYS_FUNC_NAME "keys"
 #define VALUES_FUNC_NAME "values"
@@ -9,21 +12,23 @@ class LgsMap final : public LgsIterable {
 public:
     static constexpr auto name = "Map";
     LgsTypePair* mapType = nullptr;
+    LgsFunc* addFunc = new LgsFunc(ADD_FUNC_NAME, name, &LGS_VOID, {this, new LgsStr(), &LGS_ANY}, PUBLIC | BUILTIN | METHOD);
+    LgsFunc* keysFunc;
+    LgsFunc* valuesFunc;
 
-    explicit LgsMap(LgsType* keyType = nullptr, LgsType* valueType = nullptr) {
-        mapType = new LgsTypePair(keyType, valueType);
-        baseType = mapType;
+    explicit LgsMap(LgsType* keyType = nullptr, LgsType* valueType = nullptr): LgsIterable(new LgsTypePair(keyType, valueType)) {
+        mapType = baseType->asPair();
         isHeapAlloc = true;
         passByRef = true;
-        addEmptyMethod(KEYS_FUNC_NAME);
-        addEmptyMethod(VALUES_FUNC_NAME);
+        keysFunc = new LgsFunc(KEYS_FUNC_NAME, name, new LgsDArray(mapType->key), {this}, BUILTIN | PUBLIC | METHOD);
+        valuesFunc = new LgsFunc(VALUES_FUNC_NAME, name, new LgsDArray(mapType->value), {this}, BUILTIN | PUBLIC | METHOD);
+        addMethod(addFunc);
+        addMethod(keysFunc);
+        addMethod(valuesFunc);
     }
 
     Type* getIRType(LgsLLVMGen& cg) override;
     Constant* getRTType(LgsLLVMGen& cg) override;
-    LgsFunc* getKeysFunc();
-    LgsFunc* getValuesFunc();
-    LgsFunc* getAddFunc() override;
     std::string getName() override;
     std::string pname() override;
     size_t sizeBytes() override;

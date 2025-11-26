@@ -10,6 +10,7 @@ public:
     }
     size_t sizeBytes() override;
     Type* getIRType(LgsLLVMGen& cg) override;
+    Constant* getRTType(LgsLLVMGen& cg) override;
     std::string getName() override;
     LgsExpr* getZeroValue() override;
     std::string strFormatPart() const override;

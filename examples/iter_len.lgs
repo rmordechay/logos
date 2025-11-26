@@ -1,0 +1,10 @@
+main() {
+    list = ["Roi", "Roi"]
+    str = "Roi"
+    set = Set["Roi", "Roi"]
+    map = {"Roi": "Roi"}
+    print(str.len())
+    print(list.len())
+    print(set.len())
+    print(map.len())
+}

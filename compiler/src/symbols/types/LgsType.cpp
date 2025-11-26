@@ -8,7 +8,7 @@
 #include "types/LgsObject.h"
 #include "types/iterables/LgsDArray.h"
 #include "types/LgsEnum.h"
-#include "types/LgsGenericParam.h"
+#include "types/LgsGenericType.h"
 #include "types/iterables/LgsMap.h"
 #include "types/LgsNullable.h"
 #include "types/LgsSubType.h"
@@ -41,6 +41,47 @@ bool LgsType::addEmptyMethod(const std::string& name) {
     if (methods.contains(name)) return false;
     methods[name] = nullptr;
     return true;
+}
+
+LgsField* LgsType::getField(const std::string& fieldName) {
+    for (auto* f : fields) {
+        if (f->name == fieldName) return f;
+    }
+    return nullptr;
+}
+
+LgsFunc* LgsType::getMethod(const std::string& methodName) {
+    const auto method = methods.find(methodName);
+    if (method != methods.end()) {
+        if (method->second) {
+            return method->second;
+        }
+    }
+    return nullptr;
+}
+
+Constant* LgsType::getRTType(LgsLLVMGen& cg) {
+    assert(0);
+}
+
+LgsType* LgsType::applyBinOp(LgsType* toType, LgsBinOp& op) {
+    assert(0);
+}
+
+void LgsType::hashNode(size_t& oldHash) {
+    assert(0);
+}
+
+std::string LgsType::pname() {
+    return getName();
+}
+
+std::string LgsType::getGenericName() {
+    return getName();
+}
+
+bool LgsType::equals(LgsType* other) {
+    return getName() == other->getName();
 }
 
 bool LgsType::isVoid() {
@@ -172,41 +213,6 @@ Value* LgsType::andInt(LgsLLVMGen& cg, LgsExpr* self, const LgsExpr* other) {
     phi->addIncoming(cg.false_(), currentBlock);
     phi->addIncoming(other->IRValue, rightBlock);
     return phi;
-}
-
-LgsField* LgsType::getField(const std::string& fieldName) {
-    for (auto* f : fields) {
-        if (f->name == fieldName) return f;
-    }
-    return nullptr;
-}
-
-LgsFunc* LgsType::getMethod(const std::string& methodName) {
-    return nullptr;
-}
-
-Constant* LgsType::getRTType(LgsLLVMGen& cg) {
-    assert(0);
-}
-
-LgsType* LgsType::applyBinOp(LgsType* toType, LgsBinOp& op) {
-    assert(0);
-}
-
-void LgsType::hashNode(size_t& oldHash) {
-    assert(0);
-}
-
-std::string LgsType::getGenericName() {
-    return getName();
-}
-
-std::string LgsType::pname() {
-    return getName();
-}
-
-bool LgsType::equals(LgsType* other) {
-    return getName() == other->getName();
 }
 
 Value* LgsType::addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
@@ -349,8 +355,8 @@ LgsEnum* LgsType::asEnum() {
     return dynamic_cast<LgsEnum*>(this);
 }
 
-LgsGenericParam* LgsType::asGeneric() {
-    return dynamic_cast<LgsGenericParam*>(this);
+LgsGenericType* LgsType::asGeneric() {
+    return dynamic_cast<LgsGenericType*>(this);
 }
 
 LgsIterable* LgsType::asIterable() {
@@ -413,5 +419,5 @@ void freeType(LgsType* type) {
     if (!type) return;
     if (type->isPrimitive) return;
     // std::cout << type->getName() << ' ' << type << '\n';
-    delete type;
+    // delete type;
 }

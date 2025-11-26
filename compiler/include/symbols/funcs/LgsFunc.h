@@ -40,6 +40,9 @@ public:
         }
         initFunc(name, rt, params, ops);
     }
+    explicit LgsFunc(const std::string& name, const std::string& parentName, LgsType* rt, const std::vector<LgsType*>& paramTypes, const uint32_t ops = 0): LgsFunc(name, rt, paramTypes, ops) {
+        funcType->parentName = parentName;
+    }
 
     virtual Function* getIRFunc(LgsLLVMGen& cg);
     void initFunc(const std::string& name, LgsType* rt, const std::vector<LgsParam>& params, uint32_t ops);

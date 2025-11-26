@@ -13,6 +13,10 @@ Type* LgsLong::getIRType(LgsLLVMGen& cg) {
     return cg.i64Ty();
 }
 
+Constant* LgsLong::getRTType(LgsLLVMGen& cg) {
+    return cg.getRTTypeInfo(getGenericName(), sizeBytes(), RTT_LONG, cg.null());
+}
+
 size_t LgsLong::sizeBytes() {
     return sizeof(long);
 }

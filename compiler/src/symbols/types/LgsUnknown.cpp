@@ -35,3 +35,7 @@ LgsType* LgsUnknown::clone() {
 Type* LgsUnknown::getIRType(LgsLLVMGen& cg) {
     assert(0);
 }
+
+Constant* LgsUnknown::getRTType(LgsLLVMGen& cg) {
+    assert(0);
+}

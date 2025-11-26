@@ -44,7 +44,7 @@
 #include "stmts/LgsReturn.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsEnum.h"
-#include "types/LgsGenericParam.h"
+#include "types/LgsGenericType.h"
 #include "types/LgsInterface.h"
 #include "types/LgsSelf.h"
 #include "types/LgsSubType.h"
@@ -647,9 +647,9 @@ LgsMap* LgsParser::parseMapType() {
     return mapType;
 }
 
-LgsGenericParam* LgsParser::parseGenericType() {
+LgsGenericType* LgsParser::parseGenericType() {
     if (currentToken.type != T_IDENTIFIER) return nullptr;
-    const auto generic = new LgsGenericParam(currentToken.lexeme);
+    const auto generic = new LgsGenericType(currentToken.lexeme);
     setLocation(generic->location, &currentToken);
     consume();
     return generic;
@@ -729,7 +729,7 @@ LgsFunc* LgsParser::parseMethod(LgsObject* obj) {
 LgsFuncType* LgsParser::parseFuncHeader() {
     const auto nameToken = currentToken;
     if (currentToken.type != T_IDENTIFIER) return nullptr;
-    std::vector<LgsGenericParam*> genericsParams;
+    std::vector<LgsGenericType*> genericsParams;
     if (peek().type == T_LANGLE) {
         consume(2);
         while (true) {
@@ -748,7 +748,7 @@ LgsFuncType* LgsParser::parseFuncHeader() {
     const auto funcType = new LgsFuncType();
     setLocation(funcType->location, &nameToken);
     funcType->name = nameToken.lexeme;
-    funcType->genericParams = genericsParams;
+    funcType->genericTypes = genericsParams;
     parseParams(funcType);
     mustMatch(T_RPAREN);
     if (matchAndConsume(T_COLON)) {

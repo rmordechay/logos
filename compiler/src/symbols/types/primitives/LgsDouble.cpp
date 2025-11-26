@@ -24,6 +24,10 @@ Type* LgsDouble::getIRType(LgsLLVMGen& cg) {
     return cg.builder.getDoubleTy();
 }
 
+Constant* LgsDouble::getRTType(LgsLLVMGen& cg) {
+    assert(0);
+}
+
 bool LgsDouble::canCastTo(LgsType* other) {
     const auto IRName = other->getName();
     if (name == IRName) return true;

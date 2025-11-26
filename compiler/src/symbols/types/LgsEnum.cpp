@@ -14,6 +14,10 @@ Type* LgsEnum::getIRType(LgsLLVMGen& cg) {
     return cg.getStructType({cg.sizeTy(), cg.ptrTy()});
 }
 
+Constant* LgsEnum::getRTType(LgsLLVMGen& cg) {
+    assert(0);
+}
+
 std::string LgsEnum::getName() {
     return name;
 }

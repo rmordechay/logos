@@ -51,7 +51,7 @@
 #include "stmts/LgsIfStmt.h"
 #include "stmts/LgsSwitch.h"
 #include "types/primitives/LgsDouble.h"
-#include "types/LgsGenericParam.h"
+#include "types/LgsGenericType.h"
 #include <iostream>
 #include <ranges>
 #include <unordered_set>
@@ -105,9 +105,6 @@ void LgsSema::visitMainFile(LgsMainFile* mainFile) {
 
 void LgsSema::visitObject(LgsObject* obj) {
     validateTypeName(obj->name, &obj->location);
-    for (const auto generic : obj->generics) {
-        visitGeneric(generic);
-    }
     for (const auto enum_ : obj->enums) {
         visitEnum(enum_);
     }
@@ -140,9 +137,6 @@ void LgsSema::visitTestFile(const LgsTestFile* testFile) {
     }
 }
 
-void LgsSema::visitGeneric(LgsGenericParam* generic) {
-}
-
 void LgsSema::visitEnum(const LgsEnum* enum_) {
     validateTypeName(enum_->name, &enum_->location);
 }
@@ -161,8 +155,9 @@ void LgsSema::visitField(LgsField* field) {
 }
 
 void LgsSema::visitFunc(LgsFunc* func) {
+    assert(!func->funcType->isCoroutine);
     const auto ft = func->funcType;
-    if (!ft->genericParams.empty()) return;
+    if (!ft->genericTypes.empty()) return;
     stack.enterScope(func);
     auto defaultParamsStarted = false;
     for (auto& param : ft->params) {
@@ -1012,21 +1007,24 @@ void LgsSema::visitFuncCall(LgsFuncCall* funcCall) {
     }
 
     const auto func = symbol->func;
-    if (!func->funcType->genericParams.empty()) {
+    if (!func->funcType->genericTypes.empty()) {
         const auto funcName = funcCall->getGenericName();
-        const auto generics = file->symbolTable.genericCalls.find(funcName);
+        const auto generics = file->symbolTable.genericFuncCalls.find(funcName);
         LgsFunc* genericFunc = nullptr;
-        if (generics != file->symbolTable.genericCalls.end()) {
+        if (generics != file->symbolTable.genericFuncCalls.end()) {
             genericFunc = generics->second;
         } else {
             genericFunc = createGenericFunc(funcCall, func);
-            file->symbolTable.genericCalls[funcName] = genericFunc;
+            file->symbolTable.genericFuncCalls[funcName] = genericFunc;
         }
         funcCall->func = genericFunc->clone();
         funcCall->setType(genericFunc->funcType->rt);
     } else {
         funcCall->func = func;
         funcCall->setType(ft->rt);
+    }
+    if (funcCall->isCoroutine) {
+        funcCall->coroutine = createCoroutineFunc(funcCall);
     }
 }
 
@@ -1538,6 +1536,17 @@ LgsSymbol* LgsSema::getSymbol(const std::string& name, const LgsLocation* locati
     }
     addError(E10006, *location, {name});
     return nullptr;
+}
+
+LgsFunc* LgsSema::createCoroutineFunc(LgsFuncCall* funcCall) {
+    const auto originalFT = funcCall->func->funcType;
+    const auto newFunc = new LgsFunc(originalFT->name, nullptr);
+    newFunc->location = funcCall->func->location;
+    newFunc->funcType->location = originalFT->location;
+    newFunc->stmtsBlock = funcCall->func->stmtsBlock->clone();
+    visitFunc(newFunc);
+    funcCall->coroutine = newFunc;
+    return newFunc;
 }
 
 LgsFunc* LgsSema::createGenericFunc(LgsFuncCall* funcCall, const LgsFunc* originalFunc) {

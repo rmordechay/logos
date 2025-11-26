@@ -19,6 +19,10 @@ Type* LgsPtr::getIRType(LgsLLVMGen& cg) {
     return cg.ptrTy();
 }
 
+Constant* LgsPtr::getRTType(LgsLLVMGen& cg) {
+    assert(0);
+}
+
 size_t LgsPtr::sizeBytes() {
     return sizeof(void*);
 }

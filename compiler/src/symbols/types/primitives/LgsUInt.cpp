@@ -13,6 +13,10 @@ Type* LgsUInt::getIRType(LgsLLVMGen& cg) {
     return cg.i32Ty();
 }
 
+Constant* LgsUInt::getRTType(LgsLLVMGen& cg) {
+    return cg.getRTTypeInfo(getGenericName(), sizeBytes(), RTT_UINT, cg.null());
+}
+
 std::string LgsUInt::getName() {
     return name;
 }

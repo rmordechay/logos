@@ -6,6 +6,10 @@ Type* LgsTypePair::getIRType(LgsLLVMGen& cg) {
     assert(0);
 }
 
+Constant* LgsTypePair::getRTType(LgsLLVMGen& cg) {
+    assert(0);
+}
+
 LgsExpr* LgsTypePair::getZeroValue() {
     assert(false);
 }

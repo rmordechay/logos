@@ -14,7 +14,7 @@
 struct LgsFuncArg;
 
 Function* LgsFunc::getIRFunc(LgsLLVMGen& cg) {
-    const auto funcName = funcType->getName();
+    const auto funcName = funcType->getGenericName();
     auto IRFunc = cg.IRModule->getFunction(funcName);
     if (IRFunc) return IRFunc;
     const auto type = funcType->getIRType(cg);
@@ -41,9 +41,6 @@ void LgsFunc::initFunc(const std::string& name, LgsType* rt, const std::vector<L
     funcType->name = name;
     funcType->rt = rt;
     funcType->setFuncOptions(ops);
-    if (funcType->isMethod) {
-        funcType->parentName = params.front().type->getName();
-    }
     for (const auto& param : params) {
         funcType->params.push_back(param);
     }
@@ -57,7 +54,7 @@ Value* LgsFunc::call(LgsLLVMGen& cg, std::vector<LgsFuncArg>& args) {
     if (fn) return fn(cg, args);
     std::vector<Value*> IRArgs;
     if (funcType->isVariadic) return callWithVariadic(cg, args);
-    const auto isNamed = !args.empty() && args.front().name != "";
+    const auto isNamed = !args.empty() && (funcType->isMethod ? args[1].name : args.front().name) != "";
     if (isNamed) {
         std::unordered_map<std::string, LgsFuncArg*> argsByName;
         for (size_t i = 0; i < args.size(); ++i) {

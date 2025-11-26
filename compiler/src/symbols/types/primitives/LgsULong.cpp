@@ -11,6 +11,10 @@ Type* LgsULong::getIRType(LgsLLVMGen& cg) {
     return cg.i32Ty();
 }
 
+Constant* LgsULong::getRTType(LgsLLVMGen& cg) {
+    return cg.getRTTypeInfo(getGenericName(), sizeBytes(), RTT_ULONG, cg.null());
+}
+
 std::string LgsULong::getName() {
     return name;
 }

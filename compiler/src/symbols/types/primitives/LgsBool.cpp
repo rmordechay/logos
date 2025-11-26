@@ -13,6 +13,10 @@ Type* LgsBool::getIRType(LgsLLVMGen& cg) {
     return cg.i1Ty();
 }
 
+Constant* LgsBool::getRTType(LgsLLVMGen& cg) {
+    assert(0);
+}
+
 LgsType* LgsBool::applyBinOp(LgsType* toType, LgsBinOp& op) {
     return applyIntBinOp(toType, op.opType);
 }
