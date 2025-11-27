@@ -15,6 +15,7 @@ public:
 
     LgsPrefixExpr(LgsExpr* baseExpr, const LgsPrefixOperator op) : expr(baseExpr), op(op) {}
     Value* loadIR(LgsLLVMGen& cg) override;
+    Value* castIR(LgsLLVMGen& cg, LgsType* toType) override;
     std::string asText() override;
     ~LgsPrefixExpr() override;
 };

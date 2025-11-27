@@ -48,7 +48,7 @@ public:
 
     virtual LgsExpr* castExplicitly(LgsType* toType);
     virtual void castImplicitly(LgsType* toType);
-    virtual Value* castIR(LgsLLVMGen& cg, LgsType* toType);
+    virtual Value* castIR(LgsLLVMGen& cg, LgsType* toType) = 0;
     virtual Value* hashValue(LgsLLVMGen& cg);
     virtual void assign(LgsLLVMGen& cg, LgsExpr* expr);
     virtual bool equals(LgsExpr* other);

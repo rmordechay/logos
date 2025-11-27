@@ -22,6 +22,7 @@ public:
     }
     Value* loadIR(LgsLLVMGen& cg) override;
     LgsExpr* getBaseExpr() const;
+    Value* castIR(LgsLLVMGen& cg, LgsType* toType) override;
     void setIRElementPtr(LgsLLVMGen& cg, bool assign = false);
     void setIRRangePtr(LgsLLVMGen& cg, bool assign = false);
     void assign(LgsLLVMGen& cg, LgsExpr* expr) override;

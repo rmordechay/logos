@@ -44,6 +44,10 @@ LgsExpr* LgsIterIndex::getBaseExpr() const {
     }
 }
 
+Value* LgsIterIndex::castIR(LgsLLVMGen& cg, LgsType* toType) {
+    assert(0);
+}
+
 void LgsIterIndex::setIRElementPtr(LgsLLVMGen& cg, const bool assign) {
     auto fromIR = index.from->IRValue;
     assert(baseExpr->IRValue);

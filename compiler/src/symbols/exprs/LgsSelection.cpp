@@ -20,6 +20,10 @@ LgsFuncCall* LgsSelection::asMethodCall() const {
     return lastExpr()->asFuncCall();
 }
 
+Value* LgsSelection::castIR(LgsLLVMGen& cg, LgsType* toType) {
+    assert(0);
+}
+
 void LgsSelection::assign(LgsLLVMGen& cg, LgsExpr* expr) {
     const auto rIR = expr->IRValue;
     const auto lExpr = lastExpr();

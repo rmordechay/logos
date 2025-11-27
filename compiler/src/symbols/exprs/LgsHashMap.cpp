@@ -11,6 +11,10 @@ void LgsHashMap::castImplicitly(LgsType* toType) {
     }
 }
 
+Value* LgsHashMap::castIR(LgsLLVMGen& cg, LgsType* toType) {
+    assert(0);
+}
+
 bool LgsHashMap::equals(LgsExpr* other) {
     assert(0);
 }

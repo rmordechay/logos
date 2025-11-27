@@ -11,8 +11,13 @@ public:
         : condExpr(codeExpr), thenExpr(thenExpr), elseExpr(elseExpr) {
     }
     std::string asText() override;
+    Value* castIR(LgsLLVMGen& cg, LgsType* toType) override;
 };
 
 inline std::string LgsTernaryExpr::asText() {
+    assert(0);
+}
+
+inline Value* LgsTernaryExpr::castIR(LgsLLVMGen& cg, LgsType* toType) {
     assert(0);
 }

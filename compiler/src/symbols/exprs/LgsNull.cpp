@@ -18,6 +18,10 @@ bool LgsNull::equals(LgsExpr* other) {
     assert(0);
 }
 
+Value* LgsNull::castIR(LgsLLVMGen& cg, LgsType* toType) {
+    assert(0);
+}
+
 LgsNull::~LgsNull() {
     freeType(type);
     setType(nullptr);

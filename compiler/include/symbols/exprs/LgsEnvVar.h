@@ -9,5 +9,6 @@ public:
     explicit LgsEnvVar(const std::string& name) : LgsExpr(new LgsStr()), name(name) {}
     std::string asText() override;
     Value* loadIR(LgsLLVMGen& cg) override;
+    Value* castIR(LgsLLVMGen& cg, LgsType* toType) override;
     void hashNode(size_t& oldHash) override;
 };

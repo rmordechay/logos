@@ -5,5 +5,6 @@
 class LgsTypeExpr final : public LgsExpr {
 public:
     explicit LgsTypeExpr(LgsType* type): LgsExpr(type) {}
+    Value* castIR(LgsLLVMGen& cg, LgsType* toType) override;
     std::string asText() override;
 };

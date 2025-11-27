@@ -12,6 +12,7 @@ public:
     LgsPostfixOperator op;
 
     LgsPostfixExpr(LgsExpr* baseExpr, const LgsPostfixOperator op) : baseExpr(baseExpr), op(op) {}
+    Value* castIR(LgsLLVMGen& cg, LgsType* toType) override;
     std::string asText() override;
     ~LgsPostfixExpr() override;
 };
