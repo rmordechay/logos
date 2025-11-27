@@ -104,14 +104,14 @@ llvm::AllocaInst* LgsLLVMGen::getEmptyBuffer() {
 }
 
 Constant* LgsLLVMGen::getRTTypeInfo(const std::string& name, const size_t size, const Lgs_TypeKind kind, Constant* extra) {
-    const auto typeInfo = getRTTypeInfo();
+    const auto typeInfo = getRTBaseType();
     const auto v = llvm::ConstantStruct::get(typeInfo, {usize(size), usize(kind), extra});
-    return createGlobal("TypeInfo" + name, typeInfo, v);
+    return createGlobal(LGS_TYPEINFO_PREFIX + name, typeInfo, v);
 }
 
-StructType* LgsLLVMGen::getRTTypeInfo() {
+StructType* LgsLLVMGen::getRTBaseType() {
     const auto typeInfoMatrix = getStructType({sizeTy(), sizeTy(), sizeTy(), ptrTy()}, "Matrix");
-    return getStructType({i32Ty(), ptrTy(), typeInfoMatrix}, "TypeInfo");
+    return getStructType({i32Ty(), ptrTy(), typeInfoMatrix}, LGS_TYPEINFO_PREFIX);
 }
 
 BasicBlock* LgsLLVMGen::createBlock(const std::string& name, Function* parent) {
@@ -213,14 +213,8 @@ void LgsLLVMGen::callMemCpy(Value* dest, Value* src, Value* size) {
     builder.CreateMemCpy(dest, llvm::MaybeAlign(), src, llvm::MaybeAlign(), size);
 }
 
-Value* LgsLLVMGen::callAllocate(const size_t size, const bool isOwner, Constant* type) {
-    return callAllocate(usize(size), isOwner, type);
-}
-
-Value* LgsLLVMGen::callAllocate(Value* size, const bool isOwner, Constant* type) {
-    const auto ptr = callRuntimeFunc("allocate", ptrTy(), {sizeTy()}, {size});
-    addHeapVariable(isOwner, type, ptr);
-    return ptr;
+Value* LgsLLVMGen::callAllocate(const bool isOwner, Constant* type) {
+    return callRuntimeFunc("allocate", ptrTy(), {i1Ty(), ptrTy()}, {i1(isOwner), type});
 }
 
 void LgsLLVMGen::callStackPush() {
@@ -241,11 +235,6 @@ Value* LgsLLVMGen::getFromVTable(Value* instance, Value* key) {
 
 void LgsLLVMGen::addNullTerminate(Value* strPtr, Value* pos) {
     builder.CreateStore(i8Zero(), builder.CreateGEP(i8Ty(), strPtr, pos));
-}
-
-void LgsLLVMGen::addHeapVariable(const bool isOwner, Constant* type, Value* ptr) {
-    // if (isOwner) callRuntimeFunc("addOwner", voidTy(), {ptrTy(), ptrTy()}, {ptr, type});
-    // else callRuntimeFunc("addOrphan", voidTy(), {ptrTy(), ptrTy()}, {ptr, type});
 }
 
 Type* LgsLLVMGen::i1Ty() {

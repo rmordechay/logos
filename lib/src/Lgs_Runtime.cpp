@@ -1,67 +1,69 @@
 #include "LgsDefinitions.h"
 #include "Lgs_Allocator.h"
-#include "Lgs_Stack.h"
 #include "Lgs_Types.h"
 #include <cassert>
 #include "Lgs_HashMap.h"
 #include "LgsUtils.h"
 #include "context/Lgs_Aarch64.h"
 #include <iostream>
+#include <stack>
+
+extern "C" void Lgs_Runtime_callDefers();
 
 struct Lgs_Runtime {
-    Lgs_Stack stack;
     Lgs_Allocator arena;
+    std::vector<void*> owners;
+    std::vector<void*> orphans;
+    std::vector<Lgs_ThunkFunc> coros;
+    std::stack<std::vector<Lgs_ThunkFunc>> defers;
     std::unordered_map<VKey, void*, VKeyHash> vtable;
 };
 
 static inline Lgs_Runtime runtime;
 
-extern "C" void Lgs_Runtime_init() {
-
-}
+extern "C" void Lgs_Runtime_init() {}
 
 extern "C" void Lgs_Runtime_close() {
-
-}
-
-extern "C" void Lgs_Runtime_addDefer(void* funcPtr, void* ctx) {
-    runtime.stack.addDefer(funcPtr, ctx);
-}
-
-extern "C" void Lgs_Runtime_callDefers() {
-    runtime.stack.callDefers();
-}
-
-extern "C" void Lgs_Runtime_addOwner(void* ptr, const Lgs_TypeInfo* type) {
-    runtime.stack.addOwner(ptr, type->kind);
-}
-
-extern "C" void Lgs_Runtime_addOrphan(void* ptr, const Lgs_TypeInfo* type) {
-    runtime.stack.addOrphan(ptr, type->kind);
-}
-
-extern "C" void Lgs_Runtime_removeOwner(const void* owner) {
-    runtime.stack.removeOwner(owner);
+    runtime.arena.free();
 }
 
 extern "C" void Lgs_Runtime_push() {
-    runtime.stack.stack.push(Lgs_StackFrame());
+    runtime.defers.push({});
 }
 
 extern "C" void Lgs_Runtime_pop() {
-    runtime.stack.stack.pop();
+    Lgs_Runtime_callDefers();
+    runtime.defers.pop();
 }
 
-extern "C" void Lgs_Runtime_addCoro(void* funcPtr, void* ctx) {
-    runtime.stack.addCoro(funcPtr, ctx);
+extern "C" void Lgs_Runtime_addDefer(const ThunkFunc funcPtr, void* ctx) {
+    runtime.defers.top().emplace_back(Lgs_ThunkFunc{funcPtr, ctx});
+}
+
+extern "C" void Lgs_Runtime_addCoro(const ThunkFunc funcPtr, void* ctx) {
+    runtime.coros.emplace_back(Lgs_ThunkFunc{funcPtr, ctx});
+}
+
+extern "C" void Lgs_Runtime_callDefers() {
+    for (auto [func, ctx] : runtime.defers.top()) {
+        if (!func) continue;
+        func(ctx);
+    }
+}
+
+extern "C" void* Lgs_Runtime_allocate(const bool isOwner, const Lgs_TypeInfo* type) {
+    const auto ptr = runtime.arena.allocate(type->size);
+    if (isOwner) runtime.owners.push_back(ptr);
+    else runtime.orphans.push_back(ptr);
+    return ptr;
+}
+
+extern "C" void Lgs_Runtime_removeOwner(const void* owner) {
+    auto& top = runtime.defers.top();
 }
 
 extern "C" void Lgs_Runtime_yield() {
     Lgs_switchContext();
-}
-
-extern "C" void* Lgs_Runtime_allocate(const size_t size) {
-    return runtime.arena.allocate(size);
 }
 
 extern "C" void Lgs_Runtime_addToVTable(void* instance, const int32_t virtualID, void* ptr) {

@@ -158,7 +158,7 @@ std::string LgsFunc::asText() {
 LgsFunc* LgsFunc::clone() {
     const auto newFunc = new LgsFunc(*this);
     newFunc->funcType = funcType->clone()->asFuncType();
-    newFunc->stmtsBlock = stmtsBlock->clone();
+    if (stmtsBlock) newFunc->stmtsBlock = stmtsBlock->clone();
     return newFunc;
 }
 

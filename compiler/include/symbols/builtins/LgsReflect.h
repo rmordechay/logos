@@ -1,5 +1,4 @@
 #pragma once
-#include "exprs/LgsInstance.h"
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
 #include "types/LgsAny.h"
@@ -15,7 +14,7 @@ public:
     explicit LgsReflect() : LgsObject(name) {
         addMethod(getFieldFunc);
         addMethod(getMethodFunc);
-        getMethodFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsFuncArg>& args) -> Value* {
+        getMethodFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsFuncArg>& args) {
             if (args.size() < 2) return nullptr;
             assert(0);
         };

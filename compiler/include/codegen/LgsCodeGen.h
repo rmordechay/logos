@@ -1,5 +1,6 @@
 #pragma once
 #include "LgsLLVMGen.h"
+#include "exprs/LgsFuncCall.h"
 #include "files/LgsFile.h"
 #include "logos/LgsStack.h"
 
@@ -142,7 +143,7 @@ public:
     void initMainArgs(const LgsMainFunc* mainFunc) const;
     StructType* getThunkCtxType(const LgsFuncCall* fc) const;
     Value* getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) const;
-    Function* getThunkFunc(const LgsFuncCall* fc, Type* ctxTy) const;
+    Function* getThunkFunc(LgsFuncCall* fc, Type* ctxTy) const;
 
     // Iterables
     void setSArrElements(const LgsArrayExpr* arrayExpr);

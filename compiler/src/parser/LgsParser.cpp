@@ -1210,10 +1210,12 @@ LgsDeferStmt* LgsParser::parseDeferStmt() {
     deferStmt->location = expr->location;
     if (const auto funcCall = expr->asFuncCall()) {
         deferStmt->funcCall = funcCall;
+        deferStmt->funcCall->isDeferred = true;
     } else if (const auto selection = expr->asSelection()) {
         deferStmt->selection = selection;
-        const auto methodCall = deferStmt->selection->asMethodCall();
+        const auto& methodCall = deferStmt->selection->asMethodCall();
         if (!methodCall) addParsingError();
+        methodCall->isDeferred = true;
     }
     return deferStmt;
 }

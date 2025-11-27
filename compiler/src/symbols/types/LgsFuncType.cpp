@@ -166,7 +166,7 @@ LgsFuncType* LgsFuncType::clone() {
 
 LgsFuncType::~LgsFuncType() {
     freeType(rt);
-    if (isMethod) {
+    if (isMethod && !params.empty()) {
         params.erase(params.begin());
     }
     freeParams(params);

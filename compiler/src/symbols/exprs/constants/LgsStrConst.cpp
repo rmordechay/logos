@@ -48,7 +48,9 @@ bool LgsStrConst::equals(LgsExpr* other) {
 }
 
 LgsStrConst* LgsStrConst::clone() {
-    return new LgsStrConst(*this);
+    const auto newStrConst = new LgsStrConst(*this);
+    newStrConst->type = type->clone();
+    return newStrConst;
 }
 
 void LgsStrConst::setDebugValue(LgsLLVMGen& cg) {

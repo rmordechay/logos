@@ -201,7 +201,7 @@ void LgsSema::visitLambda(LgsFunc* lambda) {
     if (ft->params.empty()) {
         ft->params.emplace_back(&LGS_INT, "it");
     }
-    const auto stmtsBlock = lambda->stmtsBlock;
+    const auto& stmtsBlock = lambda->stmtsBlock;
     // Wraps in return if it's the last statement
     if (!stmtsBlock->stmts.empty() && !lambda->funcType->rt->isVoid()) {
         const auto expr = stmtsBlock->stmts.back().stmt->asExpr();
@@ -977,7 +977,7 @@ void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent) {
     if (!visitFuncArgs(methodCall, method->funcType)) return;
     if (methodCall->equals(method->funcType)) {
         methodCall->func = method;
-        methodCall->setType(method->funcType->rt);
+        methodCall->setType(method->funcType->rt->clone());
     } else {
         addError(E10034, methodCall->location, {parent->type->pname(), name, methodCall->asText(), method->asText()});
         return;

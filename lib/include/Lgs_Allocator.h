@@ -11,6 +11,6 @@ public:
     std::vector<void*> blocks;
 
     void* allocate(size_t size);
+    void free();
     void print() const;
-    ~Lgs_Allocator();
 };

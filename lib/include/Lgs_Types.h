@@ -2,6 +2,7 @@
 #include <unordered_map>
 
 struct Lgs_TypeInfo;
+typedef void (*ThunkFunc)(void*);
 
 enum Lgs_TypeKind {
     RTT_VOID,
@@ -107,4 +108,9 @@ struct VKeyHash {
         const auto h2 = std::hash<int32_t>{}(k.virtualID);
         return h1 ^ h2 + 0x9e3779b9 + (h1 << 6) + (h1 >> 2);
     }
+};
+
+struct Lgs_ThunkFunc {
+    ThunkFunc func;
+    void* ctx;
 };

@@ -180,8 +180,10 @@ void LgsType::cloneFields(LgsType* newType) const {
 void LgsType::cloneMethods(LgsType* newType) const {
     newType->methods.clear();
     for (const auto& [_, method] : methods) {
-        const auto newField = new LgsFunc(*method);
-        newType->addMethod(newField);
+        const auto newMethod = new LgsFunc(*method);
+        if (method->stmtsBlock) newMethod->stmtsBlock = method->stmtsBlock->clone();
+        newMethod->funcType = method->funcType->clone();
+        newType->addMethod(newMethod);
     }
 }
 

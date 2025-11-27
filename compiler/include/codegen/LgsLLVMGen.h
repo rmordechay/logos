@@ -68,7 +68,7 @@ public:
     StructType* getStructType(const std::vector<Type*>& fields, const std::string& name = "");
     llvm::AllocaInst* getEmptyBuffer();
     Constant* getRTTypeInfo(const std::string& name, size_t size, Lgs_TypeKind kind, Constant* extra);
-    StructType* getRTTypeInfo();
+    StructType* getRTBaseType();
 
     // Blocks
     BasicBlock* createBlock(const std::string& name = "", Function* parent = nullptr);
@@ -94,8 +94,7 @@ public:
     Value* callStrLen(Value* str);
     void callMemSet(Value* dest, Value* src, Value* size);
     void callMemCpy(Value* dest, Value* src, Value* size);
-    Value* callAllocate(size_t size, bool isOwner, Constant* type);
-    Value* callAllocate(Value* size, bool isOwner, Constant* type);
+    Value* callAllocate(bool isOwner, Constant* type);
 
     // Stack
     void callStackPush();
@@ -103,7 +102,6 @@ public:
     void addToVTable(Value* instance, Value* key, Value* ptr);
     Value* getFromVTable(Value* instance, Value* key);
     void addNullTerminate(Value* strPtr, Value* pos);
-    void addHeapVariable(bool isOwner, Constant* type, Value* ptr);
 
     // Types
     Type* i1Ty();

@@ -45,10 +45,10 @@ public:
     }
 
     virtual Function* getIRFunc(LgsLLVMGen& cg);
-    void initFunc(const std::string& name, LgsType* rt, const std::vector<LgsParam>& params, uint32_t ops);
     virtual Value* call(LgsLLVMGen& cg, std::vector<LgsFuncArg>& args);
-    Value* callWithVariadic(LgsLLVMGen& cg, const std::vector<LgsFuncArg>& args);
     Value* callIR(LgsLLVMGen& cg, const std::vector<Value*>& args = {});
+    void initFunc(const std::string& name, LgsType* rt, const std::vector<LgsParam>& params, uint32_t ops);
+    Value* callWithVariadic(LgsLLVMGen& cg, const std::vector<LgsFuncArg>& args);
     Value* loadIR(LgsLLVMGen& cg) override;
     Value* castIR(LgsLLVMGen& cg, LgsType* toType) override;
     void castImplicitly(LgsType* toType) override;

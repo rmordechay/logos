@@ -24,12 +24,12 @@ public:
         isHeapAlloc = true;
         passByRef = true;
     }
-    LgsFunc* getMethod(const std::string& methodName) override;
     std::string getName() override;
+    LgsFunc* getMethod(const std::string& methodName) override;
     Type* getIRType(LgsLLVMGen& cg) override;
+    Constant* getRTType(LgsLLVMGen& cg) override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
-    Constant* getRTType(LgsLLVMGen& cg) override;
     bool canCastTo(LgsType* other) override;
     std::string strFormatPart() const override;
     LgsObject* clone() override;

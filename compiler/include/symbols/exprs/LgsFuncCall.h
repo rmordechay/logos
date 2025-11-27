@@ -19,6 +19,7 @@ public:
     LgsFunc* func = nullptr;
     LgsFunc* coroutine = nullptr;
     bool inSelection = false;
+    bool isDeferred = false;
     bool isNamed = false;
     bool isMock = false;
     LgsExpr* parentPtr = nullptr;

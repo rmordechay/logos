@@ -81,7 +81,7 @@ Value* LgsStr::addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
     const auto otherSize = lenIR(cg, buffer);
     const auto totalSize = cg.builder.CreateAdd(selfSize, otherSize);
     const auto newStrSize = cg.builder.CreateAdd(totalSize, cg.i64(1));
-    const auto newStrPtr = cg.callAllocate(newStrSize, true, getRTType(cg));
+    const auto newStrPtr = cg.callAllocate(true, getRTType(cg));
 
     cg.callMemCpy(newStrPtr, left->IRValue, selfSize);
     const auto dstPtr = cg.builder.CreateInBoundsGEP(cg.i8Ty(), newStrPtr, selfSize);
@@ -120,6 +120,7 @@ LgsType* LgsStr::clone() {
     if (size) {
         newStr->size = size->clone();
     }
-    newStr->baseType = baseType;
+    cloneMethods(newStr);
+    cloneFields(newStr);
     return newStr;
 }

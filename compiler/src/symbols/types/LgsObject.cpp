@@ -14,6 +14,10 @@
 #include <sstream>
 #include <llvm/IR/Module.h>
 
+std::string LgsObject::getName() {
+    return name;
+}
+
 LgsFunc* LgsObject::getMethod(const std::string& methodName) {
     const auto method = methods.find(methodName);
     if (method != methods.end() && method->second) {
@@ -32,10 +36,6 @@ LgsFunc* LgsObject::getMethod(const std::string& methodName) {
         }
     }
     return nullptr;
-}
-
-std::string LgsObject::getName() {
-    return name;
 }
 
 Type* LgsObject::getIRType(LgsLLVMGen& cg) {
@@ -59,6 +59,20 @@ Type* LgsObject::getIRType(LgsLLVMGen& cg) {
     return IRType;
 }
 
+Constant* LgsObject::getRTType(LgsLLVMGen& cg) {
+    std::vector<Constant*> fieldRTTs;
+    fieldRTTs.reserve(fields.size());
+    for (const auto fields : fields) {
+        fieldRTTs.push_back(fields->type->getRTType(cg));
+    }
+    const auto fieldsArrType = ArrayType::get(cg.getRTBaseType(), fields.size());
+    const auto genericName = getGenericName();
+    const auto fieldsArr = cg.createGlobal(LGS_TYPEINFO_PREFIX + genericName + "Fields", fieldsArrType, llvm::ConstantArray::get(fieldsArrType, fieldRTTs));
+    const auto st = cg.getStructType({cg.sizeTy(), cg.ptrTy()}, LGS_TYPEINFO_PREFIX + genericName);
+    const auto sv = llvm::ConstantStruct::get(st, {cg.usize(fields.size()), fieldsArr});
+    return cg.getRTTypeInfo(genericName, sizeBytes(), RTT_OBJECT, sv);
+}
+
 size_t LgsObject::sizeBytes() {
     size_t sum = 0;
     for (const auto& field : fields) {
@@ -73,21 +87,6 @@ size_t LgsObject::sizeBytes() {
 
 LgsExpr* LgsObject::getZeroValue() {
     return new LgsInstance(clone());
-}
-
-Constant* LgsObject::getRTType(LgsLLVMGen& cg) {
-    std::vector<Constant*> fieldRTTs;
-    fieldRTTs.reserve(fields.size());
-    for (const auto fields : fields) {
-        fieldRTTs.push_back(fields->type->getRTType(cg));
-    }
-    const auto fieldsArrType = ArrayType::get(cg.getRTTypeInfo(), fields.size());
-    const auto globalArr = cg.createGlobal("", fieldsArrType, llvm::ConstantArray::get(fieldsArrType, fieldRTTs));
-    const auto ptr = llvm::ConstantExpr::getBitCast(globalArr, cg.ptrTy());
-    const auto genericName = getGenericName();
-    const auto st = cg.getStructType({cg.sizeTy(), cg.ptrTy()}, genericName);
-    const auto sv = llvm::ConstantStruct::get(st, {cg.usize(fields.size()), ptr});
-    return cg.getRTTypeInfo(genericName, sizeBytes(), RTT_OBJECT, sv);
 }
 
 bool LgsObject::canCastTo(LgsType* other) {

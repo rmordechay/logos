@@ -13,6 +13,19 @@ void* Lgs_Allocator::allocate(const size_t size) {
     return ptr;
 }
 
+void deallocate(void* ptr, const size_t size) {
+    std::memset(ptr, 0, size);
+}
+
+void Lgs_Allocator::free() {
+    currentBlock = nullptr;
+    currentOffset = 0;
+    for (void* block : blocks) {
+        munmap(block, BLOCK_SIZE);
+    }
+    blocks.clear();
+}
+
 void Lgs_Allocator::print() const {
     printf("Current offset:  %lu\n", currentOffset);
     printf("Current address: %p\n", currentBlock);
@@ -21,13 +34,4 @@ void Lgs_Allocator::print() const {
         printf(" - block %p\n", block);
     }
     printf("\n");
-}
-
-Lgs_Allocator::~Lgs_Allocator() {
-    currentBlock = nullptr;
-    currentOffset = 0;
-    for (void* block : blocks) {
-        munmap(block, BLOCK_SIZE);
-    }
-    blocks.clear();
 }

@@ -21,7 +21,7 @@ LgsFuncCall* LgsSelection::asMethodCall() const {
 }
 
 Value* LgsSelection::castIR(LgsLLVMGen& cg, LgsType* toType) {
-    assert(0);
+    return IRValue;
 }
 
 void LgsSelection::assign(LgsLLVMGen& cg, LgsExpr* expr) {
