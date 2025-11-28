@@ -1,5 +1,4 @@
 #pragma once
-#include "stmts/LgsStmtsBlock.h"
 #include "types/LgsFuncType.h"
 
 struct LgsFuncArg;

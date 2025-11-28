@@ -102,7 +102,3 @@ std::string LgsByte::strFormatPart() const {
 llvm::DIType* LgsByte::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
-
-LgsType* LgsByte::clone() {
-    return this;
-}

@@ -1,5 +1,5 @@
 #pragma once
-#include <unordered_map>
+#include <iostream>
 
 struct Lgs_TypeInfo;
 typedef void (*ThunkFunc)(void*);
@@ -38,7 +38,8 @@ enum Lgs_TypeKind {
 
 struct Lgs_Object {
     size_t fieldsCount;
-    Lgs_TypeInfo** baseType;
+    uint64_t* fieldHashes;
+    Lgs_TypeInfo** fieldTypes;
 };
 
 struct Lgs_SArray {

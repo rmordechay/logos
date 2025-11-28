@@ -31,6 +31,7 @@
 #include "logos/LgsApp.h"
 #include "errors/LgsErrHandler.h"
 #include "exprs/LgsMatrixExpr.h"
+#include "exprs/LgsMetaSelection.h"
 #include "exprs/LgsNullableExpr.h"
 #include "loops/LgsInfiniteLoop.h"
 #include "loops/LgsWhileLoop.h"
@@ -650,6 +651,7 @@ void LgsSema::visitExpr(LgsExpr*& expr) {
         else if (const auto funcCall = expr->asFuncCall()) visitFuncCall(funcCall);
         else if (const auto strConst = expr->asStrConst()) visitStrConst(strConst);
         else if (const auto selection = expr->asSelection()) visitSelection(selection);
+        else if (const auto metaSelection = expr->asMetaSelection()) visitMetaSelection(metaSelection);
         else if (const auto arrayExpr = expr->asArrayExpr()) visitArrayExpr(arrayExpr);
         else if (const auto hashMap = expr->asHashMap()) visitHashMap(hashMap);
         else if (const auto iterIndex = expr->asIterIndex()) visitIterIndex(iterIndex);
@@ -958,6 +960,27 @@ void LgsSema::visitIterIndexSelection(LgsIterIndex* iterIndex, LgsType* parentTy
         baseExpr->ref = LgsSymbol(field);
     }
     visitIndex(iterIndex);
+}
+
+void LgsSema::visitMetaSelection(LgsMetaSelection* metaSelection) {
+    visitExpr(metaSelection->baseExpr);
+    const auto obj = metaSelection->baseExpr->type->asObject();
+    if (const auto methodCall = metaSelection->child->asFuncCall()) {
+        if (!obj->metaMethods.contains(methodCall->name)) {
+            return addError(E10005, metaSelection->location, {methodCall->name, obj->pname()});
+        }
+        const auto method = obj->metaMethods[methodCall->name];
+        if (!visitFuncArgs(methodCall, method->funcType)) return;
+        if (methodCall->equals(method->funcType)) {
+            methodCall->func = method;
+            methodCall->setType(method->funcType->rt);
+        } else {
+            addError(E10034, methodCall->location, {obj->name, methodCall->name, methodCall->asText(), method->asText()});
+        }
+        if (method->funcType->isMethod) {
+            methodCall->args.insert(methodCall->args.begin(), LgsFuncArg(metaSelection->baseExpr, LGS_SELF, true));
+        }
+    }
 }
 
 void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent) {

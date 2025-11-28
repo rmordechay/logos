@@ -32,7 +32,3 @@ std::string LgsGenericType::strFormatPart() const {
 llvm::DIType* LgsGenericType::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
-
-LgsGenericType* LgsGenericType::clone() {
-    return new LgsGenericType(*this);
-}

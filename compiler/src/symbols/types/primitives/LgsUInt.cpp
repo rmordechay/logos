@@ -37,10 +37,6 @@ llvm::DIType* LgsUInt::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
 
-LgsType* LgsUInt::clone() {
-    return this;
-}
-
 std::string LgsUInt::strFormatPart() const {
     return "%d";
 }

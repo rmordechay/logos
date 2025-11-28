@@ -280,7 +280,3 @@ std::string LgsVec::strFormatPart() const {
 llvm::DIType* LgsVec::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
-
-LgsType* LgsVec::clone() {
-    return new LgsVec(vectorDim, baseType);
-}

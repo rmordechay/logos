@@ -68,7 +68,6 @@ public:
     virtual llvm::DIType* getDebugType(LgsCgModule& cg) = 0;
     virtual LgsType* applyBinOp(LgsType* toType, LgsBinOp& op);
     virtual void hashNode(size_t& oldHash);
-    virtual LgsType* clone() = 0;
     virtual std::string getName() = 0;
     virtual std::string pname(); // pretty name
     virtual std::string getGenericName();

@@ -107,7 +107,3 @@ std::string LgsMap::strFormatPart() const {
 llvm::DIType* LgsMap::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
-
-LgsType* LgsMap::clone() {
-    return new LgsMap(mapType->key, mapType->value);
-}

@@ -36,7 +36,3 @@ llvm::DIType* LgsULong::getDebugType(LgsCgModule& cg) {
 std::string LgsULong::strFormatPart() const {
     return "%ul";
 }
-
-LgsType* LgsULong::clone() {
-    return this;
-}

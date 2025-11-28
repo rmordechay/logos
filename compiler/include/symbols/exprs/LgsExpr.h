@@ -2,6 +2,7 @@
 #include <stmts/LgsStmt.h>
 #include "LgsValue.h"
 
+class LgsMetaSelection;
 class LgsMatrixExpr;
 class LgsNullableExpr;
 class LgsEnvVar;
@@ -74,6 +75,7 @@ public:
     LgsMetaVar* asLoopMetaVar();
     LgsBinaryExpr* asBinExpr();
     LgsNullableExpr* asNullableExpr();
+    LgsMetaSelection* asMetaSelection();
     ~LgsExpr() override = default;
 };
 

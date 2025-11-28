@@ -12,6 +12,7 @@
 #include "files/LgsTestFile.h"
 #include "logos/LgsApp.h"
 #include "loops/LgsMetaVar.h"
+#include "stmts/LgsStmtsBlock.h"
 #include "stmts/LgsVarDec.h"
 #include <iostream>
 #define TAB_SIZE 4

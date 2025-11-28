@@ -40,10 +40,6 @@ llvm::DIType* LgsTypePair::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
 
-LgsType* LgsTypePair::clone() {
-    return new LgsTypePair(key, value);
-}
-
 LgsTypePair::~LgsTypePair() {
     freeType(key);
     freeType(value);

@@ -123,7 +123,3 @@ llvm::DIType* LgsDArray::getDebugType(LgsCgModule& cg) {
         di->getOrCreateArray(fields)
     );
 }
-
-LgsType* LgsDArray::clone() {
-    return new LgsDArray(baseType);
-}

@@ -29,5 +29,4 @@ public:
     Value* inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
     Value* getIRElement(LgsCgModule& cg, Value* iterable, Value* index) override;
     llvm::DIType* getDebugType(LgsCgModule& cg) override;
-    LgsType* clone() override;
 };

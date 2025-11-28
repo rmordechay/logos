@@ -135,7 +135,3 @@ std::string LgsSize::strFormatPart() const {
 llvm::DIType* LgsSize::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
-
-LgsType* LgsSize::clone() {
-    return this;
-}

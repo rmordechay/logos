@@ -114,13 +114,3 @@ llvm::DIType* LgsStr::getDebugType(LgsCgModule& cg) {
     const auto charType = diBuilder->createBasicType("char", sizeof(char), llvm::dwarf::DW_ATE_signed_char);
     return diBuilder->createPointerType(charType, sizeof(void*));
 }
-
-LgsType* LgsStr::clone() {
-    const auto newStr = new LgsStr(*this);
-    if (size) {
-        newStr->size = size;
-    }
-    cloneMethods(newStr);
-    cloneFields(newStr);
-    return newStr;
-}

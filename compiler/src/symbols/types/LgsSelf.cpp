@@ -31,7 +31,3 @@ std::string LgsSelf::strFormatPart() const {
 llvm::DIType* LgsSelf::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
-
-LgsType* LgsSelf::clone() {
-    assert(0);
-}

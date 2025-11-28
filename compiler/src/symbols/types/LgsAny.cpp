@@ -32,7 +32,3 @@ bool LgsAny::canCastTo(LgsType*) {
 llvm::DIType* LgsAny::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
-
-LgsType* LgsAny::clone() {
-    return this;
-}

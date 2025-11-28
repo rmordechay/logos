@@ -25,5 +25,4 @@ public:
     Value* lenIR(LgsCgModule& cg, Value* iterable) override;
     bool canCastTo(LgsType* other) override;
     llvm::DIType* getDebugType(LgsCgModule& cg) override;
-    LgsType* clone() override;
 };

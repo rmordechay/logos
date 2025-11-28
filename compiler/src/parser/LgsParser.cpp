@@ -28,6 +28,7 @@
 #include "exprs/LgsCast.h"
 #include "exprs/LgsEnvVar.h"
 #include "exprs/LgsMatrixExpr.h"
+#include "exprs/LgsMetaSelection.h"
 #include "exprs/LgsNull.h"
 #include "exprs/LgsNullableExpr.h"
 #include "exprs/LgsTernaryExpr.h"
@@ -53,6 +54,7 @@
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsByte.h"
 #include "types/primitives/LgsDouble.h"
+#include "types/primitives/LgsLong.h"
 #include "types/primitives/LgsShort.h"
 #include "types/primitives/LgsSize.h"
 #include "types/primitives/LgsUInt.h"
@@ -1325,6 +1327,7 @@ LgsExpr* LgsParser::parseUnary(const bool withInstance) {
     else return nullptr;
 
     if (matchAndConsume(T_DOT)) return parseSelection(expr);
+    if (matchAndConsume(T_DOUBLE_COLON)) return parseMetaSelection(expr);
     if (const auto iterIndex = parseIterIndex(expr)) return iterIndex;
     if (const auto postfixExpr = parsePostfixExpr(expr)) return postfixExpr;
 
@@ -1792,6 +1795,18 @@ LgsSelection* LgsParser::parseSelection(LgsExpr* firstExpr) {
     selection->location = firstExpr->location;
     selection->importVar = importVar;
     return selection;
+}
+
+LgsMetaSelection* LgsParser::parseMetaSelection(LgsExpr* firstExpr) {
+    LgsExpr* expr = nullptr;
+    if (const auto funcCall = parseFuncCall()) {
+        expr = funcCall;
+    } else if (const auto variable = parseVariable()) {
+        expr = variable;
+    }
+    const auto metaSelection = new LgsMetaSelection(firstExpr, expr);
+    metaSelection->location = firstExpr->location;
+    return metaSelection;
 }
 
 LgsJson* LgsParser::parseJson() {

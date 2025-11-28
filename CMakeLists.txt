@@ -81,6 +81,7 @@ set(LGS_SOURCE
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/LgsPostfixExpr.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/LgsPrefixExpr.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/LgsSelection.cpp
+    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/LgsMetaSelection.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/LgsVariable.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/LgsEnvVar.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/LgsVectorExpr.cpp

@@ -91,7 +91,7 @@ public:
     Value* callLgsFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes = {}, const std::vector<Value*>& args = {});
     Value* callRuntimeFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes = {}, const std::vector<Value*>& args = {});
     Value* callHash(Value* arg);
-    Value* hashConst(const std::string& str);
+    Constant* hashConst(const std::string& str);
 
     // System
     Value* callPrintf(const std::vector<Value*>& args);

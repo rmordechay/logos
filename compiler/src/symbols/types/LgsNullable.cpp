@@ -69,12 +69,6 @@ llvm::DIType* LgsNullable::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
 
-LgsType* LgsNullable::clone() {
-    const auto newNullable = new LgsNullable(*this);
-    newNullable->baseType = baseType;
-    return newNullable;
-}
-
 LgsNullable::~LgsNullable() {
     if (baseType) {
         freeType(baseType);

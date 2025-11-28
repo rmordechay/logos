@@ -97,10 +97,6 @@ llvm::DIType* LgsLong::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
 
-LgsType* LgsLong::clone() {
-    return this;
-}
-
 std::string LgsLong::strFormatPart() const {
     return "%lu";
 }

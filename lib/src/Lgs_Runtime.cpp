@@ -63,7 +63,6 @@ extern "C" void Lgs_Runtime_callDefers() {
 
 extern "C" void* Lgs_Runtime_allocate(Lgs_TypeInfo* type, const bool isOwner) {
     const auto ptr = std::malloc(type->size);
-    std::cout << "Allocated: " << ptr << '\n';
     if (isOwner) {
         runtime.stack.top().owners[ptr] = type;
     } else {
@@ -92,4 +91,16 @@ extern "C" void* Lgs_Runtime_getFromVTable(void* instance, const int32_t virtual
 extern "C" void Lgs_Runtime_throwError(const char* msg) {
     logError(std::string(msg) + "\n");
     exit(1);
+}
+
+extern "C" void* Lgs_getObjectField(const Lgs_TypeInfo* typeInfo, void* ptr, const char* name) {
+    auto f = static_cast<char*>(ptr);
+    for (int i = 0; i < typeInfo->obj.fieldsCount; ++i) {
+        const auto hash1 = typeInfo->obj.fieldHashes[i];
+        const auto hash2 = hashString(name);
+        f += typeInfo->obj.fieldTypes[i]->size * i;
+        if (hash1 != hash2) continue;
+        return f;
+    }
+    return nullptr;
 }

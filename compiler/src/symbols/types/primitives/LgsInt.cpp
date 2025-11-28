@@ -4,6 +4,7 @@
 #include "types/LgsAny.h"
 #include "types/primitives/LgsDouble.h"
 #include "types/primitives/LgsFloat.h"
+#include "types/primitives/LgsLong.h"
 #include "types/primitives/LgsSize.h"
 #include <iostream>
 #include <llvm/IR/DIBuilder.h>
@@ -134,8 +135,4 @@ std::string LgsInt::getName() {
 
 llvm::DIType* LgsInt::getDebugType(LgsCgModule& cg) {
     return cg.debugger.diBuilder->createBasicType(name, 32, llvm::dwarf::DW_ATE_signed);
-}
-
-LgsType* LgsInt::clone() {
-    return this;
 }

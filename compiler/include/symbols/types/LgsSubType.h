@@ -17,5 +17,4 @@ public:
     bool canCastTo(LgsType* other) override;
     std::string strFormatPart() const override;
     llvm::DIType* getDebugType(LgsCgModule& cg) override;
-    LgsSubType* clone() override;
 };

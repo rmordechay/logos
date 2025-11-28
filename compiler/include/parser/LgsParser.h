@@ -9,6 +9,7 @@
 #include "funcs/LgsMainFunc.h"
 #include "stmts/LgsAssignment.h"
 
+class LgsMetaSelection;
 class LgsMatrixExpr;
 class LgsGenericType;
 struct LgsPaths;
@@ -151,6 +152,7 @@ public:
     LgsIterIndex* parseIterIndex(LgsExpr* baseExpr);
     LgsPostfixExpr* parsePostfixExpr(LgsExpr* baseExpr);
     LgsSelection* parseSelection(LgsExpr* firstExpr);
+    LgsMetaSelection* parseMetaSelection(LgsExpr* firstExpr);
 
     // JSON
     LgsJson* parseJson();

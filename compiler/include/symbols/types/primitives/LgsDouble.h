@@ -17,7 +17,6 @@ public:
     bool canCastTo(LgsType* other) override;
     Value* powIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
     llvm::DIType* getDebugType(LgsCgModule& cg) override;
-    LgsType* clone() override;
 };
 
 inline LgsDouble LGS_DOUBLE;

@@ -153,9 +153,6 @@ void LgsTypeResolver::resolveInterfaceTypes(LgsInterface* interface, LgsFile& fi
     for (const auto& [_, method] : interface->methods) {
         resolveFuncTypes(method->funcType, file);
     }
-    for (auto& i : interface->implements) {
-        i = resolveType(i, &file);
-    }
 }
 
 void LgsTypeResolver::resolveFuncTypes(LgsFuncType* funcType, LgsFile& file) {

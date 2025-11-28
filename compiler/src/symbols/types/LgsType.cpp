@@ -21,6 +21,7 @@
 #include "types/primitives/LgsByte.h"
 #include "types/primitives/LgsChar.h"
 #include "types/primitives/LgsDouble.h"
+#include "types/primitives/LgsLong.h"
 #include "types/primitives/LgsShort.h"
 #include "types/primitives/LgsSize.h"
 #include "types/primitives/LgsUInt.h"

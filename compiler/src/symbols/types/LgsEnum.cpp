@@ -36,10 +36,6 @@ size_t LgsEnum::sizeBytes() {
     return sizeof(void*);
 }
 
-LgsEnum* LgsEnum::clone() {
-    return new LgsEnum(*this);
-}
-
 llvm::DIType* LgsEnum::getDebugType(LgsCgModule& cg) {
     assert(0);
 }

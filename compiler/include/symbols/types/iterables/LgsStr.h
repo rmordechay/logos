@@ -1,7 +1,6 @@
 #pragma once
 #include "LgsIterable.h"
 #include "types/primitives/LgsChar.h"
-#include "types/primitives/LgsLong.h"
 
 class LgsStr final : public LgsIterable {
 public:
@@ -26,5 +25,4 @@ public:
     Value* lenIR(LgsCgModule& cg, Value* iterable) override;
     Value* inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
     llvm::DIType* getDebugType(LgsCgModule& cg) override;
-    LgsType* clone() override;
 };

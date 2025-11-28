@@ -61,22 +61,38 @@ Type* LgsObject::getIRType(LgsCgModule& cg) {
 
 Constant* LgsObject::getRTType(LgsCgModule& cg) {
     std::vector<Constant*> fieldRTTs;
+    std::vector<Constant*> fieldNameHashes;
     fieldRTTs.reserve(fields.size());
-    for (const auto fields : fields) {
-        fieldRTTs.push_back(fields->type->getRTType(cg));
+    fieldNameHashes.reserve(fields.size());
+    for (const auto field : fields) {
+        fieldRTTs.push_back(field->type->getRTType(cg));
+        fieldNameHashes.push_back(cg.hashConst(field->name));
     }
-    const auto fieldsArrType = ArrayType::get(cg.getRTBaseType(), fields.size());
+
     const auto genericName = getGenericName();
-    const auto fieldsName = LGS_TYPEINFO_PREFIX + genericName + "Fields";
-    GlobalVariable* fieldsArr = nullptr;
-    if (cg.isRTTModule) {
-        const auto args = llvm::ConstantArray::get(fieldsArrType, fieldRTTs);
-        fieldsArr = cg.createGlobal(fieldsName, fieldsArrType, args);
-    } else {
-        fieldsArr = cg.createGlobal(fieldsName, fieldsArrType, nullptr);
+    const auto fieldsArrType = ArrayType::get(cg.getRTBaseType(), fields.size());
+    Constant* fieldsArr = cg.null();
+    Constant* hashesArr = cg.null();
+    if (!fields.empty()) {
+        const auto fieldsName = LGS_TYPEINFO_PREFIX + genericName + "_fields";
+        if (cg.isRTTModule) {
+            const auto args = llvm::ConstantArray::get(fieldsArrType, fieldRTTs);
+            fieldsArr = cg.createGlobal(fieldsName, fieldsArrType, args);
+        } else {
+            fieldsArr = cg.createGlobal(fieldsName, fieldsArrType, nullptr);
+        }
+
+        const auto hashesArrType = ArrayType::get(cg.i64Ty(), fields.size());
+        const auto hashesName = LGS_TYPEINFO_PREFIX + genericName + "_hashes";
+        if (cg.isRTTModule) {
+            const auto hashes = llvm::ConstantArray::get(hashesArrType, fieldNameHashes);
+            hashesArr = cg.createGlobal(hashesName, hashesArrType, hashes);
+        } else {
+            hashesArr = cg.createGlobal(hashesName, hashesArrType, nullptr);
+        }
     }
-    const auto st = cg.getStructType({cg.sizeTy(), cg.ptrTy()}, LGS_TYPEINFO_PREFIX + genericName);
-    const auto sv = llvm::ConstantStruct::get(st, {cg.usize(fields.size()), fieldsArr});
+    const auto st = cg.getStructType({cg.sizeTy(), cg.ptrTy(), cg.ptrTy()}, LGS_TYPEINFO_PREFIX + genericName);
+    const auto sv = llvm::ConstantStruct::get(st, {cg.usize(fields.size()), hashesArr, fieldsArr});
     return cg.getRTTypeInfo(genericName, sizeBytes(), RTT_OBJECT, sv);
 }
 
@@ -126,22 +142,6 @@ std::string LgsObject::strFormatPart() const {
     return str.str();
 }
 
-LgsObject* LgsObject::clone() {
-    assert(!singleton);
-    const auto newObj = new LgsObject(name);
-    newObj->fields.clear();
-    newObj->generics.clear();
-    for (const auto& generic : generics) {
-        newObj->generics.emplace_back(new LgsGenericType(*generic));
-    }
-    for (const auto& enum_ : enums) {
-        newObj->enums.emplace_back(new LgsEnum(*enum_));
-    }
-    cloneFields(newObj);
-    cloneMethods(newObj);
-    return newObj;
-}
-
 llvm::DIType* LgsObject::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
@@ -159,5 +159,7 @@ LgsObject::~LgsObject() {
     for (const auto ioPair : ioPairs) {
         delete ioPair;
     }
+    delete getFieldFunc;
+    getFieldFunc = nullptr;
 }
 

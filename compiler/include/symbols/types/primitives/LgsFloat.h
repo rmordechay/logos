@@ -22,7 +22,6 @@ public:
     Value* mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
     Value* divIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
     llvm::DIType* getDebugType(LgsCgModule& cg) override;
-    LgsType* clone() override;
 };
 
 inline LgsFloat LGS_FLOAT;

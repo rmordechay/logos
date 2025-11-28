@@ -50,7 +50,3 @@ bool LgsChar::canCastTo(LgsType* other) {
 llvm::DIType* LgsChar::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
-
-LgsType* LgsChar::clone() {
-    return this;
-}

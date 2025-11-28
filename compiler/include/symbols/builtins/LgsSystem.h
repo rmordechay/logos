@@ -4,6 +4,7 @@
 #include "types/LgsObject.h"
 #include "types/iterables/LgsStr.h"
 #include "types/primitives/LgsInt.h"
+#include "types/primitives/LgsLong.h"
 #include "types/primitives/LgsSize.h"
 #include "types/primitives/LgsVoid.h"
 

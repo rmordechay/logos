@@ -103,14 +103,15 @@ std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
         break;
     }
     case RTT_OBJECT: {
-        const auto& [fieldsCount, fieldTypes] = rtt->obj;
+        const auto fieldsCount = rtt->obj.fieldsCount;
+        const auto fieldTypes = rtt->obj.fieldTypes;
         str  << "<";
         for (size_t i = 0; i < fieldsCount; ++i) {
-            void* f = static_cast<char*>(elem) + fieldTypes[i]->size * i;
+            void* fieldPtr = static_cast<char*>(elem) + fieldTypes[i]->size * i;
             if (fieldTypes[i]->kind == RTT_STR || fieldTypes[i]->kind == RTT_TYPE) {
-                f = *static_cast<void**>(f);
+                fieldPtr = *static_cast<void**>(fieldPtr);
             }
-            str << formatElement(fieldTypes[i], f);
+            str << formatElement(fieldTypes[i], fieldPtr);
             if (i + 1 < fieldsCount) str << ", ";
         }
         str << ">";
@@ -153,7 +154,6 @@ void freeValue(void* ptr, const Lgs_TypeInfo* type) {
     case RTT_MAP:
         break;
     case RTT_OBJECT: {
-        std::cout << "Freeing: " << ptr << '\n';
         std::free(ptr);
         return;
     }

@@ -37,8 +37,7 @@ void LgsSelection::assign(LgsCgModule& cg, LgsExpr* expr) {
     } else {
         freeOwner(cg);
         if (const auto gv = llvm::dyn_cast<GlobalVariable>(rIR)) {
-            const auto gep = cg.builder.CreateConstInBoundsGEP1_32(gv->getType(), gv, 0);
-            cg.builder.CreateStore(gep, IRValue);
+            assert(0);
         } else {
             cg.builder.CreateStore(rIR, IRValue);
         }

@@ -88,7 +88,3 @@ Value* LgsSet::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
 llvm::DIType* LgsSet::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
-
-LgsType* LgsSet::clone() {
-    assert(0);
-}

@@ -1,6 +1,5 @@
 #pragma once
 #include "exprs/LgsExpr.h"
-#include "types/LgsInterface.h"
 #include <LgsValue.h>
 
 class LgsVariable;

@@ -15,6 +15,7 @@
 #include "stmts/LgsVarDec.h"
 #include "exprs/LgsJson.h"
 #include "exprs/LgsMatrixExpr.h"
+#include "exprs/LgsMetaSelection.h"
 #include "exprs/LgsNull.h"
 #include "exprs/LgsNullableExpr.h"
 #include "exprs/LgsTypeExpr.h"
@@ -192,6 +193,10 @@ LgsBinaryExpr* LgsExpr::asBinExpr() {
 
 LgsNullableExpr* LgsExpr::asNullableExpr() {
     return dynamic_cast<LgsNullableExpr*>(this);
+}
+
+LgsMetaSelection* LgsExpr::asMetaSelection() {
+    return dynamic_cast<LgsMetaSelection*>(this);
 }
 
 void freeExpr(LgsExpr* expr) {

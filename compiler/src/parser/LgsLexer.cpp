@@ -119,6 +119,7 @@ LgsToken LgsLexer::nextToken() {
     case ':':
         advance();
         if (match('=')) return {T_WALRUS, ":=", location};
+        if (match(':')) return {T_DOUBLE_COLON, "::", location};
         return {T_COLON, ":", location};
     case '+':
         advance();

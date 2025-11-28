@@ -2,10 +2,11 @@
 #include "LgsObject.h"
 #include "LgsType.h"
 
-class LgsInterface final : public LgsObject {
+class LgsInterface final : public LgsType {
 public:
+    std::string name;
 
-    explicit LgsInterface(const std::string& name) : LgsObject(name) {}
+    explicit LgsInterface(const std::string& name) : name(name) {}
     LgsFunc* getMethod(const std::string& methodName) override;
     std::string getName() override;
     Type* getIRType(LgsCgModule& cg) override;
@@ -13,5 +14,6 @@ public:
     bool canCastTo(LgsType* other) override;
     size_t sizeBytes() override;
     llvm::DIType* getDebugType(LgsCgModule& cg) override;
-    LgsInterface* clone() override;
+    Constant* getRTType(LgsCgModule& cg) override;
+    std::string strFormatPart() const override;
 };

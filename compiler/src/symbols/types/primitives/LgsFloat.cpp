@@ -75,7 +75,3 @@ Value* LgsFloat::divIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
 llvm::DIType* LgsFloat::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
-
-LgsType* LgsFloat::clone() {
-    return this;
-}

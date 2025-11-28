@@ -1,9 +1,9 @@
 #pragma once
 #include "LgsCgModule.h"
-#include "exprs/LgsFuncCall.h"
 #include "files/LgsFile.h"
 #include "logos/LgsStack.h"
 
+class LgsMetaSelection;
 class LgsJson;
 class LgsNull;
 class LgsMatrixExpr;
@@ -127,6 +127,7 @@ public:
     void visitVariable(LgsVariable* variable);
     void visitSelection(LgsSelection* selection, bool assign = false);
     void visitFieldSelection(LgsVariable* var, LgsExpr* parent, bool assign) const;
+    void visitMetaSelection(LgsMetaSelection* metaSelection);
     void visitFuncCall(LgsFuncCall* funcCall);
     void visitIterFunc(const LgsFuncCall* funcCall);
     void visitPrefixExpr(LgsPrefixExpr* prefixExpr);

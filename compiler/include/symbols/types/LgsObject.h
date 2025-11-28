@@ -1,6 +1,9 @@
 #pragma once
+#include "iterables/LgsStr.h"
+#include "LgsAny.h"
+#include "exprs/LgsFuncCall.h"
+
 #include <utility>
-#include "LgsType.h"
 
 class LgsGenericType;
 class LgsInstance;
@@ -18,11 +21,19 @@ public:
     std::vector<LgsSubType*> subtypes;
     std::vector<LgsIOPair*> ioPairs;
     LgsInstance* singleton = nullptr;
+    std::map<std::string, LgsFunc*> metaMethods;
+    LgsFunc* getFieldFunc = new LgsFunc{"getField", &LGS_ANY, {new LgsStr()}, PUBLIC | BUILTIN | METHOD};
     bool hasGenerics = false;
 
     explicit LgsObject(std::string  name) : name(std::move(name)) {
         isHeapAlloc = true;
         passByRef = true;
+        getFieldFunc->fn = [this](LgsCgModule& cg, const std::vector<LgsFuncArg>& args) {
+            return cg.callLgsFunc("getObjectField", cg.ptrTy(), {cg.ptrTy(), cg.ptrTy(), cg.ptrTy()}, {
+                getRTType(cg), args[0].expr->IRValue, args[1].expr->IRValue
+            });
+        };
+        metaMethods[getFieldFunc->funcType->name] = getFieldFunc;
     }
     std::string getName() override;
     LgsFunc* getMethod(const std::string& methodName) override;
@@ -32,7 +43,6 @@ public:
     LgsExpr* getZeroValue() override;
     bool canCastTo(LgsType* other) override;
     std::string strFormatPart() const override;
-    LgsObject* clone() override;
     llvm::DIType* getDebugType(LgsCgModule& cg) override;
     ~LgsObject() override;
 };

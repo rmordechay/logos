@@ -39,7 +39,3 @@ std::string LgsSubType::strFormatPart() const {
 llvm::DIType* LgsSubType::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
-
-LgsSubType* LgsSubType::clone() {
-    assert(0);
-}

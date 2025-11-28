@@ -6,6 +6,7 @@
 #include "logos/LgsAppConfigs.h"
 #include <unordered_map>
 
+class LgsMetaSelection;
 class LgsAppConfigFile;
 class LgsTernaryExpr;
 class LgsVec;
@@ -113,6 +114,7 @@ public:
     void visitInnerSelections(LgsSelection* selection);
     void visitFieldSelection(LgsVariable* child, LgsType* parentType);
     void visitIterIndexSelection(LgsIterIndex* iterIndex, LgsType* parentType);
+    void visitMetaSelection(LgsMetaSelection* metaSelection);
     void visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent);
     bool visitFuncArgs(LgsFuncCall* funcCall, LgsFuncType* ft);
     void visitFuncCall(LgsFuncCall* funcCall);

@@ -58,6 +58,7 @@
 #include <unordered_set>
 #include "cblas/cblas.h"
 #include "exprs/LgsMatrixExpr.h"
+#include "exprs/LgsMetaSelection.h"
 
 std::atomic<size_t> LgsCodeGen::lambdasIDGenerator{0};
 
@@ -644,6 +645,7 @@ void LgsCodeGen::visitExpr(LgsExpr* expr, const bool assign) {
         else if (const auto instance = expr->asInstance()) visitInstance(instance);
         else if (const auto funcCall = expr->asFuncCall()) visitFuncCall(funcCall);
         else if (const auto selection = expr->asSelection()) visitSelection(selection, assign);
+        else if (const auto metaSelection = expr->asMetaSelection()) visitMetaSelection(metaSelection);
         else if (const auto arrayExpr = expr->asArrayExpr()) visitArrayExpr(arrayExpr);
         else if (const auto hashMap = expr->asHashMap()) visitHashMap(hashMap);
         else if (const auto iterIndex = expr->asIterIndex()) visitIterIndex(iterIndex, assign);
@@ -999,6 +1001,17 @@ void LgsCodeGen::visitFieldSelection(LgsVariable* var, LgsExpr* parent, const bo
     } else {
         visitField(field);
         var->IRValue = field->IRValue;
+    }
+}
+
+void LgsCodeGen::visitMetaSelection(LgsMetaSelection* metaSelection) {
+    visitExpr(metaSelection->baseExpr);
+    if (const auto methodCall = metaSelection->child->asFuncCall()) {
+        for (const auto& arg : methodCall->args) {
+            if (arg.isSelf) continue;
+            visitExpr(arg.expr);
+        }
+        metaSelection->IRValue = methodCall->func->call(cg, methodCall->args);
     }
 }
 

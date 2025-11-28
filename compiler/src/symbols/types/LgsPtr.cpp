@@ -48,10 +48,6 @@ llvm::DIType* LgsPtr::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
 
-LgsType* LgsPtr::clone() {
-    assert(0);
-}
-
 LgsPtr::~LgsPtr() {
     freeType(baseType);
     baseType = nullptr;

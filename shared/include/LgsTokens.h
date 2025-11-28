@@ -21,6 +21,7 @@ enum LgsTokenType {
     T_ARROW,
     T_DARROW,
     T_COLON,
+    T_DOUBLE_COLON,
     T_EQUAL,
     T_DOUBLE_EQUAL,
     T_NOT_EQUAL,

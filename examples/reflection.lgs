@@ -1,13 +1,9 @@
 object Obj {
-    name: Str
-    func() {
-        print("hello")
-    }
+    age: Long
+    age2: Int
 }
 
 main() {
-    obj = Obj{}
-    field = Reflect.setField(obj, "name", "world")
-    method = Reflect.getMethod(obj, "func")
-    method()
+    obj = Obj{age=57}
+    field = obj::getField("age2")
 }

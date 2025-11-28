@@ -28,10 +28,6 @@ llvm::DIType* LgsUnknown::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
 
-LgsType* LgsUnknown::clone() {
-    assert(0);
-}
-
 Type* LgsUnknown::getIRType(LgsCgModule& cg) {
     assert(0);
 }

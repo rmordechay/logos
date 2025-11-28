@@ -147,7 +147,3 @@ bool LgsSArray::canCastTo(LgsType* other) {
 llvm::DIType* LgsSArray::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
-
-LgsType* LgsSArray::clone() {
-    return new LgsSArray(baseType, size);
-}

@@ -136,10 +136,6 @@ llvm::DIType* LgsMatrix::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
 
-LgsType* LgsMatrix::clone() {
-    assert(0);
-}
-
 Value* LgsMatrix::inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) {
     assert(0);
 }

@@ -40,8 +40,8 @@ std::string LgsFuncType::getName() {
         if (isBuiltin) strStream << LGS_RUNTIME_PREFIX;
         else strStream << "u_";
     }
-    if (isMethod) {
-        strStream << (parentName != "" ? parentName : params.front().type->getName()) << "_";
+    if (parentName != "") {
+        strStream << parentName << "_";
     }
     strStream << name;
     if (isCoroutine) strStream << LGS_CORO_SUFFIX;
@@ -132,36 +132,6 @@ std::unordered_map<std::string, LgsParam*> LgsFuncType::getParamsByName() {
 
 llvm::DIType* LgsFuncType::getDebugType(LgsCgModule& cg) {
     assert(0);
-}
-
-LgsFuncType* LgsFuncType::clone() {
-    const auto lgsFunc = new LgsFuncType();
-    lgsFunc->name = name;
-    lgsFunc->IRName = IRName;
-    lgsFunc->parentName = parentName;
-    lgsFunc->rt = rt ? rt : nullptr;
-    for (const auto& param : params) {
-        lgsFunc->params.push_back(LgsParam(param));
-    }
-    for (const auto generic : genericTypes) {
-        lgsFunc->genericTypes.push_back(generic);
-    }
-    lgsFunc->isPublic = isPublic;
-    lgsFunc->isBuiltin = isBuiltin;
-    lgsFunc->isVirtual = isVirtual;
-    lgsFunc->isVariadic = isVariadic;
-    lgsFunc->isLambda = isLambda;
-    lgsFunc->isOptional = isOptional;
-    lgsFunc->isTerminator = isTerminator;
-    lgsFunc->isMethod = isMethod;
-    lgsFunc->isSyscall = isSyscall;
-    lgsFunc->isCoroutine = isCoroutine;
-    lgsFunc->isIOMember = isIOMember;
-    lgsFunc->isExternal = isExternal;
-    lgsFunc->isArrFunc = isArrFunc;
-    lgsFunc->hasDefaults = hasDefaults;
-    lgsFunc->IRType = nullptr;
-    return lgsFunc;
 }
 
 LgsFuncType::~LgsFuncType() {

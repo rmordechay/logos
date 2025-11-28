@@ -10,7 +10,7 @@ Type* LgsInterface::getIRType(LgsCgModule& cg) {
 }
 
 LgsFunc* LgsInterface::getMethod(const std::string& methodName) {
-    return LgsObject::getMethod(methodName);
+    assert(0);
 }
 
 std::string LgsInterface::getName() {
@@ -41,9 +41,10 @@ llvm::DIType* LgsInterface::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
 
-LgsInterface* LgsInterface::clone() {
-    const auto newInterface = new LgsInterface(*this);
-    cloneFields(newInterface);
-    cloneMethods(newInterface);
-    return newInterface;
+Constant* LgsInterface::getRTType(LgsCgModule& cg) {
+    assert(0);
+}
+
+std::string LgsInterface::strFormatPart() const {
+    assert(0);
 }

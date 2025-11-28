@@ -248,8 +248,8 @@ Value* LgsCgModule::callHash(Value* arg) {
     return callLgsFunc("hash", i32Ty(), {ptrTy()}, {arg});
 }
 
-Value* LgsCgModule::hashConst(const std::string& str) {
-    return i32(hashString(str));
+Constant* LgsCgModule::hashConst(const std::string& str) {
+    return i64(hashString(str));
 }
 
 Value* LgsCgModule::callPrintf(const std::vector<Value*>& args) {

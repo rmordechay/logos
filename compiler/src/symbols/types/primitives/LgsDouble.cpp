@@ -43,7 +43,3 @@ Value* LgsDouble::powIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
 llvm::DIType* LgsDouble::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
-
-LgsType* LgsDouble::clone() {
-    return this;
-}

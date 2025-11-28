@@ -38,7 +38,6 @@ public:
     size_t sizeBytes() override;
     bool canCastTo(LgsType* other) override;
     llvm::DIType* getDebugType(LgsCgModule& cg) override;
-    LgsType* clone() override;
 };
 
 inline LgsBool LGS_BOOL;
