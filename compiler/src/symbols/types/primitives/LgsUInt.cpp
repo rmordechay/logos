@@ -1,6 +1,6 @@
 #include "types/primitives/LgsUInt.h"
 #include "exprs/constants/LgsIntConst.h"
-#include "codegen/LgsLLVMGen.h"
+#include "codegen/LgsCgModule.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsInt.h"
 #include "types/primitives/LgsSize.h"
@@ -9,11 +9,11 @@ size_t LgsUInt::sizeBytes() {
     return sizeof(uint32_t);
 }
 
-Type* LgsUInt::getIRType(LgsLLVMGen& cg) {
+Type* LgsUInt::getIRType(LgsCgModule& cg) {
     return cg.i32Ty();
 }
 
-Constant* LgsUInt::getRTType(LgsLLVMGen& cg) {
+Constant* LgsUInt::getRTType(LgsCgModule& cg) {
     return cg.getRTTypeInfo(getGenericName(), sizeBytes(), RTT_UINT, cg.null());
 }
 
@@ -33,7 +33,7 @@ bool LgsUInt::canCastTo(LgsType* other) {
     return name == IRName;
 }
 
-llvm::DIType* LgsUInt::getDebugType(LgsLLVMGen& cg) {
+llvm::DIType* LgsUInt::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
 

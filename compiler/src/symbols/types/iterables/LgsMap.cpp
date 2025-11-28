@@ -12,14 +12,14 @@
 #include "types/iterables/LgsDArray.h"
 #include "LgsUtils.h"
 
-Type* LgsMap::getIRType(LgsLLVMGen& cg) {
+Type* LgsMap::getIRType(LgsCgModule& cg) {
     if (IRType) return IRType;
     const std::vector<Type*> mapStructFields = {cg.i64Ty(), cg.i64Ty(), cg.i64Ty(), cg.ptrTy()};
     IRType = cg.getStructType(mapStructFields, name);
     return IRType;
 }
 
-Constant* LgsMap::getRTType(LgsLLVMGen& cg) {
+Constant* LgsMap::getRTType(LgsCgModule& cg) {
     const auto genericName = getGenericName();
     const auto st = cg.getStructType({cg.ptrTy(), cg.ptrTy()}, genericName);
     const auto sv = llvm::ConstantStruct::get(st, {mapType->key->getRTType(cg), mapType->value->getRTType(cg)});
@@ -69,7 +69,7 @@ bool LgsMap::unpackLoopVarsTypes(LgsForeachLoop* loop) const {
     return false;
 }
 
-void LgsMap::unpackLoopIR(LgsLLVMGen& cg, LgsForeachLoop* loop) const {
+void LgsMap::unpackLoopIR(LgsCgModule& cg, LgsForeachLoop* loop) const {
     const auto keyPtr = cg.callLgsFunc("Map_getKeyAt", cg.ptrTy(), {cg.ptrTy(), cg.sizeTy()}, {loop->iterExpr->IRValue, loop->iValue});
     loop->loopVars[0]->IRValue = keyPtr;
     if (loop->loopVars.size() == 2) {
@@ -78,15 +78,15 @@ void LgsMap::unpackLoopIR(LgsLLVMGen& cg, LgsForeachLoop* loop) const {
     }
 }
 
-Value* LgsMap::lenIR(LgsLLVMGen& cg, Value* iterable) {
+Value* LgsMap::lenIR(LgsCgModule& cg, Value* iterable) {
     return cg.callLgsFunc("Map_len", cg.sizeTy(), {cg.ptrTy()}, {iterable});
 }
 
-Value* LgsMap::inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) {
+Value* LgsMap::inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) {
     assert(0);
 }
 
-Value* LgsMap::getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) {
+Value* LgsMap::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
     return cg.callLgsFunc("Map_get", cg.ptrTy(), {cg.ptrTy(), cg.ptrTy()}, {iterable, index});
 }
 
@@ -104,10 +104,10 @@ std::string LgsMap::strFormatPart() const {
     return "%s";
 }
 
-llvm::DIType* LgsMap::getDebugType(LgsLLVMGen& cg) {
+llvm::DIType* LgsMap::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
 
 LgsType* LgsMap::clone() {
-    return new LgsMap(mapType->key->clone(), mapType->value->clone());
+    return new LgsMap(mapType->key, mapType->value);
 }

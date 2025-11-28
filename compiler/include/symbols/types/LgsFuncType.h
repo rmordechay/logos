@@ -49,8 +49,8 @@ public:
         setFuncOptions(ops);
         passByRef = true;
     }
-    Type* getIRType(LgsLLVMGen& cg) override;
-    Constant* getRTType(LgsLLVMGen& cg) override;
+    Type* getIRType(LgsCgModule& cg) override;
+    Constant* getRTType(LgsCgModule& cg) override;
     LgsExpr* getZeroValue() override;
     size_t sizeBytes() override;
     std::string getName() override;
@@ -60,7 +60,7 @@ public:
     bool equals(LgsType* other) override;
     void setFuncOptions(uint32_t ops);
     std::unordered_map<std::string, LgsParam*> getParamsByName();
-    llvm::DIType* getDebugType(LgsLLVMGen& cg) override;
+    llvm::DIType* getDebugType(LgsCgModule& cg) override;
     LgsFuncType* clone() override;
     ~LgsFuncType() override;
 };

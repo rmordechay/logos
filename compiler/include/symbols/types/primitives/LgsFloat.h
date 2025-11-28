@@ -9,19 +9,19 @@ public:
         isPrimitive = true;
         isFloatingPoint = true;
     }
-    Type* getIRType(LgsLLVMGen& cg) override;
+    Type* getIRType(LgsCgModule& cg) override;
     std::string getName() override;
     LgsExpr* getZeroValue() override;
-    Constant* getRTType(LgsLLVMGen& cg) override;
+    Constant* getRTType(LgsCgModule& cg) override;
     size_t sizeBytes() override;
     std::string strFormatPart() const override;
     bool canCastTo(LgsType* other) override;
     LgsType* applyBinOp(LgsType* toType, LgsBinOp& op) override;
-    Value* addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* subIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* mulIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* divIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
-    llvm::DIType* getDebugType(LgsLLVMGen& cg) override;
+    Value* addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
+    Value* subIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
+    Value* mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
+    Value* divIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
+    llvm::DIType* getDebugType(LgsCgModule& cg) override;
     LgsType* clone() override;
 };
 

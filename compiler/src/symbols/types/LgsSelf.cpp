@@ -1,10 +1,10 @@
 #include "types/LgsSelf.h"
 
-Type* LgsSelf::getIRType(LgsLLVMGen& cg) {
+Type* LgsSelf::getIRType(LgsCgModule& cg) {
     assert(0);
 }
 
-Constant* LgsSelf::getRTType(LgsLLVMGen& cg) {
+Constant* LgsSelf::getRTType(LgsCgModule& cg) {
     assert(0);
 }
 
@@ -28,7 +28,7 @@ std::string LgsSelf::strFormatPart() const {
     assert(0);
 }
 
-llvm::DIType* LgsSelf::getDebugType(LgsLLVMGen& cg) {
+llvm::DIType* LgsSelf::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
 

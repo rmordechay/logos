@@ -6,7 +6,7 @@ class LgsSwitch;
 class LgsDeferStmt;
 class LgsCoroutine;
 class LgsPostfixExpr;
-class LgsLLVMGen;
+class LgsCgModule;
 class LgsForLoop;
 class LgsVarDec;
 class LgsSelection;
@@ -20,7 +20,6 @@ class LgsAssignment;
 class LgsStmt : virtual public LgsValue {
 public:
     bool isTerminator();
-    LgsStmt* clone() override;
     LgsForLoop* asLoop();
     LgsCoroutine* asCoroutine();
     LgsDeferStmt* asDefer();

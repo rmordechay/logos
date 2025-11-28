@@ -15,8 +15,8 @@ public:
         isHeapAlloc = true;
         addMethod(addFunc);
     }
-    Type* getIRType(LgsLLVMGen& cg) override;
-    Constant* getRTType(LgsLLVMGen& cg) override;
+    Type* getIRType(LgsCgModule& cg) override;
+    Constant* getRTType(LgsCgModule& cg) override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
     std::string getName() override;
@@ -25,9 +25,9 @@ public:
     std::string strFormatPart() const override;
     bool inferBaseType(const std::vector<LgsExpr*>& args) override;
     LgsType* applyBinOp(LgsType* toType, LgsBinOp& op) override;
-    Value* lenIR(LgsLLVMGen& cg, Value* iterable) override;
-    Value* inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
-    Value* getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) override;
-    llvm::DIType* getDebugType(LgsLLVMGen& cg) override;
+    Value* lenIR(LgsCgModule& cg, Value* iterable) override;
+    Value* inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
+    Value* getIRElement(LgsCgModule& cg, Value* iterable, Value* index) override;
+    llvm::DIType* getDebugType(LgsCgModule& cg) override;
     LgsType* clone() override;
 };

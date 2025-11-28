@@ -8,14 +8,14 @@ public:
     bool isWeakType = false;
 
     LgsSubType(const std::string& name, LgsType* baseType) : name(name), subtype(baseType) {}
-    Type* getIRType(LgsLLVMGen& cg) override;
-    Constant* getRTType(LgsLLVMGen& cg) override;
+    Type* getIRType(LgsCgModule& cg) override;
+    Constant* getRTType(LgsCgModule& cg) override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
     std::string getName() override;
     std::string pname() override;
     bool canCastTo(LgsType* other) override;
     std::string strFormatPart() const override;
-    llvm::DIType* getDebugType(LgsLLVMGen& cg) override;
+    llvm::DIType* getDebugType(LgsCgModule& cg) override;
     LgsSubType* clone() override;
 };

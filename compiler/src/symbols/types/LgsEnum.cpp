@@ -1,5 +1,5 @@
 #include "types/LgsEnum.h"
-#include "codegen/LgsLLVMGen.h"
+#include "codegen/LgsCgModule.h"
 #include "stmts/LgsField.h"
 #include "types/LgsAny.h"
 
@@ -7,14 +7,14 @@ LgsExpr* LgsEnum::getZeroValue() {
     return nullptr;
 }
 
-Type* LgsEnum::getIRType(LgsLLVMGen& cg) {
+Type* LgsEnum::getIRType(LgsCgModule& cg) {
     if (const auto expr = fields.front()->expr) {
         return cg.getStructType({cg.sizeTy(), expr->type->getIRType(cg)});
     }
     return cg.getStructType({cg.sizeTy(), cg.ptrTy()});
 }
 
-Constant* LgsEnum::getRTType(LgsLLVMGen& cg) {
+Constant* LgsEnum::getRTType(LgsCgModule& cg) {
     assert(0);
 }
 
@@ -40,6 +40,6 @@ LgsEnum* LgsEnum::clone() {
     return new LgsEnum(*this);
 }
 
-llvm::DIType* LgsEnum::getDebugType(LgsLLVMGen& cg) {
+llvm::DIType* LgsEnum::getDebugType(LgsCgModule& cg) {
     assert(0);
 }

@@ -11,7 +11,7 @@ void LgsHashMap::castImplicitly(LgsType* toType) {
     }
 }
 
-Value* LgsHashMap::castIR(LgsLLVMGen& cg, LgsType* toType) {
+Value* LgsHashMap::castIR(LgsCgModule& cg, LgsType* toType) {
     assert(0);
 }
 

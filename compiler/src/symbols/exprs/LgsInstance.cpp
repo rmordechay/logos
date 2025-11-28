@@ -14,11 +14,11 @@ LgsExpr* LgsInstance::castExplicitly(LgsType* toType) {
     assert(0);
 }
 
-Value* LgsInstance::castIR(LgsLLVMGen& cg, LgsType* toType) {
+Value* LgsInstance::castIR(LgsCgModule& cg, LgsType* toType) {
     return IRValue;
 }
 
-Value* LgsInstance::loadIR(LgsLLVMGen& cg) {
+Value* LgsInstance::loadIR(LgsCgModule& cg) {
     return IRValue;
 }
 

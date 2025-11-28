@@ -8,7 +8,7 @@
 #include <sstream>
 #include <llvm/IR/InlineAsm.h>
 
-Value* LgsSelection::loadIR(LgsLLVMGen& cg) {
+Value* LgsSelection::loadIR(LgsCgModule& cg) {
     assert(0);
 }
 
@@ -20,11 +20,11 @@ LgsFuncCall* LgsSelection::asMethodCall() const {
     return lastExpr()->asFuncCall();
 }
 
-Value* LgsSelection::castIR(LgsLLVMGen& cg, LgsType* toType) {
+Value* LgsSelection::castIR(LgsCgModule& cg, LgsType* toType) {
     return IRValue;
 }
 
-void LgsSelection::assign(LgsLLVMGen& cg, LgsExpr* expr) {
+void LgsSelection::assign(LgsCgModule& cg, LgsExpr* expr) {
     const auto rIR = expr->IRValue;
     const auto lExpr = lastExpr();
     if (lExpr->type->asVec()) {
@@ -54,7 +54,7 @@ std::string LgsSelection::asText() {
     return str.str();
 }
 
-Value* LgsSelection::hashValue(LgsLLVMGen& cg) {
+Value* LgsSelection::hashValue(LgsCgModule& cg) {
     return lastExpr()->hashValue(cg);
 }
 

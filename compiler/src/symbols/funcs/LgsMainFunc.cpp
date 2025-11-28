@@ -4,7 +4,7 @@
 #include "types/primitives/LgsInt.h"
 #include <llvm/IR/DIBuilder.h>
 
-Function* LgsMainFunc::getIRFunc(LgsLLVMGen& cg) {
+Function* LgsMainFunc::getIRFunc(LgsCgModule& cg) {
     FunctionType* mainFuncType;
     if (funcType->params.empty()) {
         mainFuncType = cg.getFT(cg.i32Ty());
@@ -20,7 +20,7 @@ Function* LgsMainFunc::getIRFunc(LgsLLVMGen& cg) {
     return IRFunc;
 }
 
-void LgsMainFunc::setDebugValue(LgsLLVMGen& cg) {
+void LgsMainFunc::setDebugValue(LgsCgModule& cg) {
     const auto diBuilder = cg.debugger.diBuilder;
     const auto dbInt32 = LGS_INT.getDebugType(cg);
     const auto parameterTypes = diBuilder->getOrCreateTypeArray({dbInt32});

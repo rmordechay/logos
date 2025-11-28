@@ -1,5 +1,5 @@
 #pragma once
-#include "codegen/LgsLLVMGen.h"
+#include "codegen/LgsCgModule.h"
 #include <string>
 
 class LgsGenericType;

@@ -1,6 +1,6 @@
 #include "loops/LgsForLoop.h"
 #include "LgsDefinitions.h"
-#include "codegen/LgsLLVMGen.h"
+#include "codegen/LgsCgModule.h"
 #include "loops/LgsForeachLoop.h"
 #include "loops/LgsInfiniteLoop.h"
 #include "loops/LgsRangeLoop.h"
@@ -9,13 +9,13 @@
 #include "stmts/LgsVarDec.h"
 #include "LgsUtils.h"
 
-void LgsForLoop::setBlocks(LgsLLVMGen& cg) {
+void LgsForLoop::setBlocks(LgsCgModule& cg) {
     IRCondBlock = cg.createBlock(BLOCK_NAME_LOOP_COND);
     IRBodyBlock = cg.createBlock(BLOCK_NAME_LOOP_BODY);
     IRExitBlock = cg.createBlock(BLOCK_NAME_LOOP_EXIT);
 }
 
-void LgsForLoop::incAndJumpToCond(LgsLLVMGen& cg) {
+void LgsForLoop::incAndJumpToCond(LgsCgModule& cg) {
     if (cg.lastInstTerminator()) return;
     iValue = cg.builder.CreateLoad(cg.i32Ty(), iPtr);
     const auto inc = cg.builder.CreateAdd(iValue, cg.i32(1));

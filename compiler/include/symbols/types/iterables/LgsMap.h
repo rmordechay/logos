@@ -27,8 +27,8 @@ public:
         addMethod(valuesFunc);
     }
 
-    Type* getIRType(LgsLLVMGen& cg) override;
-    Constant* getRTType(LgsLLVMGen& cg) override;
+    Type* getIRType(LgsCgModule& cg) override;
+    Constant* getRTType(LgsCgModule& cg) override;
     std::string getName() override;
     std::string pname() override;
     size_t sizeBytes() override;
@@ -37,13 +37,13 @@ public:
     LgsType* getValueType() override;
     bool inferBaseType(const std::vector<LgsExpr*>& args) override;
     bool unpackLoopVarsTypes(LgsForeachLoop* loop) const override;
-    void unpackLoopIR(LgsLLVMGen& cg, LgsForeachLoop* loop) const override;
-    Value* lenIR(LgsLLVMGen& cg, Value* iterable) override;
-    Value* inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
-    Value* getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) override;
+    void unpackLoopIR(LgsCgModule& cg, LgsForeachLoop* loop) const override;
+    Value* lenIR(LgsCgModule& cg, Value* iterable) override;
+    Value* inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
+    Value* getIRElement(LgsCgModule& cg, Value* iterable, Value* index) override;
     bool canCastTo(LgsType* other) override;
     std::string strFormatPart() const override;
-    llvm::DIType* getDebugType(LgsLLVMGen& cg) override;
+    llvm::DIType* getDebugType(LgsCgModule& cg) override;
     LgsType* clone() override;
 };
 

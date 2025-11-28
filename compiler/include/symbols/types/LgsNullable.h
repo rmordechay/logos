@@ -8,16 +8,16 @@ public:
     explicit LgsNullable(LgsType* baseType) : baseType(baseType) {}
     LgsField* getField(const std::string& fieldName) override;
     LgsFunc* getMethod(const std::string& methodName) override;
-    void setIRValue(LgsLLVMGen& cg, Value* nullablePtr, Value* value);
-    Type* getIRType(LgsLLVMGen& cg) override;
-    Constant* getRTType(LgsLLVMGen& cg) override;
+    void setIRValue(LgsCgModule& cg, Value* nullablePtr, Value* value);
+    Type* getIRType(LgsCgModule& cg) override;
+    Constant* getRTType(LgsCgModule& cg) override;
     LgsExpr* getZeroValue() override;
     std::string getName() override;
     std::string pname() override;
     bool canCastTo(LgsType* other) override;
     size_t sizeBytes() override;
     std::string strFormatPart() const override;
-    llvm::DIType* getDebugType(LgsLLVMGen& cg) override;
+    llvm::DIType* getDebugType(LgsCgModule& cg) override;
     LgsType* clone() override;
     ~LgsNullable() override;
 };

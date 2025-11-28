@@ -29,15 +29,15 @@ void LgsExpr::castImplicitly(LgsType* toType) {
 
 }
 
-Value* LgsExpr::castIR(LgsLLVMGen& cg, LgsType* toType) {
+Value* LgsExpr::castIR(LgsCgModule& cg, LgsType* toType) {
     assert(0);
 }
 
-Value* LgsExpr::hashValue(LgsLLVMGen& cg) {
+Value* LgsExpr::hashValue(LgsCgModule& cg) {
     assert(0);
 }
 
-void LgsExpr::assign(LgsLLVMGen& cg, LgsExpr* expr) {
+void LgsExpr::assign(LgsCgModule& cg, LgsExpr* expr) {
     assert(0);
 }
 
@@ -45,7 +45,7 @@ bool LgsExpr::equals(LgsExpr* other) {
     assert(0);
 }
 
-void LgsExpr::freeOwner(LgsLLVMGen& cg) {
+void LgsExpr::freeOwner(LgsCgModule& cg) {
     if (type->isHeapAlloc && owner) {
         cg.callRuntimeFunc("removeOwner", cg.voidTy(), {cg.ptrTy()}, {owner->IRValue});
         owner = nullptr;
@@ -194,15 +194,10 @@ LgsNullableExpr* LgsExpr::asNullableExpr() {
     return dynamic_cast<LgsNullableExpr*>(this);
 }
 
-LgsExpr* LgsExpr::clone() {
-    assert(0);
-}
-
 void freeExpr(LgsExpr* expr) {
     if (!expr) return;
     if (!expr->asVariable()) {
-        freeType(expr->type);
-        expr->type = nullptr;
+        expr->setType(nullptr);
     }
     delete expr;
 }

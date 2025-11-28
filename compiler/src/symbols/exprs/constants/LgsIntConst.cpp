@@ -8,7 +8,7 @@
 #include "types/primitives/LgsSize.h"
 #include "LgsUtils.h"
 
-Value* LgsIntConst::loadIR(LgsLLVMGen& cg) {
+Value* LgsIntConst::loadIR(LgsCgModule& cg) {
     return IRValue;
 }
 
@@ -20,7 +20,7 @@ LgsExpr* LgsIntConst::castExplicitly(LgsType* toType) {
     if (toType->isInt) {
         // Widening is always allowed
         if (otherSize >= thisSize) {
-            type = toType;
+            setType(toType);
             return this;
         }
         return nullptr;
@@ -31,7 +31,7 @@ LgsExpr* LgsIntConst::castExplicitly(LgsType* toType) {
     return nullptr;
 }
 
-Value* LgsIntConst::castIR(LgsLLVMGen& cg, LgsType* toType) {
+Value* LgsIntConst::castIR(LgsCgModule& cg, LgsType* toType) {
     if (type->getName() == toType->getName()) return IRValue;
     if (toType->asGeneric()) return IRValue;
     if (toType->asLong()) {
@@ -60,7 +60,7 @@ void LgsIntConst::hashNode(size_t& oldHash) {
     hashNodeInt(oldHash, value);
 }
 
-Value* LgsIntConst::hashValue(LgsLLVMGen& cg) {
+Value* LgsIntConst::hashValue(LgsCgModule& cg) {
     return IRValue;
 }
 
@@ -68,8 +68,4 @@ std::string LgsIntConst::asText() {
     return std::to_string(value);
 }
 
-LgsIntConst* LgsIntConst::clone() {
-    return new LgsIntConst(type->clone(), value);
-}
-
-void LgsIntConst::setDebugValue(LgsLLVMGen& cg) { /* do nothing */}
+void LgsIntConst::setDebugValue(LgsCgModule& cg) { /* do nothing */}

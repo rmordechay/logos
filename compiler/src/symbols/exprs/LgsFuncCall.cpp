@@ -8,7 +8,7 @@
 #include <sstream>
 bool argAndParamEqual(const LgsFuncArg* arg, const LgsParam* param);
 
-Value* LgsFuncCall::loadIR(LgsLLVMGen& cg) {
+Value* LgsFuncCall::loadIR(LgsCgModule& cg) {
     return IRValue;
 }
 
@@ -102,7 +102,7 @@ std::string LgsFuncCall::getGenericName() const {
     return str.str();
 }
 
-Value* LgsFuncCall::castIR(LgsLLVMGen& cg, LgsType* toType) {
+Value* LgsFuncCall::castIR(LgsCgModule& cg, LgsType* toType) {
     if (type->getName() == toType->getName()) return IRValue;
     assert(0);
 }
@@ -125,18 +125,8 @@ std::string LgsFuncCall::asText() {
     return str.str();
 }
 
-void LgsFuncCall::setDebugValue(LgsLLVMGen& cg) {
+void LgsFuncCall::setDebugValue(LgsCgModule& cg) {
     cg.builder.SetCurrentDebugLocation(cg.getDebugLoc(location));
-}
-
-LgsFuncCall* LgsFuncCall::clone() {
-    const auto newFuncCall = new LgsFuncCall(*this);
-    newFuncCall->args.clear();
-    for (const auto& arg : args) {
-        newFuncCall->args.emplace_back(LgsFuncArg(arg.expr->clone(), arg.name));
-    }
-    if (type) newFuncCall->type = type->clone();
-    return newFuncCall;
 }
 
 bool argAndParamEqual(const LgsFuncArg* arg, const LgsParam* param) {

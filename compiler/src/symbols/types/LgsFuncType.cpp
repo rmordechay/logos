@@ -1,11 +1,11 @@
 #include "types/LgsFuncType.h"
 #include "LgsDefinitions.h"
-#include "codegen/LgsLLVMGen.h"
+#include "codegen/LgsCgModule.h"
 #include "types/LgsGenericType.h"
 #include "LgsUtils.h"
 #include <sstream>
 
-Type* LgsFuncType::getIRType(LgsLLVMGen& cg) {
+Type* LgsFuncType::getIRType(LgsCgModule& cg) {
     std::vector<Type*> types;
     for (size_t i = 0; i < params.size(); ++i) {
         const auto param = params[i];
@@ -22,7 +22,7 @@ Type* LgsFuncType::getIRType(LgsLLVMGen& cg) {
     return IRType;
 }
 
-Constant* LgsFuncType::getRTType(LgsLLVMGen& cg) {
+Constant* LgsFuncType::getRTType(LgsCgModule& cg) {
     assert(0);
 }
 
@@ -130,7 +130,7 @@ std::unordered_map<std::string, LgsParam*> LgsFuncType::getParamsByName() {
     return paramsByName;
 }
 
-llvm::DIType* LgsFuncType::getDebugType(LgsLLVMGen& cg) {
+llvm::DIType* LgsFuncType::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
 
@@ -139,12 +139,12 @@ LgsFuncType* LgsFuncType::clone() {
     lgsFunc->name = name;
     lgsFunc->IRName = IRName;
     lgsFunc->parentName = parentName;
-    lgsFunc->rt = rt ? rt->clone() : nullptr;
+    lgsFunc->rt = rt ? rt : nullptr;
     for (const auto& param : params) {
         lgsFunc->params.push_back(LgsParam(param));
     }
     for (const auto generic : genericTypes) {
-        lgsFunc->genericTypes.push_back(generic->clone());
+        lgsFunc->genericTypes.push_back(generic);
     }
     lgsFunc->isPublic = isPublic;
     lgsFunc->isBuiltin = isBuiltin;

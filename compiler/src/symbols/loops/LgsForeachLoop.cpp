@@ -2,16 +2,16 @@
 #include "types/iterables/LgsMap.h"
 #include "LgsUtils.h"
 
-Value* LgsForeachLoop::loopStart(LgsLLVMGen& cg) {
+Value* LgsForeachLoop::loopStart(LgsCgModule& cg) {
     return cg.i32Zero();
 }
 
-Value* LgsForeachLoop::loopEnd(LgsLLVMGen& cg) {
+Value* LgsForeachLoop::loopEnd(LgsCgModule& cg) {
     const auto iter = iterExpr->type->asIterable();
     return cg.builder.CreateTrunc(iter->lenIR(cg, iterExpr->IRValue), cg.i32Ty());
 }
 
-void LgsForeachLoop::incAndJumpToCond(LgsLLVMGen& cg) {
+void LgsForeachLoop::incAndJumpToCond(LgsCgModule& cg) {
     if (cg.lastInstTerminator()) return;
     iValue = cg.builder.CreateLoad(cg.i32Ty(), iPtr);
     const auto inc = cg.builder.CreateAdd(iValue, cg.i32(1));

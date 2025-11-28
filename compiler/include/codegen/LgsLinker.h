@@ -8,7 +8,7 @@ namespace llvm {
 }
 struct LgsAppConfigs;
 class LgsFile;
-class LgsLLVMGen;
+class LgsCgModule;
 
 class LgsLinker {
 public:

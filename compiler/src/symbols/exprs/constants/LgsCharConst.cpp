@@ -1,10 +1,10 @@
 #include "exprs/constants/LgsCharConst.h"
 
-Value* LgsCharConst::loadIR(LgsLLVMGen& cg) {
+Value* LgsCharConst::loadIR(LgsCgModule& cg) {
     return IRValue;
 }
 
-Value* LgsCharConst::castIR(LgsLLVMGen& cg, LgsType* toType) {
+Value* LgsCharConst::castIR(LgsCgModule& cg, LgsType* toType) {
     assert(0);
 }
 

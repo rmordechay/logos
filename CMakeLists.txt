@@ -40,7 +40,7 @@ set(LGS_SOURCE
     ${CMAKE_SOURCE_DIR}/compiler/src/files/LgsAppConfigFile.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/codegen/LgsLinker.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/codegen/LgsCodeGen.cpp
-    ${CMAKE_SOURCE_DIR}/compiler/src/codegen/LgsLLVMGen.cpp
+    ${CMAKE_SOURCE_DIR}/compiler/src/codegen/LgsCgModule.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/analysis/LgsSema.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/analysis/LgsTypeResolver.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/tools/LgsLinter.cpp

@@ -1,5 +1,6 @@
 #pragma once
 #include "Lgs_Types.h"
+
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/Passes/OptimizationLevel.h>
@@ -7,6 +8,8 @@
 #include <map>
 #include <filesystem>
 
+struct LgsPaths;
+struct LgsAppConfigs;
 struct LgsLocation;
 class LgsFile;
 namespace llvm {
@@ -50,7 +53,7 @@ struct LgsLLDBGen {
     std::vector<llvm::DIScope*> blocks = {};
 };
 
-class LgsLLVMGen {
+class LgsCgModule {
 public:
     LLVMContext context;
     LgsLLDBGen debugger;
@@ -59,8 +62,10 @@ public:
     IRBuilder<> builder = IRBuilder(context);
     std::map<std::string, Type*> typesRegistry;
     std::unordered_map<std::string, Value*> stringsRegistry;
+    bool isRTTModule = false;
 
-    void setupModule(const LgsFile& file, bool debugMode = false);
+    void setupModule(const std::string& file, bool debugMode = false);
+    bool writeIRModule(const LgsPaths& paths, uint8_t optLevel) const;
     void loop(Value* loopLength, const std::function<void(Value*, BasicBlock*)>& body);
     Constant* getIRStr(const std::string& value);
     Value* getPtrTo(Value* v);
@@ -144,7 +149,7 @@ public:
     llvm::DILocation* getDebugLoc(const LgsLocation& location);
     static void initLLVM();
     static llvm::OptimizationLevel getOptLevel(uint8_t optLevel);
-    ~LgsLLVMGen();
+    ~LgsCgModule();
 };
 
 inline TargetMachine* targetMachine;

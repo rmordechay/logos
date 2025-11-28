@@ -1,5 +1,5 @@
 #include "codegen/LgsLinker.h"
-#include "codegen/LgsLLVMGen.h"
+#include "codegen/LgsCgModule.h"
 #include "logos/LgsAppConfigs.h"
 #include <llvm/Support/FileSystem.h>
 

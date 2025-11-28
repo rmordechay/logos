@@ -712,7 +712,7 @@ void LgsSema::visitCast(LgsCast* cast) {
 
 void LgsSema::visitNullableExpr(LgsNullableExpr* nullableExpr) {
     visitExpr(nullableExpr->baseExpr);
-    nullableExpr->nullableType->baseType = nullableExpr->baseExpr->type->clone();
+    nullableExpr->nullableType->baseType = nullableExpr->baseExpr->type;
 }
 
 void LgsSema::visitArrayExpr(LgsArrayExpr* arrayExpr) {
@@ -723,7 +723,7 @@ void LgsSema::visitArrayExpr(LgsArrayExpr* arrayExpr) {
         visitExpr(element);
     }
     if (!arrayExpr->type) {
-        arrayExpr->type = new LgsDArray();
+        arrayExpr->setType(new LgsDArray());
         visitDynamicArray(arrayExpr);
     } else if (arrayExpr->type->asSet()) {
         visitDynamicArray(arrayExpr);
@@ -772,7 +772,7 @@ void LgsSema::visitHashMap(LgsHashMap* hashMap) {
         return addError(E10049, hashMap->location, {LgsMap::name});
     }
     const auto [key, value] = hashMap->elements.front();
-    hashMap->setType(new LgsMap(key->type->clone(), value->type->clone()));
+    hashMap->setType(new LgsMap(key->type, value->type));
 }
 
 void LgsSema::visitVectorExpr(const LgsVectorExpr* vectorExpr) {
@@ -812,7 +812,7 @@ void LgsSema::visitMatrixExpr(const LgsMatrixExpr* matrixExpr) {
             castExpr(innerElement, matrixExpr->matType->baseType);
         }
         const auto columnsInt = new LgsIntConst(&LGS_SIZE, matrixExpr->matType->columns);
-        vector->type = new LgsSArray(matrixExpr->matType->baseType, columnsInt);
+        vector->setType(new LgsSArray(matrixExpr->matType->baseType, columnsInt));
     }
 }
 
@@ -930,12 +930,12 @@ void LgsSema::visitFieldSelection(LgsVariable* child, LgsType* parentType) {
     if (parentType->asVec() && !validateVecElements(child, parentType->asVec())) return;
     auto childName = child->name;
     if (const auto field = parentType->getField(childName)) {
-        child->setType(field->type->clone());
+        child->setType(field->type);
         child->ref = LgsSymbol(field);
         if (field->isOwner && field->type->isHeapAlloc) {
             child->owner = field;
         }
-        validateFieldVisibility(field, parentType);
+        validateFieldVisibility(field, parentType, child->location);
     } else if (const auto method = parentType->getMethod(childName)) {
         child->setType(method->type);
         child->ref = LgsSymbol(method);
@@ -977,7 +977,7 @@ void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent) {
     if (!visitFuncArgs(methodCall, method->funcType)) return;
     if (methodCall->equals(method->funcType)) {
         methodCall->func = method;
-        methodCall->setType(method->funcType->rt->clone());
+        methodCall->setType(method->funcType->rt);
     } else {
         addError(E10034, methodCall->location, {parent->type->pname(), name, methodCall->asText(), method->asText()});
         return;
@@ -1019,11 +1019,11 @@ void LgsSema::visitFuncCall(LgsFuncCall* funcCall) {
             genericFunc = createGenericFunc(funcCall, func);
             file->symbolTable.genericFuncCalls[funcName] = genericFunc;
         }
-        funcCall->func = genericFunc->clone();
+        funcCall->func = genericFunc;
         funcCall->setType(genericFunc->funcType->rt);
     } else {
         funcCall->func = func;
-        funcCall->setType(ft->rt->clone());
+        funcCall->setType(ft->rt);
     }
 }
 
@@ -1136,7 +1136,7 @@ void LgsSema::visitInstance(LgsInstance* instance) {
     if (obj->singleton) {
         return addError(E10032, instance->location, {objName});
     }
-    instance->setObject(obj->clone());
+    instance->setObject(obj);
 
     // Args
     std::unordered_set<std::string> visited;
@@ -1150,7 +1150,7 @@ void LgsSema::visitInstance(LgsInstance* instance) {
             addError(E10005, arg.expr->location, {argName, objName});
             continue;
         }
-        if (!validateFieldVisibility(field, instance->obj)) continue;
+        if (!validateFieldVisibility(field, instance->obj, arg.expr->location)) continue;
         castExpr(arg.expr, field->type);
         if (field->type->asNullable() && !arg.expr->asNullableExpr()) {
             arg.expr = new LgsNullableExpr(arg.expr);
@@ -1221,7 +1221,7 @@ void LgsSema::visitIndex(LgsIterIndex* iterIndex) {
     if (exprTo) {
         visitExpr(exprTo);
         visitSlice(iterIndex);
-        iterIndex->setType(iterable->clone());
+        iterIndex->setType(iterable);
     } else {
         if (!exprFrom->type->canCastTo(iterable->getIndexType())) {
             return addError(E10036, iterIndex->location, {iterIndex->asText(), exprFrom->type->pname()});
@@ -1391,14 +1391,14 @@ void LgsSema::validateIndex(LgsIterIndex* iterIndex) {
     }
 }
 
-bool LgsSema::validateFieldVisibility(LgsField* field, LgsType* parent) {
+bool LgsSema::validateFieldVisibility(LgsField* field, LgsType* parent, const LgsLocation& location) {
     assert(parent);
     if (parent->asVec()) return true;
     if (parent->asObject() && parent->asObject()->singleton) return true;
     if (!field || field->isVirtual) return false;
     if (stack.currentFunc()->isTest) return true;
     if (!field->isPublic && file->path != *field->location.filepath) {
-        if (parent) addError(E10030, field->location, {field->name, parent->pname()});
+        addError(E10030, location, {field->name, parent->pname()});
         return false;
     }
     return true;
@@ -1538,12 +1538,12 @@ LgsSymbol* LgsSema::getSymbol(const std::string& name, const LgsLocation* locati
 }
 
 void LgsSema::createCoroutineFunc(LgsFuncCall* funcCall) {
-    const auto originalFT = funcCall->func->funcType->clone();
+    const auto originalFT = funcCall->func->funcType;
     const auto newFunc = new LgsFunc(originalFT);
     newFunc->location = funcCall->func->location;
     newFunc->funcType->location = originalFT->location;
     newFunc->funcType->isCoroutine = true;
-    newFunc->stmtsBlock = funcCall->func->stmtsBlock->clone();
+    newFunc->stmtsBlock = funcCall->func->stmtsBlock;
     visitFunc(newFunc);
     funcCall->coroutine = newFunc;
     funcCall->func = nullptr;
@@ -1564,11 +1564,11 @@ LgsFunc* LgsSema::createGenericFunc(LgsFuncCall* funcCall, const LgsFunc* origin
         const auto paramTypeName = param.type->getName();
         if (genericArgs.contains(paramTypeName)) continue;
         if (originalFT->rt->asGeneric()) {
-            const auto newType = arg.expr->type->clone();
+            const auto newType = arg.expr->type;
             genericArgs[paramTypeName] = newType;
             newFunc->funcType->params.emplace_back(newType, param.name);
         } else {
-            newFunc->funcType->params.emplace_back(param.type->clone(), param.name);
+            newFunc->funcType->params.emplace_back(param.type, param.name);
         }
     }
 
@@ -1582,10 +1582,10 @@ LgsFunc* LgsSema::createGenericFunc(LgsFuncCall* funcCall, const LgsFunc* origin
     if (originalFT->rt->asGeneric()) {
         newFunc->funcType->rt = genericArgs[originalFT->rt->getName()];
     } else {
-        newFunc->funcType->rt = originalFT->rt->clone();
+        newFunc->funcType->rt = originalFT->rt;
     }
 
-    newFunc->stmtsBlock = originalFunc->stmtsBlock->clone();
+    newFunc->stmtsBlock = originalFunc->stmtsBlock;
     visitFunc(newFunc);
     funcCall->func = newFunc;
     return newFunc;

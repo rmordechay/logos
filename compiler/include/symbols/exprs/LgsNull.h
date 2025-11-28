@@ -11,7 +11,7 @@ public:
     void castImplicitly(LgsType* toType) override;
     std::string asText() override;
     bool equals(LgsExpr* other) override;
-    Value* castIR(LgsLLVMGen& cg, LgsType* toType) override;
+    Value* castIR(LgsCgModule& cg, LgsType* toType) override;
     ~LgsNull() override;
 };
 

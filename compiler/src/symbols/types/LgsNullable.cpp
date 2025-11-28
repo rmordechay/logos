@@ -1,5 +1,5 @@
 #include "types/LgsNullable.h"
-#include "codegen/LgsLLVMGen.h"
+#include "codegen/LgsCgModule.h"
 #include "LgsDefinitions.h"
 #include "exprs/LgsNull.h"
 #include "LgsUtils.h"
@@ -13,7 +13,7 @@ LgsFunc* LgsNullable::getMethod(const std::string& methodName) {
     return baseType->getMethod(methodName);
 }
 
-void LgsNullable::setIRValue(LgsLLVMGen& cg, Value* nullablePtr, Value* value) {
+void LgsNullable::setIRValue(LgsCgModule& cg, Value* nullablePtr, Value* value) {
     if (baseType->passByRef) {
         cg.builder.CreateStore(value, nullablePtr);
     } else {
@@ -25,11 +25,11 @@ void LgsNullable::setIRValue(LgsLLVMGen& cg, Value* nullablePtr, Value* value) {
     }
 }
 
-Type* LgsNullable::getIRType(LgsLLVMGen& cg) {
+Type* LgsNullable::getIRType(LgsCgModule& cg) {
     return cg.getStructType({baseType->getIRType(cg), cg.i1Ty()}, "nullable_" + baseType->getName());
 }
 
-Constant* LgsNullable::getRTType(LgsLLVMGen& cg) {
+Constant* LgsNullable::getRTType(LgsCgModule& cg) {
     const auto genericName = getGenericName();
     const auto st = cg.getStructType({cg.ptrTy()}, genericName);
     const auto sv = llvm::ConstantStruct::get(st, {baseType->getRTType(cg)});
@@ -65,13 +65,13 @@ std::string LgsNullable::strFormatPart() const {
     return baseType->strFormatPart();
 }
 
-llvm::DIType* LgsNullable::getDebugType(LgsLLVMGen& cg) {
+llvm::DIType* LgsNullable::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
 
 LgsType* LgsNullable::clone() {
     const auto newNullable = new LgsNullable(*this);
-    newNullable->baseType = baseType->clone();
+    newNullable->baseType = baseType;
     return newNullable;
 }
 

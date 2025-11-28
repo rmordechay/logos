@@ -1,5 +1,4 @@
 #pragma once
-#include "Lgs_Types.h"
 #include "errors/LgsErrors.h"
 #include "exprs/LgsBinaryExpr.h"
 #include <map>
@@ -40,7 +39,7 @@ class LgsExpr;
 class LgsFuncCall;
 class LgsField;
 class LgsFunc;
-class LgsLLVMGen;
+class LgsCgModule;
 
 class LgsType {
 public:
@@ -62,11 +61,11 @@ public:
     virtual LgsFunc* getMethod(const std::string& methodName);
     virtual size_t sizeBytes() = 0;
     virtual LgsExpr* getZeroValue() = 0;
-    virtual Type* getIRType(LgsLLVMGen& cg) = 0;
-    virtual Constant* getRTType(LgsLLVMGen& cg) = 0;
+    virtual Type* getIRType(LgsCgModule& cg) = 0;
+    virtual Constant* getRTType(LgsCgModule& cg) = 0;
     virtual bool canCastTo(LgsType* other) = 0;
     virtual std::string strFormatPart() const = 0;
-    virtual llvm::DIType* getDebugType(LgsLLVMGen& cg) = 0;
+    virtual llvm::DIType* getDebugType(LgsCgModule& cg) = 0;
     virtual LgsType* applyBinOp(LgsType* toType, LgsBinOp& op);
     virtual void hashNode(size_t& oldHash);
     virtual LgsType* clone() = 0;
@@ -84,28 +83,28 @@ public:
     LgsType* applyIntBinOp(LgsType* toType, LgsBinOpType op);
     void cloneFields(LgsType* newType) const;
     void cloneMethods(LgsType* newType) const;
-    static Value* orInt(LgsLLVMGen& cg, const LgsExpr* self, const LgsExpr* other);
-    static Value* andInt(LgsLLVMGen& cg, LgsExpr* self, const LgsExpr* other);
+    static Value* orInt(LgsCgModule& cg, const LgsExpr* self, const LgsExpr* other);
+    static Value* andInt(LgsCgModule& cg, LgsExpr* self, const LgsExpr* other);
 
-    virtual Value* addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* subIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* mulIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* divIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* modIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* powIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* bitAndIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* bitOrIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* bitXorIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* lshiftIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* other);
-    virtual Value* rshiftIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* eqIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* neIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* ltIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* gtIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* geIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* leIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* andIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* orIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right);
+    virtual Value* addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
+    virtual Value* subIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
+    virtual Value* mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
+    virtual Value* divIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
+    virtual Value* modIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
+    virtual Value* powIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
+    virtual Value* bitAndIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
+    virtual Value* bitOrIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
+    virtual Value* bitXorIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
+    virtual Value* lshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* other);
+    virtual Value* rshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
+    virtual Value* eqIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
+    virtual Value* neIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
+    virtual Value* ltIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
+    virtual Value* gtIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
+    virtual Value* geIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
+    virtual Value* leIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
+    virtual Value* andIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
+    virtual Value* orIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
 
     LgsAny* asAny();
     LgsChar* asChar();

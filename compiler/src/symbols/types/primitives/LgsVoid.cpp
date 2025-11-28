@@ -1,14 +1,14 @@
 #include "types/primitives/LgsVoid.h"
-#include "codegen/LgsLLVMGen.h"
+#include "codegen/LgsCgModule.h"
 #include "types/LgsFuncType.h"
 
 #include <llvm/IR/DIBuilder.h>
 
-Type* LgsVoid::getIRType(LgsLLVMGen& cg) {
+Type* LgsVoid::getIRType(LgsCgModule& cg) {
     return Type::getVoidTy(cg.context);
 }
 
-Constant* LgsVoid::getRTType(LgsLLVMGen& cg) {
+Constant* LgsVoid::getRTType(LgsCgModule& cg) {
     assert(0);
 }
 
@@ -32,7 +32,7 @@ bool LgsVoid::canCastTo(LgsType* other) {
     return name == other->getName();
 }
 
-llvm::DIType* LgsVoid::getDebugType(LgsLLVMGen& cg) {
+llvm::DIType* LgsVoid::getDebugType(LgsCgModule& cg) {
     return cg.debugger.diBuilder->createUnspecifiedType(name);
 }
 

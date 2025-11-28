@@ -1,8 +1,8 @@
 #pragma once
-#include "LgsSymbolTable.h"
 #include "errors/LgsErrors.h"
-#include "codegen/LgsLLVMGen.h"
 #include "LgsDefinitions.h"
+#include "codegen/LgsCgModule.h"
+#include "LgsSymbolTable.h"
 
 namespace fs = std::filesystem;
 class LgsStrConst;
@@ -11,7 +11,7 @@ class LgsApp;
 class LgsFile {
 public:
     fs::path path;
-    LgsLLVMGen cg;
+    LgsCgModule cg;
     LgsLocation location;
     LgsSymbolTable symbolTable;
 

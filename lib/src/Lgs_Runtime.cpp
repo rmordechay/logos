@@ -46,12 +46,11 @@ extern "C" void Lgs_Runtime_addCoro(const ThunkFunc funcPtr, void* ctx) {
 
 extern "C" void Lgs_Runtime_callDefers() {
     for (auto [func, ctx] : runtime.defers.top()) {
-        if (!func) continue;
         func(ctx);
     }
 }
 
-extern "C" void* Lgs_Runtime_allocate(const bool isOwner, const Lgs_TypeInfo* type) {
+extern "C" void* Lgs_Runtime_allocate(const Lgs_TypeInfo* type, const bool isOwner) {
     const auto ptr = runtime.arena.allocate(type->size);
     if (isOwner) runtime.owners.push_back(ptr);
     else runtime.orphans.push_back(ptr);

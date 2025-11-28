@@ -1,5 +1,5 @@
 #include "types/iterables/LgsSArray.h"
-#include "codegen/LgsLLVMGen.h"
+#include "codegen/LgsCgModule.h"
 #include "exprs/LgsArrayExpr.h"
 #include "funcs/LgsFunc.h"
 #include "types/LgsAny.h"
@@ -7,7 +7,7 @@
 #include "LgsUtils.h"
 #include "lgsc/LgsCLang.h"
 
-Type* LgsSArray::getIRType(LgsLLVMGen& cg) {
+Type* LgsSArray::getIRType(LgsCgModule& cg) {
     if (IRType) return IRType;
     const auto numElements = size->getConstInt();
     if (numElements) {
@@ -19,7 +19,7 @@ Type* LgsSArray::getIRType(LgsLLVMGen& cg) {
     return IRType;
 }
 
-Constant* LgsSArray::getRTType(LgsLLVMGen& cg) {
+Constant* LgsSArray::getRTType(LgsCgModule& cg) {
     const auto genericName = getGenericName();
     const auto st = cg.getStructType({cg.sizeTy(), cg.ptrTy()}, genericName);
     const auto constSize = size->getConstInt();
@@ -76,7 +76,7 @@ bool LgsSArray::inferBaseType(const std::vector<LgsExpr*>& args) {
     assert(0);
 }
 
-Value* LgsSArray::addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsSArray::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     const auto baseIR = baseType->getIRType(cg);
     const auto leftSArr = left->type->asSArray();
     const auto rightSArr = right->type->asSArray();
@@ -93,7 +93,7 @@ Value* LgsSArray::addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
     return newArr;
 }
 
-Value* LgsSArray::mulIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsSArray::mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     const auto arrPtr = left->IRValue;
     const auto arrSize = cg.extendToSize(left->type->asSArray()->size->IRValue);
     const auto multiplier = cg.extendToSize(right->IRValue);
@@ -108,7 +108,7 @@ Value* LgsSArray::mulIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
     return newArr;
 }
 
-Value* LgsSArray::inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) {
+Value* LgsSArray::inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) {
     const auto resultPtr = cg.builder.CreateAlloca(cg.builder.getInt1Ty());
     cg.builder.CreateStore(cg.false_(), resultPtr);
     cg.loop(size->loadIR(cg), [this, &cg, iterableExpr, value, resultPtr](Value* index, BasicBlock* exitBlock) {
@@ -127,12 +127,12 @@ Value* LgsSArray::inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) {
     return cg.builder.CreateLoad(cg.builder.getInt1Ty(), resultPtr);
 }
 
-Value* LgsSArray::getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) {
+Value* LgsSArray::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
     const auto gep = cg.builder.CreateGEP(getIRType(cg), iterable, {cg.i32Zero(), index});
     return cg.builder.CreateLoad(baseType->getIRType(cg), gep);
 }
 
-Value* LgsSArray::lenIR(LgsLLVMGen& cg, Value* iterable) {
+Value* LgsSArray::lenIR(LgsCgModule& cg, Value* iterable) {
     return size->IRValue;
 }
 
@@ -144,10 +144,10 @@ bool LgsSArray::canCastTo(LgsType* other) {
     return baseType->canCastTo(otherArr->baseType);
 }
 
-llvm::DIType* LgsSArray::getDebugType(LgsLLVMGen& cg) {
+llvm::DIType* LgsSArray::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
 
 LgsType* LgsSArray::clone() {
-    return new LgsSArray(baseType->clone(), size->clone());
+    return new LgsSArray(baseType, size);
 }

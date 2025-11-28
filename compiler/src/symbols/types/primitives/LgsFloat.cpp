@@ -1,10 +1,10 @@
 #include "types/primitives/LgsFloat.h"
-#include "codegen/LgsLLVMGen.h"
+#include "codegen/LgsCgModule.h"
 #include "exprs/constants/LgsFloatConst.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsDouble.h"
 
-std::pair<Value*, Value*> loadOperands(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) {
+std::pair<Value*, Value*> loadOperands(LgsCgModule& cg, LgsExpr* self, LgsExpr* other) {
     auto l = self->loadIR(cg);
     auto r = other->loadIR(cg);
     if (l->getType()->isIntegerTy()) {
@@ -20,7 +20,7 @@ std::string LgsFloat::getName() {
     return name;
 }
 
-Type* LgsFloat::getIRType(LgsLLVMGen& cg) {
+Type* LgsFloat::getIRType(LgsCgModule& cg) {
     return Type::getFloatTy(cg.context);
 }
 
@@ -28,7 +28,7 @@ LgsExpr* LgsFloat::getZeroValue() {
     return new LgsFloatConst(this, 0.0);
 }
 
-Constant* LgsFloat::getRTType(LgsLLVMGen& cg) {
+Constant* LgsFloat::getRTType(LgsCgModule& cg) {
     return cg.getRTTypeInfo(getGenericName(), sizeBytes(), RTT_FLOAT, cg.null());
 }
 
@@ -52,27 +52,27 @@ LgsType* LgsFloat::applyBinOp(LgsType* toType, LgsBinOp& op) {
     assert(0);
 }
 
-Value* LgsFloat::addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsFloat::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     const auto [l, r] = loadOperands(cg, left, right);
     return cg.builder.CreateFAdd(l, r);
 }
 
-Value* LgsFloat::subIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsFloat::subIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     const auto [l, r] = loadOperands(cg, left, right);
     return cg.builder.CreateFSub(l, r);
 }
 
-Value* LgsFloat::mulIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsFloat::mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     const auto [l, r] = loadOperands(cg, left, right);
     return cg.builder.CreateFMul(l, r);
 }
 
-Value* LgsFloat::divIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsFloat::divIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     const auto [l, r] = loadOperands(cg, left, right);
     return cg.builder.CreateFDiv(l, r);
 }
 
-llvm::DIType* LgsFloat::getDebugType(LgsLLVMGen& cg) {
+llvm::DIType* LgsFloat::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
 

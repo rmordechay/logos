@@ -18,26 +18,26 @@ public:
     }
 
     LgsField* getField(const std::string& fieldName) override;
-    Type* getIRType(LgsLLVMGen& cg) override;
-    Constant* getRTType(LgsLLVMGen& cg) override;
+    Type* getIRType(LgsCgModule& cg) override;
+    Constant* getRTType(LgsCgModule& cg) override;
     std::string getName() override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
     bool canCastTo(LgsType* other) override;
     LgsType* applyBinOp(LgsType* toType, LgsBinOp& op) override;
     bool inferBaseType(const std::vector<LgsExpr*>& args) override;
-    Value* addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* subIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* mulIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* divIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
-    Value* lenIR(LgsLLVMGen& cg, Value* iterable) override;
-    Value* getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) override;
-    Value* dotProduct(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) const;
-    Value* matMul(LgsLLVMGen& cg, const LgsExpr* left, const LgsExpr* right) const;
+    Value* addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
+    Value* subIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
+    Value* mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
+    Value* divIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
+    Value* inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
+    Value* lenIR(LgsCgModule& cg, Value* iterable) override;
+    Value* getIRElement(LgsCgModule& cg, Value* iterable, Value* index) override;
+    Value* dotProduct(LgsCgModule& cg, LgsExpr* self, LgsExpr* other) const;
+    Value* matMul(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right) const;
     static size_t getSwizzleSet(char c);
     static size_t getComponentIndex(char c);
     std::string strFormatPart() const override;
-    llvm::DIType* getDebugType(LgsLLVMGen& cg) override;
+    llvm::DIType* getDebugType(LgsCgModule& cg) override;
     LgsType* clone() override;
 };

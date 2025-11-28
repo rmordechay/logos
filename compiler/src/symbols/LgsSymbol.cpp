@@ -70,23 +70,23 @@ LgsType* LgsSymbol::getType() const {
 LgsSymbol LgsSymbol::clone() const {
     switch (symbolType) {
     case VAR_DEC:
-        return LgsSymbol(varDec->clone());
+        return LgsSymbol(varDec);
     case PARAM:
         return LgsSymbol(param);
     case FIELD:
-        return LgsSymbol(field->clone());
+        return LgsSymbol(field);
     case FUNC:
-        return LgsSymbol(func->clone());
+        return LgsSymbol(func);
     case OBJECT:
-        return LgsSymbol(object->clone());
+        return LgsSymbol(object);
     case INTERFACE:
-        return LgsSymbol(interface->clone());
+        return LgsSymbol(interface);
     case SUBTYPE:
-        return LgsSymbol(subtype->clone());
+        return LgsSymbol(subtype);
     case GENERIC:
-        return LgsSymbol(generic->clone());
+        return LgsSymbol(generic);
     case ENUM:
-        return LgsSymbol(enum_->clone());
+        return LgsSymbol(enum_);
     case UNKNOWN:
         return LgsSymbol();
     }

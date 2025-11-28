@@ -1,7 +1,7 @@
 #include "LgsValue.h"
-#include "codegen/LgsLLVMGen.h"
+#include "codegen/LgsCgModule.h"
 
-Value* LgsValue::loadIR(LgsLLVMGen& cg) {
+Value* LgsValue::loadIR(LgsCgModule& cg) {
     assert(0);
 }
 
@@ -9,10 +9,6 @@ void LgsValue::hashNode(size_t& oldHash) {
     assert(0);
 }
 
-void LgsValue::setDebugValue(LgsLLVMGen& cg) {
-    assert(0);
-}
-
-LgsValue* LgsValue::clone() {
+void LgsValue::setDebugValue(LgsCgModule& cg) {
     assert(0);
 }

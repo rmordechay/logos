@@ -1,6 +1,6 @@
 #include "stmts/LgsIfStmt.h"
 #include "funcs/LgsFunc.h"
-#include "codegen/LgsLLVMGen.h"
+#include "codegen/LgsCgModule.h"
 #include "LgsUtils.h"
 
 LgsIfStmt::~LgsIfStmt() {

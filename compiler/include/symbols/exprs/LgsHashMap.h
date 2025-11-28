@@ -8,7 +8,7 @@ public:
     LgsHashMap() = default;
     explicit LgsHashMap(LgsMap* mapType) : LgsExpr(mapType) {}
     void castImplicitly(LgsType* toType) override;
-    Value* castIR(LgsLLVMGen& cg, LgsType* toType) override;
+    Value* castIR(LgsCgModule& cg, LgsType* toType) override;
     bool equals(LgsExpr* other) override;
     std::string asText() override;
     ~LgsHashMap() override;

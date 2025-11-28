@@ -6,8 +6,8 @@ public:
     LgsExpr* condExpr;
 
     explicit LgsWhileLoop(LgsExpr* cond = nullptr) : condExpr(cond) {}
-    void incAndJumpToCond(LgsLLVMGen& cg) override;
-    Value* loopStart(LgsLLVMGen& cg) override;
-    Value* loopEnd(LgsLLVMGen& cg) override;
+    void incAndJumpToCond(LgsCgModule& cg) override;
+    Value* loopStart(LgsCgModule& cg) override;
+    Value* loopEnd(LgsCgModule& cg) override;
     ~LgsWhileLoop() override;
 };

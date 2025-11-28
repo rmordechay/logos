@@ -9,7 +9,7 @@
 #include <sstream>
 #include <llvm/IR/Module.h>
 
-Value* LgsIterIndex::loadIR(LgsLLVMGen& cg) {
+Value* LgsIterIndex::loadIR(LgsCgModule& cg) {
     const auto baseExprType = baseExpr->type;
     if (baseExprType->asMap() || baseExprType->asDArray() || baseExprType->asSet()) {
         const auto arr = baseExpr->type->asIterable();
@@ -44,11 +44,11 @@ LgsExpr* LgsIterIndex::getBaseExpr() const {
     }
 }
 
-Value* LgsIterIndex::castIR(LgsLLVMGen& cg, LgsType* toType) {
+Value* LgsIterIndex::castIR(LgsCgModule& cg, LgsType* toType) {
     assert(0);
 }
 
-void LgsIterIndex::setIRElementPtr(LgsLLVMGen& cg, const bool assign) {
+void LgsIterIndex::setIRElementPtr(LgsCgModule& cg, const bool assign) {
     auto fromIR = index.from->IRValue;
     assert(baseExpr->IRValue);
     if (const auto sArr = baseExpr->type->asSArray()) {
@@ -73,7 +73,7 @@ void LgsIterIndex::setIRElementPtr(LgsLLVMGen& cg, const bool assign) {
     }
 }
 
-void LgsIterIndex::setIRRangePtr(LgsLLVMGen& cg, bool assign) {
+void LgsIterIndex::setIRRangePtr(LgsCgModule& cg, bool assign) {
     assert(!assign);
     const auto fromIR = index.from->IRValue;
     const auto toIR = index.to->IRValue;
@@ -99,7 +99,7 @@ void LgsIterIndex::setIRRangePtr(LgsLLVMGen& cg, bool assign) {
     }
 }
 
-void LgsIterIndex::assign(LgsLLVMGen& cg, LgsExpr* expr) {
+void LgsIterIndex::assign(LgsCgModule& cg, LgsExpr* expr) {
     const auto rIRValue = expr->IRValue;
     const auto baseIRValue = baseExpr;
     auto indexIR = index.from->IRValue;
@@ -113,7 +113,7 @@ void LgsIterIndex::assign(LgsLLVMGen& cg, LgsExpr* expr) {
     }
 }
 
-void LgsIterIndex::assignScalar(LgsLLVMGen& cg, LgsExpr* expr) const {
+void LgsIterIndex::assignScalar(LgsCgModule& cg, LgsExpr* expr) const {
     const auto rIRValue = expr->IRValue;
     const auto baseIRValue = baseExpr;
     auto indexIR = index.from->IRValue;
@@ -138,7 +138,7 @@ std::string LgsIterIndex::asText() {
     return str.str();
 }
 
-Type* LgsIterIndex::getSArrayType(LgsLLVMGen& cg) const {
+Type* LgsIterIndex::getSArrayType(LgsCgModule& cg) const {
     auto current = this;
     while (true) {
         if (const auto nextIndex = current->baseExpr->asIterIndex()) {

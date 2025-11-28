@@ -133,7 +133,7 @@ public:
     bool validateLocalName(const std::string& typeName, const LgsLocation* location);
     void validateObjImplements(LgsObject* obj, const std::vector<LgsType*>& interfaces);
     void validateIndex(LgsIterIndex* iterIndex);
-    bool validateFieldVisibility(LgsField* field, LgsType* parent);
+    bool validateFieldVisibility(LgsField* field, LgsType* parent, const LgsLocation& location);
     bool validateMethodVisibility(const LgsFunc* method, LgsType* parent, const LgsLocation& location);
     bool validateVecElements(const LgsVariable* fieldVar, LgsVec* vec);
     void validateObjDuplicates(LgsType* type);

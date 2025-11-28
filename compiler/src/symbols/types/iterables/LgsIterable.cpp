@@ -40,7 +40,7 @@ bool LgsIterable::unpackLoopVarsTypes(LgsForeachLoop* loop) const {
     return true;
 }
 
-void LgsIterable::unpackLoopIR(LgsLLVMGen& cg, LgsForeachLoop* loop) const {
+void LgsIterable::unpackLoopIR(LgsCgModule& cg, LgsForeachLoop* loop) const {
     const auto iterIndex = loop->loopVars[0]->expr->asIterIndex();
     iterIndex->index.from->IRValue = loop->iValue;
     iterIndex->setIRElementPtr(cg);

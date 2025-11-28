@@ -1,17 +1,17 @@
 #include "types/primitives/LgsULong.h"
 #include "exprs/constants/LgsIntConst.h"
-#include "codegen/LgsLLVMGen.h"
+#include "codegen/LgsCgModule.h"
 #include "types/LgsAny.h"
 
 size_t LgsULong::sizeBytes() {
     return sizeof(uint64_t);
 }
 
-Type* LgsULong::getIRType(LgsLLVMGen& cg) {
+Type* LgsULong::getIRType(LgsCgModule& cg) {
     return cg.i32Ty();
 }
 
-Constant* LgsULong::getRTType(LgsLLVMGen& cg) {
+Constant* LgsULong::getRTType(LgsCgModule& cg) {
     return cg.getRTTypeInfo(getGenericName(), sizeBytes(), RTT_ULONG, cg.null());
 }
 
@@ -29,7 +29,7 @@ bool LgsULong::canCastTo(LgsType* other) {
     return name == IRName;
 }
 
-llvm::DIType* LgsULong::getDebugType(LgsLLVMGen& cg) {
+llvm::DIType* LgsULong::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
 

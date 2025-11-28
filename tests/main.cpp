@@ -1,10 +1,10 @@
 #include "LgsConfigs.h"
-#include "codegen/LgsLLVMGen.h"
+#include "codegen/LgsCgModule.h"
 #define DOCTEST_CONFIG_IMPLEMENT
 #include "../external/include/doctest.h"
 
 int main(const int argc, char** argv) {
-    LgsLLVMGen::initLLVM();
+    LgsCgModule::initLLVM();
     lgsConfigs.isDevMode = true;
     lgsConfigs.printIR = false;
     lgsConfigs.writeIRFiles = false;

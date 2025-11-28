@@ -2,11 +2,11 @@
 
 #include "LgsUtils.h"
 
-Type* LgsTypePair::getIRType(LgsLLVMGen& cg) {
+Type* LgsTypePair::getIRType(LgsCgModule& cg) {
     assert(0);
 }
 
-Constant* LgsTypePair::getRTType(LgsLLVMGen& cg) {
+Constant* LgsTypePair::getRTType(LgsCgModule& cg) {
     assert(0);
 }
 
@@ -36,12 +36,12 @@ std::string LgsTypePair::strFormatPart() const {
     return "%s";
 }
 
-llvm::DIType* LgsTypePair::getDebugType(LgsLLVMGen& cg) {
+llvm::DIType* LgsTypePair::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
 
 LgsType* LgsTypePair::clone() {
-    return new LgsTypePair(key->clone(), value->clone());
+    return new LgsTypePair(key, value);
 }
 
 LgsTypePair::~LgsTypePair() {

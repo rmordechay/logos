@@ -1,5 +1,5 @@
 #pragma once
-#include "LgsLLVMGen.h"
+#include "LgsCgModule.h"
 #include "exprs/LgsFuncCall.h"
 #include "files/LgsFile.h"
 #include "logos/LgsStack.h"
@@ -66,7 +66,7 @@ class LgsCodeGen {
 public:
     LgsFile& file;
     LgsStack stack;
-    LgsLLVMGen& cg;
+    LgsCgModule& cg;
     LgsPaths& paths;
     LgsGlobals& globals;
     LgsAppConfigs& appConfigs;
@@ -154,5 +154,4 @@ public:
     Value* getIRValue(LgsValue* value);
     void setNullableValue(LgsExpr* expr);
     void addVirtuals(LgsObject* obj, Value* ptr) const;
-    bool writeIRModule() const;
 };

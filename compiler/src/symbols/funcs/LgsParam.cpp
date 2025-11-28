@@ -1,8 +1,8 @@
 #include "funcs/LgsParam.h"
 #include "LgsType.h"
-#include "codegen/LgsLLVMGen.h"
+#include "codegen/LgsCgModule.h"
 
-Value* LgsParam::loadIR(LgsLLVMGen& cg) {
+Value* LgsParam::loadIR(LgsCgModule& cg) {
     if (IRValue->getType()->isPointerTy()) {
         return cg.builder.CreateLoad(type->getIRType(cg), IRValue);
     }
@@ -11,17 +11,6 @@ Value* LgsParam::loadIR(LgsLLVMGen& cg) {
 
 void LgsParam::setType(LgsType* newType) {
     type = newType;
-}
-
-LgsParam* LgsParam::clone() {
-    const auto cloned = new LgsParam(type, name);
-    cloned->location = location;
-    if (expr) {
-        cloned->expr = expr->clone();
-    }
-    cloned->isSelf = isSelf;
-    cloned->isVariadic = isVariadic;
-    return cloned;
 }
 
 void freeParams(std::vector<LgsParam>& params) {

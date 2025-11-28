@@ -15,7 +15,7 @@ class LgsIntConst;
 class LgsVectorExpr;
 class LgsPrefixExpr;
 class LgsPostfixExpr;
-class LgsLLVMGen;
+class LgsCgModule;
 class LgsFunc;
 class LgsHashMap;
 class LgsFuncCall;
@@ -40,17 +40,16 @@ public:
     Value* destPtrValue = nullptr;
 
     explicit LgsExpr(LgsType* type = nullptr) : type(type) {}
-    void freeOwner(LgsLLVMGen& cg);
+    void freeOwner(LgsCgModule& cg);
     int64_t* getConstInt();
     std::string* getConstStr();
     void setType(LgsType* newType);
-    LgsExpr* clone() override;
 
     virtual LgsExpr* castExplicitly(LgsType* toType);
     virtual void castImplicitly(LgsType* toType);
-    virtual Value* castIR(LgsLLVMGen& cg, LgsType* toType) = 0;
-    virtual Value* hashValue(LgsLLVMGen& cg);
-    virtual void assign(LgsLLVMGen& cg, LgsExpr* expr);
+    virtual Value* castIR(LgsCgModule& cg, LgsType* toType) = 0;
+    virtual Value* hashValue(LgsCgModule& cg);
+    virtual void assign(LgsCgModule& cg, LgsExpr* expr);
     virtual bool equals(LgsExpr* other);
     virtual std::string asText() = 0;
 

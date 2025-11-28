@@ -70,22 +70,22 @@ LgsType* LgsTypeResolver::resolveType(LgsType* type, LgsFile* file) {
         LgsType* newType = nullptr;
         switch (symbol->symbolType) {
         case FUNC:
-            newType = symbol->func->funcType->clone();
+            newType = symbol->func->funcType;
             break;
         case OBJECT:
-            newType = symbol->object->clone();
+            newType = symbol->object;
             break;
         case INTERFACE:
-            newType = symbol->interface->clone();
+            newType = symbol->interface;
             break;
         case ENUM:
-            newType = symbol->enum_->clone();
+            newType = symbol->enum_;
             break;
         case SUBTYPE:
-            newType = symbol->subtype->clone();
+            newType = symbol->subtype;
             break;
         case GENERIC:
-            newType = symbol->generic->clone();
+            newType = symbol->generic;
             break;
         case VAR_DEC:
         case PARAM:
@@ -162,7 +162,7 @@ void LgsTypeResolver::resolveFuncTypes(LgsFuncType* funcType, LgsFile& file) {
     auto resolveTypeOrGeneric = [&](LgsType* type) -> LgsType* {
         if (!type) return &LGS_VOID;
         for (const auto generic : funcType->genericTypes) {
-            if (type->equals(generic)) return generic->clone();
+            if (type->equals(generic)) return generic;
         }
         return resolveType(type, &file);
     };

@@ -46,7 +46,6 @@
 #include "stmts/LgsIOStmt.h"
 #include "stmts/LgsIfStmt.h"
 #include "stmts/LgsSwitch.h"
-#include "types/LgsGenericType.h"
 #include "types/iterables/LgsSArray.h"
 #include "types/iterables/LgsVec.h"
 #include "types/primitives/LgsSize.h"
@@ -55,18 +54,15 @@
 #include <llvm/Support/FileSystem.h>
 #include <llvm/Passes/PassBuilder.h>
 #include "llvm/Bitcode/BitcodeWriter.h"
-#include <iostream>
 #include <unistd.h>
 #include <unordered_set>
-#include <llvm/TargetParser/Host.h>
 #include "cblas/cblas.h"
 #include "exprs/LgsMatrixExpr.h"
 
 std::atomic<size_t> LgsCodeGen::lambdasIDGenerator{0};
-#define GENERATE_OBJ_CMD "clang -fstack-protector-strong -Wno-override-module -target %s -c -o %s %s.bc"
 
 bool LgsCodeGen::generate() {
-    cg.setupModule(file, appConfigs.debugMode);
+    cg.setupModule(file.path.stem(), appConfigs.debugMode);
     for (auto [name, symbol] : file.symbolTable.symbols) {
         if (symbol.symbolType == VAR_DEC && symbol.isExternal) {
             visitConstant(symbol.varDec->expr);
@@ -83,7 +79,7 @@ bool LgsCodeGen::generate() {
         visitTestFile(testFile);
     }
     if (appConfigs.debugMode) cg.finalizeDebugger(paths.buildDir);
-    return writeIRModule();
+    return cg.writeIRModule(paths, appConfigs.optLevel);
 }
 
 void LgsCodeGen::visitMainFile(LgsMainFile* mainFile) {
@@ -1506,56 +1502,3 @@ void LgsCodeGen::addVirtuals(LgsObject* obj, Value* ptr) const {
     // }
 }
 
-bool LgsCodeGen::writeIRModule() const {
-    if (verifyModule(*cg.IRModule, &llvm::errs())) return false;
-    // Write IR to file
-    auto moduleName = cg.IRModule->getName().str();
-    if (lgsConfigs.writeIRFiles) {
-        const auto filePath = (paths.buildDirIR / moduleName).string() + ".ll";
-        if (fs::exists(filePath)) fs::remove(filePath);
-        std::error_code EC;
-        raw_fd_ostream textFile(filePath, EC, llvm::sys::fs::OF_None);
-        cg.IRModule->print(textFile, nullptr);
-    }
-
-    // Run pass
-    llvm::PassBuilder builder(targetMachine);
-    llvm::LoopAnalysisManager loopAnalyser;
-    llvm::FunctionAnalysisManager funcAnalyser;
-    llvm::CGSCCAnalysisManager CGAnalyser;
-    llvm::ModuleAnalysisManager analysisManager;
-    builder.registerModuleAnalyses(analysisManager);
-    builder.registerFunctionAnalyses(funcAnalyser);
-    builder.registerLoopAnalyses(loopAnalyser);
-    builder.registerCGSCCAnalyses(CGAnalyser);
-    builder.crossRegisterProxies(loopAnalyser, funcAnalyser, CGAnalyser, analysisManager);
-
-    const auto optLevel = cg.getOptLevel(appConfigs.optLevel);
-    auto passManager = builder.buildPerModuleDefaultPipeline(optLevel);
-    passManager.run(*cg.IRModule, analysisManager);
-
-    // Create bc file
-    std::error_code ec;
-    const std::string outputPath = paths.buildDirObjs / (moduleName + ".o");
-    if (fs::exists(outputPath)) fs::remove(outputPath);
-    raw_fd_ostream bitcodeStream(outputPath + ".bc", ec, llvm::sys::fs::OF_None);
-    assert(!ec);
-    llvm::WriteBitcodeToFile(*cg.IRModule, bitcodeStream);
-    bitcodeStream.flush();
-    bitcodeStream.close();
-
-    // Create object
-    char cmd[1024*4];
-    const auto triple = llvm::sys::getDefaultTargetTriple();
-    std::snprintf(
-        cmd,
-        sizeof(cmd),
-        GENERATE_OBJ_CMD,
-        triple.c_str(),
-        outputPath.c_str(),
-        outputPath.c_str()
-    );
-    if (!runCmd(cmd)) assert(0);
-    fs::remove(outputPath + ".bc");
-    return true;
-}

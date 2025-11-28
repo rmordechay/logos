@@ -4,7 +4,7 @@
 #include "types/LgsAny.h"
 #include "types/iterables/LgsVec.h"
 
-Type* LgsMatrix::getIRType(LgsLLVMGen& cg) {
+Type* LgsMatrix::getIRType(LgsCgModule& cg) {
     return ArrayType::get(baseType->getIRType(cg), rows * columns);
 }
 
@@ -58,7 +58,7 @@ LgsType* LgsMatrix::applyMatMatOp(const LgsMatrix* otherMat, const LgsBinOp& op)
     }
 }
 
-Value* LgsMatrix::mulIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsMatrix::mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     const auto leftMat = left->type->asMatrix();
     const auto rightMat = right->type->asMatrix();
     const auto order = cg.i32(CblasRowMajor);
@@ -98,7 +98,7 @@ LgsExpr* LgsMatrix::getZeroValue() {
     return new LgsMatrixExpr(rows, columns);
 }
 
-Constant* LgsMatrix::getRTType(LgsLLVMGen& cg) {
+Constant* LgsMatrix::getRTType(LgsCgModule& cg) {
     const auto genericName = getGenericName();
     const auto st = cg.getStructType({cg.sizeTy(), cg.sizeTy(), cg.ptrTy()}, genericName);
     const auto sv = llvm::ConstantStruct::get(st, {cg.usize(rows), cg.usize(columns), baseType->getRTType(cg)});
@@ -123,16 +123,16 @@ bool LgsMatrix::inferBaseType(const std::vector<LgsExpr*>& args) {
     assert(0);
 }
 
-Value* LgsMatrix::getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) {
+Value* LgsMatrix::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
     const auto gep = cg.builder.CreateGEP(getIRType(cg), iterable, {cg.i32Zero(), index});
     return cg.builder.CreateLoad(baseType->getIRType(cg), gep);
 }
 
-Value* LgsMatrix::lenIR(LgsLLVMGen& cg, Value* iterable) {
+Value* LgsMatrix::lenIR(LgsCgModule& cg, Value* iterable) {
     return cg.i32(rows);
 }
 
-llvm::DIType* LgsMatrix::getDebugType(LgsLLVMGen& cg) {
+llvm::DIType* LgsMatrix::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
 
@@ -140,6 +140,6 @@ LgsType* LgsMatrix::clone() {
     assert(0);
 }
 
-Value* LgsMatrix::inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) {
+Value* LgsMatrix::inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) {
     assert(0);
 }

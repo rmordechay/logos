@@ -8,19 +8,17 @@ void LgsField::setType(LgsType* newType) {
     type = newType;
 }
 
-Value* LgsField::loadIR(LgsLLVMGen& cg) {
+Value* LgsField::loadIR(LgsCgModule& cg) {
     if (!IRValue) IRValue = getGEP(cg);
     return cg.builder.CreateLoad(type->getIRType(cg), IRValue);
 }
 
-Value* LgsField::getGEP(LgsLLVMGen& cg) {
+Value* LgsField::getGEP(LgsCgModule& cg) const {
     assert(parentType && parentIRPtr);
-    if (gep) return gep;
-    gep = cg.builder.CreateStructGEP(parentType->getIRType(cg), parentIRPtr, position);
-    return gep;
+    return cg.builder.CreateStructGEP(parentType->getIRType(cg), parentIRPtr, position);
 }
 
-Value* LgsField::resolveVirtualField(LgsLLVMGen* cg, const LgsHashMap* vtable) const {
+Value* LgsField::resolveVirtualField(LgsCgModule* cg, const LgsHashMap* vtable) const {
     const auto vtableMap = vtable->type->asMap();
     const auto fieldIRType = type->getIRType(*cg);
     const auto keyIR = cg->getIRStr(name);
@@ -35,8 +33,4 @@ LgsField::~LgsField() {
     freeType(type);
     expr = nullptr;
     type = nullptr;
-}
-
-LgsField* LgsField::clone() {
-    assert(0);
 }

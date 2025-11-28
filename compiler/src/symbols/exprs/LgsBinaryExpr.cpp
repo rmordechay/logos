@@ -1,18 +1,18 @@
 #include "exprs/LgsBinaryExpr.h"
 
 #include "LgsType.h"
-#include "codegen/LgsLLVMGen.h"
+#include "codegen/LgsCgModule.h"
 #include "LgsUtils.h"
 
-Value* LgsBinaryExpr::loadIR(LgsLLVMGen& cg) {
+Value* LgsBinaryExpr::loadIR(LgsCgModule& cg) {
     return IRValue;
 }
 
-Value* LgsBinaryExpr::castIR(LgsLLVMGen& cg, LgsType* toType) {
+Value* LgsBinaryExpr::castIR(LgsCgModule& cg, LgsType* toType) {
     assert(0);
 }
 
-void LgsBinaryExpr::setDebugValue(LgsLLVMGen& cg) {
+void LgsBinaryExpr::setDebugValue(LgsCgModule& cg) {
     cg.builder.SetCurrentDebugLocation(cg.getDebugLoc(location));
 }
 
@@ -22,15 +22,6 @@ bool LgsBinaryExpr::equals(LgsExpr* other) {
 
 std::string LgsBinaryExpr::asText() {
     return left->asText() + ' ' + op.text + ' ' + right->asText();
-}
-
-LgsExpr* LgsBinaryExpr::clone() {
-    const auto newBinaryExpr = new LgsBinaryExpr(*this);
-    newBinaryExpr->left = left->clone();
-    newBinaryExpr->right = right->clone();
-    if (type) newBinaryExpr->type = type->clone();
-    if (results) newBinaryExpr->results = results->clone();
-    return newBinaryExpr;
 }
 
 LgsBinaryExpr::~LgsBinaryExpr() {

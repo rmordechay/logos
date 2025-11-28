@@ -1,6 +1,6 @@
 #include "types/primitives/LgsDouble.h"
 #include "exprs/constants/LgsFloatConst.h"
-#include "codegen/LgsLLVMGen.h"
+#include "codegen/LgsCgModule.h"
 #include "exprs/constants/LgsIntConst.h"
 #include "types/LgsAny.h"
 
@@ -20,12 +20,12 @@ std::string LgsDouble::strFormatPart() const {
     return "%f";
 }
 
-Type* LgsDouble::getIRType(LgsLLVMGen& cg) {
+Type* LgsDouble::getIRType(LgsCgModule& cg) {
     return cg.builder.getDoubleTy();
 }
 
-Constant* LgsDouble::getRTType(LgsLLVMGen& cg) {
-    assert(0);
+Constant* LgsDouble::getRTType(LgsCgModule& cg) {
+    return cg.getRTTypeInfo(getGenericName(), sizeBytes(), RTT_DOUBLE, cg.null());
 }
 
 bool LgsDouble::canCastTo(LgsType* other) {
@@ -36,11 +36,11 @@ bool LgsDouble::canCastTo(LgsType* other) {
     return false;
 }
 
-Value* LgsDouble::powIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsDouble::powIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     return LgsType::powIR(cg, left, right);
 }
 
-llvm::DIType* LgsDouble::getDebugType(LgsLLVMGen& cg) {
+llvm::DIType* LgsDouble::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
 

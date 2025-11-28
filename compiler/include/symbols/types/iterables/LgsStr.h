@@ -10,21 +10,21 @@ public:
     LgsStr(): LgsIterable(&LGS_CHAR) {
         passByRef = true;
     }
-    Type* getIRType(LgsLLVMGen& cg) override;
+    Type* getIRType(LgsCgModule& cg) override;
     std::string getName() override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
-    Constant* getRTType(LgsLLVMGen& cg) override;
+    Constant* getRTType(LgsCgModule& cg) override;
     bool canCastTo(LgsType* other) override;
     LgsType* applyBinOp(LgsType* toType, LgsBinOp& op) override;
-    Value* getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) override;
+    Value* getIRElement(LgsCgModule& cg, Value* iterable, Value* index) override;
     std::string strFormatPart() const override;
     bool inferBaseType(const std::vector<LgsExpr*>& args) override;
-    Value* addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* eqIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* neIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* lenIR(LgsLLVMGen& cg, Value* iterable) override;
-    Value* inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
-    llvm::DIType* getDebugType(LgsLLVMGen& cg) override;
+    Value* addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
+    Value* eqIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
+    Value* neIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
+    Value* lenIR(LgsCgModule& cg, Value* iterable) override;
+    Value* inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
+    llvm::DIType* getDebugType(LgsCgModule& cg) override;
     LgsType* clone() override;
 };

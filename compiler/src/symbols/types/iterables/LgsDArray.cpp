@@ -1,6 +1,6 @@
 #include "types/iterables/LgsDArray.h"
 #include "Lgs_DArrayExpr.h"
-#include "codegen/LgsLLVMGen.h"
+#include "codegen/LgsCgModule.h"
 #include "exprs/LgsArrayExpr.h"
 #include "exprs/LgsFuncCall.h"
 #include "types/LgsAny.h"
@@ -15,17 +15,17 @@ bool LgsDArray::inferBaseType(const std::vector<LgsExpr*>& args) {
         const auto arg = args[i];
         if (!baseExprType->equals(arg->type)) return false;
     }
-    baseType = baseExprType->clone();
+    baseType = baseExprType;
     return true;
 }
 
-Type* LgsDArray::getIRType(LgsLLVMGen& cg) {
+Type* LgsDArray::getIRType(LgsCgModule& cg) {
     if (IRType) return IRType;
     IRType = cg.getStructType({cg.ptrTy(), cg.sizeTy(), cg.sizeTy(), cg.ptrTy()}, name);
     return IRType;
 }
 
-Constant* LgsDArray::getRTType(LgsLLVMGen& cg) {
+Constant* LgsDArray::getRTType(LgsCgModule& cg) {
     const auto genericName = getGenericName();
     const auto st = cg.getStructType({cg.ptrTy()}, genericName);
     const auto sv = llvm::ConstantStruct::get(st, {baseType->getRTType(cg)});
@@ -72,18 +72,18 @@ LgsType* LgsDArray::applyBinOp(LgsType* toType, LgsBinOp& op) {
     return nullptr;
 }
 
-Value* LgsDArray::lenIR(LgsLLVMGen& cg, Value* iterable) {
+Value* LgsDArray::lenIR(LgsCgModule& cg, Value* iterable) {
     return cg.callLgsFunc("DArray_len", cg.sizeTy(), {cg.ptrTy()}, {iterable});
 }
 
-Value* LgsDArray::inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) {
+Value* LgsDArray::inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) {
     return cg.callLgsFunc("DArray_contains", cg.i1Ty(), {cg.ptrTy(), cg.ptrTy()}, {
         iterableExpr->IRValue,
         cg.getPtrTo(value->IRValue),
     });
 }
 
-Value* LgsDArray::getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) {
+Value* LgsDArray::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
     return cg.callLgsFunc("DArray_get", cg.ptrTy(), {cg.ptrTy(), cg.sizeTy()}, {iterable, index});;
 }
 
@@ -96,7 +96,7 @@ bool LgsDArray::canCastTo(LgsType* other) {
     return baseType->canCastTo(otherArr->baseType);
 }
 
-llvm::DIType* LgsDArray::getDebugType(LgsLLVMGen& cg) {
+llvm::DIType* LgsDArray::getDebugType(LgsCgModule& cg) {
     const auto di = cg.debugger.diBuilder;
     const auto file = cg.debugger.diFile;
     constexpr auto ptrSizeInBits = sizeof(void*) * 8;
@@ -125,5 +125,5 @@ llvm::DIType* LgsDArray::getDebugType(LgsLLVMGen& cg) {
 }
 
 LgsType* LgsDArray::clone() {
-    return new LgsDArray(baseType->clone());
+    return new LgsDArray(baseType);
 }

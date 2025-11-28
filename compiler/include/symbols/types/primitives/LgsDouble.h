@@ -8,15 +8,15 @@ public:
         isPrimitive = true;
         isFloatingPoint = true;
     }
-    Type* getIRType(LgsLLVMGen& cg) override;
-    Constant* getRTType(LgsLLVMGen& cg) override;
+    Type* getIRType(LgsCgModule& cg) override;
+    Constant* getRTType(LgsCgModule& cg) override;
     std::string getName() override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
     std::string strFormatPart() const override;
     bool canCastTo(LgsType* other) override;
-    Value* powIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
-    llvm::DIType* getDebugType(LgsLLVMGen& cg) override;
+    Value* powIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
+    llvm::DIType* getDebugType(LgsCgModule& cg) override;
     LgsType* clone() override;
 };
 

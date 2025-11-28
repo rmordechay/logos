@@ -1,13 +1,13 @@
 #pragma once
 #include "LgsType.h"
-#include "codegen/LgsLLVMGen.h"
+#include "codegen/LgsCgModule.h"
 #include "funcs/LgsFunc.h"
 #include "types/LgsFuncType.h"
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsSize.h"
 
 class LgsForeachLoop;
-class LgsLLVMGen;
+class LgsCgModule;
 class LgsVarDec;
 struct LgsIndex;
 struct CodegenMetadata;
@@ -40,10 +40,10 @@ public:
     virtual LgsType* getIndexType();
     virtual LgsType* getValueType();
     virtual bool unpackLoopVarsTypes(LgsForeachLoop* loop) const;
-    virtual void unpackLoopIR(LgsLLVMGen& cg, LgsForeachLoop* loop) const;
+    virtual void unpackLoopIR(LgsCgModule& cg, LgsForeachLoop* loop) const;
     virtual bool inferBaseType(const std::vector<LgsExpr*>& args) = 0;
-    virtual Value* lenIR(LgsLLVMGen& cg, Value* iterable) = 0;
-    virtual Value* inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) = 0;
-    virtual Value* getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) = 0;
+    virtual Value* lenIR(LgsCgModule& cg, Value* iterable) = 0;
+    virtual Value* inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) = 0;
+    virtual Value* getIRElement(LgsCgModule& cg, Value* iterable, Value* index) = 0;
     ~LgsIterable() override;
 };

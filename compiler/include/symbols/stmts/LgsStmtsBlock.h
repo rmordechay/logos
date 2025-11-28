@@ -26,7 +26,6 @@ public:
     bool isMacro = false;
 
     explicit LgsStmtsBlock(const std::vector<LgsObjOrStmt>& stmts = {}) : stmts(stmts) {}
-    LgsStmtsBlock* clone() override;
     void hashNode(size_t& oldHash) override;
     ~LgsStmtsBlock() override;
 };

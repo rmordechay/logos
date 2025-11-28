@@ -7,7 +7,7 @@
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsChar.h"
 
-Type* LgsStr::getIRType(LgsLLVMGen& cg) {
+Type* LgsStr::getIRType(LgsCgModule& cg) {
     // if (isStatic) return ArrayType::get(cg.i8Ty(), *size->getConstInt() + 1);
     return cg.ptrTy();
 }
@@ -24,7 +24,7 @@ LgsExpr* LgsStr::getZeroValue() {
     return new LgsStrConst("");
 }
 
-Constant* LgsStr::getRTType(LgsLLVMGen& cg) {
+Constant* LgsStr::getRTType(LgsCgModule& cg) {
     return cg.getRTTypeInfo(getGenericName(), sizeBytes(), RTT_STR, cg.null());
 }
 
@@ -61,7 +61,7 @@ LgsType* LgsStr::applyBinOp(LgsType* toType, LgsBinOp& op) {
     return nullptr;
 }
 
-Value* LgsStr::getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) {
+Value* LgsStr::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
     const auto gep =  cg.builder.CreateGEP(cg.i8Ty(), iterable, {cg.i32Zero(), index});
     return cg.builder.CreateLoad(cg.i8Ty(), gep);
 }
@@ -74,7 +74,7 @@ bool LgsStr::inferBaseType(const std::vector<LgsExpr*>& args) {
     assert(0);
 }
 
-Value* LgsStr::addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsStr::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     const auto selfSize = lenIR(cg, left->IRValue);
     const auto buffer = cg.builder.CreateAlloca(ArrayType::get(cg.i8Ty(), STRING_BUFFER_SIZE));
     cg.callSnprintf(buffer, cg.getIRStr("%d"), {right->IRValue});
@@ -90,26 +90,26 @@ Value* LgsStr::addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
     return newStrPtr;
 }
 
-Value* LgsStr::eqIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsStr::eqIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     const auto rt = cg.callFunc("strcmp", cg.i32Ty(), {cg.ptrTy(), cg.ptrTy()}, {left->IRValue, right->IRValue});
     return cg.builder.CreateICmpEQ(rt, cg.i32Zero());
 }
 
-Value* LgsStr::neIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsStr::neIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     const auto rt = cg.callFunc("strcmp", cg.i32Ty(), {cg.ptrTy(), cg.ptrTy()}, {left->IRValue, right->IRValue});
     return cg.builder.CreateICmpNE(rt, cg.i32Zero());
 }
 
-Value* LgsStr::lenIR(LgsLLVMGen& cg, Value* iterable) {
+Value* LgsStr::lenIR(LgsCgModule& cg, Value* iterable) {
     return cg.callStrLen(iterable);
 }
 
-Value* LgsStr::inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) {
+Value* LgsStr::inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) {
     const auto rv = cg.callFunc("strstr", cg.ptrTy(), {cg.ptrTy(), cg.ptrTy()}, {iterableExpr->IRValue, value->IRValue});
     return cg.builder.CreateIsNotNull(rv);
 }
 
-llvm::DIType* LgsStr::getDebugType(LgsLLVMGen& cg) {
+llvm::DIType* LgsStr::getDebugType(LgsCgModule& cg) {
     const auto& diBuilder = cg.debugger.diBuilder;
     const auto charType = diBuilder->createBasicType("char", sizeof(char), llvm::dwarf::DW_ATE_signed_char);
     return diBuilder->createPointerType(charType, sizeof(void*));
@@ -118,7 +118,7 @@ llvm::DIType* LgsStr::getDebugType(LgsLLVMGen& cg) {
 LgsType* LgsStr::clone() {
     const auto newStr = new LgsStr(*this);
     if (size) {
-        newStr->size = size->clone();
+        newStr->size = size;
     }
     cloneMethods(newStr);
     cloneFields(newStr);

@@ -4,7 +4,7 @@
 
 class LgsGenericType;
 class LgsInstance;
-class LgsLLVMGen;
+class LgsCgModule;
 class LgsField;
 class LgsIOPair;
 
@@ -26,13 +26,13 @@ public:
     }
     std::string getName() override;
     LgsFunc* getMethod(const std::string& methodName) override;
-    Type* getIRType(LgsLLVMGen& cg) override;
-    Constant* getRTType(LgsLLVMGen& cg) override;
+    Type* getIRType(LgsCgModule& cg) override;
+    Constant* getRTType(LgsCgModule& cg) override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
     bool canCastTo(LgsType* other) override;
     std::string strFormatPart() const override;
     LgsObject* clone() override;
-    llvm::DIType* getDebugType(LgsLLVMGen& cg) override;
+    llvm::DIType* getDebugType(LgsCgModule& cg) override;
     ~LgsObject() override;
 };

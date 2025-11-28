@@ -17,9 +17,8 @@ public:
     bool isVariadic = false;
 
     explicit LgsParam(LgsType* type, const std::string& name = "", LgsExpr* expr = nullptr) : name(name), type(type), expr(expr) {}
-    Value* loadIR(LgsLLVMGen& cg) override;
+    Value* loadIR(LgsCgModule& cg) override;
     void setType(LgsType* newType);
-    LgsParam* clone() override;
     ~LgsParam() override = default;
 };
 

@@ -50,7 +50,7 @@ main() {
 ```
 
 #### Statements Block
-Statements Block is collection of statements wrapped in curly braces and can be part of a function,
+Statements Block is a collection of statements wrapped in curly braces and can be part of a function,
 for loop, if statement, etc. If only one statement exists in the block, you can omit the braces altogether (similar to C/C++).
 ```
 // Block with multiple statements and braces - valid
@@ -69,7 +69,6 @@ main()
 ```
 
 #### If Statement
-Logos doesn't have 'else if' but uses only 'else + condition'.
 ```
 main() {
     x = 3
@@ -102,9 +101,11 @@ main() {
     
     str = "some string"
     switch str {
-        "some string": { print("some string") }
+        "some string": print("some string")
         "other string": { print("other string") }
-        else: { print("default string") }
+        else: { 
+            print("default string") 
+        }
     }
 }
 ```
@@ -128,16 +129,20 @@ main() {
     }
 }
 ```
+Or even (more on _for.i_ below).
+```
+main() {
+    for 10 {
+        print(for.i)
+    }
+}
+```
 
 #### Foreach Loop
 ```
 main() {
     arr = [1, 2, 3]
     for element in arr {
-        print(element)
-    }
-    for i, element in arr {
-        print(i)
         print(element)
     }
 }
@@ -153,8 +158,12 @@ main() {
 }
 ```
 
-#### The _for.i_ Meta Variable
-In Logos you don't have to necessarily define an 'i' for iteration. Logos will generate it for you 
+### Meta Variables
+In Logos, there are special variables called Meta Variables that are namespaced with a keyword, for example, 'for.i'. These variables
+will be automatically created and assigned a value once you will declare them. 
+
+#### for.i
+In for loops, you don't have to necessarily define an _i_ variable for iteration. Logos will generate it for you 
 using the meta variable 'for.i'. For example
 ```
 main() {
@@ -171,8 +180,8 @@ Prints:
 8
 9
 ```
-#### The _for.isFirst_ and _for.isLast_ Meta Variables
-Likewise, you can hook into the first and last iteration of a loop the 'for.isFirst' and 'for.isLast' variable instead
+#### for.isFirst and for.isLast
+Likewise, you can hook into the first and last iteration of a loop using the _for.isFirst_ and _for.isLast_ variable instead
 of calculating the index yourself.
 ```
 main() {
@@ -230,6 +239,7 @@ Prints:
 inside nested if
 ```
 #### If Macro
+tbd
 
 ### The _defer_ keyword
 Logos has two mechanisms to work with IO safely, for example closing files or connection.
@@ -266,6 +276,6 @@ io f = openFile() {
     // text = f.read()
 } 
 ```
-And that's it. You don't need to call closeFile. Logos will do it for you. Everytime you call the opening function
+And you are done. You don't need to call closeFile. Logos will do it for you. Everytime you call the opening function
 with the io keyword, the closing function will be called at the end of the scope, making sure your
 resources are being freed correctly. 

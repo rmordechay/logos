@@ -2,11 +2,11 @@
 
 #include "LgsUtils.h"
 
-Value* LgsPrefixExpr::loadIR(LgsLLVMGen& cg) {
+Value* LgsPrefixExpr::loadIR(LgsCgModule& cg) {
     return IRValue;
 }
 
-Value* LgsPrefixExpr::castIR(LgsLLVMGen& cg, LgsType* toType) {
+Value* LgsPrefixExpr::castIR(LgsCgModule& cg, LgsType* toType) {
     assert(0);
 }
 

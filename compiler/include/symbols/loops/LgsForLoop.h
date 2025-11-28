@@ -24,10 +24,10 @@ public:
     BasicBlock* IRExitBlock = nullptr;
     std::unordered_map<LgsMetaVarType, LgsMetaVar*> metaVars;
 
-    virtual void setBlocks(LgsLLVMGen& cg);
-    virtual void incAndJumpToCond(LgsLLVMGen& cg);
-    virtual Value* loopStart(LgsLLVMGen& cg) = 0;
-    virtual Value* loopEnd(LgsLLVMGen& cg) = 0;
+    virtual void setBlocks(LgsCgModule& cg);
+    virtual void incAndJumpToCond(LgsCgModule& cg);
+    virtual Value* loopStart(LgsCgModule& cg) = 0;
+    virtual Value* loopEnd(LgsCgModule& cg) = 0;
     LgsForeachLoop* asForeachLoop();
     LgsRangeLoop* asRangeLoop();
     LgsInfiniteLoop* asInfiniteLoop();

@@ -1,14 +1,14 @@
 #include "exprs/LgsArrayExpr.h"
 #include "types/iterables/LgsSet.h"
 #include "LgsUtils.h"
-#include "codegen/LgsLLVMGen.h"
+#include "codegen/LgsCgModule.h"
 
-Value* LgsArrayExpr::loadIR(LgsLLVMGen& cg) {
+Value* LgsArrayExpr::loadIR(LgsCgModule& cg) {
     if (type->asDArray() || type->asSet()) return IRValue;
     return cg.builder.CreateLoad(type->getIRType(cg), IRValue);
 }
 
-Value* LgsArrayExpr::castIR(LgsLLVMGen& cg, LgsType* toType) {
+Value* LgsArrayExpr::castIR(LgsCgModule& cg, LgsType* toType) {
     if (const auto sArr = type->asSArray()) {
         if (toType->asStr() && sArr->baseType->asChar()) {
             return IRValue;
@@ -20,10 +20,10 @@ Value* LgsArrayExpr::castIR(LgsLLVMGen& cg, LgsType* toType) {
 void LgsArrayExpr::castImplicitly(LgsType* toType) {
     // Replace static and dynamic if needed
     if (!type && toType->asSArray()) {
-        setType(toType->clone());
+        setType(toType);
     } else if (type->asDArray() && (toType->asSArray() || toType->asSet())) {
         freeType(type);
-        setType(toType->clone());
+        setType(toType);
     }
 
     LgsType* otherBaseType = nullptr;
@@ -34,12 +34,12 @@ void LgsArrayExpr::castImplicitly(LgsType* toType) {
     }
     for (size_t i = 0; i < elements.size(); ++i) {
         if (elements[i]->type) continue;
-        elements[i]->castImplicitly(otherBaseType->clone());
+        elements[i]->castImplicitly(otherBaseType);
     }
-    type->asIterable()->baseType = otherBaseType->clone();
+    type->asIterable()->baseType = otherBaseType;
 }
 
-void LgsArrayExpr::setDebugValue(LgsLLVMGen& cg) {
+void LgsArrayExpr::setDebugValue(LgsCgModule& cg) {
     if (!IRValue) return;
     const auto di = cg.debugger.diBuilder;
     const auto file = cg.debugger.diFile;
@@ -60,16 +60,6 @@ void LgsArrayExpr::setDebugValue(LgsLLVMGen& cg) {
 
 std::string LgsArrayExpr::asText() {
     return type ? type->pname() : "[]";
-}
-
-LgsExpr* LgsArrayExpr::clone() {
-    const auto newArr = new LgsArrayExpr(*this);
-    newArr->type = type->clone();
-    newArr->elements.clear();
-    for (const auto element : elements) {
-        newArr->elements.push_back(element->clone());
-    }
-    return newArr;
 }
 
 LgsArrayExpr::~LgsArrayExpr() {

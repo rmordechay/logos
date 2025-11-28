@@ -50,7 +50,7 @@ public:
     };
     bool equals(LgsExpr* other) override;
     std::string asText() override;
-    Value* castIR(LgsLLVMGen& cg, LgsType* toType) override;
+    Value* castIR(LgsCgModule& cg, LgsType* toType) override;
     ~LgsJson() override;
 };
 
@@ -62,7 +62,7 @@ inline std::string LgsJson::asText() {
     assert(0);
 }
 
-inline Value* LgsJson::castIR(LgsLLVMGen& cg, LgsType* toType) {
+inline Value* LgsJson::castIR(LgsCgModule& cg, LgsType* toType) {
     assert(0);
 }
 

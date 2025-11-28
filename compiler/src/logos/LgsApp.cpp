@@ -16,7 +16,14 @@
 #include "lgsc/LgsCLang.h"
 #include "parser/LgsParser.h"
 #include "LgsUtils.h"
-#include <iostream>
+#include "types/primitives/LgsByte.h"
+#include "types/primitives/LgsDouble.h"
+#include "types/primitives/LgsFloat.h"
+#include "types/primitives/LgsShort.h"
+#include "types/primitives/LgsUInt.h"
+#include "types/primitives/LgsULong.h"
+
+#include <llvm/Target/TargetMachine.h>
 
 inline ThreadPool threadPool;
 
@@ -149,9 +156,10 @@ bool LgsApp::analyse() {
 
 bool LgsApp::generate() {
     createBuildDirs();
-    LgsLLVMGen::initLLVM();
+    LgsCgModule::initLLVM();
     const auto execFileName = configs.name == "" ? LGS_DEFAULT_EXEC_FILE : configs.name;
     paths.execFile = paths.buildDir / execFileName;
+    if (!generateRTTTypes()) return false;
 
     // Main file is generated first non-concurrently
     const auto mainFile = getMainFile();
@@ -175,6 +183,37 @@ bool LgsApp::generate() {
     threadPool.wait();
     printIR();
     return errHandler.successful;
+}
+
+bool LgsApp::generateRTTTypes() {
+    rttTypeModule.setupModule("rttypes");
+    rttTypeModule.isRTTModule = true;
+    LGS_BYTE.getRTType(rttTypeModule);
+    LGS_BOOL.getRTType(rttTypeModule);
+    LGS_CHAR.getRTType(rttTypeModule);
+    LGS_INT.getRTType(rttTypeModule);
+    LGS_UINT.getRTType(rttTypeModule);
+    LGS_ULONG.getRTType(rttTypeModule);
+    LGS_SHORT.getRTType(rttTypeModule);
+    LGS_LONG.getRTType(rttTypeModule);
+    LGS_SIZE.getRTType(rttTypeModule);
+    LGS_FLOAT.getRTType(rttTypeModule);
+    LGS_DOUBLE.getRTType(rttTypeModule);
+    const auto mainFile = getMainFile();
+    for (const auto object : mainFile->objects) {
+        object->getRTType(rttTypeModule);
+        for (const auto innerObj : object->objects) {
+            innerObj->getRTType(rttTypeModule);
+        }
+    }
+    for (auto [symbolName, symbol] : globals.table.symbols) {
+        if (symbol.symbolType != OBJECT) continue;
+        symbol.object->getRTType(rttTypeModule);
+        for (const auto innerObj : symbol.object->objects) {
+            innerObj->getRTType(rttTypeModule);
+        }
+    }
+    return rttTypeModule.writeIRModule(paths, 3);
 }
 
 bool LgsApp::link() {
@@ -347,6 +386,8 @@ void LgsApp::compareHash() const {
 
 void LgsApp::printIR() const {
     if (!lgsConfigs.isDevMode || !lgsConfigs.printIR) return;
+    rttTypeModule.IRModule->print(llvm::outs(), nullptr);
+    logInfo(LGS_MSG_LINE_SEPERATOR);
     std::lock_guard lock(mtx);
     for (const auto& file : srcFiles) {
         if (!file->cg.IRModule) continue;

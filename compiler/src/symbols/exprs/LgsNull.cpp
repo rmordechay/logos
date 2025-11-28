@@ -1,5 +1,5 @@
 #include "exprs/LgsNull.h"
-#include "codegen/LgsLLVMGen.h"
+#include "codegen/LgsCgModule.h"
 #include "LgsDefinitions.h"
 #include "LgsUtils.h"
 #include <llvm/IR/Module.h>
@@ -18,7 +18,7 @@ bool LgsNull::equals(LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsNull::castIR(LgsLLVMGen& cg, LgsType* toType) {
+Value* LgsNull::castIR(LgsCgModule& cg, LgsType* toType) {
     assert(0);
 }
 

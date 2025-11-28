@@ -1,9 +1,9 @@
 #include "types/LgsInterface.h"
-#include "codegen/LgsLLVMGen.h"
+#include "codegen/LgsCgModule.h"
 #include "stmts/LgsField.h"
 #include "types/LgsObject.h"
 
-Type* LgsInterface::getIRType(LgsLLVMGen& cg) {
+Type* LgsInterface::getIRType(LgsCgModule& cg) {
     if (IRType) return IRType;
     IRType = cg.ptrTy();
     return IRType;
@@ -37,7 +37,7 @@ size_t LgsInterface::sizeBytes() {
     return 0;
 }
 
-llvm::DIType* LgsInterface::getDebugType(LgsLLVMGen& cg) {
+llvm::DIType* LgsInterface::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
 

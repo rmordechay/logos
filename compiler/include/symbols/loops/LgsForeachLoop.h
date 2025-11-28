@@ -6,9 +6,9 @@ public:
     LgsExpr* iterExpr = nullptr;
 
     explicit LgsForeachLoop(LgsExpr* iterable) : iterExpr(iterable) {}
-    Value* loopStart(LgsLLVMGen& cg) override;
-    Value* loopEnd(LgsLLVMGen& cg) override;
-    void incAndJumpToCond(LgsLLVMGen& cg) override;
+    Value* loopStart(LgsCgModule& cg) override;
+    Value* loopEnd(LgsCgModule& cg) override;
+    void incAndJumpToCond(LgsCgModule& cg) override;
     ~LgsForeachLoop() override;
 };
 

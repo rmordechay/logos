@@ -1,11 +1,11 @@
 #include "types/LgsGenericType.h"
 #include "types/LgsAny.h"
 
-Type* LgsGenericType::getIRType(LgsLLVMGen& cg) {
+Type* LgsGenericType::getIRType(LgsCgModule& cg) {
     assert(0);
 }
 
-Constant* LgsGenericType::getRTType(LgsLLVMGen& cg) {
+Constant* LgsGenericType::getRTType(LgsCgModule& cg) {
     assert(0);
 }
 
@@ -29,7 +29,7 @@ std::string LgsGenericType::strFormatPart() const {
     assert(0);
 }
 
-llvm::DIType* LgsGenericType::getDebugType(LgsLLVMGen& cg) {
+llvm::DIType* LgsGenericType::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
 

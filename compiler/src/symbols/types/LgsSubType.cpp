@@ -1,11 +1,11 @@
 #include "types/LgsSubType.h"
 #include "types/LgsAny.h"
 
-Type* LgsSubType::getIRType(LgsLLVMGen& cg) {
+Type* LgsSubType::getIRType(LgsCgModule& cg) {
     return subtype->getIRType(cg);
 }
 
-Constant* LgsSubType::getRTType(LgsLLVMGen& cg) {
+Constant* LgsSubType::getRTType(LgsCgModule& cg) {
     assert(0);
 }
 
@@ -36,7 +36,7 @@ std::string LgsSubType::strFormatPart() const {
     return subtype->strFormatPart();
 }
 
-llvm::DIType* LgsSubType::getDebugType(LgsLLVMGen& cg) {
+llvm::DIType* LgsSubType::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
 

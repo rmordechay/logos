@@ -1,17 +1,17 @@
 #include "types/iterables/LgsSet.h"
-#include "codegen/LgsLLVMGen.h"
+#include "codegen/LgsCgModule.h"
 #include "exprs/LgsFuncCall.h"
 #include "types/LgsAny.h"
 #include "types/iterables/LgsDArray.h"
 #include "types/primitives/LgsLong.h"
 
-Type* LgsSet::getIRType(LgsLLVMGen& cg) {
+Type* LgsSet::getIRType(LgsCgModule& cg) {
     if (IRType) return IRType;
     IRType = cg.getStructType({cg.ptrTy(), cg.sizeTy(), cg.sizeTy(), cg.ptrTy()}, name);
     return IRType;
 }
 
-Constant* LgsSet::getRTType(LgsLLVMGen& cg) {
+Constant* LgsSet::getRTType(LgsCgModule& cg) {
     const auto genericName = getGenericName();
     const auto st = cg.getStructType({cg.ptrTy()}, genericName);
     const auto sv = llvm::ConstantStruct::get(st, {baseType->getRTType(cg)});
@@ -69,23 +69,23 @@ bool LgsSet::inferBaseType(const std::vector<LgsExpr*>& args) {
         const auto arg = args[i];
         if (!baseExprType->canCastTo(arg->type)) return false;
     }
-    baseType = baseExprType->clone();
+    baseType = baseExprType;
     return true;
 }
 
-Value* LgsSet::lenIR(LgsLLVMGen& cg, Value* iterable) {
+Value* LgsSet::lenIR(LgsCgModule& cg, Value* iterable) {
     return cg.callLgsFunc("Set_len", cg.sizeTy(), {cg.ptrTy()}, {iterable});
 }
 
-Value* LgsSet::inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) {
+Value* LgsSet::inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) {
     return cg.callLgsFunc("Set_contains", cg.i1Ty(), {cg.ptrTy(), cg.ptrTy()}, {iterableExpr->IRValue, cg.getPtrTo(value->IRValue)});
 }
 
-Value* LgsSet::getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) {
+Value* LgsSet::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
     return cg.callLgsFunc("Set_get", cg.ptrTy(), {cg.ptrTy(), cg.sizeTy()}, {iterable, index});
 }
 
-llvm::DIType* LgsSet::getDebugType(LgsLLVMGen& cg) {
+llvm::DIType* LgsSet::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
 

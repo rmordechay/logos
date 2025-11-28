@@ -15,11 +15,11 @@ std::string LgsPtr::pname() {
     return name;
 }
 
-Type* LgsPtr::getIRType(LgsLLVMGen& cg) {
+Type* LgsPtr::getIRType(LgsCgModule& cg) {
     return cg.ptrTy();
 }
 
-Constant* LgsPtr::getRTType(LgsLLVMGen& cg) {
+Constant* LgsPtr::getRTType(LgsCgModule& cg) {
     assert(0);
 }
 
@@ -44,7 +44,7 @@ std::string LgsPtr::strFormatPart() const {
     return baseType->strFormatPart();
 }
 
-llvm::DIType* LgsPtr::getDebugType(LgsLLVMGen& cg) {
+llvm::DIType* LgsPtr::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
 

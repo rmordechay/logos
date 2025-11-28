@@ -22,13 +22,12 @@ public:
         }
     }
     LgsExpr* castExplicitly(LgsType* toType) override;
-    Value* castIR(LgsLLVMGen& cg, LgsType* toType) override;
-    Value* loadIR(LgsLLVMGen& cg) override;
+    Value* castIR(LgsCgModule& cg, LgsType* toType) override;
+    Value* loadIR(LgsCgModule& cg) override;
     std::string asText() override;
-    Value* hashValue(LgsLLVMGen& cg) override;
+    Value* hashValue(LgsCgModule& cg) override;
     void hashNode(size_t& oldHash) override;
     bool equals(LgsExpr* other) override;
-    LgsStrConst* clone() override;
-    void setDebugValue(LgsLLVMGen& cg) override;
+    void setDebugValue(LgsCgModule& cg) override;
     ~LgsStrConst() override;
 };

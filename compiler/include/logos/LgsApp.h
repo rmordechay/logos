@@ -16,7 +16,7 @@
 class LgsAppConfigFile;
 class LgsTestFile;
 class LogosParser;
-class LgsLLVMGen;
+class LgsCgModule;
 class LgsStrConst;
 class LgsEnvFile;
 class LgsObject;
@@ -35,6 +35,7 @@ public:
     LgsGlobals globals;
     LgsErrHandler errHandler;
     LgsTypeResolver typeResolver;
+    LgsCgModule rttTypeModule;
     std::vector<LgsFile*> srcFiles;
     std::vector<LgsEnvFile*> envFiles;
     std::vector<LgsTestFile*> testFiles;
@@ -52,6 +53,7 @@ public:
     bool parseHeaders();
     bool analyse();
     bool generate();
+    bool generateRTTTypes();
     bool link();
     void loadSrcFile(LgsFileMetadata& metadata);
     void loadSrcFile(const std::string& fileCode, const fs::path& filePath = LGS_MAIN_FILE);

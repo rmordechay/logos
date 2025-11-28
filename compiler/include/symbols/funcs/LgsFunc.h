@@ -9,7 +9,7 @@ class LgsExpr;
 class LgsStmt;
 class LgsType;
 
-typedef std::function<Value*(LgsLLVMGen&, const std::vector<LgsFuncArg>&)> CallFn;
+typedef std::function<Value*(LgsCgModule&, const std::vector<LgsFuncArg>&)> CallFn;
 
 class LgsFunc : public LgsExpr {
 public:
@@ -44,19 +44,18 @@ public:
         funcType->parentName = parentName;
     }
 
-    virtual Function* getIRFunc(LgsLLVMGen& cg);
-    virtual Value* call(LgsLLVMGen& cg, std::vector<LgsFuncArg>& args);
-    Value* callIR(LgsLLVMGen& cg, const std::vector<Value*>& args = {});
+    virtual Function* getIRFunc(LgsCgModule& cg);
+    virtual Value* call(LgsCgModule& cg, std::vector<LgsFuncArg>& args);
+    Value* callIR(LgsCgModule& cg, const std::vector<Value*>& args = {});
     void initFunc(const std::string& name, LgsType* rt, const std::vector<LgsParam>& params, uint32_t ops);
-    Value* callWithVariadic(LgsLLVMGen& cg, const std::vector<LgsFuncArg>& args);
-    Value* loadIR(LgsLLVMGen& cg) override;
-    Value* castIR(LgsLLVMGen& cg, LgsType* toType) override;
+    Value* callWithVariadic(LgsCgModule& cg, const std::vector<LgsFuncArg>& args);
+    Value* loadIR(LgsCgModule& cg) override;
+    Value* castIR(LgsCgModule& cg, LgsType* toType) override;
     void castImplicitly(LgsType* toType) override;
     bool needsCleanup() const;
     std::string asText() override;
-    LgsFunc* clone() override;
     void hashNode(size_t& oldHash) override;
-    BasicBlock* getCleanupBlock(LgsLLVMGen& cg);
-    void setDebugValue(LgsLLVMGen& cg) override;
+    BasicBlock* getCleanupBlock(LgsCgModule& cg);
+    void setDebugValue(LgsCgModule& cg) override;
     ~LgsFunc() override;
 };

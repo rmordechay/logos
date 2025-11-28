@@ -60,7 +60,7 @@ LgsFunc* LgsType::getMethod(const std::string& methodName) {
     return nullptr;
 }
 
-Constant* LgsType::getRTType(LgsLLVMGen& cg) {
+Constant* LgsType::getRTType(LgsCgModule& cg) {
     assert(0);
 }
 
@@ -169,9 +169,9 @@ void LgsType::cloneFields(LgsType* newType) const {
     newType->fields.clear();
     for (const auto& field : fields) {
         const auto newField = new LgsField(*field);
-        newField->type = field->type->clone();
+        newField->type = field->type;
         if (field->expr) {
-            newField->expr = field->expr->clone();
+            newField->expr = field->expr;
         }
         newType->addField(newField);
     }
@@ -181,13 +181,13 @@ void LgsType::cloneMethods(LgsType* newType) const {
     newType->methods.clear();
     for (const auto& [_, method] : methods) {
         const auto newMethod = new LgsFunc(*method);
-        if (method->stmtsBlock) newMethod->stmtsBlock = method->stmtsBlock->clone();
-        newMethod->funcType = method->funcType->clone();
+        if (method->stmtsBlock) newMethod->stmtsBlock = method->stmtsBlock;
+        newMethod->funcType = method->funcType;
         newType->addMethod(newMethod);
     }
 }
 
-Value* LgsType::orInt(LgsLLVMGen& cg, const LgsExpr* self, const LgsExpr* other) {
+Value* LgsType::orInt(LgsCgModule& cg, const LgsExpr* self, const LgsExpr* other) {
     const auto currentBlock = cg.builder.GetInsertBlock();
     const auto func = currentBlock->getParent();
     const auto rightBlock = cg.createBlock("or_right", func);
@@ -202,7 +202,7 @@ Value* LgsType::orInt(LgsLLVMGen& cg, const LgsExpr* self, const LgsExpr* other)
     return phi;
 }
 
-Value* LgsType::andInt(LgsLLVMGen& cg, LgsExpr* self, const LgsExpr* other) {
+Value* LgsType::andInt(LgsCgModule& cg, LgsExpr* self, const LgsExpr* other) {
     const auto currentBlock = cg.builder.GetInsertBlock();
     const auto func = currentBlock->getParent();
     const auto rightBlock = cg.createBlock("and_right", func);
@@ -217,79 +217,79 @@ Value* LgsType::andInt(LgsLLVMGen& cg, LgsExpr* self, const LgsExpr* other) {
     return phi;
 }
 
-Value* LgsType::addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
-Value* LgsType::subIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::subIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
-Value* LgsType::mulIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
-Value* LgsType::divIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::divIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
-Value* LgsType::modIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::modIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
-Value* LgsType::powIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::powIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
-Value* LgsType::bitAndIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::bitAndIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
-Value* LgsType::bitOrIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::bitOrIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
-Value* LgsType::bitXorIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::bitXorIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
-Value* LgsType::lshiftIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* other) {
+Value* LgsType::lshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsType::rshiftIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::rshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
-Value* LgsType::eqIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::eqIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
-Value* LgsType::neIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::neIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
-Value* LgsType::ltIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::ltIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
-Value* LgsType::gtIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::gtIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
-Value* LgsType::geIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::geIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
-Value* LgsType::leIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::leIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
-Value* LgsType::andIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::andIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
-Value* LgsType::orIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::orIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 

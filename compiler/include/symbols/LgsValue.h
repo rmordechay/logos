@@ -9,7 +9,7 @@ namespace llvm {
 class LgsType;
 class LgsVariable;
 class LgsExpr;
-class LgsLLVMGen;
+class LgsCgModule;
 class LgsFunc;
 using llvm::Value;
 using llvm::Type;
@@ -42,9 +42,8 @@ public:
     Value* IRValue = nullptr;
     LgsLocation location;
 
-    virtual Value* loadIR(LgsLLVMGen& cg);
+    virtual Value* loadIR(LgsCgModule& cg);
     virtual void hashNode(size_t& oldHash);
-    virtual void setDebugValue(LgsLLVMGen& cg);
-    virtual LgsValue* clone();
+    virtual void setDebugValue(LgsCgModule& cg);
     virtual ~LgsValue() = default;
 };

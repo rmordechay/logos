@@ -13,7 +13,7 @@
 
 struct LgsFuncArg;
 
-Function* LgsFunc::getIRFunc(LgsLLVMGen& cg) {
+Function* LgsFunc::getIRFunc(LgsCgModule& cg) {
     const auto funcName = funcType->getGenericName();
     auto IRFunc = cg.IRModule->getFunction(funcName);
     if (IRFunc) return IRFunc;
@@ -50,7 +50,7 @@ void LgsFunc::initFunc(const std::string& name, LgsType* rt, const std::vector<L
     }
 }
 
-Value* LgsFunc::call(LgsLLVMGen& cg, std::vector<LgsFuncArg>& args) {
+Value* LgsFunc::call(LgsCgModule& cg, std::vector<LgsFuncArg>& args) {
     if (fn) return fn(cg, args);
     std::vector<Value*> IRArgs;
     if (funcType->isVariadic) return callWithVariadic(cg, args);
@@ -91,7 +91,7 @@ Value* LgsFunc::call(LgsLLVMGen& cg, std::vector<LgsFuncArg>& args) {
     return callIR(cg, IRArgs);
 }
 
-Value* LgsFunc::callWithVariadic(LgsLLVMGen& cg, const std::vector<LgsFuncArg>& args) {
+Value* LgsFunc::callWithVariadic(LgsCgModule& cg, const std::vector<LgsFuncArg>& args) {
     std::vector<Value*> IRArgs;
     const auto variadicOffset = funcType->params.size() - 1;
     for (size_t i = 0; i < variadicOffset; ++i) {
@@ -114,7 +114,7 @@ Value* LgsFunc::callWithVariadic(LgsLLVMGen& cg, const std::vector<LgsFuncArg>& 
     return callIR(cg, IRArgs);
 }
 
-Value* LgsFunc::callIR(LgsLLVMGen& cg, const std::vector<Value*>& args) {
+Value* LgsFunc::callIR(LgsCgModule& cg, const std::vector<Value*>& args) {
     llvm::CallInst* rv = nullptr;
     if (IRValue) {
         const auto funcTypeIR = funcType->getIRType(cg);
@@ -127,11 +127,11 @@ Value* LgsFunc::callIR(LgsLLVMGen& cg, const std::vector<Value*>& args) {
     return rv;
 }
 
-Value* LgsFunc::loadIR(LgsLLVMGen& cg) {
+Value* LgsFunc::loadIR(LgsCgModule& cg) {
     return IRValue;
 }
 
-Value* LgsFunc::castIR(LgsLLVMGen& cg, LgsType* toType) {
+Value* LgsFunc::castIR(LgsCgModule& cg, LgsType* toType) {
     return IRValue;
 }
 
@@ -155,25 +155,18 @@ std::string LgsFunc::asText() {
     return funcType->pname();
 }
 
-LgsFunc* LgsFunc::clone() {
-    const auto newFunc = new LgsFunc(*this);
-    newFunc->funcType = funcType->clone()->asFuncType();
-    if (stmtsBlock) newFunc->stmtsBlock = stmtsBlock->clone();
-    return newFunc;
-}
-
 void LgsFunc::hashNode(size_t& oldHash) {
     funcType->hashNode(oldHash);
     stmtsBlock->hashNode(oldHash);
 }
 
-BasicBlock* LgsFunc::getCleanupBlock(LgsLLVMGen& cg) {
+BasicBlock* LgsFunc::getCleanupBlock(LgsCgModule& cg) {
     if (cleanupBlock) return cleanupBlock;
     cleanupBlock = cg.createBlock(BLOCK_NAME_CLEANUP);
     return cleanupBlock;
 }
 
-void LgsFunc::setDebugValue(LgsLLVMGen& cg) {
+void LgsFunc::setDebugValue(LgsCgModule& cg) {
     const auto diBuilder = cg.debugger.diBuilder;
     const auto dbInt32 = funcType->rt->getDebugType(cg);
     const auto parameterTypes = diBuilder->getOrCreateTypeArray({dbInt32});

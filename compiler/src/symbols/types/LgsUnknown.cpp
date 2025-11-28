@@ -24,7 +24,7 @@ std::string LgsUnknown::strFormatPart() const {
     assert(0);
 }
 
-llvm::DIType* LgsUnknown::getDebugType(LgsLLVMGen& cg) {
+llvm::DIType* LgsUnknown::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
 
@@ -32,10 +32,10 @@ LgsType* LgsUnknown::clone() {
     assert(0);
 }
 
-Type* LgsUnknown::getIRType(LgsLLVMGen& cg) {
+Type* LgsUnknown::getIRType(LgsCgModule& cg) {
     assert(0);
 }
 
-Constant* LgsUnknown::getRTType(LgsLLVMGen& cg) {
+Constant* LgsUnknown::getRTType(LgsCgModule& cg) {
     assert(0);
 }

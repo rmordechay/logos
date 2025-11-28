@@ -1,4 +1,4 @@
-#include "codegen/LgsLLVMGen.h"
+#include "codegen/LgsCgModule.h"
 #include "exprs/constants/LgsCharConst.h"
 #include "types/LgsAny.h"
 #include "types/iterables/LgsStr.h"
@@ -14,11 +14,11 @@ size_t LgsChar::sizeBytes() {
     return sizeof(char);
 }
 
-Type* LgsChar::getIRType(LgsLLVMGen& cg) {
+Type* LgsChar::getIRType(LgsCgModule& cg) {
     return cg.i8Ty();
 }
 
-Constant* LgsChar::getRTType(LgsLLVMGen& cg) {
+Constant* LgsChar::getRTType(LgsCgModule& cg) {
     return cg.getRTTypeInfo(getGenericName(), sizeBytes(), RTT_CHAR, cg.null());
 }
 
@@ -47,7 +47,7 @@ bool LgsChar::canCastTo(LgsType* other) {
     return name == IRName;
 }
 
-llvm::DIType* LgsChar::getDebugType(LgsLLVMGen& cg) {
+llvm::DIType* LgsChar::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
 

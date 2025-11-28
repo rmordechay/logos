@@ -2,11 +2,11 @@
 
 #include "LgsUtils.h"
 
-Value* LgsEnvVar::loadIR(LgsLLVMGen& cg) {
+Value* LgsEnvVar::loadIR(LgsCgModule& cg) {
     return IRValue;
 }
 
-Value* LgsEnvVar::castIR(LgsLLVMGen& cg, LgsType* toType) {
+Value* LgsEnvVar::castIR(LgsCgModule& cg, LgsType* toType) {
     assert(0);
 }
 

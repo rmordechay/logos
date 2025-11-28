@@ -14,18 +14,18 @@ LgsField* LgsVec::getField(const std::string& fieldName) {
         if (f->name == fieldName) return f;
     }
     const size_t newFieldDim = fieldName.size();
-    const auto scalarOrVector = newFieldDim == 1 ? baseType->clone() : new LgsVec(newFieldDim);
+    const auto scalarOrVector = newFieldDim == 1 ? baseType : new LgsVec(newFieldDim);
     const auto field = new LgsField(fieldName, scalarOrVector);
     addField(field);
     return field;
 }
 
-Type* LgsVec::getIRType(LgsLLVMGen& cg) {
+Type* LgsVec::getIRType(LgsCgModule& cg) {
     IRType = llvm::FixedVectorType::get(baseType->getIRType(cg), vectorDim);
     return IRType;
 }
 
-Constant* LgsVec::getRTType(LgsLLVMGen& cg) {
+Constant* LgsVec::getRTType(LgsCgModule& cg) {
     const auto genericName = getGenericName();
     const auto st = cg.getStructType({cg.ptrTy()}, genericName);
     const auto sv = llvm::ConstantStruct::get(st, {baseType->getRTType(cg)});
@@ -66,17 +66,17 @@ LgsType* LgsVec::applyBinOp(LgsType* toType, LgsBinOp& op) {
     switch (op.opType) {
     case ADD:
     case SUB: {
-        if (thisNme == otherName) return clone();
+        if (thisNme == otherName) return this;
         break;
     }
     case DIV:
     case MUL: {
         if (thisNme == otherName) return &LGS_FLOAT;
-        if (toType->isNumber()) return clone();
+        if (toType->isNumber()) return this;
         break;
     }
     case IN: {
-        if (toType->canCastTo(baseType)) return baseType->clone();
+        if (toType->canCastTo(baseType)) return baseType;
         break;
     }
     default:
@@ -99,21 +99,21 @@ bool LgsVec::inferBaseType(const std::vector<LgsExpr*>& args) {
     return true;
 }
 
-Value* LgsVec::addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsVec::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     if (right->IRValue->getType()->isIntegerTy()) {
         return cg.builder.CreateFAdd(left->loadIR(cg), right->loadIR(cg));
     }
     return cg.builder.CreateFAdd(left->loadIR(cg), right->loadIR(cg));
 }
 
-Value* LgsVec::subIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsVec::subIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     if (right->IRValue->getType()->isIntegerTy()) {
         return cg.builder.CreateFSub(left->loadIR(cg), right->loadIR(cg));
     }
     return cg.builder.CreateFSub(left->loadIR(cg), right->loadIR(cg));
 }
 
-Value* LgsVec::mulIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsVec::mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     if (right->type->isNumber()) {
         const auto vecTy = llvm::cast<llvm::VectorType>(getIRType(cg));
         right->IRValue = cg.builder.CreateSIToFP(right->IRValue, vecTy->getElementType());
@@ -134,7 +134,7 @@ Value* LgsVec::mulIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
     return cg.builder.CreateFMul(left->IRValue, right->IRValue);
 }
 
-Value* LgsVec::divIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsVec::divIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     if (right->IRValue->getType()->isIntegerTy()) {
         const auto vecTy = llvm::cast<llvm::VectorType>(getIRType(cg));
         right->IRValue = cg.builder.CreateSIToFP(right->IRValue, vecTy->getElementType());
@@ -152,7 +152,7 @@ Value* LgsVec::divIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
     return cg.builder.CreateFDiv(left->IRValue, right->IRValue);
 }
 
-Value* LgsVec::inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) {
+Value* LgsVec::inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) {
     const auto resultPtr = cg.builder.CreateAlloca(cg.i1Ty());
     cg.builder.CreateStore(cg.false_(), resultPtr);
     cg.loop(cg.i64(vectorDim), [this, &cg, iterableExpr, value, resultPtr](Value* index, BasicBlock* exitBlock) {
@@ -171,16 +171,16 @@ Value* LgsVec::inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) {
     return cg.builder.CreateLoad(cg.i1Ty(), resultPtr);
 }
 
-Value* LgsVec::lenIR(LgsLLVMGen& cg, Value* iterable) {
+Value* LgsVec::lenIR(LgsCgModule& cg, Value* iterable) {
     return cg.usize(2);
 }
 
-Value* LgsVec::getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) {
+Value* LgsVec::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
     const auto gep = cg.builder.CreateGEP(getIRType(cg), iterable, {cg.i32Zero(), index});
     return cg.builder.CreateLoad(baseType->getIRType(cg), gep);
 }
 
-Value* LgsVec::dotProduct(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) const {
+Value* LgsVec::dotProduct(LgsCgModule& cg, LgsExpr* self, LgsExpr* other) const {
     const auto vecTypeIR = self->IRValue->getType();
     cg.savedIP = cg.builder.saveIP();
     const auto dotFunc = cg.getFunc("Lgs_dotProduct", cg.getFT(cg.sizeTy(), {vecTypeIR, vecTypeIR}));
@@ -213,7 +213,7 @@ Value* LgsVec::dotProduct(LgsLLVMGen& cg, LgsExpr* self, LgsExpr* other) const {
     return cg.builder.CreateCall(dotFunc, {self->IRValue, other->IRValue});
 }
 
-Value* LgsVec::matMul(LgsLLVMGen& cg, const LgsExpr* left, const LgsExpr* right) const {
+Value* LgsVec::matMul(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right) const {
     const auto mat = left->type->asMatrix();
     const auto order = cg.i32(CblasRowMajor);
     const auto transpose = cg.i32(CblasNoTrans);
@@ -277,10 +277,10 @@ std::string LgsVec::strFormatPart() const {
     return str.str();
 }
 
-llvm::DIType* LgsVec::getDebugType(LgsLLVMGen& cg) {
+llvm::DIType* LgsVec::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
 
 LgsType* LgsVec::clone() {
-    return new LgsVec(vectorDim, baseType->clone());
+    return new LgsVec(vectorDim, baseType);
 }

@@ -38,7 +38,7 @@ LgsFunc* LgsObject::getMethod(const std::string& methodName) {
     return nullptr;
 }
 
-Type* LgsObject::getIRType(LgsLLVMGen& cg) {
+Type* LgsObject::getIRType(LgsCgModule& cg) {
     const auto type = cg.typesRegistry.find(name);
     if (type != cg.typesRegistry.end()) return type->second;
     std::vector<Type*> elementTypes;
@@ -59,7 +59,7 @@ Type* LgsObject::getIRType(LgsLLVMGen& cg) {
     return IRType;
 }
 
-Constant* LgsObject::getRTType(LgsLLVMGen& cg) {
+Constant* LgsObject::getRTType(LgsCgModule& cg) {
     std::vector<Constant*> fieldRTTs;
     fieldRTTs.reserve(fields.size());
     for (const auto fields : fields) {
@@ -67,7 +67,14 @@ Constant* LgsObject::getRTType(LgsLLVMGen& cg) {
     }
     const auto fieldsArrType = ArrayType::get(cg.getRTBaseType(), fields.size());
     const auto genericName = getGenericName();
-    const auto fieldsArr = cg.createGlobal(LGS_TYPEINFO_PREFIX + genericName + "Fields", fieldsArrType, llvm::ConstantArray::get(fieldsArrType, fieldRTTs));
+    const auto fieldsName = LGS_TYPEINFO_PREFIX + genericName + "Fields";
+    GlobalVariable* fieldsArr = nullptr;
+    if (cg.isRTTModule) {
+        const auto args = llvm::ConstantArray::get(fieldsArrType, fieldRTTs);
+        fieldsArr = cg.createGlobal(fieldsName, fieldsArrType, args);
+    } else {
+        fieldsArr = cg.createGlobal(fieldsName, fieldsArrType, nullptr);
+    }
     const auto st = cg.getStructType({cg.sizeTy(), cg.ptrTy()}, LGS_TYPEINFO_PREFIX + genericName);
     const auto sv = llvm::ConstantStruct::get(st, {cg.usize(fields.size()), fieldsArr});
     return cg.getRTTypeInfo(genericName, sizeBytes(), RTT_OBJECT, sv);
@@ -86,7 +93,7 @@ size_t LgsObject::sizeBytes() {
 }
 
 LgsExpr* LgsObject::getZeroValue() {
-    return new LgsInstance(clone());
+    return new LgsInstance(this);
 }
 
 bool LgsObject::canCastTo(LgsType* other) {
@@ -121,7 +128,7 @@ std::string LgsObject::strFormatPart() const {
 
 LgsObject* LgsObject::clone() {
     assert(!singleton);
-    const auto newObj = new LgsObject(*this);
+    const auto newObj = new LgsObject(name);
     newObj->fields.clear();
     newObj->generics.clear();
     for (const auto& generic : generics) {
@@ -135,7 +142,7 @@ LgsObject* LgsObject::clone() {
     return newObj;
 }
 
-llvm::DIType* LgsObject::getDebugType(LgsLLVMGen& cg) {
+llvm::DIType* LgsObject::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
 

@@ -2,7 +2,7 @@
 #include "LgsType.h"
 #include "LgsUtils.h"
 
-Value* LgsPostfixExpr::castIR(LgsLLVMGen& cg, LgsType* toType) {
+Value* LgsPostfixExpr::castIR(LgsCgModule& cg, LgsType* toType) {
     assert(0);
 }
 
