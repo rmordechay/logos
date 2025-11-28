@@ -146,7 +146,7 @@ Value* LgsCgModule::getPtrTo(Value* v) {
     return ptr;
 }
 
-GlobalVariable* LgsCgModule::createGlobal(const std::string& name, Type* type, Constant* args, const bool isConst, GlobalValue::LinkageTypes linkage) const {
+GlobalVariable* LgsCgModule::createGlobal(const std::string& name, Type* type, Constant* args, const bool isConst, const GlobalValue::LinkageTypes linkage) const {
     if (const auto var = IRModule->getGlobalVariable(name)) return var;
     return new GlobalVariable(*IRModule, type, isConst, linkage, args, name);
 }

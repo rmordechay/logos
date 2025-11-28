@@ -4,18 +4,23 @@
 #include <cassert>
 #include "Lgs_HashMap.h"
 #include "LgsUtils.h"
+#include "Lgs_Helpers.h"
 #include "context/Lgs_Aarch64.h"
 #include <iostream>
 #include <stack>
 
 extern "C" void Lgs_Runtime_callDefers();
 
+struct Lgs_StackFrame {
+    std::unordered_map<void*, Lgs_TypeInfo*> owners;
+    std::unordered_map<void*, Lgs_TypeInfo*> orphans;
+    std::vector<Lgs_ThunkFunc> defers;
+};
+
 struct Lgs_Runtime {
     Lgs_Allocator arena;
-    std::vector<void*> owners;
-    std::vector<void*> orphans;
     std::vector<Lgs_ThunkFunc> coros;
-    std::stack<std::vector<Lgs_ThunkFunc>> defers;
+    std::stack<Lgs_StackFrame> stack;
     std::unordered_map<VKey, void*, VKeyHash> vtable;
 };
 
@@ -28,16 +33,22 @@ extern "C" void Lgs_Runtime_close() {
 }
 
 extern "C" void Lgs_Runtime_push() {
-    runtime.defers.push({});
+    runtime.stack.push(Lgs_StackFrame{});
 }
 
 extern "C" void Lgs_Runtime_pop() {
     Lgs_Runtime_callDefers();
-    runtime.defers.pop();
+    for (const auto [ptr, type] : runtime.stack.top().owners) {
+        freeValue(ptr, type);
+    }
+    for (const auto [ptr, type] : runtime.stack.top().orphans) {
+        freeValue(ptr, type);
+    }
+    runtime.stack.pop();
 }
 
 extern "C" void Lgs_Runtime_addDefer(const ThunkFunc funcPtr, void* ctx) {
-    runtime.defers.top().emplace_back(Lgs_ThunkFunc{funcPtr, ctx});
+    runtime.stack.top().defers.emplace_back(Lgs_ThunkFunc{funcPtr, ctx});
 }
 
 extern "C" void Lgs_Runtime_addCoro(const ThunkFunc funcPtr, void* ctx) {
@@ -45,20 +56,24 @@ extern "C" void Lgs_Runtime_addCoro(const ThunkFunc funcPtr, void* ctx) {
 }
 
 extern "C" void Lgs_Runtime_callDefers() {
-    for (auto [func, ctx] : runtime.defers.top()) {
+    for (auto [func, ctx] : runtime.stack.top().defers) {
         func(ctx);
     }
 }
 
-extern "C" void* Lgs_Runtime_allocate(const Lgs_TypeInfo* type, const bool isOwner) {
-    const auto ptr = runtime.arena.allocate(type->size);
-    if (isOwner) runtime.owners.push_back(ptr);
-    else runtime.orphans.push_back(ptr);
+extern "C" void* Lgs_Runtime_allocate(Lgs_TypeInfo* type, const bool isOwner) {
+    const auto ptr = std::malloc(type->size);
+    std::cout << "Allocated: " << ptr << '\n';
+    if (isOwner) {
+        runtime.stack.top().owners[ptr] = type;
+    } else {
+        runtime.stack.top().orphans[ptr] = type;
+    }
     return ptr;
 }
 
 extern "C" void Lgs_Runtime_removeOwner(const void* owner) {
-    auto& top = runtime.defers.top();
+
 }
 
 extern "C" void Lgs_Runtime_yield() {

@@ -18,18 +18,18 @@ std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
     std::ostringstream str;
     switch (rtt->kind) {
     case RTT_ANY: str << elem; break;
-    case RTT_BOOL:  str << (*static_cast<bool*>(elem) ? "true" : "false"); break;
-    case RTT_BYTE:  str << *static_cast<int8_t*>(elem); break;
-    case RTT_SHORT:  str << *static_cast<int16_t*>(elem); break;
-    case RTT_INT:  str << *static_cast<int32_t*>(elem); break;
-    case RTT_LONG:  str << *static_cast<int64_t*>(elem); break;
-    case RTT_SIZE:  str << *static_cast<size_t*>(elem); break;
-    case RTT_UBYTE:  str << *static_cast<uint8_t*>(elem); break;
-    case RTT_USHORT:  str << *static_cast<uint16_t*>(elem); break;
-    case RTT_UINT:  str << *static_cast<uint32_t*>(elem); break;
-    case RTT_ULONG:  str << *static_cast<uint64_t*>(elem); break;
-    case RTT_FLOAT:  str << *static_cast<float*>(elem); break;
-    case RTT_DOUBLE:  str << *static_cast<double*>(elem); break;
+    case RTT_BOOL: str << (*static_cast<bool*>(elem) ? "true" : "false"); break;
+    case RTT_BYTE: str << *static_cast<int8_t*>(elem); break;
+    case RTT_SHORT: str << *static_cast<int16_t*>(elem); break;
+    case RTT_INT: str << *static_cast<int32_t*>(elem); break;
+    case RTT_LONG: str << *static_cast<int64_t*>(elem); break;
+    case RTT_SIZE: str << *static_cast<size_t*>(elem); break;
+    case RTT_UBYTE: str << *static_cast<uint8_t*>(elem); break;
+    case RTT_USHORT: str << *static_cast<uint16_t*>(elem); break;
+    case RTT_UINT: str << *static_cast<uint32_t*>(elem); break;
+    case RTT_ULONG: str << *static_cast<uint64_t*>(elem); break;
+    case RTT_FLOAT: str << *static_cast<float*>(elem); break;
+    case RTT_DOUBLE: str << *static_cast<double*>(elem); break;
     case RTT_TYPE:
     case RTT_ENUM:
     case RTT_STR: str << static_cast<const char*>(elem); break;
@@ -140,4 +140,27 @@ std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
     case RTT_UNKNOWN: assert(0);
     }
     return str.str();
+}
+
+void freeValue(void* ptr, const Lgs_TypeInfo* type) {
+    switch (type->kind) {
+    case RTT_SARRAY:
+        break;
+    case RTT_DARRAY:
+        break;
+    case RTT_SET:
+        break;
+    case RTT_MAP:
+        break;
+    case RTT_OBJECT: {
+        std::cout << "Freeing: " << ptr << '\n';
+        std::free(ptr);
+        return;
+    }
+    case RTT_NULLABLE:
+        break;
+    default:
+        break;
+    }
+    assert(0);
 }
