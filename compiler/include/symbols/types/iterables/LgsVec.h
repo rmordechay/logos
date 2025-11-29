@@ -1,6 +1,7 @@
 #pragma once
 #include "exprs/constants/LgsIntConst.h"
 #include "stmts/LgsField.h"
+#include "types/primitives/LgsDouble.h"
 #include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsInt.h"
 
@@ -8,7 +9,6 @@ class LgsVec final : public LgsIterable {
 public:
     static constexpr auto baseName = "Vec";
     size_t vectorDim = 0;
-    std::vector<uint8_t> indices;
 
     explicit LgsVec(const size_t dim, LgsType* baseType = &LGS_FLOAT) : LgsIterable(baseType), vectorDim(dim) {
         assert(dim > 1 && dim <= 4);
@@ -20,6 +20,7 @@ public:
     LgsField* getField(const std::string& fieldName) override;
     Type* getIRType(LgsCgModule& cg) override;
     Constant* getRTType(LgsCgModule& cg) override;
+    std::string getGenericName() override;
     std::string getName() override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
@@ -33,10 +34,19 @@ public:
     Value* inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
     Value* lenIR(LgsCgModule& cg, Value* iterable) override;
     Value* getIRElement(LgsCgModule& cg, Value* iterable, Value* index) override;
-    Value* dotProduct(LgsCgModule& cg, LgsExpr* self, LgsExpr* other) const;
     Value* matMul(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right) const;
     static size_t getSwizzleSet(char c);
     static size_t getComponentIndex(char c);
     std::string strFormatPart() const override;
     llvm::DIType* getDebugType(LgsCgModule& cg) override;
 };
+
+inline LgsVec LGS_VEC2_F(2);
+inline LgsVec LGS_VEC3_F(3);
+inline LgsVec LGS_VEC4_F(4);
+inline LgsVec LGS_VEC2_D(2, &LGS_DOUBLE);
+inline LgsVec LGS_VEC3_D(3, &LGS_DOUBLE);
+inline LgsVec LGS_VEC4_D(4, &LGS_DOUBLE);
+inline LgsVec LGS_VEC2_I(2, &LGS_INT);
+inline LgsVec LGS_VEC3_I(3, &LGS_INT);
+inline LgsVec LGS_VEC4_I(4, &LGS_INT);

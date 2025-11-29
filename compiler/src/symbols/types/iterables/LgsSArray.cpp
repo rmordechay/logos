@@ -1,7 +1,6 @@
 #include "types/iterables/LgsSArray.h"
 #include "codegen/LgsCgModule.h"
 #include "exprs/LgsArrayExpr.h"
-#include "funcs/LgsFunc.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsBool.h"
 #include "LgsUtils.h"

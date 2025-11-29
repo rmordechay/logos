@@ -1,15 +1,11 @@
 #include "types/iterables/LgsMap.h"
 #include "Lgs_HashMap.h"
 #include "LgsDefinitions.h"
-#include "exprs/LgsFuncCall.h"
 #include "exprs/LgsHashMap.h"
 #include "exprs/LgsIterIndex.h"
-#include "funcs/LgsFunc.h"
 #include "loops/LgsForeachLoop.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsAny.h"
-#include "types/primitives/LgsVoid.h"
-#include "types/iterables/LgsDArray.h"
 #include "LgsUtils.h"
 
 Type* LgsMap::getIRType(LgsCgModule& cg) {

@@ -199,6 +199,33 @@ LgsMetaSelection* LgsExpr::asMetaSelection() {
     return dynamic_cast<LgsMetaSelection*>(this);
 }
 
+Value* dotProduct(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+    const auto l = left->loadIR(cg);
+    const auto r = right->loadIR(cg);
+
+    const auto lx = cg.builder.CreateExtractElement(l, cg.i32(0));
+    const auto rx = cg.builder.CreateExtractElement(r, cg.i32(0));
+    const auto ly = cg.builder.CreateExtractElement(l, cg.i32(1));
+    const auto ry = cg.builder.CreateExtractElement(r, cg.i32(1));
+    const auto mulX = cg.builder.CreateFMul(lx, rx);
+    const auto mulY = cg.builder.CreateFMul(ly, ry);
+    Value* result = cg.builder.CreateFAdd(mulX, mulY);
+
+    const auto vectorDim = left->type->asVec()->vectorDim;
+    if (vectorDim == 3) {
+        const auto lz = cg.builder.CreateExtractElement(l, cg.i32(2));
+        const auto rz = cg.builder.CreateExtractElement(r, cg.i32(2));
+        const auto mulZ = cg.builder.CreateFMul(lz, rz);
+        result = cg.builder.CreateFAdd(result, mulZ);
+    } else if (vectorDim == 4) {
+        const auto lw = cg.builder.CreateExtractElement(l, cg.i32(3));
+        const auto rw = cg.builder.CreateExtractElement(r, cg.i32(3));
+        const auto mulW = cg.builder.CreateFMul(lw, rw);
+        result = cg.builder.CreateFAdd(result, mulW);
+    }
+    return result;
+}
+
 void freeExpr(LgsExpr* expr) {
     if (!expr) return;
     expr->setType(nullptr);

@@ -6,7 +6,6 @@
 #include "cblas/cblas.h"
 #include "types/iterables/LgsMatrix.h"
 
-#include <iostream>
 #include <sstream>
 
 LgsField* LgsVec::getField(const std::string& fieldName) {
@@ -14,8 +13,13 @@ LgsField* LgsVec::getField(const std::string& fieldName) {
         if (f->name == fieldName) return f;
     }
     const size_t newFieldDim = fieldName.size();
-    const auto scalarOrVector = newFieldDim == 1 ? baseType : new LgsVec(newFieldDim);
-    const auto field = new LgsField(fieldName, scalarOrVector);
+    LgsField* field = nullptr;
+    if (newFieldDim == 1) {
+        field = new LgsField(fieldName, baseType);
+        field->position = getComponentIndex(fieldName[0]);
+    } else {
+        field = new LgsField(fieldName, new LgsVec(newFieldDim));
+    }
     addField(field);
     return field;
 }
@@ -39,6 +43,10 @@ Constant* LgsVec::getRTType(LgsCgModule& cg) {
         return cg.getRTTypeInfo(genericName, sizeBytes(), sizeBytes(), RTT_VEC4, sv);
     }
     assert(0);
+}
+
+std::string LgsVec::getGenericName() {
+    return getName() + baseType->getGenericName();
 }
 
 std::string LgsVec::getName() {
@@ -120,9 +128,6 @@ Value* LgsVec::mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
         right->IRValue = cg.builder.CreateVectorSplat(vecTy->getElementCount(), right->IRValue);
         return cg.builder.CreateFMul(left->loadIR(cg), right->loadIR(cg));
     }
-    if (left->type->asVec() && right->type->asVec()) {
-        return dotProduct(cg, left, right);
-    }
     if (left->type->asMatrix() && right->type->asVec()) {
         return matMul(cg, left, right);
     }
@@ -140,9 +145,6 @@ Value* LgsVec::divIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
         right->IRValue = cg.builder.CreateSIToFP(right->IRValue, vecTy->getElementType());
         right->IRValue = cg.builder.CreateVectorSplat(vecTy->getElementCount(), right->IRValue);
         return cg.builder.CreateFDiv(left->loadIR(cg), right->loadIR(cg));
-    }
-    if (right->IRValue->getType()->isVectorTy()) {
-        return dotProduct(cg, left, right);
     }
     if (right->IRValue->getType()->isFloatingPointTy()) {
         const auto vecTy = llvm::cast<llvm::VectorType>(left->IRValue->getType());
@@ -178,39 +180,6 @@ Value* LgsVec::lenIR(LgsCgModule& cg, Value* iterable) {
 Value* LgsVec::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
     const auto gep = cg.builder.CreateGEP(getIRType(cg), iterable, {cg.i32Zero(), index});
     return cg.builder.CreateLoad(baseType->getIRType(cg), gep);
-}
-
-Value* LgsVec::dotProduct(LgsCgModule& cg, LgsExpr* self, LgsExpr* other) const {
-    const auto vecTypeIR = self->IRValue->getType();
-    cg.savedIP = cg.builder.saveIP();
-    const auto dotFunc = cg.getFunc("Lgs_dotProduct", cg.getFT(cg.sizeTy(), {vecTypeIR, vecTypeIR}));
-    const auto block = cg.createBlock("entry", dotFunc);
-    cg.builder.SetInsertPoint(block);
-    const auto l = dotFunc->getArg(0);
-    const auto r = dotFunc->getArg(1);
-
-    const auto lx = cg.builder.CreateExtractValue(l, {0});
-    const auto rx = cg.builder.CreateExtractValue(r, {0});
-    const auto ly = cg.builder.CreateExtractValue(l, {1});
-    const auto ry = cg.builder.CreateExtractValue(r, {1});
-    const auto mulX = cg.builder.CreateFMul(lx, rx);
-    const auto mulY = cg.builder.CreateFMul(ly, ry);
-    Value* result = cg.builder.CreateFAdd(mulX, mulY);
-    if (vectorDim == 3) {
-        const auto lz = cg.builder.CreateExtractValue(l, {2});
-        const auto rz = cg.builder.CreateExtractValue(r, {2});
-        const auto mulZ = cg.builder.CreateFMul(lz, rz);
-        result = cg.builder.CreateFAdd(result, mulZ);
-    } else if (vectorDim == 4) {
-        const auto lw = cg.builder.CreateExtractValue(l, {3});
-        const auto rw = cg.builder.CreateExtractValue(r, {3});
-        const auto mulW = cg.builder.CreateFMul(lw, rw);
-        result = cg.builder.CreateFAdd(result, mulW);
-    }
-    cg.builder.CreateRet(result);
-    cg.builder.restoreIP(cg.savedIP);
-
-    return cg.builder.CreateCall(dotFunc, {self->IRValue, other->IRValue});
 }
 
 Value* LgsVec::matMul(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right) const {

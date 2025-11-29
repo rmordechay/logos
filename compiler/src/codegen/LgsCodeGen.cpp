@@ -202,7 +202,9 @@ void LgsCodeGen::visitField(LgsField* field) const {
         const auto newVec = cg.builder.CreateShuffleVector(l, UndefValue::get(parentTy), mask);
         cg.builder.CreateStore(newVec, field->IRValue);
     } else {
-        field->IRValue = field->getGEP(cg);
+        if (!field->IRValue) {
+            field->IRValue = field->getGEP(cg);
+        }
         if (field->expr) {
             field->expr->destPtrValue = field->IRValue;
         }

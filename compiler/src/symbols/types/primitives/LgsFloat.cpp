@@ -63,6 +63,9 @@ Value* LgsFloat::subIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
 }
 
 Value* LgsFloat::mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+    if (left->type->asVec() && right->type->asVec()) {
+        return dotProduct(cg, left, right);
+    }
     const auto [l, r] = loadOperands(cg, left, right);
     return cg.builder.CreateFMul(l, r);
 }

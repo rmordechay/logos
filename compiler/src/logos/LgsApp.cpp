@@ -15,6 +15,7 @@
 #include "lgsc/LgsCLang.h"
 #include "parser/LgsParser.h"
 #include "LgsUtils.h"
+#include "types/iterables/LgsVec.h"
 #include "types/primitives/LgsByte.h"
 #include "types/primitives/LgsDouble.h"
 #include "types/primitives/LgsFloat.h"
@@ -156,8 +157,6 @@ bool LgsApp::analyse() {
 bool LgsApp::generate() {
     createBuildDirs();
     LgsCgModule::initLLVM();
-    const auto execFileName = configs.name == "" ? LGS_DEFAULT_EXEC_FILE : configs.name;
-    paths.execFile = paths.buildDir / execFileName;
     if (!generateRTTTypes()) return false;
 
     // Main file is generated first non-concurrently
@@ -185,6 +184,7 @@ bool LgsApp::generate() {
 }
 
 bool LgsApp::link() {
+    paths.execFile = paths.buildDir / (configs.name != "" ? configs.name : LGS_DEFAULT_EXEC_FILE);
     LgsLinker linker(configs, paths, srcFiles);
     for (auto& [_, app] : globals.table.imports) {
         linker.externalLibs.push_back(app->paths.rootPath);
@@ -313,13 +313,17 @@ bool LgsApp::generateRTTTypes() {
     LGS_SIZE.getRTType(rttTypeModule);
     LGS_FLOAT.getRTType(rttTypeModule);
     LGS_DOUBLE.getRTType(rttTypeModule);
-    const auto mainFile = getMainFile();
-    for (const auto object : mainFile->objects) {
-        object->getRTType(rttTypeModule);
-        for (const auto innerObj : object->objects) {
-            innerObj->getRTType(rttTypeModule);
-        }
-    }
+    LGS_VEC2_F.getRTType(rttTypeModule);
+    LGS_VEC3_F.getRTType(rttTypeModule);
+    LGS_VEC4_F.getRTType(rttTypeModule);
+    LGS_VEC2_D.getRTType(rttTypeModule);
+    LGS_VEC3_D.getRTType(rttTypeModule);
+    LGS_VEC4_D.getRTType(rttTypeModule);
+    LGS_VEC2_I.getRTType(rttTypeModule);
+    LGS_VEC3_I.getRTType(rttTypeModule);
+    LGS_VEC4_I.getRTType(rttTypeModule);
+
+    // Globals
     for (auto [symbolName, symbol] : globals.table.symbols) {
         if (symbol.symbolType != OBJECT) continue;
         symbol.object->getRTType(rttTypeModule);
@@ -327,6 +331,16 @@ bool LgsApp::generateRTTTypes() {
             innerObj->getRTType(rttTypeModule);
         }
     }
+
+    // Main file
+    const auto mainFile = getMainFile();
+    for (const auto object : mainFile->objects) {
+        object->getRTType(rttTypeModule);
+        for (const auto innerObj : object->objects) {
+            innerObj->getRTType(rttTypeModule);
+        }
+    }
+
     return rttTypeModule.writeIRModule(paths, 3);
 }
 

@@ -1,6 +1,5 @@
 #include "exprs/LgsFuncCall.h"
 #include "exprs/constants/LgsStrConst.h"
-#include "funcs/LgsFunc.h"
 #include "LgsConfigs.h"
 #include "types/LgsAny.h"
 #include "types/iterables/LgsSArray.h"

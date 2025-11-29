@@ -59,26 +59,35 @@ std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
     }
     case RTT_VEC2: {
         const auto& [baseType] = rtt->vec2;
+        void* e1 = elem;
+        void* e2 = static_cast<char*>(e1) + baseType->size;
         str << "Vec2<";
-        str << formatElement(baseType, &static_cast<char*>(elem)[0]) << ", ";
-        str << formatElement(baseType, &static_cast<char*>(elem)[1]) << ">";
+        str << formatElement(baseType, e1) << ", ";
+        str << formatElement(baseType, e2) << ">";
         break;
     }
     case RTT_VEC3: {
         const auto& [baseType] = rtt->vec3;
+        void* e1 = elem;
+        void* e2 = static_cast<char*>(e1) + baseType->size;
+        void* e3 = static_cast<char*>(e2) + baseType->size;
         str << "Vec3<";
-        str << formatElement(baseType, &static_cast<char*>(elem)[0]) << ", ";
-        str << formatElement(baseType, &static_cast<char*>(elem)[1]) << ", ";
-        str << formatElement(baseType, &static_cast<char*>(elem)[2]) << ">";
+        str << formatElement(baseType, e1) << ", ";
+        str << formatElement(baseType, e2) << ", ";
+        str << formatElement(baseType, e3) << ">";
         break;
     }
     case RTT_VEC4: {
         const auto& [baseType] = rtt->vec4;
+        void* e1 = elem;
+        void* e2 = static_cast<char*>(e1) + baseType->size;
+        void* e3 = static_cast<char*>(e2) + baseType->size;
+        void* e4 = static_cast<char*>(e3) + baseType->size;
         str << "Vec4<";
-        str << formatElement(baseType, &static_cast<char*>(elem)[0]) << ", ";
-        str << formatElement(baseType, &static_cast<char*>(elem)[1]) << ", ";
-        str << formatElement(baseType, &static_cast<char*>(elem)[2]) << ", ";
-        str << formatElement(baseType, &static_cast<char*>(elem)[3]) << ">";
+        str << formatElement(baseType, e1) << ", ";
+        str << formatElement(baseType, e2) << ", ";
+        str << formatElement(baseType, e3) << ", ";
+        str << formatElement(baseType, e4) << ">";
         break;
     }
     case RTT_MATRIX: {
