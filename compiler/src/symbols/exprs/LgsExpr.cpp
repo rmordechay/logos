@@ -264,10 +264,3 @@ void freeExpr(LgsExpr* expr) {
     expr->setType(nullptr);
     delete expr;
 }
-
-void freeExprs(std::vector<LgsExpr*>& exprs) {
-    for (const auto expr : exprs) {
-        freeExpr(expr);
-    }
-    exprs.clear();
-}

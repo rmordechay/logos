@@ -9,46 +9,54 @@ void LgsStack::enterScope(LgsValue* value) {
     if (const auto func = dynamic_cast<LgsFunc*>(value)) {
         stackFrame.func = func;
     } else if (const auto loop = dynamic_cast<LgsForLoop*>(value)) {
-        stackFrame.func = stack.top().func;
-        stackFrame.symbolTable = stack.top().symbolTable;
+        stackFrame.func = stack.back().func;
+        stackFrame.symbolTable = stack.back().symbolTable;
         stackFrame.loop = loop;
     } else if (const auto ifStmt = dynamic_cast<LgsIfStmt*>(value)) {
-        stackFrame.func = stack.top().func;
-        stackFrame.symbolTable = stack.top().symbolTable;
+        stackFrame.func = stack.back().func;
+        stackFrame.symbolTable = stack.back().symbolTable;
         stackFrame.ifStmt = ifStmt;
     } else if (dynamic_cast<LgsSwitch*>(value)) {
-        stackFrame.func = stack.top().func;
-        stackFrame.symbolTable = stack.top().symbolTable;
+        stackFrame.func = stack.back().func;
+        stackFrame.symbolTable = stack.back().symbolTable;
     } else {
         assert(0);
     }
-    stack.push(stackFrame);
+    stack.push_back(stackFrame);
 }
 
 void LgsStack::exitScope() {
-    stack.pop();
-}
-
-LgsFunc* LgsStack::currentFunc() {
-    return stack.top().func;
-}
-
-LgsForLoop* LgsStack::currentLoop() {
-    return stack.top().loop;
-}
-
-LgsIfStmt* LgsStack::currentIfStmt() {
-    return stack.top().ifStmt;
-}
-
-LgsIfStmt* LgsStack::outermostIfStmt() {
-    assert(0);
-}
-
-BasicBlock* LgsStack::findTagExitBlock(const std::string& tag) {
-    assert(0);
+    stack.pop_back();
 }
 
 LgsSymbolTable& LgsStack::getSymbolTable() {
-    return stack.top().symbolTable;
+    return stack.back().symbolTable;
+}
+
+LgsFunc* LgsStack::currentFunc() const {
+    return stack.back().func;
+}
+
+LgsForLoop* LgsStack::currentLoop() const {
+    return stack.back().loop;
+}
+
+LgsIfStmt* LgsStack::currentIfStmt() const {
+    return stack.back().ifStmt;
+}
+
+LgsIfStmt* LgsStack::getOutermostIfStmt() const {
+    for (const auto& frame : stack) {
+        if (frame.ifStmt) return frame.ifStmt;
+    }
+    return nullptr;
+}
+
+BasicBlock* LgsStack::findTagExitBlock(const std::string& tag) const {
+    for (const auto& frame : stack) {
+        if (frame.ifStmt && frame.ifStmt->tag == tag) {
+            return frame.ifStmt->IRExitBlock;
+        }
+    }
+    return nullptr;
 }

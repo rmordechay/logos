@@ -33,7 +33,7 @@
 #include "exprs/LgsNullableExpr.h"
 #include "exprs/LgsTernaryExpr.h"
 #include "files/LgsAppConfigFile.h"
-#include "lgsc/LgsCLang.h"
+#include "lgsc/LgsCCompiler.h"
 #include "logos/LgsApp.h"
 #include "stmts/LgsBreak.h"
 #include "stmts/LgsContinue.h"
@@ -84,31 +84,28 @@ bool LgsParser::scanTokens() {
 
 LgsFile* LgsParser::parseSrcFile(const bool isTestRun) {
     if (!scanTokens()) return nullptr;
-    std::unordered_set<std::string> externalImports;
+
+    std::vector<LgsStrConst*> externalImports;
     while (true) {
         if (currentToken.type != T_IMPORT) break;
         parseImports(externalImports);
     }
+
     LgsFile* file = nullptr;
     if (const auto mainFile = parseMainFile()) {
         file = mainFile;
-    }
-    if (const auto objFile = parseObjectFile()) {
+    } else if (const auto objFile = parseObjectFile()) {
         file = objFile;
-    }
-    if (const auto interfaceFile = parseInterfaceFile()) {
+    } else if (const auto interfaceFile = parseInterfaceFile()) {
         file = interfaceFile;
-    }
-    if (isTestRun) {
+    } else if (isTestRun) {
         if (const auto testFile = parseTestFile()) {
             file = testFile;
         }
     }
-    const LgsCLang lgsClang(paths.cLibHeadersDir);
-    LgsCLangParser parser(file->symbolTable);
-    for (auto externalImport : externalImports) {
-        lgsClang.parseFile(parser, externalImport);
-    }
+
+    parseCImports(externalImports, file);
+
     assert(file);
     return file;
 }
@@ -191,8 +188,8 @@ LgsAppConfigFile* LgsParser::parseAppConfigFile() {
         if (currentToken.lexeme == "required") break;
     }
 
-    if (currentToken.lexeme == "required" && peek().lexeme == LGS_ENVS_DIR) {
-        consume(2);
+    if (currentToken.lexeme == "requiredEnvs") {
+        consume();
         mustMatch(T_LBRACE);
         if (!matchAndConsume(T_RBRACE)) {
             while (true) {
@@ -224,6 +221,31 @@ LgsAppConfigFile* LgsParser::parseAppConfigFile() {
         }
         mustMatch(T_RBRACE);
     }
+
+    if (currentToken.lexeme == "searchPaths") {
+        consume();
+        mustMatch(T_LBRACE);
+        while (true) {
+            const auto searchPath = currentToken;
+            if (!matchAndConsume(T_STRING)) break;
+            paths.userSearchPaths.emplace_back(paths.rootPath / searchPath.lexeme);
+            if (currentToken.type != T_RBRACE) break;
+        }
+        mustMatch(T_RBRACE);
+    }
+
+    if (currentToken.lexeme == "libs") {
+        consume();
+        mustMatch(T_LBRACE);
+        while (true) {
+            const auto searchPath = currentToken;
+            if (!matchAndConsume(T_STRING)) break;
+            paths.userCLibs.emplace_back(paths.rootPath / searchPath.lexeme);
+            if (currentToken.type != T_RBRACE) break;
+        }
+        mustMatch(T_RBRACE);
+    }
+
     return file;
 }
 
@@ -1420,7 +1442,7 @@ LgsFuncCall* LgsParser::parseFuncCall() {
             const auto expr = parseExprOrStmtsBlock();
             if (!mustParse(expr)) break;
             if (!seen.insert(argName).second) {
-                addError(E10054, &expr->location, {argName});
+                addError(E10054, expr->location, {argName});
                 break;
             }
             funcCall->args.emplace_back(LgsFuncArg{expr, argName});
@@ -1608,7 +1630,6 @@ LgsMatrixExpr* LgsParser::parseMatrixExpr() {
     return matExpr;
 }
 
-
 LgsHashMap* LgsParser::parseHashMap() {
     const auto oldIndex = currentIndex;
     if (!matchAndConsume(T_LBRACE)) return nullptr;
@@ -1645,6 +1666,7 @@ LgsHashMap* LgsParser::parseHashMap() {
     hashMap->elements = pairs;
     return hashMap;
 }
+
 
 LgsFunc* LgsParser::parseLambda() {
     const auto oldIndex = currentIndex;
@@ -1891,7 +1913,7 @@ void LgsParser::parseArgs(LgsInstance* instance) {
         if (!mustParse(expr)) continue;
         auto argName = argNameToken.lexeme;
         if (!seen.insert(argName).second) {
-            addError(E10054, &expr->location, {argName});
+            addError(E10054, expr->location, {argName});
             break;
         }
         instance->args.emplace(argName, LgsInstanceArg{argName, expr});
@@ -1955,31 +1977,42 @@ void LgsParser::parseJsonPrimitive(LgsJson* json) {
     }
 }
 
-void LgsParser::parseImports(std::unordered_set<std::string>& cImports) {
+void LgsParser::parseImports(std::vector<LgsStrConst*>& cImports) {
     const auto importToken = currentToken;
     if (!matchAndConsume(T_IMPORT)) return;
-    if (currentToken.lexeme == LGS_C) {
-        return parseCImports(cImports);
-    }
+    if (currentToken.lexeme == LGS_C) return parseCIncludes(cImports);
     while (true) {
         const auto var = currentToken;
         if (!mustMatch(T_IDENTIFIER)) break;
-        imports[var.lexeme] = nullptr;
         if (importToken.location.lineStart != peek().location.lineStart) break;
         mustMatch(T_COMMA);
     }
 }
 
-void LgsParser::parseCImports(std::unordered_set<std::string>& cImports) {
+void LgsParser::parseCIncludes(std::vector<LgsStrConst*>& cImports) {
     const auto cToken = currentToken;
     consume();
     while (true) {
-        const auto strConst = currentToken;
-        if (!matchAndConsume(T_STRING)) break;
-        cImports.insert(strConst.lexeme);
+        const auto strConst = parseStrConst();
+        if (!strConst) break;
+        cImports.push_back(strConst);
         if (cToken.location.lineStart != peek().location.lineStart) break;
         mustMatch(T_COMMA);
     }
+}
+
+void LgsParser::parseCImports(std::vector<LgsStrConst*> externalImports, LgsFile* file) {
+    LgsCLangParser parser(file->symbolTable);
+    std::unordered_set<std::string> seen;
+    for (const auto externalImport : externalImports) {
+        auto headerPath = externalImport->value;
+        if (seen.contains(headerPath)) continue;
+        seen.insert(headerPath);
+        if (!lgsCC.parseFile(parser, headerPath)) {
+            addError(E10106, externalImport->location, {headerPath});
+        }
+    }
+    freeExprs(externalImports);
 }
 
 void LgsParser::addFileSymbol(LgsMainFile* file, const LgsSymbol& newSymbol) {
@@ -2036,7 +2069,7 @@ void LgsParser::validateTestFolder(const LgsFile* testFile) {
         currentPath = currentPath.parent_path();
     }
     if (!foundTestsFolder) {
-        addError(E10079, &testFile->location, {testFile->path.filename()});
+        addError(E10079, testFile->location, {testFile->path.filename()});
     }
 }
 
@@ -2194,8 +2227,8 @@ void LgsParser::recursionGuard() {
     assert(0);
 }
 
-void LgsParser::addError(const LgsBaseMsg& lgsErr, const LgsLocation* location, const std::vector<std::string>& args) {
-    errHandler.addError(lgsErr, location, metadata->path, args);
+void LgsParser::addError(const LgsBaseMsg& lgsErr, const LgsLocation& location, const std::vector<std::string>& args) {
+    errHandler.addError(lgsErr, &location, metadata->path, args);
 }
 
 LgsFunc* wrapStmtsBlockWithFunc(LgsStmtsBlock* stmtsBlock) {

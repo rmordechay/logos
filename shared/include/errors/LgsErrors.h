@@ -137,3 +137,5 @@ inline LgsBaseMsg E10102{"Macro condition must be of type Bool. Given: %s.", err
 inline LgsBaseMsg E10103{"'%s' doesn't match the rows length. Given: %s.", errCodeStart++};
 inline LgsBaseMsg E10104{"'%s' doesn't match the columns length. Given: %s.", errCodeStart++};
 inline LgsBaseMsg E10105{"Too many elements for array of size %s", errCodeStart++};
+inline LgsBaseMsg E10106{"Could not parse C file %s", errCodeStart++};
+inline LgsBaseMsg E10107{"Could not find C library %s", errCodeStart++};

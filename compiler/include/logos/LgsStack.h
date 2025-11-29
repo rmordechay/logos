@@ -24,14 +24,14 @@ struct LgsStackFrame {
 
 class LgsStack final {
 public:
-    std::stack<LgsStackFrame> stack;
+    std::vector<LgsStackFrame> stack;
 
     void enterScope(LgsValue* value);
     void exitScope();
-    LgsFunc* currentFunc();
-    LgsForLoop* currentLoop();
-    LgsIfStmt* currentIfStmt();
-    LgsIfStmt* outermostIfStmt();
-    BasicBlock* findTagExitBlock(const std::string& tag);
     LgsSymbolTable& getSymbolTable();
+    LgsFunc* currentFunc() const;
+    LgsForLoop* currentLoop() const;
+    LgsIfStmt* currentIfStmt() const;
+    LgsIfStmt* getOutermostIfStmt() const;
+    BasicBlock* findTagExitBlock(const std::string& tag) const;
 };

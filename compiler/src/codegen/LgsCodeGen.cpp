@@ -51,7 +51,6 @@
 #include "types/primitives/LgsSize.h"
 #include <llvm/IR/Module.h>
 #include "llvm/IR/Verifier.h"
-#include <llvm/Support/FileSystem.h>
 #include <llvm/Passes/PassBuilder.h>
 #include "llvm/Bitcode/BitcodeWriter.h"
 #include <unistd.h>
@@ -269,6 +268,7 @@ void LgsCodeGen::visitLoop(LgsForLoop* loop) {
     cg.startBlock(loop->IRExitBlock);
     stack.exitScope();
 }
+#include "llvm/IR/Metadata.h"
 
 void LgsCodeGen::visitRangeLoop(LgsRangeLoop* loop) {
     visitExpr(loop->startRange);
@@ -312,7 +312,7 @@ void LgsCodeGen::visitInfiniteLoop(const LgsInfiniteLoop* loop) const {
     cg.branchAndStartBlock(loop->IRBodyBlock);
 }
 
-void LgsCodeGen::visitLoopMetaVar(LgsMetaVar* metaVar) {
+void LgsCodeGen::visitLoopMetaVar(LgsMetaVar* metaVar) const {
     const auto loop = stack.currentLoop();
     const auto iValue = loop->iValue;
     switch (metaVar->varType) {
@@ -531,7 +531,7 @@ void LgsCodeGen::visitSwitch(LgsSwitch* switchStmt) {
     cg.builder.SetInsertPoint(exitBlock);
 }
 
-void LgsCodeGen::visitContinueStmt() {
+void LgsCodeGen::visitContinueStmt() const {
     stack.currentLoop()->incAndJumpToCond(cg);
 }
 
@@ -547,9 +547,9 @@ void LgsCodeGen::visitReturnStmt(LgsReturn* returnStmt) {
     }
 }
 
-void LgsCodeGen::visitBreakStmt(const LgsBreak* breakStmt) {
+void LgsCodeGen::visitBreakStmt(const LgsBreak* breakStmt) const {
     if (breakStmt->isBreakIf) {
-        cg.builder.CreateBr(stack.outermostIfStmt()->IRExitBlock);
+        cg.builder.CreateBr(stack.getOutermostIfStmt()->IRExitBlock);
     } else if (breakStmt->tag != "") {
         cg.builder.CreateBr(stack.findTagExitBlock(breakStmt->tag));
     } else {
@@ -1031,7 +1031,7 @@ void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
         funcCall->func->IRValue = getIRValue(value);
     }
     assert(funcCall->func || funcCall->coroutine);
-    const auto func = funcCall->func ? funcCall->func : funcCall->coroutine;;
+    const auto func = funcCall->func ? funcCall->func : funcCall->coroutine;
     const auto ft = func->funcType;
     if (ft->hasDefaults) {
         const auto diff = ft->params.size() - funcCall->args.size() - 1;
@@ -1042,7 +1042,7 @@ void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
 
     if (ft->isVirtual) {
         const auto name = func->funcType->getName();
-        const auto id = cg.hashConst(name);;
+        const auto id = cg.hashConst(name);
         func->IRValue = cg.getFromVTable(funcCall->parentPtr->IRValue, id);
     } else if (func->funcType->isArrFunc) {
         visitIterFunc(funcCall);
@@ -1399,7 +1399,7 @@ void LgsCodeGen::createFilterFunc(LgsFunc* func) {
     func->IRValue = func->getIRFunc(cg);
 }
 
-bool LgsCodeGen::checkMock(LgsExpr* expr) {
+bool LgsCodeGen::checkMock(LgsExpr* expr) const {
     const auto currentFunc = stack.currentFunc();
     if (currentFunc->isTest) {
         for (auto [when, then] : currentFunc->mocks) {

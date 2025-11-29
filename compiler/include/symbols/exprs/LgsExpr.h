@@ -82,4 +82,11 @@ public:
 Value* dotProduct(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
 Value* crossProduct(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
 void freeExpr(LgsExpr* expr);
-void freeExprs(std::vector<LgsExpr*>& exprs);
+
+template<typename T>
+void freeExprs(std::vector<T*>& exprs) {
+    for (const auto expr : exprs) {
+        freeExpr(static_cast<LgsExpr*>(expr));
+    }
+    exprs.clear();
+}

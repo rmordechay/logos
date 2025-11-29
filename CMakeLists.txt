@@ -48,7 +48,7 @@ set(LGS_SOURCE
     ${CMAKE_SOURCE_DIR}/compiler/src/tools/LgsJsonParser.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/parser/LgsLexer.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/parser/LgsParser.cpp
-    ${CMAKE_SOURCE_DIR}/compiler/src/lgsc/LgsCLang.cpp
+    ${CMAKE_SOURCE_DIR}/compiler/src/lgsc/LgsCCompiler.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/lgsc/LgsCLangParser.cpp
 
     # CLI

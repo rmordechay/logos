@@ -1,5 +1,6 @@
 #pragma once
 #include <filesystem>
+#include <vector>
 
 namespace fs = std::filesystem;
 
@@ -13,10 +14,12 @@ struct LgsPaths {
     fs::path cacheFile;
     fs::path appConfigFile;
     fs::path execFile;
-    fs::path cLibHeadersDir;
     fs::path lgsRootDir;
     fs::path lgsPackagesDir;
     fs::path cblasDir;
+    fs::path cLibHeadersDir;
+    std::vector<fs::path> userCLibs;
+    std::vector<fs::path> userSearchPaths;
     void findLgsRootDir();
     void findCLibHeaders();
 };

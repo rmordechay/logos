@@ -4,7 +4,7 @@
 #include "types/LgsAny.h"
 #include "types/primitives/LgsBool.h"
 #include "LgsUtils.h"
-#include "lgsc/LgsCLang.h"
+#include "lgsc/LgsCCompiler.h"
 
 Type* LgsSArray::getIRType(LgsCgModule& cg) {
     if (IRType) return IRType;

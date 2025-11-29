@@ -17,6 +17,7 @@ public:
     std::vector<LgsVarDec*> configs;
     std::vector<LgsVarDec*> requiredEnvs;
     std::vector<LgsImportPackage> packages;
+    std::vector<LgsStrConst*> searchPaths;
 
     explicit LgsAppConfigFile(const fs::path& path) : LgsFile(path) {}
     size_t hashFile() override;

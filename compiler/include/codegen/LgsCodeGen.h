@@ -92,7 +92,7 @@ public:
     void visitRangeLoop(LgsRangeLoop* loop);
     void visitForeachLoop(LgsForeachLoop* loop);
     void visitInfiniteLoop(const LgsInfiniteLoop* loop) const;
-    void visitLoopMetaVar(LgsMetaVar* metaVar);
+    void visitLoopMetaVar(LgsMetaVar* metaVar) const;
     void visitWhileLoop(const LgsWhileLoop* loop);
     void visitVarDec(LgsVarDec* varDec);
     void visitAssignment(const LgsAssignment* assignment);
@@ -101,9 +101,9 @@ public:
     void visitIfWithElse(LgsIfStmt* ifStmt);
     void visitElseIf(LgsIfStmt* ifStmt);
     void visitSwitch(LgsSwitch* switchStmt);
-    void visitContinueStmt();
+    void visitContinueStmt() const;
     void visitReturnStmt(LgsReturn* returnStmt);
-    void visitBreakStmt(const LgsBreak* breakStmt);
+    void visitBreakStmt(const LgsBreak* breakStmt) const;
     void visitCoroutine(const LgsCoroutine* coroutine);
     void visitDeferStmt(const LgsDeferStmt* defer);
     void visitIOStmt(const LgsIOStmt* ioStmt);
@@ -150,7 +150,7 @@ public:
     void createMapFunc(LgsFunc* func);
     void createFilterFunc(LgsFunc* func);
 
-    bool checkMock(LgsExpr* expr);
+    bool checkMock(LgsExpr* expr) const;
     Value* getIRValue(LgsValue* value);
     void setNullableValue(LgsExpr* expr);
     void addVirtuals(LgsObject* obj, Value* ptr) const;

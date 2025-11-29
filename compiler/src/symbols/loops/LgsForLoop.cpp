@@ -9,6 +9,9 @@
 #include "stmts/LgsVarDec.h"
 #include "LgsUtils.h"
 
+using llvm::MDNode;
+using llvm::MDString;
+
 void LgsForLoop::setBlocks(LgsCgModule& cg) {
     IRCondBlock = cg.createBlock(BLOCK_NAME_LOOP_COND);
     IRBodyBlock = cg.createBlock(BLOCK_NAME_LOOP_BODY);
@@ -20,7 +23,9 @@ void LgsForLoop::incAndJumpToCond(LgsCgModule& cg) {
     iValue = cg.builder.CreateLoad(cg.i32Ty(), iPtr);
     const auto inc = cg.builder.CreateAdd(iValue, cg.i32(1));
     cg.builder.CreateStore(inc, iPtr);
-    cg.builder.CreateBr(IRCondBlock);
+    const auto br = cg.builder.CreateBr(IRCondBlock);
+    const auto mustProgress = MDNode::get(cg.context, MDString::get(cg.context, "llvm.loop.mustprogress"));
+    br->setMetadata("llvm.loop", MDNode::getDistinct(cg.context, {mustProgress}));
 }
 
 LgsForeachLoop* LgsForLoop::asForeachLoop() {

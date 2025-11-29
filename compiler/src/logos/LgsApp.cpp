@@ -12,7 +12,7 @@
 #include "codegen/LgsLinker.h"
 #include "LgsConfigs.h"
 #include "files/LgsTestFile.h"
-#include "lgsc/LgsCLang.h"
+#include "lgsc/LgsCCompiler.h"
 #include "parser/LgsParser.h"
 #include "LgsUtils.h"
 #include "types/iterables/LgsVec.h"
@@ -161,6 +161,7 @@ bool LgsApp::generate() {
 
     // Main file is generated first non-concurrently
     const auto mainFile = getMainFile();
+    assert(mainFile);
     LgsCodeGen mainCodeGen(*mainFile, configs, globals, paths);
     if (!mainCodeGen.generate()) {
         errHandler.setUnsuccessful();
@@ -185,10 +186,13 @@ bool LgsApp::generate() {
 
 bool LgsApp::link() {
     paths.execFile = paths.buildDir / (configs.name != "" ? configs.name : LGS_DEFAULT_EXEC_FILE);
-    LgsLinker linker(configs, paths, srcFiles);
-    for (auto& [_, app] : globals.table.imports) {
-        linker.externalLibs.push_back(app->paths.rootPath);
+    const LgsLinker linker(configs, paths, srcFiles);
+    for (const auto& path : paths.userCLibs) {
+        if (!fs::exists(path)) {
+            errHandler.addError(E10107, {path});
+        }
     }
+    if (!errHandler.successful) return false;
     return linker.link();
 }
 
@@ -302,6 +306,7 @@ void LgsApp::loadBuiltins() {
 bool LgsApp::generateRTTTypes() {
     rttTypeModule.setupModule("rttypes");
     rttTypeModule.isRTTModule = true;
+    LgsStr().getRTType(rttTypeModule);
     LGS_BYTE.getRTType(rttTypeModule);
     LGS_BOOL.getRTType(rttTypeModule);
     LGS_CHAR.getRTType(rttTypeModule);
@@ -332,12 +337,12 @@ bool LgsApp::generateRTTTypes() {
         }
     }
 
-    // Main file
-    const auto mainFile = getMainFile();
-    for (const auto object : mainFile->objects) {
-        object->getRTType(rttTypeModule);
-        for (const auto innerObj : object->objects) {
-            innerObj->getRTType(rttTypeModule);
+    if (const auto mainFile = getMainFile()) {
+        for (const auto object : mainFile->objects) {
+            object->getRTType(rttTypeModule);
+            for (const auto innerObj : object->objects) {
+                innerObj->getRTType(rttTypeModule);
+            }
         }
     }
 

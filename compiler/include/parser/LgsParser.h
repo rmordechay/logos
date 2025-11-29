@@ -7,6 +7,7 @@
 #include "errors/LgsPlmErrors.h"
 #include "exprs/LgsFuncCall.h"
 #include "funcs/LgsMainFunc.h"
+#include "lgsc/LgsCCompiler.h"
 #include "stmts/LgsAssignment.h"
 
 class LgsMetaSelection;
@@ -69,13 +70,14 @@ public:
     std::string code = "";
     LgsErrHandler errHandler;
     LgsFunc* currentFunc = nullptr;
-    std::unordered_map<std::string, LgsApp*> imports;
+    LgsCCompiler lgsCC;
 
     LgsParser(LgsFileMetadata* metadata, LgsPaths& paths, LgsGlobals& globals, const bool headersOnly = false)
-        : paths(paths), headersOnly(headersOnly), metadata(metadata), globals(globals) {}
+        : paths(paths), headersOnly(headersOnly), metadata(metadata), globals(globals), lgsCC(paths) {
+    }
 
     LgsParser(const std::string& code, LgsPaths& paths, LgsGlobals& globals, const bool headersOnly = false)
-        : paths(paths), headersOnly(headersOnly), globals(globals), code(code) {}
+        : paths(paths), headersOnly(headersOnly), globals(globals), code(code), lgsCC(paths) {}
 
     // Files
     bool scanTokens();
@@ -163,8 +165,9 @@ public:
     void parseArgs(LgsInstance* instance);
     void parsePackageString(LgsImportPackage& pkg, const LgsToken& importToken);
     void parseJsonPrimitive(LgsJson* json);
-    void parseImports(std::unordered_set<std::string>& cImports);
-    void parseCImports(std::unordered_set<std::string>& cImports);
+    void parseImports(std::vector<LgsStrConst*>& cImports);
+    void parseCIncludes(std::vector<LgsStrConst*>& cImports);
+    void parseCImports(std::vector<LgsStrConst*> externalImports, LgsFile* file);
 
     void addFileSymbol(LgsMainFile* file, const LgsSymbol& newSymbol);
     void setLocation(LgsLocation& location, const LgsToken* token) const;
@@ -186,5 +189,5 @@ public:
     bool parsedOrReset(const void* value, size_t resetIndex);
     void addParsingError();
     void recursionGuard();
-    void addError(const LgsBaseMsg& lgsErr, const LgsLocation* location, const std::vector<std::string>& args);
+    void addError(const LgsBaseMsg& lgsErr, const LgsLocation& location, const std::vector<std::string>& args);
 };
