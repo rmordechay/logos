@@ -996,7 +996,7 @@ void LgsCodeGen::visitFieldSelection(LgsVariable* var, LgsExpr* parent, const bo
         var->IRValue = cg.getFromVTable(field->parentIRPtr, id);
     }
 
-    if (field->type->asObject() || (field->type->asEnum() && !assign)) {
+    if (!assign && (field->type->asObject() || field->type->asEnum())) {
         var->IRValue = cg.builder.CreateLoad(cg.ptrTy(), field->IRValue);
     } else {
         visitField(field);

@@ -26,7 +26,7 @@ Constant* LgsSArray::getRTType(LgsCgModule& cg) {
     if (!constSize) return nullptr;
     const auto sArrSize = cg.usize(*constSize);
     const auto sv = llvm::ConstantStruct::get(st, {sArrSize, baseType->getRTType(cg)});
-    return cg.getRTTypeInfo(genericName, sizeBytes(), RTT_SARRAY, sv);
+    return cg.getRTTypeInfo(genericName, sizeBytes(), sizeBytes(), RTT_SARRAY, sv);
 }
 
 std::string LgsSArray::getName() {

@@ -16,7 +16,7 @@
 #define LGS_APP_FILE_NAME "app.lgs"
 #define LGS_DEBUG_CONFIG_FILE "logosdbg.bc"
 #define LGS_DEFAULT_EXEC_FILE "out"
-#define LGS_TYPEINFO_PREFIX "RTI"
+#define LGS_TYPEINFO_PREFIX "RTI_"
 #define LGS_C "C"
 #define LGS_MAIN_FUNC "main"
 #define LGS_SELF "self"

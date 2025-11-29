@@ -12,7 +12,7 @@ Type* LgsULong::getIRType(LgsCgModule& cg) {
 }
 
 Constant* LgsULong::getRTType(LgsCgModule& cg) {
-    return cg.getRTTypeInfo(getGenericName(), sizeBytes(), RTT_ULONG, cg.null());
+    return cg.getRTTypeInfo(getGenericName(), sizeBytes(), sizeBytes(), RTT_ULONG, cg.null());
 }
 
 std::string LgsULong::getName() {

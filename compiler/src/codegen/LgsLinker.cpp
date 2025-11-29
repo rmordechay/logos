@@ -3,7 +3,7 @@
 #include "logos/LgsAppConfigs.h"
 #include <llvm/Support/FileSystem.h>
 
-#define LINK_CMD_STRING "clang %s -L%s -llgs %s -Wl,-rpath,%s %s -o %s"
+#define LINK_CMD_STRING "clang -flto -o3 %s -L%s -llgs %s -Wl,-rpath,%s %s -o %s"
 
 bool LgsLinker::link() const {
     assert(paths.lgsRootDir != "" && paths.execFile != "");

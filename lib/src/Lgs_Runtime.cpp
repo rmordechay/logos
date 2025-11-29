@@ -9,6 +9,7 @@
 #include <iostream>
 #include <stack>
 
+static void freeValue(void* ptr, const Lgs_TypeInfo* type);
 extern "C" void Lgs_Runtime_callDefers();
 
 struct Lgs_StackFrame {
@@ -64,8 +65,10 @@ extern "C" void Lgs_Runtime_callDefers() {
 extern "C" void* Lgs_Runtime_allocate(Lgs_TypeInfo* type, const bool isOwner) {
     const auto ptr = std::malloc(type->size);
     if (isOwner) {
+        std::cout << "Allocated owner: " << ptr << '\n';
         runtime.stack.top().owners[ptr] = type;
     } else {
+        std::cout << "Allocated orphan: " << ptr << '\n';
         runtime.stack.top().orphans[ptr] = type;
     }
     return ptr;
@@ -93,14 +96,25 @@ extern "C" void Lgs_Runtime_throwError(const char* msg) {
     exit(1);
 }
 
-extern "C" void* Lgs_getObjectField(const Lgs_TypeInfo* typeInfo, void* ptr, const char* name) {
-    auto f = static_cast<char*>(ptr);
-    for (int i = 0; i < typeInfo->obj.fieldsCount; ++i) {
-        const auto hash1 = typeInfo->obj.fieldHashes[i];
-        const auto hash2 = hashString(name);
-        f += typeInfo->obj.fieldTypes[i]->size * i;
-        if (hash1 != hash2) continue;
-        return f;
+static void freeValue(void* ptr, const Lgs_TypeInfo* type) {
+    std::cout << "Freeing: " << ptr << '\n';
+    switch (type->kind) {
+    case RTT_SARRAY:
+        break;
+    case RTT_DARRAY:
+        break;
+    case RTT_SET:
+        break;
+    case RTT_MAP:
+        break;
+    case RTT_OBJECT: {
+        std::free(ptr);
+        return;
     }
-    return nullptr;
+    case RTT_NULLABLE:
+        break;
+    default:
+        break;
+    }
+    assert(0);
 }

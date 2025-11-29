@@ -1,12 +1,9 @@
 #include "Lgs_Helpers.h"
-
 #include "LgsDefinitions.h"
 #include "Lgs_DArrayExpr.h"
 #include "Lgs_HashMap.h"
 #include "Lgs_Types.h"
-
 #include <cassert>
-#include <iostream>
 #include <sstream>
 
 extern "C" void Lgs_print(const Lgs_TypeInfo* rtt, void* v) {
@@ -105,14 +102,17 @@ std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
     case RTT_OBJECT: {
         const auto fieldsCount = rtt->obj.fieldsCount;
         const auto fieldTypes = rtt->obj.fieldTypes;
-        str  << "<";
+        str << "<";
+        size_t offset = 0;
         for (size_t i = 0; i < fieldsCount; ++i) {
-            void* fieldPtr = static_cast<char*>(elem) + fieldTypes[i]->size * i;
-            if (fieldTypes[i]->kind == RTT_STR || fieldTypes[i]->kind == RTT_TYPE) {
+            const auto fieldType = fieldTypes[i];
+            void* fieldPtr = static_cast<char*>(elem) + offset;
+            if (fieldTypes[i]->kind == RTT_OBJECT || fieldTypes[i]->kind == RTT_STR) {
                 fieldPtr = *static_cast<void**>(fieldPtr);
             }
-            str << formatElement(fieldTypes[i], fieldPtr);
-            if (i + 1 < fieldsCount) str << ", ";
+            str << formatElement(fieldType, fieldPtr);
+            if (i < fieldsCount - 1) str << ", ";
+            offset += fieldType->alignment;
         }
         str << ">";
         break;
@@ -143,24 +143,3 @@ std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
     return str.str();
 }
 
-void freeValue(void* ptr, const Lgs_TypeInfo* type) {
-    switch (type->kind) {
-    case RTT_SARRAY:
-        break;
-    case RTT_DARRAY:
-        break;
-    case RTT_SET:
-        break;
-    case RTT_MAP:
-        break;
-    case RTT_OBJECT: {
-        std::free(ptr);
-        return;
-    }
-    case RTT_NULLABLE:
-        break;
-    default:
-        break;
-    }
-    assert(0);
-}

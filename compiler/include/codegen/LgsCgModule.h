@@ -72,7 +72,7 @@ public:
     GlobalVariable* createGlobal(const std::string& name, Type* type, Constant* args, bool isConst = false, GlobalValue::LinkageTypes linkage = GlobalValue::ExternalLinkage) const;
     StructType* getStructType(const std::vector<Type*>& fields, const std::string& name = "");
     llvm::AllocaInst* getEmptyBuffer();
-    Constant* getRTTypeInfo(const std::string& name, size_t size, Lgs_TypeKind kind, Constant* extra);
+    Constant* getRTTypeInfo(const std::string& name, size_t size, size_t alignment, Lgs_TypeKind kind, Constant* extra);
     StructType* getRTBaseType();
 
     // Blocks

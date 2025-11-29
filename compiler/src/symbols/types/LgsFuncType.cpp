@@ -135,7 +135,9 @@ llvm::DIType* LgsFuncType::getDebugType(LgsCgModule& cg) {
 }
 
 LgsFuncType::~LgsFuncType() {
-    freeType(rt);
+    if (!rt->asObject()) {
+        freeType(rt);
+    }
     if (isMethod && !params.empty()) {
         params.erase(params.begin());
     }

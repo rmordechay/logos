@@ -117,7 +117,7 @@ Value* LgsSize::orIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
 }
 
 Constant* LgsSize::getRTType(LgsCgModule& cg) {
-    return cg.getRTTypeInfo(getGenericName(), sizeBytes(), RTT_SIZE, cg.null());
+    return cg.getRTTypeInfo(getGenericName(), sizeBytes(), sizeBytes(), RTT_SIZE, cg.null());
 }
 
 bool LgsSize::canCastTo(LgsType* other) {

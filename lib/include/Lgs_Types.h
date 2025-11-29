@@ -80,6 +80,7 @@ struct Lgs_Nullable {
 
 struct Lgs_TypeInfo {
     size_t size;
+    size_t alignment;
     Lgs_TypeKind kind;
     union {
         Lgs_Object obj;

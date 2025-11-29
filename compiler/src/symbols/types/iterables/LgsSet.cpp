@@ -15,7 +15,7 @@ Constant* LgsSet::getRTType(LgsCgModule& cg) {
     const auto genericName = getGenericName();
     const auto st = cg.getStructType({cg.ptrTy()}, genericName);
     const auto sv = llvm::ConstantStruct::get(st, {baseType->getRTType(cg)});
-    return cg.getRTTypeInfo(genericName, sizeBytes(), RTT_SET, sv);
+    return cg.getRTTypeInfo(genericName, sizeBytes(), sizeBytes(), RTT_SET, sv);
 }
 
 size_t LgsSet::sizeBytes() {

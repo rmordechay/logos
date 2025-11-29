@@ -102,7 +102,7 @@ Constant* LgsMatrix::getRTType(LgsCgModule& cg) {
     const auto genericName = getGenericName();
     const auto st = cg.getStructType({cg.sizeTy(), cg.sizeTy(), cg.ptrTy()}, genericName);
     const auto sv = llvm::ConstantStruct::get(st, {cg.usize(rows), cg.usize(columns), baseType->getRTType(cg)});
-    return cg.getRTTypeInfo(genericName, sizeBytes(), RTT_MATRIX, sv);
+    return cg.getRTTypeInfo(genericName, sizeBytes(), sizeBytes(), RTT_MATRIX, sv);
 }
 
 std::string LgsMatrix::getName() {

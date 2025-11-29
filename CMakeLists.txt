@@ -163,6 +163,7 @@ set(RUNTIME_SOURCE
     ${CMAKE_SOURCE_DIR}/lib/src/Lgs_Allocator.cpp
     ${CMAKE_SOURCE_DIR}/lib/src/Lgs_SetExpr.cpp
     ${CMAKE_SOURCE_DIR}/lib/src/Lgs_Helpers.cpp
+    ${CMAKE_SOURCE_DIR}/lib/src/Lgs_Reflection.cpp
     ${CMAKE_SOURCE_DIR}/lib/src/context/Lgs_Aarch64.cpp
 )
 

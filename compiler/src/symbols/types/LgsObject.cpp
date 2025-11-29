@@ -93,7 +93,7 @@ Constant* LgsObject::getRTType(LgsCgModule& cg) {
     }
     const auto st = cg.getStructType({cg.sizeTy(), cg.ptrTy(), cg.ptrTy()}, LGS_TYPEINFO_PREFIX + genericName);
     const auto sv = llvm::ConstantStruct::get(st, {cg.usize(fields.size()), hashesArr, fieldsArr});
-    return cg.getRTTypeInfo(genericName, sizeBytes(), RTT_OBJECT, sv);
+    return cg.getRTTypeInfo(genericName, sizeBytes(), sizeof(void*), RTT_OBJECT, sv);
 }
 
 size_t LgsObject::sizeBytes() {

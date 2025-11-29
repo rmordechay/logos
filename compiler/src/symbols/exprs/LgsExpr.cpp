@@ -201,9 +201,7 @@ LgsMetaSelection* LgsExpr::asMetaSelection() {
 
 void freeExpr(LgsExpr* expr) {
     if (!expr) return;
-    if (!expr->asVariable()) {
-        expr->setType(nullptr);
-    }
+    expr->setType(nullptr);
     delete expr;
 }
 

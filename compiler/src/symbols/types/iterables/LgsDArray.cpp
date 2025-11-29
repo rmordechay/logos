@@ -29,7 +29,7 @@ Constant* LgsDArray::getRTType(LgsCgModule& cg) {
     const auto genericName = getGenericName();
     const auto st = cg.getStructType({cg.ptrTy()}, genericName);
     const auto sv = llvm::ConstantStruct::get(st, {baseType->getRTType(cg)});
-    return cg.getRTTypeInfo(genericName, sizeBytes(), RTT_DARRAY, sv);
+    return cg.getRTTypeInfo(genericName, sizeBytes(), sizeof(void*), RTT_DARRAY, sv);
 }
 
 std::string LgsDArray::getName() {

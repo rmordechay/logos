@@ -30,13 +30,13 @@ Constant* LgsVec::getRTType(LgsCgModule& cg) {
     const auto st = cg.getStructType({cg.ptrTy()}, genericName);
     const auto sv = llvm::ConstantStruct::get(st, {baseType->getRTType(cg)});
     if (vectorDim == 2) {
-        return cg.getRTTypeInfo(genericName, sizeBytes(), RTT_VEC2, sv);
+        return cg.getRTTypeInfo(genericName, sizeBytes(), sizeBytes(), RTT_VEC2, sv);
     }
     if (vectorDim == 3) {
-        return cg.getRTTypeInfo(genericName, sizeBytes(), RTT_VEC3, sv);
+        return cg.getRTTypeInfo(genericName, sizeBytes(), sizeBytes(), RTT_VEC3, sv);
     }
     if (vectorDim == 4) {
-        return cg.getRTTypeInfo(genericName, sizeBytes(), RTT_VEC4, sv);
+        return cg.getRTTypeInfo(genericName, sizeBytes(), sizeBytes(), RTT_VEC4, sv);
     }
     assert(0);
 }
