@@ -226,6 +226,39 @@ Value* dotProduct(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     return result;
 }
 
+Value* crossProduct(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+    const auto l = left->loadIR(cg);
+    const auto r = right->loadIR(cg);
+
+    const auto lx = cg.builder.CreateExtractElement(l, cg.i32(0));
+    const auto ly = cg.builder.CreateExtractElement(l, cg.i32(1));
+    const auto lz = cg.builder.CreateExtractElement(l, cg.i32(2));
+    const auto rx = cg.builder.CreateExtractElement(r, cg.i32(0));
+    const auto ry = cg.builder.CreateExtractElement(r, cg.i32(1));
+    const auto rz = cg.builder.CreateExtractElement(r, cg.i32(2));
+
+    const auto cx = cg.builder.CreateFSub(
+        cg.builder.CreateFMul(ly, rz),
+        cg.builder.CreateFMul(lz, ry)
+    );
+    const auto cy = cg.builder.CreateFSub(
+        cg.builder.CreateFMul(lz, rx),
+        cg.builder.CreateFMul(lx, rz)
+    );
+    const auto cz = cg.builder.CreateFSub(
+        cg.builder.CreateFMul(lx, ry),
+        cg.builder.CreateFMul(ly, rx)
+    );
+
+    const auto vecTy = left->type->getIRType(cg);
+    Value* result = UndefValue::get(vecTy);
+    result = cg.builder.CreateInsertElement(result, cx, cg.i32(0));
+    result = cg.builder.CreateInsertElement(result, cy, cg.i32(1));
+    result = cg.builder.CreateInsertElement(result, cz, cg.i32(2));
+
+    return result;
+}
+
 void freeExpr(LgsExpr* expr) {
     if (!expr) return;
     expr->setType(nullptr);

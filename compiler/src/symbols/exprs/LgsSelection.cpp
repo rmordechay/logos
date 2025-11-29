@@ -9,7 +9,7 @@
 #include <llvm/IR/InlineAsm.h>
 
 Value* LgsSelection::loadIR(LgsCgModule& cg) {
-    assert(0);
+    return cg.builder.CreateLoad(type->getIRType(cg), IRValue);
 }
 
 LgsExpr* LgsSelection::lastExpr() const {

@@ -77,7 +77,6 @@ LgsType* LgsVec::applyBinOp(LgsType* toType, LgsBinOp& op) {
         if (thisNme == otherName) return this;
         break;
     }
-    case DIV:
     case MUL: {
         if (thisNme == otherName) return &LGS_FLOAT;
         if (toType->isNumber()) return this;
