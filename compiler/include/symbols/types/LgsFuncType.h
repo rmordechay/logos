@@ -31,7 +31,6 @@ public:
     bool isBuiltin = false;
     bool isVirtual = false;
     bool isVariadic = false;
-    bool isLambda = false;
     bool isOptional = false;
     bool isMethod = false;
     bool isCoroutine = false;

@@ -1,5 +1,4 @@
 #include "analysis/LgsSema.h"
-#include "builtins/LgsReflect.h"
 #include "builtins/LgsTest.h"
 #include "funcs/LgsCoroutine.h"
 #include "errors/LgsErrors.h"
@@ -320,7 +319,6 @@ void LgsSema::visitVarDec(LgsVarDec* varDec) {
         varDec->isOwner = false;
     }
     addLocalSymbol(LgsSymbol(varDec));
-    addHeapExpr(varDec->expr);
 }
 
 void LgsSema::visitAssignment(const LgsAssignment* assignment) {
@@ -558,11 +556,9 @@ void LgsSema::visitReturnStmt(LgsReturn* returnStmt) {
     const auto funcType = stack.currentFunc()->funcType;
     auto retExpr = returnStmt->expr;
     if (retExpr) {
-        stack.currentFunc()->returnStmts.push_back(returnStmt);
-        const auto rt = stack.currentFunc()->funcType->rt;
-        castExpr(retExpr, rt);
+        castExpr(retExpr, funcType->rt);
         visitExpr(retExpr);
-        validateExprType(returnStmt->expr, rt);
+        validateExprType(returnStmt->expr, funcType->rt);
     }
     const auto rt = funcType->rt;
     if (rt->isVoid() && retExpr && retExpr->type && !retExpr->type->isVoid()) {
@@ -622,7 +618,6 @@ void LgsSema::visitDeferStmt(const LgsDeferStmt* deferStmt) {
     } else {
         assert(0);
     }
-    stack.currentFunc()->hasDefers = true;
 }
 
 void LgsSema::visitIOStmt(const LgsIOStmt* ioStmt) {
@@ -664,6 +659,7 @@ void LgsSema::visitExpr(LgsExpr*& expr) {
         else if (const auto castExpr = expr->asCast()) visitCast(castExpr);
         else if (const auto json = expr->asJson()) visitJson(json);
     }
+    addHeapExpr(expr);
 }
 
 void LgsSema::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
@@ -1518,8 +1514,8 @@ void LgsSema::resolveImports() const {
 }
 
 void LgsSema::addHeapExpr(LgsExpr* expr) {
-    if (!expr->type) return;
-    if (!expr->type->isHeapAlloc) return;
+    if (!expr->type || !expr->type->isHeapAlloc) return;
+    if (expr->asVariable()) return;
     const auto currentFunc = stack.currentFunc();
     if (expr->owner) {
         currentFunc->owners.push_back(expr);

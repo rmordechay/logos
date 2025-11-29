@@ -16,12 +16,8 @@ public:
     LgsStmtsBlock* stmtsBlock = nullptr;
     std::vector<LgsExpr*> owners;
     std::vector<LgsExpr*> orphans;
-    std::vector<LgsReturn*> returnStmts;
-    BasicBlock* cleanupBlock = nullptr;
     Value* variadicCount = nullptr;
-    bool hasDefers = false;
     bool isTest = false;
-    bool isLambda = false;
     std::vector<std::pair<LgsExpr*, LgsExpr*>> mocks;
     CallFn fn;
 
@@ -54,7 +50,6 @@ public:
     bool needsCleanup() const;
     std::string asText() override;
     void hashNode(size_t& oldHash) override;
-    BasicBlock* getCleanupBlock(LgsCgModule& cg);
     void setDebugValue(LgsCgModule& cg) override;
     ~LgsFunc() override;
 };

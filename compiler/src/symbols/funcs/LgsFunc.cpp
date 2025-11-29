@@ -160,12 +160,6 @@ void LgsFunc::hashNode(size_t& oldHash) {
     stmtsBlock->hashNode(oldHash);
 }
 
-BasicBlock* LgsFunc::getCleanupBlock(LgsCgModule& cg) {
-    if (cleanupBlock) return cleanupBlock;
-    cleanupBlock = cg.createBlock(BLOCK_NAME_CLEANUP);
-    return cleanupBlock;
-}
-
 void LgsFunc::setDebugValue(LgsCgModule& cg) {
     const auto diBuilder = cg.debugger.diBuilder;
     const auto dbInt32 = funcType->rt->getDebugType(cg);

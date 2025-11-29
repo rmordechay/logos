@@ -1685,7 +1685,6 @@ LgsFunc* LgsParser::parseLambda() {
     }
 
     const auto lambda = new LgsFunc(LGS_ANONYMOUS_NAME, rt, params);
-    lambda->isLambda = true;
     setLocation(lambda->location, &tokens[oldIndex]);
 
     currentFunc = lambda;
@@ -2196,7 +2195,6 @@ LgsFunc* wrapStmtsBlockWithFunc(LgsStmtsBlock* stmtsBlock) {
     const auto func = new LgsFunc(LGS_ANONYMOUS_NAME, nullptr);
     func->location = stmtsBlock->location;
     func->stmtsBlock = stmtsBlock;
-    func->funcType->isLambda = true;
     func->funcType->rt = &LGS_VOID;
     return func;
 }

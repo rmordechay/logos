@@ -53,7 +53,6 @@ public:
     bool parseHeaders();
     bool analyse();
     bool generate();
-    bool generateRTTTypes();
     bool link();
     void loadSrcFile(LgsFileMetadata& metadata);
     void loadSrcFile(const std::string& fileCode, const fs::path& filePath = LGS_MAIN_FILE);
@@ -62,6 +61,7 @@ public:
     bool loadConfigs();
     bool loadDeps() const;
     void loadBuiltins();
+    bool generateRTTTypes();
     void createBuildDirs();
     bool validateEnvs();
     bool validateRequiredEnvs();

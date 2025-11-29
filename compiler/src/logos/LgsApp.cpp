@@ -6,7 +6,6 @@
 #include "logos/LgsPaths.h"
 #include "utils/ThreadPool.h"
 #include "builtins/LgsPrint.h"
-#include "builtins/LgsReflect.h"
 #include "builtins/LgsSystem.h"
 #include "files/LgsEnvFile.h"
 #include "codegen/LgsCodeGen.h"
@@ -185,37 +184,6 @@ bool LgsApp::generate() {
     return errHandler.successful;
 }
 
-bool LgsApp::generateRTTTypes() {
-    rttTypeModule.setupModule("rttypes");
-    rttTypeModule.isRTTModule = true;
-    LGS_BYTE.getRTType(rttTypeModule);
-    LGS_BOOL.getRTType(rttTypeModule);
-    LGS_CHAR.getRTType(rttTypeModule);
-    LGS_INT.getRTType(rttTypeModule);
-    LGS_UINT.getRTType(rttTypeModule);
-    LGS_ULONG.getRTType(rttTypeModule);
-    LGS_SHORT.getRTType(rttTypeModule);
-    LGS_LONG.getRTType(rttTypeModule);
-    LGS_SIZE.getRTType(rttTypeModule);
-    LGS_FLOAT.getRTType(rttTypeModule);
-    LGS_DOUBLE.getRTType(rttTypeModule);
-    const auto mainFile = getMainFile();
-    for (const auto object : mainFile->objects) {
-        object->getRTType(rttTypeModule);
-        for (const auto innerObj : object->objects) {
-            innerObj->getRTType(rttTypeModule);
-        }
-    }
-    for (auto [symbolName, symbol] : globals.table.symbols) {
-        if (symbol.symbolType != OBJECT) continue;
-        symbol.object->getRTType(rttTypeModule);
-        for (const auto innerObj : symbol.object->objects) {
-            innerObj->getRTType(rttTypeModule);
-        }
-    }
-    return rttTypeModule.writeIRModule(paths, 3);
-}
-
 bool LgsApp::link() {
     LgsLinker linker(configs, paths, srcFiles);
     for (auto& [_, app] : globals.table.imports) {
@@ -326,10 +294,40 @@ void LgsApp::loadBuiltins() {
     globals.table.addSymbol(LgsSymbol(new LgsSystem(), true, false), &errHandler);
     globals.table.addSymbol(LgsSymbol(new LgsPrint(), true, false), &errHandler);
     globals.table.addSymbol(LgsSymbol(new LgsTest(), true, false), &errHandler);
-    globals.table.addSymbol(LgsSymbol(new LgsReflect(), true, false), &errHandler);
     globals.table.addSymbol(LgsSymbol(new LgsVarDec("_LINUX", &LGS_BOOL, new LgsIntConst(&LGS_BOOL, lgsConfigs.os == LINUX)), true, false), &errHandler);
     globals.table.addSymbol(LgsSymbol(new LgsVarDec("_MACOS", &LGS_BOOL, new LgsIntConst(&LGS_BOOL, lgsConfigs.os == MAC_OS)), true, false), &errHandler);
     globals.table.addSymbol(LgsSymbol(new LgsVarDec("_WINDOWS", &LGS_BOOL, new LgsIntConst(&LGS_BOOL, lgsConfigs.os == WINDOWS)), true, false), &errHandler);
+}
+
+bool LgsApp::generateRTTTypes() {
+    rttTypeModule.setupModule("rttypes");
+    rttTypeModule.isRTTModule = true;
+    LGS_BYTE.getRTType(rttTypeModule);
+    LGS_BOOL.getRTType(rttTypeModule);
+    LGS_CHAR.getRTType(rttTypeModule);
+    LGS_INT.getRTType(rttTypeModule);
+    LGS_UINT.getRTType(rttTypeModule);
+    LGS_ULONG.getRTType(rttTypeModule);
+    LGS_SHORT.getRTType(rttTypeModule);
+    LGS_LONG.getRTType(rttTypeModule);
+    LGS_SIZE.getRTType(rttTypeModule);
+    LGS_FLOAT.getRTType(rttTypeModule);
+    LGS_DOUBLE.getRTType(rttTypeModule);
+    const auto mainFile = getMainFile();
+    for (const auto object : mainFile->objects) {
+        object->getRTType(rttTypeModule);
+        for (const auto innerObj : object->objects) {
+            innerObj->getRTType(rttTypeModule);
+        }
+    }
+    for (auto [symbolName, symbol] : globals.table.symbols) {
+        if (symbol.symbolType != OBJECT) continue;
+        symbol.object->getRTType(rttTypeModule);
+        for (const auto innerObj : symbol.object->objects) {
+            innerObj->getRTType(rttTypeModule);
+        }
+    }
+    return rttTypeModule.writeIRModule(paths, 3);
 }
 
 void LgsApp::createBuildDirs() {

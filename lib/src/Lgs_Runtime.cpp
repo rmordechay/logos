@@ -38,7 +38,11 @@ extern "C" void Lgs_Runtime_push() {
 }
 
 extern "C" void Lgs_Runtime_pop() {
-    Lgs_Runtime_callDefers();
+    // Call defers
+    for (auto [func, ctx] : runtime.stack.top().defers) {
+        func(ctx);
+    }
+    // Free values
     for (const auto [ptr, type] : runtime.stack.top().owners) {
         freeValue(ptr, type);
     }
@@ -56,26 +60,18 @@ extern "C" void Lgs_Runtime_addCoro(const ThunkFunc funcPtr, void* ctx) {
     runtime.coros.emplace_back(Lgs_ThunkFunc{funcPtr, ctx});
 }
 
-extern "C" void Lgs_Runtime_callDefers() {
-    for (auto [func, ctx] : runtime.stack.top().defers) {
-        func(ctx);
-    }
-}
-
 extern "C" void* Lgs_Runtime_allocate(Lgs_TypeInfo* type, const bool isOwner) {
     const auto ptr = std::malloc(type->size);
     if (isOwner) {
-        std::cout << "Allocated owner: " << ptr << '\n';
         runtime.stack.top().owners[ptr] = type;
     } else {
-        std::cout << "Allocated orphan: " << ptr << '\n';
         runtime.stack.top().orphans[ptr] = type;
     }
     return ptr;
 }
 
 extern "C" void Lgs_Runtime_removeOwner(const void* owner) {
-
+    assert(0);
 }
 
 extern "C" void Lgs_Runtime_yield() {

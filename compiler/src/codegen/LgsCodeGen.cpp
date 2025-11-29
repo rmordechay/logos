@@ -147,7 +147,6 @@ void LgsCodeGen::visitMainFunc(LgsMainFunc* func) {
     createPrologue(func);
     initMainArgs(func);
     visitStmtsBlock(func->stmtsBlock);
-    createEpilogue(func);
     cg.callRuntimeFunc("close", cg.voidTy());
     cg.builder.CreateRet(cg.i32(EXIT_SUCCESS));
     stack.exitScope();
@@ -168,8 +167,8 @@ void LgsCodeGen::visitFunc(LgsFunc* func) {
     if (ft->isVariadic) {
         cg.callIntrinsics(llvm::Intrinsic::vaend, {cg.ptrTy()}, {params.back().IRValue});
     }
-    createEpilogue(func);
     if (ft->rt->isVoid() && !cg.lastInstTerminator()) {
+        cg.callPopStack();
         cg.builder.CreateRetVoid();
     }
     stack.exitScope();
@@ -181,8 +180,8 @@ void LgsCodeGen::visitGenericFunc(LgsFunc* func) {
     stack.enterScope(func);
     createPrologue(func);
     visitStmtsBlock(func->stmtsBlock);
-    createEpilogue(func);
     if (func->funcType->rt->isVoid() && !cg.lastInstTerminator()) {
+        cg.callPopStack();
         cg.builder.CreateRetVoid();
     }
     stack.exitScope();
@@ -538,17 +537,11 @@ void LgsCodeGen::visitReturnStmt(LgsReturn* returnStmt) {
     visitExpr(returnStmt->expr);
     returnStmt->IRValue = returnStmt->expr ? returnStmt->expr->IRValue : nullptr;
     const auto currentFunc = stack.currentFunc();
-    if (currentFunc->needsCleanup()) {
-        returnStmt->parentBlock = cg.builder.GetInsertBlock();
-        const auto cleanupBlock = currentFunc->getCleanupBlock(cg);
-        cg.builder.CreateBr(cleanupBlock);
+    cg.callPopStack();
+    if (currentFunc->funcType->rt->isVoid()) {
+        cg.builder.CreateRetVoid();
     } else {
-        cg.callPopStack();
-        if (currentFunc->funcType->rt->isVoid()) {
-            cg.builder.CreateRetVoid();
-        } else {
-            cg.builder.CreateRet(returnStmt->expr->loadIR(cg));
-        }
+        cg.builder.CreateRet(returnStmt->expr->IRValue);
     }
 }
 
@@ -1155,19 +1148,22 @@ void LgsCodeGen::visitInstance(LgsInstance* instance) {
     for (const auto field : instance->obj->fields) {
         if (visited.contains(field->name) || field->type->asEnum()) continue;
         field->parentIRPtr = instance->IRValue;
-        if (!field->expr) {
-            field->expr = field->type->getZeroValue();
+        LgsExpr* expr = nullptr;
+        if (field->expr) {
+            expr = field->expr;
+        } else {
+            expr = field->type->getZeroValue();
             if (field->isOwner && field->type->isHeapAlloc) {
-                field->expr->owner = field;
+                expr->owner = field;
             }
         }
         field->IRValue = field->getGEP(cg);
-        if (field->expr) {
-            field->expr->destPtrValue = field->IRValue;
+        if (expr) {
+            expr->destPtrValue = field->IRValue;
         }
-        visitExpr(field->expr);
-        if (field->expr->IRValue == field->IRValue) continue;
-        cg.builder.CreateStore(field->expr->IRValue, field->IRValue);
+        visitExpr(expr);
+        if (expr->IRValue == field->IRValue) continue;
+        cg.builder.CreateStore(expr->IRValue, field->IRValue);
     }
     addVirtuals(instance->obj, instance->IRValue);
 }
@@ -1200,49 +1196,6 @@ void LgsCodeGen::createPrologue(LgsFunc* func) {
         cg.callRuntimeFunc("init", cg.voidTy());
     }
     cg.callStackPush();
-}
-
-void LgsCodeGen::createEpilogue(LgsFunc* func) {
-    const auto needsCleanup = func->needsCleanup();
-    if (!func->hasDefers && !needsCleanup) {
-        if (!cg.lastInstTerminator()) cg.callPopStack();
-        return;
-    }
-    cg.branchAndStartBlock(func->getCleanupBlock(cg));
-    currentIRFunc = nullptr;
-
-    if (needsCleanup) {
-        if (func->returnStmts.empty()) {
-            cg.callPopStack();
-        } else if (func->returnStmts.size() == 1) {
-            if (func->owners.size() == 1) {
-                const auto returnRef = func->returnStmts.front()->expr;
-                const auto heapExprRef = func->owners.front();
-                if (returnRef->equals(heapExprRef)) {
-                    cg.callPopStack();
-                    cg.builder.CreateRet(getIRValue(func->returnStmts.front()));
-                    return;
-                }
-            }
-            cg.callPopStack();
-            cg.builder.CreateRet(getIRValue(func->returnStmts.front()));
-        } else {
-            llvm::PHINode *phi = nullptr;
-            if (!func->funcType->rt->isVoid()) {
-                phi = cg.builder.CreatePHI(cg.ptrTy(), func->returnStmts.size());
-            }
-            for (const auto stmt : func->returnStmts) {
-                const auto retVal = getIRValue(stmt);
-                if (phi) {
-                    phi->addIncoming(retVal, stmt->parentBlock);
-                }
-            }
-            cg.callPopStack();
-            cg.builder.CreateRet(phi);
-        }
-    } else {
-        cg.callPopStack();
-    }
 }
 
 void LgsCodeGen::initMainArgs(const LgsMainFunc* mainFunc) const {
