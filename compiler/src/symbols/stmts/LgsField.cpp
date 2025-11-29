@@ -2,7 +2,6 @@
 #include "LgsType.h"
 #include "exprs/LgsExpr.h"
 #include "exprs/LgsHashMap.h"
-#include <iostream>
 
 void LgsField::setType(LgsType* newType) {
     type = newType;

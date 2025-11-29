@@ -148,4 +148,5 @@ public:
     void createCoroutineFunc(LgsFuncCall* funcCall);
     LgsFunc* createGenericFunc(LgsFuncCall* funcCall, const LgsFunc* originalFunc);
     void addError(const LgsBaseMsg& lgsErr, const LgsLocation& location, const std::vector<std::string>& args = {});
+    void addRTType(LgsType* type) const;
 };

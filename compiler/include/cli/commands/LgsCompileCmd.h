@@ -2,7 +2,6 @@
 #include "LgsRunCmd.h"
 #include "cli/LgsCliCmd.h"
 #include "types/iterables/LgsStr.h"
-#include "types/primitives/LgsInt.h"
 
 class LgsCompileCmd final : public LgsRunCmd {
 public:

@@ -98,7 +98,7 @@ std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
             str << "[";
             for (size_t c = 0; c < columns; ++c) {
                 const auto i = r * columns + c;
-                void* data = &static_cast<char*>(elem)[i];
+                void* data = static_cast<char*>(elem) + i * baseType->size;
                 str << formatElement(baseType, data);
                 if (c + 1 < columns) str << ", ";
             }

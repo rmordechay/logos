@@ -23,6 +23,7 @@ public:
     std::string getGenericName() override;
     std::string getName() override;
     size_t sizeBytes() override;
+    bool equals(LgsType* other) override;
     LgsExpr* getZeroValue() override;
     bool canCastTo(LgsType* other) override;
     LgsType* applyBinOp(LgsType* toType, LgsBinOp& op) override;

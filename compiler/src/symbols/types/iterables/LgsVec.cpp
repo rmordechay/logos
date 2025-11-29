@@ -5,7 +5,6 @@
 #include "LgsUtils.h"
 #include "cblas/cblas.h"
 #include "types/iterables/LgsMatrix.h"
-
 #include <sstream>
 
 LgsField* LgsVec::getField(const std::string& fieldName) {
@@ -55,6 +54,14 @@ std::string LgsVec::getName() {
 
 size_t LgsVec::sizeBytes() {
     return baseType->sizeBytes() * 2;
+}
+
+bool LgsVec::equals(LgsType* other) {
+    const auto otherVec = other->asVec();
+    if (!otherVec) return false;
+    if (vectorDim != otherVec->vectorDim) return false;
+    if (!baseType->equals(other)) return false;
+    return true;
 }
 
 LgsExpr* LgsVec::getZeroValue() {

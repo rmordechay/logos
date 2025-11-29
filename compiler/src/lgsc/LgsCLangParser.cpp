@@ -17,8 +17,6 @@
 #include "LgsUtils.h"
 #include "types/primitives/LgsLong.h"
 
-#include <iostream>
-
 void LgsCLangParser::HandleTranslationUnit(clang::ASTContext& clangContext){
     context = &clangContext;
     TraverseDecl(clangContext.getTranslationUnitDecl());

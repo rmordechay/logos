@@ -6,7 +6,6 @@
 #include "LgsUtils.h"
 #include "exprs/constants/LgsStrConst.h"
 #include "stmts/LgsVarDec.h"
-#include <iostream>
 #include <clang/Driver/Driver.h>
 #include <llvm/TargetParser/Host.h>
 #include <clang/Frontend/CompilerInstance.h>

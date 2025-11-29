@@ -55,7 +55,6 @@
 #include <iostream>
 #include <ranges>
 #include <unordered_set>
-#include <clang/AST/Expr.h>
 
 void castExpr(LgsExpr*& expr, LgsType* toType);
 static std::string getMissingImplementsStr(const std::vector<LgsField*>& fields, const std::vector<LgsFunc*>& methods);
@@ -283,6 +282,7 @@ void LgsSema::visitStmtsBlock(LgsStmtsBlock* stmtsBlock) {
 void LgsSema::visitVarDec(LgsVarDec* varDec) {
     validateLocalName(varDec->name, &varDec->location);
     if (const auto iter = varDec->type->asIterable()) visitExpr(iter->size);
+
     if (varDec->expr && varDec->type) {
         if (varDec->isOwner) {
             varDec->expr->owner = varDec;
@@ -312,6 +312,7 @@ void LgsSema::visitVarDec(LgsVarDec* varDec) {
             varDec->expr->owner = varDec;
         }
     }
+
     if (varDec->expr->type->isVoid()) {
         addError(E10093, varDec->location);
     }
@@ -319,6 +320,7 @@ void LgsSema::visitVarDec(LgsVarDec* varDec) {
         varDec->isOwner = false;
     }
     addLocalSymbol(LgsSymbol(varDec));
+    addRTType(varDec->type);
 }
 
 void LgsSema::visitAssignment(const LgsAssignment* assignment) {
@@ -1635,4 +1637,14 @@ void castExpr(LgsExpr*& expr, LgsType* toType) {
     if (toType->asNullable() && !expr->asNullableExpr()) {
         expr = new LgsNullableExpr(expr);
     }
+}
+
+void LgsSema::addRTType(LgsType* type) const {
+    for (const auto rttType : globals.table.rttTypes) {
+        if (rttType->equals(type)) return;
+    }
+    for (const auto rttType : file->symbolTable.rttTypes) {
+        if (rttType->equals(type)) return;
+    }
+    file->symbolTable.rttTypes.push_back(type);
 }

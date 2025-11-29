@@ -1,6 +1,5 @@
 #include "loops/LgsForeachLoop.h"
 #include "types/iterables/LgsMap.h"
-#include "LgsUtils.h"
 
 Value* LgsForeachLoop::loopStart(LgsCgModule& cg) {
     return cg.i32Zero();

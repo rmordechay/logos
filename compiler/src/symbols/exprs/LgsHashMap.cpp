@@ -2,8 +2,6 @@
 
 #include "LgsUtils.h"
 
-#include <iostream>
-
 void LgsHashMap::castImplicitly(LgsType* toType) {
     if (!toType->asMap()) return;
     if (!type) {

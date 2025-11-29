@@ -2,7 +2,6 @@
 
 #include "context/Lgs_Aarch64.h"
 #include "LgsDefinitions.h"
-#include <cstdint>
 
 nakedf void Lgs_switchContext() {
     asm(

@@ -1,5 +1,4 @@
 #include "logos/LgsApp.h"
-#include <llvm/Support/FileSystem.h>
 #include <llvm/IR/Module.h>
 #include "analysis/LgsSema.h"
 #include "builtins/LgsTest.h"
@@ -22,7 +21,6 @@
 #include "types/primitives/LgsShort.h"
 #include "types/primitives/LgsUInt.h"
 #include "types/primitives/LgsULong.h"
-
 #include <llvm/Target/TargetMachine.h>
 
 inline ThreadPool threadPool;
@@ -140,8 +138,13 @@ bool LgsApp::parseHeaders() {
 
 bool LgsApp::analyse() {
     loadBuiltins();
-    if (!validateEnvs()) return false;
-    if (!typeResolver.resolveGlobals(srcFiles, threadPool)) return false;
+    if (!validateEnvs()) {
+        return false;
+    }
+    LgsTypeResolver typeResolver(errHandler, globals);
+    if (!typeResolver.resolveGlobals(srcFiles, threadPool)) {
+        return false;
+    }
     for (const auto file : srcFiles) {
         threadPool.runTask([this, file] {
             LgsSema sema(configs, file, globals);
@@ -301,32 +304,20 @@ void LgsApp::loadBuiltins() {
     globals.table.addSymbol(LgsSymbol(new LgsVarDec("_LINUX", &LGS_BOOL, new LgsIntConst(&LGS_BOOL, lgsConfigs.os == LINUX)), true, false), &errHandler);
     globals.table.addSymbol(LgsSymbol(new LgsVarDec("_MACOS", &LGS_BOOL, new LgsIntConst(&LGS_BOOL, lgsConfigs.os == MAC_OS)), true, false), &errHandler);
     globals.table.addSymbol(LgsSymbol(new LgsVarDec("_WINDOWS", &LGS_BOOL, new LgsIntConst(&LGS_BOOL, lgsConfigs.os == WINDOWS)), true, false), &errHandler);
+    globals.table.rttTypes = {
+        &LGS_STR, &LGS_BYTE, &LGS_BOOL, &LGS_CHAR, &LGS_INT, &LGS_UINT, &LGS_ULONG,
+        &LGS_SHORT, &LGS_LONG, &LGS_SIZE, &LGS_FLOAT, &LGS_DOUBLE, &LGS_VEC2_F,
+        &LGS_VEC3_F, &LGS_VEC4_F, &LGS_VEC2_D, &LGS_VEC3_D, &LGS_VEC4_D, &LGS_VEC2_I,
+        &LGS_VEC3_I, &LGS_VEC4_I,
+    };
 }
 
 bool LgsApp::generateRTTTypes() {
     rttTypeModule.setupModule("rttypes");
     rttTypeModule.isRTTModule = true;
-    LgsStr().getRTType(rttTypeModule);
-    LGS_BYTE.getRTType(rttTypeModule);
-    LGS_BOOL.getRTType(rttTypeModule);
-    LGS_CHAR.getRTType(rttTypeModule);
-    LGS_INT.getRTType(rttTypeModule);
-    LGS_UINT.getRTType(rttTypeModule);
-    LGS_ULONG.getRTType(rttTypeModule);
-    LGS_SHORT.getRTType(rttTypeModule);
-    LGS_LONG.getRTType(rttTypeModule);
-    LGS_SIZE.getRTType(rttTypeModule);
-    LGS_FLOAT.getRTType(rttTypeModule);
-    LGS_DOUBLE.getRTType(rttTypeModule);
-    LGS_VEC2_F.getRTType(rttTypeModule);
-    LGS_VEC3_F.getRTType(rttTypeModule);
-    LGS_VEC4_F.getRTType(rttTypeModule);
-    LGS_VEC2_D.getRTType(rttTypeModule);
-    LGS_VEC3_D.getRTType(rttTypeModule);
-    LGS_VEC4_D.getRTType(rttTypeModule);
-    LGS_VEC2_I.getRTType(rttTypeModule);
-    LGS_VEC3_I.getRTType(rttTypeModule);
-    LGS_VEC4_I.getRTType(rttTypeModule);
+    for (const auto type : globals.table.rttTypes) {
+        type->getRTType(rttTypeModule);
+    }
 
     // Globals
     for (auto [symbolName, symbol] : globals.table.symbols) {
@@ -334,6 +325,12 @@ bool LgsApp::generateRTTTypes() {
         symbol.object->getRTType(rttTypeModule);
         for (const auto innerObj : symbol.object->objects) {
             innerObj->getRTType(rttTypeModule);
+        }
+    }
+
+    for (const auto srcFile : srcFiles) {
+        for (const auto type : srcFile->symbolTable.rttTypes) {
+            type->getRTType(rttTypeModule);
         }
     }
 

@@ -1,6 +1,5 @@
 #pragma once
 #include "Lgs_Types.h"
-#include <cstddef>
 
 #define LGS_DARRAY_MAX_LENGTH 100000
 

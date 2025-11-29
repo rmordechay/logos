@@ -7,7 +7,6 @@
 #include "types/LgsEnum.h"
 #include "types/LgsInterface.h"
 #include "types/LgsNullable.h"
-#include "types/LgsGenericType.h"
 #include "LgsUtils.h"
 #include "types/LgsAny.h"
 
@@ -149,7 +148,7 @@ llvm::DIType* LgsObject::getDebugType(LgsCgModule& cg) {
 LgsObject::~LgsObject() {
     freeTypes(enums);
     freeTypes(objects);
-    freeTypes(generics);
+    // freeTypes(generics);
     freeTypes(subtypes);
     if (singleton) {
         singleton->setType(nullptr);

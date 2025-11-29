@@ -43,6 +43,7 @@ LgsType* LgsTypeResolver::resolveType(LgsType* type, LgsFile* file) {
     for (size_t i = 0; i < type->genericArgs.size(); ++i) {
         type->genericArgs[i] = resolveType(type->genericArgs[i], file);
     }
+
     if (const auto nullable = type->asNullable()) {
         nullable->baseType = resolveType(nullable->baseType, file);
     } else if (const auto iterable = type->asIterable()) {
@@ -57,6 +58,7 @@ LgsType* LgsTypeResolver::resolveType(LgsType* type, LgsFile* file) {
     } else if (const auto funcType = type->asFuncType()) {
         resolveFuncTypes(funcType, *file);
     }
+
     if (type->isUnknown()) {
         auto typeName = type->getName();
         auto symbol = globals.table.getSymbol(typeName);
@@ -97,6 +99,7 @@ LgsType* LgsTypeResolver::resolveType(LgsType* type, LgsFile* file) {
         freeType(type);
         type = newType;
     }
+
     return type;
 }
 

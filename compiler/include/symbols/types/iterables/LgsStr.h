@@ -26,3 +26,5 @@ public:
     Value* inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
     llvm::DIType* getDebugType(LgsCgModule& cg) override;
 };
+
+inline LgsStr LGS_STR;

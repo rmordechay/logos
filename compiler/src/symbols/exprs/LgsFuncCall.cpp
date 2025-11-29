@@ -4,7 +4,6 @@
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
 #include "LgsUtils.h"
-#include <iostream>
 #include <sstream>
 bool argAndParamEqual(const LgsFuncArg* arg, const LgsParam* param);
 

@@ -1,7 +1,6 @@
 #include "types/primitives/LgsDouble.h"
 #include "exprs/constants/LgsFloatConst.h"
 #include "codegen/LgsCgModule.h"
-#include "exprs/constants/LgsIntConst.h"
 #include "types/LgsAny.h"
 
 std::string LgsDouble::getName() {

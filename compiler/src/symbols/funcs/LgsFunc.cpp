@@ -1,13 +1,10 @@
 #include "funcs/LgsFunc.h"
-#include "LgsDefinitions.h"
 #include "stmts/LgsStmtsBlock.h"
 #include "exprs/LgsExpr.h"
 #include "exprs/LgsFuncCall.h"
-#include "exprs/constants/LgsStrConst.h"
 #include "types/LgsFuncType.h"
 #include "types/primitives/LgsVoid.h"
 #include "LgsUtils.h"
-#include <iostream>
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/Module.h>
 

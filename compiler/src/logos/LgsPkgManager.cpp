@@ -1,7 +1,7 @@
 #include "logos/LgsPkgManager.h"
 #define MINIZ_HEADER_FILE_ONLY
-#include "miniz.c"
 #include "curl/curl.h"
+#include "miniz.c"
 #include "miniz.h"
 #include "files/LgsAppConfigFile.h"
 #include "logos/LgsApp.h"
@@ -56,6 +56,7 @@ bool downloadFile(const std::string& url, const std::string& outPath) {
     curl_easy_cleanup(curl);
     outFile.close();
     return res == CURLE_OK;
+
 }
 
 void LgsPkgManager::install() {

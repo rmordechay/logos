@@ -14,7 +14,6 @@
 #include "loops/LgsMetaVar.h"
 #include "stmts/LgsStmtsBlock.h"
 #include "stmts/LgsVarDec.h"
-#include <iostream>
 #define TAB_SIZE 4
 
 void LgsFormatter::formatFile(LgsFile* file) {

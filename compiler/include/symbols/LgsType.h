@@ -3,9 +3,9 @@
 #include "exprs/LgsBinaryExpr.h"
 #include <map>
 
+class LgsGenericType;
 class LgsMatrix;
 class LgsSubType;
-class LgsGenericType;
 class LgsSet;
 class LgsAny;
 class LgsByte;

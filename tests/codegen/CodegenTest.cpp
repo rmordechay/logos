@@ -1,6 +1,5 @@
 #include "logos/LgsApp.h"
 #include <cassert>
-#include <iostream>
 #include <sstream>
 #include "../../external/include/doctest.h"
 #include <unistd.h>

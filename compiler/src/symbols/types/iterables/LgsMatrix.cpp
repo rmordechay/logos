@@ -109,6 +109,10 @@ std::string LgsMatrix::getName() {
     return "Mat" + std::to_string(rows) + "x" + std::to_string(columns);
 }
 
+std::string LgsMatrix::getGenericName() {
+    return getName() + baseType->getGenericName();
+}
+
 bool LgsMatrix::canCastTo(LgsType* other) {
     if (other->getName() == LgsAny::name) return true;
     if (getName() == other->getName()) return true;

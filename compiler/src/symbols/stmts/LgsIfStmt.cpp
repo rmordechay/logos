@@ -1,5 +1,4 @@
 #include "stmts/LgsIfStmt.h"
-#include "funcs/LgsFunc.h"
 #include "codegen/LgsCgModule.h"
 #include "LgsUtils.h"
 

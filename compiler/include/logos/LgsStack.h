@@ -1,6 +1,5 @@
 #pragma once
 #include "LgsSymbolTable.h"
-#include <stack>
 
 namespace llvm {
     class BasicBlock;

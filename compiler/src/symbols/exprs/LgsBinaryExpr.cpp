@@ -1,8 +1,6 @@
 #include "exprs/LgsBinaryExpr.h"
 
-#include "LgsType.h"
 #include "codegen/LgsCgModule.h"
-#include "LgsUtils.h"
 
 Value* LgsBinaryExpr::loadIR(LgsCgModule& cg) {
     return IRValue;

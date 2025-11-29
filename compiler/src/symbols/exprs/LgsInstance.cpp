@@ -1,8 +1,6 @@
 #include "exprs/LgsInstance.h"
 #include "exprs/LgsHashMap.h"
-#include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
-#include "stmts/LgsVarDec.h"
 #include "types/LgsObject.h"
 #include "LgsUtils.h"
 

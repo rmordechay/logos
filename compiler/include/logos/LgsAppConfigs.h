@@ -2,7 +2,6 @@
 #include "LgsConfigs.h"
 #include "LgsVersion.h"
 #include "LgsUtils.h"
-#include <cstdint>
 #include <string>
 
 enum LgsAppMode {

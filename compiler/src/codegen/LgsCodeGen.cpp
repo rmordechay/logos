@@ -268,7 +268,6 @@ void LgsCodeGen::visitLoop(LgsForLoop* loop) {
     cg.startBlock(loop->IRExitBlock);
     stack.exitScope();
 }
-#include "llvm/IR/Metadata.h"
 
 void LgsCodeGen::visitRangeLoop(LgsRangeLoop* loop) {
     visitExpr(loop->startRange);

@@ -1,7 +1,6 @@
 #include "exprs/LgsNull.h"
 #include "codegen/LgsCgModule.h"
 #include "LgsDefinitions.h"
-#include "LgsUtils.h"
 #include <llvm/IR/Module.h>
 
 void LgsNull::castImplicitly(LgsType* toType) {

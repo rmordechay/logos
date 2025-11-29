@@ -1,6 +1,4 @@
 #pragma once
-#include "errors/LgsErrors.h"
-#include "LgsUtils.h"
 
 enum LgsFileType {
     LGS_SRC_FILE,
