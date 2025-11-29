@@ -1284,11 +1284,17 @@ LgsExpr* LgsParser::parseExprWithPrecedence(const int minPrecedence, const bool 
     auto left = parseUnary(withInstance);
     if (!parsedOrReset(left, oldIndex)) return nullptr;
     while (true) {
-        auto const it = LGS_BINARY_OPS_DICT.find(currentToken.type);
-        if (it == LGS_BINARY_OPS_DICT.end()) break;
+        const LgsBinOp* op;
+        const auto it = LGS_BINARY_OPS_DICT.find(currentToken.type);
+        if (it != LGS_BINARY_OPS_DICT.end()) {
+            op = &it->second;
+        } else if (currentToken.type == T_IDENTIFIER && currentToken.lexeme == "x") {
+            op = &CROSS_OP;
+        } else {
+            break;
+        }
         consume();
-        const auto [opType, _] = it->second;
-        const auto precedence = getBinOpPrecedence(opType);
+        const auto precedence = getBinOpPrecedence(op->opType);
         if (precedence < minPrecedence) {
             currentToken = tokens[--currentIndex];
             break;
@@ -1298,7 +1304,7 @@ LgsExpr* LgsParser::parseExprWithPrecedence(const int minPrecedence, const bool 
             addParsingError();
             return left;
         }
-        left = new LgsBinaryExpr(left, right, it->second);
+        left = new LgsBinaryExpr(left, right, *op);
         setLocation(left->location, &startToken);
     }
     return left;
@@ -2097,6 +2103,7 @@ int LgsParser::getBinOpPrecedence(const LgsBinOpType opType) {
         return 9;
     case MUL:
     case DIV:
+    case CROSS:
     case MODULO:
         return 10;
     case POW:

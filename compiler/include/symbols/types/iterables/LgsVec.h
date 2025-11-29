@@ -31,6 +31,7 @@ public:
     Value* subIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
     Value* mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
     Value* divIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
+    Value* crossIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
     Value* inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
     Value* lenIR(LgsCgModule& cg, Value* iterable) override;
     Value* getIRElement(LgsCgModule& cg, Value* iterable, Value* index) override;

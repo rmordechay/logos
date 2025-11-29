@@ -294,6 +294,10 @@ Value* LgsType::orIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
+Value* LgsType::crossIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+    assert(0);
+}
+
 LgsAny* LgsType::asAny() {
     return dynamic_cast<LgsAny*>(this);
 }

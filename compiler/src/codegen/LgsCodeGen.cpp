@@ -686,6 +686,7 @@ void LgsCodeGen::visitBinaryExpr(LgsBinaryExpr* binExpr) {
     case LE: binExpr->IRValue = binExpr->type->leIR(cg, l, r); break;
     case AND: binExpr->IRValue = binExpr->type->andIR(cg, l, r); break;
     case OR: binExpr->IRValue = binExpr->type->orIR(cg, l, r); break;
+    case CROSS: binExpr->IRValue = binExpr->type->crossIR(cg, l, r); break;
     case IN: binExpr->IRValue = r->type->asIterable()->inIR(cg, r, l); break;
     case NOOP: assert(0);
     }

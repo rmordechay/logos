@@ -91,7 +91,7 @@ public:
     void visitRangeLoop(LgsRangeLoop* rangeLoop);
     void visitForeachLoop(LgsForeachLoop* foreachLoop);
     void visitInfiniteLoop(const LgsInfiniteLoop* infiniteLoop);
-    void visitReturnStmt(LgsReturn* returnStmt);
+    void visitReturnStmt(const LgsReturn* returnStmt);
     void visitContinueStmt(const LgsContinue* continueStmt);
     void visitBreakStmt(const LgsBreak* breakStmt);
     void visitCoroutine(const LgsCoroutine* coroutine);

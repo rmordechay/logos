@@ -80,5 +80,6 @@ public:
 };
 
 Value* dotProduct(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
+Value* crossProduct(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
 void freeExpr(LgsExpr* expr);
 void freeExprs(std::vector<LgsExpr*>& exprs);

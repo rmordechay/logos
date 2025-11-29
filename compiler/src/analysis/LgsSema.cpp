@@ -552,7 +552,7 @@ void LgsSema::visitInfiniteLoop(const LgsInfiniteLoop* infiniteLoop) {
     visitStmtsBlock(infiniteLoop->stmtsBlock);
 }
 
-void LgsSema::visitReturnStmt(LgsReturn* returnStmt) {
+void LgsSema::visitReturnStmt(const LgsReturn* returnStmt) {
     const auto funcType = stack.currentFunc()->funcType;
     auto retExpr = returnStmt->expr;
     if (retExpr) {

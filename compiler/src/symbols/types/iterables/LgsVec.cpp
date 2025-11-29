@@ -69,16 +69,20 @@ bool LgsVec::canCastTo(LgsType* other) {
 }
 
 LgsType* LgsVec::applyBinOp(LgsType* toType, LgsBinOp& op) {
-    const auto thisNme = getName();
+    const auto thisName = getName();
     const auto otherName = toType->getName();
     switch (op.opType) {
     case ADD:
     case SUB: {
-        if (thisNme == otherName) return this;
+        if (thisName == otherName) return this;
+        break;
+    }
+    case CROSS: {
+        if (thisName == otherName && vectorDim == 3) return this;
         break;
     }
     case MUL: {
-        if (thisNme == otherName) return &LGS_FLOAT;
+        if (thisName == otherName) return &LGS_FLOAT;
         if (toType->isNumber()) return this;
         break;
     }
@@ -151,6 +155,10 @@ Value* LgsVec::divIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
         return cg.builder.CreateFDiv(left->IRValue, right->IRValue);
     }
     return cg.builder.CreateFDiv(left->IRValue, right->IRValue);
+}
+
+Value* LgsVec::crossIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+    return crossProduct(cg, left, right);
 }
 
 Value* LgsVec::inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) {

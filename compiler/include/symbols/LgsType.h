@@ -104,6 +104,7 @@ public:
     virtual Value* leIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
     virtual Value* andIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
     virtual Value* orIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
+    virtual Value* crossIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
 
     LgsAny* asAny();
     LgsChar* asChar();
