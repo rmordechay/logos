@@ -92,10 +92,9 @@ std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
     }
     case RTT_MATRIX: {
         const auto& [rows, columns, baseType] = rtt->matrix;
-        str << "Mat" << rows << "x" << columns << "[";
+        str << "Mat" << rows << "x" << columns << "[\n";
         for (size_t r = 0; r < rows; ++r) {
-            if (r > 0) str << " ";
-            str << "[";
+            str << "  [";
             for (size_t c = 0; c < columns; ++c) {
                 const auto i = r * columns + c;
                 void* data = static_cast<char*>(elem) + i * baseType->size;
@@ -105,7 +104,7 @@ std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
             str << "]";
             if (r + 1 < rows) str << "\n";
         }
-        str << "]";
+        str << "\n]";
         break;
     }
     case RTT_OBJECT: {

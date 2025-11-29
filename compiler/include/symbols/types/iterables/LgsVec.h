@@ -42,13 +42,3 @@ public:
     std::string strFormatPart() const override;
     llvm::DIType* getDebugType(LgsCgModule& cg) override;
 };
-
-inline LgsVec LGS_VEC2_F(2);
-inline LgsVec LGS_VEC3_F(3);
-inline LgsVec LGS_VEC4_F(4);
-inline LgsVec LGS_VEC2_D(2, &LGS_DOUBLE);
-inline LgsVec LGS_VEC3_D(3, &LGS_DOUBLE);
-inline LgsVec LGS_VEC4_D(4, &LGS_DOUBLE);
-inline LgsVec LGS_VEC2_I(2, &LGS_INT);
-inline LgsVec LGS_VEC3_I(3, &LGS_INT);
-inline LgsVec LGS_VEC4_I(4, &LGS_INT);

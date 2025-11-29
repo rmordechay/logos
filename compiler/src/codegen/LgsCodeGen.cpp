@@ -853,12 +853,15 @@ void LgsCodeGen::visitMatrixExpr(LgsMatrixExpr* matrixExpr) {
     if (!matrixExpr->destPtrValue) return;
     matrixExpr->IRValue = matrixExpr->destPtrValue;
     const auto matType = matrixExpr->matType->getIRType(cg);
+    auto index = 0;
     for (size_t i = 0; i < matrixExpr->elements.size(); ++i) {
         const auto vector = matrixExpr->elements[i];
-        vector->IRValue = cg.builder.CreateInBoundsGEP(matType, matrixExpr->IRValue, {cg.i32Zero(), cg.i32(i)});
-        setSArrElements(vector->asArrayExpr());
-        // cg.builder.CreateStore(vector->IRValue, gep);
-        // TODO continue
+        for (size_t j = 0; j < vector->elements.size(); ++j) {
+            const auto innerElement = vector->elements[j];
+            visitExpr(innerElement);
+            const auto gep = cg.builder.CreateInBoundsGEP(matType, matrixExpr->IRValue, {cg.i32Zero(), cg.i32(index++)});
+            cg.builder.CreateStore(innerElement->IRValue, gep);
+        }
     }
 }
 

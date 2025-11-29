@@ -13,7 +13,7 @@ bool LgsLinker::link() const {
         }
     }
     paths.cblasDir = "../external/libcblas.a";
-    assert(objFileList != "");
+    assert(objFileList != "" && fs::exists(paths.cblasDir));
     std::string additionalLibs;
     for (const auto& appPath : paths.userCLibs) {
         additionalLibs += std::string(appPath) + " ";

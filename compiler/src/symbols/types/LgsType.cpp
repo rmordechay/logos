@@ -38,12 +38,6 @@ bool LgsType::addMethod(LgsFunc* method) {
     return true;
 }
 
-bool LgsType::addEmptyMethod(const std::string& name) {
-    if (methods.contains(name)) return false;
-    methods[name] = nullptr;
-    return true;
-}
-
 LgsField* LgsType::getField(const std::string& fieldName) {
     for (auto* f : fields) {
         if (f->name == fieldName) return f;

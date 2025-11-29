@@ -2,6 +2,7 @@
 #include "cblas/cblas.h"
 #include "exprs/LgsMatrixExpr.h"
 #include "types/LgsAny.h"
+#include "types/iterables/LgsSArray.h"
 #include "types/iterables/LgsVec.h"
 
 Type* LgsMatrix::getIRType(LgsCgModule& cg) {
@@ -98,6 +99,10 @@ LgsExpr* LgsMatrix::getZeroValue() {
     return new LgsMatrixExpr(rows, columns);
 }
 
+LgsType* LgsMatrix::getValueType() {
+    return new LgsSArray(baseType, new LgsIntConst(&LGS_INT, columns));
+}
+
 Constant* LgsMatrix::getRTType(LgsCgModule& cg) {
     const auto genericName = getGenericName();
     const auto st = cg.getStructType({cg.sizeTy(), cg.sizeTy(), cg.ptrTy()}, genericName);
@@ -128,8 +133,11 @@ bool LgsMatrix::inferBaseType(const std::vector<LgsExpr*>& args) {
 }
 
 Value* LgsMatrix::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
-    const auto gep = cg.builder.CreateGEP(getIRType(cg), iterable, {cg.i32Zero(), index});
-    return cg.builder.CreateLoad(baseType->getIRType(cg), gep);
+    const auto i = cg.builder.CreateMul(index, cg.i32(columns));
+    const auto gep = cg.builder.CreateGEP(getIRType(cg), iterable, {cg.i32Zero(), i});
+    const auto rows2 = cg.builder.CreateAlloca(baseType->getIRType(cg), cg.i32(columns));
+    cg.callMemCpy(rows2, gep, cg.i32(baseType->sizeBytes() * columns));
+    return rows2;
 }
 
 Value* LgsMatrix::lenIR(LgsCgModule& cg, Value* iterable) {

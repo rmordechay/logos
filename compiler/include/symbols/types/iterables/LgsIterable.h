@@ -34,7 +34,6 @@ public:
         addMethod(isNotEmptyFunc);
         // addMethod(mapFunc);
         // addMethod(filterFunc);
-
     }
     size_t getDimension() const;
     virtual LgsType* getIndexType();

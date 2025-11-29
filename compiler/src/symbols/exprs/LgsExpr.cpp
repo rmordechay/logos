@@ -26,13 +26,7 @@ LgsExpr* LgsExpr::castExplicitly(LgsType* toType) {
     assert(0);
 }
 
-void LgsExpr::castImplicitly(LgsType* toType) {
-
-}
-
-Value* LgsExpr::castIR(LgsCgModule& cg, LgsType* toType) {
-    assert(0);
-}
+void LgsExpr::castImplicitly(LgsType* toType) {}
 
 Value* LgsExpr::hashValue(LgsCgModule& cg) {
     assert(0);

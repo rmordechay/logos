@@ -56,7 +56,6 @@ public:
 
     bool addField(LgsField* field);
     bool addMethod(LgsFunc* method);
-    bool addEmptyMethod(const std::string& name);
     virtual LgsField* getField(const std::string& fieldName);
     virtual LgsFunc* getMethod(const std::string& methodName);
     virtual size_t sizeBytes() = 0;

@@ -320,7 +320,6 @@ void LgsSema::visitVarDec(LgsVarDec* varDec) {
         varDec->isOwner = false;
     }
     addLocalSymbol(LgsSymbol(varDec));
-    addRTType(varDec->type);
 }
 
 void LgsSema::visitAssignment(const LgsAssignment* assignment) {
@@ -662,6 +661,7 @@ void LgsSema::visitExpr(LgsExpr*& expr) {
         else if (const auto json = expr->asJson()) visitJson(json);
     }
     addHeapExpr(expr);
+    addRTType(expr->type);
 }
 
 void LgsSema::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
@@ -1640,6 +1640,7 @@ void castExpr(LgsExpr*& expr, LgsType* toType) {
 }
 
 void LgsSema::addRTType(LgsType* type) const {
+    if (!type) return;
     for (const auto rttType : globals.table.rttTypes) {
         if (rttType->equals(type)) return;
     }
