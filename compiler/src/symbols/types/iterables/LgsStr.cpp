@@ -7,7 +7,7 @@
 #include "types/primitives/LgsChar.h"
 
 Type* LgsStr::getIRType(LgsCgModule& cg) {
-    // if (isStatic) return ArrayType::get(cg.i8Ty(), *size->getConstInt() + 1);
+    if (isStatic) return ArrayType::get(cg.i8Ty(), *size->getConstInt() + 1);
     return cg.ptrTy();
 }
 
@@ -16,6 +16,11 @@ std::string LgsStr::getName() {
 }
 
 size_t LgsStr::sizeBytes() {
+    if (isStatic) {
+        const auto constInt = size->getConstInt();
+        assert(constInt);
+        return *constInt;
+    }
     return sizeof(void*);
 }
 
@@ -40,9 +45,8 @@ LgsType* LgsStr::applyBinOp(LgsType* toType, LgsBinOp& op) {
     const auto IRName = toType->getName();
     switch (op.opType) {
     case ADD: {
-        if (toType->isNumber() || name == IRName) {
-            isHeapAlloc = true;
-            return this;
+        if (name == IRName) {
+            assert(0);
         }
         break;
     }
@@ -79,9 +83,7 @@ Value* LgsStr::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     cg.callSnprintf(buffer, cg.getIRStr("%d"), {right->IRValue});
     const auto otherSize = lenIR(cg, buffer);
     const auto totalSize = cg.builder.CreateAdd(selfSize, otherSize);
-    const auto newStrSize = cg.builder.CreateAdd(totalSize, cg.i64(1));
-    const auto newStrPtr = cg.callAllocate(true, getRTType(cg));
-
+    const auto newStrPtr = cg.allocate(getRTType(cg), true);
     cg.callMemCpy(newStrPtr, left->IRValue, selfSize);
     const auto dstPtr = cg.builder.CreateInBoundsGEP(cg.i8Ty(), newStrPtr, selfSize);
     cg.callMemCpy(dstPtr, buffer, otherSize);

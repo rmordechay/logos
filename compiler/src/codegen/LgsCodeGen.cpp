@@ -783,7 +783,7 @@ void LgsCodeGen::visitArrayExpr(LgsArrayExpr* array) {
 void LgsCodeGen::visitDynamicArray(LgsArrayExpr* arrayExpr) {
     const auto dArr = arrayExpr->type->asDArray();
     if (!arrayExpr->IRValue) {
-        arrayExpr->IRValue = cg.callAllocate(arrayExpr->owner, dArr->getRTType(cg));
+        arrayExpr->IRValue = cg.allocate(dArr->getRTType(cg), arrayExpr->owner);
     }
     cg.callLgsFunc("DArray_init", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {
         arrayExpr->IRValue, dArr->getRTType(cg)
@@ -800,7 +800,7 @@ void LgsCodeGen::visitDynamicArray(LgsArrayExpr* arrayExpr) {
 void LgsCodeGen::visitSetExpr(LgsArrayExpr* arrayExpr) {
     const auto set = arrayExpr->type->asSet();
     if (!arrayExpr->IRValue) {
-        arrayExpr->IRValue = cg.callAllocate(arrayExpr->owner, set->getRTType(cg));
+        arrayExpr->IRValue = cg.allocate(set->getRTType(cg), arrayExpr->owner);
     }
     cg.callLgsFunc("Set_init", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {
         arrayExpr->IRValue, set->getRTType(cg)
@@ -818,7 +818,7 @@ void LgsCodeGen::visitHashMap(LgsHashMap* hashMap) {
     const auto map = hashMap->type->asMap();
     const auto keyType = map->mapType->key;
     const auto valueType = map->mapType->value;
-    hashMap->IRValue = cg.callAllocate(hashMap->owner, map->getRTType(cg));
+    hashMap->IRValue = cg.allocate(map->getRTType(cg), hashMap->owner);
     cg.callLgsFunc("Map_init", cg.voidTy(), {cg.ptrTy(), cg.ptrTy(), cg.ptrTy()}, {
         hashMap->IRValue, keyType->getRTType(cg), valueType->getRTType(cg)
     });
@@ -1134,7 +1134,7 @@ void LgsCodeGen::visitStrConst(LgsStrConst* strConst) {
 void LgsCodeGen::visitInstance(LgsInstance* instance) {
     if (instance->IRValue) return;
     const auto obj = instance->obj;
-    instance->IRValue = cg.callAllocate(instance->owner, obj->getRTType(cg));
+    instance->IRValue = cg.allocate(obj->getRTType(cg), instance->owner);
 
     std::unordered_set<std::string> visited;
     for (const auto& [argName, arg] : instance->args) {

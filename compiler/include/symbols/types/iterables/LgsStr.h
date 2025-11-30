@@ -6,7 +6,7 @@ class LgsStr final : public LgsIterable {
 public:
     static constexpr auto name = "Str";
 
-    LgsStr(): LgsIterable(&LGS_CHAR) {
+    explicit LgsStr(LgsExpr* size = nullptr): LgsIterable(&LGS_CHAR, size) {
         passByRef = true;
     }
     Type* getIRType(LgsCgModule& cg) override;

@@ -1,5 +1,6 @@
 #pragma once
 #include "exprs/LgsExpr.h"
+#include "types/primitives/LgsInt.h"
 #include "types/primitives/LgsSize.h"
 #include <iostream>
 
@@ -8,6 +9,9 @@ public:
     int64_t value;
 
     LgsIntConst(LgsType* type, const int64_t value) : LgsExpr(type), value(value) {
+        isMutable = false;
+    }
+    explicit LgsIntConst(const int64_t value) : LgsExpr(&LGS_INT), value(value) {
         isMutable = false;
     }
     Value* loadIR(LgsCgModule& cg) override;

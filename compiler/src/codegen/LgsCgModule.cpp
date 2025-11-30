@@ -274,7 +274,7 @@ void LgsCgModule::callMemCpy(Value* dest, Value* src, Value* size) {
     builder.CreateMemCpy(dest, llvm::MaybeAlign(), src, llvm::MaybeAlign(), size);
 }
 
-Value* LgsCgModule::callAllocate(const bool isOwner, Constant* type) {
+Value* LgsCgModule::allocate(Constant* type, const bool isOwner) {
     return callRuntimeFunc("allocate", ptrTy(), {ptrTy(), i1Ty()}, {type, i1(isOwner)});
 }
 

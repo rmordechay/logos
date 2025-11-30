@@ -5,7 +5,6 @@
 #include "types/iterables/LgsVec.h"
 #include "LgsUtils.h"
 #include "types/iterables/LgsMatrix.h"
-
 #include <sstream>
 #include <llvm/IR/Module.h>
 
@@ -39,6 +38,7 @@ Value* LgsIterIndex::loadIR(LgsCgModule& cg) {
 void LgsIterIndex::setIRElementPtr(LgsCgModule& cg, const bool assign) {
     auto fromIR = index.from->IRValue;
     assert(baseExpr->IRValue);
+
     // SArray
     if (const auto sArr = baseExpr->type->asSArray()) {
         const auto ty = type->getIRType(cg);
@@ -51,7 +51,8 @@ void LgsIterIndex::setIRElementPtr(LgsCgModule& cg, const bool assign) {
     }
 
     // String
-    if (baseExpr->type->asStr()) {
+    if (const auto iter = baseExpr->type->asStr()) {
+        cg.createBoundsGuard(iter->size->IRValue, fromIR);
         IRValue = cg.builder.CreateInBoundsGEP(cg.i8Ty(), baseExpr->IRValue, fromIR);
         return;
     }

@@ -43,9 +43,6 @@ extern "C" void Lgs_Runtime_pop() {
         func(ctx);
     }
     // Free values
-    for (const auto [ptr, type] : runtime.stack.top().owners) {
-        freeValue(ptr, type);
-    }
     for (const auto [ptr, type] : runtime.stack.top().orphans) {
         freeValue(ptr, type);
     }
@@ -62,6 +59,8 @@ extern "C" void Lgs_Runtime_addCoro(const ThunkFunc funcPtr, void* ctx) {
 
 extern "C" void* Lgs_Runtime_allocate(Lgs_TypeInfo* type, const bool isOwner) {
     const auto ptr = std::malloc(type->size);
+    std::cout << type->kind << '\n';
+    std::cout << type->size << '\n';
     if (isOwner) {
         runtime.stack.top().owners[ptr] = type;
     } else {
@@ -95,18 +94,12 @@ extern "C" void Lgs_Runtime_throwError(const char* msg) {
 static void freeValue(void* ptr, const Lgs_TypeInfo* type) {
     std::cout << "Freeing: " << ptr << '\n';
     switch (type->kind) {
-    case RTT_SARRAY:
-        break;
-    case RTT_DARRAY:
-        break;
-    case RTT_SET:
-        break;
-    case RTT_MAP:
-        break;
-    case RTT_OBJECT: {
-        std::free(ptr);
-        return;
-    }
+    case RTT_SARRAY: break;
+    case RTT_DARRAY: break;
+    case RTT_SET: break;
+    case RTT_MAP: break;
+    case RTT_STR:
+    case RTT_OBJECT: std::free(ptr); return;
     case RTT_NULLABLE:
         break;
     default:
