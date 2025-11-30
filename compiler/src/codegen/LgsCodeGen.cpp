@@ -146,8 +146,7 @@ void LgsCodeGen::visitMainFunc(LgsMainFunc* func) {
     createPrologue(func);
     initMainArgs(func);
     visitStmtsBlock(func->stmtsBlock);
-    cg.callRuntimeFunc("close", cg.voidTy());
-    cg.builder.CreateRet(cg.i32(EXIT_SUCCESS));
+    createEpilogue(func);
     stack.exitScope();
 }
 
@@ -166,10 +165,7 @@ void LgsCodeGen::visitFunc(LgsFunc* func) {
     if (ft->isVariadic) {
         cg.callIntrinsics(Intrinsic::vaend, {cg.ptrTy()}, {params.back().IRValue});
     }
-    if (ft->rt->isVoid() && !cg.lastInstTerminator()) {
-        cg.callPopStack();
-        cg.builder.CreateRetVoid();
-    }
+    createEpilogue(func);
     stack.exitScope();
 }
 
@@ -179,10 +175,7 @@ void LgsCodeGen::visitGenericFunc(LgsFunc* func) {
     stack.enterScope(func);
     createPrologue(func);
     visitStmtsBlock(func->stmtsBlock);
-    if (func->funcType->rt->isVoid() && !cg.lastInstTerminator()) {
-        cg.callPopStack();
-        cg.builder.CreateRetVoid();
-    }
+    createEpilogue(func);
     stack.exitScope();
     cg.currentFunc = originalFunc;
     cg.builder.restoreIP(cg.savedIP);
@@ -1200,6 +1193,16 @@ void LgsCodeGen::createPrologue(LgsFunc* func) const {
         cg.callRuntimeFunc("init", cg.voidTy());
     }
     cg.callStackPush();
+}
+
+void LgsCodeGen::createEpilogue(const LgsFunc* func) const {
+    if (func->funcType->name == LGS_MAIN_FUNC) {
+        cg.callRuntimeFunc("close", cg.voidTy());
+        cg.builder.CreateRet(cg.i32(EXIT_SUCCESS));
+    } else if (func->funcType->rt->isVoid() && !cg.lastInstTerminator()) {
+        cg.callPopStack();
+        cg.builder.CreateRetVoid();
+    }
 }
 
 void LgsCodeGen::initMainArgs(const LgsMainFunc* mainFunc) const {

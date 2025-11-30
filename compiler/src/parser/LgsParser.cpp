@@ -317,8 +317,7 @@ LgsTestFile* LgsParser::parseTestFile() {
         if (currentToken.type == T_EOF) break;
     }
 
-    if (currentToken.type != T_EOF)
-        assert(0);
+    if (currentToken.type != T_EOF) assert(0);
     validateTestFolder(file);
     return file;
 }
@@ -851,12 +850,12 @@ LgsStmtsBlock* LgsParser::parseStmtsBlock(const bool withSingleStmt) {
         setLocation(stmtsBlock->location, &currentToken);
         if (!matchAndConsume(T_RBRACE)) {
             while (true) {
-                if (const auto expr = parseExpr()) {
-                    stmtsBlock->stmts.push_back(LgsStmtWrapper(expr));
-                } else if (const auto stmt = parseStmt()) {
+                if (const auto stmt = parseStmt()) {
                     stmtsBlock->stmts.push_back(LgsStmtWrapper(stmt));
                 } else if (const auto obj = parseObject()) {
                     stmtsBlock->stmts.push_back(LgsStmtWrapper(obj));
+                } else if (const auto expr = parseExpr()) {
+                    stmtsBlock->stmts.push_back(LgsStmtWrapper(expr));
                 } else {
                     break;
                 }
@@ -1372,20 +1371,18 @@ LgsExpr* LgsParser::parseUnary(const bool withInstance) {
     return expr;
 }
 
-LgsExpr* LgsParser::parseExprOrStmtsBlock() {
+LgsExpr* LgsParser::parseExprOrLambda() {
     // The order is important. First check for empty block, then expr, then non-empty block.
     if (currentToken.type == T_LBRACE && peek().type == T_RBRACE) {
         consume(2);
-        const auto func = wrapStmtsBlockWithFunc(new LgsStmtsBlock());
-        return func;
+        return wrapStmtsBlockWithFunc(new LgsStmtsBlock());
     }
     if (LgsExpr* expr = parseExpr()) {
         return expr;
     }
     if (const auto stmtsBlock = parseStmtsBlock()) {
         if (stmtsBlock->isMacro) addParsingError();
-        const auto func = wrapStmtsBlockWithFunc(stmtsBlock);
-        return func;
+        return wrapStmtsBlockWithFunc(stmtsBlock);
     }
     return nullptr;
 }
@@ -1444,7 +1441,7 @@ LgsFuncCall* LgsParser::parseFuncCall() {
             funcCall->isNamed = true;
             argName = currentToken.lexeme;
             consume(2);
-            const auto exprOrStmt = parseExprOrStmtsBlock();
+            const auto exprOrStmt = parseExprOrLambda();
             if (!exprOrStmt) break;
             if (!seen.insert(argName).second) {
                 addError(E10054, exprOrStmt->location, {argName});
@@ -1452,7 +1449,7 @@ LgsFuncCall* LgsParser::parseFuncCall() {
             }
             funcCall->args.emplace_back(LgsFuncArg{exprOrStmt, argName});
         } else {
-            const auto exprOrStmt = parseExprOrStmtsBlock();
+            const auto exprOrStmt = parseExprOrLambda();
             if (!exprOrStmt) break;
             funcCall->args.emplace_back(LgsFuncArg{exprOrStmt, argName});
         }

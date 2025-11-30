@@ -99,6 +99,7 @@ Value* LgsStr::neIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
 }
 
 Value* LgsStr::lenIR(LgsCgModule& cg, Value* iterable) {
+    if (isStatic) return cg.extendToSize(size->IRValue);
     return cg.callStrLen(iterable);
 }
 

@@ -43,8 +43,13 @@ extern "C" void Lgs_Runtime_pop() {
         func(ctx);
     }
     // Free values
+    for (const auto [ptr, type] : runtime.stack.top().owners) {
+        std::cout << "Freeing owner: " << ptr << '\n';
+        // freeValue(ptr, type);
+    }
     for (const auto [ptr, type] : runtime.stack.top().orphans) {
-        freeValue(ptr, type);
+        std::cout << "Freeing orphan: " << ptr << '\n';
+        // freeValue(ptr, type);
     }
     runtime.stack.pop();
 }

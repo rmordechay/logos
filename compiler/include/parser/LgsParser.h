@@ -138,7 +138,7 @@ public:
     LgsExpr* parseExpr(bool withLambda = true, bool withInstance = true);
     LgsExpr* parseExprWithPrecedence(int minPrecedence, bool withInstance = true);
     LgsExpr* parseUnary(bool withInstance = true);
-    LgsExpr* parseExprOrStmtsBlock();
+    LgsExpr* parseExprOrLambda();
     LgsVariable* parseVariable();
     LgsInstance* parseInstance();
     LgsFuncCall* parseFuncCall();

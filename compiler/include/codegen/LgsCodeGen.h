@@ -139,6 +139,7 @@ public:
 
     // Funcs
     void createPrologue(LgsFunc* func) const;
+    void createEpilogue(const LgsFunc* func) const;
     void initMainArgs(const LgsMainFunc* mainFunc) const;
     StructType* getThunkCtxType(const LgsFuncCall* fc) const;
     Value* getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) const;
