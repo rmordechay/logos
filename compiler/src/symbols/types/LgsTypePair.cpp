@@ -2,11 +2,13 @@
 
 #include "LgsUtils.h"
 
-Type* LgsTypePair::getIRType(LgsCgModule& cg) {
+#include <cassert>
+
+llvm::Type* LgsTypePair::getIRType(LgsCgModule& cg) {
     assert(0);
 }
 
-Constant* LgsTypePair::getRTType(LgsCgModule& cg) {
+llvm::Constant* LgsTypePair::getRTType(LgsCgModule& cg) {
     assert(0);
 }
 

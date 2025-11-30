@@ -1026,7 +1026,10 @@ void LgsSema::visitFuncCall(LgsFuncCall* funcCall) {
 
     if (!visitFuncArgs(funcCall, ft)) return;
     if (!funcCall->equals(ft)) {
-        addError(E10015, funcCall->location, {funcCall->name, funcCall->asText(), ft->pname()});
+        // Add error only if not already thrown
+        if (errHandler.successful) {
+            addError(E10015, funcCall->location, {funcCall->name, funcCall->asText(), ft->pname()});
+        }
         return;
     }
     if (symbol->symbolType != FUNC) {
@@ -1234,8 +1237,8 @@ void LgsSema::visitIterIndex(LgsIterIndex* iterIndex) {
     visitExpr(baseExpr);
     if (!baseExpr->type) return;
     const auto iterable = baseExpr->type->asIterable();
-    if (!iterable) {
-        return addError(E10002, iterIndex->location, {baseExpr->asText()});
+    if (!iterable || iterable->asVariadic()) {
+        return addError(E10108, iterIndex->location, {baseExpr->asText()});
     }
     visitIndex(iterIndex);
 }

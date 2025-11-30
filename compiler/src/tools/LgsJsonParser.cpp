@@ -1,6 +1,6 @@
 #include "tools/LgsJsonParser.h"
-
 #include "exprs/LgsArrayExpr.h"
+#include "exprs/LgsBinaryExpr.h"
 #include "exprs/LgsFuncCall.h"
 #include "exprs/LgsNull.h"
 #include "exprs/LgsSelection.h"

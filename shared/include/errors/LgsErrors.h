@@ -139,3 +139,4 @@ inline LgsBaseMsg E10104{"'%s' doesn't match the columns length. Given: %s.", er
 inline LgsBaseMsg E10105{"Too many elements for array of size %s", errCodeStart++};
 inline LgsBaseMsg E10106{"Could not parse C file %s", errCodeStart++};
 inline LgsBaseMsg E10107{"Could not find C library %s", errCodeStart++};
+inline LgsBaseMsg E10108{"%s is not indexable.", errCodeStart++};

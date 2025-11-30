@@ -36,7 +36,7 @@ public:
     Value* orIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
     std::string strFormatPart() const override;
     std::string getName() override;
-    llvm::DIType* getDebugType(LgsCgModule& cg) override;
+    DIType* getDebugType(LgsCgModule& cg) override;
 };
 
 inline LgsInt LGS_INT;

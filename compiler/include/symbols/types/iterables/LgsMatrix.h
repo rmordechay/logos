@@ -28,6 +28,6 @@ public:
     Value* mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
     Value* inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
     Value* lenIR(LgsCgModule& cg, Value* iterable) override;
-    llvm::DIType* getDebugType(LgsCgModule& cg) override;
+    DIType* getDebugType(LgsCgModule& cg) override;
     std::string strFormatPart() const override;
 };

@@ -1,5 +1,7 @@
 #include "types/LgsUnknown.h"
 
+#include <cassert>
+
 std::string LgsUnknown::getName() {
     return name;
 }
@@ -28,10 +30,10 @@ llvm::DIType* LgsUnknown::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
 
-Type* LgsUnknown::getIRType(LgsCgModule& cg) {
+llvm::Type* LgsUnknown::getIRType(LgsCgModule& cg) {
     assert(0);
 }
 
-Constant* LgsUnknown::getRTType(LgsCgModule& cg) {
+llvm::Constant* LgsUnknown::getRTType(LgsCgModule& cg) {
     assert(0);
 }

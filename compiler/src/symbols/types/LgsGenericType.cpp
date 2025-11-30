@@ -1,11 +1,13 @@
 #include "types/LgsGenericType.h"
 #include "types/LgsAny.h"
 
-Type* LgsGenericType::getIRType(LgsCgModule& cg) {
+#include <cassert>
+
+llvm::Type* LgsGenericType::getIRType(LgsCgModule& cg) {
     assert(0);
 }
 
-Constant* LgsGenericType::getRTType(LgsCgModule& cg) {
+llvm::Constant* LgsGenericType::getRTType(LgsCgModule& cg) {
     assert(0);
 }
 

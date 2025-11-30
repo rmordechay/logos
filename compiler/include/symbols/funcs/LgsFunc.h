@@ -1,10 +1,11 @@
 #pragma once
+#include "exprs/LgsExpr.h"
 #include "types/LgsFuncType.h"
 
+class LgsFuncType;
 struct LgsFuncArg;
 class LgsStmtsBlock;
 class LgsParam;
-class LgsExpr;
 class LgsStmt;
 class LgsType;
 

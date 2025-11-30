@@ -2,6 +2,12 @@
 #include "LgsType.h"
 #include <string>
 
+namespace llvm {
+    class DIType;
+    class Constant;
+    class Type;
+}
+
 class LgsEnum final : public LgsType {
 public:
     std::string name;
@@ -14,7 +20,7 @@ public:
     bool canCastTo(LgsType* other) override;
     std::string strFormatPart() const override;
     size_t sizeBytes() override;
-    llvm::DIType* getDebugType(LgsCgModule& cg) override;
+    DIType* getDebugType(LgsCgModule& cg) override;
 };
 
 

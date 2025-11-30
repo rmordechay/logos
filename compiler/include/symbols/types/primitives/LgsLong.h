@@ -28,7 +28,7 @@ public:
     std::string strFormatPart() const override;
     std::string getName() override;
     bool canCastTo(LgsType* other) override;
-    llvm::DIType* getDebugType(LgsCgModule& cg) override;
+    DIType* getDebugType(LgsCgModule& cg) override;
 };
 
 inline LgsLong LGS_LONG;

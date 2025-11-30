@@ -1,7 +1,11 @@
 #pragma once
-#include "types/LgsEnum.h"
+
 #include <sstream>
 
+class LgsSubType;
+class LgsEnum;
+class LgsNull;
+class LgsIntConst;
 class LgsMetaVar;
 class LgsJson;
 class LgsTypeExpr;

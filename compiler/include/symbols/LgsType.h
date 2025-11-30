@@ -1,7 +1,8 @@
 #pragma once
+#include "LgsBinaryTokens.h"
 #include "errors/LgsErrors.h"
-#include "exprs/LgsBinaryExpr.h"
 #include <map>
+#include <vector>
 
 class LgsVariadic;
 class LgsGenericType;
@@ -42,6 +43,15 @@ class LgsField;
 class LgsFunc;
 class LgsCgModule;
 
+namespace llvm {
+    class Constant;
+    class DIType;
+    class Type;
+    class Value;
+}
+
+using namespace llvm;
+
 class LgsType {
 public:
     LgsLocation location;
@@ -65,7 +75,7 @@ public:
     virtual Constant* getRTType(LgsCgModule& cg) = 0;
     virtual bool canCastTo(LgsType* other) = 0;
     virtual std::string strFormatPart() const = 0;
-    virtual llvm::DIType* getDebugType(LgsCgModule& cg) = 0;
+    virtual DIType* getDebugType(LgsCgModule& cg) = 0;
     virtual LgsType* applyBinOp(LgsType* toType, LgsBinOp& op);
     virtual void hashNode(size_t& oldHash);
     virtual std::string getName() = 0;

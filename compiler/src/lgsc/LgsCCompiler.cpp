@@ -19,7 +19,7 @@ using namespace clang;
 void LgsCCompiler::initCompiler() {
     auto diagConsumer = std::make_unique<LgsDiagnosticConsumer>();
     compiler.createDiagnostics(diagConsumer.release());
-    auto& targetOpts = compiler.getInvocation().getTargetOpts();
+    clang::TargetOptions& targetOpts = compiler.getInvocation().getTargetOpts();
     auto& headerSearchOptions = compiler.getHeaderSearchOpts();
 
     targetOpts.Triple = llvm::sys::getDefaultTargetTriple();
@@ -34,7 +34,7 @@ void LgsCCompiler::initCompiler() {
         headerSearchOptions.AddPath(fs::canonical(searchPath).c_str(), frontend::Quoted, false, false);
     }
 
-    const auto targetOptions = std::make_shared<TargetOptions>(targetOpts);
+    const auto targetOptions = std::make_shared<clang::TargetOptions>(targetOpts);
     compiler.setTarget(TargetInfo::CreateTargetInfo(compiler.getDiagnostics(), targetOptions));
     compiler.createFileManager();
     compiler.createSourceManager(compiler.getFileManager());

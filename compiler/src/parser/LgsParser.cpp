@@ -25,6 +25,7 @@
 #include "loops/LgsRangeLoop.h"
 #include "loops/LgsWhileLoop.h"
 #include "LgsTokens.h"
+#include "exprs/LgsBinaryExpr.h"
 #include "exprs/LgsCast.h"
 #include "exprs/LgsEnvVar.h"
 #include "exprs/LgsMatrixExpr.h"

@@ -43,7 +43,7 @@ public:
     Value* getIRElement(LgsCgModule& cg, Value* iterable, Value* index) override;
     bool canCastTo(LgsType* other) override;
     std::string strFormatPart() const override;
-    llvm::DIType* getDebugType(LgsCgModule& cg) override;
+    DIType* getDebugType(LgsCgModule& cg) override;
 };
 
 class LgsPair final {

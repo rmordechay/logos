@@ -1,5 +1,4 @@
 #include "files/LgsObjectFile.h"
-
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsIOPair.h"

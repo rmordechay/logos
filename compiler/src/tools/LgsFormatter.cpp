@@ -1,5 +1,6 @@
 #include "tools/LgsFormatter.h"
 #include "exprs/LgsArrayExpr.h"
+#include "exprs/LgsBinaryExpr.h"
 #include "exprs/LgsFuncCall.h"
 #include "exprs/LgsInstance.h"
 #include "exprs/LgsIterIndex.h"

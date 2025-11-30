@@ -15,7 +15,7 @@ public:
     LgsExpr* getZeroValue() override;
     std::string strFormatPart() const override;
     bool canCastTo(LgsType* other) override;
-    llvm::DIType* getDebugType(LgsCgModule& cg) override;
+    DIType* getDebugType(LgsCgModule& cg) override;
 };
 
 inline LgsVoid LGS_VOID;

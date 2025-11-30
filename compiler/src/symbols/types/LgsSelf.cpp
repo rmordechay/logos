@@ -1,10 +1,12 @@
 #include "types/LgsSelf.h"
 
-Type* LgsSelf::getIRType(LgsCgModule& cg) {
+#include <cassert>
+
+llvm::Type* LgsSelf::getIRType(LgsCgModule& cg) {
     assert(0);
 }
 
-Constant* LgsSelf::getRTType(LgsCgModule& cg) {
+llvm::Constant* LgsSelf::getRTType(LgsCgModule& cg) {
     assert(0);
 }
 

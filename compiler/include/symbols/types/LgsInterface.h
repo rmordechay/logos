@@ -1,5 +1,4 @@
 #pragma once
-#include "LgsObject.h"
 #include "LgsType.h"
 
 class LgsInterface final : public LgsType {
@@ -13,7 +12,7 @@ public:
     LgsExpr* getZeroValue() override;
     bool canCastTo(LgsType* other) override;
     size_t sizeBytes() override;
-    llvm::DIType* getDebugType(LgsCgModule& cg) override;
+    DIType* getDebugType(LgsCgModule& cg) override;
     Constant* getRTType(LgsCgModule& cg) override;
     std::string strFormatPart() const override;
 };

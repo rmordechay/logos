@@ -1,11 +1,13 @@
 #include "types/LgsSubType.h"
 #include "types/LgsAny.h"
 
-Type* LgsSubType::getIRType(LgsCgModule& cg) {
+#include <cassert>
+
+llvm::Type* LgsSubType::getIRType(LgsCgModule& cg) {
     return subtype->getIRType(cg);
 }
 
-Constant* LgsSubType::getRTType(LgsCgModule& cg) {
+llvm::Constant* LgsSubType::getRTType(LgsCgModule& cg) {
     assert(0);
 }
 

@@ -35,7 +35,7 @@ public:
     Value* orIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
     bool canCastTo(LgsType* other) override;
     std::string strFormatPart() const override;
-    llvm::DIType* getDebugType(LgsCgModule& cg) override;
+    DIType* getDebugType(LgsCgModule& cg) override;
 };
 
 inline LgsSize LGS_SIZE;
