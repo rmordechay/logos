@@ -21,7 +21,7 @@ LgsExpr* LgsAny::getZeroValue() {
     assert(0);
 }
 
-std::string LgsAny::strFormatPart() const {
+std::string LgsAny::fmtStr() const {
     return "%p";
 }
 

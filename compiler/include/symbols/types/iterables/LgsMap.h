@@ -43,7 +43,7 @@ public:
     Value* inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
     Value* getIRElement(LgsCgModule& cg, Value* iterable, Value* index) override;
     bool canCastTo(LgsType* other) override;
-    std::string strFormatPart() const override;
+    std::string fmtStr() const override;
     DIType* getDebugType(LgsCgModule& cg) override;
 };
 

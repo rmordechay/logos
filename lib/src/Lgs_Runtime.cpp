@@ -57,10 +57,9 @@ extern "C" void Lgs_Runtime_addCoro(const ThunkFunc funcPtr, void* ctx) {
     runtime.coros.emplace_back(Lgs_ThunkFunc{funcPtr, ctx});
 }
 
-extern "C" void* Lgs_Runtime_allocate(Lgs_TypeInfo* type, const bool isOwner) {
-    const auto ptr = std::malloc(type->size);
-    std::cout << type->kind << '\n';
-    std::cout << type->size << '\n';
+extern "C" void* Lgs_Runtime_allocate(const size_t size, Lgs_TypeInfo* type, const bool isOwner) {
+    const auto ptr = std::malloc(size);
+    std::cout << "Allocated: " << size << '\n';
     if (isOwner) {
         runtime.stack.top().owners[ptr] = type;
     } else {

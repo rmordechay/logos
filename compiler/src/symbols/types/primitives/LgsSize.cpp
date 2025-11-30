@@ -128,7 +128,7 @@ bool LgsSize::canCastTo(LgsType* other) {
     return name == IRName;
 }
 
-std::string LgsSize::strFormatPart() const {
+std::string LgsSize::fmtStr() const {
     return "%zu";
 }
 

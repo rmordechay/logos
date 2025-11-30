@@ -14,7 +14,7 @@ public:
     std::string getName() override;
     LgsExpr* getZeroValue() override;
     LgsType* applyBinOp(LgsType* toType, LgsBinOp& op) override;
-    std::string strFormatPart() const override;
+    std::string fmtStr() const override;
     bool canCastTo(LgsType* other) override;
     DIType* getDebugType(LgsCgModule& cg) override;
 };

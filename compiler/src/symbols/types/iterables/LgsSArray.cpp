@@ -49,7 +49,7 @@ LgsExpr* LgsSArray::getZeroValue() {
     return new LgsArrayExpr(this);
 }
 
-std::string LgsSArray::strFormatPart() const {
+std::string LgsSArray::fmtStr() const {
     if (baseType->asChar()) return "%s";
     return "%p";
 }

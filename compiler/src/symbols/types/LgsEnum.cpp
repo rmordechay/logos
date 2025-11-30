@@ -32,7 +32,7 @@ LgsType* LgsEnum::applyBinOp(LgsType* toType, LgsBinOp& op) {
     assert(0);
 }
 
-std::string LgsEnum::strFormatPart() const {
+std::string LgsEnum::fmtStr() const {
     return "%s";
 }
 

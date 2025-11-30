@@ -109,7 +109,7 @@ LgsExpr* LgsBool::getZeroValue() {
     return new LgsIntConst(&LGS_BOOL, false);
 }
 
-std::string LgsBool::strFormatPart() const {
+std::string LgsBool::fmtStr() const {
     return "%s";
 }
 

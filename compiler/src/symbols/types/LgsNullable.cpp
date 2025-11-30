@@ -43,7 +43,7 @@ Constant* LgsNullable::getRTType(LgsCgModule& cg) {
 }
 
 LgsExpr* LgsNullable::getZeroValue() {
-    return new LgsNullableExpr(&LGS_NULL);
+    return new LgsNullableExpr(new LgsNull());
 }
 
 std::string LgsNullable::getName() {
@@ -51,7 +51,7 @@ std::string LgsNullable::getName() {
 }
 
 std::string LgsNullable::pname() {
-    return (baseType ? baseType->pname() : LGS_UNKNOWN_TYPE) + '?';
+    return baseType ? baseType->getName() + '?' : name;
 }
 
 bool LgsNullable::canCastTo(LgsType* other) {
@@ -115,8 +115,8 @@ size_t LgsNullable::sizeBytes() {
     return !baseType ? 0 : baseType->sizeBytes() + sizeof(bool);
 }
 
-std::string LgsNullable::strFormatPart() const {
-    return baseType->strFormatPart();
+std::string LgsNullable::fmtStr() const {
+    return baseType->fmtStr();
 }
 
 DIType* LgsNullable::getDebugType(LgsCgModule& cg) {

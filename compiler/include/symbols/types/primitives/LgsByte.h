@@ -26,7 +26,7 @@ public:
     LgsExpr* getZeroValue() override;
     std::string getName() override;
     bool canCastTo(LgsType* other) override;
-    std::string strFormatPart() const override;
+    std::string fmtStr() const override;
     DIType* getDebugType(LgsCgModule& cg) override;
 };
 

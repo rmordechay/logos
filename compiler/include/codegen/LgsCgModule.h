@@ -68,7 +68,7 @@ public:
     void setupModule(const std::string& file, bool debugMode = false);
     bool writeIRModule(const LgsPaths& paths, uint8_t optLevel) const;
     void loop(Value* loopLength, const std::function<void(Value*, BasicBlock*)>& body);
-    Constant* getIRStr(const std::string& value);
+    Constant* getString(const std::string& value);
     Value* getPtrTo(Value* v);
     GlobalVariable* createGlobal(const std::string& name, Type* type, Constant* args, bool isConst = false, GlobalValue::LinkageTypes linkage = GlobalValue::ExternalLinkage) const;
     StructType* getStructType(const std::vector<Type*>& fields, const std::string& name = "");
@@ -100,7 +100,7 @@ public:
     Value* callStrLen(Value* str);
     void callMemSet(Value* dest, Value* src, Value* size);
     void callMemCpy(Value* dest, Value* src, Value* size);
-    Value* allocate(Constant* type, bool isOwner);
+    Value* allocate(Value* size, Constant* type, bool isOwner);
 
     // Stack
     void callStackPush();

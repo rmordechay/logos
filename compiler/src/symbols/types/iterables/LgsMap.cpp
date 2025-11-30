@@ -100,7 +100,7 @@ bool LgsMap::canCastTo(LgsType* other) {
     return keyEqual && mapType->value->canCastTo(otherKvType->value);
 }
 
-std::string LgsMap::strFormatPart() const {
+std::string LgsMap::fmtStr() const {
     return "%s";
 }
 

@@ -15,7 +15,7 @@ public:
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
     Constant* getRTType(LgsCgModule& cg) override;
-    std::string strFormatPart() const override;
+    std::string fmtStr() const override;
     LgsType* applyBinOp(LgsType* toType, LgsBinOp& op) override;
     bool inferBaseType(const std::vector<LgsExpr*>& args) override;
     Value* addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;

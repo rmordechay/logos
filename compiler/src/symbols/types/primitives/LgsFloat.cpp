@@ -36,7 +36,7 @@ size_t LgsFloat::sizeBytes() {
     return sizeof(float);
 }
 
-std::string LgsFloat::strFormatPart() const {
+std::string LgsFloat::fmtStr() const {
     return "%.3f";
 }
 

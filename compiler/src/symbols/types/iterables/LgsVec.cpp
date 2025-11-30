@@ -249,11 +249,11 @@ size_t LgsVec::getComponentIndex(const char c) {
     }
 }
 
-std::string LgsVec::strFormatPart() const {
+std::string LgsVec::fmtStr() const {
     std::stringstream str;
     str << '<';
     for (size_t i = 0; i < vectorDim; i++) {
-        str << baseType->strFormatPart();
+        str << baseType->fmtStr();
         if (i < vectorDim - 1) str << ", ";
     }
     str << '>';

@@ -7,7 +7,12 @@ Value* LgsNull::loadIR(LgsCgModule& cg) {
     return IRValue;
 }
 
-void LgsNull::castImplicitly(LgsType* toType) {}
+void LgsNull::castImplicitly(LgsType* toType) {
+    if (type) return;
+    if (const auto nullable = toType->asNullable()) {
+        type = nullable->baseType;
+    }
+}
 
 std::string LgsNull::asText() {
     return LGS_NULL_LITERAL;

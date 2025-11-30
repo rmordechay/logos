@@ -32,7 +32,7 @@ public:
     std::string getGenericName() override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
-    std::string strFormatPart() const override;
+    std::string fmtStr() const override;
     LgsType* applyBinOp(LgsType* toType, LgsBinOp& op) override;
     Value* lenIR(LgsCgModule& cg, Value* iterable) override;
     Value* inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) override;

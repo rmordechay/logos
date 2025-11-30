@@ -43,7 +43,7 @@ bool LgsSet::canCastTo(LgsType* other) {
     return baseType->canCastTo(otherArr->baseType);
 }
 
-std::string LgsSet::strFormatPart() const {
+std::string LgsSet::fmtStr() const {
     if (baseType->asChar()) return "%s";
     return "%p";
 }

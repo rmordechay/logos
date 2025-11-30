@@ -1,6 +1,7 @@
 #include "exprs/LgsFuncCall.h"
 #include "exprs/constants/LgsStrConst.h"
 #include "LgsConfigs.h"
+#include "exprs/LgsBinaryExpr.h"
 #include "types/LgsAny.h"
 #include "types/LgsNullable.h"
 #include "types/iterables/LgsSArray.h"
@@ -46,9 +47,7 @@ LgsType* LgsStr::applyBinOp(LgsType* toType, LgsBinOp& op) {
     const auto IRName = toType->getName();
     switch (op.opType) {
     case ADD: {
-        if (name == IRName) {
-            assert(0);
-        }
+        if (name == IRName) return this;
         break;
     }
     case IN: {
@@ -70,7 +69,7 @@ Value* LgsStr::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
     return cg.builder.CreateLoad(cg.i8Ty(), gep);
 }
 
-std::string LgsStr::strFormatPart() const {
+std::string LgsStr::fmtStr() const {
     return "%s";
 }
 
@@ -79,17 +78,14 @@ bool LgsStr::inferBaseType(const std::vector<LgsExpr*>& args) {
 }
 
 Value* LgsStr::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto selfSize = lenIR(cg, left->IRValue);
-    const auto buffer = cg.builder.CreateAlloca(ArrayType::get(cg.i8Ty(), STRING_BUFFER_SIZE));
-    cg.callSnprintf(buffer, cg.getIRStr("%d"), {right->IRValue});
-    const auto otherSize = lenIR(cg, buffer);
-    const auto totalSize = cg.builder.CreateAdd(selfSize, otherSize);
-    const auto newStrPtr = cg.allocate(getRTType(cg), true);
-    cg.callMemCpy(newStrPtr, left->IRValue, selfSize);
-    const auto dstPtr = cg.builder.CreateInBoundsGEP(cg.i8Ty(), newStrPtr, selfSize);
-    cg.callMemCpy(dstPtr, buffer, otherSize);
-    cg.addNullTerminate(newStrPtr, totalSize);
-    return newStrPtr;
+    const auto leftSize = lenIR(cg, left->IRValue);
+    const auto rightSize = right->type->asStr()->lenIR(cg, right->IRValue);
+    const auto sumSize = cg.builder.CreateAdd(leftSize, rightSize);
+    const auto buffer = cg.allocate(sumSize, getRTType(cg), true);
+    const auto gep = cg.builder.CreateInBoundsGEP(cg.i8Ty(), buffer, leftSize);
+    cg.callMemCpy(buffer, left->IRValue, leftSize); // cpy left str
+    cg.callMemCpy(gep, right->IRValue, rightSize); // cpy right str
+    return buffer;
 }
 
 Value* LgsStr::eqIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {

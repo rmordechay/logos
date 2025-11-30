@@ -34,7 +34,7 @@ public:
     Value* orIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
     std::string getName() override;
     LgsExpr* getZeroValue() override;
-    std::string strFormatPart() const override;
+    std::string fmtStr() const override;
     size_t sizeBytes() override;
     bool canCastTo(LgsType* other) override;
     DIType* getDebugType(LgsCgModule& cg) override;

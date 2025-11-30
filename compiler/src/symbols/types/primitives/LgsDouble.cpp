@@ -19,7 +19,7 @@ LgsType* LgsDouble::applyBinOp(LgsType* toType, LgsBinOp& op) {
     assert(0);
 }
 
-std::string LgsDouble::strFormatPart() const {
+std::string LgsDouble::fmtStr() const {
     return "%f";
 }
 

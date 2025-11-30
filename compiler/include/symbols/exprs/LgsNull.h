@@ -14,4 +14,3 @@ public:
     ~LgsNull() override;
 };
 
-inline LgsNull LGS_NULL;

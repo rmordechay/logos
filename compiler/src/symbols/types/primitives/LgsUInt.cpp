@@ -41,6 +41,6 @@ DIType* LgsUInt::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
 
-std::string LgsUInt::strFormatPart() const {
+std::string LgsUInt::fmtStr() const {
     return "%d";
 }

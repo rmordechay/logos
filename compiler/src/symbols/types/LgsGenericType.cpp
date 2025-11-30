@@ -31,7 +31,7 @@ LgsType* LgsGenericType::applyBinOp(LgsType* toType, LgsBinOp& op) {
     assert(0);
 }
 
-std::string LgsGenericType::strFormatPart() const {
+std::string LgsGenericType::fmtStr() const {
     assert(0);
 }
 

@@ -1539,7 +1539,7 @@ LgsExpr* LgsParser::parseConstant() {
         break;
     }
     case T_NULL: {
-        constant = new LgsNullableExpr(&LGS_NULL);
+        constant = new LgsNull();
         break;
     }
     default:

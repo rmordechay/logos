@@ -42,7 +42,7 @@ LgsType* LgsShort::applyBinOp(LgsType* toType, LgsBinOp& op) {
     assert(0);
 }
 
-std::string LgsShort::strFormatPart() const {
+std::string LgsShort::fmtStr() const {
     return "%d";
 }
 

@@ -54,7 +54,7 @@ public:
     size_t sizeBytes() override;
     std::string getName() override;
     std::string pname() override;
-    std::string strFormatPart() const override;
+    std::string fmtStr() const override;
     bool canCastTo(LgsType* other) override;
     bool equals(LgsType* other) override;
     LgsType* applyBinOp(LgsType* toType, LgsBinOp& op) override;

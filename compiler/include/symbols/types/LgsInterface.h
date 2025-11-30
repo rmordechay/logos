@@ -15,5 +15,5 @@ public:
     size_t sizeBytes() override;
     DIType* getDebugType(LgsCgModule& cg) override;
     Constant* getRTType(LgsCgModule& cg) override;
-    std::string strFormatPart() const override;
+    std::string fmtStr() const override;
 };

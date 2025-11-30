@@ -663,6 +663,7 @@ void LgsSema::visitExpr(LgsExpr*& expr) {
         else if (const auto vecExpr = expr->asVectorExpr()) visitVectorExpr(vecExpr);
         else if (const auto matrixExpr = expr->asMatrixExpr()) visitMatrixExpr(matrixExpr);
         else if (const auto nullableExpr = expr->asNullableExpr()) visitNullableExpr(nullableExpr);
+        else if (const auto null = expr->asNull()) visitNull(null);
         else if (const auto castExpr = expr->asCast()) visitCast(castExpr);
         else if (const auto json = expr->asJson()) visitJson(json);
     }
@@ -721,6 +722,10 @@ void LgsSema::visitNullableExpr(LgsNullableExpr* nullableExpr) {
     if (!nullableExpr->type || !nullableExpr->baseExpr->type->asNullable()) {
         nullableExpr->type = new LgsNullable(nullableExpr->baseExpr->type);
     }
+}
+
+void LgsSema::visitNull(LgsNull* null) {
+
 }
 
 void LgsSema::visitArrayExpr(LgsArrayExpr* arrayExpr) {

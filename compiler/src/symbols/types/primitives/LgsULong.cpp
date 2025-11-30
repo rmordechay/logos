@@ -37,6 +37,6 @@ DIType* LgsULong::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
 
-std::string LgsULong::strFormatPart() const {
+std::string LgsULong::fmtStr() const {
     return "%ul";
 }

@@ -125,7 +125,7 @@ Value* LgsInt::orIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     return orInt(cg, left, right);
 }
 
-std::string LgsInt::strFormatPart() const {
+std::string LgsInt::fmtStr() const {
     return "%d";
 }
 

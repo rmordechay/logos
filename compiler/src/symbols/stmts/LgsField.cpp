@@ -20,7 +20,7 @@ Value* LgsField::getGEP(LgsCgModule& cg) const {
 Value* LgsField::resolveVirtualField(LgsCgModule* cg, const LgsHashMap* vtable) const {
     const auto vtableMap = vtable->type->asMap();
     const auto fieldIRType = type->getIRType(*cg);
-    const auto keyIR = cg->getIRStr(name);
+    const auto keyIR = cg->getString(name);
     const auto vtableIRType = vtable->type->getIRType(*cg);
     const auto mapPtr = cg->builder.CreateGEP(vtableIRType, parentIRPtr, {cg->i64Zero()});
     const auto rv = vtableMap->getIRElement(*cg, mapPtr, keyIR);

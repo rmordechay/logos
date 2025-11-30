@@ -34,7 +34,7 @@ bool LgsTypePair::canCastTo(LgsType* other) {
     return key->canCastTo(otherPair->key) && value->canCastTo(otherPair->value);
 }
 
-std::string LgsTypePair::strFormatPart() const {
+std::string LgsTypePair::fmtStr() const {
     return "%s";
 }
 

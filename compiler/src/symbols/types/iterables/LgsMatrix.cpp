@@ -124,7 +124,7 @@ bool LgsMatrix::canCastTo(LgsType* other) {
     return false;
 }
 
-std::string LgsMatrix::strFormatPart() const {
+std::string LgsMatrix::fmtStr() const {
     return "%s";
 }
 

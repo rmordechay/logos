@@ -71,7 +71,7 @@ std::string LgsFuncType::pname() {
     return str.str();
 }
 
-std::string LgsFuncType::strFormatPart() const {
+std::string LgsFuncType::fmtStr() const {
     return "%p";
 }
 

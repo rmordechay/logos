@@ -30,7 +30,7 @@ LgsExpr* LgsChar::getZeroValue() {
     return new LgsCharConst('0');
 }
 
-std::string LgsChar::strFormatPart() const {
+std::string LgsChar::fmtStr() const {
     return "%c";
 }
 

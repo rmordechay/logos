@@ -39,6 +39,6 @@ public:
     Value* matMul(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right) const;
     static size_t getSwizzleSet(char c);
     static size_t getComponentIndex(char c);
-    std::string strFormatPart() const override;
+    std::string fmtStr() const override;
     DIType* getDebugType(LgsCgModule& cg) override;
 };

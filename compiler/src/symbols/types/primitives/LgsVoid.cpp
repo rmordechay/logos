@@ -28,7 +28,7 @@ LgsType* LgsVoid::applyBinOp(LgsType* toType, LgsBinOp& op) {
     assert(0);
 }
 
-std::string LgsVoid::strFormatPart() const {
+std::string LgsVoid::fmtStr() const {
     assert(0);
 }
 

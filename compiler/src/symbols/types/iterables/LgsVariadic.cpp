@@ -24,7 +24,7 @@ LgsType* LgsVariadic::applyBinOp(LgsType* toType, LgsBinOp& op) {
     assert(0);
 }
 
-std::string LgsVariadic::strFormatPart() const {
+std::string LgsVariadic::fmtStr() const {
     assert(0);
 }
 

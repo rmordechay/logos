@@ -30,7 +30,7 @@ LgsType* LgsSelf::applyBinOp(LgsType* toType, LgsBinOp& op) {
     assert(0);
 }
 
-std::string LgsSelf::strFormatPart() const {
+std::string LgsSelf::fmtStr() const {
     assert(0);
 }
 

@@ -5,7 +5,6 @@
 #include "types/primitives/LgsDouble.h"
 #include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsLong.h"
-#include "types/primitives/LgsSize.h"
 #include "LgsUtils.h"
 
 Value* LgsIntConst::loadIR(LgsCgModule& cg) {

@@ -132,13 +132,13 @@ LgsType* LgsObject::applyBinOp(LgsType* toType, LgsBinOp& op) {
     assert(0);
 }
 
-std::string LgsObject::strFormatPart() const {
+std::string LgsObject::fmtStr() const {
     std::stringstream str;
     str << '{';
     bool first = true;
     for (const auto& field : fields) {
         if (!first) str << ", ";
-        str << field->name << " = " << field->type->strFormatPart();
+        str << field->name << " = " << field->type->fmtStr();
         first = false;
     }
     str << '}';

@@ -34,7 +34,7 @@ public:
     Value* leIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
     Value* andIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
     Value* orIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
-    std::string strFormatPart() const override;
+    std::string fmtStr() const override;
     std::string getName() override;
     DIType* getDebugType(LgsCgModule& cg) override;
 };

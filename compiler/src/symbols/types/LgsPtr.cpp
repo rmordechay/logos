@@ -29,7 +29,7 @@ size_t LgsPtr::sizeBytes() {
 }
 
 LgsExpr* LgsPtr::getZeroValue() {
-    return new LgsNullableExpr(&LGS_NULL);
+    return new LgsNullableExpr(new LgsNull());
 }
 
 bool LgsPtr::canCastTo(LgsType* other) {
@@ -45,8 +45,8 @@ LgsType* LgsPtr::applyBinOp(LgsType* toType, LgsBinOp& op) {
     assert(0);
 }
 
-std::string LgsPtr::strFormatPart() const {
-    return baseType->strFormatPart();
+std::string LgsPtr::fmtStr() const {
+    return baseType->fmtStr();
 }
 
 DIType* LgsPtr::getDebugType(LgsCgModule& cg) {

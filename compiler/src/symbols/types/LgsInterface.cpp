@@ -49,6 +49,6 @@ Constant* LgsInterface::getRTType(LgsCgModule& cg) {
     assert(0);
 }
 
-std::string LgsInterface::strFormatPart() const {
+std::string LgsInterface::fmtStr() const {
     assert(0);
 }

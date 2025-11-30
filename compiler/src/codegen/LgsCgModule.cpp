@@ -114,7 +114,7 @@ void LgsCgModule::loop(Value* loopLength, const std::function<void(Value*, Basic
     startBlock(exitBlock);
 }
 
-Constant* LgsCgModule::getIRStr(const std::string& value) {
+Constant* LgsCgModule::getString(const std::string& value) {
     for (auto& globals : IRModule->globals()) {
         if (!globals.hasInitializer()) continue;
         const auto dataArray = llvm::dyn_cast<llvm::ConstantDataArray>(globals.getInitializer());
@@ -205,7 +205,7 @@ void LgsCgModule::createBoundsGuard(Value* len, Value* index) {
     const auto invalidBlock = createBlock();
     builder.CreateCondBr(condition, invalidBlock, validBlock);
     startBlock(invalidBlock);
-    callRuntimeFunc("throwError", voidTy(), {ptrTy()}, {getIRStr(E10003.msg)});
+    callRuntimeFunc("throwError", voidTy(), {ptrTy()}, {getString(E10003.msg)});
     branchAndStartBlock(validBlock);
 }
 
@@ -274,8 +274,8 @@ void LgsCgModule::callMemCpy(Value* dest, Value* src, Value* size) {
     builder.CreateMemCpy(dest, llvm::MaybeAlign(), src, llvm::MaybeAlign(), size);
 }
 
-Value* LgsCgModule::allocate(Constant* type, const bool isOwner) {
-    return callRuntimeFunc("allocate", ptrTy(), {ptrTy(), i1Ty()}, {type, i1(isOwner)});
+Value* LgsCgModule::allocate(Value* size, Constant* type, const bool isOwner) {
+    return callRuntimeFunc("allocate", ptrTy(), {sizeTy(), ptrTy(), i1Ty()}, {extendToSize(size), type, i1(isOwner)});
 }
 
 void LgsCgModule::callStackPush() {
@@ -412,17 +412,17 @@ Value* LgsCgModule::emptyStr() {
 }
 
 void LgsCgModule::printStr(const std::string& str) {
-    callPrintf({getIRStr("%s"), getIRStr(str)});
+    callPrintf({getString("%s"), getString(str)});
 }
 
 void LgsCgModule::printPtr(Value* ptr, const std::string& text) {
     if (text != "") printStr(text);
-    callPrintf({getIRStr("%p\n"), ptr});
+    callPrintf({getString("%p\n"), ptr});
 }
 
 void LgsCgModule::printInt(Value* number, const std::string& text) {
     if (text != "") printStr(text);
-    callPrintf({getIRStr("%d\n"), number});
+    callPrintf({getString("%d\n"), number});
 }
 
 void LgsCgModule::finalizeDebugger(const fs::path& buildPath) const {

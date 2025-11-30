@@ -25,7 +25,7 @@ public:
     Value* bitXorIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
     Value* rshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
     Value* lshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* other) override;
-    std::string strFormatPart() const override;
+    std::string fmtStr() const override;
     std::string getName() override;
     bool canCastTo(LgsType* other) override;
     DIType* getDebugType(LgsCgModule& cg) override;

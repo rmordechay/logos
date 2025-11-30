@@ -26,7 +26,7 @@ LgsType* LgsUnknown::applyBinOp(LgsType* toType, LgsBinOp& op) {
     assert(0);
 }
 
-std::string LgsUnknown::strFormatPart() const {
+std::string LgsUnknown::fmtStr() const {
     assert(0);
 }
 

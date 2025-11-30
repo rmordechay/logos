@@ -38,8 +38,8 @@ LgsType* LgsSubType::applyBinOp(LgsType* toType, LgsBinOp& op) {
     assert(0);
 }
 
-std::string LgsSubType::strFormatPart() const {
-    return subtype->strFormatPart();
+std::string LgsSubType::fmtStr() const {
+    return subtype->fmtStr();
 }
 
 DIType* LgsSubType::getDebugType(LgsCgModule& cg) {

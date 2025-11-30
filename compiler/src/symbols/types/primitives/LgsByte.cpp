@@ -95,7 +95,7 @@ bool LgsByte::canCastTo(LgsType* other) {
     return name == IRName;
 }
 
-std::string LgsByte::strFormatPart() const {
+std::string LgsByte::fmtStr() const {
     return "%d";
 }
 
