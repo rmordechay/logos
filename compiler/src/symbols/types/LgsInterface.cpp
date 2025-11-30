@@ -33,11 +33,15 @@ bool LgsInterface::canCastTo(LgsType* other) {
     return false;
 }
 
+LgsType* LgsInterface::applyBinOp(LgsType* toType, LgsBinOp& op) {
+    assert(0);
+}
+
 size_t LgsInterface::sizeBytes() {
     return 0;
 }
 
-llvm::DIType* LgsInterface::getDebugType(LgsCgModule& cg) {
+DIType* LgsInterface::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
 

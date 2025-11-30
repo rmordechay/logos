@@ -25,7 +25,7 @@ Constant* LgsSArray::getRTType(LgsCgModule& cg) {
     const auto constSize = size->getConstInt();
     if (!constSize) return nullptr;
     const auto sArrSize = cg.usize(*constSize);
-    const auto sv = llvm::ConstantStruct::get(st, {sArrSize, baseType->getRTType(cg)});
+    const auto sv = ConstantStruct::get(st, {sArrSize, baseType->getRTType(cg)});
     return cg.getRTTypeInfo(genericName, sizeBytes(), sizeBytes(), RTT_SARRAY, sv);
 }
 
@@ -144,6 +144,6 @@ bool LgsSArray::canCastTo(LgsType* other) {
     return baseType->canCastTo(otherArr->baseType);
 }
 
-llvm::DIType* LgsSArray::getDebugType(LgsCgModule& cg) {
+DIType* LgsSArray::getDebugType(LgsCgModule& cg) {
     assert(0);
 }

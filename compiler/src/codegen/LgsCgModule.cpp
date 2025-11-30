@@ -171,7 +171,7 @@ Constant* LgsCgModule::getRTTypeInfo(const std::string& name, const size_t size,
 }
 
 StructType* LgsCgModule::getRTBaseType() {
-    const auto typeInfoMatrix = getStructType({sizeTy(), sizeTy(), ptrTy()}, LGS_TYPEINFO_PREFIX"Matrix"); // Biggest
+    const auto typeInfoMatrix = getStructType({sizeTy(), sizeTy(), ptrTy()}, "Matrix"); // Biggest
     return getStructType({sizeTy(), sizeTy(), ptrTy(), typeInfoMatrix}, "RTI");
 }
 

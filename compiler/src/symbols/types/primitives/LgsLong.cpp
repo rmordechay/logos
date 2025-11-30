@@ -92,7 +92,7 @@ bool LgsLong::canCastTo(LgsType* other) {
     return name == otherName;
 }
 
-llvm::DIType* LgsLong::getDebugType(LgsCgModule& cg) {
+DIType* LgsLong::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
 

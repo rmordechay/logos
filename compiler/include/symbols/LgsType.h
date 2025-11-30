@@ -76,7 +76,7 @@ public:
     virtual bool canCastTo(LgsType* other) = 0;
     virtual std::string strFormatPart() const = 0;
     virtual DIType* getDebugType(LgsCgModule& cg) = 0;
-    virtual LgsType* applyBinOp(LgsType* toType, LgsBinOp& op);
+    virtual LgsType* applyBinOp(LgsType* toType, LgsBinOp& op) = 0;
     virtual void hashNode(size_t& oldHash);
     virtual std::string getName() = 0;
     virtual std::string pname(); // pretty name

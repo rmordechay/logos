@@ -106,7 +106,7 @@ LgsType* LgsMatrix::getValueType() {
 Constant* LgsMatrix::getRTType(LgsCgModule& cg) {
     const auto genericName = getGenericName();
     const auto st = cg.getStructType({cg.sizeTy(), cg.sizeTy(), cg.ptrTy()}, genericName);
-    const auto sv = llvm::ConstantStruct::get(st, {cg.usize(rows), cg.usize(columns), baseType->getRTType(cg)});
+    const auto sv = ConstantStruct::get(st, {cg.usize(rows), cg.usize(columns), baseType->getRTType(cg)});
     return cg.getRTTypeInfo(genericName, sizeBytes(), sizeBytes(), RTT_MATRIX, sv);
 }
 
@@ -144,7 +144,7 @@ Value* LgsMatrix::lenIR(LgsCgModule& cg, Value* iterable) {
     return cg.i32(rows);
 }
 
-llvm::DIType* LgsMatrix::getDebugType(LgsCgModule& cg) {
+DIType* LgsMatrix::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
 

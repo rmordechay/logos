@@ -12,7 +12,6 @@ public:
 
     LgsBinaryExpr(LgsExpr* left, LgsExpr* right, const LgsBinOp& op) : left(left), right(right), op(op) {}
     Value* loadIR(LgsCgModule& cg) override;
-    Value* castIR(LgsCgModule& cg, LgsType* toType) override;
     void setDebugValue(LgsCgModule& cg) override;
     bool equals(LgsExpr* other) override;
     std::string asText() override;

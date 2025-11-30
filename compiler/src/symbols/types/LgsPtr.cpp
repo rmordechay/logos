@@ -6,6 +6,7 @@
 #include "types/iterables/LgsSArray.h"
 #include "types/primitives/LgsLong.h"
 #include "LgsUtils.h"
+#include "exprs/LgsNullableExpr.h"
 
 std::string LgsPtr::getName() {
     return name;
@@ -28,7 +29,7 @@ size_t LgsPtr::sizeBytes() {
 }
 
 LgsExpr* LgsPtr::getZeroValue() {
-    return new LgsNull();
+    return new LgsNullableExpr(&LGS_NULL);
 }
 
 bool LgsPtr::canCastTo(LgsType* other) {
@@ -40,11 +41,15 @@ bool LgsPtr::canCastTo(LgsType* other) {
     return name == IRName;
 }
 
+LgsType* LgsPtr::applyBinOp(LgsType* toType, LgsBinOp& op) {
+    assert(0);
+}
+
 std::string LgsPtr::strFormatPart() const {
     return baseType->strFormatPart();
 }
 
-llvm::DIType* LgsPtr::getDebugType(LgsCgModule& cg) {
+DIType* LgsPtr::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
 

@@ -3,11 +3,11 @@
 
 #include <cassert>
 
-llvm::Type* LgsGenericType::getIRType(LgsCgModule& cg) {
+Type* LgsGenericType::getIRType(LgsCgModule& cg) {
     assert(0);
 }
 
-llvm::Constant* LgsGenericType::getRTType(LgsCgModule& cg) {
+Constant* LgsGenericType::getRTType(LgsCgModule& cg) {
     assert(0);
 }
 
@@ -27,10 +27,14 @@ bool LgsGenericType::canCastTo(LgsType* other) {
     return true;
 }
 
+LgsType* LgsGenericType::applyBinOp(LgsType* toType, LgsBinOp& op) {
+    assert(0);
+}
+
 std::string LgsGenericType::strFormatPart() const {
     assert(0);
 }
 
-llvm::DIType* LgsGenericType::getDebugType(LgsCgModule& cg) {
+DIType* LgsGenericType::getDebugType(LgsCgModule& cg) {
     assert(0);
 }

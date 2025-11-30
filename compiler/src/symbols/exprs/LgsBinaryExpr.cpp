@@ -6,10 +6,6 @@ Value* LgsBinaryExpr::loadIR(LgsCgModule& cg) {
     return IRValue;
 }
 
-Value* LgsBinaryExpr::castIR(LgsCgModule& cg, LgsType* toType) {
-    assert(0);
-}
-
 void LgsBinaryExpr::setDebugValue(LgsCgModule& cg) {
     cg.builder.SetCurrentDebugLocation(cg.getDebugLoc(location));
 }

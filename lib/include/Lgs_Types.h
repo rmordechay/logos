@@ -77,6 +77,7 @@ struct Lgs_Matrix {
 
 struct Lgs_Nullable {
     Lgs_TypeInfo* baseType;
+    bool isPtr;
 };
 
 struct Lgs_TypeInfo {

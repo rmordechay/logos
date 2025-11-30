@@ -34,6 +34,10 @@ std::string LgsChar::strFormatPart() const {
     return "%c";
 }
 
+LgsType* LgsChar::applyBinOp(LgsType* toType, LgsBinOp& op) {
+    assert(0);
+}
+
 bool LgsChar::canCastTo(LgsType* other) {
     const auto IRName = other->getName();
     if (IRName == LgsAny::name) return true;
@@ -47,6 +51,6 @@ bool LgsChar::canCastTo(LgsType* other) {
     return name == IRName;
 }
 
-llvm::DIType* LgsChar::getDebugType(LgsCgModule& cg) {
+DIType* LgsChar::getDebugType(LgsCgModule& cg) {
     assert(0);
 }

@@ -24,14 +24,14 @@ LgsField* LgsVec::getField(const std::string& fieldName) {
 }
 
 Type* LgsVec::getIRType(LgsCgModule& cg) {
-    IRType = llvm::FixedVectorType::get(baseType->getIRType(cg), vectorDim);
+    IRType = FixedVectorType::get(baseType->getIRType(cg), vectorDim);
     return IRType;
 }
 
 Constant* LgsVec::getRTType(LgsCgModule& cg) {
     const auto genericName = getGenericName();
     const auto st = cg.getStructType({cg.ptrTy()}, genericName);
-    const auto sv = llvm::ConstantStruct::get(st, {baseType->getRTType(cg)});
+    const auto sv = ConstantStruct::get(st, {baseType->getRTType(cg)});
     if (vectorDim == 2) {
         return cg.getRTTypeInfo(genericName, sizeBytes(), sizeBytes(), RTT_VEC2, sv);
     }
@@ -133,7 +133,7 @@ Value* LgsVec::subIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
 
 Value* LgsVec::mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     if (right->type->isNumber()) {
-        const auto vecTy = llvm::cast<llvm::VectorType>(getIRType(cg));
+        const auto vecTy = llvm::cast<VectorType>(getIRType(cg));
         right->IRValue = cg.builder.CreateSIToFP(right->IRValue, vecTy->getElementType());
         right->IRValue = cg.builder.CreateVectorSplat(vecTy->getElementCount(), right->IRValue);
         return cg.builder.CreateFMul(left->loadIR(cg), right->loadIR(cg));
@@ -142,7 +142,7 @@ Value* LgsVec::mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
         return matMul(cg, left, right);
     }
     if (right->IRValue->getType()->isFloatingPointTy()) {
-        const auto vecTy = llvm::cast<llvm::VectorType>(left->IRValue->getType());
+        const auto vecTy = llvm::cast<VectorType>(left->IRValue->getType());
         right->IRValue = cg.builder.CreateVectorSplat(vecTy->getElementCount(), right->IRValue);
         return cg.builder.CreateFMul(left->IRValue, right->IRValue);
     }
@@ -151,13 +151,13 @@ Value* LgsVec::mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
 
 Value* LgsVec::divIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     if (right->IRValue->getType()->isIntegerTy()) {
-        const auto vecTy = llvm::cast<llvm::VectorType>(getIRType(cg));
+        const auto vecTy = llvm::cast<VectorType>(getIRType(cg));
         right->IRValue = cg.builder.CreateSIToFP(right->IRValue, vecTy->getElementType());
         right->IRValue = cg.builder.CreateVectorSplat(vecTy->getElementCount(), right->IRValue);
         return cg.builder.CreateFDiv(left->loadIR(cg), right->loadIR(cg));
     }
     if (right->IRValue->getType()->isFloatingPointTy()) {
-        const auto vecTy = llvm::cast<llvm::VectorType>(left->IRValue->getType());
+        const auto vecTy = llvm::cast<VectorType>(left->IRValue->getType());
         right->IRValue = cg.builder.CreateVectorSplat(vecTy->getElementCount(), right->IRValue);
         return cg.builder.CreateFDiv(left->IRValue, right->IRValue);
     }
@@ -260,6 +260,6 @@ std::string LgsVec::strFormatPart() const {
     return str.str();
 }
 
-llvm::DIType* LgsVec::getDebugType(LgsCgModule& cg) {
+DIType* LgsVec::getDebugType(LgsCgModule& cg) {
     assert(0);
 }

@@ -4,11 +4,11 @@
 
 #include <cassert>
 
-llvm::Type* LgsTypePair::getIRType(LgsCgModule& cg) {
+Type* LgsTypePair::getIRType(LgsCgModule& cg) {
     assert(0);
 }
 
-llvm::Constant* LgsTypePair::getRTType(LgsCgModule& cg) {
+Constant* LgsTypePair::getRTType(LgsCgModule& cg) {
     assert(0);
 }
 
@@ -38,7 +38,11 @@ std::string LgsTypePair::strFormatPart() const {
     return "%s";
 }
 
-llvm::DIType* LgsTypePair::getDebugType(LgsCgModule& cg) {
+LgsType* LgsTypePair::applyBinOp(LgsType* toType, LgsBinOp& op) {
+    assert(0);
+}
+
+DIType* LgsTypePair::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
 

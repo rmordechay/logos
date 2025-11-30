@@ -19,17 +19,13 @@ class LgsAssignment;
 
 class LgsStmt : virtual public LgsValue {
 public:
-    bool isTerminator();
     LgsForLoop* asLoop();
     LgsCoroutine* asCoroutine();
     LgsDeferStmt* asDefer();
-    LgsFuncCall* asFuncCall();
     LgsIfStmt* asIfStmt();
     LgsIOStmt* asIOStmt();
     LgsSwitch* asSwitch();
-    LgsPostfixExpr* asPostfixExpr();
     LgsExpr* asExpr();
-    LgsSelection* asSelection();
     LgsBreak* asBreak();
     LgsContinue* asContinue();
     LgsReturn* asReturn();

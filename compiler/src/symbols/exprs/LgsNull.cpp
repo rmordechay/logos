@@ -3,21 +3,17 @@
 #include "LgsDefinitions.h"
 #include <llvm/IR/Module.h>
 
-void LgsNull::castImplicitly(LgsType* toType) {
-    const auto otherNullable = toType->asNullable();
-    if (!otherNullable) return;
-    type->asNullable()->baseType = otherNullable->baseType;
+Value* LgsNull::loadIR(LgsCgModule& cg) {
+    return IRValue;
 }
+
+void LgsNull::castImplicitly(LgsType* toType) {}
 
 std::string LgsNull::asText() {
     return LGS_NULL_LITERAL;
 }
 
 bool LgsNull::equals(LgsExpr* other) {
-    assert(0);
-}
-
-Value* LgsNull::castIR(LgsCgModule& cg, LgsType* toType) {
     assert(0);
 }
 

@@ -57,6 +57,7 @@ public:
     std::string strFormatPart() const override;
     bool canCastTo(LgsType* other) override;
     bool equals(LgsType* other) override;
+    LgsType* applyBinOp(LgsType* toType, LgsBinOp& op) override;
     void setFuncOptions(uint32_t ops);
     std::unordered_map<std::string, LgsParam*> getParamsByName();
     DIType* getDebugType(LgsCgModule& cg) override;

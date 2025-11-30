@@ -22,7 +22,6 @@ public:
         }
     }
     LgsExpr* castExplicitly(LgsType* toType) override;
-    Value* castIR(LgsCgModule& cg, LgsType* toType) override;
     Value* loadIR(LgsCgModule& cg) override;
     std::string asText() override;
     Value* hashValue(LgsCgModule& cg) override;

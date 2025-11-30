@@ -8,14 +8,18 @@ void LgsStmtsBlock::hashNode(size_t& oldHash) {
     }
 }
 
+
 LgsStmtsBlock::~LgsStmtsBlock() {
     for (const auto& stmt : stmts) {
         switch (stmt.type) {
-        case LgsObjOrStmt::Type::Object:
+        case LgsStmtWrapper::Type::Object:
             freeType(stmt.obj);
             break;
-        case LgsObjOrStmt::Type::Stmt:
+        case LgsStmtWrapper::Type::Stmt:
             freeStmt(stmt.stmt);
+            break;
+        case LgsStmtWrapper::Type::Expr:
+            freeExpr(stmt.expr);
             break;
         }
     }

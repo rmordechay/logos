@@ -121,7 +121,7 @@ LgsType* LgsType::extendInt() {
 LgsType* LgsType::applyIntBinOp(LgsType* toType, const LgsBinOpType op) {
     switch (op) {
     case POW:
-        if (toType->canCastTo(this)) return &LGS_DOUBLE;
+        if (canCastTo(toType)) return &LGS_DOUBLE;
         break;
     case ADD:
     case SUB:
@@ -133,7 +133,7 @@ LgsType* LgsType::applyIntBinOp(LgsType* toType, const LgsBinOpType op) {
     case LSHIFT:
     case RSHIFT:
         if (toType->asFloat()) return toType;
-        if (toType->canCastTo(this)) return this;
+        if (canCastTo(toType)) return this;
         break;
     case DIV:
         if (toType->isNumber()) return &LGS_FLOAT;
@@ -144,7 +144,7 @@ LgsType* LgsType::applyIntBinOp(LgsType* toType, const LgsBinOpType op) {
     case GT:
     case GE:
     case LE: {
-        if (toType->canCastTo(this)) return &LGS_BOOL;
+        if (canCastTo(toType)) return &LGS_BOOL;
         break;
     }
     case IN: {

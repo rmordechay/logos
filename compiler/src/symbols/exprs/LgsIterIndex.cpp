@@ -89,10 +89,6 @@ LgsExpr* LgsIterIndex::getBaseExpr() const {
     }
 }
 
-Value* LgsIterIndex::castIR(LgsCgModule& cg, LgsType* toType) {
-    assert(0);
-}
-
 void LgsIterIndex::setIRRangePtr(LgsCgModule& cg, bool assign) {
     assert(!assign);
     const auto fromIR = index.from->IRValue;

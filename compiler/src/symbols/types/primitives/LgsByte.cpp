@@ -99,6 +99,6 @@ std::string LgsByte::strFormatPart() const {
     return "%d";
 }
 
-llvm::DIType* LgsByte::getDebugType(LgsCgModule& cg) {
+DIType* LgsByte::getDebugType(LgsCgModule& cg) {
     assert(0);
 }

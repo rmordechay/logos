@@ -18,7 +18,7 @@ Type* LgsMap::getIRType(LgsCgModule& cg) {
 Constant* LgsMap::getRTType(LgsCgModule& cg) {
     const auto genericName = getGenericName();
     const auto st = cg.getStructType({cg.ptrTy(), cg.ptrTy()}, genericName);
-    const auto sv = llvm::ConstantStruct::get(st, {mapType->key->getRTType(cg), mapType->value->getRTType(cg)});
+    const auto sv = ConstantStruct::get(st, {mapType->key->getRTType(cg), mapType->value->getRTType(cg)});
     return cg.getRTTypeInfo(genericName, sizeBytes(), sizeof(void*), RTT_MAP, sv);
 }
 
@@ -46,6 +46,10 @@ LgsType* LgsMap::getIndexType() {
 
 LgsType* LgsMap::getValueType() {
     return mapType->value;
+}
+
+LgsType* LgsMap::applyBinOp(LgsType* toType, LgsBinOp& op) {
+    assert(0);
 }
 
 bool LgsMap::inferBaseType(const std::vector<LgsExpr*>& args) {
@@ -100,6 +104,6 @@ std::string LgsMap::strFormatPart() const {
     return "%s";
 }
 
-llvm::DIType* LgsMap::getDebugType(LgsCgModule& cg) {
+DIType* LgsMap::getDebugType(LgsCgModule& cg) {
     assert(0);
 }

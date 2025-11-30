@@ -28,7 +28,7 @@ Type* LgsDArray::getIRType(LgsCgModule& cg) {
 Constant* LgsDArray::getRTType(LgsCgModule& cg) {
     const auto genericName = getGenericName();
     const auto st = cg.getStructType({cg.ptrTy()}, genericName);
-    const auto sv = llvm::ConstantStruct::get(st, {baseType->getRTType(cg)});
+    const auto sv = ConstantStruct::get(st, {baseType->getRTType(cg)});
     return cg.getRTTypeInfo(genericName, sizeBytes(), sizeof(void*), RTT_DARRAY, sv);
 }
 
@@ -96,19 +96,19 @@ bool LgsDArray::canCastTo(LgsType* other) {
     return baseType->canCastTo(otherArr->baseType);
 }
 
-llvm::DIType* LgsDArray::getDebugType(LgsCgModule& cg) {
+DIType* LgsDArray::getDebugType(LgsCgModule& cg) {
     const auto di = cg.debugger.diBuilder;
     const auto file = cg.debugger.diFile;
     constexpr auto ptrSizeInBits = sizeof(void*) * 8;
-    const auto t_data = di->createPointerType(di->createBasicType("char", 8, llvm::dwarf::DW_ATE_unsigned_char), ptrSizeInBits);
-    const auto t_length = di->createBasicType("size_t", ptrSizeInBits, llvm::dwarf::DW_ATE_unsigned);
+    const auto t_data = di->createPointerType(di->createBasicType("char", 8, dwarf::DW_ATE_unsigned_char), ptrSizeInBits);
+    const auto t_length = di->createBasicType("size_t", ptrSizeInBits, dwarf::DW_ATE_unsigned);
     const auto t_capacity = t_length;
     const auto t_base = di->createPointerType(baseType->getDebugType(cg), ptrSizeInBits);
-    llvm::Metadata* fields[] = {
-        di->createMemberType(nullptr, "data", file, 0, ptrSizeInBits, ptrSizeInBits, 0, llvm::DINode::FlagZero, t_data),
-        di->createMemberType(nullptr, "length", file, 0, ptrSizeInBits, ptrSizeInBits, ptrSizeInBits,llvm::DINode::FlagZero, t_length),
-        di->createMemberType(nullptr, "capacity", file, 0, ptrSizeInBits, ptrSizeInBits, sizeof(void*) * 16,llvm::DINode::FlagZero, t_capacity),
-        di->createMemberType(nullptr, "baseType", file, 0, ptrSizeInBits, ptrSizeInBits, sizeof(void*) * 24,llvm::DINode::FlagZero, t_base)
+    Metadata* fields[] = {
+        di->createMemberType(nullptr, "data", file, 0, ptrSizeInBits, ptrSizeInBits, 0, DINode::FlagZero, t_data),
+        di->createMemberType(nullptr, "length", file, 0, ptrSizeInBits, ptrSizeInBits, ptrSizeInBits,DINode::FlagZero, t_length),
+        di->createMemberType(nullptr, "capacity", file, 0, ptrSizeInBits, ptrSizeInBits, sizeof(void*) * 16,DINode::FlagZero, t_capacity),
+        di->createMemberType(nullptr, "baseType", file, 0, ptrSizeInBits, ptrSizeInBits, sizeof(void*) * 24,DINode::FlagZero, t_base)
     };
 
     return di->createStructType(
@@ -118,7 +118,7 @@ llvm::DIType* LgsDArray::getDebugType(LgsCgModule& cg) {
         0,
         ptrSizeInBits * 4,
         ptrSizeInBits,
-        llvm::DINode::FlagZero,
+        DINode::FlagZero,
         nullptr,
         di->getOrCreateArray(fields)
     );

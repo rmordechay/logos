@@ -31,27 +31,6 @@ LgsExpr* LgsIntConst::castExplicitly(LgsType* toType) {
     return nullptr;
 }
 
-Value* LgsIntConst::castIR(LgsCgModule& cg, LgsType* toType) {
-    if (type->getName() == toType->getName()) return IRValue;
-    if (toType->asGeneric()) return IRValue;
-    if (toType->asLong()) {
-        return cg.i64(value);
-    }
-    if (toType->asSize()) {
-        return cg.usize(value);
-    }
-    if (toType->asFloat()) {
-        return cg.floatv(value);
-    }
-    if (toType->asDouble()) {
-        return cg.doublev(value);
-    }
-    if (toType->asStr()) {
-        return cg.getIRStr(std::to_string(value));
-    }
-    assert(0);
-}
-
 bool LgsIntConst::equals(LgsExpr* other) {
     assert(0);
 }

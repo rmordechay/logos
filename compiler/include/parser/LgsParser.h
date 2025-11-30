@@ -9,6 +9,7 @@
 #include "funcs/LgsMainFunc.h"
 #include "lgsc/LgsCCompiler.h"
 #include "stmts/LgsAssignment.h"
+#include "stmts/LgsStmtsBlock.h"
 
 class LgsMetaSelection;
 class LgsMatrixExpr;
@@ -119,7 +120,7 @@ public:
     LgsStmtsBlock* parseStmtsBlock(bool withSingleStmt = true);
     LgsVarDec* parseVarDec();
     LgsAssignType parseAssignType();
-    LgsStmt* parseAssignOrExpr();
+    LgsStmt* parseAssignment();
     LgsStmt* parseIfStmt();
     LgsSwitch* parseSwitch();
     LgsStmt* parseBoolSwitch();

@@ -3,11 +3,11 @@
 
 #include <cassert>
 
-llvm::Type* LgsSubType::getIRType(LgsCgModule& cg) {
+Type* LgsSubType::getIRType(LgsCgModule& cg) {
     return subtype->getIRType(cg);
 }
 
-llvm::Constant* LgsSubType::getRTType(LgsCgModule& cg) {
+Constant* LgsSubType::getRTType(LgsCgModule& cg) {
     assert(0);
 }
 
@@ -34,10 +34,14 @@ bool LgsSubType::canCastTo(LgsType* other) {
     return getName() == otherName;
 }
 
+LgsType* LgsSubType::applyBinOp(LgsType* toType, LgsBinOp& op) {
+    assert(0);
+}
+
 std::string LgsSubType::strFormatPart() const {
     return subtype->strFormatPart();
 }
 
-llvm::DIType* LgsSubType::getDebugType(LgsCgModule& cg) {
+DIType* LgsSubType::getDebugType(LgsCgModule& cg) {
     assert(0);
 }

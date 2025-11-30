@@ -130,6 +130,6 @@ bool LgsBool::canCastTo(LgsType* other) {
     return name == otherName;
 }
 
-llvm::DIType* LgsBool::getDebugType(LgsCgModule& cg) {
+DIType* LgsBool::getDebugType(LgsCgModule& cg) {
     assert(0);
 }

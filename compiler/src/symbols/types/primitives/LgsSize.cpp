@@ -132,6 +132,6 @@ std::string LgsSize::strFormatPart() const {
     return "%zu";
 }
 
-llvm::DIType* LgsSize::getDebugType(LgsCgModule& cg) {
+DIType* LgsSize::getDebugType(LgsCgModule& cg) {
     assert(0);
 }

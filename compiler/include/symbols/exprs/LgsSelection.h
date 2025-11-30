@@ -11,7 +11,6 @@ public:
     Value* loadIR(LgsCgModule& cg) override;
     LgsExpr* lastExpr() const;
     LgsFuncCall* asMethodCall() const;
-    Value* castIR(LgsCgModule& cg, LgsType* toType) override;
     void assign(LgsCgModule& cg, LgsExpr* expr) override;
     std::string asText() override;
     Value* hashValue(LgsCgModule& cg) override;

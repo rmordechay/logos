@@ -8,15 +8,6 @@ Value* LgsArrayExpr::loadIR(LgsCgModule& cg) {
     return cg.builder.CreateLoad(type->getIRType(cg), IRValue);
 }
 
-Value* LgsArrayExpr::castIR(LgsCgModule& cg, LgsType* toType) {
-    if (const auto sArr = type->asSArray()) {
-        if (toType->asStr() && sArr->baseType->asChar()) {
-            return IRValue;
-        }
-    }
-    return IRValue;
-}
-
 void LgsArrayExpr::castImplicitly(LgsType* toType) {
     // Replace static and dynamic if needed
     if (!type && toType->asSArray()) {

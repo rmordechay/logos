@@ -28,6 +28,10 @@ bool LgsEnum::canCastTo(LgsType* other) {
     return name == otherName;
 }
 
+LgsType* LgsEnum::applyBinOp(LgsType* toType, LgsBinOp& op) {
+    assert(0);
+}
+
 std::string LgsEnum::strFormatPart() const {
     return "%s";
 }
@@ -36,6 +40,6 @@ size_t LgsEnum::sizeBytes() {
     return sizeof(void*);
 }
 
-llvm::DIType* LgsEnum::getDebugType(LgsCgModule& cg) {
+DIType* LgsEnum::getDebugType(LgsCgModule& cg) {
     assert(0);
 }

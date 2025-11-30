@@ -12,10 +12,6 @@ LgsExpr* LgsInstance::castExplicitly(LgsType* toType) {
     assert(0);
 }
 
-Value* LgsInstance::castIR(LgsCgModule& cg, LgsType* toType) {
-    return IRValue;
-}
-
 Value* LgsInstance::loadIR(LgsCgModule& cg) {
     return IRValue;
 }

@@ -20,7 +20,6 @@ public:
     explicit LgsInstance(LgsObject* obj) : LgsExpr(obj), name(obj->name), obj(obj) {}
     std::string asText() override;
     LgsExpr* castExplicitly(LgsType* toType) override;
-    Value* castIR(LgsCgModule& cg, LgsType* toType) override;
     Value* loadIR(LgsCgModule& cg) override;
     void hashNode(size_t& oldHash) override;
     void setObject(LgsObject* newObj);

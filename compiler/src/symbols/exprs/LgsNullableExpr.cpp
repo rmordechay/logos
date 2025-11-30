@@ -6,7 +6,7 @@ std::string LgsNullableExpr::asText() {
 }
 
 Value* LgsNullableExpr::loadIR(LgsCgModule& cg) {
-    assert(0);
+    return cg.builder.CreateLoad(type->getIRType(cg), IRValue);
 }
 
 void LgsNullableExpr::setDebugValue(LgsCgModule& cg) {
@@ -22,11 +22,7 @@ LgsExpr* LgsNullableExpr::castExplicitly(LgsType* toType) {
 }
 
 void LgsNullableExpr::castImplicitly(LgsType* toType) {
-    assert(0);
-}
 
-Value* LgsNullableExpr::castIR(LgsCgModule& cg, LgsType* toType) {
-    assert(0);
 }
 
 Value* LgsNullableExpr::hashValue(LgsCgModule& cg) {

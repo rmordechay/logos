@@ -18,12 +18,6 @@ LgsExpr* LgsStrConst::castExplicitly(LgsType* toType) {
     return nullptr;
 }
 
-Value* LgsStrConst::castIR(LgsCgModule& cg, LgsType* toType) {
-    if (toType->asStr()) return IRValue;
-    if (toType->asGeneric()) return IRValue;
-    return IRValue;
-}
-
 Value* LgsStrConst::loadIR(LgsCgModule& cg) {
     return IRValue;
 }

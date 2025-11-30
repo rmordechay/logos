@@ -11,13 +11,8 @@ public:
         : condExpr(codeExpr), thenExpr(thenExpr), elseExpr(elseExpr) {
     }
     std::string asText() override;
-    Value* castIR(LgsCgModule& cg, LgsType* toType) override;
 };
 
 inline std::string LgsTernaryExpr::asText() {
-    assert(0);
-}
-
-inline Value* LgsTernaryExpr::castIR(LgsCgModule& cg, LgsType* toType) {
     assert(0);
 }

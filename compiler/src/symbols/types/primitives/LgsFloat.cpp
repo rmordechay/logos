@@ -75,6 +75,6 @@ Value* LgsFloat::divIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     return cg.builder.CreateFDiv(l, r);
 }
 
-llvm::DIType* LgsFloat::getDebugType(LgsCgModule& cg) {
+DIType* LgsFloat::getDebugType(LgsCgModule& cg) {
     assert(0);
 }

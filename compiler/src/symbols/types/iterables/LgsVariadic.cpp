@@ -20,11 +20,15 @@ bool LgsVariadic::canCastTo(LgsType* other) {
     assert(0);
 }
 
+LgsType* LgsVariadic::applyBinOp(LgsType* toType, LgsBinOp& op) {
+    assert(0);
+}
+
 std::string LgsVariadic::strFormatPart() const {
     assert(0);
 }
 
-llvm::DIType* LgsVariadic::getDebugType(LgsCgModule& cg) {
+DIType* LgsVariadic::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
 

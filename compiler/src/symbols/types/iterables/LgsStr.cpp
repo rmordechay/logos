@@ -2,6 +2,7 @@
 #include "exprs/constants/LgsStrConst.h"
 #include "LgsConfigs.h"
 #include "types/LgsAny.h"
+#include "types/LgsNullable.h"
 #include "types/iterables/LgsSArray.h"
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsChar.h"
@@ -110,8 +111,8 @@ Value* LgsStr::inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) {
     return cg.builder.CreateIsNotNull(rv);
 }
 
-llvm::DIType* LgsStr::getDebugType(LgsCgModule& cg) {
+DIType* LgsStr::getDebugType(LgsCgModule& cg) {
     const auto& diBuilder = cg.debugger.diBuilder;
-    const auto charType = diBuilder->createBasicType("char", sizeof(char), llvm::dwarf::DW_ATE_signed_char);
+    const auto charType = diBuilder->createBasicType("char", sizeof(char), dwarf::DW_ATE_signed_char);
     return diBuilder->createPointerType(charType, sizeof(void*));
 }

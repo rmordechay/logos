@@ -22,18 +22,22 @@ bool LgsUnknown::canCastTo(LgsType* other) {
     return false;
 }
 
+LgsType* LgsUnknown::applyBinOp(LgsType* toType, LgsBinOp& op) {
+    assert(0);
+}
+
 std::string LgsUnknown::strFormatPart() const {
     assert(0);
 }
 
-llvm::DIType* LgsUnknown::getDebugType(LgsCgModule& cg) {
+DIType* LgsUnknown::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
 
-llvm::Type* LgsUnknown::getIRType(LgsCgModule& cg) {
+Type* LgsUnknown::getIRType(LgsCgModule& cg) {
     assert(0);
 }
 
-llvm::Constant* LgsUnknown::getRTType(LgsCgModule& cg) {
+Constant* LgsUnknown::getRTType(LgsCgModule& cg) {
     assert(0);
 }

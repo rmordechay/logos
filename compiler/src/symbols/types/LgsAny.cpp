@@ -25,10 +25,14 @@ std::string LgsAny::strFormatPart() const {
     return "%p";
 }
 
+LgsType* LgsAny::applyBinOp(LgsType* toType, LgsBinOp& op) {
+    assert(0);
+}
+
 bool LgsAny::canCastTo(LgsType*) {
     return true;
 }
 
-llvm::DIType* LgsAny::getDebugType(LgsCgModule& cg) {
+DIType* LgsAny::getDebugType(LgsCgModule& cg) {
     assert(0);
 }

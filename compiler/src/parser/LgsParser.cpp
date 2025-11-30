@@ -838,7 +838,7 @@ LgsStmt* LgsParser::parseStmt() {
     if (const auto defer = parseDeferStmt()) return defer;
     if (const auto ioStmt = parseIOStmt()) return ioStmt;
     if (const auto varDec = parseVarDec()) return varDec;
-    if (const auto assignOrExpr = parseAssignOrExpr()) return assignOrExpr;
+    if (const auto assignment = parseAssignment()) return assignment;
     return nullptr;
 }
 
@@ -851,10 +851,12 @@ LgsStmtsBlock* LgsParser::parseStmtsBlock(const bool withSingleStmt) {
         setLocation(stmtsBlock->location, &currentToken);
         if (!matchAndConsume(T_RBRACE)) {
             while (true) {
-                if (const auto stmt = parseStmt()) {
-                    stmtsBlock->stmts.push_back(LgsObjOrStmt(stmt));
+                if (const auto expr = parseExpr()) {
+                    stmtsBlock->stmts.push_back(LgsStmtWrapper(expr));
+                } else if (const auto stmt = parseStmt()) {
+                    stmtsBlock->stmts.push_back(LgsStmtWrapper(stmt));
                 } else if (const auto obj = parseObject()) {
-                    stmtsBlock->stmts.push_back(LgsObjOrStmt(obj));
+                    stmtsBlock->stmts.push_back(LgsStmtWrapper(obj));
                 } else {
                     break;
                 }
@@ -864,10 +866,14 @@ LgsStmtsBlock* LgsParser::parseStmtsBlock(const bool withSingleStmt) {
             else mustMatch(T_RBRACE);
         }
     } else if (withSingleStmt) {
-        if (const auto stmt = parseStmt()) {
-            stmtsBlock = new LgsStmtsBlock();
+        stmtsBlock = new LgsStmtsBlock();
+        if (const auto expr = parseExpr()) {
+            stmtsBlock->location = expr->location;
+            stmtsBlock->stmts.push_back(LgsStmtWrapper(expr));
+            stmtsBlock->location = expr->location;
+        } else if (const auto stmt = parseStmt()) {
             stmtsBlock->location = stmt->location;
-            stmtsBlock->stmts.push_back(LgsObjOrStmt(stmt));
+            stmtsBlock->stmts.push_back(LgsStmtWrapper(stmt));
             stmtsBlock->location = stmt->location;
         }
     }
@@ -964,29 +970,27 @@ LgsAssignType LgsParser::parseAssignType() {
     return op;
 }
 
-LgsStmt* LgsParser::parseAssignOrExpr() {
+LgsStmt* LgsParser::parseAssignment() {
     const auto oldIndex = currentIndex;
-    const auto varDec = parseVarDec();
-    if (varDec) return varDec;
-
     // Assignment
     const auto l = parseExpr();
     if (!parsedOrReset(l, oldIndex)) return nullptr;
     const auto opToken = currentToken;
     const auto op = parseAssignType();
-    if (op != ASSIGN_UNKNOWN) {
-        const auto r = parseExpr();
-        if (!r) {
-            freeExpr(l);
-            reset(oldIndex);
-            return nullptr;
-        }
-        const auto assignment = new LgsAssignment(op, l, r);
-        setLocation(assignment->location, &opToken);
-        return assignment;
+    if (op == ASSIGN_UNKNOWN) {
+        freeExpr(l);
+        reset(oldIndex);
+        return nullptr;
     }
-    // Return expr
-    return l;
+    const auto r = parseExpr();
+    if (!r) {
+        freeExpr(l);
+        reset(oldIndex);
+        return nullptr;
+    }
+    const auto assignment = new LgsAssignment(op, l, r);
+    setLocation(assignment->location, &opToken);
+    return assignment;
 }
 
 LgsStmt* LgsParser::parseIfStmt() {
@@ -1535,7 +1539,7 @@ LgsExpr* LgsParser::parseConstant() {
         break;
     }
     case T_NULL: {
-        constant = new LgsNull();
+        constant = new LgsNullableExpr(&LGS_NULL);
         break;
     }
     default:

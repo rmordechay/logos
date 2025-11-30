@@ -33,7 +33,11 @@ bool LgsUInt::canCastTo(LgsType* other) {
     return name == IRName;
 }
 
-llvm::DIType* LgsUInt::getDebugType(LgsCgModule& cg) {
+LgsType* LgsUInt::applyBinOp(LgsType* toType, LgsBinOp& op) {
+    assert(0);
+}
+
+DIType* LgsUInt::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
 

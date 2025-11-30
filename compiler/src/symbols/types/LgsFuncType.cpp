@@ -105,6 +105,10 @@ bool LgsFuncType::equals(LgsType* other) {
     return true;
 }
 
+LgsType* LgsFuncType::applyBinOp(LgsType* toType, LgsBinOp& op) {
+    assert(0);
+}
+
 void LgsFuncType::setFuncOptions(const uint32_t ops) {
     isPublic =  ops & PUBLIC;
     isBuiltin =  ops & BUILTIN;
@@ -129,7 +133,7 @@ std::unordered_map<std::string, LgsParam*> LgsFuncType::getParamsByName() {
     return paramsByName;
 }
 
-llvm::DIType* LgsFuncType::getDebugType(LgsCgModule& cg) {
+DIType* LgsFuncType::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
 

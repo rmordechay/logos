@@ -20,10 +20,6 @@ void LgsMetaSelection::castImplicitly(LgsType* toType) {
     assert(0);
 }
 
-Value* LgsMetaSelection::castIR(LgsCgModule& cg, LgsType* toType) {
-    assert(0);
-}
-
 std::string LgsMetaSelection::asText() {
     assert(0);
 }

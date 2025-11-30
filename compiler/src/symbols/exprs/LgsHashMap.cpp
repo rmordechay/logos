@@ -1,6 +1,7 @@
 #include "exprs/LgsHashMap.h"
 
 #include "LgsUtils.h"
+#include "codegen/LgsCgModule.h"
 
 void LgsHashMap::castImplicitly(LgsType* toType) {
     if (!toType->asMap()) return;
@@ -9,8 +10,15 @@ void LgsHashMap::castImplicitly(LgsType* toType) {
     }
 }
 
-Value* LgsHashMap::castIR(LgsCgModule& cg, LgsType* toType) {
-    assert(0);
+void LgsHashMap::setDebugValue(LgsCgModule& cg) {
+    if (!IRValue) return;
+    const auto di = cg.debugger.diBuilder;
+    const auto file = cg.debugger.diFile;
+    const auto map = type->asMap();
+    assert(map);
+    const auto dbType = map->getDebugType(cg);
+    const auto var = di->createAutoVariable(cg.debugger.subprogram, "", file, location.lineStart, dbType);
+    di->insertDeclare(IRValue, var, di->createExpression(), cg.getDebugLoc(location), cg.builder.GetInsertBlock());
 }
 
 bool LgsHashMap::equals(LgsExpr* other) {

@@ -3,9 +3,6 @@
 #include "codegen/LgsCgModule.h"
 
 Value* LgsParam::loadIR(LgsCgModule& cg) {
-    if (IRValue->getType()->isPointerTy()) {
-        return cg.builder.CreateLoad(type->getIRType(cg), IRValue);
-    }
     return IRValue;
 }
 

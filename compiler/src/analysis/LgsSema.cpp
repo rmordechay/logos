@@ -251,9 +251,6 @@ void LgsSema::visitStmt(LgsStmt* stmt) {
     else if (const auto coroutine = stmt->asCoroutine()) visitCoroutine(coroutine);
     else if (const auto deferStmt = stmt->asDefer()) visitDeferStmt(deferStmt);
     else if (const auto assignment = stmt->asAssignment()) visitAssignment(assignment);
-    else if (const auto funcCall = stmt->asFuncCall()) visitFuncCall(funcCall);
-    else if (const auto postfixExpr = stmt->asPostfixExpr()) visitPostfixExpr(postfixExpr);
-    else if (const auto selection = stmt->asSelection()) visitSelection(selection);
     else if (const auto returnStmt = stmt->asReturn()) visitReturnStmt(returnStmt);
     else if (const auto continueStmt = stmt->asContinue()) visitContinueStmt(continueStmt);
     else if (const auto ioStmt = stmt->asIOStmt()) visitIOStmt(ioStmt);
@@ -264,14 +261,17 @@ void LgsSema::visitStmt(LgsStmt* stmt) {
 
 void LgsSema::visitStmtsBlock(LgsStmtsBlock* stmtsBlock) {
     if (!stmtsBlock || stmtsBlock->stmts.empty()) return;
-    for (const auto& stmt : stmtsBlock->stmts) {
+    for (auto& stmt : stmtsBlock->stmts) {
         switch (stmt.type) {
-        case LgsObjOrStmt::Type::Object:
+        case LgsStmtWrapper::Type::Object:
             visitObject(stmt.obj);
             addLocalSymbol(LgsSymbol(stmt.obj));
             break;
-        case LgsObjOrStmt::Type::Stmt:
+        case LgsStmtWrapper::Type::Stmt:
             visitStmt(stmt.stmt);
+            break;
+        case LgsStmtWrapper::Type::Expr:
+            visitExpr(stmt.expr);
             break;
         }
     }
@@ -279,7 +279,7 @@ void LgsSema::visitStmtsBlock(LgsStmtsBlock* stmtsBlock) {
     const auto lastStmt = stmtsBlock->stmts[stmtsBlock->stmts.size() - 1];
     stmtsBlock->returnStmt = lastStmt.stmt->asReturn();
     for (size_t i = 0; i < stmtsBlock->stmts.size() - 1; ++i) {
-        if (stmtsBlock->stmts[i].stmt->isTerminator()) {
+        if (stmtsBlock->stmts[i].isTerminator()) {
             return addError(E10059, lastStmt.stmt->location);
         }
     }
@@ -718,7 +718,9 @@ void LgsSema::visitCast(LgsCast* cast) {
 
 void LgsSema::visitNullableExpr(LgsNullableExpr* nullableExpr) {
     visitExpr(nullableExpr->baseExpr);
-    nullableExpr->nullableType->baseType = nullableExpr->baseExpr->type;
+    if (!nullableExpr->type || !nullableExpr->baseExpr->type->asNullable()) {
+        nullableExpr->type = new LgsNullable(nullableExpr->baseExpr->type);
+    }
 }
 
 void LgsSema::visitArrayExpr(LgsArrayExpr* arrayExpr) {
@@ -1497,7 +1499,7 @@ bool LgsSema::validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const Lgs
     if (stmtBlock->returnStmt) return true;
     auto isValid = false;
     for (const auto stmt : stmtBlock->stmts) {
-        if (stmt.type == LgsObjOrStmt::Type::Object) continue;
+        if (stmt.type == LgsStmtWrapper::Type::Object) continue;
         if (const auto ifStmt = stmt.stmt->asIfStmt()) {
             isValid = validateBlockControlFlow(ifStmt->ifBlock, func);
             for (const auto [_, elseIfStmt] : ifStmt->elseIfs) {
@@ -1649,7 +1651,7 @@ void castExpr(LgsExpr*& expr, LgsType* toType) {
 }
 
 void LgsSema::addRTType(LgsType* type) const {
-    if (!type) return;
+    if (!type || type->isVoid()) return;
     for (const auto rttType : globals.table.rttTypes) {
         if (rttType->equals(type)) return;
     }

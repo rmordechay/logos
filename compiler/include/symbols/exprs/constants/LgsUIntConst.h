@@ -8,7 +8,6 @@ public:
 
     explicit LgsUIntConst(const int value) : LgsExpr(&LGS_UINT), value(value) {}
     std::string asText() override;
-    Value* castIR(LgsCgModule& cg, LgsType* toType) override;
     ~LgsUIntConst() override = default;
 };
 

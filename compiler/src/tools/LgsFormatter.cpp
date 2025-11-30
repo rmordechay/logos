@@ -128,9 +128,6 @@ void LgsFormatter::formatStmt(LgsStmt* stmt) {
     else if (const auto coroutine = stmt->asCoroutine()) formatCoroutine(coroutine);
     else if (const auto deferStmt = stmt->asDefer()) formatDeferStmt(deferStmt);
     else if (const auto assignment = stmt->asAssignment()) formatAssignment(assignment);
-    else if (const auto funcCall = stmt->asFuncCall()) formatFuncCall(funcCall);
-    else if (const auto postfixExpr = stmt->asPostfixExpr()) formatPostfixExpr(postfixExpr);
-    else if (const auto selection = stmt->asSelection()) formatSelection(selection);
     else if (const auto returnStmt = stmt->asReturn()) formatReturnStmt(returnStmt);
     else if (const auto continueStmt = stmt->asContinue()) formatContinueStmt(continueStmt);
     else if (const auto ioStmt = stmt->asIOStmt()) formatIOStmt(ioStmt);

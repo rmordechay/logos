@@ -36,21 +36,6 @@ LgsExpr* LgsVariable::castExplicitly(LgsType* toType) {
     assert(0);
 }
 
-Value* LgsVariable::castIR(LgsCgModule& cg, LgsType* toType) {
-    switch (ref.symbolType) {
-    case PARAM:
-        return IRValue;
-    case VAR_DEC:
-        return ref.varDec->expr->castIR(cg, toType);
-    case FIELD:
-        assert(0);
-    case FUNC:
-        return IRValue;
-    default:
-        assert(0);
-    }
-}
-
 void LgsVariable::assign(LgsCgModule& cg, LgsExpr* expr) {
     owner = expr->owner;
     freeOwner(cg);

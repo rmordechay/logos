@@ -2,10 +2,6 @@
 #include "LgsType.h"
 #include "LgsUtils.h"
 
-Value* LgsPostfixExpr::castIR(LgsCgModule& cg, LgsType* toType) {
-    assert(0);
-}
-
 std::string LgsPostfixExpr::asText() {
     assert(0);
 }

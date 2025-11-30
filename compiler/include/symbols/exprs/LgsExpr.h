@@ -2,6 +2,7 @@
 #include <stmts/LgsStmt.h>
 #include "LgsValue.h"
 
+class LgsNullable;
 class LgsMetaSelection;
 class LgsMatrixExpr;
 class LgsNullableExpr;
@@ -32,7 +33,7 @@ class LgsFloatConst;
 class LgsStrConst;
 class LgsTypeConst;
 
-class LgsExpr : public LgsStmt {
+class LgsExpr : public LgsValue {
 public:
     LgsType* type = nullptr;
     bool isMutable = true;
@@ -48,7 +49,6 @@ public:
 
     virtual LgsExpr* castExplicitly(LgsType* toType);
     virtual void castImplicitly(LgsType* toType);
-    virtual Value* castIR(LgsCgModule& cg, LgsType* toType) = 0;
     virtual Value* hashValue(LgsCgModule& cg);
     virtual void assign(LgsCgModule& cg, LgsExpr* expr);
     virtual bool equals(LgsExpr* other);
@@ -58,6 +58,9 @@ public:
     LgsFunc* asFunc();
     LgsVariable* asVariable();
     LgsPrefixExpr* asPrefixExpr();
+    LgsFuncCall* asFuncCall();
+    LgsPostfixExpr* asPostfixExpr();
+    LgsSelection* asSelection();
     LgsIterIndex* asIterIndex();
     LgsTypeExpr* asTypeExpr();
     LgsJson* asJson();
@@ -90,3 +93,4 @@ void freeExprs(std::vector<T*>& exprs) {
     }
     exprs.clear();
 }
+

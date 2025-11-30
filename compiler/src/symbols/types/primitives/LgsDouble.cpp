@@ -15,6 +15,10 @@ LgsExpr* LgsDouble::getZeroValue() {
     return new LgsFloatConst(this, 0.0);
 }
 
+LgsType* LgsDouble::applyBinOp(LgsType* toType, LgsBinOp& op) {
+    assert(0);
+}
+
 std::string LgsDouble::strFormatPart() const {
     return "%f";
 }
@@ -39,6 +43,6 @@ Value* LgsDouble::powIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     return LgsType::powIR(cg, left, right);
 }
 
-llvm::DIType* LgsDouble::getDebugType(LgsCgModule& cg) {
+DIType* LgsDouble::getDebugType(LgsCgModule& cg) {
     assert(0);
 }

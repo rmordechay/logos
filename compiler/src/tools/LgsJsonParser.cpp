@@ -189,14 +189,11 @@ void LgsJsonParser::parseStmt(LgsStmt* stmt) {
     else if (const auto coroutine = stmt->asCoroutine()) parseCoroutine(coroutine);
     else if (const auto deferStmt = stmt->asDefer()) parseDeferStmt(deferStmt);
     else if (const auto assignment = stmt->asAssignment()) parseAssignment(assignment);
-    else if (const auto funcCall = stmt->asFuncCall()) parseFuncCall(funcCall);
-    else if (const auto postfixExpr = stmt->asPostfixExpr()) parsePostfixExpr(postfixExpr);
-    else if (const auto selection = stmt->asSelection()) parseSelection(selection);
     else if (const auto returnStmt = stmt->asReturn()) parseReturnStmt(returnStmt);
     else if (const auto continueStmt = stmt->asContinue()) parseContinueStmt(continueStmt);
     else if (const auto ioStmt = stmt->asIOStmt()) parseIOStmt(ioStmt);
     else if (const auto breakStmt = stmt->asBreak()) parseBreakStmt(breakStmt);
-    else if (auto expr = stmt->asExpr()) parseExpr(expr);
+    else if (const auto expr = stmt->asExpr()) parseExpr(expr);
     else assert(0);
 }
 

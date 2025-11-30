@@ -14,7 +14,7 @@ Type* LgsSet::getIRType(LgsCgModule& cg) {
 Constant* LgsSet::getRTType(LgsCgModule& cg) {
     const auto genericName = getGenericName();
     const auto st = cg.getStructType({cg.ptrTy()}, genericName);
-    const auto sv = llvm::ConstantStruct::get(st, {baseType->getRTType(cg)});
+    const auto sv = ConstantStruct::get(st, {baseType->getRTType(cg)});
     return cg.getRTTypeInfo(genericName, sizeBytes(), sizeBytes(), RTT_SET, sv);
 }
 
@@ -85,6 +85,6 @@ Value* LgsSet::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
     return cg.callLgsFunc("Set_get", cg.ptrTy(), {cg.ptrTy(), cg.sizeTy()}, {iterable, index});
 }
 
-llvm::DIType* LgsSet::getDebugType(LgsCgModule& cg) {
+DIType* LgsSet::getDebugType(LgsCgModule& cg) {
     assert(0);
 }

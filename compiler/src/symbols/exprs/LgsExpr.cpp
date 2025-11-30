@@ -19,6 +19,8 @@
 #include "exprs/LgsMetaSelection.h"
 #include "exprs/LgsNull.h"
 #include "exprs/LgsNullableExpr.h"
+#include "exprs/LgsPostfixExpr.h"
+#include "exprs/LgsSelection.h"
 #include "exprs/LgsTypeExpr.h"
 #include "funcs/LgsFunc.h"
 #include "loops/LgsMetaVar.h"
@@ -120,6 +122,18 @@ LgsVariable* LgsExpr::asVariable() {
 
 LgsPrefixExpr* LgsExpr::asPrefixExpr() {
     return dynamic_cast<LgsPrefixExpr*>(this);
+}
+
+LgsFuncCall* LgsExpr::asFuncCall() {
+    return dynamic_cast<LgsFuncCall*>(this);
+}
+
+LgsPostfixExpr* LgsExpr::asPostfixExpr() {
+    return dynamic_cast<LgsPostfixExpr*>(this);
+}
+
+LgsSelection* LgsExpr::asSelection() {
+    return dynamic_cast<LgsSelection*>(this);
 }
 
 LgsIterIndex* LgsExpr::asIterIndex() {

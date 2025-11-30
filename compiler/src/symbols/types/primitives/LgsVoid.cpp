@@ -24,6 +24,10 @@ LgsExpr* LgsVoid::getZeroValue() {
     return nullptr;
 }
 
+LgsType* LgsVoid::applyBinOp(LgsType* toType, LgsBinOp& op) {
+    assert(0);
+}
+
 std::string LgsVoid::strFormatPart() const {
     assert(0);
 }
@@ -32,6 +36,6 @@ bool LgsVoid::canCastTo(LgsType* other) {
     return name == other->getName();
 }
 
-llvm::DIType* LgsVoid::getDebugType(LgsCgModule& cg) {
+DIType* LgsVoid::getDebugType(LgsCgModule& cg) {
     return cg.debugger.diBuilder->createUnspecifiedType(name);
 }

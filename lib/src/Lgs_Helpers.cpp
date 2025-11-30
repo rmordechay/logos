@@ -126,10 +126,14 @@ std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
         break;
     }
     case RTT_NULLABLE: {
-        const auto& [baseType] = rtt->nullable;
-        const auto isSet = *(static_cast<bool*>(elem) + baseType->size);
-        if (isSet) str << formatElement(baseType, elem);
-        else str << LGS_NULL_LITERAL;
+        const auto& [baseType, isPtr] = rtt->nullable;
+        if (isPtr) {
+            str << formatElement(baseType, elem);
+        } else {
+            const auto isSet = *(static_cast<bool*>(elem) + baseType->size);
+            if (isSet) str << formatElement(baseType, elem);
+            else str << LGS_NULL_LITERAL;
+        }
         break;
     }
     case RTT_MAP: {

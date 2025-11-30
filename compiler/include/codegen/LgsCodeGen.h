@@ -110,6 +110,7 @@ public:
     void visitBinaryExpr(LgsBinaryExpr* binExpr);
     void visitTernaryExpr(LgsTernaryExpr* ternaryExpr);
     void visitNullableExpr(LgsNullableExpr* nullableExpr);
+    void visitNull(LgsNull* null) const;
     void visitCast(LgsCast* cast);
     void visitLambda(LgsFunc* func);
     void visitIntConst(LgsIntConst* intConst) const;
@@ -134,11 +135,10 @@ public:
     void visitStrConst(LgsStrConst* strConst);
     void visitInstance(LgsInstance* instance);
     void visitIterIndex(LgsIterIndex* iterIndex, bool assign);
-    void visitNull(LgsNull* null) const;
     void visitJson(LgsJson* json);
 
     // Funcs
-    void createPrologue(LgsFunc* func);
+    void createPrologue(LgsFunc* func) const;
     void initMainArgs(const LgsMainFunc* mainFunc) const;
     StructType* getThunkCtxType(const LgsFuncCall* fc) const;
     Value* getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) const;
@@ -151,6 +151,5 @@ public:
 
     bool checkMock(LgsExpr* expr) const;
     Value* getIRValue(LgsValue* value);
-    void setNullableValue(LgsExpr* expr);
     void addVirtuals(LgsObject* obj, Value* ptr) const;
 };

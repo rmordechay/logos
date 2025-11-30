@@ -12,6 +12,5 @@ public:
     void setDebugValue(LgsCgModule& cg) override;
     LgsExpr* castExplicitly(LgsType* toType) override;
     void castImplicitly(LgsType* toType) override;
-    Value* castIR(LgsCgModule& cg, LgsType* toType) override;
     std::string asText() override;
 };

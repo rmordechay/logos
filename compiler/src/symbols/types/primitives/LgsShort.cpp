@@ -38,10 +38,14 @@ bool LgsShort::canCastTo(LgsType* other) {
     return name == IRName;
 }
 
+LgsType* LgsShort::applyBinOp(LgsType* toType, LgsBinOp& op) {
+    assert(0);
+}
+
 std::string LgsShort::strFormatPart() const {
     return "%d";
 }
 
-llvm::DIType* LgsShort::getDebugType(LgsCgModule& cg) {
+DIType* LgsShort::getDebugType(LgsCgModule& cg) {
     assert(0);
 }

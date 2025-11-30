@@ -75,7 +75,7 @@ Constant* LgsObject::getRTType(LgsCgModule& cg) {
     if (!fields.empty()) {
         const auto fieldsName = LGS_TYPEINFO_PREFIX + genericName + "_fields";
         if (cg.isRTTModule) {
-            const auto args = llvm::ConstantArray::get(fieldsArrType, fieldRTTs);
+            const auto args = ConstantArray::get(fieldsArrType, fieldRTTs);
             fieldsArr = cg.createGlobal(fieldsName, fieldsArrType, args);
         } else {
             fieldsArr = cg.createGlobal(fieldsName, fieldsArrType, nullptr);
@@ -84,14 +84,14 @@ Constant* LgsObject::getRTType(LgsCgModule& cg) {
         const auto hashesArrType = ArrayType::get(cg.i64Ty(), fields.size());
         const auto hashesName = LGS_TYPEINFO_PREFIX + genericName + "_hashes";
         if (cg.isRTTModule) {
-            const auto hashes = llvm::ConstantArray::get(hashesArrType, fieldNameHashes);
+            const auto hashes = ConstantArray::get(hashesArrType, fieldNameHashes);
             hashesArr = cg.createGlobal(hashesName, hashesArrType, hashes);
         } else {
             hashesArr = cg.createGlobal(hashesName, hashesArrType, nullptr);
         }
     }
-    const auto st = cg.getStructType({cg.sizeTy(), cg.ptrTy(), cg.ptrTy()}, LGS_TYPEINFO_PREFIX + genericName);
-    const auto sv = llvm::ConstantStruct::get(st, {cg.usize(fields.size()), hashesArr, fieldsArr});
+    const auto st = cg.getStructType({cg.sizeTy(), cg.ptrTy(), cg.ptrTy()}, genericName);
+    const auto sv = ConstantStruct::get(st, {cg.usize(fields.size()), hashesArr, fieldsArr});
     return cg.getRTTypeInfo(genericName, sizeBytes(), sizeof(void*), RTT_OBJECT, sv);
 }
 
@@ -128,6 +128,10 @@ bool LgsObject::canCastTo(LgsType* other) {
     return name == otherType->getName();
 }
 
+LgsType* LgsObject::applyBinOp(LgsType* toType, LgsBinOp& op) {
+    assert(0);
+}
+
 std::string LgsObject::strFormatPart() const {
     std::stringstream str;
     str << '{';
@@ -141,7 +145,7 @@ std::string LgsObject::strFormatPart() const {
     return str.str();
 }
 
-llvm::DIType* LgsObject::getDebugType(LgsCgModule& cg) {
+DIType* LgsObject::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
 

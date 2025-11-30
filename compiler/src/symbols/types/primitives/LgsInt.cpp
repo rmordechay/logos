@@ -133,6 +133,6 @@ std::string LgsInt::getName() {
     return name;
 }
 
-llvm::DIType* LgsInt::getDebugType(LgsCgModule& cg) {
-    return cg.debugger.diBuilder->createBasicType(name, 32, llvm::dwarf::DW_ATE_signed);
+DIType* LgsInt::getDebugType(LgsCgModule& cg) {
+    return cg.debugger.diBuilder->createBasicType(name, 32, dwarf::DW_ATE_signed);
 }

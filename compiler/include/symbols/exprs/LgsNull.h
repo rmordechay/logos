@@ -4,14 +4,14 @@
 
 class LgsNull final : public LgsExpr {
 public:
-    explicit LgsNull() {
-        setType(new LgsNullable(nullptr));
+    LgsNull() {
+        isMutable = false;
     }
-
+    Value* loadIR(LgsCgModule& cg) override;
     void castImplicitly(LgsType* toType) override;
     std::string asText() override;
     bool equals(LgsExpr* other) override;
-    Value* castIR(LgsCgModule& cg, LgsType* toType) override;
     ~LgsNull() override;
 };
 
+inline LgsNull LGS_NULL;

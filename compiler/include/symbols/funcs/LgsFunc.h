@@ -45,7 +45,6 @@ public:
     void initFunc(const std::string& name, LgsType* rt, const std::vector<LgsParam>& params, uint32_t ops);
     Value* callWithVariadic(LgsCgModule& cg, const std::vector<LgsFuncArg>& args);
     Value* loadIR(LgsCgModule& cg) override;
-    Value* castIR(LgsCgModule& cg, LgsType* toType) override;
     void castImplicitly(LgsType* toType) override;
     bool needsCleanup() const;
     std::string asText() override;
