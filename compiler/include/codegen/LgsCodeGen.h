@@ -70,7 +70,6 @@ public:
     LgsPaths& paths;
     LgsGlobals& globals;
     LgsAppConfigs& appConfigs;
-    Function* currentIRFunc = nullptr;
     static std::atomic<size_t> lambdasIDGenerator;
 
     explicit LgsCodeGen(LgsFile& file, LgsAppConfigs& appConfigs, LgsGlobals& globals, LgsPaths& paths)

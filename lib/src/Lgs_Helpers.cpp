@@ -146,6 +146,7 @@ std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
         break;
     }
     case RTT_VOID: break;
+    case RTT_VARIADIC:
     case RTT_UNKNOWN: assert(0);
     }
     return str.str();

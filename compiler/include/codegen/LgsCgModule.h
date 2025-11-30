@@ -58,6 +58,7 @@ public:
     LLVMContext context;
     LgsLLDBGen debugger;
     Module* IRModule = nullptr;
+    Function* currentFunc = nullptr;
     IRBuilderBase::InsertPoint savedIP;
     IRBuilder<> builder = IRBuilder(context);
     std::map<std::string, Type*> typesRegistry;

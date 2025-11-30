@@ -52,6 +52,8 @@
 #include "stmts/LgsSwitch.h"
 #include "types/primitives/LgsDouble.h"
 #include "types/LgsGenericType.h"
+#include "types/iterables/LgsVariadic.h"
+
 #include <iostream>
 #include <ranges>
 #include <unordered_set>
@@ -215,12 +217,16 @@ void LgsSema::visitLambda(LgsFunc* lambda) {
 
 void LgsSema::visitParam(LgsParam* param) {
     validateLocalName(param->name, &param->location);
-    if (param->expr) {
+    if (param->isVariadic) {
+        if (param->expr) {
+            addError(E10045, param->location);
+        } else {
+            param->type = new LgsVariadic(param->type);
+        }
+    } else if (param->expr) {
         castExpr(param->expr, param->type);
         visitExpr(param->expr);
         validateExprType(param->expr, param->type);
-    } else if (param->isVariadic) {
-        if (param->expr) addError(E10045, param->location);
     }
     addLocalSymbol(LgsSymbol(param));
     assert(param->type);

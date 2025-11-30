@@ -16,7 +16,6 @@ public:
     LgsStmtsBlock* stmtsBlock = nullptr;
     std::vector<LgsExpr*> owners;
     std::vector<LgsExpr*> orphans;
-    Value* variadicCount = nullptr;
     bool isTest = false;
     std::vector<std::pair<LgsExpr*, LgsExpr*>> mocks;
     CallFn fn;

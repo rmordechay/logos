@@ -159,7 +159,7 @@ void LgsCodeGen::visitFunc(LgsFunc* func) {
     if (func->isTest) for (auto [_, then] : func->mocks) visitExpr(then);
     auto& params = ft->params;
     if (ft->isVariadic) {
-        params.back().IRValue = cg.builder.CreateAlloca(cg.i8Ty(), nullptr, "va_list");
+        params.back().IRValue = cg.builder.CreateAlloca(cg.ptrTy(), nullptr, "va_list");
         cg.callIntrinsics(llvm::Intrinsic::vastart, {cg.ptrTy()}, {params.back().IRValue});
     }
     visitStmtsBlock(func->stmtsBlock);
@@ -175,7 +175,7 @@ void LgsCodeGen::visitFunc(LgsFunc* func) {
 
 void LgsCodeGen::visitGenericFunc(LgsFunc* func) {
     cg.savedIP = cg.builder.saveIP();
-    const auto originalFunc = currentIRFunc;
+    const auto originalFunc = cg.currentFunc;
     stack.enterScope(func);
     createPrologue(func);
     visitStmtsBlock(func->stmtsBlock);
@@ -184,7 +184,7 @@ void LgsCodeGen::visitGenericFunc(LgsFunc* func) {
         cg.builder.CreateRetVoid();
     }
     stack.exitScope();
-    currentIRFunc = originalFunc;
+    cg.currentFunc = originalFunc;
     cg.builder.restoreIP(cg.savedIP);
 }
 
@@ -495,7 +495,7 @@ void LgsCodeGen::visitElseIf(LgsIfStmt* ifStmt) {
 void LgsCodeGen::visitSwitch(LgsSwitch* switchStmt) {
     assert(switchStmt->cond);
     const auto defaultBlock = cg.createBlock("");
-    const auto exitBlock = cg.createBlock("", currentIRFunc);
+    const auto exitBlock = cg.createBlock("", cg.currentFunc);
     visitExpr(switchStmt->cond);
 
     const auto exprIRValue = switchStmt->cond->hashValue(cg);
@@ -511,7 +511,7 @@ void LgsCodeGen::visitSwitch(LgsSwitch* switchStmt) {
         stack.enterScope(switchStmt);
         const auto [expr, stmtsBlock] = switchStmt->patterns[i];
         visitExpr(expr);
-        const auto patternBlock = cg.createBlock(BLOCK_NAME_CASE_PREFIX + std::to_string(i), currentIRFunc);
+        const auto patternBlock = cg.createBlock(BLOCK_NAME_CASE_PREFIX + std::to_string(i), cg.currentFunc);
         const auto hashed = expr->hashValue(cg);
         switchInst->addCase(llvm::dyn_cast<ConstantInt>(hashed), patternBlock);
         cg.builder.SetInsertPoint(patternBlock);
@@ -724,12 +724,12 @@ void LgsCodeGen::visitCast(LgsCast* cast) {
 
 void LgsCodeGen::visitLambda(LgsFunc* func) {
     cg.savedIP = cg.builder.saveIP();
-    const auto originalFunc = currentIRFunc;
+    const auto originalFunc = cg.currentFunc;
     const auto lambdaID = lambdasIDGenerator.fetch_add(1);
     func->funcType->IRName = LGS_ANONYMOUS_NAME + std::to_string(lambdaID);
     func->IRValue = func->getIRFunc(cg);
     visitFunc(func);
-    currentIRFunc = originalFunc;
+    cg.currentFunc = originalFunc;
     cg.builder.restoreIP(cg.savedIP);
 }
 
@@ -889,7 +889,7 @@ void LgsCodeGen::visitVariable(LgsVariable* variable) {
         break;
     case PARAM:
         if (variable->ref.param->isSelf) {
-            variable->IRValue = currentIRFunc->getArg(0);
+            variable->IRValue = cg.currentFunc->getArg(0);
         } else {
             assert(variable->ref.param->IRValue);
             variable->IRValue = variable->ref.param->IRValue;
@@ -1194,8 +1194,8 @@ void LgsCodeGen::visitJson(LgsJson* json) {
 
 void LgsCodeGen::createPrologue(LgsFunc* func) {
     if (appConfigs.debugMode) func->setDebugValue(cg);
-    currentIRFunc = func->getIRFunc(cg);
-    const auto entryBlock = cg.createBlock(BLOCK_NAME_ENTRY, currentIRFunc);
+    cg.currentFunc = func->getIRFunc(cg);
+    const auto entryBlock = cg.createBlock(BLOCK_NAME_ENTRY, cg.currentFunc);
     cg.builder.SetInsertPoint(entryBlock);
     if (func->funcType->name == LGS_MAIN_FUNC) {
         cg.callRuntimeFunc("init", cg.voidTy());
@@ -1208,8 +1208,8 @@ void LgsCodeGen::initMainArgs(const LgsMainFunc* mainFunc) const {
     if (ft->params.empty()) return;
     const auto argsArray = ft->params.front().expr->asArrayExpr();
     const auto sArray = argsArray->type->asSArray();
-    sArray->size->IRValue = currentIRFunc->getArg(0);
-    argsArray->IRValue = currentIRFunc->getArg(1);
+    sArray->size->IRValue = cg.currentFunc->getArg(0);
+    argsArray->IRValue = cg.currentFunc->getArg(1);
     mainFunc->funcType->params[0].IRValue = argsArray->IRValue;
 }
 
@@ -1286,13 +1286,13 @@ void LgsCodeGen::createMapFunc(LgsFunc* func) {
     if (cg.IRModule->getFunction(func->funcType->getName())) return;
     // Save state
     cg.savedIP = cg.builder.saveIP();
-    const auto originalFunc = currentIRFunc;
+    const auto originalFunc = cg.currentFunc;
 
     // Init
-    currentIRFunc = func->getIRFunc(cg);
+    cg.currentFunc = func->getIRFunc(cg);
     const auto& originalArr = func->funcType->params[0];
     const auto& callback = func->funcType->params[1];
-    const auto entryBlock = cg.createBlock(BLOCK_NAME_ENTRY, currentIRFunc);
+    const auto entryBlock = cg.createBlock(BLOCK_NAME_ENTRY, cg.currentFunc);
     const auto condBlock = cg.createBlock();
     const auto bodyBlock = cg.createBlock();
     const auto exitBlock = cg.createBlock();
@@ -1333,7 +1333,7 @@ void LgsCodeGen::createMapFunc(LgsFunc* func) {
     cg.builder.CreateRet(newArr.IRValue);
 
     // Restore state
-    currentIRFunc = originalFunc;
+    cg.currentFunc = originalFunc;
     cg.builder.restoreIP(cg.savedIP);
     func->IRValue = func->getIRFunc(cg);
 }
@@ -1342,13 +1342,13 @@ void LgsCodeGen::createFilterFunc(LgsFunc* func) {
     if (cg.IRModule->getFunction(func->funcType->getName())) return;
     // Save state
     cg.savedIP = cg.builder.saveIP();
-    const auto originalFunc = currentIRFunc;
+    const auto originalFunc = cg.currentFunc;
 
     // Init
-    currentIRFunc = func->getIRFunc(cg);
+    cg.currentFunc = func->getIRFunc(cg);
     const auto& originalArr = func->funcType->params[0];
     const auto& callback = func->funcType->params[1];
-    const auto entryBlock = cg.createBlock(BLOCK_NAME_ENTRY, currentIRFunc);
+    const auto entryBlock = cg.createBlock(BLOCK_NAME_ENTRY, cg.currentFunc);
     const auto condBlock = cg.createBlock();
     const auto bodyBlock = cg.createBlock();
     const auto exitBlock = cg.createBlock();
@@ -1396,7 +1396,7 @@ void LgsCodeGen::createFilterFunc(LgsFunc* func) {
     cg.builder.CreateRet(newArr.IRValue);
 
     // Restore state
-    currentIRFunc = originalFunc;
+    cg.currentFunc = originalFunc;
     cg.builder.restoreIP(cg.savedIP);
     func->IRValue = func->getIRFunc(cg);
 }

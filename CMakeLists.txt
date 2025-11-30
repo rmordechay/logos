@@ -140,6 +140,7 @@ set(LGS_SOURCE
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/iterables/LgsIterable.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/iterables/LgsVec.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/iterables/LgsMatrix.cpp
+    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/iterables/LgsVariadic.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsBool.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsChar.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsDouble.cpp

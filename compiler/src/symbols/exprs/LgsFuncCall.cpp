@@ -4,6 +4,8 @@
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
 #include "LgsUtils.h"
+#include "types/iterables/LgsVariadic.h"
+
 #include <sstream>
 bool argAndParamEqual(const LgsFuncArg* arg, const LgsParam* param);
 
@@ -49,15 +51,15 @@ bool LgsFuncCall::equalsVariadic(const LgsFuncType* funcType) const {
         if (i >= args.size()) continue;
         const auto arg = args[i];
         const auto param = funcType->params[i];
-        if (argAndParamEqual(&arg, &param)) continue;
-        return false;
+        if (!argAndParamEqual(&arg, &param)) return false;
     }
     // Check the variadic arguments
     const auto& variadicParam = funcType->params.back();
+    const auto variadic = variadicParam.type->asVariadic();
+    assert(variadic);
     for (uint32_t i = variadicParam.index; i < args.size(); ++i) {
         const auto arg = args[i];
-        if (argAndParamEqual(&arg, &variadicParam)) continue;
-        return false;
+        if (!arg.expr->type->canCastTo(variadic->baseType)) return false;
     }
     return true;
 }

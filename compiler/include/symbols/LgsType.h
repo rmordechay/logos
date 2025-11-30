@@ -3,6 +3,7 @@
 #include "exprs/LgsBinaryExpr.h"
 #include <map>
 
+class LgsVariadic;
 class LgsGenericType;
 class LgsMatrix;
 class LgsSubType;
@@ -133,6 +134,7 @@ public:
     LgsTypePair* asPair();
     LgsSubType* asSubtype();
     LgsNullable* asNullable();
+    LgsVariadic* asVariadic();
     virtual ~LgsType();
 };
 

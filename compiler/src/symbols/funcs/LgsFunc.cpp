@@ -22,10 +22,6 @@ Function* LgsFunc::getIRFunc(LgsCgModule& cg) {
     auto args = IRFunc->arg_begin();
     for (size_t i = 0; i < funcType->params.size(); ++i) {
         auto& param = funcType->params[i];
-        if (param.isVariadic && !funcType->isExternal) {
-            variadicCount = args;
-            break;
-        }
         args->setName(param.name);
         param.IRValue = args;
         args++;

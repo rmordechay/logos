@@ -1439,23 +1439,23 @@ LgsFuncCall* LgsParser::parseFuncCall() {
             funcCall->isNamed = true;
             argName = currentToken.lexeme;
             consume(2);
-            const auto expr = parseExprOrStmtsBlock();
-            if (!mustParse(expr)) break;
+            const auto exprOrStmt = parseExprOrStmtsBlock();
+            if (!exprOrStmt) break;
             if (!seen.insert(argName).second) {
-                addError(E10054, expr->location, {argName});
+                addError(E10054, exprOrStmt->location, {argName});
                 break;
             }
-            funcCall->args.emplace_back(LgsFuncArg{expr, argName});
+            funcCall->args.emplace_back(LgsFuncArg{exprOrStmt, argName});
         } else {
-            const auto expr = parseExprOrStmtsBlock();
-            if (!mustParse(expr)) break;
-            funcCall->args.emplace_back(LgsFuncArg{expr, argName});
+            const auto exprOrStmt = parseExprOrStmtsBlock();
+            if (!exprOrStmt) break;
+            funcCall->args.emplace_back(LgsFuncArg{exprOrStmt, argName});
         }
         if (currentToken.type == T_RPAREN) break;
         mustMatch(T_COMMA);
+        if (currentToken.type == T_RPAREN) break;
     }
 
-    if (currentToken.type == T_COMMA) consume();
     mustMatch(T_RPAREN);
     return funcCall;
 }

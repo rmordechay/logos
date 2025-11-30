@@ -56,7 +56,6 @@ std::string LgsFuncType::pname() {
         const auto param = params[i];
         if (param.type) {
             str << param.type->pname();
-            if (param.isVariadic) str << "...";
         } else if (param.name != ""){
             str << param.name;
         } else {

@@ -17,6 +17,7 @@
 #include "types/primitives/LgsVoid.h"
 #include "types/iterables/LgsSArray.h"
 #include "types/iterables/LgsSet.h"
+#include "types/iterables/LgsVariadic.h"
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsByte.h"
 #include "types/primitives/LgsChar.h"
@@ -402,6 +403,10 @@ LgsSubType* LgsType::asSubtype() {
 
 LgsNullable* LgsType::asNullable() {
     return dynamic_cast<LgsNullable*>(this);
+}
+
+LgsVariadic* LgsType::asVariadic() {
+    return dynamic_cast<LgsVariadic*>(this);
 }
 
 LgsType::~LgsType() {
