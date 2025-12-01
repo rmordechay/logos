@@ -7,7 +7,7 @@ Value* LgsBinaryExpr::loadIR(LgsCgModule& cg) {
 }
 
 void LgsBinaryExpr::setDebugValue(LgsCgModule& cg) {
-    cg.builder.SetCurrentDebugLocation(cg.getDebugLoc(location));
+    setDebugLoc(cg);
 }
 
 bool LgsBinaryExpr::equals(LgsExpr* other) {

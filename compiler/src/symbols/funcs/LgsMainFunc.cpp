@@ -37,5 +37,5 @@ void LgsMainFunc::setDebugValue(LgsCgModule& cg) {
         DISubprogram::SPFlagDefinition
     );
     getIRFunc(cg)->setSubprogram(cg.debugger.subprogram);
-    cg.builder.SetCurrentDebugLocation(cg.getDebugLoc(location));
+    setDebugLoc(cg);
 }

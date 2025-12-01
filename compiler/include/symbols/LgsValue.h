@@ -46,4 +46,5 @@ public:
     virtual void hashNode(size_t& oldHash);
     virtual void setDebugValue(LgsCgModule& cg) = 0;
     virtual ~LgsValue() = default;
+    void setDebugLoc(LgsCgModule& cg) const;
 };
