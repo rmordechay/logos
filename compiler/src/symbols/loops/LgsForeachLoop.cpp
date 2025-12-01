@@ -18,6 +18,10 @@ void LgsForeachLoop::incAndJumpToCond(LgsCgModule& cg) {
     cg.builder.CreateBr(IRCondBlock);
 }
 
+void LgsForeachLoop::setDebugValue(LgsCgModule& cg) {
+    assert(0);
+}
+
 LgsForeachLoop::~LgsForeachLoop() {
     freeExpr(iterExpr);
 }

@@ -8,7 +8,3 @@ Value* LgsValue::loadIR(LgsCgModule& cg) {
 void LgsValue::hashNode(size_t& oldHash) {
     assert(0);
 }
-
-void LgsValue::setDebugValue(LgsCgModule& cg) {
-    assert(0);
-}

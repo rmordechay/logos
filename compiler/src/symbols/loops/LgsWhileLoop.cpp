@@ -15,6 +15,10 @@ Value* LgsWhileLoop::loopEnd(LgsCgModule& cg) {
     assert(0);
 }
 
+void LgsWhileLoop::setDebugValue(LgsCgModule& cg) {
+    assert(0);
+}
+
 LgsWhileLoop::~LgsWhileLoop() {
     if (condExpr) {
         delete condExpr;

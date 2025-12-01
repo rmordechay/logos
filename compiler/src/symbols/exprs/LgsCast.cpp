@@ -10,6 +10,10 @@ std::string LgsCast::asText() {
     return fromValue->asText() + "->" + toType->pname();
 }
 
+void LgsCast::setDebugValue(LgsCgModule& cg) {
+    assert(0);
+}
+
 LgsCast::~LgsCast() {
     freeExpr(fromValue);
     freeType(toType);

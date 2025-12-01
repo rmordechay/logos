@@ -9,6 +9,7 @@ public:
     Value* loopStart(LgsCgModule& cg) override;
     Value* loopEnd(LgsCgModule& cg) override;
     void incAndJumpToCond(LgsCgModule& cg) override;
+    void setDebugValue(LgsCgModule& cg) override;
     ~LgsForeachLoop() override;
 };
 

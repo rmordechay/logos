@@ -15,5 +15,6 @@ public:
     std::string asText() override;
     Value* hashValue(LgsCgModule& cg) override;
     bool equals(LgsExpr* other) override;
+    void setDebugValue(LgsCgModule& cg) override;
     ~LgsSelection() override;
 };

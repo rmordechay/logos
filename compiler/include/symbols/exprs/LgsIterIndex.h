@@ -28,5 +28,6 @@ public:
     void assignScalar(LgsCgModule& cg, LgsExpr* expr) const;
     std::string asText() override;
     Type* getSArrayType(LgsCgModule& cg) const;
+    void setDebugValue(LgsCgModule& cg) override;
     ~LgsIterIndex() override;
 };

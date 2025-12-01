@@ -61,6 +61,10 @@ bool LgsSelection::equals(LgsExpr* other) {
     return true;
 }
 
+void LgsSelection::setDebugValue(LgsCgModule& cg) {
+    assert(0);
+}
+
 LgsSelection::~LgsSelection() {
     freeExpr(importVar);
     importVar = nullptr;

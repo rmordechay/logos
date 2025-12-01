@@ -75,7 +75,7 @@ public:
     void visitEnum(const LgsEnum* enum_);
     void visitField(LgsField* field);
     void visitFunc(LgsFunc* func);
-    void visitMainFunc(const LgsMainFunc* mainFunc);
+    void visitMainFunc(LgsMainFunc* mainFunc);
     void visitLambda(LgsFunc* lambda);
     void visitParam(LgsParam* param);
     void visitIOPair(LgsIOPair* ioPair, LgsObject* obj);

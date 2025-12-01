@@ -22,6 +22,10 @@ bool LgsNull::equals(LgsExpr* other) {
     assert(0);
 }
 
+void LgsNull::setDebugValue(LgsCgModule& cg) {
+    assert(0);
+}
+
 LgsNull::~LgsNull() {
     freeType(type);
     setType(nullptr);

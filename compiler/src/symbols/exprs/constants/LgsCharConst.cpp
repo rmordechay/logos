@@ -7,3 +7,7 @@ Value* LgsCharConst::loadIR(LgsCgModule& cg) {
 std::string LgsCharConst::asText() {
     return type->pname();
 }
+
+void LgsCharConst::setDebugValue(LgsCgModule& cg) {
+    assert(0);
+}

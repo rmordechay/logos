@@ -2,6 +2,10 @@
 #include "codegen/LgsCgModule.h"
 #include "LgsUtils.h"
 
+void LgsIfStmt::setDebugValue(LgsCgModule& cg) {
+    assert(0);
+}
+
 LgsIfStmt::~LgsIfStmt() {
     freeExpr(ifCond);
     ifCond = nullptr;

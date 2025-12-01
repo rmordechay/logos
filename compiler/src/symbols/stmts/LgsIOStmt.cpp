@@ -8,3 +8,7 @@ LgsIOStmt::~LgsIOStmt() {
         stmtsBlock = nullptr;
     }
 }
+
+void LgsIOStmt::setDebugValue(LgsCgModule& cg) {
+    assert(0);
+}

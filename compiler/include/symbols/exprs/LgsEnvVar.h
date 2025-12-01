@@ -10,4 +10,5 @@ public:
     std::string asText() override;
     Value* loadIR(LgsCgModule& cg) override;
     void hashNode(size_t& oldHash) override;
+    void setDebugValue(LgsCgModule& cg) override;
 };

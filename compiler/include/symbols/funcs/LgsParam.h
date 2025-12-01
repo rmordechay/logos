@@ -18,6 +18,7 @@ public:
     explicit LgsParam(LgsType* type, const std::string& name = "", LgsExpr* expr = nullptr) : name(name), type(type), expr(expr) {}
     Value* loadIR(LgsCgModule& cg) override;
     void setType(LgsType* newType);
+    void setDebugValue(LgsCgModule& cg) override;
     ~LgsParam() override = default;
 };
 

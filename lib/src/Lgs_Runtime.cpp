@@ -4,7 +4,9 @@
 #include <cassert>
 #include "Lgs_HashMap.h"
 #include "LgsUtils.h"
+#include "Lgs_DArrayExpr.h"
 #include "Lgs_Helpers.h"
+#include "Lgs_SetExpr.h"
 #include "context/Lgs_Aarch64.h"
 #include <iostream>
 #include <stack>
@@ -64,7 +66,7 @@ extern "C" void Lgs_Runtime_addCoro(const ThunkFunc funcPtr, void* ctx) {
 
 extern "C" void* Lgs_Runtime_allocate(const size_t size, Lgs_TypeInfo* type, const bool isOwner) {
     const auto ptr = std::malloc(size);
-    std::cout << "Allocated: " << size << '\n';
+    std::cout << "Allocated: " << size << ' ' << '\n';
     if (isOwner) {
         runtime.stack.top().owners[ptr] = type;
     } else {
@@ -98,16 +100,30 @@ extern "C" void Lgs_Runtime_throwError(const char* msg) {
 static void freeValue(void* ptr, const Lgs_TypeInfo* type) {
     std::cout << "Freeing: " << ptr << '\n';
     switch (type->kind) {
-    case RTT_SARRAY: break;
-    case RTT_DARRAY: break;
-    case RTT_SET: break;
-    case RTT_MAP: break;
+    case RTT_DARRAY: {
+        const auto darray = static_cast<Lgs_DArrayExpr*>(ptr);
+        std::free(darray->data);
+        std::free(darray);
+        break;
+    }
+    case RTT_SET: {
+        const auto set = static_cast<Lgs_SetExpr*>(ptr);
+        std::free(set->data);
+        std::free(set);
+        break;
+    }
     case RTT_STR:
-    case RTT_OBJECT: std::free(ptr); return;
+    case RTT_OBJECT: {
+        std::free(ptr); return;
+    }
+    case RTT_SARRAY:
     case RTT_NULLABLE:
+    case RTT_MAP: {
         break;
-    default:
+    }
+    default: {
         break;
+    }
     }
     assert(0);
 }

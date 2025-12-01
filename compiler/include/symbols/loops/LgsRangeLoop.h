@@ -10,5 +10,6 @@ public:
     LgsRangeLoop(LgsExpr* rangeStart, LgsExpr* rangeEnd) : startRange(rangeStart), endRange(rangeEnd) {}
     Value* loopStart(LgsCgModule& cg) override;
     Value* loopEnd(LgsCgModule& cg) override;
+    void setDebugValue(LgsCgModule& cg) override;
     ~LgsRangeLoop() override;
 };

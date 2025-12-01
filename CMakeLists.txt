@@ -25,7 +25,7 @@ if (CCACHE_PROGRAM AND NOT LOGOS_RELEASE)
     set(CMAKE_C_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
 endif ()
 
-set(LGS_SOURCE
+set(COMPILER_SOURCE
     # Logos
     ${CMAKE_SOURCE_DIR}/compiler/src/logos/LgsApp.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/logos/LgsStack.cpp
@@ -153,9 +153,10 @@ set(LGS_SOURCE
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsULong.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsByte.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsVoid.cpp
+    compiler/src/symbols/exprs/LgsTernaryExpr.cpp
 )
 
-set(RUNTIME_SOURCE
+set(LGS_LIB_SOURCE
     ${CMAKE_SOURCE_DIR}/lib/src/Lgs_HashMap.cpp
     ${CMAKE_SOURCE_DIR}/lib/src/Lgs_DArrayExpr.cpp
     ${CMAKE_SOURCE_DIR}/lib/src/Lgs_StrExpr.cpp
@@ -174,12 +175,12 @@ set(SHARED_SOURCE
 )
 
 # Logos lib and shared
-add_library(lgs_lib SHARED ${RUNTIME_SOURCE})
+add_library(lgs_lib SHARED ${LGS_LIB_SOURCE})
 add_library(lgs_shared STATIC ${SHARED_SOURCE})
 set_target_properties(lgs_lib PROPERTIES OUTPUT_NAME "lgs")
 
 # Compiler executable
-add_executable(lgs main.cpp ${LGS_SOURCE})
+add_executable(lgs main.cpp ${COMPILER_SOURCE})
 
 # Includes
 target_include_directories(lgs_lib PUBLIC

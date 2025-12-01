@@ -11,6 +11,7 @@
 #include "stmts/LgsAssignment.h"
 #include "stmts/LgsStmtsBlock.h"
 
+struct LgsFileMetadata;
 class LgsMetaSelection;
 class LgsMatrixExpr;
 class LgsGenericType;

@@ -11,3 +11,7 @@ bool LgsMetaVar::equals(LgsExpr* other) {
 std::string LgsMetaVar::asText() {
     return name;
 }
+
+void LgsMetaVar::setDebugValue(LgsCgModule& cg) {
+    assert(0);
+}

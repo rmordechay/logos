@@ -24,5 +24,6 @@ public:
     void hashNode(size_t& oldHash) override;
     void setObject(LgsObject* newObj);
     bool equals(LgsExpr* other) override;
+    void setDebugValue(LgsCgModule& cg) override;
     ~LgsInstance() override;
 };

@@ -2,18 +2,8 @@
 #include <filesystem>
 #include <vector>
 
-class LgsStmt;
-struct LgsFileMetadata;
-struct LgsAppConfigs;
-class LgsParam;
-class LgsSubType;
-class LgsExpr;
-struct LgsError;
 struct LgsBaseMsg;
-class LgsFile;
-class LgsErrHandler;
 struct LgsLocation;
-class LgsType;
 namespace fs = std::filesystem;
 
 #define EXPECTED_ERR(E, code) "Expected error: '" << std::string(E.msg) << "'" << std::string(code)

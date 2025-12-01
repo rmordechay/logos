@@ -165,6 +165,10 @@ Type* LgsIterIndex::getSArrayType(LgsCgModule& cg) const {
     }
 }
 
+void LgsIterIndex::setDebugValue(LgsCgModule& cg) {
+    assert(0);
+}
+
 LgsIterIndex::~LgsIterIndex() {
     // TODO free baseExpr
     // freeExpr(baseExpr);

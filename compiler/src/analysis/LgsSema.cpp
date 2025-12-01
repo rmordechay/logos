@@ -92,8 +92,9 @@ void LgsSema::visitMainFile(LgsMainFile* mainFile) {
     for (const auto& [funcName, func] : mainFile->funcs) {
         if (funcName == LGS_MAIN_FUNC) {
             visitMainFunc(dynamic_cast<LgsMainFunc*>(func));
+        } else {
+            visitFunc(func);
         }
-        visitFunc(func);
     }
     if (mainFile->funcs.contains(LGS_MAIN_FUNC)) {
         if (appConfigs.isLibrary) {
@@ -178,23 +179,27 @@ void LgsSema::visitFunc(LgsFunc* func) {
     stack.exitScope();
 }
 
-void LgsSema::visitMainFunc(const LgsMainFunc* mainFunc) {
+void LgsSema::visitMainFunc(LgsMainFunc* mainFunc) {
+    stack.enterScope(mainFunc);
     const auto ft = mainFunc->funcType;
     const auto paramSize = ft->params.size();
-    if (paramSize == 0) return;
-    if (paramSize != 1) {
+    if (paramSize > 1) {
         return addError(E10039, mainFunc->location);
     }
-    auto& firstParam = ft->params.front();
-    const auto iterable = firstParam.type->asIterable();
-    if (!iterable || !iterable->baseType->asStr()) {
-        return addError(E10039, mainFunc->location);
+    if (paramSize == 1) {
+        auto& firstParam = ft->params.front();
+        const auto iterable = firstParam.type->asIterable();
+        if (!iterable || !iterable->baseType->asStr()) {
+            return addError(E10039, mainFunc->location);
+        }
+        // Replaces dyn array to static array
+        freeType(firstParam.type);
+        const auto sArray = new LgsSArray(new LgsStr(), LGS_INT.getZeroValue());
+        firstParam.setType(sArray);
+        firstParam.expr = new LgsArrayExpr(sArray);
     }
-    // Replaces dyn array to static array
-    freeType(firstParam.type);
-    const auto sArray = new LgsSArray(new LgsStr(), LGS_INT.getZeroValue());
-    firstParam.setType(sArray);
-    firstParam.expr = new LgsArrayExpr(sArray);
+    visitStmtsBlock(mainFunc->stmtsBlock);
+    stack.exitScope();
 }
 
 void LgsSema::visitLambda(LgsFunc* lambda) {

@@ -32,5 +32,6 @@ public:
 
     LgsAssignment(const LgsAssignType assignmentType, LgsExpr* lValue, LgsExpr* rValue) : lValue(lValue), rValue(rValue), assignmentType(assignmentType) {}
     std::string getAssignTypeStr() const;
+    void setDebugValue(LgsCgModule& cg) override;
     ~LgsAssignment() override;
 };

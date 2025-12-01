@@ -65,7 +65,7 @@ public:
     std::unordered_map<std::string, Value*> stringsRegistry;
     bool isRTTModule = false;
 
-    void setupModule(const std::string& file, bool debugMode = false);
+    void setupModule(const std::filesystem::path& file, bool debugMode = false);
     bool writeIRModule(const LgsPaths& paths, uint8_t optLevel) const;
     void loop(Value* loopLength, const std::function<void(Value*, BasicBlock*)>& body);
     Constant* getString(const std::string& value);

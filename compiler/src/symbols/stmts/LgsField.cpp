@@ -27,6 +27,10 @@ Value* LgsField::resolveVirtualField(LgsCgModule* cg, const LgsHashMap* vtable) 
     return cg->builder.CreateLoad(fieldIRType, rv);
 }
 
+void LgsField::setDebugValue(LgsCgModule& cg) {
+    assert(0);
+}
+
 LgsField::~LgsField() {
     freeExpr(expr);
     freeType(type);

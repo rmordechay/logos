@@ -6,6 +6,10 @@ std::string LgsPostfixExpr::asText() {
     assert(0);
 }
 
+void LgsPostfixExpr::setDebugValue(LgsCgModule& cg) {
+    assert(0);
+}
+
 LgsPostfixExpr::~LgsPostfixExpr() {
     freeExpr(baseExpr);
     baseExpr = nullptr;

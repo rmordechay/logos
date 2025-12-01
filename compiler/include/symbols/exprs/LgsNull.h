@@ -11,6 +11,7 @@ public:
     void castImplicitly(LgsType* toType) override;
     std::string asText() override;
     bool equals(LgsExpr* other) override;
+    void setDebugValue(LgsCgModule& cg) override;
     ~LgsNull() override;
 };
 

@@ -10,6 +10,10 @@ std::string LgsPrefixExpr::asText() {
     assert(0);
 }
 
+void LgsPrefixExpr::setDebugValue(LgsCgModule& cg) {
+    assert(0);
+}
+
 LgsPrefixExpr::~LgsPrefixExpr() {
     freeExpr(expr);
     expr = nullptr;

@@ -24,3 +24,7 @@ LgsExpr* LgsFloatConst::castExplicitly(LgsType* toType) {
 std::string LgsFloatConst::asText() {
     return std::to_string(value);
 }
+
+void LgsFloatConst::setDebugValue(LgsCgModule& cg) {
+    assert(0);
+}

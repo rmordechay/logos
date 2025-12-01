@@ -8,8 +8,6 @@
 #include <sstream>
 #include <unistd.h>
 
-struct LgsFileMetadata;
-
 void execute(const fs::path& execPath, std::vector<const char*> mainArgs) {
     const auto path = const_cast<char*>(execPath.c_str());
     mainArgs.insert(mainArgs.begin(), path);

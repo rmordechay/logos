@@ -28,5 +28,6 @@ public:
     Value* getGEP(LgsCgModule& cg) const;
     Value* loadIR(LgsCgModule& cg) override;
     Value* resolveVirtualField(LgsCgModule* cg, const LgsHashMap* vtable) const;
+    void setDebugValue(LgsCgModule& cg) override;
     ~LgsField() override;
 };

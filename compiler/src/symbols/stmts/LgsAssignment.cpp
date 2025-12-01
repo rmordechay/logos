@@ -35,6 +35,10 @@ std::string LgsAssignment::getAssignTypeStr() const {
     assert(0);
 }
 
+void LgsAssignment::setDebugValue(LgsCgModule& cg) {
+    assert(0);
+}
+
 LgsAssignment::~LgsAssignment() {
     freeExpr(lValue);
     freeExpr(rValue);

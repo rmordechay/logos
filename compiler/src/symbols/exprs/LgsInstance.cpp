@@ -35,6 +35,10 @@ bool LgsInstance::equals(LgsExpr* other) {
     assert(0);
 }
 
+void LgsInstance::setDebugValue(LgsCgModule& cg) {
+    assert(0);
+}
+
 LgsInstance::~LgsInstance() {
     for (const auto& [_, arg] : args) {
         freeExpr(arg.expr);

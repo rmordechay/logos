@@ -21,13 +21,13 @@
 
 #define GENERATE_OBJ_CMD "clang -fstack-protector-strong -Wno-override-module -target %s -c -o %s %s.bc"
 
-void LgsCgModule::setupModule(const std::string& file, const bool debugMode) {
-    IRModule = new Module(file, context);
+void LgsCgModule::setupModule(const fs::path& file, const bool debugMode) {
+    IRModule = new Module(file.stem().string(), context);
     IRModule->setTargetTriple(llvm::sys::getDefaultTargetTriple());
     IRModule->setDataLayout(targetMachine->createDataLayout());
-    if (debugMode) {
+    if (debugMode && !isRTTModule) {
         debugger.diBuilder = new DIBuilder(*IRModule);
-        debugger.diFile = debugger.diBuilder->createFile(file, "");
+        debugger.diFile = debugger.diBuilder->createFile(fs::canonical(file).string(), "");
         debugger.compileUnit = debugger.diBuilder->createCompileUnit(llvm::dwarf::DW_LANG_C, debugger.diFile, "Logos", false, "", 0);
         IRModule->addModuleFlag(Module::Warning, "Dwarf Version", 5);
         IRModule->addModuleFlag(Module::Warning, "Debug Info Version", llvm::DEBUG_METADATA_VERSION);

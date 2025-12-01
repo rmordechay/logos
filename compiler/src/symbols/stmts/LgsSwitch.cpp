@@ -1,6 +1,11 @@
 #include "stmts/LgsSwitch.h"
 #include "stmts/LgsStmtsBlock.h"
 #include "LgsUtils.h"
+#include "exprs/LgsExpr.h"
+
+void LgsSwitch::setDebugValue(LgsCgModule& cg) {
+    assert(0);
+}
 
 LgsSwitch::~LgsSwitch() {
     if (cond) {

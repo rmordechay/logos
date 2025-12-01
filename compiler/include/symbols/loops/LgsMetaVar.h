@@ -17,5 +17,6 @@ public:
     Value* loadIR(LgsCgModule& cg) override;
     bool equals(LgsExpr* other) override;
     std::string asText() override;
+    void setDebugValue(LgsCgModule& cg) override;
 };
 

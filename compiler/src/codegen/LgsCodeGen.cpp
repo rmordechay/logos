@@ -62,7 +62,7 @@
 std::atomic<size_t> LgsCodeGen::lambdasIDGenerator{0};
 
 bool LgsCodeGen::generate() {
-    cg.setupModule(file.path.stem(), appConfigs.debugMode);
+    cg.setupModule(file.path, appConfigs.debugMode);
     for (auto [name, symbol] : file.symbolTable.symbols) {
         if (symbol.symbolType == VAR_DEC && symbol.isExternal) {
             visitConstant(symbol.varDec->expr);

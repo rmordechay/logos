@@ -8,6 +8,7 @@ public:
 
     explicit LgsUIntConst(const int value) : LgsExpr(&LGS_UINT), value(value) {}
     std::string asText() override;
+    void setDebugValue(LgsCgModule& cg) override;
     ~LgsUIntConst() override = default;
 };
 

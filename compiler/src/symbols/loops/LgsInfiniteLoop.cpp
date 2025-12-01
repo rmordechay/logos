@@ -15,6 +15,10 @@ Value* LgsInfiniteLoop::loopEnd(LgsCgModule& cg) {
     assert(0);
 }
 
+void LgsInfiniteLoop::setDebugValue(LgsCgModule& cg) {
+    assert(0);
+}
+
 void LgsInfiniteLoop::setBlocks(LgsCgModule& cg) {
     IRBodyBlock = cg.createBlock(BLOCK_NAME_LOOP_BODY);
     IRExitBlock = cg.createBlock(BLOCK_NAME_LOOP_EXIT);
