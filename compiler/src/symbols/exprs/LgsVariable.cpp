@@ -67,7 +67,7 @@ std::string LgsVariable::asText() {
 
 void LgsVariable::setDebugValue(LgsCgModule& cg) {
     const auto var = cg.debugger.diBuilder->createAutoVariable(
-        cg.debugger.blocks.back(),
+        cg.debugger.subprogram->getScope(),
         name,
         cg.debugger.diFile,
         location.lineStart,

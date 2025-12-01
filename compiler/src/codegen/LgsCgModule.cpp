@@ -441,7 +441,7 @@ llvm::DILocation* LgsCgModule::getDebugLoc(const LgsLocation& location) {
         location.columnStart,
         debugger.subprogram,
         debugger.subprogram->getScope()
-        );
+    );
 }
 
 void LgsCgModule::initLLVM() {

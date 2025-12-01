@@ -50,7 +50,6 @@ struct LgsLLDBGen {
     DIBuilder* diBuilder = nullptr;
     DICompileUnit* compileUnit = nullptr;
     DISubprogram* subprogram = nullptr;
-    std::vector<llvm::DIScope*> blocks = {};
 };
 
 class LgsCgModule {

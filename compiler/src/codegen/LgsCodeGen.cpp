@@ -215,12 +215,10 @@ void LgsCodeGen::visitStmt(LgsStmt* stmt) {
     else if (const auto returnStmt = stmt->asReturn()) visitReturnStmt(returnStmt);
     else if (const auto breakStmt = stmt->asBreak()) visitBreakStmt(breakStmt);
     else if (stmt->asContinue()) visitContinueStmt();
-    if (appConfigs.debugMode) stmt->setDebugValue(cg);
 }
 
 void LgsCodeGen::visitStmtsBlock(const LgsStmtsBlock* stmtsBlock) {
     assert(stmtsBlock);
-    if (appConfigs.debugMode) cg.debugger.blocks.push_back(cg.debugger.subprogram);
     for (const auto& stmt : stmtsBlock->stmts) {
         switch (stmt.type) {
         case LgsStmtWrapper::Type::Object:
@@ -228,13 +226,14 @@ void LgsCodeGen::visitStmtsBlock(const LgsStmtsBlock* stmtsBlock) {
             break;
         case LgsStmtWrapper::Type::Stmt:
             visitStmt(stmt.stmt);
+            if (appConfigs.debugMode) stmt.stmt->setDebugValue(cg);
             break;
         case LgsStmtWrapper::Type::Expr:
             visitExpr(stmt.expr);
+            if (appConfigs.debugMode) stmt.expr->setDebugValue(cg);
             break;
         }
     }
-    if (appConfigs.debugMode) cg.debugger.blocks.pop_back();
 }
 
 void LgsCodeGen::visitLoop(LgsForLoop* loop) {
@@ -646,7 +645,6 @@ void LgsCodeGen::visitExpr(LgsExpr* expr, const bool assign) {
         else if (const auto cast = expr->asCast()) visitCast(cast);
         else if (const auto json = expr->asJson()) visitJson(json);
     }
-    if (appConfigs.debugMode) expr->setDebugValue(cg);
     assert(expr->IRValue);
 }
 
