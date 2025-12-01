@@ -1,48 +1,79 @@
 #pragma once
 #include "Lgs_Types.h"
-#include "exprs/LgsExpr.h"
+
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/DIBuilder.h>
+#include <llvm/Passes/OptimizationLevel.h>
 #include <cmath>
 #include <map>
 #include <filesystem>
-#include <llvm/Passes/OptimizationLevel.h>
 
+struct LgsPaths;
+struct LgsAppConfigs;
+struct LgsLocation;
 class LgsFile;
 namespace llvm {
     class PassBuilder;
     class TargetMachine;
 }
 
+using llvm::DIFile;
+using llvm::DICompileUnit;
+using llvm::DISubprogram;
+using llvm::LLVMContext;
+using llvm::Module;
+using llvm::GlobalVariable;
+using llvm::ConstantInt;
+using llvm::ConstantAggregateZero;
+using llvm::StructType;
+using llvm::Constant;
+using llvm::GlobalValue;
+using llvm::IntegerType;
+using llvm::PointerType;
+using llvm::TypeSize;
+using llvm::FunctionType;
+using llvm::Function;
+using llvm::BasicBlock;
+using llvm::UndefValue;
+using llvm::ArrayType;
+using llvm::TargetMachine;
+using llvm::raw_fd_ostream;
+using llvm::DIBasicType;
 using llvm::DIBuilder;
 using llvm::IRBuilderBase;
 using llvm::IRBuilder;
+using llvm::Type;
+using llvm::Value;
 
 struct LgsLLDBGen {
     DIFile* diFile = nullptr;
     DIBuilder* diBuilder = nullptr;
     DICompileUnit* compileUnit = nullptr;
     DISubprogram* subprogram = nullptr;
-    std::vector<llvm::DIScope*> blocks = {};
 };
 
-class LgsLLVMGen {
+class LgsCgModule {
 public:
     LLVMContext context;
     LgsLLDBGen debugger;
     Module* IRModule = nullptr;
+    Function* currentFunc = nullptr;
     IRBuilderBase::InsertPoint savedIP;
     IRBuilder<> builder = IRBuilder(context);
     std::map<std::string, Type*> typesRegistry;
     std::unordered_map<std::string, Value*> stringsRegistry;
+    bool isRTTModule = false;
 
-    void setupModule(const LgsFile& file, bool debugMode = false);
+    void setupModule(const std::filesystem::path& file, bool debugMode = false);
+    bool writeIRModule(const LgsPaths& paths, uint8_t optLevel) const;
     void loop(Value* loopLength, const std::function<void(Value*, BasicBlock*)>& body);
-    Constant* getIRStr(const std::string& value);
+    Constant* getString(const std::string& value);
     Value* getPtrTo(Value* v);
-    GlobalVariable* createGlobal(Type* type, Constant* args, const std::string& name) const;
+    GlobalVariable* createGlobal(const std::string& name, Type* type, Constant* args, bool isConst = false, GlobalValue::LinkageTypes linkage = GlobalValue::ExternalLinkage) const;
     StructType* getStructType(const std::vector<Type*>& fields, const std::string& name = "");
     llvm::AllocaInst* getEmptyBuffer();
+    Constant* getRTTypeInfo(const std::string& name, size_t size, size_t alignment, Lgs_TypeKind kind, Constant* extra);
+    StructType* getRTBaseType();
 
     // Blocks
     BasicBlock* createBlock(const std::string& name = "", Function* parent = nullptr);
@@ -60,7 +91,7 @@ public:
     Value* callLgsFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes = {}, const std::vector<Value*>& args = {});
     Value* callRuntimeFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes = {}, const std::vector<Value*>& args = {});
     Value* callHash(Value* arg);
-    Value* hashConst(const std::string& str);
+    Constant* hashConst(const std::string& str);
 
     // System
     Value* callPrintf(const std::vector<Value*>& args);
@@ -68,16 +99,14 @@ public:
     Value* callStrLen(Value* str);
     void callMemSet(Value* dest, Value* src, Value* size);
     void callMemCpy(Value* dest, Value* src, Value* size);
-    Value* callAllocate(size_t size, bool isOwner, Lgs_TypeKind type);
-    Value* callAllocate(Value* size, bool isOwner, Lgs_TypeKind type);
+    Value* allocate(Value* size, Constant* type, bool isOwner);
 
     // Stack
-    void callStackPush(bool hasDefers, bool needsCleanup);
-    void callPopStack(bool hasDefers, bool needsCleanup = false);
+    void callStackPush();
+    void callPopStack();
     void addToVTable(Value* instance, Value* key, Value* ptr);
     Value* getFromVTable(Value* instance, Value* key);
     void addNullTerminate(Value* strPtr, Value* pos);
-    void addHeap(bool isOwner, Lgs_TypeKind type, Value* ptr);
 
     // Types
     Type* i1Ty();
@@ -92,7 +121,7 @@ public:
     PointerType* ptrTy();
 
     // Values
-    Value* null();
+    Constant* null();
     ConstantInt* true_();
     ConstantInt* false_();
     ConstantInt* i1(bool v);
@@ -120,7 +149,7 @@ public:
     llvm::DILocation* getDebugLoc(const LgsLocation& location);
     static void initLLVM();
     static llvm::OptimizationLevel getOptLevel(uint8_t optLevel);
-    ~LgsLLVMGen();
+    ~LgsCgModule();
 };
 
 inline TargetMachine* targetMachine;

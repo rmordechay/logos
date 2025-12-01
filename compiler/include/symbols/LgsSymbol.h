@@ -1,8 +1,8 @@
 #pragma once
-#include "codegen/LgsLLVMGen.h"
+#include "codegen/LgsCgModule.h"
 #include <string>
 
-class LgsGenericParam;
+class LgsGenericType;
 class LgsType;
 class LgsSubType;
 class LgsVariable;
@@ -42,7 +42,7 @@ struct LgsSymbol {
         LgsObject* object;
         LgsInterface* interface;
         LgsSubType* subtype;
-        LgsGenericParam* generic;
+        LgsGenericType* generic;
         LgsField* field;
         LgsEnum* enum_;
         LgsFunc* func;
@@ -53,7 +53,7 @@ struct LgsSymbol {
     explicit LgsSymbol(LgsParam* param);
     explicit LgsSymbol(LgsField* field);
     explicit LgsSymbol(LgsInterface* interface);
-    explicit LgsSymbol(LgsGenericParam* generic);
+    explicit LgsSymbol(LgsGenericType* generic);
     explicit LgsSymbol(LgsSubType* subtype);
     explicit LgsSymbol(LgsVarDec* varDec, bool isBuiltin = false, bool isExternal = false);
     explicit LgsSymbol(LgsObject* object, bool isBuiltin = false, bool isExternal = false);

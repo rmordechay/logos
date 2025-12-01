@@ -2,11 +2,13 @@
 
 #include "LgsUtils.h"
 
-Type* LgsTypePair::getIRType(LgsLLVMGen& cg) {
+#include <cassert>
+
+Type* LgsTypePair::getIRType(LgsCgModule& cg) {
     assert(0);
 }
 
-Lgs_TypeKind LgsTypePair::getRTTypeKind() {
+Constant* LgsTypePair::getRTType(LgsCgModule& cg) {
     assert(0);
 }
 
@@ -19,7 +21,7 @@ size_t LgsTypePair::sizeBytes() {
 }
 
 std::string LgsTypePair::getName() {
-    return name;
+    return name + key->pname() + value->pname();
 }
 
 std::string LgsTypePair::pname() {
@@ -32,12 +34,16 @@ bool LgsTypePair::canCastTo(LgsType* other) {
     return key->canCastTo(otherPair->key) && value->canCastTo(otherPair->value);
 }
 
-std::string LgsTypePair::strFormatPart() const {
+std::string LgsTypePair::fmtStr() const {
     return "%s";
 }
 
-LgsType* LgsTypePair::clone() {
-    return new LgsTypePair(key->clone(), value->clone());
+LgsType* LgsTypePair::applyBinOp(LgsType* toType, LgsBinOp& op) {
+    assert(0);
+}
+
+DIType* LgsTypePair::getDebugType(LgsCgModule& cg) {
+    assert(0);
 }
 
 LgsTypePair::~LgsTypePair() {

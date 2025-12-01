@@ -1,5 +1,7 @@
 #include "types/LgsUnknown.h"
 
+#include <cassert>
+
 std::string LgsUnknown::getName() {
     return name;
 }
@@ -12,10 +14,6 @@ LgsExpr* LgsUnknown::getZeroValue() {
     assert(0);
 }
 
-Lgs_TypeKind LgsUnknown::getRTTypeKind() {
-    return RTT_UNKNOWN;
-}
-
 size_t LgsUnknown::sizeBytes() {
     return 0;
 }
@@ -24,10 +22,22 @@ bool LgsUnknown::canCastTo(LgsType* other) {
     return false;
 }
 
-std::string LgsUnknown::strFormatPart() const {
+LgsType* LgsUnknown::applyBinOp(LgsType* toType, LgsBinOp& op) {
     assert(0);
 }
 
-Type* LgsUnknown::getIRType(LgsLLVMGen& cg) {
+std::string LgsUnknown::fmtStr() const {
+    assert(0);
+}
+
+DIType* LgsUnknown::getDebugType(LgsCgModule& cg) {
+    assert(0);
+}
+
+Type* LgsUnknown::getIRType(LgsCgModule& cg) {
+    assert(0);
+}
+
+Constant* LgsUnknown::getRTType(LgsCgModule& cg) {
     assert(0);
 }

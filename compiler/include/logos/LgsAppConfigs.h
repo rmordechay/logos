@@ -2,7 +2,6 @@
 #include "LgsConfigs.h"
 #include "LgsVersion.h"
 #include "LgsUtils.h"
-#include <cstdint>
 #include <string>
 
 enum LgsAppMode {
@@ -25,7 +24,7 @@ struct LgsAppConfigs {
     bool isLibrary = false;
 };
 
-inline void print(const LgsAppConfigs& configs) {
+inline void printAppConfigs(const LgsAppConfigs& configs) {
     logInfo("name       = " + configs.name + '\n');
     logInfo("activeEnv  = " + configs.activeEnv + '\n');
     logInfo("logLevel   = " + std::to_string(configs.logLevel) + '\n');

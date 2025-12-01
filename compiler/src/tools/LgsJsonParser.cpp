@@ -1,4 +1,6 @@
 #include "tools/LgsJsonParser.h"
+#include "exprs/LgsArrayExpr.h"
+#include "exprs/LgsBinaryExpr.h"
 #include "exprs/LgsFuncCall.h"
 #include "exprs/LgsNull.h"
 #include "exprs/LgsSelection.h"
@@ -187,14 +189,11 @@ void LgsJsonParser::parseStmt(LgsStmt* stmt) {
     else if (const auto coroutine = stmt->asCoroutine()) parseCoroutine(coroutine);
     else if (const auto deferStmt = stmt->asDefer()) parseDeferStmt(deferStmt);
     else if (const auto assignment = stmt->asAssignment()) parseAssignment(assignment);
-    else if (const auto funcCall = stmt->asFuncCall()) parseFuncCall(funcCall);
-    else if (const auto postfixExpr = stmt->asPostfixExpr()) parsePostfixExpr(postfixExpr);
-    else if (const auto selection = stmt->asSelection()) parseSelection(selection);
     else if (const auto returnStmt = stmt->asReturn()) parseReturnStmt(returnStmt);
     else if (const auto continueStmt = stmt->asContinue()) parseContinueStmt(continueStmt);
     else if (const auto ioStmt = stmt->asIOStmt()) parseIOStmt(ioStmt);
     else if (const auto breakStmt = stmt->asBreak()) parseBreakStmt(breakStmt);
-    else if (auto expr = stmt->asExpr()) parseExpr(expr);
+    else if (const auto expr = stmt->asExpr()) parseExpr(expr);
     else assert(0);
 }
 
@@ -212,7 +211,9 @@ void LgsJsonParser::parseStmtsBlock(const LgsStmtsBlock* stmtsBlock) {
 void LgsJsonParser::parseVarDec(const LgsVarDec* varDec) {
     openObject();
     addKeyValueStr("kind", "variable", true);
-    addKeyValueStr("name", varDec->name);
+    addKeyValueStr("name", varDec->name, true);
+    openKey("expr");
+    parseExpr(varDec->expr);
     closeObject();
 }
 
@@ -312,7 +313,7 @@ void LgsJsonParser::parseIOStmt(const LgsIOStmt* ioStmt) {
     closeObject();
 }
 
-void LgsJsonParser::parseExpr(LgsExpr*& expr) {
+void LgsJsonParser::parseExpr(LgsExpr* expr) {
     if (!expr) return;
     if (const auto ternaryExpr = dynamic_cast<LgsTernaryExpr*>(expr)) {
         parseTernaryExpr(ternaryExpr);
@@ -361,19 +362,16 @@ void LgsJsonParser::parseCast(LgsCast* cast) {
 
 void LgsJsonParser::parseArrayExpr(LgsArrayExpr* arrayExpr) {
     openObject();
-    addKeyValueStr("kind", "arrayExpr");
-    closeObject();
-}
-
-void LgsJsonParser::parseStaticArray(const LgsArrayExpr* arrayExpr) {
-    openObject();
-    addKeyValueStr("kind", "arrayExpr");
-    closeObject();
-}
-
-void LgsJsonParser::parseDynamicArray(LgsArrayExpr* arrayExpr) {
-    openObject();
-    addKeyValueStr("kind", "arrayExpr");
+    addKeyValueStr("kind", "arrayExpr", true);
+    openKey("elements");
+    openArray();
+    bool isFirst = true;
+    for (const auto element : arrayExpr->elements) {
+        if (!isFirst) addComma();
+        isFirst = false;
+        parseExpr(element);
+    }
+    closeArray();
     closeObject();
 }
 

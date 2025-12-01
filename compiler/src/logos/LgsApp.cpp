@@ -1,29 +1,34 @@
 #include "logos/LgsApp.h"
-#include <llvm/Support/FileSystem.h>
 #include <llvm/IR/Module.h>
 #include "analysis/LgsSema.h"
 #include "builtins/LgsTest.h"
 #include "logos/LgsPaths.h"
 #include "utils/ThreadPool.h"
 #include "builtins/LgsPrint.h"
-#include "builtins/LgsReflect.h"
 #include "builtins/LgsSystem.h"
 #include "files/LgsEnvFile.h"
 #include "codegen/LgsCodeGen.h"
 #include "codegen/LgsLinker.h"
 #include "LgsConfigs.h"
 #include "files/LgsTestFile.h"
-#include "lgsc/LgsCLang.h"
+#include "lgsc/LgsCCompiler.h"
 #include "parser/LgsParser.h"
 #include "LgsUtils.h"
-#include <iostream>
+#include "types/iterables/LgsVec.h"
+#include "types/primitives/LgsByte.h"
+#include "types/primitives/LgsDouble.h"
+#include "types/primitives/LgsFloat.h"
+#include "types/primitives/LgsShort.h"
+#include "types/primitives/LgsUInt.h"
+#include "types/primitives/LgsULong.h"
+#include <llvm/Target/TargetMachine.h>
 
 inline ThreadPool threadPool;
 
 bool LgsApp::compile() {
     if (!setup()) return false;
     if (!loadConfigs()) return false;
-    // if (!loadDeps()) return false;
+    if (!loadDeps()) return false;
     if (!parse()) return false;
     if (!analyse()) return false;
     if (!generate()) return false;
@@ -133,8 +138,13 @@ bool LgsApp::parseHeaders() {
 
 bool LgsApp::analyse() {
     loadBuiltins();
-    if (!validateEnvs()) return false;
-    if (!typeResolver.resolveGlobals(srcFiles, threadPool)) return false;
+    if (!validateEnvs()) {
+        return false;
+    }
+    LgsTypeResolver typeResolver(errHandler, globals);
+    if (!typeResolver.resolveGlobals(srcFiles, threadPool)) {
+        return false;
+    }
     for (const auto file : srcFiles) {
         threadPool.runTask([this, file] {
             LgsSema sema(configs, file, globals);
@@ -149,11 +159,12 @@ bool LgsApp::analyse() {
 
 bool LgsApp::generate() {
     createBuildDirs();
-    LgsLLVMGen::initLLVM();
-    paths.execFile = paths.buildDir / (configs.name == "" ? LGS_DEFAULT_EXEC_FILE : configs.name);
+    LgsCgModule::initLLVM();
+    if (!generateRTTTypes()) return false;
 
     // Main file is generated first non-concurrently
     const auto mainFile = getMainFile();
+    assert(mainFile);
     LgsCodeGen mainCodeGen(*mainFile, configs, globals, paths);
     if (!mainCodeGen.generate()) {
         errHandler.setUnsuccessful();
@@ -177,10 +188,14 @@ bool LgsApp::generate() {
 }
 
 bool LgsApp::link() {
-    LgsLinker linker(configs, paths, srcFiles);
-    for (auto& [_, app] : globals.table.imports) {
-        linker.externalLibs.push_back(app->paths.rootPath);
+    paths.execFile = paths.buildDir / (configs.name != "" ? configs.name : LGS_DEFAULT_EXEC_FILE);
+    const LgsLinker linker(configs, paths, srcFiles);
+    for (const auto& path : paths.userCLibs) {
+        if (!fs::exists(path)) {
+            errHandler.addError(E10107, {path});
+        }
     }
+    if (!errHandler.successful) return false;
     return linker.link();
 }
 
@@ -278,39 +293,55 @@ bool LgsApp::loadConfigs() {
     return true;
 }
 
-bool LgsApp::loadDeps() {
-    // for (auto package : appConfigFile->packages) {
-    //     const auto app = new LgsApp(path);
-    //     if (!app->setup()) {
-    //         errHandler.mergeErrorsWithLock(app->errHandler);
-    //         return false;
-    //     }
-    //     if (!app->loadConfigs()) {
-    //         errHandler.mergeErrorsWithLock(app->errHandler);
-    //         return false;
-    //     }
-    //     if (!app->parseHeaders()) {
-    //         errHandler.mergeErrorsWithLock(app->errHandler);
-    //         return false;
-    //     }
-    //     LgsTypeResolver typeResolver(app->errHandler, app->globals.symbolTable);
-    //     if (!typeResolver.resolveGlobals(app->srcFiles, threadPool)) {
-    //         errHandler.mergeErrorsWithLock(typeResolver.errHandler);
-    //         return false;
-    //     }
-    //     globals.symbolTable.imports[app->configs.name] = app;
-    // }
-    return true;
+bool LgsApp::loadDeps() const {
+    return errHandler.successful;
 }
 
 void LgsApp::loadBuiltins() {
     globals.table.addSymbol(LgsSymbol(new LgsSystem(), true, false), &errHandler);
     globals.table.addSymbol(LgsSymbol(new LgsPrint(), true, false), &errHandler);
     globals.table.addSymbol(LgsSymbol(new LgsTest(), true, false), &errHandler);
-    globals.table.addSymbol(LgsSymbol(new LgsReflect(), true, false), &errHandler);
     globals.table.addSymbol(LgsSymbol(new LgsVarDec("_LINUX", &LGS_BOOL, new LgsIntConst(&LGS_BOOL, lgsConfigs.os == LINUX)), true, false), &errHandler);
     globals.table.addSymbol(LgsSymbol(new LgsVarDec("_MACOS", &LGS_BOOL, new LgsIntConst(&LGS_BOOL, lgsConfigs.os == MAC_OS)), true, false), &errHandler);
     globals.table.addSymbol(LgsSymbol(new LgsVarDec("_WINDOWS", &LGS_BOOL, new LgsIntConst(&LGS_BOOL, lgsConfigs.os == WINDOWS)), true, false), &errHandler);
+    globals.table.rttTypes = {
+        &LGS_STR, &LGS_BYTE, &LGS_BOOL, &LGS_CHAR, &LGS_INT, &LGS_UINT, &LGS_ULONG,
+        &LGS_SHORT, &LGS_LONG, &LGS_SIZE, &LGS_FLOAT, &LGS_DOUBLE
+    };
+}
+
+bool LgsApp::generateRTTTypes() {
+    rttTypeModule.setupModule("rttypes");
+    rttTypeModule.isRTTModule = true;
+    for (const auto type : globals.table.rttTypes) {
+        type->getRTType(rttTypeModule);
+    }
+
+    // Globals
+    for (auto [symbolName, symbol] : globals.table.symbols) {
+        if (symbol.symbolType != OBJECT) continue;
+        symbol.object->getRTType(rttTypeModule);
+        for (const auto innerObj : symbol.object->objects) {
+            innerObj->getRTType(rttTypeModule);
+        }
+    }
+
+    for (const auto srcFile : srcFiles) {
+        for (const auto type : srcFile->symbolTable.rttTypes) {
+            type->getRTType(rttTypeModule);
+        }
+    }
+
+    if (const auto mainFile = getMainFile()) {
+        for (const auto object : mainFile->objects) {
+            object->getRTType(rttTypeModule);
+            for (const auto innerObj : object->objects) {
+                innerObj->getRTType(rttTypeModule);
+            }
+        }
+    }
+
+    return rttTypeModule.writeIRModule(paths, 3);
 }
 
 void LgsApp::createBuildDirs() {
@@ -367,6 +398,8 @@ void LgsApp::compareHash() const {
 
 void LgsApp::printIR() const {
     if (!lgsConfigs.isDevMode || !lgsConfigs.printIR) return;
+    rttTypeModule.IRModule->print(llvm::outs(), nullptr);
+    logInfo(LGS_MSG_LINE_SEPERATOR);
     std::lock_guard lock(mtx);
     for (const auto& file : srcFiles) {
         if (!file->cg.IRModule) continue;

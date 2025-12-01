@@ -6,11 +6,11 @@ std::string LgsMatrixExpr::asText() {
     assert(0);
 }
 
-Value* LgsMatrixExpr::loadIR(LgsLLVMGen& cg) {
+Value* LgsMatrixExpr::loadIR(LgsCgModule& cg) {
     assert(0);
 }
 
-void LgsMatrixExpr::setDebugValue(LgsLLVMGen& cg) {
+void LgsMatrixExpr::setDebugValue(LgsCgModule& cg) {
     assert(0);
 }
 
@@ -27,19 +27,11 @@ void LgsMatrixExpr::castImplicitly(LgsType* toType) {
     assert(0);
 }
 
-Value* LgsMatrixExpr::castIR(LgsLLVMGen& cg, LgsType* toType) {
-    assert(0);
-}
-
-Value* LgsMatrixExpr::hashValue(LgsLLVMGen& cg) {
+Value* LgsMatrixExpr::hashValue(LgsCgModule& cg) {
     assert(0);
 }
 
 bool LgsMatrixExpr::equals(LgsExpr* other) {
-    assert(0);
-}
-
-LgsExpr* LgsMatrixExpr::clone() {
     assert(0);
 }
 

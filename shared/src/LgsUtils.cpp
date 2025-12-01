@@ -8,8 +8,6 @@
 #include <sstream>
 #include <unistd.h>
 
-struct LgsFileMetadata;
-
 void execute(const fs::path& execPath, std::vector<const char*> mainArgs) {
     const auto path = const_cast<char*>(execPath.c_str());
     mainArgs.insert(mainArgs.begin(), path);
@@ -149,7 +147,7 @@ std::string scanEscapeStr(const std::string& value) {
     return out;
 }
 
-int32_t hashString(const std::string& str) {
+uint64_t hashString(const std::string& str) {
     return std::hash<std::string_view>{}(str);
 }
 

@@ -6,17 +6,15 @@
 #include "errors/LgsErrHandler.h"
 #include "LgsPaths.h"
 #include "tools/LgsLinter.h"
-#include "analysis/LgsTypeResolver.h"
 #include "LgsDefinitions.h"
 #include "files/LgsFile.h"
 #include "parser/LgsParser.h"
-#include "utils/ThreadPool.h"
 #include <mutex>
 
 class LgsAppConfigFile;
 class LgsTestFile;
 class LogosParser;
-class LgsLLVMGen;
+class LgsCgModule;
 class LgsStrConst;
 class LgsEnvFile;
 class LgsObject;
@@ -34,7 +32,7 @@ public:
     LgsAppCache appCache;
     LgsGlobals globals;
     LgsErrHandler errHandler;
-    LgsTypeResolver typeResolver;
+    LgsCgModule rttTypeModule;
     std::vector<LgsFile*> srcFiles;
     std::vector<LgsEnvFile*> envFiles;
     std::vector<LgsTestFile*> testFiles;
@@ -42,7 +40,7 @@ public:
     std::unordered_map<std::string, std::string> lgsCode; // Used when passing code directly.
     LgsPaths paths;
 
-    explicit LgsApp(const fs::path& rootPath = ""): typeResolver(errHandler, globals) {
+    explicit LgsApp(const fs::path& rootPath = "") {
         paths.rootPath = rootPath;
     }
 
@@ -58,8 +56,9 @@ public:
     bool loadConfigFile();
     bool loadEnvFiles();
     bool loadConfigs();
-    bool loadDeps();
+    bool loadDeps() const;
     void loadBuiltins();
+    bool generateRTTTypes();
     void createBuildDirs();
     bool validateEnvs();
     bool validateRequiredEnvs();

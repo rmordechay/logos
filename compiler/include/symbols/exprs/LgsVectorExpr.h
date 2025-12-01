@@ -12,15 +12,13 @@ public:
     }
 
     explicit LgsVectorExpr(LgsVec* vecType): vecType(vecType) {}
-    Value* loadIR(LgsLLVMGen& cg) override;
+    Value* loadIR(LgsCgModule& cg) override;
     void hashNode(size_t& oldHash) override;
     LgsExpr* castExplicitly(LgsType* toType) override;
     void castImplicitly(LgsType* toType) override;
-    Value* castIR(LgsLLVMGen& cg, LgsType* toType) override;
-    Value* hashValue(LgsLLVMGen& cg) override;
-    LgsExpr* clone() override;
+    Value* hashValue(LgsCgModule& cg) override;
     std::string asText() override;
     bool equals(LgsExpr* other) override;
-    void setDebugValue(LgsLLVMGen& cg) override;
+    void setDebugValue(LgsCgModule& cg) override;
     ~LgsVectorExpr() override;
 };

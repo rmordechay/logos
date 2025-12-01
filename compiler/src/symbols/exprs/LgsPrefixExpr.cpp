@@ -2,11 +2,15 @@
 
 #include "LgsUtils.h"
 
-Value* LgsPrefixExpr::loadIR(LgsLLVMGen& cg) {
+Value* LgsPrefixExpr::loadIR(LgsCgModule& cg) {
     return IRValue;
 }
 
 std::string LgsPrefixExpr::asText() {
+    assert(0);
+}
+
+void LgsPrefixExpr::setDebugValue(LgsCgModule& cg) {
     assert(0);
 }
 

@@ -6,6 +6,7 @@
 #include "logos/LgsAppConfigs.h"
 #include <unordered_map>
 
+class LgsMetaSelection;
 class LgsAppConfigFile;
 class LgsTernaryExpr;
 class LgsVec;
@@ -71,11 +72,10 @@ public:
     void visitObject(LgsObject* obj);
     void visitInterface(LgsInterface* interface);
     void visitTestFile(const LgsTestFile* testFile);
-    void visitGeneric(LgsGenericParam* generic);
     void visitEnum(const LgsEnum* enum_);
     void visitField(LgsField* field);
     void visitFunc(LgsFunc* func);
-    void visitMainFunc(const LgsMainFunc* mainFunc);
+    void visitMainFunc(LgsMainFunc* mainFunc);
     void visitLambda(LgsFunc* lambda);
     void visitParam(LgsParam* param);
     void visitIOPair(LgsIOPair* ioPair, LgsObject* obj);
@@ -91,7 +91,7 @@ public:
     void visitRangeLoop(LgsRangeLoop* rangeLoop);
     void visitForeachLoop(LgsForeachLoop* foreachLoop);
     void visitInfiniteLoop(const LgsInfiniteLoop* infiniteLoop);
-    void visitReturnStmt(LgsReturn* returnStmt);
+    void visitReturnStmt(const LgsReturn* returnStmt);
     void visitContinueStmt(const LgsContinue* continueStmt);
     void visitBreakStmt(const LgsBreak* breakStmt);
     void visitCoroutine(const LgsCoroutine* coroutine);
@@ -102,6 +102,7 @@ public:
     void visitTernaryExpr(LgsTernaryExpr* ternary);
     void visitCast(LgsCast* cast);
     void visitNullableExpr(LgsNullableExpr* nullableExpr);
+    void visitNull(LgsNull* null);
     void visitArrayExpr(LgsArrayExpr* arrayExpr);
     void visitStaticArray(const LgsArrayExpr* arrayExpr);
     void visitDynamicArray(LgsArrayExpr* arrayExpr);
@@ -114,8 +115,9 @@ public:
     void visitInnerSelections(LgsSelection* selection);
     void visitFieldSelection(LgsVariable* child, LgsType* parentType);
     void visitIterIndexSelection(LgsIterIndex* iterIndex, LgsType* parentType);
+    void visitMetaSelection(LgsMetaSelection* metaSelection);
     void visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent);
-    void visitFuncArgs(LgsFuncCall* funcCall, LgsFuncType* ft);
+    bool visitFuncArgs(LgsFuncCall* funcCall, LgsFuncType* ft);
     void visitFuncCall(LgsFuncCall* funcCall);
     void visitPrefixExpr(LgsPrefixExpr* prefixExpr);
     void visitPostfixExpr(LgsPostfixExpr* postfixExpr);
@@ -134,17 +136,18 @@ public:
     bool validateLocalName(const std::string& typeName, const LgsLocation* location);
     void validateObjImplements(LgsObject* obj, const std::vector<LgsType*>& interfaces);
     void validateIndex(LgsIterIndex* iterIndex);
-    bool validateFieldVisibility(LgsField* field, LgsType* parent);
+    bool validateFieldVisibility(LgsField* field, LgsType* parent, const LgsLocation& location);
     bool validateMethodVisibility(const LgsFunc* method, LgsType* parent, const LgsLocation& location);
     bool validateVecElements(const LgsVariable* fieldVar, LgsVec* vec);
     void validateObjDuplicates(LgsType* type);
     static bool validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const LgsFunc* func);
 
     void resolveImports() const;
-    void mergeRTTypes();
     void addHeapExpr(LgsExpr* expr);
     void addLocalSymbol(const LgsSymbol& newSymbol);
     LgsSymbol* getSymbol(const std::string& name, const LgsLocation* location);
+    void createCoroutineFunc(LgsFuncCall* funcCall);
     LgsFunc* createGenericFunc(LgsFuncCall* funcCall, const LgsFunc* originalFunc);
     void addError(const LgsBaseMsg& lgsErr, const LgsLocation& location, const std::vector<std::string>& args = {});
+    void addRTType(LgsType* type) const;
 };

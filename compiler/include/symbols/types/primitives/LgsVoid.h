@@ -8,14 +8,15 @@ public:
     LgsVoid() {
         isPrimitive = true;
     }
-    Type* getIRType(LgsLLVMGen& cg) override;
+    Type* getIRType(LgsCgModule& cg) override;
+    Constant* getRTType(LgsCgModule& cg) override;
     size_t sizeBytes() override;
     std::string getName() override;
     LgsExpr* getZeroValue() override;
-    Lgs_TypeKind getRTTypeKind() override;
-    std::string strFormatPart() const override;
+    LgsType* applyBinOp(LgsType* toType, LgsBinOp& op) override;
+    std::string fmtStr() const override;
     bool canCastTo(LgsType* other) override;
-    DIBasicType* getDebugType(LgsLLVMGen& cg) override;
+    DIType* getDebugType(LgsCgModule& cg) override;
 };
 
 inline LgsVoid LGS_VOID;

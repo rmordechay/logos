@@ -8,14 +8,13 @@ namespace llvm {
 }
 struct LgsAppConfigs;
 class LgsFile;
-class LgsLLVMGen;
+class LgsCgModule;
 
 class LgsLinker {
 public:
     LgsPaths& paths;
     LgsAppConfigs& appConfigs;
     std::vector<LgsFile*> files;
-    std::vector<std::string> externalLibs;
 
     LgsLinker(LgsAppConfigs& appConfigs, LgsPaths& paths, const std::vector<LgsFile*>& modules) : paths(paths), appConfigs(appConfigs), files(modules) {}
     bool link() const;

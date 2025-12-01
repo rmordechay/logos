@@ -1,6 +1,5 @@
 #include "stmts/LgsAssignment.h"
 #include "exprs/LgsArrayExpr.h"
-#include "exprs/LgsHashMap.h"
 #include "exprs/LgsVariable.h"
 #include "LgsUtils.h"
 
@@ -33,6 +32,10 @@ std::string LgsAssignment::getAssignTypeStr() const {
     case ASSIGN_UNKNOWN:
         break;
     }
+    assert(0);
+}
+
+void LgsAssignment::setDebugValue(LgsCgModule& cg) {
     assert(0);
 }
 

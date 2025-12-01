@@ -1,5 +1,6 @@
 #include "tools/LgsFormatter.h"
 #include "exprs/LgsArrayExpr.h"
+#include "exprs/LgsBinaryExpr.h"
 #include "exprs/LgsFuncCall.h"
 #include "exprs/LgsInstance.h"
 #include "exprs/LgsIterIndex.h"
@@ -12,8 +13,8 @@
 #include "files/LgsTestFile.h"
 #include "logos/LgsApp.h"
 #include "loops/LgsMetaVar.h"
+#include "stmts/LgsStmtsBlock.h"
 #include "stmts/LgsVarDec.h"
-#include <iostream>
 #define TAB_SIZE 4
 
 void LgsFormatter::formatFile(LgsFile* file) {
@@ -127,9 +128,6 @@ void LgsFormatter::formatStmt(LgsStmt* stmt) {
     else if (const auto coroutine = stmt->asCoroutine()) formatCoroutine(coroutine);
     else if (const auto deferStmt = stmt->asDefer()) formatDeferStmt(deferStmt);
     else if (const auto assignment = stmt->asAssignment()) formatAssignment(assignment);
-    else if (const auto funcCall = stmt->asFuncCall()) formatFuncCall(funcCall);
-    else if (const auto postfixExpr = stmt->asPostfixExpr()) formatPostfixExpr(postfixExpr);
-    else if (const auto selection = stmt->asSelection()) formatSelection(selection);
     else if (const auto returnStmt = stmt->asReturn()) formatReturnStmt(returnStmt);
     else if (const auto continueStmt = stmt->asContinue()) formatContinueStmt(continueStmt);
     else if (const auto ioStmt = stmt->asIOStmt()) formatIOStmt(ioStmt);

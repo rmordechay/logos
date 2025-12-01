@@ -5,8 +5,10 @@
 
 struct LgsLocation {
     size_t index = 0;
-    size_t lineStart = 0;
-    size_t columnStart = 0;
+    size_t lineStart = 1;
+    size_t columnStart = 1;
+    size_t lineEnd = 1;
+    size_t columnEnd = 1;
     std::filesystem::path* filepath = nullptr;
 };
 
@@ -105,7 +107,7 @@ inline LgsBaseMsg E10070{"Invalid scalars %s for %s.", errCodeStart++};
 inline LgsBaseMsg E10071{"break if must be inside an if statement.", errCodeStart++};
 inline LgsBaseMsg E10072{"%s has multiple methods with the same name %s.", errCodeStart++};
 inline LgsBaseMsg E10073{"Only numbers or vectors can be elements of a vector. Given: %s.", errCodeStart++};
-inline LgsBaseMsg E10074{"Vector mismatch. Vector dimension: %s. Given: %s.", errCodeStart++};
+inline LgsBaseMsg E10074{"Vector dimensions mismatch. Dimension: %s. Given: %s.", errCodeStart++};
 inline LgsBaseMsg E10075{"Expression %s already has an owner.", errCodeStart++};
 inline LgsBaseMsg E10076{"'%s' is not defined between %s and %s.", errCodeStart++}; // operation, left-expr, right-expr
 inline LgsBaseMsg E10077{"Expression %s has no owner.", errCodeStart++};
@@ -134,3 +136,9 @@ inline LgsBaseMsg E10099{"Local names must start with a lowercase letter. Given:
 inline LgsBaseMsg E10100{"Global variable '%s' must be declared const.", errCodeStart++};
 inline LgsBaseMsg E10101{"Macro condition must be known at compile time.", errCodeStart++};
 inline LgsBaseMsg E10102{"Macro condition must be of type Bool. Given: %s.", errCodeStart++};
+inline LgsBaseMsg E10103{"'%s' doesn't match the rows length. Given: %s.", errCodeStart++};
+inline LgsBaseMsg E10104{"'%s' doesn't match the columns length. Given: %s.", errCodeStart++};
+inline LgsBaseMsg E10105{"Too many elements for array of size %s", errCodeStart++};
+inline LgsBaseMsg E10106{"Could not parse C file %s", errCodeStart++};
+inline LgsBaseMsg E10107{"Could not find C library %s", errCodeStart++};
+inline LgsBaseMsg E10108{"%s is not indexable.", errCodeStart++};

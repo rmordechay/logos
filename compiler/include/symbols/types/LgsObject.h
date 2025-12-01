@@ -1,10 +1,13 @@
 #pragma once
+#include "LgsAny.h"
+#include "LgsFuncType.h"
+#include "exprs/LgsFuncCall.h"
+#include "iterables/LgsStr.h"
 #include <utility>
-#include "LgsType.h"
 
-class LgsGenericParam;
+class LgsGenericType;
 class LgsInstance;
-class LgsLLVMGen;
+class LgsCgModule;
 class LgsField;
 class LgsIOPair;
 
@@ -12,27 +15,35 @@ class LgsObject : public LgsType {
 public:
     std::string name;
     std::vector<LgsType*> implements;
-    std::vector<LgsGenericParam*> generics;
+    std::vector<LgsGenericType*> generics;
     std::vector<LgsEnum*> enums;
     std::vector<LgsObject*> objects;
     std::vector<LgsSubType*> subtypes;
     std::vector<LgsIOPair*> ioPairs;
     LgsInstance* singleton = nullptr;
+    std::map<std::string, LgsFunc*> metaMethods;
+    LgsFunc* getFieldFunc = new LgsFunc{"getField", &LGS_ANY, {new LgsStr()}, PUBLIC | BUILTIN | METHOD};
     bool hasGenerics = false;
 
     explicit LgsObject(std::string  name) : name(std::move(name)) {
         isHeapAlloc = true;
         passByRef = true;
+        getFieldFunc->fn = [this](LgsCgModule& cg, const std::vector<LgsFuncArg>& args) {
+            return cg.callLgsFunc("getObjectField", cg.ptrTy(), {cg.ptrTy(), cg.ptrTy(), cg.ptrTy()}, {
+                getRTType(cg), args[0].expr->IRValue, args[1].expr->IRValue
+            });
+        };
+        metaMethods[getFieldFunc->funcType->name] = getFieldFunc;
     }
-    LgsFunc* getMethod(const std::string& methodName) override;
     std::string getName() override;
-    Type* getIRType(LgsLLVMGen& cg) override;
+    LgsFunc* getMethod(const std::string& methodName) override;
+    Type* getIRType(LgsCgModule& cg) override;
+    Constant* getRTType(LgsCgModule& cg) override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
-    Lgs_TypeKind getRTTypeKind() override;
-    Constant* getRTType(LgsLLVMGen& cg) override;
     bool canCastTo(LgsType* other) override;
-    std::string strFormatPart() const override;
-    LgsObject* clone() override;
+    LgsType* applyBinOp(LgsType* toType, LgsBinOp& op) override;
+    std::string fmtStr() const override;
+    DIType* getDebugType(LgsCgModule& cg) override;
     ~LgsObject() override;
 };

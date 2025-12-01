@@ -13,7 +13,7 @@
 #### Windows
 Not working yet.
 
-## Basic syntax
+## Overview
 #### Hello world
 ```
 main() {
@@ -49,16 +49,33 @@ main() {
 }
 ```
 
-### Conditional
+#### Statements Block
+Statements Block is a collection of statements wrapped in curly braces and can be part of a function,
+for loop, if statement, etc. If only one statement exists in the block, you can omit the braces altogether (similar to C/C++).
+```
+// Block with multiple statements and braces - valid
+main() {
+    x = 3
+    y = 4
+}
+
+// Block with one statement without braces - valid
+main() print("Hello world")
+
+// Block with multiple statements without braces - invalid!
+main() 
+    x = 3
+    y = 4
+```
+
 #### If Statement
-Logos doesn't have 'else if' but uses only 'else + condition'.
 ```
 main() {
     x = 3
     y = 4
     if x > y {
         print("x is greater than y")
-    } else x < y {
+    } else if x < y {
         print("x is less than y")
     } else {
         print("x is equal to y")
@@ -76,22 +93,23 @@ enum Enum {
 
 main() {
     e = Enum.ENUM1
-    if e {
+    switch e {
         ENUM1: { print(ENUM1) }
         ENUM2: { print(ENUM2) }
         ENUM3: { print(ENUM3) }
     }
     
     str = "some string"
-    if str {
-        "some string": { print("some string") }
+    switch str {
+        "some string": print("some string")
         "other string": { print("other string") }
-        else: { print("default string") }
+        else: { 
+            print("default string") 
+        }
     }
 }
 ```
 
-### Iteration
 #### Range Loop
 To iterate over an index, use the range loop. The range loop has one variable loop, usually named 'i'.
 ```
@@ -111,6 +129,14 @@ main() {
     }
 }
 ```
+Or even (more on _for.i_ below).
+```
+main() {
+    for 10 {
+        print(for.i)
+    }
+}
+```
 
 #### Foreach Loop
 ```
@@ -119,30 +145,43 @@ main() {
     for element in arr {
         print(element)
     }
-    for i, element in arr {
-        print(i)
-        print(element)
-    }
 }
 ```
 
 #### Infinite Loop
 ```
 main() {
-    for {
-        print("in infitine loop")
-        if true {
-            break
-        } 
+    for.ever {
+        print("In infitine loop")
+        if true break
     }
 }
 ```
 
-### Loop Meta Varaibles
-#### 'for.i'
+### Meta Variables
+In Logos, there are special variables called Meta Variables that are namespaced with a keyword, for example, 'for.i'. These variables
+will be automatically created and assigned a value once you will declare them. 
 
-#### 'for.isFirst' and 'for.isLast'
-You can hook into the first and last iteration of a loop using special constructs called 'for.isFirst' and 'for.isLast' instead
+#### for.i
+In for loops, you don't have to necessarily define an _i_ variable for iteration. Logos will generate it for you 
+using the meta variable 'for.i'. For example
+```
+main() {
+    for 10 {
+        print(for.i)
+    }
+}
+```
+Prints:
+```
+0
+1
+...
+8
+9
+```
+#### for.isFirst and for.isLast
+Likewise, you can hook into the first and last iteration of a loop using the _for.isFirst_ and _for.isLast_ variable instead
 of calculating the index yourself.
 ```
 main() {
@@ -163,20 +202,21 @@ Prints:
 ```
 
 ### Control Flow
+#### If Statement
 ```
 func() {
-    for i in 5..10 {
-        if i > 2 {
-            break
-        }
-        if i == 5 {
-            continue
-        }
-        if i == 9 {
-            return
-        }
+    a = 3
+    if a > 2 {
+        return
+    }
+    if a == 5 {
+        return
+    }
+    if a <= 9 {
+        return
     }
 }
+
 main() {
     func()
 }
@@ -198,9 +238,10 @@ Prints:
 ```
 inside nested if
 ```
+#### If Macro
+tbd
 
-### IO
-#### Deferred Function
+### The _defer_ keyword
 Logos has two mechanisms to work with IO safely, for example closing files or connection.
 The first one is deferred functions. Similar to other languages, you can delay the exection of a function
 using the 'defer' keyword. For example
@@ -220,7 +261,7 @@ Before
 After
 ```
 
-#### The _io_ keyword
+### The _io_ keyword
 The second mechanism to handle IO connections is with the _io_ keyword. With this mechanism you
 pass a pair of function names, like so: 
 ```
@@ -235,6 +276,6 @@ io f = openFile() {
     // text = f.read()
 } 
 ```
-And that's it. You don't need to call closeFile. Logos will do it for you. Everytime you call the opening function
+And you are done. You don't need to call closeFile. Logos will do it for you. Everytime you call the opening function
 with the io keyword, the closing function will be called at the end of the scope, making sure your
 resources are being freed correctly. 

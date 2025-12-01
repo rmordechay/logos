@@ -2,32 +2,33 @@
 #include "LgsType.h"
 #include "exprs/LgsExpr.h"
 #include "exprs/LgsHashMap.h"
-#include <iostream>
 
 void LgsField::setType(LgsType* newType) {
     type = newType;
 }
 
-Value* LgsField::loadIR(LgsLLVMGen& cg) {
+Value* LgsField::loadIR(LgsCgModule& cg) {
     if (!IRValue) IRValue = getGEP(cg);
     return cg.builder.CreateLoad(type->getIRType(cg), IRValue);
 }
 
-Value* LgsField::getGEP(LgsLLVMGen& cg) {
+Value* LgsField::getGEP(LgsCgModule& cg) const {
     assert(parentType && parentIRPtr);
-    if (gep) return gep;
-    gep = cg.builder.CreateStructGEP(parentType->getIRType(cg), parentIRPtr, position);
-    return gep;
+    return cg.builder.CreateStructGEP(parentType->getIRType(cg), parentIRPtr, position);
 }
 
-Value* LgsField::resolveVirtualField(LgsLLVMGen* cg, const LgsHashMap* vtable) const {
+Value* LgsField::resolveVirtualField(LgsCgModule* cg, const LgsHashMap* vtable) const {
     const auto vtableMap = vtable->type->asMap();
     const auto fieldIRType = type->getIRType(*cg);
-    const auto keyIR = cg->getIRStr(name);
+    const auto keyIR = cg->getString(name);
     const auto vtableIRType = vtable->type->getIRType(*cg);
     const auto mapPtr = cg->builder.CreateGEP(vtableIRType, parentIRPtr, {cg->i64Zero()});
     const auto rv = vtableMap->getIRElement(*cg, mapPtr, keyIR);
     return cg->builder.CreateLoad(fieldIRType, rv);
+}
+
+void LgsField::setDebugValue(LgsCgModule& cg) {
+    assert(0);
 }
 
 LgsField::~LgsField() {
@@ -35,8 +36,4 @@ LgsField::~LgsField() {
     freeType(type);
     expr = nullptr;
     type = nullptr;
-}
-
-LgsField* LgsField::clone() {
-    assert(0);
 }

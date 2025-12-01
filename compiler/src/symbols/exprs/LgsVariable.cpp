@@ -4,10 +4,9 @@
 #include "funcs/LgsParam.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
-#include "LgsUtils.h"
-#include <codegen/LgsLLVMGen.h>
+#include <codegen/LgsCgModule.h>
 
-Value* LgsVariable::loadIR(LgsLLVMGen& cg) {
+Value* LgsVariable::loadIR(LgsCgModule& cg) {
     switch (ref.symbolType) {
     case PARAM:
         return ref.param->loadIR(cg);
@@ -36,22 +35,7 @@ LgsExpr* LgsVariable::castExplicitly(LgsType* toType) {
     assert(0);
 }
 
-Value* LgsVariable::castIR(LgsLLVMGen& cg, LgsType* toType) {
-    switch (ref.symbolType) {
-    case PARAM:
-        return IRValue;
-    case VAR_DEC:
-        return ref.varDec->expr->castIR(cg, toType);
-    case FIELD:
-        assert(0);
-    case FUNC:
-        return IRValue;
-    default:
-        assert(0);
-    }
-}
-
-void LgsVariable::assign(LgsLLVMGen& cg, LgsExpr* expr) {
+void LgsVariable::assign(LgsCgModule& cg, LgsExpr* expr) {
     owner = expr->owner;
     freeOwner(cg);
     if (const auto nullable = type->asNullable()) {
@@ -61,7 +45,7 @@ void LgsVariable::assign(LgsLLVMGen& cg, LgsExpr* expr) {
     }
 }
 
-Value* LgsVariable::hashValue(LgsLLVMGen& cg) {
+Value* LgsVariable::hashValue(LgsCgModule& cg) {
     switch (ref.symbolType) {
     case PARAM:
         return cg.callHash(ref.param->IRValue);
@@ -80,9 +64,10 @@ std::string LgsVariable::asText() {
     return name;
 }
 
-void LgsVariable::setDebugValue(LgsLLVMGen& cg) {
+void LgsVariable::setDebugValue(LgsCgModule& cg) {
+    setDebugLoc(cg);
     const auto var = cg.debugger.diBuilder->createAutoVariable(
-        cg.debugger.blocks.back(),
+        cg.debugger.subprogram->getScope(),
         name,
         cg.debugger.diFile,
         location.lineStart,
@@ -95,11 +80,4 @@ void LgsVariable::setDebugValue(LgsLLVMGen& cg) {
         cg.getDebugLoc(location),
         cg.builder.GetInsertBlock()
     );
-}
-
-LgsVariable* LgsVariable::clone() {
-    const auto newVariable = new LgsVariable(*this);
-    newVariable->ref = ref.clone();
-    if (type) newVariable->type = type->clone();
-    return newVariable;
 }

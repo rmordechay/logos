@@ -1,6 +1,12 @@
 #pragma once
 #include "LgsType.h"
 
+namespace llvm {
+    class DIType;
+    class Constant;
+    class Type;
+}
+
 class LgsAny final : public LgsType {
 public:
     static constexpr auto name = "Any";
@@ -9,12 +15,14 @@ public:
         isPrimitive = true;
     }
     size_t sizeBytes() override;
-    Type* getIRType(LgsLLVMGen& cg) override;
+    Type* getIRType(LgsCgModule& cg) override;
+    Constant* getRTType(LgsCgModule& cg) override;
     LgsExpr* getZeroValue() override;
-    Lgs_TypeKind getRTTypeKind() override;
     std::string getName() override;
-    std::string strFormatPart() const override;
+    std::string fmtStr() const override;
+    LgsType* applyBinOp(LgsType* toType, LgsBinOp& op) override;
     bool canCastTo(LgsType* other) override;
+    DIType* getDebugType(LgsCgModule& cg) override;
 };
 
 inline LgsAny LGS_ANY;

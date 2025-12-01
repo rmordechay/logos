@@ -1,11 +1,7 @@
 #include "loops/LgsMetaVar.h"
 
-Value* LgsMetaVar::loadIR(LgsLLVMGen& cg) {
+Value* LgsMetaVar::loadIR(LgsCgModule& cg) {
     return IRValue;
-}
-
-LgsMetaVar* LgsMetaVar::clone() {
-    return new LgsMetaVar(*this);
 }
 
 bool LgsMetaVar::equals(LgsExpr* other) {
@@ -14,4 +10,8 @@ bool LgsMetaVar::equals(LgsExpr* other) {
 
 std::string LgsMetaVar::asText() {
     return name;
+}
+
+void LgsMetaVar::setDebugValue(LgsCgModule& cg) {
+    assert(0);
 }

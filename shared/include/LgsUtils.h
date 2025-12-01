@@ -2,18 +2,8 @@
 #include <filesystem>
 #include <vector>
 
-class LgsStmt;
-struct LgsFileMetadata;
-struct LgsAppConfigs;
-class LgsParam;
-class LgsSubType;
-class LgsExpr;
-struct LgsError;
 struct LgsBaseMsg;
-class LgsFile;
-class LgsErrHandler;
 struct LgsLocation;
-class LgsType;
 namespace fs = std::filesystem;
 
 #define EXPECTED_ERR(E, code) "Expected error: '" << std::string(E.msg) << "'" << std::string(code)
@@ -33,7 +23,7 @@ std::string getLine(const std::string& filename, size_t lineNumber);
 std::string trim(const std::string& str);
 std::string getFullPath(const LgsLocation& location, const std::string& filePath);
 std::string scanEscapeStr(const std::string& value);
-int32_t hashString(const std::string& str);
+uint64_t hashString(const std::string& str);
 time_t getLastWritten(const fs::path& filePath);
 
 void logInfo(const std::string& msg = "", bool withNewLine = false);

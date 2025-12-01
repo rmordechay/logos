@@ -2,7 +2,7 @@
 
 #include "LgsUtils.h"
 
-Value* LgsEnvVar::loadIR(LgsLLVMGen& cg) {
+Value* LgsEnvVar::loadIR(LgsCgModule& cg) {
     return IRValue;
 }
 
@@ -12,4 +12,8 @@ void LgsEnvVar::hashNode(size_t& oldHash) {
 
 std::string LgsEnvVar::asText() {
     return name;
+}
+
+void LgsEnvVar::setDebugValue(LgsCgModule& cg) {
+    assert(0);
 }

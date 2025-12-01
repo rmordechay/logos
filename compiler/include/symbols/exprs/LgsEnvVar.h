@@ -8,6 +8,7 @@ public:
 
     explicit LgsEnvVar(const std::string& name) : LgsExpr(new LgsStr()), name(name) {}
     std::string asText() override;
-    Value* loadIR(LgsLLVMGen& cg) override;
+    Value* loadIR(LgsCgModule& cg) override;
     void hashNode(size_t& oldHash) override;
+    void setDebugValue(LgsCgModule& cg) override;
 };

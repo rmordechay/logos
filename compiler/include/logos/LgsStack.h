@@ -1,6 +1,5 @@
 #pragma once
 #include "LgsSymbolTable.h"
-#include <stack>
 
 namespace llvm {
     class BasicBlock;
@@ -22,19 +21,16 @@ struct LgsStackFrame {
     LgsIfStmt* ifStmt = nullptr;
 };
 
-class LgsStack final : std::stack<LgsStackFrame> {
+class LgsStack final {
 public:
+    std::vector<LgsStackFrame> stack;
+
     void enterScope(LgsValue* value);
     void exitScope();
-    LgsFunc* currentFunc();
-    LgsForLoop* currentLoop();
-    LgsIfStmt* currentIfStmt();
-    LgsIfStmt* outermostIfStmt();
-    llvm::BasicBlock* findTagExitBlock(const std::string& tag);
     LgsSymbolTable& getSymbolTable();
-
-    auto begin() { return c.begin(); }
-    auto end() { return c.end(); }
-    auto rbegin() { return c.rbegin(); }
-    auto rend() { return c.rend(); }
+    LgsFunc* currentFunc() const;
+    LgsForLoop* currentLoop() const;
+    LgsIfStmt* currentIfStmt() const;
+    LgsIfStmt* getOutermostIfStmt() const;
+    BasicBlock* findTagExitBlock(const std::string& tag) const;
 };

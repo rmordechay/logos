@@ -1,4 +1,4 @@
-#include "lgsc/LgsCLang.h"
+#include "lgsc/LgsCCompiler.h"
 #include "LgsDefinitions.h"
 #include "files/LgsFile.h"
 #include "lgsc/LgsCLangParser.h"
@@ -6,7 +6,6 @@
 #include "LgsUtils.h"
 #include "exprs/constants/LgsStrConst.h"
 #include "stmts/LgsVarDec.h"
-#include <iostream>
 #include <clang/Driver/Driver.h>
 #include <llvm/TargetParser/Host.h>
 #include <clang/Frontend/CompilerInstance.h>
@@ -17,38 +16,54 @@
 
 using namespace clang;
 
-bool LgsCLang::parseFile(LgsCLangParser& parser, const fs::path& headerPath) const {
-    CompilerInstance compiler;
+void LgsCCompiler::initCompiler() {
     auto diagConsumer = std::make_unique<LgsDiagnosticConsumer>();
     compiler.createDiagnostics(diagConsumer.release());
+    clang::TargetOptions& targetOpts = compiler.getInvocation().getTargetOpts();
+    auto& headerSearchOptions = compiler.getHeaderSearchOpts();
 
-    auto& targetOpts = compiler.getInvocation().getTargetOpts();
     targetOpts.Triple = llvm::sys::getDefaultTargetTriple();
-    compiler.getHeaderSearchOpts().UseBuiltinIncludes = true;
-    compiler.getHeaderSearchOpts().UseStandardSystemIncludes = true;
-    compiler.getHeaderSearchOpts().ResourceDir = cLibHeadersDir.c_str();
-    compiler.getHeaderSearchOpts().AddPath(cLibHeadersDir.c_str(), frontend::System, false, false);
+    headerSearchOptions.UseBuiltinIncludes = true;
+    headerSearchOptions.UseStandardSystemIncludes = true;
 
-    const auto targetOptions = std::make_shared<TargetOptions>(targetOpts);
+    const auto cLibHeader = paths.cLibHeadersDir.c_str();
+    headerSearchOptions.ResourceDir = cLibHeader;
+    headerSearchOptions.AddPath(cLibHeader, frontend::System, false, false);
+    for (auto searchPath : paths.userSearchPaths) {
+        if (!fs::exists(searchPath)) continue;
+        headerSearchOptions.AddPath(fs::canonical(searchPath).c_str(), frontend::Quoted, false, false);
+    }
+
+    const auto targetOptions = std::make_shared<clang::TargetOptions>(targetOpts);
     compiler.setTarget(TargetInfo::CreateTargetInfo(compiler.getDiagnostics(), targetOptions));
     compiler.createFileManager();
     compiler.createSourceManager(compiler.getFileManager());
+}
 
-    const auto fullPath = fs::absolute(cLibHeadersDir / headerPath).string();
-    auto fileEntry = compiler.getFileManager().getFileRef(fullPath);
-    if (!fileEntry) return false;
-    const auto fileID = compiler.getSourceManager().createFileID(*fileEntry, SourceLocation(), SrcMgr::C_System);
-    compiler.getSourceManager().setMainFileID(fileID);
-
+bool LgsCCompiler::parseFile(LgsCLangParser& parser, const fs::path& headerPath) {
     compiler.getPreprocessorOpts().UsePredefines = true;
     compiler.createPreprocessor(TU_Complete);
-    auto& preprocessor = compiler.getPreprocessor();
-    auto ppCallback = std::make_unique<LgsPPCallbacks>(parser.table, preprocessor, compiler.getLangOpts(), compiler.getSourceManager());
-    preprocessor.addPPCallbacks(std::move(ppCallback));
+
+    auto& pp = compiler.getPreprocessor();
+    auto& si = pp.getHeaderSearchInfo();
+    const ConstSearchDirIterator fromDir = {nullptr};
+    ConstSearchDirIterator *curDir = nullptr;
+    constexpr ArrayRef<std::pair<OptionalFileEntryRef, DirectoryEntryRef>> includers;
+    auto file = si.LookupFile(
+        headerPath.string(), SourceLocation(), false, fromDir, curDir, includers,
+        nullptr, nullptr, nullptr, nullptr, nullptr, nullptr
+    );
+    if (!file.has_value()) return false;
+
+    const auto fileCharacter = fs::exists(paths.cLibHeadersDir / headerPath) ? SrcMgr::C_System : SrcMgr::C_User;
+    const auto fileID = compiler.getSourceManager().createFileID(*file, SourceLocation(), fileCharacter);
+    compiler.getSourceManager().setMainFileID(fileID);
+    auto ppCallback = std::make_unique<LgsPPCallbacks>(parser.table, pp, compiler.getLangOpts(), compiler.getSourceManager());
+    pp.addPPCallbacks(std::move(ppCallback));
 
     compiler.createASTContext();
     if (compiler.getDiagnostics().hasErrorOccurred()) return false;
-    ParseAST(preprocessor, &parser, compiler.getASTContext());
+    ParseAST(pp, &parser, compiler.getASTContext());
     return !compiler.getDiagnostics().hasErrorOccurred();
 }
 

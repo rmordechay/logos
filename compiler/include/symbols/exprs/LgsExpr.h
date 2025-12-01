@@ -2,6 +2,8 @@
 #include <stmts/LgsStmt.h>
 #include "LgsValue.h"
 
+class LgsNullable;
+class LgsMetaSelection;
 class LgsMatrixExpr;
 class LgsNullableExpr;
 class LgsEnvVar;
@@ -15,7 +17,7 @@ class LgsIntConst;
 class LgsVectorExpr;
 class LgsPrefixExpr;
 class LgsPostfixExpr;
-class LgsLLVMGen;
+class LgsCgModule;
 class LgsFunc;
 class LgsHashMap;
 class LgsFuncCall;
@@ -31,7 +33,7 @@ class LgsFloatConst;
 class LgsStrConst;
 class LgsTypeConst;
 
-class LgsExpr : public LgsStmt {
+class LgsExpr : public LgsValue {
 public:
     LgsType* type = nullptr;
     bool isMutable = true;
@@ -40,24 +42,25 @@ public:
     Value* destPtrValue = nullptr;
 
     explicit LgsExpr(LgsType* type = nullptr) : type(type) {}
-    virtual LgsExpr* castExplicitly(LgsType* toType);
-    virtual void castImplicitly(LgsType* toType);
-    virtual Value* castIR(LgsLLVMGen& cg, LgsType* toType);
-    virtual Value* hashValue(LgsLLVMGen& cg);
-    virtual void assign(LgsLLVMGen& cg, LgsExpr* expr);
-    virtual bool equals(LgsExpr* other);
-    virtual std::string asText() = 0;
-
-    void freeOwner(LgsLLVMGen& cg);
+    void freeOwner(LgsCgModule& cg);
     int64_t* getConstInt();
     std::string* getConstStr();
     void setType(LgsType* newType);
-    LgsExpr* clone() override;
+
+    virtual LgsExpr* castExplicitly(LgsType* toType);
+    virtual void castImplicitly(LgsType* toType);
+    virtual Value* hashValue(LgsCgModule& cg);
+    virtual void assign(LgsCgModule& cg, LgsExpr* expr);
+    virtual bool equals(LgsExpr* other);
+    virtual std::string asText() = 0;
 
     LgsNull* asNull();
     LgsFunc* asFunc();
     LgsVariable* asVariable();
     LgsPrefixExpr* asPrefixExpr();
+    LgsFuncCall* asFuncCall();
+    LgsPostfixExpr* asPostfixExpr();
+    LgsSelection* asSelection();
     LgsIterIndex* asIterIndex();
     LgsTypeExpr* asTypeExpr();
     LgsJson* asJson();
@@ -75,9 +78,19 @@ public:
     LgsMetaVar* asLoopMetaVar();
     LgsBinaryExpr* asBinExpr();
     LgsNullableExpr* asNullableExpr();
+    LgsMetaSelection* asMetaSelection();
     ~LgsExpr() override = default;
 };
 
+Value* dotProduct(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
+Value* crossProduct(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
 void freeExpr(LgsExpr* expr);
-void freeExprs(std::vector<LgsExpr*>& exprs);
+
+template<typename T>
+void freeExprs(std::vector<T*>& exprs) {
+    for (const auto expr : exprs) {
+        freeExpr(static_cast<LgsExpr*>(expr));
+    }
+    exprs.clear();
+}
 

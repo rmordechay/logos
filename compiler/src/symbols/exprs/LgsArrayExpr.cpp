@@ -1,26 +1,22 @@
 #include "exprs/LgsArrayExpr.h"
 #include "types/iterables/LgsSet.h"
 #include "LgsUtils.h"
+#include "codegen/LgsCgModule.h"
 
-Value* LgsArrayExpr::loadIR(LgsLLVMGen& cg) {
-    return IRValue;
-}
-
-Value* LgsArrayExpr::castIR(LgsLLVMGen& cg, LgsType* toType) {
-    if (const auto sArr = type->asSArray()) {
-        if (toType->asStr() && sArr->baseType->asChar()) {
-            return IRValue;
-        }
-    }
-    return IRValue;
+Value* LgsArrayExpr::loadIR(LgsCgModule& cg) {
+    if (type->asDArray() || type->asSet()) return IRValue;
+    return cg.builder.CreateLoad(type->getIRType(cg), IRValue);
 }
 
 void LgsArrayExpr::castImplicitly(LgsType* toType) {
-    if (!type) return;
-    if (type->asDArray() && (toType->asSArray() || toType->asSet())) {
+    // Replace static and dynamic if needed
+    if (!type && toType->asSArray()) {
+        setType(toType);
+    } else if (type->asDArray() && (toType->asSArray() || toType->asSet())) {
         freeType(type);
         setType(toType);
     }
+
     LgsType* otherBaseType = nullptr;
     if (toType->asSet()) {
         otherBaseType = toType->genericArgs.front();
@@ -28,11 +24,29 @@ void LgsArrayExpr::castImplicitly(LgsType* toType) {
         otherBaseType = toType->asIterable()->baseType;
     }
     for (size_t i = 0; i < elements.size(); ++i) {
-        const auto element = elements[i];
-        if (element->type) continue;
-        element->setType(otherBaseType);
+        if (elements[i]->type) continue;
+        elements[i]->castImplicitly(otherBaseType);
     }
     type->asIterable()->baseType = otherBaseType;
+}
+
+void LgsArrayExpr::setDebugValue(LgsCgModule& cg) {
+    if (!IRValue) return;
+    const auto di = cg.debugger.diBuilder;
+    const auto file = cg.debugger.diFile;
+
+    llvm::DIType* dbType = nullptr;
+    if (const auto sarr = type->asSArray()) {
+        dbType = sarr->getDebugType(cg);
+    } else if (const auto darr = type->asDArray()) {
+        dbType = darr->getDebugType(cg);
+    } else if (const auto sett = type->asSet()) {
+        dbType = sett->getDebugType(cg);
+    } else {
+        assert(0);
+    }
+    const auto var = di->createAutoVariable(cg.debugger.subprogram, "", file, location.lineStart, dbType);
+    di->insertDeclare(IRValue, var, di->createExpression(), cg.getDebugLoc(location), cg.builder.GetInsertBlock());
 }
 
 std::string LgsArrayExpr::asText() {

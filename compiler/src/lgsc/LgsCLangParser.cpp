@@ -15,7 +15,7 @@
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsChar.h"
 #include "LgsUtils.h"
-#include <iostream>
+#include "types/primitives/LgsLong.h"
 
 void LgsCLangParser::HandleTranslationUnit(clang::ASTContext& clangContext){
     context = &clangContext;

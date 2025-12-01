@@ -1,5 +1,7 @@
 #include "files/LgsAppConfigFile.h"
 
+#include "exprs/constants/LgsStrConst.h"
+
 size_t LgsAppConfigFile::hashFile() {
     size_t hash = 0;
     HASH_VECTOR(configs, hash);
@@ -20,4 +22,8 @@ LgsAppConfigFile::~LgsAppConfigFile() {
         freeStmt(requiredEnv);
     }
     requiredEnvs.clear();
+    for (const auto searchPath : searchPaths) {
+        freeExpr(searchPath);
+    }
+    searchPaths.clear();
 }

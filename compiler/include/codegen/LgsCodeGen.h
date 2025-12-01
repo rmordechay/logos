@@ -1,8 +1,14 @@
 #pragma once
-#include "LgsLLVMGen.h"
+#include "LgsCgModule.h"
 #include "files/LgsFile.h"
 #include "logos/LgsStack.h"
 
+class LgsMetaSelection;
+class LgsJson;
+class LgsNull;
+class LgsMatrixExpr;
+class LgsEnvVar;
+class LgsNullableExpr;
 struct LgsPaths;
 class LgsTernaryExpr;
 class LgsMainFunc;
@@ -60,11 +66,10 @@ class LgsCodeGen {
 public:
     LgsFile& file;
     LgsStack stack;
-    LgsLLVMGen& cg;
+    LgsCgModule& cg;
     LgsPaths& paths;
     LgsGlobals& globals;
     LgsAppConfigs& appConfigs;
-    Function* currentIRFunc = nullptr;
     static std::atomic<size_t> lambdasIDGenerator;
 
     explicit LgsCodeGen(LgsFile& file, LgsAppConfigs& appConfigs, LgsGlobals& globals, LgsPaths& paths)
@@ -86,7 +91,7 @@ public:
     void visitRangeLoop(LgsRangeLoop* loop);
     void visitForeachLoop(LgsForeachLoop* loop);
     void visitInfiniteLoop(const LgsInfiniteLoop* loop) const;
-    void visitLoopMetaVar(LgsMetaVar* metaVar);
+    void visitLoopMetaVar(LgsMetaVar* metaVar) const;
     void visitWhileLoop(const LgsWhileLoop* loop);
     void visitVarDec(LgsVarDec* varDec);
     void visitAssignment(const LgsAssignment* assignment);
@@ -95,9 +100,9 @@ public:
     void visitIfWithElse(LgsIfStmt* ifStmt);
     void visitElseIf(LgsIfStmt* ifStmt);
     void visitSwitch(LgsSwitch* switchStmt);
-    void visitContinueStmt();
+    void visitContinueStmt() const;
     void visitReturnStmt(LgsReturn* returnStmt);
-    void visitBreakStmt(const LgsBreak* breakStmt);
+    void visitBreakStmt(const LgsBreak* breakStmt) const;
     void visitCoroutine(const LgsCoroutine* coroutine);
     void visitDeferStmt(const LgsDeferStmt* defer);
     void visitIOStmt(const LgsIOStmt* ioStmt);
@@ -105,19 +110,24 @@ public:
     void visitBinaryExpr(LgsBinaryExpr* binExpr);
     void visitTernaryExpr(LgsTernaryExpr* ternaryExpr);
     void visitNullableExpr(LgsNullableExpr* nullableExpr);
+    void visitNull(LgsNull* null) const;
     void visitCast(LgsCast* cast);
     void visitLambda(LgsFunc* func);
     void visitIntConst(LgsIntConst* intConst) const;
     void visitConstant(LgsExpr* expr);
     void visitFloatConst(LgsFloatConst* floatConst) const;
-    void visitArrayExpr(LgsArrayExpr* array);
-    void visitHashMap(LgsHashMap* hashMap);
-    void visitEnvVar(LgsEnvVar* envVar) const;
+    void visitArrayExpr(LgsArrayExpr* arrayExpr);
+    void visitStaticArray(LgsArrayExpr* arrayExpr) const;
+    void visitDynamicArray(LgsArrayExpr* arrayExpr) const;
+    void visitSetExpr(LgsArrayExpr* arrayExpr) const;
     void visitVectorExpr(LgsVectorExpr* vectorExpr);
     void visitMatrixExpr(LgsMatrixExpr* matrixExpr);
+    void visitHashMap(LgsHashMap* hashMap);
+    void visitEnvVar(LgsEnvVar* envVar) const;
     void visitVariable(LgsVariable* variable);
     void visitSelection(LgsSelection* selection, bool assign = false);
     void visitFieldSelection(LgsVariable* var, LgsExpr* parent, bool assign) const;
+    void visitMetaSelection(LgsMetaSelection* metaSelection);
     void visitFuncCall(LgsFuncCall* funcCall);
     void visitIterFunc(const LgsFuncCall* funcCall);
     void visitPrefixExpr(LgsPrefixExpr* prefixExpr);
@@ -125,32 +135,20 @@ public:
     void visitStrConst(LgsStrConst* strConst);
     void visitInstance(LgsInstance* instance);
     void visitIterIndex(LgsIterIndex* iterIndex, bool assign);
-    void visitNull(LgsNull* null) const;
     void visitJson(LgsJson* json);
 
     // Funcs
-    void createPrologue(LgsFunc* func);
-    void createEpilogue(LgsFunc* func);
+    void createPrologue(LgsFunc* func) const;
+    void createEpilogue(const LgsFunc* func) const;
     void initMainArgs(const LgsMainFunc* mainFunc) const;
     StructType* getThunkCtxType(const LgsFuncCall* fc) const;
     Value* getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) const;
-    Function* getThunkFunc(const LgsFuncCall* fc, Type* ctxTy) const;
-    void yield() const;
+    Function* getThunkFunc(LgsFuncCall* fc, Type* ctxTy) const;
 
-    // Iterables
-    void setStaticArray(LgsArrayExpr* arrayExpr);
-    void setNestedSArr(const LgsArrayExpr* arrayExpr, Type* parentType, Value* parentValue, const std::vector<Value*>& indices);
-    void setDynamicArray(LgsArrayExpr* arrayExpr);
-    void setSetExpr(LgsArrayExpr* arrayExpr);
     void createMapFunc(LgsFunc* func);
     void createFilterFunc(LgsFunc* func);
 
-    bool checkMock(LgsExpr* expr);
+    bool checkMock(LgsExpr* expr) const;
     Value* getIRValue(LgsValue* value);
-    Value* getRTType(Value* typeID) const;
-    void createRTTypes() const;
-    void setNullableValue(LgsExpr* expr);
-    bool allArgsAreConst(const std::vector<LgsExpr*>& args);
     void addVirtuals(LgsObject* obj, Value* ptr) const;
-    bool writeIRModule() const;
 };

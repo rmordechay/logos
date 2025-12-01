@@ -1,8 +1,6 @@
 #include "exprs/LgsInstance.h"
 #include "exprs/LgsHashMap.h"
-#include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
-#include "stmts/LgsVarDec.h"
 #include "types/LgsObject.h"
 #include "LgsUtils.h"
 
@@ -14,11 +12,7 @@ LgsExpr* LgsInstance::castExplicitly(LgsType* toType) {
     assert(0);
 }
 
-Value* LgsInstance::castIR(LgsLLVMGen& cg, LgsType* toType) {
-    return IRValue;
-}
-
-Value* LgsInstance::loadIR(LgsLLVMGen& cg) {
+Value* LgsInstance::loadIR(LgsCgModule& cg) {
     return IRValue;
 }
 
@@ -38,6 +32,10 @@ void LgsInstance::setObject(LgsObject* newObj) {
 bool LgsInstance::equals(LgsExpr* other) {
     const auto otherInstance = other->asInstance();
     if (!otherInstance) return false;
+    assert(0);
+}
+
+void LgsInstance::setDebugValue(LgsCgModule& cg) {
     assert(0);
 }
 

@@ -9,13 +9,11 @@ public:
     LgsSymbol ref;
 
     explicit LgsVariable(const std::string& name, LgsType* type = nullptr) : LgsExpr(type), name(name) {}
-    Value* loadIR(LgsLLVMGen& cg) override;
+    Value* loadIR(LgsCgModule& cg) override;
     bool equals(LgsExpr* other) override;
     LgsExpr* castExplicitly(LgsType* toType) override;
-    Value* castIR(LgsLLVMGen& cg, LgsType* toType) override;
-    Value* hashValue(LgsLLVMGen& cg) override;
-    void assign(LgsLLVMGen& cg, LgsExpr* expr) override;
+    Value* hashValue(LgsCgModule& cg) override;
+    void assign(LgsCgModule& cg, LgsExpr* expr) override;
     std::string asText() override;
-    void setDebugValue(LgsLLVMGen& cg) override;
-    LgsVariable* clone() override;
+    void setDebugValue(LgsCgModule& cg) override;
 };

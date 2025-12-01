@@ -1,11 +1,14 @@
 #include "parser/LgsLexer.h"
 #include <cassert>
+#include <iostream>
 
 std::vector<LgsToken> LgsLexer::tokenize() {
     if (source.empty()) return {};
     currentChar = source[0];
     while (true) {
         auto token = nextToken();
+        token.location.lineEnd = token.location.lineStart;
+        token.location.columnEnd = token.location.columnStart + token.lexeme.length();
         tokens.push_back(token);
         if (token.type == T_EOF) break;
     }
@@ -14,7 +17,7 @@ std::vector<LgsToken> LgsLexer::tokenize() {
 
 LgsToken LgsLexer::nextToken() {
     skipWhitespace();
-    LgsLocation location{position, line, column};
+    const LgsLocation location{index, line, column};
     if (currentChar == '\0') return {T_EOF, "", location};
 
     // Comments
@@ -77,20 +80,31 @@ LgsToken LgsLexer::nextToken() {
     }
 
     switch (currentChar) {
-    case '(': advance(); return {T_LPAREN, "(", location};
-    case ')': advance(); return {T_RPAREN, ")", location};
-    case '[': advance(); return {T_LBRACK, "[", location};
-    case ']': advance(); return {T_RBRACK, "]", location};
-    case ',': advance(); return {T_COMMA, ",", location};
-    case '?': advance(); return {T_QUEST_MARK, "?", location};
+    case '(':
+        advance();
+        return {T_LPAREN, "(", location};
+    case ')':
+        advance();
+        return {T_RPAREN, ")", location};
+    case '[':
+        advance();
+        return {T_LBRACK, "[", location};
+    case ']':
+        advance();
+        return {T_RBRACK, "]", location};
+    case ',':
+        advance();
+        return {T_COMMA, ",", location};
+    case '?':
+        advance();
+        return {T_QUEST_MARK, "?", location};
     case '{':
         advance();
         if (match('*')) return {T_STAR_LBRACE, "{*", location};
         return {T_LBRACE, "{", location};
-    case '}': {
+    case '}':
         advance();
         return {T_RBRACE, "}", location};
-    }
     case '=':
         advance();
         if (match('=')) return {T_DOUBLE_EQUAL, "==", location};
@@ -119,6 +133,7 @@ LgsToken LgsLexer::nextToken() {
     case ':':
         advance();
         if (match('=')) return {T_WALRUS, ":=", location};
+        if (match(':')) return {T_DOUBLE_COLON, "::", location};
         return {T_COLON, ":", location};
     case '+':
         advance();
@@ -139,9 +154,7 @@ LgsToken LgsLexer::nextToken() {
     case '_':
         advance();
         if (match('/')) return {T_SLIDER, "_/", location};
-        if (std::isalpha(peek(-1))) {
-            position--;
-            column--;
+        if (std::isalpha(currentChar)) {
             return scanVarOrKeyword(location);
         }
         return {T_IDENTIFIER, "_", location};
@@ -178,14 +191,13 @@ LgsToken LgsLexer::nextToken() {
 }
 
 char LgsLexer::advance() {
-    if (position >= source.length()) {
+    if (index >= source.length()) {
         currentChar = '\0';
         return currentChar;
     }
-    currentChar = source[++position];
+    currentChar = source[++index];
     if (currentChar == '\n') {
         line++;
-        column = 1;
     } else {
         column++;
     }
@@ -201,8 +213,8 @@ bool LgsLexer::match(const char expected) {
 }
 
 char LgsLexer::peek(const size_t offset) const {
-    if (position + offset >= source.length()) return '\0';
-    return source[position + offset];
+    if (index + offset >= source.length()) return '\0';
+    return source[index + offset];
 }
 
 LgsToken LgsLexer::scanMatrix(const LgsLocation& location, std::string& lexeme) {
@@ -227,7 +239,7 @@ LgsToken LgsLexer::scanMatrix(const LgsLocation& location, std::string& lexeme) 
     return {T_MATRIX, lexeme, location};
 }
 
-LgsToken LgsLexer::scanVarOrKeyword(LgsLocation& location) {
+LgsToken LgsLexer::scanVarOrKeyword(const LgsLocation& location) {
     std::string lexeme;
     auto isDollared = false;
     if (currentChar == '$') {
@@ -242,7 +254,6 @@ LgsToken LgsLexer::scanVarOrKeyword(LgsLocation& location) {
         }
         lexeme += currentChar;
         advance();
-        location.columnStart++;
         if (std::isspace(currentChar)) break;
     }
     if (isDollared) {
@@ -255,7 +266,6 @@ LgsToken LgsLexer::scanVarOrKeyword(LgsLocation& location) {
         while (std::isalnum(currentChar)) {
             metaVar += currentChar;
             advance();
-            location.columnStart++;
             if (std::isspace(currentChar)) break;
         }
         const auto combined = lexeme + '.' + metaVar;
@@ -312,13 +322,12 @@ std::string LgsLexer::scanMultilineString() {
     return result;
 }
 
-LgsToken LgsLexer::scanNumber(LgsLocation& location) {
+LgsToken LgsLexer::scanNumber(const LgsLocation& location) {
     std::string lexeme;
     // Minus
     if (currentChar == '-') {
         lexeme += currentChar;
         advance();
-        location.columnStart++;
     }
     // Hexadecimal
     if (currentChar == '0' && peek() == 'x') {
@@ -326,11 +335,9 @@ LgsToken LgsLexer::scanNumber(LgsLocation& location) {
         advance();
         lexeme += currentChar;
         advance();
-        location.columnStart += 2;
         while (std::isxdigit(currentChar) || currentChar == '_') {
             lexeme += currentChar;
             advance();
-            location.columnStart++;
         }
         return {T_HEX, lexeme, location};
     }
@@ -340,11 +347,9 @@ LgsToken LgsLexer::scanNumber(LgsLocation& location) {
         advance();
         lexeme += currentChar;
         advance();
-        location.columnStart += 2;
         while (currentChar == '0' || currentChar == '1' || currentChar == '_') {
             lexeme += currentChar;
             advance();
-            location.columnStart++;
         }
         return {T_BINARY, lexeme, location};
     }
@@ -352,23 +357,19 @@ LgsToken LgsLexer::scanNumber(LgsLocation& location) {
     while (std::isdigit(currentChar) || currentChar == '_') {
         lexeme += currentChar;
         advance();
-        location.columnStart++;
     }
     // Float
     if (currentChar == '.' && peek() != '.') {
         lexeme += currentChar;
         advance();
-        location.columnStart++;
         while (std::isdigit(currentChar)) {
             lexeme += currentChar;
             advance();
-            location.columnStart++;
         }
         // Double
         if (currentChar == 'D') {
             lexeme += currentChar;
             advance();
-            location.columnStart++;
             return {T_DOUBLE, lexeme, location};
         }
         return {T_FLOAT, lexeme, location};
@@ -377,14 +378,12 @@ LgsToken LgsLexer::scanNumber(LgsLocation& location) {
     if (currentChar == 'L') {
         lexeme += currentChar;
         advance();
-        location.columnStart++;
         return {T_LONG, lexeme, location};
     }
     // Double
     if (currentChar == 'D') {
         lexeme += currentChar;
         advance();
-        location.columnStart++;
         return {T_DOUBLE, lexeme, location};
     }
     return {T_INT, lexeme, location};

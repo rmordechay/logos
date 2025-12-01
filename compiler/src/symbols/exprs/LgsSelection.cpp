@@ -8,8 +8,8 @@
 #include <sstream>
 #include <llvm/IR/InlineAsm.h>
 
-Value* LgsSelection::loadIR(LgsLLVMGen& cg) {
-    assert(0);
+Value* LgsSelection::loadIR(LgsCgModule& cg) {
+    return cg.builder.CreateLoad(type->getIRType(cg), IRValue);
 }
 
 LgsExpr* LgsSelection::lastExpr() const {
@@ -20,7 +20,7 @@ LgsFuncCall* LgsSelection::asMethodCall() const {
     return lastExpr()->asFuncCall();
 }
 
-void LgsSelection::assign(LgsLLVMGen& cg, LgsExpr* expr) {
+void LgsSelection::assign(LgsCgModule& cg, LgsExpr* expr) {
     const auto rIR = expr->IRValue;
     const auto lExpr = lastExpr();
     if (lExpr->type->asVec()) {
@@ -32,12 +32,7 @@ void LgsSelection::assign(LgsLLVMGen& cg, LgsExpr* expr) {
         cg.builder.CreateStore(insert, lExpr->IRValue);
     } else {
         freeOwner(cg);
-        if (const auto gv = llvm::dyn_cast<GlobalVariable>(rIR)) {
-            const auto gep = cg.builder.CreateConstInBoundsGEP1_32(gv->getType(), gv, 0);
-            cg.builder.CreateStore(gep, IRValue);
-        } else {
-            cg.builder.CreateStore(rIR, IRValue);
-        }
+        cg.builder.CreateStore(rIR, IRValue);
     }
 }
 
@@ -50,7 +45,7 @@ std::string LgsSelection::asText() {
     return str.str();
 }
 
-Value* LgsSelection::hashValue(LgsLLVMGen& cg) {
+Value* LgsSelection::hashValue(LgsCgModule& cg) {
     return lastExpr()->hashValue(cg);
 }
 
@@ -64,6 +59,10 @@ bool LgsSelection::equals(LgsExpr* other) {
         if (!expr->equals(otherExpr)) return false;
     }
     return true;
+}
+
+void LgsSelection::setDebugValue(LgsCgModule& cg) {
+    assert(0);
 }
 
 LgsSelection::~LgsSelection() {

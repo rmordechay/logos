@@ -11,8 +11,12 @@ size_t LgsShort::sizeBytes() {
     return sizeof(short);
 }
 
-Type* LgsShort::getIRType(LgsLLVMGen& cg) {
+Type* LgsShort::getIRType(LgsCgModule& cg) {
     return cg.i16Ty();
+}
+
+Constant* LgsShort::getRTType(LgsCgModule& cg) {
+    return cg.getRTTypeInfo(getGenericName(), sizeBytes(), sizeBytes(), RTT_SHORT, cg.null());
 }
 
 std::string LgsShort::getName() {
@@ -21,10 +25,6 @@ std::string LgsShort::getName() {
 
 LgsExpr* LgsShort::getZeroValue() {
     return new LgsIntConst(&LGS_SHORT, 0);
-}
-
-Lgs_TypeKind LgsShort::getRTTypeKind() {
-    return RTT_SHORT;
 }
 
 bool LgsShort::canCastTo(LgsType* other) {
@@ -38,6 +38,14 @@ bool LgsShort::canCastTo(LgsType* other) {
     return name == IRName;
 }
 
-std::string LgsShort::strFormatPart() const {
+LgsType* LgsShort::applyBinOp(LgsType* toType, LgsBinOp& op) {
+    assert(0);
+}
+
+std::string LgsShort::fmtStr() const {
     return "%d";
+}
+
+DIType* LgsShort::getDebugType(LgsCgModule& cg) {
+    assert(0);
 }

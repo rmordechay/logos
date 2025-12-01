@@ -1,6 +1,12 @@
 #include "types/LgsSelf.h"
 
-Type* LgsSelf::getIRType(LgsLLVMGen& cg) {
+#include <cassert>
+
+Type* LgsSelf::getIRType(LgsCgModule& cg) {
+    assert(0);
+}
+
+Constant* LgsSelf::getRTType(LgsCgModule& cg) {
     assert(0);
 }
 
@@ -12,10 +18,6 @@ LgsExpr* LgsSelf::getZeroValue() {
     return baseType->getZeroValue();
 }
 
-Lgs_TypeKind LgsSelf::getRTTypeKind() {
-    return baseType->getRTTypeKind();
-}
-
 std::string LgsSelf::getName() {
     return name;
 }
@@ -24,6 +26,14 @@ bool LgsSelf::canCastTo(LgsType* other) {
     assert(0);
 }
 
-std::string LgsSelf::strFormatPart() const {
+LgsType* LgsSelf::applyBinOp(LgsType* toType, LgsBinOp& op) {
+    assert(0);
+}
+
+std::string LgsSelf::fmtStr() const {
+    assert(0);
+}
+
+DIType* LgsSelf::getDebugType(LgsCgModule& cg) {
     assert(0);
 }

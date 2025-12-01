@@ -1,7 +1,6 @@
 #pragma once
 #include "LgsType.h"
-#include "codegen/LgsLLVMGen.h"
-
+#include "codegen/LgsCgModule.h"
 
 class LgsLong final : public LgsType {
 public:
@@ -11,24 +10,25 @@ public:
         isPrimitive = true;
         isInt = true;
     }
-    Type* getIRType(LgsLLVMGen& cg) override;
+    Type* getIRType(LgsCgModule& cg) override;
+    Constant* getRTType(LgsCgModule& cg) override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
-    Lgs_TypeKind getRTTypeKind() override;
     LgsType* applyBinOp(LgsType* toType, LgsBinOp& op) override;
-    Value* addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* subIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* mulIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* divIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* modIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* bitAndIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* bitOrIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* bitXorIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* rshiftIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* lshiftIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* other) override;
-    std::string strFormatPart() const override;
+    Value* addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
+    Value* subIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
+    Value* mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
+    Value* divIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
+    Value* modIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
+    Value* bitAndIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
+    Value* bitOrIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
+    Value* bitXorIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
+    Value* rshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
+    Value* lshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* other) override;
+    std::string fmtStr() const override;
     std::string getName() override;
     bool canCastTo(LgsType* other) override;
+    DIType* getDebugType(LgsCgModule& cg) override;
 };
 
 inline LgsLong LGS_LONG;

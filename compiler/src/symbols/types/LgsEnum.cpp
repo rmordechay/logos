@@ -1,5 +1,5 @@
 #include "types/LgsEnum.h"
-#include "codegen/LgsLLVMGen.h"
+#include "codegen/LgsCgModule.h"
 #include "stmts/LgsField.h"
 #include "types/LgsAny.h"
 
@@ -7,15 +7,15 @@ LgsExpr* LgsEnum::getZeroValue() {
     return nullptr;
 }
 
-Lgs_TypeKind LgsEnum::getRTTypeKind() {
-    return RTT_ENUM;
-}
-
-Type* LgsEnum::getIRType(LgsLLVMGen& cg) {
+Type* LgsEnum::getIRType(LgsCgModule& cg) {
     if (const auto expr = fields.front()->expr) {
         return cg.getStructType({cg.sizeTy(), expr->type->getIRType(cg)});
     }
     return cg.getStructType({cg.sizeTy(), cg.ptrTy()});
+}
+
+Constant* LgsEnum::getRTType(LgsCgModule& cg) {
+    assert(0);
 }
 
 std::string LgsEnum::getName() {
@@ -28,7 +28,11 @@ bool LgsEnum::canCastTo(LgsType* other) {
     return name == otherName;
 }
 
-std::string LgsEnum::strFormatPart() const {
+LgsType* LgsEnum::applyBinOp(LgsType* toType, LgsBinOp& op) {
+    assert(0);
+}
+
+std::string LgsEnum::fmtStr() const {
     return "%s";
 }
 
@@ -36,6 +40,6 @@ size_t LgsEnum::sizeBytes() {
     return sizeof(void*);
 }
 
-LgsEnum* LgsEnum::clone() {
-    return new LgsEnum(*this);
+DIType* LgsEnum::getDebugType(LgsCgModule& cg) {
+    assert(0);
 }

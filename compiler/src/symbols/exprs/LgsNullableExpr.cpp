@@ -1,15 +1,15 @@
 #include "exprs/LgsNullableExpr.h"
-#include "codegen/LgsLLVMGen.h"
+#include "codegen/LgsCgModule.h"
 
 std::string LgsNullableExpr::asText() {
     assert(0);
 }
 
-Value* LgsNullableExpr::loadIR(LgsLLVMGen& cg) {
-    assert(0);
+Value* LgsNullableExpr::loadIR(LgsCgModule& cg) {
+    return cg.builder.CreateLoad(type->getIRType(cg), IRValue);
 }
 
-void LgsNullableExpr::setDebugValue(LgsLLVMGen& cg) {
+void LgsNullableExpr::setDebugValue(LgsCgModule& cg) {
     assert(0);
 }
 
@@ -22,21 +22,13 @@ LgsExpr* LgsNullableExpr::castExplicitly(LgsType* toType) {
 }
 
 void LgsNullableExpr::castImplicitly(LgsType* toType) {
-    assert(0);
+
 }
 
-Value* LgsNullableExpr::castIR(LgsLLVMGen& cg, LgsType* toType) {
-    assert(0);
-}
-
-Value* LgsNullableExpr::hashValue(LgsLLVMGen& cg) {
+Value* LgsNullableExpr::hashValue(LgsCgModule& cg) {
     assert(0);
 }
 
  bool LgsNullableExpr::equals(LgsExpr* other) {
-    assert(0);
-}
-
-LgsExpr* LgsNullableExpr::clone() {
     assert(0);
 }

@@ -2,20 +2,26 @@
 #include "LgsType.h"
 #include <string>
 
+namespace llvm {
+    class DIType;
+    class Constant;
+    class Type;
+}
+
 class LgsEnum final : public LgsType {
 public:
     std::string name;
 
     explicit LgsEnum(const std::string& enumName) : name(enumName) {}
-    Type* getIRType(LgsLLVMGen& cg) override;
+    Type* getIRType(LgsCgModule& cg) override;
+    Constant* getRTType(LgsCgModule& cg) override;
     std::string getName() override;
     LgsExpr* getZeroValue() override;
-    Lgs_TypeKind getRTTypeKind() override;
     bool canCastTo(LgsType* other) override;
-    std::string strFormatPart() const override;
+    LgsType* applyBinOp(LgsType* toType, LgsBinOp& op) override;
+    std::string fmtStr() const override;
     size_t sizeBytes() override;
-    LgsEnum* clone() override;
-    ~LgsEnum() override = default;
+    DIType* getDebugType(LgsCgModule& cg) override;
 };
 
 

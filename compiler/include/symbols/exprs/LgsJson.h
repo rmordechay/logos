@@ -4,7 +4,6 @@
 #include "constants/LgsFloatConst.h"
 #include "constants/LgsIntConst.h"
 #include "constants/LgsStrConst.h"
-#include "LgsUtils.h"
 
 class LgsNull;
 
@@ -51,6 +50,7 @@ public:
     };
     bool equals(LgsExpr* other) override;
     std::string asText() override;
+    void setDebugValue(LgsCgModule& cg) override;
     ~LgsJson() override;
 };
 
@@ -59,6 +59,10 @@ inline bool LgsJson::equals(LgsExpr* other) {
 }
 
 inline std::string LgsJson::asText() {
+    assert(0);
+}
+
+inline void LgsJson::setDebugValue(LgsCgModule& cg) {
     assert(0);
 }
 

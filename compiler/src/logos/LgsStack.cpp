@@ -9,60 +9,54 @@ void LgsStack::enterScope(LgsValue* value) {
     if (const auto func = dynamic_cast<LgsFunc*>(value)) {
         stackFrame.func = func;
     } else if (const auto loop = dynamic_cast<LgsForLoop*>(value)) {
-        stackFrame.func = top().func;
-        stackFrame.symbolTable = top().symbolTable;
+        stackFrame.func = stack.back().func;
+        stackFrame.symbolTable = stack.back().symbolTable;
         stackFrame.loop = loop;
     } else if (const auto ifStmt = dynamic_cast<LgsIfStmt*>(value)) {
-        stackFrame.func = top().func;
-        stackFrame.symbolTable = top().symbolTable;
+        stackFrame.func = stack.back().func;
+        stackFrame.symbolTable = stack.back().symbolTable;
         stackFrame.ifStmt = ifStmt;
     } else if (dynamic_cast<LgsSwitch*>(value)) {
-        stackFrame.func = top().func;
-        stackFrame.symbolTable = top().symbolTable;
+        stackFrame.func = stack.back().func;
+        stackFrame.symbolTable = stack.back().symbolTable;
     } else {
         assert(0);
     }
-    push(stackFrame);
+    stack.push_back(stackFrame);
 }
 
 void LgsStack::exitScope() {
-    pop();
-}
-
-LgsFunc* LgsStack::currentFunc() {
-    return top().func;
-}
-
-LgsForLoop* LgsStack::currentLoop() {
-    for (auto it = rbegin(); it != rend(); ++it) {
-        if (it->loop) return it->loop;
-    }
-    return nullptr;
-}
-
-LgsIfStmt* LgsStack::currentIfStmt() {
-    for (auto it = rbegin(); it != rend(); ++it) {
-        if (it->ifStmt) return it->ifStmt;
-    }
-    return nullptr;
-}
-
-LgsIfStmt* LgsStack::outermostIfStmt() {
-    for (auto it = begin(); it != end(); ++it) {
-        if (it->ifStmt) return it->ifStmt;
-    }
-    return nullptr;
-}
-
-BasicBlock* LgsStack::findTagExitBlock(const std::string& tag) {
-    for (auto it = begin(); it != end(); ++it) {
-        if (it->ifStmt && it->ifStmt->tag == tag) {
-            return it->ifStmt->IRExitBlock;
-        }
-    }
-    assert(0);
+    stack.pop_back();
 }
 
 LgsSymbolTable& LgsStack::getSymbolTable() {
-    return top().symbolTable;
+    return stack.back().symbolTable;
+}
+
+LgsFunc* LgsStack::currentFunc() const {
+    return stack.back().func;
+}
+
+LgsForLoop* LgsStack::currentLoop() const {
+    return stack.back().loop;
+}
+
+LgsIfStmt* LgsStack::currentIfStmt() const {
+    return stack.back().ifStmt;
+}
+
+LgsIfStmt* LgsStack::getOutermostIfStmt() const {
+    for (const auto& frame : stack) {
+        if (frame.ifStmt) return frame.ifStmt;
+    }
+    return nullptr;
+}
+
+BasicBlock* LgsStack::findTagExitBlock(const std::string& tag) const {
+    for (const auto& frame : stack) {
+        if (frame.ifStmt && frame.ifStmt->tag == tag) {
+            return frame.ifStmt->IRExitBlock;
+        }
+    }
+    return nullptr;
 }

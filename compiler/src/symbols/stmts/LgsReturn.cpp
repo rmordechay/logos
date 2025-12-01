@@ -1,11 +1,10 @@
 #include "stmts/LgsReturn.h"
-#include "funcs/LgsFunc.h"
-#include "LgsUtils.h"
 
-LgsStmt* LgsReturn::clone() {
-    const auto newReturn = new LgsReturn(*this);
-    newReturn->expr = expr->clone();
-    return newReturn;
+#include "codegen/LgsCgModule.h"
+#include "funcs/LgsFunc.h"
+
+void LgsReturn::setDebugValue(LgsCgModule& cg) {
+    setDebugLoc(cg);
 }
 
 LgsReturn::~LgsReturn() {

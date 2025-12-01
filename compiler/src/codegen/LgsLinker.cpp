@@ -1,10 +1,8 @@
 #include "codegen/LgsLinker.h"
-#include "codegen/LgsLLVMGen.h"
+#include "codegen/LgsCgModule.h"
 #include "logos/LgsAppConfigs.h"
-#include "llvm/Bitcode/BitcodeWriter.h"
 #include <llvm/Support/FileSystem.h>
-
-#define LINK_CMD_STRING "clang %s -L%s -llgs %s -Wl,-rpath,%s %s -o %s"
+#define LINK_CMD_STRING "clang -flto -o3 %s -L%s -llgs %s -Wl,-rpath,%s %s -o %s"
 
 bool LgsLinker::link() const {
     assert(paths.lgsRootDir != "" && paths.execFile != "");
@@ -14,11 +12,13 @@ bool LgsLinker::link() const {
             objFileList += objPath.path().string() + " ";
         }
     }
-    assert(objFileList != "");
+    paths.cblasDir = "../external/libcblas.a";
+    assert(objFileList != "" && fs::exists(paths.cblasDir));
     std::string additionalLibs;
-    for (const auto& appPath : externalLibs) {
-        additionalLibs += appPath + "/build/app ";
+    for (const auto& appPath : paths.userCLibs) {
+        additionalLibs += std::string(appPath) + " ";
     }
+    additionalLibs += std::string(paths.cblasDir) + " ";
     const auto flags = appConfigs.isLibrary ? "-shared -fPIC" : "";
     char cmd[1024*4];
     std::snprintf(
@@ -34,3 +34,4 @@ bool LgsLinker::link() const {
     );
     return runCmd(cmd);
 }
+

@@ -1,7 +1,10 @@
 #include "stmts/LgsIfStmt.h"
-#include "funcs/LgsFunc.h"
-#include "codegen/LgsLLVMGen.h"
+#include "codegen/LgsCgModule.h"
 #include "LgsUtils.h"
+
+void LgsIfStmt::setDebugValue(LgsCgModule& cg) {
+    assert(0);
+}
 
 LgsIfStmt::~LgsIfStmt() {
     freeExpr(ifCond);

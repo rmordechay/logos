@@ -7,10 +7,14 @@
 #include "errors/LgsPlmErrors.h"
 #include "exprs/LgsFuncCall.h"
 #include "funcs/LgsMainFunc.h"
+#include "lgsc/LgsCCompiler.h"
 #include "stmts/LgsAssignment.h"
+#include "stmts/LgsStmtsBlock.h"
 
+struct LgsFileMetadata;
+class LgsMetaSelection;
 class LgsMatrixExpr;
-class LgsGenericParam;
+class LgsGenericType;
 struct LgsPaths;
 struct LgsSymbol;
 struct LgsAppConfigs;
@@ -68,23 +72,24 @@ public:
     std::string code = "";
     LgsErrHandler errHandler;
     LgsFunc* currentFunc = nullptr;
-    std::unordered_map<std::string, LgsApp*> imports;
+    LgsCCompiler lgsCC;
 
     LgsParser(LgsFileMetadata* metadata, LgsPaths& paths, LgsGlobals& globals, const bool headersOnly = false)
-        : paths(paths), headersOnly(headersOnly), metadata(metadata), globals(globals) {}
+        : paths(paths), headersOnly(headersOnly), metadata(metadata), globals(globals), lgsCC(paths) {
+    }
 
     LgsParser(const std::string& code, LgsPaths& paths, LgsGlobals& globals, const bool headersOnly = false)
-        : paths(paths), headersOnly(headersOnly), globals(globals), code(code) {}
+        : paths(paths), headersOnly(headersOnly), globals(globals), code(code), lgsCC(paths) {}
 
     // Files
     bool scanTokens();
     LgsFile* parseSrcFile(bool isTestRun);
     LgsFile* parseSrcFileHeaders();
-    LgsEnvFile* parseEnvFile();
     LgsMainFile* parseMainFile();
     LgsAppConfigFile* parseAppConfigFile();
     LgsObjectFile* parseObjectFile();
     LgsInterfaceFile* parseInterfaceFile();
+    LgsEnvFile* parseEnvFile();
     LgsTestFile* parseTestFile();
 
     // Object
@@ -96,12 +101,12 @@ public:
     LgsIOPair* parseIOPair();
 
     // Types
+    LgsType* parseType();
     LgsEnum* parseEnum();
     LgsSubType* parseSubtype();
     LgsFuncType* parseFuncType();
     LgsMap* parseMapType();
-    LgsType* parseType();
-    LgsGenericParam* parseGenericType();
+    LgsGenericType* parseGenericType();
     std::vector<LgsType*> parseGenericArgs();
 
     // Funcs
@@ -116,7 +121,7 @@ public:
     LgsStmtsBlock* parseStmtsBlock(bool withSingleStmt = true);
     LgsVarDec* parseVarDec();
     LgsAssignType parseAssignType();
-    LgsStmt* parseAssignOrExpr();
+    LgsStmt* parseAssignment();
     LgsStmt* parseIfStmt();
     LgsSwitch* parseSwitch();
     LgsStmt* parseBoolSwitch();
@@ -134,16 +139,16 @@ public:
     LgsExpr* parseExpr(bool withLambda = true, bool withInstance = true);
     LgsExpr* parseExprWithPrecedence(int minPrecedence, bool withInstance = true);
     LgsExpr* parseUnary(bool withInstance = true);
-    LgsExpr* parseExprOrStmtsBlock();
+    LgsExpr* parseExprOrLambda();
     LgsVariable* parseVariable();
     LgsInstance* parseInstance();
     LgsFuncCall* parseFuncCall();
-    LgsVectorExpr* parseVectorExpr();
-    LgsMatrixExpr* parseMatrixExpr();
     LgsStrConst* parseStrConst();
     LgsMetaVar* parseLoopMetaVar();
     LgsExpr* parseConstant();
     LgsArrayExpr* parseArrayExpr();
+    LgsVectorExpr* parseVectorExpr();
+    LgsMatrixExpr* parseMatrixExpr();
     LgsHashMap* parseHashMap();
     LgsFunc* parseLambda();
     LgsExpr* parsePrefixExpr();
@@ -151,6 +156,9 @@ public:
     LgsIterIndex* parseIterIndex(LgsExpr* baseExpr);
     LgsPostfixExpr* parsePostfixExpr(LgsExpr* baseExpr);
     LgsSelection* parseSelection(LgsExpr* firstExpr);
+    LgsMetaSelection* parseMetaSelection(LgsExpr* firstExpr);
+
+    // JSON
     LgsJson* parseJson();
     LgsJsonObject* parseJsonObject();
     LgsJsonArray* parseJsonArray();
@@ -159,11 +167,12 @@ public:
     void parseArgs(LgsInstance* instance);
     void parsePackageString(LgsImportPackage& pkg, const LgsToken& importToken);
     void parseJsonPrimitive(LgsJson* json);
-    void parseImports(std::unordered_set<std::string>& cImports);
-    void parseCImports(std::unordered_set<std::string>& cImports);
+    void parseImports(std::vector<LgsStrConst*>& cImports);
+    void parseCIncludes(std::vector<LgsStrConst*>& cImports);
+    void parseCImports(std::vector<LgsStrConst*> externalImports, LgsFile* file);
 
+    void setLocation(LgsLocation& location, const LgsToken* startToken, const LgsToken* endToken) const;
     void addFileSymbol(LgsMainFile* file, const LgsSymbol& newSymbol);
-    void setLocation(LgsLocation& location, const LgsToken* token) const;
     void extractStrParts(LgsStrConst& strConst);
     void validateTestFolder(const LgsFile* testFile);
     bool isImportName(LgsExpr* expr) const;
@@ -182,5 +191,5 @@ public:
     bool parsedOrReset(const void* value, size_t resetIndex);
     void addParsingError();
     void recursionGuard();
-    void addError(const LgsBaseMsg& lgsErr, const LgsLocation* location, const std::vector<std::string>& args);
+    void addError(const LgsBaseMsg& lgsErr, const LgsLocation& location, const std::vector<std::string>& args);
 };

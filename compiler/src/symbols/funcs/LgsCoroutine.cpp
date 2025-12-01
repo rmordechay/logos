@@ -1,7 +1,10 @@
 #include "funcs/LgsCoroutine.h"
 #include "exprs/LgsFuncCall.h"
 #include "exprs/LgsSelection.h"
-#include "LgsUtils.h"
+
+void LgsCoroutine::setDebugValue(LgsCgModule& cg) {
+    assert(0);
+}
 
 LgsCoroutine::~LgsCoroutine() {
     freeExpr(funcCall);

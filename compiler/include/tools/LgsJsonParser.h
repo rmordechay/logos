@@ -1,7 +1,11 @@
 #pragma once
-#include "types/LgsEnum.h"
+
 #include <sstream>
 
+class LgsSubType;
+class LgsEnum;
+class LgsNull;
+class LgsIntConst;
 class LgsMetaVar;
 class LgsJson;
 class LgsTypeExpr;
@@ -92,13 +96,11 @@ public:
     void parseCoroutine(const LgsCoroutine* coroutine);
     void parseDeferStmt(const LgsDeferStmt* deferStmt);
     void parseIOStmt(const LgsIOStmt* ioStmt);
-    void parseExpr(LgsExpr*& expr);
+    void parseExpr(LgsExpr* expr);
     void parseBinaryExpr(const LgsBinaryExpr* binaryExpr);
     void parseTernaryExpr(LgsTernaryExpr* ternary);
     void parseCast(LgsCast* cast);
     void parseArrayExpr(LgsArrayExpr* arrayExpr);
-    void parseStaticArray(const LgsArrayExpr* arrayExpr);
-    void parseDynamicArray(LgsArrayExpr* arrayExpr);
     void parseHashMap(LgsHashMap* hashMap);
     void parseVectorExpr(const LgsVectorExpr* vectorExpr);
     void parseVariable(const LgsVariable* variable);

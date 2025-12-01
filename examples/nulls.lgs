@@ -2,12 +2,27 @@ object Obj {
     x: Int?
 }
 
+func(str: Str?, number: Int?) {
+    print(str)
+    print(number)
+}
+
+nulls() {
+    func("text1", 3)
+    print("--")
+    func("text2", null)
+    print("--")
+    func(null, 45)
+    print("--")
+    func(null, null)
+}
+
 main() {
     a = 2?
     print(a)
     a := null
     print(a)
-
-    obj = Obj{x = 2}
-    x = obj.x
+    obj = Obj{x = 2}?
+    //obj = Obj{x = 2}
+    print(obj.x)
 }

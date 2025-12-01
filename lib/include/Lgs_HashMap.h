@@ -4,9 +4,8 @@
 #include <vector>
 #include <string>
 
-struct Lgs_Map {
+struct Lgs_HashMap {
+    Lgs_Map mapType;
     size_t valueSize;
-    Lgs_TypeKind keyType;
-    Lgs_TypeKind valueType;
     std::unordered_map<std::string, std::vector<char>>* data;
 };

@@ -9,12 +9,14 @@ public:
         isPrimitive = true;
     }
     size_t sizeBytes() override;
-    Type* getIRType(LgsLLVMGen& cg) override;
+    Type* getIRType(LgsCgModule& cg) override;
+    Constant* getRTType(LgsCgModule& cg) override;
     std::string getName() override;
     LgsExpr* getZeroValue() override;
-    Lgs_TypeKind getRTTypeKind() override;
-    std::string strFormatPart() const override;
+    std::string fmtStr() const override;
     bool canCastTo(LgsType* other) override;
+    LgsType* applyBinOp(LgsType* toType, LgsBinOp& op) override;
+    DIType* getDebugType(LgsCgModule& cg) override;
 };
 
 inline LgsUInt LGS_UINT;

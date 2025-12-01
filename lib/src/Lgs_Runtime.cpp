@@ -1,91 +1,86 @@
 #include "LgsDefinitions.h"
 #include "Lgs_Allocator.h"
-#include "Lgs_Scheduler.h"
-#include "Lgs_Stack.h"
 #include "Lgs_Types.h"
 #include <cassert>
-#include "Lgs_Map.h"
+#include "Lgs_HashMap.h"
 #include "LgsUtils.h"
-
+#include "Lgs_DArrayExpr.h"
+#include "Lgs_Helpers.h"
+#include "Lgs_SetExpr.h"
+#include "context/Lgs_Aarch64.h"
 #include <iostream>
+#include <stack>
 
-weakf Lgs_SArray Lgs_RTTypes_Arrays[] = {};
+static void freeValue(void* ptr, const Lgs_TypeInfo* type);
+extern "C" void Lgs_Runtime_callDefers();
 
-struct VKey {
-    void* instance;
-    int32_t virtualID;
-    bool operator==(const VKey& other) const noexcept {
-        return instance == other.instance && virtualID == other.virtualID;
-    }
-};
-
-struct VKeyHash {
-    size_t operator()(const VKey& k) const noexcept {
-        const auto h1 = std::hash<void*>{}(k.instance);
-        const auto h2 = std::hash<int32_t>{}(k.virtualID);
-        return h1 ^ h2 + 0x9e3779b9 + (h1 << 6) + (h1 >> 2);
-    }
+struct Lgs_StackFrame {
+    std::unordered_map<void*, Lgs_TypeInfo*> owners;
+    std::unordered_map<void*, Lgs_TypeInfo*> orphans;
+    std::vector<Lgs_ThunkFunc> defers;
 };
 
 struct Lgs_Runtime {
-    Lgs_Stack stack;
     Lgs_Allocator arena;
-    Lgs_Scheduler scheduler;
+    std::vector<Lgs_ThunkFunc> coros;
+    std::stack<Lgs_StackFrame> stack;
     std::unordered_map<VKey, void*, VKeyHash> vtable;
 };
 
 static inline Lgs_Runtime runtime;
 
-extern "C" void Lgs_Runtime_init() {
-    // runtime.scheduler.start();
-}
+extern "C" void Lgs_Runtime_init() {}
 
 extern "C" void Lgs_Runtime_close() {
-    // runtime.scheduler.shutdown();
-}
-
-extern "C" void Lgs_Runtime_addDefer(void* funcPtr, void* ctx) {
-    runtime.stack.addDefer(funcPtr, ctx);
-}
-
-extern "C" void Lgs_Runtime_callDefers() {
-    runtime.stack.callDefers();
-}
-
-extern "C" void Lgs_Runtime_addOwner(void* ptr, const Lgs_TypeKind type) {
-    runtime.stack.addOwner(ptr, type);
-}
-
-extern "C" void Lgs_Runtime_addOrphan(void* ptr, const Lgs_TypeKind type) {
-    runtime.stack.addOrphan(ptr, type);
-}
-
-extern "C" void Lgs_Runtime_removeOwner(const void* owner) {
-    runtime.stack.removeOwner(owner);
+    runtime.arena.free();
 }
 
 extern "C" void Lgs_Runtime_push() {
-    runtime.stack.stackIndex++;
+    runtime.stack.push(Lgs_StackFrame{});
 }
 
-extern "C" void Lgs_Runtime_pop(const bool cleanup) {
-    runtime.stack.pop(cleanup);
+extern "C" void Lgs_Runtime_pop() {
+    // Call defers
+    for (auto [func, ctx] : runtime.stack.top().defers) {
+        func(ctx);
+    }
+    // Free values
+    for (const auto [ptr, type] : runtime.stack.top().owners) {
+        std::cout << "Freeing owner: " << ptr << '\n';
+        // freeValue(ptr, type);
+    }
+    for (const auto [ptr, type] : runtime.stack.top().orphans) {
+        std::cout << "Freeing orphan: " << ptr << '\n';
+        // freeValue(ptr, type);
+    }
+    runtime.stack.pop();
 }
 
-extern "C" void Lgs_Runtime_addCoro(void* funcPtr, void* ctx) {
-    runtime.scheduler.spawn(reinterpret_cast<ThunkFunc>(funcPtr), ctx);
+extern "C" void Lgs_Runtime_addDefer(const ThunkFunc funcPtr, void* ctx) {
+    runtime.stack.top().defers.emplace_back(Lgs_ThunkFunc{funcPtr, ctx});
+}
+
+extern "C" void Lgs_Runtime_addCoro(const ThunkFunc funcPtr, void* ctx) {
+    runtime.coros.emplace_back(Lgs_ThunkFunc{funcPtr, ctx});
+}
+
+extern "C" void* Lgs_Runtime_allocate(const size_t size, Lgs_TypeInfo* type, const bool isOwner) {
+    const auto ptr = std::malloc(size);
+    std::cout << "Allocated: " << size << ' ' << '\n';
+    if (isOwner) {
+        runtime.stack.top().owners[ptr] = type;
+    } else {
+        runtime.stack.top().orphans[ptr] = type;
+    }
+    return ptr;
+}
+
+extern "C" void Lgs_Runtime_removeOwner(const void* owner) {
+    assert(0);
 }
 
 extern "C" void Lgs_Runtime_yield() {
-    runtime.scheduler.yield();
-}
-
-extern "C" bool Lgs_Runtime_shouldYield() {
-    return runtime.scheduler.shouldYield();
-}
-
-extern "C" void* Lgs_Runtime_allocate(const size_t size) {
-    return runtime.arena.allocate(size);
+    Lgs_switchContext();
 }
 
 extern "C" void Lgs_Runtime_addToVTable(void* instance, const int32_t virtualID, void* ptr) {
@@ -100,4 +95,35 @@ extern "C" void* Lgs_Runtime_getFromVTable(void* instance, const int32_t virtual
 extern "C" void Lgs_Runtime_throwError(const char* msg) {
     logError(std::string(msg) + "\n");
     exit(1);
+}
+
+static void freeValue(void* ptr, const Lgs_TypeInfo* type) {
+    std::cout << "Freeing: " << ptr << '\n';
+    switch (type->kind) {
+    case RTT_DARRAY: {
+        const auto darray = static_cast<Lgs_DArrayExpr*>(ptr);
+        std::free(darray->data);
+        std::free(darray);
+        break;
+    }
+    case RTT_SET: {
+        const auto set = static_cast<Lgs_SetExpr*>(ptr);
+        std::free(set->data);
+        std::free(set);
+        break;
+    }
+    case RTT_STR:
+    case RTT_OBJECT: {
+        std::free(ptr); return;
+    }
+    case RTT_SARRAY:
+    case RTT_NULLABLE:
+    case RTT_MAP: {
+        break;
+    }
+    default: {
+        break;
+    }
+    }
+    assert(0);
 }

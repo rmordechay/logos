@@ -1,7 +1,5 @@
 #pragma once
 #include "LgsSymbol.h"
-#include <map>
-#include <vector>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -13,8 +11,9 @@ struct LgsSymbolTable {
     std::unordered_map<std::string, LgsSymbol> symbols;
     std::unordered_map<std::string, LgsApp*> imports;
     std::unordered_map<std::string, LgsFunc*> coroutines;
-    std::unordered_map<std::string, LgsFunc*> genericCalls;
-    std::unordered_set<std::string> cImportNames;
+    std::unordered_map<std::string, LgsFunc*> genericFuncCalls;
+    std::unordered_set<std::string> cImportPaths;
+    std::vector<LgsType*> rttTypes;
 
     LgsSymbol* getSymbol(const std::string& name);
     void addSymbol(const LgsSymbol& symbol, LgsErrHandler* errHandler, const std::string& filePath = "");
@@ -22,6 +21,5 @@ struct LgsSymbolTable {
 
 struct LgsGlobals {
     LgsSymbolTable table;
-    std::vector<LgsType*> rtTypes;
     std::map<std::string, LgsSymbolTable> cImports;
 };

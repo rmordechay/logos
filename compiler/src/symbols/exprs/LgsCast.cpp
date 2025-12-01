@@ -2,7 +2,7 @@
 #include "LgsType.h"
 #include "LgsUtils.h"
 
-Value* LgsCast::loadIR(LgsLLVMGen& cg) {
+Value* LgsCast::loadIR(LgsCgModule& cg) {
     return value->loadIR(cg);
 }
 
@@ -10,9 +10,8 @@ std::string LgsCast::asText() {
     return fromValue->asText() + "->" + toType->pname();
 }
 
-Value* LgsCast::castIR(LgsLLVMGen& cg, LgsType* castToType) {
-    assert(value->IRValue);
-    return value->IRValue;
+void LgsCast::setDebugValue(LgsCgModule& cg) {
+    assert(0);
 }
 
 LgsCast::~LgsCast() {

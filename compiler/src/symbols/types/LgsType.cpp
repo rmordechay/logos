@@ -8,7 +8,7 @@
 #include "types/LgsObject.h"
 #include "types/iterables/LgsDArray.h"
 #include "types/LgsEnum.h"
-#include "types/LgsGenericParam.h"
+#include "types/LgsGenericType.h"
 #include "types/iterables/LgsMap.h"
 #include "types/LgsNullable.h"
 #include "types/LgsSubType.h"
@@ -17,10 +17,12 @@
 #include "types/primitives/LgsVoid.h"
 #include "types/iterables/LgsSArray.h"
 #include "types/iterables/LgsSet.h"
+#include "types/iterables/LgsVariadic.h"
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsByte.h"
 #include "types/primitives/LgsChar.h"
 #include "types/primitives/LgsDouble.h"
+#include "types/primitives/LgsLong.h"
 #include "types/primitives/LgsShort.h"
 #include "types/primitives/LgsSize.h"
 #include "types/primitives/LgsUInt.h"
@@ -37,10 +39,45 @@ bool LgsType::addMethod(LgsFunc* method) {
     return true;
 }
 
-bool LgsType::addEmptyMethod(const std::string& name) {
-    if (methods.contains(name)) return false;
-    methods[name] = nullptr;
-    return true;
+LgsField* LgsType::getField(const std::string& fieldName) {
+    for (auto* f : fields) {
+        if (f->name == fieldName) return f;
+    }
+    return nullptr;
+}
+
+LgsFunc* LgsType::getMethod(const std::string& methodName) {
+    const auto method = methods.find(methodName);
+    if (method != methods.end()) {
+        if (method->second) {
+            return method->second;
+        }
+    }
+    return nullptr;
+}
+
+Constant* LgsType::getRTType(LgsCgModule& cg) {
+    assert(0);
+}
+
+LgsType* LgsType::applyBinOp(LgsType* toType, LgsBinOp& op) {
+    assert(0);
+}
+
+void LgsType::hashNode(size_t& oldHash) {
+    assert(0);
+}
+
+std::string LgsType::pname() {
+    return getName();
+}
+
+std::string LgsType::getGenericName() {
+    return getName();
+}
+
+bool LgsType::equals(LgsType* other) {
+    return getName() == other->getName();
 }
 
 bool LgsType::isVoid() {
@@ -84,7 +121,7 @@ LgsType* LgsType::extendInt() {
 LgsType* LgsType::applyIntBinOp(LgsType* toType, const LgsBinOpType op) {
     switch (op) {
     case POW:
-        if (toType->canCastTo(this)) return &LGS_DOUBLE;
+        if (canCastTo(toType)) return &LGS_DOUBLE;
         break;
     case ADD:
     case SUB:
@@ -96,7 +133,7 @@ LgsType* LgsType::applyIntBinOp(LgsType* toType, const LgsBinOpType op) {
     case LSHIFT:
     case RSHIFT:
         if (toType->asFloat()) return toType;
-        if (toType->canCastTo(this)) return this;
+        if (canCastTo(toType)) return this;
         break;
     case DIV:
         if (toType->isNumber()) return &LGS_FLOAT;
@@ -107,7 +144,7 @@ LgsType* LgsType::applyIntBinOp(LgsType* toType, const LgsBinOpType op) {
     case GT:
     case GE:
     case LE: {
-        if (toType->canCastTo(this)) return &LGS_BOOL;
+        if (canCastTo(toType)) return &LGS_BOOL;
         break;
     }
     case IN: {
@@ -128,9 +165,9 @@ void LgsType::cloneFields(LgsType* newType) const {
     newType->fields.clear();
     for (const auto& field : fields) {
         const auto newField = new LgsField(*field);
-        newField->type = field->type->clone();
+        newField->type = field->type;
         if (field->expr) {
-            newField->expr = field->expr->clone();
+            newField->expr = field->expr;
         }
         newType->addField(newField);
     }
@@ -139,12 +176,14 @@ void LgsType::cloneFields(LgsType* newType) const {
 void LgsType::cloneMethods(LgsType* newType) const {
     newType->methods.clear();
     for (const auto& [_, method] : methods) {
-        const auto newField = new LgsFunc(*method);
-        newType->addMethod(newField);
+        const auto newMethod = new LgsFunc(*method);
+        if (method->stmtsBlock) newMethod->stmtsBlock = method->stmtsBlock;
+        newMethod->funcType = method->funcType;
+        newType->addMethod(newMethod);
     }
 }
 
-Value* LgsType::orInt(LgsLLVMGen& cg, const LgsExpr* self, const LgsExpr* other) {
+Value* LgsType::orInt(LgsCgModule& cg, const LgsExpr* self, const LgsExpr* other) {
     const auto currentBlock = cg.builder.GetInsertBlock();
     const auto func = currentBlock->getParent();
     const auto rightBlock = cg.createBlock("or_right", func);
@@ -159,7 +198,7 @@ Value* LgsType::orInt(LgsLLVMGen& cg, const LgsExpr* self, const LgsExpr* other)
     return phi;
 }
 
-Value* LgsType::andInt(LgsLLVMGen& cg, LgsExpr* self, const LgsExpr* other) {
+Value* LgsType::andInt(LgsCgModule& cg, LgsExpr* self, const LgsExpr* other) {
     const auto currentBlock = cg.builder.GetInsertBlock();
     const auto func = currentBlock->getParent();
     const auto rightBlock = cg.createBlock("and_right", func);
@@ -174,123 +213,83 @@ Value* LgsType::andInt(LgsLLVMGen& cg, LgsExpr* self, const LgsExpr* other) {
     return phi;
 }
 
-LgsField* LgsType::getField(const std::string& fieldName) {
-    for (auto* f : fields) {
-        if (f->name == fieldName) return f;
-    }
-    return nullptr;
-}
-
-LgsFunc* LgsType::getMethod(const std::string& methodName) {
-    return nullptr;
-}
-
-Lgs_TypeKind LgsType::getRTTypeKind() {
+Value* LgsType::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
-Constant* LgsType::getRTType(LgsLLVMGen& cg) {
+Value* LgsType::subIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
-std::string LgsType::pname() {
-    return getName();
-}
-
-bool LgsType::equals(LgsType* other) {
-    return getName() == other->getName();
-}
-
-LgsType* LgsType::applyBinOp(LgsType* toType, LgsBinOp& op) {
+Value* LgsType::mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
-DIBasicType* LgsType::getDebugType(LgsLLVMGen& cg) {
+Value* LgsType::divIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
-void LgsType::hashNode(size_t& oldHash) {
+Value* LgsType::modIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
-LgsType* LgsType::clone() {
-    if (isPrimitive) return this;
+Value* LgsType::powIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
-Value* LgsType::addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::bitAndIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
-Value* LgsType::subIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::bitOrIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
-Value* LgsType::mulIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::bitXorIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
-Value* LgsType::divIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::lshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsType::modIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::rshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
-Value* LgsType::powIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::eqIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
-Value* LgsType::bitAndIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::neIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
-Value* LgsType::bitOrIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::ltIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
-Value* LgsType::bitXorIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::gtIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
-Value* LgsType::lshiftIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* other) {
+Value* LgsType::geIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
-Value* LgsType::rshiftIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::leIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
-Value* LgsType::eqIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::andIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
-Value* LgsType::neIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::orIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
-Value* LgsType::ltIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
-    assert(0);
-}
-
-Value* LgsType::gtIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
-    assert(0);
-}
-
-Value* LgsType::geIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
-    assert(0);
-}
-
-Value* LgsType::leIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
-    assert(0);
-}
-
-Value* LgsType::andIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
-    assert(0);
-}
-
-Value* LgsType::orIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::crossIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
@@ -358,8 +357,8 @@ LgsEnum* LgsType::asEnum() {
     return dynamic_cast<LgsEnum*>(this);
 }
 
-LgsGenericParam* LgsType::asGeneric() {
-    return dynamic_cast<LgsGenericParam*>(this);
+LgsGenericType* LgsType::asGeneric() {
+    return dynamic_cast<LgsGenericType*>(this);
 }
 
 LgsIterable* LgsType::asIterable() {
@@ -406,6 +405,10 @@ LgsNullable* LgsType::asNullable() {
     return dynamic_cast<LgsNullable*>(this);
 }
 
+LgsVariadic* LgsType::asVariadic() {
+    return dynamic_cast<LgsVariadic*>(this);
+}
+
 LgsType::~LgsType() {
     for (const auto [_, method] : methods) {
         if (!method) continue;
@@ -418,7 +421,7 @@ LgsType::~LgsType() {
     fields.clear();
 }
 
-void freeType(LgsType* type) {
+void freeType(const LgsType* type) {
     if (!type) return;
     if (type->isPrimitive) return;
     delete type;

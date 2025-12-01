@@ -1,13 +1,17 @@
 #include "exprs/LgsNull.h"
-#include "codegen/LgsLLVMGen.h"
+#include "codegen/LgsCgModule.h"
 #include "LgsDefinitions.h"
-#include "LgsUtils.h"
 #include <llvm/IR/Module.h>
 
+Value* LgsNull::loadIR(LgsCgModule& cg) {
+    return IRValue;
+}
+
 void LgsNull::castImplicitly(LgsType* toType) {
-    const auto otherNullable = toType->asNullable();
-    if (!otherNullable) return;
-    type->asNullable()->baseType = otherNullable->baseType;
+    if (type) return;
+    if (const auto nullable = toType->asNullable()) {
+        type = nullable->baseType;
+    }
 }
 
 std::string LgsNull::asText() {
@@ -15,6 +19,10 @@ std::string LgsNull::asText() {
 }
 
 bool LgsNull::equals(LgsExpr* other) {
+    assert(0);
+}
+
+void LgsNull::setDebugValue(LgsCgModule& cg) {
     assert(0);
 }
 

@@ -1,16 +1,21 @@
 #include "types/iterables/LgsSet.h"
-#include "codegen/LgsLLVMGen.h"
+#include "codegen/LgsCgModule.h"
 #include "exprs/LgsFuncCall.h"
-#include "funcs/LgsFunc.h"
 #include "types/LgsAny.h"
-#include "types/LgsFuncType.h"
-#include "types/primitives/LgsVoid.h"
 #include "types/iterables/LgsDArray.h"
 #include "types/primitives/LgsLong.h"
 
-Type* LgsSet::getIRType(LgsLLVMGen& cg) {
+Type* LgsSet::getIRType(LgsCgModule& cg) {
     if (IRType) return IRType;
-    return getArrStruct(cg);
+    IRType = cg.getStructType({cg.ptrTy(), cg.sizeTy(), cg.sizeTy(), cg.ptrTy()}, name);
+    return IRType;
+}
+
+Constant* LgsSet::getRTType(LgsCgModule& cg) {
+    const auto genericName = getGenericName();
+    const auto st = cg.getStructType({cg.ptrTy()}, genericName);
+    const auto sv = ConstantStruct::get(st, {baseType->getRTType(cg)});
+    return cg.getRTTypeInfo(genericName, sizeBytes(), sizeBytes(), RTT_SET, sv);
 }
 
 size_t LgsSet::sizeBytes() {
@@ -19,10 +24,6 @@ size_t LgsSet::sizeBytes() {
 
 LgsExpr* LgsSet::getZeroValue() {
     assert(0);
-}
-
-Lgs_TypeKind LgsSet::getRTTypeKind() {
-    return RTT_SET;
 }
 
 std::string LgsSet::getName() {
@@ -42,26 +43,9 @@ bool LgsSet::canCastTo(LgsType* other) {
     return baseType->canCastTo(otherArr->baseType);
 }
 
-std::string LgsSet::strFormatPart() const {
+std::string LgsSet::fmtStr() const {
     if (baseType->asChar()) return "%s";
     return "%p";
-}
-
-StructType* LgsSet::getArrStruct(LgsLLVMGen& cg) {
-    if (arrStruct) return arrStruct;
-    arrStruct = cg.getStructType({cg.i64Ty(), cg.ptrTy()}, name);
-    return arrStruct;
-}
-
-LgsFunc* LgsSet::getAddFunc() {
-    const auto func = methods.find(ADD_FUNC_NAME);
-    if (func != methods.end() && func->second) return func->second;
-    func->second = new LgsFunc(ADD_FUNC_NAME, &LGS_VOID, {this, &LGS_ANY}, BUILTIN | PUBLIC | METHOD);
-    func->second->fn = [func](LgsLLVMGen& cg, const std::vector<LgsFuncArg>& args) {
-        return func->second->callIR(cg, {args[0].expr->IRValue, cg.getPtrTo(args[1].expr->IRValue)});
-    };
-    addMethod(func->second);
-    return func->second;
 }
 
 LgsType* LgsSet::applyBinOp(LgsType* toType, LgsBinOp& op) {
@@ -89,15 +73,18 @@ bool LgsSet::inferBaseType(const std::vector<LgsExpr*>& args) {
     return true;
 }
 
-Value* LgsSet::lengthIR(LgsLLVMGen& cg, Value* iterable) {
-    return getLenFunc()->callIR(cg, {iterable});
+Value* LgsSet::lenIR(LgsCgModule& cg, Value* iterable) {
+    return cg.callLgsFunc("Set_len", cg.sizeTy(), {cg.ptrTy()}, {iterable});
 }
 
-Value* LgsSet::inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) {
+Value* LgsSet::inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) {
     return cg.callLgsFunc("Set_contains", cg.i1Ty(), {cg.ptrTy(), cg.ptrTy()}, {iterableExpr->IRValue, cg.getPtrTo(value->IRValue)});
 }
 
-Value* LgsSet::getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) {
-    LgsFunc f("get", &LGS_ANY, {this, &LGS_LONG}, BUILTIN | PUBLIC | METHOD);
-    return f.callIR(cg, {iterable, index});
+Value* LgsSet::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
+    return cg.callLgsFunc("Set_get", cg.ptrTy(), {cg.ptrTy(), cg.sizeTy()}, {iterable, index});
+}
+
+DIType* LgsSet::getDebugType(LgsCgModule& cg) {
+    assert(0);
 }

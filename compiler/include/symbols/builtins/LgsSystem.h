@@ -1,9 +1,9 @@
 #pragma once
 #include "funcs/LgsFunc.h"
-#include "types/LgsNullable.h"
 #include "types/LgsObject.h"
 #include "types/iterables/LgsStr.h"
 #include "types/primitives/LgsInt.h"
+#include "types/primitives/LgsLong.h"
 #include "types/primitives/LgsSize.h"
 #include "types/primitives/LgsVoid.h"
 
@@ -19,20 +19,20 @@ public:
 
     explicit LgsSystem() : LgsObject(name) {
         pidFunc->funcType->IRName = "getpid";
-        sleepFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsFuncArg>& args) {
+        sleepFunc->fn = [](LgsCgModule& cg, const std::vector<LgsFuncArg>& args) {
             return cg.callLgsFunc("System_sleep", cg.i32Ty(), {cg.i32Ty()}, {args.front().expr->IRValue});
         };
-        cwdFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsFuncArg>&) {
+        cwdFunc->fn = [](LgsCgModule& cg, const std::vector<LgsFuncArg>&) {
             const auto value = cg.builder.CreateAlloca(ArrayType::get(cg.i8Ty(), STRING_BUFFER_SIZE));
-            // TODO os?
+            // TODO os
             cg.callFunc("getcwd", cg.ptrTy(), {cg.ptrTy(), cg.sizeTy()}, {value, cg.usize(STRING_BUFFER_SIZE)});
             return value;
         };
-        coresNumFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsFuncArg>&) {
+        coresNumFunc->fn = [](LgsCgModule& cg, const std::vector<LgsFuncArg>&) {
             // TODO os?
             return cg.callFunc("sysconf", cg.i64Ty(), {cg.i32Ty()}, {cg.i32(58)});
         };
-        getEnvFunc->fn = [](LgsLLVMGen& cg, const std::vector<LgsFuncArg>& args) {
+        getEnvFunc->fn = [](LgsCgModule& cg, const std::vector<LgsFuncArg>& args) {
             const auto fallback = args.size() == 2 ? args.back().expr->IRValue : cg.null();
             return cg.callLgsFunc("System_getEnv", cg.ptrTy(), {cg.ptrTy(), cg.ptrTy()}, {args.front().expr->IRValue, fallback});
         };

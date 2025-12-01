@@ -20,13 +20,14 @@ public:
         index.from = from;
         index.to = to;
     }
-    Value* loadIR(LgsLLVMGen& cg) override;
+    Value* loadIR(LgsCgModule& cg) override;
     LgsExpr* getBaseExpr() const;
-    void setIRElementPtr(LgsLLVMGen& cg, bool assign = false);
-    void setIRRangePtr(LgsLLVMGen& cg, bool assign = false);
-    void assign(LgsLLVMGen& cg, LgsExpr* expr) override;
-    void assignScalar(LgsLLVMGen& cg, LgsExpr* expr) const;
+    void setIRElementPtr(LgsCgModule& cg, bool assign = false);
+    void setIRRangePtr(LgsCgModule& cg, bool assign = false);
+    void assign(LgsCgModule& cg, LgsExpr* expr) override;
+    void assignScalar(LgsCgModule& cg, LgsExpr* expr) const;
     std::string asText() override;
-    Type* getSArrayType(LgsLLVMGen& cg) const;
+    Type* getSArrayType(LgsCgModule& cg) const;
+    void setDebugValue(LgsCgModule& cg) override;
     ~LgsIterIndex() override;
 };

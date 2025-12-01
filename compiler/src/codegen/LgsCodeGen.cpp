@@ -15,7 +15,6 @@
 #include "exprs/LgsIterIndex.h"
 #include "exprs/LgsJson.h"
 #include "exprs/LgsNull.h"
-#include "exprs/LgsNullableExpr.h"
 #include "exprs/LgsPostfixExpr.h"
 #include "exprs/LgsPrefixExpr.h"
 #include "exprs/LgsSelection.h"
@@ -46,27 +45,24 @@
 #include "stmts/LgsIOStmt.h"
 #include "stmts/LgsIfStmt.h"
 #include "stmts/LgsSwitch.h"
-#include "types/LgsGenericParam.h"
 #include "types/iterables/LgsSArray.h"
 #include "types/iterables/LgsVec.h"
 #include "types/primitives/LgsSize.h"
 #include <llvm/IR/Module.h>
 #include "llvm/IR/Verifier.h"
-#include <llvm/Support/FileSystem.h>
 #include <llvm/Passes/PassBuilder.h>
 #include "llvm/Bitcode/BitcodeWriter.h"
-#include <iostream>
 #include <unistd.h>
 #include <unordered_set>
-#include <llvm/TargetParser/Host.h>
 #include "cblas/cblas.h"
 #include "exprs/LgsMatrixExpr.h"
+#include "exprs/LgsMetaSelection.h"
+#include "exprs/LgsNullableExpr.h"
 
 std::atomic<size_t> LgsCodeGen::lambdasIDGenerator{0};
-#define GENERATE_OBJ_CMD "clang -Wno-override-module -target %s -c -o %s %s.bc"
 
 bool LgsCodeGen::generate() {
-    cg.setupModule(file, appConfigs.debugMode);
+    cg.setupModule(file.path, appConfigs.debugMode);
     for (auto [name, symbol] : file.symbolTable.symbols) {
         if (symbol.symbolType == VAR_DEC && symbol.isExternal) {
             visitConstant(symbol.varDec->expr);
@@ -83,7 +79,7 @@ bool LgsCodeGen::generate() {
         visitTestFile(testFile);
     }
     if (appConfigs.debugMode) cg.finalizeDebugger(paths.buildDir);
-    return writeIRModule();
+    return cg.writeIRModule(paths, appConfigs.optLevel);
 }
 
 void LgsCodeGen::visitMainFile(LgsMainFile* mainFile) {
@@ -102,11 +98,10 @@ void LgsCodeGen::visitMainFile(LgsMainFile* mainFile) {
     for (const auto object : mainFile->objects) {
         visitObject(object);
     }
-    for (auto [_, genericsCall] : file.symbolTable.genericCalls) {
+    for (auto [_, genericsCall] : file.symbolTable.genericFuncCalls) {
         visitFunc(genericsCall);
     }
 
-    // createRTTypes();
     for (const auto& [name, func] : mainFile->funcs) {
         if (const auto mainFunc = dynamic_cast<LgsMainFunc*>(func)) {
             visitMainFunc(mainFunc);
@@ -138,7 +133,7 @@ void LgsCodeGen::visitObject(LgsObject* obj) {
         singleton->IRValue = cg.IRModule->getGlobalVariable(obj->name);
         if (!singleton->IRValue) {
             const auto zeroInit = ConstantAggregateZero::get(objIRType);
-            singleton->IRValue = cg.createGlobal(objIRType, zeroInit, obj->name);
+            singleton->IRValue = cg.createGlobal(obj->name, objIRType, zeroInit);
         }
     }
     for (const auto& [_, method] : obj->methods) {
@@ -152,52 +147,44 @@ void LgsCodeGen::visitMainFunc(LgsMainFunc* func) {
     initMainArgs(func);
     visitStmtsBlock(func->stmtsBlock);
     createEpilogue(func);
-    cg.callRuntimeFunc("close", cg.voidTy());
-    cg.builder.CreateRet(cg.i32(EXIT_SUCCESS));
     stack.exitScope();
 }
 
 void LgsCodeGen::visitFunc(LgsFunc* func) {
     const auto ft = func->funcType;
-    if (!ft->genericParams.empty()) return;
+    if (!ft->genericTypes.empty()) return;
     stack.enterScope(func);
     createPrologue(func);
     if (func->isTest) for (auto [_, then] : func->mocks) visitExpr(then);
     auto& params = ft->params;
     if (ft->isVariadic) {
-        params.back().IRValue = cg.builder.CreateAlloca(cg.i8Ty(), nullptr, "va_list");
-        cg.callIntrinsics(llvm::Intrinsic::vastart, {cg.ptrTy()}, {params.back().IRValue});
+        params.back().IRValue = cg.builder.CreateAlloca(cg.ptrTy(), nullptr, "va_list");
+        cg.callIntrinsics(Intrinsic::vastart, {cg.ptrTy()}, {params.back().IRValue});
     }
     visitStmtsBlock(func->stmtsBlock);
     if (ft->isVariadic) {
-        cg.callIntrinsics(llvm::Intrinsic::vaend, {cg.ptrTy()}, {params.back().IRValue});
+        cg.callIntrinsics(Intrinsic::vaend, {cg.ptrTy()}, {params.back().IRValue});
     }
     createEpilogue(func);
-    if (ft->rt->isVoid() && !cg.lastInstTerminator()) {
-        cg.builder.CreateRetVoid();
-    }
     stack.exitScope();
 }
 
 void LgsCodeGen::visitGenericFunc(LgsFunc* func) {
     cg.savedIP = cg.builder.saveIP();
-    const auto originalFunc = currentIRFunc;
+    const auto originalFunc = cg.currentFunc;
     stack.enterScope(func);
     createPrologue(func);
     visitStmtsBlock(func->stmtsBlock);
     createEpilogue(func);
-    if (func->funcType->rt->isVoid() && !cg.lastInstTerminator()) {
-        cg.builder.CreateRetVoid();
-    }
     stack.exitScope();
-    currentIRFunc = originalFunc;
+    cg.currentFunc = originalFunc;
     cg.builder.restoreIP(cg.savedIP);
 }
 
 void LgsCodeGen::visitField(LgsField* field) const {
     if (const auto vec = field->type->asVec()) {
         std::vector<int> mask(vec->vectorDim);
-        for (int8_t i = 0; i < vec->vectorDim; i++) {
+        for (size_t i = 0; i < vec->vectorDim; i++) {
             mask[i] = LgsVec::getComponentIndex(field->name[i]);
         }
         const auto vecType = field->type->getIRType(cg);
@@ -207,7 +194,9 @@ void LgsCodeGen::visitField(LgsField* field) const {
         const auto newVec = cg.builder.CreateShuffleVector(l, UndefValue::get(parentTy), mask);
         cg.builder.CreateStore(newVec, field->IRValue);
     } else {
-        field->IRValue = field->getGEP(cg);
+        if (!field->IRValue) {
+            field->IRValue = field->getGEP(cg);
+        }
         if (field->expr) {
             field->expr->destPtrValue = field->IRValue;
         }
@@ -222,32 +211,29 @@ void LgsCodeGen::visitStmt(LgsStmt* stmt) {
     else if (const auto coroutine = stmt->asCoroutine()) visitCoroutine(coroutine);
     else if (const auto deferStmt = stmt->asDefer()) visitDeferStmt(deferStmt);
     else if (const auto assignment = stmt->asAssignment()) visitAssignment(assignment);
-    else if (const auto funcCall = stmt->asFuncCall()) visitFuncCall(funcCall);
-    else if (const auto postfixExpr = stmt->asPostfixExpr()) visitPostfixExpr(postfixExpr);
-    else if (const auto selection = stmt->asSelection()) visitSelection(selection);
     else if (const auto ioStmt = stmt->asIOStmt()) visitIOStmt(ioStmt);
     else if (const auto returnStmt = stmt->asReturn()) visitReturnStmt(returnStmt);
     else if (const auto breakStmt = stmt->asBreak()) visitBreakStmt(breakStmt);
     else if (stmt->asContinue()) visitContinueStmt();
-    if (appConfigs.debugMode) stmt->setDebugValue(cg);
 }
 
 void LgsCodeGen::visitStmtsBlock(const LgsStmtsBlock* stmtsBlock) {
     assert(stmtsBlock);
-    if (appConfigs.debugMode) cg.debugger.blocks.push_back(cg.debugger.subprogram);
     for (const auto& stmt : stmtsBlock->stmts) {
         switch (stmt.type) {
-        case LgsObjOrStmt::Type::Object:
+        case LgsStmtWrapper::Type::Object:
             visitObject(stmt.obj);
             break;
-        case LgsObjOrStmt::Type::Stmt:
+        case LgsStmtWrapper::Type::Stmt:
             visitStmt(stmt.stmt);
-             break;
-        default:
-            assert(0);
+            if (appConfigs.debugMode) stmt.stmt->setDebugValue(cg);
+            break;
+        case LgsStmtWrapper::Type::Expr:
+            visitExpr(stmt.expr);
+            if (appConfigs.debugMode) stmt.expr->setDebugValue(cg);
+            break;
         }
     }
-    if (appConfigs.debugMode) cg.debugger.blocks.pop_back();
 }
 
 void LgsCodeGen::visitLoop(LgsForLoop* loop) {
@@ -266,7 +252,7 @@ void LgsCodeGen::visitLoop(LgsForLoop* loop) {
     }
     visitStmtsBlock(loop->stmtsBlock);
     if (stack.currentFunc()->funcType->isCoroutine) {
-        yield();
+        cg.callRuntimeFunc("yield", cg.voidTy());
     }
     loop->incAndJumpToCond(cg);
     cg.startBlock(loop->IRExitBlock);
@@ -315,7 +301,7 @@ void LgsCodeGen::visitInfiniteLoop(const LgsInfiniteLoop* loop) const {
     cg.branchAndStartBlock(loop->IRBodyBlock);
 }
 
-void LgsCodeGen::visitLoopMetaVar(LgsMetaVar* metaVar) {
+void LgsCodeGen::visitLoopMetaVar(LgsMetaVar* metaVar) const {
     const auto loop = stack.currentLoop();
     const auto iValue = loop->iValue;
     switch (metaVar->varType) {
@@ -499,11 +485,11 @@ void LgsCodeGen::visitElseIf(LgsIfStmt* ifStmt) {
 void LgsCodeGen::visitSwitch(LgsSwitch* switchStmt) {
     assert(switchStmt->cond);
     const auto defaultBlock = cg.createBlock("");
-    const auto exitBlock = cg.createBlock("", currentIRFunc);
+    const auto exitBlock = cg.createBlock("", cg.currentFunc);
     visitExpr(switchStmt->cond);
 
     const auto exprIRValue = switchStmt->cond->hashValue(cg);
-    llvm::SwitchInst* switchInst;
+    SwitchInst* switchInst;
     if (switchStmt->elseBlock) {
         const auto numOfCases = switchStmt->patterns.size();
         switchInst = cg.builder.CreateSwitch(exprIRValue, defaultBlock, numOfCases);
@@ -515,7 +501,7 @@ void LgsCodeGen::visitSwitch(LgsSwitch* switchStmt) {
         stack.enterScope(switchStmt);
         const auto [expr, stmtsBlock] = switchStmt->patterns[i];
         visitExpr(expr);
-        const auto patternBlock = cg.createBlock(BLOCK_NAME_CASE_PREFIX + std::to_string(i), currentIRFunc);
+        const auto patternBlock = cg.createBlock(BLOCK_NAME_CASE_PREFIX + std::to_string(i), cg.currentFunc);
         const auto hashed = expr->hashValue(cg);
         switchInst->addCase(llvm::dyn_cast<ConstantInt>(hashed), patternBlock);
         cg.builder.SetInsertPoint(patternBlock);
@@ -534,7 +520,7 @@ void LgsCodeGen::visitSwitch(LgsSwitch* switchStmt) {
     cg.builder.SetInsertPoint(exitBlock);
 }
 
-void LgsCodeGen::visitContinueStmt() {
+void LgsCodeGen::visitContinueStmt() const {
     stack.currentLoop()->incAndJumpToCond(cg);
 }
 
@@ -542,23 +528,17 @@ void LgsCodeGen::visitReturnStmt(LgsReturn* returnStmt) {
     visitExpr(returnStmt->expr);
     returnStmt->IRValue = returnStmt->expr ? returnStmt->expr->IRValue : nullptr;
     const auto currentFunc = stack.currentFunc();
-    if (currentFunc->needsCleanup()) {
-        returnStmt->parentBlock = cg.builder.GetInsertBlock();
-        const auto cleanupBlock = currentFunc->getCleanupBlock(cg);
-        cg.builder.CreateBr(cleanupBlock);
+    cg.callPopStack();
+    if (currentFunc->funcType->rt->isVoid()) {
+        cg.builder.CreateRetVoid();
     } else {
-        cg.callPopStack(currentFunc->hasDefers, currentFunc->needsCleanup());
-        if (currentFunc->funcType->rt->isVoid()) {
-            cg.builder.CreateRetVoid();
-        } else {
-            cg.builder.CreateRet(returnStmt->IRValue);
-        }
+        cg.builder.CreateRet(returnStmt->expr->IRValue);
     }
 }
 
-void LgsCodeGen::visitBreakStmt(const LgsBreak* breakStmt) {
+void LgsCodeGen::visitBreakStmt(const LgsBreak* breakStmt) const {
     if (breakStmt->isBreakIf) {
-        cg.builder.CreateBr(stack.outermostIfStmt()->IRExitBlock);
+        cg.builder.CreateBr(stack.getOutermostIfStmt()->IRExitBlock);
     } else if (breakStmt->tag != "") {
         cg.builder.CreateBr(stack.findTagExitBlock(breakStmt->tag));
     } else {
@@ -568,7 +548,7 @@ void LgsCodeGen::visitBreakStmt(const LgsBreak* breakStmt) {
 }
 
 void LgsCodeGen::visitCoroutine(const LgsCoroutine* coroutine) {
-    const LgsFuncCall* fc = nullptr;
+    LgsFuncCall* fc = nullptr;
     if (coroutine->funcCall->name == "") {
         visitLambda(coroutine->funcCall->func);
         visitFuncCall(coroutine->funcCall);
@@ -580,6 +560,13 @@ void LgsCodeGen::visitCoroutine(const LgsCoroutine* coroutine) {
         visitSelection(coroutine->selection);
         fc = coroutine->selection->asMethodCall();
     }
+
+    if (!cg.IRModule->getFunction(fc->coroutine->funcType->getName())) {
+        cg.savedIP = cg.builder.saveIP();
+        visitFunc(fc->coroutine);
+        cg.builder.restoreIP(cg.savedIP);
+    }
+
     Type* ctxTy = nullptr;
     Value* ctx = nullptr;
     if (fc->args.empty()) {
@@ -589,12 +576,11 @@ void LgsCodeGen::visitCoroutine(const LgsCoroutine* coroutine) {
         ctxTy = getThunkCtxType(fc);
         ctx = getThunkCtx(fc, ctxTy);
     }
-    const auto func = getThunkFunc(fc, ctxTy);
-    cg.callRuntimeFunc("addCoro", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {func, ctx});
+    cg.callRuntimeFunc("addCoro", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {getThunkFunc(fc, ctxTy), ctx});
 }
 
 void LgsCodeGen::visitDeferStmt(const LgsDeferStmt* defer) {
-    const LgsFuncCall* fc = nullptr;
+    LgsFuncCall* fc = nullptr;
     if (defer->funcCall->name == "") {
         visitLambda(defer->funcCall->func);
         visitFuncCall(defer->funcCall);
@@ -615,28 +601,12 @@ void LgsCodeGen::visitDeferStmt(const LgsDeferStmt* defer) {
         ctxTy = getThunkCtxType(fc);
         ctx = getThunkCtx(fc, ctxTy);
     }
-    const auto func = getThunkFunc(fc, ctxTy);
-    cg.callRuntimeFunc("addDefer", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {func, ctx});
+    cg.callRuntimeFunc("addDefer", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {getThunkFunc(fc, ctxTy), ctx});
 }
 
 void LgsCodeGen::visitIOStmt(const LgsIOStmt* ioStmt) {
     visitExpr(ioStmt->varDec->expr);
     visitStmtsBlock(ioStmt->stmtsBlock);
-}
-
-void LgsCodeGen::visitNullableExpr(LgsNullableExpr* nullableExpr) {
-    const auto baseExpr = nullableExpr->baseExpr;
-    visitExpr(baseExpr);
-    if (baseExpr->type->passByRef) {
-        nullableExpr->IRValue = baseExpr->IRValue;
-        return;
-    }
-    if (nullableExpr->destPtrValue) {
-        nullableExpr->IRValue = nullableExpr->destPtrValue;
-    } else {
-        nullableExpr->IRValue = cg.builder.CreateAlloca(nullableExpr->type->getIRType(cg));
-    }
-    nullableExpr->type->asNullable()->setIRValue(cg, nullableExpr->IRValue, baseExpr->IRValue);
 }
 
 void LgsCodeGen::visitExpr(LgsExpr* expr, const bool assign) {
@@ -659,6 +629,7 @@ void LgsCodeGen::visitExpr(LgsExpr* expr, const bool assign) {
         else if (const auto instance = expr->asInstance()) visitInstance(instance);
         else if (const auto funcCall = expr->asFuncCall()) visitFuncCall(funcCall);
         else if (const auto selection = expr->asSelection()) visitSelection(selection, assign);
+        else if (const auto metaSelection = expr->asMetaSelection()) visitMetaSelection(metaSelection);
         else if (const auto arrayExpr = expr->asArrayExpr()) visitArrayExpr(arrayExpr);
         else if (const auto hashMap = expr->asHashMap()) visitHashMap(hashMap);
         else if (const auto iterIndex = expr->asIterIndex()) visitIterIndex(iterIndex, assign);
@@ -674,7 +645,6 @@ void LgsCodeGen::visitExpr(LgsExpr* expr, const bool assign) {
         else if (const auto cast = expr->asCast()) visitCast(cast);
         else if (const auto json = expr->asJson()) visitJson(json);
     }
-    if (appConfigs.debugMode) expr->setDebugValue(cg);
     assert(expr->IRValue);
 }
 
@@ -704,6 +674,7 @@ void LgsCodeGen::visitBinaryExpr(LgsBinaryExpr* binExpr) {
     case LE: binExpr->IRValue = binExpr->type->leIR(cg, l, r); break;
     case AND: binExpr->IRValue = binExpr->type->andIR(cg, l, r); break;
     case OR: binExpr->IRValue = binExpr->type->orIR(cg, l, r); break;
+    case CROSS: binExpr->IRValue = binExpr->type->crossIR(cg, l, r); break;
     case IN: binExpr->IRValue = r->type->asIterable()->inIR(cg, r, l); break;
     case NOOP: assert(0);
     }
@@ -719,6 +690,29 @@ void LgsCodeGen::visitTernaryExpr(LgsTernaryExpr* ternaryExpr) {
     ternaryExpr->IRValue = cg.builder.CreateSelect(cond->IRValue, then->IRValue, else_->IRValue);
 }
 
+void LgsCodeGen::visitNullableExpr(LgsNullableExpr* nullableExpr) {
+    const auto baseExpr = nullableExpr->baseExpr;
+    visitExpr(baseExpr);
+    if (baseExpr->type->passByRef) {
+        nullableExpr->IRValue = baseExpr->IRValue;
+        return;
+    }
+    if (nullableExpr->destPtrValue) {
+        nullableExpr->IRValue = nullableExpr->destPtrValue;
+    } else {
+        nullableExpr->IRValue = cg.builder.CreateAlloca(nullableExpr->type->getIRType(cg));
+    }
+    const auto nullable = nullableExpr->type->asNullable();
+    nullable->setIRValue(cg, nullableExpr->IRValue, baseExpr->IRValue);
+    if (baseExpr && !baseExpr->type->passByRef) {
+        nullableExpr->IRValue = nullableExpr->loadIR(cg);
+    }
+}
+
+void LgsCodeGen::visitNull(LgsNull* null) const {
+    null->IRValue = cg.null();
+}
+
 void LgsCodeGen::visitCast(LgsCast* cast) {
     assert(cast->value);
     visitExpr(cast->value);
@@ -727,12 +721,12 @@ void LgsCodeGen::visitCast(LgsCast* cast) {
 
 void LgsCodeGen::visitLambda(LgsFunc* func) {
     cg.savedIP = cg.builder.saveIP();
-    const auto originalFunc = currentIRFunc;
+    const auto originalFunc = cg.currentFunc;
     const auto lambdaID = lambdasIDGenerator.fetch_add(1);
     func->funcType->IRName = LGS_ANONYMOUS_NAME + std::to_string(lambdaID);
     func->IRValue = func->getIRFunc(cg);
     visitFunc(func);
-    currentIRFunc = originalFunc;
+    cg.currentFunc = originalFunc;
     cg.builder.restoreIP(cg.savedIP);
 }
 
@@ -771,42 +765,92 @@ void LgsCodeGen::visitFloatConst(LgsFloatConst* floatConst) const {
     }
 }
 
-void LgsCodeGen::visitArrayExpr(LgsArrayExpr* array) {
-    if (array->destPtrValue) {
-        array->IRValue = array->destPtrValue;
+void LgsCodeGen::visitArrayExpr(LgsArrayExpr* arrayExpr) {
+    for (size_t i = 0; i < arrayExpr->elements.size(); ++i) {
+        const auto element = arrayExpr->elements[i];
+        element->destPtrValue = arrayExpr->IRValue;
+        visitExpr(element);
     }
-    if (array->type->asSArray()) {
-        setStaticArray(array);
-    } else if (array->type->asDArray()) {
-        setDynamicArray(array);
-    } else if (array->type->asSet()) {
-        setSetExpr(array);
+    if (arrayExpr->type->asSArray()) {
+        visitStaticArray(arrayExpr);
+    } else if (arrayExpr->type->asDArray()) {
+        visitDynamicArray(arrayExpr);
+    } else if (arrayExpr->type->asSet()) {
+        visitSetExpr(arrayExpr);
     } else {
         assert(0);
     }
 }
 
-void LgsCodeGen::visitHashMap(LgsHashMap* hashMap) {
-    const auto map = hashMap->type->asMap();
-    const auto keyType = map->typePair->key;
-    const auto valueType = map->typePair->value;
-    const auto elementSize = cg.usize(valueType->sizeBytes());
-    hashMap->IRValue = cg.callAllocate(map->sizeBytes(), hashMap->owner, hashMap->type->getRTTypeKind());
-    cg.callLgsFunc("Map_init", cg.voidTy(), {cg.ptrTy(), cg.sizeTy(), cg.i32Ty(), cg.i32Ty()}, {
-        hashMap->IRValue,
-        elementSize,
-        cg.i32(keyType->getRTTypeKind()),
-        cg.i32(valueType->getRTTypeKind()),
-    });
-    for (const auto [key, value] : hashMap->elements) {
-        visitExpr(key);
-        visitExpr(value);
-        map->getAddFunc()->callIR(cg, {hashMap->IRValue, key->IRValue, value->IRValue});
+void LgsCodeGen::visitStaticArray(LgsArrayExpr* arrayExpr) const {
+    if (arrayExpr->destPtrValue) {
+        arrayExpr->IRValue = arrayExpr->destPtrValue;
+    }
+    const auto arr = arrayExpr->type->asSArray();
+    const auto arrTypeIR = arr->getIRType(cg);
+    if (!arrayExpr->destPtrValue && !arrayExpr->IRValue) {
+        arrayExpr->IRValue = cg.builder.CreateAlloca(arrTypeIR);
+    }
+    if (arrayExpr->elements.empty()) return;
+    const auto sArr = arrayExpr->type->asSArray();
+
+    // Check if all args are const for chunk copy
+    std::vector<Constant*> constantArgs;
+    constantArgs.reserve(arrayExpr->elements.size());
+    auto allArgsAreConst = true;
+    for (const auto element : arrayExpr->elements) {
+        if (const auto constant = llvm::dyn_cast<Constant>(element->IRValue)) {
+            constantArgs.push_back(constant);
+        } else {
+            allArgsAreConst = false;
+            break;
+        }
+    }
+
+    if (allArgsAreConst) {
+        const auto sArrTy = llvm::dyn_cast<ArrayType>(sArr->getIRType(cg));
+        const auto argsIR = ConstantArray::get(sArrTy, constantArgs);
+        cg.builder.CreateStore(argsIR, arrayExpr->IRValue);
+    } else {
+        if (sArr->baseType->asSArray()) return; // Nested arrays are handled before
+        for (size_t i = 0; i < arrayExpr->elements.size(); ++i) {
+            const std::vector<Value*> indices = {cg.i32Zero(), cg.i32(i)};
+            const auto gep = cg.builder.CreateInBoundsGEP(sArr->getIRType(cg), arrayExpr->IRValue, indices);
+            cg.builder.CreateStore(arrayExpr->elements[i]->IRValue, gep);
+        }
     }
 }
 
-void LgsCodeGen::visitEnvVar(LgsEnvVar* envVar) const {
-    envVar->IRValue = cg.callLgsFunc("System_getEnv", cg.ptrTy(), {cg.ptrTy(), cg.ptrTy()}, {cg.getIRStr(envVar->name), cg.emptyStr()});
+void LgsCodeGen::visitDynamicArray(LgsArrayExpr* arrayExpr) const {
+    const auto dArr = arrayExpr->type->asDArray();
+    if (!arrayExpr->IRValue) {
+        arrayExpr->IRValue = cg.allocate(cg.usize(dArr->sizeBytes()), dArr->getRTType(cg), arrayExpr->owner);
+    }
+    cg.callLgsFunc("DArray_init", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {
+        arrayExpr->IRValue, dArr->getRTType(cg)
+    });
+    for (size_t i = 0; i < arrayExpr->elements.size(); ++i) {
+        const auto element = arrayExpr->elements[i];
+        element->destPtrValue = arrayExpr->IRValue;
+        std::vector args = {LgsFuncArg(arrayExpr), LgsFuncArg(element)};
+        dArr->addFunc->call(cg, args);
+    }
+}
+
+void LgsCodeGen::visitSetExpr(LgsArrayExpr* arrayExpr) const {
+    const auto set = arrayExpr->type->asSet();
+    if (!arrayExpr->IRValue) {
+        arrayExpr->IRValue = cg.allocate(cg.usize(set->sizeBytes()), set->getRTType(cg), arrayExpr->owner);
+    }
+    cg.callLgsFunc("Set_init", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {
+        arrayExpr->IRValue, set->getRTType(cg)
+    });
+    for (size_t i = 0; i < arrayExpr->elements.size(); ++i) {
+        const auto element = arrayExpr->elements[i];
+        element->destPtrValue = arrayExpr->IRValue;
+        std::vector args = {LgsFuncArg(arrayExpr), LgsFuncArg(element)};
+        set->addFunc->call(cg, args);
+    }
 }
 
 void LgsCodeGen::visitVectorExpr(LgsVectorExpr* vectorExpr) {
@@ -819,8 +863,9 @@ void LgsCodeGen::visitVectorExpr(LgsVectorExpr* vectorExpr) {
     if (!vectorExpr->elements.empty()) {
         Value* vectorValue = UndefValue::get(ty);
         for (size_t i = 0; i < vectorExpr->elements.size(); ++i) {
+            visitExpr(vectorExpr->elements[i]);
             const auto elementValue = getIRValue(vectorExpr->elements[i]);
-            vectorValue = cg.builder.CreateInsertElement(vectorValue, elementValue, ConstantInt::get(Type::getInt32Ty(cg.context), i));
+            vectorValue = cg.builder.CreateInsertElement(vectorValue, elementValue, cg.i32(i));
         }
         cg.builder.CreateStore(vectorValue, vectorExpr->IRValue);
     } else {
@@ -829,7 +874,61 @@ void LgsCodeGen::visitVectorExpr(LgsVectorExpr* vectorExpr) {
 }
 
 void LgsCodeGen::visitMatrixExpr(LgsMatrixExpr* matrixExpr) {
-    matrixExpr->IRValue = cg.null();
+    if (!matrixExpr->destPtrValue) return;
+    matrixExpr->IRValue = matrixExpr->destPtrValue;
+
+    auto allArgsConst = true;
+    std::vector<Constant*> constantArgs;
+    for (size_t i = 0; i < matrixExpr->elements.size(); ++i) {
+        const auto vector = matrixExpr->elements[i];
+        for (size_t j = 0; j < vector->elements.size(); ++j) {
+            const auto element = vector->elements[j];
+            visitExpr(element);
+            if (const auto constant = llvm::dyn_cast<Constant>(element->IRValue)) {
+                constantArgs.push_back(constant);
+            } else {
+                allArgsConst = false;
+            }
+        }
+    }
+
+    const auto matTypeIR = matrixExpr->type->getIRType(cg);
+    if (allArgsConst) {
+        const auto matArrayType = llvm::dyn_cast<ArrayType>(matTypeIR);
+        const auto constantMatrix = ConstantArray::get(matArrayType, constantArgs);
+        cg.builder.CreateStore(constantMatrix, matrixExpr->IRValue);
+    } else {
+        auto index = 0;
+        for (size_t i = 0; i < matrixExpr->elements.size(); ++i) {
+            const auto vector = matrixExpr->elements[i];
+            for (size_t j = 0; j < vector->elements.size(); ++j) {
+                const auto element = vector->elements[j];
+                const std::vector<Value*> indices = {cg.i32Zero(), cg.i32(index++)};
+                const auto gep = cg.builder.CreateInBoundsGEP(matTypeIR, matrixExpr->IRValue, indices);
+                cg.builder.CreateStore(element->IRValue, gep);
+            }
+        }
+    }
+}
+
+void LgsCodeGen::visitHashMap(LgsHashMap* hashMap) {
+    const auto map = hashMap->type->asMap();
+    const auto keyType = map->mapType->key;
+    const auto valueType = map->mapType->value;
+    hashMap->IRValue = cg.allocate(cg.usize(map->sizeBytes()), map->getRTType(cg), hashMap->owner);
+    cg.callLgsFunc("Map_init", cg.voidTy(), {cg.ptrTy(), cg.ptrTy(), cg.ptrTy()}, {
+                       hashMap->IRValue, keyType->getRTType(cg), valueType->getRTType(cg)
+                   });
+    for (const auto [key, value] : hashMap->elements) {
+        visitExpr(key);
+        visitExpr(value);
+        std::vector args = {LgsFuncArg(hashMap), LgsFuncArg(key), LgsFuncArg(value)};
+        map->addFunc->call(cg, args);
+    }
+}
+
+void LgsCodeGen::visitEnvVar(LgsEnvVar* envVar) const {
+    envVar->IRValue = cg.callLgsFunc("System_getEnv", cg.ptrTy(), {cg.ptrTy(), cg.ptrTy()}, {cg.getString(envVar->name), cg.emptyStr()});
 }
 
 void LgsCodeGen::visitVariable(LgsVariable* variable) {
@@ -840,7 +939,7 @@ void LgsCodeGen::visitVariable(LgsVariable* variable) {
         break;
     case PARAM:
         if (variable->ref.param->isSelf) {
-            variable->IRValue = currentIRFunc->getArg(0);
+            variable->IRValue = cg.currentFunc->getArg(0);
         } else {
             assert(variable->ref.param->IRValue);
             variable->IRValue = variable->ref.param->IRValue;
@@ -896,9 +995,6 @@ void LgsCodeGen::visitSelection(LgsSelection* selection, const bool assign) {
         }
     }
     selection->IRValue = selection->lastExpr()->IRValue;
-    if (assign && selection->type->asNullable()) {
-        setNullableValue(selection);
-    }
 }
 
 void LgsCodeGen::visitFieldSelection(LgsVariable* var, LgsExpr* parent, const bool assign) const {
@@ -945,11 +1041,22 @@ void LgsCodeGen::visitFieldSelection(LgsVariable* var, LgsExpr* parent, const bo
         var->IRValue = cg.getFromVTable(field->parentIRPtr, id);
     }
 
-    if (field->type->asObject() || (field->type->asEnum() && !assign)) {
+    if (!assign && (field->type->asObject() || field->type->asEnum())) {
         var->IRValue = cg.builder.CreateLoad(cg.ptrTy(), field->IRValue);
     } else {
         visitField(field);
         var->IRValue = field->IRValue;
+    }
+}
+
+void LgsCodeGen::visitMetaSelection(LgsMetaSelection* metaSelection) {
+    visitExpr(metaSelection->baseExpr);
+    if (const auto methodCall = metaSelection->child->asFuncCall()) {
+        for (const auto& arg : methodCall->args) {
+            if (arg.isSelf) continue;
+            visitExpr(arg.expr);
+        }
+        metaSelection->IRValue = methodCall->func->call(cg, methodCall->args);
     }
 }
 
@@ -972,10 +1079,9 @@ void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
         funcCall->func = new LgsFunc(type->asFuncType());
         funcCall->func->IRValue = getIRValue(value);
     }
-
-    const auto func = funcCall->func;
+    assert(funcCall->func || funcCall->coroutine);
+    const auto func = funcCall->func ? funcCall->func : funcCall->coroutine;
     const auto ft = func->funcType;
-    assert(ft);
     if (ft->hasDefaults) {
         const auto diff = ft->params.size() - funcCall->args.size() - 1;
         for (size_t i = diff; i < ft->params.size(); ++i) {
@@ -985,17 +1091,14 @@ void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
 
     if (ft->isVirtual) {
         const auto name = func->funcType->getName();
-        const auto id = cg.hashConst(name);;
+        const auto id = cg.hashConst(name);
         func->IRValue = cg.getFromVTable(funcCall->parentPtr->IRValue, id);
     } else if (func->funcType->isArrFunc) {
         visitIterFunc(funcCall);
     }
-    if (!func->funcType->genericParams.empty()) visitGenericFunc(func);
-    if (funcCall->isCoroutine || funcCall->isDeferred) return;
 
-    std::vector<LgsExpr*> args;
-    args.reserve(funcCall->args.size());
-    for (const auto& arg : funcCall->args) args.emplace_back(arg.expr);
+    if (!func->funcType->genericTypes.empty()) visitGenericFunc(func);
+    if (funcCall->coroutine || funcCall->isDeferred) return;
     funcCall->IRValue = func->call(cg, funcCall->args);
 }
 
@@ -1055,7 +1158,7 @@ void LgsCodeGen::visitPostfixExpr(LgsPostfixExpr* postfixExpr) {
 
 void LgsCodeGen::visitStrConst(LgsStrConst* strConst) {
     if (strConst->parts.empty()) {
-        strConst->IRValue = cg.getIRStr(strConst->value);
+        strConst->IRValue = cg.getString(strConst->value);
     } else {
         for (const auto parts : strConst->parts) {
             visitExpr(parts);
@@ -1067,18 +1170,18 @@ void LgsCodeGen::visitStrConst(LgsStrConst* strConst) {
             values.push_back(partIR);
             const auto pos = formatted.find(LGS_STR_FMT_PLACEHOLDER);
             if (pos != std::string::npos) {
-                formatted.replace(pos, strlen(LGS_STR_FMT_PLACEHOLDER), part->type->strFormatPart());
+                formatted.replace(pos, strlen(LGS_STR_FMT_PLACEHOLDER), part->type->fmtStr());
             }
         }
         strConst->IRValue = cg.getEmptyBuffer();
-        cg.callSnprintf(strConst->IRValue, cg.getIRStr(formatted + "\n"), values);
+        cg.callSnprintf(strConst->IRValue, cg.getString(formatted + "\n"), values);
     }
 }
 
 void LgsCodeGen::visitInstance(LgsInstance* instance) {
     if (instance->IRValue) return;
     const auto obj = instance->obj;
-    instance->IRValue = cg.callAllocate(obj->sizeBytes(), instance->owner, obj->getRTTypeKind());
+    instance->IRValue = cg.allocate(cg.usize(obj->sizeBytes()), obj->getRTType(cg), instance->owner);
 
     std::unordered_set<std::string> visited;
     for (const auto& [argName, arg] : instance->args) {
@@ -1097,19 +1200,22 @@ void LgsCodeGen::visitInstance(LgsInstance* instance) {
     for (const auto field : instance->obj->fields) {
         if (visited.contains(field->name) || field->type->asEnum()) continue;
         field->parentIRPtr = instance->IRValue;
-        if (!field->expr) {
-            field->expr = field->type->getZeroValue();
+        LgsExpr* expr = nullptr;
+        if (field->expr) {
+            expr = field->expr;
+        } else {
+            expr = field->type->getZeroValue();
             if (field->isOwner && field->type->isHeapAlloc) {
-                field->expr->owner = field;
+                expr->owner = field;
             }
         }
         field->IRValue = field->getGEP(cg);
-        if (field->expr) {
-            field->expr->destPtrValue = field->IRValue;
+        if (expr) {
+            expr->destPtrValue = field->IRValue;
         }
-        visitExpr(field->expr);
-        if (field->expr->IRValue == field->IRValue) continue;
-        cg.builder.CreateStore(field->expr->IRValue, field->IRValue);
+        visitExpr(expr);
+        if (expr->IRValue == field->IRValue) continue;
+        cg.builder.CreateStore(expr->IRValue, field->IRValue);
     }
     addVirtuals(instance->obj, instance->IRValue);
 }
@@ -1125,66 +1231,28 @@ void LgsCodeGen::visitIterIndex(LgsIterIndex* iterIndex, const bool assign) {
     }
 }
 
-void LgsCodeGen::visitNull(LgsNull* null) const {
-    null->IRValue = cg.null();
-}
-
 void LgsCodeGen::visitJson(LgsJson* json) {
     assert(0);
 }
 
-void LgsCodeGen::createPrologue(LgsFunc* func) {
+void LgsCodeGen::createPrologue(LgsFunc* func) const {
     if (appConfigs.debugMode) func->setDebugValue(cg);
-    currentIRFunc = func->getIRFunc(cg);
-    const auto entryBlock = cg.createBlock(BLOCK_NAME_ENTRY, currentIRFunc);
+    cg.currentFunc = func->getIRFunc(cg);
+    const auto entryBlock = cg.createBlock(BLOCK_NAME_ENTRY, cg.currentFunc);
     cg.builder.SetInsertPoint(entryBlock);
     if (func->funcType->name == LGS_MAIN_FUNC) {
         cg.callRuntimeFunc("init", cg.voidTy());
     }
-    cg.callStackPush(func->hasDefers, func->needsCleanup());
+    cg.callStackPush();
 }
 
-void LgsCodeGen::createEpilogue(LgsFunc* func) {
-    const auto needsCleanup = func->needsCleanup();
-    if (!func->hasDefers && !needsCleanup) {
-        cg.callPopStack(false, false);
-        return;
-    }
-    cg.branchAndStartBlock(func->getCleanupBlock(cg));
-    if (func->hasDefers) cg.callRuntimeFunc("callDefers", cg.voidTy());
-    currentIRFunc = nullptr;
-
-    if (needsCleanup) {
-        if (func->returnStmts.empty()) {
-            cg.callPopStack(func->hasDefers, func->needsCleanup());
-        } else if (func->returnStmts.size() == 1) {
-            if (func->owners.size() == 1) {
-                const auto returnRef = func->returnStmts.front()->expr;
-                const auto heapExprRef = func->owners.front();
-                if (returnRef->equals(heapExprRef)) {
-                    cg.callPopStack(func->hasDefers, func->needsCleanup());
-                    cg.builder.CreateRet(getIRValue(func->returnStmts.front()));
-                    return;
-                }
-            }
-            cg.callPopStack(func->hasDefers, func->needsCleanup());
-            cg.builder.CreateRet(getIRValue(func->returnStmts.front()));
-        } else {
-            llvm::PHINode *phi = nullptr;
-            if (!func->funcType->rt->isVoid()) {
-                phi = cg.builder.CreatePHI(cg.ptrTy(), func->returnStmts.size());
-            }
-            for (const auto stmt : func->returnStmts) {
-                const auto retVal = getIRValue(stmt);
-                if (phi) {
-                    phi->addIncoming(retVal, stmt->parentBlock);
-                }
-            }
-            cg.callPopStack(func->hasDefers, func->needsCleanup());
-            cg.builder.CreateRet(phi);
-        }
-    } else {
-        cg.callPopStack(func->hasDefers, needsCleanup);
+void LgsCodeGen::createEpilogue(const LgsFunc* func) const {
+    if (func->funcType->name == LGS_MAIN_FUNC) {
+        cg.callRuntimeFunc("close", cg.voidTy());
+        cg.builder.CreateRet(cg.i32(EXIT_SUCCESS));
+    } else if (func->funcType->rt->isVoid() && !cg.lastInstTerminator()) {
+        cg.callPopStack();
+        cg.builder.CreateRetVoid();
     }
 }
 
@@ -1193,8 +1261,8 @@ void LgsCodeGen::initMainArgs(const LgsMainFunc* mainFunc) const {
     if (ft->params.empty()) return;
     const auto argsArray = ft->params.front().expr->asArrayExpr();
     const auto sArray = argsArray->type->asSArray();
-    sArray->size->IRValue = currentIRFunc->getArg(0);
-    argsArray->IRValue = currentIRFunc->getArg(1);
+    sArray->size->IRValue = cg.currentFunc->getArg(0);
+    argsArray->IRValue = cg.currentFunc->getArg(1);
     mainFunc->funcType->params[0].IRValue = argsArray->IRValue;
 }
 
@@ -1204,7 +1272,7 @@ StructType* LgsCodeGen::getThunkCtxType(const LgsFuncCall* fc) const {
     for (const auto& arg : fc->args) {
         types.push_back(arg.expr->type->getIRType(cg));
     }
-    return cg.getStructType(types, fc->name + "_thunk_type");
+    return cg.getStructType(types, fc->name + "ThunkType");
 }
 
 Value* LgsCodeGen::getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) const {
@@ -1217,134 +1285,43 @@ Value* LgsCodeGen::getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) const {
     return ctx;
 }
 
-Function* LgsCodeGen::getThunkFunc(const LgsFuncCall* fc, Type* ctxTy) const {
-    auto func = cg.IRModule->getFunction(fc->name + "_thunk");
-    if (func) return func;
-
+Function* LgsCodeGen::getThunkFunc(LgsFuncCall* fc, Type* ctxTy) const {
+    auto thunkFunc = cg.IRModule->getFunction(fc->name + "Thunk");
+    if (thunkFunc) return thunkFunc;
     cg.savedIP = cg.builder.saveIP();
+
     const auto ft = cg.getFT(cg.voidTy(), {cg.ptrTy()});
-    func = cg.getFunc(fc->name + "_thunk", ft, Function::PrivateLinkage);
+    thunkFunc = cg.getFunc(fc->name + "Thunk", ft, Function::PrivateLinkage);
     const auto entryBlock = cg.createBlock(BLOCK_NAME_ENTRY);
-    entryBlock->insertInto(func);
+    entryBlock->insertInto(thunkFunc);
     cg.builder.SetInsertPoint(entryBlock);
 
-    std::vector<Value*> args;
     for (size_t i = 0; i < fc->args.size(); i++) {
-        auto v = cg.builder.CreateStructGEP(ctxTy, func->arg_begin(), i);
-        const auto expr = fc->args[i].expr;
-        if (expr->type->isNumber()) {
-            v = cg.builder.CreateLoad(expr->type->getIRType(cg), v);
-        } else if (expr->type->passByRef) {
-            v = cg.builder.CreateLoad(cg.ptrTy(), v);
-        }
-        args.push_back(v);
+        fc->args[i].expr->IRValue = cg.builder.CreateStructGEP(ctxTy, thunkFunc->arg_begin(), i);
     }
-
-    const auto deferFunc = fc->func->getIRFunc(cg);
-    cg.builder.CreateCall(deferFunc, args);
+    const auto func = fc->coroutine ? fc->coroutine : fc->func;
+    func->call(cg, fc->args);
     cg.builder.CreateRetVoid();
-
     cg.builder.restoreIP(cg.savedIP);
-    return func;
-}
-
-void LgsCodeGen::yield() const {
-    const auto doYieldBlock = cg.createBlock("do_yield_block", currentIRFunc);
-    const auto continueBlock = cg.createBlock("continue_block", currentIRFunc);
-    const auto shouldYield = cg.callRuntimeFunc("shouldYield", cg.i1Ty());
-    cg.builder.CreateCondBr(shouldYield, doYieldBlock, continueBlock);
-    cg.builder.SetInsertPoint(doYieldBlock);
-    cg.callRuntimeFunc("yield", cg.voidTy());
-    cg.branchIfNeeded(continueBlock);
-    cg.builder.SetInsertPoint(continueBlock);
-}
-
-void LgsCodeGen::setStaticArray(LgsArrayExpr* arrayExpr) {
-    const auto arr = arrayExpr->type->asSArray();
-    const auto arrTypeIR = arr->getIRType(cg);
-    if (!arrayExpr->destPtrValue && !arrayExpr->IRValue) {
-        arrayExpr->IRValue = cg.builder.CreateAlloca(arrTypeIR);
-    }
-    if (arrayExpr->elements.empty()) return;
-    if (arr->baseType->asIterable()) {
-        setNestedSArr(arrayExpr, arrTypeIR, arrayExpr->IRValue, {cg.i32Zero()});
-    } else {
-        for (size_t i = 0; i < arrayExpr->elements.size(); ++i) {
-            const auto element = arrayExpr->elements[i];
-            element->destPtrValue = arrayExpr->IRValue;
-            visitExpr(element);
-            const auto gep = cg.builder.CreateInBoundsGEP(arrTypeIR, arrayExpr->IRValue, {cg.i32Zero(), cg.i32(i)});
-            cg.builder.CreateStore(element->IRValue, gep);
-        }
-    }
-}
-
-void LgsCodeGen::setNestedSArr(const LgsArrayExpr* arrayExpr, Type* parentType, Value* parentValue, const std::vector<Value*>& indices) {
-    for (size_t i = 0; i < arrayExpr->elements.size(); ++i) {
-        const auto element = arrayExpr->elements[i];
-        element->destPtrValue = arrayExpr->IRValue;
-        if (const auto innerArrExpr = element->asArrayExpr()) {
-            auto innerArrIndices = indices;
-            innerArrIndices.push_back(cg.i32(i));
-            setNestedSArr(innerArrExpr, parentType, parentValue, innerArrIndices);
-        } else {
-            auto elementIndices = indices;
-            elementIndices.push_back(cg.i32(i));
-            visitExpr(element);
-            const auto gep = cg.builder.CreateGEP(parentType, parentValue, elementIndices);
-            cg.builder.CreateStore(element->IRValue, gep);
-        }
-    }
-}
-
-void LgsCodeGen::setDynamicArray(LgsArrayExpr* arrayExpr) {
-    const auto arr = arrayExpr->type->asDArray();
-    if (!arrayExpr->IRValue) {
-        arrayExpr->IRValue = cg.callAllocate(arr->sizeBytes(), arrayExpr->owner, arr->getRTTypeKind());
-    }
-    arr->initArr(cg, arrayExpr->IRValue);
-    const auto rtt = arr->baseType->getRTTypeKind();
-    cg.addHeap(arrayExpr->owner, rtt, arrayExpr->IRValue);
-    for (size_t i = 0; i < arrayExpr->elements.size(); ++i) {
-        const auto element = arrayExpr->elements[i];
-        element->destPtrValue = arrayExpr->IRValue;
-        visitExpr(element);
-        arr->getAddFunc()->callIR(cg, {arrayExpr->IRValue, cg.getPtrTo(element->IRValue)});
-    }
-}
-
-void LgsCodeGen::setSetExpr(LgsArrayExpr* arrayExpr) {
-    const auto arr = arrayExpr->type->asSet();
-    const auto baseType = arr->baseType;
-    const auto size = baseType->sizeBytes();
-    arrayExpr->IRValue = cg.callAllocate(arr->sizeBytes(), arrayExpr->owner, arr->getRTTypeKind());
-    LgsFunc initFunc("init", &LGS_VOID, {arr, &LGS_SIZE, &LGS_SIZE}, BUILTIN | METHOD);
-    initFunc.callIR(cg, {arrayExpr->IRValue, cg.i64(size), cg.usize(baseType->getRTTypeKind())});
-
-    for (size_t i = 0; i < arrayExpr->elements.size(); ++i) {
-        const auto element = arrayExpr->elements[i];
-        element->destPtrValue = arrayExpr->IRValue;
-        visitExpr(element);
-        arr->getAddFunc()->callIR(cg, {arrayExpr->IRValue, cg.getPtrTo(element->IRValue)});
-    }
+    return thunkFunc;
 }
 
 void LgsCodeGen::createMapFunc(LgsFunc* func) {
     if (cg.IRModule->getFunction(func->funcType->getName())) return;
     // Save state
     cg.savedIP = cg.builder.saveIP();
-    const auto originalFunc = currentIRFunc;
+    const auto originalFunc = cg.currentFunc;
 
     // Init
-    currentIRFunc = func->getIRFunc(cg);
+    cg.currentFunc = func->getIRFunc(cg);
     const auto& originalArr = func->funcType->params[0];
     const auto& callback = func->funcType->params[1];
-    const auto entryBlock = cg.createBlock(BLOCK_NAME_ENTRY, currentIRFunc);
+    const auto entryBlock = cg.createBlock(BLOCK_NAME_ENTRY, cg.currentFunc);
     const auto condBlock = cg.createBlock();
     const auto bodyBlock = cg.createBlock();
     const auto exitBlock = cg.createBlock();
     cg.builder.SetInsertPoint(entryBlock);
-    cg.callStackPush(func->hasDefers, func->needsCleanup());
+    cg.callStackPush();
 
     const auto dArray = originalArr.type->asDArray();
     LgsArrayExpr newArr(dArray);
@@ -1358,7 +1335,7 @@ void LgsCodeGen::createMapFunc(LgsFunc* func) {
     // Condition
     cg.startBlock(condBlock);
     const auto iValue = cg.builder.CreateLoad(cg.sizeTy(), iPtr);
-    const auto condition = cg.builder.CreateICmpSLT(iValue, dArray->lengthIR(cg, func->funcType->params[0].IRValue));
+    const auto condition = cg.builder.CreateICmpSLT(iValue, dArray->lenIR(cg, func->funcType->params[0].IRValue));
     cg.builder.CreateCondBr(condition, bodyBlock, exitBlock);
 
     // Body
@@ -1367,7 +1344,7 @@ void LgsCodeGen::createMapFunc(LgsFunc* func) {
     const auto ft = llvm::dyn_cast<FunctionType>(callback.type->getIRType(cg));
     const auto arg = cg.builder.CreateLoad(dArray->baseType->getIRType(cg), element);
     const auto v = cg.builder.CreateCall(ft, callback.IRValue, {arg});
-    dArray->getAddFunc()->callIR(cg, {newArr.IRValue, cg.getPtrTo(v)});
+    dArray->addFunc->callIR(cg, {newArr.IRValue, cg.getPtrTo(v)});
 
     // Increment
     const auto inc = cg.builder.CreateAdd(iValue, cg.usize(1));
@@ -1376,11 +1353,11 @@ void LgsCodeGen::createMapFunc(LgsFunc* func) {
 
     // End func
     cg.startBlock(exitBlock);
-    cg.callPopStack(func->hasDefers, func->needsCleanup());
+    cg.callPopStack();
     cg.builder.CreateRet(newArr.IRValue);
 
     // Restore state
-    currentIRFunc = originalFunc;
+    cg.currentFunc = originalFunc;
     cg.builder.restoreIP(cg.savedIP);
     func->IRValue = func->getIRFunc(cg);
 }
@@ -1389,20 +1366,20 @@ void LgsCodeGen::createFilterFunc(LgsFunc* func) {
     if (cg.IRModule->getFunction(func->funcType->getName())) return;
     // Save state
     cg.savedIP = cg.builder.saveIP();
-    const auto originalFunc = currentIRFunc;
+    const auto originalFunc = cg.currentFunc;
 
     // Init
-    currentIRFunc = func->getIRFunc(cg);
+    cg.currentFunc = func->getIRFunc(cg);
     const auto& originalArr = func->funcType->params[0];
     const auto& callback = func->funcType->params[1];
-    const auto entryBlock = cg.createBlock(BLOCK_NAME_ENTRY, currentIRFunc);
+    const auto entryBlock = cg.createBlock(BLOCK_NAME_ENTRY, cg.currentFunc);
     const auto condBlock = cg.createBlock();
     const auto bodyBlock = cg.createBlock();
     const auto exitBlock = cg.createBlock();
     const auto trueBlock = cg.createBlock();
     const auto falseBlock = cg.createBlock();
     cg.builder.SetInsertPoint(entryBlock);
-    cg.callStackPush(func->hasDefers, func->needsCleanup());
+    cg.callStackPush();
 
     const auto dArray = originalArr.type->asDArray();
     LgsArrayExpr newArr(dArray);
@@ -1416,7 +1393,7 @@ void LgsCodeGen::createFilterFunc(LgsFunc* func) {
     // Condition
     cg.startBlock(condBlock);
     const auto iValue = cg.builder.CreateLoad(cg.sizeTy(), iPtr);
-    const auto condition = cg.builder.CreateICmpSLT(iValue, dArray->lengthIR(cg, func->funcType->params[0].IRValue));
+    const auto condition = cg.builder.CreateICmpSLT(iValue, dArray->lenIR(cg, func->funcType->params[0].IRValue));
     cg.builder.CreateCondBr(condition, bodyBlock, exitBlock);
 
     // Body
@@ -1428,7 +1405,7 @@ void LgsCodeGen::createFilterFunc(LgsFunc* func) {
 
     cg.builder.CreateCondBr(v, trueBlock, falseBlock);
     cg.startBlock(trueBlock);
-    dArray->getAddFunc()->callIR(cg, {newArr.IRValue, element});
+    dArray->addFunc->callIR(cg, {newArr.IRValue, element});
     cg.builder.CreateBr(falseBlock);
     cg.startBlock(falseBlock);
 
@@ -1439,16 +1416,16 @@ void LgsCodeGen::createFilterFunc(LgsFunc* func) {
 
     // End func
     cg.startBlock(exitBlock);
-    cg.callPopStack(func->hasDefers, func->needsCleanup());
+    cg.callPopStack();
     cg.builder.CreateRet(newArr.IRValue);
 
     // Restore state
-    currentIRFunc = originalFunc;
+    cg.currentFunc = originalFunc;
     cg.builder.restoreIP(cg.savedIP);
     func->IRValue = func->getIRFunc(cg);
 }
 
-bool LgsCodeGen::checkMock(LgsExpr* expr) {
+bool LgsCodeGen::checkMock(LgsExpr* expr) const {
     const auto currentFunc = stack.currentFunc();
     if (currentFunc->isTest) {
         for (auto [when, then] : currentFunc->mocks) {
@@ -1458,12 +1435,6 @@ bool LgsCodeGen::checkMock(LgsExpr* expr) {
         }
     }
     return false;
-}
-
-Value* LgsCodeGen::getRTType(Value* typeID) const {
-    const auto rtTypesGlobal = cg.IRModule->getGlobalVariable(LGS_RT_OBJECTS_ARR);
-    const auto rtTypesArrayType = rtTypesGlobal->getValueType();
-    return cg.builder.CreateInBoundsGEP(rtTypesArrayType, rtTypesGlobal, {cg.i32Zero(), typeID});
 }
 
 Value* LgsCodeGen::getIRValue(LgsValue* value) {
@@ -1479,62 +1450,13 @@ Value* LgsCodeGen::getIRValue(LgsValue* value) {
     return value->IRValue;
 }
 
-void LgsCodeGen::createRTTypes() const {
-    size_t currentID = 0;
-    for (auto [name, symbol] : globals.table.symbols) {
-        if (symbol.isBuiltin) continue;
-        LgsType* c = nullptr;
-        switch (symbol.symbolType) {
-        case OBJECT:c = symbol.object; break;
-        case INTERFACE:c = symbol.interface; break;
-        case SUBTYPE:c = symbol.subtype; break;
-        case GENERIC:c = symbol.generic; break;
-        case ENUM:c = symbol.enum_; break;
-        default: continue;
-        }
-        globals.rtTypes.push_back(c);
-    }
-
-    std::vector<Constant*> sArrTypes;
-    for (const auto rtType : globals.rtTypes) {
-        const auto sArr = rtType->asSArray();
-        if (!sArr) continue;
-        rtType->runtimeID = currentID++;
-        sArrTypes.emplace_back(sArr->getRTType(cg));
-    }
-    const auto arrRTStruct = cg.getStructType({cg.i32Ty(), cg.sizeTy()}, LGS_RT_ARRAY);
-    const auto rtTypeArrayType = ArrayType::get(arrRTStruct, currentID);
-    const auto rtTypeArray = llvm::ConstantArray::get(rtTypeArrayType, sArrTypes);
-    cg.createGlobal(rtTypeArrayType, rtTypeArray, LGS_RT_ARRAYS_ARR);
-}
-
-void LgsCodeGen::setNullableValue(LgsExpr* expr) {
-    if (const auto var = expr->asVariable()) {
-        visitVariable(var);
-    }
-    // const auto nullable = expr->type->asNullable();
-    // const auto ty = nullable->baseType->getIRType(cg);
-    // expr->IRValue = cg.builder.CreateLoad(ty, nullable->valueField);
-}
-
-bool LgsCodeGen::allArgsAreConst(const std::vector<LgsExpr*>& args) {
-    bool allElementsConst = true;
-    for (const auto element : args) {
-        visitExpr(element);
-        if (!llvm::isa<Constant>(getIRValue(element))) {
-            allElementsConst = false;
-        }
-    }
-    return allElementsConst;
-}
-
 void LgsCodeGen::addVirtuals(LgsObject* obj, Value* ptr) const {
     for (const auto& field : obj->fields) {
         if (!field->isVirtual) continue;
-        const auto id = cg.hashConst(field->name);
+        const auto virtualID = cg.hashConst(field->name);
         const auto objIR = obj->getIRType(cg);
         const auto fieldGEP = cg.builder.CreateStructGEP(objIR, ptr, field->position);
-        cg.addToVTable(ptr, id, fieldGEP);
+        cg.addToVTable(ptr, virtualID, fieldGEP);
     }
 
     for (const auto& [_, method] : obj->methods) {
@@ -1543,9 +1465,9 @@ void LgsCodeGen::addVirtuals(LgsObject* obj, Value* ptr) const {
         for (const auto implement : obj->implements) {
             if (!implement->methods.contains(methodName)) continue;
             const auto name = implement->methods[methodName]->funcType->getName();
-            const auto id = cg.hashConst(name);
+            const auto virtualID = cg.hashConst(name);
             const auto IRFunc = method->getIRFunc(cg);
-            cg.addToVTable(ptr, id, IRFunc);
+            cg.addToVTable(ptr, virtualID, IRFunc);
             break;
         }
     }
@@ -1566,56 +1488,3 @@ void LgsCodeGen::addVirtuals(LgsObject* obj, Value* ptr) const {
     // }
 }
 
-bool LgsCodeGen::writeIRModule() const {
-    if (verifyModule(*cg.IRModule, &llvm::errs())) return false;
-    // Write IR to file
-    auto moduleName = cg.IRModule->getName().str();
-    if (lgsConfigs.writeIRFiles) {
-        const auto filePath = (paths.buildDirIR / moduleName).string() + ".ll";
-        if (fs::exists(filePath)) fs::remove(filePath);
-        std::error_code EC;
-        raw_fd_ostream textFile(filePath, EC, llvm::sys::fs::OF_None);
-        cg.IRModule->print(textFile, nullptr);
-    }
-
-    // Run pass
-    llvm::PassBuilder builder(targetMachine);
-    llvm::LoopAnalysisManager loopAnalyser;
-    llvm::FunctionAnalysisManager funcAnalyser;
-    llvm::CGSCCAnalysisManager CGAnalyser;
-    llvm::ModuleAnalysisManager analysisManager;
-    builder.registerModuleAnalyses(analysisManager);
-    builder.registerFunctionAnalyses(funcAnalyser);
-    builder.registerLoopAnalyses(loopAnalyser);
-    builder.registerCGSCCAnalyses(CGAnalyser);
-    builder.crossRegisterProxies(loopAnalyser, funcAnalyser, CGAnalyser, analysisManager);
-
-    const auto optLevel = cg.getOptLevel(appConfigs.optLevel);
-    auto passManager = builder.buildPerModuleDefaultPipeline(optLevel);
-    passManager.run(*cg.IRModule, analysisManager);
-
-    // Create bc file
-    std::error_code ec;
-    const std::string outputPath = paths.buildDirObjs / (moduleName + ".o");
-    if (fs::exists(outputPath)) fs::remove(outputPath);
-    raw_fd_ostream bitcodeStream(outputPath + ".bc", ec, llvm::sys::fs::OF_None);
-    assert(!ec);
-    llvm::WriteBitcodeToFile(*cg.IRModule, bitcodeStream);
-    bitcodeStream.flush();
-    bitcodeStream.close();
-
-    // Create object
-    char cmd[1024*4];
-    const auto triple = llvm::sys::getDefaultTargetTriple();
-    std::snprintf(
-        cmd,
-        sizeof(cmd),
-        GENERATE_OBJ_CMD,
-        triple.c_str(),
-        outputPath.c_str(),
-        outputPath.c_str()
-    );
-    if (!runCmd(cmd)) assert(0);
-    fs::remove(outputPath + ".bc");
-    return true;
-}

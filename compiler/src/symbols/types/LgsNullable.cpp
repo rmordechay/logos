@@ -1,9 +1,10 @@
 #include "types/LgsNullable.h"
-#include "codegen/LgsLLVMGen.h"
+#include "codegen/LgsCgModule.h"
 #include "LgsDefinitions.h"
 #include "exprs/LgsNull.h"
-#include "LgsUtils.h"
+#include "exprs/LgsNullableExpr.h"
 #include "types/LgsAny.h"
+#include "types/primitives/LgsBool.h"
 
 LgsField* LgsNullable::getField(const std::string& fieldName) {
     return baseType->getField(fieldName);
@@ -13,7 +14,12 @@ LgsFunc* LgsNullable::getMethod(const std::string& methodName) {
     return baseType->getMethod(methodName);
 }
 
-void LgsNullable::setIRValue(LgsLLVMGen& cg, Value* nullablePtr, Value* value) {
+Type* LgsNullable::getIRType(LgsCgModule& cg) {
+    if (baseType->passByRef) return cg.ptrTy();
+    return cg.getStructType({baseType->getIRType(cg), cg.i1Ty()}, "nullable_" + baseType->getName());
+}
+
+void LgsNullable::setIRValue(LgsCgModule& cg, Value* nullablePtr, Value* value) {
     if (baseType->passByRef) {
         cg.builder.CreateStore(value, nullablePtr);
     } else {
@@ -25,24 +31,27 @@ void LgsNullable::setIRValue(LgsLLVMGen& cg, Value* nullablePtr, Value* value) {
     }
 }
 
-Type* LgsNullable::getIRType(LgsLLVMGen& cg) {
-    return cg.getStructType({baseType->getIRType(cg), cg.i1Ty()}, "nullable_" + baseType->getName());
+Constant* LgsNullable::getRTType(LgsCgModule& cg) {
+    const auto genericName = getGenericName();
+    if (!baseType) {
+        return cg.getRTTypeInfo(genericName, 0, 0, RTT_ANY, cg.null());
+    }
+    const auto st = cg.getStructType({cg.ptrTy(), cg.i1Ty()}, genericName);
+    const auto baseRTType = baseType->getRTType(cg);
+    const auto sv = ConstantStruct::get(st, {baseRTType, cg.i1(baseType->passByRef)});
+    return cg.getRTTypeInfo(genericName, sizeBytes(), sizeBytes(), RTT_NULLABLE, sv);
 }
 
 LgsExpr* LgsNullable::getZeroValue() {
-    return new LgsNull();
-}
-
-Lgs_TypeKind LgsNullable::getRTTypeKind() {
-    return RTT_NULLABLE;
+    return new LgsNullableExpr(new LgsNull());
 }
 
 std::string LgsNullable::getName() {
-    return baseType ? baseType->getName() + '?' : "Null";
+    return baseType ? baseType->getName() + name : name;
 }
 
 std::string LgsNullable::pname() {
-    return (baseType ? baseType->pname() : LGS_UNKNOWN_TYPE) + '?';
+    return baseType ? baseType->getName() + '?' : name;
 }
 
 bool LgsNullable::canCastTo(LgsType* other) {
@@ -54,18 +63,64 @@ bool LgsNullable::canCastTo(LgsType* other) {
     return baseType->canCastTo(otherNullable->baseType);
 }
 
+LgsType* LgsNullable::applyBinOp(LgsType* toType, LgsBinOp& op) {
+    const auto otherNullable = toType->asNullable();
+    switch (op.opType) {
+    case ADD:
+        break;
+    case SUB:
+        break;
+    case MUL:
+        break;
+    case DIV:
+        break;
+    case MODULO:
+        break;
+    case POW:
+        break;
+    case BIT_AND:
+        break;
+    case BIT_OR:
+        break;
+    case BIT_XOR:
+        break;
+    case LSHIFT:
+        break;
+    case RSHIFT:
+        break;
+    case EQ:
+    case NE:
+    case LT:
+    case GT:
+    case GE:
+    case LE: {
+        if (!baseType || baseType->canCastTo(toType)) return &LGS_BOOL;
+        break;
+    }
+    case AND:
+        break;
+    case OR:
+        break;
+    case IN:
+        break;
+    case CROSS:
+        break;
+    case NOOP:
+        break;
+    }
+    return nullptr;
+}
+
 size_t LgsNullable::sizeBytes() {
-    return baseType->sizeBytes() + sizeof(bool);
+    return !baseType ? 0 : baseType->sizeBytes() + sizeof(bool);
 }
 
-std::string LgsNullable::strFormatPart() const {
-    return baseType->strFormatPart();
+std::string LgsNullable::fmtStr() const {
+    return baseType->fmtStr();
 }
 
-LgsType* LgsNullable::clone() {
-    const auto newNullable = new LgsNullable(*this);
-    newNullable->baseType = baseType->clone();
-    return newNullable;
+DIType* LgsNullable::getDebugType(LgsCgModule& cg) {
+    assert(0);
 }
 
 LgsNullable::~LgsNullable() {

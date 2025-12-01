@@ -7,12 +7,14 @@ public:
     std::string name;
 
     explicit LgsUnknown(std::string name) : name(std::move(name)) {}
-    Type* getIRType(LgsLLVMGen& cg) override;
+    Type* getIRType(LgsCgModule& cg) override;
+    Constant* getRTType(LgsCgModule& cg) override;
     std::string getName() override;
     std::string pname() override;
     LgsExpr* getZeroValue() override;
-    Lgs_TypeKind getRTTypeKind() override;
     size_t sizeBytes() override;
     bool canCastTo(LgsType* other) override;
-    std::string strFormatPart() const override;
+    LgsType* applyBinOp(LgsType* toType, LgsBinOp& op) override;
+    std::string fmtStr() const override;
+    DIType* getDebugType(LgsCgModule& cg) override;
 };

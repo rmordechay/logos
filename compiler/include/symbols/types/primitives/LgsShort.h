@@ -10,12 +10,14 @@ public:
         isInt = true;
     }
     size_t sizeBytes() override;
-    Type* getIRType(LgsLLVMGen& cg) override;
+    Type* getIRType(LgsCgModule& cg) override;
+    Constant* getRTType(LgsCgModule& cg) override;
     std::string getName() override;
     LgsExpr* getZeroValue() override;
-    Lgs_TypeKind getRTTypeKind() override;
     bool canCastTo(LgsType* other) override;
-    std::string strFormatPart() const override;
+    LgsType* applyBinOp(LgsType* toType, LgsBinOp& op) override;
+    std::string fmtStr() const override;
+    DIType* getDebugType(LgsCgModule& cg) override;
 };
 
 inline LgsShort LGS_SHORT;

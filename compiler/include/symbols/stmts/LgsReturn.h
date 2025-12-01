@@ -1,10 +1,5 @@
 #pragma once
 #include "LgsStmt.h"
-#include "exprs/LgsExpr.h"
-
-namespace llvm {
-    class BasicBlock;
-}
 
 class LgsReturn final : public LgsStmt {
 public:
@@ -12,7 +7,7 @@ public:
     BasicBlock* parentBlock = nullptr;
 
     explicit LgsReturn(LgsExpr* expr) : expr(expr) {}
-    LgsStmt* clone() override;
+    void setDebugValue(LgsCgModule& cg) override;
     ~LgsReturn() override;
 };
 

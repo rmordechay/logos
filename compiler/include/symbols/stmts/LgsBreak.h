@@ -5,7 +5,7 @@ class LgsForLoop;
 
 class LgsBreak final : public LgsStmt {
 public:
-    bool isBreakIf;
-    std::string tag;
-
+    bool isBreakIf = false;
+    std::string tag = "";
+    void setDebugValue(LgsCgModule& cg) override;
 };

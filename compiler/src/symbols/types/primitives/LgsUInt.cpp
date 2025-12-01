@@ -1,6 +1,6 @@
 #include "types/primitives/LgsUInt.h"
 #include "exprs/constants/LgsIntConst.h"
-#include "codegen/LgsLLVMGen.h"
+#include "codegen/LgsCgModule.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsInt.h"
 #include "types/primitives/LgsSize.h"
@@ -9,8 +9,12 @@ size_t LgsUInt::sizeBytes() {
     return sizeof(uint32_t);
 }
 
-Type* LgsUInt::getIRType(LgsLLVMGen& cg) {
+Type* LgsUInt::getIRType(LgsCgModule& cg) {
     return cg.i32Ty();
+}
+
+Constant* LgsUInt::getRTType(LgsCgModule& cg) {
+    return cg.getRTTypeInfo(getGenericName(), sizeBytes(), sizeBytes(), RTT_UINT, cg.null());
 }
 
 std::string LgsUInt::getName() {
@@ -21,10 +25,6 @@ LgsExpr* LgsUInt::getZeroValue() {
     return new LgsIntConst(this, 0);
 }
 
-Lgs_TypeKind LgsUInt::getRTTypeKind() {
-    return RTT_UINT;
-}
-
 bool LgsUInt::canCastTo(LgsType* other) {
     const auto IRName = other->getName();
     if (IRName == LgsAny::name) return true;
@@ -33,6 +33,14 @@ bool LgsUInt::canCastTo(LgsType* other) {
     return name == IRName;
 }
 
-std::string LgsUInt::strFormatPart() const {
+LgsType* LgsUInt::applyBinOp(LgsType* toType, LgsBinOp& op) {
+    assert(0);
+}
+
+DIType* LgsUInt::getDebugType(LgsCgModule& cg) {
+    assert(0);
+}
+
+std::string LgsUInt::fmtStr() const {
     return "%d";
 }

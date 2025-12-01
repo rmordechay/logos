@@ -3,7 +3,7 @@
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
-#include "types/LgsGenericParam.h"
+#include "types/LgsGenericType.h"
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
 #include "types/LgsSubType.h"
@@ -23,7 +23,7 @@ LgsSymbol::LgsSymbol(LgsField* field)
 LgsSymbol::LgsSymbol(LgsInterface* interface)
     : name(&interface->name), symbolType(INTERFACE), location(&interface->location), interface(interface) {}
 
-LgsSymbol::LgsSymbol(LgsGenericParam* generic)
+LgsSymbol::LgsSymbol(LgsGenericType* generic)
     : name(&generic->name), symbolType(GENERIC), location(&generic->location), generic(generic) {}
 
 LgsSymbol::LgsSymbol(LgsSubType* subtype)
@@ -70,23 +70,23 @@ LgsType* LgsSymbol::getType() const {
 LgsSymbol LgsSymbol::clone() const {
     switch (symbolType) {
     case VAR_DEC:
-        return LgsSymbol(varDec->clone());
+        return LgsSymbol(varDec);
     case PARAM:
         return LgsSymbol(param);
     case FIELD:
-        return LgsSymbol(field->clone());
+        return LgsSymbol(field);
     case FUNC:
-        return LgsSymbol(func->clone());
+        return LgsSymbol(func);
     case OBJECT:
-        return LgsSymbol(object->clone());
+        return LgsSymbol(object);
     case INTERFACE:
-        return LgsSymbol(interface->clone());
+        return LgsSymbol(interface);
     case SUBTYPE:
-        return LgsSymbol(subtype->clone());
+        return LgsSymbol(subtype);
     case GENERIC:
-        return LgsSymbol(generic->clone());
+        return LgsSymbol(generic);
     case ENUM:
-        return LgsSymbol(enum_->clone());
+        return LgsSymbol(enum_);
     case UNKNOWN:
         return LgsSymbol();
     }

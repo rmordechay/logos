@@ -1,8 +1,14 @@
 #include "types/LgsSubType.h"
 #include "types/LgsAny.h"
 
-Type* LgsSubType::getIRType(LgsLLVMGen& cg) {
+#include <cassert>
+
+Type* LgsSubType::getIRType(LgsCgModule& cg) {
     return subtype->getIRType(cg);
+}
+
+Constant* LgsSubType::getRTType(LgsCgModule& cg) {
+    assert(0);
 }
 
 size_t LgsSubType::sizeBytes() {
@@ -28,14 +34,14 @@ bool LgsSubType::canCastTo(LgsType* other) {
     return getName() == otherName;
 }
 
-Lgs_TypeKind LgsSubType::getRTTypeKind() {
-    return subtype->getRTTypeKind();
+LgsType* LgsSubType::applyBinOp(LgsType* toType, LgsBinOp& op) {
+    assert(0);
 }
 
-std::string LgsSubType::strFormatPart() const {
-    return subtype->strFormatPart();
+std::string LgsSubType::fmtStr() const {
+    return subtype->fmtStr();
 }
 
-LgsSubType* LgsSubType::clone() {
+DIType* LgsSubType::getDebugType(LgsCgModule& cg) {
     assert(0);
 }

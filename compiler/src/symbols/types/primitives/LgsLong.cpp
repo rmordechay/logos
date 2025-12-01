@@ -3,14 +3,17 @@
 #include "types/LgsAny.h"
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsChar.h"
-#include "types/primitives/LgsDouble.h"
 #include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsInt.h"
 #include "types/primitives/LgsShort.h"
 #include "types/primitives/LgsSize.h"
 
-Type* LgsLong::getIRType(LgsLLVMGen& cg) {
+Type* LgsLong::getIRType(LgsCgModule& cg) {
     return cg.i64Ty();
+}
+
+Constant* LgsLong::getRTType(LgsCgModule& cg) {
+    return cg.getRTTypeInfo(getGenericName(), sizeBytes(), sizeBytes(), RTT_LONG, cg.null());
 }
 
 size_t LgsLong::sizeBytes() {
@@ -21,59 +24,55 @@ LgsExpr* LgsLong::getZeroValue() {
     return new LgsIntConst(&LGS_LONG, 0);
 }
 
-Lgs_TypeKind LgsLong::getRTTypeKind() {
-    return RTT_LONG;
-}
-
 LgsType* LgsLong::applyBinOp(LgsType* toType, LgsBinOp& op) {
     return applyIntBinOp(toType, op.opType);
 }
 
-Value* LgsLong::addIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsLong::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     const auto l = cg.builder.CreateZExt(left->loadIR(cg), getIRType(cg));
     const auto r = cg.builder.CreateZExt(right->loadIR(cg), getIRType(cg));
     return cg.builder.CreateAdd(l, r);
 }
 
-Value* LgsLong::subIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsLong::subIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     const auto l = cg.builder.CreateZExt(left->loadIR(cg), getIRType(cg));
     const auto r = cg.builder.CreateZExt(right->loadIR(cg), getIRType(cg));
     return cg.builder.CreateSub(l, r);
 }
 
-Value* LgsLong::mulIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsLong::mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     const auto l = cg.builder.CreateZExt(left->loadIR(cg), getIRType(cg));
     const auto r = cg.builder.CreateZExt(right->loadIR(cg), getIRType(cg));
     return cg.builder.CreateMul(l, r);
 }
 
-Value* LgsLong::divIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsLong::divIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     const auto l = cg.builder.CreateZExt(left->loadIR(cg), getIRType(cg));
     const auto r = cg.builder.CreateZExt(right->loadIR(cg), getIRType(cg));
     return cg.builder.CreateSDiv(l, r);
 }
 
-Value* LgsLong::modIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsLong::modIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     return cg.builder.CreateSRem(left->loadIR(cg), right->loadIR(cg));
 }
 
-Value* LgsLong::bitAndIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsLong::bitAndIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     return cg.builder.CreateAnd(left->loadIR(cg), right->loadIR(cg));
 }
 
-Value* LgsLong::bitOrIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsLong::bitOrIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     return cg.builder.CreateOr(left->loadIR(cg), right->loadIR(cg));
 }
 
-Value* LgsLong::bitXorIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsLong::bitXorIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     return cg.builder.CreateXor(left->loadIR(cg), right->loadIR(cg));
 }
 
-Value* LgsLong::rshiftIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsLong::rshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     return cg.builder.CreateShl(left->loadIR(cg), right->loadIR(cg));
 }
 
-Value* LgsLong::lshiftIR(LgsLLVMGen& cg, LgsExpr* left, LgsExpr* other) {
+Value* LgsLong::lshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* other) {
     return cg.builder.CreateLShr(left->loadIR(cg), other->loadIR(cg));
 }
 
@@ -93,6 +92,10 @@ bool LgsLong::canCastTo(LgsType* other) {
     return name == otherName;
 }
 
-std::string LgsLong::strFormatPart() const {
+DIType* LgsLong::getDebugType(LgsCgModule& cg) {
+    assert(0);
+}
+
+std::string LgsLong::fmtStr() const {
     return "%lu";
 }

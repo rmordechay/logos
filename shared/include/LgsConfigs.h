@@ -1,6 +1,5 @@
 #pragma once
 #include <string>
-#include <cstdlib>
 
 #define BIG_SIZE_THRESHOLD 4
 #define STRING_BUFFER_SIZE 1024
@@ -43,7 +42,7 @@ struct LgsConfigs {
 };
 
 inline void LgsConfigs::init() {
-    const char* env = std::getenv("LGS_DEV_MODE");
+    const char* env = getenv("LGS_DEV_MODE");
     if (!env) return;
     isDevMode = std::string(env) == "1" || std::string(env) == "true";
 }

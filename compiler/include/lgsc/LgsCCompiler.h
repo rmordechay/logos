@@ -3,6 +3,7 @@
 #include "LgsSymbolTable.h"
 #include "logos/LgsPaths.h"
 #include <clang/Basic/Diagnostic.h>
+#include <clang/Frontend/CompilerInstance.h>
 
 class LgsStrConst;
 class LgsFile;
@@ -12,14 +13,17 @@ public:
     void HandleDiagnostic(clang::DiagnosticsEngine::Level level, const clang::Diagnostic& info) override;
 };
 
-class LgsCLang final {
+class LgsCCompiler final {
 public:
-    fs::path cLibHeadersDir;
+    LgsPaths& paths;
+    clang::CompilerInstance compiler;
 
-    explicit LgsCLang(const fs::path& cLibHeadersDir): cLibHeadersDir(cLibHeadersDir) {}
-    bool parseFile(LgsCLangParser& parser, const fs::path& headerPath) const;
+    explicit LgsCCompiler(LgsPaths& paths): paths(paths) {
+        initCompiler();
+    }
+    bool parseFile(LgsCLangParser& parser, const fs::path& headerPath);
+    void initCompiler();
 };
-
 
 class LgsPPCallbacks final : public clang::PPCallbacks {
 public:

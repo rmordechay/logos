@@ -1,6 +1,5 @@
 #pragma once
 #include "exprs/LgsExpr.h"
-#include "types/LgsInterface.h"
 #include <LgsValue.h>
 
 class LgsVariable;
@@ -16,10 +15,10 @@ public:
     bool isSelf = false;
     bool isVariadic = false;
 
-    explicit LgsParam(LgsType* type, const std::string& name, LgsExpr* expr = nullptr) : name(name), type(type), expr(expr) {}
-    Value* loadIR(LgsLLVMGen& cg) override;
+    explicit LgsParam(LgsType* type, const std::string& name = "", LgsExpr* expr = nullptr) : name(name), type(type), expr(expr) {}
+    Value* loadIR(LgsCgModule& cg) override;
     void setType(LgsType* newType);
-    LgsParam* clone() override;
+    void setDebugValue(LgsCgModule& cg) override;
     ~LgsParam() override = default;
 };
 

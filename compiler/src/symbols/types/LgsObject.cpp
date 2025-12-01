@@ -7,12 +7,15 @@
 #include "types/LgsEnum.h"
 #include "types/LgsInterface.h"
 #include "types/LgsNullable.h"
-#include "types/LgsGenericParam.h"
 #include "LgsUtils.h"
 #include "types/LgsAny.h"
 
 #include <sstream>
 #include <llvm/IR/Module.h>
+
+std::string LgsObject::getName() {
+    return name;
+}
 
 LgsFunc* LgsObject::getMethod(const std::string& methodName) {
     const auto method = methods.find(methodName);
@@ -34,11 +37,7 @@ LgsFunc* LgsObject::getMethod(const std::string& methodName) {
     return nullptr;
 }
 
-std::string LgsObject::getName() {
-    return name;
-}
-
-Type* LgsObject::getIRType(LgsLLVMGen& cg) {
+Type* LgsObject::getIRType(LgsCgModule& cg) {
     const auto type = cg.typesRegistry.find(name);
     if (type != cg.typesRegistry.end()) return type->second;
     std::vector<Type*> elementTypes;
@@ -59,6 +58,43 @@ Type* LgsObject::getIRType(LgsLLVMGen& cg) {
     return IRType;
 }
 
+Constant* LgsObject::getRTType(LgsCgModule& cg) {
+    std::vector<Constant*> fieldRTTs;
+    std::vector<Constant*> fieldNameHashes;
+    fieldRTTs.reserve(fields.size());
+    fieldNameHashes.reserve(fields.size());
+    for (const auto field : fields) {
+        fieldRTTs.push_back(field->type->getRTType(cg));
+        fieldNameHashes.push_back(cg.hashConst(field->name));
+    }
+
+    const auto genericName = getGenericName();
+    const auto fieldsArrType = ArrayType::get(cg.getRTBaseType(), fields.size());
+    Constant* fieldsArr = cg.null();
+    Constant* hashesArr = cg.null();
+    if (!fields.empty()) {
+        const auto fieldsName = LGS_TYPEINFO_PREFIX + genericName + "_fields";
+        if (cg.isRTTModule) {
+            const auto args = ConstantArray::get(fieldsArrType, fieldRTTs);
+            fieldsArr = cg.createGlobal(fieldsName, fieldsArrType, args);
+        } else {
+            fieldsArr = cg.createGlobal(fieldsName, fieldsArrType, nullptr);
+        }
+
+        const auto hashesArrType = ArrayType::get(cg.i64Ty(), fields.size());
+        const auto hashesName = LGS_TYPEINFO_PREFIX + genericName + "_hashes";
+        if (cg.isRTTModule) {
+            const auto hashes = ConstantArray::get(hashesArrType, fieldNameHashes);
+            hashesArr = cg.createGlobal(hashesName, hashesArrType, hashes);
+        } else {
+            hashesArr = cg.createGlobal(hashesName, hashesArrType, nullptr);
+        }
+    }
+    const auto st = cg.getStructType({cg.sizeTy(), cg.ptrTy(), cg.ptrTy()}, genericName);
+    const auto sv = ConstantStruct::get(st, {cg.usize(fields.size()), hashesArr, fieldsArr});
+    return cg.getRTTypeInfo(genericName, sizeBytes(), sizeof(void*), RTT_OBJECT, sv);
+}
+
 size_t LgsObject::sizeBytes() {
     size_t sum = 0;
     for (const auto& field : fields) {
@@ -72,27 +108,7 @@ size_t LgsObject::sizeBytes() {
 }
 
 LgsExpr* LgsObject::getZeroValue() {
-    return new LgsInstance(clone());
-}
-
-Lgs_TypeKind LgsObject::getRTTypeKind() {
-    return RTT_OBJECT;
-}
-
-Constant* LgsObject::getRTType(LgsLLVMGen& cg) {
-    const auto objRTStruct = cg.getStructType({cg.ptrTy(), cg.sizeTy(), cg.ptrTy()}, LGS_RT_OBJECT);
-    const auto fieldCount = fields.size();
-    std::vector<Constant*> fieldTypeValues;
-    for (const auto field : fields) {
-        fieldTypeValues.push_back(cg.i32(field->type->getRTTypeKind()));
-    }
-    const auto fieldTypesArrayType = ArrayType::get(cg.i32Ty(), fieldCount);
-    const auto fieldTypesArray = llvm::ConstantArray::get(fieldTypesArrayType, fieldTypeValues);
-    const auto fieldTypesGlobal = cg.createGlobal(fieldTypesArrayType, fieldTypesArray, name + "_field_types");
-    const std::vector<Constant*> structFields = {
-        cg.getIRStr(name), cg.usize(fieldCount), fieldTypesGlobal
-    };
-    return llvm::ConstantStruct::get(objRTStruct, structFields);
+    return new LgsInstance(this);
 }
 
 bool LgsObject::canCastTo(LgsType* other) {
@@ -112,39 +128,31 @@ bool LgsObject::canCastTo(LgsType* other) {
     return name == otherType->getName();
 }
 
-std::string LgsObject::strFormatPart() const {
+LgsType* LgsObject::applyBinOp(LgsType* toType, LgsBinOp& op) {
+    assert(0);
+}
+
+std::string LgsObject::fmtStr() const {
     std::stringstream str;
     str << '{';
     bool first = true;
     for (const auto& field : fields) {
         if (!first) str << ", ";
-        str << field->name << " = " << field->type->strFormatPart();
+        str << field->name << " = " << field->type->fmtStr();
         first = false;
     }
     str << '}';
     return str.str();
 }
 
-LgsObject* LgsObject::clone() {
-    assert(!singleton);
-    const auto newObj = new LgsObject(*this);
-    newObj->fields.clear();
-    newObj->generics.clear();
-    for (const auto& generic : generics) {
-        newObj->generics.emplace_back(new LgsGenericParam(*generic));
-    }
-    for (const auto& enum_ : enums) {
-        newObj->enums.emplace_back(new LgsEnum(*enum_));
-    }
-    cloneFields(newObj);
-    cloneMethods(newObj);
-    return newObj;
+DIType* LgsObject::getDebugType(LgsCgModule& cg) {
+    assert(0);
 }
 
 LgsObject::~LgsObject() {
     freeTypes(enums);
     freeTypes(objects);
-    freeTypes(generics);
+    // freeTypes(generics);
     freeTypes(subtypes);
     if (singleton) {
         singleton->setType(nullptr);
@@ -154,5 +162,7 @@ LgsObject::~LgsObject() {
     for (const auto ioPair : ioPairs) {
         delete ioPair;
     }
+    delete getFieldFunc;
+    getFieldFunc = nullptr;
 }
 

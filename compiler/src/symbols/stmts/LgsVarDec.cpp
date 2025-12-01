@@ -1,5 +1,5 @@
 #include "stmts/LgsVarDec.h"
-#include "codegen/LgsLLVMGen.h"
+#include "codegen/LgsCgModule.h"
 #include "types/iterables/LgsStr.h"
 #include "LgsUtils.h"
 #include <llvm/IR/DIBuilder.h>
@@ -8,19 +8,22 @@ void LgsVarDec::setType(LgsType* newType) {
     type = newType;
 }
 
-Value* LgsVarDec::loadIR(LgsLLVMGen& cg) {
+Value* LgsVarDec::loadIR(LgsCgModule& cg) {
     if (!IRValue->getType()->isPointerTy()) return IRValue;
     return cg.builder.CreateLoad(type->getIRType(cg), IRValue);
 }
 
 bool LgsVarDec::shouldAllocate() const {
+    if (!type) return false;
     if (type->isHeapAlloc) return false;
     if (type->asIterable() && type->asIterable()->isStatic) return false;
     if (type->asSubtype() || type->asNullable()  || type->asFuncType()) return false;
+    if (expr->asFuncCall()) return false;
     return true;
 }
 
-void LgsVarDec::setDebugValue(LgsLLVMGen& cg) {
+void LgsVarDec::setDebugValue(LgsCgModule& cg) {
+    setDebugLoc(cg);
     const auto var = cg.debugger.diBuilder->createAutoVariable(
         cg.debugger.subprogram,
         name,
@@ -44,13 +47,6 @@ void LgsVarDec::hashNode(size_t& oldHash) {
     hashNodeString(oldHash, name);
     if (type) type->hashNode(oldHash);
     if (expr) expr->hashNode(oldHash);
-}
-
-LgsVarDec* LgsVarDec::clone() {
-    const auto newVarDec = new LgsVarDec(*this);
-    if (type) newVarDec->type = type->clone();
-    if (expr) newVarDec->expr = expr->clone();
-    return newVarDec;
 }
 
 LgsVarDec::~LgsVarDec() {

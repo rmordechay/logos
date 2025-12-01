@@ -18,13 +18,7 @@ LgsExpr* LgsStrConst::castExplicitly(LgsType* toType) {
     return nullptr;
 }
 
-Value* LgsStrConst::castIR(LgsLLVMGen& cg, LgsType* toType) {
-    if (toType->asStr()) return IRValue;
-    if (toType->asGeneric()) return IRValue;
-    return LgsExpr::castIR(cg, toType);
-}
-
-Value* LgsStrConst::loadIR(LgsLLVMGen& cg) {
+Value* LgsStrConst::loadIR(LgsCgModule& cg) {
     return IRValue;
 }
 
@@ -33,7 +27,7 @@ std::string LgsStrConst::asText() {
     return quote + scanEscapeStr(value) + quote;
 }
 
-Value* LgsStrConst::hashValue(LgsLLVMGen& cg) {
+Value* LgsStrConst::hashValue(LgsCgModule& cg) {
     return cg.hashConst(value);
 }
 
@@ -47,12 +41,8 @@ bool LgsStrConst::equals(LgsExpr* other) {
     assert(0);
 }
 
-LgsStrConst* LgsStrConst::clone() {
-    return new LgsStrConst(*this);
-}
-
-void LgsStrConst::setDebugValue(LgsLLVMGen& cg) {
-    cg.builder.SetCurrentDebugLocation(cg.getDebugLoc(location));
+void LgsStrConst::setDebugValue(LgsCgModule& cg) {
+    setDebugLoc(cg);
 }
 
 LgsStrConst::~LgsStrConst() {

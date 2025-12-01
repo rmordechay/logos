@@ -2,7 +2,7 @@
 
 set -e
 
-LOGOS_PATH=https://gitlab.com/rmordechay1/logos
+LOGOS_GIT_URL=https://gitlab.com/rmordechay1/logos
 INSTALL_PREFIX="${INSTALL_PREFIX:-/usr/local}"
 TEMP_DIR=$(mktemp -d)
 
@@ -77,7 +77,7 @@ install_dependencies() {
 install_logos() {
   echo "Installing Logos..."
   cd "$TEMP_DIR"
-  git clone --depth 1 -b dev "$LOGOS_PATH"
+  git clone --depth 1 -b dev "$LOGOS_GIT_URL"
   cd logos
 
   cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local -DLOGOS_RELEASE=ON
@@ -90,8 +90,16 @@ install_logos() {
   fi
 }
 
+build_cblas() {
+    git clone --depth 1 https://github.com/OpenMathLib/OpenBLAS.git
+    make -C OpenBLAS CFLAGS="-O3 -Wno-uninitialized" > /dev/null
+    cp OpenBLAS/libopenblas.a libcblas.a
+    rm -rf OpenBLAS
+}
+
 detect_os
-install_dependencies
+#install_dependencies
+build_cblas
 #install_logos
 
 echo "Installation done."

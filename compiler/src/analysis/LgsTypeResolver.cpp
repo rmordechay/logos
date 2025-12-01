@@ -11,7 +11,7 @@
 #include "stmts/LgsIOPair.h"
 #include "types/LgsEnum.h"
 #include "types/LgsFuncType.h"
-#include "types/LgsGenericParam.h"
+#include "types/LgsGenericType.h"
 #include "types/LgsInterface.h"
 #include "types/iterables/LgsIterable.h"
 #include "types/LgsNullable.h"
@@ -43,6 +43,7 @@ LgsType* LgsTypeResolver::resolveType(LgsType* type, LgsFile* file) {
     for (size_t i = 0; i < type->genericArgs.size(); ++i) {
         type->genericArgs[i] = resolveType(type->genericArgs[i], file);
     }
+
     if (const auto nullable = type->asNullable()) {
         nullable->baseType = resolveType(nullable->baseType, file);
     } else if (const auto iterable = type->asIterable()) {
@@ -51,13 +52,13 @@ LgsType* LgsTypeResolver::resolveType(LgsType* type, LgsFile* file) {
         } else {
             iterable->baseType = resolveType(iterable->baseType, file);
         }
-        rtTypesRegistry.push_back(iterable);
     } else if (const auto pair = type->asPair()) {
         pair->key = resolveType(pair->key, file);
         pair->value = resolveType(pair->value, file);
     } else if (const auto funcType = type->asFuncType()) {
         resolveFuncTypes(funcType, *file);
     }
+
     if (type->isUnknown()) {
         auto typeName = type->getName();
         auto symbol = globals.table.getSymbol(typeName);
@@ -71,22 +72,22 @@ LgsType* LgsTypeResolver::resolveType(LgsType* type, LgsFile* file) {
         LgsType* newType = nullptr;
         switch (symbol->symbolType) {
         case FUNC:
-            newType = symbol->func->funcType->clone();
+            newType = symbol->func->funcType;
             break;
         case OBJECT:
-            newType = symbol->object->clone();
+            newType = symbol->object;
             break;
         case INTERFACE:
-            newType = symbol->interface->clone();
+            newType = symbol->interface;
             break;
         case ENUM:
-            newType = symbol->enum_->clone();
+            newType = symbol->enum_;
             break;
         case SUBTYPE:
-            newType = symbol->subtype->clone();
+            newType = symbol->subtype;
             break;
         case GENERIC:
-            newType = symbol->generic->clone();
+            newType = symbol->generic;
             break;
         case VAR_DEC:
         case PARAM:
@@ -98,6 +99,7 @@ LgsType* LgsTypeResolver::resolveType(LgsType* type, LgsFile* file) {
         freeType(type);
         type = newType;
     }
+
     return type;
 }
 
@@ -154,16 +156,13 @@ void LgsTypeResolver::resolveInterfaceTypes(LgsInterface* interface, LgsFile& fi
     for (const auto& [_, method] : interface->methods) {
         resolveFuncTypes(method->funcType, file);
     }
-    for (auto& i : interface->implements) {
-        i = resolveType(i, &file);
-    }
 }
 
 void LgsTypeResolver::resolveFuncTypes(LgsFuncType* funcType, LgsFile& file) {
     auto resolveTypeOrGeneric = [&](LgsType* type) -> LgsType* {
         if (!type) return &LGS_VOID;
-        for (const auto generic : funcType->genericParams) {
-            if (type->equals(generic)) return generic->clone();
+        for (const auto generic : funcType->genericTypes) {
+            if (type->equals(generic)) return generic;
         }
         return resolveType(type, &file);
     };

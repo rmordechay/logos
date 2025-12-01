@@ -8,8 +8,8 @@ public:
     LgsExpr* endRange = nullptr;
 
     LgsRangeLoop(LgsExpr* rangeStart, LgsExpr* rangeEnd) : startRange(rangeStart), endRange(rangeEnd) {}
-    Value* loopStart(LgsLLVMGen& cg) override;
-    Value* loopEnd(LgsLLVMGen& cg) override;
-    LgsRangeLoop* clone() override;
+    Value* loopStart(LgsCgModule& cg) override;
+    Value* loopEnd(LgsCgModule& cg) override;
+    void setDebugValue(LgsCgModule& cg) override;
     ~LgsRangeLoop() override;
 };

@@ -6,8 +6,9 @@ class LgsCharConst final : public LgsExpr {
 public:
     char value;
     explicit LgsCharConst(const char value) : LgsExpr(&LGS_CHAR), value(value) {}
-    Value* loadIR(LgsLLVMGen& cg) override;
+    Value* loadIR(LgsCgModule& cg) override;
     std::string asText() override;
+    void setDebugValue(LgsCgModule& cg) override;
 };
 
 

@@ -1,5 +1,6 @@
 #include "exprs/LgsExpr.h"
 #include "exprs/LgsArrayExpr.h"
+#include "exprs/LgsBinaryExpr.h"
 #include "exprs/LgsCast.h"
 #include "exprs/LgsEnvVar.h"
 #include "exprs/LgsIterIndex.h"
@@ -15,8 +16,11 @@
 #include "stmts/LgsVarDec.h"
 #include "exprs/LgsJson.h"
 #include "exprs/LgsMatrixExpr.h"
+#include "exprs/LgsMetaSelection.h"
 #include "exprs/LgsNull.h"
 #include "exprs/LgsNullableExpr.h"
+#include "exprs/LgsPostfixExpr.h"
+#include "exprs/LgsSelection.h"
 #include "exprs/LgsTypeExpr.h"
 #include "funcs/LgsFunc.h"
 #include "loops/LgsMetaVar.h"
@@ -25,19 +29,13 @@ LgsExpr* LgsExpr::castExplicitly(LgsType* toType) {
     assert(0);
 }
 
-void LgsExpr::castImplicitly(LgsType* toType) {
+void LgsExpr::castImplicitly(LgsType* toType) {}
 
-}
-
-Value* LgsExpr::castIR(LgsLLVMGen& cg, LgsType* toType) {
+Value* LgsExpr::hashValue(LgsCgModule& cg) {
     assert(0);
 }
 
-Value* LgsExpr::hashValue(LgsLLVMGen& cg) {
-    assert(0);
-}
-
-void LgsExpr::assign(LgsLLVMGen& cg, LgsExpr* expr) {
+void LgsExpr::assign(LgsCgModule& cg, LgsExpr* expr) {
     assert(0);
 }
 
@@ -45,7 +43,7 @@ bool LgsExpr::equals(LgsExpr* other) {
     assert(0);
 }
 
-void LgsExpr::freeOwner(LgsLLVMGen& cg) {
+void LgsExpr::freeOwner(LgsCgModule& cg) {
     if (type->isHeapAlloc && owner) {
         cg.callRuntimeFunc("removeOwner", cg.voidTy(), {cg.ptrTy()}, {owner->IRValue});
         owner = nullptr;
@@ -126,6 +124,18 @@ LgsPrefixExpr* LgsExpr::asPrefixExpr() {
     return dynamic_cast<LgsPrefixExpr*>(this);
 }
 
+LgsFuncCall* LgsExpr::asFuncCall() {
+    return dynamic_cast<LgsFuncCall*>(this);
+}
+
+LgsPostfixExpr* LgsExpr::asPostfixExpr() {
+    return dynamic_cast<LgsPostfixExpr*>(this);
+}
+
+LgsSelection* LgsExpr::asSelection() {
+    return dynamic_cast<LgsSelection*>(this);
+}
+
 LgsIterIndex* LgsExpr::asIterIndex() {
     return dynamic_cast<LgsIterIndex*>(this);
 }
@@ -194,22 +204,72 @@ LgsNullableExpr* LgsExpr::asNullableExpr() {
     return dynamic_cast<LgsNullableExpr*>(this);
 }
 
-LgsExpr* LgsExpr::clone() {
-    assert(0);
+LgsMetaSelection* LgsExpr::asMetaSelection() {
+    return dynamic_cast<LgsMetaSelection*>(this);
+}
+
+Value* dotProduct(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+    const auto l = left->loadIR(cg);
+    const auto r = right->loadIR(cg);
+
+    const auto lx = cg.builder.CreateExtractElement(l, cg.i32(0));
+    const auto rx = cg.builder.CreateExtractElement(r, cg.i32(0));
+    const auto ly = cg.builder.CreateExtractElement(l, cg.i32(1));
+    const auto ry = cg.builder.CreateExtractElement(r, cg.i32(1));
+    const auto mulX = cg.builder.CreateFMul(lx, rx);
+    const auto mulY = cg.builder.CreateFMul(ly, ry);
+    Value* result = cg.builder.CreateFAdd(mulX, mulY);
+
+    const auto vectorDim = left->type->asVec()->vectorDim;
+    if (vectorDim == 3) {
+        const auto lz = cg.builder.CreateExtractElement(l, cg.i32(2));
+        const auto rz = cg.builder.CreateExtractElement(r, cg.i32(2));
+        const auto mulZ = cg.builder.CreateFMul(lz, rz);
+        result = cg.builder.CreateFAdd(result, mulZ);
+    } else if (vectorDim == 4) {
+        const auto lw = cg.builder.CreateExtractElement(l, cg.i32(3));
+        const auto rw = cg.builder.CreateExtractElement(r, cg.i32(3));
+        const auto mulW = cg.builder.CreateFMul(lw, rw);
+        result = cg.builder.CreateFAdd(result, mulW);
+    }
+    return result;
+}
+
+Value* crossProduct(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+    const auto l = left->loadIR(cg);
+    const auto r = right->loadIR(cg);
+
+    const auto lx = cg.builder.CreateExtractElement(l, cg.i32(0));
+    const auto ly = cg.builder.CreateExtractElement(l, cg.i32(1));
+    const auto lz = cg.builder.CreateExtractElement(l, cg.i32(2));
+    const auto rx = cg.builder.CreateExtractElement(r, cg.i32(0));
+    const auto ry = cg.builder.CreateExtractElement(r, cg.i32(1));
+    const auto rz = cg.builder.CreateExtractElement(r, cg.i32(2));
+
+    const auto cx = cg.builder.CreateFSub(
+        cg.builder.CreateFMul(ly, rz),
+        cg.builder.CreateFMul(lz, ry)
+    );
+    const auto cy = cg.builder.CreateFSub(
+        cg.builder.CreateFMul(lz, rx),
+        cg.builder.CreateFMul(lx, rz)
+    );
+    const auto cz = cg.builder.CreateFSub(
+        cg.builder.CreateFMul(lx, ry),
+        cg.builder.CreateFMul(ly, rx)
+    );
+
+    const auto vecTy = left->type->getIRType(cg);
+    Value* result = UndefValue::get(vecTy);
+    result = cg.builder.CreateInsertElement(result, cx, cg.i32(0));
+    result = cg.builder.CreateInsertElement(result, cy, cg.i32(1));
+    result = cg.builder.CreateInsertElement(result, cz, cg.i32(2));
+
+    return result;
 }
 
 void freeExpr(LgsExpr* expr) {
     if (!expr) return;
-    if (!expr->asVariable()) {
-        freeType(expr->type);
-        expr->type = nullptr;
-    }
+    expr->setType(nullptr);
     delete expr;
-}
-
-void freeExprs(std::vector<LgsExpr*>& exprs) {
-    for (const auto expr : exprs) {
-        freeExpr(expr);
-    }
-    exprs.clear();
 }

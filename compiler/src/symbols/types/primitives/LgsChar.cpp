@@ -1,4 +1,4 @@
-#include "codegen/LgsLLVMGen.h"
+#include "codegen/LgsCgModule.h"
 #include "exprs/constants/LgsCharConst.h"
 #include "types/LgsAny.h"
 #include "types/iterables/LgsStr.h"
@@ -14,8 +14,12 @@ size_t LgsChar::sizeBytes() {
     return sizeof(char);
 }
 
-Type* LgsChar::getIRType(LgsLLVMGen& cg) {
+Type* LgsChar::getIRType(LgsCgModule& cg) {
     return cg.i8Ty();
+}
+
+Constant* LgsChar::getRTType(LgsCgModule& cg) {
+    return cg.getRTTypeInfo(getGenericName(), sizeBytes(), sizeBytes(), RTT_CHAR, cg.null());
 }
 
 std::string LgsChar::getName() {
@@ -26,12 +30,12 @@ LgsExpr* LgsChar::getZeroValue() {
     return new LgsCharConst('0');
 }
 
-Lgs_TypeKind LgsChar::getRTTypeKind() {
-    return RTT_CHAR;
+std::string LgsChar::fmtStr() const {
+    return "%c";
 }
 
-std::string LgsChar::strFormatPart() const {
-    return "%c";
+LgsType* LgsChar::applyBinOp(LgsType* toType, LgsBinOp& op) {
+    assert(0);
 }
 
 bool LgsChar::canCastTo(LgsType* other) {
@@ -45,4 +49,8 @@ bool LgsChar::canCastTo(LgsType* other) {
     if (IRName == LgsFloat::name) return true;
     if (IRName == LgsUInt::name) return true;
     return name == IRName;
+}
+
+DIType* LgsChar::getDebugType(LgsCgModule& cg) {
+    assert(0);
 }

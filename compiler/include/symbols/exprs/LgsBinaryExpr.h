@@ -1,4 +1,5 @@
 #pragma once
+#include "LgsBinaryTokens.h"
 #include "LgsTokens.h"
 #include "exprs/LgsExpr.h"
 
@@ -10,10 +11,9 @@ public:
     LgsBinOp op = LgsBinOp(NOOP, "");
 
     LgsBinaryExpr(LgsExpr* left, LgsExpr* right, const LgsBinOp& op) : left(left), right(right), op(op) {}
-    Value* loadIR(LgsLLVMGen& cg) override;
-    std::string asText() override;
-    void setDebugValue(LgsLLVMGen& cg) override;
+    Value* loadIR(LgsCgModule& cg) override;
+    void setDebugValue(LgsCgModule& cg) override;
     bool equals(LgsExpr* other) override;
-    LgsExpr* clone() override;
+    std::string asText() override;
     ~LgsBinaryExpr() override;
 };

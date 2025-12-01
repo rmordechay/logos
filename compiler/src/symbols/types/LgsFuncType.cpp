@@ -1,11 +1,11 @@
 #include "types/LgsFuncType.h"
 #include "LgsDefinitions.h"
-#include "codegen/LgsLLVMGen.h"
-#include "types/LgsGenericParam.h"
+#include "codegen/LgsCgModule.h"
+#include "types/LgsGenericType.h"
 #include "LgsUtils.h"
 #include <sstream>
 
-Type* LgsFuncType::getIRType(LgsLLVMGen& cg) {
+Type* LgsFuncType::getIRType(LgsCgModule& cg) {
     std::vector<Type*> types;
     for (size_t i = 0; i < params.size(); ++i) {
         const auto param = params[i];
@@ -22,11 +22,11 @@ Type* LgsFuncType::getIRType(LgsLLVMGen& cg) {
     return IRType;
 }
 
-LgsExpr* LgsFuncType::getZeroValue() {
+Constant* LgsFuncType::getRTType(LgsCgModule& cg) {
     assert(0);
 }
 
-Lgs_TypeKind LgsFuncType::getRTTypeKind() {
+LgsExpr* LgsFuncType::getZeroValue() {
     assert(0);
 }
 
@@ -35,13 +35,14 @@ size_t LgsFuncType::sizeBytes() {
 }
 
 std::string LgsFuncType::getName() {
-    if (IRName != "") return IRName;
     std::stringstream strStream;
     if (!isExternal) {
-        if (isBuiltin) strStream << LGS_NAME_PREFIX;
+        if (isBuiltin) strStream << LGS_RUNTIME_PREFIX;
         else strStream << "u_";
     }
-    if (parentName != "") strStream << parentName << "_";
+    if (parentName != "") {
+        strStream << parentName << "_";
+    }
     strStream << name;
     if (isCoroutine) strStream << LGS_CORO_SUFFIX;
     IRName = strStream.str();
@@ -55,7 +56,6 @@ std::string LgsFuncType::pname() {
         const auto param = params[i];
         if (param.type) {
             str << param.type->pname();
-            if (param.isVariadic) str << "...";
         } else if (param.name != ""){
             str << param.name;
         } else {
@@ -71,7 +71,7 @@ std::string LgsFuncType::pname() {
     return str.str();
 }
 
-std::string LgsFuncType::strFormatPart() const {
+std::string LgsFuncType::fmtStr() const {
     return "%p";
 }
 
@@ -105,6 +105,10 @@ bool LgsFuncType::equals(LgsType* other) {
     return true;
 }
 
+LgsType* LgsFuncType::applyBinOp(LgsType* toType, LgsBinOp& op) {
+    assert(0);
+}
+
 void LgsFuncType::setFuncOptions(const uint32_t ops) {
     isPublic =  ops & PUBLIC;
     isBuiltin =  ops & BUILTIN;
@@ -121,36 +125,6 @@ void LgsFuncType::setFuncOptions(const uint32_t ops) {
     hasDefaults =  ops & HAS_DEFAULTS;
 }
 
-LgsFuncType* LgsFuncType::clone() {
-    const auto lgsFunc = new LgsFuncType();
-    lgsFunc->name = name;
-    lgsFunc->IRName = IRName;
-    lgsFunc->parentName = parentName;
-    lgsFunc->rt = rt ? rt->clone() : nullptr;
-    for (const auto& param : params) {
-        lgsFunc->params.push_back(LgsParam(param));
-    }
-    for (const auto generic : genericParams) {
-        lgsFunc->genericParams.push_back(generic->clone());
-    }
-    lgsFunc->isPublic = isPublic;
-    lgsFunc->isBuiltin = isBuiltin;
-    lgsFunc->isVirtual = isVirtual;
-    lgsFunc->isVariadic = isVariadic;
-    lgsFunc->isLambda = isLambda;
-    lgsFunc->isOptional = isOptional;
-    lgsFunc->isTerminator = isTerminator;
-    lgsFunc->isMethod = isMethod;
-    lgsFunc->isSyscall = isSyscall;
-    lgsFunc->isCoroutine = isCoroutine;
-    lgsFunc->isIOMember = isIOMember;
-    lgsFunc->isExternal = isExternal;
-    lgsFunc->isArrFunc = isArrFunc;
-    lgsFunc->hasDefaults = hasDefaults;
-    lgsFunc->IRType = nullptr;
-    return lgsFunc;
-}
-
 std::unordered_map<std::string, LgsParam*> LgsFuncType::getParamsByName() {
     std::unordered_map<std::string, LgsParam*> paramsByName;
     for (size_t i = 0; i < params.size(); ++i) {
@@ -159,9 +133,15 @@ std::unordered_map<std::string, LgsParam*> LgsFuncType::getParamsByName() {
     return paramsByName;
 }
 
+DIType* LgsFuncType::getDebugType(LgsCgModule& cg) {
+    assert(0);
+}
+
 LgsFuncType::~LgsFuncType() {
-    freeType(rt);
-    if (isMethod) {
+    if (!rt->asObject()) {
+        freeType(rt);
+    }
+    if (isMethod && !params.empty()) {
         params.erase(params.begin());
     }
     freeParams(params);

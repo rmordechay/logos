@@ -9,17 +9,15 @@ public:
 
     LgsMatrixExpr(const size_t rows, const size_t columns) {
         matType = new LgsMatrix(rows, columns);
-        type = matType;
+        setType(matType);
     }
     std::string asText() override;
-    Value* loadIR(LgsLLVMGen& cg) override;
-    void setDebugValue(LgsLLVMGen& cg) override;
+    Value* loadIR(LgsCgModule& cg) override;
+    void setDebugValue(LgsCgModule& cg) override;
     void hashNode(size_t& oldHash) override;
     LgsExpr* castExplicitly(LgsType* toType) override;
     void castImplicitly(LgsType* toType) override;
-    Value* castIR(LgsLLVMGen& cg, LgsType* toType) override;
-    Value* hashValue(LgsLLVMGen& cg) override;
+    Value* hashValue(LgsCgModule& cg) override;
     bool equals(LgsExpr* other) override;
-    LgsExpr* clone() override;
     ~LgsMatrixExpr() override;
 };

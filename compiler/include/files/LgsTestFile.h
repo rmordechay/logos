@@ -1,6 +1,5 @@
 #pragma once
 #include "LgsFile.h"
-#include "funcs/LgsFunc.h"
 
 
 class LgsTestFile final : public LgsFile {

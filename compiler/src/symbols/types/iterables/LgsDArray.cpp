@@ -1,27 +1,11 @@
 #include "types/iterables/LgsDArray.h"
-#include "Lgs_DArray.h"
-#include "codegen/LgsLLVMGen.h"
+#include "Lgs_DArrayExpr.h"
+#include "codegen/LgsCgModule.h"
 #include "exprs/LgsArrayExpr.h"
 #include "exprs/LgsFuncCall.h"
-#include "funcs/LgsFunc.h"
 #include "types/LgsAny.h"
-#include "types/primitives/LgsVoid.h"
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsLong.h"
-#include "types/primitives/LgsSize.h"
-
-LgsFunc* LgsDArray::getMethod(const std::string& methodName) {
-    const auto method = methods.find(methodName);
-    if (method != methods.end()) {
-        if (method->second) {
-            return method->second;
-        }
-        if (methodName == RESERVE_FUNC_NAME) {
-            return getReserveFunc();
-        }
-    }
-    return LgsIterable::getMethod(methodName);
-}
 
 bool LgsDArray::inferBaseType(const std::vector<LgsExpr*>& args) {
     assert(!args.empty());
@@ -35,14 +19,25 @@ bool LgsDArray::inferBaseType(const std::vector<LgsExpr*>& args) {
     return true;
 }
 
-Type* LgsDArray::getIRType(LgsLLVMGen& cg) {
+Type* LgsDArray::getIRType(LgsCgModule& cg) {
     if (IRType) return IRType;
-    IRType = cg.getStructType({cg.ptrTy(), cg.sizeTy(), cg.sizeTy(), cg.ptrTy(), cg.i32Ty()}, name);
+    IRType = cg.getStructType({cg.ptrTy(), cg.sizeTy(), cg.sizeTy(), cg.ptrTy()}, name);
     return IRType;
+}
+
+Constant* LgsDArray::getRTType(LgsCgModule& cg) {
+    const auto genericName = getGenericName();
+    const auto st = cg.getStructType({cg.ptrTy()}, genericName);
+    const auto sv = ConstantStruct::get(st, {baseType->getRTType(cg)});
+    return cg.getRTTypeInfo(genericName, sizeBytes(), sizeof(void*), RTT_DARRAY, sv);
 }
 
 std::string LgsDArray::getName() {
     return name;
+}
+
+std::string LgsDArray::getGenericName() {
+    return name + baseType->getGenericName();
 }
 
 std::string LgsDArray::pname() {
@@ -51,18 +46,14 @@ std::string LgsDArray::pname() {
 }
 
 size_t LgsDArray::sizeBytes() {
-    return sizeof(Lgs_DArray);
+    return sizeof(Lgs_DArrayExpr);
 }
 
 LgsExpr* LgsDArray::getZeroValue() {
     return new LgsArrayExpr(this);
 }
 
-Lgs_TypeKind LgsDArray::getRTTypeKind() {
-    return RTT_DARRAY;
-}
-
-std::string LgsDArray::strFormatPart() const {
+std::string LgsDArray::fmtStr() const {
     if (baseType->asChar()) return "%s";
     return "%p";
 }
@@ -81,49 +72,19 @@ LgsType* LgsDArray::applyBinOp(LgsType* toType, LgsBinOp& op) {
     return nullptr;
 }
 
-LgsFunc* LgsDArray::getAddFunc() {
-    const auto func = methods.find(ADD_FUNC_NAME);
-    if (func != methods.end() && func->second) return func->second;
-    func->second = new LgsFunc(ADD_FUNC_NAME, &LGS_VOID, {this, &LGS_ANY}, BUILTIN | PUBLIC | METHOD);
-    func->second->fn = [](LgsLLVMGen& cg, const std::vector<LgsFuncArg>& args) {
-        return cg.callLgsFunc(std::string(name) + "_add", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {
-            cg.getPtrTo(args[0].expr->IRValue),
-            cg.getPtrTo(args[1].expr->IRValue),
-        });
-    };
-    methods[func->second->funcType->name] = func->second;
-    return func->second;
+Value* LgsDArray::lenIR(LgsCgModule& cg, Value* iterable) {
+    return cg.callLgsFunc("DArray_len", cg.sizeTy(), {cg.ptrTy()}, {iterable});
 }
 
-LgsFunc* LgsDArray::getReserveFunc() {
-    const auto func = methods.find(RESERVE_FUNC_NAME);
-    if (func != methods.end() && func->second) return func->second;
-    func->second = new LgsFunc(RESERVE_FUNC_NAME, &LGS_VOID, {this, &LGS_SIZE}, BUILTIN | PUBLIC | METHOD);
-    methods[func->second->funcType->name] = func->second;
-    return func->second;
-}
-
-Value* LgsDArray::lengthIR(LgsLLVMGen& cg, Value* iterable) {
-    return getLenFunc()->callIR(cg, {iterable});
-}
-
-Value* LgsDArray::inIR(LgsLLVMGen& cg, LgsExpr* iterableExpr, LgsExpr* value) {
-    return cg.callLgsFunc(std::string(name) + "_contains", cg.i1Ty(), {cg.ptrTy(), cg.ptrTy()}, {
+Value* LgsDArray::inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) {
+    return cg.callLgsFunc("DArray_contains", cg.i1Ty(), {cg.ptrTy(), cg.ptrTy()}, {
         iterableExpr->IRValue,
         cg.getPtrTo(value->IRValue),
     });
 }
 
-Value* LgsDArray::getIRElement(LgsLLVMGen& cg, Value* iterable, Value* index) {
+Value* LgsDArray::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
     return cg.callLgsFunc("DArray_get", cg.ptrTy(), {cg.ptrTy(), cg.sizeTy()}, {iterable, index});;
-}
-
-void LgsDArray::initArr(LgsLLVMGen& cg, Value* iterable) {
-    cg.callLgsFunc("DArray_init", cg.voidTy(), {cg.ptrTy(), cg.sizeTy(), cg.i32Ty()}, {
-        iterable,
-        cg.usize(baseType->sizeBytes()),
-        cg.i32(getRTTypeKind()),
-    });
 }
 
 bool LgsDArray::canCastTo(LgsType* other) {
@@ -133,4 +94,32 @@ bool LgsDArray::canCastTo(LgsType* other) {
     if (!baseType) return true;
     if (!otherArr->baseType) return true;
     return baseType->canCastTo(otherArr->baseType);
+}
+
+DIType* LgsDArray::getDebugType(LgsCgModule& cg) {
+    const auto di = cg.debugger.diBuilder;
+    const auto file = cg.debugger.diFile;
+    constexpr auto ptrSizeInBits = sizeof(void*) * 8;
+    const auto t_data = di->createPointerType(di->createBasicType("char", 8, dwarf::DW_ATE_unsigned_char), ptrSizeInBits);
+    const auto t_length = di->createBasicType("size_t", ptrSizeInBits, dwarf::DW_ATE_unsigned);
+    const auto t_capacity = t_length;
+    const auto t_base = di->createPointerType(baseType->getDebugType(cg), ptrSizeInBits);
+    Metadata* fields[] = {
+        di->createMemberType(nullptr, "data", file, 0, ptrSizeInBits, ptrSizeInBits, 0, DINode::FlagZero, t_data),
+        di->createMemberType(nullptr, "length", file, 0, ptrSizeInBits, ptrSizeInBits, ptrSizeInBits,DINode::FlagZero, t_length),
+        di->createMemberType(nullptr, "capacity", file, 0, ptrSizeInBits, ptrSizeInBits, sizeof(void*) * 16,DINode::FlagZero, t_capacity),
+        di->createMemberType(nullptr, "baseType", file, 0, ptrSizeInBits, ptrSizeInBits, sizeof(void*) * 24,DINode::FlagZero, t_base)
+    };
+
+    return di->createStructType(
+        cg.debugger.subprogram,
+        "Lgs_DArrayExpr",
+        file,
+        0,
+        ptrSizeInBits * 4,
+        ptrSizeInBits,
+        DINode::FlagZero,
+        nullptr,
+        di->getOrCreateArray(fields)
+    );
 }
