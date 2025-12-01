@@ -122,7 +122,7 @@ std::string LgsFuncCall::asText() {
 }
 
 void LgsFuncCall::setDebugValue(LgsCgModule& cg) {
-    // cg.builder.SetCurrentDebugLocation(cg.getDebugLoc(location));
+    setDebugLoc(cg);
 }
 
 bool argAndParamEqual(const LgsExpr* arg, const LgsParam* param) {

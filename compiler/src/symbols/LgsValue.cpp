@@ -8,3 +8,7 @@ Value* LgsValue::loadIR(LgsCgModule& cg) {
 void LgsValue::hashNode(size_t& oldHash) {
     assert(0);
 }
+
+void LgsValue::setDebugLoc(LgsCgModule& cg) const {
+    cg.builder.SetCurrentDebugLocation(cg.getDebugLoc(location));
+}

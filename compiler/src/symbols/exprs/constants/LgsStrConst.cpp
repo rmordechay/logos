@@ -42,7 +42,7 @@ bool LgsStrConst::equals(LgsExpr* other) {
 }
 
 void LgsStrConst::setDebugValue(LgsCgModule& cg) {
-    cg.builder.SetCurrentDebugLocation(cg.getDebugLoc(location));
+    setDebugLoc(cg);
 }
 
 LgsStrConst::~LgsStrConst() {

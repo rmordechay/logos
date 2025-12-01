@@ -4,7 +4,7 @@
 #include "funcs/LgsFunc.h"
 
 void LgsReturn::setDebugValue(LgsCgModule& cg) {
-    cg.builder.SetCurrentDebugLocation(cg.getDebugLoc(location));
+    setDebugLoc(cg);
 }
 
 LgsReturn::~LgsReturn() {

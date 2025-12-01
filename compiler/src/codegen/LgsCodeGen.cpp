@@ -1254,15 +1254,6 @@ void LgsCodeGen::createEpilogue(const LgsFunc* func) const {
         cg.callPopStack();
         cg.builder.CreateRetVoid();
     }
-    if (appConfigs.debugMode) {
-        const auto endLoc = DILocation::get(
-            cg.debugger.subprogram->getContext(),
-            func->location.lineEnd,
-            func->location.columnEnd,
-            cg.debugger.subprogram
-        );
-        cg.builder.SetCurrentDebugLocation(endLoc);
-    }
 }
 
 void LgsCodeGen::initMainArgs(const LgsMainFunc* mainFunc) const {

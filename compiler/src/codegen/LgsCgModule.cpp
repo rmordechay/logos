@@ -437,7 +437,7 @@ void LgsCgModule::finalizeDebugger(const fs::path& buildPath) const {
 llvm::DILocation* LgsCgModule::getDebugLoc(const LgsLocation& location) {
     return llvm::DILocation::get(
         context,
-        location.lineStart,
+        location.lineStart + 1,
         location.columnStart,
         debugger.subprogram,
         debugger.subprogram->getScope()
