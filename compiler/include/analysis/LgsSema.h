@@ -2,6 +2,7 @@
 #include "logos/LgsStack.h"
 #include "errors/LgsErrHandler.h"
 #include "analysis/LgsTypeResolver.h"
+#include "exprs/LgsJson.h"
 #include "files/LgsEnvFile.h"
 #include "logos/LgsAppConfigs.h"
 #include <unordered_map>
@@ -102,7 +103,6 @@ public:
     void visitTernaryExpr(LgsTernaryExpr* ternary);
     void visitCast(LgsCast* cast);
     void visitNullableExpr(LgsNullableExpr* nullableExpr);
-    void visitNull(LgsNull* null);
     void visitArrayExpr(LgsArrayExpr* arrayExpr);
     void visitStaticArray(const LgsArrayExpr* arrayExpr);
     void visitDynamicArray(LgsArrayExpr* arrayExpr);
@@ -124,6 +124,8 @@ public:
     void visitStrConst(const LgsStrConst* strConst);
     void visitTypeExpr(LgsTypeExpr* typeExpr);
     void visitJson(const LgsJson* json);
+    void visitJsonArr(const LgsJsonArray* jsonArr);
+    void visitJsonObj(const LgsJsonObject* jsonObj);
     void visitInstance(LgsInstance* instance);
     void visitInterfaceInstance(LgsInstance* instance, LgsInterface* interface);
     void visitIterIndex(LgsIterIndex* iterIndex);
@@ -143,7 +145,7 @@ public:
     static bool validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const LgsFunc* func);
 
     void resolveImports() const;
-    void addHeapExpr(LgsExpr* expr);
+    void addHeapExpr(LgsExpr* expr) const;
     void addLocalSymbol(const LgsSymbol& newSymbol);
     LgsSymbol* getSymbol(const std::string& name, const LgsLocation* location);
     void createCoroutineFunc(LgsFuncCall* funcCall);

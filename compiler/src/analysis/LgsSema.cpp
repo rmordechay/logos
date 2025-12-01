@@ -194,7 +194,7 @@ void LgsSema::visitMainFunc(LgsMainFunc* mainFunc) {
         }
         // Replaces dyn array to static array
         freeType(firstParam.type);
-        const auto sArray = new LgsSArray(new LgsStr(), LGS_INT.getZeroValue());
+        const auto sArray = new LgsSArray(new LgsStr(), static_cast<size_t>(0));
         firstParam.setType(sArray);
         firstParam.expr = new LgsArrayExpr(sArray);
     }
@@ -671,7 +671,6 @@ void LgsSema::visitExpr(LgsExpr*& expr) {
         else if (const auto vecExpr = expr->asVectorExpr()) visitVectorExpr(vecExpr);
         else if (const auto matrixExpr = expr->asMatrixExpr()) visitMatrixExpr(matrixExpr);
         else if (const auto nullableExpr = expr->asNullableExpr()) visitNullableExpr(nullableExpr);
-        else if (const auto null = expr->asNull()) visitNull(null);
         else if (const auto castExpr = expr->asCast()) visitCast(castExpr);
         else if (const auto json = expr->asJson()) visitJson(json);
     }
@@ -730,10 +729,6 @@ void LgsSema::visitNullableExpr(LgsNullableExpr* nullableExpr) {
     if (!nullableExpr->type || !nullableExpr->baseExpr->type->asNullable()) {
         nullableExpr->type = new LgsNullable(nullableExpr->baseExpr->type);
     }
-}
-
-void LgsSema::visitNull(LgsNull* null) {
-
 }
 
 void LgsSema::visitArrayExpr(LgsArrayExpr* arrayExpr) {
@@ -1163,7 +1158,35 @@ void LgsSema::visitTypeExpr(LgsTypeExpr* typeExpr) {
 }
 
 void LgsSema::visitJson(const LgsJson* json) {
-    assert(0);
+    switch (json->jsonType->kind) {
+    case JSON_OBJECT:
+        visitJsonObj(json->obj);
+        break;
+    case JSON_ARRAY:
+        visitJsonArr(json->arr);
+        break;
+    case JSON_STRING:
+        visitStrConst(json->strConst);
+        break;
+    case JSON_NULL:
+    case JSON_INT:
+    case JSON_FLOAT:
+        break;
+    case JSON_UNKNOWN:
+        assert(0);
+    }
+}
+
+void LgsSema::visitJsonArr(const LgsJsonArray* jsonArr) {
+    for (const auto element : jsonArr->elements) {
+        visitJson(element);
+    }
+}
+
+void LgsSema::visitJsonObj(const LgsJsonObject* jsonObj) {
+    for (auto &[_, v] : jsonObj->entries) {
+        visitJson(v);
+    }
 }
 
 void LgsSema::visitInstance(LgsInstance* instance) {
@@ -1539,7 +1562,7 @@ void LgsSema::resolveImports() const {
     }
 }
 
-void LgsSema::addHeapExpr(LgsExpr* expr) {
+void LgsSema::addHeapExpr(LgsExpr* expr) const {
     if (!expr->type || !expr->type->isHeapAlloc) return;
     if (expr->asVariable()) return;
     const auto currentFunc = stack.currentFunc();

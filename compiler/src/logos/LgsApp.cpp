@@ -14,6 +14,7 @@
 #include "lgsc/LgsCCompiler.h"
 #include "parser/LgsParser.h"
 #include "LgsUtils.h"
+#include "files/LgsAppConfigFile.h"
 #include "types/iterables/LgsVec.h"
 #include "types/primitives/LgsByte.h"
 #include "types/primitives/LgsDouble.h"
@@ -327,17 +328,16 @@ bool LgsApp::generateRTTTypes() {
     }
 
     for (const auto srcFile : srcFiles) {
+        if (const auto mainFile = dynamic_cast<LgsMainFile*>(srcFile)) {
+            for (const auto object : mainFile->objects) {
+                object->getRTType(rttTypeModule);
+                for (const auto innerObj : object->objects) {
+                    innerObj->getRTType(rttTypeModule);
+                }
+            }
+        }
         for (const auto type : srcFile->symbolTable.rttTypes) {
             type->getRTType(rttTypeModule);
-        }
-    }
-
-    if (const auto mainFile = getMainFile()) {
-        for (const auto object : mainFile->objects) {
-            object->getRTType(rttTypeModule);
-            for (const auto innerObj : object->objects) {
-                innerObj->getRTType(rttTypeModule);
-            }
         }
     }
 

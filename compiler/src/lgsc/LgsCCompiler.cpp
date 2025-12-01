@@ -22,7 +22,7 @@ void LgsCCompiler::initCompiler() {
     clang::TargetOptions& targetOpts = compiler.getInvocation().getTargetOpts();
     auto& headerSearchOptions = compiler.getHeaderSearchOpts();
 
-    targetOpts.Triple = llvm::sys::getDefaultTargetTriple();
+    targetOpts.Triple = sys::getDefaultTargetTriple();
     headerSearchOptions.UseBuiltinIncludes = true;
     headerSearchOptions.UseStandardSystemIncludes = true;
 

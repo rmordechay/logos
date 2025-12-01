@@ -426,3 +426,4 @@ void freeType(const LgsType* type) {
     if (type->isPrimitive) return;
     delete type;
 }
+

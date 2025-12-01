@@ -1,5 +1,6 @@
 #pragma once
 #include "LgsIterable.h"
+#include "exprs/constants/LgsIntConst.h"
 
 class LgsSArray final : public LgsIterable {
 public:
@@ -9,6 +10,7 @@ public:
         isStatic = true;
         passByRef = true;
     }
+    explicit LgsSArray(LgsType* baseType, const size_t size): LgsSArray(baseType, new LgsIntConst(size)) {}
     Type* getIRType(LgsCgModule& cg) override;
     std::string getName() override;
     std::string pname() override;

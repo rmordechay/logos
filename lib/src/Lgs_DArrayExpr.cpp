@@ -1,4 +1,7 @@
 #include "Lgs_DArrayExpr.h"
+
+#include "Lgs_Helpers.h"
+#include "Lgs_Runtime.h"
 #include "Lgs_Types.h"
 #include <cassert>
 #include <cstdlib>

@@ -100,7 +100,7 @@ LgsExpr* LgsMatrix::getZeroValue() {
 }
 
 LgsType* LgsMatrix::getValueType() {
-    return new LgsSArray(baseType, new LgsIntConst(&LGS_INT, columns));
+    return new LgsSArray(baseType, new LgsIntConst(columns));
 }
 
 Constant* LgsMatrix::getRTType(LgsCgModule& cg) {

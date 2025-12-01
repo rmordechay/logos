@@ -1,16 +1,20 @@
 #pragma once
-#include "parser/LgsLexer.h"
-#include "files/LgsAppConfigFile.h"
-#include "exprs/LgsJson.h"
-#include "loops/LgsForeachLoop.h"
+#include "LgsBinaryTokens.h"
+#include "LgsTokens.h"
 #include "errors/LgsErrHandler.h"
-#include "errors/LgsPlmErrors.h"
-#include "exprs/LgsFuncCall.h"
-#include "funcs/LgsMainFunc.h"
 #include "lgsc/LgsCCompiler.h"
 #include "stmts/LgsAssignment.h"
-#include "stmts/LgsStmtsBlock.h"
 
+class LgsJsonObject;
+class LgsJsonArray;
+class LgsMetaVar;
+struct LgsImportPackage;
+class LgsStmtsBlock;
+class LgsMainFunc;
+class LgsMap;
+class LgsFuncType;
+class LgsAppConfigFile;
+struct LgsGlobals;
 struct LgsFileMetadata;
 class LgsMetaSelection;
 class LgsMatrixExpr;
@@ -160,13 +164,13 @@ public:
 
     // JSON
     LgsJson* parseJson();
-    LgsJsonObject* parseJsonObject();
-    LgsJsonArray* parseJsonArray();
     LgsJson* parseJsonValue();
+    LgsJson* parseJsonPrimitive();
+    LgsJsonArray* parseJsonArray();
+    LgsJsonObject* parseJsonObject();
 
     void parseArgs(LgsInstance* instance);
     void parsePackageString(LgsImportPackage& pkg, const LgsToken& importToken);
-    void parseJsonPrimitive(LgsJson* json);
     void parseImports(std::vector<LgsStrConst*>& cImports);
     void parseCIncludes(std::vector<LgsStrConst*>& cImports);
     void parseCImports(std::vector<LgsStrConst*> externalImports, LgsFile* file);
