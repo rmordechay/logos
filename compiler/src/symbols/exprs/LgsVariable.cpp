@@ -4,7 +4,6 @@
 #include "funcs/LgsParam.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
-#include "LgsUtils.h"
 #include <codegen/LgsCgModule.h>
 
 Value* LgsVariable::loadIR(LgsCgModule& cg) {

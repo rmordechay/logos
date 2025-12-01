@@ -23,7 +23,8 @@ bool LgsVarDec::shouldAllocate() const {
 }
 
 void LgsVarDec::setDebugValue(LgsCgModule& cg) {
-    cg.builder.SetCurrentDebugLocation(cg.getDebugLoc(location));
+    const auto dl = cg.getDebugLoc(location);
+    cg.builder.SetCurrentDebugLocation(dl);
     const auto var = cg.debugger.diBuilder->createAutoVariable(
         cg.debugger.subprogram,
         name,
@@ -35,7 +36,7 @@ void LgsVarDec::setDebugValue(LgsCgModule& cg) {
         IRValue,
         var,
         cg.debugger.diBuilder->createExpression(),
-        cg.getDebugLoc(location),
+        dl,
         cg.builder.GetInsertBlock()
     );
 }

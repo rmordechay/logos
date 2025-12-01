@@ -168,7 +168,6 @@ void LgsFunc::setDebugValue(LgsCgModule& cg) {
     const auto irFunc = getIRFunc(cg);
     irFunc->addFnAttr("frame-pointer", "all");
     irFunc->setSubprogram(cg.debugger.subprogram);
-    cg.builder.SetCurrentDebugLocation(cg.getDebugLoc(location));
 }
 
 LgsFunc::~LgsFunc() {

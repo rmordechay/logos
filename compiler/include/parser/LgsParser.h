@@ -85,11 +85,11 @@ public:
     bool scanTokens();
     LgsFile* parseSrcFile(bool isTestRun);
     LgsFile* parseSrcFileHeaders();
-    LgsEnvFile* parseEnvFile();
     LgsMainFile* parseMainFile();
     LgsAppConfigFile* parseAppConfigFile();
     LgsObjectFile* parseObjectFile();
     LgsInterfaceFile* parseInterfaceFile();
+    LgsEnvFile* parseEnvFile();
     LgsTestFile* parseTestFile();
 
     // Object
@@ -171,8 +171,8 @@ public:
     void parseCIncludes(std::vector<LgsStrConst*>& cImports);
     void parseCImports(std::vector<LgsStrConst*> externalImports, LgsFile* file);
 
+    void setLocation(LgsLocation& location, const LgsToken* startToken, const LgsToken* endToken) const;
     void addFileSymbol(LgsMainFile* file, const LgsSymbol& newSymbol);
-    void setLocation(LgsLocation& location, const LgsToken* token) const;
     void extractStrParts(LgsStrConst& strConst);
     void validateTestFolder(const LgsFile* testFile);
     bool isImportName(LgsExpr* expr) const;
