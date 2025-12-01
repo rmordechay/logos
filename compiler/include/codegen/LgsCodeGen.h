@@ -116,13 +116,13 @@ public:
     void visitIntConst(LgsIntConst* intConst) const;
     void visitConstant(LgsExpr* expr);
     void visitFloatConst(LgsFloatConst* floatConst) const;
-    void visitArrayExpr(LgsArrayExpr* array);
-    void visitDynamicArray(LgsArrayExpr* arrayExpr);
-    void visitHashMap(LgsHashMap* hashMap);
-    void visitSetExpr(LgsArrayExpr* arrayExpr);
+    void visitArrayExpr(LgsArrayExpr* arrayExpr);
+    void visitStaticArray(LgsArrayExpr* arrayExpr) const;
+    void visitDynamicArray(LgsArrayExpr* arrayExpr) const;
+    void visitSetExpr(LgsArrayExpr* arrayExpr) const;
     void visitVectorExpr(LgsVectorExpr* vectorExpr);
     void visitMatrixExpr(LgsMatrixExpr* matrixExpr);
-    void visitStaticArray(LgsArrayExpr* arrayExpr);
+    void visitHashMap(LgsHashMap* hashMap);
     void visitEnvVar(LgsEnvVar* envVar) const;
     void visitVariable(LgsVariable* variable);
     void visitSelection(LgsSelection* selection, bool assign = false);
@@ -145,8 +145,6 @@ public:
     Value* getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) const;
     Function* getThunkFunc(LgsFuncCall* fc, Type* ctxTy) const;
 
-    // Iterables
-    void setSArrElements(const LgsArrayExpr* arrayExpr);
     void createMapFunc(LgsFunc* func);
     void createFilterFunc(LgsFunc* func);
 

@@ -1,8 +1,6 @@
 #include "stmts/LgsStmt.h"
 #include "funcs/LgsCoroutine.h"
 #include "exprs/LgsFuncCall.h"
-#include "exprs/LgsPostfixExpr.h"
-#include "exprs/LgsSelection.h"
 #include "stmts/LgsAssignment.h"
 #include "stmts/LgsBreak.h"
 #include "stmts/LgsContinue.h"
@@ -13,8 +11,6 @@
 #include "stmts/LgsDeferStmt.h"
 #include "stmts/LgsIOStmt.h"
 #include "stmts/LgsSwitch.h"
-
-class LgsIOStmt;
 
 LgsForLoop* LgsStmt::asLoop() { return dynamic_cast<LgsForLoop*>(this); }
 LgsCoroutine* LgsStmt::asCoroutine() { return dynamic_cast<LgsCoroutine*>(this); }

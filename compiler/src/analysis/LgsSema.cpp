@@ -282,7 +282,10 @@ void LgsSema::visitStmtsBlock(LgsStmtsBlock* stmtsBlock) {
     }
     if (stmtsBlock->stmts.empty()) return;
     const auto lastStmt = stmtsBlock->stmts[stmtsBlock->stmts.size() - 1];
-    stmtsBlock->returnStmt = lastStmt.stmt->asReturn();
+    if (lastStmt.type == LgsStmtWrapper::Type::Stmt) {
+        stmtsBlock->returnStmt = lastStmt.stmt->asReturn();
+    }
+    // Check unreachable code
     for (size_t i = 0; i < stmtsBlock->stmts.size() - 1; ++i) {
         if (stmtsBlock->stmts[i].isTerminator()) {
             return addError(E10059, lastStmt.stmt->location);
