@@ -1,6 +1,4 @@
 #include "Lgs_DArrayExpr.h"
-
-#include "Lgs_Helpers.h"
 #include "Lgs_Runtime.h"
 #include "Lgs_Types.h"
 #include <cassert>
@@ -60,7 +58,10 @@ extern "C" void Lgs_DArray_put(const Lgs_DArrayExpr* arr, const size_t index, co
 }
 
 extern "C" void* Lgs_DArray_get(const Lgs_DArrayExpr* arr, const int64_t index) {
-    if (!arr || arr->length == 0) assert(0);
+    if (index >= arr->length) {
+        Lgs_exitWithErrors(E10003);
+        return nullptr;
+    }
     size_t actualIndex;
     if (index >= 0) {
         actualIndex = index;

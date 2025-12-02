@@ -80,6 +80,11 @@ extern "C" void Lgs_Runtime_throwError(const char* msg) {
     exit(1);
 }
 
+void Lgs_exitWithErrors(const LgsBaseMsg& baseMsg, const std::vector<std::string>& args) {
+    printCliError(baseMsg, args);
+    exit(1);
+}
+
 static void freeValue(void* ptr, const Lgs_TypeInfo* type) {
     std::cout << "Freeing: " << ptr << '\n';
     switch (type->kind) {

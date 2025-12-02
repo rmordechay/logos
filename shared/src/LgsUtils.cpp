@@ -68,23 +68,6 @@ bool isLogosKeyword(const std::string& s) {
     return LGS_KEYWORDS.contains(s);
 }
 
-void printCliError(const LgsBaseMsg& err, const std::vector<std::string>& args) {
-    const auto errMsg = formatErrorMsg(err.msg, args) + '\n';
-    logError(errMsg);
-}
-
-std::string formatErrorMsg(const std::string& msg, const std::vector<std::string>& args) {
-    size_t pos = 0;
-    size_t argIndex = 0;
-    auto result = std::string(msg);
-    while ((pos = result.find(MSG_PLACEHOLDER, pos)) != std::string::npos && argIndex < args.size()) {
-        result.replace(pos, std::strlen(MSG_PLACEHOLDER), args[argIndex]);
-        pos += args[argIndex].length();
-        argIndex++;
-    }
-    return result;
-}
-
 std::string getFileText(const fs::path& filePath) {
     if (!fs::exists(filePath)) return "";
     std::ifstream file(filePath);
@@ -179,6 +162,23 @@ void logError(const std::string& msg, const std::string& epilogue) {
 
 void logWarning(const std::string& msg) {
     logInfo(LGS_COLORIZE(LGS_WARNING_TEXT, LGS_MSG_COLOR_YELLOW) + msg);
+}
+
+void printCliError(const LgsBaseMsg& err, const std::vector<std::string>& args) {
+    const auto errMsg = formatErrorMsg(err.msg, args) + '\n';
+    logError(errMsg);
+}
+
+std::string formatErrorMsg(const std::string& msg, const std::vector<std::string>& args) {
+    size_t pos = 0;
+    size_t argIndex = 0;
+    auto result = std::string(msg);
+    while ((pos = result.find(MSG_PLACEHOLDER, pos)) != std::string::npos && argIndex < args.size()) {
+        result.replace(pos, std::strlen(MSG_PLACEHOLDER), args[argIndex]);
+        pos += args[argIndex].length();
+        argIndex++;
+    }
+    return result;
 }
 
 void combineNodeHash(size_t& oldHash, const size_t newHash) {
