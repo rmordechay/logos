@@ -1,10 +1,11 @@
 #pragma once
 
+#include "exprs/LgsNullableExpr.h"
+
 #include <sstream>
 
 class LgsSubType;
 class LgsEnum;
-class LgsNull;
 class LgsIntConst;
 class LgsMetaVar;
 class LgsJson;
@@ -96,6 +97,7 @@ public:
     void parseCoroutine(const LgsCoroutine* coroutine);
     void parseDeferStmt(const LgsDeferStmt* deferStmt);
     void parseIOStmt(const LgsIOStmt* ioStmt);
+    void parseNullableExpr(LgsNullableExpr* null);
     void parseExpr(LgsExpr* expr);
     void parseBinaryExpr(const LgsBinaryExpr* binaryExpr);
     void parseTernaryExpr(LgsTernaryExpr* ternary);
@@ -112,7 +114,6 @@ public:
     void parseTypeExpr(LgsTypeExpr* typeExpr);
     void parseJson(const LgsJson* jsonStmt);
     void parseInstance(LgsInstance* instance);
-    void parseNull(LgsNull* null);
     void parseIntConst(const LgsIntConst* intConst);
     void parseInterfaceInstance(LgsInstance* instance, LgsInterface* interface);
     void parseIterIndex(LgsIterIndex* iterIndex);

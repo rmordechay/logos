@@ -14,7 +14,6 @@
 #include "exprs/LgsInstance.h"
 #include "exprs/LgsIterIndex.h"
 #include "exprs/LgsJson.h"
-#include "exprs/LgsNull.h"
 #include "exprs/LgsPostfixExpr.h"
 #include "exprs/LgsPrefixExpr.h"
 #include "exprs/LgsSelection.h"
@@ -641,7 +640,6 @@ void LgsCodeGen::visitExpr(LgsExpr* expr, const bool assign) {
         else if (const auto matrixExpr = expr->asMatrixExpr()) visitMatrixExpr(matrixExpr);
         else if (const auto loopMetaVar = expr->asLoopMetaVar()) visitLoopMetaVar(loopMetaVar);
         else if (const auto nullableExpr = expr->asNullableExpr()) visitNullableExpr(nullableExpr);
-        else if (const auto null = expr->asNull()) visitNull(null);
         else if (const auto cast = expr->asCast()) visitCast(cast);
         else if (const auto json = expr->asJson()) visitJson(json);
     }
@@ -691,6 +689,10 @@ void LgsCodeGen::visitTernaryExpr(LgsTernaryExpr* ternaryExpr) {
 }
 
 void LgsCodeGen::visitNullableExpr(LgsNullableExpr* nullableExpr) {
+    if (nullableExpr->isNull) {
+        nullableExpr->IRValue = cg.null();
+        return;
+    }
     const auto baseExpr = nullableExpr->baseExpr;
     visitExpr(baseExpr);
     if (baseExpr->type->passByRef) {
@@ -707,10 +709,6 @@ void LgsCodeGen::visitNullableExpr(LgsNullableExpr* nullableExpr) {
     if (baseExpr && !baseExpr->type->passByRef) {
         nullableExpr->IRValue = nullableExpr->loadIR(cg);
     }
-}
-
-void LgsCodeGen::visitNull(LgsNull* null) const {
-    null->IRValue = cg.null();
 }
 
 void LgsCodeGen::visitCast(LgsCast* cast) {

@@ -7,7 +7,7 @@
 #include "types/iterables/LgsVariadic.h"
 
 #include <sstream>
-bool argAndParamEqual(const LgsExpr* arg, const LgsParam* param);
+bool argAndParamEqual(LgsExpr* arg, const LgsParam* param);
 
 Value* LgsFuncCall::loadIR(LgsCgModule& cg) {
     return IRValue;
@@ -125,7 +125,8 @@ void LgsFuncCall::setDebugValue(LgsCgModule& cg) {
     setDebugLoc(cg);
 }
 
-bool argAndParamEqual(const LgsExpr* arg, const LgsParam* param) {
+bool argAndParamEqual(LgsExpr* arg, const LgsParam* param) {
+    if (arg->asNull()) return true;
     const auto argType = arg->type;
     if (!argType) return false;
     if (const auto nullable = param->type->asNullable()) {

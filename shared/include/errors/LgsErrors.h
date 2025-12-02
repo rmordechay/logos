@@ -17,8 +17,8 @@ struct LgsLocation {
  */
 struct LgsBaseMsg {
     const char* const msg;
-    size_t const code;
-    LgsBaseMsg(const char* msg, const size_t code) : msg(msg), code(code) {}
+    size_t const errCode;
+    LgsBaseMsg(const char* msg, const size_t code) : msg(msg), errCode(code) {}
 };
 
 struct LgsError {
@@ -81,7 +81,7 @@ inline LgsBaseMsg E10044{"Value of switch case must be known at compile time. Gi
 inline LgsBaseMsg E10045{"Variadic argument cannot have default arguments.", errCodeStart++};
 inline LgsBaseMsg E10046{"%s is not callable.", errCodeStart++};
 inline LgsBaseMsg E10047{"External %s file '%s' was not found.", errCodeStart++};
-inline LgsBaseMsg E10048{"Index %s is out of bounds. Max expected index: %s", errCodeStart++};
+inline LgsBaseMsg E10048{"Index %s is out of bounds. Iterable length: %s", errCodeStart++};
 inline LgsBaseMsg E10049{"Not enough information to infer type of %s.", errCodeStart++};
 inline LgsBaseMsg E10050{"Only integer values can be incremented (++) or decremented (--). Given: %s.", errCodeStart++};
 inline LgsBaseMsg E10051{"%s is constant and cannot be overwritten.", errCodeStart++};

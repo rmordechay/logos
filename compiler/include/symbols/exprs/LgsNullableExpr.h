@@ -4,9 +4,11 @@
 
 class LgsNullableExpr final : public LgsExpr {
 public:
-    LgsExpr* baseExpr;
+    LgsExpr* baseExpr = nullptr;
+    bool isNull = false;
 
     explicit LgsNullableExpr(LgsExpr* baseExpr): baseExpr(baseExpr) {}
+    explicit LgsNullableExpr(const bool isNull): isNull(isNull) {}
     std::string asText() override;
     Value* loadIR(LgsCgModule& cg) override;
     void setDebugValue(LgsCgModule& cg) override;

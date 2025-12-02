@@ -15,6 +15,7 @@ public:
     LgsExpr* getZeroValue() override;
     std::string getName() override;
     std::string pname() override;
+    Value* eqIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
     bool canCastTo(LgsType* other) override;
     LgsType* applyBinOp(LgsType* toType, LgsBinOp& op) override;
     size_t sizeBytes() override;

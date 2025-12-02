@@ -2,7 +2,6 @@
 #include "exprs/LgsArrayExpr.h"
 #include "exprs/LgsBinaryExpr.h"
 #include "exprs/LgsFuncCall.h"
-#include "exprs/LgsNull.h"
 #include "exprs/LgsSelection.h"
 #include "exprs/LgsTernaryExpr.h"
 #include "exprs/LgsVariable.h"
@@ -313,6 +312,10 @@ void LgsJsonParser::parseIOStmt(const LgsIOStmt* ioStmt) {
     closeObject();
 }
 
+void LgsJsonParser::parseNullableExpr(LgsNullableExpr* null) {
+    assert(0);
+}
+
 void LgsJsonParser::parseExpr(LgsExpr* expr) {
     if (!expr) return;
     if (const auto ternaryExpr = dynamic_cast<LgsTernaryExpr*>(expr)) {
@@ -334,7 +337,7 @@ void LgsJsonParser::parseExpr(LgsExpr* expr) {
         if (const auto prefixExpr = expr->asPrefixExpr()) return parsePrefixExpr(prefixExpr);
         if (const auto forVar = expr->asLoopMetaVar()) return parseLoopMetaVar(forVar);
         if (const auto vecExpr = expr->asVectorExpr()) return parseVectorExpr(vecExpr);
-        if (const auto null = expr->asNull()) return parseNull(null);
+        if (const auto null = expr->asNullableExpr()) return parseNullableExpr(null);
         if (const auto castExpr = expr->asCast()) return parseCast(castExpr);
         if (const auto jsonExpr = expr->asJson()) return parseJson(jsonExpr);
         assert(0);
@@ -444,10 +447,6 @@ void LgsJsonParser::parseJson(const LgsJson* jsonStmt) {
 }
 
 void LgsJsonParser::parseInstance(LgsInstance* instance) {
-    assert(0);
-}
-
-void LgsJsonParser::parseNull(LgsNull* null) {
     assert(0);
 }
 

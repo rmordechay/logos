@@ -6,6 +6,7 @@ std::string LgsNullableExpr::asText() {
 }
 
 Value* LgsNullableExpr::loadIR(LgsCgModule& cg) {
+    if (isNull) return IRValue;
     return cg.builder.CreateLoad(type->getIRType(cg), IRValue);
 }
 

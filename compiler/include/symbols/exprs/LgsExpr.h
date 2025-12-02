@@ -8,7 +8,6 @@ class LgsMatrixExpr;
 class LgsNullableExpr;
 class LgsEnvVar;
 class LgsBinaryExpr;
-class LgsNull;
 class LgsJson;
 class LgsCast;
 class LgsTypeExpr;
@@ -54,7 +53,7 @@ public:
     virtual bool equals(LgsExpr* other);
     virtual std::string asText() = 0;
 
-    LgsNull* asNull();
+    bool asNull();
     LgsFunc* asFunc();
     LgsVariable* asVariable();
     LgsPrefixExpr* asPrefixExpr();

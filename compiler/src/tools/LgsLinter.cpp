@@ -177,10 +177,6 @@ void LgsLinter::visitInstance(LgsInstance* instance) {
     assert(0);
 }
 
-void LgsLinter::visitNull(LgsNull* null) {
-    assert(0);
-}
-
 void LgsLinter::visitIntConst(const LgsIntConst* intConst) {
     assert(0);
 }

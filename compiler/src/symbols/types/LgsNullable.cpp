@@ -1,7 +1,5 @@
 #include "types/LgsNullable.h"
 #include "codegen/LgsCgModule.h"
-#include "LgsDefinitions.h"
-#include "exprs/LgsNull.h"
 #include "exprs/LgsNullableExpr.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsBool.h"
@@ -15,7 +13,7 @@ LgsFunc* LgsNullable::getMethod(const std::string& methodName) {
 }
 
 Type* LgsNullable::getIRType(LgsCgModule& cg) {
-    if (baseType->passByRef) return cg.ptrTy();
+    if (!baseType || baseType->passByRef) return cg.ptrTy();
     return cg.getStructType({baseType->getIRType(cg), cg.i1Ty()}, "nullable_" + baseType->getName());
 }
 
@@ -43,7 +41,7 @@ Constant* LgsNullable::getRTType(LgsCgModule& cg) {
 }
 
 LgsExpr* LgsNullable::getZeroValue() {
-    return new LgsNullableExpr(new LgsNull());
+    return new LgsNullableExpr(true);
 }
 
 std::string LgsNullable::getName() {
@@ -54,11 +52,27 @@ std::string LgsNullable::pname() {
     return baseType ? baseType->getName() + '?' : name;
 }
 
+Value* LgsNullable::eqIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+    const auto l = left->asNullableExpr();
+    const auto r = right->asNullableExpr();
+    if (l && r) {
+        if (l->isNull && r->isNull) return cg.true_();
+        if (r->isNull) return cg.builder.CreateIsNull(left->IRValue);
+        if (l->isNull) return cg.builder.CreateIsNull(right->IRValue);
+    } else if (l && l->isNull) {
+        return cg.builder.CreateIsNull(right->IRValue);
+    } else if (r && r->isNull) {
+        return cg.builder.CreateIsNull(left->IRValue);
+    }
+    return cg.builder.CreateICmpEQ(left->loadIR(cg), right->loadIR(cg));
+}
+
 bool LgsNullable::canCastTo(LgsType* other) {
     if (baseType->isVoid() && !other->isVoid()) return false;
     if (other->getName() == LgsAny::name) return true;
     const auto otherNullable = other->asNullable();
     if (!otherNullable) return false;
+    if (!otherNullable->baseType) return true; // meaning null
     if (!baseType) return true;
     return baseType->canCastTo(otherNullable->baseType);
 }

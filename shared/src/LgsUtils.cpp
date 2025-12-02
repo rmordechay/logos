@@ -139,7 +139,7 @@ time_t getLastWritten(const fs::path& filePath) {
     const auto ftime = fs::last_write_time(filePath);
     const auto sctp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(
         ftime - fs::file_time_type::clock::now() + std::chrono::system_clock::now()
-        );
+    );
     return std::chrono::system_clock::to_time_t(sctp);
 }
 

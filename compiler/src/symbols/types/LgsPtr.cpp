@@ -1,11 +1,8 @@
 #include "types/LgsPtr.h"
-
-#include "exprs/LgsNull.h"
 #include "types/LgsAny.h"
 #include "types/iterables/LgsDArray.h"
 #include "types/iterables/LgsSArray.h"
 #include "types/primitives/LgsLong.h"
-#include "LgsUtils.h"
 #include "exprs/LgsNullableExpr.h"
 
 std::string LgsPtr::getName() {
@@ -29,7 +26,7 @@ size_t LgsPtr::sizeBytes() {
 }
 
 LgsExpr* LgsPtr::getZeroValue() {
-    return new LgsNullableExpr(new LgsNull());
+    return new LgsNullableExpr(true);
 }
 
 bool LgsPtr::canCastTo(LgsType* other) {

@@ -31,7 +31,6 @@
 #include "exprs/LgsEnvVar.h"
 #include "exprs/LgsMatrixExpr.h"
 #include "exprs/LgsMetaSelection.h"
-#include "exprs/LgsNull.h"
 #include "exprs/LgsNullableExpr.h"
 #include "exprs/LgsTernaryExpr.h"
 #include "files/LgsAppConfigFile.h"
@@ -1551,7 +1550,7 @@ LgsExpr* LgsParser::parseConstant() {
         break;
     }
     case T_NULL: {
-        constant = new LgsNull();
+        constant = new LgsNullableExpr(true);
         break;
     }
     default:
@@ -1894,8 +1893,8 @@ LgsJson* LgsParser::parseJsonPrimitive() {
             json = new LgsJson(new LgsJsonType(JSON_INT), intConst);
         } else if (const auto floatConst = constant->asFloatConst()) {
             json = new LgsJson(new LgsJsonType(JSON_FLOAT), floatConst);
-        } else if (const auto null = constant->asNull()) {
-            json = new LgsJson(new LgsJsonType(JSON_NULL), null);
+        } else if (constant->asNull()) {
+            json = new LgsJson(new LgsJsonType(JSON_NULL), new LgsNullableExpr(true));
         }
     }
     return json;

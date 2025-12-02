@@ -58,10 +58,7 @@ extern "C" void Lgs_DArray_put(const Lgs_DArrayExpr* arr, const size_t index, co
 }
 
 extern "C" void* Lgs_DArray_get(const Lgs_DArrayExpr* arr, const int64_t index) {
-    if (index >= arr->length) {
-        Lgs_exitWithErrors(E10003);
-        return nullptr;
-    }
+    if (index >= arr->length) return nullptr;
     size_t actualIndex;
     if (index >= 0) {
         actualIndex = index;

@@ -5,7 +5,6 @@
 
 class LgsMetaSelection;
 class LgsJson;
-class LgsNull;
 class LgsMatrixExpr;
 class LgsEnvVar;
 class LgsNullableExpr;
@@ -110,7 +109,6 @@ public:
     void visitBinaryExpr(LgsBinaryExpr* binExpr);
     void visitTernaryExpr(LgsTernaryExpr* ternaryExpr);
     void visitNullableExpr(LgsNullableExpr* nullableExpr);
-    void visitNull(LgsNull* null) const;
     void visitCast(LgsCast* cast);
     void visitLambda(LgsFunc* func);
     void visitIntConst(LgsIntConst* intConst) const;

@@ -17,7 +17,6 @@
 #include "exprs/LgsJson.h"
 #include "exprs/LgsMatrixExpr.h"
 #include "exprs/LgsMetaSelection.h"
-#include "exprs/LgsNull.h"
 #include "exprs/LgsNullableExpr.h"
 #include "exprs/LgsPostfixExpr.h"
 #include "exprs/LgsSelection.h"
@@ -108,8 +107,9 @@ void LgsExpr::setType(LgsType* newType) {
 
 
 // Casting
-LgsNull* LgsExpr::asNull() {
-    return dynamic_cast<LgsNull*>(this);
+bool LgsExpr::asNull() {
+    const auto nullable = dynamic_cast<LgsNullableExpr*>(this);
+    return nullable && nullable->isNull;
 }
 
 LgsFunc* LgsExpr::asFunc() {

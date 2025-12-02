@@ -17,7 +17,6 @@
 #include "types/LgsEnum.h"
 #include "exprs/LgsHashMap.h"
 #include "exprs/LgsJson.h"
-#include "exprs/LgsNull.h"
 #include "exprs/LgsPostfixExpr.h"
 #include "exprs/LgsPrefixExpr.h"
 #include "exprs/LgsTernaryExpr.h"
@@ -32,6 +31,7 @@
 #include "exprs/LgsMatrixExpr.h"
 #include "exprs/LgsMetaSelection.h"
 #include "exprs/LgsNullableExpr.h"
+#include "logos/LgsApp.h"
 #include "loops/LgsInfiniteLoop.h"
 #include "loops/LgsWhileLoop.h"
 #include "stmts/LgsBreak.h"
@@ -50,10 +50,11 @@
 #include "stmts/LgsIOStmt.h"
 #include "stmts/LgsIfStmt.h"
 #include "stmts/LgsSwitch.h"
+#include "tools/LgsFormatter.h"
+#include "tools/LgsJsonParser.h"
 #include "types/primitives/LgsDouble.h"
 #include "types/LgsGenericType.h"
 #include "types/iterables/LgsVariadic.h"
-
 #include <iostream>
 #include <ranges>
 #include <unordered_set>
@@ -692,7 +693,11 @@ void LgsSema::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
     }
     if (const auto iter = type->asIterable()) visitExpr(iter->size);
     type = typeResolver.resolveType(type, file);
-    binaryExpr->setType(type);
+    if (ltype->asNullable() && rtype->asNullable()) {
+        binaryExpr->setType(new LgsNullable(type));
+    } else {
+        binaryExpr->setType(type);
+    }
     binaryExpr->isMutable = l->isMutable || r->isMutable;
 }
 
@@ -727,7 +732,11 @@ void LgsSema::visitCast(LgsCast* cast) {
 void LgsSema::visitNullableExpr(LgsNullableExpr* nullableExpr) {
     visitExpr(nullableExpr->baseExpr);
     if (!nullableExpr->type || !nullableExpr->baseExpr->type->asNullable()) {
-        nullableExpr->type = new LgsNullable(nullableExpr->baseExpr->type);
+        if (nullableExpr->isNull) {
+            nullableExpr->type = new LgsNullable(nullptr);
+        } else {
+            nullableExpr->type = new LgsNullable(nullableExpr->baseExpr->type);
+        }
     }
 }
 
@@ -1301,7 +1310,7 @@ void LgsSema::visitIndex(LgsIterIndex* iterIndex) {
                 addError(E10048, iterIndex->location, {iterIndex->asText(), std::to_string(*bounds)});
             }
         }
-        iterIndex->setType(iterable->getValueType());
+        iterIndex->setType(new LgsNullable(iterable->getValueType()));
     }
 }
 
@@ -1329,10 +1338,10 @@ void LgsSema::visitSlice(LgsIterIndex* iterIndex) {
         const auto bounds = iterable->size->getConstInt();
         if (!bounds) return;
         if (*sizeFrom >= *bounds) {
-            return addError(E10048, exprFrom->location, {std::to_string(*sizeFrom), std::to_string(*bounds - 1)});
+            return addError(E10048, exprFrom->location, {std::to_string(*sizeFrom), std::to_string(*bounds)});
         }
         if (*sizeTo >= *bounds) {
-            return addError(E10048, exprTo->location, {std::to_string(*sizeTo), std::to_string(*bounds - 1)});
+            return addError(E10048, exprTo->location, {std::to_string(*sizeTo), std::to_string(*bounds)});
         }
     }
 }
