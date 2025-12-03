@@ -78,7 +78,6 @@ bool LgsNullable::canCastTo(LgsType* other) {
 }
 
 LgsType* LgsNullable::applyBinOp(LgsType* toType, LgsBinOp& op) {
-    const auto otherNullable = toType->asNullable();
     switch (op.opType) {
     case ADD:
         break;

@@ -1,6 +1,7 @@
 #include "types/primitives/LgsBool.h"
 #include "exprs/constants/LgsIntConst.h"
 #include "types/LgsAny.h"
+#include "types/LgsNullable.h"
 #include "types/primitives/LgsChar.h"
 #include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsInt.h"
@@ -26,6 +27,16 @@ Value* LgsBool::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     const auto r = cg.builder.CreateZExt(right->loadIR(cg), getIRType(cg));
     return cg.builder.CreateAdd(l, r);
 }
+
+// BinExpr type
+// left expr
+// left type
+// right expr
+// right type
+
+// Value* LgsExpr::subIR(LgsCgModule& cg, LgsExpr* right) {
+// Value* LgsType::subIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+// Value* LgsBinExpr::subIR(LgsCgModule& cg) {
 
 Value* LgsBool::subIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     const auto l = cg.builder.CreateZExt(left->loadIR(cg), getIRType(cg));

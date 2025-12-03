@@ -9,7 +9,7 @@
 #include "types/primitives/LgsChar.h"
 
 Type* LgsStr::getIRType(LgsCgModule& cg) {
-    if (isStatic) return ArrayType::get(cg.i8Ty(), *size->getConstInt() + 1);
+    if (isStatic) return ArrayType::get(cg.i8Ty(), size->getConstInt().value() + 1);
     return cg.ptrTy();
 }
 
@@ -20,8 +20,8 @@ std::string LgsStr::getName() {
 size_t LgsStr::sizeBytes() {
     if (isStatic) {
         const auto constInt = size->getConstInt();
-        assert(constInt);
-        return *constInt;
+        assert(constInt.has_value());
+        return constInt.value();
     }
     return sizeof(void*);
 }

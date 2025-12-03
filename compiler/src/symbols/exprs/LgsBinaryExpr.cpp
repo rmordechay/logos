@@ -21,8 +21,6 @@ std::string LgsBinaryExpr::asText() {
 LgsBinaryExpr::~LgsBinaryExpr() {
     freeExpr(left);
     freeExpr(right);
-    freeExpr(results);
     left = nullptr;
     right = nullptr;
-    results = nullptr;
 }

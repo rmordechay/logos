@@ -366,12 +366,19 @@ void LgsSema::visitAssignment(const LgsAssignment* assignment) {
 void LgsSema::visitIfStmt(LgsIfStmt* ifStmt) {
     if (ifStmt->ifBlock->isMacro) return visitMacroIf(ifStmt);
     stack.enterScope(ifStmt);
-    visitExpr(ifStmt->ifCond);
+    auto ifCond = ifStmt->ifCond;
+    visitExpr(ifCond);
+    if (ifCond->type && !ifCond->type->asBool()) {
+        addError(E10092, ifCond->location, {ifCond->type->pname()});
+    }
     visitStmtsBlock(ifStmt->ifBlock);
     stack.exitScope();
     for (auto& [expr, block] : ifStmt->elseIfs) {
         stack.enterScope(ifStmt);
         visitExpr(expr);
+        if (expr->type && !expr->type->asBool()) {
+            addError(E10092, expr->location, {expr->type->pname()});
+        }
         visitStmtsBlock(block);
         stack.exitScope();
     }
@@ -392,7 +399,7 @@ void LgsSema::visitMacroIf(LgsIfStmt* ifStmt) {
         return;
     }
     auto constValue = ifCond->getConstInt();
-    if (!constValue) {
+    if (!constValue.has_value()) {
         addError(E10101, ifCond->location);
         stack.exitScope();
         return;
@@ -412,7 +419,7 @@ void LgsSema::visitMacroIf(LgsIfStmt* ifStmt) {
             return;
         }
         constValue = expr->getConstInt();
-        if (!constValue) {
+        if (!constValue.has_value()) {
             addError(E10101, expr->location);
             stack.exitScope();
             return;
@@ -693,11 +700,7 @@ void LgsSema::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
     }
     if (const auto iter = type->asIterable()) visitExpr(iter->size);
     type = typeResolver.resolveType(type, file);
-    if (ltype->asNullable() && rtype->asNullable()) {
-        binaryExpr->setType(new LgsNullable(type));
-    } else {
-        binaryExpr->setType(type);
-    }
+    binaryExpr->setType(type);
     binaryExpr->isMutable = l->isMutable || r->isMutable;
 }
 
@@ -708,8 +711,8 @@ void LgsSema::visitTernaryExpr(LgsTernaryExpr* ternary) {
     visitExpr(condExpr);
     visitExpr(thenExpr);
     visitExpr(elseExpr);
-    if (!condExpr->type->asBool()) {
-        addError(E10092, ternary->location, {condExpr->asText(), condExpr->type->pname()});
+    if (!condExpr->type->asBool() && !condExpr->type->asNullable()) {
+        addError(E10092, ternary->location, {condExpr->type->pname()});
     }
     if (!thenExpr->type->canCastTo(elseExpr->type)) {
         addError(E10021, ternary->location, {thenExpr->asText(), elseExpr->asText(), thenExpr->type->pname(), elseExpr->type->pname()});
@@ -768,7 +771,7 @@ void LgsSema::visitArrayExpr(LgsArrayExpr* arrayExpr) {
 void LgsSema::visitStaticArray(const LgsArrayExpr* arrayExpr) {
     const auto sArr = arrayExpr->type->asSArray();
     const auto size = sArr->size->getConstInt();
-    if (size && *size != static_cast<int64_t>(arrayExpr->elements.size())) {
+    if (size.has_value() && size.value() != static_cast<int64_t>(arrayExpr->elements.size())) {
         addError(E10105, arrayExpr->location, {std::to_string(*size)});
     }
     for (auto element : arrayExpr->elements) {
@@ -1306,7 +1309,7 @@ void LgsSema::visitIndex(LgsIterIndex* iterIndex) {
         if (iterable->isStatic) {
             const auto index = exprFrom->getConstInt();
             const auto bounds = iterable->size->getConstInt();
-            if (index && bounds && *index >= *bounds) {
+            if (index.has_value() && bounds.has_value() && index.value() >= bounds.value()) {
                 addError(E10048, iterIndex->location, {iterIndex->asText(), std::to_string(*bounds)});
             }
         }
@@ -1331,16 +1334,16 @@ void LgsSema::visitSlice(LgsIterIndex* iterIndex) {
     if (iterable->isStatic) {
         const auto sizeFrom = exprFrom->getConstInt();
         const auto sizeTo = exprTo->getConstInt();
-        if (!sizeFrom || !sizeTo) return;
-        if (*sizeFrom > *sizeTo) {
+        if (!sizeFrom.has_value() || !sizeTo.has_value()) return;
+        if (sizeFrom.value() > sizeTo.value()) {
             return addError(E10037, iterIndex->location);
         }
         const auto bounds = iterable->size->getConstInt();
-        if (!bounds) return;
-        if (*sizeFrom >= *bounds) {
+        if (!bounds.has_value()) return;
+        if (sizeFrom.value() >= bounds.value()) {
             return addError(E10048, exprFrom->location, {std::to_string(*sizeFrom), std::to_string(*bounds)});
         }
-        if (*sizeTo >= *bounds) {
+        if (sizeTo.value() >= bounds.value()) {
             return addError(E10048, exprTo->location, {std::to_string(*sizeTo), std::to_string(*bounds)});
         }
     }
@@ -1461,8 +1464,8 @@ void LgsSema::validateIndex(LgsIterIndex* iterIndex) {
     if (const auto sArr = iterable->asSArray()) {
         const auto i = exprFrom->getConstInt();
         const auto bounds = sArr->size->getConstInt();
-        if (!i || !bounds) return;
-        if (*i >= *bounds) {
+        if (!i.has_value() || !bounds.has_value()) return;
+        if (i.value() >= bounds.value()) {
             return addError(E10048, iterIndex->location, {iterIndex->asText(), std::to_string(*bounds)});
         }
     }

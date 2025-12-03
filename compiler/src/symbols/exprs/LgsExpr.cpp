@@ -49,12 +49,12 @@ void LgsExpr::freeOwner(LgsCgModule& cg) {
     }
 }
 
-int64_t* LgsExpr::getConstInt() {
+std::optional<int64_t> LgsExpr::getConstInt() {
     if (const auto intConst = asIntConst()) {
-        return &intConst->value;
+        return intConst->value;
     }
     if (const auto var = asVariable()) {
-        if (var->isMutable) return nullptr;
+        if (var->isMutable) return std::nullopt;
         switch (var->ref.symbolType) {
         case VAR_DEC:
             return var->ref.varDec->expr->getConstInt();
@@ -66,22 +66,19 @@ int64_t* LgsExpr::getConstInt() {
         }
     }
     if (const auto binExpr = asBinExpr()) {
-        if (binExpr->isMutable) return nullptr;
-        if (binExpr->results) return binExpr->results->getConstInt();
+        if (binExpr->isMutable) return std::nullopt;
         const auto const1 = binExpr->left->getConstInt();
-        if (!const1) return nullptr;
+        if (!const1.has_value()) return std::nullopt;
         const auto const2 = binExpr->right->getConstInt();
-        if (!const2) return nullptr;
-        const auto malloc = static_cast<int64_t*>(std::malloc(sizeof(int64_t)));
-        *malloc = *const1 + *const2;
-        return malloc;
+        if (!const2.has_value()) return std::nullopt;
+        return const1.value() + const2.value();
     }
-    return nullptr;
+    return std::nullopt;
 }
 
-std::string* LgsExpr::getConstStr() {
+std::optional<std::string> LgsExpr::getConstStr() {
     if (const auto strConst = asStrConst()) {
-        return &strConst->value;
+        return strConst->value;
     }
     if (const auto var = asVariable()) {
         switch (var->ref.symbolType) {
@@ -93,12 +90,7 @@ std::string* LgsExpr::getConstStr() {
             break;
         }
     }
-    if (const auto bin = asBinExpr()) {
-        if (bin->op.opType == ADD) {
-            return &bin->results->asStrConst()->value;
-        }
-    }
-    return nullptr;
+    return std::nullopt;
 }
 
 void LgsExpr::setType(LgsType* newType) {

@@ -42,8 +42,8 @@ public:
 
     explicit LgsExpr(LgsType* type = nullptr) : type(type) {}
     void freeOwner(LgsCgModule& cg);
-    int64_t* getConstInt();
-    std::string* getConstStr();
+    std::optional<int64_t> getConstInt();
+    std::optional<std::string> getConstStr();
     void setType(LgsType* newType);
 
     virtual LgsExpr* castExplicitly(LgsType* toType);
