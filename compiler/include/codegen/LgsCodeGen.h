@@ -7,7 +7,6 @@ class LgsMetaSelection;
 class LgsJson;
 class LgsMatrixExpr;
 class LgsEnvVar;
-class LgsNullableExpr;
 struct LgsPaths;
 class LgsTernaryExpr;
 class LgsMainFunc;
@@ -108,7 +107,6 @@ public:
     void visitExpr(LgsExpr* expr, bool assign = false);
     void visitBinaryExpr(LgsBinaryExpr* binExpr);
     void visitTernaryExpr(LgsTernaryExpr* ternaryExpr);
-    void visitNullableExpr(LgsNullableExpr* nullableExpr);
     void visitCast(LgsCast* cast);
     void visitLambda(LgsFunc* func);
     void visitIntConst(LgsIntConst* intConst) const;

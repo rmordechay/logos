@@ -10,7 +10,6 @@
 #include "types/LgsEnum.h"
 #include "types/LgsGenericType.h"
 #include "types/iterables/LgsMap.h"
-#include "types/LgsNullable.h"
 #include "types/LgsSubType.h"
 #include "types/LgsUnknown.h"
 #include "types/iterables/LgsMatrix.h"
@@ -399,10 +398,6 @@ LgsTypePair* LgsType::asPair() {
 
 LgsSubType* LgsType::asSubtype() {
     return dynamic_cast<LgsSubType*>(this);
-}
-
-LgsNullable* LgsType::asNullable() {
-    return dynamic_cast<LgsNullable*>(this);
 }
 
 LgsVariadic* LgsType::asVariadic() {

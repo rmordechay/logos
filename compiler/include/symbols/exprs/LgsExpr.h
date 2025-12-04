@@ -2,10 +2,8 @@
 #include <stmts/LgsStmt.h>
 #include "LgsValue.h"
 
-class LgsNullable;
 class LgsMetaSelection;
 class LgsMatrixExpr;
-class LgsNullableExpr;
 class LgsEnvVar;
 class LgsBinaryExpr;
 class LgsJson;
@@ -53,7 +51,6 @@ public:
     virtual bool equals(LgsExpr* other);
     virtual std::string asText() = 0;
 
-    bool asNull();
     LgsFunc* asFunc();
     LgsVariable* asVariable();
     LgsPrefixExpr* asPrefixExpr();
@@ -76,7 +73,6 @@ public:
     LgsIntConst* asIntConst();
     LgsMetaVar* asLoopMetaVar();
     LgsBinaryExpr* asBinExpr();
-    LgsNullableExpr* asNullableExpr();
     LgsMetaSelection* asMetaSelection();
     ~LgsExpr() override = default;
 };

@@ -14,7 +14,6 @@
 #include "types/LgsGenericType.h"
 #include "types/LgsInterface.h"
 #include "types/iterables/LgsIterable.h"
-#include "types/LgsNullable.h"
 #include "types/LgsSubType.h"
 #include "errors/LgsErrHandler.h"
 
@@ -44,9 +43,7 @@ LgsType* LgsTypeResolver::resolveType(LgsType* type, LgsFile* file) {
         type->genericArgs[i] = resolveType(type->genericArgs[i], file);
     }
 
-    if (const auto nullable = type->asNullable()) {
-        nullable->baseType = resolveType(nullable->baseType, file);
-    } else if (const auto iterable = type->asIterable()) {
+    if (const auto iterable = type->asIterable()) {
         if (!iterable->genericArgs.empty()) {
             iterable->baseType = iterable->genericArgs.front();
         } else {

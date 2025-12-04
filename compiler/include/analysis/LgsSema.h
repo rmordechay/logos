@@ -102,7 +102,6 @@ public:
     void visitBinaryExpr(LgsBinaryExpr* binaryExpr);
     void visitTernaryExpr(LgsTernaryExpr* ternary);
     void visitCast(LgsCast* cast);
-    void visitNullableExpr(LgsNullableExpr* nullableExpr);
     void visitArrayExpr(LgsArrayExpr* arrayExpr);
     void visitStaticArray(const LgsArrayExpr* arrayExpr);
     void visitDynamicArray(LgsArrayExpr* arrayExpr);

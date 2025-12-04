@@ -30,8 +30,6 @@
 #include "errors/LgsErrHandler.h"
 #include "exprs/LgsMatrixExpr.h"
 #include "exprs/LgsMetaSelection.h"
-#include "exprs/LgsNullableExpr.h"
-#include "logos/LgsApp.h"
 #include "loops/LgsInfiniteLoop.h"
 #include "loops/LgsWhileLoop.h"
 #include "stmts/LgsBreak.h"
@@ -40,7 +38,6 @@
 #include "stmts/LgsVarDec.h"
 #include "types/iterables/LgsDArray.h"
 #include "types/LgsInterface.h"
-#include "types/LgsNullable.h"
 #include "loops/LgsForeachLoop.h"
 #include "loops/LgsForLoop.h"
 #include "loops/LgsMetaVar.h"
@@ -51,7 +48,6 @@
 #include "stmts/LgsIfStmt.h"
 #include "stmts/LgsSwitch.h"
 #include "tools/LgsFormatter.h"
-#include "tools/LgsJsonParser.h"
 #include "types/primitives/LgsDouble.h"
 #include "types/LgsGenericType.h"
 #include "types/iterables/LgsVariadic.h"
@@ -347,7 +343,7 @@ void LgsSema::visitAssignment(const LgsAssignment* assignment) {
     if (!l->type || !r->type) return;
 
     auto canAssign = false;
-    if (l->asIterIndex() || l->asVariable() || l->asNull()) {
+    if (l->asIterIndex() || l->asVariable()) {
         canAssign = true;
     } else if (const auto selection = l->asSelection()) {
         const auto firstExpr = selection->exprs.front();
@@ -678,7 +674,6 @@ void LgsSema::visitExpr(LgsExpr*& expr) {
         else if (const auto forVar = expr->asLoopMetaVar()) visitLoopMetaVar(forVar);
         else if (const auto vecExpr = expr->asVectorExpr()) visitVectorExpr(vecExpr);
         else if (const auto matrixExpr = expr->asMatrixExpr()) visitMatrixExpr(matrixExpr);
-        else if (const auto nullableExpr = expr->asNullableExpr()) visitNullableExpr(nullableExpr);
         else if (const auto castExpr = expr->asCast()) visitCast(castExpr);
         else if (const auto json = expr->asJson()) visitJson(json);
     }
@@ -711,9 +706,6 @@ void LgsSema::visitTernaryExpr(LgsTernaryExpr* ternary) {
     visitExpr(condExpr);
     visitExpr(thenExpr);
     visitExpr(elseExpr);
-    if (!condExpr->type->asBool() && !condExpr->type->asNullable()) {
-        addError(E10092, ternary->location, {condExpr->type->pname()});
-    }
     if (!thenExpr->type->canCastTo(elseExpr->type)) {
         addError(E10021, ternary->location, {thenExpr->asText(), elseExpr->asText(), thenExpr->type->pname(), elseExpr->type->pname()});
     }
@@ -730,17 +722,6 @@ void LgsSema::visitCast(LgsCast* cast) {
         return;
     }
     cast->setType(cast->value->type);
-}
-
-void LgsSema::visitNullableExpr(LgsNullableExpr* nullableExpr) {
-    visitExpr(nullableExpr->baseExpr);
-    if (!nullableExpr->type || !nullableExpr->baseExpr->type->asNullable()) {
-        if (nullableExpr->isNull) {
-            nullableExpr->type = new LgsNullable(nullptr);
-        } else {
-            nullableExpr->type = new LgsNullable(nullableExpr->baseExpr->type);
-        }
-    }
 }
 
 void LgsSema::visitArrayExpr(LgsArrayExpr* arrayExpr) {
@@ -909,9 +890,6 @@ void LgsSema::visitSelection(LgsSelection* selection) {
     if (!firstExpr->type) return;
     visitInnerSelections(selection);
     const auto lastExpr = selection->lastExpr();
-    if (selection->hasNullables && !lastExpr->type->asNullable()) {
-        lastExpr->setType(new LgsNullable(lastExpr->type));
-    }
     selection->setType(lastExpr->type);
     selection->owner = lastExpr->owner;
 }
@@ -932,8 +910,6 @@ void LgsSema::visitFirstSelection(LgsExpr* firstExpr) {
 
 void LgsSema::visitInnerSelections(LgsSelection* selection) {
     const auto exprs = selection->exprs;
-    const auto firstExpr = exprs.front();
-    selection->hasNullables = firstExpr->type->asNullable();
     for (size_t i = 0; i < exprs.size() - 1; ++i) {
         const auto parentExpr = exprs[i];
         const auto childExpr = exprs[i + 1];
@@ -946,7 +922,6 @@ void LgsSema::visitInnerSelections(LgsSelection* selection) {
         } else {
             assert(0);
         }
-        selection->hasNullables = selection->hasNullables || childExpr->type->asNullable();
         if (!childExpr->type || childExpr->type->isUnknown()) {
             return;
         }
@@ -1232,9 +1207,6 @@ void LgsSema::visitInstance(LgsInstance* instance) {
         }
         if (!validateFieldVisibility(field, instance->obj, arg.expr->location)) continue;
         castExpr(arg.expr, field->type);
-        if (field->type->asNullable() && !arg.expr->asNullableExpr()) {
-            arg.expr = new LgsNullableExpr(arg.expr);
-        }
         visitExpr(arg.expr);
         validateExprType(arg.expr, field->type);
         if (field->isOwner && field->type->isHeapAlloc) {
@@ -1313,7 +1285,7 @@ void LgsSema::visitIndex(LgsIterIndex* iterIndex) {
                 addError(E10048, iterIndex->location, {iterIndex->asText(), std::to_string(*bounds)});
             }
         }
-        iterIndex->setType(new LgsNullable(iterable->getValueType()));
+        iterIndex->setType(iterable->getValueType());
     }
 }
 
@@ -1366,19 +1338,19 @@ void LgsSema::visitLoopMetaVar(LgsMetaVar* metaVar) {
 }
 
 bool LgsSema::validateExprType(LgsExpr* expr, LgsType* type) {
-    if (expr->asNull()) {
-        const auto nullable = type->asNullable();
-        // null must have a type
-        if (nullable && !nullable->baseType) {
-            addError(E10024, expr->location);
-            return false;
-        }
-        // type must be nullable
-        if (!nullable) {
-            addError(E10023, expr->location, {type->pname()});
-            return false;
-        }
-    }
+    // if (expr->asNull()) {
+    //     const auto nullable = type->asNullable();
+    //     // null must have a type
+    //     if (nullable && !nullable->baseType) {
+    //         addError(E10024, expr->location);
+    //         return false;
+    //     }
+    //     // type must be nullable
+    //     if (!nullable) {
+    //         addError(E10023, expr->location, {type->pname()});
+    //         return false;
+    //     }
+    // }
     if (!type || !expr->type || type->isUnknown() || expr->type->isUnknown()) return false;
     if (!expr->type->canCastTo(type)) {
         addError(E10001, expr->location, {type->pname(), expr->type->pname()});
@@ -1693,9 +1665,6 @@ void LgsSema::addError(const LgsBaseMsg& lgsErr, const LgsLocation& location, co
 
 void castExpr(LgsExpr*& expr, LgsType* toType) {
     expr->castImplicitly(toType);
-    if (toType->asNullable() && !expr->asNullableExpr()) {
-        expr = new LgsNullableExpr(expr);
-    }
 }
 
 void LgsSema::addRTType(LgsType* type) const {

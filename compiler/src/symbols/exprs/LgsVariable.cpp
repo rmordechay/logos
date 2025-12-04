@@ -3,8 +3,6 @@
 #include "funcs/LgsParam.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
-#include "types/LgsNullable.h"
-
 #include <codegen/LgsCgModule.h>
 
 Value* LgsVariable::loadIR(LgsCgModule& cg) {
@@ -39,11 +37,7 @@ LgsExpr* LgsVariable::castExplicitly(LgsType* toType) {
 void LgsVariable::assign(LgsCgModule& cg, LgsExpr* expr) {
     owner = expr->owner;
     freeOwner(cg);
-    if (const auto nullable = type->asNullable()) {
-        nullable->setIRValue(cg, IRValue, expr->IRValue);
-    } else {
-        cg.builder.CreateStore(expr->IRValue, IRValue);
-    }
+    cg.builder.CreateStore(expr->IRValue, IRValue);
 }
 
 Value* LgsVariable::hashValue(LgsCgModule& cg) {

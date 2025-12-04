@@ -2,7 +2,6 @@
 #include "exprs/constants/LgsIntConst.h"
 #include "stmts/LgsField.h"
 #include "types/LgsAny.h"
-#include "types/LgsNullable.h"
 #include "types/primitives/LgsDouble.h"
 #include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsLong.h"
@@ -35,10 +34,6 @@ bool LgsInt::canCastTo(LgsType* other) {
     if (otherName == LgsLong::name) return true;
     if (otherName == LgsFloat::name) return true;
     if (otherName == LgsDouble::name) return true;
-    if (const auto nullable = other->asNullable()) {
-        if (!nullable->baseType) return true;
-        return canCastTo(nullable->baseType);
-    }
     return false;
 }
 

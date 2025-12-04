@@ -5,7 +5,6 @@ class LgsSelection final : public LgsExpr {
 public:
     std::vector<LgsExpr*> exprs;
     LgsVariable* importVar = nullptr;
-    bool hasNullables = false;
 
     explicit LgsSelection(const std::vector<LgsExpr*>& exprs) : exprs(exprs) {}
     Value* loadIR(LgsCgModule& cg) override;

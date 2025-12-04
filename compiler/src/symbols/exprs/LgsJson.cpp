@@ -1,6 +1,4 @@
 #include "exprs/LgsJson.h"
-
-#include "exprs/LgsNullableExpr.h"
 #include "exprs/constants/LgsFloatConst.h"
 #include "exprs/constants/LgsIntConst.h"
 #include "exprs/constants/LgsStrConst.h"
@@ -35,7 +33,6 @@ LgsJson::~LgsJson() {
         freeExpr(strConst);
         break;
     case JSON_NULL:
-        freeExpr(null);
         break;
     case JSON_UNKNOWN:
         break;

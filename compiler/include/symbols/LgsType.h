@@ -143,7 +143,6 @@ public:
     LgsMap* asMap();
     LgsTypePair* asPair();
     LgsSubType* asSubtype();
-    LgsNullable* asNullable();
     LgsVariadic* asVariadic();
     virtual ~LgsType();
 };

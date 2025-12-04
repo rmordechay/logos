@@ -86,7 +86,6 @@ set(COMPILER_SOURCE
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/LgsEnvVar.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/LgsVectorExpr.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/LgsTypeExpr.cpp
-    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/LgsNullableExpr.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/LgsMatrixExpr.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/constants/LgsCharConst.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/constants/LgsFloatConst.cpp
@@ -128,7 +127,6 @@ set(COMPILER_SOURCE
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsEnum.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsFuncType.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsInterface.cpp
-    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsNullable.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsObject.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsSubType.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsTypePair.cpp

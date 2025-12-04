@@ -312,10 +312,6 @@ void LgsJsonParser::parseIOStmt(const LgsIOStmt* ioStmt) {
     closeObject();
 }
 
-void LgsJsonParser::parseNullableExpr(LgsNullableExpr* null) {
-    assert(0);
-}
-
 void LgsJsonParser::parseExpr(LgsExpr* expr) {
     if (!expr) return;
     if (const auto ternaryExpr = dynamic_cast<LgsTernaryExpr*>(expr)) {
@@ -337,7 +333,6 @@ void LgsJsonParser::parseExpr(LgsExpr* expr) {
         if (const auto prefixExpr = expr->asPrefixExpr()) return parsePrefixExpr(prefixExpr);
         if (const auto forVar = expr->asLoopMetaVar()) return parseLoopMetaVar(forVar);
         if (const auto vecExpr = expr->asVectorExpr()) return parseVectorExpr(vecExpr);
-        if (const auto null = expr->asNullableExpr()) return parseNullableExpr(null);
         if (const auto castExpr = expr->asCast()) return parseCast(castExpr);
         if (const auto jsonExpr = expr->asJson()) return parseJson(jsonExpr);
         assert(0);

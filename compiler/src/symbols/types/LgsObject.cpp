@@ -6,7 +6,6 @@
 #include "types/LgsSubType.h"
 #include "types/LgsEnum.h"
 #include "types/LgsInterface.h"
-#include "types/LgsNullable.h"
 #include "LgsUtils.h"
 #include "types/LgsAny.h"
 
@@ -113,10 +112,7 @@ LgsExpr* LgsObject::getZeroValue() {
 
 bool LgsObject::canCastTo(LgsType* other) {
     if (other->getName() == LgsAny::name) return true;
-    auto otherType = other;
-    if (const auto nullable = other->asNullable()) {
-        otherType = nullable->baseType;
-    }
+    const auto otherType = other;
     if (const auto otherInterface = otherType->asInterface()) {
         for (const auto objInterface : implements) {
             if (objInterface->getName() == otherInterface->name) {

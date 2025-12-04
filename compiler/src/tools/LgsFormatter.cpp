@@ -239,7 +239,6 @@ void LgsFormatter::formatExpr(LgsExpr*& expr) {
         if (const auto vecExpr = expr->asVectorExpr()) return formatVectorExpr(vecExpr);
         if (const auto castExpr = expr->asCast()) return formatCast(castExpr);
         if (const auto jsonExpr = expr->asJson()) return formatJson(jsonExpr);
-        if (expr->asNull()) return insert(LGS_NULL_LITERAL);
         assert(0);
     }
 }

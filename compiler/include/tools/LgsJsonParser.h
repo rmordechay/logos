@@ -1,7 +1,4 @@
 #pragma once
-
-#include "exprs/LgsNullableExpr.h"
-
 #include <sstream>
 
 class LgsSubType;
@@ -97,7 +94,6 @@ public:
     void parseCoroutine(const LgsCoroutine* coroutine);
     void parseDeferStmt(const LgsDeferStmt* deferStmt);
     void parseIOStmt(const LgsIOStmt* ioStmt);
-    void parseNullableExpr(LgsNullableExpr* null);
     void parseExpr(LgsExpr* expr);
     void parseBinaryExpr(const LgsBinaryExpr* binaryExpr);
     void parseTernaryExpr(LgsTernaryExpr* ternary);

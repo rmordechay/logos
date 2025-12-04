@@ -31,7 +31,6 @@
 #include "exprs/LgsEnvVar.h"
 #include "exprs/LgsMatrixExpr.h"
 #include "exprs/LgsMetaSelection.h"
-#include "exprs/LgsNullableExpr.h"
 #include "exprs/LgsTernaryExpr.h"
 #include "files/LgsAppConfigFile.h"
 #include "lgsc/LgsCCompiler.h"
@@ -580,8 +579,7 @@ LgsType* LgsParser::parseType() {
 
     // Nullable
     if (type && matchAndConsume(T_QUEST_MARK)) {
-        type = new LgsNullable(type);
-        setLocation(type->location, &startToken, &currentToken);
+        assert(0);
     }
 
     return type;
@@ -1376,9 +1374,7 @@ LgsExpr* LgsParser::parseUnary(const bool withInstance) {
     if (const auto postfixExpr = parsePostfixExpr(expr)) return postfixExpr;
 
     if (matchAndConsume(T_QUEST_MARK)) {
-        const auto nullableExpr = new LgsNullableExpr(expr);
-        nullableExpr->location = expr->location;
-        expr = nullableExpr;
+        assert(0);
     }
     return expr;
 }
@@ -1550,7 +1546,7 @@ LgsExpr* LgsParser::parseConstant() {
         break;
     }
     case T_NULL: {
-        constant = new LgsNullableExpr(true);
+        constant = nullptr;
         break;
     }
     default:
@@ -1893,9 +1889,10 @@ LgsJson* LgsParser::parseJsonPrimitive() {
             json = new LgsJson(new LgsJsonType(JSON_INT), intConst);
         } else if (const auto floatConst = constant->asFloatConst()) {
             json = new LgsJson(new LgsJsonType(JSON_FLOAT), floatConst);
-        } else if (constant->asNull()) {
-            json = new LgsJson(new LgsJsonType(JSON_NULL), new LgsNullableExpr(true));
         }
+        // else if (constant->asNull()) {
+        //     json = new LgsJson(new LgsJsonType(JSON_NULL), new LgsNullableExpr(true));
+        // }
     }
     return json;
 }
