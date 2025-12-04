@@ -198,6 +198,7 @@ char LgsLexer::advance() {
     currentChar = source[++index];
     if (currentChar == '\n') {
         line++;
+        column = 1;
     } else {
         column++;
     }

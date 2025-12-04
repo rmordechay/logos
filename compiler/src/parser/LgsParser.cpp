@@ -49,6 +49,7 @@
 #include "types/LgsEnum.h"
 #include "types/LgsGenericType.h"
 #include "types/LgsInterface.h"
+#include "types/LgsNullable.h"
 #include "types/LgsSelf.h"
 #include "types/LgsSubType.h"
 #include "types/LgsUnknown.h"
@@ -579,7 +580,7 @@ LgsType* LgsParser::parseType() {
 
     // Nullable
     if (type && matchAndConsume(T_QUEST_MARK)) {
-        assert(0);
+        type = new LgsNullable(type);
     }
 
     return type;
@@ -1374,7 +1375,7 @@ LgsExpr* LgsParser::parseUnary(const bool withInstance) {
     if (const auto postfixExpr = parsePostfixExpr(expr)) return postfixExpr;
 
     if (matchAndConsume(T_QUEST_MARK)) {
-        assert(0);
+        expr = new LgsNullableExpr(expr);
     }
     return expr;
 }
@@ -1407,7 +1408,7 @@ LgsVariable* LgsParser::parseVariable() {
         return nullptr;
     }
     consume();
-    setLocation(var->location, &startToken, &currentToken);
+    setLocation(var->location, &startToken, &startToken);
     return var;
 }
 
@@ -1546,7 +1547,7 @@ LgsExpr* LgsParser::parseConstant() {
         break;
     }
     case T_NULL: {
-        constant = nullptr;
+        constant = new LgsNullableExpr();
         break;
     }
     default:
@@ -2030,8 +2031,8 @@ void LgsParser::setLocation(LgsLocation& location, const LgsToken* startToken, c
     location.filepath = &metadata->path;
     location.lineStart = startToken->location.lineStart;
     location.columnStart = startToken->location.columnStart;
-    location.lineEnd = startToken->location.lineEnd;
-    location.columnEnd = startToken->location.columnEnd;
+    location.lineEnd = endToken->location.lineEnd;
+    location.columnEnd = endToken->location.columnEnd;
 }
 
 void LgsParser::addFileSymbol(LgsMainFile* file, const LgsSymbol& newSymbol) {

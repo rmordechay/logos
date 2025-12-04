@@ -30,6 +30,7 @@
 #include "errors/LgsErrHandler.h"
 #include "exprs/LgsMatrixExpr.h"
 #include "exprs/LgsMetaSelection.h"
+#include "exprs/LgsNullableExpr.h"
 #include "loops/LgsInfiniteLoop.h"
 #include "loops/LgsWhileLoop.h"
 #include "stmts/LgsBreak.h"
@@ -55,7 +56,7 @@
 #include <ranges>
 #include <unordered_set>
 
-void castExpr(LgsExpr*& expr, LgsType* toType);
+void castExprImplicitly(LgsExpr*& expr, LgsType* toType);
 static std::string getMissingImplementsStr(const std::vector<LgsField*>& fields, const std::vector<LgsFunc*>& methods);
 
 void LgsSema::analyse() {
@@ -226,7 +227,7 @@ void LgsSema::visitParam(LgsParam* param) {
             param->type = new LgsVariadic(param->type);
         }
     } else if (param->expr) {
-        castExpr(param->expr, param->type);
+        castExprImplicitly(param->expr, param->type);
         visitExpr(param->expr);
         validateExprType(param->expr, param->type);
     }
@@ -299,7 +300,7 @@ void LgsSema::visitVarDec(LgsVarDec* varDec) {
             varDec->expr->owner = varDec;
         }
         varDec->setType(typeResolver.resolveType(varDec->type, file));
-        castExpr(varDec->expr, varDec->type);
+        castExprImplicitly(varDec->expr, varDec->type);
         visitExpr(varDec->expr);
         validateExprType(varDec->expr, varDec->type);
         if (varDec->type != varDec->expr->type) {
@@ -338,7 +339,7 @@ void LgsSema::visitAssignment(const LgsAssignment* assignment) {
     auto r = assignment->rValue;
     visitExpr(l);
     visitExpr(r);
-    castExpr(r, l->type);
+    castExprImplicitly(r, l->type);
     if (!validateExprType(r, l->type)) return;
     if (!l->type || !r->type) return;
 
@@ -575,7 +576,7 @@ void LgsSema::visitReturnStmt(const LgsReturn* returnStmt) {
     const auto funcType = stack.currentFunc()->funcType;
     auto retExpr = returnStmt->expr;
     if (retExpr) {
-        castExpr(retExpr, funcType->rt);
+        castExprImplicitly(retExpr, funcType->rt);
         visitExpr(retExpr);
         validateExprType(returnStmt->expr, funcType->rt);
     }
@@ -674,6 +675,7 @@ void LgsSema::visitExpr(LgsExpr*& expr) {
         else if (const auto forVar = expr->asLoopMetaVar()) visitLoopMetaVar(forVar);
         else if (const auto vecExpr = expr->asVectorExpr()) visitVectorExpr(vecExpr);
         else if (const auto matrixExpr = expr->asMatrixExpr()) visitMatrixExpr(matrixExpr);
+        else if (const auto nullableExpr = expr->asNullableExpr()) visitNullableExpr(nullableExpr);
         else if (const auto castExpr = expr->asCast()) visitCast(castExpr);
         else if (const auto json = expr->asJson()) visitJson(json);
     }
@@ -682,8 +684,8 @@ void LgsSema::visitExpr(LgsExpr*& expr) {
 }
 
 void LgsSema::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
-    auto l = binaryExpr->left;
-    auto r = binaryExpr->right;
+    auto& l = binaryExpr->left;
+    auto& r = binaryExpr->right;
     visitExpr(l);
     visitExpr(r);
     const auto ltype = l->type;
@@ -694,7 +696,6 @@ void LgsSema::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
         return addError(E10076, l->location, {binaryExpr->op.text, ltype->pname(), rtype->pname()});
     }
     if (const auto iter = type->asIterable()) visitExpr(iter->size);
-    type = typeResolver.resolveType(type, file);
     binaryExpr->setType(type);
     binaryExpr->isMutable = l->isMutable || r->isMutable;
 }
@@ -722,6 +723,12 @@ void LgsSema::visitCast(LgsCast* cast) {
         return;
     }
     cast->setType(cast->value->type);
+}
+
+void LgsSema::visitNullableExpr(LgsNullableExpr* nullableExpr) {
+    if (nullableExpr->isNull) return;
+    visitExpr(nullableExpr->baseExpr);
+    nullableExpr->type = new LgsNullable(nullableExpr->baseExpr->type);
 }
 
 void LgsSema::visitArrayExpr(LgsArrayExpr* arrayExpr) {
@@ -813,12 +820,12 @@ void LgsSema::visitMatrixExpr(const LgsMatrixExpr* matrixExpr) {
     }
     for (const auto vector : matrixExpr->elements) {
         if (vector->elements.size() != matrixExpr->matType->columns) {
-            addError(E10104, vector->location, {matrixExpr->matType->pname(), std::to_string(vector->elements.size())});
+            addError(E10104, matrixExpr->location, {matrixExpr->matType->pname(), std::to_string(vector->elements.size())});
             return;
         }
         for (auto innerElement : vector->elements) {
             visitExpr(innerElement);
-            castExpr(innerElement, matrixExpr->matType->baseType);
+            castExprImplicitly(innerElement, matrixExpr->matType->baseType);
         }
         const auto columnsInt = new LgsIntConst(&LGS_SIZE, matrixExpr->matType->columns);
         vector->setType(new LgsSArray(matrixExpr->matType->baseType, columnsInt));
@@ -1069,7 +1076,7 @@ bool LgsSema::visitFuncArgs(LgsFuncCall* funcCall, LgsFuncType* ft) {
                 return false;
             }
             const auto param = paramsByName[arg.name];
-            castExpr(arg.expr, param->type);
+            castExprImplicitly(arg.expr, param->type);
             visitExpr(arg.expr);
             if (arg.name == "") {
                 addError(E10096, funcCall->location);
@@ -1081,7 +1088,7 @@ bool LgsSema::visitFuncArgs(LgsFuncCall* funcCall, LgsFuncType* ft) {
             if (i >= funcCall->args.size()) break;
             auto& arg = funcCall->args[i];
             const auto& param = ft->params[i];
-            castExpr(arg.expr, param.type);
+            castExprImplicitly(arg.expr, param.type);
             visitExpr(arg.expr);
             if (arg.name != "") {
                 addError(E10096, funcCall->location);
@@ -1206,7 +1213,7 @@ void LgsSema::visitInstance(LgsInstance* instance) {
             continue;
         }
         if (!validateFieldVisibility(field, instance->obj, arg.expr->location)) continue;
-        castExpr(arg.expr, field->type);
+        castExprImplicitly(arg.expr, field->type);
         visitExpr(arg.expr);
         validateExprType(arg.expr, field->type);
         if (field->isOwner && field->type->isHeapAlloc) {
@@ -1267,33 +1274,31 @@ void LgsSema::visitIterIndex(LgsIterIndex* iterIndex) {
 
 void LgsSema::visitIndex(LgsIterIndex* iterIndex) {
     const auto iterable = iterIndex->baseExpr->type->asIterable();
+    if (iterIndex->index.to) {
+        visitSlice(iterIndex);
+    }
     auto exprFrom = iterIndex->index.from;
     visitExpr(exprFrom);
-    auto exprTo = iterIndex->index.to;
-    if (exprTo) {
-        visitExpr(exprTo);
-        visitSlice(iterIndex);
-        iterIndex->setType(iterable);
-    } else {
-        if (!exprFrom->type->canCastTo(iterable->getIndexType())) {
-            return addError(E10036, iterIndex->location, {iterIndex->asText(), exprFrom->type->pname()});
-        }
-        if (iterable->isStatic) {
-            const auto index = exprFrom->getConstInt();
-            const auto bounds = iterable->size->getConstInt();
-            if (index.has_value() && bounds.has_value() && index.value() >= bounds.value()) {
-                addError(E10048, iterIndex->location, {iterIndex->asText(), std::to_string(*bounds)});
-            }
-        }
-        iterIndex->setType(iterable->getValueType());
+    if (!exprFrom->type->canCastTo(iterable->getIndexType())) {
+        return addError(E10036, iterIndex->location, {iterIndex->asText(), exprFrom->type->pname()});
     }
+    if (iterable->isStatic) {
+        const auto index = exprFrom->getConstInt();
+        const auto bounds = iterable->size->getConstInt();
+        if (index.has_value() && bounds.has_value() && index.value() >= bounds.value()) {
+            addError(E10048, iterIndex->location, {iterIndex->asText(), std::to_string(*bounds)});
+        }
+    }
+    iterIndex->setType(new LgsNullable(iterable->getValueType()));
 }
 
 void LgsSema::visitSlice(LgsIterIndex* iterIndex) {
     const auto baseExpr = iterIndex->baseExpr;
-    const auto exprFrom = iterIndex->index.from;
-    const auto exprTo = iterIndex->index.to;
     const auto iterable = baseExpr->type->asIterable();
+    auto exprFrom = iterIndex->index.from;
+    auto exprTo = iterIndex->index.to;
+    visitExpr(exprFrom);
+    visitExpr(exprTo);
     if (!baseExpr->type->isSliceable()) {
         return addError(E10042, iterIndex->location, {iterIndex->asText(), baseExpr->type->pname()});
     }
@@ -1319,6 +1324,7 @@ void LgsSema::visitSlice(LgsIterIndex* iterIndex) {
             return addError(E10048, exprTo->location, {std::to_string(*sizeTo), std::to_string(*bounds)});
         }
     }
+    iterIndex->setType(iterable);
 }
 
 void LgsSema::visitLoopMetaVar(LgsMetaVar* metaVar) {
@@ -1337,20 +1343,19 @@ void LgsSema::visitLoopMetaVar(LgsMetaVar* metaVar) {
     }
 }
 
-bool LgsSema::validateExprType(LgsExpr* expr, LgsType* type) {
-    // if (expr->asNull()) {
-    //     const auto nullable = type->asNullable();
-    //     // null must have a type
-    //     if (nullable && !nullable->baseType) {
-    //         addError(E10024, expr->location);
-    //         return false;
-    //     }
-    //     // type must be nullable
-    //     if (!nullable) {
-    //         addError(E10023, expr->location, {type->pname()});
-    //         return false;
-    //     }
-    // }
+bool LgsSema::validateExprType(const LgsExpr* expr, LgsType* type) {
+    if (const auto nullable = type->asNullable()) {
+        // null must have a type
+        if (expr->isNull && !nullable->baseType) {
+            addError(E10024, expr->location);
+            return false;
+        }
+        // // type must be nullable
+        // if (!nullable) {
+        //     addError(E10023, expr->location, {type->pname()});
+        //     return false;
+        // }
+    }
     if (!type || !expr->type || type->isUnknown() || expr->type->isUnknown()) return false;
     if (!expr->type->canCastTo(type)) {
         addError(E10001, expr->location, {type->pname(), expr->type->pname()});
@@ -1663,12 +1668,8 @@ void LgsSema::addError(const LgsBaseMsg& lgsErr, const LgsLocation& location, co
     errHandler.addError(lgsErr, &location, file->path, args);
 }
 
-void castExpr(LgsExpr*& expr, LgsType* toType) {
-    expr->castImplicitly(toType);
-}
-
 void LgsSema::addRTType(LgsType* type) const {
-    if (!type || type->isVoid()) return;
+    if (!type || type->isVoid() || (type->asNullable() && !type->asNullable()->baseType)) return;
     for (const auto rttType : globals.table.rttTypes) {
         if (rttType->equals(type)) return;
     }
@@ -1676,4 +1677,15 @@ void LgsSema::addRTType(LgsType* type) const {
         if (rttType->equals(type)) return;
     }
     file->symbolTable.rttTypes.push_back(type);
+}
+
+void castExprImplicitly(LgsExpr*& expr, LgsType* toType) {
+    expr->castImplicitly(toType);
+    if (!expr->asVariable() && !expr->asNullableExpr() && toType->asNullable()) {
+        // The Expr and its type are wrapped in NullableExpr and Nullable.
+        const auto& nullable = toType->asNullable();
+        expr->type = nullable->baseType;
+        expr = new LgsNullableExpr(expr);
+        expr->type = nullable;
+    }
 }

@@ -17,6 +17,7 @@
 #include "exprs/LgsJson.h"
 #include "exprs/LgsMatrixExpr.h"
 #include "exprs/LgsMetaSelection.h"
+#include "exprs/LgsNullableExpr.h"
 #include "exprs/LgsPostfixExpr.h"
 #include "exprs/LgsSelection.h"
 #include "exprs/LgsTypeExpr.h"
@@ -187,6 +188,10 @@ LgsBinaryExpr* LgsExpr::asBinExpr() {
 
 LgsMetaSelection* LgsExpr::asMetaSelection() {
     return dynamic_cast<LgsMetaSelection*>(this);
+}
+
+LgsNullableExpr* LgsExpr::asNullableExpr() {
+    return dynamic_cast<LgsNullableExpr*>(this);
 }
 
 Value* dotProduct(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {

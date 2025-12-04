@@ -92,8 +92,8 @@ public:
     LgsType* applyIntBinOp(LgsType* toType, LgsBinOpType op);
     void cloneFields(LgsType* newType) const;
     void cloneMethods(LgsType* newType) const;
-    static Value* orInt(LgsCgModule& cg, const LgsExpr* self, const LgsExpr* other);
-    static Value* andInt(LgsCgModule& cg, LgsExpr* self, const LgsExpr* other);
+    static Value* orInt(LgsCgModule& cg, Value* self, Value* other);
+    static Value* andInt(LgsCgModule& cg, Value* self, Value* other);
 
     virtual Value* addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
     virtual Value* subIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
@@ -144,6 +144,7 @@ public:
     LgsTypePair* asPair();
     LgsSubType* asSubtype();
     LgsVariadic* asVariadic();
+    LgsNullable* asNullable();
     virtual ~LgsType();
 };
 

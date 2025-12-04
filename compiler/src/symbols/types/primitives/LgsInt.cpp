@@ -118,11 +118,11 @@ Value* LgsInt::leIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
 }
 
 Value* LgsInt::andIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return andInt(cg, left, right);
+    return andInt(cg, left->IRValue, right->IRValue);
 }
 
 Value* LgsInt::orIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return orInt(cg, left, right);
+    return orInt(cg, left->IRValue, right->IRValue);
 }
 
 std::string LgsInt::fmtStr() const {

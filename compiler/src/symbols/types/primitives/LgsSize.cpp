@@ -109,11 +109,11 @@ Value* LgsSize::leIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
 }
 
 Value* LgsSize::andIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return andInt(cg, left, right);
+    return andInt(cg, left->IRValue, right->IRValue);
 }
 
 Value* LgsSize::orIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return orInt(cg, left, right);
+    return orInt(cg, left->IRValue, right->IRValue);
 }
 
 Constant* LgsSize::getRTType(LgsCgModule& cg) {

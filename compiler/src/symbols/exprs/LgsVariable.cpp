@@ -3,6 +3,8 @@
 #include "funcs/LgsParam.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
+#include "types/LgsNullable.h"
+
 #include <codegen/LgsCgModule.h>
 
 Value* LgsVariable::loadIR(LgsCgModule& cg) {
@@ -24,6 +26,8 @@ bool LgsVariable::equals(LgsExpr* other) {
     switch (ref.symbolType) {
     case VAR_DEC:
         return ref.varDec->name == otherVar->name;
+    case PARAM:
+        return ref.param->name == otherVar->name;
     default:
         break;
     }
@@ -37,6 +41,13 @@ LgsExpr* LgsVariable::castExplicitly(LgsType* toType) {
 void LgsVariable::assign(LgsCgModule& cg, LgsExpr* expr) {
     owner = expr->owner;
     freeOwner(cg);
+    if (const auto nullable = type->asNullable()) {
+        if (!nullable->passByRef) {
+            const auto isSet = cg.builder.CreateIsNotNull(expr->IRValue);
+            nullable->setNullableFields(cg, IRValue, expr->IRValue, isSet);
+            return;
+        }
+    }
     cg.builder.CreateStore(expr->IRValue, IRValue);
 }
 

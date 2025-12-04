@@ -1,5 +1,6 @@
 #pragma once
 #include "LgsCgModule.h"
+#include "exprs/LgsNullableExpr.h"
 #include "files/LgsFile.h"
 #include "logos/LgsStack.h"
 
@@ -112,6 +113,7 @@ public:
     void visitIntConst(LgsIntConst* intConst) const;
     void visitConstant(LgsExpr* expr);
     void visitFloatConst(LgsFloatConst* floatConst) const;
+    void visitNullableExpr(LgsNullableExpr* nullableExpr);
     void visitArrayExpr(LgsArrayExpr* arrayExpr);
     void visitStaticArray(LgsArrayExpr* arrayExpr) const;
     void visitDynamicArray(LgsArrayExpr* arrayExpr) const;

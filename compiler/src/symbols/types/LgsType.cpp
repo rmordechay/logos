@@ -9,6 +9,7 @@
 #include "types/iterables/LgsDArray.h"
 #include "types/LgsEnum.h"
 #include "types/LgsGenericType.h"
+#include "types/LgsNullable.h"
 #include "types/iterables/LgsMap.h"
 #include "types/LgsSubType.h"
 #include "types/LgsUnknown.h"
@@ -182,33 +183,33 @@ void LgsType::cloneMethods(LgsType* newType) const {
     }
 }
 
-Value* LgsType::orInt(LgsCgModule& cg, const LgsExpr* self, const LgsExpr* other) {
+Value* LgsType::orInt(LgsCgModule& cg, Value* self, Value* other) {
     const auto currentBlock = cg.builder.GetInsertBlock();
     const auto func = currentBlock->getParent();
     const auto rightBlock = cg.createBlock("or_right", func);
     const auto endBlock = cg.createBlock("or_end", func);
-    cg.builder.CreateCondBr(self->IRValue, endBlock, rightBlock);
+    cg.builder.CreateCondBr(self, endBlock, rightBlock);
     cg.builder.SetInsertPoint(rightBlock);
     cg.builder.CreateBr(endBlock);
     cg.builder.SetInsertPoint(endBlock);
     auto* phi = cg.builder.CreatePHI(cg.builder.getInt1Ty(), 2);
     phi->addIncoming(cg.true_(), currentBlock);
-    phi->addIncoming(other->IRValue, rightBlock);
+    phi->addIncoming(other, rightBlock);
     return phi;
 }
 
-Value* LgsType::andInt(LgsCgModule& cg, LgsExpr* self, const LgsExpr* other) {
+Value* LgsType::andInt(LgsCgModule& cg, Value* self, Value* other) {
     const auto currentBlock = cg.builder.GetInsertBlock();
     const auto func = currentBlock->getParent();
     const auto rightBlock = cg.createBlock("and_right", func);
     const auto endBlock = cg.createBlock("and_end", func);
-    cg.builder.CreateCondBr(self->IRValue, rightBlock, endBlock);
+    cg.builder.CreateCondBr(self, rightBlock, endBlock);
     cg.builder.SetInsertPoint(rightBlock);
     cg.builder.CreateBr(endBlock);
     cg.builder.SetInsertPoint(endBlock);
     auto* phi = cg.builder.CreatePHI(cg.builder.getInt1Ty(), 2);
     phi->addIncoming(cg.false_(), currentBlock);
-    phi->addIncoming(other->IRValue, rightBlock);
+    phi->addIncoming(other, rightBlock);
     return phi;
 }
 
@@ -402,6 +403,10 @@ LgsSubType* LgsType::asSubtype() {
 
 LgsVariadic* LgsType::asVariadic() {
     return dynamic_cast<LgsVariadic*>(this);
+}
+
+LgsNullable* LgsType::asNullable() {
+    return dynamic_cast<LgsNullable*>(this);
 }
 
 LgsType::~LgsType() {

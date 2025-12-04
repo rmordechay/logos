@@ -16,6 +16,7 @@
 #include "types/iterables/LgsIterable.h"
 #include "types/LgsSubType.h"
 #include "errors/LgsErrHandler.h"
+#include "types/LgsNullable.h"
 
 bool LgsTypeResolver::resolveGlobals(const std::vector<LgsFile*>& srcFiles, ThreadPool& pool) {
     std::atomic successful = true;
@@ -43,7 +44,10 @@ LgsType* LgsTypeResolver::resolveType(LgsType* type, LgsFile* file) {
         type->genericArgs[i] = resolveType(type->genericArgs[i], file);
     }
 
-    if (const auto iterable = type->asIterable()) {
+    if (const auto nullable = type->asNullable()) {
+        nullable->baseType = resolveType(nullable->baseType, file);
+        nullable->passByRef = nullable->baseType->passByRef;
+    } else if (const auto iterable = type->asIterable()) {
         if (!iterable->genericArgs.empty()) {
             iterable->baseType = iterable->genericArgs.front();
         } else {

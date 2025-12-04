@@ -47,7 +47,8 @@ Value* LgsFunc::call(LgsCgModule& cg, std::vector<LgsFuncArg>& args) {
     if (fn) return fn(cg, args);
     std::vector<Value*> IRArgs;
     if (funcType->isVariadic) return callWithVariadic(cg, args);
-    const auto isNamed = !args.empty() && (funcType->isMethod ? args[1].name : args.front().name) != "";
+    const auto firstArgName = funcType->isMethod ? args[1].name : args.front().name;
+    const auto isNamed = !args.empty() && firstArgName != "";
     if (isNamed) {
         std::unordered_map<std::string, LgsFuncArg*> argsByName;
         for (size_t i = 0; i < args.size(); ++i) {
@@ -56,29 +57,19 @@ Value* LgsFunc::call(LgsCgModule& cg, std::vector<LgsFuncArg>& args) {
         for (const auto& param : funcType->params) {
             assert(argsByName.contains(param.name));
             const auto arg = argsByName[param.name];
-            if (param.isSelf) {
-                IRArgs.emplace_back(arg->expr->IRValue);
-            } else {
-                IRArgs.emplace_back(arg->expr->IRValue);
-            }
+            IRArgs.emplace_back(arg->expr->IRValue);
         }
+        assert(!funcType->hasDefaults);
     } else {
-        for (size_t i = 0; i < args.size(); ++i) {
-            const auto arg = args[i];
-            const auto& param = funcType->params[i];
-            if (param.isSelf) {
-                IRArgs.emplace_back(arg.expr->IRValue);
-            } else {
-                IRArgs.emplace_back(arg.expr->IRValue);
-            }
+        for (const auto& arg : args) {
+            IRArgs.emplace_back(arg.expr->loadIR(cg));
         }
-    }
-
-    if (funcType->hasDefaults) {
-        const auto diff = funcType->params.size() - args.size() - 1;
-        for (size_t i = diff; i < funcType->params.size(); ++i) {
-            const auto& param = funcType->params[i];
-            IRArgs.emplace_back(param.expr->IRValue);
+        if (funcType->hasDefaults) {
+            const auto diff = funcType->params.size() - args.size() - 1;
+            for (size_t i = diff; i < funcType->params.size(); ++i) {
+                const auto& param = funcType->params[i];
+                IRArgs.emplace_back(param.expr->IRValue);
+            }
         }
     }
     return callIR(cg, IRArgs);

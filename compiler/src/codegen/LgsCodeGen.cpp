@@ -56,6 +56,7 @@
 #include "cblas/cblas.h"
 #include "exprs/LgsMatrixExpr.h"
 #include "exprs/LgsMetaSelection.h"
+#include "types/LgsNullable.h"
 
 std::atomic<size_t> LgsCodeGen::lambdasIDGenerator{0};
 
@@ -638,6 +639,7 @@ void LgsCodeGen::visitExpr(LgsExpr* expr, const bool assign) {
         else if (const auto vecExpr = expr->asVectorExpr()) visitVectorExpr(vecExpr);
         else if (const auto matrixExpr = expr->asMatrixExpr()) visitMatrixExpr(matrixExpr);
         else if (const auto loopMetaVar = expr->asLoopMetaVar()) visitLoopMetaVar(loopMetaVar);
+        else if (const auto nullableExpr = expr->asNullableExpr()) visitNullableExpr(nullableExpr);
         else if (const auto cast = expr->asCast()) visitCast(cast);
         else if (const auto json = expr->asJson()) visitJson(json);
     }
@@ -735,6 +737,27 @@ void LgsCodeGen::visitFloatConst(LgsFloatConst* floatConst) const {
         floatConst->IRValue = cg.doublev(floatConst->value);
     } else {
         assert(0);
+    }
+}
+
+void LgsCodeGen::visitNullableExpr(LgsNullableExpr* nullableExpr) {
+    visitExpr(nullableExpr->baseExpr);
+    const auto nullable = nullableExpr->type->asNullable();
+    assert(nullable);
+    const auto ty = nullable->getIRType(cg);
+    if (nullableExpr->isNull) {
+        if (nullable->passByRef ) {
+            nullableExpr->IRValue = cg.null();
+        } else {
+            nullableExpr->IRValue = cg.builder.CreateAlloca(ty);
+            nullable->setIsSet(cg, nullableExpr->IRValue, cg.false_());
+        }
+    } else if (nullable->passByRef) {
+        nullableExpr->IRValue = nullableExpr->baseExpr->IRValue;
+    } else {
+        nullableExpr->IRValue = cg.builder.CreateAlloca(ty);
+        const auto isSet = cg.builder.CreateIsNotNull(nullableExpr->baseExpr->IRValue);
+        nullable->setNullableFields(cg, nullableExpr->IRValue, nullableExpr->baseExpr->loadIR(cg), isSet);
     }
 }
 

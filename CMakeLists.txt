@@ -87,6 +87,8 @@ set(COMPILER_SOURCE
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/LgsVectorExpr.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/LgsTypeExpr.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/LgsMatrixExpr.cpp
+    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/LgsJson.cpp
+    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/LgsNullableExpr.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/constants/LgsCharConst.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/constants/LgsFloatConst.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/constants/LgsIntConst.cpp
@@ -132,6 +134,7 @@ set(COMPILER_SOURCE
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsTypePair.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsGenericType.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsJsonType.cpp
+    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsNullable.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/iterables/LgsMap.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/iterables/LgsDArray.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/iterables/LgsSet.cpp
@@ -153,8 +156,6 @@ set(COMPILER_SOURCE
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsULong.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsByte.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsVoid.cpp
-    compiler/src/symbols/exprs/LgsJson.cpp
-    lib/include/Lgs_Runtime.h
 )
 
 set(LGS_LIB_SOURCE

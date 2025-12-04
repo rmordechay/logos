@@ -102,6 +102,7 @@ public:
     void visitBinaryExpr(LgsBinaryExpr* binaryExpr);
     void visitTernaryExpr(LgsTernaryExpr* ternary);
     void visitCast(LgsCast* cast);
+    void visitNullableExpr(LgsNullableExpr* nullableExpr);
     void visitArrayExpr(LgsArrayExpr* arrayExpr);
     void visitStaticArray(const LgsArrayExpr* arrayExpr);
     void visitDynamicArray(LgsArrayExpr* arrayExpr);
@@ -132,7 +133,7 @@ public:
     void visitSlice(LgsIterIndex* iterIndex);
     void visitLoopMetaVar(LgsMetaVar* metaVar);
 
-    bool validateExprType(LgsExpr* expr, LgsType* type);
+    bool validateExprType(const LgsExpr* expr, LgsType* type);
     bool validateTypeName(const std::string& typeName, const LgsLocation* location);
     bool validateLocalName(const std::string& typeName, const LgsLocation* location);
     void validateObjImplements(LgsObject* obj, const std::vector<LgsType*>& interfaces);

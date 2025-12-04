@@ -1,4 +1,6 @@
 #include "types/primitives/LgsBool.h"
+
+#include "exprs/LgsNullableExpr.h"
 #include "exprs/constants/LgsIntConst.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsChar.h"
@@ -80,10 +82,26 @@ Value* LgsBool::lshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* other) {
 }
 
 Value* LgsBool::eqIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+    const auto f = [&cg](const LgsExpr* expr) {
+        if (expr->type->asNullable()->passByRef) return cg.builder.CreateIsNull(expr->IRValue);
+        const auto gepIsSet = cg.builder.CreateStructGEP(expr->type->getIRType(cg), expr->IRValue, 1);
+        return cg.builder.CreateNot(cg.builder.CreateLoad(cg.i1Ty(), gepIsSet));
+    };
+    if (left->isNull && right->isNull) return cg.true_();
+    if (left->isNull) return f(right);
+    if (right->isNull) return f(left);
     return cg.builder.CreateICmpEQ(left->loadIR(cg), right->loadIR(cg));
 }
 
 Value* LgsBool::neIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+    const auto f = [&cg](const LgsExpr* expr) -> Value* {
+        if (expr->type->asNullable()->passByRef) return cg.builder.CreateIsNotNull(expr->IRValue);
+        const auto gepIsSet = cg.builder.CreateStructGEP(expr->type->getIRType(cg), expr->IRValue, 1);
+        return cg.builder.CreateLoad(cg.i1Ty(), gepIsSet);
+    };
+    if (left->isNull && right->isNull) return cg.false_();
+    if (left->isNull) return f(right);
+    if (right->isNull) return f(left);
     return cg.builder.CreateICmpNE(left->loadIR(cg), right->loadIR(cg));
 }
 
@@ -104,11 +122,11 @@ Value* LgsBool::leIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
 }
 
 Value* LgsBool::andIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return andInt(cg, left, right);
+    return andInt(cg, left->IRValue, right->IRValue);
 }
 
 Value* LgsBool::orIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return orInt(cg, left, right);
+    return orInt(cg, left->IRValue, right->IRValue);
 }
 
 std::string LgsBool::getName() {
