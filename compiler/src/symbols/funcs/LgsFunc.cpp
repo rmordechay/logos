@@ -5,6 +5,8 @@
 #include "types/LgsFuncType.h"
 #include "types/primitives/LgsVoid.h"
 #include "LgsUtils.h"
+#include "types/LgsGenericType.h"
+
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/Module.h>
 
@@ -62,7 +64,7 @@ Value* LgsFunc::call(LgsCgModule& cg, std::vector<LgsFuncArg>& args) {
         assert(!funcType->hasDefaults);
     } else {
         for (const auto& arg : args) {
-            IRArgs.emplace_back(arg.expr->loadIR(cg));
+            IRArgs.emplace_back(arg.expr->IRValue);
         }
         if (funcType->hasDefaults) {
             const auto diff = funcType->params.size() - args.size() - 1;

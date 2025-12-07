@@ -87,3 +87,9 @@ void LgsVariable::setDebugValue(LgsCgModule& cg) {
         cg.builder.GetInsertBlock()
     );
 }
+
+LgsExpr* LgsVariable::clone() {
+    const auto newVar = new LgsVariable(*this);
+    if (type) newVar->type = type;
+    return newVar;
+}

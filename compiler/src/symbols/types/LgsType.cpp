@@ -357,7 +357,7 @@ LgsEnum* LgsType::asEnum() {
     return dynamic_cast<LgsEnum*>(this);
 }
 
-LgsGenericType* LgsType::asGeneric() {
+LgsGenericType* LgsType::asGenericType() {
     return dynamic_cast<LgsGenericType*>(this);
 }
 
@@ -421,9 +421,10 @@ LgsType::~LgsType() {
     fields.clear();
 }
 
-void freeType(const LgsType* type) {
+void freeType(LgsType* type) {
     if (!type) return;
     if (type->isPrimitive) return;
+    if (type->asGenericType() || type->asObject()) return;
     delete type;
 }
 

@@ -19,9 +19,8 @@ void freeParams(std::vector<LgsParam>& params) {
         if (param.isSelf) continue;
         if (param.expr) {
             freeExpr(param.expr);
-        } else if (param.type) {
-            freeType(param.type);
         }
+        freeType(param.type);
     }
     params.clear();
 }

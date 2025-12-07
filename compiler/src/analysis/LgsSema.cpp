@@ -1022,6 +1022,42 @@ void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent) {
     }
 }
 
+LgsFunc* clone(const LgsFunc* func, const LgsFuncCall* funcCall) {
+    const auto funcType = func->funcType;
+    const auto newFuncType = new LgsFuncType(*funcType);
+    newFuncType->params.clear();
+    newFuncType->genericTypes.clear();
+
+    std::unordered_map<std::string, LgsType*> replacements;
+    for (size_t i = 0; i < funcCall->args.size(); ++i) {
+        const auto& param = funcType->params[i];
+        LgsType* newType = nullptr;
+        if (funcType->isGenericType(param.type)) {
+            newType = funcCall->args[i].expr->type;
+            replacements[param.type->getName()] = funcCall->args[i].expr->type;
+        } else {
+            newType = param.type;
+        }
+        LgsParam newParam(newType, param.name);
+        newParam.isSelf = param.isSelf;
+        newParam.isVariadic = param.isVariadic;
+        newFuncType->params.push_back(newParam);
+    }
+
+    if (funcType->isGenericType(funcType->rt)) {
+        newFuncType->rt = replacements[funcType->rt->getName()];
+    } else {
+        newFuncType->rt = funcType->rt;
+    }
+
+    for (auto& [_, t] : replacements) {
+        newFuncType->name += '_' + t->getName();
+    }
+    const auto newFunc = new LgsFunc(newFuncType);
+    newFunc->stmtsBlock = func->stmtsBlock->clone();
+    return newFunc;
+}
+
 void LgsSema::visitFuncCall(LgsFuncCall* funcCall) {
     const auto symbol = getSymbol(funcCall->name, &funcCall->location);
     if (!symbol) return;
@@ -1050,7 +1086,8 @@ void LgsSema::visitFuncCall(LgsFuncCall* funcCall) {
         if (generics != file->symbolTable.genericFuncCalls.end()) {
             genericFunc = generics->second;
         } else {
-            genericFunc = createGenericFunc(funcCall, func);
+            genericFunc = clone(func, funcCall);
+            visitFunc(genericFunc);
             file->symbolTable.genericFuncCalls[funcName] = genericFunc;
         }
         funcCall->func = genericFunc;
@@ -1604,48 +1641,6 @@ void LgsSema::createCoroutineFunc(LgsFuncCall* funcCall) {
     visitFunc(newFunc);
     funcCall->coroutine = newFunc;
     funcCall->func = nullptr;
-}
-
-LgsFunc* LgsSema::createGenericFunc(LgsFuncCall* funcCall, const LgsFunc* originalFunc) {
-    const auto newFunc = new LgsFunc(originalFunc->funcType->name, nullptr);
-    const auto originalFT = originalFunc->funcType;
-    newFunc->location = originalFunc->location;
-    newFunc->funcType->location = originalFT->location;
-
-    // Params
-    std::unordered_map<std::string, LgsType*> genericArgs;
-    for (size_t i = 0; i < originalFT->params.size(); ++i) {
-        const auto& param = originalFT->params[i];
-        const auto& arg = funcCall->args[i];
-        if (!param.type->asGeneric()) continue;
-        const auto paramTypeName = param.type->getName();
-        if (genericArgs.contains(paramTypeName)) continue;
-        if (originalFT->rt->asGeneric()) {
-            const auto newType = arg.expr->type;
-            genericArgs[paramTypeName] = newType;
-            newFunc->funcType->params.emplace_back(newType, param.name);
-        } else {
-            newFunc->funcType->params.emplace_back(param.type, param.name);
-        }
-    }
-
-    // Set generic IRName
-    newFunc->funcType->IRName = newFunc->funcType->getName();
-    for (const auto& t : std::views::values(genericArgs)) {
-        newFunc->funcType->IRName += "_" + t->getName();
-    }
-
-    // Return type
-    if (originalFT->rt->asGeneric()) {
-        newFunc->funcType->rt = genericArgs[originalFT->rt->getName()];
-    } else {
-        newFunc->funcType->rt = originalFT->rt;
-    }
-
-    newFunc->stmtsBlock = originalFunc->stmtsBlock;
-    visitFunc(newFunc);
-    funcCall->func = newFunc;
-    return newFunc;
 }
 
 static std::string getMissingImplementsStr(const std::vector<LgsField*>& fields, const std::vector<LgsFunc*>& methods) {

@@ -1243,11 +1243,11 @@ void LgsCodeGen::createPrologue(LgsFunc* func) const {
 }
 
 void LgsCodeGen::createEpilogue(const LgsFunc* func) const {
+    cg.callPopStack();
     if (func->funcType->name == LGS_MAIN_FUNC) {
         cg.callRuntimeFunc("close", cg.voidTy());
         cg.builder.CreateRet(cg.i32(EXIT_SUCCESS));
     } else if (func->funcType->rt->isVoid() && !cg.lastInstTerminator()) {
-        cg.callPopStack();
         cg.builder.CreateRetVoid();
     }
 }

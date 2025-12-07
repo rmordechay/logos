@@ -137,12 +137,29 @@ DIType* LgsFuncType::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
 
+bool LgsFuncType::isGenericType(LgsType* type) const {
+    for (const auto genericType : genericTypes) {
+        if (genericType->equals(type)) return true;
+    }
+    return false;
+}
+
 LgsFuncType::~LgsFuncType() {
     if (!rt->asObject()) {
-        freeType(rt);
+        if (!rt->asGenericType()) freeType(rt);
+        rt = nullptr;
     }
     if (isMethod && !params.empty()) {
         params.erase(params.begin());
     }
-    freeParams(params);
+    for (const auto& param : params) {
+        if (param.isSelf) continue;
+        if (param.expr) freeExpr(param.expr);
+        freeType(param.type);
+    }
+    params.clear();
+    for (const auto& genericType : genericTypes) {
+        freeType(genericType);
+    }
+    genericTypes.clear();
 }

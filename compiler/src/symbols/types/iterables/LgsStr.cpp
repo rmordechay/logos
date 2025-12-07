@@ -8,7 +8,6 @@
 #include "types/primitives/LgsChar.h"
 
 Type* LgsStr::getIRType(LgsCgModule& cg) {
-    if (isStatic) return ArrayType::get(cg.i8Ty(), size->getConstInt().value() + 1);
     return cg.ptrTy();
 }
 
@@ -35,10 +34,10 @@ Constant* LgsStr::getRTType(LgsCgModule& cg) {
 
 bool LgsStr::canCastTo(LgsType* other) {
     if (other->getName() == LgsAny::name) return true;
+    if (other->asGenericType()) return true;
     if (const auto iter = other->asSArray()) {
         return iter->baseType && iter->baseType->asChar();
     }
-    if (other->asGeneric()) return true;
     return name == other->getName();
 }
 

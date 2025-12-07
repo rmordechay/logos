@@ -26,8 +26,8 @@ public:
     bool hasGenerics = false;
 
     explicit LgsObject(std::string  name) : name(std::move(name)) {
-        isHeapAlloc = true;
         passByRef = true;
+        isHeapAlloc = true;
         getFieldFunc->fn = [this](LgsCgModule& cg, const std::vector<LgsFuncArg>& args) {
             return cg.callLgsFunc("getObjectField", cg.ptrTy(), {cg.ptrTy(), cg.ptrTy(), cg.ptrTy()}, {
                 getRTType(cg), args[0].expr->IRValue, args[1].expr->IRValue

@@ -132,7 +132,7 @@ public:
     LgsObject* asObject();
     LgsInterface* asInterface();
     LgsEnum* asEnum();
-    LgsGenericType* asGeneric();
+    LgsGenericType* asGenericType();
     LgsIterable* asIterable();
     LgsSArray* asSArray();
     LgsDArray* asDArray();
@@ -148,7 +148,7 @@ public:
     virtual ~LgsType();
 };
 
-void freeType(const LgsType* type);
+void freeType(LgsType* type);
 
 template<typename T>
 void freeTypes(std::vector<T*>& types) {

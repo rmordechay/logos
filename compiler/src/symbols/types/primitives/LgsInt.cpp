@@ -28,7 +28,7 @@ Constant* LgsInt::getRTType(LgsCgModule& cg) {
 bool LgsInt::canCastTo(LgsType* other) {
     const auto otherName = other->getName();
     if (name == otherName) return true;
-    if (other->asGeneric()) return true;
+    if (other->asGenericType()) return true;
     if (otherName == LgsAny::name) return true;
     if (otherName == LgsSize::name) return true;
     if (otherName == LgsLong::name) return true;

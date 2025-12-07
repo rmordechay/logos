@@ -52,6 +52,7 @@ public:
     virtual void assign(LgsCgModule& cg, LgsExpr* expr);
     virtual bool equals(LgsExpr* other);
     virtual std::string asText() = 0;
+    virtual LgsExpr* clone();
 
     LgsFunc* asFunc();
     LgsVariable* asVariable();

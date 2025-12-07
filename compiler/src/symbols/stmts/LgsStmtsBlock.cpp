@@ -29,6 +29,18 @@ bool LgsStmtWrapper::isTerminator() const {
     return false;
 }
 
+LgsStmtWrapper LgsStmtWrapper::clone() const {
+    switch (type) {
+    case Type::Stmt:
+        return LgsStmtWrapper(stmt->clone());
+    case Type::Expr:
+        return LgsStmtWrapper(expr->clone());
+    case Type::Object:
+        assert(0);
+    }
+    return LgsStmtWrapper();
+}
+
 void LgsStmtsBlock::hashNode(size_t& oldHash) {
     for (const auto stmt : stmts) {
         stmt.stmt->hashNode(oldHash);
@@ -38,14 +50,14 @@ void LgsStmtsBlock::hashNode(size_t& oldHash) {
 LgsStmtsBlock::~LgsStmtsBlock() {
     for (const auto& stmt : stmts) {
         switch (stmt.type) {
-        case LgsStmtWrapper::Type::Object:
-            freeType(stmt.obj);
-            break;
         case LgsStmtWrapper::Type::Stmt:
             freeStmt(stmt.stmt);
             break;
         case LgsStmtWrapper::Type::Expr:
             freeExpr(stmt.expr);
+            break;
+        case LgsStmtWrapper::Type::Object:
+            freeType(stmt.obj);
             break;
         }
     }
@@ -54,4 +66,12 @@ LgsStmtsBlock::~LgsStmtsBlock() {
 
 void LgsStmtsBlock::setDebugValue(LgsCgModule& cg) {
     assert(0);
+}
+
+LgsStmtsBlock* LgsStmtsBlock::clone() const {
+    const auto newBlock = new LgsStmtsBlock();
+    for (const auto& stmt : stmts) {
+        newBlock->stmts.push_back(stmt.clone());
+    }
+    return newBlock;
 }

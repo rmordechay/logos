@@ -24,24 +24,6 @@
 #include "funcs/LgsFunc.h"
 #include "loops/LgsMetaVar.h"
 
-LgsExpr* LgsExpr::castExplicitly(LgsType* toType) {
-    assert(0);
-}
-
-void LgsExpr::castImplicitly(LgsType* toType) {}
-
-Value* LgsExpr::hashValue(LgsCgModule& cg) {
-    assert(0);
-}
-
-void LgsExpr::assign(LgsCgModule& cg, LgsExpr* expr) {
-    assert(0);
-}
-
-bool LgsExpr::equals(LgsExpr* other) {
-    assert(0);
-}
-
 void LgsExpr::freeOwner(LgsCgModule& cg) {
     if (type->isHeapAlloc && owner) {
         cg.callRuntimeFunc("removeOwner", cg.voidTy(), {cg.ptrTy()}, {owner->IRValue});
@@ -97,6 +79,28 @@ void LgsExpr::setType(LgsType* newType) {
     type = newType;
 }
 
+LgsExpr* LgsExpr::castExplicitly(LgsType* toType) {
+    assert(0);
+}
+
+void LgsExpr::castImplicitly(LgsType* toType) {}
+
+Value* LgsExpr::hashValue(LgsCgModule& cg) {
+    assert(0);
+}
+
+void LgsExpr::assign(LgsCgModule& cg, LgsExpr* expr) {
+    assert(0);
+}
+
+bool LgsExpr::equals(LgsExpr* other) {
+    assert(0);
+}
+
+
+LgsExpr* LgsExpr::clone() {
+    assert(0);
+}
 
 LgsFunc* LgsExpr::asFunc() {
     return dynamic_cast<LgsFunc*>(this);

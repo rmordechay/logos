@@ -24,5 +24,5 @@ public:
     void resolveObjTypes(LgsObject* obj, LgsFile& file);
     void resolveInterfaceTypes(LgsInterface* interface, LgsFile& file);
     void resolveFuncTypes(LgsFuncType* funcType, LgsFile& file);
-    void resolveIOPair(LgsIOPair* ioPair, LgsObject* obj, LgsFile& file) const;
+    void resolveIOPair(LgsIOPair* ioPair, LgsObject* obj, const LgsFile& file) const;
 };

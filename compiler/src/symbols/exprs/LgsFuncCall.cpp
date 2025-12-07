@@ -124,6 +124,16 @@ void LgsFuncCall::setDebugValue(LgsCgModule& cg) {
     setDebugLoc(cg);
 }
 
+LgsExpr* LgsFuncCall::clone() {
+    const auto newFuncCall = new LgsFuncCall(*this);
+    newFuncCall->args.clear();
+    for (const auto& arg : args) {
+        newFuncCall->args.emplace_back(LgsFuncArg(arg.expr->clone(), arg.name, arg.isSelf));
+    }
+    newFuncCall->type = type;
+    return newFuncCall;
+}
+
 bool argAndParamEqual(const LgsExpr* arg, const LgsParam* param) {
     const auto argType = arg->type;
     if (!argType) return false;

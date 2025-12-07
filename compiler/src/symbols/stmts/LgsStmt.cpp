@@ -25,6 +25,10 @@ LgsReturn* LgsStmt::asReturn() { return dynamic_cast<LgsReturn*>(this); }
 LgsVarDec* LgsStmt::asVarDec() { return dynamic_cast<LgsVarDec*>(this); }
 LgsAssignment* LgsStmt::asAssignment() { return dynamic_cast<LgsAssignment*>(this); }
 
+LgsStmt* LgsStmt::clone() {
+    assert(0);
+}
+
 void freeStmt(const LgsStmt* stmt) {
     if (!stmt) return;
     delete stmt;

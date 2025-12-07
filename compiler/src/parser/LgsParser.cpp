@@ -756,13 +756,13 @@ LgsFunc* LgsParser::parseMethod(LgsObject* obj) {
 LgsFuncType* LgsParser::parseFuncHeader() {
     const auto nameToken = currentToken;
     if (currentToken.type != T_IDENTIFIER) return nullptr;
-    std::vector<LgsGenericType*> genericsParams;
+    std::vector<LgsGenericType*> genericsTypes;
     if (peek().type == T_LANGLE) {
         consume(2);
         while (true) {
             const auto type = parseGenericType();
             if (!type) break;
-            genericsParams.push_back(type);
+            genericsTypes.push_back(type);
             if (currentToken.type == T_RANGLE) break;
         }
         mustMatch(T_RANGLE);
@@ -774,7 +774,7 @@ LgsFuncType* LgsParser::parseFuncHeader() {
 
     const auto funcType = new LgsFuncType();
     funcType->name = nameToken.lexeme;
-    funcType->genericTypes = genericsParams;
+    funcType->genericTypes = genericsTypes;
     parseParams(funcType);
     mustMatch(T_RPAREN);
     if (matchAndConsume(T_COLON)) {

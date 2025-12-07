@@ -89,6 +89,7 @@ Value* LgsDArray::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
 
 bool LgsDArray::canCastTo(LgsType* other) {
     if (other->getName() == LgsAny::name) return true;
+    if (other->asGenericType()) return true;
     const auto otherArr = other->asDArray();
     if (!otherArr) return false;
     if (!baseType) return true;

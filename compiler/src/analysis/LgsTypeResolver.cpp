@@ -100,7 +100,6 @@ LgsType* LgsTypeResolver::resolveType(LgsType* type, LgsFile* file) {
         freeType(type);
         type = newType;
     }
-
     return type;
 }
 
@@ -163,7 +162,8 @@ void LgsTypeResolver::resolveFuncTypes(LgsFuncType* funcType, LgsFile& file) {
     auto resolveTypeOrGeneric = [&](LgsType* type) -> LgsType* {
         if (!type) return &LGS_VOID;
         for (const auto generic : funcType->genericTypes) {
-            if (type->equals(generic)) return generic;
+            if (!type->equals(generic)) continue;
+            return generic;
         }
         return resolveType(type, &file);
     };
@@ -173,7 +173,7 @@ void LgsTypeResolver::resolveFuncTypes(LgsFuncType* funcType, LgsFile& file) {
     funcType->rt = resolveTypeOrGeneric(funcType->rt);
 }
 
-void LgsTypeResolver::resolveIOPair(LgsIOPair* ioPair, LgsObject* obj, LgsFile& file) const {
+void LgsTypeResolver::resolveIOPair(LgsIOPair* ioPair, LgsObject* obj, const LgsFile& file) const {
     ioPair->openFunc = obj->getMethod(ioPair->openFuncName);
     ioPair->openFunc->funcType->isIOMember = true;
     if (!ioPair->openFunc) {

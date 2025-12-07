@@ -62,4 +62,5 @@ public:
     std::unordered_map<std::string, LgsParam*> getParamsByName();
     DIType* getDebugType(LgsCgModule& cg) override;
     ~LgsFuncType() override;
+    bool isGenericType(LgsType* type) const;
 };

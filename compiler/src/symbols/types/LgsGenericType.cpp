@@ -4,11 +4,11 @@
 #include <cassert>
 
 Type* LgsGenericType::getIRType(LgsCgModule& cg) {
-    assert(0);
+    return nullptr;
 }
 
 Constant* LgsGenericType::getRTType(LgsCgModule& cg) {
-    assert(0);
+    return nullptr;
 }
 
 size_t LgsGenericType::sizeBytes() {
