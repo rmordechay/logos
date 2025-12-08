@@ -39,8 +39,6 @@ LgsExpr* LgsVariable::castExplicitly(LgsType* toType) {
 }
 
 void LgsVariable::assign(LgsCgModule& cg, LgsExpr* expr) {
-    owner = expr->owner;
-    freeOwner(cg);
     if (const auto nullable = type->asNullable()) {
         if (!nullable->passByRef) {
             const auto isSet = cg.builder.CreateIsNotNull(expr->IRValue);
@@ -59,7 +57,7 @@ Value* LgsVariable::hashValue(LgsCgModule& cg) {
         return ref.varDec->expr->hashValue(cg);
     case FIELD:
         if (ref.field->isEnumField) return cg.usize(ref.field->position);
-        if (ref.field->type->asEnum()) return cg.builder.CreateLoad(cg.sizeTy(), ref.field->getGEP(cg));
+        if (ref.field->type->asEnum()) return ref.field->loadIR(cg);
         return cg.callHash(ref.field->IRValue);
     default:
         assert(0);

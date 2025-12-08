@@ -118,10 +118,10 @@ LgsType* LgsType::extendInt() {
     return this;
 }
 
-LgsType* LgsType::applyIntBinOp(LgsType* toType, const LgsBinOpType op) {
+LgsType* LgsType::applyIntBinOp(LgsType* rightType, const LgsBinOpType op) {
     switch (op) {
     case POW:
-        if (canCastTo(toType)) return &LGS_DOUBLE;
+        if (canCastTo(rightType)) return &LGS_DOUBLE;
         break;
     case ADD:
     case SUB:
@@ -132,11 +132,11 @@ LgsType* LgsType::applyIntBinOp(LgsType* toType, const LgsBinOpType op) {
     case BIT_XOR:
     case LSHIFT:
     case RSHIFT:
-        if (toType->asFloat()) return toType;
-        if (canCastTo(toType)) return this;
+        if (rightType->asFloat()) return &LGS_FLOAT;
+        if (canCastTo(rightType)) return this;
         break;
     case DIV:
-        if (toType->isNumber()) return &LGS_FLOAT;
+        if (rightType->isNumber()) return &LGS_FLOAT;
         break;
     case EQ:
     case NE:
@@ -144,19 +144,25 @@ LgsType* LgsType::applyIntBinOp(LgsType* toType, const LgsBinOpType op) {
     case GT:
     case GE:
     case LE: {
-        if (canCastTo(toType)) return &LGS_BOOL;
+        if (canCastTo(rightType)) return &LGS_BOOL;
         break;
     }
     case IN: {
-        const auto iter = toType->asIterable();
+        const auto iter = rightType->asIterable();
         if (!iter) break;
         if (iter->getDimension() == 1 && canCastTo(iter->baseType)) {
             return &LGS_BOOL;
         }
         break;
     }
-    default:
+    case AND:
+    case OR:
+        if (asBool() && rightType->asBool()) return &LGS_BOOL;
         break;
+    case CROSS:
+        break;
+    case NOOP:
+        assert(0);
     }
     return nullptr;
 }
@@ -183,33 +189,73 @@ void LgsType::cloneMethods(LgsType* newType) const {
     }
 }
 
-Value* LgsType::orInt(LgsCgModule& cg, Value* self, Value* other) {
-    const auto currentBlock = cg.builder.GetInsertBlock();
-    const auto func = currentBlock->getParent();
-    const auto rightBlock = cg.createBlock("or_right", func);
-    const auto endBlock = cg.createBlock("or_end", func);
-    cg.builder.CreateCondBr(self, endBlock, rightBlock);
-    cg.builder.SetInsertPoint(rightBlock);
-    cg.builder.CreateBr(endBlock);
-    cg.builder.SetInsertPoint(endBlock);
-    auto* phi = cg.builder.CreatePHI(cg.builder.getInt1Ty(), 2);
-    phi->addIncoming(cg.true_(), currentBlock);
-    phi->addIncoming(other, rightBlock);
-    return phi;
+Value* eqIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+    const auto eqNullFunc = [&cg](const LgsExpr* expr) {
+        const auto nullable = expr->type->asNullable();
+        if (expr->type->passByRef) return cg.builder.CreateIsNull(expr->IRValue);
+        return cg.builder.CreateNot(nullable->getIsSet(cg, expr->IRValue));
+    };
+    if (left->isNull && right->isNull) return cg.true_();
+    if (left->isNull) return eqNullFunc(right);
+    if (right->isNull) return eqNullFunc(left);
+    return cg.builder.CreateICmpEQ(left->loadIR(cg), right->loadIR(cg));
 }
 
-Value* LgsType::andInt(LgsCgModule& cg, Value* self, Value* other) {
+Value* neIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+    const auto neNullFunc = [&cg](const LgsExpr* expr) -> Value* {
+        const auto nullable = expr->type->asNullable();
+        if (expr->type->passByRef) return cg.builder.CreateIsNotNull(expr->IRValue);
+        return nullable->getIsSet(cg, expr->IRValue);
+    };
+    if (left->isNull && right->isNull) return cg.false_();
+    if (left->isNull) return neNullFunc(right);
+    if (right->isNull) return neNullFunc(left);
+    return cg.builder.CreateICmpNE(left->loadIR(cg), right->loadIR(cg));
+}
+
+Value* ltIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+    return cg.builder.CreateICmpSLT(left->loadIR(cg), right->loadIR(cg));
+}
+
+Value* gtIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+    return cg.builder.CreateICmpSGT(left->loadIR(cg), right->loadIR(cg));
+}
+
+Value* geIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+    return cg.builder.CreateICmpSGE(left->loadIR(cg), right->loadIR(cg));
+}
+
+Value* leIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+    return cg.builder.CreateICmpSLE(left->loadIR(cg), right->loadIR(cg));
+}
+
+Value* andIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     const auto currentBlock = cg.builder.GetInsertBlock();
     const auto func = currentBlock->getParent();
     const auto rightBlock = cg.createBlock("and_right", func);
     const auto endBlock = cg.createBlock("and_end", func);
-    cg.builder.CreateCondBr(self, rightBlock, endBlock);
+    cg.builder.CreateCondBr(left->IRValue, rightBlock, endBlock);
     cg.builder.SetInsertPoint(rightBlock);
     cg.builder.CreateBr(endBlock);
     cg.builder.SetInsertPoint(endBlock);
     auto* phi = cg.builder.CreatePHI(cg.builder.getInt1Ty(), 2);
     phi->addIncoming(cg.false_(), currentBlock);
-    phi->addIncoming(other, rightBlock);
+    phi->addIncoming(right->IRValue, rightBlock);
+    return phi;
+}
+
+Value* orIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+    const auto currentBlock = cg.builder.GetInsertBlock();
+    const auto func = currentBlock->getParent();
+    const auto rightBlock = cg.createBlock("or_right", func);
+    const auto endBlock = cg.createBlock("or_end", func);
+    cg.builder.CreateCondBr(left->IRValue, endBlock, rightBlock);
+    cg.builder.SetInsertPoint(rightBlock);
+    cg.builder.CreateBr(endBlock);
+    cg.builder.SetInsertPoint(endBlock);
+    auto* phi = cg.builder.CreatePHI(cg.builder.getInt1Ty(), 2);
+    phi->addIncoming(cg.true_(), currentBlock);
+    phi->addIncoming(right->IRValue, rightBlock);
     return phi;
 }
 
@@ -254,38 +300,6 @@ Value* LgsType::lshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* other) {
 }
 
 Value* LgsType::rshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    assert(0);
-}
-
-Value* LgsType::eqIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    assert(0);
-}
-
-Value* LgsType::neIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    assert(0);
-}
-
-Value* LgsType::ltIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    assert(0);
-}
-
-Value* LgsType::gtIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    assert(0);
-}
-
-Value* LgsType::geIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    assert(0);
-}
-
-Value* LgsType::leIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    assert(0);
-}
-
-Value* LgsType::andIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    assert(0);
-}
-
-Value* LgsType::orIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 

@@ -12,7 +12,7 @@ struct Lgs_StackFrame {
 };
 
 struct Lgs_Runtime {
-    Lgs_Allocator arena;
+    Lgs_Allocator allocator;
     LgsErrHandler errHandler;
     std::vector<Lgs_ThunkFunc> coros;
     std::vector<Lgs_StackFrame> stack;

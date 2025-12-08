@@ -307,7 +307,7 @@ void LgsApp::loadBuiltins() {
     globals.table.addSymbol(LgsSymbol(new LgsVarDec("_WINDOWS", &LGS_BOOL, new LgsIntConst(&LGS_BOOL, lgsConfigs.os == WINDOWS)), true, false), &errHandler);
     globals.table.rttTypes = {
         &LGS_STR, &LGS_BYTE, &LGS_BOOL, &LGS_CHAR, &LGS_INT, &LGS_UINT, &LGS_ULONG,
-        &LGS_SHORT, &LGS_LONG, &LGS_SIZE, &LGS_FLOAT, &LGS_DOUBLE
+        &LGS_SHORT, &LGS_LONG, &LGS_SIZE, &LGS_FLOAT, &LGS_DOUBLE, &LGS_NULL
     };
 }
 

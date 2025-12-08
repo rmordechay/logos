@@ -1175,6 +1175,7 @@ LgsReturn* LgsParser::parseReturnStmt() {
     const auto returnToken = currentToken;
     if (!matchAndConsume(T_RETURN)) return nullptr;
     const auto expr = parseExpr();
+    expr->isReturnExpr = true;
     auto const returnStmt = new LgsReturn(expr);
     setLocation(returnStmt->location, &returnToken, &currentToken);
     return returnStmt;

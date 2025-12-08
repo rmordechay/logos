@@ -93,38 +93,6 @@ Value* LgsInt::lshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* other) {
     return cg.builder.CreateLShr(left->loadIR(cg), other->loadIR(cg));
 }
 
-Value* LgsInt::eqIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return cg.builder.CreateICmpEQ(left->loadIR(cg), right->loadIR(cg));
-}
-
-Value* LgsInt::neIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return cg.builder.CreateICmpNE(left->loadIR(cg), right->loadIR(cg));
-}
-
-Value* LgsInt::ltIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return cg.builder.CreateICmpSLT(left->loadIR(cg), right->loadIR(cg));
-}
-
-Value* LgsInt::gtIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return cg.builder.CreateICmpSGT(left->loadIR(cg), right->loadIR(cg));
-}
-
-Value* LgsInt::geIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return cg.builder.CreateICmpSGE(left->loadIR(cg), right->loadIR(cg));
-}
-
-Value* LgsInt::leIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return cg.builder.CreateICmpSLE(left->loadIR(cg), right->loadIR(cg));
-}
-
-Value* LgsInt::andIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return andInt(cg, left->IRValue, right->IRValue);
-}
-
-Value* LgsInt::orIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return orInt(cg, left->IRValue, right->IRValue);
-}
-
 std::string LgsInt::fmtStr() const {
     return "%d";
 }

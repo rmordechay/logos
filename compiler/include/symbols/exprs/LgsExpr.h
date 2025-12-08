@@ -37,11 +37,10 @@ public:
     bool isMutable = true;
     bool isImportName = false;
     bool isNull = false;
+    bool isReturnExpr = false;
     LgsValue* owner = nullptr;
-    Value* destPtrValue = nullptr;
 
     explicit LgsExpr(LgsType* type = nullptr) : type(type) {}
-    void freeOwner(LgsCgModule& cg);
     std::optional<int64_t> getConstInt();
     std::optional<std::string> getConstStr();
     void setType(LgsType* newType);

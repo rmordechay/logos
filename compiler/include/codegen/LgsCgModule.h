@@ -100,6 +100,7 @@ public:
     void callMemSet(Value* dest, Value* src, Value* size);
     void callMemCpy(Value* dest, Value* src, Value* size);
     Value* allocate(Value* size, Constant* type, bool isOwner);
+    Value* allocateReturn(Value* size, Constant* type);
 
     // Stack
     void callStackPush();

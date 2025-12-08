@@ -83,7 +83,7 @@ public:
     void visitMainFunc(LgsMainFunc* func);
     void visitFunc(LgsFunc* func);
     void visitGenericFunc(LgsFunc* func);
-    void visitField(LgsField* field) const;
+    void visitField(LgsField* field, Value* parent) const;
     void visitStmt(LgsStmt* stmt);
     void visitStmtsBlock(const LgsStmtsBlock* stmtsBlock);
     void visitLoop(LgsForLoop* loop);
@@ -119,7 +119,7 @@ public:
     void visitDynamicArray(LgsArrayExpr* arrayExpr) const;
     void visitSetExpr(LgsArrayExpr* arrayExpr) const;
     void visitVectorExpr(LgsVectorExpr* vectorExpr);
-    void visitMatrixExpr(LgsMatrixExpr* matrixExpr);
+    void visitMatrixExpr(const LgsMatrixExpr* matrixExpr);
     void visitHashMap(LgsHashMap* hashMap);
     void visitEnvVar(LgsEnvVar* envVar) const;
     void visitVariable(LgsVariable* variable);
@@ -149,4 +149,5 @@ public:
     bool checkMock(LgsExpr* expr) const;
     Value* getIRValue(LgsValue* value);
     void addVirtuals(LgsObject* obj, Value* ptr) const;
+    Value* allocate(const LgsExpr* expr, Value* size, Constant* type) const;
 };

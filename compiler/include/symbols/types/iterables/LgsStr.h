@@ -6,8 +6,9 @@ class LgsStr final : public LgsIterable {
 public:
     static constexpr auto name = "Str";
 
-    explicit LgsStr(LgsExpr* size = nullptr): LgsIterable(&LGS_CHAR, size) {
+    explicit LgsStr(const bool isHeap = false): LgsIterable(&LGS_CHAR) {
         passByRef = true;
+        isHeapAlloc = isHeap;
     }
     Type* getIRType(LgsCgModule& cg) override;
     std::string getName() override;
@@ -20,8 +21,8 @@ public:
     std::string fmtStr() const override;
     bool inferBaseType(const std::vector<LgsExpr*>& args) override;
     Value* addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* eqIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* neIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
+    Value* eqIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
+    Value* neIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
     Value* lenIR(LgsCgModule& cg, Value* iterable) override;
     Value* inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
     DIType* getDebugType(LgsCgModule& cg) override;

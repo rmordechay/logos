@@ -329,7 +329,7 @@ void LgsSema::visitVarDec(LgsVarDec* varDec) {
         addError(E10093, varDec->location);
     }
     if (varDec->type && !varDec->type->isHeapAlloc && varDec->isOwner) {
-        varDec->isOwner = false;
+        addError(E10109, varDec->location);
     }
     addLocalSymbol(LgsSymbol(varDec));
 }
@@ -572,7 +572,7 @@ void LgsSema::visitInfiniteLoop(const LgsInfiniteLoop* infiniteLoop) {
     visitStmtsBlock(infiniteLoop->stmtsBlock);
 }
 
-void LgsSema::visitReturnStmt(const LgsReturn* returnStmt) {
+void LgsSema::visitReturnStmt(LgsReturn* returnStmt) {
     const auto funcType = stack.currentFunc()->funcType;
     auto retExpr = returnStmt->expr;
     if (retExpr) {
@@ -679,7 +679,6 @@ void LgsSema::visitExpr(LgsExpr*& expr) {
         else if (const auto castExpr = expr->asCast()) visitCast(castExpr);
         else if (const auto json = expr->asJson()) visitJson(json);
     }
-    addHeapExpr(expr);
     addRTType(expr->type);
 }
 
@@ -942,9 +941,6 @@ void LgsSema::visitFieldSelection(LgsVariable* child, LgsType* parentType) {
     if (const auto field = parentType->getField(childName)) {
         child->setType(field->type);
         child->ref = LgsSymbol(field);
-        if (field->isOwner && field->type->isHeapAlloc) {
-            child->owner = field;
-        }
         validateFieldVisibility(field, parentType, child->location);
     } else if (const auto method = parentType->getMethod(childName)) {
         child->setType(method->type);
@@ -1253,9 +1249,6 @@ void LgsSema::visitInstance(LgsInstance* instance) {
         castExprImplicitly(arg.expr, field->type);
         visitExpr(arg.expr);
         validateExprType(arg.expr, field->type);
-        if (field->isOwner && field->type->isHeapAlloc) {
-            field->expr->owner = field;
-        }
     }
 
     // Missing required fields
@@ -1585,17 +1578,6 @@ void LgsSema::resolveImports() const {
         const auto it = globals.table.imports.find(name);
         if (it == globals.table.imports.end()) continue;
         app = it->second;
-    }
-}
-
-void LgsSema::addHeapExpr(LgsExpr* expr) const {
-    if (!expr->type || !expr->type->isHeapAlloc) return;
-    if (expr->asVariable()) return;
-    const auto currentFunc = stack.currentFunc();
-    if (expr->owner) {
-        currentFunc->owners.push_back(expr);
-    } else {
-        currentFunc->orphans.push_back(expr);
     }
 }
 

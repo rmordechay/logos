@@ -176,7 +176,7 @@ Value* LgsVec::inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) {
         const auto falseBlock = cg.createBlock();
         const auto tempExpr = iterableExpr->type->asIterable()->baseType->getZeroValue();
         tempExpr->IRValue = getIRElement(cg, iterableExpr->IRValue, index);
-        const auto eq = baseType->eqIR(cg, tempExpr, value);
+        const auto eq = eqIR(cg, tempExpr, value);
         cg.builder.CreateCondBr(eq, trueBlock, falseBlock);
         cg.startBlock(trueBlock);
         cg.builder.CreateStore(cg.true_(), resultPtr);

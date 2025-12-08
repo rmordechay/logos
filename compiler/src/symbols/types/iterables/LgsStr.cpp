@@ -45,7 +45,7 @@ LgsType* LgsStr::applyBinOp(LgsType* toType, LgsBinOp& op) {
     const auto IRName = toType->getName();
     switch (op.opType) {
     case ADD: {
-        if (name == IRName) return this;
+        if (name == IRName) return new LgsStr(true);
         break;
     }
     case IN: {

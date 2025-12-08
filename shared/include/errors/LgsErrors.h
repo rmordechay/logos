@@ -142,3 +142,4 @@ inline LgsBaseMsg E10105{"Too many elements for array of size %s", errCodeStart+
 inline LgsBaseMsg E10106{"Could not parse C file %s", errCodeStart++};
 inline LgsBaseMsg E10107{"Could not find C library %s", errCodeStart++};
 inline LgsBaseMsg E10108{"%s is not indexable.", errCodeStart++};
+inline LgsBaseMsg E10109{"Primitive types should not have an ownership.", errCodeStart++};

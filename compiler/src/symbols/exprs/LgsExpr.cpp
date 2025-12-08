@@ -24,13 +24,6 @@
 #include "funcs/LgsFunc.h"
 #include "loops/LgsMetaVar.h"
 
-void LgsExpr::freeOwner(LgsCgModule& cg) {
-    if (type->isHeapAlloc && owner) {
-        cg.callRuntimeFunc("removeOwner", cg.voidTy(), {cg.ptrTy()}, {owner->IRValue});
-        owner = nullptr;
-    }
-}
-
 std::optional<int64_t> LgsExpr::getConstInt() {
     if (const auto intConst = asIntConst()) {
         return intConst->value;
@@ -96,7 +89,6 @@ void LgsExpr::assign(LgsCgModule& cg, LgsExpr* expr) {
 bool LgsExpr::equals(LgsExpr* other) {
     assert(0);
 }
-
 
 LgsExpr* LgsExpr::clone() {
     assert(0);

@@ -47,6 +47,7 @@ void LgsFunc::initFunc(const std::string& name, LgsType* rt, const std::vector<L
 
 Value* LgsFunc::call(LgsCgModule& cg, std::vector<LgsFuncArg>& args) {
     if (fn) return fn(cg, args);
+    if (args.empty()) return callIR(cg, {});
     std::vector<Value*> IRArgs;
     if (funcType->isVariadic) return callWithVariadic(cg, args);
     const auto firstArgName = funcType->isMethod ? args[1].name : args.front().name;
@@ -126,10 +127,6 @@ void LgsFunc::castImplicitly(LgsType* toType) {
     if (!funcType->rt) {
         funcType->rt = otherFuncType->rt;
     }
-}
-
-bool LgsFunc::needsCleanup() const {
-    return !owners.empty() || !orphans.empty();
 }
 
 std::string LgsFunc::asText() {

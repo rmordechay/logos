@@ -24,3 +24,31 @@ main() {
     func(obj2.obj1)
     print(obj2.obj1.x)
 }
+
+
+object Obj1 {
+    x: Int
+}
+
+object Obj2 {
+    obj: Obj1
+}
+
+f(obj: Obj1) {
+    print(obj.x)
+}
+
+g(): Obj1 {
+    if true {
+        obj = Obj1{x=34}
+        obj2 = Obj2{}
+        if obj.x == 33 {
+            return obj
+        }
+    }
+    return Obj1{}
+}
+
+main() {
+    print(g().x)
+}

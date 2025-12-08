@@ -15,10 +15,8 @@ class LgsFunc : public LgsExpr {
 public:
     LgsFuncType* funcType;
     LgsStmtsBlock* stmtsBlock = nullptr;
-    std::vector<LgsExpr*> owners;
-    std::vector<LgsExpr*> orphans;
-    bool isTest = false;
     std::vector<std::pair<LgsExpr*, LgsExpr*>> mocks;
+    bool isTest = false;
     CallFn fn;
 
     explicit LgsFunc(LgsFuncType* funcType) : LgsExpr(funcType), funcType(funcType) {}
@@ -46,7 +44,6 @@ public:
     Value* callWithVariadic(LgsCgModule& cg, const std::vector<LgsFuncArg>& args);
     Value* loadIR(LgsCgModule& cg) override;
     void castImplicitly(LgsType* toType) override;
-    bool needsCleanup() const;
     std::string asText() override;
     void hashNode(size_t& oldHash) override;
     void setDebugValue(LgsCgModule& cg) override;

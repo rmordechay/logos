@@ -92,7 +92,7 @@ public:
     void visitRangeLoop(LgsRangeLoop* rangeLoop);
     void visitForeachLoop(LgsForeachLoop* foreachLoop);
     void visitInfiniteLoop(const LgsInfiniteLoop* infiniteLoop);
-    void visitReturnStmt(const LgsReturn* returnStmt);
+    void visitReturnStmt(LgsReturn* returnStmt);
     void visitContinueStmt(const LgsContinue* continueStmt);
     void visitBreakStmt(const LgsBreak* breakStmt);
     void visitCoroutine(const LgsCoroutine* coroutine);
@@ -145,7 +145,6 @@ public:
     static bool validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const LgsFunc* func);
 
     void resolveImports() const;
-    void addHeapExpr(LgsExpr* expr) const;
     void addLocalSymbol(const LgsSymbol& newSymbol);
     LgsSymbol* getSymbol(const std::string& name, const LgsLocation* location);
     void createCoroutineFunc(LgsFuncCall* funcCall);

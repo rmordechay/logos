@@ -78,44 +78,6 @@ Value* LgsSize::lshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* other) {
     return cg.builder.CreateLShr(left->loadIR(cg), r);
 }
 
-Value* LgsSize::eqIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto r = cg.builder.CreateZExt(right->loadIR(cg), getIRType(cg));
-    return cg.builder.CreateICmpEQ(left->loadIR(cg), r);
-}
-
-Value* LgsSize::neIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto r = cg.builder.CreateZExt(right->loadIR(cg), getIRType(cg));
-    return cg.builder.CreateICmpNE(left->loadIR(cg), r);
-}
-
-Value* LgsSize::ltIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto r = cg.builder.CreateZExt(right->loadIR(cg), getIRType(cg));
-    return cg.builder.CreateICmpSLT(left->loadIR(cg), r);
-}
-
-Value* LgsSize::gtIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto r = cg.builder.CreateZExt(right->loadIR(cg), getIRType(cg));
-    return cg.builder.CreateICmpSGT(left->loadIR(cg), r);
-}
-
-Value* LgsSize::geIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto r = cg.builder.CreateZExt(right->loadIR(cg), getIRType(cg));
-    return cg.builder.CreateICmpSGE(left->loadIR(cg), r);
-}
-
-Value* LgsSize::leIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto r = cg.builder.CreateZExt(right->loadIR(cg), getIRType(cg));
-    return cg.builder.CreateICmpSLE(left->loadIR(cg), r);
-}
-
-Value* LgsSize::andIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return andInt(cg, left->IRValue, right->IRValue);
-}
-
-Value* LgsSize::orIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return orInt(cg, left->IRValue, right->IRValue);
-}
-
 Constant* LgsSize::getRTType(LgsCgModule& cg) {
     return cg.getRTTypeInfo(getGenericName(), sizeBytes(), sizeBytes(), RTT_SIZE, cg.null());
 }

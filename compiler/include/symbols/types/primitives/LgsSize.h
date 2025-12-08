@@ -25,14 +25,6 @@ public:
     Value* bitXorIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
     Value* rshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
     Value* lshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* other) override;
-    Value* eqIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* neIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* ltIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* gtIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* geIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* leIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* andIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* orIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
     bool canCastTo(LgsType* other) override;
     std::string fmtStr() const override;
     DIType* getDebugType(LgsCgModule& cg) override;

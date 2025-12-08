@@ -89,11 +89,9 @@ public:
     bool isUnknown();
     bool isSliceable();
     LgsType* extendInt();
-    LgsType* applyIntBinOp(LgsType* toType, LgsBinOpType op);
+    LgsType* applyIntBinOp(LgsType* rightType, LgsBinOpType op);
     void cloneFields(LgsType* newType) const;
     void cloneMethods(LgsType* newType) const;
-    static Value* orInt(LgsCgModule& cg, Value* self, Value* other);
-    static Value* andInt(LgsCgModule& cg, Value* self, Value* other);
 
     virtual Value* addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
     virtual Value* subIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
@@ -106,14 +104,6 @@ public:
     virtual Value* bitXorIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
     virtual Value* lshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* other);
     virtual Value* rshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* eqIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* neIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* ltIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* gtIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* geIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* leIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* andIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* orIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
     virtual Value* crossIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
 
     LgsAny* asAny();

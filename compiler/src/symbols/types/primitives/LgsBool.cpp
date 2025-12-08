@@ -29,16 +29,6 @@ Value* LgsBool::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     return cg.builder.CreateAdd(l, r);
 }
 
-// BinExpr type
-// left expr
-// left type
-// right expr
-// right type
-
-// Value* LgsExpr::subIR(LgsCgModule& cg, LgsExpr* right) {
-// Value* LgsType::subIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-// Value* LgsBinExpr::subIR(LgsCgModule& cg) {
-
 Value* LgsBool::subIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     const auto l = cg.builder.CreateZExt(left->loadIR(cg), getIRType(cg));
     const auto r = cg.builder.CreateZExt(right->loadIR(cg), getIRType(cg));
@@ -79,54 +69,6 @@ Value* LgsBool::rshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
 
 Value* LgsBool::lshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* other) {
     return cg.builder.CreateLShr(left->loadIR(cg), other->loadIR(cg));
-}
-
-Value* LgsBool::eqIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto f = [&cg](const LgsExpr* expr) {
-        if (expr->type->asNullable()->passByRef) return cg.builder.CreateIsNull(expr->IRValue);
-        const auto gepIsSet = cg.builder.CreateStructGEP(expr->type->getIRType(cg), expr->IRValue, 1);
-        return cg.builder.CreateNot(cg.builder.CreateLoad(cg.i1Ty(), gepIsSet));
-    };
-    if (left->isNull && right->isNull) return cg.true_();
-    if (left->isNull) return f(right);
-    if (right->isNull) return f(left);
-    return cg.builder.CreateICmpEQ(left->loadIR(cg), right->loadIR(cg));
-}
-
-Value* LgsBool::neIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto f = [&cg](const LgsExpr* expr) -> Value* {
-        if (expr->type->asNullable()->passByRef) return cg.builder.CreateIsNotNull(expr->IRValue);
-        const auto gepIsSet = cg.builder.CreateStructGEP(expr->type->getIRType(cg), expr->IRValue, 1);
-        return cg.builder.CreateLoad(cg.i1Ty(), gepIsSet);
-    };
-    if (left->isNull && right->isNull) return cg.false_();
-    if (left->isNull) return f(right);
-    if (right->isNull) return f(left);
-    return cg.builder.CreateICmpNE(left->loadIR(cg), right->loadIR(cg));
-}
-
-Value* LgsBool::ltIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return cg.builder.CreateICmpSLT(left->loadIR(cg), right->loadIR(cg));
-}
-
-Value* LgsBool::gtIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return cg.builder.CreateICmpSGT(left->loadIR(cg), right->loadIR(cg));
-}
-
-Value* LgsBool::geIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return cg.builder.CreateICmpSGE(left->loadIR(cg), right->loadIR(cg));
-}
-
-Value* LgsBool::leIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return cg.builder.CreateICmpSLE(left->loadIR(cg), right->loadIR(cg));
-}
-
-Value* LgsBool::andIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return andInt(cg, left->IRValue, right->IRValue);
-}
-
-Value* LgsBool::orIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return orInt(cg, left->IRValue, right->IRValue);
 }
 
 std::string LgsBool::getName() {
