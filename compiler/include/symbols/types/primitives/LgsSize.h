@@ -14,7 +14,7 @@ public:
     std::string getName() override;
     LgsExpr* getZeroValue() override;
     Constant* getRTType(LgsCgModule& cg) override;
-    LgsType* applyBinOp(LgsType* toType, LgsBinOp& op) override;
+    LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     Value* addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
     Value* subIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
     Value* mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;

@@ -38,7 +38,7 @@ bool LgsShort::canCastTo(LgsType* other) {
     return name == IRName;
 }
 
-LgsType* LgsShort::applyBinOp(LgsType* toType, LgsBinOp& op) {
+LgsType* LgsShort::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     assert(0);
 }
 

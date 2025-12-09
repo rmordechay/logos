@@ -24,8 +24,8 @@ LgsExpr* LgsLong::getZeroValue() {
     return new LgsIntConst(&LGS_LONG, 0);
 }
 
-LgsType* LgsLong::applyBinOp(LgsType* toType, LgsBinOp& op) {
-    return applyIntBinOp(toType, op.opType);
+LgsType* LgsLong::applyBinOp(LgsType* rightType, LgsBinOp& op) {
+    assert(0);
 }
 
 Value* LgsLong::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {

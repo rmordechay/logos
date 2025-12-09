@@ -15,7 +15,7 @@ LgsExpr* LgsDouble::getZeroValue() {
     return new LgsFloatConst(this, 0.0);
 }
 
-LgsType* LgsDouble::applyBinOp(LgsType* toType, LgsBinOp& op) {
+LgsType* LgsDouble::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     assert(0);
 }
 

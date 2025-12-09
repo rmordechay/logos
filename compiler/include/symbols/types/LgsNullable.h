@@ -21,7 +21,7 @@ public:
     bool canCastTo(LgsType* other) override;
     std::string fmtStr() const override;
     DIType* getDebugType(LgsCgModule& cg) override;
-    LgsType* applyBinOp(LgsType* toType, LgsBinOp& op) override;
+    LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     Value* addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
     void setNullableFields(LgsCgModule& cg, Value* ptr, Value* value, Value* isSet);
     Value* getNullableValue(LgsCgModule& cg, Value* ptr);

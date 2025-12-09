@@ -25,7 +25,7 @@ std::string LgsAny::fmtStr() const {
     return "%p";
 }
 
-LgsType* LgsAny::applyBinOp(LgsType* toType, LgsBinOp& op) {
+LgsType* LgsAny::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     assert(0);
 }
 

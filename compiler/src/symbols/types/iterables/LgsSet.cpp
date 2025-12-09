@@ -48,11 +48,11 @@ std::string LgsSet::fmtStr() const {
     return "%p";
 }
 
-LgsType* LgsSet::applyBinOp(LgsType* toType, LgsBinOp& op) {
-    const auto IRName = toType->getName();
+LgsType* LgsSet::applyBinOp(LgsType* rightType, LgsBinOp& op) {
+    const auto IRName = rightType->getName();
     switch (op.opType) {
     case IN: {
-        if (toType->canCastTo(baseType)) return baseType;
+        if (rightType->canCastTo(baseType)) return baseType;
         break;
     }
     default:

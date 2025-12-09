@@ -274,13 +274,12 @@ void LgsCgModule::callMemCpy(Value* dest, Value* src, Value* size) {
     builder.CreateMemCpy(dest, llvm::MaybeAlign(), src, llvm::MaybeAlign(), size);
 }
 
-Value* LgsCgModule::allocate(Value* size, Constant* type, const bool isOwner) {
+Value* LgsCgModule::allocate(Value* size, Constant* type, const bool isOwner, const bool isReturnExpr) {
+    if (isReturnExpr) {
+        return callRuntimeFunc("allocateReturn", ptrTy(), {sizeTy(), ptrTy()}, {extendToSize(size), type});
+    }
     const auto name = isOwner ? "allocateOwner" : "allocateOrphan";
     return callRuntimeFunc(name, ptrTy(), {sizeTy(), ptrTy()}, {extendToSize(size), type});
-}
-
-Value* LgsCgModule::allocateReturn(Value* size, Constant* type) {
-    return callRuntimeFunc("allocateReturn", ptrTy(), {sizeTy(), ptrTy()}, {extendToSize(size), type});
 }
 
 void LgsCgModule::callStackPush() {

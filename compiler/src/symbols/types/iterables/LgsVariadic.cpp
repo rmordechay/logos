@@ -20,7 +20,7 @@ bool LgsVariadic::canCastTo(LgsType* other) {
     assert(0);
 }
 
-LgsType* LgsVariadic::applyBinOp(LgsType* toType, LgsBinOp& op) {
+LgsType* LgsVariadic::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     assert(0);
 }
 

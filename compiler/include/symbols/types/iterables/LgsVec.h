@@ -26,7 +26,7 @@ public:
     bool equals(LgsType* other) override;
     LgsExpr* getZeroValue() override;
     bool canCastTo(LgsType* other) override;
-    LgsType* applyBinOp(LgsType* toType, LgsBinOp& op) override;
+    LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     bool inferBaseType(const std::vector<LgsExpr*>& args) override;
     Value* addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
     Value* subIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;

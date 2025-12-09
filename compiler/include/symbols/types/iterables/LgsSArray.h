@@ -18,7 +18,7 @@ public:
     LgsExpr* getZeroValue() override;
     Constant* getRTType(LgsCgModule& cg) override;
     std::string fmtStr() const override;
-    LgsType* applyBinOp(LgsType* toType, LgsBinOp& op) override;
+    LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     bool inferBaseType(const std::vector<LgsExpr*>& args) override;
     Value* addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
     Value* mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;

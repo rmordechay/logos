@@ -33,7 +33,7 @@ bool LgsUInt::canCastTo(LgsType* other) {
     return name == IRName;
 }
 
-LgsType* LgsUInt::applyBinOp(LgsType* toType, LgsBinOp& op) {
+LgsType* LgsUInt::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     assert(0);
 }
 

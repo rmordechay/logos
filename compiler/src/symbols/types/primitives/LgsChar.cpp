@@ -34,7 +34,7 @@ std::string LgsChar::fmtStr() const {
     return "%c";
 }
 
-LgsType* LgsChar::applyBinOp(LgsType* toType, LgsBinOp& op) {
+LgsType* LgsChar::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     assert(0);
 }
 

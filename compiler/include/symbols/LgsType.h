@@ -76,7 +76,7 @@ public:
     virtual bool canCastTo(LgsType* other) = 0;
     virtual std::string fmtStr() const = 0;
     virtual DIType* getDebugType(LgsCgModule& cg) = 0;
-    virtual LgsType* applyBinOp(LgsType* toType, LgsBinOp& op) = 0;
+    virtual LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) = 0;
     virtual void hashNode(size_t& oldHash);
     virtual std::string getName() = 0;
     virtual std::string pname(); // pretty name
@@ -89,7 +89,6 @@ public:
     bool isUnknown();
     bool isSliceable();
     LgsType* extendInt();
-    LgsType* applyIntBinOp(LgsType* rightType, LgsBinOpType op);
     void cloneFields(LgsType* newType) const;
     void cloneMethods(LgsType* newType) const;
 

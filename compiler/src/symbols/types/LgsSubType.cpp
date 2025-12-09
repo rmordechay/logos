@@ -34,7 +34,7 @@ bool LgsSubType::canCastTo(LgsType* other) {
     return getName() == otherName;
 }
 
-LgsType* LgsSubType::applyBinOp(LgsType* toType, LgsBinOp& op) {
+LgsType* LgsSubType::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     assert(0);
 }
 

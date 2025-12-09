@@ -20,7 +20,7 @@ public:
     bool inferBaseType(const std::vector<LgsExpr*>& args) override;
     Type* getIRType(LgsCgModule& cg) override;
     Constant* getRTType(LgsCgModule& cg) override;
-    LgsType* applyBinOp(LgsType* toType, LgsBinOp& op) override;
+    LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     LgsType* applyMatScalarOp(const LgsType* number, const LgsBinOp& op) const;
     LgsType* applyMatVecOp(const LgsVec* vec, const LgsBinOp& op) const;
     LgsType* applyMatMatOp(const LgsMatrix* otherMat, const LgsBinOp& op) const;

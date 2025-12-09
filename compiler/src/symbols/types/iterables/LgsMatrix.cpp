@@ -13,14 +13,14 @@ size_t LgsMatrix::sizeBytes() {
     return rows * columns * baseType->sizeBytes();
 }
 
-LgsType* LgsMatrix::applyBinOp(LgsType* toType, LgsBinOp& op) {
-    if (toType->isNumber()) {
-        return applyMatScalarOp(toType, op);
+LgsType* LgsMatrix::applyBinOp(LgsType* rightType, LgsBinOp& op) {
+    if (rightType->isNumber()) {
+        return applyMatScalarOp(rightType, op);
     }
-    if (const auto vec = toType->asVec()) {
+    if (const auto vec = rightType->asVec()) {
         return applyMatVecOp(vec, op);
     }
-    if (const auto otherMat = toType->asMatrix()) {
+    if (const auto otherMat = rightType->asMatrix()) {
         return applyMatMatOp(otherMat, op);
     }
     return nullptr;

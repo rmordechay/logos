@@ -16,7 +16,7 @@ public:
     size_t sizeBytes() override;
     std::string fmtStr() const override;
     bool canCastTo(LgsType* other) override;
-    LgsType* applyBinOp(LgsType* toType, LgsBinOp& op) override;
+    LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     Value* addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
     Value* subIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
     Value* mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;

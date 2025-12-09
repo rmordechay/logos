@@ -48,7 +48,7 @@ LgsType* LgsMap::getValueType() {
     return mapType->value;
 }
 
-LgsType* LgsMap::applyBinOp(LgsType* toType, LgsBinOp& op) {
+LgsType* LgsMap::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     assert(0);
 }
 

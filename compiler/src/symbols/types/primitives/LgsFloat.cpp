@@ -2,6 +2,8 @@
 #include "codegen/LgsCgModule.h"
 #include "exprs/constants/LgsFloatConst.h"
 #include "types/LgsAny.h"
+#include "types/iterables/LgsIterable.h"
+#include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsDouble.h"
 
 std::string LgsFloat::getName() {
@@ -36,8 +38,39 @@ bool LgsFloat::canCastTo(LgsType* other) {
     return false;
 }
 
-LgsType* LgsFloat::applyBinOp(LgsType* toType, LgsBinOp& op) {
-    assert(0);
+LgsType* LgsFloat::applyBinOp(LgsType* rightType, LgsBinOp& op) {
+    if (!rightType->isNumber()) return nullptr;
+    switch (op.opType) {
+    case POW:
+        return &LGS_DOUBLE;
+    case ADD:
+    case SUB:
+    case MUL:
+    case DIV:
+    case MODULO:
+    case BIT_AND:
+    case BIT_OR:
+    case BIT_XOR:
+    case LSHIFT:
+    case RSHIFT:
+        if (rightType->asDouble()) return &LGS_DOUBLE;
+        return &LGS_FLOAT;
+    case EQ:
+    case NE:
+    case LT:
+    case GT:
+    case GE:
+    case LE:
+        return &LGS_BOOL;
+    case AND:
+    case OR:
+    case IN:
+    case CROSS:
+        break;
+    case NOOP:
+        assert(0);
+    }
+    return nullptr;
 }
 
 Value* LgsFloat::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {

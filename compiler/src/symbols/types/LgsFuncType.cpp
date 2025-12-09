@@ -105,7 +105,7 @@ bool LgsFuncType::equals(LgsType* other) {
     return true;
 }
 
-LgsType* LgsFuncType::applyBinOp(LgsType* toType, LgsBinOp& op) {
+LgsType* LgsFuncType::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     assert(0);
 }
 

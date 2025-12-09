@@ -57,8 +57,8 @@ DIType* LgsNullable::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
 
-LgsType* LgsNullable::applyBinOp(LgsType* toType, LgsBinOp& op) {
-    const auto toNullable = toType->asNullable();
+LgsType* LgsNullable::applyBinOp(LgsType* rightType, LgsBinOp& op) {
+    const auto toNullable = rightType->asNullable();
     if (!toNullable) return nullptr;
     switch (op.opType) {
     case EQ:

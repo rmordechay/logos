@@ -29,7 +29,7 @@ DIType* LgsJsonType::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
 
-LgsType* LgsJsonType::applyBinOp(LgsType* toType, LgsBinOp& op) {
+LgsType* LgsJsonType::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     assert(0);
 }
 

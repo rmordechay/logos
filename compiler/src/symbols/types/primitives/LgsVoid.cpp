@@ -24,7 +24,7 @@ LgsExpr* LgsVoid::getZeroValue() {
     return nullptr;
 }
 
-LgsType* LgsVoid::applyBinOp(LgsType* toType, LgsBinOp& op) {
+LgsType* LgsVoid::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     assert(0);
 }
 

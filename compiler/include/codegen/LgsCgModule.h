@@ -99,8 +99,7 @@ public:
     Value* callStrLen(Value* str);
     void callMemSet(Value* dest, Value* src, Value* size);
     void callMemCpy(Value* dest, Value* src, Value* size);
-    Value* allocate(Value* size, Constant* type, bool isOwner);
-    Value* allocateReturn(Value* size, Constant* type);
+    Value* allocate(Value* size, Constant* type, bool isOwner, bool isReturnExpr = false);
 
     // Stack
     void callStackPush();

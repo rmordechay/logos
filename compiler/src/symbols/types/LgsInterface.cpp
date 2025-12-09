@@ -33,7 +33,7 @@ bool LgsInterface::canCastTo(LgsType* other) {
     return false;
 }
 
-LgsType* LgsInterface::applyBinOp(LgsType* toType, LgsBinOp& op) {
+LgsType* LgsInterface::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     assert(0);
 }
 

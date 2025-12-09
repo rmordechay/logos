@@ -54,14 +54,14 @@ std::string LgsSArray::fmtStr() const {
     return "%p";
 }
 
-LgsType* LgsSArray::applyBinOp(LgsType* toType, LgsBinOp& op) {
+LgsType* LgsSArray::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     switch (op.opType) {
     case IN: {
-        if (toType->canCastTo(baseType)) return &LGS_BOOL;
+        if (rightType->canCastTo(baseType)) return &LGS_BOOL;
         break;
     }
     case ADD: {
-        if (const auto otherSArr = toType->asSArray()) {
+        if (const auto otherSArr = rightType->asSArray()) {
             if (!baseType->canCastTo(otherSArr->baseType)) break;
             return new LgsSArray(baseType, new LgsBinaryExpr(size, otherSArr->size, ADD_OP));
         }

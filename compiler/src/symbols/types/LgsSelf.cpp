@@ -26,7 +26,7 @@ bool LgsSelf::canCastTo(LgsType* other) {
     assert(0);
 }
 
-LgsType* LgsSelf::applyBinOp(LgsType* toType, LgsBinOp& op) {
+LgsType* LgsSelf::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     assert(0);
 }
 

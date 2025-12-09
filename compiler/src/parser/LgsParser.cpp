@@ -32,6 +32,7 @@
 #include "exprs/LgsMatrixExpr.h"
 #include "exprs/LgsMetaSelection.h"
 #include "exprs/LgsTernaryExpr.h"
+#include "exprs/constants/LgsUIntConst.h"
 #include "files/LgsAppConfigFile.h"
 #include "lgsc/LgsCCompiler.h"
 #include "logos/LgsApp.h"
@@ -1512,9 +1513,26 @@ LgsExpr* LgsParser::parseConstant() {
     LgsExpr* constant = nullptr;
     switch (currentToken.type) {
     case T_INT: {
-        std::string result = tokenStr;
+        auto result = tokenStr;
         result.erase(std::ranges::remove(result, '_').begin(), result.end());
         constant = determineIntConst(result, 10);
+        break;
+    }
+    case T_UINT: {
+        auto str = tokenStr;
+        if (tokenStr.ends_with("U")) str.pop_back();
+        uint64_t v = 0;
+        if (str[0] == '-') {
+            addError(E10110, startToken.location);
+        } else {
+            errno = 0;
+            char* end = nullptr;
+            v = strtoull(str.c_str(), &end, 10);
+            if (errno == ERANGE || *end != '\0') {
+                addError(E10110, startToken.location);
+            }
+        }
+        constant = new LgsUIntConst(&LGS_UINT, v);
         break;
     }
     case T_HEX: {
@@ -2098,25 +2116,24 @@ bool LgsParser::isImportName(LgsExpr* expr) const {
 }
 
 LgsExpr* LgsParser::determineIntConst(const std::string& tokenStr, const int base) const {
-    char* end = nullptr;
-    errno = 0;
-    uint64_t v;
+    auto str = tokenStr;
     if (tokenStr.starts_with("0b") || tokenStr.starts_with("0x")) {
-        v = strtoull(tokenStr.substr(2).c_str(), &end, base);
-    } else {
-        v = strtoull(tokenStr.c_str(), &end, base);
+        str = tokenStr.substr(2).c_str();
     }
     LgsExpr* expr = nullptr;
-    if (errno == ERANGE) {
-        expr = new LgsIntConst(&LGS_ULONG, UINT64_MAX);
+    errno = 0;
+    char* end = nullptr;
+    const auto v = strtoull(str.c_str(), &end, base);
+    if (errno == ERANGE || *end != '\0') {
+        expr = new LgsUIntConst(&LGS_ULONG, UINT64_MAX);
     } else if (v <= INT_MAX) {
         expr = new LgsIntConst(&LGS_INT, static_cast<int32_t>(v));
     } else if (v <= UINT_MAX) {
-        expr = new LgsIntConst(&LGS_UINT, static_cast<uint32_t>(v));
+        expr = new LgsUIntConst(&LGS_UINT, static_cast<uint32_t>(v));
     } else if (v <= LONG_MAX) {
         expr = new LgsIntConst(&LGS_LONG, static_cast<int64_t>(v));
     } else {
-        expr = new LgsIntConst(&LGS_ULONG, v);
+        expr = new LgsUIntConst(&LGS_ULONG, v);
     }
     setLocation(expr->location, &currentToken, &currentToken);
     return expr;

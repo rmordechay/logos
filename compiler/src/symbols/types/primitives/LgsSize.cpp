@@ -20,8 +20,8 @@ LgsExpr* LgsSize::getZeroValue() {
     return new LgsIntConst(this, 0);
 }
 
-LgsType* LgsSize::applyBinOp(LgsType* toType, LgsBinOp& op) {
-    return applyIntBinOp(toType, op.opType);
+LgsType* LgsSize::applyBinOp(LgsType* rightType, LgsBinOp& op) {
+    assert(0);
 }
 
 Value* LgsSize::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {

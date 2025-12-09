@@ -149,5 +149,4 @@ public:
     bool checkMock(LgsExpr* expr) const;
     Value* getIRValue(LgsValue* value);
     void addVirtuals(LgsObject* obj, Value* ptr) const;
-    Value* allocate(const LgsExpr* expr, Value* size, Constant* type) const;
 };

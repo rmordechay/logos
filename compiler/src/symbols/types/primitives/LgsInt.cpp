@@ -37,8 +37,45 @@ bool LgsInt::canCastTo(LgsType* other) {
     return false;
 }
 
-LgsType* LgsInt::applyBinOp(LgsType* toType, LgsBinOp& op) {
-    return applyIntBinOp(toType, op.opType);
+LgsType* LgsInt::applyBinOp(LgsType* rightType, LgsBinOp& op) {
+    if (!rightType->isNumber()) return nullptr;
+    switch (op.opType) {
+    case ADD:
+    case SUB:
+    case MUL:
+    case DIV:
+    case MODULO: {
+        if (rightType->asDouble()) return &LGS_DOUBLE;
+        if (rightType->asFloat()) return &LGS_FLOAT;
+        return &LGS_INT;
+    }
+    case BIT_AND:
+    case BIT_OR:
+    case BIT_XOR:
+    case LSHIFT:
+    case RSHIFT: {
+        return &LGS_INT;
+    }
+    case POW: {
+        return &LGS_DOUBLE;
+    }
+    case EQ:
+    case NE:
+    case LT:
+    case GT:
+    case GE:
+    case LE: {
+        return &LGS_BOOL;
+    }
+    case AND:
+    case OR:
+    case IN:
+    case CROSS:
+        break;
+    case NOOP:
+        assert(0);
+    }
+    return nullptr;
 }
 
 Value* LgsInt::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {

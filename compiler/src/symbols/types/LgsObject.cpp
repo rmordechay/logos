@@ -124,7 +124,7 @@ bool LgsObject::canCastTo(LgsType* other) {
     return name == otherType->getName();
 }
 
-LgsType* LgsObject::applyBinOp(LgsType* toType, LgsBinOp& op) {
+LgsType* LgsObject::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     assert(0);
 }
 

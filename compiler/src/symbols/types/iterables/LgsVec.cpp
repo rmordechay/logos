@@ -75,9 +75,9 @@ bool LgsVec::canCastTo(LgsType* other) {
     return vectorDim == otherVec->vectorDim && baseType->canCastTo(otherVec->baseType);
 }
 
-LgsType* LgsVec::applyBinOp(LgsType* toType, LgsBinOp& op) {
+LgsType* LgsVec::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     const auto thisName = getName();
-    const auto otherName = toType->getName();
+    const auto otherName = rightType->getName();
     switch (op.opType) {
     case ADD:
     case SUB: {
@@ -90,11 +90,11 @@ LgsType* LgsVec::applyBinOp(LgsType* toType, LgsBinOp& op) {
     }
     case MUL: {
         if (thisName == otherName) return &LGS_FLOAT;
-        if (toType->isNumber()) return this;
+        if (rightType->isNumber()) return this;
         break;
     }
     case IN: {
-        if (toType->canCastTo(baseType)) return baseType;
+        if (rightType->canCastTo(baseType)) return baseType;
         break;
     }
     default:

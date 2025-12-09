@@ -28,7 +28,7 @@ bool LgsEnum::canCastTo(LgsType* other) {
     return name == otherName;
 }
 
-LgsType* LgsEnum::applyBinOp(LgsType* toType, LgsBinOp& op) {
+LgsType* LgsEnum::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     assert(0);
 }
 

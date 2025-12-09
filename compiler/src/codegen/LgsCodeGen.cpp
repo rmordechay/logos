@@ -813,7 +813,7 @@ void LgsCodeGen::visitStaticArray(LgsArrayExpr* arrayExpr) const {
 void LgsCodeGen::visitDynamicArray(LgsArrayExpr* arrayExpr) const {
     const auto dArr = arrayExpr->type->asDArray();
     if (!arrayExpr->IRValue) {
-        arrayExpr->IRValue = allocate(arrayExpr, cg.usize(dArr->sizeBytes()), dArr->getRTType(cg));
+        arrayExpr->IRValue = cg.allocate(cg.usize(dArr->sizeBytes()), dArr->getRTType(cg), !!arrayExpr->owner);
     }
     cg.callLgsFunc("DArray_init", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {
         arrayExpr->IRValue, dArr->getRTType(cg)
@@ -828,7 +828,7 @@ void LgsCodeGen::visitDynamicArray(LgsArrayExpr* arrayExpr) const {
 void LgsCodeGen::visitSetExpr(LgsArrayExpr* arrayExpr) const {
     const auto set = arrayExpr->type->asSet();
     if (!arrayExpr->IRValue) {
-        arrayExpr->IRValue = allocate(arrayExpr, cg.usize(set->sizeBytes()), set->getRTType(cg));
+        arrayExpr->IRValue = cg.allocate(cg.usize(set->sizeBytes()), set->getRTType(cg), !!arrayExpr->owner);
     }
     cg.callLgsFunc("Set_init", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {
         arrayExpr->IRValue, set->getRTType(cg)
@@ -899,7 +899,7 @@ void LgsCodeGen::visitHashMap(LgsHashMap* hashMap) {
     const auto map = hashMap->type->asMap();
     const auto keyType = map->mapType->key;
     const auto valueType = map->mapType->value;
-    hashMap->IRValue = allocate(hashMap, cg.usize(map->sizeBytes()), map->getRTType(cg));
+    hashMap->IRValue = cg.allocate(cg.usize(map->sizeBytes()), map->getRTType(cg), !!hashMap->owner);
     cg.callLgsFunc("Map_init", cg.voidTy(), {cg.ptrTy(), cg.ptrTy(), cg.ptrTy()}, {
         hashMap->IRValue, keyType->getRTType(cg), valueType->getRTType(cg)
     });
@@ -1164,7 +1164,7 @@ void LgsCodeGen::visitStrConst(LgsStrConst* strConst) {
 void LgsCodeGen::visitInstance(LgsInstance* instance) {
     if (instance->IRValue) return;
     const auto obj = instance->obj;
-    instance->IRValue = allocate(instance, cg.usize(obj->sizeBytes()), obj->getRTType(cg));
+    instance->IRValue = cg.allocate(cg.usize(obj->sizeBytes()), obj->getRTType(cg), !!instance->owner);
 
     std::unordered_set<std::string> visited;
     for (const auto& [argName, arg] : instance->args) {
@@ -1463,9 +1463,4 @@ void LgsCodeGen::addVirtuals(LgsObject* obj, Value* ptr) const {
     //         cg.addToVTable(ptr, id, IRFunc);
     //     }
     // }
-}
-
-Value* LgsCodeGen::allocate(const LgsExpr* expr, Value* size, Constant* type) const {
-    if (expr->isReturnExpr) return cg.allocateReturn(size, type);
-    return cg.allocate(size, type, !!expr->owner);
 }

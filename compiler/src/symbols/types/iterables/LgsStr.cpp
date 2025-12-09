@@ -29,7 +29,7 @@ LgsExpr* LgsStr::getZeroValue() {
 }
 
 Constant* LgsStr::getRTType(LgsCgModule& cg) {
-    return cg.getRTTypeInfo(getGenericName(), sizeBytes(), sizeof(void*), RTT_STR, cg.null());
+    return cg.getRTTypeInfo(getGenericName(), sizeBytes(), sizeof(void*), RTT_STR, baseType->getRTType(cg));
 }
 
 bool LgsStr::canCastTo(LgsType* other) {
@@ -41,19 +41,19 @@ bool LgsStr::canCastTo(LgsType* other) {
     return name == other->getName();
 }
 
-LgsType* LgsStr::applyBinOp(LgsType* toType, LgsBinOp& op) {
-    const auto IRName = toType->getName();
+LgsType* LgsStr::applyBinOp(LgsType* rightType, LgsBinOp& op) {
+    const auto IRName = rightType->getName();
     switch (op.opType) {
     case ADD: {
         if (name == IRName) return new LgsStr(true);
         break;
     }
     case IN: {
-        if (equals(toType)) return &LGS_BOOL;
-        if (toType->asIterable() && canCastTo(toType->asIterable()->baseType)) return &LGS_BOOL;
+        if (equals(rightType)) return &LGS_BOOL;
+        if (rightType->asIterable() && canCastTo(rightType->asIterable()->baseType)) return &LGS_BOOL;
     }
     case EQ: {
-        if (equals(toType)) return &LGS_BOOL;
+        if (equals(rightType)) return &LGS_BOOL;
         break;
     }
     default:
@@ -79,7 +79,7 @@ Value* LgsStr::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     const auto leftSize = lenIR(cg, left->IRValue);
     const auto rightSize = right->type->asStr()->lenIR(cg, right->IRValue);
     const auto sumSize = cg.builder.CreateAdd(leftSize, rightSize);
-    const auto buffer = cg.allocate(sumSize, getRTType(cg), true);
+    const auto buffer = cg.allocate(sumSize, getRTType(cg), false, true);
     const auto gep = cg.builder.CreateInBoundsGEP(cg.i8Ty(), buffer, leftSize);
     cg.callMemCpy(buffer, left->IRValue, leftSize); // cpy left str
     cg.callMemCpy(gep, right->IRValue, rightSize); // cpy right str

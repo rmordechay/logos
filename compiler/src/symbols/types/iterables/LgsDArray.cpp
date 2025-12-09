@@ -58,10 +58,10 @@ std::string LgsDArray::fmtStr() const {
     return "%p";
 }
 
-LgsType* LgsDArray::applyBinOp(LgsType* toType, LgsBinOp& op) {
+LgsType* LgsDArray::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     switch (op.opType) {
     case IN: {
-        const auto otherIter = toType->asIterable();
+        const auto otherIter = rightType->asIterable();
         if (!otherIter) return nullptr;
         if (otherIter->getDimension() - 1 == getDimension()) return &LGS_BOOL;
         break;

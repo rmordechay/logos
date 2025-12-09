@@ -14,7 +14,7 @@ public:
     LgsExpr* getZeroValue() override;
     size_t sizeBytes() override;
     bool canCastTo(LgsType* other) override;
-    LgsType* applyBinOp(LgsType* toType, LgsBinOp& op) override;
+    LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     std::string fmtStr() const override;
     DIType* getDebugType(LgsCgModule& cg) override;
 };

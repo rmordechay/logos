@@ -59,7 +59,7 @@ Constant* LgsType::getRTType(LgsCgModule& cg) {
     assert(0);
 }
 
-LgsType* LgsType::applyBinOp(LgsType* toType, LgsBinOp& op) {
+LgsType* LgsType::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     assert(0);
 }
 
@@ -115,55 +115,6 @@ LgsType* LgsType::extendInt() {
         return &LGS_LONG;
     }
     return this;
-}
-
-LgsType* LgsType::applyIntBinOp(LgsType* rightType, const LgsBinOpType op) {
-    switch (op) {
-    case POW:
-        if (canCastTo(rightType)) return &LGS_DOUBLE;
-        break;
-    case ADD:
-    case SUB:
-    case MUL:
-    case MODULO:
-    case BIT_AND:
-    case BIT_OR:
-    case BIT_XOR:
-    case LSHIFT:
-    case RSHIFT:
-        if (rightType->asFloat()) return &LGS_FLOAT;
-        if (canCastTo(rightType)) return this;
-        break;
-    case DIV:
-        if (rightType->isNumber()) return &LGS_FLOAT;
-        break;
-    case EQ:
-    case NE:
-    case LT:
-    case GT:
-    case GE:
-    case LE: {
-        if (canCastTo(rightType)) return &LGS_BOOL;
-        break;
-    }
-    case IN: {
-        const auto iter = rightType->asIterable();
-        if (!iter) break;
-        if (iter->getDimension() == 1 && canCastTo(iter->baseType)) {
-            return &LGS_BOOL;
-        }
-        break;
-    }
-    case AND:
-    case OR:
-        if (asBool() && rightType->asBool()) return &LGS_BOOL;
-        break;
-    case CROSS:
-        break;
-    case NOOP:
-        assert(0);
-    }
-    return nullptr;
 }
 
 void LgsType::cloneFields(LgsType* newType) const {

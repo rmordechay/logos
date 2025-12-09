@@ -35,7 +35,7 @@ public:
     LgsExpr* getZeroValue() override;
     LgsType* getIndexType() override;
     LgsType* getValueType() override;
-    LgsType* applyBinOp(LgsType* toType, LgsBinOp& op) override;
+    LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     bool inferBaseType(const std::vector<LgsExpr*>& args) override;
     bool unpackLoopVarsTypes(LgsForeachLoop* loop) const override;
     void unpackLoopIR(LgsCgModule& cg, LgsForeachLoop* loop) const override;

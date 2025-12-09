@@ -56,10 +56,7 @@ LgsToken LgsLexer::nextToken() {
     }
 
     // Number
-    if (std::isdigit(currentChar)) {
-        return scanNumber(location);
-    }
-    if (currentChar == '-' && std::isdigit(peek())) {
+    if (std::isdigit(currentChar) || (currentChar == '-' && std::isdigit(peek()))) {
         return scanNumber(location);
     }
 
@@ -367,12 +364,6 @@ LgsToken LgsLexer::scanNumber(const LgsLocation& location) {
             lexeme += currentChar;
             advance();
         }
-        // Double
-        if (currentChar == 'D') {
-            lexeme += currentChar;
-            advance();
-            return {T_DOUBLE, lexeme, location};
-        }
         return {T_FLOAT, lexeme, location};
     }
     // Long
@@ -386,6 +377,12 @@ LgsToken LgsLexer::scanNumber(const LgsLocation& location) {
         lexeme += currentChar;
         advance();
         return {T_DOUBLE, lexeme, location};
+    }
+    // Unsigned
+    if (currentChar == 'U') {
+        lexeme += currentChar;
+        advance();
+        return {T_UINT, lexeme, location};
     }
     return {T_INT, lexeme, location};
 }
