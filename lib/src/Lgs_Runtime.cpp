@@ -111,7 +111,7 @@ static void freeValue(void* ptr, const Lgs_TypeInfo* type) {
             const auto fieldType = fieldTypes[i];
             void* fieldPtr = static_cast<char*>(ptr) + offset;
             // freeValue(fieldPtr, fieldType);
-            offset += fieldType->alignment;
+            offset += fieldType->size;
         }
         std::free(ptr);
         break;

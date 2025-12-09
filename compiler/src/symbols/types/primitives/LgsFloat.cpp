@@ -1,4 +1,6 @@
 #include "types/primitives/LgsFloat.h"
+
+#include "LgsBinaryTokens.h"
 #include "codegen/LgsCgModule.h"
 #include "exprs/constants/LgsFloatConst.h"
 #include "types/LgsAny.h"
@@ -19,7 +21,7 @@ LgsExpr* LgsFloat::getZeroValue() {
 }
 
 Constant* LgsFloat::getRTType(LgsCgModule& cg) {
-    return cg.getRTTypeInfo(getGenericName(), sizeBytes(), sizeBytes(), RTT_FLOAT, cg.null());
+    return cg.getRTTypeInfo(getGenericName(), sizeBytes(), RTT_FLOAT, cg.null());
 }
 
 size_t LgsFloat::sizeBytes() {

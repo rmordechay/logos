@@ -1,4 +1,6 @@
 #include "types/iterables/LgsMatrix.h"
+
+#include "LgsBinaryTokens.h"
 #include "cblas/cblas.h"
 #include "exprs/LgsMatrixExpr.h"
 #include "types/LgsAny.h"
@@ -107,7 +109,7 @@ Constant* LgsMatrix::getRTType(LgsCgModule& cg) {
     const auto genericName = getGenericName();
     const auto st = cg.getStructType({cg.sizeTy(), cg.sizeTy(), cg.ptrTy()}, genericName);
     const auto sv = ConstantStruct::get(st, {cg.usize(rows), cg.usize(columns), baseType->getRTType(cg)});
-    return cg.getRTTypeInfo(genericName, sizeBytes(), sizeBytes(), RTT_MATRIX, sv);
+    return cg.getRTTypeInfo(genericName, sizeBytes(), RTT_MATRIX, sv);
 }
 
 std::string LgsMatrix::getName() {

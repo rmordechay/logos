@@ -1,5 +1,7 @@
 #include "types/LgsNullable.h"
 
+#include "LgsBinaryTokens.h"
+#include "LgsDefinitions.h"
 #include "codegen/LgsCgModule.h"
 #include "exprs/LgsExpr.h"
 #include "types/LgsAny.h"
@@ -33,12 +35,12 @@ Type* LgsNullable::getIRType(LgsCgModule& cg) {
 Constant* LgsNullable::getRTType(LgsCgModule& cg) {
     const auto genericName = getGenericName();
     if (!baseType) {
-        return cg.getRTTypeInfo(name, 0, 0, RTT_ANY, cg.null());
+        return cg.getRTTypeInfo(name, 0, RTT_ANY, cg.null());
     }
     const auto st = cg.getStructType({cg.ptrTy(), cg.i1Ty()}, genericName);
     const auto baseRTType = baseType->getRTType(cg);
     const auto sv = ConstantStruct::get(st, {baseRTType, cg.i1(passByRef)});
-    return cg.getRTTypeInfo(genericName, sizeBytes(), sizeBytes(), RTT_NULLABLE, sv);
+    return cg.getRTTypeInfo(genericName, sizeBytes(), RTT_NULLABLE, sv);
 }
 
 bool LgsNullable::canCastTo(LgsType* other) {

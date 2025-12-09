@@ -10,23 +10,13 @@
 Type* LgsSArray::getIRType(LgsCgModule& cg) {
     if (IRType) return IRType;
     const auto numElements = size->getConstInt();
-    if (numElements.value()) {
+    if (numElements.has_value()) {
         const auto innerIRType = baseType->getIRType(cg);
         IRType = ArrayType::get(innerIRType, numElements.value());
     } else {
         IRType = cg.ptrTy();
     }
     return IRType;
-}
-
-Constant* LgsSArray::getRTType(LgsCgModule& cg) {
-    const auto genericName = getGenericName();
-    const auto st = cg.getStructType({cg.sizeTy(), cg.ptrTy()}, genericName);
-    const auto constSize = size->getConstInt();
-    if (!constSize.has_value()) return nullptr;
-    const auto sArrSize = cg.usize(constSize.value());
-    const auto sv = ConstantStruct::get(st, {sArrSize, baseType->getRTType(cg)});
-    return cg.getRTTypeInfo(genericName, sizeBytes(), sizeBytes(), RTT_SARRAY, sv);
 }
 
 std::string LgsSArray::getName() {
@@ -38,6 +28,10 @@ std::string LgsSArray::pname() {
     return "[]";;
 }
 
+std::string LgsSArray::getGenericName() {
+    return name + baseType->getGenericName();
+}
+
 size_t LgsSArray::sizeBytes() {
     const auto constInt = size->getConstInt();
     if (!constInt.has_value()) return 0;
@@ -47,6 +41,19 @@ size_t LgsSArray::sizeBytes() {
 LgsExpr* LgsSArray::getZeroValue() {
     assert(isStatic);
     return new LgsArrayExpr(this);
+}
+
+Constant* LgsSArray::getRTType(LgsCgModule& cg) {
+    const auto genericName = getGenericName();
+    const auto st = cg.getStructType({cg.sizeTy(), cg.ptrTy()}, genericName);
+    const auto constSize = size->getConstInt();
+    auto size = 1;
+    if (constSize.has_value()) {
+        size = constSize.value();
+    }
+    const auto sArrSize = cg.usize(size);
+    const auto sv = ConstantStruct::get(st, {sArrSize, baseType->getRTType(cg)});
+    return cg.getRTTypeInfo(genericName, sizeBytes(), RTT_SARRAY, sv);
 }
 
 std::string LgsSArray::fmtStr() const {

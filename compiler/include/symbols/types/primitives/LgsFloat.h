@@ -7,7 +7,7 @@ public:
 
     LgsFloat() {
         isPrimitive = true;
-        isFloatingPoint = true;
+        isFloat = true;
     }
     Type* getIRType(LgsCgModule& cg) override;
     std::string getName() override;

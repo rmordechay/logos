@@ -120,7 +120,7 @@ std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
             }
             str << formatElement(fieldType, fieldPtr);
             if (i < fieldsCount - 1) str << ", ";
-            offset += fieldType->alignment;
+            offset += fieldType->size;
         }
         str << ">";
         break;

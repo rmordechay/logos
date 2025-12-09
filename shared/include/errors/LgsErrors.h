@@ -138,7 +138,7 @@ inline LgsBaseMsg E10101{"Macro condition must be known at compile time.", errCo
 inline LgsBaseMsg E10102{"Macro condition must be of type Bool. Given: %s.", errCodeStart++};
 inline LgsBaseMsg E10103{"'%s' doesn't match the rows length. Given: %s.", errCodeStart++};
 inline LgsBaseMsg E10104{"'%s' doesn't match the columns length. Given: %s.", errCodeStart++};
-inline LgsBaseMsg E10105{"Too many elements for array of size %s", errCodeStart++};
+inline LgsBaseMsg E10105{"Too many elements for array of size: %s.", errCodeStart++};
 inline LgsBaseMsg E10106{"Could not parse C file %s", errCodeStart++};
 inline LgsBaseMsg E10107{"Could not find C library %s", errCodeStart++};
 inline LgsBaseMsg E10108{"%s is not indexable.", errCodeStart++};

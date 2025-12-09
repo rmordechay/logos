@@ -1,9 +1,10 @@
 #pragma once
-#include "LgsBinaryTokens.h"
 #include "errors/LgsErrors.h"
 #include <map>
 #include <vector>
 
+struct LgsBinOp;
+class LgsBinaryExpr;
 class LgsVariadic;
 class LgsGenericType;
 class LgsMatrix;
@@ -60,7 +61,8 @@ public:
     std::vector<LgsType*> genericArgs;
     Type* IRType = nullptr;
     bool isInt = false;
-    bool isFloatingPoint = false;
+    bool isUnsinged = false;
+    bool isFloat = false;
     bool isPrimitive = false;
     bool isHeapAlloc = false;
     bool passByRef = false;
@@ -153,8 +155,6 @@ void freeTypes(std::vector<T*>& types) {
     types.clear();
 }
 
-std::pair<Value*, Value*> loadPairAsFloat(LgsCgModule& cg, LgsExpr* self, LgsExpr* other);
-std::pair<Value*, Value*> loadPairAsInt(LgsCgModule& cg, LgsExpr* self, LgsExpr* other);
 Value* eqIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
 Value* neIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
 Value* ltIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
@@ -163,3 +163,5 @@ Value* geIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
 Value* leIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
 Value* andIR(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right);
 Value* orIR(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right);
+std::pair<Value*, Value*> loadPairAsFloat(LgsCgModule& cg, LgsExpr* self, LgsExpr* other);
+std::pair<Value*, Value*> loadPairAsInt(LgsCgModule& cg, LgsExpr* self, LgsExpr* other);

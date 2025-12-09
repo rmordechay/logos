@@ -19,7 +19,7 @@ Constant* LgsMap::getRTType(LgsCgModule& cg) {
     const auto genericName = getGenericName();
     const auto st = cg.getStructType({cg.ptrTy(), cg.ptrTy()}, genericName);
     const auto sv = ConstantStruct::get(st, {mapType->key->getRTType(cg), mapType->value->getRTType(cg)});
-    return cg.getRTTypeInfo(genericName, sizeBytes(), sizeof(void*), RTT_MAP, sv);
+    return cg.getRTTypeInfo(genericName, sizeBytes(), RTT_MAP, sv);
 }
 
 std::string LgsMap::getName() {

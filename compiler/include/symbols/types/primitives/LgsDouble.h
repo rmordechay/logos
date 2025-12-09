@@ -6,7 +6,7 @@ public:
     static constexpr auto name = "Double";
     LgsDouble() {
         isPrimitive = true;
-        isFloatingPoint = true;
+        isFloat = true;
     }
     Type* getIRType(LgsCgModule& cg) override;
     Constant* getRTType(LgsCgModule& cg) override;

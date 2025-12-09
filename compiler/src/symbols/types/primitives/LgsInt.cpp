@@ -1,4 +1,6 @@
 #include "types/primitives/LgsInt.h"
+
+#include "LgsBinaryTokens.h"
 #include "exprs/constants/LgsIntConst.h"
 #include "stmts/LgsField.h"
 #include "types/LgsAny.h"
@@ -22,7 +24,7 @@ LgsExpr* LgsInt::getZeroValue() {
 }
 
 Constant* LgsInt::getRTType(LgsCgModule& cg) {
-    return cg.getRTTypeInfo(getGenericName(), sizeBytes(), sizeBytes(), RTT_INT, cg.null());
+    return cg.getRTTypeInfo(getGenericName(), sizeBytes(), RTT_INT, cg.null());
 }
 
 bool LgsInt::canCastTo(LgsType* other) {

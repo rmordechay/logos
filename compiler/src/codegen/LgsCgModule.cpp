@@ -163,16 +163,16 @@ llvm::AllocaInst* LgsCgModule::getEmptyBuffer() {
     return builder.CreateAlloca(ArrayType::get(i8Ty(), STRING_BUFFER_SIZE));
 }
 
-Constant* LgsCgModule::getRTTypeInfo(const std::string& name, const size_t size, const size_t alignment, const Lgs_TypeKind kind, Constant* extra) {
+Constant* LgsCgModule::getRTTypeInfo(const std::string& name, const size_t size, const Lgs_TypeKind kind, Constant* extra) {
     const auto typeInfo = getRTBaseType();
-    const auto v = llvm::ConstantStruct::get(typeInfo, {usize(size), usize(alignment), usize(kind), extra});
+    const auto v = llvm::ConstantStruct::get(typeInfo, {usize(size), usize(kind), extra});
     if (isRTTModule) return createGlobal(LGS_TYPEINFO_PREFIX + name, typeInfo, v);
     return createGlobal(LGS_TYPEINFO_PREFIX + name, typeInfo, nullptr);
 }
 
 StructType* LgsCgModule::getRTBaseType() {
     const auto typeInfoMatrix = getStructType({sizeTy(), sizeTy(), ptrTy()}, "Matrix"); // Biggest
-    return getStructType({sizeTy(), sizeTy(), ptrTy(), typeInfoMatrix}, "RTI");
+    return getStructType({sizeTy(), ptrTy(), typeInfoMatrix}, "RTI"); // size, kind, type
 }
 
 BasicBlock* LgsCgModule::createBlock(const std::string& name, Function* parent) {

@@ -1,4 +1,5 @@
 #include "LgsConfigs.h"
+#include "exprs/LgsBinaryExpr.h"
 #include "exprs/LgsVectorExpr.h"
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
@@ -84,7 +85,7 @@ bool LgsType::isVoid() {
 }
 
 bool LgsType::isNumber() const {
-    return isInt || isFloatingPoint;
+    return isInt || isFloat;
 }
 
 bool LgsType::isBig() {
@@ -327,30 +328,6 @@ LgsType::~LgsType() {
     fields.clear();
 }
 
-std::pair<Value*, Value*> loadPairAsFloat(LgsCgModule& cg, LgsExpr* self, LgsExpr* other) {
-    auto l = self->loadIR(cg);
-    auto r = other->loadIR(cg);
-    if (l->getType()->isIntegerTy()) {
-        l = cg.builder.CreateSIToFP(l, cg.floatTy());
-    }
-    if (r->getType()->isIntegerTy()) {
-        r = cg.builder.CreateSIToFP(r, cg.floatTy());
-    }
-    return {l, r};
-}
-
-std::pair<Value*, Value*> loadPairAsInt(LgsCgModule& cg, LgsExpr* self, LgsExpr* other) {
-    auto l = self->loadIR(cg);
-    auto r = other->loadIR(cg);
-    if (l->getType()->isFloatTy()) {
-        l = cg.builder.CreateFPToSI(l, cg.i32Ty());
-    }
-    if (r->getType()->isFloatTy()) {
-        r = cg.builder.CreateFPToSI(r, cg.i32Ty());
-    }
-    return {l, r};
-}
-
 Value* eqIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     if (left->isNull && right->isNull) return cg.true_();
     if (left->isNull) return eqNullFunc(cg, right);
@@ -358,7 +335,7 @@ Value* eqIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     if (left->type->isInt && right->type->isInt) {
         return cg.builder.CreateICmpEQ(left->loadIR(cg), right->loadIR(cg));
     }
-    if (left->type->isFloatingPoint || right->type->isFloatingPoint) {
+    if (left->type->isFloat || right->type->isFloat) {
         const auto [l, r] = loadPairAsFloat(cg, left, right);
         return cg.builder.CreateFCmpOEQ(l, r);
     }
@@ -376,7 +353,7 @@ Value* neIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     if (left->type->isInt && left->type->isInt) {
         return cg.builder.CreateICmpEQ(left->loadIR(cg), right->loadIR(cg));
     }
-    if (left->type->isFloatingPoint && left->type->isFloatingPoint) {
+    if (left->type->isFloat && left->type->isFloat) {
         return cg.builder.CreateFCmpOEQ(left->loadIR(cg), right->loadIR(cg));
     }
     if (left->type->asStr() && right->type->asStr()) {
@@ -387,19 +364,59 @@ Value* neIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
 }
 
 Value* ltIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return cg.builder.CreateICmpSLT(left->loadIR(cg), right->loadIR(cg));
+    if (left->type->isUnsinged && right->type->isUnsinged) {
+        return cg.builder.CreateICmpULT(left->loadIR(cg), right->loadIR(cg));
+    }
+    if (left->type->isInt && right->type->isInt) {
+        return cg.builder.CreateICmpSLT(left->loadIR(cg), right->loadIR(cg));
+    }
+    if (left->type->isFloat || right->type->isFloat) {
+        const auto [l, r] = loadPairAsFloat(cg, left, right);
+        return cg.builder.CreateFCmpOLT(l, r);
+    }
+    assert(0);
 }
 
 Value* gtIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return cg.builder.CreateICmpSGT(left->loadIR(cg), right->loadIR(cg));
+    if (left->type->isUnsinged && right->type->isUnsinged) {
+        return cg.builder.CreateICmpUGT(left->loadIR(cg), right->loadIR(cg));
+    }
+    if (left->type->isInt && right->type->isInt) {
+        return cg.builder.CreateICmpSGT(left->loadIR(cg), right->loadIR(cg));
+    }
+    if (left->type->isFloat || right->type->isFloat) {
+        const auto [l, r] = loadPairAsFloat(cg, left, right);
+        return cg.builder.CreateFCmpOGT(l, r);
+    }
+    assert(0);
 }
 
 Value* geIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return cg.builder.CreateICmpSGE(left->loadIR(cg), right->loadIR(cg));
+    if (left->type->isUnsinged && right->type->isUnsinged) {
+        return cg.builder.CreateICmpUGE(left->loadIR(cg), right->loadIR(cg));
+    }
+    if (left->type->isInt && right->type->isInt) {
+        return cg.builder.CreateICmpSGE(left->loadIR(cg), right->loadIR(cg));
+    }
+    if (left->type->isFloat || right->type->isFloat) {
+        const auto [l, r] = loadPairAsFloat(cg, left, right);
+        return cg.builder.CreateFCmpOGE(l, r);
+    }
+    assert(0);
 }
 
 Value* leIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return cg.builder.CreateICmpSLE(left->loadIR(cg), right->loadIR(cg));
+    if (left->type->isUnsinged && right->type->isUnsinged) {
+        return cg.builder.CreateICmpULE(left->loadIR(cg), right->loadIR(cg));
+    }
+    if (left->type->isInt && right->type->isInt) {
+        return cg.builder.CreateICmpSLE(left->loadIR(cg), right->loadIR(cg));
+    }
+    if (left->type->isFloat || right->type->isFloat) {
+        const auto [l, r] = loadPairAsFloat(cg, left, right);
+        return cg.builder.CreateFCmpOLE(l, r);
+    }
+    assert(0);
 }
 
 Value* andIR(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right) {
@@ -432,3 +449,26 @@ Value* orIR(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right) {
     return phi;
 }
 
+std::pair<Value*, Value*> loadPairAsFloat(LgsCgModule& cg, LgsExpr* self, LgsExpr* other) {
+    auto l = self->loadIR(cg);
+    auto r = other->loadIR(cg);
+    if (l->getType()->isIntegerTy()) {
+        l = cg.builder.CreateSIToFP(l, cg.floatTy());
+    }
+    if (r->getType()->isIntegerTy()) {
+        r = cg.builder.CreateSIToFP(r, cg.floatTy());
+    }
+    return {l, r};
+}
+
+std::pair<Value*, Value*> loadPairAsInt(LgsCgModule& cg, LgsExpr* self, LgsExpr* other) {
+    auto l = self->loadIR(cg);
+    auto r = other->loadIR(cg);
+    if (l->getType()->isFloatTy()) {
+        l = cg.builder.CreateFPToSI(l, cg.i32Ty());
+    }
+    if (r->getType()->isFloatTy()) {
+        r = cg.builder.CreateFPToSI(r, cg.i32Ty());
+    }
+    return {l, r};
+}

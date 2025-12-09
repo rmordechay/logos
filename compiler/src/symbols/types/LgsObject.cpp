@@ -1,4 +1,6 @@
 #include "types/LgsObject.h"
+
+#include "LgsDefinitions.h"
 #include "exprs/LgsInstance.h"
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
@@ -91,7 +93,7 @@ Constant* LgsObject::getRTType(LgsCgModule& cg) {
     }
     const auto st = cg.getStructType({cg.sizeTy(), cg.ptrTy(), cg.ptrTy()}, genericName);
     const auto sv = ConstantStruct::get(st, {cg.usize(fields.size()), hashesArr, fieldsArr});
-    return cg.getRTTypeInfo(genericName, sizeBytes(), sizeof(void*), RTT_OBJECT, sv);
+    return cg.getRTTypeInfo(genericName, sizeBytes(), RTT_OBJECT, sv);
 }
 
 size_t LgsObject::sizeBytes() {

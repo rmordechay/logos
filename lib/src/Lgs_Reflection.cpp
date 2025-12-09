@@ -9,7 +9,7 @@ extern "C" void* Lgs_getObjectField(const Lgs_TypeInfo* typeInfo, void* ptr, con
         const auto hash2 = hashString(name);
         const auto fieldType = typeInfo->obj.fieldTypes[i];
         void* fieldPtr = static_cast<char*>(ptr) + offset;
-        offset += fieldType->alignment;
+        offset += fieldType->size;
         if (hash1 == hash2) {
             return fieldPtr;
         }

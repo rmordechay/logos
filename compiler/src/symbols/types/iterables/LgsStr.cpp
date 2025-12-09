@@ -29,7 +29,7 @@ LgsExpr* LgsStr::getZeroValue() {
 }
 
 Constant* LgsStr::getRTType(LgsCgModule& cg) {
-    return cg.getRTTypeInfo(getGenericName(), sizeBytes(), sizeof(void*), RTT_STR, baseType->getRTType(cg));
+    return cg.getRTTypeInfo(getGenericName(), sizeBytes(), RTT_STR, baseType->getRTType(cg));
 }
 
 bool LgsStr::canCastTo(LgsType* other) {
@@ -79,7 +79,7 @@ Value* LgsStr::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     const auto leftSize = lenIR(cg, left->IRValue);
     const auto rightSize = right->type->asStr()->lenIR(cg, right->IRValue);
     const auto sumSize = cg.builder.CreateAdd(leftSize, rightSize);
-    const auto buffer = cg.allocate(sumSize, getRTType(cg), false, true);
+    const auto buffer = cg.allocate(sumSize, getRTType(cg), false, left->isReturnExpr);
     const auto gep = cg.builder.CreateInBoundsGEP(cg.i8Ty(), buffer, leftSize);
     cg.callMemCpy(buffer, left->IRValue, leftSize); // cpy left str
     cg.callMemCpy(gep, right->IRValue, rightSize); // cpy right str

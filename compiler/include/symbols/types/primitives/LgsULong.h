@@ -7,6 +7,8 @@ public:
 
     LgsULong() {
         isPrimitive = true;
+        isUnsinged = true;
+        isInt = true;
     }
     size_t sizeBytes() override;
     Type* getIRType(LgsCgModule& cg) override;

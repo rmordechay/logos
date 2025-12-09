@@ -685,12 +685,19 @@ void LgsSema::visitExpr(LgsExpr*& expr) {
 void LgsSema::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
     auto& l = binaryExpr->left;
     auto& r = binaryExpr->right;
+    l->isReturnExpr = binaryExpr->isReturnExpr;
+    r->isReturnExpr = binaryExpr->isReturnExpr;
     visitExpr(l);
     visitExpr(r);
     const auto ltype = l->type;
     const auto rtype = r->type;
     if (!ltype || !rtype) return;
-    auto type = ltype->applyBinOp(rtype, binaryExpr->op);
+    LgsType* type = nullptr;
+    if (binaryExpr->op.opType == IN) {
+        type = rtype->applyBinOp(ltype, binaryExpr->op);
+    } else {
+        type = ltype->applyBinOp(rtype, binaryExpr->op);
+    }
     if (!type) {
         return addError(E10076, l->location, {binaryExpr->op.text, ltype->pname(), rtype->pname()});
     }
@@ -758,7 +765,7 @@ void LgsSema::visitArrayExpr(LgsArrayExpr* arrayExpr) {
 void LgsSema::visitStaticArray(const LgsArrayExpr* arrayExpr) {
     const auto sArr = arrayExpr->type->asSArray();
     const auto size = sArr->size->getConstInt();
-    if (size.has_value() && size.value() != static_cast<int64_t>(arrayExpr->elements.size())) {
+    if (size.has_value() && size.value() < static_cast<int64_t>(arrayExpr->elements.size())) {
         addError(E10105, arrayExpr->location, {std::to_string(*size)});
     }
     for (auto element : arrayExpr->elements) {

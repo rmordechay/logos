@@ -19,7 +19,7 @@ Type* LgsChar::getIRType(LgsCgModule& cg) {
 }
 
 Constant* LgsChar::getRTType(LgsCgModule& cg) {
-    return cg.getRTTypeInfo(getGenericName(), sizeBytes(), sizeBytes(), RTT_CHAR, cg.null());
+    return cg.getRTTypeInfo(getGenericName(), sizeBytes(), RTT_CHAR, cg.null());
 }
 
 std::string LgsChar::getName() {
