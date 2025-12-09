@@ -1,5 +1,4 @@
 #include "exprs/LgsHashMap.h"
-
 #include "LgsUtils.h"
 #include "codegen/LgsCgModule.h"
 
@@ -36,4 +35,3 @@ LgsHashMap::~LgsHashMap() {
     }
     elements.clear();
 }
-

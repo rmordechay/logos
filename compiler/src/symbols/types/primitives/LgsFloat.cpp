@@ -4,18 +4,6 @@
 #include "types/LgsAny.h"
 #include "types/primitives/LgsDouble.h"
 
-std::pair<Value*, Value*> loadOperands(LgsCgModule& cg, LgsExpr* self, LgsExpr* other) {
-    auto l = self->loadIR(cg);
-    auto r = other->loadIR(cg);
-    if (l->getType()->isIntegerTy()) {
-        l = cg.builder.CreateSIToFP(l, cg.floatTy());
-    }
-    if (r->getType()->isIntegerTy()) {
-        r = cg.builder.CreateSIToFP(r, cg.floatTy());
-    }
-    return {l, r};
-}
-
 std::string LgsFloat::getName() {
     return name;
 }
@@ -53,12 +41,12 @@ LgsType* LgsFloat::applyBinOp(LgsType* toType, LgsBinOp& op) {
 }
 
 Value* LgsFloat::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto [l, r] = loadOperands(cg, left, right);
+    const auto [l, r] = loadPairAsFloat(cg, left, right);
     return cg.builder.CreateFAdd(l, r);
 }
 
 Value* LgsFloat::subIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto [l, r] = loadOperands(cg, left, right);
+    const auto [l, r] = loadPairAsFloat(cg, left, right);
     return cg.builder.CreateFSub(l, r);
 }
 
@@ -66,12 +54,12 @@ Value* LgsFloat::mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     if (left->type->asVec() && right->type->asVec()) {
         return dotProduct(cg, left, right);
     }
-    const auto [l, r] = loadOperands(cg, left, right);
+    const auto [l, r] = loadPairAsFloat(cg, left, right);
     return cg.builder.CreateFMul(l, r);
 }
 
 Value* LgsFloat::divIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto [l, r] = loadOperands(cg, left, right);
+    const auto [l, r] = loadPairAsFloat(cg, left, right);
     return cg.builder.CreateFDiv(l, r);
 }
 

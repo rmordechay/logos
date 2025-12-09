@@ -1,5 +1,4 @@
 #pragma once
-#include <stmts/LgsStmt.h>
 #include "LgsValue.h"
 
 class LgsNullableExpr;
@@ -82,7 +81,12 @@ public:
 
 Value* dotProduct(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
 Value* crossProduct(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-void freeExpr(LgsExpr* expr);
+
+inline void freeExpr(LgsExpr* expr) {
+    if (!expr) return;
+    expr->setType(nullptr);
+    delete expr;
+}
 
 template<typename T>
 void freeExprs(std::vector<T*>& exprs) {
@@ -91,4 +95,3 @@ void freeExprs(std::vector<T*>& exprs) {
     }
     exprs.clear();
 }
-

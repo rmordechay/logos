@@ -1,5 +1,5 @@
 #pragma once
-#include "LgsFunc.h"
+#include "stmts/LgsStmt.h"
 
 class LgsCoroutine final : public LgsStmt {
 public:

@@ -249,9 +249,3 @@ Value* crossProduct(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
 
     return result;
 }
-
-void freeExpr(LgsExpr* expr) {
-    if (!expr) return;
-    expr->setType(nullptr);
-    delete expr;
-}

@@ -138,7 +138,13 @@ public:
     virtual ~LgsType();
 };
 
-void freeType(LgsType* type);
+inline void freeType(LgsType* type) {
+    if (!type) return;
+    if (type->isPrimitive) return;
+    if (type->asGenericType() || type->asObject()) return;
+    delete type;
+}
+
 
 template<typename T>
 void freeTypes(std::vector<T*>& types) {
@@ -147,3 +153,14 @@ void freeTypes(std::vector<T*>& types) {
     }
     types.clear();
 }
+
+std::pair<Value*, Value*> loadPairAsFloat(LgsCgModule& cg, LgsExpr* self, LgsExpr* other);
+std::pair<Value*, Value*> loadPairAsInt(LgsCgModule& cg, LgsExpr* self, LgsExpr* other);
+Value* eqIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
+Value* neIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
+Value* ltIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
+Value* gtIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
+Value* geIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
+Value* leIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
+Value* andIR(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right);
+Value* orIR(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right);

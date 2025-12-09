@@ -26,7 +26,6 @@
 #include "types/primitives/LgsShort.h"
 #include "types/primitives/LgsSize.h"
 #include "types/primitives/LgsUInt.h"
-#include <iostream>
 
 bool LgsType::addField(LgsField* field) {
     fields.push_back(field);
@@ -189,74 +188,16 @@ void LgsType::cloneMethods(LgsType* newType) const {
     }
 }
 
-Value* eqIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto eqNullFunc = [&cg](const LgsExpr* expr) {
-        const auto nullable = expr->type->asNullable();
-        if (expr->type->passByRef) return cg.builder.CreateIsNull(expr->IRValue);
-        return cg.builder.CreateNot(nullable->getIsSet(cg, expr->IRValue));
-    };
-    if (left->isNull && right->isNull) return cg.true_();
-    if (left->isNull) return eqNullFunc(right);
-    if (right->isNull) return eqNullFunc(left);
-    return cg.builder.CreateICmpEQ(left->loadIR(cg), right->loadIR(cg));
+Value* eqNullFunc(LgsCgModule& cg, const LgsExpr* expr) {
+    const auto nullable = expr->type->asNullable();
+    if (expr->type->passByRef) return cg.builder.CreateIsNull(expr->IRValue);
+    return cg.builder.CreateNot(nullable->getIsSet(cg, expr->IRValue));
 }
 
-Value* neIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto neNullFunc = [&cg](const LgsExpr* expr) -> Value* {
-        const auto nullable = expr->type->asNullable();
-        if (expr->type->passByRef) return cg.builder.CreateIsNotNull(expr->IRValue);
-        return nullable->getIsSet(cg, expr->IRValue);
-    };
-    if (left->isNull && right->isNull) return cg.false_();
-    if (left->isNull) return neNullFunc(right);
-    if (right->isNull) return neNullFunc(left);
-    return cg.builder.CreateICmpNE(left->loadIR(cg), right->loadIR(cg));
-}
-
-Value* ltIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return cg.builder.CreateICmpSLT(left->loadIR(cg), right->loadIR(cg));
-}
-
-Value* gtIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return cg.builder.CreateICmpSGT(left->loadIR(cg), right->loadIR(cg));
-}
-
-Value* geIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return cg.builder.CreateICmpSGE(left->loadIR(cg), right->loadIR(cg));
-}
-
-Value* leIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return cg.builder.CreateICmpSLE(left->loadIR(cg), right->loadIR(cg));
-}
-
-Value* andIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto currentBlock = cg.builder.GetInsertBlock();
-    const auto func = currentBlock->getParent();
-    const auto rightBlock = cg.createBlock("and_right", func);
-    const auto endBlock = cg.createBlock("and_end", func);
-    cg.builder.CreateCondBr(left->IRValue, rightBlock, endBlock);
-    cg.builder.SetInsertPoint(rightBlock);
-    cg.builder.CreateBr(endBlock);
-    cg.builder.SetInsertPoint(endBlock);
-    auto* phi = cg.builder.CreatePHI(cg.builder.getInt1Ty(), 2);
-    phi->addIncoming(cg.false_(), currentBlock);
-    phi->addIncoming(right->IRValue, rightBlock);
-    return phi;
-}
-
-Value* orIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto currentBlock = cg.builder.GetInsertBlock();
-    const auto func = currentBlock->getParent();
-    const auto rightBlock = cg.createBlock("or_right", func);
-    const auto endBlock = cg.createBlock("or_end", func);
-    cg.builder.CreateCondBr(left->IRValue, endBlock, rightBlock);
-    cg.builder.SetInsertPoint(rightBlock);
-    cg.builder.CreateBr(endBlock);
-    cg.builder.SetInsertPoint(endBlock);
-    auto* phi = cg.builder.CreatePHI(cg.builder.getInt1Ty(), 2);
-    phi->addIncoming(cg.true_(), currentBlock);
-    phi->addIncoming(right->IRValue, rightBlock);
-    return phi;
+Value* neNullFunc(LgsCgModule& cg, const LgsExpr* expr) {
+    const auto nullable = expr->type->asNullable();
+    if (expr->type->passByRef) return cg.builder.CreateIsNotNull(expr->IRValue);
+    return nullable->getIsSet(cg, expr->IRValue);
 }
 
 Value* LgsType::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
@@ -435,10 +376,108 @@ LgsType::~LgsType() {
     fields.clear();
 }
 
-void freeType(LgsType* type) {
-    if (!type) return;
-    if (type->isPrimitive) return;
-    if (type->asGenericType() || type->asObject()) return;
-    delete type;
+std::pair<Value*, Value*> loadPairAsFloat(LgsCgModule& cg, LgsExpr* self, LgsExpr* other) {
+    auto l = self->loadIR(cg);
+    auto r = other->loadIR(cg);
+    if (l->getType()->isIntegerTy()) {
+        l = cg.builder.CreateSIToFP(l, cg.floatTy());
+    }
+    if (r->getType()->isIntegerTy()) {
+        r = cg.builder.CreateSIToFP(r, cg.floatTy());
+    }
+    return {l, r};
+}
+
+std::pair<Value*, Value*> loadPairAsInt(LgsCgModule& cg, LgsExpr* self, LgsExpr* other) {
+    auto l = self->loadIR(cg);
+    auto r = other->loadIR(cg);
+    if (l->getType()->isFloatTy()) {
+        l = cg.builder.CreateFPToSI(l, cg.i32Ty());
+    }
+    if (r->getType()->isFloatTy()) {
+        r = cg.builder.CreateFPToSI(r, cg.i32Ty());
+    }
+    return {l, r};
+}
+
+Value* eqIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+    if (left->isNull && right->isNull) return cg.true_();
+    if (left->isNull) return eqNullFunc(cg, right);
+    if (right->isNull) return eqNullFunc(cg, left);
+    if (left->type->isInt && right->type->isInt) {
+        return cg.builder.CreateICmpEQ(left->loadIR(cg), right->loadIR(cg));
+    }
+    if (left->type->isFloatingPoint || right->type->isFloatingPoint) {
+        const auto [l, r] = loadPairAsFloat(cg, left, right);
+        return cg.builder.CreateFCmpOEQ(l, r);
+    }
+    if (left->type->asStr() && right->type->asStr()) {
+        const auto rt = cg.callFunc("strcmp", cg.i32Ty(), {cg.ptrTy(), cg.ptrTy()}, {left->IRValue, right->IRValue});
+        return cg.builder.CreateICmpEQ(rt, cg.i32Zero());
+    }
+    assert(0);
+}
+
+Value* neIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+    if (left->isNull && right->isNull) return cg.false_();
+    if (left->isNull) return neNullFunc(cg, right);
+    if (right->isNull) return neNullFunc(cg, left);
+    if (left->type->isInt && left->type->isInt) {
+        return cg.builder.CreateICmpEQ(left->loadIR(cg), right->loadIR(cg));
+    }
+    if (left->type->isFloatingPoint && left->type->isFloatingPoint) {
+        return cg.builder.CreateFCmpOEQ(left->loadIR(cg), right->loadIR(cg));
+    }
+    if (left->type->asStr() && right->type->asStr()) {
+        const auto rt = cg.callFunc("strcmp", cg.i32Ty(), {cg.ptrTy(), cg.ptrTy()}, {left->IRValue, right->IRValue});
+        return cg.builder.CreateICmpNE(rt, cg.i32Zero());
+    }
+    assert(0);
+}
+
+Value* ltIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+    return cg.builder.CreateICmpSLT(left->loadIR(cg), right->loadIR(cg));
+}
+
+Value* gtIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+    return cg.builder.CreateICmpSGT(left->loadIR(cg), right->loadIR(cg));
+}
+
+Value* geIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+    return cg.builder.CreateICmpSGE(left->loadIR(cg), right->loadIR(cg));
+}
+
+Value* leIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+    return cg.builder.CreateICmpSLE(left->loadIR(cg), right->loadIR(cg));
+}
+
+Value* andIR(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right) {
+    const auto currentBlock = cg.builder.GetInsertBlock();
+    const auto func = currentBlock->getParent();
+    const auto rightBlock = cg.createBlock("and_right", func);
+    const auto endBlock = cg.createBlock("and_end", func);
+    cg.builder.CreateCondBr(left->IRValue, rightBlock, endBlock);
+    cg.builder.SetInsertPoint(rightBlock);
+    cg.builder.CreateBr(endBlock);
+    cg.builder.SetInsertPoint(endBlock);
+    auto* phi = cg.builder.CreatePHI(cg.builder.getInt1Ty(), 2);
+    phi->addIncoming(cg.false_(), currentBlock);
+    phi->addIncoming(right->IRValue, rightBlock);
+    return phi;
+}
+
+Value* orIR(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right) {
+    const auto currentBlock = cg.builder.GetInsertBlock();
+    const auto func = currentBlock->getParent();
+    const auto rightBlock = cg.createBlock("or_right", func);
+    const auto endBlock = cg.createBlock("or_end", func);
+    cg.builder.CreateCondBr(left->IRValue, endBlock, rightBlock);
+    cg.builder.SetInsertPoint(rightBlock);
+    cg.builder.CreateBr(endBlock);
+    cg.builder.SetInsertPoint(endBlock);
+    auto* phi = cg.builder.CreatePHI(cg.builder.getInt1Ty(), 2);
+    phi->addIncoming(cg.true_(), currentBlock);
+    phi->addIncoming(right->IRValue, rightBlock);
+    return phi;
 }
 

@@ -86,16 +86,6 @@ Value* LgsStr::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     return buffer;
 }
 
-Value* LgsStr::eqIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto rt = cg.callFunc("strcmp", cg.i32Ty(), {cg.ptrTy(), cg.ptrTy()}, {left->IRValue, right->IRValue});
-    return cg.builder.CreateICmpEQ(rt, cg.i32Zero());
-}
-
-Value* LgsStr::neIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto rt = cg.callFunc("strcmp", cg.i32Ty(), {cg.ptrTy(), cg.ptrTy()}, {left->IRValue, right->IRValue});
-    return cg.builder.CreateICmpNE(rt, cg.i32Zero());
-}
-
 Value* LgsStr::lenIR(LgsCgModule& cg, Value* iterable) {
     if (isStatic) return cg.extendToSize(size->IRValue);
     return cg.callStrLen(iterable);

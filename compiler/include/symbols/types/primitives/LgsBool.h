@@ -32,15 +32,6 @@ public:
     DIType* getDebugType(LgsCgModule& cg) override;
 };
 
-Value* eqIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-Value* neIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-Value* ltIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-Value* gtIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-Value* geIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-Value* leIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-Value* andIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-Value* orIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-
 inline LgsBool LGS_BOOL;
 
 

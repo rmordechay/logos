@@ -1,4 +1,5 @@
 #pragma once
+#include "LgsType.h"
 #include "exprs/LgsExpr.h"
 #include <LgsValue.h>
 
@@ -22,4 +23,13 @@ public:
     ~LgsParam() override = default;
 };
 
-void freeParams(std::vector<LgsParam>& params);
+inline void freeParams(std::vector<LgsParam>& params) {
+    for (const auto& param : params) {
+        if (param.isSelf) continue;
+        if (param.expr) {
+            freeExpr(param.expr);
+        }
+        freeType(param.type);
+    }
+    params.clear();
+}

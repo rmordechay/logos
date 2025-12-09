@@ -11,7 +11,7 @@ class LgsExpr;
 class LgsField final : public LgsValue {
 public:
     std::string name;
-    size_t position = 0;
+    unsigned position = 0;
     LgsType* type = nullptr;
     LgsExpr* expr = nullptr;
     bool isConst = false;
