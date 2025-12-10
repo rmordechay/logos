@@ -1,6 +1,6 @@
 #pragma once
 #include "LgsDefinitions.h"
-#include "errors/LgsErrors.h"
+#include "errors/LgsErrHandler.h"
 #include <string>
 #include <unordered_map>
 

@@ -42,7 +42,7 @@ void LgsIterIndex::setIRElementPtr(LgsCgModule& cg, const bool assign) {
     // SArray
     if (const auto sArr = baseExpr->type->asSArray()) {
         const auto ty = type->getIRType(cg);
-        cg.createBoundsGuard(sArr->size->IRValue, fromIR);
+        if (!boundsChecked) cg.createIndexBoundsGuard(sArr->size->IRValue, fromIR);
         IRValue = cg.builder.CreateInBoundsGEP(ty, baseExpr->IRValue, fromIR);
         if (ty->isPointerTy()) {
             IRValue = cg.builder.CreateLoad(cg.ptrTy(), IRValue);
@@ -52,7 +52,7 @@ void LgsIterIndex::setIRElementPtr(LgsCgModule& cg, const bool assign) {
 
     // String
     if (const auto iter = baseExpr->type->asStr()) {
-        cg.createBoundsGuard(iter->size->IRValue, fromIR);
+        if (!boundsChecked) cg.createIndexBoundsGuard(iter->size->IRValue, fromIR);
         IRValue = cg.builder.CreateInBoundsGEP(cg.i8Ty(), baseExpr->IRValue, fromIR);
         return;
     }
@@ -66,7 +66,7 @@ void LgsIterIndex::setIRElementPtr(LgsCgModule& cg, const bool assign) {
 
     // Matrix
     if (const auto matrix = baseExpr->type->asMatrix()) {
-        cg.createBoundsGuard(cg.i32(matrix->rows), fromIR);
+        if (!boundsChecked) cg.createIndexBoundsGuard(cg.i32(matrix->rows), fromIR);
         IRValue = matrix->getIRElement(cg, baseExpr->IRValue, fromIR);
         return;
     }

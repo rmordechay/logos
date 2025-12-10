@@ -48,12 +48,8 @@ void LgsIterable::unpackLoopIR(LgsCgModule& cg, LgsForeachLoop* loop) const {
 }
 
 LgsIterable::~LgsIterable() {
-    if (size) {
-        freeExpr(size);
-        size = nullptr;
-    }
-    if (baseType) {
-        freeType(baseType);
-        baseType = nullptr;
-    }
+    freeExpr(size);
+    freeType(baseType);
+    size = nullptr;
+    baseType = nullptr;
 }

@@ -10,7 +10,6 @@ public:
         isStatic = true;
         passByRef = true;
     }
-    explicit LgsSArray(LgsType* baseType, const size_t size): LgsSArray(baseType, new LgsIntConst(size)) {}
     Type* getIRType(LgsCgModule& cg) override;
     std::string getName() override;
     std::string pname() override;
@@ -27,5 +26,6 @@ public:
     Value* getIRElement(LgsCgModule& cg, Value* iterable, Value* index) override;
     Value* lenIR(LgsCgModule& cg, Value* iterable) override;
     bool canCastTo(LgsType* other) override;
+    bool equals(LgsType* other) override;
     DIType* getDebugType(LgsCgModule& cg) override;
 };

@@ -2,17 +2,13 @@
 #include "Lgs_Types.h"
 
 #include <llvm/IR/IRBuilder.h>
-#include <llvm/IR/DIBuilder.h>
 #include <llvm/Passes/OptimizationLevel.h>
 #include <cmath>
 #include <map>
 #include <filesystem>
 
-struct LgsPaths;
-struct LgsAppConfigs;
-struct LgsLocation;
-class LgsFile;
 namespace llvm {
+    class DIBuilder;
     class PassBuilder;
     class TargetMachine;
 }
@@ -45,6 +41,12 @@ using llvm::IRBuilder;
 using llvm::Type;
 using llvm::Value;
 
+struct LgsPaths;
+struct LgsAppConfigs;
+struct LgsLocation;
+struct LgsBaseMsg;
+class LgsFile;
+
 struct LgsLLDBGen {
     DIFile* diFile = nullptr;
     DIBuilder* diBuilder = nullptr;
@@ -71,6 +73,7 @@ public:
     Value* getPtrTo(Value* v);
     GlobalVariable* createGlobal(const std::string& name, Type* type, Constant* args, bool isConst = false, GlobalValue::LinkageTypes linkage = GlobalValue::ExternalLinkage) const;
     StructType* getStructType(const std::vector<Type*>& fields, const std::string& name = "");
+    void setStructField(Type* type, Value* instancePtr, size_t position, Value* v);
     llvm::AllocaInst* getEmptyBuffer();
     Constant* getRTTypeInfo(const std::string& name, size_t size, Lgs_TypeKind kind, Constant* extra);
     StructType* getRTBaseType();
@@ -81,7 +84,8 @@ public:
     void startBlock(BasicBlock* block);
     void branchAndStartBlock(BasicBlock* block);
     bool lastInstTerminator() const;
-    void createBoundsGuard(Value* len, Value* index);
+    void createIndexBoundsGuard(Value* len, Value* index);
+    void createArrBoundsGuard(Value* maxLen, Value* arrLen);
 
     // Funcs
     static FunctionType* getFT(Type* rt, const std::vector<Type*>& params = {}, bool isVariadic = false);
@@ -89,13 +93,14 @@ public:
     Value* callFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes = {}, const std::vector<Value*>& args = {}, bool isVariadic = false);
     Value* callIntrinsics(llvm::Intrinsic::ID intrinsicID, const std::vector<Type*>& types = {}, const std::vector<Value*>& args = {});
     Value* callLgsFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes = {}, const std::vector<Value*>& args = {});
-    Value* callRuntimeFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes = {}, const std::vector<Value*>& args = {});
+    Value* callRuntimeFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes = {}, const std::vector<Value*>& args = {}, bool isVariadic = false);
+    void callThrowError(const LgsBaseMsg& err, const std::vector<Value*>& args = {});
     Value* callHash(Value* arg);
     Constant* hashConst(const std::string& str);
 
     // System
     Value* callPrintf(const std::vector<Value*>& args);
-    Value* callSnprintf(Value* buffer, Value* fmt, const std::vector<Value*>& args);
+    Value* callSnprintf(const std::string& fmt, const std::vector<Value*>& args);
     Value* callStrLen(Value* str);
     void callMemSet(Value* dest, Value* src, Value* size);
     void callMemCpy(Value* dest, Value* src, Value* size);

@@ -1,4 +1,6 @@
 #include "Lgs_Runtime.h"
+
+#include "LgsConfigs.h"
 #include "LgsDefinitions.h"
 #include "LgsUtils.h"
 #include "Lgs_DArrayExpr.h"
@@ -78,13 +80,13 @@ extern "C" void* Lgs_Runtime_getFromVTable(void* instance, const int32_t virtual
     return runtime.vtable[VKey{instance, virtualID}];
 }
 
-extern "C" void Lgs_Runtime_throwError(const char* msg) {
-    logError(std::string(msg) + "\n");
-    exit(1);
-}
-
-void Lgs_exitWithErrors(const LgsBaseMsg& baseMsg, const std::vector<std::string>& args) {
-    printCliError(baseMsg, args);
+extern "C" void Lgs_Runtime_throwError(const size_t count, const char* msg, ...) {
+    char out[STRING_BUFFER_SIZE];
+    va_list args;
+    va_start(args, msg);
+    formatErrorMsg(msg, out, count, args);
+    va_end(args);
+    logError(std::string(out) + "\n");
     exit(1);
 }
 

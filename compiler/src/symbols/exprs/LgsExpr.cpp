@@ -46,7 +46,21 @@ std::optional<int64_t> LgsExpr::getConstInt() {
         if (!const1.has_value()) return std::nullopt;
         const auto const2 = binExpr->right->getConstInt();
         if (!const2.has_value()) return std::nullopt;
-        return const1.value() + const2.value();
+
+        switch (binExpr->op.opType) {
+        case ADD: return const1.value() + const2.value();
+        case SUB: return const1.value() - const2.value();
+        case MUL: return const1.value() * const2.value();
+        case DIV: return const1.value() / const2.value();
+        case MODULO: return const1.value() % const2.value();
+        case POW: return std::pow(const1.value(), const2.value());
+        case BIT_AND: return const1.value() & const2.value();
+        case BIT_OR: return const1.value() | const2.value();
+        case BIT_XOR: return const1.value() ^ const2.value();
+        case LSHIFT: return const1.value() << const2.value();
+        case RSHIFT: return const1.value() >> const2.value();
+        default: break;
+        }
     }
     return std::nullopt;
 }
@@ -76,7 +90,9 @@ LgsExpr* LgsExpr::castExplicitly(LgsType* toType) {
     assert(0);
 }
 
-void LgsExpr::castImplicitly(LgsType* toType) {}
+void LgsExpr::castImplicitly(LgsType* toType) {
+
+}
 
 Value* LgsExpr::hashValue(LgsCgModule& cg) {
     assert(0);
@@ -248,4 +264,15 @@ Value* crossProduct(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     result = cg.builder.CreateInsertElement(result, cz, cg.i32(2));
 
     return result;
+}
+
+void castExprImplicitly(LgsExpr*& expr, LgsType* toType) {
+    expr->castImplicitly(toType);
+    if (!expr->asVariable() && !expr->asNullableExpr() && toType->asNullable()) {
+        // The Expr and its type are wrapped in NullableExpr and Nullable.
+        const auto& nullable = toType->asNullable();
+        expr->type = nullable->baseType;
+        expr = new LgsNullableExpr(expr);
+        expr->type = nullable;
+    }
 }

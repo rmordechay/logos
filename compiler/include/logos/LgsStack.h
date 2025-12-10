@@ -32,5 +32,5 @@ public:
     LgsForLoop* currentLoop() const;
     LgsIfStmt* currentIfStmt() const;
     LgsIfStmt* getOutermostIfStmt() const;
-    BasicBlock* findTagExitBlock(const std::string& tag) const;
+    llvm::BasicBlock* findTagExitBlock(const std::string& tag) const;
 };

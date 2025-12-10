@@ -1,13 +1,5 @@
 #pragma once
-
-struct LgsWarning {
-    std::string msg;
-    size_t errCode;
-    LgsLocation location;
-
-    LgsWarning(const std::string& msg, size_t errCode) : msg(msg), errCode(errCode) {}
-    LgsWarning(const std::string& msg, size_t errCode, const LgsLocation& location) : msg(msg), errCode(errCode), location(location) {}
-};
+#include "LgsErrHandler.h"
 
 /** Templates warnings. Should not be returned directly, but formatted and returned as a new LgsWarning */
 static inline size_t warningCodeStart = 50000;

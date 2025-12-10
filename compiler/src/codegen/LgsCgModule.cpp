@@ -2,6 +2,7 @@
 #include "files/LgsFile.h"
 #include "LgsConfigs.h"
 #include "LgsUtils.h"
+#include "errors/LgsErrors.h"
 #include "logos/LgsPaths.h"
 #include <llvm/Support/FileSystem.h>
 #include <llvm/Bitcode/BitcodeWriter.h>
@@ -12,7 +13,6 @@
 #include <llvm/MC/TargetRegistry.h>
 #include <llvm/Target/TargetMachine.h>
 #include <llvm/Target/TargetOptions.h>
-#include <iostream>
 #include <string>
 #include <llvm/Analysis/CGSCCPassManager.h>
 #include <llvm/Analysis/LoopAnalysisManager.h>
@@ -70,7 +70,6 @@ bool LgsCgModule::writeIRModule(const LgsPaths& paths, uint8_t optLevel) const {
     llvm::WriteBitcodeToFile(*IRModule, bitcodeStream);
     bitcodeStream.flush();
     bitcodeStream.close();
-
     // Create object
     char cmd[1024*4];
     const auto triple = llvm::sys::getDefaultTargetTriple();
@@ -159,6 +158,11 @@ StructType* LgsCgModule::getStructType(const std::vector<Type*>& fields, const s
     return structType;
 }
 
+void LgsCgModule::setStructField(Type* type, Value* instancePtr, const size_t position, Value* v) {
+    const auto gep = builder.CreateStructGEP(type, instancePtr, position);
+    builder.CreateStore(v, gep);
+}
+
 llvm::AllocaInst* LgsCgModule::getEmptyBuffer() {
     return builder.CreateAlloca(ArrayType::get(i8Ty(), STRING_BUFFER_SIZE));
 }
@@ -171,8 +175,8 @@ Constant* LgsCgModule::getRTTypeInfo(const std::string& name, const size_t size,
 }
 
 StructType* LgsCgModule::getRTBaseType() {
-    const auto typeInfoMatrix = getStructType({sizeTy(), sizeTy(), ptrTy()}, "Matrix"); // Biggest
-    return getStructType({sizeTy(), ptrTy(), typeInfoMatrix}, "RTI"); // size, kind, type
+    const auto typeInfoMatrix = getStructType({sizeTy(), sizeTy(), ptrTy()}, LGS_TYPEINFO_PREFIX"Matrix"); // Biggest
+    return getStructType({sizeTy(), i32Ty(), typeInfoMatrix}, "RTI"); // size, kind, type
 }
 
 BasicBlock* LgsCgModule::createBlock(const std::string& name, Function* parent) {
@@ -199,13 +203,25 @@ bool LgsCgModule::lastInstTerminator() const {
     return builder.GetInsertBlock()->getTerminator();
 }
 
-void LgsCgModule::createBoundsGuard(Value* len, Value* index) {
+void LgsCgModule::createIndexBoundsGuard(Value* len, Value* index) {
     const auto condition = builder.CreateICmpUGE(extendToSize(index), extendToSize(len));
     const auto validBlock = createBlock();
     const auto invalidBlock = createBlock();
     builder.CreateCondBr(condition, invalidBlock, validBlock);
     startBlock(invalidBlock);
-    callRuntimeFunc("throwError", voidTy(), {ptrTy()}, {getString(E10003.msg)});
+    callThrowError(E10003);
+    builder.CreateUnreachable();
+    branchAndStartBlock(validBlock);
+}
+
+void LgsCgModule::createArrBoundsGuard(Value* maxLen, Value* arrLen) {
+    const auto condition = builder.CreateICmpUGT(extendToSize(arrLen), extendToSize(maxLen));
+    const auto validBlock = createBlock();
+    const auto invalidBlock = createBlock();
+    builder.CreateCondBr(condition, invalidBlock, validBlock);
+    startBlock(invalidBlock);
+    callThrowError(E10105, {callSnprintf("%d", {maxLen})});
+    builder.CreateUnreachable();
     branchAndStartBlock(validBlock);
 }
 
@@ -233,15 +249,21 @@ Value* LgsCgModule::callLgsFunc(const std::string& funcName, Type* rt, const std
     return callFunc(LGS_RUNTIME_PREFIX + funcName, rt, paramTypes, args);
 }
 
-Value* LgsCgModule::callRuntimeFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes, const std::vector<Value*>& args) {
+Value* LgsCgModule::callRuntimeFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes, const std::vector<Value*>& args, bool isVariadic) {
     if (debugger.diBuilder) {
         const auto savedDbg = builder.getCurrentDebugLocation();
         builder.SetCurrentDebugLocation(llvm::DebugLoc());
-        const auto v = callFunc(LGS_RUNTIME_PREFIX"Runtime_" + funcName, rt, paramTypes, args);
+        const auto v = callFunc(LGS_RUNTIME_PREFIX"Runtime_" + funcName, rt, paramTypes, args, isVariadic);
         builder.SetCurrentDebugLocation(savedDbg);
         return v;
     }
-    return callFunc(LGS_RUNTIME_PREFIX"Runtime_" + funcName, rt, paramTypes, args);
+    return callFunc(LGS_RUNTIME_PREFIX"Runtime_" + funcName, rt, paramTypes, args, isVariadic);
+}
+
+void LgsCgModule::callThrowError(const LgsBaseMsg& err, const std::vector<Value*>& args) {
+    std::vector<Value*> irArgs = {usize(args.size()), getString(err.msg)};
+    irArgs.insert(irArgs.end(), args.begin(), args.end());
+    callRuntimeFunc("throwError", voidTy(), {sizeTy(), ptrTy()}, irArgs, true);
 }
 
 Value* LgsCgModule::callHash(Value* arg) {
@@ -256,10 +278,12 @@ Value* LgsCgModule::callPrintf(const std::vector<Value*>& args) {
     return callFunc("printf", i32Ty(), {ptrTy()}, args, true);
 }
 
-Value* LgsCgModule::callSnprintf(Value* buffer, Value* fmt, const std::vector<Value*>& args) {
-    std::vector<Value*> tempArgs = {buffer, usize(STRING_BUFFER_SIZE), fmt};
+Value* LgsCgModule::callSnprintf(const std::string& fmt, const std::vector<Value*>& args) {
+    const auto buffer = getEmptyBuffer();
+    std::vector<Value*> tempArgs = {buffer, usize(STRING_BUFFER_SIZE), getString(fmt)};
     tempArgs.insert(tempArgs.end(), args.begin(), args.end());
-    return callFunc("snprintf", i32Ty(), {ptrTy(), sizeTy(), ptrTy()}, tempArgs, true);
+    callFunc("snprintf", i32Ty(), {ptrTy(), sizeTy(), ptrTy()}, tempArgs, true);
+    return buffer;
 }
 
 Value* LgsCgModule::callStrLen(Value* str) {
@@ -445,7 +469,7 @@ llvm::DILocation* LgsCgModule::getDebugLoc(const LgsLocation& location) {
         location.columnStart,
         debugger.subprogram,
         debugger.subprogram->getScope()
-    );
+        );
 }
 
 void LgsCgModule::initLLVM() {

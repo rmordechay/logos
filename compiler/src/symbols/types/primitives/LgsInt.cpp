@@ -1,5 +1,4 @@
 #include "types/primitives/LgsInt.h"
-
 #include "LgsBinaryTokens.h"
 #include "exprs/constants/LgsIntConst.h"
 #include "stmts/LgsField.h"

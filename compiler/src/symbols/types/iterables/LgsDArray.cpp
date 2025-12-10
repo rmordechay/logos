@@ -1,10 +1,8 @@
 #include "types/iterables/LgsDArray.h"
-
 #include "LgsBinaryTokens.h"
 #include "Lgs_DArrayExpr.h"
 #include "codegen/LgsCgModule.h"
 #include "exprs/LgsArrayExpr.h"
-#include "exprs/LgsFuncCall.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsLong.h"
@@ -38,13 +36,13 @@ std::string LgsDArray::getName() {
     return name;
 }
 
-std::string LgsDArray::getGenericName() {
-    return name + baseType->getGenericName();
-}
-
 std::string LgsDArray::pname() {
     if (baseType) return baseType->pname() + "[]";
     return "[]";
+}
+
+std::string LgsDArray::getGenericName() {
+    return name + baseType->getGenericName();
 }
 
 size_t LgsDArray::sizeBytes() {
@@ -80,9 +78,9 @@ Value* LgsDArray::lenIR(LgsCgModule& cg, Value* iterable) {
 
 Value* LgsDArray::inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) {
     return cg.callLgsFunc("DArray_contains", cg.i1Ty(), {cg.ptrTy(), cg.ptrTy()}, {
-        iterableExpr->IRValue,
-        cg.getPtrTo(value->IRValue),
-    });
+                              iterableExpr->IRValue,
+                              cg.getPtrTo(value->IRValue),
+                          });
 }
 
 Value* LgsDArray::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
@@ -124,5 +122,17 @@ DIType* LgsDArray::getDebugType(LgsCgModule& cg) {
         DINode::FlagZero,
         nullptr,
         di->getOrCreateArray(fields)
-    );
+        );
+}
+
+Value* LgsDArray::addFuncImpl(LgsCgModule& cg, const std::vector<LgsFuncArg>& args) {
+    const auto arr = args.front().expr->IRValue;
+    const auto arg = args[1].expr;
+    if (arg->type->asInt()) return cg.callLgsFunc(std::string(name) + "_addInt", cg.voidTy(), {cg.ptrTy(), cg.i32Ty()}, {arr, arg->IRValue});
+    return cg.callLgsFunc(std::string(name) + "_add", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {arr, arg->IRValue});
+}
+
+LgsDArray::~LgsDArray() {
+    // set null because this is the baseType of the iterable
+    addFunc->funcType->params[1].setType(nullptr);
 }

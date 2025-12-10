@@ -11,6 +11,11 @@ Value* LgsIntConst::loadIR(LgsCgModule& cg) {
     return IRValue;
 }
 
+void LgsIntConst::castImplicitly(LgsType* toType) {
+    if (!type->canCastTo(toType)) return;
+    type = toType;
+}
+
 LgsExpr* LgsIntConst::castExplicitly(LgsType* toType) {
     if (type->getName() == toType->getName()) return this;
     if (toType->getName() == LgsAny::name) return this;

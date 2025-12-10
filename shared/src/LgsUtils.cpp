@@ -2,6 +2,8 @@
 #include "LgsConfigs.h"
 #include "LgsDefinitions.h"
 #include "LgsTokens.h"
+#include "errors/LgsErrors.h"
+
 #include <algorithm>
 #include <cassert>
 #include <iostream>
@@ -169,7 +171,7 @@ void printCliError(const LgsBaseMsg& err, const std::vector<std::string>& args) 
     logError(errMsg);
 }
 
-std::string formatErrorMsg(const std::string& msg, const std::vector<std::string>& args) {
+std::string formatErrorMsg(const char* msg, const std::vector<std::string>& args) {
     size_t pos = 0;
     size_t argIndex = 0;
     auto result = std::string(msg);
@@ -179,6 +181,20 @@ std::string formatErrorMsg(const std::string& msg, const std::vector<std::string
         argIndex++;
     }
     return result;
+}
+
+void formatErrorMsg(const char* msg, char* out, const size_t count, va_list args) {
+    std::string result(msg);
+    size_t pos = 0;
+    for (size_t i = 0; i < count; i++) {
+        const auto arg = va_arg(args, const char*);
+        pos = result.find(MSG_PLACEHOLDER, pos);
+        if (pos == std::string::npos) break;
+        result.replace(pos, strlen(MSG_PLACEHOLDER), arg);
+        pos += strlen(arg);
+    }
+    std::strncpy(out, result.c_str(), STRING_BUFFER_SIZE - 1);
+    out[STRING_BUFFER_SIZE - 1] = '\0';
 }
 
 void combineNodeHash(size_t& oldHash, const size_t newHash) {

@@ -4,17 +4,18 @@
 #include "types/LgsAny.h"
 #include "types/primitives/LgsBool.h"
 #include "LgsUtils.h"
+#include "Lgs_DArrayExpr.h"
 #include "exprs/LgsBinaryExpr.h"
 #include "lgsc/LgsCCompiler.h"
 
 Type* LgsSArray::getIRType(LgsCgModule& cg) {
     if (IRType) return IRType;
-    const auto numElements = size->getConstInt();
-    if (numElements.has_value()) {
+    const auto sizeInt = size->getConstInt();
+    if (sizeInt.has_value()) {
         const auto innerIRType = baseType->getIRType(cg);
-        IRType = ArrayType::get(innerIRType, numElements.value());
+        IRType = ArrayType::get(innerIRType, sizeInt.value());
     } else {
-        IRType = cg.ptrTy();
+        IRType = cg.getStructType({cg.sizeTy(), cg.ptrTy()}, getGenericName());
     }
     return IRType;
 }
@@ -29,13 +30,18 @@ std::string LgsSArray::pname() {
 }
 
 std::string LgsSArray::getGenericName() {
-    return name + baseType->getGenericName();
+    auto genericName = name + baseType->getGenericName();
+    const auto constSize = size->getConstInt();
+    if (constSize.has_value()) {
+        genericName += std::to_string(constSize.value());
+    }
+    return genericName;
 }
 
 size_t LgsSArray::sizeBytes() {
     const auto constInt = size->getConstInt();
-    if (!constInt.has_value()) return 0;
-    return baseType->sizeBytes() * constInt.value();
+    if (constInt.has_value()) return baseType->sizeBytes() * constInt.value();
+    return sizeof(Lgs_SArrayExpr);
 }
 
 LgsExpr* LgsSArray::getZeroValue() {
@@ -47,13 +53,13 @@ Constant* LgsSArray::getRTType(LgsCgModule& cg) {
     const auto genericName = getGenericName();
     const auto st = cg.getStructType({cg.sizeTy(), cg.ptrTy()}, genericName);
     const auto constSize = size->getConstInt();
-    auto size = 1;
+    auto size = 0;
     if (constSize.has_value()) {
         size = constSize.value();
     }
     const auto sArrSize = cg.usize(size);
     const auto sv = ConstantStruct::get(st, {sArrSize, baseType->getRTType(cg)});
-    return cg.getRTTypeInfo(genericName, sizeBytes(), RTT_SARRAY, sv);
+    return cg.getRTTypeInfo(genericName, size, RTT_SARRAY, sv);
 }
 
 std::string LgsSArray::fmtStr() const {
@@ -149,6 +155,20 @@ bool LgsSArray::canCastTo(LgsType* other) {
     const auto otherArr = other->asIterable();
     if (!otherArr) return false;
     return baseType->canCastTo(otherArr->baseType);
+}
+
+bool LgsSArray::equals(LgsType* other) {
+    if (baseType->asChar() && other->asStr()) return true;
+    const auto otherArr = other->asSArray();
+    if (!otherArr) return false;
+    if (!baseType->equals(otherArr->baseType)) return false;
+    const auto constSize = size->getConstInt();
+    const auto otherConstSize = otherArr->size->getConstInt();
+    if (!constSize.has_value() && !otherConstSize.has_value()) return true;
+    if (constSize.has_value() && otherConstSize.has_value()) {
+        return constSize.value() == otherConstSize.value();
+    }
+    return false;
 }
 
 DIType* LgsSArray::getDebugType(LgsCgModule& cg) {

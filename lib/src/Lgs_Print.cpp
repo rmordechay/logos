@@ -1,4 +1,3 @@
-#include "Lgs_Helpers.h"
 #include "LgsDefinitions.h"
 #include "Lgs_DArrayExpr.h"
 #include "Lgs_HashMap.h"
@@ -6,11 +5,7 @@
 #include <cassert>
 #include <sstream>
 
-extern "C" void Lgs_print(const Lgs_TypeInfo* rtt, void* v) {
-    printf("%s\n", formatElement(rtt, v).c_str());
-}
-
-std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
+static std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
     if (!elem) return LGS_NULL_LITERAL;
     std::ostringstream str;
     switch (rtt->kind) {
@@ -46,11 +41,21 @@ std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
         break;
     }
     case RTT_SARRAY: {
-        const auto& [len, baseType] = rtt->sArray;
+        const auto& sArr = rtt->sArray;
+        const auto baseType = sArr.baseType;
+        size_t len = 0;
+        void* base = nullptr;
+        if (sArr.len == 0) {
+            const auto sArrExpr = static_cast<Lgs_SArrayExpr*>(elem);
+            base = sArrExpr->data;
+            len = sArrExpr->length;
+        } else {
+            base = elem;
+            len = sArr.len;
+        }
         str << "[";
-        const auto base = static_cast<char*>(elem);
         for (size_t i = 0; i < len; ++i) {
-            void* data = base + i * baseType->size;
+            void* data = static_cast<char*>(base) + i * baseType->size;
             str << formatElement(baseType, data);
             if (i < len - 1) str << ", ";
         }
@@ -130,7 +135,11 @@ std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
         if (isPtr) {
             str << formatElement(baseType, elem);
         } else {
-            const auto isSet = *(static_cast<bool*>(elem) + baseType->size);
+            struct my {
+                int value;
+                bool isSet;
+            };
+            const bool isSet = *(static_cast<bool*>(elem) + baseType->size);
             if (isSet) str << formatElement(baseType, elem);
             else str << LGS_NULL_LITERAL;
         }
@@ -142,7 +151,7 @@ std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
         str << "{";
         bool first = true;
         for (auto& [k, v] : *hashMap->data) {
-        if (!first) str << ", ";
+            if (!first) str << ", ";
             first = false;
             str << k << ": " << formatElement(valueType, v.data());
         }
@@ -156,3 +165,6 @@ std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
     return str.str();
 }
 
+extern "C" void Lgs_print(const Lgs_TypeInfo* rtt, void* v) {
+    printf("%s\n", formatElement(rtt, v).c_str());
+}

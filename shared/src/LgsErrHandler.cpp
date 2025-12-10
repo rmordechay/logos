@@ -1,7 +1,9 @@
-#include "../include/errors/LgsErrHandler.h"
+#include "errors/LgsErrHandler.h"
 #include "LgsDefinitions.h"
 #include "LgsUtils.h"
+#include "errors/LgsErrors.h"
 #include <algorithm>
+#include <cassert>
 
 void LgsErrHandler::setUnsuccessful() {
     successful = false;
@@ -17,6 +19,7 @@ void LgsErrHandler::addError(const LgsBaseMsg& lgsErr, const LgsLocation* locati
     setUnsuccessful();
     LgsError err(formatErrorMsg(lgsErr.msg, args), lgsErr.errCode);
     if (location) {
+        assert(filePath != "");
         err.location = *location;
         err.filePath = filePath;
         errors.emplace_back(err);

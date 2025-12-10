@@ -25,10 +25,13 @@ void LgsArrayExpr::castImplicitly(LgsType* toType) {
         otherBaseType = toType->asIterable()->baseType;
     }
     for (size_t i = 0; i < elements.size(); ++i) {
-        if (elements[i]->type) continue;
-        elements[i]->castImplicitly(otherBaseType);
+        castExprImplicitly(elements[i], otherBaseType);
     }
-    type->asIterable()->baseType = otherBaseType;
+    if (!type) {
+        type = toType;
+    } else if (const auto& iter = type->asIterable()) {
+        iter->baseType = otherBaseType;
+    }
 }
 
 void LgsArrayExpr::setDebugValue(LgsCgModule& cg) {

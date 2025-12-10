@@ -1,16 +1,4 @@
 #pragma once
-#include <fstream>
-#include <string>
-#include <unordered_map>
-
-struct LgsLocation {
-    size_t index = 0;
-    size_t lineStart = 1;
-    size_t columnStart = 1;
-    size_t lineEnd = 1;
-    size_t columnEnd = 1;
-    std::filesystem::path* filepath = nullptr;
-};
 
 /**
  * Generic base struct for warnings and errors.
@@ -19,16 +7,6 @@ struct LgsBaseMsg {
     const char* const msg;
     size_t const errCode;
     LgsBaseMsg(const char* msg, const size_t code) : msg(msg), errCode(code) {}
-};
-
-struct LgsError {
-    std::string msg;
-    size_t errCode;
-    LgsLocation location;
-    std::string filePath = "";
-
-    LgsError(const std::string& msg, const size_t errCode) : msg(msg), errCode(errCode) {}
-    LgsError(const std::string& msg, const size_t errCode, const LgsLocation& location) : msg(msg), errCode(errCode), location(location) {}
 };
 
 /** Templates errors. Should not be returned directly but formatted and wrapped around with another struct */
@@ -144,3 +122,4 @@ inline LgsBaseMsg E10107{"Could not find C library %s", errCodeStart++};
 inline LgsBaseMsg E10108{"%s is not indexable.", errCodeStart++};
 inline LgsBaseMsg E10109{"Primitive types should not have an ownership.", errCodeStart++};
 inline LgsBaseMsg E10110{"Unsigned number cannot be negative.", errCodeStart++};
+inline LgsBaseMsg E10111{"Array type %s does not match the element type %s.", errCodeStart++};

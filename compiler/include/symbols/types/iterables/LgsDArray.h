@@ -17,12 +17,7 @@ public:
         isHeapAlloc = true;
         addMethod(addFunc);
         addMethod(reserveFunc);
-        addFunc->fn = [](LgsCgModule& cg, const std::vector<LgsFuncArg>& args) {
-            const auto arr = args.front().expr->IRValue;
-            const auto arg = args[1].expr;
-            if (arg->type->asInt()) return cg.callLgsFunc(std::string(name) + "_addInt", cg.voidTy(), {cg.ptrTy(), cg.i32Ty()}, {arr, arg->IRValue});
-            return cg.callLgsFunc(std::string(name) + "_add", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {arr, arg->IRValue});
-        };
+        addFunc->fn = addFuncImpl;
     }
     bool inferBaseType(const std::vector<LgsExpr*>& args) override;
     Type* getIRType(LgsCgModule& cg) override;
@@ -39,4 +34,6 @@ public:
     Value* getIRElement(LgsCgModule& cg, Value* iterable, Value* index) override;
     bool canCastTo(LgsType* other) override;
     DIType* getDebugType(LgsCgModule& cg) override;
+    static Value* addFuncImpl(LgsCgModule& cg, const std::vector<LgsFuncArg>& args);
+    ~LgsDArray() override;
 };

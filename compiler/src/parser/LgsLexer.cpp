@@ -1,4 +1,7 @@
 #include "parser/LgsLexer.h"
+
+#include "errors/LgsErrors.h"
+
 #include <cassert>
 #include <iostream>
 

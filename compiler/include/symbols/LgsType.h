@@ -1,7 +1,8 @@
 #pragma once
-#include "errors/LgsErrors.h"
 #include <map>
+#include <ostream>
 #include <vector>
+#include "errors/LgsErrHandler.h"
 
 struct LgsBinOp;
 class LgsBinaryExpr;

@@ -1,15 +1,7 @@
 #pragma once
 #include "LgsAppCache.h"
 #include "LgsAppConfigs.h"
-#include "codegen/LgsLinker.h"
-#include "LgsSymbolTable.h"
-#include "errors/LgsErrHandler.h"
 #include "LgsPaths.h"
-#include "tools/LgsLinter.h"
-#include "LgsDefinitions.h"
-#include "files/LgsFile.h"
-#include "parser/LgsParser.h"
-#include <mutex>
 
 class LgsAppConfigFile;
 class LgsTestFile;

@@ -16,6 +16,7 @@
 #include "types/iterables/LgsIterable.h"
 #include "types/LgsSubType.h"
 #include "errors/LgsErrHandler.h"
+#include "errors/LgsErrors.h"
 #include "types/LgsNullable.h"
 
 bool LgsTypeResolver::resolveGlobals(const std::vector<LgsFile*>& srcFiles, ThreadPool& pool) {

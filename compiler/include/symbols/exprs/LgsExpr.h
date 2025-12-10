@@ -81,6 +81,7 @@ public:
 
 Value* dotProduct(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
 Value* crossProduct(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
+void castExprImplicitly(LgsExpr*& expr, LgsType* toType);
 
 inline void freeExpr(LgsExpr* expr) {
     if (!expr) return;

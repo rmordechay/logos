@@ -52,11 +52,9 @@
 #include "types/primitives/LgsDouble.h"
 #include "types/LgsGenericType.h"
 #include "types/iterables/LgsVariadic.h"
-#include <iostream>
 #include <ranges>
 #include <unordered_set>
 
-void castExprImplicitly(LgsExpr*& expr, LgsType* toType);
 static std::string getMissingImplementsStr(const std::vector<LgsField*>& fields, const std::vector<LgsFunc*>& methods);
 
 void LgsSema::analyse() {
@@ -152,6 +150,7 @@ void LgsSema::visitField(LgsField* field) {
     if (!field->type->isHeapAlloc && field->isOwner) {
         field->isOwner = false;
     }
+    addRTType(field->type);
 }
 
 void LgsSema::visitFunc(LgsFunc* func) {
@@ -192,7 +191,7 @@ void LgsSema::visitMainFunc(LgsMainFunc* mainFunc) {
         }
         // Replaces dyn array to static array
         freeType(firstParam.type);
-        const auto sArray = new LgsSArray(new LgsStr(), static_cast<size_t>(0));
+        const auto sArray = new LgsSArray(new LgsStr(), new LgsIntConst(0));
         firstParam.setType(sArray);
         firstParam.expr = new LgsArrayExpr(sArray);
     }
@@ -232,6 +231,7 @@ void LgsSema::visitParam(LgsParam* param) {
         validateExprType(param->expr, param->type);
     }
     addLocalSymbol(LgsSymbol(param));
+    addRTType(param->type);
     assert(param->type);
 }
 
@@ -332,6 +332,7 @@ void LgsSema::visitVarDec(LgsVarDec* varDec) {
         addError(E10109, varDec->location);
     }
     addLocalSymbol(LgsSymbol(varDec));
+    addRTType(varDec->type);
 }
 
 void LgsSema::visitAssignment(const LgsAssignment* assignment) {
@@ -679,7 +680,6 @@ void LgsSema::visitExpr(LgsExpr*& expr) {
         else if (const auto castExpr = expr->asCast()) visitCast(castExpr);
         else if (const auto json = expr->asJson()) visitJson(json);
     }
-    addRTType(expr->type);
 }
 
 void LgsSema::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
@@ -747,7 +747,7 @@ void LgsSema::visitArrayExpr(LgsArrayExpr* arrayExpr) {
     if (!arrayExpr->type) {
         arrayExpr->setType(new LgsDArray());
         visitDynamicArray(arrayExpr);
-    } else if (arrayExpr->type->asSet()) {
+    } else if (arrayExpr->type->asDArray() || arrayExpr->type->asSet()) {
         visitDynamicArray(arrayExpr);
     } else if (arrayExpr->type->asSArray()) {
         visitStaticArray(arrayExpr);
@@ -758,7 +758,7 @@ void LgsSema::visitArrayExpr(LgsArrayExpr* arrayExpr) {
     if (!iter) return;
     for (const auto element : arrayExpr->elements) {
         if (iter->baseType && element->type->canCastTo(iter->baseType)) continue;
-        return addError(E10001, element->location, {iter->pname(), element->type->pname()});
+        return addError(E10111, element->location, {iter->baseType->pname(), element->type->pname()});
     }
 }
 
@@ -1322,8 +1322,11 @@ void LgsSema::visitIndex(LgsIterIndex* iterIndex) {
     if (iterable->isStatic) {
         const auto index = exprFrom->getConstInt();
         const auto bounds = iterable->size->getConstInt();
-        if (index.has_value() && bounds.has_value() && index.value() >= bounds.value()) {
-            addError(E10048, iterIndex->location, {iterIndex->asText(), std::to_string(*bounds)});
+        if (index.has_value() && bounds.has_value()) {
+            if (index.value() >= bounds.value()) {
+                addError(E10048, iterIndex->location, {iterIndex->asText(), std::to_string(*bounds)});
+            }
+            iterIndex->boundsChecked = true;
         }
     }
     iterIndex->setType(new LgsNullable(iterable->getValueType()));
@@ -1597,7 +1600,7 @@ void LgsSema::addLocalSymbol(const LgsSymbol& newSymbol) {
     if (file->symbolTable.getSymbol(symbolName)) {
         return addError(E10011, *newSymbol.location, {symbolName});
     }
-    stack.getSymbolTable().addSymbol(newSymbol, &errHandler);
+    stack.getSymbolTable().addSymbol(newSymbol, &errHandler, file->path);
 }
 
 LgsSymbol* LgsSema::getSymbol(const std::string& name, const LgsLocation* location) {
@@ -1661,15 +1664,4 @@ void LgsSema::addRTType(LgsType* type) const {
         if (rttType->equals(type)) return;
     }
     file->symbolTable.rttTypes.push_back(type);
-}
-
-void castExprImplicitly(LgsExpr*& expr, LgsType* toType) {
-    expr->castImplicitly(toType);
-    if (!expr->asVariable() && !expr->asNullableExpr() && toType->asNullable()) {
-        // The Expr and its type are wrapped in NullableExpr and Nullable.
-        const auto& nullable = toType->asNullable();
-        expr->type = nullable->baseType;
-        expr = new LgsNullableExpr(expr);
-        expr->type = nullable;
-    }
 }

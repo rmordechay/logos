@@ -775,17 +775,21 @@ void LgsCodeGen::visitArrayExpr(LgsArrayExpr* arrayExpr) {
 }
 
 void LgsCodeGen::visitStaticArray(LgsArrayExpr* arrayExpr) const {
-    const auto arr = arrayExpr->type->asSArray();
-    const auto arrTypeIR = arr->getIRType(cg);
+    const auto sArr = arrayExpr->type->asSArray();
+    const auto sArrTypeIR = sArr->getIRType(cg);
     if (!arrayExpr->IRValue) {
-        arrayExpr->IRValue = cg.builder.CreateAlloca(arrTypeIR);
+        arrayExpr->IRValue = cg.builder.CreateAlloca(sArrTypeIR);
     }
     if (arrayExpr->elements.empty()) return;
-    const auto sArr = arrayExpr->type->asSArray();
+
+    const auto size = sArr->size->getConstInt();
+    if (!size.has_value()) {
+        cg.createArrBoundsGuard(sArr->size->IRValue, cg.usize(arrayExpr->elements.size()));
+        cg.setStructField(sArrTypeIR, arrayExpr->IRValue, 1, sArr->size->IRValue);
+    }
 
     // Check if all args are const for chunk copy
     std::vector<Constant*> constantArgs;
-    constantArgs.reserve(arrayExpr->elements.size());
     auto allArgsAreConst = true;
     for (const auto element : arrayExpr->elements) {
         if (const auto constant = llvm::dyn_cast<Constant>(element->IRValue)) {
@@ -797,9 +801,17 @@ void LgsCodeGen::visitStaticArray(LgsArrayExpr* arrayExpr) const {
     }
 
     if (allArgsAreConst) {
-        const auto sArrTy = llvm::dyn_cast<ArrayType>(sArr->getIRType(cg));
-        const auto argsIR = ConstantArray::get(sArrTy, constantArgs);
-        cg.builder.CreateStore(argsIR, arrayExpr->IRValue);
+        if (size.has_value()) {
+            const auto sArrTy = llvm::dyn_cast<ArrayType>(sArrTypeIR);
+            const auto argsIR = ConstantArray::get(sArrTy, constantArgs);
+            cg.builder.CreateStore(argsIR, arrayExpr->IRValue);
+        } else {
+            const auto sArrTy = llvm::dyn_cast<ArrayType>(sArrTypeIR);
+            const auto argsIR = ConstantArray::get(sArrTy, constantArgs);
+            const auto alloc = cg.builder.CreateAlloca(sArrTypeIR);
+            cg.builder.CreateStore(argsIR, alloc);
+            cg.builder.CreateStore(alloc, arrayExpr->IRValue);
+        }
     } else {
         if (sArr->baseType->asSArray()) return; // Nested arrays are handled before
         for (size_t i = 0; i < arrayExpr->elements.size(); ++i) {
@@ -1156,8 +1168,7 @@ void LgsCodeGen::visitStrConst(LgsStrConst* strConst) {
                 formatted.replace(pos, strlen(LGS_STR_FMT_PLACEHOLDER), part->type->fmtStr());
             }
         }
-        strConst->IRValue = cg.getEmptyBuffer();
-        cg.callSnprintf(strConst->IRValue, cg.getString(formatted + "\n"), values);
+        strConst->IRValue = cg.callSnprintf(formatted + "\n", values);
     }
 }
 
@@ -1172,8 +1183,7 @@ void LgsCodeGen::visitInstance(LgsInstance* instance) {
         const auto field = instance->obj->getField(argName);
         visitExpr(arg.expr);
         if (arg.expr->IRValue != field->IRValue) {
-            const auto gep = cg.builder.CreateStructGEP(obj->getIRType(cg), instance->IRValue, field->position);
-            cg.builder.CreateStore(arg.expr->IRValue, gep);
+            cg.setStructField(obj->getIRType(cg), instance->IRValue, field->position, arg.expr->IRValue);
         }
     }
 
@@ -1256,8 +1266,7 @@ Value* LgsCodeGen::getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) const {
     const auto ctx = cg.builder.CreateAlloca(ctxTy);
     for (size_t i = 0; i < fc->args.size(); i++) {
         const auto v = fc->args[i].expr->IRValue;
-        const auto fieldPtr = cg.builder.CreateStructGEP(ctxTy, ctx, i);
-        cg.builder.CreateStore(v, fieldPtr);
+        cg.setStructField(ctxTy, ctx, i, v);
     }
     return ctx;
 }

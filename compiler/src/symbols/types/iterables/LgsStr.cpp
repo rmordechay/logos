@@ -35,8 +35,8 @@ Constant* LgsStr::getRTType(LgsCgModule& cg) {
 bool LgsStr::canCastTo(LgsType* other) {
     if (other->getName() == LgsAny::name) return true;
     if (other->asGenericType()) return true;
-    if (const auto iter = other->asSArray()) {
-        return iter->baseType && iter->baseType->asChar();
+    if (const auto sArr = other->asSArray()) {
+        return sArr->baseType && sArr->baseType->asChar();
     }
     return name == other->getName();
 }

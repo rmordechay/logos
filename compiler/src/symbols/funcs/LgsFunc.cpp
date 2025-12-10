@@ -5,9 +5,7 @@
 #include "types/LgsFuncType.h"
 #include "types/primitives/LgsVoid.h"
 #include "LgsUtils.h"
-#include "types/LgsGenericType.h"
-
-#include <llvm/IR/DIBuilder.h>
+#include "codegen/LgsCgModule.h"
 #include <llvm/IR/Module.h>
 
 struct LgsFuncArg;
