@@ -11,7 +11,7 @@
 struct LgsFuncArg;
 
 Function* LgsFunc::getIRFunc(LgsCgModule& cg) {
-    const auto funcName = funcType->getGenericName();
+    const auto funcName = funcType->getName();
     auto IRFunc = cg.IRModule->getFunction(funcName);
     if (IRFunc) return IRFunc;
     const auto type = funcType->getIRType(cg);

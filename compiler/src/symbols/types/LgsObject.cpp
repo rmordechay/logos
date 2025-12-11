@@ -69,25 +69,21 @@ Constant* LgsObject::getRTType(LgsCgModule& cg) {
         fieldNameHashes.push_back(cg.hashConst(field->name));
     }
 
-    const auto genericName = getGenericName();
+    const auto genericName = getName();
     const auto fieldsArrType = ArrayType::get(cg.getRTBaseType(), fields.size());
     Constant* fieldsArr = cg.null();
     Constant* hashesArr = cg.null();
     if (!fields.empty()) {
-        const auto fieldsName = LGS_TYPEINFO_PREFIX + genericName + "_fields";
+        const auto fieldsName = genericName + "_fields";
+        const auto hashesArrType = ArrayType::get(cg.i64Ty(), fields.size());
+        const auto hashesName = genericName + "_hashes";
         if (cg.isRTTModule) {
             const auto args = ConstantArray::get(fieldsArrType, fieldRTTs);
-            fieldsArr = cg.createGlobal(fieldsName, fieldsArrType, args);
-        } else {
-            fieldsArr = cg.createGlobal(fieldsName, fieldsArrType, nullptr);
-        }
-
-        const auto hashesArrType = ArrayType::get(cg.i64Ty(), fields.size());
-        const auto hashesName = LGS_TYPEINFO_PREFIX + genericName + "_hashes";
-        if (cg.isRTTModule) {
             const auto hashes = ConstantArray::get(hashesArrType, fieldNameHashes);
+            fieldsArr = cg.createGlobal(fieldsName, fieldsArrType, args);
             hashesArr = cg.createGlobal(hashesName, hashesArrType, hashes);
         } else {
+            fieldsArr = cg.createGlobal(fieldsName, fieldsArrType, nullptr);
             hashesArr = cg.createGlobal(hashesName, hashesArrType, nullptr);
         }
     }

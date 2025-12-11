@@ -106,7 +106,7 @@ LgsType* LgsMatrix::getValueType() {
 }
 
 Constant* LgsMatrix::getRTType(LgsCgModule& cg) {
-    const auto genericName = getGenericName();
+    const auto genericName = getName();
     const auto st = cg.getStructType({cg.sizeTy(), cg.sizeTy(), cg.ptrTy()}, genericName);
     const auto sv = ConstantStruct::get(st, {cg.usize(rows), cg.usize(columns), baseType->getRTType(cg)});
     return cg.getRTTypeInfo(genericName, sizeBytes(), RTT_MATRIX, sv);
@@ -114,10 +114,6 @@ Constant* LgsMatrix::getRTType(LgsCgModule& cg) {
 
 std::string LgsMatrix::getName() {
     return "Mat" + std::to_string(rows) + "x" + std::to_string(columns);
-}
-
-std::string LgsMatrix::getGenericName() {
-    return getName() + baseType->getGenericName();
 }
 
 bool LgsMatrix::canCastTo(LgsType* other) {

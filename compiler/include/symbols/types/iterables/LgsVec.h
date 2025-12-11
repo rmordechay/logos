@@ -20,7 +20,6 @@ public:
     LgsField* getField(const std::string& fieldName) override;
     Type* getIRType(LgsCgModule& cg) override;
     Constant* getRTType(LgsCgModule& cg) override;
-    std::string getGenericName() override;
     std::string getName() override;
     size_t sizeBytes() override;
     bool equals(LgsType* other) override;

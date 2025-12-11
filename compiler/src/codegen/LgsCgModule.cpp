@@ -169,6 +169,10 @@ llvm::AllocaInst* LgsCgModule::getEmptyBuffer() {
 
 Constant* LgsCgModule::getRTTypeInfo(const std::string& name, const size_t size, const Lgs_TypeKind kind, Constant* extra) {
     const auto typeInfo = getRTBaseType();
+    if (extra && !extra->getType()->isPointerTy()) {
+        const auto st = llvm::cast<StructType>(extra->getType());
+        st->setName(LGS_TYPEINFO_PREFIX + name);
+    }
     const auto v = llvm::ConstantStruct::get(typeInfo, {usize(size), usize(kind), extra});
     if (isRTTModule) return createGlobal(LGS_TYPEINFO_PREFIX + name, typeInfo, v);
     return createGlobal(LGS_TYPEINFO_PREFIX + name, typeInfo, nullptr);

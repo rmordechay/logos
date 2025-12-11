@@ -24,7 +24,6 @@ public:
     Constant* getRTType(LgsCgModule& cg) override;
     std::string getName() override;
     std::string pname() override;
-    std::string getGenericName() override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
     std::string fmtStr() const override;

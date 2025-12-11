@@ -15,7 +15,6 @@ public:
     LgsExpr* getZeroValue() override;
     LgsType* getValueType() override;
     std::string getName() override;
-    std::string getGenericName() override;
     bool canCastTo(LgsType* other) override;
     bool inferBaseType(const std::vector<LgsExpr*>& args) override;
     Type* getIRType(LgsCgModule& cg) override;

@@ -16,7 +16,7 @@ Type* LgsBool::getIRType(LgsCgModule& cg) {
 }
 
 Constant* LgsBool::getRTType(LgsCgModule& cg) {
-    return cg.getRTTypeInfo(getGenericName(), sizeBytes(), RTT_BOOL, cg.null());
+    return cg.getRTTypeInfo(getName(), sizeBytes(), RTT_BOOL, cg.null());
 }
 
 LgsType* LgsBool::applyBinOp(LgsType* rightType, LgsBinOp& op) {

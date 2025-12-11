@@ -13,7 +13,6 @@ public:
     Type* getIRType(LgsCgModule& cg) override;
     std::string getName() override;
     std::string pname() override;
-    std::string getGenericName() override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
     Constant* getRTType(LgsCgModule& cg) override;

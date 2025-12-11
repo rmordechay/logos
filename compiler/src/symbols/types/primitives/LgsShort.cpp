@@ -16,7 +16,7 @@ Type* LgsShort::getIRType(LgsCgModule& cg) {
 }
 
 Constant* LgsShort::getRTType(LgsCgModule& cg) {
-    return cg.getRTTypeInfo(getGenericName(), sizeBytes(), RTT_SHORT, cg.null());
+    return cg.getRTTypeInfo(getName(), sizeBytes(), RTT_SHORT, cg.null());
 }
 
 std::string LgsShort::getName() {

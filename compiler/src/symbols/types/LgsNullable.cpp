@@ -33,7 +33,7 @@ Type* LgsNullable::getIRType(LgsCgModule& cg) {
 }
 
 Constant* LgsNullable::getRTType(LgsCgModule& cg) {
-    const auto genericName = LGS_TYPEINFO_PREFIX + getGenericName();
+    const auto genericName = getName();
     if (!baseType) return cg.getRTTypeInfo(name, 0, RTT_ANY, cg.null());
 
     const auto st = cg.getStructType({cg.ptrTy(), cg.i1Ty()}, genericName);

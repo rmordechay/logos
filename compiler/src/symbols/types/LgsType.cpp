@@ -72,10 +72,6 @@ std::string LgsType::pname() {
     return getName();
 }
 
-std::string LgsType::getGenericName() {
-    return getName();
-}
-
 bool LgsType::equals(LgsType* other) {
     return getName() == other->getName();
 }

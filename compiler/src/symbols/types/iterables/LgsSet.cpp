@@ -14,7 +14,7 @@ Type* LgsSet::getIRType(LgsCgModule& cg) {
 }
 
 Constant* LgsSet::getRTType(LgsCgModule& cg) {
-    const auto genericName = getGenericName();
+    const auto genericName = getName();
     const auto st = cg.getStructType({cg.ptrTy()}, genericName);
     const auto sv = ConstantStruct::get(st, {baseType->getRTType(cg)});
     return cg.getRTTypeInfo(genericName, sizeBytes(), RTT_SET, sv);
