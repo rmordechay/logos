@@ -14,7 +14,7 @@ extern "C" void Lgs_Runtime_init() {}
 extern "C" void Lgs_Runtime_close() {}
 
 extern "C" void Lgs_Runtime_push() {
-    runtime.stack.push_back(Lgs_StackFrame{});
+    runtime.stackLevel++;
 }
 
 extern "C" void Lgs_Runtime_pop() {
@@ -30,7 +30,7 @@ extern "C" void Lgs_Runtime_pop() {
             freeValue(ptr, type);
         }
     }
-    runtime.stack.pop_back();
+    runtime.stackLevel--;
 }
 
 extern "C" void Lgs_Runtime_addDefer(const ThunkFunc funcPtr, void* ctx) {

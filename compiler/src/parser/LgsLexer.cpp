@@ -185,7 +185,7 @@ LgsToken LgsLexer::nextToken() {
         if (match('=')) return {T_EQUAL_CARET, "^=", location};
         return {T_CARET, "^", location};
     default:
-        errHandler.addError(E10088, &location, filePath, {});
+        errHandler.addError(E10088, &location, filePath);
         return {T_EOF, "", location};
     }
 }
@@ -218,21 +218,24 @@ char LgsLexer::peek(const size_t offset) const {
     return source[index + offset];
 }
 
-LgsToken LgsLexer::scanMatrix(const LgsLocation& location, std::string& lexeme) {
-    if (!std::isdigit(currentChar) || currentChar == '0') {
-        errHandler.addError(E10088, &location, filePath, {});
+LgsToken LgsLexer::scanMatrixDims(const LgsLocation& location, std::string& lexeme) {
+    if (!std::isdigit(currentChar)) {
+        errHandler.addError(E10088, &location, filePath);
         return {};
+    }
+    if (currentChar == '0') {
+        errHandler.addError(E10112, &location, filePath);
     }
     lexeme += currentChar;
     advance();
     if (currentChar != 'x') {
-        errHandler.addError(E10088, &location, filePath, {});
+        errHandler.addError(E10088, &location, filePath);
         return {};
     }
     lexeme += currentChar;
     advance();
     if (!std::isdigit(currentChar) || currentChar == '0') {
-        errHandler.addError(E10088, &location, filePath, {});
+        errHandler.addError(E10088, &location, filePath);
         return {};
     }
     lexeme += currentChar;
@@ -251,7 +254,7 @@ LgsToken LgsLexer::scanVarOrKeyword(const LgsLocation& location) {
 
     while (std::isalnum(currentChar) || currentChar == '_') {
         if (lexeme == "Mat") {
-            return scanMatrix(location, lexeme);
+            return scanMatrixDims(location, lexeme);
         }
         lexeme += currentChar;
         advance();
@@ -274,7 +277,7 @@ LgsToken LgsLexer::scanVarOrKeyword(const LgsLocation& location) {
         if (metaVar == "isFirst") return {T_FOR_IS_FIRST, combined, location};
         if (metaVar == "isLast") return {T_FOR_IS_LAST, combined, location};
         if (metaVar == "ever") return {T_FOR_EVER, combined, location};
-        errHandler.addError(E10088, &location, filePath, {});
+        errHandler.addError(E10088, &location, filePath);
         return {T_EOF, "", location};
     }
 

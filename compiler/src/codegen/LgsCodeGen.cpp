@@ -759,10 +759,10 @@ void LgsCodeGen::visitNullableExpr(LgsNullableExpr* nullableExpr) {
 }
 
 void LgsCodeGen::visitArrayExpr(LgsArrayExpr* arrayExpr) {
-    for (size_t i = 0; i < arrayExpr->elements.size(); ++i) {
-        const auto element = arrayExpr->elements[i];
+    for (const auto element : arrayExpr->elements) {
         visitExpr(element);
     }
+
     if (arrayExpr->type->asSArray()) {
         visitStaticArray(arrayExpr);
     } else if (arrayExpr->type->asDArray()) {

@@ -5,7 +5,7 @@
 
 class LgsNullable final : public LgsType {
 public:
-    static constexpr auto name = "Nullable";
+    static constexpr auto name = "Null";
     LgsType* baseType;
 
     explicit LgsNullable(LgsType* baseType = nullptr) : baseType(baseType) {

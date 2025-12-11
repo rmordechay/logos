@@ -22,7 +22,7 @@ public:
     char advance();
     bool match(char expected);
     char peek(size_t offset = 1) const;
-    LgsToken scanMatrix(const LgsLocation& location, std::string& lexeme);
+    LgsToken scanMatrixDims(const LgsLocation& location, std::string& lexeme);
     LgsToken scanVarOrKeyword(const LgsLocation& location);
     std::string scanDoubleQuotesString();
     std::string scanSingleQuotesString();

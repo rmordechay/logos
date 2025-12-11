@@ -9,7 +9,7 @@
 #define LGS_BUILD_IR_DIR "IR"
 #define LGS_BUILD_OBJECTS_DIR "objects"
 #define LGS_FILE_EXTENSION ".lgs"
-#define LGS_RUNTIME_PREFIX "Lgs_"
+#define LGS_PREFIX "Lgs_"
 #define LGS_CORO_SUFFIX "_co"
 #define LGS_FILES_CACHE_FILE "metadata.bin"
 #define LGS_MAIN_FILE "main.lgs"

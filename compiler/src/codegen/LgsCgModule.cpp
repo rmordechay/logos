@@ -145,9 +145,9 @@ Value* LgsCgModule::getPtrTo(Value* v) {
     return ptr;
 }
 
-GlobalVariable* LgsCgModule::createGlobal(const std::string& name, Type* type, Constant* args, const bool isConst, const GlobalValue::LinkageTypes linkage) const {
+GlobalVariable* LgsCgModule::createGlobal(const std::string& name, Type* type, Constant* initializer, const bool isConst, const GlobalValue::LinkageTypes linkage) const {
     if (const auto var = IRModule->getGlobalVariable(name)) return var;
-    return new GlobalVariable(*IRModule, type, isConst, linkage, args, name);
+    return new GlobalVariable(*IRModule, type, isConst, linkage, initializer, name);
 }
 
 StructType* LgsCgModule::getStructType(const std::vector<Type*>& fields, const std::string& name) {
@@ -173,8 +173,10 @@ Constant* LgsCgModule::getRTTypeInfo(const std::string& name, const size_t size,
         const auto st = llvm::cast<StructType>(extra->getType());
         st->setName(LGS_TYPEINFO_PREFIX + name);
     }
-    const auto v = llvm::ConstantStruct::get(typeInfo, {usize(size), usize(kind), extra});
-    if (isRTTModule) return createGlobal(LGS_TYPEINFO_PREFIX + name, typeInfo, v);
+    if (isRTTModule) {
+        const auto v = llvm::ConstantStruct::get(typeInfo, {usize(size), usize(kind), extra});
+        return createGlobal(LGS_TYPEINFO_PREFIX + name, typeInfo, v);
+    }
     return createGlobal(LGS_TYPEINFO_PREFIX + name, typeInfo, nullptr);
 }
 
@@ -250,18 +252,18 @@ Value* LgsCgModule::callIntrinsics(const llvm::Intrinsic::ID intrinsicID, const 
 }
 
 Value* LgsCgModule::callLgsFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes, const std::vector<Value*>& args) {
-    return callFunc(LGS_RUNTIME_PREFIX + funcName, rt, paramTypes, args);
+    return callFunc(LGS_PREFIX + funcName, rt, paramTypes, args);
 }
 
 Value* LgsCgModule::callRuntimeFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes, const std::vector<Value*>& args, bool isVariadic) {
     if (debugger.diBuilder) {
         const auto savedDbg = builder.getCurrentDebugLocation();
         builder.SetCurrentDebugLocation(llvm::DebugLoc());
-        const auto v = callFunc(LGS_RUNTIME_PREFIX"Runtime_" + funcName, rt, paramTypes, args, isVariadic);
+        const auto v = callFunc(LGS_PREFIX"Runtime_" + funcName, rt, paramTypes, args, isVariadic);
         builder.SetCurrentDebugLocation(savedDbg);
         return v;
     }
-    return callFunc(LGS_RUNTIME_PREFIX"Runtime_" + funcName, rt, paramTypes, args, isVariadic);
+    return callFunc(LGS_PREFIX"Runtime_" + funcName, rt, paramTypes, args, isVariadic);
 }
 
 void LgsCgModule::callThrowError(const LgsBaseMsg& err, const std::vector<Value*>& args) {

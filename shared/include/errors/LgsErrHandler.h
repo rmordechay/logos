@@ -42,7 +42,7 @@ public:
 
     void setUnsuccessful();
     void addError(const LgsBaseMsg& lgsErr, const std::vector<std::string>& args = {});
-    void addError(const LgsBaseMsg& lgsErr, const LgsLocation* location, const std::string& filePath, const std::vector<std::string>& args);
+    void addError(const LgsBaseMsg& lgsErr, const LgsLocation* location, const std::string& filePath, const std::vector<std::string>& args = {});
     void addWarning(const LgsBaseMsg& lgsErr, const LgsLocation* location, const std::vector<std::string>& args = {});
     void mergeErrors(LgsErrHandler& other);
     void mergeErrorsWithLock(LgsErrHandler& other, std::mutex& mtx);

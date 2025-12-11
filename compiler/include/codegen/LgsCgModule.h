@@ -71,7 +71,7 @@ public:
     void loop(Value* loopLength, const std::function<void(Value*, BasicBlock*)>& body);
     Constant* getString(const std::string& value);
     Value* getPtrTo(Value* v);
-    GlobalVariable* createGlobal(const std::string& name, Type* type, Constant* args, bool isConst = false, GlobalValue::LinkageTypes linkage = GlobalValue::ExternalLinkage) const;
+    GlobalVariable* createGlobal(const std::string& name, Type* type, Constant* initializer, bool isConst = false, GlobalValue::LinkageTypes linkage = GlobalValue::ExternalLinkage) const;
     StructType* getStructType(const std::vector<Type*>& fields, const std::string& name = "");
     void setStructField(Type* type, Value* instancePtr, size_t position, Value* v);
     llvm::AllocaInst* getEmptyBuffer();

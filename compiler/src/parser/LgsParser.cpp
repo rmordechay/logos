@@ -529,6 +529,7 @@ LgsType* LgsParser::parseType() {
         type = new LgsVec(4);
         consume();
     } else if (currentToken.type == T_MATRIX) {
+        // Matrix type is presented as 'MatNxM' where N and M are numbers
         const auto rows = currentToken.lexeme[3] - '0';
         const auto columns = currentToken.lexeme[5] - '0';
         type = new LgsMatrix(rows, columns);
@@ -551,17 +552,17 @@ LgsType* LgsParser::parseType() {
         else if (typeText == LgsVoid::name) type = &LGS_VOID;
         else if (typeText == LgsStr::name) type = new LgsStr();
         else type = new LgsUnknown(typeText);
-        setLocation(type->location, &startToken, &currentToken);
         consume();
     }
-
     if (type && currentToken.type == T_LANGLE) {
         type->genericArgs = parseGenericArgs();
     }
+    setLocation(type->location, &startToken, &currentToken);
 
     // Nullable
     if (type && matchAndConsume(T_QUEST_MARK)) {
         type = new LgsNullable(type);
+        setLocation(type->location, &startToken, &currentToken);
     }
     
     // Array
@@ -572,18 +573,17 @@ LgsType* LgsParser::parseType() {
                 sizes.push_back(size);
             } else {
                 type = new LgsDArray(type);
-                mustMatch(T_RBRACK);
-                break;
             }
             mustMatch(T_RBRACK);
         }
-        std::ranges::reverse(sizes);
-        for (const auto& size : sizes) {
-            type = new LgsSArray(type, size);
+        if (!sizes.empty()) {
+            std::ranges::reverse(sizes);
+            for (const auto& size : sizes) {
+                type = new LgsSArray(type, size);
+                setLocation(type->location, &startToken, &currentToken);
+            }
         }
-        setLocation(type->location, &startToken, &currentToken);
     }
-
     return type;
 }
 
@@ -2251,7 +2251,7 @@ bool LgsParser::parsedOrReset(const void* value, const size_t resetIndex) {
 
 void LgsParser::addParsingError() {
     const auto token = tokens[currentIndex];
-    return errHandler.addError(E10085, &token.location, metadata->path, {});
+    return errHandler.addError(E10085, &token.location, metadata->path);
 }
 
 void LgsParser::recursionGuard() {

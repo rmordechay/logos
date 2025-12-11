@@ -123,3 +123,4 @@ inline LgsBaseMsg E10108{"%s is not indexable.", errCodeStart++};
 inline LgsBaseMsg E10109{"Primitive types should not have an ownership.", errCodeStart++};
 inline LgsBaseMsg E10110{"Unsigned number cannot be negative.", errCodeStart++};
 inline LgsBaseMsg E10111{"Array type %s does not match the element type %s.", errCodeStart++};
+inline LgsBaseMsg E10112{"Matrix rows/columns cannot be 0.", errCodeStart++};

@@ -328,6 +328,9 @@ bool LgsApp::generateRTTTypes() {
     }
 
     for (const auto srcFile : srcFiles) {
+        for (const auto type : srcFile->symbolTable.rttTypes) {
+            type->getRTType(rttTypeModule);
+        }
         if (const auto mainFile = dynamic_cast<LgsMainFile*>(srcFile)) {
             for (const auto object : mainFile->objects) {
                 object->getRTType(rttTypeModule);
@@ -335,9 +338,6 @@ bool LgsApp::generateRTTTypes() {
                     innerObj->getRTType(rttTypeModule);
                 }
             }
-        }
-        for (const auto type : srcFile->symbolTable.rttTypes) {
-            type->getRTType(rttTypeModule);
         }
     }
 

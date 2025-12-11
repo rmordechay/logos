@@ -33,7 +33,7 @@ Constant* LgsDArray::getRTType(LgsCgModule& cg) {
 }
 
 std::string LgsDArray::getName() {
-    return name;
+    return baseType->getName() + name;
 }
 
 std::string LgsDArray::pname() {

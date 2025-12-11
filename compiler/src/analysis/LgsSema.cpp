@@ -754,11 +754,11 @@ void LgsSema::visitArrayExpr(LgsArrayExpr* arrayExpr) {
     } else {
         assert(0);
     }
-    const auto iter = arrayExpr->type->asIterable();
-    if (!iter) return;
+    const auto iterable = arrayExpr->type->asIterable();
+    if (!iterable) return;
     for (const auto element : arrayExpr->elements) {
-        if (iter->baseType && element->type->canCastTo(iter->baseType)) continue;
-        return addError(E10111, element->location, {iter->baseType->pname(), element->type->pname()});
+        if (iterable->baseType && element->type->canCastTo(iterable->baseType)) continue;
+        return addError(E10111, element->location, {iterable->baseType->pname(), element->type->pname()});
     }
 }
 
