@@ -3,8 +3,6 @@
 #include "codegen/LgsCgModule.h"
 #include "types/LgsGenericType.h"
 #include "LgsUtils.h"
-
-#include <ranges>
 #include <sstream>
 
 Type* LgsFuncType::getIRType(LgsCgModule& cg) {
@@ -28,12 +26,12 @@ Constant* LgsFuncType::getRTType(LgsCgModule& cg) {
     const auto funcName = getName();
     std::vector<LgsOwner*> paramsAsOwners;
     for (auto& param : params) paramsAsOwners.emplace_back(static_cast<LgsOwner*>(&param));
-    const auto [typesArr, hashesArr] = getRTTypesAndHashes(cg, name, paramsAsOwners);
-    // paramsCount, params, rt
-    const auto sv = cg.getRTTStruct({cg.sizeTy(), cg.ptrTy(), cg.ptrTy()}, name, {
+    const auto [typesArr, hashesArr] = getRTTypesAndHashes(cg, funcName, paramsAsOwners);
+    // paramsCount, paramHashes, paramTypes, rt
+    const auto sv = cg.getRTTStruct(funcName, {cg.sizeTy(), cg.ptrTy(), cg.ptrTy(), cg.ptrTy()}, {
         cg.usize(params.size()), hashesArr, typesArr, rt->getRTType(cg)
     });
-    return cg.getRTTypeInfo(name, sizeBytes(), RTT_FUNC, sv);
+    return cg.getRTTypeInfo(funcName, sizeBytes(), RTT_FUNC, sv);
 }
 
 LgsExpr* LgsFuncType::getZeroValue() {
@@ -45,6 +43,7 @@ size_t LgsFuncType::sizeBytes() {
 }
 
 std::string LgsFuncType::getName() {
+    if (name == "") return LGS_LAMBDA_NAME;
     std::stringstream strStream;
     if (!isExternal) {
         if (isBuiltin) strStream << LGS_PREFIX;
@@ -55,8 +54,7 @@ std::string LgsFuncType::getName() {
     }
     strStream << name;
     if (isCoroutine) strStream << LGS_CORO_SUFFIX;
-    IRName = strStream.str();
-    return IRName;
+    return strStream.str();
 }
 
 std::string LgsFuncType::pname() {

@@ -486,9 +486,9 @@ std::pair<Constant*, Constant*> getRTTypesAndHashes(LgsCgModule& cg, const std::
         typesArr = cg.null();
         hashesArr = cg.null();
     } else {
-        const auto fieldsName = name + "_fields";
+        const auto fieldsName = LGS_TYPEINFO_PREFIX + name + "_fields";
+        const auto hashesName = LGS_TYPEINFO_PREFIX + name + "_hashes";
         const auto hashesArrType = ArrayType::get(cg.i64Ty(), values.size());
-        const auto hashesName = name + "_hashes";
         if (cg.isRTTModule) {
             const auto args = ConstantArray::get(fieldsArrType, fieldRTTs);
             const auto hashes = ConstantArray::get(hashesArrType, fieldNameHashes);

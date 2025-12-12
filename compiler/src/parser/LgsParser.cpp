@@ -1741,7 +1741,7 @@ LgsFunc* LgsParser::parseLambda() {
         return nullptr;
     }
 
-    const auto lambda = new LgsFunc(LGS_ANONYMOUS_NAME, rt, params);
+    const auto lambda = new LgsFunc("", rt, params);
     currentFunc = lambda;
     lambda->stmtsBlock = parseStmtsBlock();
     mustParse(lambda->stmtsBlock);
@@ -2272,7 +2272,7 @@ void LgsParser::addError(const LgsBaseMsg& lgsErr, const LgsLocation& location, 
 }
 
 LgsFunc* wrapStmtsBlockWithFunc(LgsStmtsBlock* stmtsBlock) {
-    const auto func = new LgsFunc(LGS_ANONYMOUS_NAME, nullptr);
+    const auto func = new LgsFunc("", nullptr);
     func->location = stmtsBlock->location;
     func->stmtsBlock = stmtsBlock;
     func->funcType->rt = &LGS_VOID;

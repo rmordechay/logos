@@ -305,7 +305,7 @@ void LgsApp::loadBuiltins() {
     globals.table.addSymbol(LgsSymbol(new LgsVarDec("_WINDOWS", &LGS_BOOL, new LgsIntConst(&LGS_BOOL, lgsConfigs.os == WINDOWS)), true, false), &errHandler);
     globals.table.rttTypes = {
         &LGS_STR, &LGS_CHAR, &LGS_BYTE, &LGS_BOOL, &LGS_INT, &LGS_UINT, &LGS_ULONG,
-        &LGS_SHORT, &LGS_LONG, &LGS_SIZE, &LGS_FLOAT, &LGS_DOUBLE, &LGS_NULL
+        &LGS_SHORT, &LGS_LONG, &LGS_SIZE, &LGS_FLOAT, &LGS_DOUBLE, &LGS_NULL, &LGS_VOID
     };
 }
 
@@ -396,12 +396,12 @@ void LgsApp::compareHash() const {
 
 void LgsApp::printIR() const {
     if (!lgsConfigs.isDevMode || !lgsConfigs.printIR) return;
-    rttTypeModule.IRModule->print(llvm::outs(), nullptr);
+    rttTypeModule.IRModule->print(outs(), nullptr);
     logInfo(LGS_MSG_LINE_SEPERATOR);
     std::lock_guard lock(mtx);
     for (const auto& file : srcFiles) {
         if (!file->cg.IRModule) continue;
-        file->cg.IRModule->print(llvm::outs(), nullptr);
+        file->cg.IRModule->print(outs(), nullptr);
         logInfo(LGS_MSG_LINE_SEPERATOR);
     }
 }

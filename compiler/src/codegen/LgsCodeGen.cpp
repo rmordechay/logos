@@ -694,8 +694,8 @@ void LgsCodeGen::visitCast(LgsCast* cast) {
 void LgsCodeGen::visitLambda(LgsFunc* func) {
     cg.savedIP = cg.builder.saveIP();
     const auto originalFunc = cg.currentFunc;
-    const auto lambdaID = lambdasIDGenerator.fetch_add(1);
-    func->funcType->IRName = LGS_ANONYMOUS_NAME + std::to_string(lambdaID);
+    // const auto lambdaID = lambdasIDGenerator.fetch_add(1);
+    // func->funcType->IRName = LGS_LAMBDA_NAME + std::to_string(lambdaID);
     func->IRValue = func->getIRFunc(cg);
     visitFunc(func);
     cg.currentFunc = originalFunc;
@@ -1089,7 +1089,7 @@ void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
     if (ft->isVirtual) {
         const auto name = func->funcType->getName();
         const auto id = cg.hashConst(name);
-        func->IRValue = cg.getFromVTable(funcCall->parentPtr->IRValue, id);
+        func->IRValue = cg.getFromVTable(funcCall->args.front().expr->IRValue, id);
     } else if (func->funcType->isArrFunc) {
         visitIterFunc(funcCall);
     }

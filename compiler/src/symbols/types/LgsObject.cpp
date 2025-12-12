@@ -66,7 +66,7 @@ Constant* LgsObject::getRTType(LgsCgModule& cg) {
     for (const auto field : fields) fieldsAsOwners.push_back(field);
     const auto [typesArr, hashesArr] = getRTTypesAndHashes(cg, name, fieldsAsOwners);
     // fieldsCount, fieldHashes, fieldTypes
-    const auto sv = cg.getRTTStruct({cg.sizeTy(), cg.ptrTy(), cg.ptrTy()}, objName, {cg.usize(fields.size()), hashesArr, typesArr});
+    const auto sv = cg.getRTTStruct(objName, {cg.sizeTy(), cg.ptrTy(), cg.ptrTy()}, {cg.usize(fields.size()), hashesArr, typesArr});
     return cg.getRTTypeInfo(objName, sizeBytes(), RTT_OBJECT, sv);
 }
 

@@ -192,7 +192,6 @@ void LgsJsonParser::parseStmt(LgsStmt* stmt) {
     else if (const auto continueStmt = stmt->asContinue()) parseContinueStmt(continueStmt);
     else if (const auto ioStmt = stmt->asIOStmt()) parseIOStmt(ioStmt);
     else if (const auto breakStmt = stmt->asBreak()) parseBreakStmt(breakStmt);
-    else if (const auto expr = stmt->asExpr()) parseExpr(expr);
     else assert(0);
 }
 

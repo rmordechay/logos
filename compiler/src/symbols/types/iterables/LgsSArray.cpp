@@ -47,7 +47,7 @@ Constant* LgsSArray::getRTType(LgsCgModule& cg) {
     if (constSize.has_value()) {
         size = constSize.value();
     }
-    const auto sv = cg.getRTTStruct({cg.sizeTy(), cg.ptrTy()}, sArrName, {cg.usize(size), baseType->getRTType(cg)});
+    const auto sv = cg.getRTTStruct(sArrName, {cg.sizeTy(), cg.ptrTy()}, {cg.usize(size), baseType->getRTType(cg)});
     return cg.getRTTypeInfo(sArrName, size, RTT_SARRAY, sv);
 }
 

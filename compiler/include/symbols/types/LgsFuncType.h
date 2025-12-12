@@ -21,7 +21,6 @@ enum LgsFuncFlags : uint32_t {
 class LgsFuncType final : public LgsType {
 public:
     std::string name;
-    std::string IRName;
     std::string parentName;
     LgsType* rt = nullptr;
     std::vector<LgsParam> params;

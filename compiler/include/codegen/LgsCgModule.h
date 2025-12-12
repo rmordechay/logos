@@ -76,7 +76,7 @@ public:
     void setStructField(Type* type, Value* instancePtr, size_t position, Value* v);
     llvm::AllocaInst* getEmptyBuffer();
     Constant* getRTTypeInfo(const std::string& name, size_t size, Lgs_TypeKind kind, Constant* extra);
-    Constant* getRTTStruct(const std::vector<Type*>& fields, const std::string& name, const std::vector<Constant*>& args);
+    Constant* getRTTStruct(const std::string& name, const std::vector<Type*>& fields, const std::vector<Constant*>& args);
     StructType* getRTTBaseStruct();
 
     // Blocks

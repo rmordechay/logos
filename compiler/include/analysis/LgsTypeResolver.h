@@ -19,7 +19,7 @@ public:
 
     LgsTypeResolver(LgsErrHandler& errHandler, LgsGlobals& globals) : globals(globals), errHandler(errHandler) {}
     bool resolveGlobals(const std::vector<LgsFile*>& srcFiles, ThreadPool& pool);
-    LgsType* resolveType(LgsType* type, LgsFile* file);
+    void resolveType(LgsType*& type, LgsFile* file);
     void resolveMainFileTypes(LgsMainFile* mf);
     void resolveObjTypes(LgsObject* obj, LgsFile& file);
     void resolveInterfaceTypes(LgsInterface* interface, LgsFile& file);

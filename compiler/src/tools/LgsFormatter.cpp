@@ -132,7 +132,6 @@ void LgsFormatter::formatStmt(LgsStmt* stmt) {
     else if (const auto continueStmt = stmt->asContinue()) formatContinueStmt(continueStmt);
     else if (const auto ioStmt = stmt->asIOStmt()) formatIOStmt(ioStmt);
     else if (const auto breakStmt = stmt->asBreak()) formatBreakStmt(breakStmt);
-    else if (auto expr = stmt->asExpr()) formatExpr(expr);
     else assert(0);
 }
 

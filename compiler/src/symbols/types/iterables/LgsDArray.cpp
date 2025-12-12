@@ -29,7 +29,7 @@ Type* LgsDArray::getIRType(LgsCgModule& cg) {
 
 Constant* LgsDArray::getRTType(LgsCgModule& cg) {
     const auto dArrName = getName();
-    const auto sv = cg.getRTTStruct({cg.ptrTy()}, dArrName, {baseType->getRTType(cg)});
+    const auto sv = cg.getRTTStruct(dArrName, {cg.ptrTy()}, {baseType->getRTType(cg)});
     return cg.getRTTypeInfo(dArrName, sizeBytes(), RTT_DARRAY, sv);
 }
 

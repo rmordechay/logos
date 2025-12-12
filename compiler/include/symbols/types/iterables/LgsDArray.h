@@ -4,8 +4,6 @@
 #include "types/LgsAny.h"
 #include "types/primitives/LgsVoid.h"
 
-#define RESERVE_FUNC_NAME "reserve"
-
 class LgsDArray final : public LgsIterable {
 public:
     static constexpr auto name = "DArray";
@@ -16,8 +14,17 @@ public:
         isHeapAlloc = true;
         addFunc->fn = [this](LgsCgModule& cg, const std::vector<LgsFuncArg>& args) {
             const auto arr = args[0].expr->IRValue;
-            const auto arg = args[1].expr->IRValue;
-            return cg.callLgsFunc(std::string(name) + "_add", cg.voidTy(), {cg.ptrTy(), cg.ptrTy(), cg.ptrTy()}, {arr, getRTType(cg), arg});
+            const auto arg = args[1].expr;
+            if (args[1].expr->type->asInt()) {
+                return cg.callLgsFunc(std::string(name) + "_addInt", cg.voidTy(), {cg.ptrTy(), cg.ptrTy(), cg.i32Ty()}, {arr, getRTType(cg), arg->IRValue});
+            }
+            if (args[1].expr->type->asLong()) {
+                return cg.callLgsFunc(std::string(name) + "_addLong", cg.voidTy(), {cg.ptrTy(), cg.ptrTy(), cg.i64Ty()}, {arr, getRTType(cg), arg->IRValue});
+            }
+            if (args[1].expr->type->asSize()) {
+                return cg.callLgsFunc(std::string(name) + "_addSize", cg.voidTy(), {cg.ptrTy(), cg.ptrTy(), cg.sizeTy()}, {arr, getRTType(cg), arg->IRValue});
+            }
+            return cg.callLgsFunc(std::string(name) + "_add", cg.voidTy(), {cg.ptrTy(), cg.ptrTy(), cg.ptrTy()}, {arr, getRTType(cg), arg->IRValue});
         };
         addMethod(addFunc);
     }

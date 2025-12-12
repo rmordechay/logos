@@ -81,7 +81,6 @@ bool LgsCgModule::writeIRModule(const LgsPaths& paths, uint8_t optLevel) const {
         outputPath.c_str(),
         outputPath.c_str()
     );
-    IRModule->print(llvm::outs(), nullptr);
     if (!runCmd(cmd)) assert(0);
     fs::remove(outputPath + ".bc");
     return true;
@@ -177,7 +176,7 @@ Constant* LgsCgModule::getRTTypeInfo(const std::string& name, const size_t size,
     return createGlobal(prefixedName, typeInfo, nullptr);
 }
 
-Constant* LgsCgModule::getRTTStruct(const std::vector<Type*>& fields, const std::string& name, const std::vector<Constant*>& args) {
+Constant* LgsCgModule::getRTTStruct(const std::string& name, const std::vector<Type*>& fields, const std::vector<Constant*>& args) {
     const auto structName = LGS_TYPEINFO_PREFIX + name;
     auto st = StructType::getTypeByName(context, structName);
     if (!st) {
@@ -187,7 +186,7 @@ Constant* LgsCgModule::getRTTStruct(const std::vector<Type*>& fields, const std:
 }
 
 StructType* LgsCgModule::getRTTBaseStruct() {
-    const auto typeInfoMatrix = getStructType({sizeTy(), sizeTy(), ptrTy()}, LGS_TYPEINFO_PREFIX"Matrix"); // Biggest
+    const auto typeInfoMatrix = getStructType({sizeTy(), ptrTy(), ptrTy(), ptrTy()}, LGS_TYPEINFO_PREFIX"FuncType"); // Biggest
     return getStructType({sizeTy(), i32Ty(), typeInfoMatrix}, "RTI"); // size, kind, type
 }
 

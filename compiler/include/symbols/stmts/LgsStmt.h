@@ -27,7 +27,6 @@ public:
     LgsIfStmt* asIfStmt();
     LgsIOStmt* asIOStmt();
     LgsSwitch* asSwitch();
-    LgsExpr* asExpr();
     LgsBreak* asBreak();
     LgsContinue* asContinue();
     LgsReturn* asReturn();

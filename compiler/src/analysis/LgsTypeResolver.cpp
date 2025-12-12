@@ -40,23 +40,23 @@ bool LgsTypeResolver::resolveGlobals(const std::vector<LgsFile*>& srcFiles, Thre
     return successful;
 }
 
-LgsType* LgsTypeResolver::resolveType(LgsType* type, LgsFile* file) {
+void LgsTypeResolver::resolveType(LgsType*& type, LgsFile* file) {
     for (size_t i = 0; i < type->genericArgs.size(); ++i) {
-        type->genericArgs[i] = resolveType(type->genericArgs[i], file);
+        resolveType(type->genericArgs[i], file);
     }
 
     if (const auto nullable = type->asNullable()) {
-        nullable->baseType = resolveType(nullable->baseType, file);
+        resolveType(nullable->baseType, file);
         nullable->passByRef = nullable->baseType->passByRef;
     } else if (const auto iterable = type->asIterable()) {
-        if (!iterable->genericArgs.empty()) {
-            iterable->baseType = iterable->genericArgs.front();
+        if (iterable->genericArgs.empty()) {
+            resolveType(iterable->baseType, file);
         } else {
-            iterable->baseType = resolveType(iterable->baseType, file);
+            iterable->baseType = iterable->genericArgs.front();
         }
     } else if (const auto pair = type->asPair()) {
-        pair->key = resolveType(pair->key, file);
-        pair->value = resolveType(pair->value, file);
+        resolveType(pair->key, file);
+        resolveType(pair->value, file);
     } else if (const auto funcType = type->asFuncType()) {
         resolveFuncTypes(funcType, *file);
     }
@@ -69,7 +69,7 @@ LgsType* LgsTypeResolver::resolveType(LgsType* type, LgsFile* file) {
         }
         if (!symbol) {
             errHandler.addError(E10006, &type->location, file->path, {typeName});
-            return type;
+            return;
         }
         LgsType* newType = nullptr;
         switch (symbol->symbolType) {
@@ -101,7 +101,6 @@ LgsType* LgsTypeResolver::resolveType(LgsType* type, LgsFile* file) {
         freeType(type);
         type = newType;
     }
-    return type;
 }
 
 void LgsTypeResolver::resolveMainFileTypes(LgsMainFile* mf) {
@@ -112,7 +111,7 @@ void LgsTypeResolver::resolveMainFileTypes(LgsMainFile* mf) {
         resolveInterfaceTypes(interface, *mf);
     }
     for (const auto subtype : mf->subtypes) {
-        subtype->subtype = resolveType(subtype->subtype, mf);
+        resolveType(subtype->subtype, mf);
         subtype->isPrimitive = subtype->subtype->isPrimitive;
     }
     for (const auto& [_, func] : mf->funcs) {
@@ -123,7 +122,7 @@ void LgsTypeResolver::resolveMainFileTypes(LgsMainFile* mf) {
 
 void LgsTypeResolver::resolveObjTypes(LgsObject* obj, LgsFile& file) {
     for (auto& interface : obj->implements) {
-        interface = resolveType(interface, &file);
+        resolveType(interface, &file);
     }
 
     for (const auto generic : obj->generics) {
@@ -135,7 +134,7 @@ void LgsTypeResolver::resolveObjTypes(LgsObject* obj, LgsFile& file) {
     }
 
     for (const auto& field : obj->fields) {
-        field->setType(resolveType(field->type, &file));
+        resolveType(field->type, &file);
     }
 
     for (const auto& ioPair : obj->ioPairs) {
@@ -143,16 +142,16 @@ void LgsTypeResolver::resolveObjTypes(LgsObject* obj, LgsFile& file) {
     }
 
     for (const auto& [_, method] : obj->methods) {
-        method->funcType->rt = resolveType(method->funcType->rt, &file);
+        resolveType(method->funcType->rt, &file);
         for (auto& param : method->funcType->params) {
-            param.setType(resolveType(param.type, &file));
+            resolveType(param.type, &file);
         }
     }
 }
 
 void LgsTypeResolver::resolveInterfaceTypes(LgsInterface* interface, LgsFile& file) {
     for (const auto& field : interface->fields) {
-        field->setType(resolveType(field->type, &file));
+        resolveType(field->type, &file);
     }
     for (const auto& [_, method] : interface->methods) {
         resolveFuncTypes(method->funcType, file);
@@ -166,7 +165,8 @@ void LgsTypeResolver::resolveFuncTypes(LgsFuncType* funcType, LgsFile& file) {
             if (!type->equals(generic)) continue;
             return generic;
         }
-        return resolveType(type, &file);
+        resolveType(type, &file);
+        return type;
     };
     for (auto& param : funcType->params) {
         param.setType(resolveTypeOrGeneric(param.type));

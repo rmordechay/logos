@@ -25,14 +25,14 @@ public:
     LgsFunc* lenFunc = new LgsFunc("len", &LGS_SIZE, {this}, BUILTIN | PUBLIC | METHOD);
     LgsFunc* isEmptyFunc = new LgsFunc("isEmpty", &LGS_BOOL, {this}, BUILTIN | PUBLIC | METHOD);
     LgsFunc* isNotEmptyFunc = new LgsFunc("isNotEmpty", &LGS_BOOL, {this}, BUILTIN | PUBLIC | METHOD);
-    // LgsFunc* mapFunc = new LgsFunc(MAP_FUNC_NAME, this, {this, new LgsFuncType(baseType, {LgsParam(baseType)})}, BUILTIN | PUBLIC | METHOD);
+    LgsFunc* mapFunc = new LgsFunc(MAP_FUNC_NAME, this, {this, new LgsFuncType(nullptr, {LgsParam(nullptr)})}, BUILTIN | PUBLIC | METHOD);
     // LgsFunc* filterFunc = new LgsFunc(FILTER_FUNC_NAME, this, {this, new LgsFuncType(&LGS_BOOL, {LgsParam(baseType)})}, BUILTIN | PUBLIC | METHOD);
 
     explicit LgsIterable(LgsType* baseType = nullptr, LgsExpr* size = nullptr) : baseType(baseType), size(size) {
         addMethod(lenFunc);
         addMethod(isEmptyFunc);
         addMethod(isNotEmptyFunc);
-        // addMethod(mapFunc);
+        addMethod(mapFunc);
         // addMethod(filterFunc);
     }
     size_t getDimension() const;

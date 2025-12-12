@@ -18,9 +18,11 @@ public:
     LgsFunc* coresNumFunc = new LgsFunc{"coresNumber", &LGS_LONG, PUBLIC | BUILTIN | SYSCALL};
 
     explicit LgsSystem() : LgsObject(name) {
-        pidFunc->funcType->IRName = "getpid";
         sleepFunc->fn = [](LgsCgModule& cg, const std::vector<LgsFuncArg>& args) {
             return cg.callLgsFunc("System_sleep", cg.i32Ty(), {cg.i32Ty()}, {args.front().expr->IRValue});
+        };
+        pidFunc->fn = [](LgsCgModule& cg, const std::vector<LgsFuncArg>& args) {
+            return nullptr;
         };
         cwdFunc->fn = [](LgsCgModule& cg, const std::vector<LgsFuncArg>&) {
             const auto value = cg.builder.CreateAlloca(ArrayType::get(cg.i8Ty(), STRING_BUFFER_SIZE));

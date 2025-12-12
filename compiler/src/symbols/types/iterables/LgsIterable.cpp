@@ -50,6 +50,7 @@ void LgsIterable::unpackLoopIR(LgsCgModule& cg, LgsForeachLoop* loop) const {
 LgsIterable::~LgsIterable() {
     freeExpr(size);
     freeType(baseType);
+    mapFunc->funcType->rt = nullptr;
     size = nullptr;
     baseType = nullptr;
 }

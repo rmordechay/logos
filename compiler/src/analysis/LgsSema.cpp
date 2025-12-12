@@ -152,7 +152,7 @@ void LgsSema::visitField(LgsField* field) {
 
 void LgsSema::visitFunc(LgsFunc* func) {
     const auto ft = func->funcType;
-    validateLocalName(ft->name, ft->location);
+    if (ft->name != "") validateLocalName(ft->name, ft->location);
     if (!ft->genericTypes.empty()) return;
     stack.enterScope(func);
     auto defaultParamsStarted = false;
@@ -207,12 +207,13 @@ void LgsSema::visitLambda(LgsFunc* lambda) {
     }
     const auto& stmtsBlock = lambda->stmtsBlock;
     // Wraps in return if it's the last statement
-    if (!stmtsBlock->stmts.empty() && !lambda->funcType->rt->isVoid()) {
-        const auto expr = stmtsBlock->stmts.back().stmt->asExpr();
-        if (expr) {
-            const auto returnStmt = new LgsReturn(expr);
-            returnStmt->location = expr->location;
+    if (stmtsBlock->stmts.size() == 1 && !lambda->funcType->rt->isVoid()) {
+        const auto lastStmtWrapper = stmtsBlock->stmts.front();
+        if (lastStmtWrapper.type == LgsStmtWrapper::Type::Expr) {
+            const auto returnStmt = new LgsReturn(lastStmtWrapper.expr);
+            returnStmt->location = lastStmtWrapper.expr->location;
             stmtsBlock->stmts[0].stmt = returnStmt;
+            stmtsBlock->stmts[0].type = LgsStmtWrapper::Type::Stmt;
         }
     }
     visitFunc(lambda);
@@ -259,7 +260,6 @@ void LgsSema::visitStmt(LgsStmt* stmt) {
     else if (const auto continueStmt = stmt->asContinue()) visitContinueStmt(continueStmt);
     else if (const auto ioStmt = stmt->asIOStmt()) visitIOStmt(ioStmt);
     else if (const auto breakStmt = stmt->asBreak()) visitBreakStmt(breakStmt);
-    else if (auto expr = stmt->asExpr()) visitExpr(expr);
     else assert(0);
 }
 
@@ -280,6 +280,7 @@ void LgsSema::visitStmtsBlock(LgsStmtsBlock* stmtsBlock) {
         }
     }
     if (stmtsBlock->stmts.empty()) return;
+
     const auto lastStmt = stmtsBlock->stmts[stmtsBlock->stmts.size() - 1];
     if (lastStmt.type == LgsStmtWrapper::Type::Stmt) {
         stmtsBlock->returnStmt = lastStmt.stmt->asReturn();
@@ -300,7 +301,7 @@ void LgsSema::visitVarDec(LgsVarDec* varDec) {
         if (varDec->isOwner) {
             varDec->expr->owner = varDec;
         }
-        varDec->setType(typeResolver.resolveType(varDec->type, file));
+        typeResolver.resolveType(varDec->type, file);
         castExprImplicitly(varDec->expr, varDec->type);
         visitExpr(varDec->expr);
         validateExprType(varDec->expr, varDec->type);
@@ -316,7 +317,7 @@ void LgsSema::visitVarDec(LgsVarDec* varDec) {
         varDec->setType(varDec->expr->type);
         validateExprType(varDec->expr, varDec->type);
     } else {
-        varDec->setType(typeResolver.resolveType(varDec->type, file));
+        typeResolver.resolveType(varDec->type, file);
         if (!varDec->type) return;
         varDec->expr = varDec->type->getZeroValue();
         varDec->expr->location = varDec->location;
@@ -723,7 +724,7 @@ void LgsSema::visitTernaryExpr(LgsTernaryExpr* ternary) {
 void LgsSema::visitCast(LgsCast* cast) {
     visitExpr(cast->fromValue);
     if (!cast->fromValue->type) return;
-    cast->toType = typeResolver.resolveType(cast->toType, file);
+    typeResolver.resolveType(cast->toType, file);
     cast->value = cast->fromValue->castExplicitly(cast->toType);
     if (!cast->value) {
         addError(E10018, cast->location, {cast->fromValue->asText(), cast->toType->pname()});
@@ -1007,12 +1008,15 @@ void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent) {
     if (parent->asTypeExpr() && method->funcType->isMethod) {
         return addError(E10083, methodCall->location, {method->funcType->pname()});
     }
-
-    methodCall->parentPtr = parent;
     if (method->funcType->isMethod) {
         methodCall->args.insert(methodCall->args.begin(), LgsFuncArg(parent, LGS_SELF, true));
     }
     if (!visitFuncArgs(methodCall, method->funcType)) return;
+    if (methodCall->name == "map") {
+        const auto& iterable = method->funcType->rt->asIterable();
+        iterable->mapFunc->funcType->params[1].type->asFuncType()->rt = iterable->baseType;
+        iterable->mapFunc->funcType->params[1].type->asFuncType()->params[0].type = iterable->baseType;
+    }
     if (methodCall->equals(method->funcType)) {
         methodCall->func = method;
         methodCall->setType(method->funcType->rt);
@@ -1192,7 +1196,7 @@ void LgsSema::visitStrConst(const LgsStrConst* strConst) {
 }
 
 void LgsSema::visitTypeExpr(LgsTypeExpr* typeExpr) {
-    typeExpr->setType(typeResolver.resolveType(typeExpr->type, file));
+    typeResolver.resolveType(typeExpr->type, file);
 }
 
 void LgsSema::visitJson(const LgsJson* json) {

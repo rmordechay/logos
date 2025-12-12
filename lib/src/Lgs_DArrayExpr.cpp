@@ -5,7 +5,6 @@
 #include <cstdlib>
 #include <cstring>
 
-static void resizeArrIfNeeded(Lgs_DArrayExpr* arr);
 static bool compare_arrays(const Lgs_DArrayExpr* arr1, const Lgs_DArrayExpr* arr2, Lgs_TypeInfo* type1, Lgs_TypeInfo* type2);
 
 extern "C" void Lgs_DArray_init(Lgs_DArrayExpr* arr, const Lgs_TypeInfo* dArr) {
@@ -16,30 +15,34 @@ extern "C" void Lgs_DArray_init(Lgs_DArrayExpr* arr, const Lgs_TypeInfo* dArr) {
 
 extern "C" void Lgs_DArray_add(Lgs_DArrayExpr* arr, const Lgs_TypeInfo* type, const void* value) {
     assert(arr);
-    resizeArrIfNeeded(arr);
+    arr->capacity *= 2;
+    arr->data = static_cast<char*>(realloc(arr->data, arr->capacity));
     const auto size = type->dArray.baseType->size;
     const auto dst = arr->data + arr->length * size;
     std::memcpy(dst, value, size);
-    arr->length += 1;
+    arr->length++;
 }
 
 extern "C" void Lgs_DArray_addInt(Lgs_DArrayExpr* arr, const Lgs_TypeInfo* type, const int32_t value) {
     assert(arr);
-    resizeArrIfNeeded(arr);
+    arr->capacity *= 2;
+    arr->data = static_cast<char*>(realloc(arr->data, arr->capacity));
     *reinterpret_cast<int32_t*>(arr->data + arr->length * type->dArray.baseType->size) = value;
     arr->length += 1;
 }
 
 extern "C" void Lgs_DArray_addLong(Lgs_DArrayExpr* arr, const Lgs_TypeInfo* type, const int64_t value) {
     assert(arr);
-    resizeArrIfNeeded(arr);
+    arr->capacity *= 2;
+    arr->data = static_cast<char*>(realloc(arr->data, arr->capacity));
     *reinterpret_cast<int64_t*>(arr->data + arr->length * type->dArray.baseType->size) = value;
     arr->length += 1;
 }
 
 extern "C" void Lgs_DArray_addSize(Lgs_DArrayExpr* arr, const Lgs_TypeInfo* type, const size_t value) {
     assert(arr);
-    resizeArrIfNeeded(arr);
+    arr->capacity *= 2;
+    arr->data = static_cast<char*>(realloc(arr->data, arr->capacity));
     *reinterpret_cast<size_t*>(arr->data + arr->length * type->dArray.baseType->size) = value;
     arr->length += 1;
 }
@@ -122,10 +125,4 @@ static bool compare_arrays(const Lgs_DArrayExpr* arr1, const Lgs_DArrayExpr* arr
         }
     }
     return true;
-}
-
-static void resizeArrIfNeeded(Lgs_DArrayExpr* arr) {
-    if (arr->length <= arr->capacity) return;
-    arr->capacity *= 2;
-    arr->data = static_cast<char*>(realloc(arr->data, arr->capacity));
 }
