@@ -177,6 +177,7 @@ public:
 
     void setLocation(LgsLocation& location, const LgsToken* startToken, const LgsToken* endToken) const;
     void extractStrParts(LgsStrConst& strConst);
+    std::pair<size_t, size_t> extractMatDims(const LgsToken& matToken);
     void validateTestFolder(const LgsFile* testFile);
     bool isImportName(LgsExpr* expr) const;
     LgsExpr* determineIntConst(const std::string& tokenStr, int base) const;

@@ -528,9 +528,7 @@ LgsType* LgsParser::parseType() {
         type = new LgsVec(4);
         consume();
     } else if (currentToken.type == T_MATRIX) {
-        // Matrix type is presented as 'MatNxM' where N and M are numbers
-        const auto rows = currentToken.lexeme[3] - '0';
-        const auto columns = currentToken.lexeme[5] - '0';
+        const auto [rows, columns] = extractMatDims(currentToken);
         type = new LgsMatrix(rows, columns);
         consume();
     } else if (currentToken.type == T_JSON) {
@@ -1652,8 +1650,7 @@ LgsMatrixExpr* LgsParser::parseMatrixExpr() {
     }
 
     mustMatch(T_RPAREN);
-    const auto rows = nameToken.lexeme[3] - '0';
-    const auto columns = nameToken.lexeme[5] - '0';
+    const auto [rows, columns] = extractMatDims(nameToken);
     auto const matExpr = new LgsMatrixExpr(rows, columns);
     setLocation(matExpr->location, &nameToken, &currentToken);
     matExpr->elements = args;
@@ -2076,6 +2073,22 @@ void LgsParser::extractStrParts(LgsStrConst& strConst) {
     }
     if (replaced == strConst.value) return;
     strConst.formatedStr = replaced;
+}
+
+std::pair<size_t, size_t> LgsParser::extractMatDims(const LgsToken& matToken) {
+    const auto matName = matToken.lexeme;
+    // Matrix type is presented as 'MatNxM' where N and M are numbers
+    const auto xPos = matName.find('x');
+    const auto rowsStr = matName.substr(3, xPos - 3);
+    const auto colsStr = matName.substr(xPos + 1);
+    assert(std::ranges::all_of(rowsStr.begin(), rowsStr.end(), ::isdigit));
+    assert(std::ranges::all_of(colsStr.begin(), colsStr.end(), ::isdigit));
+    const auto rows = std::stoi(rowsStr);
+    const auto columns = std::stoi(colsStr);
+    if (rows == 0 || columns == 0) {
+        addError(E10112, matToken.location);
+    }
+    return std::make_pair(rows, columns);
 }
 
 void LgsParser::validateTestFolder(const LgsFile* testFile) {

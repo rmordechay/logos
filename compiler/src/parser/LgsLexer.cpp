@@ -218,114 +218,6 @@ char LgsLexer::peek(const size_t offset) const {
     return source[index + offset];
 }
 
-LgsToken LgsLexer::scanMatrixDims(const LgsLocation& location, std::string& lexeme) {
-    if (!std::isdigit(currentChar)) {
-        errHandler.addError(E10088, &location, filePath);
-        return {};
-    }
-    if (currentChar == '0') {
-        errHandler.addError(E10112, &location, filePath);
-    }
-    lexeme += currentChar;
-    advance();
-    if (currentChar != 'x') {
-        errHandler.addError(E10088, &location, filePath);
-        return {};
-    }
-    lexeme += currentChar;
-    advance();
-    if (!std::isdigit(currentChar) || currentChar == '0') {
-        errHandler.addError(E10088, &location, filePath);
-        return {};
-    }
-    lexeme += currentChar;
-    advance();
-    return {T_MATRIX, lexeme, location};
-}
-
-LgsToken LgsLexer::scanVarOrKeyword(const LgsLocation& location) {
-    std::string lexeme;
-    auto isDollared = false;
-    if (currentChar == '$') {
-        lexeme = "$";
-        isDollared = true;
-        advance();
-    }
-
-    while (std::isalnum(currentChar) || currentChar == '_') {
-        if (lexeme == "Mat") {
-            return scanMatrixDims(location, lexeme);
-        }
-        lexeme += currentChar;
-        advance();
-        if (std::isspace(currentChar)) break;
-    }
-    if (isDollared) {
-        return {T_DOLLAR_IDENTIFIER, lexeme, location};
-    }
-
-    if (lexeme == "for") {
-        if (!match('.')) return {T_FOR, lexeme, location};
-        std::string metaVar;
-        while (std::isalnum(currentChar)) {
-            metaVar += currentChar;
-            advance();
-            if (std::isspace(currentChar)) break;
-        }
-        const auto combined = lexeme + '.' + metaVar;
-        if (metaVar == "i") return {T_FOR_I, combined, location};
-        if (metaVar == "isFirst") return {T_FOR_IS_FIRST, combined, location};
-        if (metaVar == "isLast") return {T_FOR_IS_LAST, combined, location};
-        if (metaVar == "ever") return {T_FOR_EVER, combined, location};
-        errHandler.addError(E10088, &location, filePath);
-        return {T_EOF, "", location};
-    }
-
-    auto const it = LGS_KEYWORDS.find(lexeme);
-    if (it != LGS_KEYWORDS.end()) {
-        return {it->second, lexeme, location};
-    }
-    return {T_IDENTIFIER, lexeme, location};
-}
-
-std::string LgsLexer::scanDoubleQuotesString() {
-    advance();
-    std::string result;
-    while (currentChar != '"' && currentChar != '\0') {
-        scanEscapeChar(result);
-    }
-    if (currentChar == '"') advance();
-    return result;
-}
-
-std::string LgsLexer::scanSingleQuotesString() {
-    advance();
-    std::string result;
-    while (currentChar != '\'' && currentChar != '\0') {
-        scanEscapeChar(result);
-    }
-    if (currentChar == '\'') advance();
-    return result;
-}
-
-std::string LgsLexer::scanMultilineString() {
-    advance();
-    advance();
-    advance();
-    std::string result;
-    while (currentChar != '\0') {
-        if (currentChar == '"' && peek() == '"' && peek(2) == '"') {
-            advance();
-            advance();
-            advance();
-            break;
-        }
-        result += currentChar;
-        advance();
-    }
-    return result;
-}
-
 LgsToken LgsLexer::scanNumber(const LgsLocation& location) {
     std::string lexeme;
     // Minus
@@ -391,6 +283,118 @@ LgsToken LgsLexer::scanNumber(const LgsLocation& location) {
         return {T_UINT, lexeme, location};
     }
     return {T_INT, lexeme, location};
+}
+
+LgsToken LgsLexer::scanVarOrKeyword(const LgsLocation& location) {
+    std::string lexeme;
+    auto isDollared = false;
+    if (currentChar == '$') {
+        lexeme = "$";
+        isDollared = true;
+        advance();
+    }
+
+    while (std::isalnum(currentChar) || currentChar == '_') {
+        if (lexeme == "Mat") {
+            return scanMatrixDims(location, lexeme);
+        }
+        lexeme += currentChar;
+        advance();
+        if (std::isspace(currentChar)) break;
+    }
+    if (isDollared) {
+        return {T_DOLLAR_IDENTIFIER, lexeme, location};
+    }
+
+    if (lexeme == "for") {
+        if (!match('.')) return {T_FOR, lexeme, location};
+        std::string metaVar;
+        while (std::isalnum(currentChar)) {
+            metaVar += currentChar;
+            advance();
+            if (std::isspace(currentChar)) break;
+        }
+        const auto combined = lexeme + '.' + metaVar;
+        if (metaVar == "i") return {T_FOR_I, combined, location};
+        if (metaVar == "isFirst") return {T_FOR_IS_FIRST, combined, location};
+        if (metaVar == "isLast") return {T_FOR_IS_LAST, combined, location};
+        if (metaVar == "ever") return {T_FOR_EVER, combined, location};
+        errHandler.addError(E10088, &location, filePath);
+        return {T_EOF, "", location};
+    }
+
+    auto const it = LGS_KEYWORDS.find(lexeme);
+    if (it != LGS_KEYWORDS.end()) {
+        return {it->second, lexeme, location};
+    }
+    return {T_IDENTIFIER, lexeme, location};
+}
+
+LgsToken LgsLexer::scanMatrixDims(const LgsLocation& location, std::string& lexeme) {
+    // Rows
+    std::string rows;
+    while (std::isdigit(currentChar)) {
+        rows += currentChar;
+        lexeme += currentChar;
+        advance();
+    }
+    if (rows == "" || currentChar != 'x') {
+        errHandler.addError(E10088, &location, filePath);
+        return {};
+    }
+    // x
+    lexeme += currentChar;
+    advance();
+    // Columns
+    std::string columns;
+    while (std::isdigit(currentChar)) {
+        columns += currentChar;
+        lexeme += currentChar;
+        advance();
+    }
+    if (columns == "") {
+        errHandler.addError(E10088, &location, filePath);
+        return {};
+    }
+    return {T_MATRIX, lexeme, location};
+}
+
+std::string LgsLexer::scanDoubleQuotesString() {
+    advance();
+    std::string result;
+    while (currentChar != '"' && currentChar != '\0') {
+        scanEscapeChar(result);
+    }
+    if (currentChar == '"') advance();
+    return result;
+}
+
+std::string LgsLexer::scanSingleQuotesString() {
+    advance();
+    std::string result;
+    while (currentChar != '\'' && currentChar != '\0') {
+        scanEscapeChar(result);
+    }
+    if (currentChar == '\'') advance();
+    return result;
+}
+
+std::string LgsLexer::scanMultilineString() {
+    advance();
+    advance();
+    advance();
+    std::string result;
+    while (currentChar != '\0') {
+        if (currentChar == '"' && peek() == '"' && peek(2) == '"') {
+            advance();
+            advance();
+            advance();
+            break;
+        }
+        result += currentChar;
+        advance();
+    }
+    return result;
 }
 
 void LgsLexer::scanEscapeChar(std::string& result) {
