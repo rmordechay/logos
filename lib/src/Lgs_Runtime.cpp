@@ -8,7 +8,7 @@
 #include "context/Lgs_Aarch64.h"
 #include <cassert>
 
-static void freeValue(void* ptr, const Lgs_TypeInfo* type);
+extern "C" void Lgs_Runtime_freeValue(void* ptr, const Lgs_TypeInfo* type);
 
 extern "C" void Lgs_Runtime_init() {}
 extern "C" void Lgs_Runtime_close() {}
@@ -23,10 +23,8 @@ extern "C" void Lgs_Runtime_pop() {
         func(ctx);
     }
     if (!top.orphans.empty()) {
-        std::println("Freeing orphans in {}:", runtime.stackLevel);
         for (const auto [ptr, type] : top.orphans) {
-            std::println("\t* {}", ptr);
-            freeValue(ptr, type);
+            Lgs_Runtime_freeValue(ptr, type);
         }
     }
     runtime.stackLevel--;
@@ -89,23 +87,25 @@ extern "C" void Lgs_Runtime_throwError(const size_t count, const char* msg, ...)
     exit(1);
 }
 
-static void freeValue(void* ptr, const Lgs_TypeInfo* type) {
+extern "C" void Lgs_Runtime_freeValue(void* ptr, const Lgs_TypeInfo* type) {
+    if (!ptr) return;
+    std::println("Freeing in {}: {}", runtime.stackLevel, ptr);
     switch (type->kind) {
     case RTT_DARRAY: {
         const auto darray = static_cast<Lgs_DArrayExpr*>(ptr);
         auto offset = 0;
         for (int i = 0; i < darray->length; ++i) {
             const auto element = darray->data + offset;
-            freeValue(element, type->dArray.baseType);
+            Lgs_Runtime_freeValue(element, type->dArray.baseType);
             offset += type->dArray.baseType->size;
         }
-        std::free(ptr);
+        //std::free(ptr);
         break;
     }
     case RTT_SET: {
         const auto set = static_cast<Lgs_SetExpr*>(ptr);
-        std::free(set->data);
-        std::free(ptr);
+        //std::free(set->data);
+        //std::free(ptr);
         break;
     }
     case RTT_OBJECT: {
@@ -118,13 +118,13 @@ static void freeValue(void* ptr, const Lgs_TypeInfo* type) {
             // freeValue(fieldPtr, fieldType);
             offset += fieldType->size;
         }
-        std::free(ptr);
+        // std::free(ptr);
         break;
     }
     case RTT_STR:
         break;
     case RTT_NULLABLE: {
-        freeValue(ptr, type->nullable.baseType);
+        Lgs_Runtime_freeValue(ptr, type->nullable.baseType);
         break;
     }
     case RTT_SARRAY:

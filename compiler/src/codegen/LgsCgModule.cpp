@@ -80,7 +80,7 @@ bool LgsCgModule::writeIRModule(const LgsPaths& paths, uint8_t optLevel) const {
         triple.c_str(),
         outputPath.c_str(),
         outputPath.c_str()
-    );
+        );
     if (!runCmd(cmd)) assert(0);
     fs::remove(outputPath + ".bc");
     return true;
@@ -158,6 +158,15 @@ StructType* LgsCgModule::getStructType(const std::vector<Type*>& fields, const s
     return structType;
 }
 
+Constant* LgsCgModule::getRTTStruct(const std::vector<Type*>& fields, const std::string& name, const std::vector<Constant*>& args) {
+    const auto structName = LGS_TYPEINFO_PREFIX + name;
+    auto st = StructType::getTypeByName(context, structName);
+    if (!st) {
+        st = StructType::create(context, fields, structName);
+    }
+    return llvm::ConstantStruct::get(st, args);
+}
+
 void LgsCgModule::setStructField(Type* type, Value* instancePtr, const size_t position, Value* v) {
     const auto gep = builder.CreateStructGEP(type, instancePtr, position);
     builder.CreateStore(v, gep);
@@ -174,15 +183,6 @@ Constant* LgsCgModule::getRTTypeInfo(const std::string& name, const size_t size,
         return createGlobal(prefixedName, typeInfo, llvm::ConstantStruct::get(typeInfo, {usize(size), usize(kind), extra}));
     }
     return createGlobal(prefixedName, typeInfo, nullptr);
-}
-
-Constant* LgsCgModule::getRTTStruct(const std::vector<Type*>& fields, const std::string& name, const std::vector<Constant*>& args) {
-    const auto structName = LGS_TYPEINFO_PREFIX + name;
-    auto st = StructType::getTypeByName(context, structName);
-    if (!st) {
-        st = StructType::create(context, fields, structName);
-    }
-    return llvm::ConstantStruct::get(st, args);
 }
 
 StructType* LgsCgModule::getRTTBaseStruct() {
@@ -272,20 +272,6 @@ Value* LgsCgModule::callRuntimeFunc(const std::string& funcName, Type* rt, const
     return callFunc(LGS_PREFIX"Runtime_" + funcName, rt, paramTypes, args, isVariadic);
 }
 
-void LgsCgModule::callThrowError(const LgsBaseMsg& err, const std::vector<Value*>& args) {
-    std::vector<Value*> irArgs = {usize(args.size()), getString(err.msg)};
-    irArgs.insert(irArgs.end(), args.begin(), args.end());
-    callRuntimeFunc("throwError", voidTy(), {sizeTy(), ptrTy()}, irArgs, true);
-}
-
-Value* LgsCgModule::callHash(Value* arg) {
-    return callLgsFunc("hash", i32Ty(), {ptrTy()}, {arg});
-}
-
-Constant* LgsCgModule::hashConst(const std::string& str) {
-    return i64(hashString(str));
-}
-
 Value* LgsCgModule::callPrintf(const std::vector<Value*>& args) {
     return callFunc("printf", i32Ty(), {ptrTy()}, args, true);
 }
@@ -308,6 +294,24 @@ void LgsCgModule::callMemSet(Value* dest, Value* src, Value* size) {
 
 void LgsCgModule::callMemCpy(Value* dest, Value* src, Value* size) {
     builder.CreateMemCpy(dest, llvm::MaybeAlign(), src, llvm::MaybeAlign(), size);
+}
+
+Value* LgsCgModule::callHash(Value* arg) {
+    return callLgsFunc("hash", i32Ty(), {ptrTy()}, {arg});
+}
+
+Constant* LgsCgModule::hashConst(const std::string& str) {
+    return i64(hashString(str));
+}
+
+void LgsCgModule::callThrowError(const LgsBaseMsg& err, const std::vector<Value*>& args) {
+    std::vector<Value*> irArgs = {usize(args.size()), getString(err.msg)};
+    irArgs.insert(irArgs.end(), args.begin(), args.end());
+    callRuntimeFunc("throwError", voidTy(), {sizeTy(), ptrTy()}, irArgs, true);
+}
+
+void LgsCgModule::freeValue(Value* ptr, Constant* type) {
+    callRuntimeFunc("freeValue", voidTy(), {ptrTy(), ptrTy()}, {ptr, type});
 }
 
 Value* LgsCgModule::allocate(Value* size, Constant* type, const bool isOwner, const bool isReturnExpr) {

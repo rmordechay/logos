@@ -393,6 +393,28 @@ LgsToken LgsLexer::scanNumber(const LgsLocation& location) {
     return {T_INT, lexeme, location};
 }
 
+void LgsLexer::scanEscapeChar(std::string& result) {
+    if (currentChar == '\\') {
+        advance();
+        switch (currentChar) {
+        case 'n': result += '\n'; break;
+        case 'r': result += '\r'; break;
+        case 't': result += '\t'; break;
+        case '\\': result += '\\'; break;
+        case '"': result += '"'; break;
+        case '\'': result += '\''; break;
+        case '0': result += '\0'; break;
+        default:
+            result += '\\';
+            result += currentChar;
+            break;
+        }
+    } else {
+        result += currentChar;
+    }
+    advance();
+}
+
 void LgsLexer::skipWhitespace() {
     while (std::isspace(currentChar)) {
         advance();
@@ -419,26 +441,4 @@ void LgsLexer::skipBlockComment() {
         }
         advance();
     }
-}
-
-void LgsLexer::scanEscapeChar(std::string& result) {
-    if (currentChar == '\\') {
-        advance();
-        switch (currentChar) {
-        case 'n': result += '\n'; break;
-        case 'r': result += '\r'; break;
-        case 't': result += '\t'; break;
-        case '\\': result += '\\'; break;
-        case '"': result += '"'; break;
-        case '\'': result += '\''; break;
-        case '0': result += '\0'; break;
-        default:
-            result += '\\';
-            result += currentChar;
-            break;
-        }
-    } else {
-        result += currentChar;
-    }
-    advance();
 }

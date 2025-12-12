@@ -103,6 +103,7 @@ LgsType* LgsVec::applyBinOp(LgsType* rightType, LgsBinOp& op) {
 bool LgsVec::inferBaseType(const std::vector<LgsExpr*>& args) {
     assert(!args.empty());
     const auto firstArg = args.front();
+    if (!firstArg->type) return false;
     const auto argsBaseType = firstArg->type->isNumber() ? firstArg->type : firstArg->type->asIterable()->baseType;
     if (!argsBaseType) return false;
     for (size_t i = 1; i < args.size(); ++i) {

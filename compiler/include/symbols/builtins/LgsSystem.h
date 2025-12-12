@@ -9,7 +9,7 @@
 
 class LgsSystem final : public LgsObject {
 public:
-    static constexpr auto name = "System";
+    static constexpr auto name = "Sys";
     LgsFunc* pidFunc = new LgsFunc{"pid", &LGS_SIZE, PUBLIC | BUILTIN | SYSCALL};
     LgsFunc* sleepFunc = new LgsFunc{"sleep", &LGS_VOID, {&LGS_INT}, PUBLIC | BUILTIN | SYSCALL};
     LgsFunc* exitFunc = new LgsFunc{"exit", &LGS_VOID, {&LGS_INT}, PUBLIC | BUILTIN | SYSCALL | TERMINATOR};

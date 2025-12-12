@@ -95,16 +95,16 @@ public:
     Value* callIntrinsics(llvm::Intrinsic::ID intrinsicID, const std::vector<Type*>& types = {}, const std::vector<Value*>& args = {});
     Value* callLgsFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes = {}, const std::vector<Value*>& args = {});
     Value* callRuntimeFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes = {}, const std::vector<Value*>& args = {}, bool isVariadic = false);
-    void callThrowError(const LgsBaseMsg& err, const std::vector<Value*>& args = {});
-    Value* callHash(Value* arg);
-    Constant* hashConst(const std::string& str);
 
-    // System
     Value* callPrintf(const std::vector<Value*>& args);
     Value* callSnprintf(const std::string& fmt, const std::vector<Value*>& args);
     Value* callStrLen(Value* str);
     void callMemSet(Value* dest, Value* src, Value* size);
     void callMemCpy(Value* dest, Value* src, Value* size);
+    Value* callHash(Value* arg);
+    Constant* hashConst(const std::string& str);
+    void callThrowError(const LgsBaseMsg& err, const std::vector<Value*>& args = {});
+    void freeValue(Value* ptr, Constant* type);
     Value* allocate(Value* size, Constant* type, bool isOwner, bool isReturnExpr = false);
 
     // Stack

@@ -28,8 +28,8 @@ public:
     std::string scanSingleQuotesString();
     std::string scanMultilineString();
     LgsToken scanNumber(const LgsLocation& location);
+    void scanEscapeChar(std::string& result);
     void skipWhitespace();
     void skipLineComment();
     void skipBlockComment();
-    void scanEscapeChar(std::string& result);
 };
