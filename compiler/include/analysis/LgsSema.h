@@ -72,8 +72,8 @@ public:
     void visitMainFile(LgsMainFile* mainFile);
     void visitObject(LgsObject* obj);
     void visitInterface(LgsInterface* interface);
-    void visitTestFile(const LgsTestFile* testFile);
     void visitEnum(const LgsEnum* enum_);
+    void visitTestFile(const LgsTestFile* testFile);
     void visitField(LgsField* field);
     void visitFunc(LgsFunc* func);
     void visitMainFunc(LgsMainFunc* mainFunc);
@@ -134,8 +134,8 @@ public:
     void visitLoopMetaVar(LgsMetaVar* metaVar);
 
     bool validateExprType(const LgsExpr* expr, LgsType* type);
-    bool validateTypeName(const std::string& typeName, const LgsLocation* location);
-    bool validateLocalName(const std::string& typeName, const LgsLocation* location);
+    bool validateTypeName(const std::string& name, const LgsLocation& location);
+    bool validateLocalName(const std::string& name, const LgsLocation& location);
     void validateObjImplements(LgsObject* obj, const std::vector<LgsType*>& interfaces);
     void validateIndex(LgsIterIndex* iterIndex);
     bool validateFieldVisibility(LgsField* field, LgsType* parent, const LgsLocation& location);
@@ -146,7 +146,7 @@ public:
 
     void resolveImports() const;
     void addLocalSymbol(const LgsSymbol& newSymbol);
-    LgsSymbol* getSymbol(const std::string& name, const LgsLocation* location);
+    LgsSymbol* getSymbol(const std::string& name);
     void createCoroutineFunc(LgsFuncCall* funcCall);
     void addError(const LgsBaseMsg& lgsErr, const LgsLocation& location, const std::vector<std::string>& args = {});
     void addRTType(LgsType* type) const;

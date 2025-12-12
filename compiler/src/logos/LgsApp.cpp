@@ -139,9 +139,7 @@ bool LgsApp::parseHeaders() {
 
 bool LgsApp::analyse() {
     loadBuiltins();
-    if (!validateEnvs()) {
-        return false;
-    }
+    if (!validateEnvs()) return false;
     LgsTypeResolver typeResolver(errHandler, globals);
     if (!typeResolver.resolveGlobals(srcFiles, threadPool)) {
         return false;

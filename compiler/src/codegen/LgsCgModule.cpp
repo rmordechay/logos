@@ -158,15 +158,6 @@ StructType* LgsCgModule::getStructType(const std::vector<Type*>& fields, const s
     return structType;
 }
 
-Constant* LgsCgModule::getRTTStruct(const std::vector<Type*>& fields, const std::string& name, const std::vector<Constant*>& args) {
-    const auto structName = LGS_TYPEINFO_PREFIX + name;
-    auto st = StructType::getTypeByName(context, structName);
-    if (!st) {
-        st = StructType::create(context, fields, structName);
-    }
-    return llvm::ConstantStruct::get(st, args);
-}
-
 void LgsCgModule::setStructField(Type* type, Value* instancePtr, const size_t position, Value* v) {
     const auto gep = builder.CreateStructGEP(type, instancePtr, position);
     builder.CreateStore(v, gep);
@@ -183,6 +174,15 @@ Constant* LgsCgModule::getRTTypeInfo(const std::string& name, const size_t size,
         return createGlobal(prefixedName, typeInfo, llvm::ConstantStruct::get(typeInfo, {usize(size), usize(kind), extra}));
     }
     return createGlobal(prefixedName, typeInfo, nullptr);
+}
+
+Constant* LgsCgModule::getRTTStruct(const std::vector<Type*>& fields, const std::string& name, const std::vector<Constant*>& args) {
+    const auto structName = LGS_TYPEINFO_PREFIX + name;
+    auto st = StructType::getTypeByName(context, structName);
+    if (!st) {
+        st = StructType::create(context, fields, structName);
+    }
+    return llvm::ConstantStruct::get(st, args);
 }
 
 StructType* LgsCgModule::getRTTBaseStruct() {

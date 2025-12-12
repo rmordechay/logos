@@ -176,7 +176,6 @@ public:
     void parseCImports(std::vector<LgsStrConst*> externalImports, LgsFile* file);
 
     void setLocation(LgsLocation& location, const LgsToken* startToken, const LgsToken* endToken) const;
-    void addFileSymbol(LgsMainFile* file, const LgsSymbol& newSymbol);
     void extractStrParts(LgsStrConst& strConst);
     void validateTestFolder(const LgsFile* testFile);
     bool isImportName(LgsExpr* expr) const;
@@ -194,6 +193,7 @@ public:
     bool mustParse(const void* value);
     bool parsedOrReset(const void* value, size_t resetIndex);
     void addParsingError();
+    bool validateTypeName(const std::string& typeName, const LgsLocation* location);
     void recursionGuard();
     void addError(const LgsBaseMsg& lgsErr, const LgsLocation& location, const std::vector<std::string>& args = {});
 };

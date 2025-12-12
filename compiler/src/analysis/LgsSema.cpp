@@ -102,10 +102,7 @@ void LgsSema::visitMainFile(LgsMainFile* mainFile) {
 }
 
 void LgsSema::visitObject(LgsObject* obj) {
-    validateTypeName(obj->name, &obj->location);
-    for (const auto enum_ : obj->enums) {
-        visitEnum(enum_);
-    }
+    validateTypeName(obj->name, obj->location);
     for (const auto field : obj->fields) {
         visitField(field);
     }
@@ -120,10 +117,14 @@ void LgsSema::visitObject(LgsObject* obj) {
 }
 
 void LgsSema::visitInterface(LgsInterface* interface) {
-    validateTypeName(interface->name, &interface->location);
+    validateTypeName(interface->name, interface->location);
     for (const auto& [_, method] : interface->methods) {
         visitFunc(method);
     }
+}
+
+void LgsSema::visitEnum(const LgsEnum* enum_) {
+    validateTypeName(enum_->name, enum_->location);
 }
 
 void LgsSema::visitTestFile(const LgsTestFile* testFile) {
@@ -133,10 +134,6 @@ void LgsSema::visitTestFile(const LgsTestFile* testFile) {
     for (const auto& test : testFile->tests) {
         visitFunc(test);
     }
-}
-
-void LgsSema::visitEnum(const LgsEnum* enum_) {
-    validateTypeName(enum_->name, &enum_->location);
 }
 
 void LgsSema::visitField(LgsField* field) {
@@ -155,6 +152,7 @@ void LgsSema::visitField(LgsField* field) {
 
 void LgsSema::visitFunc(LgsFunc* func) {
     const auto ft = func->funcType;
+    validateLocalName(ft->name, ft->location);
     if (!ft->genericTypes.empty()) return;
     stack.enterScope(func);
     auto defaultParamsStarted = false;
@@ -218,7 +216,7 @@ void LgsSema::visitLambda(LgsFunc* lambda) {
 }
 
 void LgsSema::visitParam(LgsParam* param) {
-    validateLocalName(param->name, &param->location);
+    validateLocalName(param->name, param->location);
     if (param->isVariadic) {
         if (param->expr) {
             addError(E10045, param->location);
@@ -292,7 +290,7 @@ void LgsSema::visitStmtsBlock(LgsStmtsBlock* stmtsBlock) {
 }
 
 void LgsSema::visitVarDec(LgsVarDec* varDec) {
-    validateLocalName(varDec->name, &varDec->location);
+    validateLocalName(varDec->name, varDec->location);
     if (const auto iter = varDec->type->asIterable()) visitExpr(iter->size);
 
     if (varDec->expr && varDec->type) {
@@ -839,8 +837,8 @@ void LgsSema::visitMatrixExpr(const LgsMatrixExpr* matrixExpr) {
 }
 
 void LgsSema::visitVariable(LgsVariable* variable) {
-    const auto symbol = getSymbol(variable->name, &variable->location);
-    if (!symbol) return;
+    const auto symbol = getSymbol(variable->name);
+    if (!symbol) return addError(E10006, variable->location, {variable->name});
     variable->ref.symbolType = symbol->symbolType;
     switch (symbol->symbolType) {
     case VAR_DEC: {
@@ -1065,8 +1063,8 @@ LgsFunc* clone(const LgsFunc* func, const LgsFuncCall* funcCall) {
 }
 
 void LgsSema::visitFuncCall(LgsFuncCall* funcCall) {
-    const auto symbol = getSymbol(funcCall->name, &funcCall->location);
-    if (!symbol) return;
+    const auto symbol = getSymbol(funcCall->name);
+    if (!symbol) return addError(E10006, funcCall->location, {funcCall->name});
     const auto ft = symbol->getType()->asFuncType();
     if (!ft) return addError(E10046, funcCall->location, {funcCall->name});
 
@@ -1228,8 +1226,8 @@ void LgsSema::visitJsonObj(const LgsJsonObject* jsonObj) {
 
 void LgsSema::visitInstance(LgsInstance* instance) {
     const auto objName = instance->name;
-    const auto symbol = getSymbol(objName, &instance->location);
-    if (!symbol) return;
+    const auto symbol = getSymbol(objName);
+    if (!symbol) return addError(E10006, instance->location, {instance->name});
     if (symbol->symbolType != OBJECT && symbol->symbolType != INTERFACE) {
         return addError(E10022, instance->location, {objName});
     }
@@ -1407,17 +1405,27 @@ bool LgsSema::validateExprType(const LgsExpr* expr, LgsType* type) {
     return true;
 }
 
-bool LgsSema::validateTypeName(const std::string& typeName, const LgsLocation* location) {
-    if (islower(typeName[0])) {
-        errHandler.addError(E10033, location, file->path, {typeName});
+bool LgsSema::validateTypeName(const std::string& name, const LgsLocation& location) {
+    if (islower(name[0])) {
+        addError(E10033, location);
+        return false;
+    }
+    const auto symbol = getSymbol(name);
+    if (symbol && symbol->isBuiltin) {
+        addError(E10053, location, {name});
         return false;
     }
     return true;
 }
 
-bool LgsSema::validateLocalName(const std::string& typeName, const LgsLocation* location) {
-    if (isupper(typeName[0])) {
-        errHandler.addError(E10099, location, file->path, {typeName});
+bool LgsSema::validateLocalName(const std::string& name, const LgsLocation& location) {
+    if (isupper(name[0])) {
+        addError(E10099, location);
+        return false;
+    }
+    const auto symbol = getSymbol(name);
+    if (symbol && symbol->isBuiltin) {
+        addError(E10053, location, {name});
         return false;
     }
     return true;
@@ -1606,7 +1614,7 @@ void LgsSema::addLocalSymbol(const LgsSymbol& newSymbol) {
     stack.getSymbolTable().addSymbol(newSymbol, &errHandler, file->path);
 }
 
-LgsSymbol* LgsSema::getSymbol(const std::string& name, const LgsLocation* location) {
+LgsSymbol* LgsSema::getSymbol(const std::string& name) {
     if (const auto globalSymbol = globals.table.getSymbol(name)) {
         if (!globalSymbol->isBuiltin) refCount[*globalSymbol->name]++;
         return globalSymbol;
@@ -1622,7 +1630,6 @@ LgsSymbol* LgsSema::getSymbol(const std::string& name, const LgsLocation* locati
     if (const auto symbol = stack.getSymbolTable().getSymbol(name)) {
         return symbol;
     }
-    addError(E10006, *location, {name});
     return nullptr;
 }
 

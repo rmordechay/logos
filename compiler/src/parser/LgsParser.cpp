@@ -1,5 +1,4 @@
 #include "parser/LgsParser.h"
-#include "errors/LgsCliErrors.h"
 #include "exprs/LgsArrayExpr.h"
 #include "stmts/LgsAssignment.h"
 #include "exprs/LgsFuncCall.h"
@@ -133,25 +132,25 @@ LgsMainFile* LgsParser::parseMainFile() {
         if (const auto obj = parseObject()) {
             file->objects.push_back(obj);
             if (obj->singleton) continue;
-            addFileSymbol(file, LgsSymbol(obj));
+            file->symbolTable.addSymbol(LgsSymbol(obj), &errHandler, metadata->path);
         } else if (const auto interface = parseInterface()) {
             file->interfaces.push_back(interface);
-            addFileSymbol(file, LgsSymbol(interface));
+            file->symbolTable.addSymbol(LgsSymbol(interface), &errHandler, metadata->path);
         } else if (const auto varDec = parseVarDec()) {
             file->varDecs.push_back(varDec);
-            addFileSymbol(file, LgsSymbol(varDec));
+            file->symbolTable.addSymbol(LgsSymbol(varDec), &errHandler, metadata->path);
             if (!varDec->expr) addParsingError();
         } else if (auto lgsEnum = parseEnum()) {
             file->enums.push_back(lgsEnum);
-            addFileSymbol(file, LgsSymbol(lgsEnum));
+            file->symbolTable.addSymbol(LgsSymbol(lgsEnum), &errHandler, metadata->path);
         } else if (const auto mainFunc = parseMainFunc()) {
             file->funcs[mainFunc->funcType->name] = mainFunc;
         } else if (const auto func = parseFunc()) {
             file->funcs[func->funcType->name] = func;
-            addFileSymbol(file, LgsSymbol(func));
+            file->symbolTable.addSymbol(LgsSymbol(func), &errHandler, metadata->path);
         } else if (const auto subType = parseSubtype()) {
             file->subtypes.emplace_back(subType);
-            addFileSymbol(file, LgsSymbol(subType));
+            file->symbolTable.addSymbol(LgsSymbol(subType), &errHandler, metadata->path);
         } else {
             addParsingError();
             break;
@@ -2054,18 +2053,6 @@ void LgsParser::setLocation(LgsLocation& location, const LgsToken* startToken, c
     location.columnEnd = endToken->location.columnEnd;
 }
 
-void LgsParser::addFileSymbol(LgsMainFile* file, const LgsSymbol& newSymbol) {
-    auto symbolName = *newSymbol.name;
-    const auto globalSymbol = globals.table.getSymbol(symbolName);
-    if (globalSymbol) {
-        if (globalSymbol->isBuiltin) {
-            errHandler.addError(E10053, newSymbol.location, metadata->path, {symbolName});
-        }
-        return;
-    }
-    file->symbolTable.addSymbol(newSymbol, &errHandler, metadata->path);
-}
-
 void LgsParser::extractStrParts(LgsStrConst& strConst) {
     size_t start = 0;
     std::string replaced = strConst.value;
@@ -2252,6 +2239,14 @@ bool LgsParser::parsedOrReset(const void* value, const size_t resetIndex) {
 void LgsParser::addParsingError() {
     const auto token = tokens[currentIndex];
     return errHandler.addError(E10085, &token.location, metadata->path);
+}
+
+bool LgsParser::validateTypeName(const std::string& typeName, const LgsLocation* location) {
+    if (islower(typeName[0])) {
+        errHandler.addError(E10033, location, metadata->path, {typeName});
+        return false;
+    }
+    return true;
 }
 
 void LgsParser::recursionGuard() {
