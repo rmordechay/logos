@@ -158,8 +158,9 @@ static std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
         str << "}";
         break;
     }
-    case RTT_VOID: break;
+    case RTT_VOID:
     case RTT_VARIADIC:
+    case RTT_FUNC:
     case RTT_UNKNOWN: assert(0);
     }
     return str.str();

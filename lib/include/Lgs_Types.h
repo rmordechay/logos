@@ -5,6 +5,7 @@ struct Lgs_TypeInfo;
 typedef void (*ThunkFunc)(void*);
 
 enum Lgs_TypeKind {
+    RTT_ANY,
     RTT_VOID,
     RTT_BOOL,
     RTT_CHAR,
@@ -31,7 +32,7 @@ enum Lgs_TypeKind {
     RTT_OBJECT,
     RTT_ENUM,
     RTT_TYPE,
-    RTT_ANY,
+    RTT_FUNC,
     RTT_VARIADIC,
     RTT_NULLABLE,
     RTT_UNKNOWN,
@@ -43,6 +44,13 @@ struct Lgs_Object {
     Lgs_TypeInfo** fieldTypes;
 };
 
+struct Lgs_FuncType {
+    size_t paramsCount;
+    uint64_t* paramHashes;
+    Lgs_TypeInfo** paramTypes;
+    Lgs_TypeInfo* rt;
+};
+
 struct Lgs_SArray {
     size_t len;
     Lgs_TypeInfo* baseType;
@@ -50,12 +58,6 @@ struct Lgs_SArray {
 
 struct Lgs_DArray {
     Lgs_TypeInfo* baseType;
-};
-
-struct Lgs_FuncType {
-    size_t paramsCount;
-    Lgs_TypeInfo** params;
-    Lgs_TypeInfo* rt;
 };
 
 struct Lgs_Map {

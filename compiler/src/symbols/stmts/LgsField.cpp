@@ -11,6 +11,14 @@ Value* LgsField::loadIR(LgsCgModule& cg) {
     return cg.builder.CreateLoad(type->getIRType(cg), IRValue);
 }
 
+std::string LgsField::getName() {
+    return name;
+}
+
+LgsType* LgsField::getType() {
+    return type;
+}
+
 Value* LgsField::getGEP(LgsCgModule& cg, Value* parentIRPtr) const {
     assert(parentType);
     return cg.builder.CreateStructGEP(parentType->getIRType(cg), parentIRPtr, position);

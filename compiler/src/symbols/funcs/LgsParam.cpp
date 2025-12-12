@@ -13,3 +13,11 @@ void LgsParam::setType(LgsType* newType) {
 void LgsParam::setDebugValue(LgsCgModule& cg) {
     assert(0);
 }
+
+std::string LgsParam::getName() {
+    return name;
+}
+
+LgsType* LgsParam::getType() {
+    return type;
+}

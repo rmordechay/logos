@@ -8,7 +8,7 @@ class LgsInstance;
 class LgsType;
 class LgsExpr;
 
-class LgsField final : public LgsValue {
+class LgsField final : public LgsValue, public LgsOwner {
 public:
     std::string name;
     unsigned position = 0;
@@ -26,6 +26,8 @@ public:
     void setType(LgsType* newType);
     Value* getGEP(LgsCgModule& cg, Value* parentIRPtr) const;
     Value* loadIR(LgsCgModule& cg) override;
+    std::string getName() override;
+    LgsType* getType() override;
     void setDebugValue(LgsCgModule& cg) override;
     ~LgsField() override;
 };

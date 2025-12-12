@@ -3,6 +3,8 @@
 #include "codegen/LgsCgModule.h"
 #include "types/LgsGenericType.h"
 #include "LgsUtils.h"
+
+#include <ranges>
 #include <sstream>
 
 Type* LgsFuncType::getIRType(LgsCgModule& cg) {
@@ -24,6 +26,14 @@ Type* LgsFuncType::getIRType(LgsCgModule& cg) {
 
 Constant* LgsFuncType::getRTType(LgsCgModule& cg) {
     const auto funcName = getName();
+    std::vector<LgsOwner*> paramsAsOwners;
+    for (auto& param : params) paramsAsOwners.emplace_back(static_cast<LgsOwner*>(&param));
+    const auto [typesArr, hashesArr] = getRTTypesAndHashes(cg, name, paramsAsOwners);
+    // paramsCount, params, rt
+    const auto sv = cg.getRTTStruct({cg.sizeTy(), cg.ptrTy(), cg.ptrTy()}, name, {
+        cg.usize(params.size()), hashesArr, typesArr, rt->getRTType(cg)
+    });
+    return cg.getRTTypeInfo(name, sizeBytes(), RTT_FUNC, sv);
 }
 
 LgsExpr* LgsFuncType::getZeroValue() {

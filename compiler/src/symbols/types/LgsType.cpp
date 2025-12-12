@@ -468,3 +468,36 @@ std::pair<Value*, Value*> loadPairAsInt(LgsCgModule& cg, LgsExpr* self, LgsExpr*
     }
     return {l, r};
 }
+
+std::pair<Constant*, Constant*> getRTTypesAndHashes(LgsCgModule& cg, const std::string& name, const std::vector<LgsOwner*>& values) {
+    std::vector<Constant*> fieldRTTs;
+    std::vector<Constant*> fieldNameHashes;
+    fieldRTTs.reserve(values.size());
+    fieldNameHashes.reserve(values.size());
+    for (size_t i = 0; i < values.size(); ++i) {
+        fieldRTTs.push_back(values[i]->getType()->getRTType(cg));
+        fieldNameHashes.push_back(cg.hashConst(values[i]->getName()));
+    }
+
+    const auto fieldsArrType = ArrayType::get(cg.getRTTBaseStruct(), values.size());
+    Constant* typesArr = nullptr;
+    Constant* hashesArr = nullptr;
+    if (values.empty()) {
+        typesArr = cg.null();
+        hashesArr = cg.null();
+    } else {
+        const auto fieldsName = name + "_fields";
+        const auto hashesArrType = ArrayType::get(cg.i64Ty(), values.size());
+        const auto hashesName = name + "_hashes";
+        if (cg.isRTTModule) {
+            const auto args = ConstantArray::get(fieldsArrType, fieldRTTs);
+            const auto hashes = ConstantArray::get(hashesArrType, fieldNameHashes);
+            typesArr = cg.createGlobal(fieldsName, fieldsArrType, args);
+            hashesArr = cg.createGlobal(hashesName, hashesArrType, hashes);
+        } else {
+            typesArr = cg.createGlobal(fieldsName, fieldsArrType, nullptr);
+            hashesArr = cg.createGlobal(hashesName, hashesArrType, nullptr);
+        }
+    }
+    return {typesArr, hashesArr};
+}

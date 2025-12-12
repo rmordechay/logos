@@ -39,10 +39,7 @@ Constant* LgsVec::getRTType(LgsCgModule& cg) {
     if (vectorDim == 3) {
         return cg.getRTTypeInfo(name, sizeBytes(), RTT_VEC3, sv);
     }
-    if (vectorDim == 4) {
-        return cg.getRTTypeInfo(name, sizeBytes(), RTT_VEC4, sv);
-    }
-    assert(0);
+    return cg.getRTTypeInfo(name, sizeBytes(), RTT_VEC4, sv);
 }
 
 std::string LgsVec::getName() {

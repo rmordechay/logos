@@ -1,4 +1,5 @@
 #pragma once
+#include "LgsOwner.h"
 #include "LgsType.h"
 #include "exprs/LgsExpr.h"
 #include <LgsValue.h>
@@ -7,12 +8,7 @@ class LgsVariable;
 class LgsExpr;
 class LgsType;
 
-class LgsOwner {
-    virtual void getOwner();
-    virtual ~LgsOwner() = default;
-};
-
-class LgsParam final : public LgsValue {
+class LgsParam final : public LgsValue, public LgsOwner {
 public:
     std::string name;
     uint32_t index = 0;
@@ -23,9 +19,11 @@ public:
     bool isVariadic = false;
 
     explicit LgsParam(LgsType* type, const std::string& name = "", LgsExpr* expr = nullptr) : name(name), type(type), expr(expr) {}
-    Value* loadIR(LgsCgModule& cg) override;
     void setType(LgsType* newType);
+    Value* loadIR(LgsCgModule& cg) override;
     void setDebugValue(LgsCgModule& cg) override;
+    std::string getName() override;
+    LgsType* getType() override;
     ~LgsParam() override = default;
 };
 

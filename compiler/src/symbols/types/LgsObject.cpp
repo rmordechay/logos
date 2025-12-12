@@ -11,6 +11,7 @@
 #include "LgsUtils.h"
 #include "types/LgsAny.h"
 
+#include <ranges>
 #include <sstream>
 #include <llvm/IR/Module.h>
 
@@ -60,37 +61,12 @@ Type* LgsObject::getIRType(LgsCgModule& cg) {
 }
 
 Constant* LgsObject::getRTType(LgsCgModule& cg) {
-    std::vector<Constant*> fieldRTTs;
-    std::vector<Constant*> fieldNameHashes;
-    fieldRTTs.reserve(fields.size());
-    fieldNameHashes.reserve(fields.size());
-    for (const auto field : fields) {
-        fieldRTTs.push_back(field->type->getRTType(cg));
-        fieldNameHashes.push_back(cg.hashConst(field->name));
-    }
-
     const auto objName = getName();
-    const auto fieldsArrType = ArrayType::get(cg.getRTTBaseStruct(), fields.size());
-    Constant* fieldsArr = nullptr;
-    Constant* hashesArr = nullptr;
-    if (fields.empty()) {
-        fieldsArr = cg.null();
-        hashesArr = cg.null();
-    } else {
-        const auto fieldsName = objName + "_fields";
-        const auto hashesArrType = ArrayType::get(cg.i64Ty(), fields.size());
-        const auto hashesName = objName + "_hashes";
-        if (cg.isRTTModule) {
-            const auto args = ConstantArray::get(fieldsArrType, fieldRTTs);
-            const auto hashes = ConstantArray::get(hashesArrType, fieldNameHashes);
-            fieldsArr = cg.createGlobal(fieldsName, fieldsArrType, args);
-            hashesArr = cg.createGlobal(hashesName, hashesArrType, hashes);
-        } else {
-            fieldsArr = cg.createGlobal(fieldsName, fieldsArrType, nullptr);
-            hashesArr = cg.createGlobal(hashesName, hashesArrType, nullptr);
-        }
-    }
-    const auto sv = cg.getRTTStruct({cg.sizeTy(), cg.ptrTy(), cg.ptrTy()}, objName, {cg.usize(fields.size()), hashesArr, fieldsArr});
+    std::vector<LgsOwner*> fieldsAsOwners;
+    for (const auto field : fields) fieldsAsOwners.push_back(field);
+    const auto [typesArr, hashesArr] = getRTTypesAndHashes(cg, name, fieldsAsOwners);
+    // fieldsCount, fieldHashes, fieldTypes
+    const auto sv = cg.getRTTStruct({cg.sizeTy(), cg.ptrTy(), cg.ptrTy()}, objName, {cg.usize(fields.size()), hashesArr, typesArr});
     return cg.getRTTypeInfo(objName, sizeBytes(), RTT_OBJECT, sv);
 }
 
