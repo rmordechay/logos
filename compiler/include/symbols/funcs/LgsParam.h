@@ -7,6 +7,11 @@ class LgsVariable;
 class LgsExpr;
 class LgsType;
 
+class LgsOwner {
+    virtual void getOwner();
+    virtual ~LgsOwner() = default;
+};
+
 class LgsParam final : public LgsValue {
 public:
     std::string name;
@@ -14,6 +19,7 @@ public:
     LgsType* type = nullptr;
     LgsExpr* expr = nullptr;
     bool isSelf = false;
+    bool isOwner = true;
     bool isVariadic = false;
 
     explicit LgsParam(LgsType* type, const std::string& name = "", LgsExpr* expr = nullptr) : name(name), type(type), expr(expr) {}

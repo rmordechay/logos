@@ -168,19 +168,24 @@ llvm::AllocaInst* LgsCgModule::getEmptyBuffer() {
 }
 
 Constant* LgsCgModule::getRTTypeInfo(const std::string& name, const size_t size, const Lgs_TypeKind kind, Constant* extra) {
-    const auto typeInfo = getRTBaseType();
-    if (extra && !extra->getType()->isPointerTy()) {
-        const auto st = llvm::cast<StructType>(extra->getType());
-        st->setName(LGS_TYPEINFO_PREFIX + name);
-    }
+    const auto typeInfo = getRTTBaseStruct();
+    const auto prefixedName = LGS_TYPEINFO_PREFIX + name;
     if (isRTTModule) {
-        const auto v = llvm::ConstantStruct::get(typeInfo, {usize(size), usize(kind), extra});
-        return createGlobal(LGS_TYPEINFO_PREFIX + name, typeInfo, v);
+        return createGlobal(prefixedName, typeInfo, llvm::ConstantStruct::get(typeInfo, {usize(size), usize(kind), extra}));
     }
-    return createGlobal(LGS_TYPEINFO_PREFIX + name, typeInfo, nullptr);
+    return createGlobal(prefixedName, typeInfo, nullptr);
 }
 
-StructType* LgsCgModule::getRTBaseType() {
+Constant* LgsCgModule::getRTTStruct(const std::vector<Type*>& fields, const std::string& name, const std::vector<Constant*>& args) {
+    const auto structName = LGS_TYPEINFO_PREFIX + name;
+    auto st = StructType::getTypeByName(context, structName);
+    if (!st) {
+        st = StructType::create(context, fields, structName);
+    }
+    return llvm::ConstantStruct::get(st, args);
+}
+
+StructType* LgsCgModule::getRTTBaseStruct() {
     const auto typeInfoMatrix = getStructType({sizeTy(), sizeTy(), ptrTy()}, LGS_TYPEINFO_PREFIX"Matrix"); // Biggest
     return getStructType({sizeTy(), i32Ty(), typeInfoMatrix}, "RTI"); // size, kind, type
 }
@@ -243,6 +248,7 @@ Function* LgsCgModule::getFunc(const std::string& funcName, FunctionType* ft, co
 
 Value* LgsCgModule::callFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes, const std::vector<Value*>& args, const bool isVariadic) {
     const auto func = IRModule->getOrInsertFunction(funcName, FunctionType::get(rt, paramTypes, isVariadic));
+    if (!isVariadic) assert(args.size() == paramTypes.size());
     return builder.CreateCall(func, args);
 }
 

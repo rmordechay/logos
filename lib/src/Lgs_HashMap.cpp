@@ -75,7 +75,7 @@ extern "C" Lgs_DArrayExpr* Lgs_Map_keys(const Lgs_HashMap* map) {
     Lgs_DArray_init(arr, map->mapType.keyType);
     for (const auto& [k, v] : *map->data) {
         const auto keyStr = strdup(k.c_str());
-        Lgs_DArray_add(arr, keyStr);
+        Lgs_DArray_add(arr, map->mapType.keyType, keyStr);
     }
     return arr;
 }
@@ -85,7 +85,7 @@ extern "C" Lgs_DArrayExpr* Lgs_Map_values(const Lgs_HashMap* map) {
     const auto arr = new Lgs_DArrayExpr();
     Lgs_DArray_init(arr, map->mapType.valueType);
     for (const auto& [k, v] : *map->data) {
-        Lgs_DArray_add(arr, v.data());
+        Lgs_DArray_add(arr, map->mapType.valueType, v.data());
     }
     return arr;
 }

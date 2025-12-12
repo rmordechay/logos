@@ -70,10 +70,13 @@ Constant* LgsObject::getRTType(LgsCgModule& cg) {
     }
 
     const auto genericName = getName();
-    const auto fieldsArrType = ArrayType::get(cg.getRTBaseType(), fields.size());
-    Constant* fieldsArr = cg.null();
-    Constant* hashesArr = cg.null();
-    if (!fields.empty()) {
+    const auto fieldsArrType = ArrayType::get(cg.getRTTBaseStruct(), fields.size());
+    Constant* fieldsArr = nullptr;
+    Constant* hashesArr = nullptr;
+    if (fields.empty()) {
+        fieldsArr = cg.null();
+        hashesArr = cg.null();
+    } else {
         const auto fieldsName = genericName + "_fields";
         const auto hashesArrType = ArrayType::get(cg.i64Ty(), fields.size());
         const auto hashesName = genericName + "_hashes";
@@ -87,8 +90,7 @@ Constant* LgsObject::getRTType(LgsCgModule& cg) {
             hashesArr = cg.createGlobal(hashesName, hashesArrType, nullptr);
         }
     }
-    const auto st = cg.getStructType({cg.sizeTy(), cg.ptrTy(), cg.ptrTy()}, genericName);
-    const auto sv = ConstantStruct::get(st, {cg.usize(fields.size()), hashesArr, fieldsArr});
+    const auto sv = cg.getRTTStruct({cg.sizeTy(), cg.ptrTy(), cg.ptrTy()}, genericName, {cg.usize(fields.size()), hashesArr, fieldsArr});
     return cg.getRTTypeInfo(genericName, sizeBytes(), RTT_OBJECT, sv);
 }
 

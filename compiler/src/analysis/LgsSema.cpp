@@ -854,6 +854,9 @@ void LgsSema::visitVariable(LgsVariable* variable) {
     case PARAM: {
         variable->ref.param = symbol->param;
         variable->setType(symbol->param->type);
+        if (symbol->param->isOwner) {
+            variable->owner = symbol->param;
+        }
         break;
     }
     case ENUM: {

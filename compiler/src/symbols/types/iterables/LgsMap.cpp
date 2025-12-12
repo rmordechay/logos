@@ -17,8 +17,7 @@ Type* LgsMap::getIRType(LgsCgModule& cg) {
 
 Constant* LgsMap::getRTType(LgsCgModule& cg) {
     const auto genericName = getName();
-    const auto st = cg.getStructType({cg.ptrTy(), cg.ptrTy()}, genericName);
-    const auto sv = ConstantStruct::get(st, {mapType->key->getRTType(cg), mapType->value->getRTType(cg)});
+    const auto sv = cg.getRTTStruct({cg.ptrTy(), cg.ptrTy()}, genericName, {mapType->key->getRTType(cg), mapType->value->getRTType(cg)});
     return cg.getRTTypeInfo(genericName, sizeBytes(), RTT_MAP, sv);
 }
 

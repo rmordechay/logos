@@ -11,7 +11,7 @@ struct Lgs_StackFrame {
 };
 
 struct Lgs_Runtime {
-    uint16_t stackLevel = 0;
+    int16_t stackLevel = -1;
     Lgs_Allocator allocator;
     LgsErrHandler errHandler;
     std::vector<Lgs_ThunkFunc> coros;

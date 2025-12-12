@@ -10,14 +10,16 @@ class LgsDArray final : public LgsIterable {
 public:
     static constexpr auto name = "DArray";
     LgsFunc* addFunc = new LgsFunc(ADD_FUNC_NAME, name, &LGS_VOID, {this, nullptr}, BUILTIN | PUBLIC | METHOD);
-    LgsFunc* reserveFunc = new LgsFunc(RESERVE_FUNC_NAME, name, &LGS_VOID, {this, &LGS_SIZE}, BUILTIN | PUBLIC | METHOD);
 
     explicit LgsDArray(LgsType* baseType = nullptr) : LgsIterable(baseType) {
         passByRef = true;
         isHeapAlloc = true;
+        addFunc->fn = [this](LgsCgModule& cg, const std::vector<LgsFuncArg>& args) {
+            const auto arr = args[0].expr->IRValue;
+            const auto arg = args[1].expr->IRValue;
+            return cg.callLgsFunc(std::string(name) + "_add", cg.voidTy(), {cg.ptrTy(), cg.ptrTy(), cg.ptrTy()}, {arr, getRTType(cg), arg});
+        };
         addMethod(addFunc);
-        addMethod(reserveFunc);
-        addFunc->fn = addFuncImpl;
     }
     bool inferBaseType(const std::vector<LgsExpr*>& args) override;
     Type* getIRType(LgsCgModule& cg) override;
@@ -33,6 +35,5 @@ public:
     Value* getIRElement(LgsCgModule& cg, Value* iterable, Value* index) override;
     bool canCastTo(LgsType* other) override;
     DIType* getDebugType(LgsCgModule& cg) override;
-    static Value* addFuncImpl(LgsCgModule& cg, const std::vector<LgsFuncArg>& args);
     ~LgsDArray() override;
 };

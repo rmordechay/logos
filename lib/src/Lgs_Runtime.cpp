@@ -18,13 +18,12 @@ extern "C" void Lgs_Runtime_push() {
 }
 
 extern "C" void Lgs_Runtime_pop() {
-    auto& stack = runtime.stack;
-    auto& top = stack.back();
+    auto& top = runtime.stack[runtime.stackLevel];
     for (auto [func, ctx] : top.defers) {
         func(ctx);
     }
     if (!top.orphans.empty()) {
-        std::println("Freeing orphans in {}:", stack.size());
+        std::println("Freeing orphans in {}:", runtime.stackLevel);
         for (const auto [ptr, type] : top.orphans) {
             std::println("\t* {}", ptr);
             freeValue(ptr, type);
@@ -34,7 +33,7 @@ extern "C" void Lgs_Runtime_pop() {
 }
 
 extern "C" void Lgs_Runtime_addDefer(const ThunkFunc funcPtr, void* ctx) {
-    runtime.stack.back().defers.emplace_back(Lgs_ThunkFunc{funcPtr, ctx});
+    runtime.stack[runtime.stackLevel].defers.emplace_back(Lgs_ThunkFunc{funcPtr, ctx});
 }
 
 extern "C" void Lgs_Runtime_addCoro(const ThunkFunc funcPtr, void* ctx) {
@@ -43,28 +42,28 @@ extern "C" void Lgs_Runtime_addCoro(const ThunkFunc funcPtr, void* ctx) {
 
 extern "C" void* Lgs_Runtime_allocateOwner(const size_t size, Lgs_TypeInfo* type) {
     const auto ptr = std::malloc(size);
-    std::println("Allocated owner in {}: {}B {}", runtime.stack.size(), size, ptr);
-    runtime.stack.back().owners[ptr] = type;
+    std::println("Allocated owner in {}: {}B {}", runtime.stackLevel, size, ptr);
+    runtime.stack[runtime.stackLevel].owners[ptr] = type;
     return ptr;
 }
 
 extern "C" void* Lgs_Runtime_allocateOrphan(const size_t size, Lgs_TypeInfo* type) {
     const auto ptr = std::malloc(size);
-    std::println("Allocated orphan in {}: {}B {}", runtime.stack.size(), size, ptr);
-    runtime.stack.back().orphans[ptr] = type;
+    std::println("Allocated orphan in {}: {}B {}", runtime.stackLevel, size, ptr);
+    runtime.stack[runtime.stackLevel].orphans[ptr] = type;
     return ptr;
 }
 
 extern "C" void* Lgs_Runtime_allocateReturn(const size_t size, Lgs_TypeInfo* type) {
     const auto ptr = std::malloc(size);
-    std::println("Allocated return in {}: {}B {}", runtime.stack.size(), size, ptr);
+    std::println("Allocated return in {}: {}B {}", runtime.stackLevel, size, ptr);
     // This is safe because the func should never be called from the main frame
     runtime.stack[runtime.stack.size() - 2].orphans[ptr] = type;
     return ptr;
 }
 
 extern "C" void Lgs_Runtime_removeOwner(void* owner) {
-    runtime.stack.back().owners.erase(owner);
+    runtime.stack[runtime.stackLevel].owners.erase(owner);
 }
 
 extern "C" void Lgs_Runtime_yield() {
@@ -92,10 +91,14 @@ extern "C" void Lgs_Runtime_throwError(const size_t count, const char* msg, ...)
 
 static void freeValue(void* ptr, const Lgs_TypeInfo* type) {
     switch (type->kind) {
-    case RTT_STR: break;
     case RTT_DARRAY: {
         const auto darray = static_cast<Lgs_DArrayExpr*>(ptr);
-        std::free(darray->data);
+        auto offset = 0;
+        for (int i = 0; i < darray->length; ++i) {
+            const auto element = darray->data + offset;
+            freeValue(element, type->dArray.baseType);
+            offset += type->dArray.baseType->size;
+        }
         std::free(ptr);
         break;
     }
@@ -118,8 +121,13 @@ static void freeValue(void* ptr, const Lgs_TypeInfo* type) {
         std::free(ptr);
         break;
     }
+    case RTT_STR:
+        break;
+    case RTT_NULLABLE: {
+        freeValue(ptr, type->nullable.baseType);
+        break;
+    }
     case RTT_SARRAY:
-    case RTT_NULLABLE:
     case RTT_MAP: {
         assert(0);
     }

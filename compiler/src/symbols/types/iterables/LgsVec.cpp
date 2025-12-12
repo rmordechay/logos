@@ -32,8 +32,7 @@ Type* LgsVec::getIRType(LgsCgModule& cg) {
 
 Constant* LgsVec::getRTType(LgsCgModule& cg) {
     const auto genericName = getName();
-    const auto st = cg.getStructType({cg.ptrTy()}, genericName);
-    const auto sv = ConstantStruct::get(st, {baseType->getRTType(cg)});
+    const auto sv = cg.getRTTStruct({cg.ptrTy()}, genericName, {baseType->getRTType(cg)});
     if (vectorDim == 2) {
         return cg.getRTTypeInfo(genericName, sizeBytes(), RTT_VEC2, sv);
     }

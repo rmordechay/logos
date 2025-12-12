@@ -824,11 +824,13 @@ void LgsCodeGen::visitStaticArray(LgsArrayExpr* arrayExpr) const {
 
 void LgsCodeGen::visitDynamicArray(LgsArrayExpr* arrayExpr) const {
     const auto dArr = arrayExpr->type->asDArray();
+    const auto rtType = dArr->getRTType(cg);
     if (!arrayExpr->IRValue) {
-        arrayExpr->IRValue = cg.allocate(cg.usize(dArr->sizeBytes()), dArr->getRTType(cg), !!arrayExpr->owner);
+        const auto size = cg.usize(dArr->sizeBytes());
+        arrayExpr->IRValue = cg.allocate(size, rtType, !!arrayExpr->owner);
     }
     cg.callLgsFunc("DArray_init", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {
-        arrayExpr->IRValue, dArr->getRTType(cg)
+        arrayExpr->IRValue, rtType
     });
     for (size_t i = 0; i < arrayExpr->elements.size(); ++i) {
         const auto element = arrayExpr->elements[i];

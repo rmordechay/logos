@@ -73,10 +73,11 @@ public:
     Value* getPtrTo(Value* v);
     GlobalVariable* createGlobal(const std::string& name, Type* type, Constant* initializer, bool isConst = false, GlobalValue::LinkageTypes linkage = GlobalValue::ExternalLinkage) const;
     StructType* getStructType(const std::vector<Type*>& fields, const std::string& name = "");
+    Constant* getRTTStruct(const std::vector<Type*>& fields, const std::string& name, const std::vector<Constant*>& args);
     void setStructField(Type* type, Value* instancePtr, size_t position, Value* v);
     llvm::AllocaInst* getEmptyBuffer();
     Constant* getRTTypeInfo(const std::string& name, size_t size, Lgs_TypeKind kind, Constant* extra);
-    StructType* getRTBaseType();
+    StructType* getRTTBaseStruct();
 
     // Blocks
     BasicBlock* createBlock(const std::string& name = "", Function* parent = nullptr);
