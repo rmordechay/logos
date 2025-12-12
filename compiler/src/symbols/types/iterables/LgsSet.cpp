@@ -14,9 +14,9 @@ Type* LgsSet::getIRType(LgsCgModule& cg) {
 }
 
 Constant* LgsSet::getRTType(LgsCgModule& cg) {
-    const auto genericName = getName();
-    const auto sv = cg.getRTTStruct({cg.ptrTy()}, genericName, {baseType->getRTType(cg)});
-    return cg.getRTTypeInfo(genericName, sizeBytes(), RTT_SET, sv);
+    const auto setName = getName();
+    const auto sv = cg.getRTTStruct({cg.ptrTy()}, setName, {baseType->getRTType(cg)});
+    return cg.getRTTypeInfo(setName, sizeBytes(), RTT_SET, sv);
 }
 
 size_t LgsSet::sizeBytes() {

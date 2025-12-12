@@ -52,6 +52,12 @@ struct Lgs_DArray {
     Lgs_TypeInfo* baseType;
 };
 
+struct Lgs_FuncType {
+    size_t paramsCount;
+    Lgs_TypeInfo** params;
+    Lgs_TypeInfo* rt;
+};
+
 struct Lgs_Map {
     Lgs_TypeInfo* keyType;
     Lgs_TypeInfo* valueType;

@@ -23,7 +23,7 @@ Type* LgsFuncType::getIRType(LgsCgModule& cg) {
 }
 
 Constant* LgsFuncType::getRTType(LgsCgModule& cg) {
-    assert(0);
+    const auto funcName = getName();
 }
 
 LgsExpr* LgsFuncType::getZeroValue() {

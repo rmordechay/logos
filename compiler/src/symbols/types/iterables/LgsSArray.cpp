@@ -41,14 +41,14 @@ LgsExpr* LgsSArray::getZeroValue() {
 }
 
 Constant* LgsSArray::getRTType(LgsCgModule& cg) {
-    const auto genericName = getName();
+    const auto sArrName = getName();
     const auto constSize = size->getConstInt();
     auto size = 0;
     if (constSize.has_value()) {
         size = constSize.value();
     }
-    const auto sv = cg.getRTTStruct({cg.sizeTy(), cg.ptrTy()}, genericName, {cg.usize(size), baseType->getRTType(cg)});
-    return cg.getRTTypeInfo(genericName, size, RTT_SARRAY, sv);
+    const auto sv = cg.getRTTStruct({cg.sizeTy(), cg.ptrTy()}, sArrName, {cg.usize(size), baseType->getRTType(cg)});
+    return cg.getRTTypeInfo(sArrName, size, RTT_SARRAY, sv);
 }
 
 std::string LgsSArray::fmtStr() const {

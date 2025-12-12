@@ -28,9 +28,9 @@ Type* LgsDArray::getIRType(LgsCgModule& cg) {
 }
 
 Constant* LgsDArray::getRTType(LgsCgModule& cg) {
-    const auto genericName = getName();
-    const auto sv = cg.getRTTStruct({cg.ptrTy()}, genericName, {baseType->getRTType(cg)});
-    return cg.getRTTypeInfo(genericName, sizeBytes(), RTT_DARRAY, sv);
+    const auto dArrName = getName();
+    const auto sv = cg.getRTTStruct({cg.ptrTy()}, dArrName, {baseType->getRTType(cg)});
+    return cg.getRTTypeInfo(dArrName, sizeBytes(), RTT_DARRAY, sv);
 }
 
 std::string LgsDArray::getName() {

@@ -33,10 +33,10 @@ Type* LgsNullable::getIRType(LgsCgModule& cg) {
 }
 
 Constant* LgsNullable::getRTType(LgsCgModule& cg) {
-    const auto genericName = getName();
+    const auto nullableName = getName();
     if (!baseType) return cg.getRTTypeInfo(name, 0, RTT_ANY, cg.null());
-    const auto sv = cg.getRTTStruct({cg.ptrTy(), cg.i1Ty()}, genericName, {baseType->getRTType(cg), cg.i1(passByRef)});
-    return cg.getRTTypeInfo(genericName, sizeBytes(), RTT_NULLABLE, sv);
+    const auto sv = cg.getRTTStruct({cg.ptrTy(), cg.i1Ty()}, nullableName, {baseType->getRTType(cg), cg.i1(passByRef)});
+    return cg.getRTTypeInfo(nullableName, sizeBytes(), RTT_NULLABLE, sv);
 }
 
 bool LgsNullable::canCastTo(LgsType* other) {

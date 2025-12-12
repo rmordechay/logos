@@ -106,9 +106,9 @@ LgsType* LgsMatrix::getValueType() {
 }
 
 Constant* LgsMatrix::getRTType(LgsCgModule& cg) {
-    const auto genericName = getName();
-    const auto sv = cg.getRTTStruct({cg.sizeTy(), cg.sizeTy(), cg.ptrTy()}, genericName, {cg.usize(rows), cg.usize(columns), baseType->getRTType(cg)});
-    return cg.getRTTypeInfo(genericName, sizeBytes(), RTT_MATRIX, sv);
+    const auto matName = getName();
+    const auto sv = cg.getRTTStruct({cg.sizeTy(), cg.sizeTy(), cg.ptrTy()}, matName, {cg.usize(rows), cg.usize(columns), baseType->getRTType(cg)});
+    return cg.getRTTypeInfo(matName, sizeBytes(), RTT_MATRIX, sv);
 }
 
 std::string LgsMatrix::getName() {
