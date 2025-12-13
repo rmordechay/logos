@@ -1,4 +1,6 @@
 #include "funcs/LgsFunc.h"
+
+#include "LgsDefinitions.h"
 #include "stmts/LgsStmtsBlock.h"
 #include "exprs/LgsExpr.h"
 #include "exprs/LgsFuncCall.h"
@@ -6,6 +8,8 @@
 #include "types/primitives/LgsVoid.h"
 #include "LgsUtils.h"
 #include "codegen/LgsCgModule.h"
+
+#include <sstream>
 #include <llvm/IR/Module.h>
 
 struct LgsFuncArg;
@@ -44,7 +48,6 @@ void LgsFunc::initFunc(const std::string& name, LgsType* rt, const std::vector<L
 }
 
 Value* LgsFunc::call(LgsCgModule& cg, std::vector<LgsFuncArg>& args) {
-    if (fn) return fn(cg, args);
     if (args.empty()) return callIR(cg, {});
     std::vector<Value*> IRArgs;
     if (funcType->isVariadic) return callWithVariadic(cg, args);
@@ -99,6 +102,7 @@ Value* LgsFunc::callWithVariadic(LgsCgModule& cg, const std::vector<LgsFuncArg>&
 }
 
 Value* LgsFunc::callIR(LgsCgModule& cg, const std::vector<Value*>& args) {
+    if (fn) return fn(cg, args);
     CallInst* rv = nullptr;
     if (IRValue) {
         const auto funcTypeIR = funcType->getIRType(cg);
@@ -118,6 +122,9 @@ Value* LgsFunc::loadIR(LgsCgModule& cg) {
 void LgsFunc::castImplicitly(LgsType* toType) {
     const auto otherFuncType = toType->asFuncType();
     if (!otherFuncType) return;
+    if (isLambda && funcType->params.empty() && otherFuncType->params.size() == 1) {
+        funcType->params.emplace_back(otherFuncType->params.front().type, LGS_LAMBDA_IT_PARAM);
+    }
     for (size_t i = 0; i < funcType->params.size(); ++i) {
         if (funcType->params[i].type) continue;
         funcType->params[i].setType(otherFuncType->params[i].type);
@@ -125,6 +132,16 @@ void LgsFunc::castImplicitly(LgsType* toType) {
     if (!funcType->rt) {
         funcType->rt = otherFuncType->rt;
     }
+}
+
+std::string LgsFunc::getGenericName() const {
+    std::stringstream str;
+    str << "u_" << funcType->name;
+    for (size_t i = funcType->isMethod; i < funcType->params.size(); ++i) {
+        const auto& param = funcType->params[i];
+        str << '_' << param.type->getName();
+    }
+    return str.str();
 }
 
 std::string LgsFunc::asText() {

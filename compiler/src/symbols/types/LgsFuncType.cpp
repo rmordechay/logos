@@ -31,7 +31,7 @@ Constant* LgsFuncType::getRTType(LgsCgModule& cg) {
     const auto sv = cg.getRTTExtraStruct(funcName, {cg.sizeTy(), cg.ptrTy(), cg.ptrTy(), cg.ptrTy()}, {
         cg.usize(params.size()), hashesArr, typesArr, rt->getRTType(cg)
     });
-    return cg.getRTTypeInfo(funcName, sizeBytes(), RTT_FUNC, cg.i1(isHeapAlloc), sv);
+    return cg.getRTTypeInfo(funcName, sizeBytes(), RTT_FUNC, isHeapAlloc, sv);
 }
 
 LgsExpr* LgsFuncType::getZeroValue() {
@@ -129,7 +129,6 @@ void LgsFuncType::setFuncOptions(const uint32_t ops) {
     isIOMember =  ops & IO_MEMBER;
     isSyscall =  ops & SYSCALL;
     isExternal =  ops & EXTERNAL;
-    isArrFunc =  ops & ARR_FUNC;
     hasDefaults =  ops & HAS_DEFAULTS;
 }
 

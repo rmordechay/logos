@@ -50,6 +50,7 @@ public:
     bool loadConfigs();
     bool loadDeps() const;
     void loadBuiltins();
+    bool resolveGlobals();
     bool generateRTTTypes();
     void createBuildDirs();
     bool validateEnvs();

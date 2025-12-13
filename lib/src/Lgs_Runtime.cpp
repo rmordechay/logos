@@ -26,6 +26,7 @@ extern "C" void Lgs_Runtime_pop() {
         for (const auto [ptr, type] : top.orphans) {
             Lgs_Runtime_freeValue(ptr, type);
         }
+        top.orphans.clear();
     }
     runtime.stackLevel--;
 }
@@ -88,10 +89,10 @@ extern "C" void Lgs_Runtime_throwError(const size_t count, const char* msg, ...)
 }
 
 extern "C" void Lgs_Runtime_freeValue(void* ptr, const Lgs_TypeInfo* type) {
-    if (!ptr) return;
+    if (!ptr || !type->isHeap) return;
+    std::println("Freeing in {}: {}", runtime.stackLevel, ptr);
     switch (type->kind) {
     case RTT_DARRAY: {
-        std::println("Freeing darray in {}: {}", runtime.stackLevel, ptr);
         const auto darray = static_cast<Lgs_DArrayExpr*>(ptr);
         auto offset = 0;
         for (int i = 0; i < darray->length; ++i) {
@@ -103,14 +104,12 @@ extern "C" void Lgs_Runtime_freeValue(void* ptr, const Lgs_TypeInfo* type) {
         break;
     }
     case RTT_SET: {
-        std::println("Freeing set in {}: {}", runtime.stackLevel, ptr);
         const auto set = static_cast<Lgs_SetExpr*>(ptr);
         //std::free(set->data);
         //std::free(ptr);
         break;
     }
     case RTT_OBJECT: {
-        std::println("Freeing object in {}: {}", runtime.stackLevel, ptr);
         const auto fieldsCount = type->obj.fieldsCount;
         const auto fieldTypes = type->obj.fieldTypes;
         size_t offset = 0;
@@ -126,7 +125,6 @@ extern "C" void Lgs_Runtime_freeValue(void* ptr, const Lgs_TypeInfo* type) {
     case RTT_STR:
         break;
     case RTT_NULLABLE: {
-        std::println("Freeing nullable in {}: {}", runtime.stackLevel, ptr);
         Lgs_Runtime_freeValue(ptr, type->nullable.baseType);
         break;
     }

@@ -28,7 +28,7 @@ Type* LgsDouble::getIRType(LgsCgModule& cg) {
 }
 
 Constant* LgsDouble::getRTType(LgsCgModule& cg) {
-    return cg.getRTTypeInfo(getName(), sizeBytes(), RTT_DOUBLE, cg.i1(isHeapAlloc), cg.null());
+    return cg.getRTTypeInfo(getName(), sizeBytes(), RTT_DOUBLE, isHeapAlloc, cg.null());
 }
 
 bool LgsDouble::canCastTo(LgsType* other) {

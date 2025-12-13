@@ -18,26 +18,6 @@ public:
     LgsFunc* coresNumFunc = new LgsFunc{"coresNumber", &LGS_LONG, PUBLIC | BUILTIN | SYSCALL};
 
     explicit LgsSystem() : LgsObject(name) {
-        sleepFunc->fn = [](LgsCgModule& cg, const std::vector<LgsFuncArg>& args) {
-            return cg.callLgsFunc("System_sleep", cg.i32Ty(), {cg.i32Ty()}, {args.front().expr->IRValue});
-        };
-        pidFunc->fn = [](LgsCgModule& cg, const std::vector<LgsFuncArg>& args) {
-            return nullptr;
-        };
-        cwdFunc->fn = [](LgsCgModule& cg, const std::vector<LgsFuncArg>&) {
-            const auto value = cg.builder.CreateAlloca(ArrayType::get(cg.i8Ty(), STRING_BUFFER_SIZE));
-            // TODO os
-            cg.callFunc("getcwd", cg.ptrTy(), {cg.ptrTy(), cg.sizeTy()}, {value, cg.usize(STRING_BUFFER_SIZE)});
-            return value;
-        };
-        coresNumFunc->fn = [](LgsCgModule& cg, const std::vector<LgsFuncArg>&) {
-            // TODO os?
-            return cg.callFunc("sysconf", cg.i64Ty(), {cg.i32Ty()}, {cg.i32(58)});
-        };
-        getEnvFunc->fn = [](LgsCgModule& cg, const std::vector<LgsFuncArg>& args) {
-            const auto fallback = args.size() == 2 ? args.back().expr->IRValue : cg.null();
-            return cg.callLgsFunc("System_getEnv", cg.ptrTy(), {cg.ptrTy(), cg.ptrTy()}, {args.front().expr->IRValue, fallback});
-        };
         addMethod(pidFunc);
         addMethod(sleepFunc);
         addMethod(exitFunc);

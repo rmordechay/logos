@@ -48,7 +48,7 @@ Constant* LgsSArray::getRTType(LgsCgModule& cg) {
         size = constSize.value();
     }
     const auto sv = cg.getRTTExtraStruct(sArrName, {cg.sizeTy(), cg.ptrTy()}, {cg.usize(size), baseType->getRTType(cg)});
-    return cg.getRTTypeInfo(sArrName, size, RTT_SARRAY, cg.i1(isHeapAlloc), sv);
+    return cg.getRTTypeInfo(sArrName, size, RTT_SARRAY, isHeapAlloc, sv);
 }
 
 std::string LgsSArray::fmtStr() const {

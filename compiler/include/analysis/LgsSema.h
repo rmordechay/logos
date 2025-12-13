@@ -7,6 +7,7 @@
 #include "logos/LgsAppConfigs.h"
 #include <unordered_map>
 
+class LgsMainFunc;
 class LgsMetaSelection;
 class LgsAppConfigFile;
 class LgsTernaryExpr;
@@ -66,7 +67,7 @@ public:
     std::unordered_map<std::string, size_t> refCount;
 
     explicit LgsSema(LgsAppConfigs& appConfigs, LgsFile* file, LgsGlobals& globals)
-        : file(file), appConfigs(appConfigs), globals(globals), typeResolver(errHandler, globals) {}
+        : file(file), appConfigs(appConfigs), globals(globals), typeResolver(file, errHandler, globals) {}
 
     void analyse();
     void visitMainFile(LgsMainFile* mainFile);
@@ -149,5 +150,6 @@ public:
     LgsSymbol* getSymbol(const std::string& name);
     void createCoroutineFunc(LgsFuncCall* funcCall);
     void addError(const LgsBaseMsg& lgsErr, const LgsLocation& location, const std::vector<std::string>& args = {});
+    void addErrorIfSuccessful(const LgsBaseMsg& lgsErr, const LgsLocation& location, const std::vector<std::string>& args);
     void addRTType(LgsType* type) const;
 };

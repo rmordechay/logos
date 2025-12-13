@@ -145,6 +145,7 @@ public:
 
     void createMapFunc(LgsFunc* func);
     void createFilterFunc(LgsFunc* func);
+    void createForeachFunc(LgsFunc* func) const;
 
     bool checkMock(LgsExpr* expr) const;
     Value* getIRValue(LgsValue* value);

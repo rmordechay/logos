@@ -2,6 +2,7 @@
 #include "LgsAny.h"
 #include "LgsFuncType.h"
 #include "exprs/LgsFuncCall.h"
+#include "funcs/LgsFunc.h"
 #include "iterables/LgsStr.h"
 #include <utility>
 
@@ -28,9 +29,9 @@ public:
     explicit LgsObject(std::string  name) : name(std::move(name)) {
         passByRef = true;
         isHeapAlloc = true;
-        getFieldFunc->fn = [this](LgsCgModule& cg, const std::vector<LgsFuncArg>& args) {
+        getFieldFunc->fn = [this](LgsCgModule& cg, const std::vector<Value*>& args) {
             return cg.callLgsFunc("getObjectField", cg.ptrTy(), {cg.ptrTy(), cg.ptrTy(), cg.ptrTy()}, {
-                getRTType(cg), args[0].expr->IRValue, args[1].expr->IRValue
+                getRTType(cg), args[0], args[1]
             });
         };
         metaMethods[getFieldFunc->funcType->name] = getFieldFunc;

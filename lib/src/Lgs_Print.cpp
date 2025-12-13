@@ -24,8 +24,8 @@ static std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
     case RTT_DOUBLE: str << *static_cast<double*>(elem); break;
     case RTT_TYPE:
     case RTT_ENUM:
-    case RTT_STR: str << static_cast<const char*>(elem); break;
-    case RTT_CHAR: str << *static_cast<const char*>(elem); break;
+    case RTT_STR: str << '"' << static_cast<const char*>(elem) << '"'; break;
+    case RTT_CHAR: str << '"' << *static_cast<const char*>(elem) << '"'; break;
     case RTT_SET:
     case RTT_DARRAY: {
         const auto dArrExpr = static_cast<Lgs_DArrayExpr*>(elem);

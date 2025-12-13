@@ -18,7 +18,7 @@ Type* LgsMap::getIRType(LgsCgModule& cg) {
 Constant* LgsMap::getRTType(LgsCgModule& cg) {
     const auto mapName = getName();
     const auto sv = cg.getRTTExtraStruct(mapName, {cg.ptrTy(), cg.ptrTy()}, {mapType->key->getRTType(cg), mapType->value->getRTType(cg)});
-    return cg.getRTTypeInfo(mapName, sizeBytes(), RTT_MAP, cg.i1(isHeapAlloc), sv);
+    return cg.getRTTypeInfo(mapName, sizeBytes(), RTT_MAP, isHeapAlloc, sv);
 }
 
 std::string LgsMap::getName() {

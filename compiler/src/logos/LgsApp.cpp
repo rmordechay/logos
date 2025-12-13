@@ -15,6 +15,9 @@
 #include "LgsUtils.h"
 #include "errors/LgsErrors.h"
 #include "files/LgsAppConfigFile.h"
+#include "files/LgsInterfaceFile.h"
+#include "files/LgsMainFile.h"
+#include "files/LgsObjectFile.h"
 #include "types/iterables/LgsVec.h"
 #include "types/primitives/LgsByte.h"
 #include "types/primitives/LgsDouble.h"
@@ -140,10 +143,7 @@ bool LgsApp::parseHeaders() {
 bool LgsApp::analyse() {
     loadBuiltins();
     if (!validateEnvs()) return false;
-    LgsTypeResolver typeResolver(errHandler, globals);
-    if (!typeResolver.resolveGlobals(srcFiles, threadPool)) {
-        return false;
-    }
+    if (!resolveGlobals()) return false;
     for (const auto file : srcFiles) {
         threadPool.runTask([this, file] {
             LgsSema sema(configs, file, globals);
@@ -307,6 +307,28 @@ void LgsApp::loadBuiltins() {
         &LGS_STR, &LGS_CHAR, &LGS_BYTE, &LGS_BOOL, &LGS_INT, &LGS_UINT, &LGS_ULONG,
         &LGS_SHORT, &LGS_LONG, &LGS_SIZE, &LGS_FLOAT, &LGS_DOUBLE, &LGS_NULL, &LGS_VOID
     };
+}
+
+bool LgsApp::resolveGlobals() {
+    std::atomic successful = true;
+    for (const auto& file : srcFiles) {
+        threadPool.runTask([&] {
+            LgsTypeResolver typeResolver(file, errHandler, globals);
+            if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
+                typeResolver.resolveMainFile(mainFile);
+            } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
+                typeResolver.resolveObj(objFile->obj);
+            } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
+                typeResolver.resolveInterface(interfaceFile->interface);
+            }
+            if (!errHandler.successful) {
+                successful.store(false, std::memory_order_relaxed);
+            }
+        });
+    }
+    threadPool.wait();
+    errHandler.successful = successful;
+    return successful;
 }
 
 bool LgsApp::generateRTTTypes() {

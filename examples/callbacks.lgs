@@ -7,3 +7,22 @@ main() {
     funcVar4 = (x, y) -> print(x + y)
     funcVar5 = x -> print(x) // only with single param
 }
+
+object Obj {
+    name: Str
+    age: Int
+}
+
+main() {
+    arr = [
+        Obj{name="Avichay", age=88},
+        Obj{name="Yifat", age=12},
+        Obj{name="Adi", age=4},
+    ]
+    callback = (x: Obj): Obj => Obj{name=x.name, age=x.age + 2}
+    callback2 = (x: Obj): Bool => x.age > 10
+    print(arr)
+    arr.map(callback)
+       .filter(callback2)
+       .forEach({print(it)})
+}

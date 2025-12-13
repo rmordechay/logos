@@ -276,3 +276,9 @@ void castExprImplicitly(LgsExpr*& expr, LgsType* toType) {
         expr->type = nullable;
     }
 }
+
+void freeExpr(LgsExpr* expr) {
+    if (!expr) return;
+    expr->setType(nullptr);
+    delete expr;
+}

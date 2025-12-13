@@ -6,7 +6,6 @@
 #include "types/LgsAny.h"
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsLong.h"
-
 #include <llvm/IR/Module.h>
 
 bool LgsDArray::inferBaseType(const std::vector<LgsExpr*>& args) {
@@ -30,7 +29,7 @@ Type* LgsDArray::getIRType(LgsCgModule& cg) {
 Constant* LgsDArray::getRTType(LgsCgModule& cg) {
     const auto dArrName = getName();
     const auto sv = cg.getRTTExtraStruct(dArrName, {cg.ptrTy()}, {baseType->getRTType(cg)});
-    return cg.getRTTypeInfo(dArrName, sizeBytes(), RTT_DARRAY, cg.i1(isHeapAlloc), sv);
+    return cg.getRTTypeInfo(dArrName, sizeBytes(), RTT_DARRAY, isHeapAlloc, sv);
 }
 
 std::string LgsDArray::getName() {
@@ -74,13 +73,11 @@ Value* LgsDArray::lenIR(LgsCgModule& cg, Value* iterable) {
 }
 
 Value* LgsDArray::inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) {
-    return cg.callLgsFunc("DArray_contains", cg.i1Ty(), {cg.ptrTy(), cg.ptrTy(), cg.ptrTy()}, {
-        iterableExpr->IRValue, getRTType(cg), cg.getPtrTo(value->IRValue)
-    });
+    return cg.callLgsFunc("DArray_contains", cg.i1Ty(), {cg.ptrTy(), cg.ptrTy(), cg.ptrTy()}, {iterableExpr->IRValue, getRTType(cg), cg.getPtrTo(value->IRValue)});
 }
 
 Value* LgsDArray::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
-    return cg.callLgsFunc("DArray_get", cg.ptrTy(), {cg.ptrTy(), cg.sizeTy()}, {iterable, index});;
+    return cg.callLgsFunc("DArray_get", cg.ptrTy(), {cg.ptrTy(), cg.ptrTy(), cg.sizeTy()}, {iterable, getRTType(cg), index});
 }
 
 bool LgsDArray::canCastTo(LgsType* other) {
@@ -97,7 +94,19 @@ DIType* LgsDArray::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
 
-LgsDArray::~LgsDArray() {
-    // set null because this is the baseType of the iterable
-    addFunc->funcType->params[1].setType(nullptr);
+CallFn LgsDArray::getAddFn() {
+    return [this](LgsCgModule& cg, const std::vector<Value*>& args) -> Value* {
+        const auto arr = args[0];
+        const auto value = args[1];
+        if (value->getType()->isIntegerTy(LGS_INT.sizeBytes() * 8)) {
+            return cg.callLgsFunc(std::string(name) + "_addInt", cg.voidTy(), {cg.ptrTy(), cg.ptrTy(), cg.i32Ty()}, {arr, getRTType(cg), value});
+        }
+        if (value->getType()->isIntegerTy(LGS_LONG.sizeBytes() * 8)) {
+            return cg.callLgsFunc(std::string(name) + "_addLong", cg.voidTy(), {cg.ptrTy(), cg.ptrTy(), cg.i64Ty()}, {arr, getRTType(cg), value});
+        }
+        if (value->getType()->isIntegerTy(LGS_SIZE.sizeBytes() * 8)) {
+            return cg.callLgsFunc(std::string(name) + "_addSize", cg.voidTy(), {cg.ptrTy(), cg.ptrTy(), cg.sizeTy()}, {arr, getRTType(cg), value});
+        }
+        return cg.callLgsFunc(std::string(name) + "_add", cg.voidTy(), {cg.ptrTy(), cg.ptrTy(), cg.ptrTy()}, {arr, getRTType(cg), value});
+    };
 }

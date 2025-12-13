@@ -13,7 +13,7 @@ Type* LgsLong::getIRType(LgsCgModule& cg) {
 }
 
 Constant* LgsLong::getRTType(LgsCgModule& cg) {
-    return cg.getRTTypeInfo(getName(), sizeBytes(), RTT_LONG, cg.i1(isHeapAlloc), cg.null());
+    return cg.getRTTypeInfo(getName(), sizeBytes(), RTT_LONG, isHeapAlloc, cg.null());
 }
 
 size_t LgsLong::sizeBytes() {

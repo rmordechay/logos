@@ -83,11 +83,7 @@ Value* dotProduct(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
 Value* crossProduct(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
 void castExprImplicitly(LgsExpr*& expr, LgsType* toType);
 
-inline void freeExpr(LgsExpr* expr) {
-    if (!expr) return;
-    expr->setType(nullptr);
-    delete expr;
-}
+void freeExpr(LgsExpr* expr);
 
 template<typename T>
 void freeExprs(std::vector<T*>& exprs) {

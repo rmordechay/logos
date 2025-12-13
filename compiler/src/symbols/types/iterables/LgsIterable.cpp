@@ -5,7 +5,9 @@
 #include "types/primitives/LgsInt.h"
 #include "types/primitives/LgsSize.h"
 #include "LgsUtils.h"
+#include "funcs/LgsFunc.h"
 #include "types/iterables/LgsMap.h"
+#include "types/primitives/LgsBool.h"
 
 size_t LgsIterable::getDimension() const {
     size_t dim = 1;
@@ -20,6 +22,50 @@ size_t LgsIterable::getDimension() const {
         }
     }
     return dim;
+}
+
+LgsFunc* LgsIterable::getMethod(const std::string& methodName) {
+    constexpr auto flags = BUILTIN | PUBLIC | METHOD;
+    if (methodName == LEN_FUNC) {
+        if (methods.contains(LEN_FUNC)) return methods[LEN_FUNC];
+        const auto lenFunc = new LgsFunc(LEN_FUNC, &LGS_SIZE, {this}, flags);
+        addMethod(lenFunc);
+        return lenFunc;
+    }
+    if (methodName == IS_EMPTY_FUNC) {
+        if (methods.contains(IS_EMPTY_FUNC)) return methods[IS_EMPTY_FUNC];
+        const auto isEmptyFunc = new LgsFunc(IS_EMPTY_FUNC, &LGS_BOOL, {this}, flags);
+        addMethod(isEmptyFunc);
+        return isEmptyFunc;
+    }
+    if (methodName == NOT_EMPTY_FUNC) {
+        if (methods.contains(NOT_EMPTY_FUNC)) return methods[NOT_EMPTY_FUNC];
+        const auto isNotEmptyFunc = new LgsFunc(NOT_EMPTY_FUNC, &LGS_BOOL, {this}, flags);
+        addMethod(isNotEmptyFunc);
+        return isNotEmptyFunc;
+    }
+    if (methodName == MAP_FUNC) {
+        if (methods.contains(MAP_FUNC)) return methods[MAP_FUNC];
+        const auto callback = new LgsFuncType(baseType, {LgsParam(baseType)});
+        const auto mapFunc = new LgsFunc(MAP_FUNC, this, {this, callback}, flags);
+        addMethod(mapFunc);
+        return mapFunc;
+    }
+    if (methodName == FILTER_FUNC) {
+        if (methods.contains(FILTER_FUNC)) return methods[FILTER_FUNC];
+        const auto callback = new LgsFuncType(&LGS_BOOL, {LgsParam(baseType)});
+        const auto filterFund = new LgsFunc(FILTER_FUNC, this, {this, callback}, flags);
+        addMethod(filterFund);
+        return filterFund;
+    }
+    if (methodName == FOREACH_FUNC) {
+        if (methods.contains(FOREACH_FUNC)) return methods[FOREACH_FUNC];
+        const auto callback = new LgsFuncType(&LGS_VOID, {LgsParam(baseType)});
+        const auto filterFund = new LgsFunc(FOREACH_FUNC, &LGS_VOID, {this, callback}, flags);
+        addMethod(filterFund);
+        return filterFund;
+    }
+    return LgsType::getMethod(methodName);
 }
 
 LgsType* LgsIterable::getIndexType() {
@@ -50,7 +96,15 @@ void LgsIterable::unpackLoopIR(LgsCgModule& cg, LgsForeachLoop* loop) const {
 LgsIterable::~LgsIterable() {
     freeExpr(size);
     freeType(baseType);
-    mapFunc->funcType->rt = nullptr;
+    for (auto [name, method] : methods) {
+        if (name == MAP_FUNC || name == FILTER_FUNC || name == FOREACH_FUNC) {
+            method->funcType->rt = nullptr;
+            method->funcType->params[0].type = nullptr;
+            const auto& ft = method->funcType->params[1].type->asFuncType();
+            ft->rt = nullptr;
+            ft->params[0].type = nullptr;
+        }
+    }
     size = nullptr;
     baseType = nullptr;
 }

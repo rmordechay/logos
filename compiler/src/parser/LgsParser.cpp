@@ -65,7 +65,7 @@
 #include <unordered_set>
 
 #define MAX_TOKENS_NUMBER 100000
-LgsFunc* wrapStmtsBlockWithFunc(LgsStmtsBlock* stmtsBlock);
+LgsFunc* wrapStmtsBlockWithLambda(LgsStmtsBlock* stmtsBlock);
 
 bool LgsParser::scanTokens() {
     if (code == "") {
@@ -1206,7 +1206,7 @@ LgsCoroutine* LgsParser::parseCoroutine() {
         if (stmtsBlock->isMacro) addParsingError();
         const auto fc = new LgsFuncCall("");
         setLocation(fc->location, &goToken, &currentToken);
-        fc->func = wrapStmtsBlockWithFunc(stmtsBlock);
+        fc->func = wrapStmtsBlockWithLambda(stmtsBlock);
         fc->setType(&LGS_VOID);
         expr = fc;
     } else {
@@ -1236,7 +1236,7 @@ LgsDeferStmt* LgsParser::parseDeferStmt() {
         if (stmtsBlock->isMacro) addParsingError();
         const auto fc = new LgsFuncCall("");
         setLocation(fc->location, &deferToken, &currentToken);
-        fc->func = wrapStmtsBlockWithFunc(stmtsBlock);
+        fc->func = wrapStmtsBlockWithLambda(stmtsBlock);
         fc->setType(&LGS_VOID);
         expr = fc;
     } else {
@@ -1383,14 +1383,14 @@ LgsExpr* LgsParser::parseExprOrLambda() {
     // The order is important. First check for empty block, then expr, then non-empty block.
     if (currentToken.type == T_LBRACE && peek().type == T_RBRACE) {
         consume(2);
-        return wrapStmtsBlockWithFunc(new LgsStmtsBlock());
+        return wrapStmtsBlockWithLambda(new LgsStmtsBlock());
     }
     if (LgsExpr* expr = parseExpr()) {
         return expr;
     }
     if (const auto stmtsBlock = parseStmtsBlock()) {
         if (stmtsBlock->isMacro) addParsingError();
-        return wrapStmtsBlockWithFunc(stmtsBlock);
+        return wrapStmtsBlockWithLambda(stmtsBlock);
     }
     return nullptr;
 }
@@ -1743,6 +1743,7 @@ LgsFunc* LgsParser::parseLambda() {
 
     const auto lambda = new LgsFunc("", rt, params);
     currentFunc = lambda;
+    lambda->isLambda = true;
     lambda->stmtsBlock = parseStmtsBlock();
     mustParse(lambda->stmtsBlock);
     if (lambda->stmtsBlock->isMacro) addParsingError();
@@ -2271,8 +2272,9 @@ void LgsParser::addError(const LgsBaseMsg& lgsErr, const LgsLocation& location, 
     errHandler.addError(lgsErr, &location, metadata->path, args);
 }
 
-LgsFunc* wrapStmtsBlockWithFunc(LgsStmtsBlock* stmtsBlock) {
+LgsFunc* wrapStmtsBlockWithLambda(LgsStmtsBlock* stmtsBlock) {
     const auto func = new LgsFunc("", nullptr);
+    func->isLambda = true;
     func->location = stmtsBlock->location;
     func->stmtsBlock = stmtsBlock;
     func->funcType->rt = &LGS_VOID;

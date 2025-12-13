@@ -14,7 +14,7 @@ Type* LgsUInt::getIRType(LgsCgModule& cg) {
 }
 
 Constant* LgsUInt::getRTType(LgsCgModule& cg) {
-    return cg.getRTTypeInfo(getName(), sizeBytes(), RTT_UINT, cg.i1(isHeapAlloc), cg.null());
+    return cg.getRTTypeInfo(getName(), sizeBytes(), RTT_UINT, isHeapAlloc, cg.null());
 }
 
 std::string LgsUInt::getName() {

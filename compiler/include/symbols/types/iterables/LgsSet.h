@@ -1,4 +1,5 @@
 #pragma once
+#include "funcs/LgsFunc.h"
 #include "types/LgsAny.h"
 #include "types/iterables/LgsIterable.h"
 #include "types/primitives/LgsVoid.h"
@@ -8,7 +9,7 @@ using llvm::StructType;
 class LgsSet final : public LgsIterable {
 public:
     static constexpr auto name = "Set";
-    LgsFunc* addFunc = new LgsFunc(ADD_FUNC_NAME, name, &LGS_VOID, {this, &LGS_ANY}, BUILTIN | PUBLIC | METHOD);
+    LgsFunc* addFunc = new LgsFunc(ADD_FUNC, name, &LGS_VOID, {this, &LGS_ANY}, BUILTIN | PUBLIC | METHOD);
 
     explicit LgsSet(LgsType* baseType = nullptr) : LgsIterable(baseType) {
         passByRef = true;

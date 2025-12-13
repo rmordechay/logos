@@ -1,7 +1,8 @@
 #pragma once
-#include "files/LgsMainFile.h"
-#include "utils/ThreadPool.h"
 
+
+class LgsMainFile;
+struct LgsGlobals;
 class LgsIOPair;
 class LgsFuncType;
 class LgsIterable;
@@ -14,15 +15,15 @@ class LgsErrHandler;
 
 class LgsTypeResolver {
 public:
+    LgsFile* file;
     LgsGlobals& globals;
     LgsErrHandler& errHandler;
 
-    LgsTypeResolver(LgsErrHandler& errHandler, LgsGlobals& globals) : globals(globals), errHandler(errHandler) {}
-    bool resolveGlobals(const std::vector<LgsFile*>& srcFiles, ThreadPool& pool);
-    void resolveType(LgsType*& type, LgsFile* file);
-    void resolveMainFileTypes(LgsMainFile* mf);
-    void resolveObjTypes(LgsObject* obj, LgsFile& file);
-    void resolveInterfaceTypes(LgsInterface* interface, LgsFile& file);
-    void resolveFuncTypes(LgsFuncType* funcType, LgsFile& file);
-    void resolveIOPair(LgsIOPair* ioPair, LgsObject* obj, const LgsFile& file) const;
+    LgsTypeResolver(LgsFile* file, LgsErrHandler& errHandler, LgsGlobals& globals) : file(file), globals(globals),errHandler(errHandler) {}
+    void resolveType(LgsType*& type);
+    void resolveMainFile(LgsMainFile* mf);
+    void resolveObj(LgsObject* obj);
+    void resolveInterface(LgsInterface* interface);
+    void resolveFuncType(LgsFuncType* funcType);
+    void resolveIOPair(LgsIOPair* ioPair, LgsObject* obj) const;
 };

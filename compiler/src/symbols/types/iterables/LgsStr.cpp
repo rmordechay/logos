@@ -29,7 +29,7 @@ LgsExpr* LgsStr::getZeroValue() {
 }
 
 Constant* LgsStr::getRTType(LgsCgModule& cg) {
-    return cg.getRTTypeInfo(getName(), sizeBytes(), RTT_STR, cg.i1(isHeapAlloc), baseType->getRTType(cg));
+    return cg.getRTTypeInfo(getName(), sizeBytes(), RTT_STR, isHeapAlloc, baseType->getRTType(cg));
 }
 
 bool LgsStr::canCastTo(LgsType* other) {

@@ -3,6 +3,7 @@
 #include "exprs/constants/LgsIntConst.h"
 #include "stmts/LgsField.h"
 #include "types/LgsAny.h"
+#include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsDouble.h"
 #include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsLong.h"
@@ -23,7 +24,7 @@ LgsExpr* LgsInt::getZeroValue() {
 }
 
 Constant* LgsInt::getRTType(LgsCgModule& cg) {
-    return cg.getRTTypeInfo(getName(), sizeBytes(), RTT_INT, cg.i1(isHeapAlloc), cg.null());
+    return cg.getRTTypeInfo(getName(), sizeBytes(), RTT_INT, isHeapAlloc, cg.null());
 }
 
 bool LgsInt::canCastTo(LgsType* other) {

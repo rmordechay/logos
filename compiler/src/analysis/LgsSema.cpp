@@ -164,9 +164,6 @@ void LgsSema::visitFunc(LgsFunc* func) {
         }
         defaultParamsStarted = !!param.expr;
     }
-    if (!func->funcType->rt) {
-        func->funcType->rt = &LGS_VOID;
-    }
     visitStmtsBlock(func->stmtsBlock);
     if (ft->isVariadic && ft->hasDefaults) {
         addError(E10043, func->location);
@@ -202,11 +199,9 @@ void LgsSema::visitMainFunc(LgsMainFunc* mainFunc) {
 
 void LgsSema::visitLambda(LgsFunc* lambda) {
     const auto ft = lambda->funcType;
-    if (ft->params.empty()) {
-        ft->params.emplace_back(&LGS_INT, "it");
-    }
+    typeResolver.resolveFuncType(ft);
     const auto& stmtsBlock = lambda->stmtsBlock;
-    // Wraps in return if it's the last statement
+    // Wraps expr in returnStmt if it's the last statement
     if (stmtsBlock->stmts.size() == 1 && !lambda->funcType->rt->isVoid()) {
         const auto lastStmtWrapper = stmtsBlock->stmts.front();
         if (lastStmtWrapper.type == LgsStmtWrapper::Type::Expr) {
@@ -301,7 +296,7 @@ void LgsSema::visitVarDec(LgsVarDec* varDec) {
         if (varDec->isOwner) {
             varDec->expr->owner = varDec;
         }
-        typeResolver.resolveType(varDec->type, file);
+        typeResolver.resolveType(varDec->type);
         castExprImplicitly(varDec->expr, varDec->type);
         visitExpr(varDec->expr);
         validateExprType(varDec->expr, varDec->type);
@@ -317,7 +312,7 @@ void LgsSema::visitVarDec(LgsVarDec* varDec) {
         varDec->setType(varDec->expr->type);
         validateExprType(varDec->expr, varDec->type);
     } else {
-        typeResolver.resolveType(varDec->type, file);
+        typeResolver.resolveType(varDec->type);
         if (!varDec->type) return;
         varDec->expr = varDec->type->getZeroValue();
         varDec->expr->location = varDec->location;
@@ -724,7 +719,7 @@ void LgsSema::visitTernaryExpr(LgsTernaryExpr* ternary) {
 void LgsSema::visitCast(LgsCast* cast) {
     visitExpr(cast->fromValue);
     if (!cast->fromValue->type) return;
-    typeResolver.resolveType(cast->toType, file);
+    typeResolver.resolveType(cast->toType);
     cast->value = cast->fromValue->castExplicitly(cast->toType);
     if (!cast->value) {
         addError(E10018, cast->location, {cast->fromValue->asText(), cast->toType->pname()});
@@ -999,40 +994,6 @@ void LgsSema::visitMetaSelection(LgsMetaSelection* metaSelection) {
     }
 }
 
-void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent) {
-    auto name = methodCall->name;
-    const auto method = parent->type->getMethod(name);
-    if (!method) {
-        return addError(E10005, methodCall->location, {name, parent->type->pname()});
-    }
-    if (parent->asTypeExpr() && method->funcType->isMethod) {
-        return addError(E10083, methodCall->location, {method->funcType->pname()});
-    }
-    if (method->funcType->isMethod) {
-        methodCall->args.insert(methodCall->args.begin(), LgsFuncArg(parent, LGS_SELF, true));
-    }
-    if (!visitFuncArgs(methodCall, method->funcType)) return;
-    if (methodCall->name == "map") {
-        const auto& iterable = method->funcType->rt->asIterable();
-        iterable->mapFunc->funcType->params[1].type->asFuncType()->rt = iterable->baseType;
-        iterable->mapFunc->funcType->params[1].type->asFuncType()->params[0].type = iterable->baseType;
-    }
-    if (methodCall->equals(method->funcType)) {
-        methodCall->func = method;
-        methodCall->setType(method->funcType->rt);
-    } else {
-        addError(E10034, methodCall->location, {parent->type->pname(), name, methodCall->asText(), method->asText()});
-        return;
-    }
-
-    if (!validateMethodVisibility(method, parent->type, methodCall->location)) return;
-    methodCall->isMock = stack.currentFunc()->isTest && parent->type->pname() == LgsTest::name && methodCall->name == "mock";
-    if (methodCall->isMock) {
-        const auto pair = std::make_pair(methodCall->args[0].expr, methodCall->args[1].expr);
-        stack.currentFunc()->mocks.push_back(pair);
-    }
-}
-
 LgsFunc* clone(const LgsFunc* func, const LgsFuncCall* funcCall) {
     const auto funcType = func->funcType;
     const auto newFuncType = new LgsFuncType(*funcType);
@@ -1069,6 +1030,35 @@ LgsFunc* clone(const LgsFunc* func, const LgsFuncCall* funcCall) {
     return newFunc;
 }
 
+void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent) {
+    auto name = methodCall->name;
+    const auto method = parent->type->getMethod(name);
+    if (!method) {
+        return addError(E10005, methodCall->location, {name, parent->type->pname()});
+    }
+    if (parent->asTypeExpr() && method->funcType->isMethod) {
+        return addError(E10083, methodCall->location, {method->funcType->pname()});
+    }
+    if (method->funcType->isMethod) {
+        methodCall->args.insert(methodCall->args.begin(), LgsFuncArg(parent, LGS_SELF, true));
+    }
+    if (!visitFuncArgs(methodCall, method->funcType)) return;
+    if (methodCall->equals(method->funcType)) {
+        methodCall->func = method;
+        methodCall->setType(method->funcType->rt);
+    } else {
+        addErrorIfSuccessful(E10034, methodCall->location, {parent->type->pname(), name, methodCall->asText(), method->asText()});
+        return;
+    }
+
+    if (!validateMethodVisibility(method, parent->type, methodCall->location)) return;
+    methodCall->isMock = stack.currentFunc()->isTest && parent->type->pname() == LgsTest::name && methodCall->name == "mock";
+    if (methodCall->isMock) {
+        const auto pair = std::make_pair(methodCall->args[0].expr, methodCall->args[1].expr);
+        stack.currentFunc()->mocks.push_back(pair);
+    }
+}
+
 void LgsSema::visitFuncCall(LgsFuncCall* funcCall) {
     const auto symbol = getSymbol(funcCall->name);
     if (!symbol) return addError(E10006, funcCall->location, {funcCall->name});
@@ -1077,10 +1067,7 @@ void LgsSema::visitFuncCall(LgsFuncCall* funcCall) {
 
     if (!visitFuncArgs(funcCall, ft)) return;
     if (!funcCall->equals(ft)) {
-        // Add error only if not already thrown
-        if (errHandler.successful) {
-            addError(E10015, funcCall->location, {funcCall->name, funcCall->asText(), ft->pname()});
-        }
+        addErrorIfSuccessful(E10015, funcCall->location, {funcCall->name, funcCall->asText(), ft->pname()});
         return;
     }
     if (symbol->symbolType != FUNC) {
@@ -1196,7 +1183,7 @@ void LgsSema::visitStrConst(const LgsStrConst* strConst) {
 }
 
 void LgsSema::visitTypeExpr(LgsTypeExpr* typeExpr) {
-    typeResolver.resolveType(typeExpr->type, file);
+    typeResolver.resolveType(typeExpr->type);
 }
 
 void LgsSema::visitJson(const LgsJson* json) {
@@ -1669,6 +1656,11 @@ static std::string getMissingImplementsStr(const std::vector<LgsField*>& fields,
 }
 
 void LgsSema::addError(const LgsBaseMsg& lgsErr, const LgsLocation& location, const std::vector<std::string>& args) {
+    errHandler.addError(lgsErr, &location, file->path, args);
+}
+
+void LgsSema::addErrorIfSuccessful(const LgsBaseMsg& lgsErr, const LgsLocation& location, const std::vector<std::string>& args) {
+    if (!errHandler.successful) return;
     errHandler.addError(lgsErr, &location, file->path, args);
 }
 

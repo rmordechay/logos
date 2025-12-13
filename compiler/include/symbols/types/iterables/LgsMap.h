@@ -12,7 +12,7 @@ class LgsMap final : public LgsIterable {
 public:
     static constexpr auto name = "Map";
     LgsTypePair* mapType = nullptr;
-    LgsFunc* addFunc = new LgsFunc(ADD_FUNC_NAME, name, &LGS_VOID, {this, new LgsStr(), &LGS_ANY}, PUBLIC | BUILTIN | METHOD);
+    LgsFunc* addFunc = new LgsFunc(ADD_FUNC, name, &LGS_VOID, {this, new LgsStr(), &LGS_ANY}, PUBLIC | BUILTIN | METHOD);
     LgsFunc* keysFunc;
     LgsFunc* valuesFunc;
 
