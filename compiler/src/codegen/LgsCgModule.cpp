@@ -167,27 +167,27 @@ llvm::AllocaInst* LgsCgModule::getEmptyBuffer() {
     return builder.CreateAlloca(ArrayType::get(i8Ty(), STRING_BUFFER_SIZE));
 }
 
-Constant* LgsCgModule::getRTTypeInfo(const std::string& name, const size_t size, const Lgs_TypeKind kind, Constant* extra) {
+Constant* LgsCgModule::getRTTypeInfo(const std::string& name, const size_t size, const Lgs_TypeKind kind, const bool isHeapAlloc, Constant* extra) {
     const auto typeInfo = getRTTBaseStruct();
     const auto prefixedName = LGS_TYPEINFO_PREFIX + name;
     if (isRTTModule) {
-        return createGlobal(prefixedName, typeInfo, llvm::ConstantStruct::get(typeInfo, {usize(size), usize(kind), extra}));
+        return createGlobal(prefixedName, typeInfo, llvm::ConstantStruct::get(typeInfo, {usize(size), i32(kind), i1(isHeapAlloc), extra}));
     }
     return createGlobal(prefixedName, typeInfo, nullptr);
 }
 
-Constant* LgsCgModule::getRTTStruct(const std::string& name, const std::vector<Type*>& fields, const std::vector<Constant*>& args) {
+StructType* LgsCgModule::getRTTBaseStruct() {
+    const auto typeInfoMatrix = getStructType({sizeTy(), ptrTy(), ptrTy(), ptrTy()}, LGS_TYPEINFO_PREFIX"FuncType"); // Biggest
+    return getStructType({sizeTy(), i32Ty(), i1Ty(), typeInfoMatrix}, "RTI"); // size, kind, isHeap, type
+}
+
+Constant* LgsCgModule::getRTTExtraStruct(const std::string& name, const std::vector<Type*>& fields, const std::vector<Constant*>& args) {
     const auto structName = LGS_TYPEINFO_PREFIX + name;
     auto st = StructType::getTypeByName(context, structName);
     if (!st) {
         st = StructType::create(context, fields, structName);
     }
     return llvm::ConstantStruct::get(st, args);
-}
-
-StructType* LgsCgModule::getRTTBaseStruct() {
-    const auto typeInfoMatrix = getStructType({sizeTy(), ptrTy(), ptrTy(), ptrTy()}, LGS_TYPEINFO_PREFIX"FuncType"); // Biggest
-    return getStructType({sizeTy(), i32Ty(), typeInfoMatrix}, "RTI"); // size, kind, type
 }
 
 BasicBlock* LgsCgModule::createBlock(const std::string& name, Function* parent) {

@@ -324,7 +324,6 @@ bool LgsApp::generateRTTTypes() {
             innerObj->getRTType(rttTypeModule);
         }
     }
-
     for (const auto srcFile : srcFiles) {
         for (const auto type : srcFile->symbolTable.rttTypes) {
             type->getRTType(rttTypeModule);
@@ -338,7 +337,6 @@ bool LgsApp::generateRTTTypes() {
             }
         }
     }
-
     return rttTypeModule.writeIRModule(paths, 3);
 }
 

@@ -21,7 +21,7 @@ LgsExpr* LgsFloat::getZeroValue() {
 }
 
 Constant* LgsFloat::getRTType(LgsCgModule& cg) {
-    return cg.getRTTypeInfo(getName(), sizeBytes(), RTT_FLOAT, cg.null());
+    return cg.getRTTypeInfo(getName(), sizeBytes(), RTT_FLOAT, cg.i1(isHeapAlloc), cg.null());
 }
 
 size_t LgsFloat::sizeBytes() {

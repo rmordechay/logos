@@ -28,10 +28,10 @@ Constant* LgsFuncType::getRTType(LgsCgModule& cg) {
     for (auto& param : params) paramsAsOwners.emplace_back(static_cast<LgsOwner*>(&param));
     const auto [typesArr, hashesArr] = getRTTypesAndHashes(cg, funcName, paramsAsOwners);
     // paramsCount, paramHashes, paramTypes, rt
-    const auto sv = cg.getRTTStruct(funcName, {cg.sizeTy(), cg.ptrTy(), cg.ptrTy(), cg.ptrTy()}, {
+    const auto sv = cg.getRTTExtraStruct(funcName, {cg.sizeTy(), cg.ptrTy(), cg.ptrTy(), cg.ptrTy()}, {
         cg.usize(params.size()), hashesArr, typesArr, rt->getRTType(cg)
     });
-    return cg.getRTTypeInfo(funcName, sizeBytes(), RTT_FUNC, sv);
+    return cg.getRTTypeInfo(funcName, sizeBytes(), RTT_FUNC, cg.i1(isHeapAlloc), sv);
 }
 
 LgsExpr* LgsFuncType::getZeroValue() {
