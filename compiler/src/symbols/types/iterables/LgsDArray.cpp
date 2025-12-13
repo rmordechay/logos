@@ -8,6 +8,17 @@
 #include "types/primitives/LgsLong.h"
 #include <llvm/IR/Module.h>
 
+LgsFunc* LgsDArray::getMethod(const std::string& methodName) {
+    constexpr auto flags = BUILTIN | PUBLIC | METHOD;
+    if (methodName == ADD_FUNC) {
+        if (methods.contains(ADD_FUNC)) return methods[ADD_FUNC];
+        const auto func = new LgsFunc(ADD_FUNC, name, &LGS_VOID, {this, baseType}, flags);
+        addMethod(func);
+        return func;
+    }
+    return LgsIterable::getMethod(methodName);
+}
+
 bool LgsDArray::inferBaseType(const std::vector<LgsExpr*>& args) {
     assert(!args.empty());
     if (baseType) return true;

@@ -28,42 +28,42 @@ LgsFunc* LgsIterable::getMethod(const std::string& methodName) {
     constexpr auto flags = BUILTIN | PUBLIC | METHOD;
     if (methodName == LEN_FUNC) {
         if (methods.contains(LEN_FUNC)) return methods[LEN_FUNC];
-        const auto lenFunc = new LgsFunc(LEN_FUNC, &LGS_SIZE, {this}, flags);
-        addMethod(lenFunc);
-        return lenFunc;
+        const auto func = new LgsFunc(LEN_FUNC, &LGS_SIZE, {this}, flags);
+        addMethod(func);
+        return func;
     }
     if (methodName == IS_EMPTY_FUNC) {
         if (methods.contains(IS_EMPTY_FUNC)) return methods[IS_EMPTY_FUNC];
-        const auto isEmptyFunc = new LgsFunc(IS_EMPTY_FUNC, &LGS_BOOL, {this}, flags);
-        addMethod(isEmptyFunc);
-        return isEmptyFunc;
+        const auto func = new LgsFunc(IS_EMPTY_FUNC, &LGS_BOOL, {this}, flags);
+        addMethod(func);
+        return func;
     }
     if (methodName == NOT_EMPTY_FUNC) {
         if (methods.contains(NOT_EMPTY_FUNC)) return methods[NOT_EMPTY_FUNC];
-        const auto isNotEmptyFunc = new LgsFunc(NOT_EMPTY_FUNC, &LGS_BOOL, {this}, flags);
-        addMethod(isNotEmptyFunc);
-        return isNotEmptyFunc;
+        const auto func = new LgsFunc(NOT_EMPTY_FUNC, &LGS_BOOL, {this}, flags);
+        addMethod(func);
+        return func;
     }
     if (methodName == MAP_FUNC) {
         if (methods.contains(MAP_FUNC)) return methods[MAP_FUNC];
         const auto callback = new LgsFuncType(baseType, {LgsParam(baseType)});
-        const auto mapFunc = new LgsFunc(MAP_FUNC, this, {this, callback}, flags);
-        addMethod(mapFunc);
-        return mapFunc;
+        const auto func = new LgsFunc(MAP_FUNC, this, {this, callback}, flags);
+        addMethod(func);
+        return func;
     }
     if (methodName == FILTER_FUNC) {
         if (methods.contains(FILTER_FUNC)) return methods[FILTER_FUNC];
         const auto callback = new LgsFuncType(&LGS_BOOL, {LgsParam(baseType)});
-        const auto filterFund = new LgsFunc(FILTER_FUNC, this, {this, callback}, flags);
-        addMethod(filterFund);
-        return filterFund;
+        const auto func = new LgsFunc(FILTER_FUNC, this, {this, callback}, flags);
+        addMethod(func);
+        return func;
     }
     if (methodName == FOREACH_FUNC) {
         if (methods.contains(FOREACH_FUNC)) return methods[FOREACH_FUNC];
         const auto callback = new LgsFuncType(&LGS_VOID, {LgsParam(baseType)});
-        const auto filterFund = new LgsFunc(FOREACH_FUNC, &LGS_VOID, {this, callback}, flags);
-        addMethod(filterFund);
-        return filterFund;
+        const auto func = new LgsFunc(FOREACH_FUNC, &LGS_VOID, {this, callback}, flags);
+        addMethod(func);
+        return func;
     }
     return LgsType::getMethod(methodName);
 }

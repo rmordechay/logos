@@ -830,7 +830,7 @@ void LgsCodeGen::visitDynamicArray(LgsArrayExpr* arrayExpr) const {
     for (size_t i = 0; i < arrayExpr->elements.size(); ++i) {
         const auto element = arrayExpr->elements[i];
         std::vector args = {LgsFuncArg(arrayExpr), LgsFuncArg(element)};
-        dArr->addFunc->call(cg, args);
+        dArr->getMethod(ADD_FUNC)->call(cg, args);
     }
 }
 
@@ -1330,7 +1330,7 @@ void LgsCodeGen::createMapFunc(LgsFunc* func) {
         element = cg.builder.CreateLoad(dArray->baseType->getIRType(cg), element);
     }
     const auto v = cg.builder.CreateCall(ft, callbackParam.IRValue, {element});
-    dArray->addFunc->fn(cg, {newArr.IRValue, v});
+    dArray->getMethod(ADD_FUNC)->fn(cg, {newArr.IRValue, v});
 
     // Increment
     const auto inc = cg.builder.CreateAdd(iValue, cg.usize(1));
@@ -1393,7 +1393,7 @@ void LgsCodeGen::createFilterFunc(LgsFunc* func) {
 
     cg.builder.CreateCondBr(v, trueBlock, falseBlock);
     cg.startBlock(trueBlock);
-    dArray->addFunc->callIR(cg, {newArr.IRValue, element});
+    dArray->getMethod(ADD_FUNC)->callIR(cg, {newArr.IRValue, element});
     cg.builder.CreateBr(falseBlock);
     cg.startBlock(falseBlock);
 

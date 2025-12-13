@@ -778,7 +778,7 @@ void LgsSema::visitDynamicArray(LgsArrayExpr* arrayExpr) {
     if (!dArr->inferBaseType(arrayExpr->elements)) {
         return addError(E10095, arrayExpr->location);
     }
-    dArr->addFunc->funcType->params[1].type = dArr->baseType;
+    dArr->getMethod(ADD_FUNC)->funcType->params[1].type = dArr->baseType;
 }
 
 void LgsSema::visitHashMap(LgsHashMap* hashMap) {
