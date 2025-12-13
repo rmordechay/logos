@@ -5,7 +5,6 @@
 #include <unordered_map>
 
 struct Lgs_StackFrame {
-    std::unordered_map<void*, Lgs_TypeInfo*> owners;
     std::unordered_map<void*, Lgs_TypeInfo*> orphans;
     std::vector<Lgs_ThunkFunc> defers;
 };

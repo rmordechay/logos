@@ -11,6 +11,7 @@
 extern "C" void Lgs_Runtime_freeValue(void* ptr, const Lgs_TypeInfo* type);
 
 extern "C" void Lgs_Runtime_init() {}
+
 extern "C" void Lgs_Runtime_close() {}
 
 extern "C" void Lgs_Runtime_push() {
@@ -23,7 +24,7 @@ extern "C" void Lgs_Runtime_pop() {
         func(ctx);
     }
     if (!top.orphans.empty()) {
-        for (const auto [ptr, type] : top.orphans) {
+        for (const auto& [ptr, type] : top.orphans) {
             Lgs_Runtime_freeValue(ptr, type);
         }
         top.orphans.clear();
@@ -39,14 +40,7 @@ extern "C" void Lgs_Runtime_addCoro(const ThunkFunc funcPtr, void* ctx) {
     runtime.coros.emplace_back(Lgs_ThunkFunc{funcPtr, ctx});
 }
 
-extern "C" void* Lgs_Runtime_allocateOwner(const size_t size, Lgs_TypeInfo* type) {
-    const auto ptr = std::malloc(size);
-    std::println("Allocated owner in {}: {}B {}", runtime.stackLevel, size, ptr);
-    runtime.stack[runtime.stackLevel].owners[ptr] = type;
-    return ptr;
-}
-
-extern "C" void* Lgs_Runtime_allocateOrphan(const size_t size, Lgs_TypeInfo* type) {
+extern "C" void* Lgs_Runtime_allocate(const size_t size, Lgs_TypeInfo* type) {
     const auto ptr = std::malloc(size);
     std::println("Allocated orphan in {}: {}B {}", runtime.stackLevel, size, ptr);
     runtime.stack[runtime.stackLevel].orphans[ptr] = type;
@@ -61,31 +55,9 @@ extern "C" void* Lgs_Runtime_allocateReturn(const size_t size, Lgs_TypeInfo* typ
     return ptr;
 }
 
-extern "C" void Lgs_Runtime_removeOwner(void* owner) {
-    runtime.stack[runtime.stackLevel].owners.erase(owner);
-}
-
-extern "C" void Lgs_Runtime_yield() {
-    Lgs_switchContext();
-}
-
-extern "C" void Lgs_Runtime_addToVTable(void* instance, const int32_t virtualID, void* ptr) {
-    runtime.vtable[{instance, virtualID}] = ptr;
-}
-
-extern "C" void* Lgs_Runtime_getFromVTable(void* instance, const int32_t virtualID) {
-    assert(runtime.vtable.contains(VKey{instance, virtualID}));
-    return runtime.vtable[VKey{instance, virtualID}];
-}
-
-extern "C" void Lgs_Runtime_throwError(const size_t count, const char* msg, ...) {
-    char out[STRING_BUFFER_SIZE];
-    va_list args;
-    va_start(args, msg);
-    formatErrorMsg(msg, out, count, args);
-    va_end(args);
-    logError(std::string(out) + "\n");
-    exit(1);
+extern "C" void Lgs_Runtime_freeOwner(void* ptr, const Lgs_TypeInfo* type) {
+    Lgs_Runtime_freeValue(ptr, type);
+    runtime.stack[runtime.stackLevel].orphans.erase(ptr);
 }
 
 extern "C" void Lgs_Runtime_freeValue(void* ptr, const Lgs_TypeInfo* type) {
@@ -134,4 +106,27 @@ extern "C" void Lgs_Runtime_freeValue(void* ptr, const Lgs_TypeInfo* type) {
     }
     default: break;
     }
+}
+
+extern "C" void Lgs_Runtime_yield() {
+    Lgs_switchContext();
+}
+
+extern "C" void Lgs_Runtime_addToVTable(void* instance, const int32_t virtualID, void* ptr) {
+    runtime.vtable[{instance, virtualID}] = ptr;
+}
+
+extern "C" void* Lgs_Runtime_getFromVTable(void* instance, const int32_t virtualID) {
+    assert(runtime.vtable.contains(VKey{instance, virtualID}));
+    return runtime.vtable[VKey{instance, virtualID}];
+}
+
+extern "C" void Lgs_Runtime_throwError(const size_t count, const char* msg, ...) {
+    char out[STRING_BUFFER_SIZE];
+    va_list args;
+    va_start(args, msg);
+    formatErrorMsg(msg, out, count, args);
+    va_end(args);
+    logError(std::string(out) + "\n");
+    exit(1);
 }

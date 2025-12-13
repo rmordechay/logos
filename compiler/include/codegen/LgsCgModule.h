@@ -104,7 +104,7 @@ public:
     Value* callHash(Value* arg);
     Constant* hashConst(const std::string& str);
     void callThrowError(const LgsBaseMsg& err, const std::vector<Value*>& args = {});
-    void freeValue(Value* ptr, Constant* type);
+    void freeOwner(Value* ptr, Constant* type);
     Value* allocate(Value* size, Constant* type, bool isOwner, bool isReturnExpr = false);
 
     // Stack

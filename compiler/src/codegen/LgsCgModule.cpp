@@ -310,16 +310,15 @@ void LgsCgModule::callThrowError(const LgsBaseMsg& err, const std::vector<Value*
     callRuntimeFunc("throwError", voidTy(), {sizeTy(), ptrTy()}, irArgs, true);
 }
 
-void LgsCgModule::freeValue(Value* ptr, Constant* type) {
-    callRuntimeFunc("freeValue", voidTy(), {ptrTy(), ptrTy()}, {ptr, type});
+void LgsCgModule::freeOwner(Value* ptr, Constant* type) {
+    callRuntimeFunc("freeOwner", voidTy(), {ptrTy(), ptrTy()}, {ptr, type});
 }
 
 Value* LgsCgModule::allocate(Value* size, Constant* type, const bool isOwner, const bool isReturnExpr) {
     if (isReturnExpr) {
         return callRuntimeFunc("allocateReturn", ptrTy(), {sizeTy(), ptrTy()}, {extendToSize(size), type});
     }
-    const auto name = isOwner ? "allocateOwner" : "allocateOrphan";
-    return callRuntimeFunc(name, ptrTy(), {sizeTy(), ptrTy()}, {extendToSize(size), type});
+    return callRuntimeFunc("allocate", ptrTy(), {sizeTy(), ptrTy()}, {extendToSize(size), type});
 }
 
 void LgsCgModule::callStackPush() {
