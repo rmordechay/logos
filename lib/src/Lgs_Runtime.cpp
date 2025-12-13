@@ -100,11 +100,13 @@ extern "C" void Lgs_Runtime_freeValue(void* ptr, const Lgs_TypeInfo* type) {
         Lgs_Runtime_freeValue(ptr, type->nullable.baseType);
         break;
     }
-    case RTT_SARRAY:
     case RTT_MAP: {
+        break;
+    }
+    case RTT_SARRAY:
+    default: {
         assert(0);
     }
-    default: break;
     }
 }
 

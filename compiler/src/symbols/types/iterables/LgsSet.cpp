@@ -5,7 +5,6 @@
 #include "exprs/LgsFuncCall.h"
 #include "types/LgsAny.h"
 #include "types/iterables/LgsDArray.h"
-#include "types/primitives/LgsLong.h"
 
 Type* LgsSet::getIRType(LgsCgModule& cg) {
     if (IRType) return IRType;
@@ -75,15 +74,19 @@ bool LgsSet::inferBaseType(const std::vector<LgsExpr*>& args) {
 }
 
 Value* LgsSet::lenIR(LgsCgModule& cg, Value* iterable) {
-    return cg.callLgsFunc("Set_len", cg.sizeTy(), {cg.ptrTy()}, {iterable});
+    return cg.callLgsFunc(std::string(name) + "_len", cg.sizeTy(), {cg.ptrTy()}, {iterable});
 }
 
 Value* LgsSet::inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) {
-    return cg.callLgsFunc("Set_contains", cg.i1Ty(), {cg.ptrTy(), cg.ptrTy()}, {iterableExpr->IRValue, cg.getPtrTo(value->IRValue)});
+    const std::vector<Type*> params = {cg.ptrTy(), cg.ptrTy()};
+    const std::vector IRArgs = {iterableExpr->IRValue, value->getPtrTo(cg)};
+    return cg.callLgsFunc(std::string(name) + "_contains", cg.i1Ty(), params, IRArgs);
 }
 
 Value* LgsSet::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
-    return cg.callLgsFunc("Set_get", cg.ptrTy(), {cg.ptrTy(), cg.sizeTy()}, {iterable, index});
+    const std::vector<Type*> params = {cg.ptrTy(), cg.sizeTy()};
+    const std::vector IRArgs = {iterable, index};
+    return cg.callLgsFunc(std::string(name) + "_get", cg.ptrTy(), params, IRArgs);
 }
 
 DIType* LgsSet::getDebugType(LgsCgModule& cg) {

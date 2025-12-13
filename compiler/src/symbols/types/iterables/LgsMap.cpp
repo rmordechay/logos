@@ -6,7 +6,48 @@
 #include "loops/LgsForeachLoop.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsAny.h"
-#include "LgsUtils.h"
+#include "types/primitives/LgsVoid.h"
+
+LgsFunc* LgsMap::getMethod(const std::string& methodName) {
+    constexpr auto flags = BUILTIN | PUBLIC | METHOD;
+    if (methodName == ADD_FUNC) {
+        if (methods.contains(ADD_FUNC)) return methods[ADD_FUNC];
+        const auto func = new LgsFunc(ADD_FUNC, name, &LGS_VOID, {this, new LgsStr(), &LGS_ANY}, flags);
+        func->fn = [this](LgsCgModule& cg, const std::vector<LgsFuncArg>& args) {
+            const auto map = args[0].expr->IRValue;
+            const auto key = args[1].expr->IRValue;
+            const auto value = args[2].expr->IRValue;
+            const std::vector<Type*> params = {cg.ptrTy(), cg.ptrTy(), cg.ptrTy(), cg.ptrTy()};
+            const std::vector<Value*> IRArgs = {map, getRTType(cg), key, value};
+            return cg.callLgsFunc(std::string(name) + "_add", cg.ptrTy(), params, IRArgs);
+        };
+        addMethod(func);
+        return func;
+    }
+    if (methodName == KEYS_FUNC_NAME) {
+        if (methods.contains(KEYS_FUNC_NAME)) return methods[KEYS_FUNC_NAME];
+        const auto func = new LgsFunc(KEYS_FUNC_NAME, name, new LgsDArray(mapType->key), {this}, flags);
+        func->fn = [this](LgsCgModule& cg, const std::vector<LgsFuncArg>& args) {
+            const std::vector<Type*> params = {cg.ptrTy(), cg.ptrTy()};
+            const std::vector<Value*> IRArgs = {args[0].expr->IRValue, mapType->key->getRTType(cg)};
+            return cg.callLgsFunc(std::string(name) + "_keys", cg.ptrTy(), params, IRArgs);
+        };
+        addMethod(func);
+        return func;
+    }
+    if (methodName == VALUES_FUNC_NAME) {
+        if (methods.contains(VALUES_FUNC_NAME)) return methods[VALUES_FUNC_NAME];
+        const auto func = new LgsFunc(VALUES_FUNC_NAME, name, new LgsDArray(mapType->value), {this}, flags);
+        func->fn = [this](LgsCgModule& cg, const std::vector<LgsFuncArg>& args) {
+            const std::vector<Type*> params = {cg.ptrTy(), cg.ptrTy()};
+            const std::vector<Value*> IRArgs = {args[0].expr->IRValue, mapType->value->getRTType(cg)};
+            return cg.callLgsFunc(std::string(name) + "_values", cg.ptrTy(), params, IRArgs);
+        };
+        addMethod(func);
+        return func;
+    }
+    return LgsIterable::getMethod(methodName);
+}
 
 Type* LgsMap::getIRType(LgsCgModule& cg) {
     if (IRType) return IRType;
@@ -69,16 +110,16 @@ bool LgsMap::unpackLoopVarsTypes(LgsForeachLoop* loop) const {
 }
 
 void LgsMap::unpackLoopIR(LgsCgModule& cg, LgsForeachLoop* loop) const {
-    const auto keyPtr = cg.callLgsFunc("Map_getKeyAt", cg.ptrTy(), {cg.ptrTy(), cg.sizeTy()}, {loop->iterExpr->IRValue, loop->iValue});
+    const auto keyPtr = cg.callLgsFunc(std::string(name) + "_getKeyAt", cg.ptrTy(), {cg.ptrTy(), cg.sizeTy()}, {loop->iterExpr->IRValue, cg.extendToSize(loop->iValue)});
     loop->loopVars[0]->IRValue = keyPtr;
     if (loop->loopVars.size() == 2) {
-        const auto valuePtr = cg.callLgsFunc("Map_getValueAt", cg.ptrTy(), {cg.ptrTy(), cg.sizeTy()}, {loop->iterExpr->IRValue, loop->iValue});
+        const auto valuePtr = cg.callLgsFunc(std::string(name) + "_getValueAt", cg.ptrTy(), {cg.ptrTy(), cg.sizeTy()}, {loop->iterExpr->IRValue, cg.extendToSize(loop->iValue)});
         loop->loopVars[1]->IRValue = valuePtr;
     }
 }
 
 Value* LgsMap::lenIR(LgsCgModule& cg, Value* iterable) {
-    return cg.callLgsFunc("Map_len", cg.sizeTy(), {cg.ptrTy()}, {iterable});
+    return cg.callLgsFunc(std::string(name) + "_len", cg.sizeTy(), {cg.ptrTy()}, {iterable});
 }
 
 Value* LgsMap::inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) {
@@ -86,7 +127,7 @@ Value* LgsMap::inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) {
 }
 
 Value* LgsMap::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
-    return cg.callLgsFunc("Map_get", cg.ptrTy(), {cg.ptrTy(), cg.ptrTy()}, {iterable, index});
+    return cg.callLgsFunc(std::string(name) + "_get", cg.ptrTy(), {cg.ptrTy(), cg.ptrTy()}, {iterable, index});
 }
 
 bool LgsMap::canCastTo(LgsType* other) {

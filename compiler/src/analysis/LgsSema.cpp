@@ -677,6 +677,7 @@ void LgsSema::visitExpr(LgsExpr*& expr) {
         else if (const auto castExpr = expr->asCast()) visitCast(castExpr);
         else if (const auto json = expr->asJson()) visitJson(json);
     }
+    addRTType(expr->type);
 }
 
 void LgsSema::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {

@@ -7,7 +7,7 @@
 #include "types/primitives/LgsSize.h"
 #include "types/primitives/LgsVoid.h"
 
-class LgsSystem final : public LgsObject {
+class LgsSys final : public LgsObject {
 public:
     static constexpr auto name = "Sys";
     LgsFunc* pidFunc = new LgsFunc{"pid", &LGS_SIZE, PUBLIC | BUILTIN | SYSCALL};
@@ -17,7 +17,7 @@ public:
     LgsFunc* getEnvFunc = new LgsFunc{"getEnv", new LgsStr(), {LgsParam(new LgsStr(), ""), LgsParam(new LgsStr(), "fallback", new LgsStrConst(""))}, PUBLIC | BUILTIN};
     LgsFunc* coresNumFunc = new LgsFunc{"coresNumber", &LGS_LONG, PUBLIC | BUILTIN | SYSCALL};
 
-    explicit LgsSystem() : LgsObject(name) {
+    explicit LgsSys() : LgsObject(name) {
         addMethod(pidFunc);
         addMethod(sleepFunc);
         addMethod(exitFunc);

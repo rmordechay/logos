@@ -12,8 +12,6 @@ public:
     explicit LgsDArray(LgsType* baseType = nullptr) : LgsIterable(baseType) {
         passByRef = true;
         isHeapAlloc = true;
-        // addFunc->fn = getAddFn();
-        // addMethod(addFunc);
     }
     LgsFunc* getMethod(const std::string& methodName) override;
     bool inferBaseType(const std::vector<LgsExpr*>& args) override;
@@ -30,5 +28,4 @@ public:
     Value* getIRElement(LgsCgModule& cg, Value* iterable, Value* index) override;
     bool canCastTo(LgsType* other) override;
     DIType* getDebugType(LgsCgModule& cg) override;
-    CallFn getAddFn();
 };

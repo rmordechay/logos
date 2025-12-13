@@ -4,9 +4,7 @@
 
 void LgsHashMap::castImplicitly(LgsType* toType) {
     if (!toType->asMap()) return;
-    if (!type) {
-        setType(toType);
-    }
+    if (!type) setType(toType);
 }
 
 void LgsHashMap::setDebugValue(LgsCgModule& cg) {

@@ -16,11 +16,11 @@ class LgsObject : public LgsType {
 public:
     std::string name;
     std::vector<LgsType*> implements;
-    std::vector<LgsGenericType*> generics;
     std::vector<LgsEnum*> enums;
     std::vector<LgsObject*> objects;
     std::vector<LgsSubType*> subtypes;
     std::vector<LgsIOPair*> ioPairs;
+    std::vector<LgsGenericType*> generics;
     LgsInstance* singleton = nullptr;
     std::map<std::string, LgsFunc*> metaMethods;
     LgsFunc* getFieldFunc = new LgsFunc{"getField", &LGS_ANY, {new LgsStr()}, PUBLIC | BUILTIN | METHOD};
@@ -29,9 +29,9 @@ public:
     explicit LgsObject(std::string  name) : name(std::move(name)) {
         passByRef = true;
         isHeapAlloc = true;
-        getFieldFunc->fn = [this](LgsCgModule& cg, const std::vector<Value*>& args) {
+        getFieldFunc->fn = [this](LgsCgModule& cg, const std::vector<LgsFuncArg>& args) {
             return cg.callLgsFunc("getObjectField", cg.ptrTy(), {cg.ptrTy(), cg.ptrTy(), cg.ptrTy()}, {
-                getRTType(cg), args[0], args[1]
+                getRTType(cg), args[0].expr->IRValue, args[1].expr->IRValue
             });
         };
         metaMethods[getFieldFunc->funcType->name] = getFieldFunc;

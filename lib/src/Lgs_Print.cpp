@@ -33,7 +33,10 @@ static std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
         const auto& [baseType] = rtt->dArray;
         str << "[";
         for (size_t i = 0; i < dArrExpr->length; ++i) {
-            void* data = Lgs_DArray_get(dArrExpr, rtt, i);
+            auto data = Lgs_DArray_get(dArrExpr, rtt, i);
+            if (rtt->dArray.baseType->kind == RTT_STR) {
+                data = *static_cast<void**>(data);
+            }
             str << formatElement(baseType, data);
             if (i < dArrExpr->length - 1) str << ", ";
         }
@@ -147,13 +150,19 @@ static std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
     }
     case RTT_MAP: {
         const auto& [keyType, valueType] = rtt->map;
-        const auto hashMap = static_cast<Lgs_HashMap*>(elem);
+        auto hashMap = static_cast<Lgs_HashMap*>(elem);
         str << "{";
         bool first = true;
-        for (auto& [k, v] : *hashMap->data) {
-            if (!first) str << ", ";
-            first = false;
-            str << k << ": " << formatElement(valueType, v.data());
+        for (size_t i = 0; i < LGS_MAP_CAPACITY; i++) {
+            if (hashMap->entries[i].occupied) {
+                if (!first) str << ", ";
+                first = false;
+                void* valuePtr = hashMap->entries[i].value;
+                if (valueType->kind == RTT_STR) {
+                    valuePtr = *static_cast<void**>(valuePtr);
+                }
+                str << hashMap->entries[i].key << ": " << formatElement(valueType, valuePtr);
+            }
         }
         str << "}";
         break;

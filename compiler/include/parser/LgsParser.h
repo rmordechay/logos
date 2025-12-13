@@ -193,8 +193,8 @@ public:
     bool mustMatch(LgsTokenType t2);
     bool mustParse(const void* value);
     bool parsedOrReset(const void* value, size_t resetIndex);
-    void addParsingError();
     bool validateTypeName(const std::string& typeName, const LgsLocation* location);
-    void recursionGuard();
     void addError(const LgsBaseMsg& lgsErr, const LgsLocation& location, const std::vector<std::string>& args = {});
+    void addParsingError();
+    void recursionGuard();
 };

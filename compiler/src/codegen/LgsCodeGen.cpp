@@ -1,6 +1,7 @@
 #include "codegen/LgsCodeGen.h"
 #include "builtins/LgsTest.h"
 #include "LgsConfigs.h"
+#include "builtins/LgsSys.h"
 #include "exprs/LgsArrayExpr.h"
 #include "funcs/LgsCoroutine.h"
 #include "files/LgsInterfaceFile.h"
@@ -829,8 +830,7 @@ void LgsCodeGen::visitDynamicArray(LgsArrayExpr* arrayExpr) const {
     });
     for (size_t i = 0; i < arrayExpr->elements.size(); ++i) {
         const auto element = arrayExpr->elements[i];
-        std::vector args = {LgsFuncArg(arrayExpr), LgsFuncArg(element)};
-        dArr->getMethod(ADD_FUNC)->call(cg, args);
+        dArr->getMethod(ADD_FUNC)->call(cg, {arrayExpr, element});
     }
 }
 
@@ -844,9 +844,7 @@ void LgsCodeGen::visitSetExpr(LgsArrayExpr* arrayExpr) const {
     });
     for (size_t i = 0; i < arrayExpr->elements.size(); ++i) {
         const auto element = arrayExpr->elements[i];
-
-        std::vector args = {LgsFuncArg(arrayExpr), LgsFuncArg(element)};
-        set->addFunc->call(cg, args);
+        set->addFunc->call(cg, {arrayExpr, element});
     }
 }
 
@@ -906,22 +904,17 @@ void LgsCodeGen::visitMatrixExpr(const LgsMatrixExpr* matrixExpr) {
 
 void LgsCodeGen::visitHashMap(LgsHashMap* hashMap) {
     const auto map = hashMap->type->asMap();
-    const auto keyType = map->mapType->key;
-    const auto valueType = map->mapType->value;
     hashMap->IRValue = cg.allocate(cg.usize(map->sizeBytes()), map->getRTType(cg), !!hashMap->owner);
-    cg.callLgsFunc("Map_init", cg.voidTy(), {cg.ptrTy(), cg.ptrTy(), cg.ptrTy()}, {
-        hashMap->IRValue, keyType->getRTType(cg), valueType->getRTType(cg)
-    });
+    cg.callLgsFunc(std::string(LgsMap::name) + "_init", cg.voidTy(), {cg.ptrTy()}, {hashMap->IRValue});
     for (const auto [key, value] : hashMap->elements) {
         visitExpr(key);
         visitExpr(value);
-        std::vector args = {LgsFuncArg(hashMap), LgsFuncArg(key), LgsFuncArg(value)};
-        map->addFunc->call(cg, args);
+        map->getMethod(ADD_FUNC)->call(cg, {hashMap, key, value});
     }
 }
 
 void LgsCodeGen::visitEnvVar(LgsEnvVar* envVar) const {
-    envVar->IRValue = cg.callLgsFunc("System_getEnv", cg.ptrTy(), {cg.ptrTy(), cg.ptrTy()}, {cg.getString(envVar->name), cg.emptyStr()});
+    envVar->IRValue = cg.callLgsFunc(std::string(LgsSys::name) + "_getEnv", cg.ptrTy(), {cg.ptrTy(), cg.ptrTy()}, {cg.getString(envVar->name), cg.emptyStr()});
 }
 
 void LgsCodeGen::visitVariable(LgsVariable* variable) {
@@ -1329,8 +1322,10 @@ void LgsCodeGen::createMapFunc(LgsFunc* func) {
     if (!dArray->baseType->passByRef) {
         element = cg.builder.CreateLoad(dArray->baseType->getIRType(cg), element);
     }
-    const auto v = cg.builder.CreateCall(ft, callbackParam.IRValue, {element});
-    dArray->getMethod(ADD_FUNC)->fn(cg, {newArr.IRValue, v});
+    const auto tempExpr = dArray->baseType->getZeroValue();
+    tempExpr->IRValue = cg.builder.CreateCall(ft, callbackParam.IRValue, {tempExpr->IRValue});
+    dArray->getMethod(ADD_FUNC)->call(cg, {&newArr, tempExpr});
+    freeExpr(tempExpr);
 
     // Increment
     const auto inc = cg.builder.CreateAdd(iValue, cg.usize(1));
@@ -1393,7 +1388,11 @@ void LgsCodeGen::createFilterFunc(LgsFunc* func) {
 
     cg.builder.CreateCondBr(v, trueBlock, falseBlock);
     cg.startBlock(trueBlock);
-    dArray->getMethod(ADD_FUNC)->callIR(cg, {newArr.IRValue, element});
+    const auto tempExpr = dArray->baseType->getZeroValue();
+    tempExpr->IRValue = cg.builder.CreateCall(ft, callbackParam.IRValue, {tempExpr->IRValue});
+    dArray->getMethod(ADD_FUNC)->call(cg, {&newArr, tempExpr});
+    freeExpr(tempExpr);
+
     cg.builder.CreateBr(falseBlock);
     cg.startBlock(falseBlock);
 

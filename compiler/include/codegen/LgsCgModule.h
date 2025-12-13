@@ -68,13 +68,12 @@ public:
 
     void setupModule(const std::filesystem::path& file, bool debugMode = false);
     bool writeIRModule(const LgsPaths& paths, uint8_t optLevel) const;
-    void loop(Value* loopLength, const std::function<void(Value*, BasicBlock*)>& body);
     Constant* getString(const std::string& value);
-    Value* getPtrTo(Value* v);
+    llvm::AllocaInst* getEmptyBuffer();
     GlobalVariable* createGlobal(const std::string& name, Type* type, Constant* initializer, bool isConst = false, GlobalValue::LinkageTypes linkage = GlobalValue::ExternalLinkage) const;
     StructType* getStructType(const std::vector<Type*>& fields, const std::string& name = "");
     void setStructField(Type* type, Value* instancePtr, size_t position, Value* v);
-    llvm::AllocaInst* getEmptyBuffer();
+    void loop(Value* loopLength, const std::function<void(Value*, BasicBlock*)>& body);
     Constant* getRTTypeInfo(const std::string& name, size_t size, Lgs_TypeKind kind, bool isHeapAlloc, Constant* extra);
     Constant* getRTTExtraStruct(const std::string& name, const std::vector<Type*>& fields, const std::vector<Constant*>& args);
     StructType* getRTTBaseStruct();

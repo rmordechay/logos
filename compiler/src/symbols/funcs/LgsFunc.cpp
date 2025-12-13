@@ -48,6 +48,7 @@ void LgsFunc::initFunc(const std::string& name, LgsType* rt, const std::vector<L
 }
 
 Value* LgsFunc::call(LgsCgModule& cg, std::vector<LgsFuncArg>& args) {
+    if (fn) return fn(cg, args);
     if (args.empty()) return callIR(cg, {});
     std::vector<Value*> IRArgs;
     if (funcType->isVariadic) return callWithVariadic(cg, args);
@@ -79,6 +80,14 @@ Value* LgsFunc::call(LgsCgModule& cg, std::vector<LgsFuncArg>& args) {
     return callIR(cg, IRArgs);
 }
 
+Value* LgsFunc::call(LgsCgModule& cg, const std::vector<LgsExpr*>& args) {
+    std::vector<LgsFuncArg> funcArgs;
+    for (const auto& arg : args) {
+        funcArgs.push_back(LgsFuncArg(arg));
+    }
+    return call(cg, funcArgs);
+}
+
 Value* LgsFunc::callWithVariadic(LgsCgModule& cg, const std::vector<LgsFuncArg>& args) {
     std::vector<Value*> IRArgs;
     const auto variadicOffset = funcType->params.size() - 1;
@@ -102,7 +111,6 @@ Value* LgsFunc::callWithVariadic(LgsCgModule& cg, const std::vector<LgsFuncArg>&
 }
 
 Value* LgsFunc::callIR(LgsCgModule& cg, const std::vector<Value*>& args) {
-    if (fn) return fn(cg, args);
     CallInst* rv = nullptr;
     if (IRValue) {
         const auto funcTypeIR = funcType->getIRType(cg);

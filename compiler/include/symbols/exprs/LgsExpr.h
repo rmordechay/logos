@@ -77,10 +77,14 @@ public:
     LgsMetaSelection* asMetaSelection();
     LgsNullableExpr* asNullableExpr();
     ~LgsExpr() override = default;
+Value* getPtrTo(LgsCgModule& cg) const;
 };
 
+
 Value* dotProduct(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
+
 Value* crossProduct(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
+
 void castExprImplicitly(LgsExpr*& expr, LgsType* toType);
 
 void freeExpr(LgsExpr* expr);

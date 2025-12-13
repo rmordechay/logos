@@ -92,10 +92,8 @@ Value* LgsNullable::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
 
 void LgsNullable::setNullableFields(LgsCgModule& cg, Value* ptr, Value* value, Value* isSet) {
     const auto ty = getIRType(cg);
-    const auto gepValue = cg.builder.CreateStructGEP(ty, ptr, 0);
-    const auto gepIsSet = cg.builder.CreateStructGEP(ty, ptr, 1);
-    cg.builder.CreateStore(value, gepValue);
-    cg.builder.CreateStore(isSet, gepIsSet);
+    cg.setStructField(ty, ptr, 0, value);
+    cg.setStructField(ty, ptr, 1, isSet);
 }
 
 Value* LgsNullable::getNullableValue(LgsCgModule& cg, Value* ptr) {
@@ -109,13 +107,11 @@ Value* LgsNullable::getIsSet(LgsCgModule& cg, Value* ptr) {
 }
 
 void LgsNullable::setNullableValue(LgsCgModule& cg, Value* ptr, Value* value) {
-    const auto valueField = cg.builder.CreateStructGEP(getIRType(cg), ptr, 0);
-    cg.builder.CreateStore(value, valueField);
+    cg.setStructField(getIRType(cg), ptr, 0, value);
 }
 
 void LgsNullable::setIsSet(LgsCgModule& cg, Value* ptr, Value* value) {
-    const auto isSetField = cg.builder.CreateStructGEP(getIRType(cg), ptr, 1);
-    cg.builder.CreateStore(value, isSetField);
+    cg.setStructField(getIRType(cg), ptr, 1, value);
 }
 
 Value* LgsNullable::applyNumberBinOp(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right, const std::function<Value*(LgsExpr*, LgsExpr*)>& func) {

@@ -5,7 +5,7 @@
 #include "logos/LgsPaths.h"
 #include "utils/ThreadPool.h"
 #include "builtins/LgsPrint.h"
-#include "builtins/LgsSystem.h"
+#include "builtins/LgsSys.h"
 #include "files/LgsEnvFile.h"
 #include "codegen/LgsCodeGen.h"
 #include "codegen/LgsLinker.h"
@@ -297,7 +297,7 @@ bool LgsApp::loadDeps() const {
 }
 
 void LgsApp::loadBuiltins() {
-    globals.table.addSymbol(LgsSymbol(new LgsSystem(), true, false), &errHandler);
+    globals.table.addSymbol(LgsSymbol(new LgsSys(), true, false), &errHandler);
     globals.table.addSymbol(LgsSymbol(new LgsPrint(), true, false), &errHandler);
     globals.table.addSymbol(LgsSymbol(new LgsTest(), true, false), &errHandler);
     globals.table.addSymbol(LgsSymbol(new LgsVarDec("_LINUX", &LGS_BOOL, new LgsIntConst(&LGS_BOOL, lgsConfigs.os == LINUX)), true, false), &errHandler);

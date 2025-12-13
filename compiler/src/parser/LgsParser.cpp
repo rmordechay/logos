@@ -1083,7 +1083,7 @@ LgsForLoop* LgsParser::parseForLoop() {
     const auto forKeyword = currentToken;
     if (!matchAndConsume(T_FOR)) return nullptr;
 
-    // Consume the first loop expr. After this we could have 3 cases:
+    // Consume the first loop expr. After this we may have 3 cases:
     // 1. Next token is T_LBRACE -> for expr {...} (expr can be anything)
     // 2. Next token is T_IN -> for var in iter {...} (var must be a variable)
     // 3. Next token is T_COMMA -> for expr1, expr2, ... in iter {...} (expr1, expr2... must be variables)
@@ -1101,17 +1101,17 @@ LgsForLoop* LgsParser::parseForLoop() {
 
     // At this point we are expecting a loop with an 'in' keyword (only variables are allowed).
     const auto firstLoopVar = firstExpr->asVariable();
-    if (!mustParse(firstLoopVar)) return nullptr;
+    assert(firstLoopVar);
     const auto firstVarName = firstLoopVar->name;
-    freeExpr(firstExpr);
+    freeExpr(firstExpr); // We only need the name of the variable
 
     // Multiple loop vars
     std::vector loopVars = {firstVarName};
     if (matchAndConsume(T_COMMA)) {
         while (true) {
-            const auto nextToken = consume();
+            const auto var = currentToken;
             mustMatch(T_IDENTIFIER);
-            loopVars.push_back(currentToken.lexeme);
+            loopVars.push_back(var.lexeme);
             if (matchAndConsume(T_COMMA)) continue;
             if (currentToken.type == T_IN) break;
         }
@@ -2250,11 +2250,6 @@ bool LgsParser::parsedOrReset(const void* value, const size_t resetIndex) {
     return false;
 }
 
-void LgsParser::addParsingError() {
-    const auto token = tokens[currentIndex];
-    return errHandler.addError(E10085, &token.location, metadata->path);
-}
-
 bool LgsParser::validateTypeName(const std::string& typeName, const LgsLocation* location) {
     if (islower(typeName[0])) {
         errHandler.addError(E10033, location, metadata->path, {typeName});
@@ -2263,13 +2258,18 @@ bool LgsParser::validateTypeName(const std::string& typeName, const LgsLocation*
     return true;
 }
 
+void LgsParser::addError(const LgsBaseMsg& lgsErr, const LgsLocation& location, const std::vector<std::string>& args) {
+    errHandler.addError(lgsErr, &location, metadata->path, args);
+}
+
+void LgsParser::addParsingError() {
+    const auto token = tokens[currentIndex];
+    return errHandler.addError(E10085, &token.location, metadata->path);
+}
+
 void LgsParser::recursionGuard() {
     if (recursionCount++ < MAX_TOKENS_NUMBER) return;
     assert(0);
-}
-
-void LgsParser::addError(const LgsBaseMsg& lgsErr, const LgsLocation& location, const std::vector<std::string>& args) {
-    errHandler.addError(lgsErr, &location, metadata->path, args);
 }
 
 LgsFunc* wrapStmtsBlockWithLambda(LgsStmtsBlock* stmtsBlock) {

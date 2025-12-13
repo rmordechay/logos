@@ -5,7 +5,6 @@
 #include "exprs/LgsArrayExpr.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsBool.h"
-#include "types/primitives/LgsLong.h"
 #include <llvm/IR/Module.h>
 
 LgsFunc* LgsDArray::getMethod(const std::string& methodName) {
@@ -13,6 +12,11 @@ LgsFunc* LgsDArray::getMethod(const std::string& methodName) {
     if (methodName == ADD_FUNC) {
         if (methods.contains(ADD_FUNC)) return methods[ADD_FUNC];
         const auto func = new LgsFunc(ADD_FUNC, name, &LGS_VOID, {this, baseType}, flags);
+        func->fn = [this](LgsCgModule& cg, const std::vector<LgsFuncArg>& args) {
+            const std::vector<Type*> params = {cg.ptrTy(), cg.ptrTy(), cg.ptrTy()};
+            const std::vector<Value*> IRArgs = {args[0].expr->IRValue, getRTType(cg), args[1].expr->getPtrTo(cg)};
+            return cg.callLgsFunc(std::string(name) + "_add", cg.voidTy(), params, IRArgs);
+        };
         addMethod(func);
         return func;
     }
@@ -44,7 +48,7 @@ Constant* LgsDArray::getRTType(LgsCgModule& cg) {
 }
 
 std::string LgsDArray::getName() {
-    return baseType->getName() + name;
+    return name + baseType->getName();
 }
 
 std::string LgsDArray::pname() {
@@ -80,15 +84,21 @@ LgsType* LgsDArray::applyBinOp(LgsType* rightType, LgsBinOp& op) {
 }
 
 Value* LgsDArray::lenIR(LgsCgModule& cg, Value* iterable) {
-    return cg.callLgsFunc("DArray_len", cg.sizeTy(), {cg.ptrTy(), cg.ptrTy()}, {iterable, getRTType(cg)});
+    const std::vector<Type*> params = {cg.ptrTy(), cg.ptrTy()};
+    const std::vector<Value*> IRArgs = {iterable, getRTType(cg)};
+    return cg.callLgsFunc(std::string(name) + "_len", cg.sizeTy(), params, IRArgs);
 }
 
 Value* LgsDArray::inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) {
-    return cg.callLgsFunc("DArray_contains", cg.i1Ty(), {cg.ptrTy(), cg.ptrTy(), cg.ptrTy()}, {iterableExpr->IRValue, getRTType(cg), cg.getPtrTo(value->IRValue)});
+    const std::vector<Type*> params = {cg.ptrTy(), cg.ptrTy(), cg.ptrTy()};
+    const std::vector<Value*> IRArgs = {iterableExpr->IRValue, getRTType(cg), value->getPtrTo(cg)};
+    return cg.callLgsFunc(std::string(name) + "_contains", cg.i1Ty(), params, IRArgs);
 }
 
 Value* LgsDArray::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
-    return cg.callLgsFunc("DArray_get", cg.ptrTy(), {cg.ptrTy(), cg.ptrTy(), cg.sizeTy()}, {iterable, getRTType(cg), index});
+    const std::vector<Type*> params = {cg.ptrTy(), cg.ptrTy(), cg.sizeTy()};
+    const std::vector<Value*> IRArgs = {iterable, getRTType(cg), index};
+    return cg.callLgsFunc(std::string(name) + "_get", cg.ptrTy(), params, IRArgs);
 }
 
 bool LgsDArray::canCastTo(LgsType* other) {
@@ -103,21 +113,4 @@ bool LgsDArray::canCastTo(LgsType* other) {
 
 DIType* LgsDArray::getDebugType(LgsCgModule& cg) {
     assert(0);
-}
-
-CallFn LgsDArray::getAddFn() {
-    return [this](LgsCgModule& cg, const std::vector<Value*>& args) -> Value* {
-        const auto arr = args[0];
-        const auto value = args[1];
-        if (value->getType()->isIntegerTy(LGS_INT.sizeBytes() * 8)) {
-            return cg.callLgsFunc(std::string(name) + "_addInt", cg.voidTy(), {cg.ptrTy(), cg.ptrTy(), cg.i32Ty()}, {arr, getRTType(cg), value});
-        }
-        if (value->getType()->isIntegerTy(LGS_LONG.sizeBytes() * 8)) {
-            return cg.callLgsFunc(std::string(name) + "_addLong", cg.voidTy(), {cg.ptrTy(), cg.ptrTy(), cg.i64Ty()}, {arr, getRTType(cg), value});
-        }
-        if (value->getType()->isIntegerTy(LGS_SIZE.sizeBytes() * 8)) {
-            return cg.callLgsFunc(std::string(name) + "_addSize", cg.voidTy(), {cg.ptrTy(), cg.ptrTy(), cg.sizeTy()}, {arr, getRTType(cg), value});
-        }
-        return cg.callLgsFunc(std::string(name) + "_add", cg.voidTy(), {cg.ptrTy(), cg.ptrTy(), cg.ptrTy()}, {arr, getRTType(cg), value});
-    };
 }

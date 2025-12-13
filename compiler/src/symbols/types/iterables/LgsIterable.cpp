@@ -8,6 +8,7 @@
 #include "funcs/LgsFunc.h"
 #include "types/iterables/LgsMap.h"
 #include "types/primitives/LgsBool.h"
+#include "types/primitives/LgsVoid.h"
 
 size_t LgsIterable::getDimension() const {
     size_t dim = 1;

@@ -3,7 +3,7 @@
 
 Value* LgsPrint::call(LgsCgModule& cg, std::vector<LgsFuncArg>& args) {
     const auto arg = args.empty() ? funcType->params.front().expr : args.front().expr;
-    return cg.callLgsFunc(name, cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {
-        arg->type->getRTType(cg), cg.getPtrTo(arg->IRValue)
-    });
+    const std::vector<Type*> params = {cg.ptrTy(), cg.ptrTy()};
+    const std::vector<Value*> IRArgs = {arg->type->getRTType(cg), arg->getPtrTo(cg)};
+    return cg.callLgsFunc(name, cg.voidTy(), params, IRArgs);
 }

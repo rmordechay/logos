@@ -9,7 +9,7 @@ class LgsParam;
 class LgsStmt;
 class LgsType;
 
-typedef std::function<Value*(LgsCgModule&, const std::vector<Value*>&)> CallFn;
+typedef std::function<Value*(LgsCgModule&, const std::vector<LgsFuncArg>&)> CallFn;
 
 class LgsFunc : public LgsExpr {
 public:
@@ -42,6 +42,7 @@ public:
     virtual Value* call(LgsCgModule& cg, std::vector<LgsFuncArg>& args);
     Value* callIR(LgsCgModule& cg, const std::vector<Value*>& args = {});
     void initFunc(const std::string& name, LgsType* rt, const std::vector<LgsParam>& params, uint32_t ops);
+    Value* call(LgsCgModule& cg, const std::vector<LgsExpr*>& args);
     Value* callWithVariadic(LgsCgModule& cg, const std::vector<LgsFuncArg>& args);
     Value* loadIR(LgsCgModule& cg) override;
     void castImplicitly(LgsType* toType) override;

@@ -206,6 +206,15 @@ LgsNullableExpr* LgsExpr::asNullableExpr() {
     return dynamic_cast<LgsNullableExpr*>(this);
 }
 
+Value* LgsExpr::getPtrTo(LgsCgModule& cg) const {
+    if (!type->passByRef) {
+        const auto ptr = cg.builder.CreateAlloca(type->getIRType(cg));
+        cg.builder.CreateStore(IRValue, ptr);
+        return ptr;
+    }
+    return IRValue;
+}
+
 Value* dotProduct(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     const auto l = left->loadIR(cg);
     const auto r = right->loadIR(cg);

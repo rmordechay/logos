@@ -3,7 +3,6 @@
 #include "exprs/LgsArrayExpr.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsBool.h"
-#include "LgsUtils.h"
 #include "Lgs_DArrayExpr.h"
 #include "exprs/LgsBinaryExpr.h"
 #include "lgsc/LgsCCompiler.h"

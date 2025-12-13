@@ -120,10 +120,10 @@ void LgsIterIndex::assign(LgsCgModule& cg, LgsExpr* expr) {
     const auto baseIRValue = baseExpr;
     auto indexIR = index.from->IRValue;
     if (baseExpr->type->asDArray() || baseExpr->type->asSet()) {
-        const auto args = {baseIRValue->IRValue, indexIR, cg.getPtrTo(rIRValue)};
+        const auto args = {baseIRValue->IRValue, indexIR, expr->getPtrTo(cg)};
         cg.callLgsFunc("put", cg.voidTy(), {cg.ptrTy(), cg.i32Ty(), cg.ptrTy()}, args);
     } else if (const auto map = baseExpr->type->asMap()) {
-        map->addFunc->callIR(cg, {baseExpr->IRValue, indexIR, expr->IRValue});
+        map->getMethod(ADD_FUNC)->call(cg, {baseExpr, index.from, expr});
     } else {
         cg.builder.CreateStore(rIRValue, IRValue);
     }
@@ -134,10 +134,10 @@ void LgsIterIndex::assignScalar(LgsCgModule& cg, LgsExpr* expr) const {
     const auto baseIRValue = baseExpr;
     auto indexIR = index.from->IRValue;
     if (baseExpr->type->asDArray() || baseExpr->type->asSet()) {
-        const auto args = {baseIRValue->IRValue, indexIR, cg.getPtrTo(rIRValue)};
+        const auto args = {baseIRValue->IRValue, indexIR, expr->getPtrTo(cg)};
         cg.callLgsFunc("put", cg.voidTy(), {cg.ptrTy(), cg.i32Ty(), cg.ptrTy()}, args);
     } else if (const auto map = baseExpr->type->asMap()) {
-        map->addFunc->callIR(cg, {baseExpr->IRValue, indexIR, expr->IRValue});
+        map->getMethod(ADD_FUNC)->callIR(cg, {baseExpr->IRValue, indexIR, expr->IRValue});
     } else {
         cg.builder.CreateStore(rIRValue, IRValue);
     }
