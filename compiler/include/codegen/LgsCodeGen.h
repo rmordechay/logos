@@ -83,7 +83,6 @@ public:
     void visitMainFunc(LgsMainFunc* func);
     void visitFunc(LgsFunc* func);
     void visitGenericFunc(LgsFunc* func);
-    void visitField(LgsField* field, Value* parent) const;
     void visitStmt(LgsStmt* stmt);
     void visitStmtsBlock(const LgsStmtsBlock* stmtsBlock);
     void visitLoop(LgsForLoop* loop);
@@ -146,6 +145,7 @@ public:
     void createMapFunc(LgsFunc* func);
     void createFilterFunc(LgsFunc* func);
     void createForeachFunc(LgsFunc* func) const;
+    void createNewVecField(LgsField* field, Value* parent) const;
 
     bool checkMock(LgsExpr* expr) const;
     Value* getIRValue(LgsValue* value);

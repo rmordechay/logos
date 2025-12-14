@@ -676,6 +676,7 @@ void LgsSema::visitExpr(LgsExpr*& expr) {
         else if (const auto nullableExpr = expr->asNullableExpr()) visitNullableExpr(nullableExpr);
         else if (const auto castExpr = expr->asCast()) visitCast(castExpr);
         else if (const auto json = expr->asJson()) visitJson(json);
+        visitUnwrap(expr);
     }
     addRTType(expr->type);
 }
@@ -733,6 +734,16 @@ void LgsSema::visitNullableExpr(LgsNullableExpr* nullableExpr) {
     if (nullableExpr->isNull) return;
     visitExpr(nullableExpr->baseExpr);
     nullableExpr->type = new LgsNullable(nullableExpr->baseExpr->type);
+}
+
+void LgsSema::visitUnwrap(LgsExpr* expr) {
+    if (!expr->type || !expr->hasUnwrapSuffix) return;
+    if (!expr->type->asNullable()) {
+        addError(E10113, expr->location, {expr->type->pname()});
+        return;
+    }
+    const auto nullable = expr->type->asNullable();
+    expr->type = nullable->baseType;
 }
 
 void LgsSema::visitArrayExpr(LgsArrayExpr* arrayExpr) {
@@ -900,7 +911,6 @@ void LgsSema::visitSelection(LgsSelection* selection) {
             selection->exprs[0] = typeExpr;
         }
     }
-
     if (!firstExpr->type) return;
     visitInnerSelections(selection);
     const auto lastExpr = selection->lastExpr();
@@ -1674,4 +1684,15 @@ void LgsSema::addRTType(LgsType* type) const {
         if (rttType->equals(type)) return;
     }
     file->symbolTable.rttTypes.push_back(type);
+}
+
+void LgsSema::deleteRTType(LgsType* type) const {
+    if (!type || type->isVoid() || (type->asNullable() && !type->asNullable()->baseType)) return;
+    auto& rttTypes = file->symbolTable.rttTypes;
+    for (auto it = rttTypes.begin(); it != rttTypes.end(); ++it) {
+        if ((*it)->equals(type)) {
+            rttTypes.erase(it);
+            return;
+        }
+    }
 }

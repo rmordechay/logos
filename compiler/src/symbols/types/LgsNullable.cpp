@@ -8,6 +8,10 @@
 #include "types/primitives/LgsBool.h"
 #include <cassert>
 
+LgsField* LgsNullable::getField(const std::string& fieldName) {
+    return baseType->getField(fieldName);
+}
+
 size_t LgsNullable::sizeBytes() {
     if (passByRef) return sizeof(void*);
     return baseType->sizeBytes() + sizeof(bool);

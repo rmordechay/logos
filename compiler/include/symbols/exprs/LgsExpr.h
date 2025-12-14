@@ -37,6 +37,7 @@ public:
     bool isImportName = false;
     bool isNull = false;
     bool isReturnExpr = false;
+    bool hasUnwrapSuffix = false;
     LgsValue* owner = nullptr;
 
     explicit LgsExpr(LgsType* type = nullptr) : type(type) {}

@@ -104,6 +104,7 @@ public:
     void visitTernaryExpr(LgsTernaryExpr* ternary);
     void visitCast(LgsCast* cast);
     void visitNullableExpr(LgsNullableExpr* nullableExpr);
+    void visitUnwrap(LgsExpr* expr);
     void visitArrayExpr(LgsArrayExpr* arrayExpr);
     void visitStaticArray(const LgsArrayExpr* arrayExpr);
     void visitDynamicArray(LgsArrayExpr* arrayExpr);
@@ -152,4 +153,5 @@ public:
     void addError(const LgsBaseMsg& lgsErr, const LgsLocation& location, const std::vector<std::string>& args = {});
     void addErrorIfSuccessful(const LgsBaseMsg& lgsErr, const LgsLocation& location, const std::vector<std::string>& args);
     void addRTType(LgsType* type) const;
+    void deleteRTType(LgsType* type) const;
 };

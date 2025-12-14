@@ -1368,13 +1368,15 @@ LgsExpr* LgsParser::parseUnary(const bool withInstance) {
     else if (const auto variable = parseVariable()) expr = variable;
     else return nullptr;
 
-    if (matchAndConsume(T_DOT)) return parseSelection(expr);
-    if (matchAndConsume(T_DOUBLE_COLON)) return parseMetaSelection(expr);
-    if (const auto iterIndex = parseIterIndex(expr)) return iterIndex;
-    if (const auto postfixExpr = parsePostfixExpr(expr)) return postfixExpr;
+    if (matchAndConsume(T_DOT)) expr = parseSelection(expr);
+    else if (matchAndConsume(T_DOUBLE_COLON)) expr = parseMetaSelection(expr);
+    else if (const auto iterIndex = parseIterIndex(expr)) expr = iterIndex;
+    else if (const auto postfixExpr = parsePostfixExpr(expr)) expr = postfixExpr;
 
     if (matchAndConsume(T_QUEST_MARK)) {
         expr = new LgsNullableExpr(expr);
+    } else if (matchAndConsume(T_EXCLA_MARK)) {
+        expr->hasUnwrapSuffix = true;
     }
     return expr;
 }

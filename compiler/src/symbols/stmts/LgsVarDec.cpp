@@ -17,8 +17,8 @@ bool LgsVarDec::shouldAllocate() const {
     if (!type) return false;
     if (type->isHeapAlloc) return false;
     if (type->asIterable() && type->asIterable()->isStatic) return false;
-    if (type->asSubtype() || type->asFuncType()) return false;
-    if (expr->asFuncCall() || (expr->asNullableExpr() && !expr->type->passByRef)) return false;
+    if (type->asNullable() || type->asSubtype() || type->asFuncType()) return false;
+    if (expr->asFuncCall()) return false;
     return true;
 }
 

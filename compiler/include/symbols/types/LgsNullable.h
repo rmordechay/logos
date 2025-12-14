@@ -12,6 +12,8 @@ public:
         if (baseType) passByRef = baseType->passByRef;
         else passByRef = true;
     }
+
+    LgsField* getField(const std::string& fieldName) override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
     std::string pname() override;
@@ -32,4 +34,4 @@ public:
     Value* applyPtrBinOp(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right, const std::function<Value*(LgsExpr*, LgsExpr*)>& func);
 };
 
-inline LgsNullable LGS_NULL;
+inline LgsNullable LGS_NULLABLE;

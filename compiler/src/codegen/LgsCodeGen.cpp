@@ -28,7 +28,6 @@
 #include "files/LgsMainFile.h"
 #include "files/LgsTestFile.h"
 #include "funcs/LgsMainFunc.h"
-#include "logos/LgsApp.h"
 #include "logos/LgsAppConfigs.h"
 #include "logos/LgsPaths.h"
 #include "stmts/LgsBreak.h"
@@ -49,7 +48,6 @@
 #include "types/iterables/LgsVec.h"
 #include "types/primitives/LgsSize.h"
 #include <llvm/IR/Module.h>
-#include "llvm/IR/Verifier.h"
 #include <llvm/Passes/PassBuilder.h>
 #include "llvm/Bitcode/BitcodeWriter.h"
 #include <unistd.h>
@@ -179,21 +177,6 @@ void LgsCodeGen::visitGenericFunc(LgsFunc* func) {
     stack.exitScope();
     cg.currentFunc = originalFunc;
     cg.builder.restoreIP(cg.savedIP);
-}
-
-void LgsCodeGen::visitField(LgsField* field, Value* parent) const {
-    if (const auto vec = field->type->asVec()) {
-        std::vector<int> mask(vec->vectorDim);
-        for (size_t i = 0; i < vec->vectorDim; i++) {
-            mask[i] = LgsVec::getComponentIndex(field->name[i]);
-        }
-        const auto vecType = field->type->getIRType(cg);
-        field->IRValue = cg.builder.CreateAlloca(vecType);
-        const auto parentTy = field->parentType->getIRType(cg);
-        const auto l = cg.builder.CreateLoad(parentTy, parent);
-        const auto newVec = cg.builder.CreateShuffleVector(l, UndefValue::get(parentTy), mask);
-        cg.builder.CreateStore(newVec, field->IRValue);
-    }
 }
 
 void LgsCodeGen::visitStmt(LgsStmt* stmt) {
@@ -1019,9 +1002,10 @@ void LgsCodeGen::visitFieldSelection(LgsVariable* var, LgsExpr* parent, const bo
         }
     }
 
+    // Set the reference
     field->IRValue = field->getGEP(cg, parentIR);
 
-    // Virtual fields
+    // Check for virtual fields
     if (field && field->isVirtual) {
         const auto id = cg.hashConst(field->name);
         var->IRValue = cg.getFromVTable(parent->IRValue, id);
@@ -1030,7 +1014,7 @@ void LgsCodeGen::visitFieldSelection(LgsVariable* var, LgsExpr* parent, const bo
     if (!assign && (field->type->asObject() || field->type->asEnum())) {
         var->IRValue = cg.builder.CreateLoad(cg.ptrTy(), field->IRValue);
     } else {
-        visitField(field, parent->IRValue);
+        createNewVecField(field, parent->IRValue);
         var->IRValue = field->IRValue;
     }
 }
@@ -1172,7 +1156,7 @@ void LgsCodeGen::visitInstance(LgsInstance* instance) {
         const auto field = instance->obj->getField(argName);
         visitExpr(arg.expr);
         if (arg.expr->IRValue != field->IRValue) {
-            cg.setStructField(obj->getIRType(cg), instance->IRValue, field->position, arg.expr->IRValue);
+            cg.setStructField(obj->getIRType(cg), instance->IRValue, field->position, arg.expr->getPtrTo(cg));
         }
     }
 
@@ -1463,6 +1447,21 @@ void LgsCodeGen::createForeachFunc(LgsFunc* func) const {
     cg.currentFunc = originalFunc;
     cg.builder.restoreIP(cg.savedIP);
     func->IRValue = func->getIRFunc(cg);
+}
+
+void LgsCodeGen::createNewVecField(LgsField* field, Value* parent) const {
+    const auto vec = field->type->asVec();
+    if (!vec) return;
+    std::vector<int> mask(vec->vectorDim);
+    for (size_t i = 0; i < vec->vectorDim; i++) {
+        mask[i] = LgsVec::getComponentIndex(field->name[i]);
+    }
+    const auto vecType = field->type->getIRType(cg);
+    field->IRValue = cg.builder.CreateAlloca(vecType);
+    const auto parentTy = field->parentType->getIRType(cg);
+    const auto l = cg.builder.CreateLoad(parentTy, parent);
+    const auto newVec = cg.builder.CreateShuffleVector(l, UndefValue::get(parentTy), mask);
+    cg.builder.CreateStore(newVec, field->IRValue);
 }
 
 bool LgsCodeGen::checkMock(LgsExpr* expr) const {

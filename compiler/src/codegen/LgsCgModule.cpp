@@ -237,6 +237,7 @@ Value* LgsCgModule::callIntrinsics(const llvm::Intrinsic::ID intrinsicID, const 
 }
 
 Value* LgsCgModule::callLgsFunc(const std::string& baseName, const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes, const std::vector<Value*>& args) {
+    if (baseName == "") return callFunc(LGS_PREFIX + funcName, rt, paramTypes, args);
     return callFunc(LGS_PREFIX + baseName + '_' + funcName, rt, paramTypes, args);
 }
 
