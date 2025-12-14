@@ -825,9 +825,7 @@ void LgsCodeGen::visitDynamicArray(LgsArrayExpr* arrayExpr) const {
         const auto size = cg.usize(dArr->sizeBytes());
         arrayExpr->IRValue = cg.allocate(size, rtType, !!arrayExpr->owner);
     }
-    cg.callLgsFunc("DArray_init", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {
-        arrayExpr->IRValue, rtType
-    });
+    cg.callLgsFunc(LgsDArray::name, "init", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {arrayExpr->IRValue, rtType});
     for (size_t i = 0; i < arrayExpr->elements.size(); ++i) {
         const auto element = arrayExpr->elements[i];
         dArr->getMethod(ADD_FUNC)->call(cg, {arrayExpr, element});
@@ -839,9 +837,7 @@ void LgsCodeGen::visitSetExpr(LgsArrayExpr* arrayExpr) const {
     if (!arrayExpr->IRValue) {
         arrayExpr->IRValue = cg.allocate(cg.usize(set->sizeBytes()), set->getRTType(cg), !!arrayExpr->owner);
     }
-    cg.callLgsFunc("Set_init", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {
-        arrayExpr->IRValue, set->getRTType(cg)
-    });
+    cg.callLgsFunc(LgsSet::name, "init", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {arrayExpr->IRValue, set->getRTType(cg)});
     for (size_t i = 0; i < arrayExpr->elements.size(); ++i) {
         const auto element = arrayExpr->elements[i];
         set->addFunc->call(cg, {arrayExpr, element});
@@ -905,7 +901,7 @@ void LgsCodeGen::visitMatrixExpr(const LgsMatrixExpr* matrixExpr) {
 void LgsCodeGen::visitHashMap(LgsHashMap* hashMap) {
     const auto map = hashMap->type->asMap();
     hashMap->IRValue = cg.allocate(cg.usize(map->sizeBytes()), map->getRTType(cg), !!hashMap->owner);
-    cg.callLgsFunc(std::string(LgsMap::name) + "_init", cg.voidTy(), {cg.ptrTy()}, {hashMap->IRValue});
+    cg.callLgsFunc(LgsMap::name, "init", cg.voidTy(), {cg.ptrTy()}, {hashMap->IRValue});
     for (const auto [key, value] : hashMap->elements) {
         visitExpr(key);
         visitExpr(value);
@@ -914,7 +910,9 @@ void LgsCodeGen::visitHashMap(LgsHashMap* hashMap) {
 }
 
 void LgsCodeGen::visitEnvVar(LgsEnvVar* envVar) const {
-    envVar->IRValue = cg.callLgsFunc(std::string(LgsSys::name) + "_getEnv", cg.ptrTy(), {cg.ptrTy(), cg.ptrTy()}, {cg.getString(envVar->name), cg.emptyStr()});
+    const std::vector<Type*> params = {cg.ptrTy(), cg.ptrTy()};
+    const std::vector<Value*> IRArgs = {cg.getString(envVar->name), cg.emptyStr()};
+    envVar->IRValue = cg.callLgsFunc(LgsSys::name, "getEnv", cg.ptrTy(), params, IRArgs);
 }
 
 void LgsCodeGen::visitVariable(LgsVariable* variable) {

@@ -15,7 +15,7 @@ LgsFunc* LgsDArray::getMethod(const std::string& methodName) {
         func->fn = [this](LgsCgModule& cg, const std::vector<LgsFuncArg>& args) {
             const std::vector<Type*> params = {cg.ptrTy(), cg.ptrTy(), cg.ptrTy()};
             const std::vector<Value*> IRArgs = {args[0].expr->IRValue, getRTType(cg), args[1].expr->getPtrTo(cg)};
-            return cg.callLgsFunc(std::string(name) + "_add", cg.voidTy(), params, IRArgs);
+            return cg.callLgsFunc(name, "add", cg.voidTy(), params, IRArgs);
         };
         addMethod(func);
         return func;
@@ -86,19 +86,19 @@ LgsType* LgsDArray::applyBinOp(LgsType* rightType, LgsBinOp& op) {
 Value* LgsDArray::lenIR(LgsCgModule& cg, Value* iterable) {
     const std::vector<Type*> params = {cg.ptrTy(), cg.ptrTy()};
     const std::vector<Value*> IRArgs = {iterable, getRTType(cg)};
-    return cg.callLgsFunc(std::string(name) + "_len", cg.sizeTy(), params, IRArgs);
+    return cg.callLgsFunc(name, "len", cg.sizeTy(), params, IRArgs);
 }
 
 Value* LgsDArray::inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) {
     const std::vector<Type*> params = {cg.ptrTy(), cg.ptrTy(), cg.ptrTy()};
     const std::vector<Value*> IRArgs = {iterableExpr->IRValue, getRTType(cg), value->getPtrTo(cg)};
-    return cg.callLgsFunc(std::string(name) + "_contains", cg.i1Ty(), params, IRArgs);
+    return cg.callLgsFunc(name, "contains", cg.i1Ty(), params, IRArgs);
 }
 
 Value* LgsDArray::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
     const std::vector<Type*> params = {cg.ptrTy(), cg.ptrTy(), cg.sizeTy()};
     const std::vector<Value*> IRArgs = {iterable, getRTType(cg), index};
-    return cg.callLgsFunc(std::string(name) + "_get", cg.ptrTy(), params, IRArgs);
+    return cg.callLgsFunc(name, "get", cg.ptrTy(), params, IRArgs);
 }
 
 bool LgsDArray::canCastTo(LgsType* other) {

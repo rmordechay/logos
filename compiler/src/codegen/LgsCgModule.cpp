@@ -236,8 +236,8 @@ Value* LgsCgModule::callIntrinsics(const llvm::Intrinsic::ID intrinsicID, const 
     return builder.CreateCall(declaration, args);
 }
 
-Value* LgsCgModule::callLgsFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes, const std::vector<Value*>& args) {
-    return callFunc(LGS_PREFIX + funcName, rt, paramTypes, args);
+Value* LgsCgModule::callLgsFunc(const std::string& baseName, const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes, const std::vector<Value*>& args) {
+    return callFunc(LGS_PREFIX + baseName + '_' + funcName, rt, paramTypes, args);
 }
 
 Value* LgsCgModule::callRuntimeFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes, const std::vector<Value*>& args, bool isVariadic) {
@@ -276,7 +276,7 @@ void LgsCgModule::callMemCpy(Value* dest, Value* src, Value* size) {
 }
 
 Value* LgsCgModule::callHash(Value* arg) {
-    return callLgsFunc("hash", i32Ty(), {ptrTy()}, {arg});
+    return callLgsFunc("", "hash", i32Ty(), {ptrTy()}, {arg});
 }
 
 Constant* LgsCgModule::hashConst(const std::string& str) {

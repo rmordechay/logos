@@ -19,7 +19,7 @@ LgsFunc* LgsMap::getMethod(const std::string& methodName) {
             const auto value = args[2].expr->IRValue;
             const std::vector<Type*> params = {cg.ptrTy(), cg.ptrTy(), cg.ptrTy(), cg.ptrTy()};
             const std::vector<Value*> IRArgs = {map, getRTType(cg), key, value};
-            return cg.callLgsFunc(std::string(name) + "_add", cg.ptrTy(), params, IRArgs);
+            return cg.callLgsFunc(name, "add", cg.ptrTy(), params, IRArgs);
         };
         addMethod(func);
         return func;
@@ -30,7 +30,7 @@ LgsFunc* LgsMap::getMethod(const std::string& methodName) {
         func->fn = [this](LgsCgModule& cg, const std::vector<LgsFuncArg>& args) {
             const std::vector<Type*> params = {cg.ptrTy(), cg.ptrTy()};
             const std::vector<Value*> IRArgs = {args[0].expr->IRValue, mapType->key->getRTType(cg)};
-            return cg.callLgsFunc(std::string(name) + "_keys", cg.ptrTy(), params, IRArgs);
+            return cg.callLgsFunc(name, "keys", cg.ptrTy(), params, IRArgs);
         };
         addMethod(func);
         return func;
@@ -41,7 +41,7 @@ LgsFunc* LgsMap::getMethod(const std::string& methodName) {
         func->fn = [this](LgsCgModule& cg, const std::vector<LgsFuncArg>& args) {
             const std::vector<Type*> params = {cg.ptrTy(), cg.ptrTy()};
             const std::vector<Value*> IRArgs = {args[0].expr->IRValue, mapType->value->getRTType(cg)};
-            return cg.callLgsFunc(std::string(name) + "_values", cg.ptrTy(), params, IRArgs);
+            return cg.callLgsFunc(name, "values", cg.ptrTy(), params, IRArgs);
         };
         addMethod(func);
         return func;
@@ -110,16 +110,16 @@ bool LgsMap::unpackLoopVarsTypes(LgsForeachLoop* loop) const {
 }
 
 void LgsMap::unpackLoopIR(LgsCgModule& cg, LgsForeachLoop* loop) const {
-    const auto keyPtr = cg.callLgsFunc(std::string(name) + "_getKeyAt", cg.ptrTy(), {cg.ptrTy(), cg.sizeTy()}, {loop->iterExpr->IRValue, cg.extendToSize(loop->iValue)});
+    const auto keyPtr = cg.callLgsFunc(name, "getKeyAt", cg.ptrTy(), {cg.ptrTy(), cg.sizeTy()}, {loop->iterExpr->IRValue, cg.extendToSize(loop->iValue)});
     loop->loopVars[0]->IRValue = keyPtr;
     if (loop->loopVars.size() == 2) {
-        const auto valuePtr = cg.callLgsFunc(std::string(name) + "_getValueAt", cg.ptrTy(), {cg.ptrTy(), cg.sizeTy()}, {loop->iterExpr->IRValue, cg.extendToSize(loop->iValue)});
+        const auto valuePtr = cg.callLgsFunc(name, "getValueAt", cg.ptrTy(), {cg.ptrTy(), cg.sizeTy()}, {loop->iterExpr->IRValue, cg.extendToSize(loop->iValue)});
         loop->loopVars[1]->IRValue = valuePtr;
     }
 }
 
 Value* LgsMap::lenIR(LgsCgModule& cg, Value* iterable) {
-    return cg.callLgsFunc(std::string(name) + "_len", cg.sizeTy(), {cg.ptrTy()}, {iterable});
+    return cg.callLgsFunc(name, "len", cg.sizeTy(), {cg.ptrTy()}, {iterable});
 }
 
 Value* LgsMap::inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) {
@@ -127,7 +127,7 @@ Value* LgsMap::inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) {
 }
 
 Value* LgsMap::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
-    return cg.callLgsFunc(std::string(name) + "_get", cg.ptrTy(), {cg.ptrTy(), cg.ptrTy()}, {iterable, index});
+    return cg.callLgsFunc(name, "get", cg.ptrTy(), {cg.ptrTy(), cg.ptrTy()}, {iterable, index});
 }
 
 bool LgsMap::canCastTo(LgsType* other) {
