@@ -45,12 +45,12 @@ LgsWhileLoop* LgsForLoop::asWhileLoop() {
 }
 
 LgsForLoop::~LgsForLoop() {
-    for (const auto& loopVar : loopVars) {
-        freeStmt(loopVar);
-    }
     if (stmtsBlock) {
         delete stmtsBlock;
         stmtsBlock = nullptr;
+    }
+    for (const auto& loopVar : loopVars) {
+        freeStmt(loopVar);
     }
     loopVars.clear();
 }

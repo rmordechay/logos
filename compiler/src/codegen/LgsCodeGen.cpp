@@ -297,6 +297,7 @@ void LgsCodeGen::visitLoopMetaVar(LgsMetaVar* metaVar) const {
         break;
     }
     case FOR_ELEMENT:
+        metaVar->IRValue = loop->loopVars.front()->IRValue;
         break;
     }
 }
@@ -1445,7 +1446,7 @@ void LgsCodeGen::createForeachFunc(LgsFunc* func) const {
     auto element = dArray->getIRElement(cg, arrParam.IRValue, iValue);
     const auto ft = llvm::dyn_cast<FunctionType>(callbackParam.type->getIRType(cg));
     if (!dArray->baseType->passByRef) {
-        element = cg.builder.CreateLoad(dArray->baseType->getIRType(cg), element);
+        element = cg.builder.CreateLoad(cg.ptrTy(), element);
     }
     cg.builder.CreateCall(ft, callbackParam.IRValue, {element});
 

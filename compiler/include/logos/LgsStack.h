@@ -1,5 +1,6 @@
 #pragma once
 #include "LgsSymbolTable.h"
+#include "loops/LgsForeachLoop.h"
 
 namespace llvm {
     class BasicBlock;
@@ -32,5 +33,6 @@ public:
     LgsForLoop* currentLoop() const;
     LgsIfStmt* currentIfStmt() const;
     LgsIfStmt* getOutermostIfStmt() const;
+    LgsForeachLoop* getInnermostForeachLoop() const;
     llvm::BasicBlock* findTagExitBlock(const std::string& tag) const;
 };

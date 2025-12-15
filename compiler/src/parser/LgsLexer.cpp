@@ -318,6 +318,7 @@ LgsToken LgsLexer::scanVarOrKeyword(const LgsLocation& location) {
         if (metaVar == "i") return {T_FOR_I, combined, location};
         if (metaVar == "isFirst") return {T_FOR_IS_FIRST, combined, location};
         if (metaVar == "isLast") return {T_FOR_IS_LAST, combined, location};
+        if (metaVar == "element") return {T_FOR_ELEMENT, combined, location};
         if (metaVar == "ever") return {T_FOR_EVER, combined, location};
         errHandler.addError(E10088, &location, filePath);
         return {T_EOF, "", location};

@@ -1503,6 +1503,11 @@ LgsMetaVar* LgsParser::parseLoopMetaVar() {
         metaVar->setType(&LGS_BOOL);
         return metaVar;
     }
+    if (matchAndConsume(T_FOR_ELEMENT)) {
+        const auto metaVar = new LgsMetaVar(metaVarToken.lexeme, FOR_ELEMENT);
+        setLocation(metaVar->location, &metaVarToken, &currentToken);
+        return metaVar;
+    }
     return nullptr;
 }
 

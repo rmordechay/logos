@@ -75,6 +75,9 @@ void LgsIterIndex::setIRElementPtr(LgsCgModule& cg, const bool assign) {
     if (const auto iter = baseExpr->type->asIterable()) {
         fromIR = cg.builder.CreateZExt(fromIR, cg.i64Ty());
         IRValue = iter->getIRElement(cg, baseExpr->IRValue, fromIR);
+        if (!type->passByRef) {
+            IRValue = cg.builder.CreateLoad(cg.ptrTy(), IRValue);
+        }
     }
 }
 

@@ -93,6 +93,7 @@ enum LgsTokenType {
     T_FOR_I,
     T_FOR_IS_FIRST,
     T_FOR_IS_LAST,
+    T_FOR_ELEMENT,
     T_FOR_EVER,
     T_BOOL,
     T_INT,
