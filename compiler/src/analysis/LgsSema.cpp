@@ -50,7 +50,6 @@
 #include "stmts/LgsSwitch.h"
 #include "tools/LgsFormatter.h"
 #include "types/primitives/LgsDouble.h"
-#include "types/LgsGenericType.h"
 #include "types/iterables/LgsVariadic.h"
 #include <ranges>
 #include <unordered_set>
@@ -332,17 +331,20 @@ void LgsSema::visitVarDec(LgsVarDec* varDec) {
     addRTType(varDec->type);
 }
 
-void LgsSema::visitAssignment(const LgsAssignment* assignment) {
-    auto l = assignment->lValue;
+void LgsSema::visitAssignment(LgsAssignment* assignment) {
+    auto& l = assignment->lValue;
     auto r = assignment->rValue;
     visitExpr(l);
+    if (!l->asNullableExpr() && l->type->asNullable()) {
+        wrapInNullable(l, l->type->asNullable());
+    }
     visitExpr(r);
     castExprImplicitly(r, l->type);
     if (!validateExprType(r, l->type)) return;
     if (!l->type || !r->type) return;
 
     auto canAssign = false;
-    if (l->asIterIndex() || l->asVariable()) {
+    if (l->asIterIndex() || l->asVariable() || l->asNullableExpr()) {
         canAssign = true;
     } else if (const auto selection = l->asSelection()) {
         const auto firstExpr = selection->exprs.front();
@@ -901,8 +903,8 @@ void LgsSema::visitVariable(LgsVariable* variable) {
 
 void LgsSema::visitSelection(LgsSelection* selection) {
     const auto exprs = selection->exprs;
+    visitFirstSelection(selection);
     const auto firstExpr = exprs.front();
-    visitFirstSelection(firstExpr);
     if (!firstExpr->type) return;
     if (const auto var = firstExpr->asVariable()) {
         if (var->ref.symbolType == OBJECT) {
@@ -918,7 +920,8 @@ void LgsSema::visitSelection(LgsSelection* selection) {
     selection->owner = lastExpr->owner;
 }
 
-void LgsSema::visitFirstSelection(LgsExpr* firstExpr) {
+void LgsSema::visitFirstSelection(LgsSelection* selection) {
+    auto& firstExpr = selection->exprs.front();
     if (const auto variable = firstExpr->asVariable()) {
         visitVariable(variable);
     } else if (const auto funcCall = firstExpr->asFuncCall()) {
@@ -930,13 +933,17 @@ void LgsSema::visitFirstSelection(LgsExpr* firstExpr) {
     } else {
         assert(0);
     }
+    if (!firstExpr->asNullableExpr() && firstExpr->type->asNullable()) {
+        wrapInNullable(firstExpr, firstExpr->type->asNullable());
+        selection->hasNullables = true;
+    }
 }
 
 void LgsSema::visitInnerSelections(LgsSelection* selection) {
-    const auto exprs = selection->exprs;
+    auto& exprs = selection->exprs;
     for (size_t i = 0; i < exprs.size() - 1; ++i) {
         const auto parentExpr = exprs[i];
-        const auto childExpr = exprs[i + 1];
+        auto& childExpr = exprs[i + 1];
         if (const auto var = childExpr->asVariable()) {
             visitFieldSelection(var, parentExpr->type);
         } else if (const auto methodCall = childExpr->asFuncCall()) {
@@ -948,6 +955,17 @@ void LgsSema::visitInnerSelections(LgsSelection* selection) {
         }
         if (!childExpr->type || childExpr->type->isUnknown()) {
             return;
+        }
+        // Only the parts that comes after the first nullable encounter
+        // will be wrapped in nullable
+        selection->hasNullables = selection->hasNullables || childExpr->type->asNullable();
+        if (selection->hasNullables) {
+            assert(!childExpr->asNullableExpr());
+            if (childExpr->type->asNullable()) {
+                wrapInNullable(childExpr, childExpr->type->asNullable());
+            } else {
+                wrapInNullable(childExpr, new LgsNullable(childExpr->type));
+            }
         }
     }
 }
@@ -1236,6 +1254,7 @@ void LgsSema::visitInstance(LgsInstance* instance) {
     if (symbol->symbolType != OBJECT && symbol->symbolType != INTERFACE) {
         return addError(E10022, instance->location, {objName});
     }
+
     if (symbol->symbolType == INTERFACE) {
         return visitInterfaceInstance(instance, symbol->interface);
     }

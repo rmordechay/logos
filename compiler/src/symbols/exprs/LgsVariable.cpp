@@ -39,13 +39,6 @@ LgsExpr* LgsVariable::castExplicitly(LgsType* toType) {
 }
 
 void LgsVariable::assign(LgsCgModule& cg, LgsExpr* expr) {
-    if (const auto nullable = type->asNullable()) {
-        if (!nullable->passByRef) {
-            const auto isSet = cg.builder.CreateIsNotNull(expr->IRValue);
-            nullable->setNullableFields(cg, IRValue, expr->IRValue, isSet);
-            return;
-        }
-    }
     cg.builder.CreateStore(expr->IRValue, IRValue);
 }
 

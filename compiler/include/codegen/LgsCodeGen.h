@@ -124,6 +124,7 @@ public:
     void visitVariable(LgsVariable* variable);
     void visitSelection(LgsSelection* selection, bool assign = false);
     void visitFieldSelection(LgsVariable* var, LgsExpr* parent, bool assign) const;
+    void visitNullableSelection(LgsExpr* child, LgsExpr* parent) const;
     void visitMetaSelection(LgsMetaSelection* metaSelection);
     void visitFuncCall(LgsFuncCall* funcCall);
     void visitIterFunc(const LgsFuncCall* funcCall);
@@ -145,7 +146,7 @@ public:
     void createMapFunc(LgsFunc* func);
     void createFilterFunc(LgsFunc* func);
     void createForeachFunc(LgsFunc* func) const;
-    void createNewVecField(LgsField* field, Value* parent) const;
+    void createVecField(LgsField* field, Value* parent) const;
 
     bool checkMock(LgsExpr* expr) const;
     Value* getIRValue(LgsValue* value);

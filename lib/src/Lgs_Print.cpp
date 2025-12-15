@@ -24,7 +24,11 @@ static std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
     case RTT_DOUBLE: str << *static_cast<double*>(elem); break;
     case RTT_TYPE:
     case RTT_ENUM:
-    case RTT_STR: str << '"' << *static_cast<const char**>(elem) << '"'; break;
+    case RTT_STR: {
+        const auto s = static_cast<const char*>(elem);
+        if (!*s) return LGS_NULL_LITERAL;
+        str << '"' << s << '"'; break;
+    }
     case RTT_CHAR: str << '"' << *static_cast<const char*>(elem) << '"'; break;
     case RTT_SET:
     case RTT_DARRAY: {
@@ -34,9 +38,6 @@ static std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
         str << "[";
         for (size_t i = 0; i < dArrExpr->length; ++i) {
             auto data = Lgs_DArray_get(dArrExpr, rtt, i);
-            if (rtt->dArray.baseType->kind == RTT_STR) {
-                data = *static_cast<void**>(data);
-            }
             str << formatElement(baseType, data);
             if (i < dArrExpr->length - 1) str << ", ";
         }
@@ -123,9 +124,6 @@ static std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
         for (size_t i = 0; i < fieldsCount; ++i) {
             const auto fieldType = fieldTypes[i];
             void* fieldPtr = static_cast<char*>(elem) + offset;
-            if (fieldTypes[i]->kind == RTT_OBJECT || fieldTypes[i]->kind == RTT_STR) {
-                fieldPtr = *static_cast<void**>(fieldPtr);
-            }
             str << formatElement(fieldType, fieldPtr);
             if (i < fieldsCount - 1) str << ", ";
             offset += fieldType->size;
@@ -138,10 +136,6 @@ static std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
         if (isPtr) {
             str << formatElement(baseType, elem);
         } else {
-            struct my {
-                int value;
-                bool isSet;
-            };
             const bool isSet = *(static_cast<bool*>(elem) + baseType->size);
             if (isSet) str << formatElement(baseType, elem);
             else str << LGS_NULL_LITERAL;
@@ -158,9 +152,6 @@ static std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
                 if (!first) str << ", ";
                 first = false;
                 void* valuePtr = hashMap->entries[i].value;
-                if (valueType->kind == RTT_STR) {
-                    valuePtr = *static_cast<void**>(valuePtr);
-                }
                 str << hashMap->entries[i].key << ": " << formatElement(valueType, valuePtr);
             }
         }

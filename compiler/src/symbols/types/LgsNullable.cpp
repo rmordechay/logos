@@ -4,6 +4,7 @@
 #include "LgsDefinitions.h"
 #include "codegen/LgsCgModule.h"
 #include "exprs/LgsExpr.h"
+#include "exprs/LgsNullableExpr.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsBool.h"
 #include <cassert>
@@ -18,7 +19,7 @@ size_t LgsNullable::sizeBytes() {
 }
 
 LgsExpr* LgsNullable::getZeroValue() {
-    assert(0);
+    return new LgsNullableExpr();
 }
 
 std::string LgsNullable::pname() {

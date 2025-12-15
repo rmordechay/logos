@@ -70,7 +70,7 @@ public:
     bool writeIRModule(const LgsPaths& paths, uint8_t optLevel) const;
     Constant* getString(const std::string& value);
     llvm::AllocaInst* getEmptyBuffer();
-    GlobalVariable* createGlobal(const std::string& name, Type* type, Constant* initializer, bool isConst = false, GlobalValue::LinkageTypes linkage = GlobalValue::ExternalLinkage) const;
+    GlobalVariable* createGlobal(const std::string& name, Type* type, Constant* initializer, bool isConst = true, GlobalValue::LinkageTypes linkage = GlobalValue::ExternalLinkage) const;
     StructType* getStructType(const std::vector<Type*>& fields, const std::string& name = "");
     void setStructField(Type* type, Value* instancePtr, size_t position, Value* v);
     void loop(Value* loopLength, const std::function<void(Value*, BasicBlock*)>& body);
@@ -103,7 +103,7 @@ public:
     Value* callHash(Value* arg);
     Constant* hashConst(const std::string& str);
     void callThrowError(const LgsBaseMsg& err, const std::vector<Value*>& args = {});
-    void freeOwner(Value* ptr, Constant* type);
+    void freeValue(Value* ptr, Constant* type);
     Value* allocate(Value* size, Constant* type, bool isOwner, bool isReturnExpr = false);
 
     // Stack

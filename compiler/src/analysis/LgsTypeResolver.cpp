@@ -23,8 +23,11 @@ void LgsTypeResolver::resolveType(LgsType*& type) {
     }
 
     if (const auto nullable = type->asNullable()) {
-        resolveType(nullable->baseType);
-        nullable->passByRef = nullable->baseType->passByRef;
+        if (!nullable->isNull) {
+            resolveType(nullable->baseType);
+            nullable->passByRef = nullable->baseType->passByRef;
+            nullable->isHeapAlloc = nullable->baseType->isHeapAlloc;
+        }
     } else if (const auto iterable = type->asIterable()) {
         if (iterable->genericArgs.empty()) {
             resolveType(iterable->baseType);

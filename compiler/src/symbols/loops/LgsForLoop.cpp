@@ -13,9 +13,9 @@ using llvm::MDNode;
 using llvm::MDString;
 
 void LgsForLoop::setBlocks(LgsCgModule& cg) {
-    IRCondBlock = cg.createBlock(BLOCK_NAME_LOOP_COND);
-    IRBodyBlock = cg.createBlock(BLOCK_NAME_LOOP_BODY);
-    IRExitBlock = cg.createBlock(BLOCK_NAME_LOOP_EXIT);
+    IRCondBlock = cg.createBlock(BLOCK_LOOP_COND);
+    IRBodyBlock = cg.createBlock(BLOCK_LOOP_BODY);
+    IRExitBlock = cg.createBlock(BLOCK_LOOP_EXIT);
 }
 
 void LgsForLoop::incAndJumpToCond(LgsCgModule& cg) {

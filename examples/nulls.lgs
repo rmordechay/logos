@@ -51,3 +51,18 @@ main() {
         print(a)
     }
 }
+
+object Obj {
+    name: Str?
+}
+
+object Obj2 {
+    obj: Obj?
+}
+
+main() {
+    obj = Obj2{}?
+    //obj := null
+    print(obj.obj.name)
+    print("Hellow world")
+}

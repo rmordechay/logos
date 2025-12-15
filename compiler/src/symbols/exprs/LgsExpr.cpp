@@ -86,6 +86,18 @@ void LgsExpr::setType(LgsType* newType) {
     type = newType;
 }
 
+Value* LgsExpr::getPtrTo(LgsCgModule& cg) const {
+    if (!type->passByRef) {
+        const auto ptr = cg.builder.CreateAlloca(type->getIRType(cg));
+        cg.builder.CreateStore(IRValue, ptr);
+        return ptr;
+    }
+    if (type->asNullable() && type->asNullable()->passByRef) {
+        return cg.builder.CreateLoad(cg.ptrTy(), IRValue);
+    }
+    return IRValue;
+}
+
 LgsExpr* LgsExpr::castExplicitly(LgsType* toType) {
     assert(0);
 }
@@ -206,32 +218,18 @@ LgsNullableExpr* LgsExpr::asNullableExpr() {
     return dynamic_cast<LgsNullableExpr*>(this);
 }
 
-// Value* LgsCgModule::getPtrTo(Value* v) {
-//     if (const auto gepInst = dyn_cast<llvm::GetElementPtrInst>(v)) {
-//         const auto elementType = gepInst->getResultElementType();
-//         if (elementType && (elementType->isPointerTy() || elementType->isArrayTy())) {
-//             return builder.CreateLoad(ptrTy(), gepInst);
-//         }
-//         return v;
-//     }
-//     if (const auto ce = llvm::dyn_cast<llvm::ConstantExpr>(v)) {
-//         if (ce->getOpcode() == llvm::Instruction::GetElementPtr) {
-//             return builder.CreateLoad(ptrTy(), ce);
-//         }
-//     }
-//     if (v->getType()->isPointerTy()) return v;
-//     const auto ptr = builder.CreateAlloca(v->getType());
-//     builder.CreateStore(v, ptr);
-//     return ptr;
-// }
+void wrapInNullable(LgsExpr*& expr, LgsNullable* nullable) {
+    assert(!nullable->baseType->asNullable() && !expr->asNullableExpr());
+    expr->type = nullable->baseType;
+    expr = new LgsNullableExpr(expr);
+    expr->type = nullable;
+}
 
-Value* LgsExpr::getPtrTo(LgsCgModule& cg) const {
-    if (!type->passByRef) {
-        const auto ptr = cg.builder.CreateAlloca(type->getIRType(cg));
-        cg.builder.CreateStore(IRValue, ptr);
-        return ptr;
+void castExprImplicitly(LgsExpr*& expr, LgsType* toType) {
+    expr->castImplicitly(toType);
+    if (!expr->asNullableExpr() && toType->asNullable()) {
+        wrapInNullable(expr, toType->asNullable());
     }
-    return IRValue;
 }
 
 Value* dotProduct(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
@@ -275,15 +273,15 @@ Value* crossProduct(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     const auto cx = cg.builder.CreateFSub(
         cg.builder.CreateFMul(ly, rz),
         cg.builder.CreateFMul(lz, ry)
-    );
+        );
     const auto cy = cg.builder.CreateFSub(
         cg.builder.CreateFMul(lz, rx),
         cg.builder.CreateFMul(lx, rz)
-    );
+        );
     const auto cz = cg.builder.CreateFSub(
         cg.builder.CreateFMul(lx, ry),
         cg.builder.CreateFMul(ly, rx)
-    );
+        );
 
     const auto vecTy = left->type->getIRType(cg);
     Value* result = UndefValue::get(vecTy);
@@ -292,17 +290,6 @@ Value* crossProduct(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     result = cg.builder.CreateInsertElement(result, cz, cg.i32(2));
 
     return result;
-}
-
-void castExprImplicitly(LgsExpr*& expr, LgsType* toType) {
-    expr->castImplicitly(toType);
-    if (!expr->asVariable() && !expr->asNullableExpr() && toType->asNullable()) {
-        // Wrap expr in NullableExpr and its type with Nullable
-        const auto& nullable = toType->asNullable();
-        expr->type = nullable->baseType;
-        expr = new LgsNullableExpr(expr);
-        expr->type = nullable;
-    }
 }
 
 void freeExpr(LgsExpr* expr) {

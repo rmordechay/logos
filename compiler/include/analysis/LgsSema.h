@@ -84,7 +84,7 @@ public:
     void visitStmt(LgsStmt* stmt);
     void visitStmtsBlock(LgsStmtsBlock* stmtsBlock);
     void visitVarDec(LgsVarDec* varDec);
-    void visitAssignment(const LgsAssignment* assignment);
+    void visitAssignment(LgsAssignment* assignment);
     void visitIfStmt(LgsIfStmt* ifStmt);
     void visitMacroIf(LgsIfStmt* ifStmt);
     void visitSwitch(LgsSwitch* switchStmt);
@@ -113,7 +113,7 @@ public:
     void visitMatrixExpr(const LgsMatrixExpr* matrixExpr);
     void visitVariable(LgsVariable* variable);
     void visitSelection(LgsSelection* selection);
-    void visitFirstSelection(LgsExpr* firstExpr);
+    void visitFirstSelection(LgsSelection* selection);
     void visitInnerSelections(LgsSelection* selection);
     void visitFieldSelection(LgsVariable* child, LgsType* parentType);
     void visitIterIndexSelection(LgsIterIndex* iterIndex, LgsType* parentType);

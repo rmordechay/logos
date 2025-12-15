@@ -1,6 +1,7 @@
 #pragma once
 #include "LgsValue.h"
 
+class LgsNullable;
 class LgsNullableExpr;
 class LgsMetaSelection;
 class LgsMatrixExpr;
@@ -44,6 +45,7 @@ public:
     std::optional<int64_t> getConstInt();
     std::optional<std::string> getConstStr();
     void setType(LgsType* newType);
+    Value* getPtrTo(LgsCgModule& cg) const;
 
     virtual LgsExpr* castExplicitly(LgsType* toType);
     virtual void castImplicitly(LgsType* toType);
@@ -78,18 +80,14 @@ public:
     LgsMetaSelection* asMetaSelection();
     LgsNullableExpr* asNullableExpr();
     ~LgsExpr() override = default;
-Value* getPtrTo(LgsCgModule& cg) const;
 };
 
-
+void wrapInNullable(LgsExpr*& expr, LgsNullable* nullable);
+void castExprImplicitly(LgsExpr*& expr, LgsType* toType);
 Value* dotProduct(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-
 Value* crossProduct(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
 
-void castExprImplicitly(LgsExpr*& expr, LgsType* toType);
-
 void freeExpr(LgsExpr* expr);
-
 template<typename T>
 void freeExprs(std::vector<T*>& exprs) {
     for (const auto expr : exprs) {

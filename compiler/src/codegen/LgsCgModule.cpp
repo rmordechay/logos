@@ -122,9 +122,9 @@ void LgsCgModule::setStructField(Type* type, Value* instancePtr, const size_t po
 }
 
 void LgsCgModule::loop(Value* loopLength, const std::function<void(Value*, BasicBlock*)>& body) {
-    const auto condBlock = createBlock(BLOCK_NAME_LOOP_COND);
-    const auto bodyBlock = createBlock(BLOCK_NAME_LOOP_BODY);
-    const auto exitBlock = createBlock(BLOCK_NAME_LOOP_EXIT);
+    const auto condBlock = createBlock(BLOCK_LOOP_COND);
+    const auto bodyBlock = createBlock(BLOCK_LOOP_BODY);
+    const auto exitBlock = createBlock(BLOCK_LOOP_EXIT);
     const auto iPtr = builder.CreateAlloca(sizeTy());
     const auto loopStart = builder.CreateSExt(sizeZero(), sizeTy());
     builder.CreateStore(loopStart, iPtr);
@@ -291,8 +291,8 @@ void LgsCgModule::callThrowError(const LgsBaseMsg& err, const std::vector<Value*
     builder.CreateUnreachable();
 }
 
-void LgsCgModule::freeOwner(Value* ptr, Constant* type) {
-    callRuntimeFunc("freeOwner", voidTy(), {ptrTy(), ptrTy()}, {ptr, type});
+void LgsCgModule::freeValue(Value* ptr, Constant* type) {
+    callRuntimeFunc("freeValue", voidTy(), {ptrTy(), ptrTy()}, {ptr, type});
 }
 
 Value* LgsCgModule::allocate(Value* size, Constant* type, const bool isOwner, const bool isReturnExpr) {

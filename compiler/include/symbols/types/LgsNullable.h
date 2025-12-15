@@ -6,13 +6,18 @@
 class LgsNullable final : public LgsType {
 public:
     static constexpr auto name = "Null";
-    LgsType* baseType;
+    LgsType* baseType = nullptr;
+    bool isNull = false;
 
-    explicit LgsNullable(LgsType* baseType = nullptr) : baseType(baseType) {
-        if (baseType) passByRef = baseType->passByRef;
-        else passByRef = true;
+    explicit LgsNullable(LgsType* baseType) : baseType(baseType) {
+        passByRef = baseType->passByRef;
+        isHeapAlloc = baseType->isHeapAlloc;
     }
-
+    explicit LgsNullable() {
+        isNull = true;
+        passByRef = true;
+        isPrimitive = true;
+    }
     LgsField* getField(const std::string& fieldName) override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
