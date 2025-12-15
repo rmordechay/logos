@@ -1,7 +1,8 @@
 #pragma once
 #include "Lgs_Types.h"
 
-#define LGS_MAP_CAPACITY 1024
+#define LGS_MAP_CAP 1024
+#define LGS_MAP_SLOTS_CAP 10
 
 struct Lgs_HashMapEntry {
     char* key;

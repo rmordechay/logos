@@ -147,7 +147,7 @@ static std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
         auto hashMap = static_cast<Lgs_HashMap*>(elem);
         str << "{";
         bool first = true;
-        for (size_t i = 0; i < LGS_MAP_CAPACITY; i++) {
+        for (size_t i = 0; i < LGS_MAP_CAP; i++) {
             if (hashMap->entries[i].occupied) {
                 if (!first) str << ", ";
                 first = false;

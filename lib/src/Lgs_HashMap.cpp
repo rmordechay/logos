@@ -7,7 +7,7 @@
 
 extern "C" void Lgs_Map_init(Lgs_HashMap* map) {
     map->length = 0;
-    map->entries = static_cast<Lgs_HashMapEntry*>(std::malloc(LGS_MAP_CAPACITY * sizeof(Lgs_HashMapEntry)));
+    map->entries = static_cast<Lgs_HashMapEntry*>(std::malloc(LGS_MAP_CAP * sizeof(Lgs_HashMapEntry)));
 }
 
 extern "C" void Lgs_Map_add(Lgs_HashMap* map, const Lgs_TypeInfo* type, const char* key, const void* value) {
@@ -58,7 +58,7 @@ extern "C" bool Lgs_Map_isNotEmpty(const Lgs_HashMap* map) {
 extern "C" const char* Lgs_Map_getKeyAt(const Lgs_HashMap* map, const size_t index) {
     if (!map) return nullptr;
     size_t count = 0;
-    for (size_t i = 0; i < LGS_MAP_CAPACITY; i++) {
+    for (size_t i = 0; i < LGS_MAP_CAP; i++) {
         if (map->entries[i].occupied) {
             if (count == index) return map->entries[i].key;
             count++;
@@ -70,7 +70,7 @@ extern "C" const char* Lgs_Map_getKeyAt(const Lgs_HashMap* map, const size_t ind
 extern "C" void* Lgs_Map_getValueAt(const Lgs_HashMap* map, const size_t index) {
     if (!map) return nullptr;
     size_t count = 0;
-    for (size_t i = 0; i < LGS_MAP_CAPACITY; i++) {
+    for (size_t i = 0; i < LGS_MAP_CAP; i++) {
         if (map->entries[i].occupied) {
             if (count == index) return map->entries[i].value;
             count++;
@@ -83,7 +83,7 @@ extern "C" Lgs_DArrayExpr* Lgs_Map_keys(const Lgs_HashMap* map, const Lgs_TypeIn
     if (!map) return nullptr;
     const auto arr = new Lgs_DArrayExpr();
     Lgs_DArray_init(arr, keyType);
-    for (size_t i = 0; i < LGS_MAP_CAPACITY; i++) {
+    for (size_t i = 0; i < LGS_MAP_CAP; i++) {
         if (!map->entries[i].occupied) continue;
         const auto keyStr = strdup(map->entries[i].key);
         Lgs_DArray_add(arr, keyType, keyStr);
@@ -95,7 +95,7 @@ extern "C" Lgs_DArrayExpr* Lgs_Map_values(const Lgs_HashMap* map, const Lgs_Type
     if (!map) return nullptr;
     const auto arr = new Lgs_DArrayExpr();
     Lgs_DArray_init(arr, valueType);
-    for (size_t i = 0; i < LGS_MAP_CAPACITY; i++) {
+    for (size_t i = 0; i < LGS_MAP_CAP; i++) {
         if (!map->entries[i].occupied) continue;
         Lgs_DArray_add(arr, valueType, map->entries[i].value);
     }
@@ -104,15 +104,15 @@ extern "C" Lgs_DArrayExpr* Lgs_Map_values(const Lgs_HashMap* map, const Lgs_Type
 
 static size_t findSlot(const Lgs_HashMap* map, const char* key) {
     const auto hash = hashString(key);
-    size_t index = hash % LGS_MAP_CAPACITY;
+    size_t index = hash % LGS_MAP_CAP;
     size_t probe = 0;
-    while (probe < LGS_MAP_CAPACITY) {
+    while (probe < LGS_MAP_CAP) {
         const auto& entry = map->entries[index];
         if (!entry.occupied || strcmp(entry.key, key) == 0) {
             return index;
         }
         probe++;
-        index = (index + 1) % LGS_MAP_CAPACITY;
+        index = (index + 1) % LGS_MAP_CAP;
     }
     return index;
 }

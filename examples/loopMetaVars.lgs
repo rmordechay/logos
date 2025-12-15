@@ -25,4 +25,12 @@ main() {
     //    // for.isFirst not allowed
     //    // for.isLast not allowed
     //}
+    a = [3254, 235, 2345]
+    for a {
+        print(for.i)
+        print(for.isFirst)
+        print(for.isLast)
+        print(for.element)
+    }
 }
+
