@@ -116,9 +116,20 @@ StructType* LgsCgModule::getStructType(const std::vector<Type*>& fields, const s
     return structType;
 }
 
-void LgsCgModule::setStructField(Type* type, Value* instancePtr, const size_t position, Value* v) {
+void LgsCgModule::storeStructField(Type* type, Value* instancePtr, const size_t position, Value* v) {
     const auto gep = builder.CreateStructGEP(type, instancePtr, position);
-    builder.CreateStore(v, gep);
+    store(v, gep);
+}
+
+void LgsCgModule::store(Value* v, Value* ptr) {
+    if (v == ptr) return;
+    builder.CreateStore(v, ptr);
+}
+
+Value* LgsCgModule::allocaAndStore(Type* type, Value* v) {
+    const auto ptr = builder.CreateAlloca(type);
+    builder.CreateStore(v, ptr);
+    return ptr;
 }
 
 void LgsCgModule::loop(Value* loopLength, const std::function<void(Value*, BasicBlock*)>& body) {
@@ -127,7 +138,7 @@ void LgsCgModule::loop(Value* loopLength, const std::function<void(Value*, Basic
     const auto exitBlock = createBlock(BLOCK_LOOP_EXIT);
     const auto iPtr = builder.CreateAlloca(sizeTy());
     const auto loopStart = builder.CreateSExt(sizeZero(), sizeTy());
-    builder.CreateStore(loopStart, iPtr);
+    store(loopStart, iPtr);
     builder.CreateBr(condBlock);
 
     // Condition
@@ -143,7 +154,7 @@ void LgsCgModule::loop(Value* loopLength, const std::function<void(Value*, Basic
     if (lastInstTerminator()) return;
     iValue = builder.CreateLoad(sizeTy(), iPtr);
     const auto inc = builder.CreateAdd(iValue, usize(1));
-    builder.CreateStore(inc, iPtr);
+    store(inc, iPtr);
     builder.CreateBr(condBlock);
     startBlock(exitBlock);
 }
@@ -319,7 +330,7 @@ Value* LgsCgModule::getFromVTable(Value* instance, Value* key) {
 }
 
 void LgsCgModule::addNullTerminate(Value* strPtr, Value* pos) {
-    builder.CreateStore(i8Zero(), builder.CreateGEP(i8Ty(), strPtr, pos));
+    store(i8Zero(), builder.CreateGEP(i8Ty(), strPtr, pos));
 }
 
 Type* LgsCgModule::i1Ty() {

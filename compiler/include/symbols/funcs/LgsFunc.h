@@ -49,6 +49,9 @@ public:
     std::string getGenericName() const;
     std::string asText() override;
     void hashNode(size_t& oldHash) override;
+    void createMapFunc(LgsCgModule& cg);
+    void createFilterFunc(LgsCgModule& cg);
+    void createForeachFunc(LgsCgModule& cg);
     void setDebugValue(LgsCgModule& cg) override;
     ~LgsFunc() override;
 };

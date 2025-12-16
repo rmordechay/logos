@@ -1,4 +1,6 @@
 #include "lgsc/LgsCLangParser.h"
+
+#include "LgsTokens.h"
 #include "exprs/constants/LgsIntConst.h"
 #include "files/LgsFile.h"
 #include "funcs/LgsFunc.h"
@@ -24,7 +26,7 @@ void LgsCLangParser::HandleTranslationUnit(clang::ASTContext& clangContext){
 
 bool LgsCLangParser::VisitFunctionDecl(const clang::FunctionDecl* func) {
     auto name = func->getNameAsString();
-    if (isLogosKeyword(name)) {
+    if (LGS_KEYWORDS.contains(name)) {
         name = name + '_';
     }
     const auto lgsType = mapCType(func->getReturnType());
@@ -47,7 +49,7 @@ bool LgsCLangParser::VisitFunctionDecl(const clang::FunctionDecl* func) {
 bool LgsCLangParser::VisitRecordDecl(const clang::RecordDecl* record) {
     auto name = record->getNameAsString();
     if (!name.empty() && name[0] == '_') return true;
-    if (isLogosKeyword(name)) {
+    if (LGS_KEYWORDS.contains(name)) {
         name = name + '_';
     }
     if (!record->isStruct() || !record->isThisDeclarationADefinition()) return true;

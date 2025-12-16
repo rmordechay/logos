@@ -26,7 +26,7 @@ Constant* LgsFuncType::getRTType(LgsCgModule& cg) {
     const auto funcName = getName();
     std::vector<LgsOwner*> paramsAsOwners;
     for (auto& param : params) paramsAsOwners.emplace_back(static_cast<LgsOwner*>(&param));
-    const auto [typesArr, hashesArr] = getRTTypesAndHashes(cg, funcName, paramsAsOwners);
+    const auto [typesArr, hashesArr] = getRTFieldsInfo(cg, funcName, paramsAsOwners);
     // paramsCount, paramHashes, paramTypes, rt
     const auto sv = cg.getRTTExtraStruct(funcName, {cg.sizeTy(), cg.ptrTy(), cg.ptrTy(), cg.ptrTy()}, {
         cg.usize(params.size()), hashesArr, typesArr, rt->getRTType(cg)

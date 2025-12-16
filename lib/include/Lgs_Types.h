@@ -21,6 +21,7 @@ enum Lgs_TypeKind {
     RTT_ULONG,
     RTT_FLOAT,
     RTT_DOUBLE,
+    RTT_COMPLEX,
     RTT_VEC2,
     RTT_VEC3,
     RTT_VEC4,
@@ -39,8 +40,9 @@ enum Lgs_TypeKind {
 };
 
 struct Lgs_Object {
+    char* name;
     size_t fieldsCount;
-    uint64_t* fieldHashes;
+    char** fieldNames;
     Lgs_TypeInfo** fieldTypes;
 };
 
@@ -77,6 +79,11 @@ struct Lgs_Vec4 {
     Lgs_TypeInfo* baseType;
 };
 
+struct Lgs_Complex {
+    Lgs_TypeInfo* realType;
+    Lgs_TypeInfo* imaginaryType;
+};
+
 struct Lgs_Matrix {
     size_t rows;
     size_t columns;
@@ -102,6 +109,7 @@ struct Lgs_TypeInfo {
         Lgs_Vec4 vec4;
         Lgs_Matrix matrix;
         Lgs_Nullable nullable;
+        Lgs_Complex complex;
         void* dummy; // used for types that don't need extra information.
     };
 };

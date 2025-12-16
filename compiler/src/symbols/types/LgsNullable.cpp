@@ -97,8 +97,8 @@ Value* LgsNullable::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
 
 void LgsNullable::setNullableFields(LgsCgModule& cg, Value* ptr, Value* value, Value* isSet) {
     const auto ty = getIRType(cg);
-    cg.setStructField(ty, ptr, 0, value);
-    cg.setStructField(ty, ptr, 1, isSet);
+    cg.storeStructField(ty, ptr, 0, value);
+    cg.storeStructField(ty, ptr, 1, isSet);
 }
 
 Value* LgsNullable::getNullableValue(LgsCgModule& cg, Value* ptr) {
@@ -112,11 +112,11 @@ Value* LgsNullable::getIsSet(LgsCgModule& cg, Value* ptr) {
 }
 
 void LgsNullable::setNullableValue(LgsCgModule& cg, Value* ptr, Value* value) {
-    cg.setStructField(getIRType(cg), ptr, 0, value);
+    cg.storeStructField(getIRType(cg), ptr, 0, value);
 }
 
 void LgsNullable::setIsSet(LgsCgModule& cg, Value* ptr, Value* value) {
-    cg.setStructField(getIRType(cg), ptr, 1, value);
+    cg.storeStructField(getIRType(cg), ptr, 1, value);
 }
 
 Value* LgsNullable::applyNumberBinOp(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right, const std::function<Value*(LgsExpr*, LgsExpr*)>& func) {
@@ -167,11 +167,11 @@ Value* LgsNullable::applyPtrBinOp(LgsCgModule& cg, const LgsExpr* left, const Lg
     const auto tempExpr1 = leftNullable->baseType->getZeroValue();
     const auto tempExpr2 = rightNullable->baseType->getZeroValue();
     const auto result = func(tempExpr1, tempExpr2);
-    cg.builder.CreateStore(result, ptr);
+    cg.store(result, ptr);
     cg.builder.CreateBr(exitBlock);
 
     cg.startBlock(nullBlock);
-    cg.builder.CreateStore(cg.null(), ptr);
+    cg.store(cg.null(), ptr);
     cg.builder.CreateBr(exitBlock);
 
     cg.startBlock(exitBlock);

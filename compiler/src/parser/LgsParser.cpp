@@ -24,6 +24,7 @@
 #include "loops/LgsRangeLoop.h"
 #include "loops/LgsWhileLoop.h"
 #include "LgsTokens.h"
+#include "../../include/symbols/exprs/constants/LgsComplexConst.h"
 #include "errors/LgsPlmErrors.h"
 #include "exprs/LgsBinaryExpr.h"
 #include "exprs/LgsCast.h"
@@ -1344,7 +1345,11 @@ LgsExpr* LgsParser::parseExprWithPrecedence(const int minPrecedence, const bool 
             addParsingError();
             return left;
         }
-        left = new LgsBinaryExpr(left, right, *op);
+        if (right->type && right->type == &LGS_IMAGINARY) {
+            left = new LgsComplexConst(left, right);
+        } else {
+            left = new LgsBinaryExpr(left, right, *op);
+        }
         setLocation(left->location, &startToken, &currentToken);
     }
     return left;
@@ -1357,6 +1362,7 @@ LgsExpr* LgsParser::parseUnary(const bool withInstance) {
         mustMatch(T_RPAREN);
         return expr;
     }
+
     if (const auto metaVar = parseLoopMetaVar()) return metaVar;
     if (const auto constant = parseConstant()) expr = constant;
     else if (const auto strConst = parseStrConst()) expr = strConst;
@@ -1524,6 +1530,13 @@ LgsExpr* LgsParser::parseConstant() {
         auto result = tokenStr;
         result.erase(std::ranges::remove(result, '_').begin(), result.end());
         constant = determineIntConst(result, 10);
+        break;
+    }
+    case T_IMAGINARY: {
+        auto result = tokenStr;
+        result.erase(std::ranges::remove(result, '_').begin(), result.end());
+        constant = determineIntConst(result, 10);
+        constant->type = &LGS_IMAGINARY;
         break;
     }
     case T_UINT: {

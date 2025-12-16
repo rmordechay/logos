@@ -14,7 +14,6 @@ void execute(const fs::path& execPath, std::vector<const char*> mainArgs = {});
 bool runCmd(const char* cmd);
 bool createDir(fs::path& dirPath);
 bool isLogosFile(const fs::path& filePath);
-bool isLogosKeyword(const std::string& s);
 
 std::string getFileText(const fs::path& filePath);
 std::string getLine(const std::string& filename, size_t lineNumber);

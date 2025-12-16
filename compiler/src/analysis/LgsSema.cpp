@@ -1,4 +1,6 @@
 #include "analysis/LgsSema.h"
+
+#include "../../include/symbols/exprs/constants/LgsComplexConst.h"
 #include "builtins/LgsTest.h"
 #include "funcs/LgsCoroutine.h"
 #include "errors/LgsErrors.h"
@@ -695,6 +697,7 @@ void LgsSema::visitExpr(LgsExpr*& expr) {
         else if (const auto instance = expr->asInstance()) visitInstance(instance);
         else if (const auto funcCall = expr->asFuncCall()) visitFuncCall(funcCall);
         else if (const auto strConst = expr->asStrConst()) visitStrConst(strConst);
+        else if (const auto complexConst = expr->asComplexConst()) visitComplexConst(complexConst);
         else if (const auto selection = expr->asSelection()) visitSelection(selection);
         else if (const auto metaSelection = expr->asMetaSelection()) visitMetaSelection(metaSelection);
         else if (const auto arrayExpr = expr->asArrayExpr()) visitArrayExpr(arrayExpr);
@@ -765,6 +768,7 @@ void LgsSema::visitCast(LgsCast* cast) {
 void LgsSema::visitNullableExpr(LgsNullableExpr* nullableExpr) {
     if (nullableExpr->isNull) return;
     visitExpr(nullableExpr->baseExpr);
+    if (nullableExpr->type) return;
     nullableExpr->type = new LgsNullable(nullableExpr->baseExpr->type);
 }
 
@@ -1239,6 +1243,11 @@ void LgsSema::visitStrConst(const LgsStrConst* strConst) {
     for (auto templatePart : strConst->parts) {
         visitExpr(templatePart);
     }
+}
+
+void LgsSema::visitComplexConst(LgsComplexConst* complex) {
+    visitExpr(complex->real);
+    visitExpr(complex->imaginary);
 }
 
 void LgsSema::visitTypeExpr(LgsTypeExpr* typeExpr) {

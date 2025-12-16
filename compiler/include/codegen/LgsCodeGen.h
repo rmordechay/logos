@@ -112,6 +112,7 @@ public:
     void visitIntConst(LgsIntConst* intConst) const;
     void visitConstant(LgsExpr* expr);
     void visitFloatConst(LgsFloatConst* floatConst) const;
+    void visitComplexConst(const LgsComplexConst* complex);
     void visitNullableExpr(LgsNullableExpr* nullableExpr);
     void visitArrayExpr(LgsArrayExpr* arrayExpr);
     void visitStaticArray(LgsArrayExpr* arrayExpr) const;
@@ -127,7 +128,7 @@ public:
     void visitNullableSelection(LgsExpr* child, LgsExpr* parent) const;
     void visitMetaSelection(LgsMetaSelection* metaSelection);
     void visitFuncCall(LgsFuncCall* funcCall);
-    void visitIterFunc(const LgsFuncCall* funcCall);
+    void visitIterFunc(const LgsFuncCall* funcCall) const;
     void visitPrefixExpr(LgsPrefixExpr* prefixExpr);
     void visitPostfixExpr(LgsPostfixExpr* postfixExpr);
     void visitStrConst(LgsStrConst* strConst);
@@ -143,11 +144,7 @@ public:
     Value* getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) const;
     Function* getThunkFunc(LgsFuncCall* fc, Type* ctxTy) const;
 
-    void createMapFunc(LgsFunc* func);
-    void createFilterFunc(LgsFunc* func);
-    void createForeachFunc(LgsFunc* func) const;
     void createVecField(LgsField* field, Value* parent) const;
-
     bool checkMock(LgsExpr* expr) const;
     Value* getIRValue(LgsValue* value);
     void addVirtuals(LgsObject* obj, Value* ptr) const;

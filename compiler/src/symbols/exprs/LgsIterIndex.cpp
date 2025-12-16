@@ -131,7 +131,7 @@ void LgsIterIndex::assign(LgsCgModule& cg, LgsExpr* expr) {
     } else if (const auto map = baseExpr->type->asMap()) {
         map->getMethod(ADD_FUNC)->call(cg, {baseExpr, index.from, expr});
     } else {
-        cg.builder.CreateStore(rIRValue, IRValue);
+        cg.store(rIRValue, IRValue);
     }
 }
 
@@ -148,7 +148,7 @@ void LgsIterIndex::assignScalar(LgsCgModule& cg, LgsExpr* expr) const {
     } else if (const auto map = baseExpr->type->asMap()) {
         map->getMethod(ADD_FUNC)->callIR(cg, {baseExpr->IRValue, indexIR, expr->IRValue});
     } else {
-        cg.builder.CreateStore(rIRValue, IRValue);
+        cg.store(rIRValue, IRValue);
     }
 }
 

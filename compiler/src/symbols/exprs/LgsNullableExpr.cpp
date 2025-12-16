@@ -2,18 +2,21 @@
 #include "codegen/LgsCgModule.h"
 
 Value* LgsNullableExpr::loadIR(LgsCgModule& cg) {
-    if (type->passByRef) return IRValue;
+    if (isNull) return IRValue;
+    if (type->passByRef) return cg.builder.CreateLoad(cg.ptrTy(), IRValue);
     return cg.builder.CreateLoad(type->getIRType(cg), IRValue);
 }
 
 void LgsNullableExpr::assign(LgsCgModule& cg, LgsExpr* expr) {
-    if (type->isHeapAlloc) cg.freeValue(cg.builder.CreateLoad(cg.ptrTy(), IRValue), type->getRTType(cg));
+    if (type->isHeapAlloc) {
+        cg.freeValue(loadIR(cg), type->getRTType(cg));
+    }
     if (!type->passByRef) {
         const auto isSet = cg.builder.CreateIsNotNull(expr->IRValue);
         type->asNullable()->setNullableFields(cg, IRValue, expr->IRValue, isSet);
         return;
     }
-    cg.builder.CreateStore(expr->IRValue, IRValue);
+    cg.store(expr->IRValue, IRValue);
 }
 
 void LgsNullableExpr::setDebugValue(LgsCgModule& cg) {

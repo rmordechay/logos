@@ -4,6 +4,7 @@
 #include <vector>
 #include "errors/LgsErrHandler.h"
 
+class LgsComplex;
 class LgsOwner;
 struct LgsBinOp;
 class LgsBinaryExpr;
@@ -87,7 +88,7 @@ public:
     virtual bool equals(LgsType* other);
 
     bool isVoid();
-    bool isNumber() const;
+    bool isNumber();
     bool isBig();
     bool isUnknown();
     bool isSliceable();
@@ -120,6 +121,7 @@ public:
     LgsUInt* asUInt();
     LgsFloat* asFloat();
     LgsDouble* asDouble();
+    LgsComplex* asComplex();
     LgsFuncType* asFuncType();
     LgsObject* asObject();
     LgsInterface* asInterface();
@@ -167,4 +169,4 @@ Value* orIR(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right);
 std::pair<Value*, Value*> loadPairAsFloat(LgsCgModule& cg, LgsExpr* self, LgsExpr* other);
 std::pair<Value*, Value*> loadPairAsDouble(LgsCgModule& cg, LgsExpr* self, LgsExpr* other);
 std::pair<Value*, Value*> loadPairAsInt(LgsCgModule& cg, LgsExpr* self, LgsExpr* other);
-std::pair<Constant*, Constant*> getRTTypesAndHashes(LgsCgModule& cg, const std::string& name, const std::vector<LgsOwner*>& values);
+std::pair<Constant*, Constant*> getRTFieldsInfo(LgsCgModule& cg, const std::string& name, const std::vector<LgsOwner*>& values);

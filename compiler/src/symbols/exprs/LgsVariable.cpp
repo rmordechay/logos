@@ -39,7 +39,7 @@ LgsExpr* LgsVariable::castExplicitly(LgsType* toType) {
 }
 
 void LgsVariable::assign(LgsCgModule& cg, LgsExpr* expr) {
-    cg.builder.CreateStore(expr->IRValue, IRValue);
+    cg.store(expr->IRValue, loadIR(cg));
 }
 
 Value* LgsVariable::hashValue(LgsCgModule& cg) {

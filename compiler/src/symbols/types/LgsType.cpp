@@ -4,6 +4,7 @@
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
 #include "types/LgsAny.h"
+#include "types/LgsComplex.h"
 #include "types/LgsPtr.h"
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
@@ -80,8 +81,8 @@ bool LgsType::isVoid() {
     return dynamic_cast<LgsVoid*>(this);
 }
 
-bool LgsType::isNumber() const {
-    return isInt || isFloat;
+bool LgsType::isNumber() {
+    return isInt || isFloat || asComplex();
 }
 
 bool LgsType::isBig() {
@@ -134,18 +135,6 @@ void LgsType::cloneMethods(LgsType* newType) const {
         newMethod->funcType = method->funcType;
         newType->addMethod(newMethod);
     }
-}
-
-Value* eqNullFunc(LgsCgModule& cg, const LgsExpr* expr) {
-    const auto nullable = expr->type->asNullable();
-    if (expr->type->passByRef) return cg.builder.CreateIsNull(expr->IRValue);
-    return cg.builder.CreateNot(nullable->getIsSet(cg, expr->IRValue));
-}
-
-Value* neNullFunc(LgsCgModule& cg, const LgsExpr* expr) {
-    const auto nullable = expr->type->asNullable();
-    if (expr->type->passByRef) return cg.builder.CreateIsNotNull(expr->IRValue);
-    return nullable->getIsSet(cg, expr->IRValue);
 }
 
 Value* LgsType::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
@@ -244,6 +233,10 @@ LgsDouble* LgsType::asDouble() {
     return dynamic_cast<LgsDouble*>(this);
 }
 
+LgsComplex* LgsType::asComplex() {
+    return dynamic_cast<LgsComplex*>(this);
+}
+
 LgsFuncType* LgsType::asFuncType() {
     return dynamic_cast<LgsFuncType*>(this);
 }
@@ -324,16 +317,55 @@ LgsType::~LgsType() {
     fields.clear();
 }
 
+Value* eqNull(LgsCgModule& cg, const LgsExpr* expr) {
+    const auto nullable = expr->type->asNullable();
+    if (expr->type->passByRef) return cg.builder.CreateIsNull(expr->IRValue);
+    return cg.builder.CreateNot(nullable->getIsSet(cg, expr->IRValue));
+}
+
+Value* neNull(LgsCgModule& cg, const LgsExpr* expr) {
+    const auto nullable = expr->type->asNullable();
+    if (expr->type->passByRef) return cg.builder.CreateIsNotNull(expr->IRValue);
+    return nullable->getIsSet(cg, expr->IRValue);
+}
+
+Value* eqComplex(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right) {
+    const auto l = cg.builder.CreateLoad(left->type->getIRType(cg), left->IRValue);
+    const auto r = cg.builder.CreateLoad(right->type->getIRType(cg), right->IRValue);
+    const auto lReal = cg.builder.CreateExtractValue(l, 0);
+    const auto lImag = cg.builder.CreateExtractValue(l, 1);
+    const auto rReal = cg.builder.CreateExtractValue(r, 0);
+    const auto rImag = cg.builder.CreateExtractValue(r, 1);
+    const auto realEq = cg.builder.CreateICmpEQ(lReal, rReal);
+    const auto imagEq = cg.builder.CreateICmpEQ(lImag, rImag);
+    return cg.builder.CreateAnd(realEq, imagEq);
+}
+
+Value* neComplex(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right) {
+    const auto l = cg.builder.CreateLoad(left->type->getIRType(cg), left->IRValue);
+    const auto r = cg.builder.CreateLoad(right->type->getIRType(cg), right->IRValue);
+    const auto lReal = cg.builder.CreateExtractValue(l, 0);
+    const auto lImag = cg.builder.CreateExtractValue(l, 1);
+    const auto rReal = cg.builder.CreateExtractValue(r, 0);
+    const auto rImag = cg.builder.CreateExtractValue(r, 1);
+    const auto realNe = cg.builder.CreateICmpNE(lReal, rReal);
+    const auto imagNe = cg.builder.CreateICmpNE(lImag, rImag);
+    return cg.builder.CreateOr(realNe, imagNe);
+}
+
 Value* eqIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     if (left->isNull && right->isNull) return cg.true_();
-    if (left->isNull) return eqNullFunc(cg, right);
-    if (right->isNull) return eqNullFunc(cg, left);
+    if (left->isNull) return eqNull(cg, right);
+    if (right->isNull) return eqNull(cg, left);
     if (left->type->isInt && right->type->isInt) {
         return cg.builder.CreateICmpEQ(left->loadIR(cg), right->loadIR(cg));
     }
     if (left->type->isFloat || right->type->isFloat) {
         const auto [l, r] = loadPairAsFloat(cg, left, right);
         return cg.builder.CreateFCmpOEQ(l, r);
+    }
+    if (left->type->asComplex() && right->type->asComplex()) {
+        return eqComplex(cg, left, right);
     }
     if (left->type->asStr() && right->type->asStr()) {
         const auto rt = cg.callFunc("strcmp", cg.i32Ty(), {cg.ptrTy(), cg.ptrTy()}, {left->IRValue, right->IRValue});
@@ -344,13 +376,16 @@ Value* eqIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
 
 Value* neIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     if (left->isNull && right->isNull) return cg.false_();
-    if (left->isNull) return neNullFunc(cg, right);
-    if (right->isNull) return neNullFunc(cg, left);
+    if (left->isNull) return neNull(cg, right);
+    if (right->isNull) return neNull(cg, left);
     if (left->type->isInt && left->type->isInt) {
         return cg.builder.CreateICmpEQ(left->loadIR(cg), right->loadIR(cg));
     }
     if (left->type->isFloat && left->type->isFloat) {
         return cg.builder.CreateFCmpOEQ(left->loadIR(cg), right->loadIR(cg));
+    }
+    if (left->type->asComplex() && right->type->asComplex()) {
+        return neComplex(cg, left, right);
     }
     if (left->type->asStr() && right->type->asStr()) {
         const auto rt = cg.callFunc("strcmp", cg.i32Ty(), {cg.ptrTy(), cg.ptrTy()}, {left->IRValue, right->IRValue});
@@ -481,35 +516,33 @@ std::pair<Value*, Value*> loadPairAsInt(LgsCgModule& cg, LgsExpr* self, LgsExpr*
     return {l, r};
 }
 
-std::pair<Constant*, Constant*> getRTTypesAndHashes(LgsCgModule& cg, const std::string& name, const std::vector<LgsOwner*>& values) {
-    std::vector<Constant*> fieldRTTs;
-    std::vector<Constant*> fieldNameHashes;
-    fieldRTTs.reserve(values.size());
-    fieldNameHashes.reserve(values.size());
+std::pair<Constant*, Constant*> getRTFieldsInfo(LgsCgModule& cg, const std::string& name, const std::vector<LgsOwner*>& values) {
+    std::vector<Constant*> fieldTypes;
+    std::vector<Constant*> fieldNames;
+    fieldTypes.reserve(values.size());
+    fieldNames.reserve(values.size());
     for (size_t i = 0; i < values.size(); ++i) {
-        fieldRTTs.push_back(values[i]->getType()->getRTType(cg));
-        fieldNameHashes.push_back(cg.hashConst(values[i]->getName()));
+        fieldTypes.push_back(values[i]->getType()->getRTType(cg));
+        fieldNames.push_back(cg.getString(values[i]->getName()));
     }
 
-    const auto fieldsArrType = ArrayType::get(cg.getRTTBaseStruct(), values.size());
-    Constant* typesArr = nullptr;
-    Constant* hashesArr = nullptr;
+    Constant* fieldTypesArr = nullptr;
+    Constant* fieldNamesArr = nullptr;
     if (values.empty()) {
-        typesArr = cg.null();
-        hashesArr = cg.null();
+        fieldTypesArr = cg.null();
+        fieldNamesArr = cg.null();
     } else {
-        const auto fieldsName = LGS_TYPEINFO_PREFIX + name + "_fields";
-        const auto hashesName = LGS_TYPEINFO_PREFIX + name + "_hashes";
-        const auto hashesArrType = ArrayType::get(cg.i64Ty(), values.size());
+        const auto types = LGS_TYPEINFO_PREFIX + name + "_fields";
+        const auto names = LGS_TYPEINFO_PREFIX + name + "_names";
+        const auto fieldsArrType = ArrayType::get(cg.getRTTBaseStruct(), values.size());
+        const auto namesArrType = ArrayType::get(cg.ptrTy(), values.size());
         if (cg.isRTTModule) {
-            const auto args = ConstantArray::get(fieldsArrType, fieldRTTs);
-            const auto hashes = ConstantArray::get(hashesArrType, fieldNameHashes);
-            typesArr = cg.createGlobal(fieldsName, fieldsArrType, args);
-            hashesArr = cg.createGlobal(hashesName, hashesArrType, hashes);
+            fieldTypesArr = cg.createGlobal(types, fieldsArrType, ConstantArray::get(fieldsArrType, fieldTypes));
+            fieldNamesArr = cg.createGlobal(names, namesArrType, ConstantArray::get(namesArrType, fieldNames));
         } else {
-            typesArr = cg.createGlobal(fieldsName, fieldsArrType, nullptr);
-            hashesArr = cg.createGlobal(hashesName, hashesArrType, nullptr);
+            fieldTypesArr = cg.createGlobal(types, fieldsArrType, nullptr);
+            fieldNamesArr = cg.createGlobal(names, namesArrType, nullptr);
         }
     }
-    return {typesArr, hashesArr};
+    return {fieldTypesArr, fieldNamesArr};
 }

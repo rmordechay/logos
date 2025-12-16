@@ -156,6 +156,10 @@ set(COMPILER_SOURCE
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsULong.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsByte.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsVoid.cpp
+    compiler/src/symbols/types/LgsComplex.cpp
+    compiler/include/symbols/types/LgsComplex.h
+    compiler/src/symbols/exprs/constants/LgsComplexConst.cpp
+    compiler/include/symbols/exprs/constants/LgsComplexConst.h
 )
 
 set(LGS_LIB_SOURCE

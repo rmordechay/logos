@@ -28,7 +28,7 @@ LgsType* LgsMatrix::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     return nullptr;
 }
 
-LgsType* LgsMatrix::applyMatScalarOp(const LgsType* number, const LgsBinOp& op) const {
+LgsType* LgsMatrix::applyMatScalarOp(LgsType* number, const LgsBinOp& op) const {
     if (!number->isNumber()) return nullptr;
     switch (op.opType) {
     case ADD:

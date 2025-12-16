@@ -1,4 +1,6 @@
 #include "exprs/LgsExpr.h"
+
+#include "../../../include/symbols/exprs/constants/LgsComplexConst.h"
 #include "exprs/LgsArrayExpr.h"
 #include "exprs/LgsBinaryExpr.h"
 #include "exprs/LgsCast.h"
@@ -89,10 +91,10 @@ void LgsExpr::setType(LgsType* newType) {
 Value* LgsExpr::getPtrTo(LgsCgModule& cg) const {
     if (!type->passByRef) {
         const auto ptr = cg.builder.CreateAlloca(type->getIRType(cg));
-        cg.builder.CreateStore(IRValue, ptr);
+        cg.store(IRValue, ptr);
         return ptr;
     }
-    if (type->asNullable() && type->asNullable()->passByRef) {
+    if (type->asNullable() && type->passByRef) {
         return cg.builder.CreateLoad(cg.ptrTy(), IRValue);
     }
     return IRValue;
@@ -186,6 +188,10 @@ LgsFloatConst* LgsExpr::asFloatConst() {
     return dynamic_cast<LgsFloatConst*>(this);
 }
 
+LgsComplexConst* LgsExpr::asComplexConst() {
+    return dynamic_cast<LgsComplexConst*>(this);
+}
+
 LgsStrConst* LgsExpr::asStrConst() {
     return dynamic_cast<LgsStrConst*>(this);
 }
@@ -220,8 +226,10 @@ LgsNullableExpr* LgsExpr::asNullableExpr() {
 
 void wrapInNullable(LgsExpr*& expr, LgsNullable* nullable) {
     assert(!nullable->baseType->asNullable() && !expr->asNullableExpr());
-    expr->type = nullable->baseType;
-    expr = new LgsNullableExpr(expr);
+    const auto oldExpr = expr;
+    oldExpr->type = nullable->baseType;
+    expr = new LgsNullableExpr(oldExpr);
+    expr->owner = oldExpr->owner;
     expr->type = nullable;
 }
 

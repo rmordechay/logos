@@ -66,10 +66,6 @@ bool isLogosFile(const fs::path& filePath) {
     return fs::exists(filePath) && is_regular_file(filePath) && filePath.extension().string() == LGS_FILE_EXTENSION;
 }
 
-bool isLogosKeyword(const std::string& s) {
-    return LGS_KEYWORDS.contains(s);
-}
-
 std::string getFileText(const fs::path& filePath) {
     if (!fs::exists(filePath)) return "";
     std::ifstream file(filePath);

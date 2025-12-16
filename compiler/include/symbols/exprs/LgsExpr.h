@@ -1,6 +1,7 @@
 #pragma once
 #include "LgsValue.h"
 
+class LgsComplexConst;
 class LgsNullable;
 class LgsNullableExpr;
 class LgsMetaSelection;
@@ -69,12 +70,13 @@ public:
     LgsArrayExpr* asArrayExpr();
     LgsHashMap* asHashMap();
     LgsEnvVar* asEnvVar();
+    LgsIntConst* asIntConst();
+    LgsStrConst* asStrConst();
     LgsCharConst* asCharConst();
     LgsFloatConst* asFloatConst();
-    LgsStrConst* asStrConst();
+    LgsComplexConst* asComplexConst();
     LgsVectorExpr* asVectorExpr();
     LgsMatrixExpr* asMatrixExpr();
-    LgsIntConst* asIntConst();
     LgsMetaVar* asLoopMetaVar();
     LgsBinaryExpr* asBinExpr();
     LgsMetaSelection* asMetaSelection();

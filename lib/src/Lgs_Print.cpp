@@ -25,8 +25,10 @@ static std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
     case RTT_TYPE:
     case RTT_ENUM:
     case RTT_STR: {
-        const auto s = static_cast<const char*>(elem);
-        if (!*s) return LGS_NULL_LITERAL;
+        auto s = *static_cast<char**>(elem);
+        if (!s) return LGS_NULL_LITERAL;
+        s = static_cast<char*>(elem);
+        if (!s) return LGS_NULL_LITERAL;
         str << '"' << s << '"'; break;
     }
     case RTT_CHAR: str << '"' << *static_cast<const char*>(elem) << '"'; break;
@@ -118,17 +120,18 @@ static std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
     }
     case RTT_OBJECT: {
         const auto fieldsCount = rtt->obj.fieldsCount;
-        const auto fieldTypes = rtt->obj.fieldTypes;
-        str << "<";
+        str << rtt->obj.name << "{";
         size_t offset = 0;
         for (size_t i = 0; i < fieldsCount; ++i) {
-            const auto fieldType = fieldTypes[i];
-            void* fieldPtr = static_cast<char*>(elem) + offset;
-            str << formatElement(fieldType, fieldPtr);
+            const auto fieldType = rtt->obj.fieldTypes[i];
+            const auto fieldName = rtt->obj.fieldNames[i];
+            void* fieldValue = static_cast<char*>(elem) + offset;
+            str << fieldName << '=';
+            str << formatElement(fieldType, fieldValue);
             if (i < fieldsCount - 1) str << ", ";
             offset += fieldType->size;
         }
-        str << ">";
+        str << "}";
         break;
     }
     case RTT_NULLABLE: {
@@ -158,10 +161,17 @@ static std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
         str << "}";
         break;
     }
+    case RTT_COMPLEX: {
+        const auto& [real, img] = rtt->complex;
+        str << formatElement(real, elem) << " + ";
+        str << formatElement(img, static_cast<char*>(elem) + real->size) << 'i';
+        break;
+    }
     case RTT_VOID:
     case RTT_VARIADIC:
     case RTT_FUNC:
-    case RTT_UNKNOWN: assert(0);
+    case RTT_UNKNOWN:
+    default: assert(0);
     }
     return str.str();
 }

@@ -69,13 +69,10 @@ LgsType* LgsInt::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     case LE: {
         return &LGS_BOOL;
     }
-    case AND:
-    case OR:
-    case IN:
-    case CROSS:
-        break;
     case NOOP:
         assert(0);
+    default:
+        break;
     }
     return nullptr;
 }

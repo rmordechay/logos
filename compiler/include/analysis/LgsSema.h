@@ -125,6 +125,7 @@ public:
     void visitPrefixExpr(LgsPrefixExpr* prefixExpr);
     void visitPostfixExpr(LgsPostfixExpr* postfixExpr);
     void visitStrConst(const LgsStrConst* strConst);
+    void visitComplexConst(LgsComplexConst* complex);
     void visitTypeExpr(LgsTypeExpr* typeExpr);
     void visitJson(const LgsJson* json);
     void visitJsonArr(const LgsJsonArray* jsonArr);

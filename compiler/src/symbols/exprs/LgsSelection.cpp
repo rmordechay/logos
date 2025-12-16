@@ -30,10 +30,10 @@ void LgsSelection::assign(LgsCgModule& cg, LgsExpr* expr) {
         const auto c = lastExpr()->asVariable()->name;
         const auto i = cg.i32(LgsVec::getComponentIndex(c.front()));
         const auto insert = cg.builder.CreateInsertElement(vec, rIR, i);
-        cg.builder.CreateStore(insert, lExpr->IRValue);
+        cg.store(insert, lExpr->IRValue);
     } else {
         cg.freeValue(loadIR(cg), type->getRTType(cg));
-        cg.builder.CreateStore(rIR, IRValue);
+        cg.store(rIR, IRValue);
     }
 }
 

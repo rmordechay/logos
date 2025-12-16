@@ -64,9 +64,11 @@ Constant* LgsObject::getRTType(LgsCgModule& cg) {
     const auto objName = getName();
     std::vector<LgsOwner*> fieldsAsOwners;
     for (const auto field : fields) fieldsAsOwners.push_back(field);
-    const auto [typesArr, hashesArr] = getRTTypesAndHashes(cg, name, fieldsAsOwners);
-    // fieldsCount, fieldHashes, fieldTypes
-    const auto sv = cg.getRTTExtraStruct(objName, {cg.sizeTy(), cg.ptrTy(), cg.ptrTy()}, {cg.usize(fields.size()), hashesArr, typesArr});
+    const auto [typesArr, hashesArr] = getRTFieldsInfo(cg, name, fieldsAsOwners);
+    // name, fieldsCount, fieldNames, fieldTypes
+    const std::vector<Type*> params = {cg.ptrTy(), cg.sizeTy(), cg.ptrTy(), cg.ptrTy()};
+    const std::vector<Constant*> args = {cg.getString(objName), cg.usize(fields.size()), hashesArr, typesArr};
+    const auto sv = cg.getRTTExtraStruct(objName, params, args);
     return cg.getRTTypeInfo(objName, sizeBytes(), RTT_OBJECT, isHeapAlloc, sv);
 }
 
