@@ -457,6 +457,18 @@ std::pair<Value*, Value*> loadPairAsFloat(LgsCgModule& cg, LgsExpr* self, LgsExp
     return {l, r};
 }
 
+std::pair<Value*, Value*> loadPairAsDouble(LgsCgModule& cg, LgsExpr* self, LgsExpr* other) {
+    auto l = self->loadIR(cg);
+    auto r = other->loadIR(cg);
+    if (l->getType()->isIntegerTy()) {
+        l = cg.builder.CreateSIToFP(l, cg.doubleTy());
+    }
+    if (r->getType()->isIntegerTy()) {
+        r = cg.builder.CreateSIToFP(r, cg.doubleTy());
+    }
+    return {l, r};
+}
+
 std::pair<Value*, Value*> loadPairAsInt(LgsCgModule& cg, LgsExpr* self, LgsExpr* other) {
     auto l = self->loadIR(cg);
     auto r = other->loadIR(cg);

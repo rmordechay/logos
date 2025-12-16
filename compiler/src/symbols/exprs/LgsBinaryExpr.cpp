@@ -1,5 +1,4 @@
 #include "exprs/LgsBinaryExpr.h"
-
 #include "codegen/LgsCgModule.h"
 
 Value* LgsBinaryExpr::loadIR(LgsCgModule& cg) {

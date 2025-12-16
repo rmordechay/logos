@@ -63,6 +63,13 @@ LgsToken LgsLexer::nextToken() {
         return scanNumber(location);
     }
 
+    // Slider
+    if (currentChar == '_' && peek() == '/') {
+        advance();
+        advance();
+        return {T_SLIDER, "_/", location};
+    }
+
     // Var or keyword
     if ((currentChar == '$' && peek() != ' ') || std::isalpha(currentChar) || currentChar == '_') {
         return scanVarOrKeyword(location);
@@ -153,7 +160,6 @@ LgsToken LgsLexer::nextToken() {
         return {T_STAR, "*", location};
     case '_':
         advance();
-        if (match('/')) return {T_SLIDER, "_/", location};
         if (std::isalpha(currentChar)) {
             return scanVarOrKeyword(location);
         }

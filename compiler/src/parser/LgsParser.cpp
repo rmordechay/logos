@@ -286,7 +286,8 @@ LgsEnvFile* LgsParser::parseEnvFile() {
         if (!varDec) break;
         file->varDecs.push_back(varDec);
     }
-    if (currentToken.type != T_EOF) assert(0);
+    if (currentToken.type != T_EOF)
+        assert(0);
     setLocation(file->location, &nameToken, &currentToken);
     return file;
 }
@@ -318,7 +319,8 @@ LgsTestFile* LgsParser::parseTestFile() {
         if (currentToken.type == T_EOF) break;
     }
 
-    if (currentToken.type != T_EOF) assert(0);
+    if (currentToken.type != T_EOF)
+        assert(0);
     validateTestFolder(file);
     setLocation(file->location, &nameToken, &currentToken);
     return file;
@@ -357,7 +359,8 @@ LgsObject* LgsParser::parseObjectBody(const LgsToken& tokenName, const bool isSi
             obj->generics.push_back(type);
             const auto ct = currentToken.type;
             const auto nt = peek().type;
-            if (ct == T_EOF || ct == T_RBRACE || nt == T_COLON || nt == T_LPAREN || nt == T_ENUM || nt == T_INTERFACE || nt == T_IMPLEMENTS) {
+            if (ct == T_EOF || ct == T_RBRACE || nt == T_COLON || nt == T_LPAREN || nt == T_ENUM || nt == T_INTERFACE ||
+                nt == T_IMPLEMENTS) {
                 break;
             }
             mustMatch(T_COMMA);
@@ -561,7 +564,7 @@ LgsType* LgsParser::parseType() {
         type = new LgsNullable(type);
         setLocation(type->location, &startToken, &currentToken);
     }
-    
+
     // Array
     if (type && currentToken.type == T_LBRACK) {
         std::vector<LgsExpr*> sizes;
@@ -810,7 +813,8 @@ void LgsParser::parseParams(LgsFuncType* funcType) {
             if (funcType->isVariadic) addParsingError();
             param.isVariadic = true;
             funcType->isVariadic = true;
-        } else if (funcType->isVariadic) { // Normal param cannot come after variadic param
+        } else if (funcType->isVariadic) {
+            // Normal param cannot come after variadic param
             addParsingError();
         } else if (matchAndConsume(T_EQUAL)) {
             param.expr = parseExpr();
@@ -1364,8 +1368,8 @@ LgsExpr* LgsParser::parseUnary(const bool withInstance) {
     else if (const auto json = parseJson()) expr = json;
     else if (const auto prefixExpr = parsePrefixExpr()) expr = prefixExpr;
     else if (const auto funcCall = parseFuncCall()) expr = funcCall;
-    else if (withInstance && ((expr = parseInstance()))) {}
-    else if (const auto variable = parseVariable()) expr = variable;
+    else if (withInstance && ((expr = parseInstance()))) {
+    } else if (const auto variable = parseVariable()) expr = variable;
     else return nullptr;
 
     if (matchAndConsume(T_DOT)) expr = parseSelection(expr);
@@ -1619,10 +1623,17 @@ LgsVectorExpr* LgsParser::parseVectorExpr() {
 
     uint8_t dim = 0;
     switch (nameToken.type) {
-    case T_VEC2: dim = 2; break;
-    case T_VEC3: dim = 3; break;
-    case T_VEC4: dim = 4; break;
-    default: break;
+    case T_VEC2:
+        dim = 2;
+        break;
+    case T_VEC3:
+        dim = 3;
+        break;
+    case T_VEC4:
+        dim = 4;
+        break;
+    default:
+        break;
     }
 
     std::vector<LgsExpr*> args;
@@ -1707,7 +1718,8 @@ LgsFunc* LgsParser::parseLambda() {
     const auto startToken = currentToken;
     const auto oldIndex = currentIndex;
     std::vector<LgsParam> params;
-    if (currentToken.type == T_IDENTIFIER) { // Single param
+    if (currentToken.type == T_IDENTIFIER) {
+        // Single param
         LgsParam param(nullptr, currentToken.lexeme);
         consume();
         if (matchAndConsume(T_COLON)) {
@@ -1715,7 +1727,8 @@ LgsFunc* LgsParser::parseLambda() {
             mustParse(param.type);
         }
         params.emplace_back(param);
-    } else if (matchAndConsume(T_LPAREN)) { // Multiple params
+    } else if (matchAndConsume(T_LPAREN)) {
+        // Multiple params
         if (!matchAndConsume(T_RPAREN)) {
             while (true) {
                 auto paramName = currentToken.lexeme;
@@ -2123,26 +2136,27 @@ bool LgsParser::isImportName(LgsExpr* expr) const {
     return false;
 }
 
+bool fitsIn(const std::string& value, const std::string& limit) {
+    if (value.size() != limit.size())
+        return value.size() < limit.size();
+    return value <= limit;
+}
+
 LgsExpr* LgsParser::determineIntConst(const std::string& tokenStr, const int base) const {
     auto str = tokenStr;
     if (tokenStr.starts_with("0b") || tokenStr.starts_with("0x")) {
         str = tokenStr.substr(2).c_str();
     }
-    LgsExpr* expr = nullptr;
-    errno = 0;
-    char* end = nullptr;
-    const auto v = strtoull(str.c_str(), &end, base);
-    if (errno == ERANGE || *end != '\0') {
-        expr = new LgsUIntConst(&LGS_ULONG, UINT64_MAX);
-    } else if (v <= INT_MAX) {
-        expr = new LgsIntConst(&LGS_INT, static_cast<int32_t>(v));
-    } else if (v <= UINT_MAX) {
-        expr = new LgsUIntConst(&LGS_UINT, static_cast<uint32_t>(v));
-    } else if (v <= LONG_MAX) {
-        expr = new LgsIntConst(&LGS_LONG, static_cast<int64_t>(v));
-    } else {
-        expr = new LgsUIntConst(&LGS_ULONG, v);
+    const bool negative = str[0] == '-';
+    const auto digits = negative ? str.substr(1) : str;
+    const auto v = strtoll(str.c_str(), nullptr, base);
+    LgsType* type = nullptr;
+    if (fitsIn(digits, std::to_string(std::numeric_limits<int32_t>::max()))) {
+        type = &LGS_INT;
+    } else if (fitsIn(digits, std::to_string(std::numeric_limits<long>::max())) || fitsIn(digits, std::to_string(std::numeric_limits<int64_t>::max()))) {
+        type = &LGS_LONG;
     }
+    const auto expr = new LgsIntConst(type, v);
     setLocation(expr->location, &currentToken, &currentToken);
     return expr;
 }

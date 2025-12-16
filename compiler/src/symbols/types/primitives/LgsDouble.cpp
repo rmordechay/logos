@@ -39,8 +39,19 @@ bool LgsDouble::canCastTo(LgsType* other) {
     return false;
 }
 
+Value* LgsDouble::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+    const auto [l, r] = loadPairAsDouble(cg, left, right);
+    return cg.builder.CreateFAdd(l, r);
+}
+
+Value* LgsDouble::mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+    const auto [l, r] = loadPairAsDouble(cg, left, right);
+    return cg.builder.CreateFMul(l, r);
+}
+
 Value* LgsDouble::powIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return LgsType::powIR(cg, left, right);
+    const auto [l, r] = loadPairAsDouble(cg, left, right);
+    return cg.callFunc("pow", cg.doubleTy(), {cg.doubleTy(), cg.doubleTy()}, {l, r});
 }
 
 DIType* LgsDouble::getDebugType(LgsCgModule& cg) {

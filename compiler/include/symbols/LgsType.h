@@ -165,5 +165,6 @@ Value* leIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
 Value* andIR(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right);
 Value* orIR(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right);
 std::pair<Value*, Value*> loadPairAsFloat(LgsCgModule& cg, LgsExpr* self, LgsExpr* other);
+std::pair<Value*, Value*> loadPairAsDouble(LgsCgModule& cg, LgsExpr* self, LgsExpr* other);
 std::pair<Value*, Value*> loadPairAsInt(LgsCgModule& cg, LgsExpr* self, LgsExpr* other);
 std::pair<Constant*, Constant*> getRTTypesAndHashes(LgsCgModule& cg, const std::string& name, const std::vector<LgsOwner*>& values);
