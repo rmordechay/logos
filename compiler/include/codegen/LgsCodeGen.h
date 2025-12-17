@@ -128,7 +128,7 @@ public:
     void visitNullableSelection(LgsExpr* child, LgsExpr* parent) const;
     void visitMetaSelection(LgsMetaSelection* metaSelection);
     void visitFuncCall(LgsFuncCall* funcCall);
-    void visitIterFunc(const LgsFuncCall* funcCall) const;
+    void visitIterFunc(const LgsFuncCall* funcCall);
     void visitPrefixExpr(LgsPrefixExpr* prefixExpr);
     void visitPostfixExpr(LgsPostfixExpr* postfixExpr);
     void visitStrConst(LgsStrConst* strConst);
@@ -148,4 +148,5 @@ public:
     bool checkMock(LgsExpr* expr) const;
     Value* getIRValue(LgsValue* value);
     void addVirtuals(LgsObject* obj, Value* ptr) const;
+    void createMapFunc(LgsFunc* func);
 };

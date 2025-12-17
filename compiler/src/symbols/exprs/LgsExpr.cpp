@@ -88,15 +88,6 @@ void LgsExpr::setType(LgsType* newType) {
     type = newType;
 }
 
-Value* LgsExpr::getPtrTo(LgsCgModule& cg) const {
-    if (!type->passByRef || type->asVec()) {
-        const auto ptr = cg.builder.CreateAlloca(type->getIRType(cg));
-        cg.store(IRValue, ptr);
-        return ptr;
-    }
-    return IRValue;
-}
-
 LgsExpr* LgsExpr::castExplicitly(LgsType* toType) {
     assert(0);
 }

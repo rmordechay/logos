@@ -8,22 +8,6 @@ Value* LgsArrayExpr::loadIR(LgsCgModule& cg) {
     return cg.builder.CreateLoad(type->getIRType(cg), IRValue);
 }
 
-void LgsArrayExpr::initIRArray(LgsCgModule& cg) {
-    if (const auto dArr = type->asDArray()) {
-        auto rtType = dArr->getRTType(cg);
-        if (!IRValue) {
-            IRValue = cg.allocate(cg.usize(dArr->sizeBytes()), rtType, false);
-        }
-        cg.callLgsFunc(LgsDArray::name, "init", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {IRValue, rtType});
-    } else if (const auto set = type->asSet()) {
-        auto rtType = set->getRTType(cg);
-        if (!IRValue) {
-            IRValue = cg.allocate(cg.usize(set->sizeBytes()), rtType, false);
-        }
-        cg.callLgsFunc(LgsSet::name, "init", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {IRValue, rtType});
-    }
-}
-
 void LgsArrayExpr::castImplicitly(LgsType* toType) {
     if (toType->asGenericType()) return;
     // Replace static and dynamic if needed

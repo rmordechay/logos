@@ -94,6 +94,10 @@ void LgsIterable::unpackLoopIR(LgsCgModule& cg, LgsForeachLoop* loop) const {
     loop->loopVars[0]->IRValue = iterIndex->IRValue;
 }
 
+void LgsIterable::addIRElement(LgsCgModule& cg, Value*& iterable, Value* index, Value* value) {
+    assert(0);
+}
+
 LgsIterable::~LgsIterable() {
     freeExpr(size);
     freeType(baseType);

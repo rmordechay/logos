@@ -10,8 +10,7 @@ public:
         vecType = new LgsVec(dim);
         setType(vecType);
     }
-
-    explicit LgsVectorExpr(LgsVec* vecType): vecType(vecType) {}
+    explicit LgsVectorExpr(LgsVec* vecType): LgsExpr(vecType), vecType(vecType) {}
     Value* loadIR(LgsCgModule& cg) override;
     void hashNode(size_t& oldHash) override;
     LgsExpr* castExplicitly(LgsType* toType) override;

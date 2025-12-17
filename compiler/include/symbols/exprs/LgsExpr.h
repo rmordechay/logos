@@ -47,7 +47,6 @@ public:
     std::optional<int64_t> getConstInt();
     std::optional<std::string> getConstStr();
     void setType(LgsType* newType);
-    Value* getPtrTo(LgsCgModule& cg) const;
 
     virtual LgsExpr* castExplicitly(LgsType* toType);
     virtual void castImplicitly(LgsType* toType);

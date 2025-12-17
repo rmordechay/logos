@@ -204,8 +204,15 @@ Value* LgsVec::lenIR(LgsCgModule& cg, Value* iterable) {
 }
 
 Value* LgsVec::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
-    const auto gep = cg.builder.CreateGEP(getIRType(cg), iterable, {cg.i32Zero(), index});
-    return cg.builder.CreateLoad(baseType->getIRType(cg), gep);
+    return cg.builder.CreateExtractElement(iterable, index);
+}
+
+void LgsVec::addIRElement(LgsCgModule& cg, Value*& iterable, Value* index, Value* value) {
+    auto v = iterable;
+    if (!iterable->getType()->isVectorTy()) {
+        v = cg.builder.CreateLoad(getIRType(cg), iterable);
+    }
+    iterable = cg.builder.CreateInsertElement(v, value, index);
 }
 
 Value* LgsVec::matMul(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right) const {

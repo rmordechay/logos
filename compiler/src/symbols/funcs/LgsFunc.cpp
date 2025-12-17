@@ -244,7 +244,6 @@ void LgsFunc::createFilterFunc(LgsCgModule& cg) {
 
     const auto dArray = arrParam.type->asDArray();
     LgsArrayExpr newArr(dArray);
-    newArr.initIRArray(cg);
 
     const auto iPtr = cg.builder.CreateAlloca(cg.sizeTy());
     const auto loopStart = cg.builder.CreateSExt(cg.sizeZero(), cg.sizeTy());

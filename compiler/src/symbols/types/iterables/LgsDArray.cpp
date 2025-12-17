@@ -13,9 +13,8 @@ LgsFunc* LgsDArray::getMethod(const std::string& methodName) {
         if (methods.contains(ADD_FUNC)) return methods[ADD_FUNC];
         const auto func = new LgsFunc(ADD_FUNC, name, &LGS_VOID, {this, baseType}, flags);
         func->fn = [this](LgsCgModule& cg, const std::vector<LgsFuncArg>& args) {
-            const std::vector<Type*> params = {cg.ptrTy(), cg.ptrTy(), cg.ptrTy()};
-            const std::vector<Value*> IRArgs = {args[0].expr->IRValue, getRTType(cg), args[1].expr->getPtrTo(cg)};
-            return cg.callLgsFunc(name, "add", cg.voidTy(), params, IRArgs);
+            addIRElement(cg, args[0].expr->IRValue, nullptr, cg.getPtrTo(args[1].expr->IRValue));
+            return nullptr;
         };
         addMethod(func);
         return func;
@@ -91,7 +90,7 @@ Value* LgsDArray::lenIR(LgsCgModule& cg, Value* iterable) {
 
 Value* LgsDArray::inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) {
     const std::vector<Type*> params = {cg.ptrTy(), cg.ptrTy(), cg.ptrTy()};
-    const std::vector<Value*> IRArgs = {iterableExpr->IRValue, getRTType(cg), value->getPtrTo(cg)};
+    const std::vector<Value*> IRArgs = {iterableExpr->IRValue, getRTType(cg), cg.getPtrTo(value->IRValue)};
     return cg.callLgsFunc(name, "contains", cg.i1Ty(), params, IRArgs);
 }
 
@@ -99,6 +98,12 @@ Value* LgsDArray::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
     const std::vector<Type*> params = {cg.ptrTy(), cg.ptrTy(), cg.sizeTy()};
     const std::vector<Value*> IRArgs = {iterable, getRTType(cg), index};
     return cg.callLgsFunc(name, "get", cg.ptrTy(), params, IRArgs);
+}
+
+void LgsDArray::addIRElement(LgsCgModule& cg, Value*& iterable, Value* index, Value* value) {
+    const std::vector<Type*> params = {cg.ptrTy(), cg.ptrTy(), cg.ptrTy()};
+    const std::vector<Value*> IRArgs = {iterable, getRTType(cg), cg.getPtrTo(value)};
+    cg.callLgsFunc(name, "add", cg.voidTy(), params, IRArgs);
 }
 
 bool LgsDArray::canCastTo(LgsType* other) {
