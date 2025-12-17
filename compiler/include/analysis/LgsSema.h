@@ -110,7 +110,7 @@ public:
     void visitStaticArray(const LgsArrayExpr* arrayExpr);
     void visitDynamicArray(LgsArrayExpr* arrayExpr);
     void visitHashMap(LgsHashMap* hashMap);
-    void visitVectorExpr(const LgsVectorExpr* vectorExpr);
+    void visitVectorExpr(LgsVectorExpr* vectorExpr);
     void visitMatrixExpr(const LgsMatrixExpr* matrixExpr);
     void visitVariable(LgsVariable* variable);
     void visitSelection(LgsSelection* selection);

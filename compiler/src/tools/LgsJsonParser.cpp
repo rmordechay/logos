@@ -215,7 +215,7 @@ void LgsJsonParser::parseVarDec(const LgsVarDec* varDec) {
     closeObject();
 }
 
-void LgsJsonParser::parseAssignment(LgsAssignment* assignment) {
+void LgsJsonParser::parseAssignment(const LgsAssignment* assignment) {
     openObject();
     addKeyValueStr("kind", "assignment", true);
     openKey("leftExpr");
@@ -224,11 +224,11 @@ void LgsJsonParser::parseAssignment(LgsAssignment* assignment) {
     openKey("rightExpr");
     parseExpr(assignment->rValue);
     addComma();
-    addKeyValueStr("op", assignment->getAssignTypeStr());
+    addKeyValueStr("op", assignment->assignmentType.text);
     closeObject();
 }
 
-void LgsJsonParser::parseIfStmt(LgsIfStmt* ifStmt) {
+void LgsJsonParser::parseIfStmt(const LgsIfStmt* ifStmt) {
     openObject();
     addKeyValueStr("kind", "ifStmt", true);
     openKey("ifCond");
@@ -357,7 +357,7 @@ void LgsJsonParser::parseCast(LgsCast* cast) {
     closeObject();
 }
 
-void LgsJsonParser::parseArrayExpr(LgsArrayExpr* arrayExpr) {
+void LgsJsonParser::parseArrayExpr(const LgsArrayExpr* arrayExpr) {
     openObject();
     addKeyValueStr("kind", "arrayExpr", true);
     openKey("elements");
@@ -391,7 +391,7 @@ void LgsJsonParser::parseVariable(const LgsVariable* variable) {
     closeObject();
 }
 
-void LgsJsonParser::parseSelection(LgsSelection* selection) {
+void LgsJsonParser::parseSelection(const LgsSelection* selection) {
     openObject();
     addKeyValueStr("kind", "selection", true);
     openKeyArray("exprs");
@@ -403,7 +403,7 @@ void LgsJsonParser::parseSelection(LgsSelection* selection) {
     closeObject();
 }
 
-void LgsJsonParser::parseFuncCall(LgsFuncCall* funcCall) {
+void LgsJsonParser::parseFuncCall(const LgsFuncCall* funcCall) {
     openObject();
     addKeyValueStr("kind", "funcCall", true);
     addKeyValueStr("name", funcCall->name, true);

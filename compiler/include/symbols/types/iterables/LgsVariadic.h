@@ -15,7 +15,7 @@ public:
     std::string fmtStr() const override;
     DIType* getDebugType(LgsCgModule& cg) override;
     std::string getName() override;
-    bool inferBaseType(const std::vector<LgsExpr*>& args) override;
+    bool inferBaseType(std::vector<LgsExpr*>& args) override;
     Value* lenIR(LgsCgModule& cg, Value* iterable) override;
     Value* inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
     Value* getIRElement(LgsCgModule& cg, Value* iterable, Value* index) override;

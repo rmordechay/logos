@@ -92,7 +92,7 @@ LgsType* LgsMap::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     assert(0);
 }
 
-bool LgsMap::inferBaseType(const std::vector<LgsExpr*>& args) {
+bool LgsMap::inferBaseType(std::vector<LgsExpr*>& args) {
     assert(0);
 }
 

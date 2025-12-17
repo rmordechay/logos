@@ -979,22 +979,27 @@ LgsAssignType LgsParser::parseAssignType() {
 
 LgsStmt* LgsParser::parseAssignment() {
     const auto oldIndex = currentIndex;
-    // Assignment
+    // Left expr
     const auto l = parseExpr();
     if (!parsedOrReset(l, oldIndex)) return nullptr;
+
+    // Operation
     const auto opToken = currentToken;
-    const auto op = parseAssignType();
-    if (op == ASSIGN_UNKNOWN) {
+    if (!LGS_ASSIGN_OPS_DICT.contains(currentToken.type)) {
         freeExpr(l);
         reset(oldIndex);
         return nullptr;
     }
+    const auto op = LGS_ASSIGN_OPS_DICT.at(currentToken.type);
+
+    // Right expr
     const auto r = parseExpr();
     if (!r) {
         freeExpr(l);
         reset(oldIndex);
         return nullptr;
     }
+
     const auto assignment = new LgsAssignment(op, l, r);
     setLocation(assignment->location, &opToken, &currentToken);
     return assignment;
@@ -1578,7 +1583,9 @@ LgsExpr* LgsParser::parseConstant() {
         break;
     }
     case T_DOUBLE: {
-        constant = new LgsFloatConst(&LGS_DOUBLE, std::stol(tokenStr));
+        auto str = tokenStr;
+        if (tokenStr.ends_with("D")) str.pop_back();
+        constant = new LgsFloatConst(&LGS_DOUBLE, std::stod(str));
         break;
     }
     case T_BOOL: {
@@ -2311,6 +2318,5 @@ LgsFunc* wrapStmtsBlockWithLambda(LgsStmtsBlock* stmtsBlock) {
     func->isLambda = true;
     func->location = stmtsBlock->location;
     func->stmtsBlock = stmtsBlock;
-    func->funcType->rt = &LGS_VOID;
     return func;
 }

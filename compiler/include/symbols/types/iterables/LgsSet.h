@@ -24,7 +24,7 @@ public:
     std::string pname() override;
     bool canCastTo(LgsType* other) override;
     std::string fmtStr() const override;
-    bool inferBaseType(const std::vector<LgsExpr*>& args) override;
+    bool inferBaseType(std::vector<LgsExpr*>& args) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     Value* lenIR(LgsCgModule& cg, Value* iterable) override;
     Value* inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) override;

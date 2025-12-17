@@ -43,7 +43,7 @@ LgsType* LgsMatrix::applyMatScalarOp(LgsType* number, const LgsBinOp& op) const 
 
 LgsType* LgsMatrix::applyMatVecOp(const LgsVec* vec, const LgsBinOp& op) const {
     if (op.opType != MUL) return nullptr;
-    if (vec->vectorDim != columns) return nullptr;
+    if (vec->dimVec != columns) return nullptr;
     return new LgsVec(rows, baseType);
 }
 
@@ -125,7 +125,7 @@ std::string LgsMatrix::fmtStr() const {
     return "%s";
 }
 
-bool LgsMatrix::inferBaseType(const std::vector<LgsExpr*>& args) {
+bool LgsMatrix::inferBaseType(std::vector<LgsExpr*>& args) {
     assert(0);
 }
 

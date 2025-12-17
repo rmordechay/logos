@@ -14,7 +14,7 @@ public:
         isHeapAlloc = true;
     }
     LgsFunc* getMethod(const std::string& methodName) override;
-    bool inferBaseType(const std::vector<LgsExpr*>& args) override;
+    bool inferBaseType(std::vector<LgsExpr*>& args) override;
     Type* getIRType(LgsCgModule& cg) override;
     Constant* getRTType(LgsCgModule& cg) override;
     std::string getName() override;
