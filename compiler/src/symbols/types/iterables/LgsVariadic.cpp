@@ -36,7 +36,7 @@ std::string LgsVariadic::getName() {
     return baseType->getName() + "...";
 }
 
-bool LgsVariadic::inferBaseType(const std::vector<LgsExpr*>& args) {
+bool LgsVariadic::inferBaseType(std::vector<LgsExpr*>& args) {
     assert(0);
 }
 

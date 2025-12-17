@@ -71,7 +71,7 @@ std::string LgsStr::fmtStr() const {
     return "%s";
 }
 
-bool LgsStr::inferBaseType(const std::vector<LgsExpr*>& args) {
+bool LgsStr::inferBaseType(std::vector<LgsExpr*>& args) {
     assert(0);
 }
 

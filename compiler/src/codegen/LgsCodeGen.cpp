@@ -839,19 +839,25 @@ void LgsCodeGen::visitSetExpr(LgsArrayExpr* arrayExpr) const {
 
 void LgsCodeGen::visitVectorExpr(LgsVectorExpr* vectorExpr) {
     const auto ty = vectorExpr->type->getIRType(cg);
-    if (!vectorExpr->IRValue) {
-        vectorExpr->IRValue = cg.builder.CreateAlloca(ty);
-    }
-    if (!vectorExpr->elements.empty()) {
-        Value* vectorValue = UndefValue::get(ty);
-        for (size_t i = 0; i < vectorExpr->elements.size(); ++i) {
-            visitExpr(vectorExpr->elements[i]);
-            const auto elementValue = getIRValue(vectorExpr->elements[i]);
-            vectorValue = cg.builder.CreateInsertElement(vectorValue, elementValue, cg.i32(i));
-        }
-        cg.store(vectorValue, vectorExpr->IRValue);
+    if (vectorExpr->elements.empty()) {
+        if (vectorExpr->IRValue) return;
+        vectorExpr->IRValue = ConstantAggregateZero::get(ty);
     } else {
-        cg.store(ConstantAggregateZero::get(ty), vectorExpr->IRValue);
+        vectorExpr->IRValue = UndefValue::get(ty);
+        size_t index = 0;
+        for (size_t i = 0; i < vectorExpr->elements.size(); ++i) {
+            const auto element = vectorExpr->elements[i];
+            visitExpr(element);
+            if (const auto innerVec = element->type->asVec()) {
+                const auto innerVecValue = element->IRValue;
+                for (size_t j = 0; j < innerVec->dimVec; j++) {
+                    const auto innerElement = cg.builder.CreateExtractElement(innerVecValue, j);
+                    vectorExpr->IRValue = cg.builder.CreateInsertElement(vectorExpr->IRValue, innerElement, index++);
+                }
+            } else {
+                vectorExpr->IRValue = cg.builder.CreateInsertElement(vectorExpr->IRValue, element->IRValue, index++);
+            }
+        }
     }
 }
 
@@ -1294,8 +1300,8 @@ Function* LgsCodeGen::getThunkFunc(LgsFuncCall* fc, Type* ctxTy) const {
 void LgsCodeGen::createVecField(LgsField* field, Value* parent) const {
     const auto vec = field->type->asVec();
     assert(vec);
-    std::vector<int> mask(vec->vectorDim);
-    for (size_t i = 0; i < vec->vectorDim; i++) {
+    std::vector<int> mask(vec->dimVec);
+    for (size_t i = 0; i < vec->dimVec; i++) {
         mask[i] = LgsVec::getComponentIndex(field->name[i]);
     }
     const auto vecType = field->type->getIRType(cg);

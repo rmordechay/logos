@@ -73,7 +73,7 @@ LgsType* LgsSArray::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     return nullptr;
 }
 
-bool LgsSArray::inferBaseType(const std::vector<LgsExpr*>& args) {
+bool LgsSArray::inferBaseType(std::vector<LgsExpr*>& args) {
     assert(0);
 }
 

@@ -21,6 +21,16 @@ LgsExpr* LgsFloatConst::castExplicitly(LgsType* toType) {
     return nullptr;
 }
 
+void LgsFloatConst::castImplicitly(LgsType* toType) {
+    const auto otherName = toType->getName();
+    if (type->getName() == otherName) return;
+    if (otherName == LgsAny::name) return;
+    if (type->asFloat() && toType->asDouble()) {
+        // Widening is always allowed
+        setType(toType);
+    }
+}
+
 std::string LgsFloatConst::asText() {
     return std::to_string(value);
 }

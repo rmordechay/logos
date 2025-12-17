@@ -842,7 +842,7 @@ void LgsSema::visitHashMap(LgsHashMap* hashMap) {
     hashMap->setType(new LgsMap(key->type, value->type));
 }
 
-void LgsSema::visitVectorExpr(const LgsVectorExpr* vectorExpr) {
+void LgsSema::visitVectorExpr(LgsVectorExpr* vectorExpr) {
     const auto vec = vectorExpr->type->asVec();
     if (!vec->inferBaseType(vectorExpr->elements)) {
         return addError(E10095, vectorExpr->location);
@@ -853,14 +853,14 @@ void LgsSema::visitVectorExpr(const LgsVectorExpr* vectorExpr) {
         if (arg->type->isNumber()) {
             sumDim++;
         } else if (const auto otherVec = arg->type->asVec()) {
-            sumDim += otherVec->vectorDim;
+            sumDim += otherVec->dimVec;
         } else {
             addError(E10073, vectorExpr->location, {arg->type->pname()});
             break;
         }
     }
-    if (sumDim > vectorExpr->vecType->vectorDim) {
-        addError(E10074, vectorExpr->location, {std::to_string(vectorExpr->vecType->vectorDim), std::to_string(sumDim)});
+    if (sumDim > vectorExpr->vecType->dimVec) {
+        addError(E10074, vectorExpr->location, {vec->pname(), std::to_string(sumDim)});
     }
 }
 
@@ -1590,7 +1590,7 @@ bool LgsSema::validateMethodVisibility(const LgsFunc* method, LgsType* parent, c
 
 bool LgsSema::validateVecElements(const LgsVariable* fieldVar, LgsVec* vec) {
     const auto fieldName = fieldVar->name;
-    const auto dim = vec->vectorDim;
+    const auto dim = vec->dimVec;
     if (fieldName.empty() || fieldName.size() > 4) {
         addError(E10069, fieldVar->location, {vec->pname()});
         return false;

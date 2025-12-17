@@ -18,7 +18,7 @@ LgsExpr* LgsVectorExpr::castExplicitly(LgsType* toType) {
 }
 
 void LgsVectorExpr::castImplicitly(LgsType* toType) {
-    assert(0);
+
 }
 
 Value* LgsVectorExpr::hashValue(LgsCgModule& cg) {

@@ -275,6 +275,11 @@ LgsToken LgsLexer::scanNumber(const LgsLocation& location) {
             lexeme += currentChar;
             advance();
         }
+        if (currentChar == 'D') {
+            lexeme += currentChar;
+            advance();
+            return {T_DOUBLE, lexeme, location};
+        }
         return {T_FLOAT, lexeme, location};
     }
     // Long

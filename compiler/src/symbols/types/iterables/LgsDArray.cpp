@@ -23,7 +23,7 @@ LgsFunc* LgsDArray::getMethod(const std::string& methodName) {
     return LgsIterable::getMethod(methodName);
 }
 
-bool LgsDArray::inferBaseType(const std::vector<LgsExpr*>& args) {
+bool LgsDArray::inferBaseType(std::vector<LgsExpr*>& args) {
     assert(!args.empty());
     if (baseType) return true;
     const auto baseExprType = args.front()->type;

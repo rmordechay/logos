@@ -61,7 +61,7 @@ LgsType* LgsSet::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     return nullptr;
 }
 
-bool LgsSet::inferBaseType(const std::vector<LgsExpr*>& args) {
+bool LgsSet::inferBaseType(std::vector<LgsExpr*>& args) {
     assert(!args.empty());
     if (baseType) return true;
     const auto baseExprType = args.front()->type;

@@ -11,6 +11,7 @@ public:
     }
     Value* loadIR(LgsCgModule& cg) override;
     LgsExpr* castExplicitly(LgsType* toType) override;
+    void castImplicitly(LgsType* toType) override;
     std::string asText() override;
     void setDebugValue(LgsCgModule& cg) override;
     ~LgsFloatConst() override = default;

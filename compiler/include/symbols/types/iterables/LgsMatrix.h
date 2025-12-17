@@ -16,7 +16,7 @@ public:
     LgsType* getValueType() override;
     std::string getName() override;
     bool canCastTo(LgsType* other) override;
-    bool inferBaseType(const std::vector<LgsExpr*>& args) override;
+    bool inferBaseType(std::vector<LgsExpr*>& args) override;
     Type* getIRType(LgsCgModule& cg) override;
     Constant* getRTType(LgsCgModule& cg) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;

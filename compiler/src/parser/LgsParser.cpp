@@ -1578,7 +1578,9 @@ LgsExpr* LgsParser::parseConstant() {
         break;
     }
     case T_DOUBLE: {
-        constant = new LgsFloatConst(&LGS_DOUBLE, std::stol(tokenStr));
+        auto str = tokenStr;
+        if (tokenStr.ends_with("D")) str.pop_back();
+        constant = new LgsFloatConst(&LGS_DOUBLE, std::stod(str));
         break;
     }
     case T_BOOL: {
