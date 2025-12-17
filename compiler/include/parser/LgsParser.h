@@ -1,16 +1,20 @@
 #pragma once
-#include "parser/LgsLexer.h"
-#include "files/LgsAppConfigFile.h"
-#include "exprs/LgsJson.h"
-#include "loops/LgsForeachLoop.h"
+#include "LgsBinaryTokens.h"
+#include "LgsTokens.h"
 #include "errors/LgsErrHandler.h"
-#include "errors/LgsPlmErrors.h"
-#include "exprs/LgsFuncCall.h"
-#include "funcs/LgsMainFunc.h"
 #include "lgsc/LgsCCompiler.h"
 #include "stmts/LgsAssignment.h"
-#include "stmts/LgsStmtsBlock.h"
 
+class LgsJsonObject;
+class LgsJsonArray;
+class LgsMetaVar;
+struct LgsImportPackage;
+class LgsStmtsBlock;
+class LgsMainFunc;
+class LgsMap;
+class LgsFuncType;
+class LgsAppConfigFile;
+struct LgsGlobals;
 struct LgsFileMetadata;
 class LgsMetaSelection;
 class LgsMatrixExpr;
@@ -160,20 +164,20 @@ public:
 
     // JSON
     LgsJson* parseJson();
-    LgsJsonObject* parseJsonObject();
-    LgsJsonArray* parseJsonArray();
     LgsJson* parseJsonValue();
+    LgsJson* parseJsonPrimitive();
+    LgsJsonArray* parseJsonArray();
+    LgsJsonObject* parseJsonObject();
 
     void parseArgs(LgsInstance* instance);
     void parsePackageString(LgsImportPackage& pkg, const LgsToken& importToken);
-    void parseJsonPrimitive(LgsJson* json);
     void parseImports(std::vector<LgsStrConst*>& cImports);
     void parseCIncludes(std::vector<LgsStrConst*>& cImports);
     void parseCImports(std::vector<LgsStrConst*> externalImports, LgsFile* file);
 
     void setLocation(LgsLocation& location, const LgsToken* startToken, const LgsToken* endToken) const;
-    void addFileSymbol(LgsMainFile* file, const LgsSymbol& newSymbol);
     void extractStrParts(LgsStrConst& strConst);
+    std::pair<size_t, size_t> extractMatDims(const LgsToken& matToken);
     void validateTestFolder(const LgsFile* testFile);
     bool isImportName(LgsExpr* expr) const;
     LgsExpr* determineIntConst(const std::string& tokenStr, int base) const;
@@ -189,7 +193,8 @@ public:
     bool mustMatch(LgsTokenType t2);
     bool mustParse(const void* value);
     bool parsedOrReset(const void* value, size_t resetIndex);
+    bool validateTypeName(const std::string& typeName, const LgsLocation* location);
+    void addError(const LgsBaseMsg& lgsErr, const LgsLocation& location, const std::vector<std::string>& args = {});
     void addParsingError();
     void recursionGuard();
-    void addError(const LgsBaseMsg& lgsErr, const LgsLocation& location, const std::vector<std::string>& args);
 };

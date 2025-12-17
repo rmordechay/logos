@@ -15,10 +15,9 @@ class LgsFunc : public LgsExpr {
 public:
     LgsFuncType* funcType;
     LgsStmtsBlock* stmtsBlock = nullptr;
-    std::vector<LgsExpr*> owners;
-    std::vector<LgsExpr*> orphans;
-    bool isTest = false;
     std::vector<std::pair<LgsExpr*, LgsExpr*>> mocks;
+    bool isTest = false;
+    bool isLambda = false;
     CallFn fn;
 
     explicit LgsFunc(LgsFuncType* funcType) : LgsExpr(funcType), funcType(funcType) {}
@@ -43,12 +42,16 @@ public:
     virtual Value* call(LgsCgModule& cg, std::vector<LgsFuncArg>& args);
     Value* callIR(LgsCgModule& cg, const std::vector<Value*>& args = {});
     void initFunc(const std::string& name, LgsType* rt, const std::vector<LgsParam>& params, uint32_t ops);
+    Value* call(LgsCgModule& cg, const std::vector<LgsExpr*>& args);
     Value* callWithVariadic(LgsCgModule& cg, const std::vector<LgsFuncArg>& args);
     Value* loadIR(LgsCgModule& cg) override;
     void castImplicitly(LgsType* toType) override;
-    bool needsCleanup() const;
+    std::string getGenericName() const;
     std::string asText() override;
     void hashNode(size_t& oldHash) override;
+    void createMapFunc(LgsCgModule& cg);
+    void createFilterFunc(LgsCgModule& cg);
+    void createForeachFunc(LgsCgModule& cg);
     void setDebugValue(LgsCgModule& cg) override;
     ~LgsFunc() override;
 };

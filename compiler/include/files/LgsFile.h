@@ -1,8 +1,8 @@
 #pragma once
-#include "errors/LgsErrors.h"
 #include "LgsDefinitions.h"
 #include "codegen/LgsCgModule.h"
 #include "LgsSymbolTable.h"
+#include "errors/LgsErrHandler.h"
 
 namespace fs = std::filesystem;
 class LgsStrConst;

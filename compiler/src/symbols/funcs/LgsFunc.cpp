@@ -1,17 +1,22 @@
 #include "funcs/LgsFunc.h"
+
+#include "LgsDefinitions.h"
 #include "stmts/LgsStmtsBlock.h"
 #include "exprs/LgsExpr.h"
 #include "exprs/LgsFuncCall.h"
 #include "types/LgsFuncType.h"
 #include "types/primitives/LgsVoid.h"
 #include "LgsUtils.h"
-#include <llvm/IR/DIBuilder.h>
+#include "codegen/LgsCgModule.h"
+#include "exprs/LgsArrayExpr.h"
+
+#include <sstream>
 #include <llvm/IR/Module.h>
 
 struct LgsFuncArg;
 
 Function* LgsFunc::getIRFunc(LgsCgModule& cg) {
-    const auto funcName = funcType->getGenericName();
+    const auto funcName = funcType->getName();
     auto IRFunc = cg.IRModule->getFunction(funcName);
     if (IRFunc) return IRFunc;
     const auto type = funcType->getIRType(cg);
@@ -45,9 +50,11 @@ void LgsFunc::initFunc(const std::string& name, LgsType* rt, const std::vector<L
 
 Value* LgsFunc::call(LgsCgModule& cg, std::vector<LgsFuncArg>& args) {
     if (fn) return fn(cg, args);
+    if (args.empty()) return callIR(cg, {});
     std::vector<Value*> IRArgs;
     if (funcType->isVariadic) return callWithVariadic(cg, args);
-    const auto isNamed = !args.empty() && (funcType->isMethod ? args[1].name : args.front().name) != "";
+    const auto firstArgName = funcType->isMethod ? args[1].name : args.front().name;
+    const auto isNamed = !args.empty() && firstArgName != "";
     if (isNamed) {
         std::unordered_map<std::string, LgsFuncArg*> argsByName;
         for (size_t i = 0; i < args.size(); ++i) {
@@ -56,32 +63,30 @@ Value* LgsFunc::call(LgsCgModule& cg, std::vector<LgsFuncArg>& args) {
         for (const auto& param : funcType->params) {
             assert(argsByName.contains(param.name));
             const auto arg = argsByName[param.name];
-            if (param.isSelf) {
-                IRArgs.emplace_back(arg->expr->IRValue);
-            } else {
-                IRArgs.emplace_back(arg->expr->IRValue);
-            }
+            IRArgs.emplace_back(arg->expr->IRValue);
         }
+        assert(!funcType->hasDefaults);
     } else {
-        for (size_t i = 0; i < args.size(); ++i) {
-            const auto arg = args[i];
-            const auto& param = funcType->params[i];
-            if (param.isSelf) {
-                IRArgs.emplace_back(arg.expr->IRValue);
-            } else {
-                IRArgs.emplace_back(arg.expr->IRValue);
-            }
+        for (const auto& arg : args) {
+            IRArgs.emplace_back(arg.expr->IRValue);
         }
-    }
-
-    if (funcType->hasDefaults) {
-        const auto diff = funcType->params.size() - args.size() - 1;
-        for (size_t i = diff; i < funcType->params.size(); ++i) {
-            const auto& param = funcType->params[i];
-            IRArgs.emplace_back(param.expr->IRValue);
+        if (funcType->hasDefaults) {
+            const auto diff = funcType->params.size() - args.size() - 1;
+            for (size_t i = diff; i < funcType->params.size(); ++i) {
+                const auto& param = funcType->params[i];
+                IRArgs.emplace_back(param.expr->IRValue);
+            }
         }
     }
     return callIR(cg, IRArgs);
+}
+
+Value* LgsFunc::call(LgsCgModule& cg, const std::vector<LgsExpr*>& args) {
+    std::vector<LgsFuncArg> funcArgs;
+    for (const auto& arg : args) {
+        funcArgs.push_back(LgsFuncArg(arg));
+    }
+    return call(cg, funcArgs);
 }
 
 Value* LgsFunc::callWithVariadic(LgsCgModule& cg, const std::vector<LgsFuncArg>& args) {
@@ -126,6 +131,9 @@ Value* LgsFunc::loadIR(LgsCgModule& cg) {
 void LgsFunc::castImplicitly(LgsType* toType) {
     const auto otherFuncType = toType->asFuncType();
     if (!otherFuncType) return;
+    if (isLambda && funcType->params.empty() && otherFuncType->params.size() == 1) {
+        funcType->params.emplace_back(otherFuncType->params.front().type, LGS_LAMBDA_IT_PARAM);
+    }
     for (size_t i = 0; i < funcType->params.size(); ++i) {
         if (funcType->params[i].type) continue;
         funcType->params[i].setType(otherFuncType->params[i].type);
@@ -135,8 +143,14 @@ void LgsFunc::castImplicitly(LgsType* toType) {
     }
 }
 
-bool LgsFunc::needsCleanup() const {
-    return !owners.empty() || !orphans.empty();
+std::string LgsFunc::getGenericName() const {
+    std::stringstream str;
+    str << "u_" << funcType->name;
+    for (size_t i = funcType->isMethod; i < funcType->params.size(); ++i) {
+        const auto& param = funcType->params[i];
+        str << '_' << param.type->getName();
+    }
+    return str.str();
 }
 
 std::string LgsFunc::asText() {
@@ -146,6 +160,190 @@ std::string LgsFunc::asText() {
 void LgsFunc::hashNode(size_t& oldHash) {
     funcType->hashNode(oldHash);
     stmtsBlock->hashNode(oldHash);
+}
+
+void LgsFunc::createMapFunc(LgsCgModule& cg) {
+    if (cg.IRModule->getFunction(getGenericName())) return;
+    // Save state
+    cg.savedIP = cg.builder.saveIP();
+    const auto originalFunc = cg.currentFunc;
+
+    // Init
+    cg.currentFunc = getIRFunc(cg);
+    const auto& arrParam = funcType->params[0];
+    const auto& callbackParam = funcType->params[1];
+    const auto entryBlock = cg.createBlock(BLOCK_ENTRY, cg.currentFunc);
+    const auto condBlock = cg.createBlock(BLOCK_LOOP_COND);
+    const auto bodyBlock = cg.createBlock(BLOCK_LOOP_BODY);
+    const auto exitBlock = cg.createBlock(BLOCK_LOOP_EXIT);
+    cg.builder.SetInsertPoint(entryBlock);
+    cg.callStackPush();
+
+    const auto dArr = arrParam.type->asDArray();
+    LgsArrayExpr newArr(dArr);
+    newArr.initIRArray(cg);
+
+    const auto iPtr = cg.builder.CreateAlloca(cg.sizeTy());
+    const auto loopStart = cg.builder.CreateSExt(cg.sizeZero(), cg.sizeTy());
+    cg.store(loopStart, iPtr);
+    cg.builder.CreateBr(condBlock);
+
+    // Condition
+    cg.startBlock(condBlock);
+    const auto iValue = cg.builder.CreateLoad(cg.sizeTy(), iPtr);
+    const auto condition = cg.builder.CreateICmpSLT(iValue, dArr->lenIR(cg, arrParam.IRValue));
+    cg.builder.CreateCondBr(condition, bodyBlock, exitBlock);
+
+    // Body
+    cg.startBlock(bodyBlock);
+    auto element = dArr->getIRElement(cg, arrParam.IRValue, iValue);
+    const auto ft = llvm::dyn_cast<FunctionType>(callbackParam.type->getIRType(cg));
+    if (!dArr->baseType->passByRef) {
+        element = cg.builder.CreateLoad(dArr->baseType->getIRType(cg), element);
+    }
+    const auto tempExpr = dArr->baseType->getZeroValue();
+    tempExpr->IRValue = cg.builder.CreateCall(ft, callbackParam.IRValue, {tempExpr->IRValue});
+    dArr->getMethod(ADD_FUNC)->call(cg, {&newArr, tempExpr});
+    freeExpr(tempExpr);
+
+    // Increment
+    const auto inc = cg.builder.CreateAdd(iValue, cg.usize(1));
+    cg.store(inc, iPtr);
+    cg.builder.CreateBr(condBlock);
+
+    // End func
+    cg.startBlock(exitBlock);
+    cg.callPopStack();
+    cg.builder.CreateRet(newArr.IRValue);
+
+    // Restore state
+    cg.currentFunc = originalFunc;
+    cg.builder.restoreIP(cg.savedIP);
+    IRValue = getIRFunc(cg);
+}
+
+void LgsFunc::createFilterFunc(LgsCgModule& cg) {
+    if (cg.IRModule->getFunction(getGenericName())) return;
+    // Save state
+    cg.savedIP = cg.builder.saveIP();
+    const auto originalFunc = cg.currentFunc;
+
+    // Init
+    cg.currentFunc = getIRFunc(cg);
+    const auto& arrParam = funcType->params[0];
+    const auto& callbackParam = funcType->params[1];
+    const auto entryBlock = cg.createBlock(BLOCK_ENTRY, cg.currentFunc);
+    const auto condBlock = cg.createBlock(BLOCK_LOOP_COND);
+    const auto bodyBlock = cg.createBlock(BLOCK_LOOP_BODY);
+    const auto exitBlock = cg.createBlock(BLOCK_LOOP_EXIT);
+    const auto trueBlock = cg.createBlock(BLOCK_IF_TRUE);
+    const auto falseBlock = cg.createBlock(BLOCK_IF_FALSE);
+    cg.builder.SetInsertPoint(entryBlock);
+    cg.callStackPush();
+
+    const auto dArray = arrParam.type->asDArray();
+    LgsArrayExpr newArr(dArray);
+    newArr.initIRArray(cg);
+
+    const auto iPtr = cg.builder.CreateAlloca(cg.sizeTy());
+    const auto loopStart = cg.builder.CreateSExt(cg.sizeZero(), cg.sizeTy());
+    cg.store(loopStart, iPtr);
+    cg.builder.CreateBr(condBlock);
+
+    // Condition
+    cg.startBlock(condBlock);
+    const auto iValue = cg.builder.CreateLoad(cg.sizeTy(), iPtr);
+    const auto condition = cg.builder.CreateICmpSLT(iValue, dArray->lenIR(cg, arrParam.IRValue));
+    cg.builder.CreateCondBr(condition, bodyBlock, exitBlock);
+
+    // Body
+    cg.startBlock(bodyBlock);
+    auto element = dArray->getIRElement(cg, arrParam.IRValue, iValue);
+    const auto ft = llvm::dyn_cast<FunctionType>(callbackParam.type->getIRType(cg));
+    if (!dArray->baseType->passByRef) {
+        element = cg.builder.CreateLoad(dArray->baseType->getIRType(cg), element);
+    }
+    const auto v = cg.builder.CreateCall(ft, callbackParam.IRValue, {element});
+
+    cg.builder.CreateCondBr(v, trueBlock, falseBlock);
+    cg.startBlock(trueBlock);
+    const auto tempExpr = dArray->baseType->getZeroValue();
+    tempExpr->IRValue = cg.builder.CreateCall(ft, callbackParam.IRValue, {tempExpr->IRValue});
+    dArray->getMethod(ADD_FUNC)->call(cg, {&newArr, tempExpr});
+    freeExpr(tempExpr);
+
+    cg.builder.CreateBr(falseBlock);
+    cg.startBlock(falseBlock);
+
+    // Increment
+    const auto inc = cg.builder.CreateAdd(iValue, cg.usize(1));
+    cg.store(inc, iPtr);
+    cg.builder.CreateBr(condBlock);
+
+    // End func
+    cg.startBlock(exitBlock);
+    cg.callPopStack();
+    cg.builder.CreateRet(newArr.IRValue);
+
+    // Restore state
+    cg.currentFunc = originalFunc;
+    cg.builder.restoreIP(cg.savedIP);
+    IRValue = getIRFunc(cg);
+}
+
+void LgsFunc::createForeachFunc(LgsCgModule& cg) {
+    if (cg.IRModule->getFunction(getGenericName())) return;
+    // Save state
+    cg.savedIP = cg.builder.saveIP();
+    const auto originalFunc = cg.currentFunc;
+
+    // Init
+    cg.currentFunc = getIRFunc(cg);
+    const auto& arrParam = funcType->params[0];
+    const auto& callbackParam = funcType->params[1];
+    const auto entryBlock = cg.createBlock(BLOCK_ENTRY, cg.currentFunc);
+    const auto condBlock = cg.createBlock(BLOCK_LOOP_COND);
+    const auto bodyBlock = cg.createBlock(BLOCK_LOOP_BODY);
+    const auto exitBlock = cg.createBlock(BLOCK_LOOP_EXIT);
+    cg.builder.SetInsertPoint(entryBlock);
+    cg.callStackPush();
+
+    const auto dArray = arrParam.type->asDArray();
+
+    const auto iPtr = cg.builder.CreateAlloca(cg.sizeTy());
+    const auto loopStart = cg.builder.CreateSExt(cg.sizeZero(), cg.sizeTy());
+    cg.store(loopStart, iPtr);
+    cg.builder.CreateBr(condBlock);
+
+    // Condition
+    cg.startBlock(condBlock);
+    const auto iValue = cg.builder.CreateLoad(cg.sizeTy(), iPtr);
+    const auto condition = cg.builder.CreateICmpSLT(iValue, dArray->lenIR(cg, arrParam.IRValue));
+    cg.builder.CreateCondBr(condition, bodyBlock, exitBlock);
+
+    // Body
+    cg.startBlock(bodyBlock);
+    auto element = dArray->getIRElement(cg, arrParam.IRValue, iValue);
+    const auto ft = llvm::dyn_cast<FunctionType>(callbackParam.type->getIRType(cg));
+    if (!dArray->baseType->passByRef) {
+        element = cg.builder.CreateLoad(cg.ptrTy(), element);
+    }
+    cg.builder.CreateCall(ft, callbackParam.IRValue, {element});
+
+    // Increment
+    const auto inc = cg.builder.CreateAdd(iValue, cg.usize(1));
+    cg.store(inc, iPtr);
+    cg.builder.CreateBr(condBlock);
+
+    // End func
+    cg.startBlock(exitBlock);
+    cg.callPopStack();
+    cg.builder.CreateRetVoid();
+
+    // Restore state
+    cg.currentFunc = originalFunc;
+    cg.builder.restoreIP(cg.savedIP);
+    IRValue = getIRFunc(cg);
 }
 
 void LgsFunc::setDebugValue(LgsCgModule& cg) {

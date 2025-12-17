@@ -2,6 +2,8 @@
 #include "codegen/LgsCgModule.h"
 #include "types/iterables/LgsStr.h"
 #include "LgsUtils.h"
+#include "types/LgsNullable.h"
+
 #include <llvm/IR/DIBuilder.h>
 
 void LgsVarDec::setType(LgsType* newType) {
@@ -15,10 +17,11 @@ Value* LgsVarDec::loadIR(LgsCgModule& cg) {
 
 bool LgsVarDec::shouldAllocate() const {
     if (!type) return false;
-    if (type->isHeapAlloc) return false;
+    if (type->asObject()) return false;
+    if (type->asNullable() && !type->asNullable()->passByRef) return false;
+    if (expr->asFuncCall() || expr->asBinExpr()) return false;
     if (type->asIterable() && type->asIterable()->isStatic) return false;
-    if (type->asSubtype() || type->asNullable()  || type->asFuncType()) return false;
-    if (expr->asFuncCall()) return false;
+    if (type->asSubtype() || type->asFuncType()) return false;
     return true;
 }
 

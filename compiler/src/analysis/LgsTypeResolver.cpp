@@ -1,12 +1,10 @@
 #include "analysis/LgsTypeResolver.h"
 #include "exprs/LgsVariable.h"
 #include "files/LgsFile.h"
-#include "files/LgsInterfaceFile.h"
 #include "files/LgsMainFile.h"
 #include "files/LgsObjectFile.h"
 #include "funcs/LgsFunc.h"
 #include "funcs/LgsMainFunc.h"
-#include "logos/LgsApp.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsIOPair.h"
 #include "types/LgsEnum.h"
@@ -14,49 +12,33 @@
 #include "types/LgsGenericType.h"
 #include "types/LgsInterface.h"
 #include "types/iterables/LgsIterable.h"
-#include "types/LgsNullable.h"
 #include "types/LgsSubType.h"
 #include "errors/LgsErrHandler.h"
+#include "errors/LgsErrors.h"
+#include "types/LgsNullable.h"
 
-bool LgsTypeResolver::resolveGlobals(const std::vector<LgsFile*>& srcFiles, ThreadPool& pool) {
-    std::atomic successful = true;
-    for (const auto& file : srcFiles) {
-        pool.runTask([this, file, &successful] {
-            if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
-                resolveMainFileTypes(mainFile);
-            } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
-                resolveObjTypes(objFile->obj, *objFile);
-            } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
-                resolveInterfaceTypes(interfaceFile->interface, *interfaceFile);
-            }
-            if (!errHandler.successful) {
-                successful.store(false, std::memory_order_relaxed);
-            }
-        });
-    }
-    pool.wait();
-    errHandler.successful = successful;
-    return successful;
-}
-
-LgsType* LgsTypeResolver::resolveType(LgsType* type, LgsFile* file) {
+void LgsTypeResolver::resolveType(LgsType*& type) {
     for (size_t i = 0; i < type->genericArgs.size(); ++i) {
-        type->genericArgs[i] = resolveType(type->genericArgs[i], file);
+        resolveType(type->genericArgs[i]);
     }
 
     if (const auto nullable = type->asNullable()) {
-        nullable->baseType = resolveType(nullable->baseType, file);
+        if (!nullable->isNull) {
+            resolveType(nullable->baseType);
+            nullable->passByRef = nullable->baseType->passByRef;
+            nullable->isHeapAlloc = nullable->baseType->isHeapAlloc;
+        }
     } else if (const auto iterable = type->asIterable()) {
-        if (!iterable->genericArgs.empty()) {
-            iterable->baseType = iterable->genericArgs.front();
+        if (iterable->genericArgs.empty()) {
+            resolveType(iterable->baseType);
         } else {
-            iterable->baseType = resolveType(iterable->baseType, file);
+            iterable->baseType = iterable->genericArgs.front();
         }
     } else if (const auto pair = type->asPair()) {
-        pair->key = resolveType(pair->key, file);
-        pair->value = resolveType(pair->value, file);
+        resolveType(pair->key);
+        resolveType(pair->value);
     } else if (const auto funcType = type->asFuncType()) {
-        resolveFuncTypes(funcType, *file);
+        resolveFuncType(funcType);
     }
 
     if (type->isUnknown()) {
@@ -67,7 +49,7 @@ LgsType* LgsTypeResolver::resolveType(LgsType* type, LgsFile* file) {
         }
         if (!symbol) {
             errHandler.addError(E10006, &type->location, file->path, {typeName});
-            return type;
+            return;
         }
         LgsType* newType = nullptr;
         switch (symbol->symbolType) {
@@ -99,88 +81,91 @@ LgsType* LgsTypeResolver::resolveType(LgsType* type, LgsFile* file) {
         freeType(type);
         type = newType;
     }
-
-    return type;
 }
 
-void LgsTypeResolver::resolveMainFileTypes(LgsMainFile* mf) {
+void LgsTypeResolver::resolveMainFile(LgsMainFile* mf) {
     for (const auto object : mf->objects) {
-        resolveObjTypes(object, *mf);
+        resolveObj(object);
     }
     for (const auto interface : mf->interfaces) {
-        resolveInterfaceTypes(interface, *mf);
+        resolveInterface(interface);
     }
     for (const auto subtype : mf->subtypes) {
-        subtype->subtype = resolveType(subtype->subtype, mf);
+        resolveType(subtype->subtype);
         subtype->isPrimitive = subtype->subtype->isPrimitive;
     }
     for (const auto& [_, func] : mf->funcs) {
         if (dynamic_cast<LgsMainFunc*>(func)) continue;
-        resolveFuncTypes(func->funcType, *mf);
+        resolveFuncType(func->funcType);
     }
 }
 
-void LgsTypeResolver::resolveObjTypes(LgsObject* obj, LgsFile& file) {
+void LgsTypeResolver::resolveObj(LgsObject* obj) {
     for (auto& interface : obj->implements) {
-        interface = resolveType(interface, &file);
+        resolveType(interface);
     }
 
     for (const auto generic : obj->generics) {
-        file.symbolTable.addSymbol(LgsSymbol(generic), &errHandler, file.path);
+        file->symbolTable.addSymbol(LgsSymbol(generic), &errHandler, file->path);
     }
 
     for (const auto& enum_ : obj->enums) {
-        file.symbolTable.addSymbol(LgsSymbol(enum_), &errHandler, file.path);
+        file->symbolTable.addSymbol(LgsSymbol(enum_), &errHandler, file->path);
     }
 
     for (const auto& field : obj->fields) {
-        field->setType(resolveType(field->type, &file));
+        resolveType(field->type);
     }
 
     for (const auto& ioPair : obj->ioPairs) {
-        resolveIOPair(ioPair, obj, file);
+        resolveIOPair(ioPair, obj);
     }
 
     for (const auto& [_, method] : obj->methods) {
-        method->funcType->rt = resolveType(method->funcType->rt, &file);
+        resolveType(method->funcType->rt);
         for (auto& param : method->funcType->params) {
-            param.setType(resolveType(param.type, &file));
+            resolveType(param.type);
         }
     }
 }
 
-void LgsTypeResolver::resolveInterfaceTypes(LgsInterface* interface, LgsFile& file) {
+void LgsTypeResolver::resolveInterface(LgsInterface* interface) {
     for (const auto& field : interface->fields) {
-        field->setType(resolveType(field->type, &file));
+        resolveType(field->type);
     }
     for (const auto& [_, method] : interface->methods) {
-        resolveFuncTypes(method->funcType, file);
+        resolveFuncType(method->funcType);
     }
 }
 
-void LgsTypeResolver::resolveFuncTypes(LgsFuncType* funcType, LgsFile& file) {
-    auto resolveTypeOrGeneric = [&](LgsType* type) -> LgsType* {
-        if (!type) return &LGS_VOID;
-        for (const auto generic : funcType->genericTypes) {
-            if (type->equals(generic)) return generic;
+void LgsTypeResolver::resolveFuncType(LgsFuncType* funcType) {
+    auto resolveTypeOrGeneric = [&](LgsType*& type) {
+        if (!type) {
+            type = &LGS_VOID;
+            return;
         }
-        return resolveType(type, &file);
+        for (const auto generic : funcType->genericTypes) {
+            if (!type->equals(generic)) continue;
+            type = generic;
+        }
+        resolveType(type);
     };
+
     for (auto& param : funcType->params) {
-        param.setType(resolveTypeOrGeneric(param.type));
+        resolveTypeOrGeneric(param.type);
     }
-    funcType->rt = resolveTypeOrGeneric(funcType->rt);
+    resolveTypeOrGeneric(funcType->rt);
 }
 
-void LgsTypeResolver::resolveIOPair(LgsIOPair* ioPair, LgsObject* obj, LgsFile& file) const {
+void LgsTypeResolver::resolveIOPair(LgsIOPair* ioPair, LgsObject* obj) const {
     ioPair->openFunc = obj->getMethod(ioPair->openFuncName);
     ioPair->openFunc->funcType->isIOMember = true;
     if (!ioPair->openFunc) {
-        errHandler.addError(E10005, &ioPair->openFunc->location, file.path, {ioPair->openFuncName, obj->pname()});
+        errHandler.addError(E10005, &ioPair->openFunc->location, file->path, {ioPair->openFuncName, obj->pname()});
     }
     ioPair->closeFunc = obj->getMethod(ioPair->closeFuncName);
     ioPair->closeFunc->funcType->isIOMember = true;
     if (!ioPair->closeFunc) {
-        errHandler.addError(E10005, &ioPair->closeFunc->location, file.path, {ioPair->closeFuncName, obj->pname()});
+        errHandler.addError(E10005, &ioPair->closeFunc->location, file->path, {ioPair->closeFuncName, obj->pname()});
     }
 }

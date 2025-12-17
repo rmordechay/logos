@@ -22,7 +22,7 @@ bool LgsUnknown::canCastTo(LgsType* other) {
     return false;
 }
 
-LgsType* LgsUnknown::applyBinOp(LgsType* toType, LgsBinOp& op) {
+LgsType* LgsUnknown::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     assert(0);
 }
 

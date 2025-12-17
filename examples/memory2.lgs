@@ -1,22 +1,20 @@
-object Obj1 {
-    x: Int = 34
+object Pool {
+    id: Int
+    system: System
 }
 
-object Obj2 {
-    owner obj1: Obj1
+object System {
+    id: Int
 }
 
-func(owner obj1: Obj1) {
-    owner obj2 = Obj2{}
-    obj2.obj1.x := 123
-    print(obj2.obj1.x)
-    owner obj2b = Obj2{}
-    obj2b.obj1.x := 125
-    obj2 := obj2b
-    print(obj2.obj1.x)
+func(pool: Pool) {
+    //system1 = System{id=23}
+    pool.system := System{id=35}
 }
 
 main() {
-    owner obj2 = Obj2{}
-    func(obj2.obj1)
+    system1 = System{id=23}
+    pool1 = Pool{id=1, system=system1}
+    func(pool1)
+    print(pool1.system.id)
 }

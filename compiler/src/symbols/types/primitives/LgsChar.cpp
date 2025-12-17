@@ -19,7 +19,7 @@ Type* LgsChar::getIRType(LgsCgModule& cg) {
 }
 
 Constant* LgsChar::getRTType(LgsCgModule& cg) {
-    return cg.getRTTypeInfo(getGenericName(), sizeBytes(), sizeBytes(), RTT_CHAR, cg.null());
+    return cg.getRTTypeInfo(getName(), sizeBytes(), RTT_CHAR, isHeapAlloc, cg.null());
 }
 
 std::string LgsChar::getName() {
@@ -34,7 +34,7 @@ std::string LgsChar::fmtStr() const {
     return "%c";
 }
 
-LgsType* LgsChar::applyBinOp(LgsType* toType, LgsBinOp& op) {
+LgsType* LgsChar::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     assert(0);
 }
 

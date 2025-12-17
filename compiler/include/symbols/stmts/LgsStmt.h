@@ -1,4 +1,6 @@
 #pragma once
+#include "LgsStmtsBlock.h"
+
 #include <LgsValue.h>
 
 class LgsIOStmt;
@@ -25,12 +27,12 @@ public:
     LgsIfStmt* asIfStmt();
     LgsIOStmt* asIOStmt();
     LgsSwitch* asSwitch();
-    LgsExpr* asExpr();
     LgsBreak* asBreak();
     LgsContinue* asContinue();
     LgsReturn* asReturn();
     LgsVarDec* asVarDec();
     LgsAssignment* asAssignment();
+    virtual LgsStmt* clone();
 };
 
 void freeStmt(const LgsStmt* stmt);

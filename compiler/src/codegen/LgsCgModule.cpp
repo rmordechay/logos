@@ -2,6 +2,7 @@
 #include "files/LgsFile.h"
 #include "LgsConfigs.h"
 #include "LgsUtils.h"
+#include "errors/LgsErrors.h"
 #include "logos/LgsPaths.h"
 #include <llvm/Support/FileSystem.h>
 #include <llvm/Bitcode/BitcodeWriter.h>
@@ -12,7 +13,6 @@
 #include <llvm/MC/TargetRegistry.h>
 #include <llvm/Target/TargetMachine.h>
 #include <llvm/Target/TargetOptions.h>
-#include <iostream>
 #include <string>
 #include <llvm/Analysis/CGSCCPassManager.h>
 #include <llvm/Analysis/LoopAnalysisManager.h>
@@ -70,7 +70,6 @@ bool LgsCgModule::writeIRModule(const LgsPaths& paths, uint8_t optLevel) const {
     llvm::WriteBitcodeToFile(*IRModule, bitcodeStream);
     bitcodeStream.flush();
     bitcodeStream.close();
-
     // Create object
     char cmd[1024*4];
     const auto triple = llvm::sys::getDefaultTargetTriple();
@@ -81,37 +80,10 @@ bool LgsCgModule::writeIRModule(const LgsPaths& paths, uint8_t optLevel) const {
         triple.c_str(),
         outputPath.c_str(),
         outputPath.c_str()
-    );
+        );
     if (!runCmd(cmd)) assert(0);
     fs::remove(outputPath + ".bc");
     return true;
-}
-
-void LgsCgModule::loop(Value* loopLength, const std::function<void(Value*, BasicBlock*)>& body) {
-    const auto condBlock = createBlock(BLOCK_NAME_LOOP_COND);
-    const auto bodyBlock = createBlock(BLOCK_NAME_LOOP_BODY);
-    const auto exitBlock = createBlock(BLOCK_NAME_LOOP_EXIT);
-    const auto iPtr = builder.CreateAlloca(sizeTy());
-    const auto loopStart = builder.CreateSExt(sizeZero(), sizeTy());
-    builder.CreateStore(loopStart, iPtr);
-    builder.CreateBr(condBlock);
-
-    // Condition
-    startBlock(condBlock);
-    auto iValue = builder.CreateLoad(sizeTy(), iPtr);
-    const auto loopEnd = builder.CreateSExt(loopLength, sizeTy());
-    const auto condition = builder.CreateICmpSLT(iValue, loopEnd);
-    builder.CreateCondBr(condition, bodyBlock, exitBlock);
-
-    // Body
-    startBlock(bodyBlock);
-    body(iValue, exitBlock);
-    if (lastInstTerminator()) return;
-    iValue = builder.CreateLoad(sizeTy(), iPtr);
-    const auto inc = builder.CreateAdd(iValue, usize(1));
-    builder.CreateStore(inc, iPtr);
-    builder.CreateBr(condBlock);
-    startBlock(exitBlock);
 }
 
 Constant* LgsCgModule::getString(const std::string& value) {
@@ -127,28 +99,13 @@ Constant* LgsCgModule::getString(const std::string& value) {
     return globalVar;
 }
 
-Value* LgsCgModule::getPtrTo(Value* v) {
-    if (const auto gepInst = dyn_cast<llvm::GetElementPtrInst>(v)) {
-        const auto elementType = gepInst->getResultElementType();
-        if (elementType && (elementType->isPointerTy() || elementType->isArrayTy())) {
-            return builder.CreateLoad(ptrTy(), gepInst);
-        }
-        return v;
-    }
-    if (const auto ce = llvm::dyn_cast<llvm::ConstantExpr>(v)) {
-        if (ce->getOpcode() == llvm::Instruction::GetElementPtr) {
-            return builder.CreateLoad(ptrTy(), ce);
-        }
-    }
-    if (v->getType()->isPointerTy()) return v;
-    const auto ptr = builder.CreateAlloca(v->getType());
-    builder.CreateStore(v, ptr);
-    return ptr;
+llvm::AllocaInst* LgsCgModule::getEmptyBuffer() {
+    return builder.CreateAlloca(ArrayType::get(i8Ty(), STRING_BUFFER_SIZE));
 }
 
-GlobalVariable* LgsCgModule::createGlobal(const std::string& name, Type* type, Constant* args, const bool isConst, const GlobalValue::LinkageTypes linkage) const {
+GlobalVariable* LgsCgModule::createGlobal(const std::string& name, Type* type, Constant* initializer, const bool isConst, const GlobalValue::LinkageTypes linkage) const {
     if (const auto var = IRModule->getGlobalVariable(name)) return var;
-    return new GlobalVariable(*IRModule, type, isConst, linkage, args, name);
+    return new GlobalVariable(*IRModule, type, isConst, linkage, initializer, name);
 }
 
 StructType* LgsCgModule::getStructType(const std::vector<Type*>& fields, const std::string& name) {
@@ -159,20 +116,70 @@ StructType* LgsCgModule::getStructType(const std::vector<Type*>& fields, const s
     return structType;
 }
 
-llvm::AllocaInst* LgsCgModule::getEmptyBuffer() {
-    return builder.CreateAlloca(ArrayType::get(i8Ty(), STRING_BUFFER_SIZE));
+void LgsCgModule::storeStructField(Type* type, Value* instancePtr, const size_t position, Value* v) {
+    const auto gep = builder.CreateStructGEP(type, instancePtr, position);
+    store(v, gep);
 }
 
-Constant* LgsCgModule::getRTTypeInfo(const std::string& name, const size_t size, const size_t alignment, const Lgs_TypeKind kind, Constant* extra) {
-    const auto typeInfo = getRTBaseType();
-    const auto v = llvm::ConstantStruct::get(typeInfo, {usize(size), usize(alignment), usize(kind), extra});
-    if (isRTTModule) return createGlobal(LGS_TYPEINFO_PREFIX + name, typeInfo, v);
-    return createGlobal(LGS_TYPEINFO_PREFIX + name, typeInfo, nullptr);
+void LgsCgModule::store(Value* v, Value* ptr) {
+    assert(v != ptr);
+    builder.CreateStore(v, ptr);
 }
 
-StructType* LgsCgModule::getRTBaseType() {
-    const auto typeInfoMatrix = getStructType({sizeTy(), sizeTy(), ptrTy()}, "Matrix"); // Biggest
-    return getStructType({sizeTy(), sizeTy(), ptrTy(), typeInfoMatrix}, "RTI");
+Value* LgsCgModule::allocaAndStore(Type* type, Value* v) {
+    const auto ptr = builder.CreateAlloca(type);
+    builder.CreateStore(v, ptr);
+    return ptr;
+}
+
+void LgsCgModule::loop(Value* loopLength, const std::function<void(Value*, BasicBlock*)>& body) {
+    const auto condBlock = createBlock(BLOCK_LOOP_COND);
+    const auto bodyBlock = createBlock(BLOCK_LOOP_BODY);
+    const auto exitBlock = createBlock(BLOCK_LOOP_EXIT);
+    const auto iPtr = builder.CreateAlloca(sizeTy());
+    const auto loopStart = builder.CreateSExt(sizeZero(), sizeTy());
+    store(loopStart, iPtr);
+    builder.CreateBr(condBlock);
+
+    // Condition
+    startBlock(condBlock);
+    auto iValue = builder.CreateLoad(sizeTy(), iPtr);
+    const auto loopEnd = builder.CreateSExt(loopLength, sizeTy());
+    const auto condition = builder.CreateICmpSLT(iValue, loopEnd);
+    builder.CreateCondBr(condition, bodyBlock, exitBlock);
+
+    // Body
+    startBlock(bodyBlock);
+    body(iValue, exitBlock);
+    if (lastInstTerminator()) return;
+    iValue = builder.CreateLoad(sizeTy(), iPtr);
+    const auto inc = builder.CreateAdd(iValue, usize(1));
+    store(inc, iPtr);
+    builder.CreateBr(condBlock);
+    startBlock(exitBlock);
+}
+
+Constant* LgsCgModule::getRTTypeInfo(const std::string& name, const size_t size, const Lgs_TypeKind kind, const bool isHeapAlloc, Constant* extra) {
+    const auto typeInfo = getRTTBaseStruct();
+    const auto prefixedName = LGS_TYPEINFO_PREFIX + name;
+    if (isRTTModule) {
+        return createGlobal(prefixedName, typeInfo, llvm::ConstantStruct::get(typeInfo, {usize(size), i32(kind), i1(isHeapAlloc), extra}));
+    }
+    return createGlobal(prefixedName, typeInfo, nullptr);
+}
+
+Constant* LgsCgModule::getRTTExtraStruct(const std::string& name, const std::vector<Type*>& fields, const std::vector<Constant*>& args) {
+    const auto structName = LGS_TYPEINFO_PREFIX + name;
+    auto st = StructType::getTypeByName(context, structName);
+    if (!st) {
+        st = StructType::create(context, fields, structName);
+    }
+    return llvm::ConstantStruct::get(st, args);
+}
+
+StructType* LgsCgModule::getRTTBaseStruct() {
+    const auto typeInfoMatrix = getStructType({sizeTy(), ptrTy(), ptrTy(), ptrTy()}, LGS_TYPEINFO_PREFIX"FuncType"); // Biggest
+    return getStructType({sizeTy(), i32Ty(), i1Ty(), typeInfoMatrix}, "RTI"); // size, kind, isHeap, type
 }
 
 BasicBlock* LgsCgModule::createBlock(const std::string& name, Function* parent) {
@@ -199,13 +206,23 @@ bool LgsCgModule::lastInstTerminator() const {
     return builder.GetInsertBlock()->getTerminator();
 }
 
-void LgsCgModule::createBoundsGuard(Value* len, Value* index) {
+void LgsCgModule::createIndexBoundsGuard(Value* len, Value* index) {
     const auto condition = builder.CreateICmpUGE(extendToSize(index), extendToSize(len));
     const auto validBlock = createBlock();
     const auto invalidBlock = createBlock();
     builder.CreateCondBr(condition, invalidBlock, validBlock);
     startBlock(invalidBlock);
-    callRuntimeFunc("throwError", voidTy(), {ptrTy()}, {getString(E10003.msg)});
+    callThrowError(E10003);
+    branchAndStartBlock(validBlock);
+}
+
+void LgsCgModule::createArrBoundsGuard(Value* maxLen, Value* arrLen) {
+    const auto condition = builder.CreateICmpUGT(extendToSize(arrLen), extendToSize(maxLen));
+    const auto validBlock = createBlock();
+    const auto invalidBlock = createBlock();
+    builder.CreateCondBr(condition, invalidBlock, validBlock);
+    startBlock(invalidBlock);
+    callThrowError(E10105, {callSnprintf("%d", {maxLen})});
     branchAndStartBlock(validBlock);
 }
 
@@ -221,6 +238,7 @@ Function* LgsCgModule::getFunc(const std::string& funcName, FunctionType* ft, co
 
 Value* LgsCgModule::callFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes, const std::vector<Value*>& args, const bool isVariadic) {
     const auto func = IRModule->getOrInsertFunction(funcName, FunctionType::get(rt, paramTypes, isVariadic));
+    if (!isVariadic) assert(args.size() == paramTypes.size());
     return builder.CreateCall(func, args);
 }
 
@@ -229,37 +247,32 @@ Value* LgsCgModule::callIntrinsics(const llvm::Intrinsic::ID intrinsicID, const 
     return builder.CreateCall(declaration, args);
 }
 
-Value* LgsCgModule::callLgsFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes, const std::vector<Value*>& args) {
-    return callFunc(LGS_RUNTIME_PREFIX + funcName, rt, paramTypes, args);
+Value* LgsCgModule::callLgsFunc(const std::string& baseName, const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes, const std::vector<Value*>& args) {
+    if (baseName == "") return callFunc(LGS_PREFIX + funcName, rt, paramTypes, args);
+    return callFunc(LGS_PREFIX + baseName + '_' + funcName, rt, paramTypes, args);
 }
 
-Value* LgsCgModule::callRuntimeFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes, const std::vector<Value*>& args) {
+Value* LgsCgModule::callRuntimeFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes, const std::vector<Value*>& args, bool isVariadic) {
     if (debugger.diBuilder) {
         const auto savedDbg = builder.getCurrentDebugLocation();
         builder.SetCurrentDebugLocation(llvm::DebugLoc());
-        const auto v = callFunc(LGS_RUNTIME_PREFIX"Runtime_" + funcName, rt, paramTypes, args);
+        const auto v = callFunc(LGS_PREFIX"Runtime_" + funcName, rt, paramTypes, args, isVariadic);
         builder.SetCurrentDebugLocation(savedDbg);
         return v;
     }
-    return callFunc(LGS_RUNTIME_PREFIX"Runtime_" + funcName, rt, paramTypes, args);
-}
-
-Value* LgsCgModule::callHash(Value* arg) {
-    return callLgsFunc("hash", i32Ty(), {ptrTy()}, {arg});
-}
-
-Constant* LgsCgModule::hashConst(const std::string& str) {
-    return i64(hashString(str));
+    return callFunc(LGS_PREFIX"Runtime_" + funcName, rt, paramTypes, args, isVariadic);
 }
 
 Value* LgsCgModule::callPrintf(const std::vector<Value*>& args) {
     return callFunc("printf", i32Ty(), {ptrTy()}, args, true);
 }
 
-Value* LgsCgModule::callSnprintf(Value* buffer, Value* fmt, const std::vector<Value*>& args) {
-    std::vector<Value*> tempArgs = {buffer, usize(STRING_BUFFER_SIZE), fmt};
+Value* LgsCgModule::callSnprintf(const std::string& fmt, const std::vector<Value*>& args) {
+    const auto buffer = getEmptyBuffer();
+    std::vector<Value*> tempArgs = {buffer, usize(STRING_BUFFER_SIZE), getString(fmt)};
     tempArgs.insert(tempArgs.end(), args.begin(), args.end());
-    return callFunc("snprintf", i32Ty(), {ptrTy(), sizeTy(), ptrTy()}, tempArgs, true);
+    callFunc("snprintf", i32Ty(), {ptrTy(), sizeTy(), ptrTy()}, tempArgs, true);
+    return buffer;
 }
 
 Value* LgsCgModule::callStrLen(Value* str) {
@@ -274,8 +287,30 @@ void LgsCgModule::callMemCpy(Value* dest, Value* src, Value* size) {
     builder.CreateMemCpy(dest, llvm::MaybeAlign(), src, llvm::MaybeAlign(), size);
 }
 
-Value* LgsCgModule::allocate(Value* size, Constant* type, const bool isOwner) {
-    return callRuntimeFunc("allocate", ptrTy(), {sizeTy(), ptrTy(), i1Ty()}, {extendToSize(size), type, i1(isOwner)});
+Value* LgsCgModule::callHash(Value* arg) {
+    return callLgsFunc("", "hash", i32Ty(), {ptrTy()}, {arg});
+}
+
+Constant* LgsCgModule::hashConst(const std::string& str) {
+    return i64(hashString(str));
+}
+
+void LgsCgModule::callThrowError(const LgsBaseMsg& err, const std::vector<Value*>& args) {
+    std::vector<Value*> irArgs = {usize(args.size()), getString(err.msg)};
+    irArgs.insert(irArgs.end(), args.begin(), args.end());
+    callRuntimeFunc("throwError", voidTy(), {sizeTy(), ptrTy()}, irArgs, true);
+    builder.CreateUnreachable();
+}
+
+void LgsCgModule::freeValue(Value* ptr, Constant* type) {
+    callRuntimeFunc("freeValue", voidTy(), {ptrTy(), ptrTy()}, {ptr, type});
+}
+
+Value* LgsCgModule::allocate(Value* size, Constant* type, const bool isOwner, const bool isReturnExpr) {
+    if (isReturnExpr) {
+        return callRuntimeFunc("allocateReturn", ptrTy(), {sizeTy(), ptrTy()}, {extendToSize(size), type});
+    }
+    return callRuntimeFunc("allocate", ptrTy(), {sizeTy(), ptrTy()}, {extendToSize(size), type});
 }
 
 void LgsCgModule::callStackPush() {
@@ -295,7 +330,7 @@ Value* LgsCgModule::getFromVTable(Value* instance, Value* key) {
 }
 
 void LgsCgModule::addNullTerminate(Value* strPtr, Value* pos) {
-    builder.CreateStore(i8Zero(), builder.CreateGEP(i8Ty(), strPtr, pos));
+    store(i8Zero(), builder.CreateGEP(i8Ty(), strPtr, pos));
 }
 
 Type* LgsCgModule::i1Ty() {
@@ -441,14 +476,13 @@ llvm::DILocation* LgsCgModule::getDebugLoc(const LgsLocation& location) {
         location.columnStart,
         debugger.subprogram,
         debugger.subprogram->getScope()
-    );
+        );
 }
 
 void LgsCgModule::initLLVM() {
     llvm::InitializeNativeTarget();
     llvm::InitializeNativeTargetAsmPrinter();
     llvm::InitializeNativeTargetAsmParser();
-    LLVMInitializeAArch64TargetInfo();
 
     std::string error;
     const auto targetTriple = llvm:: sys::getDefaultTargetTriple();

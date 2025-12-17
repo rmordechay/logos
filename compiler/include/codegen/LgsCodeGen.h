@@ -1,14 +1,13 @@
 #pragma once
 #include "LgsCgModule.h"
+#include "exprs/LgsNullableExpr.h"
 #include "files/LgsFile.h"
 #include "logos/LgsStack.h"
 
 class LgsMetaSelection;
 class LgsJson;
-class LgsNull;
 class LgsMatrixExpr;
 class LgsEnvVar;
-class LgsNullableExpr;
 struct LgsPaths;
 class LgsTernaryExpr;
 class LgsMainFunc;
@@ -84,7 +83,6 @@ public:
     void visitMainFunc(LgsMainFunc* func);
     void visitFunc(LgsFunc* func);
     void visitGenericFunc(LgsFunc* func);
-    void visitField(LgsField* field) const;
     void visitStmt(LgsStmt* stmt);
     void visitStmtsBlock(const LgsStmtsBlock* stmtsBlock);
     void visitLoop(LgsForLoop* loop);
@@ -109,27 +107,28 @@ public:
     void visitExpr(LgsExpr* expr, bool assign = false);
     void visitBinaryExpr(LgsBinaryExpr* binExpr);
     void visitTernaryExpr(LgsTernaryExpr* ternaryExpr);
-    void visitNullableExpr(LgsNullableExpr* nullableExpr);
-    void visitNull(LgsNull* null) const;
     void visitCast(LgsCast* cast);
     void visitLambda(LgsFunc* func);
     void visitIntConst(LgsIntConst* intConst) const;
     void visitConstant(LgsExpr* expr);
     void visitFloatConst(LgsFloatConst* floatConst) const;
+    void visitComplexConst(const LgsComplexConst* complex);
+    void visitNullableExpr(LgsNullableExpr* nullableExpr);
     void visitArrayExpr(LgsArrayExpr* arrayExpr);
     void visitStaticArray(LgsArrayExpr* arrayExpr) const;
     void visitDynamicArray(LgsArrayExpr* arrayExpr) const;
     void visitSetExpr(LgsArrayExpr* arrayExpr) const;
     void visitVectorExpr(LgsVectorExpr* vectorExpr);
-    void visitMatrixExpr(LgsMatrixExpr* matrixExpr);
+    void visitMatrixExpr(const LgsMatrixExpr* matrixExpr);
     void visitHashMap(LgsHashMap* hashMap);
     void visitEnvVar(LgsEnvVar* envVar) const;
     void visitVariable(LgsVariable* variable);
     void visitSelection(LgsSelection* selection, bool assign = false);
     void visitFieldSelection(LgsVariable* var, LgsExpr* parent, bool assign) const;
+    void visitNullableSelection(LgsExpr* child, LgsExpr* parent) const;
     void visitMetaSelection(LgsMetaSelection* metaSelection);
     void visitFuncCall(LgsFuncCall* funcCall);
-    void visitIterFunc(const LgsFuncCall* funcCall);
+    void visitIterFunc(const LgsFuncCall* funcCall) const;
     void visitPrefixExpr(LgsPrefixExpr* prefixExpr);
     void visitPostfixExpr(LgsPostfixExpr* postfixExpr);
     void visitStrConst(LgsStrConst* strConst);
@@ -145,9 +144,7 @@ public:
     Value* getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) const;
     Function* getThunkFunc(LgsFuncCall* fc, Type* ctxTy) const;
 
-    void createMapFunc(LgsFunc* func);
-    void createFilterFunc(LgsFunc* func);
-
+    void createVecField(LgsField* field, Value* parent) const;
     bool checkMock(LgsExpr* expr) const;
     Value* getIRValue(LgsValue* value);
     void addVirtuals(LgsObject* obj, Value* ptr) const;

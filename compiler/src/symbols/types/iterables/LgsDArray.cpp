@@ -1,13 +1,29 @@
 #include "types/iterables/LgsDArray.h"
+#include "LgsBinaryTokens.h"
 #include "Lgs_DArrayExpr.h"
 #include "codegen/LgsCgModule.h"
 #include "exprs/LgsArrayExpr.h"
-#include "exprs/LgsFuncCall.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsBool.h"
-#include "types/primitives/LgsLong.h"
+#include <llvm/IR/Module.h>
 
-bool LgsDArray::inferBaseType(const std::vector<LgsExpr*>& args) {
+LgsFunc* LgsDArray::getMethod(const std::string& methodName) {
+    constexpr auto flags = BUILTIN | PUBLIC | METHOD;
+    if (methodName == ADD_FUNC) {
+        if (methods.contains(ADD_FUNC)) return methods[ADD_FUNC];
+        const auto func = new LgsFunc(ADD_FUNC, name, &LGS_VOID, {this, baseType}, flags);
+        func->fn = [this](LgsCgModule& cg, const std::vector<LgsFuncArg>& args) {
+            const std::vector<Type*> params = {cg.ptrTy(), cg.ptrTy(), cg.ptrTy()};
+            const std::vector<Value*> IRArgs = {args[0].expr->IRValue, getRTType(cg), args[1].expr->getPtrTo(cg)};
+            return cg.callLgsFunc(name, "add", cg.voidTy(), params, IRArgs);
+        };
+        addMethod(func);
+        return func;
+    }
+    return LgsIterable::getMethod(methodName);
+}
+
+bool LgsDArray::inferBaseType(std::vector<LgsExpr*>& args) {
     assert(!args.empty());
     if (baseType) return true;
     const auto baseExprType = args.front()->type;
@@ -26,18 +42,13 @@ Type* LgsDArray::getIRType(LgsCgModule& cg) {
 }
 
 Constant* LgsDArray::getRTType(LgsCgModule& cg) {
-    const auto genericName = getGenericName();
-    const auto st = cg.getStructType({cg.ptrTy()}, genericName);
-    const auto sv = ConstantStruct::get(st, {baseType->getRTType(cg)});
-    return cg.getRTTypeInfo(genericName, sizeBytes(), sizeof(void*), RTT_DARRAY, sv);
+    const auto dArrName = getName();
+    const auto sv = cg.getRTTExtraStruct(dArrName, {cg.ptrTy()}, {baseType->getRTType(cg)});
+    return cg.getRTTypeInfo(dArrName, sizeBytes(), RTT_DARRAY, isHeapAlloc, sv);
 }
 
 std::string LgsDArray::getName() {
-    return name;
-}
-
-std::string LgsDArray::getGenericName() {
-    return name + baseType->getGenericName();
+    return name + baseType->getName();
 }
 
 std::string LgsDArray::pname() {
@@ -58,10 +69,10 @@ std::string LgsDArray::fmtStr() const {
     return "%p";
 }
 
-LgsType* LgsDArray::applyBinOp(LgsType* toType, LgsBinOp& op) {
+LgsType* LgsDArray::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     switch (op.opType) {
     case IN: {
-        const auto otherIter = toType->asIterable();
+        const auto otherIter = rightType->asIterable();
         if (!otherIter) return nullptr;
         if (otherIter->getDimension() - 1 == getDimension()) return &LGS_BOOL;
         break;
@@ -73,22 +84,26 @@ LgsType* LgsDArray::applyBinOp(LgsType* toType, LgsBinOp& op) {
 }
 
 Value* LgsDArray::lenIR(LgsCgModule& cg, Value* iterable) {
-    return cg.callLgsFunc("DArray_len", cg.sizeTy(), {cg.ptrTy()}, {iterable});
+    const std::vector<Type*> params = {cg.ptrTy(), cg.ptrTy()};
+    const std::vector<Value*> IRArgs = {iterable, getRTType(cg)};
+    return cg.callLgsFunc(name, "len", cg.sizeTy(), params, IRArgs);
 }
 
 Value* LgsDArray::inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) {
-    return cg.callLgsFunc("DArray_contains", cg.i1Ty(), {cg.ptrTy(), cg.ptrTy()}, {
-        iterableExpr->IRValue,
-        cg.getPtrTo(value->IRValue),
-    });
+    const std::vector<Type*> params = {cg.ptrTy(), cg.ptrTy(), cg.ptrTy()};
+    const std::vector<Value*> IRArgs = {iterableExpr->IRValue, getRTType(cg), value->getPtrTo(cg)};
+    return cg.callLgsFunc(name, "contains", cg.i1Ty(), params, IRArgs);
 }
 
 Value* LgsDArray::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
-    return cg.callLgsFunc("DArray_get", cg.ptrTy(), {cg.ptrTy(), cg.sizeTy()}, {iterable, index});;
+    const std::vector<Type*> params = {cg.ptrTy(), cg.ptrTy(), cg.sizeTy()};
+    const std::vector<Value*> IRArgs = {iterable, getRTType(cg), index};
+    return cg.callLgsFunc(name, "get", cg.ptrTy(), params, IRArgs);
 }
 
 bool LgsDArray::canCastTo(LgsType* other) {
     if (other->getName() == LgsAny::name) return true;
+    if (other->asGenericType()) return true;
     const auto otherArr = other->asDArray();
     if (!otherArr) return false;
     if (!baseType) return true;
@@ -97,29 +112,5 @@ bool LgsDArray::canCastTo(LgsType* other) {
 }
 
 DIType* LgsDArray::getDebugType(LgsCgModule& cg) {
-    const auto di = cg.debugger.diBuilder;
-    const auto file = cg.debugger.diFile;
-    constexpr auto ptrSizeInBits = sizeof(void*) * 8;
-    const auto t_data = di->createPointerType(di->createBasicType("char", 8, dwarf::DW_ATE_unsigned_char), ptrSizeInBits);
-    const auto t_length = di->createBasicType("size_t", ptrSizeInBits, dwarf::DW_ATE_unsigned);
-    const auto t_capacity = t_length;
-    const auto t_base = di->createPointerType(baseType->getDebugType(cg), ptrSizeInBits);
-    Metadata* fields[] = {
-        di->createMemberType(nullptr, "data", file, 0, ptrSizeInBits, ptrSizeInBits, 0, DINode::FlagZero, t_data),
-        di->createMemberType(nullptr, "length", file, 0, ptrSizeInBits, ptrSizeInBits, ptrSizeInBits,DINode::FlagZero, t_length),
-        di->createMemberType(nullptr, "capacity", file, 0, ptrSizeInBits, ptrSizeInBits, sizeof(void*) * 16,DINode::FlagZero, t_capacity),
-        di->createMemberType(nullptr, "baseType", file, 0, ptrSizeInBits, ptrSizeInBits, sizeof(void*) * 24,DINode::FlagZero, t_base)
-    };
-
-    return di->createStructType(
-        cg.debugger.subprogram,
-        "Lgs_DArrayExpr",
-        file,
-        0,
-        ptrSizeInBits * 4,
-        ptrSizeInBits,
-        DINode::FlagZero,
-        nullptr,
-        di->getOrCreateArray(fields)
-    );
+    assert(0);
 }

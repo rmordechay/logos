@@ -12,7 +12,7 @@ TEST_CASE("ParserError10011B") {
     app.loadSrcFile(code);
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10011, code));
     if (app.errHandler.errors.size() > 0) {
-        CHECK_EQ(app.errHandler.errors[0].errCode, E10011.code);
+        CHECK_EQ(app.errHandler.errors[0].errCode, E10011.errCode);
     }
 }
 
@@ -24,7 +24,7 @@ TEST_CASE("ParserErrorError10033A") {
     )";
     app.loadSrcFile(code, "Obj.lgs");
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10033, code));
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10033.code);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10033.errCode);
 }
 
 TEST_CASE("ParserError10033B") {
@@ -35,7 +35,7 @@ TEST_CASE("ParserError10033B") {
     )";
     app.loadSrcFile(code, "Interface.lgs");
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10033, code));
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10033.code);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10033.errCode);
 }
 
 TEST_CASE("ParserError10033C") {
@@ -47,8 +47,8 @@ TEST_CASE("ParserError10033C") {
     )";
     app.loadSrcFile(code);
     CHECK_EQ(app.errHandler.errors.size(), 2);
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10033.code);
-    CHECK_EQ(app.errHandler.errors[1].errCode, E10033.code);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10033.errCode);
+    CHECK_EQ(app.errHandler.errors[1].errCode, E10033.errCode);
 }
 
 TEST_CASE("ParserError10054") {
@@ -66,6 +66,6 @@ TEST_CASE("ParserError10054") {
     app.loadSrcFile(code);
     CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10054, code));
     if (app.errHandler.errors.size() > 0) {
-        CHECK_EQ(app.errHandler.errors[0].errCode, E10054.code);
+        CHECK_EQ(app.errHandler.errors[0].errCode, E10054.errCode);
     }
 }

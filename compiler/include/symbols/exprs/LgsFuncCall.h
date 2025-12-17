@@ -22,7 +22,6 @@ public:
     bool isDeferred = false;
     bool isNamed = false;
     bool isMock = false;
-    LgsExpr* parentPtr = nullptr;
     LgsSymbol ref;
 
     explicit LgsFuncCall(const std::string& name) : name(name) {}
@@ -34,5 +33,6 @@ public:
     bool equalsDefaults(LgsFuncType* funcType) const;
     std::string asText() override;
     void setDebugValue(LgsCgModule& cg) override;
+    LgsExpr* clone() override;
     ~LgsFuncCall() override;
 };

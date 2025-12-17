@@ -38,7 +38,7 @@ std::string LgsTypePair::fmtStr() const {
     return "%s";
 }
 
-LgsType* LgsTypePair::applyBinOp(LgsType* toType, LgsBinOp& op) {
+LgsType* LgsTypePair::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     assert(0);
 }
 

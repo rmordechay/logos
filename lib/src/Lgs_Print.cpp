@@ -1,4 +1,3 @@
-#include "Lgs_Helpers.h"
 #include "LgsDefinitions.h"
 #include "Lgs_DArrayExpr.h"
 #include "Lgs_HashMap.h"
@@ -6,11 +5,7 @@
 #include <cassert>
 #include <sstream>
 
-extern "C" void Lgs_print(const Lgs_TypeInfo* rtt, void* v) {
-    printf("%s\n", formatElement(rtt, v).c_str());
-}
-
-std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
+static std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
     if (!elem) return LGS_NULL_LITERAL;
     std::ostringstream str;
     switch (rtt->kind) {
@@ -29,8 +24,12 @@ std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
     case RTT_DOUBLE: str << *static_cast<double*>(elem); break;
     case RTT_TYPE:
     case RTT_ENUM:
-    case RTT_STR: str << static_cast<const char*>(elem); break;
-    case RTT_CHAR: str << *static_cast<const char*>(elem); break;
+    case RTT_STR: {
+        auto s = *static_cast<char**>(elem);
+        if (!s) return LGS_NULL_LITERAL;
+        str << '"' << s << '"'; break;
+    }
+    case RTT_CHAR: str << '"' << *static_cast<const char*>(elem) << '"'; break;
     case RTT_SET:
     case RTT_DARRAY: {
         const auto dArrExpr = static_cast<Lgs_DArrayExpr*>(elem);
@@ -38,7 +37,7 @@ std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
         const auto& [baseType] = rtt->dArray;
         str << "[";
         for (size_t i = 0; i < dArrExpr->length; ++i) {
-            void* data = Lgs_DArray_get(dArrExpr, i);
+            auto data = Lgs_DArray_get(dArrExpr, rtt, i);
             str << formatElement(baseType, data);
             if (i < dArrExpr->length - 1) str << ", ";
         }
@@ -46,11 +45,21 @@ std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
         break;
     }
     case RTT_SARRAY: {
-        const auto& [len, baseType] = rtt->sArray;
+        const auto& sArr = rtt->sArray;
+        const auto baseType = sArr.baseType;
+        size_t len = 0;
+        void* base = nullptr;
+        if (sArr.len == 0) {
+            const auto sArrExpr = static_cast<Lgs_SArrayExpr*>(elem);
+            base = sArrExpr->data;
+            len = sArrExpr->length;
+        } else {
+            base = elem;
+            len = sArr.len;
+        }
         str << "[";
-        const auto base = static_cast<char*>(elem);
         for (size_t i = 0; i < len; ++i) {
-            void* data = base + i * baseType->size;
+            void* data = static_cast<char*>(base) + i * baseType->size;
             str << formatElement(baseType, data);
             if (i < len - 1) str << ", ";
         }
@@ -109,20 +118,18 @@ std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
     }
     case RTT_OBJECT: {
         const auto fieldsCount = rtt->obj.fieldsCount;
-        const auto fieldTypes = rtt->obj.fieldTypes;
-        str << "<";
+        str << rtt->obj.name << "{";
         size_t offset = 0;
         for (size_t i = 0; i < fieldsCount; ++i) {
-            const auto fieldType = fieldTypes[i];
-            void* fieldPtr = static_cast<char*>(elem) + offset;
-            if (fieldTypes[i]->kind == RTT_OBJECT || fieldTypes[i]->kind == RTT_STR) {
-                fieldPtr = *static_cast<void**>(fieldPtr);
-            }
-            str << formatElement(fieldType, fieldPtr);
+            const auto fieldType = rtt->obj.fieldTypes[i];
+            const auto fieldName = rtt->obj.fieldNames[i];
+            void* fieldValue = static_cast<char*>(elem) + offset;
+            str << fieldName << '=';
+            str << formatElement(fieldType, fieldValue);
             if (i < fieldsCount - 1) str << ", ";
-            offset += fieldType->alignment;
+            offset += fieldType->size;
         }
-        str << ">";
+        str << "}";
         break;
     }
     case RTT_NULLABLE: {
@@ -130,7 +137,7 @@ std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
         if (isPtr) {
             str << formatElement(baseType, elem);
         } else {
-            const auto isSet = *(static_cast<bool*>(elem) + baseType->size);
+            const bool isSet = *(static_cast<bool*>(elem) + baseType->size);
             if (isSet) str << formatElement(baseType, elem);
             else str << LGS_NULL_LITERAL;
         }
@@ -138,21 +145,35 @@ std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
     }
     case RTT_MAP: {
         const auto& [keyType, valueType] = rtt->map;
-        const auto hashMap = static_cast<Lgs_HashMap*>(elem);
+        auto hashMap = static_cast<Lgs_HashMap*>(elem);
         str << "{";
         bool first = true;
-        for (auto& [k, v] : *hashMap->data) {
-        if (!first) str << ", ";
-            first = false;
-            str << k << ": " << formatElement(valueType, v.data());
+        for (size_t i = 0; i < LGS_MAP_CAP; i++) {
+            if (hashMap->entries[i].occupied) {
+                if (!first) str << ", ";
+                first = false;
+                void* valuePtr = hashMap->entries[i].value;
+                str << hashMap->entries[i].key << ": " << formatElement(valueType, valuePtr);
+            }
         }
         str << "}";
         break;
     }
-    case RTT_VOID: break;
+    case RTT_COMPLEX: {
+        const auto& [real, img] = rtt->complex;
+        str << formatElement(real, elem) << " + ";
+        str << formatElement(img, static_cast<char*>(elem) + real->size) << 'i';
+        break;
+    }
+    case RTT_VOID:
     case RTT_VARIADIC:
-    case RTT_UNKNOWN: assert(0);
+    case RTT_FUNC:
+    case RTT_UNKNOWN:
+    default: assert(0);
     }
     return str.str();
 }
 
+extern "C" void Lgs_print(const Lgs_TypeInfo* rtt, void* v) {
+    printf("%s\n", formatElement(rtt, v).c_str());
+}

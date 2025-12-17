@@ -1,14 +1,13 @@
 #pragma once
-#include <stmts/LgsStmt.h>
 #include "LgsValue.h"
 
+class LgsComplexConst;
 class LgsNullable;
+class LgsNullableExpr;
 class LgsMetaSelection;
 class LgsMatrixExpr;
-class LgsNullableExpr;
 class LgsEnvVar;
 class LgsBinaryExpr;
-class LgsNull;
 class LgsJson;
 class LgsCast;
 class LgsTypeExpr;
@@ -38,14 +37,17 @@ public:
     LgsType* type = nullptr;
     bool isMutable = true;
     bool isImportName = false;
+    bool isNull = false;
+    bool isReturnExpr = false;
+    bool hasUnwrapSuffix = false;
     LgsValue* owner = nullptr;
-    Value* destPtrValue = nullptr;
+    Value* pointee = nullptr;
 
     explicit LgsExpr(LgsType* type = nullptr) : type(type) {}
-    void freeOwner(LgsCgModule& cg);
-    int64_t* getConstInt();
-    std::string* getConstStr();
+    std::optional<int64_t> getConstInt();
+    std::optional<std::string> getConstStr();
     void setType(LgsType* newType);
+    Value* getPtrTo(LgsCgModule& cg) const;
 
     virtual LgsExpr* castExplicitly(LgsType* toType);
     virtual void castImplicitly(LgsType* toType);
@@ -53,8 +55,8 @@ public:
     virtual void assign(LgsCgModule& cg, LgsExpr* expr);
     virtual bool equals(LgsExpr* other);
     virtual std::string asText() = 0;
+    virtual LgsExpr* clone();
 
-    LgsNull* asNull();
     LgsFunc* asFunc();
     LgsVariable* asVariable();
     LgsPrefixExpr* asPrefixExpr();
@@ -69,23 +71,24 @@ public:
     LgsArrayExpr* asArrayExpr();
     LgsHashMap* asHashMap();
     LgsEnvVar* asEnvVar();
+    LgsIntConst* asIntConst();
+    LgsStrConst* asStrConst();
     LgsCharConst* asCharConst();
     LgsFloatConst* asFloatConst();
-    LgsStrConst* asStrConst();
+    LgsComplexConst* asComplexConst();
     LgsVectorExpr* asVectorExpr();
     LgsMatrixExpr* asMatrixExpr();
-    LgsIntConst* asIntConst();
     LgsMetaVar* asLoopMetaVar();
     LgsBinaryExpr* asBinExpr();
-    LgsNullableExpr* asNullableExpr();
     LgsMetaSelection* asMetaSelection();
+    LgsNullableExpr* asNullableExpr();
     ~LgsExpr() override = default;
 };
 
-Value* dotProduct(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-Value* crossProduct(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-void freeExpr(LgsExpr* expr);
+void wrapInNullable(LgsExpr*& expr, LgsNullable* nullable);
+void castExprImplicitly(LgsExpr*& expr, LgsType* toType);
 
+void freeExpr(LgsExpr* expr);
 template<typename T>
 void freeExprs(std::vector<T*>& exprs) {
     for (const auto expr : exprs) {
@@ -93,4 +96,3 @@ void freeExprs(std::vector<T*>& exprs) {
     }
     exprs.clear();
 }
-

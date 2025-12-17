@@ -3,7 +3,6 @@
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
 #include "LgsUtils.h"
-#include "types/LgsNullable.h"
 #include "types/iterables/LgsVariadic.h"
 
 #include <sstream>
@@ -125,15 +124,19 @@ void LgsFuncCall::setDebugValue(LgsCgModule& cg) {
     setDebugLoc(cg);
 }
 
+LgsExpr* LgsFuncCall::clone() {
+    const auto newFuncCall = new LgsFuncCall(*this);
+    newFuncCall->args.clear();
+    for (const auto& arg : args) {
+        newFuncCall->args.emplace_back(LgsFuncArg(arg.expr->clone(), arg.name, arg.isSelf));
+    }
+    newFuncCall->type = type;
+    return newFuncCall;
+}
+
 bool argAndParamEqual(const LgsExpr* arg, const LgsParam* param) {
     const auto argType = arg->type;
     if (!argType) return false;
-    if (const auto nullable = param->type->asNullable()) {
-        if (const auto argNullable = nullable->asNullable()) {
-            return argNullable->baseType->canCastTo(nullable->baseType);
-        }
-        return argType->canCastTo(nullable->baseType);
-    }
     return argType->canCastTo(param->type);
 }
 

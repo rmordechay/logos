@@ -1,5 +1,5 @@
 #pragma once
-#include "errors/LgsErrors.h"
+#include "errors/LgsErrHandler.h"
 #include <llvm/IR/DIBuilder.h>
 
 namespace llvm {

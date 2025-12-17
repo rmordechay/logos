@@ -26,18 +26,11 @@ if (CCACHE_PROGRAM AND NOT LOGOS_RELEASE)
 endif ()
 
 set(COMPILER_SOURCE
-    # Logos
     ${CMAKE_SOURCE_DIR}/compiler/src/logos/LgsApp.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/logos/LgsStack.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/logos/LgsPaths.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/logos/LgsAppCache.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/logos/LgsPkgManager.cpp
-    ${CMAKE_SOURCE_DIR}/compiler/src/files/LgsMainFile.cpp
-    ${CMAKE_SOURCE_DIR}/compiler/src/files/LgsObjectFile.cpp
-    ${CMAKE_SOURCE_DIR}/compiler/src/files/LgsInterfaceFile.cpp
-    ${CMAKE_SOURCE_DIR}/compiler/src/files/LgsTestFile.cpp
-    ${CMAKE_SOURCE_DIR}/compiler/src/files/LgsEnvFile.cpp
-    ${CMAKE_SOURCE_DIR}/compiler/src/files/LgsAppConfigFile.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/codegen/LgsLinker.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/codegen/LgsCodeGen.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/codegen/LgsCgModule.cpp
@@ -50,6 +43,14 @@ set(COMPILER_SOURCE
     ${CMAKE_SOURCE_DIR}/compiler/src/parser/LgsParser.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/lgsc/LgsCCompiler.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/lgsc/LgsCLangParser.cpp
+
+    # Files
+    ${CMAKE_SOURCE_DIR}/compiler/src/files/LgsMainFile.cpp
+    ${CMAKE_SOURCE_DIR}/compiler/src/files/LgsObjectFile.cpp
+    ${CMAKE_SOURCE_DIR}/compiler/src/files/LgsInterfaceFile.cpp
+    ${CMAKE_SOURCE_DIR}/compiler/src/files/LgsTestFile.cpp
+    ${CMAKE_SOURCE_DIR}/compiler/src/files/LgsEnvFile.cpp
+    ${CMAKE_SOURCE_DIR}/compiler/src/files/LgsAppConfigFile.cpp
 
     # CLI
     ${CMAKE_SOURCE_DIR}/compiler/src/cli/LgsCliHandler.cpp
@@ -68,10 +69,9 @@ set(COMPILER_SOURCE
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/LgsSymbol.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/LgsSymbolTable.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/LgsValue.cpp
-    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/builtins/LgsPrint.cpp
-    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/builtins/LgsTest.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/LgsExpr.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/LgsBinaryExpr.cpp
+    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/LgsTernaryExpr.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/LgsArrayExpr.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/LgsCast.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/LgsFuncCall.cpp
@@ -86,9 +86,9 @@ set(COMPILER_SOURCE
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/LgsEnvVar.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/LgsVectorExpr.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/LgsTypeExpr.cpp
-    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/LgsNull.cpp
-    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/LgsNullableExpr.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/LgsMatrixExpr.cpp
+    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/LgsJson.cpp
+    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/LgsNullableExpr.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/constants/LgsCharConst.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/constants/LgsFloatConst.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/constants/LgsIntConst.cpp
@@ -117,6 +117,8 @@ set(COMPILER_SOURCE
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/stmts/LgsStmtsBlock.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/stmts/LgsVarDec.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/stmts/LgsSwitch.cpp
+    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/builtins/LgsPrint.cpp
+    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/builtins/LgsTest.cpp
 
     # Types
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsType.cpp
@@ -127,11 +129,12 @@ set(COMPILER_SOURCE
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsEnum.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsFuncType.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsInterface.cpp
-    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsNullable.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsObject.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsSubType.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsTypePair.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsGenericType.cpp
+    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsJsonType.cpp
+    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsNullable.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/iterables/LgsMap.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/iterables/LgsDArray.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/iterables/LgsSet.cpp
@@ -153,7 +156,10 @@ set(COMPILER_SOURCE
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsULong.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsByte.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsVoid.cpp
-    compiler/src/symbols/exprs/LgsTernaryExpr.cpp
+    compiler/src/symbols/types/LgsComplex.cpp
+    compiler/include/symbols/types/LgsComplex.h
+    compiler/src/symbols/exprs/constants/LgsComplexConst.cpp
+    compiler/include/symbols/exprs/constants/LgsComplexConst.h
 )
 
 set(LGS_LIB_SOURCE
@@ -164,7 +170,7 @@ set(LGS_LIB_SOURCE
     ${CMAKE_SOURCE_DIR}/lib/src/Lgs_Runtime.cpp
     ${CMAKE_SOURCE_DIR}/lib/src/Lgs_Allocator.cpp
     ${CMAKE_SOURCE_DIR}/lib/src/Lgs_SetExpr.cpp
-    ${CMAKE_SOURCE_DIR}/lib/src/Lgs_Helpers.cpp
+    ${CMAKE_SOURCE_DIR}/lib/src/Lgs_Print.cpp
     ${CMAKE_SOURCE_DIR}/lib/src/Lgs_Reflection.cpp
     ${CMAKE_SOURCE_DIR}/lib/src/context/Lgs_Aarch64.cpp
 )

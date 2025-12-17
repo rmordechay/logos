@@ -9,7 +9,7 @@ Type* LgsVoid::getIRType(LgsCgModule& cg) {
 }
 
 Constant* LgsVoid::getRTType(LgsCgModule& cg) {
-    assert(0);
+    return cg.getRTTypeInfo(getName(), sizeBytes(), RTT_VOID, isHeapAlloc, cg.null());
 }
 
 size_t LgsVoid::sizeBytes() {
@@ -24,7 +24,7 @@ LgsExpr* LgsVoid::getZeroValue() {
     return nullptr;
 }
 
-LgsType* LgsVoid::applyBinOp(LgsType* toType, LgsBinOp& op) {
+LgsType* LgsVoid::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     assert(0);
 }
 

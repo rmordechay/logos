@@ -1,6 +1,6 @@
 #pragma once
 #include "LgsDefinitions.h"
-#include "errors/LgsErrors.h"
+#include "errors/LgsErrHandler.h"
 #include <string>
 #include <unordered_map>
 
@@ -49,6 +49,7 @@ enum LgsTokenType {
     T_STAR,
     T_SLASH,
     T_SLIDER,
+    T_IMAGINARY,
     T_PERCENT,
     T_AMPERSAND,
     T_PIPE,
@@ -93,9 +94,11 @@ enum LgsTokenType {
     T_FOR_I,
     T_FOR_IS_FIRST,
     T_FOR_IS_LAST,
+    T_FOR_ELEMENT,
     T_FOR_EVER,
     T_BOOL,
     T_INT,
+    T_UINT,
     T_LONG,
     T_DOUBLE,
     T_HEX,

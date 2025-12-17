@@ -14,9 +14,6 @@ void execute(const fs::path& execPath, std::vector<const char*> mainArgs = {});
 bool runCmd(const char* cmd);
 bool createDir(fs::path& dirPath);
 bool isLogosFile(const fs::path& filePath);
-bool isLogosKeyword(const std::string& s);
-void printCliError(const LgsBaseMsg& err, const std::vector<std::string>& args = {});
-std::string formatErrorMsg(const std::string& msg, const std::vector<std::string>& args);
 
 std::string getFileText(const fs::path& filePath);
 std::string getLine(const std::string& filename, size_t lineNumber);
@@ -30,6 +27,9 @@ void logInfo(const std::string& msg = "", bool withNewLine = false);
 void logDebug(const std::string& msg, bool withNewLine = false);
 void logError(const std::string& msg, const std::string& epilogue = "");
 void logWarning(const std::string& msg);
+void printCliError(const LgsBaseMsg& err, const std::vector<std::string>& args = {});
+std::string formatErrorMsg(const char* msg, const std::vector<std::string>& args);
+void formatErrorMsg(const char* msg, char* out, const size_t count, va_list args);
 
 void combineNodeHash(size_t& oldHash, size_t newHash);
 void hashNodeString(size_t& oldHash, const std::string& str);

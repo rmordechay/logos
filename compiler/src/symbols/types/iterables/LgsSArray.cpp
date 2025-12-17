@@ -3,30 +3,20 @@
 #include "exprs/LgsArrayExpr.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsBool.h"
-#include "LgsUtils.h"
+#include "Lgs_DArrayExpr.h"
 #include "exprs/LgsBinaryExpr.h"
 #include "lgsc/LgsCCompiler.h"
 
 Type* LgsSArray::getIRType(LgsCgModule& cg) {
     if (IRType) return IRType;
-    const auto numElements = size->getConstInt();
-    if (numElements) {
+    const auto sizeInt = size->getConstInt();
+    if (sizeInt.has_value()) {
         const auto innerIRType = baseType->getIRType(cg);
-        IRType = ArrayType::get(innerIRType, *numElements);
+        IRType = ArrayType::get(innerIRType, sizeInt.value());
     } else {
-        IRType = cg.ptrTy();
+        IRType = cg.getStructType({cg.sizeTy(), cg.ptrTy()}, getName());
     }
     return IRType;
-}
-
-Constant* LgsSArray::getRTType(LgsCgModule& cg) {
-    const auto genericName = getGenericName();
-    const auto st = cg.getStructType({cg.sizeTy(), cg.ptrTy()}, genericName);
-    const auto constSize = size->getConstInt();
-    if (!constSize) return nullptr;
-    const auto sArrSize = cg.usize(*constSize);
-    const auto sv = ConstantStruct::get(st, {sArrSize, baseType->getRTType(cg)});
-    return cg.getRTTypeInfo(genericName, sizeBytes(), sizeBytes(), RTT_SARRAY, sv);
 }
 
 std::string LgsSArray::getName() {
@@ -40,8 +30,8 @@ std::string LgsSArray::pname() {
 
 size_t LgsSArray::sizeBytes() {
     const auto constInt = size->getConstInt();
-    if (!constInt) return 0;
-    return baseType->sizeBytes() * *constInt;
+    if (constInt.has_value()) return baseType->sizeBytes() * constInt.value();
+    return sizeof(Lgs_SArrayExpr);
 }
 
 LgsExpr* LgsSArray::getZeroValue() {
@@ -49,19 +39,30 @@ LgsExpr* LgsSArray::getZeroValue() {
     return new LgsArrayExpr(this);
 }
 
+Constant* LgsSArray::getRTType(LgsCgModule& cg) {
+    const auto sArrName = getName();
+    const auto constSize = size->getConstInt();
+    auto size = 0;
+    if (constSize.has_value()) {
+        size = constSize.value();
+    }
+    const auto sv = cg.getRTTExtraStruct(sArrName, {cg.sizeTy(), cg.ptrTy()}, {cg.usize(size), baseType->getRTType(cg)});
+    return cg.getRTTypeInfo(sArrName, size, RTT_SARRAY, isHeapAlloc, sv);
+}
+
 std::string LgsSArray::fmtStr() const {
     if (baseType->asChar()) return "%s";
     return "%p";
 }
 
-LgsType* LgsSArray::applyBinOp(LgsType* toType, LgsBinOp& op) {
+LgsType* LgsSArray::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     switch (op.opType) {
     case IN: {
-        if (toType->canCastTo(baseType)) return &LGS_BOOL;
+        if (rightType->canCastTo(baseType)) return &LGS_BOOL;
         break;
     }
     case ADD: {
-        if (const auto otherSArr = toType->asSArray()) {
+        if (const auto otherSArr = rightType->asSArray()) {
             if (!baseType->canCastTo(otherSArr->baseType)) break;
             return new LgsSArray(baseType, new LgsBinaryExpr(size, otherSArr->size, ADD_OP));
         }
@@ -72,7 +73,7 @@ LgsType* LgsSArray::applyBinOp(LgsType* toType, LgsBinOp& op) {
     return nullptr;
 }
 
-bool LgsSArray::inferBaseType(const std::vector<LgsExpr*>& args) {
+bool LgsSArray::inferBaseType(std::vector<LgsExpr*>& args) {
     assert(0);
 }
 
@@ -110,16 +111,16 @@ Value* LgsSArray::mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
 
 Value* LgsSArray::inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) {
     const auto resultPtr = cg.builder.CreateAlloca(cg.builder.getInt1Ty());
-    cg.builder.CreateStore(cg.false_(), resultPtr);
+    cg.store(cg.false_(), resultPtr);
     cg.loop(size->loadIR(cg), [this, &cg, iterableExpr, value, resultPtr](Value* index, BasicBlock* exitBlock) {
         const auto trueBlock = cg.createBlock();
         const auto falseBlock = cg.createBlock();
         const auto tempExpr = iterableExpr->type->asIterable()->baseType->getZeroValue();
         tempExpr->IRValue = getIRElement(cg, iterableExpr->IRValue, index);
-        const auto eq = baseType->eqIR(cg, tempExpr, value);
+        const auto eq = eqIR(cg, tempExpr, value);
         cg.builder.CreateCondBr(eq, trueBlock, falseBlock);
         cg.startBlock(trueBlock);
-        cg.builder.CreateStore(cg.true_(), resultPtr);
+        cg.store(cg.true_(), resultPtr);
         cg.builder.CreateBr(exitBlock);
         cg.startBlock(falseBlock);
         freeExpr(tempExpr);
@@ -142,6 +143,20 @@ bool LgsSArray::canCastTo(LgsType* other) {
     const auto otherArr = other->asIterable();
     if (!otherArr) return false;
     return baseType->canCastTo(otherArr->baseType);
+}
+
+bool LgsSArray::equals(LgsType* other) {
+    if (baseType->asChar() && other->asStr()) return true;
+    const auto otherArr = other->asSArray();
+    if (!otherArr) return false;
+    if (!baseType->equals(otherArr->baseType)) return false;
+    const auto constSize = size->getConstInt();
+    const auto otherConstSize = otherArr->size->getConstInt();
+    if (!constSize.has_value() && !otherConstSize.has_value()) return true;
+    if (constSize.has_value() && otherConstSize.has_value()) {
+        return constSize.value() == otherConstSize.value();
+    }
+    return false;
 }
 
 DIType* LgsSArray::getDebugType(LgsCgModule& cg) {

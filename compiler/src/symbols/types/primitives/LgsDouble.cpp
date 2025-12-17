@@ -15,7 +15,7 @@ LgsExpr* LgsDouble::getZeroValue() {
     return new LgsFloatConst(this, 0.0);
 }
 
-LgsType* LgsDouble::applyBinOp(LgsType* toType, LgsBinOp& op) {
+LgsType* LgsDouble::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     assert(0);
 }
 
@@ -28,19 +28,30 @@ Type* LgsDouble::getIRType(LgsCgModule& cg) {
 }
 
 Constant* LgsDouble::getRTType(LgsCgModule& cg) {
-    return cg.getRTTypeInfo(getGenericName(), sizeBytes(), sizeBytes(), RTT_DOUBLE, cg.null());
+    return cg.getRTTypeInfo(getName(), sizeBytes(), RTT_DOUBLE, isHeapAlloc, cg.null());
 }
 
 bool LgsDouble::canCastTo(LgsType* other) {
     const auto IRName = other->getName();
     if (name == IRName) return true;
-    if (other->asGeneric()) return true;
+    if (other->asGenericType()) return true;
     if (IRName == LgsAny::name) return true;
     return false;
 }
 
+Value* LgsDouble::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+    const auto [l, r] = loadPairAsDouble(cg, left, right);
+    return cg.builder.CreateFAdd(l, r);
+}
+
+Value* LgsDouble::mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+    const auto [l, r] = loadPairAsDouble(cg, left, right);
+    return cg.builder.CreateFMul(l, r);
+}
+
 Value* LgsDouble::powIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return LgsType::powIR(cg, left, right);
+    const auto [l, r] = loadPairAsDouble(cg, left, right);
+    return cg.callFunc("pow", cg.doubleTy(), {cg.doubleTy(), cg.doubleTy()}, {l, r});
 }
 
 DIType* LgsDouble::getDebugType(LgsCgModule& cg) {

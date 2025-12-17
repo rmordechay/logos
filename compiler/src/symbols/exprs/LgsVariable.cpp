@@ -1,9 +1,10 @@
 #include "exprs/LgsVariable.h"
 #include "exprs/LgsInstance.h"
-#include "exprs/LgsNull.h"
 #include "funcs/LgsParam.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
+#include "types/LgsNullable.h"
+
 #include <codegen/LgsCgModule.h>
 
 Value* LgsVariable::loadIR(LgsCgModule& cg) {
@@ -25,6 +26,8 @@ bool LgsVariable::equals(LgsExpr* other) {
     switch (ref.symbolType) {
     case VAR_DEC:
         return ref.varDec->name == otherVar->name;
+    case PARAM:
+        return ref.param->name == otherVar->name;
     default:
         break;
     }
@@ -36,13 +39,7 @@ LgsExpr* LgsVariable::castExplicitly(LgsType* toType) {
 }
 
 void LgsVariable::assign(LgsCgModule& cg, LgsExpr* expr) {
-    owner = expr->owner;
-    freeOwner(cg);
-    if (const auto nullable = type->asNullable()) {
-        nullable->setIRValue(cg, IRValue, expr->IRValue);
-    } else {
-        cg.builder.CreateStore(expr->IRValue, IRValue);
-    }
+    cg.store(expr->IRValue, loadIR(cg));
 }
 
 Value* LgsVariable::hashValue(LgsCgModule& cg) {
@@ -53,7 +50,7 @@ Value* LgsVariable::hashValue(LgsCgModule& cg) {
         return ref.varDec->expr->hashValue(cg);
     case FIELD:
         if (ref.field->isEnumField) return cg.usize(ref.field->position);
-        if (ref.field->type->asEnum()) return cg.builder.CreateLoad(cg.sizeTy(), ref.field->getGEP(cg));
+        if (ref.field->type->asEnum()) return ref.field->loadIR(cg);
         return cg.callHash(ref.field->IRValue);
     default:
         assert(0);
@@ -80,4 +77,10 @@ void LgsVariable::setDebugValue(LgsCgModule& cg) {
         cg.getDebugLoc(location),
         cg.builder.GetInsertBlock()
     );
+}
+
+LgsExpr* LgsVariable::clone() {
+    const auto newVar = new LgsVariable(*this);
+    if (type) newVar->type = type;
+    return newVar;
 }

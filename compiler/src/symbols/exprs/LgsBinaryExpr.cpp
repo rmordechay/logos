@@ -1,5 +1,4 @@
 #include "exprs/LgsBinaryExpr.h"
-
 #include "codegen/LgsCgModule.h"
 
 Value* LgsBinaryExpr::loadIR(LgsCgModule& cg) {
@@ -21,8 +20,6 @@ std::string LgsBinaryExpr::asText() {
 LgsBinaryExpr::~LgsBinaryExpr() {
     freeExpr(left);
     freeExpr(right);
-    freeExpr(results);
     left = nullptr;
     right = nullptr;
-    results = nullptr;
 }

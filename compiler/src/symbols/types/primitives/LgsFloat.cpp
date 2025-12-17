@@ -1,20 +1,13 @@
 #include "types/primitives/LgsFloat.h"
+
+#include "LgsBinaryTokens.h"
 #include "codegen/LgsCgModule.h"
 #include "exprs/constants/LgsFloatConst.h"
 #include "types/LgsAny.h"
+#include "types/iterables/LgsIterable.h"
+#include "types/iterables/LgsVec.h"
+#include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsDouble.h"
-
-std::pair<Value*, Value*> loadOperands(LgsCgModule& cg, LgsExpr* self, LgsExpr* other) {
-    auto l = self->loadIR(cg);
-    auto r = other->loadIR(cg);
-    if (l->getType()->isIntegerTy()) {
-        l = cg.builder.CreateSIToFP(l, cg.floatTy());
-    }
-    if (r->getType()->isIntegerTy()) {
-        r = cg.builder.CreateSIToFP(r, cg.floatTy());
-    }
-    return {l, r};
-}
 
 std::string LgsFloat::getName() {
     return name;
@@ -29,7 +22,7 @@ LgsExpr* LgsFloat::getZeroValue() {
 }
 
 Constant* LgsFloat::getRTType(LgsCgModule& cg) {
-    return cg.getRTTypeInfo(getGenericName(), sizeBytes(), sizeBytes(), RTT_FLOAT, cg.null());
+    return cg.getRTTypeInfo(getName(), sizeBytes(), RTT_FLOAT, isHeapAlloc, cg.null());
 }
 
 size_t LgsFloat::sizeBytes() {
@@ -48,30 +41,62 @@ bool LgsFloat::canCastTo(LgsType* other) {
     return false;
 }
 
-LgsType* LgsFloat::applyBinOp(LgsType* toType, LgsBinOp& op) {
-    assert(0);
+LgsType* LgsFloat::applyBinOp(LgsType* rightType, LgsBinOp& op) {
+    if (!rightType->isNumber()) return nullptr;
+    switch (op.opType) {
+    case POW:
+        return &LGS_DOUBLE;
+    case ADD:
+    case SUB:
+    case MUL:
+    case DIV:
+    case MODULO:
+    case BIT_AND:
+    case BIT_OR:
+    case BIT_XOR:
+    case LSHIFT:
+    case RSHIFT:
+        if (rightType->asDouble()) return &LGS_DOUBLE;
+        return &LGS_FLOAT;
+    case EQ:
+    case NE:
+    case LT:
+    case GT:
+    case GE:
+    case LE:
+        return &LGS_BOOL;
+    case AND:
+    case OR:
+    case IN:
+    case CROSS:
+        break;
+    case NOOP:
+        assert(0);
+    }
+    return nullptr;
 }
 
 Value* LgsFloat::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto [l, r] = loadOperands(cg, left, right);
+    const auto [l, r] = loadPairAsFloat(cg, left, right);
     return cg.builder.CreateFAdd(l, r);
 }
 
 Value* LgsFloat::subIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto [l, r] = loadOperands(cg, left, right);
+    const auto [l, r] = loadPairAsFloat(cg, left, right);
     return cg.builder.CreateFSub(l, r);
 }
 
 Value* LgsFloat::mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     if (left->type->asVec() && right->type->asVec()) {
-        return dotProduct(cg, left, right);
+        const auto dotFunc = dotProductFunc(cg, left, right);
+        return cg.builder.CreateCall(dotFunc, {left->loadIR(cg), right->loadIR(cg)});
     }
-    const auto [l, r] = loadOperands(cg, left, right);
+    const auto [l, r] = loadPairAsFloat(cg, left, right);
     return cg.builder.CreateFMul(l, r);
 }
 
 Value* LgsFloat::divIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto [l, r] = loadOperands(cg, left, right);
+    const auto [l, r] = loadPairAsFloat(cg, left, right);
     return cg.builder.CreateFDiv(l, r);
 }
 

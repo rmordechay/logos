@@ -1,9 +1,13 @@
 #pragma once
-#include "LgsBinaryTokens.h"
-#include "errors/LgsErrors.h"
 #include <map>
+#include <ostream>
 #include <vector>
+#include "errors/LgsErrHandler.h"
 
+class LgsComplex;
+class LgsOwner;
+struct LgsBinOp;
+class LgsBinaryExpr;
 class LgsVariadic;
 class LgsGenericType;
 class LgsMatrix;
@@ -60,7 +64,8 @@ public:
     std::vector<LgsType*> genericArgs;
     Type* IRType = nullptr;
     bool isInt = false;
-    bool isFloatingPoint = false;
+    bool isUnsinged = false;
+    bool isFloat = false;
     bool isPrimitive = false;
     bool isHeapAlloc = false;
     bool passByRef = false;
@@ -76,24 +81,20 @@ public:
     virtual bool canCastTo(LgsType* other) = 0;
     virtual std::string fmtStr() const = 0;
     virtual DIType* getDebugType(LgsCgModule& cg) = 0;
-    virtual LgsType* applyBinOp(LgsType* toType, LgsBinOp& op) = 0;
+    virtual LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) = 0;
     virtual void hashNode(size_t& oldHash);
     virtual std::string getName() = 0;
     virtual std::string pname(); // pretty name
-    virtual std::string getGenericName();
     virtual bool equals(LgsType* other);
 
     bool isVoid();
-    bool isNumber() const;
+    bool isNumber();
     bool isBig();
     bool isUnknown();
     bool isSliceable();
     LgsType* extendInt();
-    LgsType* applyIntBinOp(LgsType* toType, LgsBinOpType op);
     void cloneFields(LgsType* newType) const;
     void cloneMethods(LgsType* newType) const;
-    static Value* orInt(LgsCgModule& cg, const LgsExpr* self, const LgsExpr* other);
-    static Value* andInt(LgsCgModule& cg, LgsExpr* self, const LgsExpr* other);
 
     virtual Value* addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
     virtual Value* subIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
@@ -106,14 +107,6 @@ public:
     virtual Value* bitXorIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
     virtual Value* lshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* other);
     virtual Value* rshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* eqIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* neIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* ltIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* gtIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* geIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* leIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* andIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* orIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
     virtual Value* crossIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
 
     LgsAny* asAny();
@@ -128,11 +121,12 @@ public:
     LgsUInt* asUInt();
     LgsFloat* asFloat();
     LgsDouble* asDouble();
+    LgsComplex* asComplex();
     LgsFuncType* asFuncType();
     LgsObject* asObject();
     LgsInterface* asInterface();
     LgsEnum* asEnum();
-    LgsGenericType* asGeneric();
+    LgsGenericType* asGenericType();
     LgsIterable* asIterable();
     LgsSArray* asSArray();
     LgsDArray* asDArray();
@@ -143,12 +137,18 @@ public:
     LgsMap* asMap();
     LgsTypePair* asPair();
     LgsSubType* asSubtype();
-    LgsNullable* asNullable();
     LgsVariadic* asVariadic();
+    LgsNullable* asNullable();
     virtual ~LgsType();
 };
 
-void freeType(const LgsType* type);
+inline void freeType(LgsType* type) {
+    if (!type) return;
+    if (type->isPrimitive) return;
+    if (type->asGenericType() || type->asObject()) return;
+    delete type;
+}
+
 
 template<typename T>
 void freeTypes(std::vector<T*>& types) {
@@ -157,3 +157,16 @@ void freeTypes(std::vector<T*>& types) {
     }
     types.clear();
 }
+
+Value* eqIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
+Value* neIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
+Value* ltIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
+Value* gtIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
+Value* geIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
+Value* leIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
+Value* andIR(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right);
+Value* orIR(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right);
+std::pair<Value*, Value*> loadPairAsFloat(LgsCgModule& cg, LgsExpr* self, LgsExpr* other);
+std::pair<Value*, Value*> loadPairAsDouble(LgsCgModule& cg, LgsExpr* self, LgsExpr* other);
+std::pair<Value*, Value*> loadPairAsInt(LgsCgModule& cg, LgsExpr* self, LgsExpr* other);
+std::pair<Constant*, Constant*> getRTFieldsInfo(LgsCgModule& cg, const std::string& name, const std::vector<LgsOwner*>& values);

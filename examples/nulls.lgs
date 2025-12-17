@@ -17,6 +17,18 @@ nulls() {
     func(null, null)
 }
 
+nulls2() {
+    a: Int? = null
+    b = 3?
+    print(a + b)
+    a := 2
+    print(a + b)
+
+    func("Roi", null)
+    func(null, null)
+    func(null, 2)
+}
+
 main() {
     a = 2?
     print(a)
@@ -25,4 +37,32 @@ main() {
     obj = Obj{x = 2}?
     //obj = Obj{x = 2}
     print(obj.x)
+
+
+    arr = [1, 2, 3]
+    if arr[0] == null {
+        print(arr)
+    }
+    if null == null {
+        print(arr)
+    }
+    a = 2
+    if a == null {
+        print(a)
+    }
+}
+
+object Obj {
+    name: Str?
+}
+
+object Obj2 {
+    obj: Obj?
+}
+
+main() {
+    obj = Obj2{}?
+    //obj := null
+    print(obj.obj.name)
+    print("Hellow world")
 }

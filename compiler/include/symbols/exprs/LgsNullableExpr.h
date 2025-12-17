@@ -4,15 +4,15 @@
 
 class LgsNullableExpr final : public LgsExpr {
 public:
-    LgsExpr* baseExpr;
+    LgsExpr* baseExpr = nullptr;
 
     explicit LgsNullableExpr(LgsExpr* baseExpr): baseExpr(baseExpr) {}
-    std::string asText() override;
+    LgsNullableExpr(): LgsExpr(&LGS_NULLABLE) {
+        isNull = true;
+    }
     Value* loadIR(LgsCgModule& cg) override;
+    void assign(LgsCgModule& cg, LgsExpr* expr) override;
     void setDebugValue(LgsCgModule& cg) override;
-    void hashNode(size_t& oldHash) override;
-    LgsExpr* castExplicitly(LgsType* toType) override;
     void castImplicitly(LgsType* toType) override;
-    Value* hashValue(LgsCgModule& cg) override;
-    bool equals(LgsExpr* other) override;
+    std::string asText() override;
 };

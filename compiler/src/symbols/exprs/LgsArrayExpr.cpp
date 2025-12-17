@@ -8,7 +8,24 @@ Value* LgsArrayExpr::loadIR(LgsCgModule& cg) {
     return cg.builder.CreateLoad(type->getIRType(cg), IRValue);
 }
 
+void LgsArrayExpr::initIRArray(LgsCgModule& cg) {
+    if (const auto dArr = type->asDArray()) {
+        auto rtType = dArr->getRTType(cg);
+        if (!IRValue) {
+            IRValue = cg.allocate(cg.usize(dArr->sizeBytes()), rtType, false);
+        }
+        cg.callLgsFunc(LgsDArray::name, "init", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {IRValue, rtType});
+    } else if (const auto set = type->asSet()) {
+        auto rtType = set->getRTType(cg);
+        if (!IRValue) {
+            IRValue = cg.allocate(cg.usize(set->sizeBytes()), rtType, false);
+        }
+        cg.callLgsFunc(LgsSet::name, "init", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {IRValue, rtType});
+    }
+}
+
 void LgsArrayExpr::castImplicitly(LgsType* toType) {
+    if (toType->asGenericType()) return;
     // Replace static and dynamic if needed
     if (!type && toType->asSArray()) {
         setType(toType);
@@ -24,10 +41,13 @@ void LgsArrayExpr::castImplicitly(LgsType* toType) {
         otherBaseType = toType->asIterable()->baseType;
     }
     for (size_t i = 0; i < elements.size(); ++i) {
-        if (elements[i]->type) continue;
-        elements[i]->castImplicitly(otherBaseType);
+        castExprImplicitly(elements[i], otherBaseType);
     }
-    type->asIterable()->baseType = otherBaseType;
+    if (!type) {
+        type = toType;
+    } else if (const auto& iter = type->asIterable()) {
+        iter->baseType = otherBaseType;
+    }
 }
 
 void LgsArrayExpr::setDebugValue(LgsCgModule& cg) {

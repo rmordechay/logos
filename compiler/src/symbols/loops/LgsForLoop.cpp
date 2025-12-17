@@ -13,16 +13,16 @@ using llvm::MDNode;
 using llvm::MDString;
 
 void LgsForLoop::setBlocks(LgsCgModule& cg) {
-    IRCondBlock = cg.createBlock(BLOCK_NAME_LOOP_COND);
-    IRBodyBlock = cg.createBlock(BLOCK_NAME_LOOP_BODY);
-    IRExitBlock = cg.createBlock(BLOCK_NAME_LOOP_EXIT);
+    IRCondBlock = cg.createBlock(BLOCK_LOOP_COND);
+    IRBodyBlock = cg.createBlock(BLOCK_LOOP_BODY);
+    IRExitBlock = cg.createBlock(BLOCK_LOOP_EXIT);
 }
 
 void LgsForLoop::incAndJumpToCond(LgsCgModule& cg) {
     if (cg.lastInstTerminator()) return;
     iValue = cg.builder.CreateLoad(cg.i32Ty(), iPtr);
     const auto inc = cg.builder.CreateAdd(iValue, cg.i32(1));
-    cg.builder.CreateStore(inc, iPtr);
+    cg.store(inc, iPtr);
     const auto br = cg.builder.CreateBr(IRCondBlock);
     const auto mustProgress = MDNode::get(cg.context, MDString::get(cg.context, "llvm.loop.mustprogress"));
     br->setMetadata("llvm.loop", MDNode::getDistinct(cg.context, {mustProgress}));
@@ -45,12 +45,12 @@ LgsWhileLoop* LgsForLoop::asWhileLoop() {
 }
 
 LgsForLoop::~LgsForLoop() {
-    for (const auto& loopVar : loopVars) {
-        freeStmt(loopVar);
-    }
     if (stmtsBlock) {
         delete stmtsBlock;
         stmtsBlock = nullptr;
+    }
+    for (const auto& loopVar : loopVars) {
+        freeStmt(loopVar);
     }
     loopVars.clear();
 }

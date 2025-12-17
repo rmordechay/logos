@@ -3,7 +3,7 @@
 
 class LgsPtr final : public LgsType {
 public:
-    static constexpr auto name = "CPtr";
+    static constexpr auto name = "Ptr";
     LgsType* baseType;
 
     explicit LgsPtr(LgsType* baseType) : baseType(baseType) {}
@@ -14,7 +14,7 @@ public:
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
     bool canCastTo(LgsType* other) override;
-    LgsType* applyBinOp(LgsType* toType, LgsBinOp& op) override;
+    LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     std::string fmtStr() const override;
     DIType* getDebugType(LgsCgModule& cg) override;
     ~LgsPtr() override;

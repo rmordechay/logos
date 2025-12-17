@@ -23,7 +23,15 @@ Type* LgsFuncType::getIRType(LgsCgModule& cg) {
 }
 
 Constant* LgsFuncType::getRTType(LgsCgModule& cg) {
-    assert(0);
+    const auto funcName = getName();
+    std::vector<LgsOwner*> paramsAsOwners;
+    for (auto& param : params) paramsAsOwners.emplace_back(static_cast<LgsOwner*>(&param));
+    const auto [typesArr, hashesArr] = getRTFieldsInfo(cg, funcName, paramsAsOwners);
+    // paramsCount, paramHashes, paramTypes, rt
+    const auto sv = cg.getRTTExtraStruct(funcName, {cg.sizeTy(), cg.ptrTy(), cg.ptrTy(), cg.ptrTy()}, {
+        cg.usize(params.size()), hashesArr, typesArr, rt->getRTType(cg)
+    });
+    return cg.getRTTypeInfo(funcName, sizeBytes(), RTT_FUNC, isHeapAlloc, sv);
 }
 
 LgsExpr* LgsFuncType::getZeroValue() {
@@ -35,9 +43,10 @@ size_t LgsFuncType::sizeBytes() {
 }
 
 std::string LgsFuncType::getName() {
+    if (name == "") return LGS_LAMBDA_NAME;
     std::stringstream strStream;
     if (!isExternal) {
-        if (isBuiltin) strStream << LGS_RUNTIME_PREFIX;
+        if (isBuiltin) strStream << LGS_PREFIX;
         else strStream << "u_";
     }
     if (parentName != "") {
@@ -45,8 +54,7 @@ std::string LgsFuncType::getName() {
     }
     strStream << name;
     if (isCoroutine) strStream << LGS_CORO_SUFFIX;
-    IRName = strStream.str();
-    return IRName;
+    return strStream.str();
 }
 
 std::string LgsFuncType::pname() {
@@ -105,7 +113,7 @@ bool LgsFuncType::equals(LgsType* other) {
     return true;
 }
 
-LgsType* LgsFuncType::applyBinOp(LgsType* toType, LgsBinOp& op) {
+LgsType* LgsFuncType::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     assert(0);
 }
 
@@ -121,7 +129,6 @@ void LgsFuncType::setFuncOptions(const uint32_t ops) {
     isIOMember =  ops & IO_MEMBER;
     isSyscall =  ops & SYSCALL;
     isExternal =  ops & EXTERNAL;
-    isArrFunc =  ops & ARR_FUNC;
     hasDefaults =  ops & HAS_DEFAULTS;
 }
 
@@ -137,12 +144,29 @@ DIType* LgsFuncType::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
 
+bool LgsFuncType::isGenericType(LgsType* type) const {
+    for (const auto genericType : genericTypes) {
+        if (genericType->equals(type)) return true;
+    }
+    return false;
+}
+
 LgsFuncType::~LgsFuncType() {
     if (!rt->asObject()) {
-        freeType(rt);
+        if (!rt->asGenericType()) freeType(rt);
+        rt = nullptr;
     }
     if (isMethod && !params.empty()) {
         params.erase(params.begin());
     }
-    freeParams(params);
+    for (const auto& param : params) {
+        if (param.isSelf) continue;
+        if (param.expr) freeExpr(param.expr);
+        freeType(param.type);
+    }
+    params.clear();
+    for (const auto& genericType : genericTypes) {
+        freeType(genericType);
+    }
+    genericTypes.clear();
 }

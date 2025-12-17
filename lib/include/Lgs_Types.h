@@ -5,6 +5,7 @@ struct Lgs_TypeInfo;
 typedef void (*ThunkFunc)(void*);
 
 enum Lgs_TypeKind {
+    RTT_ANY,
     RTT_VOID,
     RTT_BOOL,
     RTT_CHAR,
@@ -20,6 +21,7 @@ enum Lgs_TypeKind {
     RTT_ULONG,
     RTT_FLOAT,
     RTT_DOUBLE,
+    RTT_COMPLEX,
     RTT_VEC2,
     RTT_VEC3,
     RTT_VEC4,
@@ -31,16 +33,24 @@ enum Lgs_TypeKind {
     RTT_OBJECT,
     RTT_ENUM,
     RTT_TYPE,
-    RTT_ANY,
+    RTT_FUNC,
     RTT_VARIADIC,
     RTT_NULLABLE,
     RTT_UNKNOWN,
 };
 
 struct Lgs_Object {
+    char* name;
     size_t fieldsCount;
-    uint64_t* fieldHashes;
+    char** fieldNames;
     Lgs_TypeInfo** fieldTypes;
+};
+
+struct Lgs_FuncType {
+    size_t paramsCount;
+    uint64_t* paramHashes;
+    Lgs_TypeInfo** paramTypes;
+    Lgs_TypeInfo* rt;
 };
 
 struct Lgs_SArray {
@@ -69,6 +79,11 @@ struct Lgs_Vec4 {
     Lgs_TypeInfo* baseType;
 };
 
+struct Lgs_Complex {
+    Lgs_TypeInfo* realType;
+    Lgs_TypeInfo* imaginaryType;
+};
+
 struct Lgs_Matrix {
     size_t rows;
     size_t columns;
@@ -82,8 +97,8 @@ struct Lgs_Nullable {
 
 struct Lgs_TypeInfo {
     size_t size;
-    size_t alignment;
     Lgs_TypeKind kind;
+    bool isHeap;
     union {
         Lgs_Object obj;
         Lgs_SArray sArray;
@@ -94,6 +109,7 @@ struct Lgs_TypeInfo {
         Lgs_Vec4 vec4;
         Lgs_Matrix matrix;
         Lgs_Nullable nullable;
+        Lgs_Complex complex;
         void* dummy; // used for types that don't need extra information.
     };
 };

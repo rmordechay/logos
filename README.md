@@ -2,7 +2,7 @@
 
 ## Build
 ### Requirements
-- clang 19
+- C++ compiler
 - LLVM 19
 - cmake
 
@@ -202,7 +202,10 @@ Prints:
 ```
 
 ### Control Flow
+
 #### If Statement
+If statements are done using the 'if', 'if else' and 'else' keyword, similar to other languages like Java, Go or C/C++. 
+In Logos you don't have to wrap the condition in parenthesis. 
 ```
 func() {
     a = 3
@@ -221,8 +224,9 @@ main() {
     func()
 }
 ```
-You can also break from if statement using 'break if'. This will break from the outermost
-if. For example:
+
+Sometimes you want to break from nested if statements. In Logos you can do this using 'break if' which will 
+break from the outermost if. For example:
 ```
 main() {
     if true {
@@ -238,13 +242,12 @@ Prints:
 ```
 inside nested if
 ```
+
 #### If Macro
 tbd
 
 ### The _defer_ keyword
-Logos has two mechanisms to work with IO safely, for example closing files or connection.
-The first one is deferred functions. Similar to other languages, you can delay the exection of a function
-using the 'defer' keyword. For example
+Similar to other languages, you can delay the execution of a function using the 'defer' keyword. For example
 ```
 func(str: Str) {
     print(str)

@@ -1,4 +1,6 @@
 #include "exprs/LgsExpr.h"
+
+#include "exprs/constants/LgsComplexConst.h"
 #include "exprs/LgsArrayExpr.h"
 #include "exprs/LgsBinaryExpr.h"
 #include "exprs/LgsCast.h"
@@ -17,7 +19,6 @@
 #include "exprs/LgsJson.h"
 #include "exprs/LgsMatrixExpr.h"
 #include "exprs/LgsMetaSelection.h"
-#include "exprs/LgsNull.h"
 #include "exprs/LgsNullableExpr.h"
 #include "exprs/LgsPostfixExpr.h"
 #include "exprs/LgsSelection.h"
@@ -25,11 +26,84 @@
 #include "funcs/LgsFunc.h"
 #include "loops/LgsMetaVar.h"
 
+std::optional<int64_t> LgsExpr::getConstInt() {
+    if (const auto intConst = asIntConst()) {
+        return intConst->value;
+    }
+    if (const auto var = asVariable()) {
+        if (var->isMutable) return std::nullopt;
+        switch (var->ref.symbolType) {
+        case VAR_DEC:
+            return var->ref.varDec->expr->getConstInt();
+        case FIELD:
+            if (var->ref.field->expr) return var->ref.field->expr->getConstInt();
+            break;
+        default:
+            break;
+        }
+    }
+    if (const auto binExpr = asBinExpr()) {
+        if (binExpr->isMutable) return std::nullopt;
+        const auto const1 = binExpr->left->getConstInt();
+        if (!const1.has_value()) return std::nullopt;
+        const auto const2 = binExpr->right->getConstInt();
+        if (!const2.has_value()) return std::nullopt;
+
+        switch (binExpr->op.opType) {
+        case ADD: return const1.value() + const2.value();
+        case SUB: return const1.value() - const2.value();
+        case MUL: return const1.value() * const2.value();
+        case DIV: return const1.value() / const2.value();
+        case MODULO: return const1.value() % const2.value();
+        case POW: return std::pow(const1.value(), const2.value());
+        case BIT_AND: return const1.value() & const2.value();
+        case BIT_OR: return const1.value() | const2.value();
+        case BIT_XOR: return const1.value() ^ const2.value();
+        case LSHIFT: return const1.value() << const2.value();
+        case RSHIFT: return const1.value() >> const2.value();
+        default: break;
+        }
+    }
+    return std::nullopt;
+}
+
+std::optional<std::string> LgsExpr::getConstStr() {
+    if (const auto strConst = asStrConst()) {
+        return strConst->value;
+    }
+    if (const auto var = asVariable()) {
+        switch (var->ref.symbolType) {
+        case VAR_DEC:
+            return var->ref.varDec->expr->getConstStr();
+        case FIELD:
+            return var->ref.field->expr->getConstStr();
+        default:
+            break;
+        }
+    }
+    return std::nullopt;
+}
+
+void LgsExpr::setType(LgsType* newType) {
+    type = newType;
+}
+
+Value* LgsExpr::getPtrTo(LgsCgModule& cg) const {
+    if (!type->passByRef || type->asVec()) {
+        const auto ptr = cg.builder.CreateAlloca(type->getIRType(cg));
+        cg.store(IRValue, ptr);
+        return ptr;
+    }
+    return IRValue;
+}
+
 LgsExpr* LgsExpr::castExplicitly(LgsType* toType) {
     assert(0);
 }
 
-void LgsExpr::castImplicitly(LgsType* toType) {}
+void LgsExpr::castImplicitly(LgsType* toType) {
+
+}
 
 Value* LgsExpr::hashValue(LgsCgModule& cg) {
     assert(0);
@@ -43,73 +117,8 @@ bool LgsExpr::equals(LgsExpr* other) {
     assert(0);
 }
 
-void LgsExpr::freeOwner(LgsCgModule& cg) {
-    if (type->isHeapAlloc && owner) {
-        cg.callRuntimeFunc("removeOwner", cg.voidTy(), {cg.ptrTy()}, {owner->IRValue});
-        owner = nullptr;
-    }
-}
-
-int64_t* LgsExpr::getConstInt() {
-    if (const auto intConst = asIntConst()) {
-        return &intConst->value;
-    }
-    if (const auto var = asVariable()) {
-        if (var->isMutable) return nullptr;
-        switch (var->ref.symbolType) {
-        case VAR_DEC:
-            return var->ref.varDec->expr->getConstInt();
-        case FIELD:
-            if (var->ref.field->expr) return var->ref.field->expr->getConstInt();
-            break;
-        default:
-            break;
-        }
-    }
-    if (const auto binExpr = asBinExpr()) {
-        if (binExpr->isMutable) return nullptr;
-        if (binExpr->results) return binExpr->results->getConstInt();
-        const auto const1 = binExpr->left->getConstInt();
-        if (!const1) return nullptr;
-        const auto const2 = binExpr->right->getConstInt();
-        if (!const2) return nullptr;
-        const auto malloc = static_cast<int64_t*>(std::malloc(sizeof(int64_t)));
-        *malloc = *const1 + *const2;
-        return malloc;
-    }
-    return nullptr;
-}
-
-std::string* LgsExpr::getConstStr() {
-    if (const auto strConst = asStrConst()) {
-        return &strConst->value;
-    }
-    if (const auto var = asVariable()) {
-        switch (var->ref.symbolType) {
-        case VAR_DEC:
-            return var->ref.varDec->expr->getConstStr();
-        case FIELD:
-            return var->ref.field->expr->getConstStr();
-        default:
-            break;
-        }
-    }
-    if (const auto bin = asBinExpr()) {
-        if (bin->op.opType == ADD) {
-            return &bin->results->asStrConst()->value;
-        }
-    }
-    return nullptr;
-}
-
-void LgsExpr::setType(LgsType* newType) {
-    type = newType;
-}
-
-
-// Casting
-LgsNull* LgsExpr::asNull() {
-    return dynamic_cast<LgsNull*>(this);
+LgsExpr* LgsExpr::clone() {
+    assert(0);
 }
 
 LgsFunc* LgsExpr::asFunc() {
@@ -176,6 +185,10 @@ LgsFloatConst* LgsExpr::asFloatConst() {
     return dynamic_cast<LgsFloatConst*>(this);
 }
 
+LgsComplexConst* LgsExpr::asComplexConst() {
+    return dynamic_cast<LgsComplexConst*>(this);
+}
+
 LgsStrConst* LgsExpr::asStrConst() {
     return dynamic_cast<LgsStrConst*>(this);
 }
@@ -200,72 +213,28 @@ LgsBinaryExpr* LgsExpr::asBinExpr() {
     return dynamic_cast<LgsBinaryExpr*>(this);
 }
 
-LgsNullableExpr* LgsExpr::asNullableExpr() {
-    return dynamic_cast<LgsNullableExpr*>(this);
-}
-
 LgsMetaSelection* LgsExpr::asMetaSelection() {
     return dynamic_cast<LgsMetaSelection*>(this);
 }
 
-Value* dotProduct(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto l = left->loadIR(cg);
-    const auto r = right->loadIR(cg);
-
-    const auto lx = cg.builder.CreateExtractElement(l, cg.i32(0));
-    const auto rx = cg.builder.CreateExtractElement(r, cg.i32(0));
-    const auto ly = cg.builder.CreateExtractElement(l, cg.i32(1));
-    const auto ry = cg.builder.CreateExtractElement(r, cg.i32(1));
-    const auto mulX = cg.builder.CreateFMul(lx, rx);
-    const auto mulY = cg.builder.CreateFMul(ly, ry);
-    Value* result = cg.builder.CreateFAdd(mulX, mulY);
-
-    const auto vectorDim = left->type->asVec()->vectorDim;
-    if (vectorDim == 3) {
-        const auto lz = cg.builder.CreateExtractElement(l, cg.i32(2));
-        const auto rz = cg.builder.CreateExtractElement(r, cg.i32(2));
-        const auto mulZ = cg.builder.CreateFMul(lz, rz);
-        result = cg.builder.CreateFAdd(result, mulZ);
-    } else if (vectorDim == 4) {
-        const auto lw = cg.builder.CreateExtractElement(l, cg.i32(3));
-        const auto rw = cg.builder.CreateExtractElement(r, cg.i32(3));
-        const auto mulW = cg.builder.CreateFMul(lw, rw);
-        result = cg.builder.CreateFAdd(result, mulW);
-    }
-    return result;
+LgsNullableExpr* LgsExpr::asNullableExpr() {
+    return dynamic_cast<LgsNullableExpr*>(this);
 }
 
-Value* crossProduct(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto l = left->loadIR(cg);
-    const auto r = right->loadIR(cg);
+void wrapInNullable(LgsExpr*& expr, LgsNullable* nullable) {
+    assert(!nullable->baseType->asNullable() && !expr->asNullableExpr());
+    const auto oldExpr = expr;
+    oldExpr->type = nullable->baseType;
+    expr = new LgsNullableExpr(oldExpr);
+    expr->owner = oldExpr->owner;
+    expr->type = nullable;
+}
 
-    const auto lx = cg.builder.CreateExtractElement(l, cg.i32(0));
-    const auto ly = cg.builder.CreateExtractElement(l, cg.i32(1));
-    const auto lz = cg.builder.CreateExtractElement(l, cg.i32(2));
-    const auto rx = cg.builder.CreateExtractElement(r, cg.i32(0));
-    const auto ry = cg.builder.CreateExtractElement(r, cg.i32(1));
-    const auto rz = cg.builder.CreateExtractElement(r, cg.i32(2));
-
-    const auto cx = cg.builder.CreateFSub(
-        cg.builder.CreateFMul(ly, rz),
-        cg.builder.CreateFMul(lz, ry)
-    );
-    const auto cy = cg.builder.CreateFSub(
-        cg.builder.CreateFMul(lz, rx),
-        cg.builder.CreateFMul(lx, rz)
-    );
-    const auto cz = cg.builder.CreateFSub(
-        cg.builder.CreateFMul(lx, ry),
-        cg.builder.CreateFMul(ly, rx)
-    );
-
-    const auto vecTy = left->type->getIRType(cg);
-    Value* result = UndefValue::get(vecTy);
-    result = cg.builder.CreateInsertElement(result, cx, cg.i32(0));
-    result = cg.builder.CreateInsertElement(result, cy, cg.i32(1));
-    result = cg.builder.CreateInsertElement(result, cz, cg.i32(2));
-
-    return result;
+void castExprImplicitly(LgsExpr*& expr, LgsType* toType) {
+    expr->castImplicitly(toType);
+    if (!expr->asNullableExpr() && toType->asNullable()) {
+        wrapInNullable(expr, toType->asNullable());
+    }
 }
 
 void freeExpr(LgsExpr* expr) {

@@ -132,7 +132,6 @@ void LgsFormatter::formatStmt(LgsStmt* stmt) {
     else if (const auto continueStmt = stmt->asContinue()) formatContinueStmt(continueStmt);
     else if (const auto ioStmt = stmt->asIOStmt()) formatIOStmt(ioStmt);
     else if (const auto breakStmt = stmt->asBreak()) formatBreakStmt(breakStmt);
-    else if (auto expr = stmt->asExpr()) formatExpr(expr);
     else assert(0);
 }
 
@@ -239,7 +238,6 @@ void LgsFormatter::formatExpr(LgsExpr*& expr) {
         if (const auto vecExpr = expr->asVectorExpr()) return formatVectorExpr(vecExpr);
         if (const auto castExpr = expr->asCast()) return formatCast(castExpr);
         if (const auto jsonExpr = expr->asJson()) return formatJson(jsonExpr);
-        if (expr->asNull()) return insert(LGS_NULL_LITERAL);
         assert(0);
     }
 }

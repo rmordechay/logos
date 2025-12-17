@@ -14,7 +14,7 @@ Type* LgsUInt::getIRType(LgsCgModule& cg) {
 }
 
 Constant* LgsUInt::getRTType(LgsCgModule& cg) {
-    return cg.getRTTypeInfo(getGenericName(), sizeBytes(), sizeBytes(), RTT_UINT, cg.null());
+    return cg.getRTTypeInfo(getName(), sizeBytes(), RTT_UINT, isHeapAlloc, cg.null());
 }
 
 std::string LgsUInt::getName() {
@@ -33,7 +33,7 @@ bool LgsUInt::canCastTo(LgsType* other) {
     return name == IRName;
 }
 
-LgsType* LgsUInt::applyBinOp(LgsType* toType, LgsBinOp& op) {
+LgsType* LgsUInt::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     assert(0);
 }
 

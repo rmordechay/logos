@@ -1,7 +1,9 @@
 #include "types/primitives/LgsInt.h"
+#include "LgsBinaryTokens.h"
 #include "exprs/constants/LgsIntConst.h"
 #include "stmts/LgsField.h"
 #include "types/LgsAny.h"
+#include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsDouble.h"
 #include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsLong.h"
@@ -22,13 +24,13 @@ LgsExpr* LgsInt::getZeroValue() {
 }
 
 Constant* LgsInt::getRTType(LgsCgModule& cg) {
-    return cg.getRTTypeInfo(getGenericName(), sizeBytes(), sizeBytes(), RTT_INT, cg.null());
+    return cg.getRTTypeInfo(getName(), sizeBytes(), RTT_INT, isHeapAlloc, cg.null());
 }
 
 bool LgsInt::canCastTo(LgsType* other) {
     const auto otherName = other->getName();
     if (name == otherName) return true;
-    if (other->asGeneric()) return true;
+    if (other->asGenericType()) return true;
     if (otherName == LgsAny::name) return true;
     if (otherName == LgsSize::name) return true;
     if (otherName == LgsLong::name) return true;
@@ -37,8 +39,42 @@ bool LgsInt::canCastTo(LgsType* other) {
     return false;
 }
 
-LgsType* LgsInt::applyBinOp(LgsType* toType, LgsBinOp& op) {
-    return applyIntBinOp(toType, op.opType);
+LgsType* LgsInt::applyBinOp(LgsType* rightType, LgsBinOp& op) {
+    if (!rightType->isNumber()) return nullptr;
+    switch (op.opType) {
+    case ADD:
+    case SUB:
+    case MUL:
+    case DIV:
+    case MODULO: {
+        if (rightType->asDouble()) return &LGS_DOUBLE;
+        if (rightType->asFloat()) return &LGS_FLOAT;
+        return &LGS_INT;
+    }
+    case BIT_AND:
+    case BIT_OR:
+    case BIT_XOR:
+    case LSHIFT:
+    case RSHIFT: {
+        return &LGS_INT;
+    }
+    case POW: {
+        return &LGS_DOUBLE;
+    }
+    case EQ:
+    case NE:
+    case LT:
+    case GT:
+    case GE:
+    case LE: {
+        return &LGS_BOOL;
+    }
+    case NOOP:
+        assert(0);
+    default:
+        break;
+    }
+    return nullptr;
 }
 
 Value* LgsInt::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
@@ -91,38 +127,6 @@ Value* LgsInt::rshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
 
 Value* LgsInt::lshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* other) {
     return cg.builder.CreateLShr(left->loadIR(cg), other->loadIR(cg));
-}
-
-Value* LgsInt::eqIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return cg.builder.CreateICmpEQ(left->loadIR(cg), right->loadIR(cg));
-}
-
-Value* LgsInt::neIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return cg.builder.CreateICmpNE(left->loadIR(cg), right->loadIR(cg));
-}
-
-Value* LgsInt::ltIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return cg.builder.CreateICmpSLT(left->loadIR(cg), right->loadIR(cg));
-}
-
-Value* LgsInt::gtIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return cg.builder.CreateICmpSGT(left->loadIR(cg), right->loadIR(cg));
-}
-
-Value* LgsInt::geIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return cg.builder.CreateICmpSGE(left->loadIR(cg), right->loadIR(cg));
-}
-
-Value* LgsInt::leIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return cg.builder.CreateICmpSLE(left->loadIR(cg), right->loadIR(cg));
-}
-
-Value* LgsInt::andIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return andInt(cg, left, right);
-}
-
-Value* LgsInt::orIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return orInt(cg, left, right);
 }
 
 std::string LgsInt::fmtStr() const {

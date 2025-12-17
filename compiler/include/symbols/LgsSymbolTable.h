@@ -2,6 +2,8 @@
 #include "LgsSymbol.h"
 #include <unordered_map>
 #include <unordered_set>
+#include <map>
+#include <vector>
 
 class LgsStrConst;
 class LgsApp;

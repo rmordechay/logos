@@ -7,7 +7,7 @@
 #include "logos/LgsApp.h"
 #include <fstream>
 #include <filesystem>
-#include <iostream>
+#include <sstream>
 #include <string>
 #include <openssl/evp.h>
 

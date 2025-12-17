@@ -2,6 +2,8 @@
 #include "LgsConfigs.h"
 #include "LgsDefinitions.h"
 #include "LgsTokens.h"
+#include "errors/LgsErrors.h"
+
 #include <algorithm>
 #include <cassert>
 #include <iostream>
@@ -62,27 +64,6 @@ bool createDir(fs::path& dirPath) {
 
 bool isLogosFile(const fs::path& filePath) {
     return fs::exists(filePath) && is_regular_file(filePath) && filePath.extension().string() == LGS_FILE_EXTENSION;
-}
-
-bool isLogosKeyword(const std::string& s) {
-    return LGS_KEYWORDS.contains(s);
-}
-
-void printCliError(const LgsBaseMsg& err, const std::vector<std::string>& args) {
-    const auto errMsg = formatErrorMsg(err.msg, args) + '\n';
-    logError(errMsg);
-}
-
-std::string formatErrorMsg(const std::string& msg, const std::vector<std::string>& args) {
-    size_t pos = 0;
-    size_t argIndex = 0;
-    auto result = std::string(msg);
-    while ((pos = result.find(MSG_PLACEHOLDER, pos)) != std::string::npos && argIndex < args.size()) {
-        result.replace(pos, std::strlen(MSG_PLACEHOLDER), args[argIndex]);
-        pos += args[argIndex].length();
-        argIndex++;
-    }
-    return result;
 }
 
 std::string getFileText(const fs::path& filePath) {
@@ -156,7 +137,7 @@ time_t getLastWritten(const fs::path& filePath) {
     const auto ftime = fs::last_write_time(filePath);
     const auto sctp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(
         ftime - fs::file_time_type::clock::now() + std::chrono::system_clock::now()
-        );
+    );
     return std::chrono::system_clock::to_time_t(sctp);
 }
 
@@ -179,6 +160,37 @@ void logError(const std::string& msg, const std::string& epilogue) {
 
 void logWarning(const std::string& msg) {
     logInfo(LGS_COLORIZE(LGS_WARNING_TEXT, LGS_MSG_COLOR_YELLOW) + msg);
+}
+
+void printCliError(const LgsBaseMsg& err, const std::vector<std::string>& args) {
+    const auto errMsg = formatErrorMsg(err.msg, args) + '\n';
+    logError(errMsg);
+}
+
+std::string formatErrorMsg(const char* msg, const std::vector<std::string>& args) {
+    size_t pos = 0;
+    size_t argIndex = 0;
+    auto result = std::string(msg);
+    while ((pos = result.find(MSG_PLACEHOLDER, pos)) != std::string::npos && argIndex < args.size()) {
+        result.replace(pos, std::strlen(MSG_PLACEHOLDER), args[argIndex]);
+        pos += args[argIndex].length();
+        argIndex++;
+    }
+    return result;
+}
+
+void formatErrorMsg(const char* msg, char* out, const size_t count, va_list args) {
+    std::string result(msg);
+    size_t pos = 0;
+    for (size_t i = 0; i < count; i++) {
+        const auto arg = va_arg(args, const char*);
+        pos = result.find(MSG_PLACEHOLDER, pos);
+        if (pos == std::string::npos) break;
+        result.replace(pos, strlen(MSG_PLACEHOLDER), arg);
+        pos += strlen(arg);
+    }
+    std::strncpy(out, result.c_str(), STRING_BUFFER_SIZE - 1);
+    out[STRING_BUFFER_SIZE - 1] = '\0';
 }
 
 void combineNodeHash(size_t& oldHash, const size_t newHash) {

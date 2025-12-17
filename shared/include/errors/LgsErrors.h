@@ -1,34 +1,12 @@
 #pragma once
-#include <fstream>
-#include <string>
-#include <unordered_map>
-
-struct LgsLocation {
-    size_t index = 0;
-    size_t lineStart = 1;
-    size_t columnStart = 1;
-    size_t lineEnd = 1;
-    size_t columnEnd = 1;
-    std::filesystem::path* filepath = nullptr;
-};
 
 /**
  * Generic base struct for warnings and errors.
  */
 struct LgsBaseMsg {
     const char* const msg;
-    size_t const code;
-    LgsBaseMsg(const char* msg, const size_t code) : msg(msg), code(code) {}
-};
-
-struct LgsError {
-    std::string msg;
-    size_t errCode;
-    LgsLocation location;
-    std::string filePath = "";
-
-    LgsError(const std::string& msg, const size_t errCode) : msg(msg), errCode(errCode) {}
-    LgsError(const std::string& msg, const size_t errCode, const LgsLocation& location) : msg(msg), errCode(errCode), location(location) {}
+    size_t const errCode;
+    LgsBaseMsg(const char* msg, const size_t code) : msg(msg), errCode(code) {}
 };
 
 /** Templates errors. Should not be returned directly but formatted and wrapped around with another struct */
@@ -66,7 +44,7 @@ inline LgsBaseMsg E10029{"Constant field %s must be initialized in the class or 
 inline LgsBaseMsg E10030{"Non-public field %s is used outside its parent object %s.", errCodeStart++};
 inline LgsBaseMsg E10031{"Non-public method %s is used outside its parent object %s.", errCodeStart++};
 inline LgsBaseMsg E10032{"Singleton object %s cannot be instantiated.", errCodeStart++};
-inline LgsBaseMsg E10033{"Type name must start with an uppercase letter. Given: %s.", errCodeStart++};
+inline LgsBaseMsg E10033{"Type name must start with an uppercase letter.", errCodeStart++};
 inline LgsBaseMsg E10034{"%s has a method with name %s but it doesnt match the parameters.\nGiven:\t  %s\nExpected:  %s", errCodeStart++};
 inline LgsBaseMsg E10035{"Index of %s has %s level which is too deep. Max level: %s.", errCodeStart++};
 inline LgsBaseMsg E10036{"%s cannot be indexed with type %s.", errCodeStart++};
@@ -81,12 +59,12 @@ inline LgsBaseMsg E10044{"Value of switch case must be known at compile time. Gi
 inline LgsBaseMsg E10045{"Variadic argument cannot have default arguments.", errCodeStart++};
 inline LgsBaseMsg E10046{"%s is not callable.", errCodeStart++};
 inline LgsBaseMsg E10047{"External %s file '%s' was not found.", errCodeStart++};
-inline LgsBaseMsg E10048{"Index %s is out of bounds. Max expected index: %s", errCodeStart++};
+inline LgsBaseMsg E10048{"Index %s is out of bounds. Iterable length: %s", errCodeStart++};
 inline LgsBaseMsg E10049{"Not enough information to infer type of %s.", errCodeStart++};
 inline LgsBaseMsg E10050{"Only integer values can be incremented (++) or decremented (--). Given: %s.", errCodeStart++};
 inline LgsBaseMsg E10051{"%s is constant and cannot be overwritten.", errCodeStart++};
 inline LgsBaseMsg E10052{"Spread operator in %s... must only be used with iterables. Given type: %s.", errCodeStart++};
-inline LgsBaseMsg E10053{"%s is a Logos global name and cannot be redefined.", errCodeStart++};
+inline LgsBaseMsg E10053{"'%s' is a Logos global name and cannot be redefined.", errCodeStart++};
 inline LgsBaseMsg E10054{"Field %s is set more than one time.", errCodeStart++};
 inline LgsBaseMsg E10055{"Function %s must return from all its paths.", errCodeStart++};
 inline LgsBaseMsg E10056{"%s has multiple fields with the same name %s.", errCodeStart++};
@@ -106,8 +84,8 @@ inline LgsBaseMsg E10069{"Too many scalars passed to %s.", errCodeStart++};
 inline LgsBaseMsg E10070{"Invalid scalars %s for %s.", errCodeStart++};
 inline LgsBaseMsg E10071{"break if must be inside an if statement.", errCodeStart++};
 inline LgsBaseMsg E10072{"%s has multiple methods with the same name %s.", errCodeStart++};
-inline LgsBaseMsg E10073{"Only numbers or vectors can be elements of a vector. Given: %s.", errCodeStart++};
-inline LgsBaseMsg E10074{"Vector dimensions mismatch. Dimension: %s. Given: %s.", errCodeStart++};
+inline LgsBaseMsg E10073{"Vector elements must be numbers or vectors. Given: %s.", errCodeStart++};
+inline LgsBaseMsg E10074{"Too many vector elements for %s. Given: %s.", errCodeStart++};
 inline LgsBaseMsg E10075{"Expression %s already has an owner.", errCodeStart++};
 inline LgsBaseMsg E10076{"'%s' is not defined between %s and %s.", errCodeStart++}; // operation, left-expr, right-expr
 inline LgsBaseMsg E10077{"Expression %s has no owner.", errCodeStart++};
@@ -125,20 +103,25 @@ inline LgsBaseMsg E10088{"Bad character.", errCodeStart++};
 inline LgsBaseMsg E10089{"%s can only be assigned to an instance of %s, not the object itself.", errCodeStart++};
 inline LgsBaseMsg E10090{"%s can only prefix numbers. Given: %s.", errCodeStart++};
 inline LgsBaseMsg E10091{"'not' can only prefix Bool. Given: %s.", errCodeStart++};
-inline LgsBaseMsg E10092{"Condition %s must be of type Bool. Given: %s.", errCodeStart++};
+inline LgsBaseMsg E10092{"If condition must be of type Bool. Given: %s.", errCodeStart++};
 inline LgsBaseMsg E10093{"Cannot assign variable to Void type.", errCodeStart++};
 inline LgsBaseMsg E10094{"%s is not a parameter of '%s'.", errCodeStart++};
 inline LgsBaseMsg E10095{"Could not infer the type of the iterable.", errCodeStart++};
 inline LgsBaseMsg E10096{"Mixed named und position arguments are not allowed.", errCodeStart++};
 inline LgsBaseMsg E10097{"switch statement must have at least one pattern.", errCodeStart++};
 inline LgsBaseMsg E10098{"Argument %s is set more than one time.", errCodeStart++};
-inline LgsBaseMsg E10099{"Local names must start with a lowercase letter. Given: %s.", errCodeStart++};
+inline LgsBaseMsg E10099{"Local names must start with a lowercase letter.", errCodeStart++};
 inline LgsBaseMsg E10100{"Global variable '%s' must be declared const.", errCodeStart++};
 inline LgsBaseMsg E10101{"Macro condition must be known at compile time.", errCodeStart++};
 inline LgsBaseMsg E10102{"Macro condition must be of type Bool. Given: %s.", errCodeStart++};
 inline LgsBaseMsg E10103{"'%s' doesn't match the rows length. Given: %s.", errCodeStart++};
 inline LgsBaseMsg E10104{"'%s' doesn't match the columns length. Given: %s.", errCodeStart++};
-inline LgsBaseMsg E10105{"Too many elements for array of size %s", errCodeStart++};
+inline LgsBaseMsg E10105{"Too many elements for array of size: %s.", errCodeStart++};
 inline LgsBaseMsg E10106{"Could not parse C file %s", errCodeStart++};
 inline LgsBaseMsg E10107{"Could not find C library %s", errCodeStart++};
 inline LgsBaseMsg E10108{"%s is not indexable.", errCodeStart++};
+inline LgsBaseMsg E10109{"Primitive types should not have an ownership.", errCodeStart++};
+inline LgsBaseMsg E10110{"Unsigned number cannot be negative.", errCodeStart++};
+inline LgsBaseMsg E10111{"Array type %s does not match the element type %s.", errCodeStart++};
+inline LgsBaseMsg E10112{"Matrix rows/columns cannot be 0.", errCodeStart++};
+inline LgsBaseMsg E10113{"Only nullable values can be unwrapped with '!'.", errCodeStart++};

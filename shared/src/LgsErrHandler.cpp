@@ -1,7 +1,9 @@
-#include "../include/errors/LgsErrHandler.h"
+#include "errors/LgsErrHandler.h"
 #include "LgsDefinitions.h"
 #include "LgsUtils.h"
+#include "errors/LgsErrors.h"
 #include <algorithm>
+#include <cassert>
 
 void LgsErrHandler::setUnsuccessful() {
     successful = false;
@@ -9,14 +11,15 @@ void LgsErrHandler::setUnsuccessful() {
 
 void LgsErrHandler::addError(const LgsBaseMsg& lgsErr, const std::vector<std::string>& args) {
     setUnsuccessful();
-    LgsError err(formatErrorMsg(lgsErr.msg, args), lgsErr.code);
+    LgsError err(formatErrorMsg(lgsErr.msg, args), lgsErr.errCode);
     errors.emplace_back(err);
 }
 
 void LgsErrHandler::addError(const LgsBaseMsg& lgsErr, const LgsLocation* location, const std::string& filePath, const std::vector<std::string>& args) {
     setUnsuccessful();
-    LgsError err(formatErrorMsg(lgsErr.msg, args), lgsErr.code);
+    LgsError err(formatErrorMsg(lgsErr.msg, args), lgsErr.errCode);
     if (location) {
+        assert(filePath != "");
         err.location = *location;
         err.filePath = filePath;
         errors.emplace_back(err);
@@ -28,9 +31,9 @@ void LgsErrHandler::addError(const LgsBaseMsg& lgsErr, const LgsLocation* locati
 void LgsErrHandler::addWarning(const LgsBaseMsg& lgsErr, const LgsLocation* location, const std::vector<std::string>& args) {
     const auto result = formatErrorMsg(lgsErr.msg, args);
     if (location) {
-        warnings.emplace_back(LgsWarning(result, lgsErr.code, *location));
+        warnings.emplace_back(LgsWarning(result, lgsErr.errCode, *location));
     } else {
-        warnings.emplace_back(LgsWarning(result, lgsErr.code));
+        warnings.emplace_back(LgsWarning(result, lgsErr.errCode));
     }
 }
 

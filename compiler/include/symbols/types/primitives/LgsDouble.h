@@ -6,16 +6,18 @@ public:
     static constexpr auto name = "Double";
     LgsDouble() {
         isPrimitive = true;
-        isFloatingPoint = true;
+        isFloat = true;
     }
     Type* getIRType(LgsCgModule& cg) override;
     Constant* getRTType(LgsCgModule& cg) override;
     std::string getName() override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
-    LgsType* applyBinOp(LgsType* toType, LgsBinOp& op) override;
+    LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     std::string fmtStr() const override;
     bool canCastTo(LgsType* other) override;
+    Value* addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
+    Value* mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
     Value* powIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
     DIType* getDebugType(LgsCgModule& cg) override;
 };

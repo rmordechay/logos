@@ -3,6 +3,8 @@
 #include "LgsDefinitions.h"
 #include "LgsUtils.h"
 
+#include <sstream>
+
 void LgsCliCmd::printHelp() {
     const auto h = getHelp();
     assert(h.name != "" && h.usage != "" && h.desc != "" && !h.examples.empty());

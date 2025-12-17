@@ -1,12 +1,10 @@
 #include "types/LgsPtr.h"
 
-#include "exprs/LgsNull.h"
+#include "codegen/LgsCodeGen.h"
 #include "types/LgsAny.h"
 #include "types/iterables/LgsDArray.h"
 #include "types/iterables/LgsSArray.h"
 #include "types/primitives/LgsLong.h"
-#include "LgsUtils.h"
-#include "exprs/LgsNullableExpr.h"
 
 std::string LgsPtr::getName() {
     return name;
@@ -29,7 +27,7 @@ size_t LgsPtr::sizeBytes() {
 }
 
 LgsExpr* LgsPtr::getZeroValue() {
-    return new LgsNullableExpr(new LgsNull());
+    assert(0);
 }
 
 bool LgsPtr::canCastTo(LgsType* other) {
@@ -41,7 +39,7 @@ bool LgsPtr::canCastTo(LgsType* other) {
     return name == IRName;
 }
 
-LgsType* LgsPtr::applyBinOp(LgsType* toType, LgsBinOp& op) {
+LgsType* LgsPtr::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     assert(0);
 }
 

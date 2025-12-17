@@ -18,12 +18,15 @@ LgsDeferStmt* LgsStmt::asDefer() { return dynamic_cast<LgsDeferStmt*>(this); }
 LgsIfStmt* LgsStmt::asIfStmt() { return dynamic_cast<LgsIfStmt*>(this); }
 LgsIOStmt* LgsStmt::asIOStmt() { return dynamic_cast<LgsIOStmt*>(this); }
 LgsSwitch* LgsStmt::asSwitch() { return dynamic_cast<LgsSwitch*>(this); }
-LgsExpr* LgsStmt::asExpr() { return dynamic_cast<LgsExpr*>(this); }
 LgsBreak* LgsStmt::asBreak() { return dynamic_cast<LgsBreak*>(this); }
 LgsContinue* LgsStmt::asContinue() { return dynamic_cast<LgsContinue*>(this); }
 LgsReturn* LgsStmt::asReturn() { return dynamic_cast<LgsReturn*>(this); }
 LgsVarDec* LgsStmt::asVarDec() { return dynamic_cast<LgsVarDec*>(this); }
 LgsAssignment* LgsStmt::asAssignment() { return dynamic_cast<LgsAssignment*>(this); }
+
+LgsStmt* LgsStmt::clone() {
+    assert(0);
+}
 
 void freeStmt(const LgsStmt* stmt) {
     if (!stmt) return;

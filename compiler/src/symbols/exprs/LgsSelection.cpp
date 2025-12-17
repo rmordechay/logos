@@ -9,6 +9,7 @@
 #include <llvm/IR/InlineAsm.h>
 
 Value* LgsSelection::loadIR(LgsCgModule& cg) {
+    if (type->passByRef) return cg.builder.CreateLoad(cg.ptrTy(), IRValue);
     return cg.builder.CreateLoad(type->getIRType(cg), IRValue);
 }
 
@@ -29,10 +30,10 @@ void LgsSelection::assign(LgsCgModule& cg, LgsExpr* expr) {
         const auto c = lastExpr()->asVariable()->name;
         const auto i = cg.i32(LgsVec::getComponentIndex(c.front()));
         const auto insert = cg.builder.CreateInsertElement(vec, rIR, i);
-        cg.builder.CreateStore(insert, lExpr->IRValue);
+        cg.store(insert, lExpr->IRValue);
     } else {
-        freeOwner(cg);
-        cg.builder.CreateStore(rIR, IRValue);
+        cg.freeValue(loadIR(cg), type->getRTType(cg));
+        cg.store(rIR, IRValue);
     }
 }
 

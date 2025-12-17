@@ -1,4 +1,6 @@
 #include "types/primitives/LgsBool.h"
+
+#include "exprs/LgsNullableExpr.h"
 #include "exprs/constants/LgsIntConst.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsChar.h"
@@ -14,11 +16,11 @@ Type* LgsBool::getIRType(LgsCgModule& cg) {
 }
 
 Constant* LgsBool::getRTType(LgsCgModule& cg) {
-    return cg.getRTTypeInfo(getGenericName(), sizeBytes(), sizeBytes(), RTT_BOOL, cg.null());
+    return cg.getRTTypeInfo(getName(), sizeBytes(), RTT_BOOL, isHeapAlloc, cg.null());
 }
 
-LgsType* LgsBool::applyBinOp(LgsType* toType, LgsBinOp& op) {
-    return applyIntBinOp(toType, op.opType);
+LgsType* LgsBool::applyBinOp(LgsType* rightType, LgsBinOp& op) {
+    assert(0);
 }
 
 Value* LgsBool::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
@@ -67,38 +69,6 @@ Value* LgsBool::rshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
 
 Value* LgsBool::lshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* other) {
     return cg.builder.CreateLShr(left->loadIR(cg), other->loadIR(cg));
-}
-
-Value* LgsBool::eqIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return cg.builder.CreateICmpEQ(left->loadIR(cg), right->loadIR(cg));
-}
-
-Value* LgsBool::neIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return cg.builder.CreateICmpNE(left->loadIR(cg), right->loadIR(cg));
-}
-
-Value* LgsBool::ltIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return cg.builder.CreateICmpSLT(left->loadIR(cg), right->loadIR(cg));
-}
-
-Value* LgsBool::gtIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return cg.builder.CreateICmpSGT(left->loadIR(cg), right->loadIR(cg));
-}
-
-Value* LgsBool::geIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return cg.builder.CreateICmpSGE(left->loadIR(cg), right->loadIR(cg));
-}
-
-Value* LgsBool::leIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return cg.builder.CreateICmpSLE(left->loadIR(cg), right->loadIR(cg));
-}
-
-Value* LgsBool::andIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return andInt(cg, left, right);
-}
-
-Value* LgsBool::orIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return orInt(cg, left, right);
 }
 
 std::string LgsBool::getName() {

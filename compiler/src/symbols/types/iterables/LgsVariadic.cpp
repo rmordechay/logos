@@ -13,14 +13,14 @@ Type* LgsVariadic::getIRType(LgsCgModule& cg) {
 }
 
 Constant* LgsVariadic::getRTType(LgsCgModule& cg) {
-    return cg.getRTTypeInfo(getGenericName(), sizeBytes(), sizeBytes(), RTT_VARIADIC, cg.null());
+    return cg.getRTTypeInfo(getName(), sizeBytes(), RTT_VARIADIC, isHeapAlloc, cg.null());
 }
 
 bool LgsVariadic::canCastTo(LgsType* other) {
     assert(0);
 }
 
-LgsType* LgsVariadic::applyBinOp(LgsType* toType, LgsBinOp& op) {
+LgsType* LgsVariadic::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     assert(0);
 }
 
@@ -36,7 +36,7 @@ std::string LgsVariadic::getName() {
     return baseType->getName() + "...";
 }
 
-bool LgsVariadic::inferBaseType(const std::vector<LgsExpr*>& args) {
+bool LgsVariadic::inferBaseType(std::vector<LgsExpr*>& args) {
     assert(0);
 }
 

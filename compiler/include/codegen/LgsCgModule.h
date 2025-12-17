@@ -2,17 +2,13 @@
 #include "Lgs_Types.h"
 
 #include <llvm/IR/IRBuilder.h>
-#include <llvm/IR/DIBuilder.h>
 #include <llvm/Passes/OptimizationLevel.h>
 #include <cmath>
 #include <map>
 #include <filesystem>
 
-struct LgsPaths;
-struct LgsAppConfigs;
-struct LgsLocation;
-class LgsFile;
 namespace llvm {
+    class DIBuilder;
     class PassBuilder;
     class TargetMachine;
 }
@@ -45,6 +41,12 @@ using llvm::IRBuilder;
 using llvm::Type;
 using llvm::Value;
 
+struct LgsPaths;
+struct LgsAppConfigs;
+struct LgsLocation;
+struct LgsBaseMsg;
+class LgsFile;
+
 struct LgsLLDBGen {
     DIFile* diFile = nullptr;
     DIBuilder* diBuilder = nullptr;
@@ -66,14 +68,17 @@ public:
 
     void setupModule(const std::filesystem::path& file, bool debugMode = false);
     bool writeIRModule(const LgsPaths& paths, uint8_t optLevel) const;
-    void loop(Value* loopLength, const std::function<void(Value*, BasicBlock*)>& body);
     Constant* getString(const std::string& value);
-    Value* getPtrTo(Value* v);
-    GlobalVariable* createGlobal(const std::string& name, Type* type, Constant* args, bool isConst = false, GlobalValue::LinkageTypes linkage = GlobalValue::ExternalLinkage) const;
-    StructType* getStructType(const std::vector<Type*>& fields, const std::string& name = "");
     llvm::AllocaInst* getEmptyBuffer();
-    Constant* getRTTypeInfo(const std::string& name, size_t size, size_t alignment, Lgs_TypeKind kind, Constant* extra);
-    StructType* getRTBaseType();
+    GlobalVariable* createGlobal(const std::string& name, Type* type, Constant* initializer, bool isConst = true, GlobalValue::LinkageTypes linkage = GlobalValue::ExternalLinkage) const;
+    StructType* getStructType(const std::vector<Type*>& fields, const std::string& name = "");
+    void storeStructField(Type* type, Value* instancePtr, size_t position, Value* v);
+    void store(Value* v, Value* ptr);
+    Value* allocaAndStore(Type* type, Value* v);
+    void loop(Value* loopLength, const std::function<void(Value*, BasicBlock*)>& body);
+    Constant* getRTTypeInfo(const std::string& name, size_t size, Lgs_TypeKind kind, bool isHeapAlloc, Constant* extra);
+    Constant* getRTTExtraStruct(const std::string& name, const std::vector<Type*>& fields, const std::vector<Constant*>& args);
+    StructType* getRTTBaseStruct();
 
     // Blocks
     BasicBlock* createBlock(const std::string& name = "", Function* parent = nullptr);
@@ -81,25 +86,27 @@ public:
     void startBlock(BasicBlock* block);
     void branchAndStartBlock(BasicBlock* block);
     bool lastInstTerminator() const;
-    void createBoundsGuard(Value* len, Value* index);
+    void createIndexBoundsGuard(Value* len, Value* index);
+    void createArrBoundsGuard(Value* maxLen, Value* arrLen);
 
     // Funcs
     static FunctionType* getFT(Type* rt, const std::vector<Type*>& params = {}, bool isVariadic = false);
     Function* getFunc(const std::string& funcName, FunctionType* ft, GlobalValue::LinkageTypes linkage = GlobalValue::ExternalLinkage) const;
     Value* callFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes = {}, const std::vector<Value*>& args = {}, bool isVariadic = false);
     Value* callIntrinsics(llvm::Intrinsic::ID intrinsicID, const std::vector<Type*>& types = {}, const std::vector<Value*>& args = {});
-    Value* callLgsFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes = {}, const std::vector<Value*>& args = {});
-    Value* callRuntimeFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes = {}, const std::vector<Value*>& args = {});
-    Value* callHash(Value* arg);
-    Constant* hashConst(const std::string& str);
+    Value* callLgsFunc(const std::string& baseName, const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes = {}, const std::vector<Value*>& args = {});
+    Value* callRuntimeFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes = {}, const std::vector<Value*>& args = {}, bool isVariadic = false);
 
-    // System
     Value* callPrintf(const std::vector<Value*>& args);
-    Value* callSnprintf(Value* buffer, Value* fmt, const std::vector<Value*>& args);
+    Value* callSnprintf(const std::string& fmt, const std::vector<Value*>& args);
     Value* callStrLen(Value* str);
     void callMemSet(Value* dest, Value* src, Value* size);
     void callMemCpy(Value* dest, Value* src, Value* size);
-    Value* allocate(Value* size, Constant* type, bool isOwner);
+    Value* callHash(Value* arg);
+    Constant* hashConst(const std::string& str);
+    void callThrowError(const LgsBaseMsg& err, const std::vector<Value*>& args = {});
+    void freeValue(Value* ptr, Constant* type);
+    Value* allocate(Value* size, Constant* type, bool isOwner, bool isReturnExpr = false);
 
     // Stack
     void callStackPush();

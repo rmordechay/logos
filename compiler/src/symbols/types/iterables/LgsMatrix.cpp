@@ -1,4 +1,6 @@
 #include "types/iterables/LgsMatrix.h"
+
+#include "LgsBinaryTokens.h"
 #include "cblas/cblas.h"
 #include "exprs/LgsMatrixExpr.h"
 #include "types/LgsAny.h"
@@ -13,20 +15,20 @@ size_t LgsMatrix::sizeBytes() {
     return rows * columns * baseType->sizeBytes();
 }
 
-LgsType* LgsMatrix::applyBinOp(LgsType* toType, LgsBinOp& op) {
-    if (toType->isNumber()) {
-        return applyMatScalarOp(toType, op);
+LgsType* LgsMatrix::applyBinOp(LgsType* rightType, LgsBinOp& op) {
+    if (rightType->isNumber()) {
+        return applyMatScalarOp(rightType, op);
     }
-    if (const auto vec = toType->asVec()) {
+    if (const auto vec = rightType->asVec()) {
         return applyMatVecOp(vec, op);
     }
-    if (const auto otherMat = toType->asMatrix()) {
+    if (const auto otherMat = rightType->asMatrix()) {
         return applyMatMatOp(otherMat, op);
     }
     return nullptr;
 }
 
-LgsType* LgsMatrix::applyMatScalarOp(const LgsType* number, const LgsBinOp& op) const {
+LgsType* LgsMatrix::applyMatScalarOp(LgsType* number, const LgsBinOp& op) const {
     if (!number->isNumber()) return nullptr;
     switch (op.opType) {
     case ADD:
@@ -41,7 +43,7 @@ LgsType* LgsMatrix::applyMatScalarOp(const LgsType* number, const LgsBinOp& op) 
 
 LgsType* LgsMatrix::applyMatVecOp(const LgsVec* vec, const LgsBinOp& op) const {
     if (op.opType != MUL) return nullptr;
-    if (vec->vectorDim != columns) return nullptr;
+    if (vec->dimVec != columns) return nullptr;
     return new LgsVec(rows, baseType);
 }
 
@@ -100,22 +102,17 @@ LgsExpr* LgsMatrix::getZeroValue() {
 }
 
 LgsType* LgsMatrix::getValueType() {
-    return new LgsSArray(baseType, new LgsIntConst(&LGS_INT, columns));
+    return new LgsSArray(baseType, new LgsIntConst(columns));
 }
 
 Constant* LgsMatrix::getRTType(LgsCgModule& cg) {
-    const auto genericName = getGenericName();
-    const auto st = cg.getStructType({cg.sizeTy(), cg.sizeTy(), cg.ptrTy()}, genericName);
-    const auto sv = ConstantStruct::get(st, {cg.usize(rows), cg.usize(columns), baseType->getRTType(cg)});
-    return cg.getRTTypeInfo(genericName, sizeBytes(), sizeBytes(), RTT_MATRIX, sv);
+    const auto matName = getName();
+    const auto sv = cg.getRTTExtraStruct(matName, {cg.sizeTy(), cg.sizeTy(), cg.ptrTy()}, {cg.usize(rows), cg.usize(columns), baseType->getRTType(cg)});
+    return cg.getRTTypeInfo(matName, sizeBytes(), RTT_MATRIX, isHeapAlloc, sv);
 }
 
 std::string LgsMatrix::getName() {
     return "Mat" + std::to_string(rows) + "x" + std::to_string(columns);
-}
-
-std::string LgsMatrix::getGenericName() {
-    return getName() + baseType->getGenericName();
 }
 
 bool LgsMatrix::canCastTo(LgsType* other) {
@@ -128,7 +125,7 @@ std::string LgsMatrix::fmtStr() const {
     return "%s";
 }
 
-bool LgsMatrix::inferBaseType(const std::vector<LgsExpr*>& args) {
+bool LgsMatrix::inferBaseType(std::vector<LgsExpr*>& args) {
     assert(0);
 }
 

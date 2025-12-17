@@ -1,4 +1,7 @@
 #include "parser/LgsLexer.h"
+
+#include "errors/LgsErrors.h"
+
 #include <cassert>
 #include <iostream>
 
@@ -56,11 +59,15 @@ LgsToken LgsLexer::nextToken() {
     }
 
     // Number
-    if (std::isdigit(currentChar)) {
+    if (std::isdigit(currentChar) || (currentChar == '-' && std::isdigit(peek()))) {
         return scanNumber(location);
     }
-    if (currentChar == '-' && std::isdigit(peek())) {
-        return scanNumber(location);
+
+    // Slider
+    if (currentChar == '_' && peek() == '/') {
+        advance();
+        advance();
+        return {T_SLIDER, "_/", location};
     }
 
     // Var or keyword
@@ -153,7 +160,6 @@ LgsToken LgsLexer::nextToken() {
         return {T_STAR, "*", location};
     case '_':
         advance();
-        if (match('/')) return {T_SLIDER, "_/", location};
         if (std::isalpha(currentChar)) {
             return scanVarOrKeyword(location);
         }
@@ -185,7 +191,7 @@ LgsToken LgsLexer::nextToken() {
         if (match('=')) return {T_EQUAL_CARET, "^=", location};
         return {T_CARET, "^", location};
     default:
-        errHandler.addError(E10088, &location, filePath, {});
+        errHandler.addError(E10088, &location, filePath);
         return {T_EOF, "", location};
     }
 }
@@ -198,6 +204,7 @@ char LgsLexer::advance() {
     currentChar = source[++index];
     if (currentChar == '\n') {
         line++;
+        column = 1;
     } else {
         column++;
     }
@@ -217,26 +224,83 @@ char LgsLexer::peek(const size_t offset) const {
     return source[index + offset];
 }
 
-LgsToken LgsLexer::scanMatrix(const LgsLocation& location, std::string& lexeme) {
-    if (!std::isdigit(currentChar) || currentChar == '0') {
-        errHandler.addError(E10088, &location, filePath, {});
-        return {};
+LgsToken LgsLexer::scanNumber(const LgsLocation& location) {
+    std::string lexeme;
+    // Minus
+    if (currentChar == '-') {
+        lexeme += currentChar;
+        advance();
     }
-    lexeme += currentChar;
-    advance();
-    if (currentChar != 'x') {
-        errHandler.addError(E10088, &location, filePath, {});
-        return {};
+    // Hexadecimal
+    if (currentChar == '0' && peek() == 'x') {
+        lexeme += currentChar;
+        advance();
+        lexeme += currentChar;
+        advance();
+        while (std::isxdigit(currentChar) || currentChar == '_') {
+            lexeme += currentChar;
+            advance();
+        }
+        return {T_HEX, lexeme, location};
     }
-    lexeme += currentChar;
-    advance();
-    if (!std::isdigit(currentChar) || currentChar == '0') {
-        errHandler.addError(E10088, &location, filePath, {});
-        return {};
+    // Binary
+    if (currentChar == '0' && peek() == 'b') {
+        lexeme += currentChar;
+        advance();
+        lexeme += currentChar;
+        advance();
+        while (currentChar == '0' || currentChar == '1' || currentChar == '_') {
+            lexeme += currentChar;
+            advance();
+        }
+        return {T_BINARY, lexeme, location};
     }
-    lexeme += currentChar;
-    advance();
-    return {T_MATRIX, lexeme, location};
+    // Int
+    while (std::isdigit(currentChar) || currentChar == '_') {
+        lexeme += currentChar;
+        advance();
+    }
+
+    // Imaginary
+    if (currentChar == 'i') {
+        advance();
+        return {T_IMAGINARY, lexeme, location};
+    }
+
+    // Float
+    if (currentChar == '.' && peek() != '.') {
+        lexeme += currentChar;
+        advance();
+        while (std::isdigit(currentChar)) {
+            lexeme += currentChar;
+            advance();
+        }
+        if (currentChar == 'D') {
+            lexeme += currentChar;
+            advance();
+            return {T_DOUBLE, lexeme, location};
+        }
+        return {T_FLOAT, lexeme, location};
+    }
+    // Long
+    if (currentChar == 'L') {
+        lexeme += currentChar;
+        advance();
+        return {T_LONG, lexeme, location};
+    }
+    // Double
+    if (currentChar == 'D') {
+        lexeme += currentChar;
+        advance();
+        return {T_DOUBLE, lexeme, location};
+    }
+    // Unsigned
+    if (currentChar == 'U') {
+        lexeme += currentChar;
+        advance();
+        return {T_UINT, lexeme, location};
+    }
+    return {T_INT, lexeme, location};
 }
 
 LgsToken LgsLexer::scanVarOrKeyword(const LgsLocation& location) {
@@ -250,7 +314,7 @@ LgsToken LgsLexer::scanVarOrKeyword(const LgsLocation& location) {
 
     while (std::isalnum(currentChar) || currentChar == '_') {
         if (lexeme == "Mat") {
-            return scanMatrix(location, lexeme);
+            return scanMatrixDims(location, lexeme);
         }
         lexeme += currentChar;
         advance();
@@ -272,8 +336,9 @@ LgsToken LgsLexer::scanVarOrKeyword(const LgsLocation& location) {
         if (metaVar == "i") return {T_FOR_I, combined, location};
         if (metaVar == "isFirst") return {T_FOR_IS_FIRST, combined, location};
         if (metaVar == "isLast") return {T_FOR_IS_LAST, combined, location};
+        if (metaVar == "element") return {T_FOR_ELEMENT, combined, location};
         if (metaVar == "ever") return {T_FOR_EVER, combined, location};
-        errHandler.addError(E10088, &location, filePath, {});
+        errHandler.addError(E10088, &location, filePath);
         return {T_EOF, "", location};
     }
 
@@ -282,6 +347,35 @@ LgsToken LgsLexer::scanVarOrKeyword(const LgsLocation& location) {
         return {it->second, lexeme, location};
     }
     return {T_IDENTIFIER, lexeme, location};
+}
+
+LgsToken LgsLexer::scanMatrixDims(const LgsLocation& location, std::string& lexeme) {
+    // Rows
+    std::string rows;
+    while (std::isdigit(currentChar)) {
+        rows += currentChar;
+        lexeme += currentChar;
+        advance();
+    }
+    if (rows == "" || currentChar != 'x') {
+        errHandler.addError(E10088, &location, filePath);
+        return {};
+    }
+    // x
+    lexeme += currentChar;
+    advance();
+    // Columns
+    std::string columns;
+    while (std::isdigit(currentChar)) {
+        columns += currentChar;
+        lexeme += currentChar;
+        advance();
+    }
+    if (columns == "") {
+        errHandler.addError(E10088, &location, filePath);
+        return {};
+    }
+    return {T_MATRIX, lexeme, location};
 }
 
 std::string LgsLexer::scanDoubleQuotesString() {
@@ -322,71 +416,26 @@ std::string LgsLexer::scanMultilineString() {
     return result;
 }
 
-LgsToken LgsLexer::scanNumber(const LgsLocation& location) {
-    std::string lexeme;
-    // Minus
-    if (currentChar == '-') {
-        lexeme += currentChar;
+void LgsLexer::scanEscapeChar(std::string& result) {
+    if (currentChar == '\\') {
         advance();
-    }
-    // Hexadecimal
-    if (currentChar == '0' && peek() == 'x') {
-        lexeme += currentChar;
-        advance();
-        lexeme += currentChar;
-        advance();
-        while (std::isxdigit(currentChar) || currentChar == '_') {
-            lexeme += currentChar;
-            advance();
+        switch (currentChar) {
+        case 'n': result += '\n'; break;
+        case 'r': result += '\r'; break;
+        case 't': result += '\t'; break;
+        case '\\': result += '\\'; break;
+        case '"': result += '"'; break;
+        case '\'': result += '\''; break;
+        case '0': result += '\0'; break;
+        default:
+            result += '\\';
+            result += currentChar;
+            break;
         }
-        return {T_HEX, lexeme, location};
+    } else {
+        result += currentChar;
     }
-    // Binary
-    if (currentChar == '0' && peek() == 'b') {
-        lexeme += currentChar;
-        advance();
-        lexeme += currentChar;
-        advance();
-        while (currentChar == '0' || currentChar == '1' || currentChar == '_') {
-            lexeme += currentChar;
-            advance();
-        }
-        return {T_BINARY, lexeme, location};
-    }
-    // Int
-    while (std::isdigit(currentChar) || currentChar == '_') {
-        lexeme += currentChar;
-        advance();
-    }
-    // Float
-    if (currentChar == '.' && peek() != '.') {
-        lexeme += currentChar;
-        advance();
-        while (std::isdigit(currentChar)) {
-            lexeme += currentChar;
-            advance();
-        }
-        // Double
-        if (currentChar == 'D') {
-            lexeme += currentChar;
-            advance();
-            return {T_DOUBLE, lexeme, location};
-        }
-        return {T_FLOAT, lexeme, location};
-    }
-    // Long
-    if (currentChar == 'L') {
-        lexeme += currentChar;
-        advance();
-        return {T_LONG, lexeme, location};
-    }
-    // Double
-    if (currentChar == 'D') {
-        lexeme += currentChar;
-        advance();
-        return {T_DOUBLE, lexeme, location};
-    }
-    return {T_INT, lexeme, location};
+    advance();
 }
 
 void LgsLexer::skipWhitespace() {
@@ -415,26 +464,4 @@ void LgsLexer::skipBlockComment() {
         }
         advance();
     }
-}
-
-void LgsLexer::scanEscapeChar(std::string& result) {
-    if (currentChar == '\\') {
-        advance();
-        switch (currentChar) {
-        case 'n': result += '\n'; break;
-        case 'r': result += '\r'; break;
-        case 't': result += '\t'; break;
-        case '\\': result += '\\'; break;
-        case '"': result += '"'; break;
-        case '\'': result += '\''; break;
-        case '0': result += '\0'; break;
-        default:
-            result += '\\';
-            result += currentChar;
-            break;
-        }
-    } else {
-        result += currentChar;
-    }
-    advance();
 }

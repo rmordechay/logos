@@ -13,15 +13,13 @@ enum LgsFuncFlags : uint32_t {
     IO_MEMBER = 1 << 7,
     SYSCALL = 1 << 8,
     EXTERNAL = 1 << 9,
-    ARR_FUNC = 1 << 10,
-    TERMINATOR = 1 << 11,
-    HAS_DEFAULTS = 1 << 12,
+    TERMINATOR = 1 << 10,
+    HAS_DEFAULTS = 1 << 11,
 };
 
 class LgsFuncType final : public LgsType {
 public:
     std::string name;
-    std::string IRName;
     std::string parentName;
     LgsType* rt = nullptr;
     std::vector<LgsParam> params;
@@ -38,7 +36,6 @@ public:
     bool isIOMember = false;
     bool isSyscall = false;
     bool isExternal = false;
-    bool isArrFunc = false;
     bool isTerminator = false;
     bool hasDefaults = false;
     uint32_t variadicIndex = 0;
@@ -57,9 +54,10 @@ public:
     std::string fmtStr() const override;
     bool canCastTo(LgsType* other) override;
     bool equals(LgsType* other) override;
-    LgsType* applyBinOp(LgsType* toType, LgsBinOp& op) override;
+    LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     void setFuncOptions(uint32_t ops);
     std::unordered_map<std::string, LgsParam*> getParamsByName();
     DIType* getDebugType(LgsCgModule& cg) override;
     ~LgsFuncType() override;
+    bool isGenericType(LgsType* type) const;
 };

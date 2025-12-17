@@ -14,7 +14,7 @@ void LgsForeachLoop::incAndJumpToCond(LgsCgModule& cg) {
     if (cg.lastInstTerminator()) return;
     iValue = cg.builder.CreateLoad(cg.i32Ty(), iPtr);
     const auto inc = cg.builder.CreateAdd(iValue, cg.i32(1));
-    cg.builder.CreateStore(inc, iPtr);
+    cg.store(inc, iPtr);
     cg.builder.CreateBr(IRCondBlock);
 }
 

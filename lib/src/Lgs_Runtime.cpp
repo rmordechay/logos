@@ -1,82 +1,113 @@
+#include "Lgs_Runtime.h"
+
+#include "LgsConfigs.h"
 #include "LgsDefinitions.h"
-#include "Lgs_Allocator.h"
-#include "Lgs_Types.h"
-#include <cassert>
-#include "Lgs_HashMap.h"
 #include "LgsUtils.h"
 #include "Lgs_DArrayExpr.h"
-#include "Lgs_Helpers.h"
 #include "Lgs_SetExpr.h"
 #include "context/Lgs_Aarch64.h"
-#include <iostream>
-#include <stack>
+#include <cassert>
 
-static void freeValue(void* ptr, const Lgs_TypeInfo* type);
-extern "C" void Lgs_Runtime_callDefers();
-
-struct Lgs_StackFrame {
-    std::unordered_map<void*, Lgs_TypeInfo*> owners;
-    std::unordered_map<void*, Lgs_TypeInfo*> orphans;
-    std::vector<Lgs_ThunkFunc> defers;
-};
-
-struct Lgs_Runtime {
-    Lgs_Allocator arena;
-    std::vector<Lgs_ThunkFunc> coros;
-    std::stack<Lgs_StackFrame> stack;
-    std::unordered_map<VKey, void*, VKeyHash> vtable;
-};
-
-static inline Lgs_Runtime runtime;
+extern "C" void Lgs_Runtime_freeValue(void* ptr, const Lgs_TypeInfo* type);
 
 extern "C" void Lgs_Runtime_init() {}
 
-extern "C" void Lgs_Runtime_close() {
-    runtime.arena.free();
-}
+extern "C" void Lgs_Runtime_close() {}
 
 extern "C" void Lgs_Runtime_push() {
-    runtime.stack.push(Lgs_StackFrame{});
+    runtime.stackLevel++;
 }
 
 extern "C" void Lgs_Runtime_pop() {
-    // Call defers
-    for (auto [func, ctx] : runtime.stack.top().defers) {
+    auto& top = runtime.stack[runtime.stackLevel];
+    for (auto [func, ctx] : top.defers) {
         func(ctx);
     }
-    // Free values
-    for (const auto [ptr, type] : runtime.stack.top().owners) {
-        std::cout << "Freeing owner: " << ptr << '\n';
-        // freeValue(ptr, type);
+    if (!top.orphans.empty()) {
+        for (const auto& [ptr, type] : top.orphans) {
+            Lgs_Runtime_freeValue(ptr, type);
+        }
+        top.orphans.clear();
     }
-    for (const auto [ptr, type] : runtime.stack.top().orphans) {
-        std::cout << "Freeing orphan: " << ptr << '\n';
-        // freeValue(ptr, type);
-    }
-    runtime.stack.pop();
+    runtime.stackLevel--;
 }
 
 extern "C" void Lgs_Runtime_addDefer(const ThunkFunc funcPtr, void* ctx) {
-    runtime.stack.top().defers.emplace_back(Lgs_ThunkFunc{funcPtr, ctx});
+    runtime.stack[runtime.stackLevel].defers.emplace_back(Lgs_ThunkFunc{funcPtr, ctx});
 }
 
 extern "C" void Lgs_Runtime_addCoro(const ThunkFunc funcPtr, void* ctx) {
     runtime.coros.emplace_back(Lgs_ThunkFunc{funcPtr, ctx});
 }
 
-extern "C" void* Lgs_Runtime_allocate(const size_t size, Lgs_TypeInfo* type, const bool isOwner) {
+extern "C" void* Lgs_Runtime_allocate(const size_t size, Lgs_TypeInfo* type) {
     const auto ptr = std::malloc(size);
-    std::cout << "Allocated: " << size << ' ' << '\n';
-    if (isOwner) {
-        runtime.stack.top().owners[ptr] = type;
-    } else {
-        runtime.stack.top().orphans[ptr] = type;
-    }
+    //std::println("Allocated orphan in {}: {}B {}", runtime.stackLevel, size, ptr);
+    runtime.stack[runtime.stackLevel].orphans[ptr] = type;
     return ptr;
 }
 
-extern "C" void Lgs_Runtime_removeOwner(const void* owner) {
-    assert(0);
+extern "C" void* Lgs_Runtime_allocateReturn(const size_t size, Lgs_TypeInfo* type) {
+    const auto ptr = std::malloc(size);
+    //std::println("Allocated return in {}: {}B {}", runtime.stackLevel, size, ptr);
+    // This is safe because the func should never be called from the main frame
+    runtime.stack[runtime.stack.size() - 2].orphans[ptr] = type;
+    return ptr;
+}
+
+extern "C" void Lgs_Runtime_freeOwner(void* ptr, const Lgs_TypeInfo* type) {
+    Lgs_Runtime_freeValue(ptr, type);
+    runtime.stack[runtime.stackLevel].orphans.erase(ptr);
+}
+
+extern "C" void Lgs_Runtime_freeValue(void* ptr, const Lgs_TypeInfo* type) {
+    if (!ptr || !type->isHeap) return;
+    //std::println("Freeing in {}: {}", runtime.stackLevel, ptr);
+    switch (type->kind) {
+    case RTT_DARRAY: {
+        const auto darray = static_cast<Lgs_DArrayExpr*>(ptr);
+        auto offset = 0;
+        for (int i = 0; i < darray->length; ++i) {
+            const auto element = darray->data + offset;
+            Lgs_Runtime_freeValue(element, type->dArray.baseType);
+            offset += type->dArray.baseType->size;
+        }
+        //std::free(ptr);
+        break;
+    }
+    case RTT_SET: {
+        const auto set = static_cast<Lgs_SetExpr*>(ptr);
+        //std::free(set->data);
+        //std::free(ptr);
+        break;
+    }
+    case RTT_OBJECT: {
+        const auto fieldsCount = type->obj.fieldsCount;
+        const auto fieldTypes = type->obj.fieldTypes;
+        size_t offset = 0;
+        for (size_t i = 0; i < fieldsCount; ++i) {
+            const auto fieldType = fieldTypes[i];
+            void* fieldPtr = static_cast<char*>(ptr) + offset;
+            // freeValue(fieldPtr, fieldType);
+            offset += fieldType->size;
+        }
+        // std::free(ptr);
+        break;
+    }
+    case RTT_STR:
+        break;
+    case RTT_NULLABLE: {
+        Lgs_Runtime_freeValue(ptr, type->nullable.baseType);
+        break;
+    }
+    case RTT_MAP: {
+        break;
+    }
+    case RTT_SARRAY:
+    default: {
+        assert(0);
+    }
+    }
 }
 
 extern "C" void Lgs_Runtime_yield() {
@@ -92,38 +123,12 @@ extern "C" void* Lgs_Runtime_getFromVTable(void* instance, const int32_t virtual
     return runtime.vtable[VKey{instance, virtualID}];
 }
 
-extern "C" void Lgs_Runtime_throwError(const char* msg) {
-    logError(std::string(msg) + "\n");
+extern "C" void Lgs_Runtime_throwError(const size_t count, const char* msg, ...) {
+    char out[STRING_BUFFER_SIZE];
+    va_list args;
+    va_start(args, msg);
+    formatErrorMsg(msg, out, count, args);
+    va_end(args);
+    logError(std::string(out) + "\n");
     exit(1);
-}
-
-static void freeValue(void* ptr, const Lgs_TypeInfo* type) {
-    std::cout << "Freeing: " << ptr << '\n';
-    switch (type->kind) {
-    case RTT_DARRAY: {
-        const auto darray = static_cast<Lgs_DArrayExpr*>(ptr);
-        std::free(darray->data);
-        std::free(darray);
-        break;
-    }
-    case RTT_SET: {
-        const auto set = static_cast<Lgs_SetExpr*>(ptr);
-        std::free(set->data);
-        std::free(set);
-        break;
-    }
-    case RTT_STR:
-    case RTT_OBJECT: {
-        std::free(ptr); return;
-    }
-    case RTT_SARRAY:
-    case RTT_NULLABLE:
-    case RTT_MAP: {
-        break;
-    }
-    default: {
-        break;
-    }
-    }
-    assert(0);
 }

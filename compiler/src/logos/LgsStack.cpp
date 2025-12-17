@@ -52,6 +52,14 @@ LgsIfStmt* LgsStack::getOutermostIfStmt() const {
     return nullptr;
 }
 
+LgsForeachLoop* LgsStack::getInnermostForeachLoop() const {
+    for (const auto& frame : stack) {
+        if (!frame.loop) continue;
+        if (const auto forEach = frame.loop->asForeachLoop()) return forEach;
+    }
+    return nullptr;
+}
+
 BasicBlock* LgsStack::findTagExitBlock(const std::string& tag) const {
     for (const auto& frame : stack) {
         if (frame.ifStmt && frame.ifStmt->tag == tag) {

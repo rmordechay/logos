@@ -14,14 +14,10 @@ void LgsParam::setDebugValue(LgsCgModule& cg) {
     assert(0);
 }
 
-void freeParams(std::vector<LgsParam>& params) {
-    for (const auto& param : params) {
-        if (param.isSelf) continue;
-        if (param.expr) {
-            freeExpr(param.expr);
-        } else if (param.type) {
-            freeType(param.type);
-        }
-    }
-    params.clear();
+std::string LgsParam::getName() {
+    return name;
+}
+
+LgsType* LgsParam::getType() {
+    return type;
 }

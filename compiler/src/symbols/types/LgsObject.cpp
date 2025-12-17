@@ -1,4 +1,6 @@
 #include "types/LgsObject.h"
+
+#include "LgsDefinitions.h"
 #include "exprs/LgsInstance.h"
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
@@ -6,10 +8,10 @@
 #include "types/LgsSubType.h"
 #include "types/LgsEnum.h"
 #include "types/LgsInterface.h"
-#include "types/LgsNullable.h"
 #include "LgsUtils.h"
 #include "types/LgsAny.h"
 
+#include <ranges>
 #include <sstream>
 #include <llvm/IR/Module.h>
 
@@ -59,40 +61,15 @@ Type* LgsObject::getIRType(LgsCgModule& cg) {
 }
 
 Constant* LgsObject::getRTType(LgsCgModule& cg) {
-    std::vector<Constant*> fieldRTTs;
-    std::vector<Constant*> fieldNameHashes;
-    fieldRTTs.reserve(fields.size());
-    fieldNameHashes.reserve(fields.size());
-    for (const auto field : fields) {
-        fieldRTTs.push_back(field->type->getRTType(cg));
-        fieldNameHashes.push_back(cg.hashConst(field->name));
-    }
-
-    const auto genericName = getGenericName();
-    const auto fieldsArrType = ArrayType::get(cg.getRTBaseType(), fields.size());
-    Constant* fieldsArr = cg.null();
-    Constant* hashesArr = cg.null();
-    if (!fields.empty()) {
-        const auto fieldsName = LGS_TYPEINFO_PREFIX + genericName + "_fields";
-        if (cg.isRTTModule) {
-            const auto args = ConstantArray::get(fieldsArrType, fieldRTTs);
-            fieldsArr = cg.createGlobal(fieldsName, fieldsArrType, args);
-        } else {
-            fieldsArr = cg.createGlobal(fieldsName, fieldsArrType, nullptr);
-        }
-
-        const auto hashesArrType = ArrayType::get(cg.i64Ty(), fields.size());
-        const auto hashesName = LGS_TYPEINFO_PREFIX + genericName + "_hashes";
-        if (cg.isRTTModule) {
-            const auto hashes = ConstantArray::get(hashesArrType, fieldNameHashes);
-            hashesArr = cg.createGlobal(hashesName, hashesArrType, hashes);
-        } else {
-            hashesArr = cg.createGlobal(hashesName, hashesArrType, nullptr);
-        }
-    }
-    const auto st = cg.getStructType({cg.sizeTy(), cg.ptrTy(), cg.ptrTy()}, genericName);
-    const auto sv = ConstantStruct::get(st, {cg.usize(fields.size()), hashesArr, fieldsArr});
-    return cg.getRTTypeInfo(genericName, sizeBytes(), sizeof(void*), RTT_OBJECT, sv);
+    const auto objName = getName();
+    std::vector<LgsOwner*> fieldsAsOwners;
+    for (const auto field : fields) fieldsAsOwners.push_back(field);
+    const auto [typesArr, hashesArr] = getRTFieldsInfo(cg, name, fieldsAsOwners);
+    // name, fieldsCount, fieldNames, fieldTypes
+    const std::vector<Type*> params = {cg.ptrTy(), cg.sizeTy(), cg.ptrTy(), cg.ptrTy()};
+    const std::vector<Constant*> args = {cg.getString(objName), cg.usize(fields.size()), hashesArr, typesArr};
+    const auto sv = cg.getRTTExtraStruct(objName, params, args);
+    return cg.getRTTypeInfo(objName, sizeBytes(), RTT_OBJECT, isHeapAlloc, sv);
 }
 
 size_t LgsObject::sizeBytes() {
@@ -113,10 +90,7 @@ LgsExpr* LgsObject::getZeroValue() {
 
 bool LgsObject::canCastTo(LgsType* other) {
     if (other->getName() == LgsAny::name) return true;
-    auto otherType = other;
-    if (const auto nullable = other->asNullable()) {
-        otherType = nullable->baseType;
-    }
+    const auto otherType = other;
     if (const auto otherInterface = otherType->asInterface()) {
         for (const auto objInterface : implements) {
             if (objInterface->getName() == otherInterface->name) {
@@ -128,7 +102,7 @@ bool LgsObject::canCastTo(LgsType* other) {
     return name == otherType->getName();
 }
 
-LgsType* LgsObject::applyBinOp(LgsType* toType, LgsBinOp& op) {
+LgsType* LgsObject::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     assert(0);
 }
 

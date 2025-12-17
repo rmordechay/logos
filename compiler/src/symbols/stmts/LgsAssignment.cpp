@@ -6,7 +6,7 @@
 std::string LgsAssignment::getAssignTypeStr() const {
     switch (assignmentType) {
     case ASSIGN:
-        return "assign";
+        return "re";
     case ASSIGN_ADD:
         return "add";
     case ASSIGN_SUB:

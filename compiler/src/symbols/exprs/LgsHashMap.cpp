@@ -1,13 +1,10 @@
 #include "exprs/LgsHashMap.h"
-
 #include "LgsUtils.h"
 #include "codegen/LgsCgModule.h"
 
 void LgsHashMap::castImplicitly(LgsType* toType) {
     if (!toType->asMap()) return;
-    if (!type) {
-        setType(toType);
-    }
+    if (!type) setType(toType);
 }
 
 void LgsHashMap::setDebugValue(LgsCgModule& cg) {
@@ -36,4 +33,3 @@ LgsHashMap::~LgsHashMap() {
     }
     elements.clear();
 }
-

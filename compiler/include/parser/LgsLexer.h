@@ -22,14 +22,14 @@ public:
     char advance();
     bool match(char expected);
     char peek(size_t offset = 1) const;
-    LgsToken scanMatrix(const LgsLocation& location, std::string& lexeme);
+    LgsToken scanNumber(const LgsLocation& location);
     LgsToken scanVarOrKeyword(const LgsLocation& location);
+    LgsToken scanMatrixDims(const LgsLocation& location, std::string& lexeme);
     std::string scanDoubleQuotesString();
     std::string scanSingleQuotesString();
     std::string scanMultilineString();
-    LgsToken scanNumber(const LgsLocation& location);
+    void scanEscapeChar(std::string& result);
     void skipWhitespace();
     void skipLineComment();
     void skipBlockComment();
-    void scanEscapeChar(std::string& result);
 };

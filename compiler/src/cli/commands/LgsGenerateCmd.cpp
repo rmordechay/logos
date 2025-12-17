@@ -27,7 +27,10 @@ LgsCliCmdHelp& LgsGenerateCmd::getHelp() {
 
 void LgsGenerateCmd::createProjectStructure(const std::string& name) {
     auto projectDir = fs::current_path() / name;
-    if (fs::exists(projectDir)) return printCliError(E40006, {name});
+    if (fs::exists(projectDir)) {
+        printCliError(E40006, {name});
+        return;
+    }
     createDir(projectDir);
     auto srcDir = projectDir / LGS_SRC_DIR;
     createDir(srcDir);

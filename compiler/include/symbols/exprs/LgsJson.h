@@ -1,24 +1,11 @@
 #pragma once
 #include "LgsExpr.h"
-#include "LgsNull.h"
-#include "constants/LgsFloatConst.h"
-#include "constants/LgsIntConst.h"
-#include "constants/LgsStrConst.h"
-
-class LgsNull;
-
-enum LgsJsonType {
-    JSON_OBJECT,
-    JSON_ARRAY,
-    JSON_INT,
-    JSON_FLOAT,
-    JSON_STRING,
-    JSON_NULL,
-};
+#include "types/LgsJsonType.h"
+#include "types/LgsObject.h"
 
 class LgsJsonArray {
 public:
-    std::vector<LgsJson*> entries;
+    std::vector<LgsJson*> elements;
 };
 
 class LgsJsonObject {
@@ -26,65 +13,23 @@ public:
     std::map<std::string, LgsJson*> entries;
 };
 
-class LgsJsonPrimitive {
-public:
-    LgsJsonType jsonType;
-    union {
-        LgsIntConst intConst;
-        LgsFloatConst* floatConst;
-        LgsStrConst* strConst;
-        LgsNull* null;
-    };
-};
-
 class LgsJson final : public LgsExpr {
 public:
-    LgsJsonType jsonType;
+    LgsJsonType* jsonType;
     union {
-        LgsJsonObject* jsonObject;
-        LgsJsonArray* jsonArray;
+        LgsJsonObject* obj;
+        LgsJsonArray* arr;
         LgsIntConst* intConst;
         LgsFloatConst* floatConst;
         LgsStrConst* strConst;
-        LgsNull* null;
     };
+    explicit LgsJson(LgsJsonType* type, LgsJsonObject* obj): LgsExpr(type), jsonType(type), obj(obj) {}
+    explicit LgsJson(LgsJsonType* type, LgsJsonArray* arr): LgsExpr(type), jsonType(type), arr(arr) {}
+    explicit LgsJson(LgsJsonType* type, LgsIntConst* intConst): LgsExpr(type), jsonType(type), intConst(intConst) {}
+    explicit LgsJson(LgsJsonType* type, LgsFloatConst* floatConst): LgsExpr(type), jsonType(type), floatConst(floatConst) {}
+    explicit LgsJson(LgsJsonType* type, LgsStrConst* strConst): LgsExpr(type), jsonType(type), strConst(strConst) {}
     bool equals(LgsExpr* other) override;
     std::string asText() override;
     void setDebugValue(LgsCgModule& cg) override;
     ~LgsJson() override;
 };
-
-inline bool LgsJson::equals(LgsExpr* other) {
-    assert(0);
-}
-
-inline std::string LgsJson::asText() {
-    assert(0);
-}
-
-inline void LgsJson::setDebugValue(LgsCgModule& cg) {
-    assert(0);
-}
-
-inline LgsJson::~LgsJson() {
-    switch (jsonType) {
-    case JSON_OBJECT:
-        delete jsonObject;
-        break;
-    case JSON_ARRAY:
-        delete jsonArray;
-        break;
-    case JSON_INT:
-        freeExpr(intConst);
-        break;
-    case JSON_FLOAT:
-        freeExpr(floatConst);
-        break;
-    case JSON_STRING:
-        freeExpr(strConst);
-        break;
-    case JSON_NULL:
-        freeExpr(null);
-        break;
-    }
-}

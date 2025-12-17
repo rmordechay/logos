@@ -13,7 +13,7 @@ Type* LgsLong::getIRType(LgsCgModule& cg) {
 }
 
 Constant* LgsLong::getRTType(LgsCgModule& cg) {
-    return cg.getRTTypeInfo(getGenericName(), sizeBytes(), sizeBytes(), RTT_LONG, cg.null());
+    return cg.getRTTypeInfo(getName(), sizeBytes(), RTT_LONG, isHeapAlloc, cg.null());
 }
 
 size_t LgsLong::sizeBytes() {
@@ -24,8 +24,8 @@ LgsExpr* LgsLong::getZeroValue() {
     return new LgsIntConst(&LGS_LONG, 0);
 }
 
-LgsType* LgsLong::applyBinOp(LgsType* toType, LgsBinOp& op) {
-    return applyIntBinOp(toType, op.opType);
+LgsType* LgsLong::applyBinOp(LgsType* rightType, LgsBinOp& op) {
+    assert(0);
 }
 
 Value* LgsLong::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {

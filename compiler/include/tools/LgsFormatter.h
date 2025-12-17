@@ -5,7 +5,6 @@
 class LgsSubType;
 class LgsEnum;
 class LgsIntConst;
-class LgsNull;
 class LgsMetaVar;
 class LgsJson;
 class LgsTypeExpr;
