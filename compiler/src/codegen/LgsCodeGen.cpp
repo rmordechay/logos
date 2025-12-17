@@ -737,18 +737,16 @@ void LgsCodeGen::visitNullableExpr(LgsNullableExpr* nullableExpr) {
     const auto nullable = nullableExpr->type->asNullable();
     const auto ty = nullable->getIRType(cg);
     if (nullableExpr->isNull) {
-        if (nullable->passByRef ) {
+        if (nullable->passByRef) {
             nullableExpr->IRValue = cg.null();
         } else {
-            if (!nullableExpr->IRValue) {
-                nullableExpr->IRValue = cg.builder.CreateAlloca(ty);
-            }
-            nullable->setIsSet(cg, nullableExpr->IRValue, cg.false_());
+            nullableExpr->IRValue = nullableExpr->pointee ? nullableExpr->pointee : cg.builder.CreateAlloca(ty);
+            nullable->storeIsSet(cg, nullableExpr->IRValue, cg.false_());
         }
     } else if (nullable->passByRef) {
         nullableExpr->IRValue = nullableExpr->baseExpr->IRValue;
     } else {
-        nullableExpr->IRValue = cg.builder.CreateAlloca(ty);
+        nullableExpr->IRValue = nullableExpr->pointee ? nullableExpr->pointee : cg.builder.CreateAlloca(ty);
         const auto isSet = cg.builder.CreateIsNotNull(nullableExpr->baseExpr->IRValue);
         nullable->setNullableFields(cg, nullableExpr->IRValue, nullableExpr->baseExpr->loadIR(cg), isSet);
     }
@@ -1184,9 +1182,9 @@ void LgsCodeGen::visitInstance(LgsInstance* instance) {
     for (const auto& [argName, arg] : instance->args) {
         visited.insert(argName);
         const auto field = instance->obj->getField(argName);
-        const auto gep = field->getGEP(cg, instance->IRValue);
+        arg.expr->pointee = field->getGEP(cg, instance->IRValue);
         visitExpr(arg.expr);
-        cg.store(arg.expr->loadIR(cg), gep);
+        cg.store(arg.expr->loadIR(cg), arg.expr->pointee);
     }
 
     // Zero values
@@ -1198,9 +1196,9 @@ void LgsCodeGen::visitInstance(LgsInstance* instance) {
             cg.store(field->expr->IRValue, gep);
         } else {
             const auto& expr = field->type->getZeroValue();
-            const auto gep = field->getGEP(cg, instance->IRValue);
+            expr->pointee = field->getGEP(cg, instance->IRValue);
             visitExpr(expr);
-            cg.store(expr->loadIR(cg), gep);
+            cg.store(expr->loadIR(cg), expr->pointee);
             freeExpr(expr);
         }
     }

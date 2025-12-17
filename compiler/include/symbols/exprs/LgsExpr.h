@@ -41,6 +41,7 @@ public:
     bool isReturnExpr = false;
     bool hasUnwrapSuffix = false;
     LgsValue* owner = nullptr;
+    Value* pointee = nullptr;
 
     explicit LgsExpr(LgsType* type = nullptr) : type(type) {}
     std::optional<int64_t> getConstInt();
@@ -86,8 +87,6 @@ public:
 
 void wrapInNullable(LgsExpr*& expr, LgsNullable* nullable);
 void castExprImplicitly(LgsExpr*& expr, LgsType* toType);
-Value* dotProduct(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-Value* crossProduct(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
 
 void freeExpr(LgsExpr* expr);
 template<typename T>

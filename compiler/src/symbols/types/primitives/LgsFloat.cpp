@@ -5,6 +5,7 @@
 #include "exprs/constants/LgsFloatConst.h"
 #include "types/LgsAny.h"
 #include "types/iterables/LgsIterable.h"
+#include "types/iterables/LgsVec.h"
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsDouble.h"
 

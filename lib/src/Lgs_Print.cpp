@@ -27,8 +27,6 @@ static std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
     case RTT_STR: {
         auto s = *static_cast<char**>(elem);
         if (!s) return LGS_NULL_LITERAL;
-        s = static_cast<char*>(elem);
-        if (!s) return LGS_NULL_LITERAL;
         str << '"' << s << '"'; break;
     }
     case RTT_CHAR: str << '"' << *static_cast<const char*>(elem) << '"'; break;

@@ -122,7 +122,7 @@ void LgsCgModule::storeStructField(Type* type, Value* instancePtr, const size_t 
 }
 
 void LgsCgModule::store(Value* v, Value* ptr) {
-    if (v == ptr) return;
+    assert(v != ptr);
     builder.CreateStore(v, ptr);
 }
 

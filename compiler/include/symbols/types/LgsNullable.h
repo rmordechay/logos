@@ -33,8 +33,8 @@ public:
     void setNullableFields(LgsCgModule& cg, Value* ptr, Value* value, Value* isSet);
     Value* getNullableValue(LgsCgModule& cg, Value* ptr);
     Value* getIsSet(LgsCgModule& cg, Value* ptr);
-    void setNullableValue(LgsCgModule& cg, Value* ptr, Value* value);
-    void setIsSet(LgsCgModule& cg, Value* ptr, Value* value);
+    void storeNullableValue(LgsCgModule& cg, Value* ptr, Value* value);
+    void storeIsSet(LgsCgModule& cg, Value* ptr, Value* value);
     Value* applyNumberBinOp(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right, const std::function<Value*(LgsExpr*, LgsExpr*)>& func);
     Value* applyPtrBinOp(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right, const std::function<Value*(LgsExpr*, LgsExpr*)>& func);
 };

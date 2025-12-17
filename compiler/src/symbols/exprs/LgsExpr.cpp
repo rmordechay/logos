@@ -1,6 +1,6 @@
 #include "exprs/LgsExpr.h"
 
-#include "../../../include/symbols/exprs/constants/LgsComplexConst.h"
+#include "exprs/constants/LgsComplexConst.h"
 #include "exprs/LgsArrayExpr.h"
 #include "exprs/LgsBinaryExpr.h"
 #include "exprs/LgsCast.h"
@@ -93,9 +93,6 @@ Value* LgsExpr::getPtrTo(LgsCgModule& cg) const {
         const auto ptr = cg.builder.CreateAlloca(type->getIRType(cg));
         cg.store(IRValue, ptr);
         return ptr;
-    }
-    if (type->asNullable() && type->passByRef) {
-        return cg.builder.CreateLoad(cg.ptrTy(), IRValue);
     }
     return IRValue;
 }
@@ -238,66 +235,6 @@ void castExprImplicitly(LgsExpr*& expr, LgsType* toType) {
     if (!expr->asNullableExpr() && toType->asNullable()) {
         wrapInNullable(expr, toType->asNullable());
     }
-}
-
-Value* dotProduct(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto l = left->loadIR(cg);
-    const auto r = right->loadIR(cg);
-
-    const auto lx = cg.builder.CreateExtractElement(l, cg.i32(0));
-    const auto rx = cg.builder.CreateExtractElement(r, cg.i32(0));
-    const auto ly = cg.builder.CreateExtractElement(l, cg.i32(1));
-    const auto ry = cg.builder.CreateExtractElement(r, cg.i32(1));
-    const auto mulX = cg.builder.CreateFMul(lx, rx);
-    const auto mulY = cg.builder.CreateFMul(ly, ry);
-    Value* result = cg.builder.CreateFAdd(mulX, mulY);
-
-    const auto vectorDim = left->type->asVec()->vectorDim;
-    if (vectorDim == 3) {
-        const auto lz = cg.builder.CreateExtractElement(l, cg.i32(2));
-        const auto rz = cg.builder.CreateExtractElement(r, cg.i32(2));
-        const auto mulZ = cg.builder.CreateFMul(lz, rz);
-        result = cg.builder.CreateFAdd(result, mulZ);
-    } else if (vectorDim == 4) {
-        const auto lw = cg.builder.CreateExtractElement(l, cg.i32(3));
-        const auto rw = cg.builder.CreateExtractElement(r, cg.i32(3));
-        const auto mulW = cg.builder.CreateFMul(lw, rw);
-        result = cg.builder.CreateFAdd(result, mulW);
-    }
-    return result;
-}
-
-Value* crossProduct(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto l = left->loadIR(cg);
-    const auto r = right->loadIR(cg);
-
-    const auto lx = cg.builder.CreateExtractElement(l, cg.i32(0));
-    const auto ly = cg.builder.CreateExtractElement(l, cg.i32(1));
-    const auto lz = cg.builder.CreateExtractElement(l, cg.i32(2));
-    const auto rx = cg.builder.CreateExtractElement(r, cg.i32(0));
-    const auto ry = cg.builder.CreateExtractElement(r, cg.i32(1));
-    const auto rz = cg.builder.CreateExtractElement(r, cg.i32(2));
-
-    const auto cx = cg.builder.CreateFSub(
-        cg.builder.CreateFMul(ly, rz),
-        cg.builder.CreateFMul(lz, ry)
-        );
-    const auto cy = cg.builder.CreateFSub(
-        cg.builder.CreateFMul(lz, rx),
-        cg.builder.CreateFMul(lx, rz)
-        );
-    const auto cz = cg.builder.CreateFSub(
-        cg.builder.CreateFMul(lx, ry),
-        cg.builder.CreateFMul(ly, rx)
-        );
-
-    const auto vecTy = left->type->getIRType(cg);
-    Value* result = UndefValue::get(vecTy);
-    result = cg.builder.CreateInsertElement(result, cx, cg.i32(0));
-    result = cg.builder.CreateInsertElement(result, cy, cg.i32(1));
-    result = cg.builder.CreateInsertElement(result, cz, cg.i32(2));
-
-    return result;
 }
 
 void freeExpr(LgsExpr* expr) {

@@ -41,3 +41,6 @@ public:
     std::string fmtStr() const override;
     DIType* getDebugType(LgsCgModule& cg) override;
 };
+
+Value* dotProduct(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
+Value* crossProduct(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);

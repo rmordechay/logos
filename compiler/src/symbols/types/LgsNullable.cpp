@@ -111,11 +111,11 @@ Value* LgsNullable::getIsSet(LgsCgModule& cg, Value* ptr) {
     return cg.builder.CreateLoad(cg.i1Ty(), isSetField);
 }
 
-void LgsNullable::setNullableValue(LgsCgModule& cg, Value* ptr, Value* value) {
+void LgsNullable::storeNullableValue(LgsCgModule& cg, Value* ptr, Value* value) {
     cg.storeStructField(getIRType(cg), ptr, 0, value);
 }
 
-void LgsNullable::setIsSet(LgsCgModule& cg, Value* ptr, Value* value) {
+void LgsNullable::storeIsSet(LgsCgModule& cg, Value* ptr, Value* value) {
     cg.storeStructField(getIRType(cg), ptr, 1, value);
 }
 
@@ -142,7 +142,7 @@ Value* LgsNullable::applyNumberBinOp(LgsCgModule& cg, const LgsExpr* left, const
     cg.builder.CreateBr(exitBlock);
 
     cg.startBlock(nullBlock);
-    setIsSet(cg, ptr, cg.false_());
+    storeIsSet(cg, ptr, cg.false_());
     cg.builder.CreateBr(exitBlock);
 
     cg.startBlock(exitBlock);
