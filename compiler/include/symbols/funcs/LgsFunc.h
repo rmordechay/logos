@@ -50,7 +50,6 @@ public:
     std::string getGenericName() const;
     std::string asText() override;
     void hashNode(size_t& oldHash) override;
-    void createForeachFunc(LgsCgModule& cg);
     void setDebugValue(LgsCgModule& cg) override;
     ~LgsFunc() override;
 };

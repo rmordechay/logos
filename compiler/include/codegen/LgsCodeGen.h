@@ -149,4 +149,5 @@ public:
     void addVirtuals(LgsObject* obj, Value* ptr) const;
     void createMapFunc(LgsFunc* func);
     void createFilterFunc(LgsFunc* func);
+    void createForeachFunc(LgsFunc* func);
 };
