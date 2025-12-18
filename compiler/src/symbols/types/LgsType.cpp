@@ -57,6 +57,10 @@ LgsFunc* LgsType::getMethod(const std::string& methodName) {
     return nullptr;
 }
 
+Value* LgsType::getIRZeroValue(LgsCgModule& cg) {
+    assert(0);
+}
+
 Constant* LgsType::getRTType(LgsCgModule& cg) {
     assert(0);
 }

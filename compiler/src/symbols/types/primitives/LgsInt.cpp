@@ -23,6 +23,10 @@ LgsExpr* LgsInt::getZeroValue() {
     return new LgsIntConst(&LGS_INT, 0);
 }
 
+Value* LgsInt::getIRZeroValue(LgsCgModule& cg) {
+    return cg.i32Zero();
+}
+
 Constant* LgsInt::getRTType(LgsCgModule& cg) {
     return cg.getRTTypeInfo(getName(), sizeBytes(), RTT_INT, isHeapAlloc, cg.null());
 }

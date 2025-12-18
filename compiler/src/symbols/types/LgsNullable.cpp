@@ -119,7 +119,7 @@ void LgsNullable::storeIsSet(LgsCgModule& cg, Value* ptr, Value* value) {
     cg.storeStructField(getIRType(cg), ptr, 1, value);
 }
 
-Value* LgsNullable::applyNumberBinOp(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right, const std::function<Value*(LgsExpr*, LgsExpr*)>& func) {
+Value* LgsNullable::applyNumberBinOp(LgsCgModule& cg, LgsExpr* left, LgsExpr* right, const std::function<Value*(LgsExpr*, LgsExpr*)>& func) {
     const auto ptr = cg.builder.CreateAlloca(getIRType(cg));
     const auto leftNullable = left->type->asNullable();
     const auto rightNullable = right->type->asNullable();
@@ -133,11 +133,7 @@ Value* LgsNullable::applyNumberBinOp(LgsCgModule& cg, const LgsExpr* left, const
     cg.builder.CreateCondBr(bothSet, addBlock, nullBlock);
 
     cg.startBlock(addBlock);
-    const auto tempExpr1 = leftNullable->baseType->getZeroValue();
-    const auto tempExpr2 = rightNullable->baseType->getZeroValue();
-    tempExpr1->IRValue = leftNullable->getNullableValue(cg, left->IRValue);
-    tempExpr2->IRValue = rightNullable->getNullableValue(cg, right->IRValue);
-    const auto result = func(tempExpr1, tempExpr2);
+    const auto result = func(left, right);
     setNullableFields(cg, ptr, result, cg.true_());
     cg.builder.CreateBr(exitBlock);
 
@@ -146,15 +142,11 @@ Value* LgsNullable::applyNumberBinOp(LgsCgModule& cg, const LgsExpr* left, const
     cg.builder.CreateBr(exitBlock);
 
     cg.startBlock(exitBlock);
-    freeExpr(tempExpr1);
-    freeExpr(tempExpr2);
     return ptr;
 }
 
-Value* LgsNullable::applyPtrBinOp(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right, const std::function<Value*(LgsExpr*, LgsExpr*)>& func) {
+Value* LgsNullable::applyPtrBinOp(LgsCgModule& cg, LgsExpr* left, LgsExpr* right, const std::function<Value*(LgsExpr*, LgsExpr*)>& func) {
     const auto ptr = cg.builder.CreateAlloca(getIRType(cg));
-    const auto leftNullable = left->type->asNullable();
-    const auto rightNullable = right->type->asNullable();
     const auto leftNotNull = cg.builder.CreateIsNotNull(left->IRValue);
     const auto rightNotNull = cg.builder.CreateIsNotNull(right->IRValue);
     const auto bothNotNull = cg.builder.CreateAnd(leftNotNull, rightNotNull);
@@ -164,9 +156,7 @@ Value* LgsNullable::applyPtrBinOp(LgsCgModule& cg, const LgsExpr* left, const Lg
     cg.builder.CreateCondBr(bothNotNull, addBlock, nullBlock);
 
     cg.startBlock(addBlock);
-    const auto tempExpr1 = leftNullable->baseType->getZeroValue();
-    const auto tempExpr2 = rightNullable->baseType->getZeroValue();
-    const auto result = func(tempExpr1, tempExpr2);
+    const auto result = func(left, right);
     cg.store(result, ptr);
     cg.builder.CreateBr(exitBlock);
 
@@ -175,7 +165,5 @@ Value* LgsNullable::applyPtrBinOp(LgsCgModule& cg, const LgsExpr* left, const Lg
     cg.builder.CreateBr(exitBlock);
 
     cg.startBlock(exitBlock);
-    freeExpr(tempExpr1);
-    freeExpr(tempExpr2);
     return ptr;
 }

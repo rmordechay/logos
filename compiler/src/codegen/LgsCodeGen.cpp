@@ -805,12 +805,16 @@ void LgsCodeGen::visitStaticArray(LgsArrayExpr* arrayExpr) const {
             const auto element = arrayExpr->elements[i]->IRValue;
             sArr->addIRElement(cg, arrayExpr->IRValue, cg.i32(i), element);
         }
-        const auto sa = sArr->size->getConstInt();
-        if (!sa.has_value()) return;
-        const auto diff = sa.value() - arrayExpr->elements.size();
-        for (size_t i = 0; i < diff; ++i) {
-            sArr->addIRElement(cg, arrayExpr->IRValue, cg.i32(i), cg.zero);
+    }
+    // Init rest of the values with zero
+    const auto arrSize = sArr->size->getConstInt();
+    if (arrSize.has_value()) {
+        const auto diff = arrSize.value() - arrayExpr->elements.size();
+        for (size_t i = diff; i <= arrayExpr->elements.size(); ++i) {
+            sArr->addIRElement(cg, arrayExpr->IRValue, cg.i32(i), sArr->baseType->getIRZeroValue(cg));
         }
+    } else {
+        assert(0);
     }
 }
 
@@ -1203,11 +1207,9 @@ void LgsCodeGen::visitInstance(LgsInstance* instance) {
             const auto gep = field->getGEP(cg, instance->IRValue);
             cg.store(field->expr->IRValue, gep);
         } else {
-            const auto& expr = field->type->getZeroValue();
-            expr->pointee = field->getGEP(cg, instance->IRValue);
-            visitExpr(expr);
-            cg.store(expr->loadIR(cg), expr->pointee);
-            freeExpr(expr);
+            const auto zeroValue = field->type->getIRZeroValue(cg);
+            const auto gep = field->getGEP(cg, instance->IRValue);
+            cg.store(zeroValue, gep);
         }
     }
     addVirtuals(instance->obj, instance->IRValue);
@@ -1377,7 +1379,7 @@ void LgsCodeGen::addVirtuals(LgsObject* obj, Value* ptr) const {
     // }
 }
 
-void LgsCodeGen::createMapFunc(LgsFunc* func) {
+void LgsCodeGen::createMapFunc(LgsFunc* func) const {
     if (cg.IRModule->getFunction(func->funcType->getName())) return;
     // Save state
     cg.savedIP = cg.builder.saveIP();
@@ -1396,8 +1398,7 @@ void LgsCodeGen::createMapFunc(LgsFunc* func) {
     cg.callStackPush();
 
     const auto iterable = iterableParam.type->asIterable();
-    const auto newArr = iterableParam.type->getZeroValue();
-    visitExpr(newArr);
+    const auto newArr = iterableParam.type->getIRZeroValue(cg);
 
     const auto iPtr = cg.builder.CreateAlloca(cg.sizeTy());
     const auto loopStart = cg.builder.CreateSExt(cg.sizeZero(), cg.sizeTy());
@@ -1420,7 +1421,7 @@ void LgsCodeGen::createMapFunc(LgsFunc* func) {
     }
     const auto ft = llvm::dyn_cast<FunctionType>(callbackParam.type->getIRType(cg));
     const auto v = cg.builder.CreateCall(ft, callbackParam.IRValue, {element});
-    iterable->addIRElement(cg, newArr->IRValue, iValue, v);
+    iterable->addIRElement(cg, newArr, iValue, v);
 
     // Increment
     const auto inc = cg.builder.CreateAdd(iValue, cg.usize(1));
@@ -1430,17 +1431,15 @@ void LgsCodeGen::createMapFunc(LgsFunc* func) {
     // End func
     cg.startBlock(exitBlock);
     cg.callPopStack();
-    cg.builder.CreateRet(newArr->loadIR(cg));
+    cg.builder.CreateRet(newArr);
 
     // Restore state
     cg.currentFunc = originalFunc;
     cg.builder.restoreIP(cg.savedIP);
     func->IRValue = IRFunc;
-
-    freeExpr(newArr);
 }
 
-void LgsCodeGen::createFilterFunc(LgsFunc* func) {
+void LgsCodeGen::createFilterFunc(LgsFunc* func) const {
     if (cg.IRModule->getFunction(func->funcType->getName())) return;
     // Save state
     cg.savedIP = cg.builder.saveIP();
@@ -1461,8 +1460,7 @@ void LgsCodeGen::createFilterFunc(LgsFunc* func) {
     cg.callStackPush();
 
     const auto iterable = iterableParam.type->asIterable();
-    const auto newArr = iterableParam.type->getZeroValue();
-    visitExpr(newArr);
+    const auto newArr = iterableParam.type->getIRZeroValue(cg);
 
     const auto iPtr = cg.builder.CreateAlloca(cg.sizeTy());
     const auto loopStart = cg.builder.CreateSExt(cg.sizeZero(), cg.sizeTy());
@@ -1487,7 +1485,7 @@ void LgsCodeGen::createFilterFunc(LgsFunc* func) {
     const auto filterCond = cg.builder.CreateCall(ft, callbackParam.IRValue, {element});
     cg.builder.CreateCondBr(filterCond, trueBlock, falseBlock);
     cg.startBlock(trueBlock);
-    iterable->addIRElement(cg, newArr->IRValue, iValue, element);
+    iterable->addIRElement(cg, newArr, iValue, element);
     cg.branchAndStartBlock(falseBlock);
 
     // Increment
@@ -1498,17 +1496,15 @@ void LgsCodeGen::createFilterFunc(LgsFunc* func) {
     // End func
     cg.startBlock(exitBlock);
     cg.callPopStack();
-    cg.builder.CreateRet(newArr->loadIR(cg));
+    cg.builder.CreateRet(newArr);
 
     // Restore state
     cg.currentFunc = originalFunc;
     cg.builder.restoreIP(cg.savedIP);
     func->IRValue = IRFunc;
-
-    freeExpr(newArr);
 }
 
-void LgsCodeGen::createForeachFunc(LgsFunc* func) {
+void LgsCodeGen::createForeachFunc(LgsFunc* func) const {
     if (cg.IRModule->getFunction(func->funcType->getName())) return;
     // Save state
     cg.savedIP = cg.builder.saveIP();
