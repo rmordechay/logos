@@ -129,7 +129,7 @@ void LgsIterIndex::assign(LgsCgModule& cg, LgsExpr* expr) {
         const auto args = {baseIRValue->IRValue, indexIR, cg.getPtrTo(expr->IRValue)};
         cg.callLgsFunc(LgsSet::name, "put", cg.voidTy(), {cg.ptrTy(), cg.i32Ty(), cg.ptrTy()}, args);
     } else if (const auto map = baseExpr->type->asMap()) {
-        map->getMethod(ADD_FUNC)->call(cg, {baseExpr, index.from, expr});
+        map->addIRElement(cg, baseExpr->IRValue, index.from->IRValue, expr->IRValue);
     } else {
         cg.store(rIRValue, IRValue);
     }
@@ -146,7 +146,7 @@ void LgsIterIndex::assignScalar(LgsCgModule& cg, LgsExpr* expr) const {
         const auto args = {baseIRValue->IRValue, indexIR, cg.getPtrTo(expr->IRValue)};
         cg.callLgsFunc(LgsSet::name, "put", cg.voidTy(), {cg.ptrTy(), cg.i32Ty(), cg.ptrTy()}, args);
     } else if (const auto map = baseExpr->type->asMap()) {
-        map->getMethod(ADD_FUNC)->callIR(cg, {baseExpr->IRValue, indexIR, expr->IRValue});
+        map->addIRElement(cg, baseExpr->IRValue, indexIR, expr->IRValue);
     } else {
         cg.store(rIRValue, IRValue);
     }

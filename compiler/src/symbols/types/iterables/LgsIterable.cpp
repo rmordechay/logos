@@ -47,15 +47,15 @@ LgsFunc* LgsIterable::getMethod(const std::string& methodName) {
     }
     if (methodName == MAP_FUNC) {
         if (methods.contains(MAP_FUNC)) return methods[MAP_FUNC];
-        const auto callback = new LgsFuncType(baseType, {LgsParam(baseType)});
-        const auto func = new LgsFunc(MAP_FUNC, this, {this, callback}, flags);
+        const auto callback = new LgsFuncType(nullptr, {LgsParam(baseType)});
+        const auto func = new LgsFunc(MAP_FUNC, getName(), this, {this, callback}, flags);
         addMethod(func);
         return func;
     }
     if (methodName == FILTER_FUNC) {
         if (methods.contains(FILTER_FUNC)) return methods[FILTER_FUNC];
         const auto callback = new LgsFuncType(&LGS_BOOL, {LgsParam(baseType)});
-        const auto func = new LgsFunc(FILTER_FUNC, this, {this, callback}, flags);
+        const auto func = new LgsFunc(FILTER_FUNC, getName(), this, {this, callback}, flags);
         addMethod(func);
         return func;
     }
@@ -94,7 +94,7 @@ void LgsIterable::unpackLoopIR(LgsCgModule& cg, LgsForeachLoop* loop) const {
     loop->loopVars[0]->IRValue = iterIndex->IRValue;
 }
 
-void LgsIterable::addIRElement(LgsCgModule& cg, Value*& iterable, Value* index, Value* value) {
+void LgsIterable::addIRElement(LgsCgModule& cg, Value* iterable, Value* index, Value* value) {
     assert(0);
 }
 

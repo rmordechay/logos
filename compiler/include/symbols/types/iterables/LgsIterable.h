@@ -34,6 +34,6 @@ public:
     virtual Value* lenIR(LgsCgModule& cg, Value* iterable) = 0;
     virtual Value* inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) = 0;
     virtual Value* getIRElement(LgsCgModule& cg, Value* iterable, Value* index) = 0;
-    virtual void addIRElement(LgsCgModule& cg, Value*& iterable, Value* index, Value* value);
+    virtual void addIRElement(LgsCgModule& cg, Value* iterable, Value* index, Value* value);
     ~LgsIterable() override;
 };

@@ -66,8 +66,8 @@ Value* LgsByte::rshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     return cg.builder.CreateShl(left->loadIR(cg), right->loadIR(cg));
 }
 
-Value* LgsByte::lshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* other) {
-    return cg.builder.CreateLShr(left->loadIR(cg), other->loadIR(cg));
+Value* LgsByte::lshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+    return cg.builder.CreateLShr(left->loadIR(cg), right->loadIR(cg));
 }
 
 size_t LgsByte::sizeBytes() {

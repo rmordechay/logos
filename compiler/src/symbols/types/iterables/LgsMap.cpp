@@ -130,6 +130,10 @@ Value* LgsMap::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
     return cg.callLgsFunc(name, "get", cg.ptrTy(), {cg.ptrTy(), cg.ptrTy()}, {iterable, index});
 }
 
+void LgsMap::addIRElement(LgsCgModule& cg, Value* iterable, Value* index, Value* value) {
+    LgsIterable::addIRElement(cg, iterable, index, value);
+}
+
 bool LgsMap::canCastTo(LgsType* other) {
     if (other->getName() == LgsAny::name) return true;
     const auto otherMap = other->asMap();

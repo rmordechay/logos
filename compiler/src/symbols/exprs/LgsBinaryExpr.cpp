@@ -1,8 +1,11 @@
 #include "exprs/LgsBinaryExpr.h"
+
+#include "LgsType.h"
 #include "codegen/LgsCgModule.h"
 
 Value* LgsBinaryExpr::loadIR(LgsCgModule& cg) {
-    return IRValue;
+    if (!IRValue->getType()->isPointerTy()) return IRValue;
+    return cg.builder.CreateLoad(type->getIRType(cg), IRValue);
 }
 
 void LgsBinaryExpr::setDebugValue(LgsCgModule& cg) {

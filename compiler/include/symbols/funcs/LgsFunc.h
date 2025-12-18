@@ -2,6 +2,7 @@
 #include "exprs/LgsExpr.h"
 #include "types/LgsFuncType.h"
 
+class LgsReturn;
 class LgsFuncType;
 struct LgsFuncArg;
 class LgsStmtsBlock;
@@ -15,9 +16,9 @@ class LgsFunc : public LgsExpr {
 public:
     LgsFuncType* funcType;
     LgsStmtsBlock* stmtsBlock = nullptr;
+    std::vector<const LgsReturn*> returnStmts;
     std::vector<std::pair<LgsExpr*, LgsExpr*>> mocks;
     bool isTest = false;
-    bool isLambda = false;
     CallFn fn;
 
     explicit LgsFunc(LgsFuncType* funcType) : LgsExpr(funcType), funcType(funcType) {}
@@ -49,8 +50,6 @@ public:
     std::string getGenericName() const;
     std::string asText() override;
     void hashNode(size_t& oldHash) override;
-    void createMapFunc(LgsCgModule& cg);
-    void createFilterFunc(LgsCgModule& cg);
     void createForeachFunc(LgsCgModule& cg);
     void setDebugValue(LgsCgModule& cg) override;
     ~LgsFunc() override;

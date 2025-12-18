@@ -189,6 +189,7 @@ LgsToken LgsLexer::nextToken() {
     case '^':
         advance();
         if (match('=')) return {T_EQUAL_CARET, "^=", location};
+        if (match('^')) return {T_DOUBLE_CARET, "^^", location};
         return {T_CARET, "^", location};
     default:
         errHandler.addError(E10088, &location, filePath);

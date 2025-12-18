@@ -140,15 +140,11 @@ void LgsTypeResolver::resolveInterface(LgsInterface* interface) {
 
 void LgsTypeResolver::resolveFuncType(LgsFuncType* funcType) {
     auto resolveTypeOrGeneric = [&](LgsType*& type) {
-        if (!type) {
-            type = &LGS_VOID;
-            return;
-        }
         for (const auto generic : funcType->genericTypes) {
             if (!type->equals(generic)) continue;
             type = generic;
         }
-        resolveType(type);
+        if (type) resolveType(type);
     };
 
     for (auto& param : funcType->params) {

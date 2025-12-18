@@ -105,7 +105,7 @@ public:
     virtual Value* bitAndIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
     virtual Value* bitOrIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
     virtual Value* bitXorIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* lshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* other);
+    virtual Value* lshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
     virtual Value* rshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
     virtual Value* crossIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
 

@@ -133,6 +133,12 @@ Value* LgsSArray::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
     return cg.builder.CreateLoad(baseType->getIRType(cg), gep);
 }
 
+void LgsSArray::addIRElement(LgsCgModule& cg, Value* iterable, Value* index, Value* value) {
+    const std::vector<Value*> indices = {cg.i32Zero(), index};
+    const auto gep = cg.builder.CreateInBoundsGEP(getIRType(cg), iterable, indices);
+    cg.store(value, gep);
+}
+
 Value* LgsSArray::lenIR(LgsCgModule& cg, Value* iterable) {
     return size->IRValue;
 }

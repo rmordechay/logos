@@ -73,7 +73,9 @@ LgsType* LgsVec::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     const auto otherName = rightType->getName();
     switch (op.opType) {
     case ADD:
-    case SUB: {
+    case SUB:
+    case DIV:
+    case MODULO: {
         if (thisName == otherName || rightType->isNumber()) return this;
         break;
     }
@@ -82,11 +84,7 @@ LgsType* LgsVec::applyBinOp(LgsType* rightType, LgsBinOp& op) {
         break;
     }
     case MUL: {
-        if (thisName == otherName) return &LGS_FLOAT;
-        if (rightType->isNumber()) return this;
-        break;
-    }
-    case DIV: {
+        if (thisName == otherName) return &LGS_FLOAT; // dot product
         if (rightType->isNumber()) return this;
         break;
     }
@@ -118,61 +116,50 @@ bool LgsVec::inferBaseType(std::vector<LgsExpr*>& args) {
 
 Value* LgsVec::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     if (!baseType->isFloat) assert(0);
-    const auto [l, r] = loadPairAsFloat(cg, left, right);
+    auto [l, r] = loadPairAsFloat(cg, left, right);
     if (right->type->isNumber()) {
-        Value* result = UndefValue::get(getIRType(cg));
-        for (size_t i = 0; i < dimVec; ++i) {
-            result = cg.builder.CreateInsertElement(result, r, cg.i32(i));
-        }
-        return cg.builder.CreateFAdd(l, result);
+        r = getIRVector(cg, r);
     }
     return cg.builder.CreateFAdd(l, r);
 }
 
 Value* LgsVec::subIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     if (!baseType->isFloat) assert(0);
-    const auto [l, r] = loadPairAsFloat(cg, left, right);
+    auto [l, r] = loadPairAsFloat(cg, left, right);
     if (right->type->isNumber()) {
-        Value* result = UndefValue::get(getIRType(cg));
-        for (size_t i = 0; i < dimVec; ++i) {
-            result = cg.builder.CreateInsertElement(result, r, cg.i32(i));
-        }
-        return cg.builder.CreateFSub(l, result);
+        r = getIRVector(cg, r);
     }
     return cg.builder.CreateFSub(l, r);
 }
 
 Value* LgsVec::mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    if (right->type->isNumber()) {
-        const auto vecTy = llvm::cast<VectorType>(getIRType(cg));
-        right->IRValue = cg.builder.CreateSIToFP(right->IRValue, vecTy->getElementType());
-        right->IRValue = cg.builder.CreateVectorSplat(vecTy->getElementCount(), right->IRValue);
-        return cg.builder.CreateFMul(left->loadIR(cg), right->loadIR(cg));
-    }
     if (left->type->asMatrix() && right->type->asVec()) {
-        return matMul(cg, left, right);
+        return matVecMul(cg, left, right);
     }
-    if (right->IRValue->getType()->isFloatingPointTy()) {
-        const auto vecTy = llvm::cast<VectorType>(left->IRValue->getType());
-        right->IRValue = cg.builder.CreateVectorSplat(vecTy->getElementCount(), right->IRValue);
-        return cg.builder.CreateFMul(left->IRValue, right->IRValue);
+    if (!baseType->isFloat) assert(0);
+    auto [l, r] = loadPairAsFloat(cg, left, right);
+    if (right->type->isNumber()) {
+        r = getIRVector(cg, r);
     }
-    return cg.builder.CreateFMul(left->IRValue, right->IRValue);
+    return cg.builder.CreateFMul(l, r);
 }
 
 Value* LgsVec::divIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    if (right->IRValue->getType()->isIntegerTy()) {
-        const auto vecTy = llvm::cast<VectorType>(getIRType(cg));
-        right->IRValue = cg.builder.CreateSIToFP(right->IRValue, vecTy->getElementType());
-        right->IRValue = cg.builder.CreateVectorSplat(vecTy->getElementCount(), right->IRValue);
-        return cg.builder.CreateFDiv(left->loadIR(cg), right->loadIR(cg));
+    if (!baseType->isFloat) assert(0);
+    auto [l, r] = loadPairAsFloat(cg, left, right);
+    if (right->type->isNumber()) {
+        r = getIRVector(cg, r);
     }
-    if (right->IRValue->getType()->isFloatingPointTy()) {
-        const auto vecTy = llvm::cast<VectorType>(left->IRValue->getType());
-        right->IRValue = cg.builder.CreateVectorSplat(vecTy->getElementCount(), right->IRValue);
-        return cg.builder.CreateFDiv(left->IRValue, right->IRValue);
+    return cg.builder.CreateFDiv(l, r);
+}
+
+Value* LgsVec::modIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+    if (!baseType->isFloat) assert(0);
+    auto [l, r] = loadPairAsFloat(cg, left, right);
+    if (right->type->isNumber()) {
+        r = getIRVector(cg, r);
     }
-    return cg.builder.CreateFDiv(left->IRValue, right->IRValue);
+    return cg.builder.CreateFRem(l, r);
 }
 
 Value* LgsVec::crossIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
@@ -200,55 +187,28 @@ Value* LgsVec::inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) {
 }
 
 Value* LgsVec::lenIR(LgsCgModule& cg, Value* iterable) {
-    return cg.usize(2);
+    return cg.usize(dimVec);
 }
 
 Value* LgsVec::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
-    return cg.builder.CreateExtractElement(iterable, index);
-}
-
-void LgsVec::addIRElement(LgsCgModule& cg, Value*& iterable, Value* index, Value* value) {
-    auto v = iterable;
-    if (!iterable->getType()->isVectorTy()) {
-        v = cg.builder.CreateLoad(getIRType(cg), iterable);
+    Value* vec = iterable;
+    if (iterable->getType()->isPointerTy()) {
+        vec = cg.builder.CreateLoad(getIRType(cg), iterable);
     }
-    iterable = cg.builder.CreateInsertElement(v, value, index);
+    return cg.builder.CreateExtractElement(vec, index);
 }
 
-Value* LgsVec::matMul(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right) const {
-    const auto mat = left->type->asMatrix();
-    const auto order = cg.i32(CblasRowMajor);
-    const auto transpose = cg.i32(CblasNoTrans);
-    const auto m = cg.i32(mat->rows);
-    const auto n = cg.i32(mat->columns);
-    const auto alpha = cg.floatv(1);
-    const auto matrixPtr = left->IRValue;
-    const auto lda = cg.i32(mat->columns);
-    const auto vectorPtr = right->IRValue;
-    const auto incx = cg.i32(1);
-    const auto beta = cg.floatv(0);
-    const auto results = cg.builder.CreateAlloca(baseType->getIRType(cg), m);
-    const auto incy = cg.i32(1);
-    const std::vector<Type*> params = {
-        cg.i32Ty(),     // order
-        cg.i32Ty(),     // transpose
-        cg.i32Ty(),     // m
-        cg.i32Ty(),     // n
-        cg.floatTy(),   // alpha
-        cg.ptrTy(),     // matrixPtr
-        cg.i32Ty(),     // lda
-        cg.ptrTy(),     // vectorPtr
-        cg.i32Ty(),     // incx
-        cg.floatTy(),   // beta
-        cg.ptrTy(),     // results
-        cg.i32Ty()      // incy
-    };
-    const auto ft = cg.getFT(cg.voidTy(), params);
-    const std::vector<Value*> args = {
-        order, transpose, m, n, alpha, matrixPtr, lda, vectorPtr, incx, beta, results, incy
-    };
-    cg.builder.CreateCall(cg.getFunc("cblas_sgemv", ft), args);
-    return results;
+void LgsVec::addIRElement(LgsCgModule& cg, Value* iterable, Value* index, Value* value) {
+    const auto gep = cg.builder.CreateGEP(getIRType(cg), iterable, {cg.i32Zero(), index});
+    cg.store(value, gep);
+}
+
+Value* LgsVec::getIRVector(LgsCgModule& cg, Value* value) {
+    Value* result = UndefValue::get(getIRType(cg));
+    for (size_t i = 0; i < dimVec; ++i) {
+        result = cg.builder.CreateInsertElement(result, value, i);
+    }
+    return result;
 }
 
 size_t LgsVec::getSwizzleSet(const char c) {
@@ -327,6 +287,43 @@ Function* dotProductFunc(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* ri
     cg.currentFunc = originalFunc;
     cg.builder.restoreIP(cg.savedIP);
     return func;
+}
+
+Value* LgsVec::matVecMul(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right) const {
+    const auto mat = left->type->asMatrix();
+    const auto order = cg.i32(CblasRowMajor);
+    const auto transpose = cg.i32(CblasNoTrans);
+    const auto m = cg.i32(mat->rows);
+    const auto n = cg.i32(mat->columns);
+    const auto alpha = cg.floatv(1);
+    const auto matrixPtr = left->IRValue;
+    const auto lda = cg.i32(mat->columns);
+    const auto vectorPtr = cg.getPtrTo(right->IRValue);
+    const auto incx = cg.i32(1);
+    const auto beta = cg.floatv(0);
+    const auto vecType = VectorType::get(baseType->getIRType(cg), mat->rows, false);
+    const auto results = cg.builder.CreateAlloca(vecType);
+    const auto incy = cg.i32(1);
+    const std::vector<Type*> params = {
+        cg.i32Ty(),     // order
+        cg.i32Ty(),     // transpose
+        cg.i32Ty(),     // m
+        cg.i32Ty(),     // n
+        cg.floatTy(),   // alpha
+        cg.ptrTy(),     // matrixPtr
+        cg.i32Ty(),     // lda
+        cg.ptrTy(),     // vectorPtr
+        cg.i32Ty(),     // incx
+        cg.floatTy(),   // beta
+        cg.ptrTy(),     // results
+        cg.i32Ty()      // incy
+    };
+    const auto ft = cg.getFT(cg.voidTy(), params);
+    const std::vector<Value*> args = {
+        order, transpose, m, n, alpha, matrixPtr, lda, vectorPtr, incx, beta, results, incy
+    };
+    cg.builder.CreateCall(cg.getFunc("cblas_sgemv", ft), args);
+    return results;
 }
 
 Function* crossProductFunc(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right) {

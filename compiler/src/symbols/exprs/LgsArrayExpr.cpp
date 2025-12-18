@@ -9,8 +9,8 @@ Value* LgsArrayExpr::loadIR(LgsCgModule& cg) {
 }
 
 void LgsArrayExpr::castImplicitly(LgsType* toType) {
-    if (toType->asGenericType()) return;
-    // Replace static and dynamic if needed
+    if (!toType->asIterable()) return;
+    // Replace dynamic array with static if needed
     if (!type && toType->asSArray()) {
         setType(toType);
     } else if (type->asDArray() && (toType->asSArray() || toType->asSet())) {

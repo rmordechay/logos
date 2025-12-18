@@ -54,6 +54,7 @@ enum LgsTokenType {
     T_AMPERSAND,
     T_PIPE,
     T_CARET,
+    T_DOUBLE_CARET,
     T_DOLLAR,
     T_DOUBLE_LANGLE,
     T_DOUBLE_RANGLE,

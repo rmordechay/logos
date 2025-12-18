@@ -81,8 +81,8 @@ public:
     void visitLambda(LgsFunc* lambda);
     void visitParam(LgsParam* param);
     void visitIOPair(LgsIOPair* ioPair, LgsObject* obj);
-    void visitStmt(LgsStmt* stmt);
-    void replaceForLoops(LgsStmtWrapper& stmt);
+    void visitStmt(LgsStmtWrapper& stmt);
+    void replaceForLoop(LgsStmtWrapper& stmt);
     void visitStmtsBlock(LgsStmtsBlock* stmtsBlock);
     void visitVarDec(LgsVarDec* varDec);
     void visitAssignment(LgsAssignment* assignment);

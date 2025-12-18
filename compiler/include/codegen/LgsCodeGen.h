@@ -69,7 +69,6 @@ public:
     LgsPaths& paths;
     LgsGlobals& globals;
     LgsAppConfigs& appConfigs;
-    static std::atomic<size_t> lambdasIDGenerator;
 
     explicit LgsCodeGen(LgsFile& file, LgsAppConfigs& appConfigs, LgsGlobals& globals, LgsPaths& paths)
         : file(file), cg(file.cg), paths(paths), globals(globals), appConfigs(appConfigs) {
@@ -149,4 +148,5 @@ public:
     Value* getIRValue(LgsValue* value);
     void addVirtuals(LgsObject* obj, Value* ptr) const;
     void createMapFunc(LgsFunc* func);
+    void createFilterFunc(LgsFunc* func);
 };

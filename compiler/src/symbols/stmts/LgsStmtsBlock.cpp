@@ -8,13 +8,13 @@
 #include "types/LgsObject.h"
 
 bool LgsStmtWrapper::isTerminator() const {
-    switch (type) {
-    case Type::Stmt: {
+    switch (wrapperType) {
+    case WrapperType::Stmt: {
         const bool isControlFlow = dynamic_cast<LgsBreak*>(stmt) || dynamic_cast<LgsContinue*>(stmt) || dynamic_cast<LgsReturn*>(stmt);
         if (isControlFlow) return true;
         break;
     }
-    case Type::Expr: {
+    case WrapperType::Expr: {
         const auto fc = expr->asFuncCall();
         if (fc && fc->func && fc->func->funcType->isTerminator) return true;
         const auto selection = expr->asSelection();
@@ -23,19 +23,19 @@ bool LgsStmtWrapper::isTerminator() const {
         if (!methodCall) break;
         return methodCall->func && methodCall->func->funcType->isTerminator;
     }
-    case Type::Object:
+    case WrapperType::Object:
         break;
     }
     return false;
 }
 
 LgsStmtWrapper LgsStmtWrapper::clone() const {
-    switch (type) {
-    case Type::Stmt:
+    switch (wrapperType) {
+    case WrapperType::Stmt:
         return LgsStmtWrapper(stmt->clone());
-    case Type::Expr:
+    case WrapperType::Expr:
         return LgsStmtWrapper(expr->clone());
-    case Type::Object:
+    case WrapperType::Object:
         assert(0);
     }
     return LgsStmtWrapper();
@@ -49,14 +49,14 @@ void LgsStmtsBlock::hashNode(size_t& oldHash) {
 
 LgsStmtsBlock::~LgsStmtsBlock() {
     for (const auto& stmt : stmts) {
-        switch (stmt.type) {
-        case LgsStmtWrapper::Type::Stmt:
+        switch (stmt.wrapperType) {
+        case LgsStmtWrapper::WrapperType::Stmt:
             freeStmt(stmt.stmt);
             break;
-        case LgsStmtWrapper::Type::Expr:
+        case LgsStmtWrapper::WrapperType::Expr:
             freeExpr(stmt.expr);
             break;
-        case LgsStmtWrapper::Type::Object:
+        case LgsStmtWrapper::WrapperType::Object:
             freeType(stmt.obj);
             break;
         }

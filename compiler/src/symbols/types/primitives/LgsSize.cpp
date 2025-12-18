@@ -73,8 +73,8 @@ Value* LgsSize::rshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     return cg.builder.CreateShl(left->loadIR(cg), r);
 }
 
-Value* LgsSize::lshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* other) {
-    const auto r = cg.builder.CreateZExt(other->loadIR(cg), getIRType(cg));
+Value* LgsSize::lshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+    const auto r = cg.builder.CreateZExt(right->loadIR(cg), getIRType(cg));
     return cg.builder.CreateLShr(left->loadIR(cg), r);
 }
 

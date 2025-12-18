@@ -53,17 +53,17 @@ struct LgsAssignOp {
     std::string text;
 };
 
-const auto ADD_OP = LgsBinOp{ADD, "+"};
-const auto SUB_OP = LgsBinOp{SUB, "-"};
-const auto MUL_OP = LgsBinOp{MUL, "*"};
-const auto DIV_OP = LgsBinOp{DIV, "/"};
-const auto MODULO_OP = LgsBinOp{MODULO, "%"};
-const auto POW_OP = LgsBinOp{POW, "^"};
-const auto BIT_AND_OP = LgsBinOp{BIT_AND, "&"};
-const auto BIT_OR_OP = LgsBinOp{BIT_OR, "|"};
-const auto BIT_XOR_OP = LgsBinOp{BIT_XOR, "$"};
-const auto LSHIFT_OP = LgsBinOp{LSHIFT, "<<"};
-const auto RSHIFT_OP = LgsBinOp{RSHIFT, ">>"};
+const auto ADD_OP = LgsBinOp{ADD, "addition"};
+const auto SUB_OP = LgsBinOp{SUB, "subtraction"};
+const auto MUL_OP = LgsBinOp{MUL, "multiplication"};
+const auto DIV_OP = LgsBinOp{DIV, "division"};
+const auto MODULO_OP = LgsBinOp{MODULO, "module"};
+const auto POW_OP = LgsBinOp{POW, "power"};
+const auto BIT_AND_OP = LgsBinOp{BIT_AND, "bit and"};
+const auto BIT_OR_OP = LgsBinOp{BIT_OR, "bit or"};
+const auto BIT_XOR_OP = LgsBinOp{BIT_XOR, "xor"};
+const auto LSHIFT_OP = LgsBinOp{LSHIFT, "left shift"};
+const auto RSHIFT_OP = LgsBinOp{RSHIFT, "right shift"};
 const auto EQ_OP = LgsBinOp{EQ, "=="};
 const auto NE_OP = LgsBinOp{NE, "!="};
 const auto GT_OP = LgsBinOp{GT, ">"};
@@ -73,7 +73,7 @@ const auto LE_OP = LgsBinOp{LE, ">="};
 const auto AND_OP = LgsBinOp{AND, "and"};
 const auto OR_OP = LgsBinOp{OR, "or"};
 const auto IN_OP = LgsBinOp{IN, "in"};
-const auto CROSS_OP = LgsBinOp{CROSS, "x"};
+const auto CROSS_OP = LgsBinOp{CROSS, "cross product"};
 const auto NOOP_BIN_OP = LgsBinOp{NOOP, ""};
 
 // Names will be attached to 'assign'. for example, re-assign, add-assign, etc.
@@ -100,7 +100,7 @@ const std::unordered_map<LgsTokenType, LgsBinOp> LGS_BINARY_OPS_DICT = {
     {T_CARET, POW_OP},
     {T_AMPERSAND, BIT_AND_OP},
     {T_PIPE, BIT_OR_OP},
-    {T_DOLLAR, BIT_XOR_OP},
+    {T_DOUBLE_CARET, BIT_XOR_OP},
     {T_DOUBLE_LANGLE, LSHIFT_OP},
     {T_DOUBLE_RANGLE, RSHIFT_OP},
     {T_DOUBLE_EQUAL, EQ_OP},
@@ -130,4 +130,3 @@ const std::unordered_map<LgsTokenType, LgsAssignOp> LGS_ASSIGN_OPS_DICT = {
     {T_EQUAL_DOUBLE_LANGLE, RSHIFT_ASSIGN_OP},
     {T_UNKNOWN, NOOP_ASSIGN_OP},
 };
-

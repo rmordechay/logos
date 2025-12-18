@@ -175,6 +175,13 @@ void LgsSema::visitFunc(LgsFunc* func) {
     stack.exitScope();
 }
 
+void LgsSema::visitLambda(LgsFunc* lambda) {
+    const auto ft = lambda->funcType;
+    typeResolver.resolveFuncType(ft);
+    visitFunc(lambda);
+    assert(lambda->funcType->rt);
+}
+
 void LgsSema::visitMainFunc(LgsMainFunc* mainFunc) {
     stack.enterScope(mainFunc);
     const auto ft = mainFunc->funcType;
@@ -196,23 +203,6 @@ void LgsSema::visitMainFunc(LgsMainFunc* mainFunc) {
     }
     visitStmtsBlock(mainFunc->stmtsBlock);
     stack.exitScope();
-}
-
-void LgsSema::visitLambda(LgsFunc* lambda) {
-    const auto ft = lambda->funcType;
-    typeResolver.resolveFuncType(ft);
-    const auto& stmtsBlock = lambda->stmtsBlock;
-    // Wraps expr in returnStmt if it's the last statement
-    if (stmtsBlock->stmts.size() == 1 && !lambda->funcType->rt->isVoid()) {
-        const auto lastStmtWrapper = stmtsBlock->stmts.front();
-        if (lastStmtWrapper.type == LgsStmtWrapper::Type::Expr) {
-            const auto returnStmt = new LgsReturn(lastStmtWrapper.expr);
-            returnStmt->location = lastStmtWrapper.expr->location;
-            stmtsBlock->stmts[0].stmt = returnStmt;
-            stmtsBlock->stmts[0].type = LgsStmtWrapper::Type::Stmt;
-        }
-    }
-    visitFunc(lambda);
 }
 
 void LgsSema::visitParam(LgsParam* param) {
@@ -244,45 +234,58 @@ void LgsSema::visitIOPair(LgsIOPair* ioPair, LgsObject* obj) {
     }
 }
 
-void LgsSema::visitStmt(LgsStmt* stmt) {
-    if (const auto pattern = stmt->asSwitch()) visitSwitch(pattern);
-    else if (const auto ifStmt = stmt->asIfStmt()) visitIfStmt(ifStmt);
-    else if (const auto varDec = stmt->asVarDec()) visitVarDec(varDec);
-    else if (const auto loopStmt = stmt->asLoop()) visitLoop(loopStmt);
-    else if (const auto coroutine = stmt->asCoroutine()) visitCoroutine(coroutine);
-    else if (const auto deferStmt = stmt->asDefer()) visitDeferStmt(deferStmt);
-    else if (const auto assignment = stmt->asAssignment()) visitAssignment(assignment);
-    else if (const auto returnStmt = stmt->asReturn()) visitReturnStmt(returnStmt);
-    else if (const auto continueStmt = stmt->asContinue()) visitContinueStmt(continueStmt);
-    else if (const auto ioStmt = stmt->asIOStmt()) visitIOStmt(ioStmt);
-    else if (const auto breakStmt = stmt->asBreak()) visitBreakStmt(breakStmt);
+void LgsSema::visitStmt(LgsStmtWrapper& stmt) {
+    if (const auto pattern = stmt.stmt->asSwitch()) visitSwitch(pattern);
+    else if (const auto ifStmt = stmt.stmt->asIfStmt()) visitIfStmt(ifStmt);
+    else if (const auto varDec = stmt.stmt->asVarDec()) visitVarDec(varDec);
+    else if (const auto coroutine = stmt.stmt->asCoroutine()) visitCoroutine(coroutine);
+    else if (const auto deferStmt = stmt.stmt->asDefer()) visitDeferStmt(deferStmt);
+    else if (const auto assignment = stmt.stmt->asAssignment()) visitAssignment(assignment);
+    else if (const auto returnStmt = stmt.stmt->asReturn()) visitReturnStmt(returnStmt);
+    else if (const auto continueStmt = stmt.stmt->asContinue()) visitContinueStmt(continueStmt);
+    else if (const auto ioStmt = stmt.stmt->asIOStmt()) visitIOStmt(ioStmt);
+    else if (const auto breakStmt = stmt.stmt->asBreak()) visitBreakStmt(breakStmt);
+    else if (const auto loopStmt = stmt.stmt->asLoop()) {
+        replaceForLoop(stmt);
+        visitLoop(loopStmt);
+    }
     else assert(0);
 }
 
 void LgsSema::visitStmtsBlock(LgsStmtsBlock* stmtsBlock) {
     if (!stmtsBlock || stmtsBlock->stmts.empty()) return;
+
+    // Check if it's lambda with one expr line and replace with return stmt
+    auto& firstStmt = stmtsBlock->stmts.front();
+    const auto& ft = stack.currentFunc()->funcType;
+    const auto isExpr = firstStmt.wrapperType == LgsStmtWrapper::WrapperType::Expr;
+    if (isExpr && stmtsBlock->isSingleLine && ft->isLambda && !ft->rt) {
+        visitExpr(firstStmt.expr);
+        if (firstStmt.expr->type->isVoid()) return;
+        ft->rt = firstStmt.expr->type;
+        firstStmt.stmt = new LgsReturn(firstStmt.expr);
+        firstStmt.wrapperType = LgsStmtWrapper::WrapperType::Stmt;
+        return;
+    }
+
     for (auto& stmt : stmtsBlock->stmts) {
-        switch (stmt.type) {
-        case LgsStmtWrapper::Type::Object:
+        switch (stmt.wrapperType) {
+        case LgsStmtWrapper::WrapperType::Object:
             visitObject(stmt.obj);
             addLocalSymbol(LgsSymbol(stmt.obj));
             break;
-        case LgsStmtWrapper::Type::Stmt:
-            replaceForLoops(stmt);
-            visitStmt(stmt.stmt);
+        case LgsStmtWrapper::WrapperType::Stmt:
+            visitStmt(stmt);
             break;
-        case LgsStmtWrapper::Type::Expr:
+        case LgsStmtWrapper::WrapperType::Expr:
             visitExpr(stmt.expr);
             break;
         }
     }
     if (stmtsBlock->stmts.empty()) return;
 
-    const auto lastStmt = stmtsBlock->stmts[stmtsBlock->stmts.size() - 1];
-    if (lastStmt.type == LgsStmtWrapper::Type::Stmt) {
-        stmtsBlock->returnStmt = lastStmt.stmt->asReturn();
-    }
     // Check unreachable code
+    const auto lastStmt = stmtsBlock->stmts[stmtsBlock->stmts.size() - 1];
     for (size_t i = 0; i < stmtsBlock->stmts.size() - 1; ++i) {
         if (stmtsBlock->stmts[i].isTerminator()) {
             return addError(E10059, lastStmt.stmt->location);
@@ -290,7 +293,7 @@ void LgsSema::visitStmtsBlock(LgsStmtsBlock* stmtsBlock) {
     }
 }
 
-void LgsSema::replaceForLoops(LgsStmtWrapper& stmt) {
+void LgsSema::replaceForLoop(LgsStmtWrapper& stmt) {
     const auto rangeLoop = stmt.stmt->asLoop()->asRangeLoop();
     if (!rangeLoop) return;
     visitExpr(rangeLoop->endRange);
@@ -605,20 +608,23 @@ void LgsSema::visitWhileLoop(LgsWhileLoop* whileLoop) {
 }
 
 void LgsSema::visitReturnStmt(const LgsReturn* returnStmt) {
-    const auto funcType = stack.currentFunc()->funcType;
+    const auto currentFunc = stack.currentFunc();
+    const auto ft = currentFunc->funcType;
     auto retExpr = returnStmt->expr;
     if (retExpr) {
-        castExprImplicitly(retExpr, funcType->rt);
+        castExprImplicitly(retExpr, ft->rt);
         visitExpr(retExpr);
-        validateExprType(returnStmt->expr, funcType->rt);
+        validateExprType(returnStmt->expr, ft->rt);
+        currentFunc->returnStmts.push_back(returnStmt);
     }
-    const auto rt = funcType->rt;
+    const auto rt = ft->rt;
+    if (!rt && ft->isLambda) return;
     if (rt->isVoid() && retExpr && retExpr->type && !retExpr->type->isVoid()) {
         addError(E10027, returnStmt->location, {retExpr->type->pname()});
     } else if (!rt->isVoid() && !retExpr) {
-        addError(E10026, returnStmt->location, {funcType->name, rt->pname()});
+        addError(E10026, returnStmt->location, {ft->name, rt->pname()});
     } else if (retExpr && retExpr->type && !rt->canCastTo(retExpr->type)) {
-        addError(E10004, returnStmt->location, {funcType->name, rt->pname(), retExpr->type->pname()});
+        addError(E10004, returnStmt->location, {ft->name, rt->pname(), retExpr->type->pname()});
     }
 }
 
@@ -797,7 +803,7 @@ void LgsSema::visitArrayExpr(LgsArrayExpr* arrayExpr) {
     } else if (arrayExpr->type->asSArray()) {
         visitStaticArray(arrayExpr);
     } else {
-        assert(0);
+        return;
     }
     const auto iterable = arrayExpr->type->asIterable();
     if (!iterable) return;
@@ -826,7 +832,6 @@ void LgsSema::visitDynamicArray(LgsArrayExpr* arrayExpr) {
     if (!dArr->inferBaseType(arrayExpr->elements)) {
         return addError(E10095, arrayExpr->location);
     }
-    dArr->getMethod(ADD_FUNC)->funcType->params[1].type = dArr->baseType;
 }
 
 void LgsSema::visitHashMap(LgsHashMap* hashMap) {
@@ -844,9 +849,6 @@ void LgsSema::visitHashMap(LgsHashMap* hashMap) {
 
 void LgsSema::visitVectorExpr(LgsVectorExpr* vectorExpr) {
     const auto vec = vectorExpr->type->asVec();
-    if (!vec->inferBaseType(vectorExpr->elements)) {
-        return addError(E10095, vectorExpr->location);
-    }
     size_t sumDim = 0;
     for (auto arg : vectorExpr->elements) {
         visitExpr(arg);
@@ -858,6 +860,9 @@ void LgsSema::visitVectorExpr(LgsVectorExpr* vectorExpr) {
             addError(E10073, vectorExpr->location, {arg->type->pname()});
             break;
         }
+    }
+    if (!vec->inferBaseType(vectorExpr->elements)) {
+        return addError(E10095, vectorExpr->location);
     }
     if (sumDim > vectorExpr->vecType->dimVec) {
         addError(E10074, vectorExpr->location, {vec->pname(), std::to_string(sumDim)});
@@ -956,17 +961,7 @@ void LgsSema::visitSelection(LgsSelection* selection) {
 
 void LgsSema::visitFirstSelection(LgsSelection* selection) {
     auto& firstExpr = selection->exprs.front();
-    if (const auto variable = firstExpr->asVariable()) {
-        visitVariable(variable);
-    } else if (const auto funcCall = firstExpr->asFuncCall()) {
-        visitFuncCall(funcCall);
-    } else if (const auto iterIndex = firstExpr->asIterIndex()) {
-        visitIterIndex(iterIndex);
-    } else if (const auto typeExpr = firstExpr->asTypeExpr()) {
-        visitTypeExpr(typeExpr);
-    } else {
-        assert(0);
-    }
+    visitExpr(firstExpr);
     if (!firstExpr->asNullableExpr() && firstExpr->type->asNullable()) {
         wrapInNullable(firstExpr, firstExpr->type->asNullable());
         selection->hasNullables = true;
@@ -1636,12 +1631,13 @@ void LgsSema::validateObjDuplicates(LgsType* type){
 
 bool LgsSema::validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const LgsFunc* func) {
     assert(func->funcType->rt);
-    if (func->funcType->rt->isVoid()) return true;
-    if (!stmtBlock) return true;
-    if (stmtBlock->returnStmt) return true;
+    if (!stmtBlock || func->funcType->rt->isVoid()) return true;
+    const auto lastStmt = stmtBlock->stmts.back();
+    const auto isStmt = lastStmt.wrapperType == LgsStmtWrapper::WrapperType::Stmt;
+    if (isStmt && lastStmt.stmt->asReturn()) return true;
     auto isValid = false;
     for (const auto stmt : stmtBlock->stmts) {
-        if (stmt.type == LgsStmtWrapper::Type::Object) continue;
+        if (stmt.wrapperType == LgsStmtWrapper::WrapperType::Object) continue;
         if (const auto ifStmt = stmt.stmt->asIfStmt()) {
             isValid = validateBlockControlFlow(ifStmt->ifBlock, func);
             for (const auto [_, elseIfStmt] : ifStmt->elseIfs) {

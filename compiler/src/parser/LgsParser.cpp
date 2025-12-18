@@ -24,7 +24,7 @@
 #include "loops/LgsRangeLoop.h"
 #include "loops/LgsWhileLoop.h"
 #include "LgsTokens.h"
-#include "../../include/symbols/exprs/constants/LgsComplexConst.h"
+#include "exprs/constants/LgsComplexConst.h"
 #include "errors/LgsPlmErrors.h"
 #include "exprs/LgsBinaryExpr.h"
 #include "exprs/LgsCast.h"
@@ -62,7 +62,6 @@
 #include "types/primitives/LgsShort.h"
 #include "types/primitives/LgsSize.h"
 #include "types/primitives/LgsUInt.h"
-#include "types/primitives/LgsULong.h"
 #include <unordered_set>
 
 #define MAX_TOKENS_NUMBER 100000
@@ -873,6 +872,7 @@ LgsStmtsBlock* LgsParser::parseStmtsBlock(const bool withSingleStmt) {
         setLocation(stmtsBlock->location, &currentToken, &startToken);
     } else if (withSingleStmt) {
         stmtsBlock = new LgsStmtsBlock();
+        stmtsBlock->isSingleLine = true;
         if (const auto expr = parseExpr()) {
             stmtsBlock->location = expr->location;
             stmtsBlock->stmts.push_back(LgsStmtWrapper(expr));
@@ -1396,13 +1396,13 @@ LgsExpr* LgsParser::parseUnary(const bool withInstance) {
     return expr;
 }
 
-LgsExpr* LgsParser::parseExprOrLambda() {
+LgsExpr* LgsParser::parseArgExprOrLambda() {
     // The order is important. First check for empty block, then expr, then non-empty block.
     if (currentToken.type == T_LBRACE && peek().type == T_RBRACE) {
         consume(2);
         return wrapStmtsBlockWithLambda(new LgsStmtsBlock());
     }
-    if (LgsExpr* expr = parseExpr()) {
+    if (const auto expr = parseExpr()) {
         return expr;
     }
     if (const auto stmtsBlock = parseStmtsBlock()) {
@@ -1466,7 +1466,7 @@ LgsFuncCall* LgsParser::parseFuncCall() {
             funcCall->isNamed = true;
             argName = currentToken.lexeme;
             consume(2);
-            const auto exprOrStmt = parseExprOrLambda();
+            const auto exprOrStmt = parseArgExprOrLambda();
             if (!exprOrStmt) break;
             if (!seen.insert(argName).second) {
                 addError(E10054, exprOrStmt->location, {argName});
@@ -1474,7 +1474,7 @@ LgsFuncCall* LgsParser::parseFuncCall() {
             }
             funcCall->args.emplace_back(LgsFuncArg{exprOrStmt, argName});
         } else {
-            const auto exprOrStmt = parseExprOrLambda();
+            const auto exprOrStmt = parseArgExprOrLambda();
             if (!exprOrStmt) break;
             funcCall->args.emplace_back(LgsFuncArg{exprOrStmt, argName});
         }
@@ -1783,7 +1783,7 @@ LgsFunc* LgsParser::parseLambda() {
 
     const auto lambda = new LgsFunc("", rt, params);
     currentFunc = lambda;
-    lambda->isLambda = true;
+    lambda->funcType->isLambda = true;
     lambda->stmtsBlock = parseStmtsBlock();
     mustParse(lambda->stmtsBlock);
     if (lambda->stmtsBlock->isMacro) addParsingError();
@@ -2315,8 +2315,9 @@ void LgsParser::recursionGuard() {
 
 LgsFunc* wrapStmtsBlockWithLambda(LgsStmtsBlock* stmtsBlock) {
     const auto func = new LgsFunc("", nullptr);
-    func->isLambda = true;
+    func->funcType->isLambda = true;
     func->location = stmtsBlock->location;
     func->stmtsBlock = stmtsBlock;
+    stmtsBlock->isSingleLine = stmtsBlock->stmts.size() == 1;
     return func;
 }

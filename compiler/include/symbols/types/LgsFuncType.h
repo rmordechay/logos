@@ -37,6 +37,7 @@ public:
     bool isSyscall = false;
     bool isExternal = false;
     bool isTerminator = false;
+    bool isLambda = false;
     bool hasDefaults = false;
     uint32_t variadicIndex = 0;
 

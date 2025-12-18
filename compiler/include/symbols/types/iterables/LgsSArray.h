@@ -23,6 +23,7 @@ public:
     Value* mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
     Value* inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
     Value* getIRElement(LgsCgModule& cg, Value* iterable, Value* index) override;
+    void addIRElement(LgsCgModule& cg, Value* iterable, Value* index, Value* value) override;
     Value* lenIR(LgsCgModule& cg, Value* iterable) override;
     bool canCastTo(LgsType* other) override;
     bool equals(LgsType* other) override;

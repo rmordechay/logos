@@ -67,8 +67,8 @@ Value* LgsBool::rshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     return cg.builder.CreateShl(left->loadIR(cg), right->loadIR(cg));
 }
 
-Value* LgsBool::lshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* other) {
-    return cg.builder.CreateLShr(left->loadIR(cg), other->loadIR(cg));
+Value* LgsBool::lshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+    return cg.builder.CreateLShr(left->loadIR(cg), right->loadIR(cg));
 }
 
 std::string LgsBool::getName() {
