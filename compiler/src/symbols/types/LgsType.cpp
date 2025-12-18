@@ -57,7 +57,7 @@ LgsFunc* LgsType::getMethod(const std::string& methodName) {
     return nullptr;
 }
 
-Value* LgsType::getIRZeroValue(LgsCgModule& cg) {
+Value* LgsType::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
     assert(0);
 }
 

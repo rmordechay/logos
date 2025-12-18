@@ -76,7 +76,7 @@ public:
     virtual LgsFunc* getMethod(const std::string& methodName);
     virtual size_t sizeBytes() = 0;
     virtual LgsExpr* getZeroValue() = 0;
-    virtual Value* getIRZeroValue(LgsCgModule& cg);
+    virtual Value* getIRZeroValue(LgsCgModule& cg, Value* pointee = nullptr);
     virtual Type* getIRType(LgsCgModule& cg) = 0;
     virtual Constant* getRTType(LgsCgModule& cg) = 0;
     virtual bool canCastTo(LgsType* other) = 0;

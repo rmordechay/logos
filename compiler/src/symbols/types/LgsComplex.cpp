@@ -144,7 +144,7 @@ LgsType* LgsComplex::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     case SUB:
     case MUL:
     case DIV: {
-        return &LGS_COMPLEX;
+        return this;
     }
     case EQ:
     case NE: {

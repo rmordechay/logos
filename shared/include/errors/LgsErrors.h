@@ -71,7 +71,7 @@ inline LgsBaseMsg E10056{"%s has multiple fields with the same name %s.", errCod
 inline LgsBaseMsg E10057{"Pattern matching expression %s must be of type Bool.", errCodeStart++};
 inline LgsBaseMsg E10058{"Field '%s' is defined in multiple interfaces.", errCodeStart++};
 inline LgsBaseMsg E10059{"Unreachable code.", errCodeStart++};
-inline LgsBaseMsg E10060{"for.isFirst and for.isLast are only allowed inside a for loop.", errCodeStart++};
+inline LgsBaseMsg E10060{"for meta variables are only allowed inside a for loop.", errCodeStart++};
 inline LgsBaseMsg E10061{"%s is not allowed in an infinite loop.", errCodeStart++};
 inline LgsBaseMsg E10062{"Interface %s implements all its methods which is not allowed. Make at least one of the methods abstract (without implementation) or change it to object", errCodeStart++};
 inline LgsBaseMsg E10063{"Interfaces must have at least one (abstract) method or field.", errCodeStart++};

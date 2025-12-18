@@ -28,6 +28,10 @@ LgsExpr* LgsStr::getZeroValue() {
     return new LgsStrConst("");
 }
 
+Value* LgsStr::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
+    return cg.emptyStr();
+}
+
 Constant* LgsStr::getRTType(LgsCgModule& cg) {
     return cg.getRTTypeInfo(getName(), sizeBytes(), RTT_STR, isHeapAlloc, baseType->getRTType(cg));
 }

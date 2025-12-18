@@ -23,7 +23,7 @@ LgsExpr* LgsInt::getZeroValue() {
     return new LgsIntConst(&LGS_INT, 0);
 }
 
-Value* LgsInt::getIRZeroValue(LgsCgModule& cg) {
+Value* LgsInt::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
     return cg.i32Zero();
 }
 

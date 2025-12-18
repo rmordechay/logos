@@ -245,9 +245,9 @@ void LgsSema::visitStmt(LgsStmtWrapper& stmt) {
     else if (const auto continueStmt = stmt.stmt->asContinue()) visitContinueStmt(continueStmt);
     else if (const auto ioStmt = stmt.stmt->asIOStmt()) visitIOStmt(ioStmt);
     else if (const auto breakStmt = stmt.stmt->asBreak()) visitBreakStmt(breakStmt);
-    else if (const auto loopStmt = stmt.stmt->asLoop()) {
+    else if (stmt.stmt->asLoop()) {
         replaceForLoop(stmt);
-        visitLoop(loopStmt);
+        visitLoop(stmt.stmt->asLoop());
     }
     else assert(0);
 }
@@ -1243,6 +1243,7 @@ void LgsSema::visitStrConst(const LgsStrConst* strConst) {
 void LgsSema::visitComplexConst(LgsComplexConst* complex) {
     visitExpr(complex->real);
     visitExpr(complex->imaginary);
+    complex->type = new LgsComplex(complex->real->type, complex->imaginary->type);
 }
 
 void LgsSema::visitTypeExpr(LgsTypeExpr* typeExpr) {

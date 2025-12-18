@@ -20,7 +20,6 @@ bool LgsFuncCall::equals(LgsFuncType* funcType) const {
     const auto argsSize = args.size();
     const auto paramsSize = funcType->params.size();
     if (argsSize != paramsSize) return false;
-    if (!type || !type->canCastTo(funcType->rt)) return false;
     if (isNamed) {
         auto paramsByName = funcType->getParamsByName();
         for (size_t i = funcType->isMethod; i < argsSize; ++i) {

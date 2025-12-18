@@ -88,6 +88,16 @@ LgsExpr* LgsObject::getZeroValue() {
     return new LgsInstance(this);
 }
 
+Value* LgsObject::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
+    const auto ty = getIRType(cg);
+    const auto zero = pointee ? pointee : cg.builder.CreateAlloca(ty);
+    for (const auto field : fields) {
+        const auto fieldZero = field->type->getIRZeroValue(cg);
+        cg.storeStructField(ty, zero, field->position, fieldZero);
+    }
+    return zero;
+}
+
 bool LgsObject::canCastTo(LgsType* other) {
     if (other->getName() == LgsAny::name) return true;
     const auto otherType = other;

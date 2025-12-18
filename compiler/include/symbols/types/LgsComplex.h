@@ -9,7 +9,7 @@ public:
     LgsType* realType;
     LgsType* imaginaryType;
 
-    explicit LgsComplex(LgsType* realType = &LGS_FLOAT, LgsType* imaginaryType = &LGS_FLOAT): realType(realType), imaginaryType(imaginaryType) {
+    explicit LgsComplex(LgsType* realType, LgsType* imaginaryType): realType(realType), imaginaryType(imaginaryType) {
         passByRef = true;
     }
     size_t sizeBytes() override;
@@ -27,5 +27,3 @@ public:
     std::string getName() override;
     ~LgsComplex() override;
 };
-
-inline LgsComplex LGS_COMPLEX;

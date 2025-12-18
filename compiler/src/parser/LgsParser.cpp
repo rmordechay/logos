@@ -991,6 +991,7 @@ LgsStmt* LgsParser::parseAssignment() {
         return nullptr;
     }
     const auto op = LGS_ASSIGN_OPS_DICT.at(currentToken.type);
+    consume();
 
     // Right expr
     const auto r = parseExpr();

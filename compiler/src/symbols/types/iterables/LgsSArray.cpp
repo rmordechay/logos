@@ -39,6 +39,10 @@ LgsExpr* LgsSArray::getZeroValue() {
     return new LgsArrayExpr(this);
 }
 
+Value* LgsSArray::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
+    return ConstantAggregateZero::get(getIRType(cg));
+}
+
 Constant* LgsSArray::getRTType(LgsCgModule& cg) {
     const auto sArrName = getName();
     const auto constSize = size->getConstInt();

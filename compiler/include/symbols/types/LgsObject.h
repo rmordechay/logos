@@ -4,7 +4,6 @@
 #include "exprs/LgsFuncCall.h"
 #include "funcs/LgsFunc.h"
 #include "iterables/LgsStr.h"
-#include <utility>
 
 class LgsGenericType;
 class LgsInstance;
@@ -40,6 +39,7 @@ public:
     Constant* getRTType(LgsCgModule& cg) override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
+    Value* getIRZeroValue(LgsCgModule& cg, Value* pointee = nullptr) override;
     bool canCastTo(LgsType* other) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     std::string fmtStr() const override;

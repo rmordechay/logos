@@ -129,7 +129,7 @@ void LgsCgModule::storeStructField(Type* type, Value* instancePtr, const size_t 
 }
 
 void LgsCgModule::store(Value* v, Value* ptr) {
-    assert(v != ptr);
+    if (v == ptr) return;
     builder.CreateStore(v, ptr);
 }
 
@@ -449,8 +449,7 @@ TypeSize LgsCgModule::typeSize(Type* v) const {
 }
 
 Value* LgsCgModule::emptyStr() {
-    const auto ty = ArrayType::get(i8Ty(), 1);
-    return createGlobal("empty_string", ty, ConstantAggregateZero::get(ty));
+    return getString("");
 }
 
 void LgsCgModule::printStr(const std::string& str) {

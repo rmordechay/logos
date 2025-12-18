@@ -1207,9 +1207,11 @@ void LgsCodeGen::visitInstance(LgsInstance* instance) {
             const auto gep = field->getGEP(cg, instance->IRValue);
             cg.store(field->expr->IRValue, gep);
         } else {
-            const auto zeroValue = field->type->getIRZeroValue(cg);
-            const auto gep = field->getGEP(cg, instance->IRValue);
-            cg.store(zeroValue, gep);
+            const auto zeroValue = field->type->getZeroValue();
+            zeroValue->pointee = field->getGEP(cg, instance->IRValue);
+            visitExpr(zeroValue);
+            cg.store(zeroValue->loadIR(cg), zeroValue->pointee);
+            freeExpr(zeroValue);
         }
     }
     addVirtuals(instance->obj, instance->IRValue);
