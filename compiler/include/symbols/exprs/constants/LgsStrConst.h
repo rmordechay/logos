@@ -10,14 +10,14 @@ public:
     std::vector<LgsExpr*> parts;
     bool isSingleQuoted;
 
-    explicit LgsStrConst(const std::string& value) : value(value) {
+    explicit LgsStrConst(const std::string& v) : value(v) {
         isMutable = false;
-        if (value.size() == 1) {
+        if (v.size() == 1) {
             setType(&LGS_CHAR);
         } else {
             const auto lgsStr = new LgsStr();
             lgsStr->isStatic = true;
-            lgsStr->size = new LgsIntConst(&LGS_INT, value.size());
+            lgsStr->size = new LgsIntConst(&LGS_INT, v.size());
             setType(lgsStr);
         }
     }

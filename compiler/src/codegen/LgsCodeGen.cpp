@@ -766,17 +766,15 @@ void LgsCodeGen::visitArrayExpr(LgsArrayExpr* arrayExpr) {
 void LgsCodeGen::visitStaticArray(LgsArrayExpr* arrayExpr) const {
     const auto sArr = arrayExpr->type->asSArray();
     const auto sArrTypeIR = sArr->getIRType(cg);
+    if (arrayExpr->elements.empty()) {
+        arrayExpr->IRValue = sArr->getIRZeroValue(cg, arrayExpr->pointee);
+        return;
+    }
+
     if (arrayExpr->pointee) {
         arrayExpr->IRValue = arrayExpr->pointee;
     } else {
         arrayExpr->IRValue = cg.builder.CreateAlloca(sArrTypeIR);
-    }
-    if (arrayExpr->elements.empty()) return;
-
-    const auto size = sArr->size->getConstInt();
-    if (!size.has_value()) {
-        cg.createArrBoundsGuard(sArr->size->IRValue, cg.usize(arrayExpr->elements.size()));
-        cg.storeStructField(sArrTypeIR, arrayExpr->IRValue, 1, sArr->size->IRValue);
     }
 
     // Check if all args are const for chunk copy
@@ -794,13 +792,7 @@ void LgsCodeGen::visitStaticArray(LgsArrayExpr* arrayExpr) const {
     if (allArgsAreConst) {
         const auto sArrTy = llvm::dyn_cast<ArrayType>(sArrTypeIR);
         const auto argsIR = ConstantArray::get(sArrTy, constantArgs);
-        if (size.has_value()) {
-            cg.store(argsIR, arrayExpr->IRValue);
-        } else {
-            const auto alloc = cg.builder.CreateAlloca(sArrTypeIR);
-            cg.store(argsIR, alloc);
-            cg.store(alloc, arrayExpr->IRValue);
-        }
+        cg.store(argsIR, arrayExpr->IRValue);
     } else {
         if (sArr->baseType->asSArray()) return; // Nested arrays are handled before
         for (size_t i = 0; i < arrayExpr->elements.size(); ++i) {
@@ -808,15 +800,11 @@ void LgsCodeGen::visitStaticArray(LgsArrayExpr* arrayExpr) const {
             sArr->addIRElement(cg, arrayExpr->IRValue, cg.i32(i), element);
         }
     }
+
     // Init rest of the values with zero
-    const auto arrSize = sArr->size->getConstInt();
-    if (arrSize.has_value()) {
-        const auto diff = arrSize.value() - arrayExpr->elements.size();
-        for (size_t i = diff; i <= arrayExpr->elements.size(); ++i) {
-            sArr->addIRElement(cg, arrayExpr->IRValue, cg.i32(i), sArr->baseType->getIRZeroValue(cg));
-        }
-    } else {
-        assert(0);
+    const size_t arrSize = sArr->size->getConstInt().value();
+    for (size_t i = arrayExpr->elements.size(); i < arrSize; ++i) {
+        sArr->addIRElement(cg, arrayExpr->IRValue, cg.i32(i), sArr->baseType->getIRZeroValue(cg));
     }
 }
 
@@ -949,7 +937,7 @@ void LgsCodeGen::visitVariable(LgsVariable* variable) {
         if (variable->ref.field->type->asEnum()) {
             variable->IRValue = cg.usize(variable->ref.field->position);
         } else {
-            assert(0);
+            variable->IRValue = variable->pointee;
         }
         break;
     case GENERIC:
@@ -983,7 +971,7 @@ void LgsCodeGen::visitSelection(LgsSelection* selection, const bool assign) {
         } else if (const auto iterIndex = child->asIterIndex()) {
             const auto baseExpr = iterIndex->getBaseExpr()->asVariable();
             const auto field = parent->type->getField(baseExpr->name);
-            iterIndex->IRValue = field->IRValue;
+            iterIndex->pointee = field->getGEP(cg, parent->IRValue);
             visitIterIndex(iterIndex, false);
         } else {
             assert(0);
@@ -1034,6 +1022,9 @@ void LgsCodeGen::visitFieldSelection(LgsVariable* var, LgsExpr* parent, const bo
         createVecField(field, parent->IRValue);
     }
     var->IRValue = field->getGEP(cg, parent->IRValue);
+    if (field->type->passByRef) {
+        var->IRValue = cg.builder.CreateLoad(cg.ptrTy(), var->IRValue);
+    }
 }
 
 void LgsCodeGen::visitNullableSelection(LgsExpr* child, LgsExpr* parent) const {
@@ -1194,6 +1185,7 @@ void LgsCodeGen::visitInstance(LgsInstance* instance) {
     const auto obj = instance->obj;
     instance->IRValue = cg.allocate(cg.usize(obj->sizeBytes()), obj->getRTType(cg), !!instance->owner);
 
+    // Args
     std::unordered_set<std::string> visited;
     for (const auto& [argName, arg] : instance->args) {
         visited.insert(argName);
@@ -1208,9 +1200,7 @@ void LgsCodeGen::visitInstance(LgsInstance* instance) {
         if (visited.contains(field->name) || field->type->asEnum()) continue;
         const auto pointee = field->getGEP(cg, instance->IRValue);
         if (field->expr) {
-            assert(field->expr->IRValue);
-            const auto gep = pointee;
-            cg.store(field->expr->IRValue, gep);
+            cg.store(field->expr->IRValue, pointee);
         } else {
             const auto zeroValue = field->type->getIRZeroValue(cg, pointee);
             cg.store(zeroValue, pointee);
@@ -1220,6 +1210,8 @@ void LgsCodeGen::visitInstance(LgsInstance* instance) {
 }
 
 void LgsCodeGen::visitIterIndex(LgsIterIndex* iterIndex, const bool assign) {
+    iterIndex->baseExpr->pointee = iterIndex->pointee;
+    iterIndex->pointee = nullptr;
     visitExpr(iterIndex->baseExpr);
     visitExpr(iterIndex->index.from);
     if(iterIndex->index.to) {

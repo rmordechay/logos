@@ -21,7 +21,7 @@ public:
     LgsField* getField(const std::string& fieldName) override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
-    Value* getIRZeroValue(LgsCgModule& cg, Value* pointee) override;
+    Value* getIRZeroValue(LgsCgModule& cg, Value* pointee = nullptr) override;
     std::string pname() override;
     std::string getName() override;
     Type* getIRType(LgsCgModule& cg) override;

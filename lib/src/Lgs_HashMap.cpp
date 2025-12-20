@@ -7,37 +7,13 @@
 
 #define MAP_INITIAL_CAPACITY 10
 
-static void resize(Lgs_HashMap* map) {
-    const auto newCap = map->capacity * 2;
-    const auto newBuckets = static_cast<Lgs_HashMapEntry**>(calloc(newCap, sizeof(Lgs_HashMapEntry*)));
-    for (int i = 0; i < map->capacity; i++) {
-        auto entry = map->entries[i];
-        while (entry) {
-            const auto next = entry->next;
-            const auto index = hashString(entry->key) % newCap;
-            entry->next = newBuckets[index];
-            newBuckets[index] = entry;
-            entry = next;
-        }
-    }
-    free(map->entries);
-    map->entries = newBuckets;
-    map->capacity = newCap;
-}
-
-static Lgs_HashMapEntry* create_entry(const char* key, void* value) {
-    const auto entry = static_cast<Lgs_HashMapEntry*>(malloc(sizeof(Lgs_HashMapEntry)));
-    entry->key = strdup(key);
-    entry->value = value;
-    entry->next = nullptr;
-    return entry;
-}
+static void resize(Lgs_HashMap* map);
+static Lgs_HashMapEntry* createEntry(const char* key, void* value);
 
 extern "C" void Lgs_Map_init(Lgs_HashMap* map) {
     const auto entries = std::calloc(MAP_INITIAL_CAPACITY, sizeof(Lgs_HashMapEntry));
     map->entries = static_cast<Lgs_HashMapEntry**>(entries);
     map->len = 0;
-    map->capacity = MAP_INITIAL_CAPACITY;
 }
 
 extern "C" void Lgs_Map_add(Lgs_HashMap* map, const char* key, void* value) {
@@ -51,7 +27,7 @@ extern "C" void Lgs_Map_add(Lgs_HashMap* map, const char* key, void* value) {
         }
         entry = entry->next;
     }
-    const auto new_entry = create_entry(key, value);
+    const auto new_entry = createEntry(key, value);
     map->entries[hashedValue] = new_entry;
     map->len++;
 }
@@ -124,4 +100,30 @@ extern "C" Lgs_DArrayExpr* Lgs_Map_keys(const Lgs_HashMap* map, const Lgs_TypeIn
 
 extern "C" Lgs_DArrayExpr* Lgs_Map_values(const Lgs_HashMap* map, const Lgs_TypeInfo* valueType) {
     assert(0);
+}
+
+static void resize(Lgs_HashMap* map) {
+    const auto newCap = map->capacity * 2;
+    const auto newBuckets = static_cast<Lgs_HashMapEntry**>(calloc(newCap, sizeof(Lgs_HashMapEntry*)));
+    for (int i = 0; i < map->capacity; i++) {
+        auto entry = map->entries[i];
+        while (entry) {
+            const auto next = entry->next;
+            const auto index = hashString(entry->key) % newCap;
+            entry->next = newBuckets[index];
+            newBuckets[index] = entry;
+            entry = next;
+        }
+    }
+    free(map->entries);
+    map->entries = newBuckets;
+    map->capacity = newCap;
+}
+
+static Lgs_HashMapEntry* createEntry(const char* key, void* value) {
+    const auto entry = static_cast<Lgs_HashMapEntry*>(malloc(sizeof(Lgs_HashMapEntry)));
+    entry->key = strdup(key);
+    entry->value = value;
+    entry->next = nullptr;
+    return entry;
 }

@@ -8,8 +8,6 @@
 #include "types/primitives/LgsVoid.h"
 #include "LgsUtils.h"
 #include "codegen/LgsCgModule.h"
-#include "exprs/LgsArrayExpr.h"
-
 #include <sstream>
 #include <llvm/IR/Module.h>
 

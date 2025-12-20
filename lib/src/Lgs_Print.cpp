@@ -24,10 +24,7 @@ static std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
     case RTT_DOUBLE: str << *static_cast<double*>(elem); break;
     case RTT_TYPE:
     case RTT_ENUM:
-    case RTT_STR: {
-        str << '"' << static_cast<char*>(elem) << '"';
-        break;
-    }
+    case RTT_STR: str << '"' << static_cast<char*>(elem) << '"'; break;
     case RTT_CHAR: str << '"' << *static_cast<const char*>(elem) << '"'; break;
     case RTT_SET:
     case RTT_DARRAY: {
@@ -44,23 +41,13 @@ static std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
         break;
     }
     case RTT_SARRAY: {
-        const auto& sArr = rtt->sArray;
+        const auto sArr = rtt->sArray;
         const auto baseType = sArr.baseType;
-        size_t len = 0;
-        void* base = nullptr;
-        if (sArr.len == 0) {
-            const auto sArrExpr = static_cast<Lgs_SArrayExpr*>(elem);
-            base = sArrExpr->data;
-            len = sArrExpr->length;
-        } else {
-            base = elem;
-            len = sArr.len;
-        }
         str << "[";
-        for (size_t i = 0; i < len; ++i) {
-            void* data = static_cast<char*>(base) + i * baseType->size;
+        for (size_t i = 0; i < sArr.len; ++i) {
+            void* data = static_cast<char*>(elem) + i * baseType->size;
             str << formatElement(baseType, data);
-            if (i < len - 1) str << ", ";
+            if (i < sArr.len - 1) str << ", ";
         }
         str << "]";
         break;
@@ -121,9 +108,11 @@ static std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
         size_t offset = 0;
         for (size_t i = 0; i < fieldsCount; ++i) {
             const auto fieldType = rtt->obj.fieldTypes[i];
-            const auto fieldName = rtt->obj.fieldNames[i];
             void* fieldValue = static_cast<char*>(elem) + offset;
-            str << fieldName << '=';
+            if (fieldType->kind == RTT_OBJECT) {
+                fieldValue = *static_cast<void**>(fieldValue);
+            }
+            str << rtt->obj.fieldNames[i] << '=';
             str << formatElement(fieldType, fieldValue);
             if (i < fieldsCount - 1) str << ", ";
             offset += fieldType->size;
@@ -134,6 +123,7 @@ static std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
     case RTT_NULLABLE: {
         const auto& [baseType, isPtr] = rtt->nullable;
         if (isPtr) {
+            elem = *static_cast<void**>(elem);
             str << formatElement(baseType, elem);
         } else {
             const bool isSet = *(static_cast<bool*>(elem) + baseType->size);
@@ -146,7 +136,6 @@ static std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
         const auto& [keyType, valueType] = rtt->map;
         auto hashMap = static_cast<Lgs_HashMap*>(elem);
         str << "{";
-        assert(0);
         str << "}";
         break;
     }

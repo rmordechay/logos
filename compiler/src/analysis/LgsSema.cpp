@@ -150,12 +150,9 @@ void LgsSema::visitField(LgsField* field) {
     }
     addRTType(field->type);
 }
-
-void LgsSema::visitFunc(LgsFunc* func) {
-    const auto ft = func->funcType;
+void LgsSema::visitFuncHeader(LgsFuncType* ft) {
     if (ft->name != "") validateLocalName(ft->name, ft->location);
     if (!ft->genericTypes.empty()) return;
-    stack.enterScope(func);
     auto defaultParamsStarted = false;
     for (auto& param : ft->params) {
         visitParam(&param);
@@ -165,6 +162,12 @@ void LgsSema::visitFunc(LgsFunc* func) {
         }
         defaultParamsStarted = !!param.expr;
     }
+}
+
+void LgsSema::visitFunc(LgsFunc* func) {
+    const auto ft = func->funcType;
+    visitFuncHeader(ft);
+    stack.enterScope(func);
     visitStmtsBlock(func->stmtsBlock);
     if (ft->isVariadic && ft->hasDefaults) {
         addError(E10043, func->location);
@@ -178,7 +181,16 @@ void LgsSema::visitFunc(LgsFunc* func) {
 void LgsSema::visitLambda(LgsFunc* lambda) {
     const auto ft = lambda->funcType;
     typeResolver.resolveFuncType(ft);
-    visitFunc(lambda);
+    visitFuncHeader(ft);
+    stack.enterScope(lambda);
+    visitStmtsBlock(lambda->stmtsBlock);
+    if (ft->isVariadic && ft->hasDefaults) {
+        addError(E10043, lambda->location);
+    }
+    if (!validateBlockControlFlow(lambda->stmtsBlock, lambda)) {
+        addError(E10055, lambda->location, {lambda->asText()});
+    }
+    stack.exitScope();
     assert(lambda->funcType->rt);
 }
 
@@ -352,20 +364,24 @@ void LgsSema::visitVarDec(LgsVarDec* varDec) {
 }
 
 void LgsSema::visitAssignment(LgsAssignment* assignment) {
-    auto l = assignment->lValue;
+    const auto l = assignment->lValue;
     auto& r = assignment->rValue;
     visitExpr(r);
     if (const auto iterIndex = l->asIterIndex()) {
         visitIterIndex(iterIndex);
     } else if (const auto variable = l->asVariable()) {
         visitVariable(variable);
+    } else if (const auto selection = l->asSelection()) {
+        visitSelection(selection);
     } else if (const auto nullableExpr = l->asNullableExpr()) {
         visitNullableExpr(nullableExpr);
+    } else {
+        assert(0);
     }
 
     r->castImplicitly(l->type);
-    if (!validateExprType(r, l->type)) return;
     if (!l->type || !r->type) return;
+    if (!validateExprType(r, l->type)) return;
 
     auto canAssign = false;
     if (l->asIterIndex() || l->asVariable() || l->asNullableExpr()) {
@@ -820,7 +836,9 @@ void LgsSema::visitArrayExpr(LgsArrayExpr* arrayExpr) {
 void LgsSema::visitStaticArray(const LgsArrayExpr* arrayExpr) {
     const auto sArr = arrayExpr->type->asSArray();
     const auto size = sArr->size->getConstInt();
-    if (size.has_value() && size.value() < static_cast<int64_t>(arrayExpr->elements.size())) {
+    if (!size.has_value()) {
+        addError(E10114, arrayExpr->location);
+    } else if (size.value() < static_cast<int64_t>(arrayExpr->elements.size())) {
         addError(E10105, arrayExpr->location, {std::to_string(*size)});
     }
     for (auto element : arrayExpr->elements) {
@@ -963,7 +981,6 @@ void LgsSema::visitSelection(LgsSelection* selection) {
             selection->exprs[0] = typeExpr;
         }
     }
-    if (!firstExpr->type) return;
     visitInnerSelections(selection);
     const auto lastExpr = selection->lastExpr();
     selection->setType(lastExpr->type);
@@ -1645,11 +1662,14 @@ bool LgsSema::validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const Lgs
     assert(func->funcType->rt);
     if (!stmtBlock || func->funcType->rt->isVoid()) return true;
     const auto lastStmt = stmtBlock->stmts.back();
-    const auto isStmt = lastStmt.wrapperType == LgsStmtWrapper::WrapperType::Stmt;
+    constexpr auto objWrapper = LgsStmtWrapper::WrapperType::Object;
+    constexpr auto stmtWrapper = LgsStmtWrapper::WrapperType::Stmt;
+    constexpr auto exprWrapper = LgsStmtWrapper::WrapperType::Expr;
+    const auto isStmt = lastStmt.wrapperType == stmtWrapper;
     if (isStmt && lastStmt.stmt->asReturn()) return true;
     auto isValid = false;
     for (const auto stmt : stmtBlock->stmts) {
-        if (stmt.wrapperType == LgsStmtWrapper::WrapperType::Object) continue;
+        if (stmt.wrapperType == objWrapper || stmt.wrapperType == exprWrapper) continue;
         if (const auto ifStmt = stmt.stmt->asIfStmt()) {
             isValid = validateBlockControlFlow(ifStmt->ifBlock, func);
             for (const auto [_, elseIfStmt] : ifStmt->elseIfs) {
@@ -1745,7 +1765,9 @@ void LgsSema::addErrorIfSuccessful(const LgsBaseMsg& lgsErr, const LgsLocation& 
 }
 
 void LgsSema::addRTType(LgsType* type) const {
-    if (!type || type->isVoid() || (type->asNullable() && !type->asNullable()->baseType)) return;
+    if (!errHandler.successful) return;
+    if (!type || type->isVoid()) return;
+    if (type->asNullable() && !type->asNullable()->baseType) return;
     for (const auto rttType : globals.table.rttTypes) {
         if (rttType->equals(type)) return;
     }

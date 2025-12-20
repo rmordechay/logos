@@ -73,7 +73,7 @@ public:
     llvm::AllocaInst* getEmptyBuffer();
     GlobalVariable* createGlobal(const std::string& name, Type* type, Constant* initializer, bool isConst = true, GlobalValue::LinkageTypes linkage = GlobalValue::ExternalLinkage) const;
     StructType* getStructType(const std::vector<Type*>& fields, const std::string& name = "");
-    void storeStructField(Type* type, Value* instancePtr, size_t position, Value* v);
+    void storeStructField(Type* parentType, Value* parentPtr, size_t position, Value* v);
     void store(Value* v, Value* ptr);
     Value* allocaAndStore(Type* type, Value* v);
     void loop(Value* loopLength, const std::function<void(Value*, BasicBlock*)>& body);

@@ -123,8 +123,8 @@ StructType* LgsCgModule::getStructType(const std::vector<Type*>& fields, const s
     return structType;
 }
 
-void LgsCgModule::storeStructField(Type* type, Value* instancePtr, const size_t position, Value* v) {
-    const auto gep = builder.CreateStructGEP(type, instancePtr, position);
+void LgsCgModule::storeStructField(Type* parentType, Value* parentPtr, const size_t position, Value* v) {
+    const auto gep = builder.CreateStructGEP(parentType, parentPtr, position);
     store(v, gep);
 }
 
@@ -449,7 +449,12 @@ TypeSize LgsCgModule::typeSize(Type* v) const {
 }
 
 Value* LgsCgModule::emptyStr() {
-    return getString("");
+    const auto name = LGS_PREFIX"emptyStr";
+    const auto s = IRModule->getNamedGlobal(name);
+    if (s) return s;
+    const auto constant = getString("");
+    constant->setName(name);
+    return constant;
 }
 
 void LgsCgModule::printStr(const std::string& str) {
