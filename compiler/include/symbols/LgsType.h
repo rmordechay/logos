@@ -3,6 +3,7 @@
 #include <ostream>
 #include <vector>
 #include "errors/LgsErrHandler.h"
+#include <unordered_map>
 
 class LgsComplex;
 class LgsOwner;
@@ -69,6 +70,7 @@ public:
     bool isPrimitive = false;
     bool isHeapAlloc = false;
     bool passByRef = false;
+    static std::unordered_map<std::string, uint8_t> numberPrecedences;
 
     bool addField(LgsField* field);
     bool addMethod(LgsFunc* method);
@@ -90,6 +92,7 @@ public:
 
     bool isVoid();
     bool isNumber();
+    bool isScalar() const;
     bool isBig();
     bool isUnknown();
     bool isSliceable();
@@ -150,7 +153,6 @@ inline void freeType(LgsType* type) {
     delete type;
 }
 
-
 template<typename T>
 void freeTypes(std::vector<T*>& types) {
     for (const auto type : types) {
@@ -159,6 +161,7 @@ void freeTypes(std::vector<T*>& types) {
     types.clear();
 }
 
+LgsType* getHighestNumPrecedence(const std::vector<LgsExpr*>& args);
 Value* eqIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
 Value* neIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
 Value* ltIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
@@ -167,7 +170,7 @@ Value* geIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
 Value* leIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
 Value* andIR(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right);
 Value* orIR(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right);
-std::pair<Value*, Value*> loadPairAsFloat(LgsCgModule& cg, LgsExpr* self, LgsExpr* other);
-std::pair<Value*, Value*> loadPairAsDouble(LgsCgModule& cg, LgsExpr* self, LgsExpr* other);
-std::pair<Value*, Value*> loadPairAsInt(LgsCgModule& cg, LgsExpr* self, LgsExpr* other);
+std::pair<Value*, Value*> loadPairAsFloat(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
+std::pair<Value*, Value*> loadPairAsDouble(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
+std::pair<Value*, Value*> loadPairAsInt(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
 std::pair<Constant*, Constant*> getRTFieldsInfo(LgsCgModule& cg, const std::string& name, const std::vector<LgsOwner*>& values);

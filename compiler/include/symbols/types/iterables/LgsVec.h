@@ -14,19 +14,18 @@ public:
         assert(dim > 1 && dim <= 4);
         size = new LgsIntConst(&LGS_INT, dim);
         isStatic = true;
-        passByRef = true;
     }
     LgsField* getField(const std::string& fieldName) override;
     Type* getIRType(LgsCgModule& cg) override;
     Constant* getRTType(LgsCgModule& cg) override;
     std::string getName() override;
+    std::string pname() override;
     size_t sizeBytes() override;
     bool equals(LgsType* other) override;
     LgsExpr* getZeroValue() override;
     bool canCastTo(LgsType* other) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     bool inferBaseType(std::vector<LgsExpr*>& args) override;
-    Value* getIRVector(LgsCgModule& cg, Value* value);
     Value* addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
     Value* subIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
     Value* mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;

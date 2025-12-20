@@ -844,26 +844,28 @@ void LgsCodeGen::visitSetExpr(LgsArrayExpr* arrayExpr) const {
 
 void LgsCodeGen::visitVectorExpr(LgsVectorExpr* vectorExpr) {
     const auto ty = vectorExpr->type->getIRType(cg);
-    if (!vectorExpr->IRValue) {
-        vectorExpr->IRValue = cg.builder.CreateAlloca(ty);
-    }
     if (vectorExpr->elements.empty()) {
-        cg.store(ConstantAggregateZero::get(ty), vectorExpr->IRValue);
+        vectorExpr->IRValue = ConstantAggregateZero::get(ty);
         return;
     }
 
-    size_t index = 0;
+    // Check if all args are const for chunk copy
+    std::vector<Constant*> constantArgs;
+    auto allArgsAreConst = true;
     for (const auto element : vectorExpr->elements) {
         visitExpr(element);
-        if (const auto innerVec = element->type->asVec()) {
-            const auto innerVecValue = cg.builder.CreateLoad(innerVec->getIRType(cg), element->IRValue);
-            for (size_t j = 0; j < innerVec->dimVec; j++) {
-                const auto innerElement = cg.builder.CreateExtractElement(innerVecValue, j);
-                vectorExpr->vecType->addIRElement(cg, vectorExpr->IRValue, cg.usize(index++), innerElement);
-            }
+        if (const auto constant = llvm::dyn_cast<Constant>(element->IRValue)) {
+            constantArgs.push_back(constant);
         } else {
-            vectorExpr->vecType->addIRElement(cg, vectorExpr->IRValue, cg.usize(index++), element->IRValue);
+            allArgsAreConst = false;
+            break;
         }
+    }
+
+    if (allArgsAreConst) {
+        vectorExpr->IRValue = ConstantVector::get(constantArgs);
+    } else {
+        assert(0);
     }
 }
 

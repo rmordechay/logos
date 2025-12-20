@@ -46,10 +46,9 @@ bool LgsStr::canCastTo(LgsType* other) {
 }
 
 LgsType* LgsStr::applyBinOp(LgsType* rightType, LgsBinOp& op) {
-    const auto IRName = rightType->getName();
     switch (op.opType) {
     case ADD: {
-        if (name == IRName) return new LgsStr(true);
+        if (rightType->canCastTo(this)) return new LgsStr(true);
         break;
     }
     case IN: {
@@ -80,13 +79,15 @@ bool LgsStr::inferBaseType(std::vector<LgsExpr*>& args) {
 }
 
 Value* LgsStr::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto leftSize = lenIR(cg, left->IRValue);
-    const auto rightSize = right->type->asStr()->lenIR(cg, right->IRValue);
+    const auto leftSize  = lenIR(cg, left->IRValue);
+    const auto rightSize = lenIR(cg, right->IRValue);
     const auto sumSize = cg.builder.CreateAdd(leftSize, rightSize);
-    const auto buffer = cg.allocate(sumSize, getRTType(cg), false, left->isReturnExpr);
-    const auto gep = cg.builder.CreateInBoundsGEP(cg.i8Ty(), buffer, leftSize);
-    cg.callMemCpy(buffer, left->IRValue, leftSize); // cpy left str
-    cg.callMemCpy(gep, right->IRValue, rightSize); // cpy right str
+    const auto endIndex = cg.builder.CreateAdd(sumSize, cg.usize(1));
+    const auto buffer = cg.allocate(endIndex, getRTType(cg), false, left->isReturnExpr);
+    const auto rightPos = cg.builder.CreateInBoundsGEP(cg.i8Ty(), buffer, leftSize);
+    cg.callMemCpy(buffer, left->IRValue, leftSize);
+    cg.callMemCpy(rightPos, right->IRValue, rightSize);
+    cg.addNullTerminate(buffer, endIndex);
     return buffer;
 }
 

@@ -53,27 +53,27 @@ struct LgsAssignOp {
     std::string text;
 };
 
-const auto ADD_OP = LgsBinOp{ADD, "addition"};
-const auto SUB_OP = LgsBinOp{SUB, "subtraction"};
-const auto MUL_OP = LgsBinOp{MUL, "multiplication"};
-const auto DIV_OP = LgsBinOp{DIV, "division"};
-const auto MODULO_OP = LgsBinOp{MODULO, "module"};
-const auto POW_OP = LgsBinOp{POW, "power"};
-const auto BIT_AND_OP = LgsBinOp{BIT_AND, "bit and"};
-const auto BIT_OR_OP = LgsBinOp{BIT_OR, "bit or"};
-const auto BIT_XOR_OP = LgsBinOp{BIT_XOR, "xor"};
-const auto LSHIFT_OP = LgsBinOp{LSHIFT, "left shift"};
-const auto RSHIFT_OP = LgsBinOp{RSHIFT, "right shift"};
+const auto ADD_OP = LgsBinOp{ADD, "Addition"};
+const auto SUB_OP = LgsBinOp{SUB, "Subtraction"};
+const auto MUL_OP = LgsBinOp{MUL, "Multiplication"};
+const auto DIV_OP = LgsBinOp{DIV, "Division"};
+const auto MODULO_OP = LgsBinOp{MODULO, "Module"};
+const auto POW_OP = LgsBinOp{POW, "Power"};
+const auto BIT_AND_OP = LgsBinOp{BIT_AND, "Bit-and"};
+const auto BIT_OR_OP = LgsBinOp{BIT_OR, "Bit-or"};
+const auto BIT_XOR_OP = LgsBinOp{BIT_XOR, "Xor"};
+const auto LSHIFT_OP = LgsBinOp{LSHIFT, "Left-shift"};
+const auto RSHIFT_OP = LgsBinOp{RSHIFT, "Right-shift"};
 const auto EQ_OP = LgsBinOp{EQ, "=="};
 const auto NE_OP = LgsBinOp{NE, "!="};
 const auto GT_OP = LgsBinOp{GT, ">"};
 const auto LT_OP = LgsBinOp{LT, "<"};
 const auto GE_OP = LgsBinOp{GE, "<="};
 const auto LE_OP = LgsBinOp{LE, ">="};
-const auto AND_OP = LgsBinOp{AND, "and"};
-const auto OR_OP = LgsBinOp{OR, "or"};
-const auto IN_OP = LgsBinOp{IN, "in"};
-const auto CROSS_OP = LgsBinOp{CROSS, "cross product"};
+const auto AND_OP = LgsBinOp{AND, "And"};
+const auto OR_OP = LgsBinOp{OR, "Or"};
+const auto IN_OP = LgsBinOp{IN, "In"};
+const auto CROSS_OP = LgsBinOp{CROSS, "Cross-product"};
 const auto NOOP_BIN_OP = LgsBinOp{NOOP, ""};
 
 // Names will be attached to 'assign'. for example, re-assign, add-assign, etc.

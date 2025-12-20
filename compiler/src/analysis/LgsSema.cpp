@@ -857,7 +857,7 @@ void LgsSema::visitVectorExpr(LgsVectorExpr* vectorExpr) {
         } else if (const auto otherVec = arg->type->asVec()) {
             sumDim += otherVec->dimVec;
         } else {
-            addError(E10073, vectorExpr->location, {arg->type->pname()});
+            addError(E10073, vectorExpr->location);
             break;
         }
     }
@@ -866,6 +866,13 @@ void LgsSema::visitVectorExpr(LgsVectorExpr* vectorExpr) {
     }
     if (sumDim > vectorExpr->vecType->dimVec) {
         addError(E10074, vectorExpr->location, {vec->pname(), std::to_string(sumDim)});
+    }
+    for (size_t i = 0; i < vectorExpr->elements.size(); ++i) {
+        auto& arg = vectorExpr->elements[i];
+        if (arg->type->equals(vec->baseType)) continue;
+        const auto castArg = arg->castExplicitly(vec->baseType);
+        if (castArg != arg) freeExpr(arg);
+        arg = castArg;
     }
 }
 

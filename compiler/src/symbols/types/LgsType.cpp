@@ -28,6 +28,23 @@
 #include "types/primitives/LgsShort.h"
 #include "types/primitives/LgsSize.h"
 #include "types/primitives/LgsUInt.h"
+#include "types/primitives/LgsULong.h"
+
+std::unordered_map<std::string, uint8_t> LgsType::numberPrecedences = {
+    {LgsBool::name, 1},
+    {LgsByte::name, 2},
+    // {LgsUByte::name, 3},
+    {LgsShort::name, 4},
+    // {LgsUShort::name, 5},
+    {LgsChar::name, 6},
+    {LgsInt::name, 7},
+    {LgsUInt::name, 8},
+    {LgsLong::name, 9},
+    {LgsULong::name, 10},
+    {LgsSize::name, 11},
+    {LgsFloat::name, 12},
+    {LgsDouble::name, 13},
+};
 
 bool LgsType::addField(LgsField* field) {
     fields.push_back(field);
@@ -89,6 +106,10 @@ bool LgsType::isNumber() {
     return isInt || isFloat || asComplex();
 }
 
+bool LgsType::isScalar() const {
+    return isInt || isFloat;
+}
+
 bool LgsType::isBig() {
     return (asObject() || asDArray()) && sizeBytes() >= BIG_SIZE_THRESHOLD;
 }
@@ -139,6 +160,29 @@ void LgsType::cloneMethods(LgsType* newType) const {
         newMethod->funcType = method->funcType;
         newType->addMethod(newMethod);
     }
+}
+
+LgsType* getHighestNumPrecedence(const std::vector<LgsExpr*>& args) {
+    if (args.empty()) return nullptr;
+    LgsType* inferredType = nullptr;
+    uint8_t highestPrecedence = 0;
+    for (size_t i = 0; i < args.size(); ++i) {
+        const auto& arg = args[i];
+        if (!arg->type) return nullptr;
+        LgsType* currentType = nullptr;
+        if (arg->type->isScalar()) {
+            currentType = arg->type;
+        } else if (const auto iter = arg->type->asIterable()) {
+            currentType = iter->baseType;
+        }
+        if (!currentType || !currentType->isScalar()) return nullptr;
+        const auto precedence = LgsType::numberPrecedences[currentType->getName()];
+        if (highestPrecedence >= precedence) continue;
+        inferredType = currentType;
+        highestPrecedence = precedence;
+    }
+    assert(inferredType);
+    return inferredType;
 }
 
 Value* LgsType::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
@@ -484,21 +528,29 @@ Value* orIR(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right) {
     return phi;
 }
 
-std::pair<Value*, Value*> loadPairAsFloat(LgsCgModule& cg, LgsExpr* self, LgsExpr* other) {
-    auto l = self->loadIR(cg);
-    auto r = other->loadIR(cg);
-    if (l->getType()->isIntegerTy()) {
+std::pair<Value*, Value*> loadPairAsFloat(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+    auto l = left->loadIR(cg);
+    auto r = right->loadIR(cg);
+    if (left->type->isInt) {
         l = cg.builder.CreateSIToFP(l, cg.floatTy());
+    } else if (const auto lVec = left->type->asVec()) {
+        if (left->type->asVec()->baseType->isInt) {
+            l = cg.builder.CreateSIToFP(l, FixedVectorType::get(cg.floatTy(), lVec->dimVec));
+        }
     }
-    if (r->getType()->isIntegerTy()) {
+    if (right->type->isInt) {
         r = cg.builder.CreateSIToFP(r, cg.floatTy());
+    } else if (const auto rVec = right->type->asVec()) {
+        if (right->type->asVec()->baseType->isInt) {
+            r = cg.builder.CreateSIToFP(r, FixedVectorType::get(cg.floatTy(), rVec->dimVec));
+        }
     }
     return {l, r};
 }
 
-std::pair<Value*, Value*> loadPairAsDouble(LgsCgModule& cg, LgsExpr* self, LgsExpr* other) {
-    auto l = self->loadIR(cg);
-    auto r = other->loadIR(cg);
+std::pair<Value*, Value*> loadPairAsDouble(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+    auto l = left->loadIR(cg);
+    auto r = right->loadIR(cg);
     if (l->getType()->isIntegerTy()) {
         l = cg.builder.CreateSIToFP(l, cg.doubleTy());
     }
@@ -508,15 +560,10 @@ std::pair<Value*, Value*> loadPairAsDouble(LgsCgModule& cg, LgsExpr* self, LgsEx
     return {l, r};
 }
 
-std::pair<Value*, Value*> loadPairAsInt(LgsCgModule& cg, LgsExpr* self, LgsExpr* other) {
-    auto l = self->loadIR(cg);
-    auto r = other->loadIR(cg);
-    if (l->getType()->isFloatTy()) {
-        l = cg.builder.CreateFPToSI(l, cg.i32Ty());
-    }
-    if (r->getType()->isFloatTy()) {
-        r = cg.builder.CreateFPToSI(r, cg.i32Ty());
-    }
+std::pair<Value*, Value*> loadPairAsInt(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+    auto l = left->loadIR(cg);
+    auto r = right->loadIR(cg);
+    assert(!l->getType()->isFloatTy() && !r->getType()->isFloatTy());
     return {l, r};
 }
 

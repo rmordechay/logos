@@ -34,5 +34,5 @@ public:
     LgsIfStmt* currentIfStmt() const;
     LgsIfStmt* getOutermostIfStmt() const;
     LgsForeachLoop* getInnermostForeachLoop() const;
-    llvm::BasicBlock* findTagExitBlock(const std::string& tag) const;
+    BasicBlock* findTagExitBlock(const std::string& tag) const;
 };
