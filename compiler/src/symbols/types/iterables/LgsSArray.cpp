@@ -19,8 +19,12 @@ Type* LgsSArray::getIRType(LgsCgModule& cg) {
     return IRType;
 }
 
-std::string LgsSArray::getName() {
+std::string LgsSArray::getBaseName() {
     return name;
+}
+
+std::string LgsSArray::getName() {
+    return name + baseType->getName();
 }
 
 std::string LgsSArray::pname() {

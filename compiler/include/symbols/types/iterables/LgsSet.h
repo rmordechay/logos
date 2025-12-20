@@ -20,6 +20,7 @@ public:
     Constant* getRTType(LgsCgModule& cg) override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
+    std::string getBaseName() override;
     std::string getName() override;
     std::string pname() override;
     bool canCastTo(LgsType* other) override;

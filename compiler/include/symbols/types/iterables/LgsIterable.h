@@ -24,16 +24,17 @@ public:
     bool isStatic = false;
 
     explicit LgsIterable(LgsType* baseType = nullptr, LgsExpr* size = nullptr) : baseType(baseType), size(size) {}
-    size_t getDimension() const;
     LgsFunc* getMethod(const std::string& methodName) override;
+    size_t getDimension() const;
     virtual LgsType* getIndexType();
     virtual LgsType* getValueType();
-    virtual bool unpackLoopVarsTypes(LgsForeachLoop* loop) const;
-    virtual void unpackLoopIR(LgsCgModule& cg, LgsForeachLoop* loop) const;
+    virtual std::string getBaseName() = 0;
     virtual bool inferBaseType(std::vector<LgsExpr*>& args) = 0;
     virtual Value* lenIR(LgsCgModule& cg, Value* iterable) = 0;
     virtual Value* inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) = 0;
     virtual Value* getIRElement(LgsCgModule& cg, Value* iterable, Value* index) = 0;
+    virtual bool unpackLoopVarsTypes(LgsForeachLoop* loop) const;
+    virtual void unpackLoopIR(LgsCgModule& cg, LgsForeachLoop* loop) const;
     virtual void addIRElement(LgsCgModule& cg, Value* iterable, Value* index, Value* value);
     ~LgsIterable() override;
 };

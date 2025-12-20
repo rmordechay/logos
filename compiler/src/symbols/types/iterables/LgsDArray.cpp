@@ -46,6 +46,10 @@ Constant* LgsDArray::getRTType(LgsCgModule& cg) {
     return cg.getRTTypeInfo(dArrName, sizeBytes(), RTT_DARRAY, isHeapAlloc, sv);
 }
 
+std::string LgsDArray::getBaseName() {
+    return name;
+}
+
 std::string LgsDArray::getName() {
     return name + baseType->getName();
 }

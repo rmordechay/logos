@@ -26,6 +26,10 @@ LgsExpr* LgsSet::getZeroValue() {
     assert(0);
 }
 
+std::string LgsSet::getBaseName() {
+    return name;
+}
+
 std::string LgsSet::getName() {
     return name;
 }

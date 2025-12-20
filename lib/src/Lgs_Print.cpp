@@ -146,15 +146,7 @@ static std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
         const auto& [keyType, valueType] = rtt->map;
         auto hashMap = static_cast<Lgs_HashMap*>(elem);
         str << "{";
-        bool first = true;
-        for (size_t i = 0; i < LGS_MAP_CAP; i++) {
-            if (hashMap->entries[i].occupied) {
-                if (!first) str << ", ";
-                first = false;
-                void* valuePtr = hashMap->entries[i].value;
-                str << hashMap->entries[i].key << ": " << formatElement(valueType, valuePtr);
-            }
-        }
+        assert(0);
         str << "}";
         break;
     }

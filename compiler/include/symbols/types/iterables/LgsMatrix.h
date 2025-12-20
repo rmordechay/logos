@@ -5,6 +5,7 @@
 
 class LgsMatrix final : public LgsIterable {
 public:
+    static constexpr auto name = "Mat";
     size_t rows;
     size_t columns;
 
@@ -14,6 +15,7 @@ public:
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
     LgsType* getValueType() override;
+    std::string getBaseName() override;
     std::string getName() override;
     bool canCastTo(LgsType* other) override;
     bool inferBaseType(std::vector<LgsExpr*>& args) override;

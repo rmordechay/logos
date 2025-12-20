@@ -17,6 +17,7 @@ public:
     bool inferBaseType(std::vector<LgsExpr*>& args) override;
     Type* getIRType(LgsCgModule& cg) override;
     Constant* getRTType(LgsCgModule& cg) override;
+    std::string getBaseName() override;
     std::string getName() override;
     std::string pname() override;
     size_t sizeBytes() override;

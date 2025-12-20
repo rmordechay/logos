@@ -7,6 +7,8 @@
 #include "cblas/cblas.h"
 #include "types/iterables/LgsMatrix.h"
 #include "types/primitives/LgsBool.h"
+#include "types/primitives/LgsVoid.h"
+
 #include <sstream>
 
 LgsField* LgsVec::getField(const std::string& fieldName) {
@@ -42,14 +44,18 @@ Constant* LgsVec::getRTType(LgsCgModule& cg) {
     return cg.getRTTypeInfo(name, sizeBytes(), RTT_VEC4, isHeapAlloc, sv);
 }
 
+std::string LgsVec::getBaseName() {
+    return name + std::to_string(dimVec);
+}
+
 std::string LgsVec::getName() {
-    auto s = baseName + std::to_string(dimVec);
+    auto s = name + std::to_string(dimVec);
     if (baseType) s += baseType->getName();
     return s;
 }
 
 std::string LgsVec::pname() {
-    auto s = baseName + std::to_string(dimVec);
+    auto s = name + std::to_string(dimVec);
     if (baseType) s += '<' + baseType->getName() + '>';
     else s += LGS_UNKNOWN_TYPE;
     return s;

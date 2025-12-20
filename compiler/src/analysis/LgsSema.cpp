@@ -352,14 +352,18 @@ void LgsSema::visitVarDec(LgsVarDec* varDec) {
 }
 
 void LgsSema::visitAssignment(LgsAssignment* assignment) {
-    auto& l = assignment->lValue;
-    auto r = assignment->rValue;
-    visitExpr(l);
-    if (!l->asNullableExpr() && l->type->asNullable()) {
-        wrapInNullable(l, l->type->asNullable());
-    }
+    auto l = assignment->lValue;
+    auto& r = assignment->rValue;
     visitExpr(r);
-    castExprImplicitly(r, l->type);
+    if (const auto iterIndex = l->asIterIndex()) {
+        visitIterIndex(iterIndex);
+    } else if (const auto variable = l->asVariable()) {
+        visitVariable(variable);
+    } else if (const auto nullableExpr = l->asNullableExpr()) {
+        visitNullableExpr(nullableExpr);
+    }
+
+    r->castImplicitly(l->type);
     if (!validateExprType(r, l->type)) return;
     if (!l->type || !r->type) return;
 
@@ -1396,7 +1400,7 @@ void LgsSema::visitIndex(LgsIterIndex* iterIndex) {
             iterIndex->boundsChecked = true;
         }
     }
-    iterIndex->setType(new LgsNullable(iterable->getValueType()));
+    iterIndex->setType(iterable->getValueType());
 }
 
 void LgsSema::visitSlice(LgsIterIndex* iterIndex) {

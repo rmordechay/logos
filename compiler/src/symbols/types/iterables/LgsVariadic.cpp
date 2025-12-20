@@ -32,6 +32,10 @@ DIType* LgsVariadic::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
 
+std::string LgsVariadic::getBaseName() {
+    return name;
+}
+
 std::string LgsVariadic::getName() {
     return baseType->getName() + "...";
 }

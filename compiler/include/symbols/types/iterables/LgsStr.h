@@ -11,6 +11,7 @@ public:
         isHeapAlloc = isHeap;
     }
     Type* getIRType(LgsCgModule& cg) override;
+    std::string getBaseName() override;
     std::string getName() override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;

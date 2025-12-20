@@ -62,8 +62,12 @@ Constant* LgsMap::getRTType(LgsCgModule& cg) {
     return cg.getRTTypeInfo(mapName, sizeBytes(), RTT_MAP, isHeapAlloc, sv);
 }
 
-std::string LgsMap::getName() {
+std::string LgsMap::getBaseName() {
     return name;
+}
+
+std::string LgsMap::getName() {
+    return name + mapType->getName();
 }
 
 std::string LgsMap::pname() {
@@ -131,7 +135,9 @@ Value* LgsMap::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
 }
 
 void LgsMap::addIRElement(LgsCgModule& cg, Value* iterable, Value* index, Value* value) {
-    LgsIterable::addIRElement(cg, iterable, index, value);
+    const std::vector<Type*> params = {cg.ptrTy(), cg.ptrTy(), cg.ptrTy()};
+    const std::vector IRArgs = {iterable, index, cg.getPtrTo(value)};
+    cg.callLgsFunc(name, "add", cg.voidTy(), params, IRArgs);
 }
 
 bool LgsMap::canCastTo(LgsType* other) {

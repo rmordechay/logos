@@ -11,6 +11,10 @@ Type* LgsStr::getIRType(LgsCgModule& cg) {
     return cg.ptrTy();
 }
 
+std::string LgsStr::getBaseName() {
+    return name;
+}
+
 std::string LgsStr::getName() {
     return name;
 }

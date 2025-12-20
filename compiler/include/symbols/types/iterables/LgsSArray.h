@@ -11,6 +11,7 @@ public:
         passByRef = true;
     }
     Type* getIRType(LgsCgModule& cg) override;
+    std::string getBaseName() override;
     std::string getName() override;
     std::string pname() override;
     size_t sizeBytes() override;

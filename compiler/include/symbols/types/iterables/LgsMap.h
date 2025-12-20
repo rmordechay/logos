@@ -19,6 +19,7 @@ public:
     LgsFunc* getMethod(const std::string& methodName) override;
     Type* getIRType(LgsCgModule& cg) override;
     Constant* getRTType(LgsCgModule& cg) override;
+    std::string getBaseName() override;
     std::string getName() override;
     std::string pname() override;
     size_t sizeBytes() override;

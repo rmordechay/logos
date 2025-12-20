@@ -5,7 +5,7 @@
 #include <cstring>
 #include <cstdlib>
 
-#define MAP_INITIAL_SIZE 10
+#define MAP_INITIAL_CAPACITY 10
 
 static void resize(Lgs_HashMap* map) {
     const auto newCap = map->capacity * 2;
@@ -34,9 +34,10 @@ static Lgs_HashMapEntry* create_entry(const char* key, void* value) {
 }
 
 extern "C" void Lgs_Map_init(Lgs_HashMap* map) {
+    const auto entries = std::calloc(MAP_INITIAL_CAPACITY, sizeof(Lgs_HashMapEntry));
+    map->entries = static_cast<Lgs_HashMapEntry**>(entries);
     map->len = 0;
-    map->capacity = 0;
-    map->entries = static_cast<Lgs_HashMapEntry**>(std::calloc(MAP_INITIAL_SIZE, sizeof(Lgs_HashMapEntry)));
+    map->capacity = MAP_INITIAL_CAPACITY;
 }
 
 extern "C" void Lgs_Map_add(Lgs_HashMap* map, const char* key, void* value) {

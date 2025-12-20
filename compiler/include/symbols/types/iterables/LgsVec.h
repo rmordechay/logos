@@ -7,7 +7,7 @@
 
 class LgsVec final : public LgsIterable {
 public:
-    static constexpr auto baseName = "Vec";
+    static constexpr auto name = "Vec";
     size_t dimVec = 0;
 
     explicit LgsVec(const size_t dim, LgsType* baseType = &LGS_FLOAT) : LgsIterable(baseType), dimVec(dim) {
@@ -18,6 +18,7 @@ public:
     LgsField* getField(const std::string& fieldName) override;
     Type* getIRType(LgsCgModule& cg) override;
     Constant* getRTType(LgsCgModule& cg) override;
+    std::string getBaseName() override;
     std::string getName() override;
     std::string pname() override;
     size_t sizeBytes() override;
