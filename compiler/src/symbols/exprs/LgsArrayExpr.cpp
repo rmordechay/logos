@@ -4,8 +4,7 @@
 #include "codegen/LgsCgModule.h"
 
 Value* LgsArrayExpr::loadIR(LgsCgModule& cg) {
-    if (type->asDArray() || type->asSet()) return IRValue;
-    return cg.builder.CreateLoad(type->getIRType(cg), IRValue);
+    return IRValue;
 }
 
 void LgsArrayExpr::castImplicitly(LgsType* toType) {

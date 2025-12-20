@@ -766,7 +766,9 @@ void LgsCodeGen::visitArrayExpr(LgsArrayExpr* arrayExpr) {
 void LgsCodeGen::visitStaticArray(LgsArrayExpr* arrayExpr) const {
     const auto sArr = arrayExpr->type->asSArray();
     const auto sArrTypeIR = sArr->getIRType(cg);
-    if (!arrayExpr->IRValue) {
+    if (arrayExpr->pointee) {
+        arrayExpr->IRValue = arrayExpr->pointee;
+    } else {
         arrayExpr->IRValue = cg.builder.CreateAlloca(sArrTypeIR);
     }
     if (arrayExpr->elements.empty()) return;
@@ -1204,16 +1206,14 @@ void LgsCodeGen::visitInstance(LgsInstance* instance) {
     // Zero values
     for (const auto field : instance->obj->fields) {
         if (visited.contains(field->name) || field->type->asEnum()) continue;
+        const auto pointee = field->getGEP(cg, instance->IRValue);
         if (field->expr) {
             assert(field->expr->IRValue);
-            const auto gep = field->getGEP(cg, instance->IRValue);
+            const auto gep = pointee;
             cg.store(field->expr->IRValue, gep);
         } else {
-            const auto zeroValue = field->type->getZeroValue();
-            zeroValue->pointee = field->getGEP(cg, instance->IRValue);
-            visitExpr(zeroValue);
-            cg.store(zeroValue->loadIR(cg), zeroValue->pointee);
-            freeExpr(zeroValue);
+            const auto zeroValue = field->type->getIRZeroValue(cg, pointee);
+            cg.store(zeroValue, pointee);
         }
     }
     addVirtuals(instance->obj, instance->IRValue);

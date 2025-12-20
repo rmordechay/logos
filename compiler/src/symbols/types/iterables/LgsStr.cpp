@@ -33,7 +33,7 @@ LgsExpr* LgsStr::getZeroValue() {
 }
 
 Value* LgsStr::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
-    return cg.emptyStr();
+    return cg.builder.CreateLoad(cg.ptrTy(), cg.emptyStr());
 }
 
 Constant* LgsStr::getRTType(LgsCgModule& cg) {
