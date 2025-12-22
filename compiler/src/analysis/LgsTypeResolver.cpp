@@ -18,58 +18,53 @@
 #include "types/LgsNullable.h"
 
 void LgsTypeResolver::resolveType(LgsType*& type) {
+    if (!type) return;
     for (size_t i = 0; i < type->genericArgs.size(); ++i) {
         resolveType(type->genericArgs[i]);
     }
 
-    if (const auto nullable = type->asNullable()) {
-        if (!nullable->isNull) {
-            resolveType(nullable->baseType);
-            nullable->passByRef = nullable->baseType->passByRef;
-            nullable->isHeapAlloc = nullable->baseType->isHeapAlloc;
-        }
+    if (const auto funcType = type->asFuncType()) {
+        resolveFuncType(funcType);
     } else if (const auto iterable = type->asIterable()) {
         if (iterable->genericArgs.empty()) {
             resolveType(iterable->baseType);
         } else {
             iterable->baseType = iterable->genericArgs.front();
         }
+    } else if (const auto nullable = type->asNullable()) {
+        if (!nullable->isNull) {
+            resolveType(nullable->baseType);
+            nullable->passByRef = nullable->baseType->passByRef;
+            nullable->isHeapAlloc = nullable->baseType->isHeapAlloc;
+        }
     } else if (const auto pair = type->asPair()) {
         resolveType(pair->key);
         resolveType(pair->value);
-    } else if (const auto funcType = type->asFuncType()) {
-        resolveFuncType(funcType);
     }
 
     if (type->isUnknown()) {
-        auto typeName = type->getName();
-        auto symbol = globals.table.getSymbol(typeName);
-        if (!symbol) {
-            symbol = file->symbolTable.getSymbol(typeName);
-        }
-        if (!symbol) {
-            errHandler.addError(E10006, &type->location, file->path, {typeName});
-            return;
-        }
+        const auto typeName = type->getName();
+        const auto symbol = findSymbol(typeName, type->location);
+        if (symbol.symbolType == UNKNOWN) return;
         LgsType* newType = nullptr;
-        switch (symbol->symbolType) {
+        switch (symbol.symbolType) {
         case FUNC:
-            newType = symbol->func->funcType;
+            newType = symbol.func->funcType;
             break;
         case OBJECT:
-            newType = symbol->object;
+            newType = symbol.object;
             break;
         case INTERFACE:
-            newType = symbol->interface;
+            newType = symbol.interface;
             break;
         case ENUM:
-            newType = symbol->enum_;
+            newType = symbol.enum_;
             break;
         case SUBTYPE:
-            newType = symbol->subtype;
+            newType = symbol.subtype;
             break;
         case GENERIC:
-            newType = symbol->generic;
+            newType = symbol.generic;
             break;
         case VAR_DEC:
         case PARAM:
@@ -139,18 +134,12 @@ void LgsTypeResolver::resolveInterface(LgsInterface* interface) {
 }
 
 void LgsTypeResolver::resolveFuncType(LgsFuncType* funcType) {
-    auto resolveTypeOrGeneric = [&](LgsType*& type) {
-        for (const auto generic : funcType->genericTypes) {
-            if (!type->equals(generic)) continue;
-            type = generic;
-        }
-        if (type) resolveType(type);
-    };
-
+    currentFuncType = funcType;
     for (auto& param : funcType->params) {
-        resolveTypeOrGeneric(param.type);
+        resolveType(param.type);
     }
-    resolveTypeOrGeneric(funcType->rt);
+    resolveType(funcType->rt);
+    currentFuncType = nullptr;
 }
 
 void LgsTypeResolver::resolveIOPair(LgsIOPair* ioPair, LgsObject* obj) const {
@@ -164,4 +153,17 @@ void LgsTypeResolver::resolveIOPair(LgsIOPair* ioPair, LgsObject* obj) const {
     if (!ioPair->closeFunc) {
         errHandler.addError(E10005, &ioPair->closeFunc->location, file->path, {ioPair->closeFuncName, obj->pname()});
     }
+}
+
+LgsSymbol LgsTypeResolver::findSymbol(const std::string& typeName, const LgsLocation& location) const {
+    auto symbol = globals.table.getSymbol(typeName);
+    if (symbol) return *symbol;
+    symbol = file->symbolTable.getSymbol(typeName);
+    if (symbol) return *symbol;
+    for (const auto genericType : currentFuncType->genericTypes) {
+        if (genericType->name != typeName) continue;
+        return LgsSymbol(genericType);
+    }
+    errHandler.addError(E10006, &location, file->path, {typeName});
+    return LgsSymbol();
 }

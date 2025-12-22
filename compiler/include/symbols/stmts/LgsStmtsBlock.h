@@ -27,7 +27,6 @@ class LgsStmtsBlock final : public LgsValue {
 public:
     std::vector<LgsStmtWrapper> stmts;
     bool isMacro = false;
-    bool isSingleLine = false;
 
     explicit LgsStmtsBlock(const std::vector<LgsStmtWrapper>& stmts = {}) : stmts(stmts) {}
     void hashNode(size_t& oldHash) override;

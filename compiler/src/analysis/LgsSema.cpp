@@ -1,6 +1,5 @@
 #include "analysis/LgsSema.h"
-
-#include "../../include/symbols/exprs/constants/LgsComplexConst.h"
+#include "exprs/constants/LgsComplexConst.h"
 #include "builtins/LgsTest.h"
 #include "funcs/LgsCoroutine.h"
 #include "errors/LgsErrors.h"
@@ -57,6 +56,7 @@
 #include <unordered_set>
 
 static std::string getMissingImplementsStr(const std::vector<LgsField*>& fields, const std::vector<LgsFunc*>& methods);
+LgsFunc* clone(const LgsFunc* func, const LgsFuncCall* funcCall);
 
 void LgsSema::analyse() {
     resolveImports();
@@ -150,9 +150,8 @@ void LgsSema::visitField(LgsField* field) {
     }
     addRTType(field->type);
 }
+
 void LgsSema::visitFuncHeader(LgsFuncType* ft) {
-    if (ft->name != "") validateLocalName(ft->name, ft->location);
-    if (!ft->genericTypes.empty()) return;
     auto defaultParamsStarted = false;
     for (auto& param : ft->params) {
         visitParam(&param);
@@ -165,9 +164,15 @@ void LgsSema::visitFuncHeader(LgsFuncType* ft) {
 }
 
 void LgsSema::visitFunc(LgsFunc* func) {
-    const auto ft = func->funcType;
-    visitFuncHeader(ft);
     stack.enterScope(func);
+    const auto ft = func->funcType;
+    if (ft->name != "") validateLocalName(ft->name, ft->location);
+    visitFuncHeader(ft);
+    // The generic version of the func is not visited.
+    if (!ft->genericTypes.empty()) {
+        stack.exitScope();
+        return;
+    }
     visitStmtsBlock(func->stmtsBlock);
     if (ft->isVariadic && ft->hasDefaults) {
         addError(E10043, func->location);
@@ -179,19 +184,8 @@ void LgsSema::visitFunc(LgsFunc* func) {
 }
 
 void LgsSema::visitLambda(LgsFunc* lambda) {
-    const auto ft = lambda->funcType;
-    typeResolver.resolveFuncType(ft);
-    visitFuncHeader(ft);
-    stack.enterScope(lambda);
-    visitStmtsBlock(lambda->stmtsBlock);
-    if (ft->isVariadic && ft->hasDefaults) {
-        addError(E10043, lambda->location);
-    }
-    if (!validateBlockControlFlow(lambda->stmtsBlock, lambda)) {
-        addError(E10055, lambda->location, {lambda->asText()});
-    }
-    stack.exitScope();
-    assert(lambda->funcType->rt);
+    typeResolver.resolveFuncType(lambda->funcType);
+    visitFunc(lambda);
 }
 
 void LgsSema::visitMainFunc(LgsMainFunc* mainFunc) {
@@ -232,7 +226,6 @@ void LgsSema::visitParam(LgsParam* param) {
     }
     addLocalSymbol(LgsSymbol(param));
     addRTType(param->type);
-    assert(param->type);
 }
 
 void LgsSema::visitIOPair(LgsIOPair* ioPair, LgsObject* obj) {
@@ -267,11 +260,12 @@ void LgsSema::visitStmt(LgsStmtWrapper& stmt) {
 void LgsSema::visitStmtsBlock(LgsStmtsBlock* stmtsBlock) {
     if (!stmtsBlock || stmtsBlock->stmts.empty()) return;
 
-    // Check if it's lambda with one expr line and replace with return stmt
+    // Check if it's lambda with one expr and replace with return stmt
     auto& firstStmt = stmtsBlock->stmts.front();
-    const auto& ft = stack.currentFunc()->funcType;
-    const auto isExpr = firstStmt.wrapperType == LgsStmtWrapper::WrapperType::Expr;
-    if (isExpr && stmtsBlock->isSingleLine && ft->isLambda && !ft->rt) {
+    const auto currentFunc = stack.currentFunc();
+    const auto& ft = currentFunc->funcType;
+    const auto firstStmtIsExpr = firstStmt.wrapperType == LgsStmtWrapper::WrapperType::Expr;
+    if (ft->isLambda && stmtsBlock->stmts.size() == 1 && firstStmtIsExpr && currentFunc->returnStmts.empty()) {
         visitExpr(firstStmt.expr);
         if (firstStmt.expr->type->isVoid()) return;
         ft->rt = firstStmt.expr->type;
@@ -324,22 +318,15 @@ void LgsSema::visitVarDec(LgsVarDec* varDec) {
     if (const auto iter = varDec->type->asIterable()) visitExpr(iter->size);
 
     if (varDec->expr && varDec->type) {
-        if (varDec->isOwner) {
-            varDec->expr->owner = varDec;
-        }
         typeResolver.resolveType(varDec->type);
         castExprImplicitly(varDec->expr, varDec->type);
         visitExpr(varDec->expr);
         validateExprType(varDec->expr, varDec->type);
-        if (varDec->type != varDec->expr->type) {
-            freeType(varDec->expr->type);
-        }
+        // TODO free
+        //if (varDec->type != varDec->expr->type) freeType(varDec->expr->type);
         varDec->expr->setType(varDec->type);
     } else if (varDec->expr) {
         visitExpr(varDec->expr);
-        if (varDec->isOwner) {
-            varDec->expr->owner = varDec;
-        }
         varDec->setType(varDec->expr->type);
         validateExprType(varDec->expr, varDec->type);
     } else {
@@ -348,17 +335,18 @@ void LgsSema::visitVarDec(LgsVarDec* varDec) {
         varDec->expr = varDec->type->getZeroValue();
         varDec->expr->location = varDec->location;
         visitExpr(varDec->expr);
-        if (varDec->isOwner) {
-            varDec->expr->owner = varDec;
-        }
     }
 
+    if (varDec->isOwner) {
+        varDec->expr->owner = varDec;
+    }
     if (varDec->expr->type->isVoid()) {
         addError(E10093, varDec->location);
     }
     if (varDec->type && !varDec->type->isHeapAlloc && varDec->isOwner) {
         addError(E10109, varDec->location);
     }
+
     addLocalSymbol(LgsSymbol(varDec));
     addRTType(varDec->type);
 }
@@ -739,7 +727,6 @@ void LgsSema::visitExpr(LgsExpr*& expr) {
         else if (const auto json = expr->asJson()) visitJson(json);
         visitUnwrap(expr);
     }
-    addRTType(expr->type);
 }
 
 void LgsSema::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
@@ -1078,42 +1065,6 @@ void LgsSema::visitMetaSelection(LgsMetaSelection* metaSelection) {
             methodCall->args.insert(methodCall->args.begin(), LgsFuncArg(metaSelection->baseExpr, LGS_SELF, true));
         }
     }
-}
-
-LgsFunc* clone(const LgsFunc* func, const LgsFuncCall* funcCall) {
-    const auto funcType = func->funcType;
-    const auto newFuncType = new LgsFuncType(*funcType);
-    newFuncType->params.clear();
-    newFuncType->genericTypes.clear();
-
-    std::unordered_map<std::string, LgsType*> replacements;
-    for (size_t i = 0; i < funcCall->args.size(); ++i) {
-        const auto& param = funcType->params[i];
-        LgsType* newType = nullptr;
-        if (funcType->isGenericType(param.type)) {
-            newType = funcCall->args[i].expr->type;
-            replacements[param.type->getName()] = funcCall->args[i].expr->type;
-        } else {
-            newType = param.type;
-        }
-        LgsParam newParam(newType, param.name);
-        newParam.isSelf = param.isSelf;
-        newParam.isVariadic = param.isVariadic;
-        newFuncType->params.push_back(newParam);
-    }
-
-    if (funcType->isGenericType(funcType->rt)) {
-        newFuncType->rt = replacements[funcType->rt->getName()];
-    } else {
-        newFuncType->rt = funcType->rt;
-    }
-
-    for (auto& [_, t] : replacements) {
-        newFuncType->name += '_' + t->getName();
-    }
-    const auto newFunc = new LgsFunc(newFuncType);
-    newFunc->stmtsBlock = func->stmtsBlock->clone();
-    return newFunc;
 }
 
 void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent) {
@@ -1659,7 +1610,7 @@ void LgsSema::validateObjDuplicates(LgsType* type){
 }
 
 bool LgsSema::validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const LgsFunc* func) {
-    assert(func->funcType->rt);
+    if (!func->funcType->rt) return true; // In this case an error was already added
     if (!stmtBlock || func->funcType->rt->isVoid()) return true;
     const auto lastStmt = stmtBlock->stmts.back();
     constexpr auto objWrapper = LgsStmtWrapper::WrapperType::Object;
@@ -1717,9 +1668,7 @@ LgsSymbol* LgsSema::getSymbol(const std::string& name) {
         return fileSymbol;
     }
     for (auto [_, app] : file->symbolTable.imports) {
-        if (const auto s = app->globals.table.getSymbol(name)) {
-            return s;
-        }
+        if (const auto s = app->globals.table.getSymbol(name)) return s;
     }
     if (const auto symbol = stack.getSymbolTable().getSymbol(name)) {
         return symbol;
@@ -1737,22 +1686,6 @@ void LgsSema::createCoroutineFunc(LgsFuncCall* funcCall) {
     visitFunc(newFunc);
     funcCall->coroutine = newFunc;
     funcCall->func = nullptr;
-}
-
-static std::string getMissingImplementsStr(const std::vector<LgsField*>& fields, const std::vector<LgsFunc*>& methods) {
-    std::stringstream str;
-    str << "Missing fields/methods:";
-    if (!fields.empty()) {
-        for (const auto& field : fields) {
-            str << "\n - " << field->name << ": " << field->type->pname();
-        }
-    }
-    if (!methods.empty()) {
-        for (const auto& func : methods) {
-            str << "\n - " << func->asText();
-        }
-    }
-    return str.str();
 }
 
 void LgsSema::addError(const LgsBaseMsg& lgsErr, const LgsLocation& location, const std::vector<std::string>& args) {
@@ -1786,4 +1719,56 @@ void LgsSema::deleteRTType(LgsType* type) const {
             return;
         }
     }
+}
+
+LgsFunc* clone(const LgsFunc* func, const LgsFuncCall* funcCall) {
+    const auto funcType = func->funcType;
+    const auto newFuncType = new LgsFuncType(*funcType);
+    newFuncType->params.clear();
+    newFuncType->genericTypes.clear();
+
+    std::unordered_map<std::string, LgsType*> replacements;
+    for (size_t i = 0; i < funcCall->args.size(); ++i) {
+        const auto& param = funcType->params[i];
+        LgsType* newType = nullptr;
+        if (funcType->isGenericType(param.type)) {
+            newType = funcCall->args[i].expr->type;
+            replacements[param.type->getName()] = funcCall->args[i].expr->type;
+        } else {
+            newType = param.type;
+        }
+        LgsParam newParam(newType, param.name);
+        newParam.isSelf = param.isSelf;
+        newParam.isVariadic = param.isVariadic;
+        newFuncType->params.push_back(newParam);
+    }
+
+    if (funcType->isGenericType(funcType->rt)) {
+        newFuncType->rt = replacements[funcType->rt->getName()];
+    } else {
+        newFuncType->rt = funcType->rt;
+    }
+
+    for (auto& [_, t] : replacements) {
+        newFuncType->name += '_' + t->getName();
+    }
+    const auto newFunc = new LgsFunc(newFuncType);
+    newFunc->stmtsBlock = func->stmtsBlock->clone();
+    return newFunc;
+}
+
+static std::string getMissingImplementsStr(const std::vector<LgsField*>& fields, const std::vector<LgsFunc*>& methods) {
+    std::stringstream str;
+    str << "Missing fields/methods:";
+    if (!fields.empty()) {
+        for (const auto& field : fields) {
+            str << "\n - " << field->name << ": " << field->type->pname();
+        }
+    }
+    if (!methods.empty()) {
+        for (const auto& func : methods) {
+            str << "\n - " << func->asText();
+        }
+    }
+    return str.str();
 }

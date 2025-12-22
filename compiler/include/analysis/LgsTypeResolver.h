@@ -1,4 +1,6 @@
 #pragma once
+#include "LgsSymbol.h"
+#include "errors/LgsErrHandler.h"
 
 
 class LgsMainFile;
@@ -18,6 +20,7 @@ public:
     LgsFile* file;
     LgsGlobals& globals;
     LgsErrHandler& errHandler;
+    LgsFuncType* currentFuncType = nullptr;
 
     LgsTypeResolver(LgsFile* file, LgsErrHandler& errHandler, LgsGlobals& globals) : file(file), globals(globals),errHandler(errHandler) {}
     void resolveType(LgsType*& type);
@@ -26,4 +29,5 @@ public:
     void resolveInterface(LgsInterface* interface);
     void resolveFuncType(LgsFuncType* funcType);
     void resolveIOPair(LgsIOPair* ioPair, LgsObject* obj) const;
+    LgsSymbol findSymbol(const std::string& typeName, const LgsLocation& location) const;
 };

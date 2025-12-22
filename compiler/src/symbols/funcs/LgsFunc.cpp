@@ -190,6 +190,7 @@ LgsFunc::~LgsFunc() {
         delete stmtsBlock;
         stmtsBlock = nullptr;
     }
-    freeType(funcType);
+    freeType(type);
+    setType(nullptr);
     funcType = nullptr;
 }

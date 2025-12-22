@@ -60,12 +60,7 @@
 
 bool LgsCodeGen::generate() {
     cg.setupModule(file.path, appConfigs.debugMode);
-    for (auto [name, symbol] : file.symbolTable.symbols) {
-        if (symbol.symbolType == VAR_DEC && symbol.isExternal) {
-            visitConstant(symbol.varDec->expr);
-            symbol.varDec->IRValue = symbol.varDec->expr->IRValue;
-        }
-    }
+    visitExternalSymbols();
     if (const auto mainFile = dynamic_cast<LgsMainFile*>(&file)) {
         visitMainFile(mainFile);
     } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(&file)) {
@@ -176,6 +171,15 @@ void LgsCodeGen::visitGenericFunc(LgsFunc* func) {
     stack.exitScope();
     cg.currentFunc = originalFunc;
     cg.builder.restoreIP(cg.savedIP);
+}
+
+void LgsCodeGen::visitExternalSymbols() {
+    for (auto [name, symbol] : file.symbolTable.symbols) {
+        if (symbol.symbolType == VAR_DEC && symbol.isExternal) {
+            visitConstant(symbol.varDec->expr);
+            symbol.varDec->IRValue = symbol.varDec->expr->IRValue;
+        }
+    }
 }
 
 void LgsCodeGen::visitStmt(LgsStmt* stmt) {

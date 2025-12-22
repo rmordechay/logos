@@ -17,7 +17,7 @@ Type* LgsFuncType::getIRType(LgsCgModule& cg) {
             types.emplace_back(paramType->getIRType(cg));
         }
     }
-    const auto returnType = rt->isBig() ? cg.ptrTy() : rt->getIRType(cg);
+    const auto returnType = rt->passByRef ? cg.ptrTy() : rt->getIRType(cg);
     IRType = cg.getFT(returnType, types, this->isVariadic);
     return IRType;
 }

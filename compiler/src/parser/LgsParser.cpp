@@ -554,7 +554,8 @@ LgsType* LgsParser::parseType() {
         else type = new LgsUnknown(typeText);
         consume();
     }
-    if (type && currentToken.type == T_LANGLE) {
+    if (!type) return nullptr;
+    if (currentToken.type == T_LANGLE) {
         type->genericArgs = parseGenericArgs();
     }
     setLocation(type->location, &startToken, &currentToken);
@@ -654,7 +655,7 @@ LgsFuncType* LgsParser::parseFuncType() {
     mustMatch(T_COLON);
     funcType->rt = parseType();
     mustParse(funcType->rt);
-    setLocation(funcType->location, &startToken, &currentToken);
+    setLocation(funcType->location, &startToken, &startToken);
     return funcType;
 }
 
@@ -778,11 +779,7 @@ LgsFuncType* LgsParser::parseFuncHeader() {
     funcType->genericTypes = genericsTypes;
     parseParams(funcType);
     mustMatch(T_RPAREN);
-    if (matchAndConsume(T_COLON)) {
-        funcType->rt = parseType();
-    } else {
-        funcType->rt = &LGS_VOID;
-    }
+    funcType->rt = matchAndConsume(T_COLON) ? parseType() : &LGS_VOID;
     setLocation(funcType->location, &nameToken, &currentToken);
     return funcType;
 }
@@ -872,7 +869,6 @@ LgsStmtsBlock* LgsParser::parseStmtsBlock(const bool withSingleStmt) {
         setLocation(stmtsBlock->location, &currentToken, &startToken);
     } else if (withSingleStmt) {
         stmtsBlock = new LgsStmtsBlock();
-        stmtsBlock->isSingleLine = true;
         if (const auto expr = parseExpr()) {
             stmtsBlock->location = expr->location;
             stmtsBlock->stmts.push_back(LgsStmtWrapper(expr));
@@ -2319,6 +2315,5 @@ LgsFunc* wrapStmtsBlockWithLambda(LgsStmtsBlock* stmtsBlock) {
     func->funcType->isLambda = true;
     func->location = stmtsBlock->location;
     func->stmtsBlock = stmtsBlock;
-    stmtsBlock->isSingleLine = stmtsBlock->stmts.size() == 1;
     return func;
 }

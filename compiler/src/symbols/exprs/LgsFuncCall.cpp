@@ -135,6 +135,7 @@ LgsExpr* LgsFuncCall::clone() {
 }
 
 bool argAndParamEqual(const LgsExpr* arg, const LgsParam* param) {
+    if (!param->type) return false;
     const auto argType = arg->type;
     if (!argType) return false;
     return argType->canCastTo(param->type);
