@@ -51,6 +51,7 @@ public:
     LgsExpr* getZeroValue() override;
     size_t sizeBytes() override;
     std::string getName() override;
+    std::string getGenericName();
     std::string pname() override;
     std::string fmtStr() const override;
     bool canCastTo(LgsType* other) override;
@@ -60,5 +61,4 @@ public:
     std::unordered_map<std::string, LgsParam*> getParamsByName();
     DIType* getDebugType(LgsCgModule& cg) override;
     ~LgsFuncType() override;
-    bool isGenericType(LgsType* type) const;
 };

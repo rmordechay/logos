@@ -5,7 +5,7 @@
 
 Value* LgsBinaryExpr::loadIR(LgsCgModule& cg) {
     if (!IRValue->getType()->isPointerTy()) return IRValue;
-    return cg.builder.CreateLoad(type->getIRType(cg), IRValue);
+    return cg.load(type->getIRType(cg), IRValue);
 }
 
 void LgsBinaryExpr::setDebugValue(LgsCgModule& cg) {

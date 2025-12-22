@@ -1,5 +1,6 @@
 #pragma once
 #include "LgsValue.h"
+#include "types/LgsGenericType.h"
 
 class LgsReturn;
 class LgsStmt;
@@ -7,7 +8,7 @@ class LgsObject;
 
 class LgsStmtWrapper {
 public:
-    enum class WrapperType { Object, Stmt, Expr };
+    enum class WrapperType { Stmt, Expr, Object };
     WrapperType wrapperType = WrapperType::Stmt;
     union {
         LgsStmt* stmt;
@@ -20,7 +21,6 @@ public:
     explicit LgsStmtWrapper(LgsObject* o) : wrapperType(WrapperType::Object), obj(o) {}
     explicit LgsStmtWrapper(LgsExpr* e) : wrapperType(WrapperType::Expr), expr(e) {}
     bool isTerminator() const;
-    LgsStmtWrapper clone() const;
 };
 
 class LgsStmtsBlock final : public LgsValue {
@@ -31,6 +31,6 @@ public:
     explicit LgsStmtsBlock(const std::vector<LgsStmtWrapper>& stmts = {}) : stmts(stmts) {}
     void hashNode(size_t& oldHash) override;
     void setDebugValue(LgsCgModule& cg) override;
-    LgsStmtsBlock* clone() const;
+    LgsStmtsBlock* clone() override;
     ~LgsStmtsBlock() override;
 };

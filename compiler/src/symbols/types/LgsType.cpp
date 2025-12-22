@@ -378,8 +378,8 @@ Value* neNull(LgsCgModule& cg, const LgsExpr* expr) {
 }
 
 Value* eqComplex(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right) {
-    const auto l = cg.builder.CreateLoad(left->type->getIRType(cg), left->IRValue);
-    const auto r = cg.builder.CreateLoad(right->type->getIRType(cg), right->IRValue);
+    const auto l = cg.load(left->type->getIRType(cg), left->IRValue);
+    const auto r = cg.load(right->type->getIRType(cg), right->IRValue);
     const auto lReal = cg.builder.CreateExtractValue(l, 0);
     const auto lImag = cg.builder.CreateExtractValue(l, 1);
     const auto rReal = cg.builder.CreateExtractValue(r, 0);
@@ -390,8 +390,8 @@ Value* eqComplex(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right) {
 }
 
 Value* neComplex(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right) {
-    const auto l = cg.builder.CreateLoad(left->type->getIRType(cg), left->IRValue);
-    const auto r = cg.builder.CreateLoad(right->type->getIRType(cg), right->IRValue);
+    const auto l = cg.load(left->type->getIRType(cg), left->IRValue);
+    const auto r = cg.load(right->type->getIRType(cg), right->IRValue);
     const auto lReal = cg.builder.CreateExtractValue(l, 0);
     const auto lImag = cg.builder.CreateExtractValue(l, 1);
     const auto rReal = cg.builder.CreateExtractValue(r, 0);

@@ -27,7 +27,7 @@ void LgsArrayExpr::castImplicitly(LgsType* toType) {
         castExprImplicitly(elements[i], otherBaseType);
     }
     if (!type) {
-        type = toType;
+        setType(toType);
     } else if (const auto& iter = type->asIterable()) {
         iter->baseType = otherBaseType;
     }

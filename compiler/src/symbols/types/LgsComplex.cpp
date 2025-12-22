@@ -36,8 +36,8 @@ bool LgsComplex::canCastTo(LgsType* other) {
 }
 
 Value* LgsComplex::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto l = cg.builder.CreateLoad(getIRType(cg), left->IRValue);
-    const auto r = cg.builder.CreateLoad(getIRType(cg), right->IRValue);
+    const auto l = cg.load(getIRType(cg), left->IRValue);
+    const auto r = cg.load(getIRType(cg), right->IRValue);
     const auto lReal = cg.builder.CreateExtractValue(l, 0);
     const auto rReal = cg.builder.CreateExtractValue(r, 0);
     const auto lImag = cg.builder.CreateExtractValue(l, 1);
@@ -53,8 +53,8 @@ Value* LgsComplex::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
 }
 
 Value* LgsComplex::subIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto l = cg.builder.CreateLoad(getIRType(cg), left->IRValue);
-    const auto r = cg.builder.CreateLoad(getIRType(cg), right->IRValue);
+    const auto l = cg.load(getIRType(cg), left->IRValue);
+    const auto r = cg.load(getIRType(cg), right->IRValue);
     const auto lReal = cg.builder.CreateExtractValue(l, 0);
     const auto rReal = cg.builder.CreateExtractValue(r, 0);
     const auto lImag = cg.builder.CreateExtractValue(l, 1);
@@ -70,8 +70,8 @@ Value* LgsComplex::subIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
 }
 
 Value* LgsComplex::mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto l = cg.builder.CreateLoad(getIRType(cg), left->IRValue);
-    const auto r = cg.builder.CreateLoad(getIRType(cg), right->IRValue);
+    const auto l = cg.load(getIRType(cg), left->IRValue);
+    const auto r = cg.load(getIRType(cg), right->IRValue);
 
     const auto a = cg.builder.CreateExtractValue(l, 0);  // lReal
     const auto b = cg.builder.CreateExtractValue(l, 1);  // lImag
@@ -99,8 +99,8 @@ Value* LgsComplex::mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
 
 Value* LgsComplex::divIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     const auto ty = getIRType(cg);
-    const auto l = cg.builder.CreateLoad(ty, left->IRValue);
-    const auto r = cg.builder.CreateLoad(ty, right->IRValue);
+    const auto l = cg.load(ty, left->IRValue);
+    const auto r = cg.load(ty, right->IRValue);
 
     const auto a = cg.builder.CreateExtractValue(l, 0);
     const auto b = cg.builder.CreateExtractValue(l, 1);

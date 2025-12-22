@@ -13,10 +13,10 @@ Value* LgsIterIndex::loadIR(LgsCgModule& cg) {
     if (baseExprType->asMap() || baseExprType->asDArray() || baseExprType->asSet()) {
         const auto arr = baseExpr->type->asIterable();
         const auto valueTy = arr->baseType->getIRType(cg);
-        return cg.builder.CreateLoad(valueTy, IRValue);
+        return cg.load(valueTy, IRValue);
     }
     if (baseExprType->asStr()) {
-        return cg.builder.CreateLoad(cg.i8Ty(), IRValue);
+        return cg.load(cg.i8Ty(), IRValue);
     }
     if (baseExprType->asMatrix()) {
         assert(0);
@@ -25,10 +25,10 @@ Value* LgsIterIndex::loadIR(LgsCgModule& cg) {
         const auto indexIR = index.from->IRValue;
         const auto ty = baseExpr->type->getIRType(cg);
         const auto gep = cg.builder.CreateGEP(ty, IRValue, {cg.i32Zero(), indexIR});
-        return cg.builder.CreateLoad(type->getIRType(cg), gep);
+        return cg.load(type->getIRType(cg), gep);
     }
     if (baseExprType->asVec()) {
-        const auto vec = cg.builder.CreateLoad(baseExpr->type->getIRType(cg), IRValue);
+        const auto vec = cg.load(baseExpr->type->getIRType(cg), IRValue);
         const auto i = index.from->IRValue;
         return cg.builder.CreateExtractElement(vec, i);
     }
@@ -45,7 +45,7 @@ void LgsIterIndex::setIRElementPtr(LgsCgModule& cg, const bool assign) {
         if (!boundsChecked) cg.createIndexBoundsGuard(sArr->size->IRValue, fromIR);
         IRValue = cg.builder.CreateInBoundsGEP(ty, baseExpr->IRValue, fromIR);
         if (ty->isPointerTy()) {
-            IRValue = cg.builder.CreateLoad(cg.ptrTy(), IRValue);
+            IRValue = cg.load(cg.ptrTy(), IRValue);
         }
         return;
     }
@@ -75,9 +75,6 @@ void LgsIterIndex::setIRElementPtr(LgsCgModule& cg, const bool assign) {
     if (const auto iter = baseExpr->type->asIterable()) {
         fromIR = cg.builder.CreateZExt(fromIR, cg.i64Ty());
         IRValue = iter->getIRElement(cg, baseExpr->IRValue, fromIR);
-        if (!type->passByRef) {
-            IRValue = cg.builder.CreateLoad(cg.ptrTy(), IRValue);
-        }
     }
 }
 

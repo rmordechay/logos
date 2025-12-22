@@ -331,6 +331,9 @@ bool LgsApp::resolveGlobals() {
     return successful;
 }
 
+/**
+ *  The runtime types are set in the semantic analysis
+ */
 bool LgsApp::generateRTTTypes() {
     rttTypeModule.setupModule("rttypes");
     rttTypeModule.isRTTModule = true;

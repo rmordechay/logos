@@ -32,7 +32,7 @@ public:
     LgsReturn* asReturn();
     LgsVarDec* asVarDec();
     LgsAssignment* asAssignment();
-    virtual LgsStmt* clone();
+    LgsStmt* clone() override;
 };
 
 void freeStmt(const LgsStmt* stmt);

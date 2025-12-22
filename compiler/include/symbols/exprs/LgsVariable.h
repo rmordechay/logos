@@ -16,5 +16,5 @@ public:
     void assign(LgsCgModule& cg, LgsExpr* expr) override;
     std::string asText() override;
     void setDebugValue(LgsCgModule& cg) override;
-    LgsExpr* clone() override;
+    LgsVariable* clone() override;
 };

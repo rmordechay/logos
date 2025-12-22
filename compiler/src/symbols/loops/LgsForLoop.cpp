@@ -20,7 +20,7 @@ void LgsForLoop::setBlocks(LgsCgModule& cg) {
 
 void LgsForLoop::incAndJumpToCond(LgsCgModule& cg) {
     if (cg.lastInstTerminator()) return;
-    iValue = cg.builder.CreateLoad(cg.i32Ty(), iPtr);
+    iValue = cg.load(cg.i32Ty(), iPtr);
     const auto inc = cg.builder.CreateAdd(iValue, cg.i32(1));
     cg.store(inc, iPtr);
     const auto br = cg.builder.CreateBr(IRCondBlock);

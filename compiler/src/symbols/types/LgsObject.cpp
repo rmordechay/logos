@@ -90,7 +90,7 @@ LgsExpr* LgsObject::getZeroValue() {
 
 Value* LgsObject::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
     const auto ty = getIRType(cg);
-    const auto zero = cg.allocate(cg.usize(sizeBytes()), getRTType(cg), false);
+    const auto zero = cg.heapAllocate(cg.usize(sizeBytes()), getRTType(cg), false);
     for (const auto field : fields) {
         const auto fieldZero = field->type->getIRZeroValue(cg);
         cg.storeStructField(ty, zero, field->position, fieldZero);

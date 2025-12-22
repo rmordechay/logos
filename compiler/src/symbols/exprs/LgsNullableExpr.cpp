@@ -3,8 +3,8 @@
 
 Value* LgsNullableExpr::loadIR(LgsCgModule& cg) {
     if (isNull) return IRValue;
-    if (type->passByRef) return cg.builder.CreateLoad(cg.ptrTy(), IRValue);
-    return cg.builder.CreateLoad(type->getIRType(cg), IRValue);
+    if (type->passByRef) return cg.load(cg.ptrTy(), IRValue);
+    return cg.load(type->getIRType(cg), IRValue);
 }
 
 void LgsNullableExpr::assign(LgsCgModule& cg, LgsExpr* expr) {
@@ -26,7 +26,7 @@ void LgsNullableExpr::setDebugValue(LgsCgModule& cg) {
 void LgsNullableExpr::castImplicitly(LgsType* toType) {
     const auto otherNullable = toType->asNullable();
     if (isNull && otherNullable) {
-        type = otherNullable;
+        setType(otherNullable);
     }
 }
 

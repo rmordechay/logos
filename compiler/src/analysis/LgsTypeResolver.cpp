@@ -43,8 +43,7 @@ void LgsTypeResolver::resolveType(LgsType*& type) {
     }
 
     if (type->isUnknown()) {
-        const auto typeName = type->getName();
-        const auto symbol = findSymbol(typeName, type->location);
+        const auto symbol = findSymbol(type->getName(), type->location);
         if (symbol.symbolType == UNKNOWN) return;
         LgsType* newType = nullptr;
         switch (symbol.symbolType) {
@@ -136,6 +135,9 @@ void LgsTypeResolver::resolveInterface(LgsInterface* interface) {
 void LgsTypeResolver::resolveFuncType(LgsFuncType* funcType) {
     currentFuncType = funcType;
     for (auto& param : funcType->params) {
+        if (const auto& cb = param.type->asFuncType()) {
+            cb->genericTypes = funcType->genericTypes;
+        }
         resolveType(param.type);
     }
     resolveType(funcType->rt);
@@ -156,13 +158,10 @@ void LgsTypeResolver::resolveIOPair(LgsIOPair* ioPair, LgsObject* obj) const {
 }
 
 LgsSymbol LgsTypeResolver::findSymbol(const std::string& typeName, const LgsLocation& location) const {
-    auto symbol = globals.table.getSymbol(typeName);
-    if (symbol) return *symbol;
-    symbol = file->symbolTable.getSymbol(typeName);
-    if (symbol) return *symbol;
+    if (const auto symbol = globals.table.getSymbol(typeName)) return *symbol;
+    if (const auto symbol = file->symbolTable.getSymbol(typeName)) return *symbol;
     for (const auto genericType : currentFuncType->genericTypes) {
-        if (genericType->name != typeName) continue;
-        return LgsSymbol(genericType);
+        if (genericType->name == typeName) return LgsSymbol(genericType);
     }
     errHandler.addError(E10006, &location, file->path, {typeName});
     return LgsSymbol();

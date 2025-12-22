@@ -1538,7 +1538,7 @@ LgsExpr* LgsParser::parseConstant() {
         auto result = tokenStr;
         result.erase(std::ranges::remove(result, '_').begin(), result.end());
         constant = determineIntConst(result, 10);
-        constant->type = &LGS_IMAGINARY;
+        constant->setType(&LGS_IMAGINARY);
         break;
     }
     case T_UINT: {

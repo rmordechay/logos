@@ -56,7 +56,6 @@
 #include <unordered_set>
 
 static std::string getMissingImplementsStr(const std::vector<LgsField*>& fields, const std::vector<LgsFunc*>& methods);
-LgsFunc* clone(const LgsFunc* func, const LgsFuncCall* funcCall);
 
 void LgsSema::analyse() {
     resolveImports();
@@ -183,11 +182,6 @@ void LgsSema::visitFunc(LgsFunc* func) {
     stack.exitScope();
 }
 
-void LgsSema::visitLambda(LgsFunc* lambda) {
-    typeResolver.resolveFuncType(lambda->funcType);
-    visitFunc(lambda);
-}
-
 void LgsSema::visitMainFunc(LgsMainFunc* mainFunc) {
     stack.enterScope(mainFunc);
     const auto ft = mainFunc->funcType;
@@ -209,6 +203,11 @@ void LgsSema::visitMainFunc(LgsMainFunc* mainFunc) {
     }
     visitStmtsBlock(mainFunc->stmtsBlock);
     stack.exitScope();
+}
+
+void LgsSema::visitLambda(LgsFunc* lambda) {
+    typeResolver.resolveFuncType(lambda->funcType);
+    visitFunc(lambda);
 }
 
 void LgsSema::visitParam(LgsParam* param) {
@@ -257,6 +256,20 @@ void LgsSema::visitStmt(LgsStmtWrapper& stmt) {
     else assert(0);
 }
 
+void LgsSema::replaceForLoop(LgsStmtWrapper& stmt) {
+    const auto rangeLoop = stmt.stmt->asLoop()->asRangeLoop();
+    if (!rangeLoop) return;
+    visitExpr(rangeLoop->endRange);
+    if (rangeLoop->endRange->type && rangeLoop->endRange->type->asIterable()) {
+        const auto foreach = new LgsForeachLoop(rangeLoop->endRange);
+        foreach->stmtsBlock = rangeLoop->stmtsBlock;
+        rangeLoop->stmtsBlock = nullptr;
+        rangeLoop->endRange = nullptr;
+        delete rangeLoop;
+        stmt.stmt = foreach;
+    }
+}
+
 void LgsSema::visitStmtsBlock(LgsStmtsBlock* stmtsBlock) {
     if (!stmtsBlock || stmtsBlock->stmts.empty()) return;
 
@@ -296,20 +309,6 @@ void LgsSema::visitStmtsBlock(LgsStmtsBlock* stmtsBlock) {
         if (stmtsBlock->stmts[i].isTerminator()) {
             return addError(E10059, lastStmt.stmt->location);
         }
-    }
-}
-
-void LgsSema::replaceForLoop(LgsStmtWrapper& stmt) {
-    const auto rangeLoop = stmt.stmt->asLoop()->asRangeLoop();
-    if (!rangeLoop) return;
-    visitExpr(rangeLoop->endRange);
-    if (rangeLoop->endRange->type && rangeLoop->endRange->type->asIterable()) {
-        const auto foreach = new LgsForeachLoop(rangeLoop->endRange);
-        foreach->stmtsBlock = rangeLoop->stmtsBlock;
-        rangeLoop->stmtsBlock = nullptr;
-        rangeLoop->endRange = nullptr;
-        delete rangeLoop;
-        stmt.stmt = foreach;
     }
 }
 
@@ -782,7 +781,7 @@ void LgsSema::visitNullableExpr(LgsNullableExpr* nullableExpr) {
     if (nullableExpr->isNull) return;
     visitExpr(nullableExpr->baseExpr);
     if (nullableExpr->type) return;
-    nullableExpr->type = new LgsNullable(nullableExpr->baseExpr->type);
+    nullableExpr->setType(new LgsNullable(nullableExpr->baseExpr->type));
 }
 
 void LgsSema::visitUnwrap(LgsExpr* expr) {
@@ -792,7 +791,7 @@ void LgsSema::visitUnwrap(LgsExpr* expr) {
         return;
     }
     const auto nullable = expr->type->asNullable();
-    expr->type = nullable->baseType;
+    expr->setType(nullable->baseType);
 }
 
 void LgsSema::visitArrayExpr(LgsArrayExpr* arrayExpr) {
@@ -1096,43 +1095,6 @@ void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent) {
     }
 }
 
-void LgsSema::visitFuncCall(LgsFuncCall* funcCall) {
-    const auto symbol = getSymbol(funcCall->name);
-    if (!symbol) return addError(E10006, funcCall->location, {funcCall->name});
-    const auto ft = symbol->getType()->asFuncType();
-    if (!ft) return addError(E10046, funcCall->location, {funcCall->name});
-
-    if (!visitFuncArgs(funcCall, ft)) return;
-    if (!funcCall->equals(ft)) {
-        addErrorIfSuccessful(E10015, funcCall->location, {funcCall->name, funcCall->asText(), ft->pname()});
-        return;
-    }
-    if (symbol->symbolType != FUNC) {
-        funcCall->ref = *symbol;
-        funcCall->setType(ft->rt);
-        return;
-    }
-
-    const auto func = symbol->func;
-    if (!func->funcType->genericTypes.empty()) {
-        const auto funcName = funcCall->getGenericName();
-        const auto generics = file->symbolTable.genericFuncCalls.find(funcName);
-        LgsFunc* genericFunc = nullptr;
-        if (generics != file->symbolTable.genericFuncCalls.end()) {
-            genericFunc = generics->second;
-        } else {
-            genericFunc = clone(func, funcCall);
-            visitFunc(genericFunc);
-            file->symbolTable.genericFuncCalls[funcName] = genericFunc;
-        }
-        funcCall->func = genericFunc;
-        funcCall->setType(genericFunc->funcType->rt);
-    } else {
-        funcCall->func = func;
-        funcCall->setType(ft->rt);
-    }
-}
-
 bool LgsSema::visitFuncArgs(LgsFuncCall* funcCall, LgsFuncType* ft) {
     if (funcCall->isNamed) {
         auto paramsByName = ft->getParamsByName();
@@ -1169,6 +1131,43 @@ bool LgsSema::visitFuncArgs(LgsFuncCall* funcCall, LgsFuncType* ft) {
         }
     }
     return true;
+}
+
+void LgsSema::visitFuncCall(LgsFuncCall* funcCall) {
+    const auto symbol = getSymbol(funcCall->name);
+    if (!symbol) return addError(E10006, funcCall->location, {funcCall->name});
+    const auto ft = symbol->getType()->asFuncType();
+    if (!ft) return addError(E10046, funcCall->location, {funcCall->name});
+
+    if (!visitFuncArgs(funcCall, ft)) return;
+    if (!funcCall->equals(ft)) {
+        addErrorIfSuccessful(E10015, funcCall->location, {funcCall->name, funcCall->asText(), ft->pname()});
+        return;
+    }
+    if (symbol->symbolType != FUNC) {
+        funcCall->ref = *symbol;
+        funcCall->setType(ft->rt);
+        return;
+    }
+
+    const auto func = symbol->func;
+    if (!func->funcType->genericTypes.empty()) {
+        const auto funcName = funcCall->getGenericName();
+        const auto generics = file->symbolTable.genericFuncCalls.find(funcName);
+        LgsFunc* genericFunc = nullptr;
+        if (generics != file->symbolTable.genericFuncCalls.end()) {
+            genericFunc = generics->second;
+        } else {
+            genericFunc = func->cloneGenericFunc(funcCall);
+            visitFunc(genericFunc);
+            file->symbolTable.genericFuncCalls[funcName] = genericFunc;
+        }
+        funcCall->func = genericFunc;
+        funcCall->setType(genericFunc->funcType->rt);
+    } else {
+        funcCall->func = func;
+        funcCall->setType(ft->rt);
+    }
 }
 
 void LgsSema::visitPrefixExpr(LgsPrefixExpr* prefixExpr) {
@@ -1222,7 +1221,7 @@ void LgsSema::visitStrConst(const LgsStrConst* strConst) {
 void LgsSema::visitComplexConst(LgsComplexConst* complex) {
     visitExpr(complex->real);
     visitExpr(complex->imaginary);
-    complex->type = new LgsComplex(complex->real->type, complex->imaginary->type);
+    complex->setType(new LgsComplex(complex->real->type, complex->imaginary->type));
 }
 
 void LgsSema::visitTypeExpr(LgsTypeExpr* typeExpr) {
@@ -1417,7 +1416,7 @@ void LgsSema::visitLoopMetaVar(LgsMetaVar* metaVar) {
         return addError(E10061, metaVar->location, {name});
     }
     if (metaVar->varType == FOR_ELEMENT) {
-        metaVar->type = stack.getInnermostForeachLoop()->loopVars.front()->type;
+        metaVar->setType(stack.getInnermostForeachLoop()->loopVars.front()->type);
     }
 
     if (!loop->metaVars.contains(metaVar->varType)) {
@@ -1699,13 +1698,20 @@ void LgsSema::addErrorIfSuccessful(const LgsBaseMsg& lgsErr, const LgsLocation& 
 
 void LgsSema::addRTType(LgsType* type) const {
     if (!errHandler.successful) return;
-    if (!type || type->isVoid()) return;
+    if (!type || type->isVoid() || type->asGenericType()) return;
     if (type->asNullable() && !type->asNullable()->baseType) return;
     for (const auto rttType : globals.table.rttTypes) {
         if (rttType->equals(type)) return;
     }
     for (const auto rttType : file->symbolTable.rttTypes) {
         if (rttType->equals(type)) return;
+    }
+    if (const auto ft = type->asFuncType()) {
+        if (!type->asFuncType()->genericTypes.empty()) return;
+        if (ft->rt->asGenericType()) return;
+        for (const auto& param : ft->params) {
+            if (param.type->asGenericType()) return;
+        }
     }
     file->symbolTable.rttTypes.push_back(type);
 }
@@ -1719,42 +1725,6 @@ void LgsSema::deleteRTType(LgsType* type) const {
             return;
         }
     }
-}
-
-LgsFunc* clone(const LgsFunc* func, const LgsFuncCall* funcCall) {
-    const auto funcType = func->funcType;
-    const auto newFuncType = new LgsFuncType(*funcType);
-    newFuncType->params.clear();
-    newFuncType->genericTypes.clear();
-
-    std::unordered_map<std::string, LgsType*> replacements;
-    for (size_t i = 0; i < funcCall->args.size(); ++i) {
-        const auto& param = funcType->params[i];
-        LgsType* newType = nullptr;
-        if (funcType->isGenericType(param.type)) {
-            newType = funcCall->args[i].expr->type;
-            replacements[param.type->getName()] = funcCall->args[i].expr->type;
-        } else {
-            newType = param.type;
-        }
-        LgsParam newParam(newType, param.name);
-        newParam.isSelf = param.isSelf;
-        newParam.isVariadic = param.isVariadic;
-        newFuncType->params.push_back(newParam);
-    }
-
-    if (funcType->isGenericType(funcType->rt)) {
-        newFuncType->rt = replacements[funcType->rt->getName()];
-    } else {
-        newFuncType->rt = funcType->rt;
-    }
-
-    for (auto& [_, t] : replacements) {
-        newFuncType->name += '_' + t->getName();
-    }
-    const auto newFunc = new LgsFunc(newFuncType);
-    newFunc->stmtsBlock = func->stmtsBlock->clone();
-    return newFunc;
 }
 
 static std::string getMissingImplementsStr(const std::vector<LgsField*>& fields, const std::vector<LgsFunc*>& methods) {

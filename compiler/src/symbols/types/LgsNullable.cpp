@@ -107,12 +107,12 @@ void LgsNullable::setNullableFields(LgsCgModule& cg, Value* ptr, Value* value, V
 
 Value* LgsNullable::getNullableValue(LgsCgModule& cg, Value* ptr) {
     const auto valueField = cg.builder.CreateStructGEP(getIRType(cg), ptr, 0);
-    return cg.builder.CreateLoad(baseType->getIRType(cg), valueField);
+    return cg.load(baseType->getIRType(cg), valueField);
 }
 
 Value* LgsNullable::getIsSet(LgsCgModule& cg, Value* ptr) {
     const auto isSetField = cg.builder.CreateStructGEP(getIRType(cg), ptr, 1);
-    return cg.builder.CreateLoad(cg.i1Ty(), isSetField);
+    return cg.load(cg.i1Ty(), isSetField);
 }
 
 void LgsNullable::storeNullableValue(LgsCgModule& cg, Value* ptr, Value* value) {

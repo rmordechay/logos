@@ -214,7 +214,7 @@ Value* LgsVec::inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) {
         cg.startBlock(falseBlock);
         freeExpr(tempExpr);
     });
-    return cg.builder.CreateLoad(cg.i1Ty(), resultPtr);
+    return cg.load(cg.i1Ty(), resultPtr);
 }
 
 Value* LgsVec::lenIR(LgsCgModule& cg, Value* iterable) {
@@ -224,7 +224,7 @@ Value* LgsVec::lenIR(LgsCgModule& cg, Value* iterable) {
 Value* LgsVec::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
     Value* vec = iterable;
     if (iterable->getType()->isPointerTy()) {
-        vec = cg.builder.CreateLoad(getIRType(cg), iterable);
+        vec = cg.load(getIRType(cg), iterable);
     }
     return cg.builder.CreateExtractElement(vec, index);
 }

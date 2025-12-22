@@ -1,20 +1,20 @@
-object Pool {
+object Parent {
     id: Int
-    system: System
+    child: Child
 }
 
-object System {
+object Child {
     id: Int
 }
 
-func(pool: Pool) {
-    //system1 = System{id=23}
-    pool.system := System{id=35}
+func(parent: Parent) {
+    //child1 = Child{id=23}
+    parent.child := Child{id=35}
 }
 
 main() {
-    system1 = System{id=23}
-    pool1 = Pool{id=1, system=system1}
-    func(pool1)
-    print(pool1.system.id)
+    child1 = Child{id=23}
+    parent1 = Parent{id=1, child=child1}
+    func(parent1)
+    //print(parent1.child.id)
 }

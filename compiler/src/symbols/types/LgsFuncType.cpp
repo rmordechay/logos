@@ -23,7 +23,7 @@ Type* LgsFuncType::getIRType(LgsCgModule& cg) {
 }
 
 Constant* LgsFuncType::getRTType(LgsCgModule& cg) {
-    const auto funcName = getName();
+    const auto funcName = getGenericName();
     std::vector<LgsOwner*> paramsAsOwners;
     for (auto& param : params) paramsAsOwners.emplace_back(static_cast<LgsOwner*>(&param));
     const auto [typesArr, hashesArr] = getRTFieldsInfo(cg, funcName, paramsAsOwners);
@@ -43,7 +43,7 @@ size_t LgsFuncType::sizeBytes() {
 }
 
 std::string LgsFuncType::getName() {
-    if (name == "") return LGS_LAMBDA_NAME;
+    if (name == "") return LGS_LAMBDA;
     std::stringstream strStream;
     if (!isExternal) {
         if (isBuiltin) strStream << LGS_PREFIX;
@@ -55,6 +55,16 @@ std::string LgsFuncType::getName() {
     strStream << name;
     if (isCoroutine) strStream << LGS_CORO_SUFFIX;
     return strStream.str();
+}
+
+std::string LgsFuncType::getGenericName() {
+    std::stringstream str;
+    str << getName();
+    for (size_t i = isMethod; i < params.size(); ++i) {
+        const auto& param = params[i];
+        str << '_' << param.type->getName();
+    }
+    return str.str();
 }
 
 std::string LgsFuncType::pname() {
@@ -89,7 +99,7 @@ bool LgsFuncType::canCastTo(LgsType* other) {
     const auto otherParams = otherFuncType->params;
     if (params.size() != otherParams.size()) return false;
     if (params.size() == 0 && otherParams.size() == 0) return true;
-    if (otherFuncType->rt && !rt->canCastTo(otherFuncType->rt)) return false;
+    if (rt && otherFuncType->rt && !rt->canCastTo(otherFuncType->rt)) return false;
     for (size_t i = isMethod; i < params.size(); ++i) {
         const auto thisType = params[i].type;
         const auto otherType = otherFuncType->params[i].type;
@@ -142,13 +152,6 @@ std::unordered_map<std::string, LgsParam*> LgsFuncType::getParamsByName() {
 
 DIType* LgsFuncType::getDebugType(LgsCgModule& cg) {
     assert(0);
-}
-
-bool LgsFuncType::isGenericType(LgsType* type) const {
-    for (const auto genericType : genericTypes) {
-        if (genericType->equals(type)) return true;
-    }
-    return false;
 }
 
 LgsFuncType::~LgsFuncType() {

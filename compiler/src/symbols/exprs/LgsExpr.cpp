@@ -215,10 +215,10 @@ LgsNullableExpr* LgsExpr::asNullableExpr() {
 void wrapInNullable(LgsExpr*& expr, LgsNullable* nullable) {
     assert(!nullable->baseType->asNullable() && !expr->asNullableExpr());
     const auto oldExpr = expr;
-    oldExpr->type = nullable->baseType;
+    oldExpr->setType(nullable->baseType);
     expr = new LgsNullableExpr(oldExpr);
     expr->owner = oldExpr->owner;
-    expr->type = nullable;
+    expr->setType(nullable);
 }
 
 void castExprImplicitly(LgsExpr*& expr, LgsType* toType) {

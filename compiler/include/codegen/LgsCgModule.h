@@ -72,14 +72,24 @@ public:
     Value* getPtrTo(Value* v);
     llvm::AllocaInst* getEmptyBuffer();
     GlobalVariable* createGlobal(const std::string& name, Type* type, Constant* initializer, bool isConst = true, GlobalValue::LinkageTypes linkage = GlobalValue::ExternalLinkage) const;
+    void loop(Value* loopLength, const std::function<void(Value*, BasicBlock*)>& body);
+
+    void store(Value* v, Value* ptr);
+    Value* load(Type* ty, Value* ptr);
+    Value* allocaAndStore(Type* type, Value* v);
     StructType* getStructType(const std::vector<Type*>& fields, const std::string& name = "");
     void storeStructField(Type* parentType, Value* parentPtr, size_t position, Value* v);
-    void store(Value* v, Value* ptr);
-    Value* allocaAndStore(Type* type, Value* v);
-    void loop(Value* loopLength, const std::function<void(Value*, BasicBlock*)>& body);
-    Constant* getRTTypeInfo(const std::string& name, size_t size, Lgs_TypeKind kind, bool isHeapAlloc, Constant* extra);
-    Constant* getRTTExtraStruct(const std::string& name, const std::vector<Type*>& fields, const std::vector<Constant*>& args);
-    StructType* getRTTBaseStruct();
+    void addNullTerminate(Value* strPtr, Value* pos);
+
+    void callStackPush();
+    void callPopStack();
+    Value* callHash(Value* arg);
+    Constant* hashConst(const std::string& str);
+    void addToVTable(Value* instance, Value* key, Value* ptr);
+    Value* getFromVTable(Value* instance, Value* key);
+    void freeValue(Value* ptr, Constant* type);
+    Value* heapAllocate(Value* size, Constant* type, bool isOwner, bool isReturnExpr = false);
+    void callThrowError(const LgsBaseMsg& err, const std::vector<Value*>& args = {});
 
     // Blocks
     BasicBlock* createBlock(const std::string& name = "", Function* parent = nullptr);
@@ -98,23 +108,17 @@ public:
     Value* callLgsFunc(const std::string& baseName, const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes = {}, const std::vector<Value*>& args = {});
     Value* callRuntimeFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes = {}, const std::vector<Value*>& args = {}, bool isVariadic = false);
 
+    // Externals (syscalls, clib, etc.)
     Value* callPrintf(const std::vector<Value*>& args);
     Value* callSnprintf(const std::string& fmt, const std::vector<Value*>& args);
     Value* callStrLen(Value* str);
     void callMemSet(Value* dest, Value* src, Value* size);
     void callMemCpy(Value* dest, Value* src, Value* size);
-    Value* callHash(Value* arg);
-    Constant* hashConst(const std::string& str);
-    void callThrowError(const LgsBaseMsg& err, const std::vector<Value*>& args = {});
-    void freeValue(Value* ptr, Constant* type);
-    Value* allocate(Value* size, Constant* type, bool isOwner, bool isReturnExpr = false);
 
-    // Stack
-    void callStackPush();
-    void callPopStack();
-    void addToVTable(Value* instance, Value* key, Value* ptr);
-    Value* getFromVTable(Value* instance, Value* key);
-    void addNullTerminate(Value* strPtr, Value* pos);
+    // Runtime funcs
+    Constant* getRTTypeInfo(const std::string& name, size_t size, Lgs_TypeKind kind, bool isHeapAlloc, Constant* extra);
+    Constant* getRTTExtraStruct(const std::string& name, const std::vector<Type*>& fields, const std::vector<Constant*>& args);
+    StructType* getRTTBaseStruct();
 
     // Types
     Type* i1Ty();

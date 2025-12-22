@@ -16,6 +16,7 @@ public:
     Value* loadIR(LgsCgModule& cg) override;
     void castImplicitly(LgsType* toType) override;
     LgsExpr* castExplicitly(LgsType* toType) override;
+    LgsIntConst* clone() override;
     std::string asText() override;
     bool equals(LgsExpr* other) override;
     void hashNode(size_t& oldHash) override;

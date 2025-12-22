@@ -58,6 +58,8 @@
 #include "exprs/LgsMetaSelection.h"
 #include "types/LgsNullable.h"
 
+std::atomic<size_t> LgsCodeGen::lambdasIDGenerator{0};
+
 bool LgsCodeGen::generate() {
     cg.setupModule(file.path, appConfigs.debugMode);
     visitExternalSymbols();
@@ -161,18 +163,6 @@ void LgsCodeGen::visitFunc(LgsFunc* func) {
     stack.exitScope();
 }
 
-void LgsCodeGen::visitGenericFunc(LgsFunc* func) {
-    cg.savedIP = cg.builder.saveIP();
-    const auto originalFunc = cg.currentFunc;
-    stack.enterScope(func);
-    createPrologue(func);
-    visitStmtsBlock(func->stmtsBlock);
-    createEpilogue(func);
-    stack.exitScope();
-    cg.currentFunc = originalFunc;
-    cg.builder.restoreIP(cg.savedIP);
-}
-
 void LgsCodeGen::visitExternalSymbols() {
     for (auto [name, symbol] : file.symbolTable.symbols) {
         if (symbol.symbolType == VAR_DEC && symbol.isExternal) {
@@ -248,7 +238,7 @@ void LgsCodeGen::visitRangeLoop(LgsRangeLoop* loop) {
 
     // Condition
     cg.startBlock(loop->IRCondBlock);
-    loop->iValue = cg.builder.CreateLoad(cg.i32Ty(), loop->iPtr);
+    loop->iValue = cg.load(cg.i32Ty(), loop->iPtr);
     const auto loopEnd = cg.builder.CreateSExt(loop->loopEnd(cg), cg.i32Ty());
     const auto condition = cg.builder.CreateICmpSLT(loop->iValue, loopEnd);
     cg.builder.CreateCondBr(condition, loop->IRBodyBlock, loop->IRExitBlock);
@@ -267,7 +257,7 @@ void LgsCodeGen::visitForeachLoop(LgsForeachLoop* loop) {
     cg.store(cg.i32Zero(), loop->iPtr);
     cg.branchAndStartBlock(loop->IRCondBlock);
 
-    loop->iValue = cg.builder.CreateLoad(indexTy, loop->iPtr);
+    loop->iValue = cg.load(indexTy, loop->iPtr);
     const auto condition = cg.builder.CreateICmpSLT(loop->iValue, loop->loopEnd(cg));
     cg.builder.CreateCondBr(condition, loop->IRBodyBlock, loop->IRExitBlock);
     cg.startBlock(loop->IRBodyBlock);
@@ -681,6 +671,8 @@ void LgsCodeGen::visitCast(LgsCast* cast) {
 void LgsCodeGen::visitLambda(LgsFunc* func) {
     cg.savedIP = cg.builder.saveIP();
     const auto originalFunc = cg.currentFunc;
+    const auto lambdaID = lambdasIDGenerator.fetch_add(1);
+    func->funcType->name += LGS_LAMBDA + std::to_string(lambdaID);
     func->IRValue = func->getIRFunc(cg);
     visitFunc(func);
     cg.currentFunc = originalFunc;
@@ -816,7 +808,7 @@ void LgsCodeGen::visitDynamicArray(LgsArrayExpr* arrayExpr) const {
     const auto dArr = arrayExpr->type->asDArray();
     auto rtType = dArr->getRTType(cg);
     if (!arrayExpr->IRValue) {
-        arrayExpr->IRValue = cg.allocate(cg.usize(dArr->sizeBytes()), rtType, false);
+        arrayExpr->IRValue = cg.heapAllocate(cg.usize(dArr->sizeBytes()), rtType, false);
     }
     cg.callLgsFunc(LgsDArray::name, "init", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {arrayExpr->IRValue, rtType});
     for (const auto element : arrayExpr->elements) {
@@ -828,7 +820,7 @@ void LgsCodeGen::visitSetExpr(LgsArrayExpr* arrayExpr) const {
     const auto set = arrayExpr->type->asSArray();
     auto rtType = set->getRTType(cg);
     if (!arrayExpr->IRValue) {
-        arrayExpr->IRValue = cg.allocate(cg.usize(set->sizeBytes()), rtType, false);
+        arrayExpr->IRValue = cg.heapAllocate(cg.usize(set->sizeBytes()), rtType, false);
     }
     cg.callLgsFunc(LgsSet::name, "init", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {arrayExpr->IRValue, rtType});
     for (const auto element : arrayExpr->elements) {
@@ -901,7 +893,7 @@ void LgsCodeGen::visitMatrixExpr(const LgsMatrixExpr* matrixExpr) {
 
 void LgsCodeGen::visitHashMap(LgsHashMap* hashMap) {
     const auto map = hashMap->type->asMap();
-    hashMap->IRValue = cg.allocate(cg.usize(map->sizeBytes()), map->getRTType(cg), !!hashMap->owner);
+    hashMap->IRValue = cg.heapAllocate(cg.usize(map->sizeBytes()), map->getRTType(cg), !!hashMap->owner);
     cg.callLgsFunc(LgsMap::name, "init", cg.voidTy(), {cg.ptrTy()}, {hashMap->IRValue});
     for (const auto [key, value] : hashMap->elements) {
         visitExpr(key);
@@ -1004,7 +996,7 @@ void LgsCodeGen::visitFieldSelection(LgsVariable* var, LgsExpr* parent, const bo
         if (assign) {
             var->IRValue = field->getGEP(cg, parent->IRValue);
         } else {
-            var->IRValue = cg.builder.CreateLoad(cg.sizeTy(), field->getGEP(cg, parent->IRValue));
+            var->IRValue = cg.load(cg.sizeTy(), field->getGEP(cg, parent->IRValue));
         }
         return;
     }
@@ -1026,9 +1018,6 @@ void LgsCodeGen::visitFieldSelection(LgsVariable* var, LgsExpr* parent, const bo
         createVecField(field, parent->IRValue);
     }
     var->IRValue = field->getGEP(cg, parent->IRValue);
-    if (field->type->passByRef) {
-        var->IRValue = cg.builder.CreateLoad(cg.ptrTy(), var->IRValue);
-    }
 }
 
 void LgsCodeGen::visitNullableSelection(LgsExpr* child, LgsExpr* parent) const {
@@ -1105,7 +1094,7 @@ void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
     }
 
     visitIterFunc(funcCall);
-    if (!func->funcType->genericTypes.empty()) visitGenericFunc(func);
+    assert(func->funcType->genericTypes.empty());
     if (funcCall->coroutine || funcCall->isDeferred) return;
     funcCall->IRValue = func->call(cg, funcCall->args);
 }
@@ -1187,7 +1176,7 @@ void LgsCodeGen::visitStrConst(LgsStrConst* strConst) {
 
 void LgsCodeGen::visitInstance(LgsInstance* instance) {
     const auto obj = instance->obj;
-    instance->IRValue = cg.allocate(cg.usize(obj->sizeBytes()), obj->getRTType(cg), !!instance->owner);
+    instance->IRValue = cg.heapAllocate(cg.usize(obj->sizeBytes()), obj->getRTType(cg), !!instance->owner);
 
     // Args
     std::unordered_set<std::string> visited;
@@ -1311,7 +1300,7 @@ void LgsCodeGen::createVecField(LgsField* field, Value* parent) const {
     const auto vecType = field->type->getIRType(cg);
     field->IRValue = cg.builder.CreateAlloca(vecType);
     const auto parentTy = field->parentType->getIRType(cg);
-    const auto l = cg.builder.CreateLoad(parentTy, parent);
+    const auto l = cg.load(parentTy, parent);
     const auto newVec = cg.builder.CreateShuffleVector(l, UndefValue::get(parentTy), mask);
     cg.store(newVec, field->IRValue);
 }
@@ -1407,7 +1396,7 @@ void LgsCodeGen::createMapFunc(LgsFunc* func) const {
 
     // Condition
     cg.startBlock(condBlock);
-    const auto iValue = cg.builder.CreateLoad(cg.sizeTy(), iPtr);
+    const auto iValue = cg.load(cg.sizeTy(), iPtr);
     auto length = iterable->lenIR(cg, iterableParam.IRValue);
     length = cg.extendToSize(length);
     const auto condition = cg.builder.CreateICmpSLT(iValue, length);
@@ -1417,7 +1406,7 @@ void LgsCodeGen::createMapFunc(LgsFunc* func) const {
     cg.startBlock(bodyBlock);
     auto element = iterable->getIRElement(cg, iterableParam.IRValue, iValue);
     if (element->getType()->isPointerTy()) {
-        element = cg.builder.CreateLoad(iterable->baseType->getIRType(cg), element);
+        element = cg.load(iterable->baseType->getIRType(cg), element);
     }
     const auto ft = llvm::dyn_cast<FunctionType>(callbackParam.type->getIRType(cg));
     const auto v = cg.builder.CreateCall(ft, callbackParam.IRValue, {element});
@@ -1469,7 +1458,7 @@ void LgsCodeGen::createFilterFunc(LgsFunc* func) const {
 
     // Condition
     cg.startBlock(condBlock);
-    const auto iValue = cg.builder.CreateLoad(cg.sizeTy(), iPtr);
+    const auto iValue = cg.load(cg.sizeTy(), iPtr);
     auto length = iterable->lenIR(cg, iterableParam.IRValue);
     length = cg.extendToSize(length);
     const auto condition = cg.builder.CreateICmpSLT(iValue, length);
@@ -1479,7 +1468,7 @@ void LgsCodeGen::createFilterFunc(LgsFunc* func) const {
     cg.startBlock(bodyBlock);
     auto element = iterable->getIRElement(cg, iterableParam.IRValue, iValue);
     if (element->getType()->isPointerTy()) {
-        element = cg.builder.CreateLoad(iterable->baseType->getIRType(cg), element);
+        element = cg.load(iterable->baseType->getIRType(cg), element);
     }
     const auto ft = llvm::dyn_cast<FunctionType>(callbackParam.type->getIRType(cg));
     const auto filterCond = cg.builder.CreateCall(ft, callbackParam.IRValue, {element});
@@ -1530,7 +1519,7 @@ void LgsCodeGen::createForeachFunc(LgsFunc* func) const {
 
     // Condition
     cg.startBlock(condBlock);
-    const auto iValue = cg.builder.CreateLoad(cg.sizeTy(), iPtr);
+    const auto iValue = cg.load(cg.sizeTy(), iPtr);
     auto length = iterable->lenIR(cg, iterableParam.IRValue);
     length = cg.extendToSize(length);
     const auto condition = cg.builder.CreateICmpSLT(iValue, length);
@@ -1540,7 +1529,7 @@ void LgsCodeGen::createForeachFunc(LgsFunc* func) const {
     cg.startBlock(bodyBlock);
     auto element = iterable->getIRElement(cg, iterableParam.IRValue, iValue);
     if (element->getType()->isPointerTy()) {
-        element = cg.builder.CreateLoad(iterable->baseType->getIRType(cg), element);
+        element = cg.load(iterable->baseType->getIRType(cg), element);
     }
     const auto ft = llvm::dyn_cast<FunctionType>(callbackParam.type->getIRType(cg));
     cg.builder.CreateCall(ft, callbackParam.IRValue, {element});

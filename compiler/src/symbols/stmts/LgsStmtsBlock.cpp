@@ -3,8 +3,10 @@
 #include "exprs/LgsFuncCall.h"
 #include "exprs/LgsSelection.h"
 #include "funcs/LgsFunc.h"
+#include "stmts/LgsAssignment.h"
 #include "stmts/LgsBreak.h"
 #include "stmts/LgsContinue.h"
+#include "stmts/LgsVarDec.h"
 #include "types/LgsObject.h"
 
 bool LgsStmtWrapper::isTerminator() const {
@@ -29,22 +31,35 @@ bool LgsStmtWrapper::isTerminator() const {
     return false;
 }
 
-LgsStmtWrapper LgsStmtWrapper::clone() const {
-    switch (wrapperType) {
-    case WrapperType::Stmt:
-        return LgsStmtWrapper(stmt->clone());
-    case WrapperType::Expr:
-        return LgsStmtWrapper(expr->clone());
-    case WrapperType::Object:
-        assert(0);
-    }
-    return LgsStmtWrapper();
-}
-
 void LgsStmtsBlock::hashNode(size_t& oldHash) {
     for (const auto stmt : stmts) {
         stmt.stmt->hashNode(oldHash);
     }
+}
+
+void LgsStmtsBlock::setDebugValue(LgsCgModule& cg) {
+    assert(0);
+}
+
+LgsStmtsBlock* LgsStmtsBlock::clone() {
+    const auto newStmtBlock = new LgsStmtsBlock();
+    for ( auto& stmtWrapper : stmts) {
+        switch (stmtWrapper.wrapperType) {
+        case LgsStmtWrapper::WrapperType::Stmt: {
+            LgsStmtWrapper stmt((stmtWrapper.stmt->clone()));
+            newStmtBlock->stmts.push_back(stmt);
+            break;
+        }
+        case LgsStmtWrapper::WrapperType::Expr: {
+            LgsStmtWrapper expr((stmtWrapper.expr->clone()));
+            newStmtBlock->stmts.push_back(expr);
+            break;
+        }
+        case LgsStmtWrapper::WrapperType::Object:
+            assert(0);
+        }
+    }
+    return newStmtBlock;
 }
 
 LgsStmtsBlock::~LgsStmtsBlock() {
@@ -62,16 +77,4 @@ LgsStmtsBlock::~LgsStmtsBlock() {
         }
     }
     stmts.clear();
-}
-
-void LgsStmtsBlock::setDebugValue(LgsCgModule& cg) {
-    assert(0);
-}
-
-LgsStmtsBlock* LgsStmtsBlock::clone() const {
-    const auto newBlock = new LgsStmtsBlock();
-    for (const auto& stmt : stmts) {
-        newBlock->stmts.push_back(stmt.clone());
-    }
-    return newBlock;
 }

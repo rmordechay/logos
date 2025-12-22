@@ -79,8 +79,8 @@ void LgsVariable::setDebugValue(LgsCgModule& cg) {
     );
 }
 
-LgsExpr* LgsVariable::clone() {
+LgsVariable* LgsVariable::clone() {
     const auto newVar = new LgsVariable(*this);
-    if (type) newVar->type = type;
+    newVar->setType(type);
     return newVar;
 }

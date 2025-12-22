@@ -129,12 +129,12 @@ Value* LgsSArray::inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) {
         cg.startBlock(falseBlock);
         freeExpr(tempExpr);
     });
-    return cg.builder.CreateLoad(cg.builder.getInt1Ty(), resultPtr);
+    return cg.load(cg.builder.getInt1Ty(), resultPtr);
 }
 
 Value* LgsSArray::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
     const auto gep = cg.builder.CreateGEP(getIRType(cg), iterable, {cg.i32Zero(), index});
-    return cg.builder.CreateLoad(baseType->getIRType(cg), gep);
+    return cg.load(baseType->getIRType(cg), gep);
 }
 
 void LgsSArray::addIRElement(LgsCgModule& cg, Value* iterable, Value* index, Value* value) {

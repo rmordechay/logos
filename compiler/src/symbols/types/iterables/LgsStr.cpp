@@ -33,7 +33,7 @@ LgsExpr* LgsStr::getZeroValue() {
 }
 
 Value* LgsStr::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
-    return cg.builder.CreateLoad(cg.ptrTy(), cg.emptyStr());
+    return cg.load(cg.ptrTy(), cg.emptyStr());
 }
 
 Constant* LgsStr::getRTType(LgsCgModule& cg) {
@@ -71,7 +71,7 @@ LgsType* LgsStr::applyBinOp(LgsType* rightType, LgsBinOp& op) {
 
 Value* LgsStr::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
     const auto gep =  cg.builder.CreateGEP(cg.i8Ty(), iterable, {cg.i32Zero(), index});
-    return cg.builder.CreateLoad(cg.i8Ty(), gep);
+    return cg.load(cg.i8Ty(), gep);
 }
 
 std::string LgsStr::fmtStr() const {
@@ -87,7 +87,7 @@ Value* LgsStr::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     const auto rightSize = lenIR(cg, right->IRValue);
     const auto sumSize = cg.builder.CreateAdd(leftSize, rightSize);
     const auto endIndex = cg.builder.CreateAdd(sumSize, cg.usize(1));
-    const auto buffer = cg.allocate(endIndex, getRTType(cg), false, left->isReturnExpr);
+    const auto buffer = cg.heapAllocate(endIndex, getRTType(cg), false, left->isReturnExpr);
     const auto rightPos = cg.builder.CreateInBoundsGEP(cg.i8Ty(), buffer, leftSize);
     cg.callMemCpy(buffer, left->IRValue, leftSize);
     cg.callMemCpy(rightPos, right->IRValue, rightSize);

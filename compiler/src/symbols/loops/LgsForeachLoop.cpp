@@ -12,7 +12,7 @@ Value* LgsForeachLoop::loopEnd(LgsCgModule& cg) {
 
 void LgsForeachLoop::incAndJumpToCond(LgsCgModule& cg) {
     if (cg.lastInstTerminator()) return;
-    iValue = cg.builder.CreateLoad(cg.i32Ty(), iPtr);
+    iValue = cg.load(cg.i32Ty(), iPtr);
     const auto inc = cg.builder.CreateAdd(iValue, cg.i32(1));
     cg.store(inc, iPtr);
     cg.builder.CreateBr(IRCondBlock);

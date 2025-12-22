@@ -115,6 +115,49 @@ GlobalVariable* LgsCgModule::createGlobal(const std::string& name, Type* type, C
     return new GlobalVariable(*IRModule, type, isConst, linkage, initializer, name);
 }
 
+void LgsCgModule::loop(Value* loopLength, const std::function<void(Value*, BasicBlock*)>& body) {
+    const auto condBlock = createBlock(BLOCK_LOOP_COND);
+    const auto bodyBlock = createBlock(BLOCK_LOOP_BODY);
+    const auto exitBlock = createBlock(BLOCK_LOOP_EXIT);
+    const auto iPtr = builder.CreateAlloca(sizeTy());
+    const auto loopStart = builder.CreateSExt(sizeZero(), sizeTy());
+    store(loopStart, iPtr);
+    builder.CreateBr(condBlock);
+
+    // Condition
+    startBlock(condBlock);
+    auto iValue = load(sizeTy(), iPtr);
+    const auto loopEnd = builder.CreateSExt(loopLength, sizeTy());
+    const auto condition = builder.CreateICmpSLT(iValue, loopEnd);
+    builder.CreateCondBr(condition, bodyBlock, exitBlock);
+
+    // Body
+    startBlock(bodyBlock);
+    body(iValue, exitBlock);
+    if (lastInstTerminator()) return;
+    iValue = load(sizeTy(), iPtr);
+    const auto inc = builder.CreateAdd(iValue, usize(1));
+    store(inc, iPtr);
+    builder.CreateBr(condBlock);
+    startBlock(exitBlock);
+}
+
+void LgsCgModule::store(Value* v, Value* ptr) {
+    if (v == ptr) return;
+    builder.CreateStore(v, ptr);
+}
+
+Value* LgsCgModule::load(Type* ty, Value* ptr) {
+    assert(ty && ptr);
+    return builder.CreateLoad(ty, ptr);
+}
+
+Value* LgsCgModule::allocaAndStore(Type* type, Value* v) {
+    const auto ptr = builder.CreateAlloca(type);
+    builder.CreateStore(v, ptr);
+    return ptr;
+}
+
 StructType* LgsCgModule::getStructType(const std::vector<Type*>& fields, const std::string& name) {
     const auto structType = StructType::getTypeByName(context, name);
     if (!structType) {
@@ -128,65 +171,50 @@ void LgsCgModule::storeStructField(Type* parentType, Value* parentPtr, const siz
     store(v, gep);
 }
 
-void LgsCgModule::store(Value* v, Value* ptr) {
-    if (v == ptr) return;
-    builder.CreateStore(v, ptr);
+void LgsCgModule::addNullTerminate(Value* strPtr, Value* pos) {
+    store(i8Zero(), builder.CreateGEP(i8Ty(), strPtr, pos));
 }
 
-Value* LgsCgModule::allocaAndStore(Type* type, Value* v) {
-    const auto ptr = builder.CreateAlloca(type);
-    builder.CreateStore(v, ptr);
-    return ptr;
+void LgsCgModule::callStackPush() {
+    callRuntimeFunc("push", voidTy());
 }
 
-void LgsCgModule::loop(Value* loopLength, const std::function<void(Value*, BasicBlock*)>& body) {
-    const auto condBlock = createBlock(BLOCK_LOOP_COND);
-    const auto bodyBlock = createBlock(BLOCK_LOOP_BODY);
-    const auto exitBlock = createBlock(BLOCK_LOOP_EXIT);
-    const auto iPtr = builder.CreateAlloca(sizeTy());
-    const auto loopStart = builder.CreateSExt(sizeZero(), sizeTy());
-    store(loopStart, iPtr);
-    builder.CreateBr(condBlock);
-
-    // Condition
-    startBlock(condBlock);
-    auto iValue = builder.CreateLoad(sizeTy(), iPtr);
-    const auto loopEnd = builder.CreateSExt(loopLength, sizeTy());
-    const auto condition = builder.CreateICmpSLT(iValue, loopEnd);
-    builder.CreateCondBr(condition, bodyBlock, exitBlock);
-
-    // Body
-    startBlock(bodyBlock);
-    body(iValue, exitBlock);
-    if (lastInstTerminator()) return;
-    iValue = builder.CreateLoad(sizeTy(), iPtr);
-    const auto inc = builder.CreateAdd(iValue, usize(1));
-    store(inc, iPtr);
-    builder.CreateBr(condBlock);
-    startBlock(exitBlock);
+void LgsCgModule::callPopStack() {
+    callRuntimeFunc("pop", voidTy());
 }
 
-Constant* LgsCgModule::getRTTypeInfo(const std::string& name, const size_t size, const Lgs_TypeKind kind, const bool isHeapAlloc, Constant* extra) {
-    const auto typeInfo = getRTTBaseStruct();
-    const auto prefixedName = LGS_TYPEINFO_PREFIX + name;
-    if (isRTTModule) {
-        return createGlobal(prefixedName, typeInfo, llvm::ConstantStruct::get(typeInfo, {usize(size), i32(kind), i1(isHeapAlloc), extra}));
+Value* LgsCgModule::callHash(Value* arg) {
+    return callLgsFunc("", "hash", i32Ty(), {ptrTy()}, {arg});
+}
+
+Constant* LgsCgModule::hashConst(const std::string& str) {
+    return i64(hashString(str));
+}
+
+void LgsCgModule::addToVTable(Value* instance, Value* key, Value* ptr) {
+    callRuntimeFunc("addToVTable", voidTy(), {ptrTy(), i32Ty(), ptrTy()}, {instance, key, ptr});
+}
+
+Value* LgsCgModule::getFromVTable(Value* instance, Value* key) {
+    return callRuntimeFunc("getFromVTable", ptrTy(), {ptrTy(), i32Ty()}, {instance, key});
+}
+
+void LgsCgModule::freeValue(Value* ptr, Constant* type) {
+    callRuntimeFunc("freeValue", voidTy(), {ptrTy(), ptrTy()}, {ptr, type});
+}
+
+Value* LgsCgModule::heapAllocate(Value* size, Constant* type, const bool isOwner, const bool isReturnExpr) {
+    if (isReturnExpr) {
+        return callRuntimeFunc("allocateReturn", ptrTy(), {sizeTy(), ptrTy()}, {extendToSize(size), type});
     }
-    return createGlobal(prefixedName, typeInfo, nullptr);
+    return callRuntimeFunc("allocate", ptrTy(), {sizeTy(), ptrTy()}, {extendToSize(size), type});
 }
 
-Constant* LgsCgModule::getRTTExtraStruct(const std::string& name, const std::vector<Type*>& fields, const std::vector<Constant*>& args) {
-    const auto structName = LGS_TYPEINFO_PREFIX + name;
-    auto st = StructType::getTypeByName(context, structName);
-    if (!st) {
-        st = StructType::create(context, fields, structName);
-    }
-    return llvm::ConstantStruct::get(st, args);
-}
-
-StructType* LgsCgModule::getRTTBaseStruct() {
-    const auto typeInfoMatrix = getStructType({sizeTy(), ptrTy(), ptrTy(), ptrTy()}, LGS_TYPEINFO_PREFIX"FuncType"); // Biggest
-    return getStructType({sizeTy(), i32Ty(), i1Ty(), typeInfoMatrix}, "RTI"); // size, kind, isHeap, type
+void LgsCgModule::callThrowError(const LgsBaseMsg& err, const std::vector<Value*>& args) {
+    std::vector<Value*> irArgs = {usize(args.size()), getString(err.msg)};
+    irArgs.insert(irArgs.end(), args.begin(), args.end());
+    callRuntimeFunc("throwError", voidTy(), {sizeTy(), ptrTy()}, irArgs, true);
+    builder.CreateUnreachable();
 }
 
 BasicBlock* LgsCgModule::createBlock(const std::string& name, Function* parent) {
@@ -234,6 +262,7 @@ void LgsCgModule::createArrBoundsGuard(Value* maxLen, Value* arrLen) {
 }
 
 FunctionType* LgsCgModule::getFT(Type* rt, const std::vector<Type*>& params, const bool isVariadic) {
+    assert(rt);
     return FunctionType::get(rt, params, isVariadic);
 }
 
@@ -294,50 +323,27 @@ void LgsCgModule::callMemCpy(Value* dest, Value* src, Value* size) {
     builder.CreateMemCpy(dest, llvm::MaybeAlign(), src, llvm::MaybeAlign(), size);
 }
 
-Value* LgsCgModule::callHash(Value* arg) {
-    return callLgsFunc("", "hash", i32Ty(), {ptrTy()}, {arg});
-}
-
-Constant* LgsCgModule::hashConst(const std::string& str) {
-    return i64(hashString(str));
-}
-
-void LgsCgModule::callThrowError(const LgsBaseMsg& err, const std::vector<Value*>& args) {
-    std::vector<Value*> irArgs = {usize(args.size()), getString(err.msg)};
-    irArgs.insert(irArgs.end(), args.begin(), args.end());
-    callRuntimeFunc("throwError", voidTy(), {sizeTy(), ptrTy()}, irArgs, true);
-    builder.CreateUnreachable();
-}
-
-void LgsCgModule::freeValue(Value* ptr, Constant* type) {
-    callRuntimeFunc("freeValue", voidTy(), {ptrTy(), ptrTy()}, {ptr, type});
-}
-
-Value* LgsCgModule::allocate(Value* size, Constant* type, const bool isOwner, const bool isReturnExpr) {
-    if (isReturnExpr) {
-        return callRuntimeFunc("allocateReturn", ptrTy(), {sizeTy(), ptrTy()}, {extendToSize(size), type});
+Constant* LgsCgModule::getRTTypeInfo(const std::string& name, const size_t size, const Lgs_TypeKind kind, const bool isHeapAlloc, Constant* extra) {
+    const auto typeInfo = getRTTBaseStruct();
+    const auto prefixedName = LGS_TYPEINFO_PREFIX + name;
+    if (isRTTModule) {
+        return createGlobal(prefixedName, typeInfo, llvm::ConstantStruct::get(typeInfo, {usize(size), i32(kind), i1(isHeapAlloc), extra}));
     }
-    return callRuntimeFunc("allocate", ptrTy(), {sizeTy(), ptrTy()}, {extendToSize(size), type});
+    return createGlobal(prefixedName, typeInfo, nullptr);
 }
 
-void LgsCgModule::callStackPush() {
-    callRuntimeFunc("push", voidTy());
+Constant* LgsCgModule::getRTTExtraStruct(const std::string& name, const std::vector<Type*>& fields, const std::vector<Constant*>& args) {
+    const auto structName = LGS_TYPEINFO_PREFIX + name;
+    auto st = StructType::getTypeByName(context, structName);
+    if (!st) {
+        st = StructType::create(context, fields, structName);
+    }
+    return llvm::ConstantStruct::get(st, args);
 }
 
-void LgsCgModule::callPopStack() {
-    callRuntimeFunc("pop", voidTy());
-}
-
-void LgsCgModule::addToVTable(Value* instance, Value* key, Value* ptr) {
-    callRuntimeFunc("addToVTable", voidTy(), {ptrTy(), i32Ty(), ptrTy()}, {instance, key, ptr});
-}
-
-Value* LgsCgModule::getFromVTable(Value* instance, Value* key) {
-    return callRuntimeFunc("getFromVTable", ptrTy(), {ptrTy(), i32Ty()}, {instance, key});
-}
-
-void LgsCgModule::addNullTerminate(Value* strPtr, Value* pos) {
-    store(i8Zero(), builder.CreateGEP(i8Ty(), strPtr, pos));
+StructType* LgsCgModule::getRTTBaseStruct() {
+    const auto typeInfoMatrix = getStructType({sizeTy(), ptrTy(), ptrTy(), ptrTy()}, LGS_TYPEINFO_PREFIX"FuncType"); // Biggest
+    return getStructType({sizeTy(), i32Ty(), i1Ty(), typeInfoMatrix}, "RTI"); // size, kind, isHeap, type
 }
 
 Type* LgsCgModule::i1Ty() {

@@ -8,7 +8,7 @@ void LgsField::setType(LgsType* newType) {
 }
 
 Value* LgsField::loadIR(LgsCgModule& cg) {
-    return cg.builder.CreateLoad(type->getIRType(cg), IRValue);
+    return cg.load(type->getIRType(cg), IRValue);
 }
 
 std::string LgsField::getName() {

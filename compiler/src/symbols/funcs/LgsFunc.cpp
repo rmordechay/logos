@@ -14,7 +14,7 @@
 struct LgsFuncArg;
 
 Function* LgsFunc::getIRFunc(LgsCgModule& cg) {
-    const auto funcName = funcType->getName();
+    const auto funcName = funcType->getGenericName();
     auto IRFunc = cg.IRModule->getFunction(funcName);
     if (IRFunc) return IRFunc;
     const auto type = funcType->getIRType(cg);
@@ -129,33 +129,31 @@ Value* LgsFunc::loadIR(LgsCgModule& cg) {
 void LgsFunc::castImplicitly(LgsType* toType) {
     const auto otherFuncType = toType->asFuncType();
     if (!otherFuncType) return;
-    if (funcType->isLambda) {
-        if (funcType->params.empty() && otherFuncType->params.size() == 1) {
-            auto otherParamType = otherFuncType->params.front().type;
-            funcType->params.emplace_back(otherParamType, LGS_LAMBDA_IT_PARAM);
+
+    // Add 'it' if needed, else as normal params
+    if (funcType->isLambda && funcType->params.empty() && otherFuncType->params.size() == 1) {
+        funcType->params.emplace_back(otherFuncType->params.front().type, LGS_LAMBDA_IT_PARAM);
+    } else {
+        for (size_t i = 0; i < funcType->params.size(); ++i) {
+            auto& selfParam = funcType->params[i];
+            if (selfParam.type) continue;
+            selfParam.setType(otherFuncType->params[i].type);
         }
     }
-    for (size_t i = 0; i < funcType->params.size(); ++i) {
-        if (funcType->params[i].type) continue;
-        funcType->params[i].setType(otherFuncType->params[i].type);
-    }
+
+    // Return type
     if (!funcType->rt) {
         funcType->rt = otherFuncType->rt;
     }
 }
 
-std::string LgsFunc::getGenericName() const {
-    std::stringstream str;
-    str << "u_" << funcType->name;
-    for (size_t i = funcType->isMethod; i < funcType->params.size(); ++i) {
-        const auto& param = funcType->params[i];
-        str << '_' << param.type->getName();
-    }
-    return str.str();
-}
-
 std::string LgsFunc::asText() {
     return funcType->pname();
+}
+
+void LgsFunc::setType(LgsType* newType) {
+    LgsExpr::setType(newType);
+    funcType = newType->asFuncType();
 }
 
 void LgsFunc::hashNode(size_t& oldHash) {
@@ -185,12 +183,39 @@ void LgsFunc::setDebugValue(LgsCgModule& cg) {
     irFunc->setSubprogram(cg.debugger.subprogram);
 }
 
+void replace(LgsType*& type, LgsType* replacement) {
+    if (const auto paramFT = type->asFuncType()) {
+        const auto argFT = replacement->asFuncType();
+        argFT->genericTypes.clear();
+        if (paramFT->rt->asGenericType()) {
+            replace(paramFT->rt, argFT->rt);
+        }
+        for (size_t j = 0; j < paramFT->params.size(); ++j) {
+            auto& paramType = paramFT->params[j].type;
+            const auto argType = argFT->params[j].type;
+            if (!paramType->asGenericType()) continue;
+            replace(paramType, argType);
+        }
+        return;
+    }
+    if (!type->asGenericType()) return;
+    type = replacement;
+}
+
+LgsFunc* LgsFunc::cloneGenericFunc(const LgsFuncCall* funcCall) const {
+    const auto newFuncType = new LgsFuncType(*funcType);
+    newFuncType->genericTypes.clear();
+    const auto newFunc = new LgsFunc(newFuncType);
+    newFunc->stmtsBlock = stmtsBlock->clone();
+    return newFunc;
+}
+
 LgsFunc::~LgsFunc() {
     if (stmtsBlock) {
         delete stmtsBlock;
         stmtsBlock = nullptr;
     }
     freeType(type);
-    setType(nullptr);
+    type = nullptr;
     funcType = nullptr;
 }

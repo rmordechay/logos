@@ -14,7 +14,7 @@ Value* LgsIntConst::loadIR(LgsCgModule& cg) {
 void LgsIntConst::castImplicitly(LgsType* toType) {
     if (!toType) return;
     if (!type->canCastTo(toType)) return;
-    type = toType;
+    setType(toType);
 }
 
 LgsExpr* LgsIntConst::castExplicitly(LgsType* toType) {
@@ -34,6 +34,10 @@ LgsExpr* LgsIntConst::castExplicitly(LgsType* toType) {
     if (toType->asDouble()) return new LgsFloatConst(&LGS_DOUBLE, value);
     if (toType->asStr()) return new LgsStrConst(std::to_string(value));
     return nullptr;
+}
+
+LgsIntConst* LgsIntConst::clone() {
+    return new LgsIntConst(type, value);
 }
 
 bool LgsIntConst::equals(LgsExpr* other) {

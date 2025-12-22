@@ -47,9 +47,10 @@ public:
     Value* callWithVariadic(LgsCgModule& cg, const std::vector<LgsFuncArg>& args);
     Value* loadIR(LgsCgModule& cg) override;
     void castImplicitly(LgsType* toType) override;
-    std::string getGenericName() const;
     std::string asText() override;
+    void setType(LgsType* newType) override;
     void hashNode(size_t& oldHash) override;
     void setDebugValue(LgsCgModule& cg) override;
+    LgsFunc* cloneGenericFunc(const LgsFuncCall* funcCall) const;
     ~LgsFunc() override;
 };

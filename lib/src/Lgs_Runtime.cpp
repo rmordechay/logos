@@ -42,14 +42,14 @@ extern "C" void Lgs_Runtime_addCoro(const ThunkFunc funcPtr, void* ctx) {
 
 extern "C" void* Lgs_Runtime_allocate(const size_t size, Lgs_TypeInfo* type) {
     const auto ptr = std::malloc(size);
-    //std::println("Allocated orphan in {}: {}B {}", runtime.stackLevel, size, ptr);
+    std::println("Allocated orphan in {}: {}B {}", runtime.stackLevel, size, ptr);
     runtime.stack[runtime.stackLevel].orphans[ptr] = type;
     return ptr;
 }
 
 extern "C" void* Lgs_Runtime_allocateReturn(const size_t size, Lgs_TypeInfo* type) {
     const auto ptr = std::malloc(size);
-    //std::println("Allocated return in {}: {}B {}", runtime.stackLevel, size, ptr);
+    std::println("Allocated return in {}: {}B {}", runtime.stackLevel, size, ptr);
     // This is safe because the func should never be called from the main frame
     runtime.stack[runtime.stack.size() - 2].orphans[ptr] = type;
     return ptr;
@@ -62,7 +62,7 @@ extern "C" void Lgs_Runtime_freeOwner(void* ptr, const Lgs_TypeInfo* type) {
 
 extern "C" void Lgs_Runtime_freeValue(void* ptr, const Lgs_TypeInfo* type) {
     if (!ptr || !type->isHeap) return;
-    //std::println("Freeing in {}: {}", runtime.stackLevel, ptr);
+    std::println("Freeing in {}: {}", runtime.stackLevel, ptr);
     switch (type->kind) {
     case RTT_DARRAY: {
         const auto darray = static_cast<Lgs_DArrayExpr*>(ptr);

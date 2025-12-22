@@ -2,7 +2,7 @@
 #include "LgsUtils.h"
 
 Value* LgsVectorExpr::loadIR(LgsCgModule& cg) {
-    return cg.builder.CreateLoad(vecType->getIRType(cg), IRValue);
+    return cg.load(vecType->getIRType(cg), IRValue);
 }
 
 void LgsVectorExpr::setDebugValue(LgsCgModule& cg) {

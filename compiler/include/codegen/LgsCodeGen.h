@@ -69,6 +69,8 @@ public:
     LgsPaths& paths;
     LgsGlobals& globals;
     LgsAppConfigs& appConfigs;
+    static std::atomic<size_t> lambdasIDGenerator;
+
 
     explicit LgsCodeGen(LgsFile& file, LgsAppConfigs& appConfigs, LgsGlobals& globals, LgsPaths& paths)
         : file(file), cg(file.cg), paths(paths), globals(globals), appConfigs(appConfigs) {
@@ -81,7 +83,6 @@ public:
     void visitObject(LgsObject* obj);
     void visitMainFunc(LgsMainFunc* func);
     void visitFunc(LgsFunc* func);
-    void visitGenericFunc(LgsFunc* func);
     void visitExternalSymbols();
     void visitStmt(LgsStmt* stmt);
     void visitStmtsBlock(const LgsStmtsBlock* stmtsBlock);
