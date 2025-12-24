@@ -219,10 +219,10 @@ void LgsJsonParser::parseAssignment(const LgsAssignment* assignment) {
     openObject();
     addKeyValueStr("kind", "assignment", true);
     openKey("leftExpr");
-    parseExpr(assignment->lValue);
+    parseExpr(assignment->lExpr);
     addComma();
     openKey("rightExpr");
-    parseExpr(assignment->rValue);
+    parseExpr(assignment->rExpr);
     addComma();
     addKeyValueStr("op", assignment->assignmentType.text);
     closeObject();

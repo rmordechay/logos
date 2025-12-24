@@ -13,7 +13,7 @@ LgsExpr* LgsInstance::castExplicitly(LgsType* toType) {
 }
 
 Value* LgsInstance::loadIR(LgsCgModule& cg) {
-    return IRValue;
+    return cg.load(cg.ptrTy(), IRValue);
 }
 
 void LgsInstance::hashNode(size_t& oldHash) {
@@ -45,5 +45,5 @@ LgsInstance::~LgsInstance() {
     }
     args.clear();
     obj = nullptr;
-    setType(nullptr);
+    type = nullptr;
 }

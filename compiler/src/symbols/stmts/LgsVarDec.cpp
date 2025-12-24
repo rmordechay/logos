@@ -11,8 +11,7 @@ void LgsVarDec::setType(LgsType* newType) {
 }
 
 Value* LgsVarDec::loadIR(LgsCgModule& cg) {
-    if (!IRValue->getType()->isPointerTy()) return IRValue;
-    return cg.load(type->getIRType(cg), IRValue);
+    return expr->loadIR(cg);
 }
 
 bool LgsVarDec::shouldAllocate() const {

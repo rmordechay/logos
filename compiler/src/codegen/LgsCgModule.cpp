@@ -207,7 +207,7 @@ Value* LgsCgModule::heapAllocate(Value* size, Constant* type, const bool isOwner
     if (isReturnExpr) {
         return callRuntimeFunc("allocateReturn", ptrTy(), {sizeTy(), ptrTy()}, {extendToSize(size), type});
     }
-    return callRuntimeFunc("allocate", ptrTy(), {sizeTy(), ptrTy()}, {extendToSize(size), type});
+    return callRuntimeFunc("allocate", ptrTy(), {sizeTy(), ptrTy(), i1Ty()}, {extendToSize(size), type, i1(isOwner)});
 }
 
 void LgsCgModule::callThrowError(const LgsBaseMsg& err, const std::vector<Value*>& args) {

@@ -351,8 +351,8 @@ void LgsSema::visitVarDec(LgsVarDec* varDec) {
 }
 
 void LgsSema::visitAssignment(LgsAssignment* assignment) {
-    const auto l = assignment->lValue;
-    auto& r = assignment->rValue;
+    const auto l = assignment->lExpr;
+    auto& r = assignment->rExpr;
     visitExpr(r);
     if (const auto iterIndex = l->asIterIndex()) {
         visitIterIndex(iterIndex);
@@ -369,6 +369,9 @@ void LgsSema::visitAssignment(LgsAssignment* assignment) {
     r->castImplicitly(l->type);
     if (!l->type || !r->type) return;
     if (!validateExprType(r, l->type)) return;
+    if (assignment->lExpr->owner) {
+        assignment->rExpr->owner = assignment->lExpr->owner;
+    }
 
     auto canAssign = false;
     if (l->asIterIndex() || l->asVariable() || l->asNullableExpr()) {
@@ -1020,6 +1023,7 @@ void LgsSema::visitFieldSelection(LgsVariable* child, LgsType* parentType) {
     if (const auto field = parentType->getField(childName)) {
         child->setType(field->type);
         child->ref = LgsSymbol(field);
+        if (field->isOwner) child->owner = field;
         validateFieldVisibility(field, parentType, child->location);
     } else if (const auto method = parentType->getMethod(childName)) {
         child->setType(method->type);

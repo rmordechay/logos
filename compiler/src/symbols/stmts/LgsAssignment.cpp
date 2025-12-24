@@ -8,8 +8,8 @@ void LgsAssignment::setDebugValue(LgsCgModule& cg) {
 }
 
 LgsAssignment::~LgsAssignment() {
-    freeExpr(lValue);
-    freeExpr(rValue);
-    lValue = nullptr;
-    rValue = nullptr;
+    freeExpr(lExpr);
+    freeExpr(rExpr);
+    lExpr = nullptr;
+    rExpr = nullptr;
 }

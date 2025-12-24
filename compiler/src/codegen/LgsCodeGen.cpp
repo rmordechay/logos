@@ -322,8 +322,8 @@ void LgsCodeGen::visitVarDec(LgsVarDec* varDec) {
 }
 
 void LgsCodeGen::visitAssignment(const LgsAssignment* assignment) {
-    const auto lValue = assignment->lValue;
-    const auto rValue = assignment->rValue;
+    const auto lValue = assignment->lExpr;
+    const auto rValue = assignment->rExpr;
     if (const auto iterIndex = lValue->asIterIndex()) {
         visitIterIndex(iterIndex, true);
     } else if (const auto var = lValue->asVariable()) {
@@ -336,7 +336,7 @@ void LgsCodeGen::visitAssignment(const LgsAssignment* assignment) {
     } else {
         assert(0);
     }
-    visitExpr(assignment->rValue, true);
+    visitExpr(assignment->rExpr, true);
 
     Value* results = nullptr;
     switch (assignment->assignmentType.opType) {

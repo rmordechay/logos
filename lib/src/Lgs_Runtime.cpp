@@ -40,17 +40,19 @@ extern "C" void Lgs_Runtime_addCoro(const ThunkFunc funcPtr, void* ctx) {
     runtime.coros.emplace_back(Lgs_ThunkFunc{funcPtr, ctx});
 }
 
-extern "C" void* Lgs_Runtime_allocate(const size_t size, Lgs_TypeInfo* type) {
+extern "C" void* Lgs_Runtime_allocate(const size_t size, Lgs_TypeInfo* type, const bool isOwner) {
     const auto ptr = std::malloc(size);
-    std::println("Allocated orphan in {}: {}B {}", runtime.stackLevel, size, ptr);
-    runtime.stack[runtime.stackLevel].orphans[ptr] = type;
+    std::println("Allocated in {}: {}B {}", runtime.stackLevel, size, ptr);
+    if (!isOwner) {
+        runtime.stack[runtime.stackLevel].orphans[ptr] = type;
+    }
     return ptr;
 }
 
 extern "C" void* Lgs_Runtime_allocateReturn(const size_t size, Lgs_TypeInfo* type) {
     const auto ptr = std::malloc(size);
     std::println("Allocated return in {}: {}B {}", runtime.stackLevel, size, ptr);
-    // This is safe because the func should never be called from the main frame
+    // Safe because this func should never be called from the main frame
     runtime.stack[runtime.stack.size() - 2].orphans[ptr] = type;
     return ptr;
 }
@@ -88,7 +90,7 @@ extern "C" void Lgs_Runtime_freeValue(void* ptr, const Lgs_TypeInfo* type) {
         for (size_t i = 0; i < fieldsCount; ++i) {
             const auto fieldType = fieldTypes[i];
             void* fieldPtr = static_cast<char*>(ptr) + offset;
-            // freeValue(fieldPtr, fieldType);
+            Lgs_Runtime_freeValue(fieldPtr, fieldType);
             offset += fieldType->size;
         }
         // std::free(ptr);

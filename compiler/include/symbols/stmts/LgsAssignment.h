@@ -11,11 +11,11 @@ class LgsType;
 
 class LgsAssignment final : public LgsStmt {
 public:
-    LgsExpr* lValue = nullptr;
-    LgsExpr* rValue = nullptr;
+    LgsExpr* lExpr = nullptr;
+    LgsExpr* rExpr = nullptr;
     LgsAssignOp assignmentType;
 
-    LgsAssignment(const LgsAssignOp& assignmentType, LgsExpr* lValue, LgsExpr* rValue) : lValue(lValue), rValue(rValue), assignmentType(assignmentType) {}
+    LgsAssignment(const LgsAssignOp& assignmentType, LgsExpr* lValue, LgsExpr* rValue) : lExpr(lValue), rExpr(rValue), assignmentType(assignmentType) {}
     void setDebugValue(LgsCgModule& cg) override;
     ~LgsAssignment() override;
 };

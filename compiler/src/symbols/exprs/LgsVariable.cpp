@@ -12,7 +12,7 @@ Value* LgsVariable::loadIR(LgsCgModule& cg) {
     case PARAM:
         return ref.param->loadIR(cg);
     case VAR_DEC:
-        return ref.varDec->loadIR(cg);
+        return ref.varDec->expr->loadIR(cg);
     case FIELD:
         return ref.field->loadIR(cg);
     default:
