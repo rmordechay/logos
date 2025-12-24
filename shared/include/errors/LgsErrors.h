@@ -107,7 +107,7 @@ inline LgsBaseMsg E10092{"If condition must be of type Bool. Given: %s.", errCod
 inline LgsBaseMsg E10093{"Cannot assign variable to Void type.", errCodeStart++};
 inline LgsBaseMsg E10094{"%s is not a parameter of '%s'.", errCodeStart++};
 inline LgsBaseMsg E10095{"Could not infer the type of the iterable.", errCodeStart++};
-inline LgsBaseMsg E10096{"Mixed named und position arguments are not allowed.", errCodeStart++};
+inline LgsBaseMsg E10096{"Mixing named und position arguments is not allowed.", errCodeStart++};
 inline LgsBaseMsg E10097{"switch statement must have at least one pattern.", errCodeStart++};
 inline LgsBaseMsg E10098{"Argument %s is set more than one time.", errCodeStart++};
 inline LgsBaseMsg E10099{"Local names must start with a lowercase letter.", errCodeStart++};

@@ -43,7 +43,7 @@ void LgsStmtsBlock::setDebugValue(LgsCgModule& cg) {
 
 LgsStmtsBlock* LgsStmtsBlock::clone() {
     const auto newStmtBlock = new LgsStmtsBlock();
-    for ( auto& stmtWrapper : stmts) {
+    for (const auto& stmtWrapper : stmts) {
         switch (stmtWrapper.wrapperType) {
         case LgsStmtWrapper::WrapperType::Stmt: {
             LgsStmtWrapper stmt((stmtWrapper.stmt->clone()));

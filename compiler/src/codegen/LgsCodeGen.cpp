@@ -58,8 +58,6 @@
 #include "exprs/LgsMetaSelection.h"
 #include "types/LgsNullable.h"
 
-std::atomic<size_t> LgsCodeGen::lambdasIDGenerator{0};
-
 bool LgsCodeGen::generate() {
     cg.setupModule(file.path, appConfigs.debugMode);
     visitExternalSymbols();
@@ -91,9 +89,6 @@ void LgsCodeGen::visitMainFile(LgsMainFile* mainFile) {
     }
     for (const auto object : mainFile->objects) {
         visitObject(object);
-    }
-    for (auto [_, genericsCall] : file.symbolTable.genericFuncCalls) {
-        visitFunc(genericsCall);
     }
 
     for (const auto& [name, func] : mainFile->funcs) {
@@ -671,8 +666,6 @@ void LgsCodeGen::visitCast(LgsCast* cast) {
 void LgsCodeGen::visitLambda(LgsFunc* func) {
     cg.savedIP = cg.builder.saveIP();
     const auto originalFunc = cg.currentFunc;
-    const auto lambdaID = lambdasIDGenerator.fetch_add(1);
-    func->funcType->name += LGS_LAMBDA + std::to_string(lambdaID);
     func->IRValue = func->getIRFunc(cg);
     visitFunc(func);
     cg.currentFunc = originalFunc;
@@ -806,11 +799,7 @@ void LgsCodeGen::visitStaticArray(LgsArrayExpr* arrayExpr) const {
 
 void LgsCodeGen::visitDynamicArray(LgsArrayExpr* arrayExpr) const {
     const auto dArr = arrayExpr->type->asDArray();
-    auto rtType = dArr->getRTType(cg);
-    if (!arrayExpr->IRValue) {
-        arrayExpr->IRValue = cg.heapAllocate(cg.usize(dArr->sizeBytes()), rtType, false);
-    }
-    cg.callLgsFunc(LgsDArray::name, "init", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {arrayExpr->IRValue, rtType});
+    arrayExpr->IRValue = dArr->getIRZeroValue(cg, arrayExpr->pointee);
     for (const auto element : arrayExpr->elements) {
         dArr->addIRElement(cg, arrayExpr->IRValue, nullptr, element->IRValue);
     }
@@ -1018,6 +1007,9 @@ void LgsCodeGen::visitFieldSelection(LgsVariable* var, LgsExpr* parent, const bo
         createVecField(field, parent->IRValue);
     }
     var->IRValue = field->getGEP(cg, parent->IRValue);
+    if (field->type->asObject()) {
+        var->IRValue = cg.load(cg.ptrTy(), var->IRValue);
+    }
 }
 
 void LgsCodeGen::visitNullableSelection(LgsExpr* child, LgsExpr* parent) const {
@@ -1093,22 +1085,16 @@ void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
         func->IRValue = cg.getFromVTable(funcCall->args.front().expr->IRValue, id);
     }
 
-    visitIterFunc(funcCall);
+    if (func->funcType->name == MAP_FUNC) {
+        createMapFunc(func);
+    } else if (func->funcType->name == FILTER_FUNC) {
+        createFilterFunc(func);
+    } else if (func->funcType->name == FOREACH_FUNC) {
+        createForeachFunc(func);
+    }
     assert(func->funcType->genericTypes.empty());
     if (funcCall->coroutine || funcCall->isDeferred) return;
     funcCall->IRValue = func->call(cg, funcCall->args);
-}
-
-void LgsCodeGen::visitIterFunc(const LgsFuncCall* funcCall) {
-    if (funcCall->name == MAP_FUNC) {
-        return createMapFunc(funcCall->func);
-    }
-    if (funcCall->name == FILTER_FUNC) {
-        return createFilterFunc(funcCall->func);
-    }
-    if (funcCall->name == FOREACH_FUNC) {
-        return createForeachFunc(funcCall->func);
-    }
 }
 
 void LgsCodeGen::visitPrefixExpr(LgsPrefixExpr* prefixExpr) {
@@ -1185,7 +1171,7 @@ void LgsCodeGen::visitInstance(LgsInstance* instance) {
         const auto field = instance->obj->getField(argName);
         arg.expr->pointee = field->getGEP(cg, instance->IRValue);
         visitExpr(arg.expr);
-        cg.store(arg.expr->loadIR(cg), arg.expr->pointee);
+        cg.store(arg.expr->IRValue, arg.expr->pointee);
     }
 
     // Zero values
@@ -1374,8 +1360,8 @@ void LgsCodeGen::createMapFunc(LgsFunc* func) const {
     cg.savedIP = cg.builder.saveIP();
     const auto originalFunc = cg.currentFunc;
 
-    const auto IRFunc = func->getIRFunc(cg);
     // Init
+    const auto IRFunc = func->getIRFunc(cg);
     cg.currentFunc = IRFunc;
     const auto& iterableParam = func->funcType->params[0];
     const auto& callbackParam = func->funcType->params[1];
@@ -1387,7 +1373,8 @@ void LgsCodeGen::createMapFunc(LgsFunc* func) const {
     cg.callStackPush();
 
     const auto iterable = iterableParam.type->asIterable();
-    const auto newArr = iterableParam.type->getIRZeroValue(cg);
+    LgsDArray dArray(iterable->baseType);
+    const auto newArr = dArray.getIRZeroValue(cg, nullptr);
 
     const auto iPtr = cg.builder.CreateAlloca(cg.sizeTy());
     const auto loopStart = cg.builder.CreateSExt(cg.sizeZero(), cg.sizeTy());

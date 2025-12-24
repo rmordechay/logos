@@ -6,6 +6,7 @@
 #include <sstream>
 
 Type* LgsFuncType::getIRType(LgsCgModule& cg) {
+    assert(rt);
     std::vector<Type*> types;
     for (size_t i = 0; i < params.size(); ++i) {
         const auto param = params[i];

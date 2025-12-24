@@ -74,6 +74,14 @@ public:
 
     bool addField(LgsField* field);
     bool addMethod(LgsFunc* method);
+    bool isVoid();
+    bool isNumber();
+    bool isScalar() const;
+    bool isBig();
+    bool isUnknown();
+    bool isSliceable();
+    bool hasGenericTypes();
+
     virtual LgsField* getField(const std::string& fieldName);
     virtual LgsFunc* getMethod(const std::string& methodName);
     virtual size_t sizeBytes() = 0;
@@ -89,16 +97,6 @@ public:
     virtual std::string getName() = 0;
     virtual std::string pname(); // pretty name
     virtual bool equals(LgsType* other);
-
-    bool isVoid();
-    bool isNumber();
-    bool isScalar() const;
-    bool isBig();
-    bool isUnknown();
-    bool isSliceable();
-    LgsType* extendInt();
-    void cloneFields(LgsType* newType) const;
-    void cloneMethods(LgsType* newType) const;
 
     virtual Value* addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
     virtual Value* subIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);

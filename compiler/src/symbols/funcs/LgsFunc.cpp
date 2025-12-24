@@ -183,33 +183,6 @@ void LgsFunc::setDebugValue(LgsCgModule& cg) {
     irFunc->setSubprogram(cg.debugger.subprogram);
 }
 
-void replace(LgsType*& type, LgsType* replacement) {
-    if (const auto paramFT = type->asFuncType()) {
-        const auto argFT = replacement->asFuncType();
-        argFT->genericTypes.clear();
-        if (paramFT->rt->asGenericType()) {
-            replace(paramFT->rt, argFT->rt);
-        }
-        for (size_t j = 0; j < paramFT->params.size(); ++j) {
-            auto& paramType = paramFT->params[j].type;
-            const auto argType = argFT->params[j].type;
-            if (!paramType->asGenericType()) continue;
-            replace(paramType, argType);
-        }
-        return;
-    }
-    if (!type->asGenericType()) return;
-    type = replacement;
-}
-
-LgsFunc* LgsFunc::cloneGenericFunc(const LgsFuncCall* funcCall) const {
-    const auto newFuncType = new LgsFuncType(*funcType);
-    newFuncType->genericTypes.clear();
-    const auto newFunc = new LgsFunc(newFuncType);
-    newFunc->stmtsBlock = stmtsBlock->clone();
-    return newFunc;
-}
-
 LgsFunc::~LgsFunc() {
     if (stmtsBlock) {
         delete stmtsBlock;

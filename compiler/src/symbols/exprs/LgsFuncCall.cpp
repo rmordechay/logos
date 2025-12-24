@@ -138,7 +138,7 @@ bool argAndParamEqual(const LgsExpr* arg, const LgsParam* param) {
     if (!param->type) return false;
     const auto argType = arg->type;
     if (!argType) return false;
-    if (param->type->asGenericType()) return true;
+    if (param->type->hasGenericTypes()) return true;
     return argType->canCastTo(param->type);
 }
 

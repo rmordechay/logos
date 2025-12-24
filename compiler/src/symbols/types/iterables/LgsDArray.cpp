@@ -67,6 +67,16 @@ LgsExpr* LgsDArray::getZeroValue() {
     return new LgsArrayExpr(this);
 }
 
+Value* LgsDArray::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
+    auto rtType = getRTType(cg);
+    Value* v = pointee;
+    if (!pointee) {
+        v = cg.heapAllocate(cg.usize(sizeBytes()), rtType, false);
+    }
+    cg.callLgsFunc(name, "init", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {v, rtType});
+    return v;
+}
+
 std::string LgsDArray::fmtStr() const {
     if (baseType->asChar()) return "%s";
     return "%p";

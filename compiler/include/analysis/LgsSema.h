@@ -65,6 +65,7 @@ public:
     LgsErrHandler errHandler;
     LgsTypeResolver typeResolver;
     std::unordered_map<std::string, size_t> refCount;
+    static std::atomic<size_t> lambdasIDGenerator;
 
     explicit LgsSema(LgsAppConfigs& appConfigs, LgsFile* file, LgsGlobals& globals)
         : file(file), appConfigs(appConfigs), globals(globals), typeResolver(file, errHandler, globals) {}
@@ -120,9 +121,9 @@ public:
     void visitFieldSelection(LgsVariable* child, LgsType* parentType);
     void visitIterIndexSelection(LgsIterIndex* iterIndex, LgsType* parentType);
     void visitMetaSelection(LgsMetaSelection* metaSelection);
+    void visitFuncCall(LgsFuncCall* funcCall);
     void visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent);
     bool visitFuncArgs(LgsFuncCall* funcCall, LgsFuncType* ft);
-    void visitFuncCall(LgsFuncCall* funcCall);
     void visitPrefixExpr(LgsPrefixExpr* prefixExpr);
     void visitPostfixExpr(LgsPostfixExpr* postfixExpr);
     void visitStrConst(const LgsStrConst* strConst);
@@ -153,6 +154,7 @@ public:
     void addLocalSymbol(const LgsSymbol& newSymbol);
     LgsSymbol* getSymbol(const std::string& name);
     void createCoroutineFunc(LgsFuncCall* funcCall);
+    void makeGenericFuncCall(LgsFuncCall* funcCall, const LgsFunc* func);
     void addError(const LgsBaseMsg& lgsErr, const LgsLocation& location, const std::vector<std::string>& args = {});
     void addErrorIfSuccessful(const LgsBaseMsg& lgsErr, const LgsLocation& location, const std::vector<std::string>& args);
     void addRTType(LgsType* type) const;

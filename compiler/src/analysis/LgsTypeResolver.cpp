@@ -133,6 +133,8 @@ void LgsTypeResolver::resolveInterface(LgsInterface* interface) {
 }
 
 void LgsTypeResolver::resolveFuncType(LgsFuncType* funcType) {
+    assert(funcType);
+    const auto oldFunc = currentFuncType;
     currentFuncType = funcType;
     for (auto& param : funcType->params) {
         if (const auto& cb = param.type->asFuncType()) {
@@ -141,7 +143,7 @@ void LgsTypeResolver::resolveFuncType(LgsFuncType* funcType) {
         resolveType(param.type);
     }
     resolveType(funcType->rt);
-    currentFuncType = nullptr;
+    currentFuncType = oldFunc;
 }
 
 void LgsTypeResolver::resolveIOPair(LgsIOPair* ioPair, LgsObject* obj) const {

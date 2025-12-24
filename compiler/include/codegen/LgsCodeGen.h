@@ -69,8 +69,6 @@ public:
     LgsPaths& paths;
     LgsGlobals& globals;
     LgsAppConfigs& appConfigs;
-    static std::atomic<size_t> lambdasIDGenerator;
-
 
     explicit LgsCodeGen(LgsFile& file, LgsAppConfigs& appConfigs, LgsGlobals& globals, LgsPaths& paths)
         : file(file), cg(file.cg), paths(paths), globals(globals), appConfigs(appConfigs) {
@@ -129,7 +127,6 @@ public:
     void visitNullableSelection(LgsExpr* child, LgsExpr* parent) const;
     void visitMetaSelection(LgsMetaSelection* metaSelection);
     void visitFuncCall(LgsFuncCall* funcCall);
-    void visitIterFunc(const LgsFuncCall* funcCall);
     void visitPrefixExpr(LgsPrefixExpr* prefixExpr);
     void visitPostfixExpr(LgsPostfixExpr* postfixExpr);
     void visitStrConst(LgsStrConst* strConst);

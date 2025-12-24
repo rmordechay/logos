@@ -64,9 +64,9 @@ extern "C" void Lgs_Runtime_freeOwner(void* ptr, const Lgs_TypeInfo* type) {
 
 extern "C" void Lgs_Runtime_freeValue(void* ptr, const Lgs_TypeInfo* type) {
     if (!ptr || !type->isHeap) return;
-    std::println("Freeing in {}: {}", runtime.stackLevel, ptr);
     switch (type->kind) {
     case RTT_DARRAY: {
+        std::println("Freeing darr {}", ptr);
         const auto darray = static_cast<Lgs_DArrayExpr*>(ptr);
         auto offset = 0;
         for (int i = 0; i < darray->length; ++i) {
@@ -74,7 +74,7 @@ extern "C" void Lgs_Runtime_freeValue(void* ptr, const Lgs_TypeInfo* type) {
             Lgs_Runtime_freeValue(element, type->dArray.baseType);
             offset += type->dArray.baseType->size;
         }
-        //std::free(ptr);
+        std::free(ptr);
         break;
     }
     case RTT_SET: {
@@ -93,6 +93,7 @@ extern "C" void Lgs_Runtime_freeValue(void* ptr, const Lgs_TypeInfo* type) {
             Lgs_Runtime_freeValue(fieldPtr, fieldType);
             offset += fieldType->size;
         }
+        // std::println("Freeing {} in {}: {}", type->obj.name, runtime.stackLevel, ptr);
         // std::free(ptr);
         break;
     }

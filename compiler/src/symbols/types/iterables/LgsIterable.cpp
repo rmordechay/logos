@@ -47,8 +47,11 @@ LgsFunc* LgsIterable::getMethod(const std::string& methodName) {
     }
     if (methodName == MAP_FUNC) {
         if (methods.contains(MAP_FUNC)) return methods[MAP_FUNC];
-        const auto callback = new LgsFuncType(nullptr, {LgsParam(baseType)});
-        const auto func = new LgsFunc(MAP_FUNC, getBaseName(), this, {this, callback}, flags);
+        const auto generic = new LgsGenericType("T");
+        const auto callback = new LgsFuncType(generic, {LgsParam(baseType)});
+        const auto func = new LgsFunc(MAP_FUNC, getBaseName(), new LgsDArray(generic), {this, callback}, flags);
+        func->funcType->genericTypes.push_back(generic);
+        callback->genericTypes.push_back(generic);
         addMethod(func);
         return func;
     }
@@ -100,7 +103,6 @@ void LgsIterable::addIRElement(LgsCgModule& cg, Value* iterable, Value* index, V
 
 LgsIterable::~LgsIterable() {
     freeExpr(size);
-    freeType(baseType);
     for (auto [name, method] : methods) {
         if (name == MAP_FUNC || name == FILTER_FUNC || name == FOREACH_FUNC) {
             method->funcType->rt = nullptr;

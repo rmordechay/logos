@@ -57,6 +57,47 @@ bool LgsType::addMethod(LgsFunc* method) {
     return true;
 }
 
+bool LgsType::isVoid() {
+    return dynamic_cast<LgsVoid*>(this);
+}
+
+bool LgsType::isNumber() {
+    return isInt || isFloat || asComplex();
+}
+
+bool LgsType::isScalar() const {
+    return isInt || isFloat;
+}
+
+bool LgsType::isBig() {
+    return (asObject() || asDArray()) && sizeBytes() >= BIG_SIZE_THRESHOLD;
+}
+
+bool LgsType::isUnknown() {
+    if (dynamic_cast<LgsUnknown*>(this)) return true;
+    if (const auto iter = asIterable()) return dynamic_cast<LgsUnknown*>(iter->baseType);
+    return false;
+}
+
+bool LgsType::isSliceable() {
+    return asStr() || asDArray() || asSArray();
+}
+
+bool LgsType::hasGenericTypes() {
+    if (asGenericType()) return true;
+    if (const auto ft = asFuncType()) {
+        if (ft->rt->hasGenericTypes()) return true;
+        for (const auto& param : ft->params) {
+            if (param.type->hasGenericTypes()) return true;
+        }
+        return false;
+    }
+    if (const auto iter = asIterable()) {
+        if (iter->baseType->hasGenericTypes()) return true;
+    }
+    return false;
+}
+
 LgsField* LgsType::getField(const std::string& fieldName) {
     for (auto* f : fields) {
         if (f->name == fieldName) return f;
@@ -96,93 +137,6 @@ std::string LgsType::pname() {
 
 bool LgsType::equals(LgsType* other) {
     return getName() == other->getName();
-}
-
-bool LgsType::isVoid() {
-    return dynamic_cast<LgsVoid*>(this);
-}
-
-bool LgsType::isNumber() {
-    return isInt || isFloat || asComplex();
-}
-
-bool LgsType::isScalar() const {
-    return isInt || isFloat;
-}
-
-bool LgsType::isBig() {
-    return (asObject() || asDArray()) && sizeBytes() >= BIG_SIZE_THRESHOLD;
-}
-
-bool LgsType::isUnknown() {
-    if (dynamic_cast<LgsUnknown*>(this)) return true;
-    if (const auto iter = asIterable()) return dynamic_cast<LgsUnknown*>(iter->baseType);
-    return false;
-}
-
-bool LgsType::isSliceable() {
-    return asStr() || asDArray() || asSArray();
-}
-
-LgsType* LgsType::extendInt() {
-    if (asBool()) {
-        return &LGS_BYTE;
-    }
-    if (asByte()) {
-        return &LGS_SHORT;
-    }
-    if (asShort()) {
-        return &LGS_INT;
-    }
-    if (asInt()) {
-        return &LGS_LONG;
-    }
-    return this;
-}
-
-void LgsType::cloneFields(LgsType* newType) const {
-    newType->fields.clear();
-    for (const auto& field : fields) {
-        const auto newField = new LgsField(*field);
-        newField->type = field->type;
-        if (field->expr) {
-            newField->expr = field->expr;
-        }
-        newType->addField(newField);
-    }
-}
-
-void LgsType::cloneMethods(LgsType* newType) const {
-    newType->methods.clear();
-    for (const auto& [_, method] : methods) {
-        const auto newMethod = new LgsFunc(*method);
-        if (method->stmtsBlock) newMethod->stmtsBlock = method->stmtsBlock;
-        newMethod->funcType = method->funcType;
-        newType->addMethod(newMethod);
-    }
-}
-
-LgsType* getHighestNumPrecedence(const std::vector<LgsExpr*>& args) {
-    if (args.empty()) return nullptr;
-    LgsType* inferredType = nullptr;
-    uint8_t highestPrecedence = 0;
-    for (size_t i = 0; i < args.size(); ++i) {
-        const auto& arg = args[i];
-        if (!arg->type) return nullptr;
-        LgsType* currentType = nullptr;
-        if (arg->type->isScalar()) {
-            currentType = arg->type;
-        } else if (const auto iter = arg->type->asIterable()) {
-            currentType = iter->baseType;
-        }
-        if (!currentType || !currentType->isScalar()) return nullptr;
-        const auto precedence = LgsType::numberPrecedences[currentType->getName()];
-        if (highestPrecedence >= precedence) continue;
-        inferredType = currentType;
-        highestPrecedence = precedence;
-    }
-    assert(inferredType);
-    return inferredType;
 }
 
 Value* LgsType::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
@@ -363,6 +317,29 @@ LgsType::~LgsType() {
         delete field;
     }
     fields.clear();
+}
+
+LgsType* getHighestNumPrecedence(const std::vector<LgsExpr*>& args) {
+    if (args.empty()) return nullptr;
+    LgsType* inferredType = nullptr;
+    uint8_t highestPrecedence = 0;
+    for (size_t i = 0; i < args.size(); ++i) {
+        const auto& arg = args[i];
+        if (!arg->type) return nullptr;
+        LgsType* currentType = nullptr;
+        if (arg->type->isScalar()) {
+            currentType = arg->type;
+        } else if (const auto iter = arg->type->asIterable()) {
+            currentType = iter->baseType;
+        }
+        if (!currentType || !currentType->isScalar()) return nullptr;
+        const auto precedence = LgsType::numberPrecedences[currentType->getName()];
+        if (highestPrecedence >= precedence) continue;
+        inferredType = currentType;
+        highestPrecedence = precedence;
+    }
+    assert(inferredType);
+    return inferredType;
 }
 
 Value* eqNull(LgsCgModule& cg, const LgsExpr* expr) {
