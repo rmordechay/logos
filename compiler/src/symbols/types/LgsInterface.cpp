@@ -4,9 +4,7 @@
 #include "types/LgsObject.h"
 
 Type* LgsInterface::getIRType(LgsCgModule& cg) {
-    if (IRType) return IRType;
-    IRType = cg.ptrTy();
-    return IRType;
+    return cg.ptrTy();
 }
 
 LgsFunc* LgsInterface::getMethod(const std::string& methodName) {

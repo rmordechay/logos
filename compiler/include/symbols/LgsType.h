@@ -63,7 +63,6 @@ public:
     std::vector<LgsField*> fields;
     std::map<std::string, LgsFunc*> methods;
     std::vector<LgsType*> genericArgs;
-    Type* IRType = nullptr;
     bool isInt = false;
     bool isUnsinged = false;
     bool isFloat = false;

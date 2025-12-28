@@ -882,6 +882,7 @@ void LgsCodeGen::visitMatrixExpr(const LgsMatrixExpr* matrixExpr) {
 
 void LgsCodeGen::visitHashMap(LgsHashMap* hashMap) {
     const auto map = hashMap->type->asMap();
+    hashMap->IRValue = cg.builder.CreateAlloca(cg.i1Ty(), cg.usize(map->sizeBytes()));
     hashMap->IRValue = cg.heapAllocate(cg.usize(map->sizeBytes()), map->getRTType(cg));
     cg.callLgsFunc(LgsMap::name, "init", cg.voidTy(), {cg.ptrTy()}, {hashMap->IRValue});
     for (const auto [key, value] : hashMap->elements) {

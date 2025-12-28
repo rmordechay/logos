@@ -28,8 +28,7 @@ LgsField* LgsVec::getField(const std::string& fieldName) {
 }
 
 Type* LgsVec::getIRType(LgsCgModule& cg) {
-    IRType = FixedVectorType::get(baseType->getIRType(cg), dimVec);
-    return IRType;
+    return FixedVectorType::get(baseType->getIRType(cg), dimVec);
 }
 
 Constant* LgsVec::getRTType(LgsCgModule& cg) {

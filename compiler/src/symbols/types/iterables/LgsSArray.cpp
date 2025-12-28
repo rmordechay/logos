@@ -8,10 +8,8 @@
 #include "lgsc/LgsCCompiler.h"
 
 Type* LgsSArray::getIRType(LgsCgModule& cg) {
-    if (IRType) return IRType;
     const auto innerIRType = baseType->getIRType(cg);
-    IRType = ArrayType::get(innerIRType, size->getConstInt().value());
-    return IRType;
+    return ArrayType::get(innerIRType, size->getConstInt().value());
 }
 
 std::string LgsSArray::getBaseName() {

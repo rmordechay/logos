@@ -50,10 +50,8 @@ LgsFunc* LgsMap::getMethod(const std::string& methodName) {
 }
 
 Type* LgsMap::getIRType(LgsCgModule& cg) {
-    if (IRType) return IRType;
     const std::vector<Type*> mapStructFields = {cg.i64Ty(), cg.i64Ty(), cg.i64Ty(), cg.ptrTy()};
-    IRType = cg.getStructType(mapStructFields, name);
-    return IRType;
+    return cg.getStructType(mapStructFields, name);
 }
 
 Constant* LgsMap::getRTType(LgsCgModule& cg) {

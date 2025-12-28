@@ -7,9 +7,7 @@
 #include "types/iterables/LgsDArray.h"
 
 Type* LgsSet::getIRType(LgsCgModule& cg) {
-    if (IRType) return IRType;
-    IRType = cg.getStructType({cg.ptrTy(), cg.sizeTy(), cg.sizeTy(), cg.ptrTy()}, name);
-    return IRType;
+    return cg.getStructType({cg.ptrTy(), cg.sizeTy(), cg.sizeTy(), cg.ptrTy()}, name);
 }
 
 Constant* LgsSet::getRTType(LgsCgModule& cg) {

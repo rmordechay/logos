@@ -35,10 +35,8 @@ std::string LgsNullable::getName() {
 }
 
 Type* LgsNullable::getIRType(LgsCgModule& cg) {
-    if (IRType) return IRType;
-    if (passByRef) IRType = cg.ptrTy();
-    else IRType = cg.getStructType({baseType->getIRType(cg), cg.i1Ty()}, getName());
-    return IRType;
+    if (passByRef) return cg.ptrTy();
+    return cg.getStructType({baseType->getIRType(cg), cg.i1Ty()}, getName());
 }
 
 Constant* LgsNullable::getRTType(LgsCgModule& cg) {
