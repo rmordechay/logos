@@ -199,16 +199,20 @@ Value* LgsCgModule::getFromVTable(Value* instance, Value* key) {
     return callRuntimeFunc("getFromVTable", ptrTy(), {ptrTy(), i32Ty()}, {instance, key});
 }
 
-void LgsCgModule::freeValue(Value* ptr, Constant* type) {
-    callRuntimeFunc("freeValue", voidTy(), {ptrTy(), ptrTy()}, {ptr, type});
+void LgsCgModule::freeValue(Value* ptr) {
+    callRuntimeFunc("freeValue", voidTy(), {ptrTy()}, {ptr});
 }
 
-void LgsCgModule::moveValue(Value* ptr, Constant* type) {
-    callRuntimeFunc("moveValue", voidTy(), {ptrTy(), ptrTy()}, {ptr, type});
+void LgsCgModule::moveValue(Value* ptr) {
+    callRuntimeFunc("moveValue", voidTy(), {ptrTy()}, {ptr});
 }
 
-Value* LgsCgModule::heapAllocate(Value* size, Constant* type, const bool isOwner) {
-    return callRuntimeFunc("allocate", ptrTy(), {sizeTy(), ptrTy(), i1Ty()}, {extendToSize(size), type, i1(isOwner)});
+Value* LgsCgModule::heapAllocate(Value* size, const bool isOwner) {
+    return callRuntimeFunc("allocate", ptrTy(), {sizeTy(), i1Ty()}, {extendToSize(size), i1(isOwner)});
+}
+
+Value* LgsCgModule::addOrphan(Value* ptr) {
+    return callRuntimeFunc("addOrphan", voidTy(), {ptrTy()}, {ptr});
 }
 
 void LgsCgModule::callThrowError(const LgsBaseMsg& err, const std::vector<Value*>& args) {

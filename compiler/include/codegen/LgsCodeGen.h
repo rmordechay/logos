@@ -116,7 +116,6 @@ public:
     void visitArrayExpr(LgsArrayExpr* arrayExpr);
     void visitStaticArray(LgsArrayExpr* arrayExpr) const;
     void visitDynamicArray(LgsArrayExpr* arrayExpr) const;
-    void visitSetExpr(LgsArrayExpr* arrayExpr) const;
     void visitVectorExpr(LgsVectorExpr* vectorExpr);
     void visitMatrixExpr(const LgsMatrixExpr* matrixExpr);
     void visitHashMap(LgsHashMap* hashMap);

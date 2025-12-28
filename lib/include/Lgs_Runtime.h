@@ -3,11 +3,12 @@
 #include "Lgs_Types.h"
 #include "errors/LgsErrHandler.h"
 #include <unordered_map>
+#include <unordered_set>
 
 struct Lgs_StackFrame {
     std::vector<Lgs_ThunkFunc> defers;
-    std::unordered_map<void*, Lgs_TypeInfo*> owners;
-    std::unordered_map<void*, Lgs_TypeInfo*> orphans;
+    std::unordered_set<void*> orphans;
+    std::unordered_set<void*> owners;
 };
 
 struct Lgs_Runtime {

@@ -6,8 +6,8 @@
 #include <cstring>
 
 extern "C" void Lgs_DArray_init(Lgs_DArrayExpr* arr, const Lgs_TypeInfo* dArr) {
-    arr->capacity = 10;
     arr->data = static_cast<char*>(std::malloc(arr->capacity * dArr->dArray.baseType->size));
+    arr->capacity = 10;
     arr->length = 0;
 }
 

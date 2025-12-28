@@ -33,7 +33,7 @@ static std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
         const auto& [baseType] = rtt->dArray;
         str << "[";
         for (size_t i = 0; i < dArrExpr->length; ++i) {
-            auto data = Lgs_DArray_get(dArrExpr, rtt, i);
+            const auto data = Lgs_DArray_get(dArrExpr, rtt, i);
             str << formatElement(baseType, data);
             if (i < dArrExpr->length - 1) str << ", ";
         }

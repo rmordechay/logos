@@ -743,10 +743,8 @@ void LgsCodeGen::visitArrayExpr(LgsArrayExpr* arrayExpr) {
     }
     if (arrayExpr->type->asSArray()) {
         visitStaticArray(arrayExpr);
-    } else if (arrayExpr->type->asDArray()) {
+    } else if (arrayExpr->type->asDArray() || arrayExpr->type->asSet()) {
         visitDynamicArray(arrayExpr);
-    } else if (arrayExpr->type->asSet()) {
-        visitSetExpr(arrayExpr);
     } else {
         assert(0);
     }
@@ -798,22 +796,12 @@ void LgsCodeGen::visitStaticArray(LgsArrayExpr* arrayExpr) const {
 }
 
 void LgsCodeGen::visitDynamicArray(LgsArrayExpr* arrayExpr) const {
-    const auto dArr = arrayExpr->type->asDArray();
+    const auto dArr = arrayExpr->type->asIterable();
     arrayExpr->IRValue = dArr->getIRZeroValue(cg, arrayExpr->pointee);
+    const auto entriesField = cg.builder.CreateStructGEP(dArr->getIRType(cg), arrayExpr->IRValue, 0);
+    cg.addOrphan(cg.load(cg.ptrTy(), entriesField));
     for (const auto element : arrayExpr->elements) {
         dArr->addIRElement(cg, arrayExpr->IRValue, nullptr, element->IRValue);
-    }
-}
-
-void LgsCodeGen::visitSetExpr(LgsArrayExpr* arrayExpr) const {
-    const auto set = arrayExpr->type->asSArray();
-    auto rtType = set->getRTType(cg);
-    if (!arrayExpr->pointee) {
-        arrayExpr->IRValue = cg.heapAllocate(cg.usize(set->sizeBytes()), rtType);
-    }
-    cg.callLgsFunc(LgsSet::name, "init", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {arrayExpr->IRValue, rtType});
-    for (const auto element : arrayExpr->elements) {
-        set->addIRElement(cg, arrayExpr->IRValue, nullptr, element->IRValue);
     }
 }
 
@@ -882,9 +870,9 @@ void LgsCodeGen::visitMatrixExpr(const LgsMatrixExpr* matrixExpr) {
 
 void LgsCodeGen::visitHashMap(LgsHashMap* hashMap) {
     const auto map = hashMap->type->asMap();
-    hashMap->IRValue = cg.builder.CreateAlloca(cg.i1Ty(), cg.usize(map->sizeBytes()));
-    hashMap->IRValue = cg.heapAllocate(cg.usize(map->sizeBytes()), map->getRTType(cg));
-    cg.callLgsFunc(LgsMap::name, "init", cg.voidTy(), {cg.ptrTy()}, {hashMap->IRValue});
+    hashMap->IRValue = map->getIRZeroValue(cg, hashMap->pointee);
+    const auto entriesField = cg.builder.CreateStructGEP(map->getIRType(cg), hashMap->IRValue, 0);
+    cg.addOrphan(cg.load(cg.ptrTy(), entriesField));
     for (const auto [key, value] : hashMap->elements) {
         visitExpr(key);
         visitExpr(value);
@@ -1164,7 +1152,7 @@ void LgsCodeGen::visitStrConst(LgsStrConst* strConst) {
 void LgsCodeGen::visitInstance(LgsInstance* instance) {
     const auto obj = instance->obj;
     const auto sizeIR = cg.usize(obj->sizeBytes());
-    instance->IRValue = cg.heapAllocate(sizeIR, obj->getRTType(cg), !!instance->owner);
+    instance->IRValue = cg.heapAllocate(sizeIR, !!instance->owner);
 
     // Args
     std::unordered_set<std::string> visited;

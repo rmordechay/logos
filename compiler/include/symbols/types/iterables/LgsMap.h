@@ -24,6 +24,7 @@ public:
     std::string pname() override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
+    Value* getIRZeroValue(LgsCgModule& cg, Value* pointee) override;
     LgsType* getIndexType() override;
     LgsType* getValueType() override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;

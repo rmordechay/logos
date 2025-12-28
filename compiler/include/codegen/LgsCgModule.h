@@ -87,9 +87,10 @@ public:
     Constant* hashConst(const std::string& str);
     void addToVTable(Value* instance, Value* key, Value* ptr);
     Value* getFromVTable(Value* instance, Value* key);
-    void freeValue(Value* ptr, Constant* type);
-    void moveValue(Value* ptr, Constant* type);
-    Value* heapAllocate(Value* size, Constant* type, bool isOwner = false);
+    void freeValue(Value* ptr);
+    void moveValue(Value* ptr);
+    Value* heapAllocate(Value* size, bool isOwner = false);
+    Value* addOrphan(Value* ptr);
     void callThrowError(const LgsBaseMsg& err, const std::vector<Value*>& args = {});
 
     // Blocks

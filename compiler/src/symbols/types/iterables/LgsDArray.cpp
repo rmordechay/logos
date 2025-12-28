@@ -66,12 +66,9 @@ LgsExpr* LgsDArray::getZeroValue() {
 }
 
 Value* LgsDArray::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
-    auto rtType = getRTType(cg);
-    Value* v = pointee;
-    if (!pointee) {
-        v = cg.heapAllocate(cg.usize(sizeBytes()), rtType);
-    }
-    cg.callLgsFunc(name, "init", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {v, rtType});
+    const auto ty = getIRType(cg);
+    const auto v = pointee ? pointee : cg.builder.CreateAlloca(ty);
+    cg.callLgsFunc(name, "init", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {v, getRTType(cg)});
     return v;
 }
 

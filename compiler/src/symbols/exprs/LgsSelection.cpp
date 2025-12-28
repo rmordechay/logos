@@ -32,7 +32,7 @@ void LgsSelection::assign(LgsCgModule& cg, LgsExpr* expr) {
         const auto insert = cg.builder.CreateInsertElement(vec, rIR, i);
         cg.store(insert, lExpr->IRValue);
     } else {
-        cg.moveValue(cg.load(cg.ptrTy(), IRValue), type->getRTType(cg));
+        cg.moveValue(cg.load(cg.ptrTy(), IRValue));
         cg.store(rIR, IRValue);
     }
 }

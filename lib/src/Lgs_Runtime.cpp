@@ -6,7 +6,7 @@
 #include "Lgs_SetExpr.h"
 #include <cassert>
 
-extern "C" void Lgs_Runtime_freeValue(void* ptr, const Lgs_TypeInfo* type);
+extern "C" void Lgs_Runtime_freeValue(void* ptr);
 
 extern "C" void Lgs_Runtime_init() {}
 
@@ -23,66 +23,37 @@ extern "C" void Lgs_Runtime_pop() {
     // Call defers
     for (auto [defer, ctx] : top.defers) defer(ctx);
     // Free allocations
-    if (!top.orphans.empty()) {
-        for (const auto& [ptr, type] : top.orphans) {
-            Lgs_Runtime_freeValue(ptr, type);
-        }
-        top.orphans.clear();
+    for (const auto ptr : top.orphans) {
+        std::println("Freeing in {}: {}", runtime.stackLevel, ptr);
+        std::free(ptr);
     }
+    top.orphans.clear();
     runtime.stackLevel--;
 }
 
-extern "C" void* Lgs_Runtime_allocate(const size_t size, Lgs_TypeInfo* type, const bool isOwner) {
+extern "C" void* Lgs_Runtime_allocate(const size_t size, const bool isOwner) {
     const auto ptr = std::malloc(size);
     std::println("Allocated {}B in {}: {}", size, runtime.stackLevel, ptr);
     auto& top = runtime.stack[runtime.stackLevel];
     if (isOwner) {
-        top.owners[ptr] = type;
+        top.owners.insert(ptr);
     } else {
-        top.orphans[ptr] = type;
+        top.orphans.insert(ptr);
     }
     return ptr;
 }
 
-extern "C" void Lgs_Runtime_moveValue(void* ptr, const Lgs_TypeInfo* type) {
+extern "C" void Lgs_Runtime_addOrphan(void* ptr) {
+    std::println("Added orphan in {}: {}", runtime.stackLevel, ptr);
+    runtime.stack[runtime.stackLevel].orphans.insert(ptr);
+}
+
+extern "C" void Lgs_Runtime_moveValue(void* ptr) {
     for (int i = 0; i < runtime.stackLevel; ++i) {
         auto& frame = runtime.stack[i];
         if (frame.orphans.contains(ptr)) {
             frame.orphans.erase(ptr);
         }
-    }
-    Lgs_Runtime_freeValue(ptr, type);
-}
-
-extern "C" void Lgs_Runtime_freeValue(void* ptr, const Lgs_TypeInfo* type) {
-    if (!ptr) return;
-    switch (type->kind) {
-    case RTT_DARRAY: {
-        std::println("Freeing darr {}", ptr);
-        std::free(static_cast<Lgs_DArrayExpr*>(ptr)->data);
-        break;
-    }
-    case RTT_SET: {
-        std::println("Freeing set {}", ptr);
-        std::free(static_cast<Lgs_SetExpr*>(ptr)->data);
-        break;
-    }
-    case RTT_OBJECT: {
-        std::println("Freeing {} {}", type->obj.name, ptr);
-        break;
-    }
-    case RTT_STR:
-        std::println("Freeing str {}", ptr);
-        break;
-    case RTT_NULLABLE: {
-        std::println("Freeing nullable {}", ptr);
-        break;
-    }
-    case RTT_MAP:
-    case RTT_SARRAY:
-    default: {
-        assert(0);
-    }
     }
     std::free(ptr);
 }

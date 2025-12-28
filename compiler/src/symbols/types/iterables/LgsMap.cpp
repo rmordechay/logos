@@ -50,13 +50,13 @@ LgsFunc* LgsMap::getMethod(const std::string& methodName) {
 }
 
 Type* LgsMap::getIRType(LgsCgModule& cg) {
-    const std::vector<Type*> mapStructFields = {cg.i64Ty(), cg.i64Ty(), cg.i64Ty(), cg.ptrTy()};
-    return cg.getStructType(mapStructFields, name);
+    return cg.getStructType({cg.ptrTy(), cg.sizeTy(), cg.sizeTy()}, name);
 }
 
 Constant* LgsMap::getRTType(LgsCgModule& cg) {
     const auto mapName = getName();
-    const auto sv = cg.getRTTExtraStruct(mapName, {cg.ptrTy(), cg.ptrTy()}, {mapType->key->getRTType(cg), mapType->value->getRTType(cg)});
+    const auto args = {mapType->key->getRTType(cg), mapType->value->getRTType(cg)};
+    const auto sv = cg.getRTTExtraStruct(mapName, {cg.ptrTy(), cg.ptrTy()}, args);
     return cg.getRTTypeInfo(mapName, sizeBytes(), RTT_MAP, sv);
 }
 
@@ -80,6 +80,13 @@ size_t LgsMap::sizeBytes() {
 
 LgsExpr* LgsMap::getZeroValue() {
     return new LgsHashMap(this);
+}
+
+Value* LgsMap::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
+    const auto ty = getIRType(cg);
+    const auto v = pointee ? pointee : cg.builder.CreateAlloca(ty);
+    cg.callLgsFunc(name, "init", cg.voidTy(), {cg.ptrTy()}, {v});
+    return v;
 }
 
 LgsType* LgsMap::getIndexType() {

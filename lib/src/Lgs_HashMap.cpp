@@ -14,6 +14,7 @@ extern "C" void Lgs_Map_init(Lgs_HashMap* map) {
     const auto entries = std::calloc(MAP_INITIAL_CAPACITY, sizeof(Lgs_HashMapEntry));
     map->entries = static_cast<Lgs_HashMapEntry**>(entries);
     map->len = 0;
+    map->capacity = MAP_INITIAL_CAPACITY;
 }
 
 extern "C" void Lgs_Map_add(Lgs_HashMap* map, const char* key, void* value) {
@@ -115,13 +116,14 @@ static void resize(Lgs_HashMap* map) {
             entry = next;
         }
     }
-    free(map->entries);
+    std::free(map->entries);
     map->entries = newBuckets;
     map->capacity = newCap;
 }
 
 static Lgs_HashMapEntry* createEntry(const char* key, void* value) {
-    const auto entry = static_cast<Lgs_HashMapEntry*>(malloc(sizeof(Lgs_HashMapEntry)));
+    const auto ptr = std::malloc(sizeof(Lgs_HashMapEntry));
+    const auto entry = static_cast<Lgs_HashMapEntry*>(ptr);
     entry->key = strdup(key);
     entry->value = value;
     entry->next = nullptr;

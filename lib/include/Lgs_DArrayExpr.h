@@ -14,7 +14,4 @@ struct Lgs_DArrayExpr {
     size_t capacity;
 };
 
-extern "C" void Lgs_DArray_init(Lgs_DArrayExpr* arr, const Lgs_TypeInfo* dArr);
-extern "C" void Lgs_DArray_add(Lgs_DArrayExpr* arr, const Lgs_TypeInfo* type, const void* value);
-extern "C" size_t Lgs_DArray_len(const Lgs_DArrayExpr* arr);
 extern "C" void* Lgs_DArray_get(const Lgs_DArrayExpr* arr, const Lgs_TypeInfo* type, int64_t index);
