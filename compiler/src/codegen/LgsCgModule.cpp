@@ -203,10 +203,11 @@ void LgsCgModule::freeValue(Value* ptr, Constant* type) {
     callRuntimeFunc("freeValue", voidTy(), {ptrTy(), ptrTy()}, {ptr, type});
 }
 
-Value* LgsCgModule::heapAllocate(Value* size, Constant* type, const bool isOwner, const bool isReturnExpr) {
-    if (isReturnExpr) {
-        return callRuntimeFunc("allocateReturn", ptrTy(), {sizeTy(), ptrTy()}, {extendToSize(size), type});
-    }
+void LgsCgModule::moveValue(Value* ptr, Constant* type) {
+    callRuntimeFunc("moveValue", voidTy(), {ptrTy(), ptrTy()}, {ptr, type});
+}
+
+Value* LgsCgModule::heapAllocate(Value* size, Constant* type, const bool isOwner) {
     return callRuntimeFunc("allocate", ptrTy(), {sizeTy(), ptrTy(), i1Ty()}, {extendToSize(size), type, i1(isOwner)});
 }
 
@@ -323,11 +324,11 @@ void LgsCgModule::callMemCpy(Value* dest, Value* src, Value* size) {
     builder.CreateMemCpy(dest, llvm::MaybeAlign(), src, llvm::MaybeAlign(), size);
 }
 
-Constant* LgsCgModule::getRTTypeInfo(const std::string& name, const size_t size, const Lgs_TypeKind kind, const bool isHeapAlloc, Constant* extra) {
+Constant* LgsCgModule::getRTTypeInfo(const std::string& name, const size_t size, const Lgs_TypeKind kind, Constant* extra) {
     const auto typeInfo = getRTTBaseStruct();
     const auto prefixedName = LGS_TYPEINFO_PREFIX + name;
     if (isRTTModule) {
-        return createGlobal(prefixedName, typeInfo, llvm::ConstantStruct::get(typeInfo, {usize(size), i32(kind), i1(isHeapAlloc), extra}));
+        return createGlobal(prefixedName, typeInfo, llvm::ConstantStruct::get(typeInfo, {usize(size), i32(kind), extra}));
     }
     return createGlobal(prefixedName, typeInfo, nullptr);
 }
@@ -342,8 +343,8 @@ Constant* LgsCgModule::getRTTExtraStruct(const std::string& name, const std::vec
 }
 
 StructType* LgsCgModule::getRTTBaseStruct() {
-    const auto typeInfoMatrix = getStructType({sizeTy(), ptrTy(), ptrTy(), ptrTy()}, LGS_TYPEINFO_PREFIX"FuncType"); // Biggest
-    return getStructType({sizeTy(), i32Ty(), i1Ty(), typeInfoMatrix}, "RTI"); // size, kind, isHeap, type
+    const auto biggest = getStructType({sizeTy(), ptrTy(), ptrTy(), ptrTy()}, LGS_TYPEINFO_PREFIX"FuncType");
+    return getStructType({sizeTy(), i32Ty(), biggest}, "RTI"); // size, kind, isHeap, type
 }
 
 Type* LgsCgModule::i1Ty() {

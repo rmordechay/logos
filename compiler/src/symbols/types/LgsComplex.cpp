@@ -26,7 +26,7 @@ Constant* LgsComplex::getRTType(LgsCgModule& cg) {
     const std::vector<Type*> params = {cg.ptrTy(), cg.ptrTy()};
     const std::vector args = {realType->getRTType(cg), imaginaryType->getRTType(cg)};
     const auto sv = cg.getRTTExtraStruct(nullableName, params, args);
-    return cg.getRTTypeInfo(nullableName, sizeBytes(), RTT_COMPLEX, isHeapAlloc, sv);
+    return cg.getRTTypeInfo(nullableName, sizeBytes(), RTT_COMPLEX, sv);
 }
 
 bool LgsComplex::canCastTo(LgsType* other) {

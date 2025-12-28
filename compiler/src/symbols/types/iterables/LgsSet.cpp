@@ -15,7 +15,7 @@ Type* LgsSet::getIRType(LgsCgModule& cg) {
 Constant* LgsSet::getRTType(LgsCgModule& cg) {
     const auto setName = getName();
     const auto sv = cg.getRTTExtraStruct(setName, {cg.ptrTy()}, {baseType->getRTType(cg)});
-    return cg.getRTTypeInfo(setName, sizeBytes(), RTT_SET, isHeapAlloc, sv);
+    return cg.getRTTypeInfo(setName, sizeBytes(), RTT_SET, sv);
 }
 
 size_t LgsSet::sizeBytes() {

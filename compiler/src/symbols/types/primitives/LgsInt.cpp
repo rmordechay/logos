@@ -28,7 +28,7 @@ Value* LgsInt::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
 }
 
 Constant* LgsInt::getRTType(LgsCgModule& cg) {
-    return cg.getRTTypeInfo(getName(), sizeBytes(), RTT_INT, isHeapAlloc, cg.null());
+    return cg.getRTTypeInfo(getName(), sizeBytes(), RTT_INT, cg.null());
 }
 
 bool LgsInt::canCastTo(LgsType* other) {

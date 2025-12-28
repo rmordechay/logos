@@ -98,7 +98,6 @@ struct Lgs_Nullable {
 struct Lgs_TypeInfo {
     size_t size;
     Lgs_TypeKind kind;
-    bool isHeap;
     union {
         Lgs_Object obj;
         Lgs_SArray sArray;

@@ -43,7 +43,7 @@ Type* LgsDArray::getIRType(LgsCgModule& cg) {
 Constant* LgsDArray::getRTType(LgsCgModule& cg) {
     const auto dArrName = getName();
     const auto sv = cg.getRTTExtraStruct(dArrName, {cg.ptrTy()}, {baseType->getRTType(cg)});
-    return cg.getRTTypeInfo(dArrName, sizeBytes(), RTT_DARRAY, isHeapAlloc, sv);
+    return cg.getRTTypeInfo(dArrName, sizeBytes(), RTT_DARRAY, sv);
 }
 
 std::string LgsDArray::getBaseName() {
@@ -71,7 +71,7 @@ Value* LgsDArray::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
     auto rtType = getRTType(cg);
     Value* v = pointee;
     if (!pointee) {
-        v = cg.heapAllocate(cg.usize(sizeBytes()), rtType, false);
+        v = cg.heapAllocate(cg.usize(sizeBytes()), rtType);
     }
     cg.callLgsFunc(name, "init", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {v, rtType});
     return v;

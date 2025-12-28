@@ -44,6 +44,7 @@ public:
     Value* pointee = nullptr;
 
     explicit LgsExpr(LgsType* type = nullptr) : type(type) {}
+    void setOwner(LgsValue* newOwner);
     std::optional<int64_t> getConstInt();
     std::optional<std::string> getConstStr();
 

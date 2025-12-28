@@ -79,7 +79,7 @@ Value* LgsSize::lshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
 }
 
 Constant* LgsSize::getRTType(LgsCgModule& cg) {
-    return cg.getRTTypeInfo(getName(), sizeBytes(), RTT_SIZE, isHeapAlloc, cg.null());
+    return cg.getRTTypeInfo(getName(), sizeBytes(), RTT_SIZE, cg.null());
 }
 
 bool LgsSize::canCastTo(LgsType* other) {

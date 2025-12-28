@@ -15,6 +15,7 @@ func(parent: Parent) {
 main() {
     child1 = Child{id=23}
     parent1 = Parent{id=1, child=child1}
+    print(parent1.child.id)
     func(parent1)
-    //print(parent1.child.id)
+    print(parent1.child.id)
 }

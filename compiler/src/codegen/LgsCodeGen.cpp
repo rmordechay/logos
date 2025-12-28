@@ -808,8 +808,8 @@ void LgsCodeGen::visitDynamicArray(LgsArrayExpr* arrayExpr) const {
 void LgsCodeGen::visitSetExpr(LgsArrayExpr* arrayExpr) const {
     const auto set = arrayExpr->type->asSArray();
     auto rtType = set->getRTType(cg);
-    if (!arrayExpr->IRValue) {
-        arrayExpr->IRValue = cg.heapAllocate(cg.usize(set->sizeBytes()), rtType, false);
+    if (!arrayExpr->pointee) {
+        arrayExpr->IRValue = cg.heapAllocate(cg.usize(set->sizeBytes()), rtType);
     }
     cg.callLgsFunc(LgsSet::name, "init", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {arrayExpr->IRValue, rtType});
     for (const auto element : arrayExpr->elements) {
@@ -882,7 +882,7 @@ void LgsCodeGen::visitMatrixExpr(const LgsMatrixExpr* matrixExpr) {
 
 void LgsCodeGen::visitHashMap(LgsHashMap* hashMap) {
     const auto map = hashMap->type->asMap();
-    hashMap->IRValue = cg.heapAllocate(cg.usize(map->sizeBytes()), map->getRTType(cg), !!hashMap->owner);
+    hashMap->IRValue = cg.heapAllocate(cg.usize(map->sizeBytes()), map->getRTType(cg));
     cg.callLgsFunc(LgsMap::name, "init", cg.voidTy(), {cg.ptrTy()}, {hashMap->IRValue});
     for (const auto [key, value] : hashMap->elements) {
         visitExpr(key);
@@ -1007,7 +1007,7 @@ void LgsCodeGen::visitFieldSelection(LgsVariable* var, LgsExpr* parent, const bo
         createVecField(field, parent->IRValue);
     }
     var->IRValue = field->getGEP(cg, parent->IRValue);
-    if (field->type->asObject()) {
+    if (!assign && field->type->asObject()) {
         var->IRValue = cg.load(cg.ptrTy(), var->IRValue);
     }
 }
@@ -1162,7 +1162,8 @@ void LgsCodeGen::visitStrConst(LgsStrConst* strConst) {
 
 void LgsCodeGen::visitInstance(LgsInstance* instance) {
     const auto obj = instance->obj;
-    instance->IRValue = cg.heapAllocate(cg.usize(obj->sizeBytes()), obj->getRTType(cg), !!instance->owner);
+    const auto sizeIR = cg.usize(obj->sizeBytes());
+    instance->IRValue = cg.heapAllocate(sizeIR, obj->getRTType(cg), !!instance->owner);
 
     // Args
     std::unordered_set<std::string> visited;

@@ -32,7 +32,7 @@ Constant* LgsFuncType::getRTType(LgsCgModule& cg) {
     const auto sv = cg.getRTTExtraStruct(funcName, {cg.sizeTy(), cg.ptrTy(), cg.ptrTy(), cg.ptrTy()}, {
         cg.usize(params.size()), hashesArr, typesArr, rt->getRTType(cg)
     });
-    return cg.getRTTypeInfo(funcName, sizeBytes(), RTT_FUNC, isHeapAlloc, sv);
+    return cg.getRTTypeInfo(funcName, sizeBytes(), RTT_FUNC, sv);
 }
 
 LgsExpr* LgsFuncType::getZeroValue() {

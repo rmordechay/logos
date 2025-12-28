@@ -88,7 +88,8 @@ public:
     void addToVTable(Value* instance, Value* key, Value* ptr);
     Value* getFromVTable(Value* instance, Value* key);
     void freeValue(Value* ptr, Constant* type);
-    Value* heapAllocate(Value* size, Constant* type, bool isOwner, bool isReturnExpr = false);
+    void moveValue(Value* ptr, Constant* type);
+    Value* heapAllocate(Value* size, Constant* type, bool isOwner = false);
     void callThrowError(const LgsBaseMsg& err, const std::vector<Value*>& args = {});
 
     // Blocks
@@ -116,7 +117,7 @@ public:
     void callMemCpy(Value* dest, Value* src, Value* size);
 
     // Runtime funcs
-    Constant* getRTTypeInfo(const std::string& name, size_t size, Lgs_TypeKind kind, bool isHeapAlloc, Constant* extra);
+    Constant* getRTTypeInfo(const std::string& name, size_t size, Lgs_TypeKind kind, Constant* extra);
     Constant* getRTTExtraStruct(const std::string& name, const std::vector<Type*>& fields, const std::vector<Constant*>& args);
     StructType* getRTTBaseStruct();
 

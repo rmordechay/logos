@@ -18,7 +18,7 @@ public:
     bool isPublic = false;
     bool isVirtual = false;
     bool isOptional = false;
-    bool isOwner = false;
+    bool isOwner = true;
     bool isEnumField = false; // Not to be confused with type enum.
     LgsType* parentType = nullptr;
 

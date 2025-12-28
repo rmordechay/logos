@@ -457,9 +457,9 @@ LgsInterface* LgsParser::parseInterfaceBody(const LgsToken& tokenName) {
 
 LgsField* LgsParser::parseField(const size_t fieldPosition) {
     const auto oldIndex = currentIndex;
-    auto isConst = false;
-    auto isOwner = false;
-    auto isPublic = false;
+    std::optional<bool> isConst = std::nullopt;
+    std::optional<bool> isOwner = std::nullopt;
+    std::optional<bool> isPublic = std::nullopt;
 
     // Qualifiers
     while (true) {
@@ -491,9 +491,9 @@ LgsField* LgsParser::parseField(const size_t fieldPosition) {
     setLocation(field->location, &nameToken, &currentToken);
     field->setType(type);
     field->position = fieldPosition;
-    field->isConst = isConst;
-    field->isOwner = isOwner;
-    field->isPublic = isPublic;
+    if (isConst.has_value()) field->isConst = isConst.value();
+    if (isOwner.has_value()) field->isOwner = isOwner.value();
+    if (isPublic.has_value()) field->isPublic = isPublic.value();
     return field;
 }
 

@@ -37,7 +37,7 @@ Value* LgsStr::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
 }
 
 Constant* LgsStr::getRTType(LgsCgModule& cg) {
-    return cg.getRTTypeInfo(getName(), sizeBytes(), RTT_STR, isHeapAlloc, baseType->getRTType(cg));
+    return cg.getRTTypeInfo(getName(), sizeBytes(), RTT_STR, baseType->getRTType(cg));
 }
 
 bool LgsStr::canCastTo(LgsType* other) {
@@ -87,7 +87,7 @@ Value* LgsStr::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     const auto rightSize = lenIR(cg, right->IRValue);
     const auto sumSize = cg.builder.CreateAdd(leftSize, rightSize);
     const auto endIndex = cg.builder.CreateAdd(sumSize, cg.usize(1));
-    const auto buffer = cg.heapAllocate(endIndex, getRTType(cg), false, left->isReturnExpr);
+    const auto buffer = cg.heapAllocate(endIndex, getRTType(cg));
     const auto rightPos = cg.builder.CreateInBoundsGEP(cg.i8Ty(), buffer, leftSize);
     cg.callMemCpy(buffer, left->IRValue, leftSize);
     cg.callMemCpy(rightPos, right->IRValue, rightSize);

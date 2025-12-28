@@ -26,6 +26,11 @@
 #include "funcs/LgsFunc.h"
 #include "loops/LgsMetaVar.h"
 
+void LgsExpr::setOwner(LgsValue* newOwner) {
+    assert(!owner);
+    owner = newOwner;
+}
+
 std::optional<int64_t> LgsExpr::getConstInt() {
     if (const auto intConst = asIntConst()) {
         return intConst->value;
@@ -217,7 +222,7 @@ void wrapInNullable(LgsExpr*& expr, LgsNullable* nullable) {
     const auto oldExpr = expr;
     oldExpr->setType(nullable->baseType);
     expr = new LgsNullableExpr(oldExpr);
-    expr->owner = oldExpr->owner;
+    expr->setOwner(oldExpr->owner);
     expr->setType(nullable);
 }
 

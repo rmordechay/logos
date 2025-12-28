@@ -69,7 +69,7 @@ Constant* LgsObject::getRTType(LgsCgModule& cg) {
     const std::vector<Type*> params = {cg.ptrTy(), cg.sizeTy(), cg.ptrTy(), cg.ptrTy()};
     const std::vector<Constant*> args = {cg.getString(objName), cg.usize(fields.size()), hashesArr, typesArr};
     const auto sv = cg.getRTTExtraStruct(objName, params, args);
-    return cg.getRTTypeInfo(objName, sizeBytes(), RTT_OBJECT, isHeapAlloc, sv);
+    return cg.getRTTypeInfo(objName, sizeBytes(), RTT_OBJECT, sv);
 }
 
 size_t LgsObject::sizeBytes() {
@@ -90,7 +90,7 @@ LgsExpr* LgsObject::getZeroValue() {
 
 Value* LgsObject::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
     const auto ty = getIRType(cg);
-    const auto zero = cg.heapAllocate(cg.usize(sizeBytes()), getRTType(cg), false);
+    const auto zero = cg.heapAllocate(cg.usize(sizeBytes()), getRTType(cg));
     for (const auto field : fields) {
         const auto fieldZero = field->type->getIRZeroValue(cg);
         cg.storeStructField(ty, zero, field->position, fieldZero);

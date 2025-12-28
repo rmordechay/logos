@@ -355,7 +355,7 @@ void LgsSema::visitVarDec(LgsVarDec* varDec) {
     }
 
     if (varDec->isOwner) {
-        varDec->expr->owner = varDec;
+        varDec->expr->setOwner(varDec);
     }
     if (varDec->expr->type->isVoid()) {
         addError(E10093, varDec->location);
@@ -388,7 +388,7 @@ void LgsSema::visitAssignment(LgsAssignment* assignment) {
     if (!l->type || !r->type) return;
     if (!validateExprType(r, l->type)) return;
     if (assignment->lExpr->owner) {
-        assignment->rExpr->owner = assignment->lExpr->owner;
+        assignment->rExpr->setOwner(assignment->lExpr->owner);
     }
 
     auto canAssign = false;
@@ -933,7 +933,7 @@ void LgsSema::visitVariable(LgsVariable* variable) {
         variable->ref.varDec = symbol->varDec;
         variable->setType(symbol->varDec->type);
         if (symbol->varDec->isOwner) {
-            variable->owner = symbol->varDec;
+            variable->setOwner(symbol->varDec);
         }
         break;
     }
@@ -941,7 +941,7 @@ void LgsSema::visitVariable(LgsVariable* variable) {
         variable->ref.param = symbol->param;
         variable->setType(symbol->param->type);
         if (symbol->param->isOwner) {
-            variable->owner = symbol->param;
+            variable->setOwner(symbol->param);
         }
         break;
     }
@@ -966,7 +966,7 @@ void LgsSema::visitVariable(LgsVariable* variable) {
         variable->isMutable = !symbol->field->isConst;
         variable->setType(symbol->field->type);
         if (symbol->field->isOwner) {
-            variable->owner = symbol->field;
+            variable->setOwner(symbol->field);
         }
         break;
     }
@@ -991,7 +991,7 @@ void LgsSema::visitSelection(LgsSelection* selection) {
     visitInnerSelections(selection);
     const auto lastExpr = selection->lastExpr();
     selection->setType(lastExpr->type);
-    selection->owner = lastExpr->owner;
+    selection->setOwner(lastExpr->owner);
 }
 
 void LgsSema::visitFirstSelection(LgsSelection* selection) {
@@ -1017,12 +1017,11 @@ void LgsSema::visitInnerSelections(LgsSelection* selection) {
         } else {
             assert(0);
         }
-        if (!childExpr->type || childExpr->type->isUnknown()) {
-            return;
-        }
-        // Only the parts that comes after the first nullable encounter
-        // will be wrapped in nullable
+        if (!childExpr->type || childExpr->type->isUnknown()) return;
         selection->hasNullables = selection->hasNullables || childExpr->type->asNullable();
+
+        // Wraps with nullable. Only the parts that comes after the first
+        // nullable encounter will be wrapped in nullable, the parts before remain as is.
         if (selection->hasNullables) {
             assert(!childExpr->asNullableExpr());
             if (childExpr->type->asNullable()) {
@@ -1041,7 +1040,7 @@ void LgsSema::visitFieldSelection(LgsVariable* child, LgsType* parentType) {
     if (const auto field = parentType->getField(childName)) {
         child->setType(field->type);
         child->ref = LgsSymbol(field);
-        if (field->isOwner) child->owner = field;
+        if (field->isOwner) child->setOwner(field);
         validateFieldVisibility(field, parentType, child->location);
     } else if (const auto method = parentType->getMethod(childName)) {
         child->setType(method->type);

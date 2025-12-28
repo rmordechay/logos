@@ -26,7 +26,7 @@ Value* LgsFloat::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
 }
 
 Constant* LgsFloat::getRTType(LgsCgModule& cg) {
-    return cg.getRTTypeInfo(getName(), sizeBytes(), RTT_FLOAT, isHeapAlloc, cg.null());
+    return cg.getRTTypeInfo(getName(), sizeBytes(), RTT_FLOAT, cg.null());
 }
 
 size_t LgsFloat::sizeBytes() {
