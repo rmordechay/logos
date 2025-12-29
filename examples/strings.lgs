@@ -11,3 +11,24 @@ main() {
     print("Hello " + 67)
     func("Hello", "World")
 }
+
+object Obj {
+    name: Str
+}
+
+getStr(x: Str, y: Str): Str {
+    return x + y
+}
+
+main() {
+    roi = "Roi"
+    print(roi)
+    roi := getStr("roi", "rfj")
+    print(roi)
+    obj = Obj{}
+    print(obj)
+    print(obj.name)
+    obj2 = Obj{name="Roi"}
+    print(obj2)
+    print(obj2.name)
+}

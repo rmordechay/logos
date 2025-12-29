@@ -20,11 +20,6 @@ std::string LgsStr::getName() {
 }
 
 size_t LgsStr::sizeBytes() {
-    if (isStatic) {
-        const auto constInt = size->getConstInt();
-        assert(constInt.has_value());
-        return constInt.value();
-    }
     return sizeof(void*);
 }
 
@@ -33,7 +28,7 @@ LgsExpr* LgsStr::getZeroValue() {
 }
 
 Value* LgsStr::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
-    return cg.load(cg.ptrTy(), cg.emptyStr());
+    return cg.emptyStr();
 }
 
 Constant* LgsStr::getRTType(LgsCgModule& cg) {
@@ -52,7 +47,7 @@ bool LgsStr::canCastTo(LgsType* other) {
 LgsType* LgsStr::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     switch (op.opType) {
     case ADD: {
-        if (rightType->canCastTo(this)) return new LgsStr(true);
+        if (rightType->canCastTo(this)) return new LgsStr();
         break;
     }
     case IN: {
@@ -86,12 +81,13 @@ Value* LgsStr::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     const auto leftSize  = lenIR(cg, left->IRValue);
     const auto rightSize = lenIR(cg, right->IRValue);
     const auto sumSize = cg.builder.CreateAdd(leftSize, rightSize);
-    const auto endIndex = cg.builder.CreateAdd(sumSize, cg.usize(1));
-    const auto buffer = cg.heapAllocate(endIndex, getRTType(cg));
+    const auto allocSize = cg.builder.CreateAdd(sumSize, cg.usize(1));
+    const auto buffer = cg.heapAllocate(allocSize, true);
     const auto rightPos = cg.builder.CreateInBoundsGEP(cg.i8Ty(), buffer, leftSize);
     cg.callMemCpy(buffer, left->IRValue, leftSize);
     cg.callMemCpy(rightPos, right->IRValue, rightSize);
-    cg.addNullTerminate(buffer, endIndex);
+    const auto nullPos = cg.builder.CreateInBoundsGEP(cg.i8Ty(), buffer, sumSize);
+    cg.builder.CreateStore(cg.i8Zero(), nullPos);
     return buffer;
 }
 

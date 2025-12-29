@@ -86,7 +86,7 @@ bool LgsCgModule::writeIRModule(const LgsPaths& paths, uint8_t optLevel) const {
     return true;
 }
 
-Constant* LgsCgModule::getString(const std::string& value) {
+Value* LgsCgModule::getString(const std::string& value) {
     for (auto& globals : IRModule->globals()) {
         if (!globals.hasInitializer()) continue;
         const auto dataArray = llvm::dyn_cast<llvm::ConstantDataArray>(globals.getInitializer());
@@ -94,9 +94,7 @@ Constant* LgsCgModule::getString(const std::string& value) {
         return &globals;
     }
     const auto strConstant = llvm::ConstantDataArray::getString(context, value, true);
-    const auto globalVar = new GlobalVariable(*IRModule, strConstant->getType(), true, GlobalValue::PrivateLinkage, strConstant);
-    globalVar->setUnnamedAddr(GlobalValue::UnnamedAddr::Global);
-    return globalVar;
+    return new GlobalVariable(*IRModule, strConstant->getType(), true, GlobalValue::PrivateLinkage, strConstant);
 }
 
 Value* LgsCgModule::getPtrTo(Value* v) {
@@ -203,16 +201,8 @@ void LgsCgModule::freeValue(Value* ptr) {
     callRuntimeFunc("freeValue", voidTy(), {ptrTy()}, {ptr});
 }
 
-void LgsCgModule::moveValue(Value* ptr) {
-    callRuntimeFunc("moveValue", voidTy(), {ptrTy()}, {ptr});
-}
-
 Value* LgsCgModule::heapAllocate(Value* size, const bool isOwner) {
     return callRuntimeFunc("allocate", ptrTy(), {sizeTy(), i1Ty()}, {extendToSize(size), i1(isOwner)});
-}
-
-Value* LgsCgModule::addOrphan(Value* ptr) {
-    return callRuntimeFunc("addOrphan", voidTy(), {ptrTy()}, {ptr});
 }
 
 void LgsCgModule::callThrowError(const LgsBaseMsg& err, const std::vector<Value*>& args) {

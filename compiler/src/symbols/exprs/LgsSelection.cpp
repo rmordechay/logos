@@ -22,19 +22,8 @@ LgsFuncCall* LgsSelection::asMethodCall() const {
 }
 
 void LgsSelection::assign(LgsCgModule& cg, LgsExpr* expr) {
-    const auto rIR = expr->IRValue;
-    const auto lExpr = lastExpr();
-    if (lExpr->type->asVec()) {
-        const auto vecTy = lExpr->type->getIRType(cg);
-        const auto vec = cg.load(vecTy, lExpr->IRValue);
-        const auto c = lastExpr()->asVariable()->name;
-        const auto i = cg.i32(LgsVec::getComponentIndex(c.front()));
-        const auto insert = cg.builder.CreateInsertElement(vec, rIR, i);
-        cg.store(insert, lExpr->IRValue);
-    } else {
-        if (type->isHeapAlloc) cg.moveValue(cg.load(cg.ptrTy(), IRValue));
-        cg.store(rIR, IRValue);
-    }
+    assert(!type->asVec());
+    cg.store(expr->IRValue, IRValue);
 }
 
 std::string LgsSelection::asText() {

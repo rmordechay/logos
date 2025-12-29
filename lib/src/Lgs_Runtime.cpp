@@ -2,29 +2,33 @@
 #include "LgsConfigs.h"
 #include "LgsDefinitions.h"
 #include "LgsUtils.h"
-#include "Lgs_DArrayExpr.h"
-#include "Lgs_SetExpr.h"
 #include <cassert>
+#include <complex>
 
 extern "C" void Lgs_Runtime_freeValue(void* ptr);
 
 extern "C" void Lgs_Runtime_init() {}
 
-extern "C" void Lgs_Runtime_close() {}
+extern "C" void Lgs_Runtime_close() {
+    // Free owners
+    for (const auto ptr : runtime.owners) {
+        std::println("Freeing owner in {}: {}", runtime.stackLevel, ptr);
+        std::free(ptr);
+    }
+    runtime.owners.clear();
+}
 
 extern "C" void Lgs_Runtime_push() {
     runtime.stackLevel++;
-    std::println("Entering {}", runtime.stackLevel);
 }
 
 extern "C" void Lgs_Runtime_pop() {
-    std::println("Exiting {}", runtime.stackLevel);
     auto& top = runtime.stack[runtime.stackLevel];
     // Call defers
     for (auto [defer, ctx] : top.defers) defer(ctx);
-    // Free allocations
+    // Free orphans
     for (const auto ptr : top.orphans) {
-        std::println("Freeing in {}: {}", runtime.stackLevel, ptr);
+        std::println("Freeing orphan in {}: {}", runtime.stackLevel, ptr);
         std::free(ptr);
     }
     top.orphans.clear();
@@ -34,28 +38,26 @@ extern "C" void Lgs_Runtime_pop() {
 extern "C" void* Lgs_Runtime_allocate(const size_t size, const bool isOwner) {
     const auto ptr = std::malloc(size);
     std::println("Allocated {}B in {}: {}", size, runtime.stackLevel, ptr);
-    auto& top = runtime.stack[runtime.stackLevel];
     if (isOwner) {
-        top.owners.insert(ptr);
+        runtime.owners.insert(ptr);
     } else {
-        top.orphans.insert(ptr);
+        runtime.stack[runtime.stackLevel].orphans.insert(ptr);
     }
     return ptr;
 }
 
-extern "C" void Lgs_Runtime_addOrphan(void* ptr) {
-    std::println("Added orphan in {}: {}", runtime.stackLevel, ptr);
-    runtime.stack[runtime.stackLevel].orphans.insert(ptr);
-}
-
-extern "C" void Lgs_Runtime_moveValue(void* ptr) {
-    for (int i = 0; i < runtime.stackLevel; ++i) {
-        auto& frame = runtime.stack[i];
-        if (frame.orphans.contains(ptr)) {
-            frame.orphans.erase(ptr);
-        }
+extern "C" void* Lgs_Runtime_reallocate(void* ptr, const size_t size, const bool isOwner) {
+    const auto newPtr = std::realloc(ptr, size);
+    std::println("Reallocated {}B in {}: {}", size, runtime.stackLevel, newPtr);
+    if (isOwner) {
+        runtime.owners.erase(ptr);
+        runtime.owners.insert(newPtr);
+    } else {
+        auto& top = runtime.stack[runtime.stackLevel];
+        top.orphans.erase(ptr);
+        top.orphans.insert(newPtr);
     }
-    std::free(ptr);
+    return newPtr;
 }
 
 extern "C" void Lgs_Runtime_addDefer(const ThunkFunc funcPtr, void* ctx) {

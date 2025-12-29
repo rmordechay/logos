@@ -16,11 +16,11 @@ Value* LgsVarDec::loadIR(LgsCgModule& cg) {
 
 bool LgsVarDec::shouldAllocate() const {
     if (!type) return false;
-    if (type->asNullable() && !type->asNullable()->passByRef) return false;
     if (type->isHeapAlloc) return false;
-    if (expr->asFuncCall() || expr->asBinExpr()) return false;
-    if (type->asIterable() && type->asIterable()->isStatic) return false;
+    if (type->asSArray()) return false;
+    if (type->asNullable() && !type->asNullable()->passByRef) return false;
     if (type->asSubtype() || type->asFuncType()) return false;
+    if (expr->asFuncCall() || expr->asBinExpr()) return false;
     return true;
 }
 

@@ -24,8 +24,23 @@ static std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
     case RTT_DOUBLE: str << *static_cast<double*>(elem); break;
     case RTT_TYPE:
     case RTT_ENUM:
-    case RTT_STR: str << '"' << static_cast<char*>(elem) << '"'; break;
+    case RTT_STR: str << '"' << *static_cast<char**>(elem) << '"'; break;
     case RTT_CHAR: str << '"' << *static_cast<const char*>(elem) << '"'; break;
+    case RTT_OBJECT: {
+        const auto fieldsCount = rtt->obj.fieldsCount;
+        str << rtt->obj.name << "{";
+        size_t offset = 0;
+        for (size_t i = 0; i < fieldsCount; ++i) {
+            const auto fieldType = rtt->obj.fieldTypes[i];
+            void* fieldValue = static_cast<char*>(elem) + offset;
+            str << rtt->obj.fieldNames[i] << '=';
+            str << formatElement(fieldType, fieldValue);
+            if (i < fieldsCount - 1) str << ", ";
+            offset += fieldType->size;
+        }
+        str << "}";
+        break;
+    }
     case RTT_SET:
     case RTT_DARRAY: {
         const auto dArrExpr = static_cast<Lgs_DArrayExpr*>(elem);
@@ -100,24 +115,6 @@ static std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
             if (r + 1 < rows) str << "\n";
         }
         str << "\n]";
-        break;
-    }
-    case RTT_OBJECT: {
-        const auto fieldsCount = rtt->obj.fieldsCount;
-        str << "{";
-        size_t offset = 0;
-        for (size_t i = 0; i < fieldsCount; ++i) {
-            const auto fieldType = rtt->obj.fieldTypes[i];
-            void* fieldValue = static_cast<char*>(elem) + offset;
-            if (fieldType->kind == RTT_OBJECT) {
-                fieldValue = *static_cast<void**>(fieldValue);
-            }
-            str << rtt->obj.fieldNames[i] << '=';
-            str << formatElement(fieldType, fieldValue);
-            if (i < fieldsCount - 1) str << ", ";
-            offset += fieldType->size;
-        }
-        str << "}";
         break;
     }
     case RTT_NULLABLE: {

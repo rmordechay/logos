@@ -6,9 +6,8 @@ class LgsStr final : public LgsIterable {
 public:
     static constexpr auto name = "Str";
 
-    explicit LgsStr(const bool isHeap = false): LgsIterable(&LGS_CHAR) {
+    explicit LgsStr(): LgsIterable(&LGS_CHAR) {
         passByRef = true;
-        isHeapAlloc = isHeap;
     }
     Type* getIRType(LgsCgModule& cg) override;
     std::string getBaseName() override;

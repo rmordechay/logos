@@ -68,7 +68,7 @@ public:
 
     void setupModule(const std::filesystem::path& file, bool debugMode = false);
     bool writeIRModule(const LgsPaths& paths, uint8_t optLevel) const;
-    Constant* getString(const std::string& value);
+    Value* getString(const std::string& value);
     Value* getPtrTo(Value* v);
     llvm::AllocaInst* getEmptyBuffer();
     GlobalVariable* createGlobal(const std::string& name, Type* type, Constant* initializer, bool isConst = true, GlobalValue::LinkageTypes linkage = GlobalValue::ExternalLinkage) const;
@@ -88,9 +88,7 @@ public:
     void addToVTable(Value* instance, Value* key, Value* ptr);
     Value* getFromVTable(Value* instance, Value* key);
     void freeValue(Value* ptr);
-    void moveValue(Value* ptr);
     Value* heapAllocate(Value* size, bool isOwner = false);
-    Value* addOrphan(Value* ptr);
     void callThrowError(const LgsBaseMsg& err, const std::vector<Value*>& args = {});
 
     // Blocks

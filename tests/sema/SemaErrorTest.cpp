@@ -2,6 +2,7 @@
 #include "LgsUtils.h"
 #include <string>
 #include "../../external/include/doctest.h"
+#include "errors/LgsErrors.h"
 
 TEST_CASE("SemaError10000") {
     LgsApp app;

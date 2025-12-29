@@ -67,7 +67,7 @@ Constant* LgsObject::getRTType(LgsCgModule& cg) {
     const auto [typesArr, hashesArr] = getRTFieldsInfo(cg, name, fieldsAsOwners);
     // name, fieldsCount, fieldNames, fieldTypes
     const std::vector<Type*> params = {cg.ptrTy(), cg.sizeTy(), cg.ptrTy(), cg.ptrTy()};
-    const std::vector<Constant*> args = {cg.getString(objName), cg.usize(fields.size()), hashesArr, typesArr};
+    const std::vector<Constant*> args = {llvm::dyn_cast<Constant>(cg.getString(objName)), cg.usize(fields.size()), hashesArr, typesArr};
     const auto sv = cg.getRTTExtraStruct(objName, params, args);
     return cg.getRTTypeInfo(objName, sizeBytes(), RTT_OBJECT, sv);
 }

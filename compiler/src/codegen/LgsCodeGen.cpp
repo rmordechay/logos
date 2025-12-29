@@ -797,8 +797,6 @@ void LgsCodeGen::visitStaticArray(LgsArrayExpr* arrayExpr) const {
 void LgsCodeGen::visitDynamicArray(LgsArrayExpr* arrayExpr) const {
     const auto dArr = arrayExpr->type->asIterable();
     arrayExpr->IRValue = dArr->getIRZeroValue(cg, arrayExpr->pointee);
-    const auto entriesField = cg.builder.CreateStructGEP(dArr->getIRType(cg), arrayExpr->IRValue, 0);
-    cg.addOrphan(cg.load(cg.ptrTy(), entriesField));
     for (const auto element : arrayExpr->elements) {
         dArr->addIRElement(cg, arrayExpr->IRValue, nullptr, element->IRValue);
     }
@@ -870,8 +868,6 @@ void LgsCodeGen::visitMatrixExpr(const LgsMatrixExpr* matrixExpr) {
 void LgsCodeGen::visitHashMap(LgsHashMap* hashMap) {
     const auto map = hashMap->type->asMap();
     hashMap->IRValue = map->getIRZeroValue(cg, hashMap->pointee);
-    const auto entriesField = cg.builder.CreateStructGEP(map->getIRType(cg), hashMap->IRValue, 0);
-    cg.addOrphan(cg.load(cg.ptrTy(), entriesField));
     for (const auto [key, value] : hashMap->elements) {
         visitExpr(key);
         visitExpr(value);
@@ -1128,11 +1124,7 @@ void LgsCodeGen::visitPostfixExpr(LgsPostfixExpr* postfixExpr) {
 
 void LgsCodeGen::visitStrConst(LgsStrConst* strConst) {
     if (strConst->parts.empty()) {
-        Value* str = cg.getString(strConst->value);
-        if (strConst->pointee) { // Str is field
-            str = cg.load(cg.ptrTy(), str);
-        }
-        strConst->IRValue = str;
+        strConst->IRValue = cg.getString(strConst->value);
         return;
     }
 
