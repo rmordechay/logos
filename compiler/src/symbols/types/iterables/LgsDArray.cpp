@@ -110,6 +110,11 @@ Value* LgsDArray::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
 }
 
 void LgsDArray::addIRElement(LgsCgModule& cg, Value* iterable, Value* index, Value* value) {
+    if (index) {
+        const auto args = {iterable, index, value};
+        cg.callLgsFunc(LgsSet::name, "put", cg.voidTy(), {cg.ptrTy(), cg.i32Ty(), cg.ptrTy()}, args);
+        return;
+    }
     const std::vector<Type*> params = {cg.ptrTy(), cg.ptrTy(), cg.ptrTy()};
     const std::vector<Value*> IRArgs = {iterable, getRTType(cg), cg.getPtrTo(value)};
     cg.callLgsFunc(name, "add", cg.voidTy(), params, IRArgs);

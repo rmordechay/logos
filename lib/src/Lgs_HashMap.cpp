@@ -8,7 +8,7 @@
 #define MAP_INITIAL_CAPACITY 10
 
 static void resize(Lgs_HashMap* map);
-static Lgs_HashMapEntry* createEntry(const char* key, void* value);
+static Lgs_HashMapEntry* createEntry(const char* key, char* value);
 
 extern "C" void Lgs_Map_init(Lgs_HashMap* map) {
     const auto entries = std::calloc(MAP_INITIAL_CAPACITY, sizeof(Lgs_HashMapEntry));
@@ -17,7 +17,7 @@ extern "C" void Lgs_Map_init(Lgs_HashMap* map) {
     map->capacity = MAP_INITIAL_CAPACITY;
 }
 
-extern "C" void Lgs_Map_add(Lgs_HashMap* map, const char* key, void* value) {
+extern "C" void Lgs_Map_add(Lgs_HashMap* map, const char* key, char* value) {
     if (map->len >= map->capacity) resize(map);
     const auto hashedValue = hashString(key) % map->capacity;
     auto entry = map->entries[hashedValue];
@@ -37,7 +37,7 @@ extern "C" void* Lgs_Map_get(const Lgs_HashMap* map, const char* key) {
     const auto hashed = hashString(key) % map->capacity;
     auto entry = map->entries[hashed];
     while (entry) {
-        if (strcmp(entry->key, key) == 0) return entry->value;
+        if (strcmp(entry->key, key) == 0) return &entry->value;
         entry = entry->next;
     }
     return nullptr;
@@ -121,7 +121,7 @@ static void resize(Lgs_HashMap* map) {
     map->capacity = newCap;
 }
 
-static Lgs_HashMapEntry* createEntry(const char* key, void* value) {
+static Lgs_HashMapEntry* createEntry(const char* key, char* value) {
     const auto ptr = std::malloc(sizeof(Lgs_HashMapEntry));
     const auto entry = static_cast<Lgs_HashMapEntry*>(ptr);
     entry->key = strdup(key);

@@ -123,16 +123,9 @@ void LgsIterIndex::assign(LgsCgModule& cg, LgsExpr* expr) {
 
 void LgsIterIndex::assignScalar(LgsCgModule& cg, LgsExpr* expr) const {
     const auto rIRValue = expr->IRValue;
-    const auto baseIRValue = baseExpr;
-    auto indexIR = index.from->IRValue;
-    if (baseExpr->type->asDArray()) {
-        const auto args = {baseIRValue->IRValue, indexIR, cg.getPtrTo(expr->IRValue)};
-        cg.callLgsFunc(LgsDArray::name, "put", cg.voidTy(), {cg.ptrTy(), cg.i32Ty(), cg.ptrTy()}, args);
-    } else if (baseExpr->type->asSet()) {
-        const auto args = {baseIRValue->IRValue, indexIR, cg.getPtrTo(expr->IRValue)};
-        cg.callLgsFunc(LgsSet::name, "put", cg.voidTy(), {cg.ptrTy(), cg.i32Ty(), cg.ptrTy()}, args);
-    } else if (const auto map = baseExpr->type->asMap()) {
-        map->addIRElement(cg, baseExpr->IRValue, indexIR, expr->IRValue);
+    const auto indexIR = index.from->IRValue;
+    if (const auto iter = baseExpr->type->asIterable()) {
+        iter->addIRElement(cg, baseExpr->IRValue, indexIR, expr->IRValue);
     } else {
         cg.store(rIRValue, IRValue);
     }

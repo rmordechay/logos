@@ -3,7 +3,7 @@
 
 struct Lgs_HashMapEntry {
     char* key;
-    void* value;
+    char* value;
     Lgs_HashMapEntry* next;
 };
 

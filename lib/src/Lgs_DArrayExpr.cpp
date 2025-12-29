@@ -31,16 +31,7 @@ extern "C" void Lgs_DArray_put(const Lgs_DArrayExpr* arr, const Lgs_TypeInfo* ty
 
 extern "C" void* Lgs_DArray_get(const Lgs_DArrayExpr* arr, const Lgs_TypeInfo* type, const int64_t index) {
     if (index >= arr->length) return nullptr;
-    size_t actualIndex;
-    if (index >= 0) {
-        actualIndex = index;
-    } else {
-        const auto absIndex = static_cast<size_t>(-index);
-        if (absIndex > arr->length) return nullptr;
-        actualIndex = arr->length - absIndex;
-    }
-    if (actualIndex >= arr->length) return nullptr;
-    return arr->data + actualIndex * type->dArray.baseType->size;
+    return arr->data + index * type->dArray.baseType->size;
 }
 
 extern "C" size_t Lgs_DArray_len(const Lgs_DArrayExpr* arr) {
