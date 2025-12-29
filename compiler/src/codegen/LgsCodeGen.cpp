@@ -611,7 +611,6 @@ void LgsCodeGen::visitExpr(LgsExpr* expr, const bool assign) {
         else if (const auto cast = expr->asCast()) visitCast(cast);
         else if (const auto json = expr->asJson()) visitJson(json);
     }
-    assert(expr->IRValue);
 }
 
 void LgsCodeGen::visitBinaryExpr(LgsBinaryExpr* binExpr) {
@@ -795,7 +794,7 @@ void LgsCodeGen::visitStaticArray(LgsArrayExpr* arrayExpr) const {
 }
 
 void LgsCodeGen::visitDynamicArray(LgsArrayExpr* arrayExpr) const {
-    const auto dArr = arrayExpr->type->asIterable();
+    const auto dArr = arrayExpr->type->asDArray();
     arrayExpr->IRValue = dArr->getIRZeroValue(cg, arrayExpr->pointee);
     for (const auto element : arrayExpr->elements) {
         dArr->addIRElement(cg, arrayExpr->IRValue, nullptr, element->IRValue);
@@ -1471,10 +1470,10 @@ void LgsCodeGen::createForeachFunc(LgsFunc* func) const {
     // Save state
     cg.savedIP = cg.builder.saveIP();
     const auto originalFunc = cg.currentFunc;
+    cg.currentFunc = func->getIRFunc(cg);
+    func->IRValue = cg.currentFunc;
 
-    const auto IRFunc = func->getIRFunc(cg);
     // Init
-    cg.currentFunc = IRFunc;
     const auto& iterableParam = func->funcType->params[0];
     const auto& callbackParam = func->funcType->params[1];
     const auto iterable = iterableParam.type->asIterable();
@@ -1520,5 +1519,4 @@ void LgsCodeGen::createForeachFunc(LgsFunc* func) const {
     // Restore state
     cg.currentFunc = originalFunc;
     cg.builder.restoreIP(cg.savedIP);
-    func->IRValue = IRFunc;
 }

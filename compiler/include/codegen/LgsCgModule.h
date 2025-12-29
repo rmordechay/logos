@@ -79,6 +79,7 @@ public:
     Value* allocaAndStore(Type* type, Value* v);
     StructType* getStructType(const std::vector<Type*>& fields, const std::string& name = "");
     void storeStructField(Type* parentType, Value* parentPtr, size_t position, Value* v);
+    Value* loadStructField(Type* parentType, Value* parentPtr, size_t position, Type* ty);
     void addNullTerminate(Value* strPtr, Value* pos);
 
     void callStackPush();
@@ -89,6 +90,7 @@ public:
     Value* getFromVTable(Value* instance, Value* key);
     void freeValue(Value* ptr);
     Value* heapAllocate(Value* size, bool isOwner = false);
+    Value* reallocate(Value* ptr, Value* size, bool isOwner);
     void callThrowError(const LgsBaseMsg& err, const std::vector<Value*>& args = {});
 
     // Blocks

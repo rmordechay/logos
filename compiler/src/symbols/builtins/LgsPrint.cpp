@@ -4,6 +4,12 @@
 Value* LgsPrint::call(LgsCgModule& cg, std::vector<LgsFuncArg>& args) {
     const auto arg = args.empty() ? funcType->params.front().expr : args.front().expr;
     const std::vector<Type*> params = {cg.ptrTy(), cg.ptrTy()};
-    const std::vector<Value*> IRArgs = {arg->type->getRTType(cg), cg.getPtrTo(arg->IRValue)};
+    Value* v;
+    if (arg->asStrConst()) {
+        v = cg.allocaAndStore(cg.ptrTy(), arg->IRValue);
+    } else {
+        v = cg.getPtrTo(arg->IRValue);
+    }
+    const std::vector<Value*> IRArgs = {arg->type->getRTType(cg), v};
     return cg.callLgsFunc("", name, cg.voidTy(), params, IRArgs);
 }

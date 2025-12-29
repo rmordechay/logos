@@ -99,9 +99,7 @@ Value* LgsCgModule::getString(const std::string& value) {
 
 Value* LgsCgModule::getPtrTo(Value* v) {
     if (v->getType()->isPointerTy()) return v;
-    const auto ptr = builder.CreateAlloca(v->getType());
-    builder.CreateStore(v, ptr);
-    return ptr;
+    return allocaAndStore(v->getType(), v);
 }
 
 llvm::AllocaInst* LgsCgModule::getEmptyBuffer() {
@@ -169,6 +167,11 @@ void LgsCgModule::storeStructField(Type* parentType, Value* parentPtr, const siz
     store(v, gep);
 }
 
+Value* LgsCgModule::loadStructField(Type* parentType, Value* parentPtr, const size_t position, Type* ty) {
+    const auto gep = builder.CreateStructGEP(parentType, parentPtr, position);
+    return builder.CreateLoad(ty, gep);
+}
+
 void LgsCgModule::addNullTerminate(Value* strPtr, Value* pos) {
     store(i8Zero(), builder.CreateGEP(i8Ty(), strPtr, pos));
 }
@@ -203,6 +206,10 @@ void LgsCgModule::freeValue(Value* ptr) {
 
 Value* LgsCgModule::heapAllocate(Value* size, const bool isOwner) {
     return callRuntimeFunc("allocate", ptrTy(), {sizeTy(), i1Ty()}, {extendToSize(size), i1(isOwner)});
+}
+
+Value* LgsCgModule::reallocate(Value* ptr, Value* size, const bool isOwner) {
+    return callRuntimeFunc("reallocate", ptrTy(), {ptrTy(), sizeTy(), i1Ty()}, {ptr, extendToSize(size), i1(isOwner)});
 }
 
 void LgsCgModule::callThrowError(const LgsBaseMsg& err, const std::vector<Value*>& args) {

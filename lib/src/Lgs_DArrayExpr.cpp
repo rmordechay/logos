@@ -5,9 +5,10 @@
 #include <cstring>
 
 extern "C" void Lgs_DArray_init(Lgs_DArrayExpr* arr, const Lgs_TypeInfo* dArr) {
-    arr->data = static_cast<char*>(Lgs_Runtime_allocate(arr->capacity * dArr->dArray.baseType->size, true));
-    arr->capacity = 10;
     arr->length = 0;
+    arr->capacity = 10;
+    void* ptr = Lgs_Runtime_allocate(arr->capacity * dArr->dArray.baseType->size, true);
+    arr->data = static_cast<char*>(ptr);
 }
 
 extern "C" void Lgs_DArray_add(Lgs_DArrayExpr* arr, const Lgs_TypeInfo* type, const void* value) {
