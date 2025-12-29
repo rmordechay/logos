@@ -54,7 +54,6 @@ public:
     virtual Value* hashValue(LgsCgModule& cg);
     virtual void assign(LgsCgModule& cg, LgsExpr* expr);
     virtual bool equals(LgsExpr* other);
-    LgsExpr* clone() override;
     virtual std::string asText() = 0;
 
     LgsFunc* asFunc();
@@ -82,6 +81,7 @@ public:
     LgsBinaryExpr* asBinExpr();
     LgsMetaSelection* asMetaSelection();
     LgsNullableExpr* asNullableExpr();
+    LgsExpr* clone() override;
     ~LgsExpr() override = default;
 };
 

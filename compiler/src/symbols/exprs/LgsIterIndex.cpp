@@ -121,16 +121,6 @@ void LgsIterIndex::assign(LgsCgModule& cg, LgsExpr* expr) {
     iter->addIRElement(cg, baseExpr->IRValue, index.from->IRValue, expr->loadIR(cg));
 }
 
-void LgsIterIndex::assignScalar(LgsCgModule& cg, LgsExpr* expr) const {
-    const auto rIRValue = expr->IRValue;
-    const auto indexIR = index.from->IRValue;
-    if (const auto iter = baseExpr->type->asIterable()) {
-        iter->addIRElement(cg, baseExpr->IRValue, indexIR, expr->IRValue);
-    } else {
-        cg.store(rIRValue, IRValue);
-    }
-}
-
 std::string LgsIterIndex::asText() {
     std::stringstream str;
     str << baseExpr->asText();

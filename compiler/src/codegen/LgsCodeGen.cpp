@@ -328,9 +328,8 @@ void LgsCodeGen::visitAssignment(const LgsAssignment* assignment) {
     } else if (const auto nullable = lValue->asNullableExpr()) {
         visitExpr(nullable->baseExpr, true);
         nullable->IRValue = nullable->baseExpr->IRValue;
-    } else {
-        assert(0);
     }
+    assignment->rExpr->pointee = assignment->lExpr->IRValue;
     visitExpr(assignment->rExpr, true);
 
     Value* results = nullptr;
@@ -1128,25 +1127,29 @@ void LgsCodeGen::visitPostfixExpr(LgsPostfixExpr* postfixExpr) {
 }
 
 void LgsCodeGen::visitStrConst(LgsStrConst* strConst) {
-    if (!strConst->parts.empty()) {
-        for (const auto parts : strConst->parts) {
-            visitExpr(parts);
+    if (strConst->parts.empty()) {
+        Value* str = cg.getString(strConst->value);
+        if (strConst->pointee) { // Str is field
+            str = cg.load(cg.ptrTy(), str);
         }
-        auto formatted = strConst->formatedStr;
-        std::vector<Value*> values;
-        for (const auto part : strConst->parts) {
-            auto partIR = part->loadIR(cg);
-            values.push_back(partIR);
-            const auto pos = formatted.find(LGS_STR_FMT_PLACEHOLDER);
-            if (pos != std::string::npos) {
-                formatted.replace(pos, strlen(LGS_STR_FMT_PLACEHOLDER), part->type->fmtStr());
-            }
-        }
-        strConst->IRValue = cg.callSnprintf(formatted + "\n", values);
+        strConst->IRValue = str;
         return;
     }
-    const auto str = cg.getString(strConst->value);
-    strConst->IRValue = str;
+
+    for (const auto parts : strConst->parts) {
+        visitExpr(parts);
+    }
+    auto formatted = strConst->formatedStr;
+    std::vector<Value*> values;
+    for (const auto part : strConst->parts) {
+        auto partIR = part->loadIR(cg);
+        values.push_back(partIR);
+        const auto pos = formatted.find(LGS_STR_FMT_PLACEHOLDER);
+        if (pos != std::string::npos) {
+            formatted.replace(pos, strlen(LGS_STR_FMT_PLACEHOLDER), part->type->fmtStr());
+        }
+    }
+    strConst->IRValue = cg.callSnprintf(formatted + "\n", values);
 }
 
 void LgsCodeGen::visitInstance(LgsInstance* instance) {
@@ -1373,24 +1376,25 @@ void LgsCodeGen::createMapFunc(LgsFunc* func) const {
 
     // Condition
     cg.startBlock(condBlock);
-    const auto iValue = cg.load(cg.sizeTy(), iPtr);
+    LgsIntConst size(&LGS_SIZE, 0);
+    size.IRValue = cg.load(cg.sizeTy(), iPtr);
     auto length = iterable->lenIR(cg, iterableParam.IRValue);
     length = cg.extendToSize(length);
-    const auto condition = cg.builder.CreateICmpSLT(iValue, length);
+    const auto condition = cg.builder.CreateICmpSLT(size.IRValue, length);
     cg.builder.CreateCondBr(condition, bodyBlock, exitBlock);
 
     // Body
     cg.startBlock(bodyBlock);
-    auto element = iterable->getIRElement(cg, iterableParam.IRValue, iValue);
+    auto element = iterable->getIRElement(cg, iterableParam.IRValue, size.IRValue);
     if (element->getType()->isPointerTy()) {
         element = cg.load(iterable->baseType->getIRType(cg), element);
     }
     const auto ft = llvm::dyn_cast<FunctionType>(callbackParam.type->getIRType(cg));
     const auto v = cg.builder.CreateCall(ft, callbackParam.IRValue, {element});
-    iterable->addIRElement(cg, newArr, iValue, v);
+    iterable->addIRElement(cg, newArr, size.IRValue, v);
 
     // Increment
-    const auto inc = cg.builder.CreateAdd(iValue, cg.usize(1));
+    const auto inc = cg.builder.CreateAdd(size.IRValue, cg.usize(1));
     cg.store(inc, iPtr);
     cg.builder.CreateBr(condBlock);
 

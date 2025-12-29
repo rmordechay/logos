@@ -47,7 +47,7 @@ Type* LgsObject::getIRType(LgsCgModule& cg) {
     for (size_t i = 0; i < fields.size(); ++i) {
         const auto field = fields[i];
         Type* fieldType;
-        const auto ptr = field->type->asObject() || field->type->asFuncType() || field->type->asInterface() || field->type->asDArray();
+        const auto ptr = field->type->asObject() || field->type->asFuncType() || field->type->asInterface();
         if (ptr) {
             fieldType = cg.ptrTy();
         } else {
@@ -75,7 +75,7 @@ Constant* LgsObject::getRTType(LgsCgModule& cg) {
 size_t LgsObject::sizeBytes() {
     size_t sum = 0;
     for (const auto& field : fields) {
-        if (field->type->asObject() || field->type->asFuncType() || field->type->asInterface() || field->type->asDArray()) {
+        if (field->type->asObject() || field->type->asFuncType() || field->type->asInterface()) {
             sum += sizeof(void*);
         } else {
             sum += field->type->sizeBytes();

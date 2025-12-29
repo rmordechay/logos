@@ -8,17 +8,16 @@ public:
     std::string value;
     std::string formatedStr = "";
     std::vector<LgsExpr*> parts;
-    bool isSingleQuoted;
 
     explicit LgsStrConst(const std::string& v) : value(v) {
         isMutable = false;
         if (v.size() == 1) {
-            setType(&LGS_CHAR);
+            type = &LGS_CHAR;
         } else {
             const auto lgsStr = new LgsStr();
             lgsStr->isStatic = true;
             lgsStr->size = new LgsIntConst(&LGS_INT, v.size());
-            setType(lgsStr);
+            type = lgsStr;
         }
     }
     LgsExpr* castExplicitly(LgsType* toType) override;

@@ -19,12 +19,11 @@ LgsExpr* LgsStrConst::castExplicitly(LgsType* toType) {
 }
 
 Value* LgsStrConst::loadIR(LgsCgModule& cg) {
-    return cg.load(cg.ptrTy(), IRValue);
+    return cg.load(type->getIRType(cg), IRValue);
 }
 
 std::string LgsStrConst::asText() {
-    const auto quote = isSingleQuoted ? '\'' : '\"';
-    return quote + scanEscapeStr(value) + quote;
+    return '\"' + scanEscapeStr(value) + '\"';
 }
 
 Value* LgsStrConst::hashValue(LgsCgModule& cg) {

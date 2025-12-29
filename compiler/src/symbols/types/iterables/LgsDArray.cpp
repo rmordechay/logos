@@ -35,7 +35,7 @@ bool LgsDArray::inferBaseType(std::vector<LgsExpr*>& args) {
 }
 
 Type* LgsDArray::getIRType(LgsCgModule& cg) {
-    return cg.getStructType({cg.ptrTy(), cg.sizeTy(), cg.sizeTy(), cg.ptrTy()}, name);
+    return cg.getStructType({cg.ptrTy(), cg.sizeTy(), cg.sizeTy()}, name);
 }
 
 Constant* LgsDArray::getRTType(LgsCgModule& cg) {

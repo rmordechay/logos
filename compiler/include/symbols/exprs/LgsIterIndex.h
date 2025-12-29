@@ -26,7 +26,6 @@ public:
     void setIRElementPtr(LgsCgModule& cg, bool assign = false);
     void setIRRangePtr(LgsCgModule& cg, bool assign = false);
     void assign(LgsCgModule& cg, LgsExpr* expr) override;
-    void assignScalar(LgsCgModule& cg, LgsExpr* expr) const;
     std::string asText() override;
     Type* getSArrayType(LgsCgModule& cg) const;
     void setDebugValue(LgsCgModule& cg) override;
