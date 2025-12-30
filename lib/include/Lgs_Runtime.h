@@ -6,8 +6,9 @@
 #include <unordered_set>
 
 struct Lgs_StackFrame {
-    std::vector<Lgs_ThunkFunc> defers;
+    std::unordered_set<void*> owners;
     std::unordered_set<void*> orphans;
+    std::vector<Lgs_ThunkFunc> defers;
 };
 
 struct Lgs_Runtime {

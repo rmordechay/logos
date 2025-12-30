@@ -20,7 +20,7 @@ std::string getLine(const std::string& filename, size_t lineNumber);
 std::string trim(const std::string& str);
 std::string getFullPath(const LgsLocation& location, const std::string& filePath);
 std::string scanEscapeStr(const std::string& value);
-uint64_t hashString(const std::string& str);
+size_t hashString(const std::string& str);
 time_t getLastWritten(const fs::path& filePath);
 
 void logInfo(const std::string& msg = "", bool withNewLine = false);

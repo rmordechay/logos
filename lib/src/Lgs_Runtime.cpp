@@ -86,3 +86,7 @@ extern "C" void Lgs_Runtime_throwError(const size_t count, const char* msg, ...)
     logError(std::string(out) + "\n");
     exit(1);
 }
+
+extern "C" size_t Lgs_Runtime_hash(const char* str) {
+    return hashString(str);
+}

@@ -128,7 +128,8 @@ std::string scanEscapeStr(const std::string& value) {
     return out;
 }
 
-uint64_t hashString(const std::string& str) {
+size_t hashString(const std::string& str) {
+    assert(str != "");
     return std::hash<std::string_view>{}(str);
 }
 

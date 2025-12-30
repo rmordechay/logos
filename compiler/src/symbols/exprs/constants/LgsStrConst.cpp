@@ -27,7 +27,7 @@ std::string LgsStrConst::asText() {
 }
 
 Value* LgsStrConst::hashValue(LgsCgModule& cg) {
-    return cg.hashConst(value);
+    return cg.callHash(IRValue);
 }
 
 void LgsStrConst::hashNode(size_t& oldHash) {

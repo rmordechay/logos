@@ -29,9 +29,9 @@
 #define LGS_EMPTY_STR "\"\""
 
 #define BLOCK_ENTRY "entry"
-#define BLOCK_IF_TRUE "if_true"
+#define BLOCK_TRUE "if_true"
 #define BLOCK_IF_FALSE "if_false"
-#define BLOCK_IF_EXIT "if_exit"
+#define BLOCK_EXIT "if_exit"
 #define BLOCK_ELSE_IF "else_if"
 #define BLOCK_ELSE_IF_CHECK "else_if_check"
 #define BLOCK_EXIT_PATTERN "exit_switch"

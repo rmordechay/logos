@@ -85,7 +85,6 @@ public:
     void callStackPush();
     void callPopStack();
     Value* callHash(Value* arg);
-    Constant* hashConst(const std::string& str);
     void addToVTable(Value* instance, Value* key, Value* ptr);
     Value* getFromVTable(Value* instance, Value* key);
     void freeValue(Value* ptr);
@@ -151,11 +150,11 @@ public:
     Value* extendToSize(Value* v);
     Constant* floatv(float_t v);
     Constant* doublev(double_t v);
-    TypeSize typeSize(Type* v) const;
     Value* emptyStr();
 
     // Debugging
     void printStr(const std::string& str);
+    void printStr(Value* str);
     void printPtr(Value* ptr, const std::string& text = "");
     void printInt(Value* number, const std::string& text = "");
 

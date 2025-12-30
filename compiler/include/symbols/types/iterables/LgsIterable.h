@@ -32,9 +32,9 @@ public:
     virtual bool inferBaseType(std::vector<LgsExpr*>& args) = 0;
     virtual Value* lenIR(LgsCgModule& cg, Value* iterable) = 0;
     virtual Value* inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) = 0;
-    virtual Value* getIRElement(LgsCgModule& cg, Value* iterable, Value* index) = 0;
+    virtual Value* getIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index) = 0;
     virtual bool unpackLoopVarsTypes(LgsForeachLoop* loop) const;
-    virtual void unpackLoopIR(LgsCgModule& cg, LgsForeachLoop* loop) const;
-    virtual void addIRElement(LgsCgModule& cg, Value* iterable, Value* index, Value* value);
+    virtual void unpackLoopIR(LgsCgModule& cg, LgsForeachLoop* loop);
+    virtual void addIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index, LgsExpr* value);
     ~LgsIterable() override;
 };

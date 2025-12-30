@@ -15,7 +15,7 @@ LgsFunc* LgsDArray::getMethod(const std::string& methodName) {
         if (methods.contains(ADD_FUNC)) return methods[ADD_FUNC];
         const auto func = new LgsFunc(ADD_FUNC, name, &LGS_VOID, {this, baseType}, flags);
         func->fn = [this](LgsCgModule& cg, const std::vector<LgsFuncArg>& args) {
-            addIRElement(cg, args[0].expr->IRValue, nullptr, args[1].expr->IRValue);
+            addIRElement(cg, args[0].expr, nullptr, args[1].expr);
             return nullptr;
         };
         addMethod(func);
@@ -108,46 +108,45 @@ Value* LgsDArray::inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) {
     return cg.callLgsFunc(name, "contains", cg.i1Ty(), params, IRArgs);
 }
 
-Value* LgsDArray::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
+Value* LgsDArray::getIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index) {
     const auto ty = getIRType(cg);
     const auto baseSize = cg.usize(baseType->sizeBytes());
-    const auto dataFieldPtr = cg.builder.CreateStructGEP(ty, iterable, 0);
-    const auto offset = cg.builder.CreateMul(index, baseSize);
+    const auto dataFieldPtr = cg.builder.CreateStructGEP(ty, iterable->IRValue, 0);
+    const auto offset = cg.builder.CreateMul(index->IRValue, baseSize);
     const auto dataField = cg.load(cg.ptrTy(), dataFieldPtr);
     return cg.builder.CreateInBoundsPtrAdd(dataField, offset);
 }
 
-void LgsDArray::addIRElement(LgsCgModule& cg, Value* iterable, Value* index, Value* value) {
+void LgsDArray::addIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index, LgsExpr* value) {
     if (index) assert(0);
-
     const auto funcName = getName() + "_add";
     if (const auto f = cg.IRModule->getFunction(funcName)) {
-        cg.builder.CreateCall(f, {iterable, value});
+        cg.builder.CreateCall(f, {iterable->IRValue, value->IRValue});
         return;
     }
     const auto ty = getIRType(cg);
     const auto baseSize = cg.usize(baseType->sizeBytes());
+    const std::vector<Type*> params = {cg.ptrTy(), baseType->getIRType(cg)};
+    const auto ft = cg.getFT(cg.voidTy(), params);
+    const auto func = cg.getFunc(funcName, ft);
 
     // Save state
     cg.savedIP = cg.builder.saveIP();
     const auto originalFunc = cg.currentFunc;
-    const std::vector<Type*> params = {cg.ptrTy(), baseType->getIRType(cg)};
-    const auto ft = cg.getFT(cg.voidTy(), params);
-    const auto func = cg.getFunc(funcName, ft);
     cg.currentFunc = func;
 
     // Prologue
     const auto entryBlock = cg.createBlock(BLOCK_ENTRY, cg.currentFunc);
-    const auto needsResizeBlock = cg.createBlock(BLOCK_IF_TRUE);
-    const auto exitBlock = cg.createBlock(BLOCK_IF_EXIT);
+    const auto needsResizeBlock = cg.createBlock(BLOCK_TRUE);
+    const auto exitBlock = cg.createBlock(BLOCK_EXIT);
     cg.builder.SetInsertPoint(entryBlock);
     cg.callStackPush();
 
-    const auto iterParam = cg.currentFunc->getArg(0);
-    const auto valueParam = cg.currentFunc->getArg(1);
-    const auto dataFieldPtr = cg.builder.CreateStructGEP(ty, iterParam, 0);
-    const auto lenFieldPtr = cg.builder.CreateStructGEP(ty, iterParam, 1);
-    const auto capFieldPtr = cg.builder.CreateStructGEP(ty, iterParam, 2);
+    const auto arrIR = cg.currentFunc->getArg(0);
+    const auto elementIR = cg.currentFunc->getArg(1);
+    const auto dataFieldPtr = cg.builder.CreateStructGEP(ty, arrIR, 0);
+    const auto lenFieldPtr = cg.builder.CreateStructGEP(ty, arrIR, 1);
+    const auto capFieldPtr = cg.builder.CreateStructGEP(ty, arrIR, 2);
     const auto dataField = cg.load(cg.ptrTy(), dataFieldPtr);
     const auto lenField = cg.load(cg.sizeTy(), lenFieldPtr);
     const auto capField = cg.load(cg.sizeTy(), capFieldPtr);
@@ -158,18 +157,18 @@ void LgsDArray::addIRElement(LgsCgModule& cg, Value* iterable, Value* index, Val
     // Resize
     cg.startBlock(needsResizeBlock);
     const auto newCap = cg.builder.CreateMul(capField, cg.usize(2));
-    cg.storeStructField(ty, iterParam, 2, newCap);
+    cg.storeStructField(ty, arrIR, 2, newCap);
     cg.reallocate(dataField, newCap, true);
     cg.branchAndStartBlock(exitBlock);
 
     // Set element
     const auto offset = cg.builder.CreateMul(lenField, baseSize);
     const auto elementPtr = cg.builder.CreateInBoundsPtrAdd(dataField, offset);
-    cg.store(valueParam, elementPtr);
+    cg.store(elementIR, elementPtr);
 
     // Increment length
     const auto inc = cg.builder.CreateAdd(lenField, cg.usize(1));
-    cg.storeStructField(ty, iterParam, 1, inc);
+    cg.storeStructField(ty, arrIR, 1, inc);
 
     // Epilogue
     cg.callPopStack();
@@ -178,7 +177,9 @@ void LgsDArray::addIRElement(LgsCgModule& cg, Value* iterable, Value* index, Val
     // Restore state
     cg.currentFunc = originalFunc;
     cg.builder.restoreIP(cg.savedIP);
-    cg.builder.CreateCall(func, {iterable, value});
+
+    // Call
+    cg.builder.CreateCall(func, {iterable->IRValue, value->IRValue});
 }
 
 bool LgsDArray::canCastTo(LgsType* other) {

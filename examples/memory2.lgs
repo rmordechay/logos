@@ -8,13 +8,16 @@ object Child {
 }
 
 func(parent: Parent) {
-    //child1 = Child{id=23}
-    parent.child := Child{id=35}
+    child1 = Child{id=23}
+    if true {
+        parent.child := child1
+    }
 }
 
 main() {
     child1 = Child{id=23}
     parent1 = Parent{id=1, child=child1}
+    parent2 = Parent{id=2, child=child1}
     print(parent1.child.id)
     func(parent1)
     print(parent1.child.id)

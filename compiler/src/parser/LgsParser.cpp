@@ -669,8 +669,8 @@ LgsMap* LgsParser::parseMapType() {
     const auto r = parseType();
     mustParse(r);
     mustMatch(T_RBRACE);
-    mapType->mapType->key = l;
-    mapType->mapType->value = r;
+    mapType->typePair->key = l;
+    mapType->typePair->value = r;
     setLocation(mapType->location, &startToken, &currentToken);
     return mapType;
 }

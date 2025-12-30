@@ -133,9 +133,9 @@ bool LgsMatrix::inferBaseType(std::vector<LgsExpr*>& args) {
     assert(0);
 }
 
-Value* LgsMatrix::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
-    const auto i = cg.builder.CreateMul(index, cg.i32(columns));
-    const auto gep = cg.builder.CreateGEP(getIRType(cg), iterable, {cg.i32Zero(), i});
+Value* LgsMatrix::getIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index) {
+    const auto i = cg.builder.CreateMul(index->IRValue, cg.i32(columns));
+    const auto gep = cg.builder.CreateGEP(getIRType(cg), iterable->IRValue, {cg.i32Zero(), i});
     const auto rows2 = cg.builder.CreateAlloca(baseType->getIRType(cg), cg.i32(columns));
     cg.callMemCpy(rows2, gep, cg.i32(baseType->sizeBytes() * columns));
     return rows2;

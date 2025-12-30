@@ -25,7 +25,7 @@ public:
     LgsType* applyMatScalarOp(LgsType* number, const LgsBinOp& op) const;
     LgsType* applyMatVecOp(const LgsVec* vec, const LgsBinOp& op) const;
     LgsType* applyMatMatOp(const LgsMatrix* otherMat, const LgsBinOp& op) const;
-    Value* getIRElement(LgsCgModule& cg, Value* iterable, Value* index) override;
+    Value* getIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index) override;
     Value* mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
     Value* inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
     Value* lenIR(LgsCgModule& cg, Value* iterable) override;

@@ -38,8 +38,14 @@ Value* LgsSArray::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
     const auto ty = getIRType(cg);
     const auto arrSize = size->getConstInt().value();
     const auto arr = pointee ? pointee : cg.builder.CreateAlloca(ty);
+    LgsIntConst index(&LGS_INT, 0);
+    const auto tempExpr = baseType->getZeroValue();
     for (int64_t i = 0; i < arrSize; ++i) {
-        addIRElement(cg, arr, cg.i32(i), baseType->getIRZeroValue(cg));
+        index.IRValue = cg.i32(i);
+        tempExpr->IRValue = baseType->getIRZeroValue(cg);
+        const std::vector<Value*> indices = {cg.i32Zero(), cg.i32(i)};
+        const auto gep = cg.builder.CreateInBoundsGEP(getIRType(cg), arr, indices);
+        cg.store(baseType->getIRZeroValue(cg), gep);
     }
     return arr;
 }
@@ -118,7 +124,9 @@ Value* LgsSArray::inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) {
         const auto trueBlock = cg.createBlock();
         const auto falseBlock = cg.createBlock();
         const auto tempExpr = iterableExpr->type->asIterable()->baseType->getZeroValue();
-        tempExpr->IRValue = getIRElement(cg, iterableExpr->IRValue, index);
+        LgsIntConst tempIndex(&LGS_INT, 0);
+        tempIndex.IRValue = index;
+        tempExpr->IRValue = getIRElement(cg, iterableExpr, &tempIndex);
         const auto eq = eqIR(cg, tempExpr, value);
         cg.builder.CreateCondBr(eq, trueBlock, falseBlock);
         cg.startBlock(trueBlock);
@@ -130,15 +138,15 @@ Value* LgsSArray::inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) {
     return cg.load(cg.builder.getInt1Ty(), resultPtr);
 }
 
-Value* LgsSArray::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
-    const auto gep = cg.builder.CreateGEP(getIRType(cg), iterable, {cg.i32Zero(), index});
+Value* LgsSArray::getIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index) {
+    const auto gep = cg.builder.CreateGEP(getIRType(cg), iterable->IRValue, {cg.i32Zero(), index->IRValue});
     return cg.load(baseType->getIRType(cg), gep);
 }
 
-void LgsSArray::addIRElement(LgsCgModule& cg, Value* iterable, Value* index, Value* value) {
-    const std::vector<Value*> indices = {cg.i32Zero(), index};
-    const auto gep = cg.builder.CreateInBoundsGEP(getIRType(cg), iterable, indices);
-    cg.store(value, gep);
+void LgsSArray::addIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index, LgsExpr* value) {
+    const std::vector<Value*> indices = {cg.i32Zero(), index->IRValue};
+    const auto gep = cg.builder.CreateInBoundsGEP(getIRType(cg), iterable->IRValue, indices);
+    cg.store(value->IRValue, gep);
 }
 
 Value* LgsSArray::lenIR(LgsCgModule& cg, Value* iterable) {

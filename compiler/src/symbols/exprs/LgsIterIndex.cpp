@@ -60,21 +60,21 @@ void LgsIterIndex::setIRElementPtr(LgsCgModule& cg, const bool assign) {
 
     // Map
     if (const auto map = baseExpr->type->asMap()) {
-        IRValue = map->getIRElement(cg, baseExpr->IRValue, fromIR);
+        IRValue = map->getIRElement(cg, baseExpr, index.from);
         return;
     }
 
     // Matrix
     if (const auto matrix = baseExpr->type->asMatrix()) {
         if (!boundsChecked) cg.createIndexBoundsGuard(cg.i32(matrix->rows), fromIR);
-        IRValue = matrix->getIRElement(cg, baseExpr->IRValue, fromIR);
+        IRValue = matrix->getIRElement(cg, baseExpr, index.from);
         return;
     }
 
     // Fallback
     if (const auto iter = baseExpr->type->asIterable()) {
         fromIR = cg.builder.CreateZExt(fromIR, cg.i64Ty());
-        IRValue = iter->getIRElement(cg, baseExpr->IRValue, fromIR);
+        IRValue = iter->getIRElement(cg, baseExpr, index.from);
     }
 }
 
@@ -118,7 +118,11 @@ void LgsIterIndex::setIRRangePtr(LgsCgModule& cg, bool assign) {
 void LgsIterIndex::assign(LgsCgModule& cg, LgsExpr* expr) {
     const auto iter = baseExpr->type->asIterable();
     assert(iter);
-    iter->addIRElement(cg, baseExpr->IRValue, index.from->IRValue, expr->loadIR(cg));
+    if (const auto addFunc = iter->getMethod("add"); addFunc->fn) {
+        addFunc->fn(cg, {LgsFuncArg(baseExpr), LgsFuncArg(index.from), LgsFuncArg(expr)});
+    } else {
+        iter->addIRElement(cg, baseExpr, index.from, expr);
+    }
 }
 
 std::string LgsIterIndex::asText() {

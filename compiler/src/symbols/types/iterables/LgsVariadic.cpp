@@ -54,6 +54,6 @@ Value* LgsVariadic::inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value)
     assert(0);
 }
 
-Value* LgsVariadic::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
-    return cg.builder.CreateVAArg(iterable, baseType->getIRType(cg));
+Value* LgsVariadic::getIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index) {
+    return cg.builder.CreateVAArg(iterable->IRValue, baseType->getIRType(cg));
 }

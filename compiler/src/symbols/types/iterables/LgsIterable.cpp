@@ -30,6 +30,9 @@ LgsFunc* LgsIterable::getMethod(const std::string& methodName) {
     if (methodName == LEN_FUNC) {
         if (methods.contains(LEN_FUNC)) return methods[LEN_FUNC];
         const auto func = new LgsFunc(LEN_FUNC, getBaseName(), &LGS_SIZE, {this}, flags);
+        func->fn = [this](LgsCgModule& cg, const std::vector<LgsFuncArg>& args) {
+            return lenIR(cg, args.front().expr->IRValue);
+        };
         addMethod(func);
         return func;
     }
@@ -82,22 +85,22 @@ LgsType* LgsIterable::getValueType() {
 
 bool LgsIterable::unpackLoopVarsTypes(LgsForeachLoop* loop) const {
     if (loop->loopVars.size() > 1) return false;
-    const auto iterIndex = new LgsIterIndex(loop->iterExpr, LGS_SIZE.getZeroValue());
     assert(baseType);
+    const auto iterIndex = new LgsIterIndex(loop->iterExpr, LGS_SIZE.getZeroValue());
     iterIndex->setType(baseType);
     loop->loopVars[0]->expr = iterIndex;
     loop->loopVars[0]->setType(iterIndex->type);
     return true;
 }
 
-void LgsIterable::unpackLoopIR(LgsCgModule& cg, LgsForeachLoop* loop) const {
+void LgsIterable::unpackLoopIR(LgsCgModule& cg, LgsForeachLoop* loop) {
     const auto iterIndex = loop->loopVars[0]->expr->asIterIndex();
-    iterIndex->index.from->IRValue = loop->iValue;
+    iterIndex->index.from->IRValue = loop->loadIndex(cg);
     iterIndex->setIRElementPtr(cg);
     loop->loopVars[0]->IRValue = iterIndex->IRValue;
 }
 
-void LgsIterable::addIRElement(LgsCgModule& cg, Value* iterable, Value* index, Value* value) {
+void LgsIterable::addIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index, LgsExpr* value) {
     assert(0);
 }
 

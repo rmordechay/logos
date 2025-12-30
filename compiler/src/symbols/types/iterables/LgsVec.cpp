@@ -202,8 +202,11 @@ Value* LgsVec::inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) {
     cg.loop(cg.i64(dimVec), [this, &cg, iterableExpr, value, resultPtr](Value* index, BasicBlock* exitBlock) {
         const auto trueBlock = cg.createBlock();
         const auto falseBlock = cg.createBlock();
-        const auto tempExpr = iterableExpr->type->asIterable()->baseType->getZeroValue();
-        tempExpr->IRValue = getIRElement(cg, iterableExpr->IRValue, index);
+        const auto iterable = iterableExpr->type->asIterable();
+        const auto tempExpr = iterable->baseType->getZeroValue();
+        LgsIntConst tempIndex(&LGS_INT, 0);
+        tempIndex.IRValue = index;
+        tempExpr->IRValue = getIRElement(cg, iterableExpr, &tempIndex);
         const auto eq = eqIR(cg, tempExpr, value);
         cg.builder.CreateCondBr(eq, trueBlock, falseBlock);
         cg.startBlock(trueBlock);
@@ -219,17 +222,17 @@ Value* LgsVec::lenIR(LgsCgModule& cg, Value* iterable) {
     return cg.usize(dimVec);
 }
 
-Value* LgsVec::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
-    Value* vec = iterable;
-    if (iterable->getType()->isPointerTy()) {
-        vec = cg.load(getIRType(cg), iterable);
+Value* LgsVec::getIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index) {
+    Value* vec = iterable->IRValue;
+    if (iterable->IRValue->getType()->isPointerTy()) {
+        vec = cg.load(getIRType(cg), iterable->IRValue);
     }
-    return cg.builder.CreateExtractElement(vec, index);
+    return cg.builder.CreateExtractElement(vec, index->IRValue);
 }
 
-void LgsVec::addIRElement(LgsCgModule& cg, Value* iterable, Value* index, Value* value) {
-    const auto gep = cg.builder.CreateGEP(getIRType(cg), iterable, {cg.i32Zero(), index});
-    cg.store(value, gep);
+void LgsVec::addIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index, LgsExpr* value) {
+    const auto gep = cg.builder.CreateGEP(getIRType(cg), iterable->IRValue, {cg.i32Zero(), index->IRValue});
+    cg.store(value->IRValue, gep);
 }
 
 Value* LgsVec::matVecMul(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right) const {

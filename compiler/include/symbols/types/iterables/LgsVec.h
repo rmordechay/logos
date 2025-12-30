@@ -35,8 +35,8 @@ public:
     Value* crossIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
     Value* inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
     Value* lenIR(LgsCgModule& cg, Value* iterable) override;
-    Value* getIRElement(LgsCgModule& cg, Value* iterable, Value* index) override;
-    void addIRElement(LgsCgModule& cg, Value* iterable, Value* index, Value* value) override;
+    Value* getIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index) override;
+    void addIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index, LgsExpr* value) override;
     Value* matVecMul(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right) const;
     static size_t getSwizzleSet(char c);
     static size_t getComponentIndex(char c);

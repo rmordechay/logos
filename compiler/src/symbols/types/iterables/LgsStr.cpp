@@ -64,8 +64,8 @@ LgsType* LgsStr::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     return nullptr;
 }
 
-Value* LgsStr::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
-    const auto gep =  cg.builder.CreateGEP(cg.i8Ty(), iterable, {cg.i32Zero(), index});
+Value* LgsStr::getIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index) {
+    const auto gep =  cg.builder.CreateGEP(cg.i8Ty(), iterable->IRValue, {cg.i32Zero(), index->IRValue});
     return cg.load(cg.i8Ty(), gep);
 }
 

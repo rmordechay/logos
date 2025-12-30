@@ -29,6 +29,6 @@ public:
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     Value* lenIR(LgsCgModule& cg, Value* iterable) override;
     Value* inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
-    Value* getIRElement(LgsCgModule& cg, Value* iterable, Value* index) override;
+    Value* getIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index) override;
     DIType* getDebugType(LgsCgModule& cg) override;
 };

@@ -185,11 +185,7 @@ void LgsCgModule::callPopStack() {
 }
 
 Value* LgsCgModule::callHash(Value* arg) {
-    return callLgsFunc("", "hash", i32Ty(), {ptrTy()}, {arg});
-}
-
-Constant* LgsCgModule::hashConst(const std::string& str) {
-    return i64(hashString(str));
+    return callRuntimeFunc("hash", sizeTy(), {ptrTy()}, {arg});
 }
 
 void LgsCgModule::addToVTable(Value* instance, Value* key, Value* ptr) {
@@ -452,10 +448,6 @@ Constant* LgsCgModule::doublev(const double_t v) {
     return llvm::ConstantFP::get(doubleTy(), v);
 }
 
-TypeSize LgsCgModule::typeSize(Type* v) const {
-    return IRModule->getDataLayout().getTypeStoreSize(v);
-}
-
 Value* LgsCgModule::emptyStr() {
     const auto name = LGS_PREFIX"emptyStr";
     const auto s = IRModule->getNamedGlobal(name);
@@ -467,6 +459,10 @@ Value* LgsCgModule::emptyStr() {
 
 void LgsCgModule::printStr(const std::string& str) {
     callPrintf({getString("%s"), getString(str)});
+}
+
+void LgsCgModule::printStr(Value* str) {
+    callPrintf({getString("%s\n"), str});
 }
 
 void LgsCgModule::printPtr(Value* ptr, const std::string& text) {
