@@ -24,16 +24,13 @@ bool LgsFuncCall::equals(LgsFuncType* funcType) const {
         auto paramsByName = funcType->getParamsByName();
         for (size_t i = funcType->isMethod; i < argsSize; ++i) {
             const auto arg = args[i];
-            const auto param = paramsByName[arg.name];
-            if (argAndParamEqual(arg.expr, param)) continue;
+            if (argAndParamEqual(args[i].expr, paramsByName[arg.name])) continue;
             return false;
         }
     } else {
         for (size_t i = funcType->isMethod; i < paramsSize; ++i) {
             if (i >= argsSize) continue;
-            const auto arg = args[i];
-            const auto param = funcType->params[i];
-            if (argAndParamEqual(arg.expr, &param)) continue;
+            if (argAndParamEqual(args[i].expr, &funcType->params[i])) continue;
             return false;
         }
     }

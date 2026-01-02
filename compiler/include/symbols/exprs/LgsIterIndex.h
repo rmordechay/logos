@@ -29,5 +29,6 @@ public:
     std::string asText() override;
     Type* getSArrayType(LgsCgModule& cg) const;
     void setDebugValue(LgsCgModule& cg) override;
+    LgsExpr* clone() override;
     ~LgsIterIndex() override;
 };

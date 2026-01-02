@@ -140,6 +140,10 @@ std::string LgsInt::getName() {
     return name;
 }
 
+LgsType* LgsInt::clone() {
+    return this;
+}
+
 DIType* LgsInt::getDebugType(LgsCgModule& cg) {
     return cg.debugger.diBuilder->createBasicType(name, 32, dwarf::DW_ATE_signed);
 }

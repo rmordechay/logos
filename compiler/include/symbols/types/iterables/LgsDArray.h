@@ -17,6 +17,7 @@ public:
     bool inferBaseType(std::vector<LgsExpr*>& args) override;
     Type* getIRType(LgsCgModule& cg) override;
     Constant* getRTType(LgsCgModule& cg) override;
+    LgsType* replaceGenerics(LgsType* replacement, std::unordered_map<std::string, LgsType*>& replacements) override;
     std::string getBaseName() override;
     std::string getName() override;
     std::string pname() override;
@@ -30,5 +31,6 @@ public:
     Value* getIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index) override;
     void addIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index, LgsExpr* value) override;
     bool canCastTo(LgsType* other) override;
+    LgsType* clone() override;
     DIType* getDebugType(LgsCgModule& cg) override;
 };

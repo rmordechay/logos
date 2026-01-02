@@ -1709,16 +1709,16 @@ void LgsSema::makeGenericFuncCall(LgsFuncCall* funcCall, const LgsFunc* func) {
     if (generics != file->symbolTable.genericFuncCalls.end()) {
         genericFunc = generics->second;
     } else {
-        const auto newFuncType = new LgsFuncType(*func->funcType);
+        const auto newFuncType = func->funcType->clone();
         newFuncType->genericTypes.clear();
         genericFunc = new LgsFunc(newFuncType);
-        for (size_t i = 0; i < newFuncType->params.size(); ++i) {
-            const auto& paramType = newFuncType->params[i].type;
-            if (!paramType->hasGenericTypes()) continue;
-            newFuncType->params[i].type = funcCall->args[i].expr->type;
+        std::unordered_map<std::string, LgsType*> replacements;
+        for (size_t i = func->funcType->isMethod; i < newFuncType->params.size(); ++i) {
+            const auto replacement = funcCall->args[i].expr->type;
+            newFuncType->params[i].type = newFuncType->params[i].type->replaceGenerics(replacement, replacements);
         }
-        if (newFuncType->rt->hasGenericTypes()) {
-            newFuncType->rt = funcCall->type;
+        if (newFuncType->hasGenericTypes()) {
+            newFuncType->rt = newFuncType->rt->replaceGenerics(funcCall->type, replacements);
         }
         if (func->stmtsBlock) {
             genericFunc->stmtsBlock = func->stmtsBlock->clone();

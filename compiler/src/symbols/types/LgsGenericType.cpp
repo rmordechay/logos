@@ -11,6 +11,11 @@ Constant* LgsGenericType::getRTType(LgsCgModule& cg) {
     return nullptr;
 }
 
+LgsType* LgsGenericType::replaceGenerics(LgsType* replacement, std::unordered_map<std::string, LgsType*>& replacements) {
+    replacements[name] = replacement;
+    return replacement;
+}
+
 size_t LgsGenericType::sizeBytes() {
     assert(0);
 }
@@ -33,6 +38,11 @@ LgsType* LgsGenericType::applyBinOp(LgsType* rightType, LgsBinOp& op) {
 
 std::string LgsGenericType::fmtStr() const {
     assert(0);
+}
+
+LgsType* LgsGenericType::clone() {
+    const auto newGeneric = new LgsGenericType(*this);
+    return newGeneric;
 }
 
 DIType* LgsGenericType::getDebugType(LgsCgModule& cg) {

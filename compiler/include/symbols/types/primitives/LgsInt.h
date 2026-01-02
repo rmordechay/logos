@@ -29,6 +29,7 @@ public:
     Value* lshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
     std::string fmtStr() const override;
     std::string getName() override;
+    LgsType* clone() override;
     DIType* getDebugType(LgsCgModule& cg) override;
 };
 

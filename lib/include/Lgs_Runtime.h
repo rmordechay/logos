@@ -15,7 +15,6 @@ struct Lgs_Runtime {
     int16_t stackLevel = -1;
     Lgs_Allocator allocator;
     LgsErrHandler errHandler;
-    std::unordered_set<void*> owners;
     std::vector<Lgs_ThunkFunc> coros;
     std::array<Lgs_StackFrame, 1024> stack;
     std::unordered_map<VKey, void*, VKeyHash> vtable;

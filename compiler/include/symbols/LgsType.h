@@ -61,7 +61,7 @@ class LgsType {
 public:
     LgsLocation location;
     std::vector<LgsField*> fields;
-    std::map<std::string, LgsFunc*> methods;
+    std::unordered_map<std::string, LgsFunc*> methods;
     std::vector<LgsType*> genericArgs;
     bool isInt = false;
     bool isUnsinged = false;
@@ -69,7 +69,6 @@ public:
     bool isPrimitive = false;
     bool isHeapAlloc = false;
     bool passByRef = false;
-    static std::unordered_map<std::string, uint8_t> numberPrecedences;
 
     bool addField(LgsField* field);
     bool addMethod(LgsFunc* method);
@@ -83,6 +82,7 @@ public:
 
     virtual LgsField* getField(const std::string& fieldName);
     virtual LgsFunc* getMethod(const std::string& methodName);
+    virtual LgsType* replaceGenerics(LgsType* replacement, std::unordered_map<std::string, LgsType*>& replacements);
     virtual size_t sizeBytes() = 0;
     virtual LgsExpr* getZeroValue() = 0;
     virtual Value* getIRZeroValue(LgsCgModule& cg, Value* pointee = nullptr);
@@ -96,6 +96,7 @@ public:
     virtual std::string getName() = 0;
     virtual std::string pname(); // pretty name
     virtual bool equals(LgsType* other);
+    virtual LgsType* clone();
 
     virtual Value* addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
     virtual Value* subIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);

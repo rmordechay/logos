@@ -39,6 +39,17 @@ LgsExpr* LgsFuncType::getZeroValue() {
     assert(0);
 }
 
+LgsType* LgsFuncType::replaceGenerics(LgsType* replacement, std::unordered_map<std::string, LgsType*>& replacements) {
+    const auto otherFT = replacement->asFuncType();
+    if (!otherFT) return this;
+    rt = rt->replaceGenerics(otherFT->rt, replacements);
+    for (size_t i = 0; i < params.size(); ++i) {
+        const auto otherParamType = otherFT->params[i].type;
+        params[i].type = params[i].type->replaceGenerics(otherParamType, replacements);
+    }
+    return this;
+}
+
 size_t LgsFuncType::sizeBytes() {
     return sizeof(void*);
 }
@@ -153,6 +164,16 @@ std::unordered_map<std::string, LgsParam*> LgsFuncType::getParamsByName() {
 
 DIType* LgsFuncType::getDebugType(LgsCgModule& cg) {
     assert(0);
+}
+
+LgsFuncType* LgsFuncType::clone() {
+    const auto newFuncType = new LgsFuncType(*this);
+    newFuncType->rt = rt->clone();
+    newFuncType->params.clear();
+    for (const auto& param : params) {
+        newFuncType->params.emplace_back(param.type->clone());
+    }
+    return newFuncType;
 }
 
 LgsFuncType::~LgsFuncType() {

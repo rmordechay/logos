@@ -30,7 +30,7 @@
 #include "types/primitives/LgsUInt.h"
 #include "types/primitives/LgsULong.h"
 
-std::unordered_map<std::string, uint8_t> LgsType::numberPrecedences = {
+static std::unordered_map<std::string, uint8_t> numberPrecedences = {
     {LgsBool::name, 1},
     {LgsByte::name, 2},
     // {LgsUByte::name, 3},
@@ -115,6 +115,10 @@ LgsFunc* LgsType::getMethod(const std::string& methodName) {
     return nullptr;
 }
 
+LgsType* LgsType::replaceGenerics(LgsType* replacement, std::unordered_map<std::string, LgsType*>& replacements) {
+    return this;
+}
+
 Value* LgsType::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
     assert(0);
 }
@@ -137,6 +141,10 @@ std::string LgsType::pname() {
 
 bool LgsType::equals(LgsType* other) {
     return getName() == other->getName();
+}
+
+LgsType* LgsType::clone() {
+    assert(0);
 }
 
 Value* LgsType::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
@@ -333,7 +341,7 @@ LgsType* getHighestNumPrecedence(const std::vector<LgsExpr*>& args) {
             currentType = iter->baseType;
         }
         if (!currentType || !currentType->isScalar()) return nullptr;
-        const auto precedence = LgsType::numberPrecedences[currentType->getName()];
+        const auto precedence = numberPrecedences[currentType->getName()];
         if (highestPrecedence >= precedence) continue;
         inferredType = currentType;
         highestPrecedence = precedence;

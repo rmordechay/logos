@@ -21,7 +21,7 @@ size_t LgsTypePair::sizeBytes() {
 }
 
 std::string LgsTypePair::getName() {
-    return name + key->pname() + value->pname();
+    return name + key->getName() + value->getName();
 }
 
 std::string LgsTypePair::pname() {

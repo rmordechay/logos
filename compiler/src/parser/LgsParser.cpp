@@ -766,8 +766,10 @@ LgsFuncType* LgsParser::parseFuncHeader() {
             if (!type) break;
             genericsTypes.push_back(type);
             if (currentToken.type == T_RANGLE) break;
+            mustMatch(T_COMMA);
         }
         mustMatch(T_RANGLE);
+        if (genericsTypes.empty()) addParsingError();
     } else if (peek().type == T_LPAREN) {
         consume();
     } else {

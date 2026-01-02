@@ -163,8 +163,8 @@ void LgsMap::addIRElement(LgsCgModule& cg, LgsExpr* map, LgsExpr* index, LgsExpr
         return;
     }
     const auto mapTy = getIRType(cg);
-    const auto valueTy = typePair->value->getIRType(cg);
-    const auto keyType = typePair->key->getIRType(cg);
+    const auto valueTy = typePair->value->passByRef ? cg.ptrTy() : typePair->value->getIRType(cg);
+    const auto keyType = typePair->key->passByRef ? cg.ptrTy() : typePair->key->getIRType(cg);
     const std::vector<Type*> params = {cg.ptrTy(), keyType, valueTy};
     const auto ft = cg.getFT(cg.voidTy(), params);
     const auto func = cg.getFunc(funcName, ft);

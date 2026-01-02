@@ -133,7 +133,8 @@ void LgsFunc::castImplicitly(LgsType* toType) {
 
     // Add 'it' if needed, else as normal params
     if (funcType->isLambda && funcType->params.empty() && otherFuncType->params.size() == 1) {
-        funcType->params.emplace_back(otherFuncType->params.front().type, LGS_LAMBDA_IT_PARAM);
+        auto itType = otherFuncType->params.front().type;
+        funcType->params.emplace_back(itType, LGS_LAMBDA_IT_PARAM);
     } else {
         for (size_t i = 0; i < funcType->params.size(); ++i) {
             auto& selfParam = funcType->params[i];

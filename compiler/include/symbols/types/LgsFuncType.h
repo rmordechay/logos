@@ -49,6 +49,7 @@ public:
     Type* getIRType(LgsCgModule& cg) override;
     Constant* getRTType(LgsCgModule& cg) override;
     LgsExpr* getZeroValue() override;
+    LgsType* replaceGenerics(LgsType* replacement, std::unordered_map<std::string, LgsType*>& replacements) override;
     size_t sizeBytes() override;
     std::string getName() override;
     std::string getGenericName();
@@ -60,5 +61,6 @@ public:
     void setFuncOptions(uint32_t ops);
     std::unordered_map<std::string, LgsParam*> getParamsByName();
     DIType* getDebugType(LgsCgModule& cg) override;
+    LgsFuncType* clone() override;
     ~LgsFuncType() override;
 };

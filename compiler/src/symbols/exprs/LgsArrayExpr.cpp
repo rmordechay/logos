@@ -56,6 +56,14 @@ std::string LgsArrayExpr::asText() {
     return type ? type->pname() : "[]";
 }
 
+LgsExpr* LgsArrayExpr::clone() {
+    const auto expr = new LgsArrayExpr();
+    for (const auto element : elements) {
+        expr->elements.push_back(element->clone());
+    }
+    return expr;
+}
+
 LgsArrayExpr::~LgsArrayExpr() {
     for (const auto& initialElement : elements) {
         freeExpr(initialElement);

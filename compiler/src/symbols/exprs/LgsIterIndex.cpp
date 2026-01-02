@@ -151,6 +151,15 @@ void LgsIterIndex::setDebugValue(LgsCgModule& cg) {
     assert(0);
 }
 
+LgsExpr* LgsIterIndex::clone() {
+    const auto newIterIndex = new LgsIterIndex(baseExpr->clone());
+    newIterIndex->index.from = index.from->clone();
+    if (index.to) {
+        newIterIndex->index.to = index.to->clone();
+    }
+    return newIterIndex;
+}
+
 LgsIterIndex::~LgsIterIndex() {
     // TODO free baseExpr
     // freeExpr(baseExpr);

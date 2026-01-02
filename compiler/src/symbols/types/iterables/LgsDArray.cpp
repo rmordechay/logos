@@ -46,6 +46,19 @@ Constant* LgsDArray::getRTType(LgsCgModule& cg) {
     return cg.getRTTypeInfo(dArrName, sizeBytes(), RTT_DARRAY, sv);
 }
 
+LgsType* LgsDArray::replaceGenerics(LgsType* replacement, std::unordered_map<std::string, LgsType*>& replacements) {
+    const auto otherDArr = replacement->asDArray();
+    if (otherDArr) {
+        baseType = baseType->replaceGenerics(otherDArr->baseType, replacements);
+    } else {
+        const auto baseName = baseType->getName();
+        if (replacements.contains(baseName)) {
+            baseType = replacements[baseName];
+        }
+    }
+    return this;
+}
+
 std::string LgsDArray::getBaseName() {
     return name;
 }
@@ -69,7 +82,7 @@ LgsExpr* LgsDArray::getZeroValue() {
 
 Value* LgsDArray::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
     const auto ty = getIRType(cg);
-    const auto ptr = pointee ? pointee : cg.builder.CreateAlloca(ty);
+    const auto ptr = pointee ? pointee : cg.heapAllocate(cg.usize(sizeBytes()), true);
     const auto cap = cg.usize(INITIAL_CAPACITY);
     const auto initSize = cg.builder.CreateMul(cap, cg.usize(baseType->sizeBytes()));
     cg.storeStructField(ty, ptr, 0, cg.heapAllocate(initSize, true));
@@ -137,7 +150,7 @@ void LgsDArray::addIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index,
 
     // Prologue
     const auto entryBlock = cg.createBlock(BLOCK_ENTRY, cg.currentFunc);
-    const auto needsResizeBlock = cg.createBlock(BLOCK_TRUE);
+    const auto needsResizeBlock = cg.createBlock("resize");
     const auto exitBlock = cg.createBlock(BLOCK_EXIT);
     cg.builder.SetInsertPoint(entryBlock);
     cg.callStackPush();
@@ -147,21 +160,23 @@ void LgsDArray::addIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index,
     const auto dataFieldPtr = cg.builder.CreateStructGEP(ty, arrIR, 0);
     const auto lenFieldPtr = cg.builder.CreateStructGEP(ty, arrIR, 1);
     const auto capFieldPtr = cg.builder.CreateStructGEP(ty, arrIR, 2);
-    const auto dataField = cg.load(cg.ptrTy(), dataFieldPtr);
-    const auto lenField = cg.load(cg.sizeTy(), lenFieldPtr);
-    const auto capField = cg.load(cg.sizeTy(), capFieldPtr);
 
+    auto lenField = cg.load(cg.sizeTy(), lenFieldPtr);
+    const auto capField = cg.load(cg.sizeTy(), capFieldPtr);
     const auto needsResize = cg.builder.CreateICmpSGE(lenField, capField);
     cg.builder.CreateCondBr(needsResize, needsResizeBlock, exitBlock);
 
     // Resize
     cg.startBlock(needsResizeBlock);
+    auto dataField = cg.load(cg.ptrTy(), dataFieldPtr);
     const auto newCap = cg.builder.CreateMul(capField, cg.usize(2));
     cg.storeStructField(ty, arrIR, 2, newCap);
     cg.reallocate(dataField, newCap, true);
-    cg.branchAndStartBlock(exitBlock);
 
     // Set element
+    cg.branchAndStartBlock(exitBlock);
+    lenField = cg.load(cg.sizeTy(), lenFieldPtr);
+    dataField = cg.load(cg.ptrTy(), dataFieldPtr);
     const auto offset = cg.builder.CreateMul(lenField, baseSize);
     const auto elementPtr = cg.builder.CreateInBoundsPtrAdd(dataField, offset);
     cg.store(elementIR, elementPtr);
@@ -190,6 +205,12 @@ bool LgsDArray::canCastTo(LgsType* other) {
     if (!baseType) return true;
     if (!otherArr->baseType) return true;
     return baseType->canCastTo(otherArr->baseType);
+}
+
+LgsType* LgsDArray::clone() {
+    const auto newDArray = new LgsDArray(*this);
+    newDArray->baseType = baseType->clone();
+    return newDArray;
 }
 
 DIType* LgsDArray::getDebugType(LgsCgModule& cg) {

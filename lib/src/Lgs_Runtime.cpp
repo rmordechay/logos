@@ -9,14 +9,7 @@ extern "C" void Lgs_Runtime_freeValue(void* ptr);
 
 extern "C" void Lgs_Runtime_init() {}
 
-extern "C" void Lgs_Runtime_close() {
-    // Free owners
-    for (const auto ptr : runtime.owners) {
-        std::println("Freeing owner in {}: {}", runtime.stackLevel, ptr);
-        std::free(ptr);
-    }
-    runtime.owners.clear();
-}
+extern "C" void Lgs_Runtime_close() {}
 
 extern "C" void Lgs_Runtime_push() {
     runtime.stackLevel++;
@@ -39,7 +32,7 @@ extern "C" void* Lgs_Runtime_allocate(const size_t size, const bool isOwner) {
     const auto ptr = std::malloc(size);
     std::println("Allocated {}B in {}: {}", size, runtime.stackLevel, ptr);
     if (isOwner) {
-        runtime.owners.insert(ptr);
+        runtime.stack[runtime.stackLevel].owners.insert(ptr);
     } else {
         runtime.stack[runtime.stackLevel].orphans.insert(ptr);
     }
@@ -49,15 +42,7 @@ extern "C" void* Lgs_Runtime_allocate(const size_t size, const bool isOwner) {
 extern "C" void* Lgs_Runtime_reallocate(void* ptr, const size_t size, const bool isOwner) {
     const auto newPtr = std::realloc(ptr, size);
     std::println("Reallocated {}B in {}: {}", size, runtime.stackLevel, newPtr);
-    if (isOwner) {
-        runtime.owners.erase(ptr);
-        runtime.owners.insert(newPtr);
-    } else {
-        auto& top = runtime.stack[runtime.stackLevel];
-        top.orphans.erase(ptr);
-        top.orphans.insert(newPtr);
-    }
-    return newPtr;
+    assert(0);
 }
 
 extern "C" void Lgs_Runtime_addDefer(const ThunkFunc funcPtr, void* ctx) {

@@ -90,6 +90,9 @@ void LgsCodeGen::visitMainFile(LgsMainFile* mainFile) {
     for (const auto object : mainFile->objects) {
         visitObject(object);
     }
+    for (auto [_, genericsCall] : file.symbolTable.genericFuncCalls) {
+        visitFunc(genericsCall);
+    }
 
     for (const auto& [name, func] : mainFile->funcs) {
         if (const auto mainFunc = dynamic_cast<LgsMainFunc*>(func)) {
@@ -682,6 +685,8 @@ void LgsCodeGen::visitIntConst(LgsIntConst* intConst) const {
         intConst->IRValue = cg.i64(intConst->value);
     } else if (intConst->type->asSize()) {
         intConst->IRValue = cg.usize(intConst->value);
+    } else if (intConst->type->asFloat()) { // IntConst to float is allowed
+        intConst->IRValue = cg.floatv(intConst->value);
     } else {
         assert(0);
     }
@@ -1074,12 +1079,14 @@ void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
         func->IRValue = cg.getFromVTable(funcCall->args.front().expr->IRValue, id);
     }
 
-    if (func->funcType->name == MAP_FUNC) {
-        createMapFunc(func);
-    } else if (func->funcType->name == FILTER_FUNC) {
-        createFilterFunc(func);
-    } else if (func->funcType->name == FOREACH_FUNC) {
-        createForeachFunc(func);
+    if (func->funcType->isBuiltin) {
+        if (func->funcType->name == MAP_FUNC) {
+            createMapFunc(func);
+        } else if (func->funcType->name == FILTER_FUNC) {
+            createFilterFunc(func);
+        } else if (func->funcType->name == FOREACH_FUNC) {
+            createForeachFunc(func);
+        }
     }
     assert(func->funcType->genericTypes.empty());
     if (funcCall->coroutine || funcCall->isDeferred) return;

@@ -8,6 +8,7 @@ public:
 
     explicit LgsReturn(LgsExpr* expr) : expr(expr) {}
     void setDebugValue(LgsCgModule& cg) override;
+    LgsStmt* clone() override;
     ~LgsReturn() override;
 };
 
