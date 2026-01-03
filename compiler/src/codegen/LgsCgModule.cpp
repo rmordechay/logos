@@ -197,7 +197,7 @@ Value* LgsCgModule::getFromVTable(Value* instance, Value* key) {
 }
 
 void LgsCgModule::freeValue(Value* ptr) {
-    callRuntimeFunc("freeValue", voidTy(), {ptrTy()}, {ptr});
+    callFunc("free", voidTy(), {ptrTy()}, {ptr});
 }
 
 Value* LgsCgModule::heapAllocate(Value* size, const bool isOwner) {

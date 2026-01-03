@@ -110,9 +110,9 @@ static void resize(Lgs_HashMap* map) {
         auto entry = map->entries[i];
         while (entry) {
             const auto next = entry->next;
-            const auto index = hashString(entry->key) % newCap;
-            entry->next = newBuckets[index];
-            newBuckets[index] = entry;
+            const auto hash = hashString(entry->key) % newCap;
+            entry->next = newBuckets[hash];
+            newBuckets[hash] = entry;
             entry = next;
         }
     }

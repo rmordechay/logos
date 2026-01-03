@@ -132,7 +132,7 @@ Value* LgsDArray::getIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* inde
 
 void LgsDArray::addIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index, LgsExpr* value) {
     if (index) assert(0);
-    const auto funcName = getName() + "_add";
+    const auto funcName = getName() + "_" + ADD_FUNC;
     if (const auto f = cg.IRModule->getFunction(funcName)) {
         cg.builder.CreateCall(f, {iterable->IRValue, value->IRValue});
         return;

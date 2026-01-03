@@ -21,7 +21,7 @@ extern "C" void Lgs_Runtime_pop() {
     for (auto [defer, ctx] : top.defers) defer(ctx);
     // Free orphans
     for (const auto ptr : top.orphans) {
-        std::println("Freeing orphan in {}: {}", runtime.stackLevel, ptr);
+        //std::println("Freeing orphan in {}: {}", runtime.stackLevel, ptr);
         std::free(ptr);
     }
     top.orphans.clear();
@@ -30,7 +30,7 @@ extern "C" void Lgs_Runtime_pop() {
 
 extern "C" void* Lgs_Runtime_allocate(const size_t size, const bool isOwner) {
     const auto ptr = std::malloc(size);
-    std::println("Allocated {}B in {}: {}", size, runtime.stackLevel, ptr);
+    //std::println("Allocated {}B in {}: {}", size, runtime.stackLevel, ptr);
     if (isOwner) {
         runtime.stack[runtime.stackLevel].owners.insert(ptr);
     } else {
@@ -41,7 +41,7 @@ extern "C" void* Lgs_Runtime_allocate(const size_t size, const bool isOwner) {
 
 extern "C" void* Lgs_Runtime_reallocate(void* ptr, const size_t size, const bool isOwner) {
     const auto newPtr = std::realloc(ptr, size);
-    std::println("Reallocated {}B in {}: {}", size, runtime.stackLevel, newPtr);
+    //std::println("Reallocated {}B in {}: {}", size, runtime.stackLevel, newPtr);
     assert(0);
 }
 
