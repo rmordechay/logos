@@ -65,7 +65,6 @@ public:
     LgsErrHandler errHandler;
     LgsTypeResolver typeResolver;
     std::unordered_map<std::string, size_t> refCount;
-    static std::atomic<size_t> lambdasIDGenerator;
 
     explicit LgsSema(LgsAppConfigs& appConfigs, LgsFile* file, LgsGlobals& globals)
         : file(file), appConfigs(appConfigs), globals(globals), typeResolver(file, errHandler, globals) {}

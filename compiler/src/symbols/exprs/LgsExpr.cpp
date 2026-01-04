@@ -26,8 +26,7 @@
 #include "funcs/LgsFunc.h"
 #include "loops/LgsMetaVar.h"
 
-void LgsExpr::setOwner(LgsValue* newOwner) {
-    assert(!owner);
+void LgsExpr::setOwner(const LgsOwner newOwner) {
     owner = newOwner;
 }
 

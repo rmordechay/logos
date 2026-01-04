@@ -57,7 +57,7 @@
 
 static std::string getMissingImplementsStr(const std::vector<LgsField*>& fields, const std::vector<LgsFunc*>& methods);
 
-std::atomic<size_t> LgsSema::lambdasIDGenerator{0};
+std::atomic<size_t> lambdasIDGenerator{0};
 
 void LgsSema::analyse() {
     resolveImports();
@@ -146,9 +146,6 @@ void LgsSema::visitField(LgsField* field) {
     if (field->expr && field->expr->asFunc()) {
         addError(E10013, field->location, {field->name});
     }
-    if (!field->type->isHeapAlloc && field->isOwner) {
-        field->isOwner = false;
-    }
     addRTType(field->type);
 }
 
@@ -222,8 +219,7 @@ void LgsSema::visitLambda(LgsFunc* lambda) {
         }
         lambda->funcType->rt = inferredType;
     }
-    const auto lambdaID = lambdasIDGenerator.fetch_add(1);
-    lambda->funcType->name += LGS_LAMBDA + std::to_string(lambdaID);
+    lambda->funcType->name += LGS_LAMBDA + std::to_string(lambdasIDGenerator.fetch_add(1));
 }
 
 void LgsSema::visitParam(LgsParam* param) {
@@ -353,15 +349,9 @@ void LgsSema::visitVarDec(LgsVarDec* varDec) {
         varDec->expr->location = varDec->location;
         visitExpr(varDec->expr);
     }
-
-    if (varDec->isOwner) {
-        varDec->expr->setOwner(varDec);
-    }
+    varDec->expr->setOwner(LgsOwner(varDec));
     if (varDec->expr->type->isVoid()) {
         addError(E10093, varDec->location);
-    }
-    if (varDec->type && !varDec->type->isHeapAlloc && varDec->isOwner) {
-        addError(E10109, varDec->location);
     }
 
     addLocalSymbol(LgsSymbol(varDec));
@@ -387,7 +377,7 @@ void LgsSema::visitAssignment(LgsAssignment* assignment) {
     r->castImplicitly(l->type);
     if (!l->type || !r->type) return;
     if (!validateExprType(r, l->type)) return;
-    if (assignment->lExpr->owner) {
+    if (assignment->lExpr->owner.type != NO_OWNER) {
         assignment->rExpr->setOwner(assignment->lExpr->owner);
     }
 
@@ -398,7 +388,7 @@ void LgsSema::visitAssignment(LgsAssignment* assignment) {
         const auto firstExpr = selection->exprs.front();
         const auto obj = firstExpr->type->asObject();
         if (obj && !obj->singleton && firstExpr->asTypeExpr()) {
-            addError(E10089, selection->location, {firstExpr->asText(), selection->lastExpr()->asText()});
+            addError(E10089, selection->location, {firstExpr->asText(), selection->exprs.back()->asText()});
             return;
         }
         canAssign = true;
@@ -932,17 +922,13 @@ void LgsSema::visitVariable(LgsVariable* variable) {
     case VAR_DEC: {
         variable->ref.varDec = symbol->varDec;
         variable->setType(symbol->varDec->type);
-        if (symbol->varDec->isOwner) {
-            variable->setOwner(symbol->varDec);
-        }
+        variable->setOwner(LgsOwner(symbol->varDec));
         break;
     }
     case PARAM: {
         variable->ref.param = symbol->param;
         variable->setType(symbol->param->type);
-        if (symbol->param->isOwner) {
-            variable->setOwner(symbol->param);
-        }
+        variable->setOwner(LgsOwner(symbol->param));
         break;
     }
     case ENUM: {
@@ -965,9 +951,7 @@ void LgsSema::visitVariable(LgsVariable* variable) {
         variable->ref.field = symbol->field;
         variable->isMutable = !symbol->field->isConst;
         variable->setType(symbol->field->type);
-        if (symbol->field->isOwner) {
-            variable->setOwner(symbol->field);
-        }
+        variable->setOwner(LgsOwner(symbol->field));
         break;
     }
     default:
@@ -989,9 +973,7 @@ void LgsSema::visitSelection(LgsSelection* selection) {
         }
     }
     visitInnerSelections(selection);
-    const auto lastExpr = selection->lastExpr();
-    selection->setType(lastExpr->type);
-    selection->setOwner(lastExpr->owner);
+    selection->setType(selection->exprs.back()->type);
 }
 
 void LgsSema::visitFirstSelection(LgsSelection* selection) {
@@ -1040,7 +1022,7 @@ void LgsSema::visitFieldSelection(LgsVariable* child, LgsType* parentType) {
     if (const auto field = parentType->getField(childName)) {
         child->setType(field->type);
         child->ref = LgsSymbol(field);
-        if (field->isOwner) child->setOwner(field);
+        child->setOwner(LgsOwner(field));
         validateFieldVisibility(field, parentType, child->location);
     } else if (const auto method = parentType->getMethod(childName)) {
         child->setType(method->type);

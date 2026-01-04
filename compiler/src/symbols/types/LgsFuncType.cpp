@@ -25,9 +25,9 @@ Type* LgsFuncType::getIRType(LgsCgModule& cg) {
 
 Constant* LgsFuncType::getRTType(LgsCgModule& cg) {
     const auto funcName = getGenericName();
-    std::vector<LgsOwner*> paramsAsOwners;
-    for (auto& param : params) paramsAsOwners.emplace_back(static_cast<LgsOwner*>(&param));
-    const auto [typesArr, hashesArr] = getRTFieldsInfo(cg, funcName, paramsAsOwners);
+    std::vector<LgsValue*> paramsAsValue;
+    for (auto& param : params) paramsAsValue.emplace_back(static_cast<LgsValue*>(&param));
+    const auto [typesArr, hashesArr] = getRTFieldsInfo(cg, funcName, paramsAsValue);
     // paramsCount, paramHashes, paramTypes, rt
     const auto sv = cg.getRTTExtraStruct(funcName, {cg.sizeTy(), cg.ptrTy(), cg.ptrTy(), cg.ptrTy()}, {
         cg.usize(params.size()), hashesArr, typesArr, rt->getRTType(cg)

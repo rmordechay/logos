@@ -5,8 +5,6 @@
 #include <cassert>
 #include <complex>
 
-extern "C" void Lgs_Runtime_freeValue(void* ptr);
-
 extern "C" void Lgs_Runtime_init() {}
 
 extern "C" void Lgs_Runtime_close() {}
@@ -19,27 +17,30 @@ extern "C" void Lgs_Runtime_pop() {
     auto& top = runtime.stack[runtime.stackLevel];
     // Call defers
     for (auto [defer, ctx] : top.defers) defer(ctx);
-    // Free orphans
-    for (const auto ptr : top.orphans) {
-        //std::println("Freeing orphan in {}: {}", runtime.stackLevel, ptr);
-        std::free(ptr);
+    // Free allocations
+    for (auto alloc : top.allocs) {
+        if (!alloc) continue;
+        //std::println("Freeing orphan in {}: {}", runtime.stackLevel, alloc);
+        std::free(alloc);
     }
-    top.orphans.clear();
     runtime.stackLevel--;
 }
 
-extern "C" void* Lgs_Runtime_allocate(const size_t size, const bool isOwner) {
+extern "C" void* Lgs_Runtime_allocate(const size_t size) {
     const auto ptr = std::malloc(size);
+    auto& top = runtime.stack[runtime.stackLevel];
     //std::println("Allocated {}B in {}: {}", size, runtime.stackLevel, ptr);
-    if (isOwner) {
-        runtime.stack[runtime.stackLevel].owners.insert(ptr);
-    } else {
-        runtime.stack[runtime.stackLevel].orphans.insert(ptr);
-    }
+    top.allocs[top.allocaIndex++] = ptr;
     return ptr;
 }
 
-extern "C" void* Lgs_Runtime_reallocate(void* ptr, const size_t size, const bool isOwner) {
+extern "C" void Lgs_Runtime_move(void* ptr) {
+    auto& top = runtime.stack[runtime.stackLevel];
+    auto& parent = runtime.stack[runtime.stackLevel - 1];
+    //std::println("{}", ptr);
+}
+
+extern "C" void* Lgs_Runtime_reallocate(void* ptr, const size_t size) {
     const auto newPtr = std::realloc(ptr, size);
     //std::println("Reallocated {}B in {}: {}", size, runtime.stackLevel, newPtr);
     assert(0);
@@ -74,4 +75,9 @@ extern "C" void Lgs_Runtime_throwError(const size_t count, const char* msg, ...)
 
 extern "C" size_t Lgs_Runtime_hash(const char* str) {
     return hashString(str);
+}
+
+extern "C" void Lgs_Runtime_freeValue(void* ptr) {
+    //std::println("Freeing in {}: {}", runtime.stackLevel, ptr);
+    std::free(ptr);
 }

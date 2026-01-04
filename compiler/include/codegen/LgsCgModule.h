@@ -88,8 +88,9 @@ public:
     void addToVTable(Value* instance, Value* key, Value* ptr);
     Value* getFromVTable(Value* instance, Value* key);
     void freeValue(Value* ptr);
-    Value* heapAllocate(Value* size, bool isOwner = false);
-    Value* reallocate(Value* ptr, Value* size, bool isOwner);
+    Value* heapAllocate(Value* size);
+    Value* moveAlloc(Value* ptr);
+    Value* reallocate(Value* ptr, Value* size);
     void callThrowError(const LgsBaseMsg& err, const std::vector<Value*>& args = {});
 
     // Blocks

@@ -64,8 +64,9 @@
 #include "types/primitives/LgsUInt.h"
 #include <unordered_set>
 
-#define MAX_TOKENS_NUMBER 100000
 LgsFunc* wrapStmtsBlockWithLambda(LgsStmtsBlock* stmtsBlock);
+
+#define MAX_TOKENS_NUMBER 100000
 
 bool LgsParser::scanTokens() {
     if (code == "") {
@@ -492,7 +493,6 @@ LgsField* LgsParser::parseField(const size_t fieldPosition) {
     field->setType(type);
     field->position = fieldPosition;
     if (isConst.has_value()) field->isConst = isConst.value();
-    if (isOwner.has_value()) field->isOwner = isOwner.value();
     if (isPublic.has_value()) field->isPublic = isPublic.value();
     return field;
 }
@@ -927,7 +927,6 @@ LgsVarDec* LgsParser::parseVarDec() {
     const auto varDec = new LgsVarDec(nameToken.lexeme, type, expr);
     setLocation(varDec->location, &nameToken, &currentToken);
     varDec->isConst = isConst;
-    varDec->isOwner = isOwner;
     return varDec;
 }
 

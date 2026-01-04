@@ -1,6 +1,9 @@
 #pragma once
 #include "LgsValue.h"
 
+class LgsField;
+class LgsParam;
+class LgsVarDec;
 class LgsComplexConst;
 class LgsNullable;
 class LgsNullableExpr;
@@ -32,6 +35,27 @@ class LgsFloatConst;
 class LgsStrConst;
 class LgsTypeConst;
 
+enum LgsOwnerType {
+    PARAM_OWNER,
+    VARDEC_OWNER,
+    FIELD_OWNER,
+    NO_OWNER,
+};
+
+struct LgsOwner {
+    LgsOwnerType type;
+    union {
+        LgsParam* param;
+        LgsField* field;
+        LgsVarDec* varDec;
+        void* noOwner;
+    };
+    LgsOwner(): type(NO_OWNER), noOwner(nullptr) {}
+    explicit LgsOwner(LgsParam* param): type(PARAM_OWNER), param(param) {}
+    explicit LgsOwner(LgsField* field): type(FIELD_OWNER), field(field) {}
+    explicit LgsOwner(LgsVarDec* varDec): type(VARDEC_OWNER), varDec(varDec) {}
+};
+
 class LgsExpr : public LgsValue {
 public:
     LgsType* type = nullptr;
@@ -40,11 +64,11 @@ public:
     bool isNull = false;
     bool isReturnExpr = false;
     bool hasUnwrapSuffix = false;
-    LgsValue* owner = nullptr;
     Value* pointee = nullptr;
+    LgsOwner owner;
 
     explicit LgsExpr(LgsType* type = nullptr) : type(type) {}
-    void setOwner(LgsValue* newOwner);
+    void setOwner(LgsOwner newOwner);
     std::optional<int64_t> getConstInt();
     std::optional<std::string> getConstStr();
 

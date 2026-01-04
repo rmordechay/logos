@@ -7,7 +7,7 @@
 extern "C" void Lgs_DArray_init(Lgs_DArrayExpr* arr, const Lgs_TypeInfo* dArr) {
     arr->length = 0;
     arr->capacity = 10;
-    void* ptr = Lgs_Runtime_allocate(arr->capacity * dArr->dArray.baseType->size, true);
+    void* ptr = Lgs_Runtime_allocate(arr->capacity * dArr->dArray.baseType->size);
     arr->data = static_cast<char*>(ptr);
 }
 
@@ -15,7 +15,7 @@ extern "C" void Lgs_DArray_add(Lgs_DArrayExpr* arr, const Lgs_TypeInfo* type, co
     assert(arr);
     if (arr->length <= arr->capacity) {
         arr->capacity *= 2;
-        arr->data = static_cast<char*>(Lgs_Runtime_reallocate(arr->data, arr->capacity, true));
+        arr->data = static_cast<char*>(Lgs_Runtime_reallocate(arr->data, arr->capacity));
     }
     const auto size = type->dArray.baseType->size;
     const auto dst = arr->data + arr->length * size;

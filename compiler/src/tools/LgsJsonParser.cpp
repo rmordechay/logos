@@ -148,7 +148,6 @@ void LgsJsonParser::parseField(const LgsField* field) {
     openObject();
     addKeyValueStr("name", field->name, true);
     addKeyValueStr("type", field->type->getName(), true);
-    addKeyValueBool("isOwner", field->isOwner, true);
     addKeyValueBool("isConst", field->isConst, true);
     addKeyValueBool("isPublic", field->isPublic);
     closeObject();

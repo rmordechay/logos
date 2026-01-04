@@ -13,16 +13,15 @@ Value* LgsSelection::loadIR(LgsCgModule& cg) {
     return cg.load(type->getIRType(cg), IRValue);
 }
 
-LgsExpr* LgsSelection::lastExpr() const {
-    return exprs[exprs.size() - 1];
-}
-
 LgsFuncCall* LgsSelection::asMethodCall() const {
-    return lastExpr()->asFuncCall();
+    return exprs.back()->asFuncCall();
 }
 
 void LgsSelection::assign(LgsCgModule& cg, LgsExpr* expr) {
     assert(!type->asVec());
+    if (type->isHeapAlloc) {
+        cg.moveAlloc(loadIR(cg));
+    }
     cg.store(expr->IRValue, IRValue);
 }
 
@@ -36,7 +35,7 @@ std::string LgsSelection::asText() {
 }
 
 Value* LgsSelection::hashValue(LgsCgModule& cg) {
-    return lastExpr()->hashValue(cg);
+    return exprs.back()->hashValue(cg);
 }
 
 bool LgsSelection::equals(LgsExpr* other) {

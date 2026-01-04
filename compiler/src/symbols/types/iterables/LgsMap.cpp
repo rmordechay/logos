@@ -103,7 +103,7 @@ Value* LgsMap::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
     const auto cap = cg.usize(INITIAL_CAPACITY);
     const auto entriesSize = cg.usize(pairType->sizeBytes() + sizeof(void*));
     const auto totalSize = cg.builder.CreateMul(entriesSize, cap);
-    const auto entries = cg.heapAllocate(totalSize, true);
+    const auto entries = cg.heapAllocate(totalSize);
     cg.storeStructField(ty, ptr, 0, entries);
     cg.storeStructField(ty, ptr, 1, cg.sizeZero());
     cg.storeStructField(ty, ptr, 2, cap);
@@ -200,8 +200,9 @@ void LgsMap::addIRElement(LgsCgModule& cg, LgsExpr* map, LgsExpr* index, LgsExpr
     cg.startBlock(needsResizeBlock);
     const auto entriesSize = cg.usize(pairType->sizeBytes() + sizeof(void*));
     const auto newCap = cg.builder.CreateMul(entriesSize, cg.builder.CreateMul(cap, cg.usize(2)));
-    const auto newEntries = cg.heapAllocate(newCap, true);
+    const auto newEntries = cg.heapAllocate(newCap);
     auto entries = cg.load(cg.ptrTy(), entriesField);
+
     cg.loop(cap, [&](Value* iValue, BasicBlock*) {
         auto entry = cg.builder.CreateInBoundsGEP(cg.ptrTy(), entries, {iValue});
         entry = cg.load(cg.ptrTy(), entry);
@@ -210,6 +211,7 @@ void LgsMap::addIRElement(LgsCgModule& cg, LgsExpr* map, LgsExpr* index, LgsExpr
         const auto entryPtr = cg.builder.CreateInBoundsGEP(cg.ptrTy(), newEntries, {hash});
         cg.store(entry, entryPtr);
     });
+
     cg.freeValue(entries);
     cg.store(newEntries, entriesField);
     cg.store(newCap, capField);
@@ -228,7 +230,7 @@ void LgsMap::addIRElement(LgsCgModule& cg, LgsExpr* map, LgsExpr* index, LgsExpr
     // Store entry
     cg.startBlock(trueBlock);
     const auto entryTy = getEntryStruct(cg);
-    const auto entry = cg.heapAllocate(cg.usize(pairType->sizeBytes() + sizeof(void*)), true);
+    const auto entry = cg.heapAllocate(cg.usize(pairType->sizeBytes() + sizeof(void*)));
     cg.storeStructField(entryTy, entry, 0, keyIR);
     cg.storeStructField(entryTy, entry, 1, valueIR);
     cg.storeStructField(entryTy, entry, 2, cg.null());

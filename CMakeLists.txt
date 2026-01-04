@@ -160,7 +160,6 @@ set(COMPILER_SOURCE
     compiler/include/symbols/types/LgsComplex.h
     compiler/src/symbols/exprs/constants/LgsComplexConst.cpp
     compiler/include/symbols/exprs/constants/LgsComplexConst.h
-    test.c
 )
 
 set(LGS_LIB_SOURCE

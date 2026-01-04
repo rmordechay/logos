@@ -197,15 +197,19 @@ Value* LgsCgModule::getFromVTable(Value* instance, Value* key) {
 }
 
 void LgsCgModule::freeValue(Value* ptr) {
-    callFunc("free", voidTy(), {ptrTy()}, {ptr});
+    callRuntimeFunc("freeValue", voidTy(), {ptrTy()}, {ptr});
 }
 
-Value* LgsCgModule::heapAllocate(Value* size, const bool isOwner) {
-    return callRuntimeFunc("allocate", ptrTy(), {sizeTy(), i1Ty()}, {extendToSize(size), i1(isOwner)});
+Value* LgsCgModule::heapAllocate(Value* size) {
+    return callRuntimeFunc("allocate", ptrTy(), {sizeTy()}, {extendToSize(size)});
 }
 
-Value* LgsCgModule::reallocate(Value* ptr, Value* size, const bool isOwner) {
-    return callRuntimeFunc("reallocate", ptrTy(), {ptrTy(), sizeTy(), i1Ty()}, {ptr, extendToSize(size), i1(isOwner)});
+Value* LgsCgModule::moveAlloc(Value* ptr) {
+    return callRuntimeFunc("move", voidTy(), {ptrTy()}, {ptr});
+}
+
+Value* LgsCgModule::reallocate(Value* ptr, Value* size) {
+    return callRuntimeFunc("reallocate", ptrTy(), {ptrTy(), sizeTy()}, {ptr, extendToSize(size)});
 }
 
 void LgsCgModule::callThrowError(const LgsBaseMsg& err, const std::vector<Value*>& args) {

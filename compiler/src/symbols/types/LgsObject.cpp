@@ -62,9 +62,9 @@ Type* LgsObject::getIRType(LgsCgModule& cg) {
 
 Constant* LgsObject::getRTType(LgsCgModule& cg) {
     const auto objName = getName();
-    std::vector<LgsOwner*> fieldsAsOwners;
-    for (const auto field : fields) fieldsAsOwners.push_back(field);
-    const auto [typesArr, hashesArr] = getRTFieldsInfo(cg, name, fieldsAsOwners);
+    std::vector<LgsValue*> fieldsAsValue;
+    for (const auto field : fields) fieldsAsValue.push_back(field);
+    const auto [typesArr, hashesArr] = getRTFieldsInfo(cg, name, fieldsAsValue);
     // name, fieldsCount, fieldNames, fieldTypes
     const std::vector<Type*> params = {cg.ptrTy(), cg.sizeTy(), cg.ptrTy(), cg.ptrTy()};
     const std::vector<Constant*> args = {llvm::dyn_cast<Constant>(cg.getString(objName)), cg.usize(fields.size()), hashesArr, typesArr};

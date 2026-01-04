@@ -13,7 +13,6 @@ public:
     LgsExpr* expr = nullptr;
     bool isNullable = false;
     bool isConst = false;
-    bool isOwner = false;
 
     explicit LgsVarDec(const std::string& name, LgsExpr* expr) : name(name), expr(expr) {}
     LgsVarDec(const std::string& name, LgsType* type, LgsExpr* expr) : name(name), type(type), expr(expr) {}

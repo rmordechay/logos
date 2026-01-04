@@ -8,7 +8,7 @@ class LgsInstance;
 class LgsType;
 class LgsExpr;
 
-class LgsField final : public LgsValue, public LgsOwner {
+class LgsField final : public LgsValue {
 public:
     std::string name;
     unsigned position = 0;
@@ -18,7 +18,6 @@ public:
     bool isPublic = false;
     bool isVirtual = false;
     bool isOptional = false;
-    bool isOwner = true;
     bool isEnumField = false; // Not to be confused with type enum.
     LgsType* parentType = nullptr;
 

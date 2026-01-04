@@ -552,7 +552,7 @@ std::pair<Value*, Value*> loadPairAsInt(LgsCgModule& cg, LgsExpr* left, LgsExpr*
     return {l, r};
 }
 
-std::pair<Constant*, Constant*> getRTFieldsInfo(LgsCgModule& cg, const std::string& name, const std::vector<LgsOwner*>& values) {
+std::pair<Constant*, Constant*> getRTFieldsInfo(LgsCgModule& cg, const std::string& name, const std::vector<LgsValue*>& values) {
     std::vector<Constant*> fieldTypes;
     std::vector<Constant*> fieldNames;
     fieldTypes.reserve(values.size());

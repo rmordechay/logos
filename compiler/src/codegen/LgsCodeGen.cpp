@@ -956,7 +956,7 @@ void LgsCodeGen::visitSelection(LgsSelection* selection, const bool assign) {
             assert(0);
         }
     }
-    selection->IRValue = selection->lastExpr()->IRValue;
+    selection->IRValue = selection->exprs.back()->IRValue;
 }
 
 void LgsCodeGen::visitFieldSelection(LgsVariable* var, LgsExpr* parent, const bool assign) const {
@@ -1159,7 +1159,7 @@ void LgsCodeGen::visitStrConst(LgsStrConst* strConst) {
 void LgsCodeGen::visitInstance(LgsInstance* instance) {
     const auto obj = instance->obj;
     const auto sizeIR = cg.usize(obj->sizeBytes());
-    instance->IRValue = cg.heapAllocate(sizeIR, !!instance->owner);
+    instance->IRValue = cg.heapAllocate(sizeIR);
 
     // Args
     std::unordered_set<std::string> visited;

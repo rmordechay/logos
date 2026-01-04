@@ -82,10 +82,10 @@ LgsExpr* LgsDArray::getZeroValue() {
 
 Value* LgsDArray::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
     const auto ty = getIRType(cg);
-    const auto ptr = pointee ? pointee : cg.heapAllocate(cg.usize(sizeBytes()), true);
+    const auto ptr = pointee ? pointee : cg.heapAllocate(cg.usize(sizeBytes()));
     const auto cap = cg.usize(INITIAL_CAPACITY);
     const auto initSize = cg.builder.CreateMul(cap, cg.usize(baseType->sizeBytes()));
-    cg.storeStructField(ty, ptr, 0, cg.heapAllocate(initSize, true));
+    cg.storeStructField(ty, ptr, 0, cg.heapAllocate(initSize));
     cg.storeStructField(ty, ptr, 1, cg.sizeZero());
     cg.storeStructField(ty, ptr, 2, cap);
     return ptr;
@@ -171,7 +171,7 @@ void LgsDArray::addIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index,
     auto dataField = cg.load(cg.ptrTy(), dataFieldPtr);
     const auto newCap = cg.builder.CreateMul(capField, cg.usize(2));
     cg.storeStructField(ty, arrIR, 2, newCap);
-    cg.reallocate(dataField, newCap, true);
+    cg.reallocate(dataField, newCap);
 
     // Set element
     cg.branchAndStartBlock(exitBlock);
