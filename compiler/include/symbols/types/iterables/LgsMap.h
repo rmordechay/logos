@@ -39,6 +39,7 @@ public:
     Value* inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
     Value* getIRElement(LgsCgModule& cg, LgsExpr* map, LgsExpr* index) override;
     void addIRElement(LgsCgModule& cg, LgsExpr* map, LgsExpr* index, LgsExpr* value) override;
+    Value* getNewEntry(LgsCgModule& cg, Value* entryPtr, Value* key, Value* value) const;
     StructType* getEntryStruct(LgsCgModule& cg) const;
     bool unpackLoopVarsTypes(LgsForeachLoop* loop) const override;
     void unpackLoopIR(LgsCgModule& cg, LgsForeachLoop* loop) override;

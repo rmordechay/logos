@@ -24,8 +24,8 @@ static std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
     case RTT_DOUBLE: str << *static_cast<double*>(elem); break;
     case RTT_TYPE:
     case RTT_ENUM:
-    case RTT_STR: str << '"' << *static_cast<char**>(elem) << '"'; break;
-    case RTT_CHAR: str << '"' << *static_cast<const char*>(elem) << '"'; break;
+    case RTT_STR: str << *static_cast<char**>(elem); break;
+    case RTT_CHAR: str << *static_cast<const char*>(elem); break;
     case RTT_OBJECT: {
         const auto fieldsCount = rtt->obj.fieldsCount;
         str << rtt->obj.name << "{";
@@ -131,8 +131,17 @@ static std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
     }
     case RTT_MAP: {
         const auto& [keyType, valueType] = rtt->map;
-        auto hashMap = static_cast<Lgs_HashMap*>(elem);
+        const auto hashMap = static_cast<Lgs_HashMap*>(elem);
         str << "{";
+        auto isFirst = true;
+        for (int i = 0; i < hashMap->capacity; ++i) {
+            const auto entry = hashMap->entries[i];
+            if (!entry) continue;
+            if (!isFirst) str << ", ";
+            isFirst = false;
+            str << formatElement(keyType, entry) << ": ";
+            str << formatElement(valueType, static_cast<char*>(entry) + keyType->size);
+        }
         str << "}";
         break;
     }
