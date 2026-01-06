@@ -76,7 +76,7 @@ public:
     virtual LgsExpr* castExplicitly(LgsType* toType);
     virtual void castImplicitly(LgsType* toType);
     virtual Value* hashValue(LgsCgModule& cg);
-    virtual void assign(LgsCgModule& cg, LgsExpr* expr);
+    virtual void assign(LgsCgModule& cg, LgsExpr* expr, Value* level);
     virtual bool equals(LgsExpr* other);
     virtual std::string asText() = 0;
 

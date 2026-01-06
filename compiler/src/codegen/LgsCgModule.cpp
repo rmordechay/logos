@@ -196,20 +196,29 @@ Value* LgsCgModule::getFromVTable(Value* instance, Value* key) {
     return callRuntimeFunc("getFromVTable", ptrTy(), {ptrTy(), i32Ty()}, {instance, key});
 }
 
-void LgsCgModule::freeValue(Value* ptr) {
-    callRuntimeFunc("freeValue", voidTy(), {ptrTy()}, {ptr});
-}
-
-Value* LgsCgModule::heapAllocate(Value* size) {
+Value* LgsCgModule::heapAlloc(Value* size) {
     return callRuntimeFunc("allocate", ptrTy(), {sizeTy()}, {extendToSize(size)});
 }
 
-Value* LgsCgModule::moveAlloc(Value* ptr) {
-    return callRuntimeFunc("move", voidTy(), {ptrTy()}, {ptr});
+StructType* LgsCgModule::getAllocaType() {
+    return getStructType({ptrTy(), sizeTy()}, "Alloca");
+}
+
+Value* LgsCgModule::heapAlloc(Value* size, Value* level) {
+    const auto s = getAllocaType();
+    return callRuntimeFunc("allocate2", s, {sizeTy(), sizeTy()}, {extendToSize(size), level});
+}
+
+Value* LgsCgModule::moveAlloc(Value* fromLevel, Value* toLevel, Value* ptr, Value* expr) {
+    return callRuntimeFunc("move", voidTy(), {sizeTy(), sizeTy(), ptrTy(), ptrTy()}, {fromLevel, toLevel, ptr, expr});
 }
 
 Value* LgsCgModule::reallocate(Value* ptr, Value* size) {
     return callRuntimeFunc("reallocate", ptrTy(), {ptrTy(), sizeTy()}, {ptr, extendToSize(size)});
+}
+
+void LgsCgModule::freeValue(Value* ptr) {
+    callRuntimeFunc("freeValue", voidTy(), {ptrTy()}, {ptr});
 }
 
 void LgsCgModule::callThrowError(const LgsBaseMsg& err, const std::vector<Value*>& args) {

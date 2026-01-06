@@ -98,11 +98,11 @@ LgsExpr* LgsMap::getZeroValue() {
 
 Value* LgsMap::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
     const auto ty = getIRType(cg);
-    const auto ptr = pointee ? pointee : cg.builder.CreateAlloca(ty);
+    const auto ptr = pointee ? pointee : cg.heapAlloc(cg.usize(sizeBytes()));
     const auto cap = cg.usize(INITIAL_CAPACITY);
     const auto entriesSize = cg.usize(pairType->sizeBytes() + sizeof(void*));
     const auto totalSize = cg.builder.CreateMul(entriesSize, cap);
-    const auto entries = cg.heapAllocate(totalSize);
+    const auto entries = cg.heapAlloc(totalSize);
     cg.storeStructField(ty, ptr, 0, entries);
     cg.storeStructField(ty, ptr, 1, cg.sizeZero());
     cg.storeStructField(ty, ptr, 2, cap);
@@ -202,7 +202,7 @@ void LgsMap::addIRElement(LgsCgModule& cg, LgsExpr* map, LgsExpr* index, LgsExpr
     cg.startBlock(needsResizeBlock);
     const auto entriesSize = cg.usize(pairType->sizeBytes() + sizeof(void*));
     const auto newCap = cg.builder.CreateMul(entriesSize, cg.builder.CreateMul(cap, cg.usize(2)));
-    const auto newEntries = cg.heapAllocate(newCap);
+    const auto newEntries = cg.heapAlloc(newCap);
     auto entries = cg.load(cg.ptrTy(), entriesField);
 
     cg.loop(cap, [&](Value* iValue, BasicBlock*) {
@@ -243,7 +243,7 @@ void LgsMap::addIRElement(LgsCgModule& cg, LgsExpr* map, LgsExpr* index, LgsExpr
     // Store entry
     cg.startBlock(exitBlock);
     const auto entryTy = getEntryStruct(cg);
-    const auto newEntry = cg.heapAllocate(cg.usize(pairType->sizeBytes() + sizeof(void*)));
+    const auto newEntry = cg.heapAlloc(cg.usize(pairType->sizeBytes() + sizeof(void*)));
     cg.storeStructField(entryTy, newEntry, 0, keyIR);
     cg.storeStructField(entryTy, newEntry, 1, valueIR);
     cg.storeStructField(entryTy, newEntry, 2, cg.null());
@@ -266,7 +266,7 @@ void LgsMap::addIRElement(LgsCgModule& cg, LgsExpr* map, LgsExpr* index, LgsExpr
 
 Value* LgsMap::getNewEntry(LgsCgModule& cg, Value* entryPtr, Value* key, Value* value) const {
     const auto entryTy = getEntryStruct(cg);
-    const auto entry = cg.heapAllocate(cg.usize(pairType->sizeBytes() + sizeof(void*)));
+    const auto entry = cg.heapAlloc(cg.usize(pairType->sizeBytes() + sizeof(void*)));
     cg.storeStructField(entryTy, entry, 0, key);
     cg.storeStructField(entryTy, entry, 1, value);
     cg.storeStructField(entryTy, entry, 2, cg.null());

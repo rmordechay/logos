@@ -17,10 +17,10 @@ LgsFuncCall* LgsSelection::asMethodCall() const {
     return exprs.back()->asFuncCall();
 }
 
-void LgsSelection::assign(LgsCgModule& cg, LgsExpr* expr) {
+void LgsSelection::assign(LgsCgModule& cg, LgsExpr* expr, Value* level) {
     assert(!type->asVec());
     if (type->isHeapAlloc) {
-        cg.moveAlloc(loadIR(cg));
+        cg.moveAlloc(level, cg.sizeZero(), loadIR(cg), expr->IRValue);
     }
     cg.store(expr->IRValue, IRValue);
 }

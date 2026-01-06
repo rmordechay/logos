@@ -5,49 +5,61 @@
 #include <cassert>
 #include <complex>
 
+extern "C" size_t Lgs_Runtime_getLevel();
+extern "C" void Lgs_Runtime_freeValue(void* ptr);
+
 extern "C" void Lgs_Runtime_init() {}
 
 extern "C" void Lgs_Runtime_close() {}
 
 extern "C" void Lgs_Runtime_push() {
-    runtime.stackLevel++;
+    runtime.stack.emplace_back(Lgs_StackFrame{});
 }
 
 extern "C" void Lgs_Runtime_pop() {
-    auto& top = runtime.stack[runtime.stackLevel];
+    auto& top = runtime.stack.back();
     // Call defers
     for (auto [defer, ctx] : top.defers) defer(ctx);
     // Free allocations
-    for (auto alloc : top.allocs) {
-        if (!alloc) continue;
-        //std::println("Freeing orphan in {}: {}", runtime.stackLevel, alloc);
-        std::free(alloc);
+    for (auto ptr : top.allocs) {
+        if (!ptr) continue;
+        Lgs_Runtime_freeValue(ptr);
     }
-    runtime.stackLevel--;
+    runtime.stack.pop_back();
 }
 
 extern "C" void* Lgs_Runtime_allocate(const size_t size) {
     const auto ptr = std::malloc(size);
-    auto& top = runtime.stack[runtime.stackLevel];
-    //std::println("Allocated {}B in {}: {}", size, runtime.stackLevel, ptr);
-    top.allocs[top.allocaIndex++] = ptr;
+    auto& top = runtime.stack.back();
+    std::println("Allocated in {}: {}", Lgs_Runtime_getLevel(), ptr);
+    top.allocs.insert(ptr);
     return ptr;
 }
 
-extern "C" void Lgs_Runtime_move(void* ptr) {
-    auto& top = runtime.stack[runtime.stackLevel];
-    auto& parent = runtime.stack[runtime.stackLevel - 1];
-    //std::println("{}", ptr);
+extern "C" Lgs_Alloc Lgs_Runtime_allocate2(const size_t size, const size_t level) {
+    const auto ptr = std::malloc(size);
+    auto& top = runtime.stack.back();
+    std::println("Allocated in {}: {}", Lgs_Runtime_getLevel(), ptr);
+    top.allocs.insert(ptr);
+    return Lgs_Alloc{.ptr = ptr, .level = level};
+}
+
+extern "C" void Lgs_Runtime_move(const size_t fromLevel, const size_t toLevel, void* ptr, void* expr) {
+    std::println("move {} from {} to {} and freeing {}", expr, fromLevel, toLevel, ptr);
+    runtime.stack[toLevel].allocs.erase(ptr);
+    runtime.stack[fromLevel].allocs.erase(expr);
+    runtime.stack[toLevel].allocs.insert(expr);
+    Lgs_Runtime_freeValue(ptr);
 }
 
 extern "C" void* Lgs_Runtime_reallocate(void* ptr, const size_t size) {
     const auto newPtr = std::realloc(ptr, size);
-    //std::println("Reallocated {}B in {}: {}", size, runtime.stackLevel, newPtr);
+    std::println("Reallocated {}B in {}: {}", size, Lgs_Runtime_getLevel(), newPtr);
     assert(0);
 }
 
 extern "C" void Lgs_Runtime_addDefer(const ThunkFunc funcPtr, void* ctx) {
-    runtime.stack[runtime.stackLevel].defers.emplace_back(Lgs_ThunkFunc{funcPtr, ctx});
+    runtime.stack.back().defers.emplace_back(Lgs_ThunkFunc{funcPtr, ctx});
 }
 
 extern "C" void Lgs_Runtime_addCoro(const ThunkFunc funcPtr, void* ctx) {
@@ -78,6 +90,10 @@ extern "C" size_t Lgs_Runtime_hash(const char* str) {
 }
 
 extern "C" void Lgs_Runtime_freeValue(void* ptr) {
-    //std::println("Freeing in {}: {}", runtime.stackLevel, ptr);
-    std::free(ptr);
+    std::println("Freeing in {}: {}", Lgs_Runtime_getLevel(), ptr);
+    // std::free(ptr);
+}
+
+extern "C" size_t Lgs_Runtime_getLevel() {
+    return runtime.stack.size() - 1;
 }

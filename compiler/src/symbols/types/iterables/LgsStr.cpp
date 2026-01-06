@@ -82,7 +82,7 @@ Value* LgsStr::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     const auto rightSize = lenIR(cg, right->IRValue);
     const auto sumSize = cg.builder.CreateAdd(leftSize, rightSize);
     const auto allocSize = cg.builder.CreateAdd(sumSize, cg.usize(1));
-    const auto buffer = cg.heapAllocate(allocSize);
+    const auto buffer = cg.heapAlloc(allocSize);
     const auto rightPos = cg.builder.CreateInBoundsGEP(cg.i8Ty(), buffer, leftSize);
     cg.callMemCpy(buffer, left->IRValue, leftSize);
     cg.callMemCpy(rightPos, right->IRValue, rightSize);

@@ -336,7 +336,7 @@ void LgsCodeGen::visitAssignment(const LgsAssignment* assignment) {
 
     Value* results = nullptr;
     switch (assignment->assignmentType.opType) {
-    case ASSIGN: lValue->assign(cg, rValue); return;
+    case ASSIGN: lValue->assign(cg, rValue, stack.currentFunc()->level); return;
     case ASSIGN_ADD: results = lValue->type->addIR(cg, lValue, rValue); break;
     case ASSIGN_SUB: results = lValue->type->subIR(cg, lValue, rValue); break;
     case ASSIGN_MUL: results = lValue->type->mulIR(cg, lValue, rValue); break;
@@ -1159,7 +1159,7 @@ void LgsCodeGen::visitStrConst(LgsStrConst* strConst) {
 void LgsCodeGen::visitInstance(LgsInstance* instance) {
     const auto obj = instance->obj;
     const auto sizeIR = cg.usize(obj->sizeBytes());
-    instance->IRValue = cg.heapAllocate(sizeIR);
+    instance->IRValue = cg.heapAlloc(sizeIR);
 
     // Args
     std::unordered_set<std::string> visited;
@@ -1211,6 +1211,7 @@ void LgsCodeGen::createPrologue(LgsFunc* func) const {
         cg.callRuntimeFunc("init", cg.voidTy());
     }
     cg.callStackPush();
+    func->level = cg.callRuntimeFunc("getLevel", cg.sizeTy());
 }
 
 void LgsCodeGen::createEpilogue(const LgsFunc* func) const {

@@ -18,6 +18,7 @@ public:
     LgsStmtsBlock* stmtsBlock = nullptr;
     std::vector<const LgsReturn*> returnStmts;
     std::vector<std::pair<LgsExpr*, LgsExpr*>> mocks;
+    Value* level = nullptr;
     bool isTest = false;
     CallFn fn;
 

@@ -3,20 +3,23 @@
 #include "Lgs_Types.h"
 #include "errors/LgsErrHandler.h"
 #include <unordered_map>
+#include <unordered_set>
 
+struct Lgs_Alloc {
+    void* ptr;
+    size_t level;
+};
 
 struct Lgs_StackFrame {
-    size_t allocaIndex{};
-    std::array<void*, 1024> allocs;
+    std::unordered_set<void*> allocs;
     std::vector<Lgs_ThunkFunc> defers;
 };
 
 struct Lgs_Runtime {
-    int16_t stackLevel = -1;
     Lgs_Allocator allocator;
     LgsErrHandler errHandler;
     std::vector<Lgs_ThunkFunc> coros;
-    std::array<Lgs_StackFrame, 1024> stack;
+    std::vector<Lgs_StackFrame> stack;
     std::unordered_map<VKey, void*, VKeyHash> vtable;
 };
 

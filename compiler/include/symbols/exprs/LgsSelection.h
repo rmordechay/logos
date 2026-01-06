@@ -10,7 +10,7 @@ public:
     explicit LgsSelection(const std::vector<LgsExpr*>& exprs) : exprs(exprs) {}
     Value* loadIR(LgsCgModule& cg) override;
     LgsFuncCall* asMethodCall() const;
-    void assign(LgsCgModule& cg, LgsExpr* expr) override;
+    void assign(LgsCgModule& cg, LgsExpr* expr, Value* level) override;
     std::string asText() override;
     Value* hashValue(LgsCgModule& cg) override;
     bool equals(LgsExpr* other) override;

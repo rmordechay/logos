@@ -115,7 +115,7 @@ void LgsIterIndex::setIRRangePtr(LgsCgModule& cg, bool assign) {
     }
 }
 
-void LgsIterIndex::assign(LgsCgModule& cg, LgsExpr* expr) {
+void LgsIterIndex::assign(LgsCgModule& cg, LgsExpr* expr, Value* level) {
     const auto iter = baseExpr->type->asIterable();
     assert(iter);
     if (const auto addFunc = iter->getMethod("add"); addFunc->fn) {
