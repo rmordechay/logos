@@ -1608,6 +1608,7 @@ void LgsSema::validateObjDuplicates(LgsType* type){
 bool LgsSema::validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const LgsFunc* func) {
     if (!func->funcType->rt) return true; // In this case an error was already added
     if (!stmtBlock || func->funcType->rt->isVoid()) return true;
+    if (stmtBlock->stmts.empty()) return false;
     const auto lastStmt = stmtBlock->stmts.back();
     constexpr auto objWrapper = LgsStmtWrapper::WrapperType::Object;
     constexpr auto stmtWrapper = LgsStmtWrapper::WrapperType::Stmt;

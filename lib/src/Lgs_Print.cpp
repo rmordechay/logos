@@ -1,6 +1,7 @@
 #include "LgsDefinitions.h"
 #include "Lgs_DArrayExpr.h"
 #include "Lgs_HashMap.h"
+#include "Lgs_Runtime.h"
 #include "Lgs_Types.h"
 #include <cassert>
 #include <sstream>
