@@ -104,7 +104,7 @@ Value* LgsExpr::hashValue(LgsCgModule& cg) {
     assert(0);
 }
 
-void LgsExpr::assign(LgsCgModule& cg, LgsExpr* expr, Value* level) {
+void LgsExpr::assign(LgsCgModule& cg, LgsExpr* expr) {
     assert(0);
 }
 

@@ -13,7 +13,7 @@ public:
     bool equals(LgsExpr* other) override;
     LgsExpr* castExplicitly(LgsType* toType) override;
     Value* hashValue(LgsCgModule& cg) override;
-    void assign(LgsCgModule& cg, LgsExpr* expr, Value* level) override;
+    void assign(LgsCgModule& cg, LgsExpr* expr) override;
     std::string asText() override;
     void setDebugValue(LgsCgModule& cg) override;
     LgsVariable* clone() override;

@@ -90,7 +90,7 @@ public:
     Value* heapAlloc(Value* size);
     StructType* getAllocaType();
     Value* heapAlloc(Value* size, Value* level);
-    Value* moveAlloc(Value* fromLevel, Value* toLevel, Value* ptr, Value* expr);
+    Value* moveAlloc(Value* left, Value* right);
     Value* reallocate(Value* ptr, Value* size);
     void freeValue(Value* ptr);
     void callThrowError(const LgsBaseMsg& err, const std::vector<Value*>& args = {});

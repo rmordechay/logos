@@ -21,7 +21,7 @@ extern "C" void Lgs_Runtime_pop() {
     // Call defers
     for (auto [defer, ctx] : top.defers) defer(ctx);
     // Free allocations
-    for (auto ptr : top.allocs) {
+    for (const auto ptr : top.allocs) {
         if (!ptr) continue;
         Lgs_Runtime_freeValue(ptr);
     }
@@ -44,12 +44,15 @@ extern "C" Lgs_Alloc Lgs_Runtime_allocate2(const size_t size, const size_t level
     return Lgs_Alloc{.ptr = ptr, .level = level};
 }
 
-extern "C" void Lgs_Runtime_move(const size_t fromLevel, const size_t toLevel, void* ptr, void* expr) {
-    std::println("move {} from {} to {} and freeing {}", expr, fromLevel, toLevel, ptr);
-    runtime.stack[toLevel].allocs.erase(ptr);
-    runtime.stack[fromLevel].allocs.erase(expr);
-    runtime.stack[toLevel].allocs.insert(expr);
-    Lgs_Runtime_freeValue(ptr);
+extern "C" void Lgs_Runtime_move(const Lgs_Alloc left, const Lgs_Alloc right) {
+    const auto leftPtr = left.ptr;
+    const auto rightPtr = right.ptr;
+    auto& leftAllocs = runtime.stack[left.level].allocs;
+    auto& rightAllocs = runtime.stack[right.level].allocs;
+    leftAllocs.erase(leftPtr);
+    leftAllocs.insert(rightPtr);
+    rightAllocs.erase(rightPtr);
+    Lgs_Runtime_freeValue(leftPtr);
 }
 
 extern "C" void* Lgs_Runtime_reallocate(void* ptr, const size_t size) {
@@ -91,7 +94,7 @@ extern "C" size_t Lgs_Runtime_hash(const char* str) {
 
 extern "C" void Lgs_Runtime_freeValue(void* ptr) {
     std::println("Freeing in {}: {}", Lgs_Runtime_getLevel(), ptr);
-    // std::free(ptr);
+    std::free(ptr);
 }
 
 extern "C" size_t Lgs_Runtime_getLevel() {

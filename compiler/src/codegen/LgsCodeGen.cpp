@@ -336,7 +336,7 @@ void LgsCodeGen::visitAssignment(const LgsAssignment* assignment) {
 
     Value* results = nullptr;
     switch (assignment->assignmentType.opType) {
-    case ASSIGN: lValue->assign(cg, rValue, stack.currentFunc()->level); return;
+    case ASSIGN: lValue->assign(cg, rValue); return;
     case ASSIGN_ADD: results = lValue->type->addIR(cg, lValue, rValue); break;
     case ASSIGN_SUB: results = lValue->type->subIR(cg, lValue, rValue); break;
     case ASSIGN_MUL: results = lValue->type->mulIR(cg, lValue, rValue); break;
@@ -1000,9 +1000,13 @@ void LgsCodeGen::visitFieldSelection(LgsVariable* var, LgsExpr* parent, const bo
     if (field->type->asVec()) {
         createVecField(field, parent->IRValue);
     }
-    var->IRValue = field->getGEP(cg, parent->IRValue);
-    if (!assign && field->type->asObject()) {
-        var->IRValue = cg.load(cg.ptrTy(), var->IRValue);
+    if (field->type->isHeapAlloc) {
+        var->IRValue = parent->IRValue;
+    } else {
+        var->IRValue = field->getGEP(cg, parent->IRValue);
+        if (!assign && field->type->asObject()) {
+            var->IRValue = cg.load(cg.ptrTy(), var->IRValue);
+        }
     }
 }
 
@@ -1159,14 +1163,15 @@ void LgsCodeGen::visitStrConst(LgsStrConst* strConst) {
 void LgsCodeGen::visitInstance(LgsInstance* instance) {
     const auto obj = instance->obj;
     const auto sizeIR = cg.usize(obj->sizeBytes());
-    instance->IRValue = cg.heapAlloc(sizeIR);
+    instance->IRValue = cg.heapAlloc(sizeIR, stack.currentFunc()->level);
+    const auto v = cg.builder.CreateExtractValue(instance->IRValue, 0);
 
     // Args
     std::unordered_set<std::string> visited;
     for (const auto& [argName, arg] : instance->args) {
         visited.insert(argName);
         const auto field = instance->obj->getField(argName);
-        arg.expr->pointee = field->getGEP(cg, instance->IRValue);
+        arg.expr->pointee = field->getGEP(cg, v);
         visitExpr(arg.expr);
         cg.store(arg.expr->IRValue, arg.expr->pointee);
     }
@@ -1174,7 +1179,7 @@ void LgsCodeGen::visitInstance(LgsInstance* instance) {
     // Zero values
     for (const auto field : instance->obj->fields) {
         if (visited.contains(field->name) || field->type->asEnum()) continue;
-        const auto pointee = field->getGEP(cg, instance->IRValue);
+        const auto pointee = field->getGEP(cg, v);
         if (field->expr) {
             cg.store(field->expr->IRValue, pointee);
         } else {
@@ -1182,7 +1187,7 @@ void LgsCodeGen::visitInstance(LgsInstance* instance) {
             cg.store(zeroValue, pointee);
         }
     }
-    addVirtuals(instance->obj, instance->IRValue);
+    addVirtuals(instance->obj, v);
 }
 
 void LgsCodeGen::visitIterIndex(LgsIterIndex* iterIndex, const bool assign) {

@@ -350,13 +350,13 @@ LgsType* getHighestNumPrecedence(const std::vector<LgsExpr*>& args) {
     return inferredType;
 }
 
-Value* eqNull(LgsCgModule& cg, const LgsExpr* expr) {
+Value* exprEqNull(LgsCgModule& cg, const LgsExpr* expr) {
     const auto nullable = expr->type->asNullable();
     if (expr->type->passByRef) return cg.builder.CreateIsNull(expr->IRValue);
     return cg.builder.CreateNot(nullable->getIsSet(cg, expr->IRValue));
 }
 
-Value* neNull(LgsCgModule& cg, const LgsExpr* expr) {
+Value* exprNeNull(LgsCgModule& cg, const LgsExpr* expr) {
     const auto nullable = expr->type->asNullable();
     if (expr->type->passByRef) return cg.builder.CreateIsNotNull(expr->IRValue);
     return nullable->getIsSet(cg, expr->IRValue);
@@ -388,8 +388,8 @@ Value* neComplex(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right) {
 
 Value* eqIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     if (left->isNull && right->isNull) return cg.true_();
-    if (left->isNull) return eqNull(cg, right);
-    if (right->isNull) return eqNull(cg, left);
+    if (left->isNull) return exprEqNull(cg, right);
+    if (right->isNull) return exprEqNull(cg, left);
     if (left->type->isInt && right->type->isInt) {
         return cg.builder.CreateICmpEQ(left->loadIR(cg), right->loadIR(cg));
     }
@@ -409,8 +409,8 @@ Value* eqIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
 
 Value* neIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     if (left->isNull && right->isNull) return cg.false_();
-    if (left->isNull) return neNull(cg, right);
-    if (right->isNull) return neNull(cg, left);
+    if (left->isNull) return exprNeNull(cg, right);
+    if (right->isNull) return exprNeNull(cg, left);
     if (left->type->isInt && left->type->isInt) {
         return cg.builder.CreateICmpEQ(left->loadIR(cg), right->loadIR(cg));
     }

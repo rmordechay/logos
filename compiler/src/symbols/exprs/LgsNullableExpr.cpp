@@ -7,7 +7,7 @@ Value* LgsNullableExpr::loadIR(LgsCgModule& cg) {
     return cg.load(type->getIRType(cg), IRValue);
 }
 
-void LgsNullableExpr::assign(LgsCgModule& cg, LgsExpr* expr, Value* level) {
+void LgsNullableExpr::assign(LgsCgModule& cg, LgsExpr* expr) {
     if (type->isHeapAlloc) {
         cg.freeValue(loadIR(cg));
     }

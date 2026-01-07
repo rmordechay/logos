@@ -9,7 +9,7 @@
 #include <llvm/IR/InlineAsm.h>
 
 Value* LgsSelection::loadIR(LgsCgModule& cg) {
-    if (type->passByRef) return cg.load(cg.ptrTy(), IRValue);
+    if (type->passByRef) return cg.builder.CreateExtractValue(IRValue, 0);
     return cg.load(type->getIRType(cg), IRValue);
 }
 
@@ -17,12 +17,14 @@ LgsFuncCall* LgsSelection::asMethodCall() const {
     return exprs.back()->asFuncCall();
 }
 
-void LgsSelection::assign(LgsCgModule& cg, LgsExpr* expr, Value* level) {
+void LgsSelection::assign(LgsCgModule& cg, LgsExpr* expr) {
     assert(!type->asVec());
     if (type->isHeapAlloc) {
-        cg.moveAlloc(level, cg.sizeZero(), loadIR(cg), expr->IRValue);
+        cg.moveAlloc(IRValue, expr->IRValue);
+        cg.builder.CreateInsertValue(IRValue, cg.builder.CreateExtractValue(expr->IRValue, 0), {0});
+    } else {
+        cg.store(expr->IRValue, IRValue);
     }
-    cg.store(expr->IRValue, IRValue);
 }
 
 std::string LgsSelection::asText() {

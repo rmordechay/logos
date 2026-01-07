@@ -38,7 +38,7 @@ LgsExpr* LgsVariable::castExplicitly(LgsType* toType) {
     assert(0);
 }
 
-void LgsVariable::assign(LgsCgModule& cg, LgsExpr* expr, Value* level) {
+void LgsVariable::assign(LgsCgModule& cg, LgsExpr* expr) {
     cg.store(expr->IRValue, IRValue);
 }
 
