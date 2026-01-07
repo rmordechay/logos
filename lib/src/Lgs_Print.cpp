@@ -33,9 +33,9 @@ static std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
         size_t offset = 0;
         for (size_t i = 0; i < fieldsCount; ++i) {
             const auto fieldType = rtt->obj.fieldTypes[i];
-            void* fieldValue = static_cast<char*>(elem) + offset;
+            void* fieldPtr = static_cast<char*>(elem) + offset;
             str << rtt->obj.fieldNames[i] << '=';
-            str << formatElement(fieldType, fieldValue);
+            str << formatElement(fieldType, fieldPtr);
             if (i < fieldsCount - 1) str << ", ";
             offset += fieldType->size;
         }

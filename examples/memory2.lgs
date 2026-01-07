@@ -12,12 +12,17 @@ func(parent: Parent) {
     if true {
         parent.child := child1
     }
+    //parent1 = Parent{id=1, child=child1}
+}
+
+func2() {
+    parent = Parent{id=43, child=Child{id=83}}
+    print(parent)
+    func(parent)
+    //print(parent)
+    //print(parent1.child.id)
 }
 
 main() {
-    child1 = Child{id=23}
-    parent1 = Parent{id=1, child=child1}
-    print(parent1.child.id)
-    func(parent1)
-    print(parent1.child.id)
+    func2()
 }

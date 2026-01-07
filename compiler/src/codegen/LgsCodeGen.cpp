@@ -334,7 +334,7 @@ void LgsCodeGen::visitAssignment(const LgsAssignment* assignment) {
     assignment->rExpr->pointee = assignment->lExpr->IRValue;
     visitExpr(assignment->rExpr, true);
 
-    Value* results = nullptr;
+    const Value* results = nullptr;
     switch (assignment->assignmentType.opType) {
     case ASSIGN: lValue->assign(cg, rValue); return;
     case ASSIGN_ADD: results = lValue->type->addIR(cg, lValue, rValue); break;
@@ -351,7 +351,6 @@ void LgsCodeGen::visitAssignment(const LgsAssignment* assignment) {
     case ASSIGN_UNKNOWN: break;
     }
     assert(results);
-    cg.store(results, lValue->IRValue);
 }
 
 void LgsCodeGen::visitIfStmt(LgsIfStmt* ifStmt) {
@@ -370,14 +369,11 @@ void LgsCodeGen::visitIfStmt(LgsIfStmt* ifStmt) {
 }
 
 void LgsCodeGen::visitSimpleIf(LgsIfStmt* ifStmt) {
-    const auto IRBlockIfTrue = cg.createBlock(BLOCK_TRUE);
-    ifStmt->IRExitBlock = cg.createBlock(BLOCK_IF_FALSE);
     stack.enterScope(ifStmt);
     visitExpr(ifStmt->ifCond);
-    cg.builder.CreateCondBr(ifStmt->ifCond->IRValue, IRBlockIfTrue, ifStmt->IRExitBlock);
-    cg.startBlock(IRBlockIfTrue);
-    visitStmtsBlock(ifStmt->ifBlock);
-    cg.branchAndStartBlock(ifStmt->IRExitBlock);
+    cg.ifStmt(ifStmt->ifCond->IRValue, [this, &ifStmt] {
+        visitStmtsBlock(ifStmt->ifBlock);
+    });
     stack.exitScope();
 }
 
@@ -1000,13 +996,9 @@ void LgsCodeGen::visitFieldSelection(LgsVariable* var, LgsExpr* parent, const bo
     if (field->type->asVec()) {
         createVecField(field, parent->IRValue);
     }
-    if (field->type->isHeapAlloc) {
-        var->IRValue = parent->IRValue;
-    } else {
-        var->IRValue = field->getGEP(cg, parent->IRValue);
-        if (!assign && field->type->asObject()) {
-            var->IRValue = cg.load(cg.ptrTy(), var->IRValue);
-        }
+    var->IRValue = field->getGEP(cg, parent->IRValue);
+    if (!assign && field->type->asObject()) {
+        var->IRValue = cg.load(cg.ptrTy(), var->IRValue);
     }
 }
 
@@ -1163,15 +1155,14 @@ void LgsCodeGen::visitStrConst(LgsStrConst* strConst) {
 void LgsCodeGen::visitInstance(LgsInstance* instance) {
     const auto obj = instance->obj;
     const auto sizeIR = cg.usize(obj->sizeBytes());
-    instance->IRValue = cg.heapAlloc(sizeIR, stack.currentFunc()->level);
-    const auto v = cg.builder.CreateExtractValue(instance->IRValue, 0);
+    instance->IRValue = cg.heapAlloc(sizeIR);
 
     // Args
     std::unordered_set<std::string> visited;
     for (const auto& [argName, arg] : instance->args) {
         visited.insert(argName);
         const auto field = instance->obj->getField(argName);
-        arg.expr->pointee = field->getGEP(cg, v);
+        arg.expr->pointee = field->getGEP(cg, instance->IRValue);
         visitExpr(arg.expr);
         cg.store(arg.expr->IRValue, arg.expr->pointee);
     }
@@ -1179,7 +1170,7 @@ void LgsCodeGen::visitInstance(LgsInstance* instance) {
     // Zero values
     for (const auto field : instance->obj->fields) {
         if (visited.contains(field->name) || field->type->asEnum()) continue;
-        const auto pointee = field->getGEP(cg, v);
+        const auto pointee = field->getGEP(cg, instance->IRValue);
         if (field->expr) {
             cg.store(field->expr->IRValue, pointee);
         } else {
@@ -1187,7 +1178,7 @@ void LgsCodeGen::visitInstance(LgsInstance* instance) {
             cg.store(zeroValue, pointee);
         }
     }
-    addVirtuals(instance->obj, v);
+    addVirtuals(instance->obj, instance->IRValue);
 }
 
 void LgsCodeGen::visitIterIndex(LgsIterIndex* iterIndex, const bool assign) {
@@ -1216,7 +1207,6 @@ void LgsCodeGen::createPrologue(LgsFunc* func) const {
         cg.callRuntimeFunc("init", cg.voidTy());
     }
     cg.callStackPush();
-    func->level = cg.callRuntimeFunc("getLevel", cg.sizeTy());
 }
 
 void LgsCodeGen::createEpilogue(const LgsFunc* func) const {

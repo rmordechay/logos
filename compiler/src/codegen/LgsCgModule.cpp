@@ -138,6 +138,15 @@ void LgsCgModule::loop(Value* loopLength, const std::function<void(Value*, Basic
     startBlock(exitBlock);
 }
 
+void LgsCgModule::ifStmt(Value* cond, const std::function<void()>& body) {
+    const auto IRBlockIfTrue = createBlock(BLOCK_TRUE);
+    const auto IRExitBlock = createBlock(BLOCK_EXIT);
+    builder.CreateCondBr(cond, IRBlockIfTrue, IRExitBlock);
+    startBlock(IRBlockIfTrue);
+    body();
+    branchAndStartBlock(IRExitBlock);
+}
+
 void LgsCgModule::store(Value* v, Value* ptr) {
     if (v == ptr) return;
     builder.CreateStore(v, ptr);
@@ -176,8 +185,12 @@ void LgsCgModule::addNullTerminate(Value* strPtr, Value* pos) {
     store(i8Zero(), builder.CreateGEP(i8Ty(), strPtr, pos));
 }
 
+StructType* LgsCgModule::getAllocaType() {
+    return getStructType({ptrTy(), sizeTy()}, "Alloca");
+}
+
 void LgsCgModule::callStackPush() {
-    callRuntimeFunc("push", voidTy());
+    callRuntimeFunc("push", sizeTy());
 }
 
 void LgsCgModule::callPopStack() {
@@ -200,17 +213,13 @@ Value* LgsCgModule::heapAlloc(Value* size) {
     return callRuntimeFunc("allocate", ptrTy(), {sizeTy()}, {extendToSize(size)});
 }
 
-StructType* LgsCgModule::getAllocaType() {
-    return getStructType({ptrTy(), sizeTy()}, "Alloca");
-}
-
-Value* LgsCgModule::heapAlloc(Value* size, Value* level) {
-    const auto s = getAllocaType();
-    return callRuntimeFunc("allocate2", s, {sizeTy(), sizeTy()}, {extendToSize(size), level});
+Value* LgsCgModule::heapAlloc2(Value* size) {
+    return callRuntimeFunc("allocate2", getAllocaType(), {sizeTy()}, {extendToSize(size)});
 }
 
 Value* LgsCgModule::moveAlloc(Value* left, Value* right) {
-    return callRuntimeFunc("move", voidTy(), {getAllocaType(), getAllocaType()}, {left, right});
+    const auto s = ptrTy();
+    return callRuntimeFunc("move", voidTy(), {s, s}, {left, right});
 }
 
 Value* LgsCgModule::reallocate(Value* ptr, Value* size) {
@@ -254,8 +263,8 @@ bool LgsCgModule::lastInstTerminator() const {
 
 void LgsCgModule::createIndexBoundsGuard(Value* len, Value* index) {
     const auto condition = builder.CreateICmpUGE(extendToSize(index), extendToSize(len));
-    const auto validBlock = createBlock();
-    const auto invalidBlock = createBlock();
+    const auto validBlock = createBlock("valid_block");
+    const auto invalidBlock = createBlock("invalid_block");
     builder.CreateCondBr(condition, invalidBlock, validBlock);
     startBlock(invalidBlock);
     callThrowError(E10003);

@@ -12,9 +12,7 @@ Type* LgsFuncType::getIRType(LgsCgModule& cg) {
         const auto param = params[i];
         const auto paramType = param.type;
         if (param.isVariadic) types.emplace_back(cg.sizeTy());
-        if (param.type->passByRef && param.type->isHeapAlloc) {
-            types.emplace_back(cg.getAllocaType());
-        } else if (param.type->passByRef) {
+        if (param.type->passByRef) {
             types.emplace_back(cg.ptrTy());
         } else {
             types.emplace_back(paramType->getIRType(cg));

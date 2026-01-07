@@ -47,8 +47,7 @@ Type* LgsObject::getIRType(LgsCgModule& cg) {
     for (size_t i = 0; i < fields.size(); ++i) {
         const auto field = fields[i];
         Type* fieldType;
-        const auto ptr = field->type->asObject() || field->type->asFuncType() || field->type->asInterface();
-        if (ptr) {
+        if (field->type->passByRef) {
             fieldType = cg.ptrTy();
         } else {
             fieldType = field->type->getIRType(cg);

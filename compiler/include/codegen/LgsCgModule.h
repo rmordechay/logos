@@ -73,6 +73,7 @@ public:
     llvm::AllocaInst* getEmptyBuffer();
     GlobalVariable* createGlobal(const std::string& name, Type* type, Constant* initializer, bool isConst = true, GlobalValue::LinkageTypes linkage = GlobalValue::ExternalLinkage) const;
     void loop(Value* loopLength, const std::function<void(Value*, BasicBlock*)>& body);
+    void ifStmt(Value* cond, const std::function<void()>& body);
 
     void store(Value* v, Value* ptr);
     Value* load(Type* ty, Value* ptr);
@@ -81,6 +82,7 @@ public:
     void storeStructField(Type* parentType, Value* parentPtr, size_t position, Value* v);
     Value* loadStructField(Type* parentType, Value* parentPtr, size_t position, Type* ty);
     void addNullTerminate(Value* strPtr, Value* pos);
+    StructType* getAllocaType();
 
     void callStackPush();
     void callPopStack();
@@ -88,8 +90,7 @@ public:
     void addToVTable(Value* instance, Value* key, Value* ptr);
     Value* getFromVTable(Value* instance, Value* key);
     Value* heapAlloc(Value* size);
-    StructType* getAllocaType();
-    Value* heapAlloc(Value* size, Value* level);
+    Value* heapAlloc2(Value* size);
     Value* moveAlloc(Value* left, Value* right);
     Value* reallocate(Value* ptr, Value* size);
     void freeValue(Value* ptr);
