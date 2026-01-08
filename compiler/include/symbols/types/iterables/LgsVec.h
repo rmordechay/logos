@@ -37,7 +37,7 @@ public:
     Value* lenIR(LgsCgModule& cg, Value* iterable) override;
     Value* getIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index) override;
     void addIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index, LgsExpr* value) override;
-    Value* matVecMul(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right) const;
+    Value* matVecMul(LgsCgModule& cg, const LgsExpr* left, LgsExpr* right) const;
     static size_t getSwizzleSet(char c);
     static size_t getComponentIndex(char c);
     std::string fmtStr() const override;

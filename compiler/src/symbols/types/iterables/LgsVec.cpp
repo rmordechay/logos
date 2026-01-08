@@ -235,7 +235,7 @@ void LgsVec::addIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index, Lg
     cg.store(value->IRValue, gep);
 }
 
-Value* LgsVec::matVecMul(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right) const {
+Value* LgsVec::matVecMul(LgsCgModule& cg, const LgsExpr* left, LgsExpr* right) const {
     const auto mat = left->type->asMatrix();
     const auto order = cg.i32(CblasRowMajor);
     const auto transpose = cg.i32(CblasNoTrans);
@@ -244,7 +244,7 @@ Value* LgsVec::matVecMul(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* ri
     const auto alpha = cg.floatv(1);
     const auto matrixPtr = left->IRValue;
     const auto lda = cg.i32(mat->columns);
-    const auto vectorPtr = cg.getPtrTo(right->IRValue);
+    const auto vectorPtr = right->getIRPtr(cg);
     const auto incx = cg.i32(1);
     const auto beta = cg.floatv(0);
     const auto vecType = VectorType::get(baseType->getIRType(cg), mat->rows, false);

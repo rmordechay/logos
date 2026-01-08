@@ -349,7 +349,6 @@ void LgsSema::visitVarDec(LgsVarDec* varDec) {
         varDec->expr->location = varDec->location;
         visitExpr(varDec->expr);
     }
-    varDec->expr->setOwner(LgsOwner(varDec));
     if (varDec->expr->type->isVoid()) {
         addError(E10093, varDec->location);
     }
@@ -377,9 +376,6 @@ void LgsSema::visitAssignment(LgsAssignment* assignment) {
     r->castImplicitly(l->type);
     if (!l->type || !r->type) return;
     if (!validateExprType(r, l->type)) return;
-    if (assignment->lExpr->owner.type != NO_OWNER) {
-        assignment->rExpr->setOwner(assignment->lExpr->owner);
-    }
 
     auto canAssign = false;
     if (l->asIterIndex() || l->asVariable() || l->asNullableExpr()) {
@@ -925,13 +921,11 @@ void LgsSema::visitVariable(LgsVariable* variable) {
     case VAR_DEC: {
         variable->ref.varDec = symbol->varDec;
         variable->setType(symbol->varDec->type);
-        variable->setOwner(LgsOwner(symbol->varDec));
         break;
     }
     case PARAM: {
         variable->ref.param = symbol->param;
         variable->setType(symbol->param->type);
-        variable->setOwner(LgsOwner(symbol->param));
         break;
     }
     case ENUM: {
@@ -954,7 +948,6 @@ void LgsSema::visitVariable(LgsVariable* variable) {
         variable->ref.field = symbol->field;
         variable->isMutable = !symbol->field->isConst;
         variable->setType(symbol->field->type);
-        variable->setOwner(LgsOwner(symbol->field));
         break;
     }
     default:
@@ -1025,7 +1018,6 @@ void LgsSema::visitFieldSelection(LgsVariable* child, LgsType* parentType) {
     if (const auto field = parentType->getField(childName)) {
         child->setType(field->type);
         child->ref = LgsSymbol(field);
-        child->setOwner(LgsOwner(field));
         validateFieldVisibility(field, parentType, child->location);
     } else if (const auto method = parentType->getMethod(childName)) {
         child->setType(method->type);

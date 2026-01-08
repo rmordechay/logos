@@ -80,9 +80,7 @@ Value* LgsSet::lenIR(LgsCgModule& cg, Value* iterable) {
 }
 
 Value* LgsSet::inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) {
-    const std::vector<Type*> params = {cg.ptrTy(), cg.ptrTy()};
-    const std::vector IRArgs = {iterableExpr->IRValue, cg.getPtrTo(value->IRValue)};
-    return cg.callLgsFunc(name, "contains", cg.i1Ty(), params, IRArgs);
+    assert(0);
 }
 
 Value* LgsSet::getIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index) {

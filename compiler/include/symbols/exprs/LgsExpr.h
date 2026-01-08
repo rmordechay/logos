@@ -65,12 +65,11 @@ public:
     bool isReturnExpr = false;
     bool hasUnwrapSuffix = false;
     Value* pointee = nullptr;
-    LgsOwner owner;
 
     explicit LgsExpr(LgsType* type = nullptr) : type(type) {}
-    void setOwner(LgsOwner newOwner);
     std::optional<int64_t> getConstInt();
     std::optional<std::string> getConstStr();
+    Value* getIRPtr(LgsCgModule& cg);
 
     virtual void setType(LgsType* newType);
     virtual LgsExpr* castExplicitly(LgsType* toType);

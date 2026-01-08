@@ -117,7 +117,7 @@ Value* LgsDArray::lenIR(LgsCgModule& cg, Value* iterable) {
 
 Value* LgsDArray::inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) {
     const std::vector<Type*> params = {cg.ptrTy(), cg.ptrTy(), cg.ptrTy()};
-    const std::vector<Value*> IRArgs = {iterableExpr->IRValue, getRTType(cg), cg.getPtrTo(value->IRValue)};
+    const std::vector<Value*> IRArgs = {iterableExpr->IRValue, getRTType(cg), value->IRValue};
     return cg.callLgsFunc(name, "contains", cg.i1Ty(), params, IRArgs);
 }
 

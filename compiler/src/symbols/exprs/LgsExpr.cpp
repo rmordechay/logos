@@ -26,10 +26,6 @@
 #include "funcs/LgsFunc.h"
 #include "loops/LgsMetaVar.h"
 
-void LgsExpr::setOwner(const LgsOwner newOwner) {
-    owner = newOwner;
-}
-
 std::optional<int64_t> LgsExpr::getConstInt() {
     if (const auto intConst = asIntConst()) {
         return intConst->value;
@@ -88,6 +84,11 @@ std::optional<std::string> LgsExpr::getConstStr() {
     return std::nullopt;
 }
 
+Value* LgsExpr::getIRPtr(LgsCgModule& cg) {
+    if (type->passByRef && !asStrConst()) return IRValue;
+    return cg.allocaAndStore(type->getIRType(cg), IRValue);
+}
+
 void LgsExpr::setType(LgsType* newType) {
     type = newType;
 }
@@ -109,10 +110,6 @@ void LgsExpr::assign(LgsCgModule& cg, LgsExpr* expr) {
 }
 
 bool LgsExpr::equals(LgsExpr* other) {
-    assert(0);
-}
-
-LgsExpr* LgsExpr::clone() {
     assert(0);
 }
 
@@ -172,6 +169,14 @@ LgsEnvVar* LgsExpr::asEnvVar() {
     return dynamic_cast<LgsEnvVar*>(this);
 }
 
+LgsIntConst* LgsExpr::asIntConst() {
+    return dynamic_cast<LgsIntConst*>(this);
+}
+
+LgsStrConst* LgsExpr::asStrConst() {
+    return dynamic_cast<LgsStrConst*>(this);
+}
+
 LgsCharConst* LgsExpr::asCharConst() {
     return dynamic_cast<LgsCharConst*>(this);
 }
@@ -184,20 +189,12 @@ LgsComplexConst* LgsExpr::asComplexConst() {
     return dynamic_cast<LgsComplexConst*>(this);
 }
 
-LgsStrConst* LgsExpr::asStrConst() {
-    return dynamic_cast<LgsStrConst*>(this);
-}
-
 LgsVectorExpr* LgsExpr::asVectorExpr() {
     return dynamic_cast<LgsVectorExpr*>(this);
 }
 
 LgsMatrixExpr* LgsExpr::asMatrixExpr() {
     return dynamic_cast<LgsMatrixExpr*>(this);
-}
-
-LgsIntConst* LgsExpr::asIntConst() {
-    return dynamic_cast<LgsIntConst*>(this);
 }
 
 LgsMetaVar* LgsExpr::asLoopMetaVar() {
@@ -216,12 +213,15 @@ LgsNullableExpr* LgsExpr::asNullableExpr() {
     return dynamic_cast<LgsNullableExpr*>(this);
 }
 
+LgsExpr* LgsExpr::clone() {
+    assert(0);
+}
+
 void wrapInNullable(LgsExpr*& expr, LgsNullable* nullable) {
     assert(!nullable->baseType->asNullable() && !expr->asNullableExpr());
     const auto oldExpr = expr;
     oldExpr->setType(nullable->baseType);
     expr = new LgsNullableExpr(oldExpr);
-    expr->setOwner(oldExpr->owner);
     expr->setType(nullable);
 }
 

@@ -97,11 +97,6 @@ Value* LgsCgModule::getString(const std::string& value) {
     return new GlobalVariable(*IRModule, strConstant->getType(), true, GlobalValue::PrivateLinkage, strConstant);
 }
 
-Value* LgsCgModule::getPtrTo(Value* v) {
-    if (v->getType()->isPointerTy()) return v;
-    return allocaAndStore(v->getType(), v);
-}
-
 llvm::AllocaInst* LgsCgModule::getEmptyBuffer() {
     return builder.CreateAlloca(ArrayType::get(i8Ty(), STRING_BUFFER_SIZE));
 }
