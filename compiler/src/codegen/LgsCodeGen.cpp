@@ -60,15 +60,15 @@
 #include "types/LgsNullable.h"
 
 bool LgsCodeGen::generate() {
-    cg.setupModule(file.path, appConfigs.debugMode);
+    cg.setupModule(file->path, appConfigs.debugMode);
     visitExternalSymbols();
-    if (const auto mainFile = dynamic_cast<LgsMainFile*>(&file)) {
+    if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
         visitMainFile(mainFile);
-    } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(&file)) {
+    } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
         visitObject(objFile->obj);
-    } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(&file)) {
+    } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
         visitInterface(interfaceFile->interface);
-    } else if (const auto testFile = dynamic_cast<LgsTestFile*>(&file)) {
+    } else if (const auto testFile = dynamic_cast<LgsTestFile*>(file)) {
         visitTestFile(testFile);
     }
     if (appConfigs.debugMode) cg.finalizeDebugger(paths.buildDir);
@@ -90,9 +90,6 @@ void LgsCodeGen::visitMainFile(LgsMainFile* mainFile) {
     }
     for (const auto object : mainFile->objects) {
         visitObject(object);
-    }
-    for (auto [_, genericsCall] : file.symbolTable.genericFuncCalls) {
-        visitFunc(genericsCall);
     }
 
     for (const auto& [name, func] : mainFile->funcs) {
@@ -163,7 +160,7 @@ void LgsCodeGen::visitFunc(LgsFunc* func) {
 }
 
 void LgsCodeGen::visitExternalSymbols() {
-    for (auto [name, symbol] : file.symbolTable.symbols) {
+    for (auto [name, symbol] : file->symbolTable.symbols) {
         if (symbol.symbolType == VAR_DEC && symbol.isExternal) {
             visitConstant(symbol.varDec->expr);
             symbol.varDec->IRValue = symbol.varDec->expr->IRValue;

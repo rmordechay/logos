@@ -54,6 +54,12 @@ struct LgsLLDBGen {
     DISubprogram* subprogram = nullptr;
 };
 
+enum LgsCodeGenMode {
+    CG_MODE_RTTYPES,
+    CG_MODE_SRC_CODE,
+    CG_MODE_GENERICS,
+};
+
 class LgsCgModule {
 public:
     LLVMContext context;
@@ -64,6 +70,7 @@ public:
     IRBuilder<> builder = IRBuilder(context);
     std::map<std::string, Type*> typesRegistry;
     std::unordered_map<std::string, Value*> stringsRegistry;
+    LgsCodeGenMode mode = CG_MODE_SRC_CODE;
     bool isRTTModule = false;
 
     void setupModule(const std::filesystem::path& file, bool debugMode = false);

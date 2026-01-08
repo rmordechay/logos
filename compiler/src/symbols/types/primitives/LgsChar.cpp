@@ -41,7 +41,6 @@ LgsType* LgsChar::applyBinOp(LgsType* rightType, LgsBinOp& op) {
 bool LgsChar::canCastTo(LgsType* other) {
     const auto IRName = other->getName();
     if (IRName == LgsAny::name) return true;
-    if (IRName == LgsStr::name) return true;
     if (IRName == LgsShort::name) return true;
     if (IRName == LgsInt::name) return true;
     if (IRName == LgsSize::name) return true;

@@ -817,17 +817,17 @@ void LgsSema::visitArrayExpr(LgsArrayExpr* arrayExpr) {
     if (!arrayExpr->type) {
         arrayExpr->setType(new LgsDArray());
     }
+    const auto iterable = arrayExpr->type->asIterable();
+    if (!iterable) return;
+    if (!iterable->inferBaseType(arrayExpr->elements)) {
+        return addError(E10095, arrayExpr->location);
+    }
     if (arrayExpr->type->asDArray() || arrayExpr->type->asSet()) {
         visitDynamicArray(arrayExpr);
     } else if (arrayExpr->type->asSArray()) {
         visitStaticArray(arrayExpr);
     } else {
         return;
-    }
-    const auto iterable = arrayExpr->type->asIterable();
-    if (!iterable) return;
-    if (!iterable->inferBaseType(arrayExpr->elements)) {
-        return addError(E10095, arrayExpr->location);
     }
     for (const auto element : arrayExpr->elements) {
         if (iterable->baseType && element->type->canCastTo(iterable->baseType)) continue;
@@ -853,6 +853,7 @@ void LgsSema::visitDynamicArray(LgsArrayExpr* arrayExpr) {
     if (!dArr->baseType && arrayExpr->elements.empty()) {
         return addError(E10049, arrayExpr->location, {arrayExpr->asText()});
     }
+    file->symbolTable.generics[dArr->getName()] = arrayExpr;
 }
 
 void LgsSema::visitHashMap(LgsHashMap* hashMap) {
@@ -1689,10 +1690,10 @@ void LgsSema::createCoroutineFunc(LgsFuncCall* funcCall) {
 
 void LgsSema::makeGenericFuncCall(LgsFuncCall* funcCall, const LgsFunc* func) {
     const auto funcName = funcCall->getGenericName();
-    const auto generics = file->symbolTable.genericFuncCalls.find(funcName);
+    const auto generics = file->symbolTable.generics.find(funcName);
     LgsFunc* genericFunc = nullptr;
-    if (generics != file->symbolTable.genericFuncCalls.end()) {
-        genericFunc = generics->second;
+    if (generics != file->symbolTable.generics.end()) {
+        genericFunc = generics->second->asFunc();
     } else {
         const auto newFuncType = func->funcType->clone();
         newFuncType->genericTypes.clear();
@@ -1709,7 +1710,7 @@ void LgsSema::makeGenericFuncCall(LgsFuncCall* funcCall, const LgsFunc* func) {
             genericFunc->stmtsBlock = func->stmtsBlock->clone();
         }
         visitFunc(genericFunc);
-        file->symbolTable.genericFuncCalls[funcName] = genericFunc;
+        file->symbolTable.generics[funcName] = genericFunc;
     }
     funcCall->func = genericFunc;
     funcCall->setType(genericFunc->funcType->rt);

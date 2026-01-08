@@ -30,7 +30,7 @@ bool LgsDArray::inferBaseType(std::vector<LgsExpr*>& args) {
     const auto baseExprType = args.front()->type;
     for (size_t i = 1; i < args.size(); ++i) {
         const auto arg = args[i];
-        if (!baseExprType->equals(arg->type)) return false;
+        if (!arg->type->canCastTo(baseExprType)) return false;
     }
     baseType = baseExprType;
     return true;
@@ -132,20 +132,23 @@ Value* LgsDArray::getIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* inde
 
 void LgsDArray::addIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index, LgsExpr* value) {
     if (index) assert(0);
+    cg.builder.CreateCall(getAddFunc(cg), {iterable->IRValue, value->IRValue});
+}
+
+Function* LgsDArray::getAddFunc(LgsCgModule& cg) {
     const auto funcName = getName() + "_" + ADD_FUNC;
-    if (const auto f = cg.IRModule->getFunction(funcName)) {
-        cg.builder.CreateCall(f, {iterable->IRValue, value->IRValue});
-        return;
-    }
     const auto ty = getIRType(cg);
     const auto baseSize = cg.usize(baseType->sizeBytes());
     const std::vector<Type*> params = {cg.ptrTy(), baseType->getIRType(cg)};
     const auto ft = cg.getFT(cg.voidTy(), params);
-    const auto func = cg.getFunc(funcName, ft);
+    if (cg.mode == CG_MODE_SRC_CODE) {
+        return llvm::cast<Function>(cg.IRModule->getOrInsertFunction(funcName, ft).getCallee());
+    }
 
     // Save state
     cg.savedIP = cg.builder.saveIP();
     const auto originalFunc = cg.currentFunc;
+    const auto func = cg.getFunc(funcName, ft);
     cg.currentFunc = func;
 
     // Prologue
@@ -193,8 +196,7 @@ void LgsDArray::addIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index,
     cg.currentFunc = originalFunc;
     cg.builder.restoreIP(cg.savedIP);
 
-    // Call
-    cg.builder.CreateCall(func, {iterable->IRValue, value->IRValue});
+    return func;
 }
 
 bool LgsDArray::canCastTo(LgsType* other) {

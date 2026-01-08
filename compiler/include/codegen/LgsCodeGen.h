@@ -63,15 +63,15 @@ struct LgsAppConfigs;
 
 class LgsCodeGen {
 public:
-    LgsFile& file;
+    LgsFile* file;
     LgsStack stack;
     LgsCgModule& cg;
     LgsPaths& paths;
     LgsGlobals& globals;
     LgsAppConfigs& appConfigs;
 
-    explicit LgsCodeGen(LgsFile& file, LgsAppConfigs& appConfigs, LgsGlobals& globals, LgsPaths& paths)
-        : file(file), cg(file.cg), paths(paths), globals(globals), appConfigs(appConfigs) {
+    explicit LgsCodeGen(LgsFile* file, LgsAppConfigs& appConfigs, LgsGlobals& globals, LgsPaths& paths)
+        : file(file), cg(file->cg), paths(paths), globals(globals), appConfigs(appConfigs) {
     }
 
     bool generate();

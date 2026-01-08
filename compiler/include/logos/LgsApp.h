@@ -26,6 +26,7 @@ public:
     LgsErrHandler errHandler;
     LgsCgModule rttTypeModule;
     std::vector<LgsFile*> srcFiles;
+    std::vector<LgsFile*> genericFiles;
     std::vector<LgsEnvFile*> envFiles;
     std::vector<LgsTestFile*> testFiles;
     LgsAppConfigFile* appConfigFile = nullptr;
@@ -52,6 +53,7 @@ public:
     void loadBuiltins();
     bool resolveGlobals();
     bool generateRTTTypes();
+    bool generateGenerics();
     void createBuildDirs();
     bool validateEnvs();
     bool validateRequiredEnvs();

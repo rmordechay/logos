@@ -30,6 +30,7 @@ public:
     Value* inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
     Value* getIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index) override;
     void addIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index, LgsExpr* value) override;
+    Function* getAddFunc(LgsCgModule& cg);
     bool canCastTo(LgsType* other) override;
     LgsType* clone() override;
     DIType* getDebugType(LgsCgModule& cg) override;

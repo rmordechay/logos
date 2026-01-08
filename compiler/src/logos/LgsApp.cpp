@@ -160,11 +160,12 @@ bool LgsApp::generate() {
     createBuildDirs();
     LgsCgModule::initLLVM();
     if (!generateRTTTypes()) return false;
+    if (!generateGenerics()) return false;
 
     // Main file is generated first non-concurrently
     const auto mainFile = getMainFile();
     assert(mainFile);
-    LgsCodeGen mainCodeGen(*mainFile, configs, globals, paths);
+    LgsCodeGen mainCodeGen(mainFile, configs, globals, paths);
     if (!mainCodeGen.generate()) {
         errHandler.setUnsuccessful();
         printIR();
@@ -173,7 +174,7 @@ bool LgsApp::generate() {
     for (const auto& file : srcFiles) {
         if (file->isMain()) continue;
         threadPool.runTask([this, file] {
-            LgsCodeGen fileCodeCode(*file, configs, globals, paths);
+            LgsCodeGen fileCodeCode(file, configs, globals, paths);
             const auto successful = fileCodeCode.generate();
             if (!successful) {
                 std::lock_guard lock(mtx);
@@ -188,11 +189,14 @@ bool LgsApp::generate() {
 
 bool LgsApp::link() {
     paths.execFile = paths.buildDir / (configs.name != "" ? configs.name : LGS_DEFAULT_EXEC_FILE);
-    const LgsLinker linker(configs, paths, srcFiles);
+    std::vector<LgsFile*> files;
+    files.reserve(srcFiles.size() + genericFiles.size());
+    files.insert(files.end(), srcFiles.begin(), srcFiles.end());
+    files.insert(files.end(), genericFiles.begin(), genericFiles.end());
+    const LgsLinker linker(configs, paths, files);
     for (const auto& path : paths.userCLibs) {
-        if (!fs::exists(path)) {
-            errHandler.addError(E10107, {path});
-        }
+        if (fs::exists(path)) continue;
+        errHandler.addError(E10107, {path});
     }
     if (!errHandler.successful) return false;
     return linker.link();
@@ -365,6 +369,26 @@ bool LgsApp::generateRTTTypes() {
     return rttTypeModule.writeIRModule(paths, 3);
 }
 
+bool LgsApp::generateGenerics() {
+    const auto file = new LgsFile("generic");
+    file->cg.setupModule("genericsArrays");
+    file->cg.mode = CG_MODE_GENERICS;
+    const LgsCodeGen cg(file, configs, globals, paths);
+    std::unordered_map<std::string, LgsExpr*> generics;
+    for (const auto srcFile : srcFiles) {
+        generics.merge(srcFile->symbolTable.generics);
+    }
+    for (auto& [_, genericExpr] : generics) {
+        if (const auto dArr = genericExpr->type->asDArray()) {
+            dArr->getAddFunc(cg.cg);
+        } else {
+            assert(0);
+        }
+    }
+    genericFiles.push_back(file);
+    return file->cg.writeIRModule(paths, configs.optLevel);
+}
+
 void LgsApp::createBuildDirs() {
     if (!fs::exists(paths.buildDir)) {
         createDir(paths.buildDir);
@@ -421,7 +445,11 @@ void LgsApp::printIR() const {
     if (!lgsConfigs.isDevMode || !lgsConfigs.printIR) return;
     rttTypeModule.IRModule->print(outs(), nullptr);
     logInfo(LGS_MSG_LINE_SEPERATOR);
-    std::lock_guard lock(mtx);
+    for (const auto& file : genericFiles) {
+        if (!file->cg.IRModule) continue;
+        file->cg.IRModule->print(outs(), nullptr);
+        logInfo(LGS_MSG_LINE_SEPERATOR);
+    }
     for (const auto& file : srcFiles) {
         if (!file->cg.IRModule) continue;
         file->cg.IRModule->print(outs(), nullptr);
@@ -459,6 +487,10 @@ LgsApp::~LgsApp() {
         delete file;
     }
     srcFiles.clear();
+    for (const auto file : genericFiles) {
+        delete file;
+    }
+    genericFiles.clear();
     for (const auto envFile : envFiles) {
         delete envFile;
     }
