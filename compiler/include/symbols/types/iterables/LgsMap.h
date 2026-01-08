@@ -30,25 +30,22 @@ public:
     Value* getIRZeroValue(LgsCgModule& cg, Value* pointee) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     bool inferBaseType(std::vector<LgsExpr*>& args) override;
+    Value* lenIR(LgsCgModule& cg, Value* iterable) override;
+    Value* inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
+    Value* getIRElement(LgsCgModule& cg, LgsExpr* map, LgsExpr* index) override;
+    Function* getAddFunc(LgsCgModule& cg);
+    void addIRElement(LgsCgModule& cg, LgsExpr* map, LgsExpr* index, LgsExpr* value) override;
+    StructType* getEntryStruct(LgsCgModule& cg) const;
     Value* loadEntriesField(LgsCgModule& cg, Value* map);
     Value* loadCapField(LgsCgModule& cg, Value* map);
     Value* getEntryKey(LgsCgModule& cg, Value* entry) const;
     Value* getEntryValue(LgsCgModule& cg, Value* entry) const;
     Value* getEntryNext(LgsCgModule& cg, Value* entry) const;
-    Value* lenIR(LgsCgModule& cg, Value* iterable) override;
-    Value* inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
-    Value* getIRElement(LgsCgModule& cg, LgsExpr* map, LgsExpr* index) override;
-    void addIRElement(LgsCgModule& cg, LgsExpr* map, LgsExpr* index, LgsExpr* value) override;
     Value* getNewEntry(LgsCgModule& cg, Value* entryPtr, Value* key, Value* value) const;
-    StructType* getEntryStruct(LgsCgModule& cg) const;
-    bool unpackLoopVarsTypes(LgsForeachLoop* loop) const override;
-    void unpackLoopIR(LgsCgModule& cg, LgsForeachLoop* loop) override;
+    bool unpackLoopVars(LgsForeachLoop* loop) const override;
+    void setLoopIRVars(LgsCgModule& cg, LgsForeachLoop* loop) override;
     std::string fmtStr() const override;
     DIType* getDebugType(LgsCgModule& cg) override;
+    Function* getGetFunc(LgsCgModule& cg);
 };
 
-class LgsPair final {
-public:
-    LgsExpr* key;
-    LgsExpr* value;
-};

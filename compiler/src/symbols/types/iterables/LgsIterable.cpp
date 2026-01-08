@@ -83,7 +83,7 @@ LgsType* LgsIterable::getValueType() {
     return baseType;
 }
 
-bool LgsIterable::unpackLoopVarsTypes(LgsForeachLoop* loop) const {
+bool LgsIterable::unpackLoopVars(LgsForeachLoop* loop) const {
     if (loop->loopVars.size() > 1) return false;
     assert(baseType);
     const auto iterIndex = new LgsIterIndex(loop->iterExpr, LGS_SIZE.getZeroValue());
@@ -93,7 +93,7 @@ bool LgsIterable::unpackLoopVarsTypes(LgsForeachLoop* loop) const {
     return true;
 }
 
-void LgsIterable::unpackLoopIR(LgsCgModule& cg, LgsForeachLoop* loop) {
+void LgsIterable::setLoopIRVars(LgsCgModule& cg, LgsForeachLoop* loop) {
     const auto iterIndex = loop->loopVars[0]->expr->asIterIndex();
     iterIndex->index.from->IRValue = loop->loadIndex(cg);
     iterIndex->setIRElementPtr(cg);

@@ -2,6 +2,14 @@
 #include "LgsUtils.h"
 #include "codegen/LgsCgModule.h"
 
+void LgsPair::setDebugValue(LgsCgModule& cg) {
+    assert(0);
+}
+
+std::string LgsPair::asText() {
+    assert(0);
+}
+
 void LgsHashMap::castImplicitly(LgsType* toType) {
     if (!toType->asMap()) return;
     if (!type) setType(toType);
@@ -27,9 +35,9 @@ std::string LgsHashMap::asText() {
 }
 
 LgsHashMap::~LgsHashMap() {
-    for (const auto [key, value] : elements) {
-        freeExpr(key);
-        freeExpr(value);
+    for (const auto pair : elements) {
+        freeExpr(pair->key);
+        freeExpr(pair->value);
     }
     elements.clear();
 }

@@ -595,7 +595,7 @@ void LgsSema::visitForeachLoop(LgsForeachLoop* foreachLoop) {
         foreachLoop->loopVars.emplace_back(varDec);
     }
     if (!iterable->baseType) return;
-    const bool unpacked = iterable->unpackLoopVarsTypes(foreachLoop);
+    const bool unpacked = iterable->unpackLoopVars(foreachLoop);
     if (!unpacked) {
         addError(E10041, foreachLoop->iterExpr->location, {foreachLoop->iterExpr->asText(), foreachLoop->iterExpr->type->pname(), std::to_string(foreachLoop->loopVars.size())});
         return;
@@ -853,16 +853,22 @@ void LgsSema::visitDynamicArray(LgsArrayExpr* arrayExpr) {
 }
 
 void LgsSema::visitHashMap(LgsHashMap* hashMap) {
-    for (auto [key, value] : hashMap->elements) {
-        visitExpr(key);
-        visitExpr(value);
+    for (const auto pair : hashMap->elements) {
+        visitExpr(pair->key);
+        visitExpr(pair->value);
     }
-    if (hashMap->type) return;
-    if (hashMap->elements.empty()) {
+    if (!hashMap->type && hashMap->elements.empty()) {
         return addError(E10049, hashMap->location, {LgsMap::name});
     }
-    const auto [key, value] = hashMap->elements.front();
-    hashMap->setType(new LgsMap(key->type, value->type));
+    if (!hashMap->type && !hashMap->elements.empty()) {
+        const auto pair = hashMap->elements.front();
+        hashMap->setType(new LgsMap(pair->key->type, pair->value->type));
+        std::vector<LgsExpr*> elements;
+        elements.reserve(hashMap->elements.size());
+        for (const auto element : hashMap->elements) elements.push_back(element);
+        hashMap->type->asIterable()->inferBaseType(elements);
+    }
+    file->symbolTable.generics[hashMap->type->getName()] = hashMap;
 }
 
 void LgsSema::visitVectorExpr(LgsVectorExpr* vectorExpr) {

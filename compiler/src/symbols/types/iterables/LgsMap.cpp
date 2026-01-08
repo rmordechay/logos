@@ -117,6 +117,28 @@ bool LgsMap::inferBaseType(std::vector<LgsExpr*>& args) {
     assert(0);
 }
 
+Value* LgsMap::lenIR(LgsCgModule& cg, Value* iterable) {
+    return cg.loadStructField(getIRType(cg), iterable, 1, cg.sizeTy());
+}
+
+Value* LgsMap::inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) {
+    assert(0);
+}
+
+Value* LgsMap::getIRElement(LgsCgModule& cg, LgsExpr* map, LgsExpr* index) {
+    return cg.builder.CreateCall(getGetFunc(cg), {map->IRValue, index->IRValue});
+}
+
+void LgsMap::addIRElement(LgsCgModule& cg, LgsExpr* map, LgsExpr* index, LgsExpr* value) {
+    cg.builder.CreateCall(getAddFunc(cg), {map->IRValue, index->IRValue, value->IRValue});
+}
+
+StructType* LgsMap::getEntryStruct(LgsCgModule& cg) const {
+    const auto keyTy = pairType->key->getIRType(cg);
+    const auto valueTy = pairType->value->getIRType(cg);
+    return cg.getStructType({keyTy, valueTy, cg.ptrTy()}, pairType->getName());
+}
+
 Value* LgsMap::loadEntriesField(LgsCgModule& cg, Value* map) {
     return cg.loadStructField(getIRType(cg), map, 0, cg.ptrTy());
 }
@@ -137,41 +159,160 @@ Value* LgsMap::getEntryNext(LgsCgModule& cg, Value* entry) const {
     return cg.builder.CreateStructGEP(getEntryStruct(cg), entry, 2);
 }
 
-Value* LgsMap::lenIR(LgsCgModule& cg, Value* iterable) {
-    return cg.loadStructField(getIRType(cg), iterable, 1, cg.sizeTy());
+Value* LgsMap::getNewEntry(LgsCgModule& cg, Value* entryPtr, Value* key, Value* value) const {
+    const auto entryTy = getEntryStruct(cg);
+    const auto entry = cg.heapAlloc(cg.usize(pairType->sizeBytes() + sizeof(void*)));
+    cg.storeStructField(entryTy, entry, 0, key);
+    cg.storeStructField(entryTy, entry, 1, value);
+    cg.storeStructField(entryTy, entry, 2, cg.null());
+    cg.store(entry, entryPtr);
+    return entry;
 }
 
-Value* LgsMap::inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) {
+bool LgsMap::unpackLoopVars(LgsForeachLoop* loop) const {
+    if (loop->loopVars.size() == 1) {
+        loop->loopVars[0]->setType(pairType->key);
+        return true;
+    }
+    if (loop->loopVars.size() == 2) {
+        loop->loopVars[0]->setType(pairType->key);
+        loop->loopVars[1]->setType(pairType->value);
+        return true;
+    }
+    return false;
+}
+
+void LgsMap::setLoopIRVars(LgsCgModule& cg, LgsForeachLoop* loop) {
+    const auto map = loop->iterExpr->IRValue;
+    const auto mapTy = getIRType(cg);
+    const auto checkEntryBlock = cg.createBlock("check_entry");
+    const auto notFoundEntryBlock = cg.createBlock("not_found_entry");
+    const auto foundEntryBlock = cg.createBlock("found_entry");
+    const auto entries = cg.loadStructField(mapTy, map, 0, cg.ptrTy());
+
+    // Check entry
+    cg.branchAndStartBlock(checkEntryBlock);
+    const auto index = cg.load(cg.sizeTy(), loop->iteratorCounter);
+    const auto entryPtr = cg.builder.CreateInBoundsGEP(cg.ptrTy(), entries, index);
+    const auto entry = cg.load(cg.ptrTy(), entryPtr);
+    const auto hasEntry = cg.builder.CreateIsNotNull(entry);
+    cg.builder.CreateCondBr(hasEntry, foundEntryBlock, notFoundEntryBlock);
+
+    // Not found entry
+    cg.startBlock(notFoundEntryBlock);
+
+    const auto incIterator = cg.builder.CreateAdd(index, cg.usize(1));
+    cg.store(incIterator, loop->iteratorCounter);
+    cg.builder.CreateBr(checkEntryBlock);
+
+    // Found entry
+    cg.startBlock(foundEntryBlock);
+    const auto currentEntryLoad = cg.load(cg.ptrTy(), entryPtr);
+    loop->loopVars[0]->IRValue = getEntryKey(cg, currentEntryLoad);
+    if (loop->loopVars.size() == 2) {
+        loop->loopVars[1]->IRValue = getEntryValue(cg, currentEntryLoad);
+    }
+}
+
+std::string LgsMap::fmtStr() const {
+    return "%s";
+}
+
+DIType* LgsMap::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
 
-Value* LgsMap::getIRElement(LgsCgModule& cg, LgsExpr* map, LgsExpr* index) {
-    const auto cap = loadCapField(cg, map->IRValue);
-    const auto hash = cg.builder.CreateURem(index->hashValue(cg), cap);
-    const auto entries = loadEntriesField(cg, map->IRValue);
+Function* LgsMap::getGetFunc(LgsCgModule& cg) {
+    const auto funcName = getName() + "_get";
+    const auto keyTy = pairType->key->passByRef ? cg.ptrTy() : pairType->key->getIRType(cg);
+    const auto valueTy = pairType->value->passByRef ? cg.ptrTy() : pairType->value->getIRType(cg);
+    const std::vector<Type*> params = {cg.ptrTy(), keyTy};
+    const auto ft = cg.getFT(valueTy, params);
+    if (cg.mode == CG_MODE_SRC_CODE) {
+        return llvm::cast<Function>(cg.IRModule->getOrInsertFunction(funcName, ft).getCallee());
+    }
+
+    // Save state
+    cg.savedIP = cg.builder.saveIP();
+    const auto originalFunc = cg.currentFunc;
+    const auto func = cg.getFunc(funcName, ft);
+    cg.currentFunc = func;
+
+    const auto entryBlock = cg.createBlock(BLOCK_ENTRY, cg.currentFunc);
+    const auto entryNullCheckBlock = cg.createBlock("entry_null_check");
+    const auto entryNullBlock = cg.createBlock("entry_is_null");
+    const auto keyCompareBlock = cg.createBlock("keys_compare");
+    const auto keysEqualBlock = cg.createBlock("keys_equal");
+    const auto keysNotEqualBlock = cg.createBlock("keys_not_equal");
+
+    cg.builder.SetInsertPoint(entryBlock);
+    const auto mapIR = cg.currentFunc->getArg(0);
+    const auto keyIR = cg.currentFunc->getArg(1);
+    const auto indexTemp = pairType->key->getZeroValue();
+    const auto indexTemp2 = pairType->key->getZeroValue();
+    indexTemp->IRValue = keyIR;
+
+    const auto cap = loadCapField(cg, mapIR);
+    const auto hash = cg.builder.CreateURem(indexTemp->hashValue(cg), cap);
+    const auto entries = loadEntriesField(cg, mapIR);
     const auto entryPtr = cg.builder.CreateInBoundsGEP(cg.ptrTy(), entries, {hash});
     const auto entry = cg.load(cg.ptrTy(), entryPtr);
-    return getEntryValue(cg, entry);
+    const auto keyPtr = getEntryKey(cg, entry);
+    const auto currentEntryPtr = cg.allocaAndStore(cg.ptrTy(), entry);
+
+    // Entry null check
+    cg.branchAndStartBlock(entryNullCheckBlock);
+    const auto currentEntry = cg.load(cg.ptrTy(), currentEntryPtr);
+    const auto isEntryNull = cg.builder.CreateIsNull(currentEntry);
+    cg.builder.CreateCondBr(isEntryNull, entryNullBlock, keyCompareBlock);
+
+    // Entry null
+    cg.startBlock(entryNullBlock);
+    cg.builder.CreateRet(pairType->value->getIRZeroValue(cg));
+
+    // Key comparison
+    cg.startBlock(keyCompareBlock);
+    indexTemp2->IRValue = cg.load(keyTy, keyPtr);
+    const auto keysEqual = eqIR(cg, indexTemp, indexTemp2);
+    cg.builder.CreateCondBr(keysEqual, keysEqualBlock, keysNotEqualBlock);
+
+    // Key not equal
+    cg.startBlock(keysNotEqualBlock);
+    const auto nextPtr = getEntryNext(cg, entry);
+    const auto next = cg.load(cg.ptrTy(), nextPtr);
+    cg.store(next, currentEntryPtr);
+    cg.builder.CreateBr(entryNullCheckBlock);
+
+    // Key equal
+    cg.startBlock(keysEqualBlock);
+    cg.builder.CreateRet(cg.load(valueTy, getEntryValue(cg, entry)));
+
+    // Epilogue
+    cg.currentFunc = originalFunc;
+    cg.builder.restoreIP(cg.savedIP);
+    freeExpr(indexTemp);
+    freeExpr(indexTemp2);
+
+    return func;
 }
 
-void LgsMap::addIRElement(LgsCgModule& cg, LgsExpr* map, LgsExpr* index, LgsExpr* value) {
+
+Function* LgsMap::getAddFunc(LgsCgModule& cg) {
     const auto funcName = getName() + "_" + ADD_FUNC;
-    auto IRFunc = cg.IRModule->getFunction(funcName);
-    if (IRFunc) {
-        cg.builder.CreateCall(IRFunc, {map->IRValue, index->IRValue, value->IRValue});
-        return;
-    }
     const auto mapTy = getIRType(cg);
     const auto valueTy = pairType->value->passByRef ? cg.ptrTy() : pairType->value->getIRType(cg);
     const auto keyType = pairType->key->passByRef ? cg.ptrTy() : pairType->key->getIRType(cg);
     const std::vector<Type*> params = {cg.ptrTy(), keyType, valueTy};
     const auto ft = cg.getFT(cg.voidTy(), params);
-    IRFunc = cg.getFunc(funcName, ft);
+    if (cg.mode == CG_MODE_SRC_CODE) {
+        return llvm::cast<Function>(cg.IRModule->getOrInsertFunction(funcName, ft).getCallee());
+    }
 
     // Save state
     cg.savedIP = cg.builder.saveIP();
     const auto originalFunc = cg.currentFunc;
-    cg.currentFunc = IRFunc;
+    const auto func = cg.getFunc(funcName, ft);
+    cg.currentFunc = func;
 
     const auto entryBlock = cg.createBlock(BLOCK_ENTRY, cg.currentFunc);
     const auto resizeBlock = cg.createBlock("resize");
@@ -188,7 +329,8 @@ void LgsMap::addIRElement(LgsCgModule& cg, LgsExpr* map, LgsExpr* index, LgsExpr
     const auto valueIR = cg.currentFunc->getArg(2);
 
     const auto entryTy = getEntryStruct(cg);
-    const auto indexTemp = index->type->getZeroValue();
+    const auto indexTemp = pairType->key->getZeroValue();
+    const auto indexTemp2 = pairType->key->getZeroValue();
     const auto entriesField = cg.builder.CreateStructGEP(mapTy, mapIR, 0);
     const auto lenField = cg.builder.CreateStructGEP(mapTy, mapIR, 1);
     const auto capField = cg.builder.CreateStructGEP(mapTy, mapIR, 2);
@@ -235,16 +377,13 @@ void LgsMap::addIRElement(LgsCgModule& cg, LgsExpr* map, LgsExpr* index, LgsExpr
 
     // Element with same hash
     cg.startBlock(keyCompareBlock);
-    const auto indexTemp2 = index->type->getZeroValue();
-    indexTemp2->IRValue = cg.load(cg.ptrTy(), getEntryKey(cg, entry));
-    const auto eq = eqIR(cg, indexTemp, indexTemp2);
-    cg.builder.CreateCondBr(eq, equalBlock, notEqualBlock);
+    indexTemp2->IRValue = cg.load(pairType->key->getIRType(cg), getEntryKey(cg, entry));
+    cg.builder.CreateCondBr(eqIR(cg, indexTemp, indexTemp2), equalBlock, notEqualBlock);
     cg.startBlock(equalBlock);
     cg.storeStructField(entryTy, entry, 1, valueIR);
     cg.builder.CreateRetVoid();
     cg.startBlock(notEqualBlock);
-    const auto nextLoad = cg.load(cg.ptrTy(), getEntryNext(cg, entry));
-    cg.store(nextLoad, entryAlloca);
+    cg.store(cg.load(cg.ptrTy(), getEntryNext(cg, entry)), entryAlloca);
     cg.builder.CreateBr(entryNullCondBlock);
 
     // Store entry
@@ -264,64 +403,8 @@ void LgsMap::addIRElement(LgsCgModule& cg, LgsExpr* map, LgsExpr* index, LgsExpr
     cg.builder.CreateRetVoid();
     cg.currentFunc = originalFunc;
     cg.builder.restoreIP(cg.savedIP);
-
-    // Call
-    cg.builder.CreateCall(IRFunc, {map->IRValue, index->IRValue, value->IRValue});
     freeExpr(indexTemp);
     freeExpr(indexTemp2);
-}
 
-Value* LgsMap::getNewEntry(LgsCgModule& cg, Value* entryPtr, Value* key, Value* value) const {
-    const auto entryTy = getEntryStruct(cg);
-    const auto entry = cg.heapAlloc(cg.usize(pairType->sizeBytes() + sizeof(void*)));
-    cg.storeStructField(entryTy, entry, 0, key);
-    cg.storeStructField(entryTy, entry, 1, value);
-    cg.storeStructField(entryTy, entry, 2, cg.null());
-    cg.store(entry, entryPtr);
-    return entry;
-}
-
-StructType* LgsMap::getEntryStruct(LgsCgModule& cg) const {
-    const auto keyTy = pairType->key->getIRType(cg);
-    const auto valueTy = pairType->value->getIRType(cg);
-    return cg.getStructType({keyTy, valueTy, cg.ptrTy()}, pairType->getName());
-}
-
-bool LgsMap::unpackLoopVarsTypes(LgsForeachLoop* loop) const {
-    if (loop->loopVars.size() == 1) {
-        loop->loopVars[0]->setType(pairType->key);
-        return true;
-    }
-    if (loop->loopVars.size() == 2) {
-        loop->loopVars[0]->setType(pairType->key);
-        loop->loopVars[1]->setType(pairType->value);
-        return true;
-    }
-    return false;
-}
-
-void LgsMap::unpackLoopIR(LgsCgModule& cg, LgsForeachLoop* loop) {
-    const auto map = loop->iterExpr->IRValue;
-    const auto foundBlock = cg.createBlock();
-    const auto exitBlock = cg.createBlock();
-
-    const auto entries = loadEntriesField(cg, map);
-    const auto entry = cg.builder.CreateInBoundsGEP(cg.ptrTy(), entries, {loop->loadIndex(cg)});
-    const auto found = cg.builder.CreateIsNull(cg.load(cg.ptrTy(), entry));
-    cg.builder.CreateCondBr(found, foundBlock, exitBlock);
-    cg.startBlock(foundBlock);
-    // TODO continue iterator
-    cg.branchAndStartBlock(exitBlock);
-    loop->loopVars[0]->IRValue = cg.builder.CreateStructGEP(getEntryStruct(cg), entry, 0);
-    if (loop->loopVars.size() == 2) {
-        loop->loopVars[1]->IRValue = cg.builder.CreateStructGEP(getEntryStruct(cg), entry, 1);
-    }
-}
-
-std::string LgsMap::fmtStr() const {
-    return "%s";
-}
-
-DIType* LgsMap::getDebugType(LgsCgModule& cg) {
-    assert(0);
+    return func;
 }

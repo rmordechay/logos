@@ -47,7 +47,7 @@ bool LgsStr::canCastTo(LgsType* other) {
 LgsType* LgsStr::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     switch (op.opType) {
     case ADD: {
-        if (rightType->canCastTo(this)) return new LgsStr();
+        if (rightType->asStr() || rightType->asChar() || rightType->isNumber()) return new LgsStr();
         break;
     }
     case IN: {
@@ -78,8 +78,26 @@ bool LgsStr::inferBaseType(std::vector<LgsExpr*>& args) {
 }
 
 Value* LgsStr::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto leftSize  = lenIR(cg, left->IRValue);
-    const auto rightSize = lenIR(cg, right->IRValue);
+    const auto leftStrConst = left->getConstStr();
+    const auto rightStrConst = right->getConstStr();
+    if (leftStrConst.has_value() && rightStrConst.has_value()) {
+        return cg.getString(leftStrConst.value() + rightStrConst.value());
+    }
+    const auto rightIntConst = right->getConstInt();
+    if (leftStrConst.has_value() && rightIntConst.has_value()) {
+        return cg.getString(leftStrConst.value() + std::to_string(rightIntConst.value()));
+    }
+    const auto rightFloatConst = right->getConstFloat();
+    if (leftStrConst.has_value() && rightFloatConst.has_value()) {
+        return cg.getString(leftStrConst.value() + std::to_string(rightFloatConst.value()));
+    }
+    const auto leftIterable = left->type->asStr();
+    const auto rightIterable = right->type->asStr();
+    assert(leftIterable && rightIterable);
+    const auto size1 = leftIterable->size->getConstInt();
+    const auto size2 = rightIterable->size->getConstInt();
+    const auto leftSize = size1.has_value() ? cg.usize(size1.value()) : lenIR(cg, left->IRValue);
+    const auto rightSize = size2.has_value() ? cg.usize(size2.value()) : lenIR(cg, right->IRValue);
     const auto sumSize = cg.builder.CreateAdd(leftSize, rightSize);
     const auto allocSize = cg.builder.CreateAdd(sumSize, cg.usize(1));
     const auto buffer = cg.heapAlloc(allocSize);

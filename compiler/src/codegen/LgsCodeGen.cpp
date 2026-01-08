@@ -216,9 +216,6 @@ void LgsCodeGen::visitLoop(LgsForLoop* loop) {
         assert(0);
     }
     visitStmtsBlock(loop->stmtsBlock);
-    if (stack.currentFunc()->funcType->isCoroutine) {
-        cg.callRuntimeFunc("yield", cg.voidTy());
-    }
     loop->incAndJumpToCond(cg);
     cg.startBlock(loop->IRExitBlock);
     stack.exitScope();
@@ -249,16 +246,19 @@ void LgsCodeGen::visitForeachLoop(LgsForeachLoop* loop) {
     visitExpr(loop->iterExpr);
     const auto indexTy = cg.sizeTy();
     loop->iPtr = cg.allocaAndStore(indexTy, cg.sizeZero());
-    loop->iterator = cg.allocaAndStore(cg.sizeTy(), loop->iPtr);
-    cg.branchAndStartBlock(loop->IRCondBlock);
+    if (loop->iterExpr->type->asMap()) {
+        loop->iteratorCounter = cg.allocaAndStore(cg.sizeTy(), cg.sizeZero());
+    }
 
+    // Condition
+    cg.branchAndStartBlock(loop->IRCondBlock);
     const auto cond = cg.builder.CreateICmpSLT(loop->loadIndex(cg), loop->loopEnd(cg));
     cg.builder.CreateCondBr(cond, loop->IRBodyBlock, loop->IRExitBlock);
 
     // Body
     cg.startBlock(loop->IRBodyBlock);
     const auto iterable = loop->iterExpr->type->asIterable();
-    iterable->unpackLoopIR(cg, loop);
+    iterable->setLoopIRVars(cg, loop);
 }
 
 void LgsCodeGen::visitInfiniteLoop(const LgsInfiniteLoop* loop) const {
@@ -852,10 +852,10 @@ void LgsCodeGen::visitMatrixExpr(const LgsMatrixExpr* matrixExpr) {
 void LgsCodeGen::visitHashMap(LgsHashMap* hashMap) {
     const auto map = hashMap->type->asMap();
     hashMap->IRValue = map->getIRZeroValue(cg, hashMap->pointee);
-    for (const auto [key, value] : hashMap->elements) {
-        visitExpr(key);
-        visitExpr(value);
-        map->addIRElement(cg, hashMap, key, value);
+    for (const auto pair : hashMap->elements) {
+        visitExpr(pair->key);
+        visitExpr(pair->value);
+        map->addIRElement(cg, hashMap, pair->key, pair->value);
     }
 }
 

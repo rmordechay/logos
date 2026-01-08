@@ -80,7 +80,7 @@ bool LgsCgModule::writeIRModule(const LgsPaths& paths, uint8_t optLevel) const {
         triple.c_str(),
         outputPath.c_str(),
         outputPath.c_str()
-        );
+    );
     if (!runCmd(cmd)) assert(0);
     fs::remove(outputPath + ".bc");
     return true;

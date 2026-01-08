@@ -1,4 +1,6 @@
 #pragma once
+#include <math.h>
+
 #include "LgsValue.h"
 
 class LgsField;
@@ -35,27 +37,6 @@ class LgsFloatConst;
 class LgsStrConst;
 class LgsTypeConst;
 
-enum LgsOwnerType {
-    PARAM_OWNER,
-    VARDEC_OWNER,
-    FIELD_OWNER,
-    NO_OWNER,
-};
-
-struct LgsOwner {
-    LgsOwnerType type;
-    union {
-        LgsParam* param;
-        LgsField* field;
-        LgsVarDec* varDec;
-        void* noOwner;
-    };
-    LgsOwner(): type(NO_OWNER), noOwner(nullptr) {}
-    explicit LgsOwner(LgsParam* param): type(PARAM_OWNER), param(param) {}
-    explicit LgsOwner(LgsField* field): type(FIELD_OWNER), field(field) {}
-    explicit LgsOwner(LgsVarDec* varDec): type(VARDEC_OWNER), varDec(varDec) {}
-};
-
 class LgsExpr : public LgsValue {
 public:
     LgsType* type = nullptr;
@@ -68,8 +49,9 @@ public:
 
     explicit LgsExpr(LgsType* type = nullptr) : type(type) {}
     std::optional<int64_t> getConstInt();
+    std::optional<double_t> getConstFloat();
     std::optional<std::string> getConstStr();
-    Value* getIRPtr(LgsCgModule& cg);
+    Value* getIRPtr(LgsCgModule& cg) const;
 
     virtual void setType(LgsType* newType);
     virtual LgsExpr* castExplicitly(LgsType* toType);

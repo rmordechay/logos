@@ -1708,11 +1708,11 @@ LgsHashMap* LgsParser::parseHashMap() {
     const auto startToken = currentToken;
     const auto oldIndex = currentIndex;
     if (!matchAndConsume(T_LBRACE)) return nullptr;
-    std::vector<LgsPair> pairs;
+    std::vector<LgsPair*> pairs;
     const auto freePairs = [&pairs] {
-        for (auto [l, r] : pairs) {
-            freeExpr(l);
-            freeExpr(r);
+        for (const auto pair : pairs) {
+            freeExpr(pair->key);
+            freeExpr(pair->value);
         }
     };
     if (!matchAndConsume(T_RBRACE)) {
@@ -1728,7 +1728,7 @@ LgsHashMap* LgsParser::parseHashMap() {
             }
             const auto value = parseExpr();
             if (!mustParse(value)) break;
-            pairs.push_back(LgsPair{key, value});
+            pairs.push_back(new LgsPair(key, value));
             if (currentToken.type == T_RBRACE) break;
             mustMatch(T_COMMA);
         }

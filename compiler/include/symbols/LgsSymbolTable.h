@@ -15,6 +15,7 @@ struct LgsSymbolTable {
     std::unordered_map<std::string, LgsApp*> imports;
     std::unordered_map<std::string, LgsFunc*> coroutines;
     std::unordered_map<std::string, LgsExpr*> generics;
+    std::unordered_map<std::string, LgsType*> generics2;
     std::unordered_set<std::string> cImportPaths;
     std::vector<LgsType*> rttTypes;
 

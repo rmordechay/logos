@@ -67,9 +67,49 @@ std::optional<int64_t> LgsExpr::getConstInt() {
     return std::nullopt;
 }
 
+std::optional<double_t> LgsExpr::getConstFloat() {
+    if (const auto intConst = asIntConst()) {
+        return intConst->value;
+    }
+    if (const auto floatConst = asFloatConst()) {
+        return floatConst->value;
+    }
+    if (const auto var = asVariable()) {
+        if (var->isMutable) return std::nullopt;
+        switch (var->ref.symbolType) {
+        case VAR_DEC:
+            return var->ref.varDec->expr->getConstFloat();
+        case FIELD:
+            if (var->ref.field->expr) return var->ref.field->expr->getConstFloat();
+            break;
+        default:
+            break;
+        }
+    }
+    if (const auto binExpr = asBinExpr()) {
+        if (binExpr->isMutable) return std::nullopt;
+        const auto const1 = binExpr->left->getConstFloat();
+        if (!const1.has_value()) return std::nullopt;
+        const auto const2 = binExpr->right->getConstFloat();
+        if (!const2.has_value()) return std::nullopt;
+
+        switch (binExpr->op.opType) {
+        case ADD: return const1.value() + const2.value();
+        case SUB: return const1.value() - const2.value();
+        case MUL: return const1.value() * const2.value();
+        case DIV: return const1.value() / const2.value();
+        default: break;
+        }
+    }
+    return std::nullopt;
+}
+
 std::optional<std::string> LgsExpr::getConstStr() {
     if (const auto strConst = asStrConst()) {
         return strConst->value;
+    }
+    if (const auto charConst = asCharConst()) {
+        return std::to_string(charConst->value - '0');
     }
     if (const auto var = asVariable()) {
         switch (var->ref.symbolType) {
@@ -84,8 +124,10 @@ std::optional<std::string> LgsExpr::getConstStr() {
     return std::nullopt;
 }
 
-Value* LgsExpr::getIRPtr(LgsCgModule& cg) {
-    if (type->passByRef && !asStrConst()) return IRValue;
+Value* LgsExpr::getIRPtr(LgsCgModule& cg) const {
+    if (type->asStr()) return cg.allocaAndStore(cg.ptrTy(), IRValue);
+    if (type->passByRef) return IRValue;
+    if (IRValue->getType()->isPointerTy()) return IRValue;
     return cg.allocaAndStore(type->getIRType(cg), IRValue);
 }
 

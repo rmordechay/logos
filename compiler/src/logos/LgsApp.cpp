@@ -370,8 +370,8 @@ bool LgsApp::generateRTTTypes() {
 }
 
 bool LgsApp::generateGenerics() {
-    const auto file = new LgsFile("generic");
-    file->cg.setupModule("genericsArrays");
+    const auto file = new LgsFile("generics");
+    file->cg.setupModule("generics");
     file->cg.mode = CG_MODE_GENERICS;
     const LgsCodeGen cg(file, configs, globals, paths);
     std::unordered_map<std::string, LgsExpr*> generics;
@@ -381,6 +381,9 @@ bool LgsApp::generateGenerics() {
     for (auto& [_, genericExpr] : generics) {
         if (const auto dArr = genericExpr->type->asDArray()) {
             dArr->getAddFunc(cg.cg);
+        } else if (const auto map = genericExpr->type->asMap()) {
+            map->getGetFunc(cg.cg);
+            map->getAddFunc(cg.cg);
         } else {
             assert(0);
         }

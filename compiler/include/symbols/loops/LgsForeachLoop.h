@@ -4,7 +4,7 @@
 class LgsForeachLoop final : public LgsForLoop {
 public:
     LgsExpr* iterExpr = nullptr;
-    Value* iterator = nullptr;
+    Value* iteratorCounter = nullptr;
 
     explicit LgsForeachLoop(LgsExpr* iterable) : iterExpr(iterable) {}
     Value* loopStart(LgsCgModule& cg) override;
