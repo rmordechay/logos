@@ -2,17 +2,17 @@
 #include "types/iterables/LgsMap.h"
 
 Value* LgsForeachLoop::loopStart(LgsCgModule& cg) {
-    return cg.i32Zero();
+    return cg.sizeZero();
 }
 
 Value* LgsForeachLoop::loopEnd(LgsCgModule& cg) {
     const auto iter = iterExpr->type->asIterable();
-    return cg.builder.CreateTrunc(iter->lenIR(cg, iterExpr->IRValue), cg.i32Ty());
+    return iter->lenIR(cg, iterExpr->IRValue);
 }
 
 void LgsForeachLoop::incAndJumpToCond(LgsCgModule& cg) {
     if (cg.lastInstTerminator()) return;
-    const auto inc = cg.builder.CreateAdd(loadIndex(cg), cg.i32(1));
+    const auto inc = cg.builder.CreateAdd(loadIndex(cg), cg.usize(1));
     cg.store(inc, iPtr);
     cg.builder.CreateBr(IRCondBlock);
 }

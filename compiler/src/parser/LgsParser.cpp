@@ -1368,6 +1368,7 @@ LgsExpr* LgsParser::parseUnary(const bool withInstance) {
 
     if (const auto metaVar = parseLoopMetaVar()) return metaVar;
     if (const auto constant = parseConstant()) expr = constant;
+    else if (const auto charConst = parseCharConst()) expr = charConst;
     else if (const auto strConst = parseStrConst()) expr = strConst;
     else if (const auto vector = parseVectorExpr()) expr = vector;
     else if (const auto matrix = parseMatrixExpr()) expr = matrix;
@@ -1494,6 +1495,16 @@ LgsStrConst* LgsParser::parseStrConst() {
     consume();
     setLocation(strConst->location, &textToken, &currentToken);
     return strConst;
+}
+
+LgsCharConst* LgsParser::parseCharConst() {
+    if (currentToken.type != T_STRING) return nullptr;
+    const auto textToken = currentToken;
+    if (textToken.lexeme.length() != 1) return nullptr;
+    const auto expr = new LgsCharConst(textToken.lexeme[0]);
+    setLocation(expr->location, &textToken, &currentToken);
+    consume();
+    return expr;
 }
 
 LgsMetaVar* LgsParser::parseLoopMetaVar() {

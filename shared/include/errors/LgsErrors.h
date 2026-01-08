@@ -93,7 +93,7 @@ inline LgsBaseMsg E10078{"Defer functions must return Void. Given: %s.", errCode
 inline LgsBaseMsg E10079{"Test file %s must be inside tests directory.", errCodeStart++};
 inline LgsBaseMsg E10080{"Index %s was not found in iterable.", errCodeStart++};
 inline LgsBaseMsg E10081{"Range-start type %s is not equal to the range-end type %s.", errCodeStart++};
-inline LgsBaseMsg E10082{"Loop range %s must be a number. Given: %s.", errCodeStart++};
+inline LgsBaseMsg E10082{"Loop range %s must be an integer. Given: %s.", errCodeStart++};
 inline LgsBaseMsg E10083{"Method %s is an object method but was called as a class method.", errCodeStart++};
 inline LgsBaseMsg E10084{"%s does not belong to an IO pair.", errCodeStart++};
 inline LgsBaseMsg E10085{"Parsing error.", errCodeStart++};
@@ -106,7 +106,7 @@ inline LgsBaseMsg E10091{"'not' can only prefix Bool. Given: %s.", errCodeStart+
 inline LgsBaseMsg E10092{"If condition must be of type Bool. Given: %s.", errCodeStart++};
 inline LgsBaseMsg E10093{"Cannot assign variable to Void type.", errCodeStart++};
 inline LgsBaseMsg E10094{"%s is not a parameter of '%s'.", errCodeStart++};
-inline LgsBaseMsg E10095{"Could not infer the type of the iterable.", errCodeStart++};
+inline LgsBaseMsg E10095{"Could not infer the iterable type.", errCodeStart++};
 inline LgsBaseMsg E10096{"Mixing named und position arguments is not allowed.", errCodeStart++};
 inline LgsBaseMsg E10097{"switch statement must have at least one pattern.", errCodeStart++};
 inline LgsBaseMsg E10098{"Argument %s is set more than one time.", errCodeStart++};

@@ -21,9 +21,8 @@ void LgsSelection::assign(LgsCgModule& cg, LgsExpr* expr) {
     assert(!type->asVec());
     if (type->isHeapAlloc) {
         cg.moveAlloc(loadIR(cg), expr->IRValue);
-    } else {
-        cg.store(expr->IRValue, IRValue);
     }
+    cg.store(expr->IRValue, IRValue);
 }
 
 std::string LgsSelection::asText() {

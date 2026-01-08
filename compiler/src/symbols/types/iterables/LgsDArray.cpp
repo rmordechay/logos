@@ -125,7 +125,7 @@ Value* LgsDArray::getIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* inde
     const auto ty = getIRType(cg);
     const auto baseSize = cg.usize(baseType->sizeBytes());
     const auto dataFieldPtr = cg.builder.CreateStructGEP(ty, iterable->IRValue, 0);
-    const auto offset = cg.builder.CreateMul(index->IRValue, baseSize);
+    const auto offset = cg.builder.CreateMul(cg.extendToSize(index->IRValue), baseSize);
     const auto dataField = cg.load(cg.ptrTy(), dataFieldPtr);
     return cg.builder.CreateInBoundsPtrAdd(dataField, offset);
 }

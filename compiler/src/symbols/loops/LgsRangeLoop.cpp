@@ -1,12 +1,14 @@
 #include "loops/LgsRangeLoop.h"
+
+#include "codegen/LgsCgModule.h"
 #include "stmts/LgsVarDec.h"
 
 Value* LgsRangeLoop::loopStart(LgsCgModule& cg) {
-    return startRange->loadIR(cg);
+    return cg.extendToSize(startRange->loadIR(cg));
 }
 
 Value* LgsRangeLoop::loopEnd(LgsCgModule& cg) {
-    return endRange->loadIR(cg);
+    return cg.extendToSize(endRange->loadIR(cg));
 }
 
 void LgsRangeLoop::setDebugValue(LgsCgModule& cg) {

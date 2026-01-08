@@ -56,6 +56,7 @@
 #include "cblas/cblas.h"
 #include "exprs/LgsMatrixExpr.h"
 #include "exprs/LgsMetaSelection.h"
+#include "exprs/constants/LgsCharConst.h"
 #include "types/LgsNullable.h"
 
 bool LgsCodeGen::generate() {
@@ -229,14 +230,14 @@ void LgsCodeGen::visitLoop(LgsForLoop* loop) {
 void LgsCodeGen::visitRangeLoop(LgsRangeLoop* loop) {
     visitExpr(loop->startRange);
     visitExpr(loop->endRange);
-    loop->iPtr = cg.builder.CreateAlloca(cg.i32Ty());
-    const auto loopStart = cg.builder.CreateSExt(loop->loopStart(cg), cg.i32Ty());
+    loop->iPtr = cg.builder.CreateAlloca(cg.sizeTy());
+    const auto loopStart = cg.builder.CreateSExt(loop->loopStart(cg), cg.sizeTy());
     cg.store(loopStart, loop->iPtr);
     cg.builder.CreateBr(loop->IRCondBlock);
 
     // Condition
     cg.startBlock(loop->IRCondBlock);
-    const auto loopEnd = cg.builder.CreateSExt(loop->loopEnd(cg), cg.i32Ty());
+    const auto loopEnd = loop->loopEnd(cg);
     const auto condition = cg.builder.CreateICmpSLT(loop->loadIndex(cg), loopEnd);
     cg.builder.CreateCondBr(condition, loop->IRBodyBlock, loop->IRExitBlock);
 
@@ -249,9 +250,9 @@ void LgsCodeGen::visitRangeLoop(LgsRangeLoop* loop) {
 
 void LgsCodeGen::visitForeachLoop(LgsForeachLoop* loop) {
     visitExpr(loop->iterExpr);
-    const auto indexTy = cg.i32Ty();
-    loop->iPtr = cg.allocaAndStore(indexTy, cg.i32Zero());
-    loop->iterator = cg.allocaAndStore(cg.i32Ty(), loop->iPtr);
+    const auto indexTy = cg.sizeTy();
+    loop->iPtr = cg.allocaAndStore(indexTy, cg.sizeZero());
+    loop->iterator = cg.allocaAndStore(cg.sizeTy(), loop->iPtr);
     cg.branchAndStartBlock(loop->IRCondBlock);
 
     const auto cond = cg.builder.CreateICmpSLT(loop->loadIndex(cg), loop->loopEnd(cg));
@@ -276,13 +277,11 @@ void LgsCodeGen::visitLoopMetaVar(LgsMetaVar* metaVar) const {
         break;
     }
     case FOR_IS_FIRST: {
-        const auto loopStart = cg.builder.CreateSExt(loop->loopStart(cg), cg.i32Ty());
-        metaVar->IRValue = cg.builder.CreateICmpEQ(iValue, loopStart);
+        metaVar->IRValue = cg.builder.CreateICmpEQ(iValue, loop->loopStart(cg));
         break;
     }
     case FOR_IS_LAST: {
-        const auto loopEnd = cg.builder.CreateSExt(loop->loopEnd(cg), cg.i32Ty());
-        const auto decremented = cg.builder.CreateSub(loopEnd, cg.i32(1));
+        const auto decremented = cg.builder.CreateSub(loop->loopEnd(cg), cg.usize(1));
         metaVar->IRValue = cg.builder.CreateICmpEQ(iValue, decremented);
         break;
     }
@@ -587,6 +586,7 @@ void LgsCodeGen::visitExpr(LgsExpr* expr, const bool assign) {
     } else {
         if (checkMock(expr)) return;
         if (const auto func = expr->asFunc()) visitLambda(func);
+        else if (const auto charConst = expr->asCharConst()) visitCharConst(charConst);
         else if (const auto strConst = expr->asStrConst()) visitStrConst(strConst);
         else if (const auto intConst = expr->asIntConst()) visitIntConst(intConst);
         else if (const auto floatConst = expr->asFloatConst()) visitFloatConst(floatConst);
@@ -668,28 +668,9 @@ void LgsCodeGen::visitLambda(LgsFunc* func) {
     cg.builder.restoreIP(cg.savedIP);
 }
 
-void LgsCodeGen::visitIntConst(LgsIntConst* intConst) const {
-    if (intConst->type->asBool()) {
-        intConst->IRValue = cg.i1(intConst->value);
-    } else if (intConst->type->asChar()) {
-        intConst->IRValue = cg.i8(intConst->value);
-    } else if (intConst->type->asShort()) {
-        intConst->IRValue = cg.i16(intConst->value);
-    } else if (intConst->type->asInt()) {
-        intConst->IRValue = cg.i32(intConst->value);
-    } else if (intConst->type->asLong()) {
-        intConst->IRValue = cg.i64(intConst->value);
-    } else if (intConst->type->asSize()) {
-        intConst->IRValue = cg.usize(intConst->value);
-    } else if (intConst->type->asFloat()) { // IntConst to float is allowed
-        intConst->IRValue = cg.floatv(intConst->value);
-    } else {
-        assert(0);
-    }
-}
-
 void LgsCodeGen::visitConstant(LgsExpr* expr) {
-    if (const auto strConst = expr->asStrConst()) visitStrConst(strConst);
+    if (const auto charConst = expr->asCharConst()) visitCharConst(charConst);
+    else if (const auto strConst = expr->asStrConst()) visitStrConst(strConst);
     else if (const auto intConst = expr->asIntConst()) visitIntConst(intConst);
     else if (const auto floatConst = expr->asFloatConst()) visitFloatConst(floatConst);
     else assert(0);
@@ -1130,6 +1111,26 @@ void LgsCodeGen::visitPostfixExpr(LgsPostfixExpr* postfixExpr) {
     cg.store(newValue, postfixExpr->baseExpr->IRValue);
 }
 
+void LgsCodeGen::visitIntConst(LgsIntConst* intConst) const {
+    if (intConst->type->asBool()) {
+        intConst->IRValue = cg.i1(intConst->value);
+    } else if (intConst->type->asChar()) {
+        intConst->IRValue = cg.i8(intConst->value);
+    } else if (intConst->type->asShort()) {
+        intConst->IRValue = cg.i16(intConst->value);
+    } else if (intConst->type->asInt()) {
+        intConst->IRValue = cg.i32(intConst->value);
+    } else if (intConst->type->asLong()) {
+        intConst->IRValue = cg.i64(intConst->value);
+    } else if (intConst->type->asSize()) {
+        intConst->IRValue = cg.usize(intConst->value);
+    } else if (intConst->type->asFloat()) { // IntConst to float is allowed
+        intConst->IRValue = cg.floatv(intConst->value);
+    } else {
+        assert(0);
+    }
+}
+
 void LgsCodeGen::visitStrConst(LgsStrConst* strConst) {
     if (strConst->parts.empty()) {
         strConst->IRValue = cg.getString(strConst->value);
@@ -1150,6 +1151,10 @@ void LgsCodeGen::visitStrConst(LgsStrConst* strConst) {
         }
     }
     strConst->IRValue = cg.callSnprintf(formatted + "\n", values);
+}
+
+void LgsCodeGen::visitCharConst(LgsCharConst* charConst) const {
+    charConst->IRValue = cg.i8(charConst->value);
 }
 
 void LgsCodeGen::visitInstance(LgsInstance* instance) {

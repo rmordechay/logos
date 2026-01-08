@@ -20,7 +20,7 @@ void LgsForLoop::setBlocks(LgsCgModule& cg) {
 
 void LgsForLoop::incAndJumpToCond(LgsCgModule& cg) {
     if (cg.lastInstTerminator()) return;
-    const auto inc = cg.builder.CreateAdd(loadIndex(cg), cg.i32(1));
+    const auto inc = cg.builder.CreateAdd(loadIndex(cg), cg.usize(1));
     cg.store(inc, iPtr);
     const auto br = cg.builder.CreateBr(IRCondBlock);
     const auto mustProgress = MDNode::get(cg.context, MDString::get(cg.context, "llvm.loop.mustprogress"));
@@ -28,7 +28,7 @@ void LgsForLoop::incAndJumpToCond(LgsCgModule& cg) {
 }
 
 Value* LgsForLoop::loadIndex(LgsCgModule& cg) const {
-    return cg.load(cg.i32Ty(), iPtr);
+    return cg.load(cg.sizeTy(), iPtr);
 }
 
 LgsForeachLoop* LgsForLoop::asForeachLoop() {

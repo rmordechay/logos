@@ -559,7 +559,7 @@ void LgsSema::visitRangeLoop(LgsRangeLoop* rangeLoop) {
     assert(endRange);
     visitExpr(startRange);
 
-    if (endRange->type && !endRange->type->isNumber()) {
+    if (endRange->type && !endRange->type->isInt) {
         addError(E10082, endRange->location, {endRange->asText(), endRange->type->pname()});
     }
 
@@ -574,10 +574,11 @@ void LgsSema::visitRangeLoop(LgsRangeLoop* rangeLoop) {
         rangeLoop->startRange = LGS_INT.getZeroValue();
     }
 
-    // Range loop can have only one var
     if (!rangeLoop->loopVars.empty()) {
-        rangeLoop->loopVars.front()->setType(endRange->type);
-        addLocalSymbol(LgsSymbol(rangeLoop->loopVars.front()));
+        // Range loop can have only one var
+        const auto& firstVar = rangeLoop->loopVars.front();
+        firstVar->setType(&LGS_SIZE);
+        addLocalSymbol(LgsSymbol(firstVar));
     }
     visitStmtsBlock(rangeLoop->stmtsBlock);
 }
@@ -597,6 +598,7 @@ void LgsSema::visitForeachLoop(LgsForeachLoop* foreachLoop) {
         varDec->type = iterable->baseType;
         foreachLoop->loopVars.emplace_back(varDec);
     }
+    if (!iterable->baseType) return;
     const bool unpacked = iterable->unpackLoopVarsTypes(foreachLoop);
     if (!unpacked) {
         addError(E10041, foreachLoop->iterExpr->location, {foreachLoop->iterExpr->asText(), foreachLoop->iterExpr->type->pname(), std::to_string(foreachLoop->loopVars.size())});
@@ -814,8 +816,8 @@ void LgsSema::visitArrayExpr(LgsArrayExpr* arrayExpr) {
     }
     if (!arrayExpr->type) {
         arrayExpr->setType(new LgsDArray());
-        visitDynamicArray(arrayExpr);
-    } else if (arrayExpr->type->asDArray() || arrayExpr->type->asSet()) {
+    }
+    if (arrayExpr->type->asDArray() || arrayExpr->type->asSet()) {
         visitDynamicArray(arrayExpr);
     } else if (arrayExpr->type->asSArray()) {
         visitStaticArray(arrayExpr);
@@ -824,6 +826,9 @@ void LgsSema::visitArrayExpr(LgsArrayExpr* arrayExpr) {
     }
     const auto iterable = arrayExpr->type->asIterable();
     if (!iterable) return;
+    if (!iterable->inferBaseType(arrayExpr->elements)) {
+        return addError(E10095, arrayExpr->location);
+    }
     for (const auto element : arrayExpr->elements) {
         if (iterable->baseType && element->type->canCastTo(iterable->baseType)) continue;
         return addError(E10111, element->location, {iterable->baseType->pname(), element->type->pname()});
@@ -847,9 +852,6 @@ void LgsSema::visitDynamicArray(LgsArrayExpr* arrayExpr) {
     const auto dArr = arrayExpr->type->asDArray();
     if (!dArr->baseType && arrayExpr->elements.empty()) {
         return addError(E10049, arrayExpr->location, {arrayExpr->asText()});
-    }
-    if (!dArr->inferBaseType(arrayExpr->elements)) {
-        return addError(E10095, arrayExpr->location);
     }
 }
 

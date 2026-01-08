@@ -2,6 +2,7 @@
 #include "LgsBinaryTokens.h"
 #include "LgsTokens.h"
 #include "errors/LgsErrHandler.h"
+#include "exprs/constants/LgsCharConst.h"
 #include "lgsc/LgsCCompiler.h"
 #include "stmts/LgsAssignment.h"
 
@@ -148,6 +149,7 @@ public:
     LgsInstance* parseInstance();
     LgsFuncCall* parseFuncCall();
     LgsStrConst* parseStrConst();
+    LgsCharConst* parseCharConst();
     LgsMetaVar* parseLoopMetaVar();
     LgsExpr* parseConstant();
     LgsArrayExpr* parseArrayExpr();

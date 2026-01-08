@@ -108,7 +108,6 @@ public:
     void visitTernaryExpr(LgsTernaryExpr* ternaryExpr);
     void visitCast(LgsCast* cast);
     void visitLambda(LgsFunc* func);
-    void visitIntConst(LgsIntConst* intConst) const;
     void visitConstant(LgsExpr* expr);
     void visitFloatConst(LgsFloatConst* floatConst) const;
     void visitComplexConst(const LgsComplexConst* complex);
@@ -128,7 +127,9 @@ public:
     void visitFuncCall(LgsFuncCall* funcCall);
     void visitPrefixExpr(LgsPrefixExpr* prefixExpr);
     void visitPostfixExpr(LgsPostfixExpr* postfixExpr);
+    void visitIntConst(LgsIntConst* intConst) const;
     void visitStrConst(LgsStrConst* strConst);
+    void visitCharConst(LgsCharConst* charConst) const;
     void visitInstance(LgsInstance* instance);
     void visitIterIndex(LgsIterIndex* iterIndex, bool assign);
     void visitJson(LgsJson* json);

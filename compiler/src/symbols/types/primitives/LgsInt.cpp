@@ -81,8 +81,8 @@ LgsType* LgsInt::applyBinOp(LgsType* rightType, LgsBinOp& op) {
 }
 
 Value* LgsInt::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto l = cg.builder.CreateZExt(left->loadIR(cg), getIRType(cg));
-    const auto r = cg.builder.CreateZExt(right->loadIR(cg), getIRType(cg));
+    const auto l = cg.builder.CreateZExt(left->loadIR(cg), cg.i64Ty());
+    const auto r = cg.builder.CreateZExt(right->loadIR(cg), cg.i64Ty());
     return cg.builder.CreateAdd(l, r);
 }
 
