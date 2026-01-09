@@ -126,11 +126,11 @@ Value* LgsMap::inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) {
 }
 
 Value* LgsMap::getIRElement(LgsCgModule& cg, LgsExpr* map, LgsExpr* index) {
-    return cg.builder.CreateCall(getGetFunc(cg), {map->IRValue, index->IRValue});
+    return cg.builder.CreateCall(generateGetFunc(cg), {map->IRValue, index->IRValue});
 }
 
 void LgsMap::addIRElement(LgsCgModule& cg, LgsExpr* map, LgsExpr* index, LgsExpr* value) {
-    cg.builder.CreateCall(getAddFunc(cg), {map->IRValue, index->IRValue, value->IRValue});
+    cg.builder.CreateCall(generateAddFunc(cg), {map->IRValue, index->IRValue, value->IRValue});
 }
 
 StructType* LgsMap::getEntryStruct(LgsCgModule& cg) const {
@@ -222,14 +222,14 @@ DIType* LgsMap::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
 
-Function* LgsMap::getGetFunc(LgsCgModule& cg) {
+Function* LgsMap::generateGetFunc(LgsCgModule& cg) {
     const auto funcName = getName() + "_get";
     const auto keyTy = pairType->key->passByRef ? cg.ptrTy() : pairType->key->getIRType(cg);
     const auto valueTy = pairType->value->passByRef ? cg.ptrTy() : pairType->value->getIRType(cg);
     const std::vector<Type*> params = {cg.ptrTy(), keyTy};
     const auto ft = cg.getFT(valueTy, params);
     if (cg.mode == CG_MODE_SRC_CODE) {
-        return llvm::cast<Function>(cg.IRModule->getOrInsertFunction(funcName, ft).getCallee());
+        return cg.getFunc(funcName, ft);
     }
 
     // Save state
@@ -297,15 +297,13 @@ Function* LgsMap::getGetFunc(LgsCgModule& cg) {
 }
 
 
-Function* LgsMap::getAddFunc(LgsCgModule& cg) {
+Function* LgsMap::generateAddFunc(LgsCgModule& cg) {
     const auto funcName = getName() + "_" + ADD_FUNC;
-    const auto mapTy = getIRType(cg);
     const auto valueTy = pairType->value->passByRef ? cg.ptrTy() : pairType->value->getIRType(cg);
     const auto keyType = pairType->key->passByRef ? cg.ptrTy() : pairType->key->getIRType(cg);
-    const std::vector<Type*> params = {cg.ptrTy(), keyType, valueTy};
-    const auto ft = cg.getFT(cg.voidTy(), params);
+    const auto ft = cg.getFT(cg.voidTy(), {cg.ptrTy(), keyType, valueTy});
     if (cg.mode == CG_MODE_SRC_CODE) {
-        return llvm::cast<Function>(cg.IRModule->getOrInsertFunction(funcName, ft).getCallee());
+        return cg.getFunc(funcName, ft);
     }
 
     // Save state
@@ -328,6 +326,7 @@ Function* LgsMap::getAddFunc(LgsCgModule& cg) {
     const auto keyIR = cg.currentFunc->getArg(1);
     const auto valueIR = cg.currentFunc->getArg(2);
 
+    const auto mapTy = getIRType(cg);
     const auto entryTy = getEntryStruct(cg);
     const auto indexTemp = pairType->key->getZeroValue();
     const auto indexTemp2 = pairType->key->getZeroValue();

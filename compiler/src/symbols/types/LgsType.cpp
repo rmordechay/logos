@@ -558,8 +558,9 @@ std::pair<Constant*, Constant*> getRTFieldsInfo(LgsCgModule& cg, const std::stri
     fieldTypes.reserve(values.size());
     fieldNames.reserve(values.size());
     for (size_t i = 0; i < values.size(); ++i) {
-        fieldTypes.push_back(values[i]->getType()->getRTType(cg));
-        fieldNames.push_back(llvm::dyn_cast<Constant>(cg.getString(values[i]->getName())));
+        const auto value = values[i];
+        fieldTypes.push_back(value->getType()->getRTType(cg));
+        fieldNames.push_back(llvm::dyn_cast<Constant>(cg.getString(value->getName())));
     }
 
     Constant* fieldTypesArr = nullptr;

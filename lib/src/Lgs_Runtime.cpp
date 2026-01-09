@@ -18,6 +18,7 @@ extern "C" void Lgs_Runtime_push() {
 }
 
 extern "C" void Lgs_Runtime_pop() {
+    // auto start = std::chrono::high_resolution_clock::now();
     auto& top = runtime.stack.back();
     // Call defers
     for (auto [defer, ctx] : top.defers) defer(ctx);
@@ -29,28 +30,36 @@ extern "C" void Lgs_Runtime_pop() {
         return equalLevel;
     });
     runtime.stack.pop_back();
+    // const auto end = std::chrono::high_resolution_clock::now();
+    // const auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+    // std::println("{}", duration.count());
 }
 
 extern "C" void* Lgs_Runtime_allocate(const size_t size) {
     const auto ptr = std::malloc(size);
-    //std::println("Allocated in {}: {}", Lgs_Runtime_getLevel(), ptr);
+    //std::println("Allocated: {}", ptr);
     runtime.allocs[ptr] = Lgs_Runtime_getLevel();
     return ptr;
 }
 
 extern "C" void Lgs_Runtime_move(void* left, void* right) {
-    const auto leftLevel = runtime.allocs[left];
-    const auto rightLevel = runtime.allocs[right];
+    auto& leftLevel = runtime.allocs[left];
+    auto& rightLevel = runtime.allocs[right];
     if (leftLevel < rightLevel) {
-        runtime.allocs[right] = leftLevel;
-        //std::println("Move right {} to {}", right, leftLevel);
+        rightLevel = leftLevel;
+        // std::println("Move right {} to {}", right, leftLevel);
     }
-    runtime.allocs[left] = Lgs_Runtime_getLevel();
-    //std::println("Move left {} to {}", left, Lgs_Runtime_getLevel());
+    leftLevel = Lgs_Runtime_getLevel();
+    // std::println("Move left {} to {}", left, Lgs_Runtime_getLevel());
 }
 
 extern "C" void* Lgs_Runtime_reallocate(void* ptr, const size_t size) {
     assert(0);
+}
+
+extern "C" void Lgs_Runtime_freeValue(void* ptr) {
+    // std::println("Freeing {}", ptr);
+    std::free(ptr);
 }
 
 extern "C" void Lgs_Runtime_addDefer(const ThunkFunc funcPtr, void* ctx) {
@@ -82,11 +91,6 @@ extern "C" void Lgs_Runtime_throwError(const size_t count, const char* msg, ...)
 
 extern "C" size_t Lgs_Runtime_hash(const char* str) {
     return hashString(str);
-}
-
-extern "C" void Lgs_Runtime_freeValue(void* ptr) {
-    //std::println("Freeing in {}: {}", runtime.allocs[ptr], ptr);
-    std::free(ptr);
 }
 
 extern "C" size_t Lgs_Runtime_getLevel() {

@@ -341,11 +341,11 @@ bool LgsApp::resolveGlobals() {
 bool LgsApp::generateRTTTypes() {
     rttTypeModule.setupModule("rttypes");
     rttTypeModule.isRTTModule = true;
+
+    // Globals
     for (const auto type : globals.table.rttTypes) {
         type->getRTType(rttTypeModule);
     }
-
-    // Globals
     for (auto [symbolName, symbol] : globals.table.symbols) {
         if (symbol.symbolType != OBJECT) continue;
         symbol.object->getRTType(rttTypeModule);
@@ -353,6 +353,8 @@ bool LgsApp::generateRTTTypes() {
             innerObj->getRTType(rttTypeModule);
         }
     }
+
+    // Source files
     for (const auto srcFile : srcFiles) {
         for (const auto type : srcFile->symbolTable.rttTypes) {
             type->getRTType(rttTypeModule);
@@ -380,10 +382,10 @@ bool LgsApp::generateGenerics() {
     }
     for (auto& [_, genericExpr] : generics) {
         if (const auto dArr = genericExpr->type->asDArray()) {
-            dArr->getAddFunc(cg.cg);
+            dArr->generateAddFunc(cg.cg);
         } else if (const auto map = genericExpr->type->asMap()) {
-            map->getGetFunc(cg.cg);
-            map->getAddFunc(cg.cg);
+            map->generateGetFunc(cg.cg);
+            map->generateAddFunc(cg.cg);
         } else {
             assert(0);
         }

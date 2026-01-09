@@ -13,6 +13,7 @@
 
 #include <ranges>
 #include <sstream>
+#include <unordered_set>
 #include <llvm/IR/Module.h>
 
 std::string LgsObject::getName() {
@@ -59,10 +60,25 @@ Type* LgsObject::getIRType(LgsCgModule& cg) {
     return IRType;
 }
 
+void LgsObject::checkRecursiveFields(std::unordered_set<std::string>& fieldsAsValue) const {
+    // TODO think about recursive fields in rtt types
+    fieldsAsValue.insert(name);
+    for (const auto field : fields) {
+        if (const auto innerObj = field->type->asObject()) {
+            assert(!fieldsAsValue.contains(innerObj->name));
+            innerObj->checkRecursiveFields(fieldsAsValue);
+        }
+    }
+}
+
 Constant* LgsObject::getRTType(LgsCgModule& cg) {
+    std::unordered_set<std::string> fieldsAsValue2;
+    checkRecursiveFields(fieldsAsValue2);
     const auto objName = getName();
     std::vector<LgsValue*> fieldsAsValue;
-    for (const auto field : fields) fieldsAsValue.push_back(field);
+    for (const auto field : fields) {
+        fieldsAsValue.push_back(field);
+    }
     const auto [typesArr, hashesArr] = getRTFieldsInfo(cg, name, fieldsAsValue);
     // name, fieldsCount, fieldNames, fieldTypes
     const std::vector<Type*> params = {cg.ptrTy(), cg.sizeTy(), cg.ptrTy(), cg.ptrTy()};

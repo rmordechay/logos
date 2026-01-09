@@ -1,4 +1,6 @@
 #pragma once
+#include <unordered_set>
+
 #include "LgsAny.h"
 #include "LgsFuncType.h"
 #include "exprs/LgsFuncCall.h"
@@ -36,6 +38,7 @@ public:
     std::string getName() override;
     LgsFunc* getMethod(const std::string& methodName) override;
     Type* getIRType(LgsCgModule& cg) override;
+    void checkRecursiveFields(std::unordered_set<std::string>& fieldsAsValue) const;
     Constant* getRTType(LgsCgModule& cg) override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;

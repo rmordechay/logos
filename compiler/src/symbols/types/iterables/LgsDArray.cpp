@@ -33,6 +33,9 @@ bool LgsDArray::inferBaseType(std::vector<LgsExpr*>& args) {
         if (!arg->type->canCastTo(baseExprType)) return false;
     }
     baseType = baseExprType;
+    if (const auto iter = baseType->asIterable()) {
+        iter->isStatic = false;
+    }
     return true;
 }
 
@@ -44,19 +47,6 @@ Constant* LgsDArray::getRTType(LgsCgModule& cg) {
     const auto dArrName = getName();
     const auto sv = cg.getRTTExtraStruct(dArrName, {cg.ptrTy()}, {baseType->getRTType(cg)});
     return cg.getRTTypeInfo(dArrName, sizeBytes(), RTT_DARRAY, sv);
-}
-
-LgsType* LgsDArray::replaceGenerics(LgsType* replacement, std::unordered_map<std::string, LgsType*>& replacements) {
-    const auto otherDArr = replacement->asDArray();
-    if (otherDArr) {
-        baseType = baseType->replaceGenerics(otherDArr->baseType, replacements);
-    } else {
-        const auto baseName = baseType->getName();
-        if (replacements.contains(baseName)) {
-            baseType = replacements[baseName];
-        }
-    }
-    return this;
 }
 
 std::string LgsDArray::getBaseName() {
@@ -76,6 +66,16 @@ size_t LgsDArray::sizeBytes() {
     return sizeof(Lgs_DArrayExpr);
 }
 
+bool LgsDArray::canCastTo(LgsType* other) {
+    if (other->getName() == LgsAny::name) return true;
+    if (other->asGenericType()) return true;
+    const auto otherArr = other->asDArray();
+    if (!otherArr) return false;
+    if (!baseType) return true;
+    if (!otherArr->baseType) return true;
+    return baseType->canCastTo(otherArr->baseType);
+}
+
 LgsExpr* LgsDArray::getZeroValue() {
     return new LgsArrayExpr(this);
 }
@@ -91,9 +91,17 @@ Value* LgsDArray::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
     return ptr;
 }
 
-std::string LgsDArray::fmtStr() const {
-    if (baseType->asChar()) return "%s";
-    return "%p";
+LgsType* LgsDArray::replaceGenerics(LgsType* replacement, std::unordered_map<std::string, LgsType*>& replacements) {
+    const auto otherDArr = replacement->asDArray();
+    if (otherDArr) {
+        baseType = baseType->replaceGenerics(otherDArr->baseType, replacements);
+    } else {
+        const auto baseName = baseType->getName();
+        if (replacements.contains(baseName)) {
+            baseType = replacements[baseName];
+        }
+    }
+    return this;
 }
 
 LgsType* LgsDArray::applyBinOp(LgsType* rightType, LgsBinOp& op) {
@@ -124,25 +132,35 @@ Value* LgsDArray::inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) {
 Value* LgsDArray::getIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index) {
     const auto ty = getIRType(cg);
     const auto baseSize = cg.usize(baseType->sizeBytes());
+    const auto len = cg.loadStructField(ty, iterable->IRValue, 1, cg.sizeTy());
+    const auto inboundsBlock = cg.createBlock("in_bounds");
+    const auto exitBlock = cg.createBlock(BLOCK_EXIT);
+    const auto v = cg.allocaAndStore(cg.ptrTy(), cg.null());
+    cg.builder.CreateCondBr(cg.builder.CreateICmpSLT(len, cg.extendToSize(index->IRValue)), exitBlock, inboundsBlock);
+
+    cg.startBlock(inboundsBlock);
     const auto dataFieldPtr = cg.builder.CreateStructGEP(ty, iterable->IRValue, 0);
     const auto offset = cg.builder.CreateMul(cg.extendToSize(index->IRValue), baseSize);
     const auto dataField = cg.load(cg.ptrTy(), dataFieldPtr);
-    return cg.builder.CreateInBoundsPtrAdd(dataField, offset);
+    const auto ptr = cg.builder.CreateInBoundsPtrAdd(dataField, offset);
+    cg.store(cg.load(cg.ptrTy(), ptr), v);
+    cg.builder.CreateBr(exitBlock);
+
+    cg.startBlock(exitBlock);
+    return v;
 }
 
 void LgsDArray::addIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index, LgsExpr* value) {
     if (index) assert(0);
-    cg.builder.CreateCall(getAddFunc(cg), {iterable->IRValue, value->IRValue});
+    cg.builder.CreateCall(generateAddFunc(cg), {iterable->IRValue, value->IRValue});
 }
 
-Function* LgsDArray::getAddFunc(LgsCgModule& cg) {
+Function* LgsDArray::generateAddFunc(LgsCgModule& cg) {
     const auto funcName = getName() + "_" + ADD_FUNC;
-    const auto ty = getIRType(cg);
-    const auto baseSize = cg.usize(baseType->sizeBytes());
-    const std::vector<Type*> params = {cg.ptrTy(), baseType->getIRType(cg)};
-    const auto ft = cg.getFT(cg.voidTy(), params);
+    const auto valueTy = baseType->passByRef ? cg.ptrTy() : baseType->getIRType(cg);
+    const auto ft = cg.getFT(cg.voidTy(), {cg.ptrTy(), valueTy});
     if (cg.mode == CG_MODE_SRC_CODE) {
-        return llvm::cast<Function>(cg.IRModule->getOrInsertFunction(funcName, ft).getCallee());
+        return cg.getFunc(funcName, ft);
     }
 
     // Save state
@@ -158,6 +176,7 @@ Function* LgsDArray::getAddFunc(LgsCgModule& cg) {
     cg.builder.SetInsertPoint(entryBlock);
     cg.callStackPush();
 
+    const auto ty = getIRType(cg);
     const auto arrIR = cg.currentFunc->getArg(0);
     const auto elementIR = cg.currentFunc->getArg(1);
     const auto dataFieldPtr = cg.builder.CreateStructGEP(ty, arrIR, 0);
@@ -180,6 +199,7 @@ Function* LgsDArray::getAddFunc(LgsCgModule& cg) {
     cg.branchAndStartBlock(exitBlock);
     lenField = cg.load(cg.sizeTy(), lenFieldPtr);
     dataField = cg.load(cg.ptrTy(), dataFieldPtr);
+    const auto baseSize = cg.usize(baseType->sizeBytes());
     const auto offset = cg.builder.CreateMul(lenField, baseSize);
     const auto elementPtr = cg.builder.CreateInBoundsPtrAdd(dataField, offset);
     cg.store(elementIR, elementPtr);
@@ -199,22 +219,17 @@ Function* LgsDArray::getAddFunc(LgsCgModule& cg) {
     return func;
 }
 
-bool LgsDArray::canCastTo(LgsType* other) {
-    if (other->getName() == LgsAny::name) return true;
-    if (other->asGenericType()) return true;
-    const auto otherArr = other->asDArray();
-    if (!otherArr) return false;
-    if (!baseType) return true;
-    if (!otherArr->baseType) return true;
-    return baseType->canCastTo(otherArr->baseType);
+std::string LgsDArray::fmtStr() const {
+    if (baseType->asChar()) return "%s";
+    return "%p";
+}
+
+DIType* LgsDArray::getDebugType(LgsCgModule& cg) {
+    assert(0);
 }
 
 LgsType* LgsDArray::clone() {
     const auto newDArray = new LgsDArray(*this);
     newDArray->baseType = baseType->clone();
     return newDArray;
-}
-
-DIType* LgsDArray::getDebugType(LgsCgModule& cg) {
-    assert(0);
 }

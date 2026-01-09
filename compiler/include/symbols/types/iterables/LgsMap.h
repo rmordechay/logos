@@ -33,7 +33,7 @@ public:
     Value* lenIR(LgsCgModule& cg, Value* iterable) override;
     Value* inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
     Value* getIRElement(LgsCgModule& cg, LgsExpr* map, LgsExpr* index) override;
-    Function* getAddFunc(LgsCgModule& cg);
+    Function* generateAddFunc(LgsCgModule& cg);
     void addIRElement(LgsCgModule& cg, LgsExpr* map, LgsExpr* index, LgsExpr* value) override;
     StructType* getEntryStruct(LgsCgModule& cg) const;
     Value* loadEntriesField(LgsCgModule& cg, Value* map);
@@ -46,6 +46,6 @@ public:
     void setLoopIRVars(LgsCgModule& cg, LgsForeachLoop* loop) override;
     std::string fmtStr() const override;
     DIType* getDebugType(LgsCgModule& cg) override;
-    Function* getGetFunc(LgsCgModule& cg);
+    Function* generateGetFunc(LgsCgModule& cg);
 };
 
