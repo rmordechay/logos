@@ -127,7 +127,7 @@ bool LgsFuncType::equals(LgsType* other) {
     if (name != otherFuncType->name) return false;
     if (!rt->equals(otherFuncType->rt)) return false;
     if (params.size() != otherFuncType->params.size()) return false;
-    for (size_t i = 0; i < params.size(); ++i) {
+    for (size_t i = isMethod; i < params.size(); ++i) {
         const auto param1 = params[i].type;
         const auto param2 = otherFuncType->params[i];
         if (!param1->equals(param2.type)) return false;
@@ -174,6 +174,12 @@ LgsFuncType* LgsFuncType::clone() {
         newFuncType->params.emplace_back(param.type->clone());
     }
     return newFuncType;
+}
+
+void LgsFuncType::addSelf(LgsType* selfType) {
+    isMethod = true;
+    params.insert(params.begin(), LgsParam(selfType, LGS_SELF));
+    params.front().isSelf = true;
 }
 
 LgsFuncType::~LgsFuncType() {

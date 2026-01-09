@@ -196,12 +196,12 @@ Value* LgsCgModule::callHash(Value* arg) {
     return callRuntimeFunc("hash", sizeTy(), {ptrTy()}, {arg});
 }
 
-void LgsCgModule::addToVTable(Value* instance, Value* key, Value* ptr) {
-    callRuntimeFunc("addToVTable", voidTy(), {ptrTy(), i32Ty(), ptrTy()}, {instance, key, ptr});
+void LgsCgModule::addToVTable(Value* instance, Value* name, Value* ptr) {
+    callRuntimeFunc("addToVTable", voidTy(), {ptrTy(), ptrTy(), ptrTy()}, {instance, name, ptr});
 }
 
-Value* LgsCgModule::getFromVTable(Value* instance, Value* key) {
-    return callRuntimeFunc("getFromVTable", ptrTy(), {ptrTy(), i32Ty()}, {instance, key});
+Value* LgsCgModule::getFromVTable(Value* instance, Value* name) {
+    return callRuntimeFunc("getFromVTable", ptrTy(), {ptrTy(), ptrTy()}, {instance, name});
 }
 
 Value* LgsCgModule::heapAlloc(Value* size) {

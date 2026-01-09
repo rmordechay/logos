@@ -965,8 +965,7 @@ void LgsCodeGen::visitFieldSelection(LgsVariable* var, LgsExpr* parent, const bo
 
     // Virtual fields
     if (field->isVirtual) {
-        const auto id = cg.usize(hashString(field->name));
-        var->IRValue = cg.getFromVTable(parent->IRValue, id);
+        var->IRValue = cg.getFromVTable(parent->IRValue, cg.getString(field->name));
         return;
     }
 
@@ -1046,11 +1045,12 @@ void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
         }
     }
 
-    // Virtual call
+    // Virtual func call
     if (ft->isVirtual) {
         const auto name = func->funcType->getName();
-        const auto id = cg.usize(hashString(name));
-        func->IRValue = cg.getFromVTable(funcCall->args.front().expr->IRValue, id);
+        const auto self = funcCall->args.front().expr;
+        assert(funcCall->args.front().isSelf);
+        func->IRValue = cg.getFromVTable(self->IRValue, cg.getString(func->funcType->name));
     }
 
     if (func->funcType->isBuiltin) {
@@ -1314,21 +1314,20 @@ Value* LgsCodeGen::getIRValue(LgsValue* value) {
 void LgsCodeGen::addVirtuals(LgsObject* obj, Value* ptr) const {
     for (const auto& field : obj->fields) {
         if (!field->isVirtual) continue;
-        const auto virtualID = cg.usize(hashString(field->name));
         const auto objIR = obj->getIRType(cg);
         const auto fieldGEP = cg.builder.CreateStructGEP(objIR, ptr, field->position);
-        cg.addToVTable(ptr, virtualID, fieldGEP);
+        cg.addToVTable(ptr, cg.getString(field->name), fieldGEP);
     }
 
     for (const auto& [_, method] : obj->methods) {
         if (!method->funcType->isVirtual) continue;
         auto methodName = method->funcType->name;
+        auto methodGenericName = method->funcType->getName();
         for (const auto implement : obj->implements) {
             if (!implement->methods.contains(methodName)) continue;
-            const auto name = implement->methods[methodName]->funcType->getName();
-            const auto virtualID = cg.usize(hashString(name));
             const auto IRFunc = method->getIRFunc(cg);
-            cg.addToVTable(ptr, virtualID, IRFunc);
+            const auto interfaceMethodName = implement->methods[methodName]->funcType->name;
+            cg.addToVTable(ptr, cg.getString(interfaceMethodName), IRFunc);
             break;
         }
     }

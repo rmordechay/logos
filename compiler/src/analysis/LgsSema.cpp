@@ -849,7 +849,7 @@ void LgsSema::visitDynamicArray(LgsArrayExpr* arrayExpr) {
     if (!dArr->baseType && arrayExpr->elements.empty()) {
         return addError(E10049, arrayExpr->location, {arrayExpr->asText()});
     }
-    file->symbolTable.generics[dArr->getName()] = arrayExpr;
+    addGenerics(arrayExpr);
 }
 
 void LgsSema::visitHashMap(LgsHashMap* hashMap) {
@@ -868,7 +868,7 @@ void LgsSema::visitHashMap(LgsHashMap* hashMap) {
         for (const auto element : hashMap->elements) elements.push_back(element);
         hashMap->type->asIterable()->inferBaseType(elements);
     }
-    file->symbolTable.generics[hashMap->type->getName()] = hashMap;
+    addGenerics(hashMap);
 }
 
 void LgsSema::visitVectorExpr(LgsVectorExpr* vectorExpr) {
@@ -1105,7 +1105,7 @@ void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent) {
     if (parent->asTypeExpr() && method->funcType->isMethod) {
         return addError(E10083, methodCall->location, {method->funcType->pname()});
     }
-    if (method->funcType->isMethod) {
+    if (method->funcType->isMethod || method->funcType->isVirtual) {
         methodCall->args.insert(methodCall->args.begin(), LgsFuncArg(parent, LGS_SELF, true));
     }
 
@@ -1267,7 +1267,7 @@ void LgsSema::visitInstance(LgsInstance* instance) {
     }
 
     if (symbol->symbolType == INTERFACE) {
-        return visitInterfaceInstance(instance, symbol->interface);
+        return visitInlineInterface(instance, symbol->interface);
     }
 
     const auto obj = symbol->object;
@@ -1302,7 +1302,7 @@ void LgsSema::visitInstance(LgsInstance* instance) {
     }
 }
 
-void LgsSema::visitInterfaceInstance(LgsInstance* instance, LgsInterface* interface) {
+void LgsSema::visitInlineInterface(LgsInstance* instance, LgsInterface* interface) {
     instance->setObject(new LgsObject(interface->name));
     instance->obj->location = instance->location;
     instance->obj->implements.push_back(interface);
@@ -1320,9 +1320,7 @@ void LgsSema::visitInterfaceInstance(LgsInstance* instance, LgsInterface* interf
         const auto method = interface->getMethod(name);
         if (method) {
             const auto newMethod = expr->asFunc();
-            newMethod->funcType->name = method->funcType->name;
-            newMethod->funcType->params.insert(newMethod->funcType->params.begin(), LgsParam(interface, LGS_SELF));
-            newMethod->funcType->params.front().isSelf = true;
+            newMethod->funcType->addSelf(interface);
             instance->obj->addMethod(newMethod);
             continue;
         }
@@ -1499,13 +1497,17 @@ void LgsSema::validateObjImplements(LgsObject* obj, const std::vector<LgsType*>&
         std::vector<LgsFunc*> missingMethods;
         for (const auto& [name, interfaceMethod] : interface->methods) {
             const auto objMethod = obj->methods.find(name);
-            if (objMethod != obj->methods.end() && objMethod->second->type->equals(interfaceMethod->type)) {
-                auto objMethodName = objMethod->first;
-                if (!seenNames.insert(objMethodName).second) {
-                    addError(E10064, objMethod->second->location, {objMethodName});
+            const auto found = objMethod != obj->methods.end();
+            if (found) {
+                const auto& objFuncType = objMethod->second->funcType;
+                if (objFuncType->equals(interfaceMethod->type)) {
+                    auto objMethodName = objMethod->first;
+                    if (!seenNames.insert(objMethodName).second) {
+                        addError(E10064, objMethod->second->location, {objMethodName});
+                    }
+                    objFuncType->isVirtual = true;
+                    continue;
                 }
-                objMethod->second->funcType->isVirtual = true;
-                continue;
             }
             if (interfaceMethod->stmtsBlock) {
                 interfaceMethod->funcType->isVirtual = true;
@@ -1551,8 +1553,8 @@ bool LgsSema::validateFieldVisibility(LgsField* field, LgsType* parent, const Lg
 }
 
 bool LgsSema::validateMethodVisibility(const LgsFunc* method, LgsType* parent, const LgsLocation& location) {
+    if (!method) return false;
     if (parent && parent->asObject() && parent->asObject()->singleton) return true;
-    if (!method || method->funcType->isVirtual) return false;
     if (!method->funcType->isPublic && file->path != *method->location.filepath && !stack.currentFunc()->isTest) {
         addError(E10031, location, {method->funcType->name, method->funcType->parentName});
         return false;
@@ -1687,8 +1689,7 @@ void LgsSema::createCoroutineFunc(LgsFuncCall* funcCall) {
 }
 
 void LgsSema::makeGenericFuncCall(LgsFuncCall* funcCall, const LgsFunc* func) {
-    const auto funcName = funcCall->getGenericName();
-    const auto generics = file->symbolTable.generics.find(funcName);
+    const auto generics = file->symbolTable.generics.find(funcCall->getGenericName());
     LgsFunc* genericFunc = nullptr;
     if (generics != file->symbolTable.generics.end()) {
         genericFunc = generics->second->asFunc();
@@ -1708,7 +1709,7 @@ void LgsSema::makeGenericFuncCall(LgsFuncCall* funcCall, const LgsFunc* func) {
             genericFunc->stmtsBlock = func->stmtsBlock->clone();
         }
         visitFunc(genericFunc);
-        file->symbolTable.generics[funcName] = genericFunc;
+        addGenerics(genericFunc);
     }
     funcCall->func = genericFunc;
     funcCall->setType(genericFunc->funcType->rt);
@@ -1745,6 +1746,10 @@ void LgsSema::deleteRTType(LgsType* type) const {
             return;
         }
     }
+}
+
+void LgsSema::addGenerics(LgsExpr* expr) {
+    file->symbolTable.generics[expr->type->getName()] = expr;
 }
 
 static std::string getMissingImplementsStr(const std::vector<LgsField*>& fields, const std::vector<LgsFunc*>& methods) {

@@ -132,7 +132,7 @@ public:
     void visitJsonArr(const LgsJsonArray* jsonArr);
     void visitJsonObj(const LgsJsonObject* jsonObj);
     void visitInstance(LgsInstance* instance);
-    void visitInterfaceInstance(LgsInstance* instance, LgsInterface* interface);
+    void visitInlineInterface(LgsInstance* instance, LgsInterface* interface);
     void visitIterIndex(LgsIterIndex* iterIndex);
     void visitIndex(LgsIterIndex* iterIndex);
     void visitSlice(LgsIterIndex* iterIndex);
@@ -158,4 +158,5 @@ public:
     void addErrorIfSuccessful(const LgsBaseMsg& lgsErr, const LgsLocation& location, const std::vector<std::string>& args);
     void addRTType(LgsType* type) const;
     void deleteRTType(LgsType* type) const;
+    void addGenerics(LgsExpr* expr);
 };

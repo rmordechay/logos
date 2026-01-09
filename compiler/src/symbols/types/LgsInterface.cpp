@@ -8,7 +8,17 @@ Type* LgsInterface::getIRType(LgsCgModule& cg) {
 }
 
 LgsFunc* LgsInterface::getMethod(const std::string& methodName) {
-    assert(0);
+    const auto method = methods.find(methodName);
+    if (method != methods.end() && method->second) {
+        return method->second;
+    }
+    for (const auto* f : fields) {
+        if (f->name != methodName) continue;
+        if (f->expr && f->expr->asFunc()) {
+            return f->expr->asFunc();
+        }
+    }
+    return nullptr;
 }
 
 std::string LgsInterface::getName() {
@@ -44,7 +54,17 @@ DIType* LgsInterface::getDebugType(LgsCgModule& cg) {
 }
 
 Constant* LgsInterface::getRTType(LgsCgModule& cg) {
-    assert(0);
+    const auto objName = getName();
+    std::vector<LgsValue*> fieldsAsValue;
+    for (const auto field : fields) {
+        fieldsAsValue.push_back(field);
+    }
+    const auto [typesArr, hashesArr] = getRTFieldsInfo(cg, name, fieldsAsValue);
+    // name, fieldsCount, fieldNames, fieldTypes
+    const std::vector<Type*> params = {cg.ptrTy(), cg.sizeTy(), cg.ptrTy(), cg.ptrTy()};
+    const std::vector<Constant*> args = {llvm::dyn_cast<Constant>(cg.getString(objName)), cg.usize(fields.size()), hashesArr, typesArr};
+    const auto sv = cg.getRTTExtraStruct(objName, params, args);
+    return cg.getRTTypeInfo(objName, sizeBytes(), RTT_OBJECT, sv);
 }
 
 std::string LgsInterface::fmtStr() const {

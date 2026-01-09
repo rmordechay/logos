@@ -147,7 +147,7 @@ public:
 inline void freeType(LgsType* type) {
     if (!type) return;
     if (type->isPrimitive) return;
-    if (type->asGenericType() || type->asObject()) return;
+    if (type->asGenericType() || type->asObject() || type->asInterface()) return;
     delete type;
 }
 

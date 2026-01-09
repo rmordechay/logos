@@ -115,16 +115,16 @@ struct Lgs_TypeInfo {
 
 struct VKey {
     void* instance;
-    int32_t virtualID;
+    const char* name;
     bool operator==(const VKey& other) const noexcept {
-        return instance == other.instance && virtualID == other.virtualID;
+        return instance == other.instance && name == other.name;
     }
 };
 
 struct VKeyHash {
     size_t operator()(const VKey& k) const noexcept {
         const auto h1 = std::hash<void*>{}(k.instance);
-        const auto h2 = std::hash<int32_t>{}(k.virtualID);
+        const auto h2 = std::hash<const char*>{}(k.name);
         return h1 ^ h2 + 0x9e3779b9 + (h1 << 6) + (h1 >> 2);
     }
 };

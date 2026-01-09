@@ -447,8 +447,9 @@ LgsInterface* LgsParser::parseInterfaceBody(const LgsToken& tokenName) {
         const auto method = new LgsFunc(funcHeader);
         method->funcType->isPublic = true;
         method->funcType->isVirtual = true;
+        method->funcType->addSelf(interface);
         method->stmtsBlock = parseStmtsBlock(false);
-        if (method->stmtsBlock->isMacro) addParsingError();
+        if (method->stmtsBlock && method->stmtsBlock->isMacro) addParsingError();
         interface->addMethod(method);
         if (currentToken.type == T_RBRACE || currentToken.type == T_EOF) break;
     }
@@ -736,20 +737,17 @@ LgsFunc* LgsParser::parseMethod(LgsObject* obj) {
     if (matchAndConsume(T_PUBLIC)) {
         isPublic = true;
     }
-    const auto funcHeader = parseFuncHeader();
+    const auto& funcHeader = parseFuncHeader();
     if (!funcHeader) return nullptr;
     funcHeader->parentName = obj->name;
     const auto func = new LgsFunc(funcHeader);
     currentFunc = func;
     func->location = func->funcType->location;
+    funcHeader->isPublic = isPublic;
+    funcHeader->addSelf(obj);
     if (!headersOnly) {
         func->stmtsBlock = parseStmtsBlock();
         if (func->stmtsBlock->isMacro) addParsingError();
-    }
-    func->funcType->isPublic = isPublic;
-    if (func->funcType->isMethod) {
-        func->funcType->params.insert(func->funcType->params.begin(), LgsParam(obj, LGS_SELF));
-        func->funcType->params.front().isSelf = true;
     }
     currentFunc = nullptr;
     return func;
@@ -1418,7 +1416,7 @@ LgsVariable* LgsParser::parseVariable() {
         var = new LgsVariable(currentToken.lexeme);
     } else if (currentToken.type == T_SELF_INSTANCE) {
         var = new LgsVariable(currentToken.lexeme);
-        currentFunc->funcType->isMethod = true;
+        currentFunc->funcType->hasSelf = true;
     } else {
         return nullptr;
     }

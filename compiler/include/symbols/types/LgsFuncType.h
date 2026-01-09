@@ -39,6 +39,7 @@ public:
     bool isTerminator = false;
     bool isLambda = false;
     bool hasDefaults = false;
+    bool hasSelf = false;
     uint32_t variadicIndex = 0;
 
     LgsFuncType(): LgsFuncType(nullptr) {}
@@ -62,5 +63,6 @@ public:
     std::unordered_map<std::string, LgsParam*> getParamsByName();
     DIType* getDebugType(LgsCgModule& cg) override;
     LgsFuncType* clone() override;
+    void addSelf(LgsType* selfType);
     ~LgsFuncType() override;
 };

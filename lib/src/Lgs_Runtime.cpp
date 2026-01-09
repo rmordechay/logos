@@ -70,13 +70,12 @@ extern "C" void Lgs_Runtime_addCoro(const ThunkFunc funcPtr, void* ctx) {
     runtime.coros.emplace_back(Lgs_ThunkFunc{funcPtr, ctx});
 }
 
-extern "C" void Lgs_Runtime_addToVTable(void* instance, const int32_t virtualID, void* ptr) {
-    runtime.vtable[{instance, virtualID}] = ptr;
+extern "C" void Lgs_Runtime_addToVTable(void* instance, const char* name, void* ptr) {
+    runtime.vtable[{instance, name}] = ptr;
 }
 
-extern "C" void* Lgs_Runtime_getFromVTable(void* instance, const int32_t virtualID) {
-    assert(runtime.vtable.contains(VKey{instance, virtualID}));
-    return runtime.vtable[VKey{instance, virtualID}];
+extern "C" void* Lgs_Runtime_getFromVTable(void* instance, const char* name) {
+    return runtime.vtable[{instance, name}];
 }
 
 extern "C" void Lgs_Runtime_throwError(const size_t count, const char* msg, ...) {

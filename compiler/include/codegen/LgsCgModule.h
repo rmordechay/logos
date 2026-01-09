@@ -93,8 +93,8 @@ public:
     void callStackPush();
     void callPopStack();
     Value* callHash(Value* arg);
-    void addToVTable(Value* instance, Value* key, Value* ptr);
-    Value* getFromVTable(Value* instance, Value* key);
+    void addToVTable(Value* instance, Value* name, Value* ptr);
+    Value* getFromVTable(Value* instance, Value* name);
     Value* heapAlloc(Value* size);
     Value* heapAlloc2(Value* size);
     Value* moveAlloc(Value* left, Value* right);
