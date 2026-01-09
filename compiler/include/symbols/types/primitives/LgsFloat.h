@@ -12,7 +12,7 @@ public:
     Type* getIRType(LgsCgModule& cg) override;
     std::string getName() override;
     LgsExpr* getZeroValue() override;
-    Value* getIRZeroValue(LgsCgModule& cg, Value* pointee = nullptr) override;
+    Value* getIRZeroValue(LgsCgModule& cg, Value* pointee = nullptr, bool levelAbove = false) override;
     Constant* getRTType(LgsCgModule& cg) override;
     size_t sizeBytes() override;
     std::string fmtStr() const override;
@@ -23,6 +23,7 @@ public:
     Value* mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
     Value* divIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
     DIType* getDebugType(LgsCgModule& cg) override;
+    LgsType* clone() override;
 };
 
 inline LgsFloat LGS_FLOAT;

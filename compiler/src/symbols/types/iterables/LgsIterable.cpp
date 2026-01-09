@@ -10,21 +10,6 @@
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsVoid.h"
 
-size_t LgsIterable::getDimension() const {
-    size_t dim = 1;
-    auto nestedIter = this;
-    while (true) {
-        if (const auto innerIter = nestedIter->baseType->asIterable()) {
-            nestedIter = innerIter;
-            if (innerIter->asVec() || innerIter->asStr()) continue;
-            dim++;
-        } else {
-            break;
-        }
-    }
-    return dim;
-}
-
 LgsFunc* LgsIterable::getMethod(const std::string& methodName) {
     constexpr auto flags = BUILTIN | PUBLIC | METHOD;
     if (methodName == LEN_FUNC) {
@@ -50,8 +35,8 @@ LgsFunc* LgsIterable::getMethod(const std::string& methodName) {
     }
     if (methodName == MAP_FUNC) {
         if (methods.contains(MAP_FUNC)) return methods[MAP_FUNC];
-        const auto generic = new LgsGenericType("T");
-        const auto callback = new LgsFuncType(generic, {LgsParam(baseType)});
+        const auto generic = new LgsGenericType("U");
+        const auto callback = new LgsFuncType("cb", generic, {LgsParam(baseType)});
         const auto func = new LgsFunc(MAP_FUNC, getBaseName(), new LgsDArray(generic), {this, callback}, flags);
         func->funcType->genericTypes.push_back(generic);
         callback->genericTypes.push_back(generic);
@@ -60,19 +45,40 @@ LgsFunc* LgsIterable::getMethod(const std::string& methodName) {
     }
     if (methodName == FILTER_FUNC) {
         if (methods.contains(FILTER_FUNC)) return methods[FILTER_FUNC];
-        const auto callback = new LgsFuncType(&LGS_BOOL, {LgsParam(baseType)});
-        const auto func = new LgsFunc(FILTER_FUNC, getBaseName(), this, {this, callback}, flags);
+        const auto generic = new LgsGenericType("T"); // T is baseType
+        const auto callback = new LgsFuncType("cb", &LGS_BOOL, {LgsParam(baseType)});
+        const auto func = new LgsFunc(FILTER_FUNC, getBaseName(), new LgsDArray(baseType), {this, callback}, flags);
+        func->funcType->genericTypes.push_back(generic);
+        callback->genericTypes.push_back(generic);
         addMethod(func);
         return func;
     }
     if (methodName == FOREACH_FUNC) {
         if (methods.contains(FOREACH_FUNC)) return methods[FOREACH_FUNC];
-        const auto callback = new LgsFuncType(&LGS_VOID, {LgsParam(baseType)});
+        const auto generic = new LgsGenericType("T"); // T is baseType
+        const auto callback = new LgsFuncType("cb", &LGS_VOID, {LgsParam(baseType)});
         const auto func = new LgsFunc(FOREACH_FUNC, &LGS_VOID, {this, callback}, flags);
+        func->funcType->genericTypes.push_back(generic);
+        callback->genericTypes.push_back(generic);
         addMethod(func);
         return func;
     }
     return LgsType::getMethod(methodName);
+}
+
+size_t LgsIterable::getDimension() const {
+    size_t dim = 1;
+    auto nestedIter = this;
+    while (true) {
+        if (const auto innerIter = nestedIter->baseType->asIterable()) {
+            nestedIter = innerIter;
+            if (innerIter->asVec() || innerIter->asStr()) continue;
+            dim++;
+        } else {
+            break;
+        }
+    }
+    return dim;
 }
 
 LgsType* LgsIterable::getIndexType() {
@@ -81,6 +87,10 @@ LgsType* LgsIterable::getIndexType() {
 
 LgsType* LgsIterable::getValueType() {
     return baseType;
+}
+
+void LgsIterable::addIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index, LgsExpr* value) {
+    assert(0);
 }
 
 bool LgsIterable::unpackLoopVars(LgsForeachLoop* loop) const {
@@ -98,10 +108,6 @@ void LgsIterable::setLoopIRVars(LgsCgModule& cg, LgsForeachLoop* loop) {
     iterIndex->index.from->IRValue = loop->loadIndex(cg);
     iterIndex->setIRElementPtr(cg);
     loop->loopVars[0]->IRValue = iterIndex->IRValue;
-}
-
-void LgsIterable::addIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index, LgsExpr* value) {
-    assert(0);
 }
 
 LgsIterable::~LgsIterable() {

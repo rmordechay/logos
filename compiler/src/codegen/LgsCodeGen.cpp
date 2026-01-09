@@ -488,11 +488,17 @@ void LgsCodeGen::visitReturnStmt(LgsReturn* returnStmt) {
     visitExpr(returnStmt->expr);
     returnStmt->IRValue = returnStmt->expr ? returnStmt->expr->IRValue : nullptr;
     const auto currentFunc = stack.currentFunc();
-    cg.callPopStack();
     if (currentFunc->funcType->rt->isVoid()) {
+        cg.callPopStack();
         cg.builder.CreateRetVoid();
     } else {
-        cg.builder.CreateRet(returnStmt->expr->IRValue);
+        if (currentFunc->returnStmts.size() == 1) {
+            cg.callPopStack();
+            cg.builder.CreateRet(returnStmt->expr->IRValue);
+        } else {
+            returnStmt->parentBlock = cg.builder.GetInsertBlock();
+            cg.builder.CreateBr(currentFunc->epilogue);
+        }
     }
 }
 
@@ -1053,15 +1059,6 @@ void LgsCodeGen::visitFuncCall(LgsFuncCall* funcCall) {
         func->IRValue = cg.getFromVTable(self->IRValue, cg.getString(func->funcType->name));
     }
 
-    if (func->funcType->isBuiltin) {
-        if (func->funcType->name == MAP_FUNC) {
-            createMapFunc(func);
-        } else if (func->funcType->name == FILTER_FUNC) {
-            createFilterFunc(func);
-        } else if (func->funcType->name == FOREACH_FUNC) {
-            createForeachFunc(func);
-        }
-    }
     assert(func->funcType->genericTypes.empty());
     if (funcCall->coroutine || funcCall->isDeferred) return;
     funcCall->IRValue = func->call(cg, funcCall->args);
@@ -1204,6 +1201,7 @@ void LgsCodeGen::createPrologue(LgsFunc* func) const {
     if (appConfigs.debugMode) func->setDebugValue(cg);
     cg.currentFunc = func->getIRFunc(cg);
     const auto entryBlock = cg.createBlock(BLOCK_ENTRY, cg.currentFunc);
+    func->epilogue = cg.createBlock("epilogue");
     cg.builder.SetInsertPoint(entryBlock);
     if (func->funcType->name == LGS_MAIN_FUNC) {
         cg.callRuntimeFunc("init", cg.voidTy());
@@ -1219,6 +1217,14 @@ void LgsCodeGen::createEpilogue(const LgsFunc* func) const {
     } else if (func->funcType->rt->isVoid() && !cg.lastInstTerminator()) {
         cg.callPopStack();
         cg.builder.CreateRetVoid();
+    } else if (func->returnStmts.size() > 1) {
+        cg.branchAndStartBlock(func->epilogue);
+        const auto phi = cg.builder.CreatePHI(func->funcType->rt->getTypeOrPtr(cg), func->returnStmts.size());
+        for (const auto returnStmt : func->returnStmts) {
+            phi->addIncoming(returnStmt->expr->IRValue, returnStmt->parentBlock);
+        }
+        cg.callPopStack(phi);
+        cg.builder.CreateRet(phi);
     }
 }
 
@@ -1348,189 +1354,120 @@ void LgsCodeGen::addVirtuals(LgsObject* obj, Value* ptr) const {
     // }
 }
 
-void LgsCodeGen::createMapFunc(LgsFunc* func) const {
-    if (cg.IRModule->getFunction(func->funcType->getName())) return;
-    // Save state
-    cg.savedIP = cg.builder.saveIP();
-    const auto originalFunc = cg.currentFunc;
+void LgsCodeGen::generateMapFunc(LgsFunc* mapFunc) const {
+    const auto& iterableParam = mapFunc->funcType->params[0];
+    const auto& cbParam = mapFunc->funcType->params[1];
+    const auto iterable = iterableParam.type->asIterable();
+    const auto funcName = mapFunc->funcType->getName();
 
-    // Init
-    const auto IRFunc = func->getIRFunc(cg);
-    cg.currentFunc = IRFunc;
-    const auto& iterableParam = func->funcType->params[0];
-    const auto& callbackParam = func->funcType->params[1];
-    const auto entryBlock = cg.createBlock(BLOCK_ENTRY, cg.currentFunc);
-    const auto condBlock = cg.createBlock(BLOCK_LOOP_COND);
-    const auto bodyBlock = cg.createBlock(BLOCK_LOOP_BODY);
-    const auto exitBlock = cg.createBlock(BLOCK_LOOP_EXIT);
+    const auto ft = llvm::cast<FunctionType>(mapFunc->funcType->getIRType(cg));
+    const auto cbFt = llvm::cast<FunctionType>(cbParam.type->getIRType(cg));
+    const auto func = cg.getFunc(funcName, ft);
+    const auto entryBlock = cg.createBlock(BLOCK_ENTRY, func);
     cg.builder.SetInsertPoint(entryBlock);
     cg.callStackPush();
 
-    const auto iterable = iterableParam.type->asIterable();
-    LgsDArray dArray(iterable->baseType);
-    LgsArrayExpr newArr(&dArray);
-    newArr.IRValue = dArray.getIRZeroValue(cg, nullptr);
+    const auto iter = func->getArg(0);
+    const auto cb = func->getArg(1);
 
-    const auto iPtr = cg.builder.CreateAlloca(cg.sizeTy());
-    const auto loopStart = cg.builder.CreateSExt(cg.sizeZero(), cg.sizeTy());
-    cg.store(loopStart, iPtr);
-    cg.builder.CreateBr(condBlock);
+    LgsDArray dArr(iterable->baseType);
+    LgsArrayExpr retArr(&dArr);
+    const auto tempIter = iterable->getIndexType()->getZeroValue();
+    const auto tempIndex = iterable->getIndexType()->getZeroValue();
+    const auto tempValue = iterable->baseType->getZeroValue();
+    tempIter->IRValue = iter;
+    retArr.IRValue = iterable->getIRZeroValue(cg, nullptr, true);
+    const auto len = iterable->lenIR(cg, iter);
 
-    // Condition
-    cg.startBlock(condBlock);
-    LgsIntConst size(&LGS_SIZE, 0);
-    size.IRValue = cg.load(cg.sizeTy(), iPtr);
-    const auto tempExpr = iterableParam.type->getZeroValue();
-    auto length = iterable->lenIR(cg, iterableParam.IRValue);
-    length = cg.extendToSize(length);
-    const auto condition = cg.builder.CreateICmpSLT(size.IRValue, length);
-    cg.builder.CreateCondBr(condition, bodyBlock, exitBlock);
+    cg.loop(len, [&](Value* iValue, BasicBlock*) {
+        tempIndex->IRValue = iValue;
+        const auto element = iterable->getIRElement(cg, tempIter, tempIndex);
+        const auto loadElement = cg.load(iterable->baseType->getIRType(cg), element);
+        const auto results = cg.builder.CreateCall(cbFt, cb, {loadElement});
+        tempValue->IRValue = results;
+        dArr.addIRElement(cg, &retArr, nullptr, tempValue);
+    });
 
-    // Body
-    cg.startBlock(bodyBlock);
-    auto element = iterable->getIRElement(cg, tempExpr, &size);
-    if (element->getType()->isPointerTy()) {
-        element = cg.load(iterable->baseType->getIRType(cg), element);
-    }
-    const auto ft = llvm::dyn_cast<FunctionType>(callbackParam.type->getIRType(cg));
-    const auto v = cg.builder.CreateCall(ft, callbackParam.IRValue, {element});
-    tempExpr->IRValue = v;
-    iterable->addIRElement(cg, &newArr, &size, tempExpr);
-    freeExpr(tempExpr);
-
-    // Increment
-    const auto inc = cg.builder.CreateAdd(size.IRValue, cg.usize(1));
-    cg.store(inc, iPtr);
-    cg.builder.CreateBr(condBlock);
-
-    // End func
-    cg.startBlock(exitBlock);
+    freeExpr(tempIter);
+    freeExpr(tempIndex);
+    freeExpr(tempValue);
     cg.callPopStack();
-    cg.builder.CreateRet(newArr.IRValue);
-
-    // Restore state
-    cg.currentFunc = originalFunc;
-    cg.builder.restoreIP(cg.savedIP);
-    func->IRValue = IRFunc;
+    cg.builder.CreateRet(retArr.IRValue);
 }
 
-void LgsCodeGen::createFilterFunc(LgsFunc* func) const {
-    // if (cg.IRModule->getFunction(func->funcType->getName())) return;
-    // // Save state
-    // cg.savedIP = cg.builder.saveIP();
-    // const auto originalFunc = cg.currentFunc;
-    //
-    // const auto IRFunc = func->getIRFunc(cg);
-    // // Init
-    // cg.currentFunc = IRFunc;
-    // const auto& iterableParam = func->funcType->params[0];
-    // const auto& callbackParam = func->funcType->params[1];
-    // const auto entryBlock = cg.createBlock(BLOCK_ENTRY, cg.currentFunc);
-    // const auto condBlock = cg.createBlock(BLOCK_LOOP_COND);
-    // const auto bodyBlock = cg.createBlock(BLOCK_LOOP_BODY);
-    // const auto trueBlock = cg.createBlock(BLOCK_IF_TRUE);
-    // const auto falseBlock = cg.createBlock(BLOCK_IF_FALSE);
-    // const auto exitBlock = cg.createBlock(BLOCK_LOOP_EXIT);
-    // cg.builder.SetInsertPoint(entryBlock);
-    // cg.callStackPush();
-    //
-    // const auto iterable = iterableParam.type->asIterable();
-    // const auto newArr = iterableParam.type->getIRZeroValue(cg);
-    //
-    // const auto iPtr = cg.builder.CreateAlloca(cg.sizeTy());
-    // const auto loopStart = cg.builder.CreateSExt(cg.sizeZero(), cg.sizeTy());
-    // cg.store(loopStart, iPtr);
-    // cg.builder.CreateBr(condBlock);
-    //
-    // // Condition
-    // cg.startBlock(condBlock);
-    // const auto iValue = cg.load(cg.sizeTy(), iPtr);
-    // auto length = iterable->lenIR(cg, iterableParam.IRValue);
-    // length = cg.extendToSize(length);
-    // const auto condition = cg.builder.CreateICmpSLT(iValue, length);
-    // cg.builder.CreateCondBr(condition, bodyBlock, exitBlock);
-    //
-    // // Body
-    // cg.startBlock(bodyBlock);
-    // auto element = iterable->getIRElement(cg, iterableParam.IRValue, iValue);
-    // if (element->getType()->isPointerTy()) {
-    //     element = cg.load(iterable->baseType->getIRType(cg), element);
-    // }
-    // const auto ft = llvm::dyn_cast<FunctionType>(callbackParam.type->getIRType(cg));
-    // const auto filterCond = cg.builder.CreateCall(ft, callbackParam.IRValue, {element});
-    // cg.builder.CreateCondBr(filterCond, trueBlock, falseBlock);
-    // cg.startBlock(trueBlock);
-    // // iterable->addIRElement(cg, newArr, iValue, element);
-    // cg.branchAndStartBlock(falseBlock);
-    //
-    // // Increment
-    // const auto inc = cg.builder.CreateAdd(iValue, cg.usize(1));
-    // cg.store(inc, iPtr);
-    // cg.builder.CreateBr(condBlock);
-    //
-    // // End func
-    // cg.startBlock(exitBlock);
-    // cg.callPopStack();
-    // cg.builder.CreateRet(newArr);
-    //
-    // // Restore state
-    // cg.currentFunc = originalFunc;
-    // cg.builder.restoreIP(cg.savedIP);
-    // func->IRValue = IRFunc;
+void LgsCodeGen::generateFilterFunc(LgsFunc* filterFunc) const {
+    const auto& iterableParam = filterFunc->funcType->params[0];
+    const auto& cbParam = filterFunc->funcType->params[1];
+    const auto iterable = iterableParam.type->asIterable();
+    const auto funcName = filterFunc->funcType->getName();
+
+    const auto ft = llvm::cast<FunctionType>(filterFunc->funcType->getIRType(cg));
+    const auto cbFt = llvm::cast<FunctionType>(cbParam.type->getIRType(cg));
+    const auto func = cg.getFunc(funcName, ft);
+    const auto entryBlock = cg.createBlock(BLOCK_ENTRY, func);
+    cg.builder.SetInsertPoint(entryBlock);
+    cg.callStackPush();
+
+    const auto iter = func->getArg(0);
+    const auto cb = func->getArg(1);
+
+    LgsDArray dArr(iterable->baseType);
+    LgsArrayExpr retArr(&dArr);
+    const auto tempIter = iterable->getIndexType()->getZeroValue();
+    const auto tempIndex = iterable->getIndexType()->getZeroValue();
+    const auto tempValue = iterable->baseType->getZeroValue();
+    tempIter->IRValue = iter;
+    retArr.IRValue = iterable->getIRZeroValue(cg, nullptr, true);
+    const auto len = iterable->lenIR(cg, iter);
+
+    cg.loop(len, [&](Value* iValue, BasicBlock*) {
+        tempIndex->IRValue = iValue;
+        const auto baseTy = iterable->baseType->getIRType(cg);
+        const auto element = iterable->getIRElement(cg, tempIter, tempIndex);
+        const auto loadElement = cg.load(baseTy, element);
+        const auto results = cg.builder.CreateCall(cbFt, cb, {loadElement});
+        cg.ifStmt(results, [&] {
+            tempValue->IRValue = cg.load(baseTy, element);
+            dArr.addIRElement(cg, &retArr, nullptr, tempValue);
+        });
+    });
+
+    freeExpr(tempIter);
+    freeExpr(tempIndex);
+    freeExpr(tempValue);
+    cg.callPopStack();
+    cg.builder.CreateRet(retArr.IRValue);
 }
 
-void LgsCodeGen::createForeachFunc(LgsFunc* func) const {
-    // if (cg.IRModule->getFunction(func->funcType->getName())) return;
-    // // Save state
-    // cg.savedIP = cg.builder.saveIP();
-    // const auto originalFunc = cg.currentFunc;
-    // cg.currentFunc = func->getIRFunc(cg);
-    // func->IRValue = cg.currentFunc;
-    //
-    // // Init
-    // const auto& iterableParam = func->funcType->params[0];
-    // const auto& callbackParam = func->funcType->params[1];
-    // const auto iterable = iterableParam.type->asIterable();
-    // const auto entryBlock = cg.createBlock(BLOCK_ENTRY, cg.currentFunc);
-    // const auto condBlock = cg.createBlock(BLOCK_LOOP_COND);
-    // const auto bodyBlock = cg.createBlock(BLOCK_LOOP_BODY);
-    // const auto exitBlock = cg.createBlock(BLOCK_LOOP_EXIT);
-    // cg.builder.SetInsertPoint(entryBlock);
-    // cg.callStackPush();
-    //
-    // const auto iPtr = cg.builder.CreateAlloca(cg.sizeTy());
-    // const auto loopStart = cg.builder.CreateSExt(cg.sizeZero(), cg.sizeTy());
-    // cg.store(loopStart, iPtr);
-    // cg.builder.CreateBr(condBlock);
-    //
-    // // Condition
-    // cg.startBlock(condBlock);
-    // const auto iValue = cg.load(cg.sizeTy(), iPtr);
-    // auto length = iterable->lenIR(cg, iterableParam.IRValue);
-    // length = cg.extendToSize(length);
-    // const auto condition = cg.builder.CreateICmpSLT(iValue, length);
-    // cg.builder.CreateCondBr(condition, bodyBlock, exitBlock);
-    //
-    // // Body
-    // cg.startBlock(bodyBlock);
-    // auto element = iterable->getIRElement(cg, iterableParam.IRValue, iValue);
-    // if (element->getType()->isPointerTy()) {
-    //     element = cg.load(iterable->baseType->getIRType(cg), element);
-    // }
-    // const auto ft = llvm::dyn_cast<FunctionType>(callbackParam.type->getIRType(cg));
-    // cg.builder.CreateCall(ft, callbackParam.IRValue, {element});
-    //
-    // // Increment
-    // const auto inc = cg.builder.CreateAdd(iValue, cg.usize(1));
-    // cg.store(inc, iPtr);
-    // cg.builder.CreateBr(condBlock);
-    //
-    // // End func
-    // cg.startBlock(exitBlock);
-    // cg.callPopStack();
-    // cg.builder.CreateRetVoid();
-    //
-    // // Restore state
-    // cg.currentFunc = originalFunc;
-    // cg.builder.restoreIP(cg.savedIP);
+void LgsCodeGen::generateForeachFunc(const LgsFunc* forEachFunc) const {
+    const auto& iterableParam = forEachFunc->funcType->params[0];
+    const auto& cbParam = forEachFunc->funcType->params[1];
+    const auto iterable = iterableParam.type->asIterable();
+    const auto funcName = forEachFunc->funcType->getName();
+
+    const auto ft = llvm::cast<FunctionType>(forEachFunc->funcType->getIRType(cg));
+    const auto cbFt = llvm::cast<FunctionType>(cbParam.type->getIRType(cg));
+    const auto func = cg.getFunc(funcName, ft);
+    const auto entryBlock = cg.createBlock(BLOCK_ENTRY, func);
+    cg.builder.SetInsertPoint(entryBlock);
+    cg.callStackPush();
+
+    const auto iter = func->getArg(0);
+    const auto cb = func->getArg(1);
+
+    const auto tempIter = iterable->getIndexType()->getZeroValue();
+    const auto tempIndex = iterable->getIndexType()->getZeroValue();
+    tempIter->IRValue = iter;
+    const auto len = iterable->lenIR(cg, iter);
+    cg.loop(len, [&](Value* iValue, BasicBlock*) {
+        tempIndex->IRValue = iValue;
+        const auto element = iterable->getIRElement(cg, tempIter, tempIndex);
+        const auto loadElement = cg.load(iterable->baseType->getIRType(cg), element);
+        cg.builder.CreateCall(cbFt, cb, {loadElement});
+    });
+
+    freeExpr(tempIter);
+    freeExpr(tempIndex);
+    cg.callPopStack();
+    cg.builder.CreateRetVoid();
 }

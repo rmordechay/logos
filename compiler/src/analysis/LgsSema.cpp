@@ -208,11 +208,7 @@ void LgsSema::visitLambda(LgsFunc* lambda) {
     typeResolver.resolveFuncType(lambda->funcType);
     visitFunc(lambda);
     if (lambda->funcType->rt->hasGenericTypes()) {
-        LgsType* inferredType = nullptr;
-        for (const auto returnStmt : lambda->returnStmts) {
-            if (!returnStmt->expr) continue;
-            inferredType = returnStmt->expr->type;
-        }
+        const auto inferredType = lambda->returnStmts.front()->expr->type;
         if (!inferredType) {
             addError(E10049, lambda->location, {lambda->funcType->name});
             return;
@@ -292,7 +288,7 @@ void LgsSema::visitStmtsBlock(LgsStmtsBlock* stmtsBlock) {
     const auto currentFunc = stack.currentFunc();
     const auto& ft = currentFunc->funcType;
     const auto firstStmtIsExpr = firstStmt.wrapperType == LgsStmtWrapper::WrapperType::Expr;
-    if (ft->isLambda && stmtsBlock->stmts.size() == 1 && firstStmtIsExpr) {
+    if (currentFunc->isLambda && stmtsBlock->stmts.size() == 1 && firstStmtIsExpr) {
         visitExpr(firstStmt.expr);
         if (firstStmt.expr->type->isVoid()) return;
         ft->rt = firstStmt.expr->type;
@@ -634,7 +630,7 @@ void LgsSema::visitReturnStmt(const LgsReturn* returnStmt) {
         currentFunc->returnStmts.push_back(returnStmt);
     }
     const auto rt = ft->rt;
-    if (!rt && ft->isLambda) return;
+    if (!rt && currentFunc->isLambda) return;
     if (rt->isVoid() && retExpr && retExpr->type && !retExpr->type->isVoid()) {
         addError(E10027, returnStmt->location, {retExpr->type->pname()});
     } else if (!rt->isVoid() && !retExpr) {
@@ -1748,7 +1744,7 @@ void LgsSema::deleteRTType(LgsType* type) const {
     }
 }
 
-void LgsSema::addGenerics(LgsExpr* expr) {
+void LgsSema::addGenerics(LgsExpr* expr) const {
     file->symbolTable.generics[expr->type->getName()] = expr;
 }
 

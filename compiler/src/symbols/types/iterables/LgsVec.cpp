@@ -129,7 +129,7 @@ LgsType* LgsVec::applyBinOp(LgsType* rightType, LgsBinOp& op) {
 }
 
 bool LgsVec::inferBaseType(std::vector<LgsExpr*>& args) {
-    baseType = getHighestNumPrecedence(args);
+    baseType = getBiggestIntType(args);
     return !!baseType;
 }
 

@@ -340,7 +340,7 @@ bool LgsApp::resolveGlobals() {
  */
 bool LgsApp::generateRTTTypes() {
     rttTypeModule.setupModule("rttypes");
-    rttTypeModule.isRTTModule = true;
+    rttTypeModule.mode = CG_MODE_RTTYPES;
 
     // Globals
     for (const auto type : globals.table.rttTypes) {
@@ -386,6 +386,16 @@ bool LgsApp::generateGenerics() {
         } else if (const auto map = genericExpr->type->asMap()) {
             map->generateGetFunc(cg.cg);
             map->generateAddFunc(cg.cg);
+        } else if (const auto func = genericExpr->asFunc()) {
+            if (func->funcType->name == MAP_FUNC) {
+                cg.generateMapFunc(func);
+            } else if (func->funcType->name == FILTER_FUNC) {
+                cg.generateFilterFunc(func);
+            } else if (func->funcType->name == FOREACH_FUNC) {
+                cg.generateForeachFunc(func);
+            } else {
+                assert(0);
+            }
         } else {
             assert(0);
         }

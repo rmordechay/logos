@@ -161,8 +161,6 @@ set(COMPILER_SOURCE
 )
 
 set(LGS_LIB_SOURCE
-    ${CMAKE_SOURCE_DIR}/lib/src/Lgs_HashMap.cpp
-    ${CMAKE_SOURCE_DIR}/lib/src/Lgs_DArrayExpr.cpp
     ${CMAKE_SOURCE_DIR}/lib/src/Lgs_StrExpr.cpp
     ${CMAKE_SOURCE_DIR}/lib/src/Lgs_System.cpp
     ${CMAKE_SOURCE_DIR}/lib/src/Lgs_Runtime.cpp

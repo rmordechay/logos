@@ -12,22 +12,18 @@ Type* LgsFuncType::getIRType(LgsCgModule& cg) {
         const auto param = params[i];
         const auto paramType = param.type;
         if (param.isVariadic) types.emplace_back(cg.sizeTy());
-        if (param.type->passByRef) {
-            types.emplace_back(cg.ptrTy());
-        } else {
-            types.emplace_back(paramType->getIRType(cg));
-        }
+        types.emplace_back(paramType->getTypeOrPtr(cg));
     }
-    const auto returnType = rt->passByRef ? cg.ptrTy() : rt->getIRType(cg);
+    const auto returnType = rt->getTypeOrPtr(cg);
     IRType = cg.getFT(returnType, types, this->isVariadic);
     return IRType;
 }
 
 Constant* LgsFuncType::getRTType(LgsCgModule& cg) {
-    const auto funcName = getGenericName();
+    const auto funcName = getName();
     std::vector<LgsValue*> paramsAsValue;
     for (auto& param : params) paramsAsValue.emplace_back(static_cast<LgsValue*>(&param));
-    const auto [typesArr, hashesArr] = getRTFieldsInfo(cg, funcName, paramsAsValue);
+    const auto [typesArr, hashesArr] = getRTValuesInfo(cg, funcName, paramsAsValue);
     // paramsCount, paramHashes, paramTypes, rt
     const auto sv = cg.getRTTExtraStruct(funcName, {cg.sizeTy(), cg.ptrTy(), cg.ptrTy(), cg.ptrTy()}, {
         cg.usize(params.size()), hashesArr, typesArr, rt->getRTType(cg)
@@ -55,27 +51,21 @@ size_t LgsFuncType::sizeBytes() {
 }
 
 std::string LgsFuncType::getName() {
-    if (name == "") return LGS_LAMBDA;
-    std::stringstream strStream;
+    assert(name != "");
+    std::stringstream str;
     if (!isExternal) {
-        if (isBuiltin) strStream << LGS_PREFIX;
-        else strStream << "u_";
+        if (isBuiltin) str << LGS_PREFIX;
+        else str << "u_";
     }
     if (parentName != "") {
-        strStream << parentName << "_";
+        str << parentName << "_";
     }
-    strStream << name;
-    if (isCoroutine) strStream << LGS_CORO_SUFFIX;
-    return strStream.str();
-}
-
-std::string LgsFuncType::getGenericName() {
-    std::stringstream str;
-    str << getName();
+    str << name;
     for (size_t i = isMethod; i < params.size(); ++i) {
         const auto& param = params[i];
         str << '_' << param.type->getName();
     }
+    if (isCoroutine) str << LGS_CORO_SUFFIX;
     return str.str();
 }
 

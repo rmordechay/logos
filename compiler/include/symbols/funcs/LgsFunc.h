@@ -18,7 +18,9 @@ public:
     LgsStmtsBlock* stmtsBlock = nullptr;
     std::vector<const LgsReturn*> returnStmts;
     std::vector<std::pair<LgsExpr*, LgsExpr*>> mocks;
+    BasicBlock* epilogue = nullptr;
     Value* level = nullptr;
+    bool isLambda = false;
     bool isTest = false;
     CallFn fn;
 
@@ -43,10 +45,10 @@ public:
     virtual Function* getIRFunc(LgsCgModule& cg);
     virtual Value* call(LgsCgModule& cg, std::vector<LgsFuncArg>& args);
     Value* callIR(LgsCgModule& cg, const std::vector<Value*>& args = {});
-    void initFunc(const std::string& name, LgsType* rt, const std::vector<LgsParam>& params, uint32_t ops);
     Value* call(LgsCgModule& cg, const std::vector<LgsExpr*>& args);
     Value* callWithVariadic(LgsCgModule& cg, const std::vector<LgsFuncArg>& args);
     Value* loadIR(LgsCgModule& cg) override;
+    void initFunc(const std::string& name, LgsType* rt, const std::vector<LgsParam>& params, uint32_t ops);
     void castImplicitly(LgsType* toType) override;
     std::string asText() override;
     void setType(LgsType* newType) override;

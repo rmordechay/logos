@@ -1,6 +1,6 @@
 #include "types/iterables/LgsDArray.h"
 #include "LgsBinaryTokens.h"
-#include "Lgs_DArrayExpr.h"
+#include "Lgs_Exprs.h"
 #include "codegen/LgsCgModule.h"
 #include "exprs/LgsArrayExpr.h"
 #include "types/LgsAny.h"
@@ -63,7 +63,7 @@ std::string LgsDArray::pname() {
 }
 
 size_t LgsDArray::sizeBytes() {
-    return sizeof(Lgs_DArrayExpr);
+    return sizeof(Lgs_Exprs);
 }
 
 bool LgsDArray::canCastTo(LgsType* other) {
@@ -80,12 +80,12 @@ LgsExpr* LgsDArray::getZeroValue() {
     return new LgsArrayExpr(this);
 }
 
-Value* LgsDArray::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
+Value* LgsDArray::getIRZeroValue(LgsCgModule& cg, Value* pointee, const bool levelAbove) {
     const auto ty = getIRType(cg);
-    const auto ptr = pointee ? pointee : cg.heapAlloc(cg.usize(sizeBytes()));
+    const auto ptr = pointee ? pointee : cg.heapAlloc(cg.usize(sizeBytes()), levelAbove);
     const auto cap = cg.usize(INITIAL_CAPACITY);
     const auto initSize = cg.builder.CreateMul(cap, cg.usize(baseType->sizeBytes()));
-    cg.storeStructField(ty, ptr, 0, cg.heapAlloc(initSize));
+    cg.storeStructField(ty, ptr, 0, cg.heapAlloc(initSize, levelAbove));
     cg.storeStructField(ty, ptr, 1, cg.sizeZero());
     cg.storeStructField(ty, ptr, 2, cap);
     return ptr;
@@ -132,22 +132,10 @@ Value* LgsDArray::inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) {
 Value* LgsDArray::getIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index) {
     const auto ty = getIRType(cg);
     const auto baseSize = cg.usize(baseType->sizeBytes());
-    const auto len = cg.loadStructField(ty, iterable->IRValue, 1, cg.sizeTy());
-    const auto inboundsBlock = cg.createBlock("in_bounds");
-    const auto exitBlock = cg.createBlock(BLOCK_EXIT);
-    const auto v = cg.allocaAndStore(cg.ptrTy(), cg.null());
-    cg.builder.CreateCondBr(cg.builder.CreateICmpSLT(len, cg.extendToSize(index->IRValue)), exitBlock, inboundsBlock);
-
-    cg.startBlock(inboundsBlock);
     const auto dataFieldPtr = cg.builder.CreateStructGEP(ty, iterable->IRValue, 0);
     const auto offset = cg.builder.CreateMul(cg.extendToSize(index->IRValue), baseSize);
     const auto dataField = cg.load(cg.ptrTy(), dataFieldPtr);
-    const auto ptr = cg.builder.CreateInBoundsPtrAdd(dataField, offset);
-    cg.store(cg.load(cg.ptrTy(), ptr), v);
-    cg.builder.CreateBr(exitBlock);
-
-    cg.startBlock(exitBlock);
-    return v;
+    return cg.builder.CreateInBoundsPtrAdd(dataField, offset);
 }
 
 void LgsDArray::addIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index, LgsExpr* value) {
@@ -157,7 +145,9 @@ void LgsDArray::addIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index,
 
 Function* LgsDArray::generateAddFunc(LgsCgModule& cg) {
     const auto funcName = getName() + "_" + ADD_FUNC;
-    const auto valueTy = baseType->passByRef ? cg.ptrTy() : baseType->getIRType(cg);
+    if (const auto func = cg.IRModule->getFunction(funcName)) return func;
+
+    const auto valueTy = baseType->getTypeOrPtr(cg);
     const auto ft = cg.getFT(cg.voidTy(), {cg.ptrTy(), valueTy});
     if (cg.mode == CG_MODE_SRC_CODE) {
         return cg.getFunc(funcName, ft);

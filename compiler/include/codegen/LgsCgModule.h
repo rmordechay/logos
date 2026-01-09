@@ -71,7 +71,6 @@ public:
     std::map<std::string, Type*> typesRegistry;
     std::unordered_map<std::string, Value*> stringsRegistry;
     LgsCodeGenMode mode = CG_MODE_SRC_CODE;
-    bool isRTTModule = false;
 
     void setupModule(const std::filesystem::path& file, bool debugMode = false);
     bool writeIRModule(const LgsPaths& paths, uint8_t optLevel) const;
@@ -91,12 +90,11 @@ public:
     StructType* getAllocaType();
 
     void callStackPush();
-    void callPopStack();
+    void callPopStack(Value* rv = nullptr);
     Value* callHash(Value* arg);
     void addToVTable(Value* instance, Value* name, Value* ptr);
     Value* getFromVTable(Value* instance, Value* name);
-    Value* heapAlloc(Value* size);
-    Value* heapAlloc2(Value* size);
+    Value* heapAlloc(Value* size, bool levelAbove = false);
     Value* moveAlloc(Value* left, Value* right);
     Value* reallocate(Value* ptr, Value* size);
     void freeValue(Value* ptr);

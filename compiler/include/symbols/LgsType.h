@@ -85,8 +85,9 @@ public:
     virtual LgsType* replaceGenerics(LgsType* replacement, std::unordered_map<std::string, LgsType*>& replacements);
     virtual size_t sizeBytes() = 0;
     virtual LgsExpr* getZeroValue() = 0;
-    virtual Value* getIRZeroValue(LgsCgModule& cg, Value* pointee = nullptr);
+    virtual Value* getIRZeroValue(LgsCgModule& cg, Value* pointee = nullptr, bool levelAbove = false);
     virtual Type* getIRType(LgsCgModule& cg) = 0;
+    virtual Type* getTypeOrPtr(LgsCgModule& cg);
     virtual Constant* getRTType(LgsCgModule& cg) = 0;
     virtual bool canCastTo(LgsType* other) = 0;
     virtual std::string fmtStr() const = 0;
@@ -159,7 +160,7 @@ void freeTypes(std::vector<T*>& types) {
     types.clear();
 }
 
-LgsType* getHighestNumPrecedence(const std::vector<LgsExpr*>& args);
+LgsType* getBiggestIntType(const std::vector<LgsExpr*>& args);
 Value* eqIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
 Value* neIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
 Value* ltIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
@@ -171,4 +172,4 @@ Value* orIR(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right);
 std::pair<Value*, Value*> loadPairAsFloat(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
 std::pair<Value*, Value*> loadPairAsDouble(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
 std::pair<Value*, Value*> loadPairAsInt(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-std::pair<Constant*, Constant*> getRTFieldsInfo(LgsCgModule& cg, const std::string& name, const std::vector<LgsValue*>& values);
+std::pair<Constant*, Constant*> getRTValuesInfo(LgsCgModule& cg, const std::string& name, const std::vector<LgsValue*>& values);

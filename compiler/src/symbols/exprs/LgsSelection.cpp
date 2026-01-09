@@ -9,8 +9,7 @@
 #include <llvm/IR/InlineAsm.h>
 
 Value* LgsSelection::loadIR(LgsCgModule& cg) {
-    if (type->passByRef) return cg.load(cg.ptrTy(), IRValue);
-    return cg.load(type->getIRType(cg), IRValue);
+    return cg.load(type->getTypeOrPtr(cg), IRValue);
 }
 
 LgsFuncCall* LgsSelection::asMethodCall() const {

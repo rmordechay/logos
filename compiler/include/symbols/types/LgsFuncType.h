@@ -37,13 +37,13 @@ public:
     bool isSyscall = false;
     bool isExternal = false;
     bool isTerminator = false;
-    bool isLambda = false;
     bool hasDefaults = false;
     bool hasSelf = false;
     uint32_t variadicIndex = 0;
 
-    LgsFuncType(): LgsFuncType(nullptr) {}
-    explicit LgsFuncType(LgsType* rt, const std::vector<LgsParam>& params = {}, const uint32_t ops = 0) : rt(rt), params(params) {
+    explicit LgsFuncType(const std::string& name = ""): LgsFuncType(name, nullptr) {}
+    explicit LgsFuncType(const std::string& name, LgsType* rt, const std::vector<LgsParam>& params = {}, const uint32_t ops = 0)
+        : name(name), rt(rt), params(params) {
         setFuncOptions(ops);
         passByRef = true;
     }
@@ -53,7 +53,6 @@ public:
     LgsType* replaceGenerics(LgsType* replacement, std::unordered_map<std::string, LgsType*>& replacements) override;
     size_t sizeBytes() override;
     std::string getName() override;
-    std::string getGenericName();
     std::string pname() override;
     std::string fmtStr() const override;
     bool canCastTo(LgsType* other) override;

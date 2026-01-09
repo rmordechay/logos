@@ -38,13 +38,13 @@ public:
     std::string getName() override;
     LgsFunc* getMethod(const std::string& methodName) override;
     Type* getIRType(LgsCgModule& cg) override;
-    void checkRecursiveFields(std::unordered_set<std::string>& fieldsAsValue) const;
     Constant* getRTType(LgsCgModule& cg) override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
-    Value* getIRZeroValue(LgsCgModule& cg, Value* pointee = nullptr) override;
+    Value* getIRZeroValue(LgsCgModule& cg, Value* pointee = nullptr, bool levelAbove = false) override;
     bool canCastTo(LgsType* other) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
+    void checkRecursiveFields(std::unordered_set<std::string>& fieldsAsValue) const;
     std::string fmtStr() const override;
     DIType* getDebugType(LgsCgModule& cg) override;
     ~LgsObject() override;

@@ -22,7 +22,7 @@ struct Lgs_Runtime {
     std::unordered_map<VKey, void*, VKeyHash> vtable;
 };
 
-extern "C" void* Lgs_Runtime_allocate(size_t size);
+extern "C" void* Lgs_Runtime_allocate(size_t size, bool levelAbove);
 extern "C" void* Lgs_Runtime_reallocate(void* ptr, size_t size);
 
 static inline Lgs_Runtime runtime;

@@ -1,6 +1,5 @@
 #include "LgsDefinitions.h"
-#include "Lgs_DArrayExpr.h"
-#include "Lgs_HashMap.h"
+#include "Lgs_Exprs.h"
 #include "Lgs_Runtime.h"
 #include "Lgs_Types.h"
 #include <cassert>
@@ -25,8 +24,8 @@ static std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
     case RTT_DOUBLE: str << *static_cast<double*>(elem); break;
     case RTT_TYPE:
     case RTT_ENUM:
-    case RTT_STR: str << *static_cast<char**>(elem); break;
-    case RTT_CHAR: str << *static_cast<const char*>(elem); break;
+    case RTT_STR: str << "\"" << *static_cast<char**>(elem) << "\""; break;
+    case RTT_CHAR: str << "\"" << *static_cast<const char*>(elem) << "\""; break;
     case RTT_OBJECT: {
         const auto fieldsCount = rtt->obj.fieldsCount;
         str << rtt->obj.name << "{";
@@ -44,13 +43,13 @@ static std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
     }
     case RTT_SET:
     case RTT_DARRAY: {
-        const auto dArrExpr = static_cast<Lgs_DArrayExpr*>(elem);
+        const auto dArrExpr = static_cast<Lgs_Exprs*>(elem);
         assert(dArrExpr->length <= LGS_DARRAY_MAX_LENGTH);
         const auto& [baseType] = rtt->dArray;
         str << "[";
         for (size_t i = 0; i < dArrExpr->length; ++i) {
-            const auto data = Lgs_DArray_get(dArrExpr, rtt, i);
-            str << formatElement(baseType, data);
+            const auto element = dArrExpr->data + baseType->size * i;
+            str << formatElement(baseType, element);
             if (i < dArrExpr->length - 1) str << ", ";
         }
         str << "]";

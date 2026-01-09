@@ -6,8 +6,8 @@
 #include "stmts/LgsVarDec.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsVoid.h"
-
 #include <llvm/IR/Module.h>
+#include "Lgs_Exprs.h"
 
 #define INITIAL_CAPACITY 3
 
@@ -70,8 +70,7 @@ std::string LgsMap::pname() {
 }
 
 size_t LgsMap::sizeBytes() {
-    // entries, len, cap
-    return sizeof(void*) + sizeof(size_t) + sizeof(size_t);
+    return sizeof(Lgs_HashMap);
 }
 
 LgsType* LgsMap::getIndexType() {
@@ -96,13 +95,13 @@ LgsExpr* LgsMap::getZeroValue() {
     return new LgsHashMap(this);
 }
 
-Value* LgsMap::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
+Value* LgsMap::getIRZeroValue(LgsCgModule& cg, Value* pointee, const bool levelAbove) {
     const auto ty = getIRType(cg);
-    const auto ptr = pointee ? pointee : cg.heapAlloc(cg.usize(sizeBytes()));
+    const auto ptr = pointee ? pointee : cg.heapAlloc(cg.usize(sizeBytes()), levelAbove);
     const auto cap = cg.usize(INITIAL_CAPACITY);
     const auto entriesSize = cg.usize(pairType->sizeBytes() + sizeof(void*));
     const auto totalSize = cg.builder.CreateMul(entriesSize, cap);
-    const auto entries = cg.heapAlloc(totalSize);
+    const auto entries = cg.heapAlloc(totalSize, levelAbove);
     cg.storeStructField(ty, ptr, 0, entries);
     cg.storeStructField(ty, ptr, 1, cg.sizeZero());
     cg.storeStructField(ty, ptr, 2, cap);
@@ -223,9 +222,11 @@ DIType* LgsMap::getDebugType(LgsCgModule& cg) {
 }
 
 Function* LgsMap::generateGetFunc(LgsCgModule& cg) {
-    const auto funcName = getName() + "_get";
-    const auto keyTy = pairType->key->passByRef ? cg.ptrTy() : pairType->key->getIRType(cg);
-    const auto valueTy = pairType->value->passByRef ? cg.ptrTy() : pairType->value->getIRType(cg);
+    const auto funcName = getName() + "_" + GET_FUNC;
+    if (const auto func = cg.IRModule->getFunction(funcName)) return func;
+
+    const auto keyTy = pairType->key->getTypeOrPtr(cg);
+    const auto valueTy = pairType->value->getTypeOrPtr(cg);
     const std::vector<Type*> params = {cg.ptrTy(), keyTy};
     const auto ft = cg.getFT(valueTy, params);
     if (cg.mode == CG_MODE_SRC_CODE) {
@@ -249,8 +250,6 @@ Function* LgsMap::generateGetFunc(LgsCgModule& cg) {
     const auto mapIR = cg.currentFunc->getArg(0);
     const auto keyIR = cg.currentFunc->getArg(1);
     const auto indexTemp = pairType->key->getZeroValue();
-    const auto indexTemp2 = pairType->key->getZeroValue();
-    indexTemp->IRValue = keyIR;
 
     const auto cap = loadCapField(cg, mapIR);
     const auto hash = cg.builder.CreateURem(indexTemp->hashValue(cg), cap);
@@ -272,7 +271,7 @@ Function* LgsMap::generateGetFunc(LgsCgModule& cg) {
 
     // Key comparison
     cg.startBlock(keyCompareBlock);
-    indexTemp2->IRValue = cg.load(keyTy, keyPtr);
+    const auto indexTemp2 = pairType->key->getZeroValue();
     const auto keysEqual = eqIR(cg, indexTemp, indexTemp2);
     cg.builder.CreateCondBr(keysEqual, keysEqualBlock, keysNotEqualBlock);
 
@@ -299,8 +298,10 @@ Function* LgsMap::generateGetFunc(LgsCgModule& cg) {
 
 Function* LgsMap::generateAddFunc(LgsCgModule& cg) {
     const auto funcName = getName() + "_" + ADD_FUNC;
-    const auto valueTy = pairType->value->passByRef ? cg.ptrTy() : pairType->value->getIRType(cg);
-    const auto keyType = pairType->key->passByRef ? cg.ptrTy() : pairType->key->getIRType(cg);
+    if (const auto func = cg.IRModule->getFunction(funcName)) return func;
+
+    const auto valueTy = pairType->value->getTypeOrPtr(cg);
+    const auto keyType = pairType->key->getTypeOrPtr(cg);
     const auto ft = cg.getFT(cg.voidTy(), {cg.ptrTy(), keyType, valueTy});
     if (cg.mode == CG_MODE_SRC_CODE) {
         return cg.getFunc(funcName, ft);
@@ -329,7 +330,7 @@ Function* LgsMap::generateAddFunc(LgsCgModule& cg) {
     const auto mapTy = getIRType(cg);
     const auto entryTy = getEntryStruct(cg);
     const auto indexTemp = pairType->key->getZeroValue();
-    const auto indexTemp2 = pairType->key->getZeroValue();
+
     const auto entriesField = cg.builder.CreateStructGEP(mapTy, mapIR, 0);
     const auto lenField = cg.builder.CreateStructGEP(mapTy, mapIR, 1);
     const auto capField = cg.builder.CreateStructGEP(mapTy, mapIR, 2);
@@ -376,8 +377,10 @@ Function* LgsMap::generateAddFunc(LgsCgModule& cg) {
 
     // Element with same hash
     cg.startBlock(keyCompareBlock);
-    indexTemp2->IRValue = cg.load(pairType->key->getIRType(cg), getEntryKey(cg, entry));
+    const auto loadKey = cg.load(pairType->key->getIRType(cg), getEntryKey(cg, entry));
+    const auto indexTemp2 = pairType->key->getZeroValue();
     cg.builder.CreateCondBr(eqIR(cg, indexTemp, indexTemp2), equalBlock, notEqualBlock);
+
     cg.startBlock(equalBlock);
     cg.storeStructField(entryTy, entry, 1, valueIR);
     cg.builder.CreateRetVoid();

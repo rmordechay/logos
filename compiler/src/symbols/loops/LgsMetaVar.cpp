@@ -4,8 +4,7 @@
 #include "codegen/LgsCgModule.h"
 
 Value* LgsMetaVar::loadIR(LgsCgModule& cg) {
-    if (type->passByRef) return cg.load(cg.ptrTy(), IRValue);
-    return cg.load(type->getIRType(cg), IRValue);
+    return cg.load(type->getTypeOrPtr(cg), IRValue);
 }
 
 bool LgsMetaVar::equals(LgsExpr* other) {

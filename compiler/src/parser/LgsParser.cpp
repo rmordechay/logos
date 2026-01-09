@@ -774,8 +774,7 @@ LgsFuncType* LgsParser::parseFuncHeader() {
         return nullptr;
     }
 
-    const auto funcType = new LgsFuncType();
-    funcType->name = nameToken.lexeme;
+    const auto funcType = new LgsFuncType(nameToken.lexeme);
     funcType->genericTypes = genericsTypes;
     parseParams(funcType);
     mustMatch(T_RPAREN);
@@ -1790,7 +1789,7 @@ LgsFunc* LgsParser::parseLambda() {
 
     const auto lambda = new LgsFunc("", rt, params);
     currentFunc = lambda;
-    lambda->funcType->isLambda = true;
+    lambda->isLambda = true;
     lambda->stmtsBlock = parseStmtsBlock();
     mustParse(lambda->stmtsBlock);
     if (lambda->stmtsBlock->isMacro) addParsingError();
@@ -2322,7 +2321,7 @@ void LgsParser::recursionGuard() {
 
 LgsFunc* wrapStmtsBlockWithLambda(LgsStmtsBlock* stmtsBlock) {
     const auto func = new LgsFunc("", nullptr);
-    func->funcType->isLambda = true;
+    func->isLambda = true;
     func->location = stmtsBlock->location;
     func->stmtsBlock = stmtsBlock;
     return func;

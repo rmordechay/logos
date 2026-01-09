@@ -17,15 +17,18 @@ extern "C" void Lgs_Runtime_push() {
     runtime.stack.emplace_back(Lgs_StackFrame{});
 }
 
-extern "C" void Lgs_Runtime_pop() {
-    // auto start = std::chrono::high_resolution_clock::now();
+extern "C" void Lgs_Runtime_pop(void* rv) {
+    //auto start = std::chrono::high_resolution_clock::now();
     auto& top = runtime.stack.back();
     // Call defers
     for (auto [defer, ctx] : top.defers) defer(ctx);
     // Free allocations
     const auto level = Lgs_Runtime_getLevel();
-    std::erase_if(runtime.allocs, [&level](const auto& pair) {
-        auto equalLevel = pair.second == level;
+    if (rv) {
+        runtime.allocs[rv] = level - 1;
+    }
+    std::erase_if(runtime.allocs, [&level](const std::pair<void*, size_t>& pair) {
+        const auto equalLevel = pair.second == level;
         if (equalLevel) Lgs_Runtime_freeValue(pair.first);
         return equalLevel;
     });
@@ -35,10 +38,10 @@ extern "C" void Lgs_Runtime_pop() {
     // std::println("{}", duration.count());
 }
 
-extern "C" void* Lgs_Runtime_allocate(const size_t size) {
+extern "C" void* Lgs_Runtime_allocate(const size_t size, const bool levelAbove) {
     const auto ptr = std::malloc(size);
-    //std::println("Allocated: {}", ptr);
-    runtime.allocs[ptr] = Lgs_Runtime_getLevel();
+    // std::println("Allocated: {}", ptr);
+    runtime.allocs[ptr] = Lgs_Runtime_getLevel() - levelAbove;
     return ptr;
 }
 
@@ -47,10 +50,10 @@ extern "C" void Lgs_Runtime_move(void* left, void* right) {
     auto& rightLevel = runtime.allocs[right];
     if (leftLevel < rightLevel) {
         rightLevel = leftLevel;
-        // std::println("Move right {} to {}", right, leftLevel);
+        //std::println("Move right {} to {}", right, leftLevel);
     }
     leftLevel = Lgs_Runtime_getLevel();
-    // std::println("Move left {} to {}", left, Lgs_Runtime_getLevel());
+    //std::println("Move left {} to {}", left, Lgs_Runtime_getLevel());
 }
 
 extern "C" void* Lgs_Runtime_reallocate(void* ptr, const size_t size) {
@@ -58,7 +61,7 @@ extern "C" void* Lgs_Runtime_reallocate(void* ptr, const size_t size) {
 }
 
 extern "C" void Lgs_Runtime_freeValue(void* ptr) {
-    // std::println("Freeing {}", ptr);
+    // std::println("Freeing {} {}", ptr, Lgs_Runtime_getLevel());
     std::free(ptr);
 }
 

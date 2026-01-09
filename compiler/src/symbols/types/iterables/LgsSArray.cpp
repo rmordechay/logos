@@ -3,7 +3,7 @@
 #include "exprs/LgsArrayExpr.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsBool.h"
-#include "Lgs_DArrayExpr.h"
+#include "Lgs_Exprs.h"
 #include "exprs/LgsBinaryExpr.h"
 #include "lgsc/LgsCCompiler.h"
 
@@ -34,7 +34,7 @@ LgsExpr* LgsSArray::getZeroValue() {
     return new LgsArrayExpr(this);
 }
 
-Value* LgsSArray::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
+Value* LgsSArray::getIRZeroValue(LgsCgModule& cg, Value* pointee, bool levelAbove) {
     const auto ty = getIRType(cg);
     const auto arrSize = size->getConstInt().value();
     const auto arr = pointee ? pointee : cg.builder.CreateAlloca(ty);
@@ -123,7 +123,8 @@ Value* LgsSArray::inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) {
     cg.loop(size->loadIR(cg), [this, &cg, iterableExpr, value, resultPtr](Value* index, BasicBlock* exitBlock) {
         const auto trueBlock = cg.createBlock();
         const auto falseBlock = cg.createBlock();
-        const auto tempExpr = iterableExpr->type->asIterable()->baseType->getZeroValue();
+        const auto iterable = iterableExpr->type->asIterable();
+        const auto tempExpr = iterable->baseType->getZeroValue();
         LgsIntConst tempIndex(&LGS_INT, 0);
         tempIndex.IRValue = index;
         tempExpr->IRValue = getIRElement(cg, iterableExpr, &tempIndex);

@@ -25,7 +25,7 @@ void LgsCgModule::setupModule(const fs::path& file, const bool debugMode) {
     IRModule = new Module(file.stem().string(), context);
     IRModule->setTargetTriple(llvm::sys::getDefaultTargetTriple());
     IRModule->setDataLayout(targetMachine->createDataLayout());
-    if (debugMode && !isRTTModule) {
+    if (debugMode && mode == CG_MODE_RTTYPES) {
         debugger.diBuilder = new DIBuilder(*IRModule);
         debugger.diFile = debugger.diBuilder->createFile(fs::canonical(file).string(), "");
         debugger.compileUnit = debugger.diBuilder->createCompileUnit(llvm::dwarf::DW_LANG_C, debugger.diFile, "Logos", false, "", 0);
@@ -188,8 +188,8 @@ void LgsCgModule::callStackPush() {
     callRuntimeFunc("push", sizeTy());
 }
 
-void LgsCgModule::callPopStack() {
-    callRuntimeFunc("pop", voidTy());
+void LgsCgModule::callPopStack(Value* rv) {
+    callRuntimeFunc("pop", voidTy(), {ptrTy()}, {rv ? rv : null()});
 }
 
 Value* LgsCgModule::callHash(Value* arg) {
@@ -204,12 +204,8 @@ Value* LgsCgModule::getFromVTable(Value* instance, Value* name) {
     return callRuntimeFunc("getFromVTable", ptrTy(), {ptrTy(), ptrTy()}, {instance, name});
 }
 
-Value* LgsCgModule::heapAlloc(Value* size) {
-    return callRuntimeFunc("allocate", ptrTy(), {sizeTy()}, {extendToSize(size)});
-}
-
-Value* LgsCgModule::heapAlloc2(Value* size) {
-    return callRuntimeFunc("allocate2", getAllocaType(), {sizeTy()}, {extendToSize(size)});
+Value* LgsCgModule::heapAlloc(Value* size, const bool levelAbove) {
+    return callRuntimeFunc("allocate", ptrTy(), {sizeTy(), i1Ty()}, {extendToSize(size), i1(levelAbove)});
 }
 
 Value* LgsCgModule::moveAlloc(Value* left, Value* right) {
@@ -341,7 +337,7 @@ void LgsCgModule::callMemCpy(Value* dest, Value* src, Value* size) {
 Constant* LgsCgModule::getRTTypeInfo(const std::string& name, const size_t size, const Lgs_TypeKind kind, Constant* extra) {
     const auto typeInfo = getRTTBaseStruct();
     const auto prefixedName = LGS_TYPEINFO_PREFIX + name;
-    if (isRTTModule) {
+    if (mode == CG_MODE_RTTYPES) {
         return createGlobal(prefixedName, typeInfo, llvm::ConstantStruct::get(typeInfo, {usize(size), i32(kind), extra}));
     }
     return createGlobal(prefixedName, typeInfo, nullptr);
@@ -358,7 +354,7 @@ Constant* LgsCgModule::getRTTExtraStruct(const std::string& name, const std::vec
 
 StructType* LgsCgModule::getRTTBaseStruct() {
     const auto biggest = getStructType({sizeTy(), ptrTy(), ptrTy(), ptrTy()}, LGS_TYPEINFO_PREFIX"FuncType");
-    return getStructType({sizeTy(), i32Ty(), biggest}, "RTI"); // size, kind, isHeap, type
+    return getStructType({sizeTy(), i32Ty(), biggest}, "RTI"); // size, kind, biggest type
 }
 
 Type* LgsCgModule::i1Ty() {

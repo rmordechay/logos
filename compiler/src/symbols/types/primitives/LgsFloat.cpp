@@ -21,7 +21,7 @@ LgsExpr* LgsFloat::getZeroValue() {
     return new LgsFloatConst(this, 0.0);
 }
 
-Value* LgsFloat::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
+Value* LgsFloat::getIRZeroValue(LgsCgModule& cg, Value* pointee, bool levelAbove) {
     return cg.floatv(0);
 }
 
@@ -106,4 +106,8 @@ Value* LgsFloat::divIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
 
 DIType* LgsFloat::getDebugType(LgsCgModule& cg) {
     assert(0);
+}
+
+LgsType* LgsFloat::clone() {
+    return this;
 }

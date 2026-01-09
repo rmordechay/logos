@@ -119,8 +119,12 @@ LgsType* LgsType::replaceGenerics(LgsType* replacement, std::unordered_map<std::
     return this;
 }
 
-Value* LgsType::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
+Value* LgsType::getIRZeroValue(LgsCgModule& cg, Value* pointee, bool levelAbove) {
     assert(0);
+}
+
+Type* LgsType::getTypeOrPtr(LgsCgModule& cg) {
+    return passByRef ? cg.ptrTy() : getIRType(cg);
 }
 
 Constant* LgsType::getRTType(LgsCgModule& cg) {
@@ -327,7 +331,7 @@ LgsType::~LgsType() {
     fields.clear();
 }
 
-LgsType* getHighestNumPrecedence(const std::vector<LgsExpr*>& args) {
+LgsType* getBiggestIntType(const std::vector<LgsExpr*>& args) {
     if (args.empty()) return nullptr;
     LgsType* inferredType = nullptr;
     uint8_t highestPrecedence = 0;
@@ -552,7 +556,10 @@ std::pair<Value*, Value*> loadPairAsInt(LgsCgModule& cg, LgsExpr* left, LgsExpr*
     return {l, r};
 }
 
-std::pair<Constant*, Constant*> getRTFieldsInfo(LgsCgModule& cg, const std::string& name, const std::vector<LgsValue*>& values) {
+/**
+ * @return typesArr, hashesArr
+ */
+std::pair<Constant*, Constant*> getRTValuesInfo(LgsCgModule& cg, const std::string& name, const std::vector<LgsValue*>& values) {
     std::vector<Constant*> fieldTypes;
     std::vector<Constant*> fieldNames;
     fieldTypes.reserve(values.size());
@@ -573,7 +580,7 @@ std::pair<Constant*, Constant*> getRTFieldsInfo(LgsCgModule& cg, const std::stri
         const auto names = LGS_TYPEINFO_PREFIX + name + "_names";
         const auto fieldsArrType = ArrayType::get(cg.getRTTBaseStruct(), values.size());
         const auto namesArrType = ArrayType::get(cg.ptrTy(), values.size());
-        if (cg.isRTTModule) {
+        if (cg.mode == CG_MODE_RTTYPES) {
             fieldTypesArr = cg.createGlobal(types, fieldsArrType, ConstantArray::get(fieldsArrType, fieldTypes));
             fieldNamesArr = cg.createGlobal(names, namesArrType, ConstantArray::get(namesArrType, fieldNames));
         } else {

@@ -141,6 +141,9 @@ void LgsTypeResolver::resolveFuncType(LgsFuncType* funcType) {
             cb->genericTypes = funcType->genericTypes;
         }
         resolveType(param.type);
+        if (const auto ft = param.type->asFuncType()) {
+            ft->name = param.name;
+        }
     }
     resolveType(funcType->rt);
     currentFuncType = oldFunc;

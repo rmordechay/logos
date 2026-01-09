@@ -11,10 +11,8 @@
 #include <sstream>
 #include <llvm/IR/Module.h>
 
-struct LgsFuncArg;
-
 Function* LgsFunc::getIRFunc(LgsCgModule& cg) {
-    const auto funcName = funcType->getGenericName();
+    const auto funcName = funcType->getName();
     auto IRFunc = cg.IRModule->getFunction(funcName);
     if (IRFunc) return IRFunc;
     const auto type = funcType->getIRType(cg);
@@ -32,26 +30,12 @@ Function* LgsFunc::getIRFunc(LgsCgModule& cg) {
     return IRFunc;
 }
 
-void LgsFunc::initFunc(const std::string& name, LgsType* rt, const std::vector<LgsParam>& params, const uint32_t ops) {
-    funcType = new LgsFuncType();
-    funcType->name = name;
-    funcType->rt = rt;
-    funcType->setFuncOptions(ops);
-    for (const auto& param : params) {
-        funcType->params.push_back(param);
-    }
-    setType(funcType);
-    if (funcType->isMethod) {
-        funcType->params.front().isSelf = true;
-    }
-}
-
 Value* LgsFunc::call(LgsCgModule& cg, std::vector<LgsFuncArg>& args) {
     if (fn) return fn(cg, args);
     if (args.empty()) return callIR(cg, {});
+    if (funcType->isVariadic) return callWithVariadic(cg, args);
 
     std::vector<Value*> IRArgs;
-    if (funcType->isVariadic) return callWithVariadic(cg, args);
     const auto firstArgName = funcType->isMethod ? args[1].name : args.front().name;
     const auto isNamed = !args.empty() && firstArgName != "";
     if (isNamed) {
@@ -78,6 +62,19 @@ Value* LgsFunc::call(LgsCgModule& cg, std::vector<LgsFuncArg>& args) {
         }
     }
     return callIR(cg, IRArgs);
+}
+
+Value* LgsFunc::callIR(LgsCgModule& cg, const std::vector<Value*>& args) {
+    Value* rv = nullptr;
+    if (IRValue) {
+        const auto funcTypeIR = funcType->getIRType(cg);
+        const auto IRFuncType = llvm::cast<FunctionType>(funcTypeIR);
+        rv = cg.builder.CreateCall(IRFuncType, IRValue, args);
+    } else {
+        const auto IRFunc = getIRFunc(cg);
+        rv = cg.builder.CreateCall(IRFunc, args);
+    }
+    return rv;
 }
 
 Value* LgsFunc::call(LgsCgModule& cg, const std::vector<LgsExpr*>& args) {
@@ -110,21 +107,21 @@ Value* LgsFunc::callWithVariadic(LgsCgModule& cg, const std::vector<LgsFuncArg>&
     return callIR(cg, IRArgs);
 }
 
-Value* LgsFunc::callIR(LgsCgModule& cg, const std::vector<Value*>& args) {
-    Value* rv = nullptr;
-    if (IRValue) {
-        const auto funcTypeIR = funcType->getIRType(cg);
-        const auto IRFuncType = llvm::cast<FunctionType>(funcTypeIR);
-        rv = cg.builder.CreateCall(IRFuncType, IRValue, args);
-    } else {
-        const auto IRFunc = getIRFunc(cg);
-        rv = cg.builder.CreateCall(IRFunc, args);
-    }
-    return rv;
-}
-
 Value* LgsFunc::loadIR(LgsCgModule& cg) {
     return IRValue;
+}
+
+void LgsFunc::initFunc(const std::string& name, LgsType* rt, const std::vector<LgsParam>& params, const uint32_t ops) {
+    funcType = new LgsFuncType(name);
+    funcType->rt = rt;
+    funcType->setFuncOptions(ops);
+    for (const auto& param : params) {
+        funcType->params.push_back(param);
+    }
+    setType(funcType);
+    if (funcType->isMethod) {
+        funcType->params.front().isSelf = true;
+    }
 }
 
 void LgsFunc::castImplicitly(LgsType* toType) {
@@ -132,7 +129,7 @@ void LgsFunc::castImplicitly(LgsType* toType) {
     if (!otherFuncType) return;
 
     // Add 'it' if needed, else as normal params
-    if (funcType->isLambda && funcType->params.empty() && otherFuncType->params.size() == 1) {
+    if (isLambda && funcType->params.empty() && otherFuncType->params.size() == 1) {
         auto itType = otherFuncType->params.front().type;
         funcType->params.emplace_back(itType, LGS_LAMBDA_IT_PARAM);
     } else {

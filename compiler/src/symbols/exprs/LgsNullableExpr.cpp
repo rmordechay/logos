@@ -3,8 +3,7 @@
 
 Value* LgsNullableExpr::loadIR(LgsCgModule& cg) {
     if (isNull) return IRValue;
-    if (type->passByRef) return cg.load(cg.ptrTy(), IRValue);
-    return cg.load(type->getIRType(cg), IRValue);
+    return cg.load(type->getTypeOrPtr(cg), IRValue);
 }
 
 void LgsNullableExpr::assign(LgsCgModule& cg, LgsExpr* expr) {

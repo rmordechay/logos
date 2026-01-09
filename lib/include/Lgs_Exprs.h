@@ -8,10 +8,14 @@ struct Lgs_SArrayExpr {
     size_t length;
 };
 
-struct Lgs_DArrayExpr {
+struct Lgs_Exprs {
     char* data;
     size_t length;
     size_t capacity;
 };
 
-extern "C" void* Lgs_DArray_get(const Lgs_DArrayExpr* arr, const Lgs_TypeInfo* type, int64_t index);
+struct Lgs_HashMap {
+    void** entries;
+    size_t len;
+    size_t capacity;
+};

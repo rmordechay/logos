@@ -47,28 +47,12 @@ Type* LgsObject::getIRType(LgsCgModule& cg) {
     elementTypes.reserve(fields.size());
     for (size_t i = 0; i < fields.size(); ++i) {
         const auto field = fields[i];
-        Type* fieldType;
-        if (field->type->passByRef) {
-            fieldType = cg.ptrTy();
-        } else {
-            fieldType = field->type->getIRType(cg);
-        }
+        const auto fieldType = field->type->getTypeOrPtr(cg);
         elementTypes.push_back(fieldType);
     }
     const auto IRType = StructType::create(cg.context, elementTypes, name);
     cg.typesRegistry[name] = IRType;
     return IRType;
-}
-
-void LgsObject::checkRecursiveFields(std::unordered_set<std::string>& fieldsAsValue) const {
-    // TODO think about recursive fields in rtt types
-    fieldsAsValue.insert(name);
-    for (const auto field : fields) {
-        if (const auto innerObj = field->type->asObject()) {
-            assert(!fieldsAsValue.contains(innerObj->name));
-            innerObj->checkRecursiveFields(fieldsAsValue);
-        }
-    }
 }
 
 Constant* LgsObject::getRTType(LgsCgModule& cg) {
@@ -79,7 +63,7 @@ Constant* LgsObject::getRTType(LgsCgModule& cg) {
     for (const auto field : fields) {
         fieldsAsValue.push_back(field);
     }
-    const auto [typesArr, hashesArr] = getRTFieldsInfo(cg, name, fieldsAsValue);
+    const auto [typesArr, hashesArr] = getRTValuesInfo(cg, name, fieldsAsValue);
     // name, fieldsCount, fieldNames, fieldTypes
     const std::vector<Type*> params = {cg.ptrTy(), cg.sizeTy(), cg.ptrTy(), cg.ptrTy()};
     const std::vector<Constant*> args = {llvm::dyn_cast<Constant>(cg.getString(objName)), cg.usize(fields.size()), hashesArr, typesArr};
@@ -103,9 +87,9 @@ LgsExpr* LgsObject::getZeroValue() {
     return new LgsInstance(this);
 }
 
-Value* LgsObject::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
+Value* LgsObject::getIRZeroValue(LgsCgModule& cg, Value* pointee, const bool levelAbove) {
     const auto ty = getIRType(cg);
-    const auto zero = cg.heapAlloc(cg.usize(sizeBytes()));
+    const auto zero = cg.heapAlloc(cg.usize(sizeBytes()), levelAbove);
     for (const auto field : fields) {
         const auto fieldZero = field->type->getIRZeroValue(cg);
         cg.storeStructField(ty, zero, field->position, fieldZero);
@@ -129,6 +113,17 @@ bool LgsObject::canCastTo(LgsType* other) {
 
 LgsType* LgsObject::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     assert(0);
+}
+
+void LgsObject::checkRecursiveFields(std::unordered_set<std::string>& fieldsAsValue) const {
+    // TODO think about recursive fields in rtt types
+    fieldsAsValue.insert(name);
+    for (const auto field : fields) {
+        if (const auto innerObj = field->type->asObject()) {
+            assert(!fieldsAsValue.contains(innerObj->name));
+            innerObj->checkRecursiveFields(fieldsAsValue);
+        }
+    }
 }
 
 std::string LgsObject::fmtStr() const {
