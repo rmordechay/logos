@@ -60,14 +60,29 @@ Constant* LgsObject::getRTType(LgsCgModule& cg) {
     checkRecursiveFields(fieldsAsValue2);
     const auto objName = getName();
     std::vector<LgsValue*> fieldsAsValue;
-    for (const auto field : fields) {
+    const auto dl = cg.IRModule->getDataLayout();
+    const auto sl = dl.getStructLayout(llvm::cast<StructType>(getIRType(cg)));
+    std::vector<Constant*> offsets;
+    offsets.reserve(fields.size());
+    const auto offsetsName = LGS_TYPEINFO_PREFIX + name + "_offsets";
+    const auto offsetsArrType = ArrayType::get(cg.sizeTy(), fields.size());
+    for (size_t i = 0; i < fields.size(); ++i) {
+        const auto field = fields[i];
+        offsets.emplace_back(cg.usize(sl->getElementOffset(i)));
         fieldsAsValue.push_back(field);
     }
     const auto [typesArr, hashesArr] = getRTValuesInfo(cg, name, fieldsAsValue);
-    // name, fieldsCount, fieldNames, fieldTypes
-    const std::vector<Type*> params = {cg.ptrTy(), cg.sizeTy(), cg.ptrTy(), cg.ptrTy()};
-    const std::vector<Constant*> args = {llvm::dyn_cast<Constant>(cg.getString(objName)), cg.usize(fields.size()), hashesArr, typesArr};
-    const auto sv = cg.getRTTExtraStruct(objName, params, args);
+    Constant* offsetsArr = nullptr;
+    if (cg.mode == CG_MODE_RTTYPES) {
+        offsetsArr = ConstantArray::get(offsetsArrType, offsets);
+    }
+    const auto offsetsArrGlobal = cg.createGlobal(offsetsName, offsetsArrType, offsetsArr);
+
+    // name, fieldsCount, fieldOffsets, fieldNames, fieldTypes
+    const std::vector<Type*> fieldTypes = {cg.ptrTy(), cg.sizeTy(), cg.ptrTy(), cg.ptrTy(), cg.ptrTy()};
+    const auto objNameIR = llvm::dyn_cast<Constant>(cg.getString(objName));
+    const std::vector<Constant*> args = {objNameIR, cg.usize(fields.size()), offsetsArrGlobal, hashesArr, typesArr};
+    const auto sv = cg.getRTTExtraStruct(objName, fieldTypes, args);
     return cg.getRTTypeInfo(objName, sizeBytes(), RTT_OBJECT, sv);
 }
 

@@ -29,14 +29,12 @@ static std::string formatElement(const Lgs_TypeInfo* rtt, void* elem) {
     case RTT_OBJECT: {
         const auto fieldsCount = rtt->obj.fieldsCount;
         str << rtt->obj.name << "{";
-        size_t offset = 0;
         for (size_t i = 0; i < fieldsCount; ++i) {
             const auto fieldType = rtt->obj.fieldTypes[i];
-            void* fieldPtr = static_cast<char*>(elem) + offset;
+            void* fieldPtr = static_cast<char*>(elem) + rtt->obj.fieldOffsets[i];
             str << rtt->obj.fieldNames[i] << '=';
             str << formatElement(fieldType, fieldPtr);
             if (i < fieldsCount - 1) str << ", ";
-            offset += fieldType->size;
         }
         str << "}";
         break;

@@ -248,7 +248,7 @@ void LgsCgModule::branchAndStartBlock(BasicBlock* block) {
     startBlock(block);
 }
 
-bool LgsCgModule::lastInstTerminator() const {
+Instruction* LgsCgModule::lastInstTerminator() const {
     return builder.GetInsertBlock()->getTerminator();
 }
 
@@ -353,8 +353,96 @@ Constant* LgsCgModule::getRTTExtraStruct(const std::string& name, const std::vec
 }
 
 StructType* LgsCgModule::getRTTBaseStruct() {
-    const auto biggest = getStructType({sizeTy(), ptrTy(), ptrTy(), ptrTy()}, LGS_TYPEINFO_PREFIX"FuncType");
+    const std::vector<Type*> fieldTypes = {ptrTy(), sizeTy(), ptrTy(), ptrTy(), ptrTy()};
+    const auto biggest = getStructType(fieldTypes, LGS_TYPEINFO_PREFIX"Object");
     return getStructType({sizeTy(), i32Ty(), biggest}, "RTI"); // size, kind, biggest type
+}
+
+void LgsCgModule::printStr(const std::string& value) {
+    callPrintf({getString("%s"), getString(value)});
+}
+
+void LgsCgModule::printStr(Value* value) {
+    callPrintf({getString("%s\n"), value});
+}
+
+void LgsCgModule::printInt(Value* value, const std::string& text) {
+    if (text != "") printStr(text);
+    callPrintf({getString("%d\n"), value});
+}
+
+void LgsCgModule::printLong(Value* value, const std::string& text) {
+    if (text != "") printStr(text);
+    callPrintf({getString("%ld\n"), value});
+}
+
+void LgsCgModule::printPtr(Value* value, const std::string& text) {
+    if (text != "") printStr(text);
+    callPrintf({getString("%p\n"), value});
+}
+
+Value* LgsCgModule::measureTimeStart() {
+    const auto timespecTy = getStructType({i64Ty(), i64Ty()}, "timespec");
+    const auto start = builder.CreateAlloca(timespecTy);
+    callFunc("clock_gettime", i32Ty(), {i32Ty(), ptrTy()}, {i32(CLOCK_MONOTONIC), start});
+    return start;
+}
+
+void LgsCgModule::measureTimeEnd(Value* start) {
+    if (const auto terminator = builder.GetInsertBlock()->getTerminator()) {
+        builder.SetInsertPoint(terminator);
+    }
+    const auto timespecTy = getStructType({i64Ty(), i64Ty()}, "timespec");
+    const auto end = builder.CreateAlloca(timespecTy);
+    callFunc("clock_gettime", i32Ty(), {i32Ty(), ptrTy()}, {i32(CLOCK_MONOTONIC), end});
+    const auto startSec = loadStructField(timespecTy, start, 0, i64Ty());
+    const auto endSec = loadStructField(timespecTy, end, 0, i64Ty());
+    const auto startNano = loadStructField(timespecTy, start, 1, i64Ty());
+    const auto endNano = loadStructField(timespecTy, end, 1, i64Ty());
+    const auto secDiff = builder.CreateSub(endSec, startSec);
+    const auto nanoDiff = builder.CreateSub(endNano, startNano);
+    const auto secScale = builder.CreateMul(secDiff, i64(1'000'000));
+    const auto nanoScale = builder.CreateSDiv(nanoDiff, i64(1000));
+    const auto results = builder.CreateAdd(secScale, nanoScale);
+    printLong(results);
+}
+
+void LgsCgModule::finalizeDebugger(const fs::path& buildPath) const {
+    if (!debugger.diBuilder) return;
+    debugger.diBuilder->finalize();
+    std::error_code EC;
+    raw_fd_ostream file((buildPath / "logosdbg.bc").string(), EC, llvm::sys::fs::OF_None);
+    WriteBitcodeToFile(*IRModule, file);
+    file.flush();
+}
+
+llvm::DILocation* LgsCgModule::getDebugLoc(const LgsLocation& location) {
+    return llvm::DILocation::get(
+        context,
+        location.lineStart + 1,
+        location.columnStart,
+        debugger.subprogram,
+        debugger.subprogram->getScope()
+    );
+}
+
+void LgsCgModule::initLLVM() {
+    llvm::InitializeNativeTarget();
+    llvm::InitializeNativeTargetAsmPrinter();
+    llvm::InitializeNativeTargetAsmParser();
+
+    std::string error;
+    const auto targetTriple = llvm:: sys::getDefaultTargetTriple();
+    const auto target = llvm::TargetRegistry::lookupTarget(targetTriple, error);
+    targetMachine = target->createTargetMachine(targetTriple, "generic", "", llvm::TargetOptions(), std::nullopt);
+}
+
+llvm::OptimizationLevel LgsCgModule::getOptLevel(const uint8_t optLevel) {
+    if (optLevel == 0) return llvm::OptimizationLevel::O0;
+    if (optLevel == 1) return llvm::OptimizationLevel::O1;
+    if (optLevel == 2) return llvm::OptimizationLevel::O2;
+    if (optLevel == 3) return llvm::OptimizationLevel::O3;
+    assert(0);
 }
 
 Type* LgsCgModule::i1Ty() {
@@ -468,62 +556,6 @@ Value* LgsCgModule::emptyStr() {
     const auto constant = getString("");
     constant->setName(name);
     return constant;
-}
-
-void LgsCgModule::printStr(const std::string& str) {
-    callPrintf({getString("%s"), getString(str)});
-}
-
-void LgsCgModule::printStr(Value* str) {
-    callPrintf({getString("%s\n"), str});
-}
-
-void LgsCgModule::printPtr(Value* ptr, const std::string& text) {
-    if (text != "") printStr(text);
-    callPrintf({getString("%p\n"), ptr});
-}
-
-void LgsCgModule::printInt(Value* number, const std::string& text) {
-    if (text != "") printStr(text);
-    callPrintf({getString("%d\n"), number});
-}
-
-void LgsCgModule::finalizeDebugger(const fs::path& buildPath) const {
-    if (!debugger.diBuilder) return;
-    debugger.diBuilder->finalize();
-    std::error_code EC;
-    raw_fd_ostream file((buildPath / "logosdbg.bc").string(), EC, llvm::sys::fs::OF_None);
-    WriteBitcodeToFile(*IRModule, file);
-    file.flush();
-}
-
-llvm::DILocation* LgsCgModule::getDebugLoc(const LgsLocation& location) {
-    return llvm::DILocation::get(
-        context,
-        location.lineStart + 1,
-        location.columnStart,
-        debugger.subprogram,
-        debugger.subprogram->getScope()
-        );
-}
-
-void LgsCgModule::initLLVM() {
-    llvm::InitializeNativeTarget();
-    llvm::InitializeNativeTargetAsmPrinter();
-    llvm::InitializeNativeTargetAsmParser();
-
-    std::string error;
-    const auto targetTriple = llvm:: sys::getDefaultTargetTriple();
-    const auto target = llvm::TargetRegistry::lookupTarget(targetTriple, error);
-    targetMachine = target->createTargetMachine(targetTriple, "generic", "", llvm::TargetOptions(), std::nullopt);
-}
-
-llvm::OptimizationLevel LgsCgModule::getOptLevel(const uint8_t optLevel) {
-    if (optLevel == 0) return llvm::OptimizationLevel::O0;
-    if (optLevel == 1) return llvm::OptimizationLevel::O1;
-    if (optLevel == 2) return llvm::OptimizationLevel::O2;
-    if (optLevel == 3) return llvm::OptimizationLevel::O3;
-    assert(0);
 }
 
 LgsCgModule::~LgsCgModule() {

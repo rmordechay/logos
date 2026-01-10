@@ -30,18 +30,6 @@ std::optional<int64_t> LgsExpr::getConstInt() {
     if (const auto intConst = asIntConst()) {
         return intConst->value;
     }
-    if (const auto var = asVariable()) {
-        if (var->isMutable) return std::nullopt;
-        switch (var->ref.symbolType) {
-        case VAR_DEC:
-            return var->ref.varDec->expr->getConstInt();
-        case FIELD:
-            if (var->ref.field->expr) return var->ref.field->expr->getConstInt();
-            break;
-        default:
-            break;
-        }
-    }
     if (const auto binExpr = asBinExpr()) {
         if (binExpr->isMutable) return std::nullopt;
         const auto const1 = binExpr->left->getConstInt();
@@ -74,18 +62,6 @@ std::optional<double_t> LgsExpr::getConstFloat() {
     if (const auto floatConst = asFloatConst()) {
         return floatConst->value;
     }
-    if (const auto var = asVariable()) {
-        if (var->isMutable) return std::nullopt;
-        switch (var->ref.symbolType) {
-        case VAR_DEC:
-            return var->ref.varDec->expr->getConstFloat();
-        case FIELD:
-            if (var->ref.field->expr) return var->ref.field->expr->getConstFloat();
-            break;
-        default:
-            break;
-        }
-    }
     if (const auto binExpr = asBinExpr()) {
         if (binExpr->isMutable) return std::nullopt;
         const auto const1 = binExpr->left->getConstFloat();
@@ -111,14 +87,24 @@ std::optional<std::string> LgsExpr::getConstStr() {
     if (const auto charConst = asCharConst()) {
         return std::to_string(charConst->value - '0');
     }
-    if (const auto var = asVariable()) {
-        switch (var->ref.symbolType) {
-        case VAR_DEC:
-            return var->ref.varDec->expr->getConstStr();
-        case FIELD:
-            return var->ref.field->expr->getConstStr();
-        default:
-            break;
+    if (const auto binExpr = asBinExpr()) {
+        if (binExpr->isMutable || binExpr->op.opType != ADD) return std::nullopt;
+        const auto const1 = binExpr->left->getConstStr();
+        if (!const1.has_value()) return std::nullopt;
+        if (binExpr->right->type->asStr()) {
+            const auto const2 = binExpr->right->getConstStr();
+            if (!const2.has_value()) return std::nullopt;
+            return const1.value() + const2.value();
+        }
+        if (binExpr->right->type->isInt) {
+            const auto const2 = binExpr->right->getConstInt();
+            if (!const2.has_value()) return std::nullopt;
+            return const1.value() + std::to_string(const2.value());
+        }
+        if (binExpr->right->type->isFloat) {
+            const auto const2 = binExpr->right->getConstFloat();
+            if (!const2.has_value()) return std::nullopt;
+            return const1.value() + std::to_string(const2.value());
         }
     }
     return std::nullopt;

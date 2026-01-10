@@ -47,7 +47,11 @@ bool LgsStr::canCastTo(LgsType* other) {
 LgsType* LgsStr::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     switch (op.opType) {
     case ADD: {
-        if (rightType->asStr() || rightType->asChar() || rightType->isNumber()) return new LgsStr();
+        if (rightType->asStr() || rightType->asChar() || rightType->isNumber()) {
+            const auto str = new LgsStr();
+            str->isStatic = isStatic;
+            return str;
+        }
         break;
     }
     case IN: {

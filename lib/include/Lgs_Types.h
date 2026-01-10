@@ -42,6 +42,7 @@ enum Lgs_TypeKind {
 struct Lgs_Object {
     char* name;
     size_t fieldsCount;
+    size_t* fieldOffsets;
     char** fieldNames;
     Lgs_TypeInfo** fieldTypes;
 };

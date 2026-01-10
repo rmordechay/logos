@@ -40,6 +40,7 @@ using llvm::IRBuilderBase;
 using llvm::IRBuilder;
 using llvm::Type;
 using llvm::Value;
+using llvm::Instruction;
 
 struct LgsPaths;
 struct LgsAppConfigs;
@@ -105,7 +106,7 @@ public:
     void branchIfNeeded(BasicBlock* block);
     void startBlock(BasicBlock* block);
     void branchAndStartBlock(BasicBlock* block);
-    bool lastInstTerminator() const;
+    Instruction* lastInstTerminator() const;
     void createIndexBoundsGuard(Value* len, Value* index);
     void createArrBoundsGuard(Value* maxLen, Value* arrLen);
 
@@ -128,6 +129,20 @@ public:
     Constant* getRTTypeInfo(const std::string& name, size_t size, Lgs_TypeKind kind, Constant* extra);
     Constant* getRTTExtraStruct(const std::string& name, const std::vector<Type*>& fields, const std::vector<Constant*>& args);
     StructType* getRTTBaseStruct();
+
+    // Debugging
+    void printStr(const std::string& value);
+    void printStr(Value* value);
+    void printInt(Value* value, const std::string& text = "");
+    void printLong(Value* value, const std::string& text = "");
+    void printPtr(Value* value, const std::string& text = "");
+    Value* measureTimeStart();
+    void measureTimeEnd(Value* start);
+
+    void finalizeDebugger(const std::filesystem::path& buildPath) const;
+    llvm::DILocation* getDebugLoc(const LgsLocation& location);
+    static void initLLVM();
+    static llvm::OptimizationLevel getOptLevel(uint8_t optLevel);
 
     // Types
     Type* i1Ty();
@@ -159,17 +174,6 @@ public:
     Constant* floatv(float_t v);
     Constant* doublev(double_t v);
     Value* emptyStr();
-
-    // Debugging
-    void printStr(const std::string& str);
-    void printStr(Value* str);
-    void printPtr(Value* ptr, const std::string& text = "");
-    void printInt(Value* number, const std::string& text = "");
-
-    void finalizeDebugger(const std::filesystem::path& buildPath) const;
-    llvm::DILocation* getDebugLoc(const LgsLocation& location);
-    static void initLLVM();
-    static llvm::OptimizationLevel getOptLevel(uint8_t optLevel);
     ~LgsCgModule();
 };
 

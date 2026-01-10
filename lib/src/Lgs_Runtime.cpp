@@ -18,7 +18,7 @@ extern "C" void Lgs_Runtime_push() {
 }
 
 extern "C" void Lgs_Runtime_pop(void* rv) {
-    //auto start = std::chrono::high_resolution_clock::now();
+    const auto start = std::chrono::high_resolution_clock::now();
     auto& top = runtime.stack.back();
     // Call defers
     for (auto [defer, ctx] : top.defers) defer(ctx);
@@ -33,14 +33,14 @@ extern "C" void Lgs_Runtime_pop(void* rv) {
         return equalLevel;
     });
     runtime.stack.pop_back();
-    // const auto end = std::chrono::high_resolution_clock::now();
-    // const auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+    const auto end = std::chrono::high_resolution_clock::now();
+    const auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
     // std::println("{}", duration.count());
 }
 
 extern "C" void* Lgs_Runtime_allocate(const size_t size, const bool levelAbove) {
     const auto ptr = std::malloc(size);
-    // std::println("Allocated: {}", ptr);
+    //std::println("Allocated: {}", ptr);
     runtime.allocs[ptr] = Lgs_Runtime_getLevel() - levelAbove;
     return ptr;
 }
@@ -61,7 +61,7 @@ extern "C" void* Lgs_Runtime_reallocate(void* ptr, const size_t size) {
 }
 
 extern "C" void Lgs_Runtime_freeValue(void* ptr) {
-    // std::println("Freeing {} {}", ptr, Lgs_Runtime_getLevel());
+    //std::println("Freeing {} {}", ptr, Lgs_Runtime_getLevel());
     std::free(ptr);
 }
 

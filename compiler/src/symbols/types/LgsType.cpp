@@ -570,23 +570,24 @@ std::pair<Constant*, Constant*> getRTValuesInfo(LgsCgModule& cg, const std::stri
         fieldNames.push_back(llvm::dyn_cast<Constant>(cg.getString(value->getName())));
     }
 
-    Constant* fieldTypesArr = nullptr;
-    Constant* fieldNamesArr = nullptr;
+    Constant* typesArrGlobal = nullptr;
+    Constant* namesArrGlobal = nullptr;
     if (values.empty()) {
-        fieldTypesArr = cg.null();
-        fieldNamesArr = cg.null();
+        typesArrGlobal = cg.null();
+        namesArrGlobal = cg.null();
     } else {
         const auto types = LGS_TYPEINFO_PREFIX + name + "_fields";
         const auto names = LGS_TYPEINFO_PREFIX + name + "_names";
         const auto fieldsArrType = ArrayType::get(cg.getRTTBaseStruct(), values.size());
         const auto namesArrType = ArrayType::get(cg.ptrTy(), values.size());
+        Constant* typesArr = nullptr;
+        Constant* namesArr = nullptr;
         if (cg.mode == CG_MODE_RTTYPES) {
-            fieldTypesArr = cg.createGlobal(types, fieldsArrType, ConstantArray::get(fieldsArrType, fieldTypes));
-            fieldNamesArr = cg.createGlobal(names, namesArrType, ConstantArray::get(namesArrType, fieldNames));
-        } else {
-            fieldTypesArr = cg.createGlobal(types, fieldsArrType, nullptr);
-            fieldNamesArr = cg.createGlobal(names, namesArrType, nullptr);
+            typesArr = ConstantArray::get(fieldsArrType, fieldTypes);
+            namesArr = ConstantArray::get(namesArrType, fieldNames);
         }
+        typesArrGlobal = cg.createGlobal(types, fieldsArrType, typesArr);
+        namesArrGlobal = cg.createGlobal(names, namesArrType, namesArr);
     }
-    return {fieldTypesArr, fieldNamesArr};
+    return {typesArrGlobal, namesArrGlobal};
 }
