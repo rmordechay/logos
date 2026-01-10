@@ -401,9 +401,8 @@ void LgsCgModule::measureTimeEnd(Value* start) {
     const auto endNano = loadStructField(timespecTy, end, 1, i64Ty());
     const auto secDiff = builder.CreateSub(endSec, startSec);
     const auto nanoDiff = builder.CreateSub(endNano, startNano);
-    const auto secScale = builder.CreateMul(secDiff, i64(1'000'000));
-    const auto nanoScale = builder.CreateSDiv(nanoDiff, i64(1000));
-    const auto results = builder.CreateAdd(secScale, nanoScale);
+    const auto secScale = builder.CreateMul(secDiff, i64(1'000'000'000));
+    const auto results = builder.CreateAdd(secScale, nanoDiff);
     printLong(results);
 }
 

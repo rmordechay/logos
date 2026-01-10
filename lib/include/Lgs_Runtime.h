@@ -4,6 +4,8 @@
 #include "errors/LgsErrHandler.h"
 #include <unordered_map>
 
+#define ALLOCA_SIZE 200000
+
 struct Lgs_Alloc {
     void* ptr;
     size_t level;
@@ -14,11 +16,12 @@ struct Lgs_StackFrame {
 };
 
 struct Lgs_Runtime {
+    size_t level{};
+    Lgs_Alloc allocs[ALLOCA_SIZE];
     Lgs_Allocator allocator;
     LgsErrHandler errHandler;
     std::vector<Lgs_ThunkFunc> coros;
     std::vector<Lgs_StackFrame> stack;
-    std::unordered_map<void*, size_t> allocs;
     std::unordered_map<VKey, void*, VKeyHash> vtable;
 };
 

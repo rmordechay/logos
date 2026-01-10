@@ -25,13 +25,15 @@ extern "C" void Lgs_Runtime_pop(void* rv) {
     // Free allocations
     const auto level = Lgs_Runtime_getLevel();
     if (rv) {
-        runtime.allocs[rv] = level - 1;
+        const auto index = (reinterpret_cast<uintptr_t>(rv) >> 3) % ALLOCA_SIZE;
+        runtime.allocs[index].level = level - 1;
     }
-    std::erase_if(runtime.allocs, [&level](const std::pair<void*, size_t>& pair) {
-        const auto equalLevel = pair.second == level;
-        if (equalLevel) Lgs_Runtime_freeValue(pair.first);
-        return equalLevel;
-    });
+    for (int i = 0; i < ALLOCA_SIZE; ++i) {
+        auto& alloc = runtime.allocs[i];
+        if (!alloc.ptr || alloc.level != level) continue;
+        Lgs_Runtime_freeValue(alloc.ptr);
+        alloc.ptr = nullptr;
+    }
     runtime.stack.pop_back();
     const auto end = std::chrono::high_resolution_clock::now();
     const auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
@@ -41,13 +43,17 @@ extern "C" void Lgs_Runtime_pop(void* rv) {
 extern "C" void* Lgs_Runtime_allocate(const size_t size, const bool levelAbove) {
     const auto ptr = std::malloc(size);
     //std::println("Allocated: {}", ptr);
-    runtime.allocs[ptr] = Lgs_Runtime_getLevel() - levelAbove;
+    const auto index = (reinterpret_cast<uintptr_t>(ptr) >> 3) % ALLOCA_SIZE;
+    runtime.allocs[index].level = Lgs_Runtime_getLevel() - levelAbove;
+    runtime.allocs[index].ptr = ptr;
     return ptr;
 }
 
 extern "C" void Lgs_Runtime_move(void* left, void* right) {
-    auto& leftLevel = runtime.allocs[left];
-    auto& rightLevel = runtime.allocs[right];
+    const auto leftIndex = (reinterpret_cast<uintptr_t>(left) >> 3) % ALLOCA_SIZE;
+    const auto rightIndex = (reinterpret_cast<uintptr_t>(right) >> 3) % ALLOCA_SIZE;
+    auto& leftLevel = runtime.allocs[leftIndex].level;
+    auto& rightLevel = runtime.allocs[rightIndex].level;
     if (leftLevel < rightLevel) {
         rightLevel = leftLevel;
         //std::println("Move right {} to {}", right, leftLevel);
