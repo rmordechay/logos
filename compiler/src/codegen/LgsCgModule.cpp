@@ -152,8 +152,8 @@ Value* LgsCgModule::load(Type* ty, Value* ptr) {
     return builder.CreateLoad(ty, ptr);
 }
 
-Value* LgsCgModule::allocaAndStore(Type* type, Value* v) {
-    const auto ptr = builder.CreateAlloca(type);
+Value* LgsCgModule::allocaAndStore(Type* type, Value* v, const std::string& name) {
+    const auto ptr = builder.CreateAlloca(type, nullptr, name);
     builder.CreateStore(v, ptr);
     return ptr;
 }

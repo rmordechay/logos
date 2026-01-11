@@ -250,6 +250,7 @@ Function* LgsMap::generateGetFunc(LgsCgModule& cg) {
     const auto mapIR = cg.currentFunc->getArg(0);
     const auto keyIR = cg.currentFunc->getArg(1);
     const auto indexTemp = pairType->key->getZeroValue();
+    indexTemp->IRValue = keyIR;
 
     const auto cap = loadCapField(cg, mapIR);
     const auto hash = cg.builder.CreateURem(indexTemp->hashValue(cg), cap);
@@ -257,11 +258,11 @@ Function* LgsMap::generateGetFunc(LgsCgModule& cg) {
     const auto entryPtr = cg.builder.CreateInBoundsGEP(cg.ptrTy(), entries, {hash});
     const auto entry = cg.load(cg.ptrTy(), entryPtr);
     const auto keyPtr = getEntryKey(cg, entry);
-    const auto currentEntryPtr = cg.allocaAndStore(cg.ptrTy(), entry);
+    const auto currentEntryPtr = cg.allocaAndStore(cg.ptrTy(), entry, "entry");
 
     // Entry null check
     cg.branchAndStartBlock(entryNullCheckBlock);
-    const auto currentEntry = cg.load(cg.ptrTy(), currentEntryPtr);
+    auto currentEntry = cg.load(cg.ptrTy(), currentEntryPtr);
     const auto isEntryNull = cg.builder.CreateIsNull(currentEntry);
     cg.builder.CreateCondBr(isEntryNull, entryNullBlock, keyCompareBlock);
 
@@ -269,20 +270,22 @@ Function* LgsMap::generateGetFunc(LgsCgModule& cg) {
     cg.startBlock(entryNullBlock);
     cg.builder.CreateRet(pairType->value->getIRZeroValue(cg));
 
-    // Key comparison
+    // Keys comparison
     cg.startBlock(keyCompareBlock);
     const auto indexTemp2 = pairType->key->getZeroValue();
+    indexTemp2->IRValue = cg.load(keyTy, keyPtr);
     const auto keysEqual = eqIR(cg, indexTemp, indexTemp2);
     cg.builder.CreateCondBr(keysEqual, keysEqualBlock, keysNotEqualBlock);
 
-    // Key not equal
+    // Keys not equal
     cg.startBlock(keysNotEqualBlock);
-    const auto nextPtr = getEntryNext(cg, entry);
+    currentEntry = cg.load(cg.ptrTy(), currentEntryPtr);
+    const auto nextPtr = getEntryNext(cg, currentEntry);
     const auto next = cg.load(cg.ptrTy(), nextPtr);
     cg.store(next, currentEntryPtr);
     cg.builder.CreateBr(entryNullCheckBlock);
 
-    // Key equal
+    // Keys equal
     cg.startBlock(keysEqualBlock);
     cg.builder.CreateRet(cg.load(valueTy, getEntryValue(cg, entry)));
 
@@ -294,7 +297,6 @@ Function* LgsMap::generateGetFunc(LgsCgModule& cg) {
 
     return func;
 }
-
 
 Function* LgsMap::generateAddFunc(LgsCgModule& cg) {
     const auto funcName = getName() + "_" + ADD_FUNC;
@@ -339,8 +341,8 @@ Function* LgsMap::generateAddFunc(LgsCgModule& cg) {
     auto len = cg.load(cg.sizeTy(), lenField);
     auto cap = cg.load(cg.sizeTy(), capField);
     const auto cond = cg.builder.CreateICmpUGE(len, cap);
-
     cg.builder.CreateCondBr(cond, resizeBlock, checkSlotBlock);
+
     cg.startBlock(resizeBlock);
     const auto entriesSize = cg.usize(pairType->sizeBytes() + sizeof(void*));
     const auto newCap = cg.builder.CreateMul(entriesSize, cg.builder.CreateMul(cap, cg.usize(2)));
@@ -355,7 +357,6 @@ Function* LgsMap::generateAddFunc(LgsCgModule& cg) {
         const auto entryPtr = cg.builder.CreateInBoundsGEP(cg.ptrTy(), newEntries, {hash});
         cg.store(entry, entryPtr);
     });
-
     cg.freeValue(entries);
     cg.store(newEntries, entriesField);
     cg.store(newCap, capField);
@@ -369,23 +370,30 @@ Function* LgsMap::generateAddFunc(LgsCgModule& cg) {
     const auto entryPtr = cg.builder.CreateInBoundsGEP(cg.ptrTy(), entries, {hash});
     const auto entry = cg.load(cg.ptrTy(), entryPtr);
     const auto entryAlloca = cg.allocaAndStore(cg.ptrTy(), entry);
+    const auto entryPtrAlloca = cg.allocaAndStore(cg.ptrTy(), entryPtr);
 
     cg.branchAndStartBlock(entryNullCondBlock);
     const auto entryLoad = cg.load(cg.ptrTy(), entryAlloca);
     const auto isNotNull = cg.builder.CreateIsNotNull(entryLoad);
     cg.builder.CreateCondBr(isNotNull, keyCompareBlock, storeElementBlock);
 
-    // Element with same hash
+    // Keys with same hash
     cg.startBlock(keyCompareBlock);
     const auto loadKey = cg.load(pairType->key->getIRType(cg), getEntryKey(cg, entry));
     const auto indexTemp2 = pairType->key->getZeroValue();
+    indexTemp2->IRValue = loadKey;
     cg.builder.CreateCondBr(eqIR(cg, indexTemp, indexTemp2), equalBlock, notEqualBlock);
 
+    // Keys equal
     cg.startBlock(equalBlock);
     cg.storeStructField(entryTy, entry, 1, valueIR);
     cg.builder.CreateRetVoid();
+
+    // Keys not equal
     cg.startBlock(notEqualBlock);
-    cg.store(cg.load(cg.ptrTy(), getEntryNext(cg, entry)), entryAlloca);
+    const auto next = getEntryNext(cg, entry);
+    cg.store(next, entryPtrAlloca);
+    cg.store(cg.load(cg.ptrTy(), next), entryAlloca);
     cg.builder.CreateBr(entryNullCondBlock);
 
     // Store entry
@@ -394,7 +402,7 @@ Function* LgsMap::generateAddFunc(LgsCgModule& cg) {
     cg.storeStructField(entryTy, newEntry, 0, keyIR);
     cg.storeStructField(entryTy, newEntry, 1, valueIR);
     cg.storeStructField(entryTy, newEntry, 2, cg.null());
-    cg.store(newEntry, entryPtr);
+    cg.store(newEntry, cg.load(cg.ptrTy(), entryPtrAlloca));
 
     // Increment length
     len = cg.load(cg.sizeTy(), lenField);

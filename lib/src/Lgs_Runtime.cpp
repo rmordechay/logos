@@ -25,7 +25,7 @@ extern "C" void Lgs_Runtime_pop(void* rv) {
     // Free allocations
     const auto level = Lgs_Runtime_getLevel();
     if (rv) {
-        const auto index = (reinterpret_cast<uintptr_t>(rv) >> 3) % ALLOCA_SIZE;
+        const auto index = reinterpret_cast<uintptr_t>(rv) % ALLOCA_SIZE;
         runtime.allocs[index].level = level - 1;
     }
     for (int i = 0; i < ALLOCA_SIZE; ++i) {
@@ -43,15 +43,15 @@ extern "C" void Lgs_Runtime_pop(void* rv) {
 extern "C" void* Lgs_Runtime_allocate(const size_t size, const bool levelAbove) {
     const auto ptr = std::malloc(size);
     //std::println("Allocated: {}", ptr);
-    const auto index = (reinterpret_cast<uintptr_t>(ptr) >> 3) % ALLOCA_SIZE;
+    const auto index = reinterpret_cast<uintptr_t>(ptr) % ALLOCA_SIZE;
     runtime.allocs[index].level = Lgs_Runtime_getLevel() - levelAbove;
     runtime.allocs[index].ptr = ptr;
     return ptr;
 }
 
 extern "C" void Lgs_Runtime_move(void* left, void* right) {
-    const auto leftIndex = (reinterpret_cast<uintptr_t>(left) >> 3) % ALLOCA_SIZE;
-    const auto rightIndex = (reinterpret_cast<uintptr_t>(right) >> 3) % ALLOCA_SIZE;
+    const auto leftIndex = reinterpret_cast<uintptr_t>(left) % ALLOCA_SIZE;
+    const auto rightIndex = reinterpret_cast<uintptr_t>(right) % ALLOCA_SIZE;
     auto& leftLevel = runtime.allocs[leftIndex].level;
     auto& rightLevel = runtime.allocs[rightIndex].level;
     if (leftLevel < rightLevel) {

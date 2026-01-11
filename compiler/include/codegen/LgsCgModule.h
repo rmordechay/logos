@@ -83,7 +83,7 @@ public:
 
     void store(Value* v, Value* ptr);
     Value* load(Type* ty, Value* ptr);
-    Value* allocaAndStore(Type* type, Value* v);
+    Value* allocaAndStore(Type* type, Value* v, const std::string& name = "");
     StructType* getStructType(const std::vector<Type*>& fields, const std::string& name = "");
     void storeStructField(Type* parentType, Value* parentPtr, size_t position, Value* v);
     Value* loadStructField(Type* parentType, Value* parentPtr, size_t position, Type* ty);

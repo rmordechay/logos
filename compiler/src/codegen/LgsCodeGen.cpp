@@ -135,7 +135,9 @@ void LgsCodeGen::visitMainFunc(LgsMainFunc* func) {
     stack.enterScope(func);
     createPrologue(func);
     initMainArgs(func);
+    const auto start = cg.measureTimeStart();
     visitStmtsBlock(func->stmtsBlock);
+    cg.measureTimeEnd(start);
     createEpilogue(func);
     stack.exitScope();
 }
