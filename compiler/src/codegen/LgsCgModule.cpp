@@ -208,9 +208,13 @@ Value* LgsCgModule::heapAlloc(Value* size, const bool levelAbove) {
     return callRuntimeFunc("allocate", ptrTy(), {sizeTy(), i1Ty()}, {extendToSize(size), i1(levelAbove)});
 }
 
-Value* LgsCgModule::moveAlloc(Value* left, Value* right) {
-    const auto s = ptrTy();
-    return callRuntimeFunc("move", voidTy(), {s, s}, {left, right});
+Value* LgsCgModule::heapAlloc2(Value* size) {
+    return callRuntimeFunc("allocate2", getAllocaType(), {sizeTy()}, {extendToSize(size)});
+}
+
+Value* LgsCgModule::moveAlloc(Value* left, Value* right, const size_t size) {
+    const auto s = getAllocaType();
+    return callRuntimeFunc("move", voidTy(), {s, s, sizeTy()}, {left, right, usize(size)});
 }
 
 Value* LgsCgModule::reallocate(Value* ptr, Value* size) {

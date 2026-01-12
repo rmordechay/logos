@@ -39,8 +39,8 @@ using llvm::DIBasicType;
 
 class LgsValue {
 public:
-    Value* IRValue = nullptr;
     LgsLocation location;
+    Value* IRValue = nullptr;
 
     virtual Value* loadIR(LgsCgModule& cg);
     virtual void hashNode(size_t& oldHash);

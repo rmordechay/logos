@@ -6,7 +6,7 @@
 
 struct Lgs_Alloc {
     void* ptr;
-    size_t level;
+    int64_t level;
 };
 
 class Lgs_Allocator {

@@ -372,14 +372,15 @@ bool LgsApp::generateRTTTypes() {
 }
 
 bool LgsApp::generateGenerics() {
-    const auto file = new LgsFile("generics");
-    file->cg.setupModule("generics");
-    file->cg.mode = CG_MODE_GENERICS;
-    const LgsCodeGen cg(file, configs, globals, paths);
     std::unordered_map<std::string, LgsExpr*> generics;
     for (const auto srcFile : srcFiles) {
         generics.merge(srcFile->symbolTable.generics);
     }
+    if (generics.empty()) return true;
+    const auto file = new LgsFile("generics");
+    file->cg.setupModule("generics");
+    file->cg.mode = CG_MODE_GENERICS;
+    const LgsCodeGen cg(file, configs, globals, paths);
     for (auto& [_, genericExpr] : generics) {
         if (const auto dArr = genericExpr->type->asDArray()) {
             dArr->generateAddFunc(cg.cg);

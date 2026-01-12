@@ -104,10 +104,11 @@ LgsExpr* LgsObject::getZeroValue() {
 
 Value* LgsObject::getIRZeroValue(LgsCgModule& cg, Value* pointee, const bool levelAbove) {
     const auto ty = getIRType(cg);
-    const auto zero = cg.heapAlloc(cg.usize(sizeBytes()), levelAbove);
+    const auto zero = cg.heapAlloc2(cg.usize(sizeBytes()));
+    const auto zeroPtr = cg.builder.CreateExtractValue(zero, 0);
     for (const auto field : fields) {
-        const auto fieldZero = field->type->getIRZeroValue(cg);
-        cg.storeStructField(ty, zero, field->position, fieldZero);
+        auto fieldZero = field->type->getIRZeroValue(cg);
+        cg.storeStructField(ty, zeroPtr, field->position, fieldZero);
     }
     return zero;
 }

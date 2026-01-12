@@ -15,7 +15,6 @@
 #include "exprs/constants/LgsFloatConst.h"
 #include "exprs/constants/LgsStrConst.h"
 #include "stmts/LgsField.h"
-#include "stmts/LgsVarDec.h"
 #include "exprs/LgsJson.h"
 #include "exprs/LgsMatrixExpr.h"
 #include "exprs/LgsMetaSelection.h"
@@ -111,7 +110,10 @@ std::optional<std::string> LgsExpr::getConstStr() {
 }
 
 Value* LgsExpr::getIRPtr(LgsCgModule& cg) const {
-    if (type->asStr() && type->asStr()->isStatic) return cg.allocaAndStore(cg.ptrTy(), IRValue);
+    if (type->asStr() && type->asStr()->isStatic) {
+        return cg.allocaAndStore(cg.ptrTy(), IRValue);
+    }
+    if (type->isHeapAlloc) return IRValue;
     if (type->passByRef) return IRValue;
     if (IRValue->getType()->isPointerTy()) return IRValue;
     return cg.allocaAndStore(type->getIRType(cg), IRValue);
