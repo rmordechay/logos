@@ -1,6 +1,10 @@
 #include "types/primitives/LgsSize.h"
+
+#include "LgsBinaryTokens.h"
 #include "exprs/constants/LgsIntConst.h"
 #include "types/LgsAny.h"
+#include "types/primitives/LgsBool.h"
+#include "types/primitives/LgsDouble.h"
 #include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsLong.h"
 
@@ -21,7 +25,42 @@ LgsExpr* LgsSize::getZeroValue() {
 }
 
 LgsType* LgsSize::applyBinOp(LgsType* rightType, LgsBinOp& op) {
-    assert(0);
+    if (!rightType->isNumber()) return nullptr;
+    switch (op.opType) {
+    case ADD:
+    case SUB:
+    case MUL:
+    case DIV:
+    case MODULO: {
+        if (rightType->asDouble()) return &LGS_DOUBLE;
+        if (rightType->asFloat()) return &LGS_FLOAT;
+        return &LGS_SIZE;
+    }
+    case BIT_AND:
+    case BIT_OR:
+    case BIT_XOR:
+    case LSHIFT:
+    case RSHIFT: {
+        return &LGS_SIZE;
+    }
+    case POW: {
+        return &LGS_DOUBLE;
+    }
+    case EQ:
+    case NE:
+    case LT:
+    case GT:
+    case GE:
+    case LE: {
+        return &LGS_BOOL;
+    }
+    case NOOP:
+        assert(0);
+    default:
+        break;
+    }
+    return nullptr;
+
 }
 
 Value* LgsSize::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {

@@ -1,8 +1,13 @@
 #pragma once
-#define BLOCK_SIZE 1024*4
+#define BLOCK_SIZE 1024*1024
 #include <vector>
 
 #define ALIGN alignof(std::max_align_t)
+
+struct Lgs_Alloc {
+    void* ptr;
+    size_t level;
+};
 
 class Lgs_Allocator {
 public:
@@ -11,6 +16,5 @@ public:
     std::vector<void*> blocks;
 
     void* allocate(size_t size);
-    void free();
-    void print() const;
+    void freeBlocks();
 };

@@ -1,10 +1,8 @@
 #include "loops/LgsMetaVar.h"
-
-#include "LgsType.h"
 #include "codegen/LgsCgModule.h"
 
 Value* LgsMetaVar::loadIR(LgsCgModule& cg) {
-    return cg.load(type->getTypeOrPtr(cg), IRValue);
+    return IRValue;
 }
 
 bool LgsMetaVar::equals(LgsExpr* other) {

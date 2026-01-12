@@ -1,27 +1,22 @@
 #pragma once
-#include "Lgs_Allocator.h"
 #include "Lgs_Types.h"
 #include "errors/LgsErrHandler.h"
 #include <unordered_map>
 
-#define ALLOCA_SIZE 200000
+#include "Lgs_Allocator.h"
 
-struct Lgs_Alloc {
-    void* ptr;
-    size_t level;
-};
+#define ALLOCA_SIZE 1024
 
 struct Lgs_StackFrame {
+    Lgs_Allocator allocator;
     std::vector<Lgs_ThunkFunc> defers;
 };
 
 struct Lgs_Runtime {
-    size_t level{};
-    Lgs_Alloc allocs[ALLOCA_SIZE];
-    Lgs_Allocator allocator;
+    int64_t level = -1;
     LgsErrHandler errHandler;
     std::vector<Lgs_ThunkFunc> coros;
-    std::vector<Lgs_StackFrame> stack;
+    std::array<Lgs_StackFrame, 1024> stack;
     std::unordered_map<VKey, void*, VKeyHash> vtable;
 };
 

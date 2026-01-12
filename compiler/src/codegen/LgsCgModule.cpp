@@ -188,8 +188,8 @@ void LgsCgModule::callStackPush() {
     callRuntimeFunc("push", sizeTy());
 }
 
-void LgsCgModule::callPopStack(Value* rv) {
-    callRuntimeFunc("pop", voidTy(), {ptrTy()}, {rv ? rv : null()});
+void LgsCgModule::callPopStack() {
+    callRuntimeFunc("pop", voidTy());
 }
 
 Value* LgsCgModule::callHash(Value* arg) {
@@ -382,27 +382,11 @@ void LgsCgModule::printPtr(Value* value, const std::string& text) {
 }
 
 Value* LgsCgModule::measureTimeStart() {
-    const auto timespecTy = getStructType({i64Ty(), i64Ty()}, "timespec");
-    const auto start = builder.CreateAlloca(timespecTy);
-    callFunc("clock_gettime", i32Ty(), {i32Ty(), ptrTy()}, {i32(CLOCK_MONOTONIC), start});
-    return start;
+    return callRuntimeFunc("timeStart", i64Ty());
 }
 
-void LgsCgModule::measureTimeEnd(Value* start) {
-    if (const auto terminator = builder.GetInsertBlock()->getTerminator()) {
-        builder.SetInsertPoint(terminator);
-    }
-    const auto timespecTy = getStructType({i64Ty(), i64Ty()}, "timespec");
-    const auto end = builder.CreateAlloca(timespecTy);
-    callFunc("clock_gettime", i32Ty(), {i32Ty(), ptrTy()}, {i32(CLOCK_MONOTONIC), end});
-    const auto startSec = loadStructField(timespecTy, start, 0, i64Ty());
-    const auto endSec = loadStructField(timespecTy, end, 0, i64Ty());
-    const auto startNano = loadStructField(timespecTy, start, 1, i64Ty());
-    const auto endNano = loadStructField(timespecTy, end, 1, i64Ty());
-    const auto secDiff = builder.CreateSub(endSec, startSec);
-    const auto nanoDiff = builder.CreateSub(endNano, startNano);
-    const auto secScale = builder.CreateMul(secDiff, i64(1'000'000'000));
-    const auto results = builder.CreateAdd(secScale, nanoDiff);
+void LgsCgModule::measureTimeEnd(Value* startTime) {
+    const auto results = callRuntimeFunc("timeEnd", i64Ty(), {i64Ty()}, {startTime});
     printLong(results);
 }
 
