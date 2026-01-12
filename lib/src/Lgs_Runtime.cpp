@@ -2,64 +2,42 @@
 #include "LgsConfigs.h"
 #include "LgsDefinitions.h"
 #include "LgsUtils.h"
-
 #include <cassert>
 #include <complex>
 
-extern "C" size_t Lgs_Runtime_getLevel();
+Lgs_StackFrame& getTop();
 extern "C" void Lgs_Runtime_freeValue(void* ptr);
 
 extern "C" void Lgs_Runtime_init() {}
 
-extern "C" void Lgs_Runtime_close() {}
-
-extern "C" void Lgs_Runtime_push() {
-    runtime.stack.emplace_back(Lgs_StackFrame{});
+extern "C" void Lgs_Runtime_close() {
+    runtime.level--;
 }
 
-extern "C" void Lgs_Runtime_pop(void* rv) {
-    const auto start = std::chrono::high_resolution_clock::now();
-    auto& top = runtime.stack.back();
-    // Call defers
+extern "C" void Lgs_Runtime_push() {
+    runtime.level++;
+}
+
+extern "C" void Lgs_Runtime_pop() {
+    auto top = getTop();
     for (auto [defer, ctx] : top.defers) defer(ctx);
-    // Free allocations
-    const auto level = Lgs_Runtime_getLevel();
-    if (rv) {
-        const auto index = reinterpret_cast<uintptr_t>(rv) % ALLOCA_SIZE;
-        runtime.allocs[index].level = level - 1;
-    }
-    for (int i = 0; i < ALLOCA_SIZE; ++i) {
-        auto& alloc = runtime.allocs[i];
-        if (!alloc.ptr || alloc.level != level) continue;
-        Lgs_Runtime_freeValue(alloc.ptr);
-        alloc.ptr = nullptr;
-    }
-    runtime.stack.pop_back();
-    const auto end = std::chrono::high_resolution_clock::now();
-    const auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
-    // std::println("{}", duration.count());
+    top.allocator.freeBlocks();
+    runtime.level--;
+}
+
+extern "C" void* Lgs_Runtime_moveReturnValue(const void* rv, const size_t rvSize) {
+    auto allocator = runtime.stack[runtime.level - 2].allocator;
+    const auto newPtr = allocator.allocate(rvSize);
+    std::memcpy(newPtr, rv, rvSize);
+    return newPtr;
 }
 
 extern "C" void* Lgs_Runtime_allocate(const size_t size, const bool levelAbove) {
-    const auto ptr = std::malloc(size);
-    //std::println("Allocated: {}", ptr);
-    const auto index = reinterpret_cast<uintptr_t>(ptr) % ALLOCA_SIZE;
-    runtime.allocs[index].level = Lgs_Runtime_getLevel() - levelAbove;
-    runtime.allocs[index].ptr = ptr;
-    return ptr;
+    return runtime.stack[runtime.level - 1 - levelAbove].allocator.allocate(size);
 }
 
-extern "C" void Lgs_Runtime_move(void* left, void* right) {
-    const auto leftIndex = reinterpret_cast<uintptr_t>(left) % ALLOCA_SIZE;
-    const auto rightIndex = reinterpret_cast<uintptr_t>(right) % ALLOCA_SIZE;
-    auto& leftLevel = runtime.allocs[leftIndex].level;
-    auto& rightLevel = runtime.allocs[rightIndex].level;
-    if (leftLevel < rightLevel) {
-        rightLevel = leftLevel;
-        //std::println("Move right {} to {}", right, leftLevel);
-    }
-    leftLevel = Lgs_Runtime_getLevel();
-    //std::println("Move left {} to {}", left, Lgs_Runtime_getLevel());
+extern "C" void Lgs_Runtime_move(const void* left, const void* right) {
+    const auto currentLevel = runtime.level - 1;
 }
 
 extern "C" void* Lgs_Runtime_reallocate(void* ptr, const size_t size) {
@@ -67,12 +45,12 @@ extern "C" void* Lgs_Runtime_reallocate(void* ptr, const size_t size) {
 }
 
 extern "C" void Lgs_Runtime_freeValue(void* ptr) {
-    //std::println("Freeing {} {}", ptr, Lgs_Runtime_getLevel());
+    // std::println("Freeing {} {}", ptr, runtime.level - 1);
     std::free(ptr);
 }
 
 extern "C" void Lgs_Runtime_addDefer(const ThunkFunc funcPtr, void* ctx) {
-    runtime.stack.back().defers.emplace_back(Lgs_ThunkFunc{funcPtr, ctx});
+    getTop().defers.emplace_back(Lgs_ThunkFunc{funcPtr, ctx});
 }
 
 extern "C" void Lgs_Runtime_addCoro(const ThunkFunc funcPtr, void* ctx) {
@@ -101,6 +79,19 @@ extern "C" size_t Lgs_Runtime_hash(const char* str) {
     return hashString(str);
 }
 
-extern "C" size_t Lgs_Runtime_getLevel() {
-    return runtime.stack.size() - 1;
+extern "C" int64_t Lgs_Runtime_timeStart() {
+    timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    return static_cast<int64_t>(ts.tv_sec) * 1000000000LL + ts.tv_nsec;
+}
+
+extern "C" int64_t Lgs_Runtime_timeEnd(const int64_t start) {
+    timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    const auto endNano = static_cast<int64_t>(ts.tv_sec) * 1000000000LL + ts.tv_nsec;
+    return endNano - start;
+}
+
+Lgs_StackFrame& getTop() {
+    return runtime.stack[runtime.level - 1];
 }

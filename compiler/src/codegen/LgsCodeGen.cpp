@@ -135,9 +135,7 @@ void LgsCodeGen::visitMainFunc(LgsMainFunc* func) {
     stack.enterScope(func);
     createPrologue(func);
     initMainArgs(func);
-    const auto start = cg.measureTimeStart();
     visitStmtsBlock(func->stmtsBlock);
-    cg.measureTimeEnd(start);
     createEpilogue(func);
     stack.exitScope();
 }
@@ -493,10 +491,13 @@ void LgsCodeGen::visitReturnStmt(LgsReturn* returnStmt) {
     if (currentFunc->funcType->rt->isVoid()) {
         cg.callPopStack();
         cg.builder.CreateRetVoid();
-    } else {
-        if (currentFunc->returnStmts.size() == 1) {
+    } else if (!currentFunc->returnStmts.empty()) {
+        if (currentFunc->returnStmts.empty()) {
+            cg.builder.CreateRet(returnStmt->IRValue);
+        } else if (currentFunc->returnStmts.size() == 1) {
+            const auto rv = cg.callRuntimeFunc("moveReturnValue", cg.ptrTy(), {cg.ptrTy(), cg.sizeTy()}, {returnStmt->expr->IRValue, cg.usize(returnStmt->expr->type->sizeBytes())});
             cg.callPopStack();
-            cg.builder.CreateRet(returnStmt->expr->IRValue);
+            cg.builder.CreateRet(rv);
         } else {
             returnStmt->parentBlock = cg.builder.GetInsertBlock();
             cg.builder.CreateBr(currentFunc->epilogue);
@@ -1199,7 +1200,7 @@ void LgsCodeGen::visitJson(LgsJson* json) {
     assert(0);
 }
 
-void LgsCodeGen::createPrologue(LgsFunc* func) const {
+void LgsCodeGen::createPrologue(LgsFunc* func) {
     if (appConfigs.debugMode) func->setDebugValue(cg);
     cg.currentFunc = func->getIRFunc(cg);
     const auto entryBlock = cg.createBlock(BLOCK_ENTRY, cg.currentFunc);
@@ -1212,21 +1213,23 @@ void LgsCodeGen::createPrologue(LgsFunc* func) const {
 }
 
 void LgsCodeGen::createEpilogue(const LgsFunc* func) const {
-    if (func->funcType->name == LGS_MAIN_FUNC) {
+    const auto ft = func->funcType;
+    if (ft->name == LGS_MAIN_FUNC) {
         cg.callPopStack();
         cg.callRuntimeFunc("close", cg.voidTy());
         cg.builder.CreateRet(cg.i32(EXIT_SUCCESS));
-    } else if (func->funcType->rt->isVoid() && !cg.lastInstTerminator()) {
+    } else if (ft->rt->isVoid() && !cg.lastInstTerminator()) {
         cg.callPopStack();
         cg.builder.CreateRetVoid();
     } else if (func->returnStmts.size() > 1) {
         cg.branchAndStartBlock(func->epilogue);
-        const auto phi = cg.builder.CreatePHI(func->funcType->rt->getTypeOrPtr(cg), func->returnStmts.size());
+        const auto phi = cg.builder.CreatePHI(ft->rt->getTypeOrPtr(cg), func->returnStmts.size());
         for (const auto returnStmt : func->returnStmts) {
             phi->addIncoming(returnStmt->expr->IRValue, returnStmt->parentBlock);
         }
-        cg.callPopStack(phi);
-        cg.builder.CreateRet(phi);
+        const auto rv = cg.callRuntimeFunc("moveReturnValue", cg.ptrTy(), {cg.ptrTy(), cg.sizeTy()}, {phi, cg.usize(ft->rt->sizeBytes())});
+        cg.callPopStack();
+        cg.builder.CreateRet(rv);
     }
 }
 

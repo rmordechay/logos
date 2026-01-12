@@ -91,7 +91,7 @@ public:
     StructType* getAllocaType();
 
     void callStackPush();
-    void callPopStack(Value* rv = nullptr);
+    void callPopStack();
     Value* callHash(Value* arg);
     void addToVTable(Value* instance, Value* name, Value* ptr);
     Value* getFromVTable(Value* instance, Value* name);
@@ -137,7 +137,7 @@ public:
     void printLong(Value* value, const std::string& text = "");
     void printPtr(Value* value, const std::string& text = "");
     Value* measureTimeStart();
-    void measureTimeEnd(Value* start);
+    void measureTimeEnd(Value* startTime);
 
     void finalizeDebugger(const std::filesystem::path& buildPath) const;
     llvm::DILocation* getDebugLoc(const LgsLocation& location);

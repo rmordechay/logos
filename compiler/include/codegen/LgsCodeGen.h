@@ -69,6 +69,7 @@ public:
     LgsPaths& paths;
     LgsGlobals& globals;
     LgsAppConfigs& appConfigs;
+    Value* startTime = nullptr;
 
     explicit LgsCodeGen(LgsFile* file, LgsAppConfigs& appConfigs, LgsGlobals& globals, LgsPaths& paths)
         : file(file), cg(file->cg), paths(paths), globals(globals), appConfigs(appConfigs) {
@@ -135,7 +136,7 @@ public:
     void visitJson(LgsJson* json);
 
     // Funcs
-    void createPrologue(LgsFunc* func) const;
+    void createPrologue(LgsFunc* func);
     void createEpilogue(const LgsFunc* func) const;
     void initMainArgs(const LgsMainFunc* mainFunc) const;
     StructType* getThunkCtxType(const LgsFuncCall* fc) const;
