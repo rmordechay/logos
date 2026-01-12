@@ -19,7 +19,6 @@ public:
     std::vector<const LgsReturn*> returnStmts;
     std::vector<std::pair<LgsExpr*, LgsExpr*>> mocks;
     BasicBlock* epilogue = nullptr;
-    Value* level = nullptr;
     bool isLambda = false;
     bool isTest = false;
     CallFn fn;

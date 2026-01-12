@@ -124,6 +124,7 @@ Value* LgsType::getIRZeroValue(LgsCgModule& cg, Value* pointee, bool levelAbove)
 }
 
 Type* LgsType::getTypeOrPtr(LgsCgModule& cg) {
+    if (isHeapAlloc) return cg.getAllocaType();
     return passByRef ? cg.ptrTy() : getIRType(cg);
 }
 

@@ -36,8 +36,13 @@ extern "C" void* Lgs_Runtime_allocate(const size_t size, const bool levelAbove) 
     return runtime.stack[runtime.level - 1 - levelAbove].allocator.allocate(size);
 }
 
-extern "C" void Lgs_Runtime_move(const void* left, const void* right) {
-    const auto currentLevel = runtime.level - 1;
+extern "C" Lgs_Alloc Lgs_Runtime_allocate2(const size_t size) {
+    auto& frame = runtime.stack[runtime.level - 1];
+    return Lgs_Alloc{.ptr = frame.allocator.allocate(size), .level = runtime.level};
+}
+
+extern "C" void Lgs_Runtime_move(const Lgs_Alloc left, const Lgs_Alloc right) {
+    assert(0);
 }
 
 extern "C" void* Lgs_Runtime_reallocate(void* ptr, const size_t size) {

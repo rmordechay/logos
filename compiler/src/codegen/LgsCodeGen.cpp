@@ -495,7 +495,8 @@ void LgsCodeGen::visitReturnStmt(LgsReturn* returnStmt) {
         if (currentFunc->returnStmts.empty()) {
             cg.builder.CreateRet(returnStmt->IRValue);
         } else if (currentFunc->returnStmts.size() == 1) {
-            const auto rv = cg.callRuntimeFunc("moveReturnValue", cg.ptrTy(), {cg.ptrTy(), cg.sizeTy()}, {returnStmt->expr->IRValue, cg.usize(returnStmt->expr->type->sizeBytes())});
+            const auto returnSize = cg.usize(returnStmt->expr->type->sizeBytes());
+            const auto rv = cg.moveReturn(returnStmt->expr->IRValue, returnSize);
             cg.callPopStack();
             cg.builder.CreateRet(rv);
         } else {
@@ -982,9 +983,16 @@ void LgsCodeGen::visitFieldSelection(LgsVariable* var, LgsExpr* parent, const bo
     if (field->type->asVec()) {
         createVecField(field, parent->IRValue);
     }
-    var->IRValue = field->getGEP(cg, parent->IRValue);
-    if (!assign && field->type->asObject()) {
-        var->IRValue = cg.load(cg.ptrTy(), var->IRValue);
+    auto parentIR = parent->IRValue;
+    if (parent->type->isHeapAlloc) {
+        parentIR = cg.builder.CreateExtractValue(parentIR, 0);
+        const auto gep = field->getGEP(cg, parentIR);
+        var->IRValue = cg.load(cg.getAllocaType(), gep);
+    } else {
+        var->IRValue = field->getGEP(cg, parentIR);
+        if (!assign && field->type->asObject()) {
+            var->IRValue = cg.load(cg.ptrTy(), var->IRValue);
+        }
     }
 }
 
@@ -1157,14 +1165,15 @@ void LgsCodeGen::visitCharConst(LgsCharConst* charConst) const {
 void LgsCodeGen::visitInstance(LgsInstance* instance) {
     const auto obj = instance->obj;
     const auto sizeIR = cg.usize(obj->sizeBytes());
-    instance->IRValue = cg.heapAlloc(sizeIR);
+    instance->IRValue = cg.heapAlloc2(sizeIR);
+    const auto instancePtr = cg.builder.CreateExtractValue(instance->IRValue, 0);
 
     // Args
     std::unordered_set<std::string> visited;
     for (const auto& [argName, arg] : instance->args) {
         visited.insert(argName);
         const auto field = instance->obj->getField(argName);
-        arg.expr->pointee = field->getGEP(cg, instance->IRValue);
+        arg.expr->pointee = field->getGEP(cg, instancePtr);
         visitExpr(arg.expr);
         cg.store(arg.expr->IRValue, arg.expr->pointee);
     }
@@ -1172,7 +1181,7 @@ void LgsCodeGen::visitInstance(LgsInstance* instance) {
     // Zero values
     for (const auto field : instance->obj->fields) {
         if (visited.contains(field->name) || field->type->asEnum()) continue;
-        const auto pointee = field->getGEP(cg, instance->IRValue);
+        const auto pointee = field->getGEP(cg, instancePtr);
         if (field->expr) {
             cg.store(field->expr->IRValue, pointee);
         } else {
@@ -1180,7 +1189,7 @@ void LgsCodeGen::visitInstance(LgsInstance* instance) {
             cg.store(zeroValue, pointee);
         }
     }
-    addVirtuals(instance->obj, instance->IRValue);
+    addVirtuals(instance->obj, instancePtr);
 }
 
 void LgsCodeGen::visitIterIndex(LgsIterIndex* iterIndex, const bool assign) {
@@ -1227,7 +1236,7 @@ void LgsCodeGen::createEpilogue(const LgsFunc* func) const {
         for (const auto returnStmt : func->returnStmts) {
             phi->addIncoming(returnStmt->expr->IRValue, returnStmt->parentBlock);
         }
-        const auto rv = cg.callRuntimeFunc("moveReturnValue", cg.ptrTy(), {cg.ptrTy(), cg.sizeTy()}, {phi, cg.usize(ft->rt->sizeBytes())});
+        const auto rv = cg.moveReturn(phi, cg.usize(ft->rt->sizeBytes()));
         cg.callPopStack();
         cg.builder.CreateRet(rv);
     }
