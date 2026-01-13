@@ -7,7 +7,6 @@ public:
     static constexpr auto name = "Long";
 
     LgsLong() {
-        isPrimitive = true;
         isInt = true;
     }
     Type* getIRType(LgsCgModule& cg) override;

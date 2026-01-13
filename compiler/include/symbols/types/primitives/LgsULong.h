@@ -6,7 +6,6 @@ public:
     static constexpr auto name = "ULong";
 
     LgsULong() {
-        isPrimitive = true;
         isUnsinged = true;
         isInt = true;
     }

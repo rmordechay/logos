@@ -5,7 +5,6 @@ class LgsDouble final : public LgsType {
 public:
     static constexpr auto name = "Double";
     LgsDouble() {
-        isPrimitive = true;
         isFloat = true;
     }
     Type* getIRType(LgsCgModule& cg) override;

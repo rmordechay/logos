@@ -6,7 +6,6 @@ public:
     static constexpr auto name = "Short";
 
     LgsShort() {
-        isPrimitive = true;
         isInt = true;
     }
     size_t sizeBytes() override;

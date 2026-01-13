@@ -39,7 +39,12 @@ LgsExpr* LgsVariable::castExplicitly(LgsType* toType) {
 }
 
 void LgsVariable::assign(LgsCgModule& cg, LgsExpr* expr) {
-    cg.store(expr->IRValue, IRValue);
+    const auto right = expr->IRValue;
+    if (type->isHeapAlloc) {
+        cg.moveAlloc(IRValue, right, getAllocLevel(cg), expr->getAllocLevel(cg), type->getRTType(cg));
+    } else {
+        cg.store(right, IRValue);
+    }
 }
 
 Value* LgsVariable::hashValue(LgsCgModule& cg) {

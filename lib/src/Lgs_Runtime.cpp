@@ -5,6 +5,8 @@
 #include <cassert>
 #include <complex>
 
+#include "Lgs_ArrayExpr.h"
+
 Lgs_StackFrame& getTop();
 
 extern "C" void Lgs_Runtime_init() {}
@@ -39,16 +41,31 @@ extern "C" Lgs_Alloc Lgs_Runtime_allocateWithLevel(const size_t size) {
     return Lgs_Alloc{.ptr = runtime.stack.at(runtime.level).allocator.allocate(size), .level = runtime.level};
 }
 
-extern "C" void* Lgs_Runtime_move(void* right, const size_t leftLevel, const size_t rightLevel, const size_t size) {
-    if (leftLevel >= rightLevel) return right;
+extern "C" void* Lgs_Runtime_move(void* left, void* right, const size_t leftLevel, const size_t rightLevel, const Lgs_TypeInfo* type) {
+    if (leftLevel >= rightLevel) {
+        std::memcpy(left, right, type->size);
+        return left;
+    }
     auto& allocator = runtime.stack.at(leftLevel).allocator;
-    const auto newPtr = allocator.allocate(size);
-    std::memcpy(newPtr, right, size);
+    const auto newPtr = allocator.allocate(type->size);
+    if (type->kind == RTT_DARRAY) {
+        const auto oldDArr = static_cast<Lgs_ArrayExpr*>(right);
+        const auto newDArr = static_cast<Lgs_ArrayExpr*>(newPtr);
+        if (oldDArr->length > 0) {
+            const auto dataSize = type->dArray.baseType->size * oldDArr->length;
+            newDArr->data = static_cast<char*>(allocator.allocate(dataSize));
+            std::memcpy(newDArr->data, oldDArr->data, dataSize);
+        }
+    }
+    std::memcpy(newPtr, right, type->size);
     return newPtr;
 }
 
-extern "C" void* Lgs_Runtime_reallocate(void* ptr, const size_t size) {
-    assert(0);
+extern "C" void* Lgs_Runtime_reallocate(const void* ptr, const size_t size, const size_t level) {
+    auto& allocator = runtime.stack.at(level).allocator;
+    const auto newPtr = allocator.allocate(size);
+    std::memcpy(newPtr, ptr, size);
+    return newPtr;
 }
 
 extern "C" void Lgs_Runtime_addDefer(const ThunkFunc funcPtr, void* ctx) {

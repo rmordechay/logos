@@ -5,9 +5,6 @@ class LgsChar final : public LgsType {
 public:
     static constexpr auto name = "Char";
 
-    LgsChar() {
-        isPrimitive = true;
-    }
     size_t sizeBytes() override;
     Type* getIRType(LgsCgModule& cg) override;
     Constant* getRTType(LgsCgModule& cg) override;

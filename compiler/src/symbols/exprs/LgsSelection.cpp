@@ -20,11 +20,7 @@ void LgsSelection::assign(LgsCgModule& cg, LgsExpr* expr) {
     assert(!type->asVec());
     auto right = expr->IRValue;
     if (type->isHeapAlloc) {
-        assert(alloc);
-        const auto firstExpr = exprs.front();
-        const auto leftLevel = cg.builder.CreateExtractValue(firstExpr->alloc, 1);
-        const auto rightLevel = cg.builder.CreateExtractValue(expr->alloc, 1);
-        right = cg.moveAlloc(right, leftLevel, rightLevel, type->sizeBytes());
+        right = cg.moveAlloc(IRValue, right, getAllocLevel(cg), exprs.front()->getAllocLevel(cg), type->getRTType(cg));
     }
     cg.store(right, IRValue);
 }

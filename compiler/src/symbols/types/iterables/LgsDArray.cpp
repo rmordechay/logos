@@ -1,13 +1,13 @@
 #include "types/iterables/LgsDArray.h"
 #include "LgsBinaryTokens.h"
-#include "Lgs_Exprs.h"
+#include "Lgs_ArrayExpr.h"
 #include "codegen/LgsCgModule.h"
 #include "exprs/LgsArrayExpr.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsBool.h"
 #include <llvm/IR/Module.h>
 
-#define INITIAL_CAPACITY 10
+#define INITIAL_CAPACITY 3
 
 LgsFunc* LgsDArray::getMethod(const std::string& methodName) {
     constexpr auto flags = BUILTIN | PUBLIC | METHOD;
@@ -63,7 +63,7 @@ std::string LgsDArray::pname() {
 }
 
 size_t LgsDArray::sizeBytes() {
-    return sizeof(Lgs_Exprs);
+    return sizeof(Lgs_ArrayExpr);
 }
 
 bool LgsDArray::canCastTo(LgsType* other) {
@@ -148,7 +148,7 @@ Value* LgsDArray::getIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* inde
 
 void LgsDArray::addIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index, LgsExpr* value) {
     if (index) assert(0);
-    cg.builder.CreateCall(generateAddFunc(cg), {iterable->IRValue, value->IRValue});
+    cg.builder.CreateCall(generateAddFunc(cg), {iterable->IRValue, value->IRValue, iterable->getAllocLevel(cg)});
 }
 
 Function* LgsDArray::generateAddFunc(LgsCgModule& cg) {
@@ -156,7 +156,7 @@ Function* LgsDArray::generateAddFunc(LgsCgModule& cg) {
     if (const auto func = cg.IRModule->getFunction(funcName)) return func;
 
     const auto valueTy = baseType->getTypeOrPtr(cg);
-    const auto ft = cg.getFT(cg.voidTy(), {cg.ptrTy(), valueTy});
+    const auto ft = cg.getFT(cg.voidTy(), {cg.ptrTy(), valueTy, cg.sizeTy()});
     if (cg.mode == CG_MODE_SRC_CODE) {
         return cg.getFunc(funcName, ft);
     }
@@ -177,33 +177,36 @@ Function* LgsDArray::generateAddFunc(LgsCgModule& cg) {
     const auto ty = getIRType(cg);
     const auto arrIR = cg.currentFunc->getArg(0);
     const auto elementIR = cg.currentFunc->getArg(1);
-    const auto dataFieldPtr = cg.builder.CreateStructGEP(ty, arrIR, 0);
-    const auto lenFieldPtr = cg.builder.CreateStructGEP(ty, arrIR, 1);
-    const auto capFieldPtr = cg.builder.CreateStructGEP(ty, arrIR, 2);
+    const auto levelIR = cg.currentFunc->getArg(2);
+    const auto dataGEP = cg.builder.CreateStructGEP(ty, arrIR, 0);
+    const auto lenGEP = cg.builder.CreateStructGEP(ty, arrIR, 1);
+    const auto capGEP = cg.builder.CreateStructGEP(ty, arrIR, 2);
 
-    auto lenField = cg.load(cg.sizeTy(), lenFieldPtr);
-    const auto capField = cg.load(cg.sizeTy(), capFieldPtr);
-    const auto needsResize = cg.builder.CreateICmpSGE(lenField, capField);
+    auto len = cg.load(cg.sizeTy(), lenGEP);
+    const auto cap = cg.load(cg.sizeTy(), capGEP);
+    const auto needsResize = cg.builder.CreateICmpSGE(len, cap);
     cg.builder.CreateCondBr(needsResize, needsResizeBlock, exitBlock);
 
     // Resize
     cg.startBlock(needsResizeBlock);
-    auto dataField = cg.load(cg.ptrTy(), dataFieldPtr);
-    const auto newCap = cg.builder.CreateMul(capField, cg.usize(2));
+    auto data = cg.load(cg.ptrTy(), dataGEP);
+    const auto newCap = cg.builder.CreateMul(cap, cg.usize(2));
+    const auto newSize = cg.builder.CreateMul(newCap, cg.usize(baseType->sizeBytes()));
+    const auto newPtr = cg.reallocate(data, newSize, levelIR);
+    cg.store(newPtr, dataGEP);
     cg.storeStructField(ty, arrIR, 2, newCap);
-    cg.reallocate(dataField, newCap);
 
     // Set element
     cg.branchAndStartBlock(exitBlock);
-    lenField = cg.load(cg.sizeTy(), lenFieldPtr);
-    dataField = cg.load(cg.ptrTy(), dataFieldPtr);
+    len = cg.load(cg.sizeTy(), lenGEP);
+    data = cg.load(cg.ptrTy(), dataGEP);
     const auto baseSize = cg.usize(baseType->sizeBytes());
-    const auto offset = cg.builder.CreateMul(lenField, baseSize);
-    const auto elementPtr = cg.builder.CreateInBoundsPtrAdd(dataField, offset);
+    const auto offset = cg.builder.CreateMul(len, baseSize);
+    const auto elementPtr = cg.builder.CreateInBoundsPtrAdd(data, offset);
     cg.store(elementIR, elementPtr);
 
     // Increment length
-    const auto inc = cg.builder.CreateAdd(lenField, cg.usize(1));
+    const auto inc = cg.builder.CreateAdd(len, cg.usize(1));
     cg.storeStructField(ty, arrIR, 1, inc);
 
     // Epilogue

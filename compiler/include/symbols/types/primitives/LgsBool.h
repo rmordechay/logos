@@ -8,7 +8,6 @@ public:
     static constexpr auto falseLiteral = "false";
 
     LgsBool() {
-        isPrimitive = true;
         isInt = true;
     }
     Type* getIRType(LgsCgModule& cg) override;

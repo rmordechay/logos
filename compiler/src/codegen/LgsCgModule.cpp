@@ -142,6 +142,19 @@ void LgsCgModule::ifStmt(Value* cond, const std::function<void()>& body) {
     branchAndStartBlock(IRExitBlock);
 }
 
+void LgsCgModule::ifElseStmt(Value* cond, const std::function<void()>& ifBody, const std::function<void()>& elseBody) {
+    const auto trueBlock = createBlock(BLOCK_TRUE);
+    const auto falseBlock = createBlock(BLOCK_FALSE);
+    const auto exitBlock = createBlock(BLOCK_EXIT);
+    builder.CreateCondBr(cond, trueBlock, falseBlock);
+    startBlock(trueBlock);
+    ifBody();
+    createBranch(exitBlock);
+    startBlock(falseBlock);
+    elseBody();
+    branchAndStartBlock(exitBlock);
+}
+
 void LgsCgModule::store(Value* v, Value* ptr) {
     if (v == ptr) return;
     builder.CreateStore(v, ptr);
@@ -212,12 +225,14 @@ Value* LgsCgModule::heapAllocWithLevel(Value* size) {
     return callRuntimeFunc("allocateWithLevel", getAllocaType(), {sizeTy()}, {extendToSize(size)});
 }
 
-Value* LgsCgModule::moveAlloc(Value* right, Value* leftLevel, Value* rightLevel, const size_t size) {
-    return callRuntimeFunc("move", ptrTy(), {ptrTy(), sizeTy(), sizeTy(), sizeTy()}, {right, leftLevel, rightLevel, usize(size)});
+Value* LgsCgModule::moveAlloc(Value* left, Value* right, Value* leftLevel, Value* rightLevel, Constant* type) {
+    const std::vector<Type*> params = {ptrTy(), ptrTy(), sizeTy(), sizeTy(), ptrTy()};
+    const std::vector<Value*> args = {left, right, leftLevel, rightLevel, type};
+    return callRuntimeFunc("move", ptrTy(), params, args);
 }
 
-Value* LgsCgModule::reallocate(Value* ptr, Value* size) {
-    return callRuntimeFunc("reallocate", ptrTy(), {ptrTy(), sizeTy()}, {ptr, extendToSize(size)});
+Value* LgsCgModule::reallocate(Value* ptr, Value* size, Value* level) {
+    return callRuntimeFunc("reallocate", ptrTy(), {ptrTy(), sizeTy(), sizeTy()}, {ptr, extendToSize(size), extendToSize(level)});
 }
 
 void LgsCgModule::callThrowError(const LgsBaseMsg& err, const std::vector<Value*>& args) {
@@ -231,7 +246,7 @@ BasicBlock* LgsCgModule::createBlock(const std::string& name, Function* parent) 
     return BasicBlock::Create(context, name, parent);
 }
 
-void LgsCgModule::branchIfNeeded(BasicBlock* block) {
+void LgsCgModule::createBranch(BasicBlock* block) {
     if (!lastInstTerminator()) {
         builder.CreateBr(block);
     }
@@ -243,7 +258,7 @@ void LgsCgModule::startBlock(BasicBlock* block) {
 }
 
 void LgsCgModule::branchAndStartBlock(BasicBlock* block) {
-    branchIfNeeded(block);
+    createBranch(block);
     startBlock(block);
 }
 

@@ -6,7 +6,6 @@ public:
     static constexpr auto name = "Float";
 
     LgsFloat() {
-        isPrimitive = true;
         isFloat = true;
     }
     Type* getIRType(LgsCgModule& cg) override;

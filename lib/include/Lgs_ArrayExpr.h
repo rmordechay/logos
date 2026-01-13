@@ -8,7 +8,7 @@ struct Lgs_SArrayExpr {
     size_t length;
 };
 
-struct Lgs_Exprs {
+struct Lgs_ArrayExpr {
     char* data;
     size_t length;
     size_t capacity;

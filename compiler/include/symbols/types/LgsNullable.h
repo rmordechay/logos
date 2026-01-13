@@ -16,7 +16,6 @@ public:
     explicit LgsNullable() {
         isNull = true;
         passByRef = true;
-        isPrimitive = true;
     }
     LgsField* getField(const std::string& fieldName) override;
     size_t sizeBytes() override;

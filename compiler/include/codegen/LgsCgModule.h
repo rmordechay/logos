@@ -80,6 +80,7 @@ public:
     GlobalVariable* createGlobal(const std::string& name, Type* type, Constant* initializer, bool isConst = true, GlobalValue::LinkageTypes linkage = GlobalValue::ExternalLinkage) const;
     void loop(Value* loopLength, const std::function<void(Value*, BasicBlock*)>& body);
     void ifStmt(Value* cond, const std::function<void()>& body);
+    void ifElseStmt(Value* cond, const std::function<void()>& ifBody, const std::function<void()>& elseBody);
 
     void store(Value* v, Value* ptr);
     Value* load(Type* ty, Value* ptr);
@@ -97,13 +98,13 @@ public:
     Value* getFromVTable(Value* instance, Value* name);
     Value* heapAlloc(Value* size);
     Value* heapAllocWithLevel(Value* size);
-    Value* moveAlloc(Value* right, Value* leftLevel, Value* rightLevel, size_t size);
-    Value* reallocate(Value* ptr, Value* size);
+    Value* moveAlloc(Value* left, Value* right, Value* leftLevel, Value* rightLevel, Constant* type);
+    Value* reallocate(Value* ptr, Value* size, Value* level);
     void callThrowError(const LgsBaseMsg& err, const std::vector<Value*>& args = {});
 
     // Blocks
     BasicBlock* createBlock(const std::string& name = "", Function* parent = nullptr);
-    void branchIfNeeded(BasicBlock* block);
+    void createBranch(BasicBlock* block);
     void startBlock(BasicBlock* block);
     void branchAndStartBlock(BasicBlock* block);
     Instruction* lastInstTerminator() const;

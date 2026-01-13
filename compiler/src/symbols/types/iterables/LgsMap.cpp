@@ -7,7 +7,7 @@
 #include "types/LgsAny.h"
 #include "types/primitives/LgsVoid.h"
 #include <llvm/IR/Module.h>
-#include "Lgs_Exprs.h"
+#include "Lgs_ArrayExpr.h"
 
 #define INITIAL_CAPACITY 3
 

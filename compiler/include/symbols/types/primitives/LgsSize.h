@@ -6,7 +6,6 @@ public:
     static constexpr auto name = "Size";
 
     LgsSize() {
-        isPrimitive = true;
         isInt = true;
     }
     size_t sizeBytes() override;

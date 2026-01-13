@@ -30,7 +30,7 @@
 
 #define BLOCK_ENTRY "entry"
 #define BLOCK_TRUE "if_true"
-#define BLOCK_IF_FALSE "if_false"
+#define BLOCK_FALSE "if_false"
 #define BLOCK_EXIT "block_exit"
 #define BLOCK_ELSE_IF "else_if"
 #define BLOCK_ELSE_IF_CHECK "else_if_check"

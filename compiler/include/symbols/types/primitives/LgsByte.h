@@ -6,7 +6,6 @@ public:
     static constexpr auto name = "Byte";
 
     LgsByte() {
-        isPrimitive = true;
         isInt = true;
     }
     Type* getIRType(LgsCgModule& cg) override;

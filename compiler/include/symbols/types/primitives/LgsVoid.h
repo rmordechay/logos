@@ -5,9 +5,6 @@ class LgsVoid final : public LgsType {
 public:
     static constexpr auto name = "Void";
 
-    LgsVoid() {
-        isPrimitive = true;
-    }
     Type* getIRType(LgsCgModule& cg) override;
     Constant* getRTType(LgsCgModule& cg) override;
     size_t sizeBytes() override;

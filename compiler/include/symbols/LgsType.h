@@ -66,7 +66,6 @@ public:
     bool isInt = false;
     bool isUnsinged = false;
     bool isFloat = false;
-    bool isPrimitive = false;
     bool isHeapAlloc = false;
     bool passByRef = false;
 
@@ -147,7 +146,7 @@ public:
 
 inline void freeType(LgsType* type) {
     if (!type) return;
-    if (type->isPrimitive) return;
+    if (type->isInt || type->isFloat || type->asAny() || type->asChar() || type->isVoid()) return;
     if (type->asGenericType() || type->asObject() || type->asInterface()) return;
     delete type;
 }

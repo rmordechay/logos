@@ -381,13 +381,13 @@ bool LgsApp::generateGenerics() {
     file->cg.setupModule("generics");
     file->cg.mode = CG_MODE_GENERICS;
     const LgsCodeGen cg(file, configs, globals, paths);
-    for (auto& [_, genericExpr] : generics) {
-        if (const auto dArr = genericExpr->asDArray()) {
+    for (auto& [_, generic] : generics) {
+        if (const auto dArr = generic->asDArray()) {
             dArr->generateAddFunc(cg.cg);
-        } else if (const auto map = genericExpr->asMap()) {
+        } else if (const auto map = generic->asMap()) {
             map->generateGetFunc(cg.cg);
             map->generateAddFunc(cg.cg);
-        } else if (const auto func = genericExpr->asFuncType()) {
+        } else if (const auto func = generic->asFuncType()) {
             if (func->name == MAP_FUNC) {
                 cg.generateMapFunc(func);
             } else if (func->name == FILTER_FUNC) {
