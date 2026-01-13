@@ -14,6 +14,7 @@ Value* LgsIntConst::loadIR(LgsCgModule& cg) {
 void LgsIntConst::castImplicitly(LgsType* toType) {
     if (!toType) return;
     if (!type->canCastTo(toType)) return;
+    if (!toType->isInt) return;
     setType(toType);
 }
 

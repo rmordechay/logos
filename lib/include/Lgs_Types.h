@@ -32,7 +32,6 @@ enum Lgs_TypeKind {
     RTT_SET,
     RTT_MAP,
     RTT_ENUM,
-    RTT_TYPE,
     RTT_FUNC,
     RTT_VARIADIC,
     RTT_NULLABLE,

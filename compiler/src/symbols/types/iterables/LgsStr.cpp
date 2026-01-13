@@ -74,7 +74,7 @@ Value* LgsStr::getIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index) 
 }
 
 std::string LgsStr::fmtStr() const {
-    return "%s";
+    return "\"%s\"";
 }
 
 bool LgsStr::inferBaseType(std::vector<LgsExpr*>& args) {

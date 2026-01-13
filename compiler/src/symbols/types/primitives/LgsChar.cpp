@@ -31,7 +31,7 @@ LgsExpr* LgsChar::getZeroValue() {
 }
 
 std::string LgsChar::fmtStr() const {
-    return "%c";
+    return "'%c'";
 }
 
 LgsType* LgsChar::applyBinOp(LgsType* rightType, LgsBinOp& op) {

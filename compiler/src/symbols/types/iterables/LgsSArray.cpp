@@ -82,7 +82,15 @@ LgsType* LgsSArray::applyBinOp(LgsType* rightType, LgsBinOp& op) {
 }
 
 bool LgsSArray::inferBaseType(std::vector<LgsExpr*>& args) {
-    assert(0);
+    if (baseType) return true;
+    assert(!args.empty());
+    const auto baseExprType = args.front()->type;
+    for (size_t i = 1; i < args.size(); ++i) {
+        const auto arg = args[i];
+        if (!arg->type->canCastTo(baseExprType)) return false;
+    }
+    baseType = baseExprType;
+    return true;
 }
 
 Value* LgsSArray::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {

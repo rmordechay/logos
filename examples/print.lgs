@@ -1,0 +1,14 @@
+main() {
+    print(8)
+    print(8.34)
+    print(8L)
+    print(true)
+    print("true")
+    print("t")
+    arr: Int[3] = [1, 2, 3]
+    print(arr)
+    vec = Vec3(23, 34, 54)
+    print(vec)
+    print(Vec2(2, 334))
+    print(Vec4(2, 334))
+}

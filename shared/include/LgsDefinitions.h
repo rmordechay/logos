@@ -32,6 +32,7 @@
 #define BLOCK_TRUE "if_true"
 #define BLOCK_FALSE "if_false"
 #define BLOCK_EXIT "block_exit"
+#define BLOCK_DEFAULT "default"
 #define BLOCK_ELSE_IF "else_if"
 #define BLOCK_ELSE_IF_CHECK "else_if_check"
 #define BLOCK_EXIT_PATTERN "exit_switch"

@@ -7,8 +7,6 @@
 #include "cblas/cblas.h"
 #include "types/iterables/LgsMatrix.h"
 #include "types/primitives/LgsBool.h"
-#include "types/primitives/LgsVoid.h"
-
 #include <sstream>
 
 LgsField* LgsVec::getField(const std::string& fieldName) {
