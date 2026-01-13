@@ -12,7 +12,7 @@ public:
     Type* getIRType(LgsCgModule& cg) override;
     std::string getName() override;
     LgsExpr* getZeroValue() override;
-    Value* getIRZeroValue(LgsCgModule& cg, Value* pointee = nullptr, bool levelAbove = false) override;
+    Value* getIRZeroValue(LgsCgModule& cg, Value* pointee = nullptr) override;
     Constant* getRTType(LgsCgModule& cg) override;
     size_t sizeBytes() override;
     std::string fmtStr() const override;

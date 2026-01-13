@@ -95,9 +95,9 @@ public:
     Value* callHash(Value* arg);
     void addToVTable(Value* instance, Value* name, Value* ptr);
     Value* getFromVTable(Value* instance, Value* name);
-    Value* heapAlloc(Value* size, bool levelAbove = false);
+    Value* heapAlloc(Value* size);
     Value* heapAlloc2(Value* size);
-    Value* moveAlloc(Value* left, Value* right, size_t size);
+    Value* moveAlloc(Value* left, Value* right, Value* leftLevel, Value* rightLevel, size_t size);
     Value* reallocate(Value* ptr, Value* size);
     void freeValue(Value* ptr);
     void callThrowError(const LgsBaseMsg& err, const std::vector<Value*>& args = {});

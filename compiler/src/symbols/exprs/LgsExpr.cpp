@@ -113,7 +113,6 @@ Value* LgsExpr::getIRPtr(LgsCgModule& cg) const {
     if (type->asStr() && type->asStr()->isStatic) {
         return cg.allocaAndStore(cg.ptrTy(), IRValue);
     }
-    if (type->isHeapAlloc) return IRValue;
     if (type->passByRef) return IRValue;
     if (IRValue->getType()->isPointerTy()) return IRValue;
     return cg.allocaAndStore(type->getIRType(cg), IRValue);

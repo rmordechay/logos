@@ -14,7 +14,7 @@ public:
     std::string getName() override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
-    Value* getIRZeroValue(LgsCgModule& cg, Value* pointee = nullptr, bool levelAbove = false) override;
+    Value* getIRZeroValue(LgsCgModule& cg, Value* pointee = nullptr) override;
     Constant* getRTType(LgsCgModule& cg) override;
     bool canCastTo(LgsType* other) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;

@@ -119,12 +119,11 @@ LgsType* LgsType::replaceGenerics(LgsType* replacement, std::unordered_map<std::
     return this;
 }
 
-Value* LgsType::getIRZeroValue(LgsCgModule& cg, Value* pointee, bool levelAbove) {
+Value* LgsType::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
     assert(0);
 }
 
 Type* LgsType::getTypeOrPtr(LgsCgModule& cg) {
-    if (isHeapAlloc) return cg.getAllocaType();
     return passByRef ? cg.ptrTy() : getIRType(cg);
 }
 

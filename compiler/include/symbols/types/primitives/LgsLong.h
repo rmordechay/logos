@@ -14,7 +14,7 @@ public:
     Constant* getRTType(LgsCgModule& cg) override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
-    Value* getIRZeroValue(LgsCgModule& cg, Value* pointee, bool levelAbove = false) override;
+    Value* getIRZeroValue(LgsCgModule& cg, Value* pointee) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     Value* addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
     Value* subIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;

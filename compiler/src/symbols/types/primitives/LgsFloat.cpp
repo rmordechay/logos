@@ -19,7 +19,7 @@ LgsExpr* LgsFloat::getZeroValue() {
     return new LgsFloatConst(this, 0.0);
 }
 
-Value* LgsFloat::getIRZeroValue(LgsCgModule& cg, Value* pointee, bool levelAbove) {
+Value* LgsFloat::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
     return cg.floatv(0);
 }
 

@@ -7,9 +7,6 @@ Value* LgsNullableExpr::loadIR(LgsCgModule& cg) {
 }
 
 void LgsNullableExpr::assign(LgsCgModule& cg, LgsExpr* expr) {
-    if (type->isHeapAlloc) {
-        cg.freeValue(loadIR(cg));
-    }
     if (!type->passByRef) {
         const auto isSet = cg.builder.CreateIsNotNull(expr->IRValue);
         type->asNullable()->setNullableFields(cg, IRValue, expr->IRValue, isSet);

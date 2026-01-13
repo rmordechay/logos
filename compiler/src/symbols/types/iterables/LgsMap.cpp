@@ -95,13 +95,13 @@ LgsExpr* LgsMap::getZeroValue() {
     return new LgsHashMap(this);
 }
 
-Value* LgsMap::getIRZeroValue(LgsCgModule& cg, Value* pointee, const bool levelAbove) {
+Value* LgsMap::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
     const auto ty = getIRType(cg);
-    const auto ptr = pointee ? pointee : cg.heapAlloc(cg.usize(sizeBytes()), levelAbove);
+    const auto ptr = pointee ? pointee : cg.heapAlloc(cg.usize(sizeBytes()));
     const auto cap = cg.usize(INITIAL_CAPACITY);
     const auto entriesSize = cg.usize(pairType->sizeBytes() + sizeof(void*));
     const auto totalSize = cg.builder.CreateMul(entriesSize, cap);
-    const auto entries = cg.heapAlloc(totalSize, levelAbove);
+    const auto entries = cg.heapAlloc(totalSize);
     cg.storeStructField(ty, ptr, 0, entries);
     cg.storeStructField(ty, ptr, 1, cg.sizeZero());
     cg.storeStructField(ty, ptr, 2, cap);

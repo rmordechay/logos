@@ -24,7 +24,7 @@ LgsExpr* LgsLong::getZeroValue() {
     return new LgsIntConst(&LGS_LONG, 0);
 }
 
-Value* LgsLong::getIRZeroValue(LgsCgModule& cg, Value* pointee, bool levelAbove) {
+Value* LgsLong::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
     return cg.i64Zero();
 }
 

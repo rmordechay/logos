@@ -34,7 +34,7 @@ LgsExpr* LgsSArray::getZeroValue() {
     return new LgsArrayExpr(this);
 }
 
-Value* LgsSArray::getIRZeroValue(LgsCgModule& cg, Value* pointee, bool levelAbove) {
+Value* LgsSArray::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
     const auto ty = getIRType(cg);
     const auto arrSize = size->getConstInt().value();
     const auto arr = pointee ? pointee : cg.builder.CreateAlloca(ty);

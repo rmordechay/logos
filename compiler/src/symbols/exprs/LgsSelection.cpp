@@ -9,10 +9,6 @@
 #include <llvm/IR/InlineAsm.h>
 
 Value* LgsSelection::loadIR(LgsCgModule& cg) {
-    if (type->isHeapAlloc) {
-        const auto v = cg.builder.CreateExtractValue(IRValue, 0);
-        return cg.load(cg.ptrTy(), v);
-    }
     return cg.load(type->getTypeOrPtr(cg), IRValue);
 }
 
@@ -24,11 +20,9 @@ void LgsSelection::assign(LgsCgModule& cg, LgsExpr* expr) {
     assert(!type->asVec());
     const auto right = expr->IRValue;
     if (type->isHeapAlloc) {
-        cg.moveAlloc(cg.load(cg.getAllocaType(), IRValue), right, type->sizeBytes());
-        // cg.builder.CreateInsertValue(IRValue, right, 0);
-    } else {
-        cg.store(right, IRValue);
+        cg.moveAlloc(IRValue, right, cg.usize(34), cg.usize(23), type->sizeBytes());
     }
+    cg.store(right, IRValue);
 }
 
 std::string LgsSelection::asText() {

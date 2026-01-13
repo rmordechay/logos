@@ -204,17 +204,16 @@ Value* LgsCgModule::getFromVTable(Value* instance, Value* name) {
     return callRuntimeFunc("getFromVTable", ptrTy(), {ptrTy(), ptrTy()}, {instance, name});
 }
 
-Value* LgsCgModule::heapAlloc(Value* size, const bool levelAbove) {
-    return callRuntimeFunc("allocate", ptrTy(), {sizeTy(), i1Ty()}, {extendToSize(size), i1(levelAbove)});
+Value* LgsCgModule::heapAlloc(Value* size) {
+    return callRuntimeFunc("allocate", ptrTy(), {sizeTy()}, {extendToSize(size)});
 }
 
 Value* LgsCgModule::heapAlloc2(Value* size) {
     return callRuntimeFunc("allocate2", getAllocaType(), {sizeTy()}, {extendToSize(size)});
 }
 
-Value* LgsCgModule::moveAlloc(Value* left, Value* right, const size_t size) {
-    const auto s = getAllocaType();
-    return callRuntimeFunc("move", voidTy(), {s, s, sizeTy()}, {left, right, usize(size)});
+Value* LgsCgModule::moveAlloc(Value* left, Value* right, Value* leftLevel, Value* rightLevel, const size_t size) {
+    return callRuntimeFunc("move", voidTy(), {ptrTy(), ptrTy(), sizeTy(), sizeTy(), sizeTy()}, {left, right, leftLevel, rightLevel, usize(size)});
 }
 
 Value* LgsCgModule::reallocate(Value* ptr, Value* size) {

@@ -27,7 +27,7 @@ LgsExpr* LgsStr::getZeroValue() {
     return new LgsStrConst("");
 }
 
-Value* LgsStr::getIRZeroValue(LgsCgModule& cg, Value* pointee, bool levelAbove) {
+Value* LgsStr::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
     return cg.emptyStr();
 }
 

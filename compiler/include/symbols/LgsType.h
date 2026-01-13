@@ -85,7 +85,7 @@ public:
     virtual LgsType* replaceGenerics(LgsType* replacement, std::unordered_map<std::string, LgsType*>& replacements);
     virtual size_t sizeBytes() = 0;
     virtual LgsExpr* getZeroValue() = 0;
-    virtual Value* getIRZeroValue(LgsCgModule& cg, Value* pointee = nullptr, bool levelAbove = false);
+    virtual Value* getIRZeroValue(LgsCgModule& cg, Value* pointee = nullptr);
     virtual Type* getIRType(LgsCgModule& cg) = 0;
     virtual Type* getTypeOrPtr(LgsCgModule& cg);
     virtual Constant* getRTType(LgsCgModule& cg) = 0;

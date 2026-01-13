@@ -32,16 +32,16 @@ extern "C" void* Lgs_Runtime_moveReturnValue(const void* rv, const size_t rvSize
     return newPtr;
 }
 
-extern "C" void* Lgs_Runtime_allocate(const size_t size, const bool levelAbove) {
-    return runtime.stack.at(runtime.level - levelAbove).allocator.allocate(size);
+extern "C" void* Lgs_Runtime_allocate(const size_t size) {
+    return runtime.stack.at(runtime.level).allocator.allocate(size);
 }
 
 extern "C" Lgs_Alloc Lgs_Runtime_allocate2(const size_t size) {
     return Lgs_Alloc{.ptr = runtime.stack.at(runtime.level).allocator.allocate(size), .level = runtime.level};
 }
 
-extern "C" void Lgs_Runtime_move(const Lgs_Alloc left, const Lgs_Alloc right, const size_t size) {
-    const auto currentLevel = runtime.level - 1;
+extern "C" void Lgs_Runtime_move(const void* left, const void* right, const size_t levelLeft, const size_t levelRight, const size_t size) {
+    std::println("{} {} {} {} {}", left, right, levelLeft, levelRight, size);
 }
 
 extern "C" void* Lgs_Runtime_reallocate(void* ptr, const size_t size) {

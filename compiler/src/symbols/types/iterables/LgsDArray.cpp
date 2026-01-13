@@ -80,12 +80,12 @@ LgsExpr* LgsDArray::getZeroValue() {
     return new LgsArrayExpr(this);
 }
 
-Value* LgsDArray::getIRZeroValue(LgsCgModule& cg, Value* pointee, const bool levelAbove) {
+Value* LgsDArray::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
     const auto ty = getIRType(cg);
-    const auto ptr = pointee ? pointee : cg.heapAlloc(cg.usize(sizeBytes()), levelAbove);
+    const auto ptr = pointee ? pointee : cg.heapAlloc(cg.usize(sizeBytes()));
     const auto cap = cg.usize(INITIAL_CAPACITY);
     const auto initSize = cg.builder.CreateMul(cap, cg.usize(baseType->sizeBytes()));
-    cg.storeStructField(ty, ptr, 0, cg.heapAlloc(initSize, levelAbove));
+    cg.storeStructField(ty, ptr, 0, cg.heapAlloc(initSize));
     cg.storeStructField(ty, ptr, 1, cg.sizeZero());
     cg.storeStructField(ty, ptr, 2, cap);
     return ptr;
