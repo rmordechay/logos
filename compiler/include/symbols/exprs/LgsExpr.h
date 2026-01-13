@@ -46,15 +46,12 @@ public:
     bool isReturnExpr = false;
     bool hasUnwrapSuffix = false;
     Value* pointee = nullptr;
-    Value* alloc = nullptr; // {ptr, level}
-    Value* level = nullptr;
 
     explicit LgsExpr(LgsType* type = nullptr) : type(type) {}
     std::optional<int64_t> getConstInt();
     std::optional<double_t> getConstFloat();
     std::optional<std::string> getConstStr();
     Value* getIRPtr(LgsCgModule& cg) const;
-    Value* getAllocLevel(LgsCgModule& cg);
 
     virtual void setType(LgsType* newType);
     virtual LgsExpr* castExplicitly(LgsType* toType);

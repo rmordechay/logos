@@ -122,7 +122,7 @@ public:
     void visitEnvVar(LgsEnvVar* envVar) const;
     void visitVariable(LgsVariable* variable);
     void visitSelection(LgsSelection* selection, bool assign = false);
-    void visitFieldSelection(LgsVariable* var, LgsExpr* parent, bool assign) const;
+    void visitFieldSelection(LgsVariable* var, LgsExpr* parent) const;
     void visitNullableSelection(LgsExpr* child, LgsExpr* parent) const;
     void visitMetaSelection(LgsMetaSelection* metaSelection);
     void visitFuncCall(LgsFuncCall* funcCall);

@@ -118,12 +118,6 @@ Value* LgsExpr::getIRPtr(LgsCgModule& cg) const {
     return cg.allocaAndStore(type->getIRType(cg), IRValue);
 }
 
-Value* LgsExpr::getAllocLevel(LgsCgModule& cg) {
-    if (level) return level;
-    level = cg.builder.CreateExtractValue(alloc, 1);
-    return level;
-}
-
 void LgsExpr::setType(LgsType* newType) {
     type = newType;
 }

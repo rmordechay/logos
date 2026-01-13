@@ -1,54 +1,29 @@
 object Obj1 {
-    x: Int = 34
+    obj2: Obj2
 }
 
 object Obj2 {
-    obj1: Obj1
+    obj3: Obj3
 }
 
-func(obj1: Obj1): Obj2 {
-    if false {
-        a = Obj2{}
-        return Obj2{}
+object Obj3 {
+    obj4: Obj4
+}
+
+object Obj4 {
+    id: Int
+    name: Str
+}
+
+func(obj1: Obj1) {
+    for 100_000 {
+        obj1.obj2 := Obj2{obj3=Obj3{obj4=Obj4{id=5, name="Roi"}}}
     }
-    obj2a = Obj2{}
-    obj2a.obj1 := obj1
-    obj1.x := 123
-    return obj2a
 }
 
 main() {
-    owner obj2 = Obj2{}
-    obj2.obj1.x := 123
-    print(obj2.obj1.x)
-    func(obj2.obj1)
-    print(obj2.obj1.x)
-}
-
-
-object Obj1 {
-    x: Int
-}
-
-object Obj2 {
-    obj: Obj1
-}
-
-f(obj: Obj1) {
-    print(obj.x)
-}
-
-g(): Obj1 {
-    if true {
-        obj = Obj1{x=34}
-        obj2 = Obj2{}
-        if obj.x == 33 {
-            return obj
-        }
-    }
-    return Obj1{}
-}
-
-main() {
-    print(g().x)
+    obj1 = Obj1{obj2=Obj2{obj3=Obj3{obj4=Obj4{id=3}}}}
+    //print(obj1)
+    func(obj1)
+    //print(obj1)
 }

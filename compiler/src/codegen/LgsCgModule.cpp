@@ -193,8 +193,8 @@ void LgsCgModule::addNullTerminate(Value* strPtr, Value* pos) {
     store(i8Zero(), builder.CreateGEP(i8Ty(), strPtr, pos));
 }
 
-StructType* LgsCgModule::getAllocaType() {
-    return getStructType({ptrTy(), sizeTy()}, "Alloca");
+StructType* LgsCgModule::getAllocType() {
+    return getStructType({sizeTy(), sizeTy()}, "Alloc");
 }
 
 void LgsCgModule::callStackPush() {
@@ -221,14 +221,10 @@ Value* LgsCgModule::heapAlloc(Value* size) {
     return callRuntimeFunc("allocate", ptrTy(), {sizeTy()}, {extendToSize(size)});
 }
 
-Value* LgsCgModule::heapAllocWithLevel(Value* size) {
-    return callRuntimeFunc("allocateWithLevel", getAllocaType(), {sizeTy()}, {extendToSize(size)});
-}
-
-Value* LgsCgModule::moveAlloc(Value* left, Value* right, Value* leftLevel, Value* rightLevel, Constant* type) {
-    const std::vector<Type*> params = {ptrTy(), ptrTy(), sizeTy(), sizeTy(), ptrTy()};
-    const std::vector<Value*> args = {left, right, leftLevel, rightLevel, type};
-    return callRuntimeFunc("move", ptrTy(), params, args);
+Value* LgsCgModule::moveAlloc(Value* leftPtr, Value* rightPtr, Constant* type) {
+    const std::vector<Type*> params = {ptrTy(), ptrTy(), ptrTy()};
+    const std::vector<Value*> args = {leftPtr, rightPtr, type};
+    return callRuntimeFunc("move", voidTy(), params, args);
 }
 
 Value* LgsCgModule::reallocate(Value* ptr, Value* size, Value* level) {

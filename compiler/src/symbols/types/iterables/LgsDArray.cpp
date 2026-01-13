@@ -84,18 +84,11 @@ Value* LgsDArray::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
     const auto ty = getIRType(cg);
     const auto cap = cg.usize(INITIAL_CAPACITY);
     const auto initSize = cg.builder.CreateMul(cap, cg.usize(baseType->sizeBytes()));
-    const auto alloc = pointee ? pointee : cg.heapAllocWithLevel(cg.usize(sizeBytes()));
+    const auto alloc = pointee ? pointee : cg.heapAlloc(cg.usize(sizeBytes()));
     const auto entries = cg.heapAlloc(initSize);
-    if (pointee) {
-        cg.storeStructField(ty, alloc, 0, entries);
-        cg.storeStructField(ty, alloc, 1, cg.sizeZero());
-        cg.storeStructField(ty, alloc, 2, cap);
-    } else {
-        const auto ptr = cg.builder.CreateExtractValue(alloc, 0);
-        cg.storeStructField(ty, ptr, 0, entries);
-        cg.storeStructField(ty, ptr, 1, cg.sizeZero());
-        cg.storeStructField(ty, ptr, 2, cap);
-    }
+    cg.storeStructField(ty, alloc, 0, entries);
+    cg.storeStructField(ty, alloc, 1, cg.sizeZero());
+    cg.storeStructField(ty, alloc, 2, cap);
     return alloc;
 }
 
@@ -148,7 +141,7 @@ Value* LgsDArray::getIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* inde
 
 void LgsDArray::addIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index, LgsExpr* value) {
     if (index) assert(0);
-    cg.builder.CreateCall(generateAddFunc(cg), {iterable->IRValue, value->IRValue, iterable->getAllocLevel(cg)});
+    cg.builder.CreateCall(generateAddFunc(cg), {iterable->IRValue, value->IRValue, nullptr});
 }
 
 Function* LgsDArray::generateAddFunc(LgsCgModule& cg) {

@@ -1,16 +1,18 @@
 #pragma once
-#define BLOCK_SIZE 1024*1024
 #include <vector>
+#include "Lgs_Types.h"
 
+#define BLOCK_SIZE 1024*1024
 #define ALIGN alignof(std::max_align_t)
 
 struct Lgs_Alloc {
-    void* ptr;
     int64_t level;
+    int64_t block;
 };
 
 class Lgs_Allocator {
 public:
+    size_t level = 0;
     size_t currentOffset = 0;
     void* currentBlock = nullptr;
     std::vector<void*> blocks;

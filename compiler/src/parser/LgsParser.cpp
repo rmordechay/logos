@@ -384,7 +384,8 @@ LgsObject* LgsParser::parseObjectBody(const LgsToken& tokenName, const bool isSi
         }
     }
 
-    auto fieldPosition = 0;
+    // First field is level
+    auto fieldPosition = 1;
     while (true) {
         if (const auto field = parseField(fieldPosition)) {
             fieldPosition++;

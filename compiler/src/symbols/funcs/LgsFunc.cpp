@@ -51,11 +51,7 @@ Value* LgsFunc::call(LgsCgModule& cg, std::vector<LgsFuncArg>& args) {
         assert(!funcType->hasDefaults);
     } else {
         for (const auto& arg : args) {
-            if (arg.expr->type->isHeapAlloc) {
-                IRArgs.emplace_back(arg.expr->alloc);
-            } else {
-                IRArgs.emplace_back(arg.expr->IRValue);
-            }
+            IRArgs.emplace_back(arg.expr->IRValue);
         }
         if (funcType->hasDefaults) {
             const auto diff = funcType->params.size() - args.size() - 1;

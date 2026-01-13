@@ -9,15 +9,31 @@ static std::string formatElement(const Lgs_TypeInfo* rtt, void* value) {
     if (!value) return LGS_NULL_LITERAL;
     std::ostringstream str;
     switch (rtt->kind) {
+    case RTT_ANY: str << value; break;
+    case RTT_BOOL: str << (*static_cast<bool*>(value) ? "true" : "false"); break;
+    case RTT_BYTE: str << *static_cast<int8_t*>(value); break;
+    case RTT_SHORT: str << *static_cast<int16_t*>(value); break;
+    case RTT_INT: str << *static_cast<int32_t*>(value); break;
+    case RTT_LONG: str << *static_cast<int64_t*>(value); break;
+    case RTT_SIZE: str << *static_cast<size_t*>(value); break;
+    case RTT_UBYTE: str << *static_cast<uint8_t*>(value); break;
+    case RTT_USHORT: str << *static_cast<uint16_t*>(value); break;
+    case RTT_UINT: str << *static_cast<uint32_t*>(value); break;
+    case RTT_ULONG: str << *static_cast<uint64_t*>(value); break;
+    case RTT_FLOAT: str << *static_cast<float*>(value); break;
+    case RTT_DOUBLE: str << *static_cast<double*>(value); break;
+    case RTT_ENUM:
+    case RTT_STR: str << "\"" << *static_cast<char**>(value) << "\""; break;
+    case RTT_CHAR: str << "\"" << *static_cast<const char*>(value) << "\""; break;
     case RTT_OBJECT: {
         const auto fieldsCount = rtt->obj.fieldsCount;
         str << rtt->obj.name << "{";
         for (size_t i = 0; i < fieldsCount; ++i) {
             const auto fieldType = rtt->obj.fieldTypes[i];
             void* fieldPtr = static_cast<char*>(value) + rtt->obj.fieldOffsets[i];
-            // if (fieldType->kind == RTT_OBJECT) {
-            //     fieldPtr = *static_cast<void**>(fieldPtr);
-            // }
+            if (fieldType->kind == RTT_OBJECT) {
+                fieldPtr = *static_cast<void**>(fieldPtr);
+            }
             str << rtt->obj.fieldNames[i] << '=';
             str << formatElement(fieldType, fieldPtr);
             if (i < fieldsCount - 1) str << ", ";
@@ -25,6 +41,7 @@ static std::string formatElement(const Lgs_TypeInfo* rtt, void* value) {
         str << "}";
         break;
     }
+    case RTT_SET:
     case RTT_DARRAY: {
         std::println("{}", value);
         const auto dArrExpr = static_cast<Lgs_ArrayExpr*>(value);
@@ -49,6 +66,39 @@ static std::string formatElement(const Lgs_TypeInfo* rtt, void* value) {
             if (i < sArr.len - 1) str << ", ";
         }
         str << "]";
+        break;
+    }
+    case RTT_VEC2: {
+        const auto& [baseType] = rtt->vec2;
+        void* e1 = value;
+        void* e2 = static_cast<char*>(e1) + baseType->size;
+        str << "Vec2<";
+        str << formatElement(baseType, e1) << ", ";
+        str << formatElement(baseType, e2) << ">";
+        break;
+    }
+    case RTT_VEC3: {
+        const auto& [baseType] = rtt->vec3;
+        void* e1 = value;
+        void* e2 = static_cast<char*>(e1) + baseType->size;
+        void* e3 = static_cast<char*>(e2) + baseType->size;
+        str << "Vec3<";
+        str << formatElement(baseType, e1) << ", ";
+        str << formatElement(baseType, e2) << ", ";
+        str << formatElement(baseType, e3) << ">";
+        break;
+    }
+    case RTT_VEC4: {
+        const auto& [baseType] = rtt->vec4;
+        void* e1 = value;
+        void* e2 = static_cast<char*>(e1) + baseType->size;
+        void* e3 = static_cast<char*>(e2) + baseType->size;
+        void* e4 = static_cast<char*>(e3) + baseType->size;
+        str << "Vec4<";
+        str << formatElement(baseType, e1) << ", ";
+        str << formatElement(baseType, e2) << ", ";
+        str << formatElement(baseType, e3) << ", ";
+        str << formatElement(baseType, e4) << ">";
         break;
     }
     case RTT_MATRIX: {
@@ -102,6 +152,10 @@ static std::string formatElement(const Lgs_TypeInfo* rtt, void* value) {
         str << formatElement(img, static_cast<char*>(value) + real->size) << 'i';
         break;
     }
+    case RTT_VOID:
+    case RTT_VARIADIC:
+    case RTT_FUNC:
+    case RTT_UNKNOWN:
     default: assert(0);
     }
     return str.str();

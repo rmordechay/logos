@@ -89,7 +89,7 @@ public:
     void storeStructField(Type* parentType, Value* parentPtr, size_t position, Value* v);
     Value* loadStructField(Type* parentType, Value* parentPtr, size_t position, Type* ty);
     void addNullTerminate(Value* strPtr, Value* pos);
-    StructType* getAllocaType();
+    StructType* getAllocType();
 
     void callStackPush();
     void callPopStack();
@@ -97,8 +97,7 @@ public:
     void addToVTable(Value* instance, Value* name, Value* ptr);
     Value* getFromVTable(Value* instance, Value* name);
     Value* heapAlloc(Value* size);
-    Value* heapAllocWithLevel(Value* size);
-    Value* moveAlloc(Value* left, Value* right, Value* leftLevel, Value* rightLevel, Constant* type);
+    Value* moveAlloc(Value* leftPtr, Value* rightPtr, Constant* type);
     Value* reallocate(Value* ptr, Value* size, Value* level);
     void callThrowError(const LgsBaseMsg& err, const std::vector<Value*>& args = {});
 

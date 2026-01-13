@@ -43,7 +43,7 @@ LgsFunc* LgsObject::getMethod(const std::string& methodName) {
 Type* LgsObject::getIRType(LgsCgModule& cg) {
     const auto type = cg.typesRegistry.find(name);
     if (type != cg.typesRegistry.end()) return type->second;
-    std::vector<Type*> elementTypes;
+    std::vector<Type*> elementTypes = {cg.sizeTy()}; // First field is level
     elementTypes.reserve(fields.size());
     for (size_t i = 0; i < fields.size(); ++i) {
         const auto field = fields[i];
@@ -68,7 +68,7 @@ Constant* LgsObject::getRTType(LgsCgModule& cg) {
     const auto offsetsArrType = ArrayType::get(cg.sizeTy(), fields.size());
     for (size_t i = 0; i < fields.size(); ++i) {
         const auto field = fields[i];
-        offsets.emplace_back(cg.usize(sl->getElementOffset(i)));
+        offsets.emplace_back(cg.usize(sl->getElementOffset(i) + sizeof(size_t)));
         fieldsAsValue.push_back(field);
     }
     const auto [typesArr, hashesArr] = getRTValuesInfo(cg, name, fieldsAsValue);
@@ -83,7 +83,7 @@ Constant* LgsObject::getRTType(LgsCgModule& cg) {
     const auto objNameIR = llvm::dyn_cast<Constant>(cg.getString(objName));
     const std::vector<Constant*> args = {objNameIR, cg.usize(fields.size()), offsetsArrGlobal, hashesArr, typesArr};
     const auto sv = cg.getRTTExtraStruct(objName, fieldTypes, args);
-    return cg.getRTTypeInfo(objName, sizeBytes(), RTT_OBJECT, sv);
+    return cg.getRTTypeInfo(objName, dl.getTypeAllocSize(getIRType(cg)), RTT_OBJECT, sv);
 }
 
 size_t LgsObject::sizeBytes() {
@@ -95,7 +95,7 @@ size_t LgsObject::sizeBytes() {
             sum += field->type->sizeBytes();
         }
     }
-    return sum;
+    return sum + sizeof(size_t); // Fields + level
 }
 
 LgsExpr* LgsObject::getZeroValue() {

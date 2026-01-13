@@ -788,14 +788,7 @@ void LgsCodeGen::visitStaticArray(LgsArrayExpr* arrayExpr) const {
 
 void LgsCodeGen::visitDynamicArray(LgsArrayExpr* arrayExpr) const {
     const auto dArr = arrayExpr->type->asDArray();
-    const auto zeroValue = dArr->getIRZeroValue(cg, arrayExpr->pointee);
-    if (arrayExpr->pointee) {
-        arrayExpr->IRValue = zeroValue;
-    } else {
-        arrayExpr->IRValue = cg.builder.CreateExtractValue(zeroValue, 0);
-        arrayExpr->level = cg.builder.CreateExtractValue(zeroValue, 1);
-        arrayExpr->alloc = zeroValue;
-    }
+    arrayExpr->IRValue = dArr->getIRZeroValue(cg, arrayExpr->pointee);
     for (const auto element : arrayExpr->elements) {
         dArr->addIRElement(cg, arrayExpr, nullptr, element);
     }
@@ -885,22 +878,13 @@ void LgsCodeGen::visitVariable(LgsVariable* variable) {
     case VAR_DEC:
         assert(variable->ref.varDec->IRValue);
         variable->IRValue = variable->ref.varDec->IRValue;
-        if (variable->type->isHeapAlloc) {
-            variable->level = variable->ref.varDec->expr->level;
-            variable->alloc = variable->ref.varDec->expr->alloc;
-        }
         break;
     case PARAM:
         if (variable->ref.param->isSelf) {
             variable->IRValue = cg.currentFunc->getArg(0);
         } else {
             assert(variable->ref.param->IRValue);
-            if (variable->type->isHeapAlloc) {
-                variable->IRValue = cg.builder.CreateExtractValue(variable->ref.param->IRValue, 0);
-                variable->alloc = variable->ref.param->IRValue;
-            } else {
-                variable->IRValue = variable->ref.param->IRValue;
-            }
+            variable->IRValue = variable->ref.param->IRValue;
         }
         break;
     case FUNC:
@@ -939,7 +923,11 @@ void LgsCodeGen::visitSelection(LgsSelection* selection, const bool assign) {
         const auto parent = selection->exprs[i];
         const auto child = selection->exprs[i + 1];
         if (const auto var = child->asVariable()) {
-            visitFieldSelection(var, parent, assign);
+            visitFieldSelection(var, parent);
+            const auto lastIteration = i == selection->exprs.size() - 2;
+            if (var->type->isHeapAlloc && !(lastIteration && assign)) {
+                var->IRValue = cg.load(cg.ptrTy(), var->IRValue);
+            }
         } else if (const auto nullableExpr = child->asNullableExpr()) {
             visitNullableSelection(nullableExpr, parent);
         } else if (const auto methodCall = child->asFuncCall()) {
@@ -955,11 +943,9 @@ void LgsCodeGen::visitSelection(LgsSelection* selection, const bool assign) {
         }
     }
     selection->IRValue = selection->exprs.back()->IRValue;
-    selection->alloc = selection->exprs.front()->alloc;
-    selection->level = selection->exprs.front()->level;
 }
 
-void LgsCodeGen::visitFieldSelection(LgsVariable* var, LgsExpr* parent, const bool assign) const {
+void LgsCodeGen::visitFieldSelection(LgsVariable* var, LgsExpr* parent) const {
     assert(parent->IRValue && &parent->IRValue->getContext() == &cg.IRModule->getContext());
     const auto field = var->ref.field;
     // Function pointer
@@ -976,11 +962,7 @@ void LgsCodeGen::visitFieldSelection(LgsVariable* var, LgsExpr* parent, const bo
 
     // Enum type
     if (field->type->asEnum()) {
-        if (assign) {
-            var->IRValue = field->getGEP(cg, parent->IRValue);
-        } else {
-            var->IRValue = cg.load(cg.sizeTy(), field->getGEP(cg, parent->IRValue));
-        }
+        var->IRValue = field->getGEP(cg, parent->IRValue);
         return;
     }
 
@@ -1000,9 +982,6 @@ void LgsCodeGen::visitFieldSelection(LgsVariable* var, LgsExpr* parent, const bo
         createVecField(field, parent->IRValue);
     }
     var->IRValue = field->getGEP(cg, parent->IRValue);
-    if (!assign && field->type->asObject()) {
-        var->IRValue = cg.load(cg.ptrTy(), var->IRValue);
-    }
 }
 
 void LgsCodeGen::visitNullableSelection(LgsExpr* child, LgsExpr* parent) const {
@@ -1173,9 +1152,7 @@ void LgsCodeGen::visitCharConst(LgsCharConst* charConst) const {
 
 void LgsCodeGen::visitInstance(LgsInstance* instance) {
     const auto obj = instance->obj;
-    const auto sizeIR = cg.usize(obj->sizeBytes());
-    instance->alloc = cg.heapAllocWithLevel(sizeIR);
-    instance->IRValue = cg.builder.CreateExtractValue(instance->alloc, 0);
+    instance->IRValue = cg.heapAlloc(cg.usize(obj->sizeBytes()));
 
     // Args
     std::unordered_set<std::string> visited;
