@@ -46,6 +46,7 @@ public:
     bool isReturnExpr = false;
     bool hasUnwrapSuffix = false;
     Value* pointee = nullptr;
+    Value* alloc = nullptr;
 
     explicit LgsExpr(LgsType* type = nullptr) : type(type) {}
     std::optional<int64_t> getConstInt();

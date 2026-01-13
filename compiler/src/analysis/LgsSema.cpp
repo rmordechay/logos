@@ -374,16 +374,20 @@ void LgsSema::visitAssignment(LgsAssignment* assignment) {
     if (!validateExprType(r, l->type)) return;
 
     auto canAssign = false;
-    if (l->asIterIndex() || l->asVariable() || l->asNullableExpr()) {
-        canAssign = true;
-    } else if (const auto selection = l->asSelection()) {
-        const auto firstExpr = selection->exprs.front();
-        const auto obj = firstExpr->type->asObject();
-        if (obj && !obj->singleton && firstExpr->asTypeExpr()) {
-            addError(E10089, selection->location, {firstExpr->asText(), selection->exprs.back()->asText()});
-            return;
+    if (l->isMutable) {
+        if (l->asIterIndex() || l->asVariable() || l->asNullableExpr()) {
+            canAssign = true;
+        } else if (const auto selection = l->asSelection()) {
+            const auto firstExpr = selection->exprs.front();
+            const auto obj = firstExpr->type->asObject();
+            if (obj && !obj->singleton && firstExpr->asTypeExpr()) {
+                addError(E10089, selection->location, {firstExpr->asText(), selection->exprs.back()->asText()});
+                return;
+            }
+            canAssign = true;
         }
-        canAssign = true;
+    } else {
+        return addError(E10051, l->location, {l->asText()});
     }
     if (!canAssign) {
         return addError(E10012, l->location, {l->asText(), assignment->assignmentType.text, r->type->pname()});
@@ -845,7 +849,7 @@ void LgsSema::visitDynamicArray(LgsArrayExpr* arrayExpr) {
     if (!dArr->baseType && arrayExpr->elements.empty()) {
         return addError(E10049, arrayExpr->location, {arrayExpr->asText()});
     }
-    addGenerics(arrayExpr);
+    addGenerics(arrayExpr->type);
 }
 
 void LgsSema::visitHashMap(LgsHashMap* hashMap) {
@@ -864,7 +868,7 @@ void LgsSema::visitHashMap(LgsHashMap* hashMap) {
         for (const auto element : hashMap->elements) elements.push_back(element);
         hashMap->type->asIterable()->inferBaseType(elements);
     }
-    addGenerics(hashMap);
+    addGenerics(hashMap->type);
 }
 
 void LgsSema::visitVectorExpr(LgsVectorExpr* vectorExpr) {
@@ -927,6 +931,7 @@ void LgsSema::visitVariable(LgsVariable* variable) {
     }
     case PARAM: {
         variable->ref.param = symbol->param;
+        variable->isMutable = false;
         variable->setType(symbol->param->type);
         break;
     }
@@ -1288,6 +1293,11 @@ void LgsSema::visitInstance(LgsInstance* instance) {
         castExprImplicitly(arg.expr, field->type);
         visitExpr(arg.expr);
         validateExprType(arg.expr, field->type);
+    }
+
+    for (const auto field : obj->fields) {
+        if (visited.contains(field->name)) continue;
+        addGenerics(field->type);
     }
 
     // Missing required fields
@@ -1705,7 +1715,7 @@ void LgsSema::makeGenericFuncCall(LgsFuncCall* funcCall, const LgsFunc* func) {
             genericFunc->stmtsBlock = func->stmtsBlock->clone();
         }
         visitFunc(genericFunc);
-        addGenerics(genericFunc);
+        addGenerics(genericFunc->type);
     }
     funcCall->func = genericFunc;
     funcCall->setType(genericFunc->funcType->rt);
@@ -1733,19 +1743,9 @@ void LgsSema::addRTType(LgsType* type) const {
     file->symbolTable.rttTypes.push_back(type);
 }
 
-void LgsSema::deleteRTType(LgsType* type) const {
-    if (!type || type->isVoid() || (type->asNullable() && !type->asNullable()->baseType)) return;
-    auto& rttTypes = file->symbolTable.rttTypes;
-    for (auto it = rttTypes.begin(); it != rttTypes.end(); ++it) {
-        if ((*it)->equals(type)) {
-            rttTypes.erase(it);
-            return;
-        }
-    }
-}
-
-void LgsSema::addGenerics(LgsExpr* expr) const {
-    file->symbolTable.generics[expr->type->getName()] = expr;
+void LgsSema::addGenerics(LgsType* type) const {
+    if (!type->hasGenericTypes() && !type->asDArray() && !type->asMap()) return;
+    file->symbolTable.generics2[type->getName()] = type;
 }
 
 static std::string getMissingImplementsStr(const std::vector<LgsField*>& fields, const std::vector<LgsFunc*>& methods) {

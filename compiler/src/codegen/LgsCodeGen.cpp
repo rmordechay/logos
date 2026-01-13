@@ -788,7 +788,13 @@ void LgsCodeGen::visitStaticArray(LgsArrayExpr* arrayExpr) const {
 
 void LgsCodeGen::visitDynamicArray(LgsArrayExpr* arrayExpr) const {
     const auto dArr = arrayExpr->type->asDArray();
-    arrayExpr->IRValue = dArr->getIRZeroValue(cg, arrayExpr->pointee);
+    const auto zeroValue = dArr->getIRZeroValue(cg, arrayExpr->pointee);
+    if (arrayExpr->pointee) {
+        arrayExpr->IRValue = zeroValue;
+    } else {
+        arrayExpr->IRValue = cg.builder.CreateExtractValue(zeroValue, 0);
+        arrayExpr->alloc = cg.builder.CreateExtractValue(zeroValue, 1);
+    }
     for (const auto element : arrayExpr->elements) {
         dArr->addIRElement(cg, arrayExpr, nullptr, element);
     }
@@ -878,13 +884,19 @@ void LgsCodeGen::visitVariable(LgsVariable* variable) {
     case VAR_DEC:
         assert(variable->ref.varDec->IRValue);
         variable->IRValue = variable->ref.varDec->IRValue;
+        variable->alloc = variable->ref.varDec->expr->alloc;
         break;
     case PARAM:
         if (variable->ref.param->isSelf) {
             variable->IRValue = cg.currentFunc->getArg(0);
         } else {
             assert(variable->ref.param->IRValue);
-            variable->IRValue = variable->ref.param->IRValue;
+            if (variable->type->isHeapAlloc) {
+                variable->IRValue = cg.builder.CreateExtractValue(variable->ref.param->IRValue, 0);
+                variable->alloc = variable->ref.param->IRValue;
+            } else {
+                variable->IRValue = variable->ref.param->IRValue;
+            }
         }
         break;
     case FUNC:
@@ -939,6 +951,7 @@ void LgsCodeGen::visitSelection(LgsSelection* selection, const bool assign) {
         }
     }
     selection->IRValue = selection->exprs.back()->IRValue;
+    selection->alloc = selection->exprs.front()->alloc;
 }
 
 void LgsCodeGen::visitFieldSelection(LgsVariable* var, LgsExpr* parent, const bool assign) const {
@@ -1156,7 +1169,8 @@ void LgsCodeGen::visitCharConst(LgsCharConst* charConst) const {
 void LgsCodeGen::visitInstance(LgsInstance* instance) {
     const auto obj = instance->obj;
     const auto sizeIR = cg.usize(obj->sizeBytes());
-    instance->IRValue = cg.heapAlloc(sizeIR);
+    instance->alloc = cg.heapAllocWithLevel(sizeIR);
+    instance->IRValue = cg.builder.CreateExtractValue(instance->alloc, 0);
 
     // Args
     std::unordered_set<std::string> visited;
@@ -1175,8 +1189,7 @@ void LgsCodeGen::visitInstance(LgsInstance* instance) {
         if (field->expr) {
             cg.store(field->expr->IRValue, pointee);
         } else {
-            const auto zeroValue = field->type->getIRZeroValue(cg, pointee);
-            cg.store(zeroValue, pointee);
+            cg.store(field->type->getIRZeroValue(cg, pointee), pointee);
         }
     }
     addVirtuals(instance->obj, instance->IRValue);
@@ -1208,6 +1221,7 @@ void LgsCodeGen::createPrologue(LgsFunc* func) {
     if (func->funcType->name == LGS_MAIN_FUNC) {
         cg.callRuntimeFunc("init", cg.voidTy());
     }
+    startTime = cg.measureTimeStart();
     cg.callStackPush();
 }
 
@@ -1216,6 +1230,7 @@ void LgsCodeGen::createEpilogue(const LgsFunc* func) const {
     if (ft->name == LGS_MAIN_FUNC) {
         cg.callPopStack();
         cg.callRuntimeFunc("close", cg.voidTy());
+        cg.measureTimeEnd(startTime);
         cg.builder.CreateRet(cg.i32(EXIT_SUCCESS));
     } else if (ft->rt->isVoid() && !cg.lastInstTerminator()) {
         cg.callPopStack();
@@ -1357,13 +1372,13 @@ void LgsCodeGen::addVirtuals(LgsObject* obj, Value* ptr) const {
     // }
 }
 
-void LgsCodeGen::generateMapFunc(LgsFunc* mapFunc) const {
-    const auto& iterableParam = mapFunc->funcType->params[0];
-    const auto& cbParam = mapFunc->funcType->params[1];
+void LgsCodeGen::generateMapFunc(LgsFuncType* mapFunc) const {
+    const auto& iterableParam = mapFunc->params[0];
+    const auto& cbParam = mapFunc->params[1];
     const auto iterable = iterableParam.type->asIterable();
-    const auto funcName = mapFunc->funcType->getName();
+    const auto funcName = mapFunc->getName();
 
-    const auto ft = llvm::cast<FunctionType>(mapFunc->funcType->getIRType(cg));
+    const auto ft = llvm::cast<FunctionType>(mapFunc->getIRType(cg));
     const auto cbFt = llvm::cast<FunctionType>(cbParam.type->getIRType(cg));
     const auto func = cg.getFunc(funcName, ft);
     const auto entryBlock = cg.createBlock(BLOCK_ENTRY, func);
@@ -1398,13 +1413,13 @@ void LgsCodeGen::generateMapFunc(LgsFunc* mapFunc) const {
     cg.builder.CreateRet(retArr.IRValue);
 }
 
-void LgsCodeGen::generateFilterFunc(LgsFunc* filterFunc) const {
-    const auto& iterableParam = filterFunc->funcType->params[0];
-    const auto& cbParam = filterFunc->funcType->params[1];
+void LgsCodeGen::generateFilterFunc(LgsFuncType* filterFunc) const {
+    const auto& iterableParam = filterFunc->params[0];
+    const auto& cbParam = filterFunc->params[1];
     const auto iterable = iterableParam.type->asIterable();
-    const auto funcName = filterFunc->funcType->getName();
+    const auto funcName = filterFunc->getName();
 
-    const auto ft = llvm::cast<FunctionType>(filterFunc->funcType->getIRType(cg));
+    const auto ft = llvm::cast<FunctionType>(filterFunc->getIRType(cg));
     const auto cbFt = llvm::cast<FunctionType>(cbParam.type->getIRType(cg));
     const auto func = cg.getFunc(funcName, ft);
     const auto entryBlock = cg.createBlock(BLOCK_ENTRY, func);
@@ -1442,13 +1457,13 @@ void LgsCodeGen::generateFilterFunc(LgsFunc* filterFunc) const {
     cg.builder.CreateRet(retArr.IRValue);
 }
 
-void LgsCodeGen::generateForeachFunc(const LgsFunc* forEachFunc) const {
-    const auto& iterableParam = forEachFunc->funcType->params[0];
-    const auto& cbParam = forEachFunc->funcType->params[1];
+void LgsCodeGen::generateForeachFunc(LgsFuncType* forEachFunc) const {
+    const auto& iterableParam = forEachFunc->params[0];
+    const auto& cbParam = forEachFunc->params[1];
     const auto iterable = iterableParam.type->asIterable();
-    const auto funcName = forEachFunc->funcType->getName();
+    const auto funcName = forEachFunc->getName();
 
-    const auto ft = llvm::cast<FunctionType>(forEachFunc->funcType->getIRType(cg));
+    const auto ft = llvm::cast<FunctionType>(forEachFunc->getIRType(cg));
     const auto cbFt = llvm::cast<FunctionType>(cbParam.type->getIRType(cg));
     const auto func = cg.getFunc(funcName, ft);
     const auto entryBlock = cg.createBlock(BLOCK_ENTRY, func);

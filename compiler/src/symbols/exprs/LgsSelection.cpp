@@ -18,9 +18,13 @@ LgsFuncCall* LgsSelection::asMethodCall() const {
 
 void LgsSelection::assign(LgsCgModule& cg, LgsExpr* expr) {
     assert(!type->asVec());
-    const auto right = expr->IRValue;
+    auto right = expr->IRValue;
     if (type->isHeapAlloc) {
-        cg.moveAlloc(IRValue, right, cg.usize(34), cg.usize(23), type->sizeBytes());
+        assert(alloc);
+        const auto firstExpr = exprs.front();
+        const auto leftLevel = cg.builder.CreateExtractValue(firstExpr->alloc, 1);
+        const auto rightLevel = cg.builder.CreateExtractValue(expr->alloc, 1);
+        right = cg.moveAlloc(right, leftLevel, rightLevel, type->sizeBytes());
     }
     cg.store(right, IRValue);
 }

@@ -147,7 +147,7 @@ public:
     bool checkMock(LgsExpr* expr) const;
     Value* getIRValue(LgsValue* value);
     void addVirtuals(LgsObject* obj, Value* ptr) const;
-    void generateMapFunc(LgsFunc* mapFunc) const;
-    void generateFilterFunc(LgsFunc* filterFunc) const;
-    void generateForeachFunc(const LgsFunc* forEachFunc) const;
+    void generateMapFunc(LgsFuncType* mapFunc) const;
+    void generateFilterFunc(LgsFuncType* filterFunc) const;
+    void generateForeachFunc(LgsFuncType* forEachFunc) const;
 };

@@ -6,7 +6,6 @@
 #include <complex>
 
 Lgs_StackFrame& getTop();
-extern "C" void Lgs_Runtime_freeValue(void* ptr);
 
 extern "C" void Lgs_Runtime_init() {}
 
@@ -36,21 +35,20 @@ extern "C" void* Lgs_Runtime_allocate(const size_t size) {
     return runtime.stack.at(runtime.level).allocator.allocate(size);
 }
 
-extern "C" Lgs_Alloc Lgs_Runtime_allocate2(const size_t size) {
+extern "C" Lgs_Alloc Lgs_Runtime_allocateWithLevel(const size_t size) {
     return Lgs_Alloc{.ptr = runtime.stack.at(runtime.level).allocator.allocate(size), .level = runtime.level};
 }
 
-extern "C" void Lgs_Runtime_move(const void* left, const void* right, const size_t levelLeft, const size_t levelRight, const size_t size) {
-    std::println("{} {} {} {} {}", left, right, levelLeft, levelRight, size);
+extern "C" void* Lgs_Runtime_move(void* right, const size_t leftLevel, const size_t rightLevel, const size_t size) {
+    if (leftLevel >= rightLevel) return right;
+    auto& allocator = runtime.stack.at(leftLevel).allocator;
+    const auto newPtr = allocator.allocate(size);
+    std::memcpy(newPtr, right, size);
+    return newPtr;
 }
 
 extern "C" void* Lgs_Runtime_reallocate(void* ptr, const size_t size) {
     assert(0);
-}
-
-extern "C" void Lgs_Runtime_freeValue(void* ptr) {
-    // std::println("Freeing {} {}", ptr, runtime.level - 1);
-    std::free(ptr);
 }
 
 extern "C" void Lgs_Runtime_addDefer(const ThunkFunc funcPtr, void* ctx) {

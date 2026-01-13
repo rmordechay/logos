@@ -10,7 +10,6 @@ public:
     static constexpr auto name = "DArray";
 
     explicit LgsDArray(LgsType* baseType = nullptr) : LgsIterable(baseType) {
-        passByRef = true;
         isHeapAlloc = true;
     }
     LgsFunc* getMethod(const std::string& methodName) override;

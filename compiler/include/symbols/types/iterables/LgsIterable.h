@@ -11,12 +11,14 @@ struct CodegenMetadata;
 
 #define GET_FUNC "get"
 #define ADD_FUNC "add"
-#define MAP_FUNC "map"
-#define FILTER_FUNC "filter"
-#define FOREACH_FUNC "forEach"
 #define LEN_FUNC "len"
 #define IS_EMPTY_FUNC "isEmpty"
 #define NOT_EMPTY_FUNC "isNotEmpty"
+#define FIRST_ELEMENT_FUNC "first"
+#define LAST_ELEMENT_FUNC "last"
+#define MAP_FUNC "map"
+#define FILTER_FUNC "filter"
+#define FOREACH_FUNC "forEach"
 
 class LgsIterable : public LgsType {
 public:

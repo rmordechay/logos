@@ -157,6 +157,5 @@ public:
     void addError(const LgsBaseMsg& lgsErr, const LgsLocation& location, const std::vector<std::string>& args = {});
     void addErrorIfSuccessful(const LgsBaseMsg& lgsErr, const LgsLocation& location, const std::vector<std::string>& args);
     void addRTType(LgsType* type) const;
-    void deleteRTType(LgsType* type) const;
-    void addGenerics(LgsExpr* expr) const;
+    void addGenerics(LgsType* type) const;
 };

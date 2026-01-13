@@ -372,9 +372,9 @@ bool LgsApp::generateRTTTypes() {
 }
 
 bool LgsApp::generateGenerics() {
-    std::unordered_map<std::string, LgsExpr*> generics;
+    std::unordered_map<std::string, LgsType*> generics;
     for (const auto srcFile : srcFiles) {
-        generics.merge(srcFile->symbolTable.generics);
+        generics.merge(srcFile->symbolTable.generics2);
     }
     if (generics.empty()) return true;
     const auto file = new LgsFile("generics");
@@ -382,17 +382,17 @@ bool LgsApp::generateGenerics() {
     file->cg.mode = CG_MODE_GENERICS;
     const LgsCodeGen cg(file, configs, globals, paths);
     for (auto& [_, genericExpr] : generics) {
-        if (const auto dArr = genericExpr->type->asDArray()) {
+        if (const auto dArr = genericExpr->asDArray()) {
             dArr->generateAddFunc(cg.cg);
-        } else if (const auto map = genericExpr->type->asMap()) {
+        } else if (const auto map = genericExpr->asMap()) {
             map->generateGetFunc(cg.cg);
             map->generateAddFunc(cg.cg);
-        } else if (const auto func = genericExpr->asFunc()) {
-            if (func->funcType->name == MAP_FUNC) {
+        } else if (const auto func = genericExpr->asFuncType()) {
+            if (func->name == MAP_FUNC) {
                 cg.generateMapFunc(func);
-            } else if (func->funcType->name == FILTER_FUNC) {
+            } else if (func->name == FILTER_FUNC) {
                 cg.generateFilterFunc(func);
-            } else if (func->funcType->name == FOREACH_FUNC) {
+            } else if (func->name == FOREACH_FUNC) {
                 cg.generateForeachFunc(func);
             } else {
                 assert(0);

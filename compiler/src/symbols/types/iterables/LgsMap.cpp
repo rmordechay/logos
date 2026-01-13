@@ -357,7 +357,8 @@ Function* LgsMap::generateAddFunc(LgsCgModule& cg) {
         const auto entryPtr = cg.builder.CreateInBoundsGEP(cg.ptrTy(), newEntries, {hash});
         cg.store(entry, entryPtr);
     });
-    cg.freeValue(entries);
+    // TODO check if old entries needs to be freed
+    // cg.freeValue(entries);
     cg.store(newEntries, entriesField);
     cg.store(newCap, capField);
     cg.branchAndStartBlock(checkSlotBlock);
