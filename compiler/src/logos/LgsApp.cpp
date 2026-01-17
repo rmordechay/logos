@@ -341,7 +341,6 @@ bool LgsApp::resolveGlobals() {
 bool LgsApp::generateRTTTypes() {
     rttTypeModule.setupModule("rttypes");
     rttTypeModule.mode = CG_MODE_RTTYPES;
-    const auto printFunc = dynamic_cast<LgsPrint*>(globals.table.getSymbol("print")->func);
 
     // Globals
     for (const auto type : globals.table.rttTypes) {

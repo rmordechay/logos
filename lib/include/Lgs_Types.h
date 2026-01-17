@@ -97,6 +97,7 @@ struct Lgs_Nullable {
 
 struct Lgs_TypeInfo {
     size_t size;
+    bool isHeap;
     Lgs_TypeKind kind;
     union {
         Lgs_Object obj;

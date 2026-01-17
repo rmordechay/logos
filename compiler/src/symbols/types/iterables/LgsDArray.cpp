@@ -46,7 +46,7 @@ Type* LgsDArray::getIRType(LgsCgModule& cg) {
 Constant* LgsDArray::getRTType(LgsCgModule& cg) {
     const auto dArrName = getName();
     const auto sv = cg.getRTTExtraStruct(dArrName, {cg.ptrTy()}, {baseType->getRTType(cg)});
-    return cg.getRTTypeInfo(dArrName, sizeBytes(), RTT_DARRAY, sv);
+    return cg.getRTTypeInfo(dArrName, sizeBytes(), RTT_DARRAY, sv, true);
 }
 
 std::string LgsDArray::getBaseName() {
@@ -141,7 +141,7 @@ Value* LgsDArray::getIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* inde
 
 void LgsDArray::addIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index, LgsExpr* value) {
     if (index) assert(0);
-    cg.builder.CreateCall(generateAddFunc(cg), {iterable->IRValue, value->IRValue, nullptr});
+    cg.builder.CreateCall(generateAddFunc(cg), {iterable->IRValue, value->IRValue, cg.usize(0)});
 }
 
 Function* LgsDArray::generateAddFunc(LgsCgModule& cg) {

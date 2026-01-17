@@ -31,7 +31,7 @@ static std::string formatElement(const Lgs_TypeInfo* rtt, void* value) {
         for (size_t i = 0; i < fieldsCount; ++i) {
             const auto fieldType = rtt->obj.fieldTypes[i];
             void* fieldPtr = static_cast<char*>(value) + rtt->obj.fieldOffsets[i];
-            if (fieldType->kind == RTT_OBJECT) {
+            if (fieldType->isHeap) {
                 fieldPtr = *static_cast<void**>(fieldPtr);
             }
             str << rtt->obj.fieldNames[i] << '=';
@@ -43,13 +43,15 @@ static std::string formatElement(const Lgs_TypeInfo* rtt, void* value) {
     }
     case RTT_SET:
     case RTT_DARRAY: {
-        std::println("{}", value);
         const auto dArrExpr = static_cast<Lgs_ArrayExpr*>(value);
         assert(dArrExpr->length <= LGS_DARRAY_MAX_LENGTH);
         const auto& [baseType] = rtt->dArray;
         str << "[";
         for (size_t i = 0; i < dArrExpr->length; ++i) {
-            const auto element = dArrExpr->data + baseType->size * i;
+            void* element = dArrExpr->data + baseType->size * i;
+            if (baseType->isHeap) {
+                element = *static_cast<void**>(element);
+            }
             str << formatElement(baseType, element);
             if (i < dArrExpr->length - 1) str << ", ";
         }

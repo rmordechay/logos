@@ -63,7 +63,7 @@ extern "C" void Lgs_Runtime_move(void* left, void* right, const Lgs_TypeInfo* ty
             const auto fieldOffset = type->obj.fieldOffsets[i];
             void* leftFieldPtr = static_cast<char*>(left) + fieldOffset;
             void* rightFieldPtr = static_cast<char*>(right) + fieldOffset;
-            if (fieldType->kind == RTT_OBJECT || fieldType->kind == RTT_DARRAY || fieldType->kind == RTT_MAP) {
+            if (fieldType->isHeap) {
                 void* l = *static_cast<void**>(leftFieldPtr);
                 void* r = *static_cast<void**>(rightFieldPtr);
                 Lgs_Runtime_move(l, r, fieldType);

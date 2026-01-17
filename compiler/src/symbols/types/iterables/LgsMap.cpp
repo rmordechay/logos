@@ -52,7 +52,7 @@ Constant* LgsMap::getRTType(LgsCgModule& cg) {
     const auto mapName = getName();
     const auto args = {pairType->key->getRTType(cg), pairType->value->getRTType(cg)};
     const auto sv = cg.getRTTExtraStruct(mapName, {cg.ptrTy(), cg.ptrTy()}, args);
-    return cg.getRTTypeInfo(mapName, sizeBytes(), RTT_MAP, sv);
+    return cg.getRTTypeInfo(mapName, sizeBytes(), RTT_MAP, sv, true);
 }
 
 std::string LgsMap::getBaseName() {

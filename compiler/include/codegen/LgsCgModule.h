@@ -126,7 +126,7 @@ public:
     void callMemCpy(Value* dest, Value* src, Value* size);
 
     // Runtime funcs
-    Constant* getRTTypeInfo(const std::string& name, size_t size, Lgs_TypeKind kind, Constant* extra);
+    Constant* getRTTypeInfo(const std::string& name, size_t size, Lgs_TypeKind kind, Constant* extra, bool isHeap = false);
     Constant* getRTTExtraStruct(const std::string& name, const std::vector<Type*>& fields, const std::vector<Constant*>& args);
     StructType* getRTTBaseStruct();
 

@@ -56,8 +56,9 @@ Type* LgsObject::getIRType(LgsCgModule& cg) {
 }
 
 Constant* LgsObject::getRTType(LgsCgModule& cg) {
-    std::unordered_set<std::string> fieldsAsValue2;
-    checkRecursiveFields(fieldsAsValue2);
+    // TODO think about recursive fields in rtt types
+    std::unordered_set<std::string> nestedObjectNames;
+    checkRecursiveFields(nestedObjectNames);
     const auto objName = getName();
     std::vector<LgsValue*> fieldsAsValue;
     const auto dl = cg.IRModule->getDataLayout();
@@ -83,7 +84,7 @@ Constant* LgsObject::getRTType(LgsCgModule& cg) {
     const auto objNameIR = llvm::dyn_cast<Constant>(cg.getString(objName));
     const std::vector<Constant*> args = {objNameIR, cg.usize(fields.size()), offsetsArrGlobal, hashesArr, typesArr};
     const auto sv = cg.getRTTExtraStruct(objName, fieldTypes, args);
-    return cg.getRTTypeInfo(objName, dl.getTypeAllocSize(getIRType(cg)), RTT_OBJECT, sv);
+    return cg.getRTTypeInfo(objName, dl.getTypeAllocSize(getIRType(cg)), RTT_OBJECT, sv, true);
 }
 
 size_t LgsObject::sizeBytes() {
@@ -130,13 +131,12 @@ LgsType* LgsObject::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     assert(0);
 }
 
-void LgsObject::checkRecursiveFields(std::unordered_set<std::string>& fieldsAsValue) const {
-    // TODO think about recursive fields in rtt types
-    fieldsAsValue.insert(name);
+void LgsObject::checkRecursiveFields(std::unordered_set<std::string>& nestedObjectNames) const {
     for (const auto field : fields) {
         if (const auto innerObj = field->type->asObject()) {
-            assert(!fieldsAsValue.contains(innerObj->name));
-            innerObj->checkRecursiveFields(fieldsAsValue);
+            assert(!nestedObjectNames.contains(innerObj->name));
+            nestedObjectNames.insert(innerObj->name);
+            innerObj->checkRecursiveFields(nestedObjectNames);
         }
     }
 }

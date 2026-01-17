@@ -44,7 +44,7 @@ public:
     Value* getIRZeroValue(LgsCgModule& cg, Value* pointee = nullptr) override;
     bool canCastTo(LgsType* other) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
-    void checkRecursiveFields(std::unordered_set<std::string>& fieldsAsValue) const;
+    void checkRecursiveFields(std::unordered_set<std::string>& nestedObjectNames) const;
     std::string fmtStr() const override;
     DIType* getDebugType(LgsCgModule& cg) override;
     ~LgsObject() override;
