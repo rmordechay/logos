@@ -926,6 +926,7 @@ void LgsSema::visitVariable(LgsVariable* variable) {
     switch (symbol->symbolType) {
     case VAR_DEC: {
         variable->ref.varDec = symbol->varDec;
+        variable->isMutable = !symbol->varDec->isConst;
         variable->setType(symbol->varDec->type);
         break;
     }
@@ -953,7 +954,6 @@ void LgsSema::visitVariable(LgsVariable* variable) {
     }
     case FIELD: {
         variable->ref.field = symbol->field;
-        variable->isMutable = !symbol->field->isConst;
         variable->setType(symbol->field->type);
         break;
     }
@@ -1302,7 +1302,7 @@ void LgsSema::visitInstance(LgsInstance* instance) {
 
     // Missing required fields
     for (const auto& field : instance->obj->fields) {
-        if (field->isConst && !instance->args.contains(field->name)) {
+        if (!instance->args.contains(field->name)) {
             addError(E10029, field->location, {field->name});
         }
     }

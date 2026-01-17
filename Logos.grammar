@@ -49,7 +49,7 @@ subtype:
     ;
 
 field:
-        OWNER? VISIBILITY? CONST? IDENTIFIER COLON type (EQUAL expr)?
+        VISIBILITY? CONST? IDENTIFIER COLON type (EQUAL expr)?
     ;
 
 interfaceField:
@@ -148,11 +148,11 @@ assignment:
     ;
 
 explicitVarDec:
-        OWNER? CONST? IDENTIFIER COLON type (EQUAL expr)?
+        CONST? IDENTIFIER COLON type (EQUAL expr)?
     ;
 
 implicitVarDec:
-        OWNER? CONST? IDENTIFIER EQUAL expr QUEST_MARK?
+        CONST? IDENTIFIER EQUAL expr QUEST_MARK?
     ;
 
 ifStatement:
@@ -463,7 +463,6 @@ ENUM: 'enum';
 GO: 'go';
 DEFER: 'defer';
 IO: 'io';
-OWNER: 'owner';
 AND: 'and';
 OR: 'or';
 NOT: 'not';

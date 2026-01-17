@@ -460,19 +460,11 @@ LgsInterface* LgsParser::parseInterfaceBody(const LgsToken& tokenName) {
 
 LgsField* LgsParser::parseField(const size_t fieldPosition) {
     const auto oldIndex = currentIndex;
-    std::optional<bool> isConst = std::nullopt;
-    std::optional<bool> isOwner = std::nullopt;
     std::optional<bool> isPublic = std::nullopt;
 
     // Qualifiers
     while (true) {
-        if (matchAndConsume(T_OWNER)) {
-            if (isOwner) addParsingError();
-            isOwner = true;
-        } else if (matchAndConsume(T_CONST)) {
-            if (isConst) addParsingError();
-            isConst = true;
-        } else if (matchAndConsume(T_PUBLIC)) {
+        if (matchAndConsume(T_PUBLIC)) {
             if (isPublic) addParsingError();
             isPublic = true;
         } else {
@@ -494,7 +486,6 @@ LgsField* LgsParser::parseField(const size_t fieldPosition) {
     setLocation(field->location, &nameToken, &currentToken);
     field->setType(type);
     field->position = fieldPosition;
-    if (isConst.has_value()) field->isConst = isConst.value();
     if (isPublic.has_value()) field->isPublic = isPublic.value();
     return field;
 }
@@ -885,13 +876,9 @@ LgsStmtsBlock* LgsParser::parseStmtsBlock(const bool withSingleStmt) {
 
 LgsVarDec* LgsParser::parseVarDec() {
     const auto oldIndex = currentIndex;
-    auto isConst = false;
-    auto isOwner = false;
+    auto isConst = true;
     while (true) {
-        if (matchAndConsume(T_OWNER)) {
-            if (isOwner) addParsingError();
-            isOwner = true;
-        } else if (matchAndConsume(T_CONST)) {
+        if (matchAndConsume(T_CONST)) {
             if (isConst) addParsingError();
             isConst = true;
         } else {
@@ -900,7 +887,7 @@ LgsVarDec* LgsParser::parseVarDec() {
     }
 
     const auto nameToken = currentToken;
-    if (isConst || isOwner) {
+    if (isConst) {
         mustMatch(T_IDENTIFIER);
     } else if (!matchOrReset(T_IDENTIFIER, oldIndex)) {
         return nullptr;

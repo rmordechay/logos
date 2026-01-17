@@ -56,7 +56,8 @@ LgsType* LgsStr::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     }
     case IN: {
         if (equals(rightType)) return &LGS_BOOL;
-        if (rightType->asIterable() && canCastTo(rightType->asIterable()->baseType)) return &LGS_BOOL;
+        const auto rightIterable = rightType->asIterable();
+        if (rightIterable && canCastTo(rightIterable->baseType)) return &LGS_BOOL;
     }
     case EQ: {
         if (equals(rightType)) return &LGS_BOOL;

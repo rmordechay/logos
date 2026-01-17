@@ -266,7 +266,6 @@ TEST_CASE("SemaError10015B") {
         obj2.obj1 := obj1
     }
     main() {
-        owner obj2 = Obj2{}
         func(obj2.obj1)
     }
     )";

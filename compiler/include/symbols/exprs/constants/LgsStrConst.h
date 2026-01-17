@@ -1,7 +1,6 @@
 #pragma once
 #include "LgsIntConst.h"
 #include "types/iterables/LgsStr.h"
-#include "types/primitives/LgsInt.h"
 
 class LgsStrConst final : public LgsExpr {
 public:
@@ -10,10 +9,10 @@ public:
     std::vector<LgsExpr*> parts;
 
     explicit LgsStrConst(const std::string& v) : value(v) {
-        const auto lgsStr = new LgsStr();
-        lgsStr->isStatic = true;
+        const auto str = new LgsStr();
+        str->isStatic = true;
         isMutable = false;
-        type = lgsStr;
+        type = str;
     }
     LgsExpr* castExplicitly(LgsType* toType) override;
     Value* loadIR(LgsCgModule& cg) override;
