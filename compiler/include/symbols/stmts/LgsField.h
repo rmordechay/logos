@@ -14,7 +14,6 @@ public:
     unsigned position = 0;
     LgsType* type = nullptr;
     LgsExpr* expr = nullptr;
-    bool isConst = false;
     bool isPublic = false;
     bool isVirtual = false;
     bool isOptional = false;

@@ -96,7 +96,7 @@ public:
     Value* callHash(Value* arg);
     void addToVTable(Value* instance, Value* name, Value* ptr);
     Value* getFromVTable(Value* instance, Value* name);
-    Value* heapAlloc(Value* size);
+    Value* heapAlloc(Value* size, Value* levelsAbove = nullptr);
     Value* moveAlloc(Value* leftPtr, Value* rightPtr, Constant* type);
     Value* moveElement(Value* iterable, Value* element, Constant* type);
     Value* reallocate(Value* ptr, Value* size, Value* level);

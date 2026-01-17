@@ -876,18 +876,18 @@ LgsStmtsBlock* LgsParser::parseStmtsBlock(const bool withSingleStmt) {
 
 LgsVarDec* LgsParser::parseVarDec() {
     const auto oldIndex = currentIndex;
-    auto isConst = true;
+    auto isMut = false;
     while (true) {
-        if (matchAndConsume(T_CONST)) {
-            if (isConst) addParsingError();
-            isConst = true;
+        if (matchAndConsume(T_MUT)) {
+            if (isMut) addParsingError();
+            isMut = true;
         } else {
             break;
         }
     }
 
     const auto nameToken = currentToken;
-    if (isConst) {
+    if (isMut) {
         mustMatch(T_IDENTIFIER);
     } else if (!matchOrReset(T_IDENTIFIER, oldIndex)) {
         return nullptr;
@@ -911,7 +911,7 @@ LgsVarDec* LgsParser::parseVarDec() {
 
     const auto varDec = new LgsVarDec(nameToken.lexeme, type, expr);
     setLocation(varDec->location, &nameToken, &currentToken);
-    varDec->isConst = isConst;
+    varDec->isMutable = isMut;
     return varDec;
 }
 
@@ -1260,7 +1260,6 @@ LgsIOStmt* LgsParser::parseIOStmt() {
     ioStmt->location = firstExpr->location;
     ioStmt->varDec = new LgsVarDec("", nullptr);
     ioStmt->varDec->location = ioStmt->location;
-    ioStmt->varDec->isConst = true;
     if (const auto var = firstExpr->asVariable()) {
         ioStmt->varDec->name = var->name;
         if (matchAndConsume(T_COLON)) {

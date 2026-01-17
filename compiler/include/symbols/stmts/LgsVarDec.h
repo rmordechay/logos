@@ -12,7 +12,7 @@ public:
     LgsType* type = nullptr;
     LgsExpr* expr = nullptr;
     bool isNullable = false;
-    bool isConst = true;
+    bool isMutable = false;
 
     explicit LgsVarDec(const std::string& name, LgsExpr* expr) : name(name), expr(expr) {}
     LgsVarDec(const std::string& name, LgsType* type, LgsExpr* expr) : name(name), type(type), expr(expr) {}

@@ -24,10 +24,17 @@
 #include "exprs/LgsTypeExpr.h"
 #include "funcs/LgsFunc.h"
 #include "loops/LgsMetaVar.h"
+#include "stmts/LgsVarDec.h"
 
 std::optional<int64_t> LgsExpr::getConstInt() {
     if (const auto intConst = asIntConst()) {
         return intConst->value;
+    }
+    if (const auto var = asVariable()) {
+        if (var->isMutable) return std::nullopt;
+        if (var->ref.symbolType == VAR_DEC) {
+            return var->ref.varDec->expr->getConstInt();
+        }
     }
     if (const auto binExpr = asBinExpr()) {
         if (binExpr->isMutable) return std::nullopt;
@@ -61,6 +68,12 @@ std::optional<double_t> LgsExpr::getConstFloat() {
     if (const auto floatConst = asFloatConst()) {
         return floatConst->value;
     }
+    if (const auto var = asVariable()) {
+        if (var->isMutable) return std::nullopt;
+        if (var->ref.symbolType == VAR_DEC) {
+            return var->ref.varDec->expr->getConstFloat();
+        }
+    }
     if (const auto binExpr = asBinExpr()) {
         if (binExpr->isMutable) return std::nullopt;
         const auto const1 = binExpr->left->getConstFloat();
@@ -85,6 +98,12 @@ std::optional<std::string> LgsExpr::getConstStr() {
     }
     if (const auto charConst = asCharConst()) {
         return std::to_string(charConst->value - '0');
+    }
+    if (const auto var = asVariable()) {
+        if (var->isMutable) return std::nullopt;
+        if (var->ref.symbolType == VAR_DEC) {
+            return var->ref.varDec->expr->getConstStr();
+        }
     }
     if (const auto binExpr = asBinExpr()) {
         if (binExpr->isMutable || binExpr->op.opType != ADD) return std::nullopt;

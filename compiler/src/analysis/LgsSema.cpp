@@ -76,7 +76,7 @@ void LgsSema::analyse() {
 
 void LgsSema::visitMainFile(LgsMainFile* mainFile) {
     for (const auto varDec : mainFile->varDecs) {
-        if (!varDec->isConst) {
+        if (!varDec->isMutable) {
             addError(E10100, varDec->location, {varDec->name});
         }
         visitExpr(varDec->expr);
@@ -926,7 +926,7 @@ void LgsSema::visitVariable(LgsVariable* variable) {
     switch (symbol->symbolType) {
     case VAR_DEC: {
         variable->ref.varDec = symbol->varDec;
-        variable->isMutable = !symbol->varDec->isConst;
+        variable->isMutable = symbol->varDec->isMutable;
         variable->setType(symbol->varDec->type);
         break;
     }

@@ -39,13 +39,11 @@ Value* LgsSArray::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
     const auto arrSize = length->getConstInt().value();
     const auto arr = pointee ? pointee : cg.builder.CreateAlloca(ty);
     LgsIntConst index(&LGS_INT, 0);
-    const auto tempExpr = baseType->getZeroValue();
     for (int64_t i = 0; i < arrSize; ++i) {
         index.IRValue = cg.i32(i);
-        tempExpr->IRValue = baseType->getIRZeroValue(cg);
         const std::vector<Value*> indices = {cg.i32Zero(), cg.i32(i)};
         const auto gep = cg.builder.CreateInBoundsGEP(getIRType(cg), arr, indices);
-        cg.store(baseType->getIRZeroValue(cg), gep);
+        cg.store(baseType->getIRZeroValue(cg, arr), gep);
     }
     return arr;
 }

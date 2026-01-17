@@ -780,7 +780,7 @@ void LgsCodeGen::visitStaticArray(LgsArrayExpr* arrayExpr) const {
     LgsIntConst index(&LGS_INT, 0);
     for (size_t i = arrayExpr->elements.size(); i < arrSize; ++i) {
         index.IRValue = cg.i32(i);
-        tempExpr->IRValue = sArr->baseType->getIRZeroValue(cg);
+        tempExpr->IRValue = sArr->baseType->getIRZeroValue(cg, arrayExpr->IRValue);
         sArr->addIRElement(cg, arrayExpr, &index, tempExpr);
     }
     freeExpr(tempExpr);
@@ -1376,7 +1376,7 @@ void LgsCodeGen::generateMapFunc(LgsFuncType* mapFunc) const {
     const auto tempIndex = iterable->getIndexType()->getZeroValue();
     const auto tempValue = iterable->baseType->getZeroValue();
     tempIter->IRValue = iter;
-    retArr.IRValue = iterable->getIRZeroValue(cg, nullptr);
+    retArr.IRValue = iterable->getIRZeroValue(cg);
     const auto len = iterable->lenIR(cg, iter);
 
     cg.loop(len, [&](Value* iValue, BasicBlock*) {
@@ -1417,7 +1417,7 @@ void LgsCodeGen::generateFilterFunc(LgsFuncType* filterFunc) const {
     const auto tempIndex = iterable->getIndexType()->getZeroValue();
     const auto tempValue = iterable->baseType->getZeroValue();
     tempIter->IRValue = iter;
-    retArr.IRValue = iterable->getIRZeroValue(cg, nullptr);
+    retArr.IRValue = iterable->getIRZeroValue(cg);
     const auto len = iterable->lenIR(cg, iter);
 
     cg.loop(len, [&](Value* iValue, BasicBlock*) {

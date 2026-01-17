@@ -44,7 +44,7 @@ void LgsVarDec::setDebugValue(LgsCgModule& cg) {
 
 void LgsVarDec::hashNode(size_t& oldHash) {
     hashNodeInt(oldHash, isNullable);
-    hashNodeInt(oldHash, isConst);
+    hashNodeInt(oldHash, isMutable);
     hashNodeString(oldHash, name);
     if (type) type->hashNode(oldHash);
     if (expr) expr->hashNode(oldHash);

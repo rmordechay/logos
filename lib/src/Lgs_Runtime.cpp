@@ -35,8 +35,9 @@ extern "C" void* Lgs_Runtime_moveReturnValue(const void* rv, const size_t rvSize
     return newPtr;
 }
 
-extern "C" void* Lgs_Runtime_allocate(const size_t size) {
-    return runtime.stack.at(runtime.level).allocator.allocate(size);
+extern "C" void* Lgs_Runtime_allocate(const size_t size, const size_t levelsAbove) {
+    assert(runtime.level - levelsAbove > 0);
+    return runtime.stack.at(runtime.level - levelsAbove).allocator.allocate(size);
 }
 
 extern "C" void Lgs_Runtime_move(void* left, void* right, const Lgs_TypeInfo* type) {
