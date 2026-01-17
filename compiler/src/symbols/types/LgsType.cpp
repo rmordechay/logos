@@ -331,231 +331,179 @@ LgsType::~LgsType() {
     fields.clear();
 }
 
-LgsType* getBiggestIntType(const std::vector<LgsExpr*>& args) {
-    if (args.empty()) return nullptr;
-    LgsType* inferredType = nullptr;
-    uint8_t highestPrecedence = 0;
-    for (size_t i = 0; i < args.size(); ++i) {
-        const auto& arg = args[i];
-        if (!arg->type) return nullptr;
-        LgsType* currentType = nullptr;
-        if (arg->type->isScalar()) {
-            currentType = arg->type;
-        } else if (const auto iter = arg->type->asIterable()) {
-            currentType = iter->baseType;
-        }
-        if (!currentType || !currentType->isScalar()) return nullptr;
-        const auto precedence = numberPrecedences[currentType->getName()];
-        if (highestPrecedence >= precedence) continue;
-        inferredType = currentType;
-        highestPrecedence = precedence;
-    }
-    assert(inferredType);
-    return inferredType;
+Value* exprEqNull(LgsCgModule& cg, Value* expr, LgsType* type) {
+    if (type->passByRef) return cg.builder.CreateIsNull(expr);
+    return cg.builder.CreateNot(type->asNullable()->getIsSet(cg, expr));
 }
 
-Value* exprEqNull(LgsCgModule& cg, const LgsExpr* expr) {
-    const auto nullable = expr->type->asNullable();
-    if (expr->type->passByRef) return cg.builder.CreateIsNull(expr->IRValue);
-    return cg.builder.CreateNot(nullable->getIsSet(cg, expr->IRValue));
+Value* exprNeNull(LgsCgModule& cg, Value* expr, LgsType* type) {
+    if (type->passByRef) return cg.builder.CreateIsNotNull(expr);
+    return type->asNullable()->getIsSet(cg, expr);
 }
 
-Value* exprNeNull(LgsCgModule& cg, const LgsExpr* expr) {
-    const auto nullable = expr->type->asNullable();
-    if (expr->type->passByRef) return cg.builder.CreateIsNotNull(expr->IRValue);
-    return nullable->getIsSet(cg, expr->IRValue);
-}
-
-Value* eqComplex(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right) {
-    const auto l = cg.load(left->type->getIRType(cg), left->IRValue);
-    const auto r = cg.load(right->type->getIRType(cg), right->IRValue);
-    const auto lReal = cg.builder.CreateExtractValue(l, 0);
-    const auto lImag = cg.builder.CreateExtractValue(l, 1);
-    const auto rReal = cg.builder.CreateExtractValue(r, 0);
-    const auto rImag = cg.builder.CreateExtractValue(r, 1);
-    const auto realEq = cg.builder.CreateICmpEQ(lReal, rReal);
-    const auto imagEq = cg.builder.CreateICmpEQ(lImag, rImag);
-    return cg.builder.CreateAnd(realEq, imagEq);
-}
-
-Value* neComplex(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right) {
-    const auto l = cg.load(left->type->getIRType(cg), left->IRValue);
-    const auto r = cg.load(right->type->getIRType(cg), right->IRValue);
-    const auto lReal = cg.builder.CreateExtractValue(l, 0);
-    const auto lImag = cg.builder.CreateExtractValue(l, 1);
-    const auto rReal = cg.builder.CreateExtractValue(r, 0);
-    const auto rImag = cg.builder.CreateExtractValue(r, 1);
-    const auto realNe = cg.builder.CreateICmpNE(lReal, rReal);
-    const auto imagNe = cg.builder.CreateICmpNE(lImag, rImag);
-    return cg.builder.CreateOr(realNe, imagNe);
-}
-
-Value* eqIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    if (left->isNull && right->isNull) return cg.true_();
-    if (left->isNull) return exprEqNull(cg, right);
-    if (right->isNull) return exprEqNull(cg, left);
-    if (left->type->isInt && right->type->isInt) {
-        const auto l = cg.extendToSize(left->loadIR(cg));
-        const auto r = cg.extendToSize(right->loadIR(cg));
+Value* eqIR(LgsCgModule& cg, Value* left, Value* right, LgsType* leftType, LgsType* rightType) {
+    if (isa<ConstantPointerNull>(left) && isa<ConstantPointerNull>(right)) return cg.true_();
+    if (isa<ConstantPointerNull>(left)) return exprEqNull(cg, right, rightType);
+    if (isa<ConstantPointerNull>(right)) return exprEqNull(cg, left, leftType);
+    if (leftType->isInt && rightType->isInt) {
+        const auto type = getBiggestIntType({leftType, rightType})->getIRType(cg);
+        left = left->getType()->isPointerTy() ? cg.load(leftType->getIRType(cg), left) : left;
+        right = right->getType()->isPointerTy() ? cg.load(rightType->getIRType(cg), right) : right;
+        const auto l = cg.builder.CreateZExt(left, type);
+        const auto r = cg.builder.CreateZExt(right, type);
         return cg.builder.CreateICmpEQ(l, r);
     }
-    if (left->type->isFloat || right->type->isFloat) {
-        const auto [l, r] = loadPairAsFloat(cg, left, right);
+    if (leftType->isFloat || rightType->isFloat) {
+        const auto [l, r] = loadPairAsFloat(cg, left, right, leftType, rightType);
         return cg.builder.CreateFCmpOEQ(l, r);
     }
-    if (left->type->asComplex() && right->type->asComplex()) {
-        return eqComplex(cg, left, right);
+    if (leftType->asComplex() && rightType->asComplex()) {
+        assert(0);
     }
-    if (left->type->asStr() && right->type->asStr()) {
-        const auto rt = cg.callFunc("strcmp", cg.i32Ty(), {cg.ptrTy(), cg.ptrTy()}, {left->IRValue, right->IRValue});
+    if (leftType->asStr() && rightType->asStr()) {
+        const auto rt = cg.callFunc("strcmp", cg.i32Ty(), {cg.ptrTy(), cg.ptrTy()}, {left, right});
         return cg.builder.CreateICmpEQ(rt, cg.i32Zero());
     }
     assert(0);
 }
 
-Value* neIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    if (left->isNull && right->isNull) return cg.false_();
-    if (left->isNull) return exprNeNull(cg, right);
-    if (right->isNull) return exprNeNull(cg, left);
-    if (left->type->isInt && left->type->isInt) {
-        return cg.builder.CreateICmpEQ(left->loadIR(cg), right->loadIR(cg));
+Value* neIR(LgsCgModule& cg, Value* left, Value* right, LgsType* leftType, LgsType* rightType) {
+    if (isa<ConstantPointerNull>(left) && isa<ConstantPointerNull>(right)) return cg.false_();
+    if (isa<ConstantPointerNull>(left)) return exprNeNull(cg, right, rightType);
+    if (isa<ConstantPointerNull>(right)) return exprNeNull(cg, left, leftType);
+    if (leftType->isInt && rightType->isInt) {
+        const auto type = getBiggestIntType({leftType, rightType})->getIRType(cg);
+        left = left->getType()->isPointerTy() ? cg.load(leftType->getIRType(cg), left) : left;
+        right = right->getType()->isPointerTy() ? cg.load(rightType->getIRType(cg), right) : right;
+        const auto l = cg.builder.CreateZExt(left, type);
+        const auto r = cg.builder.CreateZExt(right, type);
+        return cg.builder.CreateICmpNE(l, r);
     }
-    if (left->type->isFloat && left->type->isFloat) {
-        return cg.builder.CreateFCmpOEQ(left->loadIR(cg), right->loadIR(cg));
+    if (leftType->isFloat && rightType->isFloat) {
+        return cg.builder.CreateFCmpONE(left, right);
     }
-    if (left->type->asComplex() && right->type->asComplex()) {
-        return neComplex(cg, left, right);
+    if (leftType->asComplex() && rightType->asComplex()) {
+        assert(0);
     }
-    if (left->type->asStr() && right->type->asStr()) {
-        const auto rt = cg.callFunc("strcmp", cg.i32Ty(), {cg.ptrTy(), cg.ptrTy()}, {left->IRValue, right->IRValue});
+    if (leftType->asStr() && rightType->asStr()) {
+        const auto rt = cg.callFunc("strcmp", cg.i32Ty(), {cg.ptrTy(), cg.ptrTy()}, {left, right});
         return cg.builder.CreateICmpNE(rt, cg.i32Zero());
     }
     assert(0);
 }
 
-Value* ltIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    if (left->type->isUnsinged && right->type->isUnsinged) {
-        return cg.builder.CreateICmpULT(left->loadIR(cg), right->loadIR(cg));
+Value* ltIR(LgsCgModule& cg, Value* left, Value* right, LgsType* leftType, LgsType* rightType) {
+    if (leftType->isUnsinged && rightType->isUnsinged) {
+        return cg.builder.CreateICmpULT(left, right);
     }
-    if (left->type->isInt && right->type->isInt) {
-        return cg.builder.CreateICmpSLT(left->loadIR(cg), right->loadIR(cg));
+    if (leftType->isInt && rightType->isInt) {
+        return cg.builder.CreateICmpSLT(left, right);
     }
-    if (left->type->isFloat || right->type->isFloat) {
-        const auto [l, r] = loadPairAsFloat(cg, left, right);
+    if (leftType->isFloat || rightType->isFloat) {
+        auto [l, r] = loadPairAsFloat(cg, left, right, leftType, rightType);
         return cg.builder.CreateFCmpOLT(l, r);
     }
     assert(0);
 }
 
-Value* gtIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    if (left->type->isUnsinged && right->type->isUnsinged) {
-        return cg.builder.CreateICmpUGT(left->loadIR(cg), right->loadIR(cg));
+Value* gtIR(LgsCgModule& cg, Value* left, Value* right, LgsType* leftType, LgsType* rightType) {
+    if (leftType->isUnsinged && rightType->isUnsinged) {
+        return cg.builder.CreateICmpUGT(left, right);
     }
-    if (left->type->isInt && right->type->isInt) {
-        return cg.builder.CreateICmpSGT(left->loadIR(cg), right->loadIR(cg));
+    if (leftType->isInt && rightType->isInt) {
+        return cg.builder.CreateICmpSGT(left, right);
     }
-    if (left->type->isFloat || right->type->isFloat) {
-        const auto [l, r] = loadPairAsFloat(cg, left, right);
+    if (leftType->isFloat || rightType->isFloat) {
+        auto [l, r] = loadPairAsFloat(cg, left, right, leftType, rightType);
         return cg.builder.CreateFCmpOGT(l, r);
     }
     assert(0);
 }
 
-Value* geIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    if (left->type->isUnsinged && right->type->isUnsinged) {
-        return cg.builder.CreateICmpUGE(left->loadIR(cg), right->loadIR(cg));
+Value* geIR(LgsCgModule& cg, Value* left, Value* right, LgsType* leftType, LgsType* rightType) {
+    if (leftType->isUnsinged && rightType->isUnsinged) {
+        return cg.builder.CreateICmpUGE(left, right);
     }
-    if (left->type->isInt && right->type->isInt) {
-        return cg.builder.CreateICmpSGE(left->loadIR(cg), right->loadIR(cg));
+    if (leftType->isInt && rightType->isInt) {
+        return cg.builder.CreateICmpSGE(left, right);
     }
-    if (left->type->isFloat || right->type->isFloat) {
-        const auto [l, r] = loadPairAsFloat(cg, left, right);
+    if (leftType->isFloat || rightType->isFloat) {
+        auto [l, r] = loadPairAsFloat(cg, left, right, leftType, rightType);
         return cg.builder.CreateFCmpOGE(l, r);
     }
     assert(0);
 }
 
-Value* leIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    if (left->type->isUnsinged && right->type->isUnsinged) {
-        return cg.builder.CreateICmpULE(left->loadIR(cg), right->loadIR(cg));
+Value* leIR(LgsCgModule& cg, Value* left, Value* right, LgsType* leftType, LgsType* rightType) {
+    if (leftType->isUnsinged && rightType->isUnsinged) {
+        return cg.builder.CreateICmpULE(left, right);
     }
-    if (left->type->isInt && right->type->isInt) {
-        return cg.builder.CreateICmpSLE(left->loadIR(cg), right->loadIR(cg));
+    if (leftType->isInt && rightType->isInt) {
+        return cg.builder.CreateICmpSLE(left, right);
     }
-    if (left->type->isFloat || right->type->isFloat) {
-        const auto [l, r] = loadPairAsFloat(cg, left, right);
+    if (leftType->isFloat || rightType->isFloat) {
+        auto [l, r] = loadPairAsFloat(cg, left, right, leftType, rightType);
         return cg.builder.CreateFCmpOLE(l, r);
     }
     assert(0);
 }
 
-Value* andIR(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right) {
+Value* andIR(LgsCgModule& cg, Value* left, Value* right) {
     const auto currentBlock = cg.builder.GetInsertBlock();
     const auto func = currentBlock->getParent();
     const auto rightBlock = cg.createBlock("and_right", func);
     const auto endBlock = cg.createBlock("and_end", func);
-    cg.builder.CreateCondBr(left->IRValue, rightBlock, endBlock);
+    cg.builder.CreateCondBr(left, rightBlock, endBlock);
     cg.builder.SetInsertPoint(rightBlock);
     cg.builder.CreateBr(endBlock);
     cg.builder.SetInsertPoint(endBlock);
     auto* phi = cg.builder.CreatePHI(cg.builder.getInt1Ty(), 2);
     phi->addIncoming(cg.false_(), currentBlock);
-    phi->addIncoming(right->IRValue, rightBlock);
+    phi->addIncoming(right, rightBlock);
     return phi;
 }
 
-Value* orIR(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right) {
+Value* orIR(LgsCgModule& cg, Value* left, Value* right) {
     const auto currentBlock = cg.builder.GetInsertBlock();
     const auto func = currentBlock->getParent();
     const auto rightBlock = cg.createBlock("or_right", func);
     const auto endBlock = cg.createBlock("or_end", func);
-    cg.builder.CreateCondBr(left->IRValue, endBlock, rightBlock);
+    cg.builder.CreateCondBr(left, endBlock, rightBlock);
     cg.builder.SetInsertPoint(rightBlock);
     cg.builder.CreateBr(endBlock);
     cg.builder.SetInsertPoint(endBlock);
     auto* phi = cg.builder.CreatePHI(cg.builder.getInt1Ty(), 2);
     phi->addIncoming(cg.true_(), currentBlock);
-    phi->addIncoming(right->IRValue, rightBlock);
+    phi->addIncoming(right, rightBlock);
     return phi;
 }
 
-std::pair<Value*, Value*> loadPairAsFloat(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    auto l = left->loadIR(cg);
-    auto r = right->loadIR(cg);
-    if (left->type->isInt) {
-        l = cg.builder.CreateSIToFP(l, cg.floatTy());
-    } else if (const auto lVec = left->type->asVec()) {
-        if (left->type->asVec()->baseType->isInt) {
-            l = cg.builder.CreateSIToFP(l, FixedVectorType::get(cg.floatTy(), lVec->dimVec));
+std::pair<Value*, Value*> loadPairAsFloat(LgsCgModule& cg, Value* left, Value* right, LgsType* leftType, LgsType* rightType) {
+    if (leftType->isInt) {
+        left = cg.builder.CreateSIToFP(left, cg.floatTy());
+    } else if (const auto lVec = leftType->asVec()) {
+        if (leftType->asVec()->baseType->isInt) {
+            left = cg.builder.CreateSIToFP(left, FixedVectorType::get(cg.floatTy(), lVec->dimVec));
         }
     }
-    if (right->type->isInt) {
-        r = cg.builder.CreateSIToFP(r, cg.floatTy());
-    } else if (const auto rVec = right->type->asVec()) {
-        if (right->type->asVec()->baseType->isInt) {
-            r = cg.builder.CreateSIToFP(r, FixedVectorType::get(cg.floatTy(), rVec->dimVec));
+    if (rightType->isInt) {
+        right = cg.builder.CreateSIToFP(right, cg.floatTy());
+    } else if (const auto rVec = rightType->asVec()) {
+        if (rightType->asVec()->baseType->isInt) {
+            right = cg.builder.CreateSIToFP(right, FixedVectorType::get(cg.floatTy(), rVec->dimVec));
         }
     }
-    return {l, r};
+    return {left, right};
 }
 
-std::pair<Value*, Value*> loadPairAsDouble(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    auto l = left->loadIR(cg);
-    auto r = right->loadIR(cg);
-    if (l->getType()->isIntegerTy()) {
-        l = cg.builder.CreateSIToFP(l, cg.doubleTy());
+std::pair<Value*, Value*> loadPairAsDouble(LgsCgModule& cg, Value* left, Value* right) {
+    if (left->getType()->isIntegerTy()) {
+        left = cg.builder.CreateSIToFP(left, cg.doubleTy());
     }
-    if (r->getType()->isIntegerTy()) {
-        r = cg.builder.CreateSIToFP(r, cg.doubleTy());
+    if (right->getType()->isIntegerTy()) {
+        right = cg.builder.CreateSIToFP(right, cg.doubleTy());
     }
-    return {l, r};
-}
-
-std::pair<Value*, Value*> loadPairAsInt(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    auto l = left->loadIR(cg);
-    auto r = right->loadIR(cg);
-    assert(!l->getType()->isFloatTy() && !r->getType()->isFloatTy());
-    return {l, r};
+    return {left, right};
 }
 
 /**
@@ -592,4 +540,27 @@ std::pair<Constant*, Constant*> getRTValuesInfo(LgsCgModule& cg, const std::stri
         namesArrGlobal = cg.createGlobal(names, namesArrType, namesArr);
     }
     return {typesArrGlobal, namesArrGlobal};
+}
+
+LgsType* getBiggestIntType(const std::vector<LgsType*>& types) {
+    if (types.empty()) return nullptr;
+    LgsType* inferredType = nullptr;
+    uint8_t highestPrecedence = 0;
+    for (size_t i = 0; i < types.size(); ++i) {
+        const auto& arg = types[i];
+        if (!arg) return nullptr;
+        LgsType* currentType = nullptr;
+        if (arg->isScalar()) {
+            currentType = arg;
+        } else if (const auto iter = arg->asIterable()) {
+            currentType = iter->baseType;
+        }
+        if (!currentType || !currentType->isScalar()) return nullptr;
+        const auto precedence = numberPrecedences[currentType->getName()];
+        if (highestPrecedence >= precedence) continue;
+        inferredType = currentType;
+        highestPrecedence = precedence;
+    }
+    assert(inferredType);
+    return inferredType;
 }

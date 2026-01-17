@@ -159,16 +159,15 @@ void freeTypes(std::vector<T*>& types) {
     types.clear();
 }
 
-LgsType* getBiggestIntType(const std::vector<LgsExpr*>& args);
-Value* eqIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-Value* neIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-Value* ltIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-Value* gtIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-Value* geIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-Value* leIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-Value* andIR(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right);
-Value* orIR(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right);
-std::pair<Value*, Value*> loadPairAsFloat(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-std::pair<Value*, Value*> loadPairAsDouble(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-std::pair<Value*, Value*> loadPairAsInt(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
+Value* eqIR(LgsCgModule& cg, Value* left, Value* right, LgsType* leftType, LgsType* rightType);
+Value* neIR(LgsCgModule& cg, Value* left, Value* right, LgsType* leftType, LgsType* rightType);
+Value* ltIR(LgsCgModule& cg, Value* left, Value* right, LgsType* leftType, LgsType* rightType);
+Value* gtIR(LgsCgModule& cg, Value* left, Value* right, LgsType* leftType, LgsType* rightType);
+Value* geIR(LgsCgModule& cg, Value* left, Value* right, LgsType* leftType, LgsType* rightType);
+Value* leIR(LgsCgModule& cg, Value* left, Value* right, LgsType* leftType, LgsType* rightType);
+Value* andIR(LgsCgModule& cg, Value* left, Value* right);
+Value* orIR(LgsCgModule& cg, Value* left, Value* right);
+std::pair<Value*, Value*> loadPairAsFloat(LgsCgModule& cg, Value* left, Value* right, LgsType* leftType, LgsType* rightType);
+std::pair<Value*, Value*> loadPairAsDouble(LgsCgModule& cg, Value* left, Value* right);
 std::pair<Constant*, Constant*> getRTValuesInfo(LgsCgModule& cg, const std::string& name, const std::vector<LgsValue*>& values);
+LgsType* getBiggestIntType(const std::vector<LgsType*>& types);

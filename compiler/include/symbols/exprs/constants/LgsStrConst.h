@@ -16,7 +16,7 @@ public:
         } else {
             const auto lgsStr = new LgsStr();
             lgsStr->isStatic = true;
-            lgsStr->size = new LgsIntConst(&LGS_INT, v.size());
+            lgsStr->length = new LgsIntConst(&LGS_INT, v.size());
             type = lgsStr;
         }
     }

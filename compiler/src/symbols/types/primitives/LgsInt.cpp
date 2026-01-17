@@ -76,7 +76,7 @@ LgsType* LgsInt::applyBinOp(LgsType* rightType, LgsBinOp& op) {
 }
 
 Value* LgsInt::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto ty = getBiggestIntType({left, right})->getIRType(cg);
+    const auto ty = getBiggestIntType({left->type, right->type})->getIRType(cg);
     const auto l = cg.builder.CreateZExt(left->loadIR(cg), ty);
     const auto r = cg.builder.CreateZExt(right->loadIR(cg), ty);
     return cg.builder.CreateAdd(l, r);

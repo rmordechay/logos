@@ -273,8 +273,8 @@ Function* LgsMap::generateGetFunc(LgsCgModule& cg) {
     cg.startBlock(keyCompareBlock);
     const auto indexTemp2 = pairType->key->getZeroValue();
     currentEntry = cg.load(cg.ptrTy(), currentEntryPtr);
-    indexTemp2->IRValue = cg.load(keyTy, getEntryKey(cg, currentEntry));
-    const auto keysEqual = eqIR(cg, indexTemp, indexTemp2);
+    const auto keyLoad = cg.load(keyTy, getEntryKey(cg, currentEntry));
+    const auto keysEqual = eqIR(cg, keyIR, keyLoad, pairType->key, pairType->key);
     cg.builder.CreateCondBr(keysEqual, keysEqualBlock, keysNotEqualBlock);
 
     // Keys not equal
@@ -359,8 +359,6 @@ Function* LgsMap::generateAddFunc(LgsCgModule& cg) {
         const auto entryPtr = cg.builder.CreateInBoundsGEP(cg.ptrTy(), newEntries, {hash});
         cg.store(entry, entryPtr);
     });
-    // TODO check if old entries needs to be freed
-    // cg.freeValue(entries);
     cg.store(newEntries, entriesField);
     cg.store(newCap, capField);
     cg.branchAndStartBlock(checkSlotBlock);
@@ -386,7 +384,7 @@ Function* LgsMap::generateAddFunc(LgsCgModule& cg) {
     entryLoad = cg.load(cg.ptrTy(), entryAlloca);
     const auto loadKey = cg.load(pairType->key->getIRType(cg), getEntryKey(cg, entryLoad));
     indexTemp2->IRValue = loadKey;
-    const auto keysAreEqual = eqIR(cg, indexTemp, indexTemp2);
+    const auto keysAreEqual = eqIR(cg, keyIR, loadKey, pairType->key, pairType->key);
     cg.builder.CreateCondBr(keysAreEqual, equalBlock, notEqualBlock);
 
     // Keys equal

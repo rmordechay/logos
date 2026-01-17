@@ -167,7 +167,6 @@ set(LGS_LIB_SOURCE
     ${CMAKE_SOURCE_DIR}/lib/src/Lgs_Allocator.cpp
     ${CMAKE_SOURCE_DIR}/lib/src/Lgs_Print.cpp
     ${CMAKE_SOURCE_DIR}/lib/src/Lgs_Reflection.cpp
-    ${CMAKE_SOURCE_DIR}/lib/src/context/Lgs_Aarch64.cpp
 )
 
 set(SHARED_SOURCE

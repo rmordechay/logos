@@ -324,7 +324,7 @@ void LgsSema::visitStmtsBlock(LgsStmtsBlock* stmtsBlock) {
 
 void LgsSema::visitVarDec(LgsVarDec* varDec) {
     validateLocalName(varDec->name, varDec->location);
-    if (const auto iter = varDec->type->asIterable()) visitExpr(iter->size);
+    if (const auto iter = varDec->type->asIterable()) visitExpr(iter->length);
 
     if (varDec->expr && varDec->type) {
         typeResolver.resolveType(varDec->type);
@@ -707,7 +707,7 @@ void LgsSema::visitIOStmt(const LgsIOStmt* ioStmt) {
 void LgsSema::visitExpr(LgsExpr*& expr) {
     if (!expr) return;
     if (const auto iter = expr->type->asIterable()) {
-        visitExpr(iter->size);
+        visitExpr(iter->length);
     }
     if (const auto ternaryExpr = dynamic_cast<LgsTernaryExpr*>(expr)) {
         visitTernaryExpr(ternaryExpr);
@@ -756,7 +756,7 @@ void LgsSema::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
     if (!type) {
         return addError(E10076, l->location, {binaryExpr->op.text, ltype->pname(), rtype->pname()});
     }
-    if (const auto iter = type->asIterable()) visitExpr(iter->size);
+    if (const auto iter = type->asIterable()) visitExpr(iter->length);
     binaryExpr->setType(type);
     binaryExpr->isMutable = l->isMutable || r->isMutable;
 }
@@ -833,7 +833,7 @@ void LgsSema::visitArrayExpr(LgsArrayExpr* arrayExpr) {
 
 void LgsSema::visitStaticArray(const LgsArrayExpr* arrayExpr) {
     const auto sArr = arrayExpr->type->asSArray();
-    const auto size = sArr->size->getConstInt();
+    const auto size = sArr->length->getConstInt();
     if (!size.has_value()) {
         addError(E10114, arrayExpr->location);
     } else if (size.value() < static_cast<int64_t>(arrayExpr->elements.size())) {
@@ -1361,7 +1361,7 @@ void LgsSema::visitIndex(LgsIterIndex* iterIndex) {
     }
     if (iterable->isStatic) {
         const auto index = exprFrom->getConstInt();
-        const auto bounds = iterable->size->getConstInt();
+        const auto bounds = iterable->length->getConstInt();
         if (index.has_value() && bounds.has_value()) {
             if (index.value() >= bounds.value()) {
                 addError(E10048, iterIndex->location, {iterIndex->asText(), std::to_string(*bounds)});
@@ -1395,7 +1395,7 @@ void LgsSema::visitSlice(LgsIterIndex* iterIndex) {
         if (sizeFrom.value() > sizeTo.value()) {
             return addError(E10037, iterIndex->location);
         }
-        const auto bounds = iterable->size->getConstInt();
+        const auto bounds = iterable->length->getConstInt();
         if (!bounds.has_value()) return;
         if (sizeFrom.value() >= bounds.value()) {
             return addError(E10048, exprFrom->location, {std::to_string(*sizeFrom), std::to_string(*bounds)});
@@ -1537,7 +1537,7 @@ void LgsSema::validateIndex(LgsIterIndex* iterIndex) {
     }
     if (const auto sArr = iterable->asSArray()) {
         const auto i = exprFrom->getConstInt();
-        const auto bounds = sArr->size->getConstInt();
+        const auto bounds = sArr->length->getConstInt();
         if (!i.has_value() || !bounds.has_value()) return;
         if (i.value() >= bounds.value()) {
             return addError(E10048, iterIndex->location, {iterIndex->asText(), std::to_string(*bounds)});

@@ -176,20 +176,16 @@ Function* LgsDArray::generateContainsFunc(LgsCgModule& cg) {
     cg.builder.SetInsertPoint(entryBlock);
 
     const auto arrIR = cg.currentFunc->getArg(0);
-    const auto elementIR = cg.currentFunc->getArg(1);
+    const auto value = cg.currentFunc->getArg(1);
     const auto tempArr = getZeroValue();
-    const auto tempElement1 = baseType->getZeroValue();
-    const auto tempElement2 = baseType->getZeroValue();
     tempArr->IRValue = arrIR;
-    tempElement1->IRValue = elementIR;
 
     cg.loop(lenIR(cg, arrIR), [&](Value* iValue, BasicBlock*) {
         LgsIntConst size(&LGS_SIZE, 0);
         size.IRValue = iValue;
         const auto elementPtr = tempArr->type->asIterable()->getIRElement(cg, tempArr, &size);
-        tempElement2->IRValue = cg.load(baseType->getIRType(cg), elementPtr);
-        const auto elementsEqual = eqIR(cg, tempElement1, tempElement2);
-        cg.ifStmt(elementsEqual, [&cg] {cg.builder.CreateRet(cg.true_());});
+        const auto elementsAreEqual = eqIR(cg, value, elementPtr, baseType, baseType);
+        cg.ifStmt(elementsAreEqual, [&cg] {cg.builder.CreateRet(cg.true_());});
     });
 
     // Epilogue
@@ -200,8 +196,6 @@ Function* LgsDArray::generateContainsFunc(LgsCgModule& cg) {
     cg.builder.restoreIP(cg.savedIP);
 
     freeExpr(tempArr);
-    freeExpr(tempElement1);
-    freeExpr(tempElement2);
     return func;
 }
 

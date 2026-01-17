@@ -79,12 +79,12 @@ LgsType* LgsFloat::applyBinOp(LgsType* rightType, LgsBinOp& op) {
 }
 
 Value* LgsFloat::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto [l, r] = loadPairAsFloat(cg, left, right);
+    auto [l, r] = loadPairAsFloat(cg, left->loadIR(cg), right->loadIR(cg), left->type, right->type);
     return cg.builder.CreateFAdd(l, r);
 }
 
 Value* LgsFloat::subIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto [l, r] = loadPairAsFloat(cg, left, right);
+    auto [l, r] = loadPairAsFloat(cg, left->loadIR(cg), right->loadIR(cg), left->type, right->type);
     return cg.builder.CreateFSub(l, r);
 }
 
@@ -93,12 +93,12 @@ Value* LgsFloat::mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
         const auto dotFunc = dotProductFunc(cg, left, right);
         return cg.builder.CreateCall(dotFunc, {left->loadIR(cg), right->loadIR(cg)});
     }
-    const auto [l, r] = loadPairAsFloat(cg, left, right);
+    auto [l, r] = loadPairAsFloat(cg, left->loadIR(cg), right->loadIR(cg), left->type, right->type);
     return cg.builder.CreateFMul(l, r);
 }
 
 Value* LgsFloat::divIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto [l, r] = loadPairAsFloat(cg, left, right);
+    auto [l, r] = loadPairAsFloat(cg, left->loadIR(cg), right->loadIR(cg), left->type, right->type);
     return cg.builder.CreateFDiv(l, r);
 }
 

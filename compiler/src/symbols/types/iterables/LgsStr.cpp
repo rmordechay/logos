@@ -95,15 +95,18 @@ Value* LgsStr::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     if (leftStrConst.has_value() && rightFloatConst.has_value()) {
         return cg.getString(leftStrConst.value() + std::to_string(rightFloatConst.value()));
     }
+
     const auto leftIterable = left->type->asStr();
     const auto rightIterable = right->type->asStr();
     assert(leftIterable && rightIterable);
-    const auto size1 = leftIterable->size->getConstInt();
-    const auto size2 = rightIterable->size->getConstInt();
+
+    const auto size1 = leftIterable->length->getConstInt();
+    const auto size2 = rightIterable->length->getConstInt();
     const auto leftSize = size1.has_value() ? cg.usize(size1.value()) : lenIR(cg, left->IRValue);
     const auto rightSize = size2.has_value() ? cg.usize(size2.value()) : lenIR(cg, right->IRValue);
     const auto sumSize = cg.builder.CreateAdd(leftSize, rightSize);
     const auto allocSize = cg.builder.CreateAdd(sumSize, cg.usize(1));
+
     const auto buffer = cg.heapAlloc(allocSize);
     const auto rightPos = cg.builder.CreateInBoundsGEP(cg.i8Ty(), buffer, leftSize);
     cg.callMemCpy(buffer, left->IRValue, leftSize);
@@ -114,7 +117,7 @@ Value* LgsStr::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
 }
 
 Value* LgsStr::lenIR(LgsCgModule& cg, Value* iterable) {
-    if (isStatic) return cg.extendToSize(size->IRValue);
+    if (isStatic) return cg.extendToSize(length->IRValue);
     return cg.callStrLen(iterable);
 }
 

@@ -127,7 +127,9 @@ LgsType* LgsVec::applyBinOp(LgsType* rightType, LgsBinOp& op) {
 }
 
 bool LgsVec::inferBaseType(std::vector<LgsExpr*>& args) {
-    baseType = getBiggestIntType(args);
+    std::vector<LgsType*> types;
+    for (const auto arg : args) types.push_back(arg->type);
+    baseType = getBiggestIntType(types);
     return !!baseType;
 }
 
@@ -135,11 +137,12 @@ Value* LgsVec::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     const auto rtype = right->type;
     const auto isScalar = rtype->isScalar();
     if (baseType->isFloat) {
-        auto [l, r] = loadPairAsFloat(cg, left, right);
+        auto [l, r] = loadPairAsFloat(cg, left->loadIR(cg), right->loadIR(cg), left->type, right->type);
         if (isScalar) r = cg.builder.CreateVectorSplat(dimVec, r);
         return cg.builder.CreateFAdd(l, r);
     }
-    auto [l, r] = loadPairAsInt(cg, left, right);
+    const auto l = left->loadIR(cg);
+    auto r = right->loadIR(cg);
     if (isScalar) r = cg.builder.CreateVectorSplat(dimVec, r);
     return cg.builder.CreateAdd(l, r);
 }
@@ -148,11 +151,12 @@ Value* LgsVec::subIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     const auto rtype = right->type;
     const auto isScalar = rtype->isScalar();
     if (baseType->isFloat) {
-        auto [l, r] = loadPairAsFloat(cg, left, right);
+        auto [l, r] = loadPairAsFloat(cg, left->loadIR(cg), right->loadIR(cg), left->type, right->type);
         if (isScalar) r = cg.builder.CreateVectorSplat(dimVec, r);
         return cg.builder.CreateFSub(l, r);
     }
-    auto [l, r] = loadPairAsInt(cg, left, right);
+    const auto l = left->loadIR(cg);
+    auto r = right->loadIR(cg);
     if (isScalar) r = cg.builder.CreateVectorSplat(dimVec, r);
     return cg.builder.CreateSub(l, r);
 }
@@ -164,17 +168,18 @@ Value* LgsVec::mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     const auto rtype = right->type;
     const auto isScalar = rtype->isScalar();
     if (baseType->isFloat) {
-        auto [l, r] = loadPairAsFloat(cg, left, right);
+        auto [l, r] = loadPairAsFloat(cg, left->loadIR(cg), right->loadIR(cg), left->type, right->type);
         if (isScalar) r = cg.builder.CreateVectorSplat(dimVec, r);
         return cg.builder.CreateFMul(l, r);
     }
-    auto [l, r] = loadPairAsInt(cg, left, right);
+    const auto l = left->loadIR(cg);
+    auto r = right->loadIR(cg);
     if (isScalar) r = cg.builder.CreateVectorSplat(dimVec, r);
     return cg.builder.CreateMul(l, r);
 }
 
 Value* LgsVec::divIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    auto [l, r] = loadPairAsFloat(cg, left, right);
+    auto [l, r] = loadPairAsFloat(cg, left->loadIR(cg), right->loadIR(cg), left->type, right->type);
     if (right->type->isScalar()) {
         r = cg.builder.CreateVectorSplat(dimVec, r);
     }
@@ -182,7 +187,7 @@ Value* LgsVec::divIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
 }
 
 Value* LgsVec::modIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    auto [l, r] = loadPairAsFloat(cg, left, right);
+    auto [l, r] = loadPairAsFloat(cg, left->loadIR(cg), right->loadIR(cg), left->type, right->type);
     if (right->type->isScalar()) {
         r = cg.builder.CreateVectorSplat(dimVec, r);
     }
@@ -200,18 +205,14 @@ Value* LgsVec::inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) {
     cg.loop(cg.i64(dimVec), [this, &cg, iterableExpr, value, resultPtr](Value* index, BasicBlock* exitBlock) {
         const auto trueBlock = cg.createBlock();
         const auto falseBlock = cg.createBlock();
-        const auto iterable = iterableExpr->type->asIterable();
-        const auto tempExpr = iterable->baseType->getZeroValue();
         LgsIntConst tempIndex(&LGS_INT, 0);
-        tempIndex.IRValue = index;
-        tempExpr->IRValue = getIRElement(cg, iterableExpr, &tempIndex);
-        const auto eq = eqIR(cg, tempExpr, value);
+        const auto element = getIRElement(cg, iterableExpr, &tempIndex);
+        const auto eq = eqIR(cg, element, value->IRValue, baseType, baseType);
         cg.builder.CreateCondBr(eq, trueBlock, falseBlock);
         cg.startBlock(trueBlock);
         cg.store(cg.true_(), resultPtr);
         cg.builder.CreateBr(exitBlock);
         cg.startBlock(falseBlock);
-        freeExpr(tempExpr);
     });
     return cg.load(cg.i1Ty(), resultPtr);
 }
