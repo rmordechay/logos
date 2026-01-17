@@ -182,11 +182,5 @@ LgsType* LgsCLangParser::mapCFunc(const clang::QualType type) {
 }
 
 LgsType* LgsCLangParser::mapCArray(const clang::QualType type) {
-    const auto arrayType = llvm::dyn_cast<clang::ConstantArrayType>(type.getTypePtr());
-    if (!arrayType) return nullptr;
-    const auto baseType = mapCType(arrayType->getElementType());
-    const auto size = arrayType->getSize().getZExtValue();
-    const auto arr = new LgsDArray(baseType);
-    arr->length = new LgsIntConst(&LGS_INT, size);
-    return arr;
+    assert(0);
 }

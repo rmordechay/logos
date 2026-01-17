@@ -12,7 +12,6 @@ public:
 
     explicit LgsVec(const size_t dim, LgsType* baseType = &LGS_FLOAT) : LgsIterable(baseType), dimVec(dim) {
         assert(dim > 1 && dim <= 4);
-        length = new LgsIntConst(&LGS_INT, dim);
         isStatic = true;
     }
     LgsField* getField(const std::string& fieldName) override;

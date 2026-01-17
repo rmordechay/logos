@@ -5,8 +5,9 @@
 class LgsSArray final : public LgsIterable {
 public:
     static constexpr auto name = "SArray";
+    LgsExpr* length = nullptr;
 
-    explicit LgsSArray(LgsType* baseType, LgsExpr* size): LgsIterable(baseType, size) {
+    explicit LgsSArray(LgsType* baseType, LgsExpr* length): LgsIterable(baseType), length(length) {
         isStatic = true;
         passByRef = true;
     }

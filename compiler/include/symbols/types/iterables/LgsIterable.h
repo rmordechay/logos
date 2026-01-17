@@ -24,10 +24,9 @@ struct CodegenMetadata;
 class LgsIterable : public LgsType {
 public:
     LgsType* baseType;
-    LgsExpr* length = nullptr;
     bool isStatic = false;
 
-    explicit LgsIterable(LgsType* baseType = nullptr, LgsExpr* size = nullptr) : baseType(baseType), length(size) {}
+    explicit LgsIterable(LgsType* baseType = nullptr) : baseType(baseType) {}
     LgsFunc* getMethod(const std::string& methodName) override;
     size_t getDimension() const;
     virtual LgsType* getIndexType();

@@ -100,10 +100,8 @@ Value* LgsStr::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     const auto rightIterable = right->type->asStr();
     assert(leftIterable && rightIterable);
 
-    const auto size1 = leftIterable->length->getConstInt();
-    const auto size2 = rightIterable->length->getConstInt();
-    const auto leftSize = size1.has_value() ? cg.usize(size1.value()) : lenIR(cg, left->IRValue);
-    const auto rightSize = size2.has_value() ? cg.usize(size2.value()) : lenIR(cg, right->IRValue);
+    const auto leftSize = lenIR(cg, left->IRValue);
+    const auto rightSize = lenIR(cg, right->IRValue);
     const auto sumSize = cg.builder.CreateAdd(leftSize, rightSize);
     const auto allocSize = cg.builder.CreateAdd(sumSize, cg.usize(1));
 
@@ -117,7 +115,6 @@ Value* LgsStr::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
 }
 
 Value* LgsStr::lenIR(LgsCgModule& cg, Value* iterable) {
-    if (isStatic) return cg.extendToSize(length->IRValue);
     return cg.callStrLen(iterable);
 }
 

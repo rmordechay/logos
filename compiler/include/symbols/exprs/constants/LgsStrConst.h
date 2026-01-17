@@ -10,15 +10,10 @@ public:
     std::vector<LgsExpr*> parts;
 
     explicit LgsStrConst(const std::string& v) : value(v) {
+        const auto lgsStr = new LgsStr();
+        lgsStr->isStatic = true;
         isMutable = false;
-        if (v.size() == 1) {
-            type = &LGS_CHAR;
-        } else {
-            const auto lgsStr = new LgsStr();
-            lgsStr->isStatic = true;
-            lgsStr->length = new LgsIntConst(&LGS_INT, v.size());
-            type = lgsStr;
-        }
+        type = lgsStr;
     }
     LgsExpr* castExplicitly(LgsType* toType) override;
     Value* loadIR(LgsCgModule& cg) override;

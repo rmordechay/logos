@@ -579,9 +579,9 @@ void LgsCodeGen::visitIOStmt(const LgsIOStmt* ioStmt) {
 
 void LgsCodeGen::visitExpr(LgsExpr* expr, const bool assign) {
     if (!expr) return;
-    if (const auto iter = expr->type->asIterable()) {
-        if (iter->length && !iter->length->IRValue) {
-            visitExpr(iter->length);
+    if (const auto sArr = expr->type->asSArray()) {
+        if (sArr->length && !sArr->length->IRValue) {
+            visitExpr(sArr->length);
         }
     }
     if (const auto ternaryExpr = dynamic_cast<LgsTernaryExpr*>(expr)) {

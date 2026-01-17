@@ -49,8 +49,8 @@ void LgsIterIndex::setIRElementPtr(LgsCgModule& cg, const bool assign) {
     }
 
     // String
-    if (const auto iter = baseExpr->type->asStr()) {
-        if (!boundsChecked) cg.createIndexBoundsGuard(iter->length->IRValue, fromIR);
+    if (const auto str = baseExpr->type->asStr()) {
+        if (!boundsChecked) cg.createIndexBoundsGuard(str->lenIR(cg, baseExpr->IRValue), fromIR);
         IRValue = cg.builder.CreateInBoundsGEP(cg.i8Ty(), baseExpr->IRValue, fromIR);
         return;
     }

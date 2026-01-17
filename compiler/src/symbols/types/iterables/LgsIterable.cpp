@@ -111,7 +111,6 @@ void LgsIterable::setLoopIRVars(LgsCgModule& cg, LgsForeachLoop* loop) {
 }
 
 LgsIterable::~LgsIterable() {
-    freeExpr(length);
     for (auto [name, method] : methods) {
         if (name == MAP_FUNC || name == FILTER_FUNC || name == FOREACH_FUNC) {
             method->funcType->rt = nullptr;
@@ -121,6 +120,5 @@ LgsIterable::~LgsIterable() {
             ft->params[0].type = nullptr;
         }
     }
-    length = nullptr;
     baseType = nullptr;
 }
