@@ -242,7 +242,7 @@ Value* LgsVec::matVecMul(LgsCgModule& cg, const LgsExpr* left, LgsExpr* right) c
     const auto alpha = cg.floatv(1);
     const auto matrixPtr = left->IRValue;
     const auto lda = cg.i32(mat->columns);
-    const auto vectorPtr = right->getIRPtr(cg);
+    const auto vectorPtr = right->IRValue;
     const auto incx = cg.i32(1);
     const auto beta = cg.floatv(0);
     const auto vecType = VectorType::get(baseType->getIRType(cg), mat->rows, false);

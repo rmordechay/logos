@@ -171,5 +171,4 @@ Value* orIR(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right);
 std::pair<Value*, Value*> loadPairAsFloat(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
 std::pair<Value*, Value*> loadPairAsDouble(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
 std::pair<Value*, Value*> loadPairAsInt(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-std::pair<Value*, Value*> loadPairAsLong(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
 std::pair<Constant*, Constant*> getRTValuesInfo(LgsCgModule& cg, const std::string& name, const std::vector<LgsValue*>& values);

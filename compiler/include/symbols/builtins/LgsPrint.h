@@ -10,5 +10,5 @@ public:
 
     explicit LgsPrint(): LgsFunc(name, &LGS_VOID, {LgsParam(&LGS_ANY, "", new LgsStrConst("\n"))}, PUBLIC | BUILTIN | HAS_DEFAULTS) {}
     Value* call(LgsCgModule& cg, std::vector<LgsFuncArg>& args) override;
-    void generatePrintFunc(LgsCgModule& cg);
+    static void generatePrintFunc(LgsCgModule& cg);
 };

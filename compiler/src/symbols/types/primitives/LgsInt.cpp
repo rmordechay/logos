@@ -10,6 +10,7 @@
 #include "types/primitives/LgsSize.h"
 #include <iostream>
 #include <llvm/IR/DIBuilder.h>
+#include <llvm/IR/Module.h>
 
 size_t LgsInt::sizeBytes() {
     return sizeof(int);
@@ -58,20 +59,14 @@ LgsType* LgsInt::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     case BIT_OR:
     case BIT_XOR:
     case LSHIFT:
-    case RSHIFT: {
-        return &LGS_INT;
-    }
-    case POW: {
-        return &LGS_DOUBLE;
-    }
+    case RSHIFT: return &LGS_INT;
+    case POW: return &LGS_DOUBLE;
     case EQ:
     case NE:
     case LT:
     case GT:
     case GE:
-    case LE: {
-        return &LGS_BOOL;
-    }
+    case LE: return &LGS_BOOL;
     case NOOP:
         assert(0);
     default:

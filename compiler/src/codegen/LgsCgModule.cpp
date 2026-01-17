@@ -227,6 +227,12 @@ Value* LgsCgModule::moveAlloc(Value* leftPtr, Value* rightPtr, Constant* type) {
     return callRuntimeFunc("move", voidTy(), params, args);
 }
 
+Value* LgsCgModule::moveElement(Value* iterable, Value* element, Constant* type) {
+    const std::vector<Type*> params = {ptrTy(), ptrTy(), ptrTy()};
+    const std::vector<Value*> args = {iterable, element, type};
+    return callRuntimeFunc("moveElement", ptrTy(), params, args);
+}
+
 Value* LgsCgModule::reallocate(Value* ptr, Value* size, Value* level) {
     return callRuntimeFunc("reallocate", ptrTy(), {ptrTy(), sizeTy(), sizeTy()}, {ptr, extendToSize(size), extendToSize(level)});
 }

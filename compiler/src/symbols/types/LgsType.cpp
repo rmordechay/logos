@@ -395,7 +395,8 @@ Value* eqIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     if (left->isNull) return exprEqNull(cg, right);
     if (right->isNull) return exprEqNull(cg, left);
     if (left->type->isInt && right->type->isInt) {
-        const auto [l, r] = loadPairAsLong(cg, left, right);
+        const auto l = cg.extendToSize(left->loadIR(cg));
+        const auto r = cg.extendToSize(right->loadIR(cg));
         return cg.builder.CreateICmpEQ(l, r);
     }
     if (left->type->isFloat || right->type->isFloat) {
@@ -553,13 +554,6 @@ std::pair<Value*, Value*> loadPairAsDouble(LgsCgModule& cg, LgsExpr* left, LgsEx
 std::pair<Value*, Value*> loadPairAsInt(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     auto l = left->loadIR(cg);
     auto r = right->loadIR(cg);
-    assert(!l->getType()->isFloatTy() && !r->getType()->isFloatTy());
-    return {l, r};
-}
-
-std::pair<Value*, Value*> loadPairAsLong(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    auto l = cg.extendToSize(left->loadIR(cg));
-    auto r = cg.extendToSize(right->loadIR(cg));
     assert(!l->getType()->isFloatTy() && !r->getType()->isFloatTy());
     return {l, r};
 }

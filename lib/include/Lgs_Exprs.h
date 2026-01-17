@@ -1,14 +1,13 @@
 #pragma once
-#include "Lgs_Types.h"
-
-#define LGS_DARRAY_MAX_LENGTH 100000
+#include "LgsConfigs.h"
 
 struct Lgs_SArrayExpr {
     void* data;
     size_t length;
 };
 
-struct Lgs_ArrayExpr {
+struct Lgs_DArrayExpr {
+    size_t level;
     char* data;
     size_t length;
     size_t capacity;

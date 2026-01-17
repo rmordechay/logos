@@ -69,7 +69,7 @@ Constant* LgsObject::getRTType(LgsCgModule& cg) {
     const auto offsetsArrType = ArrayType::get(cg.sizeTy(), fields.size());
     for (size_t i = 0; i < fields.size(); ++i) {
         const auto field = fields[i];
-        offsets.emplace_back(cg.usize(sl->getElementOffset(i) + sizeof(size_t)));
+        offsets.emplace_back(cg.usize(sl->getElementOffset(i + 1))); // level is first element
         fieldsAsValue.push_back(field);
     }
     const auto [typesArr, hashesArr] = getRTValuesInfo(cg, name, fieldsAsValue);
@@ -88,7 +88,7 @@ Constant* LgsObject::getRTType(LgsCgModule& cg) {
 }
 
 size_t LgsObject::sizeBytes() {
-    size_t sum = 0;
+    auto sum = sizeof(size_t); // level
     for (const auto& field : fields) {
         if (field->type->asObject() || field->type->asFuncType() || field->type->asInterface()) {
             sum += sizeof(void*);
@@ -96,7 +96,7 @@ size_t LgsObject::sizeBytes() {
             sum += field->type->sizeBytes();
         }
     }
-    return sum + sizeof(size_t); // Fields + level
+    return sum;
 }
 
 LgsExpr* LgsObject::getZeroValue() {

@@ -51,7 +51,6 @@ public:
     std::optional<int64_t> getConstInt();
     std::optional<double_t> getConstFloat();
     std::optional<std::string> getConstStr();
-    Value* getIRPtr(LgsCgModule& cg) const;
 
     virtual void setType(LgsType* newType);
     virtual LgsExpr* castExplicitly(LgsType* toType);

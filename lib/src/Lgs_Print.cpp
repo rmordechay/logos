@@ -1,5 +1,5 @@
 #include "LgsDefinitions.h"
-#include "Lgs_ArrayExpr.h"
+#include "Lgs_Exprs.h"
 #include "Lgs_Runtime.h"
 #include "Lgs_Types.h"
 #include <cassert>
@@ -43,7 +43,7 @@ static std::string formatElement(const Lgs_TypeInfo* rtt, void* value) {
     }
     case RTT_SET:
     case RTT_DARRAY: {
-        const auto dArrExpr = static_cast<Lgs_ArrayExpr*>(value);
+        const auto dArrExpr = static_cast<Lgs_DArrayExpr*>(value);
         assert(dArrExpr->length <= LGS_DARRAY_MAX_LENGTH);
         const auto& [baseType] = rtt->dArray;
         str << "[";

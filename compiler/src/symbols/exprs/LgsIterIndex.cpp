@@ -11,9 +11,7 @@
 Value* LgsIterIndex::loadIR(LgsCgModule& cg) {
     const auto baseExprType = baseExpr->type;
     if (baseExprType->asMap() || baseExprType->asDArray() || baseExprType->asSet()) {
-        const auto arr = baseExpr->type->asIterable();
-        const auto valueTy = arr->baseType->getIRType(cg);
-        return cg.load(valueTy, IRValue);
+        return IRValue;
     }
     if (baseExprType->asStr()) {
         return cg.load(cg.i8Ty(), IRValue);

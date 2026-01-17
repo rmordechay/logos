@@ -1,25 +1,23 @@
 #include "types/iterables/LgsDArray.h"
 #include "LgsBinaryTokens.h"
-#include "Lgs_ArrayExpr.h"
+#include "Lgs_Exprs.h"
 #include "codegen/LgsCgModule.h"
 #include "exprs/LgsArrayExpr.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsBool.h"
 #include <llvm/IR/Module.h>
 
-#define INITIAL_CAPACITY 3
-
 LgsFunc* LgsDArray::getMethod(const std::string& methodName) {
     constexpr auto flags = BUILTIN | PUBLIC | METHOD;
     if (methodName == ADD_FUNC) {
         if (methods.contains(ADD_FUNC)) return methods[ADD_FUNC];
-        const auto func = new LgsFunc(ADD_FUNC, name, &LGS_VOID, {this, baseType}, flags);
-        func->fn = [this](LgsCgModule& cg, const std::vector<LgsFuncArg>& args) {
+        const auto addFunc = new LgsFunc(ADD_FUNC, name, &LGS_VOID, {this, baseType}, flags);
+        addFunc->fn = [this](LgsCgModule& cg, const std::vector<LgsFuncArg>& args) {
             addIRElement(cg, args[0].expr, nullptr, args[1].expr);
             return nullptr;
         };
-        addMethod(func);
-        return func;
+        addMethod(addFunc);
+        return addFunc;
     }
     return LgsIterable::getMethod(methodName);
 }
@@ -40,7 +38,7 @@ bool LgsDArray::inferBaseType(std::vector<LgsExpr*>& args) {
 }
 
 Type* LgsDArray::getIRType(LgsCgModule& cg) {
-    return cg.getStructType({cg.ptrTy(), cg.sizeTy(), cg.sizeTy()}, name);
+    return cg.getStructType({cg.i32Ty(), cg.ptrTy(), cg.sizeTy(), cg.sizeTy()}, name);
 }
 
 Constant* LgsDArray::getRTType(LgsCgModule& cg) {
@@ -63,7 +61,7 @@ std::string LgsDArray::pname() {
 }
 
 size_t LgsDArray::sizeBytes() {
-    return sizeof(Lgs_ArrayExpr);
+    return sizeof(Lgs_DArrayExpr);
 }
 
 bool LgsDArray::canCastTo(LgsType* other) {
@@ -81,14 +79,9 @@ LgsExpr* LgsDArray::getZeroValue() {
 }
 
 Value* LgsDArray::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
-    const auto ty = getIRType(cg);
-    const auto cap = cg.usize(INITIAL_CAPACITY);
-    const auto initSize = cg.builder.CreateMul(cap, cg.usize(baseType->sizeBytes()));
     const auto alloc = pointee ? pointee : cg.heapAlloc(cg.usize(sizeBytes()));
-    const auto entries = cg.heapAlloc(initSize);
-    cg.storeStructField(ty, alloc, 0, entries);
-    cg.storeStructField(ty, alloc, 1, cg.sizeZero());
-    cg.storeStructField(ty, alloc, 2, cap);
+    const auto initSize = cg.usize(LGS_MAP_INITIAL_CAPACITY * baseType->sizeBytes());
+    cg.callLgsFunc(name, "initDArray", cg.voidTy(), {cg.ptrTy(), cg.sizeTy()}, {alloc, initSize});
     return alloc;
 }
 
@@ -108,9 +101,7 @@ LgsType* LgsDArray::replaceGenerics(LgsType* replacement, std::unordered_map<std
 LgsType* LgsDArray::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     switch (op.opType) {
     case IN: {
-        const auto otherIter = rightType->asIterable();
-        if (!otherIter) return nullptr;
-        if (otherIter->getDimension() - 1 == getDimension()) return &LGS_BOOL;
+        if (rightType->canCastTo(baseType)) return &LGS_BOOL;
         break;
     }
     default:
@@ -120,36 +111,105 @@ LgsType* LgsDArray::applyBinOp(LgsType* rightType, LgsBinOp& op) {
 }
 
 Value* LgsDArray::lenIR(LgsCgModule& cg, Value* iterable) {
-    const auto lenFieldPtr = cg.builder.CreateStructGEP(getIRType(cg), iterable, 1);
+    const auto lenFieldPtr = getLenField(cg, iterable);
     return cg.load(cg.sizeTy(), lenFieldPtr);
 }
 
-Value* LgsDArray::inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) {
-    const std::vector<Type*> params = {cg.ptrTy(), cg.ptrTy(), cg.ptrTy()};
-    const std::vector<Value*> IRArgs = {iterableExpr->IRValue, getRTType(cg), value->IRValue};
-    return cg.callLgsFunc(name, "contains", cg.i1Ty(), params, IRArgs);
+Value* LgsDArray::inIR(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* value) {
+    return cg.builder.CreateCall(generateContainsFunc(cg), {iterable->IRValue, value->IRValue});
 }
 
 Value* LgsDArray::getIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index) {
-    const auto ty = getIRType(cg);
     const auto baseSize = cg.usize(baseType->sizeBytes());
-    const auto dataFieldPtr = cg.builder.CreateStructGEP(ty, iterable->IRValue, 0);
+    const auto dataFieldPtr = getDataField(cg, iterable->IRValue);
     const auto offset = cg.builder.CreateMul(cg.extendToSize(index->IRValue), baseSize);
     const auto dataField = cg.load(cg.ptrTy(), dataFieldPtr);
-    return cg.builder.CreateInBoundsPtrAdd(dataField, offset);
+    auto ptr = cg.builder.CreateInBoundsPtrAdd(dataField, offset);
+    if (baseType->passByRef) {
+        ptr = cg.load(cg.ptrTy(), ptr);
+    }
+    return ptr;
 }
 
 void LgsDArray::addIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index, LgsExpr* value) {
     if (index) assert(0);
-    cg.builder.CreateCall(generateAddFunc(cg), {iterable->IRValue, value->IRValue, cg.usize(0)});
+    auto element = value->IRValue;
+    if (baseType->isHeapAlloc) {
+        element = cg.moveElement(iterable->IRValue, element, getRTType(cg));
+    }
+    cg.builder.CreateCall(generateAddFunc(cg), {iterable->IRValue, element});
+}
+
+Value* LgsDArray::getLevelField(LgsCgModule& cg, Value* iterable) {
+    return cg.builder.CreateStructGEP(getIRType(cg), iterable, 0);
+}
+
+Value* LgsDArray::getDataField(LgsCgModule& cg, Value* iterable) {
+    return cg.builder.CreateStructGEP(getIRType(cg), iterable, 1);
+}
+
+Value* LgsDArray::getLenField(LgsCgModule& cg, Value* iterable) {
+    return cg.builder.CreateStructGEP(getIRType(cg), iterable, 2);
+}
+
+Value* LgsDArray::getCapField(LgsCgModule& cg, Value* iterable) {
+    return cg.builder.CreateStructGEP(getIRType(cg), iterable, 3);
+}
+
+Function* LgsDArray::generateContainsFunc(LgsCgModule& cg) {
+    const auto funcName = getName() + "_" + CONTAINS_FUNC;
+    if (const auto func = cg.IRModule->getFunction(funcName)) return func;
+    const auto valueTy = baseType->getTypeOrPtr(cg);
+    const auto ft = cg.getFT(cg.i1Ty(), {cg.ptrTy(), valueTy});
+    if (cg.mode == CG_MODE_SRC_CODE) {
+        return cg.getFunc(funcName, ft);
+    }
+
+    // Save state
+    cg.savedIP = cg.builder.saveIP();
+    const auto originalFunc = cg.currentFunc;
+    const auto func = cg.getFunc(funcName, ft);
+    cg.currentFunc = func;
+
+    // Prologue
+    const auto entryBlock = cg.createBlock(BLOCK_ENTRY, cg.currentFunc);
+    cg.builder.SetInsertPoint(entryBlock);
+
+    const auto arrIR = cg.currentFunc->getArg(0);
+    const auto elementIR = cg.currentFunc->getArg(1);
+    const auto tempArr = getZeroValue();
+    const auto tempElement1 = baseType->getZeroValue();
+    const auto tempElement2 = baseType->getZeroValue();
+    tempArr->IRValue = arrIR;
+    tempElement1->IRValue = elementIR;
+
+    cg.loop(lenIR(cg, arrIR), [&](Value* iValue, BasicBlock*) {
+        LgsIntConst size(&LGS_SIZE, 0);
+        size.IRValue = iValue;
+        const auto elementPtr = tempArr->type->asIterable()->getIRElement(cg, tempArr, &size);
+        tempElement2->IRValue = cg.load(baseType->getIRType(cg), elementPtr);
+        const auto elementsEqual = eqIR(cg, tempElement1, tempElement2);
+        cg.ifStmt(elementsEqual, [&cg] {cg.builder.CreateRet(cg.true_());});
+    });
+
+    // Epilogue
+    cg.builder.CreateRet(cg.false_());
+
+    // Restore state
+    cg.currentFunc = originalFunc;
+    cg.builder.restoreIP(cg.savedIP);
+
+    freeExpr(tempArr);
+    freeExpr(tempElement1);
+    freeExpr(tempElement2);
+    return func;
 }
 
 Function* LgsDArray::generateAddFunc(LgsCgModule& cg) {
     const auto funcName = getName() + "_" + ADD_FUNC;
     if (const auto func = cg.IRModule->getFunction(funcName)) return func;
-
     const auto valueTy = baseType->getTypeOrPtr(cg);
-    const auto ft = cg.getFT(cg.voidTy(), {cg.ptrTy(), valueTy, cg.sizeTy()});
+    const auto ft = cg.getFT(cg.voidTy(), {cg.ptrTy(), valueTy});
     if (cg.mode == CG_MODE_SRC_CODE) {
         return cg.getFunc(funcName, ft);
     }
@@ -165,15 +225,13 @@ Function* LgsDArray::generateAddFunc(LgsCgModule& cg) {
     const auto needsResizeBlock = cg.createBlock("resize");
     const auto exitBlock = cg.createBlock(BLOCK_EXIT);
     cg.builder.SetInsertPoint(entryBlock);
-    cg.callStackPush();
 
     const auto ty = getIRType(cg);
     const auto arrIR = cg.currentFunc->getArg(0);
     const auto elementIR = cg.currentFunc->getArg(1);
-    const auto levelIR = cg.currentFunc->getArg(2);
-    const auto dataGEP = cg.builder.CreateStructGEP(ty, arrIR, 0);
-    const auto lenGEP = cg.builder.CreateStructGEP(ty, arrIR, 1);
-    const auto capGEP = cg.builder.CreateStructGEP(ty, arrIR, 2);
+    const auto dataGEP = getDataField(cg, arrIR);
+    const auto lenGEP = getLenField(cg, arrIR);
+    const auto capGEP = getCapField(cg, arrIR);
 
     auto len = cg.load(cg.sizeTy(), lenGEP);
     const auto cap = cg.load(cg.sizeTy(), capGEP);
@@ -184,26 +242,26 @@ Function* LgsDArray::generateAddFunc(LgsCgModule& cg) {
     cg.startBlock(needsResizeBlock);
     auto data = cg.load(cg.ptrTy(), dataGEP);
     const auto newCap = cg.builder.CreateMul(cap, cg.usize(2));
-    const auto newSize = cg.builder.CreateMul(newCap, cg.usize(baseType->sizeBytes()));
-    const auto newPtr = cg.reallocate(data, newSize, levelIR);
+    const auto baseTypeSize = cg.usize(baseType->sizeBytes());
+    const auto newSize = cg.builder.CreateMul(newCap, baseTypeSize);
+    const auto level = cg.load(cg.i32Ty(), getLevelField(cg, arrIR));
+    const auto newPtr = cg.reallocate(data, newSize, level);
     cg.store(newPtr, dataGEP);
-    cg.storeStructField(ty, arrIR, 2, newCap);
+    cg.storeStructField(ty, arrIR, 3, newCap);
 
     // Set element
     cg.branchAndStartBlock(exitBlock);
     len = cg.load(cg.sizeTy(), lenGEP);
     data = cg.load(cg.ptrTy(), dataGEP);
-    const auto baseSize = cg.usize(baseType->sizeBytes());
-    const auto offset = cg.builder.CreateMul(len, baseSize);
+    const auto offset = cg.builder.CreateMul(len, baseTypeSize);
     const auto elementPtr = cg.builder.CreateInBoundsPtrAdd(data, offset);
     cg.store(elementIR, elementPtr);
 
     // Increment length
     const auto inc = cg.builder.CreateAdd(len, cg.usize(1));
-    cg.storeStructField(ty, arrIR, 1, inc);
+    cg.storeStructField(ty, arrIR, 2, inc);
 
     // Epilogue
-    cg.callPopStack();
     cg.builder.CreateRetVoid();
 
     // Restore state
