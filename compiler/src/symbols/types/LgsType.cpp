@@ -119,7 +119,7 @@ LgsType* LgsType::replaceGenerics(LgsType* replacement, std::unordered_map<std::
     return this;
 }
 
-Value* LgsType::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
+Value* LgsType::getIRZeroValue(LgsCgModule& cg, Value* isReturnExpr, Value* pointee) {
     assert(0);
 }
 

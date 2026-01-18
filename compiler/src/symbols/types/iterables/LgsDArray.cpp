@@ -78,8 +78,8 @@ LgsExpr* LgsDArray::getZeroValue() {
     return new LgsArrayExpr(this);
 }
 
-Value* LgsDArray::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
-    const auto alloc = pointee ? pointee : cg.heapAlloc(cg.usize(sizeBytes()));
+Value* LgsDArray::getIRZeroValue(LgsCgModule& cg, Value* isReturnExpr, Value* pointee) {
+    const auto alloc = pointee ? pointee : cg.heapAlloc(cg.usize(sizeBytes()), isReturnExpr);
     const auto initSize = cg.usize(LGS_MAP_INITIAL_CAPACITY * baseType->sizeBytes());
     cg.callLgsFunc(name, "initDArray", cg.voidTy(), {cg.ptrTy(), cg.sizeTy()}, {alloc, initSize});
     return alloc;

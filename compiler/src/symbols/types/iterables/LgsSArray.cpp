@@ -34,7 +34,7 @@ LgsExpr* LgsSArray::getZeroValue() {
     return new LgsArrayExpr(this);
 }
 
-Value* LgsSArray::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
+Value* LgsSArray::getIRZeroValue(LgsCgModule& cg, Value* isReturnExpr, Value* pointee) {
     const auto ty = getIRType(cg);
     const auto arrSize = length->getConstInt().value();
     const auto arr = pointee ? pointee : cg.builder.CreateAlloca(ty);
@@ -43,7 +43,7 @@ Value* LgsSArray::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
         index.IRValue = cg.i32(i);
         const std::vector<Value*> indices = {cg.i32Zero(), cg.i32(i)};
         const auto gep = cg.builder.CreateInBoundsGEP(getIRType(cg), arr, indices);
-        cg.store(baseType->getIRZeroValue(cg, arr), gep);
+        cg.store(baseType->getIRZeroValue(cg, nullptr, arr), gep);
     }
     return arr;
 }

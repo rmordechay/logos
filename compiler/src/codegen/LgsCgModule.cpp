@@ -217,8 +217,8 @@ Value* LgsCgModule::getFromVTable(Value* instance, Value* name) {
     return callRuntimeFunc("getFromVTable", ptrTy(), {ptrTy(), ptrTy()}, {instance, name});
 }
 
-Value* LgsCgModule::heapAlloc(Value* size, Value* levelsAbove) {
-    return callRuntimeFunc("allocate", ptrTy(), {sizeTy(), sizeTy()}, {extendToSize(size), levelsAbove ? levelsAbove : usize(0)});
+Value* LgsCgModule::heapAlloc(Value* size, Value* isReturn) {
+    return callRuntimeFunc("allocate", ptrTy(), {sizeTy(), sizeTy()}, {extendToSize(size), isReturn ? isReturn : usize(0)});
 }
 
 Value* LgsCgModule::moveAlloc(Value* leftPtr, Value* rightPtr, Constant* type) {

@@ -27,7 +27,7 @@ LgsExpr* LgsStr::getZeroValue() {
     return new LgsStrConst("");
 }
 
-Value* LgsStr::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
+Value* LgsStr::getIRZeroValue(LgsCgModule& cg, Value* isReturnExpr, Value* pointee) {
     return cg.emptyStr();
 }
 

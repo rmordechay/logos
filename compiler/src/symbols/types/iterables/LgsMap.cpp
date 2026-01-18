@@ -95,13 +95,13 @@ LgsExpr* LgsMap::getZeroValue() {
     return new LgsHashMap(this);
 }
 
-Value* LgsMap::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
+Value* LgsMap::getIRZeroValue(LgsCgModule& cg, Value* isReturnExpr, Value* pointee) {
     const auto ty = getIRType(cg);
-    const auto ptr = pointee ? pointee : cg.heapAlloc(cg.usize(sizeBytes()));
+    const auto ptr = pointee ? pointee : cg.heapAlloc(cg.usize(sizeBytes()), isReturnExpr);
     const auto cap = cg.usize(INITIAL_CAPACITY);
     const auto entriesSize = cg.usize(pairType->sizeBytes() + sizeof(void*));
     const auto totalSize = cg.builder.CreateMul(entriesSize, cap);
-    const auto entries = cg.heapAlloc(totalSize);
+    const auto entries = cg.heapAlloc(totalSize, isReturnExpr);
     cg.storeStructField(ty, ptr, 0, entries);
     cg.storeStructField(ty, ptr, 1, cg.sizeZero());
     cg.storeStructField(ty, ptr, 2, cap);
@@ -129,7 +129,7 @@ Value* LgsMap::getIRElement(LgsCgModule& cg, LgsExpr* map, LgsExpr* index) {
 }
 
 void LgsMap::addIRElement(LgsCgModule& cg, LgsExpr* map, LgsExpr* index, LgsExpr* value) {
-    cg.builder.CreateCall(generateAddFunc(cg), {map->IRValue, index->IRValue, value->IRValue});
+    cg.builder.CreateCall(generateAddFunc(cg), {map->IRValue, index->IRValue, value->IRValue, cg.usize(map->isReturnExpr)});
 }
 
 StructType* LgsMap::getEntryStruct(LgsCgModule& cg) const {
@@ -156,16 +156,6 @@ Value* LgsMap::getEntryValue(LgsCgModule& cg, Value* entry) const {
 
 Value* LgsMap::getEntryNext(LgsCgModule& cg, Value* entry) const {
     return cg.builder.CreateStructGEP(getEntryStruct(cg), entry, 2);
-}
-
-Value* LgsMap::getNewEntry(LgsCgModule& cg, Value* entryPtr, Value* key, Value* value) const {
-    const auto entryTy = getEntryStruct(cg);
-    const auto entry = cg.heapAlloc(cg.usize(pairType->sizeBytes() + sizeof(void*)));
-    cg.storeStructField(entryTy, entry, 0, key);
-    cg.storeStructField(entryTy, entry, 1, value);
-    cg.storeStructField(entryTy, entry, 2, cg.null());
-    cg.store(entry, entryPtr);
-    return entry;
 }
 
 bool LgsMap::unpackLoopVars(LgsForeachLoop* loop) const {
@@ -305,7 +295,7 @@ Function* LgsMap::generateAddFunc(LgsCgModule& cg) {
 
     const auto valueTy = pairType->value->getTypeOrPtr(cg);
     const auto keyType = pairType->key->getTypeOrPtr(cg);
-    const auto ft = cg.getFT(cg.voidTy(), {cg.ptrTy(), keyType, valueTy});
+    const auto ft = cg.getFT(cg.voidTy(), {cg.ptrTy(), keyType, valueTy, cg.sizeTy()});
     if (cg.mode == CG_MODE_SRC_CODE) {
         return cg.getFunc(funcName, ft);
     }
@@ -330,6 +320,7 @@ Function* LgsMap::generateAddFunc(LgsCgModule& cg) {
     const auto mapIR = cg.currentFunc->getArg(0);
     const auto keyIR = cg.currentFunc->getArg(1);
     const auto valueIR = cg.currentFunc->getArg(2);
+    const auto isReturn = cg.currentFunc->getArg(3);
 
     const auto mapTy = getIRType(cg);
     const auto entryTy = getEntryStruct(cg);
@@ -346,9 +337,9 @@ Function* LgsMap::generateAddFunc(LgsCgModule& cg) {
     cg.builder.CreateCondBr(cond, resizeBlock, checkSlotBlock);
 
     cg.startBlock(resizeBlock);
-    const auto entriesSize = cg.usize(pairType->sizeBytes() + sizeof(void*));
-    const auto newCap = cg.builder.CreateMul(entriesSize, cg.builder.CreateMul(cap, cg.usize(2)));
-    const auto newEntries = cg.heapAlloc(newCap);
+    const auto size = cg.usize(pairType->sizeBytes() + sizeof(void*));
+    const auto newCap = cg.builder.CreateMul(size, cg.builder.CreateMul(cap, cg.usize(2)));
+    const auto newEntries = cg.heapAlloc(newCap, isReturn);
     auto entries = cg.load(cg.ptrTy(), entriesField);
 
     cg.loop(cap, [&](Value* iValue, BasicBlock*) {
@@ -403,7 +394,7 @@ Function* LgsMap::generateAddFunc(LgsCgModule& cg) {
 
     // Store entry
     cg.startBlock(storeElementBlock);
-    const auto newEntry = cg.heapAlloc(cg.usize(pairType->sizeBytes() + sizeof(void*)));
+    const auto newEntry = cg.heapAlloc(size, isReturn);
     cg.storeStructField(entryTy, newEntry, 0, keyIR);
     cg.storeStructField(entryTy, newEntry, 1, valueIR);
     cg.storeStructField(entryTy, newEntry, 2, cg.null());

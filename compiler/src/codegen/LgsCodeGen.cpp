@@ -738,7 +738,7 @@ void LgsCodeGen::visitStaticArray(LgsArrayExpr* arrayExpr) const {
     const auto sArr = arrayExpr->type->asSArray();
     const auto sArrTypeIR = sArr->getIRType(cg);
     if (arrayExpr->elements.empty()) {
-        arrayExpr->IRValue = sArr->getIRZeroValue(cg, arrayExpr->pointee);
+        arrayExpr->IRValue = sArr->getIRZeroValue(cg, nullptr, arrayExpr->pointee);
         return;
     }
 
@@ -780,7 +780,7 @@ void LgsCodeGen::visitStaticArray(LgsArrayExpr* arrayExpr) const {
     LgsIntConst index(&LGS_INT, 0);
     for (size_t i = arrayExpr->elements.size(); i < arrSize; ++i) {
         index.IRValue = cg.i32(i);
-        tempExpr->IRValue = sArr->baseType->getIRZeroValue(cg, arrayExpr->IRValue);
+        tempExpr->IRValue = sArr->baseType->getIRZeroValue(cg, nullptr, arrayExpr->IRValue);
         sArr->addIRElement(cg, arrayExpr, &index, tempExpr);
     }
     freeExpr(tempExpr);
@@ -788,7 +788,7 @@ void LgsCodeGen::visitStaticArray(LgsArrayExpr* arrayExpr) const {
 
 void LgsCodeGen::visitDynamicArray(LgsArrayExpr* arrayExpr) const {
     const auto dArr = arrayExpr->type->asDArray();
-    arrayExpr->IRValue = dArr->getIRZeroValue(cg, arrayExpr->pointee);
+    arrayExpr->IRValue = dArr->getIRZeroValue(cg, nullptr, arrayExpr->pointee);
     for (const auto element : arrayExpr->elements) {
         dArr->addIRElement(cg, arrayExpr, nullptr, element);
     }
@@ -859,7 +859,7 @@ void LgsCodeGen::visitMatrixExpr(const LgsMatrixExpr* matrixExpr) {
 
 void LgsCodeGen::visitHashMap(LgsHashMap* hashMap) {
     const auto map = hashMap->type->asMap();
-    hashMap->IRValue = map->getIRZeroValue(cg, hashMap->pointee);
+    hashMap->IRValue = map->getIRZeroValue(cg, nullptr, hashMap->pointee);
     for (const auto pair : hashMap->elements) {
         visitExpr(pair->key);
         visitExpr(pair->value);
@@ -1152,7 +1152,7 @@ void LgsCodeGen::visitCharConst(LgsCharConst* charConst) const {
 
 void LgsCodeGen::visitInstance(LgsInstance* instance) {
     const auto obj = instance->obj;
-    instance->IRValue = cg.heapAlloc(cg.usize(obj->sizeBytes()));
+    instance->IRValue = cg.heapAlloc(cg.usize(obj->sizeBytes()), cg.usize(instance->isReturnExpr));
 
     // Args
     std::unordered_set<std::string> visited;
@@ -1171,7 +1171,7 @@ void LgsCodeGen::visitInstance(LgsInstance* instance) {
         if (field->expr) {
             cg.store(field->expr->IRValue, pointee);
         } else {
-            cg.store(field->type->getIRZeroValue(cg, pointee), pointee);
+            cg.store(field->type->getIRZeroValue(cg, nullptr, pointee), pointee);
         }
     }
     addVirtuals(instance->obj, instance->IRValue);
@@ -1376,7 +1376,7 @@ void LgsCodeGen::generateMapFunc(LgsFuncType* mapFunc) const {
     const auto tempIndex = iterable->getIndexType()->getZeroValue();
     const auto tempValue = iterable->baseType->getZeroValue();
     tempIter->IRValue = iter;
-    retArr.IRValue = iterable->getIRZeroValue(cg);
+    retArr.IRValue = iterable->getIRZeroValue(cg, cg.usize(1));
     const auto len = iterable->lenIR(cg, iter);
 
     cg.loop(len, [&](Value* iValue, BasicBlock*) {
@@ -1417,7 +1417,7 @@ void LgsCodeGen::generateFilterFunc(LgsFuncType* filterFunc) const {
     const auto tempIndex = iterable->getIndexType()->getZeroValue();
     const auto tempValue = iterable->baseType->getZeroValue();
     tempIter->IRValue = iter;
-    retArr.IRValue = iterable->getIRZeroValue(cg);
+    retArr.IRValue = iterable->getIRZeroValue(cg, cg.usize(1));
     const auto len = iterable->lenIR(cg, iter);
 
     cg.loop(len, [&](Value* iValue, BasicBlock*) {

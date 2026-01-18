@@ -27,7 +27,7 @@ public:
     LgsType* getValueType() override;
     bool canCastTo(LgsType* other) override;
     LgsExpr* getZeroValue() override;
-    Value* getIRZeroValue(LgsCgModule& cg, Value* pointee) override;
+    Value* getIRZeroValue(LgsCgModule& cg, Value* isReturnExpr = nullptr, Value* pointee = nullptr) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     bool inferBaseType(std::vector<LgsExpr*>& args) override;
     Value* lenIR(LgsCgModule& cg, Value* iterable) override;
@@ -41,7 +41,6 @@ public:
     Value* getEntryKey(LgsCgModule& cg, Value* entry) const;
     Value* getEntryValue(LgsCgModule& cg, Value* entry) const;
     Value* getEntryNext(LgsCgModule& cg, Value* entry) const;
-    Value* getNewEntry(LgsCgModule& cg, Value* entryPtr, Value* key, Value* value) const;
     bool unpackLoopVars(LgsForeachLoop* loop) const override;
     void setLoopIRVars(LgsCgModule& cg, LgsForeachLoop* loop) override;
     std::string fmtStr() const override;
