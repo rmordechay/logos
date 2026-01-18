@@ -120,7 +120,7 @@ std::string LgsMatrix::getName() {
 }
 
 bool LgsMatrix::canCastTo(LgsType* other) {
-    if (other->getName() == LgsAny::name) return true;
+    if (other->isAny()) return true;
     if (getName() == other->getName()) return true;
     return false;
 }

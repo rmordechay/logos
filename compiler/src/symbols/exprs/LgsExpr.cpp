@@ -128,6 +128,10 @@ std::optional<std::string> LgsExpr::getConstStr() {
     return std::nullopt;
 }
 
+LgsType* LgsExpr::getType() {
+    return type;
+}
+
 void LgsExpr::setType(LgsType* newType) {
     type = newType;
 }

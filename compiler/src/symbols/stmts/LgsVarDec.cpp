@@ -18,6 +18,7 @@ bool LgsVarDec::shouldAllocate() const {
     if (!type) return false;
     if (type->isHeapAlloc) return false;
     if (type->asSArray()) return false;
+    if (type->asStr() && type->asStr()->isStatic) return false;
     if (type->asNullable() && !type->asNullable()->passByRef) return false;
     if (type->asSubtype() || type->asFuncType()) return false;
     if (expr->asFuncCall() || expr->asBinExpr()) return false;

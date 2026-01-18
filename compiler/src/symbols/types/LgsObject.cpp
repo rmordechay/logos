@@ -9,7 +9,6 @@
 #include "types/LgsEnum.h"
 #include "types/LgsInterface.h"
 #include "LgsUtils.h"
-#include "types/LgsAny.h"
 
 #include <ranges>
 #include <sstream>
@@ -114,7 +113,7 @@ Value* LgsObject::getIRZeroValue(LgsCgModule& cg, Value* isReturnExpr, Value* po
 }
 
 bool LgsObject::canCastTo(LgsType* other) {
-    if (other->getName() == LgsAny::name) return true;
+    if (other->isAny()) return true;
     const auto otherType = other;
     if (const auto otherInterface = otherType->asInterface()) {
         for (const auto objInterface : implements) {

@@ -30,7 +30,6 @@ public:
     Value* inIR(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* value) override;
     Value* getIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index) override;
     void addIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index, LgsExpr* value) override;
-    Value* getLevelField(LgsCgModule& cg, Value* iterable);
     Value* getDataField(LgsCgModule& cg, Value* iterable);
     Value* getLenField(LgsCgModule& cg, Value* iterable);
     Value* getCapField(LgsCgModule& cg, Value* iterable);

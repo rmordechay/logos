@@ -306,12 +306,12 @@ void LgsCodeGen::visitVarDec(LgsVarDec* varDec) {
         if (varDec->expr->IRValue != varDec->IRValue) {
             cg.store(varDec->expr->IRValue, varDec->IRValue);
         }
+        varDec->IRValue->setName(varDec->name);
     } else {
         visitExpr(varDec->expr);
         varDec->IRValue = varDec->expr->IRValue;
     }
     assert(varDec->IRValue);
-    varDec->IRValue->setName(varDec->name);
 }
 
 void LgsCodeGen::visitAssignment(const LgsAssignment* assignment) {

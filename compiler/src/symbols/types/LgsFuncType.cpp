@@ -52,11 +52,10 @@ size_t LgsFuncType::sizeBytes() {
 
 std::string LgsFuncType::getName() {
     assert(name != "");
+    if (isExternal) return name;
     std::stringstream str;
-    if (!isExternal) {
-        if (isBuiltin) str << LGS_PREFIX;
-        else str << "u_";
-    }
+    if (isBuiltin) str << LGS_PREFIX;
+    else str << "u_";
     if (parentName != "") {
         str << parentName << "_";
     }

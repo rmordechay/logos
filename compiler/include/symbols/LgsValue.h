@@ -48,6 +48,7 @@ public:
     virtual LgsValue* clone();
     virtual std::string getName();
     virtual LgsType* getType();
+    Value* getLevel(LgsCgModule& cg);
     void setDebugLoc(LgsCgModule& cg) const;
     virtual ~LgsValue() = default;
 };

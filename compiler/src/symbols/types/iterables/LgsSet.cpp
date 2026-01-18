@@ -37,7 +37,7 @@ std::string LgsSet::pname() {
 }
 
 bool LgsSet::canCastTo(LgsType* other) {
-    if (other->getName() == LgsAny::name) return true;
+    if (other->isAny()) return true;
     const auto otherArr = other->asSet();
     if (!otherArr) return false;
     if (!baseType) return true;

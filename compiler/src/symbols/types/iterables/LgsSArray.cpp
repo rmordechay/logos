@@ -6,6 +6,8 @@
 #include "Lgs_Exprs.h"
 #include "exprs/LgsBinaryExpr.h"
 #include "lgsc/LgsCCompiler.h"
+#include "types/LgsPtr.h"
+#include "types/iterables/LgsStr.h"
 
 Type* LgsSArray::getIRType(LgsCgModule& cg) {
     const auto innerIRType = baseType->getIRType(cg);
@@ -36,15 +38,9 @@ LgsExpr* LgsSArray::getZeroValue() {
 
 Value* LgsSArray::getIRZeroValue(LgsCgModule& cg, Value* isReturnExpr, Value* pointee) {
     const auto ty = getIRType(cg);
-    const auto arrSize = length->getConstInt().value();
     const auto arr = pointee ? pointee : cg.builder.CreateAlloca(ty);
-    LgsIntConst index(&LGS_INT, 0);
-    for (int64_t i = 0; i < arrSize; ++i) {
-        index.IRValue = cg.i32(i);
-        const std::vector<Value*> indices = {cg.i32Zero(), cg.i32(i)};
-        const auto gep = cg.builder.CreateInBoundsGEP(getIRType(cg), arr, indices);
-        cg.store(baseType->getIRZeroValue(cg, nullptr, arr), gep);
-    }
+    const auto zeroBaseValue = baseType->getIRZeroValue(cg, nullptr, arr);
+    cg.callMemSet(arr, zeroBaseValue, cg.usize(sizeBytes()));
     return arr;
 }
 
@@ -159,10 +155,11 @@ Value* LgsSArray::lenIR(LgsCgModule& cg, Value* iterable) {
 
 bool LgsSArray::canCastTo(LgsType* other) {
     if (!baseType) return false;
-    if (other->getName() == LgsAny::name) return true;
-    const auto otherArr = other->asIterable();
-    if (!otherArr) return false;
-    return baseType->canCastTo(otherArr->baseType);
+    if (other->isAny()) return true;
+    if (other->asStr()) return !!baseType->asChar();
+    const auto otherIter = other->asIterable();
+    if (!otherIter) return false;
+    return baseType->canCastTo(otherIter->baseType);
 }
 
 bool LgsSArray::equals(LgsType* other) {

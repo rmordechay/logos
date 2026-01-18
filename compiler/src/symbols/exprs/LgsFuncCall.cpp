@@ -49,6 +49,7 @@ bool LgsFuncCall::equalsVariadic(const LgsFuncType* funcType) const {
         const auto param = funcType->params[i];
         if (!argAndParamEqual(arg.expr, &param)) return false;
     }
+    if (funcType->isExternal) return true;
     // Check the variadic arguments
     const auto& variadicParam = funcType->params.back();
     const auto variadic = variadicParam.type->asVariadic();

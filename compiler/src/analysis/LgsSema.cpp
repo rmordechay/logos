@@ -1095,6 +1095,7 @@ void LgsSema::visitFuncCall(LgsFuncCall* funcCall) {
         funcCall->func = func;
         funcCall->setType(ft->rt);
     }
+    if (errHandler.successful) assert(funcCall->func);
 }
 
 void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent) {
@@ -1163,6 +1164,19 @@ bool LgsSema::visitFuncArgs(LgsFuncCall* funcCall, LgsFuncType* ft) {
             if (arg.name != "") {
                 addError(E10096, funcCall->location);
                 return false;
+            }
+        }
+        if (ft->isVariadic) {
+            const auto& param = ft->params.back();
+            for (size_t i = ft->params.size(); i < funcCall->args.size(); ++i) {
+                if (i >= funcCall->args.size()) break;
+                auto& arg = funcCall->args[i];
+                castExprImplicitly(arg.expr, param.type);
+                visitExpr(arg.expr);
+                if (arg.name != "") {
+                    addError(E10096, funcCall->location);
+                    return false;
+                }
             }
         }
     }
@@ -1302,7 +1316,7 @@ void LgsSema::visitInstance(LgsInstance* instance) {
 
     // Missing required fields
     for (const auto& field : instance->obj->fields) {
-        if (!instance->args.contains(field->name)) {
+        if (!field->isMutable && !instance->args.contains(field->name)) {
             addError(E10029, field->location, {field->name});
         }
     }

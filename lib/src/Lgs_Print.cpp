@@ -61,6 +61,10 @@ static std::string formatElement(const Lgs_TypeInfo* rtt, void* value) {
     case RTT_SARRAY: {
         const auto sArr = rtt->sArray;
         const auto baseType = sArr.baseType;
+        if (baseType->kind == RTT_CHAR) {
+            str << "\"" << static_cast<char*>(value) << "\"";
+            break;
+        }
         str << "[";
         for (size_t i = 0; i < sArr.len; ++i) {
             void* data = static_cast<char*>(value) + i * baseType->size;
@@ -154,10 +158,6 @@ static std::string formatElement(const Lgs_TypeInfo* rtt, void* value) {
         str << formatElement(img, static_cast<char*>(value) + real->size) << 'i';
         break;
     }
-    case RTT_VOID:
-    case RTT_VARIADIC:
-    case RTT_FUNC:
-    case RTT_UNKNOWN:
     default: assert(0);
     }
     return str.str();

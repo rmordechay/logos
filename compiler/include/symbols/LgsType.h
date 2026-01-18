@@ -111,6 +111,7 @@ public:
     virtual Value* rshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
     virtual Value* crossIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
 
+    bool isAny();
     LgsAny* asAny();
     LgsChar* asChar();
     LgsStr* asStr();

@@ -65,7 +65,7 @@ size_t LgsDArray::sizeBytes() {
 }
 
 bool LgsDArray::canCastTo(LgsType* other) {
-    if (other->getName() == LgsAny::name) return true;
+    if (other->isAny()) return true;
     if (other->asGenericType()) return true;
     const auto otherArr = other->asDArray();
     if (!otherArr) return false;
@@ -138,10 +138,6 @@ void LgsDArray::addIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index,
         element = cg.moveElement(iterable->IRValue, element, getRTType(cg));
     }
     cg.builder.CreateCall(generateAddFunc(cg), {iterable->IRValue, element});
-}
-
-Value* LgsDArray::getLevelField(LgsCgModule& cg, Value* iterable) {
-    return cg.builder.CreateStructGEP(getIRType(cg), iterable, 0);
 }
 
 Value* LgsDArray::getDataField(LgsCgModule& cg, Value* iterable) {
@@ -238,7 +234,8 @@ Function* LgsDArray::generateAddFunc(LgsCgModule& cg) {
     const auto newCap = cg.builder.CreateMul(cap, cg.usize(2));
     const auto baseTypeSize = cg.usize(baseType->sizeBytes());
     const auto newSize = cg.builder.CreateMul(newCap, baseTypeSize);
-    const auto level = cg.load(cg.i32Ty(), getLevelField(cg, arrIR));
+    const auto levelField = cg.builder.CreateStructGEP(getIRType(cg), arrIR, 0);
+    const auto level = cg.load(cg.i32Ty(), levelField);
     const auto newPtr = cg.reallocate(data, newSize, level);
     cg.store(newPtr, dataGEP);
     cg.storeStructField(ty, arrIR, 3, newCap);

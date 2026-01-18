@@ -16,7 +16,10 @@ Value* LgsPrint::call(LgsCgModule& cg, std::vector<LgsFuncArg>& args) {
     if (arg->type->asFloat()) {
         return cg.callPrintf({fmt, cg.builder.CreateFPExt(arg->IRValue, cg.doubleTy())});
     }
-    if (arg->type->isInt || arg->type->asChar() || arg->type->asStr()) {
+    if (arg->type->asStr()) {
+        return cg.callPrintf({fmt, arg->IRValue});
+    }
+    if (arg->type->isInt || arg->type->asChar()) {
         return cg.callPrintf({fmt, arg->loadIR(cg)});
     }
     if (const auto enum_ = arg->type->asEnum()) {

@@ -75,7 +75,7 @@ LgsExpr* LgsVec::getZeroValue() {
 
 bool LgsVec::canCastTo(LgsType* other) {
     if (!baseType) return false;
-    if (other->getName() == LgsAny::name) return true;
+    if (other->isAny()) return true;
     const auto otherVec = other->asVec();
     if (!otherVec) return false;
     return dimVec == otherVec->dimVec && baseType->canCastTo(otherVec->baseType);

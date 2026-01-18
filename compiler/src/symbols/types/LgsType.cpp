@@ -199,6 +199,10 @@ Value* LgsType::crossIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     assert(0);
 }
 
+bool LgsType::isAny() {
+    return getName() == LgsAny::name || (asPtr() && asPtr()->baseType->isVoid());
+}
+
 LgsAny* LgsType::asAny() {
     return dynamic_cast<LgsAny*>(this);
 }

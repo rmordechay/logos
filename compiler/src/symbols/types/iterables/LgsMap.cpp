@@ -82,7 +82,7 @@ LgsType* LgsMap::getValueType() {
 }
 
 bool LgsMap::canCastTo(LgsType* other) {
-    if (other->getName() == LgsAny::name) return true;
+    if (other->isAny()) return true;
     const auto otherMap = other->asMap();
     if (!otherMap) return false;
     const auto otherKvType = otherMap->pairType;

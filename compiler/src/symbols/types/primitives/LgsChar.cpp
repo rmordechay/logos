@@ -30,6 +30,10 @@ LgsExpr* LgsChar::getZeroValue() {
     return new LgsCharConst('0');
 }
 
+Value* LgsChar::getIRZeroValue(LgsCgModule& cg, Value* isReturnExpr, Value* pointee) {
+    return cg.i8(0);
+}
+
 std::string LgsChar::fmtStr() const {
     return "'%c'";
 }

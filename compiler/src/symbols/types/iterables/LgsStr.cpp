@@ -3,6 +3,7 @@
 #include "LgsConfigs.h"
 #include "exprs/LgsBinaryExpr.h"
 #include "types/LgsAny.h"
+#include "types/LgsPtr.h"
 #include "types/iterables/LgsSArray.h"
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsChar.h"
@@ -36,7 +37,7 @@ Constant* LgsStr::getRTType(LgsCgModule& cg) {
 }
 
 bool LgsStr::canCastTo(LgsType* other) {
-    if (other->getName() == LgsAny::name) return true;
+    if (other->isAny()) return true;
     if (other->asGenericType()) return true;
     if (const auto sArr = other->asSArray()) {
         return sArr->baseType && sArr->baseType->asChar();

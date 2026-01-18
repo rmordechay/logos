@@ -20,7 +20,7 @@ LgsType* LgsField::getType() {
 }
 
 Value* LgsField::getGEP(LgsCgModule& cg, Value* parentIRPtr) const {
-    assert(parentType);
+    assert(parentType && parentIRPtr);
     return cg.builder.CreateStructGEP(parentType->getIRType(cg), parentIRPtr, position);
 }
 

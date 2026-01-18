@@ -47,7 +47,7 @@ Constant* LgsNullable::getRTType(LgsCgModule& cg) {
 }
 
 bool LgsNullable::canCastTo(LgsType* other) {
-    if (other->getName() == LgsAny::name) return true;
+    if (other->isAny()) return true;
     const auto otherNullable = other->asNullable();
     if (!otherNullable) return false;
     if (!baseType) return true;
