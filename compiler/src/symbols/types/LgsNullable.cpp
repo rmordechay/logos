@@ -22,7 +22,7 @@ LgsExpr* LgsNullable::getZeroValue() {
     return new LgsNullableExpr();
 }
 
-Value* LgsNullable::getIRZeroValue(LgsCgModule& cg, Value* isReturnExpr, Value* pointee) {
+Value* LgsNullable::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
     return cg.null();
 }
 

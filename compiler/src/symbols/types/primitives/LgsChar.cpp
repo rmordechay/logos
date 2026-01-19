@@ -30,7 +30,7 @@ LgsExpr* LgsChar::getZeroValue() {
     return new LgsCharConst('0');
 }
 
-Value* LgsChar::getIRZeroValue(LgsCgModule& cg, Value* isReturnExpr, Value* pointee) {
+Value* LgsChar::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
     return cg.i8(0);
 }
 

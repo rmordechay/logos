@@ -89,7 +89,7 @@ LgsType* LgsIterable::getValueType() {
     return baseType;
 }
 
-void LgsIterable::addIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index, LgsExpr* value) {
+void LgsIterable::addIRElement(LgsCgModule& cg, Value* iterable, Value* index, Value* value) {
     assert(0);
 }
 

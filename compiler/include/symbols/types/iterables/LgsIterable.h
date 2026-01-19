@@ -37,8 +37,8 @@ public:
     virtual void setLoopIRVars(LgsCgModule& cg, LgsForeachLoop* loop);
 
     virtual Value* lenIR(LgsCgModule& cg, Value* iterable) = 0;
-    virtual Value* inIR(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* value) = 0;
-    virtual Value* getIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index) = 0;
-    virtual void addIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index, LgsExpr* value);
+    virtual Value* inIR(LgsCgModule& cg, Value* iterable, Value* value) = 0;
+    virtual Value* getIRElement(LgsCgModule& cg, Value* iterable, Value* index) = 0;
+    virtual void addIRElement(LgsCgModule& cg, Value* iterable, Value* index, Value* value);
     ~LgsIterable() override;
 };

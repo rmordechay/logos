@@ -3,7 +3,6 @@
 #include "LgsConfigs.h"
 #include "exprs/LgsBinaryExpr.h"
 #include "types/LgsAny.h"
-#include "types/LgsPtr.h"
 #include "types/iterables/LgsSArray.h"
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsChar.h"
@@ -28,7 +27,7 @@ LgsExpr* LgsStr::getZeroValue() {
     return new LgsStrConst("");
 }
 
-Value* LgsStr::getIRZeroValue(LgsCgModule& cg, Value* isReturnExpr, Value* pointee) {
+Value* LgsStr::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
     return cg.emptyStr();
 }
 
@@ -49,9 +48,7 @@ LgsType* LgsStr::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     switch (op.opType) {
     case ADD: {
         if (rightType->asStr() || rightType->asChar() || rightType->isNumber()) {
-            const auto str = new LgsStr();
-            str->isStatic = isStatic;
-            return str;
+            return new LgsStr();
         }
         break;
     }
@@ -70,8 +67,8 @@ LgsType* LgsStr::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     return nullptr;
 }
 
-Value* LgsStr::getIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index) {
-    const auto gep =  cg.builder.CreateGEP(cg.i8Ty(), iterable->IRValue, {cg.i32Zero(), index->IRValue});
+Value* LgsStr::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
+    const auto gep =  cg.builder.CreateGEP(cg.i8Ty(), iterable, {cg.i32Zero(), index});
     return cg.load(cg.i8Ty(), gep);
 }
 
@@ -98,21 +95,22 @@ Value* LgsStr::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
         return cg.getString(leftStrConst.value() + std::to_string(rightFloatConst.value()));
     }
 
-    const auto leftIterable = left->type->asStr();
-    const auto rightIterable = right->type->asStr();
-    assert(leftIterable && rightIterable);
-
     const auto leftSize = lenIR(cg, left->IRValue);
     const auto rightSize = lenIR(cg, right->IRValue);
     const auto sumSize = cg.builder.CreateAdd(leftSize, rightSize);
     const auto allocSize = cg.builder.CreateAdd(sumSize, cg.usize(1));
 
-    const auto buffer = cg.heapAlloc(allocSize, cg.usize(left->isReturnExpr && right->isReturnExpr));
+    Value* level = nullptr;
+    if (left->isReturnExpr) {
+        level = cg.builder.CreateSub(cg.currentLevel, cg.usize(1));
+    } else if (left->level) {
+        level = left->level;
+    }
+    const auto buffer = cg.heapAlloc(allocSize, level);
     const auto rightPos = cg.builder.CreateInBoundsGEP(cg.i8Ty(), buffer, leftSize);
-    cg.callMemCpy(buffer, left->IRValue, leftSize);
-    cg.callMemCpy(rightPos, right->IRValue, rightSize);
-    const auto nullPos = cg.builder.CreateInBoundsGEP(cg.i8Ty(), buffer, sumSize);
-    cg.builder.CreateStore(cg.i8Zero(), nullPos);
+    cg.callMemcpy(buffer, left->IRValue, leftSize);
+    cg.callMemcpy(rightPos, right->IRValue, rightSize);
+    cg.addNullTerminate(buffer, sumSize);
     return buffer;
 }
 
@@ -120,8 +118,8 @@ Value* LgsStr::lenIR(LgsCgModule& cg, Value* iterable) {
     return cg.callStrLen(iterable);
 }
 
-Value* LgsStr::inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) {
-    const auto rv = cg.callFunc("strstr", cg.ptrTy(), {cg.ptrTy(), cg.ptrTy()}, {iterableExpr->IRValue, value->IRValue});
+Value* LgsStr::inIR(LgsCgModule& cg, Value* iterableExpr, Value* value) {
+    const auto rv = cg.callFunc("strstr", cg.ptrTy(), {cg.ptrTy(), cg.ptrTy()}, {iterableExpr, value});
     return cg.builder.CreateIsNotNull(rv);
 }
 

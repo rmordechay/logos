@@ -58,21 +58,21 @@ void LgsIterIndex::setIRElementPtr(LgsCgModule& cg, const bool assign) {
 
     // Map
     if (const auto map = baseExpr->type->asMap()) {
-        IRValue = map->getIRElement(cg, baseExpr, index.from);
+        IRValue = map->getIRElement(cg, baseExpr->IRValue, index.from->IRValue);
         return;
     }
 
     // Matrix
     if (const auto matrix = baseExpr->type->asMatrix()) {
         if (!boundsChecked) cg.createIndexBoundsGuard(cg.i32(matrix->rows), fromIR);
-        IRValue = matrix->getIRElement(cg, baseExpr, index.from);
+        IRValue = matrix->getIRElement(cg, baseExpr->IRValue, index.from->IRValue);
         return;
     }
 
     // Fallback
     if (const auto iter = baseExpr->type->asIterable()) {
         fromIR = cg.builder.CreateZExt(fromIR, cg.i64Ty());
-        IRValue = iter->getIRElement(cg, baseExpr, index.from);
+        IRValue = iter->getIRElement(cg, baseExpr->IRValue, fromIR);
     }
 }
 
@@ -97,7 +97,7 @@ void LgsIterIndex::setIRRangePtr(LgsCgModule& cg, bool assign) {
         const auto sizeWithNull = cg.builder.CreateAdd(size, cg.i32(1));
         IRValue = cg.builder.CreateAlloca(cg.i8Ty(), sizeWithNull);
         const auto src = cg.builder.CreateInBoundsGEP(cg.i8Ty(), baseExpr->IRValue, {fromIR});
-        cg.callMemCpy(IRValue, src, size);
+        cg.callMemcpy(IRValue, src, size);
         cg.addNullTerminate(IRValue, size);
     } else if (const auto sArray = type->asSArray()) {
         const auto size = cg.builder.CreateSub(toIR, fromIR);
@@ -107,7 +107,7 @@ void LgsIterIndex::setIRRangePtr(LgsCgModule& cg, bool assign) {
         const auto elementSize = cg.IRModule->getDataLayout().getTypeAllocSize(ty);
         const auto elementSizeVal = cg.builder.getInt32(elementSize);
         const auto sizeInBytes = cg.builder.CreateMul(size, elementSizeVal);
-        cg.callMemCpy(IRValue, src, sizeInBytes);
+        cg.callMemcpy(IRValue, src, sizeInBytes);
     } else {
         assert(0);
     }
@@ -119,7 +119,7 @@ void LgsIterIndex::assign(LgsCgModule& cg, LgsExpr* expr) {
     if (const auto addFunc = iter->getMethod("add"); addFunc->fn) {
         addFunc->fn(cg, {LgsFuncArg(baseExpr), LgsFuncArg(index.from), LgsFuncArg(expr)});
     } else {
-        iter->addIRElement(cg, baseExpr, index.from, expr);
+        iter->addIRElement(cg, baseExpr->IRValue, index.from->IRValue, expr->IRValue);
     }
 }
 

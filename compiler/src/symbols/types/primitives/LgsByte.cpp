@@ -22,54 +22,6 @@ LgsType* LgsByte::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     assert(0);
 }
 
-Value* LgsByte::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto l = cg.builder.CreateZExt(left->loadIR(cg), getIRType(cg));
-    const auto r = cg.builder.CreateZExt(right->loadIR(cg), getIRType(cg));
-    return cg.builder.CreateAdd(l, r);
-}
-
-Value* LgsByte::subIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto l = cg.builder.CreateZExt(left->loadIR(cg), getIRType(cg));
-    const auto r = cg.builder.CreateZExt(right->loadIR(cg), getIRType(cg));
-    return cg.builder.CreateSub(l, r);
-}
-
-Value* LgsByte::mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto l = cg.builder.CreateZExt(left->loadIR(cg), getIRType(cg));
-    const auto r = cg.builder.CreateZExt(right->loadIR(cg), getIRType(cg));
-    return cg.builder.CreateMul(l, r);
-}
-
-Value* LgsByte::divIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto l = cg.builder.CreateZExt(left->loadIR(cg), getIRType(cg));
-    const auto r = cg.builder.CreateZExt(right->loadIR(cg), getIRType(cg));
-    return cg.builder.CreateSDiv(l, r);
-}
-
-Value* LgsByte::modIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return cg.builder.CreateSRem(left->loadIR(cg), right->loadIR(cg));
-}
-
-Value* LgsByte::bitAndIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return cg.builder.CreateAnd(left->loadIR(cg), right->loadIR(cg));
-}
-
-Value* LgsByte::bitOrIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return cg.builder.CreateOr(left->loadIR(cg), right->loadIR(cg));
-}
-
-Value* LgsByte::bitXorIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return cg.builder.CreateXor(left->loadIR(cg), right->loadIR(cg));
-}
-
-Value* LgsByte::rshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return cg.builder.CreateShl(left->loadIR(cg), right->loadIR(cg));
-}
-
-Value* LgsByte::lshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return cg.builder.CreateLShr(left->loadIR(cg), right->loadIR(cg));
-}
-
 size_t LgsByte::sizeBytes() {
     return sizeof(int8_t);
 }

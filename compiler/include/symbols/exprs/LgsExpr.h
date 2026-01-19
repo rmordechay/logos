@@ -37,15 +37,18 @@ class LgsFloatConst;
 class LgsStrConst;
 class LgsTypeConst;
 
+
 class LgsExpr : public LgsValue {
 public:
     LgsType* type = nullptr;
     bool isMutable = true;
     bool isImportName = false;
     bool isNull = false;
-    bool isReturnExpr = false;
     bool hasUnwrapSuffix = false;
+    bool isReturnExpr = false;
+    bool hasMoved = false;
     Value* pointee = nullptr;
+    Value* level = nullptr;
 
     explicit LgsExpr(LgsType* type = nullptr) : type(type) {}
     std::optional<int64_t> getConstInt();

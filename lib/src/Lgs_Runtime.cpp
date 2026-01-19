@@ -28,16 +28,8 @@ extern "C" void Lgs_Runtime_pop() {
     runtime.level--;
 }
 
-extern "C" void* Lgs_Runtime_moveReturnValue(const void* rv, const size_t rvSize) {
-    auto allocator = runtime.stack.at(runtime.level - 2).allocator;
-    const auto newPtr = allocator.allocate(rvSize);
-    std::memcpy(newPtr, rv, rvSize);
-    return newPtr;
-}
-
-extern "C" void* Lgs_Runtime_allocate(const size_t size, const size_t isReturn) {
-    assert(runtime.level - isReturn > 0);
-    return runtime.stack.at(runtime.level - isReturn).allocator.allocate(size);
+extern "C" void* Lgs_Runtime_allocate(const size_t size, const size_t level) {
+    return runtime.stack.at(level).allocator.allocate(size);
 }
 
 extern "C" void Lgs_Runtime_move(void* left, void* right, const Lgs_TypeInfo* type) {
@@ -118,6 +110,10 @@ extern "C" int64_t Lgs_Runtime_timeEnd(const int64_t start) {
     return endNano - start;
 }
 
+extern "C" size_t Lgs_Runtime_getCurrentLevel() {
+    return runtime.level;
+}
+
 extern "C" void Lgs_DArray_initDArray(Lgs_DArrayExpr* arr, const size_t dataSize) {
     auto& allocator = runtime.stack.at(runtime.level).allocator;
     arr->level = runtime.level;
@@ -142,6 +138,7 @@ void moveObject(void* left, void* right, const Lgs_Object* obj) {
         }
     }
 }
+
 
 static Lgs_StackFrame& getTop() {
     return runtime.stack.at(runtime.level);

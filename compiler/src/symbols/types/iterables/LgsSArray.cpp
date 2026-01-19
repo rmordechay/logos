@@ -36,11 +36,11 @@ LgsExpr* LgsSArray::getZeroValue() {
     return new LgsArrayExpr(this);
 }
 
-Value* LgsSArray::getIRZeroValue(LgsCgModule& cg, Value* isReturnExpr, Value* pointee) {
+Value* LgsSArray::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
     const auto ty = getIRType(cg);
     const auto arr = pointee ? pointee : cg.builder.CreateAlloca(ty);
-    const auto zeroBaseValue = baseType->getIRZeroValue(cg, nullptr, arr);
-    cg.callMemSet(arr, zeroBaseValue, cg.usize(sizeBytes()));
+    const auto zeroBaseValue = baseType->getIRZeroValue(cg, arr);
+    cg.callMemset(arr, zeroBaseValue, cg.usize(sizeBytes()));
     return arr;
 }
 
@@ -97,10 +97,10 @@ Value* LgsSArray::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     const auto newSize = cg.builder.CreateAdd(leftSize, rightSize);
     const auto newArr = cg.builder.CreateAlloca(baseIR, newSize);
     const auto sizeLeft = cg.builder.CreateMul(leftSize, cg.i32(baseType->sizeBytes()));
-    cg.callMemCpy(newArr, left->IRValue, sizeLeft);
+    cg.callMemcpy(newArr, left->IRValue, sizeLeft);
     const auto sizeRight = cg.builder.CreateMul(rightSize, cg.i32(baseType->sizeBytes()));
     const auto offset = cg.builder.CreateInBoundsGEP(baseIR, newArr, leftSize);
-    cg.callMemCpy(offset, right->IRValue, sizeRight);
+    cg.callMemcpy(offset, right->IRValue, sizeRight);
     return newArr;
 }
 
@@ -114,21 +114,19 @@ Value* LgsSArray::mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     cg.loop(multiplier, [&](Value* i, BasicBlock*) {
         const auto offset = cg.builder.CreateMul(i, arrSize);
         const auto destPtr = cg.builder.CreateInBoundsGEP(baseType->getIRType(cg), newArr, offset);
-        cg.callMemCpy(destPtr, arrPtr, bytesPerCopy);
+        cg.callMemcpy(destPtr, arrPtr, bytesPerCopy);
     });
     return newArr;
 }
 
-Value* LgsSArray::inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) {
+Value* LgsSArray::inIR(LgsCgModule& cg, Value* iterableExpr, Value* value) {
     const auto resultPtr = cg.builder.CreateAlloca(cg.builder.getInt1Ty());
     cg.store(cg.false_(), resultPtr);
     cg.loop(length->loadIR(cg), [this, &cg, iterableExpr, value, resultPtr](Value* index, BasicBlock* exitBlock) {
         const auto trueBlock = cg.createBlock();
         const auto falseBlock = cg.createBlock();
-        LgsIntConst tempIndex(&LGS_INT, 0);
-        tempIndex.IRValue = index;
-        const auto element = getIRElement(cg, iterableExpr, &tempIndex);
-        const auto eq = eqIR(cg, element, value->IRValue, baseType, baseType);
+        const auto element = getIRElement(cg, iterableExpr, index);
+        const auto eq = eqIR(cg, element, value, baseType);
         cg.builder.CreateCondBr(eq, trueBlock, falseBlock);
         cg.startBlock(trueBlock);
         cg.store(cg.true_(), resultPtr);
@@ -138,15 +136,15 @@ Value* LgsSArray::inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) {
     return cg.load(cg.builder.getInt1Ty(), resultPtr);
 }
 
-Value* LgsSArray::getIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index) {
-    const auto gep = cg.builder.CreateGEP(getIRType(cg), iterable->IRValue, {cg.i32Zero(), index->IRValue});
+Value* LgsSArray::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
+    const auto gep = cg.builder.CreateGEP(getIRType(cg), iterable, {cg.i32Zero(), index});
     return cg.load(baseType->getIRType(cg), gep);
 }
 
-void LgsSArray::addIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index, LgsExpr* value) {
-    const std::vector<Value*> indices = {cg.i32Zero(), index->IRValue};
-    const auto gep = cg.builder.CreateInBoundsGEP(getIRType(cg), iterable->IRValue, indices);
-    cg.store(value->IRValue, gep);
+void LgsSArray::addIRElement(LgsCgModule& cg, Value* iterable, Value* index, Value* value) {
+    const std::vector<Value*> indices = {cg.i32Zero(), index};
+    const auto gep = cg.builder.CreateInBoundsGEP(getIRType(cg), iterable, indices);
+    cg.store(value, gep);
 }
 
 Value* LgsSArray::lenIR(LgsCgModule& cg, Value* iterable) {

@@ -27,14 +27,14 @@ public:
     LgsType* getValueType() override;
     bool canCastTo(LgsType* other) override;
     LgsExpr* getZeroValue() override;
-    Value* getIRZeroValue(LgsCgModule& cg, Value* isReturnExpr = nullptr, Value* pointee = nullptr) override;
+    Value* getIRZeroValue(LgsCgModule& cg, Value* pointee = nullptr) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     bool inferBaseType(std::vector<LgsExpr*>& args) override;
     Value* lenIR(LgsCgModule& cg, Value* iterable) override;
-    Value* inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
-    Value* getIRElement(LgsCgModule& cg, LgsExpr* map, LgsExpr* index) override;
+    Value* inIR(LgsCgModule& cg, Value* iterableExpr, Value* value) override;
+    Value* getIRElement(LgsCgModule& cg, Value* map, Value* index) override;
     Function* generateAddFunc(LgsCgModule& cg);
-    void addIRElement(LgsCgModule& cg, LgsExpr* map, LgsExpr* index, LgsExpr* value) override;
+    void addIRElement(LgsCgModule& cg, Value* map, Value* index, Value* value) override;
     StructType* getEntryStruct(LgsCgModule& cg) const;
     Value* loadEntriesField(LgsCgModule& cg, Value* map);
     Value* loadCapField(LgsCgModule& cg, Value* map);

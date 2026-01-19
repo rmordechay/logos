@@ -28,7 +28,7 @@ public:
     bool inferBaseType(std::vector<LgsExpr*>& args) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     Value* lenIR(LgsCgModule& cg, Value* iterable) override;
-    Value* inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
-    Value* getIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index) override;
+    Value* inIR(LgsCgModule& cg, Value* iterableExpr, Value* value) override;
+    Value* getIRElement(LgsCgModule& cg, Value* iterable, Value* index) override;
     DIType* getDebugType(LgsCgModule& cg) override;
 };

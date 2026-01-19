@@ -63,60 +63,6 @@ LgsType* LgsSize::applyBinOp(LgsType* rightType, LgsBinOp& op) {
 
 }
 
-Value* LgsSize::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto l = cg.builder.CreateZExt(left->loadIR(cg), getIRType(cg));
-    const auto r = cg.builder.CreateZExt(right->loadIR(cg), getIRType(cg));
-    return cg.builder.CreateAdd(l, r);
-}
-
-Value* LgsSize::subIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto r = cg.builder.CreateZExt(right->loadIR(cg), getIRType(cg));
-    return cg.builder.CreateSub(left->loadIR(cg), r);
-}
-
-Value* LgsSize::mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    auto r = right->loadIR(cg);
-    if (!left->type->asVec()) {
-        r = cg.builder.CreateZExt(r, getIRType(cg));
-    }
-    return cg.builder.CreateMul(left->loadIR(cg), r);
-}
-
-Value* LgsSize::divIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto r = cg.builder.CreateZExt(right->loadIR(cg), getIRType(cg));
-    return cg.builder.CreateSDiv(left->loadIR(cg), r);
-}
-
-Value* LgsSize::modIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto r = cg.builder.CreateZExt(right->loadIR(cg), getIRType(cg));
-    return cg.builder.CreateSRem(left->loadIR(cg), r);
-}
-
-Value* LgsSize::bitAndIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto r = cg.builder.CreateZExt(right->loadIR(cg), getIRType(cg));
-    return cg.builder.CreateAnd(left->loadIR(cg), r);
-}
-
-Value* LgsSize::bitOrIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto r = cg.builder.CreateZExt(right->loadIR(cg), getIRType(cg));
-    return cg.builder.CreateOr(left->loadIR(cg), r);
-}
-
-Value* LgsSize::bitXorIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto r = cg.builder.CreateZExt(right->loadIR(cg), getIRType(cg));
-    return cg.builder.CreateXor(left->loadIR(cg), r);
-}
-
-Value* LgsSize::rshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto r = cg.builder.CreateZExt(right->loadIR(cg), getIRType(cg));
-    return cg.builder.CreateShl(left->loadIR(cg), r);
-}
-
-Value* LgsSize::lshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto r = cg.builder.CreateZExt(right->loadIR(cg), getIRType(cg));
-    return cg.builder.CreateLShr(left->loadIR(cg), r);
-}
-
 Constant* LgsSize::getRTType(LgsCgModule& cg) {
     return cg.getRTTypeInfo(getName(), sizeBytes(), RTT_SIZE, cg.null());
 }

@@ -19,7 +19,7 @@ LgsExpr* LgsFloat::getZeroValue() {
     return new LgsFloatConst(this, 0.0);
 }
 
-Value* LgsFloat::getIRZeroValue(LgsCgModule& cg, Value* isReturnExpr, Value* pointee) {
+Value* LgsFloat::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
     return cg.floatv(0);
 }
 
@@ -79,26 +79,26 @@ LgsType* LgsFloat::applyBinOp(LgsType* rightType, LgsBinOp& op) {
 }
 
 Value* LgsFloat::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    auto [l, r] = loadPairAsFloat(cg, left->loadIR(cg), right->loadIR(cg), left->type, right->type);
+    auto [l, r] = loadNumberPair(cg, left->loadIR(cg), right->loadIR(cg), cg.floatTy());
     return cg.builder.CreateFAdd(l, r);
 }
 
 Value* LgsFloat::subIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    auto [l, r] = loadPairAsFloat(cg, left->loadIR(cg), right->loadIR(cg), left->type, right->type);
+    auto [l, r] = loadNumberPair(cg, left->loadIR(cg), right->loadIR(cg), cg.floatTy());
     return cg.builder.CreateFSub(l, r);
 }
 
 Value* LgsFloat::mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     if (left->type->asVec() && right->type->asVec()) {
-        const auto dotFunc = dotProductFunc(cg, left, right);
+        const auto dotFunc = dotProductFunc(cg, left->type->asVec());
         return cg.builder.CreateCall(dotFunc, {left->loadIR(cg), right->loadIR(cg)});
     }
-    auto [l, r] = loadPairAsFloat(cg, left->loadIR(cg), right->loadIR(cg), left->type, right->type);
+    auto [l, r] = loadNumberPair(cg, left->loadIR(cg), right->loadIR(cg), cg.floatTy());
     return cg.builder.CreateFMul(l, r);
 }
 
 Value* LgsFloat::divIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    auto [l, r] = loadPairAsFloat(cg, left->loadIR(cg), right->loadIR(cg), left->type, right->type);
+    auto [l, r] = loadNumberPair(cg, left->loadIR(cg), right->loadIR(cg), cg.floatTy());
     return cg.builder.CreateFDiv(l, r);
 }
 

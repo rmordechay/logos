@@ -24,7 +24,7 @@ LgsExpr* LgsInt::getZeroValue() {
     return new LgsIntConst(&LGS_INT, 0);
 }
 
-Value* LgsInt::getIRZeroValue(LgsCgModule& cg, Value* isReturnExpr, Value* pointee) {
+Value* LgsInt::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
     return cg.i32Zero();
 }
 
@@ -76,9 +76,8 @@ LgsType* LgsInt::applyBinOp(LgsType* rightType, LgsBinOp& op) {
 }
 
 Value* LgsInt::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto ty = getBiggestIntType({left->type, right->type})->getIRType(cg);
-    const auto l = cg.builder.CreateZExt(left->loadIR(cg), ty);
-    const auto r = cg.builder.CreateZExt(right->loadIR(cg), ty);
+    const auto l = cg.builder.CreateZExt(left->loadIR(cg), getIRType(cg));
+    const auto r = cg.builder.CreateZExt(right->loadIR(cg), getIRType(cg));
     return cg.builder.CreateAdd(l, r);
 }
 

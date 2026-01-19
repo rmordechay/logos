@@ -190,11 +190,7 @@ Value* LgsCgModule::loadStructField(Type* parentType, Value* parentPtr, const si
 }
 
 void LgsCgModule::addNullTerminate(Value* strPtr, Value* pos) {
-    store(i8Zero(), builder.CreateGEP(i8Ty(), strPtr, pos));
-}
-
-StructType* LgsCgModule::getAllocType() {
-    return getStructType({sizeTy(), sizeTy()}, "Alloc");
+    store(i8Zero(), builder.CreateInBoundsGEP(i8Ty(), strPtr, {pos}));
 }
 
 void LgsCgModule::callStackPush() {
@@ -217,8 +213,12 @@ Value* LgsCgModule::getFromVTable(Value* instance, Value* name) {
     return callRuntimeFunc("getFromVTable", ptrTy(), {ptrTy(), ptrTy()}, {instance, name});
 }
 
-Value* LgsCgModule::heapAlloc(Value* size, Value* isReturn) {
-    return callRuntimeFunc("allocate", ptrTy(), {sizeTy(), sizeTy()}, {extendToSize(size), isReturn ? isReturn : usize(0)});
+Value* LgsCgModule::heapAlloc(Value* size, Value* level) {
+    return callRuntimeFunc("allocate", ptrTy(), {sizeTy(), sizeTy()}, {size, level ? level : currentLevel});
+}
+
+Value* LgsCgModule::reallocate(Value* ptr, Value* size, Value* level) {
+    return callRuntimeFunc("reallocate", ptrTy(), {ptrTy(), sizeTy(), sizeTy()}, {ptr, extendToSize(size), extendToSize(level)});
 }
 
 Value* LgsCgModule::moveAlloc(Value* leftPtr, Value* rightPtr, Constant* type) {
@@ -231,10 +231,6 @@ Value* LgsCgModule::moveElement(Value* iterable, Value* element, Constant* type)
     const std::vector<Type*> params = {ptrTy(), ptrTy(), ptrTy()};
     const std::vector<Value*> args = {iterable, element, type};
     return callRuntimeFunc("moveElement", ptrTy(), params, args);
-}
-
-Value* LgsCgModule::reallocate(Value* ptr, Value* size, Value* level) {
-    return callRuntimeFunc("reallocate", ptrTy(), {ptrTy(), sizeTy(), sizeTy()}, {ptr, extendToSize(size), extendToSize(level)});
 }
 
 void LgsCgModule::callThrowError(const LgsBaseMsg& err, const std::vector<Value*>& args) {
@@ -315,7 +311,7 @@ Value* LgsCgModule::callLgsFunc(const std::string& baseName, const std::string& 
     return callFunc(LGS_PREFIX + baseName + '_' + funcName, rt, paramTypes, args);
 }
 
-Value* LgsCgModule::callRuntimeFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes, const std::vector<Value*>& args, bool isVariadic) {
+Value* LgsCgModule::callRuntimeFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes, const std::vector<Value*>& args, const bool isVariadic) {
     if (debugger.diBuilder) {
         const auto savedDbg = builder.getCurrentDebugLocation();
         builder.SetCurrentDebugLocation(llvm::DebugLoc());
@@ -342,15 +338,15 @@ Value* LgsCgModule::callStrLen(Value* str) {
     return callFunc("strlen", i64Ty(), {ptrTy()}, {str});
 }
 
-void LgsCgModule::callMemSet(Value* dest, Value* src, Value* size) {
+void LgsCgModule::callMemset(Value* dest, Value* src, Value* size) {
     builder.CreateMemSet(dest, src, size, llvm::MaybeAlign());
 }
 
-void LgsCgModule::callMemCpy(Value* dest, Value* src, Value* size) {
+void LgsCgModule::callMemcpy(Value* dest, Value* src, Value* size) {
     builder.CreateMemCpy(dest, llvm::MaybeAlign(), src, llvm::MaybeAlign(), size);
 }
 
-Constant* LgsCgModule::getRTTypeInfo(const std::string& name, const size_t size, const Lgs_TypeKind kind, Constant* extra, bool isHeap) {
+Constant* LgsCgModule::getRTTypeInfo(const std::string& name, const size_t size, const Lgs_TypeKind kind, Constant* extra, const bool isHeap) {
     const auto typeInfo = getRTTBaseStruct();
     const auto prefixedName = LGS_TYPEINFO_PREFIX + name;
     if (mode == CG_MODE_RTTYPES) {

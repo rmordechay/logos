@@ -13,7 +13,7 @@ LgsFunc* LgsDArray::getMethod(const std::string& methodName) {
         if (methods.contains(ADD_FUNC)) return methods[ADD_FUNC];
         const auto addFunc = new LgsFunc(ADD_FUNC, name, &LGS_VOID, {this, baseType}, flags);
         addFunc->fn = [this](LgsCgModule& cg, const std::vector<LgsFuncArg>& args) {
-            addIRElement(cg, args[0].expr, nullptr, args[1].expr);
+            addIRElement(cg, args[0].expr->IRValue, nullptr, args[1].expr->IRValue);
             return nullptr;
         };
         addMethod(addFunc);
@@ -78,8 +78,8 @@ LgsExpr* LgsDArray::getZeroValue() {
     return new LgsArrayExpr(this);
 }
 
-Value* LgsDArray::getIRZeroValue(LgsCgModule& cg, Value* isReturnExpr, Value* pointee) {
-    const auto alloc = pointee ? pointee : cg.heapAlloc(cg.usize(sizeBytes()), isReturnExpr);
+Value* LgsDArray::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
+    const auto alloc = pointee ? pointee : cg.heapAlloc(cg.usize(sizeBytes()));
     const auto initSize = cg.usize(LGS_MAP_INITIAL_CAPACITY * baseType->sizeBytes());
     cg.callLgsFunc(name, "initDArray", cg.voidTy(), {cg.ptrTy(), cg.sizeTy()}, {alloc, initSize});
     return alloc;
@@ -115,14 +115,14 @@ Value* LgsDArray::lenIR(LgsCgModule& cg, Value* iterable) {
     return cg.load(cg.sizeTy(), lenFieldPtr);
 }
 
-Value* LgsDArray::inIR(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* value) {
-    return cg.builder.CreateCall(generateContainsFunc(cg), {iterable->IRValue, value->IRValue});
+Value* LgsDArray::inIR(LgsCgModule& cg, Value* iterable, Value* value) {
+    return cg.builder.CreateCall(generateContainsFunc(cg), {iterable, value});
 }
 
-Value* LgsDArray::getIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index) {
+Value* LgsDArray::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
     const auto baseSize = cg.usize(baseType->sizeBytes());
-    const auto dataFieldPtr = getDataField(cg, iterable->IRValue);
-    const auto offset = cg.builder.CreateMul(cg.extendToSize(index->IRValue), baseSize);
+    const auto dataFieldPtr = getDataField(cg, iterable);
+    const auto offset = cg.builder.CreateMul(cg.extendToSize(index), baseSize);
     const auto dataField = cg.load(cg.ptrTy(), dataFieldPtr);
     auto ptr = cg.builder.CreateInBoundsPtrAdd(dataField, offset);
     if (baseType->passByRef) {
@@ -131,13 +131,13 @@ Value* LgsDArray::getIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* inde
     return ptr;
 }
 
-void LgsDArray::addIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index, LgsExpr* value) {
+void LgsDArray::addIRElement(LgsCgModule& cg, Value* iterable, Value* index, Value* value) {
     if (index) assert(0);
-    auto element = value->IRValue;
+    auto element = value;
     if (baseType->isHeapAlloc) {
-        element = cg.moveElement(iterable->IRValue, element, getRTType(cg));
+        element = cg.moveElement(iterable, element, getRTType(cg));
     }
-    cg.builder.CreateCall(generateAddFunc(cg), {iterable->IRValue, element});
+    cg.builder.CreateCall(generateAddFunc(cg), {iterable, element});
 }
 
 Value* LgsDArray::getDataField(LgsCgModule& cg, Value* iterable) {
@@ -179,8 +179,8 @@ Function* LgsDArray::generateContainsFunc(LgsCgModule& cg) {
     cg.loop(lenIR(cg, arrIR), [&](Value* iValue, BasicBlock*) {
         LgsIntConst size(&LGS_SIZE, 0);
         size.IRValue = iValue;
-        const auto elementPtr = tempArr->type->asIterable()->getIRElement(cg, tempArr, &size);
-        const auto elementsAreEqual = eqIR(cg, value, elementPtr, baseType, baseType);
+        const auto elementPtr = tempArr->type->asIterable()->getIRElement(cg, tempArr->IRValue, size.IRValue);
+        const auto elementsAreEqual = eqIR(cg, value, elementPtr, baseType);
         cg.ifStmt(elementsAreEqual, [&cg] {cg.builder.CreateRet(cg.true_());});
     });
 

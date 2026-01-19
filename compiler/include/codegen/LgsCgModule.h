@@ -67,6 +67,7 @@ public:
     LgsLLDBGen debugger;
     Module* IRModule = nullptr;
     Function* currentFunc = nullptr;
+    Value* currentLevel = nullptr;
     IRBuilderBase::InsertPoint savedIP;
     IRBuilder<> builder = IRBuilder(context);
     std::map<std::string, Type*> typesRegistry;
@@ -89,17 +90,16 @@ public:
     void storeStructField(Type* parentType, Value* parentPtr, size_t position, Value* v);
     Value* loadStructField(Type* parentType, Value* parentPtr, size_t position, Type* ty);
     void addNullTerminate(Value* strPtr, Value* pos);
-    StructType* getAllocType();
 
     void callStackPush();
     void callPopStack();
     Value* callHash(Value* arg);
     void addToVTable(Value* instance, Value* name, Value* ptr);
     Value* getFromVTable(Value* instance, Value* name);
-    Value* heapAlloc(Value* size, Value* isReturn);
+    Value* heapAlloc(Value* size, Value* level = nullptr);
+    Value* reallocate(Value* ptr, Value* size, Value* level);
     Value* moveAlloc(Value* leftPtr, Value* rightPtr, Constant* type);
     Value* moveElement(Value* iterable, Value* element, Constant* type);
-    Value* reallocate(Value* ptr, Value* size, Value* level);
     void callThrowError(const LgsBaseMsg& err, const std::vector<Value*>& args = {});
 
     // Blocks
@@ -123,8 +123,8 @@ public:
     Value* callPrintf(const std::vector<Value*>& args);
     Value* callSnprintf(const std::string& fmt, const std::vector<Value*>& args);
     Value* callStrLen(Value* str);
-    void callMemSet(Value* dest, Value* src, Value* size);
-    void callMemCpy(Value* dest, Value* src, Value* size);
+    void callMemset(Value* dest, Value* src, Value* size);
+    void callMemcpy(Value* dest, Value* src, Value* size);
 
     // Runtime funcs
     Constant* getRTTypeInfo(const std::string& name, size_t size, Lgs_TypeKind kind, Constant* extra, bool isHeap = false);

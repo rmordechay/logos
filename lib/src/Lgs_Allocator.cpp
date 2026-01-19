@@ -17,8 +17,7 @@ void* Lgs_Allocator::allocate(const size_t size) {
         // std::println("Allocated block: {}", currentBlock);
     }
     void* ptr = static_cast<char*>(currentBlock) + offset;
-    const auto header = static_cast<int32_t*>(ptr);
-    header[0] = level;
+    static_cast<int32_t*>(ptr)[0] = level;
     currentOffset = offset + size;
     //std::println("A ptr={} level={} block={}", ptr, level, blocks.size());
     return ptr;

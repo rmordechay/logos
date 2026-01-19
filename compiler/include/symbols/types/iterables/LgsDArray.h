@@ -23,13 +23,13 @@ public:
     size_t sizeBytes() override;
     bool canCastTo(LgsType* other) override;
     LgsExpr* getZeroValue() override;
-    Value* getIRZeroValue(LgsCgModule& cg, Value* isReturnExpr = nullptr, Value* pointee = nullptr) override;
+    Value* getIRZeroValue(LgsCgModule& cg, Value* pointee = nullptr) override;
     LgsType* replaceGenerics(LgsType* replacement, std::unordered_map<std::string, LgsType*>& replacements) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     Value* lenIR(LgsCgModule& cg, Value* iterable) override;
-    Value* inIR(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* value) override;
-    Value* getIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index) override;
-    void addIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index, LgsExpr* value) override;
+    Value* inIR(LgsCgModule& cg, Value* iterable, Value* value) override;
+    Value* getIRElement(LgsCgModule& cg, Value* iterable, Value* index) override;
+    void addIRElement(LgsCgModule& cg, Value* iterable, Value* index, Value* value) override;
     Value* getDataField(LgsCgModule& cg, Value* iterable);
     Value* getLenField(LgsCgModule& cg, Value* iterable);
     Value* getCapField(LgsCgModule& cg, Value* iterable);

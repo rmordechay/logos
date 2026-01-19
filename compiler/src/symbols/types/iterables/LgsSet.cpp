@@ -79,13 +79,13 @@ Value* LgsSet::lenIR(LgsCgModule& cg, Value* iterable) {
     return cg.callLgsFunc(name, "len", cg.sizeTy(), {cg.ptrTy()}, {iterable});
 }
 
-Value* LgsSet::inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) {
+Value* LgsSet::inIR(LgsCgModule& cg, Value* iterableExpr, Value* value) {
     assert(0);
 }
 
-Value* LgsSet::getIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index) {
+Value* LgsSet::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
     const std::vector<Type*> params = {cg.ptrTy(), cg.sizeTy()};
-    const std::vector IRArgs = {iterable->IRValue, index->IRValue};
+    const std::vector IRArgs = {iterable, index};
     return cg.callLgsFunc(name, "get", cg.ptrTy(), params, IRArgs);
 }
 

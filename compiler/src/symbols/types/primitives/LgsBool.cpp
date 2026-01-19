@@ -23,54 +23,6 @@ LgsType* LgsBool::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     assert(0);
 }
 
-Value* LgsBool::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto l = cg.builder.CreateZExt(left->loadIR(cg), getIRType(cg));
-    const auto r = cg.builder.CreateZExt(right->loadIR(cg), getIRType(cg));
-    return cg.builder.CreateAdd(l, r);
-}
-
-Value* LgsBool::subIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto l = cg.builder.CreateZExt(left->loadIR(cg), getIRType(cg));
-    const auto r = cg.builder.CreateZExt(right->loadIR(cg), getIRType(cg));
-    return cg.builder.CreateSub(l, r);
-}
-
-Value* LgsBool::mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto l = cg.builder.CreateZExt(left->loadIR(cg), getIRType(cg));
-    const auto r = cg.builder.CreateZExt(right->loadIR(cg), getIRType(cg));
-    return cg.builder.CreateMul(l, r);
-}
-
-Value* LgsBool::divIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto l = cg.builder.CreateZExt(left->loadIR(cg), getIRType(cg));
-    const auto r = cg.builder.CreateZExt(right->loadIR(cg), getIRType(cg));
-    return cg.builder.CreateSDiv(l, r);
-}
-
-Value* LgsBool::modIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return cg.builder.CreateSRem(left->loadIR(cg), right->loadIR(cg));
-}
-
-Value* LgsBool::bitAndIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return cg.builder.CreateAnd(left->loadIR(cg), right->loadIR(cg));
-}
-
-Value* LgsBool::bitOrIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return cg.builder.CreateOr(left->loadIR(cg), right->loadIR(cg));
-}
-
-Value* LgsBool::bitXorIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return cg.builder.CreateXor(left->loadIR(cg), right->loadIR(cg));
-}
-
-Value* LgsBool::rshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return cg.builder.CreateShl(left->loadIR(cg), right->loadIR(cg));
-}
-
-Value* LgsBool::lshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    return cg.builder.CreateLShr(left->loadIR(cg), right->loadIR(cg));
-}
-
 std::string LgsBool::getName() {
     return name;
 }

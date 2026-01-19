@@ -14,16 +14,16 @@ public:
     std::string getName() override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
-    Value* getIRZeroValue(LgsCgModule& cg, Value* isReturnExpr = nullptr, Value* pointee = nullptr) override;
+    Value* getIRZeroValue(LgsCgModule& cg, Value* pointee = nullptr) override;
     Constant* getRTType(LgsCgModule& cg) override;
     bool canCastTo(LgsType* other) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
-    Value* getIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index) override;
+    Value* getIRElement(LgsCgModule& cg, Value* iterable, Value* index) override;
     std::string fmtStr() const override;
     bool inferBaseType(std::vector<LgsExpr*>& args) override;
     Value* addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
     Value* lenIR(LgsCgModule& cg, Value* iterable) override;
-    Value* inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
+    Value* inIR(LgsCgModule& cg, Value* iterableExpr, Value* value) override;
     DIType* getDebugType(LgsCgModule& cg) override;
 };
 

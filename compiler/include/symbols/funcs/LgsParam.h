@@ -15,7 +15,7 @@ public:
     LgsExpr* expr = nullptr;
     bool isSelf = false;
     bool isVariadic = false;
-    Value* alloc = nullptr;
+    Value* level = nullptr;
 
     explicit LgsParam(LgsType* type, const std::string& name = "", LgsExpr* expr = nullptr) : name(name), type(type), expr(expr) {}
     void setType(LgsType* newType);

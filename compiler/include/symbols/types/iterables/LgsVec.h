@@ -32,10 +32,10 @@ public:
     Value* divIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
     Value* modIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
     Value* crossIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
+    Value* inIR(LgsCgModule& cg, Value* iterableExpr, Value* value) override;
     Value* lenIR(LgsCgModule& cg, Value* iterable) override;
-    Value* getIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index) override;
-    void addIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index, LgsExpr* value) override;
+    Value* getIRElement(LgsCgModule& cg, Value* iterable, Value* index) override;
+    void addIRElement(LgsCgModule& cg, Value* iterable, Value* index, Value* value) override;
     Value* matVecMul(LgsCgModule& cg, const LgsExpr* left, LgsExpr* right) const;
     static size_t getSwizzleSet(char c);
     static size_t getComponentIndex(char c);
@@ -43,5 +43,5 @@ public:
     DIType* getDebugType(LgsCgModule& cg) override;
 };
 
-Function* dotProductFunc(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right);
-Function* crossProductFunc(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right);
+Function* dotProductFunc(LgsCgModule& cg, LgsVec* vecType);
+Function* crossProductFunc(LgsCgModule& cg, LgsVec* vecType);

@@ -45,15 +45,14 @@ bool LgsVariadic::inferBaseType(std::vector<LgsExpr*>& args) {
 }
 
 Value* LgsVariadic::lenIR(LgsCgModule& cg, Value* iterable) {
-    assert(cg.currentFunc->arg_size() > 0);
-    auto argument = cg.currentFunc->getArg(cg.currentFunc->arg_size() - 2);
-    return argument;
+    assert(cg.currentFunc->arg_size() > 1);
+    return cg.currentFunc->getArg(cg.currentFunc->arg_size() - 2);
 }
 
-Value* LgsVariadic::inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) {
+Value* LgsVariadic::inIR(LgsCgModule& cg, Value* iterableExpr, Value* value) {
     assert(0);
 }
 
-Value* LgsVariadic::getIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index) {
-    return cg.builder.CreateVAArg(iterable->IRValue, baseType->getIRType(cg));
+Value* LgsVariadic::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
+    return cg.builder.CreateVAArg(iterable, baseType->getIRType(cg));
 }

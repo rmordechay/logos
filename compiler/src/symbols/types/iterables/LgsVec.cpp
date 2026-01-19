@@ -137,7 +137,7 @@ Value* LgsVec::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     const auto rtype = right->type;
     const auto isScalar = rtype->isScalar();
     if (baseType->isFloat) {
-        auto [l, r] = loadPairAsFloat(cg, left->loadIR(cg), right->loadIR(cg), left->type, right->type);
+        auto [l, r] = loadNumberPair(cg, left->loadIR(cg), right->loadIR(cg), cg.floatTy());
         if (isScalar) r = cg.builder.CreateVectorSplat(dimVec, r);
         return cg.builder.CreateFAdd(l, r);
     }
@@ -151,7 +151,7 @@ Value* LgsVec::subIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     const auto rtype = right->type;
     const auto isScalar = rtype->isScalar();
     if (baseType->isFloat) {
-        auto [l, r] = loadPairAsFloat(cg, left->loadIR(cg), right->loadIR(cg), left->type, right->type);
+        auto [l, r] = loadNumberPair(cg, left->loadIR(cg), right->loadIR(cg), cg.floatTy());
         if (isScalar) r = cg.builder.CreateVectorSplat(dimVec, r);
         return cg.builder.CreateFSub(l, r);
     }
@@ -168,7 +168,7 @@ Value* LgsVec::mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     const auto rtype = right->type;
     const auto isScalar = rtype->isScalar();
     if (baseType->isFloat) {
-        auto [l, r] = loadPairAsFloat(cg, left->loadIR(cg), right->loadIR(cg), left->type, right->type);
+        auto [l, r] = loadNumberPair(cg, left->loadIR(cg), right->loadIR(cg), cg.floatTy());
         if (isScalar) r = cg.builder.CreateVectorSplat(dimVec, r);
         return cg.builder.CreateFMul(l, r);
     }
@@ -179,7 +179,7 @@ Value* LgsVec::mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
 }
 
 Value* LgsVec::divIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    auto [l, r] = loadPairAsFloat(cg, left->loadIR(cg), right->loadIR(cg), left->type, right->type);
+    auto [l, r] = loadNumberPair(cg, left->loadIR(cg), right->loadIR(cg), cg.floatTy());
     if (right->type->isScalar()) {
         r = cg.builder.CreateVectorSplat(dimVec, r);
     }
@@ -187,7 +187,7 @@ Value* LgsVec::divIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
 }
 
 Value* LgsVec::modIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    auto [l, r] = loadPairAsFloat(cg, left->loadIR(cg), right->loadIR(cg), left->type, right->type);
+    auto [l, r] = loadNumberPair(cg, left->loadIR(cg), right->loadIR(cg), cg.floatTy());
     if (right->type->isScalar()) {
         r = cg.builder.CreateVectorSplat(dimVec, r);
     }
@@ -195,19 +195,18 @@ Value* LgsVec::modIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
 }
 
 Value* LgsVec::crossIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto crossFunc = crossProductFunc(cg, left, right);
+    const auto crossFunc = crossProductFunc(cg, left->type->asVec());
     return cg.builder.CreateCall(crossFunc, {left->loadIR(cg), right->loadIR(cg)});
 }
 
-Value* LgsVec::inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) {
+Value* LgsVec::inIR(LgsCgModule& cg, Value* iterableExpr, Value* value) {
     const auto resultPtr = cg.builder.CreateAlloca(cg.i1Ty());
     cg.store(cg.false_(), resultPtr);
     cg.loop(cg.i64(dimVec), [this, &cg, iterableExpr, value, resultPtr](Value* index, BasicBlock* exitBlock) {
         const auto trueBlock = cg.createBlock();
         const auto falseBlock = cg.createBlock();
-        LgsIntConst tempIndex(&LGS_INT, 0);
-        const auto element = getIRElement(cg, iterableExpr, &tempIndex);
-        const auto eq = eqIR(cg, element, value->IRValue, baseType, baseType);
+        const auto element = getIRElement(cg, iterableExpr, index);
+        const auto eq = eqIR(cg, element, value, baseType);
         cg.builder.CreateCondBr(eq, trueBlock, falseBlock);
         cg.startBlock(trueBlock);
         cg.store(cg.true_(), resultPtr);
@@ -221,17 +220,17 @@ Value* LgsVec::lenIR(LgsCgModule& cg, Value* iterable) {
     return cg.usize(dimVec);
 }
 
-Value* LgsVec::getIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index) {
-    Value* vec = iterable->IRValue;
-    if (iterable->IRValue->getType()->isPointerTy()) {
-        vec = cg.load(getIRType(cg), iterable->IRValue);
+Value* LgsVec::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
+    Value* vec = iterable;
+    if (iterable->getType()->isPointerTy()) {
+        vec = cg.load(getIRType(cg), iterable);
     }
-    return cg.builder.CreateExtractElement(vec, index->IRValue);
+    return cg.builder.CreateExtractElement(vec, index);
 }
 
-void LgsVec::addIRElement(LgsCgModule& cg, LgsExpr* iterable, LgsExpr* index, LgsExpr* value) {
-    const auto gep = cg.builder.CreateGEP(getIRType(cg), iterable->IRValue, {cg.i32Zero(), index->IRValue});
-    cg.store(value->IRValue, gep);
+void LgsVec::addIRElement(LgsCgModule& cg, Value* iterable, Value* index, Value* value) {
+    const auto gep = cg.builder.CreateGEP(getIRType(cg), iterable, {cg.i32Zero(), index});
+    cg.store(value, gep);
 }
 
 Value* LgsVec::matVecMul(LgsCgModule& cg, const LgsExpr* left, LgsExpr* right) const {
@@ -303,28 +302,20 @@ DIType* LgsVec::getDebugType(LgsCgModule& cg) {
     assert(0);
 }
 
-Function* dotProductFunc(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right) {
-    const auto leftVec = left->type->asVec();
-    const auto rightVec = right->type->asVec();
-    const auto name = LGS_PREFIX + leftVec->getName() + leftVec->baseType->getName() + "Dot";
+Function* dotProductFunc(LgsCgModule& cg, LgsVec* vecType) {
+    const auto name = LGS_PREFIX + vecType->getName() + vecType->baseType->getName() + "Dot";
     auto func = cg.IRModule->getFunction(name);
     if (func) return func;
 
     cg.savedIP = cg.builder.saveIP();
     const auto originalFunc = cg.currentFunc;
 
-    const auto params = {leftVec->getIRType(cg), rightVec->getIRType(cg)};
+    const auto params = {vecType->getIRType(cg), vecType->getIRType(cg)};
     func = cg.getFunc(name, cg.getFT(cg.floatTy(), params));
     const auto entryBlock = cg.createBlock(BLOCK_ENTRY, func);
     cg.builder.SetInsertPoint(entryBlock);
     Value* l = func->getArg(0);
     Value* r = func->getArg(1);
-    if (leftVec->baseType->isInt) {
-        l = cg.builder.CreateSIToFP(l, FixedVectorType::get(cg.floatTy(), leftVec->dimVec));
-    }
-    if (rightVec->baseType->isInt) {
-        r = cg.builder.CreateSIToFP(r, FixedVectorType::get(cg.floatTy(), rightVec->dimVec));
-    }
 
     const auto lx = cg.builder.CreateExtractElement(l, cg.i32(0));
     const auto rx = cg.builder.CreateExtractElement(r, cg.i32(0));
@@ -334,7 +325,7 @@ Function* dotProductFunc(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* ri
     const auto mulX = cg.builder.CreateFMul(lx, rx);
     const auto mulY = cg.builder.CreateFMul(ly, ry);
     Value* result = cg.builder.CreateFAdd(mulX, mulY);
-    const auto vectorDim = leftVec->dimVec;
+    const auto vectorDim = vecType->dimVec;
     if (vectorDim >= 3) {
         const auto lz = cg.builder.CreateExtractElement(l, cg.i32(2));
         const auto rz = cg.builder.CreateExtractElement(r, cg.i32(2));
@@ -354,10 +345,9 @@ Function* dotProductFunc(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* ri
     return func;
 }
 
-Function* crossProductFunc(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right) {
-    const auto leftVec = left->type->asVec();
-    const auto rightVec = right->type->asVec();
-    const auto name = LGS_PREFIX + leftVec->getName() + leftVec->baseType->getName() + "Cross";
+Function* crossProductFunc(LgsCgModule& cg, LgsVec* vecType) {
+    assert(vecType->dimVec == 3);
+    const auto name = LGS_PREFIX + vecType->getName() + vecType->baseType->getName() + "Cross";
     auto func = cg.IRModule->getFunction(name);
     if (func) return func;
 
@@ -367,18 +357,12 @@ Function* crossProductFunc(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* 
 
     // Get new func
     const auto vecTy = FixedVectorType::get(cg.floatTy(), 3);
-    const auto params = {left->type->getIRType(cg), right->type->getIRType(cg)};
+    const auto params = {vecType->getIRType(cg), vecType->getIRType(cg)};
     func = cg.getFunc(name, cg.getFT(vecTy, params));
     const auto entryBlock = cg.createBlock(BLOCK_ENTRY, func);
     cg.builder.SetInsertPoint(entryBlock);
     Value* l = func->getArg(0);
     Value* r = func->getArg(1);
-    if (leftVec->baseType->isInt) {
-        l = cg.builder.CreateSIToFP(l, FixedVectorType::get(cg.floatTy(), leftVec->dimVec));
-    }
-    if (rightVec->baseType->isInt) {
-        r = cg.builder.CreateSIToFP(r, FixedVectorType::get(cg.floatTy(), rightVec->dimVec));
-    }
 
     const auto lx = cg.builder.CreateExtractElement(l, cg.i32(0));
     const auto ly = cg.builder.CreateExtractElement(l, cg.i32(1));
