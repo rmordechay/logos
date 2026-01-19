@@ -78,6 +78,7 @@ public:
     bool writeIRModule(const LgsPaths& paths, uint8_t optLevel) const;
     Value* getString(const std::string& value);
     llvm::AllocaInst* getEmptyBuffer();
+    size_t getAllocSize(Type* type) const;
     GlobalVariable* createGlobal(const std::string& name, Type* type, Constant* initializer, bool isConst = true, GlobalValue::LinkageTypes linkage = GlobalValue::ExternalLinkage) const;
     void loop(Value* loopLength, const std::function<void(Value*, BasicBlock*)>& body);
     void ifStmt(Value* cond, const std::function<void()>& body);
@@ -96,7 +97,7 @@ public:
     Value* callHash(Value* arg);
     void addToVTable(Value* instance, Value* name, Value* ptr);
     Value* getFromVTable(Value* instance, Value* name);
-    Value* heapAlloc(Value* size, Value* level = nullptr);
+    Value* heapAlloc(Value* size, Value* level, bool withLevel = true);
     Value* reallocate(Value* ptr, Value* size, Value* level);
     Value* moveAlloc(Value* leftPtr, Value* rightPtr, Constant* type);
     Value* moveElement(Value* iterable, Value* element, Constant* type);

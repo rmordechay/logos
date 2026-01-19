@@ -42,14 +42,13 @@ LgsFunc* LgsObject::getMethod(const std::string& methodName) {
 Type* LgsObject::getIRType(LgsCgModule& cg) {
     const auto type = cg.typesRegistry.find(name);
     if (type != cg.typesRegistry.end()) return type->second;
-    std::vector<Type*> elementTypes = {cg.sizeTy()}; // First field is level
-    elementTypes.reserve(fields.size());
+    std::vector<Type*> types = {cg.sizeTy()}; // First field is level
+    types.reserve(fields.size());
     for (size_t i = 0; i < fields.size(); ++i) {
         const auto field = fields[i];
-        const auto fieldType = field->type->getTypeOrPtr(cg);
-        elementTypes.push_back(fieldType);
+        types.emplace_back(field->type->getTypeOrPtr(cg));
     }
-    const auto IRType = StructType::create(cg.context, elementTypes, name);
+    const auto IRType = StructType::create(cg.context, types, name);
     cg.typesRegistry[name] = IRType;
     return IRType;
 }
@@ -104,7 +103,7 @@ LgsExpr* LgsObject::getZeroValue() {
 
 Value* LgsObject::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
     const auto ty = getIRType(cg);
-    const auto obj = pointee ? pointee : cg.heapAlloc(cg.usize(sizeBytes()));
+    const auto obj = pointee ? pointee : cg.heapAlloc(cg.usize(sizeBytes()), cg.currentLevel);
     for (const auto field : fields) {
         const auto fieldZero = field->type->getIRZeroValue(cg, obj);
         cg.storeStructField(ty, obj, field->position, fieldZero);
@@ -173,4 +172,3 @@ LgsObject::~LgsObject() {
     delete getFieldFunc;
     getFieldFunc = nullptr;
 }
-

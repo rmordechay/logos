@@ -45,10 +45,10 @@ public:
     bool isImportName = false;
     bool isNull = false;
     bool hasUnwrapSuffix = false;
+
     bool isReturnExpr = false;
     bool hasMoved = false;
     Value* pointee = nullptr;
-    Value* level = nullptr;
 
     explicit LgsExpr(LgsType* type = nullptr) : type(type) {}
     std::optional<int64_t> getConstInt();
@@ -60,7 +60,7 @@ public:
     virtual LgsExpr* castExplicitly(LgsType* toType);
     virtual void castImplicitly(LgsType* toType);
     virtual Value* hashValue(LgsCgModule& cg);
-    virtual void assign(LgsCgModule& cg, LgsExpr* expr);
+    virtual void assign(LgsCgModule& cg, LgsExpr* right);
     virtual bool equals(LgsExpr* other);
     virtual std::string asText() = 0;
 

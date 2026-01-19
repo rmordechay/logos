@@ -1,6 +1,8 @@
+#include <llvm/IR/Module.h>
+
+#include "Lgs_Exprs.h"
 #include "exprs/LgsFuncCall.h"
 #include "exprs/constants/LgsStrConst.h"
-#include "LgsConfigs.h"
 #include "exprs/LgsBinaryExpr.h"
 #include "types/LgsAny.h"
 #include "types/iterables/LgsSArray.h"
@@ -8,7 +10,7 @@
 #include "types/primitives/LgsChar.h"
 
 Type* LgsStr::getIRType(LgsCgModule& cg) {
-    return cg.ptrTy();
+    return cg.getStructType({cg.sizeTy(), cg.ptrTy()}, name);
 }
 
 std::string LgsStr::getBaseName() {
@@ -20,7 +22,7 @@ std::string LgsStr::getName() {
 }
 
 size_t LgsStr::sizeBytes() {
-    return sizeof(void*);
+    return sizeof(Lgs_Str);
 }
 
 LgsExpr* LgsStr::getZeroValue() {
@@ -28,7 +30,11 @@ LgsExpr* LgsStr::getZeroValue() {
 }
 
 Value* LgsStr::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
-    return cg.emptyStr();
+    const auto ty = getIRType(cg);
+    Value* strConst = UndefValue::get(ty);
+    strConst = cg.builder.CreateInsertValue(strConst, cg.currentLevel, 0);
+    strConst = cg.builder.CreateInsertValue(strConst, cg.emptyStr(), 1);
+    return strConst;
 }
 
 Constant* LgsStr::getRTType(LgsCgModule& cg) {
@@ -48,7 +54,9 @@ LgsType* LgsStr::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     switch (op.opType) {
     case ADD: {
         if (rightType->asStr() || rightType->asChar() || rightType->isNumber()) {
-            return new LgsStr();
+            const auto str = new LgsStr();
+            str->isHeapAlloc = true;
+            return str;
         }
         break;
     }
@@ -97,21 +105,31 @@ Value* LgsStr::addIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
         return cg.getString(leftStrConst.value() + std::to_string(rightFloatConst.value()));
     }
 
-    const auto leftSize = lenIR(cg, left->IRValue);
-    const auto rightSize = lenIR(cg, right->IRValue);
+    const auto leftPtr = cg.builder.CreateExtractValue(left->IRValue, 1);
+    const auto rightPtr = cg.builder.CreateExtractValue(right->IRValue, 1);
+    const auto leftSize = lenIR(cg, leftPtr);
+    const auto rightSize = lenIR(cg, rightPtr);
     const auto sumSize = cg.builder.CreateAdd(leftSize, rightSize);
-    const auto allocSize = cg.builder.CreateAdd(sumSize, cg.usize(1));
 
-    Value* level = nullptr;
-    if (binExpr->isReturnExpr) {
-        level = cg.builder.CreateSub(cg.currentLevel, cg.usize(1));
-    } else if (binExpr->level) {
-        level = binExpr->level;
+    if (isHeapAlloc) {
+        const auto allocSize = cg.builder.CreateAdd(sumSize, cg.usize(1));
+        const auto buffer = cg.heapAlloc(allocSize, cg.currentLevel, false);
+        const auto rightPos = cg.builder.CreateInBoundsGEP(cg.i8Ty(), buffer, leftSize);
+        cg.callMemcpy(buffer, leftPtr, leftSize);
+        cg.callMemcpy(rightPos, rightPtr, rightSize);
+        cg.addNullTerminate(buffer, sumSize);
+        const auto ty = getIRType(cg);
+        Value* strConst = UndefValue::get(ty);
+        strConst = cg.builder.CreateInsertValue(strConst, cg.currentLevel, 0);
+        strConst = cg.builder.CreateInsertValue(strConst, buffer, 1);
+        return strConst;
     }
-    const auto buffer = cg.heapAlloc(allocSize, level);
+
+    const auto allocSize = cg.builder.CreateAdd(sumSize, cg.usize(1));
+    const auto buffer = cg.builder.CreateAlloca(cg.i8Ty(), allocSize);
     const auto rightPos = cg.builder.CreateInBoundsGEP(cg.i8Ty(), buffer, leftSize);
-    cg.callMemcpy(buffer, left->IRValue, leftSize);
-    cg.callMemcpy(rightPos, right->IRValue, rightSize);
+    cg.callMemcpy(buffer, leftPtr, leftSize);
+    cg.callMemcpy(rightPos, rightPtr, rightSize);
     cg.addNullTerminate(buffer, sumSize);
     return buffer;
 }
@@ -123,6 +141,10 @@ Value* LgsStr::lenIR(LgsCgModule& cg, Value* iterable) {
 Value* LgsStr::inIR(LgsCgModule& cg, Value* iterableExpr, Value* value) {
     const auto rv = cg.callFunc("strstr", cg.ptrTy(), {cg.ptrTy(), cg.ptrTy()}, {iterableExpr, value});
     return cg.builder.CreateIsNotNull(rv);
+}
+
+void LgsStr::moveValue(LgsCgModule& cg, Value* leftPtr, Value* rightPtr, Constant* type) {
+    cg.moveAlloc(leftPtr, cg.allocaAndStore(getIRType(cg), rightPtr), type);
 }
 
 DIType* LgsStr::getDebugType(LgsCgModule& cg) {

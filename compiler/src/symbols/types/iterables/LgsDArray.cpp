@@ -7,6 +7,8 @@
 #include "types/primitives/LgsBool.h"
 #include <llvm/IR/Module.h>
 
+#include "LgsConfigs.h"
+
 LgsFunc* LgsDArray::getMethod(const std::string& methodName) {
     constexpr auto flags = BUILTIN | PUBLIC | METHOD;
     if (methodName == ADD_FUNC) {
@@ -79,7 +81,7 @@ LgsExpr* LgsDArray::getZeroValue() {
 }
 
 Value* LgsDArray::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
-    const auto alloc = pointee ? pointee : cg.heapAlloc(cg.usize(sizeBytes()));
+    const auto alloc = pointee ? pointee : cg.heapAlloc(cg.usize(sizeBytes()), cg.currentLevel);
     const auto initSize = cg.usize(LGS_MAP_INITIAL_CAPACITY * baseType->sizeBytes());
     cg.callLgsFunc(name, "initDArray", cg.voidTy(), {cg.ptrTy(), cg.sizeTy()}, {alloc, initSize});
     return alloc;

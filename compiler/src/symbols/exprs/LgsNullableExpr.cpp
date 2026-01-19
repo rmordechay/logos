@@ -6,13 +6,13 @@ Value* LgsNullableExpr::loadIR(LgsCgModule& cg) {
     return cg.load(type->getTypeOrPtr(cg), IRValue);
 }
 
-void LgsNullableExpr::assign(LgsCgModule& cg, LgsExpr* expr) {
+void LgsNullableExpr::assign(LgsCgModule& cg, LgsExpr* right) {
     if (!type->passByRef) {
-        const auto isSet = cg.builder.CreateIsNotNull(expr->IRValue);
-        type->asNullable()->setNullableFields(cg, IRValue, expr->IRValue, isSet);
+        const auto isSet = cg.builder.CreateIsNotNull(right->IRValue);
+        type->asNullable()->setNullableFields(cg, IRValue, right->IRValue, isSet);
         return;
     }
-    cg.store(expr->IRValue, IRValue);
+    cg.store(right->IRValue, IRValue);
 }
 
 void LgsNullableExpr::setDebugValue(LgsCgModule& cg) {

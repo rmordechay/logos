@@ -93,8 +93,6 @@ LgsType* LgsNullable::applyBinOp(LgsType* rightType, LgsBinOp& op) {
 }
 
 Value* LgsNullable::addIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
-    const auto left = binExpr->left;
-    const auto right = binExpr->right;
     const auto f = [this, &cg](LgsBinaryExpr* e) {
         return baseType->addIR(cg, e);
     };

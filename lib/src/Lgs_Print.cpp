@@ -5,6 +5,8 @@
 #include <cassert>
 #include <sstream>
 
+#include "LgsConfigs.h"
+
 static std::string formatElement(const Lgs_TypeInfo* rtt, void* value) {
     if (!value) return LGS_NULL_LITERAL;
     std::ostringstream str;
@@ -23,7 +25,7 @@ static std::string formatElement(const Lgs_TypeInfo* rtt, void* value) {
     case RTT_FLOAT: str << *static_cast<float*>(value); break;
     case RTT_DOUBLE: str << *static_cast<double*>(value); break;
     case RTT_ENUM:
-    case RTT_STR: str << "\"" << *static_cast<char**>(value) << "\""; break;
+    case RTT_STR: str << "\"" << static_cast<Lgs_Str*>(value)->data << "\""; break;
     case RTT_CHAR: str << "\"" << *static_cast<const char*>(value) << "\""; break;
     case RTT_OBJECT: {
         const auto fieldsCount = rtt->obj.fieldsCount;

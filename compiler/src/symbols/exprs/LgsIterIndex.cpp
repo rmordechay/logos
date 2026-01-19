@@ -113,13 +113,13 @@ void LgsIterIndex::setIRRangePtr(LgsCgModule& cg, bool assign) {
     }
 }
 
-void LgsIterIndex::assign(LgsCgModule& cg, LgsExpr* expr) {
+void LgsIterIndex::assign(LgsCgModule& cg, LgsExpr* right) {
     const auto iter = baseExpr->type->asIterable();
     assert(iter);
     if (const auto addFunc = iter->getMethod("add"); addFunc->fn) {
-        addFunc->fn(cg, {LgsFuncArg(baseExpr), LgsFuncArg(index.from), LgsFuncArg(expr)});
+        addFunc->fn(cg, {LgsFuncArg(baseExpr), LgsFuncArg(index.from), LgsFuncArg(right)});
     } else {
-        iter->addIRElement(cg, baseExpr->IRValue, index.from->IRValue, expr->IRValue);
+        iter->addIRElement(cg, baseExpr->IRValue, index.from->IRValue, right->IRValue);
     }
 }
 

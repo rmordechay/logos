@@ -13,9 +13,9 @@ public:
     uint32_t index = 0;
     LgsType* type = nullptr;
     LgsExpr* expr = nullptr;
+    Value* level = nullptr;
     bool isSelf = false;
     bool isVariadic = false;
-    Value* level = nullptr;
 
     explicit LgsParam(LgsType* type, const std::string& name = "", LgsExpr* expr = nullptr) : name(name), type(type), expr(expr) {}
     void setType(LgsType* newType);

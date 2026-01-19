@@ -97,6 +97,7 @@ public:
     virtual std::string pname(); // pretty name
     virtual bool equals(LgsType* other);
     virtual LgsType* clone();
+    virtual void moveValue(LgsCgModule& cg, Value* leftPtr, Value* rightPtr, Constant* type);
 
     virtual Value* addIR(LgsCgModule& cg, LgsBinaryExpr* binExpr);
     virtual Value* subIR(LgsCgModule& cg, LgsBinaryExpr* binExpr);

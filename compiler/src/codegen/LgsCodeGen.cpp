@@ -145,10 +145,6 @@ void LgsCodeGen::visitFunc(LgsFunc* func) {
     if (!ft->genericTypes.empty()) return;
     stack.enterScope(func);
     createPrologue(func);
-    for (auto& param : ft->params) {
-        if (!param.type->asObject()) continue;
-        param.level = cg.load(cg.sizeTy(), param.IRValue);
-    }
     if (func->isTest) for (auto [_, then] : func->mocks) visitExpr(then);
     auto& params = ft->params;
     if (ft->isVariadic) {
@@ -333,7 +329,6 @@ void LgsCodeGen::visitAssignment(const LgsAssignment* assignment) {
         nullable->IRValue = nullable->baseExpr->IRValue;
     }
     r->pointee = l->IRValue;
-    r->level = l->level;
     visitExpr(r, true);
 
     if (!binaryExpr) {
@@ -629,25 +624,22 @@ void LgsCodeGen::visitBinaryExpr(LgsBinaryExpr* binExpr) {
     assert(binExpr->type);
     const auto l = binExpr->left;
     const auto r = binExpr->right;
-    l->pointee = binExpr->pointee;
-    r->pointee = binExpr->pointee;
-    l->level = binExpr->level;
-    r->level = binExpr->level;
     visitExpr(l);
     visitExpr(r);
+    const auto type = binExpr->type;
     switch (binExpr->op.opType) {
-    case ADD: binExpr->IRValue = binExpr->type->addIR(cg, binExpr); break;
-    case SUB: binExpr->IRValue = binExpr->type->subIR(cg, binExpr); break;
-    case MUL: binExpr->IRValue = binExpr->type->mulIR(cg, binExpr); break;
-    case DIV: binExpr->IRValue = binExpr->type->divIR(cg, binExpr); break;
-    case MODULO: binExpr->IRValue = binExpr->type->modIR(cg, binExpr); break;
-    case POW: binExpr->IRValue = binExpr->type->powIR(cg, binExpr); break;
-    case BIT_AND: binExpr->IRValue = binExpr->type->bitAndIR(cg, binExpr); break;
-    case BIT_OR: binExpr->IRValue = binExpr->type->bitOrIR(cg, binExpr); break;
-    case BIT_XOR: binExpr->IRValue = binExpr->type->bitXorIR(cg, binExpr); break;
-    case LSHIFT: binExpr->IRValue = binExpr->type->rshiftIR(cg, binExpr); break;
-    case RSHIFT: binExpr->IRValue = binExpr->type->lshiftIR(cg, binExpr); break;
-    case CROSS: binExpr->IRValue = binExpr->type->crossIR(cg, binExpr); break;
+    case ADD: binExpr->IRValue = type->addIR(cg, binExpr); break;
+    case SUB: binExpr->IRValue = type->subIR(cg, binExpr); break;
+    case MUL: binExpr->IRValue = type->mulIR(cg, binExpr); break;
+    case DIV: binExpr->IRValue = type->divIR(cg, binExpr); break;
+    case MODULO: binExpr->IRValue = type->modIR(cg, binExpr); break;
+    case POW: binExpr->IRValue = type->powIR(cg, binExpr); break;
+    case BIT_AND: binExpr->IRValue = type->bitAndIR(cg, binExpr); break;
+    case BIT_OR: binExpr->IRValue = type->bitOrIR(cg, binExpr); break;
+    case BIT_XOR: binExpr->IRValue = type->bitXorIR(cg, binExpr); break;
+    case LSHIFT: binExpr->IRValue = type->rshiftIR(cg, binExpr); break;
+    case RSHIFT: binExpr->IRValue = type->lshiftIR(cg, binExpr); break;
+    case CROSS: binExpr->IRValue = type->crossIR(cg, binExpr); break;
     case EQ: binExpr->IRValue = eqIR(cg, l->loadIR(cg), r->loadIR(cg), l->type); break;
     case NE: binExpr->IRValue = neIR(cg, l->loadIR(cg), r->loadIR(cg), l->type); break;
     case LT: binExpr->IRValue = ltIR(cg, l->loadIR(cg), r->loadIR(cg), l->type); break;
@@ -754,12 +746,7 @@ void LgsCodeGen::visitStaticArray(LgsArrayExpr* arrayExpr) const {
         arrayExpr->IRValue = sArr->getIRZeroValue(cg, arrayExpr->pointee);
         return;
     }
-
-    if (arrayExpr->pointee) {
-        arrayExpr->IRValue = arrayExpr->pointee;
-    } else {
-        arrayExpr->IRValue = cg.builder.CreateAlloca(sArrTypeIR);
-    }
+    arrayExpr->IRValue = arrayExpr->pointee ? arrayExpr->pointee : cg.builder.CreateAlloca(sArrTypeIR);
 
     // Check if all args are const for chunk copy
     std::vector<Constant*> constantArgs;
@@ -885,7 +872,6 @@ void LgsCodeGen::visitVariable(LgsVariable* variable) {
     case VAR_DEC:
         assert(variable->ref.varDec->IRValue);
         variable->IRValue = variable->ref.varDec->IRValue;
-        variable->level = variable->level ? variable->level : variable->ref.varDec->expr->level;
         break;
     case PARAM:
         if (variable->ref.param->isSelf) {
@@ -893,7 +879,6 @@ void LgsCodeGen::visitVariable(LgsVariable* variable) {
         } else {
             assert(variable->ref.param->IRValue);
             variable->IRValue = variable->ref.param->IRValue;
-            variable->level = variable->level ? variable->level : variable->ref.param->level;
         }
         break;
     case FUNC:
@@ -952,7 +937,6 @@ void LgsCodeGen::visitSelection(LgsSelection* selection, const bool assign) {
         }
     }
     selection->IRValue = selection->exprs.back()->IRValue;
-    selection->level = selection->exprs.front()->level;
 }
 
 void LgsCodeGen::visitFieldSelection(LgsVariable* var, LgsExpr* parent) const {
@@ -1136,7 +1120,10 @@ void LgsCodeGen::visitIntConst(LgsIntConst* intConst) const {
 
 void LgsCodeGen::visitStrConst(LgsStrConst* strConst) {
     if (strConst->parts.empty()) {
-        strConst->IRValue = cg.getString(strConst->value);
+        const auto ty = strConst->type->getIRType(cg);
+        strConst->IRValue = UndefValue::get(ty);
+        strConst->IRValue = cg.builder.CreateInsertValue(strConst->IRValue, cg.usize(0), 0);
+        strConst->IRValue = cg.builder.CreateInsertValue(strConst->IRValue, cg.getString(strConst->value), 1);
         return;
     }
 
@@ -1162,8 +1149,7 @@ void LgsCodeGen::visitCharConst(LgsCharConst* charConst) const {
 
 void LgsCodeGen::visitInstance(LgsInstance* instance) {
     const auto obj = instance->obj;
-    instance->IRValue = cg.heapAlloc(cg.usize(obj->sizeBytes()));
-    instance->level = cg.load(cg.sizeTy(), instance->IRValue);
+    instance->IRValue = cg.heapAlloc(cg.usize(obj->sizeBytes()), cg.currentLevel);
 
     // Args
     std::unordered_set<std::string> visited;

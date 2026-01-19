@@ -16,13 +16,12 @@ LgsFuncCall* LgsSelection::asMethodCall() const {
     return exprs.back()->asFuncCall();
 }
 
-void LgsSelection::assign(LgsCgModule& cg, LgsExpr* expr) {
+void LgsSelection::assign(LgsCgModule& cg, LgsExpr* right) {
     assert(!type->asVec());
-    const auto right = expr->IRValue;
-    if (type->isHeapAlloc) {
-        cg.moveAlloc(loadIR(cg), right, type->getRTType(cg));
+    if (right->type->isHeapAlloc) {
+        right->type->moveValue(cg, IRValue, right->IRValue, type->getRTType(cg));
     } else {
-        cg.store(right, IRValue);
+        cg.store(right->IRValue, IRValue);
     }
 }
 

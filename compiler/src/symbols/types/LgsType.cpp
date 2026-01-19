@@ -151,6 +151,10 @@ LgsType* LgsType::clone() {
     assert(0);
 }
 
+void LgsType::moveValue(LgsCgModule& cg, Value* leftPtr, Value* rightPtr, Constant* type) {
+    cg.moveAlloc(leftPtr, rightPtr, type);
+}
+
 Value* LgsType::addIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
     assert(0);
 }

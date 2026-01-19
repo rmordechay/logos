@@ -6,7 +6,7 @@
 
 static constexpr auto align = alignof(std::max_align_t) - 1;
 
-void* Lgs_Allocator::allocate(const size_t size) {
+void* Lgs_Allocator::allocate(const size_t size, bool withLevel) {
     assert(level > 0);
     auto offset = currentOffset + align & ~align;
     if (!currentBlock || offset + size > BLOCK_SIZE) {
@@ -17,7 +17,7 @@ void* Lgs_Allocator::allocate(const size_t size) {
         // std::println("Allocated block: {}", currentBlock);
     }
     void* ptr = static_cast<char*>(currentBlock) + offset;
-    static_cast<int32_t*>(ptr)[0] = level;
+    if (withLevel) static_cast<size_t*>(ptr)[0] = level;
     currentOffset = offset + size;
     //std::println("A ptr={} level={} block={}", ptr, level, blocks.size());
     return ptr;

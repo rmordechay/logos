@@ -17,7 +17,7 @@ Value* LgsPrint::call(LgsCgModule& cg, std::vector<LgsFuncArg>& args) {
         return cg.callPrintf({fmt, cg.builder.CreateFPExt(arg->IRValue, cg.doubleTy())});
     }
     if (arg->type->asStr()) {
-        return cg.callPrintf({fmt, arg->IRValue});
+        return cg.callPrintf({fmt, cg.builder.CreateExtractValue(arg->IRValue, 1)});
     }
     if (arg->type->isInt || arg->type->asChar()) {
         return cg.callPrintf({fmt, arg->loadIR(cg)});

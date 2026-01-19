@@ -32,32 +32,40 @@ extern "C" void* Lgs_Runtime_allocate(const size_t size, const size_t level) {
     return runtime.stack.at(level).allocator.allocate(size);
 }
 
-extern "C" void Lgs_Runtime_move(void* left, void* right, const Lgs_TypeInfo* type) {
-    const auto leftLevel = *static_cast<uint32_t*>(left);
-    const auto rightLevel = *static_cast<uint32_t*>(right);
+extern "C" void* Lgs_Runtime_move(void* left, void* right, const Lgs_TypeInfo* type) {
+    const auto leftLevel = *static_cast<size_t*>(left);
+    const auto rightLevel = *static_cast<size_t*>(right);
     assert(leftLevel <= runtime.level && rightLevel <= runtime.level);
-    if (leftLevel >= rightLevel) return;
+    if (leftLevel >= rightLevel) return right;
     if (type->kind == RTT_OBJECT) {
         moveObject(left, right, &type->obj);
-    } else {
-        assert(0);
+        return right;
     }
+    if (type->kind == RTT_STR) {
+        const auto rightStr = static_cast<char*>(right) + sizeof(size_t);
+        auto& allocator = runtime.stack.at(leftLevel).allocator;
+        const auto size = std::strlen(rightStr) + 1;
+        const auto newAlloc = allocator.allocate(size + sizeof(size_t));
+        const auto leftStr = static_cast<size_t*>(newAlloc) + sizeof(size_t);
+        std::memcpy(leftStr, rightStr, size);
+        return newAlloc;
+    }
+    assert(0);
 }
 
 extern "C" void* Lgs_Runtime_moveElement(void* iterable, void* element, const Lgs_TypeInfo* type) {
-    const auto leftLevel = *static_cast<uint32_t*>(iterable);
-    const auto rightLevel = *static_cast<uint32_t*>(element);
+    const auto leftLevel = *static_cast<size_t*>(iterable);
+    const auto rightLevel = *static_cast<size_t*>(element);
     assert(leftLevel <= runtime.level && rightLevel <= runtime.level);
     if (leftLevel >= rightLevel) return element;
     const auto baseType = type->dArray.baseType;
-    assert(baseType->isHeap);
-    const auto ptr = runtime.stack.at(leftLevel).allocator.allocate(baseType->size);
+    const auto newPtr = runtime.stack.at(leftLevel).allocator.allocate(baseType->size);
     if (baseType->kind == RTT_OBJECT) {
-        moveObject(ptr, element, &baseType->obj);
+        moveObject(newPtr, element, &baseType->obj);
     } else {
         assert(0);
     }
-    return ptr;
+    return newPtr;
 }
 
 extern "C" void* Lgs_Runtime_reallocate(const void* ptr, const size_t size, const size_t level) {
@@ -132,7 +140,9 @@ void moveObject(void* left, void* right, const Lgs_Object* obj) {
         void* leftFieldPtr = static_cast<char*>(left) + fieldOffset;
         void* rightFieldPtr = static_cast<char*>(right) + fieldOffset;
         if (fieldType->isHeap) {
-            Lgs_Runtime_move(*static_cast<void**>(leftFieldPtr), *static_cast<void**>(rightFieldPtr), fieldType);
+            leftFieldPtr = *static_cast<void**>(leftFieldPtr);
+            rightFieldPtr = *static_cast<void**>(rightFieldPtr);
+            Lgs_Runtime_move(leftFieldPtr, rightFieldPtr, fieldType);
         } else {
             std::memcpy(leftFieldPtr, rightFieldPtr, fieldType->size);
         }

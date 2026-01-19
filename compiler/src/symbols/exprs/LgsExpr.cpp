@@ -148,7 +148,7 @@ Value* LgsExpr::hashValue(LgsCgModule& cg) {
     assert(0);
 }
 
-void LgsExpr::assign(LgsCgModule& cg, LgsExpr* expr) {
+void LgsExpr::assign(LgsCgModule& cg, LgsExpr* right) {
     assert(0);
 }
 
@@ -259,6 +259,7 @@ LgsNullableExpr* LgsExpr::asNullableExpr() {
 LgsExpr* LgsExpr::clone() {
     assert(0);
 }
+
 
 void wrapInNullable(LgsExpr*& expr, LgsNullable* nullable) {
     assert(!nullable->baseType->asNullable() && !expr->asNullableExpr());

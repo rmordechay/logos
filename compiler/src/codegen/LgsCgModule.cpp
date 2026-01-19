@@ -101,6 +101,10 @@ llvm::AllocaInst* LgsCgModule::getEmptyBuffer() {
     return builder.CreateAlloca(ArrayType::get(i8Ty(), STRING_BUFFER_SIZE));
 }
 
+size_t LgsCgModule::getAllocSize(Type* type) const {
+    return IRModule->getDataLayout().getTypeAllocSize(type);
+}
+
 GlobalVariable* LgsCgModule::createGlobal(const std::string& name, Type* type, Constant* initializer, const bool isConst, const GlobalValue::LinkageTypes linkage) const {
     if (const auto var = IRModule->getGlobalVariable(name)) return var;
     return new GlobalVariable(*IRModule, type, isConst, linkage, initializer, name);
@@ -213,8 +217,9 @@ Value* LgsCgModule::getFromVTable(Value* instance, Value* name) {
     return callRuntimeFunc("getFromVTable", ptrTy(), {ptrTy(), ptrTy()}, {instance, name});
 }
 
-Value* LgsCgModule::heapAlloc(Value* size, Value* level) {
-    return callRuntimeFunc("allocate", ptrTy(), {sizeTy(), sizeTy()}, {size, level ? level : currentLevel});
+Value* LgsCgModule::heapAlloc(Value* size, Value* level, const bool withLevel) {
+    assert(size && level);
+    return callRuntimeFunc("allocate", ptrTy(), {sizeTy(), sizeTy(), i1Ty()}, {size, level, i1(withLevel)});
 }
 
 Value* LgsCgModule::reallocate(Value* ptr, Value* size, Value* level) {
@@ -375,7 +380,7 @@ void LgsCgModule::printStr(const std::string& value) {
 }
 
 void LgsCgModule::printStr(Value* value) {
-    callPrintf({getString("%s\n"), value});
+    callPrintf({getString("\"%s\"\n"), value});
 }
 
 void LgsCgModule::printInt(Value* value, const std::string& text) {

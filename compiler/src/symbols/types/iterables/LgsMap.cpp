@@ -97,11 +97,11 @@ LgsExpr* LgsMap::getZeroValue() {
 
 Value* LgsMap::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
     const auto ty = getIRType(cg);
-    const auto ptr = pointee ? pointee : cg.heapAlloc(cg.usize(sizeBytes()));
+    const auto ptr = pointee ? pointee : cg.heapAlloc(cg.usize(sizeBytes()), cg.currentLevel);
     const auto cap = cg.usize(INITIAL_CAPACITY);
     const auto entriesSize = cg.usize(pairType->sizeBytes() + sizeof(void*));
     const auto totalSize = cg.builder.CreateMul(entriesSize, cap);
-    const auto entries = cg.heapAlloc(totalSize);
+    const auto entries = cg.heapAlloc(totalSize, cg.currentLevel);
     cg.storeStructField(ty, ptr, 0, entries);
     cg.storeStructField(ty, ptr, 1, cg.sizeZero());
     cg.storeStructField(ty, ptr, 2, cap);
@@ -328,6 +328,7 @@ Function* LgsMap::generateAddFunc(LgsCgModule& cg) {
     const auto entriesField = cg.builder.CreateStructGEP(mapTy, mapIR, 0);
     const auto lenField = cg.builder.CreateStructGEP(mapTy, mapIR, 1);
     const auto capField = cg.builder.CreateStructGEP(mapTy, mapIR, 2);
+    const auto level = cg.builder.CreateSub(cg.currentLevel, cg.usize(1));
 
     // Resize
     auto len = cg.load(cg.sizeTy(), lenField);
@@ -338,7 +339,7 @@ Function* LgsMap::generateAddFunc(LgsCgModule& cg) {
     cg.startBlock(resizeBlock);
     const auto size = cg.usize(pairType->sizeBytes() + sizeof(void*));
     const auto newCap = cg.builder.CreateMul(size, cg.builder.CreateMul(cap, cg.usize(2)));
-    const auto newEntries = cg.heapAlloc(newCap);
+    const auto newEntries = cg.heapAlloc(newCap, level);
     auto entries = cg.load(cg.ptrTy(), entriesField);
 
     cg.loop(cap, [&](Value* iValue, BasicBlock*) {
@@ -393,7 +394,7 @@ Function* LgsMap::generateAddFunc(LgsCgModule& cg) {
 
     // Store entry
     cg.startBlock(storeElementBlock);
-    const auto newEntry = cg.heapAlloc(size);
+    const auto newEntry = cg.heapAlloc(size, level);
     cg.storeStructField(entryTy, newEntry, 0, keyIR);
     cg.storeStructField(entryTy, newEntry, 1, valueIR);
     cg.storeStructField(entryTy, newEntry, 2, cg.null());

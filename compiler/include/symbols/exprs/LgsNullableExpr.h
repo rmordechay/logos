@@ -11,7 +11,7 @@ public:
         isNull = true;
     }
     Value* loadIR(LgsCgModule& cg) override;
-    void assign(LgsCgModule& cg, LgsExpr* expr) override;
+    void assign(LgsCgModule& cg, LgsExpr* right) override;
     void setDebugValue(LgsCgModule& cg) override;
     void castImplicitly(LgsType* toType) override;
     std::string asText() override;

@@ -10,6 +10,6 @@ public:
     void* currentBlock{};
     std::vector<void*> blocks;
 
-    void* allocate(size_t size);
+    void* allocate(size_t size, bool withLevel = true);
     void freeBlocks();
 };
