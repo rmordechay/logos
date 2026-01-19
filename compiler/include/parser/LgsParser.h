@@ -125,7 +125,6 @@ public:
     LgsStmt* parseStmt();
     LgsStmtsBlock* parseStmtsBlock(bool withSingleStmt = true);
     LgsVarDec* parseVarDec();
-    LgsAssignType parseAssignType();
     LgsStmt* parseAssignment();
     LgsStmt* parseIfStmt();
     LgsSwitch* parseSwitch();

@@ -1,15 +1,17 @@
 #include "stmts/LgsAssignment.h"
 #include "exprs/LgsArrayExpr.h"
 #include "exprs/LgsVariable.h"
-#include "LgsUtils.h"
+#include "exprs/LgsBinaryExpr.h"
 
 void LgsAssignment::setDebugValue(LgsCgModule& cg) {
     assert(0);
 }
 
 LgsAssignment::~LgsAssignment() {
-    freeExpr(lExpr);
-    freeExpr(rExpr);
-    lExpr = nullptr;
-    rExpr = nullptr;
+    freeExpr(binaryExpr);
+    freeExpr(left);
+    freeExpr(right);
+    binaryExpr = nullptr;
+    left = nullptr;
+    right = nullptr;
 }

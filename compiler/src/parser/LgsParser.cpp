@@ -915,50 +915,6 @@ LgsVarDec* LgsParser::parseVarDec() {
     return varDec;
 }
 
-LgsAssignType LgsParser::parseAssignType() {
-    const auto opToken = currentToken;
-    LgsAssignType op = {};
-    switch (opToken.type) {
-    case T_WALRUS:
-        op = ASSIGN;
-        break;
-    case T_EQUAL_PLUS:
-        op = ASSIGN_ADD;
-        break;
-    case T_EQUAL_MINUS:
-        op = ASSIGN_SUB;
-        break;
-    case T_EQUAL_STAR:
-        op = ASSIGN_MUL;
-        break;
-    case T_EQUAL_SLASH:
-        op = ASSIGN_DIV;
-        break;
-    case T_EQUAL_PERCENT:
-        op = ASSIGN_MOD;
-        break;
-    case T_EQUAL_AMPERSAND:
-        op = ASSIGN_AND;
-        break;
-    case T_EQUAL_PIPE:
-        op = ASSIGN_OR;
-        break;
-    case T_EQUAL_CARET:
-        op = ASSIGN_XOR;
-        break;
-    case T_EQUAL_DOUBLE_RANGLE:
-        op = ASSIGN_LSHIFT;
-        break;
-    case T_EQUAL_DOUBLE_LANGLE:
-        op = ASSIGN_RSHIFT;
-        break;
-    default:
-        return ASSIGN_UNKNOWN;
-    }
-    consume();
-    return op;
-}
-
 LgsStmt* LgsParser::parseAssignment() {
     const auto oldIndex = currentIndex;
     // Left expr
@@ -966,13 +922,12 @@ LgsStmt* LgsParser::parseAssignment() {
     if (!parsedOrReset(l, oldIndex)) return nullptr;
 
     // Operation
-    const auto opToken = currentToken;
-    if (!LGS_ASSIGN_OPS_DICT.contains(currentToken.type)) {
+    if (!LGS_BINARY_OPS_DICT.contains(currentToken.type) && currentToken.type != T_WALRUS) {
         freeExpr(l);
         reset(oldIndex);
         return nullptr;
     }
-    const auto op = LGS_ASSIGN_OPS_DICT.at(currentToken.type);
+    const auto opToken = currentToken;
     consume();
 
     // Right expr
@@ -983,7 +938,14 @@ LgsStmt* LgsParser::parseAssignment() {
         return nullptr;
     }
 
-    const auto assignment = new LgsAssignment(op, l, r);
+    LgsAssignment* assignment;
+    if (currentToken.type != T_WALRUS) {
+        assignment = new LgsAssignment(l, r);
+    } else {
+        const auto op = LGS_BINARY_OPS_DICT.at(opToken.type);
+        const auto binExpr = new LgsBinaryExpr(l, r, op);
+        assignment = new LgsAssignment(binExpr);
+    }
     setLocation(assignment->location, &opToken, &currentToken);
     return assignment;
 }
@@ -1321,6 +1283,7 @@ LgsExpr* LgsParser::parseExprWithPrecedence(const int minPrecedence, const bool 
         } else {
             break;
         }
+        const auto opToken = currentToken;
         consume();
         const auto precedence = getBinOpPrecedence(op->opType);
         if (precedence < minPrecedence) {
@@ -1337,7 +1300,7 @@ LgsExpr* LgsParser::parseExprWithPrecedence(const int minPrecedence, const bool 
         } else {
             left = new LgsBinaryExpr(left, right, *op);
         }
-        setLocation(left->location, &startToken, &currentToken);
+        setLocation(left->location, &opToken, &currentToken);
     }
     return left;
 }

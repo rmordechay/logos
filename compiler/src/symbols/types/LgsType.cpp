@@ -151,51 +151,51 @@ LgsType* LgsType::clone() {
     assert(0);
 }
 
-Value* LgsType::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::addIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
     assert(0);
 }
 
-Value* LgsType::subIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::subIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
     assert(0);
 }
 
-Value* LgsType::mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::mulIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
     assert(0);
 }
 
-Value* LgsType::divIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::divIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
     assert(0);
 }
 
-Value* LgsType::modIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::modIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
     assert(0);
 }
 
-Value* LgsType::powIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::powIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
     assert(0);
 }
 
-Value* LgsType::bitAndIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::bitAndIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
     assert(0);
 }
 
-Value* LgsType::bitOrIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::bitOrIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
     assert(0);
 }
 
-Value* LgsType::bitXorIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::bitXorIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
     assert(0);
 }
 
-Value* LgsType::lshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::lshiftIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
     assert(0);
 }
 
-Value* LgsType::rshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::rshiftIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
     assert(0);
 }
 
-Value* LgsType::crossIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::crossIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
     assert(0);
 }
 
@@ -350,6 +350,12 @@ Value* eqIR(LgsCgModule& cg, Value* left, Value* right, LgsType* type) {
     if (isa<ConstantPointerNull>(left)) return exprEqNull(cg, right, type);
     if (isa<ConstantPointerNull>(right)) return exprEqNull(cg, left, type);
     if (type->isInt) {
+        if (left->getType()->isPointerTy()) {
+            left = cg.load(type->getIRType(cg), left);
+        }
+        if (right->getType()->isPointerTy()) {
+            right = cg.load(type->getIRType(cg), right);
+        }
         return cg.builder.CreateICmpEQ(left, right);
     }
     if (type->isFloat) {

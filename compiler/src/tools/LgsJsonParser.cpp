@@ -215,14 +215,6 @@ void LgsJsonParser::parseVarDec(const LgsVarDec* varDec) {
 
 void LgsJsonParser::parseAssignment(const LgsAssignment* assignment) {
     openObject();
-    addKeyValueStr("kind", "assignment", true);
-    openKey("leftExpr");
-    parseExpr(assignment->lExpr);
-    addComma();
-    openKey("rightExpr");
-    parseExpr(assignment->rExpr);
-    addComma();
-    addKeyValueStr("op", assignment->assignmentType.text);
     closeObject();
 }
 

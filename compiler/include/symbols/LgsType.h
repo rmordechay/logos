@@ -98,18 +98,18 @@ public:
     virtual bool equals(LgsType* other);
     virtual LgsType* clone();
 
-    virtual Value* addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* subIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* divIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* modIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* powIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* bitAndIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* bitOrIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* bitXorIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* lshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* rshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* crossIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
+    virtual Value* addIR(LgsCgModule& cg, LgsBinaryExpr* binExpr);
+    virtual Value* subIR(LgsCgModule& cg, LgsBinaryExpr* binExpr);
+    virtual Value* mulIR(LgsCgModule& cg, LgsBinaryExpr* binExpr);
+    virtual Value* divIR(LgsCgModule& cg, LgsBinaryExpr* binExpr);
+    virtual Value* modIR(LgsCgModule& cg, LgsBinaryExpr* binExpr);
+    virtual Value* powIR(LgsCgModule& cg, LgsBinaryExpr* binExpr);
+    virtual Value* bitAndIR(LgsCgModule& cg, LgsBinaryExpr* binExpr);
+    virtual Value* bitOrIR(LgsCgModule& cg, LgsBinaryExpr* binExpr);
+    virtual Value* bitXorIR(LgsCgModule& cg, LgsBinaryExpr* binExpr);
+    virtual Value* lshiftIR(LgsCgModule& cg, LgsBinaryExpr* binExpr);
+    virtual Value* rshiftIR(LgsCgModule& cg, LgsBinaryExpr* binExpr);
+    virtual Value* crossIR(LgsCgModule& cg, LgsBinaryExpr* binExpr);
 
     bool isAny();
     LgsAny* asAny();

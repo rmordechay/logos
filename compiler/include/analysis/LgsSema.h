@@ -7,6 +7,8 @@
 #include "logos/LgsAppConfigs.h"
 #include <unordered_map>
 
+#include "stmts/LgsAssignment.h"
+
 class LgsMainFunc;
 class LgsMetaSelection;
 class LgsAppConfigFile;

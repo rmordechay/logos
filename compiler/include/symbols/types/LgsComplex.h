@@ -17,10 +17,10 @@ public:
     Type* getIRType(LgsCgModule& cg) override;
     Constant* getRTType(LgsCgModule& cg) override;
     bool canCastTo(LgsType* other) override;
-    Value* addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* subIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* divIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
+    Value* addIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) override;
+    Value* subIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) override;
+    Value* mulIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) override;
+    Value* divIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) override;
     std::string fmtStr() const override;
     DIType* getDebugType(LgsCgModule& cg) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;

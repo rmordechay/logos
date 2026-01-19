@@ -12,6 +12,8 @@
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/Module.h>
 
+#include "exprs/LgsBinaryExpr.h"
+
 size_t LgsInt::sizeBytes() {
     return sizeof(int);
 }
@@ -75,55 +77,77 @@ LgsType* LgsInt::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     return nullptr;
 }
 
-Value* LgsInt::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsInt::addIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+    const auto left = binExpr->left;
+    const auto right = binExpr->right;
     const auto l = cg.builder.CreateZExt(left->loadIR(cg), getIRType(cg));
     const auto r = cg.builder.CreateZExt(right->loadIR(cg), getIRType(cg));
     return cg.builder.CreateAdd(l, r);
 }
 
-Value* LgsInt::subIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsInt::subIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+    const auto left = binExpr->left;
+    const auto right = binExpr->right;
     const auto l = cg.builder.CreateZExt(left->loadIR(cg), getIRType(cg));
     const auto r = cg.builder.CreateZExt(right->loadIR(cg), getIRType(cg));
     return cg.builder.CreateSub(l, r);
 }
 
-Value* LgsInt::mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsInt::mulIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+    const auto left = binExpr->left;
+    const auto right = binExpr->right;
     const auto l = cg.builder.CreateZExt(left->loadIR(cg), getIRType(cg));
     const auto r = cg.builder.CreateZExt(right->loadIR(cg), getIRType(cg));
     return cg.builder.CreateMul(l, r);
 }
 
-Value* LgsInt::divIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsInt::divIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+    const auto left = binExpr->left;
+    const auto right = binExpr->right;
     const auto l = cg.builder.CreateZExt(left->loadIR(cg), getIRType(cg));
     const auto r = cg.builder.CreateZExt(right->loadIR(cg), getIRType(cg));
     return cg.builder.CreateSDiv(l, r);
 }
 
-Value* LgsInt::modIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsInt::modIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+    const auto left = binExpr->left;
+    const auto right = binExpr->right;
     return cg.builder.CreateSRem(left->loadIR(cg), right->loadIR(cg));
 }
 
-Value* LgsInt::powIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsInt::powIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+    const auto left = binExpr->left;
+    const auto right = binExpr->right;
     return cg.callFunc("pow", cg.doubleTy(), {cg.doubleTy(), cg.doubleTy()}, {left->loadIR(cg), right->loadIR(cg)});
 }
 
-Value* LgsInt::bitAndIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsInt::bitAndIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+    const auto left = binExpr->left;
+    const auto right = binExpr->right;
     return cg.builder.CreateAnd(left->loadIR(cg), right->loadIR(cg));
 }
 
-Value* LgsInt::bitOrIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsInt::bitOrIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+    const auto left = binExpr->left;
+    const auto right = binExpr->right;
     return cg.builder.CreateOr(left->loadIR(cg), right->loadIR(cg));
 }
 
-Value* LgsInt::bitXorIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsInt::bitXorIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+    const auto left = binExpr->left;
+    const auto right = binExpr->right;
     return cg.builder.CreateXor(left->loadIR(cg), right->loadIR(cg));
 }
 
-Value* LgsInt::rshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsInt::rshiftIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+    const auto left = binExpr->left;
+    const auto right = binExpr->right;
     return cg.builder.CreateShl(left->loadIR(cg), right->loadIR(cg));
 }
 
-Value* LgsInt::lshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsInt::lshiftIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+    const auto left = binExpr->left;
+    const auto right = binExpr->right;
     return cg.builder.CreateLShr(left->loadIR(cg), right->loadIR(cg));
 }
 

@@ -2,6 +2,7 @@
 
 #include "LgsBinaryTokens.h"
 #include "cblas/cblas.h"
+#include "exprs/LgsBinaryExpr.h"
 #include "exprs/LgsMatrixExpr.h"
 #include "types/LgsAny.h"
 #include "types/iterables/LgsSArray.h"
@@ -61,7 +62,9 @@ LgsType* LgsMatrix::applyMatMatOp(const LgsMatrix* otherMat, const LgsBinOp& op)
     }
 }
 
-Value* LgsMatrix::mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsMatrix::mulIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+    const auto left = binExpr->left;
+    const auto right = binExpr->right;
     const auto leftMat = left->type->asMatrix();
     const auto rightMat = right->type->asMatrix();
     const auto order = cg.i32(CblasRowMajor);

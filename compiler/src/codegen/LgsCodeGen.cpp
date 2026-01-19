@@ -319,39 +319,43 @@ void LgsCodeGen::visitVarDec(LgsVarDec* varDec) {
 }
 
 void LgsCodeGen::visitAssignment(const LgsAssignment* assignment) {
-    const auto lValue = assignment->lExpr;
-    const auto rValue = assignment->rExpr;
-    if (const auto iterIndex = lValue->asIterIndex()) {
+    auto& binaryExpr = assignment->binaryExpr;
+    const auto l = binaryExpr ? binaryExpr->left : assignment->left;
+    const auto r = binaryExpr ? binaryExpr->right : assignment->right;
+    if (const auto iterIndex = l->asIterIndex()) {
         visitIterIndex(iterIndex, true);
-    } else if (const auto var = lValue->asVariable()) {
+    } else if (const auto var = l->asVariable()) {
         visitVariable(var);
-    } else if (const auto selection = lValue->asSelection()) {
+    } else if (const auto selection = l->asSelection()) {
         visitSelection(selection, true);
-    } else if (const auto nullable = lValue->asNullableExpr()) {
+    } else if (const auto nullable = l->asNullableExpr()) {
         visitExpr(nullable->baseExpr, true);
         nullable->IRValue = nullable->baseExpr->IRValue;
     }
-    assignment->rExpr->pointee = assignment->lExpr->IRValue;
-    assignment->rExpr->level = assignment->lExpr->level;
-    visitExpr(assignment->rExpr, true);
+    r->pointee = l->IRValue;
+    r->level = l->level;
+    visitExpr(r, true);
 
-    const Value* results = nullptr;
-    switch (assignment->assignmentType.opType) {
-    case ASSIGN: lValue->assign(cg, rValue); return;
-    case ASSIGN_ADD: results = lValue->type->addIR(cg, lValue, rValue); break;
-    case ASSIGN_SUB: results = lValue->type->subIR(cg, lValue, rValue); break;
-    case ASSIGN_MUL: results = lValue->type->mulIR(cg, lValue, rValue); break;
-    case ASSIGN_DIV: results = lValue->type->divIR(cg, lValue, rValue); break;
-    case ASSIGN_MOD: results = lValue->type->modIR(cg, lValue, rValue); break;
-    case ASSIGN_POW: results = lValue->type->powIR(cg, lValue, rValue); break;
-    case ASSIGN_AND: results = lValue->type->bitAndIR(cg, lValue, rValue); break;
-    case ASSIGN_OR: results = lValue->type->bitOrIR(cg, lValue, rValue); break;
-    case ASSIGN_XOR: results = lValue->type->bitXorIR(cg, lValue, rValue); break;
-    case ASSIGN_LSHIFT: results = lValue->type->lshiftIR(cg, lValue, rValue); break;
-    case ASSIGN_RSHIFT: results = lValue->type->rshiftIR(cg, lValue, rValue); break;
-    case ASSIGN_UNKNOWN: break;
+    if (!binaryExpr) {
+        l->assign(cg, r);
+        return;
     }
-    assert(results);
+
+    const auto type = binaryExpr->type;
+    switch (binaryExpr->op.opType) {
+    case ADD: binaryExpr->IRValue = type->addIR(cg, binaryExpr); return;
+    case SUB: binaryExpr->IRValue = type->subIR(cg, binaryExpr); return;
+    case MUL: binaryExpr->IRValue = type->mulIR(cg, binaryExpr); return;
+    case DIV: binaryExpr->IRValue = type->divIR(cg, binaryExpr); return;
+    case MODULO: binaryExpr->IRValue = type->modIR(cg, binaryExpr); return;
+    case POW: binaryExpr->IRValue = type->powIR(cg, binaryExpr); return;
+    case BIT_AND: binaryExpr->IRValue = type->bitAndIR(cg, binaryExpr); return;
+    case BIT_OR: binaryExpr->IRValue = type->bitOrIR(cg, binaryExpr); return;
+    case BIT_XOR: binaryExpr->IRValue = type->bitXorIR(cg, binaryExpr); return;
+    case LSHIFT: binaryExpr->IRValue = type->lshiftIR(cg, binaryExpr); return;
+    case RSHIFT: binaryExpr->IRValue = type->rshiftIR(cg, binaryExpr); return;
+    default: break;
+    }
 }
 
 void LgsCodeGen::visitIfStmt(LgsIfStmt* ifStmt) {
@@ -632,18 +636,18 @@ void LgsCodeGen::visitBinaryExpr(LgsBinaryExpr* binExpr) {
     visitExpr(l);
     visitExpr(r);
     switch (binExpr->op.opType) {
-    case ADD: binExpr->IRValue = binExpr->type->addIR(cg, l, r); break;
-    case SUB: binExpr->IRValue = binExpr->type->subIR(cg, l, r); break;
-    case MUL: binExpr->IRValue = binExpr->type->mulIR(cg, l, r); break;
-    case DIV: binExpr->IRValue = binExpr->type->divIR(cg, l, r); break;
-    case MODULO: binExpr->IRValue = binExpr->type->modIR(cg, l, r); break;
-    case POW: binExpr->IRValue = binExpr->type->powIR(cg, l, r); break;
-    case BIT_AND: binExpr->IRValue = binExpr->type->bitAndIR(cg, l, r); break;
-    case BIT_OR: binExpr->IRValue = binExpr->type->bitOrIR(cg, l, r); break;
-    case BIT_XOR: binExpr->IRValue = binExpr->type->bitXorIR(cg, l, r); break;
-    case LSHIFT: binExpr->IRValue = binExpr->type->rshiftIR(cg, l, r); break;
-    case RSHIFT: binExpr->IRValue = binExpr->type->lshiftIR(cg, l, r); break;
-    case CROSS: binExpr->IRValue = binExpr->type->crossIR(cg, l, r); break;
+    case ADD: binExpr->IRValue = binExpr->type->addIR(cg, binExpr); break;
+    case SUB: binExpr->IRValue = binExpr->type->subIR(cg, binExpr); break;
+    case MUL: binExpr->IRValue = binExpr->type->mulIR(cg, binExpr); break;
+    case DIV: binExpr->IRValue = binExpr->type->divIR(cg, binExpr); break;
+    case MODULO: binExpr->IRValue = binExpr->type->modIR(cg, binExpr); break;
+    case POW: binExpr->IRValue = binExpr->type->powIR(cg, binExpr); break;
+    case BIT_AND: binExpr->IRValue = binExpr->type->bitAndIR(cg, binExpr); break;
+    case BIT_OR: binExpr->IRValue = binExpr->type->bitOrIR(cg, binExpr); break;
+    case BIT_XOR: binExpr->IRValue = binExpr->type->bitXorIR(cg, binExpr); break;
+    case LSHIFT: binExpr->IRValue = binExpr->type->rshiftIR(cg, binExpr); break;
+    case RSHIFT: binExpr->IRValue = binExpr->type->lshiftIR(cg, binExpr); break;
+    case CROSS: binExpr->IRValue = binExpr->type->crossIR(cg, binExpr); break;
     case EQ: binExpr->IRValue = eqIR(cg, l->loadIR(cg), r->loadIR(cg), l->type); break;
     case NE: binExpr->IRValue = neIR(cg, l->loadIR(cg), r->loadIR(cg), l->type); break;
     case LT: binExpr->IRValue = ltIR(cg, l->loadIR(cg), r->loadIR(cg), l->type); break;
@@ -653,7 +657,7 @@ void LgsCodeGen::visitBinaryExpr(LgsBinaryExpr* binExpr) {
     case AND: binExpr->IRValue = andIR(cg, l->loadIR(cg), r->loadIR(cg)); break;
     case OR: binExpr->IRValue = orIR(cg, l->loadIR(cg), r->loadIR(cg)); break;
     case IN: binExpr->IRValue = r->type->asIterable()->inIR(cg, r->IRValue, l->IRValue); break;
-    case NOOP: assert(0);
+    default: assert(0);
     }
 }
 
@@ -881,7 +885,7 @@ void LgsCodeGen::visitVariable(LgsVariable* variable) {
     case VAR_DEC:
         assert(variable->ref.varDec->IRValue);
         variable->IRValue = variable->ref.varDec->IRValue;
-        if (!variable->level) variable->level = variable->ref.varDec->expr->level;
+        variable->level = variable->level ? variable->level : variable->ref.varDec->expr->level;
         break;
     case PARAM:
         if (variable->ref.param->isSelf) {
@@ -889,7 +893,7 @@ void LgsCodeGen::visitVariable(LgsVariable* variable) {
         } else {
             assert(variable->ref.param->IRValue);
             variable->IRValue = variable->ref.param->IRValue;
-            if (!variable->level) variable->level = variable->ref.param->level;
+            variable->level = variable->level ? variable->level : variable->ref.param->level;
         }
         break;
     case FUNC:

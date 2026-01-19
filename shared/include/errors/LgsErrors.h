@@ -23,7 +23,7 @@ inline LgsBaseMsg E10008{"main.lgs could not be found in src directory.", errCod
 inline LgsBaseMsg E10009{"Duplicate Main files were found in the project. Locations:%s", errCodeStart++};
 inline LgsBaseMsg E10010{"Not a root path of a Logos project.", errCodeStart++};
 inline LgsBaseMsg E10011{"%s is already declared.", errCodeStart++};
-inline LgsBaseMsg E10012{"%s cannot be %s-assigned to type %s.", errCodeStart++};
+inline LgsBaseMsg E10012{"%s cannot be re-assigned to expression with type %s.", errCodeStart++};
 inline LgsBaseMsg E10013{"Field %s is with function type. Declare it as a standard function instead.", errCodeStart++};
 inline LgsBaseMsg E10014{"Expression of type %s does not match base type %s.", errCodeStart++};
 inline LgsBaseMsg E10015{"Function %s was found but it doesnt match the parameters.\nGiven:\t  %s\nExpected:  %s", errCodeStart++};

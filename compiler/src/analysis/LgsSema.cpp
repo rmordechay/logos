@@ -354,8 +354,8 @@ void LgsSema::visitVarDec(LgsVarDec* varDec) {
 }
 
 void LgsSema::visitAssignment(LgsAssignment* assignment) {
-    const auto l = assignment->lExpr;
-    auto& r = assignment->rExpr;
+    const auto l = assignment->left;
+    auto& r = assignment->right;
     visitExpr(r);
     if (const auto iterIndex = l->asIterIndex()) {
         visitIterIndex(iterIndex);
@@ -390,7 +390,7 @@ void LgsSema::visitAssignment(LgsAssignment* assignment) {
         return addError(E10051, l->location, {l->asText()});
     }
     if (!canAssign) {
-        return addError(E10012, l->location, {l->asText(), assignment->assignmentType.text, r->type->pname()});
+        return addError(E10012, l->location, {l->asText(), r->type->pname()});
     }
 }
 
@@ -754,7 +754,7 @@ void LgsSema::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
         type = ltype->applyBinOp(rtype, binaryExpr->op);
     }
     if (!type) {
-        return addError(E10076, l->location, {binaryExpr->op.text, ltype->pname(), rtype->pname()});
+        return addError(E10076, binaryExpr->location, {binaryExpr->op.text, ltype->pname(), rtype->pname()});
     }
     if (const auto sArr = type->asSArray()) visitExpr(sArr->length);
     binaryExpr->setType(type);

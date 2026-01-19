@@ -1,5 +1,4 @@
 #pragma once
-#include "LgsBinaryTokens.h"
 #include "LgsStmt.h"
 
 class LgsArrayExpr;
@@ -11,11 +10,12 @@ class LgsType;
 
 class LgsAssignment final : public LgsStmt {
 public:
-    LgsExpr* lExpr = nullptr;
-    LgsExpr* rExpr = nullptr;
-    LgsAssignOp assignmentType;
+    LgsExpr* left = nullptr;
+    LgsExpr* right = nullptr;
+    LgsBinaryExpr* binaryExpr = nullptr;
 
-    LgsAssignment(const LgsAssignOp& assignmentType, LgsExpr* lValue, LgsExpr* rValue) : lExpr(lValue), rExpr(rValue), assignmentType(assignmentType) {}
+    explicit LgsAssignment(LgsBinaryExpr* binaryExpr) : binaryExpr(binaryExpr) {}
+    explicit LgsAssignment(LgsExpr* left, LgsExpr* right) : left(left), right(right) {}
     void setDebugValue(LgsCgModule& cg) override;
     ~LgsAssignment() override;
 };

@@ -29,14 +29,14 @@ public:
     std::string fmtStr() const override;
     DIType* getDebugType(LgsCgModule& cg) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
-    Value* addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
+    Value* addIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) override;
     void setNullableFields(LgsCgModule& cg, Value* ptr, Value* value, Value* isSet);
     Value* getNullableValue(LgsCgModule& cg, Value* ptr);
     Value* getIsSet(LgsCgModule& cg, Value* ptr);
     void storeNullableValue(LgsCgModule& cg, Value* ptr, Value* value);
     void storeIsSet(LgsCgModule& cg, Value* ptr, Value* value);
-    Value* applyNumberBinOp(LgsCgModule& cg, LgsExpr* left, LgsExpr* right, const std::function<Value*(LgsExpr*, LgsExpr*)>& func);
-    Value* applyPtrBinOp(LgsCgModule& cg, LgsExpr* left, LgsExpr* right, const std::function<Value*(LgsExpr*, LgsExpr*)>& func);
+    Value* applyNumberBinOp(LgsCgModule& cg, LgsBinaryExpr* binExpr, const std::function<Value*(LgsBinaryExpr*)>& func);
+    Value* applyPtrBinOp(LgsCgModule& cg, LgsBinaryExpr* binExpr, const std::function<Value*(LgsBinaryExpr*)>& func);
 };
 
 inline LgsNullable LGS_NULLABLE;

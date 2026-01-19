@@ -9,6 +9,8 @@
 #include "types/primitives/LgsBool.h"
 #include <sstream>
 
+#include "exprs/LgsBinaryExpr.h"
+
 LgsField* LgsVec::getField(const std::string& fieldName) {
     for (auto* f : fields) {
         if (f->name == fieldName) return f;
@@ -133,7 +135,9 @@ bool LgsVec::inferBaseType(std::vector<LgsExpr*>& args) {
     return !!baseType;
 }
 
-Value* LgsVec::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsVec::addIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+    const auto left = binExpr->left;
+    const auto right = binExpr->right;
     const auto rtype = right->type;
     const auto isScalar = rtype->isScalar();
     if (baseType->isFloat) {
@@ -147,7 +151,9 @@ Value* LgsVec::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     return cg.builder.CreateAdd(l, r);
 }
 
-Value* LgsVec::subIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsVec::subIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+    const auto left = binExpr->left;
+    const auto right = binExpr->right;
     const auto rtype = right->type;
     const auto isScalar = rtype->isScalar();
     if (baseType->isFloat) {
@@ -161,7 +167,9 @@ Value* LgsVec::subIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     return cg.builder.CreateSub(l, r);
 }
 
-Value* LgsVec::mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsVec::mulIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+    const auto left = binExpr->left;
+    const auto right = binExpr->right;
     if (left->type->asMatrix() && right->type->asVec()) {
         return matVecMul(cg, left, right);
     }
@@ -178,7 +186,9 @@ Value* LgsVec::mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     return cg.builder.CreateMul(l, r);
 }
 
-Value* LgsVec::divIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsVec::divIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+    const auto left = binExpr->left;
+    const auto right = binExpr->right;
     auto [l, r] = loadNumberPair(cg, left->loadIR(cg), right->loadIR(cg), cg.floatTy());
     if (right->type->isScalar()) {
         r = cg.builder.CreateVectorSplat(dimVec, r);
@@ -186,7 +196,9 @@ Value* LgsVec::divIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     return cg.builder.CreateFDiv(l, r);
 }
 
-Value* LgsVec::modIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsVec::modIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+    const auto left = binExpr->left;
+    const auto right = binExpr->right;
     auto [l, r] = loadNumberPair(cg, left->loadIR(cg), right->loadIR(cg), cg.floatTy());
     if (right->type->isScalar()) {
         r = cg.builder.CreateVectorSplat(dimVec, r);
@@ -194,7 +206,9 @@ Value* LgsVec::modIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     return cg.builder.CreateFRem(l, r);
 }
 
-Value* LgsVec::crossIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsVec::crossIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+    const auto left = binExpr->left;
+    const auto right = binExpr->right;
     const auto crossFunc = crossProductFunc(cg, left->type->asVec());
     return cg.builder.CreateCall(crossFunc, {left->loadIR(cg), right->loadIR(cg)});
 }

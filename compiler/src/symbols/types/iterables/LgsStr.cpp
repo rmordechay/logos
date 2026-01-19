@@ -80,7 +80,9 @@ bool LgsStr::inferBaseType(std::vector<LgsExpr*>& args) {
     assert(0);
 }
 
-Value* LgsStr::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsStr::addIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+    const auto left = binExpr->left;
+    const auto right = binExpr->right;
     const auto leftStrConst = left->getConstStr();
     const auto rightStrConst = right->getConstStr();
     if (leftStrConst.has_value() && rightStrConst.has_value()) {
@@ -101,10 +103,10 @@ Value* LgsStr::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     const auto allocSize = cg.builder.CreateAdd(sumSize, cg.usize(1));
 
     Value* level = nullptr;
-    if (left->isReturnExpr) {
+    if (binExpr->isReturnExpr) {
         level = cg.builder.CreateSub(cg.currentLevel, cg.usize(1));
-    } else if (left->level) {
-        level = left->level;
+    } else if (binExpr->level) {
+        level = binExpr->level;
     }
     const auto buffer = cg.heapAlloc(allocSize, level);
     const auto rightPos = cg.builder.CreateInBoundsGEP(cg.i8Ty(), buffer, leftSize);

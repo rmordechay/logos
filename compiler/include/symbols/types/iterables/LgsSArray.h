@@ -22,8 +22,8 @@ public:
     std::string fmtStr() const override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     bool inferBaseType(std::vector<LgsExpr*>& args) override;
-    Value* addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
+    Value* addIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) override;
+    Value* mulIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) override;
     Value* inIR(LgsCgModule& cg, Value* iterableExpr, Value* value) override;
     Value* getIRElement(LgsCgModule& cg, Value* iterable, Value* index) override;
     void addIRElement(LgsCgModule& cg, Value* iterable, Value* index, Value* value) override;

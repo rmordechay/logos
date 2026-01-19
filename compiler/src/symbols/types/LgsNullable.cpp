@@ -9,6 +9,8 @@
 #include "types/primitives/LgsBool.h"
 #include <cassert>
 
+#include "exprs/LgsBinaryExpr.h"
+
 LgsField* LgsNullable::getField(const std::string& fieldName) {
     return baseType->getField(fieldName);
 }
@@ -90,11 +92,13 @@ LgsType* LgsNullable::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     return nullptr;
 }
 
-Value* LgsNullable::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto f = [this, &cg](LgsExpr* l, LgsExpr* r) {
-        return baseType->addIR(cg, l, r);
+Value* LgsNullable::addIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+    const auto left = binExpr->left;
+    const auto right = binExpr->right;
+    const auto f = [this, &cg](LgsBinaryExpr* e) {
+        return baseType->addIR(cg, e);
     };
-    return passByRef ? applyPtrBinOp(cg, left, right, f) : applyNumberBinOp(cg, left, right, f);
+    return passByRef ? applyPtrBinOp(cg, binExpr, f) : applyNumberBinOp(cg, binExpr, f);
 }
 
 void LgsNullable::setNullableFields(LgsCgModule& cg, Value* ptr, Value* value, Value* isSet) {
@@ -121,7 +125,9 @@ void LgsNullable::storeIsSet(LgsCgModule& cg, Value* ptr, Value* value) {
     cg.storeStructField(getIRType(cg), ptr, 1, value);
 }
 
-Value* LgsNullable::applyNumberBinOp(LgsCgModule& cg, LgsExpr* left, LgsExpr* right, const std::function<Value*(LgsExpr*, LgsExpr*)>& func) {
+Value* LgsNullable::applyNumberBinOp(LgsCgModule& cg, LgsBinaryExpr* binExpr, const std::function<Value*(LgsBinaryExpr*)>& func) {
+    const auto left = binExpr->left;
+    const auto right = binExpr->right;
     const auto ptr = cg.builder.CreateAlloca(getIRType(cg));
     const auto leftNullable = left->type->asNullable();
     const auto rightNullable = right->type->asNullable();
@@ -135,7 +141,7 @@ Value* LgsNullable::applyNumberBinOp(LgsCgModule& cg, LgsExpr* left, LgsExpr* ri
     cg.builder.CreateCondBr(bothSet, addBlock, nullBlock);
 
     cg.startBlock(addBlock);
-    const auto result = func(left, right);
+    const auto result = func(binExpr);
     setNullableFields(cg, ptr, result, cg.true_());
     cg.builder.CreateBr(exitBlock);
 
@@ -147,7 +153,9 @@ Value* LgsNullable::applyNumberBinOp(LgsCgModule& cg, LgsExpr* left, LgsExpr* ri
     return ptr;
 }
 
-Value* LgsNullable::applyPtrBinOp(LgsCgModule& cg, LgsExpr* left, LgsExpr* right, const std::function<Value*(LgsExpr*, LgsExpr*)>& func) {
+Value* LgsNullable::applyPtrBinOp(LgsCgModule& cg, LgsBinaryExpr* binExpr, const std::function<Value*(LgsBinaryExpr*)>& func) {
+    const auto left = binExpr->left;
+    const auto right = binExpr->right;
     const auto ptr = cg.builder.CreateAlloca(getIRType(cg));
     const auto leftNotNull = cg.builder.CreateIsNotNull(left->IRValue);
     const auto rightNotNull = cg.builder.CreateIsNotNull(right->IRValue);
@@ -158,7 +166,7 @@ Value* LgsNullable::applyPtrBinOp(LgsCgModule& cg, LgsExpr* left, LgsExpr* right
     cg.builder.CreateCondBr(bothNotNull, addBlock, nullBlock);
 
     cg.startBlock(addBlock);
-    const auto result = func(left, right);
+    const auto result = func(binExpr);
     cg.store(result, ptr);
     cg.builder.CreateBr(exitBlock);
 

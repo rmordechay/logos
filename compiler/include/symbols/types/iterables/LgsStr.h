@@ -21,7 +21,7 @@ public:
     Value* getIRElement(LgsCgModule& cg, Value* iterable, Value* index) override;
     std::string fmtStr() const override;
     bool inferBaseType(std::vector<LgsExpr*>& args) override;
-    Value* addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
+    Value* addIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) override;
     Value* lenIR(LgsCgModule& cg, Value* iterable) override;
     Value* inIR(LgsCgModule& cg, Value* iterableExpr, Value* value) override;
     DIType* getDebugType(LgsCgModule& cg) override;

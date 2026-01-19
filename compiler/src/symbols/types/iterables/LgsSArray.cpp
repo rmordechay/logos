@@ -87,7 +87,9 @@ bool LgsSArray::inferBaseType(std::vector<LgsExpr*>& args) {
     return true;
 }
 
-Value* LgsSArray::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsSArray::addIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+    const auto left = binExpr->left;
+    const auto right = binExpr->right;
     const auto baseIR = baseType->getIRType(cg);
     const auto leftSArr = left->type->asSArray();
     const auto rightSArr = right->type->asSArray();
@@ -104,7 +106,9 @@ Value* LgsSArray::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     return newArr;
 }
 
-Value* LgsSArray::mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsSArray::mulIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+    const auto left = binExpr->left;
+    const auto right = binExpr->right;
     const auto arrPtr = left->IRValue;
     const auto arrSize = cg.extendToSize(left->type->asSArray()->length->IRValue);
     const auto multiplier = cg.extendToSize(right->IRValue);

@@ -1,6 +1,7 @@
 #include "types/primitives/LgsDouble.h"
 #include "exprs/constants/LgsFloatConst.h"
 #include "codegen/LgsCgModule.h"
+#include "exprs/LgsBinaryExpr.h"
 #include "types/LgsAny.h"
 
 std::string LgsDouble::getName() {
@@ -39,17 +40,23 @@ bool LgsDouble::canCastTo(LgsType* other) {
     return false;
 }
 
-Value* LgsDouble::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsDouble::addIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+    const auto left = binExpr->left;
+    const auto right = binExpr->right;
     const auto [l, r] = loadNumberPair(cg, left->loadIR(cg), right->loadIR(cg), cg.doubleTy());
     return cg.builder.CreateFAdd(l, r);
 }
 
-Value* LgsDouble::mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsDouble::mulIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+    const auto left = binExpr->left;
+    const auto right = binExpr->right;
     const auto [l, r] = loadNumberPair(cg, left->loadIR(cg), right->loadIR(cg), cg.doubleTy());
     return cg.builder.CreateFMul(l, r);
 }
 
-Value* LgsDouble::powIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsDouble::powIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+    const auto left = binExpr->left;
+    const auto right = binExpr->right;
     const auto [l, r] = loadNumberPair(cg, left->loadIR(cg), right->loadIR(cg), cg.doubleTy());
     return cg.callFunc("pow", cg.doubleTy(), {cg.doubleTy(), cg.doubleTy()}, {l, r});
 }
