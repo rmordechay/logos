@@ -13,6 +13,7 @@ public:
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
     Constant* getRTType(LgsCgModule& cg) override;
+    Lgs_TypeKind getRTTypeKind() override;
     bool canCastTo(LgsType* other) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     Value* getIRElement(LgsCgModule& cg, Value* iterable, Value* index) override;

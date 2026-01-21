@@ -31,6 +31,7 @@ public:
     LgsFunc* getMethod(const std::string& methodName) override;
     Type* getIRType(LgsCgModule& cg) override;
     Constant* getRTType(LgsCgModule& cg) override;
+    Lgs_TypeKind getRTTypeKind() override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
     bool canCastTo(LgsType* other) override;

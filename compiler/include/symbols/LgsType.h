@@ -5,6 +5,8 @@
 #include "errors/LgsErrHandler.h"
 #include <unordered_map>
 
+#include "Lgs_Types.h"
+
 class LgsComplex;
 struct LgsBinOp;
 class LgsBinaryExpr;
@@ -89,6 +91,7 @@ public:
     virtual Type* getIRType(LgsCgModule& cg) = 0;
     virtual Type* getTypeOrPtr(LgsCgModule& cg);
     virtual Constant* getRTType(LgsCgModule& cg) = 0;
+    virtual Lgs_TypeKind getRTTypeKind();
     virtual bool canCastTo(LgsType* other) = 0;
     virtual std::string fmtStr() const = 0;
     virtual LgsType* replaceGenerics(LgsType* replacement, std::unordered_map<std::string, LgsType*>& replacements);

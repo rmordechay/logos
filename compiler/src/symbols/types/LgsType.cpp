@@ -131,6 +131,10 @@ Constant* LgsType::getRTType(LgsCgModule& cg) {
     assert(0);
 }
 
+Lgs_TypeKind LgsType::getRTTypeKind() {
+    assert(0);
+}
+
 LgsType* LgsType::replaceGenerics(LgsType* replacement, std::unordered_map<std::string, LgsType*>& replacements) {
     return this;
 }

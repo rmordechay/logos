@@ -58,8 +58,7 @@ Type* LgsObject::getIRType(LgsCgModule& cg) {
 Constant* LgsObject::getRTType(LgsCgModule& cg) {
     const auto RTTName = LGS_TYPEINFO_PREFIX + name;
     if (const auto v = cg.IRModule->getGlobalVariable(RTTName)) return v;
-    if (cg.mode != CG_MODE_RTTYPES) return cg.createGlobal(RTTName, cg.getRTTBaseStruct(), nullptr);
-    const auto rttType = cg.createGlobal(RTTName, cg.getRTTBaseStruct(), nullptr);
+    if (cg.mode != CG_MODE_RTTYPES) return cg.createGlobal(RTTName, cg.getRTTStructType(), nullptr);
     const auto numFields = fields.size();
     const auto ptrTypeArr = ArrayType::get(cg.ptrTy(), numFields);
 
@@ -67,20 +66,23 @@ Constant* LgsObject::getRTType(LgsCgModule& cg) {
     std::vector<Constant*> fieldTypes;
     for (const auto field : fields) {
         fieldNames.push_back(cg.getString(field->name));
-        fieldTypes.push_back(field->type->getRTType(cg));
+        if (field->type->asObject()) {
+            fieldTypes.push_back(cg.null());
+        } else {
+            fieldTypes.push_back(field->type->getRTType(cg));
+        }
     }
+    const auto namesArrGlobal = cg.createGlobal(RTTName + "_names", ptrTypeArr, ConstantArray::get(ptrTypeArr, fieldNames));
+    const auto typesArrGlobal = cg.createGlobal(RTTName + "_types", ptrTypeArr, ConstantArray::get(ptrTypeArr, fieldTypes));
 
-    const auto namesArr = ConstantArray::get(ptrTypeArr, fieldNames);
-    const auto namesArrGlobal = cg.createGlobal(RTTName + "_names", ptrTypeArr, namesArr);
-    const auto typesArr = ConstantArray::get(ptrTypeArr, fieldTypes);
-    const auto typesArrGlobal = cg.createGlobal(RTTName + "_types", ptrTypeArr, typesArr);
+    const std::vector<Type*> types = {cg.ptrTy(), cg.sizeTy(), cg.sizeTy(), cg.ptrTy(), cg.ptrTy()};
+    const auto objRTType = cg.getStructType(types, RTTName);
+    const std::vector<Constant*> args = {cg.getString(name), cg.usize(IRSize(cg)), cg.usize(numFields), namesArrGlobal, typesArrGlobal};
+    return cg.createGlobal(RTTName, objRTType, ConstantStruct::get(objRTType, args));
+}
 
-    const std::vector<Constant*> args = {cg.getString(RTTName), cg.usize(numFields), namesArrGlobal, typesArrGlobal};
-    const std::vector<Type*> types = {cg.ptrTy(), cg.sizeTy(), cg.ptrTy(), cg.ptrTy()};
-    const auto sv = cg.getRTTExtraStruct(name, types, args);
-    const std::vector<Constant*> rttFields = {cg.usize(IRSize(cg)), cg.i1(isHeapAlloc), cg.i32(RTT_OBJECT), sv};
-    rttType->setInitializer(ConstantStruct::get(cg.getRTTBaseStruct(), rttFields));
-    return rttType;
+Lgs_TypeKind LgsObject::getRTTypeKind() {
+    return RTT_OBJECT;
 }
 
 size_t LgsObject::sizeBytes() {
@@ -123,7 +125,7 @@ std::string LgsObject::fmtStr() const {
     bool first = true;
     for (const auto& field : fields) {
         if (!first) str << ", ";
-        str << field->name << " = " << field->type->fmtStr();
+        str << field->name << " = " << (field->type->asObject() ? "%s" : field->type->fmtStr());
         first = false;
     }
     str << '}';

@@ -35,8 +35,7 @@ Constant* LgsFuncType::getRTType(LgsCgModule& cg) {
     // paramsCount, paramHashes, paramTypes, rt
     const std::vector<Type*> rttFieldTypes = {cg.sizeTy(), cg.ptrTy(), cg.ptrTy(), cg.ptrTy()};
     const std::vector<Constant*> args = {cg.usize(params.size()), namesArrGlobal, cg.null(), rt->getRTType(cg)};
-    const auto sv = cg.getRTTExtraStruct(funcName, rttFieldTypes, args);
-    return cg.getRTTypeInfo(funcName, IRSize(cg), RTT_FUNC, isHeapAlloc, sv);
+    return cg.getRTTypeInfo(funcName, IRSize(cg), RTT_FUNC);
 }
 
 LgsExpr* LgsFuncType::getZeroValue() {

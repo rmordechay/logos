@@ -1177,8 +1177,8 @@ void LgsCodeGen::visitInstance(LgsInstance* instance) {
             cg.store(field->expr->IRValue, pointee);
         } else {
             const auto zero = field->type->getZeroValue();
-            visitExpr(zero);
-            cg.store(zero->IRValue, pointee);
+            // visitExpr(zero);
+            // cg.store(zero->IRValue, pointee);
             freeExpr(zero);
         }
     }
