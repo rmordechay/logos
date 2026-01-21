@@ -380,7 +380,7 @@ bool LgsApp::generateGenerics() {
     const auto file = new LgsFile("generics");
     file->cg.setupModule("generics");
     file->cg.mode = CG_MODE_GENERICS;
-    const LgsCodeGen cg(file, configs, globals, paths);
+    LgsCodeGen cg(file, configs, globals, paths);
     for (auto& [_, generic] : generics) {
         if (const auto dArr = generic->asDArray()) {
             dArr->generateAddFunc(cg.cg);

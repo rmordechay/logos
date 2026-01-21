@@ -18,11 +18,11 @@ LgsFuncCall* LgsSelection::asMethodCall() const {
 
 void LgsSelection::assign(LgsCgModule& cg, LgsExpr* right) {
     assert(!type->asVec());
+    auto v = right->IRValue;
     if (right->type->isHeapAlloc) {
-        right->type->moveValue(cg, IRValue, right->IRValue, type->getRTType(cg));
-    } else {
-        cg.store(right->IRValue, IRValue);
+        v = moveValue(cg, loadIR(cg), right->loadIR(cg), type);
     }
+    cg.store(v, IRValue);
 }
 
 std::string LgsSelection::asText() {

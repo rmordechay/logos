@@ -24,10 +24,6 @@ LgsExpr* LgsNullable::getZeroValue() {
     return new LgsNullableExpr();
 }
 
-Value* LgsNullable::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
-    return cg.null();
-}
-
 std::string LgsNullable::pname() {
     return baseType ? baseType->getName() + '?' : LGS_NULL_LITERAL;
 }

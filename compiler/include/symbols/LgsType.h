@@ -84,7 +84,6 @@ public:
     virtual std::string getName() = 0;
     virtual size_t sizeBytes() = 0;
     virtual LgsExpr* getZeroValue() = 0;
-    virtual Value* getIRZeroValue(LgsCgModule& cg, Value* pointee = nullptr);
     virtual Type* getIRType(LgsCgModule& cg) = 0;
     virtual Type* getTypeOrPtr(LgsCgModule& cg);
     virtual Constant* getRTType(LgsCgModule& cg) = 0;
@@ -97,7 +96,6 @@ public:
     virtual std::string pname(); // pretty name
     virtual bool equals(LgsType* other);
     virtual LgsType* clone();
-    virtual void moveValue(LgsCgModule& cg, Value* leftPtr, Value* rightPtr, Constant* type);
 
     virtual Value* addIR(LgsCgModule& cg, LgsBinaryExpr* binExpr);
     virtual Value* subIR(LgsCgModule& cg, LgsBinaryExpr* binExpr);

@@ -29,14 +29,6 @@ LgsExpr* LgsStr::getZeroValue() {
     return new LgsStrConst("");
 }
 
-Value* LgsStr::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
-    const auto ty = getIRType(cg);
-    Value* strConst = UndefValue::get(ty);
-    strConst = cg.builder.CreateInsertValue(strConst, cg.currentLevel, 0);
-    strConst = cg.builder.CreateInsertValue(strConst, cg.emptyStr(), 1);
-    return strConst;
-}
-
 Constant* LgsStr::getRTType(LgsCgModule& cg) {
     return cg.getRTTypeInfo(getName(), sizeBytes(), RTT_STR, baseType->getRTType(cg));
 }
@@ -110,28 +102,19 @@ Value* LgsStr::addIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
     const auto leftSize = lenIR(cg, leftPtr);
     const auto rightSize = lenIR(cg, rightPtr);
     const auto sumSize = cg.builder.CreateAdd(leftSize, rightSize);
-
-    if (isHeapAlloc) {
-        const auto allocSize = cg.builder.CreateAdd(sumSize, cg.usize(1));
-        const auto buffer = cg.heapAlloc(allocSize, cg.currentLevel, false);
-        const auto rightPos = cg.builder.CreateInBoundsGEP(cg.i8Ty(), buffer, leftSize);
-        cg.callMemcpy(buffer, leftPtr, leftSize);
-        cg.callMemcpy(rightPos, rightPtr, rightSize);
-        cg.addNullTerminate(buffer, sumSize);
-        const auto ty = getIRType(cg);
-        Value* strConst = UndefValue::get(ty);
-        strConst = cg.builder.CreateInsertValue(strConst, cg.currentLevel, 0);
-        strConst = cg.builder.CreateInsertValue(strConst, buffer, 1);
-        return strConst;
-    }
-
     const auto allocSize = cg.builder.CreateAdd(sumSize, cg.usize(1));
-    const auto buffer = cg.builder.CreateAlloca(cg.i8Ty(), allocSize);
-    const auto rightPos = cg.builder.CreateInBoundsGEP(cg.i8Ty(), buffer, leftSize);
-    cg.callMemcpy(buffer, leftPtr, leftSize);
+
+    const auto ptr = cg.heapAlloc(allocSize, cg.currentLevel, false);
+    const auto rightPos = cg.builder.CreateInBoundsGEP(cg.i8Ty(), ptr, leftSize);
+    cg.callMemcpy(ptr, leftPtr, leftSize);
     cg.callMemcpy(rightPos, rightPtr, rightSize);
-    cg.addNullTerminate(buffer, sumSize);
-    return buffer;
+    cg.addNullTerminate(ptr, sumSize);
+
+    const auto ty = getIRType(cg);
+    const auto alloc = cg.builder.CreateAlloca(ty);
+    cg.storeStructField(ty, alloc, 0, cg.currentLevel);
+    cg.storeStructField(ty, alloc, 1, ptr);
+    return alloc;
 }
 
 Value* LgsStr::lenIR(LgsCgModule& cg, Value* iterable) {
@@ -141,10 +124,6 @@ Value* LgsStr::lenIR(LgsCgModule& cg, Value* iterable) {
 Value* LgsStr::inIR(LgsCgModule& cg, Value* iterableExpr, Value* value) {
     const auto rv = cg.callFunc("strstr", cg.ptrTy(), {cg.ptrTy(), cg.ptrTy()}, {iterableExpr, value});
     return cg.builder.CreateIsNotNull(rv);
-}
-
-void LgsStr::moveValue(LgsCgModule& cg, Value* leftPtr, Value* rightPtr, Constant* type) {
-    cg.moveAlloc(leftPtr, cg.allocaAndStore(getIRType(cg), rightPtr), type);
 }
 
 DIType* LgsStr::getDebugType(LgsCgModule& cg) {

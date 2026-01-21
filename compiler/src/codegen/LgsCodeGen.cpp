@@ -743,7 +743,10 @@ void LgsCodeGen::visitStaticArray(LgsArrayExpr* arrayExpr) const {
     const auto sArr = arrayExpr->type->asSArray();
     const auto sArrTypeIR = sArr->getIRType(cg);
     if (arrayExpr->elements.empty()) {
-        arrayExpr->IRValue = sArr->getIRZeroValue(cg, arrayExpr->pointee);
+        const auto ty = sArr->getIRType(cg);
+        const auto arr = arrayExpr->pointee ? arrayExpr->pointee : cg.builder.CreateAlloca(ty);
+        cg.callMemset(arr, cg.usize(0), cg.usize(sArr->sizeBytes()));
+        arrayExpr->IRValue = arr;
         return;
     }
     arrayExpr->IRValue = arrayExpr->pointee ? arrayExpr->pointee : cg.builder.CreateAlloca(sArrTypeIR);
@@ -771,18 +774,14 @@ void LgsCodeGen::visitStaticArray(LgsArrayExpr* arrayExpr) const {
             sArr->addIRElement(cg, arrayExpr->IRValue, cg.i32(i), element->IRValue);
         }
     }
-
-    // Init rest of the values with zero
-    const size_t arrSize = sArr->length->getConstInt().value();
-    for (size_t i = arrayExpr->elements.size(); i < arrSize; ++i) {
-        const auto zero = sArr->baseType->getIRZeroValue(cg, arrayExpr->IRValue);
-        sArr->addIRElement(cg, arrayExpr->IRValue, cg.i32(i), zero);
-    }
 }
 
 void LgsCodeGen::visitDynamicArray(LgsArrayExpr* arrayExpr) const {
     const auto dArr = arrayExpr->type->asDArray();
-    arrayExpr->IRValue = dArr->getIRZeroValue(cg, arrayExpr->pointee);
+    const auto arr = arrayExpr->pointee ? arrayExpr->pointee : cg.heapAlloc(cg.usize(dArr->sizeBytes()), cg.currentLevel);
+    const auto initSize = cg.usize(LGS_MAP_INITIAL_CAPACITY * dArr->baseType->sizeBytes());
+    cg.callLgsFunc(dArr->name, "initDArray", cg.voidTy(), {cg.ptrTy(), cg.sizeTy()}, {arr, initSize});
+    arrayExpr->IRValue = arr;
     for (const auto element : arrayExpr->elements) {
         dArr->addIRElement(cg, arrayExpr->IRValue, nullptr, element->IRValue);
     }
@@ -853,7 +852,16 @@ void LgsCodeGen::visitMatrixExpr(const LgsMatrixExpr* matrixExpr) {
 
 void LgsCodeGen::visitHashMap(LgsHashMap* hashMap) {
     const auto map = hashMap->type->asMap();
-    hashMap->IRValue = map->getIRZeroValue(cg, hashMap->pointee);
+    const auto ptr = hashMap->pointee ? hashMap->pointee : cg.heapAlloc(cg.usize(map->sizeBytes()), cg.currentLevel);
+    const auto cap = cg.usize(MAP_INITIAL_CAPACITY);
+    const auto entriesSize = cg.usize(map->pairType->sizeBytes() + sizeof(void*));
+    const auto totalSize = cg.builder.CreateMul(entriesSize, cap);
+    const auto entries = cg.heapAlloc(totalSize, cg.currentLevel);
+    const auto ty = map->getIRType(cg);
+    cg.storeStructField(ty, ptr, 0, entries);
+    cg.storeStructField(ty, ptr, 1, cg.sizeZero());
+    cg.storeStructField(ty, ptr, 2, cap);
+    hashMap->IRValue = ptr;
     for (const auto pair : hashMap->elements) {
         visitExpr(pair->key);
         visitExpr(pair->value);
@@ -1122,7 +1130,7 @@ void LgsCodeGen::visitStrConst(LgsStrConst* strConst) {
     if (strConst->parts.empty()) {
         const auto ty = strConst->type->getIRType(cg);
         strConst->IRValue = UndefValue::get(ty);
-        strConst->IRValue = cg.builder.CreateInsertValue(strConst->IRValue, cg.usize(0), 0);
+        strConst->IRValue = cg.builder.CreateInsertValue(strConst->IRValue, cg.currentLevel, 0);
         strConst->IRValue = cg.builder.CreateInsertValue(strConst->IRValue, cg.getString(strConst->value), 1);
         return;
     }
@@ -1168,7 +1176,10 @@ void LgsCodeGen::visitInstance(LgsInstance* instance) {
         if (field->expr) {
             cg.store(field->expr->IRValue, pointee);
         } else {
-            cg.store(field->type->getIRZeroValue(cg, pointee), pointee);
+            const auto zero = field->type->getZeroValue();
+            visitExpr(zero);
+            cg.store(zero->IRValue, pointee);
+            freeExpr(zero);
         }
     }
     addVirtuals(instance->obj, instance->IRValue);
@@ -1353,7 +1364,7 @@ void LgsCodeGen::addVirtuals(LgsObject* obj, Value* ptr) const {
     // }
 }
 
-void LgsCodeGen::generateMapFunc(LgsFuncType* mapFunc) const {
+void LgsCodeGen::generateMapFunc(LgsFuncType* mapFunc) {
     const auto& iterableParam = mapFunc->params[0];
     const auto& cbParam = mapFunc->params[1];
     const auto iterable = iterableParam.type->asIterable();
@@ -1371,10 +1382,10 @@ void LgsCodeGen::generateMapFunc(LgsFuncType* mapFunc) const {
 
     LgsDArray dArr(iterable->baseType);
     LgsArrayExpr retArr(&dArr);
+    visitArrayExpr(&retArr);
     const auto tempIter = iterable->getIndexType()->getZeroValue();
     const auto tempIndex = iterable->getIndexType()->getZeroValue();
     tempIter->IRValue = iter;
-    retArr.IRValue = iterable->getIRZeroValue(cg);
     const auto len = iterable->lenIR(cg, iter);
 
     cg.loop(len, [&](Value* iValue, BasicBlock*) {
@@ -1391,7 +1402,7 @@ void LgsCodeGen::generateMapFunc(LgsFuncType* mapFunc) const {
     cg.builder.CreateRet(retArr.IRValue);
 }
 
-void LgsCodeGen::generateFilterFunc(LgsFuncType* filterFunc) const {
+void LgsCodeGen::generateFilterFunc(LgsFuncType* filterFunc) {
     const auto& iterableParam = filterFunc->params[0];
     const auto& cbParam = filterFunc->params[1];
     const auto iterable = iterableParam.type->asIterable();
@@ -1409,10 +1420,10 @@ void LgsCodeGen::generateFilterFunc(LgsFuncType* filterFunc) const {
 
     LgsDArray dArr(iterable->baseType);
     LgsArrayExpr retArr(&dArr);
+    visitArrayExpr(&retArr);
     const auto tempIter = iterable->getIndexType()->getZeroValue();
     const auto tempIndex = iterable->getIndexType()->getZeroValue();
     tempIter->IRValue = iter;
-    retArr.IRValue = iterable->getIRZeroValue(cg);
     const auto len = iterable->lenIR(cg, iter);
 
     cg.loop(len, [&](Value* iValue, BasicBlock*) {

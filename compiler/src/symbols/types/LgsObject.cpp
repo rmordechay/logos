@@ -101,16 +101,6 @@ LgsExpr* LgsObject::getZeroValue() {
     return new LgsInstance(this);
 }
 
-Value* LgsObject::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
-    const auto ty = getIRType(cg);
-    const auto obj = pointee ? pointee : cg.heapAlloc(cg.usize(sizeBytes()), cg.currentLevel);
-    for (const auto field : fields) {
-        const auto fieldZero = field->type->getIRZeroValue(cg, obj);
-        cg.storeStructField(ty, obj, field->position, fieldZero);
-    }
-    return obj;
-}
-
 bool LgsObject::canCastTo(LgsType* other) {
     if (other->isAny()) return true;
     const auto otherType = other;

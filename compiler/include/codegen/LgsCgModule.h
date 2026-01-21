@@ -99,7 +99,6 @@ public:
     Value* getFromVTable(Value* instance, Value* name);
     Value* heapAlloc(Value* size, Value* level, bool withLevel = true);
     Value* reallocate(Value* ptr, Value* size, Value* level);
-    Value* moveAlloc(Value* leftPtr, Value* rightPtr, Constant* type);
     Value* moveElement(Value* iterable, Value* element, Constant* type);
     void callThrowError(const LgsBaseMsg& err, const std::vector<Value*>& args = {});
 

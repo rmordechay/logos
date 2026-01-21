@@ -32,25 +32,26 @@ extern "C" void* Lgs_Runtime_allocate(const size_t size, const size_t level) {
     return runtime.stack.at(level).allocator.allocate(size);
 }
 
-extern "C" void* Lgs_Runtime_move(void* left, void* right, const Lgs_TypeInfo* type) {
+extern "C" void* Lgs_Runtime_moveObj(void* left, void* right, const Lgs_TypeInfo* type) {
     const auto leftLevel = *static_cast<size_t*>(left);
     const auto rightLevel = *static_cast<size_t*>(right);
     assert(leftLevel <= runtime.level && rightLevel <= runtime.level);
     if (leftLevel >= rightLevel) return right;
-    if (type->kind == RTT_OBJECT) {
-        moveObject(left, right, &type->obj);
-        return right;
-    }
-    if (type->kind == RTT_STR) {
-        const auto rightStr = static_cast<char*>(right) + sizeof(size_t);
-        auto& allocator = runtime.stack.at(leftLevel).allocator;
-        const auto size = std::strlen(rightStr) + 1;
-        const auto newAlloc = allocator.allocate(size + sizeof(size_t));
-        const auto leftStr = static_cast<size_t*>(newAlloc) + sizeof(size_t);
-        std::memcpy(leftStr, rightStr, size);
-        return newAlloc;
-    }
-    assert(0);
+    moveObject(left, right, &type->obj);
+    return right;
+}
+
+extern "C" Lgs_Str Lgs_Runtime_moveStr(const Lgs_Str left, const Lgs_Str right) {
+    const auto leftLevel = left.level;
+    const auto rightLevel = right.level;
+    assert(leftLevel <= runtime.level);
+    assert(rightLevel <= runtime.level);
+    if (leftLevel >= rightLevel) return right;
+    auto& allocator = runtime.stack.at(leftLevel).allocator;
+    const auto size = std::strlen(right.data) + 1;
+    const auto newAlloc = allocator.allocate(size, false);
+    std::memcpy(newAlloc, right.data, size);
+    return {leftLevel, static_cast<char*>(newAlloc)};
 }
 
 extern "C" void* Lgs_Runtime_moveElement(void* iterable, void* element, const Lgs_TypeInfo* type) {
@@ -142,7 +143,7 @@ void moveObject(void* left, void* right, const Lgs_Object* obj) {
         if (fieldType->isHeap) {
             leftFieldPtr = *static_cast<void**>(leftFieldPtr);
             rightFieldPtr = *static_cast<void**>(rightFieldPtr);
-            Lgs_Runtime_move(leftFieldPtr, rightFieldPtr, fieldType);
+            Lgs_Runtime_moveObj(leftFieldPtr, rightFieldPtr, fieldType);
         } else {
             std::memcpy(leftFieldPtr, rightFieldPtr, fieldType->size);
         }

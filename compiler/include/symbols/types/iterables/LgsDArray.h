@@ -23,7 +23,6 @@ public:
     size_t sizeBytes() override;
     bool canCastTo(LgsType* other) override;
     LgsExpr* getZeroValue() override;
-    Value* getIRZeroValue(LgsCgModule& cg, Value* pointee = nullptr) override;
     LgsType* replaceGenerics(LgsType* replacement, std::unordered_map<std::string, LgsType*>& replacements) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     Value* lenIR(LgsCgModule& cg, Value* iterable) override;

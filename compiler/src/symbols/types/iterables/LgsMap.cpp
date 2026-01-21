@@ -9,8 +9,6 @@
 #include <llvm/IR/Module.h>
 #include "Lgs_Exprs.h"
 
-#define INITIAL_CAPACITY 3
-
 LgsFunc* LgsMap::getMethod(const std::string& methodName) {
     constexpr auto flags = BUILTIN | PUBLIC | METHOD;
     if (methodName == ADD_FUNC) {
@@ -93,19 +91,6 @@ bool LgsMap::canCastTo(LgsType* other) {
 
 LgsExpr* LgsMap::getZeroValue() {
     return new LgsHashMap(this);
-}
-
-Value* LgsMap::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
-    const auto ty = getIRType(cg);
-    const auto ptr = pointee ? pointee : cg.heapAlloc(cg.usize(sizeBytes()), cg.currentLevel);
-    const auto cap = cg.usize(INITIAL_CAPACITY);
-    const auto entriesSize = cg.usize(pairType->sizeBytes() + sizeof(void*));
-    const auto totalSize = cg.builder.CreateMul(entriesSize, cap);
-    const auto entries = cg.heapAlloc(totalSize, cg.currentLevel);
-    cg.storeStructField(ty, ptr, 0, entries);
-    cg.storeStructField(ty, ptr, 1, cg.sizeZero());
-    cg.storeStructField(ty, ptr, 2, cap);
-    return ptr;
 }
 
 LgsType* LgsMap::applyBinOp(LgsType* rightType, LgsBinOp& op) {
@@ -257,7 +242,7 @@ Function* LgsMap::generateGetFunc(LgsCgModule& cg) {
 
     // Entry null
     cg.startBlock(entryNullBlock);
-    cg.builder.CreateRet(pairType->value->getIRZeroValue(cg));
+    cg.builder.CreateRet(ConstantAggregateZero::get(valueTy));
 
     // Keys comparison
     cg.startBlock(keyCompareBlock);

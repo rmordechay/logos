@@ -24,10 +24,6 @@ LgsExpr* LgsLong::getZeroValue() {
     return new LgsIntConst(&LGS_LONG, 0);
 }
 
-Value* LgsLong::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
-    return cg.i64Zero();
-}
-
 LgsType* LgsLong::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     assert(0);
 }

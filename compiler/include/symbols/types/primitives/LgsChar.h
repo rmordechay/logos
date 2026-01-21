@@ -10,7 +10,6 @@ public:
     Constant* getRTType(LgsCgModule& cg) override;
     std::string getName() override;
     LgsExpr* getZeroValue() override;
-    Value* getIRZeroValue(LgsCgModule& cg, Value* pointee) override;
     std::string fmtStr() const override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     bool canCastTo(LgsType* other) override;

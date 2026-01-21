@@ -36,14 +36,6 @@ LgsExpr* LgsSArray::getZeroValue() {
     return new LgsArrayExpr(this);
 }
 
-Value* LgsSArray::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
-    const auto ty = getIRType(cg);
-    const auto arr = pointee ? pointee : cg.builder.CreateAlloca(ty);
-    const auto zeroBaseValue = baseType->getIRZeroValue(cg, arr);
-    cg.callMemset(arr, zeroBaseValue, cg.usize(sizeBytes()));
-    return arr;
-}
-
 Constant* LgsSArray::getRTType(LgsCgModule& cg) {
     const auto sArrName = getName();
     const auto sArrSize = length->getConstInt().value();

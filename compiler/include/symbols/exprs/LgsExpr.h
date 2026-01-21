@@ -95,6 +95,7 @@ public:
 
 void wrapInNullable(LgsExpr*& expr, LgsNullable* nullable);
 void castExprImplicitly(LgsExpr*& expr, LgsType* toType);
+Value* moveValue(LgsCgModule& cg, Value* left, Value* right, LgsType* type);
 
 void freeExpr(LgsExpr* expr);
 template<typename T>

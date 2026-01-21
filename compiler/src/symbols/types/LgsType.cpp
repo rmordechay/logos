@@ -115,10 +115,6 @@ LgsFunc* LgsType::getMethod(const std::string& methodName) {
     return nullptr;
 }
 
-Value* LgsType::getIRZeroValue(LgsCgModule& cg, Value* pointee) {
-    assert(0);
-}
-
 Type* LgsType::getTypeOrPtr(LgsCgModule& cg) {
     return passByRef ? cg.ptrTy() : getIRType(cg);
 }
@@ -149,10 +145,6 @@ bool LgsType::equals(LgsType* other) {
 
 LgsType* LgsType::clone() {
     assert(0);
-}
-
-void LgsType::moveValue(LgsCgModule& cg, Value* leftPtr, Value* rightPtr, Constant* type) {
-    cg.moveAlloc(leftPtr, rightPtr, type);
 }
 
 Value* LgsType::addIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
