@@ -7,6 +7,7 @@
 #define LGS_DARRAY_MAX_LENGTH 100000
 #define LGS_MAP_INITIAL_CAPACITY 3
 #define MAP_INITIAL_CAPACITY 3
+#define LEVEL_SIZE sizeof(size_t)
 
 enum LgsLogLevel {
     LGS_INFO,

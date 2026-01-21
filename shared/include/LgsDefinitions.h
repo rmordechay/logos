@@ -67,5 +67,3 @@
     assert(0);
 #endif
 
-#define nakedf __attribute__((naked))
-#define weakf __attribute__((weak))

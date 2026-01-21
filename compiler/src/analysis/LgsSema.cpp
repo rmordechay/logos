@@ -1596,7 +1596,7 @@ bool LgsSema::validateVecElements(const LgsVariable* fieldVar, LgsVec* vec) {
     return true;
 }
 
-void LgsSema::validateObjDuplicates(LgsType* type){
+void LgsSema::validateObjDuplicates(LgsObject* type) {
     std::unordered_set<std::string> names;
     for (const auto* f : type->fields) {
         if (!f) continue;

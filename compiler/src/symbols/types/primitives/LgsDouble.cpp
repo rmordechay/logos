@@ -1,4 +1,7 @@
 #include "types/primitives/LgsDouble.h"
+
+#include <llvm/IR/Module.h>
+
 #include "exprs/constants/LgsFloatConst.h"
 #include "codegen/LgsCgModule.h"
 #include "exprs/LgsBinaryExpr.h"
@@ -29,7 +32,7 @@ Type* LgsDouble::getIRType(LgsCgModule& cg) {
 }
 
 Constant* LgsDouble::getRTType(LgsCgModule& cg) {
-    return cg.getRTTypeInfo(getName(), sizeBytes(), RTT_DOUBLE, cg.null());
+    return cg.getRTTypeInfo(getName(), cg.getAllocSize(getIRType(cg)), RTT_DOUBLE);
 }
 
 bool LgsDouble::canCastTo(LgsType* other) {

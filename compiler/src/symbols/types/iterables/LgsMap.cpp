@@ -50,7 +50,7 @@ Constant* LgsMap::getRTType(LgsCgModule& cg) {
     const auto mapName = getName();
     const auto args = {pairType->key->getRTType(cg), pairType->value->getRTType(cg)};
     const auto sv = cg.getRTTExtraStruct(mapName, {cg.ptrTy(), cg.ptrTy()}, args);
-    return cg.getRTTypeInfo(mapName, sizeBytes(), RTT_MAP, sv, true);
+    return cg.getRTTypeInfo(mapName, IRSize(cg), RTT_MAP, true, sv);
 }
 
 std::string LgsMap::getBaseName() {
@@ -322,7 +322,7 @@ Function* LgsMap::generateAddFunc(LgsCgModule& cg) {
     cg.builder.CreateCondBr(cond, resizeBlock, checkSlotBlock);
 
     cg.startBlock(resizeBlock);
-    const auto size = cg.usize(pairType->sizeBytes() + sizeof(void*));
+    const auto size = cg.usize(pairType->IRSize(cg) + sizeof(void*));
     const auto newCap = cg.builder.CreateMul(size, cg.builder.CreateMul(cap, cg.usize(2)));
     const auto newEntries = cg.heapAlloc(newCap, level);
     auto entries = cg.load(cg.ptrTy(), entriesField);

@@ -26,7 +26,7 @@ Value* LgsPrint::call(LgsCgModule& cg, std::vector<LgsFuncArg>& args) {
         return cg.callPrintf({fmt, cg.getString(enum_->name)});
     }
     if (const auto vec = arg->type->asVec()) {
-        std::vector vecArgs = {fmt};
+        std::vector<Value*> vecArgs = {fmt};
         const auto vecExpr = arg->loadIR(cg);
         for (size_t i = 0; i < vec->dimVec; ++i) {
             const auto element = cg.builder.CreateExtractValue(vecExpr, i);

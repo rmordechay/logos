@@ -104,7 +104,7 @@ void LgsIterIndex::setIRRangePtr(LgsCgModule& cg, bool assign) {
         const auto ty = sArray->baseType->getIRType(cg);
         IRValue = cg.builder.CreateAlloca(ty, size);
         const auto src = cg.builder.CreateInBoundsGEP(ty, baseExpr->IRValue, fromIR);
-        const auto elementSize = cg.IRModule->getDataLayout().getTypeAllocSize(ty);
+        const auto elementSize = cg.getAllocSize(ty);
         const auto elementSizeVal = cg.builder.getInt32(elementSize);
         const auto sizeInBytes = cg.builder.CreateMul(size, elementSizeVal);
         cg.callMemcpy(IRValue, src, sizeInBytes);

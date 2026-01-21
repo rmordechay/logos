@@ -1,9 +1,7 @@
 #pragma once
-#include "exprs/constants/LgsIntConst.h"
 #include "stmts/LgsField.h"
 #include "types/primitives/LgsDouble.h"
 #include "types/primitives/LgsFloat.h"
-#include "types/primitives/LgsInt.h"
 
 class LgsVec final : public LgsIterable {
 public:

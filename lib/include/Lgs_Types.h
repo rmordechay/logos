@@ -39,16 +39,15 @@ enum Lgs_TypeKind {
 };
 
 struct Lgs_Object {
-    char* name;
+    const char* name;
     size_t fieldsCount;
-    size_t* fieldOffsets;
-    char** fieldNames;
+    const char** fieldNames;
     Lgs_TypeInfo** fieldTypes;
 };
 
 struct Lgs_FuncType {
     size_t paramsCount;
-    uint64_t* paramHashes;
+    char* paramNames;
     Lgs_TypeInfo** paramTypes;
     Lgs_TypeInfo* rt;
 };

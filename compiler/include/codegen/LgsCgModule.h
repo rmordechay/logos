@@ -76,7 +76,7 @@ public:
 
     void setupModule(const std::filesystem::path& file, bool debugMode = false);
     bool writeIRModule(const LgsPaths& paths, uint8_t optLevel) const;
-    Value* getString(const std::string& value);
+    Constant* getString(const std::string& value);
     llvm::AllocaInst* getEmptyBuffer();
     size_t getAllocSize(Type* type) const;
     GlobalVariable* createGlobal(const std::string& name, Type* type, Constant* initializer, bool isConst = true, GlobalValue::LinkageTypes linkage = GlobalValue::ExternalLinkage) const;
@@ -87,7 +87,7 @@ public:
     void store(Value* v, Value* ptr);
     Value* load(Type* ty, Value* ptr);
     Value* allocaAndStore(Type* type, Value* v, const std::string& name = "");
-    StructType* getStructType(const std::vector<Type*>& fields, const std::string& name = "");
+    StructType* getStructType(const std::vector<Type*>& types, const std::string& name = "");
     void storeStructField(Type* parentType, Value* parentPtr, size_t position, Value* v);
     Value* loadStructField(Type* parentType, Value* parentPtr, size_t position, Type* ty);
     void addNullTerminate(Value* strPtr, Value* pos);
@@ -127,7 +127,7 @@ public:
     void callMemcpy(Value* dest, Value* src, Value* size);
 
     // Runtime funcs
-    Constant* getRTTypeInfo(const std::string& name, size_t size, Lgs_TypeKind kind, Constant* extra, bool isHeap = false);
+    GlobalVariable* getRTTypeInfo(const std::string& name, size_t size, Lgs_TypeKind kind, bool isHeap = false, Constant* extra = nullptr);
     Constant* getRTTExtraStruct(const std::string& name, const std::vector<Type*>& fields, const std::vector<Constant*>& args);
     StructType* getRTTBaseStruct();
 
@@ -174,7 +174,7 @@ public:
     Value* extendToSize(Value* v);
     Constant* floatv(float_t v);
     Constant* doublev(double_t v);
-    Value* emptyStr();
+    Constant* emptyStr();
     ~LgsCgModule();
 };
 

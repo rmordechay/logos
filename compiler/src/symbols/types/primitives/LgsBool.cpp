@@ -1,6 +1,5 @@
 #include "types/primitives/LgsBool.h"
-
-#include "exprs/LgsNullableExpr.h"
+#include <llvm/IR/Module.h>
 #include "exprs/constants/LgsIntConst.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsChar.h"
@@ -16,7 +15,7 @@ Type* LgsBool::getIRType(LgsCgModule& cg) {
 }
 
 Constant* LgsBool::getRTType(LgsCgModule& cg) {
-    return cg.getRTTypeInfo(getName(), sizeBytes(), RTT_BOOL, cg.null());
+    return cg.getRTTypeInfo(getName(), cg.getAllocSize(getIRType(cg)), RTT_BOOL);
 }
 
 LgsType* LgsBool::applyBinOp(LgsType* rightType, LgsBinOp& op) {

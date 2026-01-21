@@ -9,7 +9,7 @@ Type* LgsVoid::getIRType(LgsCgModule& cg) {
 }
 
 Constant* LgsVoid::getRTType(LgsCgModule& cg) {
-    return cg.getRTTypeInfo(getName(), sizeBytes(), RTT_VOID, cg.null());
+    return cg.getRTTypeInfo(getName(), 0, RTT_VOID);
 }
 
 size_t LgsVoid::sizeBytes() {

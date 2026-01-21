@@ -71,6 +71,7 @@ public:
 
     bool addField(LgsField* field);
     bool addMethod(LgsFunc* method);
+    bool isAny();
     bool isVoid();
     bool isNumber();
     bool isScalar() const;
@@ -78,6 +79,7 @@ public:
     bool isUnknown();
     bool isSliceable();
     bool hasGenericTypes();
+    size_t IRSize(LgsCgModule& cg);
 
     virtual LgsField* getField(const std::string& fieldName);
     virtual LgsFunc* getMethod(const std::string& methodName);
@@ -110,7 +112,6 @@ public:
     virtual Value* rshiftIR(LgsCgModule& cg, LgsBinaryExpr* binExpr);
     virtual Value* crossIR(LgsCgModule& cg, LgsBinaryExpr* binExpr);
 
-    bool isAny();
     LgsAny* asAny();
     LgsChar* asChar();
     LgsStr* asStr();
@@ -167,6 +168,5 @@ Value* geIR(LgsCgModule& cg, Value* left, Value* right, LgsType* type);
 Value* leIR(LgsCgModule& cg, Value* left, Value* right, LgsType* type);
 Value* andIR(LgsCgModule& cg, Value* left, Value* right);
 Value* orIR(LgsCgModule& cg, Value* left, Value* right);
-std::pair<Value*, Value*> loadNumberPair(LgsCgModule& cg, Value* left, Value* right, Type* type);
-std::pair<Constant*, Constant*> getRTValuesInfo(LgsCgModule& cg, const std::string& name, const std::vector<LgsValue*>& values);
 LgsType* getBiggestIntType(const std::vector<LgsType*>& types);
+std::pair<Value*, Value*> loadNumberPair(LgsCgModule& cg, Value* left, Value* right, Type* type);

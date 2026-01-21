@@ -1,4 +1,7 @@
 #include "types/primitives/LgsShort.h"
+
+#include <llvm/IR/Module.h>
+
 #include "exprs/constants/LgsIntConst.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsFloat.h"
@@ -16,7 +19,7 @@ Type* LgsShort::getIRType(LgsCgModule& cg) {
 }
 
 Constant* LgsShort::getRTType(LgsCgModule& cg) {
-    return cg.getRTTypeInfo(getName(), sizeBytes(), RTT_SHORT, cg.null());
+    return cg.getRTTypeInfo(getName(), cg.getAllocSize(getIRType(cg)), RTT_SHORT);
 }
 
 std::string LgsShort::getName() {

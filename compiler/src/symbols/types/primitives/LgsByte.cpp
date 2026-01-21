@@ -1,4 +1,5 @@
 #include "types/primitives/LgsByte.h"
+#include <llvm/IR/Module.h>
 #include "codegen/LgsCgModule.h"
 #include "exprs/constants/LgsIntConst.h"
 #include "types/LgsAny.h"
@@ -15,7 +16,7 @@ Type* LgsByte::getIRType(LgsCgModule& cg) {
 }
 
 Constant* LgsByte::getRTType(LgsCgModule& cg) {
-    return cg.getRTTypeInfo(getName(), sizeBytes(), RTT_BYTE, cg.null());
+    return cg.getRTTypeInfo(getName(), cg.getAllocSize(getIRType(cg)), RTT_BYTE);
 }
 
 LgsType* LgsByte::applyBinOp(LgsType* rightType, LgsBinOp& op) {

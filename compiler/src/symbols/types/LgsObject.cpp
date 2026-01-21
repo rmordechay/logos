@@ -15,6 +15,8 @@
 #include <unordered_set>
 #include <llvm/IR/Module.h>
 
+#include "LgsConfigs.h"
+
 std::string LgsObject::getName() {
     return name;
 }
@@ -54,39 +56,35 @@ Type* LgsObject::getIRType(LgsCgModule& cg) {
 }
 
 Constant* LgsObject::getRTType(LgsCgModule& cg) {
-    // TODO think about recursive fields in rtt types
-    std::unordered_set<std::string> nestedObjectNames;
-    checkRecursiveFields(nestedObjectNames);
-    const auto objName = getName();
-    std::vector<LgsValue*> fieldsAsValue;
-    const auto dl = cg.IRModule->getDataLayout();
-    const auto sl = dl.getStructLayout(llvm::cast<StructType>(getIRType(cg)));
-    std::vector<Constant*> offsets;
-    offsets.reserve(fields.size());
-    const auto offsetsName = LGS_TYPEINFO_PREFIX + name + "_offsets";
-    const auto offsetsArrType = ArrayType::get(cg.sizeTy(), fields.size());
-    for (size_t i = 0; i < fields.size(); ++i) {
-        const auto field = fields[i];
-        offsets.emplace_back(cg.usize(sl->getElementOffset(i + 1))); // level is first element
-        fieldsAsValue.push_back(field);
-    }
-    const auto [typesArr, hashesArr] = getRTValuesInfo(cg, name, fieldsAsValue);
-    Constant* offsetsArr = nullptr;
-    if (cg.mode == CG_MODE_RTTYPES) {
-        offsetsArr = ConstantArray::get(offsetsArrType, offsets);
-    }
-    const auto offsetsArrGlobal = cg.createGlobal(offsetsName, offsetsArrType, offsetsArr);
+    const auto RTTName = LGS_TYPEINFO_PREFIX + name;
+    if (const auto v = cg.IRModule->getGlobalVariable(RTTName)) return v;
+    if (cg.mode != CG_MODE_RTTYPES) return cg.createGlobal(RTTName, cg.getRTTBaseStruct(), nullptr);
+    const auto rttType = cg.createGlobal(RTTName, cg.getRTTBaseStruct(), nullptr);
+    const auto numFields = fields.size();
+    const auto ptrTypeArr = ArrayType::get(cg.ptrTy(), numFields);
 
-    // name, fieldsCount, fieldOffsets, fieldNames, fieldTypes
-    const std::vector<Type*> fieldTypes = {cg.ptrTy(), cg.sizeTy(), cg.ptrTy(), cg.ptrTy(), cg.ptrTy()};
-    const auto objNameIR = llvm::dyn_cast<Constant>(cg.getString(objName));
-    const std::vector<Constant*> args = {objNameIR, cg.usize(fields.size()), offsetsArrGlobal, hashesArr, typesArr};
-    const auto sv = cg.getRTTExtraStruct(objName, fieldTypes, args);
-    return cg.getRTTypeInfo(objName, dl.getTypeAllocSize(getIRType(cg)), RTT_OBJECT, sv, true);
+    std::vector<Constant*> fieldNames;
+    std::vector<Constant*> fieldTypes;
+    for (const auto field : fields) {
+        fieldNames.push_back(cg.getString(field->name));
+        fieldTypes.push_back(field->type->getRTType(cg));
+    }
+
+    const auto namesArr = ConstantArray::get(ptrTypeArr, fieldNames);
+    const auto namesArrGlobal = cg.createGlobal(RTTName + "_names", ptrTypeArr, namesArr);
+    const auto typesArr = ConstantArray::get(ptrTypeArr, fieldTypes);
+    const auto typesArrGlobal = cg.createGlobal(RTTName + "_types", ptrTypeArr, typesArr);
+
+    const std::vector<Constant*> args = {cg.getString(RTTName), cg.usize(numFields), namesArrGlobal, typesArrGlobal};
+    const std::vector<Type*> types = {cg.ptrTy(), cg.sizeTy(), cg.ptrTy(), cg.ptrTy()};
+    const auto sv = cg.getRTTExtraStruct(name, types, args);
+    const std::vector<Constant*> rttFields = {cg.usize(IRSize(cg)), cg.i1(isHeapAlloc), cg.i32(RTT_OBJECT), sv};
+    rttType->setInitializer(ConstantStruct::get(cg.getRTTBaseStruct(), rttFields));
+    return rttType;
 }
 
 size_t LgsObject::sizeBytes() {
-    auto sum = sizeof(size_t); // level
+    auto sum = LEVEL_SIZE;
     for (const auto& field : fields) {
         if (field->type->asObject() || field->type->asFuncType() || field->type->asInterface()) {
             sum += sizeof(void*);
@@ -119,16 +117,6 @@ LgsType* LgsObject::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     assert(0);
 }
 
-void LgsObject::checkRecursiveFields(std::unordered_set<std::string>& nestedObjectNames) const {
-    for (const auto field : fields) {
-        if (const auto innerObj = field->type->asObject()) {
-            assert(!nestedObjectNames.contains(innerObj->name));
-            nestedObjectNames.insert(innerObj->name);
-            innerObj->checkRecursiveFields(nestedObjectNames);
-        }
-    }
-}
-
 std::string LgsObject::fmtStr() const {
     std::stringstream str;
     str << '{';
@@ -159,6 +147,4 @@ LgsObject::~LgsObject() {
     for (const auto ioPair : ioPairs) {
         delete ioPair;
     }
-    delete getFieldFunc;
-    getFieldFunc = nullptr;
 }

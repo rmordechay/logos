@@ -86,7 +86,7 @@ bool LgsCgModule::writeIRModule(const LgsPaths& paths, uint8_t optLevel) const {
     return true;
 }
 
-Value* LgsCgModule::getString(const std::string& value) {
+Constant* LgsCgModule::getString(const std::string& value) {
     for (auto& globals : IRModule->globals()) {
         if (!globals.hasInitializer()) continue;
         const auto dataArray = llvm::dyn_cast<llvm::ConstantDataArray>(globals.getInitializer());
@@ -175,10 +175,10 @@ Value* LgsCgModule::allocaAndStore(Type* type, Value* v, const std::string& name
     return ptr;
 }
 
-StructType* LgsCgModule::getStructType(const std::vector<Type*>& fields, const std::string& name) {
+StructType* LgsCgModule::getStructType(const std::vector<Type*>& types, const std::string& name) {
     const auto structType = StructType::getTypeByName(context, name);
     if (!structType) {
-        return StructType::create(context, fields, name);
+        return StructType::create(context, types, name);
     }
     return structType;
 }
@@ -345,26 +345,22 @@ void LgsCgModule::callMemcpy(Value* dest, Value* src, Value* size) {
     builder.CreateMemCpy(dest, llvm::MaybeAlign(), src, llvm::MaybeAlign(), size);
 }
 
-Constant* LgsCgModule::getRTTypeInfo(const std::string& name, const size_t size, const Lgs_TypeKind kind, Constant* extra, const bool isHeap) {
-    const auto typeInfo = getRTTBaseStruct();
+GlobalVariable* LgsCgModule::getRTTypeInfo(const std::string& name, const size_t size, const Lgs_TypeKind kind, const bool isHeap, Constant* extra) {
+    const auto baseStruct = getRTTBaseStruct();
     const auto prefixedName = LGS_TYPEINFO_PREFIX + name;
     if (mode == CG_MODE_RTTYPES) {
-        return createGlobal(prefixedName, typeInfo, llvm::ConstantStruct::get(typeInfo, {usize(size), i1(isHeap), i32(kind), extra}));
+        const auto initializer = llvm::ConstantStruct::get(baseStruct, {usize(size), i1(isHeap), i32(kind), extra ? extra : null()});
+        return createGlobal(prefixedName, baseStruct, initializer);
     }
-    return createGlobal(prefixedName, typeInfo, nullptr);
+    return createGlobal(prefixedName, baseStruct, nullptr);
 }
 
 Constant* LgsCgModule::getRTTExtraStruct(const std::string& name, const std::vector<Type*>& fields, const std::vector<Constant*>& args) {
-    const auto structName = LGS_TYPEINFO_PREFIX + name;
-    auto st = StructType::getTypeByName(context, structName);
-    if (!st) {
-        st = StructType::create(context, fields, structName);
-    }
-    return llvm::ConstantStruct::get(st, args);
+    return llvm::ConstantStruct::get(getStructType(fields, LGS_TYPEINFO_PREFIX + name), args);
 }
 
 StructType* LgsCgModule::getRTTBaseStruct() {
-    const std::vector<Type*> fieldTypes = {ptrTy(), sizeTy(), ptrTy(), ptrTy(), ptrTy()};
+    const std::vector<Type*> fieldTypes = {ptrTy(), sizeTy(), ptrTy(), ptrTy()};
     const auto biggest = getStructType(fieldTypes, LGS_TYPEINFO_PREFIX"Object");
     return getStructType({sizeTy(), i1Ty(), i32Ty(), biggest}, "RTI"); // size, kind, biggest type
 }
@@ -543,7 +539,7 @@ Constant* LgsCgModule::doublev(const double_t v) {
     return llvm::ConstantFP::get(doubleTy(), v);
 }
 
-Value* LgsCgModule::emptyStr() {
+Constant* LgsCgModule::emptyStr() {
     const auto name = LGS_PREFIX"emptyStr";
     const auto s = IRModule->getNamedGlobal(name);
     if (s) return s;

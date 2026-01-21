@@ -21,14 +21,22 @@ Type* LgsFuncType::getIRType(LgsCgModule& cg) {
 
 Constant* LgsFuncType::getRTType(LgsCgModule& cg) {
     const auto funcName = getName();
-    std::vector<LgsValue*> paramsAsValue;
-    for (auto& param : params) paramsAsValue.emplace_back(static_cast<LgsValue*>(&param));
-    const auto [typesArr, hashesArr] = getRTValuesInfo(cg, funcName, paramsAsValue);
+    std::vector<Constant*> paramNames;
+    for (const auto& param : params) {
+        paramNames.push_back(cg.getString(param.name));
+    }
+
+    const auto numFields = params.size();
+    const auto RTTName = LGS_TYPEINFO_PREFIX + name;
+    const auto namesArrType = ArrayType::get(cg.ptrTy(), numFields);
+    const auto namesArr = cg.mode == CG_MODE_RTTYPES ? ConstantArray::get(namesArrType, paramNames) : nullptr;
+    const auto namesArrGlobal = cg.createGlobal(RTTName + "_names", namesArrType, namesArr);
+
     // paramsCount, paramHashes, paramTypes, rt
-    const auto sv = cg.getRTTExtraStruct(funcName, {cg.sizeTy(), cg.ptrTy(), cg.ptrTy(), cg.ptrTy()}, {
-        cg.usize(params.size()), hashesArr, typesArr, rt->getRTType(cg)
-    });
-    return cg.getRTTypeInfo(funcName, sizeBytes(), RTT_FUNC, sv);
+    const std::vector<Type*> rttFieldTypes = {cg.sizeTy(), cg.ptrTy(), cg.ptrTy(), cg.ptrTy()};
+    const std::vector<Constant*> args = {cg.usize(params.size()), namesArrGlobal, cg.null(), rt->getRTType(cg)};
+    const auto sv = cg.getRTTExtraStruct(funcName, rttFieldTypes, args);
+    return cg.getRTTypeInfo(funcName, IRSize(cg), RTT_FUNC, isHeapAlloc, sv);
 }
 
 LgsExpr* LgsFuncType::getZeroValue() {

@@ -745,7 +745,7 @@ void LgsCodeGen::visitStaticArray(LgsArrayExpr* arrayExpr) const {
     if (arrayExpr->elements.empty()) {
         const auto ty = sArr->getIRType(cg);
         const auto arr = arrayExpr->pointee ? arrayExpr->pointee : cg.builder.CreateAlloca(ty);
-        cg.callMemset(arr, cg.usize(0), cg.usize(sArr->sizeBytes()));
+        cg.callMemset(arr, cg.usize(0), cg.usize(sArr->IRSize(cg)));
         arrayExpr->IRValue = arr;
         return;
     }
@@ -778,8 +778,8 @@ void LgsCodeGen::visitStaticArray(LgsArrayExpr* arrayExpr) const {
 
 void LgsCodeGen::visitDynamicArray(LgsArrayExpr* arrayExpr) const {
     const auto dArr = arrayExpr->type->asDArray();
-    const auto arr = arrayExpr->pointee ? arrayExpr->pointee : cg.heapAlloc(cg.usize(dArr->sizeBytes()), cg.currentLevel);
-    const auto initSize = cg.usize(LGS_MAP_INITIAL_CAPACITY * dArr->baseType->sizeBytes());
+    const auto arr = arrayExpr->pointee ? arrayExpr->pointee : cg.heapAlloc(cg.usize(dArr->IRSize(cg)), cg.currentLevel);
+    const auto initSize = cg.usize(LGS_MAP_INITIAL_CAPACITY * dArr->baseType->IRSize(cg));
     cg.callLgsFunc(dArr->name, "initDArray", cg.voidTy(), {cg.ptrTy(), cg.sizeTy()}, {arr, initSize});
     arrayExpr->IRValue = arr;
     for (const auto element : arrayExpr->elements) {
@@ -852,9 +852,9 @@ void LgsCodeGen::visitMatrixExpr(const LgsMatrixExpr* matrixExpr) {
 
 void LgsCodeGen::visitHashMap(LgsHashMap* hashMap) {
     const auto map = hashMap->type->asMap();
-    const auto ptr = hashMap->pointee ? hashMap->pointee : cg.heapAlloc(cg.usize(map->sizeBytes()), cg.currentLevel);
+    const auto ptr = hashMap->pointee ? hashMap->pointee : cg.heapAlloc(cg.usize(map->IRSize(cg)), cg.currentLevel);
     const auto cap = cg.usize(MAP_INITIAL_CAPACITY);
-    const auto entriesSize = cg.usize(map->pairType->sizeBytes() + sizeof(void*));
+    const auto entriesSize = cg.usize(map->pairType->IRSize(cg) + sizeof(void*));
     const auto totalSize = cg.builder.CreateMul(entriesSize, cap);
     const auto entries = cg.heapAlloc(totalSize, cg.currentLevel);
     const auto ty = map->getIRType(cg);
@@ -871,7 +871,7 @@ void LgsCodeGen::visitHashMap(LgsHashMap* hashMap) {
 
 void LgsCodeGen::visitEnvVar(LgsEnvVar* envVar) const {
     const std::vector<Type*> params = {cg.ptrTy(), cg.ptrTy()};
-    const std::vector IRArgs = {cg.getString(envVar->name), cg.emptyStr()};
+    const std::vector<Value*> IRArgs = {cg.getString(envVar->name), cg.emptyStr()};
     envVar->IRValue = cg.callLgsFunc(LgsSys::name, "getEnv", cg.ptrTy(), params, IRArgs);
 }
 
@@ -1157,7 +1157,7 @@ void LgsCodeGen::visitCharConst(LgsCharConst* charConst) const {
 
 void LgsCodeGen::visitInstance(LgsInstance* instance) {
     const auto obj = instance->obj;
-    instance->IRValue = cg.heapAlloc(cg.usize(obj->sizeBytes()), cg.currentLevel);
+    instance->IRValue = cg.heapAlloc(cg.usize(obj->IRSize(cg)), cg.currentLevel);
 
     // Args
     std::unordered_set<std::string> visited;

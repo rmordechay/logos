@@ -46,7 +46,7 @@ Type* LgsDArray::getIRType(LgsCgModule& cg) {
 Constant* LgsDArray::getRTType(LgsCgModule& cg) {
     const auto dArrName = getName();
     const auto sv = cg.getRTTExtraStruct(dArrName, {cg.ptrTy()}, {baseType->getRTType(cg)});
-    return cg.getRTTypeInfo(dArrName, sizeBytes(), RTT_DARRAY, sv, true);
+    return cg.getRTTypeInfo(dArrName, IRSize(cg), RTT_DARRAY, true, sv);
 }
 
 std::string LgsDArray::getBaseName() {
@@ -115,7 +115,7 @@ Value* LgsDArray::inIR(LgsCgModule& cg, Value* iterable, Value* value) {
 }
 
 Value* LgsDArray::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
-    const auto baseSize = cg.usize(baseType->sizeBytes());
+    const auto baseSize = cg.usize(baseType->IRSize(cg));
     const auto dataFieldPtr = getDataField(cg, iterable);
     const auto offset = cg.builder.CreateMul(cg.extendToSize(index), baseSize);
     const auto dataField = cg.load(cg.ptrTy(), dataFieldPtr);
@@ -227,7 +227,7 @@ Function* LgsDArray::generateAddFunc(LgsCgModule& cg) {
     cg.startBlock(needsResizeBlock);
     auto data = cg.load(cg.ptrTy(), dataGEP);
     const auto newCap = cg.builder.CreateMul(cap, cg.usize(2));
-    const auto baseTypeSize = cg.usize(baseType->sizeBytes());
+    const auto baseTypeSize = cg.usize(baseType->IRSize(cg));
     const auto newSize = cg.builder.CreateMul(newCap, baseTypeSize);
     const auto levelField = cg.builder.CreateStructGEP(getIRType(cg), arrIR, 0);
     const auto level = cg.load(cg.i32Ty(), levelField);

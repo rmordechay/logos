@@ -27,7 +27,7 @@ LgsExpr* LgsInt::getZeroValue() {
 }
 
 Constant* LgsInt::getRTType(LgsCgModule& cg) {
-    return cg.getRTTypeInfo(getName(), sizeBytes(), RTT_INT, cg.null());
+    return cg.getRTTypeInfo(getName(), cg.getAllocSize(getIRType(cg)), RTT_INT);
 }
 
 bool LgsInt::canCastTo(LgsType* other) {

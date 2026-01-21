@@ -115,7 +115,7 @@ std::string LgsMatrix::getBaseName() {
 Constant* LgsMatrix::getRTType(LgsCgModule& cg) {
     const auto matName = getName();
     const auto sv = cg.getRTTExtraStruct(matName, {cg.sizeTy(), cg.sizeTy(), cg.ptrTy()}, {cg.usize(rows), cg.usize(columns), baseType->getRTType(cg)});
-    return cg.getRTTypeInfo(matName, sizeBytes(), RTT_MATRIX, sv);
+    return cg.getRTTypeInfo(matName, IRSize(cg), RTT_MATRIX, isHeapAlloc, sv);
 }
 
 std::string LgsMatrix::getName() {
@@ -140,7 +140,7 @@ Value* LgsMatrix::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
     const auto i = cg.builder.CreateMul(index, cg.i32(columns));
     const auto gep = cg.builder.CreateGEP(getIRType(cg), iterable, {cg.i32Zero(), i});
     const auto rows2 = cg.builder.CreateAlloca(baseType->getIRType(cg), cg.i32(columns));
-    cg.callMemcpy(rows2, gep, cg.i32(baseType->sizeBytes() * columns));
+    cg.callMemcpy(rows2, gep, cg.i32(baseType->IRSize(cg) * columns));
     return rows2;
 }
 

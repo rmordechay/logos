@@ -134,12 +134,11 @@ extern "C" void Lgs_DArray_initDArray(Lgs_DArrayExpr* arr, const size_t dataSize
 void moveObject(void* left, void* right, const Lgs_Object* obj) {
     const auto fieldsCount = obj->fieldsCount;
     const auto fieldTypes = obj->fieldTypes;
-    const auto fieldOffsets = obj->fieldOffsets;
+    auto offset = LEVEL_SIZE;
     for (int i = 0; i < fieldsCount; ++i) {
         const auto fieldType = fieldTypes[i];
-        const auto fieldOffset = fieldOffsets[i];
-        void* leftFieldPtr = static_cast<char*>(left) + fieldOffset;
-        void* rightFieldPtr = static_cast<char*>(right) + fieldOffset;
+        void* leftFieldPtr = static_cast<char*>(left) + offset;
+        void* rightFieldPtr = static_cast<char*>(right) + offset;
         if (fieldType->isHeap) {
             leftFieldPtr = *static_cast<void**>(leftFieldPtr);
             rightFieldPtr = *static_cast<void**>(rightFieldPtr);
@@ -147,6 +146,7 @@ void moveObject(void* left, void* right, const Lgs_Object* obj) {
         } else {
             std::memcpy(leftFieldPtr, rightFieldPtr, fieldType->size);
         }
+        offset += fieldType->size;
     }
 }
 

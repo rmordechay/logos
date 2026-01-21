@@ -34,12 +34,12 @@ Type* LgsVec::getIRType(LgsCgModule& cg) {
 Constant* LgsVec::getRTType(LgsCgModule& cg) {
     const auto sv = cg.getRTTExtraStruct(getName(), {cg.ptrTy()}, {baseType->getRTType(cg)});
     if (dimVec == 2) {
-        return cg.getRTTypeInfo(getName(), sizeBytes(), RTT_VEC2, sv);
+        return cg.getRTTypeInfo(getName(), IRSize(cg), RTT_VEC2, isHeapAlloc, sv);
     }
     if (dimVec == 3) {
-        return cg.getRTTypeInfo(getName(), sizeBytes(), RTT_VEC3, sv);
+        return cg.getRTTypeInfo(getName(), IRSize(cg), RTT_VEC3, isHeapAlloc, sv);
     }
-    return cg.getRTTypeInfo(getName(), sizeBytes(), RTT_VEC4, sv);
+    return cg.getRTTypeInfo(getName(), IRSize(cg), RTT_VEC4, isHeapAlloc, sv);
 }
 
 std::string LgsVec::getBaseName() {

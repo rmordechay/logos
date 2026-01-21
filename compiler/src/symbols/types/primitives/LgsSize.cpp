@@ -1,5 +1,7 @@
 #include "types/primitives/LgsSize.h"
 
+#include <llvm/IR/Module.h>
+
 #include "LgsBinaryTokens.h"
 #include "exprs/constants/LgsIntConst.h"
 #include "types/LgsAny.h"
@@ -64,7 +66,7 @@ LgsType* LgsSize::applyBinOp(LgsType* rightType, LgsBinOp& op) {
 }
 
 Constant* LgsSize::getRTType(LgsCgModule& cg) {
-    return cg.getRTTypeInfo(getName(), sizeBytes(), RTT_SIZE, cg.null());
+    return cg.getRTTypeInfo(getName(), cg.getAllocSize(getIRType(cg)), RTT_SIZE);
 }
 
 bool LgsSize::canCastTo(LgsType* other) {

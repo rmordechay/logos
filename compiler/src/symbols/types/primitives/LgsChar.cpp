@@ -2,12 +2,7 @@
 #include "exprs/constants/LgsCharConst.h"
 #include "types/LgsAny.h"
 #include "types/iterables/LgsStr.h"
-#include "types/primitives/LgsFloat.h"
-#include "types/primitives/LgsInt.h"
-#include "types/primitives/LgsLong.h"
-#include "types/primitives/LgsShort.h"
-#include "types/primitives/LgsSize.h"
-#include "types/primitives/LgsUInt.h"
+#include <llvm/IR/Module.h>
 
 
 size_t LgsChar::sizeBytes() {
@@ -19,7 +14,7 @@ Type* LgsChar::getIRType(LgsCgModule& cg) {
 }
 
 Constant* LgsChar::getRTType(LgsCgModule& cg) {
-    return cg.getRTTypeInfo(getName(), sizeBytes(), RTT_CHAR, cg.null());
+    return cg.getRTTypeInfo(getName(), cg.getAllocSize(getIRType(cg)), RTT_CHAR);
 }
 
 std::string LgsChar::getName() {

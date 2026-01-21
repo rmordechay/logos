@@ -57,6 +57,10 @@ bool LgsType::addMethod(LgsFunc* method) {
     return true;
 }
 
+bool LgsType::isAny() {
+    return getName() == LgsAny::name || (asPtr() && asPtr()->baseType->isVoid());
+}
+
 bool LgsType::isVoid() {
     return dynamic_cast<LgsVoid*>(this);
 }
@@ -96,6 +100,10 @@ bool LgsType::hasGenericTypes() {
         if (iter->baseType->hasGenericTypes()) return true;
     }
     return false;
+}
+
+size_t LgsType::IRSize(LgsCgModule& cg) {
+    return cg.getAllocSize(getIRType(cg));
 }
 
 LgsField* LgsType::getField(const std::string& fieldName) {
@@ -193,10 +201,6 @@ Value* LgsType::rshiftIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
 
 Value* LgsType::crossIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
     assert(0);
-}
-
-bool LgsType::isAny() {
-    return getName() == LgsAny::name || (asPtr() && asPtr()->baseType->isVoid());
 }
 
 LgsAny* LgsType::asAny() {
@@ -474,62 +478,6 @@ Value* orIR(LgsCgModule& cg, Value* left, Value* right) {
     return phi;
 }
 
-std::pair<Value*, Value*> loadNumberPair(LgsCgModule& cg, Value* left, Value* right, Type* type) {
-    const auto leftType = left->getType();
-    const auto rightType = right->getType();
-    if (leftType->isIntegerTy()) {
-        left = cg.builder.CreateSIToFP(left, type);
-    } else if (const auto lVec = dyn_cast<FixedVectorType>(leftType)) {
-        if (lVec->getElementType()->isIntegerTy()) {
-            left = cg.builder.CreateSIToFP(left, FixedVectorType::get(type, lVec->getNumElements()));
-        }
-    }
-    if (rightType->isIntegerTy()) {
-        right = cg.builder.CreateSIToFP(right, type);
-    } else if (const auto rVec = dyn_cast<FixedVectorType>(rightType)) {
-        if (rVec->getElementType()->isIntegerTy()) {
-            right = cg.builder.CreateSIToFP(right, FixedVectorType::get(type, rVec->getNumElements()));
-        }
-    }
-    return {left, right};
-}
-
-/**
- * @return typesArr, hashesArr
- */
-std::pair<Constant*, Constant*> getRTValuesInfo(LgsCgModule& cg, const std::string& name, const std::vector<LgsValue*>& values) {
-    std::vector<Constant*> fieldTypes;
-    std::vector<Constant*> fieldNames;
-    fieldTypes.reserve(values.size());
-    fieldNames.reserve(values.size());
-    for (size_t i = 0; i < values.size(); ++i) {
-        const auto value = values[i];
-        fieldTypes.push_back(value->getType()->getRTType(cg));
-        fieldNames.push_back(llvm::dyn_cast<Constant>(cg.getString(value->getName())));
-    }
-
-    Constant* typesArrGlobal = nullptr;
-    Constant* namesArrGlobal = nullptr;
-    if (values.empty()) {
-        typesArrGlobal = cg.null();
-        namesArrGlobal = cg.null();
-    } else {
-        const auto types = LGS_TYPEINFO_PREFIX + name + "_fields";
-        const auto names = LGS_TYPEINFO_PREFIX + name + "_names";
-        const auto fieldsArrType = ArrayType::get(cg.getRTTBaseStruct(), values.size());
-        const auto namesArrType = ArrayType::get(cg.ptrTy(), values.size());
-        Constant* typesArr = nullptr;
-        Constant* namesArr = nullptr;
-        if (cg.mode == CG_MODE_RTTYPES) {
-            typesArr = ConstantArray::get(fieldsArrType, fieldTypes);
-            namesArr = ConstantArray::get(namesArrType, fieldNames);
-        }
-        typesArrGlobal = cg.createGlobal(types, fieldsArrType, typesArr);
-        namesArrGlobal = cg.createGlobal(names, namesArrType, namesArr);
-    }
-    return {typesArrGlobal, namesArrGlobal};
-}
-
 LgsType* getBiggestIntType(const std::vector<LgsType*>& types) {
     if (types.empty()) return nullptr;
     LgsType* inferredType = nullptr;
@@ -551,4 +499,24 @@ LgsType* getBiggestIntType(const std::vector<LgsType*>& types) {
     }
     assert(inferredType);
     return inferredType;
+}
+
+std::pair<Value*, Value*> loadNumberPair(LgsCgModule& cg, Value* left, Value* right, Type* type) {
+    const auto leftType = left->getType();
+    const auto rightType = right->getType();
+    if (leftType->isIntegerTy()) {
+        left = cg.builder.CreateSIToFP(left, type);
+    } else if (const auto lVec = dyn_cast<FixedVectorType>(leftType)) {
+        if (lVec->getElementType()->isIntegerTy()) {
+            left = cg.builder.CreateSIToFP(left, FixedVectorType::get(type, lVec->getNumElements()));
+        }
+    }
+    if (rightType->isIntegerTy()) {
+        right = cg.builder.CreateSIToFP(right, type);
+    } else if (const auto rVec = dyn_cast<FixedVectorType>(rightType)) {
+        if (rVec->getElementType()->isIntegerTy()) {
+            right = cg.builder.CreateSIToFP(right, FixedVectorType::get(type, rVec->getNumElements()));
+        }
+    }
+    return {left, right};
 }

@@ -1,4 +1,7 @@
 #include "types/primitives/LgsULong.h"
+
+#include <llvm/IR/Module.h>
+
 #include "exprs/constants/LgsIntConst.h"
 #include "codegen/LgsCgModule.h"
 #include "types/LgsAny.h"
@@ -12,7 +15,7 @@ Type* LgsULong::getIRType(LgsCgModule& cg) {
 }
 
 Constant* LgsULong::getRTType(LgsCgModule& cg) {
-    return cg.getRTTypeInfo(getName(), sizeBytes(), RTT_ULONG, cg.null());
+    return cg.getRTTypeInfo(getName(), cg.getAllocSize(getIRType(cg)), RTT_ULONG);
 }
 
 std::string LgsULong::getName() {

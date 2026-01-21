@@ -30,15 +30,17 @@ static std::string formatElement(const Lgs_TypeInfo* rtt, void* value) {
     case RTT_OBJECT: {
         const auto fieldsCount = rtt->obj.fieldsCount;
         str << rtt->obj.name << "{";
+        auto offset = LEVEL_SIZE;
         for (size_t i = 0; i < fieldsCount; ++i) {
             const auto fieldType = rtt->obj.fieldTypes[i];
-            void* fieldPtr = static_cast<char*>(value) + rtt->obj.fieldOffsets[i];
+            void* fieldPtr = static_cast<char*>(value) + offset;
             if (fieldType->isHeap) {
                 fieldPtr = *static_cast<void**>(fieldPtr);
             }
             str << rtt->obj.fieldNames[i] << '=';
             str << formatElement(fieldType, fieldPtr);
             if (i < fieldsCount - 1) str << ", ";
+            offset += fieldType->size;
         }
         str << "}";
         break;
