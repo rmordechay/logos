@@ -745,7 +745,7 @@ void LgsCodeGen::visitStaticArray(LgsArrayExpr* arrayExpr) const {
     if (arrayExpr->elements.empty()) {
         const auto ty = sArr->getIRType(cg);
         const auto arr = arrayExpr->pointee ? arrayExpr->pointee : cg.builder.CreateAlloca(ty);
-        cg.callMemset(arr, cg.usize(0), cg.usize(sArr->IRSize(cg)));
+        cg.callMemset(arr, cg.usize(0), sArr->IRSize(cg));
         arrayExpr->IRValue = arr;
         return;
     }
@@ -778,10 +778,9 @@ void LgsCodeGen::visitStaticArray(LgsArrayExpr* arrayExpr) const {
 
 void LgsCodeGen::visitDynamicArray(LgsArrayExpr* arrayExpr) const {
     const auto dArr = arrayExpr->type->asDArray();
-    const auto arr = arrayExpr->pointee ? arrayExpr->pointee : cg.heapAlloc(cg.usize(dArr->IRSize(cg)), cg.currentLevel);
-    const auto initSize = cg.usize(LGS_MAP_INITIAL_CAPACITY * dArr->baseType->IRSize(cg));
-    cg.callLgsFunc(dArr->name, "initDArray", cg.voidTy(), {cg.ptrTy(), cg.sizeTy()}, {arr, initSize});
+    const auto arr = arrayExpr->pointee ? arrayExpr->pointee : cg.heapAlloc(dArr->IRSize(cg), cg.currentLevel, true);
     arrayExpr->IRValue = arr;
+    dArr->initIRArr(cg, arr);
     for (const auto element : arrayExpr->elements) {
         dArr->addIRElement(cg, arrayExpr->IRValue, nullptr, element->IRValue);
     }
@@ -852,11 +851,11 @@ void LgsCodeGen::visitMatrixExpr(const LgsMatrixExpr* matrixExpr) {
 
 void LgsCodeGen::visitHashMap(LgsHashMap* hashMap) {
     const auto map = hashMap->type->asMap();
-    const auto ptr = hashMap->pointee ? hashMap->pointee : cg.heapAlloc(cg.usize(map->IRSize(cg)), cg.currentLevel);
+    const auto ptr = hashMap->pointee ? hashMap->pointee : cg.heapAlloc(map->IRSize(cg), cg.currentLevel, true);
     const auto cap = cg.usize(MAP_INITIAL_CAPACITY);
-    const auto entriesSize = cg.usize(map->pairType->IRSize(cg) + sizeof(void*));
+    const auto entriesSize = map->pairType->IRSize(cg) + sizeof(void*);
     const auto totalSize = cg.builder.CreateMul(entriesSize, cap);
-    const auto entries = cg.heapAlloc(totalSize, cg.currentLevel);
+    const auto entries = cg.heapAlloc(totalSize, cg.currentLevel, false);
     const auto ty = map->getIRType(cg);
     cg.storeStructField(ty, ptr, 0, entries);
     cg.storeStructField(ty, ptr, 1, cg.sizeZero());
@@ -1157,7 +1156,8 @@ void LgsCodeGen::visitCharConst(LgsCharConst* charConst) const {
 
 void LgsCodeGen::visitInstance(LgsInstance* instance) {
     const auto obj = instance->obj;
-    instance->IRValue = cg.heapAlloc(cg.usize(obj->IRSize(cg)), cg.currentLevel);
+    instance->IRValue = cg.heapAlloc(obj->IRSize(cg), cg.currentLevel, true);
+    cg.storeStructField(obj->getIRType(cg), instance->IRValue, 1, obj->getRTType(cg));
 
     // Args
     std::unordered_set<std::string> visited;
@@ -1171,14 +1171,20 @@ void LgsCodeGen::visitInstance(LgsInstance* instance) {
 
     // Zero values
     for (const auto field : instance->obj->fields) {
-        if (visited.contains(field->name) || field->type->asEnum()) continue;
+        const auto fieldType = field->type;
+        if (visited.contains(field->name) || fieldType->asEnum()) continue;
         const auto pointee = field->getGEP(cg, instance->IRValue);
         if (field->expr) {
             cg.store(field->expr->IRValue, pointee);
         } else {
-            const auto zero = field->type->getZeroValue();
-            // visitExpr(zero);
-            // cg.store(zero->IRValue, pointee);
+            const auto zero = fieldType->getZeroValue();
+            if (fieldType->asObject()) {
+                zero->IRValue = cg.heapAlloc(fieldType->IRSize(cg), cg.currentLevel, true);
+                cg.storeStructField(fieldType->getIRType(cg), zero->IRValue, 1, fieldType->getRTType(cg));
+            } else {
+                visitExpr(zero);
+            }
+            cg.store(zero->IRValue, pointee);
             freeExpr(zero);
         }
     }

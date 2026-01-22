@@ -19,7 +19,7 @@ LgsExpr* LgsStrConst::castExplicitly(LgsType* toType) {
 }
 
 Value* LgsStrConst::loadIR(LgsCgModule& cg) {
-    return cg.load(type->getIRType(cg), IRValue);
+    return IRValue;
 }
 
 std::string LgsStrConst::asText() {

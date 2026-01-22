@@ -8,10 +8,14 @@
 class LgsDArray final : public LgsIterable {
 public:
     static constexpr auto name = "DArray";
+    size_t dataIndex = 2;
+    size_t lenIndex = 3;
+    size_t capIndex = 4;
 
     explicit LgsDArray(LgsType* baseType = nullptr) : LgsIterable(baseType) {
         isHeapAlloc = true;
         passByRef = true;
+        rtt = RTT_DARRAY;
     }
     LgsFunc* getMethod(const std::string& methodName) override;
     bool inferBaseType(std::vector<LgsExpr*>& args) override;
@@ -29,9 +33,7 @@ public:
     Value* inIR(LgsCgModule& cg, Value* iterable, Value* value) override;
     Value* getIRElement(LgsCgModule& cg, Value* iterable, Value* index) override;
     void addIRElement(LgsCgModule& cg, Value* iterable, Value* index, Value* value) override;
-    Value* getDataField(LgsCgModule& cg, Value* iterable);
-    Value* getLenField(LgsCgModule& cg, Value* iterable);
-    Value* getCapField(LgsCgModule& cg, Value* iterable);
+    void initIRArr(LgsCgModule& cg, Value* iterable);
     Function* generateContainsFunc(LgsCgModule& cg);
     Function* generateAddFunc(LgsCgModule& cg);
     std::string fmtStr() const override;

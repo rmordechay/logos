@@ -345,11 +345,11 @@ void LgsCgModule::callMemcpy(Value* dest, Value* src, Value* size) {
     builder.CreateMemCpy(dest, llvm::MaybeAlign(), src, llvm::MaybeAlign(), size);
 }
 
-GlobalVariable* LgsCgModule::getRTTypeInfo(const std::string& name, const size_t size, const Lgs_TypeKind kind) {
+GlobalVariable* LgsCgModule::getRTTypeInfo(const std::string& name, ConstantInt* size, const Lgs_TypeKind kind) {
     const auto baseStruct = getRTTStructType();
     const auto prefixedName = LGS_TYPEINFO_PREFIX + name;
     if (mode == CG_MODE_RTTYPES) {
-        const auto initializer = llvm::ConstantStruct::get(baseStruct, {usize(size), i32(kind)});
+        const auto initializer = llvm::ConstantStruct::get(baseStruct, {size, i32(kind)});
         return createGlobal(prefixedName, baseStruct, initializer);
     }
     return createGlobal(prefixedName, baseStruct, nullptr);

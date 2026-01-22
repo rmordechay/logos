@@ -66,7 +66,7 @@ LgsType* LgsSize::applyBinOp(LgsType* rightType, LgsBinOp& op) {
 }
 
 Constant* LgsSize::getRTType(LgsCgModule& cg) {
-    return cg.getRTTypeInfo(getName(), cg.getAllocSize(getIRType(cg)), RTT_SIZE);
+    return cg.getRTTypeInfo(getName(), IRSize(cg), RTT_SIZE);
 }
 
 bool LgsSize::canCastTo(LgsType* other) {

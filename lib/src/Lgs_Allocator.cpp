@@ -25,7 +25,6 @@ void* Lgs_Allocator::allocate(const size_t size, const bool withLevel) {
 
 void Lgs_Allocator::freeBlocks() {
     for (const auto& block : blocks) {
-        // std::println("Freeing block: {}", block);
         munmap(block, BLOCK_SIZE);
     }
     blocks.clear();

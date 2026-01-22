@@ -37,17 +37,19 @@ enum Lgs_TypeKind {
     RTT_UNKNOWN,
 };
 
-struct Lgs_TypeInfo {
-    size_t size;
-    Lgs_TypeKind kind;
-};
-
 struct Lgs_Object {
     const char* name;
-    size_t size;
-    size_t fieldsCount;
+    const size_t size;
+    const size_t fieldsCount;
     const char** fieldNames;
-    Lgs_TypeInfo** fieldTypes;
+    const size_t* fieldSizes;
+    const size_t* fieldOffsets;
+    const Lgs_TypeKind* fieldKinds;
+};
+
+struct Lgs_TypeInfo {
+    const size_t size;
+    const Lgs_TypeKind kind;
 };
 
 struct VKey {

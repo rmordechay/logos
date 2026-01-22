@@ -40,12 +40,11 @@ bool LgsDArray::inferBaseType(std::vector<LgsExpr*>& args) {
 }
 
 Type* LgsDArray::getIRType(LgsCgModule& cg) {
-    return cg.getStructType({cg.i32Ty(), cg.ptrTy(), cg.sizeTy(), cg.sizeTy()}, name);
+    return cg.getStructType({cg.sizeTy(), cg.ptrTy(), cg.ptrTy(), cg.sizeTy(), cg.sizeTy()}, name);
 }
 
 Constant* LgsDArray::getRTType(LgsCgModule& cg) {
-    const auto dArrName = getName();
-    return cg.getRTTypeInfo(dArrName, IRSize(cg), RTT_DARRAY);
+    return cg.getRTTypeInfo(getName(), IRSize(cg), RTT_DARRAY);
 }
 
 std::string LgsDArray::getBaseName() {
@@ -105,7 +104,7 @@ LgsType* LgsDArray::applyBinOp(LgsType* rightType, LgsBinOp& op) {
 }
 
 Value* LgsDArray::lenIR(LgsCgModule& cg, Value* iterable) {
-    const auto lenFieldPtr = getLenField(cg, iterable);
+    const auto lenFieldPtr = cg.builder.CreateStructGEP(getIRType(cg), iterable, lenIndex);
     return cg.load(cg.sizeTy(), lenFieldPtr);
 }
 
@@ -114,8 +113,8 @@ Value* LgsDArray::inIR(LgsCgModule& cg, Value* iterable, Value* value) {
 }
 
 Value* LgsDArray::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
-    const auto baseSize = cg.usize(baseType->IRSize(cg));
-    const auto dataFieldPtr = getDataField(cg, iterable);
+    const auto baseSize = baseType->IRSize(cg);
+    const auto dataFieldPtr = cg.builder.CreateStructGEP(getIRType(cg), iterable, dataIndex);
     const auto offset = cg.builder.CreateMul(cg.extendToSize(index), baseSize);
     const auto dataField = cg.load(cg.ptrTy(), dataFieldPtr);
     auto ptr = cg.builder.CreateInBoundsPtrAdd(dataField, offset);
@@ -134,16 +133,14 @@ void LgsDArray::addIRElement(LgsCgModule& cg, Value* iterable, Value* index, Val
     cg.builder.CreateCall(generateAddFunc(cg), {iterable, element});
 }
 
-Value* LgsDArray::getDataField(LgsCgModule& cg, Value* iterable) {
-    return cg.builder.CreateStructGEP(getIRType(cg), iterable, 1);
-}
-
-Value* LgsDArray::getLenField(LgsCgModule& cg, Value* iterable) {
-    return cg.builder.CreateStructGEP(getIRType(cg), iterable, 2);
-}
-
-Value* LgsDArray::getCapField(LgsCgModule& cg, Value* iterable) {
-    return cg.builder.CreateStructGEP(getIRType(cg), iterable, 3);
+void LgsDArray::initIRArr(LgsCgModule& cg, Value* iterable) {
+    const auto ty = getIRType(cg);
+    const auto dataSize = cg.builder.CreateMul(baseType->IRSize(cg), cg.usize(LGS_ITER_INIT_CAP));
+    cg.storeStructField(ty, iterable, 0, cg.currentLevel);
+    cg.storeStructField(ty, iterable, 1, baseType->getRTType(cg));
+    cg.storeStructField(ty, iterable, dataIndex, cg.heapAlloc(dataSize, cg.currentLevel, false));
+    cg.storeStructField(ty, iterable, lenIndex, cg.sizeZero());
+    cg.storeStructField(ty, iterable, capIndex, cg.usize(LGS_ITER_INIT_CAP));
 }
 
 Function* LgsDArray::generateContainsFunc(LgsCgModule& cg) {
@@ -155,36 +152,26 @@ Function* LgsDArray::generateContainsFunc(LgsCgModule& cg) {
         return cg.getFunc(funcName, ft);
     }
 
-    // Save state
-    cg.savedIP = cg.builder.saveIP();
-    const auto originalFunc = cg.currentFunc;
-    const auto func = cg.getFunc(funcName, ft);
-    cg.currentFunc = func;
-
     // Prologue
-    const auto entryBlock = cg.createBlock(BLOCK_ENTRY, cg.currentFunc);
+    const auto func = cg.getFunc(funcName, ft);
+    const auto entryBlock = cg.createBlock(BLOCK_ENTRY, func);
     cg.builder.SetInsertPoint(entryBlock);
 
-    const auto arrIR = cg.currentFunc->getArg(0);
-    const auto value = cg.currentFunc->getArg(1);
+    const auto arrIR = func->getArg(0);
+    const auto value = func->getArg(1);
     const auto tempArr = getZeroValue();
     tempArr->IRValue = arrIR;
 
     cg.loop(lenIR(cg, arrIR), [&](Value* iValue, BasicBlock*) {
         LgsIntConst size(&LGS_SIZE, 0);
         size.IRValue = iValue;
-        const auto elementPtr = tempArr->type->asIterable()->getIRElement(cg, tempArr->IRValue, size.IRValue);
+        const auto elementPtr = getIRElement(cg, tempArr->IRValue, size.IRValue);
         const auto elementsAreEqual = eqIR(cg, value, elementPtr, baseType);
         cg.ifStmt(elementsAreEqual, [&cg] {cg.builder.CreateRet(cg.true_());});
     });
 
     // Epilogue
     cg.builder.CreateRet(cg.false_());
-
-    // Restore state
-    cg.currentFunc = originalFunc;
-    cg.builder.restoreIP(cg.savedIP);
-
     freeExpr(tempArr);
     return func;
 }
@@ -198,24 +185,19 @@ Function* LgsDArray::generateAddFunc(LgsCgModule& cg) {
         return cg.getFunc(funcName, ft);
     }
 
-    // Save state
-    cg.savedIP = cg.builder.saveIP();
-    const auto originalFunc = cg.currentFunc;
-    const auto func = cg.getFunc(funcName, ft);
-    cg.currentFunc = func;
-
     // Prologue
-    const auto entryBlock = cg.createBlock(BLOCK_ENTRY, cg.currentFunc);
+    const auto func = cg.getFunc(funcName, ft);
+    const auto entryBlock = cg.createBlock(BLOCK_ENTRY, func);
     const auto needsResizeBlock = cg.createBlock("resize");
     const auto exitBlock = cg.createBlock(BLOCK_EXIT);
     cg.builder.SetInsertPoint(entryBlock);
 
     const auto ty = getIRType(cg);
-    const auto arrIR = cg.currentFunc->getArg(0);
-    const auto elementIR = cg.currentFunc->getArg(1);
-    const auto dataGEP = getDataField(cg, arrIR);
-    const auto lenGEP = getLenField(cg, arrIR);
-    const auto capGEP = getCapField(cg, arrIR);
+    const auto arrIR = func->getArg(0);
+    const auto elementIR = func->getArg(1);
+    const auto dataGEP = cg.builder.CreateStructGEP(ty, arrIR, dataIndex);
+    const auto lenGEP = cg.builder.CreateStructGEP(getIRType(cg), arrIR, lenIndex);
+    const auto capGEP = cg.builder.CreateStructGEP(getIRType(cg), arrIR, capIndex);
 
     auto len = cg.load(cg.sizeTy(), lenGEP);
     const auto cap = cg.load(cg.sizeTy(), capGEP);
@@ -226,13 +208,13 @@ Function* LgsDArray::generateAddFunc(LgsCgModule& cg) {
     cg.startBlock(needsResizeBlock);
     auto data = cg.load(cg.ptrTy(), dataGEP);
     const auto newCap = cg.builder.CreateMul(cap, cg.usize(2));
-    const auto baseTypeSize = cg.usize(baseType->IRSize(cg));
+    const auto baseTypeSize = baseType->IRSize(cg);
     const auto newSize = cg.builder.CreateMul(newCap, baseTypeSize);
     const auto levelField = cg.builder.CreateStructGEP(getIRType(cg), arrIR, 0);
     const auto level = cg.load(cg.i32Ty(), levelField);
     const auto newPtr = cg.reallocate(data, newSize, level);
     cg.store(newPtr, dataGEP);
-    cg.storeStructField(ty, arrIR, 3, newCap);
+    cg.storeStructField(ty, arrIR, capIndex, newCap);
 
     // Set element
     cg.branchAndStartBlock(exitBlock);
@@ -244,15 +226,9 @@ Function* LgsDArray::generateAddFunc(LgsCgModule& cg) {
 
     // Increment length
     const auto inc = cg.builder.CreateAdd(len, cg.usize(1));
-    cg.storeStructField(ty, arrIR, 2, inc);
+    cg.storeStructField(ty, arrIR, lenIndex, inc);
 
-    // Epilogue
     cg.builder.CreateRetVoid();
-
-    // Restore state
-    cg.currentFunc = originalFunc;
-    cg.builder.restoreIP(cg.savedIP);
-
     return func;
 }
 

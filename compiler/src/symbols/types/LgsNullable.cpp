@@ -39,7 +39,7 @@ Type* LgsNullable::getIRType(LgsCgModule& cg) {
 
 Constant* LgsNullable::getRTType(LgsCgModule& cg) {
     const auto nullableName = getName();
-    if (!baseType) return cg.getRTTypeInfo(name, 0, RTT_ANY);
+    if (!baseType) return cg.getRTTypeInfo(name, cg.sizeZero(), RTT_ANY);
     return cg.getRTTypeInfo(nullableName, IRSize(cg), RTT_NULLABLE);
 }
 

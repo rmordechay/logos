@@ -10,7 +10,8 @@ Value* LgsArrayExpr::loadIR(LgsCgModule& cg) {
 void LgsArrayExpr::castImplicitly(LgsType* toType) {
     const auto otherIterable = toType->asIterable();
     if (!otherIterable) return;
-    if (!otherIterable->baseType->canCastTo(type->asIterable()->baseType)) return;
+    const auto iterable = type->asIterable();
+    if (iterable && !otherIterable->baseType->canCastTo(iterable->baseType)) return;
     // Replace dynamic array with static if needed
     if (!type && toType->asSArray()) {
         setType(toType);
@@ -30,7 +31,7 @@ void LgsArrayExpr::castImplicitly(LgsType* toType) {
     }
     if (!type) {
         setType(toType);
-    } else if (const auto& iter = type->asIterable()) {
+    } else if (const auto& iter = iterable) {
         iter->baseType = otherBaseType;
     }
 }

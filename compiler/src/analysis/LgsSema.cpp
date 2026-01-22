@@ -1276,6 +1276,7 @@ void LgsSema::visitJsonObj(const LgsJsonObject* jsonObj) {
 void LgsSema::visitInstance(LgsInstance* instance) {
     const auto objName = instance->name;
     const auto symbol = getSymbol(objName);
+    if (!validateTypeName(instance->name, instance->location)) return;
     if (!symbol) return addError(E10006, instance->location, {instance->name});
     if (symbol->symbolType != OBJECT && symbol->symbolType != INTERFACE) {
         return addError(E10022, instance->location, {objName});
@@ -1334,7 +1335,7 @@ void LgsSema::visitInlineInterface(LgsInstance* instance, LgsInterface* interfac
         if (field) {
             const auto newField = new LgsField(*field);
             newField->expr = expr;
-            instance->obj->addField(newField);
+            instance->obj->fields.push_back(newField);
             continue;
         }
         const auto method = interface->getMethod(name);
@@ -1448,13 +1449,14 @@ bool LgsSema::validateExprType(const LgsExpr* expr, LgsType* type) {
 }
 
 bool LgsSema::validateTypeName(const std::string& name, const LgsLocation& location) {
-    if (islower(name[0])) {
-        addError(E10033, location);
-        return false;
-    }
     const auto symbol = getSymbol(name);
+    if (symbol->isExternal) return true;
     if (symbol && symbol->isBuiltin) {
         addError(E10053, location, {name});
+        return false;
+    }
+    if (islower(name[0])) {
+        addError(E10033, location);
         return false;
     }
     return true;

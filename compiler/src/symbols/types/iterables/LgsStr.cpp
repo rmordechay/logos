@@ -30,11 +30,7 @@ LgsExpr* LgsStr::getZeroValue() {
 }
 
 Constant* LgsStr::getRTType(LgsCgModule& cg) {
-    return cg.getRTTypeInfo(getName(), cg.getAllocSize(getIRType(cg)), RTT_STR);
-}
-
-Lgs_TypeKind LgsStr::getRTTypeKind() {
-    return RTT_STR;
+    return cg.getRTTypeInfo(getName(), IRSize(cg), RTT_STR);
 }
 
 bool LgsStr::canCastTo(LgsType* other) {
@@ -88,31 +84,38 @@ Value* LgsStr::addIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
     const auto leftStrConst = left->getConstStr();
-    const auto rightStrConst = right->getConstStr();
-    if (leftStrConst.has_value() && rightStrConst.has_value()) {
-        return cg.getString(leftStrConst.value() + rightStrConst.value());
-    }
-    const auto rightIntConst = right->getConstInt();
-    if (leftStrConst.has_value() && rightIntConst.has_value()) {
-        return cg.getString(leftStrConst.value() + std::to_string(rightIntConst.value()));
-    }
-    const auto rightFloatConst = right->getConstFloat();
-    if (leftStrConst.has_value() && rightFloatConst.has_value()) {
-        return cg.getString(leftStrConst.value() + std::to_string(rightFloatConst.value()));
+    if (leftStrConst.has_value()) {
+        const auto lv = leftStrConst.value();
+        // Str
+        const auto rStr = right->getConstStr();
+        if (rStr.has_value()) return cg.getString(lv + rStr.value());
+        // Int
+        const auto rInt = right->getConstInt();
+        if (rInt.has_value()) return cg.getString(lv + std::to_string(rInt.value()));
+        // Float
+        const auto rFloat = right->getConstFloat();
+        if (rFloat.has_value()) return cg.getString(lv + std::to_string(rFloat.value()));
     }
 
-    const auto leftPtr = cg.builder.CreateExtractValue(left->IRValue, 1);
-    const auto rightPtr = cg.builder.CreateExtractValue(right->IRValue, 1);
+    const auto leftPtr = cg.builder.CreateExtractValue(left->loadIR(cg), 1);
     const auto leftSize = lenIR(cg, leftPtr);
-    const auto rightSize = lenIR(cg, rightPtr);
-    const auto sumSize = cg.builder.CreateAdd(leftSize, rightSize);
-    const auto allocSize = cg.builder.CreateAdd(sumSize, cg.usize(1));
-
-    const auto ptr = cg.heapAlloc(allocSize, cg.currentLevel, false);
-    const auto rightPos = cg.builder.CreateInBoundsGEP(cg.i8Ty(), ptr, leftSize);
-    cg.callMemcpy(ptr, leftPtr, leftSize);
-    cg.callMemcpy(rightPos, rightPtr, rightSize);
-    cg.addNullTerminate(ptr, sumSize);
+    Value* ptr;
+    if (right->type->asChar()) {
+        const auto allocSize = cg.builder.CreateAdd(leftSize, cg.usize(2));
+        ptr = cg.heapAlloc(allocSize, cg.currentLevel, false);
+        const auto rightPos = cg.builder.CreateInBoundsGEP(cg.i8Ty(), ptr, leftSize);
+        cg.callMemcpy(ptr, leftPtr, leftSize);
+        cg.store(right->IRValue, rightPos);
+    } else {
+        const auto rightPtr = cg.builder.CreateExtractValue(right->IRValue, 1);
+        const auto rightSize = lenIR(cg, rightPtr);
+        const auto sumSize = cg.builder.CreateAdd(leftSize, rightSize);
+        const auto allocSize = cg.builder.CreateAdd(sumSize, cg.usize(1));
+        ptr = cg.heapAlloc(allocSize, cg.currentLevel, false);
+        const auto rightPos = cg.builder.CreateInBoundsGEP(cg.i8Ty(), ptr, leftSize);
+        cg.callMemcpy(ptr, leftPtr, leftSize);
+        cg.callMemcpy(rightPos, rightPtr, rightSize);
+    }
 
     const auto ty = getIRType(cg);
     const auto alloc = cg.builder.CreateAlloca(ty);
@@ -122,6 +125,9 @@ Value* LgsStr::addIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
 }
 
 Value* LgsStr::lenIR(LgsCgModule& cg, Value* iterable) {
+    if (iterable->getType()->isIntegerTy() && cg.getAllocSize(iterable->getType()) == sizeof(char)) {
+        return cg.usize(1);
+    }
     return cg.callStrLen(iterable);
 }
 

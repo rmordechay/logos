@@ -1,5 +1,7 @@
 #pragma once
 
+struct Lgs_TypeInfo;
+
 struct Lgs_SArrayExpr {
     void* data;
     size_t length;
@@ -12,6 +14,7 @@ struct Lgs_Str {
 
 struct Lgs_DArrayExpr {
     size_t level;
+    Lgs_TypeInfo* baseType;
     char* data;
     size_t length;
     size_t capacity;

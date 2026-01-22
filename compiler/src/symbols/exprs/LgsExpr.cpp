@@ -277,11 +277,20 @@ void castExprImplicitly(LgsExpr*& expr, LgsType* toType) {
 }
 
 Value* moveValue(LgsCgModule& cg, Value* left, Value* right, LgsType* type) {
+    const std::vector<Type*> params = {cg.ptrTy(), cg.ptrTy()};
     if (type->asStr()) {
-        const auto ty = type->getIRType(cg);
-        const std::vector params = {ty, ty};
         const std::vector args = {left, right};
-        return cg.callRuntimeFunc("moveStr", ty, params, args);
+        return cg.callRuntimeFunc("moveStr", cg.voidTy(), params, args);
+    }
+    if (type->asObject()) {
+        const std::vector args = {cg.load(cg.ptrTy(), left), right};
+        return cg.callRuntimeFunc("moveObject", cg.voidTy(), params, args);
+    }
+    if (type->asDArray()) {
+        assert(0);
+    }
+    if (type->asMap()) {
+        assert(0);
     }
     assert(0);
 }

@@ -5,9 +5,7 @@
 #include <cassert>
 #include <sstream>
 
-#include "LgsConfigs.h"
-
-static std::string formatElement(const Lgs_TypeKind kind, void* rtt, void* value) {
+static std::string formatElement(const Lgs_TypeKind kind, void* value) {
     if (!value) return LGS_NULL_LITERAL;
     std::ostringstream str;
     switch (kind) {
@@ -25,28 +23,41 @@ static std::string formatElement(const Lgs_TypeKind kind, void* rtt, void* value
     case RTT_FLOAT: str << *static_cast<float*>(value); break;
     case RTT_DOUBLE: str << *static_cast<double*>(value); break;
     case RTT_ENUM:
-    case RTT_STR: str << "\"" << static_cast<Lgs_Str*>(value)->data << "\""; break;
+    case RTT_STR: {
+        const auto lgsStr = static_cast<Lgs_Str*>(value);
+        if (!lgsStr->data) return LGS_NULL_LITERAL;
+        str << "\"" << static_cast<Lgs_Str*>(value)->data << "\"";
+    }
+    break;
     case RTT_CHAR: str << "'" << *static_cast<const char*>(value) << "'"; break;
     case RTT_OBJECT: {
-        const auto obj = static_cast<Lgs_Object*>(rtt);
-        auto offset = LEVEL_SIZE;
+        const auto level = static_cast<size_t*>(value);
+        const auto obj = *reinterpret_cast<Lgs_Object**>(level + 1);
         str << "{";
         for (int i = 0; i < obj->fieldsCount; ++i) {
             const auto fieldName = obj->fieldNames[i];
-            const auto fieldType = obj->fieldTypes[i];
-            const void* fieldPtr = static_cast<char*>(value) + offset;
+            const auto fieldOffset = obj->fieldOffsets[i];
+            const auto fieldKind = obj->fieldKinds[i];
+            void* fieldPtr = static_cast<char*>(value) + fieldOffset;
+            if (fieldKind == RTT_OBJECT || fieldKind == RTT_DARRAY) {
+                fieldPtr = *static_cast<void**>(fieldPtr);
+            }
             str << fieldName << '=';
-            str << fieldPtr;
+            str << formatElement(fieldKind, fieldPtr);
             if (i < obj->fieldsCount - 1) str << ", ";
-            if (!fieldType) continue;
-            offset += fieldType->size;
         }
         str << "}";
         break;
     }
     case RTT_SET:
     case RTT_DARRAY: {
+        const auto arr = static_cast<Lgs_DArrayExpr*>(value);
         str << "[";
+        for (int i = 0; i < arr->length; ++i) {
+            const auto element = arr->data + arr->baseType->size * i;
+            str << formatElement(arr->baseType->kind, element);
+            if (i < arr->length - 1) str << ", ";
+        }
         str << "]";
         break;
     }
@@ -67,6 +78,6 @@ static std::string formatElement(const Lgs_TypeKind kind, void* rtt, void* value
     return str.str();
 }
 
-extern "C" void Lgs_print(const Lgs_TypeKind kind, void* rtt, void* v) {
-    printf("%s\n", formatElement(kind, rtt, v).c_str());
+extern "C" void Lgs_print(const Lgs_TypeKind kind, void* v) {
+    printf("%s\n", formatElement(kind, v).c_str());
 }

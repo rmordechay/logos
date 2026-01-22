@@ -139,7 +139,7 @@ Value* LgsMatrix::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
     const auto i = cg.builder.CreateMul(index, cg.i32(columns));
     const auto gep = cg.builder.CreateGEP(getIRType(cg), iterable, {cg.i32Zero(), i});
     const auto rows2 = cg.builder.CreateAlloca(baseType->getIRType(cg), cg.i32(columns));
-    cg.callMemcpy(rows2, gep, cg.i32(baseType->IRSize(cg) * columns));
+    cg.callMemcpy(rows2, gep, cg.builder.CreateMul(baseType->IRSize(cg), cg.usize(columns)));
     return rows2;
 }
 

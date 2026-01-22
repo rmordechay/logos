@@ -2,7 +2,6 @@
 #include "exprs/LgsVariable.h"
 #include "files/LgsFile.h"
 #include "files/LgsMainFile.h"
-#include "files/LgsObjectFile.h"
 #include "funcs/LgsFunc.h"
 #include "funcs/LgsMainFunc.h"
 #include "stmts/LgsField.h"
@@ -108,6 +107,9 @@ void LgsTypeResolver::resolveObj(LgsObject* obj) {
 
     for (const auto& field : obj->fields) {
         resolveType(field->type);
+        if (field->isMutable && field->type->asStr()) {
+            field->type->isHeapAlloc = true;
+        }
     }
 
     for (const auto& ioPair : obj->ioPairs) {

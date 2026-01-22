@@ -384,14 +384,14 @@ LgsObject* LgsParser::parseObjectBody(const LgsToken& tokenName, const bool isSi
         }
     }
 
-    // First field is level
-    auto fieldPosition = 1;
+    // First field is level, second metadata
+    auto fieldPosition = 2;
     while (true) {
         if (const auto field = parseField(fieldPosition)) {
             fieldPosition++;
             if (headersOnly && !field->isPublic) continue;
             field->parentType = obj;
-            obj->addField(field);
+            obj->fields.push_back(field);
         } else if (const auto innerObj = parseObject()) {
             obj->objects.push_back(innerObj);
         } else if (const auto enum_ = parseEnum()) {
@@ -435,7 +435,7 @@ LgsInterface* LgsParser::parseInterfaceBody(const LgsToken& tokenName) {
         if (const auto field = parseField(fieldPosition)) {
             fieldPosition++;
             field->isVirtual = true;
-            interface->addField(field);
+            interface->fields.push_back(field);
         } else {
             break;
         }
@@ -600,7 +600,7 @@ LgsEnum* LgsParser::parseEnum() {
         field->isEnumField = true;
         field->position = position++;
         setLocation(field->location, &enumField, &currentToken);
-        enum_->addField(field);
+        enum_->fields.push_back(field);
         if (currentToken.type == T_RBRACE) break;
     }
     mustMatch(T_RBRACE);

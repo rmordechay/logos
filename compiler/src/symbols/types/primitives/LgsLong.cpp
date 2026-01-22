@@ -16,7 +16,7 @@ Type* LgsLong::getIRType(LgsCgModule& cg) {
 }
 
 Constant* LgsLong::getRTType(LgsCgModule& cg) {
-    return cg.getRTTypeInfo(getName(), cg.getAllocSize(getIRType(cg)), RTT_LONG);
+    return cg.getRTTypeInfo(getName(), IRSize(cg), RTT_LONG);
 }
 
 size_t LgsLong::sizeBytes() {

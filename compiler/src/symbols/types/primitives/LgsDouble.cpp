@@ -32,7 +32,7 @@ Type* LgsDouble::getIRType(LgsCgModule& cg) {
 }
 
 Constant* LgsDouble::getRTType(LgsCgModule& cg) {
-    return cg.getRTTypeInfo(getName(), cg.getAllocSize(getIRType(cg)), RTT_DOUBLE);
+    return cg.getRTTypeInfo(getName(), IRSize(cg), RTT_DOUBLE);
 }
 
 bool LgsDouble::canCastTo(LgsType* other) {

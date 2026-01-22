@@ -97,7 +97,7 @@ public:
     Value* callHash(Value* arg);
     void addToVTable(Value* instance, Value* name, Value* ptr);
     Value* getFromVTable(Value* instance, Value* name);
-    Value* heapAlloc(Value* size, Value* level, bool withLevel = true);
+    Value* heapAlloc(Value* size, Value* level, bool withLevel);
     Value* reallocate(Value* ptr, Value* size, Value* level);
     Value* moveElement(Value* iterable, Value* element, Constant* type);
     void callThrowError(const LgsBaseMsg& err, const std::vector<Value*>& args = {});
@@ -127,7 +127,7 @@ public:
     void callMemcpy(Value* dest, Value* src, Value* size);
 
     // Runtime funcs
-    GlobalVariable* getRTTypeInfo(const std::string& name, size_t size, Lgs_TypeKind kind);
+    GlobalVariable* getRTTypeInfo(const std::string& name, ConstantInt* size, Lgs_TypeKind kind);
     StructType* getRTTStructType();
 
     // Debugging

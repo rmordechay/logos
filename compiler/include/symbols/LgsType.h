@@ -4,6 +4,7 @@
 #include <vector>
 #include "errors/LgsErrHandler.h"
 #include <unordered_map>
+#include <unordered_set>
 
 #include "Lgs_Types.h"
 
@@ -52,6 +53,7 @@ class LgsCgModule;
 
 namespace llvm {
     class Constant;
+    class ConstantInt;
     class DIType;
     class Type;
     class Value;
@@ -70,9 +72,8 @@ public:
     bool isFloat = false;
     bool isHeapAlloc = false;
     bool passByRef = false;
+    Lgs_TypeKind rtt = RTT_UNKNOWN;
 
-    bool addField(LgsField* field);
-    bool addMethod(LgsFunc* method);
     bool isAny();
     bool isVoid();
     bool isNumber();
@@ -81,8 +82,9 @@ public:
     bool isUnknown();
     bool isSliceable();
     bool hasGenericTypes();
-    size_t IRSize(LgsCgModule& cg);
+    ConstantInt* IRSize(LgsCgModule& cg);
 
+    bool addMethod(LgsFunc* method);
     virtual LgsField* getField(const std::string& fieldName);
     virtual LgsFunc* getMethod(const std::string& methodName);
     virtual std::string getName() = 0;
@@ -91,7 +93,6 @@ public:
     virtual Type* getIRType(LgsCgModule& cg) = 0;
     virtual Type* getTypeOrPtr(LgsCgModule& cg);
     virtual Constant* getRTType(LgsCgModule& cg) = 0;
-    virtual Lgs_TypeKind getRTTypeKind();
     virtual bool canCastTo(LgsType* other) = 0;
     virtual std::string fmtStr() const = 0;
     virtual LgsType* replaceGenerics(LgsType* replacement, std::unordered_map<std::string, LgsType*>& replacements);

@@ -89,9 +89,9 @@ Value* LgsSArray::addIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
 
     const auto newSize = cg.builder.CreateAdd(leftSize, rightSize);
     const auto newArr = cg.builder.CreateAlloca(baseIR, newSize);
-    const auto sizeLeft = cg.builder.CreateMul(leftSize, cg.i32(baseType->IRSize(cg)));
+    const auto sizeLeft = cg.builder.CreateMul(leftSize, baseType->IRSize(cg));
     cg.callMemcpy(newArr, left->IRValue, sizeLeft);
-    const auto sizeRight = cg.builder.CreateMul(rightSize, cg.i32(baseType->IRSize(cg)));
+    const auto sizeRight = cg.builder.CreateMul(rightSize, baseType->IRSize(cg));
     const auto offset = cg.builder.CreateInBoundsGEP(baseIR, newArr, leftSize);
     cg.callMemcpy(offset, right->IRValue, sizeRight);
     return newArr;
@@ -105,7 +105,7 @@ Value* LgsSArray::mulIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
     const auto multiplier = cg.extendToSize(right->IRValue);
     const auto newSize = cg.builder.CreateMul(arrSize, multiplier);
     const auto newArr = cg.builder.CreateAlloca(baseType->getIRType(cg), newSize);
-    const auto bytesPerCopy = cg.builder.CreateMul(arrSize, cg.usize(baseType->IRSize(cg)));
+    const auto bytesPerCopy = cg.builder.CreateMul(arrSize, baseType->IRSize(cg));
     cg.loop(multiplier, [&](Value* i, BasicBlock*) {
         const auto offset = cg.builder.CreateMul(i, arrSize);
         const auto destPtr = cg.builder.CreateInBoundsGEP(baseType->getIRType(cg), newArr, offset);

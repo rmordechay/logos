@@ -46,17 +46,6 @@ static std::unordered_map<std::string, uint8_t> numberPrecedences = {
     {LgsDouble::name, 13},
 };
 
-bool LgsType::addField(LgsField* field) {
-    fields.push_back(field);
-    return true;
-}
-
-bool LgsType::addMethod(LgsFunc* method) {
-    if (methods.contains(method->funcType->name)) return false;
-    methods[method->funcType->name] = method;
-    return true;
-}
-
 bool LgsType::isAny() {
     return getName() == LgsAny::name || (asPtr() && asPtr()->baseType->isVoid());
 }
@@ -102,8 +91,14 @@ bool LgsType::hasGenericTypes() {
     return false;
 }
 
-size_t LgsType::IRSize(LgsCgModule& cg) {
-    return cg.getAllocSize(getIRType(cg));
+ConstantInt* LgsType::IRSize(LgsCgModule& cg) {
+    return cg.usize(cg.getAllocSize(getIRType(cg)));
+}
+
+bool LgsType::addMethod(LgsFunc* method) {
+    if (methods.contains(method->funcType->name)) return false;
+    methods[method->funcType->name] = method;
+    return true;
 }
 
 LgsField* LgsType::getField(const std::string& fieldName) {
@@ -114,12 +109,7 @@ LgsField* LgsType::getField(const std::string& fieldName) {
 }
 
 LgsFunc* LgsType::getMethod(const std::string& methodName) {
-    const auto method = methods.find(methodName);
-    if (method != methods.end()) {
-        if (method->second) {
-            return method->second;
-        }
-    }
+    if (methods.contains(methodName)) return methods[methodName];
     return nullptr;
 }
 
@@ -128,10 +118,6 @@ Type* LgsType::getTypeOrPtr(LgsCgModule& cg) {
 }
 
 Constant* LgsType::getRTType(LgsCgModule& cg) {
-    assert(0);
-}
-
-Lgs_TypeKind LgsType::getRTTypeKind() {
     assert(0);
 }
 
@@ -367,6 +353,9 @@ Value* eqIR(LgsCgModule& cg, Value* left, Value* right, LgsType* type) {
         return cg.builder.CreateFCmpOEQ(l, r);
     }
     if (type->asComplex()) {
+        assert(0);
+    }
+    if (type->asDArray()) {
         assert(0);
     }
     if (type->asStr()) {

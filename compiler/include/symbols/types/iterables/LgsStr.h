@@ -6,14 +6,15 @@ class LgsStr final : public LgsIterable {
 public:
     static constexpr auto name = "Str";
 
-    explicit LgsStr(): LgsIterable(&LGS_CHAR) {}
+    explicit LgsStr(): LgsIterable(&LGS_CHAR) {
+        rtt = RTT_STR;
+    }
     Type* getIRType(LgsCgModule& cg) override;
     std::string getBaseName() override;
     std::string getName() override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
     Constant* getRTType(LgsCgModule& cg) override;
-    Lgs_TypeKind getRTTypeKind() override;
     bool canCastTo(LgsType* other) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     Value* getIRElement(LgsCgModule& cg, Value* iterable, Value* index) override;

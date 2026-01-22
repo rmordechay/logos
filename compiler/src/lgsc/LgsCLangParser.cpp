@@ -149,7 +149,7 @@ LgsObject* LgsCLangParser::mapCRecord(const clang::RecordDecl* record) {
         const auto fieldName = field->getNameAsString();
         const auto fieldType = mapCType(field->getType());
         const auto lgsField = new LgsField(fieldName, fieldType);
-        obj->addField(lgsField);
+        obj->fields.push_back(lgsField);
     }
     return obj;
 }

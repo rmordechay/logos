@@ -23,7 +23,7 @@ LgsField* LgsVec::getField(const std::string& fieldName) {
     } else {
         field = new LgsField(fieldName, new LgsVec(newFieldDim));
     }
-    addField(field);
+    fields.push_back(field);
     return field;
 }
 

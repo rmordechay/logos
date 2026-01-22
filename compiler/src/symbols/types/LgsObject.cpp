@@ -44,7 +44,7 @@ LgsFunc* LgsObject::getMethod(const std::string& methodName) {
 Type* LgsObject::getIRType(LgsCgModule& cg) {
     const auto type = cg.typesRegistry.find(name);
     if (type != cg.typesRegistry.end()) return type->second;
-    std::vector<Type*> types = {cg.sizeTy()}; // First field is level
+    std::vector<Type*> types = {cg.sizeTy(), cg.ptrTy()}; // First field is level
     types.reserve(fields.size());
     for (size_t i = 0; i < fields.size(); ++i) {
         const auto field = fields[i];
@@ -61,32 +61,35 @@ Constant* LgsObject::getRTType(LgsCgModule& cg) {
     if (cg.mode != CG_MODE_RTTYPES) return cg.createGlobal(RTTName, cg.getRTTStructType(), nullptr);
     const auto numFields = fields.size();
     const auto ptrTypeArr = ArrayType::get(cg.ptrTy(), numFields);
+    const auto sizeTypeArr = ArrayType::get(cg.sizeTy(), numFields);
+    const auto intTypeArr = ArrayType::get(cg.i32Ty(), numFields);
+    const auto objRTType = cg.getStructType({cg.ptrTy(), cg.sizeTy(), cg.sizeTy(), cg.ptrTy(), cg.ptrTy(), cg.ptrTy(), cg.ptrTy()}, RTTName);
+    const auto sl = cg.IRModule->getDataLayout().getStructLayout(llvm::cast<StructType>(getIRType(cg)));
 
     std::vector<Constant*> fieldNames;
-    std::vector<Constant*> fieldTypes;
-    for (const auto field : fields) {
+    std::vector<Constant*> fieldSizes;
+    std::vector<Constant*> fieldOffsets;
+    std::vector<Constant*> fieldKinds;
+    for (size_t i = 0; i < fields.size(); ++i) {
+        const auto field = fields[i];
         fieldNames.push_back(cg.getString(field->name));
-        if (field->type->asObject()) {
-            fieldTypes.push_back(cg.null());
-        } else {
-            fieldTypes.push_back(field->type->getRTType(cg));
-        }
+        fieldSizes.push_back(field->type->IRSize(cg));
+        fieldOffsets.push_back(cg.usize(sl->getElementOffset(i + 2)));
+        assert(field->type->rtt);
+        fieldKinds.push_back(cg.i32(field->type->rtt));
     }
     const auto namesArrGlobal = cg.createGlobal(RTTName + "_names", ptrTypeArr, ConstantArray::get(ptrTypeArr, fieldNames));
-    const auto typesArrGlobal = cg.createGlobal(RTTName + "_types", ptrTypeArr, ConstantArray::get(ptrTypeArr, fieldTypes));
-
-    const std::vector<Type*> types = {cg.ptrTy(), cg.sizeTy(), cg.sizeTy(), cg.ptrTy(), cg.ptrTy()};
-    const auto objRTType = cg.getStructType(types, RTTName);
-    const std::vector<Constant*> args = {cg.getString(name), cg.usize(IRSize(cg)), cg.usize(numFields), namesArrGlobal, typesArrGlobal};
+    const auto sizesArrGlobal = cg.createGlobal(RTTName + "_sizes", sizeTypeArr, ConstantArray::get(sizeTypeArr, fieldSizes));
+    const auto offsetsArrGlobal = cg.createGlobal(RTTName + "_offsets", sizeTypeArr, ConstantArray::get(sizeTypeArr, fieldOffsets));
+    const auto kindsArrGlobal = cg.createGlobal(RTTName + "_kinds", intTypeArr, ConstantArray::get(intTypeArr, fieldKinds));
+    const std::vector<Constant*> args = {
+        cg.getString(name), IRSize(cg), cg.usize(numFields), namesArrGlobal, sizesArrGlobal, offsetsArrGlobal, kindsArrGlobal
+    };
     return cg.createGlobal(RTTName, objRTType, ConstantStruct::get(objRTType, args));
 }
 
-Lgs_TypeKind LgsObject::getRTTypeKind() {
-    return RTT_OBJECT;
-}
-
 size_t LgsObject::sizeBytes() {
-    auto sum = LEVEL_SIZE;
+    auto sum = OBJ_MD_SIZE;
     for (const auto& field : fields) {
         if (field->type->asObject() || field->type->asFuncType() || field->type->asInterface()) {
             sum += sizeof(void*);

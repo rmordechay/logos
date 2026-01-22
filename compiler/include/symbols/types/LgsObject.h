@@ -26,12 +26,12 @@ public:
     explicit LgsObject(const std::string&  objName) : name(objName) {
         passByRef = true;
         isHeapAlloc = true;
+        rtt = RTT_OBJECT;
     }
     std::string getName() override;
     LgsFunc* getMethod(const std::string& methodName) override;
     Type* getIRType(LgsCgModule& cg) override;
     Constant* getRTType(LgsCgModule& cg) override;
-    Lgs_TypeKind getRTTypeKind() override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
     bool canCastTo(LgsType* other) override;
