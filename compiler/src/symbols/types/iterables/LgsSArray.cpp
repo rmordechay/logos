@@ -1,4 +1,7 @@
 #include "types/iterables/LgsSArray.h"
+
+#include <llvm/IR/Module.h>
+
 #include "codegen/LgsCgModule.h"
 #include "exprs/LgsArrayExpr.h"
 #include "types/LgsAny.h"
@@ -37,10 +40,13 @@ LgsExpr* LgsSArray::getZeroValue() {
 }
 
 Constant* LgsSArray::getRTType(LgsCgModule& cg) {
-    const auto sArrName = getName();
-    const auto sArrSize = length->getConstInt().value();
-    const std::vector<Constant*> args = {cg.usize(sArrSize), baseType->getRTType(cg)};
-    return cg.getRTTypeInfo(sArrName, IRSize(cg), RTT_SARRAY);
+    const auto RTTName = LGS_TYPEINFO_PREFIX + getName();
+    if (const auto v = cg.IRModule->getGlobalVariable(RTTName)) return v;
+    if (cg.mode != CG_MODE_RTTYPES) return cg.createGlobal(RTTName, cg.getRTTStructType(), nullptr);
+    const auto st = cg.getStructType({cg.sizeTy(), cg.ptrTy()});
+    const auto baseTypeRTT = cg.getRTTypeInfo(baseType->getName(), baseType->IRSize(cg), baseType->rtt);
+    const std::vector<Constant*> args = {cg.usize(length->getConstInt().value()), baseTypeRTT};
+    return cg.createGlobal(RTTName, st, ConstantStruct::get(st, args));
 }
 
 std::string LgsSArray::fmtStr() const {

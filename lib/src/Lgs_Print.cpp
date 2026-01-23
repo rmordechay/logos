@@ -5,7 +5,7 @@
 #include <cassert>
 #include <sstream>
 
-static std::string formatElement(const Lgs_TypeKind kind, void* value) {
+static std::string formatElement(const Lgs_TypeKind kind, void* type, void* value) {
     if (!value) return LGS_NULL_LITERAL;
     std::ostringstream str;
     switch (kind) {
@@ -43,7 +43,7 @@ static std::string formatElement(const Lgs_TypeKind kind, void* value) {
                 fieldPtr = *static_cast<void**>(fieldPtr);
             }
             str << fieldName << '=';
-            str << formatElement(fieldKind, fieldPtr);
+            str << formatElement(fieldKind, nullptr, fieldPtr);
             if (i < obj->fieldsCount - 1) str << ", ";
         }
         str << "}";
@@ -55,14 +55,20 @@ static std::string formatElement(const Lgs_TypeKind kind, void* value) {
         str << "[";
         for (int i = 0; i < arr->length; ++i) {
             const auto element = arr->data + arr->baseType->size * i;
-            str << formatElement(arr->baseType->kind, element);
+            str << formatElement(arr->baseType->kind, nullptr, element);
             if (i < arr->length - 1) str << ", ";
         }
         str << "]";
         break;
     }
     case RTT_SARRAY: {
+        const auto sArr = static_cast<Lgs_SArr*>(type);
         str << "[";
+        for (int i = 0; i < sArr->length; ++i) {
+            const auto element = static_cast<char*>(value) + sArr->baseType->size * i;
+            str << formatElement(sArr->baseType->kind, nullptr, element);
+            if (i < sArr->length - 1) str << ", ";
+        }
         str << "]";
         break;
     }
@@ -78,6 +84,6 @@ static std::string formatElement(const Lgs_TypeKind kind, void* value) {
     return str.str();
 }
 
-extern "C" void Lgs_print(const Lgs_TypeKind kind, void* v) {
-    printf("%s\n", formatElement(kind, v).c_str());
+extern "C" void Lgs_print(const Lgs_TypeKind kind, void* type, void* v) {
+    printf("%s\n", formatElement(kind, type, v).c_str());
 }

@@ -52,6 +52,11 @@ struct Lgs_Object {
     const Lgs_TypeKind* fieldKinds;
 };
 
+struct Lgs_SArr {
+    const size_t length;
+    Lgs_TypeInfo* baseType;
+};
+
 struct VKey {
     void* instance;
     const char* name;

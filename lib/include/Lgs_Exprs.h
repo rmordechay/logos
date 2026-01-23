@@ -2,11 +2,6 @@
 
 struct Lgs_TypeInfo;
 
-struct Lgs_SArrayExpr {
-    void* data;
-    size_t length;
-};
-
 struct Lgs_Str {
     size_t level;
     char* data;

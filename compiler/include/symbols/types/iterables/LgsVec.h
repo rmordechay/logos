@@ -38,6 +38,7 @@ public:
     static size_t getSwizzleSet(char c);
     static size_t getComponentIndex(char c);
     std::string fmtStr() const override;
+    Value* asIRStr(LgsCgModule& cg, Value* v) override;
     DIType* getDebugType(LgsCgModule& cg) override;
 };
 

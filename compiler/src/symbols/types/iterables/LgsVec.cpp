@@ -311,6 +311,15 @@ std::string LgsVec::fmtStr() const {
     return str.str();
 }
 
+Value* LgsVec::asIRStr(LgsCgModule& cg, Value* v) {
+    std::vector<Value*> vecArgs;
+    for (size_t i = 0; i < dimVec; ++i) {
+        const auto element = cg.builder.CreateExtractValue(v, i);
+        vecArgs.push_back(element);
+    }
+    return cg.callSnprintf(fmtStr(), vecArgs);
+}
+
 DIType* LgsVec::getDebugType(LgsCgModule& cg) {
     assert(0);
 }

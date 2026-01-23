@@ -152,7 +152,7 @@ std::string LgsInt::fmtStr() const {
 }
 
 Value* LgsInt::asIRStr(LgsCgModule& cg, Value* v) {
-    return LgsType::asIRStr(cg, v);
+    return cg.callSnprintf(fmtStr(), {v});
 }
 
 std::string LgsInt::getName() {

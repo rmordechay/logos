@@ -35,6 +35,10 @@ std::string LgsFloat::fmtStr() const {
     return "%.3f";
 }
 
+Value* LgsFloat::asIRStr(LgsCgModule& cg, Value* v) {
+    return cg.callSnprintf(fmtStr(), {cg.builder.CreateFPExt(v, cg.doubleTy())});
+}
+
 bool LgsFloat::canCastTo(LgsType* other) {
     const auto IRName = other->getName();
     if (name == IRName) return true;

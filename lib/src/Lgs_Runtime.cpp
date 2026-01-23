@@ -1,17 +1,15 @@
 #include "Lgs_Runtime.h"
 #include "LgsConfigs.h"
 #include "LgsDefinitions.h"
+#include "Lgs_Exprs.h"
 #include "LgsUtils.h"
 #include <cassert>
 #include <complex>
 
-#include "Lgs_Exprs.h"
-struct Lgs_DArrayExpr;
+#define NANO 1000000000LL
 
 static Lgs_StackFrame& getTop();
 void moveValue(Lgs_TypeKind kind, size_t level, void* left, void* right, size_t size);
-
-constexpr int64_t nano = 1000000000LL;
 
 extern "C" void Lgs_Runtime_init() {}
 
@@ -123,13 +121,13 @@ extern "C" size_t Lgs_Runtime_hash(const char* str) {
 extern "C" int64_t Lgs_Runtime_timeStart() {
     timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);
-    return static_cast<int64_t>(ts.tv_sec) * nano + ts.tv_nsec;
+    return static_cast<int64_t>(ts.tv_sec) * NANO + ts.tv_nsec;
 }
 
 extern "C" int64_t Lgs_Runtime_timeEnd(const int64_t start) {
     timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);
-    const auto endNano = static_cast<int64_t>(ts.tv_sec) * nano + ts.tv_nsec;
+    const auto endNano = static_cast<int64_t>(ts.tv_sec) * NANO + ts.tv_nsec;
     return endNano - start;
 }
 

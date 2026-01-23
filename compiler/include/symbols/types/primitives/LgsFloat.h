@@ -14,6 +14,7 @@ public:
     Constant* getRTType(LgsCgModule& cg) override;
     size_t sizeBytes() override;
     std::string fmtStr() const override;
+    Value* asIRStr(LgsCgModule& cg, Value* v) override;
     bool canCastTo(LgsType* other) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     Value* addIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) override;

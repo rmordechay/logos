@@ -2,6 +2,7 @@
 #include <llvm/IR/Module.h>
 #include "exprs/LgsFuncCall.h"
 #include "types/LgsEnum.h"
+#include "types/iterables/LgsSArray.h"
 #include "types/iterables/LgsVec.h"
 #include "types/primitives/LgsBool.h"
 
@@ -33,8 +34,8 @@ Value* LgsPrint::call(LgsCgModule& cg, std::vector<LgsFuncArg>& args) {
         }
         return cg.callPrintf(vecArgs);
     }
-    const std::vector<Type*> params = {cg.i32Ty(), cg.ptrTy()};
+    const std::vector<Type*> params = {cg.i32Ty(), cg.ptrTy(), cg.ptrTy()};
     assert(arg->type->rtt != RTT_UNKNOWN);
-    const std::vector<Value*> IRArgs = {cg.i32(arg->type->rtt), arg->IRValue};
+    const std::vector<Value*> IRArgs = {cg.i32(arg->type->rtt), arg->type->getRTType(cg), arg->IRValue};
     return cg.callLgsFunc("", name, cg.voidTy(), params, IRArgs);
 }
