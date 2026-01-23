@@ -342,7 +342,9 @@ void LgsSema::visitStmtsBlock(LgsStmtsBlock* stmtsBlock) {
 
 void LgsSema::visitVarDec(LgsVarDec* varDec) {
     validateLocalName(varDec->name, varDec->location);
-    if (const auto sArr = varDec->type->asSArray()) visitExpr(sArr->length);
+    if (const auto sArr = varDec->type->asSArray()) {
+        visitExpr(sArr->lengthExpr);
+    }
 
     if (varDec->expr && varDec->type) {
         typeResolver.resolveType(varDec->type);
@@ -724,9 +726,6 @@ void LgsSema::visitIOStmt(const LgsIOStmt* ioStmt) {
 
 void LgsSema::visitExpr(LgsExpr*& expr) {
     if (!expr) return;
-    if (const auto sArr = expr->type->asSArray()) {
-        visitExpr(sArr->length);
-    }
     if (const auto ternaryExpr = dynamic_cast<LgsTernaryExpr*>(expr)) {
         visitTernaryExpr(ternaryExpr);
     } else if (const auto binaryExpr = dynamic_cast<LgsBinaryExpr*>(expr)) {
@@ -774,7 +773,6 @@ void LgsSema::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
     if (!type) {
         return addError(E10076, binaryExpr->location, {binaryExpr->op.text, ltype->pname(), rtype->pname()});
     }
-    if (const auto sArr = type->asSArray()) visitExpr(sArr->length);
     binaryExpr->setType(type);
     binaryExpr->isMutable = l->isMutable || r->isMutable;
 }
@@ -851,11 +849,13 @@ void LgsSema::visitArrayExpr(LgsArrayExpr* arrayExpr) {
 
 void LgsSema::visitStaticArray(const LgsArrayExpr* arrayExpr) {
     const auto sArr = arrayExpr->type->asSArray();
-    const auto size = sArr->length->getConstInt();
+    const auto size = sArr->lengthExpr->getConstInt();
     if (!size.has_value()) {
         addError(E10114, arrayExpr->location);
     } else if (size.value() < static_cast<int64_t>(arrayExpr->elements.size())) {
         addError(E10105, arrayExpr->location, {std::to_string(*size)});
+    } else {
+        sArr->len = size.value();
     }
     for (auto element : arrayExpr->elements) {
         visitExpr(element);
@@ -1557,10 +1557,10 @@ void LgsSema::validateIndex(LgsIterIndex* iterIndex) {
     }
     if (const auto sArr = iterable->asSArray()) {
         const auto i = exprFrom->getConstInt();
-        const auto bounds = sArr->length->getConstInt();
-        if (!i.has_value() || !bounds.has_value()) return;
-        if (i.value() >= bounds.value()) {
-            return addError(E10048, iterIndex->location, {iterIndex->asText(), std::to_string(*bounds)});
+        if (!i.has_value()) return;
+        const auto bounds = static_cast<int64_t>(sArr->len);
+        if (i.value() >= bounds) {
+            return addError(E10048, iterIndex->location, {iterIndex->asText(), std::to_string(bounds)});
         }
     }
 }

@@ -40,7 +40,7 @@ void LgsIterIndex::setIRElementPtr(LgsCgModule& cg, const bool assign) {
     // SArray
     if (const auto sArr = baseExpr->type->asSArray()) {
         const auto ty = type->getIRType(cg);
-        if (!boundsChecked) cg.createIndexBoundsGuard(sArr->length->IRValue, fromIR);
+        if (!boundsChecked) cg.createIndexBoundsGuard(cg.usize(sArr->len), fromIR);
         IRValue = cg.builder.CreateInBoundsGEP(ty, baseExpr->IRValue, fromIR);
         if (ty->isPointerTy()) {
             IRValue = cg.load(cg.ptrTy(), IRValue);

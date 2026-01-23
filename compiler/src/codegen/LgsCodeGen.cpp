@@ -582,11 +582,6 @@ void LgsCodeGen::visitIOStmt(const LgsIOStmt* ioStmt) {
 
 void LgsCodeGen::visitExpr(LgsExpr* expr, const bool assign) {
     if (!expr) return;
-    if (const auto sArr = expr->type->asSArray()) {
-        if (sArr->length && !sArr->length->IRValue) {
-            visitExpr(sArr->length);
-        }
-    }
     if (const auto ternaryExpr = dynamic_cast<LgsTernaryExpr*>(expr)) {
         visitTernaryExpr(ternaryExpr);
     } else if (const auto binaryExpr = dynamic_cast<LgsBinaryExpr*>(expr)) {
@@ -1245,7 +1240,7 @@ void LgsCodeGen::initMainArgs(const LgsMainFunc* mainFunc) const {
     if (ft->params.empty()) return;
     const auto argsArray = ft->params.front().expr->asArrayExpr();
     const auto sArray = argsArray->type->asSArray();
-    sArray->length->IRValue = cg.currentFunc->getArg(0);
+    sArray->lengthExpr->IRValue = cg.currentFunc->getArg(0);
     argsArray->IRValue = cg.currentFunc->getArg(1);
     mainFunc->funcType->params[0].IRValue = argsArray->IRValue;
 }
