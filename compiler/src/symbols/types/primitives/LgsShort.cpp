@@ -14,11 +14,11 @@ size_t LgsShort::sizeBytes() {
     return sizeof(short);
 }
 
-Type* LgsShort::getIRType(LgsCgModule& cg) {
+Type* LgsShort::getIRType(LgsCodeGen& cg) {
     return cg.i16Ty();
 }
 
-Constant* LgsShort::getRTType(LgsCgModule& cg) {
+Constant* LgsShort::getRTType(LgsCodeGen& cg) {
     return cg.getRTTypeInfo(getName(), IRSize(cg), RTT_SHORT);
 }
 
@@ -49,6 +49,6 @@ std::string LgsShort::fmtStr() const {
     return "%d";
 }
 
-DIType* LgsShort::getDebugType(LgsCgModule& cg) {
+DIType* LgsShort::getDebugType(LgsCodeGen& cg) {
     assert(0);
 }

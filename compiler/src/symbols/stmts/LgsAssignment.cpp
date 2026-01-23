@@ -3,7 +3,7 @@
 #include "exprs/LgsVariable.h"
 #include "exprs/LgsBinaryExpr.h"
 
-void LgsAssignment::setDebugValue(LgsCgModule& cg) {
+void LgsAssignment::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }
 

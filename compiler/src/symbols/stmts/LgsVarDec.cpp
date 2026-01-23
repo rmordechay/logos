@@ -1,5 +1,5 @@
 #include "stmts/LgsVarDec.h"
-#include "codegen/LgsCgModule.h"
+#include "codegen/LgsCodeGen.h"
 #include "types/iterables/LgsStr.h"
 #include "LgsUtils.h"
 #include "types/LgsNullable.h"
@@ -10,7 +10,7 @@ void LgsVarDec::setType(LgsType* newType) {
     type = newType;
 }
 
-Value* LgsVarDec::loadIR(LgsCgModule& cg) {
+Value* LgsVarDec::loadIR(LgsCodeGen& cg) {
     return expr->loadIR(cg);
 }
 
@@ -25,7 +25,7 @@ bool LgsVarDec::shouldAllocate() const {
     return true;
 }
 
-void LgsVarDec::setDebugValue(LgsCgModule& cg) {
+void LgsVarDec::setDebugValue(LgsCodeGen& cg) {
     setDebugLoc(cg);
     const auto var = cg.debugger.diBuilder->createAutoVariable(
         cg.debugger.subprogram,

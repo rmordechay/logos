@@ -1,11 +1,11 @@
 #include "types/LgsFuncType.h"
 #include "LgsDefinitions.h"
-#include "codegen/LgsCgModule.h"
+#include "codegen/LgsCodeGen.h"
 #include "types/LgsGenericType.h"
 #include "LgsUtils.h"
 #include <sstream>
 
-Type* LgsFuncType::getIRType(LgsCgModule& cg) {
+Type* LgsFuncType::getIRType(LgsCodeGen& cg) {
     assert(rt);
     std::vector<Type*> types;
     for (size_t i = 0; i < params.size(); ++i) {
@@ -19,7 +19,7 @@ Type* LgsFuncType::getIRType(LgsCgModule& cg) {
     return IRType;
 }
 
-Constant* LgsFuncType::getRTType(LgsCgModule& cg) {
+Constant* LgsFuncType::getRTType(LgsCodeGen& cg) {
     const auto funcName = getName();
     std::vector<Constant*> paramNames;
     for (const auto& param : params) {
@@ -158,7 +158,7 @@ std::unordered_map<std::string, LgsParam*> LgsFuncType::getParamsByName() {
     return paramsByName;
 }
 
-DIType* LgsFuncType::getDebugType(LgsCgModule& cg) {
+DIType* LgsFuncType::getDebugType(LgsCodeGen& cg) {
     assert(0);
 }
 

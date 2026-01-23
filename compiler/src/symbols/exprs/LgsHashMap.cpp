@@ -1,8 +1,8 @@
 #include "exprs/LgsHashMap.h"
 #include "LgsUtils.h"
-#include "codegen/LgsCgModule.h"
+#include "codegen/LgsCodeGen.h"
 
-void LgsPair::setDebugValue(LgsCgModule& cg) {
+void LgsPair::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }
 
@@ -15,7 +15,7 @@ void LgsHashMap::castImplicitly(LgsType* toType) {
     if (!type) setType(toType);
 }
 
-void LgsHashMap::setDebugValue(LgsCgModule& cg) {
+void LgsHashMap::setDebugValue(LgsCodeGen& cg) {
     if (!IRValue) return;
     const auto di = cg.debugger.diBuilder;
     const auto file = cg.debugger.diFile;

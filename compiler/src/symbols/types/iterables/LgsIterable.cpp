@@ -5,6 +5,7 @@
 #include "types/primitives/LgsInt.h"
 #include "types/primitives/LgsSize.h"
 #include "LgsUtils.h"
+#include "exprs/constants/LgsIntConst.h"
 #include "funcs/LgsFunc.h"
 #include "types/iterables/LgsMap.h"
 #include "types/primitives/LgsBool.h"
@@ -15,7 +16,7 @@ LgsFunc* LgsIterable::getMethod(const std::string& methodName) {
     if (methodName == LEN_FUNC) {
         if (methods.contains(LEN_FUNC)) return methods[LEN_FUNC];
         const auto func = new LgsFunc(LEN_FUNC, getBaseName(), &LGS_SIZE, {this}, flags);
-        func->fn = [this](LgsCgModule& cg, const std::vector<LgsFuncArg>& args) {
+        func->fn = [this](LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) {
             return lenIR(cg, args.front().expr->IRValue);
         };
         addMethod(func);
@@ -89,21 +90,21 @@ LgsType* LgsIterable::getValueType() {
     return baseType;
 }
 
-void LgsIterable::addIRElement(LgsCgModule& cg, Value* iterable, Value* index, Value* value) {
+void LgsIterable::addIRElement(LgsCodeGen& cg, Value* iterable, Value* index, Value* value) {
     assert(0);
 }
 
 bool LgsIterable::unpackLoopVars(LgsForeachLoop* loop) const {
     if (loop->loopVars.size() > 1) return false;
     assert(baseType);
-    const auto iterIndex = new LgsIterIndex(loop->iterExpr, LGS_SIZE.getZeroValue());
+    const auto iterIndex = new LgsIterIndex(loop->iterExpr, new LgsIntConst(&LGS_SIZE, 0));
     iterIndex->setType(baseType);
     loop->loopVars[0]->expr = iterIndex;
     loop->loopVars[0]->setType(iterIndex->type);
     return true;
 }
 
-void LgsIterable::setLoopIRVars(LgsCgModule& cg, LgsForeachLoop* loop) {
+void LgsIterable::setLoopIRVars(LgsCodeGen& cg, LgsForeachLoop* loop) {
     const auto iterIndex = loop->loopVars[0]->expr->asIterIndex();
     iterIndex->index.from->IRValue = loop->loadIndex(cg);
     iterIndex->setIRElementPtr(cg);

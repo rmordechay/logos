@@ -16,6 +16,6 @@ public:
 
     explicit LgsAssignment(LgsBinaryExpr* binaryExpr) : binaryExpr(binaryExpr) {}
     explicit LgsAssignment(LgsExpr* left, LgsExpr* right) : left(left), right(right) {}
-    void setDebugValue(LgsCgModule& cg) override;
+    void setDebugValue(LgsCodeGen& cg) override;
     ~LgsAssignment() override;
 };

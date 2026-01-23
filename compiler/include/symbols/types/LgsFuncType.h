@@ -47,8 +47,8 @@ public:
         setFuncOptions(ops);
         passByRef = true;
     }
-    Type* getIRType(LgsCgModule& cg) override;
-    Constant* getRTType(LgsCgModule& cg) override;
+    Type* getIRType(LgsCodeGen& cg) override;
+    Constant* getRTType(LgsCodeGen& cg) override;
     LgsExpr* getZeroValue() override;
     LgsType* replaceGenerics(LgsType* replacement, std::unordered_map<std::string, LgsType*>& replacements) override;
     size_t sizeBytes() override;
@@ -60,7 +60,7 @@ public:
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     void setFuncOptions(uint32_t ops);
     std::unordered_map<std::string, LgsParam*> getParamsByName();
-    DIType* getDebugType(LgsCgModule& cg) override;
+    DIType* getDebugType(LgsCodeGen& cg) override;
     LgsFuncType* clone() override;
     void addSelf(LgsType* selfType);
     ~LgsFuncType() override;

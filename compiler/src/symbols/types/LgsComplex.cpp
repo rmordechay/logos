@@ -2,7 +2,7 @@
 
 #include "LgsBinaryTokens.h"
 #include "exprs/constants/LgsComplexConst.h"
-#include "codegen/LgsCgModule.h"
+#include "codegen/LgsCodeGen.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsBool.h"
 
@@ -16,14 +16,14 @@ size_t LgsComplex::sizeBytes() {
 }
 
 LgsExpr* LgsComplex::getZeroValue() {
-    return new LgsComplexConst(LGS_INT.getZeroValue(), LGS_INT.getZeroValue());
+    return new LgsComplexConst(realType->getZeroValue(), imaginaryType->getZeroValue());
 }
 
-Type* LgsComplex::getIRType(LgsCgModule& cg) {
+Type* LgsComplex::getIRType(LgsCodeGen& cg) {
     return cg.getStructType({realType->getIRType(cg), imaginaryType->getIRType(cg)}, name);
 }
 
-Constant* LgsComplex::getRTType(LgsCgModule& cg) {
+Constant* LgsComplex::getRTType(LgsCodeGen& cg) {
     const auto nullableName = getName();
     const std::vector<Type*> params = {cg.ptrTy(), cg.ptrTy()};
     const std::vector args = {realType->getRTType(cg), imaginaryType->getRTType(cg)};
@@ -36,7 +36,7 @@ bool LgsComplex::canCastTo(LgsType* other) {
     return false;
 }
 
-Value* LgsComplex::addIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+Value* LgsComplex::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
     const auto l = cg.load(getIRType(cg), left->IRValue);
@@ -55,7 +55,7 @@ Value* LgsComplex::addIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
     return result;
 }
 
-Value* LgsComplex::subIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+Value* LgsComplex::subIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto ty = getIRType(cg);
     const auto left = binExpr->left;
     const auto right = binExpr->right;
@@ -75,7 +75,7 @@ Value* LgsComplex::subIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
     return result;
 }
 
-Value* LgsComplex::mulIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+Value* LgsComplex::mulIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto ty = getIRType(cg);
     const auto left = binExpr->left;
     const auto right = binExpr->right;
@@ -106,7 +106,7 @@ Value* LgsComplex::mulIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
     return result;
 }
 
-Value* LgsComplex::divIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+Value* LgsComplex::divIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto ty = getIRType(cg);
     const auto left = binExpr->left;
     const auto right = binExpr->right;
@@ -144,7 +144,7 @@ std::string LgsComplex::fmtStr() const {
     return "%s";
 }
 
-DIType* LgsComplex::getDebugType(LgsCgModule& cg) {
+DIType* LgsComplex::getDebugType(LgsCodeGen& cg) {
     assert(0);
 }
 

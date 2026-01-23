@@ -5,11 +5,11 @@
 #include "stmts/LgsVarDec.h"
 #include "types/LgsNullable.h"
 
-#include <codegen/LgsCgModule.h>
+#include <codegen/LgsCodeGen.h>
 
 #include "types/LgsEnum.h"
 
-Value* LgsVariable::loadIR(LgsCgModule& cg) {
+Value* LgsVariable::loadIR(LgsCodeGen& cg) {
     switch (ref.symbolType) {
     case PARAM:
         return ref.param->loadIR(cg);
@@ -44,7 +44,7 @@ LgsExpr* LgsVariable::castExplicitly(LgsType* toType) {
     assert(0);
 }
 
-void LgsVariable::assign(LgsCgModule& cg, LgsExpr* right) {
+void LgsVariable::assign(LgsCodeGen& cg, LgsExpr* right) {
     if (type->isHeapAlloc) {
 
     } else {
@@ -56,7 +56,7 @@ std::string LgsVariable::asText() {
     return name;
 }
 
-void LgsVariable::setDebugValue(LgsCgModule& cg) {
+void LgsVariable::setDebugValue(LgsCodeGen& cg) {
     setDebugLoc(cg);
     const auto var = cg.debugger.diBuilder->createAutoVariable(
         cg.debugger.subprogram->getScope(),

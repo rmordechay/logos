@@ -3,11 +3,11 @@
 
 #include <cassert>
 
-Type* LgsGenericType::getIRType(LgsCgModule& cg) {
+Type* LgsGenericType::getIRType(LgsCodeGen& cg) {
     return nullptr;
 }
 
-Constant* LgsGenericType::getRTType(LgsCgModule& cg) {
+Constant* LgsGenericType::getRTType(LgsCodeGen& cg) {
     return nullptr;
 }
 
@@ -45,6 +45,6 @@ LgsType* LgsGenericType::clone() {
     return newGeneric;
 }
 
-DIType* LgsGenericType::getDebugType(LgsCgModule& cg) {
+DIType* LgsGenericType::getDebugType(LgsCodeGen& cg) {
     assert(0);
 }

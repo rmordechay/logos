@@ -1,15 +1,15 @@
 #include "types/LgsAny.h"
-#include "codegen/LgsCgModule.h"
+#include "codegen/LgsCodeGen.h"
 
 size_t LgsAny::sizeBytes() {
     return sizeof(void*);
 }
 
-Type* LgsAny::getIRType(LgsCgModule& cg) {
+Type* LgsAny::getIRType(LgsCodeGen& cg) {
     return cg.ptrTy();
 }
 
-Constant* LgsAny::getRTType(LgsCgModule& cg) {
+Constant* LgsAny::getRTType(LgsCodeGen& cg) {
     assert(0);
 }
 
@@ -33,6 +33,6 @@ bool LgsAny::canCastTo(LgsType*) {
     return true;
 }
 
-DIType* LgsAny::getDebugType(LgsCgModule& cg) {
+DIType* LgsAny::getDebugType(LgsCodeGen& cg) {
     assert(0);
 }

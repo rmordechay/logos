@@ -41,7 +41,7 @@ LgsFunc* LgsObject::getMethod(const std::string& methodName) {
     return nullptr;
 }
 
-Type* LgsObject::getIRType(LgsCgModule& cg) {
+Type* LgsObject::getIRType(LgsCodeGen& cg) {
     const auto type = cg.typesRegistry.find(name);
     if (type != cg.typesRegistry.end()) return type->second;
     std::vector<Type*> types = {cg.sizeTy(), cg.ptrTy()}; // First field is level
@@ -55,7 +55,7 @@ Type* LgsObject::getIRType(LgsCgModule& cg) {
     return IRType;
 }
 
-Constant* LgsObject::getRTType(LgsCgModule& cg) {
+Constant* LgsObject::getRTType(LgsCodeGen& cg) {
     const auto RTTName = LGS_TYPEINFO_PREFIX + name;
     if (const auto v = cg.IRModule->getGlobalVariable(RTTName)) return v;
     if (cg.mode != CG_MODE_RTTYPES) return cg.createGlobal(RTTName, cg.getRTTStructType(), nullptr);
@@ -135,7 +135,7 @@ std::string LgsObject::fmtStr() const {
     return str.str();
 }
 
-DIType* LgsObject::getDebugType(LgsCgModule& cg) {
+DIType* LgsObject::getDebugType(LgsCodeGen& cg) {
     assert(0);
 }
 

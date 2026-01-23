@@ -14,7 +14,7 @@ size_t LgsSize::sizeBytes() {
     return sizeof(size_t);
 }
 
-Type* LgsSize::getIRType(LgsCgModule& cg) {
+Type* LgsSize::getIRType(LgsCodeGen& cg) {
     return cg.sizeTy();
 }
 
@@ -65,7 +65,7 @@ LgsType* LgsSize::applyBinOp(LgsType* rightType, LgsBinOp& op) {
 
 }
 
-Constant* LgsSize::getRTType(LgsCgModule& cg) {
+Constant* LgsSize::getRTType(LgsCodeGen& cg) {
     return cg.getRTTypeInfo(getName(), IRSize(cg), RTT_SIZE);
 }
 
@@ -81,6 +81,6 @@ std::string LgsSize::fmtStr() const {
     return "%zu";
 }
 
-DIType* LgsSize::getDebugType(LgsCgModule& cg) {
+DIType* LgsSize::getDebugType(LgsCodeGen& cg) {
     assert(0);
 }

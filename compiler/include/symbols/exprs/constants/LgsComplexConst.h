@@ -8,8 +8,8 @@ public:
     LgsExpr* imaginary;
 
     LgsComplexConst(LgsExpr* real, LgsExpr* imaginary): real(real), imaginary(imaginary) {}
-    void setDebugValue(LgsCgModule& cg) override;
-    Value* loadIR(LgsCgModule& cg) override;
+    void setDebugValue(LgsCodeGen& cg) override;
+    Value* loadIR(LgsCodeGen& cg) override;
     std::string asText() override;
     ~LgsComplexConst() override;
 };

@@ -12,9 +12,9 @@ public:
     explicit LgsArrayExpr(LgsSArray* arrType) : LgsExpr(arrType) {}
     explicit LgsArrayExpr(LgsDArray* arrType) : LgsExpr(arrType) {}
     explicit LgsArrayExpr(LgsSet* setType) : LgsExpr(setType) {}
-    Value* loadIR(LgsCgModule& cg) override;
+    Value* loadIR(LgsCodeGen& cg) override;
     void castImplicitly(LgsType* toType) override;
-    void setDebugValue(LgsCgModule& cg) override;
+    void setDebugValue(LgsCodeGen& cg) override;
     std::string asText() override;
     LgsExpr* clone() override;
     ~LgsArrayExpr() override;

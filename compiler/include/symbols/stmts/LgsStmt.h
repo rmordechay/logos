@@ -8,7 +8,7 @@ class LgsSwitch;
 class LgsDeferStmt;
 class LgsCoroutine;
 class LgsPostfixExpr;
-class LgsCgModule;
+class LgsCodeGen;
 class LgsForLoop;
 class LgsVarDec;
 class LgsSelection;

@@ -21,7 +21,7 @@ class LgsIntConst;
 class LgsVectorExpr;
 class LgsPrefixExpr;
 class LgsPostfixExpr;
-class LgsCgModule;
+class LgsCodeGen;
 class LgsFunc;
 class LgsHashMap;
 class LgsFuncCall;
@@ -59,7 +59,7 @@ public:
     virtual void setType(LgsType* newType);
     virtual LgsExpr* castExplicitly(LgsType* toType);
     virtual void castImplicitly(LgsType* toType);
-    virtual void assign(LgsCgModule& cg, LgsExpr* right);
+    virtual void assign(LgsCodeGen& cg, LgsExpr* right);
     virtual bool equals(LgsExpr* other);
     virtual std::string asText() = 0;
 
@@ -94,7 +94,7 @@ public:
 
 void wrapInNullable(LgsExpr*& expr, LgsNullable* nullable);
 void castExprImplicitly(LgsExpr*& expr, LgsType* toType);
-Value* moveValue(LgsCgModule& cg, Value* left, Value* right, LgsType* type);
+Value* moveValue(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
 
 void freeExpr(LgsExpr* expr);
 template<typename T>

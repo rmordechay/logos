@@ -10,16 +10,16 @@ public:
     LgsBool() {
         isInt = true;
     }
-    Type* getIRType(LgsCgModule& cg) override;
-    Constant* getRTType(LgsCgModule& cg) override;
+    Type* getIRType(LgsCodeGen& cg) override;
+    Constant* getRTType(LgsCodeGen& cg) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     std::string getName() override;
     LgsExpr* getZeroValue() override;
     std::string fmtStr() const override;
-    Value* asIRStr(LgsCgModule& cg, Value* v) override;
+    Value* asIRStr(LgsCodeGen& cg, Value* v) override;
     size_t sizeBytes() override;
     bool canCastTo(LgsType* other) override;
-    DIType* getDebugType(LgsCgModule& cg) override;
+    DIType* getDebugType(LgsCodeGen& cg) override;
     LgsType* clone() override;
 };
 

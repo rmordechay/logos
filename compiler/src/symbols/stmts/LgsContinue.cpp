@@ -1,5 +1,5 @@
 #include "stmts/LgsContinue.h"
 
-void LgsContinue::setDebugValue(LgsCgModule& cg) {
+void LgsContinue::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }

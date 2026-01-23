@@ -3,7 +3,7 @@
 #include <llvm/IR/Module.h>
 
 #include "LgsBinaryTokens.h"
-#include "codegen/LgsCgModule.h"
+#include "codegen/LgsCodeGen.h"
 #include "exprs/LgsBinaryExpr.h"
 #include "exprs/constants/LgsFloatConst.h"
 #include "types/LgsAny.h"
@@ -15,7 +15,7 @@ std::string LgsFloat::getName() {
     return name;
 }
 
-Type* LgsFloat::getIRType(LgsCgModule& cg) {
+Type* LgsFloat::getIRType(LgsCodeGen& cg) {
     return Type::getFloatTy(cg.context);
 }
 
@@ -23,7 +23,7 @@ LgsExpr* LgsFloat::getZeroValue() {
     return new LgsFloatConst(this, 0.0);
 }
 
-Constant* LgsFloat::getRTType(LgsCgModule& cg) {
+Constant* LgsFloat::getRTType(LgsCodeGen& cg) {
     return cg.getRTTypeInfo(getName(), IRSize(cg), RTT_FLOAT);
 }
 
@@ -35,7 +35,7 @@ std::string LgsFloat::fmtStr() const {
     return "%.3f";
 }
 
-Value* LgsFloat::asIRStr(LgsCgModule& cg, Value* v) {
+Value* LgsFloat::asIRStr(LgsCodeGen& cg, Value* v) {
     return cg.callSnprintf(fmtStr(), {cg.builder.CreateFPExt(v, cg.doubleTy())});
 }
 
@@ -82,21 +82,21 @@ LgsType* LgsFloat::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     return nullptr;
 }
 
-Value* LgsFloat::addIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+Value* LgsFloat::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
     auto [l, r] = loadNumberPair(cg, left->loadIR(cg), right->loadIR(cg), cg.floatTy());
     return cg.builder.CreateFAdd(l, r);
 }
 
-Value* LgsFloat::subIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+Value* LgsFloat::subIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
     auto [l, r] = loadNumberPair(cg, left->loadIR(cg), right->loadIR(cg), cg.floatTy());
     return cg.builder.CreateFSub(l, r);
 }
 
-Value* LgsFloat::mulIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+Value* LgsFloat::mulIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
     if (left->type->asVec() && right->type->asVec()) {
@@ -107,14 +107,14 @@ Value* LgsFloat::mulIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
     return cg.builder.CreateFMul(l, r);
 }
 
-Value* LgsFloat::divIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+Value* LgsFloat::divIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
     auto [l, r] = loadNumberPair(cg, left->loadIR(cg), right->loadIR(cg), cg.floatTy());
     return cg.builder.CreateFDiv(l, r);
 }
 
-DIType* LgsFloat::getDebugType(LgsCgModule& cg) {
+DIType* LgsFloat::getDebugType(LgsCodeGen& cg) {
     assert(0);
 }
 

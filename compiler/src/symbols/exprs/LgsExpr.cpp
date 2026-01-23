@@ -144,7 +144,7 @@ void LgsExpr::castImplicitly(LgsType* toType) {
 
 }
 
-void LgsExpr::assign(LgsCgModule& cg, LgsExpr* right) {
+void LgsExpr::assign(LgsCodeGen& cg, LgsExpr* right) {
     assert(0);
 }
 
@@ -272,7 +272,7 @@ void castExprImplicitly(LgsExpr*& expr, LgsType* toType) {
     }
 }
 
-Value* moveValue(LgsCgModule& cg, Value* left, Value* right, LgsType* type) {
+Value* moveValue(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
     const std::vector<Type*> params = {cg.ptrTy(), cg.ptrTy()};
     if (type->asStr()) {
         const std::vector args = {left, right};

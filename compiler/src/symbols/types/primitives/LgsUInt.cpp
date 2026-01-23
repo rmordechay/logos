@@ -3,7 +3,7 @@
 #include <llvm/IR/Module.h>
 
 #include "exprs/constants/LgsIntConst.h"
-#include "codegen/LgsCgModule.h"
+#include "codegen/LgsCodeGen.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsInt.h"
 #include "types/primitives/LgsSize.h"
@@ -12,11 +12,11 @@ size_t LgsUInt::sizeBytes() {
     return sizeof(uint32_t);
 }
 
-Type* LgsUInt::getIRType(LgsCgModule& cg) {
+Type* LgsUInt::getIRType(LgsCodeGen& cg) {
     return cg.i32Ty();
 }
 
-Constant* LgsUInt::getRTType(LgsCgModule& cg) {
+Constant* LgsUInt::getRTType(LgsCodeGen& cg) {
     return cg.getRTTypeInfo(getName(), IRSize(cg), RTT_UINT);
 }
 
@@ -40,7 +40,7 @@ LgsType* LgsUInt::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     assert(0);
 }
 
-DIType* LgsUInt::getDebugType(LgsCgModule& cg) {
+DIType* LgsUInt::getDebugType(LgsCodeGen& cg) {
     assert(0);
 }
 

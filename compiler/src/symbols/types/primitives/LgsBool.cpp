@@ -10,11 +10,11 @@
 #include "types/primitives/LgsSize.h"
 #include "types/primitives/LgsUInt.h"
 
-Type* LgsBool::getIRType(LgsCgModule& cg) {
+Type* LgsBool::getIRType(LgsCodeGen& cg) {
     return cg.i1Ty();
 }
 
-Constant* LgsBool::getRTType(LgsCgModule& cg) {
+Constant* LgsBool::getRTType(LgsCodeGen& cg) {
     return cg.getRTTypeInfo(getName(), IRSize(cg), RTT_BOOL);
 }
 
@@ -34,7 +34,7 @@ std::string LgsBool::fmtStr() const {
     return "%s";
 }
 
-Value* LgsBool::asIRStr(LgsCgModule& cg, Value* v) {
+Value* LgsBool::asIRStr(LgsCodeGen& cg, Value* v) {
     return cg.builder.CreateSelect(v, cg.getString(trueLiteral), cg.getString(falseLiteral));
 }
 
@@ -55,7 +55,7 @@ bool LgsBool::canCastTo(LgsType* other) {
     return name == otherName;
 }
 
-DIType* LgsBool::getDebugType(LgsCgModule& cg) {
+DIType* LgsBool::getDebugType(LgsCodeGen& cg) {
     assert(0);
 }
 

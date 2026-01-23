@@ -7,7 +7,7 @@ public:
     BasicBlock* parentBlock = nullptr;
 
     explicit LgsReturn(LgsExpr* expr) : expr(expr) {}
-    void setDebugValue(LgsCgModule& cg) override;
+    void setDebugValue(LgsCodeGen& cg) override;
     LgsStmt* clone() override;
     ~LgsReturn() override;
 };

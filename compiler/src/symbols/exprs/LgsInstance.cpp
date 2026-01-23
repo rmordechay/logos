@@ -12,7 +12,7 @@ LgsExpr* LgsInstance::castExplicitly(LgsType* toType) {
     assert(0);
 }
 
-Value* LgsInstance::loadIR(LgsCgModule& cg) {
+Value* LgsInstance::loadIR(LgsCodeGen& cg) {
     return IRValue;
 }
 
@@ -35,7 +35,7 @@ bool LgsInstance::equals(LgsExpr* other) {
     assert(0);
 }
 
-void LgsInstance::setDebugValue(LgsCgModule& cg) {
+void LgsInstance::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }
 

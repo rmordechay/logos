@@ -37,7 +37,7 @@ void LgsStmtsBlock::hashNode(size_t& oldHash) {
     }
 }
 
-void LgsStmtsBlock::setDebugValue(LgsCgModule& cg) {
+void LgsStmtsBlock::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }
 

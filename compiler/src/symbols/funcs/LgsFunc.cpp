@@ -7,11 +7,11 @@
 #include "types/LgsFuncType.h"
 #include "types/primitives/LgsVoid.h"
 #include "LgsUtils.h"
-#include "codegen/LgsCgModule.h"
+#include "codegen/LgsCodeGen.h"
 #include <sstream>
 #include <llvm/IR/Module.h>
 
-Function* LgsFunc::getIRFunc(LgsCgModule& cg) {
+Function* LgsFunc::getIRFunc(LgsCodeGen& cg) {
     const auto funcName = funcType->getName();
     auto IRFunc = cg.IRModule->getFunction(funcName);
     if (IRFunc) return IRFunc;
@@ -30,7 +30,7 @@ Function* LgsFunc::getIRFunc(LgsCgModule& cg) {
     return IRFunc;
 }
 
-Value* LgsFunc::call(LgsCgModule& cg, std::vector<LgsFuncArg>& args) {
+Value* LgsFunc::call(LgsCodeGen& cg, std::vector<LgsFuncArg>& args) {
     if (fn) return fn(cg, args);
     if (args.empty()) return callIR(cg, {});
     if (funcType->isVariadic) return callWithVariadic(cg, args);
@@ -64,7 +64,7 @@ Value* LgsFunc::call(LgsCgModule& cg, std::vector<LgsFuncArg>& args) {
     return callIR(cg, IRArgs);
 }
 
-Value* LgsFunc::callIR(LgsCgModule& cg, const std::vector<Value*>& args) {
+Value* LgsFunc::callIR(LgsCodeGen& cg, const std::vector<Value*>& args) {
     Value* rv = nullptr;
     if (IRValue) {
         const auto funcTypeIR = funcType->getIRType(cg);
@@ -77,7 +77,7 @@ Value* LgsFunc::callIR(LgsCgModule& cg, const std::vector<Value*>& args) {
     return rv;
 }
 
-Value* LgsFunc::call(LgsCgModule& cg, const std::vector<LgsExpr*>& args) {
+Value* LgsFunc::call(LgsCodeGen& cg, const std::vector<LgsExpr*>& args) {
     std::vector<LgsFuncArg> funcArgs;
     for (const auto& arg : args) {
         funcArgs.push_back(LgsFuncArg(arg));
@@ -85,7 +85,7 @@ Value* LgsFunc::call(LgsCgModule& cg, const std::vector<LgsExpr*>& args) {
     return call(cg, funcArgs);
 }
 
-Value* LgsFunc::callWithVariadic(LgsCgModule& cg, const std::vector<LgsFuncArg>& args) {
+Value* LgsFunc::callWithVariadic(LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) {
     std::vector<Value*> IRArgs;
     const auto variadicOffset = funcType->params.size() - 1;
     for (size_t i = 0; i < variadicOffset; ++i) {
@@ -107,7 +107,7 @@ Value* LgsFunc::callWithVariadic(LgsCgModule& cg, const std::vector<LgsFuncArg>&
     return callIR(cg, IRArgs);
 }
 
-Value* LgsFunc::loadIR(LgsCgModule& cg) {
+Value* LgsFunc::loadIR(LgsCodeGen& cg) {
     return IRValue;
 }
 
@@ -160,7 +160,7 @@ void LgsFunc::hashNode(size_t& oldHash) {
     stmtsBlock->hashNode(oldHash);
 }
 
-void LgsFunc::setDebugValue(LgsCgModule& cg) {
+void LgsFunc::setDebugValue(LgsCodeGen& cg) {
     const auto diBuilder = cg.debugger.diBuilder;
     const auto dbInt32 = funcType->rt->getDebugType(cg);
     const auto parameterTypes = diBuilder->getOrCreateTypeArray({dbInt32});

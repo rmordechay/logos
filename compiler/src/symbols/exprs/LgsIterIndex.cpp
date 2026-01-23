@@ -8,7 +8,7 @@
 #include <sstream>
 #include <llvm/IR/Module.h>
 
-Value* LgsIterIndex::loadIR(LgsCgModule& cg) {
+Value* LgsIterIndex::loadIR(LgsCodeGen& cg) {
     const auto baseExprType = baseExpr->type;
     if (baseExprType->asMap() || baseExprType->asDArray() || baseExprType->asSet()) {
         return IRValue;
@@ -33,7 +33,7 @@ Value* LgsIterIndex::loadIR(LgsCgModule& cg) {
     assert(0);
 }
 
-void LgsIterIndex::setIRElementPtr(LgsCgModule& cg, const bool assign) {
+void LgsIterIndex::setIRElementPtr(LgsCodeGen& cg, const bool assign) {
     auto fromIR = index.from->IRValue;
     assert(baseExpr->IRValue);
 
@@ -87,7 +87,7 @@ LgsExpr* LgsIterIndex::getBaseExpr() const {
     }
 }
 
-void LgsIterIndex::setIRRangePtr(LgsCgModule& cg, bool assign) {
+void LgsIterIndex::setIRRangePtr(LgsCodeGen& cg, bool assign) {
     assert(!assign);
     const auto fromIR = index.from->IRValue;
     const auto toIR = index.to->IRValue;
@@ -113,7 +113,7 @@ void LgsIterIndex::setIRRangePtr(LgsCgModule& cg, bool assign) {
     }
 }
 
-void LgsIterIndex::assign(LgsCgModule& cg, LgsExpr* right) {
+void LgsIterIndex::assign(LgsCodeGen& cg, LgsExpr* right) {
     const auto iter = baseExpr->type->asIterable();
     assert(iter);
     if (const auto addFunc = iter->getMethod("add"); addFunc->fn) {
@@ -134,7 +134,7 @@ std::string LgsIterIndex::asText() {
     return str.str();
 }
 
-Type* LgsIterIndex::getSArrayType(LgsCgModule& cg) const {
+Type* LgsIterIndex::getSArrayType(LgsCodeGen& cg) const {
     auto current = this;
     while (true) {
         if (const auto nextIndex = current->baseExpr->asIterIndex()) {
@@ -145,7 +145,7 @@ Type* LgsIterIndex::getSArrayType(LgsCgModule& cg) const {
     }
 }
 
-void LgsIterIndex::setDebugValue(LgsCgModule& cg) {
+void LgsIterIndex::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }
 

@@ -7,7 +7,7 @@
 #include "types/primitives/LgsLong.h"
 #include "LgsUtils.h"
 
-Value* LgsIntConst::loadIR(LgsCgModule& cg) {
+Value* LgsIntConst::loadIR(LgsCodeGen& cg) {
     return IRValue;
 }
 
@@ -53,4 +53,4 @@ std::string LgsIntConst::asText() {
     return std::to_string(value);
 }
 
-void LgsIntConst::setDebugValue(LgsCgModule& cg) { /* do nothing */}
+void LgsIntConst::setDebugValue(LgsCodeGen& cg) { /* do nothing */}

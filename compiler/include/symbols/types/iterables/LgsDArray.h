@@ -19,8 +19,8 @@ public:
     }
     LgsFunc* getMethod(const std::string& methodName) override;
     bool inferBaseType(std::vector<LgsExpr*>& args) override;
-    Type* getIRType(LgsCgModule& cg) override;
-    Constant* getRTType(LgsCgModule& cg) override;
+    Type* getIRType(LgsCodeGen& cg) override;
+    Constant* getRTType(LgsCodeGen& cg) override;
     std::string getBaseName() override;
     std::string getName() override;
     std::string pname() override;
@@ -29,14 +29,14 @@ public:
     LgsExpr* getZeroValue() override;
     LgsType* replaceGenerics(LgsType* replacement, std::unordered_map<std::string, LgsType*>& replacements) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
-    Value* lenIR(LgsCgModule& cg, Value* iterable) override;
-    Value* inIR(LgsCgModule& cg, Value* iterable, Value* value) override;
-    Value* getIRElement(LgsCgModule& cg, Value* iterable, Value* index) override;
-    void addIRElement(LgsCgModule& cg, Value* iterable, Value* index, Value* value) override;
-    Function* generateArrEqFunc(LgsCgModule& cg);
-    Function* generateContainsFunc(LgsCgModule& cg);
-    Function* generateAddFunc(LgsCgModule& cg);
+    Value* lenIR(LgsCodeGen& cg, Value* iterable) override;
+    Value* inIR(LgsCodeGen& cg, Value* iterable, Value* value) override;
+    Value* getIRElement(LgsCodeGen& cg, Value* iterable, Value* index) override;
+    void addIRElement(LgsCodeGen& cg, Value* iterable, Value* index, Value* value) override;
+    Function* generateArrEqFunc(LgsCodeGen& cg);
+    Function* generateContainsFunc(LgsCodeGen& cg);
+    Function* generateAddFunc(LgsCodeGen& cg);
     std::string fmtStr() const override;
-    DIType* getDebugType(LgsCgModule& cg) override;
+    DIType* getDebugType(LgsCodeGen& cg) override;
     LgsType* clone() override;
 };

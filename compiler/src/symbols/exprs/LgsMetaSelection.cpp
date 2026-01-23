@@ -1,6 +1,6 @@
 #include "exprs/LgsMetaSelection.h"
 
-Value* LgsMetaSelection::loadIR(LgsCgModule& cg) {
+Value* LgsMetaSelection::loadIR(LgsCodeGen& cg) {
     assert(0);
 }
 
@@ -8,7 +8,7 @@ void LgsMetaSelection::hashNode(size_t& oldHash) {
     assert(0);
 }
 
-void LgsMetaSelection::setDebugValue(LgsCgModule& cg) {
+void LgsMetaSelection::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }
 

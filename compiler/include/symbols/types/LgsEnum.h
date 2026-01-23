@@ -10,16 +10,16 @@ public:
     explicit LgsEnum(const std::string& name) : name(name) {
         rtt = RTT_ENUM;
     }
-    Type* getIRType(LgsCgModule& cg) override;
-    Constant* getRTType(LgsCgModule& cg) override;
+    Type* getIRType(LgsCodeGen& cg) override;
+    Constant* getRTType(LgsCodeGen& cg) override;
     std::string getName() override;
     LgsExpr* getZeroValue() override;
     bool canCastTo(LgsType* other) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     std::string fmtStr() const override;
-    Value* asIRStr(LgsCgModule& cg, Value* v) override;
+    Value* asIRStr(LgsCodeGen& cg, Value* v) override;
     size_t sizeBytes() override;
-    DIType* getDebugType(LgsCgModule& cg) override;
+    DIType* getDebugType(LgsCodeGen& cg) override;
     ~LgsEnum() override;
 };
 

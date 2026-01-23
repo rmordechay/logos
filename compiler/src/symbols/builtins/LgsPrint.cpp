@@ -1,11 +1,14 @@
 #include "builtins/LgsPrint.h"
 #include <llvm/IR/Module.h>
+
+#include "LgsDefinitions.h"
 #include "exprs/LgsFuncCall.h"
 #include "types/LgsEnum.h"
 #include "types/iterables/LgsVec.h"
 #include "types/primitives/LgsBool.h"
 
-Value* LgsPrint::call(LgsCgModule& cg, std::vector<LgsFuncArg>& args) {
+Value* LgsPrint::call(LgsCodeGen& cg, std::vector<LgsFuncArg>& args) {
+    cg.builder.CreateCall(generateFmtFunc(cg), {cg.emptyBuffer(), cg.i32(0), cg.null(), cg.null()});
     const auto arg = args.empty() ? funcType->params.front().expr : args.front().expr;
     if (arg->type->asFloat()) {
         const auto fmt = cg.getString(arg->type->fmtStr() + "\n");
@@ -30,8 +33,29 @@ Value* LgsPrint::call(LgsCgModule& cg, std::vector<LgsFuncArg>& args) {
         }
         return cg.callPrintf(vecArgs);
     }
-    const std::vector<Type*> params = {cg.i32Ty(), cg.ptrTy(), cg.ptrTy()};
     assert(arg->type->rtt != RTT_UNKNOWN);
+    const std::vector<Type*> params = {cg.i32Ty(), cg.ptrTy(), cg.ptrTy()};
     const std::vector<Value*> IRArgs = {cg.i32(arg->type->rtt), arg->type->getRTType(cg), arg->IRValue};
     return cg.callLgsFunc("", name, cg.voidTy(), params, IRArgs);
+}
+
+Function* LgsPrint::generateFmtFunc(LgsCodeGen& cg) {
+    const auto funcName = "formatElemen";
+    if (const auto func = cg.IRModule->getFunction(funcName)) return func;
+    const auto ft = cg.getFT(cg.voidTy(), {cg.ptrTy(), cg.i32Ty(), cg.ptrTy(), cg.ptrTy()});
+    if (cg.mode == CG_MODE_SRC_CODE) return cg.getFunc(funcName, ft);
+    const auto func = cg.getFunc(funcName, ft);
+    const auto entryBlock = cg.createBlock(BLOCK_ENTRY, func);
+    const auto defaultBlock = cg.createBlock(BLOCK_DEFAULT);
+    cg.builder.SetInsertPoint(entryBlock);
+
+    const auto buffer = func->getArg(0);
+    const auto kind = func->getArg(1);
+    const auto rtt = func->getArg(2);
+    const auto value = func->getArg(3);
+    cg.builder.CreateSwitch(kind, defaultBlock);
+
+    cg.startBlock(defaultBlock);
+    cg.builder.CreateRetVoid();
+    return func;
 }

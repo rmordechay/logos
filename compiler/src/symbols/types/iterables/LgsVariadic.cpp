@@ -8,11 +8,11 @@ LgsExpr* LgsVariadic::getZeroValue() {
     assert(0);
 }
 
-Type* LgsVariadic::getIRType(LgsCgModule& cg) {
+Type* LgsVariadic::getIRType(LgsCodeGen& cg) {
     return baseType->getIRType(cg);
 }
 
-Constant* LgsVariadic::getRTType(LgsCgModule& cg) {
+Constant* LgsVariadic::getRTType(LgsCodeGen& cg) {
     return cg.getRTTypeInfo(getName(), IRSize(cg), RTT_VARIADIC);
 }
 
@@ -28,7 +28,7 @@ std::string LgsVariadic::fmtStr() const {
     assert(0);
 }
 
-DIType* LgsVariadic::getDebugType(LgsCgModule& cg) {
+DIType* LgsVariadic::getDebugType(LgsCodeGen& cg) {
     assert(0);
 }
 
@@ -44,15 +44,15 @@ bool LgsVariadic::inferBaseType(std::vector<LgsExpr*>& args) {
     assert(0);
 }
 
-Value* LgsVariadic::lenIR(LgsCgModule& cg, Value* iterable) {
+Value* LgsVariadic::lenIR(LgsCodeGen& cg, Value* iterable) {
     assert(cg.currentFunc->arg_size() > 1);
     return cg.currentFunc->getArg(cg.currentFunc->arg_size() - 2);
 }
 
-Value* LgsVariadic::inIR(LgsCgModule& cg, Value* iterableExpr, Value* value) {
+Value* LgsVariadic::inIR(LgsCodeGen& cg, Value* iterableExpr, Value* value) {
     assert(0);
 }
 
-Value* LgsVariadic::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
+Value* LgsVariadic::getIRElement(LgsCodeGen& cg, Value* iterable, Value* index) {
     return cg.builder.CreateVAArg(iterable, baseType->getIRType(cg));
 }

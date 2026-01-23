@@ -7,9 +7,9 @@ public:
     LgsExpr* child;
 
     LgsMetaSelection(LgsExpr* baseExpr, LgsExpr* expr): baseExpr(baseExpr), child(expr) {}
-    Value* loadIR(LgsCgModule& cg) override;
+    Value* loadIR(LgsCodeGen& cg) override;
     void hashNode(size_t& oldHash) override;
-    void setDebugValue(LgsCgModule& cg) override;
+    void setDebugValue(LgsCodeGen& cg) override;
     LgsExpr* castExplicitly(LgsType* toType) override;
     void castImplicitly(LgsType* toType) override;
     std::string asText() override;

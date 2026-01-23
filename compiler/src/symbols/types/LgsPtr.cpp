@@ -1,6 +1,6 @@
 #include "types/LgsPtr.h"
 
-#include "codegen/LgsCodeGen.h"
+#include "codegen/LgsCgModule.h"
 #include "types/LgsAny.h"
 #include "types/iterables/LgsDArray.h"
 #include "types/iterables/LgsSArray.h"
@@ -14,11 +14,11 @@ std::string LgsPtr::pname() {
     return name;
 }
 
-Type* LgsPtr::getIRType(LgsCgModule& cg) {
+Type* LgsPtr::getIRType(LgsCodeGen& cg) {
     return cg.ptrTy();
 }
 
-Constant* LgsPtr::getRTType(LgsCgModule& cg) {
+Constant* LgsPtr::getRTType(LgsCodeGen& cg) {
     assert(0);
 }
 
@@ -47,7 +47,7 @@ std::string LgsPtr::fmtStr() const {
     return baseType->fmtStr();
 }
 
-DIType* LgsPtr::getDebugType(LgsCgModule& cg) {
+DIType* LgsPtr::getDebugType(LgsCodeGen& cg) {
     assert(0);
 }
 

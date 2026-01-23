@@ -17,9 +17,9 @@ public:
     explicit LgsVarDec(const std::string& name, LgsExpr* expr) : name(name), expr(expr) {}
     LgsVarDec(const std::string& name, LgsType* type, LgsExpr* expr) : name(name), type(type), expr(expr) {}
     void setType(LgsType* newType);
-    Value* loadIR(LgsCgModule& cg) override;
+    Value* loadIR(LgsCodeGen& cg) override;
     bool shouldAllocate() const;
-    void setDebugValue(LgsCgModule& cg) override;
+    void setDebugValue(LgsCodeGen& cg) override;
     void hashNode(size_t& oldHash) override;
     ~LgsVarDec() override;
 };

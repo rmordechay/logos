@@ -1,12 +1,12 @@
 #include "exprs/LgsNullableExpr.h"
-#include "codegen/LgsCgModule.h"
+#include "codegen/LgsCodeGen.h"
 
-Value* LgsNullableExpr::loadIR(LgsCgModule& cg) {
+Value* LgsNullableExpr::loadIR(LgsCodeGen& cg) {
     if (isNull) return IRValue;
     return cg.load(type->getTypeOrPtr(cg), IRValue);
 }
 
-void LgsNullableExpr::assign(LgsCgModule& cg, LgsExpr* right) {
+void LgsNullableExpr::assign(LgsCodeGen& cg, LgsExpr* right) {
     if (!type->passByRef) {
         const auto isSet = cg.builder.CreateIsNotNull(right->IRValue);
         type->asNullable()->setNullableFields(cg, IRValue, right->IRValue, isSet);
@@ -15,7 +15,7 @@ void LgsNullableExpr::assign(LgsCgModule& cg, LgsExpr* right) {
     cg.store(right->IRValue, IRValue);
 }
 
-void LgsNullableExpr::setDebugValue(LgsCgModule& cg) {
+void LgsNullableExpr::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }
 

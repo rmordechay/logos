@@ -1,7 +1,7 @@
 #include "types/iterables/LgsDArray.h"
 #include "LgsBinaryTokens.h"
 #include "Lgs_Exprs.h"
-#include "codegen/LgsCgModule.h"
+#include "codegen/LgsCodeGen.h"
 #include "exprs/LgsArrayExpr.h"
 #include "types/primitives/LgsBool.h"
 #include <llvm/IR/Module.h>
@@ -11,7 +11,7 @@ LgsFunc* LgsDArray::getMethod(const std::string& methodName) {
     if (methodName == ADD_FUNC) {
         if (methods.contains(ADD_FUNC)) return methods[ADD_FUNC];
         const auto addFunc = new LgsFunc(ADD_FUNC, name, &LGS_VOID, {this, baseType}, flags);
-        addFunc->fn = [this](LgsCgModule& cg, const std::vector<LgsFuncArg>& args) {
+        addFunc->fn = [this](LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) {
             addIRElement(cg, args[0].expr->IRValue, nullptr, args[1].expr->IRValue);
             return nullptr;
         };
@@ -36,11 +36,11 @@ bool LgsDArray::inferBaseType(std::vector<LgsExpr*>& args) {
     return true;
 }
 
-Type* LgsDArray::getIRType(LgsCgModule& cg) {
+Type* LgsDArray::getIRType(LgsCodeGen& cg) {
     return cg.getStructType({cg.sizeTy(), cg.ptrTy(), cg.ptrTy(), cg.sizeTy(), cg.sizeTy()}, name);
 }
 
-Constant* LgsDArray::getRTType(LgsCgModule& cg) {
+Constant* LgsDArray::getRTType(LgsCodeGen& cg) {
     baseType->getRTType(cg);
     return cg.getRTTypeInfo(getName(), IRSize(cg), RTT_DARRAY);
 }
@@ -101,16 +101,16 @@ LgsType* LgsDArray::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     return nullptr;
 }
 
-Value* LgsDArray::lenIR(LgsCgModule& cg, Value* iterable) {
+Value* LgsDArray::lenIR(LgsCodeGen& cg, Value* iterable) {
     const auto lenFieldPtr = cg.builder.CreateStructGEP(getIRType(cg), iterable, lenIndex);
     return cg.load(cg.sizeTy(), lenFieldPtr);
 }
 
-Value* LgsDArray::inIR(LgsCgModule& cg, Value* iterable, Value* value) {
+Value* LgsDArray::inIR(LgsCodeGen& cg, Value* iterable, Value* value) {
     return cg.builder.CreateCall(generateContainsFunc(cg), {iterable, value});
 }
 
-Value* LgsDArray::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
+Value* LgsDArray::getIRElement(LgsCodeGen& cg, Value* iterable, Value* index) {
     const auto baseSize = baseType->IRSize(cg);
     const auto dataFieldPtr = cg.builder.CreateStructGEP(getIRType(cg), iterable, dataIndex);
     const auto offset = cg.builder.CreateMul(cg.extendToSize(index), baseSize);
@@ -122,7 +122,7 @@ Value* LgsDArray::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
     return ptr;
 }
 
-void LgsDArray::addIRElement(LgsCgModule& cg, Value* iterable, Value* index, Value* value) {
+void LgsDArray::addIRElement(LgsCodeGen& cg, Value* iterable, Value* index, Value* value) {
     if (index) assert(0);
     auto element = value;
     if (baseType->isHeapAlloc) {
@@ -131,7 +131,7 @@ void LgsDArray::addIRElement(LgsCgModule& cg, Value* iterable, Value* index, Val
     cg.builder.CreateCall(generateAddFunc(cg), {iterable, element});
 }
 
-Function* LgsDArray::generateArrEqFunc(LgsCgModule& cg) {
+Function* LgsDArray::generateArrEqFunc(LgsCodeGen& cg) {
     const auto funcName = getName() + "_" + EQUAL_FUNC;
     if (const auto func = cg.IRModule->getFunction(funcName)) return func;
     const auto ft = cg.getFT(cg.i1Ty(), {cg.ptrTy(), cg.ptrTy()});
@@ -145,10 +145,6 @@ Function* LgsDArray::generateArrEqFunc(LgsCgModule& cg) {
 
     const auto arrIR1 = func->getArg(0);
     const auto arrIR2 = func->getArg(1);
-    const auto tempArr1 = getZeroValue();
-    const auto tempArr2 = getZeroValue();
-    tempArr1->IRValue = arrIR1;
-    tempArr2->IRValue = arrIR2;
 
     cg.loop(lenIR(cg, arrIR1), [&](Value* iValue, BasicBlock*) {
         const auto elementPtr1 = getIRElement(cg, arrIR1, iValue);
@@ -160,11 +156,10 @@ Function* LgsDArray::generateArrEqFunc(LgsCgModule& cg) {
     });
 
     cg.builder.CreateRet(cg.true_());
-    freeExpr(tempArr2);
     return func;
 }
 
-Function* LgsDArray::generateContainsFunc(LgsCgModule& cg) {
+Function* LgsDArray::generateContainsFunc(LgsCodeGen& cg) {
     const auto funcName = getName() + "_" + CONTAINS_FUNC;
     if (const auto func = cg.IRModule->getFunction(funcName)) return func;
     const auto valueTy = baseType->getTypeOrPtr(cg);
@@ -180,31 +175,24 @@ Function* LgsDArray::generateContainsFunc(LgsCgModule& cg) {
 
     const auto arrIR = func->getArg(0);
     const auto value = func->getArg(1);
-    const auto tempArr = getZeroValue();
-    tempArr->IRValue = arrIR;
 
     cg.loop(lenIR(cg, arrIR), [&](Value* iValue, BasicBlock*) {
         LgsIntConst size(&LGS_SIZE, 0);
         size.IRValue = iValue;
-        const auto elementPtr = getIRElement(cg, tempArr->IRValue, size.IRValue);
+        const auto elementPtr = getIRElement(cg, arrIR, size.IRValue);
         const auto elementsAreEqual = eqIR(cg, value, elementPtr, baseType);
         cg.ifStmt(elementsAreEqual, [&cg] {cg.builder.CreateRet(cg.true_());});
     });
 
-    // Epilogue
     cg.builder.CreateRet(cg.false_());
-    freeExpr(tempArr);
     return func;
 }
 
-Function* LgsDArray::generateAddFunc(LgsCgModule& cg) {
+Function* LgsDArray::generateAddFunc(LgsCodeGen& cg) {
     const auto funcName = getName() + "_" + ADD_FUNC;
     if (const auto func = cg.IRModule->getFunction(funcName)) return func;
-    const auto valueTy = baseType->getTypeOrPtr(cg);
-    const auto ft = cg.getFT(cg.voidTy(), {cg.ptrTy(), valueTy});
-    if (cg.mode == CG_MODE_SRC_CODE) {
-        return cg.getFunc(funcName, ft);
-    }
+    const auto ft = cg.getFT(cg.voidTy(), {cg.ptrTy(), baseType->getTypeOrPtr(cg)});
+    if (cg.mode == CG_MODE_SRC_CODE) return cg.getFunc(funcName, ft);
 
     // Prologue
     const auto func = cg.getFunc(funcName, ft);
@@ -258,7 +246,7 @@ std::string LgsDArray::fmtStr() const {
     return "%p";
 }
 
-DIType* LgsDArray::getDebugType(LgsCgModule& cg) {
+DIType* LgsDArray::getDebugType(LgsCodeGen& cg) {
     assert(0);
 }
 

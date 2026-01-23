@@ -4,11 +4,11 @@
 
 #include <cassert>
 
-Type* LgsTypePair::getIRType(LgsCgModule& cg) {
+Type* LgsTypePair::getIRType(LgsCodeGen& cg) {
     assert(0);
 }
 
-Constant* LgsTypePair::getRTType(LgsCgModule& cg) {
+Constant* LgsTypePair::getRTType(LgsCodeGen& cg) {
     assert(0);
 }
 
@@ -42,7 +42,7 @@ LgsType* LgsTypePair::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     assert(0);
 }
 
-DIType* LgsTypePair::getDebugType(LgsCgModule& cg) {
+DIType* LgsTypePair::getDebugType(LgsCodeGen& cg) {
     assert(0);
 }
 

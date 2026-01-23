@@ -1,6 +1,6 @@
 #pragma once
 #include "LgsDefinitions.h"
-#include "codegen/LgsCgModule.h"
+#include "codegen/LgsCodeGen.h"
 #include "LgsSymbolTable.h"
 #include "errors/LgsErrHandler.h"
 
@@ -11,7 +11,7 @@ class LgsApp;
 class LgsFile {
 public:
     fs::path path;
-    LgsCgModule cg;
+    LgsCodeGen cg;
     LgsLocation location;
     LgsSymbolTable symbolTable;
 

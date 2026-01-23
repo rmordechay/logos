@@ -135,13 +135,17 @@ void LgsSema::visitEnum(LgsEnum* enum_) {
     LgsType* baseType = nullptr;
     for (const auto field : enum_->fields) {
         if (!field->expr) continue;
+        if (field->expr->isMutable) {
+            addError(E10077, field->expr->location);
+            continue;
+        }
+        field->type->passByRef = field->expr->type->passByRef;
         if (!baseType) {
             baseType = field->expr->type;
             continue;
         }
         if (!baseType->equals(field->expr->type)) {
-            addError(E10075, enum_->location);
-            return;
+            addError(E10075, field->location);
         }
     }
     enum_->subtype = baseType;
@@ -587,7 +591,7 @@ void LgsSema::visitRangeLoop(LgsRangeLoop* rangeLoop) {
             addError(E10081, startRange->location, {startRange->asText(), endRange->asText()});
         }
     } else {
-        rangeLoop->startRange = LGS_INT.getZeroValue();
+        rangeLoop->startRange = new LgsIntConst(&LGS_SIZE, 0);
     }
 
     if (!rangeLoop->loopVars.empty()) {
@@ -1715,9 +1719,9 @@ void LgsSema::createCoroutineFunc(LgsFuncCall* funcCall) {
 }
 
 void LgsSema::makeGenericFuncCall(LgsFuncCall* funcCall, const LgsFunc* func) {
-    const auto generics = file->symbolTable.generics.find(funcCall->getGenericName());
+    const auto generics = file->symbolTable.genericsExprs.find(funcCall->getGenericName());
     LgsFunc* genericFunc = nullptr;
-    if (generics != file->symbolTable.generics.end()) {
+    if (generics != file->symbolTable.genericsExprs.end()) {
         genericFunc = generics->second->asFunc();
     } else {
         const auto newFuncType = func->funcType->clone();
@@ -1765,7 +1769,7 @@ void LgsSema::addRTType(LgsType* type) const {
 
 void LgsSema::addGenerics(LgsType* type) const {
     if (!type->hasGenericTypes() && !type->asDArray() && !type->asMap()) return;
-    file->symbolTable.generics2[type->getName()] = type;
+    file->symbolTable.genericsTypes[type->getName()] = type;
 }
 
 static std::string getMissingImplementsStr(const std::vector<LgsField*>& fields, const std::vector<LgsFunc*>& methods) {

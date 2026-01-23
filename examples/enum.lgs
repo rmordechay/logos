@@ -1,0 +1,11 @@
+enum Enum {
+    ROI = "Roi"
+    ADI = "Adi"
+}
+
+main() {
+    print(Enum.ROI.value())
+    print(Enum.ROI.index())
+    print(Enum.ADI.value())
+    print(Enum.ADI.index())
+}

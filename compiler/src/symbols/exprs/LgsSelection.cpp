@@ -8,8 +8,9 @@
 #include <sstream>
 #include <llvm/IR/InlineAsm.h>
 
-Value* LgsSelection::loadIR(LgsCgModule& cg) {
+Value* LgsSelection::loadIR(LgsCodeGen& cg) {
     if (type->asEnum() || type->asEnumField()) return IRValue;
+    if (!type->passByRef && asMethodCall()) return IRValue;
     return cg.load(type->getTypeOrPtr(cg), IRValue);
 }
 
@@ -17,7 +18,7 @@ LgsFuncCall* LgsSelection::asMethodCall() const {
     return exprs.back()->asFuncCall();
 }
 
-void LgsSelection::assign(LgsCgModule& cg, LgsExpr* right) {
+void LgsSelection::assign(LgsCodeGen& cg, LgsExpr* right) {
     assert(!type->asVec());
     if (type->isHeapAlloc || right->type->isHeapAlloc) {
         moveValue(cg, IRValue, right->IRValue, type);
@@ -47,7 +48,7 @@ bool LgsSelection::equals(LgsExpr* other) {
     return true;
 }
 
-void LgsSelection::setDebugValue(LgsCgModule& cg) {
+void LgsSelection::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }
 

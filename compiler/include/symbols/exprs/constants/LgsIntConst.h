@@ -13,12 +13,12 @@ public:
     explicit LgsIntConst(const int64_t value) : LgsExpr(&LGS_INT), value(value) {
         isMutable = false;
     }
-    Value* loadIR(LgsCgModule& cg) override;
+    Value* loadIR(LgsCodeGen& cg) override;
     void castImplicitly(LgsType* toType) override;
     LgsExpr* castExplicitly(LgsType* toType) override;
     LgsIntConst* clone() override;
     std::string asText() override;
     bool equals(LgsExpr* other) override;
     void hashNode(size_t& oldHash) override;
-    void setDebugValue(LgsCgModule& cg) override;
+    void setDebugValue(LgsCodeGen& cg) override;
 };

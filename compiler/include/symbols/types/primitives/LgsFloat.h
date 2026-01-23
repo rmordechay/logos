@@ -8,20 +8,20 @@ public:
     LgsFloat() {
         isFloat = true;
     }
-    Type* getIRType(LgsCgModule& cg) override;
+    Type* getIRType(LgsCodeGen& cg) override;
     std::string getName() override;
     LgsExpr* getZeroValue() override;
-    Constant* getRTType(LgsCgModule& cg) override;
+    Constant* getRTType(LgsCodeGen& cg) override;
     size_t sizeBytes() override;
     std::string fmtStr() const override;
-    Value* asIRStr(LgsCgModule& cg, Value* v) override;
+    Value* asIRStr(LgsCodeGen& cg, Value* v) override;
     bool canCastTo(LgsType* other) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
-    Value* addIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) override;
-    Value* subIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) override;
-    Value* mulIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) override;
-    Value* divIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) override;
-    DIType* getDebugType(LgsCgModule& cg) override;
+    Value* addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
+    Value* subIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
+    Value* mulIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
+    Value* divIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
+    DIType* getDebugType(LgsCodeGen& cg) override;
     LgsType* clone() override;
 };
 

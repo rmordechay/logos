@@ -1,6 +1,6 @@
 #include "types/primitives/LgsByte.h"
 #include <llvm/IR/Module.h>
-#include "codegen/LgsCgModule.h"
+#include "codegen/LgsCodeGen.h"
 #include "exprs/constants/LgsIntConst.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsChar.h"
@@ -11,11 +11,11 @@
 #include "types/primitives/LgsSize.h"
 #include "types/primitives/LgsUInt.h"
 
-Type* LgsByte::getIRType(LgsCgModule& cg) {
+Type* LgsByte::getIRType(LgsCodeGen& cg) {
     return cg.i8Ty();
 }
 
-Constant* LgsByte::getRTType(LgsCgModule& cg) {
+Constant* LgsByte::getRTType(LgsCodeGen& cg) {
     return cg.getRTTypeInfo(getName(), IRSize(cg), RTT_BYTE);
 }
 
@@ -52,6 +52,6 @@ std::string LgsByte::fmtStr() const {
     return "%d";
 }
 
-DIType* LgsByte::getDebugType(LgsCgModule& cg) {
+DIType* LgsByte::getDebugType(LgsCodeGen& cg) {
     assert(0);
 }

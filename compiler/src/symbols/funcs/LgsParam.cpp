@@ -1,8 +1,8 @@
 #include "funcs/LgsParam.h"
 #include "LgsType.h"
-#include "codegen/LgsCgModule.h"
+#include "codegen/LgsCodeGen.h"
 
-Value* LgsParam::loadIR(LgsCgModule& cg) {
+Value* LgsParam::loadIR(LgsCodeGen& cg) {
     return IRValue;
 }
 
@@ -10,7 +10,7 @@ void LgsParam::setType(LgsType* newType) {
     type = newType;
 }
 
-void LgsParam::setDebugValue(LgsCgModule& cg) {
+void LgsParam::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }
 

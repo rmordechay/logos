@@ -1,9 +1,9 @@
 #include "LgsValue.h"
 
 #include "LgsType.h"
-#include "codegen/LgsCgModule.h"
+#include "codegen/LgsCodeGen.h"
 
-Value* LgsValue::loadIR(LgsCgModule& cg) {
+Value* LgsValue::loadIR(LgsCodeGen& cg) {
     assert(0);
 }
 
@@ -23,6 +23,6 @@ LgsType* LgsValue::getType() {
     assert(0);
 }
 
-void LgsValue::setDebugLoc(LgsCgModule& cg) const {
+void LgsValue::setDebugLoc(LgsCodeGen& cg) const {
     cg.builder.SetCurrentDebugLocation(cg.getDebugLoc(location));
 }

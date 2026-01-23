@@ -7,7 +7,7 @@ public:
     LgsExpr* value;
 
     LgsPair(LgsExpr* key, LgsExpr* value) : key(key), value(value) {}
-    void setDebugValue(LgsCgModule& cg) override;
+    void setDebugValue(LgsCodeGen& cg) override;
     std::string asText() override;
 };
 
@@ -18,7 +18,7 @@ public:
     LgsHashMap() = default;
     explicit LgsHashMap(LgsMap* mapType) : LgsExpr(mapType) {}
     void castImplicitly(LgsType* toType) override;
-    void setDebugValue(LgsCgModule& cg) override;
+    void setDebugValue(LgsCodeGen& cg) override;
     bool equals(LgsExpr* other) override;
     std::string asText() override;
     ~LgsHashMap() override;

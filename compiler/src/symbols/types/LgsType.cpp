@@ -92,8 +92,12 @@ bool LgsType::hasGenericTypes() {
     return false;
 }
 
-ConstantInt* LgsType::IRSize(LgsCgModule& cg) {
+ConstantInt* LgsType::IRSize(LgsCodeGen& cg) {
     return cg.usize(cg.getAllocSize(getIRType(cg)));
+}
+
+Type* LgsType::getTypeOrPtr(LgsCodeGen& cg) {
+    return passByRef ? cg.ptrTy() : getIRType(cg);
 }
 
 bool LgsType::addMethod(LgsFunc* method) {
@@ -114,19 +118,15 @@ LgsFunc* LgsType::getMethod(const std::string& methodName) {
     return nullptr;
 }
 
-Value* LgsType::hashValue(LgsCgModule& cg, Value* value) {
+Value* LgsType::hashValue(LgsCodeGen& cg, Value* value) {
     assert(0);
 }
 
-Type* LgsType::getTypeOrPtr(LgsCgModule& cg) {
-    return passByRef ? cg.ptrTy() : getIRType(cg);
-}
-
-Value* LgsType::asIRStr(LgsCgModule& cg, Value* v) {
+Value* LgsType::asIRStr(LgsCodeGen& cg, Value* v) {
     assert(0);
 }
 
-Constant* LgsType::getRTType(LgsCgModule& cg) {
+Constant* LgsType::getRTType(LgsCodeGen& cg) {
     assert(0);
 }
 
@@ -154,51 +154,51 @@ LgsType* LgsType::clone() {
     assert(0);
 }
 
-Value* LgsType::addIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+Value* LgsType::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     assert(0);
 }
 
-Value* LgsType::subIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+Value* LgsType::subIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     assert(0);
 }
 
-Value* LgsType::mulIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+Value* LgsType::mulIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     assert(0);
 }
 
-Value* LgsType::divIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+Value* LgsType::divIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     assert(0);
 }
 
-Value* LgsType::modIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+Value* LgsType::modIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     assert(0);
 }
 
-Value* LgsType::powIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+Value* LgsType::powIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     assert(0);
 }
 
-Value* LgsType::bitAndIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+Value* LgsType::bitAndIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     assert(0);
 }
 
-Value* LgsType::bitOrIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+Value* LgsType::bitOrIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     assert(0);
 }
 
-Value* LgsType::bitXorIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+Value* LgsType::bitXorIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     assert(0);
 }
 
-Value* LgsType::lshiftIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+Value* LgsType::lshiftIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     assert(0);
 }
 
-Value* LgsType::rshiftIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+Value* LgsType::rshiftIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     assert(0);
 }
 
-Value* LgsType::crossIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+Value* LgsType::crossIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     assert(0);
 }
 
@@ -339,17 +339,17 @@ LgsType::~LgsType() {
     fields.clear();
 }
 
-Value* exprEqNull(LgsCgModule& cg, Value* expr, LgsType* type) {
+Value* exprEqNull(LgsCodeGen& cg, Value* expr, LgsType* type) {
     if (type->passByRef) return cg.builder.CreateIsNull(expr);
     return cg.builder.CreateNot(type->asNullable()->getIsSet(cg, expr));
 }
 
-Value* exprNeNull(LgsCgModule& cg, Value* expr, LgsType* type) {
+Value* exprNeNull(LgsCodeGen& cg, Value* expr, LgsType* type) {
     if (type->passByRef) return cg.builder.CreateIsNotNull(expr);
     return type->asNullable()->getIsSet(cg, expr);
 }
 
-Value* eqIR(LgsCgModule& cg, Value* left, Value* right, LgsType* type) {
+Value* eqIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
     if (isa<ConstantPointerNull>(left) && isa<ConstantPointerNull>(right)) return cg.true_();
     if (isa<ConstantPointerNull>(left)) return exprEqNull(cg, right, type);
     if (isa<ConstantPointerNull>(right)) return exprEqNull(cg, left, type);
@@ -379,7 +379,7 @@ Value* eqIR(LgsCgModule& cg, Value* left, Value* right, LgsType* type) {
     assert(0);
 }
 
-Value* neIR(LgsCgModule& cg, Value* left, Value* right, LgsType* type) {
+Value* neIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
     if (isa<ConstantPointerNull>(left) && isa<ConstantPointerNull>(right)) return cg.false_();
     if (isa<ConstantPointerNull>(left)) return exprNeNull(cg, right, type);
     if (isa<ConstantPointerNull>(right)) return exprNeNull(cg, left, type);
@@ -402,7 +402,7 @@ Value* neIR(LgsCgModule& cg, Value* left, Value* right, LgsType* type) {
     assert(0);
 }
 
-Value* ltIR(LgsCgModule& cg, Value* left, Value* right, LgsType* type) {
+Value* ltIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
     if (type->isUnsinged) {
         return cg.builder.CreateICmpULT(left, right);
     }
@@ -416,7 +416,7 @@ Value* ltIR(LgsCgModule& cg, Value* left, Value* right, LgsType* type) {
     assert(0);
 }
 
-Value* gtIR(LgsCgModule& cg, Value* left, Value* right, LgsType* type) {
+Value* gtIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
     if (type->isUnsinged) {
         return cg.builder.CreateICmpUGT(left, right);
     }
@@ -430,7 +430,7 @@ Value* gtIR(LgsCgModule& cg, Value* left, Value* right, LgsType* type) {
     assert(0);
 }
 
-Value* geIR(LgsCgModule& cg, Value* left, Value* right, LgsType* type) {
+Value* geIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
     if (type->isUnsinged) {
         return cg.builder.CreateICmpUGE(left, right);
     }
@@ -444,7 +444,7 @@ Value* geIR(LgsCgModule& cg, Value* left, Value* right, LgsType* type) {
     assert(0);
 }
 
-Value* leIR(LgsCgModule& cg, Value* left, Value* right, LgsType* type) {
+Value* leIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
     if (type->isUnsinged) {
         return cg.builder.CreateICmpULE(left, right);
     }
@@ -458,7 +458,7 @@ Value* leIR(LgsCgModule& cg, Value* left, Value* right, LgsType* type) {
     assert(0);
 }
 
-Value* andIR(LgsCgModule& cg, Value* left, Value* right) {
+Value* andIR(LgsCodeGen& cg, Value* left, Value* right) {
     const auto currentBlock = cg.builder.GetInsertBlock();
     const auto func = currentBlock->getParent();
     const auto rightBlock = cg.createBlock("and_right", func);
@@ -473,7 +473,7 @@ Value* andIR(LgsCgModule& cg, Value* left, Value* right) {
     return phi;
 }
 
-Value* orIR(LgsCgModule& cg, Value* left, Value* right) {
+Value* orIR(LgsCodeGen& cg, Value* left, Value* right) {
     const auto currentBlock = cg.builder.GetInsertBlock();
     const auto func = currentBlock->getParent();
     const auto rightBlock = cg.createBlock("or_right", func);
@@ -511,7 +511,7 @@ LgsType* getBiggestIntType(const std::vector<LgsType*>& types) {
     return inferredType;
 }
 
-std::pair<Value*, Value*> loadNumberPair(LgsCgModule& cg, Value* left, Value* right, Type* type) {
+std::pair<Value*, Value*> loadNumberPair(LgsCodeGen& cg, Value* left, Value* right, Type* type) {
     const auto leftType = left->getType();
     const auto rightType = right->getType();
     if (leftType->isIntegerTy()) {

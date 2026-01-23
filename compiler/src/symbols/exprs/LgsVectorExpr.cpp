@@ -1,11 +1,11 @@
 #include "exprs/LgsVectorExpr.h"
 #include "LgsUtils.h"
 
-Value* LgsVectorExpr::loadIR(LgsCgModule& cg) {
+Value* LgsVectorExpr::loadIR(LgsCodeGen& cg) {
     return IRValue;
 }
 
-void LgsVectorExpr::setDebugValue(LgsCgModule& cg) {
+void LgsVectorExpr::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }
 

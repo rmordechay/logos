@@ -7,8 +7,8 @@ public:
     std::string name;
 
     explicit LgsUnknown(std::string name) : name(std::move(name)) {}
-    Type* getIRType(LgsCgModule& cg) override;
-    Constant* getRTType(LgsCgModule& cg) override;
+    Type* getIRType(LgsCodeGen& cg) override;
+    Constant* getRTType(LgsCodeGen& cg) override;
     std::string getName() override;
     std::string pname() override;
     LgsExpr* getZeroValue() override;
@@ -16,5 +16,5 @@ public:
     bool canCastTo(LgsType* other) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     std::string fmtStr() const override;
-    DIType* getDebugType(LgsCgModule& cg) override;
+    DIType* getDebugType(LgsCodeGen& cg) override;
 };

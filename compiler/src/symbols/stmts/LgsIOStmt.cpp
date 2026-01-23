@@ -9,6 +9,6 @@ LgsIOStmt::~LgsIOStmt() {
     }
 }
 
-void LgsIOStmt::setDebugValue(LgsCgModule& cg) {
+void LgsIOStmt::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }

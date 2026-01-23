@@ -1,9 +1,9 @@
 #include "exprs/LgsArrayExpr.h"
 #include "types/iterables/LgsSet.h"
 #include "LgsUtils.h"
-#include "codegen/LgsCgModule.h"
+#include "codegen/LgsCodeGen.h"
 
-Value* LgsArrayExpr::loadIR(LgsCgModule& cg) {
+Value* LgsArrayExpr::loadIR(LgsCodeGen& cg) {
     return IRValue;
 }
 
@@ -36,7 +36,7 @@ void LgsArrayExpr::castImplicitly(LgsType* toType) {
     }
 }
 
-void LgsArrayExpr::setDebugValue(LgsCgModule& cg) {
+void LgsArrayExpr::setDebugValue(LgsCodeGen& cg) {
     if (!IRValue) return;
     const auto di = cg.debugger.diBuilder;
     const auto file = cg.debugger.diFile;

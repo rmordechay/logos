@@ -1,10 +1,10 @@
 #include "exprs/constants/LgsFloatConst.h"
 #include "LgsType.h"
-#include "codegen/LgsCgModule.h"
+#include "codegen/LgsCodeGen.h"
 #include "exprs/constants/LgsIntConst.h"
 #include "types/LgsAny.h"
 
-Value* LgsFloatConst::loadIR(LgsCgModule& cg) {
+Value* LgsFloatConst::loadIR(LgsCodeGen& cg) {
     return IRValue;
 }
 
@@ -35,6 +35,6 @@ std::string LgsFloatConst::asText() {
     return std::to_string(value);
 }
 
-void LgsFloatConst::setDebugValue(LgsCgModule& cg) {
+void LgsFloatConst::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }

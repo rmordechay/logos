@@ -1,7 +1,7 @@
 #include "stmts/LgsReturn.h"
 #include "funcs/LgsFunc.h"
 
-void LgsReturn::setDebugValue(LgsCgModule& cg) {
+void LgsReturn::setDebugValue(LgsCodeGen& cg) {
     setDebugLoc(cg);
 }
 

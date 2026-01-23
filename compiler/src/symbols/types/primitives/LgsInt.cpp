@@ -18,7 +18,7 @@ size_t LgsInt::sizeBytes() {
     return sizeof(int);
 }
 
-Type* LgsInt::getIRType(LgsCgModule& cg) {
+Type* LgsInt::getIRType(LgsCodeGen& cg) {
     return cg.i32Ty();
 }
 
@@ -26,7 +26,7 @@ LgsExpr* LgsInt::getZeroValue() {
     return new LgsIntConst(&LGS_INT, 0);
 }
 
-Constant* LgsInt::getRTType(LgsCgModule& cg) {
+Constant* LgsInt::getRTType(LgsCodeGen& cg) {
     return cg.getRTTypeInfo(getName(), IRSize(cg), RTT_INT);
 }
 
@@ -73,7 +73,7 @@ LgsType* LgsInt::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     return nullptr;
 }
 
-Value* LgsInt::addIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+Value* LgsInt::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
     const auto l = cg.builder.CreateZExt(left->loadIR(cg), getIRType(cg));
@@ -81,7 +81,7 @@ Value* LgsInt::addIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
     return cg.builder.CreateAdd(l, r);
 }
 
-Value* LgsInt::subIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+Value* LgsInt::subIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
     const auto l = cg.builder.CreateZExt(left->loadIR(cg), getIRType(cg));
@@ -89,7 +89,7 @@ Value* LgsInt::subIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
     return cg.builder.CreateSub(l, r);
 }
 
-Value* LgsInt::mulIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+Value* LgsInt::mulIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
     const auto l = cg.builder.CreateZExt(left->loadIR(cg), getIRType(cg));
@@ -97,7 +97,7 @@ Value* LgsInt::mulIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
     return cg.builder.CreateMul(l, r);
 }
 
-Value* LgsInt::divIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+Value* LgsInt::divIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
     const auto l = cg.builder.CreateZExt(left->loadIR(cg), getIRType(cg));
@@ -105,43 +105,43 @@ Value* LgsInt::divIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
     return cg.builder.CreateSDiv(l, r);
 }
 
-Value* LgsInt::modIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+Value* LgsInt::modIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
     return cg.builder.CreateSRem(left->loadIR(cg), right->loadIR(cg));
 }
 
-Value* LgsInt::powIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+Value* LgsInt::powIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
     return cg.callFunc("pow", cg.doubleTy(), {cg.doubleTy(), cg.doubleTy()}, {left->loadIR(cg), right->loadIR(cg)});
 }
 
-Value* LgsInt::bitAndIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+Value* LgsInt::bitAndIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
     return cg.builder.CreateAnd(left->loadIR(cg), right->loadIR(cg));
 }
 
-Value* LgsInt::bitOrIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+Value* LgsInt::bitOrIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
     return cg.builder.CreateOr(left->loadIR(cg), right->loadIR(cg));
 }
 
-Value* LgsInt::bitXorIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+Value* LgsInt::bitXorIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
     return cg.builder.CreateXor(left->loadIR(cg), right->loadIR(cg));
 }
 
-Value* LgsInt::rshiftIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+Value* LgsInt::rshiftIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
     return cg.builder.CreateShl(left->loadIR(cg), right->loadIR(cg));
 }
 
-Value* LgsInt::lshiftIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+Value* LgsInt::lshiftIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
     return cg.builder.CreateLShr(left->loadIR(cg), right->loadIR(cg));
@@ -151,7 +151,7 @@ std::string LgsInt::fmtStr() const {
     return "%d";
 }
 
-Value* LgsInt::asIRStr(LgsCgModule& cg, Value* v) {
+Value* LgsInt::asIRStr(LgsCodeGen& cg, Value* v) {
     return cg.callSnprintf(fmtStr(), {v});
 }
 
@@ -163,6 +163,6 @@ LgsType* LgsInt::clone() {
     return this;
 }
 
-DIType* LgsInt::getDebugType(LgsCgModule& cg) {
+DIType* LgsInt::getDebugType(LgsCodeGen& cg) {
     return cg.debugger.diBuilder->createBasicType(name, 32, dwarf::DW_ATE_signed);
 }

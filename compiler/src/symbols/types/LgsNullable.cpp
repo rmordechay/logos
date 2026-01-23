@@ -2,7 +2,7 @@
 
 #include "LgsBinaryTokens.h"
 #include "LgsDefinitions.h"
-#include "codegen/LgsCgModule.h"
+#include "codegen/LgsCodeGen.h"
 #include "exprs/LgsExpr.h"
 #include "exprs/LgsNullableExpr.h"
 #include "types/LgsAny.h"
@@ -32,12 +32,12 @@ std::string LgsNullable::getName() {
     return baseType ? baseType->getName() + name : LGS_NULL_LITERAL;
 }
 
-Type* LgsNullable::getIRType(LgsCgModule& cg) {
+Type* LgsNullable::getIRType(LgsCodeGen& cg) {
     if (passByRef) return cg.ptrTy();
     return cg.getStructType({baseType->getIRType(cg), cg.i1Ty()}, getName());
 }
 
-Constant* LgsNullable::getRTType(LgsCgModule& cg) {
+Constant* LgsNullable::getRTType(LgsCodeGen& cg) {
     const auto nullableName = getName();
     if (!baseType) return cg.getRTTypeInfo(name, cg.sizeZero(), RTT_ANY);
     return cg.getRTTypeInfo(nullableName, IRSize(cg), RTT_NULLABLE);
@@ -55,7 +55,7 @@ std::string LgsNullable::fmtStr() const {
     assert(0);
 }
 
-DIType* LgsNullable::getDebugType(LgsCgModule& cg) {
+DIType* LgsNullable::getDebugType(LgsCodeGen& cg) {
     assert(0);
 }
 
@@ -87,38 +87,38 @@ LgsType* LgsNullable::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     return nullptr;
 }
 
-Value* LgsNullable::addIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+Value* LgsNullable::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto f = [this, &cg](LgsBinaryExpr* e) {
         return baseType->addIR(cg, e);
     };
     return passByRef ? applyPtrBinOp(cg, binExpr, f) : applyNumberBinOp(cg, binExpr, f);
 }
 
-void LgsNullable::setNullableFields(LgsCgModule& cg, Value* ptr, Value* value, Value* isSet) {
+void LgsNullable::setNullableFields(LgsCodeGen& cg, Value* ptr, Value* value, Value* isSet) {
     const auto ty = getIRType(cg);
     cg.storeStructField(ty, ptr, 0, value);
     cg.storeStructField(ty, ptr, 1, isSet);
 }
 
-Value* LgsNullable::getNullableValue(LgsCgModule& cg, Value* ptr) {
+Value* LgsNullable::getNullableValue(LgsCodeGen& cg, Value* ptr) {
     const auto valueField = cg.builder.CreateStructGEP(getIRType(cg), ptr, 0);
     return cg.load(baseType->getIRType(cg), valueField);
 }
 
-Value* LgsNullable::getIsSet(LgsCgModule& cg, Value* ptr) {
+Value* LgsNullable::getIsSet(LgsCodeGen& cg, Value* ptr) {
     const auto isSetField = cg.builder.CreateStructGEP(getIRType(cg), ptr, 1);
     return cg.load(cg.i1Ty(), isSetField);
 }
 
-void LgsNullable::storeNullableValue(LgsCgModule& cg, Value* ptr, Value* value) {
+void LgsNullable::storeNullableValue(LgsCodeGen& cg, Value* ptr, Value* value) {
     cg.storeStructField(getIRType(cg), ptr, 0, value);
 }
 
-void LgsNullable::storeIsSet(LgsCgModule& cg, Value* ptr, Value* value) {
+void LgsNullable::storeIsSet(LgsCodeGen& cg, Value* ptr, Value* value) {
     cg.storeStructField(getIRType(cg), ptr, 1, value);
 }
 
-Value* LgsNullable::applyNumberBinOp(LgsCgModule& cg, LgsBinaryExpr* binExpr, const std::function<Value*(LgsBinaryExpr*)>& func) {
+Value* LgsNullable::applyNumberBinOp(LgsCodeGen& cg, LgsBinaryExpr* binExpr, const std::function<Value*(LgsBinaryExpr*)>& func) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
     const auto ptr = cg.builder.CreateAlloca(getIRType(cg));
@@ -146,7 +146,7 @@ Value* LgsNullable::applyNumberBinOp(LgsCgModule& cg, LgsBinaryExpr* binExpr, co
     return ptr;
 }
 
-Value* LgsNullable::applyPtrBinOp(LgsCgModule& cg, LgsBinaryExpr* binExpr, const std::function<Value*(LgsBinaryExpr*)>& func) {
+Value* LgsNullable::applyPtrBinOp(LgsCodeGen& cg, LgsBinaryExpr* binExpr, const std::function<Value*(LgsBinaryExpr*)>& func) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
     const auto ptr = cg.builder.CreateAlloca(getIRType(cg));

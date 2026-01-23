@@ -2,7 +2,7 @@
 #include "exprs/LgsFuncCall.h"
 #include "exprs/LgsSelection.h"
 
-void LgsCoroutine::setDebugValue(LgsCgModule& cg) {
+void LgsCoroutine::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }
 

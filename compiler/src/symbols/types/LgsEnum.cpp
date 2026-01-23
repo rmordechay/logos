@@ -1,5 +1,5 @@
 #include "types/LgsEnum.h"
-#include "codegen/LgsCgModule.h"
+#include "codegen/LgsCodeGen.h"
 #include "stmts/LgsField.h"
 #include "types/LgsAny.h"
 
@@ -7,11 +7,11 @@ LgsExpr* LgsEnum::getZeroValue() {
     return nullptr;
 }
 
-Type* LgsEnum::getIRType(LgsCgModule& cg) {
+Type* LgsEnum::getIRType(LgsCodeGen& cg) {
     assert(0);
 }
 
-Constant* LgsEnum::getRTType(LgsCgModule& cg) {
+Constant* LgsEnum::getRTType(LgsCodeGen& cg) {
     return cg.getRTTypeInfo(name, IRSize(cg), rtt);
 }
 
@@ -33,7 +33,7 @@ std::string LgsEnum::fmtStr() const {
     return "%s";
 }
 
-Value* LgsEnum::asIRStr(LgsCgModule& cg, Value* v) {
+Value* LgsEnum::asIRStr(LgsCodeGen& cg, Value* v) {
     return cg.getString(name);
 }
 
@@ -41,7 +41,7 @@ size_t LgsEnum::sizeBytes() {
     return sizeof(void*);
 }
 
-DIType* LgsEnum::getDebugType(LgsCgModule& cg) {
+DIType* LgsEnum::getDebugType(LgsCodeGen& cg) {
     assert(0);
 }
 

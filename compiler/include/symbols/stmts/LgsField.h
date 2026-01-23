@@ -22,10 +22,10 @@ public:
 
     LgsField(const std::string& name, LgsType* type, LgsExpr* expr = nullptr) : name(name), type(type), expr(expr) {}
     void setType(LgsType* newType);
-    Value* getGEP(LgsCgModule& cg, Value* parentIRPtr) const;
-    Value* loadIR(LgsCgModule& cg) override;
+    Value* getGEP(LgsCodeGen& cg, Value* parentIRPtr) const;
+    Value* loadIR(LgsCodeGen& cg) override;
     std::string getName() override;
     LgsType* getType() override;
-    void setDebugValue(LgsCgModule& cg) override;
+    void setDebugValue(LgsCodeGen& cg) override;
     ~LgsField() override;
 };

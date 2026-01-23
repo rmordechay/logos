@@ -6,6 +6,6 @@ std::string LgsTypeExpr::asText() {
     return type->pname();
 }
 
-void LgsTypeExpr::setDebugValue(LgsCgModule& cg) {
+void LgsTypeExpr::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }

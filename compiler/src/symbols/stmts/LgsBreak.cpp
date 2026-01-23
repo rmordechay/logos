@@ -1,5 +1,5 @@
 #include "stmts/LgsBreak.h"
 
-void LgsBreak::setDebugValue(LgsCgModule& cg) {
+void LgsBreak::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }

@@ -9,23 +9,23 @@ public:
     explicit LgsStr(): LgsIterable(&LGS_CHAR) {
         rtt = RTT_STR;
     }
-    Type* getIRType(LgsCgModule& cg) override;
+    Type* getIRType(LgsCodeGen& cg) override;
     std::string getBaseName() override;
     std::string getName() override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
-    Constant* getRTType(LgsCgModule& cg) override;
+    Constant* getRTType(LgsCodeGen& cg) override;
     bool canCastTo(LgsType* other) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
-    Value* getIRElement(LgsCgModule& cg, Value* iterable, Value* index) override;
+    Value* getIRElement(LgsCodeGen& cg, Value* iterable, Value* index) override;
     bool inferBaseType(std::vector<LgsExpr*>& args) override;
-    Value* addIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) override;
-    Value* lenIR(LgsCgModule& cg, Value* iterable) override;
-    Value* inIR(LgsCgModule& cg, Value* iterableExpr, Value* value) override;
-    Value* hashValue(LgsCgModule& cg, Value* value) override;
+    Value* addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
+    Value* lenIR(LgsCodeGen& cg, Value* iterable) override;
+    Value* inIR(LgsCodeGen& cg, Value* iterableExpr, Value* value) override;
+    Value* hashValue(LgsCodeGen& cg, Value* value) override;
     std::string fmtStr() const override;
-    Value* asIRStr(LgsCgModule& cg, Value* v) override;
-    DIType* getDebugType(LgsCgModule& cg) override;
+    Value* asIRStr(LgsCodeGen& cg, Value* v) override;
+    DIType* getDebugType(LgsCodeGen& cg) override;
 };
 
 inline LgsStr LGS_STR;

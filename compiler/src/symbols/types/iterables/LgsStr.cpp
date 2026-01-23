@@ -9,7 +9,7 @@
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsChar.h"
 
-Type* LgsStr::getIRType(LgsCgModule& cg) {
+Type* LgsStr::getIRType(LgsCodeGen& cg) {
     return cg.getStructType({cg.sizeTy(), cg.ptrTy()}, name);
 }
 
@@ -29,7 +29,7 @@ LgsExpr* LgsStr::getZeroValue() {
     return new LgsStrConst("");
 }
 
-Constant* LgsStr::getRTType(LgsCgModule& cg) {
+Constant* LgsStr::getRTType(LgsCodeGen& cg) {
     return cg.getRTTypeInfo(getName(), IRSize(cg), RTT_STR);
 }
 
@@ -67,7 +67,7 @@ LgsType* LgsStr::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     return nullptr;
 }
 
-Value* LgsStr::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
+Value* LgsStr::getIRElement(LgsCodeGen& cg, Value* iterable, Value* index) {
     const auto gep =  cg.builder.CreateGEP(cg.i8Ty(), iterable, {cg.i32Zero(), index});
     return cg.load(cg.i8Ty(), gep);
 }
@@ -76,7 +76,7 @@ std::string LgsStr::fmtStr() const {
     return "\"%s\"";
 }
 
-Value* LgsStr::asIRStr(LgsCgModule& cg, Value* v) {
+Value* LgsStr::asIRStr(LgsCodeGen& cg, Value* v) {
     return cg.builder.CreateExtractValue(v, 1);
 }
 
@@ -84,7 +84,7 @@ bool LgsStr::inferBaseType(std::vector<LgsExpr*>& args) {
     assert(0);
 }
 
-Value* LgsStr::addIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+Value* LgsStr::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
     const auto leftStrConst = left->getConstStr();
@@ -141,23 +141,23 @@ Value* LgsStr::addIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
     return alloc;
 }
 
-Value* LgsStr::lenIR(LgsCgModule& cg, Value* iterable) {
+Value* LgsStr::lenIR(LgsCodeGen& cg, Value* iterable) {
     if (iterable->getType()->isIntegerTy() && cg.getAllocSize(iterable->getType()) == sizeof(char)) {
         return cg.usize(1);
     }
     return cg.callStrLen(iterable);
 }
 
-Value* LgsStr::inIR(LgsCgModule& cg, Value* iterableExpr, Value* value) {
+Value* LgsStr::inIR(LgsCodeGen& cg, Value* iterableExpr, Value* value) {
     const auto rv = cg.callFunc("strstr", cg.ptrTy(), {cg.ptrTy(), cg.ptrTy()}, {iterableExpr, value});
     return cg.builder.CreateIsNotNull(rv);
 }
 
-Value* LgsStr::hashValue(LgsCgModule& cg, Value* value) {
+Value* LgsStr::hashValue(LgsCodeGen& cg, Value* value) {
     return LgsIterable::hashValue(cg, value);
 }
 
-DIType* LgsStr::getDebugType(LgsCgModule& cg) {
+DIType* LgsStr::getDebugType(LgsCodeGen& cg) {
     const auto& diBuilder = cg.debugger.diBuilder;
     const auto charType = diBuilder->createBasicType("char", sizeof(char), dwarf::DW_ATE_signed_char);
     return diBuilder->createPointerType(charType, sizeof(void*));

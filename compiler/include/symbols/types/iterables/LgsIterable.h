@@ -1,10 +1,10 @@
 #pragma once
 #include "LgsType.h"
-#include "codegen/LgsCgModule.h"
+#include "codegen/LgsCodeGen.h"
 #include "types/LgsFuncType.h"
 
 class LgsForeachLoop;
-class LgsCgModule;
+class LgsCodeGen;
 class LgsVarDec;
 struct LgsIndex;
 struct CodegenMetadata;
@@ -35,11 +35,11 @@ public:
     virtual std::string getBaseName() = 0;
     virtual bool inferBaseType(std::vector<LgsExpr*>& args) = 0;
     virtual bool unpackLoopVars(LgsForeachLoop* loop) const;
-    virtual void setLoopIRVars(LgsCgModule& cg, LgsForeachLoop* loop);
+    virtual void setLoopIRVars(LgsCodeGen& cg, LgsForeachLoop* loop);
 
-    virtual Value* lenIR(LgsCgModule& cg, Value* iterable) = 0;
-    virtual Value* inIR(LgsCgModule& cg, Value* iterable, Value* value) = 0;
-    virtual Value* getIRElement(LgsCgModule& cg, Value* iterable, Value* index) = 0;
-    virtual void addIRElement(LgsCgModule& cg, Value* iterable, Value* index, Value* value);
+    virtual Value* lenIR(LgsCodeGen& cg, Value* iterable) = 0;
+    virtual Value* inIR(LgsCodeGen& cg, Value* iterable, Value* value) = 0;
+    virtual Value* getIRElement(LgsCodeGen& cg, Value* iterable, Value* index) = 0;
+    virtual void addIRElement(LgsCodeGen& cg, Value* iterable, Value* index, Value* value);
     ~LgsIterable() override;
 };

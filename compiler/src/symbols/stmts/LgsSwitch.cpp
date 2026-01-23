@@ -3,7 +3,7 @@
 #include "LgsUtils.h"
 #include "exprs/LgsExpr.h"
 
-void LgsSwitch::setDebugValue(LgsCgModule& cg) {
+void LgsSwitch::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }
 

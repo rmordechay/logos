@@ -30,7 +30,7 @@ public:
 
     explicit LgsStmtsBlock(const std::vector<LgsStmtWrapper>& stmts = {}) : stmts(stmts) {}
     void hashNode(size_t& oldHash) override;
-    void setDebugValue(LgsCgModule& cg) override;
+    void setDebugValue(LgsCodeGen& cg) override;
     LgsStmtsBlock* clone() override;
     ~LgsStmtsBlock() override;
 };

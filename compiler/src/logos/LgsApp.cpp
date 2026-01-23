@@ -7,7 +7,7 @@
 #include "builtins/LgsPrint.h"
 #include "builtins/LgsSys.h"
 #include "files/LgsEnvFile.h"
-#include "codegen/LgsCodeGen.h"
+#include "codegen/LgsCgModule.h"
 #include "codegen/LgsLinker.h"
 #include "LgsConfigs.h"
 #include "files/LgsTestFile.h"
@@ -158,15 +158,15 @@ bool LgsApp::analyse() {
 
 bool LgsApp::generate() {
     createBuildDirs();
-    LgsCgModule::initLLVM();
+    LgsCodeGen::initLLVM();
     if (!generateRTTTypes()) return false;
     if (!generateGenerics()) return false;
 
     // Main file is generated first non-concurrently
     const auto mainFile = getMainFile();
     assert(mainFile);
-    LgsCodeGen mainCodeGen(mainFile, configs, globals, paths);
-    if (!mainCodeGen.generate()) {
+    LgsCgModule mainModule(mainFile, configs, globals, paths);
+    if (!mainModule.generate()) {
         errHandler.setUnsuccessful();
         printIR();
         return false;
@@ -174,8 +174,8 @@ bool LgsApp::generate() {
     for (const auto& file : srcFiles) {
         if (file->isMain()) continue;
         threadPool.runTask([this, file] {
-            LgsCodeGen fileCodeCode(file, configs, globals, paths);
-            const auto successful = fileCodeCode.generate();
+            LgsCgModule fileModule(file, configs, globals, paths);
+            const auto successful = fileModule.generate();
             if (!successful) {
                 std::lock_guard lock(mtx);
                 errHandler.setUnsuccessful();
@@ -371,13 +371,13 @@ bool LgsApp::generateRTTTypes() {
 bool LgsApp::generateGenerics() {
     std::unordered_map<std::string, LgsType*> generics;
     for (const auto srcFile : srcFiles) {
-        generics.merge(srcFile->symbolTable.generics2);
+        generics.merge(srcFile->symbolTable.genericsTypes);
     }
     if (generics.empty()) return true;
     const auto file = new LgsFile("generics");
     file->cg.setupModule("generics");
     file->cg.mode = CG_MODE_GENERICS;
-    LgsCodeGen cg(file, configs, globals, paths);
+    LgsCgModule cg(file, configs, globals, paths);
     for (auto& [_, generic] : generics) {
         if (const auto dArr = generic->asDArray()) {
             dArr->generateAddFunc(cg.cg);
@@ -400,6 +400,8 @@ bool LgsApp::generateGenerics() {
             assert(0);
         }
     }
+    const auto printFunc = static_cast<LgsPrint*>(globals.table.getSymbol("print")->func);
+    printFunc->generateFmtFunc(cg.cg);
     genericFiles.push_back(file);
     return file->cg.writeIRModule(paths, configs.optLevel);
 }

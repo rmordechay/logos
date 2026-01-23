@@ -4,11 +4,11 @@
 #include "stmts/LgsField.h"
 #include "LgsUtils.h"
 #include "types/iterables/LgsVariadic.h"
-
 #include <sstream>
+
 bool argAndParamEqual(const LgsExpr* arg, const LgsParam* param);
 
-Value* LgsFuncCall::loadIR(LgsCgModule& cg) {
+Value* LgsFuncCall::loadIR(LgsCodeGen& cg) {
     return IRValue;
 }
 
@@ -118,7 +118,7 @@ std::string LgsFuncCall::asText() {
     return str.str();
 }
 
-void LgsFuncCall::setDebugValue(LgsCgModule& cg) {
+void LgsFuncCall::setDebugValue(LgsCodeGen& cg) {
     setDebugLoc(cg);
 }
 

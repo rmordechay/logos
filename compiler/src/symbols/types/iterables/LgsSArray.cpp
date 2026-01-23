@@ -1,13 +1,13 @@
 #include "types/iterables/LgsSArray.h"
 #include <llvm/IR/Module.h>
-#include "codegen/LgsCgModule.h"
+#include "codegen/LgsCodeGen.h"
 #include "exprs/LgsArrayExpr.h"
 #include "types/primitives/LgsBool.h"
 #include "exprs/LgsBinaryExpr.h"
 #include "lgsc/LgsCCompiler.h"
 #include "types/iterables/LgsStr.h"
 
-Type* LgsSArray::getIRType(LgsCgModule& cg) {
+Type* LgsSArray::getIRType(LgsCodeGen& cg) {
     return ArrayType::get(baseType->getIRType(cg), len);
 }
 
@@ -32,7 +32,7 @@ LgsExpr* LgsSArray::getZeroValue() {
     return new LgsArrayExpr(this);
 }
 
-Constant* LgsSArray::getRTType(LgsCgModule& cg) {
+Constant* LgsSArray::getRTType(LgsCodeGen& cg) {
     const auto RTTName = LGS_TYPEINFO_PREFIX + getName() + std::to_string(len);
     if (const auto v = cg.IRModule->getGlobalVariable(RTTName)) return v;
     if (cg.mode != CG_MODE_RTTYPES) return cg.createGlobal(RTTName, cg.getRTTStructType(), nullptr);
@@ -77,7 +77,7 @@ bool LgsSArray::inferBaseType(std::vector<LgsExpr*>& args) {
     return true;
 }
 
-Value* LgsSArray::addIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+Value* LgsSArray::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
     const auto baseIR = baseType->getIRType(cg);
@@ -96,7 +96,7 @@ Value* LgsSArray::addIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
     return newArr;
 }
 
-Value* LgsSArray::inIR(LgsCgModule& cg, Value* iterableExpr, Value* value) {
+Value* LgsSArray::inIR(LgsCodeGen& cg, Value* iterableExpr, Value* value) {
     const auto resultPtr = cg.builder.CreateAlloca(cg.builder.getInt1Ty());
     cg.store(cg.false_(), resultPtr);
     cg.loop(cg.usize(len), [this, &cg, iterableExpr, value, resultPtr](Value* index, BasicBlock* exitBlock) {
@@ -113,18 +113,18 @@ Value* LgsSArray::inIR(LgsCgModule& cg, Value* iterableExpr, Value* value) {
     return cg.load(cg.builder.getInt1Ty(), resultPtr);
 }
 
-Value* LgsSArray::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
+Value* LgsSArray::getIRElement(LgsCodeGen& cg, Value* iterable, Value* index) {
     const auto gep = cg.builder.CreateGEP(getIRType(cg), iterable, {cg.i32Zero(), index});
     return cg.load(baseType->getIRType(cg), gep);
 }
 
-void LgsSArray::addIRElement(LgsCgModule& cg, Value* iterable, Value* index, Value* value) {
+void LgsSArray::addIRElement(LgsCodeGen& cg, Value* iterable, Value* index, Value* value) {
     const std::vector<Value*> indices = {cg.i32Zero(), index};
     const auto gep = cg.builder.CreateInBoundsGEP(getIRType(cg), iterable, indices);
     cg.store(value, gep);
 }
 
-Value* LgsSArray::lenIR(LgsCgModule& cg, Value* iterable) {
+Value* LgsSArray::lenIR(LgsCodeGen& cg, Value* iterable) {
     return cg.usize(len);
 }
 
@@ -145,6 +145,6 @@ bool LgsSArray::equals(LgsType* other) {
     return len == otherArr->len;
 }
 
-DIType* LgsSArray::getDebugType(LgsCgModule& cg) {
+DIType* LgsSArray::getDebugType(LgsCodeGen& cg) {
     assert(0);
 }

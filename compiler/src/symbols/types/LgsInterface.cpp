@@ -1,5 +1,5 @@
 #include "types/LgsInterface.h"
-#include "codegen/LgsCgModule.h"
+#include "codegen/LgsCodeGen.h"
 #include "stmts/LgsField.h"
 #include "types/LgsObject.h"
 

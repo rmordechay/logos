@@ -15,10 +15,10 @@ public:
         type = str;
     }
     LgsExpr* castExplicitly(LgsType* toType) override;
-    Value* loadIR(LgsCgModule& cg) override;
+    Value* loadIR(LgsCodeGen& cg) override;
     std::string asText() override;
     void hashNode(size_t& oldHash) override;
     bool equals(LgsExpr* other) override;
-    void setDebugValue(LgsCgModule& cg) override;
+    void setDebugValue(LgsCodeGen& cg) override;
     ~LgsStrConst() override;
 };

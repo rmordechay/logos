@@ -14,7 +14,7 @@ LgsFunc* LgsMap::getMethod(const std::string& methodName) {
     if (methodName == ADD_FUNC) {
         if (methods.contains(ADD_FUNC)) return methods[ADD_FUNC];
         const auto func = new LgsFunc(ADD_FUNC, name, &LGS_VOID, {this, new LgsStr(), &LGS_ANY}, flags);
-        func->fn = [this](LgsCgModule& cg, const std::vector<LgsFuncArg>& args) {
+        func->fn = [this](LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) {
             addIRElement(cg, args[0].expr->IRValue, args[1].expr->IRValue, args[2].expr->IRValue);
             return nullptr;
         };
@@ -24,7 +24,7 @@ LgsFunc* LgsMap::getMethod(const std::string& methodName) {
     if (methodName == KEYS_FUNC_NAME) {
         if (methods.contains(KEYS_FUNC_NAME)) return methods[KEYS_FUNC_NAME];
         const auto func = new LgsFunc(KEYS_FUNC_NAME, name, new LgsDArray(pairType->key), {this}, flags);
-        func->fn = [](LgsCgModule& cg, const std::vector<LgsFuncArg>& args) {
+        func->fn = [](LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) {
             return nullptr;
         };
         addMethod(func);
@@ -33,7 +33,7 @@ LgsFunc* LgsMap::getMethod(const std::string& methodName) {
     if (methodName == VALUES_FUNC_NAME) {
         if (methods.contains(VALUES_FUNC_NAME)) return methods[VALUES_FUNC_NAME];
         const auto func = new LgsFunc(VALUES_FUNC_NAME, name, new LgsDArray(pairType->value), {this}, flags);
-        func->fn = [](LgsCgModule& cg, const std::vector<LgsFuncArg>& args) {
+        func->fn = [](LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) {
             return nullptr;
         };
         addMethod(func);
@@ -42,11 +42,11 @@ LgsFunc* LgsMap::getMethod(const std::string& methodName) {
     return LgsIterable::getMethod(methodName);
 }
 
-Type* LgsMap::getIRType(LgsCgModule& cg) {
+Type* LgsMap::getIRType(LgsCodeGen& cg) {
     return cg.getStructType({cg.ptrTy(), cg.sizeTy(), cg.sizeTy()}, name);
 }
 
-Constant* LgsMap::getRTType(LgsCgModule& cg) {
+Constant* LgsMap::getRTType(LgsCodeGen& cg) {
     return cg.getRTTypeInfo(getName(), IRSize(cg), RTT_MAP);
 }
 
@@ -98,45 +98,45 @@ bool LgsMap::inferBaseType(std::vector<LgsExpr*>& args) {
     assert(0);
 }
 
-Value* LgsMap::lenIR(LgsCgModule& cg, Value* iterable) {
+Value* LgsMap::lenIR(LgsCodeGen& cg, Value* iterable) {
     return cg.loadStructField(getIRType(cg), iterable, lenIndex, cg.sizeTy());
 }
 
-Value* LgsMap::inIR(LgsCgModule& cg, Value* iterableExpr, Value* value) {
+Value* LgsMap::inIR(LgsCodeGen& cg, Value* iterableExpr, Value* value) {
     assert(0);
 }
 
-Value* LgsMap::getIRElement(LgsCgModule& cg, Value* map, Value* index) {
+Value* LgsMap::getIRElement(LgsCodeGen& cg, Value* map, Value* index) {
     return cg.builder.CreateCall(generateGetFunc(cg), {map, index});
 }
 
-void LgsMap::addIRElement(LgsCgModule& cg, Value* map, Value* index, Value* value) {
+void LgsMap::addIRElement(LgsCodeGen& cg, Value* map, Value* index, Value* value) {
     cg.builder.CreateCall(generateAddFunc(cg), {map, index, value, cg.usize(0)});
 }
 
-StructType* LgsMap::getEntryStruct(LgsCgModule& cg) const {
+StructType* LgsMap::getEntryStruct(LgsCodeGen& cg) const {
     const auto keyTy = pairType->key->getIRType(cg);
     const auto valueTy = pairType->value->getIRType(cg);
     return cg.getStructType({keyTy, valueTy, cg.ptrTy()}, pairType->getName());
 }
 
-Value* LgsMap::loadEntriesField(LgsCgModule& cg, Value* map) {
+Value* LgsMap::loadEntriesField(LgsCodeGen& cg, Value* map) {
     return cg.loadStructField(getIRType(cg), map, entriesIndex, cg.ptrTy());
 }
 
-Value* LgsMap::loadCapField(LgsCgModule& cg, Value* map) {
+Value* LgsMap::loadCapField(LgsCodeGen& cg, Value* map) {
     return cg.loadStructField(getIRType(cg), map, capIndex, cg.sizeTy());
 }
 
-Value* LgsMap::getEntryKey(LgsCgModule& cg, Value* entry) const {
+Value* LgsMap::getEntryKey(LgsCodeGen& cg, Value* entry) const {
     return cg.builder.CreateStructGEP(getEntryStruct(cg), entry, keyIndex);
 }
 
-Value* LgsMap::getEntryValue(LgsCgModule& cg, Value* entry) const {
+Value* LgsMap::getEntryValue(LgsCodeGen& cg, Value* entry) const {
     return cg.builder.CreateStructGEP(getEntryStruct(cg), entry, valueIndex);
 }
 
-Value* LgsMap::getEntryNext(LgsCgModule& cg, Value* entry) const {
+Value* LgsMap::getEntryNext(LgsCodeGen& cg, Value* entry) const {
     return cg.builder.CreateStructGEP(getEntryStruct(cg), entry, nextIndex);
 }
 
@@ -153,7 +153,7 @@ bool LgsMap::unpackLoopVars(LgsForeachLoop* loop) const {
     return false;
 }
 
-void LgsMap::setLoopIRVars(LgsCgModule& cg, LgsForeachLoop* loop) {
+void LgsMap::setLoopIRVars(LgsCodeGen& cg, LgsForeachLoop* loop) {
     const auto map = loop->iterExpr->IRValue;
     const auto mapTy = getIRType(cg);
     const auto checkEntryBlock = cg.createBlock("check_entry");
@@ -189,11 +189,11 @@ std::string LgsMap::fmtStr() const {
     return "%s";
 }
 
-DIType* LgsMap::getDebugType(LgsCgModule& cg) {
+DIType* LgsMap::getDebugType(LgsCodeGen& cg) {
     assert(0);
 }
 
-Function* LgsMap::generateGetFunc(LgsCgModule& cg) {
+Function* LgsMap::generateGetFunc(LgsCodeGen& cg) {
     const auto funcName = getName() + "_" + GET_FUNC;
     if (const auto func = cg.IRModule->getFunction(funcName)) return func;
     const auto keyTy = pairType->key->getTypeOrPtr(cg);
@@ -235,7 +235,6 @@ Function* LgsMap::generateGetFunc(LgsCgModule& cg) {
 
     // Keys comparison
     cg.startBlock(keyCompareBlock);
-    const auto indexTemp2 = pairType->key->getZeroValue();
     currentEntry = cg.load(cg.ptrTy(), currentEntryPtr);
     const auto keyLoad = cg.load(keyTy, getEntryKey(cg, currentEntry));
     const auto keysEqual = eqIR(cg, keyIR, keyLoad, pairType->key);
@@ -253,12 +252,10 @@ Function* LgsMap::generateGetFunc(LgsCgModule& cg) {
     cg.startBlock(keysEqualBlock);
     currentEntry = cg.load(cg.ptrTy(), currentEntryPtr);
     cg.builder.CreateRet(cg.load(valueTy, getEntryValue(cg, currentEntry)));
-
-    freeExpr(indexTemp2);
     return func;
 }
 
-Function* LgsMap::generateAddFunc(LgsCgModule& cg) {
+Function* LgsMap::generateAddFunc(LgsCodeGen& cg) {
     const auto funcName = getName() + "_" + ADD_FUNC;
     if (const auto func = cg.IRModule->getFunction(funcName)) return func;
     const auto valueTy = pairType->value->getTypeOrPtr(cg);
@@ -332,10 +329,8 @@ Function* LgsMap::generateAddFunc(LgsCgModule& cg) {
 
     // Keys with same hash
     cg.startBlock(keyCompareBlock);
-    const auto indexTemp2 = pairType->key->getZeroValue();
     entryLoad = cg.load(cg.ptrTy(), entryAlloca);
     const auto loadKey = cg.load(pairType->key->getIRType(cg), getEntryKey(cg, entryLoad));
-    indexTemp2->IRValue = loadKey;
     const auto keysAreEqual = eqIR(cg, keyIR, loadKey, pairType->key);
     cg.builder.CreateCondBr(keysAreEqual, equalBlock, notEqualBlock);
 
@@ -368,6 +363,5 @@ Function* LgsMap::generateAddFunc(LgsCgModule& cg) {
     cg.branchAndStartBlock(exitBlock);
 
     cg.builder.CreateRetVoid();
-    freeExpr(indexTemp2);
     return func;
 }

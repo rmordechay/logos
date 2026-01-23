@@ -1,8 +1,8 @@
 #include "exprs/constants/LgsCharConst.h"
 
-#include "codegen/LgsCgModule.h"
+#include "codegen/LgsCodeGen.h"
 
-Value* LgsCharConst::loadIR(LgsCgModule& cg) {
+Value* LgsCharConst::loadIR(LgsCodeGen& cg) {
     return IRValue;
 }
 
@@ -14,6 +14,6 @@ std::string LgsCharConst::asText() {
     return type->pname();
 }
 
-void LgsCharConst::setDebugValue(LgsCgModule& cg) {
+void LgsCharConst::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }

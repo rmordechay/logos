@@ -11,11 +11,11 @@
 #include "types/primitives/LgsShort.h"
 #include "types/primitives/LgsSize.h"
 
-Type* LgsLong::getIRType(LgsCgModule& cg) {
+Type* LgsLong::getIRType(LgsCodeGen& cg) {
     return cg.i64Ty();
 }
 
-Constant* LgsLong::getRTType(LgsCgModule& cg) {
+Constant* LgsLong::getRTType(LgsCodeGen& cg) {
     return cg.getRTTypeInfo(getName(), IRSize(cg), RTT_LONG);
 }
 
@@ -47,7 +47,7 @@ bool LgsLong::canCastTo(LgsType* other) {
     return name == otherName;
 }
 
-DIType* LgsLong::getDebugType(LgsCgModule& cg) {
+DIType* LgsLong::getDebugType(LgsCodeGen& cg) {
     assert(0);
 }
 

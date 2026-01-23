@@ -1,9 +1,9 @@
 #include "symbols/exprs/constants/LgsComplexConst.h"
 
-void LgsComplexConst::setDebugValue(LgsCgModule& cg) {
+void LgsComplexConst::setDebugValue(LgsCodeGen& cg) {
 }
 
-Value* LgsComplexConst::loadIR(LgsCgModule& cg) {
+Value* LgsComplexConst::loadIR(LgsCodeGen& cg) {
     return LgsExpr::loadIR(cg);
 }
 

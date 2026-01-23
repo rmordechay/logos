@@ -26,11 +26,11 @@ LgsField* LgsVec::getField(const std::string& fieldName) {
     return field;
 }
 
-Type* LgsVec::getIRType(LgsCgModule& cg) {
+Type* LgsVec::getIRType(LgsCodeGen& cg) {
     return FixedVectorType::get(baseType->getIRType(cg), dimVec);
 }
 
-Constant* LgsVec::getRTType(LgsCgModule& cg) {
+Constant* LgsVec::getRTType(LgsCodeGen& cg) {
     if (dimVec == 2) {
         return cg.getRTTypeInfo(getName(), IRSize(cg), RTT_VEC2);
     }
@@ -133,7 +133,7 @@ bool LgsVec::inferBaseType(std::vector<LgsExpr*>& args) {
     return !!baseType;
 }
 
-Value* LgsVec::addIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+Value* LgsVec::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
     const auto rtype = right->type;
@@ -149,7 +149,7 @@ Value* LgsVec::addIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
     return cg.builder.CreateAdd(l, r);
 }
 
-Value* LgsVec::subIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+Value* LgsVec::subIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
     const auto rtype = right->type;
@@ -165,7 +165,7 @@ Value* LgsVec::subIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
     return cg.builder.CreateSub(l, r);
 }
 
-Value* LgsVec::mulIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+Value* LgsVec::mulIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
     if (left->type->asMatrix() && right->type->asVec()) {
@@ -184,7 +184,7 @@ Value* LgsVec::mulIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
     return cg.builder.CreateMul(l, r);
 }
 
-Value* LgsVec::divIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+Value* LgsVec::divIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
     auto [l, r] = loadNumberPair(cg, left->loadIR(cg), right->loadIR(cg), cg.floatTy());
@@ -194,7 +194,7 @@ Value* LgsVec::divIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
     return cg.builder.CreateFDiv(l, r);
 }
 
-Value* LgsVec::modIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+Value* LgsVec::modIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
     auto [l, r] = loadNumberPair(cg, left->loadIR(cg), right->loadIR(cg), cg.floatTy());
@@ -204,14 +204,14 @@ Value* LgsVec::modIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
     return cg.builder.CreateFRem(l, r);
 }
 
-Value* LgsVec::crossIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) {
+Value* LgsVec::crossIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
     const auto crossFunc = crossProductFunc(cg, left->type->asVec());
     return cg.builder.CreateCall(crossFunc, {left->loadIR(cg), right->loadIR(cg)});
 }
 
-Value* LgsVec::inIR(LgsCgModule& cg, Value* iterableExpr, Value* value) {
+Value* LgsVec::inIR(LgsCodeGen& cg, Value* iterableExpr, Value* value) {
     const auto resultPtr = cg.builder.CreateAlloca(cg.i1Ty());
     cg.store(cg.false_(), resultPtr);
     cg.loop(cg.i64(dimVec), [this, &cg, iterableExpr, value, resultPtr](Value* index, BasicBlock* exitBlock) {
@@ -228,11 +228,11 @@ Value* LgsVec::inIR(LgsCgModule& cg, Value* iterableExpr, Value* value) {
     return cg.load(cg.i1Ty(), resultPtr);
 }
 
-Value* LgsVec::lenIR(LgsCgModule& cg, Value* iterable) {
+Value* LgsVec::lenIR(LgsCodeGen& cg, Value* iterable) {
     return cg.usize(dimVec);
 }
 
-Value* LgsVec::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
+Value* LgsVec::getIRElement(LgsCodeGen& cg, Value* iterable, Value* index) {
     Value* vec = iterable;
     if (iterable->getType()->isPointerTy()) {
         vec = cg.load(getIRType(cg), iterable);
@@ -240,12 +240,12 @@ Value* LgsVec::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
     return cg.builder.CreateExtractElement(vec, index);
 }
 
-void LgsVec::addIRElement(LgsCgModule& cg, Value* iterable, Value* index, Value* value) {
+void LgsVec::addIRElement(LgsCodeGen& cg, Value* iterable, Value* index, Value* value) {
     const auto gep = cg.builder.CreateGEP(getIRType(cg), iterable, {cg.i32Zero(), index});
     cg.store(value, gep);
 }
 
-Value* LgsVec::matVecMul(LgsCgModule& cg, const LgsExpr* left, LgsExpr* right) const {
+Value* LgsVec::matVecMul(LgsCodeGen& cg, const LgsExpr* left, LgsExpr* right) const {
     const auto mat = left->type->asMatrix();
     const auto order = cg.i32(CblasRowMajor);
     const auto transpose = cg.i32(CblasNoTrans);
@@ -310,7 +310,7 @@ std::string LgsVec::fmtStr() const {
     return str.str();
 }
 
-Value* LgsVec::asIRStr(LgsCgModule& cg, Value* v) {
+Value* LgsVec::asIRStr(LgsCodeGen& cg, Value* v) {
     std::vector<Value*> vecArgs;
     for (size_t i = 0; i < dimVec; ++i) {
         const auto element = cg.builder.CreateExtractValue(v, i);
@@ -319,11 +319,11 @@ Value* LgsVec::asIRStr(LgsCgModule& cg, Value* v) {
     return cg.callSnprintf(fmtStr(), vecArgs);
 }
 
-DIType* LgsVec::getDebugType(LgsCgModule& cg) {
+DIType* LgsVec::getDebugType(LgsCodeGen& cg) {
     assert(0);
 }
 
-Function* dotProductFunc(LgsCgModule& cg, LgsVec* vecType) {
+Function* dotProductFunc(LgsCodeGen& cg, LgsVec* vecType) {
     const auto name = LGS_PREFIX + vecType->getName() + vecType->baseType->getName() + "Dot";
     auto func = cg.IRModule->getFunction(name);
     if (func) return func;
@@ -366,7 +366,7 @@ Function* dotProductFunc(LgsCgModule& cg, LgsVec* vecType) {
     return func;
 }
 
-Function* crossProductFunc(LgsCgModule& cg, LgsVec* vecType) {
+Function* crossProductFunc(LgsCodeGen& cg, LgsVec* vecType) {
     assert(vecType->dimVec == 3);
     const auto name = LGS_PREFIX + vecType->getName() + vecType->baseType->getName() + "Cross";
     auto func = cg.IRModule->getFunction(name);

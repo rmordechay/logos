@@ -30,14 +30,14 @@ std::string LgsUnknown::fmtStr() const {
     assert(0);
 }
 
-DIType* LgsUnknown::getDebugType(LgsCgModule& cg) {
+DIType* LgsUnknown::getDebugType(LgsCodeGen& cg) {
     assert(0);
 }
 
-Type* LgsUnknown::getIRType(LgsCgModule& cg) {
+Type* LgsUnknown::getIRType(LgsCodeGen& cg) {
     assert(0);
 }
 
-Constant* LgsUnknown::getRTType(LgsCgModule& cg) {
+Constant* LgsUnknown::getRTType(LgsCodeGen& cg) {
     assert(0);
 }

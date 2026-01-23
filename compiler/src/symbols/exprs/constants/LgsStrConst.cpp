@@ -18,7 +18,7 @@ LgsExpr* LgsStrConst::castExplicitly(LgsType* toType) {
     return nullptr;
 }
 
-Value* LgsStrConst::loadIR(LgsCgModule& cg) {
+Value* LgsStrConst::loadIR(LgsCodeGen& cg) {
     return IRValue;
 }
 
@@ -36,7 +36,7 @@ bool LgsStrConst::equals(LgsExpr* other) {
     assert(0);
 }
 
-void LgsStrConst::setDebugValue(LgsCgModule& cg) {
+void LgsStrConst::setDebugValue(LgsCodeGen& cg) {
     setDebugLoc(cg);
 }
 

@@ -7,18 +7,18 @@ public:
     LgsDouble() {
         isFloat = true;
     }
-    Type* getIRType(LgsCgModule& cg) override;
-    Constant* getRTType(LgsCgModule& cg) override;
+    Type* getIRType(LgsCodeGen& cg) override;
+    Constant* getRTType(LgsCodeGen& cg) override;
     std::string getName() override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     std::string fmtStr() const override;
     bool canCastTo(LgsType* other) override;
-    Value* addIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) override;
-    Value* mulIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) override;
-    Value* powIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) override;
-    DIType* getDebugType(LgsCgModule& cg) override;
+    Value* addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
+    Value* mulIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
+    Value* powIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
+    DIType* getDebugType(LgsCodeGen& cg) override;
 };
 
 inline LgsDouble LGS_DOUBLE;
