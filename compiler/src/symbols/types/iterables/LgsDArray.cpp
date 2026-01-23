@@ -44,6 +44,7 @@ Type* LgsDArray::getIRType(LgsCgModule& cg) {
 }
 
 Constant* LgsDArray::getRTType(LgsCgModule& cg) {
+    baseType->getRTType(cg);
     return cg.getRTTypeInfo(getName(), IRSize(cg), RTT_DARRAY);
 }
 
@@ -133,14 +134,37 @@ void LgsDArray::addIRElement(LgsCgModule& cg, Value* iterable, Value* index, Val
     cg.builder.CreateCall(generateAddFunc(cg), {iterable, element});
 }
 
-void LgsDArray::initIRArr(LgsCgModule& cg, Value* iterable) {
-    const auto ty = getIRType(cg);
-    const auto dataSize = cg.builder.CreateMul(baseType->IRSize(cg), cg.usize(LGS_ITER_INIT_CAP));
-    cg.storeStructField(ty, iterable, 0, cg.currentLevel);
-    cg.storeStructField(ty, iterable, 1, baseType->getRTType(cg));
-    cg.storeStructField(ty, iterable, dataIndex, cg.heapAlloc(dataSize, cg.currentLevel, false));
-    cg.storeStructField(ty, iterable, lenIndex, cg.sizeZero());
-    cg.storeStructField(ty, iterable, capIndex, cg.usize(LGS_ITER_INIT_CAP));
+Function* LgsDArray::generateArrEqFunc(LgsCgModule& cg) {
+    const auto funcName = getName() + "_" + EQUAL_FUNC;
+    if (const auto func = cg.IRModule->getFunction(funcName)) return func;
+    const auto ft = cg.getFT(cg.i1Ty(), {cg.ptrTy(), cg.ptrTy()});
+    if (cg.mode == CG_MODE_SRC_CODE) {
+        return cg.getFunc(funcName, ft);
+    }
+
+    const auto func = cg.getFunc(funcName, ft);
+    const auto entryBlock = cg.createBlock(BLOCK_ENTRY, func);
+    cg.builder.SetInsertPoint(entryBlock);
+
+    const auto arrIR1 = func->getArg(0);
+    const auto arrIR2 = func->getArg(1);
+    const auto tempArr1 = getZeroValue();
+    const auto tempArr2 = getZeroValue();
+    tempArr1->IRValue = arrIR1;
+    tempArr2->IRValue = arrIR2;
+
+    cg.loop(lenIR(cg, arrIR1), [&](Value* iValue, BasicBlock*) {
+        const auto elementPtr1 = getIRElement(cg, arrIR1, iValue);
+        const auto elementPtr2 = getIRElement(cg, arrIR2, iValue);
+        const auto elementsNotEqual = neIR(cg, elementPtr1, elementPtr2, baseType);
+        cg.ifStmt(elementsNotEqual, [&cg] {
+            cg.builder.CreateRet(cg.false_());
+        });
+    });
+
+    cg.builder.CreateRet(cg.true_());
+    freeExpr(tempArr2);
+    return func;
 }
 
 Function* LgsDArray::generateContainsFunc(LgsCgModule& cg) {

@@ -7,18 +7,13 @@
 
 Value* LgsPrint::call(LgsCgModule& cg, std::vector<LgsFuncArg>& args) {
     const auto arg = args.empty() ? funcType->params.front().expr : args.front().expr;
-    if (arg->type->asBool()) {
-        const auto fmt = cg.getString(arg->type->fmtStr() + "\n");
-        auto boolStr = cg.builder.CreateSelect(arg->IRValue, cg.getString(LgsBool::trueLiteral), cg.getString(LgsBool::falseLiteral));
-        return cg.callPrintf({fmt, boolStr});
-    }
     if (arg->type->asFloat()) {
         const auto fmt = cg.getString(arg->type->fmtStr() + "\n");
         return cg.callPrintf({fmt, cg.builder.CreateFPExt(arg->IRValue, cg.doubleTy())});
     }
-    if (arg->type->asStr()) {
+    if (arg->type->asStr() || arg->type->asBool()) {
         const auto fmt = cg.getString(arg->type->fmtStr() + "\n");
-        return cg.callPrintf({fmt, cg.builder.CreateExtractValue(arg->IRValue, 1)});
+        return cg.callPrintf({fmt, arg->type->asIRStr(cg, arg->loadIR(cg))});
     }
     if (arg->type->isInt || arg->type->asChar()) {
         const auto fmt = cg.getString(arg->type->fmtStr() + "\n");

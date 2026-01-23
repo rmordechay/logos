@@ -33,7 +33,7 @@ public:
     Value* inIR(LgsCgModule& cg, Value* iterable, Value* value) override;
     Value* getIRElement(LgsCgModule& cg, Value* iterable, Value* index) override;
     void addIRElement(LgsCgModule& cg, Value* iterable, Value* index, Value* value) override;
-    void initIRArr(LgsCgModule& cg, Value* iterable);
+    Function* generateArrEqFunc(LgsCgModule& cg);
     Function* generateContainsFunc(LgsCgModule& cg);
     Function* generateAddFunc(LgsCgModule& cg);
     std::string fmtStr() const override;

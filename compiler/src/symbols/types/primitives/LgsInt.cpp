@@ -151,6 +151,10 @@ std::string LgsInt::fmtStr() const {
     return "%d";
 }
 
+Value* LgsInt::asIRStr(LgsCgModule& cg, Value* v) {
+    return LgsType::asIRStr(cg, v);
+}
+
 std::string LgsInt::getName() {
     return name;
 }

@@ -23,6 +23,7 @@ public:
     Value* lenIR(LgsCgModule& cg, Value* iterable) override;
     Value* inIR(LgsCgModule& cg, Value* iterableExpr, Value* value) override;
     std::string fmtStr() const override;
+    Value* asIRStr(LgsCgModule& cg, Value* v) override;
     DIType* getDebugType(LgsCgModule& cg) override;
 };
 

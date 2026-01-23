@@ -6,10 +6,12 @@
 #include <complex>
 
 #include "Lgs_Exprs.h"
+struct Lgs_DArrayExpr;
+
+static Lgs_StackFrame& getTop();
+void moveValue(Lgs_TypeKind kind, size_t level, void* left, void* right, size_t size);
 
 constexpr int64_t nano = 1000000000LL;
-struct Lgs_DArrayExpr;
-static Lgs_StackFrame& getTop();
 
 extern "C" void Lgs_Runtime_init() {}
 
@@ -27,8 +29,8 @@ extern "C" void Lgs_Runtime_pop() {
     runtime.level--;
 }
 
-extern "C" void* Lgs_Runtime_allocate(const size_t size, const size_t level) {
-    return runtime.stack.at(level).allocator.allocate(size);
+extern "C" void* Lgs_Runtime_allocate(const size_t size, const size_t level, const bool withLevel) {
+    return runtime.stack.at(level).allocator.allocate(size, withLevel);
 }
 
 extern "C" void Lgs_Runtime_moveStr(Lgs_Str* left, const Lgs_Str* right) {
@@ -42,44 +44,48 @@ extern "C" void Lgs_Runtime_moveStr(Lgs_Str* left, const Lgs_Str* right) {
     std::memcpy(left->data, right->data, size);
 }
 
-extern "C" void Lgs_Runtime_moveObject(void* left, void* right) {
-    const auto leftLevel = *static_cast<size_t*>(left);
-    const auto rightLevel = *static_cast<size_t*>(right);
+extern "C" void Lgs_Runtime_moveArr(Lgs_DArrayExpr* leftArr, Lgs_DArrayExpr* rightArr) {
+    const auto leftLevel = leftArr->level;
+    const auto rightLevel = rightArr->level;
     assert(leftLevel <= runtime.level && rightLevel <= runtime.level);
     if (leftLevel >= rightLevel) return;
-    const auto obj = *reinterpret_cast<Lgs_Object**>(static_cast<size_t*>(left) + 1);
-    for (int i = 0; i < obj->fieldsCount; ++i) {
-        void* leftFieldPtr = static_cast<char*>(left) + obj->fieldOffsets[i];
-        void* rightFieldPtr = static_cast<char*>(right) + obj->fieldOffsets[i];
-        if (obj->fieldKinds[i] == RTT_OBJECT) {
-            const auto leftField = *static_cast<void**>(leftFieldPtr);
-            const auto rightField = *static_cast<void**>(rightFieldPtr);
-            if (rightField) {
-                if (leftField) {
-                    Lgs_Runtime_moveObject(leftField, rightField);
-                } else {
-                    auto& allocator = runtime.stack.at(leftLevel).allocator;
-                    const auto newPtr = allocator.allocate(obj->fieldSizes[i], true);
-                    std::memcpy(newPtr, rightField, obj->fieldSizes[i]);
-                    *static_cast<size_t*>(newPtr) = leftLevel;
-                    *static_cast<void**>(leftFieldPtr) = newPtr;
-                }
-            } else {
-                *static_cast<void**>(leftFieldPtr) = nullptr;
-            }
-        } else {
-            std::memcpy(leftFieldPtr, rightFieldPtr, obj->fieldSizes[i]);
-        }
-    }
+    auto& allocator = runtime.stack.at(leftArr->level).allocator;
+    const auto size = rightArr->baseType->size * rightArr->capacity;
+    leftArr->length = rightArr->length;
+    leftArr->capacity = rightArr->capacity;
+    leftArr->data = static_cast<char*>(allocator.allocate(size, false));
+    std::memcpy(leftArr->data, rightArr->data, size);
 }
 
-extern "C" void* Lgs_Runtime_moveElement(void* iterable, void* element) {
+extern "C" void* Lgs_Runtime_moveElement(Lgs_DArrayExpr* arr, void* element) {
+    const auto levelArr = arr->level;
+    const auto elementLevel = *static_cast<size_t*>(element);
+    assert(levelArr <= runtime.level && elementLevel <= runtime.level);
+    if (levelArr >= elementLevel) return element;
+    if (arr->baseType->kind == RTT_DARRAY) {
+        assert(0);
+    }
     assert(0);
+}
+
+extern "C" void Lgs_Runtime_moveObject(void* left, void* right) {
+    const auto leftLevel = *static_cast<size_t*>(left);
+    const auto rightLevelPtr = static_cast<size_t*>(right);
+    const auto rightLevel = *rightLevelPtr;
+    assert(leftLevel <= runtime.level && rightLevel <= runtime.level);
+    if (leftLevel >= rightLevel) return;
+    const auto obj = *reinterpret_cast<Lgs_Object**>(rightLevelPtr + 1);
+    for (size_t i = 0; i < obj->fieldsCount; ++i) {
+        const auto offsets = obj->fieldOffsets;
+        void* leftFieldPtr = static_cast<char*>(left) + offsets[i];
+        void* rightFieldPtr = static_cast<char*>(right) + offsets[i];
+        moveValue(obj->fieldKinds[i], leftLevel, leftFieldPtr, rightFieldPtr, obj->fieldSizes[i]);
+    }
 }
 
 extern "C" void* Lgs_Runtime_reallocate(const void* ptr, const size_t size, const size_t level) {
     auto& allocator = runtime.stack.at(level).allocator;
-    const auto newPtr = allocator.allocate(size);
+    const auto newPtr = allocator.allocate(size, true);
     std::memcpy(newPtr, ptr, size);
     return newPtr;
 }
@@ -131,12 +137,32 @@ extern "C" size_t Lgs_Runtime_getCurrentLevel() {
     return runtime.level;
 }
 
-extern "C" void Lgs_DArray_initDArray(Lgs_DArrayExpr* arr, const size_t baseSize) {
-    auto& allocator = runtime.stack.at(runtime.level).allocator;
-    arr->level = runtime.level;
-    arr->length = 0;
-    arr->capacity = LGS_ITER_INIT_CAP;
-    arr->data = static_cast<char*>(allocator.allocate(LGS_ITER_INIT_CAP * baseSize));
+void moveValue(const Lgs_TypeKind kind, const size_t level, void* left, void* right, const size_t size) {
+    if (kind == RTT_OBJECT) {
+        const auto leftField = *static_cast<void**>(left);
+        const auto rightField = *static_cast<void**>(right);
+        if (leftField) {
+            Lgs_Runtime_moveObject(leftField, rightField);
+            return;
+        }
+        auto& allocator = runtime.stack.at(level).allocator;
+        const auto newPtr = allocator.allocate(size, false);
+        std::memcpy(newPtr, rightField, size);
+        *static_cast<size_t*>(newPtr) = level;
+        *static_cast<void**>(left) = newPtr;
+    } else if (kind == RTT_STR) {
+        const auto leftStr = static_cast<Lgs_Str*>(left);
+        const auto rightStr = static_cast<Lgs_Str*>(right);
+        Lgs_Runtime_moveStr(leftStr, rightStr);
+    } else if (kind == RTT_DARRAY) {
+        const auto leftArr = static_cast<Lgs_DArrayExpr*>(left);
+        const auto rightArr = static_cast<Lgs_DArrayExpr*>(right);
+        Lgs_Runtime_moveArr(leftArr, rightArr);
+    } else if (kind == RTT_MAP) {
+        assert(0);
+    } else {
+        std::memcpy(left, right, size);
+    }
 }
 
 static Lgs_StackFrame& getTop() {

@@ -382,6 +382,7 @@ bool LgsApp::generateGenerics() {
         if (const auto dArr = generic->asDArray()) {
             dArr->generateAddFunc(cg.cg);
             dArr->generateContainsFunc(cg.cg);
+            dArr->generateArrEqFunc(cg.cg);
         } else if (const auto map = generic->asMap()) {
             map->generateGetFunc(cg.cg);
             map->generateAddFunc(cg.cg);

@@ -16,6 +16,7 @@ public:
     std::string getName() override;
     LgsExpr* getZeroValue() override;
     std::string fmtStr() const override;
+    Value* asIRStr(LgsCgModule& cg, Value* v) override;
     size_t sizeBytes() override;
     bool canCastTo(LgsType* other) override;
     DIType* getDebugType(LgsCgModule& cg) override;

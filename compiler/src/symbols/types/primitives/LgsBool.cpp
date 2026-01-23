@@ -34,6 +34,10 @@ std::string LgsBool::fmtStr() const {
     return "%s";
 }
 
+Value* LgsBool::asIRStr(LgsCgModule& cg, Value* v) {
+    return cg.builder.CreateSelect(v, cg.getString(trueLiteral), cg.getString(falseLiteral));
+}
+
 size_t LgsBool::sizeBytes() {
     return sizeof(bool);
 }

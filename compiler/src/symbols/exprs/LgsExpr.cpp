@@ -287,7 +287,8 @@ Value* moveValue(LgsCgModule& cg, Value* left, Value* right, LgsType* type) {
         return cg.callRuntimeFunc("moveObject", cg.voidTy(), params, args);
     }
     if (type->asDArray()) {
-        assert(0);
+        const std::vector args = {cg.load(cg.ptrTy(), left), right};
+        return cg.callRuntimeFunc("moveArr", cg.voidTy(), params, args);
     }
     if (type->asMap()) {
         assert(0);

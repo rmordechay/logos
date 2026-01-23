@@ -12,6 +12,7 @@ struct CodegenMetadata;
 #define GET_FUNC "get"
 #define ADD_FUNC "add"
 #define CONTAINS_FUNC "contains"
+#define EQUAL_FUNC "equals"
 #define LEN_FUNC "len"
 #define IS_EMPTY_FUNC "isEmpty"
 #define NOT_EMPTY_FUNC "isNotEmpty"

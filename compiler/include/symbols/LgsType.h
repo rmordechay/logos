@@ -92,6 +92,7 @@ public:
     virtual LgsExpr* getZeroValue() = 0;
     virtual Type* getIRType(LgsCgModule& cg) = 0;
     virtual Type* getTypeOrPtr(LgsCgModule& cg);
+    virtual Value* asIRStr(LgsCgModule& cg, Value* v);
     virtual Constant* getRTType(LgsCgModule& cg) = 0;
     virtual bool canCastTo(LgsType* other) = 0;
     virtual std::string fmtStr() const = 0;
@@ -152,7 +153,7 @@ public:
 inline void freeType(LgsType* type) {
     if (!type) return;
     if (type->isInt || type->isFloat || type->asAny() || type->asChar() || type->isVoid()) return;
-    if (type->asGenericType() || type->asObject() || type->asInterface()) return;
+    if (type->asEnum() || type->asSubtype() || type->asGenericType() || type->asObject() || type->asInterface()) return;
     delete type;
 }
 

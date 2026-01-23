@@ -26,6 +26,7 @@ public:
     Value* rshiftIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) override;
     Value* lshiftIR(LgsCgModule& cg, LgsBinaryExpr* binExpr) override;
     std::string fmtStr() const override;
+    Value* asIRStr(LgsCgModule& cg, Value* v) override;
     std::string getName() override;
     LgsType* clone() override;
     DIType* getDebugType(LgsCgModule& cg) override;

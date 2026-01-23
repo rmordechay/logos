@@ -328,7 +328,6 @@ void LgsCodeGen::visitAssignment(const LgsAssignment* assignment) {
         visitExpr(nullable->baseExpr, true);
         nullable->IRValue = nullable->baseExpr->IRValue;
     }
-    r->pointee = l->IRValue;
     visitExpr(r, true);
 
     if (!binaryExpr) {
@@ -778,9 +777,16 @@ void LgsCodeGen::visitStaticArray(LgsArrayExpr* arrayExpr) const {
 
 void LgsCodeGen::visitDynamicArray(LgsArrayExpr* arrayExpr) const {
     const auto dArr = arrayExpr->type->asDArray();
-    const auto arr = arrayExpr->pointee ? arrayExpr->pointee : cg.heapAlloc(dArr->IRSize(cg), cg.currentLevel, true);
-    arrayExpr->IRValue = arr;
-    dArr->initIRArr(cg, arr);
+    const auto ty = dArr->getIRType(cg);
+    const auto baseSize = dArr->baseType->IRSize(cg);
+    const auto dataSize = cg.builder.CreateMul(baseSize, cg.usize(LGS_ITER_INIT_CAP));
+
+    arrayExpr->IRValue = arrayExpr->pointee ? arrayExpr->pointee : cg.heapAlloc(dArr->IRSize(cg), cg.currentLevel, true);
+    cg.storeStructField(ty, arrayExpr->IRValue, 1, dArr->baseType->getRTType(cg));
+    cg.storeStructField(ty, arrayExpr->IRValue, dArr->dataIndex, cg.heapAlloc(dataSize, cg.currentLevel, false));
+    cg.storeStructField(ty, arrayExpr->IRValue, dArr->lenIndex, cg.sizeZero());
+    cg.storeStructField(ty, arrayExpr->IRValue, dArr->capIndex, cg.usize(LGS_ITER_INIT_CAP));
+
     for (const auto element : arrayExpr->elements) {
         dArr->addIRElement(cg, arrayExpr->IRValue, nullptr, element->IRValue);
     }

@@ -117,6 +117,10 @@ Type* LgsType::getTypeOrPtr(LgsCgModule& cg) {
     return passByRef ? cg.ptrTy() : getIRType(cg);
 }
 
+Value* LgsType::asIRStr(LgsCgModule& cg, Value* v) {
+    assert(0);
+}
+
 Constant* LgsType::getRTType(LgsCgModule& cg) {
     assert(0);
 }
@@ -320,6 +324,7 @@ LgsType::~LgsType() {
     }
     methods.clear();
     for (const auto field : fields) {
+        field->type = nullptr;
         delete field;
     }
     fields.clear();
@@ -355,8 +360,8 @@ Value* eqIR(LgsCgModule& cg, Value* left, Value* right, LgsType* type) {
     if (type->asComplex()) {
         assert(0);
     }
-    if (type->asDArray()) {
-        assert(0);
+    if (const auto dArr = type->asDArray()) {
+        return cg.builder.CreateCall(dArr->generateArrEqFunc(cg), {left, right});
     }
     if (type->asStr()) {
         const auto rt = cg.callFunc("strcmp", cg.i32Ty(), {cg.ptrTy(), cg.ptrTy()}, {left, right});
@@ -377,6 +382,9 @@ Value* neIR(LgsCgModule& cg, Value* left, Value* right, LgsType* type) {
     }
     if (type->asComplex()) {
         assert(0);
+    }
+    if (const auto dArr = type->asDArray()) {
+        return cg.builder.CreateNot(cg.builder.CreateCall(dArr->generateArrEqFunc(cg), {left, right}));
     }
     if (type->asStr()) {
         const auto rt = cg.callFunc("strcmp", cg.i32Ty(), {cg.ptrTy(), cg.ptrTy()}, {left, right});
