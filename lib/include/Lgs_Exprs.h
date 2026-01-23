@@ -16,6 +16,7 @@ struct Lgs_DArrayExpr {
 };
 
 struct Lgs_HashMap {
+    size_t level;
     void** entries;
     size_t len;
     size_t capacity;

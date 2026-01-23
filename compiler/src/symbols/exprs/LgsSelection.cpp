@@ -9,6 +9,7 @@
 #include <llvm/IR/InlineAsm.h>
 
 Value* LgsSelection::loadIR(LgsCgModule& cg) {
+    if (type->asEnum() || type->asEnumField()) return IRValue;
     return cg.load(type->getTypeOrPtr(cg), IRValue);
 }
 
@@ -32,10 +33,6 @@ std::string LgsSelection::asText() {
         str << '.' << exprs[i]->asText();
     }
     return str.str();
-}
-
-Value* LgsSelection::hashValue(LgsCgModule& cg) {
-    return exprs.back()->hashValue(cg);
 }
 
 bool LgsSelection::equals(LgsExpr* other) {

@@ -49,10 +49,6 @@ void LgsIntConst::hashNode(size_t& oldHash) {
     hashNodeInt(oldHash, value);
 }
 
-Value* LgsIntConst::hashValue(LgsCgModule& cg) {
-    return cg.extendToSize(IRValue);
-}
-
 std::string LgsIntConst::asText() {
     return std::to_string(value);
 }

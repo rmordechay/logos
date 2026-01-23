@@ -21,10 +21,6 @@ void LgsVectorExpr::castImplicitly(LgsType* toType) {
 
 }
 
-Value* LgsVectorExpr::hashValue(LgsCgModule& cg) {
-    assert(0);
-}
-
 std::string LgsVectorExpr::asText() {
     return vecType->pname();
 }

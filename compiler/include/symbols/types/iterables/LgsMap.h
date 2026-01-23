@@ -10,6 +10,12 @@ class LgsMap final : public LgsIterable {
 public:
     static constexpr auto name = "Map";
     LgsTypePair* pairType = nullptr;
+    const size_t entriesIndex = 1;
+    const size_t lenIndex = 2;
+    const size_t capIndex = 3;
+    const size_t keyIndex = 0;
+    const size_t valueIndex = 1;
+    const size_t nextIndex = 2;
 
     explicit LgsMap(LgsType* keyType = nullptr, LgsType* valueType = nullptr): LgsIterable(new LgsTypePair(keyType, valueType)) {
         pairType = baseType->asPair();

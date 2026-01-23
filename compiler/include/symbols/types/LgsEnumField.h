@@ -2,24 +2,22 @@
 #include "LgsType.h"
 #include <string>
 
-class LgsEnum : public LgsType {
+class LgsEnumField : public LgsType {
 public:
     std::string name;
-    LgsType* subtype = nullptr;
+    LgsEnum* parentType;
 
-    explicit LgsEnum(const std::string& name) : name(name) {
+    LgsEnumField(LgsEnum* parentType, const std::string& name) : name(name), parentType(parentType) {
         rtt = RTT_ENUM;
     }
+    std::string getName() override;
+    size_t sizeBytes() override;
+    LgsExpr* getZeroValue() override;
     Type* getIRType(LgsCgModule& cg) override;
     Constant* getRTType(LgsCgModule& cg) override;
-    std::string getName() override;
-    LgsExpr* getZeroValue() override;
     bool canCastTo(LgsType* other) override;
-    LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     std::string fmtStr() const override;
     Value* asIRStr(LgsCgModule& cg, Value* v) override;
-    size_t sizeBytes() override;
+    LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     DIType* getDebugType(LgsCgModule& cg) override;
-    ~LgsEnum() override;
 };
-

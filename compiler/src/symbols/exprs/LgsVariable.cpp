@@ -7,6 +7,8 @@
 
 #include <codegen/LgsCgModule.h>
 
+#include "types/LgsEnum.h"
+
 Value* LgsVariable::loadIR(LgsCgModule& cg) {
     switch (ref.symbolType) {
     case PARAM:
@@ -15,6 +17,10 @@ Value* LgsVariable::loadIR(LgsCgModule& cg) {
         return ref.varDec->expr->loadIR(cg);
     case FIELD:
         return ref.field->loadIR(cg);
+    case FUNC:
+    case OBJECT:
+    case ENUM:
+        return IRValue;
     default:
         assert(0);
     }
@@ -43,21 +49,6 @@ void LgsVariable::assign(LgsCgModule& cg, LgsExpr* right) {
 
     } else {
         cg.store(right->IRValue, IRValue);
-    }
-}
-
-Value* LgsVariable::hashValue(LgsCgModule& cg) {
-    switch (ref.symbolType) {
-    case PARAM:
-        return cg.callHash(ref.param->IRValue);
-    case VAR_DEC:
-        return ref.varDec->expr->hashValue(cg);
-    case FIELD:
-        if (ref.field->isEnumField) return cg.usize(ref.field->position);
-        if (ref.field->type->asEnum()) return ref.field->loadIR(cg);
-        return cg.callHash(ref.field->IRValue);
-    default:
-        assert(0);
     }
 }
 

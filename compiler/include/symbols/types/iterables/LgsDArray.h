@@ -8,9 +8,9 @@
 class LgsDArray final : public LgsIterable {
 public:
     static constexpr auto name = "DArray";
-    size_t dataIndex = 2;
-    size_t lenIndex = 3;
-    size_t capIndex = 4;
+    const size_t dataIndex = 2;
+    const size_t lenIndex = 3;
+    const size_t capIndex = 4;
 
     explicit LgsDArray(LgsType* baseType = nullptr) : LgsIterable(baseType) {
         isHeapAlloc = true;

@@ -144,10 +144,6 @@ void LgsExpr::castImplicitly(LgsType* toType) {
 
 }
 
-Value* LgsExpr::hashValue(LgsCgModule& cg) {
-    assert(0);
-}
-
 void LgsExpr::assign(LgsCgModule& cg, LgsExpr* right) {
     assert(0);
 }

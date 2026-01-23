@@ -153,6 +153,10 @@ Value* LgsStr::inIR(LgsCgModule& cg, Value* iterableExpr, Value* value) {
     return cg.builder.CreateIsNotNull(rv);
 }
 
+Value* LgsStr::hashValue(LgsCgModule& cg, Value* value) {
+    return LgsIterable::hashValue(cg, value);
+}
+
 DIType* LgsStr::getDebugType(LgsCgModule& cg) {
     const auto& diBuilder = cg.debugger.diBuilder;
     const auto charType = diBuilder->createBasicType("char", sizeof(char), dwarf::DW_ATE_signed_char);

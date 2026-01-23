@@ -10,10 +10,6 @@ void LgsCharConst::castImplicitly(LgsType* toType) {
     LgsExpr::castImplicitly(toType);
 }
 
-Value* LgsCharConst::hashValue(LgsCgModule& cg) {
-    return cg.extendToSize(IRValue);
-}
-
 std::string LgsCharConst::asText() {
     return type->pname();
 }

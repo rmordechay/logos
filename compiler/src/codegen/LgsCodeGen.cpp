@@ -451,7 +451,7 @@ void LgsCodeGen::visitSwitch(LgsSwitch* switchStmt) {
     const auto exitBlock = cg.createBlock("", cg.currentFunc);
     visitExpr(switchStmt->cond);
 
-    const auto exprIRValue = switchStmt->cond->hashValue(cg);
+    const auto exprIRValue = switchStmt->cond->type->hashValue(cg, switchStmt->cond->IRValue);
     SwitchInst* switchInst;
     if (switchStmt->elseBlock) {
         const auto numOfCases = switchStmt->patterns.size();
@@ -465,7 +465,7 @@ void LgsCodeGen::visitSwitch(LgsSwitch* switchStmt) {
         const auto [expr, stmtsBlock] = switchStmt->patterns[i];
         visitExpr(expr);
         const auto patternBlock = cg.createBlock(BLOCK_CASE_PREFIX + std::to_string(i), cg.currentFunc);
-        const auto hashed = expr->hashValue(cg);
+        const auto hashed = expr->type->hashValue(cg, expr->IRValue);
         switchInst->addCase(llvm::dyn_cast<ConstantInt>(hashed), patternBlock);
         cg.builder.SetInsertPoint(patternBlock);
         visitStmtsBlock(stmtsBlock);
@@ -923,7 +923,7 @@ void LgsCodeGen::visitSelection(LgsSelection* selection, const bool assign) {
     const auto firstExpr = selection->exprs.front();
     if (!firstExpr->isImportName) {
         visitExpr(firstExpr);
-        assert(!firstExpr->IRValue || &firstExpr->IRValue->getContext() == &cg.IRModule->getContext());
+        if (firstExpr->IRValue) assert(&firstExpr->IRValue->getContext() == &cg.IRModule->getContext());
     }
 
     for (size_t i = firstExpr->isImportName; i < selection->exprs.size() - 1; ++i) {
@@ -953,29 +953,19 @@ void LgsCodeGen::visitSelection(LgsSelection* selection, const bool assign) {
 }
 
 void LgsCodeGen::visitFieldSelection(LgsVariable* var, LgsExpr* parent) const {
-    assert(parent->IRValue && &parent->IRValue->getContext() == &cg.IRModule->getContext());
     const auto field = var->ref.field;
+    const auto fieldType = field->type;
+    if (fieldType->asEnum() || fieldType->asEnumField()) return;
+
     // Function pointer
     if (var->ref.symbolType == FUNC) {
         var->IRValue = var->ref.func->getIRFunc(cg);
         return;
     }
 
-    // Enum field
-    if (field->isEnumField) {
-        var->IRValue = cg.usize(field->position);
-        return;
-    }
-
-    // Enum type
-    if (field->type->asEnum()) {
-        var->IRValue = field->getGEP(cg, parent->IRValue);
-        return;
-    }
-
     // Singleton
     if (parent->asTypeExpr() && parent->type->asObject()->singleton) {
-        parent->IRValue = cg.createGlobal(parent->type->getName(), parent->type->getIRType(cg), nullptr);
+        assert(0);
     }
 
     // Virtual fields
@@ -985,7 +975,7 @@ void LgsCodeGen::visitFieldSelection(LgsVariable* var, LgsExpr* parent) const {
     }
 
     // Vector
-    if (field->type->asVec()) {
+    if (fieldType->asVec()) {
         createVecField(field, parent->IRValue);
     }
     var->IRValue = field->getGEP(cg, parent->IRValue);

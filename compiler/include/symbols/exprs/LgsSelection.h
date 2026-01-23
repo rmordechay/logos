@@ -12,7 +12,6 @@ public:
     LgsFuncCall* asMethodCall() const;
     void assign(LgsCgModule& cg, LgsExpr* right) override;
     std::string asText() override;
-    Value* hashValue(LgsCgModule& cg) override;
     bool equals(LgsExpr* other) override;
     void setDebugValue(LgsCgModule& cg) override;
     ~LgsSelection() override;

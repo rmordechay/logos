@@ -86,7 +86,7 @@ inline LgsBaseMsg E10071{"break if must be inside an if statement.", errCodeStar
 inline LgsBaseMsg E10072{"%s has multiple methods with the same name %s.", errCodeStart++};
 inline LgsBaseMsg E10073{"Vector elements can only be numbers or vectors.", errCodeStart++};
 inline LgsBaseMsg E10074{"Too many vector elements for %s. Given: %s.", errCodeStart++};
-inline LgsBaseMsg E10075{"", errCodeStart++};
+inline LgsBaseMsg E10075{"Enum field values must all be the same type.", errCodeStart++};
 inline LgsBaseMsg E10076{"%s is not defined between %s and %s.", errCodeStart++}; // operation, left-expr, right-expr
 inline LgsBaseMsg E10077{"", errCodeStart++};
 inline LgsBaseMsg E10078{"Defer functions must return Void. Given: %s.", errCodeStart++};

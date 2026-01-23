@@ -1,15 +1,10 @@
 #include "types/iterables/LgsSArray.h"
-
 #include <llvm/IR/Module.h>
-
 #include "codegen/LgsCgModule.h"
 #include "exprs/LgsArrayExpr.h"
-#include "types/LgsAny.h"
 #include "types/primitives/LgsBool.h"
-#include "Lgs_Exprs.h"
 #include "exprs/LgsBinaryExpr.h"
 #include "lgsc/LgsCCompiler.h"
-#include "types/LgsPtr.h"
 #include "types/iterables/LgsStr.h"
 
 Type* LgsSArray::getIRType(LgsCgModule& cg) {

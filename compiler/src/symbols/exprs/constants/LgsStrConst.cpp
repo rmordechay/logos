@@ -26,10 +26,6 @@ std::string LgsStrConst::asText() {
     return '\"' + scanEscapeStr(value) + '\"';
 }
 
-Value* LgsStrConst::hashValue(LgsCgModule& cg) {
-    return cg.callHash(IRValue);
-}
-
 void LgsStrConst::hashNode(size_t& oldHash) {
     hashNodeString(oldHash, value);
 }

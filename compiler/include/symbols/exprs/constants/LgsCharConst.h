@@ -8,7 +8,6 @@ public:
     explicit LgsCharConst(const char value) : LgsExpr(&LGS_CHAR), value(value) {}
     Value* loadIR(LgsCgModule& cg) override;
     void castImplicitly(LgsType* toType) override;
-    Value* hashValue(LgsCgModule& cg) override;
     std::string asText() override;
     void setDebugValue(LgsCgModule& cg) override;
 };

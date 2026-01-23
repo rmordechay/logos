@@ -75,7 +75,7 @@ public:
     void visitMainFile(LgsMainFile* mainFile);
     void visitObject(LgsObject* obj);
     void visitInterface(LgsInterface* interface);
-    void visitEnum(const LgsEnum* enum_);
+    void visitEnum(LgsEnum* enum_);
     void visitTestFile(const LgsTestFile* testFile);
     void visitField(LgsField* field);
     void visitFuncHeader(LgsFuncType* ft);

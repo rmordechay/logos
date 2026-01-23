@@ -18,7 +18,6 @@ public:
     bool isVirtual = false;
     bool isOptional = false;
     bool isMutable = true;
-    bool isEnumField = false; // Not to be confused with type enum
     LgsType* parentType = nullptr;
 
     LgsField(const std::string& name, LgsType* type, LgsExpr* expr = nullptr) : name(name), type(type), expr(expr) {}

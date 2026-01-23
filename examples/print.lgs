@@ -1,3 +1,8 @@
+enum Enum {
+    ROI
+    ADI
+}
+
 main() {
     print(8)
     print(8.34)
@@ -10,5 +15,5 @@ main() {
     vec = Vec3(23, 34, 54)
     print(vec)
     print(Vec2(2, 334))
-    print(Vec4(2, 334))
+    print(Vec4(2, 334, 23, 234))
 }

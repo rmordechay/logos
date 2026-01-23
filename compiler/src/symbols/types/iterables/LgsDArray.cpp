@@ -3,11 +3,8 @@
 #include "Lgs_Exprs.h"
 #include "codegen/LgsCgModule.h"
 #include "exprs/LgsArrayExpr.h"
-#include "types/LgsAny.h"
 #include "types/primitives/LgsBool.h"
 #include <llvm/IR/Module.h>
-
-#include "LgsConfigs.h"
 
 LgsFunc* LgsDArray::getMethod(const std::string& methodName) {
     constexpr auto flags = BUILTIN | PUBLIC | METHOD;

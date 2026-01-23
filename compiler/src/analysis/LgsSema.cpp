@@ -81,11 +81,14 @@ void LgsSema::visitMainFile(LgsMainFile* mainFile) {
         }
         visitExpr(varDec->expr);
     }
-    for (const auto interface : mainFile->interfaces) {
-        visitInterface(interface);
-    }
     for (const auto obj : mainFile->objects) {
         visitObject(obj);
+    }
+    for (const auto enum_ : mainFile->enums) {
+        visitEnum(enum_);
+    }
+    for (const auto interface : mainFile->interfaces) {
+        visitInterface(interface);
     }
     for (const auto& [funcName, func] : mainFile->funcs) {
         if (funcName == LGS_MAIN_FUNC) {
@@ -94,6 +97,8 @@ void LgsSema::visitMainFile(LgsMainFile* mainFile) {
             visitFunc(func);
         }
     }
+
+    // Check main() func
     if (mainFile->funcs.contains(LGS_MAIN_FUNC)) {
         if (appConfigs.isLibrary) {
             addError(E10087, file->location);
@@ -125,8 +130,21 @@ void LgsSema::visitInterface(LgsInterface* interface) {
     }
 }
 
-void LgsSema::visitEnum(const LgsEnum* enum_) {
+void LgsSema::visitEnum(LgsEnum* enum_) {
     validateTypeName(enum_->name, enum_->location);
+    LgsType* baseType = nullptr;
+    for (const auto field : enum_->fields) {
+        if (!field->expr) continue;
+        if (!baseType) {
+            baseType = field->expr->type;
+            continue;
+        }
+        if (!baseType->equals(field->expr->type)) {
+            addError(E10075, enum_->location);
+            return;
+        }
+    }
+    enum_->subtype = baseType;
 }
 
 void LgsSema::visitTestFile(const LgsTestFile* testFile) {

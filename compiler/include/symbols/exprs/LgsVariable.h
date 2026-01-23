@@ -12,7 +12,6 @@ public:
     Value* loadIR(LgsCgModule& cg) override;
     bool equals(LgsExpr* other) override;
     LgsExpr* castExplicitly(LgsType* toType) override;
-    Value* hashValue(LgsCgModule& cg) override;
     void assign(LgsCgModule& cg, LgsExpr* right) override;
     std::string asText() override;
     void setDebugValue(LgsCgModule& cg) override;

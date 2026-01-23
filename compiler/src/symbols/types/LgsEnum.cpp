@@ -8,14 +8,11 @@ LgsExpr* LgsEnum::getZeroValue() {
 }
 
 Type* LgsEnum::getIRType(LgsCgModule& cg) {
-    if (const auto expr = fields.front()->expr) {
-        return cg.getStructType({cg.sizeTy(), expr->type->getIRType(cg)});
-    }
-    return cg.getStructType({cg.sizeTy(), cg.ptrTy()});
+    assert(0);
 }
 
 Constant* LgsEnum::getRTType(LgsCgModule& cg) {
-    assert(0);
+    return cg.getRTTypeInfo(name, IRSize(cg), rtt);
 }
 
 std::string LgsEnum::getName() {
@@ -36,10 +33,21 @@ std::string LgsEnum::fmtStr() const {
     return "%s";
 }
 
+Value* LgsEnum::asIRStr(LgsCgModule& cg, Value* v) {
+    return cg.getString(name);
+}
+
 size_t LgsEnum::sizeBytes() {
     return sizeof(void*);
 }
 
 DIType* LgsEnum::getDebugType(LgsCgModule& cg) {
     assert(0);
+}
+
+LgsEnum::~LgsEnum() {
+    for (const auto field : fields) {
+        delete field->type;
+        field->type = nullptr;
+    }
 }

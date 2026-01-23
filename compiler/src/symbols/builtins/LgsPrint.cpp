@@ -2,7 +2,6 @@
 #include <llvm/IR/Module.h>
 #include "exprs/LgsFuncCall.h"
 #include "types/LgsEnum.h"
-#include "types/iterables/LgsSArray.h"
 #include "types/iterables/LgsVec.h"
 #include "types/primitives/LgsBool.h"
 
@@ -12,17 +11,14 @@ Value* LgsPrint::call(LgsCgModule& cg, std::vector<LgsFuncArg>& args) {
         const auto fmt = cg.getString(arg->type->fmtStr() + "\n");
         return cg.callPrintf({fmt, cg.builder.CreateFPExt(arg->IRValue, cg.doubleTy())});
     }
-    if (arg->type->asStr() || arg->type->asBool()) {
+    if (arg->type->asStr() || arg->type->asBool() || arg->type->asEnum() || arg->type->asEnumField()) {
         const auto fmt = cg.getString(arg->type->fmtStr() + "\n");
-        return cg.callPrintf({fmt, arg->type->asIRStr(cg, arg->loadIR(cg))});
+        const auto value = arg->type->asIRStr(cg, arg->loadIR(cg));
+        return cg.callPrintf({fmt, value});
     }
     if (arg->type->isInt || arg->type->asChar()) {
         const auto fmt = cg.getString(arg->type->fmtStr() + "\n");
         return cg.callPrintf({fmt, arg->loadIR(cg)});
-    }
-    if (const auto enum_ = arg->type->asEnum()) {
-        const auto fmt = cg.getString(arg->type->fmtStr() + "\n");
-        return cg.callPrintf({fmt, cg.getString(enum_->name)});
     }
     if (const auto vec = arg->type->asVec()) {
         const auto fmt = cg.getString(arg->type->fmtStr() + "\n");

@@ -20,6 +20,5 @@ public:
     std::string asText() override;
     bool equals(LgsExpr* other) override;
     void hashNode(size_t& oldHash) override;
-    Value* hashValue(LgsCgModule& cg) override;
     void setDebugValue(LgsCgModule& cg) override;
 };

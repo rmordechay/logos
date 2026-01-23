@@ -27,10 +27,6 @@ void LgsMatrixExpr::castImplicitly(LgsType* toType) {
     assert(0);
 }
 
-Value* LgsMatrixExpr::hashValue(LgsCgModule& cg) {
-    assert(0);
-}
-
 bool LgsMatrixExpr::equals(LgsExpr* other) {
     assert(0);
 }

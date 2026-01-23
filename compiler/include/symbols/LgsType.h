@@ -8,6 +8,7 @@
 
 #include "Lgs_Types.h"
 
+class LgsEnumField;
 class LgsComplex;
 struct LgsBinOp;
 class LgsBinaryExpr;
@@ -90,6 +91,7 @@ public:
     virtual std::string getName() = 0;
     virtual size_t sizeBytes() = 0;
     virtual LgsExpr* getZeroValue() = 0;
+    virtual Value* hashValue(LgsCgModule& cg, Value* value);
     virtual Type* getIRType(LgsCgModule& cg) = 0;
     virtual Type* getTypeOrPtr(LgsCgModule& cg);
     virtual Value* asIRStr(LgsCgModule& cg, Value* v);
@@ -134,6 +136,7 @@ public:
     LgsObject* asObject();
     LgsInterface* asInterface();
     LgsEnum* asEnum();
+    LgsEnumField* asEnumField();
     LgsGenericType* asGenericType();
     LgsIterable* asIterable();
     LgsSArray* asSArray();
