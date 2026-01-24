@@ -8,6 +8,7 @@ void LgsField::setType(LgsType* newType) {
 }
 
 Value* LgsField::loadIR(LgsCodeGen& cg) {
+    if (type->asEnum()) return IRValue;
     return cg.load(type->getIRType(cg), IRValue);
 }
 

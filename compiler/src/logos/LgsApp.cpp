@@ -377,7 +377,7 @@ bool LgsApp::generateGenerics() {
     file->cg.setupModule("generics");
     file->cg.mode = CG_MODE_GENERICS;
     LgsCgModule module(file, configs, globals, paths);
-    LgsPrint::generateFmtFunc(module.cg);
+    // LgsPrint::generateFmtFunc(module.cg);
     for (auto& [_, generic] : generics) {
         if (const auto dArr = generic->asDArray()) {
             dArr->generateAddFunc(module.cg);

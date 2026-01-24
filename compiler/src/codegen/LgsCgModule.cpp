@@ -477,7 +477,6 @@ void LgsCgModule::visitSwitch(LgsSwitch* switchStmt) {
         visitExpr(expr);
         const auto patternBlock = cg.createBlock(BLOCK_CASE_PREFIX, cg.currentFunc);
         const auto hashed = expr->type->hashValue(cg, expr->IRValue);
-        assert(hashed);
         switchInst->addCase(llvm::dyn_cast<ConstantInt>(hashed), patternBlock);
         cg.builder.SetInsertPoint(patternBlock);
         visitStmtsBlock(stmtsBlock);
@@ -971,11 +970,9 @@ void LgsCgModule::visitFieldSelection(LgsVariable* var, LgsExpr* parent) const {
 
     // Enum field
     if (const auto enum_ = var->type->asEnum()) {
-        if (enum_->fieldName == "") {
-            var->IRValue = cg.getString(enum_->name);
-        } else if (field->expr) {
+        if (field->expr) {
             var->IRValue = UndefValue::get(enum_->getIRType(cg));
-            var->IRValue = cg.builder.CreateInsertValue(var->IRValue, cg.i32(enum_->fieldIndex), 0);
+            var->IRValue = cg.builder.CreateInsertValue(var->IRValue, cg.usize(enum_->fieldIndex), 0);
             var->IRValue = cg.builder.CreateInsertValue(var->IRValue, field->expr->IRValue, 1);
         } else {
             var->IRValue = cg.usize(enum_->fieldIndex);
