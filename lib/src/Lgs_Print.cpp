@@ -5,6 +5,8 @@
 #include <cassert>
 #include <sstream>
 
+#include "LgsConfigs.h"
+
 static std::string formatElement(const Lgs_TypeKind kind, void* type, void* value) {
     if (!value) return LGS_NULL_LITERAL;
     std::ostringstream str;
@@ -25,23 +27,24 @@ static std::string formatElement(const Lgs_TypeKind kind, void* type, void* valu
     case RTT_ENUM:
     case RTT_STR: {
         const auto lgsStr = static_cast<Lgs_Str*>(value);
+        assert(lgsStr->level <= LGS_MAX_LEVEL);
         if (!lgsStr->data) return LGS_NULL_LITERAL;
         str << "\"" << static_cast<Lgs_Str*>(value)->data << "\"";
     }
     break;
     case RTT_CHAR: str << "'" << *static_cast<const char*>(value) << "'"; break;
     case RTT_OBJECT: {
-        const auto obj = static_cast<Lgs_Object*>(type);
+        const auto objPtr = static_cast<char*>(value) + sizeof(size_t);
+        const auto obj = *reinterpret_cast<Lgs_Object**>(objPtr);
         str << "{";
         for (int i = 0; i < obj->fieldsCount; ++i) {
             const auto fieldName = obj->fields[i].name;
             const auto fieldOffset = obj->fields[i].offset;
             const auto fieldKind = obj->fields[i].kind;
-            auto fieldType = obj->fields[i].type;
+            const auto fieldType = obj->fields[i].type;
             void* fieldPtr = static_cast<char*>(value) + fieldOffset;
-            if (fieldKind == RTT_OBJECT) {
+            if (fieldKind == RTT_OBJECT || fieldKind == RTT_DARRAY || fieldKind == RTT_STR) {
                 fieldPtr = *static_cast<void**>(fieldPtr);
-                fieldType = static_cast<char*>(fieldPtr) + sizeof(size_t);
             }
             str << fieldName << '=';
             str << formatElement(fieldKind, fieldType, fieldPtr);
@@ -52,22 +55,30 @@ static std::string formatElement(const Lgs_TypeKind kind, void* type, void* valu
     }
     case RTT_SET:
     case RTT_DARRAY: {
-        const auto arr = static_cast<Lgs_DArrayExpr*>(value);
+        const auto dArr = static_cast<Lgs_DArrayExpr*>(value);
+        const auto baseKind = dArr->baseType->kind;
         str << "[";
-        for (int i = 0; i < arr->length; ++i) {
-            const auto element = arr->data + arr->baseType->size * i;
-            str << formatElement(arr->baseType->kind, arr->baseType, element);
-            if (i < arr->length - 1) str << ", ";
+        for (int i = 0; i < dArr->length; ++i) {
+            void* element = dArr->data + dArr->baseType->size * i;
+            if (baseKind == RTT_OBJECT || baseKind == RTT_DARRAY || baseKind == RTT_STR) {
+                element = *static_cast<void**>(element);
+            }
+            str << formatElement(baseKind, dArr->baseType, element);
+            if (i < dArr->length - 1) str << ", ";
         }
         str << "]";
         break;
     }
     case RTT_SARRAY: {
         const auto sArr = static_cast<Lgs_SArr*>(type);
+        const auto baseKind = sArr->baseType->kind;
         str << "[";
         for (int i = 0; i < sArr->length; ++i) {
-            const auto element = static_cast<char*>(value) + sArr->baseType->size * i;
-            str << formatElement(sArr->baseType->kind, nullptr, element);
+            void* element = static_cast<char*>(value) + sArr->baseType->size * i;
+            if (baseKind == RTT_OBJECT || baseKind == RTT_DARRAY || baseKind == RTT_STR) {
+                element = *static_cast<void**>(element);
+            }
+            str << formatElement(baseKind, nullptr, element);
             if (i < sArr->length - 1) str << ", ";
         }
         str << "]";
@@ -75,7 +86,14 @@ static std::string formatElement(const Lgs_TypeKind kind, void* type, void* valu
     }
     case RTT_NULLABLE: {
         const auto nullable = static_cast<Lgs_Nullable*>(type);
-        str << formatElement(nullable->baseType->kind, nullable->baseType, *static_cast<void**>(value));
+        if (nullable->isPtr) {
+            str << formatElement(nullable->baseType->kind, nullable->baseType, *static_cast<void**>(value));
+        } else {
+            const auto isSetPtr = static_cast<char*>(value) + nullable->baseType->size;
+            const auto isSet = *reinterpret_cast<bool*>(isSetPtr);
+            if (isSet) str << formatElement(nullable->baseType->kind, nullable->baseType, value);
+            else str << LGS_NULL_LITERAL;
+        }
         break;
     }
     case RTT_VEC2:

@@ -8,6 +8,8 @@ public:
     static constexpr auto name = "Null";
     LgsType* baseType = nullptr;
     bool isNull = false;
+    const size_t valueIndex = 0;
+    const size_t isSetIndex = 1;
 
     explicit LgsNullable(LgsType* baseType = nullptr) : baseType(baseType) {
         rtt = RTT_NULLABLE;
@@ -31,11 +33,9 @@ public:
     DIType* getDebugType(LgsCodeGen& cg) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     Value* addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
-    void setNullableFields(LgsCodeGen& cg, Value* ptr, Value* value, Value* isSet);
+    void setIRFields(LgsCodeGen& cg, Value* ptr, Value* value, Value* isSet);
     Value* getNullableValue(LgsCodeGen& cg, Value* ptr);
     Value* getIsSet(LgsCodeGen& cg, Value* ptr);
-    void storeNullableValue(LgsCodeGen& cg, Value* ptr, Value* value);
-    void storeIsSet(LgsCodeGen& cg, Value* ptr, Value* value);
     Value* applyNumberBinOp(LgsCodeGen& cg, LgsBinaryExpr* binExpr, const std::function<Value*(LgsBinaryExpr*)>& func);
     Value* applyPtrBinOp(LgsCodeGen& cg, LgsBinaryExpr* binExpr, const std::function<Value*(LgsBinaryExpr*)>& func);
 };

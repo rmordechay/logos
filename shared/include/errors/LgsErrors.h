@@ -34,7 +34,7 @@ inline LgsBaseMsg E10019{"activeEnv %s could not be found in the envs directory.
 inline LgsBaseMsg E10020{"Environment %s must declare the required variable %s.", errCodeStart++};
 inline LgsBaseMsg E10021{"%s and %s must be the same type. Given: %s and %s.", errCodeStart++};
 inline LgsBaseMsg E10022{"%s cannot be instantiated.", errCodeStart++};
-inline LgsBaseMsg E10023{"Expression with type %s must be nullable.", errCodeStart++};
+inline LgsBaseMsg E10023{"", errCodeStart++};
 inline LgsBaseMsg E10024{"null must have an explict nullable type.", errCodeStart++};
 inline LgsBaseMsg E10025{"Only interfaces are allowed in implements. Given: %s.", errCodeStart++};
 inline LgsBaseMsg E10026{"Function %s must return an expression of type %s. None was given.", errCodeStart++};

@@ -22,6 +22,8 @@ public:
     LgsInstance* singleton = nullptr;
     std::map<std::string, LgsFunc*> metaMethods;
     bool hasGenerics = false;
+    const size_t levelIndex = 0;
+    const size_t typeIndex = 1;
 
     explicit LgsObject(const std::string&  objName) : name(objName) {
         passByRef = true;

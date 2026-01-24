@@ -59,7 +59,7 @@ std::string LgsEnum::getName() {
 
 bool LgsEnum::canCastTo(LgsType* other) {
     const auto otherName = other->getName();
-    if (otherName == LgsAny::name) return true;
+    if (other->isAny()) return true;
     return name == otherName;
 }
 

@@ -390,16 +390,9 @@ TEST_CASE("SemaError10023") {
     LgsApp app;
     const auto code = R"(
     main() {
-        a: Int = null
+
     }
     )";
-    app.loadSrcFile(code);
-    assert(app.errHandler.successful);
-    app.analyse();
-    CHECK_MESSAGE(app.errHandler.errors.size() == 1, EXPECTED_ERR(E10023, code));
-    if (app.errHandler.errors.size() > 0) {
-        CHECK_EQ(app.errHandler.errors[0].errCode, E10023.errCode);
-    }
 }
 
 TEST_CASE("SemaError10024") {

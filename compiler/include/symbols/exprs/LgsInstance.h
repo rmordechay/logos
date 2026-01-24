@@ -12,6 +12,7 @@ class LgsInstance final : public LgsExpr {
 public:
     std::string name;
     LgsObject* obj = nullptr;
+    std::vector<LgsField*> fields;
     std::map<std::string, LgsInstanceArg> args;
     std::vector<LgsType*> generics;
 
@@ -24,5 +25,6 @@ public:
     void setObject(LgsObject* newObj);
     bool equals(LgsExpr* other) override;
     void setDebugValue(LgsCodeGen& cg) override;
+    LgsField* getField(const std::string& fieldName) const;
     ~LgsInstance() override;
 };

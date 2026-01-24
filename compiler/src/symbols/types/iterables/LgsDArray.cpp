@@ -219,7 +219,7 @@ Function* LgsDArray::generateAddFunc(LgsCodeGen& cg) {
     const auto newCap = cg.builder.CreateMul(cap, cg.usize(2));
     const auto baseTypeSize = baseType->IRSize(cg);
     const auto newSize = cg.builder.CreateMul(newCap, baseTypeSize);
-    const auto levelField = cg.builder.CreateStructGEP(getIRType(cg), arrIR, 0);
+    const auto levelField = cg.builder.CreateStructGEP(getIRType(cg), arrIR, levelIndex);
     const auto level = cg.load(cg.i32Ty(), levelField);
     const auto newPtr = cg.reallocate(data, newSize, level);
     cg.store(newPtr, dataGEP);

@@ -6,13 +6,17 @@ class LgsNullableExpr final : public LgsExpr {
 public:
     LgsExpr* baseExpr = nullptr;
 
-    explicit LgsNullableExpr(LgsExpr* baseExpr): baseExpr(baseExpr) {}
+    explicit LgsNullableExpr(LgsExpr* baseExpr): baseExpr(baseExpr) {
+        isMutable = baseExpr->isMutable;
+    }
     LgsNullableExpr(): LgsExpr(&LGS_NULLABLE) {
         isNull = true;
+        isMutable = false;
     }
     Value* loadIR(LgsCodeGen& cg) override;
     void assign(LgsCodeGen& cg, LgsExpr* right) override;
     void setDebugValue(LgsCodeGen& cg) override;
     void castImplicitly(LgsType* toType) override;
     std::string asText() override;
+    LgsExpr* clone() override;
 };

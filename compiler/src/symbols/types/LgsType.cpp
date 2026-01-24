@@ -63,7 +63,7 @@ bool LgsType::isScalar() const {
 }
 
 bool LgsType::isBig() {
-    return (asObject() || asDArray()) && sizeBytes() >= BIG_SIZE_THRESHOLD;
+    return (asObject() || asDArray()) && sizeBytes() >= LGS_BIG_SIZE_THRESHOLD;
 }
 
 bool LgsType::isUnknown() {

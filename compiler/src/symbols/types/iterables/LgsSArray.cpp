@@ -35,7 +35,7 @@ LgsExpr* LgsSArray::getZeroValue() {
 Constant* LgsSArray::getRTType(LgsCodeGen& cg) {
     const auto RTTName = LGS_TYPEINFO_PREFIX + getName() + std::to_string(len);
     if (const auto v = cg.IRModule->getGlobalVariable(RTTName)) return v;
-    if (cg.mode != CG_MODE_RTTYPES) return cg.createGlobal(RTTName, cg.getRTTStructType(), nullptr);
+    if (cg.mode != CG_MODE_RTTYPES) return cg.createGlobal(RTTName, cg.getRTTStruct(), nullptr);
     const auto st = cg.getStructType({cg.sizeTy(), cg.ptrTy()});
     const std::vector<Constant*> args = {cg.usize(len), baseType->getRTType(cg)};
     return cg.createGlobal(RTTName, st, ConstantStruct::get(st, args));

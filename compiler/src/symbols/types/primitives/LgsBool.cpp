@@ -44,7 +44,7 @@ size_t LgsBool::sizeBytes() {
 
 bool LgsBool::canCastTo(LgsType* other) {
     const auto otherName = other->getName();
-    if (otherName == LgsAny::name) return true;
+    if (other->isAny()) return true;
     if (otherName == LgsChar::name) return true;
     if (otherName == LgsShort::name) return true;
     if (otherName == LgsInt::name) return true;

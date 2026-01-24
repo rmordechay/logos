@@ -553,12 +553,6 @@ LgsType* LgsParser::parseType() {
     }
     setLocation(type->location, &startToken, &currentToken);
 
-    // Nullable
-    if (type && matchAndConsume(T_QUEST_MARK)) {
-        type = new LgsNullable(type);
-        setLocation(type->location, &startToken, &currentToken);
-    }
-
     // Array
     if (type && currentToken.type == T_LBRACK) {
         std::vector<LgsExpr*> sizes;
@@ -578,6 +572,13 @@ LgsType* LgsParser::parseType() {
             }
         }
     }
+
+    // Nullable
+    if (type && matchAndConsume(T_QUEST_MARK)) {
+        type = new LgsNullable(type);
+        setLocation(type->location, &startToken, &currentToken);
+    }
+
     return type;
 }
 

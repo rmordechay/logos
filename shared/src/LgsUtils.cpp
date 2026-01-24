@@ -190,8 +190,8 @@ void formatErrorMsg(const char* msg, char* out, const size_t count, va_list args
         result.replace(pos, strlen(MSG_PLACEHOLDER), arg);
         pos += strlen(arg);
     }
-    std::strncpy(out, result.c_str(), STRING_BUFFER_SIZE - 1);
-    out[STRING_BUFFER_SIZE - 1] = '\0';
+    std::strncpy(out, result.c_str(), LGS_STR_BUFFER_SIZE - 1);
+    out[LGS_STR_BUFFER_SIZE - 1] = '\0';
 }
 
 void combineNodeHash(size_t& oldHash, const size_t newHash) {

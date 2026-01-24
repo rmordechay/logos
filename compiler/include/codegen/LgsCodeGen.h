@@ -129,7 +129,7 @@ public:
 
     // Runtime funcs
     GlobalVariable* getRTTypeInfo(const std::string& name, ConstantInt* size, Lgs_TypeKind kind);
-    StructType* getRTTStructType();
+    StructType* getRTTStruct();
 
     // Debugging
     void printStr(const std::string& value);

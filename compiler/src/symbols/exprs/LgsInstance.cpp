@@ -31,12 +31,19 @@ void LgsInstance::setObject(LgsObject* newObj) {
 
 bool LgsInstance::equals(LgsExpr* other) {
     const auto otherInstance = other->asInstance();
-    if (!otherInstance) return false;
-    assert(0);
+    if (!other->asInstance()) return false;
+    return name == otherInstance->name;
 }
 
 void LgsInstance::setDebugValue(LgsCodeGen& cg) {
     assert(0);
+}
+
+LgsField* LgsInstance::getField(const std::string& fieldName) const {
+    for (auto* f : fields) {
+        if (f->name == fieldName) return f;
+    }
+    return nullptr;
 }
 
 LgsInstance::~LgsInstance() {
@@ -44,6 +51,10 @@ LgsInstance::~LgsInstance() {
         freeExpr(arg.expr);
     }
     args.clear();
+    for (const auto field : fields) {
+        field->type = nullptr;
+        delete field;
+    }
     obj = nullptr;
     type = nullptr;
 }

@@ -1034,8 +1034,8 @@ void LgsSema::visitInnerSelections(LgsSelection* selection) {
         if (!childExpr->type || childExpr->type->isUnknown()) return;
         selection->hasNullables = selection->hasNullables || childExpr->type->asNullable();
 
-        // Wraps with nullable. Only the parts that comes after the first
-        // nullable encounter will be wrapped in nullable, the parts before remain as is.
+        // Wraps with nullable. Only the parts that comes after the first nullable encounter
+        // will be wrapped in nullable, the parts before remain as is.
         if (selection->hasNullables) {
             assert(!childExpr->asNullableExpr());
             if (childExpr->type->asNullable()) {
@@ -1321,6 +1321,15 @@ void LgsSema::visitInstance(LgsInstance* instance) {
     }
     instance->setObject(obj);
 
+    // Clone fields
+    for (const auto field : obj->fields) {
+        auto newField = new LgsField(*field);
+        if (newField->expr) {
+            newField->expr = newField->expr->clone();
+        }
+        instance->fields.emplace_back(newField);
+    }
+
     // Args
     std::unordered_set<std::string> visited;
     for (auto& [argName, arg] : instance->args) {
@@ -1328,7 +1337,7 @@ void LgsSema::visitInstance(LgsInstance* instance) {
             addError(E10054, arg.expr->location, {argName});
         }
         visited.insert(argName);
-        const auto field = instance->obj->getField(argName);
+        const auto field = instance->getField(argName);
         if (!field) {
             addError(E10005, arg.expr->location, {argName, objName});
             continue;
@@ -1339,7 +1348,7 @@ void LgsSema::visitInstance(LgsInstance* instance) {
         validateExprType(arg.expr, field->type);
     }
 
-    for (const auto field : obj->fields) {
+    for (const auto field : instance->fields) {
         if (visited.contains(field->name)) continue;
         addGenerics(field->type);
     }
@@ -1456,11 +1465,6 @@ bool LgsSema::validateExprType(const LgsExpr* expr, LgsType* type) {
             addError(E10024, expr->location);
             return false;
         }
-        // // type must be nullable
-        // if (!nullable) {
-        //     addError(E10023, expr->location, {type->pname()});
-        //     return false;
-        // }
     }
     if (!type || !expr->type || type->isUnknown() || expr->type->isUnknown()) return false;
     if (!type->hasGenericTypes() && !expr->type->canCastTo(type)) {

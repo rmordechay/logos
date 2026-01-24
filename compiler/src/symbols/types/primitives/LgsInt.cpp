@@ -2,7 +2,6 @@
 #include "LgsBinaryTokens.h"
 #include "exprs/constants/LgsIntConst.h"
 #include "stmts/LgsField.h"
-#include "types/LgsAny.h"
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsDouble.h"
 #include "types/primitives/LgsFloat.h"
@@ -11,7 +10,6 @@
 #include <iostream>
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/Module.h>
-
 #include "exprs/LgsBinaryExpr.h"
 
 size_t LgsInt::sizeBytes() {
@@ -33,7 +31,7 @@ Constant* LgsInt::getRTType(LgsCodeGen& cg) {
 bool LgsInt::canCastTo(LgsType* other) {
     const auto otherName = other->getName();
     if (name == otherName) return true;
-    if (otherName == LgsAny::name) return true;
+    if (other->isAny()) return true;
     if (otherName == LgsSize::name) return true;
     if (otherName == LgsLong::name) return true;
     if (otherName == LgsFloat::name) return true;

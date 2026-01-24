@@ -9,13 +9,11 @@
 #include "types/LgsEnum.h"
 #include "types/LgsInterface.h"
 #include "LgsUtils.h"
+#include "LgsConfigs.h"
 
 #include <ranges>
 #include <sstream>
-#include <unordered_set>
 #include <llvm/IR/Module.h>
-
-#include "LgsConfigs.h"
 
 std::string LgsObject::getName() {
     return name;
@@ -58,7 +56,7 @@ Type* LgsObject::getIRType(LgsCodeGen& cg) {
 Constant* LgsObject::getRTType(LgsCodeGen& cg) {
     const auto RTTName = LGS_TYPEINFO_PREFIX + name;
     if (const auto v = cg.IRModule->getGlobalVariable(RTTName)) return v;
-    if (cg.mode != CG_MODE_RTTYPES) return cg.createGlobal(RTTName, cg.getRTTStructType(), nullptr);
+    if (cg.mode != CG_MODE_RTTYPES) return cg.createGlobal(RTTName, cg.getRTTStruct(), nullptr);
     const auto numFields = fields.size();
     constexpr auto RTTFieldName = std::string(LGS_TYPEINFO_PREFIX) + "field";
     const auto objRTType = cg.getStructType({cg.ptrTy(), cg.sizeTy(), cg.sizeTy(), cg.ptrTy()}, RTTName);
@@ -88,7 +86,7 @@ Constant* LgsObject::getRTType(LgsCodeGen& cg) {
 }
 
 size_t LgsObject::sizeBytes() {
-    auto sum = OBJ_MD_SIZE;
+    auto sum = LGS_OBJ_MD_SIZE;
     for (const auto& field : fields) {
         if (field->type->asObject() || field->type->asFuncType() || field->type->asInterface()) {
             sum += sizeof(void*);

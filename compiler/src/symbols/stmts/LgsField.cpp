@@ -20,9 +20,11 @@ LgsType* LgsField::getType() {
     return type;
 }
 
-Value* LgsField::getGEP(LgsCodeGen& cg, Value* parentIRPtr) const {
+Value* LgsField::getGEP(LgsCodeGen& cg, Value* parentIRPtr) {
+    if (gep) return gep;
     assert(parentType && parentIRPtr);
-    return cg.builder.CreateStructGEP(parentType->getIRType(cg), parentIRPtr, position);
+    gep = cg.builder.CreateStructGEP(parentType->getIRType(cg), parentIRPtr, position);
+    return gep;
 }
 
 void LgsField::setDebugValue(LgsCodeGen& cg) {

@@ -42,7 +42,7 @@ extern "C" void Lgs_Runtime_moveStr(Lgs_Str* left, const Lgs_Str* right) {
     std::memcpy(left->data, right->data, size);
 }
 
-extern "C" void Lgs_Runtime_moveArr(Lgs_DArrayExpr* leftArr, Lgs_DArrayExpr* rightArr) {
+extern "C" void Lgs_Runtime_moveArr(Lgs_DArrayExpr* leftArr, const Lgs_DArrayExpr* rightArr) {
     const auto leftLevel = leftArr->level;
     const auto rightLevel = rightArr->level;
     assert(leftLevel <= runtime.level && rightLevel <= runtime.level);
@@ -88,14 +88,6 @@ extern "C" void* Lgs_Runtime_reallocate(const void* ptr, const size_t size, cons
     return newPtr;
 }
 
-extern "C" void Lgs_Runtime_addDefer(const ThunkFunc funcPtr, void* ctx) {
-    getTop().defers.emplace_back(Lgs_ThunkFunc{funcPtr, ctx});
-}
-
-extern "C" void Lgs_Runtime_addCoro(const ThunkFunc funcPtr, void* ctx) {
-    runtime.coros.emplace_back(Lgs_ThunkFunc{funcPtr, ctx});
-}
-
 extern "C" void Lgs_Runtime_addToVTable(void* instance, const char* name, void* ptr) {
     runtime.vtable[{instance, name}] = ptr;
 }
@@ -104,8 +96,16 @@ extern "C" void* Lgs_Runtime_getFromVTable(void* instance, const char* name) {
     return runtime.vtable[{instance, name}];
 }
 
+extern "C" void Lgs_Runtime_addDefer(const ThunkFunc funcPtr, void* ctx) {
+    getTop().defers.emplace_back(Lgs_ThunkFunc{funcPtr, ctx});
+}
+
+extern "C" void Lgs_Runtime_addCoro(const ThunkFunc funcPtr, void* ctx) {
+    runtime.coros.emplace_back(Lgs_ThunkFunc{funcPtr, ctx});
+}
+
 extern "C" void Lgs_Runtime_throwError(const size_t count, const char* msg, ...) {
-    char out[STRING_BUFFER_SIZE];
+    char out[LGS_STR_BUFFER_SIZE];
     va_list args;
     va_start(args, msg);
     formatErrorMsg(msg, out, count, args);
@@ -136,30 +136,39 @@ extern "C" size_t Lgs_Runtime_getCurrentLevel() {
 }
 
 void moveValue(const Lgs_TypeKind kind, const size_t level, void* left, void* right, const size_t size) {
-    if (kind == RTT_OBJECT) {
-        const auto leftField = *static_cast<void**>(left);
-        const auto rightField = *static_cast<void**>(right);
-        if (leftField) {
-            Lgs_Runtime_moveObject(leftField, rightField);
-            return;
+    switch (kind) {
+        case RTT_OBJECT: {
+            const auto leftField = *static_cast<void**>(left);
+            const auto rightField = *static_cast<void**>(right);
+            if (leftField) {
+                Lgs_Runtime_moveObject(leftField, rightField);
+                return;
+            }
+            auto& allocator = runtime.stack.at(level).allocator;
+            const auto newPtr = allocator.allocate(size, false);
+            std::memcpy(newPtr, rightField, size);
+            *static_cast<size_t*>(newPtr) = level;
+            *static_cast<void**>(left) = newPtr;
+            break;
         }
-        auto& allocator = runtime.stack.at(level).allocator;
-        const auto newPtr = allocator.allocate(size, false);
-        std::memcpy(newPtr, rightField, size);
-        *static_cast<size_t*>(newPtr) = level;
-        *static_cast<void**>(left) = newPtr;
-    } else if (kind == RTT_STR) {
-        const auto leftStr = static_cast<Lgs_Str*>(left);
-        const auto rightStr = static_cast<Lgs_Str*>(right);
-        Lgs_Runtime_moveStr(leftStr, rightStr);
-    } else if (kind == RTT_DARRAY) {
-        const auto leftArr = static_cast<Lgs_DArrayExpr*>(left);
-        const auto rightArr = static_cast<Lgs_DArrayExpr*>(right);
-        Lgs_Runtime_moveArr(leftArr, rightArr);
-    } else if (kind == RTT_MAP) {
-        assert(0);
-    } else {
-        std::memcpy(left, right, size);
+        case RTT_STR: {
+            const auto leftStr = static_cast<Lgs_Str*>(left);
+            const auto rightStr = static_cast<Lgs_Str*>(right);
+            Lgs_Runtime_moveStr(leftStr, rightStr);
+            break;
+        }
+        case RTT_DARRAY: {
+            const auto leftArr = static_cast<Lgs_DArrayExpr*>(left);
+            const auto rightArr = static_cast<Lgs_DArrayExpr*>(right);
+            Lgs_Runtime_moveArr(leftArr, rightArr);
+            break;
+        }
+        case RTT_MAP: {
+            assert(0);
+        }
+        default: {
+            std::memcpy(left, right, size);
+        }
     }
 }
 

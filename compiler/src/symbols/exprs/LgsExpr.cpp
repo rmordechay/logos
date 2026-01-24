@@ -256,7 +256,6 @@ LgsExpr* LgsExpr::clone() {
     assert(0);
 }
 
-
 void wrapInNullable(LgsExpr*& expr, LgsNullable* nullable) {
     assert(!nullable->baseType->asNullable() && !expr->asNullableExpr());
     const auto oldExpr = expr;

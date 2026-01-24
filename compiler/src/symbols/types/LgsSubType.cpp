@@ -30,7 +30,7 @@ std::string LgsSubType::pname() {
 
 bool LgsSubType::canCastTo(LgsType* other) {
     const auto otherName = other->getName();
-    if (otherName == LgsAny::name) return true;
+    if (other->isAny()) return true;
     return getName() == otherName;
 }
 

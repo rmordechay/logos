@@ -141,10 +141,32 @@ void LgsCgModule::visitEnum(const LgsEnum* enum_) {
     }
 }
 
+void LgsCgModule::initVirtuals() {
+    for (const auto symbol : globals.table.symbols) {
+        if (symbol.second.symbolType != OBJECT) continue;
+        const auto obj = symbol.second.object;
+        const auto rtt = obj->getRTType(cg);
+        for (const auto& [_, method] : obj->methods) {
+            visitFunc(method);
+            if (!method->funcType->isVirtual) continue;
+            auto methodName = method->funcType->name;
+            auto methodGenericName = method->funcType->getName();
+            for (const auto implement : obj->implements) {
+                if (!implement->methods.contains(methodName)) continue;
+                const auto IRFunc = method->getIRFunc(cg);
+                const auto interfaceMethodName = implement->methods[methodName]->funcType->name;
+                cg.addToVTable(rtt, cg.getString(interfaceMethodName), IRFunc);
+                break;
+            }
+        }
+    }
+}
+
 void LgsCgModule::visitMainFunc(LgsMainFunc* func) {
     stack.enterScope(func);
     createPrologue(func);
     initMainArgs(func);
+    initVirtuals();
     visitStmtsBlock(func->stmtsBlock);
     createEpilogue(func);
     stack.exitScope();
@@ -393,7 +415,8 @@ void LgsCgModule::visitIfWithElse(LgsIfStmt* ifStmt) {
 
     // if block
     stack.enterScope(ifStmt);
-    const auto ifCondIR = getIRValue(ifStmt->ifCond);
+    visitExpr(ifStmt->ifCond);
+    const auto ifCondIR = ifStmt->IRValue;
     cg.builder.CreateCondBr(ifCondIR, IRBlockTrue, IRBlockExit);
     cg.startBlock(IRBlockTrue);
     visitStmtsBlock(ifStmt->ifBlock);
@@ -416,7 +439,8 @@ void LgsCgModule::visitElseIf(LgsIfStmt* ifStmt) {
 
     // if block
     stack.enterScope(ifStmt);
-    const auto ifCondIR = getIRValue(ifStmt->ifCond);
+    visitExpr(ifStmt->ifCond);
+    const auto ifCondIR = ifStmt->ifCond->IRValue;
     cg.builder.CreateCondBr(ifCondIR, IRBlockTrue, IRBlockElseIfCheck);
     cg.startBlock(IRBlockTrue);
     visitStmtsBlock(ifStmt->ifBlock);
@@ -427,7 +451,8 @@ void LgsCgModule::visitElseIf(LgsIfStmt* ifStmt) {
         const auto [expr, stmtBlock] = ifStmt->elseIfs[i];
         stack.enterScope(ifStmt);
         cg.startBlock(IRBlockElseIfCheck);
-        const auto elseIfCondIR = getIRValue(expr);
+        visitExpr(expr);
+        const auto elseIfCondIR = expr->IRValue;
         IRBlockTrue = cg.createBlock(BLOCK_ELSE_IF);
         if (i == ifStmt->elseIfs.size() - 1) {
             if (ifStmt->elseBlock) {
@@ -704,35 +729,29 @@ void LgsCgModule::visitFloatConst(LgsFloatConst* floatConst) const {
 void LgsCgModule::visitComplexConst(const LgsComplexConst* complex) {
     visitExpr(complex->real);
     visitExpr(complex->imaginary);
-    cg.storeStructField(complex->type->getIRType(cg), complex->IRValue, 0, complex->real->IRValue);
-    cg.storeStructField(complex->type->getIRType(cg), complex->IRValue, 1, complex->imaginary->IRValue);
+    const auto ty = complex->type->getIRType(cg);
+    cg.storeStructField(ty, complex->IRValue, 0, complex->real->IRValue);
+    cg.storeStructField(ty, complex->IRValue, 1, complex->imaginary->IRValue);
 }
 
-void LgsCgModule::visitNullableExpr(LgsNullableExpr* nullableExpr) {
-    if (nullableExpr->baseExpr) {
-        visitExpr(nullableExpr->baseExpr);
+void LgsCgModule::visitNullableExpr(LgsNullableExpr* expr) {
+    if (expr->baseExpr) {
+        visitExpr(expr->baseExpr);
     }
-
-    const auto nullable = nullableExpr->type->asNullable();
+    const auto nullable = expr->type->asNullable();
     const auto ty = nullable->getIRType(cg);
-    if (nullableExpr->isNull) {
+    if (expr->isNull) {
         if (nullable->passByRef) {
-            nullableExpr->IRValue = cg.null();
+            expr->IRValue = cg.null();
         } else {
-            nullableExpr->IRValue = nullableExpr->pointee ? nullableExpr->pointee : cg.builder.CreateAlloca(ty);
-            nullable->storeIsSet(cg, nullableExpr->IRValue, cg.false_());
+            expr->IRValue = expr->pointee ? expr->pointee : cg.builder.CreateAlloca(ty);
+            cg.storeStructField(ty, expr->IRValue, nullable->isSetIndex, cg.false_());
         }
     } else if (nullable->passByRef) {
-        nullableExpr->IRValue = nullableExpr->baseExpr->IRValue;
+        expr->IRValue = expr->baseExpr->IRValue;
     } else {
-        nullableExpr->IRValue = nullableExpr->pointee ? nullableExpr->pointee : cg.builder.CreateAlloca(ty);
-        Value* isSet;
-        if (nullable->baseType->asStr()) {
-            isSet = cg.builder.CreateExtractValue(nullableExpr->baseExpr->IRValue, 1);
-        } else {
-            isSet = nullableExpr->baseExpr->IRValue;
-        }
-        nullable->setNullableFields(cg, nullableExpr->IRValue, nullableExpr->baseExpr->loadIR(cg), isSet);
+        expr->IRValue = expr->pointee ? expr->pointee : cg.builder.CreateAlloca(ty);
+        nullable->setIRFields(cg, expr->IRValue, expr->baseExpr->loadIR(cg), cg.true_());
     }
 }
 
@@ -869,7 +888,7 @@ void LgsCgModule::visitMatrixExpr(const LgsMatrixExpr* matrixExpr) {
 void LgsCgModule::visitHashMap(LgsHashMap* hashMap) {
     const auto map = hashMap->type->asMap();
     const auto ptr = hashMap->pointee ? hashMap->pointee : cg.heapAlloc(map->IRSize(cg), cg.currentLevel, true);
-    const auto cap = cg.usize(MAP_INITIAL_CAPACITY);
+    const auto cap = cg.usize(LGS_ITER_INIT_CAP);
     const auto entriesSize = map->pairType->IRSize(cg) + sizeof(void*);
     const auto totalSize = cg.builder.CreateMul(entriesSize, cap);
     const auto entries = cg.heapAlloc(totalSize, cg.currentLevel, false);
@@ -910,7 +929,7 @@ void LgsCgModule::visitVariable(LgsVariable* variable) {
         break;
     case OBJECT:
         assert(variable->ref.object->singleton);
-        variable->IRValue = getIRValue(variable->ref.object->singleton);
+        variable->IRValue = variable->ref.object->singleton->IRValue;
         break;
     case FIELD:
         if (variable->ref.field->type->asEnum()) {
@@ -1045,7 +1064,7 @@ void LgsCgModule::visitFuncCall(LgsFuncCall* funcCall) {
     // Function pointer
     if (funcCall->ref.symbolType != UNKNOWN) {
         LgsType* type = nullptr;
-        LgsValue* value = nullptr;
+        const LgsValue* value = nullptr;
         if (funcCall->ref.symbolType == PARAM) {
             type = funcCall->ref.param->type;
             value = funcCall->ref.param;
@@ -1054,7 +1073,7 @@ void LgsCgModule::visitFuncCall(LgsFuncCall* funcCall) {
             value = funcCall->ref.varDec;
         }
         funcCall->func = new LgsFunc(type->asFuncType());
-        funcCall->func->IRValue = getIRValue(value);
+        funcCall->func->IRValue = value->IRValue;
     }
     assert(funcCall->func || funcCall->coroutine);
 
@@ -1083,7 +1102,8 @@ void LgsCgModule::visitFuncCall(LgsFuncCall* funcCall) {
 }
 
 void LgsCgModule::visitPrefixExpr(LgsPrefixExpr* prefixExpr) {
-    const auto exprIRVal = getIRValue(prefixExpr->expr);
+    visitExpr(prefixExpr->expr);
+    const auto exprIRVal = prefixExpr->expr->IRValue;
     switch (prefixExpr->op) {
     case NOT_PREFIX: {
         prefixExpr->IRValue = cg.builder.CreateNot(exprIRVal);
@@ -1174,30 +1194,32 @@ void LgsCgModule::visitCharConst(LgsCharConst* charConst) const {
 void LgsCgModule::visitInstance(LgsInstance* instance) {
     const auto obj = instance->obj;
     instance->IRValue = cg.heapAlloc(obj->IRSize(cg), cg.currentLevel, true);
-    cg.storeStructField(obj->getIRType(cg), instance->IRValue, 1, obj->getRTType(cg));
+    cg.storeStructField(obj->getIRType(cg), instance->IRValue, obj->typeIndex, obj->getRTType(cg));
 
     // Args
     std::unordered_set<std::string> visited;
     for (const auto& [argName, arg] : instance->args) {
         visited.insert(argName);
-        const auto field = instance->obj->getField(argName);
+        const auto field = instance->getField(argName);
         arg.expr->pointee = field->getGEP(cg, instance->IRValue);
         visitExpr(arg.expr);
         cg.store(arg.expr->IRValue, arg.expr->pointee);
     }
 
     // Zero values
-    for (const auto field : instance->obj->fields) {
+    for (const auto field : instance->fields) {
         const auto fieldType = field->type;
         if (visited.contains(field->name) || fieldType->asEnum()) continue;
         const auto pointee = field->getGEP(cg, instance->IRValue);
         if (field->expr) {
+            field->expr->pointee = pointee;
+            visitExpr(field->expr);
             cg.store(field->expr->IRValue, pointee);
         } else {
             const auto zero = fieldType->getZeroValue();
             if (fieldType->asObject()) {
                 zero->IRValue = cg.heapAlloc(fieldType->IRSize(cg), cg.currentLevel, true);
-                cg.storeStructField(fieldType->getIRType(cg), zero->IRValue, 1, fieldType->getRTType(cg));
+                cg.storeStructField(fieldType->getIRType(cg), zero->IRValue, obj->typeIndex, fieldType->getRTType(cg));
             } else {
                 visitExpr(zero);
             }
@@ -1205,7 +1227,7 @@ void LgsCgModule::visitInstance(LgsInstance* instance) {
             freeExpr(zero);
         }
     }
-    addVirtuals(instance->obj, instance->IRValue);
+    addVirtualFields(obj, instance->IRValue);
 }
 
 void LgsCgModule::visitIterIndex(LgsIterIndex* iterIndex, const bool assign) {
@@ -1338,54 +1360,14 @@ bool LgsCgModule::checkMock(LgsExpr* expr) const {
     return false;
 }
 
-Value* LgsCgModule::getIRValue(LgsValue* value) {
-    if (value->IRValue) return value->IRValue;
-    if (const auto expr = dynamic_cast<LgsExpr*>(value)) {
-        visitExpr(expr);
-    } else if (const auto stmt = dynamic_cast<LgsStmt*>(value)) {
-        visitStmt(stmt);
-    } else {
-        assert(0);
-    }
-    assert(value->IRValue);
-    return value->IRValue;
-}
-
-void LgsCgModule::addVirtuals(LgsObject* obj, Value* ptr) const {
+void LgsCgModule::addVirtualFields(LgsObject* obj, Value* ptr) const {
+    const auto rtt = obj->getRTType(cg);
     for (const auto& field : obj->fields) {
         if (!field->isVirtual) continue;
         const auto objIR = obj->getIRType(cg);
         const auto fieldGEP = cg.builder.CreateStructGEP(objIR, ptr, field->position);
         cg.addToVTable(ptr, cg.getString(field->name), fieldGEP);
     }
-
-    for (const auto& [_, method] : obj->methods) {
-        if (!method->funcType->isVirtual) continue;
-        auto methodName = method->funcType->name;
-        auto methodGenericName = method->funcType->getName();
-        for (const auto implement : obj->implements) {
-            if (!implement->methods.contains(methodName)) continue;
-            const auto IRFunc = method->getIRFunc(cg);
-            const auto interfaceMethodName = implement->methods[methodName]->funcType->name;
-            cg.addToVTable(ptr, cg.getString(interfaceMethodName), IRFunc);
-            break;
-        }
-    }
-
-    // TODO make virtual only if the method was overridden
-    // Implemented interface methods
-    // const auto obj = type->asObject();
-    // if (!obj) return;
-    // for (const auto implement : obj->implements) {
-    //     for (const auto& [methodName, interfaceMethod] : implement->methods) {
-    //         if (!interfaceMethod->stmtsBlock) continue;
-    //         const auto objMethod = obj->methods.find(methodName);
-    //         if (objMethod != obj->methods.end()) continue;
-    //         const auto id = cg.hashConst(methodName);
-    //         const auto IRFunc = interfaceMethod->getIRFunc(cg);
-    //         cg.addToVTable(ptr, id, IRFunc);
-    //     }
-    // }
 }
 
 void LgsCgModule::generateMapFunc(LgsFuncType* mapFunc) {

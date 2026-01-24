@@ -113,7 +113,7 @@ public:
     void visitConstant(LgsExpr* expr);
     void visitFloatConst(LgsFloatConst* floatConst) const;
     void visitComplexConst(const LgsComplexConst* complex);
-    void visitNullableExpr(LgsNullableExpr* nullableExpr);
+    void visitNullableExpr(LgsNullableExpr* expr);
     void visitArrayExpr(LgsArrayExpr* arrayExpr);
     void visitStaticArray(LgsArrayExpr* arrayExpr) const;
     void visitDynamicArray(LgsArrayExpr* arrayExpr) const;
@@ -144,10 +144,10 @@ public:
     Value* getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) const;
     Function* getThunkFunc(LgsFuncCall* fc, Type* ctxTy) const;
 
+    void initVirtuals();
+    void addVirtualFields(LgsObject* obj, Value* ptr) const;
     void createVecField(LgsField* field, Value* parent) const;
     bool checkMock(LgsExpr* expr) const;
-    Value* getIRValue(LgsValue* value);
-    void addVirtuals(LgsObject* obj, Value* ptr) const;
     void generateMapFunc(LgsFuncType* mapFunc);
     void generateFilterFunc(LgsFuncType* filterFunc);
     void generateForeachFunc(LgsFuncType* forEachFunc) const;

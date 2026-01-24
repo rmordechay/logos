@@ -98,7 +98,7 @@ Constant* LgsCodeGen::getString(const std::string& value) {
 }
 
 llvm::AllocaInst* LgsCodeGen::emptyBuffer() {
-    return builder.CreateAlloca(ArrayType::get(i8Ty(), STRING_BUFFER_SIZE));
+    return builder.CreateAlloca(ArrayType::get(i8Ty(), LGS_STR_BUFFER_SIZE));
 }
 
 size_t LgsCodeGen::getAllocSize(Type* type) const {
@@ -332,7 +332,7 @@ Value* LgsCodeGen::callPrintf(const std::vector<Value*>& args) {
 
 Value* LgsCodeGen::callSnprintf(const std::string& fmt, const std::vector<Value*>& args) {
     const auto buffer = emptyBuffer();
-    std::vector<Value*> tempArgs = {buffer, usize(STRING_BUFFER_SIZE), getString(fmt)};
+    std::vector<Value*> tempArgs = {buffer, usize(LGS_STR_BUFFER_SIZE), getString(fmt)};
     tempArgs.insert(tempArgs.end(), args.begin(), args.end());
     callFunc("snprintf", i32Ty(), {ptrTy(), sizeTy(), ptrTy()}, tempArgs, true);
     return buffer;
@@ -351,7 +351,7 @@ void LgsCodeGen::callMemcpy(Value* dest, Value* src, Value* size) {
 }
 
 GlobalVariable* LgsCodeGen::getRTTypeInfo(const std::string& name, ConstantInt* size, const Lgs_TypeKind kind) {
-    const auto baseStruct = getRTTStructType();
+    const auto baseStruct = getRTTStruct();
     const auto prefixedName = LGS_TYPEINFO_PREFIX + name;
     if (mode == CG_MODE_RTTYPES) {
         const auto initializer = llvm::ConstantStruct::get(baseStruct, {size, i32(kind)});
@@ -360,7 +360,7 @@ GlobalVariable* LgsCodeGen::getRTTypeInfo(const std::string& name, ConstantInt* 
     return createGlobal(prefixedName, baseStruct, nullptr);
 }
 
-StructType* LgsCodeGen::getRTTStructType() {
+StructType* LgsCodeGen::getRTTStruct() {
     return getStructType({sizeTy(), i32Ty()}, "RTI");
 }
 

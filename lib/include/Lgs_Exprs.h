@@ -7,6 +7,11 @@ struct Lgs_Str {
     char* data;
 };
 
+struct Lgs_NullableExpr {
+    int32_t v;
+    bool isSet;
+};
+
 struct Lgs_DArrayExpr {
     size_t level;
     Lgs_TypeInfo* baseType;

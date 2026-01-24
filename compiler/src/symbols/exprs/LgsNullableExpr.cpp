@@ -9,7 +9,7 @@ Value* LgsNullableExpr::loadIR(LgsCodeGen& cg) {
 void LgsNullableExpr::assign(LgsCodeGen& cg, LgsExpr* right) {
     if (!type->passByRef) {
         const auto isSet = cg.builder.CreateIsNotNull(right->IRValue);
-        type->asNullable()->setNullableFields(cg, IRValue, right->IRValue, isSet);
+        type->asNullable()->setIRFields(cg, IRValue, right->IRValue, isSet);
         return;
     }
     cg.store(right->IRValue, IRValue);
@@ -28,4 +28,12 @@ void LgsNullableExpr::castImplicitly(LgsType* toType) {
 
 std::string LgsNullableExpr::asText() {
     return baseExpr->asText() + '?';
+}
+
+LgsExpr* LgsNullableExpr::clone() {
+    const auto newNullableExpr = new LgsNullableExpr(*this);
+    if (newNullableExpr->baseExpr) {
+        newNullableExpr->baseExpr = baseExpr->clone();
+    }
+    return newNullableExpr;
 }
