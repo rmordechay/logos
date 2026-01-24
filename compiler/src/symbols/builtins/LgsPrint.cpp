@@ -13,7 +13,7 @@ Value* LgsPrint::call(LgsCodeGen& cg, std::vector<LgsFuncArg>& args) {
         const auto fmt = cg.getString(arg->type->fmtStr() + "\n");
         return cg.callPrintf({fmt, cg.builder.CreateFPExt(arg->IRValue, cg.doubleTy())});
     }
-    if (arg->type->asStr() || arg->type->asBool() || arg->type->asEnum() || arg->type->asEnumField()) {
+    if (arg->type->asStr() || arg->type->asBool() || arg->type->asEnum()) {
         const auto fmt = cg.getString(arg->type->fmtStr() + "\n");
         const auto value = arg->type->asIRStr(cg, arg->loadIR(cg));
         return cg.callPrintf({fmt, value});

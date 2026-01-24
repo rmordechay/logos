@@ -457,11 +457,12 @@ void LgsCgModule::visitElseIf(LgsIfStmt* ifStmt) {
 
 void LgsCgModule::visitSwitch(LgsSwitch* switchStmt) {
     assert(switchStmt->cond);
-    const auto defaultBlock = cg.createBlock("");
-    const auto exitBlock = cg.createBlock("", cg.currentFunc);
-    visitExpr(switchStmt->cond);
+    const auto defaultBlock = cg.createBlock(BLOCK_DEFAULT);
+    const auto exitBlock = cg.createBlock(BLOCK_EXIT, cg.currentFunc);
+    const auto cond = switchStmt->cond;
+    visitExpr(cond);
 
-    const auto exprIRValue = switchStmt->cond->type->hashValue(cg, switchStmt->cond->IRValue);
+    const auto exprIRValue = cond->type->hashValue(cg, cond->IRValue);
     SwitchInst* switchInst;
     if (switchStmt->elseBlock) {
         const auto numOfCases = switchStmt->patterns.size();
@@ -474,8 +475,9 @@ void LgsCgModule::visitSwitch(LgsSwitch* switchStmt) {
         stack.enterScope(switchStmt);
         const auto [expr, stmtsBlock] = switchStmt->patterns[i];
         visitExpr(expr);
-        const auto patternBlock = cg.createBlock(BLOCK_CASE_PREFIX + std::to_string(i), cg.currentFunc);
+        const auto patternBlock = cg.createBlock(BLOCK_CASE_PREFIX, cg.currentFunc);
         const auto hashed = expr->type->hashValue(cg, expr->IRValue);
+        assert(hashed);
         switchInst->addCase(llvm::dyn_cast<ConstantInt>(hashed), patternBlock);
         cg.builder.SetInsertPoint(patternBlock);
         visitStmtsBlock(stmtsBlock);
@@ -960,7 +962,6 @@ void LgsCgModule::visitSelection(LgsSelection* selection, const bool assign) {
 void LgsCgModule::visitFieldSelection(LgsVariable* var, LgsExpr* parent) const {
     const auto field = var->ref.field;
     const auto fieldType = field->type;
-    if (fieldType->asEnum() || fieldType->asEnumField()) return;
 
     // Function pointer
     if (var->ref.symbolType == FUNC) {
@@ -969,8 +970,17 @@ void LgsCgModule::visitFieldSelection(LgsVariable* var, LgsExpr* parent) const {
     }
 
     // Enum field
-    if (var->type->asEnumField()) {
-        assert(0);
+    if (const auto enum_ = var->type->asEnum()) {
+        if (enum_->fieldName == "") {
+            var->IRValue = cg.getString(enum_->name);
+        } else if (field->expr) {
+            var->IRValue = UndefValue::get(enum_->getIRType(cg));
+            var->IRValue = cg.builder.CreateInsertValue(var->IRValue, cg.i32(enum_->fieldIndex), 0);
+            var->IRValue = cg.builder.CreateInsertValue(var->IRValue, field->expr->IRValue, 1);
+        } else {
+            var->IRValue = cg.usize(enum_->fieldIndex);
+        }
+        return;
     }
 
     // Singleton

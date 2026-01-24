@@ -9,7 +9,7 @@
 #include <llvm/IR/InlineAsm.h>
 
 Value* LgsSelection::loadIR(LgsCodeGen& cg) {
-    if (type->asEnum() || type->asEnumField()) return IRValue;
+    if (type->asEnum()) return IRValue;
     if (!type->passByRef && asMethodCall()) return IRValue;
     return cg.load(type->getTypeOrPtr(cg), IRValue);
 }

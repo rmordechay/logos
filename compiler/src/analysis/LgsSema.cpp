@@ -142,11 +142,13 @@ void LgsSema::visitEnum(LgsEnum* enum_) {
         field->type->passByRef = field->expr->type->passByRef;
         if (!baseType) {
             baseType = field->expr->type;
+            field->type->asEnum()->subtype = baseType;
             continue;
         }
         if (!baseType->equals(field->expr->type)) {
             addError(E10075, field->location);
         }
+        field->type->asEnum()->subtype = baseType;
     }
     enum_->subtype = baseType;
 }
@@ -976,6 +978,7 @@ void LgsSema::visitVariable(LgsVariable* variable) {
     }
     case FIELD: {
         variable->ref.field = symbol->field;
+        variable->isMutable = symbol->field->isMutable;
         variable->setType(symbol->field->type);
         break;
     }
@@ -999,6 +1002,7 @@ void LgsSema::visitSelection(LgsSelection* selection) {
     }
     visitInnerSelections(selection);
     selection->setType(selection->exprs.back()->type);
+    selection->isMutable = selection->exprs.back()->isMutable;
 }
 
 void LgsSema::visitFirstSelection(LgsSelection* selection) {

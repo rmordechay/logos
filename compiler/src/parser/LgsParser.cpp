@@ -64,8 +64,6 @@
 #include "types/primitives/LgsUInt.h"
 #include <unordered_set>
 
-#include "types/LgsEnumField.h"
-
 LgsFunc* wrapStmtsBlockWithLambda(LgsStmtsBlock* stmtsBlock);
 
 #define MAX_TOKENS_NUMBER 100000
@@ -598,9 +596,11 @@ LgsEnum* LgsParser::parseEnum() {
             expr = parseExpr();
             mustParse(expr);
         }
-        const auto fieldType = new LgsEnumField(enum_, enumField.lexeme);
+        position++;
+        const auto fieldType = new LgsEnum(enum_->name, enumField.lexeme, position);
         const auto field = new LgsField(enumField.lexeme, fieldType, expr);
-        field->position = position++;
+        field->position = position;
+        field->isMutable = false;
         setLocation(field->location, &enumField, &currentToken);
         enum_->fields.push_back(field);
         if (currentToken.type == T_RBRACE) break;

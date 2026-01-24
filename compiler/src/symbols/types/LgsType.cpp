@@ -10,7 +10,6 @@
 #include "types/LgsObject.h"
 #include "types/iterables/LgsDArray.h"
 #include "types/LgsEnum.h"
-#include "types/LgsEnumField.h"
 #include "types/LgsGenericType.h"
 #include "types/LgsNullable.h"
 #include "types/iterables/LgsMap.h"
@@ -268,10 +267,6 @@ LgsInterface* LgsType::asInterface() {
 
 LgsEnum* LgsType::asEnum() {
     return dynamic_cast<LgsEnum*>(this);
-}
-
-LgsEnumField* LgsType::asEnumField() {
-    return dynamic_cast<LgsEnumField*>(this);
 }
 
 LgsGenericType* LgsType::asGenericType() {

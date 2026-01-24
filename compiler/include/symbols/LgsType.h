@@ -136,7 +136,6 @@ public:
     LgsObject* asObject();
     LgsInterface* asInterface();
     LgsEnum* asEnum();
-    LgsEnumField* asEnumField();
     LgsGenericType* asGenericType();
     LgsIterable* asIterable();
     LgsSArray* asSArray();
