@@ -31,19 +31,20 @@ static std::string formatElement(const Lgs_TypeKind kind, void* type, void* valu
     break;
     case RTT_CHAR: str << "'" << *static_cast<const char*>(value) << "'"; break;
     case RTT_OBJECT: {
-        const auto level = static_cast<size_t*>(value);
-        const auto obj = *reinterpret_cast<Lgs_Object**>(level + 1);
+        const auto obj = static_cast<Lgs_Object*>(type);
         str << "{";
         for (int i = 0; i < obj->fieldsCount; ++i) {
-            const auto fieldName = obj->fieldNames[i];
-            const auto fieldOffset = obj->fieldOffsets[i];
-            const auto fieldKind = obj->fieldKinds[i];
+            const auto fieldName = obj->fields[i].name;
+            const auto fieldOffset = obj->fields[i].offset;
+            const auto fieldKind = obj->fields[i].kind;
+            auto fieldType = obj->fields[i].type;
             void* fieldPtr = static_cast<char*>(value) + fieldOffset;
-            if (fieldKind == RTT_OBJECT || fieldKind == RTT_DARRAY) {
+            if (fieldKind == RTT_OBJECT) {
                 fieldPtr = *static_cast<void**>(fieldPtr);
+                fieldType = static_cast<char*>(fieldPtr) + sizeof(size_t);
             }
             str << fieldName << '=';
-            str << formatElement(fieldKind, nullptr, fieldPtr);
+            str << formatElement(fieldKind, fieldType, fieldPtr);
             if (i < obj->fieldsCount - 1) str << ", ";
         }
         str << "}";
@@ -55,7 +56,7 @@ static std::string formatElement(const Lgs_TypeKind kind, void* type, void* valu
         str << "[";
         for (int i = 0; i < arr->length; ++i) {
             const auto element = arr->data + arr->baseType->size * i;
-            str << formatElement(arr->baseType->kind, nullptr, element);
+            str << formatElement(arr->baseType->kind, arr->baseType, element);
             if (i < arr->length - 1) str << ", ";
         }
         str << "]";
@@ -73,7 +74,8 @@ static std::string formatElement(const Lgs_TypeKind kind, void* type, void* valu
         break;
     }
     case RTT_NULLABLE: {
-        const auto a = static_cast<Lgs_NullableExpr*>(value);
+        const auto nullable = static_cast<Lgs_Nullable*>(type);
+        str << formatElement(nullable->baseType->kind, nullable->baseType, *static_cast<void**>(value));
         break;
     }
     case RTT_VEC2:
@@ -82,7 +84,8 @@ static std::string formatElement(const Lgs_TypeKind kind, void* type, void* valu
     case RTT_MATRIX:
     case RTT_MAP:
     case RTT_COMPLEX:
-    default: assert(0);
+    default:
+        assert(0);
     }
     return str.str();
 }

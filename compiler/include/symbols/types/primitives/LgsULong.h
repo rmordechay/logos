@@ -8,6 +8,7 @@ public:
     LgsULong() {
         isUnsinged = true;
         isInt = true;
+        rtt = RTT_ULONG;
     }
     size_t sizeBytes() override;
     Type* getIRType(LgsCodeGen& cg) override;

@@ -40,7 +40,7 @@ inline LgsBaseMsg E10025{"Only interfaces are allowed in implements. Given: %s."
 inline LgsBaseMsg E10026{"Function %s must return an expression of type %s. None was given.", errCodeStart++};
 inline LgsBaseMsg E10027{"Void function can either return Void type or empty return. Given: %s.", errCodeStart++};
 inline LgsBaseMsg E10028{"Default parameters must be defined lastly.", errCodeStart++};
-inline LgsBaseMsg E10029{"Constant field '%s' must be initialized in the class or in the constructor.", errCodeStart++};
+inline LgsBaseMsg E10029{"", errCodeStart++};
 inline LgsBaseMsg E10030{"Non-public field %s is used outside its parent object %s.", errCodeStart++};
 inline LgsBaseMsg E10031{"Non-public method %s is used outside its parent object %s.", errCodeStart++};
 inline LgsBaseMsg E10032{"Singleton object %s cannot be instantiated.", errCodeStart++};
@@ -120,7 +120,7 @@ inline LgsBaseMsg E10105{"Too many elements for array of size: %s.", errCodeStar
 inline LgsBaseMsg E10106{"Could not parse C file %s", errCodeStart++};
 inline LgsBaseMsg E10107{"Could not find C library %s", errCodeStart++};
 inline LgsBaseMsg E10108{"%s is not indexable.", errCodeStart++};
-inline LgsBaseMsg E10109{"", errCodeStart++};
+inline LgsBaseMsg E10109{"Field default expression must be of constant type.", errCodeStart++};
 inline LgsBaseMsg E10110{"Unsigned number cannot be negative.", errCodeStart++};
 inline LgsBaseMsg E10111{"Array type %s does not match the element type %s.", errCodeStart++};
 inline LgsBaseMsg E10112{"Matrix rows/columns cannot be 0.", errCodeStart++};

@@ -8,6 +8,7 @@
 #include "types/LgsAny.h"
 #include "types/primitives/LgsBool.h"
 #include <cassert>
+#include <llvm/IR/Module.h>
 
 #include "exprs/LgsBinaryExpr.h"
 
@@ -38,7 +39,12 @@ Type* LgsNullable::getIRType(LgsCodeGen& cg) {
 }
 
 Constant* LgsNullable::getRTType(LgsCodeGen& cg) {
-    return cg.getRTTypeInfo(getName(), IRSize(cg), rtt);
+    const auto RTTName = LGS_TYPEINFO_PREFIX + getName();
+    if (const auto v = cg.IRModule->getGlobalVariable(RTTName)) return v;
+    if (cg.mode != CG_MODE_RTTYPES) return cg.createGlobal(RTTName, cg.getRTTStructType(), nullptr);
+    const auto st = cg.getStructType({cg.i1Ty(), cg.ptrTy()});
+    const std::vector<Constant*> args = {cg.i1(passByRef), baseType ? baseType->getRTType(cg) : cg.null()};
+    return cg.createGlobal(RTTName, st, ConstantStruct::get(st, args));
 }
 
 bool LgsNullable::canCastTo(LgsType* other) {

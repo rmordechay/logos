@@ -37,8 +37,7 @@ Constant* LgsSArray::getRTType(LgsCodeGen& cg) {
     if (const auto v = cg.IRModule->getGlobalVariable(RTTName)) return v;
     if (cg.mode != CG_MODE_RTTYPES) return cg.createGlobal(RTTName, cg.getRTTStructType(), nullptr);
     const auto st = cg.getStructType({cg.sizeTy(), cg.ptrTy()});
-    const auto baseTypeRTT = cg.getRTTypeInfo(baseType->getName(), baseType->IRSize(cg), baseType->rtt);
-    const std::vector<Constant*> args = {cg.usize(len), baseTypeRTT};
+    const std::vector<Constant*> args = {cg.usize(len), baseType->getRTType(cg)};
     return cg.createGlobal(RTTName, st, ConstantStruct::get(st, args));
 }
 

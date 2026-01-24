@@ -42,18 +42,28 @@ struct Lgs_TypeInfo {
     const Lgs_TypeKind kind;
 };
 
+struct Lgs_Field {
+    const char* name;
+    const size_t size;
+    const size_t offset;
+    const Lgs_TypeKind kind;
+    void* type;
+};
+
 struct Lgs_Object {
     const char* name;
     const size_t size;
     const size_t fieldsCount;
-    const char** fieldNames;
-    const size_t* fieldSizes;
-    const size_t* fieldOffsets;
-    const Lgs_TypeKind* fieldKinds;
+    const Lgs_Field* fields;
 };
 
 struct Lgs_SArr {
     const size_t length;
+    Lgs_TypeInfo* baseType;
+};
+
+struct Lgs_Nullable {
+    bool isPtr;
     Lgs_TypeInfo* baseType;
 };
 

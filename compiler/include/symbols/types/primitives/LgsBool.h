@@ -9,6 +9,7 @@ public:
 
     LgsBool() {
         isInt = true;
+        rtt = RTT_BOOL;
     }
     Type* getIRType(LgsCodeGen& cg) override;
     Constant* getRTType(LgsCodeGen& cg) override;

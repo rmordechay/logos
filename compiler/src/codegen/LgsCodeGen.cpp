@@ -160,6 +160,7 @@ void LgsCodeGen::ifElseStmt(Value* cond, const std::function<void()>& ifBody, co
 }
 
 void LgsCodeGen::store(Value* v, Value* ptr) {
+    assert(v && ptr);
     if (v == ptr) return;
     builder.CreateStore(v, ptr);
 }

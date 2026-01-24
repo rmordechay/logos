@@ -166,6 +166,9 @@ void LgsSema::visitField(LgsField* field) {
     if (field->expr) {
         visitExpr(field->expr);
         validateExprType(field->expr, field->type);
+        if (field->expr->isMutable) {
+            addError(E10109, field->expr->location);
+        }
     }
     if (field->expr && field->expr->asFunc()) {
         addError(E10013, field->location, {field->name});
@@ -1339,13 +1342,6 @@ void LgsSema::visitInstance(LgsInstance* instance) {
     for (const auto field : obj->fields) {
         if (visited.contains(field->name)) continue;
         addGenerics(field->type);
-    }
-
-    // Missing required fields
-    for (const auto& field : instance->obj->fields) {
-        if (!field->isMutable && !instance->args.contains(field->name)) {
-            addError(E10029, field->location, {field->name});
-        }
     }
 }
 

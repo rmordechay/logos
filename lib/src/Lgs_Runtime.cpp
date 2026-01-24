@@ -74,10 +74,10 @@ extern "C" void Lgs_Runtime_moveObject(void* left, void* right) {
     if (leftLevel >= rightLevel) return;
     const auto obj = *reinterpret_cast<Lgs_Object**>(rightLevelPtr + 1);
     for (size_t i = 0; i < obj->fieldsCount; ++i) {
-        const auto offsets = obj->fieldOffsets;
-        void* leftFieldPtr = static_cast<char*>(left) + offsets[i];
-        void* rightFieldPtr = static_cast<char*>(right) + offsets[i];
-        moveValue(obj->fieldKinds[i], leftLevel, leftFieldPtr, rightFieldPtr, obj->fieldSizes[i]);
+        const auto offset = obj->fields[i].offset;
+        void* leftFieldPtr = static_cast<char*>(left) + offset;
+        void* rightFieldPtr = static_cast<char*>(right) + offset;
+        moveValue(obj->fields[i].kind, leftLevel, leftFieldPtr, rightFieldPtr, obj->fields[i].size);
     }
 }
 

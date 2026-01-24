@@ -7,6 +7,7 @@ public:
 
     LgsFloat() {
         isFloat = true;
+        rtt = RTT_FLOAT;
     }
     Type* getIRType(LgsCodeGen& cg) override;
     std::string getName() override;

@@ -5,6 +5,9 @@ class LgsVoid final : public LgsType {
 public:
     static constexpr auto name = "Void";
 
+    LgsVoid() {
+        rtt = RTT_VOID;
+    }
     Type* getIRType(LgsCodeGen& cg) override;
     Constant* getRTType(LgsCodeGen& cg) override;
     size_t sizeBytes() override;

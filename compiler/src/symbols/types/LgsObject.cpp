@@ -60,30 +60,29 @@ Constant* LgsObject::getRTType(LgsCodeGen& cg) {
     if (const auto v = cg.IRModule->getGlobalVariable(RTTName)) return v;
     if (cg.mode != CG_MODE_RTTYPES) return cg.createGlobal(RTTName, cg.getRTTStructType(), nullptr);
     const auto numFields = fields.size();
-    const auto ptrTypeArr = ArrayType::get(cg.ptrTy(), numFields);
-    const auto sizeTypeArr = ArrayType::get(cg.sizeTy(), numFields);
-    const auto intTypeArr = ArrayType::get(cg.i32Ty(), numFields);
-    const auto objRTType = cg.getStructType({cg.ptrTy(), cg.sizeTy(), cg.sizeTy(), cg.ptrTy(), cg.ptrTy(), cg.ptrTy(), cg.ptrTy()}, RTTName);
+    constexpr auto RTTFieldName = std::string(LGS_TYPEINFO_PREFIX) + "field";
+    const auto objRTType = cg.getStructType({cg.ptrTy(), cg.sizeTy(), cg.sizeTy(), cg.ptrTy()}, RTTName);
+    const auto fieldRTType = cg.getStructType({cg.ptrTy(), cg.sizeTy(), cg.sizeTy(), cg.i32Ty(), cg.ptrTy()}, RTTFieldName);
+    const auto fieldTypeArr = ArrayType::get(fieldRTType, numFields);
     const auto sl = cg.IRModule->getDataLayout().getStructLayout(llvm::cast<StructType>(getIRType(cg)));
 
-    std::vector<Constant*> fieldNames;
-    std::vector<Constant*> fieldSizes;
-    std::vector<Constant*> fieldOffsets;
-    std::vector<Constant*> fieldKinds;
+    std::vector<Constant*> rttFields;
     for (size_t i = 0; i < fields.size(); ++i) {
         const auto field = fields[i];
-        fieldNames.push_back(cg.getString(field->name));
-        fieldSizes.push_back(field->type->IRSize(cg));
-        fieldOffsets.push_back(cg.usize(sl->getElementOffset(i + 2)));
-        assert(field->type->rtt);
-        fieldKinds.push_back(cg.i32(field->type->rtt));
+        assert(field->type->rtt != RTT_UNKNOWN);
+        rttFields.emplace_back(ConstantStruct::get(fieldRTType, {
+            cg.getString(field->name),
+            field->type->IRSize(cg),
+            cg.usize(sl->getElementOffset(i + 2)),
+            cg.i32(field->type->rtt),
+            field->type->asObject() ? cg.null() : field->type->getRTType(cg),
+        }));
     }
-    const auto namesArrGlobal = cg.createGlobal(RTTName + "_names", ptrTypeArr, ConstantArray::get(ptrTypeArr, fieldNames));
-    const auto sizesArrGlobal = cg.createGlobal(RTTName + "_sizes", sizeTypeArr, ConstantArray::get(sizeTypeArr, fieldSizes));
-    const auto offsetsArrGlobal = cg.createGlobal(RTTName + "_offsets", sizeTypeArr, ConstantArray::get(sizeTypeArr, fieldOffsets));
-    const auto kindsArrGlobal = cg.createGlobal(RTTName + "_kinds", intTypeArr, ConstantArray::get(intTypeArr, fieldKinds));
     const std::vector<Constant*> args = {
-        cg.getString(name), IRSize(cg), cg.usize(numFields), namesArrGlobal, sizesArrGlobal, offsetsArrGlobal, kindsArrGlobal
+        cg.getString(name),
+        IRSize(cg),
+        cg.usize(numFields),
+        cg.createGlobal(LGS_TYPEINFO_PREFIX + name + "_fields", fieldTypeArr, ConstantArray::get(fieldTypeArr, rttFields)),
     };
     return cg.createGlobal(RTTName, objRTType, ConstantStruct::get(objRTType, args));
 }
