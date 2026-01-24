@@ -726,7 +726,12 @@ void LgsCgModule::visitNullableExpr(LgsNullableExpr* nullableExpr) {
         nullableExpr->IRValue = nullableExpr->baseExpr->IRValue;
     } else {
         nullableExpr->IRValue = nullableExpr->pointee ? nullableExpr->pointee : cg.builder.CreateAlloca(ty);
-        const auto isSet = cg.builder.CreateIsNotNull(nullableExpr->baseExpr->IRValue);
+        Value* isSet;
+        if (nullable->baseType->asStr()) {
+            isSet = cg.builder.CreateExtractValue(nullableExpr->baseExpr->IRValue, 1);
+        } else {
+            isSet = nullableExpr->baseExpr->IRValue;
+        }
         nullable->setNullableFields(cg, nullableExpr->IRValue, nullableExpr->baseExpr->loadIR(cg), isSet);
     }
 }
@@ -1141,9 +1146,8 @@ void LgsCgModule::visitIntConst(LgsIntConst* intConst) const {
 void LgsCgModule::visitStrConst(LgsStrConst* strConst) {
     if (strConst->parts.empty()) {
         const auto ty = strConst->type->getIRType(cg);
-        strConst->IRValue = UndefValue::get(ty);
-        strConst->IRValue = cg.builder.CreateInsertValue(strConst->IRValue, cg.currentLevel ? cg.currentLevel : cg.sizeZero(), 0);
-        strConst->IRValue = cg.builder.CreateInsertValue(strConst->IRValue, cg.getString(strConst->value), 1);
+        strConst->IRValue = cg.heapAlloc(strConst->type->IRSize(cg), cg.sizeZero(), true);
+        cg.storeStructField(ty, strConst->IRValue, 1, cg.getString(strConst->value));
         return;
     }
 

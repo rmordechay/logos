@@ -7,6 +7,7 @@ public:
     static constexpr auto name = "Str";
 
     explicit LgsStr(): LgsIterable(&LGS_CHAR) {
+        passByRef = true;
         rtt = RTT_STR;
     }
     Type* getIRType(LgsCodeGen& cg) override;

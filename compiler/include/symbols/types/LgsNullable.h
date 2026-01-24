@@ -9,13 +9,15 @@ public:
     LgsType* baseType = nullptr;
     bool isNull = false;
 
-    explicit LgsNullable(LgsType* baseType) : baseType(baseType) {
-        passByRef = baseType->passByRef;
-        isHeapAlloc = baseType->isHeapAlloc;
-    }
-    explicit LgsNullable() {
-        isNull = true;
-        passByRef = true;
+    explicit LgsNullable(LgsType* baseType = nullptr) : baseType(baseType) {
+        rtt = RTT_NULLABLE;
+        if (baseType) {
+            isHeapAlloc = baseType->isHeapAlloc;
+            passByRef = baseType->passByRef;
+        } else {
+            isNull = true;
+            passByRef = true;
+        }
     }
     LgsField* getField(const std::string& fieldName) override;
     size_t sizeBytes() override;

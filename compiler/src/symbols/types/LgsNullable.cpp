@@ -33,14 +33,12 @@ std::string LgsNullable::getName() {
 }
 
 Type* LgsNullable::getIRType(LgsCodeGen& cg) {
-    if (passByRef) return cg.ptrTy();
+    if (passByRef) return getTypeOrPtr(cg);
     return cg.getStructType({baseType->getIRType(cg), cg.i1Ty()}, getName());
 }
 
 Constant* LgsNullable::getRTType(LgsCodeGen& cg) {
-    const auto nullableName = getName();
-    if (!baseType) return cg.getRTTypeInfo(name, cg.sizeZero(), RTT_ANY);
-    return cg.getRTTypeInfo(nullableName, IRSize(cg), RTT_NULLABLE);
+    return cg.getRTTypeInfo(getName(), IRSize(cg), rtt);
 }
 
 bool LgsNullable::canCastTo(LgsType* other) {

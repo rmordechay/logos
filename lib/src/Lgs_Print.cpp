@@ -72,11 +72,14 @@ static std::string formatElement(const Lgs_TypeKind kind, void* type, void* valu
         str << "]";
         break;
     }
+    case RTT_NULLABLE: {
+        const auto a = static_cast<Lgs_NullableExpr*>(value);
+        break;
+    }
     case RTT_VEC2:
     case RTT_VEC3:
     case RTT_VEC4:
     case RTT_MATRIX:
-    case RTT_NULLABLE:
     case RTT_MAP:
     case RTT_COMPLEX:
     default: assert(0);

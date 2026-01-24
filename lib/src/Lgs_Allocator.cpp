@@ -7,7 +7,6 @@
 static constexpr auto align = alignof(std::max_align_t) - 1;
 
 void* Lgs_Allocator::allocate(const size_t size, const bool withLevel) {
-    assert(level > 0);
     auto offset = currentOffset + align & ~align;
     if (!currentBlock || offset + size > BLOCK_SIZE) {
         const auto blockSize = std::max(BLOCK_SIZE, size);

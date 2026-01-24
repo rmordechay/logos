@@ -77,7 +77,7 @@ std::string LgsStr::fmtStr() const {
 }
 
 Value* LgsStr::asIRStr(LgsCodeGen& cg, Value* v) {
-    return cg.builder.CreateExtractValue(v, 1);
+    return cg.loadStructField(getIRType(cg), v, 1, cg.ptrTy());
 }
 
 bool LgsStr::inferBaseType(std::vector<LgsExpr*>& args) {
@@ -117,7 +117,7 @@ Value* LgsStr::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     }
 
     Value* ptr = nullptr;
-    const auto leftPtr = cg.builder.CreateExtractValue(left->loadIR(cg), 1);
+    const auto leftPtr = cg.loadStructField(ty, left->loadIR(cg), 1, cg.ptrTy());
     const auto leftSize = lenIR(cg, leftPtr);
     if (right->type->asChar()) {
         const auto allocSize = cg.builder.CreateAdd(leftSize, cg.usize(2));
