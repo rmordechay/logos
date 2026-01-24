@@ -397,7 +397,7 @@ void LgsCgModule::visitIfWithElse(LgsIfStmt* ifStmt) {
     cg.builder.CreateCondBr(ifCondIR, IRBlockTrue, IRBlockExit);
     cg.startBlock(IRBlockTrue);
     visitStmtsBlock(ifStmt->ifBlock);
-    cg.createBranch(ifStmt->IRExitBlock);
+    cg.branch(ifStmt->IRExitBlock);
     stack.exitScope();
 
     // else block
@@ -420,7 +420,7 @@ void LgsCgModule::visitElseIf(LgsIfStmt* ifStmt) {
     cg.builder.CreateCondBr(ifCondIR, IRBlockTrue, IRBlockElseIfCheck);
     cg.startBlock(IRBlockTrue);
     visitStmtsBlock(ifStmt->ifBlock);
-    cg.createBranch(ifStmt->IRExitBlock);
+    cg.branch(ifStmt->IRExitBlock);
     stack.exitScope();
 
     for (size_t i = 0; i < ifStmt->elseIfs.size(); ++i) {
@@ -441,7 +441,7 @@ void LgsCgModule::visitElseIf(LgsIfStmt* ifStmt) {
         }
         cg.startBlock(IRBlockTrue);
         visitStmtsBlock(stmtBlock);
-        cg.createBranch(ifStmt->IRExitBlock);
+        cg.branch(ifStmt->IRExitBlock);
         stack.exitScope();
     }
 
@@ -449,7 +449,7 @@ void LgsCgModule::visitElseIf(LgsIfStmt* ifStmt) {
         stack.enterScope(ifStmt);
         cg.startBlock(IRBlockExit);
         visitStmtsBlock(ifStmt->elseBlock);
-        cg.createBranch(ifStmt->IRExitBlock);
+        cg.branch(ifStmt->IRExitBlock);
         stack.exitScope();
     }
     cg.startBlock(ifStmt->IRExitBlock);

@@ -373,26 +373,26 @@ bool LgsApp::generateGenerics() {
     for (const auto srcFile : srcFiles) {
         generics.merge(srcFile->symbolTable.genericsTypes);
     }
-    if (generics.empty()) return true;
     const auto file = new LgsFile("generics");
     file->cg.setupModule("generics");
     file->cg.mode = CG_MODE_GENERICS;
-    LgsCgModule cg(file, configs, globals, paths);
+    LgsCgModule module(file, configs, globals, paths);
+    LgsPrint::generateFmtFunc(module.cg);
     for (auto& [_, generic] : generics) {
         if (const auto dArr = generic->asDArray()) {
-            dArr->generateAddFunc(cg.cg);
-            dArr->generateContainsFunc(cg.cg);
-            dArr->generateArrEqFunc(cg.cg);
+            dArr->generateAddFunc(module.cg);
+            dArr->generateContainsFunc(module.cg);
+            dArr->generateArrEqFunc(module.cg);
         } else if (const auto map = generic->asMap()) {
-            map->generateGetFunc(cg.cg);
-            map->generateAddFunc(cg.cg);
+            map->generateGetFunc(module.cg);
+            map->generateAddFunc(module.cg);
         } else if (const auto func = generic->asFuncType()) {
             if (func->name == MAP_FUNC) {
-                cg.generateMapFunc(func);
+                module.generateMapFunc(func);
             } else if (func->name == FILTER_FUNC) {
-                cg.generateFilterFunc(func);
+                module.generateFilterFunc(func);
             } else if (func->name == FOREACH_FUNC) {
-                cg.generateForeachFunc(func);
+                module.generateForeachFunc(func);
             } else {
                 assert(0);
             }
@@ -400,8 +400,6 @@ bool LgsApp::generateGenerics() {
             assert(0);
         }
     }
-    const auto printFunc = static_cast<LgsPrint*>(globals.table.getSymbol("print")->func);
-    printFunc->generateFmtFunc(cg.cg);
     genericFiles.push_back(file);
     return file->cg.writeIRModule(paths, configs.optLevel);
 }

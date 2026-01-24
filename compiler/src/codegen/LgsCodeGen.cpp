@@ -153,7 +153,7 @@ void LgsCodeGen::ifElseStmt(Value* cond, const std::function<void()>& ifBody, co
     builder.CreateCondBr(cond, trueBlock, falseBlock);
     startBlock(trueBlock);
     ifBody();
-    createBranch(exitBlock);
+    branch(exitBlock);
     startBlock(falseBlock);
     elseBody();
     branchAndStartBlock(exitBlock);
@@ -167,6 +167,10 @@ void LgsCodeGen::store(Value* v, Value* ptr) {
 Value* LgsCodeGen::load(Type* ty, Value* ptr) {
     assert(ty && ptr);
     return builder.CreateLoad(ty, ptr);
+}
+
+void LgsCodeGen::incSize(Value* bufferOffset, Value* ptr) {
+    store(builder.CreateAdd(bufferOffset, usize(1)), ptr);
 }
 
 Value* LgsCodeGen::allocaAndStore(Type* type, Value* v, const std::string& name) {
@@ -243,7 +247,7 @@ BasicBlock* LgsCodeGen::createBlock(const std::string& name, Function* parent) {
     return BasicBlock::Create(context, name, parent);
 }
 
-void LgsCodeGen::createBranch(BasicBlock* block) {
+void LgsCodeGen::branch(BasicBlock* block) {
     if (!lastInstTerminator()) {
         builder.CreateBr(block);
     }
@@ -255,7 +259,7 @@ void LgsCodeGen::startBlock(BasicBlock* block) {
 }
 
 void LgsCodeGen::branchAndStartBlock(BasicBlock* block) {
-    createBranch(block);
+    branch(block);
     startBlock(block);
 }
 
@@ -370,6 +374,11 @@ void LgsCodeGen::printStr(Value* value) {
 void LgsCodeGen::printInt(Value* value, const std::string& text) {
     if (text != "") printStr(text);
     callPrintf({getString("%d\n"), value});
+}
+
+void LgsCodeGen::printFloat(Value* value, const std::string& text) {
+    if (text != "") printStr(text);
+    callPrintf({getString("%f\n"), value});
 }
 
 void LgsCodeGen::printLong(Value* value, const std::string& text) {

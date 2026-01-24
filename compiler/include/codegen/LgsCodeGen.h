@@ -86,6 +86,7 @@ public:
 
     void store(Value* v, Value* ptr);
     Value* load(Type* ty, Value* ptr);
+    void incSize(Value* bufferOffset, Value* ptr);
     Value* allocaAndStore(Type* type, Value* v, const std::string& name = "");
     StructType* getStructType(const std::vector<Type*>& types, const std::string& name = "");
     void storeStructField(Type* parentType, Value* parentPtr, size_t position, Value* v);
@@ -104,7 +105,7 @@ public:
 
     // Blocks
     BasicBlock* createBlock(const std::string& name = "", Function* parent = nullptr);
-    void createBranch(BasicBlock* block);
+    void branch(BasicBlock* block);
     void startBlock(BasicBlock* block);
     void branchAndStartBlock(BasicBlock* block);
     Instruction* lastInstTerminator() const;
@@ -134,6 +135,7 @@ public:
     void printStr(const std::string& value);
     void printStr(Value* value);
     void printInt(Value* value, const std::string& text = "");
+    void printFloat(Value* value, const std::string& text = "");
     void printLong(Value* value, const std::string& text = "");
     void printPtr(Value* value, const std::string& text = "");
     Value* measureTimeStart();
