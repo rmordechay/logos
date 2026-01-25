@@ -11,6 +11,9 @@ class LgsAny final : public LgsType {
 public:
     static constexpr auto name = "Any";
 
+    LgsAny() {
+        rttKind = RTT_ANY;
+    }
     size_t sizeBytes() override;
     Type* getIRType(LgsCodeGen& cg) override;
     Constant* getRTType(LgsCodeGen& cg) override;

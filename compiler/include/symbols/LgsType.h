@@ -79,7 +79,6 @@ public:
     bool isVoid();
     bool isNumber();
     bool isScalar() const;
-    bool isBig();
     bool isUnknown();
     bool isSliceable();
     bool hasGenericTypes();
@@ -153,7 +152,7 @@ public:
 
 inline void freeType(LgsType* type) {
     if (!type) return;
-    if (type->isInt || type->isFloat || type->asAny() || type->asChar() || type->isVoid()) return;
+    if (type->isScalar() || type->asAny() || type->asChar() || type->isVoid()) return;
     if (type->asEnum() || type->asSubtype() || type->asGenericType() || type->asObject() || type->asInterface()) return;
     delete type;
 }

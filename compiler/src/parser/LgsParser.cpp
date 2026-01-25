@@ -64,6 +64,8 @@
 #include "types/primitives/LgsUInt.h"
 #include <unordered_set>
 
+#include "exprs/LgsNullableExpr.h"
+
 LgsFunc* wrapStmtsBlockWithLambda(LgsStmtsBlock* stmtsBlock);
 
 #define MAX_TOKENS_NUMBER 100000

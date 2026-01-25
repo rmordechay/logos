@@ -1,7 +1,6 @@
 #include "types/iterables/LgsMatrix.h"
 
 #include "LgsBinaryTokens.h"
-#include "cblas/cblas.h"
 #include "exprs/LgsBinaryExpr.h"
 #include "exprs/LgsMatrixExpr.h"
 #include "types/LgsAny.h"
@@ -67,8 +66,8 @@ Value* LgsMatrix::mulIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto right = binExpr->right;
     const auto leftMat = left->type->asMatrix();
     const auto rightMat = right->type->asMatrix();
-    const auto order = cg.i32(CblasRowMajor);
-    const auto noTranspose = cg.i32(CblasNoTrans);
+    const auto order = cg.i32(CBLAS_ROW_MAJOR);
+    const auto noTranspose = cg.i32(CBLAS_NO_TRANS);
     const auto M = cg.i32(leftMat->rows);
     const auto N = cg.i32(rightMat->columns);
     const auto K = cg.i32(leftMat->columns);

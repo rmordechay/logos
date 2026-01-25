@@ -3,6 +3,9 @@
 #include "types/primitives/LgsDouble.h"
 #include "types/primitives/LgsFloat.h"
 
+#define CBLAS_ROW_MAJOR 101
+#define CBLAS_NO_TRANS 111
+
 class LgsMatrix final : public LgsIterable {
 public:
     static constexpr auto name = "Mat";

@@ -27,8 +27,12 @@ extern "C" void Lgs_Runtime_pop() {
     runtime.level--;
 }
 
-extern "C" void* Lgs_Runtime_allocate(const size_t size, const size_t level, const bool withLevel) {
-    return runtime.stack.at(level).allocator.allocate(size, withLevel);
+extern "C" void* Lgs_Runtime_allocInCurrent(const size_t size, const bool setLevel) {
+    return runtime.stack.at(runtime.level).allocator.allocate(size, setLevel);
+}
+
+extern "C" void* Lgs_Runtime_allocInLevel(const size_t size, const size_t level) {
+    return runtime.stack.at(level).allocator.allocate(size, false);
 }
 
 extern "C" void Lgs_Runtime_moveStr(Lgs_Str* left, const Lgs_Str* right) {
@@ -88,24 +92,21 @@ extern "C" void* Lgs_Runtime_reallocate(const void* ptr, const size_t size, cons
     return newPtr;
 }
 
-extern "C" void Lgs_Runtime_addVField(void* instance, const char* name, void* ptr) {
-    runtime.vtable[{instance, name}] = ptr;
-}
-
-extern "C" void Lgs_Runtime_addVFunc(void** objs, const char** names, void** ptrs, const size_t* ids, const size_t funcsCount) {
-    for (size_t i = 0; i < funcsCount; ++i) {
-        runtime.vtable[{objs[i], names[i]}] = ptrs[i];
+extern "C" void* Lgs_Runtime_getVField(const Lgs_Object* type, const char* name, char* ptr) {
+    for (int i = 0; i < type->fieldsCount; ++i) {
+        const auto func = type->fields[i];
+        if (std::strcmp(func.name, name) != 0) continue;
+        return ptr + func.offset;
     }
+    return nullptr;
 }
 
-extern "C" void Lgs_Runtime_addVFunc2(const size_t* objsIDs, const size_t* funcIDs, void** ptrs, const size_t funcsCount) {
-    for (size_t i = 0; i < funcsCount; ++i) {
-        runtime.vtable3[objsIDs[i]][funcIDs[i]] = ptrs[i];
+extern "C" void* Lgs_Runtime_getVFunc(const Lgs_Object* type, const char* name) {
+    for (int i = 0; i < type->funcsCount; ++i) {
+        const auto func = type->funcs[i];
+        if (std::strcmp(func.name, name) == 0) return func.ptr;
     }
-}
-
-extern "C" void* Lgs_Runtime_getFromVTable(void* instance, const char* name) {
-    return runtime.vtable[{instance, name}];
+    return nullptr;
 }
 
 extern "C" void Lgs_Runtime_addDefer(const ThunkFunc funcPtr, void* ctx) {

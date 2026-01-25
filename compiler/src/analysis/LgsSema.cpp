@@ -1085,20 +1085,28 @@ void LgsSema::visitIterIndexSelection(LgsIterIndex* iterIndex, LgsType* parentTy
 void LgsSema::visitMetaSelection(LgsMetaSelection* metaSelection) {
     visitExpr(metaSelection->baseExpr);
     const auto obj = metaSelection->baseExpr->type->asObject();
-    const auto var = metaSelection->child->asVariable();
-    if (var && obj->metaFields.contains(var->name)) {
+
+    // Meta fields
+    if (const auto var = metaSelection->child->asVariable()) {
+        if (!obj->metaFields.contains(var->name)) {
+            addError(E10005, metaSelection->location, {var->name, obj->pname()});
+            return;
+        }
         var->ref.symbolType = FIELD;
         var->ref.field = obj->metaFields[var->name];
         var->type = var->ref.field->type;
-        metaSelection->type = var->type;
+        metaSelection->setType(var->type);
         return;
     }
+
+    // Meta funcs
     const auto methodCall = metaSelection->child->asFuncCall();
     if (!methodCall) return;
-    if (!obj->metaMethods.contains(methodCall->name)) {
-        return addError(E10005, metaSelection->location, {methodCall->name, obj->pname()});
+    if (!obj->getMetaFunc(methodCall->name)) {
+        addError(E10005, metaSelection->location, {methodCall->name, obj->pname()});
+        return;
     }
-    const auto method = obj->metaMethods[methodCall->name];
+    const auto method = obj->metaFuncs[methodCall->name];
     if (!visitFuncArgs(methodCall, method->funcType)) return;
     if (methodCall->equals(method->funcType)) {
         methodCall->func = method;
@@ -1106,9 +1114,8 @@ void LgsSema::visitMetaSelection(LgsMetaSelection* metaSelection) {
     } else {
         addError(E10034, methodCall->location, {obj->name, methodCall->name, methodCall->asText(), method->asText()});
     }
-    if (method->funcType->isMethod) {
-        methodCall->args.insert(methodCall->args.begin(), LgsFuncArg(metaSelection->baseExpr, LGS_SELF, true));
-    }
+    methodCall->args.insert(methodCall->args.begin(), LgsFuncArg(metaSelection->baseExpr, LGS_SELF, true));
+    metaSelection->setType(methodCall->type);
 }
 
 void LgsSema::visitFuncCall(LgsFuncCall* funcCall) {
@@ -1753,7 +1760,7 @@ void LgsSema::addRTType(LgsType* type) const {
     if (!errHandler.successful) return;
     if (!type || type->isVoid() || type->hasGenericTypes()) return;
     if (type->asNullable() && !type->asNullable()->baseType) return;
-    if (type->asInterface()) return;
+    if (type->asInterface() || type->asFuncType()) return;
     for (const auto rttType : globals.table.rttTypes) {
         if (rttType->equals(type)) return;
     }

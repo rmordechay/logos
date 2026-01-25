@@ -87,10 +87,9 @@ bool LgsStr::inferBaseType(std::vector<LgsExpr*>& args) {
 Value* LgsStr::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
-    const auto leftStrConst = left->getConstStr();
     const auto ty = getIRType(cg);
-    const auto alloc = cg.builder.CreateAlloca(ty);
-    cg.storeStructField(ty, alloc, rttIndices.level, cg.currentLevel);
+    const auto leftStrConst = left->getConstStr();
+    const auto alloc = cg.allocInCurrent(IRSize(cg), true);
     if (leftStrConst.has_value()) {
         const auto lv = leftStrConst.value();
         // Str
@@ -121,7 +120,7 @@ Value* LgsStr::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto leftSize = lenIR(cg, leftPtr);
     if (right->type->asChar()) {
         const auto allocSize = cg.builder.CreateAdd(leftSize, cg.usize(2));
-        ptr = cg.heapAlloc(allocSize, cg.currentLevel, false);
+        ptr = cg.allocInCurrent(allocSize, false);
         const auto rightPos = cg.builder.CreateInBoundsGEP(cg.i8Ty(), ptr, leftSize);
         cg.callMemcpy(ptr, leftPtr, leftSize);
         cg.store(right->IRValue, rightPos);
@@ -130,7 +129,7 @@ Value* LgsStr::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
         const auto rightSize = lenIR(cg, rightPtr);
         const auto sumSize = cg.builder.CreateAdd(leftSize, rightSize);
         const auto allocSize = cg.builder.CreateAdd(sumSize, cg.usize(1));
-        ptr = cg.heapAlloc(allocSize, cg.currentLevel, false);
+        ptr = cg.allocInCurrent(allocSize, false);
         const auto rightPos = cg.builder.CreateInBoundsGEP(cg.i8Ty(), ptr, leftSize);
         cg.callMemcpy(ptr, leftPtr, leftSize);
         cg.callMemcpy(rightPos, rightPtr, rightSize);

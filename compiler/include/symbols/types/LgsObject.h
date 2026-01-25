@@ -1,6 +1,7 @@
 #pragma once
 #include "LgsFuncType.h"
 #include "exprs/LgsFuncCall.h"
+#include "exprs/constants/LgsStrConst.h"
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
 
@@ -9,6 +10,10 @@ class LgsInstance;
 class LgsCodeGen;
 class LgsField;
 class LgsIOPair;
+
+#define OBJ_META_NAME "name"
+#define OBJ_GET_FIELD "getField"
+#define OBJ_GET_METHOD "getMethod"
 
 class LgsObject : public LgsType {
 public:
@@ -20,7 +25,7 @@ public:
     std::vector<LgsSubType*> subtypes;
     std::vector<LgsIOPair*> ioPairs;
     std::vector<LgsGenericType*> generics;
-    std::map<std::string, LgsFunc*> metaMethods;
+    std::map<std::string, LgsFunc*> metaFuncs;
     std::map<std::string, LgsField*> metaFields;
     LgsInstance* singleton = nullptr;
     bool hasGenerics = false;
@@ -30,10 +35,11 @@ public:
         passByRef = true;
         isHeapAlloc = true;
         rttKind = RTT_OBJECT;
-        // metaFields["name"] = new LgsField("name", new LgsStr(), new LgsStrConst(name));
+        metaFields[OBJ_META_NAME] = new LgsField(OBJ_META_NAME, new LgsStr(), new LgsStrConst(name));
     }
     std::string getName() override;
     LgsFunc* getMethod(const std::string& methodName) override;
+    LgsFunc* getMetaFunc(const std::string& methodName);
     Type* getIRType(LgsCodeGen& cg) override;
     Constant* getRTType(LgsCodeGen& cg) override;
     size_t sizeBytes() override;

@@ -62,10 +62,6 @@ bool LgsType::isScalar() const {
     return isInt || isFloat;
 }
 
-bool LgsType::isBig() {
-    return (asObject() || asDArray()) && sizeBytes() >= LGS_BIG_SIZE_THRESHOLD;
-}
-
 bool LgsType::isUnknown() {
     if (dynamic_cast<LgsUnknown*>(this)) return true;
     if (const auto iter = asIterable()) return dynamic_cast<LgsUnknown*>(iter->baseType);

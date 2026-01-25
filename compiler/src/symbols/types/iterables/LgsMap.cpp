@@ -287,7 +287,7 @@ Function* LgsMap::generateAddFunc(LgsCodeGen& cg) {
     const auto entriesField = cg.builder.CreateStructGEP(mapTy, mapIR, rttIndices.entries);
     const auto lenField = cg.builder.CreateStructGEP(mapTy, mapIR, rttIndices.len);
     const auto capField = cg.builder.CreateStructGEP(mapTy, mapIR, rttIndices.cap);
-    const auto level = cg.builder.CreateSub(cg.currentLevel, cg.usize(1));
+    const auto level = cg.builder.CreateSub(cg.getCurrentLevel(), cg.usize(1));
 
     // Resize
     auto len = cg.load(cg.sizeTy(), lenField);
@@ -298,7 +298,7 @@ Function* LgsMap::generateAddFunc(LgsCodeGen& cg) {
     cg.startBlock(resizeBlock);
     const auto size = cg.builder.CreateMul(pairType->IRSize(cg), cg.usize(sizeof(void*)));
     const auto newCap = cg.builder.CreateMul(size, cg.builder.CreateMul(cap, cg.usize(2)));
-    const auto newEntries = cg.heapAlloc(newCap, level, false);
+    const auto newEntries = cg.allocInLevel(newCap, level);
     auto entries = cg.load(cg.ptrTy(), entriesField);
 
     cg.loop(cap, [&](Value* iValue, BasicBlock*) {
@@ -350,7 +350,7 @@ Function* LgsMap::generateAddFunc(LgsCodeGen& cg) {
 
     // Store entry
     cg.startBlock(storeElementBlock);
-    const auto newEntry = cg.heapAlloc(size, level, false);
+    const auto newEntry = cg.allocInLevel(size, level);
     cg.storeStructField(entryTy, newEntry, rttIndices.key, keyIR);
     cg.storeStructField(entryTy, newEntry, rttIndices.value, valueIR);
     cg.storeStructField(entryTy, newEntry, rttIndices.next, cg.null());

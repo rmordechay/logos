@@ -50,6 +50,11 @@ struct Lgs_Field {
     void* type;
 };
 
+struct Lgs_Method {
+    const char* name;
+    void* ptr;
+};
+
 struct Lgs_Object {
     const size_t id;
     const char* name;
@@ -57,7 +62,7 @@ struct Lgs_Object {
     const size_t fieldsCount;
     const size_t funcsCount;
     const Lgs_Field* fields;
-    const void** funcs;
+    const Lgs_Method* funcs;
 };
 
 struct Lgs_SArr {
@@ -68,22 +73,6 @@ struct Lgs_SArr {
 struct Lgs_Nullable {
     bool isPtr;
     Lgs_TypeInfo* baseType;
-};
-
-struct VKey {
-    void* instance;
-    const char* name;
-    bool operator==(const VKey& other) const noexcept {
-        return instance == other.instance && name == other.name;
-    }
-};
-
-struct VKeyHash {
-    size_t operator()(const VKey& k) const noexcept {
-        const auto h1 = std::hash<void*>{}(k.instance);
-        const auto h2 = std::hash<const char*>{}(k.name);
-        return h1 ^ h2 + 0x9e3779b9 + (h1 << 6) + (h1 >> 2);
-    }
 };
 
 struct Lgs_ThunkFunc {

@@ -1,6 +1,5 @@
 #pragma once
 #include "LgsCodeGen.h"
-#include "exprs/LgsNullableExpr.h"
 #include "files/LgsFile.h"
 #include "logos/LgsStack.h"
 
@@ -22,7 +21,6 @@ class LgsObject;
 class LgsWhileLoop;
 class LgsFuncType;
 class LgsIterable;
-class LgsFile;
 class LgsCoroutine;
 class LgsPrefixExpr;
 class LgsDArray;
@@ -142,10 +140,9 @@ public:
     void initMainArgs(const LgsMainFunc* mainFunc) const;
     StructType* getThunkCtxType(const LgsFuncCall* fc) const;
     Value* getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) const;
+    Value* getObjRTT(Type* ty, Value* value) const;
     Function* getThunkFunc(LgsFuncCall* fc, Type* ctxTy) const;
 
-    void initVirtualFuncs() const;
-    void addVirtualFields(LgsObject* obj, Value* ptr) const;
     void createVecField(LgsField* field, Value* parent) const;
     bool checkMock(LgsExpr* expr) const;
     void generateMapFunc(LgsFuncType* mapFunc);

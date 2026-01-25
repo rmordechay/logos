@@ -1,9 +1,13 @@
 object Obj {
-    age: Long
-    age2: Int
+    x: Int
+
+    func(): Str {
+        return "From func"
+    }
 }
 
 main() {
-    obj = Obj{age=57}
-    field = obj::getField("age2")
+    obj = Obj{x=45}
+    method = obj::getMethod("func")
+    print(method())
 }

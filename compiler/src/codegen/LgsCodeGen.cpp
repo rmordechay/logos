@@ -210,25 +210,30 @@ void LgsCodeGen::callPopStack() {
     callRuntimeFunc("pop", voidTy());
 }
 
+Value* LgsCodeGen::getCurrentLevel() {
+    return callRuntimeFunc("getCurrentLevel", sizeTy());
+}
+
 Value* LgsCodeGen::callHash(Value* arg) {
     return callRuntimeFunc("hash", sizeTy(), {ptrTy()}, {arg});
 }
 
-void LgsCodeGen::addVField(Value* instance, Value* name, Value* ptr) {
-    callRuntimeFunc("addVField", voidTy(), {ptrTy(), ptrTy(), ptrTy()}, {instance, name, ptr});
+Value* LgsCodeGen::getVField(Value* instance, Value* name, Value* ptr) {
+    return callRuntimeFunc("getVField", ptrTy(), {ptrTy(), ptrTy(), ptrTy()}, {instance, name, ptr});
 }
 
-void LgsCodeGen::addVFuncs(Value* objIDs, Value* funcIDs, Value* funcPtrs, Value* funcsCount) {
-    callRuntimeFunc("addVFunc", voidTy(), {ptrTy(), ptrTy(), ptrTy(), ptrTy(), sizeTy()}, {objIDs, funcIDs, funcPtrs, ids, funcsCount});
+Value* LgsCodeGen::getVFunc(Value* objType, Value* funcName) {
+    return callRuntimeFunc("getVFunc", ptrTy(), {ptrTy(), ptrTy()}, {objType, funcName});
 }
 
-Value* LgsCodeGen::getFromVTable(Value* instance, Value* name) {
-    return callRuntimeFunc("getFromVTable", ptrTy(), {ptrTy(), ptrTy()}, {instance, name});
+Value* LgsCodeGen::allocInCurrent(Value* size, const bool setLevel) {
+    assert(size);
+    return callRuntimeFunc("allocInCurrent", ptrTy(), {sizeTy(), i1Ty()}, {size, i1(setLevel)});
 }
 
-Value* LgsCodeGen::heapAlloc(Value* size, Value* level, const bool withLevel) {
+Value* LgsCodeGen::allocInLevel(Value* size, Value* level) {
     assert(size && level);
-    return callRuntimeFunc("allocate", ptrTy(), {sizeTy(), sizeTy(), i1Ty()}, {size, level, i1(withLevel)});
+    return callRuntimeFunc("allocInLevel", ptrTy(), {sizeTy(), sizeTy()}, {size, level});
 }
 
 Value* LgsCodeGen::reallocate(Value* ptr, Value* size, Value* level) {
@@ -241,7 +246,7 @@ Value* LgsCodeGen::moveElement(Value* iterable, Value* element, Constant* type) 
     return callRuntimeFunc("moveElement", ptrTy(), params, args);
 }
 
-void LgsCodeGen::callThrowError(const LgsBaseMsg& err, const std::vector<Value*>& args) {
+void LgsCodeGen::throwError(const LgsBaseMsg& err, const std::vector<Value*>& args) {
     std::vector<Value*> irArgs = {usize(args.size()), getString(err.msg)};
     irArgs.insert(irArgs.end(), args.begin(), args.end());
     callRuntimeFunc("throwError", voidTy(), {sizeTy(), ptrTy()}, irArgs, true);
@@ -278,7 +283,7 @@ void LgsCodeGen::createIndexBoundsGuard(Value* len, Value* index) {
     const auto invalidBlock = createBlock("invalid_block");
     builder.CreateCondBr(condition, invalidBlock, validBlock);
     startBlock(invalidBlock);
-    callThrowError(E10003);
+    throwError(E10003);
     branchAndStartBlock(validBlock);
 }
 
@@ -288,7 +293,7 @@ void LgsCodeGen::createArrBoundsGuard(Value* maxLen, Value* arrLen) {
     const auto invalidBlock = createBlock();
     builder.CreateCondBr(condition, invalidBlock, validBlock);
     startBlock(invalidBlock);
-    callThrowError(E10105, {callSnprintf("%d", {maxLen})});
+    throwError(E10105, {callSnprintf("%d", {maxLen})});
     branchAndStartBlock(validBlock);
 }
 
@@ -402,9 +407,8 @@ Value* LgsCodeGen::measureTimeStart() {
     return callRuntimeFunc("timeStart", i64Ty());
 }
 
-void LgsCodeGen::measureTimeEnd(Value* startTime) {
-    const auto results = callRuntimeFunc("timeEnd", i64Ty(), {i64Ty()}, {startTime});
-    printLong(results);
+Value* LgsCodeGen::measureTimeEnd(Value* startTime) {
+    return callRuntimeFunc("timeEnd", i64Ty(), {i64Ty()}, {startTime});
 }
 
 void LgsCodeGen::finalizeDebugger(const fs::path& buildPath) const {

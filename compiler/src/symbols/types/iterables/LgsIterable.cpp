@@ -12,10 +12,10 @@
 #include "types/primitives/LgsVoid.h"
 
 LgsFunc* LgsIterable::getMethod(const std::string& methodName) {
+    if (methods.contains(methodName)) return methods[methodName];
     constexpr auto flags = BUILTIN | PUBLIC | METHOD;
     if (methodName == LEN_FUNC) {
-        if (methods.contains(LEN_FUNC)) return methods[LEN_FUNC];
-        const auto func = new LgsFunc(LEN_FUNC, getBaseName(), &LGS_SIZE, {this}, flags);
+        const auto func = new LgsFunc(methodName, getBaseName(), &LGS_SIZE, {this}, flags);
         func->fn = [this](LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) {
             return lenIR(cg, args.front().expr->IRValue);
         };
@@ -23,42 +23,37 @@ LgsFunc* LgsIterable::getMethod(const std::string& methodName) {
         return func;
     }
     if (methodName == IS_EMPTY_FUNC) {
-        if (methods.contains(IS_EMPTY_FUNC)) return methods[IS_EMPTY_FUNC];
-        const auto func = new LgsFunc(IS_EMPTY_FUNC, getBaseName(), &LGS_BOOL, {this}, flags);
+        const auto func = new LgsFunc(methodName, getBaseName(), &LGS_BOOL, {this}, flags);
         addMethod(func);
         return func;
     }
     if (methodName == NOT_EMPTY_FUNC) {
-        if (methods.contains(NOT_EMPTY_FUNC)) return methods[NOT_EMPTY_FUNC];
-        const auto func = new LgsFunc(NOT_EMPTY_FUNC, getBaseName(), &LGS_BOOL, {this}, flags);
+        const auto func = new LgsFunc(methodName, getBaseName(), &LGS_BOOL, {this}, flags);
         addMethod(func);
         return func;
     }
     if (methodName == MAP_FUNC) {
-        if (methods.contains(MAP_FUNC)) return methods[MAP_FUNC];
         const auto generic = new LgsGenericType("U");
         const auto callback = new LgsFuncType("cb", generic, {LgsParam(baseType)});
-        const auto func = new LgsFunc(MAP_FUNC, getBaseName(), new LgsDArray(generic), {this, callback}, flags);
+        const auto func = new LgsFunc(methodName, getBaseName(), new LgsDArray(generic), {this, callback}, flags);
         func->funcType->genericTypes.push_back(generic);
         callback->genericTypes.push_back(generic);
         addMethod(func);
         return func;
     }
     if (methodName == FILTER_FUNC) {
-        if (methods.contains(FILTER_FUNC)) return methods[FILTER_FUNC];
         const auto generic = new LgsGenericType("T"); // T is baseType
         const auto callback = new LgsFuncType("cb", &LGS_BOOL, {LgsParam(baseType)});
-        const auto func = new LgsFunc(FILTER_FUNC, getBaseName(), new LgsDArray(baseType), {this, callback}, flags);
+        const auto func = new LgsFunc(methodName, getBaseName(), new LgsDArray(baseType), {this, callback}, flags);
         func->funcType->genericTypes.push_back(generic);
         callback->genericTypes.push_back(generic);
         addMethod(func);
         return func;
     }
     if (methodName == FOREACH_FUNC) {
-        if (methods.contains(FOREACH_FUNC)) return methods[FOREACH_FUNC];
         const auto generic = new LgsGenericType("T"); // T is baseType
         const auto callback = new LgsFuncType("cb", &LGS_VOID, {LgsParam(baseType)});
-        const auto func = new LgsFunc(FOREACH_FUNC, &LGS_VOID, {this, callback}, flags);
+        const auto func = new LgsFunc(methodName, &LGS_VOID, {this, callback}, flags);
         func->funcType->genericTypes.push_back(generic);
         callback->genericTypes.push_back(generic);
         addMethod(func);

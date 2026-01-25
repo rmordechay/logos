@@ -1,9 +1,7 @@
 #pragma once
 #include "Lgs_Types.h"
-
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/Passes/OptimizationLevel.h>
-#include <cmath>
 #include <map>
 #include <filesystem>
 
@@ -67,12 +65,10 @@ public:
     LgsLLDBGen debugger;
     Module* IRModule = nullptr;
     Function* currentFunc = nullptr;
-    Value* currentLevel = nullptr;
-    IRBuilderBase::InsertPoint savedIP;
     IRBuilder<> builder = IRBuilder(context);
-    std::map<std::string, Type*> typesRegistry;
-    std::unordered_map<std::string, Value*> stringsRegistry;
     LgsCodeGenMode mode = CG_MODE_SRC_CODE;
+    std::map<std::string, Type*> typesRegistry;
+    IRBuilderBase::InsertPoint savedIP;
 
     void setupModule(const std::filesystem::path& file, bool debugMode = false);
     bool writeIRModule(const LgsPaths& paths, uint8_t optLevel) const;
@@ -95,14 +91,15 @@ public:
 
     void callStackPush();
     void callPopStack();
+    Value* getCurrentLevel();
     Value* callHash(Value* arg);
-    void addVField(Value* instance, Value* name, Value* ptr);
-    void addVFuncs(Value* objIDs, Value* funcIDs, Value* funcPtrs, Value* funcsCount);
-    Value* getFromVTable(Value* instance, Value* name);
-    Value* heapAlloc(Value* size, Value* level, bool withLevel);
+    Value* getVField(Value* instance, Value* name, Value* ptr);
+    Value* getVFunc(Value* objType, Value* funcName);
+    Value* allocInCurrent(Value* size, bool setLevel);
+    Value* allocInLevel(Value* size, Value* level);
     Value* reallocate(Value* ptr, Value* size, Value* level);
     Value* moveElement(Value* iterable, Value* element, Constant* type);
-    void callThrowError(const LgsBaseMsg& err, const std::vector<Value*>& args = {});
+    void throwError(const LgsBaseMsg& err, const std::vector<Value*>& args = {});
 
     // Blocks
     BasicBlock* createBlock(const std::string& name = "", Function* parent = nullptr);
@@ -140,7 +137,7 @@ public:
     void printLong(Value* value, const std::string& prefix = "");
     void printPtr(Value* value, const std::string& prefix = "");
     Value* measureTimeStart();
-    void measureTimeEnd(Value* startTime);
+    Value* measureTimeEnd(Value* startTime);
 
     void finalizeDebugger(const std::filesystem::path& buildPath) const;
     llvm::DILocation* getDebugLoc(const LgsLocation& location);

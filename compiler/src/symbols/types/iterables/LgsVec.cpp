@@ -3,7 +3,6 @@
 #include "LgsBinaryTokens.h"
 #include "exprs/LgsIterIndex.h"
 #include "exprs/LgsVectorExpr.h"
-#include "cblas/cblas.h"
 #include "types/iterables/LgsMatrix.h"
 #include "types/primitives/LgsBool.h"
 #include <sstream>
@@ -247,8 +246,8 @@ void LgsVec::addIRElement(LgsCodeGen& cg, Value* iterable, Value* index, Value* 
 
 Value* LgsVec::matVecMul(LgsCodeGen& cg, const LgsExpr* left, LgsExpr* right) const {
     const auto mat = left->type->asMatrix();
-    const auto order = cg.i32(CblasRowMajor);
-    const auto transpose = cg.i32(CblasNoTrans);
+    const auto order = cg.i32(CBLAS_ROW_MAJOR);
+    const auto transpose = cg.i32(CBLAS_NO_TRANS);
     const auto m = cg.i32(mat->rows);
     const auto n = cg.i32(mat->columns);
     const auto alpha = cg.floatv(1);

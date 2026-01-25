@@ -54,9 +54,9 @@
 #include <unistd.h>
 #include <unordered_set>
 
-#include "cblas/cblas.h"
 #include "exprs/LgsMatrixExpr.h"
 #include "exprs/LgsMetaSelection.h"
+#include "exprs/LgsNullableExpr.h"
 #include "exprs/constants/LgsCharConst.h"
 #include "types/LgsNullable.h"
 
@@ -146,7 +146,6 @@ void LgsCgModule::visitMainFunc(LgsMainFunc* func) {
     stack.enterScope(func);
     createPrologue(func);
     initMainArgs(func);
-    initVirtualFuncs();
     visitStmtsBlock(func->stmtsBlock);
     createEpilogue(func);
     stack.exitScope();
@@ -791,9 +790,9 @@ void LgsCgModule::visitDynamicArray(LgsArrayExpr* arrayExpr) const {
     const auto baseSize = dArr->baseType->IRSize(cg);
     const auto dataSize = cg.builder.CreateMul(baseSize, cg.usize(LGS_ITER_INIT_CAP));
 
-    arrayExpr->IRValue = arrayExpr->pointee ? arrayExpr->pointee : cg.heapAlloc(dArr->IRSize(cg), cg.currentLevel, true);
+    arrayExpr->IRValue = arrayExpr->pointee ? arrayExpr->pointee : cg.allocInCurrent(dArr->IRSize(cg), true);
     cg.storeStructField(ty, arrayExpr->IRValue, dArr->rttIndices.type, dArr->baseType->getRTType(cg));
-    cg.storeStructField(ty, arrayExpr->IRValue, dArr->rttIndices.data, cg.heapAlloc(dataSize, cg.currentLevel, false));
+    cg.storeStructField(ty, arrayExpr->IRValue, dArr->rttIndices.data, cg.allocInCurrent(dataSize, false));
     cg.storeStructField(ty, arrayExpr->IRValue, dArr->rttIndices.len, cg.sizeZero());
     cg.storeStructField(ty, arrayExpr->IRValue, dArr->rttIndices.cap, cg.usize(LGS_ITER_INIT_CAP));
 
@@ -867,11 +866,11 @@ void LgsCgModule::visitMatrixExpr(const LgsMatrixExpr* matrixExpr) {
 
 void LgsCgModule::visitHashMap(LgsHashMap* hashMap) {
     const auto map = hashMap->type->asMap();
-    const auto ptr = hashMap->pointee ? hashMap->pointee : cg.heapAlloc(map->IRSize(cg), cg.currentLevel, true);
+    const auto ptr = hashMap->pointee ? hashMap->pointee : cg.allocInCurrent(map->IRSize(cg), true);
     const auto cap = cg.usize(LGS_ITER_INIT_CAP);
     const auto entriesSize = map->pairType->IRSize(cg) + sizeof(void*);
     const auto totalSize = cg.builder.CreateMul(entriesSize, cap);
-    const auto entries = cg.heapAlloc(totalSize, cg.currentLevel, false);
+    const auto entries = cg.allocInCurrent(totalSize, false);
     const auto ty = map->getIRType(cg);
     cg.storeStructField(ty, ptr, map->rttIndices.entries, entries);
     cg.storeStructField(ty, ptr, map->rttIndices.len, cg.sizeZero());
@@ -991,7 +990,9 @@ void LgsCgModule::visitFieldSelection(LgsVariable* var, LgsExpr* parent) const {
 
     // Virtual fields
     if (field->isVirtual) {
-        var->IRValue = cg.getFromVTable(parent->IRValue, cg.getString(field->name));
+        const auto ty = parent->type->getIRType(cg);
+        const auto rttType = getObjRTT(ty, parent->IRValue);
+        var->IRValue = cg.getVField(rttType, cg.getString(field->name), parent->IRValue);
         return;
     }
 
@@ -1017,24 +1018,27 @@ void LgsCgModule::visitNullableSelection(LgsExpr* child, LgsExpr* parent) const 
     cg.startBlock(isNullBlock);
     cg.store(cg.null(), child->IRValue);
     cg.builder.CreateBr(exitBlock);
+
     // isNotNull block
     cg.startBlock(isNotNullBlock);
     cg.store(field->getGEP(cg, parent->IRValue), child->IRValue);
+
     // exit block
     cg.branchAndStartBlock(exitBlock);
 }
 
 void LgsCgModule::visitMetaSelection(LgsMetaSelection* metaSelection) {
     visitExpr(metaSelection->baseExpr);
-    if (metaSelection->child->asFuncCall()) {
-        assert(0);
+    if (const auto fc = metaSelection->child->asFuncCall()) {
+        visitFuncCall(fc);
+        metaSelection->IRValue = fc->IRValue;
+        return;
     }
     if (const auto var = metaSelection->child->asVariable()) {
-        if (var->name == "name") {
-            visitStrConst(var->ref.field->expr->asStrConst());
-            metaSelection->IRValue = var->ref.field->expr->IRValue;
-            return;
-        }
+        const auto field = var->ref.field;
+        assert(var->ref.symbolType == FIELD && field->expr);
+        visitExpr(field->expr);
+        metaSelection->IRValue = field->expr->IRValue;
     }
     assert(0);
 }
@@ -1076,17 +1080,8 @@ void LgsCgModule::visitFuncCall(LgsFuncCall* funcCall) {
     if (ft->isVirtual) {
         const auto self = funcCall->args.front().expr;
         const auto ty = self->type->getIRType(cg);
-        const auto rttTypeIndex = LgsInstance::rttIndices.type;
-        const auto ptr = cg.loadStructField(ty, self->IRValue, rttTypeIndex, cg.ptrTy());
-        const auto objRTType = cg.getStructType({cg.sizeTy(), cg.ptrTy(), cg.sizeTy(), cg.sizeTy(), cg.ptrTy(), cg.ptrTy(), cg.ptrTy()});
-        cg.printInt(cg.loadStructField(objRTType, ptr, LgsObject::rttIndices.id, cg.sizeTy()), "id=");
-        cg.printStr(cg.loadStructField(objRTType, ptr, LgsObject::rttIndices.name, cg.ptrTy()), "name=");
-        cg.printInt(cg.loadStructField(objRTType, ptr, LgsObject::rttIndices.size, cg.sizeTy()), "size=");
-        cg.printInt(cg.loadStructField(objRTType, ptr, LgsObject::rttIndices.fieldsCount, cg.sizeTy()), "fieldsCount=");
-        cg.printInt(cg.loadStructField(objRTType, ptr, LgsObject::rttIndices.funcsCount, cg.sizeTy()), "funcsCount=");
-        cg.printPtr(cg.builder.CreateStructGEP(objRTType, ptr, LgsObject::rttIndices.fields), "fields=");
-        cg.printPtr(cg.builder.CreateStructGEP(objRTType, ptr, LgsObject::rttIndices.funcs), "funcs=");
-        func->IRValue = cg.getFromVTable(ptr, cg.getString(func->funcType->name));
+        const auto rttType = getObjRTT(ty, self->IRValue);
+        func->IRValue = cg.getVFunc(rttType, cg.getString(ft->name));
     }
 
     if (funcCall->coroutine || funcCall->isDeferred) return;
@@ -1158,7 +1153,8 @@ void LgsCgModule::visitIntConst(LgsIntConst* intConst) const {
 void LgsCgModule::visitStrConst(LgsStrConst* strConst) {
     if (strConst->parts.empty()) {
         const auto ty = strConst->type->getIRType(cg);
-        strConst->IRValue = cg.heapAlloc(strConst->type->IRSize(cg), cg.sizeZero(), true);
+        strConst->IRValue = cg.allocInLevel(strConst->type->IRSize(cg), cg.sizeZero());
+        cg.storeStructField(ty, strConst->IRValue, LgsStr::rttIndices.level, cg.sizeZero());
         cg.storeStructField(ty, strConst->IRValue, LgsStr::rttIndices.data, cg.getString(strConst->value));
         return;
     }
@@ -1185,7 +1181,7 @@ void LgsCgModule::visitCharConst(LgsCharConst* charConst) const {
 
 void LgsCgModule::visitInstance(LgsInstance* instance) {
     const auto obj = instance->obj;
-    instance->IRValue = cg.heapAlloc(obj->IRSize(cg), cg.currentLevel, true);
+    instance->IRValue = cg.allocInCurrent(obj->IRSize(cg), true);
     cg.storeStructField(obj->getIRType(cg), instance->IRValue, LgsInstance::rttIndices.type, obj->getRTType(cg));
 
     // Args
@@ -1208,9 +1204,10 @@ void LgsCgModule::visitInstance(LgsInstance* instance) {
             visitExpr(field->expr);
             cg.store(field->expr->IRValue, pointee);
         } else {
+            if (!fieldType->isHeapAlloc) continue;
             const auto zero = fieldType->getZeroValue();
             if (fieldType->asObject()) {
-                zero->IRValue = cg.heapAlloc(fieldType->IRSize(cg), cg.currentLevel, true);
+                zero->IRValue = cg.allocInCurrent(fieldType->IRSize(cg), true);
                 cg.storeStructField(fieldType->getIRType(cg), zero->IRValue, LgsInstance::rttIndices.type, fieldType->getRTType(cg));
             } else {
                 visitExpr(zero);
@@ -1219,7 +1216,6 @@ void LgsCgModule::visitInstance(LgsInstance* instance) {
             freeExpr(zero);
         }
     }
-    addVirtualFields(obj, instance->IRValue);
 }
 
 void LgsCgModule::visitIterIndex(LgsIterIndex* iterIndex, const bool assign) {
@@ -1250,8 +1246,6 @@ void LgsCgModule::createPrologue(LgsFunc* func) {
         startTime = cg.measureTimeStart();
     }
     cg.callStackPush();
-    cg.currentLevel = cg.callRuntimeFunc("getCurrentLevel", cg.sizeTy());
-    cg.currentLevel->setName("current_level");
 }
 
 void LgsCgModule::createEpilogue(const LgsFunc* func) const {
@@ -1259,7 +1253,7 @@ void LgsCgModule::createEpilogue(const LgsFunc* func) const {
     if (ft->name == LGS_MAIN_FUNC) {
         cg.callPopStack();
         cg.callRuntimeFunc("close", cg.voidTy());
-        cg.measureTimeEnd(startTime);
+        cg.printLong(cg.measureTimeEnd(startTime));
         cg.builder.CreateRet(cg.i32(EXIT_SUCCESS));
     } else if (ft->rt->isVoid() && !cg.lastInstTerminator()) {
         cg.callPopStack();
@@ -1303,6 +1297,10 @@ Value* LgsCgModule::getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) const {
     return ctx;
 }
 
+Value* LgsCgModule::getObjRTT(Type* ty, Value* value) const {
+    return cg.loadStructField(ty, value, LgsInstance::rttIndices.type, cg.ptrTy());
+}
+
 Function* LgsCgModule::getThunkFunc(LgsFuncCall* fc, Type* ctxTy) const {
     auto thunkFunc = cg.IRModule->getFunction(fc->name + "Thunk");
     if (thunkFunc) return thunkFunc;
@@ -1322,47 +1320,6 @@ Function* LgsCgModule::getThunkFunc(LgsFuncCall* fc, Type* ctxTy) const {
     cg.builder.CreateRetVoid();
     cg.builder.restoreIP(cg.savedIP);
     return thunkFunc;
-}
-
-void LgsCgModule::initVirtualFuncs() const {
-    // Collect virtual funcs
-    std::vector<LgsObject*> objs;
-    for (const auto symbol : globals.table.symbols) {
-        if (symbol.second.symbolType != OBJECT) continue;
-        objs.push_back(symbol.second.object);
-    }
-    for (const auto symbol : file->symbolTable.symbols) {
-        if (symbol.second.symbolType != OBJECT) continue;
-        objs.push_back(symbol.second.object);
-    }
-
-    std::vector<Constant*> objIDs;
-    std::vector<Constant*> funcsIDs;
-    std::vector<Constant*> funcPtrs;
-    for (auto obj : objs) {
-        for (const auto& [_, method] : obj->methods) {
-            if (!method->funcType->isVirtual) continue;
-            objIDs.emplace_back(cg.usize(obj->id));
-            funcPtrs.emplace_back(method->getIRFunc(cg));
-            funcsIDs.emplace_back(cg.usize(method->id));
-        }
-    }
-    const auto count = objIDs.size();
-    const auto ptrArrTy = ArrayType::get(cg.ptrTy(), count);
-    const auto sizeArrTy = ArrayType::get(cg.sizeTy(), count);
-    const auto objsIDsGlobal = cg.createGlobal("vObjPtrs", ptrArrTy, ConstantArray::get(ptrArrTy, objIDs));
-    const auto funcIDsGlobal = cg.createGlobal("vFuncsIDs", sizeArrTy, ConstantArray::get(sizeArrTy, funcsIDs));
-    const auto funcPtrsGlobal = cg.createGlobal("vFuncsPtrs", ptrArrTy, ConstantArray::get(ptrArrTy, funcPtrs));
-    cg.addVFuncs(objsIDsGlobal, funcIDsGlobal, funcPtrsGlobal, cg.usize(count));
-}
-
-void LgsCgModule::addVirtualFields(LgsObject* obj, Value* ptr) const {
-    for (const auto& field : obj->fields) {
-        if (!field->isVirtual) continue;
-        const auto objIR = obj->getIRType(cg);
-        const auto fieldGEP = cg.builder.CreateStructGEP(objIR, ptr, field->position);
-        cg.addVField(ptr, cg.getString(field->name), fieldGEP);
-    }
 }
 
 void LgsCgModule::createVecField(LgsField* field, Value* parent) const {

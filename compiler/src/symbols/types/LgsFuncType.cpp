@@ -20,22 +20,7 @@ Type* LgsFuncType::getIRType(LgsCodeGen& cg) {
 }
 
 Constant* LgsFuncType::getRTType(LgsCodeGen& cg) {
-    const auto funcName = getName();
-    std::vector<Constant*> paramNames;
-    for (const auto& param : params) {
-        paramNames.push_back(cg.getString(param.name));
-    }
-
-    const auto numFields = params.size();
-    const auto RTTName = LGS_TYPEINFO_PREFIX + name;
-    const auto namesArrType = ArrayType::get(cg.ptrTy(), numFields);
-    const auto namesArr = cg.mode == CG_MODE_RTTYPES ? ConstantArray::get(namesArrType, paramNames) : nullptr;
-    const auto namesArrGlobal = cg.createGlobal(RTTName + "_names", namesArrType, namesArr);
-
-    // paramsCount, paramHashes, paramTypes, rt
-    const std::vector<Type*> rttFieldTypes = {cg.sizeTy(), cg.ptrTy(), cg.ptrTy(), cg.ptrTy()};
-    const std::vector<Constant*> args = {cg.usize(params.size()), namesArrGlobal, cg.null(), rt->getRTType(cg)};
-    return cg.getRTTypeInfo(funcName, IRSize(cg), RTT_FUNC);
+    assert(0);
 }
 
 LgsExpr* LgsFuncType::getZeroValue() {

@@ -28,6 +28,7 @@
 #include <llvm/Target/TargetMachine.h>
 
 #include "exprs/constants/LgsIntConst.h"
+#include "types/LgsNullable.h"
 
 inline ThreadPool threadPool;
 
