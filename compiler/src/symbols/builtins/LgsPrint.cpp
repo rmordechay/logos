@@ -32,9 +32,9 @@ Value* LgsPrint::call(LgsCodeGen& cg, std::vector<LgsFuncArg>& args) {
         }
         return cg.callPrintf(vecArgs);
     }
-    assert(arg->type->rtt != RTT_UNKNOWN);
+    assert(arg->type->rttKind != RTT_UNKNOWN);
     const std::vector<Type*> params = {cg.i32Ty(), cg.ptrTy(), cg.ptrTy()};
-    const std::vector<Value*> IRArgs = {cg.i32(arg->type->rtt), arg->type->getRTType(cg), arg->IRValue};
+    const std::vector<Value*> IRArgs = {cg.i32(arg->type->rttKind), arg->type->getRTType(cg), arg->IRValue};
     return cg.callLgsFunc("", name, cg.voidTy(), params, IRArgs);
 }
 

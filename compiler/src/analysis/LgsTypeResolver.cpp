@@ -70,6 +70,7 @@ void LgsTypeResolver::resolveType(LgsType*& type) {
         assert(newType);
         freeType(type);
         type = newType;
+        assert(type->rttKind != RTT_UNKNOWN);
     }
 }
 

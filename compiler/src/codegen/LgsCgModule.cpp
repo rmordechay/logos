@@ -53,6 +53,7 @@
 #include "llvm/Bitcode/BitcodeWriter.h"
 #include <unistd.h>
 #include <unordered_set>
+
 #include "cblas/cblas.h"
 #include "exprs/LgsMatrixExpr.h"
 #include "exprs/LgsMetaSelection.h"
@@ -145,7 +146,7 @@ void LgsCgModule::visitMainFunc(LgsMainFunc* func) {
     stack.enterScope(func);
     createPrologue(func);
     initMainArgs(func);
-    initVirtuals();
+    initVirtualFuncs();
     visitStmtsBlock(func->stmtsBlock);
     createEpilogue(func);
     stack.exitScope();
@@ -791,10 +792,10 @@ void LgsCgModule::visitDynamicArray(LgsArrayExpr* arrayExpr) const {
     const auto dataSize = cg.builder.CreateMul(baseSize, cg.usize(LGS_ITER_INIT_CAP));
 
     arrayExpr->IRValue = arrayExpr->pointee ? arrayExpr->pointee : cg.heapAlloc(dArr->IRSize(cg), cg.currentLevel, true);
-    cg.storeStructField(ty, arrayExpr->IRValue, 1, dArr->baseType->getRTType(cg));
-    cg.storeStructField(ty, arrayExpr->IRValue, dArr->rttDataIndex, cg.heapAlloc(dataSize, cg.currentLevel, false));
-    cg.storeStructField(ty, arrayExpr->IRValue, dArr->rttLenIndex, cg.sizeZero());
-    cg.storeStructField(ty, arrayExpr->IRValue, dArr->rttCapIndex, cg.usize(LGS_ITER_INIT_CAP));
+    cg.storeStructField(ty, arrayExpr->IRValue, dArr->rttIndices.type, dArr->baseType->getRTType(cg));
+    cg.storeStructField(ty, arrayExpr->IRValue, dArr->rttIndices.data, cg.heapAlloc(dataSize, cg.currentLevel, false));
+    cg.storeStructField(ty, arrayExpr->IRValue, dArr->rttIndices.len, cg.sizeZero());
+    cg.storeStructField(ty, arrayExpr->IRValue, dArr->rttIndices.cap, cg.usize(LGS_ITER_INIT_CAP));
 
     for (const auto element : arrayExpr->elements) {
         dArr->addIRElement(cg, arrayExpr->IRValue, nullptr, element->IRValue);
@@ -872,9 +873,9 @@ void LgsCgModule::visitHashMap(LgsHashMap* hashMap) {
     const auto totalSize = cg.builder.CreateMul(entriesSize, cap);
     const auto entries = cg.heapAlloc(totalSize, cg.currentLevel, false);
     const auto ty = map->getIRType(cg);
-    cg.storeStructField(ty, ptr, 0, entries);
-    cg.storeStructField(ty, ptr, 1, cg.sizeZero());
-    cg.storeStructField(ty, ptr, 2, cap);
+    cg.storeStructField(ty, ptr, map->rttIndices.entries, entries);
+    cg.storeStructField(ty, ptr, map->rttIndices.len, cg.sizeZero());
+    cg.storeStructField(ty, ptr, map->rttIndices.cap, cap);
     hashMap->IRValue = ptr;
     for (const auto pair : hashMap->elements) {
         visitExpr(pair->key);
@@ -1073,10 +1074,18 @@ void LgsCgModule::visitFuncCall(LgsFuncCall* funcCall) {
 
     // Virtual func call
     if (ft->isVirtual) {
-        const auto name = func->funcType->getName();
         const auto self = funcCall->args.front().expr;
-        const auto obj = self->type->asObject();
-        const auto ptr = cg.loadStructField(obj->getIRType(cg), self->IRValue, obj->rttTypeIndex, cg.ptrTy());
+        const auto ty = self->type->getIRType(cg);
+        const auto rttTypeIndex = LgsInstance::rttIndices.type;
+        const auto ptr = cg.loadStructField(ty, self->IRValue, rttTypeIndex, cg.ptrTy());
+        const auto objRTType = cg.getStructType({cg.sizeTy(), cg.ptrTy(), cg.sizeTy(), cg.sizeTy(), cg.ptrTy(), cg.ptrTy(), cg.ptrTy()});
+        cg.printInt(cg.loadStructField(objRTType, ptr, LgsObject::rttIndices.id, cg.sizeTy()), "id=");
+        cg.printStr(cg.loadStructField(objRTType, ptr, LgsObject::rttIndices.name, cg.ptrTy()), "name=");
+        cg.printInt(cg.loadStructField(objRTType, ptr, LgsObject::rttIndices.size, cg.sizeTy()), "size=");
+        cg.printInt(cg.loadStructField(objRTType, ptr, LgsObject::rttIndices.fieldsCount, cg.sizeTy()), "fieldsCount=");
+        cg.printInt(cg.loadStructField(objRTType, ptr, LgsObject::rttIndices.funcsCount, cg.sizeTy()), "funcsCount=");
+        cg.printPtr(cg.builder.CreateStructGEP(objRTType, ptr, LgsObject::rttIndices.fields), "fields=");
+        cg.printPtr(cg.builder.CreateStructGEP(objRTType, ptr, LgsObject::rttIndices.funcs), "funcs=");
         func->IRValue = cg.getFromVTable(ptr, cg.getString(func->funcType->name));
     }
 
@@ -1150,7 +1159,7 @@ void LgsCgModule::visitStrConst(LgsStrConst* strConst) {
     if (strConst->parts.empty()) {
         const auto ty = strConst->type->getIRType(cg);
         strConst->IRValue = cg.heapAlloc(strConst->type->IRSize(cg), cg.sizeZero(), true);
-        cg.storeStructField(ty, strConst->IRValue, 1, cg.getString(strConst->value));
+        cg.storeStructField(ty, strConst->IRValue, LgsStr::rttIndices.data, cg.getString(strConst->value));
         return;
     }
 
@@ -1177,7 +1186,7 @@ void LgsCgModule::visitCharConst(LgsCharConst* charConst) const {
 void LgsCgModule::visitInstance(LgsInstance* instance) {
     const auto obj = instance->obj;
     instance->IRValue = cg.heapAlloc(obj->IRSize(cg), cg.currentLevel, true);
-    cg.storeStructField(obj->getIRType(cg), instance->IRValue, obj->rttTypeIndex, obj->getRTType(cg));
+    cg.storeStructField(obj->getIRType(cg), instance->IRValue, LgsInstance::rttIndices.type, obj->getRTType(cg));
 
     // Args
     std::unordered_set<std::string> visited;
@@ -1202,7 +1211,7 @@ void LgsCgModule::visitInstance(LgsInstance* instance) {
             const auto zero = fieldType->getZeroValue();
             if (fieldType->asObject()) {
                 zero->IRValue = cg.heapAlloc(fieldType->IRSize(cg), cg.currentLevel, true);
-                cg.storeStructField(fieldType->getIRType(cg), zero->IRValue, obj->rttTypeIndex, fieldType->getRTType(cg));
+                cg.storeStructField(fieldType->getIRType(cg), zero->IRValue, LgsInstance::rttIndices.type, fieldType->getRTType(cg));
             } else {
                 visitExpr(zero);
             }
@@ -1315,7 +1324,8 @@ Function* LgsCgModule::getThunkFunc(LgsFuncCall* fc, Type* ctxTy) const {
     return thunkFunc;
 }
 
-void LgsCgModule::initVirtuals() const {
+void LgsCgModule::initVirtualFuncs() const {
+    // Collect virtual funcs
     std::vector<LgsObject*> objs;
     for (const auto symbol : globals.table.symbols) {
         if (symbol.second.symbolType != OBJECT) continue;
@@ -1325,24 +1335,25 @@ void LgsCgModule::initVirtuals() const {
         if (symbol.second.symbolType != OBJECT) continue;
         objs.push_back(symbol.second.object);
     }
-    std::vector<Constant*> objPtrs;
-    std::vector<Constant*> funcsNames;
-    std::vector<Constant*> funcsPtrs;
+
+    std::vector<Constant*> objIDs;
+    std::vector<Constant*> funcsIDs;
+    std::vector<Constant*> funcPtrs;
     for (auto obj : objs) {
-        const auto rtt = obj->getRTType(cg);
         for (const auto& [_, method] : obj->methods) {
             if (!method->funcType->isVirtual) continue;
-            objPtrs.emplace_back(rtt);
-            funcsNames.emplace_back(cg.getString(method->funcType->name));
-            funcsPtrs.emplace_back(method->getIRFunc(cg));
+            objIDs.emplace_back(cg.usize(obj->id));
+            funcPtrs.emplace_back(method->getIRFunc(cg));
+            funcsIDs.emplace_back(cg.usize(method->id));
         }
     }
-    const auto count = objPtrs.size();
-    const auto arrTy = ArrayType::get(cg.ptrTy(), count);
-    const auto objsGlobal = cg.createGlobal("vtable_objs", arrTy, ConstantArray::get(arrTy, objPtrs));
-    const auto namesGlobal = cg.createGlobal("vtable_names", arrTy, ConstantArray::get(arrTy, funcsNames));
-    const auto ptrsGlobal = cg.createGlobal("vtable_ptrs", arrTy, ConstantArray::get(arrTy, funcsPtrs));
-    cg.addVFunc(objsGlobal, namesGlobal, ptrsGlobal, cg.usize(count));
+    const auto count = objIDs.size();
+    const auto ptrArrTy = ArrayType::get(cg.ptrTy(), count);
+    const auto sizeArrTy = ArrayType::get(cg.sizeTy(), count);
+    const auto objsIDsGlobal = cg.createGlobal("vObjPtrs", ptrArrTy, ConstantArray::get(ptrArrTy, objIDs));
+    const auto funcIDsGlobal = cg.createGlobal("vFuncsIDs", sizeArrTy, ConstantArray::get(sizeArrTy, funcsIDs));
+    const auto funcPtrsGlobal = cg.createGlobal("vFuncsPtrs", ptrArrTy, ConstantArray::get(ptrArrTy, funcPtrs));
+    cg.addVFuncs(objsIDsGlobal, funcIDsGlobal, funcPtrsGlobal, cg.usize(count));
 }
 
 void LgsCgModule::addVirtualFields(LgsObject* obj, Value* ptr) const {

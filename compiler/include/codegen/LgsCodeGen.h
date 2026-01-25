@@ -97,7 +97,7 @@ public:
     void callPopStack();
     Value* callHash(Value* arg);
     void addVField(Value* instance, Value* name, Value* ptr);
-    void addVFunc(Value* obj, Value* name, Value* ptr, Value* funcsCount);
+    void addVFuncs(Value* objIDs, Value* funcIDs, Value* funcPtrs, Value* funcsCount);
     Value* getFromVTable(Value* instance, Value* name);
     Value* heapAlloc(Value* size, Value* level, bool withLevel);
     Value* reallocate(Value* ptr, Value* size, Value* level);
@@ -133,12 +133,12 @@ public:
     StructType* getRTTStruct();
 
     // Debugging
-    void printStr(const std::string& value);
-    void printStr(Value* value);
-    void printInt(Value* value, const std::string& text = "");
-    void printFloat(Value* value, const std::string& text = "");
-    void printLong(Value* value, const std::string& text = "");
-    void printPtr(Value* value, const std::string& text = "");
+    void printStr(const std::string& value, const std::string& prefix = "");
+    void printStr(Value* value, const std::string& prefix = "");
+    void printInt(Value* value, const std::string& prefix = "");
+    void printFloat(Value* value, const std::string& prefix = "");
+    void printLong(Value* value, const std::string& prefix = "");
+    void printPtr(Value* value, const std::string& prefix = "");
     Value* measureTimeStart();
     void measureTimeEnd(Value* startTime);
 

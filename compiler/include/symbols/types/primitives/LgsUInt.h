@@ -8,7 +8,7 @@ public:
     LgsUInt() {
         isUnsinged = true;
         isInt = true;
-        rtt = RTT_UINT;
+        rttKind = RTT_UINT;
     }
     size_t sizeBytes() override;
     Type* getIRType(LgsCodeGen& cg) override;

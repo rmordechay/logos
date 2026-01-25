@@ -1,5 +1,6 @@
 #pragma once
 #include "LgsIterable.h"
+#include "LgsRTTIndices.h"
 #include "exprs/LgsFuncCall.h"
 #include "funcs/LgsFunc.h"
 #include "types/LgsAny.h"
@@ -8,16 +9,12 @@
 class LgsDArray final : public LgsIterable {
 public:
     static constexpr auto name = "DArray";
-    const size_t rttLevelIndex = 0;
-    const size_t rttTypeIndex = 1;
-    const size_t rttDataIndex = 2;
-    const size_t rttLenIndex = 3;
-    const size_t rttCapIndex = 4;
+    inline static Lgs_DArrayExprIndices rttIndices;
 
     explicit LgsDArray(LgsType* baseType = nullptr) : LgsIterable(baseType) {
         isHeapAlloc = true;
         passByRef = true;
-        rtt = RTT_DARRAY;
+        rttKind = RTT_DARRAY;
     }
     LgsFunc* getMethod(const std::string& methodName) override;
     bool inferBaseType(std::vector<LgsExpr*>& args) override;

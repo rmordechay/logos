@@ -6,7 +6,7 @@ public:
     static constexpr auto name = "Void";
 
     LgsVoid() {
-        rtt = RTT_VOID;
+        rttKind = RTT_VOID;
     }
     Type* getIRType(LgsCodeGen& cg) override;
     Constant* getRTType(LgsCodeGen& cg) override;

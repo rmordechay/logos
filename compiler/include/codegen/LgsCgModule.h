@@ -144,7 +144,7 @@ public:
     Value* getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) const;
     Function* getThunkFunc(LgsFuncCall* fc, Type* ctxTy) const;
 
-    void initVirtuals() const;
+    void initVirtualFuncs() const;
     void addVirtualFields(LgsObject* obj, Value* ptr) const;
     void createVecField(LgsField* field, Value* parent) const;
     bool checkMock(LgsExpr* expr) const;

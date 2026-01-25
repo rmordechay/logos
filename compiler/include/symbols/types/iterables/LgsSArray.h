@@ -11,7 +11,7 @@ public:
     explicit LgsSArray(LgsType* baseType, LgsExpr* length): LgsIterable(baseType), lengthExpr(length) {
         isStatic = true;
         passByRef = true;
-        rtt = RTT_SARRAY;
+        rttKind = RTT_SARRAY;
     }
     Type* getIRType(LgsCodeGen& cg) override;
     std::string getBaseName() override;

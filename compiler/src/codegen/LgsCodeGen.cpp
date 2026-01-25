@@ -218,8 +218,8 @@ void LgsCodeGen::addVField(Value* instance, Value* name, Value* ptr) {
     callRuntimeFunc("addVField", voidTy(), {ptrTy(), ptrTy(), ptrTy()}, {instance, name, ptr});
 }
 
-void LgsCodeGen::addVFunc(Value* obj, Value* name, Value* ptr, Value* funcsCount) {
-    callRuntimeFunc("addVFunc", voidTy(), {ptrTy(), ptrTy(), ptrTy(), sizeTy()}, {obj, name, ptr, funcsCount});
+void LgsCodeGen::addVFuncs(Value* objIDs, Value* funcIDs, Value* funcPtrs, Value* funcsCount) {
+    callRuntimeFunc("addVFunc", voidTy(), {ptrTy(), ptrTy(), ptrTy(), ptrTy(), sizeTy()}, {objIDs, funcIDs, funcPtrs, ids, funcsCount});
 }
 
 Value* LgsCodeGen::getFromVTable(Value* instance, Value* name) {
@@ -368,31 +368,33 @@ StructType* LgsCodeGen::getRTTStruct() {
     return getStructType({sizeTy(), i32Ty()}, "RTI");
 }
 
-void LgsCodeGen::printStr(const std::string& value) {
+void LgsCodeGen::printStr(const std::string& value, const std::string& prefix) {
+    if (prefix != "") printStr(prefix);
     callPrintf({getString("%s"), getString(value)});
 }
 
-void LgsCodeGen::printStr(Value* value) {
+void LgsCodeGen::printStr(Value* value, const std::string& prefix) {
+    if (prefix != "") printStr(prefix);
     callPrintf({getString("\"%s\"\n"), value});
 }
 
-void LgsCodeGen::printInt(Value* value, const std::string& text) {
-    if (text != "") printStr(text);
+void LgsCodeGen::printInt(Value* value, const std::string& prefix) {
+    if (prefix != "") printStr(prefix);
     callPrintf({getString("%d\n"), value});
 }
 
-void LgsCodeGen::printFloat(Value* value, const std::string& text) {
-    if (text != "") printStr(text);
+void LgsCodeGen::printFloat(Value* value, const std::string& prefix) {
+    if (prefix != "") printStr(prefix);
     callPrintf({getString("%f\n"), value});
 }
 
-void LgsCodeGen::printLong(Value* value, const std::string& text) {
-    if (text != "") printStr(text);
+void LgsCodeGen::printLong(Value* value, const std::string& prefix) {
+    if (prefix != "") printStr(prefix);
     callPrintf({getString("%ld\n"), value});
 }
 
-void LgsCodeGen::printPtr(Value* value, const std::string& text) {
-    if (text != "") printStr(text);
+void LgsCodeGen::printPtr(Value* value, const std::string& prefix) {
+    if (prefix != "") printStr(prefix);
     callPrintf({getString("%p\n"), value});
 }
 

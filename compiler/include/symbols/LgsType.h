@@ -73,7 +73,7 @@ public:
     bool isFloat = false;
     bool isHeapAlloc = false;
     bool passByRef = false;
-    Lgs_TypeKind rtt = RTT_UNKNOWN;
+    Lgs_TypeKind rttKind = RTT_UNKNOWN;
 
     bool isAny();
     bool isVoid();

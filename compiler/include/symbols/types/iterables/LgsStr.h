@@ -1,16 +1,16 @@
 #pragma once
 #include "LgsIterable.h"
+#include "LgsRTTIndices.h"
 #include "types/primitives/LgsChar.h"
 
 class LgsStr final : public LgsIterable {
 public:
     static constexpr auto name = "Str";
-    const size_t rttLevelIndex = 0;
-    const size_t rttDataIndex = 1;
+    inline static Lgs_StrIndices rttIndices;
 
     explicit LgsStr(): LgsIterable(&LGS_CHAR) {
         passByRef = true;
-        rtt = RTT_STR;
+        rttKind = RTT_STR;
     }
     Type* getIRType(LgsCodeGen& cg) override;
     std::string getBaseName() override;

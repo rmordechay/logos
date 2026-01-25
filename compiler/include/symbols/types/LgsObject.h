@@ -2,7 +2,6 @@
 #include "LgsFuncType.h"
 #include "exprs/LgsFuncCall.h"
 #include "funcs/LgsFunc.h"
-#include "iterables/LgsStr.h"
 #include "stmts/LgsField.h"
 
 class LgsGenericType;
@@ -13,6 +12,7 @@ class LgsIOPair;
 
 class LgsObject : public LgsType {
 public:
+    size_t id{};
     std::string name;
     std::vector<LgsType*> implements;
     std::vector<LgsEnum*> enums;
@@ -24,18 +24,12 @@ public:
     std::map<std::string, LgsField*> metaFields;
     LgsInstance* singleton = nullptr;
     bool hasGenerics = false;
-    const size_t rttLevelIndex = 0;
-    const size_t rttTypeIndex = 1;
-    const size_t rttNameIndex = 0;
-    const size_t rttSizeIndex = 1;
-    const size_t rttFieldsCountIndex = 2;
-    const size_t rttFuncsCountIndex = 3;
-    const size_t rttFieldsIndex = 4;
+    inline static Lgs_ObjectIndices rttIndices;
 
     explicit LgsObject(const std::string&  objName) : name(objName) {
         passByRef = true;
         isHeapAlloc = true;
-        rtt = RTT_OBJECT;
+        rttKind = RTT_OBJECT;
         // metaFields["name"] = new LgsField("name", new LgsStr(), new LgsStrConst(name));
     }
     std::string getName() override;

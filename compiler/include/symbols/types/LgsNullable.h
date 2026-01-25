@@ -12,7 +12,7 @@ public:
     const size_t isSetIndex = 1;
 
     explicit LgsNullable(LgsType* baseType = nullptr) : baseType(baseType) {
-        rtt = RTT_NULLABLE;
+        rttKind = RTT_NULLABLE;
         if (baseType) {
             isHeapAlloc = baseType->isHeapAlloc;
             passByRef = baseType->passByRef;

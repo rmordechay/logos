@@ -14,6 +14,7 @@ typedef std::function<Value*(LgsCodeGen&, const std::vector<LgsFuncArg>&)> CallF
 
 class LgsFunc : public LgsExpr {
 public:
+    size_t id{};
     LgsFuncType* funcType;
     LgsStmtsBlock* stmtsBlock = nullptr;
     std::vector<const LgsReturn*> returnStmts;

@@ -51,6 +51,7 @@ struct Lgs_Field {
 };
 
 struct Lgs_Object {
+    const size_t id;
     const char* name;
     const size_t size;
     const size_t fieldsCount;

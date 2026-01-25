@@ -59,7 +59,7 @@ Constant* LgsObject::getRTType(LgsCodeGen& cg) {
     if (cg.mode != CG_MODE_RTTYPES) return cg.createGlobal(RTTName, cg.getRTTStruct(), nullptr);
     const auto numFields = fields.size();
     constexpr auto RTTFieldName = std::string(LGS_TYPEINFO_PREFIX) + "field";
-    const auto objRTType = cg.getStructType({cg.ptrTy(), cg.sizeTy(), cg.sizeTy(), cg.ptrTy(), cg.ptrTy(), cg.ptrTy()}, RTTName);
+    const auto objRTType = cg.getStructType({cg.sizeTy(), cg.ptrTy(), cg.sizeTy(), cg.sizeTy(), cg.ptrTy(), cg.ptrTy(), cg.ptrTy()}, RTTName);
     const auto fieldRTType = cg.getStructType({cg.ptrTy(), cg.sizeTy(), cg.sizeTy(), cg.sizeTy(), cg.i32Ty()}, RTTFieldName);
     const auto fieldTypeArr = ArrayType::get(fieldRTType, numFields);
     const auto funcsTypeArr = ArrayType::get(fieldRTType, numFields);
@@ -68,12 +68,12 @@ Constant* LgsObject::getRTType(LgsCodeGen& cg) {
     std::vector<Constant*> rttFields;
     for (size_t i = 0; i < fields.size(); ++i) {
         const auto field = fields[i];
-        assert(field->type->rtt != RTT_UNKNOWN);
+        assert(field->type->rttKind != RTT_UNKNOWN);
         rttFields.emplace_back(ConstantStruct::get(fieldRTType, {
             cg.getString(field->name),
             field->type->IRSize(cg),
             cg.usize(sl->getElementOffset(i + 2)),
-            cg.i32(field->type->rtt),
+            cg.i32(field->type->rttKind),
             field->type->asObject() ? cg.null() : field->type->getRTType(cg),
         }));
     }
@@ -85,6 +85,7 @@ Constant* LgsObject::getRTType(LgsCodeGen& cg) {
     const auto rttFieldsGlobal = cg.createGlobal(LGS_TYPEINFO_PREFIX + name + "_fields", fieldTypeArr, ConstantArray::get(fieldTypeArr, rttFields));
     const auto rttFuncsGlobal = cg.createGlobal(LGS_TYPEINFO_PREFIX + name + "_funcs", funcsTypeArr, ConstantArray::get(funcsTypeArr, rttFuncs));
     const std::vector<Constant*> args = {
+        cg.usize(id), // id
         cg.getString(name), // name
         IRSize(cg), // size
         cg.usize(numFields), // fieldsCount

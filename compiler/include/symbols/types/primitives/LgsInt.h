@@ -7,7 +7,7 @@ public:
 
     LgsInt() {
         isInt = true;
-        rtt = RTT_INT;
+        rttKind = RTT_INT;
     }
     size_t sizeBytes() override;
     Type* getIRType(LgsCodeGen& cg) override;

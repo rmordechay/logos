@@ -57,6 +57,8 @@
 
 static std::string getMissingImplementsStr(const std::vector<LgsField*>& fields, const std::vector<LgsFunc*>& methods);
 
+std::atomic<size_t> objsIDGenerator{0};
+std::atomic<size_t> funcsIDGenerator{0};
 std::atomic<size_t> lambdasIDGenerator{0};
 
 void LgsSema::analyse() {
@@ -109,6 +111,7 @@ void LgsSema::visitMainFile(LgsMainFile* mainFile) {
 }
 
 void LgsSema::visitObject(LgsObject* obj) {
+    obj->id = ++objsIDGenerator;
     validateTypeName(obj->name, obj->location);
     for (const auto field : obj->fields) {
         visitField(field);
@@ -190,6 +193,7 @@ void LgsSema::visitFuncHeader(LgsFuncType* ft) {
 
 void LgsSema::visitFunc(LgsFunc* func) {
     stack.enterScope(func);
+    func->id = ++funcsIDGenerator;
     const auto ft = func->funcType;
     if (ft->name != "") validateLocalName(ft->name, ft->location);
     visitFuncHeader(ft);
@@ -241,7 +245,7 @@ void LgsSema::visitLambda(LgsFunc* lambda) {
         }
         lambda->funcType->rt = inferredType;
     }
-    lambda->funcType->name += LGS_LAMBDA + std::to_string(lambdasIDGenerator.fetch_add(1));
+    lambda->funcType->name += LGS_LAMBDA + std::to_string(lambdasIDGenerator++);
 }
 
 void LgsSema::visitParam(LgsParam* param) {

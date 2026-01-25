@@ -55,7 +55,7 @@ extern "C" void Lgs_Runtime_moveArr(Lgs_DArrayExpr* leftArr, const Lgs_DArrayExp
     std::memcpy(leftArr->data, rightArr->data, size);
 }
 
-extern "C" void* Lgs_Runtime_moveElement(Lgs_DArrayExpr* arr, void* element) {
+extern "C" void* Lgs_Runtime_moveElement(const Lgs_DArrayExpr* arr, void* element) {
     const auto levelArr = arr->level;
     const auto elementLevel = *static_cast<size_t*>(element);
     assert(levelArr <= runtime.level && elementLevel <= runtime.level);
@@ -92,9 +92,15 @@ extern "C" void Lgs_Runtime_addVField(void* instance, const char* name, void* pt
     runtime.vtable[{instance, name}] = ptr;
 }
 
-extern "C" void Lgs_Runtime_addVFunc(void** objs, const char** names, void** ptrs, const size_t funcsCount) {
+extern "C" void Lgs_Runtime_addVFunc(void** objs, const char** names, void** ptrs, const size_t* ids, const size_t funcsCount) {
     for (size_t i = 0; i < funcsCount; ++i) {
         runtime.vtable[{objs[i], names[i]}] = ptrs[i];
+    }
+}
+
+extern "C" void Lgs_Runtime_addVFunc2(const size_t* objsIDs, const size_t* funcIDs, void** ptrs, const size_t funcsCount) {
+    for (size_t i = 0; i < funcsCount; ++i) {
+        runtime.vtable3[objsIDs[i]][funcIDs[i]] = ptrs[i];
     }
 }
 

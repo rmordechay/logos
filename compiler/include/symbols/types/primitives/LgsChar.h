@@ -6,7 +6,7 @@ public:
     static constexpr auto name = "Char";
 
     LgsChar() {
-        rtt = RTT_CHAR;
+        rttKind = RTT_CHAR;
     }
     size_t sizeBytes() override;
     Type* getIRType(LgsCodeGen& cg) override;

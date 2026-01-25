@@ -77,7 +77,7 @@ std::string LgsStr::fmtStr() const {
 }
 
 Value* LgsStr::asIRStr(LgsCodeGen& cg, Value* v) {
-    return cg.loadStructField(getIRType(cg), v, rttDataIndex, cg.ptrTy());
+    return cg.loadStructField(getIRType(cg), v, rttIndices.data, cg.ptrTy());
 }
 
 bool LgsStr::inferBaseType(std::vector<LgsExpr*>& args) {
@@ -90,34 +90,34 @@ Value* LgsStr::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto leftStrConst = left->getConstStr();
     const auto ty = getIRType(cg);
     const auto alloc = cg.builder.CreateAlloca(ty);
-    cg.storeStructField(ty, alloc, rttLevelIndex, cg.currentLevel);
+    cg.storeStructField(ty, alloc, rttIndices.level, cg.currentLevel);
     if (leftStrConst.has_value()) {
         const auto lv = leftStrConst.value();
         // Str
         const auto rStr = right->getConstStr();
         if (rStr.has_value()) {
             const auto str = cg.getString(lv + rStr.value());
-            cg.storeStructField(ty, alloc, rttDataIndex, str);
+            cg.storeStructField(ty, alloc, rttIndices.data, str);
             return alloc;
         }
         // Int
         const auto rInt = right->getConstInt();
         if (rInt.has_value()) {
             const auto str = cg.getString(lv + std::to_string(rInt.value()));
-            cg.storeStructField(ty, alloc, rttDataIndex, str);
+            cg.storeStructField(ty, alloc, rttIndices.data, str);
             return alloc;
         }
         // Float
         const auto rFloat = right->getConstFloat();
         if (rFloat.has_value()) {
             const auto str = cg.getString(lv + std::to_string(rFloat.value()));
-            cg.storeStructField(ty, alloc, rttDataIndex, str);
+            cg.storeStructField(ty, alloc, rttIndices.data, str);
             return alloc;
         }
     }
 
     Value* ptr = nullptr;
-    const auto leftPtr = cg.loadStructField(ty, left->loadIR(cg), rttDataIndex, cg.ptrTy());
+    const auto leftPtr = cg.loadStructField(ty, left->loadIR(cg), rttIndices.data, cg.ptrTy());
     const auto leftSize = lenIR(cg, leftPtr);
     if (right->type->asChar()) {
         const auto allocSize = cg.builder.CreateAdd(leftSize, cg.usize(2));
@@ -126,7 +126,7 @@ Value* LgsStr::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
         cg.callMemcpy(ptr, leftPtr, leftSize);
         cg.store(right->IRValue, rightPos);
     } else if (right->type->asStr()) {
-        const auto rightPtr = cg.builder.CreateExtractValue(right->IRValue, rttDataIndex);
+        const auto rightPtr = cg.builder.CreateExtractValue(right->IRValue, rttIndices.data);
         const auto rightSize = lenIR(cg, rightPtr);
         const auto sumSize = cg.builder.CreateAdd(leftSize, rightSize);
         const auto allocSize = cg.builder.CreateAdd(sumSize, cg.usize(1));
@@ -137,7 +137,7 @@ Value* LgsStr::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     } else {
         assert(0);
     }
-    cg.storeStructField(ty, alloc, rttDataIndex, ptr);
+    cg.storeStructField(ty, alloc, rttIndices.data, ptr);
     return alloc;
 }
 

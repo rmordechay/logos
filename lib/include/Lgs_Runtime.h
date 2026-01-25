@@ -19,6 +19,7 @@ struct Lgs_Runtime {
     std::vector<Lgs_ThunkFunc> coros;
     std::array<Lgs_StackFrame, 1024> stack;
     std::unordered_map<VKey, void*, VKeyHash> vtable;
+    std::vector<std::vector<void*>> vtable3;
 };
 
 static inline Lgs_Runtime runtime;

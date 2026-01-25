@@ -15,6 +15,7 @@ public:
     std::vector<LgsField*> fields;
     std::map<std::string, LgsInstanceArg> args;
     std::vector<LgsType*> generics;
+    inline static Lgs_InstanceIndices rttIndices;
 
     explicit LgsInstance(const std::string& name): name(name) {}
     explicit LgsInstance(LgsObject* obj) : LgsExpr(obj), name(obj->name), obj(obj) {}

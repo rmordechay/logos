@@ -50,7 +50,7 @@ Type* LgsEnum::getIRType(LgsCodeGen& cg) {
 }
 
 Constant* LgsEnum::getRTType(LgsCodeGen& cg) {
-    return cg.getRTTypeInfo(name, IRSize(cg), rtt);
+    return cg.getRTTypeInfo(name, IRSize(cg), rttKind);
 }
 
 std::string LgsEnum::getName() {

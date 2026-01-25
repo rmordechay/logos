@@ -11,7 +11,7 @@ public:
 
     explicit LgsEnum(const std::string& name) : LgsEnum(name, "", 0) {}
     LgsEnum(const std::string& name, const std::string& fieldName, const size_t fieldIndex) : name(name), fieldName(fieldName), fieldIndex(fieldIndex) {
-        rtt = RTT_ENUM;
+        rttKind = RTT_ENUM;
     }
     LgsFunc* getMethod(const std::string& methodName) override;
     Type* getIRType(LgsCodeGen& cg) override;
