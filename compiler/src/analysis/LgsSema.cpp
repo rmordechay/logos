@@ -1762,6 +1762,7 @@ void LgsSema::addRTType(LgsType* type) const {
     if (!errHandler.successful) return;
     if (!type || type->isVoid() || type->hasGenericTypes()) return;
     if (type->asNullable() && !type->asNullable()->baseType) return;
+    if (type->asInterface()) return;
     for (const auto rttType : globals.table.rttTypes) {
         if (rttType->equals(type)) return;
     }

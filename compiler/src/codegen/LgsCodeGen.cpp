@@ -214,8 +214,12 @@ Value* LgsCodeGen::callHash(Value* arg) {
     return callRuntimeFunc("hash", sizeTy(), {ptrTy()}, {arg});
 }
 
-void LgsCodeGen::addToVTable(Value* instance, Value* name, Value* ptr) {
-    callRuntimeFunc("addToVTable", voidTy(), {ptrTy(), ptrTy(), ptrTy()}, {instance, name, ptr});
+void LgsCodeGen::addVField(Value* instance, Value* name, Value* ptr) {
+    callRuntimeFunc("addVField", voidTy(), {ptrTy(), ptrTy(), ptrTy()}, {instance, name, ptr});
+}
+
+void LgsCodeGen::addVFunc(Value* obj, Value* name, Value* ptr, Value* funcsCount) {
+    callRuntimeFunc("addVFunc", voidTy(), {ptrTy(), ptrTy(), ptrTy(), sizeTy()}, {obj, name, ptr, funcsCount});
 }
 
 Value* LgsCodeGen::getFromVTable(Value* instance, Value* name) {

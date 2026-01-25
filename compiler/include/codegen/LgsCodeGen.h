@@ -96,7 +96,8 @@ public:
     void callStackPush();
     void callPopStack();
     Value* callHash(Value* arg);
-    void addToVTable(Value* instance, Value* name, Value* ptr);
+    void addVField(Value* instance, Value* name, Value* ptr);
+    void addVFunc(Value* obj, Value* name, Value* ptr, Value* funcsCount);
     Value* getFromVTable(Value* instance, Value* name);
     Value* heapAlloc(Value* size, Value* level, bool withLevel);
     Value* reallocate(Value* ptr, Value* size, Value* level);

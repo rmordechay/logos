@@ -141,27 +141,6 @@ void LgsCgModule::visitEnum(const LgsEnum* enum_) {
     }
 }
 
-void LgsCgModule::initVirtuals() {
-    for (const auto symbol : globals.table.symbols) {
-        if (symbol.second.symbolType != OBJECT) continue;
-        const auto obj = symbol.second.object;
-        const auto rtt = obj->getRTType(cg);
-        for (const auto& [_, method] : obj->methods) {
-            visitFunc(method);
-            if (!method->funcType->isVirtual) continue;
-            auto methodName = method->funcType->name;
-            auto methodGenericName = method->funcType->getName();
-            for (const auto implement : obj->implements) {
-                if (!implement->methods.contains(methodName)) continue;
-                const auto IRFunc = method->getIRFunc(cg);
-                const auto interfaceMethodName = implement->methods[methodName]->funcType->name;
-                cg.addToVTable(rtt, cg.getString(interfaceMethodName), IRFunc);
-                break;
-            }
-        }
-    }
-}
-
 void LgsCgModule::visitMainFunc(LgsMainFunc* func) {
     stack.enterScope(func);
     createPrologue(func);
@@ -1076,11 +1055,10 @@ void LgsCgModule::visitFuncCall(LgsFuncCall* funcCall) {
         funcCall->func->IRValue = value->IRValue;
     }
     assert(funcCall->func || funcCall->coroutine);
-
     const auto func = funcCall->func ? funcCall->func : funcCall->coroutine;
     const auto ft = func->funcType;
 
-    // Visit defaults
+    // Default params
     if (ft->hasDefaults) {
         const auto diff = ft->params.size() - funcCall->args.size() - 1;
         for (size_t i = diff; i < ft->params.size(); ++i) {
@@ -1092,8 +1070,9 @@ void LgsCgModule::visitFuncCall(LgsFuncCall* funcCall) {
     if (ft->isVirtual) {
         const auto name = func->funcType->getName();
         const auto self = funcCall->args.front().expr;
-        assert(funcCall->args.front().isSelf);
-        func->IRValue = cg.getFromVTable(self->IRValue, cg.getString(func->funcType->name));
+        const auto obj = self->type->asObject();
+        const auto ptr = cg.loadStructField(obj->getIRType(cg), self->IRValue, obj->typeIndex, cg.ptrTy());
+        func->IRValue = cg.getFromVTable(ptr, cg.getString(func->funcType->name));
     }
 
     assert(func->funcType->genericTypes.empty());
@@ -1332,6 +1311,45 @@ Function* LgsCgModule::getThunkFunc(LgsFuncCall* fc, Type* ctxTy) const {
     return thunkFunc;
 }
 
+void LgsCgModule::initVirtuals() const {
+    std::vector<LgsObject*> objs;
+    for (const auto symbol : globals.table.symbols) {
+        if (symbol.second.symbolType != OBJECT) continue;
+        objs.push_back(symbol.second.object);
+    }
+    for (const auto symbol : file->symbolTable.symbols) {
+        if (symbol.second.symbolType != OBJECT) continue;
+        objs.push_back(symbol.second.object);
+    }
+    std::vector<Constant*> objPtrs;
+    std::vector<Constant*> funcsNames;
+    std::vector<Constant*> funcsPtrs;
+    for (auto obj : objs) {
+        const auto rtt = obj->getRTType(cg);
+        for (const auto& [_, method] : obj->methods) {
+            if (!method->funcType->isVirtual) continue;
+            objPtrs.emplace_back(rtt);
+            funcsNames.emplace_back(cg.getString(method->funcType->name));
+            funcsPtrs.emplace_back(method->getIRFunc(cg));
+        }
+    }
+    const auto count = objPtrs.size();
+    const auto arrTy = ArrayType::get(cg.ptrTy(), count);
+    const auto objsGlobal = cg.createGlobal("vtable_objs", arrTy, ConstantArray::get(arrTy, objPtrs));
+    const auto namesGlobal = cg.createGlobal("vtable_names", arrTy, ConstantArray::get(arrTy, funcsNames));
+    const auto ptrsGlobal = cg.createGlobal("vtable_ptrs", arrTy, ConstantArray::get(arrTy, funcsPtrs));
+    cg.addVFunc(objsGlobal, namesGlobal, ptrsGlobal, cg.usize(count));
+}
+
+void LgsCgModule::addVirtualFields(LgsObject* obj, Value* ptr) const {
+    for (const auto& field : obj->fields) {
+        if (!field->isVirtual) continue;
+        const auto objIR = obj->getIRType(cg);
+        const auto fieldGEP = cg.builder.CreateStructGEP(objIR, ptr, field->position);
+        cg.addVField(ptr, cg.getString(field->name), fieldGEP);
+    }
+}
+
 void LgsCgModule::createVecField(LgsField* field, Value* parent) const {
     const auto vec = field->type->asVec();
     assert(vec);
@@ -1358,16 +1376,6 @@ bool LgsCgModule::checkMock(LgsExpr* expr) const {
         }
     }
     return false;
-}
-
-void LgsCgModule::addVirtualFields(LgsObject* obj, Value* ptr) const {
-    const auto rtt = obj->getRTType(cg);
-    for (const auto& field : obj->fields) {
-        if (!field->isVirtual) continue;
-        const auto objIR = obj->getIRType(cg);
-        const auto fieldGEP = cg.builder.CreateStructGEP(objIR, ptr, field->position);
-        cg.addToVTable(ptr, cg.getString(field->name), fieldGEP);
-    }
 }
 
 void LgsCgModule::generateMapFunc(LgsFuncType* mapFunc) {
