@@ -1,5 +1,4 @@
 #pragma once
-#include "LgsIntConst.h"
 #include "types/iterables/LgsStr.h"
 
 class LgsStrConst final : public LgsExpr {

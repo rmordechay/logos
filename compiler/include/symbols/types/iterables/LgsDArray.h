@@ -8,11 +8,11 @@
 class LgsDArray final : public LgsIterable {
 public:
     static constexpr auto name = "DArray";
-    const size_t levelIndex = 0;
-    const size_t typeIndex = 1;
-    const size_t dataIndex = 2;
-    const size_t lenIndex = 3;
-    const size_t capIndex = 4;
+    const size_t rttLevelIndex = 0;
+    const size_t rttTypeIndex = 1;
+    const size_t rttDataIndex = 2;
+    const size_t rttLenIndex = 3;
+    const size_t rttCapIndex = 4;
 
     explicit LgsDArray(LgsType* baseType = nullptr) : LgsIterable(baseType) {
         isHeapAlloc = true;

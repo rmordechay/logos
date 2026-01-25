@@ -1,7 +1,6 @@
 #pragma once
 #include "LgsFuncType.h"
 #include "exprs/LgsFuncCall.h"
-#include "exprs/constants/LgsStrConst.h"
 #include "funcs/LgsFunc.h"
 #include "iterables/LgsStr.h"
 #include "stmts/LgsField.h"
@@ -25,14 +24,19 @@ public:
     std::map<std::string, LgsField*> metaFields;
     LgsInstance* singleton = nullptr;
     bool hasGenerics = false;
-    const size_t levelIndex = 0;
-    const size_t typeIndex = 1;
+    const size_t rttLevelIndex = 0;
+    const size_t rttTypeIndex = 1;
+    const size_t rttNameIndex = 0;
+    const size_t rttSizeIndex = 1;
+    const size_t rttFieldsCountIndex = 2;
+    const size_t rttFuncsCountIndex = 3;
+    const size_t rttFieldsIndex = 4;
 
     explicit LgsObject(const std::string&  objName) : name(objName) {
         passByRef = true;
         isHeapAlloc = true;
         rtt = RTT_OBJECT;
-        metaFields["name"] = new LgsField("name", new LgsStr(), new LgsStrConst(name));
+        // metaFields["name"] = new LgsField("name", new LgsStr(), new LgsStrConst(name));
     }
     std::string getName() override;
     LgsFunc* getMethod(const std::string& methodName) override;

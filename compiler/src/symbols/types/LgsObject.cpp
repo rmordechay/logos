@@ -62,6 +62,7 @@ Constant* LgsObject::getRTType(LgsCodeGen& cg) {
     const auto objRTType = cg.getStructType({cg.ptrTy(), cg.sizeTy(), cg.sizeTy(), cg.ptrTy(), cg.ptrTy(), cg.ptrTy()}, RTTName);
     const auto fieldRTType = cg.getStructType({cg.ptrTy(), cg.sizeTy(), cg.sizeTy(), cg.sizeTy(), cg.i32Ty()}, RTTFieldName);
     const auto fieldTypeArr = ArrayType::get(fieldRTType, numFields);
+    const auto funcsTypeArr = ArrayType::get(fieldRTType, numFields);
     const auto sl = cg.IRModule->getDataLayout().getStructLayout(llvm::cast<StructType>(getIRType(cg)));
 
     std::vector<Constant*> rttFields;
@@ -76,9 +77,13 @@ Constant* LgsObject::getRTType(LgsCodeGen& cg) {
             field->type->asObject() ? cg.null() : field->type->getRTType(cg),
         }));
     }
+    std::vector<Constant*> rttFuncs;
+    for (auto& [_, method] : methods) {
+        rttFuncs.emplace_back(method->getIRFunc(cg));
+    }
 
     const auto rttFieldsGlobal = cg.createGlobal(LGS_TYPEINFO_PREFIX + name + "_fields", fieldTypeArr, ConstantArray::get(fieldTypeArr, rttFields));
-    const auto rttFuncsGlobal = cg.null();
+    const auto rttFuncsGlobal = cg.createGlobal(LGS_TYPEINFO_PREFIX + name + "_funcs", funcsTypeArr, ConstantArray::get(funcsTypeArr, rttFuncs));
     const std::vector<Constant*> args = {
         cg.getString(name), // name
         IRSize(cg), // size

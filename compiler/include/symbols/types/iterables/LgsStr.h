@@ -5,6 +5,8 @@
 class LgsStr final : public LgsIterable {
 public:
     static constexpr auto name = "Str";
+    const size_t rttLevelIndex = 0;
+    const size_t rttDataIndex = 1;
 
     explicit LgsStr(): LgsIterable(&LGS_CHAR) {
         passByRef = true;

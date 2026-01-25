@@ -14,6 +14,9 @@
 #include <clang/Basic/TargetInfo.h>
 #include <clang/Basic/SourceManager.h>
 
+#include "exprs/constants/LgsIntConst.h"
+#include "types/primitives/LgsInt.h"
+
 using namespace clang;
 
 void LgsCCompiler::initCompiler() {

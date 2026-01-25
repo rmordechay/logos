@@ -792,9 +792,9 @@ void LgsCgModule::visitDynamicArray(LgsArrayExpr* arrayExpr) const {
 
     arrayExpr->IRValue = arrayExpr->pointee ? arrayExpr->pointee : cg.heapAlloc(dArr->IRSize(cg), cg.currentLevel, true);
     cg.storeStructField(ty, arrayExpr->IRValue, 1, dArr->baseType->getRTType(cg));
-    cg.storeStructField(ty, arrayExpr->IRValue, dArr->dataIndex, cg.heapAlloc(dataSize, cg.currentLevel, false));
-    cg.storeStructField(ty, arrayExpr->IRValue, dArr->lenIndex, cg.sizeZero());
-    cg.storeStructField(ty, arrayExpr->IRValue, dArr->capIndex, cg.usize(LGS_ITER_INIT_CAP));
+    cg.storeStructField(ty, arrayExpr->IRValue, dArr->rttDataIndex, cg.heapAlloc(dataSize, cg.currentLevel, false));
+    cg.storeStructField(ty, arrayExpr->IRValue, dArr->rttLenIndex, cg.sizeZero());
+    cg.storeStructField(ty, arrayExpr->IRValue, dArr->rttCapIndex, cg.usize(LGS_ITER_INIT_CAP));
 
     for (const auto element : arrayExpr->elements) {
         dArr->addIRElement(cg, arrayExpr->IRValue, nullptr, element->IRValue);
@@ -1025,7 +1025,7 @@ void LgsCgModule::visitNullableSelection(LgsExpr* child, LgsExpr* parent) const 
 
 void LgsCgModule::visitMetaSelection(LgsMetaSelection* metaSelection) {
     visitExpr(metaSelection->baseExpr);
-    if (const auto methodCall = metaSelection->child->asFuncCall()) {
+    if (metaSelection->child->asFuncCall()) {
         assert(0);
     }
     if (const auto var = metaSelection->child->asVariable()) {
@@ -1076,7 +1076,7 @@ void LgsCgModule::visitFuncCall(LgsFuncCall* funcCall) {
         const auto name = func->funcType->getName();
         const auto self = funcCall->args.front().expr;
         const auto obj = self->type->asObject();
-        const auto ptr = cg.loadStructField(obj->getIRType(cg), self->IRValue, obj->typeIndex, cg.ptrTy());
+        const auto ptr = cg.loadStructField(obj->getIRType(cg), self->IRValue, obj->rttTypeIndex, cg.ptrTy());
         func->IRValue = cg.getFromVTable(ptr, cg.getString(func->funcType->name));
     }
 
@@ -1177,7 +1177,7 @@ void LgsCgModule::visitCharConst(LgsCharConst* charConst) const {
 void LgsCgModule::visitInstance(LgsInstance* instance) {
     const auto obj = instance->obj;
     instance->IRValue = cg.heapAlloc(obj->IRSize(cg), cg.currentLevel, true);
-    cg.storeStructField(obj->getIRType(cg), instance->IRValue, obj->typeIndex, obj->getRTType(cg));
+    cg.storeStructField(obj->getIRType(cg), instance->IRValue, obj->rttTypeIndex, obj->getRTType(cg));
 
     // Args
     std::unordered_set<std::string> visited;
@@ -1202,7 +1202,7 @@ void LgsCgModule::visitInstance(LgsInstance* instance) {
             const auto zero = fieldType->getZeroValue();
             if (fieldType->asObject()) {
                 zero->IRValue = cg.heapAlloc(fieldType->IRSize(cg), cg.currentLevel, true);
-                cg.storeStructField(fieldType->getIRType(cg), zero->IRValue, obj->typeIndex, fieldType->getRTType(cg));
+                cg.storeStructField(fieldType->getIRType(cg), zero->IRValue, obj->rttTypeIndex, fieldType->getRTType(cg));
             } else {
                 visitExpr(zero);
             }

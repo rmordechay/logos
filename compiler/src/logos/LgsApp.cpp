@@ -27,6 +27,8 @@
 #include "types/primitives/LgsULong.h"
 #include <llvm/Target/TargetMachine.h>
 
+#include "exprs/constants/LgsIntConst.h"
+
 inline ThreadPool threadPool;
 
 bool LgsApp::compile() {
@@ -159,7 +161,6 @@ bool LgsApp::analyse() {
 bool LgsApp::generate() {
     createBuildDirs();
     LgsCodeGen::initLLVM();
-    if (!generateRTTTypes()) return false;
     if (!generateGenerics()) return false;
 
     // Main file is generated first non-concurrently
@@ -183,6 +184,7 @@ bool LgsApp::generate() {
         });
     }
     threadPool.wait();
+    generateRTTTypes();
     printIR();
     return errHandler.successful;
 }
