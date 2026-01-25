@@ -76,19 +76,6 @@ LgsExpr* LgsDArray::getZeroValue() {
     return new LgsArrayExpr(this);
 }
 
-LgsType* LgsDArray::replaceGenerics(LgsType* replacement, std::unordered_map<std::string, LgsType*>& replacements) {
-    const auto otherDArr = replacement->asDArray();
-    if (otherDArr) {
-        baseType = baseType->replaceGenerics(otherDArr->baseType, replacements);
-    } else {
-        const auto baseName = baseType->getName();
-        if (replacements.contains(baseName)) {
-            baseType = replacements[baseName];
-        }
-    }
-    return this;
-}
-
 LgsType* LgsDArray::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     switch (op.opType) {
     case IN: {

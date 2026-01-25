@@ -182,6 +182,30 @@ void LgsFunc::setDebugValue(LgsCodeGen& cg) {
     irFunc->setSubprogram(cg.debugger.subprogram);
 }
 
+LgsFunc* LgsFunc::cloneGenerics(const LgsFuncCall* funcCall) const {
+    const auto newFunc = new LgsFunc(*this);
+    newFunc->funcType = new LgsFuncType(*newFunc->funcType);
+    std::unordered_map<std::string, LgsType*> replacements;
+    const auto& newFT = newFunc->funcType;
+    newFT->genericTypes.clear();
+    for (size_t i = 0; i < funcCall->args.size(); ++i) {
+        if (i >= newFT->params.size()) break;
+        auto& param = newFT->params[i];
+        const auto arg = funcCall->args[i].expr;
+        if (!param.genericType) continue;
+        if (!param.genericType->canReplace(arg->type)) return nullptr;
+        replacements[param.genericType->name] = arg->type;
+        param.genericType = nullptr;
+        param.type = arg->type;
+    }
+    const auto rtName = newFT->rt->getName();
+    if (replacements.contains(rtName)) {
+        newFT->rt = replacements[rtName];
+    }
+    newFunc->stmtsBlock = stmtsBlock->clone();
+    return newFunc;
+}
+
 LgsFunc::~LgsFunc() {
     if (stmtsBlock) {
         delete stmtsBlock;

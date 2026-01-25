@@ -121,7 +121,7 @@ public:
     void visitMatrixExpr(const LgsMatrixExpr* matrixExpr);
     void visitHashMap(LgsHashMap* hashMap);
     void visitEnvVar(LgsEnvVar* envVar) const;
-    void visitVariable(LgsVariable* variable);
+    void visitVariable(LgsVariable* variable) const;
     void visitSelection(LgsSelection* selection, bool assign = false);
     void visitFieldSelection(LgsVariable* var, LgsExpr* parent) const;
     void visitNullableSelection(LgsExpr* child, LgsExpr* parent) const;

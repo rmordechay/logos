@@ -889,7 +889,7 @@ void LgsCgModule::visitEnvVar(LgsEnvVar* envVar) const {
     envVar->IRValue = cg.callLgsFunc(LgsSys::name, "getEnv", cg.ptrTy(), params, IRArgs);
 }
 
-void LgsCgModule::visitVariable(LgsVariable* variable) {
+void LgsCgModule::visitVariable(LgsVariable* variable) const {
     switch (variable->ref.symbolType) {
     case VAR_DEC:
         assert(variable->ref.varDec->IRValue);
@@ -1057,6 +1057,7 @@ void LgsCgModule::visitFuncCall(LgsFuncCall* funcCall) {
     assert(funcCall->func || funcCall->coroutine);
     const auto func = funcCall->func ? funcCall->func : funcCall->coroutine;
     const auto ft = func->funcType;
+    assert(func->funcType->genericTypes.empty());
 
     // Default params
     if (ft->hasDefaults) {
@@ -1075,7 +1076,6 @@ void LgsCgModule::visitFuncCall(LgsFuncCall* funcCall) {
         func->IRValue = cg.getFromVTable(ptr, cg.getString(func->funcType->name));
     }
 
-    assert(func->funcType->genericTypes.empty());
     if (funcCall->coroutine || funcCall->isDeferred) return;
     funcCall->IRValue = func->call(cg, funcCall->args);
 }
@@ -1234,8 +1234,8 @@ void LgsCgModule::createPrologue(LgsFunc* func) {
     cg.builder.SetInsertPoint(entryBlock);
     if (func->funcType->name == LGS_MAIN_FUNC) {
         cg.callRuntimeFunc("init", cg.voidTy());
+        startTime = cg.measureTimeStart();
     }
-    startTime = cg.measureTimeStart();
     cg.callStackPush();
     cg.currentLevel = cg.callRuntimeFunc("getCurrentLevel", cg.sizeTy());
     cg.currentLevel->setName("current_level");

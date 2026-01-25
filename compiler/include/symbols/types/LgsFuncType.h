@@ -50,7 +50,6 @@ public:
     Type* getIRType(LgsCodeGen& cg) override;
     Constant* getRTType(LgsCodeGen& cg) override;
     LgsExpr* getZeroValue() override;
-    LgsType* replaceGenerics(LgsType* replacement, std::unordered_map<std::string, LgsType*>& replacements) override;
     size_t sizeBytes() override;
     std::string getName() override;
     std::string pname() override;

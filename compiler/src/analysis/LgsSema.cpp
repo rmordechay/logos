@@ -193,7 +193,6 @@ void LgsSema::visitFunc(LgsFunc* func) {
     const auto ft = func->funcType;
     if (ft->name != "") validateLocalName(ft->name, ft->location);
     visitFuncHeader(ft);
-    // The generic version of the func is not visited.
     if (!ft->genericTypes.empty()) {
         stack.exitScope();
         return;
@@ -1116,15 +1115,22 @@ void LgsSema::visitFuncCall(LgsFuncCall* funcCall) {
         funcCall->setType(ft->rt);
         return;
     }
-
-    const auto func = symbol->func;
-    if (!func->funcType->genericTypes.empty()) {
-        makeGenericFuncCall(funcCall, func);
+    if (symbol->func->funcType->genericTypes.empty()) {
+        funcCall->func = symbol->func;
     } else {
-        funcCall->func = func;
-        funcCall->setType(ft->rt);
+        auto& funcs = file->symbolTable.genericsFuncs;
+        const auto genericName = funcCall->getGenericName();
+        const auto genericFunc = funcs.find(genericName);
+        if (genericFunc != funcs.end()) {
+            funcCall->func = genericFunc->second;
+        } else {
+            funcCall->func = symbol->func->cloneGenerics(funcCall);
+            assert(funcCall->func);
+            visitFunc(funcCall->func);
+            funcs[genericName] = funcCall->func;
+        }
     }
-    if (errHandler.successful) assert(funcCall->func);
+    funcCall->setType(funcCall->func->funcType->rt);
 }
 
 void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent) {
@@ -1153,11 +1159,11 @@ void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent) {
         stack.currentFunc()->mocks.push_back(pair);
     }
 
-    if (!method->funcType->genericTypes.empty()) {
-        makeGenericFuncCall(methodCall, method);
-    } else {
+    if (method->funcType->genericTypes.empty()) {
         methodCall->func = method;
         methodCall->setType(method->funcType->rt);
+    } else {
+        assert(0);
     }
 }
 
@@ -1366,7 +1372,7 @@ void LgsSema::visitInlineInterface(LgsInstance* instance, LgsInterface* interfac
         if (field) {
             const auto newField = new LgsField(*field);
             newField->expr = expr;
-            instance->obj->fields.push_back(newField);
+            instance->fields.push_back(newField);
             continue;
         }
         const auto method = interface->getMethod(name);
@@ -1722,33 +1728,6 @@ void LgsSema::createCoroutineFunc(LgsFuncCall* funcCall) {
     funcCall->func = nullptr;
 }
 
-void LgsSema::makeGenericFuncCall(LgsFuncCall* funcCall, const LgsFunc* func) {
-    const auto generics = file->symbolTable.genericsExprs.find(funcCall->getGenericName());
-    LgsFunc* genericFunc = nullptr;
-    if (generics != file->symbolTable.genericsExprs.end()) {
-        genericFunc = generics->second->asFunc();
-    } else {
-        const auto newFuncType = func->funcType->clone();
-        newFuncType->genericTypes.clear();
-        genericFunc = new LgsFunc(newFuncType);
-        std::unordered_map<std::string, LgsType*> replacements;
-        for (size_t i = func->funcType->isMethod; i < newFuncType->params.size(); ++i) {
-            const auto replacement = funcCall->args[i].expr->type;
-            newFuncType->params[i].type = newFuncType->params[i].type->replaceGenerics(replacement, replacements);
-        }
-        if (newFuncType->hasGenericTypes()) {
-            newFuncType->rt = newFuncType->rt->replaceGenerics(funcCall->type, replacements);
-        }
-        if (func->stmtsBlock) {
-            genericFunc->stmtsBlock = func->stmtsBlock->clone();
-        }
-        visitFunc(genericFunc);
-        addGenerics(genericFunc->type);
-    }
-    funcCall->func = genericFunc;
-    funcCall->setType(genericFunc->funcType->rt);
-}
-
 void LgsSema::addError(const LgsBaseMsg& lgsErr, const LgsLocation& location, const std::vector<std::string>& args) {
     errHandler.addError(lgsErr, &location, file->path, args);
 }
@@ -1774,7 +1753,7 @@ void LgsSema::addRTType(LgsType* type) const {
 
 void LgsSema::addGenerics(LgsType* type) const {
     if (!type->hasGenericTypes() && !type->asDArray() && !type->asMap()) return;
-    file->symbolTable.genericsTypes[type->getName()] = type;
+    file->symbolTable.genericsTypes.push_back(type);
 }
 
 static std::string getMissingImplementsStr(const std::vector<LgsField*>& fields, const std::vector<LgsFunc*>& methods) {

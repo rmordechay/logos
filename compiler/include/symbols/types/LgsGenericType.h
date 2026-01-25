@@ -8,7 +8,6 @@ public:
     explicit LgsGenericType(const std::string& name): name(name) {}
     Type* getIRType(LgsCodeGen& cg) override;
     Constant* getRTType(LgsCodeGen& cg) override;
-    LgsType* replaceGenerics(LgsType* replacement, std::unordered_map<std::string, LgsType*>& replacements) override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
     std::string getName() override;
@@ -17,4 +16,5 @@ public:
     std::string fmtStr() const override;
     LgsType* clone() override;
     DIType* getDebugType(LgsCodeGen& cg) override;
+    bool canReplace(LgsType* type);
 };

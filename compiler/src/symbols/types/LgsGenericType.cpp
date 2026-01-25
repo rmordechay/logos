@@ -11,11 +11,6 @@ Constant* LgsGenericType::getRTType(LgsCodeGen& cg) {
     return nullptr;
 }
 
-LgsType* LgsGenericType::replaceGenerics(LgsType* replacement, std::unordered_map<std::string, LgsType*>& replacements) {
-    replacements[name] = replacement;
-    return replacement;
-}
-
 size_t LgsGenericType::sizeBytes() {
     assert(0);
 }
@@ -47,4 +42,8 @@ LgsType* LgsGenericType::clone() {
 
 DIType* LgsGenericType::getDebugType(LgsCodeGen& cg) {
     assert(0);
+}
+
+bool LgsGenericType::canReplace(LgsType* type) {
+    return true;
 }

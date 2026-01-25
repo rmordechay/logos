@@ -129,10 +129,6 @@ Constant* LgsType::getRTType(LgsCodeGen& cg) {
     assert(0);
 }
 
-LgsType* LgsType::replaceGenerics(LgsType* replacement, std::unordered_map<std::string, LgsType*>& replacements) {
-    return this;
-}
-
 LgsType* LgsType::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     assert(0);
 }

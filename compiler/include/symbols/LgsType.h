@@ -98,7 +98,6 @@ public:
     virtual Constant* getRTType(LgsCodeGen& cg) = 0;
     virtual bool canCastTo(LgsType* other) = 0;
     virtual std::string fmtStr() const = 0;
-    virtual LgsType* replaceGenerics(LgsType* replacement, std::unordered_map<std::string, LgsType*>& replacements);
     virtual LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) = 0;
     virtual void hashNode(size_t& oldHash);
     virtual DIType* getDebugType(LgsCodeGen& cg) = 0;

@@ -813,6 +813,13 @@ void LgsParser::parseParams(LgsFuncType* funcType) {
             funcType->hasDefaults = true;
         }
 
+        // Generic type
+        for (const auto genericType : funcType->genericTypes) {
+            if (genericType->name != param.type->getName()) continue;
+            param.genericType = genericType;
+            break;
+        }
+
         setLocation(param.location, &paramName, &currentToken);
         funcType->params.push_back(param);
         if (currentToken.type == T_RPAREN) break;

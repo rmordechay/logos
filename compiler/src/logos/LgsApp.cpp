@@ -369,24 +369,33 @@ bool LgsApp::generateRTTTypes() {
 }
 
 bool LgsApp::generateGenerics() {
-    std::unordered_map<std::string, LgsType*> generics;
-    for (const auto srcFile : srcFiles) {
-        generics.merge(srcFile->symbolTable.genericsTypes);
-    }
     const auto file = new LgsFile("generics");
     file->cg.setupModule("generics");
     file->cg.mode = CG_MODE_GENERICS;
     LgsCgModule module(file, configs, globals, paths);
+
+    std::vector<LgsType*> genericsTypes;
+    std::unordered_map<std::string, LgsFunc*> genericsFuncs;
+    for (const auto srcFile : srcFiles) {
+        auto& types = srcFile->symbolTable.genericsTypes;
+        auto& funcs = srcFile->symbolTable.genericsFuncs;
+        genericsTypes.insert(genericsTypes.end(), types.begin(), types.end());
+        genericsFuncs.merge(funcs);
+    }
+
     // LgsPrint::generateFmtFunc(module.cg);
-    for (auto& [_, generic] : generics) {
-        if (const auto dArr = generic->asDArray()) {
+    for (const auto& [_, genericFunc] : genericsFuncs) {
+        module.visitFunc(genericFunc);
+    }
+    for (const auto genericType : genericsTypes) {
+        if (const auto dArr = genericType->asDArray()) {
             dArr->generateAddFunc(module.cg);
             dArr->generateContainsFunc(module.cg);
             dArr->generateArrEqFunc(module.cg);
-        } else if (const auto map = generic->asMap()) {
+        } else if (const auto map = genericType->asMap()) {
             map->generateGetFunc(module.cg);
             map->generateAddFunc(module.cg);
-        } else if (const auto func = generic->asFuncType()) {
+        } else if (const auto func = genericType->asFuncType()) {
             if (func->name == MAP_FUNC) {
                 module.generateMapFunc(func);
             } else if (func->name == FILTER_FUNC) {
@@ -400,6 +409,7 @@ bool LgsApp::generateGenerics() {
             assert(0);
         }
     }
+
     genericFiles.push_back(file);
     return file->cg.writeIRModule(paths, configs.optLevel);
 }

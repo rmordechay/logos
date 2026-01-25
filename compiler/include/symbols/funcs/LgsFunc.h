@@ -53,5 +53,6 @@ public:
     void setType(LgsType* newType) override;
     void hashNode(size_t& oldHash) override;
     void setDebugValue(LgsCodeGen& cg) override;
+    LgsFunc* cloneGenerics(const LgsFuncCall* funcCall) const;
     ~LgsFunc() override;
 };
