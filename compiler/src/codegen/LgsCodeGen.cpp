@@ -194,8 +194,8 @@ void LgsCodeGen::storeStructField(Type* parentType, Value* parentPtr, const size
 }
 
 Value* LgsCodeGen::loadStructField(Type* parentType, Value* parentPtr, const size_t position, Type* ty) {
-    const auto gep = builder.CreateStructGEP(parentType, parentPtr, position);
-    return builder.CreateLoad(ty, gep);
+    assert(ty && parentPtr);
+    return builder.CreateLoad(ty, builder.CreateStructGEP(parentType, parentPtr, position));
 }
 
 void LgsCodeGen::addNullTerminate(Value* strPtr, Value* pos) {

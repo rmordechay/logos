@@ -73,7 +73,7 @@ Value* LgsStr::getIRElement(LgsCodeGen& cg, Value* iterable, Value* index) {
 }
 
 std::string LgsStr::fmtStr() const {
-    return "\"%s\"";
+    return "%s";
 }
 
 Value* LgsStr::asIRStr(LgsCodeGen& cg, Value* v) {

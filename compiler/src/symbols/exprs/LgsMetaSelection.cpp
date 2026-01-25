@@ -1,7 +1,7 @@
 #include "exprs/LgsMetaSelection.h"
 
 Value* LgsMetaSelection::loadIR(LgsCodeGen& cg) {
-    assert(0);
+    return IRValue;
 }
 
 void LgsMetaSelection::hashNode(size_t& oldHash) {
@@ -17,7 +17,7 @@ LgsExpr* LgsMetaSelection::castExplicitly(LgsType* toType) {
 }
 
 void LgsMetaSelection::castImplicitly(LgsType* toType) {
-    assert(0);
+
 }
 
 std::string LgsMetaSelection::asText() {

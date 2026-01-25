@@ -54,7 +54,9 @@ struct Lgs_Object {
     const char* name;
     const size_t size;
     const size_t fieldsCount;
+    const size_t funcsCount;
     const Lgs_Field* fields;
+    const void** funcs;
 };
 
 struct Lgs_SArr {

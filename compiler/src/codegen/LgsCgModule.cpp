@@ -907,7 +907,7 @@ void LgsCgModule::visitVariable(LgsVariable* variable) const {
         variable->IRValue = variable->ref.func->getIRFunc(cg);
         break;
     case OBJECT:
-        assert(variable->ref.object->singleton);
+        if (!variable->ref.object->singleton) return;
         variable->IRValue = variable->ref.object->singleton->IRValue;
         break;
     case FIELD:
@@ -1026,12 +1026,16 @@ void LgsCgModule::visitNullableSelection(LgsExpr* child, LgsExpr* parent) const 
 void LgsCgModule::visitMetaSelection(LgsMetaSelection* metaSelection) {
     visitExpr(metaSelection->baseExpr);
     if (const auto methodCall = metaSelection->child->asFuncCall()) {
-        for (const auto& arg : methodCall->args) {
-            if (arg.isSelf) continue;
-            visitExpr(arg.expr);
-        }
-        metaSelection->IRValue = methodCall->func->call(cg, methodCall->args);
+        assert(0);
     }
+    if (const auto var = metaSelection->child->asVariable()) {
+        if (var->name == "name") {
+            visitStrConst(var->ref.field->expr->asStrConst());
+            metaSelection->IRValue = var->ref.field->expr->IRValue;
+            return;
+        }
+    }
+    assert(0);
 }
 
 void LgsCgModule::visitFuncCall(LgsFuncCall* funcCall) {

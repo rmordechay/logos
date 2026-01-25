@@ -1081,6 +1081,14 @@ void LgsSema::visitIterIndexSelection(LgsIterIndex* iterIndex, LgsType* parentTy
 void LgsSema::visitMetaSelection(LgsMetaSelection* metaSelection) {
     visitExpr(metaSelection->baseExpr);
     const auto obj = metaSelection->baseExpr->type->asObject();
+    const auto var = metaSelection->child->asVariable();
+    if (var && obj->metaFields.contains(var->name)) {
+        var->ref.symbolType = FIELD;
+        var->ref.field = obj->metaFields[var->name];
+        var->type = var->ref.field->type;
+        metaSelection->type = var->type;
+        return;
+    }
     const auto methodCall = metaSelection->child->asFuncCall();
     if (!methodCall) return;
     if (!obj->metaMethods.contains(methodCall->name)) {
