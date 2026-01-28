@@ -29,6 +29,7 @@ static std::string formatElement(const Lgs_TypeKind kind, void* type, void* valu
         const auto lgsStr = static_cast<Lgs_Str*>(value);
         assert(lgsStr->level <= LGS_MAX_LEVEL);
         if (!lgsStr->data) return LGS_NULL_LITERAL;
+        if (std::strcmp(lgsStr->data, "") == 0) return "\"\"";
         str << static_cast<Lgs_Str*>(value)->data;
     }
     break;

@@ -298,7 +298,7 @@ Function* LgsMap::generateAddFunc(LgsCodeGen& cg) {
     cg.startBlock(resizeBlock);
     const auto size = cg.builder.CreateMul(pairType->IRSize(cg), cg.usize(sizeof(void*)));
     const auto newCap = cg.builder.CreateMul(size, cg.builder.CreateMul(cap, cg.usize(2)));
-    const auto newEntries = cg.allocInLevel(newCap, level);
+    const auto newEntries = cg.allocInLevel(newCap, level, false);
     auto entries = cg.load(cg.ptrTy(), entriesField);
 
     cg.loop(cap, [&](Value* iValue, BasicBlock*) {
@@ -350,7 +350,7 @@ Function* LgsMap::generateAddFunc(LgsCodeGen& cg) {
 
     // Store entry
     cg.startBlock(storeElementBlock);
-    const auto newEntry = cg.allocInLevel(size, level);
+    const auto newEntry = cg.allocInLevel(size, level, false);
     cg.storeStructField(entryTy, newEntry, rttIndices.key, keyIR);
     cg.storeStructField(entryTy, newEntry, rttIndices.value, valueIR);
     cg.storeStructField(entryTy, newEntry, rttIndices.next, cg.null());

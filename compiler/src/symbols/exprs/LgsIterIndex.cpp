@@ -116,7 +116,8 @@ void LgsIterIndex::setIRRangePtr(LgsCodeGen& cg, bool assign) {
 void LgsIterIndex::assign(LgsCodeGen& cg, LgsExpr* right) {
     const auto iter = baseExpr->type->asIterable();
     assert(iter);
-    if (const auto addFunc = iter->getMethod("add"); addFunc->fn) {
+    if (const auto addFunc = iter->getMethod("add")) {
+        assert(addFunc->fn);
         addFunc->fn(cg, {LgsFuncArg(baseExpr), LgsFuncArg(index.from), LgsFuncArg(right)});
     } else {
         iter->addIRElement(cg, baseExpr->IRValue, index.from->IRValue, right->IRValue);

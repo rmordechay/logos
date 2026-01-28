@@ -31,15 +31,18 @@ extern "C" void* Lgs_Runtime_allocInCurrent(const size_t size, const bool setLev
     return runtime.stack.at(runtime.level).allocator.allocate(size, setLevel);
 }
 
-extern "C" void* Lgs_Runtime_allocInLevel(const size_t size, const size_t level) {
-    return runtime.stack.at(level).allocator.allocate(size, false);
+extern "C" void* Lgs_Runtime_allocInLevel(const size_t size, const size_t level, const bool setLevel) {
+    return runtime.stack.at(level).allocator.allocate(size, setLevel);
 }
 
 extern "C" void Lgs_Runtime_moveStr(Lgs_Str* left, const Lgs_Str* right) {
     const auto leftLevel = left->level;
     const auto rightLevel = right->level;
     assert(leftLevel <= runtime.level && rightLevel <= runtime.level);
-    if (leftLevel >= rightLevel) return;
+    if (leftLevel >= rightLevel) {
+        left->data = right->data;
+        return;
+    }
     auto& allocator = runtime.stack.at(leftLevel).allocator;
     const auto size = std::strlen(right->data) + 1;
     left->data = static_cast<char*>(allocator.allocate(size, false));

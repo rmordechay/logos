@@ -138,6 +138,12 @@ LgsExpr* LgsObject::getZeroValue() {
     return new LgsInstance(this);
 }
 
+Value* LgsObject::getIRZeroValue(LgsCodeGen& cg, LgsValue* pointee) {
+    const auto instance = cg.allocInCurrent(IRSize(cg), true);
+    cg.storeStructField(getIRType(cg), instance, LgsInstance::rttIndices.type, getRTType(cg));
+    return instance;
+}
+
 bool LgsObject::canCastTo(LgsType* other) {
     if (other->isAny()) return true;
     const auto otherType = other;

@@ -189,8 +189,7 @@ StructType* LgsCodeGen::getStructType(const std::vector<Type*>& types, const std
 }
 
 void LgsCodeGen::storeStructField(Type* parentType, Value* parentPtr, const size_t position, Value* v) {
-    const auto gep = builder.CreateStructGEP(parentType, parentPtr, position);
-    store(v, gep);
+    store(v, builder.CreateStructGEP(parentType, parentPtr, position));
 }
 
 Value* LgsCodeGen::loadStructField(Type* parentType, Value* parentPtr, const size_t position, Type* ty) {
@@ -231,9 +230,9 @@ Value* LgsCodeGen::allocInCurrent(Value* size, const bool setLevel) {
     return callRuntimeFunc("allocInCurrent", ptrTy(), {sizeTy(), i1Ty()}, {size, i1(setLevel)});
 }
 
-Value* LgsCodeGen::allocInLevel(Value* size, Value* level) {
+Value* LgsCodeGen::allocInLevel(Value* size, Value* level, const bool setLevel) {
     assert(size && level);
-    return callRuntimeFunc("allocInLevel", ptrTy(), {sizeTy(), sizeTy()}, {size, level});
+    return callRuntimeFunc("allocInLevel", ptrTy(), {sizeTy(), sizeTy(), i1Ty()}, {size, level, i1(setLevel)});
 }
 
 Value* LgsCodeGen::reallocate(Value* ptr, Value* size, Value* level) {

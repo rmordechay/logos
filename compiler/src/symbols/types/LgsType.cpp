@@ -113,6 +113,10 @@ LgsFunc* LgsType::getMethod(const std::string& methodName) {
     return nullptr;
 }
 
+Value* LgsType::getIRZeroValue(LgsCodeGen& cg, LgsValue* pointee) {
+    assert(0);
+}
+
 Value* LgsType::hashValue(LgsCodeGen& cg, Value* value) {
     assert(0);
 }

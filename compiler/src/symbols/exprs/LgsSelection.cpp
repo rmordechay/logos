@@ -21,7 +21,7 @@ LgsFuncCall* LgsSelection::asMethodCall() const {
 void LgsSelection::assign(LgsCodeGen& cg, LgsExpr* right) {
     assert(!type->asVec());
     if (type->isHeapAlloc || right->type->isHeapAlloc) {
-        moveValue(cg, IRValue, right->IRValue, type);
+        moveValue(cg, loadIR(cg), right->IRValue, type);
     } else {
         cg.store(right->IRValue, IRValue);
     }

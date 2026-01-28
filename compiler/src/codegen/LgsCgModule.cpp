@@ -1143,7 +1143,7 @@ void LgsCgModule::visitIntConst(LgsIntConst* intConst) const {
         intConst->IRValue = cg.i64(intConst->value);
     } else if (intConst->type->asSize()) {
         intConst->IRValue = cg.usize(intConst->value);
-    } else if (intConst->type->asFloat()) { // IntConst to float is allowed
+    } else if (intConst->type->asFloat()) {
         intConst->IRValue = cg.floatv(intConst->value);
     } else {
         assert(0);
@@ -1153,8 +1153,7 @@ void LgsCgModule::visitIntConst(LgsIntConst* intConst) const {
 void LgsCgModule::visitStrConst(LgsStrConst* strConst) {
     if (strConst->parts.empty()) {
         const auto ty = strConst->type->getIRType(cg);
-        strConst->IRValue = cg.allocInLevel(strConst->type->IRSize(cg), cg.sizeZero());
-        cg.storeStructField(ty, strConst->IRValue, LgsStr::rttIndices.level, cg.sizeZero());
+        strConst->IRValue = cg.allocInLevel(strConst->type->IRSize(cg), cg.sizeZero(), true);
         cg.storeStructField(ty, strConst->IRValue, LgsStr::rttIndices.data, cg.getString(strConst->value));
         return;
     }
@@ -1205,15 +1204,8 @@ void LgsCgModule::visitInstance(LgsInstance* instance) {
             cg.store(field->expr->IRValue, pointee);
         } else {
             if (!fieldType->isHeapAlloc) continue;
-            const auto zero = fieldType->getZeroValue();
-            if (fieldType->asObject()) {
-                zero->IRValue = cg.allocInCurrent(fieldType->IRSize(cg), true);
-                cg.storeStructField(fieldType->getIRType(cg), zero->IRValue, LgsInstance::rttIndices.type, fieldType->getRTType(cg));
-            } else {
-                visitExpr(zero);
-            }
-            cg.store(zero->IRValue, pointee);
-            freeExpr(zero);
+            const auto zeroValue = fieldType->getIRZeroValue(cg, field);
+            cg.store(zeroValue, pointee);
         }
     }
 }

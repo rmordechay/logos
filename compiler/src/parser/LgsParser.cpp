@@ -1290,7 +1290,7 @@ LgsExpr* LgsParser::parseExprWithPrecedence(const int minPrecedence, const bool 
         const auto it = LGS_BINARY_OPS_DICT.find(currentToken.type);
         if (it != LGS_BINARY_OPS_DICT.end()) {
             op = &it->second;
-        } else if (currentToken.type == T_IDENTIFIER && currentToken.lexeme == "x") {
+        } else if (currentToken.type == T_IDENTIFIER && currentToken.lexeme == "X") {
             op = &CROSS_OP;
         } else {
             break;

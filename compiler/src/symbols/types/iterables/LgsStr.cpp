@@ -29,6 +29,12 @@ LgsExpr* LgsStr::getZeroValue() {
     return new LgsStrConst("");
 }
 
+Value* LgsStr::getIRZeroValue(LgsCodeGen& cg, LgsValue* pointee) {
+    const auto str = cg.allocInLevel(IRSize(cg), cg.sizeZero(), true);
+    cg.storeStructField(getIRType(cg), str, rttIndices.data, cg.emptyStr());
+    return str;
+}
+
 Constant* LgsStr::getRTType(LgsCodeGen& cg) {
     return cg.getRTTypeInfo(getName(), IRSize(cg), RTT_STR);
 }

@@ -9,6 +9,7 @@ public:
     inline static Lgs_StrIndices rttIndices;
 
     explicit LgsStr(): LgsIterable(&LGS_CHAR) {
+        isHeapAlloc = true;
         passByRef = true;
         rttKind = RTT_STR;
     }
@@ -17,6 +18,7 @@ public:
     std::string getName() override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
+    Value* getIRZeroValue(LgsCodeGen& cg, LgsValue* pointee) override;
     Constant* getRTType(LgsCodeGen& cg) override;
     bool canCastTo(LgsType* other) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;

@@ -96,7 +96,7 @@ public:
     Value* getVField(Value* instance, Value* name, Value* ptr);
     Value* getVFunc(Value* objType, Value* funcName);
     Value* allocInCurrent(Value* size, bool setLevel);
-    Value* allocInLevel(Value* size, Value* level);
+    Value* allocInLevel(Value* size, Value* level, bool setLevel);
     Value* reallocate(Value* ptr, Value* size, Value* level);
     Value* moveElement(Value* iterable, Value* element, Constant* type);
     void throwError(const LgsBaseMsg& err, const std::vector<Value*>& args = {});

@@ -45,7 +45,6 @@ public:
     bool isImportName = false;
     bool isNull = false;
     bool hasUnwrapSuffix = false;
-
     bool isReturnExpr = false;
     bool hasMoved = false;
     Value* pointee = nullptr;
