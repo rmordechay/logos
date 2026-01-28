@@ -4,7 +4,7 @@ std::string LgsTernaryExpr::asText() {
     assert(0);
 }
 
-void LgsTernaryExpr::setDebugValue(LgsCgModule& cg) {
+void LgsTernaryExpr::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }
 

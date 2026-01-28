@@ -1,5 +1,5 @@
 #pragma once
-#include "codegen/LgsCodeGen.h"
+#include "codegen/LgsCgModule.h"
 #include "exprs/LgsExpr.h"
 
 class LgsStr;
@@ -21,14 +21,14 @@ public:
         index.from = from;
         index.to = to;
     }
-    Value* loadIR(LgsCgModule& cg) override;
+    Value* loadIR(LgsCodeGen& cg) override;
     LgsExpr* getBaseExpr() const;
-    void setIRElementPtr(LgsCgModule& cg, bool assign = false);
-    void setIRRangePtr(LgsCgModule& cg, bool assign = false);
-    void assign(LgsCgModule& cg, LgsExpr* expr) override;
-    void assignScalar(LgsCgModule& cg, LgsExpr* expr) const;
+    void setIRElementPtr(LgsCodeGen& cg, bool assign = false);
+    void setIRRangePtr(LgsCodeGen& cg, bool assign = false);
+    void assign(LgsCodeGen& cg, LgsExpr* right) override;
     std::string asText() override;
-    Type* getSArrayType(LgsCgModule& cg) const;
-    void setDebugValue(LgsCgModule& cg) override;
+    Type* getSArrayType(LgsCodeGen& cg) const;
+    void setDebugValue(LgsCodeGen& cg) override;
+    LgsExpr* clone() override;
     ~LgsIterIndex() override;
 };

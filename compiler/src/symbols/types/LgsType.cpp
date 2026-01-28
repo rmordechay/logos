@@ -28,10 +28,71 @@
 #include "types/primitives/LgsShort.h"
 #include "types/primitives/LgsSize.h"
 #include "types/primitives/LgsUInt.h"
+#include "types/primitives/LgsULong.h"
 
-bool LgsType::addField(LgsField* field) {
-    fields.push_back(field);
-    return true;
+static std::unordered_map<std::string, uint8_t> numberPrecedences = {
+    {LgsBool::name, 1},
+    {LgsByte::name, 2},
+    // {LgsUByte::name, 3},
+    {LgsShort::name, 4},
+    // {LgsUShort::name, 5},
+    {LgsChar::name, 6},
+    {LgsInt::name, 7},
+    {LgsUInt::name, 8},
+    {LgsLong::name, 9},
+    {LgsULong::name, 10},
+    {LgsSize::name, 11},
+    {LgsFloat::name, 12},
+    {LgsDouble::name, 13},
+};
+
+bool LgsType::isAny() {
+    return getName() == LgsAny::name || (asPtr() && asPtr()->baseType->isVoid());
+}
+
+bool LgsType::isVoid() {
+    return dynamic_cast<LgsVoid*>(this);
+}
+
+bool LgsType::isNumber() {
+    return isInt || isFloat || asComplex();
+}
+
+bool LgsType::isScalar() const {
+    return isInt || isFloat;
+}
+
+bool LgsType::isUnknown() {
+    if (dynamic_cast<LgsUnknown*>(this)) return true;
+    if (const auto iter = asIterable()) return dynamic_cast<LgsUnknown*>(iter->baseType);
+    return false;
+}
+
+bool LgsType::isSliceable() {
+    return asStr() || asDArray() || asSArray();
+}
+
+bool LgsType::hasGenericTypes() {
+    if (asGenericType()) return true;
+    if (const auto ft = asFuncType()) {
+        if (ft->rt->hasGenericTypes()) return true;
+        for (const auto& param : ft->params) {
+            if (param.type->hasGenericTypes()) return true;
+        }
+        return false;
+    }
+    if (const auto iter = asIterable()) {
+        if (iter->baseType->hasGenericTypes()) return true;
+    }
+    return false;
+}
+
+ConstantInt* LgsType::IRSize(LgsCodeGen& cg) {
+    return cg.usize(cg.getAllocSize(getIRType(cg)));
+}
+
+Type* LgsType::getTypeOrPtr(LgsCodeGen& cg) {
+    return passByRef ? cg.ptrTy() : getIRType(cg);
 }
 
 bool LgsType::addMethod(LgsFunc* method) {
@@ -48,16 +109,19 @@ LgsField* LgsType::getField(const std::string& fieldName) {
 }
 
 LgsFunc* LgsType::getMethod(const std::string& methodName) {
-    const auto method = methods.find(methodName);
-    if (method != methods.end()) {
-        if (method->second) {
-            return method->second;
-        }
-    }
+    if (methods.contains(methodName)) return methods[methodName];
     return nullptr;
 }
 
-Constant* LgsType::getRTType(LgsCgModule& cg) {
+Value* LgsType::hashValue(LgsCodeGen& cg, Value* value) {
+    assert(0);
+}
+
+Value* LgsType::asIRStr(LgsCodeGen& cg, Value* v) {
+    assert(0);
+}
+
+Constant* LgsType::getRTType(LgsCodeGen& cg) {
     assert(0);
 }
 
@@ -77,111 +141,55 @@ bool LgsType::equals(LgsType* other) {
     return getName() == other->getName();
 }
 
-bool LgsType::isVoid() {
-    return dynamic_cast<LgsVoid*>(this);
-}
-
-bool LgsType::isNumber() {
-    return isInt || isFloat || asComplex();
-}
-
-bool LgsType::isBig() {
-    return (asObject() || asDArray()) && sizeBytes() >= BIG_SIZE_THRESHOLD;
-}
-
-bool LgsType::isUnknown() {
-    if (dynamic_cast<LgsUnknown*>(this)) return true;
-    if (const auto iter = asIterable()) return dynamic_cast<LgsUnknown*>(iter->baseType);
-    return false;
-}
-
-bool LgsType::isSliceable() {
-    return asStr() || asDArray() || asSArray();
-}
-
-LgsType* LgsType::extendInt() {
-    if (asBool()) {
-        return &LGS_BYTE;
-    }
-    if (asByte()) {
-        return &LGS_SHORT;
-    }
-    if (asShort()) {
-        return &LGS_INT;
-    }
-    if (asInt()) {
-        return &LGS_LONG;
-    }
-    return this;
-}
-
-void LgsType::cloneFields(LgsType* newType) const {
-    newType->fields.clear();
-    for (const auto& field : fields) {
-        const auto newField = new LgsField(*field);
-        newField->type = field->type;
-        if (field->expr) {
-            newField->expr = field->expr;
-        }
-        newType->addField(newField);
-    }
-}
-
-void LgsType::cloneMethods(LgsType* newType) const {
-    newType->methods.clear();
-    for (const auto& [_, method] : methods) {
-        const auto newMethod = new LgsFunc(*method);
-        if (method->stmtsBlock) newMethod->stmtsBlock = method->stmtsBlock;
-        newMethod->funcType = method->funcType;
-        newType->addMethod(newMethod);
-    }
-}
-
-Value* LgsType::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+LgsType* LgsType::clone() {
     assert(0);
 }
 
-Value* LgsType::subIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     assert(0);
 }
 
-Value* LgsType::mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::subIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     assert(0);
 }
 
-Value* LgsType::divIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::mulIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     assert(0);
 }
 
-Value* LgsType::modIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::divIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     assert(0);
 }
 
-Value* LgsType::powIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::modIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     assert(0);
 }
 
-Value* LgsType::bitAndIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::powIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     assert(0);
 }
 
-Value* LgsType::bitOrIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::bitAndIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     assert(0);
 }
 
-Value* LgsType::bitXorIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::bitOrIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     assert(0);
 }
 
-Value* LgsType::lshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* other) {
+Value* LgsType::bitXorIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     assert(0);
 }
 
-Value* LgsType::rshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::lshiftIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     assert(0);
 }
 
-Value* LgsType::crossIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsType::rshiftIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
+    assert(0);
+}
+
+Value* LgsType::crossIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     assert(0);
 }
 
@@ -312,237 +320,200 @@ LgsType::~LgsType() {
     }
     methods.clear();
     for (const auto field : fields) {
+        field->type = nullptr;
         delete field;
     }
     fields.clear();
 }
 
-Value* eqNull(LgsCgModule& cg, const LgsExpr* expr) {
-    const auto nullable = expr->type->asNullable();
-    if (expr->type->passByRef) return cg.builder.CreateIsNull(expr->IRValue);
-    return cg.builder.CreateNot(nullable->getIsSet(cg, expr->IRValue));
+Value* exprEqNull(LgsCodeGen& cg, Value* expr, LgsType* type) {
+    if (type->passByRef) return cg.builder.CreateIsNull(expr);
+    return cg.builder.CreateNot(type->asNullable()->getIsSet(cg, expr));
 }
 
-Value* neNull(LgsCgModule& cg, const LgsExpr* expr) {
-    const auto nullable = expr->type->asNullable();
-    if (expr->type->passByRef) return cg.builder.CreateIsNotNull(expr->IRValue);
-    return nullable->getIsSet(cg, expr->IRValue);
+Value* exprNeNull(LgsCodeGen& cg, Value* expr, LgsType* type) {
+    if (type->passByRef) return cg.builder.CreateIsNotNull(expr);
+    return type->asNullable()->getIsSet(cg, expr);
 }
 
-Value* eqComplex(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right) {
-    const auto l = cg.builder.CreateLoad(left->type->getIRType(cg), left->IRValue);
-    const auto r = cg.builder.CreateLoad(right->type->getIRType(cg), right->IRValue);
-    const auto lReal = cg.builder.CreateExtractValue(l, 0);
-    const auto lImag = cg.builder.CreateExtractValue(l, 1);
-    const auto rReal = cg.builder.CreateExtractValue(r, 0);
-    const auto rImag = cg.builder.CreateExtractValue(r, 1);
-    const auto realEq = cg.builder.CreateICmpEQ(lReal, rReal);
-    const auto imagEq = cg.builder.CreateICmpEQ(lImag, rImag);
-    return cg.builder.CreateAnd(realEq, imagEq);
-}
-
-Value* neComplex(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right) {
-    const auto l = cg.builder.CreateLoad(left->type->getIRType(cg), left->IRValue);
-    const auto r = cg.builder.CreateLoad(right->type->getIRType(cg), right->IRValue);
-    const auto lReal = cg.builder.CreateExtractValue(l, 0);
-    const auto lImag = cg.builder.CreateExtractValue(l, 1);
-    const auto rReal = cg.builder.CreateExtractValue(r, 0);
-    const auto rImag = cg.builder.CreateExtractValue(r, 1);
-    const auto realNe = cg.builder.CreateICmpNE(lReal, rReal);
-    const auto imagNe = cg.builder.CreateICmpNE(lImag, rImag);
-    return cg.builder.CreateOr(realNe, imagNe);
-}
-
-Value* eqIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    if (left->isNull && right->isNull) return cg.true_();
-    if (left->isNull) return eqNull(cg, right);
-    if (right->isNull) return eqNull(cg, left);
-    if (left->type->isInt && right->type->isInt) {
-        return cg.builder.CreateICmpEQ(left->loadIR(cg), right->loadIR(cg));
+Value* eqIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
+    if (isa<ConstantPointerNull>(left) && isa<ConstantPointerNull>(right)) return cg.true_();
+    if (isa<ConstantPointerNull>(left)) return exprEqNull(cg, right, type);
+    if (isa<ConstantPointerNull>(right)) return exprEqNull(cg, left, type);
+    if (type->isInt) {
+        if (left->getType()->isPointerTy()) {
+            left = cg.load(type->getIRType(cg), left);
+        }
+        if (right->getType()->isPointerTy()) {
+            right = cg.load(type->getIRType(cg), right);
+        }
+        return cg.builder.CreateICmpEQ(left, right);
     }
-    if (left->type->isFloat || right->type->isFloat) {
-        const auto [l, r] = loadPairAsFloat(cg, left, right);
+    if (type->isFloat) {
+        const auto [l, r] = loadNumberPair(cg, left, right, cg.floatTy());
         return cg.builder.CreateFCmpOEQ(l, r);
     }
-    if (left->type->asComplex() && right->type->asComplex()) {
-        return eqComplex(cg, left, right);
+    if (type->asComplex()) {
+        assert(0);
     }
-    if (left->type->asStr() && right->type->asStr()) {
-        const auto rt = cg.callFunc("strcmp", cg.i32Ty(), {cg.ptrTy(), cg.ptrTy()}, {left->IRValue, right->IRValue});
+    if (const auto dArr = type->asDArray()) {
+        return cg.builder.CreateCall(dArr->generateArrEqFunc(cg), {left, right});
+    }
+    if (type->asStr()) {
+        const auto rt = cg.callFunc("strcmp", cg.i32Ty(), {cg.ptrTy(), cg.ptrTy()}, {left, right});
         return cg.builder.CreateICmpEQ(rt, cg.i32Zero());
     }
     assert(0);
 }
 
-Value* neIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    if (left->isNull && right->isNull) return cg.false_();
-    if (left->isNull) return neNull(cg, right);
-    if (right->isNull) return neNull(cg, left);
-    if (left->type->isInt && left->type->isInt) {
-        return cg.builder.CreateICmpEQ(left->loadIR(cg), right->loadIR(cg));
+Value* neIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
+    if (isa<ConstantPointerNull>(left) && isa<ConstantPointerNull>(right)) return cg.false_();
+    if (isa<ConstantPointerNull>(left)) return exprNeNull(cg, right, type);
+    if (isa<ConstantPointerNull>(right)) return exprNeNull(cg, left, type);
+    if (type->isInt) {
+        return cg.builder.CreateICmpNE(left, right);
     }
-    if (left->type->isFloat && left->type->isFloat) {
-        return cg.builder.CreateFCmpOEQ(left->loadIR(cg), right->loadIR(cg));
+    if (type->isFloat) {
+        return cg.builder.CreateFCmpONE(left, right);
     }
-    if (left->type->asComplex() && right->type->asComplex()) {
-        return neComplex(cg, left, right);
+    if (type->asComplex()) {
+        assert(0);
     }
-    if (left->type->asStr() && right->type->asStr()) {
-        const auto rt = cg.callFunc("strcmp", cg.i32Ty(), {cg.ptrTy(), cg.ptrTy()}, {left->IRValue, right->IRValue});
+    if (const auto dArr = type->asDArray()) {
+        return cg.builder.CreateNot(cg.builder.CreateCall(dArr->generateArrEqFunc(cg), {left, right}));
+    }
+    if (type->asStr()) {
+        const auto rt = cg.callFunc("strcmp", cg.i32Ty(), {cg.ptrTy(), cg.ptrTy()}, {left, right});
         return cg.builder.CreateICmpNE(rt, cg.i32Zero());
     }
     assert(0);
 }
 
-Value* ltIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    if (left->type->isUnsinged && right->type->isUnsinged) {
-        return cg.builder.CreateICmpULT(left->loadIR(cg), right->loadIR(cg));
+Value* ltIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
+    if (type->isUnsinged) {
+        return cg.builder.CreateICmpULT(left, right);
     }
-    if (left->type->isInt && right->type->isInt) {
-        return cg.builder.CreateICmpSLT(left->loadIR(cg), right->loadIR(cg));
+    if (type->isInt) {
+        return cg.builder.CreateICmpSLT(left, right);
     }
-    if (left->type->isFloat || right->type->isFloat) {
-        const auto [l, r] = loadPairAsFloat(cg, left, right);
+    if (type->isFloat) {
+        auto [l, r] = loadNumberPair(cg, left, right, cg.floatTy());
         return cg.builder.CreateFCmpOLT(l, r);
     }
     assert(0);
 }
 
-Value* gtIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    if (left->type->isUnsinged && right->type->isUnsinged) {
-        return cg.builder.CreateICmpUGT(left->loadIR(cg), right->loadIR(cg));
+Value* gtIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
+    if (type->isUnsinged) {
+        return cg.builder.CreateICmpUGT(left, right);
     }
-    if (left->type->isInt && right->type->isInt) {
-        return cg.builder.CreateICmpSGT(left->loadIR(cg), right->loadIR(cg));
+    if (type->isInt) {
+        return cg.builder.CreateICmpSGT(left, right);
     }
-    if (left->type->isFloat || right->type->isFloat) {
-        const auto [l, r] = loadPairAsFloat(cg, left, right);
+    if (type->isFloat) {
+        auto [l, r] = loadNumberPair(cg, left, right, cg.floatTy());
         return cg.builder.CreateFCmpOGT(l, r);
     }
     assert(0);
 }
 
-Value* geIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    if (left->type->isUnsinged && right->type->isUnsinged) {
-        return cg.builder.CreateICmpUGE(left->loadIR(cg), right->loadIR(cg));
+Value* geIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
+    if (type->isUnsinged) {
+        return cg.builder.CreateICmpUGE(left, right);
     }
-    if (left->type->isInt && right->type->isInt) {
-        return cg.builder.CreateICmpSGE(left->loadIR(cg), right->loadIR(cg));
+    if (type->isInt) {
+        return cg.builder.CreateICmpSGE(left, right);
     }
-    if (left->type->isFloat || right->type->isFloat) {
-        const auto [l, r] = loadPairAsFloat(cg, left, right);
+    if (type->isFloat) {
+        auto [l, r] = loadNumberPair(cg, left, right, cg.floatTy());
         return cg.builder.CreateFCmpOGE(l, r);
     }
     assert(0);
 }
 
-Value* leIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    if (left->type->isUnsinged && right->type->isUnsinged) {
-        return cg.builder.CreateICmpULE(left->loadIR(cg), right->loadIR(cg));
+Value* leIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
+    if (type->isUnsinged) {
+        return cg.builder.CreateICmpULE(left, right);
     }
-    if (left->type->isInt && right->type->isInt) {
-        return cg.builder.CreateICmpSLE(left->loadIR(cg), right->loadIR(cg));
+    if (type->isInt) {
+        return cg.builder.CreateICmpSLE(left, right);
     }
-    if (left->type->isFloat || right->type->isFloat) {
-        const auto [l, r] = loadPairAsFloat(cg, left, right);
+    if (type->isFloat) {
+        auto [l, r] = loadNumberPair(cg, left, right, cg.floatTy());
         return cg.builder.CreateFCmpOLE(l, r);
     }
     assert(0);
 }
 
-Value* andIR(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right) {
+Value* andIR(LgsCodeGen& cg, Value* left, Value* right) {
     const auto currentBlock = cg.builder.GetInsertBlock();
     const auto func = currentBlock->getParent();
     const auto rightBlock = cg.createBlock("and_right", func);
     const auto endBlock = cg.createBlock("and_end", func);
-    cg.builder.CreateCondBr(left->IRValue, rightBlock, endBlock);
+    cg.builder.CreateCondBr(left, rightBlock, endBlock);
     cg.builder.SetInsertPoint(rightBlock);
     cg.builder.CreateBr(endBlock);
     cg.builder.SetInsertPoint(endBlock);
     auto* phi = cg.builder.CreatePHI(cg.builder.getInt1Ty(), 2);
     phi->addIncoming(cg.false_(), currentBlock);
-    phi->addIncoming(right->IRValue, rightBlock);
+    phi->addIncoming(right, rightBlock);
     return phi;
 }
 
-Value* orIR(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right) {
+Value* orIR(LgsCodeGen& cg, Value* left, Value* right) {
     const auto currentBlock = cg.builder.GetInsertBlock();
     const auto func = currentBlock->getParent();
     const auto rightBlock = cg.createBlock("or_right", func);
     const auto endBlock = cg.createBlock("or_end", func);
-    cg.builder.CreateCondBr(left->IRValue, endBlock, rightBlock);
+    cg.builder.CreateCondBr(left, endBlock, rightBlock);
     cg.builder.SetInsertPoint(rightBlock);
     cg.builder.CreateBr(endBlock);
     cg.builder.SetInsertPoint(endBlock);
     auto* phi = cg.builder.CreatePHI(cg.builder.getInt1Ty(), 2);
     phi->addIncoming(cg.true_(), currentBlock);
-    phi->addIncoming(right->IRValue, rightBlock);
+    phi->addIncoming(right, rightBlock);
     return phi;
 }
 
-std::pair<Value*, Value*> loadPairAsFloat(LgsCgModule& cg, LgsExpr* self, LgsExpr* other) {
-    auto l = self->loadIR(cg);
-    auto r = other->loadIR(cg);
-    if (l->getType()->isIntegerTy()) {
-        l = cg.builder.CreateSIToFP(l, cg.floatTy());
+LgsType* getBiggestIntType(const std::vector<LgsType*>& types) {
+    if (types.empty()) return nullptr;
+    LgsType* inferredType = nullptr;
+    uint8_t highestPrecedence = 0;
+    for (size_t i = 0; i < types.size(); ++i) {
+        const auto& arg = types[i];
+        if (!arg) return nullptr;
+        LgsType* currentType = nullptr;
+        if (arg->isScalar()) {
+            currentType = arg;
+        } else if (const auto iter = arg->asIterable()) {
+            currentType = iter->baseType;
+        }
+        if (!currentType || !currentType->isScalar()) return nullptr;
+        const auto precedence = numberPrecedences[currentType->getName()];
+        if (highestPrecedence >= precedence) continue;
+        inferredType = currentType;
+        highestPrecedence = precedence;
     }
-    if (r->getType()->isIntegerTy()) {
-        r = cg.builder.CreateSIToFP(r, cg.floatTy());
-    }
-    return {l, r};
+    assert(inferredType);
+    return inferredType;
 }
 
-std::pair<Value*, Value*> loadPairAsDouble(LgsCgModule& cg, LgsExpr* self, LgsExpr* other) {
-    auto l = self->loadIR(cg);
-    auto r = other->loadIR(cg);
-    if (l->getType()->isIntegerTy()) {
-        l = cg.builder.CreateSIToFP(l, cg.doubleTy());
-    }
-    if (r->getType()->isIntegerTy()) {
-        r = cg.builder.CreateSIToFP(r, cg.doubleTy());
-    }
-    return {l, r};
-}
-
-std::pair<Value*, Value*> loadPairAsInt(LgsCgModule& cg, LgsExpr* self, LgsExpr* other) {
-    auto l = self->loadIR(cg);
-    auto r = other->loadIR(cg);
-    if (l->getType()->isFloatTy()) {
-        l = cg.builder.CreateFPToSI(l, cg.i32Ty());
-    }
-    if (r->getType()->isFloatTy()) {
-        r = cg.builder.CreateFPToSI(r, cg.i32Ty());
-    }
-    return {l, r};
-}
-
-std::pair<Constant*, Constant*> getRTFieldsInfo(LgsCgModule& cg, const std::string& name, const std::vector<LgsOwner*>& values) {
-    std::vector<Constant*> fieldTypes;
-    std::vector<Constant*> fieldNames;
-    fieldTypes.reserve(values.size());
-    fieldNames.reserve(values.size());
-    for (size_t i = 0; i < values.size(); ++i) {
-        fieldTypes.push_back(values[i]->getType()->getRTType(cg));
-        fieldNames.push_back(cg.getString(values[i]->getName()));
-    }
-
-    Constant* fieldTypesArr = nullptr;
-    Constant* fieldNamesArr = nullptr;
-    if (values.empty()) {
-        fieldTypesArr = cg.null();
-        fieldNamesArr = cg.null();
-    } else {
-        const auto types = LGS_TYPEINFO_PREFIX + name + "_fields";
-        const auto names = LGS_TYPEINFO_PREFIX + name + "_names";
-        const auto fieldsArrType = ArrayType::get(cg.getRTTBaseStruct(), values.size());
-        const auto namesArrType = ArrayType::get(cg.ptrTy(), values.size());
-        if (cg.isRTTModule) {
-            fieldTypesArr = cg.createGlobal(types, fieldsArrType, ConstantArray::get(fieldsArrType, fieldTypes));
-            fieldNamesArr = cg.createGlobal(names, namesArrType, ConstantArray::get(namesArrType, fieldNames));
-        } else {
-            fieldTypesArr = cg.createGlobal(types, fieldsArrType, nullptr);
-            fieldNamesArr = cg.createGlobal(names, namesArrType, nullptr);
+std::pair<Value*, Value*> loadNumberPair(LgsCodeGen& cg, Value* left, Value* right, Type* type) {
+    const auto leftType = left->getType();
+    const auto rightType = right->getType();
+    if (leftType->isIntegerTy()) {
+        left = cg.builder.CreateSIToFP(left, type);
+    } else if (const auto lVec = dyn_cast<FixedVectorType>(leftType)) {
+        if (lVec->getElementType()->isIntegerTy()) {
+            left = cg.builder.CreateSIToFP(left, FixedVectorType::get(type, lVec->getNumElements()));
         }
     }
-    return {fieldTypesArr, fieldNamesArr};
+    if (rightType->isIntegerTy()) {
+        right = cg.builder.CreateSIToFP(right, type);
+    } else if (const auto rVec = dyn_cast<FixedVectorType>(rightType)) {
+        if (rVec->getElementType()->isIntegerTy()) {
+            right = cg.builder.CreateSIToFP(right, FixedVectorType::get(type, rVec->getNumElements()));
+        }
+    }
+    return {left, right};
 }

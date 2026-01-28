@@ -1,7 +1,5 @@
 #pragma once
 #include "LgsType.h"
-#include "primitives/LgsFloat.h"
-#include "primitives/LgsInt.h"
 
 class LgsComplex final : public LgsType {
 public:
@@ -9,23 +7,21 @@ public:
     LgsType* realType;
     LgsType* imaginaryType;
 
-    explicit LgsComplex(LgsType* realType = &LGS_FLOAT, LgsType* imaginaryType = &LGS_FLOAT): realType(realType), imaginaryType(imaginaryType) {
+    explicit LgsComplex(LgsType* realType, LgsType* imaginaryType): realType(realType), imaginaryType(imaginaryType) {
         passByRef = true;
     }
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
-    Type* getIRType(LgsCgModule& cg) override;
-    Constant* getRTType(LgsCgModule& cg) override;
+    Type* getIRType(LgsCodeGen& cg) override;
+    Constant* getRTType(LgsCodeGen& cg) override;
     bool canCastTo(LgsType* other) override;
-    Value* addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* subIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* divIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
+    Value* addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
+    Value* subIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
+    Value* mulIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
+    Value* divIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
     std::string fmtStr() const override;
-    DIType* getDebugType(LgsCgModule& cg) override;
+    DIType* getDebugType(LgsCodeGen& cg) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     std::string getName() override;
     ~LgsComplex() override;
 };
-
-inline LgsComplex LGS_COMPLEX;

@@ -35,8 +35,7 @@ detect_os() {
 
 install_debian() {
   apt-get update
-  DEBIAN_FRONTEND=noninteractive apt-get install -y \
-    curl git cmake clang-19 libclang-19-dev libclang-cpp19-dev
+  DEBIAN_FRONTEND=noninteractive apt-get install -y curl git cmake clang-19 libclang-19-dev libclang-cpp19-dev
   update-alternatives --install /usr/bin/clang clang /usr/lib/llvm-19/bin/clang 100
   update-alternatives --install /usr/bin/clang++ clang++ /usr/lib/llvm-19/bin/clang++ 100
   update-alternatives --install /usr/bin/llc llc /usr/lib/llvm-19/bin/llc 100

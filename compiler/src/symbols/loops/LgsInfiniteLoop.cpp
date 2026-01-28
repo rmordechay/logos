@@ -1,25 +1,25 @@
 #include "loops/LgsInfiniteLoop.h"
 #include "LgsDefinitions.h"
-#include "codegen/LgsCgModule.h"
+#include "codegen/LgsCodeGen.h"
 
-void LgsInfiniteLoop::incAndJumpToCond(LgsCgModule& cg) {
+void LgsInfiniteLoop::incAndJumpToCond(LgsCodeGen& cg) {
     if (cg.lastInstTerminator()) return;
     cg.builder.CreateBr(IRBodyBlock);
 }
 
-Value* LgsInfiniteLoop::loopStart(LgsCgModule& cg) {
+Value* LgsInfiniteLoop::loopStart(LgsCodeGen& cg) {
     return cg.i32Zero();
 }
 
-Value* LgsInfiniteLoop::loopEnd(LgsCgModule& cg) {
+Value* LgsInfiniteLoop::loopEnd(LgsCodeGen& cg) {
     assert(0);
 }
 
-void LgsInfiniteLoop::setDebugValue(LgsCgModule& cg) {
+void LgsInfiniteLoop::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }
 
-void LgsInfiniteLoop::setBlocks(LgsCgModule& cg) {
+void LgsInfiniteLoop::setBlocks(LgsCodeGen& cg) {
     IRBodyBlock = cg.createBlock(BLOCK_LOOP_BODY);
     IRExitBlock = cg.createBlock(BLOCK_LOOP_EXIT);
 }

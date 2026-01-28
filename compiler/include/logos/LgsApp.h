@@ -6,7 +6,7 @@
 class LgsAppConfigFile;
 class LgsTestFile;
 class LogosParser;
-class LgsCgModule;
+class LgsCodeGen;
 class LgsStrConst;
 class LgsEnvFile;
 class LgsObject;
@@ -24,8 +24,9 @@ public:
     LgsAppCache appCache;
     LgsGlobals globals;
     LgsErrHandler errHandler;
-    LgsCgModule rttTypeModule;
+    LgsCodeGen rttTypeModule;
     std::vector<LgsFile*> srcFiles;
+    std::vector<LgsFile*> genericFiles;
     std::vector<LgsEnvFile*> envFiles;
     std::vector<LgsTestFile*> testFiles;
     LgsAppConfigFile* appConfigFile = nullptr;
@@ -52,6 +53,7 @@ public:
     void loadBuiltins();
     bool resolveGlobals();
     bool generateRTTTypes();
+    bool generateGenerics();
     void createBuildDirs();
     bool validateEnvs();
     bool validateRequiredEnvs();

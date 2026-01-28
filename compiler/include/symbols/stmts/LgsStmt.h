@@ -8,7 +8,7 @@ class LgsSwitch;
 class LgsDeferStmt;
 class LgsCoroutine;
 class LgsPostfixExpr;
-class LgsCgModule;
+class LgsCodeGen;
 class LgsForLoop;
 class LgsVarDec;
 class LgsSelection;
@@ -32,7 +32,7 @@ public:
     LgsReturn* asReturn();
     LgsVarDec* asVarDec();
     LgsAssignment* asAssignment();
-    virtual LgsStmt* clone();
+    LgsStmt* clone() override;
 };
 
 void freeStmt(const LgsStmt* stmt);

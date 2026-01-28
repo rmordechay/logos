@@ -4,11 +4,11 @@
 #include "stmts/LgsField.h"
 #include "LgsUtils.h"
 #include "types/iterables/LgsVariadic.h"
-
 #include <sstream>
+
 bool argAndParamEqual(const LgsExpr* arg, const LgsParam* param);
 
-Value* LgsFuncCall::loadIR(LgsCgModule& cg) {
+Value* LgsFuncCall::loadIR(LgsCodeGen& cg) {
     return IRValue;
 }
 
@@ -24,16 +24,13 @@ bool LgsFuncCall::equals(LgsFuncType* funcType) const {
         auto paramsByName = funcType->getParamsByName();
         for (size_t i = funcType->isMethod; i < argsSize; ++i) {
             const auto arg = args[i];
-            const auto param = paramsByName[arg.name];
-            if (argAndParamEqual(arg.expr, param)) continue;
+            if (argAndParamEqual(args[i].expr, paramsByName[arg.name])) continue;
             return false;
         }
     } else {
         for (size_t i = funcType->isMethod; i < paramsSize; ++i) {
             if (i >= argsSize) continue;
-            const auto arg = args[i];
-            const auto param = funcType->params[i];
-            if (argAndParamEqual(arg.expr, &param)) continue;
+            if (argAndParamEqual(args[i].expr, &funcType->params[i])) continue;
             return false;
         }
     }
@@ -52,6 +49,7 @@ bool LgsFuncCall::equalsVariadic(const LgsFuncType* funcType) const {
         const auto param = funcType->params[i];
         if (!argAndParamEqual(arg.expr, &param)) return false;
     }
+    if (funcType->isExternal) return true;
     // Check the variadic arguments
     const auto& variadicParam = funcType->params.back();
     const auto variadic = variadicParam.type->asVariadic();
@@ -120,23 +118,25 @@ std::string LgsFuncCall::asText() {
     return str.str();
 }
 
-void LgsFuncCall::setDebugValue(LgsCgModule& cg) {
+void LgsFuncCall::setDebugValue(LgsCodeGen& cg) {
     setDebugLoc(cg);
 }
 
-LgsExpr* LgsFuncCall::clone() {
+LgsFuncCall* LgsFuncCall::clone() {
     const auto newFuncCall = new LgsFuncCall(*this);
     newFuncCall->args.clear();
     for (const auto& arg : args) {
         newFuncCall->args.emplace_back(LgsFuncArg(arg.expr->clone(), arg.name, arg.isSelf));
     }
-    newFuncCall->type = type;
+    newFuncCall->setType(type);
     return newFuncCall;
 }
 
 bool argAndParamEqual(const LgsExpr* arg, const LgsParam* param) {
+    if (!param->type) return false;
     const auto argType = arg->type;
     if (!argType) return false;
+    if (param->type->hasGenericTypes()) return true;
     return argType->canCastTo(param->type);
 }
 

@@ -16,18 +16,18 @@ class LgsStmtsBlock;
 class LgsForLoop : public LgsStmt {
 public:
     std::vector<LgsVarDec*> loopVars;
-    llvm::AllocaInst* iPtr = nullptr;
-    Value* iValue = nullptr;
+    Value* iPtr = nullptr;
     LgsStmtsBlock* stmtsBlock = nullptr;
     BasicBlock* IRCondBlock = nullptr;
     BasicBlock* IRBodyBlock = nullptr;
     BasicBlock* IRExitBlock = nullptr;
     std::unordered_map<LgsMetaVarType, LgsMetaVar*> metaVars;
 
-    virtual void setBlocks(LgsCgModule& cg);
-    virtual void incAndJumpToCond(LgsCgModule& cg);
-    virtual Value* loopStart(LgsCgModule& cg) = 0;
-    virtual Value* loopEnd(LgsCgModule& cg) = 0;
+    virtual void setBlocks(LgsCodeGen& cg);
+    virtual void incAndJumpToCond(LgsCodeGen& cg);
+    virtual Value* loopStart(LgsCodeGen& cg) = 0;
+    virtual Value* loopEnd(LgsCodeGen& cg) = 0;
+    Value* loadIndex(LgsCodeGen& cg) const;
     LgsForeachLoop* asForeachLoop();
     LgsRangeLoop* asRangeLoop();
     LgsInfiniteLoop* asInfiniteLoop();

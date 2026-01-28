@@ -8,6 +8,6 @@ public:
     LgsFuncCall* funcCall = nullptr;
     LgsSelection* selection = nullptr;
 
-    void setDebugValue(LgsCgModule& cg) override;
+    void setDebugValue(LgsCodeGen& cg) override;
     ~LgsDeferStmt() override;
 };

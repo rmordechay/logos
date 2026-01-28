@@ -7,6 +7,8 @@
 #include "logos/LgsAppConfigs.h"
 #include <unordered_map>
 
+#include "stmts/LgsAssignment.h"
+
 class LgsMainFunc;
 class LgsMetaSelection;
 class LgsAppConfigFile;
@@ -73,16 +75,17 @@ public:
     void visitMainFile(LgsMainFile* mainFile);
     void visitObject(LgsObject* obj);
     void visitInterface(LgsInterface* interface);
-    void visitEnum(const LgsEnum* enum_);
+    void visitEnum(LgsEnum* enum_);
     void visitTestFile(const LgsTestFile* testFile);
     void visitField(LgsField* field);
+    void visitFuncHeader(LgsFuncType* ft);
     void visitFunc(LgsFunc* func);
     void visitMainFunc(LgsMainFunc* mainFunc);
     void visitLambda(LgsFunc* lambda);
     void visitParam(LgsParam* param);
     void visitIOPair(LgsIOPair* ioPair, LgsObject* obj);
-    void visitStmt(LgsStmt* stmt);
-    void replaceForLoops(LgsStmtWrapper& stmt);
+    void visitStmt(LgsStmtWrapper& stmt);
+    void replaceForLoop(LgsStmtWrapper& stmt);
     void visitStmtsBlock(LgsStmtsBlock* stmtsBlock);
     void visitVarDec(LgsVarDec* varDec);
     void visitAssignment(LgsAssignment* assignment);
@@ -119,9 +122,9 @@ public:
     void visitFieldSelection(LgsVariable* child, LgsType* parentType);
     void visitIterIndexSelection(LgsIterIndex* iterIndex, LgsType* parentType);
     void visitMetaSelection(LgsMetaSelection* metaSelection);
+    void visitFuncCall(LgsFuncCall* funcCall);
     void visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent);
     bool visitFuncArgs(LgsFuncCall* funcCall, LgsFuncType* ft);
-    void visitFuncCall(LgsFuncCall* funcCall);
     void visitPrefixExpr(LgsPrefixExpr* prefixExpr);
     void visitPostfixExpr(LgsPostfixExpr* postfixExpr);
     void visitStrConst(const LgsStrConst* strConst);
@@ -131,7 +134,7 @@ public:
     void visitJsonArr(const LgsJsonArray* jsonArr);
     void visitJsonObj(const LgsJsonObject* jsonObj);
     void visitInstance(LgsInstance* instance);
-    void visitInterfaceInstance(LgsInstance* instance, LgsInterface* interface);
+    void visitInlineInterface(LgsInstance* instance, LgsInterface* interface);
     void visitIterIndex(LgsIterIndex* iterIndex);
     void visitIndex(LgsIterIndex* iterIndex);
     void visitSlice(LgsIterIndex* iterIndex);
@@ -145,7 +148,7 @@ public:
     bool validateFieldVisibility(LgsField* field, LgsType* parent, const LgsLocation& location);
     bool validateMethodVisibility(const LgsFunc* method, LgsType* parent, const LgsLocation& location);
     bool validateVecElements(const LgsVariable* fieldVar, LgsVec* vec);
-    void validateObjDuplicates(LgsType* type);
+    void validateObjDuplicates(LgsObject* type);
     static bool validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const LgsFunc* func);
 
     void resolveImports() const;
@@ -155,5 +158,5 @@ public:
     void addError(const LgsBaseMsg& lgsErr, const LgsLocation& location, const std::vector<std::string>& args = {});
     void addErrorIfSuccessful(const LgsBaseMsg& lgsErr, const LgsLocation& location, const std::vector<std::string>& args);
     void addRTType(LgsType* type) const;
-    void deleteRTType(LgsType* type) const;
+    void addGenerics(LgsType* type) const;
 };

@@ -1,46 +1,46 @@
 #pragma once
-#include "exprs/constants/LgsIntConst.h"
 #include "stmts/LgsField.h"
 #include "types/primitives/LgsDouble.h"
 #include "types/primitives/LgsFloat.h"
-#include "types/primitives/LgsInt.h"
 
 class LgsVec final : public LgsIterable {
 public:
-    static constexpr auto baseName = "Vec";
+    static constexpr auto name = "Vec";
     size_t dimVec = 0;
 
     explicit LgsVec(const size_t dim, LgsType* baseType = &LGS_FLOAT) : LgsIterable(baseType), dimVec(dim) {
         assert(dim > 1 && dim <= 4);
-        size = new LgsIntConst(&LGS_INT, dim);
         isStatic = true;
-        passByRef = true;
     }
-
     LgsField* getField(const std::string& fieldName) override;
-    Type* getIRType(LgsCgModule& cg) override;
-    Constant* getRTType(LgsCgModule& cg) override;
+    Type* getIRType(LgsCodeGen& cg) override;
+    Constant* getRTType(LgsCodeGen& cg) override;
+    std::string getBaseName() override;
     std::string getName() override;
+    std::string pname() override;
     size_t sizeBytes() override;
     bool equals(LgsType* other) override;
     LgsExpr* getZeroValue() override;
     bool canCastTo(LgsType* other) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     bool inferBaseType(std::vector<LgsExpr*>& args) override;
-    Value* addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* subIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* divIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* crossIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
-    Value* lenIR(LgsCgModule& cg, Value* iterable) override;
-    Value* getIRElement(LgsCgModule& cg, Value* iterable, Value* index) override;
-    Value* matMul(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right) const;
+    Value* addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
+    Value* subIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
+    Value* mulIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
+    Value* divIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
+    Value* modIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
+    Value* crossIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
+    Value* inIR(LgsCodeGen& cg, Value* iterableExpr, Value* value) override;
+    Value* lenIR(LgsCodeGen& cg, Value* iterable) override;
+    Value* getIRElement(LgsCodeGen& cg, Value* iterable, Value* index) override;
+    void addIRElement(LgsCodeGen& cg, Value* iterable, Value* index, Value* value) override;
+    Value* matVecMul(LgsCodeGen& cg, const LgsExpr* left, LgsExpr* right) const;
     static size_t getSwizzleSet(char c);
     static size_t getComponentIndex(char c);
     std::string fmtStr() const override;
-    DIType* getDebugType(LgsCgModule& cg) override;
+    Value* asIRStr(LgsCodeGen& cg, Value* v) override;
+    DIType* getDebugType(LgsCodeGen& cg) override;
 };
 
-Function* dotProductFunc(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right);
-Function* crossProductFunc(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right);
+Function* dotProductFunc(LgsCodeGen& cg, LgsVec* vecType);
+Function* crossProductFunc(LgsCodeGen& cg, LgsVec* vecType);

@@ -8,15 +8,13 @@
 #include <sstream>
 #include <llvm/IR/Module.h>
 
-Value* LgsIterIndex::loadIR(LgsCgModule& cg) {
+Value* LgsIterIndex::loadIR(LgsCodeGen& cg) {
     const auto baseExprType = baseExpr->type;
     if (baseExprType->asMap() || baseExprType->asDArray() || baseExprType->asSet()) {
-        const auto arr = baseExpr->type->asIterable();
-        const auto valueTy = arr->baseType->getIRType(cg);
-        return cg.builder.CreateLoad(valueTy, IRValue);
+        return IRValue;
     }
     if (baseExprType->asStr()) {
-        return cg.builder.CreateLoad(cg.i8Ty(), IRValue);
+        return cg.load(cg.i8Ty(), IRValue);
     }
     if (baseExprType->asMatrix()) {
         assert(0);
@@ -25,34 +23,34 @@ Value* LgsIterIndex::loadIR(LgsCgModule& cg) {
         const auto indexIR = index.from->IRValue;
         const auto ty = baseExpr->type->getIRType(cg);
         const auto gep = cg.builder.CreateGEP(ty, IRValue, {cg.i32Zero(), indexIR});
-        return cg.builder.CreateLoad(type->getIRType(cg), gep);
+        return cg.load(type->getIRType(cg), gep);
     }
     if (baseExprType->asVec()) {
-        const auto vec = cg.builder.CreateLoad(baseExpr->type->getIRType(cg), IRValue);
+        const auto vec = cg.load(baseExpr->type->getIRType(cg), IRValue);
         const auto i = index.from->IRValue;
         return cg.builder.CreateExtractElement(vec, i);
     }
     assert(0);
 }
 
-void LgsIterIndex::setIRElementPtr(LgsCgModule& cg, const bool assign) {
+void LgsIterIndex::setIRElementPtr(LgsCodeGen& cg, const bool assign) {
     auto fromIR = index.from->IRValue;
     assert(baseExpr->IRValue);
 
     // SArray
     if (const auto sArr = baseExpr->type->asSArray()) {
         const auto ty = type->getIRType(cg);
-        if (!boundsChecked) cg.createIndexBoundsGuard(sArr->size->IRValue, fromIR);
+        if (!boundsChecked) cg.createIndexBoundsGuard(cg.usize(sArr->len), fromIR);
         IRValue = cg.builder.CreateInBoundsGEP(ty, baseExpr->IRValue, fromIR);
         if (ty->isPointerTy()) {
-            IRValue = cg.builder.CreateLoad(cg.ptrTy(), IRValue);
+            IRValue = cg.load(cg.ptrTy(), IRValue);
         }
         return;
     }
 
     // String
-    if (const auto iter = baseExpr->type->asStr()) {
-        if (!boundsChecked) cg.createIndexBoundsGuard(iter->size->IRValue, fromIR);
+    if (const auto str = baseExpr->type->asStr()) {
+        if (!boundsChecked) cg.createIndexBoundsGuard(str->lenIR(cg, baseExpr->IRValue), fromIR);
         IRValue = cg.builder.CreateInBoundsGEP(cg.i8Ty(), baseExpr->IRValue, fromIR);
         return;
     }
@@ -60,14 +58,14 @@ void LgsIterIndex::setIRElementPtr(LgsCgModule& cg, const bool assign) {
 
     // Map
     if (const auto map = baseExpr->type->asMap()) {
-        IRValue = map->getIRElement(cg, baseExpr->IRValue, fromIR);
+        IRValue = map->getIRElement(cg, baseExpr->IRValue, index.from->IRValue);
         return;
     }
 
     // Matrix
     if (const auto matrix = baseExpr->type->asMatrix()) {
         if (!boundsChecked) cg.createIndexBoundsGuard(cg.i32(matrix->rows), fromIR);
-        IRValue = matrix->getIRElement(cg, baseExpr->IRValue, fromIR);
+        IRValue = matrix->getIRElement(cg, baseExpr->IRValue, index.from->IRValue);
         return;
     }
 
@@ -75,9 +73,6 @@ void LgsIterIndex::setIRElementPtr(LgsCgModule& cg, const bool assign) {
     if (const auto iter = baseExpr->type->asIterable()) {
         fromIR = cg.builder.CreateZExt(fromIR, cg.i64Ty());
         IRValue = iter->getIRElement(cg, baseExpr->IRValue, fromIR);
-        if (!type->passByRef) {
-            IRValue = cg.builder.CreateLoad(cg.ptrTy(), IRValue);
-        }
     }
 }
 
@@ -92,7 +87,7 @@ LgsExpr* LgsIterIndex::getBaseExpr() const {
     }
 }
 
-void LgsIterIndex::setIRRangePtr(LgsCgModule& cg, bool assign) {
+void LgsIterIndex::setIRRangePtr(LgsCodeGen& cg, bool assign) {
     assert(!assign);
     const auto fromIR = index.from->IRValue;
     const auto toIR = index.to->IRValue;
@@ -102,53 +97,29 @@ void LgsIterIndex::setIRRangePtr(LgsCgModule& cg, bool assign) {
         const auto sizeWithNull = cg.builder.CreateAdd(size, cg.i32(1));
         IRValue = cg.builder.CreateAlloca(cg.i8Ty(), sizeWithNull);
         const auto src = cg.builder.CreateInBoundsGEP(cg.i8Ty(), baseExpr->IRValue, {fromIR});
-        cg.callMemCpy(IRValue, src, size);
+        cg.callMemcpy(IRValue, src, size);
         cg.addNullTerminate(IRValue, size);
     } else if (const auto sArray = type->asSArray()) {
         const auto size = cg.builder.CreateSub(toIR, fromIR);
         const auto ty = sArray->baseType->getIRType(cg);
         IRValue = cg.builder.CreateAlloca(ty, size);
         const auto src = cg.builder.CreateInBoundsGEP(ty, baseExpr->IRValue, fromIR);
-        const auto elementSize = cg.IRModule->getDataLayout().getTypeAllocSize(ty);
+        const auto elementSize = cg.getAllocSize(ty);
         const auto elementSizeVal = cg.builder.getInt32(elementSize);
         const auto sizeInBytes = cg.builder.CreateMul(size, elementSizeVal);
-        cg.callMemCpy(IRValue, src, sizeInBytes);
+        cg.callMemcpy(IRValue, src, sizeInBytes);
     } else {
         assert(0);
     }
 }
 
-void LgsIterIndex::assign(LgsCgModule& cg, LgsExpr* expr) {
-    const auto rIRValue = expr->IRValue;
-    const auto baseIRValue = baseExpr;
-    const auto indexIR = index.from->IRValue;
-    if (baseExpr->type->asDArray()) {
-        const auto args = {baseIRValue->IRValue, indexIR, expr->getPtrTo(cg)};
-        cg.callLgsFunc(LgsDArray::name, "put", cg.voidTy(), {cg.ptrTy(), cg.i32Ty(), cg.ptrTy()}, args);
-    } else if (baseExpr->type->asSet()) {
-        const auto args = {baseIRValue->IRValue, indexIR, expr->getPtrTo(cg)};
-        cg.callLgsFunc(LgsSet::name, "put", cg.voidTy(), {cg.ptrTy(), cg.i32Ty(), cg.ptrTy()}, args);
-    } else if (const auto map = baseExpr->type->asMap()) {
-        map->getMethod(ADD_FUNC)->call(cg, {baseExpr, index.from, expr});
+void LgsIterIndex::assign(LgsCodeGen& cg, LgsExpr* right) {
+    const auto iter = baseExpr->type->asIterable();
+    assert(iter);
+    if (const auto addFunc = iter->getMethod("add"); addFunc->fn) {
+        addFunc->fn(cg, {LgsFuncArg(baseExpr), LgsFuncArg(index.from), LgsFuncArg(right)});
     } else {
-        cg.store(rIRValue, IRValue);
-    }
-}
-
-void LgsIterIndex::assignScalar(LgsCgModule& cg, LgsExpr* expr) const {
-    const auto rIRValue = expr->IRValue;
-    const auto baseIRValue = baseExpr;
-    auto indexIR = index.from->IRValue;
-    if (baseExpr->type->asDArray()) {
-        const auto args = {baseIRValue->IRValue, indexIR, expr->getPtrTo(cg)};
-        cg.callLgsFunc(LgsDArray::name, "put", cg.voidTy(), {cg.ptrTy(), cg.i32Ty(), cg.ptrTy()}, args);
-    } else if (baseExpr->type->asSet()) {
-        const auto args = {baseIRValue->IRValue, indexIR, expr->getPtrTo(cg)};
-        cg.callLgsFunc(LgsSet::name, "put", cg.voidTy(), {cg.ptrTy(), cg.i32Ty(), cg.ptrTy()}, args);
-    } else if (const auto map = baseExpr->type->asMap()) {
-        map->getMethod(ADD_FUNC)->callIR(cg, {baseExpr->IRValue, indexIR, expr->IRValue});
-    } else {
-        cg.store(rIRValue, IRValue);
+        iter->addIRElement(cg, baseExpr->IRValue, index.from->IRValue, right->IRValue);
     }
 }
 
@@ -163,7 +134,7 @@ std::string LgsIterIndex::asText() {
     return str.str();
 }
 
-Type* LgsIterIndex::getSArrayType(LgsCgModule& cg) const {
+Type* LgsIterIndex::getSArrayType(LgsCodeGen& cg) const {
     auto current = this;
     while (true) {
         if (const auto nextIndex = current->baseExpr->asIterIndex()) {
@@ -174,8 +145,17 @@ Type* LgsIterIndex::getSArrayType(LgsCgModule& cg) const {
     }
 }
 
-void LgsIterIndex::setDebugValue(LgsCgModule& cg) {
+void LgsIterIndex::setDebugValue(LgsCodeGen& cg) {
     assert(0);
+}
+
+LgsExpr* LgsIterIndex::clone() {
+    const auto newIterIndex = new LgsIterIndex(baseExpr->clone());
+    newIterIndex->index.from = index.from->clone();
+    if (index.to) {
+        newIterIndex->index.to = index.to->clone();
+    }
+    return newIterIndex;
 }
 
 LgsIterIndex::~LgsIterIndex() {

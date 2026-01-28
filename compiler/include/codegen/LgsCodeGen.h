@@ -1,151 +1,180 @@
 #pragma once
-#include "LgsCgModule.h"
-#include "exprs/LgsNullableExpr.h"
-#include "files/LgsFile.h"
-#include "logos/LgsStack.h"
+#include "Lgs_Types.h"
+#include <llvm/IR/IRBuilder.h>
+#include <llvm/Passes/OptimizationLevel.h>
+#include <map>
+#include <filesystem>
 
-class LgsMetaSelection;
-class LgsJson;
-class LgsMatrixExpr;
-class LgsEnvVar;
+namespace llvm {
+    class DIBuilder;
+    class PassBuilder;
+    class TargetMachine;
+}
+
+using llvm::DIFile;
+using llvm::DICompileUnit;
+using llvm::DISubprogram;
+using llvm::LLVMContext;
+using llvm::Module;
+using llvm::GlobalVariable;
+using llvm::ConstantInt;
+using llvm::ConstantAggregateZero;
+using llvm::StructType;
+using llvm::Constant;
+using llvm::GlobalValue;
+using llvm::IntegerType;
+using llvm::PointerType;
+using llvm::TypeSize;
+using llvm::FunctionType;
+using llvm::Function;
+using llvm::BasicBlock;
+using llvm::UndefValue;
+using llvm::ArrayType;
+using llvm::TargetMachine;
+using llvm::raw_fd_ostream;
+using llvm::DIBasicType;
+using llvm::DIBuilder;
+using llvm::IRBuilderBase;
+using llvm::IRBuilder;
+using llvm::Type;
+using llvm::Value;
+using llvm::Instruction;
+
 struct LgsPaths;
-class LgsTernaryExpr;
-class LgsMainFunc;
-class LgsInterfaceFile;
-class LgsTestFile;
-class LgsObjectFile;
-class LgsVectorExpr;
-class LgsPostfixExpr;
-class LgsDeferStmt;
-class LgsInfiniteLoop;
-class LgsObject;
-class LgsWhileLoop;
-class LgsFuncType;
-class LgsIterable;
-class LgsFile;
-class LgsCoroutine;
-class LgsPrefixExpr;
-class LgsDArray;
-class LgsValue;
-class LgsVariable;
-class LgsStrConst;
-class LgsHashMap;
-class LgsExpr;
-class LgsType;
-class LgsContinue;
-class LgsFloatConst;
-class LgsBreak;
-class LgsReturn;
-class LgsForeachLoop;
-class LgsRangeLoop;
-class LgsStmtsBlock;
-class LgsMetaVar;
-class LgsStmt;
-class LgsMainFile;
-class LgsApp;
-class LgsCast;
-class LgsVarDec;
-class LgsInstance;
-class LgsIterIndex;
-class LgsSelection;
-class LgsFuncCall;
-class LgsBinaryExpr;
-class LgsArrayExpr;
-class LgsIfStmt;
-class LgsAssignment;
-class LgsIntConst;
-class LgsForLoop;
-class LgsTypeExpr;
-class LgsIOStmt;
-struct LgsSymbol;
-struct LgsIndex;
 struct LgsAppConfigs;
+struct LgsLocation;
+struct LgsBaseMsg;
+class LgsFile;
+
+struct LgsLLDBGen {
+    DIFile* diFile = nullptr;
+    DIBuilder* diBuilder = nullptr;
+    DICompileUnit* compileUnit = nullptr;
+    DISubprogram* subprogram = nullptr;
+};
+
+enum LgsCodeGenMode {
+    CG_MODE_RTTYPES,
+    CG_MODE_SRC_CODE,
+    CG_MODE_GENERICS,
+};
 
 class LgsCodeGen {
 public:
-    LgsFile& file;
-    LgsStack stack;
-    LgsCgModule& cg;
-    LgsPaths& paths;
-    LgsGlobals& globals;
-    LgsAppConfigs& appConfigs;
-    static std::atomic<size_t> lambdasIDGenerator;
+    LLVMContext context;
+    LgsLLDBGen debugger;
+    Module* IRModule = nullptr;
+    Function* currentFunc = nullptr;
+    IRBuilder<> builder = IRBuilder(context);
+    LgsCodeGenMode mode = CG_MODE_SRC_CODE;
+    std::map<std::string, Type*> typesRegistry;
+    IRBuilderBase::InsertPoint savedIP;
 
-    explicit LgsCodeGen(LgsFile& file, LgsAppConfigs& appConfigs, LgsGlobals& globals, LgsPaths& paths)
-        : file(file), cg(file.cg), paths(paths), globals(globals), appConfigs(appConfigs) {
-    }
+    void setupModule(const std::filesystem::path& file, bool debugMode = false);
+    bool writeIRModule(const LgsPaths& paths, uint8_t optLevel) const;
+    Constant* getString(const std::string& value);
+    llvm::AllocaInst* emptyBuffer();
+    size_t getAllocSize(Type* type) const;
+    GlobalVariable* createGlobal(const std::string& name, Type* type, Constant* initializer, bool isConst = true, GlobalValue::LinkageTypes linkage = GlobalValue::ExternalLinkage) const;
+    void loop(Value* loopLength, const std::function<void(Value*, BasicBlock*)>& body);
+    void ifStmt(Value* cond, const std::function<void()>& body);
+    void ifElseStmt(Value* cond, const std::function<void()>& ifBody, const std::function<void()>& elseBody);
 
-    bool generate();
-    void visitMainFile(LgsMainFile* mainFile);
-    void visitInterface(const LgsInterface* interface);
-    void visitTestFile(const LgsTestFile* testFile);
-    void visitObject(LgsObject* obj);
-    void visitMainFunc(LgsMainFunc* func);
-    void visitFunc(LgsFunc* func);
-    void visitGenericFunc(LgsFunc* func);
-    void visitStmt(LgsStmt* stmt);
-    void visitStmtsBlock(const LgsStmtsBlock* stmtsBlock);
-    void visitLoop(LgsForLoop* loop);
-    void visitRangeLoop(LgsRangeLoop* loop);
-    void visitForeachLoop(LgsForeachLoop* loop);
-    void visitInfiniteLoop(const LgsInfiniteLoop* loop) const;
-    void visitLoopMetaVar(LgsMetaVar* metaVar) const;
-    void visitWhileLoop(const LgsWhileLoop* loop);
-    void visitVarDec(LgsVarDec* varDec);
-    void visitAssignment(const LgsAssignment* assignment);
-    void visitIfStmt(LgsIfStmt* ifStmt);
-    void visitSimpleIf(LgsIfStmt* ifStmt);
-    void visitIfWithElse(LgsIfStmt* ifStmt);
-    void visitElseIf(LgsIfStmt* ifStmt);
-    void visitSwitch(LgsSwitch* switchStmt);
-    void visitContinueStmt() const;
-    void visitReturnStmt(LgsReturn* returnStmt);
-    void visitBreakStmt(const LgsBreak* breakStmt) const;
-    void visitCoroutine(const LgsCoroutine* coroutine);
-    void visitDeferStmt(const LgsDeferStmt* defer);
-    void visitIOStmt(const LgsIOStmt* ioStmt);
-    void visitExpr(LgsExpr* expr, bool assign = false);
-    void visitBinaryExpr(LgsBinaryExpr* binExpr);
-    void visitTernaryExpr(LgsTernaryExpr* ternaryExpr);
-    void visitCast(LgsCast* cast);
-    void visitLambda(LgsFunc* func);
-    void visitIntConst(LgsIntConst* intConst) const;
-    void visitConstant(LgsExpr* expr);
-    void visitFloatConst(LgsFloatConst* floatConst) const;
-    void visitComplexConst(const LgsComplexConst* complex);
-    void visitNullableExpr(LgsNullableExpr* nullableExpr);
-    void visitArrayExpr(LgsArrayExpr* arrayExpr);
-    void visitStaticArray(LgsArrayExpr* arrayExpr) const;
-    void visitDynamicArray(LgsArrayExpr* arrayExpr) const;
-    void visitSetExpr(LgsArrayExpr* arrayExpr) const;
-    void visitVectorExpr(LgsVectorExpr* vectorExpr);
-    void visitMatrixExpr(const LgsMatrixExpr* matrixExpr);
-    void visitHashMap(LgsHashMap* hashMap);
-    void visitEnvVar(LgsEnvVar* envVar) const;
-    void visitVariable(LgsVariable* variable);
-    void visitSelection(LgsSelection* selection, bool assign = false);
-    void visitFieldSelection(LgsVariable* var, LgsExpr* parent, bool assign) const;
-    void visitNullableSelection(LgsExpr* child, LgsExpr* parent) const;
-    void visitMetaSelection(LgsMetaSelection* metaSelection);
-    void visitFuncCall(LgsFuncCall* funcCall);
-    void visitIterFunc(const LgsFuncCall* funcCall) const;
-    void visitPrefixExpr(LgsPrefixExpr* prefixExpr);
-    void visitPostfixExpr(LgsPostfixExpr* postfixExpr);
-    void visitStrConst(LgsStrConst* strConst);
-    void visitInstance(LgsInstance* instance);
-    void visitIterIndex(LgsIterIndex* iterIndex, bool assign);
-    void visitJson(LgsJson* json);
+    void store(Value* v, Value* ptr);
+    Value* load(Type* ty, Value* ptr);
+    void incSize(Value* bufferOffset, Value* ptr);
+    Value* allocaAndStore(Type* type, Value* v, const std::string& name = "");
+    StructType* getStructType(const std::vector<Type*>& types, const std::string& name = "");
+    void storeStructField(Type* parentType, Value* parentPtr, size_t position, Value* v);
+    Value* loadStructField(Type* parentType, Value* parentPtr, size_t position, Type* ty);
+    void addNullTerminate(Value* strPtr, Value* pos);
+
+    void callStackPush();
+    void callPopStack();
+    Value* getCurrentLevel();
+    Value* callHash(Value* arg);
+    Value* getVField(Value* instance, Value* name, Value* ptr);
+    Value* getVFunc(Value* objType, Value* funcName);
+    Value* allocInCurrent(Value* size, bool setLevel);
+    Value* allocInLevel(Value* size, Value* level);
+    Value* reallocate(Value* ptr, Value* size, Value* level);
+    Value* moveElement(Value* iterable, Value* element, Constant* type);
+    void throwError(const LgsBaseMsg& err, const std::vector<Value*>& args = {});
+
+    // Blocks
+    BasicBlock* createBlock(const std::string& name = "", Function* parent = nullptr);
+    void branch(BasicBlock* block);
+    void startBlock(BasicBlock* block);
+    void branchAndStartBlock(BasicBlock* block);
+    Instruction* lastInstTerminator() const;
+    void createIndexBoundsGuard(Value* len, Value* index);
+    void createArrBoundsGuard(Value* maxLen, Value* arrLen);
 
     // Funcs
-    void createPrologue(LgsFunc* func) const;
-    void createEpilogue(const LgsFunc* func) const;
-    void initMainArgs(const LgsMainFunc* mainFunc) const;
-    StructType* getThunkCtxType(const LgsFuncCall* fc) const;
-    Value* getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) const;
-    Function* getThunkFunc(LgsFuncCall* fc, Type* ctxTy) const;
+    static FunctionType* getFT(Type* rt, const std::vector<Type*>& params = {}, bool isVariadic = false);
+    Function* getFunc(const std::string& funcName, FunctionType* ft, GlobalValue::LinkageTypes linkage = GlobalValue::ExternalLinkage) const;
+    Value* callFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes = {}, const std::vector<Value*>& args = {}, bool isVariadic = false);
+    Value* callIntrinsics(llvm::Intrinsic::ID intrinsicID, const std::vector<Type*>& types = {}, const std::vector<Value*>& args = {});
+    Value* callLgsFunc(const std::string& baseName, const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes = {}, const std::vector<Value*>& args = {});
+    Value* callRuntimeFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes = {}, const std::vector<Value*>& args = {}, bool isVariadic = false);
 
-    void createVecField(LgsField* field, Value* parent) const;
-    bool checkMock(LgsExpr* expr) const;
-    Value* getIRValue(LgsValue* value);
-    void addVirtuals(LgsObject* obj, Value* ptr) const;
+    // Externals (syscalls, clib, etc.)
+    Value* callPrintf(const std::vector<Value*>& args);
+    Value* callSnprintf(const std::string& fmt, const std::vector<Value*>& args);
+    Value* callStrLen(Value* str);
+    void callMemset(Value* dest, Value* src, Value* size);
+    void callMemcpy(Value* dest, Value* src, Value* size);
+
+    // Runtime funcs
+    GlobalVariable* getRTTypeInfo(const std::string& name, ConstantInt* size, Lgs_TypeKind kind);
+    StructType* getRTTStruct();
+
+    // Debugging
+    void printStr(const std::string& value, const std::string& prefix = "");
+    void printStr(Value* value, const std::string& prefix = "");
+    void printInt(Value* value, const std::string& prefix = "");
+    void printFloat(Value* value, const std::string& prefix = "");
+    void printLong(Value* value, const std::string& prefix = "");
+    void printPtr(Value* value, const std::string& prefix = "");
+    Value* measureTimeStart();
+    Value* measureTimeEnd(Value* startTime);
+
+    void finalizeDebugger(const std::filesystem::path& buildPath) const;
+    llvm::DILocation* getDebugLoc(const LgsLocation& location);
+    static void initLLVM();
+    static llvm::OptimizationLevel getOptLevel(uint8_t optLevel);
+
+    // Types
+    Type* i1Ty();
+    Type* i8Ty();
+    Type* i16Ty();
+    Type* i32Ty();
+    Type* i64Ty();
+    Type* floatTy();
+    Type* doubleTy();
+    Type* voidTy();
+    IntegerType* sizeTy();
+    PointerType* ptrTy();
+
+    // Values
+    Constant* null();
+    ConstantInt* true_();
+    ConstantInt* false_();
+    ConstantInt* i1(bool v);
+    ConstantInt* i8(int8_t v);
+    ConstantInt* i16(int16_t v);
+    ConstantInt* i32(int32_t v);
+    ConstantInt* i64(int64_t v);
+    ConstantInt* usize(size_t v);
+    ConstantInt* i8Zero();
+    ConstantInt* i32Zero();
+    ConstantInt* i64Zero();
+    ConstantInt* sizeZero();
+    Value* extendToSize(Value* v);
+    Constant* floatv(float_t v);
+    Constant* doublev(double_t v);
+    Constant* emptyStr();
+    ~LgsCodeGen();
 };
+
+inline TargetMachine* targetMachine;

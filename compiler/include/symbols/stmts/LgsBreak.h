@@ -7,5 +7,5 @@ class LgsBreak final : public LgsStmt {
 public:
     bool isBreakIf = false;
     std::string tag = "";
-    void setDebugValue(LgsCgModule& cg) override;
+    void setDebugValue(LgsCodeGen& cg) override;
 };

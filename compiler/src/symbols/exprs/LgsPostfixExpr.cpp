@@ -6,7 +6,7 @@ std::string LgsPostfixExpr::asText() {
     assert(0);
 }
 
-void LgsPostfixExpr::setDebugValue(LgsCgModule& cg) {
+void LgsPostfixExpr::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }
 

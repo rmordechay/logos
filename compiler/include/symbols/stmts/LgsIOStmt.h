@@ -12,6 +12,6 @@ public:
 
     LgsIOStmt() = default;
     explicit LgsIOStmt(LgsStmtsBlock* stmtsBlock): stmtsBlock(stmtsBlock) {}
-    void setDebugValue(LgsCgModule& cg) override;
+    void setDebugValue(LgsCodeGen& cg) override;
     ~LgsIOStmt() override;
 };

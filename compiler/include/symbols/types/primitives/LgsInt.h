@@ -6,29 +6,31 @@ public:
     static constexpr auto name = "Int";
 
     LgsInt() {
-        isPrimitive = true;
         isInt = true;
+        rttKind = RTT_INT;
     }
     size_t sizeBytes() override;
-    Type* getIRType(LgsCgModule& cg) override;
+    Type* getIRType(LgsCodeGen& cg) override;
     LgsExpr* getZeroValue() override;
-    Constant* getRTType(LgsCgModule& cg) override;
+    Constant* getRTType(LgsCodeGen& cg) override;
     bool canCastTo(LgsType* other) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
-    Value* addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* subIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* divIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* modIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* powIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* bitAndIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* bitOrIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* bitXorIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* rshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* lshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* other) override;
+    Value* addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
+    Value* subIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
+    Value* mulIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
+    Value* divIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
+    Value* modIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
+    Value* powIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
+    Value* bitAndIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
+    Value* bitOrIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
+    Value* bitXorIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
+    Value* rshiftIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
+    Value* lshiftIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
     std::string fmtStr() const override;
+    Value* asIRStr(LgsCodeGen& cg, Value* v) override;
     std::string getName() override;
-    DIType* getDebugType(LgsCgModule& cg) override;
+    LgsType* clone() override;
+    DIType* getDebugType(LgsCodeGen& cg) override;
 };
 
 inline LgsInt LGS_INT;

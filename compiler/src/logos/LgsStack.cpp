@@ -38,11 +38,17 @@ LgsFunc* LgsStack::currentFunc() const {
 }
 
 LgsForLoop* LgsStack::currentLoop() const {
-    return stack.back().loop;
+    for (std::size_t i = stack.size(); i-- > 0; ) {
+        if (stack[i].loop) return stack[i].loop;
+    }
+    return nullptr;
 }
 
 LgsIfStmt* LgsStack::currentIfStmt() const {
-    return stack.back().ifStmt;
+    for (std::size_t i = stack.size(); i-- > 0; ) {
+        if (stack[i].ifStmt) return stack[i].ifStmt;
+    }
+    return nullptr;
 }
 
 LgsIfStmt* LgsStack::getOutermostIfStmt() const {
@@ -53,7 +59,8 @@ LgsIfStmt* LgsStack::getOutermostIfStmt() const {
 }
 
 LgsForeachLoop* LgsStack::getInnermostForeachLoop() const {
-    for (const auto& frame : stack) {
+    for (std::size_t i = stack.size(); i-- > 0; ) {
+        const auto& frame = stack[i];
         if (!frame.loop) continue;
         if (const auto forEach = frame.loop->asForeachLoop()) return forEach;
     }

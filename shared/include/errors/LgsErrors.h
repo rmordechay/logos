@@ -23,7 +23,7 @@ inline LgsBaseMsg E10008{"main.lgs could not be found in src directory.", errCod
 inline LgsBaseMsg E10009{"Duplicate Main files were found in the project. Locations:%s", errCodeStart++};
 inline LgsBaseMsg E10010{"Not a root path of a Logos project.", errCodeStart++};
 inline LgsBaseMsg E10011{"%s is already declared.", errCodeStart++};
-inline LgsBaseMsg E10012{"%s cannot be %s-assigned to type %s.", errCodeStart++};
+inline LgsBaseMsg E10012{"%s cannot be re-assigned to expression with type %s.", errCodeStart++};
 inline LgsBaseMsg E10013{"Field %s is with function type. Declare it as a standard function instead.", errCodeStart++};
 inline LgsBaseMsg E10014{"Expression of type %s does not match base type %s.", errCodeStart++};
 inline LgsBaseMsg E10015{"Function %s was found but it doesnt match the parameters.\nGiven:\t  %s\nExpected:  %s", errCodeStart++};
@@ -34,13 +34,13 @@ inline LgsBaseMsg E10019{"activeEnv %s could not be found in the envs directory.
 inline LgsBaseMsg E10020{"Environment %s must declare the required variable %s.", errCodeStart++};
 inline LgsBaseMsg E10021{"%s and %s must be the same type. Given: %s and %s.", errCodeStart++};
 inline LgsBaseMsg E10022{"%s cannot be instantiated.", errCodeStart++};
-inline LgsBaseMsg E10023{"Expression with type %s must be nullable.", errCodeStart++};
+inline LgsBaseMsg E10023{"", errCodeStart++};
 inline LgsBaseMsg E10024{"null must have an explict nullable type.", errCodeStart++};
 inline LgsBaseMsg E10025{"Only interfaces are allowed in implements. Given: %s.", errCodeStart++};
 inline LgsBaseMsg E10026{"Function %s must return an expression of type %s. None was given.", errCodeStart++};
 inline LgsBaseMsg E10027{"Void function can either return Void type or empty return. Given: %s.", errCodeStart++};
 inline LgsBaseMsg E10028{"Default parameters must be defined lastly.", errCodeStart++};
-inline LgsBaseMsg E10029{"Constant field %s must be initialized in the class or in the constructor.", errCodeStart++};
+inline LgsBaseMsg E10029{"", errCodeStart++};
 inline LgsBaseMsg E10030{"Non-public field %s is used outside its parent object %s.", errCodeStart++};
 inline LgsBaseMsg E10031{"Non-public method %s is used outside its parent object %s.", errCodeStart++};
 inline LgsBaseMsg E10032{"Singleton object %s cannot be instantiated.", errCodeStart++};
@@ -71,7 +71,7 @@ inline LgsBaseMsg E10056{"%s has multiple fields with the same name %s.", errCod
 inline LgsBaseMsg E10057{"Pattern matching expression %s must be of type Bool.", errCodeStart++};
 inline LgsBaseMsg E10058{"Field '%s' is defined in multiple interfaces.", errCodeStart++};
 inline LgsBaseMsg E10059{"Unreachable code.", errCodeStart++};
-inline LgsBaseMsg E10060{"for.isFirst and for.isLast are only allowed inside a for loop.", errCodeStart++};
+inline LgsBaseMsg E10060{"for meta variables are only allowed inside a for loop.", errCodeStart++};
 inline LgsBaseMsg E10061{"%s is not allowed in an infinite loop.", errCodeStart++};
 inline LgsBaseMsg E10062{"Interface %s implements all its methods which is not allowed. Make at least one of the methods abstract (without implementation) or change it to object", errCodeStart++};
 inline LgsBaseMsg E10063{"Interfaces must have at least one (abstract) method or field.", errCodeStart++};
@@ -84,16 +84,16 @@ inline LgsBaseMsg E10069{"Too many scalars passed to %s.", errCodeStart++};
 inline LgsBaseMsg E10070{"Invalid scalars %s for %s.", errCodeStart++};
 inline LgsBaseMsg E10071{"break if must be inside an if statement.", errCodeStart++};
 inline LgsBaseMsg E10072{"%s has multiple methods with the same name %s.", errCodeStart++};
-inline LgsBaseMsg E10073{"Vector elements must be numbers or vectors. Given: %s.", errCodeStart++};
+inline LgsBaseMsg E10073{"Vector elements can only be numbers or vectors.", errCodeStart++};
 inline LgsBaseMsg E10074{"Too many vector elements for %s. Given: %s.", errCodeStart++};
-inline LgsBaseMsg E10075{"Expression %s already has an owner.", errCodeStart++};
-inline LgsBaseMsg E10076{"'%s' is not defined between %s and %s.", errCodeStart++}; // operation, left-expr, right-expr
-inline LgsBaseMsg E10077{"Expression %s has no owner.", errCodeStart++};
+inline LgsBaseMsg E10075{"Enum field values must all be the same type.", errCodeStart++};
+inline LgsBaseMsg E10076{"%s is not defined between %s and %s.", errCodeStart++}; // operation, left-expr, right-expr
+inline LgsBaseMsg E10077{"Enum field value must be of constant type.", errCodeStart++};
 inline LgsBaseMsg E10078{"Defer functions must return Void. Given: %s.", errCodeStart++};
 inline LgsBaseMsg E10079{"Test file %s must be inside tests directory.", errCodeStart++};
 inline LgsBaseMsg E10080{"Index %s was not found in iterable.", errCodeStart++};
 inline LgsBaseMsg E10081{"Range-start type %s is not equal to the range-end type %s.", errCodeStart++};
-inline LgsBaseMsg E10082{"Loop range %s must be a number. Given: %s.", errCodeStart++};
+inline LgsBaseMsg E10082{"Loop range %s must be an integer. Given: %s.", errCodeStart++};
 inline LgsBaseMsg E10083{"Method %s is an object method but was called as a class method.", errCodeStart++};
 inline LgsBaseMsg E10084{"%s does not belong to an IO pair.", errCodeStart++};
 inline LgsBaseMsg E10085{"Parsing error.", errCodeStart++};
@@ -106,8 +106,8 @@ inline LgsBaseMsg E10091{"'not' can only prefix Bool. Given: %s.", errCodeStart+
 inline LgsBaseMsg E10092{"If condition must be of type Bool. Given: %s.", errCodeStart++};
 inline LgsBaseMsg E10093{"Cannot assign variable to Void type.", errCodeStart++};
 inline LgsBaseMsg E10094{"%s is not a parameter of '%s'.", errCodeStart++};
-inline LgsBaseMsg E10095{"Could not infer the type of the iterable.", errCodeStart++};
-inline LgsBaseMsg E10096{"Mixed named und position arguments are not allowed.", errCodeStart++};
+inline LgsBaseMsg E10095{"Could not infer the iterable type.", errCodeStart++};
+inline LgsBaseMsg E10096{"Mixing named und position arguments is not allowed.", errCodeStart++};
 inline LgsBaseMsg E10097{"switch statement must have at least one pattern.", errCodeStart++};
 inline LgsBaseMsg E10098{"Argument %s is set more than one time.", errCodeStart++};
 inline LgsBaseMsg E10099{"Local names must start with a lowercase letter.", errCodeStart++};
@@ -120,8 +120,9 @@ inline LgsBaseMsg E10105{"Too many elements for array of size: %s.", errCodeStar
 inline LgsBaseMsg E10106{"Could not parse C file %s", errCodeStart++};
 inline LgsBaseMsg E10107{"Could not find C library %s", errCodeStart++};
 inline LgsBaseMsg E10108{"%s is not indexable.", errCodeStart++};
-inline LgsBaseMsg E10109{"Primitive types should not have an ownership.", errCodeStart++};
+inline LgsBaseMsg E10109{"Field default expression must be of constant type.", errCodeStart++};
 inline LgsBaseMsg E10110{"Unsigned number cannot be negative.", errCodeStart++};
 inline LgsBaseMsg E10111{"Array type %s does not match the element type %s.", errCodeStart++};
 inline LgsBaseMsg E10112{"Matrix rows/columns cannot be 0.", errCodeStart++};
 inline LgsBaseMsg E10113{"Only nullable values can be unwrapped with '!'.", errCodeStart++};
+inline LgsBaseMsg E10114{"Static array size must be known at compile time.", errCodeStart++};

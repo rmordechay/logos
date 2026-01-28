@@ -8,32 +8,22 @@
 #include <sstream>
 #include <llvm/IR/InlineAsm.h>
 
-Value* LgsSelection::loadIR(LgsCgModule& cg) {
-    if (type->passByRef) return cg.builder.CreateLoad(cg.ptrTy(), IRValue);
-    return cg.builder.CreateLoad(type->getIRType(cg), IRValue);
-}
-
-LgsExpr* LgsSelection::lastExpr() const {
-    return exprs[exprs.size() - 1];
+Value* LgsSelection::loadIR(LgsCodeGen& cg) {
+    if (type->asEnum()) return IRValue;
+    if (!type->passByRef && asMethodCall()) return IRValue;
+    return cg.load(type->getTypeOrPtr(cg), IRValue);
 }
 
 LgsFuncCall* LgsSelection::asMethodCall() const {
-    return lastExpr()->asFuncCall();
+    return exprs.back()->asFuncCall();
 }
 
-void LgsSelection::assign(LgsCgModule& cg, LgsExpr* expr) {
-    const auto rIR = expr->IRValue;
-    const auto lExpr = lastExpr();
-    if (lExpr->type->asVec()) {
-        const auto vecTy = lExpr->type->getIRType(cg);
-        const auto vec = cg.builder.CreateLoad(vecTy, lExpr->IRValue);
-        const auto c = lastExpr()->asVariable()->name;
-        const auto i = cg.i32(LgsVec::getComponentIndex(c.front()));
-        const auto insert = cg.builder.CreateInsertElement(vec, rIR, i);
-        cg.store(insert, lExpr->IRValue);
+void LgsSelection::assign(LgsCodeGen& cg, LgsExpr* right) {
+    assert(!type->asVec());
+    if (type->isHeapAlloc || right->type->isHeapAlloc) {
+        moveValue(cg, IRValue, right->IRValue, type);
     } else {
-        cg.freeValue(loadIR(cg), type->getRTType(cg));
-        cg.store(rIR, IRValue);
+        cg.store(right->IRValue, IRValue);
     }
 }
 
@@ -44,10 +34,6 @@ std::string LgsSelection::asText() {
         str << '.' << exprs[i]->asText();
     }
     return str.str();
-}
-
-Value* LgsSelection::hashValue(LgsCgModule& cg) {
-    return lastExpr()->hashValue(cg);
 }
 
 bool LgsSelection::equals(LgsExpr* other) {
@@ -62,7 +48,7 @@ bool LgsSelection::equals(LgsExpr* other) {
     return true;
 }
 
-void LgsSelection::setDebugValue(LgsCgModule& cg) {
+void LgsSelection::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }
 

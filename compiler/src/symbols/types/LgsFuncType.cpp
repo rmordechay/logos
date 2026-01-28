@@ -1,37 +1,26 @@
 #include "types/LgsFuncType.h"
 #include "LgsDefinitions.h"
-#include "codegen/LgsCgModule.h"
+#include "codegen/LgsCodeGen.h"
 #include "types/LgsGenericType.h"
 #include "LgsUtils.h"
 #include <sstream>
 
-Type* LgsFuncType::getIRType(LgsCgModule& cg) {
+Type* LgsFuncType::getIRType(LgsCodeGen& cg) {
+    assert(rt);
     std::vector<Type*> types;
     for (size_t i = 0; i < params.size(); ++i) {
         const auto param = params[i];
         const auto paramType = param.type;
         if (param.isVariadic) types.emplace_back(cg.sizeTy());
-        if (param.type->passByRef) {
-            types.emplace_back(cg.ptrTy());
-        } else {
-            types.emplace_back(paramType->getIRType(cg));
-        }
+        types.emplace_back(paramType->getTypeOrPtr(cg));
     }
-    const auto returnType = rt->isBig() ? cg.ptrTy() : rt->getIRType(cg);
+    const auto returnType = rt->getTypeOrPtr(cg);
     IRType = cg.getFT(returnType, types, this->isVariadic);
     return IRType;
 }
 
-Constant* LgsFuncType::getRTType(LgsCgModule& cg) {
-    const auto funcName = getName();
-    std::vector<LgsOwner*> paramsAsOwners;
-    for (auto& param : params) paramsAsOwners.emplace_back(static_cast<LgsOwner*>(&param));
-    const auto [typesArr, hashesArr] = getRTFieldsInfo(cg, funcName, paramsAsOwners);
-    // paramsCount, paramHashes, paramTypes, rt
-    const auto sv = cg.getRTTExtraStruct(funcName, {cg.sizeTy(), cg.ptrTy(), cg.ptrTy(), cg.ptrTy()}, {
-        cg.usize(params.size()), hashesArr, typesArr, rt->getRTType(cg)
-    });
-    return cg.getRTTypeInfo(funcName, sizeBytes(), RTT_FUNC, isHeapAlloc, sv);
+Constant* LgsFuncType::getRTType(LgsCodeGen& cg) {
+    assert(0);
 }
 
 LgsExpr* LgsFuncType::getZeroValue() {
@@ -43,18 +32,21 @@ size_t LgsFuncType::sizeBytes() {
 }
 
 std::string LgsFuncType::getName() {
-    if (name == "") return LGS_LAMBDA_NAME;
-    std::stringstream strStream;
-    if (!isExternal) {
-        if (isBuiltin) strStream << LGS_PREFIX;
-        else strStream << "u_";
-    }
+    assert(name != "");
+    if (isExternal) return name;
+    std::stringstream str;
+    if (isBuiltin) str << LGS_PREFIX;
+    else str << "u_";
     if (parentName != "") {
-        strStream << parentName << "_";
+        str << parentName << "_";
     }
-    strStream << name;
-    if (isCoroutine) strStream << LGS_CORO_SUFFIX;
-    return strStream.str();
+    str << name;
+    for (size_t i = isMethod; i < params.size(); ++i) {
+        const auto& param = params[i];
+        str << '_' << param.type->getName();
+    }
+    if (isCoroutine) str << LGS_CORO_SUFFIX;
+    return str.str();
 }
 
 std::string LgsFuncType::pname() {
@@ -89,7 +81,7 @@ bool LgsFuncType::canCastTo(LgsType* other) {
     const auto otherParams = otherFuncType->params;
     if (params.size() != otherParams.size()) return false;
     if (params.size() == 0 && otherParams.size() == 0) return true;
-    if (otherFuncType->rt && !rt->canCastTo(otherFuncType->rt)) return false;
+    if (rt && otherFuncType->rt && !rt->canCastTo(otherFuncType->rt)) return false;
     for (size_t i = isMethod; i < params.size(); ++i) {
         const auto thisType = params[i].type;
         const auto otherType = otherFuncType->params[i].type;
@@ -105,7 +97,7 @@ bool LgsFuncType::equals(LgsType* other) {
     if (name != otherFuncType->name) return false;
     if (!rt->equals(otherFuncType->rt)) return false;
     if (params.size() != otherFuncType->params.size()) return false;
-    for (size_t i = 0; i < params.size(); ++i) {
+    for (size_t i = isMethod; i < params.size(); ++i) {
         const auto param1 = params[i].type;
         const auto param2 = otherFuncType->params[i];
         if (!param1->equals(param2.type)) return false;
@@ -140,15 +132,24 @@ std::unordered_map<std::string, LgsParam*> LgsFuncType::getParamsByName() {
     return paramsByName;
 }
 
-DIType* LgsFuncType::getDebugType(LgsCgModule& cg) {
+DIType* LgsFuncType::getDebugType(LgsCodeGen& cg) {
     assert(0);
 }
 
-bool LgsFuncType::isGenericType(LgsType* type) const {
-    for (const auto genericType : genericTypes) {
-        if (genericType->equals(type)) return true;
+LgsFuncType* LgsFuncType::clone() {
+    const auto newFuncType = new LgsFuncType(*this);
+    newFuncType->rt = rt->clone();
+    newFuncType->params.clear();
+    for (const auto& param : params) {
+        newFuncType->params.emplace_back(param.type->clone());
     }
-    return false;
+    return newFuncType;
+}
+
+void LgsFuncType::addSelf(LgsType* selfType) {
+    isMethod = true;
+    params.insert(params.begin(), LgsParam(selfType, LGS_SELF));
+    params.front().isSelf = true;
 }
 
 LgsFuncType::~LgsFuncType() {

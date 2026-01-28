@@ -12,17 +12,20 @@ class LgsInstance final : public LgsExpr {
 public:
     std::string name;
     LgsObject* obj = nullptr;
+    std::vector<LgsField*> fields;
     std::map<std::string, LgsInstanceArg> args;
     std::vector<LgsType*> generics;
+    inline static Lgs_InstanceIndices rttIndices;
 
     explicit LgsInstance(const std::string& name): name(name) {}
     explicit LgsInstance(LgsObject* obj) : LgsExpr(obj), name(obj->name), obj(obj) {}
     std::string asText() override;
     LgsExpr* castExplicitly(LgsType* toType) override;
-    Value* loadIR(LgsCgModule& cg) override;
+    Value* loadIR(LgsCodeGen& cg) override;
     void hashNode(size_t& oldHash) override;
     void setObject(LgsObject* newObj);
     bool equals(LgsExpr* other) override;
-    void setDebugValue(LgsCgModule& cg) override;
+    void setDebugValue(LgsCodeGen& cg) override;
+    LgsField* getField(const std::string& fieldName) const;
     ~LgsInstance() override;
 };

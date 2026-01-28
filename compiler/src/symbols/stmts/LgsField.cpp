@@ -7,8 +7,9 @@ void LgsField::setType(LgsType* newType) {
     type = newType;
 }
 
-Value* LgsField::loadIR(LgsCgModule& cg) {
-    return cg.builder.CreateLoad(type->getIRType(cg), IRValue);
+Value* LgsField::loadIR(LgsCodeGen& cg) {
+    if (type->asEnum()) return IRValue;
+    return cg.load(type->getIRType(cg), IRValue);
 }
 
 std::string LgsField::getName() {
@@ -19,12 +20,14 @@ LgsType* LgsField::getType() {
     return type;
 }
 
-Value* LgsField::getGEP(LgsCgModule& cg, Value* parentIRPtr) const {
-    assert(parentType);
-    return cg.builder.CreateStructGEP(parentType->getIRType(cg), parentIRPtr, position);
+Value* LgsField::getGEP(LgsCodeGen& cg, Value* parentIRPtr) {
+    if (gep) return gep;
+    assert(parentType && parentIRPtr);
+    gep = cg.builder.CreateStructGEP(parentType->getIRType(cg), parentIRPtr, position);
+    return gep;
 }
 
-void LgsField::setDebugValue(LgsCgModule& cg) {
+void LgsField::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }
 

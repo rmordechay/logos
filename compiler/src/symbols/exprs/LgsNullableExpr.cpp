@@ -1,35 +1,39 @@
 #include "exprs/LgsNullableExpr.h"
-#include "codegen/LgsCgModule.h"
+#include "codegen/LgsCodeGen.h"
 
-Value* LgsNullableExpr::loadIR(LgsCgModule& cg) {
+Value* LgsNullableExpr::loadIR(LgsCodeGen& cg) {
     if (isNull) return IRValue;
-    if (type->passByRef) return cg.builder.CreateLoad(cg.ptrTy(), IRValue);
-    return cg.builder.CreateLoad(type->getIRType(cg), IRValue);
+    return cg.load(type->getTypeOrPtr(cg), IRValue);
 }
 
-void LgsNullableExpr::assign(LgsCgModule& cg, LgsExpr* expr) {
-    if (type->isHeapAlloc) {
-        cg.freeValue(loadIR(cg), type->getRTType(cg));
-    }
+void LgsNullableExpr::assign(LgsCodeGen& cg, LgsExpr* right) {
     if (!type->passByRef) {
-        const auto isSet = cg.builder.CreateIsNotNull(expr->IRValue);
-        type->asNullable()->setNullableFields(cg, IRValue, expr->IRValue, isSet);
+        const auto isSet = cg.builder.CreateIsNotNull(right->IRValue);
+        type->asNullable()->setIRFields(cg, IRValue, right->IRValue, isSet);
         return;
     }
-    cg.store(expr->IRValue, IRValue);
+    cg.store(right->IRValue, IRValue);
 }
 
-void LgsNullableExpr::setDebugValue(LgsCgModule& cg) {
+void LgsNullableExpr::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }
 
 void LgsNullableExpr::castImplicitly(LgsType* toType) {
     const auto otherNullable = toType->asNullable();
     if (isNull && otherNullable) {
-        type = otherNullable;
+        setType(otherNullable);
     }
 }
 
 std::string LgsNullableExpr::asText() {
     return baseExpr->asText() + '?';
+}
+
+LgsExpr* LgsNullableExpr::clone() {
+    const auto newNullableExpr = new LgsNullableExpr(*this);
+    if (newNullableExpr->baseExpr) {
+        newNullableExpr->baseExpr = baseExpr->clone();
+    }
+    return newNullableExpr;
 }

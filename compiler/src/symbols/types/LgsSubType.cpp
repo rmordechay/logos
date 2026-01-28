@@ -3,11 +3,11 @@
 
 #include <cassert>
 
-Type* LgsSubType::getIRType(LgsCgModule& cg) {
+Type* LgsSubType::getIRType(LgsCodeGen& cg) {
     return subtype->getIRType(cg);
 }
 
-Constant* LgsSubType::getRTType(LgsCgModule& cg) {
+Constant* LgsSubType::getRTType(LgsCodeGen& cg) {
     assert(0);
 }
 
@@ -30,7 +30,7 @@ std::string LgsSubType::pname() {
 
 bool LgsSubType::canCastTo(LgsType* other) {
     const auto otherName = other->getName();
-    if (otherName == LgsAny::name) return true;
+    if (other->isAny()) return true;
     return getName() == otherName;
 }
 
@@ -42,6 +42,6 @@ std::string LgsSubType::fmtStr() const {
     return subtype->fmtStr();
 }
 
-DIType* LgsSubType::getDebugType(LgsCgModule& cg) {
+DIType* LgsSubType::getDebugType(LgsCodeGen& cg) {
     assert(0);
 }

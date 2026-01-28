@@ -1,6 +1,5 @@
 #include "stmts/LgsStmt.h"
 #include "funcs/LgsCoroutine.h"
-#include "exprs/LgsFuncCall.h"
 #include "stmts/LgsAssignment.h"
 #include "stmts/LgsBreak.h"
 #include "stmts/LgsContinue.h"

@@ -6,28 +6,18 @@ public:
     static constexpr auto name = "Size";
 
     LgsSize() {
-        isPrimitive = true;
         isInt = true;
+        rttKind = RTT_SIZE;
     }
     size_t sizeBytes() override;
-    Type* getIRType(LgsCgModule& cg) override;
+    Type* getIRType(LgsCodeGen& cg) override;
     std::string getName() override;
     LgsExpr* getZeroValue() override;
-    Constant* getRTType(LgsCgModule& cg) override;
+    Constant* getRTType(LgsCodeGen& cg) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
-    Value* addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* subIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* divIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* modIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* bitAndIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* bitOrIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* bitXorIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* rshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) override;
-    Value* lshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* other) override;
     bool canCastTo(LgsType* other) override;
     std::string fmtStr() const override;
-    DIType* getDebugType(LgsCgModule& cg) override;
+    DIType* getDebugType(LgsCodeGen& cg) override;
 };
 
 inline LgsSize LGS_SIZE;

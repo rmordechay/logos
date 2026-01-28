@@ -1,6 +1,11 @@
 #pragma once
+#include <math.h>
+
 #include "LgsValue.h"
 
+class LgsField;
+class LgsParam;
+class LgsVarDec;
 class LgsComplexConst;
 class LgsNullable;
 class LgsNullableExpr;
@@ -16,7 +21,7 @@ class LgsIntConst;
 class LgsVectorExpr;
 class LgsPrefixExpr;
 class LgsPostfixExpr;
-class LgsCgModule;
+class LgsCodeGen;
 class LgsFunc;
 class LgsHashMap;
 class LgsFuncCall;
@@ -32,30 +37,31 @@ class LgsFloatConst;
 class LgsStrConst;
 class LgsTypeConst;
 
+
 class LgsExpr : public LgsValue {
 public:
     LgsType* type = nullptr;
     bool isMutable = true;
     bool isImportName = false;
     bool isNull = false;
-    bool isReturnExpr = false;
     bool hasUnwrapSuffix = false;
-    LgsValue* owner = nullptr;
+
+    bool isReturnExpr = false;
+    bool hasMoved = false;
     Value* pointee = nullptr;
 
     explicit LgsExpr(LgsType* type = nullptr) : type(type) {}
     std::optional<int64_t> getConstInt();
+    std::optional<double_t> getConstFloat();
     std::optional<std::string> getConstStr();
-    void setType(LgsType* newType);
-    Value* getPtrTo(LgsCgModule& cg) const;
+    LgsType* getType() override;
 
+    virtual void setType(LgsType* newType);
     virtual LgsExpr* castExplicitly(LgsType* toType);
     virtual void castImplicitly(LgsType* toType);
-    virtual Value* hashValue(LgsCgModule& cg);
-    virtual void assign(LgsCgModule& cg, LgsExpr* expr);
+    virtual void assign(LgsCodeGen& cg, LgsExpr* right);
     virtual bool equals(LgsExpr* other);
     virtual std::string asText() = 0;
-    virtual LgsExpr* clone();
 
     LgsFunc* asFunc();
     LgsVariable* asVariable();
@@ -82,11 +88,13 @@ public:
     LgsBinaryExpr* asBinExpr();
     LgsMetaSelection* asMetaSelection();
     LgsNullableExpr* asNullableExpr();
+    LgsExpr* clone() override;
     ~LgsExpr() override = default;
 };
 
 void wrapInNullable(LgsExpr*& expr, LgsNullable* nullable);
 void castExprImplicitly(LgsExpr*& expr, LgsType* toType);
+Value* moveValue(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
 
 void freeExpr(LgsExpr* expr);
 template<typename T>

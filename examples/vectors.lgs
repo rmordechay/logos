@@ -1,14 +1,20 @@
 main() {
-    v1 = vec3(.23, .578, .17)
-    v2 = vec3(.32, .38, .34)
-    v3 = v1 * 3
-    v4 = v1 * v2
-    v5 = v1 + v2
-    v6 = v1 - v2
-    print(v1)
-    print(v2)
-    print(v3)
-    print(v4)
-    print(v5)
-    print(v6)
+    vec1 = Vec3(2.34, 3.71, 8.34)
+    vec2 = Vec3(4.24, 6.24, 5.54)
+    mat = Mat3x3(
+        [1.0, 2.0, 3.0],
+        [4.0, 5.0, 6.0],
+        [7.0, 8.0, 9.0],
+    )
+    //print(vec1)
+    print(mat * vec1 + 3)
+    print(mat * (vec1 + 3))
+    print(vec1 + 3)
+    print(vec1 - 3)
+    print(vec1 * 3)
+    print(vec1 / 3)
+    print(vec1 + vec2)
+    print(vec1 - vec2)
+    print(vec1 * vec2)
+    print(vec1 x vec2)
 }

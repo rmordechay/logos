@@ -9,36 +9,42 @@
 class LgsMap final : public LgsIterable {
 public:
     static constexpr auto name = "Map";
-    LgsTypePair* mapType = nullptr;
+    LgsTypePair* pairType = nullptr;
+    inline static Lgs_HashMapIndices rttIndices;
 
     explicit LgsMap(LgsType* keyType = nullptr, LgsType* valueType = nullptr): LgsIterable(new LgsTypePair(keyType, valueType)) {
-        mapType = baseType->asPair();
+        pairType = baseType->asPair();
         isHeapAlloc = true;
         passByRef = true;
     }
     LgsFunc* getMethod(const std::string& methodName) override;
-    Type* getIRType(LgsCgModule& cg) override;
-    Constant* getRTType(LgsCgModule& cg) override;
+    Type* getIRType(LgsCodeGen& cg) override;
+    Constant* getRTType(LgsCodeGen& cg) override;
+    std::string getBaseName() override;
     std::string getName() override;
     std::string pname() override;
     size_t sizeBytes() override;
-    LgsExpr* getZeroValue() override;
     LgsType* getIndexType() override;
     LgsType* getValueType() override;
+    bool canCastTo(LgsType* other) override;
+    LgsExpr* getZeroValue() override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     bool inferBaseType(std::vector<LgsExpr*>& args) override;
-    bool unpackLoopVarsTypes(LgsForeachLoop* loop) const override;
-    void unpackLoopIR(LgsCgModule& cg, LgsForeachLoop* loop) const override;
-    Value* lenIR(LgsCgModule& cg, Value* iterable) override;
-    Value* inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
-    Value* getIRElement(LgsCgModule& cg, Value* iterable, Value* index) override;
-    bool canCastTo(LgsType* other) override;
+    Value* lenIR(LgsCodeGen& cg, Value* iterable) override;
+    Value* inIR(LgsCodeGen& cg, Value* iterableExpr, Value* value) override;
+    Value* getIRElement(LgsCodeGen& cg, Value* map, Value* index) override;
+    Function* generateAddFunc(LgsCodeGen& cg);
+    void addIRElement(LgsCodeGen& cg, Value* map, Value* index, Value* value) override;
+    StructType* getEntryStruct(LgsCodeGen& cg) const;
+    Value* loadEntriesField(LgsCodeGen& cg, Value* map);
+    Value* loadCapField(LgsCodeGen& cg, Value* map);
+    Value* getEntryKey(LgsCodeGen& cg, Value* entry) const;
+    Value* getEntryValue(LgsCodeGen& cg, Value* entry) const;
+    Value* getEntryNext(LgsCodeGen& cg, Value* entry) const;
+    bool unpackLoopVars(LgsForeachLoop* loop) const override;
+    void setLoopIRVars(LgsCodeGen& cg, LgsForeachLoop* loop) override;
     std::string fmtStr() const override;
-    DIType* getDebugType(LgsCgModule& cg) override;
+    DIType* getDebugType(LgsCodeGen& cg) override;
+    Function* generateGetFunc(LgsCodeGen& cg);
 };
 
-class LgsPair final {
-public:
-    LgsExpr* key;
-    LgsExpr* value;
-};

@@ -16,6 +16,7 @@ class LgsFuncCall final : public LgsExpr {
 public:
     std::string name;
     std::vector<LgsFuncArg> args;
+    std::vector<LgsType*> genericArgs;
     LgsFunc* func = nullptr;
     LgsFunc* coroutine = nullptr;
     bool inSelection = false;
@@ -26,13 +27,13 @@ public:
 
     explicit LgsFuncCall(const std::string& name) : name(name) {}
     std::string getGenericName() const;
-    Value* loadIR(LgsCgModule& cg) override;
+    Value* loadIR(LgsCodeGen& cg) override;
     bool equals(LgsExpr* other) override;
     bool equals(LgsFuncType* funcType) const;
     bool equalsVariadic(const LgsFuncType* funcType) const;
     bool equalsDefaults(LgsFuncType* funcType) const;
     std::string asText() override;
-    void setDebugValue(LgsCgModule& cg) override;
-    LgsExpr* clone() override;
+    void setDebugValue(LgsCodeGen& cg) override;
+    LgsFuncCall* clone() override;
     ~LgsFuncCall() override;
 };

@@ -24,7 +24,7 @@
 #include "loops/LgsRangeLoop.h"
 #include "loops/LgsWhileLoop.h"
 #include "LgsTokens.h"
-#include "../../include/symbols/exprs/constants/LgsComplexConst.h"
+#include "exprs/constants/LgsComplexConst.h"
 #include "errors/LgsPlmErrors.h"
 #include "exprs/LgsBinaryExpr.h"
 #include "exprs/LgsCast.h"
@@ -62,11 +62,13 @@
 #include "types/primitives/LgsShort.h"
 #include "types/primitives/LgsSize.h"
 #include "types/primitives/LgsUInt.h"
-#include "types/primitives/LgsULong.h"
 #include <unordered_set>
 
-#define MAX_TOKENS_NUMBER 100000
+#include "exprs/LgsNullableExpr.h"
+
 LgsFunc* wrapStmtsBlockWithLambda(LgsStmtsBlock* stmtsBlock);
+
+#define MAX_TOKENS_NUMBER 100000
 
 bool LgsParser::scanTokens() {
     if (code == "") {
@@ -384,13 +386,14 @@ LgsObject* LgsParser::parseObjectBody(const LgsToken& tokenName, const bool isSi
         }
     }
 
-    auto fieldPosition = 0;
+    // First field is level, second metadata
+    auto fieldPosition = 2;
     while (true) {
         if (const auto field = parseField(fieldPosition)) {
             fieldPosition++;
             if (headersOnly && !field->isPublic) continue;
             field->parentType = obj;
-            obj->addField(field);
+            obj->fields.push_back(field);
         } else if (const auto innerObj = parseObject()) {
             obj->objects.push_back(innerObj);
         } else if (const auto enum_ = parseEnum()) {
@@ -434,7 +437,7 @@ LgsInterface* LgsParser::parseInterfaceBody(const LgsToken& tokenName) {
         if (const auto field = parseField(fieldPosition)) {
             fieldPosition++;
             field->isVirtual = true;
-            interface->addField(field);
+            interface->fields.push_back(field);
         } else {
             break;
         }
@@ -447,8 +450,9 @@ LgsInterface* LgsParser::parseInterfaceBody(const LgsToken& tokenName) {
         const auto method = new LgsFunc(funcHeader);
         method->funcType->isPublic = true;
         method->funcType->isVirtual = true;
+        method->funcType->addSelf(interface);
         method->stmtsBlock = parseStmtsBlock(false);
-        if (method->stmtsBlock->isMacro) addParsingError();
+        if (method->stmtsBlock && method->stmtsBlock->isMacro) addParsingError();
         interface->addMethod(method);
         if (currentToken.type == T_RBRACE || currentToken.type == T_EOF) break;
     }
@@ -458,19 +462,11 @@ LgsInterface* LgsParser::parseInterfaceBody(const LgsToken& tokenName) {
 
 LgsField* LgsParser::parseField(const size_t fieldPosition) {
     const auto oldIndex = currentIndex;
-    auto isConst = false;
-    auto isOwner = false;
-    auto isPublic = false;
+    std::optional<bool> isPublic = std::nullopt;
 
     // Qualifiers
     while (true) {
-        if (matchAndConsume(T_OWNER)) {
-            if (isOwner) addParsingError();
-            isOwner = true;
-        } else if (matchAndConsume(T_CONST)) {
-            if (isConst) addParsingError();
-            isConst = true;
-        } else if (matchAndConsume(T_PUBLIC)) {
+        if (matchAndConsume(T_PUBLIC)) {
             if (isPublic) addParsingError();
             isPublic = true;
         } else {
@@ -492,9 +488,7 @@ LgsField* LgsParser::parseField(const size_t fieldPosition) {
     setLocation(field->location, &nameToken, &currentToken);
     field->setType(type);
     field->position = fieldPosition;
-    field->isConst = isConst;
-    field->isOwner = isOwner;
-    field->isPublic = isPublic;
+    if (isPublic.has_value()) field->isPublic = isPublic.value();
     return field;
 }
 
@@ -555,16 +549,11 @@ LgsType* LgsParser::parseType() {
         else type = new LgsUnknown(typeText);
         consume();
     }
-    if (type && currentToken.type == T_LANGLE) {
+    if (!type) return nullptr;
+    if (currentToken.type == T_LANGLE) {
         type->genericArgs = parseGenericArgs();
     }
     setLocation(type->location, &startToken, &currentToken);
-
-    // Nullable
-    if (type && matchAndConsume(T_QUEST_MARK)) {
-        type = new LgsNullable(type);
-        setLocation(type->location, &startToken, &currentToken);
-    }
 
     // Array
     if (type && currentToken.type == T_LBRACK) {
@@ -585,6 +574,13 @@ LgsType* LgsParser::parseType() {
             }
         }
     }
+
+    // Nullable
+    if (type && matchAndConsume(T_QUEST_MARK)) {
+        type = new LgsNullable(type);
+        setLocation(type->location, &startToken, &currentToken);
+    }
+
     return type;
 }
 
@@ -603,11 +599,13 @@ LgsEnum* LgsParser::parseEnum() {
             expr = parseExpr();
             mustParse(expr);
         }
-        const auto field = new LgsField(enumField.lexeme, enum_, expr);
-        field->isEnumField = true;
-        field->position = position++;
+        position++;
+        const auto fieldType = new LgsEnum(enum_->name, enumField.lexeme, position);
+        const auto field = new LgsField(enumField.lexeme, fieldType, expr);
+        field->position = position;
+        field->isMutable = false;
         setLocation(field->location, &enumField, &currentToken);
-        enum_->addField(field);
+        enum_->fields.push_back(field);
         if (currentToken.type == T_RBRACE) break;
     }
     mustMatch(T_RBRACE);
@@ -655,7 +653,7 @@ LgsFuncType* LgsParser::parseFuncType() {
     mustMatch(T_COLON);
     funcType->rt = parseType();
     mustParse(funcType->rt);
-    setLocation(funcType->location, &startToken, &currentToken);
+    setLocation(funcType->location, &startToken, &startToken);
     return funcType;
 }
 
@@ -669,8 +667,8 @@ LgsMap* LgsParser::parseMapType() {
     const auto r = parseType();
     mustParse(r);
     mustMatch(T_RBRACE);
-    mapType->mapType->key = l;
-    mapType->mapType->value = r;
+    mapType->pairType->key = l;
+    mapType->pairType->value = r;
     setLocation(mapType->location, &startToken, &currentToken);
     return mapType;
 }
@@ -736,20 +734,17 @@ LgsFunc* LgsParser::parseMethod(LgsObject* obj) {
     if (matchAndConsume(T_PUBLIC)) {
         isPublic = true;
     }
-    const auto funcHeader = parseFuncHeader();
+    const auto& funcHeader = parseFuncHeader();
     if (!funcHeader) return nullptr;
     funcHeader->parentName = obj->name;
     const auto func = new LgsFunc(funcHeader);
     currentFunc = func;
     func->location = func->funcType->location;
+    funcHeader->isPublic = isPublic;
+    funcHeader->addSelf(obj);
     if (!headersOnly) {
         func->stmtsBlock = parseStmtsBlock();
         if (func->stmtsBlock->isMacro) addParsingError();
-    }
-    func->funcType->isPublic = isPublic;
-    if (func->funcType->isMethod) {
-        func->funcType->params.insert(func->funcType->params.begin(), LgsParam(obj, LGS_SELF));
-        func->funcType->params.front().isSelf = true;
     }
     currentFunc = nullptr;
     return func;
@@ -766,24 +761,21 @@ LgsFuncType* LgsParser::parseFuncHeader() {
             if (!type) break;
             genericsTypes.push_back(type);
             if (currentToken.type == T_RANGLE) break;
+            mustMatch(T_COMMA);
         }
         mustMatch(T_RANGLE);
+        if (genericsTypes.empty()) addParsingError();
     } else if (peek().type == T_LPAREN) {
         consume();
     } else {
         return nullptr;
     }
 
-    const auto funcType = new LgsFuncType();
-    funcType->name = nameToken.lexeme;
+    const auto funcType = new LgsFuncType(nameToken.lexeme);
     funcType->genericTypes = genericsTypes;
     parseParams(funcType);
     mustMatch(T_RPAREN);
-    if (matchAndConsume(T_COLON)) {
-        funcType->rt = parseType();
-    } else {
-        funcType->rt = &LGS_VOID;
-    }
+    funcType->rt = matchAndConsume(T_COLON) ? parseType() : &LGS_VOID;
     setLocation(funcType->location, &nameToken, &currentToken);
     return funcType;
 }
@@ -821,6 +813,13 @@ void LgsParser::parseParams(LgsFuncType* funcType) {
             param.expr = parseExpr();
             mustParse(param.expr);
             funcType->hasDefaults = true;
+        }
+
+        // Generic type
+        for (const auto genericType : funcType->genericTypes) {
+            if (genericType->name != param.type->getName()) continue;
+            param.genericType = genericType;
+            break;
         }
 
         setLocation(param.location, &paramName, &currentToken);
@@ -889,22 +888,18 @@ LgsStmtsBlock* LgsParser::parseStmtsBlock(const bool withSingleStmt) {
 
 LgsVarDec* LgsParser::parseVarDec() {
     const auto oldIndex = currentIndex;
-    auto isConst = false;
-    auto isOwner = false;
+    auto isMut = false;
     while (true) {
-        if (matchAndConsume(T_OWNER)) {
-            if (isOwner) addParsingError();
-            isOwner = true;
-        } else if (matchAndConsume(T_CONST)) {
-            if (isConst) addParsingError();
-            isConst = true;
+        if (matchAndConsume(T_MUT)) {
+            if (isMut) addParsingError();
+            isMut = true;
         } else {
             break;
         }
     }
 
     const auto nameToken = currentToken;
-    if (isConst || isOwner) {
+    if (isMut) {
         mustMatch(T_IDENTIFIER);
     } else if (!matchOrReset(T_IDENTIFIER, oldIndex)) {
         return nullptr;
@@ -928,74 +923,41 @@ LgsVarDec* LgsParser::parseVarDec() {
 
     const auto varDec = new LgsVarDec(nameToken.lexeme, type, expr);
     setLocation(varDec->location, &nameToken, &currentToken);
-    varDec->isConst = isConst;
-    varDec->isOwner = isOwner;
+    varDec->isMutable = isMut;
     return varDec;
-}
-
-LgsAssignType LgsParser::parseAssignType() {
-    const auto opToken = currentToken;
-    LgsAssignType op = {};
-    switch (opToken.type) {
-    case T_WALRUS:
-        op = ASSIGN;
-        break;
-    case T_EQUAL_PLUS:
-        op = ASSIGN_ADD;
-        break;
-    case T_EQUAL_MINUS:
-        op = ASSIGN_SUB;
-        break;
-    case T_EQUAL_STAR:
-        op = ASSIGN_MUL;
-        break;
-    case T_EQUAL_SLASH:
-        op = ASSIGN_DIV;
-        break;
-    case T_EQUAL_PERCENT:
-        op = ASSIGN_MOD;
-        break;
-    case T_EQUAL_AMPERSAND:
-        op = ASSIGN_AND;
-        break;
-    case T_EQUAL_PIPE:
-        op = ASSIGN_OR;
-        break;
-    case T_EQUAL_CARET:
-        op = ASSIGN_XOR;
-        break;
-    case T_EQUAL_DOUBLE_RANGLE:
-        op = ASSIGN_LSHIFT;
-        break;
-    case T_EQUAL_DOUBLE_LANGLE:
-        op = ASSIGN_RSHIFT;
-        break;
-    default:
-        return ASSIGN_UNKNOWN;
-    }
-    consume();
-    return op;
 }
 
 LgsStmt* LgsParser::parseAssignment() {
     const auto oldIndex = currentIndex;
-    // Assignment
+    // Left expr
     const auto l = parseExpr();
     if (!parsedOrReset(l, oldIndex)) return nullptr;
-    const auto opToken = currentToken;
-    const auto op = parseAssignType();
-    if (op == ASSIGN_UNKNOWN) {
+
+    // Operation
+    if (!LGS_BINARY_OPS_DICT.contains(currentToken.type) && currentToken.type != T_WALRUS) {
         freeExpr(l);
         reset(oldIndex);
         return nullptr;
     }
+    const auto opToken = currentToken;
+    consume();
+
+    // Right expr
     const auto r = parseExpr();
     if (!r) {
         freeExpr(l);
         reset(oldIndex);
         return nullptr;
     }
-    const auto assignment = new LgsAssignment(op, l, r);
+
+    LgsAssignment* assignment;
+    if (currentToken.type != T_WALRUS) {
+        assignment = new LgsAssignment(l, r);
+    } else {
+        const auto op = LGS_BINARY_OPS_DICT.at(opToken.type);
+        const auto binExpr = new LgsBinaryExpr(l, r, op);
+        assignment = new LgsAssignment(binExpr);
+    }
     setLocation(assignment->location, &opToken, &currentToken);
     return assignment;
 }
@@ -1272,7 +1234,6 @@ LgsIOStmt* LgsParser::parseIOStmt() {
     ioStmt->location = firstExpr->location;
     ioStmt->varDec = new LgsVarDec("", nullptr);
     ioStmt->varDec->location = ioStmt->location;
-    ioStmt->varDec->isConst = true;
     if (const auto var = firstExpr->asVariable()) {
         ioStmt->varDec->name = var->name;
         if (matchAndConsume(T_COLON)) {
@@ -1334,6 +1295,7 @@ LgsExpr* LgsParser::parseExprWithPrecedence(const int minPrecedence, const bool 
         } else {
             break;
         }
+        const auto opToken = currentToken;
         consume();
         const auto precedence = getBinOpPrecedence(op->opType);
         if (precedence < minPrecedence) {
@@ -1350,7 +1312,7 @@ LgsExpr* LgsParser::parseExprWithPrecedence(const int minPrecedence, const bool 
         } else {
             left = new LgsBinaryExpr(left, right, *op);
         }
-        setLocation(left->location, &startToken, &currentToken);
+        setLocation(left->location, &opToken, &currentToken);
     }
     return left;
 }
@@ -1365,6 +1327,7 @@ LgsExpr* LgsParser::parseUnary(const bool withInstance) {
 
     if (const auto metaVar = parseLoopMetaVar()) return metaVar;
     if (const auto constant = parseConstant()) expr = constant;
+    else if (const auto charConst = parseCharConst()) expr = charConst;
     else if (const auto strConst = parseStrConst()) expr = strConst;
     else if (const auto vector = parseVectorExpr()) expr = vector;
     else if (const auto matrix = parseMatrixExpr()) expr = matrix;
@@ -1391,13 +1354,13 @@ LgsExpr* LgsParser::parseUnary(const bool withInstance) {
     return expr;
 }
 
-LgsExpr* LgsParser::parseExprOrLambda() {
+LgsExpr* LgsParser::parseArgExprOrLambda() {
     // The order is important. First check for empty block, then expr, then non-empty block.
     if (currentToken.type == T_LBRACE && peek().type == T_RBRACE) {
         consume(2);
         return wrapStmtsBlockWithLambda(new LgsStmtsBlock());
     }
-    if (LgsExpr* expr = parseExpr()) {
+    if (const auto expr = parseExpr()) {
         return expr;
     }
     if (const auto stmtsBlock = parseStmtsBlock()) {
@@ -1414,7 +1377,7 @@ LgsVariable* LgsParser::parseVariable() {
         var = new LgsVariable(currentToken.lexeme);
     } else if (currentToken.type == T_SELF_INSTANCE) {
         var = new LgsVariable(currentToken.lexeme);
-        currentFunc->funcType->isMethod = true;
+        currentFunc->funcType->hasSelf = true;
     } else {
         return nullptr;
     }
@@ -1461,7 +1424,7 @@ LgsFuncCall* LgsParser::parseFuncCall() {
             funcCall->isNamed = true;
             argName = currentToken.lexeme;
             consume(2);
-            const auto exprOrStmt = parseExprOrLambda();
+            const auto exprOrStmt = parseArgExprOrLambda();
             if (!exprOrStmt) break;
             if (!seen.insert(argName).second) {
                 addError(E10054, exprOrStmt->location, {argName});
@@ -1469,7 +1432,7 @@ LgsFuncCall* LgsParser::parseFuncCall() {
             }
             funcCall->args.emplace_back(LgsFuncArg{exprOrStmt, argName});
         } else {
-            const auto exprOrStmt = parseExprOrLambda();
+            const auto exprOrStmt = parseArgExprOrLambda();
             if (!exprOrStmt) break;
             funcCall->args.emplace_back(LgsFuncArg{exprOrStmt, argName});
         }
@@ -1493,12 +1456,22 @@ LgsStrConst* LgsParser::parseStrConst() {
     return strConst;
 }
 
+LgsCharConst* LgsParser::parseCharConst() {
+    if (currentToken.type != T_STRING) return nullptr;
+    const auto textToken = currentToken;
+    if (textToken.lexeme.length() != 1) return nullptr;
+    const auto expr = new LgsCharConst(textToken.lexeme[0]);
+    setLocation(expr->location, &textToken, &currentToken);
+    consume();
+    return expr;
+}
+
 LgsMetaVar* LgsParser::parseLoopMetaVar() {
     const auto metaVarToken = currentToken;
     if (matchAndConsume(T_FOR_I)) {
         const auto metaVar = new LgsMetaVar(metaVarToken.lexeme, FOR_I);
         setLocation(metaVar->location, &metaVarToken, &currentToken);
-        metaVar->setType(&LGS_INT);
+        metaVar->setType(&LGS_SIZE);
         return metaVar;
     }
     if (matchAndConsume(T_FOR_IS_FIRST)) {
@@ -1536,7 +1509,7 @@ LgsExpr* LgsParser::parseConstant() {
         auto result = tokenStr;
         result.erase(std::ranges::remove(result, '_').begin(), result.end());
         constant = determineIntConst(result, 10);
-        constant->type = &LGS_IMAGINARY;
+        constant->setType(&LGS_IMAGINARY);
         break;
     }
     case T_UINT: {
@@ -1694,11 +1667,11 @@ LgsHashMap* LgsParser::parseHashMap() {
     const auto startToken = currentToken;
     const auto oldIndex = currentIndex;
     if (!matchAndConsume(T_LBRACE)) return nullptr;
-    std::vector<LgsPair> pairs;
+    std::vector<LgsPair*> pairs;
     const auto freePairs = [&pairs] {
-        for (auto [l, r] : pairs) {
-            freeExpr(l);
-            freeExpr(r);
+        for (const auto pair : pairs) {
+            freeExpr(pair->key);
+            freeExpr(pair->value);
         }
     };
     if (!matchAndConsume(T_RBRACE)) {
@@ -1714,7 +1687,7 @@ LgsHashMap* LgsParser::parseHashMap() {
             }
             const auto value = parseExpr();
             if (!mustParse(value)) break;
-            pairs.push_back(LgsPair{key, value});
+            pairs.push_back(new LgsPair(key, value));
             if (currentToken.type == T_RBRACE) break;
             mustMatch(T_COMMA);
         }
@@ -2313,6 +2286,5 @@ LgsFunc* wrapStmtsBlockWithLambda(LgsStmtsBlock* stmtsBlock) {
     func->isLambda = true;
     func->location = stmtsBlock->location;
     func->stmtsBlock = stmtsBlock;
-    func->funcType->rt = &LGS_VOID;
     return func;
 }

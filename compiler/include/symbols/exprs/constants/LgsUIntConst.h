@@ -13,7 +13,7 @@ public:
         isMutable = false;
     }
     std::string asText() override;
-    void setDebugValue(LgsCgModule& cg) override;
+    void setDebugValue(LgsCodeGen& cg) override;
     ~LgsUIntConst() override = default;
 };
 

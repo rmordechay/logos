@@ -2,6 +2,7 @@
 #include "LgsBinaryTokens.h"
 #include "LgsTokens.h"
 #include "errors/LgsErrHandler.h"
+#include "exprs/constants/LgsCharConst.h"
 #include "lgsc/LgsCCompiler.h"
 #include "stmts/LgsAssignment.h"
 
@@ -124,7 +125,6 @@ public:
     LgsStmt* parseStmt();
     LgsStmtsBlock* parseStmtsBlock(bool withSingleStmt = true);
     LgsVarDec* parseVarDec();
-    LgsAssignType parseAssignType();
     LgsStmt* parseAssignment();
     LgsStmt* parseIfStmt();
     LgsSwitch* parseSwitch();
@@ -143,11 +143,12 @@ public:
     LgsExpr* parseExpr(bool withLambda = true, bool withInstance = true);
     LgsExpr* parseExprWithPrecedence(int minPrecedence, bool withInstance = true);
     LgsExpr* parseUnary(bool withInstance = true);
-    LgsExpr* parseExprOrLambda();
+    LgsExpr* parseArgExprOrLambda();
     LgsVariable* parseVariable();
     LgsInstance* parseInstance();
     LgsFuncCall* parseFuncCall();
     LgsStrConst* parseStrConst();
+    LgsCharConst* parseCharConst();
     LgsMetaVar* parseLoopMetaVar();
     LgsExpr* parseConstant();
     LgsArrayExpr* parseArrayExpr();

@@ -3,11 +3,16 @@
 #include <ostream>
 #include <vector>
 #include "errors/LgsErrHandler.h"
+#include <unordered_map>
+#include <unordered_set>
 
+#include "Lgs_Types.h"
+
+class LgsEnumField;
 class LgsComplex;
-class LgsOwner;
 struct LgsBinOp;
 class LgsBinaryExpr;
+class LgsValue;
 class LgsVariadic;
 class LgsGenericType;
 class LgsMatrix;
@@ -45,10 +50,11 @@ class LgsExpr;
 class LgsFuncCall;
 class LgsField;
 class LgsFunc;
-class LgsCgModule;
+class LgsCodeGen;
 
 namespace llvm {
     class Constant;
+    class ConstantInt;
     class DIType;
     class Type;
     class Value;
@@ -60,54 +66,56 @@ class LgsType {
 public:
     LgsLocation location;
     std::vector<LgsField*> fields;
-    std::map<std::string, LgsFunc*> methods;
+    std::unordered_map<std::string, LgsFunc*> methods;
     std::vector<LgsType*> genericArgs;
-    Type* IRType = nullptr;
     bool isInt = false;
     bool isUnsinged = false;
     bool isFloat = false;
-    bool isPrimitive = false;
     bool isHeapAlloc = false;
     bool passByRef = false;
+    Lgs_TypeKind rttKind = RTT_UNKNOWN;
 
-    bool addField(LgsField* field);
+    bool isAny();
+    bool isVoid();
+    bool isNumber();
+    bool isScalar() const;
+    bool isUnknown();
+    bool isSliceable();
+    bool hasGenericTypes();
+    ConstantInt* IRSize(LgsCodeGen& cg);
+    Type* getTypeOrPtr(LgsCodeGen& cg);
+
     bool addMethod(LgsFunc* method);
     virtual LgsField* getField(const std::string& fieldName);
     virtual LgsFunc* getMethod(const std::string& methodName);
+    virtual std::string getName() = 0;
     virtual size_t sizeBytes() = 0;
     virtual LgsExpr* getZeroValue() = 0;
-    virtual Type* getIRType(LgsCgModule& cg) = 0;
-    virtual Constant* getRTType(LgsCgModule& cg) = 0;
+    virtual Value* hashValue(LgsCodeGen& cg, Value* value);
+    virtual Type* getIRType(LgsCodeGen& cg) = 0;
+    virtual Value* asIRStr(LgsCodeGen& cg, Value* v);
+    virtual Constant* getRTType(LgsCodeGen& cg) = 0;
     virtual bool canCastTo(LgsType* other) = 0;
     virtual std::string fmtStr() const = 0;
-    virtual DIType* getDebugType(LgsCgModule& cg) = 0;
     virtual LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) = 0;
     virtual void hashNode(size_t& oldHash);
-    virtual std::string getName() = 0;
+    virtual DIType* getDebugType(LgsCodeGen& cg) = 0;
     virtual std::string pname(); // pretty name
     virtual bool equals(LgsType* other);
+    virtual LgsType* clone();
 
-    bool isVoid();
-    bool isNumber();
-    bool isBig();
-    bool isUnknown();
-    bool isSliceable();
-    LgsType* extendInt();
-    void cloneFields(LgsType* newType) const;
-    void cloneMethods(LgsType* newType) const;
-
-    virtual Value* addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* subIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* divIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* modIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* powIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* bitAndIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* bitOrIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* bitXorIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* lshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* other);
-    virtual Value* rshiftIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-    virtual Value* crossIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
+    virtual Value* addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr);
+    virtual Value* subIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr);
+    virtual Value* mulIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr);
+    virtual Value* divIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr);
+    virtual Value* modIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr);
+    virtual Value* powIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr);
+    virtual Value* bitAndIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr);
+    virtual Value* bitOrIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr);
+    virtual Value* bitXorIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr);
+    virtual Value* lshiftIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr);
+    virtual Value* rshiftIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr);
+    virtual Value* crossIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr);
 
     LgsAny* asAny();
     LgsChar* asChar();
@@ -144,11 +152,10 @@ public:
 
 inline void freeType(LgsType* type) {
     if (!type) return;
-    if (type->isPrimitive) return;
-    if (type->asGenericType() || type->asObject()) return;
+    if (type->isScalar() || type->asAny() || type->asChar() || type->isVoid()) return;
+    if (type->asEnum() || type->asSubtype() || type->asGenericType() || type->asObject() || type->asInterface()) return;
     delete type;
 }
-
 
 template<typename T>
 void freeTypes(std::vector<T*>& types) {
@@ -158,15 +165,13 @@ void freeTypes(std::vector<T*>& types) {
     types.clear();
 }
 
-Value* eqIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-Value* neIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-Value* ltIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-Value* gtIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-Value* geIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-Value* leIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right);
-Value* andIR(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right);
-Value* orIR(LgsCgModule& cg, const LgsExpr* left, const LgsExpr* right);
-std::pair<Value*, Value*> loadPairAsFloat(LgsCgModule& cg, LgsExpr* self, LgsExpr* other);
-std::pair<Value*, Value*> loadPairAsDouble(LgsCgModule& cg, LgsExpr* self, LgsExpr* other);
-std::pair<Value*, Value*> loadPairAsInt(LgsCgModule& cg, LgsExpr* self, LgsExpr* other);
-std::pair<Constant*, Constant*> getRTFieldsInfo(LgsCgModule& cg, const std::string& name, const std::vector<LgsOwner*>& values);
+Value* eqIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
+Value* neIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
+Value* ltIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
+Value* gtIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
+Value* geIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
+Value* leIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
+Value* andIR(LgsCodeGen& cg, Value* left, Value* right);
+Value* orIR(LgsCodeGen& cg, Value* left, Value* right);
+LgsType* getBiggestIntType(const std::vector<LgsType*>& types);
+std::pair<Value*, Value*> loadNumberPair(LgsCodeGen& cg, Value* left, Value* right, Type* type);

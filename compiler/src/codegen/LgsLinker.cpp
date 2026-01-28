@@ -1,5 +1,5 @@
 #include "codegen/LgsLinker.h"
-#include "codegen/LgsCgModule.h"
+#include "codegen/LgsCodeGen.h"
 #include "logos/LgsAppConfigs.h"
 #include <llvm/Support/FileSystem.h>
 #define LINK_CMD_STRING "clang -flto -o3 %s -L%s -llgs %s -Wl,-rpath,%s %s -o %s"

@@ -17,6 +17,7 @@
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsChar.h"
 #include "LgsUtils.h"
+#include "types/iterables/LgsSArray.h"
 #include "types/primitives/LgsLong.h"
 
 void LgsCLangParser::HandleTranslationUnit(clang::ASTContext& clangContext){
@@ -40,7 +41,7 @@ bool LgsCLangParser::VisitFunctionDecl(const clang::FunctionDecl* func) {
     }
     funcImpl->funcType->isVariadic = func->isVariadic();
     funcImpl->funcType->isExternal = true;
-    if (!name.starts_with("_")) {
+    if (!name.empty() && !name.starts_with("_") && !table.symbols.contains(name)) {
         table.addSymbol(LgsSymbol(funcImpl, false, true), &errHandler);
     }
     return true;
@@ -56,7 +57,7 @@ bool LgsCLangParser::VisitRecordDecl(const clang::RecordDecl* record) {
     const auto objSymbol = table.getSymbol(name);
     if (objSymbol) return true;
     const auto obj = mapCRecord(record);
-    if (!name.starts_with("_")) {
+    if (!name.empty() && !name.starts_with("_")) {
         table.addSymbol(LgsSymbol(obj, false, true), &errHandler);
     }
     return true;
@@ -148,7 +149,7 @@ LgsObject* LgsCLangParser::mapCRecord(const clang::RecordDecl* record) {
         const auto fieldName = field->getNameAsString();
         const auto fieldType = mapCType(field->getType());
         const auto lgsField = new LgsField(fieldName, fieldType);
-        obj->addField(lgsField);
+        obj->fields.push_back(lgsField);
     }
     return obj;
 }
@@ -163,7 +164,8 @@ LgsType* LgsCLangParser::mapCStruct(const clang::QualType type) {
     const auto objSymbol = table.getSymbol(name);
     if (objSymbol) return objSymbol->object;
     const auto obj = mapCRecord(decl);
-    if (!name.starts_with("_")) {
+    obj->name = name;
+    if (!name.empty() && !name.starts_with("_")) {
         table.addSymbol(LgsSymbol(obj, false, true), &errHandler);
     }
     return obj;
@@ -186,7 +188,5 @@ LgsType* LgsCLangParser::mapCArray(const clang::QualType type) {
     if (!arrayType) return nullptr;
     const auto baseType = mapCType(arrayType->getElementType());
     const auto size = arrayType->getSize().getZExtValue();
-    const auto arr = new LgsDArray(baseType);
-    arr->size = new LgsIntConst(&LGS_INT, size);
-    return arr;
+    return new LgsSArray(baseType, new LgsIntConst(&LGS_INT, size));
 }

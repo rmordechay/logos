@@ -13,6 +13,6 @@ public:
 
     LgsPostfixExpr(LgsExpr* baseExpr, const LgsPostfixOperator op) : baseExpr(baseExpr), op(op) {}
     std::string asText() override;
-    void setDebugValue(LgsCgModule& cg) override;
+    void setDebugValue(LgsCodeGen& cg) override;
     ~LgsPostfixExpr() override;
 };

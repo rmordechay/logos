@@ -11,6 +11,6 @@ public:
     bool isExhausted = false;
 
     explicit LgsSwitch(LgsExpr* cond): cond(cond){}
-    void setDebugValue(LgsCgModule& cg) override;
+    void setDebugValue(LgsCodeGen& cg) override;
     ~LgsSwitch() override;
 };

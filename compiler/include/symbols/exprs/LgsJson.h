@@ -30,6 +30,6 @@ public:
     explicit LgsJson(LgsJsonType* type, LgsStrConst* strConst): LgsExpr(type), jsonType(type), strConst(strConst) {}
     bool equals(LgsExpr* other) override;
     std::string asText() override;
-    void setDebugValue(LgsCgModule& cg) override;
+    void setDebugValue(LgsCodeGen& cg) override;
     ~LgsJson() override;
 };

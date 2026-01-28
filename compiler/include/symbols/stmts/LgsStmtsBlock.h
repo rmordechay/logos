@@ -1,5 +1,6 @@
 #pragma once
 #include "LgsValue.h"
+#include "types/LgsGenericType.h"
 
 class LgsReturn;
 class LgsStmt;
@@ -7,8 +8,8 @@ class LgsObject;
 
 class LgsStmtWrapper {
 public:
-    enum class Type { Object, Stmt, Expr };
-    Type type = Type::Stmt;
+    enum class WrapperType { Stmt, Expr, Object };
+    WrapperType wrapperType = WrapperType::Stmt;
     union {
         LgsStmt* stmt;
         LgsExpr* expr;
@@ -17,21 +18,19 @@ public:
 
     LgsStmtWrapper() = default;
     explicit LgsStmtWrapper(LgsStmt* s) : stmt(s) {}
-    explicit LgsStmtWrapper(LgsObject* o) : type(Type::Object), obj(o) {}
-    explicit LgsStmtWrapper(LgsExpr* e) : type(Type::Expr), expr(e) {}
+    explicit LgsStmtWrapper(LgsObject* o) : wrapperType(WrapperType::Object), obj(o) {}
+    explicit LgsStmtWrapper(LgsExpr* e) : wrapperType(WrapperType::Expr), expr(e) {}
     bool isTerminator() const;
-    LgsStmtWrapper clone() const;
 };
 
 class LgsStmtsBlock final : public LgsValue {
 public:
     std::vector<LgsStmtWrapper> stmts;
-    LgsReturn* returnStmt = nullptr;
     bool isMacro = false;
 
     explicit LgsStmtsBlock(const std::vector<LgsStmtWrapper>& stmts = {}) : stmts(stmts) {}
     void hashNode(size_t& oldHash) override;
-    void setDebugValue(LgsCgModule& cg) override;
-    LgsStmtsBlock* clone() const;
+    void setDebugValue(LgsCodeGen& cg) override;
+    LgsStmtsBlock* clone() override;
     ~LgsStmtsBlock() override;
 };

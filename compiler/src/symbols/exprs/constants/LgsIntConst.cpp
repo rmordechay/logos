@@ -7,13 +7,15 @@
 #include "types/primitives/LgsLong.h"
 #include "LgsUtils.h"
 
-Value* LgsIntConst::loadIR(LgsCgModule& cg) {
+Value* LgsIntConst::loadIR(LgsCodeGen& cg) {
     return IRValue;
 }
 
 void LgsIntConst::castImplicitly(LgsType* toType) {
+    if (!toType) return;
     if (!type->canCastTo(toType)) return;
-    type = toType;
+    if (!toType->isInt) return;
+    setType(toType);
 }
 
 LgsExpr* LgsIntConst::castExplicitly(LgsType* toType) {
@@ -35,6 +37,10 @@ LgsExpr* LgsIntConst::castExplicitly(LgsType* toType) {
     return nullptr;
 }
 
+LgsIntConst* LgsIntConst::clone() {
+    return new LgsIntConst(type, value);
+}
+
 bool LgsIntConst::equals(LgsExpr* other) {
     assert(0);
 }
@@ -43,12 +49,8 @@ void LgsIntConst::hashNode(size_t& oldHash) {
     hashNodeInt(oldHash, value);
 }
 
-Value* LgsIntConst::hashValue(LgsCgModule& cg) {
-    return IRValue;
-}
-
 std::string LgsIntConst::asText() {
     return std::to_string(value);
 }
 
-void LgsIntConst::setDebugValue(LgsCgModule& cg) { /* do nothing */}
+void LgsIntConst::setDebugValue(LgsCodeGen& cg) { /* do nothing */}

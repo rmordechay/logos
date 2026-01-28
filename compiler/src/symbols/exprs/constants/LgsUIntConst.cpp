@@ -4,6 +4,6 @@ std::string LgsUIntConst::asText() {
     return std::to_string(value);
 }
 
-void LgsUIntConst::setDebugValue(LgsCgModule& cg) {
+void LgsUIntConst::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }

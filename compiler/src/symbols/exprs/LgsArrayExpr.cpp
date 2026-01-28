@@ -1,32 +1,18 @@
 #include "exprs/LgsArrayExpr.h"
 #include "types/iterables/LgsSet.h"
 #include "LgsUtils.h"
-#include "codegen/LgsCgModule.h"
+#include "codegen/LgsCodeGen.h"
 
-Value* LgsArrayExpr::loadIR(LgsCgModule& cg) {
-    if (type->asDArray() || type->asSet()) return IRValue;
-    return cg.builder.CreateLoad(type->getIRType(cg), IRValue);
-}
-
-void LgsArrayExpr::initIRArray(LgsCgModule& cg) {
-    if (const auto dArr = type->asDArray()) {
-        auto rtType = dArr->getRTType(cg);
-        if (!IRValue) {
-            IRValue = cg.allocate(cg.usize(dArr->sizeBytes()), rtType, false);
-        }
-        cg.callLgsFunc(LgsDArray::name, "init", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {IRValue, rtType});
-    } else if (const auto set = type->asSet()) {
-        auto rtType = set->getRTType(cg);
-        if (!IRValue) {
-            IRValue = cg.allocate(cg.usize(set->sizeBytes()), rtType, false);
-        }
-        cg.callLgsFunc(LgsSet::name, "init", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {IRValue, rtType});
-    }
+Value* LgsArrayExpr::loadIR(LgsCodeGen& cg) {
+    return IRValue;
 }
 
 void LgsArrayExpr::castImplicitly(LgsType* toType) {
-    if (toType->asGenericType()) return;
-    // Replace static and dynamic if needed
+    const auto otherIterable = toType->asIterable();
+    if (!otherIterable) return;
+    const auto iterable = type->asIterable();
+    if (iterable && !otherIterable->baseType->canCastTo(iterable->baseType)) return;
+    // Replace dynamic array with static if needed
     if (!type && toType->asSArray()) {
         setType(toType);
     } else if (type->asDArray() && (toType->asSArray() || toType->asSet())) {
@@ -38,19 +24,19 @@ void LgsArrayExpr::castImplicitly(LgsType* toType) {
     if (toType->asSet()) {
         otherBaseType = toType->genericArgs.front();
     } else {
-        otherBaseType = toType->asIterable()->baseType;
+        otherBaseType = otherIterable->baseType;
     }
     for (size_t i = 0; i < elements.size(); ++i) {
         castExprImplicitly(elements[i], otherBaseType);
     }
     if (!type) {
-        type = toType;
-    } else if (const auto& iter = type->asIterable()) {
+        setType(toType);
+    } else if (const auto& iter = iterable) {
         iter->baseType = otherBaseType;
     }
 }
 
-void LgsArrayExpr::setDebugValue(LgsCgModule& cg) {
+void LgsArrayExpr::setDebugValue(LgsCodeGen& cg) {
     if (!IRValue) return;
     const auto di = cg.debugger.diBuilder;
     const auto file = cg.debugger.diFile;
@@ -71,6 +57,14 @@ void LgsArrayExpr::setDebugValue(LgsCgModule& cg) {
 
 std::string LgsArrayExpr::asText() {
     return type ? type->pname() : "[]";
+}
+
+LgsExpr* LgsArrayExpr::clone() {
+    const auto expr = new LgsArrayExpr();
+    for (const auto element : elements) {
+        expr->elements.push_back(element->clone());
+    }
+    return expr;
 }
 
 LgsArrayExpr::~LgsArrayExpr() {

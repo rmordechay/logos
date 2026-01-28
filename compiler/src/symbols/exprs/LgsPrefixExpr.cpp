@@ -2,7 +2,7 @@
 
 #include "LgsUtils.h"
 
-Value* LgsPrefixExpr::loadIR(LgsCgModule& cg) {
+Value* LgsPrefixExpr::loadIR(LgsCodeGen& cg) {
     return IRValue;
 }
 
@@ -10,7 +10,7 @@ std::string LgsPrefixExpr::asText() {
     assert(0);
 }
 
-void LgsPrefixExpr::setDebugValue(LgsCgModule& cg) {
+void LgsPrefixExpr::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }
 

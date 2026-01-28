@@ -1,0 +1,35 @@
+interface Interface {
+    x: Int
+    func(): Void
+}
+
+object Obj1 {
+    implements: Interface
+    x: Int
+
+    func() {
+        print("Obj1")
+    }
+}
+
+object Obj2 {
+    implements: Interface
+    x: Int
+    func() {
+        print("Obj2")
+    }
+}
+
+f(i: Interface) {
+    i.func()
+    print(i.x)
+}
+
+main() {
+    obj1 = Obj1{x=21}
+    obj2 = Obj2{x=347}
+    obj1.func()
+    obj2.func()
+    f(obj1)
+    f(obj2)
+}

@@ -5,16 +5,22 @@
 #include "stmts/LgsVarDec.h"
 #include "types/LgsNullable.h"
 
-#include <codegen/LgsCgModule.h>
+#include <codegen/LgsCodeGen.h>
 
-Value* LgsVariable::loadIR(LgsCgModule& cg) {
+#include "types/LgsEnum.h"
+
+Value* LgsVariable::loadIR(LgsCodeGen& cg) {
     switch (ref.symbolType) {
     case PARAM:
         return ref.param->loadIR(cg);
     case VAR_DEC:
-        return ref.varDec->loadIR(cg);
+        return ref.varDec->expr->loadIR(cg);
     case FIELD:
         return ref.field->loadIR(cg);
+    case FUNC:
+    case OBJECT:
+    case ENUM:
+        return IRValue;
     default:
         assert(0);
     }
@@ -38,22 +44,11 @@ LgsExpr* LgsVariable::castExplicitly(LgsType* toType) {
     assert(0);
 }
 
-void LgsVariable::assign(LgsCgModule& cg, LgsExpr* expr) {
-    cg.store(expr->IRValue, loadIR(cg));
-}
+void LgsVariable::assign(LgsCodeGen& cg, LgsExpr* right) {
+    if (type->isHeapAlloc) {
 
-Value* LgsVariable::hashValue(LgsCgModule& cg) {
-    switch (ref.symbolType) {
-    case PARAM:
-        return cg.callHash(ref.param->IRValue);
-    case VAR_DEC:
-        return ref.varDec->expr->hashValue(cg);
-    case FIELD:
-        if (ref.field->isEnumField) return cg.usize(ref.field->position);
-        if (ref.field->type->asEnum()) return ref.field->loadIR(cg);
-        return cg.callHash(ref.field->IRValue);
-    default:
-        assert(0);
+    } else {
+        cg.store(right->IRValue, IRValue);
     }
 }
 
@@ -61,7 +56,7 @@ std::string LgsVariable::asText() {
     return name;
 }
 
-void LgsVariable::setDebugValue(LgsCgModule& cg) {
+void LgsVariable::setDebugValue(LgsCodeGen& cg) {
     setDebugLoc(cg);
     const auto var = cg.debugger.diBuilder->createAutoVariable(
         cg.debugger.subprogram->getScope(),
@@ -79,8 +74,8 @@ void LgsVariable::setDebugValue(LgsCgModule& cg) {
     );
 }
 
-LgsExpr* LgsVariable::clone() {
+LgsVariable* LgsVariable::clone() {
     const auto newVar = new LgsVariable(*this);
-    if (type) newVar->type = type;
+    newVar->setType(type);
     return newVar;
 }

@@ -1,6 +1,9 @@
 #include "types/primitives/LgsUInt.h"
+
+#include <llvm/IR/Module.h>
+
 #include "exprs/constants/LgsIntConst.h"
-#include "codegen/LgsCgModule.h"
+#include "codegen/LgsCodeGen.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsInt.h"
 #include "types/primitives/LgsSize.h"
@@ -9,12 +12,12 @@ size_t LgsUInt::sizeBytes() {
     return sizeof(uint32_t);
 }
 
-Type* LgsUInt::getIRType(LgsCgModule& cg) {
+Type* LgsUInt::getIRType(LgsCodeGen& cg) {
     return cg.i32Ty();
 }
 
-Constant* LgsUInt::getRTType(LgsCgModule& cg) {
-    return cg.getRTTypeInfo(getName(), sizeBytes(), RTT_UINT, isHeapAlloc, cg.null());
+Constant* LgsUInt::getRTType(LgsCodeGen& cg) {
+    return cg.getRTTypeInfo(getName(), IRSize(cg), RTT_UINT);
 }
 
 std::string LgsUInt::getName() {
@@ -37,7 +40,7 @@ LgsType* LgsUInt::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     assert(0);
 }
 
-DIType* LgsUInt::getDebugType(LgsCgModule& cg) {
+DIType* LgsUInt::getDebugType(LgsCodeGen& cg) {
     assert(0);
 }
 

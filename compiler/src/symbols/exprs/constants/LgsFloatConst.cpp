@@ -1,10 +1,10 @@
 #include "exprs/constants/LgsFloatConst.h"
 #include "LgsType.h"
-#include "codegen/LgsCgModule.h"
+#include "codegen/LgsCodeGen.h"
 #include "exprs/constants/LgsIntConst.h"
 #include "types/LgsAny.h"
 
-Value* LgsFloatConst::loadIR(LgsCgModule& cg) {
+Value* LgsFloatConst::loadIR(LgsCodeGen& cg) {
     return IRValue;
 }
 
@@ -24,7 +24,7 @@ LgsExpr* LgsFloatConst::castExplicitly(LgsType* toType) {
 void LgsFloatConst::castImplicitly(LgsType* toType) {
     const auto otherName = toType->getName();
     if (type->getName() == otherName) return;
-    if (otherName == LgsAny::name) return;
+    if (toType->isAny()) return;
     if (type->asFloat() && toType->asDouble()) {
         // Widening is always allowed
         setType(toType);
@@ -35,6 +35,6 @@ std::string LgsFloatConst::asText() {
     return std::to_string(value);
 }
 
-void LgsFloatConst::setDebugValue(LgsCgModule& cg) {
+void LgsFloatConst::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }

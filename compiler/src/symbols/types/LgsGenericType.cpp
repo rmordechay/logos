@@ -3,11 +3,11 @@
 
 #include <cassert>
 
-Type* LgsGenericType::getIRType(LgsCgModule& cg) {
+Type* LgsGenericType::getIRType(LgsCodeGen& cg) {
     return nullptr;
 }
 
-Constant* LgsGenericType::getRTType(LgsCgModule& cg) {
+Constant* LgsGenericType::getRTType(LgsCodeGen& cg) {
     return nullptr;
 }
 
@@ -35,6 +35,15 @@ std::string LgsGenericType::fmtStr() const {
     assert(0);
 }
 
-DIType* LgsGenericType::getDebugType(LgsCgModule& cg) {
+LgsType* LgsGenericType::clone() {
+    const auto newGeneric = new LgsGenericType(*this);
+    return newGeneric;
+}
+
+DIType* LgsGenericType::getDebugType(LgsCodeGen& cg) {
     assert(0);
+}
+
+bool LgsGenericType::canReplace(LgsType* type) {
+    return true;
 }

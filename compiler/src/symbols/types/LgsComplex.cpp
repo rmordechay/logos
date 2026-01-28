@@ -2,42 +2,45 @@
 
 #include "LgsBinaryTokens.h"
 #include "exprs/constants/LgsComplexConst.h"
-#include "codegen/LgsCgModule.h"
+#include "codegen/LgsCodeGen.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsBool.h"
 
 #include <cassert>
 #include <llvm/IR/Module.h>
 
+#include "exprs/LgsBinaryExpr.h"
+
 size_t LgsComplex::sizeBytes() {
     return realType->sizeBytes() + imaginaryType->sizeBytes();
 }
 
 LgsExpr* LgsComplex::getZeroValue() {
-    return new LgsComplexConst(LGS_INT.getZeroValue(), LGS_INT.getZeroValue());
+    return new LgsComplexConst(realType->getZeroValue(), imaginaryType->getZeroValue());
 }
 
-Type* LgsComplex::getIRType(LgsCgModule& cg) {
+Type* LgsComplex::getIRType(LgsCodeGen& cg) {
     return cg.getStructType({realType->getIRType(cg), imaginaryType->getIRType(cg)}, name);
 }
 
-Constant* LgsComplex::getRTType(LgsCgModule& cg) {
+Constant* LgsComplex::getRTType(LgsCodeGen& cg) {
     const auto nullableName = getName();
     const std::vector<Type*> params = {cg.ptrTy(), cg.ptrTy()};
     const std::vector args = {realType->getRTType(cg), imaginaryType->getRTType(cg)};
-    const auto sv = cg.getRTTExtraStruct(nullableName, params, args);
-    return cg.getRTTypeInfo(nullableName, sizeBytes(), RTT_COMPLEX, isHeapAlloc, sv);
+    return cg.getRTTypeInfo(nullableName, IRSize(cg), RTT_COMPLEX);
 }
 
 bool LgsComplex::canCastTo(LgsType* other) {
-    if (other->getName() == LgsAny::name) return true;
+    if (other->isAny()) return true;
     if (getName() == other->getName()) return true;
     return false;
 }
 
-Value* LgsComplex::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto l = cg.builder.CreateLoad(getIRType(cg), left->IRValue);
-    const auto r = cg.builder.CreateLoad(getIRType(cg), right->IRValue);
+Value* LgsComplex::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
+    const auto left = binExpr->left;
+    const auto right = binExpr->right;
+    const auto l = cg.load(getIRType(cg), left->IRValue);
+    const auto r = cg.load(getIRType(cg), right->IRValue);
     const auto lReal = cg.builder.CreateExtractValue(l, 0);
     const auto rReal = cg.builder.CreateExtractValue(r, 0);
     const auto lImag = cg.builder.CreateExtractValue(l, 1);
@@ -52,26 +55,32 @@ Value* LgsComplex::addIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     return result;
 }
 
-Value* LgsComplex::subIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto l = cg.builder.CreateLoad(getIRType(cg), left->IRValue);
-    const auto r = cg.builder.CreateLoad(getIRType(cg), right->IRValue);
+Value* LgsComplex::subIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
+    const auto ty = getIRType(cg);
+    const auto left = binExpr->left;
+    const auto right = binExpr->right;
+    const auto l = cg.load(ty, left->IRValue);
+    const auto r = cg.load(ty, right->IRValue);
     const auto lReal = cg.builder.CreateExtractValue(l, 0);
     const auto rReal = cg.builder.CreateExtractValue(r, 0);
     const auto lImag = cg.builder.CreateExtractValue(l, 1);
     const auto rImag = cg.builder.CreateExtractValue(r, 1);
     const auto resultReal = cg.builder.CreateSub(lReal, rReal);
     const auto resultImag = cg.builder.CreateSub(lImag, rImag);
-    const auto result = cg.builder.CreateAlloca(getIRType(cg));
-    Value* temp = UndefValue::get(getIRType(cg));
+    const auto result = cg.builder.CreateAlloca(ty);
+    Value* temp = UndefValue::get(ty);
     temp = cg.builder.CreateInsertValue(temp, resultReal, 0);
     temp = cg.builder.CreateInsertValue(temp, resultImag, 1);
     cg.store(temp, result);
     return result;
 }
 
-Value* LgsComplex::mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
-    const auto l = cg.builder.CreateLoad(getIRType(cg), left->IRValue);
-    const auto r = cg.builder.CreateLoad(getIRType(cg), right->IRValue);
+Value* LgsComplex::mulIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
+    const auto ty = getIRType(cg);
+    const auto left = binExpr->left;
+    const auto right = binExpr->right;
+    const auto l = cg.load(ty, left->IRValue);
+    const auto r = cg.load(ty, right->IRValue);
 
     const auto a = cg.builder.CreateExtractValue(l, 0);  // lReal
     const auto b = cg.builder.CreateExtractValue(l, 1);  // lImag
@@ -88,8 +97,8 @@ Value* LgsComplex::mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     const auto bc = cg.builder.CreateMul(b, c);
     const auto resultImag = cg.builder.CreateAdd(ad, bc);
 
-    const auto result = cg.builder.CreateAlloca(getIRType(cg));
-    Value* temp = UndefValue::get(getIRType(cg));
+    const auto result = cg.builder.CreateAlloca(ty);
+    Value* temp = UndefValue::get(ty);
     temp = cg.builder.CreateInsertValue(temp, resultReal, 0);
     temp = cg.builder.CreateInsertValue(temp, resultImag, 1);
     cg.store(temp, result);
@@ -97,10 +106,12 @@ Value* LgsComplex::mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
     return result;
 }
 
-Value* LgsComplex::divIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsComplex::divIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto ty = getIRType(cg);
-    const auto l = cg.builder.CreateLoad(ty, left->IRValue);
-    const auto r = cg.builder.CreateLoad(ty, right->IRValue);
+    const auto left = binExpr->left;
+    const auto right = binExpr->right;
+    const auto l = cg.load(ty, left->IRValue);
+    const auto r = cg.load(ty, right->IRValue);
 
     const auto a = cg.builder.CreateExtractValue(l, 0);
     const auto b = cg.builder.CreateExtractValue(l, 1);
@@ -133,7 +144,7 @@ std::string LgsComplex::fmtStr() const {
     return "%s";
 }
 
-DIType* LgsComplex::getDebugType(LgsCgModule& cg) {
+DIType* LgsComplex::getDebugType(LgsCodeGen& cg) {
     assert(0);
 }
 
@@ -144,7 +155,7 @@ LgsType* LgsComplex::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     case SUB:
     case MUL:
     case DIV: {
-        return &LGS_COMPLEX;
+        return this;
     }
     case EQ:
     case NE: {

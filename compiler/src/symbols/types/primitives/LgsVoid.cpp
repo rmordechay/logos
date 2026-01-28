@@ -1,15 +1,15 @@
 #include "types/primitives/LgsVoid.h"
-#include "codegen/LgsCgModule.h"
+#include "codegen/LgsCodeGen.h"
 #include "types/LgsFuncType.h"
 
 #include <llvm/IR/DIBuilder.h>
 
-Type* LgsVoid::getIRType(LgsCgModule& cg) {
+Type* LgsVoid::getIRType(LgsCodeGen& cg) {
     return Type::getVoidTy(cg.context);
 }
 
-Constant* LgsVoid::getRTType(LgsCgModule& cg) {
-    return cg.getRTTypeInfo(getName(), sizeBytes(), RTT_VOID, isHeapAlloc, cg.null());
+Constant* LgsVoid::getRTType(LgsCodeGen& cg) {
+    return cg.getRTTypeInfo(getName(), cg.sizeZero(), RTT_VOID);
 }
 
 size_t LgsVoid::sizeBytes() {
@@ -36,6 +36,10 @@ bool LgsVoid::canCastTo(LgsType* other) {
     return name == other->getName();
 }
 
-DIType* LgsVoid::getDebugType(LgsCgModule& cg) {
+DIType* LgsVoid::getDebugType(LgsCodeGen& cg) {
     return cg.debugger.diBuilder->createUnspecifiedType(name);
+}
+
+LgsType* LgsVoid::clone() {
+    return this;
 }

@@ -80,8 +80,8 @@ public:
     void parseStmt(LgsStmt* stmt);
     void parseStmtsBlock(const LgsStmtsBlock* stmtsBlock);
     void parseVarDec(const LgsVarDec* varDec);
-    void parseAssignment(LgsAssignment* assignment);
-    void parseIfStmt(LgsIfStmt* ifStmt);
+    void parseAssignment(const LgsAssignment* assignment);
+    void parseIfStmt(const LgsIfStmt* ifStmt);
     void parseSwitch(LgsSwitch* switchStmt);
     void parseWhileLoop(LgsWhileLoop* whileLoop);
     void parseLoopStmt(LgsForLoop* loopStmt);
@@ -98,12 +98,12 @@ public:
     void parseBinaryExpr(const LgsBinaryExpr* binaryExpr);
     void parseTernaryExpr(LgsTernaryExpr* ternary);
     void parseCast(LgsCast* cast);
-    void parseArrayExpr(LgsArrayExpr* arrayExpr);
+    void parseArrayExpr(const LgsArrayExpr* arrayExpr);
     void parseHashMap(LgsHashMap* hashMap);
     void parseVectorExpr(const LgsVectorExpr* vectorExpr);
     void parseVariable(const LgsVariable* variable);
-    void parseSelection(LgsSelection* selection);
-    void parseFuncCall(LgsFuncCall* funcCall);
+    void parseSelection(const LgsSelection* selection);
+    void parseFuncCall(const LgsFuncCall* funcCall);
     void parsePrefixExpr(LgsPrefixExpr* prefixExpr);
     void parsePostfixExpr(LgsPostfixExpr* postfixExpr);
     void parseStrConst(const LgsStrConst* strConst);

@@ -3,7 +3,7 @@
 #include <exprs/LgsFuncCall.h>
 #include <exprs/LgsSelection.h>
 
-void LgsDeferStmt::setDebugValue(LgsCgModule& cg) {
+void LgsDeferStmt::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }
 

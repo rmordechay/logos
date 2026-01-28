@@ -1,4 +1,7 @@
 #include "types/primitives/LgsShort.h"
+
+#include <llvm/IR/Module.h>
+
 #include "exprs/constants/LgsIntConst.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsFloat.h"
@@ -11,12 +14,12 @@ size_t LgsShort::sizeBytes() {
     return sizeof(short);
 }
 
-Type* LgsShort::getIRType(LgsCgModule& cg) {
+Type* LgsShort::getIRType(LgsCodeGen& cg) {
     return cg.i16Ty();
 }
 
-Constant* LgsShort::getRTType(LgsCgModule& cg) {
-    return cg.getRTTypeInfo(getName(), sizeBytes(), RTT_SHORT, isHeapAlloc, cg.null());
+Constant* LgsShort::getRTType(LgsCodeGen& cg) {
+    return cg.getRTTypeInfo(getName(), IRSize(cg), RTT_SHORT);
 }
 
 std::string LgsShort::getName() {
@@ -46,6 +49,6 @@ std::string LgsShort::fmtStr() const {
     return "%d";
 }
 
-DIType* LgsShort::getDebugType(LgsCgModule& cg) {
+DIType* LgsShort::getDebugType(LgsCodeGen& cg) {
     assert(0);
 }

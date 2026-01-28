@@ -1,13 +1,19 @@
 #include "exprs/constants/LgsCharConst.h"
 
-Value* LgsCharConst::loadIR(LgsCgModule& cg) {
+#include "codegen/LgsCodeGen.h"
+
+Value* LgsCharConst::loadIR(LgsCodeGen& cg) {
     return IRValue;
+}
+
+void LgsCharConst::castImplicitly(LgsType* toType) {
+    LgsExpr::castImplicitly(toType);
 }
 
 std::string LgsCharConst::asText() {
     return type->pname();
 }
 
-void LgsCharConst::setDebugValue(LgsCgModule& cg) {
+void LgsCharConst::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }

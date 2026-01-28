@@ -1,11 +1,11 @@
 #include "exprs/LgsVectorExpr.h"
 #include "LgsUtils.h"
 
-Value* LgsVectorExpr::loadIR(LgsCgModule& cg) {
-    return cg.builder.CreateLoad(vecType->getIRType(cg), IRValue);
+Value* LgsVectorExpr::loadIR(LgsCodeGen& cg) {
+    return IRValue;
 }
 
-void LgsVectorExpr::setDebugValue(LgsCgModule& cg) {
+void LgsVectorExpr::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }
 
@@ -19,10 +19,6 @@ LgsExpr* LgsVectorExpr::castExplicitly(LgsType* toType) {
 
 void LgsVectorExpr::castImplicitly(LgsType* toType) {
 
-}
-
-Value* LgsVectorExpr::hashValue(LgsCgModule& cg) {
-    assert(0);
 }
 
 std::string LgsVectorExpr::asText() {

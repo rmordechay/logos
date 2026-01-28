@@ -12,8 +12,8 @@ LgsExpr* LgsInstance::castExplicitly(LgsType* toType) {
     assert(0);
 }
 
-Value* LgsInstance::loadIR(LgsCgModule& cg) {
-    return cg.builder.CreateLoad(type->getIRType(cg), IRValue);
+Value* LgsInstance::loadIR(LgsCodeGen& cg) {
+    return IRValue;
 }
 
 void LgsInstance::hashNode(size_t& oldHash) {
@@ -31,12 +31,19 @@ void LgsInstance::setObject(LgsObject* newObj) {
 
 bool LgsInstance::equals(LgsExpr* other) {
     const auto otherInstance = other->asInstance();
-    if (!otherInstance) return false;
+    if (!other->asInstance()) return false;
+    return name == otherInstance->name;
+}
+
+void LgsInstance::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }
 
-void LgsInstance::setDebugValue(LgsCgModule& cg) {
-    assert(0);
+LgsField* LgsInstance::getField(const std::string& fieldName) const {
+    for (auto* f : fields) {
+        if (f->name == fieldName) return f;
+    }
+    return nullptr;
 }
 
 LgsInstance::~LgsInstance() {
@@ -44,6 +51,10 @@ LgsInstance::~LgsInstance() {
         freeExpr(arg.expr);
     }
     args.clear();
+    for (const auto field : fields) {
+        field->type = nullptr;
+        delete field;
+    }
     obj = nullptr;
-    setType(nullptr);
+    type = nullptr;
 }

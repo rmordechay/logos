@@ -3,18 +3,20 @@
 #include "exprs/LgsFuncCall.h"
 #include "exprs/LgsSelection.h"
 #include "funcs/LgsFunc.h"
+#include "stmts/LgsAssignment.h"
 #include "stmts/LgsBreak.h"
 #include "stmts/LgsContinue.h"
+#include "stmts/LgsVarDec.h"
 #include "types/LgsObject.h"
 
 bool LgsStmtWrapper::isTerminator() const {
-    switch (type) {
-    case Type::Stmt: {
+    switch (wrapperType) {
+    case WrapperType::Stmt: {
         const bool isControlFlow = dynamic_cast<LgsBreak*>(stmt) || dynamic_cast<LgsContinue*>(stmt) || dynamic_cast<LgsReturn*>(stmt);
         if (isControlFlow) return true;
         break;
     }
-    case Type::Expr: {
+    case WrapperType::Expr: {
         const auto fc = expr->asFuncCall();
         if (fc && fc->func && fc->func->funcType->isTerminator) return true;
         const auto selection = expr->asSelection();
@@ -23,22 +25,10 @@ bool LgsStmtWrapper::isTerminator() const {
         if (!methodCall) break;
         return methodCall->func && methodCall->func->funcType->isTerminator;
     }
-    case Type::Object:
+    case WrapperType::Object:
         break;
     }
     return false;
-}
-
-LgsStmtWrapper LgsStmtWrapper::clone() const {
-    switch (type) {
-    case Type::Stmt:
-        return LgsStmtWrapper(stmt->clone());
-    case Type::Expr:
-        return LgsStmtWrapper(expr->clone());
-    case Type::Object:
-        assert(0);
-    }
-    return LgsStmtWrapper();
 }
 
 void LgsStmtsBlock::hashNode(size_t& oldHash) {
@@ -47,31 +37,44 @@ void LgsStmtsBlock::hashNode(size_t& oldHash) {
     }
 }
 
+void LgsStmtsBlock::setDebugValue(LgsCodeGen& cg) {
+    assert(0);
+}
+
+LgsStmtsBlock* LgsStmtsBlock::clone() {
+    const auto newStmtBlock = new LgsStmtsBlock();
+    for (const auto& stmtWrapper : stmts) {
+        switch (stmtWrapper.wrapperType) {
+        case LgsStmtWrapper::WrapperType::Stmt: {
+            LgsStmtWrapper stmt((stmtWrapper.stmt->clone()));
+            newStmtBlock->stmts.push_back(stmt);
+            break;
+        }
+        case LgsStmtWrapper::WrapperType::Expr: {
+            LgsStmtWrapper expr((stmtWrapper.expr->clone()));
+            newStmtBlock->stmts.push_back(expr);
+            break;
+        }
+        case LgsStmtWrapper::WrapperType::Object:
+            assert(0);
+        }
+    }
+    return newStmtBlock;
+}
+
 LgsStmtsBlock::~LgsStmtsBlock() {
     for (const auto& stmt : stmts) {
-        switch (stmt.type) {
-        case LgsStmtWrapper::Type::Stmt:
+        switch (stmt.wrapperType) {
+        case LgsStmtWrapper::WrapperType::Stmt:
             freeStmt(stmt.stmt);
             break;
-        case LgsStmtWrapper::Type::Expr:
+        case LgsStmtWrapper::WrapperType::Expr:
             freeExpr(stmt.expr);
             break;
-        case LgsStmtWrapper::Type::Object:
+        case LgsStmtWrapper::WrapperType::Object:
             freeType(stmt.obj);
             break;
         }
     }
     stmts.clear();
-}
-
-void LgsStmtsBlock::setDebugValue(LgsCgModule& cg) {
-    assert(0);
-}
-
-LgsStmtsBlock* LgsStmtsBlock::clone() const {
-    const auto newBlock = new LgsStmtsBlock();
-    for (const auto& stmt : stmts) {
-        newBlock->stmts.push_back(stmt.clone());
-    }
-    return newBlock;
 }

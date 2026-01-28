@@ -94,6 +94,7 @@ set(COMPILER_SOURCE
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/constants/LgsIntConst.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/constants/LgsStrConst.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/constants/LgsUIntConst.cpp
+    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/constants/LgsComplexConst.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/funcs/LgsCoroutine.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/funcs/LgsFunc.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/funcs/LgsMainFunc.cpp
@@ -135,6 +136,7 @@ set(COMPILER_SOURCE
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsGenericType.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsJsonType.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsNullable.cpp
+    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsComplex.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/iterables/LgsMap.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/iterables/LgsDArray.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/iterables/LgsSet.cpp
@@ -156,23 +158,16 @@ set(COMPILER_SOURCE
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsULong.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsByte.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsVoid.cpp
-    compiler/src/symbols/types/LgsComplex.cpp
-    compiler/include/symbols/types/LgsComplex.h
-    compiler/src/symbols/exprs/constants/LgsComplexConst.cpp
-    compiler/include/symbols/exprs/constants/LgsComplexConst.h
+    shared/include/LgsRTTIndices.h
 )
 
 set(LGS_LIB_SOURCE
-    ${CMAKE_SOURCE_DIR}/lib/src/Lgs_HashMap.cpp
-    ${CMAKE_SOURCE_DIR}/lib/src/Lgs_DArrayExpr.cpp
     ${CMAKE_SOURCE_DIR}/lib/src/Lgs_StrExpr.cpp
     ${CMAKE_SOURCE_DIR}/lib/src/Lgs_System.cpp
     ${CMAKE_SOURCE_DIR}/lib/src/Lgs_Runtime.cpp
     ${CMAKE_SOURCE_DIR}/lib/src/Lgs_Allocator.cpp
-    ${CMAKE_SOURCE_DIR}/lib/src/Lgs_SetExpr.cpp
     ${CMAKE_SOURCE_DIR}/lib/src/Lgs_Print.cpp
     ${CMAKE_SOURCE_DIR}/lib/src/Lgs_Reflection.cpp
-    ${CMAKE_SOURCE_DIR}/lib/src/context/Lgs_Aarch64.cpp
 )
 
 set(SHARED_SOURCE

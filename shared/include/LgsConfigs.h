@@ -1,9 +1,11 @@
 #pragma once
 #include <string>
 
-#define BIG_SIZE_THRESHOLD 4
-#define STRING_BUFFER_SIZE 1024
-#define MAX_ELEMENT_SIZE 1024*100
+#define LGS_BIG_SIZE_THRESHOLD 4
+#define LGS_STR_BUFFER_SIZE 1024
+#define LGS_MAX_LEVEL 1024*10
+#define LGS_ITER_INIT_CAP 3
+#define LGS_OBJ_MD_SIZE sizeof(size_t) + sizeof(void*)
 
 enum LgsLogLevel {
     LGS_INFO,

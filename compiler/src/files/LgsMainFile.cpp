@@ -30,19 +30,19 @@ LgsMainFile::~LgsMainFile() {
     }
     varDecs.clear();
     for (const auto& object : objects) {
-        freeType(object);
+        delete object;
     }
     objects.clear();
     for (const auto& interface : interfaces) {
-        freeType(interface);
+        delete interface;
     }
     interfaces.clear();
-    for (const auto lgsEnum : enums) {
-        freeType(lgsEnum);
+    for (const auto enum_ : enums) {
+        delete enum_;
     }
     enums.clear();
     for (const auto subtype : subtypes) {
-        freeType(subtype);
+        delete subtype;
     }
     subtypes.clear();
 }

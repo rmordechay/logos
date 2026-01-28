@@ -1,25 +1,7 @@
 #include "types/LgsInterface.h"
-#include "codegen/LgsCgModule.h"
+#include "codegen/LgsCodeGen.h"
 #include "stmts/LgsField.h"
 #include "types/LgsObject.h"
-
-Type* LgsInterface::getIRType(LgsCgModule& cg) {
-    if (IRType) return IRType;
-    IRType = cg.ptrTy();
-    return IRType;
-}
-
-LgsFunc* LgsInterface::getMethod(const std::string& methodName) {
-    assert(0);
-}
-
-std::string LgsInterface::getName() {
-    return name;
-}
-
-LgsExpr* LgsInterface::getZeroValue() {
-    assert(0);
-}
 
 bool LgsInterface::canCastTo(LgsType* other) {
     if (const auto interface = other->asInterface()) {
@@ -31,24 +13,4 @@ bool LgsInterface::canCastTo(LgsType* other) {
         }
     }
     return false;
-}
-
-LgsType* LgsInterface::applyBinOp(LgsType* rightType, LgsBinOp& op) {
-    assert(0);
-}
-
-size_t LgsInterface::sizeBytes() {
-    return 0;
-}
-
-DIType* LgsInterface::getDebugType(LgsCgModule& cg) {
-    assert(0);
-}
-
-Constant* LgsInterface::getRTType(LgsCgModule& cg) {
-    assert(0);
-}
-
-std::string LgsInterface::fmtStr() const {
-    assert(0);
 }

@@ -8,8 +8,8 @@ public:
     LgsType* value;
 
     explicit LgsTypePair(LgsType* keyType = nullptr, LgsType* valueType = nullptr) : key(keyType), value(valueType) {}
-    Type* getIRType(LgsCgModule& cg) override;
-    Constant* getRTType(LgsCgModule& cg) override;
+    Type* getIRType(LgsCodeGen& cg) override;
+    Constant* getRTType(LgsCodeGen& cg) override;
     LgsExpr* getZeroValue() override;
     size_t sizeBytes() override;
     std::string getName() override;
@@ -17,6 +17,6 @@ public:
     bool canCastTo(LgsType* other) override;
     std::string fmtStr() const override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
-    DIType* getDebugType(LgsCgModule& cg) override;
+    DIType* getDebugType(LgsCodeGen& cg) override;
     ~LgsTypePair() override;
 };

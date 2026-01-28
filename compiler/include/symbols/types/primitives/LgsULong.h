@@ -6,19 +6,19 @@ public:
     static constexpr auto name = "ULong";
 
     LgsULong() {
-        isPrimitive = true;
         isUnsinged = true;
         isInt = true;
+        rttKind = RTT_ULONG;
     }
     size_t sizeBytes() override;
-    Type* getIRType(LgsCgModule& cg) override;
-    Constant* getRTType(LgsCgModule& cg) override;
+    Type* getIRType(LgsCodeGen& cg) override;
+    Constant* getRTType(LgsCodeGen& cg) override;
     std::string getName() override;
     LgsExpr* getZeroValue() override;
     std::string fmtStr() const override;
     bool canCastTo(LgsType* other) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
-    DIType* getDebugType(LgsCgModule& cg) override;
+    DIType* getDebugType(LgsCodeGen& cg) override;
 };
 
 inline LgsULong LGS_ULONG;

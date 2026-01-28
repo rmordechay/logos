@@ -38,15 +38,17 @@ public:
     bool isExternal = false;
     bool isTerminator = false;
     bool hasDefaults = false;
+    bool hasSelf = false;
     uint32_t variadicIndex = 0;
 
-    LgsFuncType(): LgsFuncType(nullptr) {}
-    explicit LgsFuncType(LgsType* rt, const std::vector<LgsParam>& params = {}, const uint32_t ops = 0) : rt(rt), params(params) {
+    explicit LgsFuncType(const std::string& name = ""): LgsFuncType(name, nullptr) {}
+    explicit LgsFuncType(const std::string& name, LgsType* rt, const std::vector<LgsParam>& params = {}, const uint32_t ops = 0)
+        : name(name), rt(rt), params(params) {
         setFuncOptions(ops);
         passByRef = true;
     }
-    Type* getIRType(LgsCgModule& cg) override;
-    Constant* getRTType(LgsCgModule& cg) override;
+    Type* getIRType(LgsCodeGen& cg) override;
+    Constant* getRTType(LgsCodeGen& cg) override;
     LgsExpr* getZeroValue() override;
     size_t sizeBytes() override;
     std::string getName() override;
@@ -57,7 +59,8 @@ public:
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     void setFuncOptions(uint32_t ops);
     std::unordered_map<std::string, LgsParam*> getParamsByName();
-    DIType* getDebugType(LgsCgModule& cg) override;
+    DIType* getDebugType(LgsCodeGen& cg) override;
+    LgsFuncType* clone() override;
+    void addSelf(LgsType* selfType);
     ~LgsFuncType() override;
-    bool isGenericType(LgsType* type) const;
 };

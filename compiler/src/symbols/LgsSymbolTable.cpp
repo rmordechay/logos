@@ -5,6 +5,7 @@
 
 void LgsSymbolTable::addSymbol(const LgsSymbol& symbol, LgsErrHandler* errHandler, const std::string& filePath) {
     const auto symbolName = *symbol.name;
+    assert(symbolName != "");
     if (symbols.contains(symbolName)) {
         return errHandler->addError(E10011, symbol.location, filePath, {symbolName});
     }

@@ -1,7 +1,6 @@
 #pragma once
 #include <iostream>
 
-struct Lgs_TypeInfo;
 typedef void (*ThunkFunc)(void*);
 
 enum Lgs_TypeKind {
@@ -22,6 +21,7 @@ enum Lgs_TypeKind {
     RTT_FLOAT,
     RTT_DOUBLE,
     RTT_COMPLEX,
+    RTT_OBJECT,
     RTT_VEC2,
     RTT_VEC3,
     RTT_VEC4,
@@ -30,104 +30,49 @@ enum Lgs_TypeKind {
     RTT_DARRAY,
     RTT_SET,
     RTT_MAP,
-    RTT_OBJECT,
     RTT_ENUM,
-    RTT_TYPE,
     RTT_FUNC,
     RTT_VARIADIC,
     RTT_NULLABLE,
     RTT_UNKNOWN,
 };
 
+struct Lgs_TypeInfo {
+    const size_t size;
+    const Lgs_TypeKind kind;
+};
+
+struct Lgs_Field {
+    const char* name;
+    const size_t size;
+    const size_t offset;
+    const Lgs_TypeKind kind;
+    void* type;
+};
+
+struct Lgs_Method {
+    const char* name;
+    void* ptr;
+};
+
 struct Lgs_Object {
-    char* name;
-    size_t fieldsCount;
-    char** fieldNames;
-    Lgs_TypeInfo** fieldTypes;
+    const size_t id;
+    const char* name;
+    const size_t size;
+    const size_t fieldsCount;
+    const size_t funcsCount;
+    const Lgs_Field* fields;
+    const Lgs_Method* funcs;
 };
 
-struct Lgs_FuncType {
-    size_t paramsCount;
-    uint64_t* paramHashes;
-    Lgs_TypeInfo** paramTypes;
-    Lgs_TypeInfo* rt;
-};
-
-struct Lgs_SArray {
-    size_t len;
-    Lgs_TypeInfo* baseType;
-};
-
-struct Lgs_DArray {
-    Lgs_TypeInfo* baseType;
-};
-
-struct Lgs_Map {
-    Lgs_TypeInfo* keyType;
-    Lgs_TypeInfo* valueType;
-};
-
-struct Lgs_Vec2 {
-    Lgs_TypeInfo* baseType;
-};
-
-struct Lgs_Vec3 {
-    Lgs_TypeInfo* baseType;
-};
-
-struct Lgs_Vec4 {
-    Lgs_TypeInfo* baseType;
-};
-
-struct Lgs_Complex {
-    Lgs_TypeInfo* realType;
-    Lgs_TypeInfo* imaginaryType;
-};
-
-struct Lgs_Matrix {
-    size_t rows;
-    size_t columns;
+struct Lgs_SArr {
+    const size_t length;
     Lgs_TypeInfo* baseType;
 };
 
 struct Lgs_Nullable {
-    Lgs_TypeInfo* baseType;
     bool isPtr;
-};
-
-struct Lgs_TypeInfo {
-    size_t size;
-    Lgs_TypeKind kind;
-    bool isHeap;
-    union {
-        Lgs_Object obj;
-        Lgs_SArray sArray;
-        Lgs_DArray dArray;
-        Lgs_Map map;
-        Lgs_Vec2 vec2;
-        Lgs_Vec3 vec3;
-        Lgs_Vec4 vec4;
-        Lgs_Matrix matrix;
-        Lgs_Nullable nullable;
-        Lgs_Complex complex;
-        void* dummy; // used for types that don't need extra information.
-    };
-};
-
-struct VKey {
-    void* instance;
-    int32_t virtualID;
-    bool operator==(const VKey& other) const noexcept {
-        return instance == other.instance && virtualID == other.virtualID;
-    }
-};
-
-struct VKeyHash {
-    size_t operator()(const VKey& k) const noexcept {
-        const auto h1 = std::hash<void*>{}(k.instance);
-        const auto h2 = std::hash<int32_t>{}(k.virtualID);
-        return h1 ^ h2 + 0x9e3779b9 + (h1 << 6) + (h1 >> 2);
-    }
+    Lgs_TypeInfo* baseType;
 };
 
 struct Lgs_ThunkFunc {

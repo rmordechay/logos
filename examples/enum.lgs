@@ -1,0 +1,24 @@
+enum Enum {
+    ROI = "Roi"
+    ADI = "Adi"
+}
+
+func(e: Enum) {
+    switch e {
+        ROI: {
+            print(e.index())
+            print(e.value())
+        }
+        ADI: print("Roi")
+    }
+}
+
+main() {
+    print(Enum.ROI)
+    print(Enum.ROI.value())
+    print(Enum.ROI.index())
+    print(Enum.ADI)
+    print(Enum.ADI.value())
+    print(Enum.ADI.index())
+    func(Enum.ROI)
+}

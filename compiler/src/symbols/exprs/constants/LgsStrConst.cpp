@@ -6,7 +6,7 @@
 LgsExpr* LgsStrConst::castExplicitly(LgsType* toType) {
     const auto thisName = type->getName();
     const auto otherName = toType->getName();
-    if (otherName == LgsAny::name) return this;
+    if (toType->isAny()) return this;
     if (const auto subtype = toType->asSubtype()) {
         if (subtype->subtype->getName() == thisName) {
             freeType(type);
@@ -18,17 +18,12 @@ LgsExpr* LgsStrConst::castExplicitly(LgsType* toType) {
     return nullptr;
 }
 
-Value* LgsStrConst::loadIR(LgsCgModule& cg) {
+Value* LgsStrConst::loadIR(LgsCodeGen& cg) {
     return IRValue;
 }
 
 std::string LgsStrConst::asText() {
-    const auto quote = isSingleQuoted ? '\'' : '\"';
-    return quote + scanEscapeStr(value) + quote;
-}
-
-Value* LgsStrConst::hashValue(LgsCgModule& cg) {
-    return cg.hashConst(value);
+    return '\"' + scanEscapeStr(value) + '\"';
 }
 
 void LgsStrConst::hashNode(size_t& oldHash) {
@@ -41,7 +36,7 @@ bool LgsStrConst::equals(LgsExpr* other) {
     assert(0);
 }
 
-void LgsStrConst::setDebugValue(LgsCgModule& cg) {
+void LgsStrConst::setDebugValue(LgsCodeGen& cg) {
     setDebugLoc(cg);
 }
 

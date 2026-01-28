@@ -1,0 +1,14 @@
+object Obj {
+    x: Int
+
+    func() {
+        print("From func")
+    }
+}
+
+main() {
+    obj = Obj{x=45}
+    name = Obj::name
+    method = Obj::getMethod("methodName"))
+    field = Obj::getField("x")
+}

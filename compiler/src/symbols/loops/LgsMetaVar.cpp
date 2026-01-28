@@ -1,6 +1,7 @@
 #include "loops/LgsMetaVar.h"
+#include "codegen/LgsCodeGen.h"
 
-Value* LgsMetaVar::loadIR(LgsCgModule& cg) {
+Value* LgsMetaVar::loadIR(LgsCodeGen& cg) {
     return IRValue;
 }
 
@@ -12,6 +13,6 @@ std::string LgsMetaVar::asText() {
     return name;
 }
 
-void LgsMetaVar::setDebugValue(LgsCgModule& cg) {
+void LgsMetaVar::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }

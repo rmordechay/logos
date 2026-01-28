@@ -9,10 +9,10 @@ public:
     explicit LgsFloatConst(LgsType* type, const double_t value) : LgsExpr(type), value(value) {
         isMutable = false;
     }
-    Value* loadIR(LgsCgModule& cg) override;
+    Value* loadIR(LgsCodeGen& cg) override;
     LgsExpr* castExplicitly(LgsType* toType) override;
     void castImplicitly(LgsType* toType) override;
     std::string asText() override;
-    void setDebugValue(LgsCgModule& cg) override;
+    void setDebugValue(LgsCodeGen& cg) override;
     ~LgsFloatConst() override = default;
 };

@@ -14,6 +14,9 @@
 #include <clang/Basic/TargetInfo.h>
 #include <clang/Basic/SourceManager.h>
 
+#include "exprs/constants/LgsIntConst.h"
+#include "types/primitives/LgsInt.h"
+
 using namespace clang;
 
 void LgsCCompiler::initCompiler() {
@@ -83,7 +86,9 @@ void LgsPPCallbacks::MacroDefined(const Token& macroNameToken, const MacroDirect
         const auto expr = new LgsIntConst(&LGS_INT, std::atoi(value.c_str()));
         const auto varDec = new LgsVarDec(stringRef.str(), expr);
         varDec->type = varDec->expr->type;
-        table.addSymbol(LgsSymbol(varDec, false, true), &errHandler);
+        if (!table.symbols.contains(varDec->name)) {
+            table.addSymbol(LgsSymbol(varDec, false, true), &errHandler);
+        }
     }
 }
 

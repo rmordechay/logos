@@ -2,11 +2,11 @@
 
 #include <cassert>
 
-Type* LgsSelf::getIRType(LgsCgModule& cg) {
+Type* LgsSelf::getIRType(LgsCodeGen& cg) {
     assert(0);
 }
 
-Constant* LgsSelf::getRTType(LgsCgModule& cg) {
+Constant* LgsSelf::getRTType(LgsCodeGen& cg) {
     assert(0);
 }
 
@@ -34,6 +34,6 @@ std::string LgsSelf::fmtStr() const {
     assert(0);
 }
 
-DIType* LgsSelf::getDebugType(LgsCgModule& cg) {
+DIType* LgsSelf::getDebugType(LgsCodeGen& cg) {
     assert(0);
 }

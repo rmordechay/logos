@@ -1,0 +1,16 @@
+object Obj {
+    a: Int
+    b: Float
+    c: Str
+    d: Str?
+}
+
+object Obj2 {
+    obj: Obj
+    arr: Int[4]
+}
+
+main() {
+    obj2 = Obj{c="Roi"}
+    print(obj2)
+}

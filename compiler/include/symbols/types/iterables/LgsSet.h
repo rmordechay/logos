@@ -16,18 +16,19 @@ public:
         isHeapAlloc = true;
         addMethod(addFunc);
     }
-    Type* getIRType(LgsCgModule& cg) override;
-    Constant* getRTType(LgsCgModule& cg) override;
+    Type* getIRType(LgsCodeGen& cg) override;
+    Constant* getRTType(LgsCodeGen& cg) override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
+    std::string getBaseName() override;
     std::string getName() override;
     std::string pname() override;
     bool canCastTo(LgsType* other) override;
     std::string fmtStr() const override;
     bool inferBaseType(std::vector<LgsExpr*>& args) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
-    Value* lenIR(LgsCgModule& cg, Value* iterable) override;
-    Value* inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) override;
-    Value* getIRElement(LgsCgModule& cg, Value* iterable, Value* index) override;
-    DIType* getDebugType(LgsCgModule& cg) override;
+    Value* lenIR(LgsCodeGen& cg, Value* iterable) override;
+    Value* inIR(LgsCodeGen& cg, Value* iterableExpr, Value* value) override;
+    Value* getIRElement(LgsCodeGen& cg, Value* iterable, Value* index) override;
+    DIType* getDebugType(LgsCodeGen& cg) override;
 };

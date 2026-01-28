@@ -9,11 +9,11 @@ LgsExpr* LgsJsonType::getZeroValue() {
     assert(0);
 }
 
-Type* LgsJsonType::getIRType(LgsCgModule& cg) {
+Type* LgsJsonType::getIRType(LgsCodeGen& cg) {
     assert(0);
 }
 
-Constant* LgsJsonType::getRTType(LgsCgModule& cg) {
+Constant* LgsJsonType::getRTType(LgsCodeGen& cg) {
     assert(0);
 }
 
@@ -25,7 +25,7 @@ std::string LgsJsonType::fmtStr() const {
     assert(0);
 }
 
-DIType* LgsJsonType::getDebugType(LgsCgModule& cg) {
+DIType* LgsJsonType::getDebugType(LgsCodeGen& cg) {
     assert(0);
 }
 

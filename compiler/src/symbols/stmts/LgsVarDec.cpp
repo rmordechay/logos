@@ -1,5 +1,5 @@
 #include "stmts/LgsVarDec.h"
-#include "codegen/LgsCgModule.h"
+#include "codegen/LgsCodeGen.h"
 #include "types/iterables/LgsStr.h"
 #include "LgsUtils.h"
 #include "types/LgsNullable.h"
@@ -10,22 +10,22 @@ void LgsVarDec::setType(LgsType* newType) {
     type = newType;
 }
 
-Value* LgsVarDec::loadIR(LgsCgModule& cg) {
-    if (!IRValue->getType()->isPointerTy()) return IRValue;
-    return cg.builder.CreateLoad(type->getIRType(cg), IRValue);
+Value* LgsVarDec::loadIR(LgsCodeGen& cg) {
+    return expr->loadIR(cg);
 }
 
 bool LgsVarDec::shouldAllocate() const {
     if (!type) return false;
-    if (type->asObject()) return false;
+    if (type->isHeapAlloc) return false;
+    if (type->asSArray()) return false;
+    if (type->asStr() && type->asStr()->isStatic) return false;
     if (type->asNullable() && !type->asNullable()->passByRef) return false;
-    if (expr->asFuncCall() || expr->asBinExpr()) return false;
-    if (type->asIterable() && type->asIterable()->isStatic) return false;
     if (type->asSubtype() || type->asFuncType()) return false;
+    if (expr->asFuncCall() || expr->asBinExpr()) return false;
     return true;
 }
 
-void LgsVarDec::setDebugValue(LgsCgModule& cg) {
+void LgsVarDec::setDebugValue(LgsCodeGen& cg) {
     setDebugLoc(cg);
     const auto var = cg.debugger.diBuilder->createAutoVariable(
         cg.debugger.subprogram,
@@ -45,8 +45,7 @@ void LgsVarDec::setDebugValue(LgsCgModule& cg) {
 
 void LgsVarDec::hashNode(size_t& oldHash) {
     hashNodeInt(oldHash, isNullable);
-    hashNodeInt(oldHash, isConst);
-    hashNodeInt(oldHash, isOwner);
+    hashNodeInt(oldHash, isMutable);
     hashNodeString(oldHash, name);
     if (type) type->hashNode(oldHash);
     if (expr) expr->hashNode(oldHash);

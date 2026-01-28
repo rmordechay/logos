@@ -11,7 +11,7 @@ std::string LgsJson::asText() {
     assert(0);
 }
 
-void LgsJson::setDebugValue(LgsCgModule& cg) {
+void LgsJson::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }
 

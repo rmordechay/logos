@@ -2,6 +2,7 @@
 #include "exprs/LgsExpr.h"
 #include "types/LgsFuncType.h"
 
+class LgsReturn;
 class LgsFuncType;
 struct LgsFuncArg;
 class LgsStmtsBlock;
@@ -9,15 +10,18 @@ class LgsParam;
 class LgsStmt;
 class LgsType;
 
-typedef std::function<Value*(LgsCgModule&, const std::vector<LgsFuncArg>&)> CallFn;
+typedef std::function<Value*(LgsCodeGen&, const std::vector<LgsFuncArg>&)> CallFn;
 
 class LgsFunc : public LgsExpr {
 public:
+    size_t id{};
     LgsFuncType* funcType;
     LgsStmtsBlock* stmtsBlock = nullptr;
+    std::vector<const LgsReturn*> returnStmts;
     std::vector<std::pair<LgsExpr*, LgsExpr*>> mocks;
-    bool isTest = false;
+    BasicBlock* epilogue = nullptr;
     bool isLambda = false;
+    bool isTest = false;
     CallFn fn;
 
     explicit LgsFunc(LgsFuncType* funcType) : LgsExpr(funcType), funcType(funcType) {}
@@ -34,24 +38,22 @@ public:
         }
         initFunc(name, rt, params, ops);
     }
-    explicit LgsFunc(const std::string& name, const std::string& parentName, LgsType* rt, const std::vector<LgsType*>& paramTypes, const uint32_t ops = 0): LgsFunc(name, rt, paramTypes, ops) {
+    explicit LgsFunc(const std::string& name, const std::string& parentName, LgsType* rt, const std::vector<LgsType*>& paramTypes, const uint32_t ops = 0)
+    : LgsFunc(name, rt, paramTypes, ops) {
         funcType->parentName = parentName;
     }
-
-    virtual Function* getIRFunc(LgsCgModule& cg);
-    virtual Value* call(LgsCgModule& cg, std::vector<LgsFuncArg>& args);
-    Value* callIR(LgsCgModule& cg, const std::vector<Value*>& args = {});
+    virtual Function* getIRFunc(LgsCodeGen& cg);
+    virtual Value* call(LgsCodeGen& cg, std::vector<LgsFuncArg>& args);
+    Value* callIR(LgsCodeGen& cg, const std::vector<Value*>& args = {});
+    Value* call(LgsCodeGen& cg, const std::vector<LgsExpr*>& args);
+    Value* callWithVariadic(LgsCodeGen& cg, const std::vector<LgsFuncArg>& args);
+    Value* loadIR(LgsCodeGen& cg) override;
     void initFunc(const std::string& name, LgsType* rt, const std::vector<LgsParam>& params, uint32_t ops);
-    Value* call(LgsCgModule& cg, const std::vector<LgsExpr*>& args);
-    Value* callWithVariadic(LgsCgModule& cg, const std::vector<LgsFuncArg>& args);
-    Value* loadIR(LgsCgModule& cg) override;
     void castImplicitly(LgsType* toType) override;
-    std::string getGenericName() const;
     std::string asText() override;
+    void setType(LgsType* newType) override;
     void hashNode(size_t& oldHash) override;
-    void createMapFunc(LgsCgModule& cg);
-    void createFilterFunc(LgsCgModule& cg);
-    void createForeachFunc(LgsCgModule& cg);
-    void setDebugValue(LgsCgModule& cg) override;
+    void setDebugValue(LgsCodeGen& cg) override;
+    LgsFunc* cloneGenerics(const LgsFuncCall* funcCall) const;
     ~LgsFunc() override;
 };

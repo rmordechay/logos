@@ -1,6 +1,6 @@
 #include "loops/LgsForLoop.h"
 #include "LgsDefinitions.h"
-#include "codegen/LgsCgModule.h"
+#include "codegen/LgsCodeGen.h"
 #include "loops/LgsForeachLoop.h"
 #include "loops/LgsInfiniteLoop.h"
 #include "loops/LgsRangeLoop.h"
@@ -12,20 +12,23 @@
 using llvm::MDNode;
 using llvm::MDString;
 
-void LgsForLoop::setBlocks(LgsCgModule& cg) {
+void LgsForLoop::setBlocks(LgsCodeGen& cg) {
     IRCondBlock = cg.createBlock(BLOCK_LOOP_COND);
     IRBodyBlock = cg.createBlock(BLOCK_LOOP_BODY);
     IRExitBlock = cg.createBlock(BLOCK_LOOP_EXIT);
 }
 
-void LgsForLoop::incAndJumpToCond(LgsCgModule& cg) {
+void LgsForLoop::incAndJumpToCond(LgsCodeGen& cg) {
     if (cg.lastInstTerminator()) return;
-    iValue = cg.builder.CreateLoad(cg.i32Ty(), iPtr);
-    const auto inc = cg.builder.CreateAdd(iValue, cg.i32(1));
+    const auto inc = cg.builder.CreateAdd(loadIndex(cg), cg.usize(1));
     cg.store(inc, iPtr);
     const auto br = cg.builder.CreateBr(IRCondBlock);
     const auto mustProgress = MDNode::get(cg.context, MDString::get(cg.context, "llvm.loop.mustprogress"));
     br->setMetadata("llvm.loop", MDNode::getDistinct(cg.context, {mustProgress}));
+}
+
+Value* LgsForLoop::loadIndex(LgsCodeGen& cg) const {
+    return cg.load(cg.sizeTy(), iPtr);
 }
 
 LgsForeachLoop* LgsForLoop::asForeachLoop() {

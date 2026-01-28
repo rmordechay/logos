@@ -11,6 +11,6 @@ public:
         : condExpr(codeExpr), thenExpr(thenExpr), elseExpr(elseExpr) {
     }
     std::string asText() override;
-    void setDebugValue(LgsCgModule& cg) override;
+    void setDebugValue(LgsCodeGen& cg) override;
     ~LgsTernaryExpr() override;
 };

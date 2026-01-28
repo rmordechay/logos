@@ -9,5 +9,5 @@ public:
     LgsFunc* closeFunc = nullptr;
 
     LgsIOPair(const std::string& openFuncName, const std::string& closeFuncName) : openFuncName(openFuncName), closeFuncName(closeFuncName) {}
-    void setDebugValue(LgsCgModule& cg) override;
+    void setDebugValue(LgsCodeGen& cg) override;
 };

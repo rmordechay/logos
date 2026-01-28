@@ -8,13 +8,11 @@ public:
     bool hasNullables = false;
 
     explicit LgsSelection(const std::vector<LgsExpr*>& exprs) : exprs(exprs) {}
-    Value* loadIR(LgsCgModule& cg) override;
-    LgsExpr* lastExpr() const;
+    Value* loadIR(LgsCodeGen& cg) override;
     LgsFuncCall* asMethodCall() const;
-    void assign(LgsCgModule& cg, LgsExpr* expr) override;
+    void assign(LgsCodeGen& cg, LgsExpr* right) override;
     std::string asText() override;
-    Value* hashValue(LgsCgModule& cg) override;
     bool equals(LgsExpr* other) override;
-    void setDebugValue(LgsCgModule& cg) override;
+    void setDebugValue(LgsCodeGen& cg) override;
     ~LgsSelection() override;
 };

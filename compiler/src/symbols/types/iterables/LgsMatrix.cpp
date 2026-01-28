@@ -1,13 +1,13 @@
 #include "types/iterables/LgsMatrix.h"
 
 #include "LgsBinaryTokens.h"
-#include "cblas/cblas.h"
+#include "exprs/LgsBinaryExpr.h"
 #include "exprs/LgsMatrixExpr.h"
 #include "types/LgsAny.h"
 #include "types/iterables/LgsSArray.h"
 #include "types/iterables/LgsVec.h"
 
-Type* LgsMatrix::getIRType(LgsCgModule& cg) {
+Type* LgsMatrix::getIRType(LgsCodeGen& cg) {
     return ArrayType::get(baseType->getIRType(cg), rows * columns);
 }
 
@@ -61,11 +61,13 @@ LgsType* LgsMatrix::applyMatMatOp(const LgsMatrix* otherMat, const LgsBinOp& op)
     }
 }
 
-Value* LgsMatrix::mulIR(LgsCgModule& cg, LgsExpr* left, LgsExpr* right) {
+Value* LgsMatrix::mulIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
+    const auto left = binExpr->left;
+    const auto right = binExpr->right;
     const auto leftMat = left->type->asMatrix();
     const auto rightMat = right->type->asMatrix();
-    const auto order = cg.i32(CblasRowMajor);
-    const auto noTranspose = cg.i32(CblasNoTrans);
+    const auto order = cg.i32(CBLAS_ROW_MAJOR);
+    const auto noTranspose = cg.i32(CBLAS_NO_TRANS);
     const auto M = cg.i32(leftMat->rows);
     const auto N = cg.i32(rightMat->columns);
     const auto K = cg.i32(leftMat->columns);
@@ -105,10 +107,13 @@ LgsType* LgsMatrix::getValueType() {
     return new LgsSArray(baseType, new LgsIntConst(columns));
 }
 
-Constant* LgsMatrix::getRTType(LgsCgModule& cg) {
+std::string LgsMatrix::getBaseName() {
+    return name;
+}
+
+Constant* LgsMatrix::getRTType(LgsCodeGen& cg) {
     const auto matName = getName();
-    const auto sv = cg.getRTTExtraStruct(matName, {cg.sizeTy(), cg.sizeTy(), cg.ptrTy()}, {cg.usize(rows), cg.usize(columns), baseType->getRTType(cg)});
-    return cg.getRTTypeInfo(matName, sizeBytes(), RTT_MATRIX, isHeapAlloc, sv);
+    return cg.getRTTypeInfo(matName, IRSize(cg), RTT_MATRIX);
 }
 
 std::string LgsMatrix::getName() {
@@ -116,7 +121,7 @@ std::string LgsMatrix::getName() {
 }
 
 bool LgsMatrix::canCastTo(LgsType* other) {
-    if (other->getName() == LgsAny::name) return true;
+    if (other->isAny()) return true;
     if (getName() == other->getName()) return true;
     return false;
 }
@@ -129,22 +134,22 @@ bool LgsMatrix::inferBaseType(std::vector<LgsExpr*>& args) {
     assert(0);
 }
 
-Value* LgsMatrix::getIRElement(LgsCgModule& cg, Value* iterable, Value* index) {
+Value* LgsMatrix::getIRElement(LgsCodeGen& cg, Value* iterable, Value* index) {
     const auto i = cg.builder.CreateMul(index, cg.i32(columns));
     const auto gep = cg.builder.CreateGEP(getIRType(cg), iterable, {cg.i32Zero(), i});
     const auto rows2 = cg.builder.CreateAlloca(baseType->getIRType(cg), cg.i32(columns));
-    cg.callMemCpy(rows2, gep, cg.i32(baseType->sizeBytes() * columns));
+    cg.callMemcpy(rows2, gep, cg.builder.CreateMul(baseType->IRSize(cg), cg.usize(columns)));
     return rows2;
 }
 
-Value* LgsMatrix::lenIR(LgsCgModule& cg, Value* iterable) {
+Value* LgsMatrix::lenIR(LgsCodeGen& cg, Value* iterable) {
     return cg.i32(rows);
 }
 
-DIType* LgsMatrix::getDebugType(LgsCgModule& cg) {
+DIType* LgsMatrix::getDebugType(LgsCodeGen& cg) {
     assert(0);
 }
 
-Value* LgsMatrix::inIR(LgsCgModule& cg, LgsExpr* iterableExpr, LgsExpr* value) {
+Value* LgsMatrix::inIR(LgsCodeGen& cg, Value* iterableExpr, Value* value) {
     assert(0);
 }
