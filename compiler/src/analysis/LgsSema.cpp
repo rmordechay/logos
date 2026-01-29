@@ -1658,15 +1658,15 @@ bool LgsSema::validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const Lgs
 
 void LgsSema::resolveImports() const {
     for (auto& [name, app] : file->symbolTable.imports) {
-        const auto it = globals.table.imports.find(name);
-        if (it == globals.table.imports.end()) continue;
+        const auto it = globals.imports.find(name);
+        if (it == globals.imports.end()) continue;
         app = it->second;
     }
 }
 
 void LgsSema::addLocalSymbol(const LgsSymbol& newSymbol) {
     auto symbolName = *newSymbol.name;
-    const auto symbol = globals.table.getSymbol(symbolName);
+    const auto symbol = globals.getSymbol(symbolName);
     if (symbol && symbol->isBuiltin) {
         return addError(E10053, *newSymbol.location, {symbolName});
     }
@@ -1677,7 +1677,7 @@ void LgsSema::addLocalSymbol(const LgsSymbol& newSymbol) {
 }
 
 LgsSymbol* LgsSema::getSymbol(const std::string& name) {
-    if (const auto globalSymbol = globals.table.getSymbol(name)) {
+    if (const auto globalSymbol = globals.getSymbol(name)) {
         if (!globalSymbol->isBuiltin) refCount[*globalSymbol->name]++;
         return globalSymbol;
     }
@@ -1685,7 +1685,7 @@ LgsSymbol* LgsSema::getSymbol(const std::string& name) {
         return fileSymbol;
     }
     for (auto [_, app] : file->symbolTable.imports) {
-        if (const auto s = app->globals.table.getSymbol(name)) return s;
+        if (const auto s = app->globals.getSymbol(name)) return s;
     }
     if (const auto symbol = stack.getSymbolTable().getSymbol(name)) {
         return symbol;
@@ -1719,7 +1719,7 @@ void LgsSema::addRTType(LgsType* type) const {
     if (!type || type->isVoid() || type->hasGenericTypes()) return;
     if (type->asNullable() && !type->asNullable()->baseType) return;
     if (type->asInterface() || type->asFuncType()) return;
-    for (const auto rttType : globals.table.rttTypes) {
+    for (const auto rttType : globals.rttTypes) {
         if (rttType->equals(type)) return;
     }
     for (const auto rttType : file->symbolTable.rttTypes) {

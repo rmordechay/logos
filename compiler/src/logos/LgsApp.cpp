@@ -304,10 +304,10 @@ bool LgsApp::loadDeps() const {
 }
 
 void LgsApp::loadBuiltins() {
-    globals.table.addSymbol(LgsSymbol(new LgsPrint(), true, false), &errHandler);
-    // globals.table.addSymbol(LgsSymbol(new LgsSys(), true, false), &errHandler);
-    // globals.table.addSymbol(LgsSymbol(new LgsTest(), true, false), &errHandler);
-    globals.table.rttTypes = {
+    globals.addSymbol(LgsSymbol(new LgsPrint(), true, false), &errHandler);
+    // globals.addSymbol(LgsSymbol(new LgsSys(), true, false), &errHandler);
+    // globals.addSymbol(LgsSymbol(new LgsTest(), true, false), &errHandler);
+    globals.rttTypes = {
         &LGS_STR, &LGS_CHAR, &LGS_BYTE, &LGS_BOOL, &LGS_INT, &LGS_UINT, &LGS_ULONG,
         &LGS_SHORT, &LGS_LONG, &LGS_SIZE, &LGS_FLOAT, &LGS_DOUBLE, &LGS_NULLABLE, &LGS_VOID
     };
@@ -343,10 +343,10 @@ bool LgsApp::generateRTTTypes() {
     rttTypeModule.mode = CG_MODE_RTTYPES;
 
     // Globals
-    for (const auto type : globals.table.rttTypes) {
+    for (const auto type : globals.rttTypes) {
         type->getRTType(rttTypeModule);
     }
-    for (auto [symbolName, symbol] : globals.table.symbols) {
+    for (auto [symbolName, symbol] : globals.symbols) {
         if (symbol.symbolType != OBJECT) continue;
         symbol.object->getRTType(rttTypeModule);
         for (const auto innerObj : symbol.object->objects) {
@@ -527,8 +527,8 @@ LgsApp::~LgsApp() {
         delete testFile;
     }
     testFiles.clear();
-    for (const auto& [_, app] : globals.table.imports) {
+    for (const auto& [_, app] : globals.imports) {
         delete app;
     }
-    globals.table.imports.clear();
+    globals.imports.clear();
 }

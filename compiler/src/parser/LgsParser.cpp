@@ -250,7 +250,7 @@ LgsObjectFile* LgsParser::parseObjectFile() {
     }
     {
         std::lock_guard lock(mtx);
-        globals.table.addSymbol(LgsSymbol(file->obj), &errHandler, metadata->path);
+        globals.addSymbol(LgsSymbol(file->obj), &errHandler, metadata->path);
     }
     return file;
 }
@@ -267,7 +267,7 @@ LgsInterfaceFile* LgsParser::parseInterfaceFile() {
     file->interface = interface;
     {
         std::lock_guard lock(mtx);
-        globals.table.addSymbol(LgsSymbol(file->interface), &errHandler, metadata->path);
+        globals.addSymbol(LgsSymbol(file->interface), &errHandler, metadata->path);
     }
     return file;
 }
@@ -417,7 +417,7 @@ LgsObject* LgsParser::parseObjectBody(const LgsToken& tokenName, const bool isSi
     if (isSingleton) {
         obj->singleton = new LgsInstance(obj);
         std::lock_guard lock(mtx);
-        globals.table.addSymbol(LgsSymbol(obj), &errHandler, metadata->path);
+        globals.addSymbol(LgsSymbol(obj), &errHandler, metadata->path);
     }
 
     if (!headersOnly && currentToken.type != T_EOF && currentToken.type != T_RBRACE) {
@@ -2017,7 +2017,7 @@ void LgsParser::validateTestFolder(const LgsFile* testFile) {
 
 bool LgsParser::isImportName(LgsExpr* expr) const {
     if (const auto variable = expr->asVariable()) {
-        if (!globals.table.imports.contains(variable->name)) return false;
+        if (!globals.imports.contains(variable->name)) return false;
         variable->isImportName = true;
         return true;
     }

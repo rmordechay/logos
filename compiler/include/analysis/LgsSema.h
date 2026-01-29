@@ -62,12 +62,12 @@ public:
     LgsFile* file;
     LgsStack stack;
     LgsAppConfigs& appConfigs;
-    LgsGlobals& globals;
+    LgsSymbolTable& globals;
     LgsErrHandler errHandler;
     LgsTypeResolver typeResolver;
     std::unordered_map<std::string, size_t> refCount;
 
-    explicit LgsSema(LgsAppConfigs& appConfigs, LgsFile* file, LgsGlobals& globals)
+    explicit LgsSema(LgsAppConfigs& appConfigs, LgsFile* file, LgsSymbolTable& globals)
         : file(file), appConfigs(appConfigs), globals(globals), typeResolver(file, errHandler, globals) {}
 
     void analyse();

@@ -165,7 +165,7 @@ void LgsTypeResolver::resolveIOPair(LgsIOPair* ioPair, LgsObject* obj) const {
 }
 
 LgsSymbol LgsTypeResolver::findSymbol(const std::string& typeName, const LgsLocation& location) const {
-    if (const auto symbol = globals.table.getSymbol(typeName)) return *symbol;
+    if (const auto symbol = globals.getSymbol(typeName)) return *symbol;
     if (const auto symbol = file->symbolTable.getSymbol(typeName)) return *symbol;
     for (const auto genericType : currentFuncType->genericTypes) {
         if (genericType->name == typeName) return LgsSymbol(genericType);

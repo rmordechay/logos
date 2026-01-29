@@ -13,7 +13,6 @@ class LgsMainFunc;
 class LgsMap;
 class LgsFuncType;
 class LgsAppConfigFile;
-struct LgsGlobals;
 struct LgsFileMetadata;
 class LgsMetaSelection;
 class LgsMatrixExpr;
@@ -70,17 +69,17 @@ public:
     size_t recursionCount = 0;
     std::vector<LgsToken> tokens;
     LgsFileMetadata* metadata = nullptr;
-    LgsGlobals& globals;
+    LgsSymbolTable& globals;
     std::string code = "";
     LgsErrHandler errHandler;
     LgsFunc* currentFunc = nullptr;
     LgsCCompiler lgsCC;
 
-    LgsParser(LgsFileMetadata* metadata, LgsPaths& paths, LgsGlobals& globals, const bool headersOnly = false)
+    LgsParser(LgsFileMetadata* metadata, LgsPaths& paths, LgsSymbolTable& globals, const bool headersOnly = false)
         : paths(paths), headersOnly(headersOnly), metadata(metadata), globals(globals), lgsCC(paths) {
     }
 
-    LgsParser(const std::string& code, LgsPaths& paths, LgsGlobals& globals, const bool headersOnly = false)
+    LgsParser(const std::string& code, LgsPaths& paths, LgsSymbolTable& globals, const bool headersOnly = false)
         : paths(paths), headersOnly(headersOnly), globals(globals), code(code), lgsCC(paths) {}
 
     // Files

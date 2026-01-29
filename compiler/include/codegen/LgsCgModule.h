@@ -64,11 +64,11 @@ public:
     LgsStack stack;
     LgsCodeGen& cg;
     LgsPaths& paths;
-    LgsGlobals& globals;
+    LgsSymbolTable& globals;
     LgsAppConfigs& appConfigs;
     Value* startTime = nullptr;
 
-    explicit LgsCgModule(LgsFile* file, LgsAppConfigs& appConfigs, LgsGlobals& globals, LgsPaths& paths)
+    explicit LgsCgModule(LgsFile* file, LgsAppConfigs& appConfigs, LgsSymbolTable& globals, LgsPaths& paths)
         : file(file), cg(file->cg), paths(paths), globals(globals), appConfigs(appConfigs) {
     }
 

@@ -23,8 +23,3 @@ struct LgsSymbolTable {
     LgsSymbol* getSymbol(const std::string& name);
     void addSymbol(const LgsSymbol& symbol, LgsErrHandler* errHandler, const std::string& filePath = "");
 };
-
-struct LgsGlobals {
-    LgsSymbolTable table;
-    std::map<std::string, LgsSymbolTable> cImports;
-};

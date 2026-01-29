@@ -79,7 +79,7 @@ void LgsCgModule::visitMainFile(LgsMainFile* mainFile) {
         visitConstant(varDec->expr);
         varDec->IRValue = varDec->expr->IRValue;
     }
-    for (const auto& [_, symbol] : globals.table.symbols) {
+    for (const auto& [_, symbol] : globals.symbols) {
         if (symbol.symbolType != VAR_DEC) continue;
         visitConstant(symbol.varDec->expr);
         symbol.varDec->IRValue = symbol.varDec->expr->IRValue;

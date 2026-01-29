@@ -4,7 +4,6 @@
 
 
 class LgsMainFile;
-struct LgsGlobals;
 class LgsIOPair;
 class LgsFuncType;
 class LgsIterable;
@@ -18,11 +17,11 @@ class LgsErrHandler;
 class LgsTypeResolver {
 public:
     LgsFile* file;
-    LgsGlobals& globals;
+    LgsSymbolTable& globals;
     LgsErrHandler& errHandler;
     LgsFuncType* currentFuncType = nullptr;
 
-    LgsTypeResolver(LgsFile* file, LgsErrHandler& errHandler, LgsGlobals& globals) : file(file), globals(globals),errHandler(errHandler) {}
+    LgsTypeResolver(LgsFile* file, LgsErrHandler& errHandler, LgsSymbolTable& globals) : file(file), globals(globals),errHandler(errHandler) {}
     void resolveType(LgsType*& type);
     void resolveMainFile(LgsMainFile* mf);
     void resolveObj(LgsObject* obj);

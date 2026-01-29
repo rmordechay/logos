@@ -22,7 +22,7 @@ class LgsApp final {
 public:
     LgsAppConfigs configs;
     LgsAppCache appCache;
-    LgsGlobals globals;
+    LgsSymbolTable globals;
     LgsErrHandler errHandler;
     LgsCodeGen rttTypeModule;
     std::vector<LgsFile*> srcFiles;
