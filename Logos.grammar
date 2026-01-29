@@ -222,7 +222,6 @@ expr:
 
 unaryExpr:
         vector
-    |   JSON json
     |   constant
     |   funcCall
     |   prefixExpr
@@ -378,27 +377,6 @@ assignemntOp:
     |   EQUAL_DOUBLE_LANGLE
     ;
 
-json:
-        constant
-    |   jsonObj
-    |   jsonArray
-    |   NULL
-    ;
-
-jsonObj:
-        LBRACE jsonPair (COMMA jsonPair)* RBRACE
-    |   LBRACE RBRACE
-    ;
-
-jsonPair:
-        STRING COLON json
-    ;
-
-jsonArray:
-        LBRACK json (COMMA json)* RBRACK
-    |   LBRACK RBRACK
-    ;
-
 // Tokens
 DOUBLE_EQUAL: '==';
 NOT_EQUAL: '!=';
@@ -473,7 +451,6 @@ ELSE: 'else';
 BREAK: 'break';
 CONTINUE: 'continue';
 RETURN: 'return';
-JSON: '.json';
 VEC2: 'vec2';
 VEC3: 'vec3';
 VEC4: 'vec4';

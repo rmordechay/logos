@@ -60,7 +60,7 @@ inline LgsBaseMsg E10045{"Variadic argument cannot have default arguments.", err
 inline LgsBaseMsg E10046{"%s is not callable.", errCodeStart++};
 inline LgsBaseMsg E10047{"External %s file '%s' was not found.", errCodeStart++};
 inline LgsBaseMsg E10048{"Index %s is out of bounds. Iterable length: %s", errCodeStart++};
-inline LgsBaseMsg E10049{"Not enough information to infer type of %s.", errCodeStart++};
+inline LgsBaseMsg E10049{"Not enough information to infer the type of %s.", errCodeStart++};
 inline LgsBaseMsg E10050{"Only integer values can be incremented (++) or decremented (--). Given: %s.", errCodeStart++};
 inline LgsBaseMsg E10051{"%s is constant and cannot be overwritten.", errCodeStart++};
 inline LgsBaseMsg E10052{"Spread operator in %s... must only be used with iterables. Given type: %s.", errCodeStart++};

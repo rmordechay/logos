@@ -6,8 +6,6 @@
 #include "lgsc/LgsCCompiler.h"
 #include "stmts/LgsAssignment.h"
 
-class LgsJsonObject;
-class LgsJsonArray;
 class LgsMetaVar;
 struct LgsImportPackage;
 class LgsStmtsBlock;
@@ -39,7 +37,6 @@ class LgsField;
 class LgsEnum;
 class LgsInterface;
 class LgsType;
-class LgsJson;
 class LgsPostfixExpr;
 class LgsIterIndex;
 class LgsSelection;
@@ -162,13 +159,6 @@ public:
     LgsPostfixExpr* parsePostfixExpr(LgsExpr* baseExpr);
     LgsSelection* parseSelection(LgsExpr* firstExpr);
     LgsMetaSelection* parseMetaSelection(LgsExpr* firstExpr);
-
-    // JSON
-    LgsJson* parseJson();
-    LgsJson* parseJsonValue();
-    LgsJson* parseJsonPrimitive();
-    LgsJsonArray* parseJsonArray();
-    LgsJsonObject* parseJsonObject();
 
     void parseArgs(LgsInstance* instance);
     void parsePackageString(LgsImportPackage& pkg, const LgsToken& importToken);

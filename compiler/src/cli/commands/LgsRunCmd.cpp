@@ -11,7 +11,8 @@ void LgsRunCmd::run() {
         parseCompileArgs(app, args);
         if (!errHandler.successful) return;
         if (!app.compile()) {
-            return errHandler.mergeErrors(app.errHandler);
+            errHandler.mergeErrors(app.errHandler);
+            return;
         }
         execPath = app.paths.execFile;
     }

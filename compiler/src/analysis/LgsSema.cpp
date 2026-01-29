@@ -17,7 +17,6 @@
 #include "exprs/LgsCast.h"
 #include "types/LgsEnum.h"
 #include "exprs/LgsHashMap.h"
-#include "exprs/LgsJson.h"
 #include "exprs/LgsPostfixExpr.h"
 #include "exprs/LgsPrefixExpr.h"
 #include "exprs/LgsTernaryExpr.h"
@@ -761,7 +760,6 @@ void LgsSema::visitExpr(LgsExpr*& expr) {
         else if (const auto matrixExpr = expr->asMatrixExpr()) visitMatrixExpr(matrixExpr);
         else if (const auto nullableExpr = expr->asNullableExpr()) visitNullableExpr(nullableExpr);
         else if (const auto castExpr = expr->asCast()) visitCast(castExpr);
-        else if (const auto json = expr->asJson()) visitJson(json);
         visitUnwrap(expr);
     }
 }
@@ -1293,38 +1291,6 @@ void LgsSema::visitComplexConst(LgsComplexConst* complex) {
 
 void LgsSema::visitTypeExpr(LgsTypeExpr* typeExpr) {
     typeResolver.resolveType(typeExpr->type);
-}
-
-void LgsSema::visitJson(const LgsJson* json) {
-    switch (json->jsonType->kind) {
-    case JSON_OBJECT:
-        visitJsonObj(json->obj);
-        break;
-    case JSON_ARRAY:
-        visitJsonArr(json->arr);
-        break;
-    case JSON_STRING:
-        visitStrConst(json->strConst);
-        break;
-    case JSON_NULL:
-    case JSON_INT:
-    case JSON_FLOAT:
-        break;
-    case JSON_UNKNOWN:
-        assert(0);
-    }
-}
-
-void LgsSema::visitJsonArr(const LgsJsonArray* jsonArr) {
-    for (const auto element : jsonArr->elements) {
-        visitJson(element);
-    }
-}
-
-void LgsSema::visitJsonObj(const LgsJsonObject* jsonObj) {
-    for (auto &[_, v] : jsonObj->entries) {
-        visitJson(v);
-    }
 }
 
 void LgsSema::visitInstance(LgsInstance* instance) {

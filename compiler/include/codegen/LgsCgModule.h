@@ -4,7 +4,6 @@
 #include "logos/LgsStack.h"
 
 class LgsMetaSelection;
-class LgsJson;
 class LgsMatrixExpr;
 class LgsEnvVar;
 struct LgsPaths;
@@ -132,7 +131,6 @@ public:
     void visitCharConst(LgsCharConst* charConst) const;
     void visitInstance(LgsInstance* instance);
     void visitIterIndex(LgsIterIndex* iterIndex, bool assign);
-    void visitJson(LgsJson* json);
 
     // Funcs
     void createPrologue(LgsFunc* func);

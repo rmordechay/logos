@@ -1,5 +1,0 @@
-main() {
-    jsonScalar: Json = .json(3.23)
-    jsonArr: Json = .json[3.23, 2.34]
-    jsonObj: Json = .json{"x": 3.23, "y": 2.34}
-}

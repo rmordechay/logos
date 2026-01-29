@@ -6,9 +6,9 @@ struct Lgs_StrIndices {
 };
 
 struct Lgs_HashMapIndices {
-    const size_t entries = 1;
-    const size_t len = 2;
-    const size_t cap = 3;
+    const size_t entries = 0;
+    const size_t len = 1;
+    const size_t cap = 2;
     const size_t key = 0;
     const size_t value = 1;
     const size_t next = 2;

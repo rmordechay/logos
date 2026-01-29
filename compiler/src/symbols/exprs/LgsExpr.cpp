@@ -15,7 +15,6 @@
 #include "exprs/constants/LgsFloatConst.h"
 #include "exprs/constants/LgsStrConst.h"
 #include "stmts/LgsField.h"
-#include "exprs/LgsJson.h"
 #include "exprs/LgsMatrixExpr.h"
 #include "exprs/LgsMetaSelection.h"
 #include "exprs/LgsNullableExpr.h"
@@ -184,10 +183,6 @@ LgsTypeExpr* LgsExpr::asTypeExpr() {
     return dynamic_cast<LgsTypeExpr*>(this);
 }
 
-LgsJson* LgsExpr::asJson() {
-    return dynamic_cast<LgsJson*>(this);
-}
-
 LgsCast* LgsExpr::asCast() {
     return dynamic_cast<LgsCast*>(this);
 }
@@ -202,6 +197,10 @@ LgsArrayExpr* LgsExpr::asArrayExpr() {
 
 LgsHashMap* LgsExpr::asHashMap() {
     return dynamic_cast<LgsHashMap*>(this);
+}
+
+LgsPair* LgsExpr::asPair() {
+    return dynamic_cast<LgsPair*>(this);
 }
 
 LgsEnvVar* LgsExpr::asEnvVar() {

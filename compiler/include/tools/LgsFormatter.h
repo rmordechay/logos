@@ -6,7 +6,6 @@ class LgsSubType;
 class LgsEnum;
 class LgsIntConst;
 class LgsMetaVar;
-class LgsJson;
 class LgsTypeExpr;
 class LgsVectorExpr;
 class LgsIOStmt;
@@ -114,7 +113,6 @@ public:
     void formatPostfixExpr(LgsPostfixExpr* postfixExpr);
     void formatStrConst(const LgsStrConst* strConst);
     void formatTypeExpr(LgsTypeExpr* typeExpr);
-    void formatJson(const LgsJson* jsonStmt);
     void formatInstance(LgsInstance* instance);
     void formatIntConst(const LgsIntConst* intConst);
     void formatInterfaceInstance(LgsInstance* instance, LgsInterface* interface);

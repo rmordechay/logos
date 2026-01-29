@@ -237,7 +237,6 @@ void LgsFormatter::formatExpr(LgsExpr*& expr) {
         if (const auto forVar = expr->asLoopMetaVar()) return formatLoopMetaVar(forVar);
         if (const auto vecExpr = expr->asVectorExpr()) return formatVectorExpr(vecExpr);
         if (const auto castExpr = expr->asCast()) return formatCast(castExpr);
-        if (const auto jsonExpr = expr->asJson()) return formatJson(jsonExpr);
         assert(0);
     }
 }
@@ -314,10 +313,6 @@ void LgsFormatter::formatStrConst(const LgsStrConst* strConst) {
 }
 
 void LgsFormatter::formatTypeExpr(LgsTypeExpr* typeExpr) {
-    assert(0);
-}
-
-void LgsFormatter::formatJson(const LgsJson* jsonStmt) {
     assert(0);
 }
 

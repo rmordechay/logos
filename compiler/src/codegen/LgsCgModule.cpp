@@ -15,7 +15,6 @@
 #include "exprs/LgsFuncCall.h"
 #include "exprs/LgsInstance.h"
 #include "exprs/LgsIterIndex.h"
-#include "exprs/LgsJson.h"
 #include "exprs/LgsPostfixExpr.h"
 #include "exprs/LgsPrefixExpr.h"
 #include "exprs/LgsSelection.h"
@@ -625,7 +624,6 @@ void LgsCgModule::visitExpr(LgsExpr* expr, const bool assign) {
         else if (const auto loopMetaVar = expr->asLoopMetaVar()) visitLoopMetaVar(loopMetaVar);
         else if (const auto nullableExpr = expr->asNullableExpr()) visitNullableExpr(nullableExpr);
         else if (const auto cast = expr->asCast()) visitCast(cast);
-        else if (const auto json = expr->asJson()) visitJson(json);
     }
 }
 
@@ -1221,10 +1219,6 @@ void LgsCgModule::visitIterIndex(LgsIterIndex* iterIndex, const bool assign) {
     } else {
         iterIndex->setIRElementPtr(cg, assign);
     }
-}
-
-void LgsCgModule::visitJson(LgsJson* json) {
-    assert(0);
 }
 
 void LgsCgModule::createPrologue(LgsFunc* func) {

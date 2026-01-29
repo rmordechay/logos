@@ -4,7 +4,6 @@
 #include "exprs/LgsFuncCall.h"
 #include "exprs/LgsInstance.h"
 #include "exprs/LgsIterIndex.h"
-#include "exprs/LgsJson.h"
 #include "exprs/LgsPostfixExpr.h"
 #include "exprs/LgsPrefixExpr.h"
 #include "exprs/LgsSelection.h"
@@ -528,9 +527,6 @@ LgsType* LgsParser::parseType() {
     } else if (currentToken.type == T_MATRIX) {
         const auto [rows, columns] = extractMatDims(currentToken);
         type = new LgsMatrix(rows, columns);
-        consume();
-    } else if (currentToken.type == T_JSON) {
-        type = new LgsJsonType();
         consume();
     } else if (startToken.type == T_IDENTIFIER) {
         const auto typeText = startToken.lexeme;
@@ -1334,7 +1330,6 @@ LgsExpr* LgsParser::parseUnary(const bool withInstance) {
     else if (const auto envVar = parseEnvVar()) expr = envVar;
     else if (const auto arrayExpr = parseArrayExpr()) expr = arrayExpr;
     else if (const auto hashMap = parseHashMap()) expr = hashMap;
-    else if (const auto json = parseJson()) expr = json;
     else if (const auto prefixExpr = parsePrefixExpr()) expr = prefixExpr;
     else if (const auto funcCall = parseFuncCall()) expr = funcCall;
     else if (withInstance && ((expr = parseInstance()))) {
@@ -1871,89 +1866,6 @@ LgsMetaSelection* LgsParser::parseMetaSelection(LgsExpr* firstExpr) {
     const auto metaSelection = new LgsMetaSelection(firstExpr, expr);
     metaSelection->location = firstExpr->location;
     return metaSelection;
-}
-
-LgsJson* LgsParser::parseJson() {
-    const auto startToken = currentToken;
-    if (!matchAndConsume(T_JSON)) return nullptr;
-    LgsJson* json = nullptr;
-    if (currentToken.type == T_LBRACE) {
-        const auto jsonType = new LgsJsonType(JSON_OBJECT);
-        json = new LgsJson(jsonType, parseJsonObject());
-    } else if (currentToken.type == T_LBRACK) {
-        const auto jsonType = new LgsJsonType(JSON_ARRAY);
-        json = new LgsJson(jsonType, parseJsonArray());
-    } else {
-        json = parseJsonPrimitive();
-    }
-    assert(json);
-    setLocation(json->location, &startToken, &currentToken);
-    return json;
-}
-
-LgsJson* LgsParser::parseJsonValue() {
-    const auto startToken = currentToken;
-    LgsJson* json = nullptr;
-    if (currentToken.type == T_LBRACE) {
-        json = new LgsJson(new LgsJsonType(JSON_OBJECT), parseJsonObject());
-    } else if (currentToken.type == T_LBRACK) {
-        json = new LgsJson(new LgsJsonType(JSON_ARRAY), parseJsonArray());
-    } else {
-        json = parseJsonPrimitive();
-    }
-    setLocation(json->location, &startToken, &currentToken);
-    return json;
-}
-
-LgsJson* LgsParser::parseJsonPrimitive() {
-    LgsJson* json = nullptr;
-    if (const auto strConst = parseStrConst()) {
-        json = new LgsJson(new LgsJsonType(JSON_STRING), strConst);
-    } else if (const auto constant = parseConstant()) {
-        if (const auto intConst = constant->asIntConst()) {
-            json = new LgsJson(new LgsJsonType(JSON_INT), intConst);
-        } else if (const auto floatConst = constant->asFloatConst()) {
-            json = new LgsJson(new LgsJsonType(JSON_FLOAT), floatConst);
-        }
-        // else if (constant->asNull()) {
-        //     json = new LgsJson(new LgsJsonType(JSON_NULL), new LgsNullableExpr(true));
-        // }
-    }
-    return json;
-}
-
-LgsJsonArray* LgsParser::parseJsonArray() {
-    mustMatch(T_LBRACK);
-    const auto jsonArray = new LgsJsonArray();
-    while (true) {
-        const auto valueJson = parseJsonValue();
-        if (!valueJson) break;
-        jsonArray->elements.push_back(valueJson);
-        if (currentToken.type == T_RBRACK) break;
-        mustMatch(T_COMMA);
-    }
-    if (currentToken.type == T_COMMA) consume();
-    mustMatch(T_RBRACK);
-    return jsonArray;
-}
-
-LgsJsonObject* LgsParser::parseJsonObject() {
-    mustMatch(T_LBRACE);
-    const auto jsonObject = new LgsJsonObject();
-    if (!matchAndConsume(T_RBRACE)) {
-        while (true) {
-            const auto keyToken = currentToken;
-            if (!mustMatch(T_STRING)) break;
-            if (!mustMatch(T_COLON)) break;
-            const auto valueJson = parseJsonValue();
-            jsonObject->entries[keyToken.lexeme] = valueJson;
-            if (currentToken.type == T_RBRACE) break;
-            mustMatch(T_COMMA);
-        }
-        if (currentToken.type == T_COMMA) consume();
-        mustMatch(T_RBRACE);
-    }
-    return jsonObject;
 }
 
 void LgsParser::parseArgs(LgsInstance* instance) {

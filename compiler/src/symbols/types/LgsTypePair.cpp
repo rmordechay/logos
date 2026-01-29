@@ -4,8 +4,10 @@
 
 #include <cassert>
 
+#include "codegen/LgsCodeGen.h"
+
 Type* LgsTypePair::getIRType(LgsCodeGen& cg) {
-    assert(0);
+    return cg.getStructType({key->getIRType(cg), value->getIRType(cg), cg.ptrTy()}, name);
 }
 
 Constant* LgsTypePair::getRTType(LgsCodeGen& cg) {
@@ -17,7 +19,7 @@ LgsExpr* LgsTypePair::getZeroValue() {
 }
 
 size_t LgsTypePair::sizeBytes() {
-    return key->sizeBytes() + value->sizeBytes() ;
+    return key->sizeBytes() + value->sizeBytes() + sizeof(void*);
 }
 
 std::string LgsTypePair::getName() {

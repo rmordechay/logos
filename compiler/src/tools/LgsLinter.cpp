@@ -169,10 +169,6 @@ void LgsLinter::visitTypeExpr(LgsTypeExpr* typeExpr) {
     assert(0);
 }
 
-void LgsLinter::visitJson(const LgsJson* jsonStmt) {
-    assert(0);
-}
-
 void LgsLinter::visitInstance(LgsInstance* instance) {
     assert(0);
 }

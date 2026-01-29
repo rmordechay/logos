@@ -2,7 +2,6 @@
 #include "logos/LgsStack.h"
 #include "errors/LgsErrHandler.h"
 #include "analysis/LgsTypeResolver.h"
-#include "exprs/LgsJson.h"
 #include "files/LgsEnvFile.h"
 #include "logos/LgsAppConfigs.h"
 #include <unordered_map>
@@ -130,9 +129,6 @@ public:
     void visitStrConst(const LgsStrConst* strConst);
     void visitComplexConst(LgsComplexConst* complex);
     void visitTypeExpr(LgsTypeExpr* typeExpr);
-    void visitJson(const LgsJson* json);
-    void visitJsonArr(const LgsJsonArray* jsonArr);
-    void visitJsonObj(const LgsJsonObject* jsonObj);
     void visitInstance(LgsInstance* instance);
     void visitInlineInterface(LgsInstance* instance, LgsInterface* interface);
     void visitIterIndex(LgsIterIndex* iterIndex);

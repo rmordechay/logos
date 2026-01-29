@@ -159,7 +159,7 @@ Value* LgsStr::inIR(LgsCodeGen& cg, Value* iterableExpr, Value* value) {
 }
 
 Value* LgsStr::hashValue(LgsCodeGen& cg, Value* value) {
-    return LgsIterable::hashValue(cg, value);
+    return cg.callHash(cg.loadStructField(getIRType(cg), value, rttIndices.data, cg.ptrTy()));
 }
 
 DIType* LgsStr::getDebugType(LgsCodeGen& cg) {

@@ -323,7 +323,6 @@ void LgsJsonParser::parseExpr(LgsExpr* expr) {
         if (const auto forVar = expr->asLoopMetaVar()) return parseLoopMetaVar(forVar);
         if (const auto vecExpr = expr->asVectorExpr()) return parseVectorExpr(vecExpr);
         if (const auto castExpr = expr->asCast()) return parseCast(castExpr);
-        if (const auto jsonExpr = expr->asJson()) return parseJson(jsonExpr);
         assert(0);
     }
 }
@@ -423,10 +422,6 @@ void LgsJsonParser::parseStrConst(const LgsStrConst* strConst) {
 }
 
 void LgsJsonParser::parseTypeExpr(LgsTypeExpr* typeExpr) {
-    assert(0);
-}
-
-void LgsJsonParser::parseJson(const LgsJson* jsonStmt) {
     assert(0);
 }
 

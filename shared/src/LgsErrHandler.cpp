@@ -38,8 +38,8 @@ void LgsErrHandler::addWarning(const LgsBaseMsg& lgsErr, const LgsLocation* loca
 }
 
 void LgsErrHandler::mergeErrors(LgsErrHandler& other) {
+    setUnsuccessful();
     if (!other.successful) {
-        setUnsuccessful();
         errors.insert(errors.end(), other.errors.begin(), other.errors.end());
         if (!other.warnings.empty()) {
             warnings.insert(warnings.end(), other.warnings.begin(), other.warnings.end());

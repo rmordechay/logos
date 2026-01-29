@@ -3,6 +3,7 @@
 
 #include "LgsValue.h"
 
+class LgsPair;
 class LgsField;
 class LgsParam;
 class LgsVarDec;
@@ -13,7 +14,6 @@ class LgsMetaSelection;
 class LgsMatrixExpr;
 class LgsEnvVar;
 class LgsBinaryExpr;
-class LgsJson;
 class LgsCast;
 class LgsTypeExpr;
 class LgsMetaVar;
@@ -63,6 +63,7 @@ public:
     virtual std::string asText() = 0;
 
     LgsFunc* asFunc();
+    LgsCast* asCast();
     LgsVariable* asVariable();
     LgsPrefixExpr* asPrefixExpr();
     LgsFuncCall* asFuncCall();
@@ -70,11 +71,10 @@ public:
     LgsSelection* asSelection();
     LgsIterIndex* asIterIndex();
     LgsTypeExpr* asTypeExpr();
-    LgsJson* asJson();
-    LgsCast* asCast();
     LgsInstance* asInstance();
     LgsArrayExpr* asArrayExpr();
     LgsHashMap* asHashMap();
+    LgsPair* asPair();
     LgsEnvVar* asEnvVar();
     LgsIntConst* asIntConst();
     LgsStrConst* asStrConst();

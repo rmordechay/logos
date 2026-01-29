@@ -108,7 +108,6 @@ public:
     void parsePostfixExpr(LgsPostfixExpr* postfixExpr);
     void parseStrConst(const LgsStrConst* strConst);
     void parseTypeExpr(LgsTypeExpr* typeExpr);
-    void parseJson(const LgsJson* jsonStmt);
     void parseInstance(LgsInstance* instance);
     void parseIntConst(const LgsIntConst* intConst);
     void parseInterfaceInstance(LgsInstance* instance, LgsInterface* interface);

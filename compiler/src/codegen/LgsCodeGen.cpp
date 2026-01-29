@@ -35,7 +35,10 @@ void LgsCodeGen::setupModule(const fs::path& file, const bool debugMode) {
 }
 
 bool LgsCodeGen::writeIRModule(const LgsPaths& paths, uint8_t optLevel) const {
-    if (verifyModule(*IRModule, &llvm::errs())) return false;
+    if (verifyModule(*IRModule, &llvm::errs())) {
+        IRModule->print(llvm::outs(), nullptr);
+        return false;
+    }
     // Write IR to file
     auto moduleName = IRModule->getName().str();
     if (lgsConfigs.writeIRFiles) {
