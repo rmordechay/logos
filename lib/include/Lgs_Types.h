@@ -75,6 +75,11 @@ struct Lgs_Nullable {
     Lgs_TypeInfo* baseType;
 };
 
+struct Lgs_Map {
+    Lgs_TypeInfo* key;
+    Lgs_TypeInfo* value;
+};
+
 struct Lgs_ThunkFunc {
     ThunkFunc func;
     void* ctx;

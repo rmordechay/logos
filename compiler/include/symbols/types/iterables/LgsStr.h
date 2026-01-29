@@ -18,7 +18,7 @@ public:
     std::string getName() override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
-    Value* getIRZeroValue(LgsCodeGen& cg, LgsValue* pointee) override;
+    Value* getIRZeroValue(LgsCodeGen& cg) override;
     Constant* getRTType(LgsCodeGen& cg) override;
     bool canCastTo(LgsType* other) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
@@ -28,6 +28,7 @@ public:
     Value* lenIR(LgsCodeGen& cg, Value* iterable) override;
     Value* inIR(LgsCodeGen& cg, Value* iterableExpr, Value* value) override;
     Value* hashValue(LgsCodeGen& cg, Value* value) override;
+    Value* getStrPtr(LgsCodeGen& cg, Value* value);
     std::string fmtStr() const override;
     Value* asIRStr(LgsCodeGen& cg, Value* v) override;
     DIType* getDebugType(LgsCodeGen& cg) override;

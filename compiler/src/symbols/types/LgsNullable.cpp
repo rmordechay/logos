@@ -39,10 +39,10 @@ Type* LgsNullable::getIRType(LgsCodeGen& cg) {
 }
 
 Constant* LgsNullable::getRTType(LgsCodeGen& cg) {
-    const auto RTTName = LGS_TYPEINFO_PREFIX + getName();
+    constexpr auto RTTName = std::string(LGS_TYPEINFO_PREFIX) + name;
     if (const auto v = cg.IRModule->getGlobalVariable(RTTName)) return v;
     if (cg.mode != CG_MODE_RTTYPES) return cg.createGlobal(RTTName, cg.getRTTStruct(), nullptr);
-    const auto st = cg.getStructType({cg.i1Ty(), cg.ptrTy()});
+    const auto st = cg.getStructType({cg.i1Ty(), cg.ptrTy()}, RTTName);
     const auto baseRTT = baseType ? baseType->getRTType(cg) : cg.null();
     const std::vector<Constant*> args = {cg.i1(passByRef), baseRTT};
     return cg.createGlobal(RTTName, st, ConstantStruct::get(st, args));

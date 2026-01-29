@@ -5,7 +5,7 @@
 
 class LgsNullable final : public LgsType {
 public:
-    static constexpr auto name = "Null";
+    static constexpr auto name = "Nullable";
     LgsType* baseType = nullptr;
     bool isNull = false;
     const size_t valueIndex = 0;

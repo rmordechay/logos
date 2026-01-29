@@ -864,16 +864,7 @@ void LgsCgModule::visitMatrixExpr(const LgsMatrixExpr* matrixExpr) {
 
 void LgsCgModule::visitHashMap(LgsHashMap* hashMap) {
     const auto map = hashMap->type->asMap();
-    const auto ptr = hashMap->pointee ? hashMap->pointee : cg.allocInCurrent(map->IRSize(cg), true);
-    const auto cap = cg.usize(LGS_ITER_INIT_CAP);
-    const auto entriesSize = map->pairType->IRSize(cg) + sizeof(void*);
-    const auto totalSize = cg.builder.CreateMul(entriesSize, cap);
-    const auto entries = cg.allocInCurrent(totalSize, false);
-    const auto ty = map->getIRType(cg);
-    cg.storeStructField(ty, ptr, map->rttIndices.entries, entries);
-    cg.storeStructField(ty, ptr, map->rttIndices.len, cg.sizeZero());
-    cg.storeStructField(ty, ptr, map->rttIndices.cap, cap);
-    hashMap->IRValue = ptr;
+    hashMap->IRValue = hashMap->type->getIRZeroValue(cg);
     for (const auto pair : hashMap->elements) {
         visitExpr(pair->key);
         visitExpr(pair->value);
@@ -1202,7 +1193,7 @@ void LgsCgModule::visitInstance(LgsInstance* instance) {
             cg.store(field->expr->IRValue, pointee);
         } else {
             if (!fieldType->isHeapAlloc) continue;
-            const auto zeroValue = fieldType->getIRZeroValue(cg, field);
+            const auto zeroValue = fieldType->getIRZeroValue(cg);
             cg.store(zeroValue, pointee);
         }
     }

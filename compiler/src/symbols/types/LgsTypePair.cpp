@@ -3,11 +3,13 @@
 #include "LgsUtils.h"
 
 #include <cassert>
+#include <llvm/IR/Module.h>
 
+#include "LgsDefinitions.h"
 #include "codegen/LgsCodeGen.h"
 
 Type* LgsTypePair::getIRType(LgsCodeGen& cg) {
-    return cg.getStructType({key->getIRType(cg), value->getIRType(cg), cg.ptrTy()}, name);
+    return cg.getStructType({key->getTypeOrPtr(cg), value->getTypeOrPtr(cg), cg.ptrTy()}, name);
 }
 
 Constant* LgsTypePair::getRTType(LgsCodeGen& cg) {

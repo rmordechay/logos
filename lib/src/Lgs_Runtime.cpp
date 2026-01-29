@@ -35,7 +35,7 @@ extern "C" void* Lgs_Runtime_allocInLevel(const size_t size, const size_t level,
     return runtime.stack.at(level).allocator.allocate(size, setLevel);
 }
 
-extern "C" void Lgs_Runtime_moveStr(Lgs_Str* left, const Lgs_Str* right) {
+extern "C" void Lgs_Runtime_moveStr(Lgs_StrExpr* left, const Lgs_StrExpr* right) {
     const auto leftLevel = left->level;
     const auto rightLevel = right->level;
     assert(leftLevel <= runtime.level && rightLevel <= runtime.level);
@@ -168,8 +168,8 @@ void moveValue(const Lgs_TypeKind kind, const size_t level, void* left, void* ri
             break;
         }
         case RTT_STR: {
-            const auto leftStr = static_cast<Lgs_Str*>(left);
-            const auto rightStr = static_cast<Lgs_Str*>(right);
+            const auto leftStr = static_cast<Lgs_StrExpr*>(left);
+            const auto rightStr = static_cast<Lgs_StrExpr*>(right);
             Lgs_Runtime_moveStr(leftStr, rightStr);
             break;
         }

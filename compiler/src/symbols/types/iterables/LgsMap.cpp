@@ -7,6 +7,8 @@
 #include "types/LgsAny.h"
 #include "types/primitives/LgsVoid.h"
 #include <llvm/IR/Module.h>
+
+#include "LgsConfigs.h"
 #include "Lgs_Exprs.h"
 
 LgsFunc* LgsMap::getMethod(const std::string& methodName) {
@@ -43,11 +45,18 @@ LgsFunc* LgsMap::getMethod(const std::string& methodName) {
 }
 
 Type* LgsMap::getIRType(LgsCodeGen& cg) {
-    return cg.getStructType({cg.ptrTy(), cg.sizeTy(), cg.sizeTy()}, name);
+    return cg.getStructType({cg.sizeTy(), cg.ptrTy(), cg.ptrTy(), cg.sizeTy(), cg.sizeTy()}, name);
 }
 
 Constant* LgsMap::getRTType(LgsCodeGen& cg) {
-    return cg.getRTTypeInfo(getName(), IRSize(cg), RTT_MAP);
+    const auto RTTName = LGS_TYPEINFO_PREFIX + getName();
+    if (const auto v = cg.IRModule->getGlobalVariable(RTTName)) return v;
+    if (cg.mode != CG_MODE_RTTYPES) return cg.createGlobal(RTTName, cg.getRTTStruct(), nullptr);
+    const auto key = pairType->key;
+    const auto value = pairType->value;
+    const auto st = cg.getStructType({key->getTypeOrPtr(cg), value->getTypeOrPtr(cg)}, RTTName);
+    const std::vector args = {key->getRTType(cg), value->getRTType(cg)};
+    return cg.createGlobal(RTTName, st, ConstantStruct::get(st, args));
 }
 
 std::string LgsMap::getBaseName() {
@@ -90,6 +99,19 @@ LgsExpr* LgsMap::getZeroValue() {
     return new LgsHashMap(this);
 }
 
+Value* LgsMap::getIRZeroValue(LgsCodeGen& cg) {
+    const auto ty = getIRType(cg);
+    const auto ptr = cg.allocInCurrent(IRSize(cg), true);
+    const auto cap = cg.usize(LGS_ITER_INIT_CAP);
+    const auto entriesSize = cg.builder.CreateAdd(pairType->IRSize(cg), cg.usize(sizeof(void*)));
+    const auto totalSize = cg.builder.CreateMul(entriesSize, cap);
+    const auto entries = cg.allocInCurrent(totalSize, false);
+    cg.storeStructField(ty, ptr, rttIndices.type, getRTType(cg));
+    cg.storeStructField(ty, ptr, rttIndices.entries, entries);
+    cg.storeStructField(ty, ptr, rttIndices.cap, cap);
+    return ptr;
+}
+
 LgsType* LgsMap::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     return nullptr;
 }
@@ -124,33 +146,19 @@ Value* LgsMap::getIRElement(LgsCodeGen& cg, Value* map, Value* index) {
 }
 
 void LgsMap::addIRElement(LgsCodeGen& cg, Value* map, Value* index, Value* value) {
-    cg.builder.CreateCall(generateAddFunc(cg), {map, index, value, cg.usize(0)});
-}
-
-StructType* LgsMap::getEntryStruct(LgsCodeGen& cg) const {
-    const auto keyTy = pairType->key->getIRType(cg);
-    const auto valueTy = pairType->value->getIRType(cg);
-    return cg.getStructType({keyTy, valueTy, cg.ptrTy()}, pairType->getName());
-}
-
-Value* LgsMap::loadEntriesField(LgsCodeGen& cg, Value* map) {
-    return cg.loadStructField(getIRType(cg), map, rttIndices.entries, cg.ptrTy());
-}
-
-Value* LgsMap::loadCapField(LgsCodeGen& cg, Value* map) {
-    return cg.loadStructField(getIRType(cg), map, rttIndices.cap, cg.sizeTy());
+    cg.builder.CreateCall(generateAddFunc(cg), {map, index, value, cg.sizeZero()});
 }
 
 Value* LgsMap::getEntryKey(LgsCodeGen& cg, Value* entry) const {
-    return cg.builder.CreateStructGEP(getEntryStruct(cg), entry, rttIndices.key);
+    return cg.builder.CreateStructGEP(baseType->getIRType(cg), entry, rttIndices.key);
 }
 
 Value* LgsMap::getEntryValue(LgsCodeGen& cg, Value* entry) const {
-    return cg.builder.CreateStructGEP(getEntryStruct(cg), entry, rttIndices.value);
+    return cg.builder.CreateStructGEP(baseType->getIRType(cg), entry, rttIndices.value);
 }
 
 Value* LgsMap::getEntryNext(LgsCodeGen& cg, Value* entry) const {
-    return cg.builder.CreateStructGEP(getEntryStruct(cg), entry, rttIndices.next);
+    return cg.builder.CreateStructGEP(baseType->getIRType(cg), entry, rttIndices.next);
 }
 
 bool LgsMap::unpackLoopVars(LgsForeachLoop* loop) const {
@@ -229,9 +237,9 @@ Function* LgsMap::generateGetFunc(LgsCodeGen& cg) {
     const auto mapIR = func->getArg(0);
     const auto keyIR = func->getArg(1);
 
-    const auto cap = loadCapField(cg, mapIR);
+    const auto cap = cg.loadStructField(getIRType(cg), mapIR, rttIndices.cap, cg.sizeTy());
     const auto hash = cg.builder.CreateURem(pairType->key->hashValue(cg, keyIR), cap);
-    const auto entries = loadEntriesField(cg, mapIR);
+    const auto entries = cg.loadStructField(getIRType(cg), mapIR, rttIndices.entries, cg.ptrTy());
     const auto entryPtr = cg.builder.CreateInBoundsGEP(cg.ptrTy(), entries, {hash});
     const auto entry = cg.load(cg.ptrTy(), entryPtr);
     const auto currentEntryPtr = cg.allocaAndStore(cg.ptrTy(), entry, "entry");
@@ -295,7 +303,7 @@ Function* LgsMap::generateAddFunc(LgsCodeGen& cg) {
     const auto valueIR = func->getArg(2);
 
     const auto mapTy = getIRType(cg);
-    const auto entryTy = getEntryStruct(cg);
+    const auto entryTy = baseType->getIRType(cg);
 
     const auto entriesField = cg.builder.CreateStructGEP(mapTy, mapIR, rttIndices.entries);
     const auto lenField = cg.builder.CreateStructGEP(mapTy, mapIR, rttIndices.len);
@@ -317,8 +325,7 @@ Function* LgsMap::generateAddFunc(LgsCodeGen& cg) {
     cg.loop(cap, [&](Value* iValue, BasicBlock*) {
         auto entry = cg.builder.CreateInBoundsGEP(cg.ptrTy(), entries, {iValue});
         entry = cg.load(cg.ptrTy(), entry);
-        const auto k = cg.load(pairType->key->getIRType(cg), entry);
-        const auto hash = cg.builder.CreateURem(pairType->key->hashValue(cg, k), newCap);
+        const auto hash = cg.builder.CreateURem(pairType->key->hashValue(cg, entry), newCap);
         const auto entryPtr = cg.builder.CreateInBoundsGEP(cg.ptrTy(), newEntries, {hash});
         cg.store(entry, entryPtr);
     });
@@ -343,8 +350,7 @@ Function* LgsMap::generateAddFunc(LgsCodeGen& cg) {
     // Keys with same hash
     cg.startBlock(keyCompareBlock);
     entryLoad = cg.load(cg.ptrTy(), entryAlloca);
-    const auto loadKey = cg.load(pairType->key->getIRType(cg), getEntryKey(cg, entryLoad));
-    const auto keysAreEqual = eqIR(cg, keyIR, loadKey, pairType->key);
+    const auto keysAreEqual = eqIR(cg, keyIR, getEntryKey(cg, entryLoad), pairType->key);
     cg.builder.CreateCondBr(keysAreEqual, equalBlock, notEqualBlock);
 
     // Keys equal

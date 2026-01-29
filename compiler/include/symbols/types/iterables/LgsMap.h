@@ -16,6 +16,7 @@ public:
         pairType = baseType->asPair();
         isHeapAlloc = true;
         passByRef = true;
+        rttKind = RTT_MAP;
     }
     LgsFunc* getMethod(const std::string& methodName) override;
     Type* getIRType(LgsCodeGen& cg) override;
@@ -28,6 +29,7 @@ public:
     LgsType* getValueType() override;
     bool canCastTo(LgsType* other) override;
     LgsExpr* getZeroValue() override;
+    Value* getIRZeroValue(LgsCodeGen& cg) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     bool inferBaseType(std::vector<LgsExpr*>& args) override;
     Value* lenIR(LgsCodeGen& cg, Value* iterable) override;
@@ -35,9 +37,6 @@ public:
     Value* getIRElement(LgsCodeGen& cg, Value* map, Value* index) override;
     Function* generateAddFunc(LgsCodeGen& cg);
     void addIRElement(LgsCodeGen& cg, Value* map, Value* index, Value* value) override;
-    StructType* getEntryStruct(LgsCodeGen& cg) const;
-    Value* loadEntriesField(LgsCodeGen& cg, Value* map);
-    Value* loadCapField(LgsCodeGen& cg, Value* map);
     Value* getEntryKey(LgsCodeGen& cg, Value* entry) const;
     Value* getEntryValue(LgsCodeGen& cg, Value* entry) const;
     Value* getEntryNext(LgsCodeGen& cg, Value* entry) const;

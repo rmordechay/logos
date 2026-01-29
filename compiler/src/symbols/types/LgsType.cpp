@@ -1,4 +1,3 @@
-#include "LgsConfigs.h"
 #include "exprs/LgsBinaryExpr.h"
 #include "exprs/LgsVectorExpr.h"
 #include "funcs/LgsFunc.h"
@@ -113,7 +112,7 @@ LgsFunc* LgsType::getMethod(const std::string& methodName) {
     return nullptr;
 }
 
-Value* LgsType::getIRZeroValue(LgsCodeGen& cg, LgsValue* pointee) {
+Value* LgsType::getIRZeroValue(LgsCodeGen& cg) {
     assert(0);
 }
 

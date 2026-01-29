@@ -22,14 +22,14 @@ std::string LgsStr::getName() {
 }
 
 size_t LgsStr::sizeBytes() {
-    return sizeof(Lgs_Str);
+    return sizeof(Lgs_StrExpr);
 }
 
 LgsExpr* LgsStr::getZeroValue() {
     return new LgsStrConst("");
 }
 
-Value* LgsStr::getIRZeroValue(LgsCodeGen& cg, LgsValue* pointee) {
+Value* LgsStr::getIRZeroValue(LgsCodeGen& cg) {
     const auto str = cg.allocInLevel(IRSize(cg), cg.sizeZero(), true);
     cg.storeStructField(getIRType(cg), str, rttIndices.data, cg.emptyStr());
     return str;
@@ -83,7 +83,7 @@ std::string LgsStr::fmtStr() const {
 }
 
 Value* LgsStr::asIRStr(LgsCodeGen& cg, Value* v) {
-    return cg.loadStructField(getIRType(cg), v, rttIndices.data, cg.ptrTy());
+    return getStrPtr(cg, v);
 }
 
 bool LgsStr::inferBaseType(std::vector<LgsExpr*>& args) {
@@ -122,7 +122,7 @@ Value* LgsStr::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     }
 
     Value* ptr = nullptr;
-    const auto leftPtr = cg.loadStructField(ty, left->loadIR(cg), rttIndices.data, cg.ptrTy());
+    const auto leftPtr = getStrPtr(cg, left->loadIR(cg));
     const auto leftSize = lenIR(cg, leftPtr);
     if (right->type->asChar()) {
         const auto allocSize = cg.builder.CreateAdd(leftSize, cg.usize(2));
@@ -131,7 +131,7 @@ Value* LgsStr::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
         cg.callMemcpy(ptr, leftPtr, leftSize);
         cg.store(right->IRValue, rightPos);
     } else if (right->type->asStr()) {
-        const auto rightPtr = cg.builder.CreateExtractValue(right->IRValue, rttIndices.data);
+        const auto rightPtr = getStrPtr(cg, right->IRValue);
         const auto rightSize = lenIR(cg, rightPtr);
         const auto sumSize = cg.builder.CreateAdd(leftSize, rightSize);
         const auto allocSize = cg.builder.CreateAdd(sumSize, cg.usize(1));
@@ -159,7 +159,11 @@ Value* LgsStr::inIR(LgsCodeGen& cg, Value* iterableExpr, Value* value) {
 }
 
 Value* LgsStr::hashValue(LgsCodeGen& cg, Value* value) {
-    return cg.callHash(cg.loadStructField(getIRType(cg), value, rttIndices.data, cg.ptrTy()));
+    return cg.callHash(getStrPtr(cg, value));
+}
+
+Value* LgsStr::getStrPtr(LgsCodeGen& cg, Value* value) {
+    return cg.loadStructField(getIRType(cg), value, rttIndices.data, cg.ptrTy());
 }
 
 DIType* LgsStr::getDebugType(LgsCodeGen& cg) {

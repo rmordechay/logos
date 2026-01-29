@@ -46,7 +46,7 @@ LgsFunc* LgsObject::getMetaFunc(const std::string& methodName) {
         metaFuncs[methodName]->fn = [](LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) {
             const auto objRTT = args[0].expr->type->getRTType(cg);
             const auto arg = args[1].expr;
-            const auto funcName = cg.loadStructField(arg->type->getIRType(cg), arg->IRValue, LgsStr::rttIndices.data, cg.ptrTy());
+            const auto funcName = arg->type->asStr()->getStrPtr(cg, arg->IRValue);
             const auto vfunc = cg.getVFunc(objRTT, funcName);
             cg.ifStmt(cg.builder.CreateIsNull(vfunc), [funcName, &cg] {cg.throwError(E10006, {funcName});});
             return vfunc;
@@ -138,7 +138,7 @@ LgsExpr* LgsObject::getZeroValue() {
     return new LgsInstance(this);
 }
 
-Value* LgsObject::getIRZeroValue(LgsCodeGen& cg, LgsValue* pointee) {
+Value* LgsObject::getIRZeroValue(LgsCodeGen& cg) {
     const auto instance = cg.allocInCurrent(IRSize(cg), true);
     cg.storeStructField(getIRType(cg), instance, LgsInstance::rttIndices.type, getRTType(cg));
     return instance;

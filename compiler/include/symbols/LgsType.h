@@ -89,7 +89,7 @@ public:
     virtual std::string getName() = 0;
     virtual size_t sizeBytes() = 0;
     virtual LgsExpr* getZeroValue() = 0;
-    virtual Value* getIRZeroValue(LgsCodeGen& cg, LgsValue* pointee);
+    virtual Value* getIRZeroValue(LgsCodeGen& cg);
     virtual Value* hashValue(LgsCodeGen& cg, Value* value);
     virtual Type* getIRType(LgsCodeGen& cg) = 0;
     virtual Value* asIRStr(LgsCodeGen& cg, Value* v);

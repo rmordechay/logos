@@ -26,11 +26,11 @@ static std::string formatElement(const Lgs_TypeKind kind, void* type, void* valu
     case RTT_DOUBLE: str << *static_cast<double*>(value); break;
     case RTT_ENUM:
     case RTT_STR: {
-        const auto lgsStr = static_cast<Lgs_Str*>(value);
+        const auto lgsStr = static_cast<Lgs_StrExpr*>(value);
         assert(lgsStr->level <= LGS_MAX_LEVEL);
         if (!lgsStr->data) return LGS_NULL_LITERAL;
         if (std::strcmp(lgsStr->data, "") == 0) return "\"\"";
-        str << static_cast<Lgs_Str*>(value)->data;
+        str << static_cast<Lgs_StrExpr*>(value)->data;
     }
     break;
     case RTT_CHAR: str << "'" << *static_cast<const char*>(value) << "'"; break;
@@ -97,11 +97,24 @@ static std::string formatElement(const Lgs_TypeKind kind, void* type, void* valu
         }
         break;
     }
+    case RTT_MAP: {
+        const auto hashMap = static_cast<Lgs_HashMap*>(value);
+        str << '{';
+        for (int i = 0; i < hashMap->capacity; ++i) {
+            const auto entry = hashMap->entries[i];
+            if (!entry) continue;
+            str << formatElement(hashMap->type->key->kind, hashMap->type->key, entry->key);
+            str << ": ";
+            str << formatElement(hashMap->type->value->kind, hashMap->type->value, entry->value);
+            if (i < hashMap->capacity - 1) str << ", ";
+        }
+        str << '}';
+        break;
+    }
     case RTT_VEC2:
     case RTT_VEC3:
     case RTT_VEC4:
     case RTT_MATRIX:
-    case RTT_MAP:
     case RTT_COMPLEX:
     default:
         assert(0);
