@@ -3,7 +3,6 @@
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
 #include "types/LgsAny.h"
-#include "types/LgsComplex.h"
 #include "types/LgsPtr.h"
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
@@ -54,7 +53,7 @@ bool LgsType::isVoid() {
 }
 
 bool LgsType::isNumber() {
-    return isInt || isFloat || asComplex();
+    return isInt || isFloat;
 }
 
 bool LgsType::isScalar() const {
@@ -244,10 +243,6 @@ LgsDouble* LgsType::asDouble() {
     return dynamic_cast<LgsDouble*>(this);
 }
 
-LgsComplex* LgsType::asComplex() {
-    return dynamic_cast<LgsComplex*>(this);
-}
-
 LgsFuncType* LgsType::asFuncType() {
     return dynamic_cast<LgsFuncType*>(this);
 }
@@ -356,9 +351,6 @@ Value* eqIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
         const auto [l, r] = loadNumberPair(cg, left, right, cg.floatTy());
         return cg.builder.CreateFCmpOEQ(l, r);
     }
-    if (type->asComplex()) {
-        assert(0);
-    }
     if (const auto dArr = type->asDArray()) {
         return cg.builder.CreateCall(dArr->generateArrEqFunc(cg), {left, right});
     }
@@ -378,9 +370,6 @@ Value* neIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
     }
     if (type->isFloat) {
         return cg.builder.CreateFCmpONE(left, right);
-    }
-    if (type->asComplex()) {
-        assert(0);
     }
     if (const auto dArr = type->asDArray()) {
         return cg.builder.CreateNot(cg.builder.CreateCall(dArr->generateArrEqFunc(cg), {left, right}));

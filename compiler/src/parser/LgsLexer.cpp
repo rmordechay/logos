@@ -262,12 +262,6 @@ LgsToken LgsLexer::scanNumber(const LgsLocation& location) {
         advance();
     }
 
-    // Imaginary
-    if (currentChar == 'i') {
-        advance();
-        return {T_IMAGINARY, lexeme, location};
-    }
-
     // Float
     if (currentChar == '.' && peek() != '.') {
         lexeme += currentChar;

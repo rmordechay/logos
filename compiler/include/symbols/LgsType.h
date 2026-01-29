@@ -7,7 +7,6 @@
 #include "Lgs_Types.h"
 
 class LgsEnumField;
-class LgsComplex;
 struct LgsBinOp;
 class LgsBinaryExpr;
 class LgsValue;
@@ -128,7 +127,6 @@ public:
     LgsUInt* asUInt();
     LgsFloat* asFloat();
     LgsDouble* asDouble();
-    LgsComplex* asComplex();
     LgsFuncType* asFuncType();
     LgsObject* asObject();
     LgsInterface* asInterface();

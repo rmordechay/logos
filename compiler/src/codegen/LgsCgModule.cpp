@@ -1,7 +1,6 @@
 #include "codegen/LgsCgModule.h"
 #include "builtins/LgsTest.h"
 #include "LgsConfigs.h"
-#include "exprs/constants/LgsComplexConst.h"
 #include "builtins/LgsSys.h"
 #include "exprs/LgsArrayExpr.h"
 #include "funcs/LgsCoroutine.h"
@@ -607,7 +606,6 @@ void LgsCgModule::visitExpr(LgsExpr* expr, const bool assign) {
         else if (const auto strConst = expr->asStrConst()) visitStrConst(strConst);
         else if (const auto intConst = expr->asIntConst()) visitIntConst(intConst);
         else if (const auto floatConst = expr->asFloatConst()) visitFloatConst(floatConst);
-        else if (const auto complex = expr->asComplexConst()) visitComplexConst(complex);
         else if (const auto instance = expr->asInstance()) visitInstance(instance);
         else if (const auto funcCall = expr->asFuncCall()) visitFuncCall(funcCall);
         else if (const auto selection = expr->asSelection()) visitSelection(selection, assign);
@@ -701,14 +699,6 @@ void LgsCgModule::visitFloatConst(LgsFloatConst* floatConst) const {
     } else {
         assert(0);
     }
-}
-
-void LgsCgModule::visitComplexConst(const LgsComplexConst* complex) {
-    visitExpr(complex->real);
-    visitExpr(complex->imaginary);
-    const auto ty = complex->type->getIRType(cg);
-    cg.storeStructField(ty, complex->IRValue, 0, complex->real->IRValue);
-    cg.storeStructField(ty, complex->IRValue, 1, complex->imaginary->IRValue);
 }
 
 void LgsCgModule::visitNullableExpr(LgsNullableExpr* expr) {

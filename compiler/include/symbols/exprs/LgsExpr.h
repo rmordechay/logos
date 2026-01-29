@@ -7,7 +7,6 @@ class LgsPair;
 class LgsField;
 class LgsParam;
 class LgsVarDec;
-class LgsComplexConst;
 class LgsNullable;
 class LgsNullableExpr;
 class LgsMetaSelection;
@@ -80,7 +79,6 @@ public:
     LgsStrConst* asStrConst();
     LgsCharConst* asCharConst();
     LgsFloatConst* asFloatConst();
-    LgsComplexConst* asComplexConst();
     LgsVectorExpr* asVectorExpr();
     LgsMatrixExpr* asMatrixExpr();
     LgsMetaVar* asLoopMetaVar();

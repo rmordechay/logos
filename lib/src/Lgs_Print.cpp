@@ -115,7 +115,6 @@ static std::string formatElement(const Lgs_TypeKind kind, void* type, void* valu
     case RTT_VEC3:
     case RTT_VEC4:
     case RTT_MATRIX:
-    case RTT_COMPLEX:
     default:
         assert(0);
     }

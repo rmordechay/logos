@@ -50,7 +50,6 @@ enum LgsTokenType {
     T_STAR,
     T_SLASH,
     T_SLIDER,
-    T_IMAGINARY,
     T_PERCENT,
     T_AMPERSAND,
     T_PIPE,

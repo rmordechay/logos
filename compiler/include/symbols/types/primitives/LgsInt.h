@@ -34,4 +34,3 @@ public:
 };
 
 inline LgsInt LGS_INT;
-inline LgsInt LGS_IMAGINARY;

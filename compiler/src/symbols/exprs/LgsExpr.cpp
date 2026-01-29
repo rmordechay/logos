@@ -1,6 +1,5 @@
 #include "exprs/LgsExpr.h"
 
-#include "exprs/constants/LgsComplexConst.h"
 #include "exprs/LgsArrayExpr.h"
 #include "exprs/LgsBinaryExpr.h"
 #include "exprs/LgsCast.h"
@@ -221,10 +220,6 @@ LgsCharConst* LgsExpr::asCharConst() {
 
 LgsFloatConst* LgsExpr::asFloatConst() {
     return dynamic_cast<LgsFloatConst*>(this);
-}
-
-LgsComplexConst* LgsExpr::asComplexConst() {
-    return dynamic_cast<LgsComplexConst*>(this);
 }
 
 LgsVectorExpr* LgsExpr::asVectorExpr() {

@@ -93,7 +93,6 @@ set(COMPILER_SOURCE
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/constants/LgsIntConst.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/constants/LgsStrConst.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/constants/LgsUIntConst.cpp
-    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/constants/LgsComplexConst.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/funcs/LgsCoroutine.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/funcs/LgsFunc.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/funcs/LgsMainFunc.cpp
@@ -134,7 +133,6 @@ set(COMPILER_SOURCE
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsTypePair.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsGenericType.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsNullable.cpp
-    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsComplex.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/iterables/LgsMap.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/iterables/LgsDArray.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/iterables/LgsSet.cpp

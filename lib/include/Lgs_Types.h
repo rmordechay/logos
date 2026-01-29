@@ -20,7 +20,6 @@ enum Lgs_TypeKind {
     RTT_ULONG,
     RTT_FLOAT,
     RTT_DOUBLE,
-    RTT_COMPLEX,
     RTT_OBJECT,
     RTT_VEC2,
     RTT_VEC3,

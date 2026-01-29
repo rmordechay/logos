@@ -127,7 +127,6 @@ public:
     void visitPrefixExpr(LgsPrefixExpr* prefixExpr);
     void visitPostfixExpr(LgsPostfixExpr* postfixExpr);
     void visitStrConst(const LgsStrConst* strConst);
-    void visitComplexConst(LgsComplexConst* complex);
     void visitTypeExpr(LgsTypeExpr* typeExpr);
     void visitInstance(LgsInstance* instance);
     void visitInlineInterface(LgsInstance* instance, LgsInterface* interface);

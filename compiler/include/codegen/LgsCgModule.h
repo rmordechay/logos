@@ -109,7 +109,6 @@ public:
     void visitLambda(LgsFunc* func);
     void visitConstant(LgsExpr* expr);
     void visitFloatConst(LgsFloatConst* floatConst) const;
-    void visitComplexConst(const LgsComplexConst* complex);
     void visitNullableExpr(LgsNullableExpr* expr);
     void visitArrayExpr(LgsArrayExpr* arrayExpr);
     void visitStaticArray(LgsArrayExpr* arrayExpr) const;
