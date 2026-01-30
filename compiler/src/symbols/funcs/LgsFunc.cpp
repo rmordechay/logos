@@ -7,9 +7,11 @@
 #include "types/LgsFuncType.h"
 #include "types/primitives/LgsVoid.h"
 #include "LgsUtils.h"
+#include "types/iterables/LgsStr.h"
 #include "codegen/LgsCodeGen.h"
 #include <sstream>
 #include <llvm/IR/Module.h>
+
 
 Function* LgsFunc::getIRFunc(LgsCodeGen& cg) {
     const auto funcName = funcType->getName();
@@ -33,6 +35,7 @@ Function* LgsFunc::getIRFunc(LgsCodeGen& cg) {
 Value* LgsFunc::call(LgsCodeGen& cg, std::vector<LgsFuncArg>& args) {
     if (fn) return fn(cg, args);
     if (args.empty()) return callIR(cg, {});
+    if (funcType->isExternal) return callExternal(cg, args);
     if (funcType->isVariadic) return callWithVariadic(cg, args);
 
     std::vector<Value*> IRArgs;
@@ -77,14 +80,6 @@ Value* LgsFunc::callIR(LgsCodeGen& cg, const std::vector<Value*>& args) {
     return rv;
 }
 
-Value* LgsFunc::call(LgsCodeGen& cg, const std::vector<LgsExpr*>& args) {
-    std::vector<LgsFuncArg> funcArgs;
-    for (const auto& arg : args) {
-        funcArgs.push_back(LgsFuncArg(arg));
-    }
-    return call(cg, funcArgs);
-}
-
 Value* LgsFunc::callWithVariadic(LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) {
     std::vector<Value*> IRArgs;
     const auto variadicOffset = funcType->params.size() - 1;
@@ -97,12 +92,22 @@ Value* LgsFunc::callWithVariadic(LgsCodeGen& cg, const std::vector<LgsFuncArg>& 
             IRArgs.emplace_back(arg.expr->IRValue);
         }
     }
-    if (!funcType->isExternal) {
-        IRArgs.emplace_back(cg.usize(args.size()));
-    }
+    IRArgs.emplace_back(cg.usize(args.size()));
     for (size_t i = variadicOffset; i < args.size(); ++i) {
         const auto arg = args[i];
         IRArgs.emplace_back(arg.expr->IRValue);
+    }
+    return callIR(cg, IRArgs);
+}
+
+Value* LgsFunc::callExternal(LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) {
+    std::vector<Value*> IRArgs;
+    for (const auto& arg : args) {
+        if (const auto s = arg.expr->type->asStr()) {
+            IRArgs.emplace_back(s->getStrPtr(cg, arg.expr->IRValue));
+        } else {
+            IRArgs.emplace_back(arg.expr->IRValue);
+        }
     }
     return callIR(cg, IRArgs);
 }

@@ -16,25 +16,26 @@ public:
 class LgsCCompiler final {
 public:
     LgsPaths& paths;
+    LgsCLangParser parser;
     clang::CompilerInstance compiler;
 
     explicit LgsCCompiler(LgsPaths& paths): paths(paths) {
         initCompiler();
     }
-    bool parseFile(LgsCLangParser& parser, const fs::path& headerPath);
+    bool parseFile(const fs::path& headerPath);
     void initCompiler();
 };
 
 class LgsPPCallbacks final : public clang::PPCallbacks {
 public:
-    LgsSymbolTable& table;
+    LgsSymbolTable& symbolTable;
     LgsErrHandler errHandler;
     clang::LangOptions &LangOpts;
     clang::SourceManager& sourceManager;
     clang::Preprocessor& preprocessor;
 
     LgsPPCallbacks(LgsSymbolTable& table, clang::Preprocessor& preprocessor, clang::LangOptions& langOpts, clang::SourceManager& sourceManager) :
-        table(table), LangOpts(langOpts), sourceManager(sourceManager), preprocessor(preprocessor) {
+        symbolTable(table), LangOpts(langOpts), sourceManager(sourceManager), preprocessor(preprocessor) {
     }
 
     void MacroDefined(const clang::Token &macroNameToken, const clang::MacroDirective *macroDirective) override;

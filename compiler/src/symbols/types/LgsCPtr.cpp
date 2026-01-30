@@ -1,4 +1,4 @@
-#include "types/LgsPtr.h"
+#include "types/LgsCPtr.h"
 
 #include "codegen/LgsCgModule.h"
 #include "types/LgsAny.h"
@@ -6,31 +6,31 @@
 #include "types/iterables/LgsSArray.h"
 #include "types/primitives/LgsLong.h"
 
-std::string LgsPtr::getName() {
+std::string LgsCPtr::getName() {
     return name;
 }
 
-std::string LgsPtr::pname() {
+std::string LgsCPtr::pname() {
     return name;
 }
 
-Type* LgsPtr::getIRType(LgsCodeGen& cg) {
+Type* LgsCPtr::getIRType(LgsCodeGen& cg) {
     return cg.ptrTy();
 }
 
-Constant* LgsPtr::getRTType(LgsCodeGen& cg) {
+Constant* LgsCPtr::getRTType(LgsCodeGen& cg) {
     assert(0);
 }
 
-size_t LgsPtr::sizeBytes() {
+size_t LgsCPtr::sizeBytes() {
     return sizeof(void*);
 }
 
-LgsExpr* LgsPtr::getZeroValue() {
+LgsExpr* LgsCPtr::getZeroValue() {
     assert(0);
 }
 
-bool LgsPtr::canCastTo(LgsType* other) {
+bool LgsCPtr::canCastTo(LgsType* other) {
     const auto IRName = other->getName();
     if (IRName == LgsAny::name) return true;
     if (IRName == LgsLong::name) return true;
@@ -39,19 +39,19 @@ bool LgsPtr::canCastTo(LgsType* other) {
     return name == IRName;
 }
 
-LgsType* LgsPtr::applyBinOp(LgsType* rightType, LgsBinOp& op) {
+LgsType* LgsCPtr::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     assert(0);
 }
 
-std::string LgsPtr::fmtStr() const {
+std::string LgsCPtr::fmtStr() const {
     return baseType->fmtStr();
 }
 
-DIType* LgsPtr::getDebugType(LgsCodeGen& cg) {
+DIType* LgsCPtr::getDebugType(LgsCodeGen& cg) {
     assert(0);
 }
 
-LgsPtr::~LgsPtr() {
+LgsCPtr::~LgsCPtr() {
     freeType(baseType);
     baseType = nullptr;
 }

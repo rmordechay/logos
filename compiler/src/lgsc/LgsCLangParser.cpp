@@ -5,9 +5,8 @@
 #include "files/LgsFile.h"
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
-#include "types/iterables/LgsDArray.h"
 #include "types/LgsObject.h"
-#include "types/LgsPtr.h"
+#include "types/LgsCPtr.h"
 #include "types/iterables/LgsStr.h"
 #include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsInt.h"
@@ -17,6 +16,7 @@
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsChar.h"
 #include "LgsUtils.h"
+#include "types/LgsSubType.h"
 #include "types/iterables/LgsSArray.h"
 #include "types/primitives/LgsLong.h"
 
@@ -41,25 +41,30 @@ bool LgsCLangParser::VisitFunctionDecl(const clang::FunctionDecl* func) {
     }
     funcImpl->funcType->isVariadic = func->isVariadic();
     funcImpl->funcType->isExternal = true;
-    if (!name.empty() && !name.starts_with("_") && !table.symbols.contains(name)) {
-        table.addSymbol(LgsSymbol(funcImpl, false, true), &errHandler);
+    if (!name.empty() && !name.starts_with("_") && !symbolTable.symbols.contains(name)) {
+        symbolTable.addSymbol(LgsSymbol(funcImpl, false, true), &errHandler);
     }
     return true;
 }
 
 bool LgsCLangParser::VisitRecordDecl(const clang::RecordDecl* record) {
     auto name = record->getNameAsString();
-    if (!name.empty() && name[0] == '_') return true;
-    if (LGS_KEYWORDS.contains(name)) {
-        name = name + '_';
-    }
-    if (!record->isStruct() || !record->isThisDeclarationADefinition()) return true;
-    const auto objSymbol = table.getSymbol(name);
+    if (name.empty()) return true;
+    if (LGS_KEYWORDS.contains(name)) name = name + '_';
+    const auto objSymbol = symbolTable.getSymbol(name);
     if (objSymbol) return true;
-    const auto obj = mapCRecord(record);
-    if (!name.empty() && !name.starts_with("_")) {
-        table.addSymbol(LgsSymbol(obj, false, true), &errHandler);
-    }
+    symbolTable.addSymbol(LgsSymbol(mapCRecord(record), false, true), &errHandler);
+    return true;
+}
+
+bool LgsCLangParser::VisitTypedefDecl(const clang::TypedefDecl* typedefDecl) {
+    const auto typedefName = typedefDecl->getNameAsString();
+    const auto underlyingType = typedefDecl->getUnderlyingType();
+    const auto cType = mapCType(underlyingType);
+    const auto subtype = new LgsSubType(typedefName, cType);
+    cType->isExternal = true;
+    subtype->isExternal = true;
+    symbolTable.addSymbol(LgsSymbol(subtype, true), &errHandler);
     return true;
 }
 
@@ -70,57 +75,46 @@ LgsType* LgsCLangParser::mapCType(const clang::QualType type) {
     }
     if (type->isPointerType()) {
         const auto pointee = type->getPointeeType();
-        if (pointee.getTypePtr() == type.getTypePtr()) {
-            return new LgsPtr(new LgsVoid());
+        if (pointee->isVoidType() || pointee->isElaboratedTypeSpecifier()) {
+            return &LGS_ANY;
         }
-        if (pointee.getTypePtr() == type.getTypePtr()) {
-            return new LgsPtr(new LgsVoid());
-        }
-        if (pointee->isVoidType()) {
-            return new LgsPtr(new LgsVoid());
-        }
-        if (pointee->isIncompleteType() && !pointee->isStructureType()) {
-            return new LgsPtr(new LgsVoid());
-        }
-        if (pointee->isElaboratedTypeSpecifier()) {
-            return new LgsPtr(new LgsVoid());
-        }
-        if (std::string(pointee->getTypeClassName()) == "Elaborated") return new LgsPtr(new LgsVoid());;
-        if (std::string(pointee->getTypeClassName()) == "Paren") return new LgsPtr(new LgsVoid());;
-        return new LgsPtr(mapCType(pointee));
+        return new LgsCPtr(mapCType(pointee));
     }
     if (type->isSpecificBuiltinType(clang::BuiltinType::Bool)) {
-        return new LgsBool();
+        return &LGS_BOOL;
     }
     if (type->isSpecificBuiltinType(clang::BuiltinType::Char_S)) {
-        return new LgsChar();
+        return &LGS_CHAR;
     }
     if (type->isSpecificBuiltinType(clang::BuiltinType::UChar)) {
-        return new LgsChar();
+        return &LGS_CHAR;
     }
     if (type->isSpecificBuiltinType(clang::BuiltinType::Short)) {
-        return new LgsShort();
+        return &LGS_SHORT;
     }
     if (type->isSpecificBuiltinType(clang::BuiltinType::UShort)) {
-        return new LgsShort();
+        return &LGS_SHORT;
     }
     if (type->isSpecificBuiltinType(clang::BuiltinType::Int)) {
-        return new LgsInt();
+        return &LGS_INT;
     }
     if (type->isSpecificBuiltinType(clang::BuiltinType::UInt)) {
-        return new LgsUInt();
+        return &LGS_UINT;
     }
     if (type->isSpecificBuiltinType(clang::BuiltinType::Long)) {
-        return new LgsLong();
+        return &LGS_LONG;
     }
     if (type->isSpecificBuiltinType(clang::BuiltinType::ULong)) {
-        return new LgsLong();
+        return &LGS_LONG;
     }
     if (type->isSpecificBuiltinType(clang::BuiltinType::Float)) {
-        return new LgsFloat();
+        return &LGS_FLOAT;
     }
     if (type->isVoidType()) {
-        return new LgsVoid();
+        return &LGS_VOID;
+    }
+    if (type->isConstantSizeType()) {
+        return &LGS_SIZE;
     }
     if (type->isStructureType()) {
         return mapCStruct(type);
@@ -131,14 +125,7 @@ LgsType* LgsCLangParser::mapCType(const clang::QualType type) {
     if (type->isConstantArrayType()) {
         return mapCArray(type);
     }
-    if (type->isConstantSizeType()) {
-        return new LgsLong();
-    }
-    const auto typeStr = type.getAsString();
-    if (typeStr == "fpos_t") {
-        return new LgsLong();
-    }
-    llvm::errs() << "Unhandled type: " << typeStr << "\n";
+    errs() << "Unhandled type: " << type.getAsString() << "\n";
     assert(0);
 }
 
@@ -151,6 +138,7 @@ LgsObject* LgsCLangParser::mapCRecord(const clang::RecordDecl* record) {
         const auto lgsField = new LgsField(fieldName, fieldType);
         obj->fields.push_back(lgsField);
     }
+    obj->isExternal = true;
     return obj;
 }
 
@@ -161,12 +149,12 @@ LgsType* LgsCLangParser::mapCStruct(const clang::QualType type) {
     if (name == "") {
         name = decl->getQualifiedNameAsString();
     }
-    const auto objSymbol = table.getSymbol(name);
+    const auto objSymbol = symbolTable.getSymbol(name);
     if (objSymbol) return objSymbol->object;
     const auto obj = mapCRecord(decl);
     obj->name = name;
     if (!name.empty() && !name.starts_with("_")) {
-        table.addSymbol(LgsSymbol(obj, false, true), &errHandler);
+        symbolTable.addSymbol(LgsSymbol(obj, false, true), &errHandler);
     }
     return obj;
 }

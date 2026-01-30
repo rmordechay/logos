@@ -18,7 +18,7 @@ class LgsSet;
 class LgsAny;
 class LgsByte;
 class LgsSize;
-class LgsPtr;
+class LgsCPtr;
 class LgsDouble;
 class LgsFloat;
 class LgsVec;
@@ -70,6 +70,7 @@ public:
     bool isFloat = false;
     bool isHeapAlloc = false;
     bool passByRef = false;
+    bool isExternal = false;
     Lgs_TypeKind rttKind = RTT_UNKNOWN;
 
     bool isAny();
@@ -138,7 +139,7 @@ public:
     LgsSet* asSet();
     LgsVec* asVec();
     LgsMatrix* asMatrix();
-    LgsPtr* asPtr();
+    LgsCPtr* asCPtr();
     LgsMap* asMap();
     LgsTypePair* asPair();
     LgsSubType* asSubtype();

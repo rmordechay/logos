@@ -18,7 +18,7 @@ void LgsErrHandler::addError(const LgsBaseMsg& lgsErr, const std::vector<std::st
 void LgsErrHandler::addError(const LgsBaseMsg& lgsErr, const LgsLocation* location, const std::string& filePath, const std::vector<std::string>& args) {
     setUnsuccessful();
     LgsError err(formatErrorMsg(lgsErr.msg, args), lgsErr.errCode);
-    if (location) {
+    if (location->filepath) {
         assert(filePath != "");
         err.location = *location;
         err.filePath = filePath;

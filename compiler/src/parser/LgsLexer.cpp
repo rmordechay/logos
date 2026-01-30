@@ -192,7 +192,7 @@ LgsToken LgsLexer::nextToken() {
         if (match('^')) return {T_DOUBLE_CARET, "^^", location};
         return {T_CARET, "^", location};
     default:
-        errHandler.addError(E10088, &location, filePath);
+        errHandler.addError(E10088, &location, filePath, {});
         return {T_EOF, "", location};
     }
 }
@@ -333,7 +333,7 @@ LgsToken LgsLexer::scanVarOrKeyword(const LgsLocation& location) {
         if (metaVar == "isLast") return {T_FOR_IS_LAST, combined, location};
         if (metaVar == "element") return {T_FOR_ELEMENT, combined, location};
         if (metaVar == "ever") return {T_FOR_EVER, combined, location};
-        errHandler.addError(E10088, &location, filePath);
+        errHandler.addError(E10088, &location, filePath, {});
         return {T_EOF, "", location};
     }
 
@@ -353,7 +353,7 @@ LgsToken LgsLexer::scanMatrixDims(const LgsLocation& location, std::string& lexe
         advance();
     }
     if (rows == "" || currentChar != 'x') {
-        errHandler.addError(E10088, &location, filePath);
+        errHandler.addError(E10088, &location, filePath, {});
         return {};
     }
     // x
@@ -367,7 +367,7 @@ LgsToken LgsLexer::scanMatrixDims(const LgsLocation& location, std::string& lexe
         advance();
     }
     if (columns == "") {
-        errHandler.addError(E10088, &location, filePath);
+        errHandler.addError(E10088, &location, filePath, {});
         return {};
     }
     return {T_MATRIX, lexeme, location};

@@ -35,7 +35,6 @@ public:
     bool isDeferred = false;
     bool isIOMember = false;
     bool isSyscall = false;
-    bool isExternal = false;
     bool isTerminator = false;
     bool hasDefaults = false;
     bool hasSelf = false;

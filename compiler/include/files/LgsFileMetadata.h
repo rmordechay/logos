@@ -11,5 +11,5 @@ struct LgsFileMetadata {
     fs::path path = "";
     LgsFileType type;
     std::time_t lastWritten;
-    LgsFileMetadata(const fs::path& filePath, const std::time_t& lastWriteTime = 0, const LgsFileType type = LGS_SRC_FILE) : path(filePath), type(type), lastWritten(lastWriteTime) {}
+    explicit LgsFileMetadata(const fs::path& filePath, const std::time_t& lastWriteTime = 0, const LgsFileType type = LGS_SRC_FILE) : path(filePath), type(type), lastWritten(lastWriteTime) {}
 };

@@ -21,7 +21,7 @@ void LgsRunCmd::run() {
 }
 
 void LgsRunCmd::parseCompileArgs(LgsApp& app, std::vector<const char*>& appArgs) {
-    if (argc < 3) return errHandler.addError(E40001);
+    if (argc < 3) return errHandler.addError(E40001, {});
     auto argStart = parseArgs(2, [this, &app](const std::string& cmd, int& i) {
         if (isArgEqual(cmd, {"o", "optimize"})) {
             int optLevel;
@@ -39,7 +39,7 @@ void LgsRunCmd::parseCompileArgs(LgsApp& app, std::vector<const char*>& appArgs)
         }
     });
 
-    if (argStart < 0) return errHandler.addError(E40001);
+    if (argStart < 0) return errHandler.addError(E40001, {});
     if (app.configs.appMode == FILE_MODE) {
         app.lgsCode[LGS_MAIN_FILE] = argv[argStart++];
     } else {

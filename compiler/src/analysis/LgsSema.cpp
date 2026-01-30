@@ -370,7 +370,7 @@ void LgsSema::visitVarDec(LgsVarDec* varDec) {
         validateExprType(varDec->expr, varDec->type);
     } else {
         typeResolver.resolveType(varDec->type);
-        if (!varDec->type) return;
+        if (varDec->type->isUnknown()) return;
         varDec->expr = varDec->type->getZeroValue();
         varDec->expr->location = varDec->location;
         visitExpr(varDec->expr);
@@ -1715,8 +1715,8 @@ void LgsSema::addErrorIfSuccessful(const LgsBaseMsg& lgsErr, const LgsLocation& 
 }
 
 void LgsSema::addRTType(LgsType* type) const {
-    if (!errHandler.successful) return;
-    if (!type || type->isVoid() || type->hasGenericTypes()) return;
+    if (!errHandler.successful || !type) return;
+    if (type->isExternal || type->isVoid() || type->hasGenericTypes()) return;
     if (type->asNullable() && !type->asNullable()->baseType) return;
     if (type->asInterface() || type->asFuncType()) return;
     for (const auto rttType : globals.rttTypes) {

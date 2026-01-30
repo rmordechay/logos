@@ -7,7 +7,9 @@ public:
     LgsType* subtype;
     bool isWeakType = false;
 
-    LgsSubType(const std::string& name, LgsType* baseType) : name(name), subtype(baseType) {}
+    LgsSubType(const std::string& name, LgsType* baseType) : name(name), subtype(baseType) {
+        rttKind = baseType->rttKind;
+    }
     Type* getIRType(LgsCodeGen& cg) override;
     Constant* getRTType(LgsCodeGen& cg) override;
     size_t sizeBytes() override;

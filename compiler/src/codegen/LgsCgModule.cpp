@@ -1159,6 +1159,10 @@ void LgsCgModule::visitCharConst(LgsCharConst* charConst) const {
 
 void LgsCgModule::visitInstance(LgsInstance* instance) {
     const auto obj = instance->obj;
+    if (obj->isExternal) {
+        instance->IRValue = cg.builder.CreateAlloca(obj->getIRType(cg));
+        return;
+    }
     instance->IRValue = cg.allocInCurrent(obj->IRSize(cg), true);
     cg.storeStructField(obj->getIRType(cg), instance->IRValue, LgsInstance::rttIndices.type, obj->getRTType(cg));
 

@@ -7,7 +7,7 @@ struct LgsCliCmdHelp;
 
 void LgsAstCmd::run() {
     if (argc != 3) {
-        return errHandler.addError(E40001);
+        return errHandler.addError(E40001, {});
     }
     const auto path = argv[2];
     if (!fs::exists(path)) {

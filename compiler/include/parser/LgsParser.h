@@ -68,19 +68,19 @@ public:
     size_t currentIndex = 0;
     size_t recursionCount = 0;
     std::vector<LgsToken> tokens;
-    LgsFileMetadata* metadata = nullptr;
     LgsSymbolTable& globals;
-    std::string code = "";
     LgsErrHandler errHandler;
+    std::string lgsCode = "";
     LgsFunc* currentFunc = nullptr;
-    LgsCCompiler lgsCC;
+    LgsFileMetadata* metadata = nullptr;
+    std::vector<LgsStrConst*> cImportPaths;
 
     LgsParser(LgsFileMetadata* metadata, LgsPaths& paths, LgsSymbolTable& globals, const bool headersOnly = false)
-        : paths(paths), headersOnly(headersOnly), metadata(metadata), globals(globals), lgsCC(paths) {
+        : paths(paths), headersOnly(headersOnly), globals(globals), metadata(metadata) {
     }
 
     LgsParser(const std::string& code, LgsPaths& paths, LgsSymbolTable& globals, const bool headersOnly = false)
-        : paths(paths), headersOnly(headersOnly), globals(globals), code(code), lgsCC(paths) {}
+        : paths(paths), headersOnly(headersOnly), globals(globals), lgsCode(code) {}
 
     // Files
     bool scanTokens();
@@ -161,9 +161,7 @@ public:
 
     void parseArgs(LgsInstance* instance);
     void parsePackageString(LgsImportPackage& pkg, const LgsToken& importToken);
-    void parseImports(std::vector<LgsStrConst*>& cImports);
-    void parseCIncludes(std::vector<LgsStrConst*>& cImports);
-    void parseCImports(std::vector<LgsStrConst*> externalImports, LgsFile* file);
+    void parseImports();
 
     void setLocation(LgsLocation& location, const LgsToken* startToken, const LgsToken* endToken) const;
     void extractStrParts(LgsStrConst& strConst);

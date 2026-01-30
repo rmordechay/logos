@@ -41,6 +41,7 @@ public:
     bool setup();
     bool parse();
     bool parseHeaders();
+    void parseCImports();
     bool analyse();
     bool generate();
     bool link();

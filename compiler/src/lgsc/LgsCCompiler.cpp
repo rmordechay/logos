@@ -4,7 +4,6 @@
 #include "lgsc/LgsCLangParser.h"
 #include "LgsConfigs.h"
 #include "LgsUtils.h"
-#include "exprs/constants/LgsStrConst.h"
 #include "stmts/LgsVarDec.h"
 #include <clang/Driver/Driver.h>
 #include <llvm/TargetParser/Host.h>
@@ -43,7 +42,7 @@ void LgsCCompiler::initCompiler() {
     compiler.createSourceManager(compiler.getFileManager());
 }
 
-bool LgsCCompiler::parseFile(LgsCLangParser& parser, const fs::path& headerPath) {
+bool LgsCCompiler::parseFile(const fs::path& headerPath) {
     compiler.getPreprocessorOpts().UsePredefines = true;
     compiler.createPreprocessor(TU_Complete);
 
@@ -61,7 +60,7 @@ bool LgsCCompiler::parseFile(LgsCLangParser& parser, const fs::path& headerPath)
     const auto fileCharacter = fs::exists(paths.cLibHeadersDir / headerPath) ? SrcMgr::C_System : SrcMgr::C_User;
     const auto fileID = compiler.getSourceManager().createFileID(*file, SourceLocation(), fileCharacter);
     compiler.getSourceManager().setMainFileID(fileID);
-    auto ppCallback = std::make_unique<LgsPPCallbacks>(parser.table, pp, compiler.getLangOpts(), compiler.getSourceManager());
+    auto ppCallback = std::make_unique<LgsPPCallbacks>(parser.symbolTable, pp, compiler.getLangOpts(), compiler.getSourceManager());
     pp.addPPCallbacks(std::move(ppCallback));
 
     compiler.createASTContext();
@@ -86,8 +85,8 @@ void LgsPPCallbacks::MacroDefined(const Token& macroNameToken, const MacroDirect
         const auto expr = new LgsIntConst(&LGS_INT, std::atoi(value.c_str()));
         const auto varDec = new LgsVarDec(stringRef.str(), expr);
         varDec->type = varDec->expr->type;
-        if (!table.symbols.contains(varDec->name)) {
-            table.addSymbol(LgsSymbol(varDec, false, true), &errHandler);
+        if (!symbolTable.symbols.contains(varDec->name)) {
+            symbolTable.addSymbol(LgsSymbol(varDec, false, true), &errHandler);
         }
     }
 }

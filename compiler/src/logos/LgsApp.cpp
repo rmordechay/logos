@@ -1,4 +1,6 @@
 #include "logos/LgsApp.h"
+
+#include <unordered_set>
 #include <llvm/IR/Module.h>
 #include "analysis/LgsSema.h"
 #include "builtins/LgsTest.h"
@@ -75,7 +77,7 @@ bool LgsApp::setup() {
     configs.appMode = PROJECT_MODE;
     initPaths(paths.rootPath);
     if (!is_directory(paths.rootPath) || !is_directory(paths.srcDir) || !fs::exists(paths.appConfigFile)) {
-        errHandler.addError(E10010);
+        errHandler.addError(E10010, {});
         return false;
     }
 
@@ -127,6 +129,7 @@ bool LgsApp::parse() {
         });
     }
     threadPool.wait();
+    parseCImports();
     return errHandler.successful;
 }
 
@@ -141,6 +144,22 @@ bool LgsApp::parseHeaders() {
     }
     threadPool.wait();
     return errHandler.successful;
+}
+
+void LgsApp::parseCImports() {
+    std::unordered_set<std::string> seen;
+    for (const auto file : srcFiles) {
+        LgsCCompiler lgsCC(paths);
+        for (const auto externalImport : file->symbolTable.cImportPaths) {
+            auto headerPath = externalImport->value;
+            if (!seen.insert(headerPath).second) assert(0);
+            if (lgsCC.parseFile(headerPath)) {
+                file->symbolTable.symbols.merge(lgsCC.parser.symbolTable.symbols);
+            } else {
+                errHandler.addError(E10106, &externalImport->location, file->path, {headerPath});
+            }
+        }
+    }
 }
 
 bool LgsApp::analyse() {
@@ -220,7 +239,7 @@ void LgsApp::loadSrcFile(LgsFileMetadata& metadata) {
 void LgsApp::loadSrcFile(const std::string& fileCode, const fs::path& filePath) {
     LgsFileMetadata metadata(filePath);
     LgsParser parser(&metadata, paths, globals);
-    parser.code = fileCode;
+    parser.lgsCode = fileCode;
     const auto file = parser.parseSrcFile(configs.isTestRun);
     {
         std::lock_guard lock(mtx);
@@ -308,8 +327,8 @@ void LgsApp::loadBuiltins() {
     // globals.addSymbol(LgsSymbol(new LgsSys(), true, false), &errHandler);
     // globals.addSymbol(LgsSymbol(new LgsTest(), true, false), &errHandler);
     globals.rttTypes = {
-        &LGS_STR, &LGS_CHAR, &LGS_BYTE, &LGS_BOOL, &LGS_INT, &LGS_UINT, &LGS_ULONG,
-        &LGS_SHORT, &LGS_LONG, &LGS_SIZE, &LGS_FLOAT, &LGS_DOUBLE, &LGS_NULLABLE, &LGS_VOID
+    &LGS_STR, &LGS_CHAR, &LGS_BYTE, &LGS_BOOL, &LGS_INT, &LGS_UINT, &LGS_ULONG,
+    &LGS_SHORT, &LGS_LONG, &LGS_SIZE, &LGS_FLOAT, &LGS_DOUBLE, &LGS_NULLABLE, &LGS_VOID
     };
 }
 

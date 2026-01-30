@@ -3,7 +3,6 @@
 #include "exprs/LgsVariable.h"
 #include "logos/LgsAppConfigs.h"
 #include "stmts/LgsVarDec.h"
-#include "LgsUtils.h"
 
 struct LgsImportPackage {
     std::string name = "";

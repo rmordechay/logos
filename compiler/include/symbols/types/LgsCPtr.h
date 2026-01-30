@@ -1,12 +1,14 @@
 #pragma once
 #include "LgsType.h"
 
-class LgsPtr final : public LgsType {
+class LgsCPtr final : public LgsType {
 public:
-    static constexpr auto name = "Ptr";
+    static constexpr auto name = "CPtr";
     LgsType* baseType;
 
-    explicit LgsPtr(LgsType* baseType) : baseType(baseType) {}
+    explicit LgsCPtr(LgsType* baseType) : baseType(baseType) {
+        isExternal = true;
+    }
     std::string getName() override;
     std::string pname() override;
     Type* getIRType(LgsCodeGen& cg) override;
@@ -17,5 +19,5 @@ public:
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     std::string fmtStr() const override;
     DIType* getDebugType(LgsCodeGen& cg) override;
-    ~LgsPtr() override;
+    ~LgsCPtr() override;
 };

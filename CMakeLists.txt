@@ -124,7 +124,7 @@ set(COMPILER_SOURCE
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsUnknown.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsSelf.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsAny.cpp
-    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsPtr.cpp
+    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsCPtr.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsEnum.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsFuncType.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsInterface.cpp

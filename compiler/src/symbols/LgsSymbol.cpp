@@ -26,8 +26,8 @@ LgsSymbol::LgsSymbol(LgsInterface* interface)
 LgsSymbol::LgsSymbol(LgsGenericType* generic)
     : name(&generic->name), symbolType(GENERIC), location(&generic->location), generic(generic) {}
 
-LgsSymbol::LgsSymbol(LgsSubType* subtype)
-    : name(&subtype->name), symbolType(SUBTYPE), location(&subtype->location), subtype(subtype) {}
+LgsSymbol::LgsSymbol(LgsSubType* subtype, const bool isExternal)
+    : name(&subtype->name), symbolType(SUBTYPE), location(&subtype->location), isExternal(isExternal), subtype(subtype) {}
 
 LgsSymbol::LgsSymbol(LgsVarDec* varDec, const bool isBuiltin, const bool isExternal)
     : name(&varDec->name), symbolType(VAR_DEC), location(&varDec->location), isExternal(isExternal), isBuiltin(isBuiltin), varDec(varDec) {}

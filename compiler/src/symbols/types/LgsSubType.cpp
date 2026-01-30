@@ -8,7 +8,7 @@ Type* LgsSubType::getIRType(LgsCodeGen& cg) {
 }
 
 Constant* LgsSubType::getRTType(LgsCodeGen& cg) {
-    assert(0);
+    return subtype->getRTType(cg);
 }
 
 size_t LgsSubType::sizeBytes() {

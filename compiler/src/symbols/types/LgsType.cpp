@@ -3,7 +3,7 @@
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
 #include "types/LgsAny.h"
-#include "types/LgsPtr.h"
+#include "types/LgsCPtr.h"
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
 #include "types/iterables/LgsDArray.h"
@@ -45,7 +45,7 @@ static std::unordered_map<std::string, uint8_t> numberPrecedences = {
 };
 
 bool LgsType::isAny() {
-    return getName() == LgsAny::name || (asPtr() && asPtr()->baseType->isVoid());
+    return getName() == LgsAny::name || (asCPtr() && asCPtr()->baseType->isVoid());
 }
 
 bool LgsType::isVoid() {
@@ -287,8 +287,8 @@ LgsMatrix* LgsType::asMatrix() {
     return dynamic_cast<LgsMatrix*>(this);
 }
 
-LgsPtr* LgsType::asPtr() {
-    return dynamic_cast<LgsPtr*>(this);
+LgsCPtr* LgsType::asCPtr() {
+    return dynamic_cast<LgsCPtr*>(this);
 }
 
 LgsMap* LgsType::asMap() {

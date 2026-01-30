@@ -4,7 +4,7 @@
 
 void LgsGenerateCmd::run() {
     if (argc != 3) {
-        return errHandler.addError(E40001);
+        return errHandler.addError(E40001, {});
     }
     const auto name = std::string(argv[2]);
     if (std::isdigit(name[0])) {
