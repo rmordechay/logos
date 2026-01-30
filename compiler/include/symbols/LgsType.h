@@ -75,7 +75,7 @@ public:
 
     bool isAny();
     bool isVoid();
-    bool isNumber();
+    bool isNumber() const;
     bool isScalar() const;
     bool isUnknown();
     bool isSliceable();
@@ -89,11 +89,11 @@ public:
     virtual std::string getName() = 0;
     virtual size_t sizeBytes() = 0;
     virtual LgsExpr* getZeroValue() = 0;
-    virtual Value* getIRZeroValue(LgsCodeGen& cg);
+    virtual Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee);
     virtual Type* getIRType(LgsCodeGen& cg) = 0;
     virtual Value* hashValue(LgsCodeGen& cg, Value* value);
     virtual Value* asIRStr(LgsCodeGen& cg, Value* v);
-    virtual Constant* getRTType(LgsCodeGen& cg) = 0;
+    virtual Constant* getRTType(LgsCodeGen& cg);
     virtual bool canCastTo(LgsType* other) = 0;
     virtual std::string fmtStr() const = 0;
     virtual LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) = 0;

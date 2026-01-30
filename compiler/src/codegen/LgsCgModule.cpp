@@ -310,7 +310,7 @@ void LgsCgModule::visitWhileLoop(const LgsWhileLoop* loop) {
 void LgsCgModule::visitVarDec(LgsVarDec* varDec) {
     if (varDec->shouldAllocate()) {
         varDec->IRValue = cg.builder.CreateAlloca(varDec->type->getIRType(cg));
-        varDec->expr->IRValue = varDec->IRValue;
+        varDec->expr->pointee = varDec->IRValue;
         visitExpr(varDec->expr);
         if (varDec->expr->IRValue != varDec->IRValue) {
             cg.store(varDec->expr->IRValue, varDec->IRValue);
@@ -324,41 +324,28 @@ void LgsCgModule::visitVarDec(LgsVarDec* varDec) {
 }
 
 void LgsCgModule::visitAssignment(const LgsAssignment* assignment) {
-    auto& binaryExpr = assignment->binaryExpr;
-    const auto l = binaryExpr ? binaryExpr->left : assignment->left;
-    const auto r = binaryExpr ? binaryExpr->right : assignment->right;
-    if (const auto iterIndex = l->asIterIndex()) {
-        visitIterIndex(iterIndex, true);
-    } else if (const auto var = l->asVariable()) {
-        visitVariable(var);
-    } else if (const auto selection = l->asSelection()) {
-        visitSelection(selection, true);
-    } else if (const auto nullable = l->asNullableExpr()) {
-        visitExpr(nullable->baseExpr, true);
-        nullable->IRValue = nullable->baseExpr->IRValue;
+    assert(!assignment->binaryExpr);
+    const auto left = assignment->left;
+    const auto right = assignment->right;
+    visitExpr(left);
+    right->pointee = left->IRValue;
+    visitExpr(right);
+    if (left->type->asNullable()) {
+        // TODO First check nullable then continue to rest
+        assert(0);
     }
-    visitExpr(r, true);
-
-    if (!binaryExpr) {
-        l->assign(cg, r);
+    if (const auto iterIndex = left->asIterIndex()) {
+        const auto baseExpr = iterIndex->baseExpr;
+        const auto from = iterIndex->index.from;
+        const auto iterable = baseExpr->type->asIterable();
+        iterable->addIRElement(cg, baseExpr->IRValue, from->IRValue, right->IRValue);
         return;
     }
-
-    const auto type = binaryExpr->type;
-    switch (binaryExpr->op.opType) {
-    case ADD: binaryExpr->IRValue = type->addIR(cg, binaryExpr); return;
-    case SUB: binaryExpr->IRValue = type->subIR(cg, binaryExpr); return;
-    case MUL: binaryExpr->IRValue = type->mulIR(cg, binaryExpr); return;
-    case DIV: binaryExpr->IRValue = type->divIR(cg, binaryExpr); return;
-    case MODULO: binaryExpr->IRValue = type->modIR(cg, binaryExpr); return;
-    case POW: binaryExpr->IRValue = type->powIR(cg, binaryExpr); return;
-    case BIT_AND: binaryExpr->IRValue = type->bitAndIR(cg, binaryExpr); return;
-    case BIT_OR: binaryExpr->IRValue = type->bitOrIR(cg, binaryExpr); return;
-    case BIT_XOR: binaryExpr->IRValue = type->bitXorIR(cg, binaryExpr); return;
-    case LSHIFT: binaryExpr->IRValue = type->lshiftIR(cg, binaryExpr); return;
-    case RSHIFT: binaryExpr->IRValue = type->rshiftIR(cg, binaryExpr); return;
-    default: break;
+    if (left->type->isHeapAlloc) {
+        left->moveValue(cg, right->IRValue);
+        return;
     }
+    cg.store(right->IRValue, left->IRValue);
 }
 
 void LgsCgModule::visitIfStmt(LgsIfStmt* ifStmt) {
@@ -593,7 +580,7 @@ void LgsCgModule::visitIOStmt(const LgsIOStmt* ioStmt) {
     visitStmtsBlock(ioStmt->stmtsBlock);
 }
 
-void LgsCgModule::visitExpr(LgsExpr* expr, const bool assign) {
+void LgsCgModule::visitExpr(LgsExpr* expr) {
     if (!expr) return;
     if (const auto ternaryExpr = dynamic_cast<LgsTernaryExpr*>(expr)) {
         visitTernaryExpr(ternaryExpr);
@@ -608,11 +595,11 @@ void LgsCgModule::visitExpr(LgsExpr* expr, const bool assign) {
         else if (const auto floatConst = expr->asFloatConst()) visitFloatConst(floatConst);
         else if (const auto instance = expr->asInstance()) visitInstance(instance);
         else if (const auto funcCall = expr->asFuncCall()) visitFuncCall(funcCall);
-        else if (const auto selection = expr->asSelection()) visitSelection(selection, assign);
+        else if (const auto selection = expr->asSelection()) visitSelection(selection);
         else if (const auto metaSelection = expr->asMetaSelection()) visitMetaSelection(metaSelection);
         else if (const auto arrayExpr = expr->asArrayExpr()) visitArrayExpr(arrayExpr);
         else if (const auto hashMap = expr->asHashMap()) visitHashMap(hashMap);
-        else if (const auto iterIndex = expr->asIterIndex()) visitIterIndex(iterIndex, assign);
+        else if (const auto iterIndex = expr->asIterIndex()) visitIterIndex(iterIndex);
         else if (const auto variable = expr->asVariable()) visitVariable(variable);
         else if (const auto envVar = expr->asEnvVar()) visitEnvVar(envVar);
         else if (const auto postfixExpr = expr->asPostfixExpr()) visitPostfixExpr(postfixExpr);
@@ -702,19 +689,14 @@ void LgsCgModule::visitFloatConst(LgsFloatConst* floatConst) const {
 }
 
 void LgsCgModule::visitNullableExpr(LgsNullableExpr* expr) {
-    if (expr->baseExpr) {
-        visitExpr(expr->baseExpr);
+    if (expr->isNull) {
+        expr->IRValue = cg.null();
+        return;
     }
+    visitExpr(expr->baseExpr);
     const auto nullable = expr->type->asNullable();
     const auto ty = nullable->getIRType(cg);
-    if (expr->isNull) {
-        if (nullable->passByRef) {
-            expr->IRValue = cg.null();
-        } else {
-            expr->IRValue = expr->pointee ? expr->pointee : cg.builder.CreateAlloca(ty);
-            cg.storeStructField(ty, expr->IRValue, nullable->isSetIndex, cg.false_());
-        }
-    } else if (nullable->passByRef) {
+    if (nullable->passByRef) {
         expr->IRValue = expr->baseExpr->IRValue;
     } else {
         expr->IRValue = expr->pointee ? expr->pointee : cg.builder.CreateAlloca(ty);
@@ -723,9 +705,6 @@ void LgsCgModule::visitNullableExpr(LgsNullableExpr* expr) {
 }
 
 void LgsCgModule::visitArrayExpr(LgsArrayExpr* arrayExpr) {
-    for (const auto element : arrayExpr->elements) {
-        visitExpr(element);
-    }
     if (arrayExpr->type->asSArray()) {
         visitStaticArray(arrayExpr);
     } else if (arrayExpr->type->asDArray() || arrayExpr->type->asSet()) {
@@ -735,17 +714,17 @@ void LgsCgModule::visitArrayExpr(LgsArrayExpr* arrayExpr) {
     }
 }
 
-void LgsCgModule::visitStaticArray(LgsArrayExpr* arrayExpr) const {
+void LgsCgModule::visitStaticArray(LgsArrayExpr* arrayExpr) {
     const auto sArr = arrayExpr->type->asSArray();
     const auto sArrTypeIR = sArr->getIRType(cg);
-    if (arrayExpr->elements.empty()) {
-        const auto ty = sArr->getIRType(cg);
-        const auto arr = arrayExpr->pointee ? arrayExpr->pointee : cg.builder.CreateAlloca(ty);
-        cg.callMemset(arr, cg.usize(0), sArr->IRSize(cg));
-        arrayExpr->IRValue = arr;
-        return;
+    arrayExpr->IRValue = sArr->getIRZeroValue(cg, arrayExpr->pointee);
+    if (arrayExpr->elements.empty()) return;
+    for (size_t i = 0; i < arrayExpr->elements.size(); ++i) {
+        const auto element = arrayExpr->elements[i];
+        const auto offset = cg.builder.CreateMul(cg.usize(i), sArr->baseType->IRSize(cg));
+        element->pointee = cg.builder.CreatePtrAdd(arrayExpr->IRValue, offset);
+        visitExpr(element);
     }
-    arrayExpr->IRValue = arrayExpr->pointee ? arrayExpr->pointee : cg.builder.CreateAlloca(sArrTypeIR);
 
     // Check if all args are const for chunk copy
     std::vector<Constant*> constantArgs;
@@ -764,7 +743,6 @@ void LgsCgModule::visitStaticArray(LgsArrayExpr* arrayExpr) const {
         const auto argsIR = ConstantArray::get(sArrTy, constantArgs);
         cg.store(argsIR, arrayExpr->IRValue);
     } else {
-        if (sArr->baseType->asSArray()) return; // Nested arrays are handled before
         for (size_t i = 0; i < arrayExpr->elements.size(); ++i) {
             const auto element = arrayExpr->elements[i];
             sArr->addIRElement(cg, arrayExpr->IRValue, cg.i32(i), element->IRValue);
@@ -772,9 +750,12 @@ void LgsCgModule::visitStaticArray(LgsArrayExpr* arrayExpr) const {
     }
 }
 
-void LgsCgModule::visitDynamicArray(LgsArrayExpr* arrayExpr) const {
+void LgsCgModule::visitDynamicArray(LgsArrayExpr* arrayExpr) {
+    for (const auto element : arrayExpr->elements) {
+        visitExpr(element);
+    }
     const auto dArr = arrayExpr->type->asDArray();
-    arrayExpr->IRValue = dArr->getIRZeroValue(cg);
+    arrayExpr->IRValue = dArr->getIRZeroValue(cg, arrayExpr->pointee);
     for (const auto element : arrayExpr->elements) {
         dArr->addIRElement(cg, arrayExpr->IRValue, nullptr, element->IRValue);
     }
@@ -845,7 +826,7 @@ void LgsCgModule::visitMatrixExpr(const LgsMatrixExpr* matrixExpr) {
 
 void LgsCgModule::visitHashMap(LgsHashMap* hashMap) {
     const auto map = hashMap->type->asMap();
-    hashMap->IRValue = hashMap->type->getIRZeroValue(cg);
+    hashMap->IRValue = hashMap->type->getIRZeroValue(cg, hashMap->pointee);
     for (const auto pair : hashMap->elements) {
         visitExpr(pair->key);
         visitExpr(pair->value);
@@ -898,23 +879,18 @@ void LgsCgModule::visitVariable(LgsVariable* variable) const {
     assert(variable->IRValue);
 }
 
-void LgsCgModule::visitSelection(LgsSelection* selection, const bool assign) {
+void LgsCgModule::visitSelection(LgsSelection* selection) {
     const auto firstExpr = selection->exprs.front();
     if (!firstExpr->isImportName) {
         visitExpr(firstExpr);
-        if (firstExpr->IRValue) assert(&firstExpr->IRValue->getContext() == &cg.IRModule->getContext());
     }
 
     const auto exprsCount = selection->exprs.size();
     for (size_t i = firstExpr->isImportName; i < exprsCount - 1; ++i) {
         const auto parent = selection->exprs[i];
         const auto child = selection->exprs[i + 1];
-        const auto lastIteration = i == exprsCount - 2;
         if (const auto var = child->asVariable()) {
             visitFieldSelection(var, parent);
-            if (var->type->isHeapAlloc && !(lastIteration && assign)) {
-                var->IRValue = cg.load(cg.ptrTy(), var->IRValue);
-            }
         } else if (const auto nullableExpr = child->asNullableExpr()) {
             visitNullableSelection(nullableExpr, parent);
         } else if (const auto methodCall = child->asFuncCall()) {
@@ -924,9 +900,12 @@ void LgsCgModule::visitSelection(LgsSelection* selection, const bool assign) {
             const auto baseExpr = iterIndex->getBaseExpr()->asVariable();
             const auto field = parent->type->getField(baseExpr->name);
             iterIndex->pointee = cg.load(cg.ptrTy(), field->getGEP(cg, parent->IRValue));
-            visitIterIndex(iterIndex, false);
+            visitIterIndex(iterIndex);
         } else {
             assert(0);
+        }
+        if (child->type->passByRef) {
+            child->IRValue = cg.load(cg.ptrTy(), child->IRValue);
         }
     }
     selection->IRValue = selection->exprs.back()->IRValue;
@@ -1153,8 +1132,8 @@ void LgsCgModule::visitInstance(LgsInstance* instance) {
         instance->IRValue = cg.builder.CreateAlloca(obj->getIRType(cg));
         return;
     }
-    instance->IRValue = obj->getIRZeroValue(cg);
 
+    instance->IRValue = obj->getIRZeroValue(cg, instance->pointee);
     // Args
     std::unordered_set<std::string> visited;
     for (const auto& [argName, arg] : instance->args) {
@@ -1176,22 +1155,26 @@ void LgsCgModule::visitInstance(LgsInstance* instance) {
             cg.store(field->expr->IRValue, pointee);
         } else {
             if (!fieldType->isHeapAlloc) continue;
-            const auto zeroValue = fieldType->getIRZeroValue(cg);
+            const auto zeroValue = fieldType->getIRZeroValue(cg, pointee);
             cg.store(zeroValue, pointee);
         }
     }
 }
 
-void LgsCgModule::visitIterIndex(LgsIterIndex* iterIndex, const bool assign) {
+void LgsCgModule::visitIterIndex(LgsIterIndex* iterIndex) {
+    const auto baseExpr = iterIndex->baseExpr;
+    const auto index = iterIndex->index;
+    const auto iterable = baseExpr->type->asIterable();
+    assert(iterable);
     iterIndex->baseExpr->pointee = iterIndex->pointee;
     iterIndex->pointee = nullptr;
-    visitExpr(iterIndex->baseExpr);
-    visitExpr(iterIndex->index.from);
-    if (iterIndex->index.to) {
-        visitExpr(iterIndex->index.to);
-        iterIndex->setIRRangePtr(cg, assign);
+    visitExpr(baseExpr);
+    visitExpr(index.from);
+    if (index.to) {
+        visitExpr(index.to);
+        iterIndex->setIRRangePtr(cg);
     } else {
-        iterIndex->setIRElementPtr(cg, assign);
+        iterIndex->IRValue = iterable->getIRElement(cg, baseExpr->IRValue, index.from->IRValue);
     }
 }
 

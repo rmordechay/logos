@@ -32,6 +32,10 @@ LgsExpr* LgsSArray::getZeroValue() {
     return new LgsArrayExpr(this);
 }
 
+Value* LgsSArray::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
+    return pointee ? pointee : cg.builder.CreateAlloca(getIRType(cg));
+}
+
 Constant* LgsSArray::getRTType(LgsCodeGen& cg) {
     const auto RTTName = LGS_TYPEINFO_PREFIX + getName() + std::to_string(len);
     if (const auto v = cg.IRModule->getGlobalVariable(RTTName)) return v;

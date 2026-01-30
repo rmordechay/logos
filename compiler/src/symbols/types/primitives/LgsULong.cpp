@@ -14,10 +14,6 @@ Type* LgsULong::getIRType(LgsCodeGen& cg) {
     return cg.i32Ty();
 }
 
-Constant* LgsULong::getRTType(LgsCodeGen& cg) {
-    return cg.getRTTypeInfo(getName(), IRSize(cg), RTT_ULONG);
-}
-
 std::string LgsULong::getName() {
     return name;
 }

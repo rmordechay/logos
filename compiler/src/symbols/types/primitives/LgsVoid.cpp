@@ -8,10 +8,6 @@ Type* LgsVoid::getIRType(LgsCodeGen& cg) {
     return Type::getVoidTy(cg.context);
 }
 
-Constant* LgsVoid::getRTType(LgsCodeGen& cg) {
-    return cg.getRTTypeInfo(getName(), cg.sizeZero(), RTT_VOID);
-}
-
 size_t LgsVoid::sizeBytes() {
     return 0;
 }
@@ -26,6 +22,10 @@ LgsExpr* LgsVoid::getZeroValue() {
 
 LgsType* LgsVoid::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     assert(0);
+}
+
+Constant* LgsVoid::getRTType(LgsCodeGen& cg) {
+    return cg.getRTTypeInfo(getName(), cg.sizeZero(), rttKind);
 }
 
 std::string LgsVoid::fmtStr() const {

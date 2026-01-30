@@ -6,15 +6,6 @@ Value* LgsNullableExpr::loadIR(LgsCodeGen& cg) {
     return cg.load(type->getTypeOrPtr(cg), IRValue);
 }
 
-void LgsNullableExpr::assign(LgsCodeGen& cg, LgsExpr* right) {
-    if (!type->passByRef) {
-        const auto isSet = cg.builder.CreateIsNotNull(right->IRValue);
-        type->asNullable()->setIRFields(cg, IRValue, right->IRValue, isSet);
-        return;
-    }
-    cg.store(right->IRValue, IRValue);
-}
-
 void LgsNullableExpr::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }

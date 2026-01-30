@@ -37,7 +37,7 @@ static std::string formatElement(const Lgs_TypeKind kind, void* type, void* valu
     case RTT_OBJECT: {
         const auto objPtr = static_cast<char*>(value) + sizeof(size_t);
         const auto obj = *reinterpret_cast<Lgs_Object**>(objPtr);
-        str << "{";
+        str << obj->name << "{";
         for (int i = 0; i < obj->fieldsCount; ++i) {
             const auto fieldName = obj->fields[i].name;
             const auto fieldOffset = obj->fields[i].offset;
@@ -88,6 +88,7 @@ static std::string formatElement(const Lgs_TypeKind kind, void* type, void* valu
     case RTT_NULLABLE: {
         const auto nullable = static_cast<Lgs_Nullable*>(type);
         if (nullable->isPtr) {
+            assert(nullable->baseType);
             str << formatElement(nullable->baseType->kind, nullable->baseType, *static_cast<void**>(value));
         } else {
             const auto isSetPtr = static_cast<char*>(value) + nullable->baseType->size;

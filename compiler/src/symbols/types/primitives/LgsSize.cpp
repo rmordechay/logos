@@ -65,10 +65,6 @@ LgsType* LgsSize::applyBinOp(LgsType* rightType, LgsBinOp& op) {
 
 }
 
-Constant* LgsSize::getRTType(LgsCodeGen& cg) {
-    return cg.getRTTypeInfo(getName(), IRSize(cg), RTT_SIZE);
-}
-
 bool LgsSize::canCastTo(LgsType* other) {
     const auto IRName = other->getName();
     if (IRName == LgsAny::name) return true;

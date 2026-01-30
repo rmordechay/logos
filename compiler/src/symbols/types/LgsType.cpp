@@ -52,7 +52,7 @@ bool LgsType::isVoid() {
     return dynamic_cast<LgsVoid*>(this);
 }
 
-bool LgsType::isNumber() {
+bool LgsType::isNumber() const {
     return isInt || isFloat;
 }
 
@@ -111,7 +111,7 @@ LgsFunc* LgsType::getMethod(const std::string& methodName) {
     return nullptr;
 }
 
-Value* LgsType::getIRZeroValue(LgsCodeGen& cg) {
+Value* LgsType::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
     assert(0);
 }
 
@@ -124,7 +124,7 @@ Value* LgsType::asIRStr(LgsCodeGen& cg, Value* v) {
 }
 
 Constant* LgsType::getRTType(LgsCodeGen& cg) {
-    assert(0);
+    return cg.getRTTypeInfo(getName(), IRSize(cg), rttKind);
 }
 
 LgsType* LgsType::applyBinOp(LgsType* rightType, LgsBinOp& op) {
@@ -322,12 +322,12 @@ LgsType::~LgsType() {
 
 Value* exprEqNull(LgsCodeGen& cg, Value* expr, LgsType* type) {
     if (type->passByRef) return cg.builder.CreateIsNull(expr);
-    return cg.builder.CreateNot(type->asNullable()->getIsSet(cg, expr));
+    return cg.builder.CreateNot(type->asNullable()->loadIsSet(cg, expr));
 }
 
 Value* exprNeNull(LgsCodeGen& cg, Value* expr, LgsType* type) {
     if (type->passByRef) return cg.builder.CreateIsNotNull(expr);
-    return type->asNullable()->getIsSet(cg, expr);
+    return type->asNullable()->loadIsSet(cg, expr);
 }
 
 Value* eqIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
@@ -352,6 +352,9 @@ Value* eqIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
     }
     if (type->asStr()) {
         return cg.strsEqual(left, right);
+    }
+    if (type->asObject()) {
+        assert(0);
     }
     assert(0);
 }

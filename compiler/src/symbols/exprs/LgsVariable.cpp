@@ -14,7 +14,7 @@ Value* LgsVariable::loadIR(LgsCodeGen& cg) {
     case PARAM:
         return ref.param->loadIR(cg);
     case VAR_DEC:
-        return ref.varDec->expr->loadIR(cg);
+        return ref.varDec->loadIR(cg);
     case FIELD:
         return ref.field->loadIR(cg);
     case FUNC:
@@ -42,14 +42,6 @@ bool LgsVariable::equals(LgsExpr* other) {
 
 LgsExpr* LgsVariable::castExplicitly(LgsType* toType) {
     assert(0);
-}
-
-void LgsVariable::assign(LgsCodeGen& cg, LgsExpr* right) {
-    if (type->isHeapAlloc) {
-        Lgs_Runtime_moveValue(cg, loadIR(cg), right->IRValue, type);
-    } else {
-        cg.store(right->IRValue, IRValue);
-    }
 }
 
 std::string LgsVariable::asText() {

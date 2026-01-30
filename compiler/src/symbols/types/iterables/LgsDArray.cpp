@@ -44,7 +44,7 @@ Type* LgsDArray::getIRType(LgsCodeGen& cg) {
 
 Constant* LgsDArray::getRTType(LgsCodeGen& cg) {
     baseType->getRTType(cg);
-    return cg.getRTTypeInfo(getName(), IRSize(cg), RTT_DARRAY);
+    return cg.getRTTypeInfo(getName(), IRSize(cg), rttKind);
 }
 
 std::string LgsDArray::getBaseName() {
@@ -78,8 +78,8 @@ LgsExpr* LgsDArray::getZeroValue() {
     return new LgsArrayExpr(this);
 }
 
-Value* LgsDArray::getIRZeroValue(LgsCodeGen& cg) {
-    return cg.allocDArr(baseType->getRTType(cg));
+Value* LgsDArray::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
+    return cg.callRuntimeFunc("allocDArr", cg.ptrTy(), {cg.ptrTy()}, {baseType->getRTType(cg)});
 }
 
 LgsType* LgsDArray::applyBinOp(LgsType* rightType, LgsBinOp& op) {
@@ -173,7 +173,7 @@ Function* LgsDArray::generateContainsFunc(LgsCodeGen& cg) {
         LgsIntConst size(&LGS_SIZE, 0);
         size.IRValue = iValue;
         const auto elementPtr = getIRElement(cg, arrIR, size.IRValue);
-        const auto elementsAreEqual = eqIR(cg, value, elementPtr, baseType);
+        const auto elementsAreEqual = eqIR(cg, value, cg.load(baseType->getTypeOrPtr(cg), elementPtr), baseType);
         cg.ifStmt(elementsAreEqual, [&cg] {cg.builder.CreateRet(cg.true_());});
     });
 

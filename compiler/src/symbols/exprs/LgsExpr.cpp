@@ -23,6 +23,7 @@
 #include "funcs/LgsFunc.h"
 #include "loops/LgsMetaVar.h"
 #include "stmts/LgsVarDec.h"
+#include "types/LgsNullable.h"
 
 std::optional<int64_t> LgsExpr::getConstInt() {
     if (const auto intConst = asIntConst()) {
@@ -123,6 +124,26 @@ std::optional<std::string> LgsExpr::getConstStr() {
     return std::nullopt;
 }
 
+Value* LgsExpr::moveValue(LgsCodeGen& cg, Value* right) const {
+    const std::vector<Type*> params = {cg.ptrTy(), cg.ptrTy()};
+    if (type->asStr()) {
+        const std::vector args = {IRValue, right};
+        return cg.callRuntimeFunc("moveStr", cg.voidTy(), params, args);
+    }
+    if (type->asObject()) {
+        const std::vector args = {cg.load(cg.ptrTy(), IRValue), right};
+        return cg.callRuntimeFunc("moveObject", cg.voidTy(), params, args);
+    }
+    if (type->asDArray()) {
+        const std::vector args = {cg.load(cg.ptrTy(), IRValue), right};
+        return cg.callRuntimeFunc("moveArr", cg.voidTy(), params, args);
+    }
+    if (type->asMap()) {
+        assert(0);
+    }
+    assert(0);
+}
+
 LgsType* LgsExpr::getType() {
     return type;
 }
@@ -139,16 +160,16 @@ void LgsExpr::castImplicitly(LgsType* toType) {
 
 }
 
-void LgsExpr::assign(LgsCodeGen& cg, LgsExpr* right) {
-    assert(0);
-}
-
 bool LgsExpr::equals(LgsExpr* other) {
     assert(0);
 }
 
 LgsFunc* LgsExpr::asFunc() {
     return dynamic_cast<LgsFunc*>(this);
+}
+
+LgsCast* LgsExpr::asCast() {
+    return dynamic_cast<LgsCast*>(this);
 }
 
 LgsVariable* LgsExpr::asVariable() {
@@ -177,10 +198,6 @@ LgsIterIndex* LgsExpr::asIterIndex() {
 
 LgsTypeExpr* LgsExpr::asTypeExpr() {
     return dynamic_cast<LgsTypeExpr*>(this);
-}
-
-LgsCast* LgsExpr::asCast() {
-    return dynamic_cast<LgsCast*>(this);
 }
 
 LgsInstance* LgsExpr::asInstance() {
@@ -247,39 +264,17 @@ LgsExpr* LgsExpr::clone() {
     assert(0);
 }
 
-void wrapInNullable(LgsExpr*& expr, LgsNullable* nullable) {
-    assert(!nullable->baseType->asNullable() && !expr->asNullableExpr());
-    const auto oldExpr = expr;
-    oldExpr->setType(nullable->baseType);
-    expr = new LgsNullableExpr(oldExpr);
-    expr->setType(nullable);
-}
-
 void castExprImplicitly(LgsExpr*& expr, LgsType* toType) {
     expr->castImplicitly(toType);
-    if (!expr->asNullableExpr() && toType->asNullable()) {
-        wrapInNullable(expr, toType->asNullable());
+    if (expr->asNullableExpr()) return;
+    if (const auto toNullable = toType->asNullable()) {
+        if (toNullable->isNull) return;
+        expr->setType(toNullable->baseType);
+        const auto nullableExpr = new LgsNullableExpr(expr);
+        nullableExpr->location = expr->location;
+        nullableExpr->setType(toNullable);
+        expr = nullableExpr;
     }
-}
-
-Value* Lgs_Runtime_moveValue(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
-    const std::vector<Type*> params = {cg.ptrTy(), cg.ptrTy()};
-    if (type->asStr()) {
-        const std::vector args = {left, right};
-        return cg.callRuntimeFunc("moveStr", cg.voidTy(), params, args);
-    }
-    if (type->asObject()) {
-        const std::vector args = {cg.load(cg.ptrTy(), left), right};
-        return cg.callRuntimeFunc("moveObject", cg.voidTy(), params, args);
-    }
-    if (type->asDArray()) {
-        const std::vector args = {cg.load(cg.ptrTy(), left), right};
-        return cg.callRuntimeFunc("moveArr", cg.voidTy(), params, args);
-    }
-    if (type->asMap()) {
-        assert(0);
-    }
-    assert(0);
 }
 
 void freeExpr(LgsExpr* expr) {

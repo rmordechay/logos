@@ -3,13 +3,14 @@
 
 #include <llvm/IR/Instructions.h>
 
+#include "LgsRTTIndices.h"
+
 class LgsNullable final : public LgsType {
 public:
     static constexpr auto name = "Nullable";
     LgsType* baseType = nullptr;
     bool isNull = false;
-    const size_t valueIndex = 0;
-    const size_t isSetIndex = 1;
+    inline static Lgs_NullableExprIndices rttIndices;
 
     explicit LgsNullable(LgsType* baseType = nullptr) : baseType(baseType) {
         rttKind = RTT_NULLABLE;
@@ -22,8 +23,10 @@ public:
         }
     }
     LgsField* getField(const std::string& fieldName) override;
+    LgsFunc* getMethod(const std::string& methodName) override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
+    Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee) override;
     std::string pname() override;
     std::string getName() override;
     Type* getIRType(LgsCodeGen& cg) override;
@@ -34,10 +37,7 @@ public:
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     Value* addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
     void setIRFields(LgsCodeGen& cg, Value* ptr, Value* value, Value* isSet);
-    Value* getNullableValue(LgsCodeGen& cg, Value* ptr);
-    Value* getIsSet(LgsCodeGen& cg, Value* ptr);
+    Value* loadIsSet(LgsCodeGen& cg, Value* ptr);
     Value* applyNumberBinOp(LgsCodeGen& cg, LgsBinaryExpr* binExpr, const std::function<Value*(LgsBinaryExpr*)>& func);
     Value* applyPtrBinOp(LgsCodeGen& cg, LgsBinaryExpr* binExpr, const std::function<Value*(LgsBinaryExpr*)>& func);
 };
-
-inline LgsNullable LGS_NULLABLE;

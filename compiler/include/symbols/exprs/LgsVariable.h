@@ -12,7 +12,6 @@ public:
     Value* loadIR(LgsCodeGen& cg) override;
     bool equals(LgsExpr* other) override;
     LgsExpr* castExplicitly(LgsType* toType) override;
-    void assign(LgsCodeGen& cg, LgsExpr* right) override;
     std::string asText() override;
     void setDebugValue(LgsCodeGen& cg) override;
     LgsVariable* clone() override;

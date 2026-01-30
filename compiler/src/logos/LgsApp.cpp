@@ -328,7 +328,7 @@ void LgsApp::loadBuiltins() {
     // globals.addSymbol(LgsSymbol(new LgsTest(), true, false), &errHandler);
     globals.rttTypes = {
     &LGS_STR, &LGS_CHAR, &LGS_BYTE, &LGS_BOOL, &LGS_INT, &LGS_UINT, &LGS_ULONG,
-    &LGS_SHORT, &LGS_LONG, &LGS_SIZE, &LGS_FLOAT, &LGS_DOUBLE, &LGS_NULLABLE, &LGS_VOID
+    &LGS_SHORT, &LGS_LONG, &LGS_SIZE, &LGS_FLOAT, &LGS_DOUBLE, &LGS_VOID
     };
 }
 

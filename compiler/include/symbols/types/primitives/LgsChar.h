@@ -10,7 +10,6 @@ public:
     }
     size_t sizeBytes() override;
     Type* getIRType(LgsCodeGen& cg) override;
-    Constant* getRTType(LgsCodeGen& cg) override;
     std::string getName() override;
     LgsExpr* getZeroValue() override;
     std::string fmtStr() const override;

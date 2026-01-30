@@ -23,10 +23,6 @@ LgsExpr* LgsFloat::getZeroValue() {
     return new LgsFloatConst(this, 0.0);
 }
 
-Constant* LgsFloat::getRTType(LgsCodeGen& cg) {
-    return cg.getRTTypeInfo(getName(), IRSize(cg), RTT_FLOAT);
-}
-
 size_t LgsFloat::sizeBytes() {
     return sizeof(float);
 }

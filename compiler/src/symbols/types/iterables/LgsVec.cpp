@@ -31,12 +31,12 @@ Type* LgsVec::getIRType(LgsCodeGen& cg) {
 
 Constant* LgsVec::getRTType(LgsCodeGen& cg) {
     if (dimVec == 2) {
-        return cg.getRTTypeInfo(getName(), IRSize(cg), RTT_VEC2);
+        return cg.getRTTypeInfo(getName(), IRSize(cg), rttKind);
     }
     if (dimVec == 3) {
-        return cg.getRTTypeInfo(getName(), IRSize(cg), RTT_VEC3);
+        return cg.getRTTypeInfo(getName(), IRSize(cg), rttKind);
     }
-    return cg.getRTTypeInfo(getName(), IRSize(cg), RTT_VEC4);
+    return cg.getRTTypeInfo(getName(), IRSize(cg), rttKind);
 }
 
 std::string LgsVec::getBaseName() {

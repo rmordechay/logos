@@ -101,8 +101,9 @@ bool LgsIterable::unpackLoopVars(LgsForeachLoop* loop) const {
 
 void LgsIterable::setLoopIRVars(LgsCodeGen& cg, LgsForeachLoop* loop) {
     const auto iterIndex = loop->loopVars[0]->expr->asIterIndex();
+    const auto iterable = iterIndex->baseExpr->type->asIterable();
     iterIndex->index.from->IRValue = loop->loadIndex(cg);
-    iterIndex->setIRElementPtr(cg);
+    iterIndex->IRValue = iterable->getIRElement(cg, iterIndex->baseExpr->IRValue, iterIndex->index.from->IRValue);
     loop->loopVars[0]->IRValue = iterIndex->IRValue;
 }
 

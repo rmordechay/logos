@@ -16,6 +16,10 @@ LgsField* LgsNullable::getField(const std::string& fieldName) {
     return baseType->getField(fieldName);
 }
 
+LgsFunc* LgsNullable::getMethod(const std::string& methodName) {
+    return baseType->getMethod(methodName);
+}
+
 size_t LgsNullable::sizeBytes() {
     if (passByRef) return sizeof(void*);
     return baseType->sizeBytes() + sizeof(bool);
@@ -25,8 +29,12 @@ LgsExpr* LgsNullable::getZeroValue() {
     return new LgsNullableExpr();
 }
 
+Value* LgsNullable::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
+    return cg.null();
+}
+
 std::string LgsNullable::pname() {
-    return baseType ? baseType->getName() + '?' : LGS_NULL_LITERAL;
+    return baseType ? baseType->pname() + '?' : LGS_NULL_LITERAL;
 }
 
 std::string LgsNullable::getName() {
@@ -39,9 +47,10 @@ Type* LgsNullable::getIRType(LgsCodeGen& cg) {
 }
 
 Constant* LgsNullable::getRTType(LgsCodeGen& cg) {
-    constexpr auto RTTName = std::string(LGS_TYPEINFO_PREFIX) + name;
+    const auto RTTName = std::string(LGS_TYPEINFO_PREFIX) + getName();
     if (const auto v = cg.IRModule->getGlobalVariable(RTTName)) return v;
     if (cg.mode != CG_MODE_RTTYPES) return cg.createGlobal(RTTName, cg.getRTTStruct(), nullptr);
+
     const auto st = cg.getStructType({cg.i1Ty(), cg.ptrTy()}, RTTName);
     const auto baseRTT = baseType ? baseType->getRTType(cg) : cg.null();
     const std::vector<Constant*> args = {cg.i1(passByRef), baseRTT};
@@ -96,24 +105,18 @@ LgsType* LgsNullable::applyBinOp(LgsType* rightType, LgsBinOp& op) {
 }
 
 Value* LgsNullable::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
-    const auto f = [this, &cg](LgsBinaryExpr* e) {
-        return baseType->addIR(cg, e);
-    };
+    const auto f = [this, &cg](LgsBinaryExpr* e) {return baseType->addIR(cg, e);};
     return passByRef ? applyPtrBinOp(cg, binExpr, f) : applyNumberBinOp(cg, binExpr, f);
 }
 
 void LgsNullable::setIRFields(LgsCodeGen& cg, Value* ptr, Value* value, Value* isSet) {
     const auto ty = getIRType(cg);
-    cg.storeStructField(ty, ptr, valueIndex, value);
-    cg.storeStructField(ty, ptr, isSetIndex, isSet);
+    cg.storeStructField(ty, ptr, rttIndices.value, value);
+    cg.storeStructField(ty, ptr, rttIndices.isSet, isSet);
 }
 
-Value* LgsNullable::getNullableValue(LgsCodeGen& cg, Value* ptr) {
-    return cg.load(baseType->getIRType(cg), cg.builder.CreateStructGEP(getIRType(cg), ptr, valueIndex));
-}
-
-Value* LgsNullable::getIsSet(LgsCodeGen& cg, Value* ptr) {
-    return cg.load(cg.i1Ty(), cg.builder.CreateStructGEP(getIRType(cg), ptr, isSetIndex));
+Value* LgsNullable::loadIsSet(LgsCodeGen& cg, Value* ptr) {
+    return cg.loadStructField(getIRType(cg), ptr, rttIndices.isSet, cg.i1Ty());
 }
 
 Value* LgsNullable::applyNumberBinOp(LgsCodeGen& cg, LgsBinaryExpr* binExpr, const std::function<Value*(LgsBinaryExpr*)>& func) {
@@ -127,8 +130,8 @@ Value* LgsNullable::applyNumberBinOp(LgsCodeGen& cg, LgsBinaryExpr* binExpr, con
     const auto nullBlock = cg.createBlock();
     const auto exitBlock = cg.createBlock();
 
-    const auto isSet1 = leftNullable->getIsSet(cg, left->IRValue);
-    const auto isSet2 = rightNullable->getIsSet(cg, right->IRValue);
+    const auto isSet1 = leftNullable->loadIsSet(cg, left->IRValue);
+    const auto isSet2 = rightNullable->loadIsSet(cg, right->IRValue);
     const auto bothSet = cg.builder.CreateAnd(isSet1, isSet2);
     cg.builder.CreateCondBr(bothSet, addBlock, nullBlock);
 
@@ -138,7 +141,7 @@ Value* LgsNullable::applyNumberBinOp(LgsCodeGen& cg, LgsBinaryExpr* binExpr, con
     cg.builder.CreateBr(exitBlock);
 
     cg.startBlock(nullBlock);
-    cg.storeStructField(ty, ptr, isSetIndex, cg.false_());
+    cg.storeStructField(ty, ptr, rttIndices.isSet, cg.false_());
     cg.builder.CreateBr(exitBlock);
 
     cg.startBlock(exitBlock);

@@ -13,7 +13,6 @@ public:
     Type* getIRType(LgsCodeGen& cg) override;
     std::string getName() override;
     LgsExpr* getZeroValue() override;
-    Constant* getRTType(LgsCodeGen& cg) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     bool canCastTo(LgsType* other) override;
     std::string fmtStr() const override;

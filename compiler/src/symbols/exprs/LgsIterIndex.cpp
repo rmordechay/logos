@@ -1,5 +1,4 @@
 #include "exprs/LgsIterIndex.h"
-#include "funcs/LgsFunc.h"
 #include <exprs/LgsArrayExpr.h>
 #include "types/iterables/LgsMap.h"
 #include "types/iterables/LgsVec.h"
@@ -10,14 +9,8 @@
 
 Value* LgsIterIndex::loadIR(LgsCodeGen& cg) {
     const auto baseExprType = baseExpr->type;
-    if (baseExprType->asMap() || baseExprType->asDArray() || baseExprType->asSet()) {
-        return IRValue;
-    }
-    if (baseExprType->asStr()) {
-        return IRValue;
-    }
-    if (baseExprType->asMatrix()) {
-        assert(0);
+    if (baseExprType->isHeapAlloc) {
+        return cg.load(cg.ptrTy(), IRValue);
     }
     if (baseExprType->asSArray()) {
         const auto indexIR = index.from->IRValue;
@@ -30,65 +23,13 @@ Value* LgsIterIndex::loadIR(LgsCodeGen& cg) {
         const auto i = index.from->IRValue;
         return cg.builder.CreateExtractElement(vec, i);
     }
+    if (baseExprType->asMatrix()) {
+        assert(0);
+    }
     assert(0);
 }
 
-void LgsIterIndex::setIRElementPtr(LgsCodeGen& cg, const bool assign) {
-    auto fromIR = index.from->IRValue;
-    assert(baseExpr->IRValue);
-
-    // SArray
-    if (const auto sArr = baseExpr->type->asSArray()) {
-        const auto ty = type->getIRType(cg);
-        if (!boundsChecked) cg.createIndexBoundsGuard(cg.usize(sArr->len), fromIR);
-        IRValue = cg.builder.CreateInBoundsGEP(ty, baseExpr->IRValue, fromIR);
-        if (ty->isPointerTy()) {
-            IRValue = cg.load(cg.ptrTy(), IRValue);
-        }
-        return;
-    }
-
-    // String
-    if (const auto str = baseExpr->type->asStr()) {
-        if (!boundsChecked) cg.createIndexBoundsGuard(str->lenIR(cg, baseExpr->IRValue), fromIR);
-        IRValue = cg.builder.CreateInBoundsGEP(cg.i8Ty(), baseExpr->IRValue, fromIR);
-        return;
-    }
-    if (assign) return;
-
-    // Map
-    if (const auto map = baseExpr->type->asMap()) {
-        IRValue = map->getIRElement(cg, baseExpr->IRValue, index.from->IRValue);
-        return;
-    }
-
-    // Matrix
-    if (const auto matrix = baseExpr->type->asMatrix()) {
-        if (!boundsChecked) cg.createIndexBoundsGuard(cg.i32(matrix->rows), fromIR);
-        IRValue = matrix->getIRElement(cg, baseExpr->IRValue, index.from->IRValue);
-        return;
-    }
-
-    // Fallback
-    if (const auto iter = baseExpr->type->asIterable()) {
-        fromIR = cg.builder.CreateZExt(fromIR, cg.i64Ty());
-        IRValue = iter->getIRElement(cg, baseExpr->IRValue, fromIR);
-    }
-}
-
-LgsExpr* LgsIterIndex::getBaseExpr() const {
-    auto nestedIterIndex = this;
-    while (true) {
-        if (const auto innerIterIndex = nestedIterIndex->baseExpr->asIterIndex()) {
-            nestedIterIndex = innerIterIndex;
-        } else {
-            return nestedIterIndex->baseExpr;
-        }
-    }
-}
-
-void LgsIterIndex::setIRRangePtr(LgsCodeGen& cg, bool assign) {
-    assert(!assign);
+void LgsIterIndex::setIRRangePtr(LgsCodeGen& cg) {
     const auto fromIR = index.from->IRValue;
     const auto toIR = index.to->IRValue;
     assert(baseExpr->IRValue && fromIR && toIR);
@@ -98,7 +39,6 @@ void LgsIterIndex::setIRRangePtr(LgsCodeGen& cg, bool assign) {
         IRValue = cg.builder.CreateAlloca(cg.i8Ty(), sizeWithNull);
         const auto src = cg.builder.CreateInBoundsGEP(cg.i8Ty(), baseExpr->IRValue, {fromIR});
         cg.callMemcpy(IRValue, src, size);
-        cg.addNullTerminate(IRValue, size);
     } else if (const auto sArray = type->asSArray()) {
         const auto size = cg.builder.CreateSub(toIR, fromIR);
         const auto ty = sArray->baseType->getIRType(cg);
@@ -113,14 +53,14 @@ void LgsIterIndex::setIRRangePtr(LgsCodeGen& cg, bool assign) {
     }
 }
 
-void LgsIterIndex::assign(LgsCodeGen& cg, LgsExpr* right) {
-    const auto iter = baseExpr->type->asIterable();
-    assert(iter);
-    if (const auto addFunc = iter->getMethod("add")) {
-        assert(addFunc->fn);
-        addFunc->fn(cg, {LgsFuncArg(baseExpr), LgsFuncArg(index.from), LgsFuncArg(right)});
-    } else {
-        iter->addIRElement(cg, baseExpr->IRValue, index.from->IRValue, right->IRValue);
+LgsExpr* LgsIterIndex::getBaseExpr() const {
+    auto nestedIterIndex = this;
+    while (true) {
+        if (const auto innerIterIndex = nestedIterIndex->baseExpr->asIterIndex()) {
+            nestedIterIndex = innerIterIndex;
+        } else {
+            return nestedIterIndex->baseExpr;
+        }
     }
 }
 
@@ -133,17 +73,6 @@ std::string LgsIterIndex::asText() {
         str << '[' << index.from->asText() << ']';
     }
     return str.str();
-}
-
-Type* LgsIterIndex::getSArrayType(LgsCodeGen& cg) const {
-    auto current = this;
-    while (true) {
-        if (const auto nextIndex = current->baseExpr->asIterIndex()) {
-            current = nextIndex;
-        } else {
-            return current->baseExpr->type->getIRType(cg);
-        }
-    }
 }
 
 void LgsIterIndex::setDebugValue(LgsCodeGen& cg) {

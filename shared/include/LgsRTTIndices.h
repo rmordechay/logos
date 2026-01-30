@@ -38,3 +38,8 @@ struct Lgs_InstanceIndices {
     const size_t level = 0;
     const size_t type = 1;
 };
+
+struct Lgs_NullableExprIndices {
+    const size_t value = 0;
+    const size_t isSet = 1;
+};

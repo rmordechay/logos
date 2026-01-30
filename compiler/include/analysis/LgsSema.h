@@ -95,14 +95,14 @@ public:
     void visitRangeLoop(LgsRangeLoop* rangeLoop);
     void visitForeachLoop(LgsForeachLoop* foreachLoop);
     void visitInfiniteLoop(const LgsInfiniteLoop* infiniteLoop);
-    void visitWhileLoop(LgsWhileLoop* whileLoop);
+    void visitWhileLoop(const LgsWhileLoop* whileLoop);
     void visitReturnStmt(const LgsReturn* returnStmt);
     void visitContinueStmt(const LgsContinue* continueStmt);
     void visitBreakStmt(const LgsBreak* breakStmt);
     void visitCoroutine(const LgsCoroutine* coroutine);
     void visitDeferStmt(const LgsDeferStmt* deferStmt);
     void visitIOStmt(const LgsIOStmt* ioStmt);
-    void visitExpr(LgsExpr*& expr);
+    void visitExpr(LgsExpr* expr);
     void visitBinaryExpr(LgsBinaryExpr* binaryExpr);
     void visitTernaryExpr(LgsTernaryExpr* ternary);
     void visitCast(LgsCast* cast);
@@ -116,8 +116,7 @@ public:
     void visitMatrixExpr(const LgsMatrixExpr* matrixExpr);
     void visitVariable(LgsVariable* variable);
     void visitSelection(LgsSelection* selection);
-    void visitFirstSelection(LgsSelection* selection);
-    void visitInnerSelections(LgsSelection* selection);
+    void visitInnerSelections(const LgsSelection* selection);
     void visitFieldSelection(LgsVariable* child, LgsType* parentType);
     void visitIterIndexSelection(LgsIterIndex* iterIndex, LgsType* parentType);
     void visitMetaSelection(LgsMetaSelection* metaSelection);

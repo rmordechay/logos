@@ -9,7 +9,6 @@ public:
         rttKind = RTT_DOUBLE;
     }
     Type* getIRType(LgsCodeGen& cg) override;
-    Constant* getRTType(LgsCodeGen& cg) override;
     std::string getName() override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;

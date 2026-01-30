@@ -11,7 +11,6 @@ public:
     }
     size_t sizeBytes() override;
     Type* getIRType(LgsCodeGen& cg) override;
-    Constant* getRTType(LgsCodeGen& cg) override;
     std::string getName() override;
     LgsExpr* getZeroValue() override;
     bool canCastTo(LgsType* other) override;

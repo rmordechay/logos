@@ -238,14 +238,6 @@ Value* LgsCodeGen::allocInLevel(Value* size, Value* level, const bool setLevel) 
     return callRuntimeFunc("allocInLevel", ptrTy(), {sizeTy(), sizeTy(), i1Ty()}, {size, level, i1(setLevel)});
 }
 
-Value* LgsCodeGen::allocObject(Value* type) {
-    return callRuntimeFunc("allocObject", ptrTy(), {ptrTy()}, {type});
-}
-
-Value* LgsCodeGen::allocDArr(Value* baseType) {
-    return callRuntimeFunc("allocDArr", ptrTy(), {ptrTy()}, {baseType});
-}
-
 Value* LgsCodeGen::allocStrConst(Value* strPtr) {
     return callRuntimeFunc("allocStrConst", ptrTy(), {ptrTy()}, {strPtr});
 }
@@ -384,6 +376,7 @@ void LgsCodeGen::callMemcpy(Value* dest, Value* src, Value* size) {
 }
 
 GlobalVariable* LgsCodeGen::getRTTypeInfo(const std::string& name, ConstantInt* size, const Lgs_TypeKind kind) {
+    assert(kind != RTT_UNKNOWN);
     const auto baseStruct = getRTTStruct();
     const auto prefixedName = LGS_TYPEINFO_PREFIX + name;
     if (mode == CG_MODE_RTTYPES) {

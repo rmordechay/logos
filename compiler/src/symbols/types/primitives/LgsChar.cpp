@@ -13,10 +13,6 @@ Type* LgsChar::getIRType(LgsCodeGen& cg) {
     return cg.i8Ty();
 }
 
-Constant* LgsChar::getRTType(LgsCodeGen& cg) {
-    return cg.getRTTypeInfo(getName(), IRSize(cg), RTT_CHAR);
-}
-
 std::string LgsChar::getName() {
     return name;
 }

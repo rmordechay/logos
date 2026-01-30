@@ -1342,7 +1342,9 @@ LgsExpr* LgsParser::parseUnary(const bool withInstance) {
     else if (const auto postfixExpr = parsePostfixExpr(expr)) expr = postfixExpr;
 
     if (matchAndConsume(T_QUEST_MARK)) {
-        expr = new LgsNullableExpr(expr);
+        const auto nullableExpr = new LgsNullableExpr(expr);
+        nullableExpr->location = expr->location;
+        expr = nullableExpr;
     } else if (matchAndConsume(T_EXCLA_MARK)) {
         expr->hasUnwrap = true;
     }

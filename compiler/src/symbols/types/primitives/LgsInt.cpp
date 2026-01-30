@@ -11,6 +11,7 @@
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/Module.h>
 #include "exprs/LgsBinaryExpr.h"
+#include "types/LgsNullable.h"
 
 size_t LgsInt::sizeBytes() {
     return sizeof(int);
@@ -24,12 +25,8 @@ LgsExpr* LgsInt::getZeroValue() {
     return new LgsIntConst(&LGS_INT, 0);
 }
 
-Value* LgsInt::getIRZeroValue(LgsCodeGen& cg) {
+Value* LgsInt::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
     return cg.i32Zero();
-}
-
-Constant* LgsInt::getRTType(LgsCodeGen& cg) {
-    return cg.getRTTypeInfo(getName(), IRSize(cg), RTT_INT);
 }
 
 bool LgsInt::canCastTo(LgsType* other) {
@@ -40,6 +37,7 @@ bool LgsInt::canCastTo(LgsType* other) {
     if (otherName == LgsLong::name) return true;
     if (otherName == LgsFloat::name) return true;
     if (otherName == LgsDouble::name) return true;
+    if (const auto nullable = other->asNullable()) return canCastTo(nullable->baseType);
     return false;
 }
 

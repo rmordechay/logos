@@ -10,7 +10,6 @@ public:
         rttKind = RTT_BYTE;
     }
     Type* getIRType(LgsCodeGen& cg) override;
-    Constant* getRTType(LgsCodeGen& cg) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;

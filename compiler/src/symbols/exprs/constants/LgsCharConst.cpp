@@ -7,7 +7,7 @@ Value* LgsCharConst::loadIR(LgsCodeGen& cg) {
 }
 
 void LgsCharConst::castImplicitly(LgsType* toType) {
-    LgsExpr::castImplicitly(toType);
+
 }
 
 std::string LgsCharConst::asText() {

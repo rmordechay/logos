@@ -97,8 +97,6 @@ public:
     Value* getVFunc(Value* objType, Value* funcName);
     Value* allocInCurrent(Value* size, bool setLevel);
     Value* allocInLevel(Value* size, Value* level, bool setLevel);
-    Value* allocObject(Value* type);
-    Value* allocDArr(Value* baseType);
     Value* allocStrConst(Value* strPtr);
     Value* reallocate(Value* ptr, Value* size, Value* level);
     Value* moveArrElement(Value* iterable, Value* element, Constant* type);

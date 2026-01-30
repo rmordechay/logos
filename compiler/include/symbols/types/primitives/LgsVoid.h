@@ -9,11 +9,11 @@ public:
         rttKind = RTT_VOID;
     }
     Type* getIRType(LgsCodeGen& cg) override;
-    Constant* getRTType(LgsCodeGen& cg) override;
     size_t sizeBytes() override;
     std::string getName() override;
     LgsExpr* getZeroValue() override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
+    Constant* getRTType(LgsCodeGen& cg) override;
     std::string fmtStr() const override;
     bool canCastTo(LgsType* other) override;
     DIType* getDebugType(LgsCodeGen& cg) override;

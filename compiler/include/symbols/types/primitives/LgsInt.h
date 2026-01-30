@@ -12,8 +12,7 @@ public:
     size_t sizeBytes() override;
     Type* getIRType(LgsCodeGen& cg) override;
     LgsExpr* getZeroValue() override;
-    Value* getIRZeroValue(LgsCodeGen& cg) override;
-    Constant* getRTType(LgsCodeGen& cg) override;
+    Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee) override;
     bool canCastTo(LgsType* other) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     Value* addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;

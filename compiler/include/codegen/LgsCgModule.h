@@ -102,7 +102,7 @@ public:
     void visitCoroutine(const LgsCoroutine* coroutine);
     void visitDeferStmt(const LgsDeferStmt* defer);
     void visitIOStmt(const LgsIOStmt* ioStmt);
-    void visitExpr(LgsExpr* expr, bool assign = false);
+    void visitExpr(LgsExpr* expr);
     void visitBinaryExpr(LgsBinaryExpr* binExpr);
     void visitTernaryExpr(LgsTernaryExpr* ternaryExpr);
     void visitCast(LgsCast* cast);
@@ -111,25 +111,25 @@ public:
     void visitFloatConst(LgsFloatConst* floatConst) const;
     void visitNullableExpr(LgsNullableExpr* expr);
     void visitArrayExpr(LgsArrayExpr* arrayExpr);
-    void visitStaticArray(LgsArrayExpr* arrayExpr) const;
-    void visitDynamicArray(LgsArrayExpr* arrayExpr) const;
+    void visitStaticArray(LgsArrayExpr* arrayExpr);
+    void visitDynamicArray(LgsArrayExpr* arrayExpr);
     void visitVectorExpr(LgsVectorExpr* vectorExpr);
     void visitMatrixExpr(const LgsMatrixExpr* matrixExpr);
     void visitHashMap(LgsHashMap* hashMap);
     void visitEnvVar(LgsEnvVar* envVar) const;
     void visitVariable(LgsVariable* variable) const;
-    void visitSelection(LgsSelection* selection, bool assign = false);
+    void visitIterIndex(LgsIterIndex* iterIndex);
+    void visitSelection(LgsSelection* selection);
     void visitFieldSelection(LgsVariable* var, LgsExpr* parent) const;
     void visitNullableSelection(LgsExpr* child, LgsExpr* parent) const;
     void visitMetaSelection(LgsMetaSelection* metaSelection);
+    void visitInstance(LgsInstance* instance);
     void visitFuncCall(LgsFuncCall* funcCall);
     void visitPrefixExpr(LgsPrefixExpr* prefixExpr);
     void visitPostfixExpr(LgsPostfixExpr* postfixExpr);
     void visitIntConst(LgsIntConst* intConst) const;
     void visitStrConst(LgsStrConst* strConst);
     void visitCharConst(LgsCharConst* charConst) const;
-    void visitInstance(LgsInstance* instance);
-    void visitIterIndex(LgsIterIndex* iterIndex, bool assign);
 
     // Funcs
     void createPrologue(LgsFunc* func);

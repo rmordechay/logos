@@ -3,6 +3,7 @@
 
 #include "LgsValue.h"
 
+class LgsNull;
 class LgsPair;
 class LgsField;
 class LgsParam;
@@ -52,12 +53,12 @@ public:
     std::optional<int64_t> getConstInt();
     std::optional<double_t> getConstFloat();
     std::optional<std::string> getConstStr();
+    Value* moveValue(LgsCodeGen& cg, Value* right) const;
     LgsType* getType() override;
 
     virtual void setType(LgsType* newType);
     virtual LgsExpr* castExplicitly(LgsType* toType);
     virtual void castImplicitly(LgsType* toType);
-    virtual void assign(LgsCodeGen& cg, LgsExpr* right);
     virtual bool equals(LgsExpr* other);
     virtual std::string asText() = 0;
 
@@ -89,9 +90,7 @@ public:
     ~LgsExpr() override = default;
 };
 
-void wrapInNullable(LgsExpr*& expr, LgsNullable* nullable);
 void castExprImplicitly(LgsExpr*& expr, LgsType* toType);
-Value* Lgs_Runtime_moveValue(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
 
 void freeExpr(LgsExpr* expr);
 template<typename T>

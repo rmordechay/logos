@@ -16,11 +16,7 @@ Value* LgsPrint::call(LgsCodeGen& cg, std::vector<LgsFuncArg>& args) {
     if (arg->type->asStr()) {
         const auto fmt = cg.getString(arg->type->fmtStr() + "\n");
         const auto value = arg->type->asIRStr(cg, arg->IRValue);
-        cg.ifElseStmt(
-            cg.strsEqual(value, cg.emptyStr()),
-            [&]{cg.callPrintf({fmt, cg.getString("\"\"")});},
-            [&]{cg.callPrintf({fmt, value});}
-        );
+        cg.callPrintf({fmt, value});
         return nullptr;
     }
     if (arg->type->asBool() || arg->type->asEnum()) {

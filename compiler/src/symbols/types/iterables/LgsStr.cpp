@@ -5,6 +5,7 @@
 #include "exprs/constants/LgsStrConst.h"
 #include "exprs/LgsBinaryExpr.h"
 #include "types/LgsAny.h"
+#include "types/LgsNullable.h"
 #include "types/iterables/LgsSArray.h"
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsChar.h"
@@ -29,20 +30,19 @@ LgsExpr* LgsStr::getZeroValue() {
     return new LgsStrConst("");
 }
 
-Value* LgsStr::getIRZeroValue(LgsCodeGen& cg) {
+Value* LgsStr::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
     return cg.allocStrConst(cg.emptyStr());
 }
 
 Constant* LgsStr::getRTType(LgsCodeGen& cg) {
-    return cg.getRTTypeInfo(getName(), IRSize(cg), RTT_STR);
+    return cg.getRTTypeInfo(getName(), IRSize(cg), rttKind);
 }
 
 bool LgsStr::canCastTo(LgsType* other) {
     if (other->isAny()) return true;
     if (other->asGenericType()) return true;
-    if (const auto sArr = other->asSArray()) {
-        return sArr->baseType && sArr->baseType->asChar();
-    }
+    if (const auto sArr = other->asSArray()) return sArr->baseType && sArr->baseType->asChar();
+    if (const auto nullable = other->asNullable()) return canCastTo(nullable->baseType);
     return name == other->getName();
 }
 

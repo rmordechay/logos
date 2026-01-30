@@ -18,15 +18,6 @@ LgsFuncCall* LgsSelection::asMethodCall() const {
     return exprs.back()->asFuncCall();
 }
 
-void LgsSelection::assign(LgsCodeGen& cg, LgsExpr* right) {
-    assert(!type->asVec());
-    if (type->isHeapAlloc || right->type->isHeapAlloc) {
-        Lgs_Runtime_moveValue(cg, loadIR(cg), right->IRValue, type);
-    } else {
-        cg.store(right->IRValue, IRValue);
-    }
-}
-
 std::string LgsSelection::asText() {
     std::stringstream str;
     str << exprs[0]->asText();

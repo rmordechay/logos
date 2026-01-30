@@ -44,7 +44,7 @@ void LgsArrayExpr::setDebugValue(LgsCodeGen& cg) {
     const auto di = cg.debugger.diBuilder;
     const auto file = cg.debugger.diFile;
 
-    llvm::DIType* dbType = nullptr;
+    DIType* dbType = nullptr;
     if (const auto sarr = type->asSArray()) {
         dbType = sarr->getDebugType(cg);
     } else if (const auto darr = type->asDArray()) {

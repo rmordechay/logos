@@ -138,8 +138,8 @@ LgsExpr* LgsObject::getZeroValue() {
     return new LgsInstance(this);
 }
 
-Value* LgsObject::getIRZeroValue(LgsCodeGen& cg) {
-    return cg.allocObject(getRTType(cg));
+Value* LgsObject::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
+    return cg.callRuntimeFunc("allocObject", cg.ptrTy(), {cg.ptrTy()}, {getRTType(cg)});
 }
 
 bool LgsObject::canCastTo(LgsType* other) {

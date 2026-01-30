@@ -99,7 +99,7 @@ LgsExpr* LgsMap::getZeroValue() {
     return new LgsHashMap(this);
 }
 
-Value* LgsMap::getIRZeroValue(LgsCodeGen& cg) {
+Value* LgsMap::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
     const auto ty = getIRType(cg);
     const auto ptr = cg.allocInCurrent(IRSize(cg), true);
     const auto cap = cg.usize(LGS_ITER_INIT_CAP);

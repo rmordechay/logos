@@ -13,7 +13,7 @@ Type* LgsVariadic::getIRType(LgsCodeGen& cg) {
 }
 
 Constant* LgsVariadic::getRTType(LgsCodeGen& cg) {
-    return cg.getRTTypeInfo(getName(), IRSize(cg), RTT_VARIADIC);
+    return cg.getRTTypeInfo(getName(), IRSize(cg), rttKind);
 }
 
 bool LgsVariadic::canCastTo(LgsType* other) {

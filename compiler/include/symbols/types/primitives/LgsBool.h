@@ -12,7 +12,6 @@ public:
         rttKind = RTT_BOOL;
     }
     Type* getIRType(LgsCodeGen& cg) override;
-    Constant* getRTType(LgsCodeGen& cg) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     std::string getName() override;
     LgsExpr* getZeroValue() override;

@@ -1,7 +1,7 @@
 #pragma once
 #include <iostream>
 
-typedef void (*ThunkFunc)(void*);
+struct Lgs_TypeInfo;
 
 enum Lgs_TypeKind {
     RTT_ANY,
@@ -34,11 +34,6 @@ enum Lgs_TypeKind {
     RTT_VARIADIC,
     RTT_NULLABLE,
     RTT_UNKNOWN,
-};
-
-struct Lgs_TypeInfo {
-    const size_t size;
-    const Lgs_TypeKind kind;
 };
 
 struct Lgs_Field {
@@ -79,7 +74,14 @@ struct Lgs_Map {
     Lgs_TypeInfo* value;
 };
 
-struct Lgs_ThunkFunc {
-    ThunkFunc func;
-    void* ctx;
+struct Lgs_TypeInfo {
+    const size_t size;
+    const Lgs_TypeKind kind;
+    union {
+        Lgs_Object* object;
+        Lgs_SArr* sArr;
+        Lgs_Nullable* nullable;
+        Lgs_Map* map;
+        void* dummy;
+    };
 };

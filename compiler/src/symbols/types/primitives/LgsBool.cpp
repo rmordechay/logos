@@ -14,10 +14,6 @@ Type* LgsBool::getIRType(LgsCodeGen& cg) {
     return cg.i1Ty();
 }
 
-Constant* LgsBool::getRTType(LgsCodeGen& cg) {
-    return cg.getRTTypeInfo(getName(), IRSize(cg), RTT_BOOL);
-}
-
 LgsType* LgsBool::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     assert(0);
 }

@@ -3,7 +3,12 @@
 #include "Lgs_Allocator.h"
 #include "Lgs_Types.h"
 
-struct Lgs_ThunkFunc;
+typedef void (*ThunkFunc)(void*);
+
+struct Lgs_ThunkFunc {
+    ThunkFunc func;
+    void* ctx;
+};
 
 struct Lgs_StackFrame {
     Lgs_Allocator allocator;

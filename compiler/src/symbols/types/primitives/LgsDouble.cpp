@@ -31,10 +31,6 @@ Type* LgsDouble::getIRType(LgsCodeGen& cg) {
     return cg.builder.getDoubleTy();
 }
 
-Constant* LgsDouble::getRTType(LgsCodeGen& cg) {
-    return cg.getRTTypeInfo(getName(), IRSize(cg), RTT_DOUBLE);
-}
-
 bool LgsDouble::canCastTo(LgsType* other) {
     const auto IRName = other->getName();
     if (name == IRName) return true;
