@@ -46,7 +46,7 @@ LgsExpr* LgsVariable::castExplicitly(LgsType* toType) {
 
 void LgsVariable::assign(LgsCodeGen& cg, LgsExpr* right) {
     if (type->isHeapAlloc) {
-        moveValue(cg, loadIR(cg), right->IRValue, type);
+        Lgs_Runtime_moveValue(cg, loadIR(cg), right->IRValue, type);
     } else {
         cg.store(right->IRValue, IRValue);
     }

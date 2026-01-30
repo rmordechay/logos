@@ -59,7 +59,6 @@ public:
     void setFuncOptions(uint32_t ops);
     std::unordered_map<std::string, LgsParam*> getParamsByName();
     DIType* getDebugType(LgsCodeGen& cg) override;
-    LgsFuncType* clone() override;
     void addSelf(LgsType* selfType);
     ~LgsFuncType() override;
 };

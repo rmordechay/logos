@@ -108,7 +108,7 @@ void LgsTypeResolver::resolveObj(LgsObject* obj) {
         if (field->expr) {
             castExprImplicitly(field->expr, field->type);
         }
-        if (field->isMutable && field->type->asStr()) {
+        if (field->type->asStr()) {
             field->type->isHeapAlloc = true;
         }
     }

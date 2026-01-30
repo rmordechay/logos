@@ -24,6 +24,10 @@ LgsExpr* LgsInt::getZeroValue() {
     return new LgsIntConst(&LGS_INT, 0);
 }
 
+Value* LgsInt::getIRZeroValue(LgsCodeGen& cg) {
+    return cg.i32Zero();
+}
+
 Constant* LgsInt::getRTType(LgsCodeGen& cg) {
     return cg.getRTTypeInfo(getName(), IRSize(cg), RTT_INT);
 }
@@ -155,10 +159,6 @@ Value* LgsInt::asIRStr(LgsCodeGen& cg, Value* v) {
 
 std::string LgsInt::getName() {
     return name;
-}
-
-LgsType* LgsInt::clone() {
-    return this;
 }
 
 DIType* LgsInt::getDebugType(LgsCodeGen& cg) {

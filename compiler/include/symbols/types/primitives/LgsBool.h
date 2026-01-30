@@ -21,7 +21,6 @@ public:
     size_t sizeBytes() override;
     bool canCastTo(LgsType* other) override;
     DIType* getDebugType(LgsCodeGen& cg) override;
-    LgsType* clone() override;
 };
 
 inline LgsBool LGS_BOOL;

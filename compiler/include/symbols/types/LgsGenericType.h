@@ -14,7 +14,6 @@ public:
     bool canCastTo(LgsType* other) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     std::string fmtStr() const override;
-    LgsType* clone() override;
     DIType* getDebugType(LgsCodeGen& cg) override;
     bool canReplace(LgsType* type);
 };

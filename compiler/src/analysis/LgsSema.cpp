@@ -165,11 +165,12 @@ void LgsSema::visitTestFile(const LgsTestFile* testFile) {
 
 void LgsSema::visitField(LgsField* field) {
     if (field->expr) {
+        castExprImplicitly(field->expr, field->type);
         visitExpr(field->expr);
         validateExprType(field->expr, field->type);
-        if (field->expr->isMutable) {
-            addError(E10109, field->expr->location);
-        }
+        // if (field->expr->isMutable) {
+        //     addError(E10109, field->expr->location, {field->type->pname()});
+        // }
     }
     if (field->expr && field->expr->asFunc()) {
         addError(E10013, field->location, {field->name});
@@ -373,7 +374,6 @@ void LgsSema::visitVarDec(LgsVarDec* varDec) {
         if (varDec->type->isUnknown()) return;
         varDec->expr = varDec->type->getZeroValue();
         varDec->expr->location = varDec->location;
-        visitExpr(varDec->expr);
     }
     if (varDec->expr->type->isVoid()) {
         addError(E10093, varDec->location);
@@ -403,24 +403,19 @@ void LgsSema::visitAssignment(LgsAssignment* assignment) {
     if (!l->type || !r->type) return;
     if (!validateExprType(r, l->type)) return;
 
-    auto canAssign = false;
-    if (l->isMutable) {
-        if (l->asIterIndex() || l->asVariable() || l->asNullableExpr()) {
-            canAssign = true;
-        } else if (const auto selection = l->asSelection()) {
-            const auto firstExpr = selection->exprs.front();
-            const auto obj = firstExpr->type->asObject();
-            if (obj && !obj->singleton && firstExpr->asTypeExpr()) {
-                addError(E10089, selection->location, {firstExpr->asText(), selection->exprs.back()->asText()});
-                return;
-            }
-            canAssign = true;
+    if (l->asIterIndex()) return;
+    if (const auto lVar = l->asVariable()) {
+        if (lVar->ref.symbolType != VAR_DEC || !lVar->ref.varDec->isMutable) {
+            addError(E10051, l->location, {l->asText()});
+        }
+    } else if (const auto selection = l->asSelection()) {
+        const auto firstExpr = selection->exprs.front();
+        const auto obj = firstExpr->type->asObject();
+        if (obj && !obj->singleton && firstExpr->asTypeExpr()) {
+            addError(E10089, selection->location, {firstExpr->asText(), selection->exprs.back()->asText()});
         }
     } else {
-        return addError(E10051, l->location, {l->asText()});
-    }
-    if (!canAssign) {
-        return addError(E10012, l->location, {l->asText(), r->type->pname()});
+        addError(E10051, l->location, {l->asText()});
     }
 }
 
@@ -782,7 +777,6 @@ void LgsSema::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
         return addError(E10076, binaryExpr->location, {binaryExpr->op.text, ltype->pname(), rtype->pname()});
     }
     binaryExpr->setType(type);
-    binaryExpr->isMutable = l->isMutable || r->isMutable;
 }
 
 void LgsSema::visitTernaryExpr(LgsTernaryExpr* ternary) {
@@ -818,7 +812,7 @@ void LgsSema::visitNullableExpr(LgsNullableExpr* nullableExpr) {
 }
 
 void LgsSema::visitUnwrap(LgsExpr* expr) {
-    if (!expr->type || !expr->hasUnwrapSuffix) return;
+    if (!expr->type || !expr->hasUnwrap) return;
     if (!expr->type->asNullable()) {
         addError(E10113, expr->location, {expr->type->pname()});
         return;
@@ -952,19 +946,16 @@ void LgsSema::visitVariable(LgsVariable* variable) {
     switch (symbol->symbolType) {
     case VAR_DEC: {
         variable->ref.varDec = symbol->varDec;
-        variable->isMutable = symbol->varDec->isMutable;
         variable->setType(symbol->varDec->type);
         break;
     }
     case PARAM: {
         variable->ref.param = symbol->param;
-        variable->isMutable = false;
         variable->setType(symbol->param->type);
         break;
     }
     case ENUM: {
         variable->ref.enum_ = symbol->enum_;
-        variable->isMutable = false;
         variable->setType(symbol->enum_);
         break;
     }
@@ -980,7 +971,6 @@ void LgsSema::visitVariable(LgsVariable* variable) {
     }
     case FIELD: {
         variable->ref.field = symbol->field;
-        variable->isMutable = symbol->field->isMutable;
         variable->setType(symbol->field->type);
         break;
     }
@@ -1004,7 +994,6 @@ void LgsSema::visitSelection(LgsSelection* selection) {
     }
     visitInnerSelections(selection);
     selection->setType(selection->exprs.back()->type);
-    selection->isMutable = selection->exprs.back()->isMutable;
 }
 
 void LgsSema::visitFirstSelection(LgsSelection* selection) {
@@ -1288,8 +1277,8 @@ void LgsSema::visitTypeExpr(LgsTypeExpr* typeExpr) {
 void LgsSema::visitInstance(LgsInstance* instance) {
     const auto objName = instance->name;
     const auto symbol = getSymbol(objName);
-    if (!validateTypeName(instance->name, instance->location)) return;
     if (!symbol) return addError(E10006, instance->location, {instance->name});
+    if (!validateTypeName(instance->name, instance->location)) return;
     if (symbol->symbolType != OBJECT && symbol->symbolType != INTERFACE) {
         return addError(E10022, instance->location, {objName});
     }

@@ -23,7 +23,7 @@ inline LgsBaseMsg E10008{"main.lgs could not be found in src directory.", errCod
 inline LgsBaseMsg E10009{"Duplicate Main files were found in the project. Locations:%s", errCodeStart++};
 inline LgsBaseMsg E10010{"Not a root path of a Logos project.", errCodeStart++};
 inline LgsBaseMsg E10011{"%s is already declared.", errCodeStart++};
-inline LgsBaseMsg E10012{"%s cannot be re-assigned to expression with type %s.", errCodeStart++};
+inline LgsBaseMsg E10012{"", errCodeStart++};
 inline LgsBaseMsg E10013{"Field %s is with function type. Declare it as a standard function instead.", errCodeStart++};
 inline LgsBaseMsg E10014{"Expression of type %s does not match base type %s.", errCodeStart++};
 inline LgsBaseMsg E10015{"Function %s was found but it doesnt match the parameters.\nGiven:\t  %s\nExpected:  %s", errCodeStart++};
@@ -62,7 +62,7 @@ inline LgsBaseMsg E10047{"External %s file '%s' was not found.", errCodeStart++}
 inline LgsBaseMsg E10048{"Index %s is out of bounds. Iterable length: %s", errCodeStart++};
 inline LgsBaseMsg E10049{"Not enough information to infer the type of %s.", errCodeStart++};
 inline LgsBaseMsg E10050{"Only integer values can be incremented (++) or decremented (--). Given: %s.", errCodeStart++};
-inline LgsBaseMsg E10051{"%s is constant and cannot be overwritten.", errCodeStart++};
+inline LgsBaseMsg E10051{"%s cannot be overwritten.", errCodeStart++};
 inline LgsBaseMsg E10052{"Spread operator in %s... must only be used with iterables. Given type: %s.", errCodeStart++};
 inline LgsBaseMsg E10053{"'%s' is a Logos global name and cannot be redefined.", errCodeStart++};
 inline LgsBaseMsg E10054{"Field %s is set more than one time.", errCodeStart++};
@@ -120,7 +120,7 @@ inline LgsBaseMsg E10105{"Too many elements for array of size: %s.", errCodeStar
 inline LgsBaseMsg E10106{"Could not parse C file %s", errCodeStart++};
 inline LgsBaseMsg E10107{"Could not find C library %s", errCodeStart++};
 inline LgsBaseMsg E10108{"%s is not indexable.", errCodeStart++};
-inline LgsBaseMsg E10109{"Field default expression must be of constant type.", errCodeStart++};
+inline LgsBaseMsg E10109{"Expression of type %s cannot be set as default value.", errCodeStart++};
 inline LgsBaseMsg E10110{"Unsigned number cannot be negative.", errCodeStart++};
 inline LgsBaseMsg E10111{"Array type %s does not match the element type %s.", errCodeStart++};
 inline LgsBaseMsg E10112{"Matrix rows/columns cannot be 0.", errCodeStart++};

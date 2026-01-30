@@ -39,7 +39,3 @@ bool LgsVoid::canCastTo(LgsType* other) {
 DIType* LgsVoid::getDebugType(LgsCodeGen& cg) {
     return cg.debugger.diBuilder->createUnspecifiedType(name);
 }
-
-LgsType* LgsVoid::clone() {
-    return this;
-}

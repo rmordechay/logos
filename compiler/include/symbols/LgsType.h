@@ -65,13 +65,13 @@ public:
     std::vector<LgsField*> fields;
     std::unordered_map<std::string, LgsFunc*> methods;
     std::vector<LgsType*> genericArgs;
+    Lgs_TypeKind rttKind = RTT_UNKNOWN;
     bool isInt = false;
     bool isUnsinged = false;
     bool isFloat = false;
     bool isHeapAlloc = false;
     bool passByRef = false;
     bool isExternal = false;
-    Lgs_TypeKind rttKind = RTT_UNKNOWN;
 
     bool isAny();
     bool isVoid();
@@ -90,8 +90,8 @@ public:
     virtual size_t sizeBytes() = 0;
     virtual LgsExpr* getZeroValue() = 0;
     virtual Value* getIRZeroValue(LgsCodeGen& cg);
-    virtual Value* hashValue(LgsCodeGen& cg, Value* value);
     virtual Type* getIRType(LgsCodeGen& cg) = 0;
+    virtual Value* hashValue(LgsCodeGen& cg, Value* value);
     virtual Value* asIRStr(LgsCodeGen& cg, Value* v);
     virtual Constant* getRTType(LgsCodeGen& cg) = 0;
     virtual bool canCastTo(LgsType* other) = 0;
@@ -101,7 +101,6 @@ public:
     virtual DIType* getDebugType(LgsCodeGen& cg) = 0;
     virtual std::string pname(); // pretty name
     virtual bool equals(LgsType* other);
-    virtual LgsType* clone();
 
     virtual Value* addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr);
     virtual Value* subIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr);

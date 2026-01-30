@@ -29,13 +29,12 @@ std::optional<int64_t> LgsExpr::getConstInt() {
         return intConst->value;
     }
     if (const auto var = asVariable()) {
-        if (var->isMutable) return std::nullopt;
         if (var->ref.symbolType == VAR_DEC) {
+            if (var->ref.varDec->isMutable) return std::nullopt;
             return var->ref.varDec->expr->getConstInt();
         }
     }
     if (const auto binExpr = asBinExpr()) {
-        if (binExpr->isMutable) return std::nullopt;
         const auto const1 = binExpr->left->getConstInt();
         if (!const1.has_value()) return std::nullopt;
         const auto const2 = binExpr->right->getConstInt();
@@ -67,13 +66,12 @@ std::optional<double_t> LgsExpr::getConstFloat() {
         return floatConst->value;
     }
     if (const auto var = asVariable()) {
-        if (var->isMutable) return std::nullopt;
         if (var->ref.symbolType == VAR_DEC) {
+            if (var->ref.varDec->isMutable) return std::nullopt;
             return var->ref.varDec->expr->getConstFloat();
         }
     }
     if (const auto binExpr = asBinExpr()) {
-        if (binExpr->isMutable) return std::nullopt;
         const auto const1 = binExpr->left->getConstFloat();
         if (!const1.has_value()) return std::nullopt;
         const auto const2 = binExpr->right->getConstFloat();
@@ -98,13 +96,12 @@ std::optional<std::string> LgsExpr::getConstStr() {
         return std::to_string(charConst->value - '0');
     }
     if (const auto var = asVariable()) {
-        if (var->isMutable) return std::nullopt;
         if (var->ref.symbolType == VAR_DEC) {
+            if (var->ref.varDec->isMutable) return std::nullopt;
             return var->ref.varDec->expr->getConstStr();
         }
     }
     if (const auto binExpr = asBinExpr()) {
-        if (binExpr->isMutable || binExpr->op.opType != ADD) return std::nullopt;
         const auto const1 = binExpr->left->getConstStr();
         if (!const1.has_value()) return std::nullopt;
         if (binExpr->right->type->asStr()) {
@@ -265,7 +262,7 @@ void castExprImplicitly(LgsExpr*& expr, LgsType* toType) {
     }
 }
 
-Value* moveValue(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
+Value* Lgs_Runtime_moveValue(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
     const std::vector<Type*> params = {cg.ptrTy(), cg.ptrTy()};
     if (type->asStr()) {
         const std::vector args = {left, right};

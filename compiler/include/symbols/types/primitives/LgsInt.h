@@ -12,6 +12,7 @@ public:
     size_t sizeBytes() override;
     Type* getIRType(LgsCodeGen& cg) override;
     LgsExpr* getZeroValue() override;
+    Value* getIRZeroValue(LgsCodeGen& cg) override;
     Constant* getRTType(LgsCodeGen& cg) override;
     bool canCastTo(LgsType* other) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
@@ -29,7 +30,6 @@ public:
     std::string fmtStr() const override;
     Value* asIRStr(LgsCodeGen& cg, Value* v) override;
     std::string getName() override;
-    LgsType* clone() override;
     DIType* getDebugType(LgsCodeGen& cg) override;
 };
 

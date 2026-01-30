@@ -30,9 +30,7 @@ LgsExpr* LgsStr::getZeroValue() {
 }
 
 Value* LgsStr::getIRZeroValue(LgsCodeGen& cg) {
-    const auto str = cg.allocInLevel(IRSize(cg), cg.sizeZero(), true);
-    cg.storeStructField(getIRType(cg), str, rttIndices.data, cg.emptyStr());
-    return str;
+    return cg.allocStrConst(cg.emptyStr());
 }
 
 Constant* LgsStr::getRTType(LgsCodeGen& cg) {
@@ -150,7 +148,7 @@ Value* LgsStr::lenIR(LgsCodeGen& cg, Value* iterable) {
     if (iterable->getType()->isIntegerTy() && cg.getAllocSize(iterable->getType()) == sizeof(char)) {
         return cg.usize(1);
     }
-    return cg.callStrLen(iterable);
+    return cg.callStrlen(iterable);
 }
 
 Value* LgsStr::inIR(LgsCodeGen& cg, Value* iterableExpr, Value* value) {

@@ -23,7 +23,6 @@ public:
     Value* mulIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
     Value* divIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
     DIType* getDebugType(LgsCodeGen& cg) override;
-    LgsType* clone() override;
 };
 
 inline LgsFloat LGS_FLOAT;

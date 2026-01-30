@@ -93,12 +93,15 @@ public:
     void callPopStack();
     Value* getCurrentLevel();
     Value* callHash(Value* arg);
-    Value* getVField(Value* instance, Value* name, Value* ptr);
+    Value* getVField(Value* objType, Value* objInstance, Value* fieldName);
     Value* getVFunc(Value* objType, Value* funcName);
     Value* allocInCurrent(Value* size, bool setLevel);
     Value* allocInLevel(Value* size, Value* level, bool setLevel);
+    Value* allocObject(Value* type);
+    Value* allocDArr(Value* baseType);
+    Value* allocStrConst(Value* strPtr);
     Value* reallocate(Value* ptr, Value* size, Value* level);
-    Value* moveElement(Value* iterable, Value* element, Constant* type);
+    Value* moveArrElement(Value* iterable, Value* element, Constant* type);
     void throwError(const LgsBaseMsg& err, const std::vector<Value*>& args = {});
 
     // Blocks
@@ -121,7 +124,9 @@ public:
     // Externals (syscalls, clib, etc.)
     Value* callPrintf(const std::vector<Value*>& args);
     Value* callSnprintf(const std::string& fmt, const std::vector<Value*>& args);
-    Value* callStrLen(Value* str);
+    Value* callStrlen(Value* str);
+    Value* strsEqual(Value* str1, Value* str2);
+    Value* strsNotEqual(Value* str1, Value* str2);
     void callMemset(Value* dest, Value* src, Value* size);
     void callMemcpy(Value* dest, Value* src, Value* size);
 

@@ -43,8 +43,8 @@ public:
     bool isMutable = true;
     bool isImportName = false;
     bool isNull = false;
-    bool hasUnwrapSuffix = false;
     bool isReturnExpr = false;
+    bool hasUnwrap = false;
     bool hasMoved = false;
     Value* pointee = nullptr;
 
@@ -91,7 +91,7 @@ public:
 
 void wrapInNullable(LgsExpr*& expr, LgsNullable* nullable);
 void castExprImplicitly(LgsExpr*& expr, LgsType* toType);
-Value* moveValue(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
+Value* Lgs_Runtime_moveValue(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
 
 void freeExpr(LgsExpr* expr);
 template<typename T>

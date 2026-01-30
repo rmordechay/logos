@@ -490,7 +490,7 @@ void LgsApp::compareHash() const {
 
 void LgsApp::printIR() const {
     if (!lgsConfigs.isDevMode || !lgsConfigs.printIR) return;
-    rttTypeModule.IRModule->print(outs(), nullptr);
+    if (rttTypeModule.IRModule) rttTypeModule.IRModule->print(outs(), nullptr);
     logInfo(LGS_MSG_LINE_SEPERATOR);
     for (const auto& file : genericFiles) {
         if (!file->cg.IRModule) continue;

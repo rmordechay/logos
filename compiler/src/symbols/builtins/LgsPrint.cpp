@@ -11,9 +11,19 @@ Value* LgsPrint::call(LgsCodeGen& cg, std::vector<LgsFuncArg>& args) {
     const auto arg = args.empty() ? funcType->params.front().expr : args.front().expr;
     if (arg->type->asFloat()) {
         const auto fmt = cg.getString(arg->type->fmtStr() + "\n");
-        return cg.callPrintf({fmt, cg.builder.CreateFPExt(arg->IRValue, cg.doubleTy())});
+        return cg.callPrintf({fmt, cg.builder.CreateFPExt(arg->loadIR(cg), cg.doubleTy())});
     }
-    if (arg->type->asStr() || arg->type->asBool() || arg->type->asEnum()) {
+    if (arg->type->asStr()) {
+        const auto fmt = cg.getString(arg->type->fmtStr() + "\n");
+        const auto value = arg->type->asIRStr(cg, arg->IRValue);
+        cg.ifElseStmt(
+            cg.strsEqual(value, cg.emptyStr()),
+            [&]{cg.callPrintf({fmt, cg.getString("\"\"")});},
+            [&]{cg.callPrintf({fmt, value});}
+        );
+        return nullptr;
+    }
+    if (arg->type->asBool() || arg->type->asEnum()) {
         const auto fmt = cg.getString(arg->type->fmtStr() + "\n");
         const auto value = arg->type->asIRStr(cg, arg->loadIR(cg));
         return cg.callPrintf({fmt, value});
@@ -99,7 +109,7 @@ Function* LgsPrint::generateFmtFunc(LgsCodeGen& cg) {
     bufferOffset = cg.load(cg.sizeTy(), bufferOffsetPtr);
     pos = cg.builder.CreateInBoundsGEP(cg.i8Ty(), buffer, bufferOffset);
     const auto fmtStr = cg.callSnprintf("%d", {cg.load(cg.i32Ty(), value)});
-    cg.callMemcpy(pos, fmtStr, cg.callStrLen(fmtStr));
+    cg.callMemcpy(pos, fmtStr, cg.callStrlen(fmtStr));
     cg.builder.CreateRetVoid();
 
     cg.startBlock(defaultBlock);

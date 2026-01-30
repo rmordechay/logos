@@ -6,12 +6,9 @@ class LgsNullableExpr final : public LgsExpr {
 public:
     LgsExpr* baseExpr = nullptr;
 
-    explicit LgsNullableExpr(LgsExpr* baseExpr): baseExpr(baseExpr) {
-        isMutable = baseExpr->isMutable;
-    }
+    explicit LgsNullableExpr(LgsExpr* baseExpr): baseExpr(baseExpr) {}
     LgsNullableExpr(): LgsExpr(&LGS_NULLABLE) {
         isNull = true;
-        isMutable = false;
     }
     Value* loadIR(LgsCodeGen& cg) override;
     void assign(LgsCodeGen& cg, LgsExpr* right) override;

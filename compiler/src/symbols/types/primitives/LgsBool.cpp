@@ -58,7 +58,3 @@ bool LgsBool::canCastTo(LgsType* other) {
 DIType* LgsBool::getDebugType(LgsCodeGen& cg) {
     assert(0);
 }
-
-LgsType* LgsBool::clone() {
-    return this;
-}

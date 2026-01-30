@@ -40,6 +40,17 @@ void LgsStrConst::setDebugValue(LgsCodeGen& cg) {
     setDebugLoc(cg);
 }
 
+LgsExpr* LgsStrConst::clone() {
+    const auto newStrConst = new LgsStrConst(*this);
+    if (!parts.empty()) {
+        newStrConst->parts.clear();
+        for (const auto part : parts) {
+            newStrConst->parts.emplace_back(part->clone());
+        }
+    }
+    return newStrConst;
+}
+
 LgsStrConst::~LgsStrConst() {
     for (const auto part : parts) {
         freeExpr(part);

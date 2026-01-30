@@ -12,6 +12,7 @@ void LgsArrayExpr::castImplicitly(LgsType* toType) {
     if (!otherIterable) return;
     const auto iterable = type->asIterable();
     if (iterable && !otherIterable->baseType->canCastTo(iterable->baseType)) return;
+
     // Replace dynamic array with static if needed
     if (!type && toType->asSArray()) {
         setType(toType);
@@ -26,9 +27,11 @@ void LgsArrayExpr::castImplicitly(LgsType* toType) {
     } else {
         otherBaseType = otherIterable->baseType;
     }
+
     for (size_t i = 0; i < elements.size(); ++i) {
         castExprImplicitly(elements[i], otherBaseType);
     }
+
     if (!type) {
         setType(toType);
     } else if (const auto& iter = iterable) {
@@ -60,11 +63,12 @@ std::string LgsArrayExpr::asText() {
 }
 
 LgsExpr* LgsArrayExpr::clone() {
-    const auto expr = new LgsArrayExpr();
+    const auto newArr = new LgsArrayExpr(*this);
+    newArr->elements.clear();
     for (const auto element : elements) {
-        expr->elements.push_back(element->clone());
+        newArr->elements.push_back(element->clone());
     }
-    return expr;
+    return newArr;
 }
 
 LgsArrayExpr::~LgsArrayExpr() {

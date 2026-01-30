@@ -6,6 +6,8 @@
 #include "types/primitives/LgsBool.h"
 #include <llvm/IR/Module.h>
 
+#include "LgsConfigs.h"
+
 LgsFunc* LgsDArray::getMethod(const std::string& methodName) {
     constexpr auto flags = BUILTIN | PUBLIC | METHOD;
     if (methodName == ADD_FUNC) {
@@ -76,6 +78,10 @@ LgsExpr* LgsDArray::getZeroValue() {
     return new LgsArrayExpr(this);
 }
 
+Value* LgsDArray::getIRZeroValue(LgsCodeGen& cg) {
+    return cg.allocDArr(baseType->getRTType(cg));
+}
+
 LgsType* LgsDArray::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     switch (op.opType) {
     case IN: {
@@ -113,7 +119,7 @@ void LgsDArray::addIRElement(LgsCodeGen& cg, Value* iterable, Value* index, Valu
     if (index) assert(0);
     auto element = value;
     if (baseType->isHeapAlloc) {
-        element = cg.moveElement(iterable, element, getRTType(cg));
+        element = cg.moveArrElement(iterable, element, getRTType(cg));
     }
     cg.builder.CreateCall(generateAddFunc(cg), {iterable, element});
 }
@@ -235,10 +241,4 @@ std::string LgsDArray::fmtStr() const {
 
 DIType* LgsDArray::getDebugType(LgsCodeGen& cg) {
     assert(0);
-}
-
-LgsType* LgsDArray::clone() {
-    const auto newDArray = new LgsDArray(*this);
-    newDArray->baseType = baseType->clone();
-    return newDArray;
 }

@@ -35,11 +35,6 @@ std::string LgsGenericType::fmtStr() const {
     assert(0);
 }
 
-LgsType* LgsGenericType::clone() {
-    const auto newGeneric = new LgsGenericType(*this);
-    return newGeneric;
-}
-
 DIType* LgsGenericType::getDebugType(LgsCodeGen& cg) {
     assert(0);
 }

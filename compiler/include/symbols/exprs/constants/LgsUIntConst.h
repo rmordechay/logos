@@ -6,12 +6,8 @@ class LgsUIntConst final : public LgsExpr {
 public:
     uint64_t value;
 
-    LgsUIntConst(LgsType* type, const uint64_t value) : LgsExpr(type), value(value) {
-        isMutable = false;
-    }
-    explicit LgsUIntConst(const uint64_t value) : LgsExpr(&LGS_UINT), value(value) {
-        isMutable = false;
-    }
+    LgsUIntConst(LgsType* type, const uint64_t value) : LgsExpr(type), value(value) {}
+    explicit LgsUIntConst(const uint64_t value) : LgsExpr(&LGS_UINT), value(value) {}
     std::string asText() override;
     void setDebugValue(LgsCodeGen& cg) override;
     ~LgsUIntConst() override = default;

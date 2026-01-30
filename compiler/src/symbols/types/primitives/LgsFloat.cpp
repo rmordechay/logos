@@ -117,7 +117,3 @@ Value* LgsFloat::divIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
 DIType* LgsFloat::getDebugType(LgsCodeGen& cg) {
     assert(0);
 }
-
-LgsType* LgsFloat::clone() {
-    return this;
-}

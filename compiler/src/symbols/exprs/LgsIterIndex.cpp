@@ -14,7 +14,7 @@ Value* LgsIterIndex::loadIR(LgsCodeGen& cg) {
         return IRValue;
     }
     if (baseExprType->asStr()) {
-        return cg.load(cg.i8Ty(), IRValue);
+        return IRValue;
     }
     if (baseExprType->asMatrix()) {
         assert(0);

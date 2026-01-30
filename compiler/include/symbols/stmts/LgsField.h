@@ -17,7 +17,6 @@ public:
     bool isPublic = false;
     bool isVirtual = false;
     bool isOptional = false;
-    bool isMutable = true;
     LgsType* parentType = nullptr;
     Value* gep = nullptr;
 

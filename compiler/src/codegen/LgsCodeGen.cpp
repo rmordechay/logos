@@ -220,8 +220,8 @@ Value* LgsCodeGen::callHash(Value* arg) {
     return callRuntimeFunc("hash", sizeTy(), {ptrTy()}, {arg});
 }
 
-Value* LgsCodeGen::getVField(Value* instance, Value* name, Value* ptr) {
-    return callRuntimeFunc("getVField", ptrTy(), {ptrTy(), ptrTy(), ptrTy()}, {instance, name, ptr});
+Value* LgsCodeGen::getVField(Value* objType, Value* objInstance, Value* fieldName) {
+    return callRuntimeFunc("getVField", ptrTy(), {ptrTy(), ptrTy(), ptrTy()}, {objType, fieldName, objInstance});
 }
 
 Value* LgsCodeGen::getVFunc(Value* objType, Value* funcName) {
@@ -238,14 +238,26 @@ Value* LgsCodeGen::allocInLevel(Value* size, Value* level, const bool setLevel) 
     return callRuntimeFunc("allocInLevel", ptrTy(), {sizeTy(), sizeTy(), i1Ty()}, {size, level, i1(setLevel)});
 }
 
+Value* LgsCodeGen::allocObject(Value* type) {
+    return callRuntimeFunc("allocObject", ptrTy(), {ptrTy()}, {type});
+}
+
+Value* LgsCodeGen::allocDArr(Value* baseType) {
+    return callRuntimeFunc("allocDArr", ptrTy(), {ptrTy()}, {baseType});
+}
+
+Value* LgsCodeGen::allocStrConst(Value* strPtr) {
+    return callRuntimeFunc("allocStrConst", ptrTy(), {ptrTy()}, {strPtr});
+}
+
 Value* LgsCodeGen::reallocate(Value* ptr, Value* size, Value* level) {
     return callRuntimeFunc("reallocate", ptrTy(), {ptrTy(), sizeTy(), sizeTy()}, {ptr, extendToSize(size), extendToSize(level)});
 }
 
-Value* LgsCodeGen::moveElement(Value* iterable, Value* element, Constant* type) {
+Value* LgsCodeGen::moveArrElement(Value* iterable, Value* element, Constant* type) {
     const std::vector<Type*> params = {ptrTy(), ptrTy(), ptrTy()};
     const std::vector<Value*> args = {iterable, element, type};
-    return callRuntimeFunc("moveElement", ptrTy(), params, args);
+    return callRuntimeFunc("moveArrElement", ptrTy(), params, args);
 }
 
 void LgsCodeGen::throwError(const LgsBaseMsg& err, const std::vector<Value*>& args) {
@@ -349,8 +361,18 @@ Value* LgsCodeGen::callSnprintf(const std::string& fmt, const std::vector<Value*
     return buffer;
 }
 
-Value* LgsCodeGen::callStrLen(Value* str) {
+Value* LgsCodeGen::callStrlen(Value* str) {
     return callFunc("strlen", i64Ty(), {ptrTy()}, {str});
+}
+
+Value* LgsCodeGen::strsEqual(Value* str1, Value* str2) {
+    const auto strEq = callFunc("strcmp", i32Ty(), {ptrTy(), ptrTy()}, {str1, str2});
+    return builder.CreateICmpEQ(strEq, i32Zero());
+}
+
+Value* LgsCodeGen::strsNotEqual(Value* str1, Value* str2) {
+    const auto strEq = callFunc("strcmp", i32Ty(), {ptrTy(), ptrTy()}, {str1, str2});
+    return builder.CreateICmpNE(strEq, i32Zero());
 }
 
 void LgsCodeGen::callMemset(Value* dest, Value* src, Value* size) {
@@ -556,12 +578,7 @@ Constant* LgsCodeGen::doublev(const double_t v) {
 }
 
 Constant* LgsCodeGen::emptyStr() {
-    const auto name = LGS_PREFIX"emptyStr";
-    const auto s = IRModule->getNamedGlobal(name);
-    if (s) return s;
-    const auto constant = getString("");
-    constant->setName(name);
-    return constant;
+    return getString("");
 }
 
 LgsCodeGen::~LgsCodeGen() {

@@ -26,6 +26,7 @@ public:
     size_t sizeBytes() override;
     bool canCastTo(LgsType* other) override;
     LgsExpr* getZeroValue() override;
+    Value* getIRZeroValue(LgsCodeGen& cg) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     Value* lenIR(LgsCodeGen& cg, Value* iterable) override;
     Value* inIR(LgsCodeGen& cg, Value* iterable, Value* value) override;
@@ -36,5 +37,4 @@ public:
     Function* generateAddFunc(LgsCodeGen& cg);
     std::string fmtStr() const override;
     DIType* getDebugType(LgsCodeGen& cg) override;
-    LgsType* clone() override;
 };

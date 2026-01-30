@@ -143,10 +143,6 @@ bool LgsType::equals(LgsType* other) {
     return getName() == other->getName();
 }
 
-LgsType* LgsType::clone() {
-    assert(0);
-}
-
 Value* LgsType::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     assert(0);
 }
@@ -355,8 +351,7 @@ Value* eqIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
         return cg.builder.CreateCall(dArr->generateArrEqFunc(cg), {left, right});
     }
     if (type->asStr()) {
-        const auto rt = cg.callFunc("strcmp", cg.i32Ty(), {cg.ptrTy(), cg.ptrTy()}, {left, right});
-        return cg.builder.CreateICmpEQ(rt, cg.i32Zero());
+        return cg.strsEqual(left, right);
     }
     assert(0);
 }
@@ -375,8 +370,7 @@ Value* neIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
         return cg.builder.CreateNot(cg.builder.CreateCall(dArr->generateArrEqFunc(cg), {left, right}));
     }
     if (type->asStr()) {
-        const auto rt = cg.callFunc("strcmp", cg.i32Ty(), {cg.ptrTy(), cg.ptrTy()}, {left, right});
-        return cg.builder.CreateICmpNE(rt, cg.i32Zero());
+        return cg.strsNotEqual(left, right);
     }
     assert(0);
 }

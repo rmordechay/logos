@@ -17,7 +17,6 @@ public:
     std::string fmtStr() const override;
     bool canCastTo(LgsType* other) override;
     DIType* getDebugType(LgsCodeGen& cg) override;
-    LgsType* clone() override;
 };
 
 inline LgsVoid LGS_VOID;

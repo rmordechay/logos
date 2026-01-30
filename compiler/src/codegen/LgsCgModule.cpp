@@ -774,16 +774,7 @@ void LgsCgModule::visitStaticArray(LgsArrayExpr* arrayExpr) const {
 
 void LgsCgModule::visitDynamicArray(LgsArrayExpr* arrayExpr) const {
     const auto dArr = arrayExpr->type->asDArray();
-    const auto ty = dArr->getIRType(cg);
-    const auto baseSize = dArr->baseType->IRSize(cg);
-    const auto dataSize = cg.builder.CreateMul(baseSize, cg.usize(LGS_ITER_INIT_CAP));
-
-    arrayExpr->IRValue = arrayExpr->pointee ? arrayExpr->pointee : cg.allocInCurrent(dArr->IRSize(cg), true);
-    cg.storeStructField(ty, arrayExpr->IRValue, dArr->rttIndices.type, dArr->baseType->getRTType(cg));
-    cg.storeStructField(ty, arrayExpr->IRValue, dArr->rttIndices.data, cg.allocInCurrent(dataSize, false));
-    cg.storeStructField(ty, arrayExpr->IRValue, dArr->rttIndices.len, cg.sizeZero());
-    cg.storeStructField(ty, arrayExpr->IRValue, dArr->rttIndices.cap, cg.usize(LGS_ITER_INIT_CAP));
-
+    arrayExpr->IRValue = dArr->getIRZeroValue(cg);
     for (const auto element : arrayExpr->elements) {
         dArr->addIRElement(cg, arrayExpr->IRValue, nullptr, element->IRValue);
     }
@@ -914,12 +905,13 @@ void LgsCgModule::visitSelection(LgsSelection* selection, const bool assign) {
         if (firstExpr->IRValue) assert(&firstExpr->IRValue->getContext() == &cg.IRModule->getContext());
     }
 
-    for (size_t i = firstExpr->isImportName; i < selection->exprs.size() - 1; ++i) {
+    const auto exprsCount = selection->exprs.size();
+    for (size_t i = firstExpr->isImportName; i < exprsCount - 1; ++i) {
         const auto parent = selection->exprs[i];
         const auto child = selection->exprs[i + 1];
+        const auto lastIteration = i == exprsCount - 2;
         if (const auto var = child->asVariable()) {
             visitFieldSelection(var, parent);
-            const auto lastIteration = i == selection->exprs.size() - 2;
             if (var->type->isHeapAlloc && !(lastIteration && assign)) {
                 var->IRValue = cg.load(cg.ptrTy(), var->IRValue);
             }
@@ -931,7 +923,7 @@ void LgsCgModule::visitSelection(LgsSelection* selection, const bool assign) {
         } else if (const auto iterIndex = child->asIterIndex()) {
             const auto baseExpr = iterIndex->getBaseExpr()->asVariable();
             const auto field = parent->type->getField(baseExpr->name);
-            iterIndex->pointee = field->getGEP(cg, parent->IRValue);
+            iterIndex->pointee = cg.load(cg.ptrTy(), field->getGEP(cg, parent->IRValue));
             visitIterIndex(iterIndex, false);
         } else {
             assert(0);
@@ -971,7 +963,7 @@ void LgsCgModule::visitFieldSelection(LgsVariable* var, LgsExpr* parent) const {
     if (field->isVirtual) {
         const auto ty = parent->type->getIRType(cg);
         const auto rttType = getObjRTT(ty, parent->IRValue);
-        var->IRValue = cg.getVField(rttType, cg.getString(field->name), parent->IRValue);
+        var->IRValue = cg.getVField(rttType, parent->IRValue, cg.getString(field->name));
         return;
     }
 
@@ -1131,9 +1123,7 @@ void LgsCgModule::visitIntConst(LgsIntConst* intConst) const {
 
 void LgsCgModule::visitStrConst(LgsStrConst* strConst) {
     if (strConst->parts.empty()) {
-        const auto ty = strConst->type->getIRType(cg);
-        strConst->IRValue = cg.allocInLevel(strConst->type->IRSize(cg), cg.sizeZero(), true);
-        cg.storeStructField(ty, strConst->IRValue, LgsStr::rttIndices.data, cg.getString(strConst->value));
+        strConst->IRValue = cg.allocStrConst(cg.getString(strConst->value));
         return;
     }
 
@@ -1163,8 +1153,7 @@ void LgsCgModule::visitInstance(LgsInstance* instance) {
         instance->IRValue = cg.builder.CreateAlloca(obj->getIRType(cg));
         return;
     }
-    instance->IRValue = cg.allocInCurrent(obj->IRSize(cg), true);
-    cg.storeStructField(obj->getIRType(cg), instance->IRValue, LgsInstance::rttIndices.type, obj->getRTType(cg));
+    instance->IRValue = obj->getIRZeroValue(cg);
 
     // Args
     std::unordered_set<std::string> visited;
@@ -1198,7 +1187,7 @@ void LgsCgModule::visitIterIndex(LgsIterIndex* iterIndex, const bool assign) {
     iterIndex->pointee = nullptr;
     visitExpr(iterIndex->baseExpr);
     visitExpr(iterIndex->index.from);
-    if(iterIndex->index.to) {
+    if (iterIndex->index.to) {
         visitExpr(iterIndex->index.to);
         iterIndex->setIRRangePtr(cg, assign);
     } else {

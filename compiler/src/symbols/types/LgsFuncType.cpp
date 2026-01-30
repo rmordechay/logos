@@ -136,16 +136,6 @@ DIType* LgsFuncType::getDebugType(LgsCodeGen& cg) {
     assert(0);
 }
 
-LgsFuncType* LgsFuncType::clone() {
-    const auto newFuncType = new LgsFuncType(*this);
-    newFuncType->rt = rt->clone();
-    newFuncType->params.clear();
-    for (const auto& param : params) {
-        newFuncType->params.emplace_back(param.type->clone());
-    }
-    return newFuncType;
-}
-
 void LgsFuncType::addSelf(LgsType* selfType) {
     isMethod = true;
     params.insert(params.begin(), LgsParam(selfType, LGS_SELF));

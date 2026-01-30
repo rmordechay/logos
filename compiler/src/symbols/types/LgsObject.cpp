@@ -139,9 +139,7 @@ LgsExpr* LgsObject::getZeroValue() {
 }
 
 Value* LgsObject::getIRZeroValue(LgsCodeGen& cg) {
-    const auto instance = cg.allocInCurrent(IRSize(cg), true);
-    cg.storeStructField(getIRType(cg), instance, LgsInstance::rttIndices.type, getRTType(cg));
-    return instance;
+    return cg.allocObject(getRTType(cg));
 }
 
 bool LgsObject::canCastTo(LgsType* other) {

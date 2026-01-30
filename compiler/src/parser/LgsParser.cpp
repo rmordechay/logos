@@ -604,7 +604,6 @@ LgsEnum* LgsParser::parseEnum() {
         const auto fieldType = new LgsEnum(enum_->name, enumField.lexeme, position);
         const auto field = new LgsField(enumField.lexeme, fieldType, expr);
         field->position = position;
-        field->isMutable = false;
         setLocation(field->location, &enumField, &currentToken);
         enum_->fields.push_back(field);
         if (currentToken.type == T_RBRACE) break;
@@ -1345,7 +1344,7 @@ LgsExpr* LgsParser::parseUnary(const bool withInstance) {
     if (matchAndConsume(T_QUEST_MARK)) {
         expr = new LgsNullableExpr(expr);
     } else if (matchAndConsume(T_EXCLA_MARK)) {
-        expr->hasUnwrapSuffix = true;
+        expr->hasUnwrap = true;
     }
     return expr;
 }
