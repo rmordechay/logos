@@ -4,7 +4,6 @@
 #include "codegen/LgsCodeGen.h"
 #include "exprs/LgsVariable.h"
 #include "stmts/LgsField.h"
-#include "types/LgsAny.h"
 #include "types/primitives/LgsSize.h"
 
 #define VALUE_FUNC "value"

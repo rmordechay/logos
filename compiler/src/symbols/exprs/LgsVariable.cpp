@@ -40,10 +40,6 @@ bool LgsVariable::equals(LgsExpr* other) {
     assert(0);
 }
 
-LgsExpr* LgsVariable::castExplicitly(LgsType* toType) {
-    assert(0);
-}
-
 std::string LgsVariable::asText() {
     return name;
 }

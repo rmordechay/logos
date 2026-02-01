@@ -62,6 +62,17 @@ LgsFunc* LgsIterable::getMethod(const std::string& methodName) {
     return LgsType::getMethod(methodName);
 }
 
+LgsType* LgsIterable::getBaseType() const {
+    auto nestedIter = this;
+    while (true) {
+        if (const auto innerIter = nestedIter->baseType->asIterable()) {
+            nestedIter = innerIter;
+        } else {
+            return nestedIter->baseType;
+        }
+    }
+}
+
 size_t LgsIterable::getDimension() const {
     size_t dim = 1;
     auto nestedIter = this;
@@ -85,10 +96,6 @@ LgsType* LgsIterable::getValueType() {
     return baseType;
 }
 
-void LgsIterable::addIRElement(LgsCodeGen& cg, Value* iterable, Value* index, Value* value) {
-    assert(0);
-}
-
 bool LgsIterable::unpackLoopVars(LgsForeachLoop* loop) const {
     if (loop->loopVars.size() > 1) return false;
     assert(baseType);
@@ -105,6 +112,10 @@ void LgsIterable::setLoopIRVars(LgsCodeGen& cg, LgsForeachLoop* loop) {
     iterIndex->index.from->IRValue = loop->loadIndex(cg);
     iterIndex->IRValue = iterable->getIRElement(cg, iterIndex->baseExpr->IRValue, iterIndex->index.from->IRValue);
     loop->loopVars[0]->IRValue = iterIndex->IRValue;
+}
+
+void LgsIterable::addIRElement(LgsCodeGen& cg, Value* iterable, Value* index, Value* value) {
+    assert(0);
 }
 
 LgsIterable::~LgsIterable() {

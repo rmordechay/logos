@@ -23,16 +23,16 @@ LgsExpr* LgsFloat::getZeroValue() {
     return new LgsFloatConst(this, 0.0);
 }
 
+Value* LgsFloat::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
+    return cg.floatv(0);
+}
+
 size_t LgsFloat::sizeBytes() {
     return sizeof(float);
 }
 
 std::string LgsFloat::fmtStr() const {
     return "%.3f";
-}
-
-Value* LgsFloat::asIRStr(LgsCodeGen& cg, Value* v) {
-    return cg.callSnprintf(fmtStr(), {cg.builder.CreateFPExt(v, cg.doubleTy())});
 }
 
 bool LgsFloat::canCastTo(LgsType* other) {

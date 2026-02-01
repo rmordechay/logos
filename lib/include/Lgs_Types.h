@@ -21,9 +21,7 @@ enum Lgs_TypeKind {
     RTT_FLOAT,
     RTT_DOUBLE,
     RTT_OBJECT,
-    RTT_VEC2,
-    RTT_VEC3,
-    RTT_VEC4,
+    RTT_VEC,
     RTT_MATRIX,
     RTT_SARRAY,
     RTT_DARRAY,
@@ -41,7 +39,7 @@ struct Lgs_Field {
     const size_t size;
     const size_t offset;
     const Lgs_TypeKind kind;
-    void* type;
+    Lgs_TypeInfo* type;
 };
 
 struct Lgs_Method {
@@ -64,8 +62,8 @@ struct Lgs_SArr {
     Lgs_TypeInfo* baseType;
 };
 
-struct Lgs_Nullable {
-    bool isPtr;
+struct Lgs_Vec {
+    const size_t length;
     Lgs_TypeInfo* baseType;
 };
 
@@ -77,11 +75,12 @@ struct Lgs_Map {
 struct Lgs_TypeInfo {
     const size_t size;
     const Lgs_TypeKind kind;
+    const bool isHeapAlloc;
     union {
         Lgs_Object* object;
         Lgs_SArr* sArr;
-        Lgs_Nullable* nullable;
+        Lgs_Vec* vec;
         Lgs_Map* map;
-        void* dummy;
+        Lgs_TypeInfo* baseType;
     };
 };

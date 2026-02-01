@@ -17,7 +17,6 @@ void LgsArrayExpr::castImplicitly(LgsType* toType) {
     if (!type && toType->asSArray()) {
         setType(toType);
     } else if (type->asDArray() && (toType->asSArray() || toType->asSet())) {
-        freeType(type);
         setType(toType);
     }
 

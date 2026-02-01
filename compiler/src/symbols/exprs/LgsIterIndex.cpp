@@ -15,7 +15,7 @@ Value* LgsIterIndex::loadIR(LgsCodeGen& cg) {
     if (baseExprType->asSArray()) {
         const auto indexIR = index.from->IRValue;
         const auto ty = baseExpr->type->getIRType(cg);
-        const auto gep = cg.builder.CreateGEP(ty, IRValue, {cg.i32Zero(), indexIR});
+        const auto gep = cg.builder.CreateGEP(ty, IRValue, {cg.zero32(), indexIR});
         return cg.load(type->getIRType(cg), gep);
     }
     if (baseExprType->asVec()) {

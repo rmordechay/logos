@@ -32,8 +32,8 @@ public:
     inline static Lgs_ObjectIndices rttIndices;
 
     explicit LgsObject(const std::string&  objName) : name(objName) {
-        passByRef = true;
         isHeapAlloc = true;
+        passByRef = true;
         rttKind = RTT_OBJECT;
         metaFields[OBJ_META_NAME] = new LgsField(OBJ_META_NAME, new LgsStr(), new LgsStrConst(name));
     }

@@ -1,4 +1,7 @@
 #include "codegen/LgsCgModule.h"
+
+#include <ranges>
+
 #include "builtins/LgsTest.h"
 #include "LgsConfigs.h"
 #include "builtins/LgsSys.h"
@@ -254,9 +257,9 @@ void LgsCgModule::visitRangeLoop(LgsRangeLoop* loop) {
 void LgsCgModule::visitForeachLoop(LgsForeachLoop* loop) {
     visitExpr(loop->iterExpr);
     const auto indexTy = cg.sizeTy();
-    loop->iPtr = cg.allocaAndStore(indexTy, cg.sizeZero());
+    loop->iPtr = cg.allocaAndStore(indexTy, cg.zeroSize());
     if (loop->iterExpr->type->asMap()) {
-        loop->iteratorCounter = cg.allocaAndStore(cg.sizeTy(), cg.sizeZero());
+        loop->iteratorCounter = cg.allocaAndStore(cg.sizeTy(), cg.zeroSize());
     }
 
     // Condition
@@ -330,22 +333,30 @@ void LgsCgModule::visitAssignment(const LgsAssignment* assignment) {
     visitExpr(left);
     right->pointee = left->IRValue;
     visitExpr(right);
-    if (left->type->asNullable()) {
-        // TODO First check nullable then continue to rest
-        assert(0);
-    }
-    if (const auto iterIndex = left->asIterIndex()) {
-        const auto baseExpr = iterIndex->baseExpr;
-        const auto from = iterIndex->index.from;
-        const auto iterable = baseExpr->type->asIterable();
-        iterable->addIRElement(cg, baseExpr->IRValue, from->IRValue, right->IRValue);
-        return;
-    }
     if (left->type->isHeapAlloc) {
-        left->moveValue(cg, right->IRValue);
-        return;
+        moveValue(left->type, left->IRValue, right->IRValue);
     }
     cg.store(right->IRValue, left->IRValue);
+}
+
+void LgsCgModule::moveValue(LgsType* type, Value* left, Value* right) const {
+    const std::vector<Type*> params = {cg.ptrTy(), cg.ptrTy()};
+    if (type->asStr()) {
+        const std::vector args = {left, right};
+        cg.callRuntimeFunc("moveStr", cg.voidTy(), params, args);
+    } else if (type->asObject()) {
+        const std::vector args = {left, right};
+        cg.callRuntimeFunc("moveObject", cg.voidTy(), params, args);
+    } else if (type->asDArray()) {
+        const std::vector args = {left, right};
+        cg.callRuntimeFunc("moveArr", cg.voidTy(), params, args);
+    } else if (const auto nullable = type->asNullable()) {
+        moveValue(nullable->baseType, left, right);
+    } else if (type->asMap()) {
+        assert(0);
+    } else {
+        assert(0);
+    }
 }
 
 void LgsCgModule::visitIfStmt(LgsIfStmt* ifStmt) {
@@ -689,13 +700,18 @@ void LgsCgModule::visitFloatConst(LgsFloatConst* floatConst) const {
 }
 
 void LgsCgModule::visitNullableExpr(LgsNullableExpr* expr) {
+    const auto nullable = expr->type->asNullable();
+    const auto ty = nullable->getIRType(cg);
     if (expr->isNull) {
-        expr->IRValue = cg.null();
+        if (nullable->passByRef) {
+            expr->IRValue = cg.null();
+        } else {
+            expr->IRValue = expr->pointee ? expr->pointee : cg.builder.CreateAlloca(ty);
+            cg.storeStructField(ty, expr->IRValue, nullable->rttIndices.isSet, cg.false_());
+        }
         return;
     }
     visitExpr(expr->baseExpr);
-    const auto nullable = expr->type->asNullable();
-    const auto ty = nullable->getIRType(cg);
     if (nullable->passByRef) {
         expr->IRValue = expr->baseExpr->IRValue;
     } else {
@@ -716,15 +732,16 @@ void LgsCgModule::visitArrayExpr(LgsArrayExpr* arrayExpr) {
 
 void LgsCgModule::visitStaticArray(LgsArrayExpr* arrayExpr) {
     const auto sArr = arrayExpr->type->asSArray();
-    const auto sArrTypeIR = sArr->getIRType(cg);
+    const auto ty = sArr->getIRType(cg);
     arrayExpr->IRValue = sArr->getIRZeroValue(cg, arrayExpr->pointee);
     if (arrayExpr->elements.empty()) return;
+
     for (size_t i = 0; i < arrayExpr->elements.size(); ++i) {
         const auto element = arrayExpr->elements[i];
-        const auto offset = cg.builder.CreateMul(cg.usize(i), sArr->baseType->IRSize(cg));
-        element->pointee = cg.builder.CreatePtrAdd(arrayExpr->IRValue, offset);
+        element->pointee = cg.builder.CreateInBoundsGEP(ty, arrayExpr->IRValue, {cg.zero32(), cg.i32(i)});
         visitExpr(element);
     }
+    if (sArr->baseType->asNullable() || sArr->baseType->asSArray()) return;
 
     // Check if all args are const for chunk copy
     std::vector<Constant*> constantArgs;
@@ -739,7 +756,7 @@ void LgsCgModule::visitStaticArray(LgsArrayExpr* arrayExpr) {
     }
 
     if (allArgsAreConst) {
-        const auto sArrTy = llvm::dyn_cast<ArrayType>(sArrTypeIR);
+        const auto sArrTy = llvm::dyn_cast<ArrayType>(ty);
         const auto argsIR = ConstantArray::get(sArrTy, constantArgs);
         cg.store(argsIR, arrayExpr->IRValue);
     } else {
@@ -761,30 +778,36 @@ void LgsCgModule::visitDynamicArray(LgsArrayExpr* arrayExpr) {
     }
 }
 
-void LgsCgModule::visitVectorExpr(LgsVectorExpr* vectorExpr) {
-    const auto ty = vectorExpr->type->getIRType(cg);
-    if (vectorExpr->elements.empty()) {
-        vectorExpr->IRValue = ConstantAggregateZero::get(ty);
+void LgsCgModule::visitVectorExpr(LgsVectorExpr* vecExpr) {
+    if (vecExpr->elements.empty()) {
+        vecExpr->IRValue = vecExpr->type->getIRZeroValue(cg, vecExpr->pointee);
         return;
     }
 
-    // Check if all args are const for chunk copy
-    std::vector<Constant*> constantArgs;
-    auto allArgsAreConst = true;
-    for (const auto element : vectorExpr->elements) {
+    for (const auto element : vecExpr->elements) {
+        element->pointee = vecExpr->IRValue;
         visitExpr(element);
-        if (const auto constant = llvm::dyn_cast<Constant>(element->IRValue)) {
-            constantArgs.push_back(constant);
-        } else {
-            allArgsAreConst = false;
-            break;
-        }
     }
 
-    if (allArgsAreConst) {
-        vectorExpr->IRValue = ConstantVector::get(constantArgs);
+    const auto vecType = vecExpr->vecType;
+    if (vecExpr->elements.size() == 1 && vecExpr->elements[0]->type->isScalar()) {
+        vecExpr->IRValue = cg.builder.CreateVectorSplat(vecType->dimVec, vecExpr->elements[0]->IRValue);
+        return;
+    }
+
+    vecExpr->IRValue = Constant::getNullValue(vecType->getIRType(cg));
+    for (size_t i = 0; i < vecExpr->elements.size(); ++i) {
+        insertVecElement(vecExpr, vecExpr->elements[i]->IRValue, i);
+    }
+}
+
+void LgsCgModule::insertVecElement(LgsVectorExpr* vecExpr, Value* element, const size_t i) const {
+    if (const auto innerVec = dyn_cast<VectorType>(element->getType())) {
+        for (size_t j = 0; j < innerVec->getElementCount().getKnownMinValue(); ++j) {
+            insertVecElement(vecExpr, cg.builder.CreateExtractElement(element, j), i+j);
+        }
     } else {
-        assert(0);
+        vecExpr->IRValue = cg.builder.CreateInsertElement(vecExpr->IRValue, element, i);
     }
 }
 
@@ -816,7 +839,7 @@ void LgsCgModule::visitMatrixExpr(const LgsMatrixExpr* matrixExpr) {
             const auto vector = matrixExpr->elements[i];
             for (size_t j = 0; j < vector->elements.size(); ++j) {
                 const auto element = vector->elements[j];
-                const std::vector<Value*> indices = {cg.i32Zero(), cg.i32(index++)};
+                const std::vector<Value*> indices = {cg.zero32(), cg.i32(index++)};
                 const auto gep = cg.builder.CreateInBoundsGEP(matTypeIR, matrixExpr->IRValue, indices);
                 cg.store(element->IRValue, gep);
             }
@@ -941,7 +964,7 @@ void LgsCgModule::visitFieldSelection(LgsVariable* var, LgsExpr* parent) const {
     // Virtual fields
     if (field->isVirtual) {
         const auto ty = parent->type->getIRType(cg);
-        const auto rttType = getObjRTT(ty, parent->IRValue);
+        const auto rttType = getInstanceRTT(ty, parent->IRValue);
         var->IRValue = cg.getVField(rttType, parent->IRValue, cg.getString(field->name));
         return;
     }
@@ -1030,7 +1053,7 @@ void LgsCgModule::visitFuncCall(LgsFuncCall* funcCall) {
     if (ft->isVirtual) {
         const auto self = funcCall->args.front().expr;
         const auto ty = self->type->getIRType(cg);
-        const auto rttType = getObjRTT(ty, self->IRValue);
+        const auto rttType = getInstanceRTT(ty, self->IRValue);
         func->IRValue = cg.getVFunc(rttType, cg.getString(ft->name));
     }
 
@@ -1240,7 +1263,7 @@ Value* LgsCgModule::getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) const {
     return ctx;
 }
 
-Value* LgsCgModule::getObjRTT(Type* ty, Value* value) const {
+Value* LgsCgModule::getInstanceRTT(Type* ty, Value* value) const {
     return cg.loadStructField(ty, value, LgsInstance::rttIndices.type, cg.ptrTy());
 }
 

@@ -16,8 +16,6 @@
 #include <llvm/IR/Module.h>
 
 #include "errors/LgsErrors.h"
-#include "exprs/LgsMetaSelection.h"
-#include "types/primitives/LgsVoid.h"
 
 std::string LgsObject::getName() {
     return name;

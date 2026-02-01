@@ -42,19 +42,18 @@ std::string LgsNullable::getName() {
 }
 
 Type* LgsNullable::getIRType(LgsCodeGen& cg) {
-    if (passByRef) return getTypeOrPtr(cg);
+    if (passByRef) return cg.ptrTy();
     return cg.getStructType({baseType->getIRType(cg), cg.i1Ty()}, getName());
 }
 
 Constant* LgsNullable::getRTType(LgsCodeGen& cg) {
-    const auto RTTName = std::string(LGS_TYPEINFO_PREFIX) + getName();
-    if (const auto v = cg.IRModule->getGlobalVariable(RTTName)) return v;
-    if (cg.mode != CG_MODE_RTTYPES) return cg.createGlobal(RTTName, cg.getRTTStruct(), nullptr);
-
-    const auto st = cg.getStructType({cg.i1Ty(), cg.ptrTy()}, RTTName);
-    const auto baseRTT = baseType ? baseType->getRTType(cg) : cg.null();
-    const std::vector<Constant*> args = {cg.i1(passByRef), baseRTT};
-    return cg.createGlobal(RTTName, st, ConstantStruct::get(st, args));
+    if (passByRef) return baseType->getRTType(cg);
+    const auto RTTName = getName();
+    const auto prefixedName = LGS_TYPEINFO_PREFIX + RTTName;
+    if (const auto v = cg.IRModule->getGlobalVariable(prefixedName)) return v;
+    if (cg.mode != CG_MODE_RTTYPES) return cg.getRTTypeInfo(RTTName, IRSize(cg), rttKind, isHeapAlloc, nullptr);
+    const auto baseRTT = baseType->getRTType(cg);
+    return cg.getRTTypeInfo(RTTName, IRSize(cg), rttKind, isHeapAlloc, baseRTT);
 }
 
 bool LgsNullable::canCastTo(LgsType* other) {

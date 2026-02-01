@@ -12,8 +12,8 @@ public:
     LgsFunc* addFunc = new LgsFunc(ADD_FUNC, name, &LGS_VOID, {this, &LGS_ANY}, BUILTIN | PUBLIC | METHOD);
 
     explicit LgsSet(LgsType* baseType = nullptr) : LgsIterable(baseType) {
-        passByRef = true;
         isHeapAlloc = true;
+        passByRef = true;
         addMethod(addFunc);
     }
     Type* getIRType(LgsCodeGen& cg) override;

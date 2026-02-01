@@ -29,6 +29,7 @@ public:
 
     explicit LgsIterable(LgsType* baseType = nullptr) : baseType(baseType) {}
     LgsFunc* getMethod(const std::string& methodName) override;
+    LgsType* getBaseType() const;
     size_t getDimension() const;
     virtual LgsType* getIndexType();
     virtual LgsType* getValueType();

@@ -2,7 +2,7 @@
 #include "types/iterables/LgsMap.h"
 
 Value* LgsForeachLoop::loopStart(LgsCodeGen& cg) {
-    return cg.sizeZero();
+    return cg.zeroSize();
 }
 
 Value* LgsForeachLoop::loopEnd(LgsCodeGen& cg) {

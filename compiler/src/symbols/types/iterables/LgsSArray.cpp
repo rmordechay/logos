@@ -16,7 +16,7 @@ std::string LgsSArray::getBaseName() {
 }
 
 std::string LgsSArray::getName() {
-    return name + baseType->getName();
+    return name + std::to_string(len) +  baseType->getName();
 }
 
 std::string LgsSArray::pname() {
@@ -33,16 +33,22 @@ LgsExpr* LgsSArray::getZeroValue() {
 }
 
 Value* LgsSArray::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
-    return pointee ? pointee : cg.builder.CreateAlloca(getIRType(cg));
+    if (pointee) return pointee;
+    const auto ty = getIRType(cg);
+    const auto ptr = cg.builder.CreateAlloca(ty);
+    cg.store(ConstantAggregateZero::get(ty), ptr);
+    return ptr;
 }
 
 Constant* LgsSArray::getRTType(LgsCodeGen& cg) {
-    const auto RTTName = LGS_TYPEINFO_PREFIX + getName() + std::to_string(len);
-    if (const auto v = cg.IRModule->getGlobalVariable(RTTName)) return v;
-    if (cg.mode != CG_MODE_RTTYPES) return cg.createGlobal(RTTName, cg.getRTTStruct(), nullptr);
+    const auto RTTName = getName();
+    const auto prefixedName = LGS_TYPEINFO_PREFIX + RTTName;
+    if (const auto v = cg.IRModule->getGlobalVariable(prefixedName)) return v;
+    if (cg.mode != CG_MODE_RTTYPES) return cg.getRTTypeInfo(RTTName, IRSize(cg), rttKind, isHeapAlloc, nullptr);
     const auto st = cg.getStructType({cg.sizeTy(), cg.ptrTy()});
     const std::vector<Constant*> args = {cg.usize(len), baseType->getRTType(cg)};
-    return cg.createGlobal(RTTName, st, ConstantStruct::get(st, args));
+    const auto gv = cg.createGlobal(prefixedName + "_extra", st, ConstantStruct::get(st, args));
+    return cg.getRTTypeInfo(RTTName, IRSize(cg), rttKind, isHeapAlloc, gv);
 }
 
 std::string LgsSArray::fmtStr() const {
@@ -117,12 +123,12 @@ Value* LgsSArray::inIR(LgsCodeGen& cg, Value* iterableExpr, Value* value) {
 }
 
 Value* LgsSArray::getIRElement(LgsCodeGen& cg, Value* iterable, Value* index) {
-    const auto gep = cg.builder.CreateGEP(getIRType(cg), iterable, {cg.i32Zero(), index});
+    const auto gep = cg.builder.CreateGEP(getIRType(cg), iterable, {cg.zero32(), index});
     return cg.load(baseType->getIRType(cg), gep);
 }
 
 void LgsSArray::addIRElement(LgsCodeGen& cg, Value* iterable, Value* index, Value* value) {
-    const std::vector<Value*> indices = {cg.i32Zero(), index};
+    const std::vector<Value*> indices = {cg.zero32(), index};
     const auto gep = cg.builder.CreateInBoundsGEP(getIRType(cg), iterable, indices);
     cg.store(value, gep);
 }

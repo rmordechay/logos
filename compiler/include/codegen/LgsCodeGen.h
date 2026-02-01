@@ -5,6 +5,8 @@
 #include <map>
 #include <filesystem>
 
+#include "exprs/LgsExpr.h"
+
 namespace llvm {
     class DIBuilder;
     class PassBuilder;
@@ -82,6 +84,7 @@ public:
 
     void store(Value* v, Value* ptr);
     Value* load(Type* ty, Value* ptr);
+    Value* isNull(Value* value);
     void incSize(Value* bufferOffset, Value* ptr);
     Value* allocaAndStore(Type* type, Value* v, const std::string& name = "");
     StructType* getStructType(const std::vector<Type*>& types, const std::string& name = "");
@@ -129,7 +132,7 @@ public:
     void callMemcpy(Value* dest, Value* src, Value* size);
 
     // Runtime funcs
-    GlobalVariable* getRTTypeInfo(const std::string& name, ConstantInt* size, Lgs_TypeKind kind);
+    GlobalVariable* getRTTypeInfo(const std::string& name, ConstantInt* size, int32_t kind, bool isHeapAlloc, Constant* extra = nullptr);
     StructType* getRTTStruct();
 
     // Debugging
@@ -169,10 +172,10 @@ public:
     ConstantInt* i32(int32_t v);
     ConstantInt* i64(int64_t v);
     ConstantInt* usize(size_t v);
-    ConstantInt* i8Zero();
-    ConstantInt* i32Zero();
-    ConstantInt* i64Zero();
-    ConstantInt* sizeZero();
+    ConstantInt* zero8();
+    ConstantInt* zero32();
+    ConstantInt* zero64();
+    ConstantInt* zeroSize();
     Value* extendToSize(Value* v);
     Constant* floatv(float_t v);
     Constant* doublev(double_t v);

@@ -46,9 +46,7 @@ LgsType* LgsStr::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     switch (op.opType) {
     case ADD: {
         if (rightType->asStr() || rightType->asChar() || rightType->isNumber()) {
-            const auto str = new LgsStr();
-            str->isHeapAlloc = true;
-            return str;
+            return new LgsStr();
         }
         break;
     }
@@ -68,16 +66,12 @@ LgsType* LgsStr::applyBinOp(LgsType* rightType, LgsBinOp& op) {
 }
 
 Value* LgsStr::getIRElement(LgsCodeGen& cg, Value* iterable, Value* index) {
-    const auto gep =  cg.builder.CreateGEP(cg.i8Ty(), iterable, {cg.i32Zero(), index});
+    const auto gep =  cg.builder.CreateGEP(cg.i8Ty(), iterable, {cg.zero32(), index});
     return cg.load(cg.i8Ty(), gep);
 }
 
 std::string LgsStr::fmtStr() const {
     return "%s";
-}
-
-Value* LgsStr::asIRStr(LgsCodeGen& cg, Value* v) {
-    return getStrPtr(cg, v);
 }
 
 bool LgsStr::inferBaseType(std::vector<LgsExpr*>& args) {

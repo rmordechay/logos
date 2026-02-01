@@ -33,8 +33,8 @@ void LgsTypeResolver::resolveType(LgsType*& type) {
     } else if (const auto nullable = type->asNullable()) {
         if (!nullable->isNull) {
             resolveType(nullable->baseType);
-            nullable->passByRef = nullable->baseType->passByRef;
             nullable->isHeapAlloc = nullable->baseType->isHeapAlloc;
+            nullable->passByRef = nullable->baseType->passByRef;
         }
     } else if (const auto pair = type->asPair()) {
         resolveType(pair->key);
@@ -107,9 +107,6 @@ void LgsTypeResolver::resolveObj(LgsObject* obj) {
         resolveType(field->type);
         if (field->expr) {
             castExprImplicitly(field->expr, field->type);
-        }
-        if (field->type->asStr()) {
-            field->type->isHeapAlloc = true;
         }
     }
 

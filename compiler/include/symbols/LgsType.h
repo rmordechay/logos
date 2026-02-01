@@ -70,8 +70,8 @@ public:
     bool isUnsinged = false;
     bool isFloat = false;
     bool isHeapAlloc = false;
-    bool passByRef = false;
     bool isExternal = false;
+    bool passByRef = false;
 
     bool isAny();
     bool isVoid();
@@ -92,7 +92,6 @@ public:
     virtual Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee);
     virtual Type* getIRType(LgsCodeGen& cg) = 0;
     virtual Value* hashValue(LgsCodeGen& cg, Value* value);
-    virtual Value* asIRStr(LgsCodeGen& cg, Value* v);
     virtual Constant* getRTType(LgsCodeGen& cg);
     virtual bool canCastTo(LgsType* other) = 0;
     virtual std::string fmtStr() const = 0;
@@ -164,7 +163,7 @@ void freeTypes(std::vector<T*>& types) {
 
 Value* eqIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
 Value* neIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
-Value* ltIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
+Value* ltIR(LgsCodeGen& cg, Value* left, Value* right, const LgsType* type);
 Value* gtIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
 Value* geIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
 Value* leIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);

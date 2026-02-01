@@ -556,6 +556,12 @@ LgsType* LgsParser::parseType() {
     }
     setLocation(type->location, &startToken, &currentToken);
 
+    // Nullable
+    if (type && matchAndConsume(T_QUEST_MARK)) {
+        type = new LgsNullable(type);
+        setLocation(type->location, &startToken, &currentToken);
+    }
+
     // Array
     if (type && currentToken.type == T_LBRACK) {
         std::vector<LgsExpr*> sizes;
@@ -1290,7 +1296,7 @@ LgsExpr* LgsParser::parseExprWithPrecedence(const int minPrecedence, const bool 
         const auto it = LGS_BINARY_OPS_DICT.find(currentToken.type);
         if (it != LGS_BINARY_OPS_DICT.end()) {
             op = &it->second;
-        } else if (currentToken.type == T_IDENTIFIER && currentToken.lexeme == "X") {
+        } else if (currentToken.lexeme == "X" && peek().type != T_DOT) {
             op = &CROSS_OP;
         } else {
             break;
@@ -1435,7 +1441,7 @@ LgsFuncCall* LgsParser::parseFuncCall() {
         }
         if (currentToken.type == T_RPAREN) break;
         mustMatch(T_COMMA);
-        if (currentToken.type == T_RPAREN) break;
+        if (currentToken.type == T_RPAREN || currentToken.type == T_RBRACE) break;
     }
 
     mustMatch(T_RPAREN);

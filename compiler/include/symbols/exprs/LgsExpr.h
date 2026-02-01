@@ -53,7 +53,6 @@ public:
     std::optional<int64_t> getConstInt();
     std::optional<double_t> getConstFloat();
     std::optional<std::string> getConstStr();
-    Value* moveValue(LgsCodeGen& cg, Value* right) const;
     LgsType* getType() override;
 
     virtual void setType(LgsType* newType);

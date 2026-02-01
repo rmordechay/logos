@@ -118,7 +118,7 @@ void LgsCodeGen::loop(Value* loopLength, const std::function<void(Value*, BasicB
     const auto bodyBlock = createBlock(BLOCK_LOOP_BODY);
     const auto exitBlock = createBlock(BLOCK_LOOP_EXIT);
     const auto iPtr = builder.CreateAlloca(sizeTy());
-    const auto loopStart = builder.CreateSExt(sizeZero(), sizeTy());
+    const auto loopStart = builder.CreateSExt(zeroSize(), sizeTy());
     store(loopStart, iPtr);
     builder.CreateBr(condBlock);
 
@@ -173,6 +173,10 @@ Value* LgsCodeGen::load(Type* ty, Value* ptr) {
     return builder.CreateLoad(ty, ptr);
 }
 
+Value* LgsCodeGen::isNull(Value* value) {
+    return builder.CreateIsNull(value);
+}
+
 void LgsCodeGen::incSize(Value* bufferOffset, Value* ptr) {
     store(builder.CreateAdd(bufferOffset, usize(1)), ptr);
 }
@@ -201,7 +205,7 @@ Value* LgsCodeGen::loadStructField(Type* parentType, Value* parentPtr, const siz
 }
 
 void LgsCodeGen::addNullTerminate(Value* strPtr, Value* pos) {
-    store(i8Zero(), builder.CreateInBoundsGEP(i8Ty(), strPtr, {pos}));
+    store(zero8(), builder.CreateInBoundsGEP(i8Ty(), strPtr, {pos}));
 }
 
 void LgsCodeGen::callStackPush() {
@@ -359,12 +363,12 @@ Value* LgsCodeGen::callStrlen(Value* str) {
 
 Value* LgsCodeGen::strsEqual(Value* str1, Value* str2) {
     const auto strEq = callFunc("strcmp", i32Ty(), {ptrTy(), ptrTy()}, {str1, str2});
-    return builder.CreateICmpEQ(strEq, i32Zero());
+    return builder.CreateICmpEQ(strEq, zero32());
 }
 
 Value* LgsCodeGen::strsNotEqual(Value* str1, Value* str2) {
     const auto strEq = callFunc("strcmp", i32Ty(), {ptrTy(), ptrTy()}, {str1, str2});
-    return builder.CreateICmpNE(strEq, i32Zero());
+    return builder.CreateICmpNE(strEq, zero32());
 }
 
 void LgsCodeGen::callMemset(Value* dest, Value* src, Value* size) {
@@ -375,19 +379,19 @@ void LgsCodeGen::callMemcpy(Value* dest, Value* src, Value* size) {
     builder.CreateMemCpy(dest, llvm::MaybeAlign(), src, llvm::MaybeAlign(), size);
 }
 
-GlobalVariable* LgsCodeGen::getRTTypeInfo(const std::string& name, ConstantInt* size, const Lgs_TypeKind kind) {
+GlobalVariable* LgsCodeGen::getRTTypeInfo(const std::string& name, ConstantInt* size, const int32_t kind, const bool isHeapAlloc, Constant* extra) {
     assert(kind != RTT_UNKNOWN);
     const auto baseStruct = getRTTStruct();
     const auto prefixedName = LGS_TYPEINFO_PREFIX + name;
     if (mode == CG_MODE_RTTYPES) {
-        const auto initializer = llvm::ConstantStruct::get(baseStruct, {size, i32(kind)});
+        const auto initializer = llvm::ConstantStruct::get(baseStruct, {size, i32(kind), i1(isHeapAlloc), extra ? extra : null()});
         return createGlobal(prefixedName, baseStruct, initializer);
     }
     return createGlobal(prefixedName, baseStruct, nullptr);
 }
 
 StructType* LgsCodeGen::getRTTStruct() {
-    return getStructType({sizeTy(), i32Ty()}, "RTI");
+    return getStructType({sizeTy(), i32Ty(), i1Ty(), ptrTy()}, "RTI");
 }
 
 void LgsCodeGen::printStr(const std::string& value, const std::string& prefix) {
@@ -542,19 +546,19 @@ ConstantInt* LgsCodeGen::usize(const size_t v) {
     return ConstantInt::get(sizeTy(), v);
 }
 
-ConstantInt* LgsCodeGen::i8Zero() {
+ConstantInt* LgsCodeGen::zero8() {
     return builder.getInt8(0);
 }
 
-ConstantInt* LgsCodeGen::i32Zero() {
+ConstantInt* LgsCodeGen::zero32() {
     return builder.getInt32(0);
 }
 
-ConstantInt* LgsCodeGen::i64Zero() {
+ConstantInt* LgsCodeGen::zero64() {
     return builder.getInt64(0);
 }
 
-ConstantInt* LgsCodeGen::sizeZero() {
+ConstantInt* LgsCodeGen::zeroSize() {
     return ConstantInt::get(sizeTy(), 0);
 }
 

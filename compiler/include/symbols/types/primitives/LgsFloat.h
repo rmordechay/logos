@@ -12,9 +12,9 @@ public:
     Type* getIRType(LgsCodeGen& cg) override;
     std::string getName() override;
     LgsExpr* getZeroValue() override;
+    Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee) override;
     size_t sizeBytes() override;
     std::string fmtStr() const override;
-    Value* asIRStr(LgsCodeGen& cg, Value* v) override;
     bool canCastTo(LgsType* other) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     Value* addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;

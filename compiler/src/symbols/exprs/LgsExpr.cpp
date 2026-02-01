@@ -124,26 +124,6 @@ std::optional<std::string> LgsExpr::getConstStr() {
     return std::nullopt;
 }
 
-Value* LgsExpr::moveValue(LgsCodeGen& cg, Value* right) const {
-    const std::vector<Type*> params = {cg.ptrTy(), cg.ptrTy()};
-    if (type->asStr()) {
-        const std::vector args = {IRValue, right};
-        return cg.callRuntimeFunc("moveStr", cg.voidTy(), params, args);
-    }
-    if (type->asObject()) {
-        const std::vector args = {cg.load(cg.ptrTy(), IRValue), right};
-        return cg.callRuntimeFunc("moveObject", cg.voidTy(), params, args);
-    }
-    if (type->asDArray()) {
-        const std::vector args = {cg.load(cg.ptrTy(), IRValue), right};
-        return cg.callRuntimeFunc("moveArr", cg.voidTy(), params, args);
-    }
-    if (type->asMap()) {
-        assert(0);
-    }
-    assert(0);
-}
-
 LgsType* LgsExpr::getType() {
     return type;
 }
@@ -266,7 +246,7 @@ LgsExpr* LgsExpr::clone() {
 
 void castExprImplicitly(LgsExpr*& expr, LgsType* toType) {
     expr->castImplicitly(toType);
-    if (expr->asNullableExpr()) return;
+    if (expr->type->asNullable()) return;
     if (const auto toNullable = toType->asNullable()) {
         if (toNullable->isNull) return;
         expr->setType(toNullable->baseType);

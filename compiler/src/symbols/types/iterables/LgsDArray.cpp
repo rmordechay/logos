@@ -44,7 +44,7 @@ Type* LgsDArray::getIRType(LgsCodeGen& cg) {
 
 Constant* LgsDArray::getRTType(LgsCodeGen& cg) {
     baseType->getRTType(cg);
-    return cg.getRTTypeInfo(getName(), IRSize(cg), rttKind);
+    return cg.getRTTypeInfo(getName(), IRSize(cg), rttKind, isHeapAlloc);
 }
 
 std::string LgsDArray::getBaseName() {
@@ -117,11 +117,7 @@ Value* LgsDArray::getIRElement(LgsCodeGen& cg, Value* iterable, Value* index) {
 
 void LgsDArray::addIRElement(LgsCodeGen& cg, Value* iterable, Value* index, Value* value) {
     if (index) assert(0);
-    auto element = value;
-    if (baseType->isHeapAlloc) {
-        element = cg.moveArrElement(iterable, element, getRTType(cg));
-    }
-    cg.builder.CreateCall(generateAddFunc(cg), {iterable, element});
+    cg.builder.CreateCall(generateAddFunc(cg), {iterable, value});
 }
 
 Function* LgsDArray::generateArrEqFunc(LgsCodeGen& cg) {

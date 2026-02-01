@@ -7,6 +7,7 @@ Value* LgsParam::loadIR(LgsCodeGen& cg) {
 }
 
 void LgsParam::setType(LgsType* newType) {
+    if (type && type != newType) freeType(type);
     type = newType;
 }
 

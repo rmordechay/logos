@@ -26,7 +26,7 @@ LgsExpr* LgsInt::getZeroValue() {
 }
 
 Value* LgsInt::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
-    return cg.i32Zero();
+    return cg.zero32();
 }
 
 bool LgsInt::canCastTo(LgsType* other) {
@@ -149,10 +149,6 @@ Value* LgsInt::lshiftIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
 
 std::string LgsInt::fmtStr() const {
     return "%d";
-}
-
-Value* LgsInt::asIRStr(LgsCodeGen& cg, Value* v) {
-    return cg.callSnprintf(fmtStr(), {v});
 }
 
 std::string LgsInt::getName() {

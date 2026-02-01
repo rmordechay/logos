@@ -91,6 +91,7 @@ public:
     void visitWhileLoop(const LgsWhileLoop* loop);
     void visitVarDec(LgsVarDec* varDec);
     void visitAssignment(const LgsAssignment* assignment);
+    void moveValue(LgsType* type, Value* left, Value* right) const;
     void visitIfStmt(LgsIfStmt* ifStmt);
     void visitSimpleIf(LgsIfStmt* ifStmt);
     void visitIfWithElse(LgsIfStmt* ifStmt);
@@ -113,7 +114,9 @@ public:
     void visitArrayExpr(LgsArrayExpr* arrayExpr);
     void visitStaticArray(LgsArrayExpr* arrayExpr);
     void visitDynamicArray(LgsArrayExpr* arrayExpr);
-    void visitVectorExpr(LgsVectorExpr* vectorExpr);
+    void visitVectorExpr(LgsVectorExpr* vecExpr);
+    void insertVecElement(LgsVectorExpr* vecExpr, Value* element, size_t i) const;
+    void f(Value*& value, Value* element, size_t i);
     void visitMatrixExpr(const LgsMatrixExpr* matrixExpr);
     void visitHashMap(LgsHashMap* hashMap);
     void visitEnvVar(LgsEnvVar* envVar) const;
@@ -137,7 +140,7 @@ public:
     void initMainArgs(const LgsMainFunc* mainFunc) const;
     StructType* getThunkCtxType(const LgsFuncCall* fc) const;
     Value* getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) const;
-    Value* getObjRTT(Type* ty, Value* value) const;
+    Value* getInstanceRTT(Type* ty, Value* value) const;
     Function* getThunkFunc(LgsFuncCall* fc, Type* ctxTy) const;
 
     void createVecField(LgsField* field, Value* parent) const;

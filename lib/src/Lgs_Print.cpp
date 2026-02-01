@@ -7,10 +7,10 @@
 
 #include "LgsConfigs.h"
 
-static std::string formatElement(const Lgs_TypeKind kind, void* type, void* value) {
+static std::string formatElement(const Lgs_TypeInfo* type, void* value) {
     if (!value) return LGS_NULL_LITERAL;
     std::ostringstream str;
-    switch (kind) {
+    switch (type->kind) {
     case RTT_ANY: str << value; break;
     case RTT_BOOL: str << (*static_cast<bool*>(value) ? "true" : "false"); break;
     case RTT_BYTE: str << *static_cast<int8_t*>(value); break;
@@ -41,14 +41,13 @@ static std::string formatElement(const Lgs_TypeKind kind, void* type, void* valu
         for (int i = 0; i < obj->fieldsCount; ++i) {
             const auto fieldName = obj->fields[i].name;
             const auto fieldOffset = obj->fields[i].offset;
-            const auto fieldKind = obj->fields[i].kind;
             const auto fieldType = obj->fields[i].type;
             void* fieldPtr = static_cast<char*>(value) + fieldOffset;
-            if (fieldKind == RTT_OBJECT || fieldKind == RTT_DARRAY || fieldKind == RTT_STR) {
+            if (fieldType->baseType->isHeapAlloc) {
                 fieldPtr = *static_cast<void**>(fieldPtr);
             }
             str << fieldName << '=';
-            str << formatElement(fieldKind, fieldType, fieldPtr);
+            str << formatElement(fieldType, fieldPtr);
             if (i < obj->fieldsCount - 1) str << ", ";
         }
         str << "}";
@@ -57,45 +56,54 @@ static std::string formatElement(const Lgs_TypeKind kind, void* type, void* valu
     case RTT_SET:
     case RTT_DARRAY: {
         const auto dArr = static_cast<Lgs_DArrayExpr*>(value);
-        const auto baseKind = dArr->baseType->kind;
+        if (!dArr->data && dArr->capacity == 0) return LGS_NULL_LITERAL;
         str << "[";
         for (int i = 0; i < dArr->length; ++i) {
             void* element = dArr->data + dArr->baseType->size * i;
-            if (baseKind == RTT_OBJECT || baseKind == RTT_DARRAY || baseKind == RTT_STR) {
+            if (dArr->baseType->isHeapAlloc) {
                 element = *static_cast<void**>(element);
             }
-            str << formatElement(baseKind, dArr->baseType, element);
+            str << formatElement(dArr->baseType, element);
             if (i < dArr->length - 1) str << ", ";
         }
         str << "]";
         break;
     }
     case RTT_SARRAY: {
-        const auto sArr = static_cast<Lgs_SArr*>(type);
-        const auto baseKind = sArr->baseType->kind;
+        const auto sArr = type->sArr;
         str << "[";
+        auto offset = 0;
         for (int i = 0; i < sArr->length; ++i) {
-            void* element = static_cast<char*>(value) + sArr->baseType->size * i;
-            if (baseKind == RTT_OBJECT || baseKind == RTT_DARRAY || baseKind == RTT_STR) {
+            void* element = static_cast<char*>(value) + offset * i;
+            if (sArr->baseType->isHeapAlloc) {
                 element = *static_cast<void**>(element);
             }
-            str << formatElement(baseKind, nullptr, element);
+            str << formatElement(sArr->baseType, element);
             if (i < sArr->length - 1) str << ", ";
+            offset += sArr->baseType->size;
         }
         str << "]";
         break;
     }
-    case RTT_NULLABLE: {
-        const auto nullable = static_cast<Lgs_Nullable*>(type);
-        if (nullable->isPtr) {
-            assert(nullable->baseType);
-            str << formatElement(nullable->baseType->kind, nullable->baseType, *static_cast<void**>(value));
-        } else {
-            const auto isSetPtr = static_cast<char*>(value) + nullable->baseType->size;
-            const auto isSet = *reinterpret_cast<bool*>(isSetPtr);
-            if (isSet) str << formatElement(nullable->baseType->kind, nullable->baseType, value);
-            else str << LGS_NULL_LITERAL;
+    case RTT_VEC: {
+        const auto vec = type->vec;
+        str << "Vec" << std::to_string(vec->length) << "(";
+        auto offset = 0;
+        for (int i = 0; i < vec->length; ++i) {
+            void* element = static_cast<char*>(value) + offset;
+            str << formatElement(vec->baseType, element);
+            if (i < vec->length - 1) str << ", ";
+            offset += vec->baseType->size;
         }
+        str << ")";
+        break;
+    }
+    case RTT_NULLABLE: {
+        const auto baseType = type->baseType;
+        const auto isSetPtr = static_cast<char*>(value) + baseType->size;
+        const auto isSet = *reinterpret_cast<bool*>(isSetPtr);
+        if (isSet) str << formatElement(baseType, value);
+        else str << LGS_NULL_LITERAL;
         break;
     }
     case RTT_MAP: {
@@ -104,17 +112,14 @@ static std::string formatElement(const Lgs_TypeKind kind, void* type, void* valu
         for (int i = 0; i < hashMap->capacity; ++i) {
             const auto entry = hashMap->entries[i];
             if (!entry) continue;
-            str << formatElement(hashMap->type->key->kind, hashMap->type->key, entry->key);
+            str << formatElement(hashMap->type->key, entry->key);
             str << ": ";
-            str << formatElement(hashMap->type->value->kind, hashMap->type->value, entry->value);
+            str << formatElement(hashMap->type->value, entry->value);
             if (i < hashMap->capacity - 1) str << ", ";
         }
         str << '}';
         break;
     }
-    case RTT_VEC2:
-    case RTT_VEC3:
-    case RTT_VEC4:
     case RTT_MATRIX:
     default:
         assert(0);
@@ -122,6 +127,6 @@ static std::string formatElement(const Lgs_TypeKind kind, void* type, void* valu
     return str.str();
 }
 
-extern "C" void Lgs_print(const Lgs_TypeKind kind, void* type, void* v) {
-    printf("%s\n", formatElement(kind, type, v).c_str());
+extern "C" void Lgs_print(const Lgs_TypeInfo* type, void* v) {
+    printf("%s\n", formatElement(type, v).c_str());
 }

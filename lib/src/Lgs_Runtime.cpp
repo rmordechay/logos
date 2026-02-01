@@ -77,16 +77,35 @@ extern "C" void Lgs_Runtime_moveObject(void* left, void* right) {
 }
 
 extern "C" void Lgs_Runtime_moveArr(Lgs_DArrayExpr* leftArr, const Lgs_DArrayExpr* rightArr) {
+    if (!rightArr) {
+        std::memset(leftArr, 0, sizeof(Lgs_DArrayExpr));
+        return;
+    }
+    // Left is null
+    if (!leftArr->data) {
+        leftArr->level = rightArr->level;
+        leftArr->baseType = rightArr->baseType;
+        leftArr->data = rightArr->data;
+        leftArr->length = rightArr->length;
+        leftArr->capacity = rightArr->capacity;
+        return;
+    }
+
     const auto leftLevel = leftArr->level;
     const auto rightLevel = rightArr->level;
     assert(leftLevel <= runtime.level && rightLevel <= runtime.level);
-    if (leftLevel >= rightLevel) return;
-    auto& allocator = runtime.stack.at(leftArr->level).allocator;
-    const auto size = rightArr->baseType->size * rightArr->capacity;
-    leftArr->length = rightArr->length;
-    leftArr->capacity = rightArr->capacity;
-    leftArr->data = static_cast<char*>(allocator.allocate(size, false));
-    std::memcpy(leftArr->data, rightArr->data, size);
+    if (leftLevel >= rightLevel) {
+        leftArr->data = rightArr->data;
+        leftArr->length = rightArr->length;
+        leftArr->capacity = rightArr->capacity;
+    } else {
+        auto& allocator = runtime.stack.at(leftArr->level).allocator;
+        const auto size = rightArr->baseType->size * rightArr->capacity;
+        leftArr->length = rightArr->length;
+        leftArr->capacity = rightArr->capacity;
+        leftArr->data = static_cast<char*>(allocator.allocate(size, false));
+        std::memcpy(leftArr->data, rightArr->data, size);
+    }
 }
 
 extern "C" void* Lgs_Runtime_moveArrElement(const Lgs_DArrayExpr* arr, void* element) {
@@ -142,6 +161,7 @@ extern "C" void Lgs_Runtime_moveValue(const Lgs_TypeKind kind, const size_t leve
         Lgs_Runtime_moveArr(leftArr, rightArr);
         break;
     }
+    case RTT_NULLABLE:
     case RTT_MAP: {
         assert(0);
     }

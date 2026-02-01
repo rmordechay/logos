@@ -4,7 +4,7 @@
 
 class LgsSArray final : public LgsIterable {
 public:
-    static constexpr auto name = "SArray";
+    static constexpr auto name = "SArr";
     LgsExpr* lengthExpr = nullptr;
     size_t len = 0;
 

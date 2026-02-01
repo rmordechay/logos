@@ -11,16 +11,18 @@ public:
     explicit LgsVec(const size_t dim, LgsType* baseType = &LGS_FLOAT) : LgsIterable(baseType), dimVec(dim) {
         assert(dim > 1 && dim <= 4);
         isStatic = true;
+        rttKind = RTT_VEC;
     }
     LgsField* getField(const std::string& fieldName) override;
     Type* getIRType(LgsCodeGen& cg) override;
-    Constant* getRTType(LgsCodeGen& cg) override;
     std::string getBaseName() override;
     std::string getName() override;
     std::string pname() override;
     size_t sizeBytes() override;
     bool equals(LgsType* other) override;
     LgsExpr* getZeroValue() override;
+    Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee) override;
+    Constant* getRTType(LgsCodeGen& cg) override;
     bool canCastTo(LgsType* other) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     bool inferBaseType(std::vector<LgsExpr*>& args) override;
@@ -38,7 +40,6 @@ public:
     static size_t getSwizzleSet(char c);
     static size_t getComponentIndex(char c);
     std::string fmtStr() const override;
-    Value* asIRStr(LgsCodeGen& cg, Value* v) override;
     DIType* getDebugType(LgsCodeGen& cg) override;
 };
 

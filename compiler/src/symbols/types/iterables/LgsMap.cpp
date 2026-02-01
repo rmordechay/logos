@@ -146,7 +146,7 @@ Value* LgsMap::getIRElement(LgsCodeGen& cg, Value* map, Value* index) {
 }
 
 void LgsMap::addIRElement(LgsCodeGen& cg, Value* map, Value* index, Value* value) {
-    cg.builder.CreateCall(generateAddFunc(cg), {map, index, value, cg.sizeZero()});
+    cg.builder.CreateCall(generateAddFunc(cg), {map, index, value, cg.zeroSize()});
 }
 
 Value* LgsMap::getEntryKey(LgsCodeGen& cg, Value* entry) const {

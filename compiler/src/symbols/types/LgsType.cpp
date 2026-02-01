@@ -119,8 +119,8 @@ Value* LgsType::hashValue(LgsCodeGen& cg, Value* value) {
     assert(0);
 }
 
-Value* LgsType::asIRStr(LgsCodeGen& cg, Value* v) {
-    assert(0);
+Constant* LgsType::getRTType(LgsCodeGen& cg) {
+    return cg.getRTTypeInfo(getName(), IRSize(cg), rttKind, isHeapAlloc);
 }
 
 LgsType* LgsType::applyBinOp(LgsType* rightType, LgsBinOp& op) {
@@ -374,7 +374,7 @@ Value* neIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
     assert(0);
 }
 
-Value* ltIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
+Value* ltIR(LgsCodeGen& cg, Value* left, Value* right, const LgsType* type) {
     if (type->isUnsinged) {
         return cg.builder.CreateICmpULT(left, right);
     }

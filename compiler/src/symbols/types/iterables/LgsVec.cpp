@@ -22,21 +22,12 @@ LgsField* LgsVec::getField(const std::string& fieldName) {
         field = new LgsField(fieldName, new LgsVec(newFieldDim));
     }
     fields.push_back(field);
+    field->parentType = this;
     return field;
 }
 
 Type* LgsVec::getIRType(LgsCodeGen& cg) {
     return FixedVectorType::get(baseType->getIRType(cg), dimVec);
-}
-
-Constant* LgsVec::getRTType(LgsCodeGen& cg) {
-    if (dimVec == 2) {
-        return cg.getRTTypeInfo(getName(), IRSize(cg), rttKind);
-    }
-    if (dimVec == 3) {
-        return cg.getRTTypeInfo(getName(), IRSize(cg), rttKind);
-    }
-    return cg.getRTTypeInfo(getName(), IRSize(cg), rttKind);
 }
 
 std::string LgsVec::getBaseName() {
@@ -70,6 +61,21 @@ bool LgsVec::equals(LgsType* other) {
 
 LgsExpr* LgsVec::getZeroValue() {
     return new LgsVectorExpr(this);
+}
+
+Value* LgsVec::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
+    return Constant::getNullValue(getIRType(cg));
+}
+
+Constant* LgsVec::getRTType(LgsCodeGen& cg) {
+    const auto RTTName = getName();
+    const auto prefixedName = LGS_TYPEINFO_PREFIX + RTTName;
+    if (const auto v = cg.IRModule->getGlobalVariable(prefixedName)) return v;
+    if (cg.mode != CG_MODE_RTTYPES) return cg.getRTTypeInfo(RTTName, IRSize(cg), rttKind, isHeapAlloc, nullptr);
+    const auto st = cg.getStructType({cg.sizeTy(), cg.ptrTy()});
+    const std::vector<Constant*> args = {cg.usize(dimVec), baseType->getRTType(cg)};
+    const auto gv = cg.createGlobal(prefixedName + "_extra", st, ConstantStruct::get(st, args));
+    return cg.getRTTypeInfo(RTTName, IRSize(cg), rttKind, isHeapAlloc, gv);
 }
 
 bool LgsVec::canCastTo(LgsType* other) {
@@ -126,6 +132,7 @@ LgsType* LgsVec::applyBinOp(LgsType* rightType, LgsBinOp& op) {
 }
 
 bool LgsVec::inferBaseType(std::vector<LgsExpr*>& args) {
+    if (args.empty()) return baseType;
     std::vector<LgsType*> types;
     for (const auto arg : args) types.push_back(arg->type);
     baseType = getBiggestIntType(types);
@@ -138,8 +145,10 @@ Value* LgsVec::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto rtype = right->type;
     const auto isScalar = rtype->isScalar();
     if (baseType->isFloat) {
-        auto [l, r] = loadNumberPair(cg, left->loadIR(cg), right->loadIR(cg), cg.floatTy());
-        if (isScalar) r = cg.builder.CreateVectorSplat(dimVec, r);
+        auto [l, r] = loadNumberPair(cg, left->IRValue, right->IRValue, cg.floatTy());
+        if (isScalar) {
+            r = cg.builder.CreateVectorSplat(dimVec, r);
+        }
         return cg.builder.CreateFAdd(l, r);
     }
     const auto l = left->loadIR(cg);
@@ -240,7 +249,7 @@ Value* LgsVec::getIRElement(LgsCodeGen& cg, Value* iterable, Value* index) {
 }
 
 void LgsVec::addIRElement(LgsCodeGen& cg, Value* iterable, Value* index, Value* value) {
-    const auto gep = cg.builder.CreateGEP(getIRType(cg), iterable, {cg.i32Zero(), index});
+    const auto gep = cg.builder.CreateGEP(getIRType(cg), iterable, {cg.zero32(), index});
     cg.store(value, gep);
 }
 
@@ -307,15 +316,6 @@ std::string LgsVec::fmtStr() const {
     }
     str << '>';
     return str.str();
-}
-
-Value* LgsVec::asIRStr(LgsCodeGen& cg, Value* v) {
-    std::vector<Value*> vecArgs;
-    for (size_t i = 0; i < dimVec; ++i) {
-        const auto element = cg.builder.CreateExtractValue(v, i);
-        vecArgs.push_back(element);
-    }
-    return cg.callSnprintf(fmtStr(), vecArgs);
 }
 
 DIType* LgsVec::getDebugType(LgsCodeGen& cg) {

@@ -360,7 +360,6 @@ void LgsSema::visitVarDec(LgsVarDec* varDec) {
             castExprImplicitly(varDec->expr, varDec->type);
             visitExpr(varDec->expr);
             validateExprType(varDec->expr, varDec->type);
-            if (varDec->type != varDec->expr->type) freeType(varDec->expr->type);
             varDec->expr->setType(varDec->type);
         } else {
             varDec->expr = varDec->type->getZeroValue();
@@ -376,8 +375,8 @@ void LgsSema::visitVarDec(LgsVarDec* varDec) {
 }
 
 void LgsSema::visitAssignment(LgsAssignment* assignment) {
-    auto& l = assignment->left;
-    const auto r = assignment->right;
+    const auto l = assignment->left;
+    auto& r = assignment->right;
     visitExpr(r);
     if (const auto iterIndex = l->asIterIndex()) {
         visitIterIndex(iterIndex);
@@ -391,7 +390,7 @@ void LgsSema::visitAssignment(LgsAssignment* assignment) {
         assert(0);
     }
 
-    castExprImplicitly(l, r->type);
+    castExprImplicitly(r, l->type);
     if (!validateExprType(r, l->type)) return;
 
     if (l->asIterIndex()) return;
@@ -850,9 +849,6 @@ void LgsSema::visitStaticArray(const LgsArrayExpr* arrayExpr) {
     } else {
         sArr->len = size.value();
     }
-    for (const auto element : arrayExpr->elements) {
-        visitExpr(element);
-    }
 }
 
 void LgsSema::visitDynamicArray(LgsArrayExpr* arrayExpr) {
@@ -900,14 +896,7 @@ void LgsSema::visitVectorExpr(LgsVectorExpr* vectorExpr) {
         return addError(E10095, vectorExpr->location);
     }
     if (sumDim > vectorExpr->vecType->dimVec) {
-        addError(E10074, vectorExpr->location, {vec->pname(), std::to_string(sumDim)});
-    }
-    for (size_t i = 0; i < vectorExpr->elements.size(); ++i) {
-        auto& arg = vectorExpr->elements[i];
-        if (arg->type->equals(vec->baseType)) continue;
-        const auto castArg = arg->castExplicitly(vec->baseType);
-        if (castArg != arg) freeExpr(arg);
-        arg = castArg;
+        addError(E10074, vectorExpr->location, {vec->pname()});
     }
 }
 

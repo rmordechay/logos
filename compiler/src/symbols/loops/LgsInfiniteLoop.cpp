@@ -8,7 +8,7 @@ void LgsInfiniteLoop::incAndJumpToCond(LgsCodeGen& cg) {
 }
 
 Value* LgsInfiniteLoop::loopStart(LgsCodeGen& cg) {
-    return cg.i32Zero();
+    return cg.zero32();
 }
 
 Value* LgsInfiniteLoop::loopEnd(LgsCodeGen& cg) {

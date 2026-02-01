@@ -29,7 +29,6 @@ public:
     Value* hashValue(LgsCodeGen& cg, Value* value) override;
     Value* getStrPtr(LgsCodeGen& cg, Value* value);
     std::string fmtStr() const override;
-    Value* asIRStr(LgsCodeGen& cg, Value* v) override;
     DIType* getDebugType(LgsCodeGen& cg) override;
 };
 
