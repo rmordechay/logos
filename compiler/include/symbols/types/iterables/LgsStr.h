@@ -19,7 +19,6 @@ public:
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
     Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee) override;
-    Constant* getRTType(LgsCodeGen& cg) override;
     bool canCastTo(LgsType* other) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     Value* getIRElement(LgsCodeGen& cg, Value* iterable, Value* index) override;

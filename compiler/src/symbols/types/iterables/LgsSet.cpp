@@ -11,8 +11,7 @@ Type* LgsSet::getIRType(LgsCodeGen& cg) {
 }
 
 Constant* LgsSet::getRTType(LgsCodeGen& cg) {
-    const auto setName = getName();
-    return cg.getRTTypeInfo(setName, IRSize(cg), RTT_SET);
+    assert(0);
 }
 
 size_t LgsSet::sizeBytes() {

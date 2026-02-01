@@ -49,10 +49,6 @@ Type* LgsEnum::getIRType(LgsCodeGen& cg) {
     return cg.sizeTy();
 }
 
-Constant* LgsEnum::getRTType(LgsCodeGen& cg) {
-    return cg.getRTTypeInfo(getName(), IRSize(cg), rttKind);
-}
-
 std::string LgsEnum::getName() {
     return name;
 }

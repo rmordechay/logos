@@ -123,10 +123,6 @@ Value* LgsType::asIRStr(LgsCodeGen& cg, Value* v) {
     assert(0);
 }
 
-Constant* LgsType::getRTType(LgsCodeGen& cg) {
-    return cg.getRTTypeInfo(getName(), IRSize(cg), rttKind);
-}
-
 LgsType* LgsType::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     assert(0);
 }

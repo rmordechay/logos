@@ -23,7 +23,6 @@ public:
     bool canCastTo(LgsType* other) override;
     bool inferBaseType(std::vector<LgsExpr*>& args) override;
     Type* getIRType(LgsCodeGen& cg) override;
-    Constant* getRTType(LgsCodeGen& cg) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     LgsType* applyMatScalarOp(LgsType* number, const LgsBinOp& op) const;
     LgsType* applyMatVecOp(const LgsVec* vec, const LgsBinOp& op) const;

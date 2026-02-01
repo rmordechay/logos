@@ -111,11 +111,6 @@ std::string LgsMatrix::getBaseName() {
     return name;
 }
 
-Constant* LgsMatrix::getRTType(LgsCodeGen& cg) {
-    const auto matName = getName();
-    return cg.getRTTypeInfo(matName, IRSize(cg), RTT_MATRIX);
-}
-
 std::string LgsMatrix::getName() {
     return "Mat" + std::to_string(rows) + "x" + std::to_string(columns);
 }
