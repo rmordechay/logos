@@ -26,7 +26,7 @@ inline LgsBaseMsg E10011{"%s is already declared.", errCodeStart++};
 inline LgsBaseMsg E10012{"null cannot have '?' suffix.", errCodeStart++};
 inline LgsBaseMsg E10013{"Field %s is with function type. Declare it as a standard function instead.", errCodeStart++};
 inline LgsBaseMsg E10014{"Expression of type %s does not match base type %s", errCodeStart++};
-inline LgsBaseMsg E10015{"Function %s was found but it doesnt match the parameters.\nGiven:\t  %s\nExpected:  %s", errCodeStart++};
+inline LgsBaseMsg E10015{"Function with name '%s' was found but it doesnt match the parameters.\nGiven:\t  %s\nExpected:  %s", errCodeStart++};
 inline LgsBaseMsg E10016{"Object %s does not fully implement %s.\n%s", errCodeStart++};
 inline LgsBaseMsg E10017{"break must be inside a for loop.", errCodeStart++};
 inline LgsBaseMsg E10018{"%s cannot cast to type %s", errCodeStart++};
@@ -45,7 +45,7 @@ inline LgsBaseMsg E10030{"Non-public field %s is used outside its parent object 
 inline LgsBaseMsg E10031{"Non-public method %s is used outside its parent object %s", errCodeStart++};
 inline LgsBaseMsg E10032{"Singleton object %s cannot be instantiated.", errCodeStart++};
 inline LgsBaseMsg E10033{"Type name must start with an uppercase letter.", errCodeStart++};
-inline LgsBaseMsg E10034{"%s has a method with name %s but it doesnt match the parameters.\nGiven:\t  %s\nExpected:  %s", errCodeStart++};
+inline LgsBaseMsg E10034{"", errCodeStart++};
 inline LgsBaseMsg E10035{"Index of %s has %s level which is too deep. Max level: %s", errCodeStart++};
 inline LgsBaseMsg E10036{"%s cannot be indexed with type %s", errCodeStart++};
 inline LgsBaseMsg E10037{"Left index of slice must be less or equal than the right index.", errCodeStart++};

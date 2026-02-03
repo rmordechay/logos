@@ -979,18 +979,19 @@ void LgsSema::visitSelection(LgsSelection* selection) {
 void LgsSema::visitInnerSelections(const LgsSelection* selection) {
     const auto& exprs = selection->exprs;
     for (size_t i = 0; i < exprs.size() - 1; ++i) {
-        const auto parentExpr = exprs[i];
-        const auto& childExpr = exprs[i + 1];
-        if (const auto var = childExpr->asVariable()) {
-            visitFieldSelection(var, parentExpr->type);
-        } else if (const auto methodCall = childExpr->asFuncCall()) {
-            visitMethodCall(methodCall, parentExpr);
-        } else if (const auto iterIndex = childExpr->asIterIndex()) {
-            visitIterIndexSelection(iterIndex, parentExpr->type);
+        const auto parent = exprs[i];
+        const auto& child = exprs[i + 1];
+        if (const auto var = child->asVariable()) {
+            visitFieldSelection(var, parent->type);
+        } else if (const auto methodCall = child->asFuncCall()) {
+            visitMethodCall(methodCall, parent);
+        } else if (const auto iterIndex = child->asIterIndex()) {
+            visitIterIndexSelection(iterIndex, parent->type);
         } else {
             assert(0);
         }
-        if (!childExpr->type || childExpr->type->isUnknown()) return;
+        addGenerics(parent->type);
+        if (!child->type || child->type->isUnknown()) return;
     }
 }
 
@@ -1056,7 +1057,7 @@ void LgsSema::visitMetaSelection(LgsMetaSelection* metaSelection) {
         methodCall->func = method;
         methodCall->setType(method->funcType->rt);
     } else {
-        addError(E10034, methodCall->location, {obj->name, methodCall->name, methodCall->asText(), method->asText()});
+        addError(E10015, methodCall->location, {methodCall->name, methodCall->asText(), method->asText()});
     }
     methodCall->args.insert(methodCall->args.begin(), LgsFuncArg(metaSelection->baseExpr, LGS_SELF, true));
     metaSelection->setType(methodCall->type);
@@ -1070,14 +1071,16 @@ void LgsSema::visitFuncCall(LgsFuncCall* funcCall) {
 
     if (!visitFuncArgs(funcCall, ft)) return;
     if (!funcCall->equals(ft)) {
-        addErrorIfSuccessful(E10015, funcCall->location, {funcCall->name, funcCall->asText(), ft->pname()});
+        addError(E10015, funcCall->location, {funcCall->name, funcCall->asText(), ft->pname()});
         return;
     }
+
     if (symbol->symbolType != FUNC) {
         funcCall->ref = *symbol;
         funcCall->setType(ft->rt);
         return;
     }
+
     if (symbol->func->funcType->genericTypes.empty()) {
         funcCall->func = symbol->func;
     } else {
@@ -1093,6 +1096,7 @@ void LgsSema::visitFuncCall(LgsFuncCall* funcCall) {
             funcs[genericName] = funcCall->func;
         }
     }
+
     funcCall->setType(funcCall->func->funcType->rt);
 }
 
@@ -1111,7 +1115,7 @@ void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent) {
 
     if (!visitFuncArgs(methodCall, method->funcType)) return;
     if (!methodCall->equals(method->funcType)) {
-        addErrorIfSuccessful(E10034, methodCall->location, {parent->type->pname(), name, methodCall->asText(), method->asText()});
+        addError(E10015, methodCall->location, {name, methodCall->asText(), method->asText()});
         return;
     }
 
@@ -1662,11 +1666,6 @@ void LgsSema::addError(const LgsBaseMsg& lgsErr, const LgsLocation& location, co
     errHandler.addError(lgsErr, &location, file->path, args);
 }
 
-void LgsSema::addErrorIfSuccessful(const LgsBaseMsg& lgsErr, const LgsLocation& location, const std::vector<std::string>& args) {
-    if (!errHandler.successful) return;
-    errHandler.addError(lgsErr, &location, file->path, args);
-}
-
 void LgsSema::addRTType(LgsType* type) const {
     if (!errHandler.successful || !type) return;
     if (type->isExternal || type->isVoid() || type->hasGenericTypes()) return;
@@ -1684,7 +1683,9 @@ void LgsSema::addRTType(LgsType* type) const {
 }
 
 void LgsSema::addGenerics(LgsType* type) const {
-    if (!type->hasGenericTypes() && !type->asDArray() && !type->asMap()) return;
+    for (const auto genericsType : file->symbolTable.genericsTypes) {
+        if (genericsType->equals(type)) return;
+    }
     file->symbolTable.genericsTypes.push_back(type);
 }
 

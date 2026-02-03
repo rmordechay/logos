@@ -23,20 +23,20 @@
 
 void LgsCodeGen::setupModule(const fs::path& file, const bool debugMode) {
     IRModule = new Module(file.stem().string(), context);
-    IRModule->setTargetTriple(llvm::sys::getDefaultTargetTriple());
+    IRModule->setTargetTriple(sys::getDefaultTargetTriple());
     IRModule->setDataLayout(targetMachine->createDataLayout());
     if (debugMode && mode == CG_MODE_RTTYPES) {
         debugger.diBuilder = new DIBuilder(*IRModule);
         debugger.diFile = debugger.diBuilder->createFile(fs::canonical(file).string(), "");
-        debugger.compileUnit = debugger.diBuilder->createCompileUnit(llvm::dwarf::DW_LANG_C, debugger.diFile, "Logos", false, "", 0);
+        debugger.compileUnit = debugger.diBuilder->createCompileUnit(dwarf::DW_LANG_C, debugger.diFile, "Logos", false, "", 0);
         IRModule->addModuleFlag(Module::Warning, "Dwarf Version", 5);
-        IRModule->addModuleFlag(Module::Warning, "Debug Info Version", llvm::DEBUG_METADATA_VERSION);
+        IRModule->addModuleFlag(Module::Warning, "Debug Info Version", DEBUG_METADATA_VERSION);
     }
 }
 
 bool LgsCodeGen::writeIRModule(const LgsPaths& paths, uint8_t optLevel) const {
-    if (verifyModule(*IRModule, &llvm::errs())) {
-        IRModule->print(llvm::outs(), nullptr);
+    if (verifyModule(*IRModule, &errs())) {
+        IRModule->print(outs(), nullptr);
         return false;
     }
     // Write IR to file
@@ -45,16 +45,16 @@ bool LgsCodeGen::writeIRModule(const LgsPaths& paths, uint8_t optLevel) const {
         const auto filePath = (paths.buildDirIR / moduleName).string() + ".ll";
         if (fs::exists(filePath)) fs::remove(filePath);
         std::error_code EC;
-        raw_fd_ostream textFile(filePath, EC, llvm::sys::fs::OF_None);
+        raw_fd_ostream textFile(filePath, EC, sys::fs::OF_None);
         IRModule->print(textFile, nullptr);
     }
 
     // Run pass
-    llvm::PassBuilder passBuilder(targetMachine);
-    llvm::LoopAnalysisManager loopAnalyser;
-    llvm::FunctionAnalysisManager funcAnalyser;
-    llvm::CGSCCAnalysisManager CGAnalyser;
-    llvm::ModuleAnalysisManager analysisManager;
+    PassBuilder passBuilder(targetMachine);
+    LoopAnalysisManager loopAnalyser;
+    FunctionAnalysisManager funcAnalyser;
+    CGSCCAnalysisManager CGAnalyser;
+    ModuleAnalysisManager analysisManager;
     passBuilder.registerModuleAnalyses(analysisManager);
     passBuilder.registerFunctionAnalyses(funcAnalyser);
     passBuilder.registerLoopAnalyses(loopAnalyser);
@@ -68,14 +68,14 @@ bool LgsCodeGen::writeIRModule(const LgsPaths& paths, uint8_t optLevel) const {
     std::error_code ec;
     const std::string outputPath = paths.buildDirObjs / (moduleName + ".o");
     if (fs::exists(outputPath)) fs::remove(outputPath);
-    raw_fd_ostream bitcodeStream(outputPath + ".bc", ec, llvm::sys::fs::OF_None);
+    raw_fd_ostream bitcodeStream(outputPath + ".bc", ec, sys::fs::OF_None);
     assert(!ec);
-    llvm::WriteBitcodeToFile(*IRModule, bitcodeStream);
+    WriteBitcodeToFile(*IRModule, bitcodeStream);
     bitcodeStream.flush();
     bitcodeStream.close();
     // Create object
     char cmd[1024*4];
-    const auto triple = llvm::sys::getDefaultTargetTriple();
+    const auto triple = sys::getDefaultTargetTriple();
     std::snprintf(
         cmd,
         sizeof(cmd),
@@ -92,15 +92,15 @@ bool LgsCodeGen::writeIRModule(const LgsPaths& paths, uint8_t optLevel) const {
 Constant* LgsCodeGen::getString(const std::string& value) {
     for (auto& globals : IRModule->globals()) {
         if (!globals.hasInitializer()) continue;
-        const auto dataArray = llvm::dyn_cast<llvm::ConstantDataArray>(globals.getInitializer());
+        const auto dataArray = llvm::dyn_cast<ConstantDataArray>(globals.getInitializer());
         if (!dataArray || !dataArray->isCString() || dataArray->getAsCString() != value) continue;
         return &globals;
     }
-    const auto strConstant = llvm::ConstantDataArray::getString(context, value, true);
+    const auto strConstant = ConstantDataArray::getString(context, value, true);
     return new GlobalVariable(*IRModule, strConstant->getType(), true, GlobalValue::PrivateLinkage, strConstant);
 }
 
-llvm::AllocaInst* LgsCodeGen::emptyBuffer() {
+AllocaInst* LgsCodeGen::emptyBuffer() {
     return builder.CreateAlloca(ArrayType::get(i8Ty(), LGS_STR_BUFFER_SIZE));
 }
 
@@ -324,8 +324,8 @@ Value* LgsCodeGen::callFunc(const std::string& funcName, Type* rt, const std::ve
     return builder.CreateCall(func, args);
 }
 
-Value* LgsCodeGen::callIntrinsics(const llvm::Intrinsic::ID intrinsicID, const std::vector<Type*>& types, const std::vector<Value*>& args) {
-    const auto declaration = llvm::Intrinsic::getDeclaration(IRModule, intrinsicID, types);
+Value* LgsCodeGen::callIntrinsics(const Intrinsic::ID intrinsicID, const std::vector<Type*>& types, const std::vector<Value*>& args) {
+    const auto declaration = Intrinsic::getDeclaration(IRModule, intrinsicID, types);
     return builder.CreateCall(declaration, args);
 }
 
@@ -337,7 +337,7 @@ Value* LgsCodeGen::callLgsFunc(const std::string& baseName, const std::string& f
 Value* LgsCodeGen::callRuntimeFunc(const std::string& funcName, Type* rt, const std::vector<Type*>& paramTypes, const std::vector<Value*>& args, const bool isVariadic) {
     if (debugger.diBuilder) {
         const auto savedDbg = builder.getCurrentDebugLocation();
-        builder.SetCurrentDebugLocation(llvm::DebugLoc());
+        builder.SetCurrentDebugLocation(DebugLoc());
         const auto v = callFunc(LGS_PREFIX"Runtime_" + funcName, rt, paramTypes, args, isVariadic);
         builder.SetCurrentDebugLocation(savedDbg);
         return v;
@@ -372,11 +372,11 @@ Value* LgsCodeGen::strsNotEqual(Value* str1, Value* str2) {
 }
 
 void LgsCodeGen::callMemset(Value* dest, Value* src, Value* size) {
-    builder.CreateMemSet(dest, src, size, llvm::MaybeAlign());
+    builder.CreateMemSet(dest, src, size, MaybeAlign());
 }
 
 void LgsCodeGen::callMemcpy(Value* dest, Value* src, Value* size) {
-    builder.CreateMemCpy(dest, llvm::MaybeAlign(), src, llvm::MaybeAlign(), size);
+    builder.CreateMemCpy(dest, MaybeAlign(), src, MaybeAlign(), size);
 }
 
 GlobalVariable* LgsCodeGen::getRTTypeInfo(const std::string& name, ConstantInt* size, const int32_t kind, const bool isHeapAlloc, Constant* extra) {
@@ -384,7 +384,7 @@ GlobalVariable* LgsCodeGen::getRTTypeInfo(const std::string& name, ConstantInt* 
     const auto baseStruct = getRTTStruct();
     const auto prefixedName = LGS_TYPEINFO_PREFIX + name;
     if (mode == CG_MODE_RTTYPES) {
-        const auto initializer = llvm::ConstantStruct::get(baseStruct, {size, i32(kind), i1(isHeapAlloc), extra ? extra : null()});
+        const auto initializer = ConstantStruct::get(baseStruct, {size, i32(kind), i1(isHeapAlloc), extra ? extra : null()});
         return createGlobal(prefixedName, baseStruct, initializer);
     }
     return createGlobal(prefixedName, baseStruct, nullptr);
@@ -436,13 +436,13 @@ void LgsCodeGen::finalizeDebugger(const fs::path& buildPath) const {
     if (!debugger.diBuilder) return;
     debugger.diBuilder->finalize();
     std::error_code EC;
-    raw_fd_ostream file((buildPath / "logosdbg.bc").string(), EC, llvm::sys::fs::OF_None);
+    raw_fd_ostream file((buildPath / "logosdbg.bc").string(), EC, sys::fs::OF_None);
     WriteBitcodeToFile(*IRModule, file);
     file.flush();
 }
 
-llvm::DILocation* LgsCodeGen::getDebugLoc(const LgsLocation& location) {
-    return llvm::DILocation::get(
+DILocation* LgsCodeGen::getDebugLoc(const LgsLocation& location) {
+    return DILocation::get(
         context,
         location.lineStart + 1,
         location.columnStart,
@@ -452,21 +452,21 @@ llvm::DILocation* LgsCodeGen::getDebugLoc(const LgsLocation& location) {
 }
 
 void LgsCodeGen::initLLVM() {
-    llvm::InitializeNativeTarget();
-    llvm::InitializeNativeTargetAsmPrinter();
-    llvm::InitializeNativeTargetAsmParser();
+    InitializeNativeTarget();
+    InitializeNativeTargetAsmPrinter();
+    InitializeNativeTargetAsmParser();
 
     std::string error;
-    const auto targetTriple = llvm:: sys::getDefaultTargetTriple();
-    const auto target = llvm::TargetRegistry::lookupTarget(targetTriple, error);
-    targetMachine = target->createTargetMachine(targetTriple, "generic", "", llvm::TargetOptions(), std::nullopt);
+    const auto targetTriple = sys::getDefaultTargetTriple();
+    const auto target = TargetRegistry::lookupTarget(targetTriple, error);
+    targetMachine = target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), std::nullopt);
 }
 
-llvm::OptimizationLevel LgsCodeGen::getOptLevel(const uint8_t optLevel) {
-    if (optLevel == 0) return llvm::OptimizationLevel::O0;
-    if (optLevel == 1) return llvm::OptimizationLevel::O1;
-    if (optLevel == 2) return llvm::OptimizationLevel::O2;
-    if (optLevel == 3) return llvm::OptimizationLevel::O3;
+OptimizationLevel LgsCodeGen::getOptLevel(const uint8_t optLevel) {
+    if (optLevel == 0) return OptimizationLevel::O0;
+    if (optLevel == 1) return OptimizationLevel::O1;
+    if (optLevel == 2) return OptimizationLevel::O2;
+    if (optLevel == 3) return OptimizationLevel::O3;
     assert(0);
 }
 
@@ -511,7 +511,7 @@ PointerType* LgsCodeGen::ptrTy() {
 }
 
 Constant* LgsCodeGen::null() {
-    return llvm::ConstantPointerNull::get(ptrTy());
+    return ConstantPointerNull::get(ptrTy());
 }
 
 ConstantInt* LgsCodeGen::true_() {
@@ -567,11 +567,11 @@ Value* LgsCodeGen::extendToSize(Value* v) {
 }
 
 Constant* LgsCodeGen::floatv(const float_t v) {
-    return llvm::ConstantFP::get(floatTy(), v);
+    return ConstantFP::get(floatTy(), v);
 }
 
 Constant* LgsCodeGen::doublev(const double_t v) {
-    return llvm::ConstantFP::get(doubleTy(), v);
+    return ConstantFP::get(doubleTy(), v);
 }
 
 Constant* LgsCodeGen::emptyStr() {

@@ -150,7 +150,6 @@ public:
     LgsSymbol* getSymbol(const std::string& name);
     void createCoroutineFunc(LgsFuncCall* funcCall);
     void addError(const LgsBaseMsg& lgsErr, const LgsLocation& location, const std::vector<std::string>& args = {});
-    void addErrorIfSuccessful(const LgsBaseMsg& lgsErr, const LgsLocation& location, const std::vector<std::string>& args);
     void addRTType(LgsType* type) const;
     void addGenerics(LgsType* type) const;
 };

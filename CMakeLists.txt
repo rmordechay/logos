@@ -33,7 +33,7 @@ set(COMPILER_SOURCE
     ${CMAKE_SOURCE_DIR}/compiler/src/logos/LgsPkgManager.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/codegen/LgsLinker.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/codegen/LgsCodeGen.cpp
-    ${CMAKE_SOURCE_DIR}/compiler/src/codegen/LgsCgModule.cpp
+    ${CMAKE_SOURCE_DIR}/compiler/src/codegen/LgsCgFile.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/analysis/LgsSema.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/analysis/LgsTypeResolver.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/tools/LgsLinter.cpp
@@ -155,6 +155,7 @@ set(COMPILER_SOURCE
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsByte.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsVoid.cpp
     shared/include/LgsRTTIndices.h
+    compiler/src/files/LgsFile.cpp
 )
 
 set(LGS_LIB_SOURCE

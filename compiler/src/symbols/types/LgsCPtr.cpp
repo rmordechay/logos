@@ -1,6 +1,6 @@
 #include "types/LgsCPtr.h"
 
-#include "codegen/LgsCgModule.h"
+#include "codegen/LgsCgFile.h"
 #include "types/LgsAny.h"
 #include "types/iterables/LgsDArray.h"
 #include "types/iterables/LgsSArray.h"

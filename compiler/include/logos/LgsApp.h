@@ -1,6 +1,7 @@
 #pragma once
 #include "LgsAppCache.h"
 #include "LgsAppConfigs.h"
+#include "LgsDefinitions.h"
 #include "LgsPaths.h"
 
 class LgsAppConfigFile;
@@ -24,19 +25,18 @@ public:
     LgsAppCache appCache;
     LgsSymbolTable globals;
     LgsErrHandler errHandler;
-    LgsCodeGen rttTypeModule;
     std::vector<LgsFile*> srcFiles;
     std::vector<LgsFile*> genericFiles;
     std::vector<LgsEnvFile*> envFiles;
     std::vector<LgsTestFile*> testFiles;
     LgsAppConfigFile* appConfigFile = nullptr;
     std::unordered_map<std::string, std::string> lgsCode; // Used when passing code directly.
+    LgsFile rttFile{"rtt", CG_MODE_RTTYPES};
     LgsPaths paths;
 
     explicit LgsApp(const fs::path& rootPath = "") {
         paths.rootPath = rootPath;
     }
-
     bool compile();
     bool setup();
     bool parse();

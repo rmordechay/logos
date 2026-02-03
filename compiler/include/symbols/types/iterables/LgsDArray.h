@@ -24,6 +24,7 @@ public:
     std::string getName() override;
     std::string pname() override;
     size_t sizeBytes() override;
+    std::string fmtStr() const override;
     bool canCastTo(LgsType* other) override;
     LgsExpr* getZeroValue() override;
     Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee) override;
@@ -32,9 +33,8 @@ public:
     Value* inIR(LgsCodeGen& cg, Value* iterable, Value* value) override;
     Value* getIRElement(LgsCodeGen& cg, Value* iterable, Value* index) override;
     void addIRElement(LgsCodeGen& cg, Value* iterable, Value* index, Value* value) override;
-    Function* generateArrEqFunc(LgsCodeGen& cg);
-    Function* generateContainsFunc(LgsCodeGen& cg);
     Function* generateAddFunc(LgsCodeGen& cg);
-    std::string fmtStr() const override;
+    Function* generateContainsFunc(LgsCodeGen& cg);
+    Function* generateArrEqFunc(LgsCodeGen& cg);
     DIType* getDebugType(LgsCodeGen& cg) override;
 };

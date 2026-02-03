@@ -18,7 +18,7 @@ public:
     std::vector<LgsImportPackage> packages;
     std::vector<LgsStrConst*> searchPaths;
 
-    explicit LgsAppConfigFile(const fs::path& path) : LgsFile(path) {}
+    explicit LgsAppConfigFile(const fs::path& path) : LgsFile(path, CG_MODE_SRC_CODE) {}
     size_t hashFile() override;
     ~LgsAppConfigFile() override;
 };

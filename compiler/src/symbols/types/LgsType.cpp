@@ -1,4 +1,5 @@
 #include "exprs/LgsBinaryExpr.h"
+#include "exprs/LgsInstance.h"
 #include "exprs/LgsVectorExpr.h"
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
@@ -111,23 +112,7 @@ LgsFunc* LgsType::getMethod(const std::string& methodName) {
     return nullptr;
 }
 
-Value* LgsType::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
-    assert(0);
-}
-
-Value* LgsType::hashValue(LgsCodeGen& cg, Value* value) {
-    assert(0);
-}
-
-Constant* LgsType::getRTType(LgsCodeGen& cg) {
-    return cg.getRTTypeInfo(getName(), IRSize(cg), rttKind, isHeapAlloc);
-}
-
-LgsType* LgsType::applyBinOp(LgsType* rightType, LgsBinOp& op) {
-    assert(0);
-}
-
-void LgsType::hashNode(size_t& oldHash) {
+std::string LgsType::getBaseName() {
     assert(0);
 }
 
@@ -135,8 +120,24 @@ std::string LgsType::pname() {
     return getName();
 }
 
+Value* LgsType::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
+    assert(0);
+}
+
+Constant* LgsType::getRTType(LgsCodeGen& cg) {
+    return cg.getRTTypeInfo(getName(), IRSize(cg), rttKind, isHeapAlloc);
+}
+
 bool LgsType::equals(LgsType* other) {
     return getName() == other->getName();
+}
+
+Value* LgsType::hashValue(LgsCodeGen& cg, Value* value) {
+    assert(0);
+}
+
+void LgsType::hashNode(size_t& oldHash) {
+    assert(0);
 }
 
 Value* LgsType::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
@@ -350,7 +351,10 @@ Value* eqIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
         return cg.strsEqual(left, right);
     }
     if (type->asObject()) {
-        assert(0);
+        const auto ty = type->getIRType(cg);
+        const auto lType = cg.loadStructField(ty, left, LgsInstance::rttIndices.type, cg.ptrTy());
+        const auto rType = cg.loadStructField(ty, right, LgsInstance::rttIndices.type, cg.ptrTy());
+        return cg.builder.CreateICmpEQ(cg.load(cg.sizeTy(), lType), cg.load(cg.sizeTy(), rType));
     }
     assert(0);
 }
@@ -370,6 +374,12 @@ Value* neIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
     }
     if (type->asStr()) {
         return cg.strsNotEqual(left, right);
+    }
+    if (type->asObject()) {
+        const auto ty = type->getIRType(cg);
+        const auto lType = cg.loadStructField(ty, left, LgsInstance::rttIndices.type, cg.ptrTy());
+        const auto rType = cg.loadStructField(ty, right, LgsInstance::rttIndices.type, cg.ptrTy());
+        return cg.builder.CreateICmpNE(cg.load(cg.sizeTy(), lType), cg.load(cg.sizeTy(), rType));
     }
     assert(0);
 }

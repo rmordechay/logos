@@ -35,15 +35,14 @@ static std::string formatElement(const Lgs_TypeInfo* type, void* value) {
     break;
     case RTT_CHAR: str << "'" << *static_cast<const char*>(value) << "'"; break;
     case RTT_OBJECT: {
-        const auto objPtr = static_cast<char*>(value) + sizeof(size_t);
-        const auto obj = *reinterpret_cast<Lgs_Object**>(objPtr);
+        const auto obj = type->object;
         str << obj->name << "{";
         for (int i = 0; i < obj->fieldsCount; ++i) {
             const auto fieldName = obj->fields[i].name;
             const auto fieldOffset = obj->fields[i].offset;
             const auto fieldType = obj->fields[i].type;
             void* fieldPtr = static_cast<char*>(value) + fieldOffset;
-            if (fieldType->baseType->isHeapAlloc) {
+            if (fieldType->isHeapAlloc) {
                 fieldPtr = *static_cast<void**>(fieldPtr);
             }
             str << fieldName << '=';

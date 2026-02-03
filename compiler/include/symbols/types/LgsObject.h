@@ -30,14 +30,16 @@ public:
     LgsInstance* singleton = nullptr;
     bool hasGenerics = false;
     inline static Lgs_ObjectIndices rttIndices;
+    static constexpr auto metaName = "Object";
 
-    explicit LgsObject(const std::string&  objName) : name(objName) {
+    explicit LgsObject(const std::string&  name) : name(name) {
         isHeapAlloc = true;
         passByRef = true;
         rttKind = RTT_OBJECT;
         metaFields[OBJ_META_NAME] = new LgsField(OBJ_META_NAME, new LgsStr(), new LgsStrConst(name));
     }
     std::string getName() override;
+    std::string getBaseName() override;
     LgsFunc* getMethod(const std::string& methodName) override;
     LgsFunc* getMetaFunc(const std::string& methodName);
     Type* getIRType(LgsCodeGen& cg) override;

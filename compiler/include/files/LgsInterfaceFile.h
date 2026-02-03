@@ -7,7 +7,7 @@ class LgsInterfaceFile final : public LgsFile {
 public:
     LgsInterface* interface = nullptr;
 
-    LgsInterfaceFile(const fs::path& path) : LgsFile(path) {}
+    explicit LgsInterfaceFile(const fs::path& path) : LgsFile(path, CG_MODE_SRC_CODE) {}
     size_t hashFile() override;
     ~LgsInterfaceFile() override;
 };

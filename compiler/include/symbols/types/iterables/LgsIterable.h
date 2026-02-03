@@ -33,7 +33,6 @@ public:
     size_t getDimension() const;
     virtual LgsType* getIndexType();
     virtual LgsType* getValueType();
-    virtual std::string getBaseName() = 0;
     virtual bool inferBaseType(std::vector<LgsExpr*>& args) = 0;
     virtual bool unpackLoopVars(LgsForeachLoop* loop) const;
     virtual void setLoopIRVars(LgsCodeGen& cg, LgsForeachLoop* loop);

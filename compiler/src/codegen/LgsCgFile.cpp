@@ -1,4 +1,4 @@
-#include "codegen/LgsCgModule.h"
+#include "codegen/LgsCgFile.h"
 
 #include <ranges>
 
@@ -61,9 +61,8 @@
 #include "exprs/constants/LgsCharConst.h"
 #include "types/LgsNullable.h"
 
-bool LgsCgModule::generate() {
-    cg.setupModule(file->path, appConfigs.debugMode);
-    visitExternalSymbols();
+bool LgsCgFile::generateSrcFile(LgsFile* file, const LgsPaths& paths) {
+    visitExternalSymbols(file);
     if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
         visitMainFile(mainFile);
     } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
@@ -73,19 +72,14 @@ bool LgsCgModule::generate() {
     } else if (const auto testFile = dynamic_cast<LgsTestFile*>(file)) {
         visitTestFile(testFile);
     }
-    if (appConfigs.debugMode) cg.finalizeDebugger(paths.buildDir);
-    return cg.writeIRModule(paths, appConfigs.optLevel);
+    if (appConfigs->debugMode) cg.finalizeDebugger(paths.buildDir);
+    return cg.writeIRModule(paths, appConfigs->optLevel);
 }
 
-void LgsCgModule::visitMainFile(LgsMainFile* mainFile) {
+void LgsCgFile::visitMainFile(LgsMainFile* mainFile) {
     for (const auto varDec : mainFile->varDecs) {
         visitConstant(varDec->expr);
         varDec->IRValue = varDec->expr->IRValue;
-    }
-    for (const auto& [_, symbol] : globals.symbols) {
-        if (symbol.symbolType != VAR_DEC) continue;
-        visitConstant(symbol.varDec->expr);
-        symbol.varDec->IRValue = symbol.varDec->expr->IRValue;
     }
     for (const auto interface : mainFile->interfaces) {
         visitInterface(interface);
@@ -106,14 +100,14 @@ void LgsCgModule::visitMainFile(LgsMainFile* mainFile) {
     }
 }
 
-void LgsCgModule::visitInterface(const LgsInterface* interface) {
+void LgsCgFile::visitInterface(const LgsInterface* interface) {
     for (const auto& [_, method] : interface->methods) {
         if (!method->stmtsBlock) continue;
         visitFunc(method);
     }
 }
 
-void LgsCgModule::visitTestFile(const LgsTestFile* testFile) {
+void LgsCgFile::visitTestFile(const LgsTestFile* testFile) {
     for (const auto& func : testFile->funcs) {
         visitFunc(func);
     }
@@ -122,7 +116,7 @@ void LgsCgModule::visitTestFile(const LgsTestFile* testFile) {
     }
 }
 
-void LgsCgModule::visitObject(LgsObject* obj) {
+void LgsCgFile::visitObject(LgsObject* obj) {
     if(const auto singleton = obj->singleton) {
         const auto objIRType = obj->getIRType(cg);
         singleton->IRValue = cg.IRModule->getGlobalVariable(obj->name);
@@ -136,14 +130,14 @@ void LgsCgModule::visitObject(LgsObject* obj) {
     }
 }
 
-void LgsCgModule::visitEnum(const LgsEnum* enum_) {
+void LgsCgFile::visitEnum(const LgsEnum* enum_) {
     for (const auto field : enum_->fields) {
         if (!field->expr) continue;
         visitExpr(field->expr);
     }
 }
 
-void LgsCgModule::visitMainFunc(LgsMainFunc* func) {
+void LgsCgFile::visitMainFunc(LgsMainFunc* func) {
     stack.enterScope(func);
     createPrologue(func);
     initMainArgs(func);
@@ -152,7 +146,7 @@ void LgsCgModule::visitMainFunc(LgsMainFunc* func) {
     stack.exitScope();
 }
 
-void LgsCgModule::visitFunc(LgsFunc* func) {
+void LgsCgFile::visitFunc(LgsFunc* func) {
     const auto ft = func->funcType;
     if (!ft->genericTypes.empty()) return;
     stack.enterScope(func);
@@ -171,7 +165,7 @@ void LgsCgModule::visitFunc(LgsFunc* func) {
     stack.exitScope();
 }
 
-void LgsCgModule::visitExternalSymbols() {
+void LgsCgFile::visitExternalSymbols(LgsFile* file) {
     for (auto [name, symbol] : file->symbolTable.symbols) {
         if (symbol.symbolType == VAR_DEC && symbol.isExternal) {
             visitConstant(symbol.varDec->expr);
@@ -180,7 +174,7 @@ void LgsCgModule::visitExternalSymbols() {
     }
 }
 
-void LgsCgModule::visitStmt(LgsStmt* stmt) {
+void LgsCgFile::visitStmt(LgsStmt* stmt) {
     if (const auto ifStmt = stmt->asIfStmt()) visitIfStmt(ifStmt);
     else if (const auto pattern = stmt->asSwitch()) visitSwitch(pattern);
     else if (const auto varDec = stmt->asVarDec()) visitVarDec(varDec);
@@ -194,7 +188,7 @@ void LgsCgModule::visitStmt(LgsStmt* stmt) {
     else if (stmt->asContinue()) visitContinueStmt();
 }
 
-void LgsCgModule::visitStmtsBlock(const LgsStmtsBlock* stmtsBlock) {
+void LgsCgFile::visitStmtsBlock(const LgsStmtsBlock* stmtsBlock) {
     assert(stmtsBlock);
     for (const auto& stmt : stmtsBlock->stmts) {
         switch (stmt.wrapperType) {
@@ -203,17 +197,17 @@ void LgsCgModule::visitStmtsBlock(const LgsStmtsBlock* stmtsBlock) {
             break;
         case LgsStmtWrapper::WrapperType::Stmt:
             visitStmt(stmt.stmt);
-            if (appConfigs.debugMode) stmt.stmt->setDebugValue(cg);
+            if (appConfigs->debugMode) stmt.stmt->setDebugValue(cg);
             break;
         case LgsStmtWrapper::WrapperType::Expr:
             visitExpr(stmt.expr);
-            if (appConfigs.debugMode) stmt.expr->setDebugValue(cg);
+            if (appConfigs->debugMode) stmt.expr->setDebugValue(cg);
             break;
         }
     }
 }
 
-void LgsCgModule::visitLoop(LgsForLoop* loop) {
+void LgsCgFile::visitLoop(LgsForLoop* loop) {
     stack.enterScope(loop);
     loop->setBlocks(cg);
     if (const auto rangeLoop = loop->asRangeLoop()) {
@@ -233,7 +227,7 @@ void LgsCgModule::visitLoop(LgsForLoop* loop) {
     stack.exitScope();
 }
 
-void LgsCgModule::visitRangeLoop(LgsRangeLoop* loop) {
+void LgsCgFile::visitRangeLoop(LgsRangeLoop* loop) {
     visitExpr(loop->startRange);
     visitExpr(loop->endRange);
     loop->iPtr = cg.builder.CreateAlloca(cg.sizeTy());
@@ -254,7 +248,7 @@ void LgsCgModule::visitRangeLoop(LgsRangeLoop* loop) {
     }
 }
 
-void LgsCgModule::visitForeachLoop(LgsForeachLoop* loop) {
+void LgsCgFile::visitForeachLoop(LgsForeachLoop* loop) {
     visitExpr(loop->iterExpr);
     const auto indexTy = cg.sizeTy();
     loop->iPtr = cg.allocaAndStore(indexTy, cg.zeroSize());
@@ -273,11 +267,11 @@ void LgsCgModule::visitForeachLoop(LgsForeachLoop* loop) {
     iterable->setLoopIRVars(cg, loop);
 }
 
-void LgsCgModule::visitInfiniteLoop(const LgsInfiniteLoop* loop) const {
+void LgsCgFile::visitInfiniteLoop(const LgsInfiniteLoop* loop) {
     cg.branchAndStartBlock(loop->IRBodyBlock);
 }
 
-void LgsCgModule::visitLoopMetaVar(LgsMetaVar* metaVar) const {
+void LgsCgFile::visitLoopMetaVar(LgsMetaVar* metaVar) {
     const auto loop = stack.currentLoop();
     const auto iValue = loop->loadIndex(cg);
     switch (metaVar->varType) {
@@ -300,7 +294,7 @@ void LgsCgModule::visitLoopMetaVar(LgsMetaVar* metaVar) const {
     }
 }
 
-void LgsCgModule::visitWhileLoop(const LgsWhileLoop* loop) {
+void LgsCgFile::visitWhileLoop(const LgsWhileLoop* loop) {
     cg.builder.CreateBr(loop->IRCondBlock);
     // Condition
     cg.startBlock(loop->IRCondBlock);
@@ -310,7 +304,7 @@ void LgsCgModule::visitWhileLoop(const LgsWhileLoop* loop) {
     cg.startBlock(loop->IRBodyBlock);
 }
 
-void LgsCgModule::visitVarDec(LgsVarDec* varDec) {
+void LgsCgFile::visitVarDec(LgsVarDec* varDec) {
     if (varDec->shouldAllocate()) {
         varDec->IRValue = cg.builder.CreateAlloca(varDec->type->getIRType(cg));
         varDec->expr->pointee = varDec->IRValue;
@@ -326,7 +320,7 @@ void LgsCgModule::visitVarDec(LgsVarDec* varDec) {
     assert(varDec->IRValue);
 }
 
-void LgsCgModule::visitAssignment(const LgsAssignment* assignment) {
+void LgsCgFile::visitAssignment(const LgsAssignment* assignment) {
     assert(!assignment->binaryExpr);
     const auto left = assignment->left;
     const auto right = assignment->right;
@@ -339,7 +333,7 @@ void LgsCgModule::visitAssignment(const LgsAssignment* assignment) {
     cg.store(right->IRValue, left->IRValue);
 }
 
-void LgsCgModule::moveValue(LgsType* type, Value* left, Value* right) const {
+void LgsCgFile::moveValue(LgsType* type, Value* left, Value* right) {
     const std::vector<Type*> params = {cg.ptrTy(), cg.ptrTy()};
     if (type->asStr()) {
         const std::vector args = {left, right};
@@ -359,7 +353,7 @@ void LgsCgModule::moveValue(LgsType* type, Value* left, Value* right) const {
     }
 }
 
-void LgsCgModule::visitIfStmt(LgsIfStmt* ifStmt) {
+void LgsCgFile::visitIfStmt(LgsIfStmt* ifStmt) {
     if (ifStmt->macroTrueBlock) {
         return visitStmtsBlock(ifStmt->macroTrueBlock);
     }
@@ -374,7 +368,7 @@ void LgsCgModule::visitIfStmt(LgsIfStmt* ifStmt) {
     }
 }
 
-void LgsCgModule::visitSimpleIf(LgsIfStmt* ifStmt) {
+void LgsCgFile::visitSimpleIf(LgsIfStmt* ifStmt) {
     stack.enterScope(ifStmt);
     visitExpr(ifStmt->ifCond);
     cg.ifStmt(ifStmt->ifCond->IRValue, [this, &ifStmt] {
@@ -383,7 +377,7 @@ void LgsCgModule::visitSimpleIf(LgsIfStmt* ifStmt) {
     stack.exitScope();
 }
 
-void LgsCgModule::visitIfWithElse(LgsIfStmt* ifStmt) {
+void LgsCgFile::visitIfWithElse(LgsIfStmt* ifStmt) {
     const auto IRBlockTrue = cg.createBlock(BLOCK_TRUE);
     const auto IRBlockExit = cg.createBlock(BLOCK_EXIT);
     ifStmt->IRExitBlock = cg.createBlock(BLOCK_FALSE);
@@ -406,7 +400,7 @@ void LgsCgModule::visitIfWithElse(LgsIfStmt* ifStmt) {
     stack.exitScope();
 }
 
-void LgsCgModule::visitElseIf(LgsIfStmt* ifStmt) {
+void LgsCgFile::visitElseIf(LgsIfStmt* ifStmt) {
     auto IRBlockTrue = cg.createBlock(BLOCK_TRUE);
     auto IRBlockElseIfCheck = cg.createBlock(BLOCK_ELSE_IF_CHECK);
     const auto IRBlockExit = cg.createBlock(BLOCK_EXIT);
@@ -455,7 +449,7 @@ void LgsCgModule::visitElseIf(LgsIfStmt* ifStmt) {
     cg.startBlock(ifStmt->IRExitBlock);
 }
 
-void LgsCgModule::visitSwitch(LgsSwitch* switchStmt) {
+void LgsCgFile::visitSwitch(LgsSwitch* switchStmt) {
     assert(switchStmt->cond);
     const auto defaultBlock = cg.createBlock(BLOCK_DEFAULT);
     const auto exitBlock = cg.createBlock(BLOCK_EXIT, cg.currentFunc);
@@ -494,11 +488,11 @@ void LgsCgModule::visitSwitch(LgsSwitch* switchStmt) {
     cg.builder.SetInsertPoint(exitBlock);
 }
 
-void LgsCgModule::visitContinueStmt() const {
+void LgsCgFile::visitContinueStmt() {
     stack.currentLoop()->incAndJumpToCond(cg);
 }
 
-void LgsCgModule::visitReturnStmt(LgsReturn* returnStmt) {
+void LgsCgFile::visitReturnStmt(LgsReturn* returnStmt) {
     visitExpr(returnStmt->expr);
     returnStmt->IRValue = returnStmt->expr ? returnStmt->expr->IRValue : nullptr;
     const auto currentFunc = stack.currentFunc();
@@ -518,7 +512,7 @@ void LgsCgModule::visitReturnStmt(LgsReturn* returnStmt) {
     }
 }
 
-void LgsCgModule::visitBreakStmt(const LgsBreak* breakStmt) const {
+void LgsCgFile::visitBreakStmt(const LgsBreak* breakStmt) {
     if (breakStmt->isBreakIf) {
         cg.builder.CreateBr(stack.getOutermostIfStmt()->IRExitBlock);
     } else if (breakStmt->tag != "") {
@@ -529,7 +523,7 @@ void LgsCgModule::visitBreakStmt(const LgsBreak* breakStmt) const {
     }
 }
 
-void LgsCgModule::visitCoroutine(const LgsCoroutine* coroutine) {
+void LgsCgFile::visitCoroutine(const LgsCoroutine* coroutine) {
     LgsFuncCall* fc = nullptr;
     if (coroutine->funcCall->name == "") {
         visitLambda(coroutine->funcCall->func);
@@ -561,7 +555,7 @@ void LgsCgModule::visitCoroutine(const LgsCoroutine* coroutine) {
     cg.callRuntimeFunc("addCoro", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {getThunkFunc(fc, ctxTy), ctx});
 }
 
-void LgsCgModule::visitDeferStmt(const LgsDeferStmt* defer) {
+void LgsCgFile::visitDeferStmt(const LgsDeferStmt* defer) {
     LgsFuncCall* fc = nullptr;
     if (defer->funcCall->name == "") {
         visitLambda(defer->funcCall->func);
@@ -586,12 +580,12 @@ void LgsCgModule::visitDeferStmt(const LgsDeferStmt* defer) {
     cg.callRuntimeFunc("addDefer", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {getThunkFunc(fc, ctxTy), ctx});
 }
 
-void LgsCgModule::visitIOStmt(const LgsIOStmt* ioStmt) {
+void LgsCgFile::visitIOStmt(const LgsIOStmt* ioStmt) {
     visitExpr(ioStmt->varDec->expr);
     visitStmtsBlock(ioStmt->stmtsBlock);
 }
 
-void LgsCgModule::visitExpr(LgsExpr* expr) {
+void LgsCgFile::visitExpr(LgsExpr* expr) {
     if (!expr) return;
     if (const auto ternaryExpr = dynamic_cast<LgsTernaryExpr*>(expr)) {
         visitTernaryExpr(ternaryExpr);
@@ -623,7 +617,7 @@ void LgsCgModule::visitExpr(LgsExpr* expr) {
     }
 }
 
-void LgsCgModule::visitBinaryExpr(LgsBinaryExpr* binExpr) {
+void LgsCgFile::visitBinaryExpr(LgsBinaryExpr* binExpr) {
     assert(binExpr->type);
     const auto l = binExpr->left;
     const auto r = binExpr->right;
@@ -656,7 +650,7 @@ void LgsCgModule::visitBinaryExpr(LgsBinaryExpr* binExpr) {
     }
 }
 
-void LgsCgModule::visitTernaryExpr(LgsTernaryExpr* ternaryExpr) {
+void LgsCgFile::visitTernaryExpr(LgsTernaryExpr* ternaryExpr) {
     const auto cond = ternaryExpr->condExpr;
     const auto then = ternaryExpr->thenExpr;
     const auto else_ = ternaryExpr->elseExpr;
@@ -666,13 +660,13 @@ void LgsCgModule::visitTernaryExpr(LgsTernaryExpr* ternaryExpr) {
     ternaryExpr->IRValue = cg.builder.CreateSelect(cond->IRValue, then->IRValue, else_->IRValue);
 }
 
-void LgsCgModule::visitCast(LgsCast* cast) {
+void LgsCgFile::visitCast(LgsCast* cast) {
     assert(cast->value);
     visitExpr(cast->value);
     cast->IRValue = cast->value->IRValue;
 }
 
-void LgsCgModule::visitLambda(LgsFunc* func) {
+void LgsCgFile::visitLambda(LgsFunc* func) {
     cg.savedIP = cg.builder.saveIP();
     const auto originalFunc = cg.currentFunc;
     func->IRValue = func->getIRFunc(cg);
@@ -681,7 +675,7 @@ void LgsCgModule::visitLambda(LgsFunc* func) {
     cg.builder.restoreIP(cg.savedIP);
 }
 
-void LgsCgModule::visitConstant(LgsExpr* expr) {
+void LgsCgFile::visitConstant(LgsExpr* expr) {
     if (const auto charConst = expr->asCharConst()) visitCharConst(charConst);
     else if (const auto strConst = expr->asStrConst()) visitStrConst(strConst);
     else if (const auto intConst = expr->asIntConst()) visitIntConst(intConst);
@@ -689,7 +683,7 @@ void LgsCgModule::visitConstant(LgsExpr* expr) {
     else assert(0);
 }
 
-void LgsCgModule::visitFloatConst(LgsFloatConst* floatConst) const {
+void LgsCgFile::visitFloatConst(LgsFloatConst* floatConst) {
     if (floatConst->type->asFloat()) {
         floatConst->IRValue = cg.floatv(floatConst->value);
     } else if (floatConst->type->asDouble()) {
@@ -699,7 +693,7 @@ void LgsCgModule::visitFloatConst(LgsFloatConst* floatConst) const {
     }
 }
 
-void LgsCgModule::visitNullableExpr(LgsNullableExpr* expr) {
+void LgsCgFile::visitNullableExpr(LgsNullableExpr* expr) {
     const auto nullable = expr->type->asNullable();
     const auto ty = nullable->getIRType(cg);
     if (expr->isNull) {
@@ -720,7 +714,7 @@ void LgsCgModule::visitNullableExpr(LgsNullableExpr* expr) {
     }
 }
 
-void LgsCgModule::visitArrayExpr(LgsArrayExpr* arrayExpr) {
+void LgsCgFile::visitArrayExpr(LgsArrayExpr* arrayExpr) {
     if (arrayExpr->type->asSArray()) {
         visitStaticArray(arrayExpr);
     } else if (arrayExpr->type->asDArray() || arrayExpr->type->asSet()) {
@@ -730,7 +724,7 @@ void LgsCgModule::visitArrayExpr(LgsArrayExpr* arrayExpr) {
     }
 }
 
-void LgsCgModule::visitStaticArray(LgsArrayExpr* arrayExpr) {
+void LgsCgFile::visitStaticArray(LgsArrayExpr* arrayExpr) {
     const auto sArr = arrayExpr->type->asSArray();
     const auto ty = sArr->getIRType(cg);
     arrayExpr->IRValue = sArr->getIRZeroValue(cg, arrayExpr->pointee);
@@ -767,7 +761,7 @@ void LgsCgModule::visitStaticArray(LgsArrayExpr* arrayExpr) {
     }
 }
 
-void LgsCgModule::visitDynamicArray(LgsArrayExpr* arrayExpr) {
+void LgsCgFile::visitDynamicArray(LgsArrayExpr* arrayExpr) {
     for (const auto element : arrayExpr->elements) {
         visitExpr(element);
     }
@@ -778,7 +772,7 @@ void LgsCgModule::visitDynamicArray(LgsArrayExpr* arrayExpr) {
     }
 }
 
-void LgsCgModule::visitVectorExpr(LgsVectorExpr* vecExpr) {
+void LgsCgFile::visitVectorExpr(LgsVectorExpr* vecExpr) {
     if (vecExpr->elements.empty()) {
         vecExpr->IRValue = vecExpr->type->getIRZeroValue(cg, vecExpr->pointee);
         return;
@@ -801,7 +795,7 @@ void LgsCgModule::visitVectorExpr(LgsVectorExpr* vecExpr) {
     }
 }
 
-void LgsCgModule::insertVecElement(LgsVectorExpr* vecExpr, Value* element, const size_t i) const {
+void LgsCgFile::insertVecElement(LgsVectorExpr* vecExpr, Value* element, const size_t i) {
     if (const auto innerVec = dyn_cast<VectorType>(element->getType())) {
         for (size_t j = 0; j < innerVec->getElementCount().getKnownMinValue(); ++j) {
             insertVecElement(vecExpr, cg.builder.CreateExtractElement(element, j), i+j);
@@ -811,7 +805,7 @@ void LgsCgModule::insertVecElement(LgsVectorExpr* vecExpr, Value* element, const
     }
 }
 
-void LgsCgModule::visitMatrixExpr(const LgsMatrixExpr* matrixExpr) {
+void LgsCgFile::visitMatrixExpr(const LgsMatrixExpr* matrixExpr) {
     if (!matrixExpr->IRValue) return;
     auto allArgsConst = true;
     std::vector<Constant*> constantArgs;
@@ -847,7 +841,7 @@ void LgsCgModule::visitMatrixExpr(const LgsMatrixExpr* matrixExpr) {
     }
 }
 
-void LgsCgModule::visitHashMap(LgsHashMap* hashMap) {
+void LgsCgFile::visitHashMap(LgsHashMap* hashMap) {
     const auto map = hashMap->type->asMap();
     hashMap->IRValue = hashMap->type->getIRZeroValue(cg, hashMap->pointee);
     for (const auto pair : hashMap->elements) {
@@ -857,13 +851,13 @@ void LgsCgModule::visitHashMap(LgsHashMap* hashMap) {
     }
 }
 
-void LgsCgModule::visitEnvVar(LgsEnvVar* envVar) const {
+void LgsCgFile::visitEnvVar(LgsEnvVar* envVar) {
     const std::vector<Type*> params = {cg.ptrTy(), cg.ptrTy()};
     const std::vector<Value*> IRArgs = {cg.getString(envVar->name), cg.emptyStr()};
     envVar->IRValue = cg.callLgsFunc(LgsSys::name, "getEnv", cg.ptrTy(), params, IRArgs);
 }
 
-void LgsCgModule::visitVariable(LgsVariable* variable) const {
+void LgsCgFile::visitVariable(LgsVariable* variable) {
     switch (variable->ref.symbolType) {
     case VAR_DEC:
         assert(variable->ref.varDec->IRValue);
@@ -902,7 +896,7 @@ void LgsCgModule::visitVariable(LgsVariable* variable) const {
     assert(variable->IRValue);
 }
 
-void LgsCgModule::visitSelection(LgsSelection* selection) {
+void LgsCgFile::visitSelection(LgsSelection* selection) {
     const auto firstExpr = selection->exprs.front();
     if (!firstExpr->isImportName) {
         visitExpr(firstExpr);
@@ -934,7 +928,7 @@ void LgsCgModule::visitSelection(LgsSelection* selection) {
     selection->IRValue = selection->exprs.back()->IRValue;
 }
 
-void LgsCgModule::visitFieldSelection(LgsVariable* var, LgsExpr* parent) const {
+void LgsCgFile::visitFieldSelection(LgsVariable* var, LgsExpr* parent) {
     const auto field = var->ref.field;
     const auto fieldType = field->type;
 
@@ -976,7 +970,7 @@ void LgsCgModule::visitFieldSelection(LgsVariable* var, LgsExpr* parent) const {
     var->IRValue = field->getGEP(cg, parent->IRValue);
 }
 
-void LgsCgModule::visitNullableSelection(LgsExpr* child, LgsExpr* parent) const {
+void LgsCgFile::visitNullableSelection(LgsExpr* child, LgsExpr* parent) {
     assert(parent->type->asNullable());
     const auto field = child->asNullableExpr()->baseExpr->asVariable()->ref.field;
     const auto isNullBlock = cg.createBlock(BLOCK_TRUE);
@@ -1000,7 +994,7 @@ void LgsCgModule::visitNullableSelection(LgsExpr* child, LgsExpr* parent) const 
     cg.branchAndStartBlock(exitBlock);
 }
 
-void LgsCgModule::visitMetaSelection(LgsMetaSelection* metaSelection) {
+void LgsCgFile::visitMetaSelection(LgsMetaSelection* metaSelection) {
     visitExpr(metaSelection->baseExpr);
     if (const auto fc = metaSelection->child->asFuncCall()) {
         visitFuncCall(fc);
@@ -1016,7 +1010,7 @@ void LgsCgModule::visitMetaSelection(LgsMetaSelection* metaSelection) {
     assert(0);
 }
 
-void LgsCgModule::visitFuncCall(LgsFuncCall* funcCall) {
+void LgsCgFile::visitFuncCall(LgsFuncCall* funcCall) {
     for (const auto& arg : funcCall->args) {
         if (arg.isSelf) continue;
         visitExpr(arg.expr);
@@ -1061,7 +1055,7 @@ void LgsCgModule::visitFuncCall(LgsFuncCall* funcCall) {
     funcCall->IRValue = func->call(cg, funcCall->args);
 }
 
-void LgsCgModule::visitPrefixExpr(LgsPrefixExpr* prefixExpr) {
+void LgsCgFile::visitPrefixExpr(LgsPrefixExpr* prefixExpr) {
     visitExpr(prefixExpr->expr);
     const auto exprIRVal = prefixExpr->expr->IRValue;
     switch (prefixExpr->op) {
@@ -1082,7 +1076,7 @@ void LgsCgModule::visitPrefixExpr(LgsPrefixExpr* prefixExpr) {
     }
 }
 
-void LgsCgModule::visitPostfixExpr(LgsPostfixExpr* postfixExpr) {
+void LgsCgFile::visitPostfixExpr(LgsPostfixExpr* postfixExpr) {
     const auto baseExpr = postfixExpr->baseExpr;
     visitExpr(baseExpr);
     postfixExpr->IRValue = postfixExpr->baseExpr->loadIR(cg);
@@ -1103,7 +1097,7 @@ void LgsCgModule::visitPostfixExpr(LgsPostfixExpr* postfixExpr) {
     cg.store(newValue, postfixExpr->baseExpr->IRValue);
 }
 
-void LgsCgModule::visitIntConst(LgsIntConst* intConst) const {
+void LgsCgFile::visitIntConst(LgsIntConst* intConst) {
     if (intConst->type->asBool()) {
         intConst->IRValue = cg.i1(intConst->value);
     } else if (intConst->type->asChar()) {
@@ -1123,7 +1117,7 @@ void LgsCgModule::visitIntConst(LgsIntConst* intConst) const {
     }
 }
 
-void LgsCgModule::visitStrConst(LgsStrConst* strConst) {
+void LgsCgFile::visitStrConst(LgsStrConst* strConst) {
     if (strConst->parts.empty()) {
         strConst->IRValue = cg.allocStrConst(cg.getString(strConst->value));
         return;
@@ -1145,11 +1139,11 @@ void LgsCgModule::visitStrConst(LgsStrConst* strConst) {
     strConst->IRValue = cg.callSnprintf(formatted + "\n", values);
 }
 
-void LgsCgModule::visitCharConst(LgsCharConst* charConst) const {
+void LgsCgFile::visitCharConst(LgsCharConst* charConst) {
     charConst->IRValue = cg.i8(charConst->value);
 }
 
-void LgsCgModule::visitInstance(LgsInstance* instance) {
+void LgsCgFile::visitInstance(LgsInstance* instance) {
     const auto obj = instance->obj;
     if (obj->isExternal) {
         instance->IRValue = cg.builder.CreateAlloca(obj->getIRType(cg));
@@ -1184,7 +1178,7 @@ void LgsCgModule::visitInstance(LgsInstance* instance) {
     }
 }
 
-void LgsCgModule::visitIterIndex(LgsIterIndex* iterIndex) {
+void LgsCgFile::visitIterIndex(LgsIterIndex* iterIndex) {
     const auto baseExpr = iterIndex->baseExpr;
     const auto index = iterIndex->index;
     const auto iterable = baseExpr->type->asIterable();
@@ -1201,8 +1195,8 @@ void LgsCgModule::visitIterIndex(LgsIterIndex* iterIndex) {
     }
 }
 
-void LgsCgModule::createPrologue(LgsFunc* func) {
-    if (appConfigs.debugMode) func->setDebugValue(cg);
+void LgsCgFile::createPrologue(LgsFunc* func) {
+    if (appConfigs->debugMode) func->setDebugValue(cg);
     cg.currentFunc = func->getIRFunc(cg);
     const auto entryBlock = cg.createBlock(BLOCK_ENTRY, cg.currentFunc);
     func->epilogue = cg.createBlock("epilogue");
@@ -1214,7 +1208,7 @@ void LgsCgModule::createPrologue(LgsFunc* func) {
     cg.callStackPush();
 }
 
-void LgsCgModule::createEpilogue(const LgsFunc* func) const {
+void LgsCgFile::createEpilogue(const LgsFunc* func) {
     const auto ft = func->funcType;
     if (ft->name == LGS_MAIN_FUNC) {
         cg.callPopStack();
@@ -1235,7 +1229,7 @@ void LgsCgModule::createEpilogue(const LgsFunc* func) const {
     }
 }
 
-void LgsCgModule::initMainArgs(const LgsMainFunc* mainFunc) const {
+void LgsCgFile::initMainArgs(const LgsMainFunc* mainFunc) {
     const auto ft = mainFunc->funcType;
     if (ft->params.empty()) return;
     const auto argsArray = ft->params.front().expr->asArrayExpr();
@@ -1245,7 +1239,7 @@ void LgsCgModule::initMainArgs(const LgsMainFunc* mainFunc) const {
     mainFunc->funcType->params[0].IRValue = argsArray->IRValue;
 }
 
-StructType* LgsCgModule::getThunkCtxType(const LgsFuncCall* fc) const {
+StructType* LgsCgFile::getThunkCtxType(const LgsFuncCall* fc) {
     std::vector<Value*> args;
     std::vector<Type*> types;
     for (const auto& arg : fc->args) {
@@ -1254,7 +1248,7 @@ StructType* LgsCgModule::getThunkCtxType(const LgsFuncCall* fc) const {
     return cg.getStructType(types, fc->name + "ThunkType");
 }
 
-Value* LgsCgModule::getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) const {
+Value* LgsCgFile::getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) {
     const auto ctx = cg.builder.CreateAlloca(ctxTy);
     for (size_t i = 0; i < fc->args.size(); i++) {
         const auto v = fc->args[i].expr->IRValue;
@@ -1263,11 +1257,11 @@ Value* LgsCgModule::getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) const {
     return ctx;
 }
 
-Value* LgsCgModule::getInstanceRTT(Type* ty, Value* value) const {
+Value* LgsCgFile::getInstanceRTT(Type* ty, Value* value) {
     return cg.loadStructField(ty, value, LgsInstance::rttIndices.type, cg.ptrTy());
 }
 
-Function* LgsCgModule::getThunkFunc(LgsFuncCall* fc, Type* ctxTy) const {
+Function* LgsCgFile::getThunkFunc(LgsFuncCall* fc, Type* ctxTy) {
     auto thunkFunc = cg.IRModule->getFunction(fc->name + "Thunk");
     if (thunkFunc) return thunkFunc;
     cg.savedIP = cg.builder.saveIP();
@@ -1288,7 +1282,7 @@ Function* LgsCgModule::getThunkFunc(LgsFuncCall* fc, Type* ctxTy) const {
     return thunkFunc;
 }
 
-void LgsCgModule::createVecField(LgsField* field, Value* parent) const {
+void LgsCgFile::createVecField(LgsField* field, Value* parent) {
     const auto vec = field->type->asVec();
     assert(vec);
     std::vector<int> mask(vec->dimVec);
@@ -1303,7 +1297,7 @@ void LgsCgModule::createVecField(LgsField* field, Value* parent) const {
     cg.store(newVec, field->IRValue);
 }
 
-bool LgsCgModule::checkMock(LgsExpr* expr) const {
+bool LgsCgFile::checkMock(LgsExpr* expr) {
     if (stack.stack.empty()) return false;
     const auto currentFunc = stack.currentFunc();
     if (currentFunc->isTest) {
@@ -1316,7 +1310,7 @@ bool LgsCgModule::checkMock(LgsExpr* expr) const {
     return false;
 }
 
-void LgsCgModule::generateMapFunc(LgsFuncType* mapFunc) {
+void LgsCgFile::generateMapFunc(LgsFuncType* mapFunc) {
     const auto& iterableParam = mapFunc->params[0];
     const auto& cbParam = mapFunc->params[1];
     const auto iterable = iterableParam.type->asIterable();
@@ -1348,7 +1342,7 @@ void LgsCgModule::generateMapFunc(LgsFuncType* mapFunc) {
     cg.builder.CreateRet(retArr.IRValue);
 }
 
-void LgsCgModule::generateFilterFunc(LgsFuncType* filterFunc) {
+void LgsCgFile::generateFilterFunc(LgsFuncType* filterFunc) {
     const auto& iterableParam = filterFunc->params[0];
     const auto& cbParam = filterFunc->params[1];
     const auto iterable = iterableParam.type->asIterable();
@@ -1383,7 +1377,7 @@ void LgsCgModule::generateFilterFunc(LgsFuncType* filterFunc) {
     cg.builder.CreateRet(retArr.IRValue);
 }
 
-void LgsCgModule::generateForeachFunc(LgsFuncType* forEachFunc) const {
+void LgsCgFile::generateForeachFunc(LgsFuncType* forEachFunc) {
     const auto& iterableParam = forEachFunc->params[0];
     const auto& cbParam = forEachFunc->params[1];
     const auto iterable = iterableParam.type->asIterable();

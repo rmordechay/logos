@@ -6,8 +6,6 @@
 #include "types/primitives/LgsBool.h"
 #include <llvm/IR/Module.h>
 
-#include "LgsConfigs.h"
-
 LgsFunc* LgsDArray::getMethod(const std::string& methodName) {
     constexpr auto flags = BUILTIN | PUBLIC | METHOD;
     if (methodName == ADD_FUNC) {
@@ -43,8 +41,12 @@ Type* LgsDArray::getIRType(LgsCodeGen& cg) {
 }
 
 Constant* LgsDArray::getRTType(LgsCodeGen& cg) {
-    baseType->getRTType(cg);
-    return cg.getRTTypeInfo(getName(), IRSize(cg), rttKind, isHeapAlloc);
+    const auto RTTName = getName();
+    const auto prefixedName = LGS_TYPEINFO_PREFIX + RTTName;
+    if (const auto v = cg.IRModule->getGlobalVariable(prefixedName)) return v;
+    if (cg.mode != CG_MODE_RTTYPES) return cg.getRTTypeInfo(RTTName, IRSize(cg), rttKind, isHeapAlloc, nullptr);
+    const auto baseRTT = baseType->getRTType(cg);
+    return cg.getRTTypeInfo(RTTName, IRSize(cg), rttKind, isHeapAlloc, baseRTT);
 }
 
 std::string LgsDArray::getBaseName() {
@@ -62,6 +64,11 @@ std::string LgsDArray::pname() {
 
 size_t LgsDArray::sizeBytes() {
     return sizeof(Lgs_DArrayExpr);
+}
+
+std::string LgsDArray::fmtStr() const {
+    if (baseType->asChar()) return "%s";
+    return "%p";
 }
 
 bool LgsDArray::canCastTo(LgsType* other) {
@@ -116,72 +123,19 @@ Value* LgsDArray::getIRElement(LgsCodeGen& cg, Value* iterable, Value* index) {
 }
 
 void LgsDArray::addIRElement(LgsCodeGen& cg, Value* iterable, Value* index, Value* value) {
-    if (index) assert(0);
-    cg.builder.CreateCall(generateAddFunc(cg), {iterable, value});
-}
-
-Function* LgsDArray::generateArrEqFunc(LgsCodeGen& cg) {
-    const auto funcName = getName() + "_" + EQUAL_FUNC;
-    if (const auto func = cg.IRModule->getFunction(funcName)) return func;
-    const auto ft = cg.getFT(cg.i1Ty(), {cg.ptrTy(), cg.ptrTy()});
-    if (cg.mode == CG_MODE_SRC_CODE) {
-        return cg.getFunc(funcName, ft);
+    assert(!index);
+    auto element = value;
+    if (baseType->isHeapAlloc) {
+        element = cg.moveArrElement(iterable, value, getRTType(cg));
     }
-
-    const auto func = cg.getFunc(funcName, ft);
-    const auto entryBlock = cg.createBlock(BLOCK_ENTRY, func);
-    cg.builder.SetInsertPoint(entryBlock);
-
-    const auto arrIR1 = func->getArg(0);
-    const auto arrIR2 = func->getArg(1);
-
-    cg.loop(lenIR(cg, arrIR1), [&](Value* iValue, BasicBlock*) {
-        const auto elementPtr1 = getIRElement(cg, arrIR1, iValue);
-        const auto elementPtr2 = getIRElement(cg, arrIR2, iValue);
-        const auto elementsNotEqual = neIR(cg, elementPtr1, elementPtr2, baseType);
-        cg.ifStmt(elementsNotEqual, [&cg] {
-            cg.builder.CreateRet(cg.false_());
-        });
-    });
-
-    cg.builder.CreateRet(cg.true_());
-    return func;
-}
-
-Function* LgsDArray::generateContainsFunc(LgsCodeGen& cg) {
-    const auto funcName = getName() + "_" + CONTAINS_FUNC;
-    if (const auto func = cg.IRModule->getFunction(funcName)) return func;
-    const auto valueTy = baseType->getTypeOrPtr(cg);
-    const auto ft = cg.getFT(cg.i1Ty(), {cg.ptrTy(), valueTy});
-    if (cg.mode == CG_MODE_SRC_CODE) {
-        return cg.getFunc(funcName, ft);
-    }
-
-    // Prologue
-    const auto func = cg.getFunc(funcName, ft);
-    const auto entryBlock = cg.createBlock(BLOCK_ENTRY, func);
-    cg.builder.SetInsertPoint(entryBlock);
-
-    const auto arrIR = func->getArg(0);
-    const auto value = func->getArg(1);
-
-    cg.loop(lenIR(cg, arrIR), [&](Value* iValue, BasicBlock*) {
-        LgsIntConst size(&LGS_SIZE, 0);
-        size.IRValue = iValue;
-        const auto elementPtr = getIRElement(cg, arrIR, size.IRValue);
-        const auto elementsAreEqual = eqIR(cg, value, cg.load(baseType->getTypeOrPtr(cg), elementPtr), baseType);
-        cg.ifStmt(elementsAreEqual, [&cg] {cg.builder.CreateRet(cg.true_());});
-    });
-
-    cg.builder.CreateRet(cg.false_());
-    return func;
+    cg.builder.CreateCall(generateAddFunc(cg), {iterable, element});
 }
 
 Function* LgsDArray::generateAddFunc(LgsCodeGen& cg) {
     const auto funcName = getName() + "_" + ADD_FUNC;
-    if (const auto func = cg.IRModule->getFunction(funcName)) return func;
     const auto ft = cg.getFT(cg.voidTy(), {cg.ptrTy(), baseType->getTypeOrPtr(cg)});
     if (cg.mode == CG_MODE_SRC_CODE) return cg.getFunc(funcName, ft);
+    assert(!cg.IRModule->getFunction(funcName));
 
     // Prologue
     const auto func = cg.getFunc(funcName, ft);
@@ -194,8 +148,8 @@ Function* LgsDArray::generateAddFunc(LgsCodeGen& cg) {
     const auto arrIR = func->getArg(0);
     const auto elementIR = func->getArg(1);
     const auto dataGEP = cg.builder.CreateStructGEP(ty, arrIR, rttIndices.data);
-    const auto lenGEP = cg.builder.CreateStructGEP(getIRType(cg), arrIR, rttIndices.len);
-    const auto capGEP = cg.builder.CreateStructGEP(getIRType(cg), arrIR, rttIndices.cap);
+    const auto lenGEP = cg.builder.CreateStructGEP(ty, arrIR, rttIndices.len);
+    const auto capGEP = cg.builder.CreateStructGEP(ty, arrIR, rttIndices.cap);
 
     auto len = cg.load(cg.sizeTy(), lenGEP);
     const auto cap = cg.load(cg.sizeTy(), capGEP);
@@ -208,7 +162,7 @@ Function* LgsDArray::generateAddFunc(LgsCodeGen& cg) {
     const auto newCap = cg.builder.CreateMul(cap, cg.usize(2));
     const auto baseTypeSize = baseType->IRSize(cg);
     const auto newSize = cg.builder.CreateMul(newCap, baseTypeSize);
-    const auto levelField = cg.builder.CreateStructGEP(getIRType(cg), arrIR, rttIndices.level);
+    const auto levelField = cg.builder.CreateStructGEP(ty, arrIR, rttIndices.level);
     const auto level = cg.load(cg.i32Ty(), levelField);
     const auto newPtr = cg.reallocate(data, newSize, level);
     cg.store(newPtr, dataGEP);
@@ -230,9 +184,62 @@ Function* LgsDArray::generateAddFunc(LgsCodeGen& cg) {
     return func;
 }
 
-std::string LgsDArray::fmtStr() const {
-    if (baseType->asChar()) return "%s";
-    return "%p";
+Function* LgsDArray::generateContainsFunc(LgsCodeGen& cg) {
+    const auto funcName = getName() + "_" + CONTAINS_FUNC;
+    if (const auto func = cg.IRModule->getFunction(funcName)) return func;
+    const auto valueTy = baseType->getTypeOrPtr(cg);
+    const auto ft = cg.getFT(cg.i1Ty(), {cg.ptrTy(), valueTy});
+    if (cg.mode == CG_MODE_SRC_CODE) return cg.getFunc(funcName, ft);
+
+    // Prologue
+    const auto func = cg.getFunc(funcName, ft);
+    const auto entryBlock = cg.createBlock(BLOCK_ENTRY, func);
+    cg.builder.SetInsertPoint(entryBlock);
+
+    const auto arrIR = func->getArg(0);
+    const auto value = func->getArg(1);
+
+    cg.loop(lenIR(cg, arrIR), [&](Value* iValue, BasicBlock*) {
+        LgsIntConst size(&LGS_SIZE, 0);
+        size.IRValue = iValue;
+        const auto elementPtr = getIRElement(cg, arrIR, size.IRValue);
+        const auto elementsAreEqual = eqIR(cg, value, cg.load(baseType->getTypeOrPtr(cg), elementPtr), baseType);
+        cg.ifStmt(elementsAreEqual, [&cg] {cg.builder.CreateRet(cg.true_());});
+    });
+
+    cg.builder.CreateRet(cg.false_());
+    return func;
+}
+
+Function* LgsDArray::generateArrEqFunc(LgsCodeGen& cg) {
+    const auto funcName = getName() + "_" + EQUAL_FUNC;
+    if (const auto func = cg.IRModule->getFunction(funcName)) return func;
+    const auto ft = cg.getFT(cg.i1Ty(), {cg.ptrTy(), cg.ptrTy()});
+    if (cg.mode == CG_MODE_SRC_CODE) return cg.getFunc(funcName, ft);
+
+    const auto func = cg.getFunc(funcName, ft);
+    const auto entryBlock = cg.createBlock(BLOCK_ENTRY, func);
+    cg.builder.SetInsertPoint(entryBlock);
+
+    const auto arrIR1 = func->getArg(0);
+    const auto arrIR2 = func->getArg(1);
+
+    const auto len1 = lenIR(cg, arrIR1);
+    const auto len2 = lenIR(cg, arrIR2);
+    cg.loop(len1, [&](Value* iValue, BasicBlock*) {
+        const auto elementPtr1 = getIRElement(cg, arrIR1, iValue);
+        const auto elementPtr2 = getIRElement(cg, arrIR2, iValue);
+        const auto elementsNotEqual = neIR(cg, elementPtr1, elementPtr2, baseType);
+        cg.ifStmt(elementsNotEqual, [&cg] {
+            cg.builder.CreateRet(cg.false_());
+        });
+        cg.ifStmt(cg.builder.CreateICmpSLE(len2, iValue), [&cg] {
+            cg.builder.CreateRet(cg.false_());
+        });
+    });
+
+    cg.builder.CreateRet(cg.true_());
+    return func;
 }
 
 DIType* LgsDArray::getDebugType(LgsCodeGen& cg) {

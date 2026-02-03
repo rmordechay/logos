@@ -63,15 +63,16 @@ enum LgsCodeGenMode {
 
 class LgsCodeGen {
 public:
+    LgsCodeGenMode mode;
     LLVMContext context;
     LgsLLDBGen debugger;
     Module* IRModule = nullptr;
     Function* currentFunc = nullptr;
     IRBuilder<> builder = IRBuilder(context);
-    LgsCodeGenMode mode = CG_MODE_SRC_CODE;
     std::map<std::string, Type*> typesRegistry;
     IRBuilderBase::InsertPoint savedIP;
 
+    explicit LgsCodeGen(const LgsCodeGenMode mode) : mode(mode) {}
     void setupModule(const std::filesystem::path& file, bool debugMode = false);
     bool writeIRModule(const LgsPaths& paths, uint8_t optLevel) const;
     Constant* getString(const std::string& value);

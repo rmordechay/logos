@@ -21,6 +21,10 @@ std::string LgsObject::getName() {
     return name;
 }
 
+std::string LgsObject::getBaseName() {
+    return metaName;
+}
+
 LgsFunc* LgsObject::getMethod(const std::string& methodName) {
     if (methods.contains(methodName)) return methods[methodName];
     for (const auto* f : fields) {
@@ -71,7 +75,7 @@ Type* LgsObject::getIRType(LgsCodeGen& cg) {
 Constant* LgsObject::getRTType(LgsCodeGen& cg) {
     const auto RTTName = LGS_TYPEINFO_PREFIX + name;
     if (const auto v = cg.IRModule->getGlobalVariable(RTTName)) return v;
-    if (cg.mode != CG_MODE_RTTYPES) return cg.createGlobal(RTTName, cg.getRTTStruct(), nullptr);
+    if (cg.mode != CG_MODE_RTTYPES) return cg.getRTTypeInfo(name, IRSize(cg), rttKind, isHeapAlloc, nullptr);
 
     const auto numFields = fields.size();
     const auto numMethods = methods.size();
@@ -89,8 +93,10 @@ Constant* LgsObject::getRTType(LgsCodeGen& cg) {
     for (size_t i = 0; i < fields.size(); ++i) {
         const auto field = fields[i];
         assert(field->type->rttKind != RTT_UNKNOWN);
+        const auto fieldName = cg.getString(field->name);
+        fieldName->setName(RTTName + "_name");
         rttFields.emplace_back(ConstantStruct::get(fieldRTType, {
-            cg.getString(field->name),
+            fieldName,
             field->type->IRSize(cg),
             cg.usize(sl->getElementOffset(i + 2)), // offset (1) level and (2) type
             cg.i32(field->type->rttKind),
@@ -117,7 +123,8 @@ Constant* LgsObject::getRTType(LgsCodeGen& cg) {
         rttFieldsGlobal,
         rttMethodsGlobal,
     };
-    return cg.createGlobal(RTTName, objRTType, ConstantStruct::get(objRTType, args));
+    const auto gv = cg.createGlobal(RTTName + "_extra", objRTType, ConstantStruct::get(objRTType, args));
+    return cg.getRTTypeInfo(name, IRSize(cg), rttKind, isHeapAlloc, gv);
 }
 
 size_t LgsObject::sizeBytes() {

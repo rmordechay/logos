@@ -18,7 +18,7 @@ public:
     std::vector<LgsSubType*> subtypes;
     std::vector<LgsEnum*> enums;
 
-    explicit LgsMainFile(const fs::path& path) : LgsFile(path) {}
+    explicit LgsMainFile(const fs::path& path) : LgsFile(path, CG_MODE_SRC_CODE) {}
     size_t hashFile() override;
     LgsFunc* getMainFunc();
     ~LgsMainFile() override;

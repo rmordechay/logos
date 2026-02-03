@@ -87,19 +87,20 @@ public:
     virtual LgsField* getField(const std::string& fieldName);
     virtual LgsFunc* getMethod(const std::string& methodName);
     virtual std::string getName() = 0;
+    virtual std::string getBaseName();
+    virtual std::string pname(); // pretty name
     virtual size_t sizeBytes() = 0;
     virtual LgsExpr* getZeroValue() = 0;
     virtual Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee);
     virtual Type* getIRType(LgsCodeGen& cg) = 0;
-    virtual Value* hashValue(LgsCodeGen& cg, Value* value);
     virtual Constant* getRTType(LgsCodeGen& cg);
+    virtual bool equals(LgsType* other);
     virtual bool canCastTo(LgsType* other) = 0;
-    virtual std::string fmtStr() const = 0;
     virtual LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) = 0;
+    virtual std::string fmtStr() const = 0;
+    virtual Value* hashValue(LgsCodeGen& cg, Value* value);
     virtual void hashNode(size_t& oldHash);
     virtual DIType* getDebugType(LgsCodeGen& cg) = 0;
-    virtual std::string pname(); // pretty name
-    virtual bool equals(LgsType* other);
 
     virtual Value* addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr);
     virtual Value* subIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr);
