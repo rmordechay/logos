@@ -6,10 +6,6 @@ Type* LgsSelf::getIRType(LgsCodeGen& cg) {
     assert(0);
 }
 
-Constant* LgsSelf::getRTType(LgsCodeGen& cg) {
-    assert(0);
-}
-
 size_t LgsSelf::sizeBytes() {
     assert(0);
 }
@@ -27,7 +23,7 @@ bool LgsSelf::canCastTo(LgsType* other) {
 }
 
 LgsType* LgsSelf::applyBinOp(LgsType* rightType, LgsBinOp& op) {
-    assert(0);
+    return nullptr;
 }
 
 std::string LgsSelf::fmtStr() const {

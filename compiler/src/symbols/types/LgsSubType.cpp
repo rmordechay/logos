@@ -7,7 +7,7 @@ Type* LgsSubType::getIRType(LgsCodeGen& cg) {
     return subtype->getIRType(cg);
 }
 
-Constant* LgsSubType::getRTType(LgsCodeGen& cg) {
+Constant* LgsSubType::getRTTypeExtra(LgsCodeGen& cg) {
     return subtype->getRTType(cg);
 }
 
@@ -35,7 +35,7 @@ bool LgsSubType::canCastTo(LgsType* other) {
 }
 
 LgsType* LgsSubType::applyBinOp(LgsType* rightType, LgsBinOp& op) {
-    assert(0);
+    return nullptr;
 }
 
 std::string LgsSubType::fmtStr() const {

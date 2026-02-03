@@ -10,7 +10,7 @@
 Value* LgsIterIndex::loadIR(LgsCodeGen& cg) {
     const auto baseExprType = baseExpr->type;
     if (baseExprType->isHeapAlloc) {
-        return cg.load(cg.ptrTy(), IRValue);
+        return cg.loadPtr(IRValue);
     }
     if (baseExprType->asSArray()) {
         const auto indexIR = index.from->IRValue;

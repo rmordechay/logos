@@ -29,7 +29,7 @@ bool LgsULong::canCastTo(LgsType* other) {
 }
 
 LgsType* LgsULong::applyBinOp(LgsType* rightType, LgsBinOp& op) {
-    assert(0);
+    return nullptr;
 }
 
 DIType* LgsULong::getDebugType(LgsCodeGen& cg) {

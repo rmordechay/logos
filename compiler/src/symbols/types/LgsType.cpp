@@ -1,3 +1,5 @@
+#include <llvm/IR/Module.h>
+
 #include "exprs/LgsBinaryExpr.h"
 #include "exprs/LgsInstance.h"
 #include "exprs/LgsVectorExpr.h"
@@ -120,12 +122,23 @@ std::string LgsType::pname() {
     return getName();
 }
 
+std::string LgsType::getRTTName() {
+    return LGS_TYPEINFO_PREFIX + getName();
+}
+
 Value* LgsType::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
     assert(0);
 }
 
 Constant* LgsType::getRTType(LgsCodeGen& cg) {
-    return cg.getRTTypeInfo(getName(), IRSize(cg), rttKind, isHeapAlloc);
+    const auto rttName = getRTTName();
+    if (const auto v = cg.IRModule->getGlobalVariable(rttName)) return v;
+    if (cg.mode != CG_MODE_RTTYPES) return cg.getRTTypeInfo(rttName, IRSize(cg), rttKind, isHeapAlloc, nullptr);
+    return cg.getRTTypeInfo(rttName, IRSize(cg), rttKind, isHeapAlloc, getRTTypeExtra(cg));
+}
+
+Constant* LgsType::getRTTypeExtra(LgsCodeGen& cg) {
+    return nullptr;
 }
 
 bool LgsType::equals(LgsType* other) {
@@ -350,11 +363,8 @@ Value* eqIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
     if (type->asStr()) {
         return cg.strsEqual(left, right);
     }
-    if (type->asObject()) {
-        const auto ty = type->getIRType(cg);
-        const auto lType = cg.loadStructField(ty, left, LgsInstance::rttIndices.type, cg.ptrTy());
-        const auto rType = cg.loadStructField(ty, right, LgsInstance::rttIndices.type, cg.ptrTy());
-        return cg.builder.CreateICmpEQ(cg.load(cg.sizeTy(), lType), cg.load(cg.sizeTy(), rType));
+    if (const auto obj = type->asObject()) {
+        return obj->objsEqual(cg, left, right);
     }
     assert(0);
 }

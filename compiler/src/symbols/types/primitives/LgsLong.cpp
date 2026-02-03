@@ -25,7 +25,7 @@ LgsExpr* LgsLong::getZeroValue() {
 }
 
 LgsType* LgsLong::applyBinOp(LgsType* rightType, LgsBinOp& op) {
-    assert(0);
+    return nullptr;
 }
 
 std::string LgsLong::getName() {

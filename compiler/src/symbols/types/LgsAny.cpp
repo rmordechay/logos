@@ -9,10 +9,6 @@ Type* LgsAny::getIRType(LgsCodeGen& cg) {
     return cg.ptrTy();
 }
 
-Constant* LgsAny::getRTType(LgsCodeGen& cg) {
-    assert(0);
-}
-
 std::string LgsAny::getName() {
     return name;
 }
@@ -26,7 +22,7 @@ std::string LgsAny::fmtStr() const {
 }
 
 LgsType* LgsAny::applyBinOp(LgsType* rightType, LgsBinOp& op) {
-    assert(0);
+    return nullptr;
 }
 
 bool LgsAny::canCastTo(LgsType*) {

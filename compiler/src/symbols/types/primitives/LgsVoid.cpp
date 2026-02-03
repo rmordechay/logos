@@ -21,11 +21,7 @@ LgsExpr* LgsVoid::getZeroValue() {
 }
 
 LgsType* LgsVoid::applyBinOp(LgsType* rightType, LgsBinOp& op) {
-    assert(0);
-}
-
-Constant* LgsVoid::getRTType(LgsCodeGen& cg) {
-    return cg.getRTTypeInfo(getName(), cg.zeroSize(), rttKind, isHeapAlloc);
+    return nullptr;
 }
 
 std::string LgsVoid::fmtStr() const {

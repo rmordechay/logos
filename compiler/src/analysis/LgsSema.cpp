@@ -360,7 +360,10 @@ void LgsSema::visitVarDec(LgsVarDec* varDec) {
             castExprImplicitly(varDec->expr, varDec->type);
             visitExpr(varDec->expr);
             validateExprType(varDec->expr, varDec->type);
-            varDec->expr->setType(varDec->type);
+            if (varDec->expr->type != varDec->type) {
+                freeType(varDec->expr->type);
+                varDec->expr->setType(varDec->type);
+            }
         } else {
             varDec->expr = varDec->type->getZeroValue();
             varDec->expr->location = varDec->location;
@@ -1683,6 +1686,7 @@ void LgsSema::addRTType(LgsType* type) const {
 }
 
 void LgsSema::addGenerics(LgsType* type) const {
+    if (type->isScalar() || type->isVoid() || type->isAny() || type->isUnknown()) return;
     for (const auto genericsType : file->symbolTable.genericsTypes) {
         if (genericsType->equals(type)) return;
     }

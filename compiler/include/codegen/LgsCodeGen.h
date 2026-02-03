@@ -84,6 +84,7 @@ public:
 
     void store(Value* v, Value* ptr);
     Value* load(Type* ty, Value* ptr);
+    Value* loadPtr(Value* value);
     Value* isNull(Value* value);
     void incSize(Value* bufferOffset, Value* ptr);
     Value* allocaAndStore(Type* type, Value* v, const std::string& name = "");

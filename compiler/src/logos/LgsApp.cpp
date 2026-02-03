@@ -327,7 +327,7 @@ void LgsApp::loadBuiltins() {
     // globals.addSymbol(LgsSymbol(new LgsTest(), true, false), &errHandler);
     globals.rttTypes = {
         &LGS_STR, &LGS_CHAR, &LGS_BYTE, &LGS_BOOL, &LGS_INT, &LGS_UINT, &LGS_ULONG,
-        &LGS_SHORT, &LGS_LONG, &LGS_SIZE, &LGS_FLOAT, &LGS_DOUBLE, &LGS_VOID
+        &LGS_SHORT, &LGS_LONG, &LGS_SIZE, &LGS_FLOAT, &LGS_DOUBLE
     };
 }
 
@@ -402,6 +402,7 @@ bool LgsApp::generateGenerics() {
         genericsFuncs.merge(funcs);
     }
 
+    LgsObject::generateObjsEqFunc(cgFile.cg);
     for (const auto& [_, genericFunc] : genericsFuncs) {
         cgFile.visitFunc(genericFunc);
     }
@@ -413,6 +414,8 @@ bool LgsApp::generateGenerics() {
         } else if (const auto map = genericType->asMap()) {
             map->generateGetFunc(cgFile.cg);
             map->generateAddFunc(cgFile.cg);
+        } else if (genericType->asNullable()) {
+            assert(0);
         } else if (const auto func = genericType->asFuncType()) {
             if (func->name == MAP_FUNC) {
                 cgFile.generateMapFunc(func);

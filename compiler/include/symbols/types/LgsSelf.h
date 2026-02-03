@@ -8,7 +8,6 @@ public:
 
     explicit LgsSelf(const std::string& name) : name(name) {}
     Type* getIRType(LgsCodeGen& cg) override;
-    Constant* getRTType(LgsCodeGen& cg) override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
     std::string getName() override;

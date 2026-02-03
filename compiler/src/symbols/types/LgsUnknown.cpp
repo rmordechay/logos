@@ -23,7 +23,7 @@ bool LgsUnknown::canCastTo(LgsType* other) {
 }
 
 LgsType* LgsUnknown::applyBinOp(LgsType* rightType, LgsBinOp& op) {
-    assert(0);
+    return nullptr;
 }
 
 std::string LgsUnknown::fmtStr() const {
@@ -35,9 +35,5 @@ DIType* LgsUnknown::getDebugType(LgsCodeGen& cg) {
 }
 
 Type* LgsUnknown::getIRType(LgsCodeGen& cg) {
-    assert(0);
-}
-
-Constant* LgsUnknown::getRTType(LgsCodeGen& cg) {
     assert(0);
 }

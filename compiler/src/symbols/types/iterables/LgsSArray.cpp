@@ -40,15 +40,11 @@ Value* LgsSArray::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
     return ptr;
 }
 
-Constant* LgsSArray::getRTType(LgsCodeGen& cg) {
-    const auto RTTName = getName();
-    const auto prefixedName = LGS_TYPEINFO_PREFIX + RTTName;
-    if (const auto v = cg.IRModule->getGlobalVariable(prefixedName)) return v;
-    if (cg.mode != CG_MODE_RTTYPES) return cg.getRTTypeInfo(RTTName, IRSize(cg), rttKind, isHeapAlloc, nullptr);
+Constant* LgsSArray::getRTTypeExtra(LgsCodeGen& cg) {
+    const auto rttName = getRTTName();
     const auto st = cg.getStructType({cg.sizeTy(), cg.ptrTy()});
     const std::vector<Constant*> args = {cg.usize(len), baseType->getRTType(cg)};
-    const auto gv = cg.createGlobal(prefixedName + "_extra", st, ConstantStruct::get(st, args));
-    return cg.getRTTypeInfo(RTTName, IRSize(cg), rttKind, isHeapAlloc, gv);
+    return cg.createGlobal(rttName + "_extra", st, ConstantStruct::get(st, args));
 }
 
 std::string LgsSArray::fmtStr() const {

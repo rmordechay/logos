@@ -17,7 +17,7 @@ bool LgsVariadic::canCastTo(LgsType* other) {
 }
 
 LgsType* LgsVariadic::applyBinOp(LgsType* rightType, LgsBinOp& op) {
-    assert(0);
+    return nullptr;
 }
 
 std::string LgsVariadic::fmtStr() const {

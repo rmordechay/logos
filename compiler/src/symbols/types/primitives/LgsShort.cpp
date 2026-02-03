@@ -39,7 +39,7 @@ bool LgsShort::canCastTo(LgsType* other) {
 }
 
 LgsType* LgsShort::applyBinOp(LgsType* rightType, LgsBinOp& op) {
-    assert(0);
+    return nullptr;
 }
 
 std::string LgsShort::fmtStr() const {

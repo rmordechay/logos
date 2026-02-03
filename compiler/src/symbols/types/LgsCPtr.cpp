@@ -18,10 +18,6 @@ Type* LgsCPtr::getIRType(LgsCodeGen& cg) {
     return cg.ptrTy();
 }
 
-Constant* LgsCPtr::getRTType(LgsCodeGen& cg) {
-    assert(0);
-}
-
 size_t LgsCPtr::sizeBytes() {
     return sizeof(void*);
 }
@@ -40,7 +36,7 @@ bool LgsCPtr::canCastTo(LgsType* other) {
 }
 
 LgsType* LgsCPtr::applyBinOp(LgsType* rightType, LgsBinOp& op) {
-    assert(0);
+    return nullptr;
 }
 
 std::string LgsCPtr::fmtStr() const {

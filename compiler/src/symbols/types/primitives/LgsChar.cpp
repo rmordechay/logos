@@ -26,7 +26,7 @@ std::string LgsChar::fmtStr() const {
 }
 
 LgsType* LgsChar::applyBinOp(LgsType* rightType, LgsBinOp& op) {
-    assert(0);
+    return nullptr;
 }
 
 bool LgsChar::canCastTo(LgsType* other) {

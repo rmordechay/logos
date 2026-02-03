@@ -19,10 +19,6 @@ Type* LgsFuncType::getIRType(LgsCodeGen& cg) {
     return IRType;
 }
 
-Constant* LgsFuncType::getRTType(LgsCodeGen& cg) {
-    assert(0);
-}
-
 LgsExpr* LgsFuncType::getZeroValue() {
     assert(0);
 }
@@ -106,7 +102,7 @@ bool LgsFuncType::equals(LgsType* other) {
 }
 
 LgsType* LgsFuncType::applyBinOp(LgsType* rightType, LgsBinOp& op) {
-    assert(0);
+    return nullptr;
 }
 
 void LgsFuncType::setFuncOptions(const uint32_t ops) {

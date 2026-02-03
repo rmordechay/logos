@@ -30,7 +30,7 @@ public:
     LgsInstance* singleton = nullptr;
     bool hasGenerics = false;
     inline static Lgs_ObjectIndices rttIndices;
-    static constexpr auto metaName = "Object";
+    static constexpr std::string metaName = "Object";
 
     explicit LgsObject(const std::string&  name) : name(name) {
         isHeapAlloc = true;
@@ -43,13 +43,18 @@ public:
     LgsFunc* getMethod(const std::string& methodName) override;
     LgsFunc* getMetaFunc(const std::string& methodName);
     Type* getIRType(LgsCodeGen& cg) override;
-    Constant* getRTType(LgsCodeGen& cg) override;
+    Constant* getRTTypeExtra(LgsCodeGen& cg) override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
     Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee) override;
     bool canCastTo(LgsType* other) override;
+    Value* objsEqual(LgsCodeGen& cg, Value* left, Value* right);
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     std::string fmtStr() const override;
     DIType* getDebugType(LgsCodeGen& cg) override;
+    static StructType* getObjRTT(LgsCodeGen& cg);
+    static StructType* getFieldRTT(LgsCodeGen& cg);
+    static StructType* getMethodRTT(LgsCodeGen& cg);
+    static Function* generateObjsEqFunc(LgsCodeGen& cg);
     ~LgsObject() override;
 };

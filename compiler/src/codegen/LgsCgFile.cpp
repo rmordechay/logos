@@ -329,8 +329,9 @@ void LgsCgFile::visitAssignment(const LgsAssignment* assignment) {
     visitExpr(right);
     if (left->type->isHeapAlloc) {
         moveValue(left->type, left->IRValue, right->IRValue);
+    } else {
+        cg.store(right->IRValue, left->IRValue);
     }
-    cg.store(right->IRValue, left->IRValue);
 }
 
 void LgsCgFile::moveValue(LgsType* type, Value* left, Value* right) {
@@ -637,14 +638,14 @@ void LgsCgFile::visitBinaryExpr(LgsBinaryExpr* binExpr) {
     case LSHIFT: binExpr->IRValue = type->rshiftIR(cg, binExpr); break;
     case RSHIFT: binExpr->IRValue = type->lshiftIR(cg, binExpr); break;
     case CROSS: binExpr->IRValue = type->crossIR(cg, binExpr); break;
-    case EQ: binExpr->IRValue = eqIR(cg, l->loadIR(cg), r->loadIR(cg), l->type); break;
-    case NE: binExpr->IRValue = neIR(cg, l->loadIR(cg), r->loadIR(cg), l->type); break;
-    case LT: binExpr->IRValue = ltIR(cg, l->loadIR(cg), r->loadIR(cg), l->type); break;
-    case GT: binExpr->IRValue = gtIR(cg, l->loadIR(cg), r->loadIR(cg), l->type); break;
-    case GE: binExpr->IRValue = geIR(cg, l->loadIR(cg), r->loadIR(cg), l->type); break;
-    case LE: binExpr->IRValue = leIR(cg, l->loadIR(cg), r->loadIR(cg), l->type); break;
-    case AND: binExpr->IRValue = andIR(cg, l->loadIR(cg), r->loadIR(cg)); break;
-    case OR: binExpr->IRValue = orIR(cg, l->loadIR(cg), r->loadIR(cg)); break;
+    case EQ: binExpr->IRValue = eqIR(cg, l->IRValue, r->IRValue, l->type); break;
+    case NE: binExpr->IRValue = neIR(cg, l->IRValue, r->IRValue, l->type); break;
+    case LT: binExpr->IRValue = ltIR(cg, l->IRValue, r->IRValue, l->type); break;
+    case GT: binExpr->IRValue = gtIR(cg, l->IRValue, r->IRValue, l->type); break;
+    case GE: binExpr->IRValue = geIR(cg, l->IRValue, r->IRValue, l->type); break;
+    case LE: binExpr->IRValue = leIR(cg, l->IRValue, r->IRValue, l->type); break;
+    case AND: binExpr->IRValue = andIR(cg, l->IRValue, r->IRValue); break;
+    case OR: binExpr->IRValue = orIR(cg, l->IRValue, r->IRValue); break;
     case IN: binExpr->IRValue = r->type->asIterable()->inIR(cg, r->IRValue, l->IRValue); break;
     default: assert(0);
     }
@@ -695,6 +696,7 @@ void LgsCgFile::visitFloatConst(LgsFloatConst* floatConst) {
 
 void LgsCgFile::visitNullableExpr(LgsNullableExpr* expr) {
     const auto nullable = expr->type->asNullable();
+    assert(nullable);
     const auto ty = nullable->getIRType(cg);
     if (expr->isNull) {
         if (nullable->passByRef) {
@@ -916,13 +918,13 @@ void LgsCgFile::visitSelection(LgsSelection* selection) {
         } else if (const auto iterIndex = child->asIterIndex()) {
             const auto baseExpr = iterIndex->getBaseExpr()->asVariable();
             const auto field = parent->type->getField(baseExpr->name);
-            iterIndex->pointee = cg.load(cg.ptrTy(), field->getGEP(cg, parent->IRValue));
+            iterIndex->pointee = cg.loadPtr(field->getGEP(cg, parent->IRValue));
             visitIterIndex(iterIndex);
         } else {
             assert(0);
         }
         if (child->type->passByRef) {
-            child->IRValue = cg.load(cg.ptrTy(), child->IRValue);
+            child->IRValue = cg.loadPtr(child->IRValue);
         }
     }
     selection->IRValue = selection->exprs.back()->IRValue;

@@ -249,11 +249,16 @@ void castExprImplicitly(LgsExpr*& expr, LgsType* toType) {
     if (expr->type->asNullable()) return;
     if (const auto toNullable = toType->asNullable()) {
         if (toNullable->isNull) return;
-        expr->setType(toNullable->baseType);
-        const auto nullableExpr = new LgsNullableExpr(expr);
-        nullableExpr->location = expr->location;
-        nullableExpr->setType(toNullable);
-        expr = nullableExpr;
+        if (const auto nullable = expr->asNullableExpr()) {
+            nullable->baseExpr->setType(toNullable->baseType);
+            expr->setType(toNullable);
+        } else {
+            expr->setType(toNullable->baseType);
+            const auto nullableExpr = new LgsNullableExpr(expr);
+            nullableExpr->location = expr->location;
+            nullableExpr->setType(toNullable);
+            expr = nullableExpr;
+        }
     }
 }
 

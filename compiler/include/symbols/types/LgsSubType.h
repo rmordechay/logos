@@ -11,7 +11,7 @@ public:
         rttKind = baseType->rttKind;
     }
     Type* getIRType(LgsCodeGen& cg) override;
-    Constant* getRTType(LgsCodeGen& cg) override;
+    Constant* getRTTypeExtra(LgsCodeGen& cg) override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
     std::string getName() override;

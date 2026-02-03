@@ -16,7 +16,7 @@ Type* LgsByte::getIRType(LgsCodeGen& cg) {
 }
 
 LgsType* LgsByte::applyBinOp(LgsType* rightType, LgsBinOp& op) {
-    assert(0);
+    return nullptr;
 }
 
 size_t LgsByte::sizeBytes() {

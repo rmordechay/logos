@@ -47,7 +47,6 @@ public:
         passByRef = true;
     }
     Type* getIRType(LgsCodeGen& cg) override;
-    Constant* getRTType(LgsCodeGen& cg) override;
     LgsExpr* getZeroValue() override;
     size_t sizeBytes() override;
     std::string getName() override;

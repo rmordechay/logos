@@ -59,7 +59,7 @@ bool LgsEnum::canCastTo(LgsType* other) {
 }
 
 LgsType* LgsEnum::applyBinOp(LgsType* rightType, LgsBinOp& op) {
-    assert(0);
+    return nullptr;
 }
 
 std::string LgsEnum::fmtStr() const {

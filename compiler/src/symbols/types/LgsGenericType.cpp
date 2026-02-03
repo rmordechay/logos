@@ -7,10 +7,6 @@ Type* LgsGenericType::getIRType(LgsCodeGen& cg) {
     return nullptr;
 }
 
-Constant* LgsGenericType::getRTType(LgsCodeGen& cg) {
-    return nullptr;
-}
-
 size_t LgsGenericType::sizeBytes() {
     assert(0);
 }
@@ -28,7 +24,7 @@ bool LgsGenericType::canCastTo(LgsType* other) {
 }
 
 LgsType* LgsGenericType::applyBinOp(LgsType* rightType, LgsBinOp& op) {
-    assert(0);
+    return nullptr;
 }
 
 std::string LgsGenericType::fmtStr() const {

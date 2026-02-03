@@ -13,6 +13,11 @@ Value* LgsPrint::call(LgsCodeGen& cg, std::vector<LgsFuncArg>& args) {
         const auto fmt = cg.getString(arg->type->fmtStr() + "\n");
         return cg.callPrintf({fmt, cg.builder.CreateFPExt(arg->loadIR(cg), cg.doubleTy())});
     }
+    if (arg->type->asBool()) {
+        const auto fmt = cg.getString(arg->type->fmtStr() + "\n");
+        const auto v = cg.builder.CreateSelect(arg->IRValue, cg.getString(LgsBool::trueLiteral), cg.getString(LgsBool::falseLiteral));;
+        return cg.callPrintf({fmt, v});
+    }
     if (arg->type->isInt || arg->type->asChar()) {
         const auto fmt = cg.getString(arg->type->fmtStr() + "\n");
         return cg.callPrintf({fmt, arg->loadIR(cg)});

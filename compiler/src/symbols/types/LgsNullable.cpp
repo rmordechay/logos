@@ -34,11 +34,12 @@ Value* LgsNullable::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
 }
 
 std::string LgsNullable::pname() {
-    return baseType ? baseType->pname() + '?' : LGS_NULL_LITERAL;
+    return baseType ? baseType->pname() + '?' : name;
 }
 
 std::string LgsNullable::getName() {
-    return baseType ? baseType->getName() + name : LGS_NULL_LITERAL;
+    if (passByRef) return baseType ? baseType->getName(): name;
+    return baseType ? baseType->getName() + name : name;
 }
 
 Type* LgsNullable::getIRType(LgsCodeGen& cg) {
@@ -46,25 +47,17 @@ Type* LgsNullable::getIRType(LgsCodeGen& cg) {
     return cg.getStructType({baseType->getIRType(cg), cg.i1Ty()}, getName());
 }
 
-Constant* LgsNullable::getRTType(LgsCodeGen& cg) {
+Constant* LgsNullable::getRTTypeExtra(LgsCodeGen& cg) {
     if (passByRef) return baseType->getRTType(cg);
-    const auto RTTName = getName();
-    const auto prefixedName = LGS_TYPEINFO_PREFIX + RTTName;
-    if (const auto v = cg.IRModule->getGlobalVariable(prefixedName)) return v;
-    if (cg.mode != CG_MODE_RTTYPES) return cg.getRTTypeInfo(RTTName, IRSize(cg), rttKind, isHeapAlloc, nullptr);
-    const auto baseRTT = baseType->getRTType(cg);
-    return cg.getRTTypeInfo(RTTName, IRSize(cg), rttKind, isHeapAlloc, baseRTT);
+    return baseType->getRTType(cg);
 }
 
 bool LgsNullable::canCastTo(LgsType* other) {
     if (other->isAny()) return true;
+    if (isNull) return false;
     const auto otherNullable = other->asNullable();
-    if (isNull && !otherNullable) return false;
-    if (!baseType) return true;
-    if (otherNullable) {
-        return baseType->canCastTo(otherNullable->baseType);
-    }
-    return baseType->canCastTo(other);
+    if (!otherNullable) return false;
+    return baseType->canCastTo(otherNullable->baseType);
 }
 
 std::string LgsNullable::fmtStr() const {

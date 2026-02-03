@@ -89,11 +89,13 @@ public:
     virtual std::string getName() = 0;
     virtual std::string getBaseName();
     virtual std::string pname(); // pretty name
+    std::string getRTTName();
     virtual size_t sizeBytes() = 0;
     virtual LgsExpr* getZeroValue() = 0;
     virtual Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee);
     virtual Type* getIRType(LgsCodeGen& cg) = 0;
-    virtual Constant* getRTType(LgsCodeGen& cg);
+    Constant* getRTType(LgsCodeGen& cg);
+    virtual Constant* getRTTypeExtra(LgsCodeGen& cg);
     virtual bool equals(LgsType* other);
     virtual bool canCastTo(LgsType* other) = 0;
     virtual LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) = 0;

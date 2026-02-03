@@ -30,7 +30,7 @@ public:
     std::string pname() override;
     std::string getName() override;
     Type* getIRType(LgsCodeGen& cg) override;
-    Constant* getRTType(LgsCodeGen& cg) override;
+    Constant* getRTTypeExtra(LgsCodeGen& cg) override;
     bool canCastTo(LgsType* other) override;
     std::string fmtStr() const override;
     DIType* getDebugType(LgsCodeGen& cg) override;

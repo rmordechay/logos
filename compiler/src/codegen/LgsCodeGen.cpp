@@ -173,6 +173,10 @@ Value* LgsCodeGen::load(Type* ty, Value* ptr) {
     return builder.CreateLoad(ty, ptr);
 }
 
+Value* LgsCodeGen::loadPtr(Value* value) {
+    return builder.CreateLoad(ptrTy(), value);
+}
+
 Value* LgsCodeGen::isNull(Value* value) {
     return builder.CreateIsNull(value);
 }
@@ -382,12 +386,11 @@ void LgsCodeGen::callMemcpy(Value* dest, Value* src, Value* size) {
 GlobalVariable* LgsCodeGen::getRTTypeInfo(const std::string& name, ConstantInt* size, const int32_t kind, const bool isHeapAlloc, Constant* extra) {
     assert(kind != RTT_UNKNOWN);
     const auto baseStruct = getRTTStruct();
-    const auto prefixedName = LGS_TYPEINFO_PREFIX + name;
     if (mode == CG_MODE_RTTYPES) {
         const auto initializer = ConstantStruct::get(baseStruct, {size, i32(kind), i1(isHeapAlloc), extra ? extra : null()});
-        return createGlobal(prefixedName, baseStruct, initializer);
+        return createGlobal(name, baseStruct, initializer);
     }
-    return createGlobal(prefixedName, baseStruct, nullptr);
+    return createGlobal(name, baseStruct, nullptr);
 }
 
 StructType* LgsCodeGen::getRTTStruct() {

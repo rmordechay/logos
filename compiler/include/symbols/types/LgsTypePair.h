@@ -9,7 +9,6 @@ public:
 
     explicit LgsTypePair(LgsType* keyType = nullptr, LgsType* valueType = nullptr) : key(keyType), value(valueType) {}
     Type* getIRType(LgsCodeGen& cg) override;
-    Constant* getRTType(LgsCodeGen& cg) override;
     LgsExpr* getZeroValue() override;
     size_t sizeBytes() override;
     std::string getName() override;

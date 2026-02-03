@@ -10,10 +10,6 @@ Type* LgsSet::getIRType(LgsCodeGen& cg) {
     return cg.getStructType({cg.ptrTy(), cg.sizeTy(), cg.sizeTy(), cg.ptrTy()}, name);
 }
 
-Constant* LgsSet::getRTType(LgsCodeGen& cg) {
-    assert(0);
-}
-
 size_t LgsSet::sizeBytes() {
     return sizeof(size_t) + sizeof(size_t) + sizeof(size_t) + sizeof(void*);
 }

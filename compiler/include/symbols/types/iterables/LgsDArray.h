@@ -19,7 +19,7 @@ public:
     LgsFunc* getMethod(const std::string& methodName) override;
     bool inferBaseType(std::vector<LgsExpr*>& args) override;
     Type* getIRType(LgsCodeGen& cg) override;
-    Constant* getRTType(LgsCodeGen& cg) override;
+    Constant* getRTTypeExtra(LgsCodeGen& cg) override;
     std::string getBaseName() override;
     std::string getName() override;
     std::string pname() override;

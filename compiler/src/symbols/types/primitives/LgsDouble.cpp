@@ -20,7 +20,7 @@ LgsExpr* LgsDouble::getZeroValue() {
 }
 
 LgsType* LgsDouble::applyBinOp(LgsType* rightType, LgsBinOp& op) {
-    assert(0);
+    return nullptr;
 }
 
 std::string LgsDouble::fmtStr() const {

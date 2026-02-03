@@ -20,7 +20,7 @@ public:
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
     Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee) override;
-    Constant* getRTType(LgsCodeGen& cg) override;
+    Constant* getRTTypeExtra(LgsCodeGen& cg) override;
     std::string fmtStr() const override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     bool inferBaseType(std::vector<LgsExpr*>& args) override;

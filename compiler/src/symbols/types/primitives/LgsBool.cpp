@@ -15,7 +15,7 @@ Type* LgsBool::getIRType(LgsCodeGen& cg) {
 }
 
 LgsType* LgsBool::applyBinOp(LgsType* rightType, LgsBinOp& op) {
-    assert(0);
+    return nullptr;
 }
 
 std::string LgsBool::getName() {
