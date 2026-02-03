@@ -1,10 +1,10 @@
 #include "logos/LgsApp.h"
 #include <cassert>
 #include <sstream>
-#include "../../external/include/doctest.h"
+#include "gtest/gtest.h"
 #include <unistd.h>
 
-TEST_CASE("TestCodeGen1") {
+TEST(TestCodeGen, Test1) {
     const auto code = R"(
     main() {
         print("Hello world")
@@ -14,7 +14,7 @@ TEST_CASE("TestCodeGen1") {
     {
         LgsApp app;
         app.lgsCode[LGS_MAIN_FILE] = code;
-        if (!app.compile()) return app.errHandler.printErrors();
+        ASSERT_TRUE(app.compile());
         execPath = app.paths.execFile;
     }
     const auto pipe = popen(execPath.c_str(), "r");
@@ -28,10 +28,10 @@ TEST_CASE("TestCodeGen1") {
     std::istringstream stream(output);
     std::string line1;
     std::getline(stream, line1);
-    CHECK(line1 == "Hello world");
+    EXPECT_EQ(line1, "Hello world");
 }
 
-TEST_CASE("TestCodeGen2") {
+TEST(TestCodeGen, Test2) {
     const auto code = R"(
     main() {
         a = 23 + 34 - 235
@@ -42,7 +42,7 @@ TEST_CASE("TestCodeGen2") {
     {
         LgsApp app;
         app.lgsCode[LGS_MAIN_FILE] = code;
-        if (!app.compile()) return app.errHandler.printErrors();
+        ASSERT_TRUE(app.compile());
         execPath = app.paths.execFile;
     }
     const auto pipe = popen(execPath.c_str(), "r");
@@ -56,10 +56,10 @@ TEST_CASE("TestCodeGen2") {
     std::istringstream stream(output);
     std::string line1;
     std::getline(stream, line1);
-    CHECK(line1 == "-178");
+    EXPECT_EQ(line1, "-178");
 }
 
-TEST_CASE("TestCodeGen3") {
+TEST(TestCodeGen, Test3) {
     const auto code = R"(
     main() {
         a = 5
@@ -79,7 +79,7 @@ TEST_CASE("TestCodeGen3") {
     {
         LgsApp app;
         app.lgsCode[LGS_MAIN_FILE] = code;
-        if (!app.compile()) return app.errHandler.printErrors();
+        ASSERT_TRUE(app.compile());
         execPath = app.paths.execFile;
     }
     const auto pipe = popen(execPath.c_str(), "r");
@@ -94,6 +94,6 @@ TEST_CASE("TestCodeGen3") {
     std::string line1, line2;
     std::getline(stream, line1);
     std::getline(stream, line2);
-    CHECK(line1 == "true");
-    CHECK(line2 == "false");
+    EXPECT_EQ(line1, "true");
+    EXPECT_EQ(line2, "false");
 }

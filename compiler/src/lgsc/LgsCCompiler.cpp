@@ -1,6 +1,5 @@
 #include "lgsc/LgsCCompiler.h"
 #include "LgsDefinitions.h"
-#include "files/LgsFile.h"
 #include "lgsc/LgsCLangParser.h"
 #include "LgsConfigs.h"
 #include "LgsUtils.h"
@@ -20,7 +19,7 @@ using namespace clang;
 
 void LgsCCompiler::initCompiler() {
     auto diagConsumer = std::make_unique<LgsDiagnosticConsumer>();
-    compiler.createDiagnostics(diagConsumer.release());
+    compiler.createDiagnostics(*vfs::getRealFileSystem());
     clang::TargetOptions& targetOpts = compiler.getInvocation().getTargetOpts();
     auto& headerSearchOptions = compiler.getHeaderSearchOpts();
 
@@ -37,7 +36,7 @@ void LgsCCompiler::initCompiler() {
     }
 
     const auto targetOptions = std::make_shared<clang::TargetOptions>(targetOpts);
-    compiler.setTarget(TargetInfo::CreateTargetInfo(compiler.getDiagnostics(), targetOptions));
+    compiler.setTarget(TargetInfo::CreateTargetInfo(compiler.getDiagnostics(), *targetOptions));
     compiler.createFileManager();
     compiler.createSourceManager(compiler.getFileManager());
 }

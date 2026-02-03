@@ -6,8 +6,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_definitions(-DLOGOS_VERSION="${CMAKE_PROJECT_VERSION}")
 option(LOGOS_RELEASE "Build release version" OFF)
 
-find_package(LLVM REQUIRED CONFIG)
-find_package(Clang REQUIRED CONFIG)
+find_package(LLVM 21.1.8 REQUIRED CONFIG)
+find_package(Clang 21.1.8 REQUIRED CONFIG)
 find_package(OpenSSL REQUIRED)
 find_package(CURL REQUIRED)
 set(LLVM_LINK_LLVM_DYLIB ON)
@@ -45,6 +45,7 @@ set(COMPILER_SOURCE
     ${CMAKE_SOURCE_DIR}/compiler/src/lgsc/LgsCLangParser.cpp
 
     # Files
+    ${CMAKE_SOURCE_DIR}/compiler/src/files/LgsFile.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/files/LgsMainFile.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/files/LgsObjectFile.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/files/LgsInterfaceFile.cpp
@@ -154,8 +155,6 @@ set(COMPILER_SOURCE
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsULong.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsByte.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsVoid.cpp
-    shared/include/LgsRTTIndices.h
-    compiler/src/files/LgsFile.cpp
 )
 
 set(LGS_LIB_SOURCE
@@ -170,6 +169,7 @@ set(LGS_LIB_SOURCE
 set(SHARED_SOURCE
     ${CMAKE_SOURCE_DIR}/shared/src/LgsErrHandler.cpp
     ${CMAKE_SOURCE_DIR}/shared/src/LgsUtils.cpp
+    ${CMAKE_SOURCE_DIR}/shared/include/LgsRTTIndices.h
 )
 
 # Logos lib and shared

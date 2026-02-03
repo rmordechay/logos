@@ -23,7 +23,7 @@
 
 void LgsCodeGen::setupModule(const fs::path& file, const bool debugMode) {
     IRModule = new Module(file.stem().string(), context);
-    IRModule->setTargetTriple(sys::getDefaultTargetTriple());
+    IRModule->setTargetTriple(Triple(sys::getDefaultTargetTriple()));
     IRModule->setDataLayout(targetMachine->createDataLayout());
     if (debugMode && mode == CG_MODE_RTTYPES) {
         debugger.diBuilder = new DIBuilder(*IRModule);
@@ -250,9 +250,9 @@ Value* LgsCodeGen::reallocate(Value* ptr, Value* size, Value* level) {
     return callRuntimeFunc("reallocate", ptrTy(), {ptrTy(), sizeTy(), sizeTy()}, {ptr, extendToSize(size), extendToSize(level)});
 }
 
-Value* LgsCodeGen::moveArrElement(Value* iterable, Value* element, Constant* type) {
-    const std::vector<Type*> params = {ptrTy(), ptrTy(), ptrTy()};
-    const std::vector<Value*> args = {iterable, element, type};
+Value* LgsCodeGen::moveArrElement(Value* arrLevel, Constant* type, Value* element) {
+    const std::vector<Type*> params = {sizeTy(), ptrTy(), ptrTy()};
+    const std::vector<Value*> args = {arrLevel, type, element};
     return callRuntimeFunc("moveArrElement", ptrTy(), params, args);
 }
 
@@ -325,7 +325,7 @@ Value* LgsCodeGen::callFunc(const std::string& funcName, Type* rt, const std::ve
 }
 
 Value* LgsCodeGen::callIntrinsics(const Intrinsic::ID intrinsicID, const std::vector<Type*>& types, const std::vector<Value*>& args) {
-    const auto declaration = Intrinsic::getDeclaration(IRModule, intrinsicID, types);
+    const auto declaration = Intrinsic::getOrInsertDeclaration(IRModule, intrinsicID, types);
     return builder.CreateCall(declaration, args);
 }
 
@@ -457,7 +457,7 @@ void LgsCodeGen::initLLVM() {
     InitializeNativeTargetAsmParser();
 
     std::string error;
-    const auto targetTriple = sys::getDefaultTargetTriple();
+    const auto targetTriple = Triple(sys::getDefaultTargetTriple());
     const auto target = TargetRegistry::lookupTarget(targetTriple, error);
     targetMachine = target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), std::nullopt);
 }

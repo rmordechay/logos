@@ -2,11 +2,11 @@
 #include "logos/LgsApp.h"
 #include "tools/LgsJsonParser.h"
 #include "LgsUtils.h"
-#include <../../external/include/doctest.h>
+#include "gtest/gtest.h"
 
 const std::string expectedDir = "../../tests/parser/expected";
 
-TEST_CASE("Parser1") {
+TEST(TestParser, Test1) {
     LgsApp app;
     const auto code = R"(
     object Obj {
@@ -28,11 +28,11 @@ TEST_CASE("Parser1") {
     const auto mainFile = dynamic_cast<LgsMainFile*>(app.srcFiles.front());
     LgsJsonParser parser;
     parser.parseMainFile(mainFile);
-    CHECK(app.errHandler.errors.size() == 0);
-    CHECK_EQ(parser.json.str(), expectedTree);
+    EXPECT_EQ(app.errHandler.errors.size(), 0);
+    EXPECT_EQ(parser.json.str(), expectedTree);
 }
 
-TEST_CASE("Parser2") {
+TEST(TestParser, Test2) {
     LgsApp app;
     const auto code = R"(
     f2(x: Interface) {
@@ -59,11 +59,11 @@ TEST_CASE("Parser2") {
     LgsJsonParser parser;
     parser.parseMainFile(mainFile);
     std::ofstream("../../test.json") << parser.json.str();
-    CHECK(app.errHandler.errors.size() == 0);
-    CHECK_EQ(parser.json.str(), expectedTree);
+    EXPECT_EQ(app.errHandler.errors.size(), 0);
+    EXPECT_EQ(parser.json.str(), expectedTree);
 }
 
-TEST_CASE("Parser3") {
+TEST(TestParser, Test3) {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -88,11 +88,11 @@ TEST_CASE("Parser3") {
     const auto mainFile = dynamic_cast<LgsMainFile*>(app.srcFiles.front());
     LgsJsonParser parser;
     parser.parseMainFile(mainFile);
-    CHECK(app.errHandler.errors.size() == 0);
-    CHECK_EQ(parser.json.str(), expectedTree);
+    EXPECT_EQ(app.errHandler.errors.size(), 0);
+    EXPECT_EQ(parser.json.str(), expectedTree);
 }
 
-TEST_CASE("Parser4") {
+TEST(TestParser, Test4) {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -127,6 +127,6 @@ TEST_CASE("Parser4") {
     const auto mainFile = dynamic_cast<LgsMainFile*>(app.srcFiles.front());
     LgsJsonParser parser;
     parser.parseMainFile(mainFile);
-    CHECK(app.errHandler.errors.size() == 0);
-    CHECK_EQ(parser.json.str(), expectedTree);
+    EXPECT_EQ(app.errHandler.errors.size(), 0);
+    EXPECT_EQ(parser.json.str(), expectedTree);
 }

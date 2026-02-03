@@ -1,3 +1,4 @@
+find_package(GTest REQUIRED)
 enable_testing()
 
 add_executable(lgs_tests
@@ -6,16 +7,18 @@ add_executable(lgs_tests
     codegen/CodegenTest.cpp
     sema/SemaErrorTest.cpp
     parser/ParserTest.cpp
-    ${LGS_SOURCE}
+    ${COMPILER_SOURCE}
 )
 
 target_include_directories(lgs_tests PRIVATE
     ${CMAKE_SOURCE_DIR}/tests
-    ${CMAKE_SOURCE_DIR}/external
     ${CMAKE_SOURCE_DIR}/compiler/include
     ${CMAKE_SOURCE_DIR}/compiler/include/symbols
     ${CMAKE_SOURCE_DIR}/lib/include
     ${CMAKE_SOURCE_DIR}/shared/include
+    ${CMAKE_SOURCE_DIR}/external/include
+    ${LLVM_INCLUDE_DIRS}
+    ${CLANG_INCLUDE_DIRS}
 )
 
 target_link_libraries(lgs_tests PRIVATE
@@ -26,4 +29,6 @@ target_link_libraries(lgs_tests PRIVATE
     CURL::libcurl
     OpenSSL::SSL
     OpenSSL::Crypto
+    GTest::gtest
+    GTest::gtest_main
 )

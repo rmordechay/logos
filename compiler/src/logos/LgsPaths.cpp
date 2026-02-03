@@ -8,14 +8,8 @@
 
 void LgsPaths::findLgsRootDir() {
     assert(lgsConfigs.isDevMode);
-    const auto current = fs::current_path();
-    if (fs::exists(current / LGS_LIB_NAME)) {
-        lgsRootDir = current;
-    } else {
-        const auto parent = current.parent_path();
-        if (!fs::exists(parent / LGS_LIB_NAME)) assert(0);
-        lgsRootDir = current;
-    }
+    const auto currentPath = fs::current_path();
+    lgsRootDir = lgsConfigs.isTestMode ? currentPath.parent_path() : currentPath;
     lgsPackagesDir = lgsRootDir / LGS_PACKAGES_DIR;
 }
 

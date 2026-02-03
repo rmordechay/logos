@@ -126,7 +126,7 @@ void LgsDArray::addIRElement(LgsCodeGen& cg, Value* iterable, Value* index, Valu
     assert(!index);
     auto element = value;
     if (baseType->isHeapAlloc) {
-        element = cg.moveArrElement(iterable, value, getRTType(cg));
+        element = cg.moveArrElement(cg.load(cg.sizeTy(), iterable), baseType->getRTType(cg), value);
     }
     cg.builder.CreateCall(generateAddFunc(cg), {iterable, element});
 }

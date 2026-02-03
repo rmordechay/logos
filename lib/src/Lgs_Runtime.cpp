@@ -108,15 +108,14 @@ extern "C" void Lgs_Runtime_moveArr(Lgs_DArrayExpr* leftArr, const Lgs_DArrayExp
     }
 }
 
-extern "C" void* Lgs_Runtime_moveArrElement(const Lgs_DArrayExpr* arr, void* element) {
-    const auto arrLevel = arr->level;
+extern "C" void* Lgs_Runtime_moveArrElement(const size_t arrLevel, const Lgs_TypeInfo* baseType, void* element) {
     const auto elementLevel = *static_cast<size_t*>(element);
     assert(arrLevel <= runtime.level && elementLevel <= runtime.level);
     if (arrLevel >= elementLevel) return element;
     auto& allocator = runtime.stack.at(arrLevel).allocator;
-    const auto baseSize = arr->baseType->size;
+    const auto baseSize = baseType->size;
     const auto ptr = allocator.allocate(baseSize, true);
-    Lgs_Runtime_moveValue(arr->baseType->kind, arrLevel, ptr, element, baseSize);
+    Lgs_Runtime_moveValue(baseType->kind, arrLevel, ptr, element, baseSize);
     return ptr;
 }
 

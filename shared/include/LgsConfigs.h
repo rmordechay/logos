@@ -29,6 +29,7 @@ struct LgsConfigs {
     LgsOS os;
     LgsArch arch;
     bool isDevMode = true;
+    bool isTestMode = false;
     bool printIR = true;
     bool writeIRFiles = false;
     LgsLogLevel logLevel = LGS_INFO;

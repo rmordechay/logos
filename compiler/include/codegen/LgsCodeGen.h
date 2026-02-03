@@ -1,5 +1,4 @@
 #pragma once
-#include "Lgs_Types.h"
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/Passes/OptimizationLevel.h>
 #include <map>
@@ -103,7 +102,7 @@ public:
     Value* allocInLevel(Value* size, Value* level, bool setLevel);
     Value* allocStrConst(Value* strPtr);
     Value* reallocate(Value* ptr, Value* size, Value* level);
-    Value* moveArrElement(Value* iterable, Value* element, Constant* type);
+    Value* moveArrElement(Value* arrLevel, Constant* type, Value* element);
     void throwError(const LgsBaseMsg& err, const std::vector<Value*>& args = {});
 
     // Blocks

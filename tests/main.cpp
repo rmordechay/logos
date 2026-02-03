@@ -1,12 +1,13 @@
+#include <gtest/gtest.h>
 #include "LgsConfigs.h"
 #include "codegen/LgsCodeGen.h"
-#define DOCTEST_CONFIG_IMPLEMENT
-#include "../external/include/doctest.h"
 
-int main(const int argc, char** argv) {
+int main(int argc, char** argv) {
     LgsCodeGen::initLLVM();
     lgsConfigs.isDevMode = true;
+    lgsConfigs.isTestMode = true;
     lgsConfigs.printIR = false;
     lgsConfigs.writeIRFiles = false;
-    return doctest::Context(argc, argv).run();
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }
