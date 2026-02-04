@@ -6,7 +6,7 @@
 class LgsStr final : public LgsIterable {
 public:
     static constexpr auto name = "Str";
-    inline static Lgs_StrIndices rttIndices;
+    inline static LgsStrIndices rttIndices;
 
     explicit LgsStr(): LgsIterable(&LGS_CHAR) {
         isHeapAlloc = true;
@@ -27,7 +27,7 @@ public:
     Value* lenIR(LgsCodeGen& cg, Value* iterable) override;
     Value* inIR(LgsCodeGen& cg, Value* iterableExpr, Value* value) override;
     Value* hashValue(LgsCodeGen& cg, Value* value) override;
-    Value* getStrPtr(LgsCodeGen& cg, Value* value);
+    Value* loadStrPtr(LgsCodeGen& cg, Value* value);
     std::string fmtStr() const override;
     DIType* getDebugType(LgsCodeGen& cg) override;
 };

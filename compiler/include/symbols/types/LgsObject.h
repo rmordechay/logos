@@ -29,7 +29,7 @@ public:
     std::map<std::string, LgsField*> metaFields;
     LgsInstance* singleton = nullptr;
     bool hasGenerics = false;
-    inline static Lgs_ObjectIndices rttIndices;
+    inline static LgsObjIndices rttIndices;
     static constexpr std::string metaName = "Object";
 
     explicit LgsObject(const std::string&  name) : name(name) {
@@ -52,9 +52,9 @@ public:
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     std::string fmtStr() const override;
     DIType* getDebugType(LgsCodeGen& cg) override;
+    Function* generateObjsEqFunc(LgsCodeGen& cg) const;
     static StructType* getObjRTT(LgsCodeGen& cg);
     static StructType* getFieldRTT(LgsCodeGen& cg);
     static StructType* getMethodRTT(LgsCodeGen& cg);
-    static Function* generateObjsEqFunc(LgsCodeGen& cg);
     ~LgsObject() override;
 };

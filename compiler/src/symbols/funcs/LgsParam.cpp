@@ -2,10 +2,6 @@
 #include "LgsType.h"
 #include "codegen/LgsCodeGen.h"
 
-Value* LgsParam::loadIR(LgsCodeGen& cg) {
-    return IRValue;
-}
-
 void LgsParam::setType(LgsType* newType) {
     if (type && type != newType) freeType(type);
     type = newType;

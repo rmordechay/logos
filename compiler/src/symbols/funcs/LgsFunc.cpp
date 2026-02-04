@@ -104,7 +104,7 @@ Value* LgsFunc::callExternal(LgsCodeGen& cg, const std::vector<LgsFuncArg>& args
     std::vector<Value*> IRArgs;
     for (const auto& arg : args) {
         if (const auto s = arg.expr->type->asStr()) {
-            IRArgs.emplace_back(s->getStrPtr(cg, arg.expr->IRValue));
+            IRArgs.emplace_back(s->loadStrPtr(cg, arg.expr->IRValue));
         } else {
             IRArgs.emplace_back(arg.expr->IRValue);
         }

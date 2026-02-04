@@ -380,16 +380,17 @@ Value* neIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
         return cg.builder.CreateFCmpONE(left, right);
     }
     if (const auto dArr = type->asDArray()) {
-        return cg.builder.CreateNot(cg.builder.CreateCall(dArr->generateArrEqFunc(cg), {left, right}));
+        const auto arrsEq = cg.builder.CreateCall(dArr->generateArrEqFunc(cg), {left, right});
+        return cg.builder.CreateNot(arrsEq);
     }
-    if (type->asStr()) {
-        return cg.strsNotEqual(left, right);
+    if (const auto str = type->asStr()) {
+        const auto ty = str->getIRType(cg);
+        const auto str1 = cg.builder.CreateStructGEP(ty, left, str->rttIndices.data);
+        const auto str2 = cg.builder.CreateStructGEP(ty, right, str->rttIndices.data);
+        return cg.strsNotEqual(str1, str2);
     }
-    if (type->asObject()) {
-        const auto ty = type->getIRType(cg);
-        const auto lType = cg.loadStructField(ty, left, LgsInstance::rttIndices.type, cg.ptrTy());
-        const auto rType = cg.loadStructField(ty, right, LgsInstance::rttIndices.type, cg.ptrTy());
-        return cg.builder.CreateICmpNE(cg.load(cg.sizeTy(), lType), cg.load(cg.sizeTy(), rType));
+    if (const auto obj = type->asObject()) {
+        return cg.builder.CreateNot(obj->objsEqual(cg, left, right));
     }
     assert(0);
 }

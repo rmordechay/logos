@@ -9,7 +9,7 @@
 class LgsDArray final : public LgsIterable {
 public:
     static constexpr auto name = "DArray";
-    inline static Lgs_DArrayExprIndices rttIndices;
+    inline static LgsDArrayExprIndices rttIndices;
 
     explicit LgsDArray(LgsType* baseType = nullptr) : LgsIterable(baseType) {
         isHeapAlloc = true;

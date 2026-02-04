@@ -50,7 +50,7 @@ LgsFunc* LgsObject::getMetaFunc(const std::string& methodName) {
         metaFuncs[methodName]->fn = [](LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) {
             const auto objRTT = args[0].expr->type->getRTType(cg);
             const auto arg = args[1].expr;
-            const auto funcName = arg->type->asStr()->getStrPtr(cg, arg->IRValue);
+            const auto funcName = arg->type->asStr()->loadStrPtr(cg, arg->IRValue);
             const auto vfunc = cg.getVFunc(objRTT, funcName);
             cg.ifStmt(cg.builder.CreateIsNull(vfunc), [funcName, &cg] {cg.throwError(E10006, {funcName});});
             return vfunc;
@@ -164,7 +164,7 @@ Value* LgsObject::objsEqual(LgsCodeGen& cg, Value* left, Value* right) {
 }
 
 LgsType* LgsObject::applyBinOp(LgsType* rightType, LgsBinOp& op) {
-    if (op.opType != EQ) return nullptr;
+    if (op.opType != EQ && op.opType != NE) return nullptr;
     return canCastTo(rightType) ? &LGS_BOOL : nullptr;
 }
 
@@ -185,6 +185,28 @@ DIType* LgsObject::getDebugType(LgsCodeGen& cg) {
     assert(0);
 }
 
+Function* LgsObject::generateObjsEqFunc(LgsCodeGen& cg) const {
+    const auto funcName = LGS_PREFIX + name + "_" + EQUAL_FUNC;
+    if (const auto func = cg.IRModule->getFunction(funcName)) return func;
+    const auto ft = cg.getFT(cg.i1Ty(), {cg.ptrTy(), cg.ptrTy()});
+    if (cg.mode == CG_MODE_SRC_CODE) return cg.getFunc(funcName, ft);
+    const auto func = cg.getFunc(funcName, ft);
+    const auto obj1 = func->getArg(0);
+    const auto obj2 = func->getArg(1);
+    const auto entryBlock = cg.createBlock(BLOCK_ENTRY, func);
+    cg.builder.SetInsertPoint(entryBlock);
+    for (const auto field : fields) {
+        const auto gep1 = field->getGEP(cg, obj1);
+        const auto gep2 = field->getGEP(cg, obj2);
+        const auto v1 = cg.load(field->type->getTypeOrPtr(cg), gep1);
+        const auto v2 = cg.load(field->type->getTypeOrPtr(cg), gep2);
+        const auto eq = neIR(cg, v1, v2, field->type);
+        cg.ifStmt(eq, [&cg]{cg.builder.CreateRet(cg.false_());});
+    }
+    cg.builder.CreateRet(cg.true_());
+    return func;
+}
+
 StructType* LgsObject::getObjRTT(LgsCodeGen& cg) {
     const auto rttName = LGS_TYPEINFO_PREFIX + metaName;
     return cg.getStructType({cg.sizeTy(), cg.ptrTy(), cg.sizeTy(), cg.sizeTy(), cg.ptrTy(), cg.ptrTy(), cg.ptrTy()}, rttName);
@@ -198,29 +220,6 @@ StructType* LgsObject::getFieldRTT(LgsCodeGen& cg) {
 StructType* LgsObject::getMethodRTT(LgsCodeGen& cg) {
     constexpr auto rttName = std::string(LGS_TYPEINFO_PREFIX) + "method";
     return cg.getStructType({cg.ptrTy(), cg.ptrTy()}, rttName);
-}
-
-Function* LgsObject::generateObjsEqFunc(LgsCodeGen& cg) {
-    const auto funcName = "ObjsEqual";
-    if (const auto func = cg.IRModule->getFunction(funcName)) return func;
-    const auto ft = cg.getFT(cg.i1Ty(), {cg.ptrTy(), cg.ptrTy()});
-    if (cg.mode == CG_MODE_SRC_CODE) return cg.getFunc(funcName, ft);
-    const auto func = cg.getFunc(funcName, ft);
-    const auto entryBlock = cg.createBlock(BLOCK_ENTRY, func);
-    cg.builder.SetInsertPoint(entryBlock);
-
-    const auto obj1 = func->getArg(0);
-    const auto obj2 = func->getArg(1);
-    const auto typePtr1 = cg.builder.CreatePtrAdd(obj1, cg.i32(sizeof(size_t)));
-    const auto typePtr2 = cg.builder.CreatePtrAdd(obj2, cg.i32(sizeof(size_t)));
-    const auto type1 = cg.loadPtr(typePtr1);
-    const auto type2 = cg.loadPtr(typePtr2);
-    const auto id1 = cg.load(cg.sizeTy(), type1);
-    const auto id2 = cg.load(cg.sizeTy(), type2);
-    const auto idsEq = cg.builder.CreateICmpEQ(id1, id2);
-    cg.ifStmt(idsEq, [&cg]{cg.builder.CreateRet(cg.false_());});
-    cg.builder.CreateRet(cg.true_());
-    return func;
 }
 
 LgsObject::~LgsObject() {

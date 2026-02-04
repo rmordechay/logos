@@ -402,7 +402,6 @@ bool LgsApp::generateGenerics() {
         genericsFuncs.merge(funcs);
     }
 
-    LgsObject::generateObjsEqFunc(cgFile.cg);
     for (const auto& [_, genericFunc] : genericsFuncs) {
         cgFile.visitFunc(genericFunc);
     }
@@ -414,6 +413,8 @@ bool LgsApp::generateGenerics() {
         } else if (const auto map = genericType->asMap()) {
             map->generateGetFunc(cgFile.cg);
             map->generateAddFunc(cgFile.cg);
+        } else if (const auto obj = genericType->asObject()) {
+            obj->generateObjsEqFunc(cgFile.cg);
         } else if (genericType->asNullable()) {
             assert(0);
         } else if (const auto func = genericType->asFuncType()) {
@@ -430,7 +431,6 @@ bool LgsApp::generateGenerics() {
             assert(0);
         }
     }
-
     genericFiles.push_back(genericsFile);
     return genericsFile->cgFile.cg.writeIRModule(paths, configs.optLevel);
 }

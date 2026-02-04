@@ -13,7 +13,6 @@
 #include "exprs/constants/LgsCharConst.h"
 #include "exprs/constants/LgsFloatConst.h"
 #include "exprs/constants/LgsStrConst.h"
-#include "stmts/LgsField.h"
 #include "exprs/LgsMatrixExpr.h"
 #include "exprs/LgsMetaSelection.h"
 #include "exprs/LgsNullableExpr.h"
@@ -24,6 +23,10 @@
 #include "loops/LgsMetaVar.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsNullable.h"
+
+Value* LgsExpr::loadIR(LgsCodeGen& cg) {
+    assert(0);
+}
 
 std::optional<int64_t> LgsExpr::getConstInt() {
     if (const auto intConst = asIntConst()) {

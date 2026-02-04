@@ -7,11 +7,6 @@ void LgsField::setType(LgsType* newType) {
     type = newType;
 }
 
-Value* LgsField::loadIR(LgsCodeGen& cg) {
-    if (type->asEnum()) return IRValue;
-    return cg.load(type->getIRType(cg), IRValue);
-}
-
 std::string LgsField::getName() {
     return name;
 }
@@ -21,7 +16,6 @@ LgsType* LgsField::getType() {
 }
 
 Value* LgsField::getGEP(LgsCodeGen& cg, Value* parentIRPtr) {
-    if (gep) return gep;
     assert(parentType && parentIRPtr);
     const auto ty = parentType->getIRType(cg);
     if (parentType->asVec()) {

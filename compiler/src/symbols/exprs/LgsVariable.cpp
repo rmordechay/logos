@@ -12,17 +12,13 @@
 Value* LgsVariable::loadIR(LgsCodeGen& cg) {
     switch (ref.symbolType) {
     case PARAM:
-        return ref.param->loadIR(cg);
+        return cg.load(type->getIRType(cg), ref.param->IRValue);
     case VAR_DEC:
-        return ref.varDec->loadIR(cg);
+        return cg.load(type->getIRType(cg), ref.varDec->IRValue);
     case FIELD:
-        return ref.field->loadIR(cg);
-    case FUNC:
-    case OBJECT:
-    case ENUM:
-        return IRValue;
+        return cg.load(type->getIRType(cg), ref.field->IRValue);
     default:
-        assert(0);
+        return IRValue;
     }
 }
 

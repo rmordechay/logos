@@ -42,7 +42,6 @@ public:
     LgsLocation location;
     Value* IRValue = nullptr;
 
-    virtual Value* loadIR(LgsCodeGen& cg);
     virtual void hashNode(size_t& oldHash);
     virtual void setDebugValue(LgsCodeGen& cg) = 0;
     virtual LgsValue* clone();

@@ -91,6 +91,13 @@ Value* LgsDArray::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
 
 LgsType* LgsDArray::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     switch (op.opType) {
+    case EQ:
+    case NE: {
+        const auto otherDarr = rightType->asDArray();
+        if (!otherDarr) return nullptr;
+        if (otherDarr->baseType->canCastTo(baseType)) return &LGS_BOOL;
+        break;
+    }
     case IN: {
         if (rightType->canCastTo(baseType)) return &LGS_BOOL;
         break;
@@ -212,28 +219,18 @@ Function* LgsDArray::generateArrEqFunc(LgsCodeGen& cg) {
     const auto ft = cg.getFT(cg.i1Ty(), {cg.ptrTy(), cg.ptrTy()});
     if (cg.mode == CG_MODE_SRC_CODE) return cg.getFunc(funcName, ft);
 
+    cg.savedIP = cg.builder.saveIP();
     const auto func = cg.getFunc(funcName, ft);
     const auto entryBlock = cg.createBlock(BLOCK_ENTRY, func);
     cg.builder.SetInsertPoint(entryBlock);
 
     const auto arrIR1 = func->getArg(0);
     const auto arrIR2 = func->getArg(1);
-
     const auto len1 = lenIR(cg, arrIR1);
     const auto len2 = lenIR(cg, arrIR2);
-    cg.loop(len1, [&](Value* iValue, BasicBlock*) {
-        const auto elementPtr1 = getIRElement(cg, arrIR1, iValue);
-        const auto elementPtr2 = getIRElement(cg, arrIR2, iValue);
-        const auto elementsNotEqual = neIR(cg, elementPtr1, elementPtr2, baseType);
-        cg.ifStmt(elementsNotEqual, [&cg] {
-            cg.builder.CreateRet(cg.false_());
-        });
-        cg.ifStmt(cg.builder.CreateICmpSLE(len2, iValue), [&cg] {
-            cg.builder.CreateRet(cg.false_());
-        });
-    });
-
+    cg.ifStmt(cg.builder.CreateICmpNE(len1, len2), [&cg] {cg.builder.CreateRet(cg.false_());});
     cg.builder.CreateRet(cg.true_());
+    cg.builder.restoreIP(cg.savedIP);
     return func;
 }
 

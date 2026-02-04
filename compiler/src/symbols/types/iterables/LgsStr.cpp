@@ -110,7 +110,7 @@ Value* LgsStr::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     }
 
     Value* ptr = nullptr;
-    const auto leftPtr = getStrPtr(cg, left->loadIR(cg));
+    const auto leftPtr = loadStrPtr(cg, left->loadIR(cg));
     const auto leftSize = lenIR(cg, leftPtr);
     if (right->type->asChar()) {
         const auto allocSize = cg.builder.CreateAdd(leftSize, cg.usize(2));
@@ -119,7 +119,7 @@ Value* LgsStr::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
         cg.callMemcpy(ptr, leftPtr, leftSize);
         cg.store(right->IRValue, rightPos);
     } else if (right->type->asStr()) {
-        const auto rightPtr = getStrPtr(cg, right->IRValue);
+        const auto rightPtr = loadStrPtr(cg, right->IRValue);
         const auto rightSize = lenIR(cg, rightPtr);
         const auto sumSize = cg.builder.CreateAdd(leftSize, rightSize);
         const auto allocSize = cg.builder.CreateAdd(sumSize, cg.usize(1));
@@ -147,10 +147,10 @@ Value* LgsStr::inIR(LgsCodeGen& cg, Value* iterableExpr, Value* value) {
 }
 
 Value* LgsStr::hashValue(LgsCodeGen& cg, Value* value) {
-    return cg.callHash(getStrPtr(cg, value));
+    return cg.callHash(loadStrPtr(cg, value));
 }
 
-Value* LgsStr::getStrPtr(LgsCodeGen& cg, Value* value) {
+Value* LgsStr::loadStrPtr(LgsCodeGen& cg, Value* value) {
     return cg.loadStructField(getIRType(cg), value, rttIndices.data, cg.ptrTy());
 }
 

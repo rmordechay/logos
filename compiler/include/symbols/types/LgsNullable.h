@@ -10,7 +10,7 @@ public:
     static constexpr auto name = "Nullable";
     LgsType* baseType = nullptr;
     bool isNull = false;
-    inline static Lgs_NullableExprIndices rttIndices;
+    inline static LgsNullableExprIndices rttIndices;
 
     explicit LgsNullable(LgsType* baseType = nullptr) : baseType(baseType) {
         rttKind = RTT_NULLABLE;

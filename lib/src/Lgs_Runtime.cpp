@@ -227,3 +227,12 @@ extern "C" int64_t Lgs_Runtime_timeEnd(const int64_t start) {
 extern "C" size_t Lgs_Runtime_getCurrentLevel() {
     return runtime.level;
 }
+
+extern "C" void Lgs_Runtime_printBytes(void* ptr, const size_t n) {
+    const auto bytes = static_cast<unsigned char*>(ptr);
+    for (size_t i = 0; i < n; ++i) {
+        printf("%02x", bytes[i]);
+        if (i < n - 1) printf(" ");
+    }
+    printf("\n");
+}

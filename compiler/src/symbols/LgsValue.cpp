@@ -3,10 +3,6 @@
 #include "LgsType.h"
 #include "codegen/LgsCodeGen.h"
 
-Value* LgsValue::loadIR(LgsCodeGen& cg) {
-    assert(0);
-}
-
 void LgsValue::hashNode(size_t& oldHash) {
     assert(0);
 }

@@ -50,6 +50,7 @@ public:
     Value* pointee = nullptr;
 
     explicit LgsExpr(LgsType* type = nullptr) : type(type) {}
+    virtual Value* loadIR(LgsCodeGen& cg);
     std::optional<int64_t> getConstInt();
     std::optional<double_t> getConstFloat();
     std::optional<std::string> getConstStr();

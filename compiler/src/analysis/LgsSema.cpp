@@ -122,6 +122,7 @@ void LgsSema::visitObject(LgsObject* obj) {
     }
     validateObjImplements(obj, obj->implements);
     validateObjDuplicates(obj);
+    addGenerics(obj);
 }
 
 void LgsSema::visitInterface(LgsInterface* interface) {
@@ -1686,7 +1687,7 @@ void LgsSema::addRTType(LgsType* type) const {
 }
 
 void LgsSema::addGenerics(LgsType* type) const {
-    if (type->isScalar() || type->isVoid() || type->isAny() || type->isUnknown()) return;
+    if (type->asStr() || type->isScalar() || type->isVoid() || type->isAny() || type->isUnknown()) return;
     for (const auto genericsType : file->symbolTable.genericsTypes) {
         if (genericsType->equals(type)) return;
     }
