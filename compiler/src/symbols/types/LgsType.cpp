@@ -115,7 +115,7 @@ LgsFunc* LgsType::getMethod(const std::string& methodName) {
 }
 
 std::string LgsType::getBaseName() {
-    assert(0);
+    return getName();
 }
 
 std::string LgsType::pname() {
@@ -194,10 +194,6 @@ Value* LgsType::lshiftIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
 }
 
 Value* LgsType::rshiftIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
-    assert(0);
-}
-
-Value* LgsType::crossIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     assert(0);
 }
 
@@ -345,54 +341,28 @@ Value* eqIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
     if (isa<ConstantPointerNull>(left)) return exprEqNull(cg, right, type);
     if (isa<ConstantPointerNull>(right)) return exprEqNull(cg, left, type);
     if (type->isInt) {
-        if (left->getType()->isPointerTy()) {
-            left = cg.load(type->getIRType(cg), left);
-        }
-        if (right->getType()->isPointerTy()) {
-            right = cg.load(type->getIRType(cg), right);
-        }
         return cg.builder.CreateICmpEQ(left, right);
     }
     if (type->isFloat) {
-        const auto [l, r] = loadNumberPair(cg, left, right, cg.floatTy());
-        return cg.builder.CreateFCmpOEQ(l, r);
-    }
-    if (const auto dArr = type->asDArray()) {
-        return cg.builder.CreateCall(dArr->generateArrEqFunc(cg), {left, right});
+        return cg.builder.CreateFCmpOEQ(left, right);
     }
     if (type->asStr()) {
         return cg.strsEqual(left, right);
     }
+    if (const auto dArr = type->asDArray()) {
+        return cg.builder.CreateCall(dArr->generateEqFunc(cg), {left, right});
+    }
+    if (const auto sArr = type->asSArray()) {
+        return cg.builder.CreateCall(sArr->generateEqFunc(cg), {left, right});
+    }
     if (const auto obj = type->asObject()) {
-        return obj->objsEqual(cg, left, right);
+        return cg.builder.CreateCall(obj->generateObjsEqFunc(cg), {left, right});
     }
     assert(0);
 }
 
 Value* neIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
-    if (isa<ConstantPointerNull>(left) && isa<ConstantPointerNull>(right)) return cg.false_();
-    if (isa<ConstantPointerNull>(left)) return exprNeNull(cg, right, type);
-    if (isa<ConstantPointerNull>(right)) return exprNeNull(cg, left, type);
-    if (type->isInt) {
-        return cg.builder.CreateICmpNE(left, right);
-    }
-    if (type->isFloat) {
-        return cg.builder.CreateFCmpONE(left, right);
-    }
-    if (const auto dArr = type->asDArray()) {
-        const auto arrsEq = cg.builder.CreateCall(dArr->generateArrEqFunc(cg), {left, right});
-        return cg.builder.CreateNot(arrsEq);
-    }
-    if (const auto str = type->asStr()) {
-        const auto ty = str->getIRType(cg);
-        const auto str1 = cg.builder.CreateStructGEP(ty, left, str->rttIndices.data);
-        const auto str2 = cg.builder.CreateStructGEP(ty, right, str->rttIndices.data);
-        return cg.strsNotEqual(str1, str2);
-    }
-    if (const auto obj = type->asObject()) {
-        return cg.builder.CreateNot(obj->objsEqual(cg, left, right));
-    }
-    assert(0);
+    return cg.builder.CreateNot(eqIR(cg, left, right, type));
 }
 
 Value* ltIR(LgsCodeGen& cg, Value* left, Value* right, const LgsType* type) {
@@ -479,6 +449,10 @@ Value* orIR(LgsCodeGen& cg, Value* left, Value* right) {
     phi->addIncoming(cg.true_(), currentBlock);
     phi->addIncoming(right, rightBlock);
     return phi;
+}
+
+Value* crossIR(LgsCodeGen& cg, Value* left, Value* right, LgsVec* vec) {
+    return cg.builder.CreateCall(generateCrossProductFunc(cg, vec), {left, right});
 }
 
 LgsType* getBiggestIntType(const std::vector<LgsType*>& types) {

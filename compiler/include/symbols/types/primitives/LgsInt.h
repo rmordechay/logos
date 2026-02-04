@@ -9,12 +9,14 @@ public:
         isInt = true;
         rttKind = RTT_INT;
     }
+    std::string getName() override;
     size_t sizeBytes() override;
-    Type* getIRType(LgsCodeGen& cg) override;
-    LgsExpr* getZeroValue() override;
-    Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee) override;
+    std::string fmtStr() const override;
     bool canCastTo(LgsType* other) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
+    LgsExpr* getZeroValue() override;
+    Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee) override;
+    Type* getIRType(LgsCodeGen& cg) override;
     Value* addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
     Value* subIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
     Value* mulIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
@@ -26,8 +28,6 @@ public:
     Value* bitXorIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
     Value* rshiftIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
     Value* lshiftIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
-    std::string fmtStr() const override;
-    std::string getName() override;
     DIType* getDebugType(LgsCodeGen& cg) override;
 };
 

@@ -13,20 +13,16 @@
 #include "exprs/LgsBinaryExpr.h"
 #include "types/LgsNullable.h"
 
+std::string LgsInt::getName() {
+    return name;
+}
+
 size_t LgsInt::sizeBytes() {
     return sizeof(int);
 }
 
-Type* LgsInt::getIRType(LgsCodeGen& cg) {
-    return cg.i32Ty();
-}
-
-LgsExpr* LgsInt::getZeroValue() {
-    return new LgsIntConst(&LGS_INT, 0);
-}
-
-Value* LgsInt::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
-    return cg.zero32();
+std::string LgsInt::fmtStr() const {
+    return "%d";
 }
 
 bool LgsInt::canCastTo(LgsType* other) {
@@ -71,6 +67,18 @@ LgsType* LgsInt::applyBinOp(LgsType* rightType, LgsBinOp& op) {
         break;
     }
     return nullptr;
+}
+
+LgsExpr* LgsInt::getZeroValue() {
+    return new LgsIntConst(&LGS_INT, 0);
+}
+
+Value* LgsInt::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
+    return cg.zero32();
+}
+
+Type* LgsInt::getIRType(LgsCodeGen& cg) {
+    return cg.i32Ty();
 }
 
 Value* LgsInt::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
@@ -145,14 +153,6 @@ Value* LgsInt::lshiftIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
     return cg.builder.CreateLShr(left->loadIR(cg), right->loadIR(cg));
-}
-
-std::string LgsInt::fmtStr() const {
-    return "%d";
-}
-
-std::string LgsInt::getName() {
-    return name;
 }
 
 DIType* LgsInt::getDebugType(LgsCodeGen& cg) {

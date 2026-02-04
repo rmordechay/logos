@@ -31,6 +31,7 @@
 
 #include "exprs/constants/LgsIntConst.h"
 #include "types/LgsNullable.h"
+#include "types/iterables/LgsSArray.h"
 
 inline ThreadPool threadPool;
 
@@ -409,7 +410,9 @@ bool LgsApp::generateGenerics() {
         if (const auto dArr = genericType->asDArray()) {
             dArr->generateAddFunc(cgFile.cg);
             dArr->generateContainsFunc(cgFile.cg);
-            dArr->generateArrEqFunc(cgFile.cg);
+            dArr->generateEqFunc(cgFile.cg);
+        } else if (const auto sArr = genericType->asSArray()) {
+            sArr->generateEqFunc(cgFile.cg);
         } else if (const auto map = genericType->asMap()) {
             map->generateGetFunc(cgFile.cg);
             map->generateAddFunc(cgFile.cg);

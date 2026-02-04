@@ -7,16 +7,13 @@
 #include "lgsc/LgsCCompiler.h"
 #include "types/iterables/LgsStr.h"
 
-Type* LgsSArray::getIRType(LgsCodeGen& cg) {
-    return ArrayType::get(baseType->getIRType(cg), len);
-}
-
 std::string LgsSArray::getBaseName() {
     return name;
 }
 
 std::string LgsSArray::getName() {
-    return name + std::to_string(len) +  baseType->getName();
+    if (len <= 0) return "";
+    return name + std::to_string(len) + "_" +  baseType->getName();
 }
 
 std::string LgsSArray::pname() {
@@ -28,46 +25,26 @@ size_t LgsSArray::sizeBytes() {
     return baseType->sizeBytes() * len;
 }
 
-LgsExpr* LgsSArray::getZeroValue() {
-    return new LgsArrayExpr(this);
-}
-
-Value* LgsSArray::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
-    if (pointee) return pointee;
-    const auto ty = getIRType(cg);
-    const auto ptr = cg.builder.CreateAlloca(ty);
-    cg.store(ConstantAggregateZero::get(ty), ptr);
-    return ptr;
-}
-
-Constant* LgsSArray::getRTTypeExtra(LgsCodeGen& cg) {
-    const auto rttName = getRTTName();
-    const auto st = cg.getStructType({cg.sizeTy(), cg.ptrTy()});
-    const std::vector<Constant*> args = {cg.usize(len), baseType->getRTType(cg)};
-    return cg.createGlobal(rttName + "_extra", st, ConstantStruct::get(st, args));
-}
-
 std::string LgsSArray::fmtStr() const {
     if (baseType->asChar()) return "%s";
     return "%p";
 }
 
-LgsType* LgsSArray::applyBinOp(LgsType* rightType, LgsBinOp& op) {
-    switch (op.opType) {
-    case IN: {
-        if (rightType->canCastTo(baseType)) return &LGS_BOOL;
-        break;
-    }
-    case ADD: {
-        if (const auto otherSArr = rightType->asSArray()) {
-            if (!baseType->canCastTo(otherSArr->baseType)) break;
-            return new LgsSArray(baseType, new LgsBinaryExpr(lengthExpr, otherSArr->lengthExpr, ADD_OP));
-        }
-    }
-    default:
-        break;
-    }
-    return nullptr;
+bool LgsSArray::canCastTo(LgsType* other) {
+    if (!baseType) return false;
+    if (other->isAny()) return true;
+    if (other->asStr()) return !!baseType->asChar();
+    const auto otherIter = other->asIterable();
+    if (!otherIter) return false;
+    return baseType->canCastTo(otherIter->baseType);
+}
+
+bool LgsSArray::equals(LgsType* other) {
+    if (baseType->asChar() && other->asStr()) return true;
+    const auto otherArr = other->asSArray();
+    if (!otherArr) return false;
+    if (!baseType->equals(otherArr->baseType)) return false;
+    return len == otherArr->len;
 }
 
 bool LgsSArray::inferBaseType(std::vector<LgsExpr*>& args) {
@@ -80,6 +57,54 @@ bool LgsSArray::inferBaseType(std::vector<LgsExpr*>& args) {
     }
     baseType = baseExprType;
     return true;
+}
+
+LgsExpr* LgsSArray::getZeroValue() {
+    return new LgsArrayExpr(this);
+}
+
+Value* LgsSArray::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
+    if (pointee) return pointee;
+    return cg.builder.CreateAlloca(getIRType(cg));
+}
+
+Type* LgsSArray::getIRType(LgsCodeGen& cg) {
+    return ArrayType::get(baseType->getIRType(cg), len);
+}
+
+LgsType* LgsSArray::applyBinOp(LgsType* rightType, LgsBinOp& op) {
+    switch (op.opType) {
+    case EQ:
+    case NE: {
+        const auto otherDarr = rightType->asSArray();
+        if (!otherDarr) return nullptr;
+        if (otherDarr->baseType->canCastTo(baseType)) return &LGS_BOOL;
+        break;
+    }
+    case IN: {
+        if (rightType->canCastTo(baseType)) return &LGS_BOOL;
+        break;
+    }
+    case ADD: {
+        if (const auto otherSArr = rightType->asSArray()) {
+            if (!baseType->canCastTo(otherSArr->baseType)) break;
+            const auto rSize = otherSArr->lengthExpr->getConstInt();
+            if (!rSize.has_value()) return nullptr;
+            return new LgsSArray(baseType, len + rSize.value());
+        }
+    }
+    default:
+        break;
+    }
+    return nullptr;
+}
+
+Constant* LgsSArray::getRTTypeExtra(LgsCodeGen& cg) {
+    assert(len > 0);
+    const auto rttName = getRTTName();
+    const auto st = cg.getStructType({cg.sizeTy(), cg.ptrTy()});
+    const std::vector<Constant*> args = {cg.usize(len), baseType->getRTType(cg)};
+    return cg.createGlobal(rttName + "_extra", st, ConstantStruct::get(st, args));
 }
 
 Value* LgsSArray::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
@@ -101,21 +126,12 @@ Value* LgsSArray::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     return newArr;
 }
 
-Value* LgsSArray::inIR(LgsCodeGen& cg, Value* iterableExpr, Value* value) {
-    const auto resultPtr = cg.builder.CreateAlloca(cg.builder.getInt1Ty());
-    cg.store(cg.false_(), resultPtr);
-    cg.loop(cg.usize(len), [this, &cg, iterableExpr, value, resultPtr](Value* index, BasicBlock* exitBlock) {
-        const auto trueBlock = cg.createBlock();
-        const auto falseBlock = cg.createBlock();
-        const auto element = getIRElement(cg, iterableExpr, index);
-        const auto eq = eqIR(cg, element, value, baseType);
-        cg.builder.CreateCondBr(eq, trueBlock, falseBlock);
-        cg.startBlock(trueBlock);
-        cg.store(cg.true_(), resultPtr);
-        cg.builder.CreateBr(exitBlock);
-        cg.startBlock(falseBlock);
-    });
-    return cg.load(cg.builder.getInt1Ty(), resultPtr);
+Value* LgsSArray::lenIR(LgsCodeGen& cg, Value* iterable) {
+    return cg.usize(len);
+}
+
+Value* LgsSArray::inIR(LgsCodeGen& cg, Value* iterable, Value* value) {
+    return cg.builder.CreateCall(generateEqFunc(cg), {iterable, value});
 }
 
 Value* LgsSArray::getIRElement(LgsCodeGen& cg, Value* iterable, Value* index) {
@@ -129,25 +145,26 @@ void LgsSArray::addIRElement(LgsCodeGen& cg, Value* iterable, Value* index, Valu
     cg.store(value, gep);
 }
 
-Value* LgsSArray::lenIR(LgsCodeGen& cg, Value* iterable) {
-    return cg.usize(len);
-}
+Function* LgsSArray::generateEqFunc(LgsCodeGen& cg) {
+    const auto funcName = name + baseType->getBaseName() + "_" + EQUAL_FUNC;
+    if (const auto func = cg.IRModule->getFunction(funcName)) return func;
+    const auto ft = cg.getFT(cg.i1Ty(), {cg.ptrTy(), cg.ptrTy()});
+    if (cg.mode == CG_MODE_SRC_CODE) return cg.getFunc(funcName, ft);
 
-bool LgsSArray::canCastTo(LgsType* other) {
-    if (!baseType) return false;
-    if (other->isAny()) return true;
-    if (other->asStr()) return !!baseType->asChar();
-    const auto otherIter = other->asIterable();
-    if (!otherIter) return false;
-    return baseType->canCastTo(otherIter->baseType);
-}
+    const auto func = cg.getFunc(funcName, ft);
+    cg.savedIP = cg.builder.saveIP();
+    const auto entryBlock = cg.createBlock(BLOCK_ENTRY, func);
+    cg.builder.SetInsertPoint(entryBlock);
 
-bool LgsSArray::equals(LgsType* other) {
-    if (baseType->asChar() && other->asStr()) return true;
-    const auto otherArr = other->asSArray();
-    if (!otherArr) return false;
-    if (!baseType->equals(otherArr->baseType)) return false;
-    return len == otherArr->len;
+    const auto arrIR1 = func->getArg(0);
+    const auto arrIR2 = func->getArg(1);
+    const auto len1 = lenIR(cg, arrIR1);
+    const auto len2 = lenIR(cg, arrIR2);
+    cg.ifStmt(cg.builder.CreateICmpNE(len1, len2), [&cg] {cg.builder.CreateRet(cg.false_());});
+
+    cg.builder.CreateRet(cg.true_());
+    cg.builder.restoreIP(cg.savedIP);
+    return func;
 }
 
 DIType* LgsSArray::getDebugType(LgsCodeGen& cg) {

@@ -12,24 +12,29 @@ public:
         isStatic = true;
         passByRef = true;
         rttKind = RTT_SARRAY;
+        len = length->getConstInt().value();
     }
-    Type* getIRType(LgsCodeGen& cg) override;
+    explicit LgsSArray(LgsType* baseType, const size_t length): LgsSArray(baseType, new LgsIntConst(&LGS_SIZE, length)) {
+        len = length;
+    }
     std::string getBaseName() override;
     std::string getName() override;
     std::string pname() override;
     size_t sizeBytes() override;
-    LgsExpr* getZeroValue() override;
-    Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee) override;
-    Constant* getRTTypeExtra(LgsCodeGen& cg) override;
     std::string fmtStr() const override;
-    LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
-    bool inferBaseType(std::vector<LgsExpr*>& args) override;
-    Value* addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
-    Value* inIR(LgsCodeGen& cg, Value* iterableExpr, Value* value) override;
-    Value* getIRElement(LgsCodeGen& cg, Value* iterable, Value* index) override;
-    void addIRElement(LgsCodeGen& cg, Value* iterable, Value* index, Value* value) override;
-    Value* lenIR(LgsCodeGen& cg, Value* iterable) override;
     bool canCastTo(LgsType* other) override;
     bool equals(LgsType* other) override;
+    bool inferBaseType(std::vector<LgsExpr*>& args) override;
+    LgsExpr* getZeroValue() override;
+    Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee) override;
+    Type* getIRType(LgsCodeGen& cg) override;
+    LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
+    Constant* getRTTypeExtra(LgsCodeGen& cg) override;
+    Value* addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
+    Value* lenIR(LgsCodeGen& cg, Value* iterable) override;
+    Value* inIR(LgsCodeGen& cg, Value* iterable, Value* value) override;
+    Value* getIRElement(LgsCodeGen& cg, Value* iterable, Value* index) override;
+    void addIRElement(LgsCodeGen& cg, Value* iterable, Value* index, Value* value) override;
+    Function* generateEqFunc(LgsCodeGen& cg);
     DIType* getDebugType(LgsCodeGen& cg) override;
 };

@@ -159,10 +159,6 @@ bool LgsObject::canCastTo(LgsType* other) {
     return name == otherType->getName();
 }
 
-Value* LgsObject::objsEqual(LgsCodeGen& cg, Value* left, Value* right) {
-    return cg.builder.CreateCall(generateObjsEqFunc(cg), {left, right});
-}
-
 LgsType* LgsObject::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     if (op.opType != EQ && op.opType != NE) return nullptr;
     return canCastTo(rightType) ? &LGS_BOOL : nullptr;
@@ -190,11 +186,14 @@ Function* LgsObject::generateObjsEqFunc(LgsCodeGen& cg) const {
     if (const auto func = cg.IRModule->getFunction(funcName)) return func;
     const auto ft = cg.getFT(cg.i1Ty(), {cg.ptrTy(), cg.ptrTy()});
     if (cg.mode == CG_MODE_SRC_CODE) return cg.getFunc(funcName, ft);
+
     const auto func = cg.getFunc(funcName, ft);
+    cg.savedIP = cg.builder.saveIP();
     const auto obj1 = func->getArg(0);
     const auto obj2 = func->getArg(1);
     const auto entryBlock = cg.createBlock(BLOCK_ENTRY, func);
     cg.builder.SetInsertPoint(entryBlock);
+
     for (const auto field : fields) {
         const auto gep1 = field->getGEP(cg, obj1);
         const auto gep2 = field->getGEP(cg, obj2);
@@ -203,18 +202,20 @@ Function* LgsObject::generateObjsEqFunc(LgsCodeGen& cg) const {
         const auto eq = neIR(cg, v1, v2, field->type);
         cg.ifStmt(eq, [&cg]{cg.builder.CreateRet(cg.false_());});
     }
+
     cg.builder.CreateRet(cg.true_());
+    cg.builder.restoreIP(cg.savedIP);
     return func;
 }
 
 StructType* LgsObject::getObjRTT(LgsCodeGen& cg) {
     const auto rttName = LGS_TYPEINFO_PREFIX + metaName;
-    return cg.getStructType({cg.sizeTy(), cg.ptrTy(), cg.sizeTy(), cg.sizeTy(), cg.ptrTy(), cg.ptrTy(), cg.ptrTy()}, rttName);
+    return cg.getStructType({cg.sizeTy(), cg.ptrTy(), cg.sizeTy(), cg.sizeTy(), cg.sizeTy(), cg.ptrTy(), cg.ptrTy()}, rttName);
 }
 
 StructType* LgsObject::getFieldRTT(LgsCodeGen& cg) {
     constexpr auto rttName = std::string(LGS_TYPEINFO_PREFIX) + "field";
-    return cg.getStructType({cg.ptrTy(), cg.sizeTy(), cg.sizeTy(), cg.sizeTy(), cg.i32Ty()}, rttName);
+    return cg.getStructType({cg.ptrTy(), cg.sizeTy(), cg.sizeTy(), cg.i32Ty(), cg.ptrTy()}, rttName);
 }
 
 StructType* LgsObject::getMethodRTT(LgsCodeGen& cg) {

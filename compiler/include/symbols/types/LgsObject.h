@@ -48,7 +48,6 @@ public:
     LgsExpr* getZeroValue() override;
     Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee) override;
     bool canCastTo(LgsType* other) override;
-    Value* objsEqual(LgsCodeGen& cg, Value* left, Value* right);
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     std::string fmtStr() const override;
     DIType* getDebugType(LgsCodeGen& cg) override;

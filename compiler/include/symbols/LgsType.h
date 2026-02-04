@@ -115,7 +115,6 @@ public:
     virtual Value* bitXorIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr);
     virtual Value* lshiftIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr);
     virtual Value* rshiftIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr);
-    virtual Value* crossIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr);
 
     LgsAny* asAny();
     LgsChar* asChar();
@@ -172,5 +171,6 @@ Value* geIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
 Value* leIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
 Value* andIR(LgsCodeGen& cg, Value* left, Value* right);
 Value* orIR(LgsCodeGen& cg, Value* left, Value* right);
+Value* crossIR(LgsCodeGen& cg, Value* left, Value* right, LgsVec* vec);
 LgsType* getBiggestIntType(const std::vector<LgsType*>& types);
 std::pair<Value*, Value*> loadNumberPair(LgsCodeGen& cg, Value* left, Value* right, Type* type);

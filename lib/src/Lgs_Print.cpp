@@ -73,7 +73,7 @@ static std::string formatElement(const Lgs_TypeInfo* type, void* value) {
         str << "[";
         auto offset = 0;
         for (int i = 0; i < sArr->length; ++i) {
-            void* element = static_cast<char*>(value) + offset * i;
+            void* element = static_cast<char*>(value) + offset;
             if (sArr->baseType->isHeapAlloc) {
                 element = *static_cast<void**>(element);
             }

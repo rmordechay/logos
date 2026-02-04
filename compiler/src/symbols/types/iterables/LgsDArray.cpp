@@ -26,29 +26,6 @@ LgsFunc* LgsDArray::getMethod(const std::string& methodName) {
     return LgsIterable::getMethod(methodName);
 }
 
-bool LgsDArray::inferBaseType(std::vector<LgsExpr*>& args) {
-    if (baseType) return true;
-    assert(!args.empty());
-    const auto baseExprType = args.front()->type;
-    for (size_t i = 1; i < args.size(); ++i) {
-        const auto arg = args[i];
-        if (!arg->type->canCastTo(baseExprType)) return false;
-    }
-    baseType = baseExprType;
-    if (const auto iter = baseType->asIterable()) {
-        iter->isStatic = false;
-    }
-    return true;
-}
-
-Type* LgsDArray::getIRType(LgsCodeGen& cg) {
-    return cg.getStructType({cg.sizeTy(), cg.ptrTy(), cg.ptrTy(), cg.sizeTy(), cg.sizeTy()}, name);
-}
-
-Constant* LgsDArray::getRTTypeExtra(LgsCodeGen& cg) {
-    return baseType->getRTType(cg);
-}
-
 std::string LgsDArray::getBaseName() {
     return name;
 }
@@ -81,12 +58,19 @@ bool LgsDArray::canCastTo(LgsType* other) {
     return baseType->canCastTo(otherArr->baseType);
 }
 
-LgsExpr* LgsDArray::getZeroValue() {
-    return new LgsArrayExpr(this);
-}
-
-Value* LgsDArray::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
-    return cg.callRuntimeFunc("allocDArr", cg.ptrTy(), {cg.ptrTy()}, {baseType->getRTType(cg)});
+bool LgsDArray::inferBaseType(std::vector<LgsExpr*>& args) {
+    if (baseType) return true;
+    assert(!args.empty());
+    const auto baseExprType = args.front()->type;
+    for (size_t i = 1; i < args.size(); ++i) {
+        const auto arg = args[i];
+        if (!arg->type->canCastTo(baseExprType)) return false;
+    }
+    baseType = baseExprType;
+    if (const auto iter = baseType->asIterable()) {
+        iter->isStatic = false;
+    }
+    return true;
 }
 
 LgsType* LgsDArray::applyBinOp(LgsType* rightType, LgsBinOp& op) {
@@ -106,6 +90,22 @@ LgsType* LgsDArray::applyBinOp(LgsType* rightType, LgsBinOp& op) {
         break;
     }
     return nullptr;
+}
+
+LgsExpr* LgsDArray::getZeroValue() {
+    return new LgsArrayExpr(this);
+}
+
+Type* LgsDArray::getIRType(LgsCodeGen& cg) {
+    return cg.getStructType({cg.sizeTy(), cg.ptrTy(), cg.ptrTy(), cg.sizeTy(), cg.sizeTy()}, name);
+}
+
+Constant* LgsDArray::getRTTypeExtra(LgsCodeGen& cg) {
+    return baseType->getRTType(cg);
+}
+
+Value* LgsDArray::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
+    return cg.callRuntimeFunc("allocDArr", cg.ptrTy(), {cg.ptrTy()}, {baseType->getRTType(cg)});
 }
 
 Value* LgsDArray::lenIR(LgsCodeGen& cg, Value* iterable) {
@@ -213,14 +213,14 @@ Function* LgsDArray::generateContainsFunc(LgsCodeGen& cg) {
     return func;
 }
 
-Function* LgsDArray::generateArrEqFunc(LgsCodeGen& cg) {
+Function* LgsDArray::generateEqFunc(LgsCodeGen& cg) {
     const auto funcName = name + baseType->getBaseName() + "_" + EQUAL_FUNC;
     if (const auto func = cg.IRModule->getFunction(funcName)) return func;
     const auto ft = cg.getFT(cg.i1Ty(), {cg.ptrTy(), cg.ptrTy()});
     if (cg.mode == CG_MODE_SRC_CODE) return cg.getFunc(funcName, ft);
+    const auto func = cg.getFunc(funcName, ft);
 
     cg.savedIP = cg.builder.saveIP();
-    const auto func = cg.getFunc(funcName, ft);
     const auto entryBlock = cg.createBlock(BLOCK_ENTRY, func);
     cg.builder.SetInsertPoint(entryBlock);
 
@@ -229,6 +229,7 @@ Function* LgsDArray::generateArrEqFunc(LgsCodeGen& cg) {
     const auto len1 = lenIR(cg, arrIR1);
     const auto len2 = lenIR(cg, arrIR2);
     cg.ifStmt(cg.builder.CreateICmpNE(len1, len2), [&cg] {cg.builder.CreateRet(cg.false_());});
+
     cg.builder.CreateRet(cg.true_());
     cg.builder.restoreIP(cg.savedIP);
     return func;

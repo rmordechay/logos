@@ -637,7 +637,6 @@ void LgsCgFile::visitBinaryExpr(LgsBinaryExpr* binExpr) {
     case BIT_XOR: binExpr->IRValue = type->bitXorIR(cg, binExpr); break;
     case LSHIFT: binExpr->IRValue = type->rshiftIR(cg, binExpr); break;
     case RSHIFT: binExpr->IRValue = type->lshiftIR(cg, binExpr); break;
-    case CROSS: binExpr->IRValue = type->crossIR(cg, binExpr); break;
     case EQ: binExpr->IRValue = eqIR(cg, l->IRValue, r->IRValue, l->type); break;
     case NE: binExpr->IRValue = neIR(cg, l->IRValue, r->IRValue, l->type); break;
     case LT: binExpr->IRValue = ltIR(cg, l->IRValue, r->IRValue, l->type); break;
@@ -647,6 +646,7 @@ void LgsCgFile::visitBinaryExpr(LgsBinaryExpr* binExpr) {
     case AND: binExpr->IRValue = andIR(cg, l->IRValue, r->IRValue); break;
     case OR: binExpr->IRValue = orIR(cg, l->IRValue, r->IRValue); break;
     case IN: binExpr->IRValue = r->type->asIterable()->inIR(cg, r->IRValue, l->IRValue); break;
+    case CROSS: binExpr->IRValue = crossIR(cg, binExpr->left->IRValue, binExpr->right->IRValue, type->asVec()); break;
     default: assert(0);
     }
 }
@@ -730,11 +730,19 @@ void LgsCgFile::visitStaticArray(LgsArrayExpr* arrayExpr) {
     const auto sArr = arrayExpr->type->asSArray();
     const auto ty = sArr->getIRType(cg);
     arrayExpr->IRValue = sArr->getIRZeroValue(cg, arrayExpr->pointee);
-    if (arrayExpr->elements.empty()) return;
+    if (arrayExpr->elements.empty()) {
+        cg.store(ConstantAggregateZero::get(ty), arrayExpr->IRValue);
+        return;
+    }
+    if (arrayExpr->elements.size() < sArr->len) {
+        cg.store(ConstantAggregateZero::get(ty), arrayExpr->IRValue);
+    }
 
     for (size_t i = 0; i < arrayExpr->elements.size(); ++i) {
         const auto element = arrayExpr->elements[i];
-        element->pointee = cg.builder.CreateInBoundsGEP(ty, arrayExpr->IRValue, {cg.zero32(), cg.i32(i)});
+        if (element->type->asSArray() || element->type->asNullable()) {
+            element->pointee = cg.builder.CreateInBoundsGEP(ty, arrayExpr->IRValue, {cg.zero32(), cg.i32(i)});
+        }
         visitExpr(element);
     }
     if (sArr->baseType->asNullable() || sArr->baseType->asSArray()) return;
@@ -1167,13 +1175,14 @@ void LgsCgFile::visitInstance(LgsInstance* instance) {
     for (const auto field : instance->fields) {
         const auto fieldType = field->type;
         if (visited.contains(field->name) || fieldType->asEnum()) continue;
-        const auto pointee = field->getGEP(cg, instance->IRValue);
         if (field->expr) {
+            const auto pointee = field->getGEP(cg, instance->IRValue);
             field->expr->pointee = pointee;
             visitExpr(field->expr);
             cg.store(field->expr->IRValue, pointee);
         } else {
             if (!fieldType->isHeapAlloc) continue;
+            const auto pointee = field->getGEP(cg, instance->IRValue);
             const auto zeroValue = fieldType->getIRZeroValue(cg, pointee);
             cg.store(zeroValue, pointee);
         }

@@ -25,11 +25,7 @@ void LgsTypeResolver::resolveType(LgsType*& type) {
     if (const auto funcType = type->asFuncType()) {
         resolveFuncType(funcType);
     } else if (const auto iterable = type->asIterable()) {
-        if (!iterable->genericArgs.empty()) {
-            iterable->baseType = iterable->genericArgs.front();
-        } else {
-            resolveType(iterable->baseType);
-        }
+        resolveType(iterable->baseType);
     } else if (const auto nullable = type->asNullable()) {
         if (!nullable->isNull) {
             resolveType(nullable->baseType);

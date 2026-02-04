@@ -31,7 +31,7 @@ public:
     Value* mulIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
     Value* divIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
     Value* modIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
-    Value* crossIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
+    Value* crossIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr);
     Value* inIR(LgsCodeGen& cg, Value* iterableExpr, Value* value) override;
     Value* lenIR(LgsCodeGen& cg, Value* iterable) override;
     Value* getIRElement(LgsCodeGen& cg, Value* iterable, Value* index) override;
@@ -43,5 +43,5 @@ public:
     DIType* getDebugType(LgsCodeGen& cg) override;
 };
 
-Function* dotProductFunc(LgsCodeGen& cg, LgsVec* vecType);
-Function* crossProductFunc(LgsCodeGen& cg, LgsVec* vecType);
+Function* generateDotProductFunc(LgsCodeGen& cg, LgsVec* vecType);
+Function* generateCrossProductFunc(LgsCodeGen& cg, LgsVec* vecType);

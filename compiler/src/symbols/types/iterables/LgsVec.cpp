@@ -211,7 +211,7 @@ Value* LgsVec::modIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
 Value* LgsVec::crossIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
-    const auto crossFunc = crossProductFunc(cg, left->type->asVec());
+    const auto crossFunc = generateCrossProductFunc(cg, left->type->asVec());
     return cg.builder.CreateCall(crossFunc, {left->loadIR(cg), right->loadIR(cg)});
 }
 
@@ -318,7 +318,7 @@ DIType* LgsVec::getDebugType(LgsCodeGen& cg) {
     assert(0);
 }
 
-Function* dotProductFunc(LgsCodeGen& cg, LgsVec* vecType) {
+Function* generateDotProductFunc(LgsCodeGen& cg, LgsVec* vecType) {
     const auto name = LGS_PREFIX + vecType->getName() + vecType->baseType->getName() + "Dot";
     auto func = cg.IRModule->getFunction(name);
     if (func) return func;
@@ -361,7 +361,7 @@ Function* dotProductFunc(LgsCodeGen& cg, LgsVec* vecType) {
     return func;
 }
 
-Function* crossProductFunc(LgsCodeGen& cg, LgsVec* vecType) {
+Function* generateCrossProductFunc(LgsCodeGen& cg, LgsVec* vecType) {
     assert(vecType->dimVec == 3);
     const auto name = LGS_PREFIX + vecType->getName() + vecType->baseType->getName() + "Cross";
     auto func = cg.IRModule->getFunction(name);

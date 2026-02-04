@@ -19,12 +19,8 @@
 #include <llvm/IR/Verifier.h>
 #include <llvm/Passes/PassBuilder.h>
 
-#define GENERATE_OBJ_CMD "clang -fstack-protector-strong -Wno-override-module -target %s -c -o %s %s.bc"
-
 void LgsCodeGen::setupModule(const fs::path& file, const bool debugMode) {
     IRModule = new Module(file.stem().string(), context);
-    IRModule->setTargetTriple(Triple(sys::getDefaultTargetTriple()));
-    IRModule->setDataLayout(targetMachine->createDataLayout());
     if (debugMode && mode == CG_MODE_RTTYPES) {
         debugger.diBuilder = new DIBuilder(*IRModule);
         debugger.diFile = debugger.diBuilder->createFile(fs::canonical(file).string(), "");
@@ -66,26 +62,12 @@ bool LgsCodeGen::writeIRModule(const LgsPaths& paths, uint8_t optLevel) const {
 
     // Create bc file
     std::error_code ec;
-    const std::string outputPath = paths.buildDirObjs / (moduleName + ".o");
+    const std::string outputPath = paths.buildDirObjs / moduleName;
     if (fs::exists(outputPath)) fs::remove(outputPath);
     raw_fd_ostream bitcodeStream(outputPath + ".bc", ec, sys::fs::OF_None);
-    assert(!ec);
     WriteBitcodeToFile(*IRModule, bitcodeStream);
     bitcodeStream.flush();
     bitcodeStream.close();
-    // Create object
-    char cmd[1024*4];
-    const auto triple = sys::getDefaultTargetTriple();
-    std::snprintf(
-        cmd,
-        sizeof(cmd),
-        GENERATE_OBJ_CMD,
-        triple.c_str(),
-        outputPath.c_str(),
-        outputPath.c_str()
-    );
-    if (!runCmd(cmd)) assert(0);
-    fs::remove(outputPath + ".bc");
     return true;
 }
 

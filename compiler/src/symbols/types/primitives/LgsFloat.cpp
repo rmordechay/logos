@@ -96,7 +96,7 @@ Value* LgsFloat::mulIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
     if (left->type->asVec() && right->type->asVec()) {
-        const auto dotFunc = dotProductFunc(cg, left->type->asVec());
+        const auto dotFunc = generateDotProductFunc(cg, left->type->asVec());
         return cg.builder.CreateCall(dotFunc, {left->loadIR(cg), right->loadIR(cg)});
     }
     auto [l, r] = loadNumberPair(cg, left->loadIR(cg), right->loadIR(cg), cg.floatTy());

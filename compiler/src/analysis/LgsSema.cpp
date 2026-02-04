@@ -376,6 +376,7 @@ void LgsSema::visitVarDec(LgsVarDec* varDec) {
     if (varDec->expr->type->isVoid()) addError(E10093, varDec->location);
     addLocalSymbol(LgsSymbol(varDec));
     addRTType(varDec->type);
+    addGenerics(varDec->type);
 }
 
 void LgsSema::visitAssignment(LgsAssignment* assignment) {
@@ -771,6 +772,8 @@ void LgsSema::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
         return addError(E10076, binaryExpr->location, {binaryExpr->op.text, ltype->pname(), rtype->pname()});
     }
     binaryExpr->setType(type);
+    addRTType(binaryExpr->type);
+    addGenerics(binaryExpr->type);
 }
 
 void LgsSema::visitTernaryExpr(LgsTernaryExpr* ternary) {
