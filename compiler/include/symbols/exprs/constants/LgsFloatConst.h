@@ -12,5 +12,6 @@ public:
     void castImplicitly(LgsType* toType) override;
     std::string asText() override;
     void setDebugValue(LgsCodeGen& cg) override;
+    LgsExpr* clone() override;
     ~LgsFloatConst() override = default;
 };

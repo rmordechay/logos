@@ -22,6 +22,7 @@ public:
     std::string pname() override;
     size_t sizeBytes() override;
     std::string fmtStr() const override;
+    std::optional<int64_t> getConstLength() override;
     bool canCastTo(LgsType* other) override;
     bool equals(LgsType* other) override;
     bool inferBaseType(std::vector<LgsExpr*>& args) override;
@@ -35,6 +36,6 @@ public:
     Value* inIR(LgsCodeGen& cg, Value* iterable, Value* value) override;
     Value* getIRElement(LgsCodeGen& cg, Value* iterable, Value* index) override;
     void addIRElement(LgsCodeGen& cg, Value* iterable, Value* index, Value* value) override;
-    Function* generateEqFunc(LgsCodeGen& cg);
+    Function* getEqFunc(LgsCodeGen& cg);
     DIType* getDebugType(LgsCodeGen& cg) override;
 };

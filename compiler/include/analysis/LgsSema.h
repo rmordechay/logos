@@ -131,7 +131,6 @@ public:
     void visitInlineInterface(LgsInstance* instance, LgsInterface* interface);
     void visitIterIndex(LgsIterIndex* iterIndex);
     void visitIndex(LgsIterIndex* iterIndex);
-    void visitSlice(LgsIterIndex* iterIndex);
     void visitLoopMetaVar(LgsMetaVar* metaVar);
 
     bool validateExprType(const LgsExpr* expr, LgsType* type);

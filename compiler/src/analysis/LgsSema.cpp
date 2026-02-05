@@ -1055,7 +1055,7 @@ void LgsSema::visitMetaSelection(LgsMetaSelection* metaSelection) {
     const auto methodCall = metaSelection->child->asFuncCall();
     if (!methodCall) return;
     if (!obj->getMetaFunc(methodCall->name)) {
-        addError(E10005, metaSelection->location, {methodCall->name, obj->pname()});
+        addError(E10005, metaSelection->location, {methodCall->asText(), obj->pname()});
         return;
     }
     const auto method = obj->metaFuncs[methodCall->name];
@@ -1262,15 +1262,7 @@ void LgsSema::visitInstance(LgsInstance* instance) {
         return addError(E10032, instance->location, {objName});
     }
     instance->setObject(obj);
-
-    // Clone fields
-    for (const auto field : obj->fields) {
-        auto newField = new LgsField(*field);
-        if (newField->expr) {
-            newField->expr = newField->expr->clone();
-        }
-        instance->fields.emplace_back(newField);
-    }
+    obj->cloneFields(instance);
 
     // Args
     std::unordered_set<std::string> visited;
@@ -1338,49 +1330,16 @@ void LgsSema::visitIterIndex(LgsIterIndex* iterIndex) {
 }
 
 void LgsSema::visitIndex(LgsIterIndex* iterIndex) {
-    if (iterIndex->index.to) {
-        visitSlice(iterIndex);
-    }
-    const auto exprFrom = iterIndex->index.from;
-    visitExpr(exprFrom);
-    const auto baseType = iterIndex->baseExpr->type;
-    const auto nullable = baseType->asNullable();
-    const auto iterable = nullable ? nullable->baseType->asIterable() : baseType->asIterable();
-    if (!exprFrom->type->canCastTo(iterable->getIndexType())) {
-        return addError(E10036, iterIndex->location, {iterIndex->asText(), exprFrom->type->pname()});
-    }
-    if (iterable->isStatic) {
-        assert(0);
-    }
-    iterIndex->setType(iterable->getValueType());
-}
-
-void LgsSema::visitSlice(LgsIterIndex* iterIndex) {
-    const auto baseExpr = iterIndex->baseExpr;
-    const auto iterable = baseExpr->type->asIterable();
     const auto exprFrom = iterIndex->index.from;
     const auto exprTo = iterIndex->index.to;
     visitExpr(exprFrom);
     visitExpr(exprTo);
-    if (!baseExpr->type->isSliceable()) {
-        return addError(E10042, iterIndex->location, {iterIndex->asText(), baseExpr->type->pname()});
-    }
-    if (!exprFrom->type->canCastTo(iterable->getIndexType())) {
-        return addError(E10036, iterIndex->location, {iterIndex->asText(), exprFrom->type->pname()});
-    }
-    if (!iterable->getIndexType()->canCastTo(exprTo->type)) {
-        return addError(E10036, iterIndex->location, {iterIndex->asText(), exprTo->type->pname()});
-    }
-    if (iterable->isStatic) {
-        const auto sizeFrom = exprFrom->getConstInt();
-        const auto sizeTo = exprTo->getConstInt();
-        if (!sizeFrom.has_value() || !sizeTo.has_value()) return;
-        if (sizeFrom.value() > sizeTo.value()) {
-            return addError(E10037, iterIndex->location);
-        }
-        assert(0);
-    }
-    iterIndex->setType(iterable);
+    validateIndex(iterIndex);
+    const auto baseType = iterIndex->baseExpr->type;
+    const auto nullable = baseType->asNullable();
+    const auto iterable = nullable ? nullable->baseType->asIterable() : baseType->asIterable();
+    const auto type = exprTo ? iterable : iterable->getValueType();
+    iterIndex->setType(type);
 }
 
 void LgsSema::visitLoopMetaVar(LgsMetaVar* metaVar) {
@@ -1506,17 +1465,34 @@ void LgsSema::validateObjImplements(LgsObject* obj, const std::vector<LgsType*>&
 void LgsSema::validateIndex(LgsIterIndex* iterIndex) {
     const auto baseExpr = iterIndex->baseExpr;
     const auto exprFrom = iterIndex->index.from;
+    const auto exprTo = iterIndex->index.to;
     const auto iterable = baseExpr->type->asIterable();
-    if (!exprFrom->type->canCastTo(iterable->getIndexType())) {
+    const auto iterIndexType = iterable->getIndexType();
+    if (!exprFrom->type->canCastTo(iterIndexType)) {
         return addError(E10036, iterIndex->location, {iterIndex->asText(), exprFrom->type->pname()});
     }
-    if (const auto sArr = iterable->asSArray()) {
-        const auto i = exprFrom->getConstInt();
-        if (!i.has_value()) return;
-        const auto bounds = static_cast<int64_t>(sArr->len);
-        if (i.value() >= bounds) {
-            return addError(E10048, iterIndex->location, {iterIndex->asText(), std::to_string(bounds)});
-        }
+
+    // Left index
+    const auto indexFrom = exprFrom->getConstInt();
+    if (!indexFrom.has_value()) return;
+    const auto iterableLength = iterable->getConstLength();
+    if (!iterableLength.has_value()) return;
+    if (indexFrom.value() >= iterableLength.value()) {
+        return addError(E10048, iterIndex->location, {iterIndex->asText(), std::to_string(iterableLength.value())});
+    }
+
+    // Slice indices
+    if (!exprTo) return;
+    if (!baseExpr->type->isSliceable()) {
+        return addError(E10042, iterIndex->location, {iterIndex->asText(), baseExpr->type->pname()});
+    }
+    if (!exprTo->type->canCastTo(iterIndexType)) {
+        return addError(E10036, iterIndex->location, {iterIndex->asText(), exprTo->type->pname()});
+    }
+    const auto indexTo = exprTo->getConstInt();
+    if (!indexTo.has_value()) return;
+    if (indexFrom.value() > indexTo.value()) {
+        return addError(E10037, iterIndex->location);
     }
 }
 
@@ -1690,7 +1666,10 @@ void LgsSema::addRTType(LgsType* type) const {
 }
 
 void LgsSema::addGenerics(LgsType* type) const {
-    if (type->asStr() || type->isScalar() || type->isVoid() || type->isAny() || type->isUnknown()) return;
+    if (!type) return;
+    if (type->asStr() || type->isScalar() || type->asFieldType()) return;
+    if (type->isAny() || type->isUnknown() || type->isVoid()) return;
+    if (type->asFuncType() || type->isUnknown() || type->isVoid()) return;
     for (const auto genericsType : file->symbolTable.genericsTypes) {
         if (genericsType->equals(type)) return;
     }

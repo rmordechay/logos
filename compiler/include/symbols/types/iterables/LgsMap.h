@@ -10,11 +10,10 @@ class LgsMap final : public LgsIterable {
 public:
     static constexpr auto name = "Map";
     LgsTypePair* pairType = nullptr;
-    inline static LgsHashMapIndices rttIndices;
 
     explicit LgsMap(LgsType* keyType = nullptr, LgsType* valueType = nullptr): LgsIterable(new LgsTypePair(keyType, valueType)) {
         pairType = baseType->asPair();
-        isHeapAlloc = true;
+        isHeap = true;
         passByRef = true;
         rttKind = RTT_MAP;
     }
@@ -35,7 +34,7 @@ public:
     Value* lenIR(LgsCodeGen& cg, Value* iterable) override;
     Value* inIR(LgsCodeGen& cg, Value* iterableExpr, Value* value) override;
     Value* getIRElement(LgsCodeGen& cg, Value* map, Value* index) override;
-    Function* generateAddFunc(LgsCodeGen& cg);
+    Function* getAddFunc(LgsCodeGen& cg);
     void addIRElement(LgsCodeGen& cg, Value* map, Value* index, Value* value) override;
     Value* getEntryKey(LgsCodeGen& cg, Value* entry) const;
     Value* getEntryValue(LgsCodeGen& cg, Value* entry) const;
@@ -44,6 +43,6 @@ public:
     void setLoopIRVars(LgsCodeGen& cg, LgsForeachLoop* loop) override;
     std::string fmtStr() const override;
     DIType* getDebugType(LgsCodeGen& cg) override;
-    Function* generateGetFunc(LgsCodeGen& cg);
+    Function* getGetFunc(LgsCodeGen& cg);
 };
 

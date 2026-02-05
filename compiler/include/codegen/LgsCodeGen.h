@@ -75,8 +75,6 @@ public:
     void setupModule(const std::filesystem::path& file, bool debugMode = false);
     bool writeIRModule(const LgsPaths& paths, uint8_t optLevel) const;
     Constant* getString(const std::string& value);
-    llvm::AllocaInst* emptyBuffer();
-    size_t getAllocSize(Type* type) const;
     GlobalVariable* createGlobal(const std::string& name, Type* type, Constant* initializer, bool isConst = true, GlobalValue::LinkageTypes linkage = GlobalValue::ExternalLinkage) const;
     void loop(Value* loopLength, const std::function<void(Value*, BasicBlock*)>& body);
     void ifStmt(Value* cond, const std::function<void()>& body);
@@ -86,6 +84,7 @@ public:
     Value* load(Type* ty, Value* ptr);
     Value* loadPtr(Value* value);
     Value* isNull(Value* value);
+    llvm::AllocaInst* emptyBuffer();
     void incSize(Value* bufferOffset, Value* ptr);
     Value* allocaAndStore(Type* type, Value* v, const std::string& name = "");
     StructType* getStructType(const std::vector<Type*>& types, const std::string& name = "");
@@ -96,7 +95,7 @@ public:
     void callStackPush();
     void callPopStack();
     Value* getCurrentLevel();
-    Value* callHash(Value* arg);
+    Value* callHash(Value* type, Value* arg);
     Value* getVField(Value* objType, Value* objInstance, Value* fieldName);
     Value* getVFunc(Value* objType, Value* funcName);
     Value* allocInCurrent(Value* size, bool setLevel);
@@ -133,7 +132,7 @@ public:
     void callMemcpy(Value* dest, Value* src, Value* size);
 
     // Runtime funcs
-    GlobalVariable* getRTTypeInfo(const std::string& name, ConstantInt* size, int32_t kind, bool isHeapAlloc, Constant* extra = nullptr);
+    GlobalVariable* getRTTypeInfo(const std::string& varName, const std::string& typeName, ConstantInt* size, int32_t kind, bool isHeapAlloc, Constant* extra = nullptr);
     StructType* getRTTStruct();
 
     // Debugging
@@ -143,6 +142,7 @@ public:
     void printFloat(Value* value, const std::string& prefix = "");
     void printLong(Value* value, const std::string& prefix = "");
     void printPtr(Value* value, const std::string& prefix = "");
+    void printBytes(Value* value, Value* size, const std::string& prefix = "");
     Value* measureTimeStart();
     Value* measureTimeEnd(Value* startTime);
 
@@ -162,6 +162,7 @@ public:
     Type* voidTy();
     IntegerType* sizeTy();
     PointerType* ptrTy();
+    ConstantInt* getTypeSize(Type* ty);
 
     // Values
     Constant* null();

@@ -42,7 +42,7 @@ static std::string formatElement(const Lgs_TypeInfo* type, void* value) {
             const auto fieldOffset = obj->fields[i].offset;
             const auto fieldType = obj->fields[i].type;
             void* fieldPtr = static_cast<char*>(value) + fieldOffset;
-            if (fieldType->isHeapAlloc) {
+            if (fieldType->isHeap) {
                 fieldPtr = *static_cast<void**>(fieldPtr);
             }
             str << fieldName << '=';
@@ -54,12 +54,12 @@ static std::string formatElement(const Lgs_TypeInfo* type, void* value) {
     }
     case RTT_SET:
     case RTT_DARRAY: {
-        const auto dArr = static_cast<Lgs_DArrayExpr*>(value);
+        const auto dArr = static_cast<Lgs_DArrExpr*>(value);
         if (!dArr->data && dArr->capacity == 0) return LGS_NULL_LITERAL;
         str << "[";
         for (int i = 0; i < dArr->length; ++i) {
             void* element = dArr->data + dArr->baseType->size * i;
-            if (dArr->baseType->isHeapAlloc) {
+            if (dArr->baseType->isHeap) {
                 element = *static_cast<void**>(element);
             }
             str << formatElement(dArr->baseType, element);
@@ -74,7 +74,7 @@ static std::string formatElement(const Lgs_TypeInfo* type, void* value) {
         auto offset = 0;
         for (int i = 0; i < sArr->length; ++i) {
             void* element = static_cast<char*>(value) + offset;
-            if (sArr->baseType->isHeapAlloc) {
+            if (sArr->baseType->isHeap) {
                 element = *static_cast<void**>(element);
             }
             str << formatElement(sArr->baseType, element);

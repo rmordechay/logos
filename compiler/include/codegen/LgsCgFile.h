@@ -74,6 +74,8 @@ public:
     void visitMainFunc(LgsMainFunc* func);
     void visitFunc(LgsFunc* func);
     void visitExternalSymbols(LgsFile* file);
+
+    // Statements
     void visitStmt(LgsStmt* stmt);
     void visitStmtsBlock(const LgsStmtsBlock* stmtsBlock);
     void visitLoop(LgsForLoop* loop);
@@ -84,7 +86,6 @@ public:
     void visitWhileLoop(const LgsWhileLoop* loop);
     void visitVarDec(LgsVarDec* varDec);
     void visitAssignment(const LgsAssignment* assignment);
-    void moveValue(LgsType* type, Value* left, Value* right);
     void visitIfStmt(LgsIfStmt* ifStmt);
     void visitSimpleIf(LgsIfStmt* ifStmt);
     void visitIfWithElse(LgsIfStmt* ifStmt);
@@ -96,14 +97,27 @@ public:
     void visitCoroutine(const LgsCoroutine* coroutine);
     void visitDeferStmt(const LgsDeferStmt* defer);
     void visitIOStmt(const LgsIOStmt* ioStmt);
+
+    // Exprs
     void visitExpr(LgsExpr* expr);
     void visitBinaryExpr(LgsBinaryExpr* binExpr);
     void visitTernaryExpr(LgsTernaryExpr* ternaryExpr);
-    void visitCast(LgsCast* cast);
-    void visitLambda(LgsFunc* func);
+    void visitInstance(LgsInstance* instance);
     void visitConstant(LgsExpr* expr);
     void visitFloatConst(LgsFloatConst* floatConst);
+    void visitIntConst(LgsIntConst* intConst);
+    void visitStrConst(LgsStrConst* strConst);
+    void visitCharConst(LgsCharConst* charConst);
+    void visitFuncCall(LgsFuncCall* funcCall);
+    void visitPrefixExpr(LgsPrefixExpr* prefixExpr);
+    void visitPostfixExpr(LgsPostfixExpr* postfixExpr);
+    void visitVariable(LgsVariable* variable);
     void visitNullableExpr(LgsNullableExpr* expr);
+    void visitIterIndex(LgsIterIndex* iterIndex);
+    void visitSelection(LgsSelection* selection);
+    void visitFieldSelection(LgsVariable* var, LgsExpr* parent);
+    void visitNullableSelection(LgsExpr* child, LgsExpr* parent);
+    void visitMetaSelection(LgsMetaSelection* metaSelection);
     void visitArrayExpr(LgsArrayExpr* arrayExpr);
     void visitStaticArray(LgsArrayExpr* arrayExpr);
     void visitDynamicArray(LgsArrayExpr* arrayExpr);
@@ -112,19 +126,8 @@ public:
     void visitMatrixExpr(const LgsMatrixExpr* matrixExpr);
     void visitHashMap(LgsHashMap* hashMap);
     void visitEnvVar(LgsEnvVar* envVar);
-    void visitVariable(LgsVariable* variable);
-    void visitIterIndex(LgsIterIndex* iterIndex);
-    void visitSelection(LgsSelection* selection);
-    void visitFieldSelection(LgsVariable* var, LgsExpr* parent);
-    void visitNullableSelection(LgsExpr* child, LgsExpr* parent);
-    void visitMetaSelection(LgsMetaSelection* metaSelection);
-    void visitInstance(LgsInstance* instance);
-    void visitFuncCall(LgsFuncCall* funcCall);
-    void visitPrefixExpr(LgsPrefixExpr* prefixExpr);
-    void visitPostfixExpr(LgsPostfixExpr* postfixExpr);
-    void visitIntConst(LgsIntConst* intConst);
-    void visitStrConst(LgsStrConst* strConst);
-    void visitCharConst(LgsCharConst* charConst);
+    void visitCast(LgsCast* cast);
+    void visitLambda(LgsFunc* func);
 
     // Funcs
     void createPrologue(LgsFunc* func);
@@ -132,12 +135,12 @@ public:
     void initMainArgs(const LgsMainFunc* mainFunc);
     StructType* getThunkCtxType(const LgsFuncCall* fc);
     Value* getThunkCtx(const LgsFuncCall* fc, Type* ctxTy);
-    Value* getInstanceRTT(Type* ty, Value* value);
     Function* getThunkFunc(LgsFuncCall* fc, Type* ctxTy);
 
+    void moveValue(LgsType* type, Value* left, Value* right);
     void createVecField(LgsField* field, Value* parent);
     bool checkMock(LgsExpr* expr);
-    void generateMapFunc(LgsFuncType* mapFunc);
-    void generateFilterFunc(LgsFuncType* filterFunc);
-    void generateForeachFunc(LgsFuncType* forEachFunc);
+    void getMapFunc(LgsFuncType* mapFunc);
+    void getFilterFunc(LgsFuncType* filterFunc);
+    void getForeachFunc(LgsFuncType* forEachFunc);
 };

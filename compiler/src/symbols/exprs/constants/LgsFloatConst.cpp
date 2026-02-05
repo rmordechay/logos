@@ -1,7 +1,6 @@
 #include "exprs/constants/LgsFloatConst.h"
 #include "LgsType.h"
 #include "codegen/LgsCodeGen.h"
-#include "exprs/constants/LgsIntConst.h"
 #include "types/LgsAny.h"
 
 Value* LgsFloatConst::loadIR(LgsCodeGen& cg) {
@@ -37,4 +36,8 @@ std::string LgsFloatConst::asText() {
 
 void LgsFloatConst::setDebugValue(LgsCodeGen& cg) {
     assert(0);
+}
+
+LgsExpr* LgsFloatConst::clone() {
+    return new LgsFloatConst(*this);
 }

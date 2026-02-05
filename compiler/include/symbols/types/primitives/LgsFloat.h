@@ -9,14 +9,15 @@ public:
         isFloat = true;
         rttKind = RTT_FLOAT;
     }
-    Type* getIRType(LgsCodeGen& cg) override;
     std::string getName() override;
-    LgsExpr* getZeroValue() override;
-    Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee) override;
     size_t sizeBytes() override;
     std::string fmtStr() const override;
     bool canCastTo(LgsType* other) override;
+    LgsExpr* getZeroValue() override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
+    Type* getIRType(LgsCodeGen& cg) override;
+    Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee) override;
+    Value* hashValue(LgsCodeGen& cg, Value* value) override;
     Value* addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
     Value* subIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
     Value* mulIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;

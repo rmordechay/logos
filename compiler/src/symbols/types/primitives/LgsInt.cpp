@@ -81,6 +81,10 @@ Type* LgsInt::getIRType(LgsCodeGen& cg) {
     return cg.i32Ty();
 }
 
+Value* LgsInt::hashValue(LgsCodeGen& cg, Value* value) {
+    return cg.extendToSize(value);
+}
+
 Value* LgsInt::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;

@@ -12,8 +12,11 @@ class LgsField;
 class LgsIOPair;
 
 #define OBJ_META_NAME "name"
-#define OBJ_GET_FIELD "getField"
-#define OBJ_GET_METHOD "getMethod"
+#define OBJ_HASH_FUNC "hash"
+#define OBJ_GET_FIELD_FUNC "getField"
+#define OBJ_SET_FIELD_FUNC "setField"
+#define OBJ_GET_FIELDS_FUNC "getFields"
+#define OBJ_GET_METHOD_FUNC "getMethod"
 
 class LgsObject : public LgsType {
 public:
@@ -29,11 +32,10 @@ public:
     std::map<std::string, LgsField*> metaFields;
     LgsInstance* singleton = nullptr;
     bool hasGenerics = false;
-    inline static LgsObjIndices rttIndices;
     static constexpr std::string metaName = "Object";
 
     explicit LgsObject(const std::string&  name) : name(name) {
-        isHeapAlloc = true;
+        isHeap = true;
         passByRef = true;
         rttKind = RTT_OBJECT;
         metaFields[OBJ_META_NAME] = new LgsField(OBJ_META_NAME, new LgsStr(), new LgsStrConst(name));
@@ -45,15 +47,21 @@ public:
     Type* getIRType(LgsCodeGen& cg) override;
     Constant* getRTTypeExtra(LgsCodeGen& cg) override;
     size_t sizeBytes() override;
+    void cloneFields(LgsInstance* instance) const;
     LgsExpr* getZeroValue() override;
     Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee) override;
     bool canCastTo(LgsType* other) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     std::string fmtStr() const override;
     DIType* getDebugType(LgsCodeGen& cg) override;
-    Function* generateObjsEqFunc(LgsCodeGen& cg) const;
-    static StructType* getObjRTT(LgsCodeGen& cg);
-    static StructType* getFieldRTT(LgsCodeGen& cg);
-    static StructType* getMethodRTT(LgsCodeGen& cg);
+    Function* getObjsEqFunc(LgsCodeGen& cg) const;
+    Function* getObjsHashFunc(LgsCodeGen& cg) const;
+    static Function* getSetFieldFunc(LgsCodeGen& cg);
+    static Function* getGetFieldFunc(LgsCodeGen& cg);
+    static Value* getInstanceRTType(LgsCodeGen& cg, Value* instance);
+    static StructType* getObjRTTStruct(LgsCodeGen& cg);
+    static StructType* getMethodRTTStruct(LgsCodeGen& cg);
+    static Value* loadRTFieldsCount(LgsCodeGen& cg, Value* ptr);
+    static Value* loadRTFields(LgsCodeGen& cg, Value* ptr);
     ~LgsObject() override;
 };

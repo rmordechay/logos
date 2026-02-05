@@ -10,12 +10,11 @@ public:
     static constexpr auto name = "Nullable";
     LgsType* baseType = nullptr;
     bool isNull = false;
-    inline static LgsNullableExprIndices rttIndices;
 
     explicit LgsNullable(LgsType* baseType = nullptr) : baseType(baseType) {
         rttKind = RTT_NULLABLE;
         if (baseType) {
-            isHeapAlloc = baseType->isHeapAlloc;
+            isHeap = baseType->isHeap;
             passByRef = baseType->passByRef;
         } else {
             isNull = true;

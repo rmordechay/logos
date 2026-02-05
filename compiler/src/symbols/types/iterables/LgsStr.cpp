@@ -90,27 +90,27 @@ Value* LgsStr::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
         const auto rStr = right->getConstStr();
         if (rStr.has_value()) {
             const auto str = cg.getString(lv + rStr.value());
-            cg.storeStructField(ty, alloc, rttIndices.data, str);
+            cg.storeStructField(ty, alloc, LgsStrIndices::data, str);
             return alloc;
         }
         // Int
         const auto rInt = right->getConstInt();
         if (rInt.has_value()) {
             const auto str = cg.getString(lv + std::to_string(rInt.value()));
-            cg.storeStructField(ty, alloc, rttIndices.data, str);
+            cg.storeStructField(ty, alloc, LgsStrIndices::data, str);
             return alloc;
         }
         // Float
         const auto rFloat = right->getConstFloat();
         if (rFloat.has_value()) {
             const auto str = cg.getString(lv + std::to_string(rFloat.value()));
-            cg.storeStructField(ty, alloc, rttIndices.data, str);
+            cg.storeStructField(ty, alloc, LgsStrIndices::data, str);
             return alloc;
         }
     }
 
     Value* ptr = nullptr;
-    const auto leftPtr = loadStrPtr(cg, left->loadIR(cg));
+    const auto leftPtr = loadRTData(cg, left->loadIR(cg));
     const auto leftSize = lenIR(cg, leftPtr);
     if (right->type->asChar()) {
         const auto allocSize = cg.builder.CreateAdd(leftSize, cg.usize(2));
@@ -119,7 +119,7 @@ Value* LgsStr::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
         cg.callMemcpy(ptr, leftPtr, leftSize);
         cg.store(right->IRValue, rightPos);
     } else if (right->type->asStr()) {
-        const auto rightPtr = loadStrPtr(cg, right->IRValue);
+        const auto rightPtr = loadRTData(cg, right->IRValue);
         const auto rightSize = lenIR(cg, rightPtr);
         const auto sumSize = cg.builder.CreateAdd(leftSize, rightSize);
         const auto allocSize = cg.builder.CreateAdd(sumSize, cg.usize(1));
@@ -130,12 +130,12 @@ Value* LgsStr::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     } else {
         assert(0);
     }
-    cg.storeStructField(ty, alloc, rttIndices.data, ptr);
+    cg.storeStructField(ty, alloc, LgsStrIndices::data, ptr);
     return alloc;
 }
 
 Value* LgsStr::lenIR(LgsCodeGen& cg, Value* iterable) {
-    if (iterable->getType()->isIntegerTy() && cg.getAllocSize(iterable->getType()) == sizeof(char)) {
+    if (iterable->getType()->isIntegerTy()) {
         return cg.usize(1);
     }
     return cg.callStrlen(iterable);
@@ -147,11 +147,11 @@ Value* LgsStr::inIR(LgsCodeGen& cg, Value* iterableExpr, Value* value) {
 }
 
 Value* LgsStr::hashValue(LgsCodeGen& cg, Value* value) {
-    return cg.callHash(loadStrPtr(cg, value));
+    return cg.callHash(getRTType(cg), loadRTData(cg, value));
 }
 
-Value* LgsStr::loadStrPtr(LgsCodeGen& cg, Value* value) {
-    return cg.loadStructField(getIRType(cg), value, rttIndices.data, cg.ptrTy());
+Value* LgsStr::loadRTData(LgsCodeGen& cg, Value* value) {
+    return cg.loadStructField(getIRType(cg), value, LgsStrIndices::data, cg.ptrTy());
 }
 
 DIType* LgsStr::getDebugType(LgsCodeGen& cg) {

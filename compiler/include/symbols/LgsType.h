@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include "Lgs_Types.h"
 
+class LgsFieldType;
 class LgsEnumField;
 struct LgsBinOp;
 class LgsBinaryExpr;
@@ -69,7 +70,7 @@ public:
     bool isInt = false;
     bool isUnsinged = false;
     bool isFloat = false;
-    bool isHeapAlloc = false;
+    bool isHeap = false;
     bool isExternal = false;
     bool passByRef = false;
 
@@ -103,6 +104,11 @@ public:
     virtual Value* hashValue(LgsCodeGen& cg, Value* value);
     virtual void hashNode(size_t& oldHash);
     virtual DIType* getDebugType(LgsCodeGen& cg) = 0;
+    static Value* loadRTTInfoName(LgsCodeGen& cg, Value* ptr);
+    static Value* loadRTTInfoSize(LgsCodeGen& cg, Value* ptr);
+    static Value* loadRTTInfoKind(LgsCodeGen& cg, Value* ptr);
+    static Value* loadRTTInfoIsHeap(LgsCodeGen& cg, Value* ptr);
+    static Value* loadRTTInfoExtra(LgsCodeGen& cg, Value* ptr);
 
     virtual Value* addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr);
     virtual Value* subIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr);
@@ -145,6 +151,7 @@ public:
     LgsSubType* asSubtype();
     LgsVariadic* asVariadic();
     LgsNullable* asNullable();
+    LgsFieldType* asFieldType();
     virtual ~LgsType();
 };
 

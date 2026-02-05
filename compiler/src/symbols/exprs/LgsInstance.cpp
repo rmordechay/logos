@@ -46,6 +46,10 @@ LgsField* LgsInstance::getField(const std::string& fieldName) const {
     return nullptr;
 }
 
+Value* LgsInstance::loadRTType(LgsCodeGen& cg, Type* ty, Value* ptr) {
+    return cg.loadStructField(ty, ptr, LgsInstanceIndices::type, cg.ptrTy());
+}
+
 LgsInstance::~LgsInstance() {
     for (const auto& [_, arg] : args) {
         freeExpr(arg.expr);

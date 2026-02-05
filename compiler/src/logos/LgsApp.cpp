@@ -1,6 +1,7 @@
 #include "logos/LgsApp.h"
 
 #include <unordered_set>
+#include <llvm/Analysis/CGSCCPassManager.h>
 #include <llvm/IR/Module.h>
 #include "analysis/LgsSema.h"
 #include "builtins/LgsTest.h"
@@ -403,30 +404,33 @@ bool LgsApp::generateGenerics() {
         genericsFuncs.merge(funcs);
     }
 
+    LgsObject::getGetFieldFunc(cgFile.cg);
+    LgsObject::getSetFieldFunc(cgFile.cg);
     for (const auto& [_, genericFunc] : genericsFuncs) {
         cgFile.visitFunc(genericFunc);
     }
     for (const auto genericType : genericsTypes) {
         if (const auto dArr = genericType->asDArray()) {
-            dArr->generateAddFunc(cgFile.cg);
-            dArr->generateContainsFunc(cgFile.cg);
-            dArr->generateEqFunc(cgFile.cg);
+            dArr->getAddFunc(cgFile.cg);
+            dArr->getContainsFunc(cgFile.cg);
+            dArr->getEqFunc(cgFile.cg);
         } else if (const auto sArr = genericType->asSArray()) {
-            sArr->generateEqFunc(cgFile.cg);
+            sArr->getEqFunc(cgFile.cg);
         } else if (const auto map = genericType->asMap()) {
-            map->generateGetFunc(cgFile.cg);
-            map->generateAddFunc(cgFile.cg);
+            map->getGetFunc(cgFile.cg);
+            map->getAddFunc(cgFile.cg);
         } else if (const auto obj = genericType->asObject()) {
-            obj->generateObjsEqFunc(cgFile.cg);
+            obj->getObjsEqFunc(cgFile.cg);
+            obj->getObjsHashFunc(cgFile.cg);
         } else if (genericType->asNullable()) {
             assert(0);
         } else if (const auto func = genericType->asFuncType()) {
             if (func->name == MAP_FUNC) {
-                cgFile.generateMapFunc(func);
+                cgFile.getMapFunc(func);
             } else if (func->name == FILTER_FUNC) {
-                cgFile.generateFilterFunc(func);
+                cgFile.getFilterFunc(func);
             } else if (func->name == FOREACH_FUNC) {
-                cgFile.generateForeachFunc(func);
+                cgFile.getForeachFunc(func);
             } else {
                 assert(0);
             }

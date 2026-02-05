@@ -8,7 +8,7 @@ struct Lgs_StrExpr {
     char* data;
 };
 
-struct Lgs_DArrayExpr {
+struct Lgs_DArrExpr {
     size_t level;
     Lgs_TypeInfo* baseType;
     char* data;

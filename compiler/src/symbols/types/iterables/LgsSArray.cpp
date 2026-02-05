@@ -30,6 +30,10 @@ std::string LgsSArray::fmtStr() const {
     return "%p";
 }
 
+std::optional<int64_t> LgsSArray::getConstLength() {
+    return len;
+}
+
 bool LgsSArray::canCastTo(LgsType* other) {
     if (!baseType) return false;
     if (other->isAny()) return true;
@@ -131,7 +135,7 @@ Value* LgsSArray::lenIR(LgsCodeGen& cg, Value* iterable) {
 }
 
 Value* LgsSArray::inIR(LgsCodeGen& cg, Value* iterable, Value* value) {
-    return cg.builder.CreateCall(generateEqFunc(cg), {iterable, value});
+    return cg.builder.CreateCall(getEqFunc(cg), {iterable, value});
 }
 
 Value* LgsSArray::getIRElement(LgsCodeGen& cg, Value* iterable, Value* index) {
@@ -145,7 +149,7 @@ void LgsSArray::addIRElement(LgsCodeGen& cg, Value* iterable, Value* index, Valu
     cg.store(value, gep);
 }
 
-Function* LgsSArray::generateEqFunc(LgsCodeGen& cg) {
+Function* LgsSArray::getEqFunc(LgsCodeGen& cg) {
     const auto funcName = name + baseType->getBaseName() + "_" + EQUAL_FUNC;
     if (const auto func = cg.IRModule->getFunction(funcName)) return func;
     const auto ft = cg.getFT(cg.i1Ty(), {cg.ptrTy(), cg.ptrTy()});

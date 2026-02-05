@@ -563,16 +563,23 @@ LgsType* LgsParser::parseType() {
     }
 
     // Array
+    auto isSized = false;
+    auto isUnsized = false;
     if (type && currentToken.type == T_LBRACK) {
         std::vector<LgsExpr*> sizes;
         while (matchAndConsume(T_LBRACK)) {
             if (const auto size = parseUnary(false)) {
                 sizes.push_back(size);
+                if (isUnsized) addError(E10029, startToken.location);
+                isSized = true;
             } else {
                 type = new LgsDArray(type);
+                if (isSized) addError(E10029, startToken.location);
+                isUnsized = true;
             }
             mustMatch(T_RBRACK);
         }
+
         if (!sizes.empty()) {
             std::ranges::reverse(sizes);
             for (const auto& size : sizes) {

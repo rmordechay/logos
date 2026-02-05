@@ -30,6 +30,7 @@ enum Lgs_TypeKind {
     RTT_FUNC,
     RTT_VARIADIC,
     RTT_NULLABLE,
+    RTT_FIELD_TYPE,
     RTT_UNKNOWN,
 };
 
@@ -72,9 +73,10 @@ struct Lgs_Map {
 };
 
 struct Lgs_TypeInfo {
+    const char* name;
     const size_t size;
     const Lgs_TypeKind kind;
-    const bool isHeapAlloc;
+    const bool isHeap;
     union {
         Lgs_Object* object;
         Lgs_SArr* sArr;

@@ -40,7 +40,7 @@ inline LgsBaseMsg E10025{"Only interfaces are allowed in implements. Given: %s",
 inline LgsBaseMsg E10026{"Function %s must return an expression of type %s. None was given.", errCodeStart++};
 inline LgsBaseMsg E10027{"Void function can either return Void type or empty return. Given: %s", errCodeStart++};
 inline LgsBaseMsg E10028{"Default parameters must be defined lastly.", errCodeStart++};
-inline LgsBaseMsg E10029{"", errCodeStart++};
+inline LgsBaseMsg E10029{"Mixed array types. All dimensions must be either sized or unsized.", errCodeStart++};
 inline LgsBaseMsg E10030{"Non-public field %s is used outside its parent object %s", errCodeStart++};
 inline LgsBaseMsg E10031{"Non-public method %s is used outside its parent object %s", errCodeStart++};
 inline LgsBaseMsg E10032{"Singleton object %s cannot be instantiated.", errCodeStart++};

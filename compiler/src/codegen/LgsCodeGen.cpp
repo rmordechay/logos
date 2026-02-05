@@ -82,14 +82,6 @@ Constant* LgsCodeGen::getString(const std::string& value) {
     return new GlobalVariable(*IRModule, strConstant->getType(), true, GlobalValue::PrivateLinkage, strConstant);
 }
 
-AllocaInst* LgsCodeGen::emptyBuffer() {
-    return builder.CreateAlloca(ArrayType::get(i8Ty(), LGS_STR_BUFFER_SIZE));
-}
-
-size_t LgsCodeGen::getAllocSize(Type* type) const {
-    return IRModule->getDataLayout().getTypeAllocSize(type);
-}
-
 GlobalVariable* LgsCodeGen::createGlobal(const std::string& name, Type* type, Constant* initializer, const bool isConst, const GlobalValue::LinkageTypes linkage) const {
     if (const auto var = IRModule->getGlobalVariable(name)) return var;
     return new GlobalVariable(*IRModule, type, isConst, linkage, initializer, name);
@@ -163,6 +155,10 @@ Value* LgsCodeGen::isNull(Value* value) {
     return builder.CreateIsNull(value);
 }
 
+AllocaInst* LgsCodeGen::emptyBuffer() {
+    return builder.CreateAlloca(ArrayType::get(i8Ty(), LGS_STR_BUFFER_SIZE));
+}
+
 void LgsCodeGen::incSize(Value* bufferOffset, Value* ptr) {
     store(builder.CreateAdd(bufferOffset, usize(1)), ptr);
 }
@@ -206,8 +202,8 @@ Value* LgsCodeGen::getCurrentLevel() {
     return callRuntimeFunc("getCurrentLevel", sizeTy());
 }
 
-Value* LgsCodeGen::callHash(Value* arg) {
-    return callRuntimeFunc("hash", sizeTy(), {ptrTy()}, {arg});
+Value* LgsCodeGen::callHash(Value* type, Value* arg) {
+    return callRuntimeFunc("hashValue", sizeTy(), {ptrTy(), ptrTy()}, {type, arg});
 }
 
 Value* LgsCodeGen::getVField(Value* objType, Value* objInstance, Value* fieldName) {
@@ -365,18 +361,19 @@ void LgsCodeGen::callMemcpy(Value* dest, Value* src, Value* size) {
     builder.CreateMemCpy(dest, MaybeAlign(), src, MaybeAlign(), size);
 }
 
-GlobalVariable* LgsCodeGen::getRTTypeInfo(const std::string& name, ConstantInt* size, const int32_t kind, const bool isHeapAlloc, Constant* extra) {
+GlobalVariable* LgsCodeGen::getRTTypeInfo(const std::string& varName, const std::string& typeName, ConstantInt* size, const int32_t kind, const bool isHeapAlloc, Constant* extra) {
     assert(kind != RTT_UNKNOWN);
     const auto baseStruct = getRTTStruct();
     if (mode == CG_MODE_RTTYPES) {
-        const auto initializer = ConstantStruct::get(baseStruct, {size, i32(kind), i1(isHeapAlloc), extra ? extra : null()});
-        return createGlobal(name, baseStruct, initializer);
+        const std::vector<Constant*> args = {getString(typeName), size, i32(kind), i1(isHeapAlloc), extra ? extra : null()};
+        const auto initializer = ConstantStruct::get(baseStruct, args);
+        return createGlobal(varName, baseStruct, initializer);
     }
-    return createGlobal(name, baseStruct, nullptr);
+    return createGlobal(varName, baseStruct, nullptr);
 }
 
 StructType* LgsCodeGen::getRTTStruct() {
-    return getStructType({sizeTy(), i32Ty(), i1Ty(), ptrTy()}, "RTI");
+    return getStructType({ptrTy(), sizeTy(), i32Ty(), i1Ty(), ptrTy()}, "RTI");
 }
 
 void LgsCodeGen::printStr(const std::string& value, const std::string& prefix) {
@@ -386,7 +383,7 @@ void LgsCodeGen::printStr(const std::string& value, const std::string& prefix) {
 
 void LgsCodeGen::printStr(Value* value, const std::string& prefix) {
     if (prefix != "") printStr(prefix);
-    callPrintf({getString("\"%s\"\n"), value});
+    callPrintf({getString("%s\n"), value});
 }
 
 void LgsCodeGen::printInt(Value* value, const std::string& prefix) {
@@ -407,6 +404,11 @@ void LgsCodeGen::printLong(Value* value, const std::string& prefix) {
 void LgsCodeGen::printPtr(Value* value, const std::string& prefix) {
     if (prefix != "") printStr(prefix);
     callPrintf({getString("%p\n"), value});
+}
+
+void LgsCodeGen::printBytes(Value* value, Value* size, const std::string& prefix) {
+    if (prefix != "") printStr(prefix);
+    callRuntimeFunc("printBytes", voidTy(), {ptrTy(), sizeTy()}, {value, size});
 }
 
 Value* LgsCodeGen::measureTimeStart() {
@@ -493,6 +495,10 @@ IntegerType* LgsCodeGen::sizeTy() {
 
 PointerType* LgsCodeGen::ptrTy() {
     return PointerType::getUnqual(context);
+}
+
+ConstantInt* LgsCodeGen::getTypeSize(Type* ty) {
+    return usize(IRModule->getDataLayout().getTypeAllocSize(ty));
 }
 
 Constant* LgsCodeGen::null() {

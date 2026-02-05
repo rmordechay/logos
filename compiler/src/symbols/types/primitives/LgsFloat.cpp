@@ -27,6 +27,10 @@ Value* LgsFloat::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
     return cg.floatv(0);
 }
 
+Value* LgsFloat::hashValue(LgsCodeGen& cg, Value* value) {
+    return cg.extendToSize(cg.builder.CreateBitCast(value, cg.i32Ty()));
+}
+
 size_t LgsFloat::sizeBytes() {
     return sizeof(float);
 }
@@ -96,7 +100,7 @@ Value* LgsFloat::mulIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
     if (left->type->asVec() && right->type->asVec()) {
-        const auto dotFunc = generateDotProductFunc(cg, left->type->asVec());
+        const auto dotFunc = getDotProductFunc(cg, left->type->asVec());
         return cg.builder.CreateCall(dotFunc, {left->loadIR(cg), right->loadIR(cg)});
     }
     auto [l, r] = loadNumberPair(cg, left->loadIR(cg), right->loadIR(cg), cg.floatTy());

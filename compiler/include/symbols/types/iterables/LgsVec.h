@@ -19,6 +19,7 @@ public:
     std::string getName() override;
     std::string pname() override;
     size_t sizeBytes() override;
+    std::optional<int64_t> getConstLength() override;
     bool equals(LgsType* other) override;
     LgsExpr* getZeroValue() override;
     Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee) override;
@@ -43,5 +44,5 @@ public:
     DIType* getDebugType(LgsCodeGen& cg) override;
 };
 
-Function* generateDotProductFunc(LgsCodeGen& cg, LgsVec* vecType);
-Function* generateCrossProductFunc(LgsCodeGen& cg, LgsVec* vecType);
+Function* getDotProductFunc(LgsCodeGen& cg, LgsVec* vecType);
+Function* getCrossProductFunc(LgsCodeGen& cg, LgsVec* vecType);

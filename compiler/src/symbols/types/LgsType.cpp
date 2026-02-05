@@ -11,6 +11,7 @@
 #include "types/LgsObject.h"
 #include "types/iterables/LgsDArray.h"
 #include "types/LgsEnum.h"
+#include "types/LgsFieldType.h"
 #include "types/LgsGenericType.h"
 #include "types/LgsNullable.h"
 #include "types/iterables/LgsMap.h"
@@ -48,7 +49,7 @@ static std::unordered_map<std::string, uint8_t> numberPrecedences = {
 };
 
 bool LgsType::isAny() {
-    return getName() == LgsAny::name || (asCPtr() && asCPtr()->baseType->isVoid());
+    return asAny() || (asCPtr() && asCPtr()->baseType->isVoid());
 }
 
 bool LgsType::isVoid() {
@@ -89,7 +90,7 @@ bool LgsType::hasGenericTypes() {
 }
 
 ConstantInt* LgsType::IRSize(LgsCodeGen& cg) {
-    return cg.usize(cg.getAllocSize(getIRType(cg)));
+    return cg.getTypeSize(getIRType(cg));
 }
 
 Type* LgsType::getTypeOrPtr(LgsCodeGen& cg) {
@@ -133,8 +134,8 @@ Value* LgsType::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
 Constant* LgsType::getRTType(LgsCodeGen& cg) {
     const auto rttName = getRTTName();
     if (const auto v = cg.IRModule->getGlobalVariable(rttName)) return v;
-    if (cg.mode != CG_MODE_RTTYPES) return cg.getRTTypeInfo(rttName, IRSize(cg), rttKind, isHeapAlloc, nullptr);
-    return cg.getRTTypeInfo(rttName, IRSize(cg), rttKind, isHeapAlloc, getRTTypeExtra(cg));
+    if (cg.mode != CG_MODE_RTTYPES) return cg.getRTTypeInfo(rttName, getName(), IRSize(cg), rttKind, isHeap, nullptr);
+    return cg.getRTTypeInfo(rttName, getName(), IRSize(cg), rttKind, isHeap, getRTTypeExtra(cg));
 }
 
 Constant* LgsType::getRTTypeExtra(LgsCodeGen& cg) {
@@ -151,6 +152,26 @@ Value* LgsType::hashValue(LgsCodeGen& cg, Value* value) {
 
 void LgsType::hashNode(size_t& oldHash) {
     assert(0);
+}
+
+Value* LgsType::loadRTTInfoName(LgsCodeGen& cg, Value* ptr) {
+    return cg.loadStructField(cg.getRTTStruct(), ptr, LgsTypeInfoIndices::name, cg.ptrTy());
+}
+
+Value* LgsType::loadRTTInfoSize(LgsCodeGen& cg, Value* ptr) {
+    return cg.loadStructField(cg.getRTTStruct(), ptr, LgsTypeInfoIndices::size, cg.sizeTy());
+}
+
+Value* LgsType::loadRTTInfoKind(LgsCodeGen& cg, Value* ptr) {
+    return cg.loadStructField(cg.getRTTStruct(), ptr, LgsTypeInfoIndices::kind, cg.i32Ty());
+}
+
+Value* LgsType::loadRTTInfoIsHeap(LgsCodeGen& cg, Value* ptr) {
+    return cg.loadStructField(cg.getRTTStruct(), ptr, LgsTypeInfoIndices::isHeap, cg.i1Ty());
+}
+
+Value* LgsType::loadRTTInfoExtra(LgsCodeGen& cg, Value* ptr) {
+    return cg.loadStructField(cg.getRTTStruct(), ptr, LgsTypeInfoIndices::extra, cg.ptrTy());
 }
 
 Value* LgsType::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
@@ -313,6 +334,10 @@ LgsNullable* LgsType::asNullable() {
     return dynamic_cast<LgsNullable*>(this);
 }
 
+LgsFieldType* LgsType::asFieldType() {
+    return dynamic_cast<LgsFieldType*>(this);
+}
+
 LgsType::~LgsType() {
     for (const auto [_, method] : methods) {
         if (!method) continue;
@@ -331,32 +356,33 @@ Value* exprEqNull(LgsCodeGen& cg, Value* expr, LgsType* type) {
     return cg.builder.CreateNot(type->asNullable()->loadIsSet(cg, expr));
 }
 
-Value* exprNeNull(LgsCodeGen& cg, Value* expr, LgsType* type) {
-    if (type->passByRef) return cg.builder.CreateIsNotNull(expr);
-    return type->asNullable()->loadIsSet(cg, expr);
-}
-
 Value* eqIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
-    if (isa<ConstantPointerNull>(left) && isa<ConstantPointerNull>(right)) return cg.true_();
-    if (isa<ConstantPointerNull>(left)) return exprEqNull(cg, right, type);
-    if (isa<ConstantPointerNull>(right)) return exprEqNull(cg, left, type);
-    if (type->isInt) {
+    if (isa<ConstantPointerNull>(left) && isa<ConstantPointerNull>(right)) {
+        return cg.true_();
+    }
+    if (isa<ConstantPointerNull>(left)) {
+        return exprEqNull(cg, right, type);
+    }
+    if (isa<ConstantPointerNull>(right)) {
+        return exprEqNull(cg, left, type);
+    }
+    if (type->isInt || type->asChar()) {
         return cg.builder.CreateICmpEQ(left, right);
     }
     if (type->isFloat) {
         return cg.builder.CreateFCmpOEQ(left, right);
     }
-    if (type->asStr()) {
-        return cg.strsEqual(left, right);
+    if (const auto str = type->asStr()) {
+        return cg.strsEqual(str->loadRTData(cg, left), str->loadRTData(cg, right));
     }
     if (const auto dArr = type->asDArray()) {
-        return cg.builder.CreateCall(dArr->generateEqFunc(cg), {left, right});
+        return cg.builder.CreateCall(dArr->getEqFunc(cg), {left, right});
     }
     if (const auto sArr = type->asSArray()) {
-        return cg.builder.CreateCall(sArr->generateEqFunc(cg), {left, right});
+        return cg.builder.CreateCall(sArr->getEqFunc(cg), {left, right});
     }
     if (const auto obj = type->asObject()) {
-        return cg.builder.CreateCall(obj->generateObjsEqFunc(cg), {left, right});
+        return cg.builder.CreateCall(obj->getObjsEqFunc(cg), {left, right});
     }
     assert(0);
 }
@@ -452,7 +478,7 @@ Value* orIR(LgsCodeGen& cg, Value* left, Value* right) {
 }
 
 Value* crossIR(LgsCodeGen& cg, Value* left, Value* right, LgsVec* vec) {
-    return cg.builder.CreateCall(generateCrossProductFunc(cg, vec), {left, right});
+    return cg.builder.CreateCall(getCrossProductFunc(cg, vec), {left, right});
 }
 
 LgsType* getBiggestIntType(const std::vector<LgsType*>& types) {

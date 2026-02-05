@@ -15,7 +15,6 @@ public:
     std::vector<LgsField*> fields;
     std::map<std::string, LgsInstanceArg> args;
     std::vector<LgsType*> generics;
-    inline static LgsInstanceIndices rttIndices;
 
     explicit LgsInstance(const std::string& name): name(name) {}
     explicit LgsInstance(LgsObject* obj) : LgsExpr(obj), name(obj->name), obj(obj) {}
@@ -27,5 +26,6 @@ public:
     bool equals(LgsExpr* other) override;
     void setDebugValue(LgsCodeGen& cg) override;
     LgsField* getField(const std::string& fieldName) const;
+    static Value* loadRTType(LgsCodeGen& cg, Type* ty, Value* ptr);
     ~LgsInstance() override;
 };

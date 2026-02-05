@@ -103,12 +103,12 @@ Value* LgsNullable::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
 
 void LgsNullable::setIRFields(LgsCodeGen& cg, Value* ptr, Value* value, Value* isSet) {
     const auto ty = getIRType(cg);
-    cg.storeStructField(ty, ptr, rttIndices.value, value);
-    cg.storeStructField(ty, ptr, rttIndices.isSet, isSet);
+    cg.storeStructField(ty, ptr, LgsNullableExprIndices::value, value);
+    cg.storeStructField(ty, ptr, LgsNullableExprIndices::isSet, isSet);
 }
 
 Value* LgsNullable::loadIsSet(LgsCodeGen& cg, Value* ptr) {
-    return cg.loadStructField(getIRType(cg), ptr, rttIndices.isSet, cg.i1Ty());
+    return cg.loadStructField(getIRType(cg), ptr, LgsNullableExprIndices::isSet, cg.i1Ty());
 }
 
 Value* LgsNullable::applyNumberBinOp(LgsCodeGen& cg, LgsBinaryExpr* binExpr, const std::function<Value*(LgsBinaryExpr*)>& func) {
@@ -133,7 +133,7 @@ Value* LgsNullable::applyNumberBinOp(LgsCodeGen& cg, LgsBinaryExpr* binExpr, con
     cg.builder.CreateBr(exitBlock);
 
     cg.startBlock(nullBlock);
-    cg.storeStructField(ty, ptr, rttIndices.isSet, cg.false_());
+    cg.storeStructField(ty, ptr, LgsNullableExprIndices::isSet, cg.false_());
     cg.builder.CreateBr(exitBlock);
 
     cg.startBlock(exitBlock);

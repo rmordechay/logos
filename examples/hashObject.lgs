@@ -1,0 +1,17 @@
+object Obj {
+    x: Int = 34
+    y: Float = 834.87
+    z: Str = "Rt"
+    d: Int[]
+}
+
+main() {
+    obj1 = Obj{x=4, y=43.12, d=[5]}
+    obj2 = Obj{x=4, y=43.12, d=[5]}
+    print(obj1)
+    print(obj2)
+    print(obj1::hash())
+    print(obj2::hash())
+    print(obj1 == obj2)
+    print(obj1::hash() == obj2::hash())
+}

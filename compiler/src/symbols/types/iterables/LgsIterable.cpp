@@ -73,19 +73,8 @@ LgsType* LgsIterable::getBaseType() const {
     }
 }
 
-size_t LgsIterable::getDimension() const {
-    size_t dim = 1;
-    auto nestedIter = this;
-    while (true) {
-        if (const auto innerIter = nestedIter->baseType->asIterable()) {
-            nestedIter = innerIter;
-            if (innerIter->asVec() || innerIter->asStr()) continue;
-            dim++;
-        } else {
-            break;
-        }
-    }
-    return dim;
+std::optional<int64_t> LgsIterable::getConstLength() {
+    return std::nullopt;
 }
 
 LgsType* LgsIterable::getIndexType() {

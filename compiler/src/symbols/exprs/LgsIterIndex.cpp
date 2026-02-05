@@ -9,7 +9,7 @@
 
 Value* LgsIterIndex::loadIR(LgsCodeGen& cg) {
     const auto baseExprType = baseExpr->type;
-    if (baseExprType->isHeapAlloc) {
+    if (baseExprType->isHeap) {
         return cg.loadPtr(IRValue);
     }
     if (baseExprType->asSArray()) {
@@ -29,28 +29,29 @@ Value* LgsIterIndex::loadIR(LgsCodeGen& cg) {
     assert(0);
 }
 
-void LgsIterIndex::setIRRangePtr(LgsCodeGen& cg) {
+Value* LgsIterIndex::getIRRangePtr(LgsCodeGen& cg) const {
     const auto fromIR = index.from->IRValue;
     const auto toIR = index.to->IRValue;
     assert(baseExpr->IRValue && fromIR && toIR);
+    Value* v = nullptr;
     if (type->asStr()) {
         const auto size = cg.builder.CreateSub(toIR, fromIR);
         const auto sizeWithNull = cg.builder.CreateAdd(size, cg.i32(1));
-        IRValue = cg.builder.CreateAlloca(cg.i8Ty(), sizeWithNull);
+        v = cg.builder.CreateAlloca(cg.i8Ty(), sizeWithNull);
         const auto src = cg.builder.CreateInBoundsGEP(cg.i8Ty(), baseExpr->IRValue, {fromIR});
         cg.callMemcpy(IRValue, src, size);
     } else if (const auto sArray = type->asSArray()) {
         const auto size = cg.builder.CreateSub(toIR, fromIR);
         const auto ty = sArray->baseType->getIRType(cg);
-        IRValue = cg.builder.CreateAlloca(ty, size);
+        v = cg.builder.CreateAlloca(ty, size);
         const auto src = cg.builder.CreateInBoundsGEP(ty, baseExpr->IRValue, fromIR);
-        const auto elementSize = cg.getAllocSize(ty);
-        const auto elementSizeVal = cg.builder.getInt32(elementSize);
-        const auto sizeInBytes = cg.builder.CreateMul(size, elementSizeVal);
+        const auto elementSize = cg.getTypeSize(ty);
+        const auto sizeInBytes = cg.builder.CreateMul(size, elementSize);
         cg.callMemcpy(IRValue, src, sizeInBytes);
     } else {
         assert(0);
     }
+    return v;
 }
 
 LgsExpr* LgsIterIndex::getBaseExpr() const {

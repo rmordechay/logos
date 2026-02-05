@@ -1,10 +1,11 @@
 #pragma once
 
 struct LgsTypeInfoIndices {
-    static constexpr size_t size = 0;
-    static constexpr size_t kind = 1;
-    static constexpr size_t isHeapAlloc = 2;
-    static constexpr size_t extra = 3;
+    static constexpr size_t name = 0;
+    static constexpr size_t size = 1;
+    static constexpr size_t kind = 2;
+    static constexpr size_t isHeap = 3;
+    static constexpr size_t extra = 4;
 };
 
 struct LgsStrIndices {
@@ -23,7 +24,7 @@ struct LgsHashMapIndices {
     static constexpr size_t next = 2;
 };
 
-struct LgsDArrayExprIndices {
+struct LgsDArrExprIndices {
     static constexpr size_t level = 0;
     static constexpr size_t type = 1;
     static constexpr size_t data = 2;
@@ -41,7 +42,7 @@ struct LgsObjIndices {
     static constexpr size_t funcs = 6;
 };
 
-struct LgsObjFieldIndices {
+struct LgsFieldIndices {
     static constexpr size_t name = 0;
     static constexpr size_t size = 1;
     static constexpr size_t offset = 2;
@@ -49,7 +50,7 @@ struct LgsObjFieldIndices {
     static constexpr size_t type = 4;
 };
 
-struct LgsObjMethodIndices {
+struct LgsMethodIndices {
     static constexpr size_t name = 0;
     static constexpr size_t ptr = 1;
 };
@@ -63,3 +64,4 @@ struct LgsNullableExprIndices {
     static constexpr size_t value = 0;
     static constexpr size_t isSet = 1;
 };
+

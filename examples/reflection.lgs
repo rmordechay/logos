@@ -1,13 +1,18 @@
 object Obj {
-    x: Int
+    a1: Int
+    b1: Float
+    c1: Str
 
-    func(): Str {
-        return "From func"
+    func(x: Str) {
+        print(x)
     }
 }
 
 main() {
-    obj = Obj{x=45}
+    obj: Obj
+    field = obj::getField("b1")
+    obj::setField("b1", 3.435)
+    print(obj)
     method = obj::getMethod("func")
-    print(method())
+    method("Roi", 78)
 }

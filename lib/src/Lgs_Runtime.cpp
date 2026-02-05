@@ -5,6 +5,8 @@
 #include "LgsUtils.h"
 #include <cassert>
 
+#include "LgsRTTIndices.h"
+
 #define NANO 1000000000LL
 
 extern "C" void Lgs_Runtime_moveValue(Lgs_TypeKind kind, size_t level, void* left, void* right, size_t size);
@@ -33,18 +35,18 @@ extern "C" void* Lgs_Runtime_allocInLevel(const size_t size, const size_t level,
     return runtime.stack.at(level).allocator.allocate(size, setLevel);
 }
 
-extern "C" void* Lgs_Runtime_allocObject(Lgs_Object* type) {
+extern "C" void* Lgs_Runtime_allocObject(Lgs_TypeInfo* type) {
     const auto obj = runtime.stack.at(runtime.level).allocator.allocate(type->size, true);
-    const auto typePtr = reinterpret_cast<Lgs_Object**>(static_cast<char*>(obj) + sizeof(size_t));
+    const auto typePtr = reinterpret_cast<Lgs_TypeInfo**>(static_cast<char*>(obj) + sizeof(size_t));
     *typePtr = type;
     return obj;
 }
 
 extern "C" void* Lgs_Runtime_allocDArr(Lgs_TypeInfo* baseType) {
     auto& allocator = runtime.stack.at(runtime.level).allocator;
-    const auto arr = allocator.allocate(sizeof(Lgs_DArrayExpr), true);
+    const auto arr = allocator.allocate(sizeof(Lgs_DArrExpr), true);
     const auto dataPtr = Lgs_Runtime_allocInCurrent(baseType->size * LGS_ITER_INIT_CAP, false);
-    const auto arrExpr = static_cast<Lgs_DArrayExpr*>(arr);
+    const auto arrExpr = static_cast<Lgs_DArrExpr*>(arr);
     arrExpr->baseType = baseType;
     arrExpr->capacity = LGS_ITER_INIT_CAP;
     arrExpr->data = static_cast<char*>(dataPtr);
@@ -76,9 +78,9 @@ extern "C" void Lgs_Runtime_moveObject(void* left, void* right) {
     }
 }
 
-extern "C" void Lgs_Runtime_moveArr(Lgs_DArrayExpr* leftArr, const Lgs_DArrayExpr* rightArr) {
+extern "C" void Lgs_Runtime_moveArr(Lgs_DArrExpr* leftArr, const Lgs_DArrExpr* rightArr) {
     if (!rightArr) {
-        std::memset(leftArr, 0, sizeof(Lgs_DArrayExpr));
+        std::memset(leftArr, 0, sizeof(Lgs_DArrExpr));
         return;
     }
     // Left is null
@@ -154,8 +156,8 @@ extern "C" void Lgs_Runtime_moveValue(const Lgs_TypeKind kind, const size_t leve
         break;
     }
     case RTT_DARRAY: {
-        const auto leftArr = static_cast<Lgs_DArrayExpr*>(left);
-        const auto rightArr = static_cast<Lgs_DArrayExpr*>(right);
+        const auto leftArr = static_cast<Lgs_DArrExpr*>(left);
+        const auto rightArr = static_cast<Lgs_DArrExpr*>(right);
         Lgs_Runtime_moveArr(leftArr, rightArr);
         break;
     }
@@ -207,8 +209,18 @@ extern "C" void Lgs_Runtime_throwError(const size_t count, const char* msg, ...)
     exit(1);
 }
 
-extern "C" size_t Lgs_Runtime_hash(const char* str) {
-    return hashString(str);
+extern "C" size_t Lgs_Runtime_hashValue(const Lgs_TypeInfo* type, void* value) {
+    switch (type->kind) {
+        case RTT_STR: {
+            return hashString(static_cast<char*>(value));
+        }
+        case RTT_DARRAY: {
+            const auto dArr = static_cast<Lgs_DArrExpr*>(value);
+            return hashBytes(dArr->data, dArr->length * dArr->baseType->size);
+        }
+    default: break;
+    }
+    assert(0);
 }
 
 extern "C" int64_t Lgs_Runtime_timeStart() {
@@ -235,4 +247,14 @@ extern "C" void Lgs_Runtime_printBytes(void* ptr, const size_t n) {
         if (i < n - 1) printf(" ");
     }
     printf("\n");
+}
+
+extern "C" bool Lgs_Runtime_canCast(const Lgs_TypeKind t1, const Lgs_TypeKind t2) {
+    if (t1 == RTT_FLOAT && t2 == RTT_INT) return true;
+    return t1 == t2;
+}
+
+extern "C" bool Lgs_Runtime_arrsEqual(const Lgs_DArrExpr* arr1, const Lgs_DArrExpr* arr2) {
+    if (arr1->length != arr2->length) return false;
+    return std::memcmp(arr1->data, arr2->data, arr1->length * arr1->baseType->size) == 0;
 }

@@ -29,7 +29,7 @@ void LgsTypeResolver::resolveType(LgsType*& type) {
     } else if (const auto nullable = type->asNullable()) {
         if (!nullable->isNull) {
             resolveType(nullable->baseType);
-            nullable->isHeapAlloc = nullable->baseType->isHeapAlloc;
+            nullable->isHeap = nullable->baseType->isHeap;
             nullable->passByRef = nullable->baseType->passByRef;
         }
     } else if (const auto pair = type->asPair()) {

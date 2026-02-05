@@ -12,7 +12,7 @@ public:
     LgsFunc* addFunc = new LgsFunc(ADD_FUNC, name, &LGS_VOID, {this, &LGS_ANY}, BUILTIN | PUBLIC | METHOD);
 
     explicit LgsSet(LgsType* baseType = nullptr) : LgsIterable(baseType) {
-        isHeapAlloc = true;
+        isHeap = true;
         passByRef = true;
         addMethod(addFunc);
     }

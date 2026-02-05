@@ -128,9 +128,17 @@ std::string scanEscapeStr(const std::string& value) {
     return out;
 }
 
+size_t hashBytes(const char* data, const size_t len) {
+    size_t hash = 0;
+    for (size_t i = 0; i < len; ++i) {
+        hash = hash * 31 + data[i];
+    }
+    return hash;
+}
+
 size_t hashString(const std::string& str) {
     assert(str != "");
-    return std::hash<std::string_view>{}(str);
+    return hashBytes(str.c_str(), str.length());
 }
 
 time_t getLastWritten(const fs::path& filePath) {
