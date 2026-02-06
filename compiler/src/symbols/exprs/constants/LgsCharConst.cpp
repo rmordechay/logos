@@ -6,10 +6,6 @@ Value* LgsCharConst::loadIR(LgsCodeGen& cg) {
     return IRValue;
 }
 
-void LgsCharConst::castImplicitly(LgsType* toType) {
-
-}
-
 std::string LgsCharConst::asText() {
     return type->pname();
 }

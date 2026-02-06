@@ -1,9 +1,6 @@
 #pragma once
+#include <functional>
 #include "LgsType.h"
-
-#include <llvm/IR/Instructions.h>
-
-#include "LgsRTTIndices.h"
 
 class LgsNullable final : public LgsType {
 public:
@@ -18,7 +15,6 @@ public:
             passByRef = baseType->passByRef;
         } else {
             isNull = true;
-            passByRef = true;
         }
     }
     LgsField* getField(const std::string& fieldName) override;

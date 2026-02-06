@@ -11,6 +11,5 @@ public:
     void hashNode(size_t& oldHash) override;
     void setDebugValue(LgsCodeGen& cg) override;
     LgsExpr* castExplicitly(LgsType* toType) override;
-    void castImplicitly(LgsType* toType) override;
     std::string asText() override;
 };

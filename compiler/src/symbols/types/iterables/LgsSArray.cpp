@@ -105,10 +105,10 @@ LgsType* LgsSArray::applyBinOp(LgsType* rightType, LgsBinOp& op) {
 
 Constant* LgsSArray::getRTTypeExtra(LgsCodeGen& cg) {
     assert(len > 0);
-    const auto rttName = getRTTName();
-    const auto st = cg.getStructType({cg.sizeTy(), cg.ptrTy()});
+    const auto rttName = getRTTName() + "_extra";
+    const auto st = cg.getStructType({cg.sizeTy(), cg.ptrTy()}, rttName);
     const std::vector<Constant*> args = {cg.usize(len), baseType->getRTType(cg)};
-    return cg.createGlobal(rttName + "_extra", st, ConstantStruct::get(st, args));
+    return cg.createGlobal(rttName, st, ConstantStruct::get(st, args));
 }
 
 Value* LgsSArray::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
@@ -139,8 +139,8 @@ Value* LgsSArray::inIR(LgsCodeGen& cg, Value* iterable, Value* value) {
 }
 
 Value* LgsSArray::getIRElement(LgsCodeGen& cg, Value* iterable, Value* index) {
-    const auto gep = cg.builder.CreateGEP(getIRType(cg), iterable, {cg.zero32(), index});
-    return cg.load(baseType->getIRType(cg), gep);
+    assert(iterable);
+    return cg.builder.CreateGEP(getIRType(cg), iterable, {cg.zero32(), index});
 }
 
 void LgsSArray::addIRElement(LgsCodeGen& cg, Value* iterable, Value* index, Value* value) {
@@ -150,7 +150,7 @@ void LgsSArray::addIRElement(LgsCodeGen& cg, Value* iterable, Value* index, Valu
 }
 
 Function* LgsSArray::getEqFunc(LgsCodeGen& cg) {
-    const auto funcName = name + baseType->getBaseName() + "_" + EQUAL_FUNC;
+    const auto funcName = getName() + "_" + EQUAL_FUNC;
     if (const auto func = cg.IRModule->getFunction(funcName)) return func;
     const auto ft = cg.getFT(cg.i1Ty(), {cg.ptrTy(), cg.ptrTy()});
     if (cg.mode == CG_MODE_SRC_CODE) return cg.getFunc(funcName, ft);

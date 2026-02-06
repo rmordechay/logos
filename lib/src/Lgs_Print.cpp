@@ -3,6 +3,7 @@
 #include "Lgs_Runtime.h"
 #include "Lgs_Types.h"
 #include <cassert>
+#include <cmath>
 #include <sstream>
 
 #include "LgsConfigs.h"
@@ -22,8 +23,8 @@ static std::string formatElement(const Lgs_TypeInfo* type, void* value) {
     case RTT_USHORT: str << *static_cast<uint16_t*>(value); break;
     case RTT_UINT: str << *static_cast<uint32_t*>(value); break;
     case RTT_ULONG: str << *static_cast<uint64_t*>(value); break;
-    case RTT_FLOAT: str << *static_cast<float*>(value); break;
-    case RTT_DOUBLE: str << *static_cast<double*>(value); break;
+    case RTT_FLOAT: str << *static_cast<float_t*>(value); break;
+    case RTT_DOUBLE: str << *static_cast<double_t*>(value); break;
     case RTT_ENUM:
     case RTT_STR: {
         const auto lgsStr = static_cast<Lgs_StrExpr*>(value);
@@ -69,6 +70,7 @@ static std::string formatElement(const Lgs_TypeInfo* type, void* value) {
         break;
     }
     case RTT_SARRAY: {
+        if (!*static_cast<void**>(value)) return LGS_NULL_LITERAL;
         const auto sArr = type->sArr;
         str << "[";
         auto offset = 0;

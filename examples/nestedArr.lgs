@@ -1,0 +1,39 @@
+main() {
+    vec: Vec2 = Vec2(1)
+    print(vec)
+
+    mut arr: Int[2][2]
+    arr := [[5]]
+    print(arr)
+    arr[1] := [4]
+    print(arr)
+    arr[1][1] := 6
+    arr[0][1] := 5
+    print(arr)
+
+    arr2: Int[2]
+    arr2[0] := 5
+    print(arr2)
+
+    arr3: Vec2[2]
+    arr3[0] := Vec2(12.5)
+    print(arr3)
+    arr3[1] := Vec2(5.34)
+    print(arr3)
+
+    arr4: Vec2[2][2]
+    print(arr4)
+    arr4[0] := [Vec2(5.23, 34.8)]
+    print(arr4)
+
+    mut arr5: Int[2][2][2]
+    print(arr5)
+    arr5 := [[[5, 2]]]
+    print(arr5)
+    arr5[1] := [[4]]
+    print(arr5)
+    arr5[1][1][0] := 6
+    print(arr5)
+    arr5[0][1][0] := 5
+    print(arr5)
+}

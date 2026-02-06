@@ -16,17 +16,17 @@ Value* LgsInstance::loadIR(LgsCodeGen& cg) {
     return IRValue;
 }
 
+void LgsInstance::setType(LgsType* newObj) {
+    obj = newObj->asObject();
+    type = newObj;
+}
+
 void LgsInstance::hashNode(size_t& oldHash) {
     hashNodeString(oldHash, name);
     for (auto [argName, arg] : args) {
         hashNodeString(oldHash, argName);
         arg.expr->hashNode(oldHash);
     }
-}
-
-void LgsInstance::setObject(LgsObject* newObj) {
-    obj = newObj;
-    setType(obj);
 }
 
 bool LgsInstance::equals(LgsExpr* other) {

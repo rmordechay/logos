@@ -46,7 +46,6 @@ public:
     bool isNull = false;
     bool isReturnExpr = false;
     bool hasUnwrap = false;
-    bool hasMoved = false;
     Value* pointee = nullptr;
 
     explicit LgsExpr(LgsType* type = nullptr) : type(type) {}
@@ -90,7 +89,7 @@ public:
     ~LgsExpr() override = default;
 };
 
-void castExprImplicitly(LgsExpr*& expr, LgsType* toType);
+LgsExpr* castExprImplicitly(LgsExpr* expr, LgsType* toType);
 
 void freeExpr(LgsExpr* expr);
 template<typename T>

@@ -66,8 +66,7 @@ LgsType* LgsStr::applyBinOp(LgsType* rightType, LgsBinOp& op) {
 }
 
 Value* LgsStr::getIRElement(LgsCodeGen& cg, Value* iterable, Value* index) {
-    const auto gep =  cg.builder.CreateGEP(cg.i8Ty(), iterable, {cg.zero32(), index});
-    return cg.load(cg.i8Ty(), gep);
+    return cg.builder.CreateGEP(cg.i8Ty(), loadRTData(cg, iterable), {cg.zero32(), index});
 }
 
 std::string LgsStr::fmtStr() const {
@@ -75,7 +74,10 @@ std::string LgsStr::fmtStr() const {
 }
 
 bool LgsStr::inferBaseType(std::vector<LgsExpr*>& args) {
-    assert(0);
+    for (const auto arg : args) {
+        if (!arg->type->canCastTo(baseType)) return false;
+    }
+    return true;
 }
 
 Value* LgsStr::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {

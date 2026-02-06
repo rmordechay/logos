@@ -78,9 +78,7 @@ Value* LgsSet::inIR(LgsCodeGen& cg, Value* iterableExpr, Value* value) {
 }
 
 Value* LgsSet::getIRElement(LgsCodeGen& cg, Value* iterable, Value* index) {
-    const std::vector<Type*> params = {cg.ptrTy(), cg.sizeTy()};
-    const std::vector IRArgs = {iterable, index};
-    return cg.callLgsFunc(name, "get", cg.ptrTy(), params, IRArgs);
+    assert(0);
 }
 
 DIType* LgsSet::getDebugType(LgsCodeGen& cg) {

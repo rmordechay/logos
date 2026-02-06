@@ -22,7 +22,7 @@ TEST(SemaErrorTest, Er0001A) {
     LgsApp app;
     const auto code = R"(
     main() {
-        s1: Str[2] = [["adi"], ["roi"]]
+        s1: Str[2] = [["text1"], ["text2"]]
     }
     )";
     app.loadSrcFile(code);

@@ -106,7 +106,7 @@ inline LgsBaseMsg E10091{"'not' can only prefix Bool. Given: %s", errCodeStart++
 inline LgsBaseMsg E10092{"If condition must be of type Bool. Given: %s", errCodeStart++};
 inline LgsBaseMsg E10093{"Cannot assign variable to Void type.", errCodeStart++};
 inline LgsBaseMsg E10094{"%s is not a parameter of '%s'.", errCodeStart++};
-inline LgsBaseMsg E10095{"Could not infer the iterable type.", errCodeStart++};
+inline LgsBaseMsg E10095{"Could not infer iterable type.", errCodeStart++};
 inline LgsBaseMsg E10096{"Mixing named und position arguments is not allowed.", errCodeStart++};
 inline LgsBaseMsg E10097{"switch statement must have at least one pattern.", errCodeStart++};
 inline LgsBaseMsg E10098{"Argument %s is set more than one time.", errCodeStart++};
@@ -122,7 +122,7 @@ inline LgsBaseMsg E10107{"Could not find C library %s", errCodeStart++};
 inline LgsBaseMsg E10108{"%s is not indexable.", errCodeStart++};
 inline LgsBaseMsg E10109{"Expression of type %s cannot be set as default value.", errCodeStart++};
 inline LgsBaseMsg E10110{"Unsigned number cannot be negative.", errCodeStart++};
-inline LgsBaseMsg E10111{"Array type %s does not match the element type %s", errCodeStart++};
+inline LgsBaseMsg E10111{"", errCodeStart++};
 inline LgsBaseMsg E10112{"Matrix rows/columns cannot be 0.", errCodeStart++};
 inline LgsBaseMsg E10113{"Only nullable values can be unwrapped with '!'.", errCodeStart++};
 inline LgsBaseMsg E10114{"Static array size must be known at compile time.", errCodeStart++};

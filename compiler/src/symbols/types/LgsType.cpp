@@ -89,18 +89,29 @@ bool LgsType::hasGenericTypes() {
     return false;
 }
 
+bool LgsType::addMethod(LgsFunc* method) {
+    if (methods.contains(method->funcType->name)) return false;
+    methods[method->funcType->name] = method;
+    return true;
+}
+
+std::string LgsType::getRTTName() {
+    return LGS_TYPEINFO_PREFIX + getName();
+}
+
+Constant* LgsType::getRTType(LgsCodeGen& cg) {
+    const auto rttName = getRTTName();
+    if (const auto v = cg.IRModule->getGlobalVariable(rttName)) return v;
+    if (cg.mode != CG_MODE_RTTYPES) return cg.getRTTypeInfo(rttName, getName(), IRSize(cg), rttKind, isHeap, nullptr);
+    return cg.getRTTypeInfo(rttName, getName(), IRSize(cg), rttKind, isHeap, getRTTypeExtra(cg));
+}
+
 ConstantInt* LgsType::IRSize(LgsCodeGen& cg) {
     return cg.getTypeSize(getIRType(cg));
 }
 
 Type* LgsType::getTypeOrPtr(LgsCodeGen& cg) {
     return passByRef ? cg.ptrTy() : getIRType(cg);
-}
-
-bool LgsType::addMethod(LgsFunc* method) {
-    if (methods.contains(method->funcType->name)) return false;
-    methods[method->funcType->name] = method;
-    return true;
 }
 
 LgsField* LgsType::getField(const std::string& fieldName) {
@@ -123,19 +134,8 @@ std::string LgsType::pname() {
     return getName();
 }
 
-std::string LgsType::getRTTName() {
-    return LGS_TYPEINFO_PREFIX + getName();
-}
-
 Value* LgsType::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
     assert(0);
-}
-
-Constant* LgsType::getRTType(LgsCodeGen& cg) {
-    const auto rttName = getRTTName();
-    if (const auto v = cg.IRModule->getGlobalVariable(rttName)) return v;
-    if (cg.mode != CG_MODE_RTTYPES) return cg.getRTTypeInfo(rttName, getName(), IRSize(cg), rttKind, isHeap, nullptr);
-    return cg.getRTTypeInfo(rttName, getName(), IRSize(cg), rttKind, isHeap, getRTTypeExtra(cg));
 }
 
 Constant* LgsType::getRTTypeExtra(LgsCodeGen& cg) {
@@ -146,197 +146,49 @@ bool LgsType::equals(LgsType* other) {
     return getName() == other->getName();
 }
 
-Value* LgsType::hashValue(LgsCodeGen& cg, Value* value) {
-    assert(0);
-}
-
-void LgsType::hashNode(size_t& oldHash) {
-    assert(0);
-}
-
-Value* LgsType::loadRTTInfoName(LgsCodeGen& cg, Value* ptr) {
-    return cg.loadStructField(cg.getRTTStruct(), ptr, LgsTypeInfoIndices::name, cg.ptrTy());
-}
-
-Value* LgsType::loadRTTInfoSize(LgsCodeGen& cg, Value* ptr) {
-    return cg.loadStructField(cg.getRTTStruct(), ptr, LgsTypeInfoIndices::size, cg.sizeTy());
-}
-
-Value* LgsType::loadRTTInfoKind(LgsCodeGen& cg, Value* ptr) {
-    return cg.loadStructField(cg.getRTTStruct(), ptr, LgsTypeInfoIndices::kind, cg.i32Ty());
-}
-
-Value* LgsType::loadRTTInfoIsHeap(LgsCodeGen& cg, Value* ptr) {
-    return cg.loadStructField(cg.getRTTStruct(), ptr, LgsTypeInfoIndices::isHeap, cg.i1Ty());
-}
-
-Value* LgsType::loadRTTInfoExtra(LgsCodeGen& cg, Value* ptr) {
-    return cg.loadStructField(cg.getRTTStruct(), ptr, LgsTypeInfoIndices::extra, cg.ptrTy());
-}
-
-Value* LgsType::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
-    assert(0);
-}
-
-Value* LgsType::subIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
-    assert(0);
-}
-
-Value* LgsType::mulIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
-    assert(0);
-}
-
-Value* LgsType::divIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
-    assert(0);
-}
-
-Value* LgsType::modIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
-    assert(0);
-}
-
-Value* LgsType::powIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
-    assert(0);
-}
-
-Value* LgsType::bitAndIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
-    assert(0);
-}
-
-Value* LgsType::bitOrIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
-    assert(0);
-}
-
-Value* LgsType::bitXorIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
-    assert(0);
-}
-
-Value* LgsType::lshiftIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
-    assert(0);
-}
-
-Value* LgsType::rshiftIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
-    assert(0);
-}
-
-LgsAny* LgsType::asAny() {
-    return dynamic_cast<LgsAny*>(this);
-}
-
-LgsChar* LgsType::asChar() {
-    return dynamic_cast<LgsChar*>(this);
-}
-
-LgsStr* LgsType::asStr() {
-    return dynamic_cast<LgsStr*>(this);
-}
-
-LgsBool* LgsType::asBool() {
-    return dynamic_cast<LgsBool*>(this);
-}
-
-LgsByte* LgsType::asByte() {
-    return dynamic_cast<LgsByte*>(this);
-}
-
-LgsInt* LgsType::asInt() {
-    return dynamic_cast<LgsInt*>(this);
-}
-
-LgsShort* LgsType::asShort() {
-    return dynamic_cast<LgsShort*>(this);
-}
-
-LgsLong* LgsType::asLong() {
-    return dynamic_cast<LgsLong*>(this);
-}
-
-LgsSize* LgsType::asSize() {
-    return dynamic_cast<LgsSize*>(this);
-}
-
-LgsUInt* LgsType::asUInt() {
-    return dynamic_cast<LgsUInt*>(this);
-}
-
-LgsFloat* LgsType::asFloat() {
-    return dynamic_cast<LgsFloat*>(this);
-}
-
-LgsDouble* LgsType::asDouble() {
-    return dynamic_cast<LgsDouble*>(this);
-}
-
-LgsFuncType* LgsType::asFuncType() {
-    return dynamic_cast<LgsFuncType*>(this);
-}
-
-LgsObject* LgsType::asObject() {
-    return dynamic_cast<LgsObject*>(this);
-}
-
-LgsInterface* LgsType::asInterface() {
-    return dynamic_cast<LgsInterface*>(this);
-}
-
-LgsEnum* LgsType::asEnum() {
-    return dynamic_cast<LgsEnum*>(this);
-}
-
-LgsGenericType* LgsType::asGenericType() {
-    return dynamic_cast<LgsGenericType*>(this);
-}
-
-LgsIterable* LgsType::asIterable() {
-    return dynamic_cast<LgsIterable*>(this);
-}
-
-LgsSArray* LgsType::asSArray() {
-    return dynamic_cast<LgsSArray*>(this);
-}
-
-LgsDArray* LgsType::asDArray() {
-    return dynamic_cast<LgsDArray*>(this);
-}
-
-LgsSet* LgsType::asSet() {
-    return dynamic_cast<LgsSet*>(this);
-}
-
-LgsVec* LgsType::asVec() {
-    return dynamic_cast<LgsVec*>(this);
-}
-
-LgsMatrix* LgsType::asMatrix() {
-    return dynamic_cast<LgsMatrix*>(this);
-}
-
-LgsCPtr* LgsType::asCPtr() {
-    return dynamic_cast<LgsCPtr*>(this);
-}
-
-LgsMap* LgsType::asMap() {
-    return dynamic_cast<LgsMap*>(this);
-}
-
-LgsTypePair* LgsType::asPair() {
-    return dynamic_cast<LgsTypePair*>(this);
-}
-
-LgsSubType* LgsType::asSubtype() {
-    return dynamic_cast<LgsSubType*>(this);
-}
-
-LgsVariadic* LgsType::asVariadic() {
-    return dynamic_cast<LgsVariadic*>(this);
-}
-
-LgsNullable* LgsType::asNullable() {
-    return dynamic_cast<LgsNullable*>(this);
-}
-
-LgsFieldType* LgsType::asFieldType() {
-    return dynamic_cast<LgsFieldType*>(this);
-}
+void LgsType::hashNode(size_t& oldHash) { assert(0);}
+Value* LgsType::hashValue(LgsCodeGen& cg, Value* value) { assert(0);}
+Value* LgsType::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) { assert(0);}
+Value* LgsType::subIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) { assert(0);}
+Value* LgsType::mulIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) { assert(0);}
+Value* LgsType::divIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) { assert(0);}
+Value* LgsType::modIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) { assert(0);}
+Value* LgsType::powIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) { assert(0);}
+Value* LgsType::bitAndIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) { assert(0);}
+Value* LgsType::bitOrIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) { assert(0);}
+Value* LgsType::bitXorIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) { assert(0);}
+Value* LgsType::lshiftIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) { assert(0);}
+Value* LgsType::rshiftIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) { assert(0); }
+LgsAny* LgsType::asAny() { return dynamic_cast<LgsAny*>(this); }
+LgsChar* LgsType::asChar() { return dynamic_cast<LgsChar*>(this); }
+LgsStr* LgsType::asStr() { return dynamic_cast<LgsStr*>(this); }
+LgsBool* LgsType::asBool() { return dynamic_cast<LgsBool*>(this); }
+LgsByte* LgsType::asByte() { return dynamic_cast<LgsByte*>(this); }
+LgsInt* LgsType::asInt() { return dynamic_cast<LgsInt*>(this); }
+LgsShort* LgsType::asShort() { return dynamic_cast<LgsShort*>(this); }
+LgsLong* LgsType::asLong() { return dynamic_cast<LgsLong*>(this); }
+LgsSize* LgsType::asSize() { return dynamic_cast<LgsSize*>(this); }
+LgsUInt* LgsType::asUInt() { return dynamic_cast<LgsUInt*>(this); }
+LgsFloat* LgsType::asFloat() { return dynamic_cast<LgsFloat*>(this); }
+LgsDouble* LgsType::asDouble() { return dynamic_cast<LgsDouble*>(this); }
+LgsFuncType* LgsType::asFuncType() { return dynamic_cast<LgsFuncType*>(this); }
+LgsObject* LgsType::asObject() { return dynamic_cast<LgsObject*>(this); }
+LgsInterface* LgsType::asInterface() { return dynamic_cast<LgsInterface*>(this); }
+LgsEnum* LgsType::asEnum() { return dynamic_cast<LgsEnum*>(this); }
+LgsGenericType* LgsType::asGenericType() { return dynamic_cast<LgsGenericType*>(this); }
+LgsIterable* LgsType::asIterable() { return dynamic_cast<LgsIterable*>(this); }
+LgsSArray* LgsType::asSArray() { return dynamic_cast<LgsSArray*>(this); }
+LgsDArray* LgsType::asDArray() { return dynamic_cast<LgsDArray*>(this); }
+LgsSet* LgsType::asSet() { return dynamic_cast<LgsSet*>(this); }
+LgsVec* LgsType::asVec() { return dynamic_cast<LgsVec*>(this); }
+LgsMatrix* LgsType::asMatrix() { return dynamic_cast<LgsMatrix*>(this); }
+LgsCPtr* LgsType::asCPtr() { return dynamic_cast<LgsCPtr*>(this); }
+LgsMap* LgsType::asMap() { return dynamic_cast<LgsMap*>(this); }
+LgsTypePair* LgsType::asPair() { return dynamic_cast<LgsTypePair*>(this); }
+LgsSubType* LgsType::asSubtype() { return dynamic_cast<LgsSubType*>(this); }
+LgsVariadic* LgsType::asVariadic() { return dynamic_cast<LgsVariadic*>(this); }
+LgsNullable* LgsType::asNullable() { return dynamic_cast<LgsNullable*>(this); }
+LgsFieldType* LgsType::asFieldType() { return dynamic_cast<LgsFieldType*>(this); }
 
 LgsType::~LgsType() {
     for (const auto [_, method] : methods) {
@@ -349,6 +201,26 @@ LgsType::~LgsType() {
         delete field;
     }
     fields.clear();
+}
+
+Value* loadRTTInfoName(LgsCodeGen& cg, Value* ptr) {
+    return cg.loadStructField(cg.getRTTStruct(), ptr, LgsTypeInfoIndices::name, cg.ptrTy());
+}
+
+Value* loadRTTInfoSize(LgsCodeGen& cg, Value* ptr) {
+    return cg.loadStructField(cg.getRTTStruct(), ptr, LgsTypeInfoIndices::size, cg.sizeTy());
+}
+
+Value* loadRTTInfoKind(LgsCodeGen& cg, Value* ptr) {
+    return cg.loadStructField(cg.getRTTStruct(), ptr, LgsTypeInfoIndices::kind, cg.i32Ty());
+}
+
+Value* loadRTTInfoIsHeap(LgsCodeGen& cg, Value* ptr) {
+    return cg.loadStructField(cg.getRTTStruct(), ptr, LgsTypeInfoIndices::isHeap, cg.i1Ty());
+}
+
+Value* loadRTTInfoExtra(LgsCodeGen& cg, Value* ptr) {
+    return cg.loadStructField(cg.getRTTStruct(), ptr, LgsTypeInfoIndices::extra, cg.ptrTy());
 }
 
 Value* exprEqNull(LgsCodeGen& cg, Value* expr, LgsType* type) {

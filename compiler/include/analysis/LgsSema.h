@@ -109,8 +109,6 @@ public:
     void visitNullableExpr(LgsNullableExpr* nullableExpr);
     void visitUnwrap(LgsExpr* expr);
     void visitArrayExpr(LgsArrayExpr* arrayExpr);
-    void visitStaticArray(const LgsArrayExpr* arrayExpr);
-    void visitDynamicArray(LgsArrayExpr* arrayExpr);
     void visitHashMap(LgsHashMap* hashMap);
     void visitVectorExpr(LgsVectorExpr* vectorExpr);
     void visitMatrixExpr(const LgsMatrixExpr* matrixExpr);

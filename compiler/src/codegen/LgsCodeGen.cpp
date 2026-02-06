@@ -61,10 +61,11 @@ bool LgsCodeGen::writeIRModule(const LgsPaths& paths, uint8_t optLevel) const {
     passManager.run(*IRModule, analysisManager);
 
     // Create bc file
-    std::error_code ec;
     const std::string outputPath = paths.buildDirObjs / moduleName;
     if (fs::exists(outputPath)) fs::remove(outputPath);
+    std::error_code ec;
     raw_fd_ostream bitcodeStream(outputPath + ".bc", ec, sys::fs::OF_None);
+    if (ec.value() != 0) assert(0);
     WriteBitcodeToFile(*IRModule, bitcodeStream);
     bitcodeStream.flush();
     bitcodeStream.close();
@@ -331,6 +332,12 @@ Value* LgsCodeGen::callPrintf(const std::vector<Value*>& args) {
     return callFunc("printf", i32Ty(), {ptrTy()}, args, true);
 }
 
+Value* LgsCodeGen::callPrintf(const std::string& fmt, const std::vector<Value*>& args) {
+    auto argsCpy = args;
+    argsCpy.insert(argsCpy.begin(), getString(fmt));
+    return callFunc("printf", i32Ty(), {ptrTy()}, argsCpy, true);
+}
+
 Value* LgsCodeGen::callSnprintf(const std::string& fmt, const std::vector<Value*>& args) {
     const auto buffer = emptyBuffer();
     std::vector<Value*> tempArgs = {buffer, usize(LGS_STR_BUFFER_SIZE), getString(fmt)};
@@ -378,32 +385,32 @@ StructType* LgsCodeGen::getRTTStruct() {
 
 void LgsCodeGen::printStr(const std::string& value, const std::string& prefix) {
     if (prefix != "") printStr(prefix);
-    callPrintf({getString("%s"), getString(value)});
+    callPrintf("%s", {getString(value)});
 }
 
 void LgsCodeGen::printStr(Value* value, const std::string& prefix) {
     if (prefix != "") printStr(prefix);
-    callPrintf({getString("%s\n"), value});
+    callPrintf("%s\n", { value});
 }
 
 void LgsCodeGen::printInt(Value* value, const std::string& prefix) {
     if (prefix != "") printStr(prefix);
-    callPrintf({getString("%d\n"), value});
+    callPrintf("%d\n", { value});
 }
 
 void LgsCodeGen::printFloat(Value* value, const std::string& prefix) {
     if (prefix != "") printStr(prefix);
-    callPrintf({getString("%f\n"), value});
+    callPrintf("%f\n", { value});
 }
 
 void LgsCodeGen::printLong(Value* value, const std::string& prefix) {
     if (prefix != "") printStr(prefix);
-    callPrintf({getString("%ld\n"), value});
+    callPrintf("%ld\n", { value});
 }
 
 void LgsCodeGen::printPtr(Value* value, const std::string& prefix) {
     if (prefix != "") printStr(prefix);
-    callPrintf({getString("%p\n"), value});
+    callPrintf("%p\n", { value});
 }
 
 void LgsCodeGen::printBytes(Value* value, Value* size, const std::string& prefix) {
@@ -442,7 +449,6 @@ void LgsCodeGen::initLLVM() {
     InitializeNativeTarget();
     InitializeNativeTargetAsmPrinter();
     InitializeNativeTargetAsmParser();
-
     std::string error;
     const auto targetTriple = Triple(sys::getDefaultTargetTriple());
     const auto target = TargetRegistry::lookupTarget(targetTriple, error);

@@ -13,7 +13,7 @@ void LgsNullableExpr::setDebugValue(LgsCodeGen& cg) {
 void LgsNullableExpr::castImplicitly(LgsType* toType) {
     const auto otherNullable = toType->asNullable();
     if (isNull && otherNullable) {
-        setType(otherNullable);
+        type->asNullable()->baseType = otherNullable->baseType;
     }
 }
 

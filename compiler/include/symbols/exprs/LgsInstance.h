@@ -18,14 +18,14 @@ public:
 
     explicit LgsInstance(const std::string& name): name(name) {}
     explicit LgsInstance(LgsObject* obj) : LgsExpr(obj), name(obj->name), obj(obj) {}
-    std::string asText() override;
+    LgsField* getField(const std::string& fieldName) const;
     LgsExpr* castExplicitly(LgsType* toType) override;
     Value* loadIR(LgsCodeGen& cg) override;
+    void setType(LgsType* newObj) override;
     void hashNode(size_t& oldHash) override;
-    void setObject(LgsObject* newObj);
     bool equals(LgsExpr* other) override;
     void setDebugValue(LgsCodeGen& cg) override;
-    LgsField* getField(const std::string& fieldName) const;
+    std::string asText() override;
     static Value* loadRTType(LgsCodeGen& cg, Type* ty, Value* ptr);
     ~LgsInstance() override;
 };

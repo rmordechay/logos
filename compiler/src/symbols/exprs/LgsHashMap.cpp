@@ -11,8 +11,7 @@ std::string LgsPair::asText() {
 }
 
 void LgsHashMap::castImplicitly(LgsType* toType) {
-    if (!toType->asMap()) return;
-    if (!type) setType(toType);
+    assert(0);
 }
 
 void LgsHashMap::setDebugValue(LgsCodeGen& cg) {

@@ -422,8 +422,6 @@ bool LgsApp::generateGenerics() {
         } else if (const auto obj = genericType->asObject()) {
             obj->getObjsEqFunc(cgFile.cg);
             obj->getObjsHashFunc(cgFile.cg);
-        } else if (genericType->asNullable()) {
-            assert(0);
         } else if (const auto func = genericType->asFuncType()) {
             if (func->name == MAP_FUNC) {
                 cgFile.getMapFunc(func);

@@ -2,7 +2,12 @@
 #include "LgsUtils.h"
 
 Value* LgsVectorExpr::loadIR(LgsCodeGen& cg) {
-    return IRValue;
+    return cg.load(vecType->getIRType(cg), IRValue);
+}
+
+void LgsVectorExpr::setType(LgsType* newType) {
+    vecType = newType->asVec();
+    type = vecType;
 }
 
 void LgsVectorExpr::setDebugValue(LgsCodeGen& cg) {
@@ -15,10 +20,6 @@ void LgsVectorExpr::hashNode(size_t& oldHash) {
 
 LgsExpr* LgsVectorExpr::castExplicitly(LgsType* toType) {
     assert(0);
-}
-
-void LgsVectorExpr::castImplicitly(LgsType* toType) {
-
 }
 
 std::string LgsVectorExpr::asText() {

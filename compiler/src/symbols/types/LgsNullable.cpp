@@ -1,7 +1,5 @@
 #include "types/LgsNullable.h"
-
 #include "LgsBinaryTokens.h"
-#include "LgsDefinitions.h"
 #include "codegen/LgsCodeGen.h"
 #include "exprs/LgsExpr.h"
 #include "exprs/LgsNullableExpr.h"
@@ -9,7 +7,7 @@
 #include "types/primitives/LgsBool.h"
 #include <cassert>
 #include <llvm/IR/Module.h>
-
+#include "LgsRTTIndices.h"
 #include "exprs/LgsBinaryExpr.h"
 
 LgsField* LgsNullable::getField(const std::string& fieldName) {
@@ -30,7 +28,11 @@ LgsExpr* LgsNullable::getZeroValue() {
 }
 
 Value* LgsNullable::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
-    return cg.null();
+    if (passByRef) return cg.null();
+    const auto ty = getIRType(cg);
+    const auto ptr = pointee ? pointee : cg.builder.CreateAlloca(ty);
+    cg.storeStructField(ty, ptr, LgsNullableExprIndices::isSet, cg.false_());
+    return ptr;
 }
 
 std::string LgsNullable::pname() {
@@ -54,9 +56,9 @@ Constant* LgsNullable::getRTTypeExtra(LgsCodeGen& cg) {
 
 bool LgsNullable::canCastTo(LgsType* other) {
     if (other->isAny()) return true;
-    if (isNull) return false;
     const auto otherNullable = other->asNullable();
     if (!otherNullable) return false;
+    if (isNull) return true;
     return baseType->canCastTo(otherNullable->baseType);
 }
 

@@ -1578,13 +1578,7 @@ LgsExpr* LgsParser::parseConstant() {
 
 LgsArrayExpr* LgsParser::parseArrayExpr() {
     const auto startToken = currentToken;
-    auto isSet = false;
-    if (matchAndConsume(T_SET)) {
-        consume();
-        isSet = true;
-    } else if (!matchAndConsume(T_LBRACK)) {
-        return nullptr;
-    }
+    if (!matchAndConsume(T_LBRACK)) return nullptr;
     std::vector<LgsExpr*> args;
     while (true) {
         const auto expr = parseExpr();
@@ -1594,12 +1588,7 @@ LgsArrayExpr* LgsParser::parseArrayExpr() {
         mustMatch(T_COMMA);
     }
     mustMatch(T_RBRACK);
-    LgsArrayExpr* arrExpr = nullptr;
-    if (isSet) {
-        arrExpr = new LgsArrayExpr(new LgsSet());
-    } else {
-        arrExpr = new LgsArrayExpr();
-    }
+    const auto arrExpr = new LgsArrayExpr();
     arrExpr->elements = args;
     setLocation(arrExpr->location, &startToken, &currentToken);
     return arrExpr;

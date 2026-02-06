@@ -12,16 +12,11 @@ Value* LgsIterIndex::loadIR(LgsCodeGen& cg) {
     if (baseExprType->isHeap) {
         return cg.loadPtr(IRValue);
     }
-    if (baseExprType->asSArray()) {
+    if (baseExprType->asSArray() || baseExprType->asVec()) {
         const auto indexIR = index.from->IRValue;
         const auto ty = baseExpr->type->getIRType(cg);
         const auto gep = cg.builder.CreateGEP(ty, IRValue, {cg.zero32(), indexIR});
         return cg.load(type->getIRType(cg), gep);
-    }
-    if (baseExprType->asVec()) {
-        const auto vec = cg.load(baseExpr->type->getIRType(cg), IRValue);
-        const auto i = index.from->IRValue;
-        return cg.builder.CreateExtractElement(vec, i);
     }
     if (baseExprType->asMatrix()) {
         assert(0);

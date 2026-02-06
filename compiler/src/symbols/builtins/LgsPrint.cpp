@@ -32,19 +32,6 @@ Value* LgsPrint::call(LgsCodeGen& cg, std::vector<LgsFuncArg>& args) {
         const auto value = enum_->asIRStr(cg, arg->loadIR(cg));
         return cg.callPrintf({fmt, value});
     }
-    if (const auto vec = type->asVec()) {
-        const auto fmt = cg.getString(type->fmtStr() + "\n");
-        std::vector<Value*> vecArgs = {fmt};
-        const auto vecExpr = arg->loadIR(cg);
-        for (size_t i = 0; i < vec->dimVec; ++i) {
-            auto element = cg.builder.CreateExtractElement(vecExpr, i);
-            if (vec->baseType->asFloat()) {
-                element = cg.builder.CreateFPExt(element, cg.doubleTy());
-            }
-            vecArgs.push_back(element);
-        }
-        return cg.callPrintf(vecArgs);
-    }
     assert(arg->type->rttKind != RTT_UNKNOWN);
     const std::vector<Type*> params = {cg.ptrTy(), cg.ptrTy()};
     const std::vector<Value*> IRArgs = {type->getRTType(cg), arg->IRValue};

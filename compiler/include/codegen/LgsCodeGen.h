@@ -124,6 +124,7 @@ public:
 
     // Externals (syscalls, clib, etc.)
     Value* callPrintf(const std::vector<Value*>& args);
+    Value* callPrintf(const std::string& fmt, const std::vector<Value*>& args);
     Value* callSnprintf(const std::string& fmt, const std::vector<Value*>& args);
     Value* callStrlen(Value* str);
     Value* strsEqual(Value* str1, Value* str2);

@@ -81,34 +81,29 @@ public:
     bool isUnknown();
     bool isSliceable();
     bool hasGenericTypes();
+    bool addMethod(LgsFunc* method);
+    std::string getRTTName();
+    Constant* getRTType(LgsCodeGen& cg);
     ConstantInt* IRSize(LgsCodeGen& cg);
     Type* getTypeOrPtr(LgsCodeGen& cg);
 
-    bool addMethod(LgsFunc* method);
     virtual LgsField* getField(const std::string& fieldName);
     virtual LgsFunc* getMethod(const std::string& methodName);
     virtual std::string getName() = 0;
     virtual std::string getBaseName();
     virtual std::string pname(); // pretty name
-    std::string getRTTName();
     virtual size_t sizeBytes() = 0;
     virtual LgsExpr* getZeroValue() = 0;
     virtual Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee);
     virtual Type* getIRType(LgsCodeGen& cg) = 0;
-    Constant* getRTType(LgsCodeGen& cg);
     virtual Constant* getRTTypeExtra(LgsCodeGen& cg);
     virtual bool equals(LgsType* other);
     virtual bool canCastTo(LgsType* other) = 0;
     virtual LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) = 0;
     virtual std::string fmtStr() const = 0;
-    virtual Value* hashValue(LgsCodeGen& cg, Value* value);
     virtual void hashNode(size_t& oldHash);
+    virtual Value* hashValue(LgsCodeGen& cg, Value* value);
     virtual DIType* getDebugType(LgsCodeGen& cg) = 0;
-    static Value* loadRTTInfoName(LgsCodeGen& cg, Value* ptr);
-    static Value* loadRTTInfoSize(LgsCodeGen& cg, Value* ptr);
-    static Value* loadRTTInfoKind(LgsCodeGen& cg, Value* ptr);
-    static Value* loadRTTInfoIsHeap(LgsCodeGen& cg, Value* ptr);
-    static Value* loadRTTInfoExtra(LgsCodeGen& cg, Value* ptr);
 
     virtual Value* addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr);
     virtual Value* subIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr);
@@ -170,6 +165,11 @@ void freeTypes(std::vector<T*>& types) {
     types.clear();
 }
 
+Value* loadRTTInfoName(LgsCodeGen& cg, Value* ptr);
+Value* loadRTTInfoSize(LgsCodeGen& cg, Value* ptr);
+Value* loadRTTInfoKind(LgsCodeGen& cg, Value* ptr);
+Value* loadRTTInfoIsHeap(LgsCodeGen& cg, Value* ptr);
+Value* loadRTTInfoExtra(LgsCodeGen& cg, Value* ptr);
 Value* eqIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
 Value* neIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
 Value* ltIR(LgsCodeGen& cg, Value* left, Value* right, const LgsType* type);

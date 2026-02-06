@@ -16,10 +16,6 @@ LgsExpr* LgsMetaSelection::castExplicitly(LgsType* toType) {
     assert(0);
 }
 
-void LgsMetaSelection::castImplicitly(LgsType* toType) {
-
-}
-
 std::string LgsMetaSelection::asText() {
     assert(0);
 }

@@ -10,6 +10,7 @@ public:
 
     explicit LgsVec(const size_t dim, LgsType* baseType = &LGS_FLOAT) : LgsIterable(baseType), dimVec(dim) {
         assert(dim > 1 && dim <= 4);
+        passByRef = true;
         isStatic = true;
         rttKind = RTT_VEC;
     }
@@ -19,28 +20,28 @@ public:
     std::string getName() override;
     std::string pname() override;
     size_t sizeBytes() override;
-    std::optional<int64_t> getConstLength() override;
-    bool equals(LgsType* other) override;
+    std::string fmtStr() const override;
     LgsExpr* getZeroValue() override;
-    Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee) override;
-    Constant* getRTTypeExtra(LgsCodeGen& cg) override;
+    bool equals(LgsType* other) override;
     bool canCastTo(LgsType* other) override;
-    LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
+    std::optional<int64_t> getConstLength() override;
     bool inferBaseType(std::vector<LgsExpr*>& args) override;
+    LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
+    Constant* getRTTypeExtra(LgsCodeGen& cg) override;
+    Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee) override;
     Value* addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
     Value* subIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
     Value* mulIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
     Value* divIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
     Value* modIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
-    Value* crossIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr);
-    Value* inIR(LgsCodeGen& cg, Value* iterableExpr, Value* value) override;
     Value* lenIR(LgsCodeGen& cg, Value* iterable) override;
+    Value* inIR(LgsCodeGen& cg, Value* iterableExpr, Value* value) override;
     Value* getIRElement(LgsCodeGen& cg, Value* iterable, Value* index) override;
     void addIRElement(LgsCodeGen& cg, Value* iterable, Value* index, Value* value) override;
     Value* matVecMul(LgsCodeGen& cg, const LgsExpr* left, LgsExpr* right) const;
+    static Value* crossIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr);
     static size_t getSwizzleSet(char c);
     static size_t getComponentIndex(char c);
-    std::string fmtStr() const override;
     DIType* getDebugType(LgsCodeGen& cg) override;
 };
 

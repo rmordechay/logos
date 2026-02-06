@@ -2,40 +2,15 @@
 #include "types/iterables/LgsSet.h"
 #include "LgsUtils.h"
 #include "codegen/LgsCodeGen.h"
+#include "types/LgsNullable.h"
 
 Value* LgsArrayExpr::loadIR(LgsCodeGen& cg) {
     return IRValue;
 }
 
 void LgsArrayExpr::castImplicitly(LgsType* toType) {
-    const auto otherIterable = toType->asIterable();
-    if (!otherIterable) return;
-    const auto iterable = type->asIterable();
-    if (iterable && !otherIterable->baseType->canCastTo(iterable->baseType)) return;
-
-    // Replace dynamic array with static if needed
-    if (!type && toType->asSArray()) {
-        setType(toType);
-    } else if (type->asDArray() && (toType->asSArray() || toType->asSet())) {
-        setType(toType);
-    }
-
-    LgsType* otherBaseType = nullptr;
-    if (toType->asSet()) {
-        otherBaseType = toType->genericArgs.front();
-    } else {
-        otherBaseType = otherIterable->baseType;
-    }
-
-    for (size_t i = 0; i < elements.size(); ++i) {
-        castExprImplicitly(elements[i], otherBaseType);
-    }
-
-    if (!type) {
-        setType(toType);
-    } else if (const auto& iter = iterable) {
-        iter->baseType = otherBaseType;
-    }
+    if ((type && type->asIterable()->baseType) || !toType->asIterable()) return;
+    setType(toType);
 }
 
 void LgsArrayExpr::setDebugValue(LgsCodeGen& cg) {

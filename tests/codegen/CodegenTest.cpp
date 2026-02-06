@@ -48,7 +48,7 @@ TEST(TestCodeGen, Test2) {
     const auto pipe = popen(execPath.c_str(), "r");
     assert(pipe);
     std::string output;
-    char buffer[64];
+    char buffer[1024];
     while (fgets(buffer, sizeof(buffer), pipe)) {
         output += buffer;
     }
