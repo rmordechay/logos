@@ -25,7 +25,6 @@ public:
     std::optional<int64_t> getConstLength() override;
     bool canCastTo(LgsType* other) override;
     bool equals(LgsType* other) override;
-    bool inferBaseType(std::vector<LgsExpr*>& args) override;
     LgsExpr* getZeroValue() override;
     Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee) override;
     Type* getIRType(LgsCodeGen& cg) override;

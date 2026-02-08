@@ -18,10 +18,6 @@ void LgsVectorExpr::hashNode(size_t& oldHash) {
     assert(0);
 }
 
-LgsExpr* LgsVectorExpr::castExplicitly(LgsType* toType) {
-    assert(0);
-}
-
 std::string LgsVectorExpr::asText() {
     return vecType->pname();
 }

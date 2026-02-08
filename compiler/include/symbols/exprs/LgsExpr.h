@@ -41,6 +41,7 @@ class LgsTypeConst;
 class LgsExpr : public LgsValue {
 public:
     LgsType* type = nullptr;
+    LgsType* implicitCast = nullptr;
     bool isMutable = true;
     bool isImportName = false;
     bool isNull = false;
@@ -56,8 +57,8 @@ public:
     LgsType* getType() override;
 
     virtual void setType(LgsType* newType);
-    virtual LgsExpr* castExplicitly(LgsType* toType);
-    virtual void castImplicitly(LgsType* toType);
+    LgsExpr* wrapInNullable();
+    virtual LgsExpr* cast(bool explicitly);
     virtual bool equals(LgsExpr* other);
     virtual std::string asText() = 0;
 
@@ -88,8 +89,6 @@ public:
     LgsExpr* clone() override;
     ~LgsExpr() override = default;
 };
-
-LgsExpr* castExprImplicitly(LgsExpr* expr, LgsType* toType);
 
 void freeExpr(LgsExpr* expr);
 template<typename T>

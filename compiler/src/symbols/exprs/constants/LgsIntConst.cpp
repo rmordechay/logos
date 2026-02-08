@@ -2,8 +2,6 @@
 #include "exprs/constants/LgsFloatConst.h"
 #include "exprs/constants/LgsStrConst.h"
 #include "types/LgsAny.h"
-#include "types/primitives/LgsDouble.h"
-#include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsLong.h"
 #include "LgsUtils.h"
 
@@ -11,30 +9,17 @@ Value* LgsIntConst::loadIR(LgsCodeGen& cg) {
     return IRValue;
 }
 
-void LgsIntConst::castImplicitly(LgsType* toType) {
-    if (!toType) return;
-    if (!type->canCastTo(toType)) return;
-    if (!toType->isInt) return;
-    setType(toType);
-}
-
-LgsExpr* LgsIntConst::castExplicitly(LgsType* toType) {
-    if (type->getName() == toType->getName()) return this;
-    if (toType->getName() == LgsAny::name) return this;
-    const auto thisSize = type->sizeBytes();
-    const auto otherSize = toType->sizeBytes();
-    if (toType->isInt) {
-        // Widening is always allowed
-        if (otherSize >= thisSize) {
-            setType(toType);
-            return this;
+LgsExpr* LgsIntConst::cast(bool explicitly) {
+    if (!implicitCast) return this;
+    if (type->canCastTo(implicitCast)) {
+        if (implicitCast->isFloat) {
+            return new LgsFloatConst(implicitCast, value);
         }
-        return nullptr;
+        if (implicitCast->isInt && implicitCast->sizeBytes() > type->sizeBytes()) {
+            setType(implicitCast);
+        }
     }
-    if (toType->asFloat()) return new LgsFloatConst(&LGS_FLOAT, value);
-    if (toType->asDouble()) return new LgsFloatConst(&LGS_DOUBLE, value);
-    if (toType->asStr()) return new LgsStrConst(std::to_string(value));
-    return nullptr;
+    return implicitCast->asNullable() ? wrapInNullable() : this;
 }
 
 LgsIntConst* LgsIntConst::clone() {

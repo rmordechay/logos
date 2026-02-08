@@ -53,26 +53,11 @@ std::string LgsDArray::fmtStr() const {
 bool LgsDArray::canCastTo(LgsType* other) {
     if (other->isAny()) return true;
     if (other->asGenericType()) return true;
-    const auto otherArr = other->asDArray();
+    const auto otherArr = other->asIterable();
     if (!otherArr) return false;
     if (!baseType) return true;
     if (!otherArr->baseType) return true;
     return baseType->canCastTo(otherArr->baseType);
-}
-
-bool LgsDArray::inferBaseType(std::vector<LgsExpr*>& args) {
-    if (baseType) return true;
-    assert(!args.empty());
-    const auto baseExprType = args.front()->type;
-    for (size_t i = 1; i < args.size(); ++i) {
-        const auto arg = args[i];
-        if (!arg->type->canCastTo(baseExprType)) return false;
-    }
-    baseType = baseExprType;
-    if (const auto iter = baseType->asIterable()) {
-        iter->isStatic = false;
-    }
-    return true;
 }
 
 LgsType* LgsDArray::applyBinOp(LgsType* rightType, LgsBinOp& op) {

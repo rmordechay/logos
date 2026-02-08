@@ -17,8 +17,8 @@ std::string LgsSArray::getName() {
 }
 
 std::string LgsSArray::pname() {
-    if (baseType) return baseType->pname() + "[]";
-    return "[]";;
+    if (baseType) return baseType->pname() + "[" + std::to_string(len) + "]";
+    return "[" + std::to_string(len) + "]";
 }
 
 size_t LgsSArray::sizeBytes() {
@@ -38,7 +38,7 @@ bool LgsSArray::canCastTo(LgsType* other) {
     if (!baseType) return false;
     if (other->isAny()) return true;
     if (other->asStr()) return !!baseType->asChar();
-    const auto otherIter = other->asIterable();
+    const auto otherIter = other->asSArray();
     if (!otherIter) return false;
     return baseType->canCastTo(otherIter->baseType);
 }
@@ -51,18 +51,6 @@ bool LgsSArray::equals(LgsType* other) {
     return len == otherArr->len;
 }
 
-bool LgsSArray::inferBaseType(std::vector<LgsExpr*>& args) {
-    if (baseType) return true;
-    assert(!args.empty());
-    const auto baseExprType = args.front()->type;
-    for (size_t i = 1; i < args.size(); ++i) {
-        const auto arg = args[i];
-        if (!arg->type->canCastTo(baseExprType)) return false;
-    }
-    baseType = baseExprType;
-    return true;
-}
-
 LgsExpr* LgsSArray::getZeroValue() {
     return new LgsArrayExpr(this);
 }
@@ -73,7 +61,7 @@ Value* LgsSArray::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
 }
 
 Type* LgsSArray::getIRType(LgsCodeGen& cg) {
-    return ArrayType::get(baseType->getIRType(cg), len);
+    return ArrayType::get(baseType->getTypeOrPtr(cg), len);
 }
 
 LgsType* LgsSArray::applyBinOp(LgsType* rightType, LgsBinOp& op) {
@@ -144,9 +132,7 @@ Value* LgsSArray::getIRElement(LgsCodeGen& cg, Value* iterable, Value* index) {
 }
 
 void LgsSArray::addIRElement(LgsCodeGen& cg, Value* iterable, Value* index, Value* value) {
-    const std::vector<Value*> indices = {cg.zero32(), index};
-    const auto gep = cg.builder.CreateInBoundsGEP(getIRType(cg), iterable, indices);
-    cg.store(value, gep);
+    cg.store(value, getIRElement(cg, iterable, index));
 }
 
 Function* LgsSArray::getEqFunc(LgsCodeGen& cg) {

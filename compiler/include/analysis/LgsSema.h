@@ -87,7 +87,7 @@ public:
     void replaceForLoop(LgsStmtWrapper& stmt);
     void visitStmtsBlock(LgsStmtsBlock* stmtsBlock);
     void visitVarDec(LgsVarDec* varDec);
-    void visitAssignment(LgsAssignment* assignment);
+    void visitAssignment(const LgsAssignment* assignment);
     void visitIfStmt(LgsIfStmt* ifStmt);
     void visitMacroIf(LgsIfStmt* ifStmt);
     void visitSwitch(LgsSwitch* switchStmt);
@@ -109,6 +109,7 @@ public:
     void visitNullableExpr(LgsNullableExpr* nullableExpr);
     void visitUnwrap(LgsExpr* expr);
     void visitArrayExpr(LgsArrayExpr* arrayExpr);
+    void visitArrayElements(const LgsArrayExpr* arrExpr);
     void visitHashMap(LgsHashMap* hashMap);
     void visitVectorExpr(LgsVectorExpr* vectorExpr);
     void visitMatrixExpr(const LgsMatrixExpr* matrixExpr);

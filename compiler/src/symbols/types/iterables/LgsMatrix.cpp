@@ -125,10 +125,6 @@ std::string LgsMatrix::fmtStr() const {
     return "%s";
 }
 
-bool LgsMatrix::inferBaseType(std::vector<LgsExpr*>& args) {
-    assert(0);
-}
-
 Value* LgsMatrix::getIRElement(LgsCodeGen& cg, Value* iterable, Value* index) {
     const auto i = cg.builder.CreateMul(index, cg.i32(columns));
     const auto gep = cg.builder.CreateGEP(getIRType(cg), iterable, {cg.zero32(), i});

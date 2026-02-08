@@ -35,7 +35,6 @@ public:
     virtual LgsType* getValueType();
     virtual bool unpackLoopVars(LgsForeachLoop* loop) const;
     virtual void setLoopIRVars(LgsCodeGen& cg, LgsForeachLoop* loop);
-    virtual bool inferBaseType(std::vector<LgsExpr*>& args) = 0;
 
     virtual Value* lenIR(LgsCodeGen& cg, Value* iterable) = 0;
     virtual Value* inIR(LgsCodeGen& cg, Value* iterable, Value* value) = 0;

@@ -1589,6 +1589,7 @@ LgsArrayExpr* LgsParser::parseArrayExpr() {
     }
     mustMatch(T_RBRACK);
     const auto arrExpr = new LgsArrayExpr();
+    arrExpr->type = new LgsDArray();
     arrExpr->elements = args;
     setLocation(arrExpr->location, &startToken, &currentToken);
     return arrExpr;

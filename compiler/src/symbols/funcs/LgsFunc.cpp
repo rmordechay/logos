@@ -129,26 +129,25 @@ void LgsFunc::initFunc(const std::string& name, LgsType* rt, const std::vector<L
     }
 }
 
-void LgsFunc::castImplicitly(LgsType* toType) {
-    const auto otherFuncType = toType->asFuncType();
-    if (!otherFuncType) return;
-
+LgsExpr* LgsFunc::cast(bool explicitly) {
+    const auto toFuncType = implicitCast->asFuncType();
+    if (!toFuncType) return this;
     // Add 'it' if needed, else as normal params
-    if (isLambda && funcType->params.empty() && otherFuncType->params.size() == 1) {
-        auto itType = otherFuncType->params.front().type;
+    if (isLambda && funcType->params.empty() && toFuncType->params.size() == 1) {
+        auto itType = toFuncType->params.front().type;
         funcType->params.emplace_back(itType, LGS_LAMBDA_IT_PARAM);
     } else {
         for (size_t i = 0; i < funcType->params.size(); ++i) {
             auto& selfParam = funcType->params[i];
             if (selfParam.type) continue;
-            selfParam.setType(otherFuncType->params[i].type);
+            selfParam.setType(toFuncType->params[i].type);
         }
     }
-
     // Return type
     if (!funcType->rt) {
-        funcType->rt = otherFuncType->rt;
+        funcType->rt = toFuncType->rt;
     }
+    return this;
 }
 
 std::string LgsFunc::asText() {
@@ -156,8 +155,8 @@ std::string LgsFunc::asText() {
 }
 
 void LgsFunc::setType(LgsType* newType) {
-    LgsExpr::setType(newType);
     funcType = newType->asFuncType();
+    type = funcType;
 }
 
 void LgsFunc::hashNode(size_t& oldHash) {

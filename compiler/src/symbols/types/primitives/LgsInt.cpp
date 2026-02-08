@@ -1,7 +1,6 @@
 #include "types/primitives/LgsInt.h"
 #include "LgsBinaryTokens.h"
 #include "exprs/constants/LgsIntConst.h"
-#include "stmts/LgsField.h"
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsDouble.h"
 #include "types/primitives/LgsFloat.h"
@@ -88,75 +87,75 @@ Value* LgsInt::hashValue(LgsCodeGen& cg, Value* value) {
 Value* LgsInt::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
-    const auto l = cg.builder.CreateZExt(left->loadIR(cg), getIRType(cg));
-    const auto r = cg.builder.CreateZExt(right->loadIR(cg), getIRType(cg));
+    const auto l = cg.builder.CreateZExt(left->IRValue, getIRType(cg));
+    const auto r = cg.builder.CreateZExt(right->IRValue, getIRType(cg));
     return cg.builder.CreateAdd(l, r);
 }
 
 Value* LgsInt::subIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
-    const auto l = cg.builder.CreateZExt(left->loadIR(cg), getIRType(cg));
-    const auto r = cg.builder.CreateZExt(right->loadIR(cg), getIRType(cg));
+    const auto l = cg.builder.CreateZExt(left->IRValue, getIRType(cg));
+    const auto r = cg.builder.CreateZExt(right->IRValue, getIRType(cg));
     return cg.builder.CreateSub(l, r);
 }
 
 Value* LgsInt::mulIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
-    const auto l = cg.builder.CreateZExt(left->loadIR(cg), getIRType(cg));
-    const auto r = cg.builder.CreateZExt(right->loadIR(cg), getIRType(cg));
+    const auto l = cg.builder.CreateZExt(left->IRValue, getIRType(cg));
+    const auto r = cg.builder.CreateZExt(right->IRValue, getIRType(cg));
     return cg.builder.CreateMul(l, r);
 }
 
 Value* LgsInt::divIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
-    const auto l = cg.builder.CreateZExt(left->loadIR(cg), getIRType(cg));
-    const auto r = cg.builder.CreateZExt(right->loadIR(cg), getIRType(cg));
+    const auto l = cg.builder.CreateZExt(left->IRValue, getIRType(cg));
+    const auto r = cg.builder.CreateZExt(right->IRValue, getIRType(cg));
     return cg.builder.CreateSDiv(l, r);
 }
 
 Value* LgsInt::modIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
-    return cg.builder.CreateSRem(left->loadIR(cg), right->loadIR(cg));
+    return cg.builder.CreateSRem(left->IRValue, right->IRValue);
 }
 
 Value* LgsInt::powIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
-    return cg.callFunc("pow", cg.doubleTy(), {cg.doubleTy(), cg.doubleTy()}, {left->loadIR(cg), right->loadIR(cg)});
+    return cg.callFunc("pow", cg.doubleTy(), {cg.doubleTy(), cg.doubleTy()}, {left->IRValue, right->IRValue});
 }
 
 Value* LgsInt::bitAndIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
-    return cg.builder.CreateAnd(left->loadIR(cg), right->loadIR(cg));
+    return cg.builder.CreateAnd(left->IRValue, right->IRValue);
 }
 
 Value* LgsInt::bitOrIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
-    return cg.builder.CreateOr(left->loadIR(cg), right->loadIR(cg));
+    return cg.builder.CreateOr(left->IRValue, right->IRValue);
 }
 
 Value* LgsInt::bitXorIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
-    return cg.builder.CreateXor(left->loadIR(cg), right->loadIR(cg));
+    return cg.builder.CreateXor(left->IRValue, right->IRValue);
 }
 
 Value* LgsInt::rshiftIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
-    return cg.builder.CreateShl(left->loadIR(cg), right->loadIR(cg));
+    return cg.builder.CreateShl(left->IRValue, right->IRValue);
 }
 
 Value* LgsInt::lshiftIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
-    return cg.builder.CreateLShr(left->loadIR(cg), right->loadIR(cg));
+    return cg.builder.CreateLShr(left->IRValue, right->IRValue);
 }
 
 DIType* LgsInt::getDebugType(LgsCodeGen& cg) {

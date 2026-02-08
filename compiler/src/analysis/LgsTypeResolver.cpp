@@ -101,9 +101,6 @@ void LgsTypeResolver::resolveObj(LgsObject* obj) {
 
     for (const auto& field : obj->fields) {
         resolveType(field->type);
-        if (field->expr) {
-            field->expr = castExprImplicitly(field->expr, field->type);
-        }
     }
 
     for (const auto& ioPair : obj->ioPairs) {

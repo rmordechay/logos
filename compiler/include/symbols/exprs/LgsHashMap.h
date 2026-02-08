@@ -17,7 +17,6 @@ public:
 
     LgsHashMap() = default;
     explicit LgsHashMap(LgsMap* mapType) : LgsExpr(mapType) {}
-    void castImplicitly(LgsType* toType) override;
     void setDebugValue(LgsCodeGen& cg) override;
     bool equals(LgsExpr* other) override;
     std::string asText() override;

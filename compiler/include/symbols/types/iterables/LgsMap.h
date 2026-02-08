@@ -30,7 +30,6 @@ public:
     LgsExpr* getZeroValue() override;
     Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
-    bool inferBaseType(std::vector<LgsExpr*>& args) override;
     Value* lenIR(LgsCodeGen& cg, Value* iterable) override;
     Value* inIR(LgsCodeGen& cg, Value* iterableExpr, Value* value) override;
     Value* getIRElement(LgsCodeGen& cg, Value* map, Value* index) override;

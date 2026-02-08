@@ -815,6 +815,7 @@ void LgsCgFile::visitNullableExpr(LgsNullableExpr* expr) {
         expr->IRValue = nullable->getIRZeroValue(cg, expr->pointee);
     } else {
         if (nullable->passByRef) {
+            if (expr->pointee) cg.store(expr->baseExpr->IRValue, expr->pointee);
             expr->IRValue = expr->baseExpr->IRValue;
         } else {
             expr->IRValue = nullable->getIRZeroValue(cg, expr->pointee);
@@ -1020,15 +1021,16 @@ void LgsCgFile::visitStaticArray(LgsArrayExpr* arrayExpr) {
     if (!arrayExpr->pointee && arrayExpr->elements.size() < sArr->len) {
         cg.store(ConstantAggregateZero::get(ty), arrayExpr->IRValue);
     }
+
     for (size_t i = 0; i < arrayExpr->elements.size(); ++i) {
         const auto element = arrayExpr->elements[i];
         element->pointee = sArr->getIRElement(cg, arrayExpr->IRValue, cg.i32(i));
         visitExpr(element);
     }
-    if (sArr->baseType->asIterable() || sArr->baseType->asNullable()) return;
+
     for (size_t i = 0; i < arrayExpr->elements.size(); ++i) {
         const auto element = arrayExpr->elements[i];
-        sArr->addIRElement(cg, arrayExpr->IRValue, cg.i32(i), element->IRValue);
+        cg.store(element->IRValue, element->pointee);
     }
 }
 

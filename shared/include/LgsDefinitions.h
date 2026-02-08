@@ -20,7 +20,7 @@
 #define LGS_C "C"
 #define LGS_MAIN_FUNC "main"
 #define LGS_SELF "self"
-#define LGS_LAMBDA "Lambda"
+#define LGS_LAMBDA "lambda"
 #define LGS_LAMBDA_IT_PARAM "it"
 #define LGS_NULL_LITERAL "null"
 #define LGS_UNKNOWN_TYPE "<Unknown>"

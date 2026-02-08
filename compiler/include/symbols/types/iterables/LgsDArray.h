@@ -21,7 +21,6 @@ public:
     size_t sizeBytes() override;
     std::string fmtStr() const override;
     bool canCastTo(LgsType* other) override;
-    bool inferBaseType(std::vector<LgsExpr*>& args) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     LgsExpr* getZeroValue() override;
     Type* getIRType(LgsCodeGen& cg) override;

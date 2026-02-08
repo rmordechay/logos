@@ -8,9 +8,19 @@ Value* LgsArrayExpr::loadIR(LgsCodeGen& cg) {
     return IRValue;
 }
 
-void LgsArrayExpr::castImplicitly(LgsType* toType) {
-    if ((type && type->asIterable()->baseType) || !toType->asIterable()) return;
-    setType(toType);
+LgsExpr* LgsArrayExpr::cast(const bool explicitly) {
+    const auto otherIter = implicitCast->asIterable();
+    if (!otherIter) return this;
+    if (type->asDArray() && implicitCast->asSArray()) {
+        freeType(type);
+        type = implicitCast;
+    }
+    for (auto& element : elements) {
+        element->implicitCast = otherIter->baseType;
+        if (!element->type->canCastTo(element->implicitCast)) continue;
+        element = element->cast(explicitly);
+    }
+    return implicitCast->asNullable() ? wrapInNullable() : this;
 }
 
 void LgsArrayExpr::setDebugValue(LgsCodeGen& cg) {

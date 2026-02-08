@@ -12,10 +12,6 @@ void LgsMetaSelection::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }
 
-LgsExpr* LgsMetaSelection::castExplicitly(LgsType* toType) {
-    assert(0);
-}
-
 std::string LgsMetaSelection::asText() {
     assert(0);
 }

@@ -48,7 +48,7 @@ public:
     Value* callExternal(LgsCodeGen& cg, const std::vector<LgsFuncArg>& args);
     Value* loadIR(LgsCodeGen& cg) override;
     void initFunc(const std::string& name, LgsType* rt, const std::vector<LgsParam>& params, uint32_t ops);
-    void castImplicitly(LgsType* toType) override;
+    LgsExpr* cast(bool explicitly) override;
     std::string asText() override;
     void setType(LgsType* newType) override;
     void hashNode(size_t& oldHash) override;

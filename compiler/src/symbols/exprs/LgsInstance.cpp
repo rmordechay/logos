@@ -8,10 +8,6 @@ std::string LgsInstance::asText() {
     return name + "{}";
 }
 
-LgsExpr* LgsInstance::castExplicitly(LgsType* toType) {
-    assert(0);
-}
-
 Value* LgsInstance::loadIR(LgsCodeGen& cg) {
     return IRValue;
 }

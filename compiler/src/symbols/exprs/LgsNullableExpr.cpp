@@ -10,11 +10,13 @@ void LgsNullableExpr::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }
 
-void LgsNullableExpr::castImplicitly(LgsType* toType) {
-    const auto otherNullable = toType->asNullable();
+LgsExpr* LgsNullableExpr::cast(bool explicitly) {
+    const auto otherNullable = implicitCast->asNullable();
     if (isNull && otherNullable) {
         type->asNullable()->baseType = otherNullable->baseType;
+        type->passByRef = otherNullable->passByRef;
     }
+    return this;
 }
 
 std::string LgsNullableExpr::asText() {

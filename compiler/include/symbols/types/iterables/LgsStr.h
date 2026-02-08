@@ -21,7 +21,6 @@ public:
     bool canCastTo(LgsType* other) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     Value* getIRElement(LgsCodeGen& cg, Value* iterable, Value* index) override;
-    bool inferBaseType(std::vector<LgsExpr*>& args) override;
     Value* addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
     Value* lenIR(LgsCodeGen& cg, Value* iterable) override;
     Value* inIR(LgsCodeGen& cg, Value* iterableExpr, Value* value) override;

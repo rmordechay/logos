@@ -13,7 +13,6 @@ public:
     Value* loadIR(LgsCodeGen& cg) override;
     void setType(LgsType* newType) override;
     void hashNode(size_t& oldHash) override;
-    LgsExpr* castExplicitly(LgsType* toType) override;
     std::string asText() override;
     bool equals(LgsExpr* other) override;
     void setDebugValue(LgsCodeGen& cg) override;

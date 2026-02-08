@@ -19,7 +19,6 @@ public:
     explicit LgsInstance(const std::string& name): name(name) {}
     explicit LgsInstance(LgsObject* obj) : LgsExpr(obj), name(obj->name), obj(obj) {}
     LgsField* getField(const std::string& fieldName) const;
-    LgsExpr* castExplicitly(LgsType* toType) override;
     Value* loadIR(LgsCodeGen& cg) override;
     void setType(LgsType* newObj) override;
     void hashNode(size_t& oldHash) override;

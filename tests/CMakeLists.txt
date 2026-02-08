@@ -4,9 +4,10 @@ enable_testing()
 add_executable(lgs_tests
     main.cpp
     parser/ParserErrorTest.cpp
-    codegen/CodegenTest.cpp
-    sema/SemaErrorTest.cpp
     parser/ParserTest.cpp
+    sema/SemaErrorTest.cpp
+    sema/TypeResolutionTest.cpp
+    codegen/CodegenTest.cpp
     ${COMPILER_SOURCE}
 )
 

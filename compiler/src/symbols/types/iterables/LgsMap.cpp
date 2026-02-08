@@ -114,23 +114,6 @@ LgsType* LgsMap::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     return nullptr;
 }
 
-bool LgsMap::inferBaseType(std::vector<LgsExpr*>& args) {
-    const auto firstPair = args.front()->asPair();
-    const auto baseKey = firstPair->key->type;
-    const auto baseValue = firstPair->value->type;
-    for (size_t i = 1; i < args.size(); ++i) {
-        const auto arg = args[i];
-        const auto pair = arg->asPair();
-        const auto keyType = pair->key->type;
-        const auto valueType = pair->value->type;
-        if (!baseKey->equals(keyType)) return false;
-        if (!baseValue->equals(valueType)) return false;
-    }
-    pairType->key = baseKey;
-    pairType->value = baseValue;
-    return true;
-}
-
 Value* LgsMap::lenIR(LgsCodeGen& cg, Value* iterable) {
     return cg.loadStructField(getIRType(cg), iterable, LgsHashMapIndices::len, cg.sizeTy());
 }

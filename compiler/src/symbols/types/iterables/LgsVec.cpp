@@ -86,14 +86,6 @@ std::optional<int64_t> LgsVec::getConstLength() {
     return dimVec;
 }
 
-bool LgsVec::inferBaseType(std::vector<LgsExpr*>& args) {
-    if (args.empty() && !baseType) return false;
-    std::vector<LgsType*> types;
-    for (const auto arg : args) types.push_back(arg->type);
-    baseType = getBiggestIntType(types);
-    return true;
-}
-
 LgsType* LgsVec::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     if (!baseType) return nullptr;
     const auto otherVec = rightType->asVec();

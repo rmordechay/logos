@@ -8,8 +8,6 @@ public:
 
     explicit LgsFloatConst(LgsType* type, const double_t value) : LgsExpr(type), value(value) {}
     Value* loadIR(LgsCodeGen& cg) override;
-    LgsExpr* castExplicitly(LgsType* toType) override;
-    void castImplicitly(LgsType* toType) override;
     std::string asText() override;
     void setDebugValue(LgsCodeGen& cg) override;
     LgsExpr* clone() override;

@@ -81,7 +81,7 @@ static std::string formatElement(const Lgs_TypeInfo* type, void* value) {
             }
             str << formatElement(sArr->baseType, element);
             if (i < sArr->length - 1) str << ", ";
-            offset += sArr->baseType->size;
+            offset += sArr->baseType->isHeap ? sizeof(void*) : sArr->baseType->size;
         }
         str << "]";
         break;

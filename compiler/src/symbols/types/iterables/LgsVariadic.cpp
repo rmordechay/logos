@@ -36,10 +36,6 @@ std::string LgsVariadic::getName() {
     return baseType->getName() + "...";
 }
 
-bool LgsVariadic::inferBaseType(std::vector<LgsExpr*>& args) {
-    assert(0);
-}
-
 Value* LgsVariadic::lenIR(LgsCodeGen& cg, Value* iterable) {
     assert(cg.currentFunc->arg_size() > 1);
     return cg.currentFunc->getArg(cg.currentFunc->arg_size() - 2);

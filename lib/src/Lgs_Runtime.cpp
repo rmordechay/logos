@@ -54,8 +54,8 @@ extern "C" void* Lgs_Runtime_allocDArr(Lgs_TypeInfo* baseType) {
 }
 
 extern "C" void* Lgs_Runtime_allocStrConst(char* str) {
-    const auto ptr = runtime.stack.at(0).allocator.allocate(sizeof(Lgs_StrExpr), true);
-    static_cast<Lgs_StrExpr*>(ptr)->data = str;
+    const auto ptr = static_cast<Lgs_StrExpr*>(runtime.stack.at(0).allocator.allocate(sizeof(Lgs_StrExpr), true));
+    ptr->data = str;
     return ptr;
 }
 

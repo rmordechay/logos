@@ -21,7 +21,6 @@ public:
     std::string getBaseName() override;
     std::string getName() override;
     bool canCastTo(LgsType* other) override;
-    bool inferBaseType(std::vector<LgsExpr*>& args) override;
     Type* getIRType(LgsCodeGen& cg) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     LgsType* applyMatScalarOp(LgsType* number, const LgsBinOp& op) const;

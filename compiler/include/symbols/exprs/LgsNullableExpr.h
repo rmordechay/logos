@@ -12,7 +12,7 @@ public:
     }
     Value* loadIR(LgsCodeGen& cg) override;
     void setDebugValue(LgsCodeGen& cg) override;
-    void castImplicitly(LgsType* toType) override;
+    LgsExpr* cast(bool explicitly) override;
     std::string asText() override;
     LgsExpr* clone() override;
 };

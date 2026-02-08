@@ -45,7 +45,7 @@ inline LgsBaseMsg E10030{"Non-public field %s is used outside its parent object 
 inline LgsBaseMsg E10031{"Non-public method %s is used outside its parent object %s", errCodeStart++};
 inline LgsBaseMsg E10032{"Singleton object %s cannot be instantiated.", errCodeStart++};
 inline LgsBaseMsg E10033{"Type name must start with an uppercase letter.", errCodeStart++};
-inline LgsBaseMsg E10034{"", errCodeStart++};
+inline LgsBaseMsg E10034{"Lambda function cannot be mutable.", errCodeStart++};
 inline LgsBaseMsg E10035{"Index of %s has %s level which is too deep. Max level: %s", errCodeStart++};
 inline LgsBaseMsg E10036{"%s cannot be indexed with type %s", errCodeStart++};
 inline LgsBaseMsg E10037{"Left index of slice must be less or equal than the right index.", errCodeStart++};

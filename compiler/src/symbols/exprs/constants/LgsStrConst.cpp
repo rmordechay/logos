@@ -3,21 +3,6 @@
 #include "types/LgsSubType.h"
 #include "LgsUtils.h"
 
-LgsExpr* LgsStrConst::castExplicitly(LgsType* toType) {
-    const auto thisName = type->getName();
-    const auto otherName = toType->getName();
-    if (toType->isAny()) return this;
-    if (const auto subtype = toType->asSubtype()) {
-        if (subtype->subtype->getName() == thisName) {
-            freeType(type);
-            setType(subtype);
-            return this;
-        }
-    }
-    if (thisName == otherName) return this;
-    return nullptr;
-}
-
 Value* LgsStrConst::loadIR(LgsCodeGen& cg) {
     return IRValue;
 }

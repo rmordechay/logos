@@ -73,13 +73,6 @@ std::string LgsStr::fmtStr() const {
     return "%s";
 }
 
-bool LgsStr::inferBaseType(std::vector<LgsExpr*>& args) {
-    for (const auto arg : args) {
-        if (!arg->type->canCastTo(baseType)) return false;
-    }
-    return true;
-}
-
 Value* LgsStr::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;

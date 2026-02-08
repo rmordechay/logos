@@ -10,6 +10,5 @@ public:
     Value* loadIR(LgsCodeGen& cg) override;
     void hashNode(size_t& oldHash) override;
     void setDebugValue(LgsCodeGen& cg) override;
-    LgsExpr* castExplicitly(LgsType* toType) override;
     std::string asText() override;
 };

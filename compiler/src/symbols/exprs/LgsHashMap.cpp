@@ -10,10 +10,6 @@ std::string LgsPair::asText() {
     assert(0);
 }
 
-void LgsHashMap::castImplicitly(LgsType* toType) {
-    assert(0);
-}
-
 void LgsHashMap::setDebugValue(LgsCodeGen& cg) {
     if (!IRValue) return;
     const auto di = cg.debugger.diBuilder;

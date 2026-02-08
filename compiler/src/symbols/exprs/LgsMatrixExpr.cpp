@@ -18,15 +18,6 @@ void LgsMatrixExpr::hashNode(size_t& oldHash) {
     assert(0);
 }
 
-LgsExpr* LgsMatrixExpr::castExplicitly(LgsType* toType) {
-    assert(0);
-}
-
-void LgsMatrixExpr::castImplicitly(LgsType* toType) {
-    if (type->getName() == toType->getName()) return;
-    assert(0);
-}
-
 bool LgsMatrixExpr::equals(LgsExpr* other) {
     assert(0);
 }

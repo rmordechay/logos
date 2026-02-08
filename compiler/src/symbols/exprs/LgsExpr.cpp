@@ -135,12 +135,14 @@ void LgsExpr::setType(LgsType* newType) {
     type = newType;
 }
 
-LgsExpr* LgsExpr::castExplicitly(LgsType* toType) {
-    assert(0);
+LgsExpr* LgsExpr::wrapInNullable() {
+    const auto nullableExpr = new LgsNullableExpr(this);
+    nullableExpr->type = implicitCast;
+    return nullableExpr;
 }
 
-void LgsExpr::castImplicitly(LgsType* toType) {
-
+LgsExpr* LgsExpr::cast(bool explicitly) {
+    return implicitCast->asNullable() ? wrapInNullable() : this;
 }
 
 bool LgsExpr::equals(LgsExpr* other) {
@@ -245,27 +247,6 @@ LgsNullableExpr* LgsExpr::asNullableExpr() {
 
 LgsExpr* LgsExpr::clone() {
     assert(0);
-}
-
-LgsExpr* castExprImplicitly(LgsExpr* expr, LgsType* toType) {
-    const auto toNullableType = toType->asNullable();
-    if (toNullableType && !expr->isNull && !expr->type->asNullable()) {
-        toType = toNullableType->baseType;
-    }
-    expr->castImplicitly(toType);
-    if (toNullableType && !expr->type->asNullable()) {
-        if (const auto nullable = expr->asNullableExpr()) {
-            nullable->baseExpr->setType(toNullableType->baseType);
-            expr->setType(toNullableType);
-        } else {
-            expr->setType(toNullableType->baseType);
-            const auto nullableExpr = new LgsNullableExpr(expr);
-            nullableExpr->location = expr->location;
-            nullableExpr->setType(toNullableType);
-            return nullableExpr;
-        }
-    }
-    return expr;
 }
 
 void freeExpr(LgsExpr* expr) {

@@ -12,7 +12,6 @@ public:
         str->isStatic = true;
         type = str;
     }
-    LgsExpr* castExplicitly(LgsType* toType) override;
     Value* loadIR(LgsCodeGen& cg) override;
     std::string asText() override;
     void hashNode(size_t& oldHash) override;

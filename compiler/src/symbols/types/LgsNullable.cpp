@@ -28,7 +28,10 @@ LgsExpr* LgsNullable::getZeroValue() {
 }
 
 Value* LgsNullable::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
-    if (passByRef) return cg.null();
+    if (passByRef) {
+        if (pointee) cg.store(cg.null(), pointee);
+        return cg.null();
+    }
     const auto ty = getIRType(cg);
     const auto ptr = pointee ? pointee : cg.builder.CreateAlloca(ty);
     cg.storeStructField(ty, ptr, LgsNullableExprIndices::isSet, cg.false_());
@@ -55,10 +58,9 @@ Constant* LgsNullable::getRTTypeExtra(LgsCodeGen& cg) {
 }
 
 bool LgsNullable::canCastTo(LgsType* other) {
-    if (other->isAny()) return true;
+    if (isNull || other->isAny()) return true;
     const auto otherNullable = other->asNullable();
     if (!otherNullable) return false;
-    if (isNull) return true;
     return baseType->canCastTo(otherNullable->baseType);
 }
 
