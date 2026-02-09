@@ -31,6 +31,7 @@ public:
     std::vector<LgsTestFile*> testFiles;
     LgsAppConfigFile* appConfigFile = nullptr;
     std::unordered_map<std::string, std::string> lgsCode; // Used when passing code directly.
+    std::vector<LgsFileMetadata> filesMetadata;
     LgsFile rttFile{"rtt", CG_MODE_RTTYPES};
     LgsPaths paths;
 

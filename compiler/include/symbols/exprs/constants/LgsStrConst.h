@@ -8,7 +8,7 @@ public:
     std::vector<LgsExpr*> parts;
 
     explicit LgsStrConst(const std::string& v) : value(v) {
-        const auto str = new LgsStr();
+        const auto str = new LgsStr(v.length());
         str->isStatic = true;
         type = str;
     }

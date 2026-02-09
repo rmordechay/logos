@@ -19,12 +19,13 @@ public:
     LgsFile* file;
     LgsSymbolTable& globals;
     LgsErrHandler& errHandler;
+    LgsObject* currentObj = nullptr;
     LgsFuncType* currentFuncType = nullptr;
 
     LgsTypeResolver(LgsFile* file, LgsErrHandler& errHandler, LgsSymbolTable& globals) : file(file), globals(globals),errHandler(errHandler) {}
     void resolveType(LgsType*& type);
     void resolveMainFile(LgsMainFile* mf);
-    void resolveObj(LgsObject* obj);
+    void resolveObjTypes(LgsObject* obj);
     void resolveInterface(LgsInterface* interface);
     void resolveFuncType(LgsFuncType* funcType);
     void resolveIOPair(LgsIOPair* ioPair, LgsObject* obj) const;

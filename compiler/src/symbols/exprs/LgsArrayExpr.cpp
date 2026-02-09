@@ -12,6 +12,7 @@ LgsExpr* LgsArrayExpr::cast(const bool explicitly) {
     const auto otherIter = implicitCast->asIterable();
     if (!otherIter) return this;
     if (type->asDArray() && implicitCast->asSArray()) {
+        if (!type->canCastTo(implicitCast)) return this;
         freeType(type);
         type = implicitCast;
     }

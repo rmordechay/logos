@@ -65,6 +65,7 @@ public:
     LgsSymbolTable& globals;
     LgsErrHandler errHandler;
     LgsTypeResolver typeResolver;
+    LgsObject* currentObj = nullptr;
     std::unordered_map<std::string, size_t> refCount;
 
     explicit LgsSema(LgsAppConfigs& appConfigs, LgsFile* file, LgsSymbolTable& globals)
@@ -118,7 +119,7 @@ public:
     void visitInnerSelections(const LgsSelection* selection);
     void visitFieldSelection(LgsVariable* child, LgsType* parentType);
     void visitIterIndexSelection(LgsIterIndex* iterIndex, LgsType* parentType);
-    void visitMetaSelection(LgsMetaSelection* metaSelection);
+    void visitMetaSelection(LgsMetaSelection* metaSelection, LgsExpr* parent = nullptr);
     void visitFuncCall(LgsFuncCall* funcCall);
     void visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent);
     bool visitFuncArgs(LgsFuncCall* funcCall, LgsFuncType* ft);
@@ -135,7 +136,7 @@ public:
     bool validateExprType(const LgsExpr* expr, LgsType* type);
     bool validateTypeName(const std::string& name, const LgsLocation& location);
     bool validateLocalName(const std::string& name, const LgsLocation& location);
-    void validateObjImplements(LgsObject* obj, const std::vector<LgsType*>& interfaces);
+    void visitObjImplements(LgsObject* obj, const std::vector<LgsType*>& interfaces);
     void validateIndex(LgsIterIndex* iterIndex);
     bool validateFieldVisibility(LgsField* field, LgsType* parent, const LgsLocation& location);
     bool validateMethodVisibility(const LgsFunc* method, LgsType* parent, const LgsLocation& location);

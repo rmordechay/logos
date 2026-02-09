@@ -157,7 +157,7 @@ public:
     LgsIterIndex* parseIterIndex(LgsExpr* baseExpr);
     LgsPostfixExpr* parsePostfixExpr(LgsExpr* baseExpr);
     LgsSelection* parseSelection(LgsExpr* firstExpr);
-    LgsMetaSelection* parseMetaSelection(LgsExpr* firstExpr);
+    LgsMetaSelection* parseMetaSelection(LgsExpr* baseExpr);
 
     void parseArgs(LgsInstance* instance);
     void parsePackageString(LgsImportPackage& pkg, const LgsToken& importToken);

@@ -70,7 +70,6 @@ static std::string formatElement(const Lgs_TypeInfo* type, void* value) {
         break;
     }
     case RTT_SARRAY: {
-        if (!*static_cast<void**>(value)) return LGS_NULL_LITERAL;
         const auto sArr = type->sArr;
         str << "[";
         auto offset = 0;

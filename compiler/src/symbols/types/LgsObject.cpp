@@ -13,6 +13,7 @@
 #include <sstream>
 #include <llvm/IR/Module.h>
 #include "LgsBinaryTokens.h"
+#include "LgsRTTIndices.h"
 #include "codegen/LgsCgFile.h"
 #include "errors/LgsErrors.h"
 #include "types/LgsFieldType.h"
@@ -85,7 +86,9 @@ LgsFunc* LgsObject::getMetaFunc(const std::string& methodName) {
             const auto fieldName = fieldNameStr->type->asStr()->loadRTData(cg, fieldNameStr->IRValue);
             const auto ty = value->IRValue->getType();
             const auto v = ty->isPointerTy() ? value->IRValue : cg.allocaAndStore(ty, value->IRValue);
-            return cg.builder.CreateCall(getSetFieldFunc(cg), {self->IRValue, fieldName, v, value->type->getRTType(cg)});
+            return cg.builder.CreateCall(getSetFieldFunc(cg), {
+                                         self->IRValue, fieldName, v, value->type->getRTType(cg)
+                                         });
         };
         metaFuncs[methodName] = func;
         return func;
@@ -124,7 +127,8 @@ Constant* LgsObject::getRTTypeExtra(LgsCodeGen& cg) {
         const auto field = fields[i];
         assert(field->type->rttKind != RTT_UNKNOWN);
         const auto fieldName = cg.getString(field->name);
-        rttFields.emplace_back(ConstantStruct::get(fieldRTType, {
+        rttFields.emplace_back(ConstantStruct::get(
+            fieldRTType, {
             fieldName,
             field->type->IRSize(cg),
             cg.usize(sl->getElementOffset(i + 2)), // offset level and type
@@ -146,13 +150,13 @@ Constant* LgsObject::getRTTypeExtra(LgsCodeGen& cg) {
     const auto objName = cg.getString(name);
     objName->setName(rttName + "_name");
     const std::vector<Constant*> args = {
-        cg.usize(id),
-        objName,
-        IRSize(cg),
-        cg.usize(numFields),
-        cg.usize(numMethods),
-        rttFieldsGlobal,
-        rttMethodsGlobal,
+    cg.usize(id),
+    objName,
+    IRSize(cg),
+    cg.usize(numFields),
+    cg.usize(numMethods),
+    rttFieldsGlobal,
+    rttMethodsGlobal,
     };
     return cg.createGlobal(rttName + "_extra", objRTType, ConstantStruct::get(objRTType, args));
 }
@@ -162,21 +166,12 @@ size_t LgsObject::sizeBytes() {
     for (const auto& field : fields) {
         if (field->type->asObject() || field->type->asFuncType() || field->type->asInterface()) {
             sum += sizeof(void*);
-        } else {
+        }
+        else {
             sum += field->type->sizeBytes();
         }
     }
     return sum;
-}
-
-void LgsObject::cloneFields(LgsInstance* instance) const {
-    for (const auto field : fields) {
-        auto newField = new LgsField(*field);
-        if (newField->expr) {
-            newField->expr = newField->expr->clone();
-        }
-        instance->fields.emplace_back(newField);
-    }
 }
 
 LgsExpr* LgsObject::getZeroValue() {
@@ -219,6 +214,16 @@ std::string LgsObject::fmtStr() const {
     }
     str << '}';
     return str.str();
+}
+
+void LgsObject::cloneFields(LgsInstance* instance) const {
+    for (const auto field : fields) {
+        auto newField = new LgsField(*field);
+        if (newField->expr) {
+            newField->expr = newField->expr->clone();
+        }
+        instance->fields.emplace_back(newField);
+    }
 }
 
 DIType* LgsObject::getDebugType(LgsCodeGen& cg) {
@@ -295,7 +300,7 @@ Function* LgsObject::getSetFieldFunc(LgsCodeGen& cg) {
     cg.builder.SetInsertPoint(entryBlock);
 
     const auto fieldTy = cg.builder.CreateCall(getGetFieldFunc(cg), {self, fieldNameArg});
-    cg.ifStmt(cg.isNull(fieldTy), [&cg]{cg.builder.CreateRet(cg.false_());});
+    cg.ifStmt(cg.isNull(fieldTy), [&cg] { cg.builder.CreateRet(cg.false_()); });
     const auto fieldKind1 = LgsFieldType::loadRTKind(cg, fieldTy);
     const auto fieldKind2 = loadRTTInfoKind(cg, valueTy);
     const auto canCast = cg.callRuntimeFunc("canCast", cg.i1Ty(), {cg.i32Ty(), cg.i32Ty()}, {fieldKind1, fieldKind2});
@@ -352,7 +357,8 @@ Value* LgsObject::getInstanceRTType(LgsCodeGen& cg, Value* instance) {
 
 StructType* LgsObject::getObjRTTStruct(LgsCodeGen& cg) {
     const auto rttName = LGS_TYPEINFO_PREFIX + metaName;
-    return cg.getStructType({cg.sizeTy(), cg.ptrTy(), cg.sizeTy(), cg.sizeTy(), cg.sizeTy(), cg.ptrTy(), cg.ptrTy()}, rttName);
+    return cg.getStructType({cg.sizeTy(), cg.ptrTy(), cg.sizeTy(), cg.sizeTy(), cg.sizeTy(), cg.ptrTy(), cg.ptrTy()},
+                            rttName);
 }
 
 StructType* LgsObject::getMethodRTTStruct(LgsCodeGen& cg) {

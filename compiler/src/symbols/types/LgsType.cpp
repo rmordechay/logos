@@ -1,5 +1,6 @@
 #include <llvm/IR/Module.h>
 
+#include "LgsRTTIndices.h"
 #include "exprs/LgsBinaryExpr.h"
 #include "exprs/LgsInstance.h"
 #include "exprs/LgsVectorExpr.h"
@@ -14,6 +15,7 @@
 #include "types/LgsFieldType.h"
 #include "types/LgsGenericType.h"
 #include "types/LgsNullable.h"
+#include "types/LgsSelf.h"
 #include "types/iterables/LgsMap.h"
 #include "types/LgsSubType.h"
 #include "types/LgsUnknown.h"
@@ -172,9 +174,10 @@ LgsUInt* LgsType::asUInt() { return dynamic_cast<LgsUInt*>(this); }
 LgsFloat* LgsType::asFloat() { return dynamic_cast<LgsFloat*>(this); }
 LgsDouble* LgsType::asDouble() { return dynamic_cast<LgsDouble*>(this); }
 LgsFuncType* LgsType::asFuncType() { return dynamic_cast<LgsFuncType*>(this); }
-LgsObject* LgsType::asObject() { return dynamic_cast<LgsObject*>(this); }
+LgsObject* LgsType::asObject() { return asSelf() ? dynamic_cast<LgsObject*>(asSelf()->baseType) : dynamic_cast<LgsObject*>(this); }
 LgsInterface* LgsType::asInterface() { return dynamic_cast<LgsInterface*>(this); }
 LgsEnum* LgsType::asEnum() { return dynamic_cast<LgsEnum*>(this); }
+LgsSelf* LgsType::asSelf() { return dynamic_cast<LgsSelf*>(this); }
 LgsGenericType* LgsType::asGenericType() { return dynamic_cast<LgsGenericType*>(this); }
 LgsIterable* LgsType::asIterable() { return dynamic_cast<LgsIterable*>(this); }
 LgsSArray* LgsType::asSArray() { return dynamic_cast<LgsSArray*>(this); }
@@ -201,6 +204,13 @@ LgsType::~LgsType() {
         delete field;
     }
     fields.clear();
+}
+
+void freeType(LgsType* type) {
+    if (!type) return;
+    if (type->isScalar() || type->asAny() || type->asChar() || type->isVoid()) return;
+    if (type->asEnum() || type->asSubtype() || type->asGenericType() || type->asObject() || type->asInterface()) return;
+    delete type;
 }
 
 Value* loadRTTInfoName(LgsCodeGen& cg, Value* ptr) {
@@ -263,59 +273,35 @@ Value* neIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
     return cg.builder.CreateNot(eqIR(cg, left, right, type));
 }
 
-Value* ltIR(LgsCodeGen& cg, Value* left, Value* right, const LgsType* type) {
-    if (type->isUnsinged) {
-        return cg.builder.CreateICmpULT(left, right);
-    }
-    if (type->isInt) {
-        return cg.builder.CreateICmpSLT(left, right);
-    }
-    if (type->isFloat) {
-        auto [l, r] = loadNumberPair(cg, left, right, cg.floatTy());
-        return cg.builder.CreateFCmpOLT(l, r);
-    }
+Value* ltIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
+    auto [l, r] = loadNumberPair(cg, left, right, type);
+    if (type->isUnsinged) return cg.builder.CreateICmpULT(l, r);
+    if (type->isInt) return cg.builder.CreateICmpSLT(l, r);
+    if (type->isFloat) return cg.builder.CreateFCmpOLT(l, r);
     assert(0);
 }
 
 Value* gtIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
-    if (type->isUnsinged) {
-        return cg.builder.CreateICmpUGT(left, right);
-    }
-    if (type->isInt) {
-        return cg.builder.CreateICmpSGT(left, right);
-    }
-    if (type->isFloat) {
-        auto [l, r] = loadNumberPair(cg, left, right, cg.floatTy());
-        return cg.builder.CreateFCmpOGT(l, r);
-    }
+    auto [l, r] = loadNumberPair(cg, left, right, type);
+    if (type->isUnsinged) return cg.builder.CreateICmpUGT(l, r);
+    if (type->isInt) return cg.builder.CreateICmpSGT(l, r);
+    if (type->isFloat) return cg.builder.CreateFCmpOGT(l, r);
     assert(0);
 }
 
 Value* geIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
-    if (type->isUnsinged) {
-        return cg.builder.CreateICmpUGE(left, right);
-    }
-    if (type->isInt) {
-        return cg.builder.CreateICmpSGE(left, right);
-    }
-    if (type->isFloat) {
-        auto [l, r] = loadNumberPair(cg, left, right, cg.floatTy());
-        return cg.builder.CreateFCmpOGE(l, r);
-    }
+    auto [l, r] = loadNumberPair(cg, left, right, type);
+    if (type->isUnsinged) return cg.builder.CreateICmpUGE(l, r);
+    if (type->isInt) return cg.builder.CreateICmpSGE(l, r);
+    if (type->isFloat) return cg.builder.CreateFCmpOGE(l, r);
     assert(0);
 }
 
 Value* leIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
-    if (type->isUnsinged) {
-        return cg.builder.CreateICmpULE(left, right);
-    }
-    if (type->isInt) {
-        return cg.builder.CreateICmpSLE(left, right);
-    }
-    if (type->isFloat) {
-        auto [l, r] = loadNumberPair(cg, left, right, cg.floatTy());
-        return cg.builder.CreateFCmpOLE(l, r);
-    }
+    auto [l, r] = loadNumberPair(cg, left, right, type);
+    if (type->isUnsinged) return cg.builder.CreateICmpULE(l, r);
+    if (type->isInt) return cg.builder.CreateICmpSLE(l, r);
+    if (type->isFloat) return cg.builder.CreateFCmpOLE(l, r);
     assert(0);
 }
 
@@ -376,22 +362,55 @@ LgsType* getBiggestIntType(const std::vector<LgsType*>& types) {
     return inferredType;
 }
 
-std::pair<Value*, Value*> loadNumberPair(LgsCodeGen& cg, Value* left, Value* right, Type* type) {
-    const auto leftType = left->getType();
-    const auto rightType = right->getType();
-    if (leftType->isIntegerTy()) {
-        left = cg.builder.CreateSIToFP(left, type);
-    } else if (const auto lVec = dyn_cast<FixedVectorType>(leftType)) {
-        if (lVec->getElementType()->isIntegerTy()) {
-            left = cg.builder.CreateSIToFP(left, FixedVectorType::get(type, lVec->getNumElements()));
+Type* getBiggestIntType(const std::vector<Type*>& types) {
+    if (types.empty()) return nullptr;
+    Type* inferredType = nullptr;
+    uint8_t highestPrecedence = 0;
+    for (const auto type : types) {
+        uint8_t precedence = 0;
+        if (type->isIntegerTy()) {
+            precedence = type->getIntegerBitWidth();
+        } else if (type->isFloatTy()) {
+            precedence = 64;
+        } else if (type->isDoubleTy()) {
+            precedence = 128;
+        } else {
+            return nullptr;
         }
+        if (highestPrecedence >= precedence) continue;
+        inferredType = type;
+        highestPrecedence = precedence;
     }
-    if (rightType->isIntegerTy()) {
-        right = cg.builder.CreateSIToFP(right, type);
-    } else if (const auto rVec = dyn_cast<FixedVectorType>(rightType)) {
-        if (rVec->getElementType()->isIntegerTy()) {
-            right = cg.builder.CreateSIToFP(right, FixedVectorType::get(type, rVec->getNumElements()));
-        }
+    assert(inferredType);
+    return inferredType;
+}
+
+Value* loadAsInt(LgsCodeGen& cg, Value* v, Type* intType) {
+    const auto ty = v->getType();
+    if (ty->isPointerTy()) v = cg.load(intType, v);
+    if (ty->isIntegerTy()) return cg.builder.CreateSExt(v, intType);
+    if (ty->isFloatingPointTy()) return cg.builder.CreateFPToSI(v, intType);
+    assert(0);
+}
+
+Value* loadAsFloat(LgsCodeGen& cg, Value* v, Type* floatType) {
+    const auto ty = v->getType();
+    if (ty->isPointerTy()) v = cg.load(floatType, v);
+    if (ty->isFloatingPointTy()) return cg.builder.CreateSIToFP(v, floatType);;
+    if (ty->isIntegerTy()) return cg.builder.CreateSIToFP(v, floatType);;
+    assert(0);
+}
+
+std::pair<Value*, Value*> loadNumberPair(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
+    const auto biggest = getBiggestIntType({left->getType(), right->getType()});
+    if (type->isInt) {
+        left = loadAsInt(cg, left, biggest);
+        right = loadAsInt(cg, right, biggest);
+    } else if (type->isFloat) {
+        left = loadAsFloat(cg, left, biggest);
+        right = loadAsFloat(cg, right, biggest);
+    } else {
+        assert(0);
     }
     return {left, right};
 }

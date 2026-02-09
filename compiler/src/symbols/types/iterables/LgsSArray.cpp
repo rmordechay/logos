@@ -61,7 +61,7 @@ Value* LgsSArray::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
 }
 
 Type* LgsSArray::getIRType(LgsCodeGen& cg) {
-    return ArrayType::get(baseType->getTypeOrPtr(cg), len);
+    return ArrayType::get(baseType->getIRType(cg), len);
 }
 
 LgsType* LgsSArray::applyBinOp(LgsType* rightType, LgsBinOp& op) {

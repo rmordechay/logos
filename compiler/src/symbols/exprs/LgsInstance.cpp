@@ -1,4 +1,6 @@
 #include "exprs/LgsInstance.h"
+
+#include "LgsRTTIndices.h"
 #include "exprs/LgsHashMap.h"
 #include "stmts/LgsField.h"
 #include "types/LgsObject.h"

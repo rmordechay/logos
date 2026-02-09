@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include "Lgs_Types.h"
 
+class LgsSelf;
 class LgsFieldType;
 class LgsEnumField;
 struct LgsBinOp;
@@ -133,6 +134,7 @@ public:
     LgsObject* asObject();
     LgsInterface* asInterface();
     LgsEnum* asEnum();
+    LgsSelf* asSelf();
     LgsGenericType* asGenericType();
     LgsIterable* asIterable();
     LgsSArray* asSArray();
@@ -150,12 +152,7 @@ public:
     virtual ~LgsType();
 };
 
-inline void freeType(LgsType* type) {
-    if (!type) return;
-    if (type->isScalar() || type->asAny() || type->asChar() || type->isVoid()) return;
-    if (type->asEnum() || type->asSubtype() || type->asGenericType() || type->asObject() || type->asInterface()) return;
-    delete type;
-}
+void freeType(LgsType* type);
 
 template<typename T>
 void freeTypes(std::vector<T*>& types) {
@@ -172,7 +169,7 @@ Value* loadRTTInfoIsHeap(LgsCodeGen& cg, Value* ptr);
 Value* loadRTTInfoExtra(LgsCodeGen& cg, Value* ptr);
 Value* eqIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
 Value* neIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
-Value* ltIR(LgsCodeGen& cg, Value* left, Value* right, const LgsType* type);
+Value* ltIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
 Value* gtIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
 Value* geIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
 Value* leIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
@@ -180,4 +177,6 @@ Value* andIR(LgsCodeGen& cg, Value* left, Value* right);
 Value* orIR(LgsCodeGen& cg, Value* left, Value* right);
 Value* crossIR(LgsCodeGen& cg, Value* left, Value* right, LgsVec* vec);
 LgsType* getBiggestIntType(const std::vector<LgsType*>& types);
-std::pair<Value*, Value*> loadNumberPair(LgsCodeGen& cg, Value* left, Value* right, Type* type);
+Value* loadAsInt(LgsCodeGen& cg, Value* v, Type* intType);
+Value* loadAsFloat(LgsCodeGen& cg, Value* v, Type* floatType);
+std::pair<Value*, Value*> loadNumberPair(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);

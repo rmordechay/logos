@@ -6,7 +6,7 @@ add_executable(lgs_tests
     parser/ParserErrorTest.cpp
     parser/ParserTest.cpp
     sema/SemaErrorTest.cpp
-    sema/TypeResolutionTest.cpp
+    sema/resolver/SArrTest.cpp
     codegen/CodegenTest.cpp
     ${COMPILER_SOURCE}
 )

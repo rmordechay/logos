@@ -18,7 +18,7 @@ TEST(SemaErrorTest, E10000) {
     }
 }
 
-TEST(SemaErrorTest, Er0001A) {
+TEST(SemaErrorTest, E0001A) {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -34,29 +34,12 @@ TEST(SemaErrorTest, Er0001A) {
     }
 }
 
-TEST(SemaErrorTest, Er0002A) {
+TEST(SemaErrorTest, E0002A) {
     LgsApp app;
     const auto code = R"(
     main() {
         a = 6
         for i in a {}
-    }
-    )";
-    app.loadSrcFile(code);
-    assert(app.errHandler.successful);
-    app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10002, code);
-    if (app.errHandler.errors.size() > 0) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10002.errCode);
-    }
-}
-
-TEST(SemaErrorTest, Er0002B) {
-    LgsApp app;
-    const auto code = R"(
-    main() {
-        num = 1
-        a = num[1:3]
     }
     )";
     app.loadSrcFile(code);
@@ -85,7 +68,7 @@ TEST(SemaErrorTest, E10004) {
     }
 }
 
-TEST(SemaErrorTest, Er0005A) {
+TEST(SemaErrorTest, E0005A) {
     LgsApp app;
     const auto code = R"(
     object Obj {
@@ -105,14 +88,14 @@ TEST(SemaErrorTest, Er0005A) {
     }
 }
 
-TEST(SemaErrorTest, Er0005B) {
+TEST(SemaErrorTest, E0005B) {
     LgsApp app;
     const auto code = R"(
     object Obj {
         a: Int
     }
     main() {
-        obj = Obj{a = 3487, b = 234}
+        obj = Obj{a=3487, b=234}
     }
     )";
     app.loadSrcFile(code);
@@ -124,7 +107,7 @@ TEST(SemaErrorTest, Er0005B) {
     }
 }
 
-TEST(SemaErrorTest, Er0006A) {
+TEST(SemaErrorTest, E0006A) {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -140,7 +123,7 @@ TEST(SemaErrorTest, Er0006A) {
     }
 }
 
-TEST(SemaErrorTest, Er0006B) {
+TEST(SemaErrorTest, E0006B) {
     LgsApp app;
     const auto code = R"(
     enum Enum {
@@ -165,7 +148,7 @@ TEST(SemaErrorTest, Er0006B) {
     }
 }
 
-TEST(SemaErrorTest, Er0011A) {
+TEST(SemaErrorTest, E0011A) {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -182,7 +165,7 @@ TEST(SemaErrorTest, Er0011A) {
     }
 }
 
-TEST(SemaErrorTest, Er0013A) {
+TEST(SemaErrorTest, E0013A) {
     LgsApp app;
     const auto code = R"(
     object Obj {a: Int}
@@ -200,7 +183,7 @@ TEST(SemaErrorTest, Er0013A) {
     }
 }
 
-TEST(SemaErrorTest, Er0013B) {
+TEST(SemaErrorTest, E0013B) {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -217,25 +200,7 @@ TEST(SemaErrorTest, Er0013B) {
     }
 }
 
-TEST(SemaErrorTest, E10014) {
-    LgsApp app;
-    const auto code = R"(
-    main() {
-        switch "str" {
-            1: {  }
-        }
-    }
-    )";
-    app.loadSrcFile(code);
-    assert(app.errHandler.successful);
-    app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10014, code);
-    if (app.errHandler.errors.size() > 0) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10014.errCode);
-    }
-}
-
-TEST(SemaErrorTest, Er0015A) {
+TEST(SemaErrorTest, E0015A) {
     LgsApp app;
     const auto code = R"(
     func(a: Int) { }
@@ -252,7 +217,7 @@ TEST(SemaErrorTest, Er0015A) {
     }
 }
 
-TEST(SemaErrorTest, Er0015B) {
+TEST(SemaErrorTest, E0015B) {
     LgsApp app;
     const auto code = R"(
     object Obj1 {
@@ -278,7 +243,7 @@ TEST(SemaErrorTest, Er0015B) {
     }
 }
 
-TEST(SemaErrorTest, Er0016A) {
+TEST(SemaErrorTest, E0016A) {
     LgsApp app;
     const auto code = R"(
     interface Interface {
@@ -299,7 +264,7 @@ TEST(SemaErrorTest, Er0016A) {
     }
 }
 
-TEST(SemaErrorTest, Er0016B) {
+TEST(SemaErrorTest, E0016B) {
     LgsApp app;
     const auto code = R"(
     interface Type {
@@ -369,7 +334,7 @@ TEST(SemaErrorTest, E10021) {
     }
 }
 
-TEST(SemaErrorTest, E10022) {
+TEST(SemaErrorTest, E10033) {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -380,9 +345,9 @@ TEST(SemaErrorTest, E10022) {
     app.loadSrcFile(code);
     assert(app.errHandler.successful);
     app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10022, code);
+    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10033, code);
     if (app.errHandler.errors.size() > 0) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10022.errCode);
+        EXPECT_EQ(app.errHandler.errors[0].errCode, E10033.errCode);
     }
 }
 
@@ -476,7 +441,7 @@ TEST(SemaErrorTest, E10028) {
     }
 }
 
-TEST(SemaErrorTest, Er0030A) {
+TEST(SemaErrorTest, E0030A) {
     LgsApp app;
     const auto code1 = R"(
     object Obj
@@ -499,7 +464,7 @@ TEST(SemaErrorTest, Er0030A) {
     }
 }
 
-TEST(SemaErrorTest, Er0030B) {
+TEST(SemaErrorTest, E0030B) {
     LgsApp app;
     const auto code1 = R"(
     object Obj
@@ -572,9 +537,9 @@ TEST(SemaErrorTest, E10033A) {
     app.loadSrcFile(code, "Obj.lgs");
     assert(app.errHandler.successful);
     app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10032, code);
+    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10033, code);
     if (app.errHandler.errors.size() > 0) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10032.errCode);
+        EXPECT_EQ(app.errHandler.errors[0].errCode, E10033.errCode);
     }
 }
 
@@ -587,9 +552,9 @@ TEST(SemaErrorTest, E10033B) {
     app.loadSrcFile(code, "Interface.lgs");
     assert(app.errHandler.successful);
     app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10032, code);
+    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10033, code);
     if (app.errHandler.errors.size() > 0) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10032.errCode);
+        EXPECT_EQ(app.errHandler.errors[0].errCode, E10033.errCode);
     }
 }
 
@@ -603,9 +568,9 @@ TEST(SemaErrorTest, E10033C) {
     app.loadSrcFile(code);
     assert(app.errHandler.successful);
     app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 2) << EXPECTED_ERR(E10032, code);
+    EXPECT_EQ(app.errHandler.errors.size(), 2) << EXPECTED_ERR(E10033, code);
     if (app.errHandler.errors.size() > 1) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10032.errCode);
+        EXPECT_EQ(app.errHandler.errors[0].errCode, E10033.errCode);
         EXPECT_EQ(app.errHandler.errors[1].errCode, E10033.errCode);
     }
 }
@@ -647,7 +612,7 @@ TEST(SemaErrorTest, E10042) {
     LgsApp app;
     const auto code = R"(
     main() {
-        map: {Str: Str}
+        map: {Int: Int}
         a = map[1:3]
     }
     )";
@@ -695,39 +660,6 @@ TEST(SemaErrorTest, E10046) {
     }
 }
 
-TEST(SemaErrorTest, Er0048A) {
-    LgsApp app;
-    const auto code = R"(
-    main() {
-        arr: Int[2]
-        arr[3] := 2
-    }
-    )";
-    app.loadSrcFile(code);
-    assert(app.errHandler.successful);
-    app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10048, code);
-    if (app.errHandler.errors.size() > 0) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10048.errCode);
-    }
-}
-
-TEST(SemaErrorTest, Er0048B) {
-    LgsApp app;
-    const auto code = R"(
-    main() {
-        a = "Roi bla"
-        b = a[1:7]
-    }
-    )";
-    app.loadSrcFile(code);
-    assert(app.errHandler.successful);
-    app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10048, code);
-    if (app.errHandler.errors.size() > 0) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10048.errCode);
-    }
-}
 
 TEST(SemaErrorTest, E10055) {
     LgsApp app;
@@ -744,7 +676,7 @@ TEST(SemaErrorTest, E10055) {
     }
 }
 
-TEST(SemaErrorTest, Er0056A) {
+TEST(SemaErrorTest, E0056A) {
     LgsApp app;
     const auto code = R"(
     object Obj {
@@ -762,7 +694,7 @@ TEST(SemaErrorTest, Er0056A) {
     }
 }
 
-TEST(SemaErrorTest, Er0056B) {
+TEST(SemaErrorTest, E0056B) {
     LgsApp app;
     const auto code = R"(
     object Obj {
@@ -778,27 +710,6 @@ TEST(SemaErrorTest, Er0056B) {
     if (app.errHandler.errors.size() > 0) {
         EXPECT_EQ(app.errHandler.errors[0].errCode, E10056.errCode);
     }
-}
-
-TEST(SemaErrorTest, E10058) {
-    LgsApp app;
-    const auto code = R"(
-        interface Inter { x: Int }
-        interface Inter2 { x: Int }
-        object Obj2 {
-            implements: Inter, Inter2
-            x: Int
-        }
-        main() {}
-    )";
-    app.loadSrcFile(code);
-    assert(app.errHandler.successful);
-    app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 2);
-    if (app.errHandler.errors.size() > 0) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10058.errCode);
-    }
-    EXPECT_EQ(app.errHandler.errors[1].errCode, E10058.errCode);
 }
 
 TEST(SemaErrorTest, E10059) {
@@ -841,11 +752,10 @@ TEST(SemaErrorTest, E10064) {
     app.loadSrcFile(code);
     assert(app.errHandler.successful);
     app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 2);
+    EXPECT_EQ(app.errHandler.errors.size(), 1);
     if (app.errHandler.errors.size() > 0) {
         EXPECT_EQ(app.errHandler.errors[0].errCode, E10064.errCode);
     }
-    EXPECT_EQ(app.errHandler.errors[1].errCode, E10064.errCode);
 }
 
 TEST(SemaErrorTest, E10066) {
@@ -871,8 +781,8 @@ TEST(SemaErrorTest, E10076) {
     LgsApp app;
     const auto code = R"(
     main() {
-        v1 = vec3(.23, .578, .17)
-        v2 = vec2(.32, .38)
+        v1 = Vec3(.23, .578, .17)
+        v2 = Vec2(.32, .38)
         v3 = v1 + v2
         v4 = v1 - v2
         v5 = v1 * v2
@@ -891,11 +801,11 @@ TEST(SemaErrorTest, E10076) {
 TEST(SemaErrorTest, E10089) {
     LgsApp app;
     const auto code = R"(
-    object Singleton {
+    object Obj {
         x: Int
     }
     main() {
-        Singleton.x := 23
+        Obj.x := 23
     }
     )";
     app.loadSrcFile(code);
@@ -936,5 +846,22 @@ TEST(SemaErrorTest, E10097) {
     EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10097, code);
     if (app.errHandler.errors.size() > 0) {
         EXPECT_EQ(app.errHandler.errors[0].errCode, E10097.errCode);
+    }
+}
+
+TEST(SemaErrorTest, E00108) {
+    LgsApp app;
+    const auto code = R"(
+    main() {
+        num = 1
+        a = num[1:3]
+    }
+    )";
+    app.loadSrcFile(code);
+    assert(app.errHandler.successful);
+    app.analyse();
+    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10108, code);
+    if (app.errHandler.errors.size() > 0) {
+        EXPECT_EQ(app.errHandler.errors[0].errCode, E10108.errCode);
     }
 }

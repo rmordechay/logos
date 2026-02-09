@@ -42,21 +42,21 @@ bool LgsDouble::canCastTo(LgsType* other) {
 Value* LgsDouble::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
-    const auto [l, r] = loadNumberPair(cg, left->loadIR(cg), right->loadIR(cg), cg.doubleTy());
+    const auto [l, r] = loadNumberPair(cg, left->loadIR(cg), right->loadIR(cg), this);
     return cg.builder.CreateFAdd(l, r);
 }
 
 Value* LgsDouble::mulIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
-    const auto [l, r] = loadNumberPair(cg, left->loadIR(cg), right->loadIR(cg), cg.doubleTy());
+    const auto [l, r] = loadNumberPair(cg, left->loadIR(cg), right->loadIR(cg), this);
     return cg.builder.CreateFMul(l, r);
 }
 
 Value* LgsDouble::powIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
-    const auto [l, r] = loadNumberPair(cg, left->loadIR(cg), right->loadIR(cg), cg.doubleTy());
+    const auto [l, r] = loadNumberPair(cg, left->loadIR(cg), right->loadIR(cg), this);
     return cg.callFunc("pow", cg.doubleTy(), {cg.doubleTy(), cg.doubleTy()}, {l, r});
 }
 

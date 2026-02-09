@@ -23,9 +23,13 @@ Value* LgsPrint::call(LgsCodeGen& cg, std::vector<LgsFuncArg>& args) {
         const auto fieldName = LgsFieldType::loadRTName(cg, cg.loadPtr(arg->IRValue));
         return cg.callPrintf({fmt, fieldName});
     }
-    if (type->isInt || type->asChar() || type->asAny()) {
+    if (type->isInt || type->asChar()) {
         const auto fmt = cg.getString(type->fmtStr() + "\n");
-        return cg.callPrintf({fmt, arg->loadIR(cg)});
+        return cg.callPrintf({fmt, loadAsInt(cg, arg->IRValue, type->getIRType(cg))});
+    }
+    if (type->asAny()) {
+        const auto fmt = cg.getString(type->fmtStr() + "\n");
+        return cg.callPrintf({fmt, arg->IRValue});
     }
     if (const auto enum_ = type->asEnum()) {
         const auto fmt = cg.getString(type->fmtStr() + "\n");

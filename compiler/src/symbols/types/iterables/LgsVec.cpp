@@ -94,6 +94,7 @@ LgsType* LgsVec::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     case SUB:
     case MODULO: {
         if (otherVec) {
+            if (dimVec != otherVec->dimVec) return nullptr;
             if (baseType->isFloat || otherVec->baseType->isFloat) return new LgsVec(dimVec, &LGS_FLOAT);
             if (baseType->sizeBytes() >= otherVec->baseType->sizeBytes()) return this;
             return new LgsVec(dimVec, otherVec->baseType);
@@ -106,11 +107,17 @@ LgsType* LgsVec::applyBinOp(LgsType* rightType, LgsBinOp& op) {
         break;
     }
     case DIV:
-        if (otherVec) return new LgsVec(dimVec, &LGS_FLOAT);
+        if (otherVec) {
+            if (dimVec != otherVec->dimVec) return nullptr;
+            return new LgsVec(dimVec, &LGS_FLOAT);
+        }
         if (rightType->isScalar()) return new LgsVec(dimVec, &LGS_FLOAT);
         break;
     case MUL:
-        if (otherVec && canCastTo(rightType)) return &LGS_FLOAT; // dot product
+        if (otherVec) {
+            if (dimVec != otherVec->dimVec) return nullptr;
+            return &LGS_FLOAT; // dot product
+        }
         if (rightType->isScalar()) {
             if (baseType->isFloat || rightType->isFloat) return new LgsVec(dimVec, &LGS_FLOAT);
             if (baseType->sizeBytes() >= rightType->sizeBytes()) return this;

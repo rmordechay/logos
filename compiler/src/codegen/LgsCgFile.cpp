@@ -358,7 +358,7 @@ void LgsCgFile::visitIfWithElse(LgsIfStmt* ifStmt) {
     // if block
     stack.enterScope(ifStmt);
     visitExpr(ifStmt->ifCond);
-    const auto ifCondIR = ifStmt->IRValue;
+    const auto ifCondIR = ifStmt->ifCond->IRValue;
     cg.builder.CreateCondBr(ifCondIR, IRBlockTrue, IRBlockExit);
     cg.startBlock(IRBlockTrue);
     visitStmtsBlock(ifStmt->ifBlock);
@@ -609,14 +609,14 @@ void LgsCgFile::visitBinaryExpr(LgsBinaryExpr* binExpr) {
     case BIT_XOR: binExpr->IRValue = type->bitXorIR(cg, binExpr); break;
     case LSHIFT: binExpr->IRValue = type->rshiftIR(cg, binExpr); break;
     case RSHIFT: binExpr->IRValue = type->lshiftIR(cg, binExpr); break;
-    case EQ: binExpr->IRValue = eqIR(cg, l->IRValue, r->IRValue, l->type); break;
-    case NE: binExpr->IRValue = neIR(cg, l->IRValue, r->IRValue, l->type); break;
-    case LT: binExpr->IRValue = ltIR(cg, l->IRValue, r->IRValue, l->type); break;
-    case GT: binExpr->IRValue = gtIR(cg, l->IRValue, r->IRValue, l->type); break;
-    case GE: binExpr->IRValue = geIR(cg, l->IRValue, r->IRValue, l->type); break;
-    case LE: binExpr->IRValue = leIR(cg, l->IRValue, r->IRValue, l->type); break;
-    case AND: binExpr->IRValue = andIR(cg, l->IRValue, r->IRValue); break;
-    case OR: binExpr->IRValue = orIR(cg, l->IRValue, r->IRValue); break;
+    case EQ: binExpr->IRValue = eqIR(cg, l->loadIR(cg), r->loadIR(cg), l->type); break;
+    case NE: binExpr->IRValue = neIR(cg, l->loadIR(cg), r->loadIR(cg), l->type); break;
+    case LT: binExpr->IRValue = ltIR(cg, l->loadIR(cg), r->loadIR(cg), l->type); break;
+    case GT: binExpr->IRValue = gtIR(cg, l->loadIR(cg), r->loadIR(cg), l->type); break;
+    case GE: binExpr->IRValue = geIR(cg, l->loadIR(cg), r->loadIR(cg), l->type); break;
+    case LE: binExpr->IRValue = leIR(cg, l->loadIR(cg), r->loadIR(cg), l->type); break;
+    case AND: binExpr->IRValue = andIR(cg, l->loadIR(cg), r->loadIR(cg)); break;
+    case OR: binExpr->IRValue = orIR(cg, l->loadIR(cg), r->loadIR(cg)); break;
     case IN: binExpr->IRValue = r->type->asIterable()->inIR(cg, r->IRValue, l->IRValue); break;
     case CROSS: binExpr->IRValue = crossIR(cg, binExpr->left->IRValue, binExpr->right->IRValue, type->asVec()); break;
     default: assert(0);
@@ -833,12 +833,11 @@ void LgsCgFile::visitIterIndex(LgsIterIndex* iterIndex) {
     visitExpr(baseExpr);
     visitExpr(from);
     visitExpr(to);
-    const auto baseExprValue = baseExpr->pointee ? baseExpr->pointee : baseExpr->IRValue;
-    const auto ptr = to ? iterIndex->getIRRangePtr(cg) : iterable->getIRElement(cg, baseExprValue, from->IRValue);
-    if (baseExpr->asIterIndex()) {
-        iterIndex->pointee = ptr;
+    if (to) {
+        iterIndex->IRValue = iterIndex->getIRRangePtr(cg);
     } else {
-        iterIndex->IRValue = ptr;
+        const auto baseExprValue = baseExpr->pointee ? baseExpr->pointee : baseExpr->IRValue;
+        iterIndex->IRValue = iterable->getIRElement(cg, baseExprValue, from->IRValue);
     }
 }
 
@@ -848,8 +847,8 @@ void LgsCgFile::visitSelection(LgsSelection* selection) {
         visitExpr(firstExpr);
     }
 
-    const auto exprsCount = selection->exprs.size();
-    for (size_t i = firstExpr->isImportName; i < exprsCount - 1; ++i) {
+    const auto iterationCount = selection->exprs.size() - 1;
+    for (size_t i = firstExpr->isImportName; i < iterationCount; ++i) {
         const auto parent = selection->exprs[i];
         const auto child = selection->exprs[i + 1];
         if (const auto var = child->asVariable()) {
@@ -859,12 +858,12 @@ void LgsCgFile::visitSelection(LgsSelection* selection) {
         } else if (const auto methodCall = child->asFuncCall()) {
             if (methodCall->isMock) continue;
             visitFuncCall(methodCall);
-        } else if (child->asIterIndex()) {
-            assert(0);
+        } else if (const auto metaSelection = child->asMetaSelection()) {
+            visitMetaSelection(metaSelection);
         } else {
             assert(0);
         }
-        if (child->type->passByRef) {
+        if (i < iterationCount - 1 && child->type->passByRef) {
             child->IRValue = cg.loadPtr(child->IRValue);
         }
     }
@@ -946,9 +945,9 @@ void LgsCgFile::visitMetaSelection(LgsMetaSelection* metaSelection) {
     }
     if (const auto var = metaSelection->child->asVariable()) {
         const auto field = var->ref.field;
-        assert(var->ref.symbolType == FIELD && field->expr);
         visitExpr(field->expr);
         metaSelection->IRValue = field->expr->IRValue;
+        return;
     }
     assert(0);
 }

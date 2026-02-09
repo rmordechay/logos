@@ -24,6 +24,10 @@
 #include "stmts/LgsVarDec.h"
 #include "types/LgsNullable.h"
 
+LgsType* LgsExpr::getType() {
+    return type;
+}
+
 Value* LgsExpr::loadIR(LgsCodeGen& cg) {
     assert(0);
 }
@@ -127,18 +131,14 @@ std::optional<std::string> LgsExpr::getConstStr() {
     return std::nullopt;
 }
 
-LgsType* LgsExpr::getType() {
-    return type;
-}
-
-void LgsExpr::setType(LgsType* newType) {
-    type = newType;
-}
-
 LgsExpr* LgsExpr::wrapInNullable() {
     const auto nullableExpr = new LgsNullableExpr(this);
     nullableExpr->type = implicitCast;
     return nullableExpr;
+}
+
+void LgsExpr::setType(LgsType* newType) {
+    type = newType;
 }
 
 LgsExpr* LgsExpr::cast(bool explicitly) {

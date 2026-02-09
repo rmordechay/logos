@@ -15,13 +15,17 @@
 #include "errors/LgsErrHandler.h"
 #include "errors/LgsErrors.h"
 #include "types/LgsNullable.h"
+#include "types/LgsSelf.h"
 
 void LgsTypeResolver::resolveType(LgsType*& type) {
     if (!type) return;
     for (size_t i = 0; i < type->genericArgs.size(); ++i) {
         resolveType(type->genericArgs[i]);
     }
-
+    if (const auto self = type->asSelf()) {
+        self->baseType = currentObj;
+        return;
+    }
     if (const auto funcType = type->asFuncType()) {
         resolveFuncType(funcType);
     } else if (const auto iterable = type->asIterable()) {
@@ -72,7 +76,7 @@ void LgsTypeResolver::resolveType(LgsType*& type) {
 
 void LgsTypeResolver::resolveMainFile(LgsMainFile* mf) {
     for (const auto object : mf->objects) {
-        resolveObj(object);
+        resolveObjTypes(object);
     }
     for (const auto interface : mf->interfaces) {
         resolveInterface(interface);
@@ -86,13 +90,22 @@ void LgsTypeResolver::resolveMainFile(LgsMainFile* mf) {
     }
 }
 
-void LgsTypeResolver::resolveObj(LgsObject* obj) {
+void LgsTypeResolver::resolveObjTypes(LgsObject* obj) {
+    currentObj = obj;
     for (auto& interface : obj->implements) {
-        resolveType(interface);
+        if (interface->asSelf()) {
+            errHandler.addError(E10014, &interface->location, file->path, {});
+        } else {
+            resolveType(interface);
+        }
     }
 
     for (const auto generic : obj->generics) {
-        file->symbolTable.addSymbol(LgsSymbol(generic), &errHandler, file->path);
+        if (generic->asSelf()) {
+            errHandler.addError(E10014, &generic->location, file->path, {});
+        } else {
+            file->symbolTable.addSymbol(LgsSymbol(generic), &errHandler, file->path);
+        }
     }
 
     for (const auto& enum_ : obj->enums) {
@@ -113,6 +126,7 @@ void LgsTypeResolver::resolveObj(LgsObject* obj) {
             resolveType(param.type);
         }
     }
+    currentObj = nullptr;
 }
 
 void LgsTypeResolver::resolveInterface(LgsInterface* interface) {

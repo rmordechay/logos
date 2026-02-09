@@ -113,12 +113,10 @@ LgsFile* LgsParser::parseSrcFile(const bool isTestRun) {
 
 LgsFile* LgsParser::parseSrcFileHeaders() {
     if (!scanTokens()) return nullptr;
-
     while (true) {
         if (currentToken.type != T_IMPORT) break;
         parseImports();
     }
-
     LgsFile* file = nullptr;
     if (const auto objFile = parseObjectFile()) {
         file = objFile;
@@ -518,7 +516,7 @@ LgsType* LgsParser::parseType() {
     } else if (startToken.type == T_LPAREN) {
         type = parseFuncType();
     } else if (currentToken.type == T_SELF_CLASS) {
-        type = new LgsSelf(startToken.lexeme);
+        type = new LgsSelf();
         consume();
     } else if (currentToken.type == T_VEC2) {
         type = new LgsVec(2);
@@ -1153,7 +1151,9 @@ LgsReturn* LgsParser::parseReturnStmt() {
     const auto returnToken = currentToken;
     if (!matchAndConsume(T_RETURN)) return nullptr;
     const auto expr = parseExpr();
-    expr->isReturnExpr = true;
+    if (expr) {
+        expr->isReturnExpr = true;
+    }
     auto const returnStmt = new LgsReturn(expr);
     setLocation(returnStmt->location, &returnToken, &currentToken);
     return returnStmt;
@@ -1388,6 +1388,8 @@ LgsVariable* LgsParser::parseVariable() {
     } else if (currentToken.type == T_SELF_INSTANCE) {
         var = new LgsVariable(currentToken.lexeme);
         currentFunc->funcType->hasSelf = true;
+    } else if (currentToken.type == T_SELF_CLASS) {
+        var = new LgsVariable(currentToken.lexeme);
     } else {
         return nullptr;
     }
@@ -1440,11 +1442,11 @@ LgsFuncCall* LgsParser::parseFuncCall() {
                 addError(E10054, exprOrStmt->location, {argName});
                 break;
             }
-            funcCall->args.emplace_back(LgsFuncArg{exprOrStmt, argName});
+            funcCall->args.emplace_back(exprOrStmt, argName);
         } else {
             const auto exprOrStmt = parseArgExprOrLambda();
             if (!exprOrStmt) break;
-            funcCall->args.emplace_back(LgsFuncArg{exprOrStmt, argName});
+            funcCall->args.emplace_back(exprOrStmt, argName);
         }
         if (currentToken.type == T_RPAREN) break;
         mustMatch(T_COMMA);
@@ -1812,7 +1814,7 @@ LgsPostfixExpr* LgsParser::parsePostfixExpr(LgsExpr* baseExpr) {
 
 LgsSelection* LgsParser::parseSelection(LgsExpr* firstExpr) {
     assert(firstExpr);
-    const auto oldIndex = currentIndex;
+    const auto startIndex = currentIndex;
     std::vector<LgsExpr*> exprs;
     LgsVariable* importVar = nullptr;
     if (isImportName(firstExpr)) {
@@ -1832,19 +1834,22 @@ LgsSelection* LgsParser::parseSelection(LgsExpr* firstExpr) {
         if (expr) {
             if (const auto iterIndex = parseIterIndex(expr)) expr = iterIndex;
         }
+        if (matchAndConsume(T_DOUBLE_COLON)) {
+            expr = parseMetaSelection(expr);
+        }
         exprs.push_back(expr);
         if (!matchAndConsume(T_DOT)) break;
     }
 
     if (exprs.empty()) {
-        reset(oldIndex);
+        reset(startIndex);
         return nullptr;
     }
 
     if (exprs.size() == 1) {
         assert(exprs.front() == firstExpr);
         freeExpr(exprs.front());
-        reset(oldIndex);
+        reset(startIndex);
         return nullptr;
     }
 
@@ -1854,15 +1859,17 @@ LgsSelection* LgsParser::parseSelection(LgsExpr* firstExpr) {
     return selection;
 }
 
-LgsMetaSelection* LgsParser::parseMetaSelection(LgsExpr* firstExpr) {
+LgsMetaSelection* LgsParser::parseMetaSelection(LgsExpr* baseExpr) {
+    const auto startIndex = currentToken;
     LgsExpr* expr = nullptr;
     if (const auto funcCall = parseFuncCall()) {
         expr = funcCall;
     } else if (const auto variable = parseVariable()) {
         expr = variable;
     }
-    const auto metaSelection = new LgsMetaSelection(firstExpr, expr);
-    metaSelection->location = firstExpr->location;
+    const auto metaSelection = new LgsMetaSelection(baseExpr, expr);
+    metaSelection->location = baseExpr->location;
+    setLocation(metaSelection->location, &startIndex, &startIndex);
     return metaSelection;
 }
 

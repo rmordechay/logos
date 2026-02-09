@@ -3,10 +3,13 @@
 
 class LgsSelf final : public LgsType {
 public:
-    std::string name;
     LgsType* baseType = nullptr;
 
-    explicit LgsSelf(const std::string& name) : name(name) {}
+    explicit LgsSelf() {
+        isHeap = true;
+        passByRef = true;
+        rttKind = RTT_OBJECT;
+    }
     Type* getIRType(LgsCodeGen& cg) override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;

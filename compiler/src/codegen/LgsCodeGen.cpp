@@ -276,7 +276,7 @@ void LgsCodeGen::createIndexBoundsGuard(Value* len, Value* index) {
     const auto invalidBlock = createBlock("invalid_block");
     builder.CreateCondBr(condition, invalidBlock, validBlock);
     startBlock(invalidBlock);
-    throwError(E10003);
+    throwError(E10003, {index});
     branchAndStartBlock(validBlock);
 }
 

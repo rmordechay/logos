@@ -9,6 +9,7 @@
 #include <llvm/IR/Module.h>
 
 #include "LgsConfigs.h"
+#include "LgsRTTIndices.h"
 #include "Lgs_Exprs.h"
 
 LgsFunc* LgsMap::getMethod(const std::string& methodName) {

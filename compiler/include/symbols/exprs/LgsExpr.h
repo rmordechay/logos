@@ -37,7 +37,6 @@ class LgsFloatConst;
 class LgsStrConst;
 class LgsTypeConst;
 
-
 class LgsExpr : public LgsValue {
 public:
     LgsType* type = nullptr;
@@ -50,14 +49,14 @@ public:
     Value* pointee = nullptr;
 
     explicit LgsExpr(LgsType* type = nullptr) : type(type) {}
-    virtual Value* loadIR(LgsCodeGen& cg);
+    LgsType* getType() override;
+    LgsExpr* wrapInNullable();
     std::optional<int64_t> getConstInt();
     std::optional<double_t> getConstFloat();
     std::optional<std::string> getConstStr();
-    LgsType* getType() override;
 
+    virtual Value* loadIR(LgsCodeGen& cg);
     virtual void setType(LgsType* newType);
-    LgsExpr* wrapInNullable();
     virtual LgsExpr* cast(bool explicitly);
     virtual bool equals(LgsExpr* other);
     virtual std::string asText() = 0;

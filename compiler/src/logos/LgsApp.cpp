@@ -238,8 +238,8 @@ void LgsApp::loadSrcFile(LgsFileMetadata& metadata) {
 }
 
 void LgsApp::loadSrcFile(const std::string& fileCode, const fs::path& filePath) {
-    LgsFileMetadata metadata(filePath);
-    LgsParser parser(&metadata, paths, globals);
+    filesMetadata.emplace_back(filePath);
+    LgsParser parser(&filesMetadata.back(), paths, globals);
     parser.lgsCode = fileCode;
     const auto file = parser.parseSrcFile(configs.isTestRun);
     {
@@ -341,7 +341,7 @@ bool LgsApp::resolveGlobals() {
             if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
                 typeResolver.resolveMainFile(mainFile);
             } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
-                typeResolver.resolveObj(objFile->obj);
+                typeResolver.resolveObjTypes(objFile->obj);
             } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
                 typeResolver.resolveInterface(interfaceFile->interface);
             }

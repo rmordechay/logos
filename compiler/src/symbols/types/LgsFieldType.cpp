@@ -3,6 +3,7 @@
 #include <cassert>
 
 #include "LgsDefinitions.h"
+#include "LgsRTTIndices.h"
 #include "types/LgsObject.h"
 
 std::string LgsFieldType::getName() {

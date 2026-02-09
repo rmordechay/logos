@@ -47,12 +47,12 @@ public:
     Type* getIRType(LgsCodeGen& cg) override;
     Constant* getRTTypeExtra(LgsCodeGen& cg) override;
     size_t sizeBytes() override;
-    void cloneFields(LgsInstance* instance) const;
     LgsExpr* getZeroValue() override;
     Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee) override;
     bool canCastTo(LgsType* other) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     std::string fmtStr() const override;
+    void cloneFields(LgsInstance* instance) const;
     DIType* getDebugType(LgsCodeGen& cg) override;
     Function* getObjsEqFunc(LgsCodeGen& cg) const;
     Function* getObjsHashFunc(LgsCodeGen& cg) const;

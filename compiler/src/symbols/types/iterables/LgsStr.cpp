@@ -1,5 +1,6 @@
 #include <llvm/IR/Module.h>
 
+#include "LgsRTTIndices.h"
 #include "Lgs_Exprs.h"
 #include "exprs/LgsFuncCall.h"
 #include "exprs/constants/LgsStrConst.h"
@@ -63,6 +64,11 @@ LgsType* LgsStr::applyBinOp(LgsType* rightType, LgsBinOp& op) {
         break;
     }
     return nullptr;
+}
+
+std::optional<int64_t> LgsStr::getConstLength() {
+    if (length == 0) return std::nullopt;
+    return length;
 }
 
 Value* LgsStr::getIRElement(LgsCodeGen& cg, Value* iterable, Value* index) {

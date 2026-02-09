@@ -2,8 +2,10 @@
 
 #include <cassert>
 
+#include "LgsDefinitions.h"
+
 Type* LgsSelf::getIRType(LgsCodeGen& cg) {
-    assert(0);
+    return baseType->getIRType(cg);
 }
 
 size_t LgsSelf::sizeBytes() {
@@ -15,11 +17,11 @@ LgsExpr* LgsSelf::getZeroValue() {
 }
 
 std::string LgsSelf::getName() {
-    return name;
+    return LGS_SELF_CLASS;
 }
 
 bool LgsSelf::canCastTo(LgsType* other) {
-    assert(0);
+    return baseType && baseType->canCastTo(other);
 }
 
 LgsType* LgsSelf::applyBinOp(LgsType* rightType, LgsBinOp& op) {
