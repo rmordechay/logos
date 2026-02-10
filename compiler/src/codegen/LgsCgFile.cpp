@@ -656,9 +656,8 @@ void LgsCgFile::visitInstance(LgsInstance* instance) {
     for (const auto field : instance->fields) {
         const auto fieldType = field->type;
         if (visited.contains(field->name) || fieldType->asEnum()) continue;
-        field->expr->pointee = field->getGEP(cg, instance->IRValue);
-        visitExpr(field->expr);
-        cg.store(field->expr->IRValue, field->expr->pointee);
+        const auto pointee = field->getGEP(cg, instance->IRValue);
+        cg.store(field->type->getIRZeroValue(cg, pointee), pointee);
     }
 }
 
@@ -851,6 +850,7 @@ void LgsCgFile::visitSelection(LgsSelection* selection) {
     for (size_t i = firstExpr->isImportName; i < iterationCount; ++i) {
         const auto parent = selection->exprs[i];
         const auto child = selection->exprs[i + 1];
+        // cg.createNullPtrGuard(cg.loadPtr(parent->IRValue));
         if (const auto var = child->asVariable()) {
             visitFieldSelection(var, parent);
         } else if (const auto nullableExpr = child->asNullableExpr()) {
@@ -988,9 +988,10 @@ void LgsCgFile::visitFuncCall(LgsFuncCall* funcCall) {
     // Virtual func call
     if (ft->isVirtual) {
         const auto self = funcCall->args.front().expr;
-        const auto ty = self->type->getIRType(cg);
-        const auto rttType = LgsInstance::loadRTType(cg, ty, self->IRValue);
-        func->IRValue = cg.getVFunc(rttType, cg.getString(ft->name));
+        const auto offset = cg.getTypeSize(cg.sizeTy());
+        const auto rttType = cg.builder.CreatePtrAdd(self->IRValue, offset);
+        const auto objType = loadRTTInfoExtra(cg, cg.loadPtr(rttType));
+        func->IRValue = cg.getVFunc(objType, cg.getString(ft->name));
     }
 
     if (funcCall->coroutine || funcCall->isDeferred) return;

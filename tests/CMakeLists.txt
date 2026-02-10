@@ -3,11 +3,14 @@ enable_testing()
 
 add_executable(lgs_tests
     main.cpp
+    LgsTestUtils.h
     parser/ParserErrorTest.cpp
     parser/ParserTest.cpp
     sema/SemaErrorTest.cpp
     sema/resolver/SArrTest.cpp
-    codegen/CodegenTest.cpp
+    codegen/CgTest.cpp
+    codegen/CgIfStmtTest.cpp
+    codegen/CgArithmeticsTest.cpp
     ${COMPILER_SOURCE}
 )
 

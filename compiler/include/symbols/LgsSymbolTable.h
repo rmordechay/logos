@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <vector>
 
+class LgsImport;
 class LgsFuncCall;
 class LgsExpr;
 class LgsStrConst;
@@ -14,7 +15,7 @@ struct LgsSymbolTable {
     std::unordered_map<std::string, LgsApp*> imports;
     std::unordered_map<std::string, LgsFunc*> coroutines;
     std::unordered_map<std::string, LgsFunc*> genericsFuncs;
-    std::vector<LgsStrConst*> cImportPaths;
+    std::vector<LgsImport*> importPaths;
     std::vector<LgsType*> genericsTypes;
     std::vector<LgsType*> rttTypes;
 

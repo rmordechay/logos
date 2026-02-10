@@ -31,6 +31,7 @@
 #include <llvm/Target/TargetMachine.h>
 
 #include "exprs/constants/LgsIntConst.h"
+#include "stmts/LgsImport.h"
 #include "types/LgsNullable.h"
 #include "types/iterables/LgsSArray.h"
 
@@ -109,9 +110,7 @@ bool LgsApp::setup() {
 bool LgsApp::parse() {
     // Code mode
     if (!lgsCode.empty()) {
-        for (auto [path, code] : lgsCode) {
-            loadSrcFile(code, path);
-        }
+        loadSrcFile(lgsCode, LGS_MAIN_FILE);
         return errHandler.successful;
     }
 
@@ -152,8 +151,8 @@ void LgsApp::parseCImports() {
     std::unordered_set<std::string> seen;
     for (const auto file : srcFiles) {
         LgsCCompiler lgsCC(paths);
-        for (const auto externalImport : file->symbolTable.cImportPaths) {
-            auto headerPath = externalImport->value;
+        for (const auto externalImport : file->symbolTable.importPaths) {
+            auto headerPath = externalImport->importPath;
             if (!seen.insert(headerPath).second) assert(0);
             if (lgsCC.parseFile(headerPath)) {
                 file->symbolTable.symbols.merge(lgsCC.parser.symbolTable.symbols);
@@ -166,7 +165,8 @@ void LgsApp::parseCImports() {
 
 bool LgsApp::analyse() {
     loadBuiltins();
-    if (!validateEnvs()) return false;
+    if (!validateProject()) return false;
+    if (!validateEnvsFiles()) return false;
     if (!resolveGlobals()) return false;
     for (const auto file : srcFiles) {
         threadPool.runTask([this, file] {
@@ -185,7 +185,7 @@ bool LgsApp::generate() {
     LgsCodeGen::initLLVM();
     if (!generateGenerics()) return false;
 
-    // Main file is generated first non-concurrently
+    // main.lgs is generated first non-concurrently
     const auto mainFile = getMainFile();
     assert(mainFile);
     mainFile->setupCodeGen(configs);
@@ -452,7 +452,21 @@ void LgsApp::createBuildDirs() {
     }
 }
 
-bool LgsApp::validateEnvs() {
+bool LgsApp::validateProject() {
+    if (configs.appMode != PROJECT_MODE) return true;
+    bool foundMain = false;
+    for (const auto& srcFile : srcFiles) {
+        if (!srcFile->isMain()) continue;
+        if (foundMain) {
+            errHandler.addError(E10009, {});
+            return false;
+        }
+        foundMain = true;
+    }
+    return true;
+}
+
+bool LgsApp::validateEnvsFiles() {
     if (configs.appMode != PROJECT_MODE) return true;
     for (const auto file : envFiles) {
         LgsSema semaAnalyser(configs, file, globals);
@@ -464,6 +478,7 @@ bool LgsApp::validateEnvs() {
 }
 
 bool LgsApp::validateRequiredEnvs() {
+    if (!appConfigFile) return true;
     for (const auto requiredEnv : appConfigFile->requiredEnvs) {
         for (const auto envFile : envFiles) {
             auto found = false;

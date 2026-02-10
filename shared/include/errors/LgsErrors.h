@@ -59,7 +59,7 @@ inline LgsBaseMsg E10044{"Value of switch case must be known at compile time. Gi
 inline LgsBaseMsg E10045{"Variadic argument cannot have default arguments.", errCodeStart++};
 inline LgsBaseMsg E10046{"%s is not callable.", errCodeStart++};
 inline LgsBaseMsg E10047{"External %s file '%s' was not found.", errCodeStart++};
-inline LgsBaseMsg E10048{"", errCodeStart++};
+inline LgsBaseMsg E10048{"Non-nullable recursive objects are not allowed.", errCodeStart++};
 inline LgsBaseMsg E10049{"Not enough information to infer the type of %s", errCodeStart++};
 inline LgsBaseMsg E10050{"Only integer values can be incremented (++) or decremented (--). Given: %s", errCodeStart++};
 inline LgsBaseMsg E10051{"%s cannot be overwritten.", errCodeStart++};
@@ -122,7 +122,7 @@ inline LgsBaseMsg E10107{"Could not find C library %s", errCodeStart++};
 inline LgsBaseMsg E10108{"%s is not indexable.", errCodeStart++};
 inline LgsBaseMsg E10109{"Expression of type %s cannot be set as default value.", errCodeStart++};
 inline LgsBaseMsg E10110{"Unsigned number cannot be negative.", errCodeStart++};
-inline LgsBaseMsg E10111{"", errCodeStart++};
+inline LgsBaseMsg E10111{"Null pointer exception.", errCodeStart++};
 inline LgsBaseMsg E10112{"Matrix rows/columns cannot be 0.", errCodeStart++};
 inline LgsBaseMsg E10113{"Only nullable values can be unwrapped with '!'.", errCodeStart++};
 inline LgsBaseMsg E10114{"Static array size must be known at compile time.", errCodeStart++};

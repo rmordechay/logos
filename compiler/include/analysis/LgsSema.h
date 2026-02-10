@@ -137,7 +137,7 @@ public:
     bool validateTypeName(const std::string& name, const LgsLocation& location);
     bool validateLocalName(const std::string& name, const LgsLocation& location);
     void visitObjImplements(LgsObject* obj, const std::vector<LgsType*>& interfaces);
-    void validateIndex(LgsIterIndex* iterIndex);
+    void validateIndex(const LgsIterIndex* iterIndex);
     bool validateFieldVisibility(LgsField* field, LgsType* parent, const LgsLocation& location);
     bool validateMethodVisibility(const LgsFunc* method, LgsType* parent, const LgsLocation& location);
     bool validateVecElements(const LgsVariable* fieldVar, LgsVec* vec);

@@ -1,4 +1,6 @@
 #pragma once
+#include <unordered_set>
+
 #include "LgsFuncType.h"
 #include "exprs/LgsFuncCall.h"
 #include "exprs/constants/LgsStrConst.h"
@@ -44,14 +46,16 @@ public:
     std::string getBaseName() override;
     LgsFunc* getMethod(const std::string& methodName) override;
     LgsFunc* getMetaFunc(const std::string& methodName);
-    Type* getIRType(LgsCodeGen& cg) override;
-    Constant* getRTTypeExtra(LgsCodeGen& cg) override;
+    std::string fmtStr() const override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
-    Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee) override;
     bool canCastTo(LgsType* other) override;
+    Value* hashValue(LgsCodeGen& cg, Value* value) override;
+    void hashNode(size_t& oldHash) override;
+    Type* getIRType(LgsCodeGen& cg) override;
+    Constant* getRTTypeExtra(LgsCodeGen& cg) override;
+    Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
-    std::string fmtStr() const override;
     void cloneFields(LgsInstance* instance) const;
     DIType* getDebugType(LgsCodeGen& cg) override;
     Function* getObjsEqFunc(LgsCodeGen& cg) const;
@@ -63,5 +67,6 @@ public:
     static StructType* getMethodRTTStruct(LgsCodeGen& cg);
     static Value* loadRTFieldsCount(LgsCodeGen& cg, Value* ptr);
     static Value* loadRTFields(LgsCodeGen& cg, Value* ptr);
+    bool checkRecursiveFields(std::unordered_set<std::string>& nestedObjectNames) const;
     ~LgsObject() override;
 };

@@ -121,6 +121,7 @@ set(COMPILER_SOURCE
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/stmts/LgsStmtsBlock.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/stmts/LgsVarDec.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/stmts/LgsSwitch.cpp
+    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/stmts/LgsImport.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/builtins/LgsPrint.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/builtins/LgsTest.cpp
 

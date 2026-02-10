@@ -6,6 +6,7 @@
 #include "lgsc/LgsCCompiler.h"
 #include "stmts/LgsAssignment.h"
 
+class LgsImport;
 class LgsMetaVar;
 struct LgsImportPackage;
 class LgsStmtsBlock;
@@ -74,6 +75,7 @@ public:
     LgsFunc* currentFunc = nullptr;
     LgsFileMetadata* metadata = nullptr;
     std::vector<LgsStrConst*> cImportPaths;
+    std::vector<LgsImport*> importPaths;
 
     LgsParser(LgsFileMetadata* metadata, LgsPaths& paths, LgsSymbolTable& globals, const bool headersOnly = false)
         : paths(paths), headersOnly(headersOnly), globals(globals), metadata(metadata) {
@@ -164,7 +166,7 @@ public:
     void parseImports();
 
     void setLocation(LgsLocation& location, const LgsToken* startToken, const LgsToken* endToken) const;
-    void extractStrParts(LgsStrConst& strConst);
+    void extractStrParts(LgsStrConst* strConst);
     std::pair<size_t, size_t> extractMatDims(const LgsToken& matToken);
     void validateTestFolder(const LgsFile* testFile);
     bool isImportName(LgsExpr* expr) const;
@@ -183,6 +185,6 @@ public:
     bool parsedOrReset(const void* value, size_t resetIndex);
     bool validateTypeName(const std::string& typeName, const LgsLocation* location);
     void addError(const LgsBaseMsg& lgsErr, const LgsLocation& location, const std::vector<std::string>& args = {});
-    void addParsingError();
+    void addParsingError(const LgsLocation* location = nullptr);
     void recursionGuard();
 };

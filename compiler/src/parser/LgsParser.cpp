@@ -1,17 +1,28 @@
 #include "parser/LgsParser.h"
+#include <unordered_set>
+#include "LgsTokens.h"
+#include "errors/LgsPlmErrors.h"
 #include "exprs/LgsArrayExpr.h"
-#include "stmts/LgsAssignment.h"
+#include "exprs/LgsBinaryExpr.h"
+#include "exprs/LgsCast.h"
+#include "exprs/LgsEnvVar.h"
 #include "exprs/LgsFuncCall.h"
 #include "exprs/LgsInstance.h"
 #include "exprs/LgsIterIndex.h"
+#include "exprs/LgsMatrixExpr.h"
+#include "exprs/LgsMetaSelection.h"
+#include "exprs/LgsNullableExpr.h"
 #include "exprs/LgsPostfixExpr.h"
 #include "exprs/LgsPrefixExpr.h"
 #include "exprs/LgsSelection.h"
+#include "exprs/LgsTernaryExpr.h"
 #include "exprs/LgsVariable.h"
 #include "exprs/LgsVectorExpr.h"
 #include "exprs/constants/LgsCharConst.h"
 #include "exprs/constants/LgsFloatConst.h"
 #include "exprs/constants/LgsStrConst.h"
+#include "exprs/constants/LgsUIntConst.h"
+#include "files/LgsAppConfigFile.h"
 #include "files/LgsEnvFile.h"
 #include "files/LgsInterfaceFile.h"
 #include "files/LgsMainFile.h"
@@ -19,31 +30,23 @@
 #include "files/LgsTestFile.h"
 #include "funcs/LgsCoroutine.h"
 #include "funcs/LgsMainFunc.h"
-#include "loops/LgsInfiniteLoop.h"
-#include "loops/LgsRangeLoop.h"
-#include "loops/LgsWhileLoop.h"
-#include "LgsTokens.h"
-#include "errors/LgsPlmErrors.h"
-#include "exprs/LgsBinaryExpr.h"
-#include "exprs/LgsCast.h"
-#include "exprs/LgsEnvVar.h"
-#include "exprs/LgsMatrixExpr.h"
-#include "exprs/LgsMetaSelection.h"
-#include "exprs/LgsTernaryExpr.h"
-#include "exprs/constants/LgsUIntConst.h"
-#include "files/LgsAppConfigFile.h"
 #include "lgsc/LgsCCompiler.h"
 #include "logos/LgsApp.h"
 #include "loops/LgsForeachLoop.h"
+#include "loops/LgsInfiniteLoop.h"
+#include "loops/LgsRangeLoop.h"
+#include "loops/LgsWhileLoop.h"
 #include "parser/LgsLexer.h"
+#include "stmts/LgsAssignment.h"
 #include "stmts/LgsBreak.h"
 #include "stmts/LgsContinue.h"
 #include "stmts/LgsDeferStmt.h"
+#include "stmts/LgsIfStmt.h"
+#include "stmts/LgsImport.h"
 #include "stmts/LgsIOPair.h"
 #include "stmts/LgsIOStmt.h"
-#include "stmts/LgsIfStmt.h"
-#include "stmts/LgsSwitch.h"
 #include "stmts/LgsReturn.h"
+#include "stmts/LgsSwitch.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsEnum.h"
 #include "types/LgsGenericType.h"
@@ -60,9 +63,6 @@
 #include "types/primitives/LgsShort.h"
 #include "types/primitives/LgsSize.h"
 #include "types/primitives/LgsUInt.h"
-#include <unordered_set>
-
-#include "exprs/LgsNullableExpr.h"
 
 LgsFunc* wrapStmtsBlockWithLambda(LgsStmtsBlock* stmtsBlock);
 
@@ -88,7 +88,6 @@ bool LgsParser::scanTokens() {
 
 LgsFile* LgsParser::parseSrcFile(const bool isTestRun) {
     if (!scanTokens()) return nullptr;
-
     while (true) {
         if (currentToken.type != T_IMPORT) break;
         parseImports();
@@ -107,7 +106,7 @@ LgsFile* LgsParser::parseSrcFile(const bool isTestRun) {
         }
     }
     assert(file);
-    file->symbolTable.cImportPaths = cImportPaths;
+    file->symbolTable.importPaths = importPaths;
     return file;
 }
 
@@ -125,7 +124,7 @@ LgsFile* LgsParser::parseSrcFileHeaders() {
         file = interfaceFile;
     }
     assert(file);
-    file->symbolTable.cImportPaths = cImportPaths;
+    file->symbolTable.importPaths = importPaths;
     return nullptr;
 }
 
@@ -451,9 +450,11 @@ LgsInterface* LgsParser::parseInterfaceBody(const LgsToken& tokenName) {
         funcHeader->parentName = interface->name;
         const auto method = new LgsFunc(funcHeader);
         method->funcType->isPublic = true;
-        method->funcType->isVirtual = true;
         method->funcType->addSelf(interface);
         method->stmtsBlock = parseStmtsBlock(false);
+        if (!method->stmtsBlock) {
+            method->funcType->isVirtual = true;
+        }
         if (method->stmtsBlock && method->stmtsBlock->isMacro) addParsingError();
         interface->addMethod(method);
         if (currentToken.type == T_RBRACE || currentToken.type == T_EOF) break;
@@ -755,7 +756,9 @@ LgsFunc* LgsParser::parseMethod(LgsObject* obj) {
     funcHeader->addSelf(obj);
     if (!headersOnly) {
         func->stmtsBlock = parseStmtsBlock();
-        if (func->stmtsBlock->isMacro) addParsingError();
+        if (!func->stmtsBlock || func->stmtsBlock->isMacro) {
+            addParsingError(&func->location);
+        }
     }
     currentFunc = nullptr;
     return func;
@@ -882,15 +885,18 @@ LgsStmtsBlock* LgsParser::parseStmtsBlock(const bool withSingleStmt) {
         }
         setLocation(stmtsBlock->location, &currentToken, &startToken);
     } else if (withSingleStmt) {
-        stmtsBlock = new LgsStmtsBlock();
         if (const auto expr = parseExpr()) {
+            stmtsBlock = new LgsStmtsBlock();
             stmtsBlock->location = expr->location;
             stmtsBlock->stmts.push_back(LgsStmtWrapper(expr));
             stmtsBlock->location = expr->location;
         } else if (const auto stmt = parseStmt()) {
+            stmtsBlock = new LgsStmtsBlock();
             stmtsBlock->location = stmt->location;
             stmtsBlock->stmts.push_back(LgsStmtWrapper(stmt));
             stmtsBlock->location = stmt->location;
+        } else {
+            return nullptr;
         }
         setLocation(stmtsBlock->location, &currentToken, &startToken);
     }
@@ -1462,7 +1468,7 @@ LgsStrConst* LgsParser::parseStrConst() {
     if (currentToken.type != T_STRING) return nullptr;
     const auto textToken = currentToken;
     const auto strConst = new LgsStrConst(textToken.lexeme);
-    extractStrParts(*strConst);
+    extractStrParts(strConst);
     consume();
     setLocation(strConst->location, &textToken, &currentToken);
     return strConst;
@@ -1937,9 +1943,9 @@ void LgsParser::parseImports() {
         const auto cToken = currentToken;
         consume();
         while (true) {
-            const auto strConst = parseStrConst();
-            if (!strConst) break;
-            cImportPaths.push_back(strConst);
+            if (currentToken.type != T_STRING) break;
+            importPaths.emplace_back(new LgsImport(LGS_C_IMPORT, currentToken.lexeme));
+            consume();
             if (cToken.location.lineStart != peek().location.lineStart) break;
             mustMatch(T_COMMA);
         }
@@ -1947,6 +1953,7 @@ void LgsParser::parseImports() {
         while (true) {
             const auto var = currentToken;
             if (!mustMatch(T_IDENTIFIER)) break;
+            importPaths.emplace_back(new LgsImport(LGS_IMPORT, currentToken.lexeme));
             if (importToken.location.lineStart != peek().location.lineStart) break;
             mustMatch(T_COMMA);
         }
@@ -1961,9 +1968,9 @@ void LgsParser::setLocation(LgsLocation& location, const LgsToken* startToken, c
     location.columnEnd = endToken->location.columnEnd;
 }
 
-void LgsParser::extractStrParts(LgsStrConst& strConst) {
+void LgsParser::extractStrParts(LgsStrConst* strConst) {
     size_t start = 0;
-    std::string replaced = strConst.value;
+    std::string replaced = strConst->value;
     while (true) {
         const auto open = replaced.find("${", start);
         if (open == std::string::npos) break;
@@ -1978,12 +1985,12 @@ void LgsParser::extractStrParts(LgsStrConst& strConst) {
         parser.lgsCode = part;
         parser.scanTokens();
         const auto expr = parser.parseExpr();
-        strConst.parts.push_back(expr);
+        strConst->parts.push_back(expr);
         replaced.replace(open, close + 1, LGS_STR_FMT_PLACEHOLDER);
         start = open + strlen(LGS_STR_FMT_PLACEHOLDER);
     }
-    if (replaced == strConst.value) return;
-    strConst.formatedStr = replaced;
+    if (replaced == strConst->value) return;
+    strConst->formatedStr = replaced;
 }
 
 std::pair<size_t, size_t> LgsParser::extractMatDims(const LgsToken& matToken) {
@@ -2174,9 +2181,9 @@ void LgsParser::addError(const LgsBaseMsg& lgsErr, const LgsLocation& location, 
     errHandler.addError(lgsErr, &location, metadata->path, args);
 }
 
-void LgsParser::addParsingError() {
-    const auto token = tokens[currentIndex];
-    return errHandler.addError(E10085, &token.location, metadata->path, {});
+void LgsParser::addParsingError(const LgsLocation* location) {
+    const auto t = location ? *location : tokens[currentIndex].location;
+    return errHandler.addError(E10085, &t, metadata->path, {});
 }
 
 void LgsParser::recursionGuard() {

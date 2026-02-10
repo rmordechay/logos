@@ -111,6 +111,8 @@ public:
     void startBlock(BasicBlock* block);
     void branchAndStartBlock(BasicBlock* block);
     Instruction* lastInstTerminator() const;
+    void assertGuard(Value* cond);
+    void createNullPtrGuard(Value* value);
     void createIndexBoundsGuard(Value* len, Value* index);
     void createArrBoundsGuard(Value* maxLen, Value* arrLen);
 

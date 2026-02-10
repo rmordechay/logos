@@ -30,7 +30,7 @@ LgsMainFile::~LgsMainFile() {
     }
     varDecs.clear();
     for (const auto& object : objects) {
-        // delete object;
+        delete object;
     }
     objects.clear();
     for (const auto& interface : interfaces) {

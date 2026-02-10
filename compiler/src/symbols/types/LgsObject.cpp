@@ -11,6 +11,7 @@
 #include "LgsConfigs.h"
 #include <ranges>
 #include <sstream>
+#include <unordered_set>
 #include <llvm/IR/Module.h>
 #include "LgsBinaryTokens.h"
 #include "LgsRTTIndices.h"
@@ -47,7 +48,7 @@ LgsFunc* LgsObject::getMetaFunc(const std::string& methodName) {
     if (methodName == OBJ_HASH_FUNC) {
         const auto func = new LgsFunc(methodName, &LGS_SIZE);
         func->fn = [&](LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) {
-            return cg.builder.CreateCall(getObjsHashFunc(cg), {args[0].expr->IRValue});
+            return hashValue(cg, args[0].expr->IRValue);
         };
         metaFuncs[methodName] = func;
         return func;
@@ -58,9 +59,10 @@ LgsFunc* LgsObject::getMetaFunc(const std::string& methodName) {
         const auto rt = new LgsFuncType("", &LGS_ANY, {param}, VARIADIC);
         const auto func = new LgsFunc(methodName, rt, {new LgsStr()});
         func->fn = [](LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) {
-            const auto arg = args[1].expr;
-            const auto funcName = arg->type->asStr()->loadRTData(cg, arg->IRValue);
-            const auto objType = loadRTTInfoExtra(cg, args[0].expr->type->getRTType(cg));
+            const auto objArg = args[0].expr;
+            const auto methodNameArg = args[1].expr;
+            const auto funcName = methodNameArg->type->asStr()->loadRTData(cg, methodNameArg->IRValue);
+            const auto objType = loadRTTInfoExtra(cg, objArg->type->getRTType(cg));
             return cg.getVFunc(objType, funcName);
         };
         metaFuncs[methodName] = func;
@@ -114,7 +116,8 @@ Constant* LgsObject::getRTTypeExtra(LgsCodeGen& cg) {
     const auto rttName = getRTTName();
     const auto numFields = fields.size();
     const auto numMethods = methods.size();
-    const auto sl = cg.IRModule->getDataLayout().getStructLayout(llvm::cast<StructType>(getIRType(cg)));
+    const auto ty = llvm::cast<StructType>(getIRType(cg));
+    const auto sl = cg.IRModule->getDataLayout().getStructLayout(ty);
 
     const auto objRTType = getObjRTTStruct(cg);
     const auto fieldRTType = LgsFieldType::getFieldRTTStruct(cg);
@@ -127,18 +130,18 @@ Constant* LgsObject::getRTTypeExtra(LgsCodeGen& cg) {
         const auto field = fields[i];
         assert(field->type->rttKind != RTT_UNKNOWN);
         const auto fieldName = cg.getString(field->name);
-        rttFields.emplace_back(ConstantStruct::get(
-            fieldRTType, {
+        rttFields.emplace_back(ConstantStruct::get(fieldRTType, {
             fieldName,
             field->type->IRSize(cg),
             cg.usize(sl->getElementOffset(i + 2)), // offset level and type
             cg.i32(field->type->rttKind),
-            field->type->asObject() ? cg.null() : field->type->getRTType(cg),
+            field->type->getRTType(cg),
         }));
     }
 
     std::vector<Constant*> rttMethods;
     for (auto& [_, method] : methods) {
+        if (method->funcType->isVirtual) continue;
         const std::vector<Constant*> args = {cg.getString(method->funcType->name), method->getIRFunc(cg)};
         rttMethods.emplace_back(ConstantStruct::get(methodRTType, args));
     }
@@ -149,16 +152,15 @@ Constant* LgsObject::getRTTypeExtra(LgsCodeGen& cg) {
     const auto rttMethodsGlobal = cg.createGlobal(rttName + "_funcs", methodsTypeArr, initializerMethods);
     const auto objName = cg.getString(name);
     objName->setName(rttName + "_name");
-    const std::vector<Constant*> args = {
-    cg.usize(id),
-    objName,
-    IRSize(cg),
-    cg.usize(numFields),
-    cg.usize(numMethods),
-    rttFieldsGlobal,
-    rttMethodsGlobal,
-    };
-    return cg.createGlobal(rttName + "_extra", objRTType, ConstantStruct::get(objRTType, args));
+    return cg.createGlobal(rttName + "_extra", objRTType, ConstantStruct::get(objRTType, {
+        cg.usize(id),
+        objName,
+        IRSize(cg),
+        cg.usize(numFields),
+        cg.usize(numMethods),
+        rttFieldsGlobal,
+        rttMethodsGlobal,
+    }));
 }
 
 size_t LgsObject::sizeBytes() {
@@ -196,6 +198,14 @@ bool LgsObject::canCastTo(LgsType* other) {
         return false;
     }
     return name == otherType->getName();
+}
+
+Value* LgsObject::hashValue(LgsCodeGen& cg, Value* value) {
+    return cg.builder.CreateCall(getObjsHashFunc(cg), {value});
+}
+
+void LgsObject::hashNode(size_t& oldHash) {
+    assert(0);
 }
 
 LgsType* LgsObject::applyBinOp(LgsType* rightType, LgsBinOp& op) {
@@ -372,6 +382,17 @@ Value* LgsObject::loadRTFieldsCount(LgsCodeGen& cg, Value* ptr) {
 
 Value* LgsObject::loadRTFields(LgsCodeGen& cg, Value* ptr) {
     return cg.loadStructField(getObjRTTStruct(cg), ptr, LgsObjIndices::fields, cg.ptrTy());
+}
+
+bool LgsObject::checkRecursiveFields(std::unordered_set<std::string>& nestedObjectNames) const {
+    for (const auto field : fields) {
+        if (const auto innerObj = field->type->asObject()) {
+            if (nestedObjectNames.contains(innerObj->name)) return false;
+            nestedObjectNames.insert(innerObj->name);
+            return innerObj->checkRecursiveFields(nestedObjectNames);
+        }
+    }
+    return true;
 }
 
 LgsObject::~LgsObject() {

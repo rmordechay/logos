@@ -266,6 +266,9 @@ Value* eqIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
     if (const auto obj = type->asObject()) {
         return cg.builder.CreateCall(obj->getObjsEqFunc(cg), {left, right});
     }
+    if (type->asNullable()) {
+        assert(0);
+    }
     assert(0);
 }
 

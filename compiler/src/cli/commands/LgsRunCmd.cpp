@@ -31,7 +31,7 @@ void LgsRunCmd::parseCompileArgs(LgsApp& app, std::vector<const char*>& appArgs)
             if (optLevel > 3) return errHandler.addError(E40003, {std::to_string(optLevel)});
             app.configs.optLevel = optLevel;
         } else if (isArgEqual(cmd, {"c", "code"})) {
-            app.configs.appMode = FILE_MODE;
+            app.configs.appMode = CODE_MODE;
         } else if (isArgEqual(cmd, {"d", "debug"})) {
             app.configs.debugMode = true;
         } else {
@@ -41,7 +41,7 @@ void LgsRunCmd::parseCompileArgs(LgsApp& app, std::vector<const char*>& appArgs)
 
     if (argStart < 0) return errHandler.addError(E40001, {});
     if (app.configs.appMode == FILE_MODE) {
-        app.lgsCode[LGS_MAIN_FILE] = argv[argStart++];
+        app.lgsCode = argv[argStart++];
     } else {
         auto path = argv[argStart++];
         if (!fs::exists(path)) return errHandler.addError(E40004, {path});

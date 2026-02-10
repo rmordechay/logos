@@ -270,24 +270,22 @@ Instruction* LgsCodeGen::lastInstTerminator() const {
     return builder.GetInsertBlock()->getTerminator();
 }
 
+void LgsCodeGen::assertGuard(Value* cond) {
+    ifStmt(cond, [this] {callFunc("abort", voidTy());});
+}
+
+void LgsCodeGen::createNullPtrGuard(Value* value) {
+    ifStmt(isNull(value), [this]{throwError(E10111);});
+}
+
 void LgsCodeGen::createIndexBoundsGuard(Value* len, Value* index) {
-    const auto condition = builder.CreateICmpUGE(extendToSize(index), extendToSize(len));
-    const auto validBlock = createBlock("valid_block");
-    const auto invalidBlock = createBlock("invalid_block");
-    builder.CreateCondBr(condition, invalidBlock, validBlock);
-    startBlock(invalidBlock);
-    throwError(E10003, {index});
-    branchAndStartBlock(validBlock);
+    const auto cond = builder.CreateICmpUGE(extendToSize(index), extendToSize(len));
+    ifStmt(cond, [this, &index]{throwError(E10003, {index});});
 }
 
 void LgsCodeGen::createArrBoundsGuard(Value* maxLen, Value* arrLen) {
-    const auto condition = builder.CreateICmpUGT(extendToSize(arrLen), extendToSize(maxLen));
-    const auto validBlock = createBlock();
-    const auto invalidBlock = createBlock();
-    builder.CreateCondBr(condition, invalidBlock, validBlock);
-    startBlock(invalidBlock);
-    throwError(E10105, {callSnprintf("%d", {maxLen})});
-    branchAndStartBlock(validBlock);
+    const auto cond = builder.CreateICmpUGT(extendToSize(arrLen), extendToSize(maxLen));
+    ifStmt(cond, [this, &maxLen]{throwError(E10105, {callSnprintf("%d", {maxLen})});});
 }
 
 FunctionType* LgsCodeGen::getFT(Type* rt, const std::vector<Type*>& params, const bool isVariadic) {

@@ -30,8 +30,8 @@ public:
     std::vector<LgsEnvFile*> envFiles;
     std::vector<LgsTestFile*> testFiles;
     LgsAppConfigFile* appConfigFile = nullptr;
-    std::unordered_map<std::string, std::string> lgsCode; // Used when passing code directly.
     std::vector<LgsFileMetadata> filesMetadata;
+    std::string lgsCode; // Used when passing code directly.
     LgsFile rttFile{"rtt", CG_MODE_RTTYPES};
     LgsPaths paths;
 
@@ -57,7 +57,8 @@ public:
     bool generateRTTTypes();
     bool generateGenerics();
     void createBuildDirs();
-    bool validateEnvs();
+    bool validateProject();
+    bool validateEnvsFiles();
     bool validateRequiredEnvs();
     void compareHash() const;
     void printIR() const;

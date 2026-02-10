@@ -112,6 +112,10 @@ void LgsSema::visitObject(LgsObject* obj) {
     obj->id = ++objsIDGenerator;
     currentObj = obj;
     validateTypeName(obj->name, obj->location);
+    std::unordered_set<std::string> nestedFields;
+    if (!obj->checkRecursiveFields(nestedFields)) {
+        return addError(E10048, obj->location);
+    }
     for (const auto field : obj->fields) {
         visitField(field);
     }
@@ -200,17 +204,11 @@ void LgsSema::visitObjImplements(LgsObject* obj, const std::vector<LgsType*>& in
                     if (!seenNames.insert(objMethodName).second) {
                         addError(E10064, objMethod->second->location, {objMethodName});
                     }
-                    objFuncType->isVirtual = true;
                     continue;
                 }
             }
-            if (interfaceMethod->stmtsBlock) {
-                interfaceMethod->funcType->isVirtual = true;
-                continue;
-            }
             missingMethods.emplace_back(interfaceMethod);
         }
-
         if (!missingMethods.empty() || !missingFields.empty()) {
             addError(E10016, obj->location, {obj->pname(), interface->name, getMissingImplementsStr(missingFields, missingMethods)});
         }
@@ -1460,7 +1458,7 @@ bool LgsSema::validateLocalName(const std::string& name, const LgsLocation& loca
     return true;
 }
 
-void LgsSema::validateIndex(LgsIterIndex* iterIndex) {
+void LgsSema::validateIndex(const LgsIterIndex* iterIndex) {
     const auto baseExpr = iterIndex->baseExpr;
     const auto exprFrom = iterIndex->index.from;
     const auto exprTo = iterIndex->index.to;

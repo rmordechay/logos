@@ -1,8 +1,9 @@
 #include "logos/LgsApp.h"
 #include "LgsUtils.h"
-#include <string>
-#include "gtest/gtest.h"
+#include "LgsTestUtils.h"
 #include "errors/LgsErrors.h"
+#include "gtest/gtest.h"
+#include <string>
 
 TEST(SemaErrorTest, E10000) {
     LgsApp app;
@@ -12,10 +13,7 @@ TEST(SemaErrorTest, E10000) {
     app.loadSrcFile(code);
     assert(app.errHandler.successful);
     app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10000, code);
-    if (app.errHandler.errors.size() > 0) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10000.errCode);
-    }
+    expectErrors(app, E10000, 1);
 }
 
 TEST(SemaErrorTest, E0001A) {
@@ -28,10 +26,7 @@ TEST(SemaErrorTest, E0001A) {
     app.loadSrcFile(code);
     assert(app.errHandler.successful);
     app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10001, code);
-    if (app.errHandler.errors.size() > 0) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10001.errCode);
-    }
+    expectErrors(app, E10001, 1);
 }
 
 TEST(SemaErrorTest, E0002A) {
@@ -45,13 +40,24 @@ TEST(SemaErrorTest, E0002A) {
     app.loadSrcFile(code);
     assert(app.errHandler.successful);
     app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10002, code);
-    if (app.errHandler.errors.size() > 0) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10002.errCode);
-    }
+    expectErrors(app, E10002, 1);
 }
 
-TEST(SemaErrorTest, E10004) {
+TEST(SemaErrorTest, E0003A) {
+    LgsApp app;
+    const auto code = R"(
+    main() {
+        arr: Int[2]
+        a = arr[2]
+    }
+    )";
+    app.loadSrcFile(code);
+    assert(app.errHandler.successful);
+    app.analyse();
+    expectErrors(app, E10003, 1);
+}
+
+TEST(SemaErrorTest, E10004A) {
     LgsApp app;
     const auto code = R"(
     f(): Int {
@@ -62,10 +68,7 @@ TEST(SemaErrorTest, E10004) {
     app.loadSrcFile(code);
     assert(app.errHandler.successful);
     app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10004, code);
-    if (app.errHandler.errors.size() > 0) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10004.errCode);
-    }
+    expectErrors(app, E10004, 1);
 }
 
 TEST(SemaErrorTest, E0005A) {
@@ -82,10 +85,7 @@ TEST(SemaErrorTest, E0005A) {
     app.loadSrcFile(code);
     assert(app.errHandler.successful);
     app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10005, code);
-    if (app.errHandler.errors.size() > 0) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10005.errCode);
-    }
+    expectErrors(app, E10005, 1);
 }
 
 TEST(SemaErrorTest, E0005B) {
@@ -101,10 +101,7 @@ TEST(SemaErrorTest, E0005B) {
     app.loadSrcFile(code);
     assert(app.errHandler.successful);
     app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10005, code);
-    if (app.errHandler.errors.size() > 0) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10005.errCode);
-    }
+    expectErrors(app, E10005, 1);
 }
 
 TEST(SemaErrorTest, E0006A) {
@@ -117,10 +114,7 @@ TEST(SemaErrorTest, E0006A) {
     app.loadSrcFile(code);
     assert(app.errHandler.successful);
     app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10006, code);
-    if (app.errHandler.errors.size() > 0) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10006.errCode);
-    }
+    expectErrors(app, E10006, 1);
 }
 
 TEST(SemaErrorTest, E0006B) {
@@ -142,10 +136,23 @@ TEST(SemaErrorTest, E0006B) {
     app.loadSrcFile(code);
     assert(app.errHandler.successful);
     app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10006, code);
-    if (app.errHandler.errors.size() > 0) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10006.errCode);
-    }
+    expectErrors(app, E10006, 1);
+}
+
+TEST(SemaErrorTest, E0009A) {
+    LgsApp app;
+    app.configs.appMode = PROJECT_MODE;
+    const auto code1 = R"(
+    main() {}
+    )";
+    const auto code2 = R"(
+    main() {}
+    )";
+    app.loadSrcFile(code1);
+    app.loadSrcFile(code2);
+    assert(app.errHandler.successful);
+    app.analyse();
+    expectErrors(app, E10009, 1);
 }
 
 TEST(SemaErrorTest, E0011A) {
@@ -159,10 +166,7 @@ TEST(SemaErrorTest, E0011A) {
     app.loadSrcFile(code);
     assert(app.errHandler.successful);
     app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10011, code);
-    if (app.errHandler.errors.size() > 0) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10011.errCode);
-    }
+    expectErrors(app, E10011, 1);
 }
 
 TEST(SemaErrorTest, E0013A) {
@@ -177,10 +181,7 @@ TEST(SemaErrorTest, E0013A) {
     app.loadSrcFile(code);
     assert(app.errHandler.successful);
     app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10005, code);
-    if (app.errHandler.errors.size() > 0) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10005.errCode);
-    }
+    expectErrors(app, E10005, 1);
 }
 
 TEST(SemaErrorTest, E0013B) {
@@ -194,10 +195,7 @@ TEST(SemaErrorTest, E0013B) {
     app.loadSrcFile(code);
     assert(app.errHandler.successful);
     app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10005, code);
-    if (app.errHandler.errors.size() > 0) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10005.errCode);
-    }
+    expectErrors(app, E10005, 1);
 }
 
 TEST(SemaErrorTest, E0015A) {
@@ -211,36 +209,7 @@ TEST(SemaErrorTest, E0015A) {
     app.loadSrcFile(code);
     assert(app.errHandler.successful);
     app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10015, code);
-    if (app.errHandler.errors.size() > 0) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10015.errCode);
-    }
-}
-
-TEST(SemaErrorTest, E0015B) {
-    LgsApp app;
-    const auto code = R"(
-    object Obj1 {
-        x: Int
-    }
-    object Obj2 {
-        obj1: Obj1
-    }
-    func(obj1: Obj1) {
-        obj2 = Obj2{}
-        obj2.obj1 := obj1
-    }
-    main() {
-        func(obj2.obj1)
-    }
-    )";
-    app.loadSrcFile(code);
-    assert(app.errHandler.successful);
-    app.analyse();
-    // EXPECT_EQ(app.errHandler.errors.size() ==,, EXPECTED_ER) <<(E10015, code);
-    if (app.errHandler.errors.size() > 0) {
-        // EXPECT_EQ(app.errHandler.errors[0].errCode, E10015.errCode);
-    }
+    expectErrors(app, E10015, 1);
 }
 
 TEST(SemaErrorTest, E0016A) {
@@ -258,10 +227,7 @@ TEST(SemaErrorTest, E0016A) {
     app.loadSrcFile(code);
     assert(app.errHandler.successful);
     app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10016, code);
-    if (app.errHandler.errors.size() > 0) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10016.errCode);
-    }
+    expectErrors(app, E10016, 1);
 }
 
 TEST(SemaErrorTest, E0016B) {
@@ -280,10 +246,7 @@ TEST(SemaErrorTest, E0016B) {
     app.loadSrcFile(code);
     assert(app.errHandler.successful);
     app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 1);
-    if (app.errHandler.errors.size() > 0) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10016.errCode);
-    }
+    expectErrors(app, E10016, 1);
 }
 
 TEST(SemaErrorTest, E10017) {
@@ -296,10 +259,7 @@ TEST(SemaErrorTest, E10017) {
     app.loadSrcFile(code);
     assert(app.errHandler.successful);
     app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10017, code);
-    if (app.errHandler.errors.size() > 0) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10017.errCode);
-    }
+    expectErrors(app, E10017, 1);
 }
 
 TEST(SemaErrorTest, E10018) {
@@ -312,10 +272,7 @@ TEST(SemaErrorTest, E10018) {
     app.loadSrcFile(code);
     assert(app.errHandler.successful);
     app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10001, code);
-    if (app.errHandler.errors.size() > 0) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10001.errCode);
-    }
+    expectErrors(app, E10001, 1);
 }
 
 TEST(SemaErrorTest, E10021) {
@@ -328,10 +285,7 @@ TEST(SemaErrorTest, E10021) {
     app.loadSrcFile(code);
     assert(app.errHandler.successful);
     app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10021, code);
-    if (app.errHandler.errors.size() > 0) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10021.errCode);
-    }
+    expectErrors(app, E10021, 1);
 }
 
 TEST(SemaErrorTest, E10033) {
@@ -345,19 +299,7 @@ TEST(SemaErrorTest, E10033) {
     app.loadSrcFile(code);
     assert(app.errHandler.successful);
     app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10033, code);
-    if (app.errHandler.errors.size() > 0) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10033.errCode);
-    }
-}
-
-TEST(SemaErrorTest, E10023) {
-    LgsApp app;
-    const auto code = R"(
-    main() {
-
-    }
-    )";
+    expectErrors(app, E10033, 1);
 }
 
 TEST(SemaErrorTest, E10024) {
@@ -370,10 +312,7 @@ TEST(SemaErrorTest, E10024) {
     app.loadSrcFile(code);
     assert(app.errHandler.successful);
     app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10024, code);
-    if (app.errHandler.errors.size() > 0) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10024.errCode);
-    }
+    expectErrors(app, E10024, 1);
 }
 
 TEST(SemaErrorTest, E10025) {
@@ -387,10 +326,7 @@ TEST(SemaErrorTest, E10025) {
     app.loadSrcFile(code);
     assert(app.errHandler.successful);
     app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10025, code);
-    if (app.errHandler.errors.size() > 0) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10025.errCode);
-    }
+    expectErrors(app, E10025, 1);
 }
 
 TEST(SemaErrorTest, E10026) {
@@ -402,10 +338,7 @@ TEST(SemaErrorTest, E10026) {
     app.loadSrcFile(code);
     assert(app.errHandler.successful);
     app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10026, code);
-    if (app.errHandler.errors.size() > 0) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10026.errCode);
-    }
+    expectErrors(app, E10026, 1);
 }
 
 TEST(SemaErrorTest, E10027) {
@@ -420,10 +353,7 @@ TEST(SemaErrorTest, E10027) {
     app.loadSrcFile(code);
     assert(app.errHandler.successful);
     app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10027, code);
-    if (app.errHandler.errors.size() > 0) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10027.errCode);
-    }
+    expectErrors(app, E10027, 1);
 }
 
 TEST(SemaErrorTest, E10028) {
@@ -435,10 +365,7 @@ TEST(SemaErrorTest, E10028) {
     app.loadSrcFile(code);
     assert(app.errHandler.successful);
     app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10028, code);
-    if (app.errHandler.errors.size() > 0) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10028.errCode);
-    }
+    expectErrors(app, E10028, 1);
 }
 
 TEST(SemaErrorTest, E0030A) {
@@ -458,10 +385,7 @@ TEST(SemaErrorTest, E0030A) {
     app.loadSrcFile(code2);
     assert(app.errHandler.successful);
     app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10030, code1);
-    if (app.errHandler.errors.size() > 0) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10030.errCode);
-    }
+    expectErrors(app, E10030, 1);
 }
 
 TEST(SemaErrorTest, E0030B) {
@@ -480,10 +404,7 @@ TEST(SemaErrorTest, E0030B) {
     app.loadSrcFile(code2);
     assert(app.errHandler.successful);
     app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10030, code1);
-    if (app.errHandler.errors.size() > 0) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10030.errCode);
-    }
+    expectErrors(app, E10030, 1);
 }
 
 TEST(SemaErrorTest, E10031) {
@@ -503,10 +424,7 @@ TEST(SemaErrorTest, E10031) {
     app.loadSrcFile(code2);
     assert(app.errHandler.successful);
     app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10031, code1);
-    if (app.errHandler.errors.size() > 0) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10031.errCode);
-    }
+    expectErrors(app, E10031, 1);
 }
 
 TEST(SemaErrorTest, E10032) {
@@ -522,10 +440,7 @@ TEST(SemaErrorTest, E10032) {
     app.loadSrcFile(code);
     assert(app.errHandler.successful);
     app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10032, code);
-    if (app.errHandler.errors.size() > 0) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10032.errCode);
-    }
+    expectErrors(app, E10032, 1);
 }
 
 TEST(SemaErrorTest, E10033A) {
@@ -537,10 +452,7 @@ TEST(SemaErrorTest, E10033A) {
     app.loadSrcFile(code, "Obj.lgs");
     assert(app.errHandler.successful);
     app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10033, code);
-    if (app.errHandler.errors.size() > 0) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10033.errCode);
-    }
+    expectErrors(app, E10033, 1);
 }
 
 TEST(SemaErrorTest, E10033B) {
@@ -552,10 +464,7 @@ TEST(SemaErrorTest, E10033B) {
     app.loadSrcFile(code, "Interface.lgs");
     assert(app.errHandler.successful);
     app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10033, code);
-    if (app.errHandler.errors.size() > 0) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10033.errCode);
-    }
+    expectErrors(app, E10033, 1);
 }
 
 TEST(SemaErrorTest, E10033C) {
@@ -568,11 +477,7 @@ TEST(SemaErrorTest, E10033C) {
     app.loadSrcFile(code);
     assert(app.errHandler.successful);
     app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 2) << EXPECTED_ERR(E10033, code);
-    if (app.errHandler.errors.size() > 1) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10033.errCode);
-        EXPECT_EQ(app.errHandler.errors[1].errCode, E10033.errCode);
-    }
+    expectErrors(app, E10033, 2);
 }
 
 TEST(SemaErrorTest, E10037) {
@@ -586,10 +491,7 @@ TEST(SemaErrorTest, E10037) {
     app.loadSrcFile(code);
     assert(app.errHandler.successful);
     app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10037, code);
-    if (app.errHandler.errors.size() > 0) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10037.errCode);
-    }
+    expectErrors(app, E10037, 1);
 }
 
 TEST(SemaErrorTest, E10038) {
@@ -602,10 +504,7 @@ TEST(SemaErrorTest, E10038) {
     app.loadSrcFile(code);
     assert(app.errHandler.successful);
     app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10038, code);
-    if (app.errHandler.errors.size() > 0) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10038.errCode);
-    }
+    expectErrors(app, E10038, 1);
 }
 
 TEST(SemaErrorTest, E10042) {
@@ -619,10 +518,7 @@ TEST(SemaErrorTest, E10042) {
     app.loadSrcFile(code);
     assert(app.errHandler.successful);
     app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10042, code);
-    if (app.errHandler.errors.size() > 0) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10042.errCode);
-    }
+    expectErrors(app, E10042, 1);
 }
 
 TEST(SemaErrorTest, E10043) {
@@ -634,7 +530,7 @@ TEST(SemaErrorTest, E10043) {
     app.loadSrcFile(code);
     assert(app.errHandler.successful);
     app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 2) << EXPECTED_ERR(E10043, code);
+    EXPECT_EQ(app.errHandler.errors.size(), 2) << EXPECTED_ERR(E10043);
     if (app.errHandler.errors.size() > 1) {
         EXPECT_EQ(app.errHandler.errors[0].errCode, E10028.errCode);
         EXPECT_EQ(app.errHandler.errors[1].errCode, E10043.errCode);
@@ -654,10 +550,7 @@ TEST(SemaErrorTest, E10046) {
     app.loadSrcFile(code);
     assert(app.errHandler.successful);
     app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10046, code);
-    if (app.errHandler.errors.size() > 0) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10046.errCode);
-    }
+    expectErrors(app, E10046, 1);
 }
 
 
@@ -670,10 +563,7 @@ TEST(SemaErrorTest, E10055) {
     app.loadSrcFile(code);
     assert(app.errHandler.successful);
     app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10055, code);
-    if (app.errHandler.errors.size() > 0) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10055.errCode);
-    }
+    expectErrors(app, E10055, 1);
 }
 
 TEST(SemaErrorTest, E0056A) {
@@ -688,10 +578,7 @@ TEST(SemaErrorTest, E0056A) {
     app.loadSrcFile(code);
     assert(app.errHandler.successful);
     app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10056, code);
-    if (app.errHandler.errors.size() > 0) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10056.errCode);
-    }
+    expectErrors(app, E10056, 1);
 }
 
 TEST(SemaErrorTest, E0056B) {
@@ -706,10 +593,7 @@ TEST(SemaErrorTest, E0056B) {
     app.loadSrcFile(code);
     assert(app.errHandler.successful);
     app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10056, code);
-    if (app.errHandler.errors.size() > 0) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10056.errCode);
-    }
+    expectErrors(app, E10056, 1);
 }
 
 TEST(SemaErrorTest, E10059) {
@@ -731,11 +615,7 @@ TEST(SemaErrorTest, E10059) {
     app.loadSrcFile(code);
     assert(app.errHandler.successful);
     app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 2);
-    if (app.errHandler.errors.size() > 0) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10059.errCode);
-    }
-    EXPECT_EQ(app.errHandler.errors[1].errCode, E10059.errCode);
+    expectErrors(app, E10059, 2);
 }
 
 TEST(SemaErrorTest, E10064) {
@@ -752,10 +632,7 @@ TEST(SemaErrorTest, E10064) {
     app.loadSrcFile(code);
     assert(app.errHandler.successful);
     app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 1);
-    if (app.errHandler.errors.size() > 0) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10064.errCode);
-    }
+    expectErrors(app, E10064, 1);
 }
 
 TEST(SemaErrorTest, E10066) {
@@ -771,10 +648,7 @@ TEST(SemaErrorTest, E10066) {
     app.loadSrcFile(code);
     assert(app.errHandler.successful);
     app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10066, code);
-    if (app.errHandler.errors.size() > 0) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10066.errCode);
-    }
+    expectErrors(app, E10066, 1);
 }
 
 TEST(SemaErrorTest, E10076) {
@@ -792,10 +666,7 @@ TEST(SemaErrorTest, E10076) {
     app.loadSrcFile(code);
     assert(app.errHandler.successful);
     app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 4) << EXPECTED_ERR(E10076, code);
-    for (const auto& error : app.errHandler.errors) {
-        EXPECT_EQ(error.errCode, E10076.errCode);
-    }
+    expectErrors(app, E10076, 4);
 }
 
 TEST(SemaErrorTest, E10089) {
@@ -811,10 +682,7 @@ TEST(SemaErrorTest, E10089) {
     app.loadSrcFile(code);
     assert(app.errHandler.successful);
     app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10089, code);
-    if (app.errHandler.errors.size() > 0) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10089.errCode);
-    }
+    expectErrors(app, E10089, 1);
 }
 
 TEST(SemaErrorTest, E10092) {
@@ -827,10 +695,7 @@ TEST(SemaErrorTest, E10092) {
     app.loadSrcFile(code);
     assert(app.errHandler.successful);
     app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10092, code);
-    if (app.errHandler.errors.size() > 0) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10092.errCode);
-    }
+    expectErrors(app, E10092, 1);
 }
 
 TEST(SemaErrorTest, E10097) {
@@ -843,10 +708,7 @@ TEST(SemaErrorTest, E10097) {
     app.loadSrcFile(code);
     assert(app.errHandler.successful);
     app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10097, code);
-    if (app.errHandler.errors.size() > 0) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10097.errCode);
-    }
+    expectErrors(app, E10097, 1);
 }
 
 TEST(SemaErrorTest, E00108) {
@@ -860,8 +722,5 @@ TEST(SemaErrorTest, E00108) {
     app.loadSrcFile(code);
     assert(app.errHandler.successful);
     app.analyse();
-    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10108, code);
-    if (app.errHandler.errors.size() > 0) {
-        EXPECT_EQ(app.errHandler.errors[0].errCode, E10108.errCode);
-    }
+    expectErrors(app, E10108, 1);
 }

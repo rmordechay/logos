@@ -5,8 +5,6 @@
 #include "LgsUtils.h"
 #include <cassert>
 
-#include "LgsRTTIndices.h"
-
 #define NANO 1000000000LL
 
 extern "C" void Lgs_Runtime_moveValue(Lgs_TypeKind kind, size_t level, void* left, void* right, size_t size);

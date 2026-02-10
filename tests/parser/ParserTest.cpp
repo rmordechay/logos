@@ -6,7 +6,7 @@
 
 const std::string expectedDir = "../../tests/parser/expected";
 
-TEST(TestParser, Test1) {
+TEST(ParserTest, Test1) {
     LgsApp app;
     const auto code = R"(
         main() {}

@@ -6,7 +6,7 @@ struct LgsBaseMsg;
 struct LgsLocation;
 namespace fs = std::filesystem;
 
-#define EXPECTED_ERR(E, code) "Expected error: '" << std::string(E.msg) << "'" << std::string(code)
+#define EXPECTED_ERR(E) "Expected error: '" << std::string(E.msg) << "'"
 #define HASH_VECTOR(vec, hash) for (const auto e : vec) e->hashNode(hash)
 #define HASH_MAP(map, hash) for (const auto [_, v] : map) v->hashNode(hash)
 

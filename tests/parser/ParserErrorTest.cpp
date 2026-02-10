@@ -11,7 +11,7 @@ TEST(ParserErrorTest, E10011B) {
     main() {}
     )";
     app.loadSrcFile(code);
-    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10011, code);
+    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10011);
     if (app.errHandler.errors.size() > 0) {
         EXPECT_EQ(app.errHandler.errors[0].errCode, E10011.errCode);
     }
@@ -30,7 +30,7 @@ TEST(ParserErrorTest, E10054) {
     }
     )";
     app.loadSrcFile(code);
-    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10054, code);
+    EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10054);
     if (app.errHandler.errors.size() > 0) {
         EXPECT_EQ(app.errHandler.errors[0].errCode, E10054.errCode);
     }
