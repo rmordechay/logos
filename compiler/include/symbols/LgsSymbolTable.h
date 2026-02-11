@@ -12,11 +12,10 @@ class LgsErrHandler;
 
 struct LgsSymbolTable {
     std::unordered_map<std::string, LgsSymbol> symbols;
-    std::unordered_map<std::string, LgsApp*> imports;
     std::unordered_map<std::string, LgsFunc*> coroutines;
     std::unordered_map<std::string, LgsFunc*> genericsFuncs;
-    std::vector<LgsImport*> importPaths;
     std::vector<LgsType*> genericsTypes;
+    std::vector<LgsImport*> importPaths;
     std::vector<LgsType*> rttTypes;
 
     LgsSymbol* getSymbol(const std::string& name);

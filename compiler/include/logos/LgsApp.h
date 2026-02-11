@@ -21,6 +21,7 @@ inline std::mutex mtx;
 
 class LgsApp final {
 public:
+    LgsPaths paths;
     LgsAppConfigs configs;
     LgsAppCache appCache;
     LgsSymbolTable globals;
@@ -29,11 +30,11 @@ public:
     std::vector<LgsFile*> genericFiles;
     std::vector<LgsEnvFile*> envFiles;
     std::vector<LgsTestFile*> testFiles;
+    std::vector<LgsApp*> importApps;
     LgsAppConfigFile* appConfigFile = nullptr;
     std::vector<LgsFileMetadata> filesMetadata;
     std::string lgsCode; // Used when passing code directly.
     LgsFile rttFile{"rtt", CG_MODE_RTTYPES};
-    LgsPaths paths;
 
     explicit LgsApp(const fs::path& rootPath = "") {
         paths.rootPath = rootPath;
@@ -46,12 +47,11 @@ public:
     bool analyse();
     bool generate();
     bool link();
-    void loadSrcFile(LgsFileMetadata& metadata);
-    void loadSrcFile(const std::string& fileCode, const fs::path& filePath = LGS_MAIN_FILE);
+    bool loadConfigs();
+    void loadSrcFile(fs::path* filePath);
+    void loadSrcFile(const std::string& fileCode, const fs::path& filePath);
     bool loadConfigFile();
     bool loadEnvFiles();
-    bool loadConfigs();
-    bool loadDeps() const;
     void loadBuiltins();
     bool resolveGlobals();
     bool generateRTTTypes();
@@ -60,6 +60,7 @@ public:
     bool validateProject();
     bool validateEnvsFiles();
     bool validateRequiredEnvs();
+    bool resolveImports();
     void compareHash() const;
     void printIR() const;
     void initPaths(const fs::path& root);

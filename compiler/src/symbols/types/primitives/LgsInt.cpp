@@ -81,7 +81,7 @@ Type* LgsInt::getIRType(LgsCodeGen& cg) {
 }
 
 Value* LgsInt::hashValue(LgsCodeGen& cg, Value* value) {
-    return cg.extendToSize(value);
+    return cg.toSize(value);
 }
 
 Value* LgsInt::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {

@@ -11,10 +11,6 @@ void LgsParam::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }
 
-std::string LgsParam::getName() {
-    return name;
-}
-
 LgsType* LgsParam::getType() {
     return type;
 }

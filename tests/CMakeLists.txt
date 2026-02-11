@@ -8,10 +8,10 @@ add_executable(lgs_tests
     parser/ParserTest.cpp
     sema/SemaErrorTest.cpp
     sema/resolver/SArrTest.cpp
-    codegen/CgTest.cpp
     codegen/CgIfStmtTest.cpp
     codegen/CgArithmeticsTest.cpp
     ${COMPILER_SOURCE}
+    codegen/CgDArrayTest.cpp
 )
 
 target_include_directories(lgs_tests PRIVATE

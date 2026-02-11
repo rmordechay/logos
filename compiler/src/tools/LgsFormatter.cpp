@@ -30,7 +30,7 @@ void LgsFormatter::formatFile(LgsFile* file) {
         assert(0);
     }
     LgsApp app;
-    app.loadSrcFile(formatted.str());
+    app.loadSrcFile(formatted.str(), file->path);
     const auto oldFileHash = file->hashFile();
     const auto newFileSize = app.srcFiles.front()->hashFile();
     assert(oldFileHash == newFileSize);

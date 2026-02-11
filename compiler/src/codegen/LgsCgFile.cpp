@@ -841,13 +841,9 @@ void LgsCgFile::visitIterIndex(LgsIterIndex* iterIndex) {
 }
 
 void LgsCgFile::visitSelection(LgsSelection* selection) {
-    const auto firstExpr = selection->exprs.front();
-    if (!firstExpr->isImportName) {
-        visitExpr(firstExpr);
-    }
-
+    visitExpr(selection->exprs.front());
     const auto iterationCount = selection->exprs.size() - 1;
-    for (size_t i = firstExpr->isImportName; i < iterationCount; ++i) {
+    for (size_t i = 0; i < iterationCount; ++i) {
         const auto parent = selection->exprs[i];
         const auto child = selection->exprs[i + 1];
         // cg.createNullPtrGuard(cg.loadPtr(parent->IRValue));
@@ -860,6 +856,8 @@ void LgsCgFile::visitSelection(LgsSelection* selection) {
             visitFuncCall(methodCall);
         } else if (const auto metaSelection = child->asMetaSelection()) {
             visitMetaSelection(metaSelection);
+        } else if (const auto instance = child->asInstance()) {
+            visitInstance(instance);
         } else {
             assert(0);
         }
@@ -1072,21 +1070,10 @@ void LgsCgFile::visitVectorExpr(LgsVectorExpr* vecExpr) {
     vecExpr->IRValue = vecExpr->vecType->getIRZeroValue(cg, vecExpr->pointee);
     for (size_t i = 0; i < vecExpr->elements.size(); ++i) {
         const auto element = vecExpr->elements[i];
+        assert(!element->type->asVec());
         element->pointee = vecType->getIRElement(cg, vecExpr->IRValue, cg.i32(i));
         visitExpr(element);
-        insertVecElement(vecExpr, element->IRValue, i);
-    }
-}
-
-void LgsCgFile::insertVecElement(LgsVectorExpr* vecExpr, Value* element, const size_t i) {
-    if (const auto innerVec = dyn_cast<VectorType>(element->getType())) {
-        const auto innerDim = innerVec->getElementCount().getKnownMinValue();
-        for (size_t j = 0; j < innerDim; ++j) {
-            insertVecElement(vecExpr, element, i+j);
-        }
-    } else {
-        const auto ty = vecExpr->type->getIRType(cg);
-        cg.store(element, cg.builder.CreateInBoundsGEP(ty, vecExpr->IRValue, {cg.i32(i)}));
+        cg.store(element->IRValue, element->pointee);
     }
 }
 

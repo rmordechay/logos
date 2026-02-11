@@ -53,6 +53,8 @@
 #include <ranges>
 #include <unordered_set>
 
+#include "exprs/LgsModuleExpr.h"
+
 static std::string getMissingImplementsStr(const std::vector<LgsField*>& fields, const std::vector<LgsFunc*>& methods);
 
 std::atomic<size_t> objsIDGenerator{0};
@@ -60,7 +62,6 @@ std::atomic<size_t> funcsIDGenerator{0};
 std::atomic<size_t> lambdasIDGenerator{0};
 
 void LgsSema::analyse() {
-    resolveImports();
     if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
         visitMainFile(mainFile);
     } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
@@ -101,10 +102,10 @@ void LgsSema::visitMainFile(LgsMainFile* mainFile) {
     // Check main() func
     if (mainFile->funcs.contains(LGS_MAIN_FUNC)) {
         if (appConfigs.isLibrary) {
-            addError(E10087, file->location);
+            errHandler.addError(E10087, {});
         }
     } else if (!appConfigs.isLibrary) {
-        addError(E10000, file->location);
+        errHandler.addError(E10000, {});
     }
 }
 
@@ -775,6 +776,7 @@ void LgsSema::visitExpr(LgsExpr* expr) {
     } else {
         if (const auto variable = expr->asVariable()) visitVariable(variable);
         else if (const auto lambda = expr->asFunc()) visitLambda(lambda);
+        else if (const auto moduleExpr = expr->asModuleExpr()) visitModuleExpr(moduleExpr);
         else if (const auto instance = expr->asInstance()) visitInstance(instance);
         else if (const auto funcCall = expr->asFuncCall()) visitFuncCall(funcCall);
         else if (const auto strConst = expr->asStrConst()) visitStrConst(strConst);
@@ -1009,7 +1011,9 @@ void LgsSema::visitSelection(LgsSelection* selection) {
     const auto exprs = selection->exprs;
     visitExpr(selection->exprs.front());
     const auto firstExpr = exprs.front();
-    if (!firstExpr->type) return;
+    if (const auto moduleExpr = firstExpr->asModuleExpr()) {
+        if (!moduleExpr->moduleTable) return;
+    }
     if (const auto var = firstExpr->asVariable()) {
         if (var->ref.symbolType == OBJECT) {
             const auto typeExpr = new LgsTypeExpr(var->ref.object);
@@ -1034,6 +1038,8 @@ void LgsSema::visitInnerSelections(const LgsSelection* selection) {
             visitIterIndexSelection(iterIndex, parent->type);
         } else if (const auto metaSelection = child->asMetaSelection()) {
             visitMetaSelection(metaSelection, parent);
+        } else if (const auto instance = child->asInstance()) {
+            visitInstance(instance);
         } else {
             assert(0);
         }
@@ -1239,6 +1245,16 @@ bool LgsSema::visitFuncArgs(LgsFuncCall* funcCall, LgsFuncType* ft) {
         }
     }
     return true;
+}
+
+void LgsSema::visitModuleExpr(LgsModuleExpr* moduleExpr) {
+    for (const auto importApp : importApps) {
+        if (importApp->configs.name == moduleExpr->name) {
+            moduleExpr->moduleTable = &importApp->globals;
+            return;
+        }
+    }
+    addError(E10006, moduleExpr->location, {moduleExpr->name});
 }
 
 void LgsSema::visitPrefixExpr(LgsPrefixExpr* prefixExpr) {
@@ -1595,14 +1611,6 @@ bool LgsSema::validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const Lgs
     return isValid;
 }
 
-void LgsSema::resolveImports() const {
-    for (auto& [name, app] : file->symbolTable.imports) {
-        const auto it = globals.imports.find(name);
-        if (it == globals.imports.end()) continue;
-        app = it->second;
-    }
-}
-
 void LgsSema::addLocalSymbol(const LgsSymbol& newSymbol) {
     auto symbolName = *newSymbol.name;
     const auto symbol = globals.getSymbol(symbolName);
@@ -1617,17 +1625,18 @@ void LgsSema::addLocalSymbol(const LgsSymbol& newSymbol) {
 
 LgsSymbol* LgsSema::getSymbol(const std::string& name) {
     if (const auto globalSymbol = globals.getSymbol(name)) {
-        if (!globalSymbol->isBuiltin) refCount[*globalSymbol->name]++;
         return globalSymbol;
     }
     if (const auto fileSymbol = file->symbolTable.getSymbol(name)) {
         return fileSymbol;
     }
-    for (auto [_, app] : file->symbolTable.imports) {
-        if (const auto s = app->globals.getSymbol(name)) return s;
-    }
     if (const auto symbol = stack.getSymbolTable().getSymbol(name)) {
         return symbol;
+    }
+    for (const auto importApp : importApps) {
+        if (const auto symbol = importApp->globals.getSymbol(name)) {
+            return symbol;
+        }
     }
     return nullptr;
 }

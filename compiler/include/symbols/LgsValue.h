@@ -45,7 +45,6 @@ public:
     virtual void hashNode(size_t& oldHash);
     virtual void setDebugValue(LgsCodeGen& cg) = 0;
     virtual LgsValue* clone();
-    virtual std::string getName();
     virtual LgsType* getType();
     void setDebugLoc(LgsCodeGen& cg) const;
     virtual ~LgsValue() = default;

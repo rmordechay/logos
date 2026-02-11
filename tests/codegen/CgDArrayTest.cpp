@@ -6,26 +6,19 @@
 
 #include "LgsTestUtils.h"
 
-TEST(CgIfStmtTest, Test1) {
+TEST(CgDArrTest, Test1) {
     const auto code = R"(
     main() {
-        a = 5
-        if a > 5 {
-            print(false)
-        } else {
-            print(true)
-        }
-        if a < 5 {
-            print(true)
-        } else {
-            print(false)
-        }
+        arr = [1, 2]
+        print(arr)
+        arr.add(3)
+        print(arr)
     }
     )";
     std::istringstream stream(getLgsOutput(code));
     std::string line1, line2;
     std::getline(stream, line1);
     std::getline(stream, line2);
-    EXPECT_EQ(line1, "true");
-    EXPECT_EQ(line2, "false");
+    EXPECT_EQ(line1, "[1, 2]");
+    EXPECT_EQ(line2, "[1, 2, 3]");
 }

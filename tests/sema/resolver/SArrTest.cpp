@@ -14,7 +14,7 @@ TEST(TypeResolverTest, SArrStr) {
     main() {
         arr: Str[2] = ["text1", "text"]
     })";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, LGS_MAIN_FILE);
     app.analyse();
     const auto mainFunc = app.getMainFile()->getMainFunc();
     const auto varDec = mainFunc->stmtsBlock->stmts.front().stmt->asVarDec();
@@ -33,7 +33,7 @@ TEST(TypeResolverTest, SArrStrNullable) {
     main() {
         arr: Str?[2] = ["text1", null]
     })";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, LGS_MAIN_FILE);
     app.analyse();
     const auto mainFunc = app.getMainFile()->getMainFunc();
     const auto varDec = mainFunc->stmtsBlock->stmts.front().stmt->asVarDec();

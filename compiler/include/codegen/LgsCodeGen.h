@@ -177,13 +177,15 @@ public:
     ConstantInt* i32(int32_t v);
     ConstantInt* i64(int64_t v);
     ConstantInt* usize(size_t v);
+    Constant* floatv(float_t v);
+    Constant* doublev(double_t v);
     ConstantInt* zero8();
     ConstantInt* zero32();
     ConstantInt* zero64();
     ConstantInt* zeroSize();
-    Value* extendToSize(Value* v);
-    Constant* floatv(float_t v);
-    Constant* doublev(double_t v);
+    Value* toFloat(Value* v);
+    Value* toInt(Value* v);
+    Value* toSize(Value* v);
     Constant* emptyStr();
     ~LgsCodeGen();
 };

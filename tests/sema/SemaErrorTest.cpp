@@ -10,26 +10,26 @@ TEST(SemaErrorTest, E10000) {
     const auto code = R"(
     func() {}
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, LGS_MAIN_FILE);
     assert(app.errHandler.successful);
     app.analyse();
     expectErrors(app, E10000, 1);
 }
 
-TEST(SemaErrorTest, E0001A) {
+TEST(SemaErrorTest, E10001A) {
     LgsApp app;
     const auto code = R"(
     main() {
         s1: Str[2] = [["text1"], ["text2"]]
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, LGS_MAIN_FILE);
     assert(app.errHandler.successful);
     app.analyse();
     expectErrors(app, E10001, 1);
 }
 
-TEST(SemaErrorTest, E0002A) {
+TEST(SemaErrorTest, E10002A) {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -37,13 +37,13 @@ TEST(SemaErrorTest, E0002A) {
         for i in a {}
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, LGS_MAIN_FILE);
     assert(app.errHandler.successful);
     app.analyse();
     expectErrors(app, E10002, 1);
 }
 
-TEST(SemaErrorTest, E0003A) {
+TEST(SemaErrorTest, E10003A) {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -51,7 +51,7 @@ TEST(SemaErrorTest, E0003A) {
         a = arr[2]
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, LGS_MAIN_FILE);
     assert(app.errHandler.successful);
     app.analyse();
     expectErrors(app, E10003, 1);
@@ -65,13 +65,13 @@ TEST(SemaErrorTest, E10004A) {
     }
     main() {}
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, LGS_MAIN_FILE);
     assert(app.errHandler.successful);
     app.analyse();
     expectErrors(app, E10004, 1);
 }
 
-TEST(SemaErrorTest, E0005A) {
+TEST(SemaErrorTest, E10005A) {
     LgsApp app;
     const auto code = R"(
     object Obj {
@@ -82,13 +82,13 @@ TEST(SemaErrorTest, E0005A) {
         a = obj.a
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, LGS_MAIN_FILE);
     assert(app.errHandler.successful);
     app.analyse();
     expectErrors(app, E10005, 1);
 }
 
-TEST(SemaErrorTest, E0005B) {
+TEST(SemaErrorTest, E10005B) {
     LgsApp app;
     const auto code = R"(
     object Obj {
@@ -98,26 +98,26 @@ TEST(SemaErrorTest, E0005B) {
         obj = Obj{a=3487, b=234}
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, LGS_MAIN_FILE);
     assert(app.errHandler.successful);
     app.analyse();
     expectErrors(app, E10005, 1);
 }
 
-TEST(SemaErrorTest, E0006A) {
+TEST(SemaErrorTest, E10006A) {
     LgsApp app;
     const auto code = R"(
     main() {
         a = b
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, LGS_MAIN_FILE);
     assert(app.errHandler.successful);
     app.analyse();
     expectErrors(app, E10006, 1);
 }
 
-TEST(SemaErrorTest, E0006B) {
+TEST(SemaErrorTest, E10006B) {
     LgsApp app;
     const auto code = R"(
     enum Enum {
@@ -133,13 +133,13 @@ TEST(SemaErrorTest, E0006B) {
         func(10, Enum.ENUM1)
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, LGS_MAIN_FILE);
     assert(app.errHandler.successful);
     app.analyse();
     expectErrors(app, E10006, 1);
 }
 
-TEST(SemaErrorTest, E0009A) {
+TEST(SemaErrorTest, E10009A) {
     LgsApp app;
     app.configs.appMode = PROJECT_MODE;
     const auto code1 = R"(
@@ -148,8 +148,8 @@ TEST(SemaErrorTest, E0009A) {
     const auto code2 = R"(
     main() {}
     )";
-    app.loadSrcFile(code1);
-    app.loadSrcFile(code2);
+    app.loadSrcFile(code1, LGS_MAIN_FILE);
+    app.loadSrcFile(code2, LGS_MAIN_FILE);
     assert(app.errHandler.successful);
     app.analyse();
     expectErrors(app, E10009, 1);
@@ -163,7 +163,7 @@ TEST(SemaErrorTest, E0011A) {
         a = 3
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, LGS_MAIN_FILE);
     assert(app.errHandler.successful);
     app.analyse();
     expectErrors(app, E10011, 1);
@@ -178,7 +178,7 @@ TEST(SemaErrorTest, E0013A) {
         obj.func()
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, LGS_MAIN_FILE);
     assert(app.errHandler.successful);
     app.analyse();
     expectErrors(app, E10005, 1);
@@ -192,7 +192,7 @@ TEST(SemaErrorTest, E0013B) {
         arr.add(2)
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, LGS_MAIN_FILE);
     assert(app.errHandler.successful);
     app.analyse();
     expectErrors(app, E10005, 1);
@@ -206,7 +206,7 @@ TEST(SemaErrorTest, E0015A) {
         func("str")
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, LGS_MAIN_FILE);
     assert(app.errHandler.successful);
     app.analyse();
     expectErrors(app, E10015, 1);
@@ -224,7 +224,7 @@ TEST(SemaErrorTest, E0016A) {
     }
     main() {}
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, LGS_MAIN_FILE);
     assert(app.errHandler.successful);
     app.analyse();
     expectErrors(app, E10016, 1);
@@ -243,7 +243,7 @@ TEST(SemaErrorTest, E0016B) {
 
     main() {}
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, LGS_MAIN_FILE);
     assert(app.errHandler.successful);
     app.analyse();
     expectErrors(app, E10016, 1);
@@ -256,7 +256,7 @@ TEST(SemaErrorTest, E10017) {
         break
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, LGS_MAIN_FILE);
     assert(app.errHandler.successful);
     app.analyse();
     expectErrors(app, E10017, 1);
@@ -269,7 +269,7 @@ TEST(SemaErrorTest, E10018) {
         s2: Int[] = [2.234, 2.34]
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, LGS_MAIN_FILE);
     assert(app.errHandler.successful);
     app.analyse();
     expectErrors(app, E10001, 1);
@@ -282,7 +282,7 @@ TEST(SemaErrorTest, E10021) {
         a = true then "36" else 6
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, LGS_MAIN_FILE);
     assert(app.errHandler.successful);
     app.analyse();
     expectErrors(app, E10021, 1);
@@ -296,7 +296,7 @@ TEST(SemaErrorTest, E10033) {
         a = var{}
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, LGS_MAIN_FILE);
     assert(app.errHandler.successful);
     app.analyse();
     expectErrors(app, E10033, 1);
@@ -309,7 +309,7 @@ TEST(SemaErrorTest, E10024) {
         a = null
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, LGS_MAIN_FILE);
     assert(app.errHandler.successful);
     app.analyse();
     expectErrors(app, E10024, 1);
@@ -323,7 +323,7 @@ TEST(SemaErrorTest, E10025) {
     }
     main() {}
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, LGS_MAIN_FILE);
     assert(app.errHandler.successful);
     app.analyse();
     expectErrors(app, E10025, 1);
@@ -335,7 +335,7 @@ TEST(SemaErrorTest, E10026) {
     func(): Int { return }
     main() {}
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, LGS_MAIN_FILE);
     assert(app.errHandler.successful);
     app.analyse();
     expectErrors(app, E10026, 1);
@@ -350,7 +350,7 @@ TEST(SemaErrorTest, E10027) {
     }
     main() {}
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, LGS_MAIN_FILE);
     assert(app.errHandler.successful);
     app.analyse();
     expectErrors(app, E10027, 1);
@@ -362,7 +362,7 @@ TEST(SemaErrorTest, E10028) {
     func(x: Int = 23, y: Str) { }
     main() {}
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, LGS_MAIN_FILE);
     assert(app.errHandler.successful);
     app.analyse();
     expectErrors(app, E10028, 1);
@@ -382,7 +382,7 @@ TEST(SemaErrorTest, E0030A) {
     )";
     app.loadSrcFile(code1, "Obj.lgs");
     assert(app.errHandler.successful);
-    app.loadSrcFile(code2);
+    app.loadSrcFile(code2, LGS_MAIN_FILE);
     assert(app.errHandler.successful);
     app.analyse();
     expectErrors(app, E10030, 1);
@@ -401,7 +401,7 @@ TEST(SemaErrorTest, E0030B) {
     )";
     app.loadSrcFile(code1, "Obj.lgs");
     assert(app.errHandler.successful);
-    app.loadSrcFile(code2);
+    app.loadSrcFile(code2, LGS_MAIN_FILE);
     assert(app.errHandler.successful);
     app.analyse();
     expectErrors(app, E10030, 1);
@@ -421,7 +421,7 @@ TEST(SemaErrorTest, E10031) {
     )";
     app.loadSrcFile(code1, "Obj.lgs");
     assert(app.errHandler.successful);
-    app.loadSrcFile(code2);
+    app.loadSrcFile(code2, LGS_MAIN_FILE);
     assert(app.errHandler.successful);
     app.analyse();
     expectErrors(app, E10031, 1);
@@ -437,7 +437,7 @@ TEST(SemaErrorTest, E10032) {
         obj = Obj{}
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, LGS_MAIN_FILE);
     assert(app.errHandler.successful);
     app.analyse();
     expectErrors(app, E10032, 1);
@@ -474,7 +474,7 @@ TEST(SemaErrorTest, E10033C) {
         object obj {}
         main() {}
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, LGS_MAIN_FILE);
     assert(app.errHandler.successful);
     app.analyse();
     expectErrors(app, E10033, 2);
@@ -488,7 +488,7 @@ TEST(SemaErrorTest, E10037) {
         b = a[2:1]
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, LGS_MAIN_FILE);
     assert(app.errHandler.successful);
     app.analyse();
     expectErrors(app, E10037, 1);
@@ -501,7 +501,7 @@ TEST(SemaErrorTest, E10038) {
         continue
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, LGS_MAIN_FILE);
     assert(app.errHandler.successful);
     app.analyse();
     expectErrors(app, E10038, 1);
@@ -515,7 +515,7 @@ TEST(SemaErrorTest, E10042) {
         a = map[1:3]
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, LGS_MAIN_FILE);
     assert(app.errHandler.successful);
     app.analyse();
     expectErrors(app, E10042, 1);
@@ -527,7 +527,7 @@ TEST(SemaErrorTest, E10043) {
         func(a: Int = 2, b: Int...) {}
         main() {}
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, LGS_MAIN_FILE);
     assert(app.errHandler.successful);
     app.analyse();
     EXPECT_EQ(app.errHandler.errors.size(), 2) << EXPECTED_ERR(E10043);
@@ -547,7 +547,7 @@ TEST(SemaErrorTest, E10046) {
         obj = Obj()
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, LGS_MAIN_FILE);
     assert(app.errHandler.successful);
     app.analyse();
     expectErrors(app, E10046, 1);
@@ -560,7 +560,7 @@ TEST(SemaErrorTest, E10055) {
     f(): Int {}
     main() {}
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, LGS_MAIN_FILE);
     assert(app.errHandler.successful);
     app.analyse();
     expectErrors(app, E10055, 1);
@@ -575,7 +575,7 @@ TEST(SemaErrorTest, E0056A) {
     }
     main() {}
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, LGS_MAIN_FILE);
     assert(app.errHandler.successful);
     app.analyse();
     expectErrors(app, E10056, 1);
@@ -590,7 +590,7 @@ TEST(SemaErrorTest, E0056B) {
     }
     main() {}
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, LGS_MAIN_FILE);
     assert(app.errHandler.successful);
     app.analyse();
     expectErrors(app, E10056, 1);
@@ -612,7 +612,7 @@ TEST(SemaErrorTest, E10059) {
     }
     main() {}
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, LGS_MAIN_FILE);
     assert(app.errHandler.successful);
     app.analyse();
     expectErrors(app, E10059, 2);
@@ -629,7 +629,7 @@ TEST(SemaErrorTest, E10064) {
         }
         main() {}
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, LGS_MAIN_FILE);
     assert(app.errHandler.successful);
     app.analyse();
     expectErrors(app, E10064, 1);
@@ -645,7 +645,7 @@ TEST(SemaErrorTest, E10066) {
         }
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, LGS_MAIN_FILE);
     assert(app.errHandler.successful);
     app.analyse();
     expectErrors(app, E10066, 1);
@@ -663,7 +663,7 @@ TEST(SemaErrorTest, E10076) {
         v6 = v1 / v2
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, LGS_MAIN_FILE);
     assert(app.errHandler.successful);
     app.analyse();
     expectErrors(app, E10076, 4);
@@ -679,7 +679,7 @@ TEST(SemaErrorTest, E10089) {
         Obj.x := 23
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, LGS_MAIN_FILE);
     assert(app.errHandler.successful);
     app.analyse();
     expectErrors(app, E10089, 1);
@@ -692,7 +692,7 @@ TEST(SemaErrorTest, E10092) {
         a = 34 then "3" else "6"
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, LGS_MAIN_FILE);
     assert(app.errHandler.successful);
     app.analyse();
     expectErrors(app, E10092, 1);
@@ -705,7 +705,7 @@ TEST(SemaErrorTest, E10097) {
         switch 2 {}
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, LGS_MAIN_FILE);
     assert(app.errHandler.successful);
     app.analyse();
     expectErrors(app, E10097, 1);
@@ -719,7 +719,7 @@ TEST(SemaErrorTest, E00108) {
         a = num[1:3]
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, LGS_MAIN_FILE);
     assert(app.errHandler.successful);
     app.analyse();
     expectErrors(app, E10108, 1);

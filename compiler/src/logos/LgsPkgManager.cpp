@@ -73,7 +73,7 @@ void LgsPkgManager::install() {
         auto versionDir = packageDir / versionStr;
         const auto zipOutputFile = versionDir / (versionStr + ".zip");
         const auto srcOutputDir = versionDir / LGS_CODE_DIR;
-        const auto downloadURL = package.url + "/archive/refs/tags/" + versionStr + ".zip";
+        const auto downloadURL = package.path + "/archive/refs/tags/" + versionStr + ".zip";
         const auto unzippedDir = versionDir / (package.name + '-' + versionStr);
         const auto srcPath = versionDir / LGS_CODE_DIR;
 

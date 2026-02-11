@@ -8,8 +8,8 @@ enum LgsFileType {
 
 struct LgsFileMetadata {
     size_t hash = 0;
-    fs::path path = "";
+    std::filesystem::path path = "";
     LgsFileType type;
     std::time_t lastWritten;
-    explicit LgsFileMetadata(const fs::path& filePath, const std::time_t& lastWriteTime = 0, const LgsFileType type = LGS_SRC_FILE) : path(filePath), type(type), lastWritten(lastWriteTime) {}
+    explicit LgsFileMetadata(const std::filesystem::path& filePath, const std::time_t& lastWriteTime = 0, const LgsFileType type = LGS_SRC_FILE) : path(filePath), type(type), lastWritten(lastWriteTime) {}
 };

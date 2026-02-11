@@ -230,7 +230,7 @@ Value* LgsCodeGen::allocStrConst(Value* strPtr) {
 }
 
 Value* LgsCodeGen::reallocate(Value* ptr, Value* size, Value* level) {
-    return callRuntimeFunc("reallocate", ptrTy(), {ptrTy(), sizeTy(), sizeTy()}, {ptr, extendToSize(size), extendToSize(level)});
+    return callRuntimeFunc("reallocate", ptrTy(), {ptrTy(), sizeTy(), sizeTy()}, {ptr, toSize(size), toSize(level)});
 }
 
 Value* LgsCodeGen::moveArrElement(Value* arrLevel, Constant* type, Value* element) {
@@ -279,12 +279,12 @@ void LgsCodeGen::createNullPtrGuard(Value* value) {
 }
 
 void LgsCodeGen::createIndexBoundsGuard(Value* len, Value* index) {
-    const auto cond = builder.CreateICmpUGE(extendToSize(index), extendToSize(len));
+    const auto cond = builder.CreateICmpUGE(toSize(index), toSize(len));
     ifStmt(cond, [this, &index]{throwError(E10003, {index});});
 }
 
 void LgsCodeGen::createArrBoundsGuard(Value* maxLen, Value* arrLen) {
-    const auto cond = builder.CreateICmpUGT(extendToSize(arrLen), extendToSize(maxLen));
+    const auto cond = builder.CreateICmpUGT(toSize(arrLen), toSize(maxLen));
     ifStmt(cond, [this, &maxLen]{throwError(E10105, {callSnprintf("%d", {maxLen})});});
 }
 
@@ -541,6 +541,14 @@ ConstantInt* LgsCodeGen::usize(const size_t v) {
     return ConstantInt::get(sizeTy(), v);
 }
 
+Constant* LgsCodeGen::floatv(const float_t v) {
+    return ConstantFP::get(floatTy(), v);
+}
+
+Constant* LgsCodeGen::doublev(const double_t v) {
+    return ConstantFP::get(doubleTy(), v);
+}
+
 ConstantInt* LgsCodeGen::zero8() {
     return builder.getInt8(0);
 }
@@ -557,16 +565,16 @@ ConstantInt* LgsCodeGen::zeroSize() {
     return ConstantInt::get(sizeTy(), 0);
 }
 
-Value* LgsCodeGen::extendToSize(Value* v) {
+Value* LgsCodeGen::toFloat(Value* v) {
+    return builder.CreateSIToFP(v, floatTy());
+}
+
+Value* LgsCodeGen::toInt(Value* v) {
+    return builder.CreateFPToSI(v, i32Ty());
+}
+
+Value* LgsCodeGen::toSize(Value* v) {
     return builder.CreateZExt(v, sizeTy());
-}
-
-Constant* LgsCodeGen::floatv(const float_t v) {
-    return ConstantFP::get(floatTy(), v);
-}
-
-Constant* LgsCodeGen::doublev(const double_t v) {
-    return ConstantFP::get(doubleTy(), v);
 }
 
 Constant* LgsCodeGen::emptyStr() {

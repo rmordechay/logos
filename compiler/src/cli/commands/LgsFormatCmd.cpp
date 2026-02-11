@@ -6,7 +6,7 @@ void LgsFormatCmd::run() {
     if (argc != 3) {
         return errHandler.addError(E40001, {});
     }
-    const auto path = argv[2];
+    fs::path path = argv[2];
     if (!fs::exists(path)) {
         return errHandler.addError(E40004, {path});
     }
@@ -15,8 +15,7 @@ void LgsFormatCmd::run() {
     }
     LgsApp app(path);
     if (!app.setup()) return;
-    LgsFileMetadata metadata(path);
-    app.loadSrcFile(metadata);
+    app.loadSrcFile(&path);
     LgsFormatter formatter;
     formatter.formatFile(app.srcFiles.front());
 }

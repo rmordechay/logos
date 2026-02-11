@@ -1,8 +1,8 @@
 #pragma once
 #include <math.h>
-
 #include "LgsValue.h"
 
+class LgsModuleExpr;
 class LgsNull;
 class LgsPair;
 class LgsField;
@@ -42,7 +42,6 @@ public:
     LgsType* type = nullptr;
     LgsType* implicitCast = nullptr;
     bool isMutable = true;
-    bool isImportName = false;
     bool isNull = false;
     bool isReturnExpr = false;
     bool hasUnwrap = false;
@@ -64,6 +63,7 @@ public:
     LgsFunc* asFunc();
     LgsCast* asCast();
     LgsVariable* asVariable();
+    LgsModuleExpr* asModuleExpr();
     LgsPrefixExpr* asPrefixExpr();
     LgsFuncCall* asFuncCall();
     LgsPostfixExpr* asPostfixExpr();

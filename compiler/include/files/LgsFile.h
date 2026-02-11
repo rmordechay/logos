@@ -9,7 +9,6 @@ class LgsFile {
 public:
     fs::path path;
     LgsCgFile cgFile;
-    LgsLocation location;
     LgsSymbolTable symbolTable;
 
     explicit LgsFile(const fs::path& path, const LgsCodeGenMode mode) : path(path), cgFile(mode) {}

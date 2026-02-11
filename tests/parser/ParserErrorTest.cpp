@@ -10,7 +10,7 @@ TEST(ParserErrorTest, E10011B) {
     func() {}
     main() {}
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, LGS_MAIN_FILE);
     EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10011);
     if (app.errHandler.errors.size() > 0) {
         EXPECT_EQ(app.errHandler.errors[0].errCode, E10011.errCode);
@@ -29,7 +29,7 @@ TEST(ParserErrorTest, E10054) {
         obj1 = Obj{x = 2, z = "Test", z = 3.23}
     }
     )";
-    app.loadSrcFile(code);
+    app.loadSrcFile(code, LGS_MAIN_FILE);
     EXPECT_EQ(app.errHandler.errors.size(), 1) << EXPECTED_ERR(E10054);
     if (app.errHandler.errors.size() > 0) {
         EXPECT_EQ(app.errHandler.errors[0].errCode, E10054.errCode);

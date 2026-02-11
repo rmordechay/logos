@@ -44,8 +44,6 @@ void LgsSelection::setDebugValue(LgsCodeGen& cg) {
 }
 
 LgsSelection::~LgsSelection() {
-    freeExpr(importVar);
-    importVar = nullptr;
     for (const auto& expr : exprs) {
         freeExpr(expr);
     }

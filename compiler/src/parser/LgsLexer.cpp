@@ -1,8 +1,5 @@
 #include "parser/LgsLexer.h"
-
 #include "errors/LgsErrors.h"
-
-#include <cassert>
 #include <iostream>
 
 std::vector<LgsToken> LgsLexer::tokenize() {
@@ -54,13 +51,23 @@ LgsToken LgsLexer::nextToken() {
             }
             return {T_DOUBLE_DOT, "..", location};
         }
-        if (std::isdigit(currentChar)) return scanNumber(location);
+        if (std::isdigit(currentChar)) {
+            auto num = scanNumber(location);
+            if (std::isalpha(currentChar)) {
+                errHandler.addError(E10099, &location, filePath, {});
+            }
+            return num;
+        }
         return {T_DOT, ".", location};
     }
 
     // Number
     if (std::isdigit(currentChar) || (currentChar == '-' && std::isdigit(peek()))) {
-        return scanNumber(location);
+        auto num = scanNumber(location);
+        if (std::isalpha(currentChar)) {
+            errHandler.addError(E10099, &location, filePath, {});
+        }
+        return num;
     }
 
     // Slider
@@ -261,7 +268,6 @@ LgsToken LgsLexer::scanNumber(const LgsLocation& location) {
         lexeme += currentChar;
         advance();
     }
-
     // Float
     if (currentChar == '.' && peek() != '.') {
         lexeme += currentChar;
@@ -308,9 +314,7 @@ LgsToken LgsLexer::scanVarOrKeyword(const LgsLocation& location) {
     }
 
     while (std::isalnum(currentChar) || currentChar == '_') {
-        if (lexeme == "Mat") {
-            return scanMatrixDims(location, lexeme);
-        }
+        if (lexeme == "Mat") return scanMatrixDims(location, lexeme);
         lexeme += currentChar;
         advance();
         if (std::isspace(currentChar)) break;
@@ -338,9 +342,7 @@ LgsToken LgsLexer::scanVarOrKeyword(const LgsLocation& location) {
     }
 
     auto const it = LGS_KEYWORDS.find(lexeme);
-    if (it != LGS_KEYWORDS.end()) {
-        return {it->second, lexeme, location};
-    }
+    if (it != LGS_KEYWORDS.end()) return {it->second, lexeme, location};
     return {T_IDENTIFIER, lexeme, location};
 }
 

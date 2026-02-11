@@ -15,6 +15,7 @@
 #include "exprs/constants/LgsStrConst.h"
 #include "exprs/LgsMatrixExpr.h"
 #include "exprs/LgsMetaSelection.h"
+#include "exprs/LgsModuleExpr.h"
 #include "exprs/LgsNullableExpr.h"
 #include "exprs/LgsPostfixExpr.h"
 #include "exprs/LgsSelection.h"
@@ -159,6 +160,10 @@ LgsCast* LgsExpr::asCast() {
 
 LgsVariable* LgsExpr::asVariable() {
     return dynamic_cast<LgsVariable*>(this);
+}
+
+LgsModuleExpr* LgsExpr::asModuleExpr() {
+    return dynamic_cast<LgsModuleExpr*>(this);
 }
 
 LgsPrefixExpr* LgsExpr::asPrefixExpr() {

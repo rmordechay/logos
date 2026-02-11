@@ -28,7 +28,7 @@ Value* LgsFloat::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
 }
 
 Value* LgsFloat::hashValue(LgsCodeGen& cg, Value* value) {
-    return cg.extendToSize(cg.builder.CreateBitCast(value, cg.i32Ty()));
+    return cg.toSize(cg.builder.CreateBitCast(value, cg.i32Ty()));
 }
 
 size_t LgsFloat::sizeBytes() {

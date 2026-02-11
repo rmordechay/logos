@@ -4,7 +4,6 @@
 class LgsSelection final : public LgsExpr {
 public:
     std::vector<LgsExpr*> exprs;
-    LgsVariable* importVar = nullptr;
 
     explicit LgsSelection(const std::vector<LgsExpr*>& exprs) : exprs(exprs) {}
     Value* loadIR(LgsCodeGen& cg) override;

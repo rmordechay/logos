@@ -122,7 +122,6 @@ public:
     void visitStaticArray(LgsArrayExpr* arrayExpr);
     void visitDynamicArray(LgsArrayExpr* arrayExpr);
     void visitVectorExpr(LgsVectorExpr* vecExpr);
-    void insertVecElement(LgsVectorExpr* vecExpr, Value* element, size_t i);
     void visitMatrixExpr(const LgsMatrixExpr* matrixExpr);
     void visitHashMap(LgsHashMap* hashMap);
     void visitEnvVar(LgsEnvVar* envVar);

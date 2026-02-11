@@ -107,7 +107,7 @@ Value* LgsDArray::inIR(LgsCodeGen& cg, Value* iterable, Value* value) {
 Value* LgsDArray::getIRElement(LgsCodeGen& cg, Value* iterable, Value* index) {
     const auto baseSize = baseType->IRSize(cg);
     const auto dataFieldPtr = cg.builder.CreateStructGEP(getIRType(cg), iterable, LgsDArrExprIndices::data);
-    const auto offset = cg.builder.CreateMul(cg.extendToSize(index), baseSize);
+    const auto offset = cg.builder.CreateMul(cg.toSize(index), baseSize);
     const auto dataField = cg.loadPtr(dataFieldPtr);
     auto ptr = cg.builder.CreateInBoundsPtrAdd(dataField, offset);
     if (baseType->passByRef) {

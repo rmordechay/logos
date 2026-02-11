@@ -10,3 +10,23 @@ inline void expectErrors(const LgsApp& app, const LgsBaseMsg& baseMsg, const siz
         EXPECT_EQ(app.errHandler.errors[i].errCode, baseMsg.errCode);
     }
 }
+
+inline std::string getLgsOutput(const std::string& code) {
+    fs::path execPath = "";
+    {
+        LgsApp app;
+        app.lgsCode = code;
+        app.configs.appMode = CODE_MODE;
+        if (!app.compile()) return "";
+        execPath = app.paths.execFile;
+    }
+    const auto pipe = popen(execPath.c_str(), "r");
+    assert(pipe);
+    std::string output;
+    char buffer[64];
+    while (fgets(buffer, sizeof(buffer), pipe)) {
+        output += buffer;
+    }
+    pclose(pipe);
+    return output;
+}

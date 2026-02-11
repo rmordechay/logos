@@ -7,10 +7,6 @@ void LgsField::setType(LgsType* newType) {
     type = newType;
 }
 
-std::string LgsField::getName() {
-    return name;
-}
-
 LgsType* LgsField::getType() {
     return type;
 }

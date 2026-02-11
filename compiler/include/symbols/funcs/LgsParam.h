@@ -21,7 +21,6 @@ public:
     explicit LgsParam(LgsType* type, const std::string& name = "", LgsExpr* expr = nullptr) : name(name), type(type), expr(expr) {}
     void setType(LgsType* newType);
     void setDebugValue(LgsCodeGen& cg) override;
-    std::string getName() override;
     LgsType* getType() override;
     ~LgsParam() override = default;
 };

@@ -11,10 +11,6 @@ LgsValue* LgsValue::clone() {
     assert(0);
 }
 
-std::string LgsValue::getName() {
-    assert(0);
-}
-
 LgsType* LgsValue::getType() {
     assert(0);
 }

@@ -66,7 +66,7 @@ public:
     LgsErrHandler errHandler;
     LgsTypeResolver typeResolver;
     LgsObject* currentObj = nullptr;
-    std::unordered_map<std::string, size_t> refCount;
+    std::vector<LgsApp*> importApps;
 
     explicit LgsSema(LgsAppConfigs& appConfigs, LgsFile* file, LgsSymbolTable& globals)
         : file(file), appConfigs(appConfigs), globals(globals), typeResolver(file, errHandler, globals) {}
@@ -123,6 +123,7 @@ public:
     void visitFuncCall(LgsFuncCall* funcCall);
     void visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent);
     bool visitFuncArgs(LgsFuncCall* funcCall, LgsFuncType* ft);
+    void visitModuleExpr(LgsModuleExpr* moduleExpr);
     void visitPrefixExpr(LgsPrefixExpr* prefixExpr);
     void visitPostfixExpr(LgsPostfixExpr* postfixExpr);
     void visitStrConst(const LgsStrConst* strConst);
@@ -144,7 +145,6 @@ public:
     void validateObjDuplicates(LgsObject* type);
     static bool validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const LgsFunc* func);
 
-    void resolveImports() const;
     void addLocalSymbol(const LgsSymbol& newSymbol);
     LgsSymbol* getSymbol(const std::string& name);
     void createCoroutineFunc(LgsFuncCall* funcCall);
