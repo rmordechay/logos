@@ -1,6 +1,7 @@
 #pragma once
 #include <math.h>
 #include "LgsValue.h"
+#include "types/LgsGenericType.h"
 
 class LgsModuleExpr;
 class LgsNull;
@@ -49,13 +50,13 @@ public:
 
     explicit LgsExpr(LgsType* type = nullptr) : type(type) {}
     LgsType* getType() override;
+    void setType(LgsType* newType) override;
     LgsExpr* wrapInNullable();
     std::optional<int64_t> getConstInt();
     std::optional<double_t> getConstFloat();
     std::optional<std::string> getConstStr();
 
     virtual Value* loadIR(LgsCodeGen& cg);
-    virtual void setType(LgsType* newType);
     virtual LgsExpr* cast(bool explicitly);
     virtual bool equals(LgsExpr* other);
     virtual std::string asText() = 0;

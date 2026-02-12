@@ -20,7 +20,6 @@ public:
     std::vector<const LgsReturn*> returnStmts;
     std::vector<std::pair<LgsExpr*, LgsExpr*>> mocks;
     BasicBlock* epilogue = nullptr;
-    bool isLambda = false;
     bool isTest = false;
     CallFn fn;
 
@@ -41,18 +40,18 @@ public:
     explicit LgsFunc(const std::string& name, const std::string& parentName, LgsType* rt, const std::vector<LgsType*>& paramTypes, const uint32_t ops = 0) : LgsFunc(name, rt, paramTypes, ops) {
         funcType->parentName = parentName;
     }
+    std::string asText() override;
+    LgsExpr* cast(bool explicitly) override;
+    void setType(LgsType* newType) override;
+    void hashNode(size_t& oldHash) override;
+    void replaceGenerics(const std::unordered_map<std::string, LgsType*>& replacements);
+    void initFunc(const std::string& name, LgsType* rt, const std::vector<LgsParam>& params, uint32_t ops);
     virtual Function* getIRFunc(LgsCodeGen& cg);
     virtual Value* call(LgsCodeGen& cg, std::vector<LgsFuncArg>& args);
     Value* callIR(LgsCodeGen& cg, const std::vector<Value*>& args = {});
     Value* callWithVariadic(LgsCodeGen& cg, const std::vector<LgsFuncArg>& args);
     Value* callExternal(LgsCodeGen& cg, const std::vector<LgsFuncArg>& args);
     Value* loadIR(LgsCodeGen& cg) override;
-    void initFunc(const std::string& name, LgsType* rt, const std::vector<LgsParam>& params, uint32_t ops);
-    LgsExpr* cast(bool explicitly) override;
-    std::string asText() override;
-    void setType(LgsType* newType) override;
-    void hashNode(size_t& oldHash) override;
     void setDebugValue(LgsCodeGen& cg) override;
-    LgsFunc* cloneGenerics(const LgsFuncCall* funcCall) const;
     ~LgsFunc() override;
 };

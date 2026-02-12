@@ -395,6 +395,10 @@ bool LgsObject::checkRecursiveFields(std::unordered_set<std::string>& nestedObje
     return true;
 }
 
+LgsObject* LgsObject::clone() {
+    assert(0);
+}
+
 LgsObject::~LgsObject() {
     freeTypes(enums);
     freeTypes(objects);

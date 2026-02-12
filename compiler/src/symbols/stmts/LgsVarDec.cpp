@@ -6,6 +6,10 @@
 
 #include <llvm/IR/DIBuilder.h>
 
+LgsType* LgsVarDec::getType() {
+    return type;
+}
+
 void LgsVarDec::setType(LgsType* newType) {
     type = newType;
 }
@@ -45,6 +49,12 @@ void LgsVarDec::hashNode(size_t& oldHash) {
     hashNodeString(oldHash, name);
     if (type) type->hashNode(oldHash);
     if (expr) expr->hashNode(oldHash);
+}
+
+LgsStmt* LgsVarDec::clone() {
+    const auto newLgsVarDec = new LgsVarDec(*this);
+    if (expr) newLgsVarDec->expr = expr->clone();
+    return newLgsVarDec;
 }
 
 LgsVarDec::~LgsVarDec() {

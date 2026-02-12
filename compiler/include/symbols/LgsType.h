@@ -81,7 +81,6 @@ public:
     bool isScalar() const;
     bool isUnknown();
     bool isSliceable();
-    bool hasGenericTypes();
     bool addMethod(LgsFunc* method);
     std::string getRTTName();
     Constant* getRTType(LgsCodeGen& cg);
@@ -105,6 +104,7 @@ public:
     virtual void hashNode(size_t& oldHash);
     virtual Value* hashValue(LgsCodeGen& cg, Value* value);
     virtual DIType* getDebugType(LgsCodeGen& cg) = 0;
+    virtual LgsType* replaceGenerics(std::unordered_map<std::string, LgsType*>& replacements);
 
     virtual Value* addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr);
     virtual Value* subIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr);

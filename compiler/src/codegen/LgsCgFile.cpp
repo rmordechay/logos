@@ -185,7 +185,7 @@ void LgsCgFile::visitStmt(LgsStmt* stmt) {
 }
 
 void LgsCgFile::visitStmtsBlock(const LgsStmtsBlock* stmtsBlock) {
-    assert(stmtsBlock);
+    if (!stmtsBlock) return;
     for (const auto& stmt : stmtsBlock->stmts) {
         switch (stmt.wrapperType) {
         case LgsStmtWrapper::WrapperType::Object:
@@ -467,17 +467,21 @@ void LgsCgFile::visitContinueStmt() {
 
 void LgsCgFile::visitReturnStmt(LgsReturn* returnStmt) {
     visitExpr(returnStmt->expr);
-    returnStmt->IRValue = returnStmt->expr ? returnStmt->expr->IRValue : nullptr;
+    returnStmt->expr->IRValue = returnStmt->expr ? returnStmt->expr->IRValue : nullptr;
     const auto currentFunc = stack.currentFunc();
     if (currentFunc->funcType->rt->isVoid()) {
         cg.callPopStack();
         cg.builder.CreateRetVoid();
     } else if (!currentFunc->returnStmts.empty()) {
         if (currentFunc->returnStmts.empty()) {
-            cg.builder.CreateRet(returnStmt->IRValue);
+            cg.builder.CreateRet(returnStmt->expr->IRValue);
         } else if (currentFunc->returnStmts.size() == 1) {
             cg.callPopStack();
-            cg.builder.CreateRet(returnStmt->IRValue);
+            if (returnStmt->expr->type->isNumber()) {
+                cg.builder.CreateRet(returnStmt->expr->loadIR(cg));
+            } else {
+                cg.builder.CreateRet(returnStmt->expr->IRValue);
+            }
         } else {
             returnStmt->parentBlock = cg.builder.GetInsertBlock();
             cg.builder.CreateBr(currentFunc->epilogue);

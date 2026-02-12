@@ -76,21 +76,6 @@ bool LgsType::isSliceable() {
     return asStr() || asDArray() || asSArray();
 }
 
-bool LgsType::hasGenericTypes() {
-    if (asGenericType()) return true;
-    if (const auto ft = asFuncType()) {
-        if (ft->rt->hasGenericTypes()) return true;
-        for (const auto& param : ft->params) {
-            if (param.type->hasGenericTypes()) return true;
-        }
-        return false;
-    }
-    if (const auto iter = asIterable()) {
-        if (iter->baseType->hasGenericTypes()) return true;
-    }
-    return false;
-}
-
 bool LgsType::addMethod(LgsFunc* method) {
     if (methods.contains(method->funcType->name)) return false;
     methods[method->funcType->name] = method;
@@ -148,8 +133,13 @@ bool LgsType::equals(LgsType* other) {
     return getName() == other->getName();
 }
 
+LgsType* LgsType::replaceGenerics(std::unordered_map<std::string, LgsType*>& replacements) {
+    return this;
+}
+
 void LgsType::hashNode(size_t& oldHash) { assert(0);}
 Value* LgsType::hashValue(LgsCodeGen& cg, Value* value) { assert(0);}
+
 Value* LgsType::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) { assert(0);}
 Value* LgsType::subIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) { assert(0);}
 Value* LgsType::mulIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) { assert(0);}
@@ -390,7 +380,7 @@ Type* getBiggestIntType(const std::vector<Type*>& types) {
 
 Value* loadAsInt(LgsCodeGen& cg, Value* v, Type* intType) {
     const auto ty = v->getType();
-    if (ty->isPointerTy()) v = cg.load(intType, v);
+    if (ty->isPointerTy()) return cg.load(intType, v);
     if (ty->isIntegerTy()) return cg.builder.CreateSExt(v, intType);
     if (ty->isFloatingPointTy()) return cg.builder.CreateFPToSI(v, intType);
     assert(0);

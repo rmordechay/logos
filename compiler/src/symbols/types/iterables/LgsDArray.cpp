@@ -52,11 +52,9 @@ std::string LgsDArray::fmtStr() const {
 
 bool LgsDArray::canCastTo(LgsType* other) {
     if (other->isAny()) return true;
-    if (other->asGenericType()) return true;
     const auto otherArr = other->asIterable();
     if (!otherArr) return false;
-    if (!baseType) return true;
-    if (!otherArr->baseType) return true;
+    if (!baseType || !otherArr->baseType) return false;
     return baseType->canCastTo(otherArr->baseType);
 }
 
@@ -85,6 +83,18 @@ LgsExpr* LgsDArray::getZeroValue() {
 
 Type* LgsDArray::getIRType(LgsCodeGen& cg) {
     return cg.getStructType({cg.sizeTy(), cg.ptrTy(), cg.ptrTy(), cg.sizeTy(), cg.sizeTy()}, name);
+}
+
+LgsType* LgsDArray::replaceGenerics(std::unordered_map<std::string, LgsType*>& replacements) {
+    auto r = replacements.find(getName());
+    const auto nestedTypeName = getNestedBaseType()->getName();
+    if (r != replacements.end() && r->second) {
+        replacements[nestedTypeName] = r->second->asIterable()->getNestedBaseType();
+        return r->second;
+    }
+    r = replacements.find(nestedTypeName);
+    if (r != replacements.end() && r->second) return new LgsDArray(r->second);
+    return nullptr;
 }
 
 Constant* LgsDArray::getRTTypeExtra(LgsCodeGen& cg) {
@@ -132,6 +142,7 @@ Function* LgsDArray::getAddFunc(LgsCodeGen& cg) {
     if (cg.mode == CG_MODE_SRC_CODE) return cg.getFunc(funcName, ft);
 
     // Prologue
+    cg.savedIP = cg.builder.saveIP();
     const auto func = cg.getFunc(funcName, ft);
     const auto entryBlock = cg.createBlock(BLOCK_ENTRY, func);
     const auto needsResizeBlock = cg.createBlock("resize");
@@ -175,6 +186,7 @@ Function* LgsDArray::getAddFunc(LgsCodeGen& cg) {
     cg.storeStructField(ty, arrIR, LgsDArrExprIndices::len, inc);
 
     cg.builder.CreateRetVoid();
+    cg.builder.restoreIP(cg.savedIP);
     return func;
 }
 

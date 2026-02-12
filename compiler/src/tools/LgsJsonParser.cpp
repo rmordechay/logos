@@ -155,7 +155,7 @@ void LgsJsonParser::parseField(const LgsField* field) {
 void LgsJsonParser::parseFunc(const LgsFunc* func) {
     openObject();
     addKeyValueStr("name", func->funcType->name, true);
-    addKeyValueStr("rt", func->funcType->rt->getName(), true);
+    // addKeyValueStr("rt", func->funcType->rt->getName(), true);
     openKeyArray("params");
     for (size_t i = 0; i < func->funcType->params.size(); ++i) {
         if (i > 0) addComma();

@@ -126,3 +126,5 @@ inline LgsBaseMsg E10111{"Null pointer exception.", errCodeStart++};
 inline LgsBaseMsg E10112{"Matrix rows/columns cannot be 0.", errCodeStart++};
 inline LgsBaseMsg E10113{"Only nullable values can be unwrapped with '!'.", errCodeStart++};
 inline LgsBaseMsg E10114{"Static array size must be known at compile time.", errCodeStart++};
+inline LgsBaseMsg E10115{"Wrong number of generic arguments. Expected: %s. Given: %s.", errCodeStart++};
+inline LgsBaseMsg E10116{"Could not replace generic types with actual types.", errCodeStart++};

@@ -32,6 +32,7 @@ bool LgsInt::canCastTo(LgsType* other) {
     if (otherName == LgsLong::name) return true;
     if (otherName == LgsFloat::name) return true;
     if (otherName == LgsDouble::name) return true;
+    if (other->asGenericType()) return other->canCastTo(this);
     if (const auto nullable = other->asNullable()) return canCastTo(nullable->baseType);
     return false;
 }

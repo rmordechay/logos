@@ -2,6 +2,8 @@
 #include "errors/LgsErrHandler.h"
 #include <llvm/IR/DIBuilder.h>
 
+#include "types/LgsGenericType.h"
+
 namespace llvm {
     class TargetMachine;
 }
@@ -42,10 +44,11 @@ public:
     LgsLocation location;
     Value* IRValue = nullptr;
 
+    virtual LgsType* getType();
+    virtual void setType(LgsType* newType);
     virtual void hashNode(size_t& oldHash);
     virtual void setDebugValue(LgsCodeGen& cg) = 0;
     virtual LgsValue* clone();
-    virtual LgsType* getType();
     void setDebugLoc(LgsCodeGen& cg) const;
     virtual ~LgsValue() = default;
 };

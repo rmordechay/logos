@@ -122,6 +122,7 @@ public:
     void visitMetaSelection(LgsMetaSelection* metaSelection, LgsExpr* parent = nullptr);
     void visitFuncCall(LgsFuncCall* funcCall);
     void visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent);
+    void visitGenericFuncCall(LgsFuncCall* funcCall, const LgsFunc* func);
     bool visitFuncArgs(LgsFuncCall* funcCall, LgsFuncType* ft);
     void visitModuleExpr(LgsModuleExpr* moduleExpr);
     void visitPrefixExpr(LgsPrefixExpr* prefixExpr);
@@ -145,10 +146,11 @@ public:
     void validateObjDuplicates(LgsObject* type);
     static bool validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const LgsFunc* func);
 
-    void addLocalSymbol(const LgsSymbol& newSymbol);
     LgsSymbol* getSymbol(const std::string& name);
+    void addLocalSymbol(const LgsSymbol& newSymbol);
     void createCoroutineFunc(LgsFuncCall* funcCall);
     void addError(const LgsBaseMsg& lgsErr, const LgsLocation& location, const std::vector<std::string>& args = {});
     void addRTType(LgsType* type) const;
     void addGenerics(LgsType* type) const;
+    LgsFunc* cloneGenericFunc(const LgsFuncCall* funcCall, const LgsFunc* func);
 };

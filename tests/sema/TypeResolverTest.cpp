@@ -16,7 +16,7 @@ TEST(TypeResolverTest, SArrStr) {
     })";
     app.loadSrcFile(code, LGS_MAIN_FILE);
     app.analyse();
-    const auto mainFunc = app.getMainFile()->getMainFunc();
+    const auto mainFunc = app.getMainFile()->funcs.at(LGS_MAIN_FUNC);
     const auto varDec = mainFunc->stmtsBlock->stmts.front().stmt->asVarDec();
     const auto sArr = varDec->type->asSArray();
     const auto arr = varDec->expr->asArrayExpr();
@@ -35,7 +35,7 @@ TEST(TypeResolverTest, SArrStrNullable) {
     })";
     app.loadSrcFile(code, LGS_MAIN_FILE);
     app.analyse();
-    const auto mainFunc = app.getMainFile()->getMainFunc();
+    const auto mainFunc = app.getMainFile()->funcs.at(LGS_MAIN_FUNC);
     const auto varDec = mainFunc->stmtsBlock->stmts.front().stmt->asVarDec();
     const auto sArr = varDec->type->asSArray();
     const auto arr = varDec->expr->asArrayExpr();

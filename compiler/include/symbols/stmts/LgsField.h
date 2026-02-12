@@ -21,7 +21,7 @@ public:
     Value* gep = nullptr;
 
     LgsField(const std::string& name, LgsType* type, LgsExpr* expr = nullptr) : name(name), type(type), expr(expr) {}
-    void setType(LgsType* newType);
+    void setType(LgsType* newType) override;
     Value* getGEP(LgsCodeGen& cg, Value* parentIRPtr);
     LgsType* getType() override;
     void setDebugValue(LgsCodeGen& cg) override;

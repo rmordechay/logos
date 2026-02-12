@@ -26,7 +26,7 @@ public:
     LgsSymbol ref;
 
     explicit LgsFuncCall(const std::string& name) : name(name) {}
-    std::string getGenericName() const;
+    std::string mangleName() const;
     Value* loadIR(LgsCodeGen& cg) override;
     bool equals(LgsExpr* other) override;
     bool equals(LgsFuncType* funcType) const;

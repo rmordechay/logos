@@ -10,6 +10,7 @@
 #include "types/LgsEnum.h"
 
 Value* LgsVariable::loadIR(LgsCodeGen& cg) {
+    if (!IRValue->getType()->isPointerTy()) return IRValue;
     switch (ref.symbolType) {
     case PARAM:
         return cg.load(type->getIRType(cg), ref.param->IRValue);

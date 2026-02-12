@@ -42,6 +42,7 @@ public:
         rttKind = RTT_OBJECT;
         metaFields[OBJ_META_NAME] = new LgsField(OBJ_META_NAME, new LgsStr(), new LgsStrConst(name));
     }
+    LgsObject* clone();
     std::string getName() override;
     std::string getBaseName() override;
     LgsFunc* getMethod(const std::string& methodName) override;
@@ -50,10 +51,11 @@ public:
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
     bool canCastTo(LgsType* other) override;
-    Value* hashValue(LgsCodeGen& cg, Value* value) override;
     void hashNode(size_t& oldHash) override;
+    bool checkRecursiveFields(std::unordered_set<std::string>& nestedObjectNames) const;
     Type* getIRType(LgsCodeGen& cg) override;
     Constant* getRTTypeExtra(LgsCodeGen& cg) override;
+    Value* hashValue(LgsCodeGen& cg, Value* value) override;
     Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     void cloneFields(LgsInstance* instance) const;
@@ -67,6 +69,5 @@ public:
     static StructType* getMethodRTTStruct(LgsCodeGen& cg);
     static Value* loadRTFieldsCount(LgsCodeGen& cg, Value* ptr);
     static Value* loadRTFields(LgsCodeGen& cg, Value* ptr);
-    bool checkRecursiveFields(std::unordered_set<std::string>& nestedObjectNames) const;
     ~LgsObject() override;
 };

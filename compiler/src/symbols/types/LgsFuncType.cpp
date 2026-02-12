@@ -47,7 +47,7 @@ std::string LgsFuncType::getName() {
 
 std::string LgsFuncType::pname() {
     std::stringstream str;
-    str << name << '(';
+    str << (isLambda ? "" : name) << '(';
     for (size_t i = isMethod; i < params.size(); ++i) {
         const auto param = params[i];
         if (param.type) {
@@ -99,6 +99,25 @@ bool LgsFuncType::equals(LgsType* other) {
         if (!param1->equals(param2.type)) return false;
     }
     return true;
+}
+
+LgsType* LgsFuncType::replaceGenerics(std::unordered_map<std::string, LgsType*>& replacements) {
+    const auto r = replacements.find(getName());
+    if (r == replacements.end()) return this;
+    const auto otherFuncType = r->second->asFuncType();
+    const auto rtName = rt->getName();
+    if (replacements.contains(rtName)) {
+        assert(replacements[rtName] == nullptr);
+        replacements[rtName] = otherFuncType->rt;
+    }
+    for (size_t i = 0; i < params.size(); ++i) {
+        const auto paramName = params[i].type->getName();
+        if (replacements.contains(paramName)) {
+            assert(replacements[paramName] == nullptr);
+            replacements[paramName] = otherFuncType->params[i].type;
+        }
+    }
+    return r->second;
 }
 
 LgsType* LgsFuncType::applyBinOp(LgsType* rightType, LgsBinOp& op) {

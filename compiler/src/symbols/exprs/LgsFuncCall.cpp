@@ -90,7 +90,7 @@ bool LgsFuncCall::equals(LgsExpr* other) {
     return equals(otherFuncCall->func->funcType);
 }
 
-std::string LgsFuncCall::getGenericName() const {
+std::string LgsFuncCall::mangleName() const {
     std::stringstream str;
     str << "u_" << name;
     for (size_t i = inSelection; i < args.size(); ++i) {
@@ -133,11 +133,8 @@ LgsFuncCall* LgsFuncCall::clone() {
 }
 
 bool argAndParamEqual(const LgsExpr* arg, const LgsParam* param) {
-    if (!param->type) return false;
-    const auto argType = arg->type;
-    if (!argType) return false;
-    if (param->type->hasGenericTypes()) return true;
-    return argType->canCastTo(param->type);
+    if (!param->type || !arg->type) return false;
+    return arg->type->canCastTo(param->type);
 }
 
 LgsFuncCall::~LgsFuncCall() {

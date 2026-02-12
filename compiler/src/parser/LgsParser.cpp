@@ -697,6 +697,7 @@ std::vector<LgsType*> LgsParser::parseGenericArgs() {
         if (!type) break;
         types.push_back(type);
         if (currentToken.type == T_RANGLE) break;
+        mustMatch(T_COMMA);
     }
     if (types.empty()) {
         reset(oldIndex);
@@ -821,13 +822,6 @@ void LgsParser::parseParams(LgsFuncType* funcType) {
             param.expr = parseExpr();
             mustParse(param.expr);
             funcType->hasDefaults = true;
-        }
-
-        // Generic type
-        for (const auto genericType : funcType->genericTypes) {
-            if (genericType->name != param.type->getName()) continue;
-            param.genericType = genericType;
-            break;
         }
 
         setLocation(param.location, &paramName, &currentToken);
@@ -1430,15 +1424,20 @@ LgsFuncCall* LgsParser::parseFuncCall() {
     const auto nameToken = currentToken;
     const auto oldIndex = currentIndex;
     if (!matchAndConsume(T_IDENTIFIER)) return nullptr;
-    auto generics = parseGenericArgs();
+
+    // Generic args
+    auto genericsArgs = parseGenericArgs();
     if (!matchOrReset(T_LPAREN, oldIndex)) {
-        freeTypes(generics);
+        freeTypes(genericsArgs);
         return nullptr;
     }
 
     const auto funcCall = new LgsFuncCall(nameToken.lexeme);
+    setLocation(funcCall->location, &nameToken, &currentToken);
+    funcCall->genericArgs = genericsArgs;
     if (matchAndConsume(T_RPAREN)) return funcCall;
 
+    // Arguments
     std::unordered_set<std::string> seen;
     while (true) {
         std::string argName = "";
@@ -1462,9 +1461,7 @@ LgsFuncCall* LgsParser::parseFuncCall() {
         mustMatch(T_COMMA);
         if (currentToken.type == T_RPAREN || currentToken.type == T_RBRACE) break;
     }
-
     mustMatch(T_RPAREN);
-    setLocation(funcCall->location, &nameToken, &currentToken);
     return funcCall;
 }
 
@@ -1756,7 +1753,7 @@ LgsFunc* LgsParser::parseLambda() {
 
     const auto lambda = new LgsFunc("", rt, params);
     currentFunc = lambda;
-    lambda->isLambda = true;
+    lambda->funcType->isLambda = true;
     lambda->stmtsBlock = parseStmtsBlock();
     mustParse(lambda->stmtsBlock);
     if (lambda->stmtsBlock->isMacro) addParsingError();
@@ -2180,7 +2177,7 @@ void LgsParser::recursionGuard() {
 
 LgsFunc* wrapStmtsBlockWithLambda(LgsStmtsBlock* stmtsBlock) {
     const auto func = new LgsFunc("", nullptr);
-    func->isLambda = true;
+    func->funcType->isLambda = true;
     func->location = stmtsBlock->location;
     func->stmtsBlock = stmtsBlock;
     return func;

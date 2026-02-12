@@ -34,6 +34,7 @@ public:
     bool isCoroutine = false;
     bool isDeferred = false;
     bool isIOMember = false;
+    bool isLambda = false;
     bool isSyscall = false;
     bool isTerminator = false;
     bool hasDefaults = false;
@@ -41,8 +42,7 @@ public:
     uint32_t variadicIndex = 0;
 
     explicit LgsFuncType(const std::string& name = ""): LgsFuncType(name, nullptr) {}
-    explicit LgsFuncType(const std::string& name, LgsType* rt, const std::vector<LgsParam>& params = {}, const uint32_t ops = 0)
-        : name(name), rt(rt), params(params) {
+    explicit LgsFuncType(const std::string& name, LgsType* rt, const std::vector<LgsParam>& params = {}, const uint32_t ops = 0) : name(name), rt(rt), params(params) {
         setFuncOptions(ops);
         passByRef = true;
     }
@@ -54,6 +54,7 @@ public:
     std::string fmtStr() const override;
     bool canCastTo(LgsType* other) override;
     bool equals(LgsType* other) override;
+    LgsType* replaceGenerics(std::unordered_map<std::string, LgsType*>& replacements) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     void setFuncOptions(uint32_t ops);
     std::unordered_map<std::string, LgsParam*> getParamsByName();

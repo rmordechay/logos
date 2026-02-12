@@ -13,13 +13,6 @@ size_t LgsMainFile::hashFile() {
     return hash;
 }
 
-LgsFunc* LgsMainFile::getMainFunc() {
-    for (auto [name, func] : funcs) {
-        if (name == LGS_MAIN_FUNC) return func;
-    }
-    return nullptr;
-}
-
 LgsMainFile::~LgsMainFile() {
     for (const auto& [_, func] : funcs) {
         delete func;

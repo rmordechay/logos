@@ -7,6 +7,7 @@
 #include "exprs/LgsBinaryExpr.h"
 #include "exprs/constants/LgsFloatConst.h"
 #include "types/LgsAny.h"
+#include "types/LgsNullable.h"
 #include "types/iterables/LgsVec.h"
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsDouble.h"
@@ -40,10 +41,12 @@ std::string LgsFloat::fmtStr() const {
 }
 
 bool LgsFloat::canCastTo(LgsType* other) {
-    const auto IRName = other->getName();
-    if (name == IRName) return true;
-    if (IRName == LgsAny::name) return true;
-    if (IRName == LgsDouble::name) return true;
+    const auto otherName = other->getName();
+    if (name == otherName) return true;
+    if (other->isAny()) return true;
+    if (otherName == LgsDouble::name) return true;
+    if (other->asGenericType()) return other->canCastTo(this);
+    if (const auto nullable = other->asNullable()) return canCastTo(nullable->baseType);
     return false;
 }
 

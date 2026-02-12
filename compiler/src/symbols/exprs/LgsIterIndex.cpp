@@ -8,20 +8,7 @@
 #include <llvm/IR/Module.h>
 
 Value* LgsIterIndex::loadIR(LgsCodeGen& cg) {
-    const auto baseExprType = baseExpr->type;
-    if (baseExprType->isHeap) {
-        return cg.loadPtr(IRValue);
-    }
-    if (baseExprType->asSArray() || baseExprType->asVec()) {
-        const auto indexIR = index.from->IRValue;
-        const auto ty = baseExpr->type->getIRType(cg);
-        const auto gep = cg.builder.CreateGEP(ty, IRValue, {cg.zero32(), indexIR});
-        return cg.load(type->getIRType(cg), gep);
-    }
-    if (baseExprType->asMatrix()) {
-        assert(0);
-    }
-    assert(0);
+    return cg.load(type->getTypeOrPtr(cg), IRValue);
 }
 
 Value* LgsIterIndex::getIRRangePtr(LgsCodeGen& cg) const {

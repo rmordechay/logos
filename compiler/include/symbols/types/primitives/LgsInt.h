@@ -16,8 +16,8 @@ public:
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     LgsExpr* getZeroValue() override;
     Type* getIRType(LgsCodeGen& cg) override;
-    Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee) override;
     Value* hashValue(LgsCodeGen& cg, Value* value) override;
+    Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee) override;
     Value* addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
     Value* subIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
     Value* mulIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;

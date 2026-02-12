@@ -7,11 +7,14 @@ add_executable(lgs_tests
     parser/ParserErrorTest.cpp
     parser/ParserTest.cpp
     sema/SemaErrorTest.cpp
-    sema/resolver/SArrTest.cpp
+    sema/TypeResolverTest.cpp
     codegen/CgIfStmtTest.cpp
     codegen/CgArithmeticsTest.cpp
-    ${COMPILER_SOURCE}
     codegen/CgDArrayTest.cpp
+    ${COMPILER_SOURCE}
+    sema/GenericsTest.cpp
+    codegen/CgGenericsTest.cpp
+    codegen/CgStrTest.cpp
 )
 
 target_include_directories(lgs_tests PRIVATE

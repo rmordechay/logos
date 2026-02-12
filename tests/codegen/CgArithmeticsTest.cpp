@@ -1,8 +1,4 @@
-#include "logos/LgsApp.h"
-#include <cassert>
-#include <sstream>
 #include "gtest/gtest.h"
-#include <unistd.h>
 #include "LgsTestUtils.h"
 
 TEST(CgArithmeticsTest, IntTest1) {

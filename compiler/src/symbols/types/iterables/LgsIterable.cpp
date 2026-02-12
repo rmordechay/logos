@@ -33,11 +33,15 @@ LgsFunc* LgsIterable::getMethod(const std::string& methodName) {
         return func;
     }
     if (methodName == MAP_FUNC) {
-        const auto generic = new LgsGenericType("U");
-        const auto callback = new LgsFuncType("cb", generic, {LgsParam(baseType)});
-        const auto func = new LgsFunc(methodName, getBaseName(), new LgsDArray(generic), {this, callback}, flags);
-        func->funcType->genericTypes.push_back(generic);
-        callback->genericTypes.push_back(generic);
+        // map<T, U>(arr: T[], cb: (e: T): U): U[]
+        const auto U = new LgsGenericType("T");
+        const auto T = new LgsGenericType("U");
+        const auto callback = new LgsFuncType("cb", U, {LgsParam(T)});
+        const auto func = new LgsFunc(methodName, getBaseName(), new LgsDArray(U), {this, callback}, flags);
+        func->funcType->genericTypes.push_back(T);
+        func->funcType->genericTypes.push_back(U);
+        callback->genericTypes.push_back(T);
+        callback->genericTypes.push_back(U);
         addMethod(func);
         return func;
     }
@@ -62,13 +66,25 @@ LgsFunc* LgsIterable::getMethod(const std::string& methodName) {
     return LgsType::getMethod(methodName);
 }
 
-LgsType* LgsIterable::getBaseType() const {
+LgsType* LgsIterable::getNestedBaseType() const {
     auto nestedIter = this;
     while (true) {
         if (const auto innerIter = nestedIter->baseType->asIterable()) {
             nestedIter = innerIter;
         } else {
             return nestedIter->baseType;
+        }
+    }
+}
+
+void LgsIterable::setBaseType(LgsType* newBaseType) {
+    auto nestedIter = this;
+    while (true) {
+        if (const auto innerIter = nestedIter->baseType->asIterable()) {
+            nestedIter = innerIter;
+        } else {
+            nestedIter->baseType = newBaseType;
+            break;
         }
     }
 }

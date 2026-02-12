@@ -20,7 +20,8 @@ std::string LgsGenericType::getName() {
 }
 
 bool LgsGenericType::canCastTo(LgsType* other) {
-    return true;
+    if (!bounds) return true;
+    return other->canCastTo(bounds);
 }
 
 LgsType* LgsGenericType::applyBinOp(LgsType* rightType, LgsBinOp& op) {
@@ -31,10 +32,11 @@ std::string LgsGenericType::fmtStr() const {
     assert(0);
 }
 
-DIType* LgsGenericType::getDebugType(LgsCodeGen& cg) {
-    assert(0);
+LgsType* LgsGenericType::replaceGenerics(std::unordered_map<std::string, LgsType*>& replacements) {
+    const auto r = replacements.find(name);
+    return r != replacements.end() && r->second ? r->second : nullptr;
 }
 
-bool LgsGenericType::canReplace(LgsType* type) {
-    return true;
+DIType* LgsGenericType::getDebugType(LgsCodeGen& cg) {
+    assert(0);
 }

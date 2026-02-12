@@ -21,9 +21,10 @@ public:
     size_t sizeBytes() override;
     std::string fmtStr() const override;
     bool canCastTo(LgsType* other) override;
-    LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     LgsExpr* getZeroValue() override;
+    LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     Type* getIRType(LgsCodeGen& cg) override;
+    LgsType* replaceGenerics(std::unordered_map<std::string, LgsType*>& replacements) override;
     Constant* getRTTypeExtra(LgsCodeGen& cg) override;
     Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee) override;
     Value* lenIR(LgsCodeGen& cg, Value* iterable) override;
