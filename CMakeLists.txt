@@ -165,12 +165,10 @@ set(COMPILER_SOURCE
 )
 
 set(LGS_LIB_SOURCE
-    ${CMAKE_SOURCE_DIR}/lib/src/Lgs_StrExpr.cpp
     ${CMAKE_SOURCE_DIR}/lib/src/Lgs_System.cpp
     ${CMAKE_SOURCE_DIR}/lib/src/Lgs_Runtime.cpp
     ${CMAKE_SOURCE_DIR}/lib/src/Lgs_Allocator.cpp
     ${CMAKE_SOURCE_DIR}/lib/src/Lgs_Print.cpp
-    ${CMAKE_SOURCE_DIR}/lib/src/Lgs_Reflection.cpp
 )
 
 set(SHARED_SOURCE

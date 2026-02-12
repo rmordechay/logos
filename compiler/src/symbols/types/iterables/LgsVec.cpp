@@ -175,15 +175,72 @@ Value* LgsVec::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
 }
 
 Value* LgsVec::subIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
-    assert(0);
+    const auto lExpr = binExpr->left;
+    const auto rExpr = binExpr->right;
+    auto l = lExpr->loadIR(cg);
+    auto r = rExpr->loadIR(cg);
+    if (baseType->isInt) {
+        if (lExpr->type->isInt) {
+            l = cg.builder.CreateVectorSplat(dimVec, cg.toInt(l));
+        }
+        if (rExpr->type->isInt) {
+            r = cg.builder.CreateVectorSplat(dimVec, cg.toInt(r));
+        }
+        return cg.allocaAndStore(getIRType(cg), cg.builder.CreateSub(l, r));
+    }
+    if (lExpr->type->isInt) {
+        l = cg.builder.CreateVectorSplat(dimVec, cg.toFloat(l));
+    }
+    if (rExpr->type->isInt) {
+        r = cg.builder.CreateVectorSplat(dimVec, cg.toFloat(r));
+    }
+    return cg.allocaAndStore(getIRType(cg), cg.builder.CreateFSub(l, r));
 }
 
 Value* LgsVec::mulIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
-    assert(0);
+    const auto lExpr = binExpr->left;
+    const auto rExpr = binExpr->right;
+    auto l = lExpr->loadIR(cg);
+    auto r = rExpr->loadIR(cg);
+    if (baseType->isInt) {
+        if (lExpr->type->isInt) {
+            l = cg.builder.CreateVectorSplat(dimVec, cg.toInt(l));
+        }
+        if (rExpr->type->isInt) {
+            r = cg.builder.CreateVectorSplat(dimVec, cg.toInt(r));
+        }
+        return cg.allocaAndStore(getIRType(cg), cg.builder.CreateMul(l, cg.toInt(r)));
+    }
+    if (lExpr->type->isInt) {
+        l = cg.builder.CreateVectorSplat(dimVec, cg.toFloat(l));
+    }
+    if (rExpr->type->isInt) {
+        r = cg.builder.CreateVectorSplat(dimVec, cg.toFloat(r));
+    }
+    return cg.allocaAndStore(getIRType(cg), cg.builder.CreateFMul(l, r));
 }
 
 Value* LgsVec::divIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
-    assert(0);
+    const auto lExpr = binExpr->left;
+    const auto rExpr = binExpr->right;
+    auto l = lExpr->loadIR(cg);
+    auto r = rExpr->loadIR(cg);
+    if (baseType->isInt) {
+        if (lExpr->type->isInt) {
+            l = cg.builder.CreateVectorSplat(dimVec, cg.toInt(l));
+        }
+        if (rExpr->type->isInt) {
+            r = cg.builder.CreateVectorSplat(dimVec, cg.toInt(r));
+        }
+        return cg.allocaAndStore(getIRType(cg), cg.builder.CreateSDiv(l, r));
+    }
+    if (lExpr->type->isInt) {
+        l = cg.builder.CreateVectorSplat(dimVec, cg.toFloat(l));
+    }
+    if (rExpr->type->isInt) {
+        r = cg.builder.CreateVectorSplat(dimVec, cg.toFloat(r));
+    }
+    return cg.allocaAndStore(getIRType(cg), cg.builder.CreateFDiv(l, r));
 }
 
 Value* LgsVec::modIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {

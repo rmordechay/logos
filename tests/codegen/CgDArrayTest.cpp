@@ -16,9 +16,7 @@ TEST(CgDArrTest, Test1) {
     }
     )";
     std::istringstream stream(getLgsOutput(code));
-    std::string line1, line2;
-    std::getline(stream, line1);
-    std::getline(stream, line2);
-    EXPECT_EQ(line1, "[1, 2]");
-    EXPECT_EQ(line2, "[1, 2, 3]");
+    const auto lines = getLines(stream, 2);
+    EXPECT_EQ(lines[0], "[1, 2]");
+    EXPECT_EQ(lines[1], "[1, 2, 3]");
 }

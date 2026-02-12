@@ -30,3 +30,13 @@ inline std::string getLgsOutput(const std::string& code) {
     pclose(pipe);
     return output;
 }
+
+inline std::vector<std::string> getLines(std::istringstream& stream, const size_t n) {
+    std::vector<std::string> lines;
+    for (size_t i = 0; i < n; ++i) {
+        std::string line;
+        std::getline(stream, line);
+        lines.push_back(line);
+    }
+    return lines;
+}

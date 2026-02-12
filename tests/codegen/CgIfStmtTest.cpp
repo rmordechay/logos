@@ -23,9 +23,7 @@ TEST(CgIfStmtTest, Test1) {
     }
     )";
     std::istringstream stream(getLgsOutput(code));
-    std::string line1, line2;
-    std::getline(stream, line1);
-    std::getline(stream, line2);
-    EXPECT_EQ(line1, "true");
-    EXPECT_EQ(line2, "false");
+    const auto lines = getLines(stream, 2);
+    EXPECT_EQ(lines[0], "true");
+    EXPECT_EQ(lines[1], "false");
 }

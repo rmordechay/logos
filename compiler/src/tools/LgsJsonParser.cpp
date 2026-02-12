@@ -198,7 +198,18 @@ void LgsJsonParser::parseStmtsBlock(const LgsStmtsBlock* stmtsBlock) {
     if (stmtsBlock) {
         for (size_t i = 0; i < stmtsBlock->stmts.size(); ++i) {
             if (i > 0) addComma();
-            parseStmt(stmtsBlock->stmts[i].stmt);
+            const auto wrapper = stmtsBlock->stmts[i];
+            switch (wrapper.wrapperType) {
+            case LgsStmtWrapper::WrapperType::Stmt:
+                parseStmt(wrapper.stmt);
+                break;
+            case LgsStmtWrapper::WrapperType::Expr:
+                parseExpr(wrapper.expr);
+                break;
+            case LgsStmtWrapper::WrapperType::Object:
+                parseObject(wrapper.obj);
+                break;
+            }
         }
     }
     closeArray();

@@ -136,9 +136,6 @@ Value* LgsStr::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
 }
 
 Value* LgsStr::lenIR(LgsCodeGen& cg, Value* iterable) {
-    if (iterable->getType()->isIntegerTy()) {
-        return cg.usize(1);
-    }
     return cg.callStrlen(iterable);
 }
 

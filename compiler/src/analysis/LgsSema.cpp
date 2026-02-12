@@ -1153,12 +1153,10 @@ void LgsSema::visitFuncCall(LgsFuncCall* funcCall) {
             funcCall->func = genericFunc->second;
         } else {
             funcCall->func = symbol->func->cloneGenerics(funcCall);
-            assert(funcCall->func);
             visitFunc(funcCall->func);
             funcs[genericName] = funcCall->func;
         }
     }
-
     funcCall->setType(funcCall->func->funcType->rt);
 }
 
@@ -1190,10 +1188,19 @@ void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent) {
 
     if (method->funcType->genericTypes.empty()) {
         methodCall->func = method;
-        methodCall->setType(method->funcType->rt);
     } else {
-        assert(0);
+        auto& funcs = file->symbolTable.genericsFuncs;
+        const auto genericName = methodCall->getGenericName();
+        const auto genericFunc = funcs.find(genericName);
+        if (genericFunc != funcs.end()) {
+            methodCall->func = genericFunc->second;
+        } else {
+            methodCall->func = method->cloneGenerics(methodCall);
+            visitFunc(methodCall->func);
+            funcs[genericName] = methodCall->func;
+        }
     }
+    methodCall->setType(method->funcType->rt);
 }
 
 bool LgsSema::visitFuncArgs(LgsFuncCall* funcCall, LgsFuncType* ft) {
