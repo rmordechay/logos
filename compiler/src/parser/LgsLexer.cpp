@@ -40,8 +40,15 @@ LgsToken LgsLexer::nextToken() {
         return {T_TAG, lexeme, location};
     }
 
-    // Dot, range or spread
+    // Float, range or spread
     if (currentChar == '.') {
+        if (std::isdigit(peek())) {
+            auto num = scanNumber(location);
+            if (std::isalpha(currentChar)) {
+                errHandler.addError(E10099, &location, filePath, {});
+            }
+            return num;
+        }
         advance();
         if (currentChar == '.') {
             advance();
@@ -50,13 +57,6 @@ LgsToken LgsLexer::nextToken() {
                 return {T_TRIPLE_DOT, "...", location};
             }
             return {T_DOUBLE_DOT, "..", location};
-        }
-        if (std::isdigit(currentChar)) {
-            auto num = scanNumber(location);
-            if (std::isalpha(currentChar)) {
-                errHandler.addError(E10099, &location, filePath, {});
-            }
-            return num;
         }
         return {T_DOT, ".", location};
     }

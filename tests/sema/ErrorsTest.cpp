@@ -20,13 +20,13 @@ TEST(ErrorsTest, E10001A) {
     LgsApp app;
     const auto code = R"(
     main() {
-        s1: Str[2] = [["text1"], ["text2"]]
+        s1: Int[2] = [["text1"], ["text2"]]
     }
     )";
     app.loadSrcFile(code, LGS_MAIN_FILE);
     ASSERT_TRUE(app.errHandler.successful);
     app.analyse();
-    expectErrors(app, E10001, 1);
+    expectErrors(app, E10001, 2);
 }
 
 TEST(ErrorsTest, E10002A) {
@@ -41,6 +41,19 @@ TEST(ErrorsTest, E10002A) {
     ASSERT_TRUE(app.errHandler.successful);
     app.analyse();
     expectErrors(app, E10002, 1);
+}
+
+TEST(ErrorsTest, E10001B) {
+    LgsApp app;
+    const auto code = R"(
+    main() {
+        s2: Int[] = [2.234, 2.34]
+    }
+    )";
+    app.loadSrcFile(code, LGS_MAIN_FILE);
+    ASSERT_TRUE(app.errHandler.successful);
+    app.analyse();
+    expectErrors(app, E10001, 2);
 }
 
 TEST(ErrorsTest, E10003A) {
@@ -326,19 +339,6 @@ TEST(ErrorsTest, E10017A) {
     ASSERT_TRUE(app.errHandler.successful);
     app.analyse();
     expectErrors(app, E10017, 1);
-}
-
-TEST(ErrorsTest, E10018A) {
-    LgsApp app;
-    const auto code = R"(
-    main() {
-        s2: Int[] = [2.234, 2.34]
-    }
-    )";
-    app.loadSrcFile(code, LGS_MAIN_FILE);
-    ASSERT_TRUE(app.errHandler.successful);
-    app.analyse();
-    expectErrors(app, E10001, 1);
 }
 
 TEST(ErrorsTest, E10021A) {
@@ -791,6 +791,20 @@ TEST(ErrorsTest, E10097A) {
     ASSERT_TRUE(app.errHandler.successful);
     app.analyse();
     expectErrors(app, E10097, 1);
+}
+
+TEST(ErrorsTest, E10105A) {
+    LgsApp app;
+    const auto code = R"(
+    main() {
+        arr: Str[2][2] = [["text1"], ["text"], ["text"]]
+        print(arr)
+    }
+    )";
+    app.loadSrcFile(code, LGS_MAIN_FILE);
+    ASSERT_TRUE(app.errHandler.successful);
+    app.analyse();
+    expectErrors(app, E10105, 1);
 }
 
 TEST(ErrorsTest, E100108A) {

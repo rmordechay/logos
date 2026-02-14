@@ -41,7 +41,7 @@ public:
         funcType->parentName = parentName;
     }
     std::string asText() override;
-    LgsExpr* cast(bool explicitly) override;
+    LgsExpr* cast(LgsType* toType, bool explicitly) override;
     void setType(LgsType* newType) override;
     void hashNode(size_t& oldHash) override;
     void replaceGenerics(const std::unordered_map<std::string, LgsType*>& replacements);

@@ -17,6 +17,7 @@ public:
     bool canCastTo(LgsType* other) override;
     Value* addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
     Value* mulIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
+    Value* divIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
     Value* powIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
     DIType* getDebugType(LgsCodeGen& cg) override;
 };

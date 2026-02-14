@@ -1330,22 +1330,6 @@ LgsExpr* LgsParser::parseUnary(const bool withInstance) {
     return expr;
 }
 
-LgsExpr* LgsParser::parseArgExprOrLambda() {
-    // The order is important. First check for empty block, then expr, then non-empty block.
-    if (currentToken.type == T_LBRACE && peek().type == T_RBRACE) {
-        consume(2);
-        return wrapStmtsBlockWithLambda(new LgsStmtsBlock());
-    }
-    if (const auto expr = parseExpr()) {
-        return expr;
-    }
-    if (const auto stmtsBlock = parseStmtsBlock()) {
-        if (stmtsBlock->isMacro) addParsingError();
-        return wrapStmtsBlockWithLambda(stmtsBlock);
-    }
-    return nullptr;
-}
-
 LgsVariable* LgsParser::parseVariable() {
     const auto startToken = currentToken;
     LgsVariable* var = nullptr;
@@ -1417,17 +1401,17 @@ LgsFuncCall* LgsParser::parseFuncCall() {
             funcCall->isNamed = true;
             argName = currentToken.lexeme;
             consume(2);
-            const auto exprOrStmt = parseArgExprOrLambda();
-            if (!exprOrStmt) break;
+            const auto exprOrLambda = parseExpr();
+            if (!exprOrLambda) break;
             if (!seen.insert(argName).second) {
-                addError(E10054, exprOrStmt->location, {argName});
+                addError(E10054, exprOrLambda->location, {argName});
                 break;
             }
-            funcCall->args.emplace_back(exprOrStmt, argName);
+            funcCall->args.emplace_back(exprOrLambda, argName);
         } else {
-            const auto exprOrStmt = parseArgExprOrLambda();
-            if (!exprOrStmt) break;
-            funcCall->args.emplace_back(exprOrStmt, argName);
+            const auto exprOrLambda = parseExpr();
+            if (!exprOrLambda) break;
+            funcCall->args.emplace_back(exprOrLambda, argName);
         }
         if (currentToken.type == T_RPAREN) break;
         mustMatch(T_COMMA);
@@ -1573,7 +1557,6 @@ LgsArrayExpr* LgsParser::parseArrayExpr() {
     }
     mustMatch(T_RBRACK);
     const auto arrExpr = new LgsArrayExpr();
-    arrExpr->type = new LgsDArray();
     arrExpr->elements = args;
     setLocation(arrExpr->location, &startToken, &currentToken);
     return arrExpr;
@@ -1683,8 +1666,7 @@ LgsFunc* LgsParser::parseLambda() {
     const auto startToken = currentToken;
     const auto oldIndex = currentIndex;
     std::vector<LgsParam> params;
-    if (currentToken.type == T_IDENTIFIER) {
-        // Single param
+    if (currentToken.type == T_IDENTIFIER) { // Single param (allowed w/o parenthesis)
         LgsParam param(nullptr, currentToken.lexeme);
         consume();
         if (matchAndConsume(T_COLON)) {
@@ -1692,8 +1674,7 @@ LgsFunc* LgsParser::parseLambda() {
             mustParse(param.type);
         }
         params.emplace_back(param);
-    } else if (matchAndConsume(T_LPAREN)) {
-        // Multiple params
+    } else if (matchAndConsume(T_LPAREN)) { // Multiple params
         if (!matchAndConsume(T_RPAREN)) {
             while (true) {
                 auto paramName = currentToken.lexeme;

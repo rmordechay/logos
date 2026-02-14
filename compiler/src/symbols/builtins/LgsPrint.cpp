@@ -9,7 +9,7 @@
 Value* LgsPrint::call(LgsCodeGen& cg, std::vector<LgsFuncArg>& args) {
     const auto arg = args.empty() ? funcType->params.front().expr : args.front().expr;
     const auto type = arg->type;
-    if (type->asFloat()) {
+    if (type->isFloat) {
         const auto fmt = cg.getString(type->fmtStr() + "\n");
         return cg.callPrintf({fmt, cg.builder.CreateFPExt(arg->loadIR(cg), cg.doubleTy())});
     }

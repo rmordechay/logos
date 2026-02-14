@@ -788,7 +788,7 @@ void LgsCgFile::visitIterIndex(LgsIterIndex* iterIndex, const bool assign) {
     } else {
         const auto baseExprValue = baseExpr->pointee ? baseExpr->pointee : baseExpr->IRValue;
         iterIndex->IRValue = iterable->getIRElement(cg, baseExprValue, from->IRValue);
-        if (!assign) iterIndex->IRValue = iterIndex->loadIR(cg);
+        if (!assign && !iterable->isStatic) iterIndex->IRValue = iterIndex->loadIR(cg);
     }
 }
 
@@ -985,7 +985,7 @@ void LgsCgFile::visitStaticArray(LgsArrayExpr* arrayExpr) {
     }
 
     // Init with zero the remaining args that are not set by the user.
-    if (!arrayExpr->pointee && arrayExpr->elements.size() < sArr->len) {
+    if (arrayExpr->elements.size() < sArr->len) {
         cg.store(ConstantAggregateZero::get(ty), arrayExpr->IRValue);
     }
 
@@ -1013,7 +1013,7 @@ void LgsCgFile::visitDynamicArray(LgsArrayExpr* arrayExpr) {
 }
 
 void LgsCgFile::visitVectorExpr(LgsVectorExpr* vecExpr) {
-    const auto vecType = vecExpr->type->asVec();
+    const auto vecType = vecExpr->vecType;
     const auto ty = vecType->getIRType(cg);
     if (vecExpr->elements.empty()) {
         vecExpr->IRValue = vecType->getIRZeroValue(cg, vecExpr->pointee);
@@ -1036,7 +1036,7 @@ void LgsCgFile::visitVectorExpr(LgsVectorExpr* vecExpr) {
     }
 
     // Multiple elements
-    vecExpr->IRValue = vecExpr->type->asVec()->getIRZeroValue(cg, vecExpr->pointee);
+    vecExpr->IRValue = vecExpr->vecType->getIRZeroValue(cg, vecExpr->pointee);
     if (vecExpr->sumArgsDim < vecType->dimVec) {
         cg.store(Constant::getNullValue(ty), vecExpr->pointee);
     }

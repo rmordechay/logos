@@ -11,7 +11,8 @@ TEST(GenericsTest, Test1) {
     }
     main() {
         arr = func([1, 2, 3])
-    })";
+    }
+    )";
     app.loadSrcFile(code, LGS_MAIN_FILE);
     app.analyse();
     const auto mainFile = app.getMainFile();
@@ -31,7 +32,8 @@ TEST(GenericsTest, Test2) {
     }
     main() {
         arr = func([1, 2, 3])
-    })";
+    }
+    )";
     app.loadSrcFile(code, LGS_MAIN_FILE);
     app.analyse();
     const auto mainFile = app.getMainFile();

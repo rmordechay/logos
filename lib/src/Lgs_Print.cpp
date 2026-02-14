@@ -71,6 +71,10 @@ static std::string formatElement(const Lgs_TypeInfo* type, void* value) {
     }
     case RTT_SARRAY: {
         const auto sArr = type->sArr;
+        if (sArr->baseType->kind == RTT_CHAR) {
+            str << static_cast<char*>(value);
+            break;
+        }
         str << "[";
         auto offset = 0;
         for (int i = 0; i < sArr->length; ++i) {

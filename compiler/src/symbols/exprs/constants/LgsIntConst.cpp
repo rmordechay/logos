@@ -9,17 +9,12 @@ Value* LgsIntConst::loadIR(LgsCodeGen& cg) {
     return IRValue;
 }
 
-LgsExpr* LgsIntConst::cast(bool explicitly) {
-    if (!implicitCast) return this;
-    if (type->canCastTo(implicitCast)) {
-        if (implicitCast->isFloat) {
-            return new LgsFloatConst(implicitCast, value);
-        }
-        if (implicitCast->isInt && implicitCast->sizeBytes() > type->sizeBytes()) {
-            setType(implicitCast);
-        }
+LgsExpr* LgsIntConst::cast(LgsType* toType, const bool explicitly) {
+    if (!toType) return this;
+    if (toType->isScalar() && type->canCastTo(toType)) {
+        setType(toType);
     }
-    return implicitCast->asNullable() ? wrapInNullable() : this;
+    return this;
 }
 
 LgsIntConst* LgsIntConst::clone() {

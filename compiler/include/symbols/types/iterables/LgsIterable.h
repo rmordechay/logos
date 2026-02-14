@@ -1,7 +1,6 @@
 #pragma once
 #include "LgsType.h"
 #include "codegen/LgsCodeGen.h"
-#include "types/LgsFuncType.h"
 
 class LgsForeachLoop;
 class LgsCodeGen;
@@ -30,10 +29,12 @@ public:
     explicit LgsIterable(LgsType* baseType = nullptr) : baseType(baseType) {}
     LgsFunc* getMethod(const std::string& methodName) override;
     LgsType* getNestedBaseType() const;
-    void setBaseType(LgsType* newBaseType);
-    virtual std::optional<int64_t> getConstLength();
+    void setNestedBaseType(LgsType* newBaseType);
+    size_t getDims() const;
+    virtual void inferBaseType(std::vector<LgsExpr*> elements);
     virtual LgsType* getIndexType();
     virtual LgsType* getValueType();
+    virtual std::optional<int64_t> getConstLength();
     virtual bool unpackLoopVars(LgsForeachLoop* loop) const;
     virtual void setLoopIRVars(LgsCodeGen& cg, LgsForeachLoop* loop);
     virtual Value* lenIR(LgsCodeGen& cg, Value* iterable) = 0;

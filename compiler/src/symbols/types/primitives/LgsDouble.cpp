@@ -6,6 +6,7 @@
 #include "codegen/LgsCodeGen.h"
 #include "exprs/LgsBinaryExpr.h"
 #include "types/LgsAny.h"
+#include "types/primitives/LgsBool.h"
 
 std::string LgsDouble::getName() {
     return name;
@@ -20,6 +21,26 @@ LgsExpr* LgsDouble::getZeroValue() {
 }
 
 LgsType* LgsDouble::applyBinOp(LgsType* rightType, LgsBinOp& op) {
+    if (!rightType->isScalar()) return nullptr;
+    switch (op.opType) {
+    case POW:
+        return &LGS_DOUBLE;
+    case ADD:
+    case SUB:
+    case MUL:
+    case DIV:
+        if (rightType->isScalar()) return this;
+        return nullptr;
+    case EQ:
+    case NE:
+    case LT:
+    case GT:
+    case GE:
+    case LE:
+        return &LGS_BOOL;
+    default:
+        break;
+    }
     return nullptr;
 }
 
@@ -51,6 +72,13 @@ Value* LgsDouble::mulIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto right = binExpr->right;
     const auto [l, r] = loadNumberPair(cg, left->loadIR(cg), right->loadIR(cg), this);
     return cg.builder.CreateFMul(l, r);
+}
+
+Value* LgsDouble::divIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
+    const auto left = binExpr->left;
+    const auto right = binExpr->right;
+    const auto [l, r] = loadNumberPair(cg, left->loadIR(cg), right->loadIR(cg), this);
+    return cg.builder.CreateFDiv(l, r);
 }
 
 Value* LgsDouble::powIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {

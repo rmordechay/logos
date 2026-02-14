@@ -11,6 +11,7 @@ public:
     explicit LgsVariable(const std::string& name, LgsType* type = nullptr) : LgsExpr(type), name(name) {}
     Value* loadIR(LgsCodeGen& cg) override;
     bool equals(LgsExpr* other) override;
+    LgsExpr* cast(LgsType* toType, bool explicitly) override;
     std::string asText() override;
     void setDebugValue(LgsCodeGen& cg) override;
     LgsVariable* clone() override;

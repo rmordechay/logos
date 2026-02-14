@@ -386,7 +386,7 @@ Value* loadAsInt(LgsCodeGen& cg, Value* v, Type* intType) {
 Value* loadAsFloat(LgsCodeGen& cg, Value* v, Type* floatType) {
     const auto ty = v->getType();
     if (ty->isPointerTy()) v = cg.load(floatType, v);
-    if (ty->isFloatingPointTy()) return cg.builder.CreateSIToFP(v, floatType);
+    if (ty->isFloatingPointTy()) return cg.builder.CreateFPExt(v, floatType);
     if (ty->isIntegerTy()) return cg.builder.CreateSIToFP(v, floatType);
     assert(0);
 }

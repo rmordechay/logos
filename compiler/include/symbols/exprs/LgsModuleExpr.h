@@ -9,7 +9,6 @@ public:
     LgsSymbolTable* moduleGlobals = nullptr;
 
     explicit LgsModuleExpr(const std::string& name) : name(name) {}
-    LgsExpr* cast(bool explicitly) override;
     void setDebugValue(LgsCodeGen& cg) override;
     std::string asText() override;
 };

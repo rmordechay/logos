@@ -73,19 +73,19 @@ public:
 
     void analyse();
     void visitMainFile(LgsMainFile* mainFile);
+    void visitTestFile(const LgsTestFile* testFile);
     void visitObject(LgsObject* obj);
     void visitInterface(LgsInterface* interface);
     void visitEnum(LgsEnum* enum_);
-    void visitTestFile(const LgsTestFile* testFile);
     void visitField(LgsField* field);
     void visitFuncHeader(LgsFuncType* ft);
     void visitFunc(LgsFunc* func);
     void visitMainFunc(LgsMainFunc* mainFunc);
+    void visitObjImplements(LgsObject* obj, const std::vector<LgsType*>& interfaces);
     void visitLambda(LgsFunc* lambda);
     void visitParam(LgsParam* param);
     void visitIOPair(LgsIOPair* ioPair, LgsObject* obj);
     void visitStmt(LgsStmtWrapper& stmt);
-    void replaceForLoop(LgsStmtWrapper& stmt);
     void visitStmtsBlock(LgsStmtsBlock* stmtsBlock);
     void visitVarDec(LgsVarDec* varDec);
     void visitAssignment(const LgsAssignment* assignment);
@@ -110,7 +110,6 @@ public:
     void visitNullableExpr(LgsNullableExpr* nullableExpr);
     void visitUnwrap(LgsExpr* expr);
     void visitArrayExpr(LgsArrayExpr* arrayExpr);
-    void visitArrayElements(const LgsArrayExpr* arrExpr);
     void visitHashMap(LgsHashMap* hashMap);
     void visitVectorExpr(LgsVectorExpr* vectorExpr);
     void visitMatrixExpr(const LgsMatrixExpr* matrixExpr);
@@ -138,7 +137,6 @@ public:
     bool validateExprType(const LgsExpr* expr, LgsType* type);
     bool validateTypeName(const std::string& name, const LgsLocation& location);
     bool validateLocalName(const std::string& name, const LgsLocation& location);
-    void visitObjImplements(LgsObject* obj, const std::vector<LgsType*>& interfaces);
     void validateIndex(const LgsIterIndex* iterIndex);
     bool validateFieldVisibility(LgsField* field, LgsType* parent, const LgsLocation& location);
     bool validateMethodVisibility(const LgsFunc* method, LgsType* parent, const LgsLocation& location);
@@ -148,6 +146,7 @@ public:
 
     LgsFunc* cloneGenericFunc(const LgsFuncCall* funcCall, const LgsFunc* func);
     LgsSymbol* getSymbol(const std::string& name);
+    void replaceForLoop(LgsStmtWrapper& stmt);
     void addLocalSymbol(const LgsSymbol& newSymbol);
     void createCoroutineFunc(LgsFuncCall* funcCall);
     void addError(const LgsBaseMsg& lgsErr, const LgsLocation& location, const std::vector<std::string>& args = {});

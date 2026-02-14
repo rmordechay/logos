@@ -55,6 +55,21 @@ bool LgsDArray::canCastTo(LgsType* other) {
     return baseType->canCastTo(otherArr->baseType);
 }
 
+void LgsDArray::inferBaseType(const std::vector<LgsExpr*> elements) {
+    LgsType* type = nullptr;
+    for (const auto element : elements) {
+        if (const auto inner = element->type->asIterable()) {
+            inner->inferBaseType({element});
+            type = inner->baseType;
+        } else {
+            type = element->type;
+        }
+    }
+    if (type) {
+        baseType = type;
+    }
+}
+
 LgsType* LgsDArray::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     switch (op.opType) {
     case EQ:
@@ -83,14 +98,18 @@ Type* LgsDArray::getIRType(LgsCodeGen& cg) {
 }
 
 LgsType* LgsDArray::replaceGenerics(std::unordered_map<std::string, LgsType*>& replacements) {
-    auto r = replacements.find(getName());
+    auto replacement = replacements.find(getName());
     const auto nestedTypeName = getNestedBaseType()->getName();
-    if (r != replacements.end() && r->second) {
-        replacements[nestedTypeName] = r->second->asIterable()->getNestedBaseType();
-        return r->second;
+    if (replacement != replacements.end() && replacement->second) {
+        const auto nestedBaseType = replacement->second->asIterable()->getNestedBaseType();
+        assert(!nestedBaseType->asGenericType());
+        replacements[nestedTypeName] = nestedBaseType;
+        return replacement->second;
     }
-    r = replacements.find(nestedTypeName);
-    if (r != replacements.end() && r->second) return new LgsDArray(r->second);
+    replacement = replacements.find(nestedTypeName);
+    if (replacement != replacements.end() && replacement->second) {
+        return new LgsDArray(replacement->second);
+    }
     return nullptr;
 }
 

@@ -151,7 +151,7 @@ void LgsTypeResolver::resolveFuncType(LgsFuncType* funcType) {
         }
     }
     resolveType(funcType->rt);
-    funcType->swapReturn = funcType->rt->asSArray();
+    funcType->swapReturn = !funcType->isExternal && funcType->rt->asSArray();
     currentFuncType = oldFunc;
 }
 

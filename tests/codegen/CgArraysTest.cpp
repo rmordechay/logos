@@ -50,3 +50,33 @@ TEST(CgArraysTest, SArrTest2) {
     const auto lines = getLines(stream, 1);
     EXPECT_EQ(lines[0], "[1, 2, 3]");
 }
+
+TEST(CgArraysTest, SArrTest3) {
+    const auto code = R"(
+    main() {
+        arr: Int[2][2][2]
+        print(arr)
+        arr[0][0][0] := 1
+        print(arr)
+        arr[0][0][1] := 1
+        print(arr)
+        arr[0][0][0] := 1
+        print(arr)
+        arr[0][1][0] := 1
+        print(arr)
+        arr[0][0][0] := 1
+        print(arr)
+        arr[1][1][1] := 1
+        print(arr)
+    }
+    )";
+    std::istringstream stream(getLgsOutput(code));
+    const auto lines = getLines(stream, 7);
+    EXPECT_EQ(lines[0], "[[[0, 0], [0, 0]], [[0, 0], [0, 0]]]");
+    EXPECT_EQ(lines[1], "[[[1, 0], [0, 0]], [[0, 0], [0, 0]]]");
+    EXPECT_EQ(lines[2], "[[[1, 1], [0, 0]], [[0, 0], [0, 0]]]");
+    EXPECT_EQ(lines[3], "[[[1, 1], [0, 0]], [[0, 0], [0, 0]]]");
+    EXPECT_EQ(lines[4], "[[[1, 1], [1, 0]], [[0, 0], [0, 0]]]");
+    EXPECT_EQ(lines[5], "[[[1, 1], [1, 0]], [[0, 0], [0, 0]]]");
+    EXPECT_EQ(lines[6], "[[[1, 1], [1, 0]], [[0, 0], [0, 1]]]");
+}

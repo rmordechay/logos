@@ -1,17 +1,12 @@
 import C "stdio.h"
 
-main() {
-    writeFile()
-    readFile()
-}
-
 writeFile() {
     file = fopen("../test.txt", "w")
     fseek(file, 0, SEEK_END)
-    length = ftell(file)
-    print("File length: ${length}")
     fseek(file, 0, SEEK_SET)
     fprintf(file, "Hello world")
+    length = ftell(file)
+    print(length)
     fclose(file)
 }
 
@@ -21,4 +16,9 @@ readFile() {
     lineRead = fgets(buffer, 1024, file)
     print(buffer)
     fclose(file)
+}
+
+main() {
+    writeFile()
+    readFile()
 }

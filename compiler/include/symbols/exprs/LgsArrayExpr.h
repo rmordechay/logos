@@ -6,14 +6,19 @@
 
 class LgsArrayExpr final : public LgsExpr {
 public:
+    LgsIterable* iterable = nullptr;
     std::vector<LgsExpr*> elements;
 
     LgsArrayExpr() = default;
-    explicit LgsArrayExpr(LgsSArray* arrType) : LgsExpr(arrType) {}
-    explicit LgsArrayExpr(LgsDArray* arrType) : LgsExpr(arrType) {}
-    explicit LgsArrayExpr(LgsSet* setType) : LgsExpr(setType) {}
+    explicit LgsArrayExpr(LgsSArray* arrType) {
+        setType(arrType);
+    }
+    explicit LgsArrayExpr(LgsDArray* arrType) {
+        setType(arrType);
+    }
     Value* loadIR(LgsCodeGen& cg) override;
-    LgsExpr* cast(bool explicitly) override;
+    LgsExpr* cast(LgsType* toType, bool explicitly) override;
+    void setType(LgsType* newType) override;
     void setDebugValue(LgsCodeGen& cg) override;
     std::string asText() override;
     LgsExpr* clone() override;

@@ -8,20 +8,18 @@ Value* LgsArrayExpr::loadIR(LgsCodeGen& cg) {
     return IRValue;
 }
 
-LgsExpr* LgsArrayExpr::cast(const bool explicitly) {
-    const auto otherIter = implicitCast->asIterable();
-    if (!otherIter) return this;
-    if (type->asDArray() && implicitCast->asSArray()) {
-        if (!type->canCastTo(implicitCast)) return this;
-        freeType(type);
-        type = implicitCast;
-    }
-    for (auto& element : elements) {
-        element->implicitCast = otherIter->baseType;
-        if (!element->type->canCastTo(element->implicitCast)) continue;
-        element = element->cast(explicitly);
-    }
-    return implicitCast->asNullable() ? wrapInNullable() : this;
+LgsExpr* LgsArrayExpr::cast(LgsType* toType, const bool explicitly) {
+    if (iterable && iterable->baseType) return this;
+    const auto otherIter = toType->asIterable();
+    if (!otherIter || otherIter->asStr()) return this;
+    if (otherIter->getNestedBaseType()->asGenericType()) return this;
+    setType(toType);
+    return this;
+}
+
+void LgsArrayExpr::setType(LgsType* newType) {
+    iterable = newType->asIterable();
+    type = iterable;
 }
 
 void LgsArrayExpr::setDebugValue(LgsCodeGen& cg) {
@@ -44,7 +42,9 @@ void LgsArrayExpr::setDebugValue(LgsCodeGen& cg) {
 }
 
 std::string LgsArrayExpr::asText() {
-    return type ? type->pname() : "[]";
+    if (type) return type->pname();
+    if (elements.empty()) return "[]";
+    return "[" + elements.front()->asText() + ", ...]";
 }
 
 LgsExpr* LgsArrayExpr::clone() {

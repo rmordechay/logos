@@ -18,8 +18,8 @@ std::string LgsFunc::asText() {
     return funcType->pname();
 }
 
-LgsExpr* LgsFunc::cast(bool explicitly) {
-    const auto toFuncType = implicitCast->asFuncType();
+LgsExpr* LgsFunc::cast(LgsType* toType, const bool explicitly) {
+    const auto toFuncType = toType->asFuncType();
     if (!toFuncType) return this;
     // Add 'it' if needed, else as normal params
     if (funcType->isLambda && funcType->params.empty() && toFuncType->params.size() == 1) {

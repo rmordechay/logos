@@ -20,6 +20,25 @@ TEST(CgArithmeticsTest, IntTest1) {
     EXPECT_EQ(lines[4], "-45");
 }
 
+TEST(CgArithmeticsTest, FloatTest1) {
+    const auto code = R"(
+    main() {
+        print(23.53 + 34.7)
+        print(23.2 - 235.45)
+        print(23.4 * 34)
+        print(23.1 + 34.2 - 235)
+        print(23.3 - 34.3 * 2.2)
+    }
+    )";
+    std::istringstream stream(getLgsOutput(code));
+    const auto lines = getLines(stream, 5);
+    EXPECT_EQ(lines[0], "58.230");
+    EXPECT_EQ(lines[1], "-212.250");
+    EXPECT_EQ(lines[2], "795.600");
+    EXPECT_EQ(lines[3], "-177.700");
+    EXPECT_EQ(lines[4], "-52.160");
+}
+
 TEST(CgArithmeticsTest, VecTest1) {
     const auto code = R"(
     main() {

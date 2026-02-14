@@ -69,6 +69,7 @@ LgsFunc* LgsIterable::getMethod(const std::string& methodName) {
 LgsType* LgsIterable::getNestedBaseType() const {
     auto nestedIter = this;
     while (true) {
+        if (nestedIter->baseType->asStr()) return nestedIter->baseType;
         if (const auto innerIter = nestedIter->baseType->asIterable()) {
             nestedIter = innerIter;
         } else {
@@ -77,16 +78,38 @@ LgsType* LgsIterable::getNestedBaseType() const {
     }
 }
 
-void LgsIterable::setBaseType(LgsType* newBaseType) {
+void LgsIterable::setNestedBaseType(LgsType* newBaseType) {
     auto nestedIter = this;
     while (true) {
         if (const auto innerIter = nestedIter->baseType->asIterable()) {
+            if (innerIter->asStr()) {
+                nestedIter->baseType = newBaseType;
+                return;
+            }
             nestedIter = innerIter;
         } else {
             nestedIter->baseType = newBaseType;
+            return;
+        }
+    }
+}
+
+size_t LgsIterable::getDims() const {
+    size_t dims = 0;
+    auto nestedIter = this;
+    while (true) {
+        dims++;
+        if (const auto innerIter = nestedIter->baseType->asIterable()) {
+            nestedIter = innerIter;
+        } else {
             break;
         }
     }
+    return dims;
+}
+
+void LgsIterable::inferBaseType(const std::vector<LgsExpr*> elements) {
+
 }
 
 std::optional<int64_t> LgsIterable::getConstLength() {

@@ -41,7 +41,6 @@ class LgsTypeConst;
 class LgsExpr : public LgsValue {
 public:
     LgsType* type = nullptr;
-    LgsType* implicitCast = nullptr;
     bool isMutable = true;
     bool isNull = false;
     bool isReturnExpr = false;
@@ -51,13 +50,12 @@ public:
     explicit LgsExpr(LgsType* type = nullptr) : type(type) {}
     LgsType* getType() override;
     void setType(LgsType* newType) override;
-    LgsExpr* wrapInNullable();
     std::optional<int64_t> getConstInt();
     std::optional<double_t> getConstFloat();
     std::optional<std::string> getConstStr();
 
     virtual Value* loadIR(LgsCodeGen& cg);
-    virtual LgsExpr* cast(bool explicitly);
+    virtual LgsExpr* cast(LgsType* toType, bool explicitly);
     virtual bool equals(LgsExpr* other);
     virtual std::string asText() = 0;
 
@@ -90,6 +88,8 @@ public:
     ~LgsExpr() override = default;
 };
 
+LgsExpr* wrapInNullable(LgsExpr* expr);
+void castExprImplicitly(LgsExpr*& expr, LgsType* toType);
 void freeExpr(LgsExpr* expr);
 template<typename T>
 void freeExprs(std::vector<T*>& exprs) {
