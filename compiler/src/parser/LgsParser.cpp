@@ -1169,33 +1169,7 @@ LgsBreak* LgsParser::parseBreakStmt() {
 }
 
 LgsCoroutine* LgsParser::parseCoroutine() {
-    const auto goToken = currentToken;
-    if (!matchAndConsume(T_GO)) return nullptr;
-
-    LgsExpr* expr = nullptr;
-    if (const auto stmtsBlock = parseStmtsBlock(false)) {
-        if (stmtsBlock->isMacro) addParsingError();
-        const auto fc = new LgsFuncCall("");
-        setLocation(fc->location, &goToken, &currentToken);
-        fc->func = wrapStmtsBlockWithLambda(stmtsBlock);
-        fc->setType(&LGS_VOID);
-        expr = fc;
-    } else {
-        expr = parseUnary(false);
-    }
-    mustParse(expr);
-
-    const auto coroutine = new LgsCoroutine();
-    coroutine->location = expr->location;
-    if (const auto funcCall = expr->asFuncCall()) {
-        coroutine->funcCall = funcCall;
-    } else if (const auto selection = expr->asSelection()) {
-        coroutine->selection = selection;
-        const auto methodCall = coroutine->selection->asMethodCall();
-        if (!methodCall) addParsingError();
-    }
-
-    return coroutine;
+    return nullptr;
 }
 
 LgsDeferStmt* LgsParser::parseDeferStmt() {
@@ -1218,13 +1192,13 @@ LgsDeferStmt* LgsParser::parseDeferStmt() {
     const auto deferStmt = new LgsDeferStmt();
     deferStmt->location = expr->location;
     if (const auto funcCall = expr->asFuncCall()) {
-        deferStmt->funcCall = funcCall;
-        deferStmt->funcCall->isDeferred = true;
+        funcCall->isDeferred = true;
+        deferStmt->expr = funcCall;
     } else if (const auto selection = expr->asSelection()) {
-        deferStmt->selection = selection;
-        const auto& methodCall = deferStmt->selection->asMethodCall();
-        if (!methodCall) addParsingError();
-        methodCall->isDeferred = true;
+        deferStmt->expr = selection;
+        const auto& methodCall = selection->asMethodCall();
+        if (methodCall) methodCall->isDeferred = true;
+        else addParsingError();
     }
     return deferStmt;
 }

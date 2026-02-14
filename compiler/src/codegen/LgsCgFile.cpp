@@ -1,6 +1,6 @@
 #include "codegen/LgsCgFile.h"
+#include <sstream>
 #include "builtins/LgsTest.h"
-#include "LgsConfigs.h"
 #include "builtins/LgsSys.h"
 #include "exprs/LgsArrayExpr.h"
 #include "funcs/LgsCoroutine.h"
@@ -503,60 +503,19 @@ void LgsCgFile::visitBreakStmt(const LgsBreak* breakStmt) {
 }
 
 void LgsCgFile::visitCoroutine(const LgsCoroutine* coroutine) {
-    LgsFuncCall* fc = nullptr;
-    if (coroutine->funcCall->name == "") {
-        visitLambda(coroutine->funcCall->func);
-        visitFuncCall(coroutine->funcCall);
-        fc = coroutine->funcCall;
-    } else if (coroutine->funcCall) {
-        visitFuncCall(coroutine->funcCall);
-        fc = coroutine->funcCall;
-    } else if (coroutine->selection) {
-        visitSelection(coroutine->selection, false);
-        fc = coroutine->selection->asMethodCall();
-    }
-
-    if (!cg.IRModule->getFunction(fc->coroutine->funcType->getName())) {
-        cg.savedIP = cg.builder.saveIP();
-        visitFunc(fc->coroutine);
-        cg.builder.restoreIP(cg.savedIP);
-    }
-
-    Type* ctxTy = nullptr;
-    Value* ctx = nullptr;
-    if (fc->args.empty()) {
-        ctxTy = cg.ptrTy();
-        ctx = cg.null();
-    } else {
-        ctxTy = getThunkCtxType(fc);
-        ctx = getThunkCtx(fc, ctxTy);
-    }
-    cg.callRuntimeFunc("addCoro", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {getThunkFunc(fc, ctxTy), ctx});
+    assert(0);
 }
 
 void LgsCgFile::visitDeferStmt(const LgsDeferStmt* defer) {
-    LgsFuncCall* fc = nullptr;
-    if (defer->funcCall->name == "") {
-        visitLambda(defer->funcCall->func);
-        visitFuncCall(defer->funcCall);
-        fc = defer->funcCall;
-    } else if (defer->funcCall) {
-        visitFuncCall(defer->funcCall);
-        fc = defer->funcCall;
-    } else if (defer->selection) {
-        visitSelection(defer->selection, false);
-        fc = defer->selection->asMethodCall();
+    const auto fc = defer->getAsFuncCall();
+    if (fc->func->funcType->isLambda) {
+        visitLambda(fc->func);
     }
-    Type* ctxTy = nullptr;
-    Value* ctx = nullptr;
-    if (fc->args.empty()) {
-        ctxTy = cg.ptrTy();
-        ctx = cg.null();
-    } else {
-        ctxTy = getThunkCtxType(fc);
-        ctx = getThunkCtx(fc, ctxTy);
-    }
-    cg.callRuntimeFunc("addDefer", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {getThunkFunc(fc, ctxTy), ctx});
+    visitExpr(defer->expr);
+    const auto ctxTy = getThunkCtxType(fc);
+    const auto ctx = getThunkCtx(fc, ctxTy);
+    const auto thunk = getThunkFunc(fc, ctxTy);
+    cg.callRuntimeFunc("addDefer", cg.voidTy(), {cg.ptrTy(), cg.ptrTy()}, {thunk, ctx});
 }
 
 void LgsCgFile::visitIOStmt(const LgsIOStmt* ioStmt) {
@@ -1231,16 +1190,20 @@ void LgsCgFile::initMainArgs(const LgsMainFunc* mainFunc) const {
     mainFunc->funcType->params[0].IRValue = argsArray->IRValue;
 }
 
-StructType* LgsCgFile::getThunkCtxType(const LgsFuncCall* fc) {
+Type* LgsCgFile::getThunkCtxType(const LgsFuncCall* fc) {
+    if (fc->args.empty()) return cg.ptrTy();
     std::vector<Value*> args;
     std::vector<Type*> types;
+    std::stringstream strTypes;
     for (const auto& arg : fc->args) {
         types.push_back(arg.expr->type->getIRType(cg));
+        strTypes << arg.expr->type->getName();
     }
-    return cg.getStructType(types, fc->name + "ThunkType");
+    return cg.getStructType(types, "ThunkFunc_" + strTypes.str());
 }
 
 Value* LgsCgFile::getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) {
+    if (fc->args.empty()) return cg.null();
     const auto ctx = cg.builder.CreateAlloca(ctxTy);
     for (size_t i = 0; i < fc->args.size(); i++) {
         const auto v = fc->args[i].expr->IRValue;
@@ -1250,21 +1213,23 @@ Value* LgsCgFile::getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) {
 }
 
 Function* LgsCgFile::getThunkFunc(LgsFuncCall* fc, Type* ctxTy) {
-    auto thunkFunc = cg.IRModule->getFunction(fc->name + "Thunk");
+    const auto funcName = fc->name + "Thunk";
+    auto thunkFunc = cg.IRModule->getFunction(funcName);
     if (thunkFunc) return thunkFunc;
     cg.savedIP = cg.builder.saveIP();
 
     const auto ft = cg.getFT(cg.voidTy(), {cg.ptrTy()});
-    thunkFunc = cg.getFunc(fc->name + "Thunk", ft, Function::PrivateLinkage);
+    thunkFunc = cg.getFunc(funcName, ft, Function::PrivateLinkage);
     const auto entryBlock = cg.createBlock(BLOCK_ENTRY);
     entryBlock->insertInto(thunkFunc);
     cg.builder.SetInsertPoint(entryBlock);
-
     for (size_t i = 0; i < fc->args.size(); i++) {
-        fc->args[i].expr->IRValue = cg.builder.CreateStructGEP(ctxTy, thunkFunc->arg_begin(), i);
+        const auto expr = fc->args[i].expr;
+        const auto ptr = cg.builder.CreateStructGEP(ctxTy, thunkFunc->arg_begin(), i);
+        expr->IRValue = cg.load(expr->type->getIRTypeOrPtr(cg), ptr);
     }
-    const auto func = fc->coroutine ? fc->coroutine : fc->func;
-    func->call(cg, fc->args);
+
+    fc->func->call(cg, fc->args);
     cg.builder.CreateRetVoid();
     cg.builder.restoreIP(cg.savedIP);
     return thunkFunc;

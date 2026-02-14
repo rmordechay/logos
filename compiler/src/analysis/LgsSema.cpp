@@ -53,13 +53,13 @@
 #include <ranges>
 #include <unordered_set>
 #include "exprs/LgsModuleExpr.h"
+using std::to_string;
 
 static std::string getMissingImplementsStr(const std::vector<LgsField*>& fields, const std::vector<LgsFunc*>& methods);
 
 std::atomic<size_t> objsIDGenerator{0};
 std::atomic<size_t> funcsIDGenerator{0};
 std::atomic<size_t> lambdasIDGenerator{0};
-using std::to_string;
 
 void LgsSema::analyse() {
     if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
@@ -674,39 +674,11 @@ void LgsSema::visitBreakStmt(const LgsBreak* breakStmt) {
 }
 
 void LgsSema::visitCoroutine(const LgsCoroutine* coroutine) {
-    LgsFuncCall* fc = nullptr;
-    if (coroutine->funcCall->name == "") { // Wrapped stmtsBlock
-        visitStmtsBlock(coroutine->funcCall->func->stmtsBlock);
-    } else if (coroutine->funcCall) {
-        visitFuncCall(coroutine->funcCall);
-        fc = coroutine->funcCall;
-    } else if (coroutine->selection) {
-        visitSelection(coroutine->selection);
-        fc = coroutine->selection->asMethodCall();
-    } else {
-        assert(0);
-    }
-
-    const auto funcName = fc->func->funcType->getName() + LGS_CORO_SUFFIX;
-    const auto coro = file->symbolTable.coroutines.find(funcName);
-    if (coro != file->symbolTable.coroutines.end()) {
-        coroutine->funcCall->coroutine = coro->second;
-    } else {
-        createCoroutineFunc(fc);
-        file->symbolTable.coroutines[funcName] = fc->coroutine;
-    }
+    assert(0);
 }
 
 void LgsSema::visitDeferStmt(const LgsDeferStmt* deferStmt) {
-    if (deferStmt->funcCall->name == "") { // Wrapped stmtsBlock
-        visitStmtsBlock(deferStmt->funcCall->func->stmtsBlock);
-    } else if (deferStmt->selection) {
-        visitSelection(deferStmt->selection);
-    } else if (deferStmt->funcCall) {
-        visitFuncCall(deferStmt->funcCall);
-    } else {
-        assert(0);
-    }
+    visitExpr(deferStmt->expr);
 }
 
 void LgsSema::visitIOStmt(const LgsIOStmt* ioStmt) {

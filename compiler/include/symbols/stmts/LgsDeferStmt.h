@@ -5,9 +5,9 @@ class LgsStmtsBlock;
 
 class LgsDeferStmt final : public LgsStmt {
 public:
-    LgsFuncCall* funcCall = nullptr;
-    LgsSelection* selection = nullptr;
+    LgsExpr* expr = nullptr;
 
     void setDebugValue(LgsCodeGen& cg) override;
+    LgsFuncCall* getAsFuncCall() const;
     ~LgsDeferStmt() override;
 };
