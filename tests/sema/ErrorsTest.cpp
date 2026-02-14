@@ -5,7 +5,7 @@
 #include "gtest/gtest.h"
 #include <string>
 
-TEST(SemaErrorTest, E10000A) {
+TEST(ErrorsTest, E10000A) {
     LgsApp app;
     const auto code = R"(
     func() {}
@@ -16,7 +16,7 @@ TEST(SemaErrorTest, E10000A) {
     expectErrors(app, E10000, 1);
 }
 
-TEST(SemaErrorTest, E10001A) {
+TEST(ErrorsTest, E10001A) {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -29,7 +29,7 @@ TEST(SemaErrorTest, E10001A) {
     expectErrors(app, E10001, 1);
 }
 
-TEST(SemaErrorTest, E10002A) {
+TEST(ErrorsTest, E10002A) {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -43,7 +43,7 @@ TEST(SemaErrorTest, E10002A) {
     expectErrors(app, E10002, 1);
 }
 
-TEST(SemaErrorTest, E10003A) {
+TEST(ErrorsTest, E10003A) {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -57,7 +57,7 @@ TEST(SemaErrorTest, E10003A) {
     expectErrors(app, E10003, 1);
 }
 
-TEST(SemaErrorTest, E10004A) {
+TEST(ErrorsTest, E10004A) {
     LgsApp app;
     const auto code = R"(
     f(): Int {
@@ -71,7 +71,7 @@ TEST(SemaErrorTest, E10004A) {
     expectErrors(app, E10004, 1);
 }
 
-TEST(SemaErrorTest, E10005A) {
+TEST(ErrorsTest, E10005A) {
     LgsApp app;
     const auto code = R"(
     object Obj {
@@ -88,7 +88,7 @@ TEST(SemaErrorTest, E10005A) {
     expectErrors(app, E10005, 1);
 }
 
-TEST(SemaErrorTest, E10005B) {
+TEST(ErrorsTest, E10005B) {
     LgsApp app;
     const auto code = R"(
     object Obj {
@@ -104,7 +104,36 @@ TEST(SemaErrorTest, E10005B) {
     expectErrors(app, E10005, 1);
 }
 
-TEST(SemaErrorTest, E10006A) {
+TEST(ErrorsTest, E10005C) {
+    LgsApp app;
+    const auto code = R"(
+    main() {
+        arr: Int[34]
+        arr.add(2)
+    }
+    )";
+    app.loadSrcFile(code, LGS_MAIN_FILE);
+    ASSERT_TRUE(app.errHandler.successful);
+    app.analyse();
+    expectErrors(app, E10005, 1);
+}
+
+TEST(ErrorsTest, E10005D) {
+    LgsApp app;
+    const auto code = R"(
+    object Obj {a: Int}
+    main() {
+        obj = Obj{}
+        obj.func()
+    }
+    )";
+    app.loadSrcFile(code, LGS_MAIN_FILE);
+    ASSERT_TRUE(app.errHandler.successful);
+    app.analyse();
+    expectErrors(app, E10005, 1);
+}
+
+TEST(ErrorsTest, E10006A) {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -117,7 +146,7 @@ TEST(SemaErrorTest, E10006A) {
     expectErrors(app, E10006, 1);
 }
 
-TEST(SemaErrorTest, E10006B) {
+TEST(ErrorsTest, E10006B) {
     LgsApp app;
     const auto code = R"(
     enum Enum {
@@ -139,7 +168,7 @@ TEST(SemaErrorTest, E10006B) {
     expectErrors(app, E10006, 1);
 }
 
-TEST(SemaErrorTest, E10009A) {
+TEST(ErrorsTest, E10009A) {
     LgsApp app;
     app.configs.appMode = PROJECT_MODE;
     const auto code1 = R"(
@@ -155,7 +184,7 @@ TEST(SemaErrorTest, E10009A) {
     expectErrors(app, E10009, 1);
 }
 
-TEST(SemaErrorTest, E10011A) {
+TEST(ErrorsTest, E10011A) {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -169,36 +198,57 @@ TEST(SemaErrorTest, E10011A) {
     expectErrors(app, E10011, 1);
 }
 
-TEST(SemaErrorTest, E10013A) {
+TEST(ParserErrorTest, E10011B) {
     LgsApp app;
     const auto code = R"(
-    object Obj {a: Int}
+    func() {}
+    func() {}
+    main() {}
+    )";
+    app.loadSrcFile(code, LGS_MAIN_FILE);
+    expectErrors(app, E10011, 1);
+}
+
+TEST(ParserErrorTest, E10012A) {
+    LgsApp app;
+    const auto code = R"(
     main() {
-        obj = Obj{}
-        obj.func()
+        a = null?
     }
+    )";
+    app.loadSrcFile(code, LGS_MAIN_FILE);
+    expectErrors(app, E10012, 1);
+}
+
+TEST(ParserErrorTest, E10013A) {
+    LgsApp app;
+    const auto code = R"(
+    object Obj {
+        f: (Int): Void
+    }
+    main() {}
     )";
     app.loadSrcFile(code, LGS_MAIN_FILE);
     ASSERT_TRUE(app.errHandler.successful);
     app.analyse();
-    expectErrors(app, E10005, 1);
+    expectErrors(app, E10013, 1);
 }
 
-TEST(SemaErrorTest, E10013B) {
+TEST(ParserErrorTest, E10014A) {
     LgsApp app;
     const auto code = R"(
-    main() {
-        arr: Int[34]
-        arr.add(2)
+    object Obj {
+        implements: Self
     }
+    main() {}
     )";
     app.loadSrcFile(code, LGS_MAIN_FILE);
     ASSERT_TRUE(app.errHandler.successful);
     app.analyse();
-    expectErrors(app, E10005, 1);
+    expectErrors(app, E10014, 1);
 }
 
-TEST(SemaErrorTest, E10015A) {
+TEST(ErrorsTest, E10015A) {
     LgsApp app;
     const auto code = R"(
     func(a: Int) { }
@@ -212,7 +262,7 @@ TEST(SemaErrorTest, E10015A) {
     expectErrors(app, E10015, 1);
 }
 
-TEST(SemaErrorTest, E10015B) {
+TEST(ErrorsTest, E10015B) {
     LgsApp app;
     const auto code = R"(
     func<T>(arr: T[]): T[] {
@@ -228,7 +278,7 @@ TEST(SemaErrorTest, E10015B) {
     expectErrors(app, E10015, 1);
 }
 
-TEST(SemaErrorTest, E10016A) {
+TEST(ErrorsTest, E10016A) {
     LgsApp app;
     const auto code = R"(
     interface Interface {
@@ -246,7 +296,7 @@ TEST(SemaErrorTest, E10016A) {
     expectErrors(app, E10016, 1);
 }
 
-TEST(SemaErrorTest, E10016B) {
+TEST(ErrorsTest, E10016B) {
     LgsApp app;
     const auto code = R"(
     interface Type {
@@ -265,7 +315,7 @@ TEST(SemaErrorTest, E10016B) {
     expectErrors(app, E10016, 1);
 }
 
-TEST(SemaErrorTest, E10017A) {
+TEST(ErrorsTest, E10017A) {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -278,7 +328,7 @@ TEST(SemaErrorTest, E10017A) {
     expectErrors(app, E10017, 1);
 }
 
-TEST(SemaErrorTest, E10018A) {
+TEST(ErrorsTest, E10018A) {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -291,7 +341,7 @@ TEST(SemaErrorTest, E10018A) {
     expectErrors(app, E10001, 1);
 }
 
-TEST(SemaErrorTest, E10021A) {
+TEST(ErrorsTest, E10021A) {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -304,7 +354,7 @@ TEST(SemaErrorTest, E10021A) {
     expectErrors(app, E10021, 1);
 }
 
-TEST(SemaErrorTest, E10024A) {
+TEST(ErrorsTest, E10024A) {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -317,7 +367,7 @@ TEST(SemaErrorTest, E10024A) {
     expectErrors(app, E10024, 1);
 }
 
-TEST(SemaErrorTest, E10025A) {
+TEST(ErrorsTest, E10025A) {
     LgsApp app;
     const auto code = R"(
     object Obj {
@@ -331,7 +381,7 @@ TEST(SemaErrorTest, E10025A) {
     expectErrors(app, E10025, 1);
 }
 
-TEST(SemaErrorTest, E10026A) {
+TEST(ErrorsTest, E10026A) {
     LgsApp app;
     const auto code = R"(
     func(): Int { return }
@@ -343,7 +393,7 @@ TEST(SemaErrorTest, E10026A) {
     expectErrors(app, E10026, 1);
 }
 
-TEST(SemaErrorTest, E10027A) {
+TEST(ErrorsTest, E10027A) {
     LgsApp app;
     const auto code = R"(
     fun(): Int { return 2 }
@@ -358,7 +408,7 @@ TEST(SemaErrorTest, E10027A) {
     expectErrors(app, E10027, 1);
 }
 
-TEST(SemaErrorTest, E10028A) {
+TEST(ErrorsTest, E10028A) {
     LgsApp app;
     const auto code = R"(
     func(x: Int = 23, y: Str) { }
@@ -370,7 +420,7 @@ TEST(SemaErrorTest, E10028A) {
     expectErrors(app, E10028, 1);
 }
 
-TEST(SemaErrorTest, E10030A) {
+TEST(ErrorsTest, E10030A) {
     LgsApp app;
     const auto code1 = R"(
     object Obj
@@ -382,7 +432,7 @@ TEST(SemaErrorTest, E10030A) {
         b = a.x
     }
     )";
-    app.loadSrcFile(code1, "Obj.lgs");
+    app.loadSrcFile(code1, "obj.lgs");
     ASSERT_TRUE(app.errHandler.successful);
     app.loadSrcFile(code2, LGS_MAIN_FILE);
     ASSERT_TRUE(app.errHandler.successful);
@@ -390,7 +440,7 @@ TEST(SemaErrorTest, E10030A) {
     expectErrors(app, E10030, 1);
 }
 
-TEST(SemaErrorTest, E10030B) {
+TEST(ErrorsTest, E10030B) {
     LgsApp app;
     const auto code1 = R"(
     object Obj
@@ -401,7 +451,7 @@ TEST(SemaErrorTest, E10030B) {
         a = Obj{x = 2}
     }
     )";
-    app.loadSrcFile(code1, "Obj.lgs");
+    app.loadSrcFile(code1, "obj.lgs");
     ASSERT_TRUE(app.errHandler.successful);
     app.loadSrcFile(code2, LGS_MAIN_FILE);
     ASSERT_TRUE(app.errHandler.successful);
@@ -409,7 +459,7 @@ TEST(SemaErrorTest, E10030B) {
     expectErrors(app, E10030, 1);
 }
 
-TEST(SemaErrorTest, E10031A) {
+TEST(ErrorsTest, E10031A) {
     LgsApp app;
     const auto code1 = R"(
     object Obj
@@ -421,7 +471,7 @@ TEST(SemaErrorTest, E10031A) {
         a.func()
     }
     )";
-    app.loadSrcFile(code1, "Obj.lgs");
+    app.loadSrcFile(code1, "obj.lgs");
     ASSERT_TRUE(app.errHandler.successful);
     app.loadSrcFile(code2, LGS_MAIN_FILE);
     ASSERT_TRUE(app.errHandler.successful);
@@ -429,7 +479,7 @@ TEST(SemaErrorTest, E10031A) {
     expectErrors(app, E10031, 1);
 }
 
-TEST(SemaErrorTest, E10032A) {
+TEST(ErrorsTest, E10032A) {
     LgsApp app;
     const auto code = R"(
     single Obj {
@@ -445,7 +495,7 @@ TEST(SemaErrorTest, E10032A) {
     expectErrors(app, E10032, 1);
 }
 
-TEST(SemaErrorTest, E10033A) {
+TEST(ErrorsTest, E10033A) {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -459,19 +509,19 @@ TEST(SemaErrorTest, E10033A) {
     expectErrors(app, E10033, 1);
 }
 
-TEST(SemaErrorTest, E10033B) {
+TEST(ErrorsTest, E10033B) {
     LgsApp app;
     const auto code = R"(
         object obj
         x: Int
     )";
-    app.loadSrcFile(code, "Obj.lgs");
+    app.loadSrcFile(code, "obj.lgs");
     ASSERT_TRUE(app.errHandler.successful);
     app.analyse();
     expectErrors(app, E10033, 1);
 }
 
-TEST(SemaErrorTest, E10033C) {
+TEST(ErrorsTest, E10033C) {
     LgsApp app;
     const auto code = R"(
         interface inter
@@ -483,7 +533,7 @@ TEST(SemaErrorTest, E10033C) {
     expectErrors(app, E10033, 1);
 }
 
-TEST(SemaErrorTest, E10033D) {
+TEST(ErrorsTest, E10033D) {
     LgsApp app;
     const auto code = R"(
         interface inter {}
@@ -496,7 +546,7 @@ TEST(SemaErrorTest, E10033D) {
     expectErrors(app, E10033, 2);
 }
 
-TEST(SemaErrorTest, E10037A) {
+TEST(ErrorsTest, E10037A) {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -510,7 +560,7 @@ TEST(SemaErrorTest, E10037A) {
     expectErrors(app, E10037, 1);
 }
 
-TEST(SemaErrorTest, E10038A) {
+TEST(ErrorsTest, E10038A) {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -523,7 +573,7 @@ TEST(SemaErrorTest, E10038A) {
     expectErrors(app, E10038, 1);
 }
 
-TEST(SemaErrorTest, E10042A) {
+TEST(ErrorsTest, E10042A) {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -537,7 +587,7 @@ TEST(SemaErrorTest, E10042A) {
     expectErrors(app, E10042, 1);
 }
 
-TEST(SemaErrorTest, E10043A) {
+TEST(ErrorsTest, E10043A) {
     LgsApp app;
     const auto code = R"(
         func(a: Int = 2, b: Int...) {}
@@ -553,7 +603,7 @@ TEST(SemaErrorTest, E10043A) {
     }
 }
 
-TEST(SemaErrorTest, E10046A) {
+TEST(ErrorsTest, E10046A) {
     LgsApp app;
     const auto code = R"(
     object Obj {
@@ -569,8 +619,24 @@ TEST(SemaErrorTest, E10046A) {
     expectErrors(app, E10046, 1);
 }
 
+TEST(ParserErrorTest, E10054A) {
+    LgsApp app;
+    const auto code = R"(
+    object Obj {
+        x: Int?
+        y: Float
+        z: Str
+    }
+    main() {
+        obj1 = Obj{x = 2, z = "Test", z = 3.23}
+    }
+    )";
+    app.loadSrcFile(code, LGS_MAIN_FILE);
+    expectErrors(app, E10054, 1);
+}
 
-TEST(SemaErrorTest, E10055A) {
+
+TEST(ErrorsTest, E10055A) {
     LgsApp app;
     const auto code = R"(
     f(): Int {}
@@ -582,7 +648,7 @@ TEST(SemaErrorTest, E10055A) {
     expectErrors(app, E10055, 1);
 }
 
-TEST(SemaErrorTest, E10056A) {
+TEST(ErrorsTest, E10056A) {
     LgsApp app;
     const auto code = R"(
     object Obj {
@@ -597,7 +663,7 @@ TEST(SemaErrorTest, E10056A) {
     expectErrors(app, E10056, 1);
 }
 
-TEST(SemaErrorTest, E10056B) {
+TEST(ErrorsTest, E10056B) {
     LgsApp app;
     const auto code = R"(
     object Obj {
@@ -612,7 +678,7 @@ TEST(SemaErrorTest, E10056B) {
     expectErrors(app, E10056, 1);
 }
 
-TEST(SemaErrorTest, E10059A) {
+TEST(ErrorsTest, E10059A) {
     LgsApp app;
     const auto code = R"(
     func(): Int {
@@ -634,7 +700,7 @@ TEST(SemaErrorTest, E10059A) {
     expectErrors(app, E10059, 2);
 }
 
-TEST(SemaErrorTest, E10064A) {
+TEST(ErrorsTest, E10064A) {
     LgsApp app;
     const auto code = R"(
         interface Inter { func() }
@@ -651,7 +717,7 @@ TEST(SemaErrorTest, E10064A) {
     expectErrors(app, E10064, 1);
 }
 
-TEST(SemaErrorTest, E10066A) {
+TEST(ErrorsTest, E10066A) {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -667,7 +733,7 @@ TEST(SemaErrorTest, E10066A) {
     expectErrors(app, E10066, 1);
 }
 
-TEST(SemaErrorTest, E10076A) {
+TEST(ErrorsTest, E10076A) {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -685,7 +751,7 @@ TEST(SemaErrorTest, E10076A) {
     expectErrors(app, E10076, 4);
 }
 
-TEST(SemaErrorTest, E10089A) {
+TEST(ErrorsTest, E10089A) {
     LgsApp app;
     const auto code = R"(
     object Obj {
@@ -701,7 +767,7 @@ TEST(SemaErrorTest, E10089A) {
     expectErrors(app, E10089, 1);
 }
 
-TEST(SemaErrorTest, E10092A) {
+TEST(ErrorsTest, E10092A) {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -714,7 +780,7 @@ TEST(SemaErrorTest, E10092A) {
     expectErrors(app, E10092, 1);
 }
 
-TEST(SemaErrorTest, E10097A) {
+TEST(ErrorsTest, E10097A) {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -727,7 +793,7 @@ TEST(SemaErrorTest, E10097A) {
     expectErrors(app, E10097, 1);
 }
 
-TEST(SemaErrorTest, E100108A) {
+TEST(ErrorsTest, E100108A) {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -741,7 +807,7 @@ TEST(SemaErrorTest, E100108A) {
     expectErrors(app, E10108, 1);
 }
 
-TEST(SemaErrorTest, E100115A) {
+TEST(ErrorsTest, E100115A) {
     LgsApp app;
     const auto code = R"(
     func<T>(t: T) {}

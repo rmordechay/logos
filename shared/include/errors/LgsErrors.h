@@ -24,7 +24,7 @@ inline LgsBaseMsg E10009{"Duplicate Main files were found in the project. Locati
 inline LgsBaseMsg E10010{"Not a root path of a Logos project.", errCodeStart++};
 inline LgsBaseMsg E10011{"%s is already declared.", errCodeStart++};
 inline LgsBaseMsg E10012{"null cannot have '?' suffix.", errCodeStart++};
-inline LgsBaseMsg E10013{"Field %s is with function type. Declare it as a standard function instead.", errCodeStart++};
+inline LgsBaseMsg E10013{"Field %s has function type. Declare it as a standard function instead.", errCodeStart++};
 inline LgsBaseMsg E10014{"Self type not allowed.", errCodeStart++};
 inline LgsBaseMsg E10015{"Function with name '%s' was found but it doesnt match the parameters.\nGiven:\t  %s\nExpected:  %s", errCodeStart++};
 inline LgsBaseMsg E10016{"Object %s does not fully implement %s.\n%s", errCodeStart++};

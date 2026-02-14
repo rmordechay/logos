@@ -4,9 +4,8 @@ enable_testing()
 add_executable(lgs_tests
     main.cpp
     LgsTestUtils.h
-    parser/ParserErrorTest.cpp
     parser/ParserTest.cpp
-    sema/SemaErrorTest.cpp
+    sema/ErrorsTest.cpp
     sema/TypeResolverTest.cpp
     codegen/CgIfStmtTest.cpp
     codegen/CgArithmeticsTest.cpp

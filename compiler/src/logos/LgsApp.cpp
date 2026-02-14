@@ -107,7 +107,8 @@ bool LgsApp::parse() {
 
     // File mode
     if (configs.appMode == FILE_MODE) {
-        loadSrcFile(&appCache.files.front().path);
+        const auto filePath = appCache.files.front().path;
+        loadSrcFile(getFileText(filePath), filePath);
         return errHandler.successful;
     }
 
@@ -117,7 +118,7 @@ bool LgsApp::parse() {
     for (auto& metadata : appCache.files) {
         if (metadata.type != LGS_SRC_FILE) continue;
         threadPool.runTask([&metadata, this] {
-            loadSrcFile(&metadata.path);
+            loadSrcFile(getFileText(metadata.path), metadata.path);
         });
     }
     threadPool.wait();
@@ -162,8 +163,7 @@ bool LgsApp::analyse() {
     if (!resolveGlobals()) return false;
     for (const auto file : srcFiles) {
         threadPool.runTask([this, file] {
-            LgsSema sema(configs, file, globals);
-            sema.importApps = importApps;
+            LgsSema sema(configs, file, globals, importApps);
             sema.analyse();
             if (sema.errHandler.successful) return;
             errHandler.mergeErrorsWithLock(sema.errHandler, mtx);
@@ -178,16 +178,19 @@ bool LgsApp::generate() {
     LgsCodeGen::initLLVM();
     if (!generateGenerics()) return false;
 
-    // main.lgs is generated first non-concurrently
-    const auto mainFile = getMainFile();
-    assert(mainFile);
-    mainFile->setupCodeGen(configs);
-    if (!mainFile->cgFile.generateSrcFile(mainFile, paths)) {
-        errHandler.setUnsuccessful();
-        printIR();
-        return false;
+    if (!configs.isImport) {
+        // main is generated first non-concurrently
+        const auto mainFile = getMainFile();
+        mainFile->setupCodeGen(configs);
+        if (!mainFile->cgFile.generateSrcFile(mainFile, paths)) {
+            errHandler.setUnsuccessful();
+            printIR();
+            return false;
+        }
     }
-
+    for (const auto importApp : importApps) {
+        importApp->generate();
+    }
     for (const auto& file : srcFiles) {
         if (file->isMain()) continue;
         threadPool.runTask([this, file] {
@@ -200,22 +203,23 @@ bool LgsApp::generate() {
         });
     }
     threadPool.wait();
-    generateRTTTypes();
+
+    if (!generateRTTTypes()) return false;
     printIR();
     return errHandler.successful;
 }
 
 bool LgsApp::link() {
-    paths.execFile = paths.buildDir / (configs.name != "" ? configs.name : LGS_DEFAULT_EXEC_FILE);
-    std::vector<LgsFile*> files;
-    files.insert(files.end(), srcFiles.begin(), srcFiles.end());
-    files.insert(files.end(), genericFiles.begin(), genericFiles.end());
-    const LgsLinker linker(configs, paths, files);
     for (const auto& path : paths.userCLibs) {
         if (fs::exists(path)) continue;
         errHandler.addError(E10107, {path});
     }
     if (!errHandler.successful) return false;
+    paths.execFile = paths.buildDir / (configs.name != "" ? configs.name : LGS_DEFAULT_EXEC_FILE);
+    LgsLinker linker(configs, paths);
+    for (const auto importApp : importApps) {
+        linker.importPaths.push_back(importApp->paths.buildDirObjs);
+    }
     return linker.link();
 }
 
@@ -245,25 +249,13 @@ bool LgsApp::loadConfigs() {
     return true;
 }
 
-void LgsApp::loadSrcFile(fs::path* filePath) {
-    const auto fileCode = getFileText(*filePath);
-    LgsParser parser(*filePath, paths, globals);
+void LgsApp::loadSrcFile(const std::string& fileCode, const fs::path& filePath) {
+    appCache.files.emplace_back(filePath);
+    LgsParser parser(filePath, paths, globals);
+    parser.lgsCode = fileCode;
     for (const auto importApp : importApps) {
         parser.importAppNames.insert(importApp->configs.name);
     }
-    const auto file = parser.parseSrcFile(configs.isTestRun);
-    {
-        std::lock_guard lock(mtx);
-        if (!parser.errHandler.successful) return errHandler.mergeErrors(parser.errHandler);
-        if (!file) return;
-        srcFiles.push_back(file);
-    }
-}
-
-void LgsApp::loadSrcFile(const std::string& fileCode, const fs::path& filePath) {
-    filesMetadata.emplace_back(filePath);
-    LgsParser parser(filesMetadata.back().path, paths, globals);
-    parser.lgsCode = fileCode;
     const auto file = parser.parseSrcFile(configs.isTestRun);
     {
         std::lock_guard lock(mtx);
@@ -351,8 +343,10 @@ bool LgsApp::resolveGlobals() {
  *  The runtime types are set in the semantic analysis
  */
 bool LgsApp::generateRTTTypes() {
+    if (configs.isImport) return true;
     rttFile.cgFile.cg.mode = CG_MODE_RTTYPES;
     rttFile.setupCodeGen(configs);
+
     // Globals
     for (const auto type : globals.rttTypes) {
         type->getRTType(rttFile.cgFile.cg);
@@ -383,6 +377,7 @@ bool LgsApp::generateRTTTypes() {
 }
 
 bool LgsApp::generateGenerics() {
+    if (configs.isImport) return true;
     const auto genericsFile = new LgsFile("generics", CG_MODE_GENERICS);
     genericsFile->setupCodeGen(configs);
     auto& cgFile = genericsFile->cgFile;
@@ -461,7 +456,7 @@ bool LgsApp::validateProject() {
 bool LgsApp::validateEnvsFiles() {
     if (configs.appMode != PROJECT_MODE) return true;
     for (const auto file : envFiles) {
-        LgsSema semaAnalyser(configs, file, globals);
+        LgsSema semaAnalyser(configs, file, globals, importApps);
         for (const auto varDec : file->varDecs) {
             varDec->setType(varDec->expr->type);
         }
@@ -494,6 +489,7 @@ bool LgsApp::resolveImports() {
     if (!appConfigFile) return true;
     for (auto package : appConfigFile->packages) {
         const auto app = new LgsApp(package.path);
+        app->configs.isImport = true;
         if (!app->setup()) return false;
         if (!app->loadConfigs()) return false;
         if (!app->parse()) return false;
@@ -501,15 +497,6 @@ bool LgsApp::resolveImports() {
         importApps.push_back(app);
     }
     return true;
-}
-
-void LgsApp::compareHash() const {
-    for (const auto& file : srcFiles) {
-        const auto oldHash = appCache.getHashByPath(file->path);
-        const auto newHash = file->hashFile();
-        if (newHash == oldHash) continue;
-        assert(0);
-    }
 }
 
 void LgsApp::printIR() const {

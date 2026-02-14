@@ -6,7 +6,7 @@ struct LgsSymbolTable;
 class LgsModuleExpr final : public LgsExpr {
 public:
     std::string name;
-    LgsSymbolTable* moduleTable = nullptr;
+    LgsSymbolTable* moduleGlobals = nullptr;
 
     explicit LgsModuleExpr(const std::string& name) : name(name) {}
     LgsExpr* cast(bool explicitly) override;

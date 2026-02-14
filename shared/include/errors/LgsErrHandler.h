@@ -12,7 +12,7 @@ struct LgsLocation {
     size_t columnStart = 1;
     size_t lineEnd = 1;
     size_t columnEnd = 1;
-    std::filesystem::path* filepath = nullptr;
+    const std::filesystem::path* filepath = nullptr;
 };
 
 struct LgsError {

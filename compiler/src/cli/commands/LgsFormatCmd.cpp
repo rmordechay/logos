@@ -15,7 +15,7 @@ void LgsFormatCmd::run() {
     }
     LgsApp app(path);
     if (!app.setup()) return;
-    app.loadSrcFile(&path);
+    app.loadSrcFile(getFileText(path), path);
     LgsFormatter formatter;
     formatter.formatFile(app.srcFiles.front());
 }

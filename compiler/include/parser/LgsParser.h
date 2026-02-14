@@ -67,7 +67,7 @@ class LgsExpr;
 
 class LgsParser {
 public:
-    fs::path& filePath;
+    const fs::path& filePath;
     std::string lgsCode = "";
     LgsToken currentToken;
     size_t currentIndex = 0;
@@ -81,7 +81,7 @@ public:
     std::vector<LgsImport*> importPaths;
     std::unordered_set<std::string> importAppNames;
 
-    LgsParser(fs::path& filePath, const LgsPaths& paths, LgsSymbolTable& globals, const bool headersOnly = false)
+    LgsParser(const fs::path& filePath, const LgsPaths& paths, LgsSymbolTable& globals, const bool headersOnly = false)
         : filePath(filePath), headersOnly(headersOnly), paths(paths), globals(globals) {
     }
     // Files

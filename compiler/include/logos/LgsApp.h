@@ -32,7 +32,6 @@ public:
     std::vector<LgsTestFile*> testFiles;
     std::vector<LgsApp*> importApps;
     LgsAppConfigFile* appConfigFile = nullptr;
-    std::vector<LgsFileMetadata> filesMetadata;
     std::string lgsCode; // Used when passing code directly.
     LgsFile rttFile{"rtt", CG_MODE_RTTYPES};
 
@@ -48,7 +47,6 @@ public:
     bool generate();
     bool link();
     bool loadConfigs();
-    void loadSrcFile(fs::path* filePath);
     void loadSrcFile(const std::string& fileCode, const fs::path& filePath);
     bool loadConfigFile();
     bool loadEnvFiles();
@@ -61,7 +59,6 @@ public:
     bool validateEnvsFiles();
     bool validateRequiredEnvs();
     bool resolveImports();
-    void compareHash() const;
     void printIR() const;
     void initPaths(const fs::path& root);
     LgsMainFile* getMainFile() const;

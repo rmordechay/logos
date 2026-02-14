@@ -68,8 +68,8 @@ public:
     LgsObject* currentObj = nullptr;
     std::vector<LgsApp*> importApps;
 
-    explicit LgsSema(LgsAppConfigs& appConfigs, LgsFile* file, LgsSymbolTable& globals)
-        : file(file), appConfigs(appConfigs), globals(globals), typeResolver(file, errHandler, globals) {}
+    explicit LgsSema(LgsAppConfigs& appConfigs, LgsFile* file, LgsSymbolTable& globals, const std::vector<LgsApp*>& importApps)
+        : file(file), appConfigs(appConfigs), globals(globals), typeResolver(file, errHandler, globals), importApps(importApps) {}
 
     void analyse();
     void visitMainFile(LgsMainFile* mainFile);
@@ -146,11 +146,11 @@ public:
     void validateObjDuplicates(LgsObject* type);
     static bool validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const LgsFunc* func);
 
+    LgsFunc* cloneGenericFunc(const LgsFuncCall* funcCall, const LgsFunc* func);
     LgsSymbol* getSymbol(const std::string& name);
     void addLocalSymbol(const LgsSymbol& newSymbol);
     void createCoroutineFunc(LgsFuncCall* funcCall);
     void addError(const LgsBaseMsg& lgsErr, const LgsLocation& location, const std::vector<std::string>& args = {});
     void addRTType(LgsType* type) const;
     void addGenerics(LgsType* type) const;
-    LgsFunc* cloneGenericFunc(const LgsFuncCall* funcCall, const LgsFunc* func);
 };

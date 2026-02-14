@@ -177,7 +177,7 @@ void LgsSema::visitField(LgsField* field) {
         visitExpr(field->expr);
         validateExprType(field->expr, field->type);
     }
-    if (field->expr && field->expr->asFunc()) {
+    if (field->type->asFuncType() || (field->expr && field->expr->asFunc())) {
         addError(E10013, field->location, {field->name});
     }
     addRTType(field->type);
@@ -962,9 +962,6 @@ void LgsSema::visitSelection(LgsSelection* selection) {
     const auto exprs = selection->exprs;
     visitExpr(selection->exprs.front());
     const auto firstExpr = exprs.front();
-    if (const auto moduleExpr = firstExpr->asModuleExpr()) {
-        if (!moduleExpr->moduleTable) return;
-    }
     if (const auto var = firstExpr->asVariable()) {
         if (var->ref.symbolType == OBJECT) {
             const auto typeExpr = new LgsTypeExpr(var->ref.object);
@@ -1207,7 +1204,7 @@ bool LgsSema::visitFuncArgs(LgsFuncCall* funcCall, LgsFuncType* ft) {
 void LgsSema::visitModuleExpr(LgsModuleExpr* moduleExpr) {
     for (const auto importApp : importApps) {
         if (importApp->configs.name == moduleExpr->name) {
-            moduleExpr->moduleTable = &importApp->globals;
+            moduleExpr->moduleGlobals = &importApp->globals;
             return;
         }
     }
@@ -1613,84 +1610,6 @@ bool LgsSema::validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const Lgs
     return isValid;
 }
 
-LgsSymbol* LgsSema::getSymbol(const std::string& name) {
-    if (const auto globalSymbol = globals.getSymbol(name)) {
-        return globalSymbol;
-    }
-    if (const auto fileSymbol = file->symbolTable.getSymbol(name)) {
-        return fileSymbol;
-    }
-    if (const auto symbol = stack.getSymbolTable().getSymbol(name)) {
-        return symbol;
-    }
-    for (const auto importApp : importApps) {
-        if (const auto symbol = importApp->globals.getSymbol(name)) {
-            return symbol;
-        }
-    }
-    return nullptr;
-}
-
-void LgsSema::addLocalSymbol(const LgsSymbol& newSymbol) {
-    auto symbolName = *newSymbol.name;
-    const auto symbol = globals.getSymbol(symbolName);
-    if (symbol && symbol->isBuiltin) {
-        return addError(E10053, *newSymbol.location, {symbolName});
-    }
-    if (file->symbolTable.getSymbol(symbolName)) {
-        return addError(E10011, *newSymbol.location, {symbolName});
-    }
-    stack.getSymbolTable().addSymbol(newSymbol, &errHandler, file->path);
-}
-
-void LgsSema::createCoroutineFunc(LgsFuncCall* funcCall) {
-    const auto originalFT = funcCall->func->funcType;
-    const auto newFunc = new LgsFunc(originalFT);
-    newFunc->location = funcCall->func->location;
-    newFunc->funcType->location = originalFT->location;
-    newFunc->funcType->isCoroutine = true;
-    newFunc->stmtsBlock = funcCall->func->stmtsBlock;
-    visitFunc(newFunc);
-    funcCall->coroutine = newFunc;
-    funcCall->func = nullptr;
-}
-
-void LgsSema::addError(const LgsBaseMsg& lgsErr, const LgsLocation& location, const std::vector<std::string>& args) {
-    errHandler.addError(lgsErr, &location, file->path, args);
-}
-
-void LgsSema::addRTType(LgsType* type) const {
-    if (!errHandler.successful || !type) return;
-    if (type->isExternal || type->isVoid()) return;
-    if (const auto nullable = type->asNullable()) {
-        if (!nullable->baseType) return;
-    }
-    if (type->asInterface() || type->asFuncType()) return;
-    for (const auto rttType : globals.rttTypes) {
-        if (rttType->equals(type)) return;
-    }
-    for (const auto rttType : file->symbolTable.rttTypes) {
-        if (rttType->equals(type)) return;
-    }
-    file->symbolTable.rttTypes.push_back(type);
-}
-
-void LgsSema::addGenerics(LgsType* type) const {
-    if (!type) return;
-    if (type->asStr() || type->asChar() || type->isScalar() || type->asFieldType()) return;
-    if (type->isAny() || type->isUnknown() || type->isVoid()) return;
-    if (type->asFuncType() || type->asVec() || type->asNullable()) return;
-    if (const auto dArr = type->asDArray()) {
-        if (const auto inner = dArr->baseType->asDArray()) {
-            addGenerics(inner);
-        }
-    }
-    for (const auto genericsType : file->symbolTable.genericsTypes) {
-        if (genericsType->equals(type)) return;
-    }
-    file->symbolTable.genericsTypes.push_back(type);
-}
-
 LgsFunc* LgsSema::cloneGenericFunc(const LgsFuncCall* funcCall, const LgsFunc* func) {
     const auto lenArgs = funcCall->genericArgs.size();
     const auto lenTypes = func->funcType->genericTypes.size();
@@ -1754,6 +1673,84 @@ LgsFunc* LgsSema::cloneGenericFunc(const LgsFuncCall* funcCall, const LgsFunc* f
         }
     }
     return newFunc;
+}
+
+LgsSymbol* LgsSema::getSymbol(const std::string& name) {
+    if (const auto globalSymbol = globals.getSymbol(name)) {
+        return globalSymbol;
+    }
+    if (const auto fileSymbol = file->symbolTable.getSymbol(name)) {
+        return fileSymbol;
+    }
+    if (const auto symbol = stack.getSymbolTable().getSymbol(name)) {
+        return symbol;
+    }
+    for (const auto importApp : importApps) {
+        if (const auto symbol = importApp->globals.getSymbol(name)) {
+            return symbol;
+        }
+    }
+    return nullptr;
+}
+
+void LgsSema::addLocalSymbol(const LgsSymbol& newSymbol) {
+    auto symbolName = *newSymbol.name;
+    const auto symbol = globals.getSymbol(symbolName);
+    if (symbol && symbol->isBuiltin) {
+        return addError(E10053, *newSymbol.location, {symbolName});
+    }
+    if (file->symbolTable.getSymbol(symbolName)) {
+        return addError(E10011, *newSymbol.location, {symbolName});
+    }
+    stack.getSymbolTable().addSymbol(newSymbol, &errHandler, file->path);
+}
+
+void LgsSema::createCoroutineFunc(LgsFuncCall* funcCall) {
+    const auto originalFT = funcCall->func->funcType;
+    const auto newFunc = new LgsFunc(originalFT);
+    newFunc->location = funcCall->func->location;
+    newFunc->funcType->location = originalFT->location;
+    newFunc->funcType->isCoroutine = true;
+    newFunc->stmtsBlock = funcCall->func->stmtsBlock;
+    visitFunc(newFunc);
+    funcCall->coroutine = newFunc;
+    funcCall->func = nullptr;
+}
+
+void LgsSema::addError(const LgsBaseMsg& lgsErr, const LgsLocation& location, const std::vector<std::string>& args) {
+    errHandler.addError(lgsErr, &location, file->path, args);
+}
+
+void LgsSema::addRTType(LgsType* type) const {
+    if (!type || !errHandler.successful) return;
+    if (type->isExternal || type->isVoid()) return;
+    if (const auto nullable = type->asNullable()) {
+        if (!nullable->baseType) return;
+    }
+    if (type->asInterface() || type->asFuncType()) return;
+    for (const auto rttType : globals.rttTypes) {
+        if (rttType->equals(type)) return;
+    }
+    for (const auto rttType : file->symbolTable.rttTypes) {
+        if (rttType->equals(type)) return;
+    }
+    file->symbolTable.rttTypes.push_back(type);
+}
+
+void LgsSema::addGenerics(LgsType* type) const {
+    if (!type || type->isExternal || !errHandler.successful) return;
+    if (type->asStr() || type->asChar() || type->isScalar() || type->asFieldType()) return;
+    if (type->isAny() || type->isUnknown() || type->isVoid()) return;
+    if (type->asFuncType() || type->asVec() || type->asNullable()) return;
+    if (const auto dArr = type->asDArray()) {
+        if (const auto inner = dArr->baseType->asDArray()) {
+            addGenerics(inner);
+        }
+    }
+    for (const auto genericsType : file->symbolTable.genericsTypes) {
+        if (genericsType->equals(type)) return;
+    }
+    file->symbolTable.genericsTypes.push_back(type);
 }
 
 static std::string getMissingImplementsStr(const std::vector<LgsField*>& fields, const std::vector<LgsFunc*>& methods) {

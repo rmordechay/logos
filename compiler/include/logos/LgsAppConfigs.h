@@ -22,6 +22,7 @@ struct LgsAppConfigs {
     bool debugMode = false;
     bool isTestRun = false;
     bool isLibrary = false;
+    bool isImport = false;
 };
 
 inline void printAppConfigs(const LgsAppConfigs& configs) {
@@ -32,6 +33,7 @@ inline void printAppConfigs(const LgsAppConfigs& configs) {
     logInfo("debugMode  = " + std::to_string(configs.debugMode) + '\n');
     logInfo("isTestRun  = " + std::to_string(configs.isTestRun) + '\n');
     logInfo("isLibrary  = " + std::to_string(configs.isLibrary) + '\n');
+    logInfo("isImport   = " + std::to_string(configs.isImport) + '\n');
     logInfo("fileMode   = " + std::to_string(configs.appMode) + '\n');
     logInfo("optLevel   = " + std::to_string(configs.optLevel) + '\n');
 }

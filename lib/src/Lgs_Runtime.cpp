@@ -5,6 +5,8 @@
 #include "LgsUtils.h"
 #include <cassert>
 
+#include "Lgs_Types.h"
+
 #define NANO 1000000000LL
 
 extern "C" void Lgs_Runtime_moveValue(Lgs_TypeKind kind, size_t level, void* left, void* right, size_t size);
@@ -58,7 +60,10 @@ extern "C" void* Lgs_Runtime_allocStrConst(char* str) {
 }
 
 extern "C" void* Lgs_Runtime_reallocate(const void* ptr, const size_t size, const size_t level) {
-    assert(0);
+    auto& allocator = runtime.stack.at(level).allocator;
+    const auto newPtr = allocator.allocate(size, true);
+    std::memcpy(newPtr, ptr, size);
+    return newPtr;
 }
 
 extern "C" void Lgs_Runtime_moveObject(void* left, void* right) {

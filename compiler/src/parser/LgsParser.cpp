@@ -73,7 +73,7 @@ bool LgsParser::scanTokens() {
     if (lgsCode == "") {
         lgsCode = getFileText(filePath);
     }
-    assert(!lgsCode.empty());
+    if (lgsCode.empty()) return false;
     LgsLexer lexer(filePath, lgsCode);
     tokens = lexer.tokenize();
     if (!lexer.errHandler.successful) {
@@ -1582,6 +1582,9 @@ LgsExpr* LgsParser::parseConstant() {
     }
     consume();
     setLocation(constant->location, &startToken, &currentToken);
+    if (constant->asNullableExpr() && currentToken.type == T_QUEST_MARK) {
+        addError(E10012, startToken.location);
+    }
     return constant;
 }
 

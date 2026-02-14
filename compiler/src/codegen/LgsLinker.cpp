@@ -11,22 +11,30 @@ bool LgsLinker::link() const {
             objFileList += objPath.path().string() + " ";
         }
     }
-    // paths.cblasDir = "../external/libcblas.a";
-    assert(objFileList != "");
-    std::string additionalCUserLibs;
-    for (const auto& libDir : paths.userCLibs) {
-        additionalCUserLibs += std::string(libDir) + " ";
+    for (auto importPath : importPaths) {
+        for (const auto& objPath : fs::directory_iterator(importPath)) {
+            if (objPath.path().extension() == ".bc") {
+                objFileList += objPath.path().string() + " ";
+            }
+        }
     }
+    assert(objFileList != "");
+    std::string additionalLibs;
+    for (const auto& libDir : paths.userCLibs) {
+        additionalLibs += std::string(libDir) + " ";
+    }
+    // paths.cblasDir = "../external/libcblas.a";
     // additionalLibs += std::string(paths.cblasDir) + " ";
     const auto flags = !appConfigs.isLibrary ? "-flto -fstack-protector-strong -Wno-override-module" : "-shared -fPIC";
     char cmd[1024*4];
     std::snprintf(
         cmd,
         sizeof(cmd),
-        CLANG_PATH " %s %s -L%s -llgs -Wl,-rpath,%s -o %s",
+        CLANG_PATH " %s %s -L%s %s -llgs -Wl,-rpath,%s -o %s",
         flags,
         objFileList.c_str(),
         paths.lgsRootDir.c_str(),
+        additionalLibs.c_str(),
         paths.lgsRootDir.c_str(),
         paths.execFile.c_str()
     );

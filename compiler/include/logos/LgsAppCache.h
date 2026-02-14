@@ -14,6 +14,6 @@ struct LgsAppCache {
     void print() const;
     void addFileMetadata(const fs::path& filePath, LgsFileType fileType);
     LgsFileMetadata* getAppConfigFile();
-    bool fileExists(const std::filesystem::directory_entry& entry) const;
+    bool fileExists(const fs::path& entry) const;
     size_t getHashByPath(const fs::path& path) const;
 };

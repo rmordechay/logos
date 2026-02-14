@@ -66,7 +66,7 @@ LgsFileMetadata* LgsAppCache::getAppConfigFile() {
     return nullptr;
 }
 
-bool LgsAppCache::fileExists(const std::filesystem::directory_entry& entry) const {
+bool LgsAppCache::fileExists(const fs::path& entry) const {
     for (auto metadata : files) {
         if (metadata.path == entry) {
             return true;
