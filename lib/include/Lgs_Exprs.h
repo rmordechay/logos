@@ -11,9 +11,9 @@ struct Lgs_StrExpr {
 struct Lgs_DArrExpr {
     size_t level;
     Lgs_TypeInfo* baseType;
-    char* data;
     size_t length;
     size_t capacity;
+    char* data;
 };
 
 struct Lgs_Entry {

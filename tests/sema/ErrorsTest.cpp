@@ -198,7 +198,7 @@ TEST(ErrorsTest, E10011A) {
     expectErrors(app, E10011, 1);
 }
 
-TEST(ParserErrorTest, E10011B) {
+TEST(ErrorsTest, E10011B) {
     LgsApp app;
     const auto code = R"(
     func() {}
@@ -209,7 +209,7 @@ TEST(ParserErrorTest, E10011B) {
     expectErrors(app, E10011, 1);
 }
 
-TEST(ParserErrorTest, E10012A) {
+TEST(ErrorsTest, E10012A) {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -220,7 +220,7 @@ TEST(ParserErrorTest, E10012A) {
     expectErrors(app, E10012, 1);
 }
 
-TEST(ParserErrorTest, E10013A) {
+TEST(ErrorsTest, E10013A) {
     LgsApp app;
     const auto code = R"(
     object Obj {
@@ -234,7 +234,7 @@ TEST(ParserErrorTest, E10013A) {
     expectErrors(app, E10013, 1);
 }
 
-TEST(ParserErrorTest, E10014A) {
+TEST(ErrorsTest, E10014A) {
     LgsApp app;
     const auto code = R"(
     object Obj {
@@ -619,7 +619,7 @@ TEST(ErrorsTest, E10046A) {
     expectErrors(app, E10046, 1);
 }
 
-TEST(ParserErrorTest, E10054A) {
+TEST(ErrorsTest, E10054A) {
     LgsApp app;
     const auto code = R"(
     object Obj {

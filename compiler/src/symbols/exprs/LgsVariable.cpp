@@ -4,20 +4,19 @@
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsNullable.h"
-
 #include <codegen/LgsCodeGen.h>
-
 #include "types/LgsEnum.h"
 
 Value* LgsVariable::loadIR(LgsCodeGen& cg) {
     if (!IRValue->getType()->isPointerTy()) return IRValue;
+    const auto ty = type->getIRType(cg);
     switch (ref.symbolType) {
     case PARAM:
-        return cg.load(type->getIRType(cg), ref.param->IRValue);
+        return cg.load(ty, ref.param->IRValue);
     case VAR_DEC:
-        return cg.load(type->getIRType(cg), ref.varDec->IRValue);
+        return cg.load(ty, ref.varDec->IRValue);
     case FIELD:
-        return cg.load(type->getIRType(cg), ref.field->IRValue);
+        return cg.load(ty, ref.field->IRValue);
     default:
         return IRValue;
     }

@@ -36,7 +36,6 @@ bool LgsCLangParser::VisitFunctionDecl(const clang::FunctionDecl* func) {
         const auto paramDecl = func->getParamDecl(i);
         const auto paramType = paramDecl->getType();
         auto lgsParam = LgsParam(mapCType(paramType), paramDecl->getName().str());
-        lgsParam.index = i;
         funcImpl->funcType->params.push_back(lgsParam);
     }
     funcImpl->funcType->isVariadic = func->isVariadic();

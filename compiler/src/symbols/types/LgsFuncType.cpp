@@ -5,16 +5,16 @@
 #include "LgsUtils.h"
 #include <sstream>
 
-Type* LgsFuncType::getIRType(LgsCodeGen& cg) {
+FunctionType* LgsFuncType::getIRType(LgsCodeGen& cg) {
     assert(rt);
     std::vector<Type*> types;
     for (size_t i = 0; i < params.size(); ++i) {
         const auto param = params[i];
         const auto paramType = param.type;
         if (param.isVariadic) types.emplace_back(cg.sizeTy());
-        types.emplace_back(paramType->getTypeOrPtr(cg));
+        types.emplace_back(paramType->getIRTypeOrPtr(cg));
     }
-    const auto returnType = rt->getTypeOrPtr(cg);
+    const auto returnType = rt->getIRTypeOrPtr(cg);
     IRType = cg.getFT(returnType, types, this->isVariadic);
     return IRType;
 }

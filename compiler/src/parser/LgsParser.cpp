@@ -792,7 +792,6 @@ LgsFuncType* LgsParser::parseFuncHeader() {
 void LgsParser::parseParams(LgsFuncType* funcType) {
     if (!matchAndConsume(T_LPAREN)) return;
     if (currentToken.type == T_RPAREN) return;
-    auto paramIndex = 0;
     while (true) {
         // Name
         const auto paramName = currentToken;
@@ -808,7 +807,6 @@ void LgsParser::parseParams(LgsFuncType* funcType) {
         const auto type = parseType();
         mustParse(type);
         LgsParam param(type, paramName.lexeme);
-        param.index = paramIndex++;
 
         // Variadic or expr
         if (matchAndConsume(T_TRIPLE_DOT)) {

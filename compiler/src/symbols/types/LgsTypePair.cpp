@@ -5,7 +5,7 @@
 #include "codegen/LgsCodeGen.h"
 
 Type* LgsTypePair::getIRType(LgsCodeGen& cg) {
-    return cg.getStructType({key->getTypeOrPtr(cg), value->getTypeOrPtr(cg), cg.ptrTy()}, name);
+    return cg.getStructType({key->getIRTypeOrPtr(cg), value->getIRTypeOrPtr(cg), cg.ptrTy()}, name);
 }
 
 LgsExpr* LgsTypePair::getZeroValue() {

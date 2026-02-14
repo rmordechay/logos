@@ -97,7 +97,7 @@ ConstantInt* LgsType::IRSize(LgsCodeGen& cg) {
     return cg.getTypeSize(getIRType(cg));
 }
 
-Type* LgsType::getTypeOrPtr(LgsCodeGen& cg) {
+Type* LgsType::getIRTypeOrPtr(LgsCodeGen& cg) {
     return passByRef ? cg.ptrTy() : getIRType(cg);
 }
 
@@ -151,6 +151,7 @@ Value* LgsType::bitOrIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) { assert(0);}
 Value* LgsType::bitXorIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) { assert(0);}
 Value* LgsType::lshiftIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) { assert(0);}
 Value* LgsType::rshiftIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) { assert(0); }
+
 LgsAny* LgsType::asAny() { return dynamic_cast<LgsAny*>(this); }
 LgsChar* LgsType::asChar() { return dynamic_cast<LgsChar*>(this); }
 LgsStr* LgsType::asStr() { return dynamic_cast<LgsStr*>(this); }
@@ -266,7 +267,7 @@ Value* neIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
     return cg.builder.CreateNot(eqIR(cg, left, right, type));
 }
 
-Value* ltIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
+Value* ltIR(LgsCodeGen& cg, Value* left, Value* right, const LgsType* type) {
     auto [l, r] = loadNumberPair(cg, left, right, type);
     if (type->isUnsinged) return cg.builder.CreateICmpULT(l, r);
     if (type->isInt) return cg.builder.CreateICmpSLT(l, r);
@@ -274,7 +275,7 @@ Value* ltIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
     assert(0);
 }
 
-Value* gtIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
+Value* gtIR(LgsCodeGen& cg, Value* left, Value* right, const LgsType* type) {
     auto [l, r] = loadNumberPair(cg, left, right, type);
     if (type->isUnsinged) return cg.builder.CreateICmpUGT(l, r);
     if (type->isInt) return cg.builder.CreateICmpSGT(l, r);
@@ -282,7 +283,7 @@ Value* gtIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
     assert(0);
 }
 
-Value* geIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
+Value* geIR(LgsCodeGen& cg, Value* left, Value* right, const LgsType* type) {
     auto [l, r] = loadNumberPair(cg, left, right, type);
     if (type->isUnsinged) return cg.builder.CreateICmpUGE(l, r);
     if (type->isInt) return cg.builder.CreateICmpSGE(l, r);
@@ -290,7 +291,7 @@ Value* geIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
     assert(0);
 }
 
-Value* leIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
+Value* leIR(LgsCodeGen& cg, Value* left, Value* right, const LgsType* type) {
     auto [l, r] = loadNumberPair(cg, left, right, type);
     if (type->isUnsinged) return cg.builder.CreateICmpULE(l, r);
     if (type->isInt) return cg.builder.CreateICmpSLE(l, r);
@@ -389,12 +390,12 @@ Value* loadAsInt(LgsCodeGen& cg, Value* v, Type* intType) {
 Value* loadAsFloat(LgsCodeGen& cg, Value* v, Type* floatType) {
     const auto ty = v->getType();
     if (ty->isPointerTy()) v = cg.load(floatType, v);
-    if (ty->isFloatingPointTy()) return cg.builder.CreateSIToFP(v, floatType);;
-    if (ty->isIntegerTy()) return cg.builder.CreateSIToFP(v, floatType);;
+    if (ty->isFloatingPointTy()) return cg.builder.CreateSIToFP(v, floatType);
+    if (ty->isIntegerTy()) return cg.builder.CreateSIToFP(v, floatType);
     assert(0);
 }
 
-std::pair<Value*, Value*> loadNumberPair(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
+std::pair<Value*, Value*> loadNumberPair(LgsCodeGen& cg, Value* left, Value* right, const LgsType* type) {
     const auto biggest = getBiggestIntType({left->getType(), right->getType()});
     if (type->isInt) {
         left = loadAsInt(cg, left, biggest);

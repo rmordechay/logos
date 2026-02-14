@@ -147,15 +147,9 @@ void LgsCgFile::visitFunc(LgsFunc* func) {
     if (!ft->genericTypes.empty()) return;
     stack.enterScope(func);
     createPrologue(func);
-    if (func->isTest) for (auto [_, then] : func->mocks) visitExpr(then);
-    auto& params = ft->params;
-    if (ft->isVariadic) {
-        params.back().IRValue = cg.builder.CreateAlloca(cg.ptrTy(), nullptr, "va_list");
-        cg.callIntrinsics(Intrinsic::vastart, {cg.ptrTy()}, {params.back().IRValue});
-    }
     visitStmtsBlock(func->stmtsBlock);
     if (ft->isVariadic) {
-        cg.callIntrinsics(Intrinsic::vaend, {cg.ptrTy()}, {params.back().IRValue});
+        cg.callIntrinsics(Intrinsic::vaend, {cg.ptrTy()}, {ft->params.back().IRValue});
     }
     createEpilogue(func);
     stack.exitScope();
@@ -292,27 +286,23 @@ void LgsCgFile::visitLoopMetaVar(LgsMetaVar* metaVar) {
 
 void LgsCgFile::visitWhileLoop(const LgsWhileLoop* loop) {
     cg.builder.CreateBr(loop->IRCondBlock);
-    // Condition
     cg.startBlock(loop->IRCondBlock);
     visitExpr(loop->condExpr);
     cg.builder.CreateCondBr(loop->condExpr->IRValue, loop->IRBodyBlock, loop->IRExitBlock);
-    // Body
     cg.startBlock(loop->IRBodyBlock);
 }
 
 void LgsCgFile::visitVarDec(LgsVarDec* varDec) {
-    if (varDec->shouldAllocate()) {
-        varDec->IRValue = cg.builder.CreateAlloca(varDec->type->getIRType(cg));
+    if (varDec->isMutable) {
+        varDec->IRValue = cg.builder.CreateAlloca(varDec->type->getIRTypeOrPtr(cg));
         varDec->expr->pointee = varDec->IRValue;
         visitExpr(varDec->expr);
-        if (varDec->expr->IRValue != varDec->IRValue) {
-            cg.store(varDec->expr->IRValue, varDec->IRValue);
-        }
-        varDec->IRValue->setName(varDec->name);
+        cg.store(varDec->expr->IRValue, varDec->IRValue);
     } else {
         visitExpr(varDec->expr);
         varDec->IRValue = varDec->expr->IRValue;
     }
+    varDec->IRValue->setName(varDec->name);
     assert(varDec->IRValue);
 }
 
@@ -320,10 +310,25 @@ void LgsCgFile::visitAssignment(const LgsAssignment* assignment) {
     assert(!assignment->binaryExpr);
     const auto left = assignment->left;
     const auto right = assignment->right;
-    visitExpr(left);
+    if (const auto var = left->asVariable()) {
+        visitVariable(var, true);
+    } else if (const auto iterIndex = left->asIterIndex()) {
+        visitIterIndex(iterIndex, true);
+    } else if (const auto selection = left->asSelection()) {
+        visitSelection(selection, true);
+    } else if (const auto nullableExpr = left->asNullableExpr()) {
+        visitNullableExpr(nullableExpr, true);
+    } else {
+        assert(0);
+    }
     right->pointee = left->IRValue;
     visitExpr(right);
-    cg.store(right->IRValue, left->pointee ? left->pointee : left->IRValue);
+    auto v = right->IRValue;
+    if (left->type->isHeap) {
+        const auto level = cg.getLevel(left->IRValue);
+        v = cg.moveValue(left->type->getBaseName(), right->IRValue, level);
+    }
+    cg.store(v, left->pointee ? left->pointee : left->IRValue);
 }
 
 void LgsCgFile::visitIfStmt(LgsIfStmt* ifStmt) {
@@ -475,13 +480,6 @@ void LgsCgFile::visitReturnStmt(LgsReturn* returnStmt) {
     } else if (!currentFunc->returnStmts.empty()) {
         if (currentFunc->returnStmts.empty()) {
             cg.builder.CreateRet(returnStmt->expr->IRValue);
-        } else if (currentFunc->returnStmts.size() == 1) {
-            cg.callPopStack();
-            if (returnStmt->expr->type->isNumber()) {
-                cg.builder.CreateRet(returnStmt->expr->loadIR(cg));
-            } else {
-                cg.builder.CreateRet(returnStmt->expr->IRValue);
-            }
         } else {
             returnStmt->parentBlock = cg.builder.GetInsertBlock();
             cg.builder.CreateBr(currentFunc->epilogue);
@@ -510,7 +508,7 @@ void LgsCgFile::visitCoroutine(const LgsCoroutine* coroutine) {
         visitFuncCall(coroutine->funcCall);
         fc = coroutine->funcCall;
     } else if (coroutine->selection) {
-        visitSelection(coroutine->selection);
+        visitSelection(coroutine->selection, false);
         fc = coroutine->selection->asMethodCall();
     }
 
@@ -542,7 +540,7 @@ void LgsCgFile::visitDeferStmt(const LgsDeferStmt* defer) {
         visitFuncCall(defer->funcCall);
         fc = defer->funcCall;
     } else if (defer->selection) {
-        visitSelection(defer->selection);
+        visitSelection(defer->selection, false);
         fc = defer->selection->asMethodCall();
     }
     Type* ctxTy = nullptr;
@@ -577,19 +575,19 @@ void LgsCgFile::visitExpr(LgsExpr* expr) {
         else if (const auto floatConst = expr->asFloatConst()) visitFloatConst(floatConst);
         else if (const auto instance = expr->asInstance()) visitInstance(instance);
         else if (const auto funcCall = expr->asFuncCall()) visitFuncCall(funcCall);
-        else if (const auto selection = expr->asSelection()) visitSelection(selection);
+        else if (const auto variable = expr->asVariable()) visitVariable(variable, false);
+        else if (const auto iterIndex = expr->asIterIndex()) visitIterIndex(iterIndex, false);
+        else if (const auto selection = expr->asSelection()) visitSelection(selection, false);
+        else if (const auto nullableExpr = expr->asNullableExpr()) visitNullableExpr(nullableExpr, false);
         else if (const auto metaSelection = expr->asMetaSelection()) visitMetaSelection(metaSelection);
         else if (const auto arrayExpr = expr->asArrayExpr()) visitArrayExpr(arrayExpr);
         else if (const auto hashMap = expr->asHashMap()) visitHashMap(hashMap);
-        else if (const auto iterIndex = expr->asIterIndex()) visitIterIndex(iterIndex);
-        else if (const auto variable = expr->asVariable()) visitVariable(variable);
         else if (const auto envVar = expr->asEnvVar()) visitEnvVar(envVar);
         else if (const auto postfixExpr = expr->asPostfixExpr()) visitPostfixExpr(postfixExpr);
         else if (const auto prefixExpr = expr->asPrefixExpr()) visitPrefixExpr(prefixExpr);
         else if (const auto vecExpr = expr->asVectorExpr()) visitVectorExpr(vecExpr);
         else if (const auto matrixExpr = expr->asMatrixExpr()) visitMatrixExpr(matrixExpr);
         else if (const auto loopMetaVar = expr->asLoopMetaVar()) visitLoopMetaVar(loopMetaVar);
-        else if (const auto nullableExpr = expr->asNullableExpr()) visitNullableExpr(nullableExpr);
         else if (const auto cast = expr->asCast()) visitCast(cast);
     }
 }
@@ -771,11 +769,14 @@ void LgsCgFile::visitPostfixExpr(LgsPostfixExpr* postfixExpr) {
     cg.store(newValue, postfixExpr->baseExpr->IRValue);
 }
 
-void LgsCgFile::visitVariable(LgsVariable* variable) {
+void LgsCgFile::visitVariable(LgsVariable* variable, const bool assign) {
     switch (variable->ref.symbolType) {
     case VAR_DEC:
         assert(variable->ref.varDec->IRValue);
         variable->IRValue = variable->ref.varDec->IRValue;
+        if (variable->ref.varDec->isMutable && !assign) {
+            variable->IRValue = cg.loadPtr(variable->IRValue);
+        }
         break;
     case PARAM:
         if (variable->ref.param->isSelf) {
@@ -810,24 +811,7 @@ void LgsCgFile::visitVariable(LgsVariable* variable) {
     assert(variable->IRValue);
 }
 
-void LgsCgFile::visitNullableExpr(LgsNullableExpr* expr) {
-    const auto nullable = expr->type->asNullable();
-    assert(nullable);
-    visitExpr(expr->baseExpr);
-    if (expr->isNull) {
-        expr->IRValue = nullable->getIRZeroValue(cg, expr->pointee);
-    } else {
-        if (nullable->passByRef) {
-            if (expr->pointee) cg.store(expr->baseExpr->IRValue, expr->pointee);
-            expr->IRValue = expr->baseExpr->IRValue;
-        } else {
-            expr->IRValue = nullable->getIRZeroValue(cg, expr->pointee);
-            nullable->setIRFields(cg, expr->IRValue, expr->baseExpr->loadIR(cg), cg.true_());
-        }
-    }
-}
-
-void LgsCgFile::visitIterIndex(LgsIterIndex* iterIndex) {
+void LgsCgFile::visitIterIndex(LgsIterIndex* iterIndex, const bool assign) {
     const auto baseExpr = iterIndex->baseExpr;
     const auto iterable = baseExpr->type->asIterable();
     const auto from = iterIndex->index.from;
@@ -841,10 +825,11 @@ void LgsCgFile::visitIterIndex(LgsIterIndex* iterIndex) {
     } else {
         const auto baseExprValue = baseExpr->pointee ? baseExpr->pointee : baseExpr->IRValue;
         iterIndex->IRValue = iterable->getIRElement(cg, baseExprValue, from->IRValue);
+        if (!assign) iterIndex->IRValue = iterIndex->loadIR(cg);
     }
 }
 
-void LgsCgFile::visitSelection(LgsSelection* selection) {
+void LgsCgFile::visitSelection(LgsSelection* selection, const bool assign) {
     visitExpr(selection->exprs.front());
     const auto iterationCount = selection->exprs.size() - 1;
     for (size_t i = 0; i < iterationCount; ++i) {
@@ -852,9 +837,9 @@ void LgsCgFile::visitSelection(LgsSelection* selection) {
         const auto child = selection->exprs[i + 1];
         // cg.createNullPtrGuard(cg.loadPtr(parent->IRValue));
         if (const auto var = child->asVariable()) {
-            visitFieldSelection(var, parent);
+            visitFieldSelection(var, parent, assign);
         } else if (const auto nullableExpr = child->asNullableExpr()) {
-            visitNullableSelection(nullableExpr, parent);
+            visitNullableSelection(nullableExpr, parent, assign);
         } else if (const auto methodCall = child->asFuncCall()) {
             if (methodCall->isMock) continue;
             visitFuncCall(methodCall);
@@ -872,7 +857,24 @@ void LgsCgFile::visitSelection(LgsSelection* selection) {
     selection->IRValue = selection->exprs.back()->IRValue;
 }
 
-void LgsCgFile::visitFieldSelection(LgsVariable* var, LgsExpr* parent) {
+void LgsCgFile::visitNullableExpr(LgsNullableExpr* expr, const bool assign) {
+    const auto nullable = expr->type->asNullable();
+    assert(nullable);
+    visitExpr(expr->baseExpr);
+    if (expr->isNull) {
+        expr->IRValue = nullable->getIRZeroValue(cg, expr->pointee);
+    } else {
+        if (nullable->passByRef) {
+            if (expr->pointee) cg.store(expr->baseExpr->IRValue, expr->pointee);
+            expr->IRValue = expr->baseExpr->IRValue;
+        } else {
+            expr->IRValue = nullable->getIRZeroValue(cg, expr->pointee);
+            nullable->setIRFields(cg, expr->IRValue, expr->baseExpr->loadIR(cg), cg.true_());
+        }
+    }
+}
+
+void LgsCgFile::visitFieldSelection(LgsVariable* var, LgsExpr* parent, bool assign) {
     const auto field = var->ref.field;
     const auto fieldType = field->type;
 
@@ -914,7 +916,7 @@ void LgsCgFile::visitFieldSelection(LgsVariable* var, LgsExpr* parent) {
     var->IRValue = field->getGEP(cg, parent->IRValue);
 }
 
-void LgsCgFile::visitNullableSelection(LgsExpr* child, LgsExpr* parent) {
+void LgsCgFile::visitNullableSelection(LgsExpr* child, LgsExpr* parent, bool assign) {
     assert(parent->type->asNullable());
     const auto field = child->asNullableExpr()->baseExpr->asVariable()->ref.field;
     const auto isNullBlock = cg.createBlock(BLOCK_TRUE);
@@ -1154,35 +1156,55 @@ void LgsCgFile::createPrologue(LgsFunc* func) {
     const auto entryBlock = cg.createBlock(BLOCK_ENTRY, cg.currentFunc);
     func->epilogue = cg.createBlock("epilogue");
     cg.builder.SetInsertPoint(entryBlock);
-    if (func->funcType->name == LGS_MAIN_FUNC) {
+    const auto ft = func->funcType;
+    if (ft->name == LGS_MAIN_FUNC) {
         cg.callRuntimeFunc("init", cg.voidTy());
         startTime = cg.measureTimeStart();
+    } else {
+        if (func->isTest) for (auto [_, then] : func->mocks) visitExpr(then);
+        if (ft->isVariadic) {
+            ft->params.back().IRValue = cg.builder.CreateAlloca(cg.ptrTy(), nullptr, "va_list");
+            cg.callIntrinsics(Intrinsic::vastart, {cg.ptrTy()}, {ft->params.back().IRValue});
+        }
     }
     cg.callStackPush();
 }
 
 void LgsCgFile::createEpilogue(const LgsFunc* func) {
     const auto ft = func->funcType;
+    // Main func
     if (ft->name == LGS_MAIN_FUNC) {
         cg.callPopStack();
         cg.callRuntimeFunc("close", cg.voidTy());
         cg.callPrintf("Time taken: %zuns\n", {cg.measureTimeEnd(startTime)});
         cg.builder.CreateRet(cg.i32(EXIT_SUCCESS));
-    } else if (ft->rt->isVoid() && !cg.lastInstTerminator()) {
+        return;
+    }
+
+    if (ft->isVariadic) {
+        cg.callIntrinsics(Intrinsic::vaend, {cg.ptrTy()}, {ft->params.back().IRValue});
+    }
+
+    // No return
+    if (ft->rt->isVoid() && !cg.lastInstTerminator()) {
         cg.callPopStack();
         cg.builder.CreateRetVoid();
-    } else if (func->returnStmts.size() > 1) {
-        cg.branchAndStartBlock(func->epilogue);
-        const auto phi = cg.builder.CreatePHI(ft->rt->getTypeOrPtr(cg), func->returnStmts.size());
-        for (const auto returnStmt : func->returnStmts) {
-            phi->addIncoming(returnStmt->expr->IRValue, returnStmt->parentBlock);
-        }
-        cg.callPopStack();
-        cg.builder.CreateRet(phi);
+        return;
     }
+
+    // With return
+    assert(!func->returnStmts.empty());
+    cg.branchAndStartBlock(func->epilogue);
+    const auto phi = cg.builder.CreatePHI(ft->rt->getIRTypeOrPtr(cg), func->returnStmts.size());
+    for (const auto returnStmt : func->returnStmts) {
+        phi->addIncoming(returnStmt->expr->IRValue, returnStmt->parentBlock);
+    }
+    const auto v = ft->rt->isHeap ? cg.moveRetValue(ft->rt->getBaseName(), phi) : phi;
+    cg.callPopStack();
+    cg.builder.CreateRet(v);
 }
 
-void LgsCgFile::initMainArgs(const LgsMainFunc* mainFunc) {
+void LgsCgFile::initMainArgs(const LgsMainFunc* mainFunc) const {
     const auto ft = mainFunc->funcType;
     if (ft->params.empty()) return;
     const auto argsArray = ft->params.front().expr->asArrayExpr();
@@ -1231,26 +1253,6 @@ Function* LgsCgFile::getThunkFunc(LgsFuncCall* fc, Type* ctxTy) {
     return thunkFunc;
 }
 
-void LgsCgFile::moveValue(LgsType* type, Value* left, Value* right) {
-    const std::vector<Type*> params = {cg.ptrTy(), cg.ptrTy()};
-    if (type->asStr()) {
-        const std::vector args = {left, right};
-        cg.callRuntimeFunc("moveStr", cg.voidTy(), params, args);
-    } else if (type->asObject()) {
-        const std::vector args = {left, right};
-        cg.callRuntimeFunc("moveObject", cg.voidTy(), params, args);
-    } else if (type->asDArray()) {
-        const std::vector args = {left, right};
-        cg.callRuntimeFunc("moveArr", cg.voidTy(), params, args);
-    } else if (const auto nullable = type->asNullable()) {
-        moveValue(nullable->baseType, left, right);
-    } else if (type->asMap()) {
-        assert(0);
-    } else {
-        assert(0);
-    }
-}
-
 void LgsCgFile::createVecField(LgsField* field, Value* parent) {
     const auto vec = field->type->asVec();
     assert(vec);
@@ -1266,7 +1268,7 @@ void LgsCgFile::createVecField(LgsField* field, Value* parent) {
     cg.store(newVec, field->IRValue);
 }
 
-bool LgsCgFile::checkMock(LgsExpr* expr) {
+bool LgsCgFile::checkMock(LgsExpr* expr) const {
     if (stack.stack.empty()) return false;
     const auto currentFunc = stack.currentFunc();
     if (currentFunc->isTest) {

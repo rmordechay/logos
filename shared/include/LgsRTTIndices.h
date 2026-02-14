@@ -26,10 +26,10 @@ struct LgsHashMapIndices {
 
 struct LgsDArrExprIndices {
     static constexpr size_t level = 0;
-    static constexpr size_t type = 1;
-    static constexpr size_t data = 2;
-    static constexpr size_t len = 3;
-    static constexpr size_t cap = 4;
+    static constexpr size_t baseType = 1;
+    static constexpr size_t length = 2;
+    static constexpr size_t capacity = 3;
+    static constexpr size_t data = 4;
 };
 
 struct LgsObjIndices {

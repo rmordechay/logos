@@ -37,6 +37,7 @@ public:
     bool isLambda = false;
     bool isSyscall = false;
     bool isTerminator = false;
+    bool isRetBig = false;
     bool hasDefaults = false;
     bool hasSelf = false;
     uint32_t variadicIndex = 0;
@@ -46,7 +47,7 @@ public:
         setFuncOptions(ops);
         passByRef = true;
     }
-    Type* getIRType(LgsCodeGen& cg) override;
+    FunctionType* getIRType(LgsCodeGen& cg) override;
     LgsExpr* getZeroValue() override;
     size_t sizeBytes() override;
     std::string getName() override;

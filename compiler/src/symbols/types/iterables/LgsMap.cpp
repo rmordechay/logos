@@ -53,7 +53,7 @@ Constant* LgsMap::getRTTypeExtra(LgsCodeGen& cg) {
     const auto rttName = getRTTName();
     const auto key = pairType->key;
     const auto value = pairType->value;
-    const auto st = cg.getStructType({key->getTypeOrPtr(cg), value->getTypeOrPtr(cg)}, rttName);
+    const auto st = cg.getStructType({key->getIRTypeOrPtr(cg), value->getIRTypeOrPtr(cg)}, rttName);
     const std::vector args = {key->getRTType(cg), value->getRTType(cg)};
     return cg.createGlobal(rttName + "_extra", st, ConstantStruct::get(st, args));
 }
@@ -199,8 +199,8 @@ DIType* LgsMap::getDebugType(LgsCodeGen& cg) {
 Function* LgsMap::getGetFunc(LgsCodeGen& cg) {
     const auto funcName = getName() + "_" + GET_FUNC;
     if (const auto func = cg.IRModule->getFunction(funcName)) return func;
-    const auto keyTy = pairType->key->getTypeOrPtr(cg);
-    const auto valueTy = pairType->value->getTypeOrPtr(cg);
+    const auto keyTy = pairType->key->getIRTypeOrPtr(cg);
+    const auto valueTy = pairType->value->getIRTypeOrPtr(cg);
     const std::vector<Type*> params = {cg.ptrTy(), keyTy};
     const auto ft = cg.getFT(valueTy, params);
     if (cg.mode == CG_MODE_SRC_CODE) {
@@ -261,8 +261,8 @@ Function* LgsMap::getGetFunc(LgsCodeGen& cg) {
 Function* LgsMap::getAddFunc(LgsCodeGen& cg) {
     const auto funcName = getName() + "_" + ADD_FUNC;
     if (const auto func = cg.IRModule->getFunction(funcName)) return func;
-    const auto valueTy = pairType->value->getTypeOrPtr(cg);
-    const auto keyType = pairType->key->getTypeOrPtr(cg);
+    const auto valueTy = pairType->value->getIRTypeOrPtr(cg);
+    const auto keyType = pairType->key->getIRTypeOrPtr(cg);
     const auto ft = cg.getFT(cg.voidTy(), {cg.ptrTy(), keyType, valueTy, cg.sizeTy()});
     if (cg.mode == CG_MODE_SRC_CODE) {
         return cg.getFunc(funcName, ft);

@@ -18,7 +18,6 @@ public:
     LgsVarDec(const std::string& name, LgsType* type, LgsExpr* expr) : name(name), type(type), expr(expr) {}
     LgsType* getType() override;
     void setType(LgsType* newType) override;
-    bool shouldAllocate() const;
     void setDebugValue(LgsCodeGen& cg) override;
     void hashNode(size_t& oldHash) override;
     LgsStmt* clone() override;

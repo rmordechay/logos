@@ -1,9 +1,7 @@
 #include "exprs/LgsSelection.h"
 #include "exprs/LgsFuncCall.h"
-#include "exprs/LgsVariable.h"
 #include "stmts/LgsField.h"
 #include "types/LgsInterface.h"
-#include "types/iterables/LgsVec.h"
 #include "LgsUtils.h"
 #include <sstream>
 #include <llvm/IR/InlineAsm.h>
@@ -11,7 +9,7 @@
 Value* LgsSelection::loadIR(LgsCodeGen& cg) {
     if (type->asEnum()) return IRValue;
     if (!type->passByRef && asMethodCall()) return IRValue;
-    return cg.load(type->getTypeOrPtr(cg), IRValue);
+    return cg.load(type->getIRTypeOrPtr(cg), IRValue);
 }
 
 LgsFuncCall* LgsSelection::asMethodCall() const {

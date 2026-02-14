@@ -8,7 +8,7 @@
 #include <llvm/IR/Module.h>
 
 Value* LgsIterIndex::loadIR(LgsCodeGen& cg) {
-    return cg.load(type->getTypeOrPtr(cg), IRValue);
+    return cg.load(type->getIRTypeOrPtr(cg), IRValue);
 }
 
 Value* LgsIterIndex::getIRRangePtr(LgsCodeGen& cg) const {

@@ -81,6 +81,26 @@ extern "C" void Lgs_Runtime_moveObject(void* left, void* right) {
     }
 }
 
+extern "C" void* Lgs_Runtime_move2DArray(Lgs_DArrExpr* arr, const size_t toLevel) {
+    if (arr->level <= toLevel) return arr;
+    auto& allocator = runtime.stack.at(toLevel).allocator;
+    const auto newArr = static_cast<Lgs_DArrExpr*>(allocator.allocate(sizeof(Lgs_DArrExpr), true));
+    newArr->level = arr->level;
+    newArr->baseType = arr->baseType;
+    newArr->length = arr->length;
+    newArr->capacity = arr->capacity;
+    const auto size = newArr->capacity * newArr->baseType->size;
+    newArr->data = static_cast<char*>(allocator.allocate(size, false));
+    std::memcpy(newArr->data, arr->data, size);
+    return newArr;
+}
+
+extern "C" void* Lgs_Runtime_moveRetDArray(Lgs_DArrExpr* arr) {
+    const auto retLevel = runtime.level - 1;
+    if (arr->level <= retLevel) return arr;
+    return Lgs_Runtime_move2DArray(arr, retLevel);
+}
+
 extern "C" void Lgs_Runtime_moveArr(Lgs_DArrExpr* leftArr, const Lgs_DArrExpr* rightArr) {
     if (!rightArr) {
         std::memset(leftArr, 0, sizeof(Lgs_DArrExpr));

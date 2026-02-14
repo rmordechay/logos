@@ -3,7 +3,7 @@
 
 Value* LgsNullableExpr::loadIR(LgsCodeGen& cg) {
     if (isNull) return IRValue;
-    return cg.load(type->getTypeOrPtr(cg), IRValue);
+    return cg.load(type->getIRTypeOrPtr(cg), IRValue);
 }
 
 void LgsNullableExpr::setDebugValue(LgsCodeGen& cg) {

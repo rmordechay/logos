@@ -11,9 +11,6 @@
 #include "codegen/LgsCodeGen.h"
 #include <sstream>
 #include <llvm/IR/Module.h>
-
-#include "stmts/LgsStmt.h"
-#include "stmts/LgsVarDec.h"
 #include "types/LgsObject.h"
 
 

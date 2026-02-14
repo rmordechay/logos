@@ -31,7 +31,7 @@ void LgsTypeResolver::resolveType(LgsType*& type) {
     } else if (const auto iterable = type->asIterable()) {
         resolveType(iterable->baseType);
     } else if (const auto nullable = type->asNullable()) {
-        if (!nullable->isNull) {
+        if (nullable->baseType) {
             resolveType(nullable->baseType);
             nullable->isHeap = nullable->baseType->isHeap;
             nullable->passByRef = nullable->baseType->passByRef;
@@ -151,6 +151,7 @@ void LgsTypeResolver::resolveFuncType(LgsFuncType* funcType) {
         }
     }
     resolveType(funcType->rt);
+    funcType->isRetBig = funcType->rt->asSArray();
     currentFuncType = oldFunc;
 }
 

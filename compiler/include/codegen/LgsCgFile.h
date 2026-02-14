@@ -110,12 +110,12 @@ public:
     void visitCharConst(LgsCharConst* charConst);
     void visitPrefixExpr(LgsPrefixExpr* prefixExpr);
     void visitPostfixExpr(LgsPostfixExpr* postfixExpr);
-    void visitVariable(LgsVariable* variable);
-    void visitNullableExpr(LgsNullableExpr* expr);
-    void visitIterIndex(LgsIterIndex* iterIndex);
-    void visitSelection(LgsSelection* selection);
-    void visitFieldSelection(LgsVariable* var, LgsExpr* parent);
-    void visitNullableSelection(LgsExpr* child, LgsExpr* parent);
+    void visitVariable(LgsVariable* variable, bool assign);
+    void visitIterIndex(LgsIterIndex* iterIndex, bool assign);
+    void visitNullableExpr(LgsNullableExpr* expr, bool assign);
+    void visitSelection(LgsSelection* selection, bool assign);
+    void visitFieldSelection(LgsVariable* var, LgsExpr* parent, bool assign);
+    void visitNullableSelection(LgsExpr* child, LgsExpr* parent, bool assign);
     void visitMetaSelection(LgsMetaSelection* metaSelection);
     void visitFuncCall(LgsFuncCall* funcCall);
     void visitArrayExpr(LgsArrayExpr* arrayExpr);
@@ -131,14 +131,13 @@ public:
     // Funcs
     void createPrologue(LgsFunc* func);
     void createEpilogue(const LgsFunc* func);
-    void initMainArgs(const LgsMainFunc* mainFunc);
+    void initMainArgs(const LgsMainFunc* mainFunc) const;
     StructType* getThunkCtxType(const LgsFuncCall* fc);
     Value* getThunkCtx(const LgsFuncCall* fc, Type* ctxTy);
     Function* getThunkFunc(LgsFuncCall* fc, Type* ctxTy);
 
-    void moveValue(LgsType* type, Value* left, Value* right);
     void createVecField(LgsField* field, Value* parent);
-    bool checkMock(LgsExpr* expr);
+    bool checkMock(LgsExpr* expr) const;
     void getMapFunc(LgsFuncType* mapFunc);
     void getFilterFunc(LgsFuncType* filterFunc);
     void getForeachFunc(LgsFuncType* forEachFunc);

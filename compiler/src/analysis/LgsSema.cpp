@@ -184,15 +184,19 @@ void LgsSema::visitField(LgsField* field) {
 }
 
 void LgsSema::visitFuncHeader(LgsFuncType* ft) {
-    auto defaultParamsStarted = false;
+    auto defaultParamStart = false;
     for (auto& param : ft->params) {
         visitParam(&param);
-        if (defaultParamsStarted && !param.expr) {
+        if (defaultParamStart && !param.expr) {
             addError(E10028, param.location);
             break;
         }
-        defaultParamsStarted = !!param.expr;
+        defaultParamStart = !!param.expr;
+        addRTType(param.type);
+        addGenerics(param.type);
     }
+    addRTType(ft->rt);
+    addGenerics(ft->rt);
 }
 
 void LgsSema::visitFunc(LgsFunc* func) {

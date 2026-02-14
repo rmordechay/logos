@@ -2,16 +2,16 @@ find_package(GTest REQUIRED)
 enable_testing()
 
 add_executable(lgs_tests
+    ${COMPILER_SOURCE}
     main.cpp
     LgsTestUtils.h
     parser/ParserTest.cpp
     sema/ErrorsTest.cpp
     sema/TypeResolverTest.cpp
+    sema/GenericsTest.cpp
     codegen/CgIfStmtTest.cpp
     codegen/CgArithmeticsTest.cpp
-    codegen/CgDArrayTest.cpp
-    ${COMPILER_SOURCE}
-    sema/GenericsTest.cpp
+    codegen/CgArraysTest.cpp
     codegen/CgGenericsTest.cpp
     codegen/CgStrTest.cpp
 )

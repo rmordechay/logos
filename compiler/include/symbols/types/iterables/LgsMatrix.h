@@ -14,6 +14,7 @@ public:
 
     LgsMatrix(const size_t rows, const size_t columns): LgsIterable(&LGS_FLOAT), rows(rows), columns(columns) {
         passByRef = true;
+        rttKind = RTT_MATRIX;
     }
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;

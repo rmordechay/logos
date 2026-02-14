@@ -156,6 +156,10 @@ Value* LgsCodeGen::isNull(Value* value) {
     return builder.CreateIsNull(value);
 }
 
+Value* LgsCodeGen::getLevel(Value* v) {
+    return load(sizeTy(), v);
+}
+
 AllocaInst* LgsCodeGen::emptyBuffer() {
     return builder.CreateAlloca(ArrayType::get(i8Ty(), LGS_STR_BUFFER_SIZE));
 }
@@ -231,6 +235,16 @@ Value* LgsCodeGen::allocStrConst(Value* strPtr) {
 
 Value* LgsCodeGen::reallocate(Value* ptr, Value* size, Value* level) {
     return callRuntimeFunc("reallocate", ptrTy(), {ptrTy(), sizeTy(), sizeTy()}, {ptr, toSize(size), toSize(level)});
+}
+
+Value* LgsCodeGen::moveValue(const std::string& baseName, Value* v, Value* toLevel) {
+    const std::vector args = {v, toLevel};
+    const std::vector<Type*> params = {ptrTy(), sizeTy()};
+    return callRuntimeFunc("move2" + baseName, ptrTy(), params, args);
+}
+
+Value* LgsCodeGen::moveRetValue(const std::string& baseName, Value* v) {
+    return callRuntimeFunc("moveRet" + baseName, ptrTy(), {ptrTy()}, {v});
 }
 
 Value* LgsCodeGen::moveArrElement(Value* arrLevel, Constant* type, Value* element) {

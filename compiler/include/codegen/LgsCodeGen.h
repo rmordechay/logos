@@ -84,7 +84,8 @@ public:
     Value* load(Type* ty, Value* ptr);
     Value* loadPtr(Value* value);
     Value* isNull(Value* value);
-    llvm::AllocaInst* emptyBuffer();
+    Value* getLevel(Value* v);
+    AllocaInst* emptyBuffer();
     void incSize(Value* bufferOffset, Value* ptr);
     Value* allocaAndStore(Type* type, Value* v, const std::string& name = "");
     StructType* getStructType(const std::vector<Type*>& types, const std::string& name = "");
@@ -102,6 +103,8 @@ public:
     Value* allocInLevel(Value* size, Value* level, bool setLevel);
     Value* allocStrConst(Value* strPtr);
     Value* reallocate(Value* ptr, Value* size, Value* level);
+    Value* moveValue(const std::string& baseName, Value* v, Value* toLevel);
+    Value* moveRetValue(const std::string& baseName, Value* v);
     Value* moveArrElement(Value* arrLevel, Constant* type, Value* element);
     void throwError(const LgsBaseMsg& err, const std::vector<Value*>& args = {});
 

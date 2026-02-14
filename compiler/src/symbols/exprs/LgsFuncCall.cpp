@@ -54,7 +54,7 @@ bool LgsFuncCall::equalsVariadic(const LgsFuncType* funcType) const {
     const auto& variadicParam = funcType->params.back();
     const auto variadic = variadicParam.type->asVariadic();
     assert(variadic);
-    for (uint32_t i = variadicParam.index; i < args.size(); ++i) {
+    for (size_t i = funcType->params.size(); i < args.size(); ++i) {
         const auto arg = args[i];
         if (!arg.expr->type->canCastTo(variadic->baseType)) return false;
     }
