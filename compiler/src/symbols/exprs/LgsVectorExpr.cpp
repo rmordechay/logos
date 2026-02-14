@@ -2,12 +2,7 @@
 #include "LgsUtils.h"
 
 Value* LgsVectorExpr::loadIR(LgsCodeGen& cg) {
-    return cg.load(vecType->getIRType(cg), IRValue);
-}
-
-void LgsVectorExpr::setType(LgsType* newType) {
-    vecType = newType->asVec();
-    type = vecType;
+    return cg.load(type->getIRType(cg), IRValue);
 }
 
 void LgsVectorExpr::setDebugValue(LgsCodeGen& cg) {
@@ -19,7 +14,7 @@ void LgsVectorExpr::hashNode(size_t& oldHash) {
 }
 
 std::string LgsVectorExpr::asText() {
-    return vecType->pname();
+    return type->asVec()->pname();
 }
 
 bool LgsVectorExpr::equals(LgsExpr* other) {

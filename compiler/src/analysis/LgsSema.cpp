@@ -870,19 +870,24 @@ void LgsSema::visitHashMap(LgsHashMap* hashMap) {
 
 void LgsSema::visitVectorExpr(LgsVectorExpr* vectorExpr) {
     const auto vec = vectorExpr->type->asVec();
+    LgsType* inferredType = nullptr;
     for (const auto arg : vectorExpr->elements) {
         visitExpr(arg);
         if (!arg->type) continue;
         if (arg->type->isScalar()) {
-            vectorExpr->sumDim++;
-        } else if (const auto otherVec = arg->type->asVec()) {
-            vectorExpr->sumDim += otherVec->dimVec;
+            inferredType = arg->type;
+            vectorExpr->sumArgsDim++;
+        } else if (const auto innerVec = arg->type->asVec()) {
+            const auto nestedBaseType = innerVec->getNestedBaseType();
+            inferredType = nestedBaseType;
+            vectorExpr->sumArgsDim += innerVec->dimVec;
         } else {
             addError(E10073, vectorExpr->location);
             break;
         }
     }
-    if (vectorExpr->sumDim > vectorExpr->vecType->dimVec) {
+    vectorExpr->type->asVec()->baseType = inferredType;
+    if (vectorExpr->sumArgsDim > vectorExpr->type->asVec()->dimVec) {
         addError(E10074, vectorExpr->location, {vec->pname()});
     }
     addRuntimeInfo(vec);
