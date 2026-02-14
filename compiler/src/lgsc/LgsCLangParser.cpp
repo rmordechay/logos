@@ -16,13 +16,13 @@
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsChar.h"
 #include "LgsUtils.h"
+#include "stmts/LgsVarDec.h"
 #include "types/LgsSubType.h"
 #include "types/iterables/LgsSArray.h"
 #include "types/primitives/LgsLong.h"
 
-void LgsCLangParser::HandleTranslationUnit(clang::ASTContext& clangContext){
-    context = &clangContext;
-    TraverseDecl(clangContext.getTranslationUnitDecl());
+void LgsCLangASTConsumer::HandleTranslationUnit(clang::ASTContext& clangContext) {
+    parser.TraverseDecl(clangContext.getTranslationUnitDecl());
 }
 
 bool LgsCLangParser::VisitFunctionDecl(const clang::FunctionDecl* func) {
@@ -177,4 +177,24 @@ LgsType* LgsCLangParser::mapCArray(const clang::QualType type) {
     const auto baseType = mapCType(arrayType->getElementType());
     const auto size = arrayType->getSize().getZExtValue();
     return new LgsSArray(baseType, new LgsIntConst(&LGS_INT, size));
+}
+
+void LgsPPCallbacks::MacroDefined(const clang::Token& macroNameToken, const clang::MacroDirective* macroDirective) {
+    const auto macroInfo = macroDirective->getMacroInfo();
+    if (!macroInfo) return;
+    const auto name = macroNameToken.getIdentifierInfo()->getName().str();
+    std::string value;
+    for (unsigned i = 0; i < macroInfo->getNumTokens(); ++i) {
+        const auto& tok = macroInfo->getReplacementToken(i);
+        value += clang::Lexer::getSpelling(tok, compiler.getSourceManager(), compiler.getLangOpts(), nullptr);
+    }
+    if (name.starts_with("_")) return;
+    if (value.length() == 1 && isdigit(value.front())) {
+        const auto expr = new LgsIntConst(&LGS_INT, std::atoi(value.c_str()));
+        const auto varDec = new LgsVarDec(name, expr);
+        varDec->type = varDec->expr->type;
+        if (!symbolTable.symbols.contains(varDec->name)) {
+            symbolTable.addSymbol(LgsSymbol(varDec, false, true), &errHandler);
+        }
+    }
 }

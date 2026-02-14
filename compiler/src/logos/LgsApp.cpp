@@ -145,7 +145,7 @@ void LgsApp::parseCImports() {
         for (const auto externalImport : file->symbolTable.importPaths) {
             if (externalImport->type != LGS_C_IMPORT) continue;
             auto headerPath = externalImport->importPath;
-            if (!seen.insert(headerPath).second) assert(0);
+            if (!seen.insert(headerPath).second) continue;
             if (lgsCC.parseFile(headerPath)) {
                 file->symbolTable.symbols.merge(lgsCC.parser.symbolTable.symbols);
             } else {
