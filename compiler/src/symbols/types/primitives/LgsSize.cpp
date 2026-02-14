@@ -27,7 +27,7 @@ LgsExpr* LgsSize::getZeroValue() {
 }
 
 LgsType* LgsSize::applyBinOp(LgsType* rightType, LgsBinOp& op) {
-    if (!rightType->isNumber()) return nullptr;
+    if (!rightType->isScalar()) return nullptr;
     switch (op.opType) {
     case ADD:
     case SUB:

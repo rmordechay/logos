@@ -51,7 +51,7 @@ bool LgsFloat::canCastTo(LgsType* other) {
 }
 
 LgsType* LgsFloat::applyBinOp(LgsType* rightType, LgsBinOp& op) {
-    if (!rightType->isNumber()) return nullptr;
+    if (!rightType->isScalar()) return nullptr;
     switch (op.opType) {
     case POW:
         return &LGS_DOUBLE;

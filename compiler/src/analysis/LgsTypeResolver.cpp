@@ -151,7 +151,7 @@ void LgsTypeResolver::resolveFuncType(LgsFuncType* funcType) {
         }
     }
     resolveType(funcType->rt);
-    funcType->isRetBig = funcType->rt->asSArray();
+    funcType->swapReturn = funcType->rt->asSArray();
     currentFuncType = oldFunc;
 }
 

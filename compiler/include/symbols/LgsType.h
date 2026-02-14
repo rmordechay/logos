@@ -77,7 +77,6 @@ public:
 
     bool isAny();
     bool isVoid();
-    bool isNumber() const;
     bool isScalar() const;
     bool isUnknown();
     bool isSliceable();

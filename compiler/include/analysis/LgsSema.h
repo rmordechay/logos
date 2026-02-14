@@ -153,4 +153,5 @@ public:
     void addError(const LgsBaseMsg& lgsErr, const LgsLocation& location, const std::vector<std::string>& args = {});
     void addRTType(LgsType* type) const;
     void addGenerics(LgsType* type) const;
+    void addRuntimeInfo(LgsType* type) const;
 };

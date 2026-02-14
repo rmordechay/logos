@@ -16,7 +16,7 @@ size_t LgsMatrix::sizeBytes() {
 }
 
 LgsType* LgsMatrix::applyBinOp(LgsType* rightType, LgsBinOp& op) {
-    if (rightType->isNumber()) {
+    if (rightType->isScalar()) {
         return applyMatScalarOp(rightType, op);
     }
     if (const auto vec = rightType->asVec()) {
@@ -29,7 +29,7 @@ LgsType* LgsMatrix::applyBinOp(LgsType* rightType, LgsBinOp& op) {
 }
 
 LgsType* LgsMatrix::applyMatScalarOp(LgsType* number, const LgsBinOp& op) const {
-    if (!number->isNumber()) return nullptr;
+    if (!number->isScalar()) return nullptr;
     switch (op.opType) {
     case ADD:
     case SUB:

@@ -471,10 +471,14 @@ void LgsCgFile::visitContinueStmt() {
 }
 
 void LgsCgFile::visitReturnStmt(LgsReturn* returnStmt) {
+    const auto currentFunc = stack.currentFunc();
+    const auto ft = currentFunc->funcType;
+    if (ft->swapReturn) {
+        returnStmt->expr->pointee = currentFunc->getIRFunc(cg)->getArg(ft->isMethod);
+    }
     visitExpr(returnStmt->expr);
     returnStmt->expr->IRValue = returnStmt->expr ? returnStmt->expr->IRValue : nullptr;
-    const auto currentFunc = stack.currentFunc();
-    if (currentFunc->funcType->rt->isVoid()) {
+    if (ft->rt->isVoid()) {
         cg.callPopStack();
         cg.builder.CreateRetVoid();
     } else if (!currentFunc->returnStmts.empty()) {
@@ -1051,35 +1055,43 @@ void LgsCgFile::visitDynamicArray(LgsArrayExpr* arrayExpr) {
 
 void LgsCgFile::visitVectorExpr(LgsVectorExpr* vecExpr) {
     const auto vecType = vecExpr->vecType;
+    const auto ty = vecType->getIRType(cg);
     if (vecExpr->elements.empty()) {
         vecExpr->IRValue = vecType->getIRZeroValue(cg, vecExpr->pointee);
+        cg.store(Constant::getNullValue(ty), vecExpr->pointee);
         return;
     }
 
     // Single scalar element
-    if (vecExpr->elements.size() == 1) {
-        const auto expr = vecExpr->elements.front();
-        if (expr->type->isScalar()) {
-            visitExpr(expr);
-            const auto newVec = cg.builder.CreateVectorSplat(vecType->dimVec, expr->IRValue);
-            if (vecExpr->pointee) {
-                vecExpr->IRValue = vecExpr->pointee;
-                cg.store(newVec, vecExpr->IRValue);
-            } else {
-                vecExpr->IRValue = cg.allocaAndStore(vecType->getIRType(cg), newVec);
-            }
-            return;
+    if (vecExpr->elements.size() == 1 && vecExpr->elements.front()->type->isScalar()) {
+        const auto element = vecExpr->elements.front();
+        visitExpr(element);
+        const auto newVec = cg.builder.CreateVectorSplat(vecType->dimVec, element->IRValue);
+        if (vecExpr->pointee) {
+            vecExpr->IRValue = vecExpr->pointee;
+            cg.store(newVec, vecExpr->IRValue);
+        } else {
+            vecExpr->IRValue = cg.allocaAndStore(ty, newVec);
         }
+        return;
     }
 
     // Multiple elements
     vecExpr->IRValue = vecExpr->vecType->getIRZeroValue(cg, vecExpr->pointee);
+    if (vecExpr->sumDim < vecType->dimVec) {
+        cg.store(Constant::getNullValue(ty), vecExpr->pointee);
+    }
+    size_t index = 0;
     for (size_t i = 0; i < vecExpr->elements.size(); ++i) {
         const auto element = vecExpr->elements[i];
-        assert(!element->type->asVec());
-        element->pointee = vecType->getIRElement(cg, vecExpr->IRValue, cg.i32(i));
+        element->pointee = vecType->getIRElement(cg, vecExpr->IRValue, cg.i32(index));
         visitExpr(element);
         cg.store(element->IRValue, element->pointee);
+        if (const auto innerVec = element->type->asVec()) {
+            index += innerVec->dimVec;
+        } else {
+            index++;
+        }
     }
 }
 
@@ -1199,9 +1211,14 @@ void LgsCgFile::createEpilogue(const LgsFunc* func) {
     for (const auto returnStmt : func->returnStmts) {
         phi->addIncoming(returnStmt->expr->IRValue, returnStmt->parentBlock);
     }
-    const auto v = ft->rt->isHeap ? cg.moveRetValue(ft->rt->getBaseName(), phi) : phi;
-    cg.callPopStack();
-    cg.builder.CreateRet(v);
+    if (ft->swapReturn) {
+        cg.callPopStack();
+        cg.builder.CreateRetVoid();
+    } else {
+        const auto v = ft->rt->isHeap ? cg.moveRetValue(ft->rt->getBaseName(), phi) : phi;
+        cg.callPopStack();
+        cg.builder.CreateRet(v);
+    }
 }
 
 void LgsCgFile::initMainArgs(const LgsMainFunc* mainFunc) const {

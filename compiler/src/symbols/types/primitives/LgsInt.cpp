@@ -38,7 +38,7 @@ bool LgsInt::canCastTo(LgsType* other) {
 }
 
 LgsType* LgsInt::applyBinOp(LgsType* rightType, LgsBinOp& op) {
-    if (!rightType->isNumber()) return nullptr;
+    if (!rightType->isScalar()) return nullptr;
     switch (op.opType) {
     case ADD:
     case SUB:

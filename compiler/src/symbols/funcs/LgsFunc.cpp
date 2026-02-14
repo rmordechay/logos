@@ -68,21 +68,26 @@ void LgsFunc::initFunc(const std::string& name, LgsType* rt, const std::vector<L
 
 Function* LgsFunc::getIRFunc(LgsCodeGen& cg) {
     const auto funcName = funcType->getName();
-    auto IRFunc = cg.IRModule->getFunction(funcName);
-    if (IRFunc) return IRFunc;
+    auto func = cg.IRModule->getFunction(funcName);
+    if (func) return func;
     const auto type = funcType->getIRType(cg);
     const auto funcTy = llvm::cast<FunctionType>(type);
-    IRFunc = cg.getFunc(funcName, funcTy);
-    IRFunc->addFnAttr(Attribute::NoUnwind);
-    if (funcType->params.empty()) return IRFunc;
-    auto args = IRFunc->arg_begin();
+    func = cg.getFunc(funcName, funcTy);
+    func->addFnAttr(Attribute::NoUnwind);
+    if (funcType->params.empty() && !funcType->swapReturn) return func;
+    auto args = func->arg_begin();
+    if (funcType->swapReturn) {
+        const auto sretAttr = Attribute::getWithStructRetType(cg.context, funcType->rt->getIRType(cg));
+        func->addParamAttr(funcType->isMethod, sretAttr);
+        args++;
+    }
     for (size_t i = 0; i < funcType->params.size(); ++i) {
         auto& param = funcType->params[i];
         args->setName(param.name);
         param.IRValue = args;
         args++;
     }
-    return IRFunc;
+    return func;
 }
 
 Value* LgsFunc::call(LgsCodeGen& cg, std::vector<LgsFuncArg>& args) {
@@ -121,16 +126,19 @@ Value* LgsFunc::call(LgsCodeGen& cg, std::vector<LgsFuncArg>& args) {
 }
 
 Value* LgsFunc::callIR(LgsCodeGen& cg, const std::vector<Value*>& args) {
+    auto argsList = args;
     Value* rv = nullptr;
-    if (IRValue) {
-        const auto funcTypeIR = funcType->getIRType(cg);
-        const auto IRFuncType = llvm::cast<FunctionType>(funcTypeIR);
-        rv = cg.builder.CreateCall(IRFuncType, IRValue, args);
-    } else {
-        const auto IRFunc = getIRFunc(cg);
-        rv = cg.builder.CreateCall(IRFunc, args);
+    Value* sret = nullptr;
+    if (funcType->swapReturn) {
+        sret = cg.builder.CreateAlloca(funcType->rt->getIRType(cg));
+        argsList.insert(args.begin() + funcType->isMethod, sret);
     }
-    return rv;
+    if (IRValue) {
+        rv = cg.builder.CreateCall(funcType->getIRType(cg), IRValue, argsList);
+    } else {
+        rv = cg.builder.CreateCall(getIRFunc(cg), argsList);
+    }
+    return sret ? sret : rv;
 }
 
 Value* LgsFunc::callWithVariadic(LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) {

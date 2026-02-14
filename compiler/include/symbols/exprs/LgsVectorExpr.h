@@ -4,6 +4,7 @@
 class LgsVectorExpr final : public LgsExpr {
 public:
     LgsVec* vecType;
+    size_t sumDim = 0;
     std::vector<LgsExpr*> elements;
 
     explicit LgsVectorExpr(const int8_t dim) {

@@ -147,8 +147,7 @@ Constant* LgsVec::getRTTypeExtra(LgsCodeGen& cg) {
 
 Value* LgsVec::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
     if (pointee) return pointee;
-    const auto ty = getIRType(cg);
-    return cg.allocaAndStore(ty, Constant::getNullValue(ty));
+    return cg.builder.CreateAlloca(getIRType(cg));
 }
 
 Value* LgsVec::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {

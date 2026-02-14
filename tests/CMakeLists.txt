@@ -14,6 +14,7 @@ add_executable(lgs_tests
     codegen/CgArraysTest.cpp
     codegen/CgGenericsTest.cpp
     codegen/CgStrTest.cpp
+    codegen/CgVectorsTest.cpp
 )
 
 target_include_directories(lgs_tests PRIVATE

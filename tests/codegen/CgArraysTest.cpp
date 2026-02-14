@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 #include "LgsTestUtils.h"
 
-TEST(CgArraysTest, Test1) {
+TEST(CgArraysTest, DArrTest1) {
     const auto code = R"(
     main() {
         arr = [1, 2]
@@ -19,7 +19,7 @@ TEST(CgArraysTest, Test1) {
     EXPECT_EQ(lines[2], "[1, 2, 3, 4]");
 }
 
-TEST(CgArraysTest, Test2) {
+TEST(CgArraysTest, SArrTest1) {
     const auto code = R"(
     main() {
         arr: Int[2] = [1, 2]
@@ -35,4 +35,18 @@ TEST(CgArraysTest, Test2) {
     EXPECT_EQ(lines[0], "[1, 2]");
     EXPECT_EQ(lines[1], "[3, 2]");
     EXPECT_EQ(lines[2], "[3, 4]");
+}
+
+TEST(CgArraysTest, SArrTest2) {
+    const auto code = R"(
+    func(): Int[3] {
+        return [1, 2, 3]
+    }
+    main() {
+        print(func())
+    }
+    )";
+    std::istringstream stream(getLgsOutput(code));
+    const auto lines = getLines(stream, 1);
+    EXPECT_EQ(lines[0], "[1, 2, 3]");
 }

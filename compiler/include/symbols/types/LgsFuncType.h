@@ -37,7 +37,7 @@ public:
     bool isLambda = false;
     bool isSyscall = false;
     bool isTerminator = false;
-    bool isRetBig = false;
+    bool swapReturn = false;
     bool hasDefaults = false;
     bool hasSelf = false;
     uint32_t variadicIndex = 0;

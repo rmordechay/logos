@@ -58,10 +58,6 @@ bool LgsType::isVoid() {
     return dynamic_cast<LgsVoid*>(this);
 }
 
-bool LgsType::isNumber() const {
-    return isInt || isFloat;
-}
-
 bool LgsType::isScalar() const {
     return isInt || isFloat;
 }
