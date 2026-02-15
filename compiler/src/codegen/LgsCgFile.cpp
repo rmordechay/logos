@@ -1174,7 +1174,7 @@ void LgsCgFile::createEpilogue(const LgsFunc* func) {
         cg.callPopStack();
         cg.builder.CreateRetVoid();
     } else {
-        const auto v = ft->rt->isHeap ? cg.moveRetValue(ft->rt->getBaseName(), phi) : phi;
+        const auto v = ft->rt->isHeap ? cg.moveRetValue(phi) : phi;
         cg.callPopStack();
         cg.builder.CreateRet(v);
     }

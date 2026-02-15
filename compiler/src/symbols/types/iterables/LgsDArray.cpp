@@ -147,7 +147,7 @@ Value* LgsDArray::getIRElement(LgsCodeGen& cg, Value* iterable, Value* index) {
 void LgsDArray::addIRElement(LgsCodeGen& cg, Value* iterable, Value* index, Value* value) {
     assert(!index);
     if (baseType->isHeap) {
-        value = cg.moveArrElement(cg.getLevel(iterable), baseType->getRTType(cg), value);
+        value = cg.moveValue(baseType->getBaseName(), value, cg.getLevel(iterable));
     }
     cg.builder.CreateCall(getAddFunc(cg), {iterable, value});
 }

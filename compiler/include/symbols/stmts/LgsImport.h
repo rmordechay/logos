@@ -1,7 +1,6 @@
 #pragma once
 #include "LgsTokens.h"
 
-
 enum LgsImportType {
     LGS_IMPORT,
     LGS_C_IMPORT,

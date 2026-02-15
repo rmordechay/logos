@@ -101,7 +101,7 @@ public:
     Value* allocStrConst(Value* strPtr);
     Value* reallocate(Value* ptr, Value* size, Value* level);
     Value* moveValue(const std::string& baseName, Value* v, Value* toLevel);
-    Value* moveRetValue(const std::string& baseName, Value* v);
+    Value* moveRetValue(Value* v);
     Value* moveArrElement(Value* arrLevel, Constant* type, Value* element);
     void throwError(const LgsBaseMsg& err, const std::vector<Value*>& args = {});
 

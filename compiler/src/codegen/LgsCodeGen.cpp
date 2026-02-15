@@ -242,11 +242,11 @@ Value* LgsCodeGen::reallocate(Value* ptr, Value* size, Value* level) {
 Value* LgsCodeGen::moveValue(const std::string& baseName, Value* v, Value* toLevel) {
     const std::vector args = {v, toLevel};
     const std::vector<Type*> params = {ptrTy(), sizeTy()};
-    return callRuntimeFunc("move2" + baseName, ptrTy(), params, args);
+    return callRuntimeFunc("move" + baseName, ptrTy(), params, args);
 }
 
-Value* LgsCodeGen::moveRetValue(const std::string& baseName, Value* v) {
-    return callRuntimeFunc("moveRet" + baseName, ptrTy(), {ptrTy()}, {v});
+Value* LgsCodeGen::moveRetValue(Value* v) {
+    return callRuntimeFunc("moveRetValue", ptrTy(), {ptrTy()}, {v});
 }
 
 Value* LgsCodeGen::moveArrElement(Value* arrLevel, Constant* type, Value* element) {
