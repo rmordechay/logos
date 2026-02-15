@@ -1,6 +1,4 @@
 #pragma once
-#include <unordered_set>
-
 #include "LgsFuncType.h"
 #include "exprs/LgsFuncCall.h"
 #include "exprs/constants/LgsStrConst.h"
@@ -42,7 +40,7 @@ public:
         rttKind = RTT_OBJECT;
         metaFields[OBJ_META_NAME] = new LgsField(OBJ_META_NAME, new LgsStr(), new LgsStrConst(name));
     }
-    LgsObject* clone();
+
     std::string getName() override;
     std::string getBaseName() override;
     LgsFunc* getMethod(const std::string& methodName) override;
@@ -52,7 +50,6 @@ public:
     LgsExpr* getZeroValue() override;
     bool canCastTo(LgsType* other) override;
     void hashNode(size_t& oldHash) override;
-    bool checkRecursiveFields(std::unordered_set<std::string>& nestedObjectNames) const;
     Type* getIRType(LgsCodeGen& cg) override;
     Constant* getRTTypeExtra(LgsCodeGen& cg) override;
     Value* hashValue(LgsCodeGen& cg, Value* value) override;

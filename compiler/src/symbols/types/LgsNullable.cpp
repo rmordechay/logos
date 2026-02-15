@@ -43,7 +43,6 @@ std::string LgsNullable::pname() {
 }
 
 std::string LgsNullable::getName() {
-    if (passByRef) return baseType ? baseType->getName(): name;
     return baseType ? baseType->getName() + name : name;
 }
 
@@ -53,8 +52,7 @@ Type* LgsNullable::getIRType(LgsCodeGen& cg) {
 }
 
 Constant* LgsNullable::getRTTypeExtra(LgsCodeGen& cg) {
-    if (passByRef) return baseType->getRTType(cg);
-    return baseType->getRTType(cg);
+    return baseType->asObject() ? cg.null() : baseType->getRTType(cg);
 }
 
 bool LgsNullable::canCastTo(LgsType* other) {

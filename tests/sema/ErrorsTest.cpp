@@ -619,6 +619,29 @@ TEST(ErrorsTest, E10046A) {
     expectErrors(app, E10046, 1);
 }
 
+TEST(ErrorsTest, E10048A) {
+    LgsApp app;
+    const auto code = R"(
+    object Obj {
+        obj: Obj
+    }
+    object Obj2 {
+        func(obj2: Obj2) {}
+    }
+    object Obj3 {
+        func(): Obj3 {}
+    }
+    object Obj4 {
+        obj: Obj
+    }
+    main() {}
+    )";
+    app.loadSrcFile(code, LGS_MAIN_FILE);
+    ASSERT_TRUE(app.errHandler.successful);
+    app.analyse();
+    expectErrors(app, E10048, 4);
+}
+
 TEST(ErrorsTest, E10054A) {
     LgsApp app;
     const auto code = R"(

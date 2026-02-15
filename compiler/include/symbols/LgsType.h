@@ -1,10 +1,7 @@
 #pragma once
-#include <map>
-#include <ostream>
-#include <vector>
+#include "Lgs_Types.h"
 #include "errors/LgsErrHandler.h"
 #include <unordered_map>
-#include "Lgs_Types.h"
 
 class LgsSelf;
 class LgsFieldType;
@@ -82,6 +79,7 @@ public:
     bool isUnknown();
     bool isSliceable();
     bool addMethod(LgsFunc* method);
+    bool hasRecursiveTypes() const;
     std::string getRTTName();
     Constant* getRTType(LgsCodeGen& cg);
     ConstantInt* IRSize(LgsCodeGen& cg);

@@ -123,7 +123,7 @@ void LgsSema::visitObject(LgsObject* obj) {
     currentObj = obj;
     validateTypeName(obj->name, obj->location);
     std::unordered_set<std::string> nestedFields;
-    if (!obj->checkRecursiveFields(nestedFields)) {
+    if (obj->hasRecursiveTypes()) {
         return addError(E10048, obj->location);
     }
     for (const auto field : obj->fields) {

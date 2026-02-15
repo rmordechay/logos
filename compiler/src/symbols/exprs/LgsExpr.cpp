@@ -236,6 +236,10 @@ LgsBinaryExpr* LgsExpr::asBinExpr() {
     return dynamic_cast<LgsBinaryExpr*>(this);
 }
 
+LgsMetaVar* LgsExpr::asMetaVar() {
+    return dynamic_cast<LgsMetaVar*>(this);
+}
+
 LgsMetaSelection* LgsExpr::asMetaSelection() {
     return dynamic_cast<LgsMetaSelection*>(this);
 }

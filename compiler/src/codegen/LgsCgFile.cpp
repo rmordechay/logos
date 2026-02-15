@@ -669,7 +669,7 @@ void LgsCgFile::visitStrConst(LgsStrConst* strConst) {
         strConst->IRValue = cg.allocStrConst(cg.getString(strConst->value));
         return;
     }
-
+    // Format with string parts
     for (const auto parts : strConst->parts) {
         visitExpr(parts);
     }

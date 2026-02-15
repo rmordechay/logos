@@ -1,8 +1,6 @@
 #include <llvm/IR/Module.h>
-
 #include "LgsRTTIndices.h"
 #include "Lgs_Exprs.h"
-#include "exprs/LgsFuncCall.h"
 #include "exprs/constants/LgsStrConst.h"
 #include "exprs/LgsBinaryExpr.h"
 #include "types/LgsAny.h"
@@ -111,7 +109,7 @@ Value* LgsStr::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     }
 
     Value* ptr = nullptr;
-    const auto leftPtr = loadRTData(cg, left->loadIR(cg));
+    const auto leftPtr = loadRTData(cg, left->IRValue);
     const auto leftSize = lenIR(cg, leftPtr);
     if (right->type->asChar()) {
         const auto allocSize = cg.builder.CreateAdd(leftSize, cg.usize(2));
@@ -125,6 +123,7 @@ Value* LgsStr::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
         const auto sumSize = cg.builder.CreateAdd(leftSize, rightSize);
         const auto allocSize = cg.builder.CreateAdd(sumSize, cg.usize(1));
         ptr = cg.allocInCurrent(allocSize, false);
+        assert(ptr->getType()->isPointerTy());
         const auto rightPos = cg.builder.CreateInBoundsGEP(cg.i8Ty(), ptr, leftSize);
         cg.callMemcpy(ptr, leftPtr, leftSize);
         cg.callMemcpy(rightPos, rightPtr, rightSize);
@@ -132,6 +131,7 @@ Value* LgsStr::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
         assert(0);
     }
     cg.storeStructField(ty, alloc, LgsStrIndices::data, ptr);
+    assert(alloc->getType()->isPointerTy());
     return alloc;
 }
 

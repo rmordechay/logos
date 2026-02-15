@@ -1,3 +1,4 @@
+#include <unordered_set>
 #include <llvm/IR/Module.h>
 
 #include "LgsRTTIndices.h"
@@ -91,6 +92,35 @@ Constant* LgsType::getRTType(LgsCodeGen& cg) {
 
 ConstantInt* LgsType::IRSize(LgsCodeGen& cg) {
     return cg.getTypeSize(getIRType(cg));
+}
+
+bool LgsType::hasRecursiveTypes() const {
+    std::unordered_set<std::string> visited;
+    const auto check = [&](const auto& self, const LgsType* type) -> bool {
+        for (const auto field : type->fields) {
+            if (const auto innerObj = field->type->asObject()) {
+                if (visited.contains(innerObj->name)) return true;
+                visited.insert(innerObj->name);
+                if (self(self, innerObj)) return true;
+            }
+        }
+        for (const auto& [_, method] : type->methods) {
+            if (const auto innerObj = method->funcType->rt->asObject()) {
+                if (visited.contains(innerObj->name)) return true;
+                visited.insert(innerObj->name);
+                if (self(self, innerObj)) return true;
+            }
+            for (size_t i = 1; i < method->funcType->params.size(); ++i) {
+                if (const auto innerObj = method->funcType->params[i].type->asObject()) {
+                    if (visited.contains(innerObj->name)) return true;
+                    visited.insert(innerObj->name);
+                    if (self(self, innerObj)) return true;
+                }
+            }
+        }
+        return false;
+    };
+    return check(check, this);
 }
 
 Type* LgsType::getIRTypeOrPtr(LgsCodeGen& cg) {

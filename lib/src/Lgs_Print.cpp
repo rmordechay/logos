@@ -32,8 +32,8 @@ static std::string formatElement(const Lgs_TypeInfo* type, void* value) {
         if (!lgsStr->data) return LGS_NULL_LITERAL;
         if (std::strcmp(lgsStr->data, "") == 0) return "\"\"";
         str << static_cast<Lgs_StrExpr*>(value)->data;
+        break;
     }
-    break;
     case RTT_CHAR: str << "'" << *static_cast<const char*>(value) << "'"; break;
     case RTT_OBJECT: {
         const auto obj = type->object;
@@ -104,6 +104,7 @@ static std::string formatElement(const Lgs_TypeInfo* type, void* value) {
     }
     case RTT_NULLABLE: {
         const auto baseType = type->baseType;
+        if (!baseType) return LGS_NULL_LITERAL;
         const auto isSetPtr = static_cast<char*>(value) + baseType->size;
         const auto isSet = *reinterpret_cast<bool*>(isSetPtr);
         if (isSet) str << formatElement(baseType, value);

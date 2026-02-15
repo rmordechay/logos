@@ -59,7 +59,7 @@ inline LgsBaseMsg E10044{"Value of switch case must be known at compile time. Gi
 inline LgsBaseMsg E10045{"Variadic argument cannot have default arguments.", errCodeStart++};
 inline LgsBaseMsg E10046{"%s is not callable.", errCodeStart++};
 inline LgsBaseMsg E10047{"External %s file '%s' was not found.", errCodeStart++};
-inline LgsBaseMsg E10048{"Non-nullable recursive objects are not allowed.", errCodeStart++};
+inline LgsBaseMsg E10048{"Recursive non-nullable objects are not allowed.", errCodeStart++};
 inline LgsBaseMsg E10049{"Not enough information to infer the type of %s", errCodeStart++};
 inline LgsBaseMsg E10050{"Only integer values can be incremented (++) or decremented (--). Given: %s", errCodeStart++};
 inline LgsBaseMsg E10051{"%s cannot be overwritten.", errCodeStart++};

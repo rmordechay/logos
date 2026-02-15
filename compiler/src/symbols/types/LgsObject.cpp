@@ -135,7 +135,7 @@ Constant* LgsObject::getRTTypeExtra(LgsCodeGen& cg) {
             field->type->IRSize(cg),
             cg.usize(sl->getElementOffset(i + 2)), // offset level and type
             cg.i32(field->type->rttKind),
-            field->type->getRTType(cg),
+            field->type->asObject() ? cg.null() : field->type->getRTType(cg),
         }));
     }
 
@@ -382,21 +382,6 @@ Value* LgsObject::loadRTFieldsCount(LgsCodeGen& cg, Value* ptr) {
 
 Value* LgsObject::loadRTFields(LgsCodeGen& cg, Value* ptr) {
     return cg.loadStructField(getObjRTTStruct(cg), ptr, LgsObjIndices::fields, cg.ptrTy());
-}
-
-bool LgsObject::checkRecursiveFields(std::unordered_set<std::string>& nestedObjectNames) const {
-    for (const auto field : fields) {
-        if (const auto innerObj = field->type->asObject()) {
-            if (nestedObjectNames.contains(innerObj->name)) return false;
-            nestedObjectNames.insert(innerObj->name);
-            return innerObj->checkRecursiveFields(nestedObjectNames);
-        }
-    }
-    return true;
-}
-
-LgsObject* LgsObject::clone() {
-    assert(0);
 }
 
 LgsObject::~LgsObject() {

@@ -1,7 +1,7 @@
 #pragma once
-#include <math.h>
+#include <cmath>
+
 #include "LgsValue.h"
-#include "types/LgsGenericType.h"
 
 class LgsModuleExpr;
 class LgsNull;
@@ -82,6 +82,7 @@ public:
     LgsMatrixExpr* asMatrixExpr();
     LgsMetaVar* asLoopMetaVar();
     LgsBinaryExpr* asBinExpr();
+    LgsMetaVar* asMetaVar();
     LgsMetaSelection* asMetaSelection();
     LgsNullableExpr* asNullableExpr();
     LgsExpr* clone() override;

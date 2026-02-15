@@ -15,8 +15,8 @@ class LgsStmtsBlock;
 
 class LgsForLoop : public LgsStmt {
 public:
-    std::vector<LgsVarDec*> loopVars;
     Value* iPtr = nullptr;
+    std::vector<LgsVarDec*> loopVars;
     LgsStmtsBlock* stmtsBlock = nullptr;
     BasicBlock* IRCondBlock = nullptr;
     BasicBlock* IRBodyBlock = nullptr;

@@ -10,5 +10,6 @@ public:
     Value* loopStart(LgsCodeGen& cg) override;
     Value* loopEnd(LgsCodeGen& cg) override;
     void setDebugValue(LgsCodeGen& cg) override;
+    LgsStmt* clone() override;
     ~LgsRangeLoop() override;
 };

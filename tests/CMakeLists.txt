@@ -2,7 +2,6 @@ find_package(GTest REQUIRED)
 enable_testing()
 
 add_executable(lgs_tests
-    ${COMPILER_SOURCE}
     main.cpp
     LgsTestUtils.h
     parser/ParserTest.cpp
@@ -18,6 +17,7 @@ add_executable(lgs_tests
     codegen/CgVectorsTest.cpp
     codegen/CgDeferTest.cpp
     codegen/CgLambdaTest.cpp
+    ${COMPILER_SOURCE}
 )
 
 target_include_directories(lgs_tests PRIVATE

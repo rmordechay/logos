@@ -163,17 +163,12 @@ void LgsFuncType::addSelf(LgsType* selfType) {
 }
 
 LgsFuncType::~LgsFuncType() {
-    if (!rt->asObject()) {
-        if (!rt->asGenericType()) freeType(rt);
-        rt = nullptr;
-    }
     if (isMethod && !params.empty()) {
         params.erase(params.begin());
     }
     for (const auto& param : params) {
         if (param.isSelf) continue;
         if (param.expr) freeExpr(param.expr);
-        freeType(param.type);
     }
     params.clear();
     for (const auto& genericType : genericTypes) {

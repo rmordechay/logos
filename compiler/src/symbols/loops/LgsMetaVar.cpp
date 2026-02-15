@@ -16,3 +16,7 @@ std::string LgsMetaVar::asText() {
 void LgsMetaVar::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }
+
+LgsExpr* LgsMetaVar::clone() {
+    return new LgsMetaVar(*this);
+}

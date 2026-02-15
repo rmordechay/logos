@@ -44,3 +44,28 @@ TEST(CgForLoopTest, Test2) {
     EXPECT_EQ(lines[3], "8");
     EXPECT_EQ(lines[4], "9");
 }
+
+TEST(CgForLoopTest, Test3) {
+    const auto code = R"(
+    func(arr: Int[]): Int {
+        for arr {
+            print(for.i)
+            print(for.element)
+        }
+        return arr[0]
+    }
+    main() {
+        arr = func([1, 2, 3])
+        print(arr)
+    }
+    )";
+    std::istringstream stream(getLgsOutput(code));
+    const auto lines = getLines(stream, 7);
+    EXPECT_EQ(lines[0], "0");
+    EXPECT_EQ(lines[1], "1");
+    EXPECT_EQ(lines[2], "1");
+    EXPECT_EQ(lines[3], "2");
+    EXPECT_EQ(lines[4], "2");
+    EXPECT_EQ(lines[5], "3");
+    EXPECT_EQ(lines[6], "1");
+}

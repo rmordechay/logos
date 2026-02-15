@@ -4,8 +4,7 @@
 #include "codegen/LgsCodeGen.h"
 
 Value* LgsBinaryExpr::loadIR(LgsCodeGen& cg) {
-    if (!IRValue->getType()->isPointerTy()) return IRValue;
-    return cg.load(type->getIRType(cg), IRValue);
+    return IRValue;
 }
 
 void LgsBinaryExpr::setDebugValue(LgsCodeGen& cg) {
