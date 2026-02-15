@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 #include "LgsTestUtils.h"
 
-TEST(CgVectorsTest, Test1) {
+TEST(CgVecTest, Test1) {
     const auto code = R"(
     main() {
         print(Vec2(1))

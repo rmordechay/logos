@@ -66,3 +66,23 @@ TEST(CgIfStmtTest, Test3) {
     const auto lines = getLines(stream, 1);
     EXPECT_EQ(lines[0], "false");
 }
+
+TEST(CgIfStmtTest, Test4) {
+    const auto code = R"(
+    func() {
+        if true {
+            if true {
+                break if
+            }
+            return
+        }
+        print("Hello world")
+    }
+    main() {
+        func()
+    }
+    )";
+    std::istringstream stream(getLgsOutput(code));
+    const auto lines = getLines(stream, 1);
+    EXPECT_EQ(lines[0], "Hello world");
+}

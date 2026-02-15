@@ -44,32 +44,12 @@ void LgsTypeResolver::resolveType(LgsType*& type) {
     }
 
     if (type->isUnknown()) {
-        const auto symbol = findSymbol(type->getName(), type->location);
-        if (symbol.symbolType == UNKNOWN) return;
-        LgsType* newType = nullptr;
-        switch (symbol.symbolType) {
-        case FUNC:
-            newType = symbol.func->funcType;
-            break;
-        case OBJECT:
-            newType = symbol.object;
-            break;
-        case INTERFACE:
-            newType = symbol.interface;
-            break;
-        case ENUM:
-            newType = symbol.enum_;
-            break;
-        case SUBTYPE:
-            newType = symbol.subtype;
-            break;
-        case GENERIC:
-            newType = symbol.generic;
-            break;
-        default:
-            break;
+        auto typeName = type->getName();
+        const auto newType = findSymbol(typeName);
+        if (!newType) {
+            errHandler.addError(E10006, &type->location, file->path, {typeName});
+            return;
         }
-        assert(newType);
         freeType(type);
         type = newType;
     }
@@ -104,8 +84,6 @@ void LgsTypeResolver::resolveObjTypes(LgsObject* obj) {
     for (const auto generic : obj->generics) {
         if (generic->asSelf()) {
             errHandler.addError(E10014, &generic->location, file->path, {});
-        } else {
-            file->symbolTable.addSymbol(LgsSymbol(generic), &errHandler, file->path);
         }
     }
 
@@ -115,10 +93,6 @@ void LgsTypeResolver::resolveObjTypes(LgsObject* obj) {
 
     for (const auto& field : obj->fields) {
         resolveType(field->type);
-    }
-
-    for (const auto& ioPair : obj->ioPairs) {
-        resolveIOPair(ioPair, obj);
     }
 
     for (const auto& [_, method] : obj->methods) {
@@ -157,27 +131,30 @@ void LgsTypeResolver::resolveFuncType(LgsFuncType* funcType) {
     currentFuncType = oldFunc;
 }
 
-void LgsTypeResolver::resolveIOPair(LgsIOPair* ioPair, LgsObject* obj) const {
-    ioPair->openFunc = obj->getMethod(ioPair->openFuncName);
-    ioPair->openFunc->funcType->isIOMember = true;
-    if (!ioPair->openFunc) {
-        errHandler.addError(E10005, &ioPair->openFunc->location, file->path, {ioPair->openFuncName, obj->pname()});
-    }
-    ioPair->closeFunc = obj->getMethod(ioPair->closeFuncName);
-    ioPair->closeFunc->funcType->isIOMember = true;
-    if (!ioPair->closeFunc) {
-        errHandler.addError(E10005, &ioPair->closeFunc->location, file->path, {ioPair->closeFuncName, obj->pname()});
-    }
-}
-
-LgsSymbol LgsTypeResolver::findSymbol(const std::string& typeName, const LgsLocation& location) const {
-    if (const auto symbol = globals.getSymbol(typeName)) return *symbol;
-    if (const auto symbol = file->symbolTable.getSymbol(typeName)) return *symbol;
-    if (currentFuncType) {
-        for (const auto genericType : currentFuncType->genericTypes) {
-            if (genericType->name == typeName) return LgsSymbol(genericType);
+LgsType* LgsTypeResolver::findSymbol(const std::string& typeName) const {
+    auto symbol = globals.getSymbol(typeName);
+    if (!symbol) {
+        symbol = file->symbolTable.getSymbol(typeName);
+        if (!symbol) {
+            symbol = file->symbolTable.getSymbol(typeName);
         }
     }
-    errHandler.addError(E10006, &location, file->path, {typeName});
-    return LgsSymbol();
+    if (symbol) {
+        switch (symbol->symbolType) {
+        case FUNC: return symbol->func->funcType;
+        case OBJECT: return symbol->object;
+        case INTERFACE: return symbol->interface;
+        case ENUM: return symbol->enum_;
+        case SUBTYPE: return symbol->subtype;
+        default: break;
+        }
+    }
+    if (currentFuncType) {
+        for (const auto genericType : currentFuncType->genericTypes) {
+            if (genericType->name == typeName) {
+                return genericType;
+            }
+        }
+    }
+    return nullptr;
 }

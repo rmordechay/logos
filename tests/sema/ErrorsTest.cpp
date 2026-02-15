@@ -642,6 +642,20 @@ TEST(ErrorsTest, E10048A) {
     expectErrors(app, E10048, 4);
 }
 
+TEST(ErrorsTest, E10051A) {
+    LgsApp app;
+    const auto code = R"(
+    main() {
+        var = 2
+        var := 3
+    }
+    )";
+    app.loadSrcFile(code, LGS_MAIN_FILE);
+    ASSERT_TRUE(app.errHandler.successful);
+    app.analyse();
+    expectErrors(app, E10051, 1);
+}
+
 TEST(ErrorsTest, E10054A) {
     LgsApp app;
     const auto code = R"(
@@ -657,7 +671,6 @@ TEST(ErrorsTest, E10054A) {
     app.loadSrcFile(code, LGS_MAIN_FILE);
     expectErrors(app, E10054, 1);
 }
-
 
 TEST(ErrorsTest, E10055A) {
     LgsApp app;
@@ -856,4 +869,21 @@ TEST(ErrorsTest, E100115A) {
     ASSERT_TRUE(app.errHandler.successful);
     app.analyse();
     expectErrors(app, E10115, 1);
+}
+
+TEST(ErrorsTest, E100117A) {
+    LgsApp app;
+    const auto code = R"(
+    object Obj {
+        func() {}
+    }
+    main() {
+        obj = Obj{}
+        obj.func() := 2
+    }
+    )";
+    app.loadSrcFile(code, LGS_MAIN_FILE);
+    ASSERT_TRUE(app.errHandler.successful);
+    app.analyse();
+    expectErrors(app, E10117, 1);
 }

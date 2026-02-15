@@ -7,7 +7,7 @@
 #include "exprs/LgsVectorExpr.h"
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
-#include "types/LgsAny.h"
+#include "../../../include/symbols/types/primitives/LgsAny.h"
 #include "types/LgsCPtr.h"
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
@@ -83,7 +83,7 @@ std::string LgsType::getRTTName() {
     return LGS_TYPEINFO_PREFIX + getName();
 }
 
-void LgsType::getAsIRText(LgsCodeGen& cg, LgsStrBuilder& strBuilder, Value* ptr) {
+void LgsType::asIRText(LgsCodeGen& cg, LgsStrBuilder& strBuilder, Value* ptr) {
     assert(0);
 }
 
@@ -174,7 +174,6 @@ bool LgsType::hasGenerics() {
 }
 
 Value* LgsType::hashValue(LgsCodeGen& cg, Value* value) { assert(0);}
-
 Value* LgsType::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) { assert(0);}
 Value* LgsType::subIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) { assert(0);}
 Value* LgsType::mulIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) { assert(0);}
@@ -234,8 +233,8 @@ LgsType::~LgsType() {
 
 void freeType(LgsType* type) {
     if (!type) return;
-    if (type->isScalar() || type->asAny() || type->asChar() || type->isVoid()) return;
-    if (type->asEnum() || type->asSubtype() || type->asGenericType() || type->asObject() || type->asInterface()) return;
+    if (type->isPrimitive) return;
+    if (type->asEnum() || type->asSubtype() || type->asGenericType() || type->asObject()) return;
     delete type;
 }
 

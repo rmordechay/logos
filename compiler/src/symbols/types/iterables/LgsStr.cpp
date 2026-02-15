@@ -3,7 +3,7 @@
 #include "Lgs_Exprs.h"
 #include "exprs/constants/LgsStrConst.h"
 #include "exprs/LgsBinaryExpr.h"
-#include "types/LgsAny.h"
+#include "../../../../include/symbols/types/primitives/LgsAny.h"
 #include "types/LgsNullable.h"
 #include "types/iterables/LgsSArray.h"
 #include "types/primitives/LgsBool.h"
@@ -69,9 +69,9 @@ std::optional<int64_t> LgsStr::getConstLength() {
     return length;
 }
 
-void LgsStr::getAsIRText(LgsCodeGen& cg, LgsStrBuilder& strBuilder, Value* ptr) {
+void LgsStr::asIRText(LgsCodeGen& cg, LgsStrBuilder& strBuilder, Value* ptr) {
     ptr = loadRTData(cg, cg.loadPtr(ptr));
-    strBuilder.add(cg, ptr, cg.callStrlen(ptr));
+    strBuilder.add(ptr, cg.callStrlen(ptr));
 }
 
 Value* LgsStr::getIRElement(LgsCodeGen& cg, Value* iterable, Value* index) {

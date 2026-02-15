@@ -33,7 +33,6 @@ public:
     bool isMethod = false;
     bool isCoroutine = false;
     bool isDeferred = false;
-    bool isIOMember = false;
     bool isLambda = false;
     bool isSyscall = false;
     bool isTerminator = false;

@@ -4,7 +4,7 @@
 
 #include "exprs/constants/LgsIntConst.h"
 #include "codegen/LgsCodeGen.h"
-#include "types/LgsAny.h"
+#include "../../../../include/symbols/types/primitives/LgsAny.h"
 #include "types/primitives/LgsInt.h"
 #include "types/primitives/LgsSize.h"
 

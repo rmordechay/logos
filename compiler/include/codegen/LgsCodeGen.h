@@ -82,7 +82,7 @@ public:
     Value* loadPtr(Value* value);
     Value* isNull(Value* value);
     Value* getLevel(Value* v);
-    Value* emptyBuffer();
+    Value* emptyBuffer(size_t size = 0);
     void incSize(Value* bufferOffset, Value* ptr);
     Value* allocaAndStore(Type* type, Value* v, const std::string& name = "");
     StructType* getStructType(const std::vector<Type*>& types, const std::string& name = "");
@@ -101,8 +101,6 @@ public:
     Value* allocStrConst(Value* strPtr);
     Value* reallocate(Value* ptr, Value* size, Value* level);
     Value* moveValue(const std::string& baseName, Value* v, Value* toLevel);
-    Value* moveRetValue(Value* v);
-    Value* moveArrElement(Value* arrLevel, Constant* type, Value* element);
     void throwError(const LgsBaseMsg& err, const std::vector<Value*>& args = {});
 
     // Blocks
@@ -128,6 +126,7 @@ public:
     Value* callPrintf(const std::vector<Value*>& args);
     Value* callPrintf(const std::string& fmt, const std::vector<Value*>& args);
     Value* callSnprintf(const std::string& fmt, const std::vector<Value*>& args);
+    Value* callSnprintf(const std::string& fmt, Value* buffer, Value* size, Value* ptr);
     Value* strBuilderAdd();
     Value* callStrlen(Value* str);
     Value* strsEqual(Value* str1, Value* str2);
@@ -193,7 +192,11 @@ public:
 
 class LgsStrBuilder {
 public:
-    Value* buffer = nullptr;
-    Value* index = nullptr;
-    void add(LgsCodeGen& cg, Value* value, Value* size);
+    Value* index;
+    Value* buffer;
+    LgsCodeGen& cg;
+
+    explicit LgsStrBuilder(LgsCodeGen& cg) : index(cg.zeroSize()), buffer(cg.emptyBuffer()), cg(cg) {}
+    void add(Value* value, Value* size);
+    void print() const;
 };

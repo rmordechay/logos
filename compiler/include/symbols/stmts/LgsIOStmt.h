@@ -8,7 +8,7 @@ class LgsIOStmt final : public LgsStmt {
 public:
     LgsStmtsBlock* stmtsBlock = nullptr;
     LgsVarDec* varDec = nullptr;
-    LgsFunc* closingFunc = nullptr;
+    LgsFunc* closeFunc = nullptr;
 
     LgsIOStmt() = default;
     explicit LgsIOStmt(LgsStmtsBlock* stmtsBlock): stmtsBlock(stmtsBlock) {}

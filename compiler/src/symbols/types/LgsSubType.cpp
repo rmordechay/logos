@@ -1,5 +1,5 @@
 #include "types/LgsSubType.h"
-#include "types/LgsAny.h"
+#include "../../../include/symbols/types/primitives/LgsAny.h"
 
 #include <cassert>
 

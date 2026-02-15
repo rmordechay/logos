@@ -4,21 +4,24 @@ enable_testing()
 add_executable(lgs_tests
     main.cpp
     LgsTestUtils.h
+    ${COMPILER_SOURCE}
     parser/ParserTest.cpp
     sema/ErrorsTest.cpp
     sema/TypeResolverTest.cpp
-    sema/GenericsTest.cpp
     codegen/CgIfStmtTest.cpp
-    codegen/CgForLoopTest.cpp
-    codegen/CgArithmeticsTest.cpp
+    codegen/CgLoopsTest.cpp
+    codegen/CgBinExprTest.cpp
     codegen/CgArraysTest.cpp
     codegen/CgGenericsTest.cpp
     codegen/CgStrTest.cpp
-    codegen/CgVectorsTest.cpp
+    codegen/CgVecTest.cpp
     codegen/CgDeferTest.cpp
     codegen/CgLambdaTest.cpp
-    ${COMPILER_SOURCE}
     codegen/CgObjectTest.cpp
+    codegen/CgAssignTest.cpp
+    codegen/CgIOPairTest.cpp
+    codegen/CgInterfaceTest.cpp
+    codegen/CgFuncCallTest.cpp
 )
 
 target_include_directories(lgs_tests PRIVATE

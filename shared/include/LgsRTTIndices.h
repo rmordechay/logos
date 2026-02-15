@@ -17,7 +17,7 @@ struct LgsHashMapIndices {
     static constexpr size_t level = 0;
     static constexpr size_t type = 1;
     static constexpr size_t entries = 2;
-    static constexpr size_t len = 3;
+    static constexpr size_t length = 3;
     static constexpr size_t cap = 4;
     static constexpr size_t key = 0;
     static constexpr size_t value = 1;

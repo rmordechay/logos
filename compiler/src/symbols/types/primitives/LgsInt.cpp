@@ -6,7 +6,6 @@
 #include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsLong.h"
 #include "types/primitives/LgsSize.h"
-#include <iostream>
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/Module.h>
 #include "exprs/LgsBinaryExpr.h"
@@ -73,9 +72,10 @@ LgsExpr* LgsInt::getZeroValue() {
     return new LgsIntConst(&LGS_INT, 0);
 }
 
-void LgsInt::getAsIRText(LgsCodeGen& cg, LgsStrBuilder& strBuilder, Value* ptr) {
-    const auto i = cg.callSnprintf(fmtStr(), {cg.load(getIRType(cg), ptr)});
-    strBuilder.add(cg, i, cg.callStrlen(i));
+void LgsInt::asIRText(LgsCodeGen& cg, LgsStrBuilder& strBuilder, Value* ptr) {
+    const auto buffer = cg.emptyBuffer(128);
+    const auto bytesRead = cg.callSnprintf(fmtStr(), buffer, cg.usize(128), ptr);
+    strBuilder.add(buffer, cg.toSize(bytesRead));
 }
 
 Value* LgsInt::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {

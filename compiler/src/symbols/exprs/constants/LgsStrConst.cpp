@@ -1,5 +1,5 @@
 #include "exprs/constants/LgsStrConst.h"
-#include "types/LgsAny.h"
+#include "../../../../include/symbols/types/primitives/LgsAny.h"
 #include "LgsUtils.h"
 
 Value* LgsStrConst::loadIR(LgsCodeGen& cg) {

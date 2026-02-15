@@ -3,6 +3,10 @@
 
 TEST(CgArraysTest, DArrTest1) {
     const auto code = R"(
+    object Obj {
+        x: Int
+    }
+
     main() {
         arr = [1, 2]
         print(arr)
@@ -10,13 +14,27 @@ TEST(CgArraysTest, DArrTest1) {
         print(arr)
         arr.add(4)
         print(arr)
+
+        arr2: Obj[]
+        print(arr2)
+        arr2.add(Obj{x=2})
+        print(arr2)
+
+        arr3: Int[][]
+        print(arr3)
+        arr3.add([23])
+        print(arr3)
     }
     )";
     std::istringstream stream(getLgsOutput(code));
-    const auto lines = getLines(stream, 3);
+    const auto lines = getLines(stream, 7);
     EXPECT_EQ(lines[0], "[1, 2]");
     EXPECT_EQ(lines[1], "[1, 2, 3]");
     EXPECT_EQ(lines[2], "[1, 2, 3, 4]");
+    EXPECT_EQ(lines[3], "[]");
+    EXPECT_EQ(lines[4], "[Obj{x=2}]");
+    EXPECT_EQ(lines[5], "[]");
+    EXPECT_EQ(lines[6], "[[23]]");
 }
 
 TEST(CgArraysTest, SArrTest1) {

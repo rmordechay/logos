@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 #include "LgsTestUtils.h"
 
-TEST(CgForLoopTest, Test1) {
+TEST(CgLoopsTest, Test1) {
     const auto code = R"(
     main() {
         for 3 {
@@ -28,7 +28,7 @@ TEST(CgForLoopTest, Test1) {
     EXPECT_EQ(lines[8], "2");
 }
 
-TEST(CgForLoopTest, Test2) {
+TEST(CgLoopsTest, Test2) {
     const auto code = R"(
     main() {
         for i in  5..10 {
@@ -45,7 +45,7 @@ TEST(CgForLoopTest, Test2) {
     EXPECT_EQ(lines[4], "9");
 }
 
-TEST(CgForLoopTest, Test3) {
+TEST(CgLoopsTest, Test3) {
     const auto code = R"(
     func(arr: Int[]): Int {
         for arr {
@@ -68,4 +68,25 @@ TEST(CgForLoopTest, Test3) {
     EXPECT_EQ(lines[4], "2");
     EXPECT_EQ(lines[5], "3");
     EXPECT_EQ(lines[6], "1");
+}
+
+TEST(CgLoopsTest, Test4) {
+    const auto code = R"(
+    main() {
+        for i in  0..2 {
+            print(i)
+            for j in  5..7 {
+                print(j)
+            }
+        }
+    }
+    )";
+    std::istringstream stream(getLgsOutput(code));
+    const auto lines = getLines(stream, 6);
+    EXPECT_EQ(lines[0], "0");
+    EXPECT_EQ(lines[1], "5");
+    EXPECT_EQ(lines[2], "6");
+    EXPECT_EQ(lines[3], "1");
+    EXPECT_EQ(lines[4], "5");
+    EXPECT_EQ(lines[5], "6");
 }

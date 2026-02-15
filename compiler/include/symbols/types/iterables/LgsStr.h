@@ -21,7 +21,7 @@ public:
     bool canCastTo(LgsType* other) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     std::optional<int64_t> getConstLength() override;
-    void getAsIRText(LgsCodeGen& cg, LgsStrBuilder& strBuilder, Value* ptr) override;
+    void asIRText(LgsCodeGen& cg, LgsStrBuilder& strBuilder, Value* ptr) override;
     Value* getIRElement(LgsCodeGen& cg, Value* iterable, Value* index) override;
     Value* addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
     Value* lenIR(LgsCodeGen& cg, Value* iterable) override;

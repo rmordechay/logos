@@ -23,9 +23,6 @@ LgsSymbol::LgsSymbol(LgsField* field)
 LgsSymbol::LgsSymbol(LgsInterface* interface)
     : name(&interface->name), symbolType(INTERFACE), location(&interface->location), interface(interface) {}
 
-LgsSymbol::LgsSymbol(LgsGenericType* generic)
-    : name(&generic->name), symbolType(GENERIC), location(&generic->location), generic(generic) {}
-
 LgsSymbol::LgsSymbol(LgsSubType* subtype, const bool isExternal)
     : name(&subtype->name), symbolType(SUBTYPE), location(&subtype->location), isExternal(isExternal), subtype(subtype) {}
 
@@ -57,8 +54,6 @@ LgsType* LgsSymbol::getType() const {
         return interface;
     case SUBTYPE:
         return subtype;
-    case GENERIC:
-        return generic;
     case ENUM:
         return enum_;
     case UNKNOWN:
@@ -83,8 +78,6 @@ LgsSymbol LgsSymbol::clone() const {
         return LgsSymbol(interface);
     case SUBTYPE:
         return LgsSymbol(subtype);
-    case GENERIC:
-        return LgsSymbol(generic);
     case ENUM:
         return LgsSymbol(enum_);
     case UNKNOWN:

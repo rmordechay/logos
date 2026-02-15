@@ -110,12 +110,11 @@ public:
     void visitCharConst(LgsCharConst* charConst);
     void visitPrefixExpr(LgsPrefixExpr* prefixExpr);
     void visitPostfixExpr(LgsPostfixExpr* postfixExpr);
-    void visitVariable(LgsVariable* variable, bool assign);
+    void visitVariable(LgsVariable* variable);
     void visitIterIndex(LgsIterIndex* iterIndex, bool assign);
-    void visitNullableExpr(LgsNullableExpr* expr, bool assign);
+    void visitNullableExpr(LgsNullableExpr* expr);
     void visitSelection(LgsSelection* selection, bool assign);
-    void visitFieldSelection(LgsVariable* var, LgsExpr* parent, bool assign);
-    void visitNullableSelection(LgsExpr* child, LgsExpr* parent, bool assign);
+    void visitFieldSelection(LgsVariable* var, LgsExpr* parent);
     void visitMetaSelection(LgsMetaSelection* metaSelection);
     void visitFuncCall(LgsFuncCall* funcCall);
     void visitArrayExpr(LgsArrayExpr* arrayExpr);

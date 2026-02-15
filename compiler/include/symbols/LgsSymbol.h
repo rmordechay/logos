@@ -22,11 +22,9 @@ enum LgsSymbolType {
     OBJECT,
     INTERFACE,
     SUBTYPE,
-    GENERIC,
     ENUM,
     UNKNOWN,
 };
-
 
 struct LgsSymbol {
     std::string* name;
@@ -41,7 +39,6 @@ struct LgsSymbol {
         LgsObject* object;
         LgsInterface* interface;
         LgsSubType* subtype;
-        LgsGenericType* generic;
         LgsField* field;
         LgsEnum* enum_;
         LgsFunc* func;
@@ -52,7 +49,6 @@ struct LgsSymbol {
     explicit LgsSymbol(LgsParam* param);
     explicit LgsSymbol(LgsField* field);
     explicit LgsSymbol(LgsInterface* interface);
-    explicit LgsSymbol(LgsGenericType* generic);
     explicit LgsSymbol(LgsSubType* subtype, bool isExternal = false);
     explicit LgsSymbol(LgsVarDec* varDec, bool isBuiltin = false, bool isExternal = false);
     explicit LgsSymbol(LgsObject* object, bool isBuiltin = false, bool isExternal = false);

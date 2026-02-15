@@ -28,6 +28,5 @@ public:
     void resolveObjTypes(LgsObject* obj);
     void resolveInterface(LgsInterface* interface);
     void resolveFuncType(LgsFuncType* funcType);
-    void resolveIOPair(LgsIOPair* ioPair, LgsObject* obj) const;
-    LgsSymbol findSymbol(const std::string& typeName, const LgsLocation& location) const;
+    LgsType* findSymbol(const std::string& typeName) const;
 };

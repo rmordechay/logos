@@ -162,8 +162,8 @@ Value* LgsCodeGen::getLevel(Value* v) {
     return load(sizeTy(), v);
 }
 
-Value* LgsCodeGen::emptyBuffer() {
-    return builder.CreateAlloca(ArrayType::get(i8Ty(), LGS_STR_BUFFER_SIZE));
+Value* LgsCodeGen::emptyBuffer(const size_t size) {
+    return builder.CreateAlloca(ArrayType::get(i8Ty(), size > 0 ? size : LGS_STR_BUFFER_SIZE));
 }
 
 void LgsCodeGen::incSize(Value* bufferOffset, Value* ptr) {
@@ -243,16 +243,6 @@ Value* LgsCodeGen::moveValue(const std::string& baseName, Value* v, Value* toLev
     const std::vector args = {v, toLevel};
     const std::vector<Type*> params = {ptrTy(), sizeTy()};
     return callRuntimeFunc("move" + baseName, ptrTy(), params, args);
-}
-
-Value* LgsCodeGen::moveRetValue(Value* v) {
-    return callRuntimeFunc("moveRetValue", ptrTy(), {ptrTy()}, {v});
-}
-
-Value* LgsCodeGen::moveArrElement(Value* arrLevel, Constant* type, Value* element) {
-    const std::vector<Type*> params = {sizeTy(), ptrTy(), ptrTy()};
-    const std::vector<Value*> args = {arrLevel, type, element};
-    return callRuntimeFunc("moveArrElement", ptrTy(), params, args);
 }
 
 void LgsCodeGen::throwError(const LgsBaseMsg& err, const std::vector<Value*>& args) {
@@ -358,6 +348,11 @@ Value* LgsCodeGen::callSnprintf(const std::string& fmt, const std::vector<Value*
     tempArgs.insert(tempArgs.end(), args.begin(), args.end());
     callFunc("snprintf", i32Ty(), {ptrTy(), sizeTy(), ptrTy()}, tempArgs, true);
     return buffer;
+}
+
+Value* LgsCodeGen::callSnprintf(const std::string& fmt, Value* buffer, Value* size, Value* ptr) {
+    const std::vector<Value*> tempArgs = {buffer, size, getString(fmt), ptr};
+    return callFunc("snprintf", i32Ty(), {ptrTy(), sizeTy(), ptrTy()}, tempArgs, true);
 }
 
 Value* LgsCodeGen::callStrlen(Value* str) {
@@ -604,8 +599,13 @@ LgsCodeGen::~LgsCodeGen() {
     }
 }
 
-void LgsStrBuilder::add(LgsCodeGen& cg, Value* value, Value* size) {
+void LgsStrBuilder::add(Value* value, Value* size) {
     const auto gep = cg.builder.CreatePtrAdd(buffer, index);
     cg.callMemcpy(gep, value, size);
     index = cg.builder.CreateAdd(index, size);
+}
+
+void LgsStrBuilder::print() const {
+    cg.addNullTerminate(buffer, index);
+    cg.printStr(buffer);
 }

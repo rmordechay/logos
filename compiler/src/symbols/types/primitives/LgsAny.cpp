@@ -1,4 +1,4 @@
-#include "types/LgsAny.h"
+#include "../../../../include/symbols/types/primitives/LgsAny.h"
 #include "codegen/LgsCodeGen.h"
 
 size_t LgsAny::sizeBytes() {

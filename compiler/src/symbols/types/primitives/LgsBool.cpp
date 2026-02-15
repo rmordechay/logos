@@ -1,7 +1,7 @@
 #include "types/primitives/LgsBool.h"
 #include <llvm/IR/Module.h>
 #include "exprs/constants/LgsIntConst.h"
-#include "types/LgsAny.h"
+#include "../../../../include/symbols/types/primitives/LgsAny.h"
 #include "types/primitives/LgsChar.h"
 #include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsInt.h"
@@ -18,15 +18,19 @@ LgsType* LgsBool::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     return nullptr;
 }
 
-void LgsBool::getAsIRText(LgsCodeGen& cg, LgsStrBuilder& strBuilder, Value* ptr) {
+void LgsBool::asIRText(LgsCodeGen& cg, LgsStrBuilder& strBuilder, Value* ptr) {
     const auto trueStr = cg.getString(trueLiteral, false);
     const auto falseStr = cg.getString(falseLiteral, false);
-    const auto v = cg.builder.CreateSelect(cg.load(getIRType(cg), ptr), trueStr, falseStr);
-    strBuilder.add(cg, v, cg.callStrlen(v));
+    const auto v = cg.builder.CreateSelect(ptr, trueStr, falseStr);
+    strBuilder.add(v, cg.callStrlen(v));
 }
 
 Value* LgsBool::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
     return cg.false_();
+}
+
+Value* LgsBool::hashValue(LgsCodeGen& cg, Value* value) {
+    return value;
 }
 
 std::string LgsBool::getName() {

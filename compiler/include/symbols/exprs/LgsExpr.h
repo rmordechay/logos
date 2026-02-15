@@ -89,7 +89,6 @@ public:
     ~LgsExpr() override = default;
 };
 
-LgsExpr* wrapInNullable(LgsExpr* expr);
 void castExprImplicitly(LgsExpr*& expr, LgsType* toType);
 void freeExpr(LgsExpr* expr);
 template<typename T>

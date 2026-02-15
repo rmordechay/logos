@@ -113,14 +113,17 @@ static std::string formatElement(const Lgs_TypeInfo* type, void* value) {
     }
     case RTT_MAP: {
         const auto hashMap = static_cast<Lgs_HashMap*>(value);
+        const auto map = hashMap->type->map;
         str << '{';
+        auto isFirst = true;
         for (int i = 0; i < hashMap->capacity; ++i) {
             const auto entry = hashMap->entries[i];
             if (!entry) continue;
-            str << formatElement(hashMap->type->key, entry->key);
+            if (!isFirst) str << ", ";
+            isFirst = false;
+            str << formatElement(map->key, entry->key);
             str << ": ";
-            str << formatElement(hashMap->type->value, entry->value);
-            if (i < hashMap->capacity - 1) str << ", ";
+            str << formatElement(map->value, entry->value);
         }
         str << '}';
         break;

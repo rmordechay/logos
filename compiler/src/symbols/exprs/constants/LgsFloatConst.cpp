@@ -1,7 +1,7 @@
 #include "exprs/constants/LgsFloatConst.h"
 #include "LgsType.h"
 #include "codegen/LgsCodeGen.h"
-#include "types/LgsAny.h"
+#include "../../../../include/symbols/types/primitives/LgsAny.h"
 
 Value* LgsFloatConst::loadIR(LgsCodeGen& cg) {
     return IRValue;

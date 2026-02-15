@@ -88,9 +88,7 @@ LgsFunc* LgsObject::getMetaFunc(const std::string& methodName) {
             const auto fieldName = fieldNameStr->type->asStr()->loadRTData(cg, fieldNameStr->IRValue);
             const auto ty = value->IRValue->getType();
             const auto v = ty->isPointerTy() ? value->IRValue : cg.allocaAndStore(ty, value->IRValue);
-            return cg.builder.CreateCall(getSetFieldFunc(cg), {
-                                         self->IRValue, fieldName, v, value->type->getRTType(cg)
-                                         });
+            return cg.builder.CreateCall(getSetFieldFunc(cg), {self->IRValue, fieldName, v, value->type->getRTType(cg)});
         };
         metaFuncs[methodName] = func;
         return func;
@@ -135,7 +133,7 @@ Constant* LgsObject::getRTTypeExtra(LgsCodeGen& cg) {
             field->type->IRSize(cg),
             cg.usize(sl->getElementOffset(i + 2)), // offset level and type
             cg.i32(field->type->rttKind),
-            field->type->asObject() ? cg.null() : field->type->getRTType(cg),
+            field->type->getRTType(cg),
         }));
     }
 
@@ -213,20 +211,18 @@ LgsType* LgsObject::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     return canCastTo(rightType) ? &LGS_BOOL : nullptr;
 }
 
-void LgsObject::getAsIRText(LgsCodeGen& cg, LgsStrBuilder& strBuilder, Value* ptr) {
+void LgsObject::asIRText(LgsCodeGen& cg, LgsStrBuilder& strBuilder, Value* ptr) {
     const auto prefix = name + "{";
-    strBuilder.add(cg, cg.getString(prefix, false), cg.usize(prefix.length()));
+    strBuilder.add(cg.getString(prefix, false), cg.usize(prefix.length()));
     auto isFirst = true;
     for (const auto field : fields) {
-        if (!isFirst) {
-            strBuilder.add(cg, cg.getString(", ", false), cg.usize(2));
-        }
+        if (!isFirst) strBuilder.add(cg.getString(", ", false), cg.usize(2));
         auto fieldName = field->name + "=";
-        strBuilder.add(cg, cg.getString(fieldName, false), cg.usize(fieldName.length()));
-        field->type->getAsIRText(cg, strBuilder, field->getGEP(cg, ptr));
+        strBuilder.add(cg.getString(fieldName, false), cg.usize(fieldName.length()));
+        field->type->asIRText(cg, strBuilder, field->getGEP(cg, ptr));
         isFirst = false;
     }
-    strBuilder.add(cg, cg.getString("}", false), cg.usize(1));
+    strBuilder.add(cg.getString("}", false), cg.usize(1));
 }
 
 std::string LgsObject::fmtStr() const {
@@ -301,7 +297,7 @@ Function* LgsObject::getObjsHashFunc(LgsCodeGen& cg) const {
         const auto gep = field->getGEP(cg, instance);
         const auto v = cg.load(field->type->getIRTypeOrPtr(cg), gep);
         const auto fieldHash = field->type->hashValue(cg, v);
-        hash = cg.builder.CreateXor(hash, fieldHash);
+        hash = cg.builder.CreateXor(hash, cg.toSize(fieldHash));
         hash = cg.builder.CreateMul(hash, cg.usize(31));
     }
 
@@ -383,8 +379,7 @@ Value* LgsObject::getInstanceRTType(LgsCodeGen& cg, Value* instance) {
 
 StructType* LgsObject::getObjRTTStruct(LgsCodeGen& cg) {
     const auto rttName = LGS_TYPEINFO_PREFIX + metaName;
-    return cg.getStructType({cg.sizeTy(), cg.ptrTy(), cg.sizeTy(), cg.sizeTy(), cg.sizeTy(), cg.ptrTy(), cg.ptrTy()},
-                            rttName);
+    return cg.getStructType({cg.sizeTy(), cg.ptrTy(), cg.sizeTy(), cg.sizeTy(), cg.sizeTy(), cg.ptrTy(), cg.ptrTy()}, rttName);
 }
 
 StructType* LgsObject::getMethodRTTStruct(LgsCodeGen& cg) {

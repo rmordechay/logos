@@ -6,7 +6,7 @@
 #include "codegen/LgsCodeGen.h"
 #include "exprs/LgsBinaryExpr.h"
 #include "exprs/constants/LgsFloatConst.h"
-#include "types/LgsAny.h"
+#include "../../../../include/symbols/types/primitives/LgsAny.h"
 #include "types/LgsNullable.h"
 #include "types/iterables/LgsVec.h"
 #include "types/primitives/LgsBool.h"
@@ -50,9 +50,10 @@ bool LgsFloat::canCastTo(LgsType* other) {
     return false;
 }
 
-void LgsFloat::getAsIRText(LgsCodeGen& cg, LgsStrBuilder& strBuilder, Value* ptr) {
-    const auto i = cg.callSnprintf(fmtStr(), {cg.load(getIRType(cg), ptr)});
-    strBuilder.add(cg, i, cg.callStrlen(i));
+void LgsFloat::asIRText(LgsCodeGen& cg, LgsStrBuilder& strBuilder, Value* ptr) {
+    const auto buffer = cg.emptyBuffer(128);
+    const auto bytesRead = cg.callSnprintf(fmtStr(), buffer, cg.usize(128), ptr);
+    strBuilder.add(buffer, cg.toSize(bytesRead));
 }
 
 LgsType* LgsFloat::applyBinOp(LgsType* rightType, LgsBinOp& op) {

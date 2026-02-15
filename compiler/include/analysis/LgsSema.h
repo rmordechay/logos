@@ -103,7 +103,7 @@ public:
     void visitBreakStmt(const LgsBreak* breakStmt);
     void visitCoroutine(const LgsCoroutine* coroutine);
     void visitDeferStmt(const LgsDeferStmt* deferStmt);
-    void visitIOStmt(const LgsIOStmt* ioStmt);
+    void visitIOStmt(LgsIOStmt* ioStmt);
     void visitExpr(LgsExpr* expr);
     void visitBinaryExpr(LgsBinaryExpr* binaryExpr);
     void visitTernaryExpr(LgsTernaryExpr* ternary);
@@ -152,4 +152,5 @@ public:
     void createCoroutineFunc(LgsFuncCall* funcCall);
     void addError(const LgsBaseMsg& lgsErr, const LgsLocation& location, const std::vector<std::string>& args = {});
     void addRTType(LgsType* type) const;
+    void addGenerics(LgsType* type) const;
 };

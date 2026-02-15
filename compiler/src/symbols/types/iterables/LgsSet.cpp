@@ -2,7 +2,7 @@
 
 #include "LgsBinaryTokens.h"
 #include "codegen/LgsCodeGen.h"
-#include "types/LgsAny.h"
+#include "../../../../include/symbols/types/primitives/LgsAny.h"
 #include "types/iterables/LgsDArray.h"
 
 Type* LgsSet::getIRType(LgsCodeGen& cg) {

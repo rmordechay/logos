@@ -134,17 +134,17 @@ public:
     LgsIOStmt* parseIOStmt();
 
     // Exprs
-    LgsExpr* parseExpr(bool withLambda = true, bool withInstance = true);
-    LgsExpr* parseExprWithPrecedence(int minPrecedence, bool withInstance = true);
-    LgsExpr* parseUnary(bool withInstance = true);
+    LgsExpr* parseExpr(bool withInstaOrLambda = true);
+    LgsExpr* parseBinaryExpr(int minPrecedence, bool witInstaOrLambda = true);
+    LgsExpr* parseUnary(bool withInstaOrLambda = true);
     LgsVariable* parseVariable();
     LgsModuleExpr* parseModuleExpr();
     LgsInstance* parseInstance();
     LgsFuncCall* parseFuncCall();
     LgsStrConst* parseStrConst();
     LgsCharConst* parseCharConst();
-    LgsMetaVar* parseLoopMetaVar();
     LgsExpr* parseConstant();
+    LgsMetaVar* parseLoopMetaVar();
     LgsArrayExpr* parseArrayExpr();
     LgsVectorExpr* parseVectorExpr();
     LgsMatrixExpr* parseMatrixExpr();

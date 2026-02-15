@@ -6,7 +6,7 @@
 #include "types/iterables/LgsVec.h"
 #include "types/primitives/LgsBool.h"
 
-Value* LgsPrint::call(LgsCodeGen& cg, std::vector<LgsFuncArg>& args) {
+Value* LgsPrint::call(LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) {
     const auto arg = args.empty() ? funcType->params.front().expr : args.front().expr;
     const auto type = arg->type;
     if (type->isFloat) {

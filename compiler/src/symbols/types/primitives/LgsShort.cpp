@@ -3,7 +3,7 @@
 #include <llvm/IR/Module.h>
 
 #include "exprs/constants/LgsIntConst.h"
-#include "types/LgsAny.h"
+#include "../../../../include/symbols/types/primitives/LgsAny.h"
 #include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsInt.h"
 #include "types/primitives/LgsLong.h"

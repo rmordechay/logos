@@ -117,10 +117,6 @@ extern "C" void* Lgs_Runtime_moveValue(const Lgs_TypeInfo* type, void* value, co
     return value;
 }
 
-extern "C" void* Lgs_Runtime_moveRetDArray(const Lgs_TypeInfo* type, void* value) {
-    return Lgs_Runtime_moveValue(type, value, runtime.level - 1);
-}
-
 extern "C" void* Lgs_Runtime_getVField(const Lgs_Object* type, void* objInstance, const char* fieldName) {
     for (int i = 0; i < type->fieldsCount; ++i) {
         const auto func = type->fields[i];

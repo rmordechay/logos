@@ -11,11 +11,12 @@ class LgsEnum;
 
 class LgsMainFile final : public LgsFile {
 public:
-    std::vector<LgsVarDec*> varDecs;
     std::map<std::string, LgsFunc*> funcs;
+    std::vector<LgsVarDec*> varDecs;
+    std::vector<LgsIOPair*> ioPairs;
+    std::vector<LgsSubType*> subtypes;
     std::vector<LgsObject*> objects;
     std::vector<LgsInterface*> interfaces;
-    std::vector<LgsSubType*> subtypes;
     std::vector<LgsEnum*> enums;
 
     explicit LgsMainFile(const fs::path& path) : LgsFile(path, CG_MODE_SRC_CODE) {}

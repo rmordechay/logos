@@ -1,7 +1,7 @@
 #pragma once
 #include "exprs/constants/LgsStrConst.h"
 #include "funcs/LgsFunc.h"
-#include "types/LgsAny.h"
+#include "../types/primitives/LgsAny.h"
 #include "types/LgsFuncType.h"
 #include "types/LgsObject.h"
 #include "types/primitives/LgsVoid.h"

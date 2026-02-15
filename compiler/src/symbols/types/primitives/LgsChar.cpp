@@ -1,6 +1,6 @@
 #include "codegen/LgsCodeGen.h"
 #include "exprs/constants/LgsCharConst.h"
-#include "types/LgsAny.h"
+#include "../../../../include/symbols/types/primitives/LgsAny.h"
 #include "types/iterables/LgsStr.h"
 #include <llvm/IR/Module.h>
 

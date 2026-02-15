@@ -24,7 +24,7 @@ struct Lgs_Entry {
 
 struct Lgs_HashMap {
     size_t level;
-    Lgs_Map* type;
+    Lgs_TypeInfo* type;
     Lgs_Entry** entries;
     size_t len;
     size_t capacity;

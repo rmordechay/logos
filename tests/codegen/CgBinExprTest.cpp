@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 #include "LgsTestUtils.h"
 
-TEST(CgArithmeticsTest, IntTest1) {
+TEST(CgBinExprTest, IntTest1) {
     const auto code = R"(
     main() {
         print(23 + 34)
@@ -20,7 +20,7 @@ TEST(CgArithmeticsTest, IntTest1) {
     EXPECT_EQ(lines[4], "-45");
 }
 
-TEST(CgArithmeticsTest, FloatTest1) {
+TEST(CgBinExprTest, FloatTest1) {
     const auto code = R"(
     main() {
         print(23.53 + 34.7)
@@ -39,7 +39,7 @@ TEST(CgArithmeticsTest, FloatTest1) {
     EXPECT_EQ(lines[4], "-52.160");
 }
 
-TEST(CgArithmeticsTest, VecTest1) {
+TEST(CgBinExprTest, VecTest1) {
     const auto code = R"(
     main() {
         vec1 = Vec3(2.34, 3.71, 8.34)

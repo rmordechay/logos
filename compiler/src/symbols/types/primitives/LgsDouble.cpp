@@ -5,7 +5,7 @@
 #include "exprs/constants/LgsFloatConst.h"
 #include "codegen/LgsCodeGen.h"
 #include "exprs/LgsBinaryExpr.h"
-#include "types/LgsAny.h"
+#include "../../../../include/symbols/types/primitives/LgsAny.h"
 #include "types/primitives/LgsBool.h"
 
 std::string LgsDouble::getName() {

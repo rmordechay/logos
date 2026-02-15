@@ -138,7 +138,6 @@ void LgsFuncType::setFuncOptions(const uint32_t ops) {
     isTerminator =  ops & TERMINATOR;
     isMethod =  ops & METHOD;
     isCoroutine =  ops & COROUTINE;
-    isIOMember =  ops & IO_MEMBER;
     isSyscall =  ops & SYSCALL;
     isExternal =  ops & EXTERNAL;
     hasDefaults =  ops & HAS_DEFAULTS;

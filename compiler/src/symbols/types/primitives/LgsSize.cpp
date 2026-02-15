@@ -4,7 +4,7 @@
 
 #include "LgsBinaryTokens.h"
 #include "exprs/constants/LgsIntConst.h"
-#include "types/LgsAny.h"
+#include "../../../../include/symbols/types/primitives/LgsAny.h"
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsDouble.h"
 #include "types/primitives/LgsFloat.h"

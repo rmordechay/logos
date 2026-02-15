@@ -45,28 +45,6 @@ void LgsFunc::setType(LgsType* newType) {
     type = funcType;
 }
 
-void LgsFunc::hashNode(size_t& oldHash) {
-    funcType->hashNode(oldHash);
-    stmtsBlock->hashNode(oldHash);
-}
-
-void LgsFunc::replaceGenerics(const std::unordered_map<std::string, LgsType*>& replacements) {
-    assert(0);
-}
-
-void LgsFunc::initFunc(const std::string& name, LgsType* rt, const std::vector<LgsParam>& params, const uint32_t ops) {
-    funcType = new LgsFuncType(name);
-    funcType->rt = rt;
-    funcType->setFuncOptions(ops);
-    for (const auto& param : params) {
-        funcType->params.push_back(param);
-    }
-    setType(funcType);
-    if (funcType->isMethod) {
-        funcType->params.front().isSelf = true;
-    }
-}
-
 Function* LgsFunc::getIRFunc(LgsCodeGen& cg) {
     const auto funcName = funcType->getName();
     auto func = cg.IRModule->getFunction(funcName);
@@ -91,7 +69,7 @@ Function* LgsFunc::getIRFunc(LgsCodeGen& cg) {
     return func;
 }
 
-Value* LgsFunc::call(LgsCodeGen& cg, std::vector<LgsFuncArg>& args) {
+Value* LgsFunc::call(LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) {
     if (fn) return fn(cg, args);
     if (args.empty()) return callIR(cg, {});
     if (funcType->isExternal) return callExternal(cg, args);
@@ -101,9 +79,9 @@ Value* LgsFunc::call(LgsCodeGen& cg, std::vector<LgsFuncArg>& args) {
     const auto firstArgName = funcType->isMethod ? args[1].name : args.front().name;
     const auto isNamed = !args.empty() && firstArgName != "";
     if (isNamed) {
-        std::unordered_map<std::string, LgsFuncArg*> argsByName;
-        for (size_t i = 0; i < args.size(); ++i) {
-            argsByName[args[i].name] = &args[i];
+        std::unordered_map<std::string, const LgsFuncArg*> argsByName;
+        for (const auto& arg : args) {
+            argsByName[arg.name] = &arg;
         }
         for (const auto& param : funcType->params) {
             assert(argsByName.contains(param.name));
@@ -178,6 +156,23 @@ Value* LgsFunc::loadIR(LgsCodeGen& cg) {
     return IRValue;
 }
 
+void LgsFunc::replaceGenerics(const std::unordered_map<std::string, LgsType*>& replacements) {
+    assert(0);
+}
+
+void LgsFunc::initFunc(const std::string& name, LgsType* rt, const std::vector<LgsParam>& params, const uint32_t ops) {
+    funcType = new LgsFuncType(name);
+    funcType->rt = rt;
+    funcType->setFuncOptions(ops);
+    for (const auto& param : params) {
+        funcType->params.push_back(param);
+    }
+    setType(funcType);
+    if (funcType->isMethod) {
+        funcType->params.front().isSelf = true;
+    }
+}
+
 void LgsFunc::setDebugValue(LgsCodeGen& cg) {
     const auto diBuilder = cg.debugger.diBuilder;
     const auto dbInt32 = funcType->rt->getDebugType(cg);
@@ -198,6 +193,11 @@ void LgsFunc::setDebugValue(LgsCodeGen& cg) {
     const auto irFunc = getIRFunc(cg);
     irFunc->addFnAttr("frame-pointer", "all");
     irFunc->setSubprogram(cg.debugger.subprogram);
+}
+
+void LgsFunc::hashNode(size_t& oldHash) {
+    funcType->hashNode(oldHash);
+    stmtsBlock->hashNode(oldHash);
 }
 
 LgsFunc::~LgsFunc() {

@@ -3,7 +3,7 @@
 #include "LgsBinaryTokens.h"
 #include "exprs/LgsBinaryExpr.h"
 #include "exprs/LgsMatrixExpr.h"
-#include "types/LgsAny.h"
+#include "../../../../include/symbols/types/primitives/LgsAny.h"
 #include "types/iterables/LgsSArray.h"
 #include "types/iterables/LgsVec.h"
 

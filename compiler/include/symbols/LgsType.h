@@ -100,7 +100,7 @@ public:
     virtual bool hasGenerics();
     virtual bool canCastTo(LgsType* other) = 0;
     virtual LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) = 0;
-    virtual void getAsIRText(LgsCodeGen& cg, LgsStrBuilder& strBuilder, Value* ptr);
+    virtual void asIRText(LgsCodeGen& cg, LgsStrBuilder& strBuilder, Value* ptr);
     virtual void replaceGenerics(std::unordered_map<std::string, LgsType*>& replacements);
     virtual Type* getIRType(LgsCodeGen& cg) = 0;
     virtual Constant* getRTTypeExtra(LgsCodeGen& cg);

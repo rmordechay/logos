@@ -2,7 +2,7 @@
 #include "LgsIterable.h"
 #include "exprs/LgsFuncCall.h"
 #include "funcs/LgsFunc.h"
-#include "types/LgsAny.h"
+#include "../primitives/LgsAny.h"
 
 class LgsDArray final : public LgsIterable {
 public:
