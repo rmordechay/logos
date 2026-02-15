@@ -6,7 +6,9 @@ class LgsVariadic final : public LgsIterable {
 public:
     static constexpr auto name = "Variadic";
 
-    explicit LgsVariadic(LgsType* baseType): LgsIterable(baseType) {}
+    explicit LgsVariadic(LgsType* baseType): LgsIterable(baseType) {
+        rttKind = RTT_VARIADIC;
+    }
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
     Type* getIRType(LgsCodeGen& cg) override;

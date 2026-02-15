@@ -34,7 +34,7 @@ LgsExpr* LgsFunc::cast(LgsType* toType, const bool explicitly) {
         }
     }
     // Return type
-    if (!funcType->rt) {
+    if (!funcType->rt && !toFuncType->rt->hasGenerics()) {
         funcType->rt = toFuncType->rt;
     }
     return this;

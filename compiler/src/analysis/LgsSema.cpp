@@ -137,7 +137,7 @@ void LgsSema::visitObject(LgsObject* obj) {
     }
     visitObjImplements(obj, obj->implements);
     validateObjDuplicates(obj);
-    addRuntimeInfo(obj);
+    addRTType(obj);
     currentObj = nullptr;
 }
 
@@ -180,7 +180,7 @@ void LgsSema::visitField(LgsField* field) {
     if (field->type->asFuncType() || (field->expr && field->expr->asFunc())) {
         addError(E10013, field->location, {field->name});
     }
-    addRuntimeInfo(field->type);
+    addRTType(field->type);
 }
 
 void LgsSema::visitFuncHeader(LgsFuncType* ft) {
@@ -192,9 +192,9 @@ void LgsSema::visitFuncHeader(LgsFuncType* ft) {
             break;
         }
         defaultParamStart = !!param.expr;
-        addRuntimeInfo(param.type);
+        addRTType(param.type);
     }
-    addRuntimeInfo(ft->rt);
+    addRTType(ft->rt);
 }
 
 void LgsSema::visitFunc(LgsFunc* func) {
@@ -310,7 +310,7 @@ void LgsSema::visitParam(LgsParam* param) {
     if (param->name != "") {
         addLocalSymbol(LgsSymbol(param));
     }
-    addRuntimeInfo(param->type);
+    addRTType(param->type);
 }
 
 void LgsSema::visitIOPair(LgsIOPair* ioPair, LgsObject* obj) {
@@ -413,7 +413,7 @@ void LgsSema::visitVarDec(LgsVarDec* varDec) {
     if (varDec->expr->type->isVoid()) addError(E10093, varDec->location);
     else if (varDec->type->asFuncType() && varDec->isMutable) addError(E10034, varDec->location);
     addLocalSymbol(LgsSymbol(varDec));
-    addRuntimeInfo(varDec->type);
+    addRTType(varDec->type);
 }
 
 void LgsSema::visitAssignment(const LgsAssignment* assignment) {
@@ -773,7 +773,7 @@ void LgsSema::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
         return addError(E10076, binaryExpr->location, {binaryExpr->op.text, ltype->pname(), rtype->pname()});
     }
     binaryExpr->setType(type);
-    addRuntimeInfo(binaryExpr->type);
+    addRTType(binaryExpr->type);
 }
 
 void LgsSema::visitTernaryExpr(LgsTernaryExpr* ternary) {
@@ -839,7 +839,8 @@ void LgsSema::visitArrayExpr(LgsArrayExpr* arrayExpr) {
         arrayExpr->iterable->inferBaseType(arrayExpr->elements);
     }
     if (arrayExpr->type->asDArray()) {
-        addRuntimeInfo(arrayExpr->type);
+        addRTType(arrayExpr->type);
+        file->symbolTable.genericsTypes[arrayExpr->type->getName()] = arrayExpr->type;
     } else if (arrayExpr->type->asSArray()) {
         const auto sArr = arrayExpr->type->asSArray();
         const auto size = sArr->lengthExpr->getConstInt();
@@ -868,7 +869,7 @@ void LgsSema::visitHashMap(LgsHashMap* hashMap) {
         elements.reserve(hashMap->elements.size());
         for (const auto element : hashMap->elements) elements.push_back(element);
     }
-    addRuntimeInfo(hashMap->type);
+    addRTType(hashMap->type);
 }
 
 void LgsSema::visitVectorExpr(LgsVectorExpr* vectorExpr) {
@@ -893,7 +894,7 @@ void LgsSema::visitVectorExpr(LgsVectorExpr* vectorExpr) {
     if (vectorExpr->sumArgsDim > vectorExpr->vecType->dimVec) {
         addError(E10074, vectorExpr->location, {vec->pname()});
     }
-    addRuntimeInfo(vec);
+    addRTType(vec);
 }
 
 void LgsSema::visitMatrixExpr(const LgsMatrixExpr* matrixExpr) {
@@ -1000,7 +1001,7 @@ void LgsSema::visitInnerSelections(const LgsSelection* selection) {
         } else {
             assert(0);
         }
-        addRuntimeInfo(parent->type);
+        addRTType(parent->type);
         if (!child->type || child->type->isUnknown()) return;
     }
 }
@@ -1188,6 +1189,7 @@ bool LgsSema::visitFuncArgs(LgsFuncCall* funcCall, LgsFuncType* ft) {
             const auto& param = ft->params[i];
             castExprImplicitly(arg.expr, param.type);
             visitExpr(arg.expr);
+            addRTType(arg.expr->type);
             if (arg.name != "") {
                 addError(E10096, funcCall->location);
                 return false;
@@ -1313,7 +1315,7 @@ void LgsSema::visitInstance(LgsInstance* instance) {
     for (const auto field : instance->fields) {
         if (visited.contains(field->name)) continue;
         field->expr = field->type->getZeroValue();
-        addRuntimeInfo(field->type);
+        addRTType(field->type);
     }
 }
 
@@ -1597,26 +1599,37 @@ LgsFunc* LgsSema::cloneGenericFunc(const LgsFuncCall* funcCall, const LgsFunc* f
     // Params
     for (size_t i = 0; i < funcCall->args.size(); ++i) {
         if (i >= newFunc->funcType->params.size()) break;
-        const auto& newParam = newFunc->funcType->params[i];
+        auto& newParam = newFunc->funcType->params[i];
         const auto arg = funcCall->args[i].expr;
         if (!newParam.type->canCastTo(arg->type)) {
             addError(E10116, newParam.location);
             return newFunc;
         }
         replacements[newParam.type->getName()] = arg->type;
-        newParam.type->replaceGenerics(replacements);
-        if (newParam.type->asGenericType()) {
+        const auto newParamTypeName = newParam.type->getName();
+        if (newParam.type->asGenericType() && replacements.contains(newParamTypeName)) {
+            newParam.type = replacements[newParamTypeName];
+        } else {
+            newParam.type->replaceGenerics(replacements);
+        }
+        if (newParam.type->hasGenerics()) {
             addError(E10116, newParam.location);
             return newFunc;
         }
     }
 
-    newFunc->funcType->rt->replaceGenerics(replacements);
-    if (newFunc->funcType->rt->asGenericType()) {
-        addError(E10116, funcCall->location);
+    auto& newRT = newFunc->funcType->rt;
+    const auto newRTName = newRT->getName();
+    if (newRT->asGenericType() && replacements.contains(newRTName)) {
+        newRT = replacements[newRTName];
+    } else {
+        newRT->replaceGenerics(replacements);
+    }
+    if (!newRT || newRT->hasGenerics()) {
+        addError(E10116, funcCall->location, {newRTName});
         return newFunc;
     }
-    addRuntimeInfo(newFunc->funcType->rt);
+    addRTType(newRT);
 
     // Statements block
     newFunc->stmtsBlock = new LgsStmtsBlock();
@@ -1699,39 +1712,8 @@ void LgsSema::addError(const LgsBaseMsg& lgsErr, const LgsLocation& location, co
 }
 
 void LgsSema::addRTType(LgsType* type) const {
-    if (const auto nullable = type->asNullable()) {
-        if (!nullable->baseType) return;
-    }
-    if (type->asInterface() || type->asFuncType()) return;
-    for (const auto rttType : globals.rttTypes) {
-        if (rttType->equals(type)) return;
-    }
-    for (const auto rttType : file->symbolTable.rttTypes) {
-        if (rttType->equals(type)) return;
-    }
-    file->symbolTable.rttTypes.push_back(type);
-}
-
-void LgsSema::addGenerics(LgsType* type) const {
-    if (const auto dArr = type->asDArray()) {
-        if (const auto inner = dArr->baseType->asDArray()) {
-            addRuntimeInfo(inner);
-        }
-    }
-    for (const auto genericsType : file->symbolTable.genericsTypes) {
-        if (genericsType->equals(type)) return;
-    }
-    file->symbolTable.genericsTypes.push_back(type);
-}
-
-void LgsSema::addRuntimeInfo(LgsType* type) const {
-    if (!type || type->isUnknown() || !errHandler.successful ||
-        type->isExternal || type->isPrimitive ||
-        type->isAny() || type->asStr() || type->asFuncType() ||
-        type->asVec() || type->asNullable() || type->asFieldType()) return;
-    assert(!type->hasGenerics());
-    addGenerics(type);
-    addRTType(type);
+    if (!type || type->rttKind == RTT_UNKNOWN || type->isVoid()) return;
+    file->symbolTable.rttTypes[type->getName()] = type;
 }
 
 static std::string getMissingImplementsStr(const std::vector<LgsField*>& fields, const std::vector<LgsFunc*>& methods) {

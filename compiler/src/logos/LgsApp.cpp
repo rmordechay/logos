@@ -311,10 +311,6 @@ void LgsApp::loadBuiltins() {
     globals.addSymbol(LgsSymbol(new LgsPrint(), true, false), &errHandler);
     // globals.addSymbol(LgsSymbol(new LgsSys(), true, false), &errHandler);
     // globals.addSymbol(LgsSymbol(new LgsTest(), true, false), &errHandler);
-    globals.rttTypes = {
-        &LGS_STR, &LGS_CHAR, &LGS_BYTE, &LGS_BOOL, &LGS_INT, &LGS_UINT, &LGS_ULONG,
-        &LGS_SHORT, &LGS_LONG, &LGS_SIZE, &LGS_FLOAT, &LGS_DOUBLE
-    };
 }
 
 bool LgsApp::resolveGlobals() {
@@ -348,9 +344,6 @@ bool LgsApp::generateRTTTypes() {
     rttFile.setupCodeGen(configs);
 
     // Globals
-    for (const auto type : globals.rttTypes) {
-        type->getRTType(rttFile.cgFile.cg);
-    }
     for (auto [symbolName, symbol] : globals.symbols) {
         if (symbol.symbolType != OBJECT) continue;
         symbol.object->getRTType(rttFile.cgFile.cg);
@@ -361,7 +354,7 @@ bool LgsApp::generateRTTTypes() {
 
     // Source files
     for (const auto srcFile : srcFiles) {
-        for (const auto type : srcFile->symbolTable.rttTypes) {
+        for (const auto [_, type] : srcFile->symbolTable.rttTypes) {
             type->getRTType(rttFile.cgFile.cg);
         }
         if (const auto mainFile = dynamic_cast<LgsMainFile*>(srcFile)) {
@@ -382,13 +375,11 @@ bool LgsApp::generateGenerics() {
     genericsFile->setupCodeGen(configs);
     auto& cgFile = genericsFile->cgFile;
 
-    std::vector<LgsType*> genericsTypes;
     std::unordered_map<std::string, LgsFunc*> genericsFuncs;
+    std::unordered_map<std::string, LgsType*> genericsTypes;
     for (const auto srcFile : srcFiles) {
-        auto& types = srcFile->symbolTable.genericsTypes;
-        auto& funcs = srcFile->symbolTable.genericsFuncs;
-        genericsTypes.insert(genericsTypes.end(), types.begin(), types.end());
-        genericsFuncs.merge(funcs);
+        genericsTypes.merge(srcFile->symbolTable.genericsTypes);
+        genericsFuncs.merge(srcFile->symbolTable.genericsFuncs);
     }
 
     LgsObject::getGetFieldFunc(cgFile.cg);
@@ -396,7 +387,7 @@ bool LgsApp::generateGenerics() {
     for (const auto& [_, genericFunc] : genericsFuncs) {
         cgFile.visitFunc(genericFunc);
     }
-    for (const auto genericType : genericsTypes) {
+    for (const auto [_, genericType] : genericsTypes) {
         if (const auto dArr = genericType->asDArray()) {
             dArr->getAddFunc(cgFile.cg);
             dArr->getContainsFunc(cgFile.cg);

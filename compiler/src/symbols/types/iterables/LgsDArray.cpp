@@ -102,12 +102,16 @@ bool LgsDArray::hasGenerics() {
 }
 
 void LgsDArray::replaceGenerics(std::unordered_map<std::string, LgsType*>& replacements) {
-    const auto replacement = replacements.find(getName());
     const auto nestedTypeName = getNestedBaseType()->getName();
-    if (replacement != replacements.end() && replacement->second) {
-        const auto nestedBaseType = replacement->second->asIterable()->getNestedBaseType();
-        assert(!nestedBaseType->asGenericType());
-        replacements[nestedTypeName] = nestedBaseType;
+    if (replacements.contains(nestedTypeName) && replacements[nestedTypeName]) {
+        setNestedBaseType(replacements[nestedTypeName]);
+        return;
+    }
+    const auto genericName = getName();
+    if (replacements.contains(genericName) && replacements[genericName]) {
+        const auto otherNestedBaseType = replacements[genericName]->asIterable()->getNestedBaseType();
+        replacements[nestedTypeName] = otherNestedBaseType;
+        setNestedBaseType(otherNestedBaseType);
     }
 }
 

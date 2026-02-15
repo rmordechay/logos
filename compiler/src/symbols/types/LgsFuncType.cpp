@@ -112,15 +112,17 @@ void LgsFuncType::replaceGenerics(std::unordered_map<std::string, LgsType*>& rep
         if (!replacements.contains(paramName)) continue;
         if (!replacements[paramName]) {
             replacements[paramName] = otherFuncType->params[i].type;
-            assert(!replacements[paramName]->hasGenerics());
         }
+        assert(!replacements[paramName]->hasGenerics());
         params[i].type = replacements[paramName];
     }
     const auto rtName = rt->getName();
-    if (replacements.contains(rtName)) {
+    if (!replacements.contains(rtName)) return;
+    if (!replacements[rtName]) {
         replacements[rtName] = otherFuncType->rt;
-        assert(!replacements[rtName]->hasGenerics());
     }
+    assert(!replacements[rtName]->hasGenerics());
+    rt = replacements[rtName];
 }
 
 LgsType* LgsFuncType::applyBinOp(LgsType* rightType, LgsBinOp& op) {
