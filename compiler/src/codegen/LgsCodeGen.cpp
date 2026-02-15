@@ -19,6 +19,8 @@
 #include <llvm/IR/Verifier.h>
 #include <llvm/Passes/PassBuilder.h>
 
+inline TargetMachine* targetMachine;
+
 void LgsCodeGen::setupModule(const fs::path& file, const bool debugMode) {
     IRModule = new Module(file.stem().string(), context);
     if (debugMode && mode == CG_MODE_RTTYPES) {
@@ -72,7 +74,7 @@ bool LgsCodeGen::writeIRModule(const LgsPaths& paths, uint8_t optLevel) const {
     return true;
 }
 
-Constant* LgsCodeGen::getString(const std::string& value) {
+Constant* LgsCodeGen::getString(const std::string& value, const bool addNull) {
     for (auto& globals : IRModule->globals()) {
         if (!globals.hasInitializer()) continue;
         const auto dataArray = llvm::dyn_cast<ConstantDataArray>(globals.getInitializer());
@@ -160,7 +162,7 @@ Value* LgsCodeGen::getLevel(Value* v) {
     return load(sizeTy(), v);
 }
 
-AllocaInst* LgsCodeGen::emptyBuffer() {
+Value* LgsCodeGen::emptyBuffer() {
     return builder.CreateAlloca(ArrayType::get(i8Ty(), LGS_STR_BUFFER_SIZE));
 }
 
@@ -600,4 +602,10 @@ LgsCodeGen::~LgsCodeGen() {
         delete debugger.diBuilder;
         debugger.diBuilder = nullptr;
     }
+}
+
+void LgsStrBuilder::add(LgsCodeGen& cg, Value* value, Value* size) {
+    const auto gep = cg.builder.CreatePtrAdd(buffer, index);
+    cg.callMemcpy(gep, value, size);
+    index = cg.builder.CreateAdd(index, size);
 }

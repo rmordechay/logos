@@ -1,8 +1,6 @@
 #include "logos/LgsPkgManager.h"
 #define MINIZ_HEADER_FILE_ONLY
 #include "curl/curl.h"
-#include "miniz.c"
-#include "miniz.h"
 #include "files/LgsAppConfigFile.h"
 #include "logos/LgsApp.h"
 #include <fstream>
@@ -15,19 +13,19 @@ namespace fs = std::filesystem;
 #define MAX_DOWNLOAD_FILE_SIZE 10'000 * 1024
 
 bool unzipFile(const std::string& zipPath, const std::string& destDir) {
-    mz_zip_archive archive = {};
-    if (!mz_zip_reader_init_file(&archive, zipPath.c_str(), 0)) return false;
-    const auto numFiles = mz_zip_reader_get_num_files(&archive);
-    for (mz_uint i = 0; i < numFiles; ++i) {
-        mz_zip_archive_file_stat file_stat;
-        mz_zip_reader_file_stat(&archive, i, &file_stat);
-        auto fullPath = fs::path(destDir) / file_stat.m_filename;
-        auto dirPath = fullPath.parent_path();
-        createDir(dirPath);
-        if (mz_zip_reader_is_file_a_directory(&archive, i)) continue;
-        mz_zip_reader_extract_to_file(&archive, i, fullPath.string().c_str(), 0);
-    }
-    mz_zip_reader_end(&archive);
+    // mz_zip_archive archive = {};
+    // if (!mz_zip_reader_init_file(&archive, zipPath.c_str(), 0)) return false;
+    // const auto numFiles = mz_zip_reader_get_num_files(&archive);
+    // for (mz_uint i = 0; i < numFiles; ++i) {
+    //     mz_zip_archive_file_stat file_stat;
+    //     mz_zip_reader_file_stat(&archive, i, &file_stat);
+    //     auto fullPath = fs::path(destDir) / file_stat.m_filename;
+    //     auto dirPath = fullPath.parent_path();
+    //     createDir(dirPath);
+    //     if (mz_zip_reader_is_file_a_directory(&archive, i)) continue;
+    //     mz_zip_reader_extract_to_file(&archive, i, fullPath.string().c_str(), 0);
+    // }
+    // mz_zip_reader_end(&archive);
     return true;
 }
 

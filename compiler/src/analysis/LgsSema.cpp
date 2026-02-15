@@ -26,7 +26,6 @@
 #include "files/LgsTestFile.h"
 #include "funcs/LgsMainFunc.h"
 #include "logos/LgsApp.h"
-#include "errors/LgsErrHandler.h"
 #include "exprs/LgsMatrixExpr.h"
 #include "exprs/LgsMetaSelection.h"
 #include "exprs/LgsNullableExpr.h"
@@ -1479,8 +1478,9 @@ bool LgsSema::validateFieldVisibility(LgsField* field, LgsType* parent, const Lg
     if (parent->asObject() && parent->asObject()->singleton) return true;
     if (!field || field->isVirtual) return false;
     if (stack.currentFunc()->isTest) return true;
-    const auto fieldHasAccess = !field->isPublic && file->path != *field->location.filepath;
-    if (fieldHasAccess) {
+    assert(field->location.filepath != "");
+    const auto hasAccess = field->isPublic || file->path == field->location.filepath;
+    if (!hasAccess) {
         addError(E10030, location, {field->name, parent->pname()});
         return false;
     }
@@ -1490,8 +1490,8 @@ bool LgsSema::validateFieldVisibility(LgsField* field, LgsType* parent, const Lg
 bool LgsSema::validateMethodVisibility(const LgsFunc* method, LgsType* parent, const LgsLocation& location) {
     if (!method) return false;
     if (parent && parent->asObject() && parent->asObject()->singleton) return true;
-    const auto methodHasAccess = !method->funcType->isPublic && file->path != *method->location.filepath && !stack.currentFunc()->isTest;
-    if (methodHasAccess) {
+    const auto hasAccess = method->funcType->isPublic || file->path == method->location.filepath || stack.currentFunc()->isTest;
+    if (!hasAccess) {
         addError(E10031, location, {method->funcType->name, method->funcType->parentName});
         return false;
     }

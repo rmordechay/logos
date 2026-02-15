@@ -3,6 +3,7 @@
 #include "LgsAppConfigs.h"
 #include "LgsDefinitions.h"
 #include "LgsPaths.h"
+#include "errors/LgsErrHandler.h"
 
 class LgsAppConfigFile;
 class LgsTestFile;

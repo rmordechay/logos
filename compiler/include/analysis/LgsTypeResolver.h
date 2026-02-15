@@ -1,6 +1,6 @@
 #pragma once
 #include "LgsSymbol.h"
-#include "errors/LgsErrHandler.h"
+
 
 
 class LgsMainFile;

@@ -17,7 +17,9 @@ inline std::string getLgsOutput(const std::string& code) {
         LgsApp app;
         app.lgsCode = code;
         app.configs.appMode = CODE_MODE;
-        if (!app.compile()) return "";
+        const auto success = app.compile();
+        EXPECT_TRUE(success);
+        if (!success) return "";
         execPath = app.paths.execFile;
     }
     const auto pipe = popen(execPath.c_str(), "r");

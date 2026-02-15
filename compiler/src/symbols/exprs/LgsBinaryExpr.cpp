@@ -1,8 +1,5 @@
 #include "exprs/LgsBinaryExpr.h"
 
-#include "LgsType.h"
-#include "codegen/LgsCodeGen.h"
-
 Value* LgsBinaryExpr::loadIR(LgsCodeGen& cg) {
     return IRValue;
 }

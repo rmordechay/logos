@@ -3,7 +3,6 @@
 #include <llvm/Passes/OptimizationLevel.h>
 #include <map>
 #include <filesystem>
-
 #include "exprs/LgsExpr.h"
 
 namespace llvm {
@@ -40,19 +39,17 @@ using llvm::IRBuilder;
 using llvm::Type;
 using llvm::Value;
 using llvm::Instruction;
-
-struct LgsPaths;
-struct LgsAppConfigs;
-struct LgsLocation;
-struct LgsBaseMsg;
-class LgsFile;
-
 struct LgsLLDBGen {
     DIFile* diFile = nullptr;
     DIBuilder* diBuilder = nullptr;
     DICompileUnit* compileUnit = nullptr;
     DISubprogram* subprogram = nullptr;
 };
+struct LgsPaths;
+struct LgsAppConfigs;
+struct LgsLocation;
+struct LgsBaseMsg;
+class LgsFile;
 
 enum LgsCodeGenMode {
     CG_MODE_RTTYPES,
@@ -74,7 +71,7 @@ public:
     explicit LgsCodeGen(const LgsCodeGenMode mode) : mode(mode) {}
     void setupModule(const std::filesystem::path& file, bool debugMode = false);
     bool writeIRModule(const LgsPaths& paths, uint8_t optLevel) const;
-    Constant* getString(const std::string& value);
+    Constant* getString(const std::string& value, bool addNull = false);
     GlobalVariable* createGlobal(const std::string& name, Type* type, Constant* initializer, bool isConst = true, GlobalValue::LinkageTypes linkage = GlobalValue::ExternalLinkage) const;
     void loop(Value* loopLength, const std::function<void(Value*, BasicBlock*)>& body);
     void ifStmt(Value* cond, const std::function<void()>& body);
@@ -85,7 +82,7 @@ public:
     Value* loadPtr(Value* value);
     Value* isNull(Value* value);
     Value* getLevel(Value* v);
-    AllocaInst* emptyBuffer();
+    Value* emptyBuffer();
     void incSize(Value* bufferOffset, Value* ptr);
     Value* allocaAndStore(Type* type, Value* v, const std::string& name = "");
     StructType* getStructType(const std::vector<Type*>& types, const std::string& name = "");
@@ -131,6 +128,7 @@ public:
     Value* callPrintf(const std::vector<Value*>& args);
     Value* callPrintf(const std::string& fmt, const std::vector<Value*>& args);
     Value* callSnprintf(const std::string& fmt, const std::vector<Value*>& args);
+    Value* strBuilderAdd();
     Value* callStrlen(Value* str);
     Value* strsEqual(Value* str1, Value* str2);
     Value* strsNotEqual(Value* str1, Value* str2);
@@ -193,4 +191,9 @@ public:
     ~LgsCodeGen();
 };
 
-inline TargetMachine* targetMachine;
+class LgsStrBuilder {
+public:
+    Value* buffer = nullptr;
+    Value* index = nullptr;
+    void add(LgsCodeGen& cg, Value* value, Value* size);
+};

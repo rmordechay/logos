@@ -1,4 +1,7 @@
 #include "logos/LgsAppCache.h"
+
+#include <fstream>
+
 #include "files/LgsFileMetadata.h"
 #include "LgsUtils.h"
 

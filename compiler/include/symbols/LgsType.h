@@ -1,7 +1,8 @@
 #pragma once
 #include "Lgs_Types.h"
-#include "errors/LgsErrHandler.h"
 #include <unordered_map>
+
+#include "codegen/LgsCodeGen.h"
 
 class LgsSelf;
 class LgsFieldType;
@@ -47,6 +48,7 @@ class LgsFuncCall;
 class LgsField;
 class LgsFunc;
 class LgsCodeGen;
+class LgsStrBuilder;
 
 namespace llvm {
     class Constant;
@@ -98,6 +100,7 @@ public:
     virtual bool hasGenerics();
     virtual bool canCastTo(LgsType* other) = 0;
     virtual LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) = 0;
+    virtual void getAsIRText(LgsCodeGen& cg, LgsStrBuilder& strBuilder, Value* ptr);
     virtual void replaceGenerics(std::unordered_map<std::string, LgsType*>& replacements);
     virtual Type* getIRType(LgsCodeGen& cg) = 0;
     virtual Constant* getRTTypeExtra(LgsCodeGen& cg);

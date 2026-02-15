@@ -1,8 +1,10 @@
 #pragma once
 #include "LgsSymbolTable.h"
-#include "errors/LgsErrHandler.h"
+
 #include <clang/AST/RecursiveASTVisitor.h>
 #include <clang/Tooling/Tooling.h>
+
+#include "errors/LgsErrHandler.h"
 
 struct LgsSymbolTable;
 class LgsErrHandler;

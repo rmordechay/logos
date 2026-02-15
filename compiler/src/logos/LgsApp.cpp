@@ -1,4 +1,6 @@
 #include "logos/LgsApp.h"
+
+#include <ostream>
 #include <unordered_set>
 #include <llvm/Analysis/CGSCCPassManager.h>
 #include <llvm/IR/Module.h>
@@ -22,11 +24,6 @@
 #include "files/LgsObjectFile.h"
 #include "types/iterables/LgsVec.h"
 #include "types/primitives/LgsByte.h"
-#include "types/primitives/LgsDouble.h"
-#include "types/primitives/LgsFloat.h"
-#include "types/primitives/LgsShort.h"
-#include "types/primitives/LgsUInt.h"
-#include "types/primitives/LgsULong.h"
 #include <llvm/Target/TargetMachine.h>
 #include "exprs/constants/LgsIntConst.h"
 #include "stmts/LgsImport.h"
@@ -118,7 +115,8 @@ bool LgsApp::parse() {
     for (auto& metadata : appCache.files) {
         if (metadata.type != LGS_SRC_FILE) continue;
         threadPool.runTask([&metadata, this] {
-            loadSrcFile(getFileText(metadata.path), metadata.path);
+            const auto fileCode = getFileText(metadata.path);
+            loadSrcFile(fileCode, metadata.path);
         });
     }
     threadPool.wait();
@@ -131,7 +129,7 @@ bool LgsApp::parseHeaders() {
         if (fileMetadata.type != LGS_SRC_FILE) continue;
         threadPool.runTask([&fileMetadata, this] {
             const auto fileCode = getFileText(fileMetadata.path);
-            LgsParser parser(fileMetadata.path, paths, globals, true);
+            LgsParser parser(fileCode, fileMetadata.path, paths, globals, true);
             parser.parseSrcFileHeaders();
         });
     }
@@ -251,8 +249,7 @@ bool LgsApp::loadConfigs() {
 
 void LgsApp::loadSrcFile(const std::string& fileCode, const fs::path& filePath) {
     appCache.files.emplace_back(filePath);
-    LgsParser parser(filePath, paths, globals);
-    parser.lgsCode = fileCode;
+    LgsParser parser(fileCode, filePath, paths, globals);
     for (const auto importApp : importApps) {
         parser.importAppNames.insert(importApp->configs.name);
     }
@@ -275,7 +272,7 @@ bool LgsApp::loadConfigFile() {
         errHandler.addError(E10086, {paths.appConfigFile});
         return false;
     }
-    LgsParser parser(paths.appConfigFile, paths, globals);
+    LgsParser parser(getFileText(paths.appConfigFile), paths.appConfigFile, paths, globals);
     appConfigFile = parser.parseAppConfigFile();
     if (!parser.errHandler.successful) {
         errHandler.mergeErrors(parser.errHandler);
@@ -290,7 +287,8 @@ bool LgsApp::loadEnvFiles() {
         const auto filePath = metadata.path;
         if (!isLogosFile(filePath)) continue;
         threadPool.runTask([this, &metadata] {
-            LgsParser parser(metadata.path, paths, globals);
+            const auto fileText = getFileText(metadata.path);
+            LgsParser parser(fileText, metadata.path, paths, globals);
             const auto envFile = parser.parseEnvFile();
             if (!envFile) return;
             metadata.hash = envFile->hashFile();

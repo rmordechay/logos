@@ -213,6 +213,22 @@ LgsType* LgsObject::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     return canCastTo(rightType) ? &LGS_BOOL : nullptr;
 }
 
+void LgsObject::getAsIRText(LgsCodeGen& cg, LgsStrBuilder& strBuilder, Value* ptr) {
+    const auto prefix = name + "{";
+    strBuilder.add(cg, cg.getString(prefix, false), cg.usize(prefix.length()));
+    auto isFirst = true;
+    for (const auto field : fields) {
+        if (!isFirst) {
+            strBuilder.add(cg, cg.getString(", ", false), cg.usize(2));
+        }
+        auto fieldName = field->name + "=";
+        strBuilder.add(cg, cg.getString(fieldName, false), cg.usize(fieldName.length()));
+        field->type->getAsIRText(cg, strBuilder, field->getGEP(cg, ptr));
+        isFirst = false;
+    }
+    strBuilder.add(cg, cg.getString("}", false), cg.usize(1));
+}
+
 std::string LgsObject::fmtStr() const {
     std::stringstream str;
     str << '{';

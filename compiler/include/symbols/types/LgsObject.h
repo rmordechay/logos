@@ -50,12 +50,13 @@ public:
     LgsExpr* getZeroValue() override;
     bool canCastTo(LgsType* other) override;
     void hashNode(size_t& oldHash) override;
+    void cloneFields(LgsInstance* instance) const;
     Type* getIRType(LgsCodeGen& cg) override;
+    LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
+    void getAsIRText(LgsCodeGen& cg, LgsStrBuilder& strBuilder, Value* ptr) override;
     Constant* getRTTypeExtra(LgsCodeGen& cg) override;
     Value* hashValue(LgsCodeGen& cg, Value* value) override;
     Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee) override;
-    LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
-    void cloneFields(LgsInstance* instance) const;
     DIType* getDebugType(LgsCodeGen& cg) override;
     Function* getObjsEqFunc(LgsCodeGen& cg) const;
     Function* getObjsHashFunc(LgsCodeGen& cg) const;

@@ -18,6 +18,17 @@ LgsType* LgsBool::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     return nullptr;
 }
 
+void LgsBool::getAsIRText(LgsCodeGen& cg, LgsStrBuilder& strBuilder, Value* ptr) {
+    const auto trueStr = cg.getString(trueLiteral, false);
+    const auto falseStr = cg.getString(falseLiteral, false);
+    const auto v = cg.builder.CreateSelect(cg.load(getIRType(cg), ptr), trueStr, falseStr);
+    strBuilder.add(cg, v, cg.callStrlen(v));
+}
+
+Value* LgsBool::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
+    return cg.false_();
+}
+
 std::string LgsBool::getName() {
     return name;
 }

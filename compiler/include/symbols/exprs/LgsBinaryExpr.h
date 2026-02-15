@@ -1,6 +1,5 @@
 #pragma once
 #include "LgsBinaryTokens.h"
-#include "LgsTokens.h"
 #include "exprs/LgsExpr.h"
 
 class LgsBinaryExpr final : public LgsExpr {

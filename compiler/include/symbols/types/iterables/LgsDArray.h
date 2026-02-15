@@ -3,7 +3,6 @@
 #include "exprs/LgsFuncCall.h"
 #include "funcs/LgsFunc.h"
 #include "types/LgsAny.h"
-#include "types/primitives/LgsLong.h"
 
 class LgsDArray final : public LgsIterable {
 public:

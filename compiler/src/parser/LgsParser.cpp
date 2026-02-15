@@ -70,10 +70,7 @@ LgsFunc* wrapStmtsBlockWithLambda(LgsStmtsBlock* stmtsBlock);
 #define MAX_TOKENS_NUMBER 100000
 
 bool LgsParser::scanTokens() {
-    if (lgsCode == "") {
-        lgsCode = getFileText(filePath);
-    }
-    if (lgsCode.empty()) return false;
+    assert(!lgsCode.empty());
     LgsLexer lexer(filePath, lgsCode);
     tokens = lexer.tokenize();
     if (!lexer.errHandler.successful) {
@@ -1910,7 +1907,7 @@ void LgsParser::parseImports() {
 }
 
 void LgsParser::setLocation(LgsLocation& location, const LgsToken* startToken, const LgsToken* endToken) const {
-    location.filepath = &filePath;
+    location.filepath = filePath;
     location.lineStart = startToken->location.lineStart;
     location.columnStart = startToken->location.columnStart;
     location.lineEnd = endToken->location.lineEnd;
@@ -1930,8 +1927,7 @@ void LgsParser::extractStrParts(LgsStrConst* strConst) {
             return;
         }
         const auto part = replaced.substr(open + 2, close - 2);
-        LgsParser parser(filePath, paths, globals);
-        parser.lgsCode = part;
+        LgsParser parser(part, filePath, paths, globals);
         parser.scanTokens();
         const auto expr = parser.parseExpr();
         strConst->parts.push_back(expr);

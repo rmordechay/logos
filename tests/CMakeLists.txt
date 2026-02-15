@@ -18,6 +18,7 @@ add_executable(lgs_tests
     codegen/CgDeferTest.cpp
     codegen/CgLambdaTest.cpp
     ${COMPILER_SOURCE}
+    codegen/CgObjectTest.cpp
 )
 
 target_include_directories(lgs_tests PRIVATE

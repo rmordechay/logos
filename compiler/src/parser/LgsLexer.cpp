@@ -1,6 +1,5 @@
 #include "parser/LgsLexer.h"
 #include "errors/LgsErrors.h"
-#include <iostream>
 
 std::vector<LgsToken> LgsLexer::tokenize() {
     if (source.empty()) return {};

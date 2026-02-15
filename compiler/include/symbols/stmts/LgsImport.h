@@ -1,5 +1,6 @@
 #pragma once
-#include "errors/LgsErrHandler.h"
+#include "LgsTokens.h"
+
 
 enum LgsImportType {
     LGS_IMPORT,

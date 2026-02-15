@@ -50,6 +50,11 @@ bool LgsFloat::canCastTo(LgsType* other) {
     return false;
 }
 
+void LgsFloat::getAsIRText(LgsCodeGen& cg, LgsStrBuilder& strBuilder, Value* ptr) {
+    const auto i = cg.callSnprintf(fmtStr(), {cg.load(getIRType(cg), ptr)});
+    strBuilder.add(cg, i, cg.callStrlen(i));
+}
+
 LgsType* LgsFloat::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     if (!rightType->isScalar()) return nullptr;
     switch (op.opType) {

@@ -83,6 +83,10 @@ std::string LgsType::getRTTName() {
     return LGS_TYPEINFO_PREFIX + getName();
 }
 
+void LgsType::getAsIRText(LgsCodeGen& cg, LgsStrBuilder& strBuilder, Value* ptr) {
+    assert(0);
+}
+
 Constant* LgsType::getRTType(LgsCodeGen& cg) {
     const auto rttName = getRTTName();
     if (const auto v = cg.IRModule->getGlobalVariable(rttName)) return v;

@@ -1,7 +1,7 @@
 #include "LgsSymbolTable.h"
 #include "errors/LgsErrors.h"
 #include "logos/LgsApp.h"
-#include "errors/LgsErrHandler.h"
+
 
 void LgsSymbolTable::addSymbol(const LgsSymbol& symbol, LgsErrHandler* errHandler, const std::string& filePath) {
     const auto symbolName = *symbol.name;

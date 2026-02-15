@@ -3,7 +3,6 @@
 #include "LgsUtils.h"
 #include "errors/LgsErrors.h"
 #include <algorithm>
-#include <cassert>
 
 void LgsErrHandler::setUnsuccessful() {
     successful = false;

@@ -1,4 +1,6 @@
 #include "analysis/LgsTypeResolver.h"
+
+#include "errors/LgsErrHandler.h"
 #include "exprs/LgsVariable.h"
 #include "files/LgsFile.h"
 #include "files/LgsMainFile.h"
@@ -12,7 +14,7 @@
 #include "types/LgsInterface.h"
 #include "types/iterables/LgsIterable.h"
 #include "types/LgsSubType.h"
-#include "errors/LgsErrHandler.h"
+
 #include "errors/LgsErrors.h"
 #include "types/LgsNullable.h"
 #include "types/LgsSelf.h"

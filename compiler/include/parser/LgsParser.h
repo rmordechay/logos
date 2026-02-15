@@ -1,14 +1,10 @@
 #pragma once
 #include <unordered_set>
-
 #include "LgsBinaryTokens.h"
 #include "LgsTokens.h"
-#include "errors/LgsErrHandler.h"
-#include "exprs/constants/LgsCharConst.h"
-#include "files/LgsFileMetadata.h"
 #include "lgsc/LgsCCompiler.h"
-#include "stmts/LgsAssignment.h"
 
+class LgsCharConst;
 class LgsModuleExpr;
 class LgsImport;
 class LgsMetaVar;
@@ -67,8 +63,8 @@ class LgsExpr;
 
 class LgsParser {
 public:
-    const fs::path& filePath;
-    std::string lgsCode = "";
+    const fs::path filePath;
+    const std::string& lgsCode;
     LgsToken currentToken;
     size_t currentIndex = 0;
     size_t recursionCount = 0;
@@ -81,8 +77,8 @@ public:
     std::vector<LgsImport*> importPaths;
     std::unordered_set<std::string> importAppNames;
 
-    LgsParser(const fs::path& filePath, const LgsPaths& paths, LgsSymbolTable& globals, const bool headersOnly = false)
-        : filePath(filePath), headersOnly(headersOnly), paths(paths), globals(globals) {
+    LgsParser(const std::string& lgsCode, const fs::path& filePath, const LgsPaths& paths, LgsSymbolTable& globals, const bool headersOnly = false)
+        : filePath(filePath), lgsCode(lgsCode), headersOnly(headersOnly), paths(paths), globals(globals) {
     }
     // Files
     bool scanTokens();

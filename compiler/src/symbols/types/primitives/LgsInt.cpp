@@ -73,6 +73,11 @@ LgsExpr* LgsInt::getZeroValue() {
     return new LgsIntConst(&LGS_INT, 0);
 }
 
+void LgsInt::getAsIRText(LgsCodeGen& cg, LgsStrBuilder& strBuilder, Value* ptr) {
+    const auto i = cg.callSnprintf(fmtStr(), {cg.load(getIRType(cg), ptr)});
+    strBuilder.add(cg, i, cg.callStrlen(i));
+}
+
 Value* LgsInt::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
     return cg.zero32();
 }

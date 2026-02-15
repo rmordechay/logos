@@ -15,7 +15,7 @@ Value* LgsPrint::call(LgsCodeGen& cg, std::vector<LgsFuncArg>& args) {
     }
     if (type->asBool()) {
         const auto fmt = cg.getString(type->fmtStr() + "\n");
-        const auto v = cg.builder.CreateSelect(arg->loadIR(cg), cg.getString(LgsBool::trueLiteral), cg.getString(LgsBool::falseLiteral));;
+        const auto v = cg.builder.CreateSelect(arg->loadIR(cg), cg.getString(LgsBool::trueLiteral), cg.getString(LgsBool::falseLiteral));
         return cg.callPrintf({fmt, v});
     }
     if (type->asFieldType()) {

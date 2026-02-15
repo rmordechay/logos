@@ -12,13 +12,15 @@ public:
         isPrimitive = true;
         rttKind = RTT_BOOL;
     }
-    Type* getIRType(LgsCodeGen& cg) override;
-    LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     std::string getName() override;
     LgsExpr* getZeroValue() override;
     std::string fmtStr() const override;
     size_t sizeBytes() override;
+    Type* getIRType(LgsCodeGen& cg) override;
     bool canCastTo(LgsType* other) override;
+    LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
+    void getAsIRText(LgsCodeGen& cg, LgsStrBuilder& strBuilder, Value* ptr) override;
+    Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee) override;
     DIType* getDebugType(LgsCodeGen& cg) override;
 };
 

@@ -69,6 +69,11 @@ std::optional<int64_t> LgsStr::getConstLength() {
     return length;
 }
 
+void LgsStr::getAsIRText(LgsCodeGen& cg, LgsStrBuilder& strBuilder, Value* ptr) {
+    ptr = loadRTData(cg, cg.loadPtr(ptr));
+    strBuilder.add(cg, ptr, cg.callStrlen(ptr));
+}
+
 Value* LgsStr::getIRElement(LgsCodeGen& cg, Value* iterable, Value* index) {
     return cg.builder.CreateGEP(cg.i8Ty(), loadRTData(cg, iterable), {cg.zero32(), index});
 }

@@ -1,6 +1,7 @@
 #pragma once
-#include "errors/LgsErrHandler.h"
+
 #include "Lgs_Allocator.h"
+#include "errors/LgsErrHandler.h"
 
 typedef void (*ThunkFunc)(void*);
 

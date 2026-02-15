@@ -1,11 +1,12 @@
 #pragma once
 #include "logos/LgsStack.h"
-#include "errors/LgsErrHandler.h"
+
 #include "analysis/LgsTypeResolver.h"
 #include "files/LgsEnvFile.h"
 #include "logos/LgsAppConfigs.h"
 #include <unordered_map>
 
+#include "errors/LgsErrHandler.h"
 #include "stmts/LgsAssignment.h"
 
 class LgsMainFunc;

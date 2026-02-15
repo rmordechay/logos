@@ -2,18 +2,10 @@
 #include <vector>
 #include <mutex>
 #include <fstream>
+#include "LgsTokens.h"
 
 struct LgsBaseMsg;
 class LgsApp;
-
-struct LgsLocation {
-    size_t index = 0;
-    size_t lineStart = 1;
-    size_t columnStart = 1;
-    size_t lineEnd = 1;
-    size_t columnEnd = 1;
-    const std::filesystem::path* filepath = nullptr;
-};
 
 struct LgsError {
     std::string msg;

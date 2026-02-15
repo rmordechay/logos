@@ -1,8 +1,6 @@
 #pragma once
-#include "errors/LgsErrHandler.h"
 #include <llvm/IR/DIBuilder.h>
-
-#include "types/LgsGenericType.h"
+#include "LgsTokens.h"
 
 namespace llvm {
     class TargetMachine;
