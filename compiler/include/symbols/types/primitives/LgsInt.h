@@ -7,6 +7,7 @@ public:
 
     LgsInt() {
         isInt = true;
+        isPrimitive = true;
         rttKind = RTT_INT;
     }
     std::string getName() override;

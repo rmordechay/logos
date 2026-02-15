@@ -8,6 +8,7 @@ public:
     LgsULong() {
         isUnsinged = true;
         isInt = true;
+        isPrimitive = true;
         rttKind = RTT_ULONG;
     }
     size_t sizeBytes() override;

@@ -129,11 +129,16 @@ bool LgsType::equals(LgsType* other) {
     return getName() == other->getName();
 }
 
-LgsType* LgsType::replaceGenerics(std::unordered_map<std::string, LgsType*>& replacements) {
-    return this;
+void LgsType::replaceGenerics(std::unordered_map<std::string, LgsType*>& replacements) {
+
 }
 
 void LgsType::hashNode(size_t& oldHash) { assert(0);}
+
+bool LgsType::hasGenerics() {
+    return !!asGenericType();
+}
+
 Value* LgsType::hashValue(LgsCodeGen& cg, Value* value) { assert(0);}
 
 Value* LgsType::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) { assert(0);}

@@ -7,6 +7,7 @@ public:
 
     LgsFloat() {
         isFloat = true;
+        isPrimitive = true;
         rttKind = RTT_FLOAT;
     }
     std::string getName() override;

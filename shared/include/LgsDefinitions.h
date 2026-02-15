@@ -24,7 +24,7 @@
 #define LGS_LAMBDA "lambda"
 #define LGS_LAMBDA_IT_PARAM "it"
 #define LGS_NULL_LITERAL "null"
-#define LGS_UNKNOWN_TYPE "<Unknown>"
+#define LGS_UNKNOWN_TYPE "Unknown"
 #define MSG_PLACEHOLDER "%s"
 #define LGS_STR_FMT_PLACEHOLDER "<!v!>"
 #define LGS_EMPTY_STR "\"\""

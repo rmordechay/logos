@@ -8,6 +8,7 @@ public:
 
     LgsLong() {
         isInt = true;
+        isPrimitive = true;
         rttKind = RTT_LONG;
     }
     Type* getIRType(LgsCodeGen& cg) override;

@@ -55,7 +55,8 @@ public:
     std::string fmtStr() const override;
     bool canCastTo(LgsType* other) override;
     bool equals(LgsType* other) override;
-    LgsType* replaceGenerics(std::unordered_map<std::string, LgsType*>& replacements) override;
+    bool hasGenerics() override;
+    void replaceGenerics(std::unordered_map<std::string, LgsType*>& replacements) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     void setFuncOptions(uint32_t ops);
     std::unordered_map<std::string, LgsParam*> getParamsByName();

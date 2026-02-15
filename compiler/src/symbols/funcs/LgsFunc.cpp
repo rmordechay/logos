@@ -27,9 +27,10 @@ LgsExpr* LgsFunc::cast(LgsType* toType, const bool explicitly) {
         funcType->params.emplace_back(itType, LGS_LAMBDA_IT_PARAM);
     } else {
         for (size_t i = 0; i < funcType->params.size(); ++i) {
-            auto& selfParam = funcType->params[i];
-            if (selfParam.type) continue;
-            selfParam.setType(toFuncType->params[i].type);
+            auto& thisParam = funcType->params[i];
+            const auto newType = toFuncType->params[i].type;
+            if (thisParam.type || newType->hasGenerics()) continue;
+            thisParam.setType(newType);
         }
     }
     // Return type

@@ -73,6 +73,7 @@ public:
     bool isFloat = false;
     bool isExternal = false;
     bool isHeap = false;
+    bool isPrimitive = false;
     bool passByRef = false;
 
     bool isAny();
@@ -93,17 +94,18 @@ public:
     virtual std::string pname(); // pretty name
     virtual size_t sizeBytes() = 0;
     virtual LgsExpr* getZeroValue() = 0;
-    virtual Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee);
-    virtual Type* getIRType(LgsCodeGen& cg) = 0;
-    virtual Constant* getRTTypeExtra(LgsCodeGen& cg);
+    virtual std::string fmtStr() const = 0;
     virtual bool equals(LgsType* other);
+    virtual void hashNode(size_t& oldHash);
+    virtual bool hasGenerics();
     virtual bool canCastTo(LgsType* other) = 0;
     virtual LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) = 0;
-    virtual std::string fmtStr() const = 0;
-    virtual void hashNode(size_t& oldHash);
+    virtual void replaceGenerics(std::unordered_map<std::string, LgsType*>& replacements);
+    virtual Type* getIRType(LgsCodeGen& cg) = 0;
+    virtual Constant* getRTTypeExtra(LgsCodeGen& cg);
+    virtual Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee);
     virtual Value* hashValue(LgsCodeGen& cg, Value* value);
     virtual DIType* getDebugType(LgsCodeGen& cg) = 0;
-    virtual LgsType* replaceGenerics(std::unordered_map<std::string, LgsType*>& replacements);
 
     virtual Value* addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr);
     virtual Value* subIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr);

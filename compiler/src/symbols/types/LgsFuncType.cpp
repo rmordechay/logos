@@ -38,9 +38,7 @@ std::string LgsFuncType::getName() {
     std::stringstream str;
     if (isBuiltin) str << LGS_PREFIX;
     else str << "u_";
-    if (parentName != "") {
-        str << parentName << "_";
-    }
+    if (parentName != "") str << parentName << "_";
     str << name;
     for (size_t i = isMethod; i < params.size(); ++i) {
         const auto& param = params[i];
@@ -55,20 +53,13 @@ std::string LgsFuncType::pname() {
     str << (isLambda ? "" : name) << '(';
     for (size_t i = isMethod; i < params.size(); ++i) {
         const auto param = params[i];
-        if (param.type) {
-            str << param.type->pname();
-        } else if (param.name != ""){
-            str << param.name;
-        } else {
-            str << LGS_UNKNOWN_TYPE;
-        }
-        if (param.expr) {
-            str << " = " << param.expr->asText();
-        }
+        if (param.type) str << param.type->pname();
+        else  str << LGS_UNKNOWN_TYPE;
+        if (param.expr) str << " = " << param.expr->asText();
         if (i != params.size() - 1) str << ", ";
     }
     if (rt) str << "): " << rt->pname();
-    else str << ')';
+    else str << "): " << LGS_UNKNOWN_TYPE;
     return str.str();
 }
 
@@ -106,23 +97,30 @@ bool LgsFuncType::equals(LgsType* other) {
     return true;
 }
 
-LgsType* LgsFuncType::replaceGenerics(std::unordered_map<std::string, LgsType*>& replacements) {
+bool LgsFuncType::hasGenerics() {
+    if (rt->hasGenerics()) return true;
+    for (const auto& param : params) if (param.type->hasGenerics()) return true;
+    return false;
+}
+
+void LgsFuncType::replaceGenerics(std::unordered_map<std::string, LgsType*>& replacements) {
     const auto r = replacements.find(getName());
-    if (r == replacements.end()) return this;
+    if (r == replacements.end()) return;
     const auto otherFuncType = r->second->asFuncType();
-    const auto rtName = rt->getName();
-    if (replacements.contains(rtName)) {
-        assert(replacements[rtName] == nullptr);
-        replacements[rtName] = otherFuncType->rt;
-    }
     for (size_t i = 0; i < params.size(); ++i) {
         const auto paramName = params[i].type->getName();
-        if (replacements.contains(paramName)) {
-            assert(replacements[paramName] == nullptr);
+        if (!replacements.contains(paramName)) continue;
+        if (!replacements[paramName]) {
             replacements[paramName] = otherFuncType->params[i].type;
+            assert(!replacements[paramName]->hasGenerics());
         }
+        params[i].type = replacements[paramName];
     }
-    return r->second;
+    const auto rtName = rt->getName();
+    if (replacements.contains(rtName)) {
+        replacements[rtName] = otherFuncType->rt;
+        assert(!replacements[rtName]->hasGenerics());
+    }
 }
 
 LgsType* LgsFuncType::applyBinOp(LgsType* rightType, LgsBinOp& op) {

@@ -8,6 +8,7 @@ public:
     LgsUInt() {
         isUnsinged = true;
         isInt = true;
+        isPrimitive = true;
         rttKind = RTT_UINT;
     }
     size_t sizeBytes() override;

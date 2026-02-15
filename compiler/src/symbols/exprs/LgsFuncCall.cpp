@@ -106,15 +106,12 @@ std::string LgsFuncCall::asText() {
     for (size_t i = 0; i < args.size(); ++i) {
         const auto arg = args[i];
         if (arg.isSelf) continue;
-        str << (arg.expr->type ? arg.expr->type->pname() : LGS_UNKNOWN_TYPE);
+        str << arg.expr->asText();
         if (i == args.size() - 1) continue;
         str << ", ";
     }
-    if (type && !type->isUnknown()) {
-        str << "): " << type->pname();
-    } else {
-        str << ')';
-    }
+    if (!type || type->isUnknown()) str << ')';
+    else  str << "): " << type->pname();
     return str.str();
 }
 

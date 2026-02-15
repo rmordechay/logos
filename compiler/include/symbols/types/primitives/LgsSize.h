@@ -7,6 +7,7 @@ public:
 
     LgsSize() {
         isInt = true;
+        isPrimitive = true;
         rttKind = RTT_SIZE;
     }
     size_t sizeBytes() override;

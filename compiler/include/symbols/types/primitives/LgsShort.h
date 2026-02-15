@@ -7,6 +7,7 @@ public:
 
     LgsShort() {
         isInt = true;
+        isPrimitive = true;
         rttKind = RTT_SHORT;
     }
     size_t sizeBytes() override;

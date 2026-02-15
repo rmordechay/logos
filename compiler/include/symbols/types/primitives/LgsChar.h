@@ -6,6 +6,7 @@ public:
     static constexpr auto name = "Char";
 
     LgsChar() {
+        isPrimitive = true;
         rttKind = RTT_CHAR;
     }
     size_t sizeBytes() override;

@@ -33,7 +33,7 @@ LgsFunc* LgsIterable::getMethod(const std::string& methodName) {
         return func;
     }
     if (methodName == MAP_FUNC) {
-        // map<T, U>(arr: T[], cb: (e: T): U): U[]
+        // map<T, U>(arr: T[], cb: (T): U): U[]
         const auto U = new LgsGenericType("T");
         const auto T = new LgsGenericType("U");
         const auto callback = new LgsFuncType("cb", U, {LgsParam(T)});

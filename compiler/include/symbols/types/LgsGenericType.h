@@ -14,6 +14,6 @@ public:
     bool canCastTo(LgsType* other) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     std::string fmtStr() const override;
-    LgsType* replaceGenerics(std::unordered_map<std::string, LgsType*>& replacements) override;
+    void replaceGenerics(std::unordered_map<std::string, LgsType*>& replacements) override;
     DIType* getDebugType(LgsCodeGen& cg) override;
 };

@@ -4,8 +4,10 @@
 class LgsDouble final : public LgsType {
 public:
     static constexpr auto name = "Double";
+
     LgsDouble() {
         isFloat = true;
+        isPrimitive = true;
         rttKind = RTT_DOUBLE;
     }
     Type* getIRType(LgsCodeGen& cg) override;

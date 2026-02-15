@@ -12,6 +12,7 @@ public:
     static constexpr auto name = "Any";
 
     LgsAny() {
+        isPrimitive = true;
         rttKind = RTT_ANY;
     }
     size_t sizeBytes() override;

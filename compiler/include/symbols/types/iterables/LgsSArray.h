@@ -26,7 +26,6 @@ public:
     bool canCastTo(LgsType* other) override;
     bool equals(LgsType* other) override;
     LgsExpr* getZeroValue() override;
-    LgsType* replaceGenerics(std::unordered_map<std::string, LgsType*>& replacements) override;
     Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee) override;
     Type* getIRType(LgsCodeGen& cg) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;

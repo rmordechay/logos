@@ -1597,22 +1597,22 @@ LgsFunc* LgsSema::cloneGenericFunc(const LgsFuncCall* funcCall, const LgsFunc* f
     // Params
     for (size_t i = 0; i < funcCall->args.size(); ++i) {
         if (i >= newFunc->funcType->params.size()) break;
-        auto& newParam = newFunc->funcType->params[i];
+        const auto& newParam = newFunc->funcType->params[i];
         const auto arg = funcCall->args[i].expr;
         if (!newParam.type->canCastTo(arg->type)) {
             addError(E10116, newParam.location);
             return newFunc;
         }
         replacements[newParam.type->getName()] = arg->type;
-        newParam.type = newParam.type->replaceGenerics(replacements);
-        if (!newParam.type) {
+        newParam.type->replaceGenerics(replacements);
+        if (newParam.type->asGenericType()) {
             addError(E10116, newParam.location);
             return newFunc;
         }
     }
 
-    newFunc->funcType->rt = newFunc->funcType->rt->replaceGenerics(replacements);
-    if (!newFunc->funcType->rt) {
+    newFunc->funcType->rt->replaceGenerics(replacements);
+    if (newFunc->funcType->rt->asGenericType()) {
         addError(E10116, funcCall->location);
         return newFunc;
     }
@@ -1699,8 +1699,6 @@ void LgsSema::addError(const LgsBaseMsg& lgsErr, const LgsLocation& location, co
 }
 
 void LgsSema::addRTType(LgsType* type) const {
-    if (!type || !errHandler.successful) return;
-    if (type->isExternal || type->isVoid()) return;
     if (const auto nullable = type->asNullable()) {
         if (!nullable->baseType) return;
     }
@@ -1715,10 +1713,6 @@ void LgsSema::addRTType(LgsType* type) const {
 }
 
 void LgsSema::addGenerics(LgsType* type) const {
-    if (!type || type->isExternal || !errHandler.successful) return;
-    if (type->asStr() || type->asChar() || type->isScalar() || type->asFieldType()) return;
-    if (type->isAny() || type->isUnknown() || type->isVoid()) return;
-    if (type->asFuncType() || type->asVec() || type->asNullable()) return;
     if (const auto dArr = type->asDArray()) {
         if (const auto inner = dArr->baseType->asDArray()) {
             addRuntimeInfo(inner);
@@ -1731,6 +1725,11 @@ void LgsSema::addGenerics(LgsType* type) const {
 }
 
 void LgsSema::addRuntimeInfo(LgsType* type) const {
+    if (!type || type->isUnknown() || !errHandler.successful ||
+        type->isExternal || type->isPrimitive ||
+        type->isAny() || type->asStr() || type->asFuncType() ||
+        type->asVec() || type->asNullable() || type->asFieldType()) return;
+    assert(!type->hasGenerics());
     addGenerics(type);
     addRTType(type);
 }

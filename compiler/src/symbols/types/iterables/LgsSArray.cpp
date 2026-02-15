@@ -55,10 +55,6 @@ LgsExpr* LgsSArray::getZeroValue() {
     return new LgsArrayExpr(this);
 }
 
-LgsType* LgsSArray::replaceGenerics(std::unordered_map<std::string, LgsType*>& replacements) {
-    assert(0);
-}
-
 Value* LgsSArray::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
     if (pointee) return pointee;
     return cg.builder.CreateAlloca(getIRType(cg));
