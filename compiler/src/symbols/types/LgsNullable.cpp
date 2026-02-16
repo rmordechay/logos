@@ -109,6 +109,10 @@ void LgsNullable::setIRFields(LgsCodeGen& cg, Value* ptr, Value* value, Value* i
     cg.storeStructField(ty, ptr, LgsNullableExprIndices::isSet, isSet);
 }
 
+Value* LgsNullable::loadValue(LgsCodeGen& cg, Value* ptr) {
+    return cg.loadStructField(getIRType(cg), ptr, LgsNullableExprIndices::value, baseType->getIRType(cg));
+}
+
 Value* LgsNullable::loadIsSet(LgsCodeGen& cg, Value* ptr) {
     return cg.loadStructField(getIRType(cg), ptr, LgsNullableExprIndices::isSet, cg.i1Ty());
 }

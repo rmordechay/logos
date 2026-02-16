@@ -1,11 +1,6 @@
 #include "exprs/LgsNullableExpr.h"
 #include "codegen/LgsCodeGen.h"
 
-Value* LgsNullableExpr::loadIR(LgsCodeGen& cg) {
-    if (isNull) return IRValue;
-    return cg.load(type->getIRTypeOrPtr(cg), IRValue);
-}
-
 void LgsNullableExpr::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }

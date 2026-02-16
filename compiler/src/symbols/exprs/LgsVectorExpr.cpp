@@ -6,10 +6,6 @@ void LgsVectorExpr::setType(LgsType* newType) {
     type = vecType;
 }
 
-Value* LgsVectorExpr::loadIR(LgsCodeGen& cg) {
-    return cg.load(type->getIRType(cg), IRValue);
-}
-
 void LgsVectorExpr::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }

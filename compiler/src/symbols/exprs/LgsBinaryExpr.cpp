@@ -1,9 +1,5 @@
 #include "exprs/LgsBinaryExpr.h"
 
-Value* LgsBinaryExpr::loadIR(LgsCodeGen& cg) {
-    return IRValue;
-}
-
 void LgsBinaryExpr::setDebugValue(LgsCodeGen& cg) {
     setDebugLoc(cg);
 }

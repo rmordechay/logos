@@ -137,11 +137,7 @@ Value* LgsDArray::getIRElement(LgsCodeGen& cg, Value* iterable, Value* index) {
     const auto dataFieldPtr = cg.builder.CreateStructGEP(getIRType(cg), iterable, LgsDArrExprIndices::data);
     const auto offset = cg.builder.CreateMul(cg.toSize(index), baseSize);
     const auto dataField = cg.loadPtr(dataFieldPtr);
-    auto ptr = cg.builder.CreateInBoundsPtrAdd(dataField, offset);
-    if (baseType->passByRef) {
-        ptr = cg.loadPtr(ptr);
-    }
-    return ptr;
+    return cg.builder.CreateInBoundsPtrAdd(dataField, offset);
 }
 
 void LgsDArray::addIRElement(LgsCodeGen& cg, Value* iterable, Value* index, Value* value) {
@@ -159,7 +155,7 @@ Value* LgsDArray::hashValue(LgsCodeGen& cg, Value* value) {
 Function* LgsDArray::getAddFunc(LgsCodeGen& cg) {
     const auto funcName = LGS_PREFIX + name + baseType->getBaseName() + "_" + ADD_FUNC;
     if (const auto func = cg.IRModule->getFunction(funcName)) return func;
-    const auto ft = cg.getFT(cg.voidTy(), {cg.ptrTy(), baseType->getIRTypeOrPtr(cg)});
+    const auto ft = cg.getFT(cg.voidTy(), {cg.ptrTy(), baseType->getTypeOrPtr(cg)});
     if (cg.mode == CG_MODE_SRC_CODE) return cg.getFunc(funcName, ft);
 
     // Prologue
@@ -213,7 +209,7 @@ Function* LgsDArray::getAddFunc(LgsCodeGen& cg) {
 Function* LgsDArray::getContainsFunc(LgsCodeGen& cg) {
     const auto funcName = LGS_PREFIX + name + baseType->getBaseName() + "_" + CONTAINS_FUNC;
     if (const auto func = cg.IRModule->getFunction(funcName)) return func;
-    const auto ft = cg.getFT(cg.i1Ty(), {cg.ptrTy(), baseType->getIRTypeOrPtr(cg)});
+    const auto ft = cg.getFT(cg.i1Ty(), {cg.ptrTy(), baseType->getTypeOrPtr(cg)});
     if (cg.mode == CG_MODE_SRC_CODE) return cg.getFunc(funcName, ft);
 
     // Prologue
@@ -228,7 +224,8 @@ Function* LgsDArray::getContainsFunc(LgsCodeGen& cg) {
         LgsIntConst size(&LGS_SIZE, 0);
         size.IRValue = iValue;
         const auto elementPtr = getIRElement(cg, arrIR, size.IRValue);
-        const auto elementsAreEqual = eqIR(cg, value, cg.load(baseType->getIRTypeOrPtr(cg), elementPtr), baseType);
+        const auto element = cg.load(baseType->getTypeOrPtr(cg), elementPtr);
+        const auto elementsAreEqual = eqIR(cg, value, element, baseType);
         cg.ifStmt(elementsAreEqual, [&cg] {cg.builder.CreateRet(cg.true_());});
     });
 

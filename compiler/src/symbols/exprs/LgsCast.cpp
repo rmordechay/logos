@@ -2,10 +2,6 @@
 #include "LgsType.h"
 #include "LgsUtils.h"
 
-Value* LgsCast::loadIR(LgsCodeGen& cg) {
-    return value->loadIR(cg);
-}
-
 std::string LgsCast::asText() {
     return fromValue->asText() + "->" + toType->pname();
 }

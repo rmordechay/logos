@@ -7,7 +7,7 @@
 #include "exprs/LgsVectorExpr.h"
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
-#include "../../../include/symbols/types/primitives/LgsAny.h"
+#include "types/primitives/LgsAny.h"
 #include "types/LgsCPtr.h"
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
@@ -127,7 +127,7 @@ bool LgsType::hasRecursiveTypes() const {
     return check(check, this);
 }
 
-Type* LgsType::getIRTypeOrPtr(LgsCodeGen& cg) {
+Type* LgsType::getTypeOrPtr(LgsCodeGen& cg) {
     return passByRef ? cg.ptrTy() : getIRType(cg);
 }
 
@@ -274,10 +274,12 @@ Value* eqIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
         return exprEqNull(cg, left, type);
     }
     if (type->isInt || type->asChar()) {
-        return cg.builder.CreateICmpEQ(left, right);
+        const auto [l, r] = loadNumberPair(cg, left, right, type);
+        return cg.builder.CreateICmpEQ(l, r);
     }
     if (type->isFloat) {
-        return cg.builder.CreateFCmpOEQ(left, right);
+        const auto [l, r] = loadNumberPair(cg, left, right, type);
+        return cg.builder.CreateFCmpOEQ(l, r);
     }
     if (const auto str = type->asStr()) {
         return cg.strsEqual(str->loadRTData(cg, left), str->loadRTData(cg, right));
@@ -301,7 +303,7 @@ Value* neIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
     return cg.builder.CreateNot(eqIR(cg, left, right, type));
 }
 
-Value* ltIR(LgsCodeGen& cg, Value* left, Value* right, const LgsType* type) {
+Value* ltIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
     auto [l, r] = loadNumberPair(cg, left, right, type);
     if (type->isUnsinged) return cg.builder.CreateICmpULT(l, r);
     if (type->isInt) return cg.builder.CreateICmpSLT(l, r);
@@ -309,7 +311,7 @@ Value* ltIR(LgsCodeGen& cg, Value* left, Value* right, const LgsType* type) {
     assert(0);
 }
 
-Value* gtIR(LgsCodeGen& cg, Value* left, Value* right, const LgsType* type) {
+Value* gtIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
     auto [l, r] = loadNumberPair(cg, left, right, type);
     if (type->isUnsinged) return cg.builder.CreateICmpUGT(l, r);
     if (type->isInt) return cg.builder.CreateICmpSGT(l, r);
@@ -317,7 +319,7 @@ Value* gtIR(LgsCodeGen& cg, Value* left, Value* right, const LgsType* type) {
     assert(0);
 }
 
-Value* geIR(LgsCodeGen& cg, Value* left, Value* right, const LgsType* type) {
+Value* geIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
     auto [l, r] = loadNumberPair(cg, left, right, type);
     if (type->isUnsinged) return cg.builder.CreateICmpUGE(l, r);
     if (type->isInt) return cg.builder.CreateICmpSGE(l, r);
@@ -325,7 +327,7 @@ Value* geIR(LgsCodeGen& cg, Value* left, Value* right, const LgsType* type) {
     assert(0);
 }
 
-Value* leIR(LgsCodeGen& cg, Value* left, Value* right, const LgsType* type) {
+Value* leIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
     auto [l, r] = loadNumberPair(cg, left, right, type);
     if (type->isUnsinged) return cg.builder.CreateICmpULE(l, r);
     if (type->isInt) return cg.builder.CreateICmpSLE(l, r);
@@ -423,22 +425,15 @@ Value* loadAsInt(LgsCodeGen& cg, Value* v, Type* intType) {
 
 Value* loadAsFloat(LgsCodeGen& cg, Value* v, Type* floatType) {
     const auto ty = v->getType();
-    if (ty->isPointerTy()) v = cg.load(floatType, v);
+    if (ty->isPointerTy()) return cg.load(floatType, v);
     if (ty->isFloatingPointTy()) return cg.builder.CreateFPExt(v, floatType);
     if (ty->isIntegerTy()) return cg.builder.CreateSIToFP(v, floatType);
     assert(0);
 }
 
-std::pair<Value*, Value*> loadNumberPair(LgsCodeGen& cg, Value* left, Value* right, const LgsType* type) {
-    const auto biggest = getBiggestIntType({left->getType(), right->getType()});
-    if (type->isInt) {
-        left = loadAsInt(cg, left, biggest);
-        right = loadAsInt(cg, right, biggest);
-    } else if (type->isFloat) {
-        left = loadAsFloat(cg, left, biggest);
-        right = loadAsFloat(cg, right, biggest);
-    } else {
-        assert(0);
-    }
-    return {left, right};
+std::pair<Value*, Value*> loadNumberPair(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
+    const auto ty = type->getIRType(cg);
+    if (type->isInt) return {loadAsInt(cg, left, ty), loadAsInt(cg, right, ty)};
+    if (type->isFloat) return {loadAsFloat(cg, left, ty), loadAsFloat(cg, right, ty)};
+    assert(0);
 }

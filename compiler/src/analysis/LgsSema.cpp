@@ -954,26 +954,31 @@ void LgsSema::visitVariable(LgsVariable* variable) {
     switch (symbol->symbolType) {
     case VAR_DEC: {
         variable->ref.varDec = symbol->varDec;
+        variable->isMutable = symbol->varDec->isMutable;
         variable->setType(symbol->varDec->type);
         break;
     }
     case PARAM: {
         variable->ref.param = symbol->param;
+        variable->isMutable = false;
         variable->setType(symbol->param->type);
         break;
     }
     case ENUM: {
         variable->ref.enum_ = symbol->enum_;
+        variable->isMutable = false;
         variable->setType(symbol->enum_);
         break;
     }
     case FUNC: {
         variable->ref.func = symbol->func;
+        variable->isMutable = false;
         variable->setType(symbol->func->funcType);
         break;
     }
     case OBJECT: {
         variable->ref.object = symbol->object;
+        variable->isMutable = false;
         variable->setType(symbol->object);
         break;
     }
@@ -1281,6 +1286,9 @@ void LgsSema::visitPostfixExpr(LgsPostfixExpr* postfixExpr) {
     const auto type = baseExpr->type;
     if (!type->isScalar()) {
         return addError(E10050, postfixExpr->location, {type->pname()});
+    }
+    if (baseExpr->asVariable() && !baseExpr->isMutable) {
+        return addError(E10051, postfixExpr->location, {baseExpr->asText()});
     }
     postfixExpr->setType(type);
 }

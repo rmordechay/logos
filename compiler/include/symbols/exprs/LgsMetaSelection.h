@@ -7,7 +7,6 @@ public:
     LgsExpr* child;
 
     LgsMetaSelection(LgsExpr* baseExpr, LgsExpr* expr): baseExpr(baseExpr), child(expr) {}
-    Value* loadIR(LgsCodeGen& cg) override;
     void hashNode(size_t& oldHash) override;
     void setDebugValue(LgsCodeGen& cg) override;
     std::string asText() override;

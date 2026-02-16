@@ -656,6 +656,21 @@ TEST(ErrorsTest, E10051A) {
     expectErrors(app, E10051, 1);
 }
 
+TEST(ErrorsTest, E10051B) {
+    LgsApp app;
+    const auto code = R"(
+    main() {
+        a = 1
+        a++
+        a--
+    }
+    )";
+    app.loadSrcFile(code, LGS_MAIN_FILE);
+    ASSERT_TRUE(app.errHandler.successful);
+    app.analyse();
+    expectErrors(app, E10051, 2);
+}
+
 TEST(ErrorsTest, E10054A) {
     LgsApp app;
     const auto code = R"(
@@ -757,7 +772,7 @@ TEST(ErrorsTest, E10066A) {
     LgsApp app;
     const auto code = R"(
     main() {
-        a = 0
+        mut a = 0
         while a {
             a++
         }

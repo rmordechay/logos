@@ -234,7 +234,7 @@ void LgsCgFile::visitRangeLoop(LgsRangeLoop* loop) {
     // Body
     cg.startBlock(loop->IRBodyBlock);
     if (!loop->loopVars.empty()) {
-        loop->loopVars[0]->IRValue = loop->loadIndex(cg);
+        loop->loopVars[0]->IRValue = loop->iPtr;
     }
 }
 
@@ -293,14 +293,15 @@ void LgsCgFile::visitWhileLoop(const LgsWhileLoop* loop) {
 }
 
 void LgsCgFile::visitVarDec(LgsVarDec* varDec) {
-    if (varDec->isMutable) {
-        varDec->IRValue = cg.builder.CreateAlloca(varDec->type->getIRTypeOrPtr(cg));
+    if (varDec->type->asFuncType()) {
+        visitExpr(varDec->expr);
+        varDec->IRValue = varDec->expr->IRValue;
+    } else {
+        const auto allocTy = varDec->type->isHeap ? cg.ptrTy() : varDec->type->getIRType(cg);
+        varDec->IRValue = cg.builder.CreateAlloca(allocTy);
         varDec->expr->pointee = varDec->IRValue;
         visitExpr(varDec->expr);
         cg.store(varDec->expr->IRValue, varDec->IRValue);
-    } else {
-        visitExpr(varDec->expr);
-        varDec->IRValue = varDec->expr->IRValue;
     }
     varDec->IRValue->setName(varDec->name);
     assert(varDec->IRValue);
@@ -485,12 +486,8 @@ void LgsCgFile::visitReturnStmt(LgsReturn* returnStmt) {
         }
         visitExpr(returnStmt->expr);
         returnStmt->expr->IRValue = returnStmt->expr ? returnStmt->expr->IRValue : nullptr;
-        if (currentFunc->returnStmts.empty()) {
-            cg.builder.CreateRet(returnStmt->expr->IRValue);
-        } else {
-            returnStmt->parentBlock = cg.builder.GetInsertBlock();
-            cg.builder.CreateBr(currentFunc->epilogue);
-        }
+        returnStmt->parentBlock = cg.builder.GetInsertBlock();
+        cg.builder.CreateBr(currentFunc->epilogue);
     }
 }
 
@@ -680,7 +677,7 @@ void LgsCgFile::visitStrConst(LgsStrConst* strConst) {
     auto formatted = strConst->formatedStr;
     std::vector<Value*> values;
     for (const auto part : strConst->parts) {
-        auto partIR = part->loadIR(cg);
+        auto partIR = part->IRValue;
         values.push_back(partIR);
         const auto pos = formatted.find(LGS_STR_FMT_PLACEHOLDER);
         if (pos != std::string::npos) {
@@ -716,10 +713,8 @@ void LgsCgFile::visitPrefixExpr(LgsPrefixExpr* prefixExpr) {
 }
 
 void LgsCgFile::visitPostfixExpr(LgsPostfixExpr* postfixExpr) {
-    const auto baseExpr = postfixExpr->baseExpr;
-    visitExpr(baseExpr);
-    postfixExpr->IRValue = postfixExpr->baseExpr->loadIR(cg);
-    assert(baseExpr->IRValue->getType()->isPointerTy());
+    visitExpr(postfixExpr->baseExpr);
+    postfixExpr->IRValue = postfixExpr->baseExpr->IRValue;
     const auto baseExprType = postfixExpr->baseExpr->type->getIRType(cg);
     const auto one = ConstantInt::get(baseExprType, 1, true);
     Value* newValue = nullptr;
@@ -742,8 +737,8 @@ void LgsCgFile::visitVariable(LgsVariable* variable) {
         const auto varDec = variable->ref.varDec;
         assert(variable->ref.varDec->IRValue);
         variable->IRValue = varDec->IRValue;
-        if (varDec->isMutable && varDec->type->passByRef) {
-            variable->IRValue = cg.load(varDec->type->getIRTypeOrPtr(cg), variable->IRValue);
+        if (!variable->type->asSArray() && !variable->type->asNullable()) {
+            variable->IRValue = variable->loadIRPtr(cg);
         }
         break;
     }
@@ -794,7 +789,9 @@ void LgsCgFile::visitIterIndex(LgsIterIndex* iterIndex, const bool assign) {
     } else {
         const auto baseExprValue = baseExpr->pointee ? baseExpr->pointee : baseExpr->IRValue;
         iterIndex->IRValue = iterable->getIRElement(cg, baseExprValue, from->IRValue);
-        if (!iterable->isStatic) iterIndex->IRValue = iterIndex->loadIR(cg);
+        if (!iterable->isStatic) {
+            iterIndex->IRValue = iterIndex->loadIRPtr(cg);
+        }
     }
 }
 
@@ -839,7 +836,7 @@ void LgsCgFile::visitNullableExpr(LgsNullableExpr* expr) {
             expr->IRValue = expr->baseExpr->IRValue;
         } else {
             expr->IRValue = nullable->getIRZeroValue(cg, expr->pointee);
-            nullable->setIRFields(cg, expr->IRValue, expr->baseExpr->loadIR(cg), cg.true_());
+            nullable->setIRFields(cg, expr->IRValue, expr->baseExpr->IRValue, cg.true_());
         }
     }
 }
@@ -1144,14 +1141,14 @@ void LgsCgFile::createEpilogue(const LgsFunc* func) {
     // With return
     assert(!func->returnStmts.empty());
     cg.branchAndStartBlock(func->epilogue);
-    const auto phi = cg.builder.CreatePHI(ft->rt->getIRTypeOrPtr(cg), func->returnStmts.size());
-    for (const auto returnStmt : func->returnStmts) {
-        phi->addIncoming(returnStmt->expr->IRValue, returnStmt->parentBlock);
-    }
     if (ft->swapReturn) {
         cg.callPopStack();
         cg.builder.CreateRetVoid();
     } else {
+        const auto phi = cg.builder.CreatePHI(ft->rt->getTypeOrPtr(cg), func->returnStmts.size());
+        for (const auto returnStmt : func->returnStmts) {
+            phi->addIncoming(returnStmt->expr->IRValue, returnStmt->parentBlock);
+        }
         const auto toLevel = cg.builder.CreateSub(cg.getCurrentLevel(), cg.usize(1));
         const auto v = ft->rt->isHeap ? cg.moveValue(ft->rt->getBaseName(), phi, toLevel) : phi;
         cg.callPopStack();
@@ -1191,7 +1188,7 @@ Value* LgsCgFile::getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) {
     return ctx;
 }
 
-Function* LgsCgFile::getThunkFunc(LgsFuncCall* fc, Type* ctxTy) {
+Function* LgsCgFile::getThunkFunc(const LgsFuncCall* fc, Type* ctxTy) {
     const auto funcName = fc->name + "Thunk";
     auto thunkFunc = cg.IRModule->getFunction(funcName);
     if (thunkFunc) return thunkFunc;
@@ -1204,8 +1201,8 @@ Function* LgsCgFile::getThunkFunc(LgsFuncCall* fc, Type* ctxTy) {
     cg.builder.SetInsertPoint(entryBlock);
     for (size_t i = 0; i < fc->args.size(); i++) {
         const auto expr = fc->args[i].expr;
-        const auto ptr = cg.builder.CreateStructGEP(ctxTy, thunkFunc->arg_begin(), i);
-        expr->IRValue = cg.load(expr->type->getIRTypeOrPtr(cg), ptr);
+        expr->IRValue = cg.builder.CreateStructGEP(ctxTy, thunkFunc->arg_begin(), i);
+        expr->IRValue = expr->loadIRPtr(cg);
     }
 
     fc->func->call(cg, fc->args);

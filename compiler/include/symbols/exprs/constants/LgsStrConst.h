@@ -12,7 +12,7 @@ public:
         str->isStatic = true;
         type = str;
     }
-    Value* loadIR(LgsCodeGen& cg) override;
+
     std::string asText() override;
     void hashNode(size_t& oldHash) override;
     bool equals(LgsExpr* other) override;

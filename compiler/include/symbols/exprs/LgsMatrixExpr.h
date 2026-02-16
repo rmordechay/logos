@@ -12,7 +12,6 @@ public:
         setType(matType);
     }
     std::string asText() override;
-    Value* loadIR(LgsCodeGen& cg) override;
     void setDebugValue(LgsCodeGen& cg) override;
     void hashNode(size_t& oldHash) override;
     bool equals(LgsExpr* other) override;

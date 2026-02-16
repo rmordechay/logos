@@ -6,7 +6,6 @@ public:
     std::vector<LgsExpr*> exprs;
 
     explicit LgsSelection(const std::vector<LgsExpr*>& exprs) : exprs(exprs) {}
-    Value* loadIR(LgsCodeGen& cg) override;
     LgsFuncCall* asMethodCall() const;
     std::string asText() override;
     bool equals(LgsExpr* other) override;

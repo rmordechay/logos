@@ -10,7 +10,7 @@ public:
     LgsNullableExpr(): LgsExpr(new LgsNullable()) {
         isNull = true;
     }
-    Value* loadIR(LgsCodeGen& cg) override;
+
     void setDebugValue(LgsCodeGen& cg) override;
     LgsExpr* cast(LgsType* toType, bool explicitly) override;
     std::string asText() override;

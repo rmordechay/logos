@@ -19,7 +19,7 @@ public:
         index.from = from;
         index.to = to;
     }
-    Value* loadIR(LgsCodeGen& cg) override;
+
     Value* getIRRangePtr(LgsCodeGen& cg) const;
     LgsExpr* getBaseExpr() const;
     std::string asText() override;

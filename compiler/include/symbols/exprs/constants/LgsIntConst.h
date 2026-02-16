@@ -10,7 +10,6 @@ public:
     LgsIntConst(LgsType* type, const int64_t value) : LgsExpr(type), value(value) {}
     explicit LgsIntConst(const int64_t value) : LgsExpr(&LGS_INT), value(value) {}
     bool inRange(LgsType* toType) const;
-    Value* loadIR(LgsCodeGen& cg) override;
     LgsExpr* cast(LgsType* toType, bool explicitly) override;
     LgsIntConst* clone() override;
     std::string asText() override;

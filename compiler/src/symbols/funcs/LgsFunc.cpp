@@ -152,10 +152,6 @@ Value* LgsFunc::callExternal(LgsCodeGen& cg, const std::vector<LgsFuncArg>& args
     return callIR(cg, IRArgs);
 }
 
-Value* LgsFunc::loadIR(LgsCodeGen& cg) {
-    return IRValue;
-}
-
 void LgsFunc::replaceGenerics(const std::unordered_map<std::string, LgsType*>& replacements) {
     assert(0);
 }

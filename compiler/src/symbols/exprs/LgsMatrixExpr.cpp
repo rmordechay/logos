@@ -6,10 +6,6 @@ std::string LgsMatrixExpr::asText() {
     assert(0);
 }
 
-Value* LgsMatrixExpr::loadIR(LgsCodeGen& cg) {
-    assert(0);
-}
-
 void LgsMatrixExpr::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }

@@ -33,6 +33,7 @@ public:
     Value* addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
     void setIRFields(LgsCodeGen& cg, Value* ptr, Value* value, Value* isSet);
     Value* loadIsSet(LgsCodeGen& cg, Value* ptr);
+    Value* loadValue(LgsCodeGen& cg, Value* ptr);
     Value* applyNumberBinOp(LgsCodeGen& cg, LgsBinaryExpr* binExpr, const std::function<Value*(LgsBinaryExpr*)>& func);
     Value* applyPtrBinOp(LgsCodeGen& cg, LgsBinaryExpr* binExpr, const std::function<Value*(LgsBinaryExpr*)>& func);
 };

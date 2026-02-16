@@ -16,7 +16,7 @@ public:
     explicit LgsArrayExpr(LgsDArray* arrType) {
         setType(arrType);
     }
-    Value* loadIR(LgsCodeGen& cg) override;
+
     LgsExpr* cast(LgsType* toType, bool explicitly) override;
     void setType(LgsType* newType) override;
     void setDebugValue(LgsCodeGen& cg) override;

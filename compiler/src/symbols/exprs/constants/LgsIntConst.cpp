@@ -4,10 +4,6 @@
 #include "types/primitives/LgsLong.h"
 #include "LgsUtils.h"
 
-Value* LgsIntConst::loadIR(LgsCodeGen& cg) {
-    return IRValue;
-}
-
 LgsExpr* LgsIntConst::cast(LgsType* toType, const bool explicitly) {
     if (!toType || !toType->isScalar()) return this;
     if (!inRange(toType)) return this;

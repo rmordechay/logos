@@ -55,4 +55,3 @@ TEST(CgInterfaceTest, Test2) {
     EXPECT_EQ(lines[0], "From Obj");
     EXPECT_EQ(lines[1], "From Interface");
 }
-

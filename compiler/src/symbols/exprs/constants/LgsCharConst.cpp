@@ -3,10 +3,6 @@
 #include "codegen/LgsCodeGen.h"
 #include "exprs/constants/LgsStrConst.h"
 
-Value* LgsCharConst::loadIR(LgsCodeGen& cg) {
-    return IRValue;
-}
-
 std::string LgsCharConst::asText() {
     return type->pname();
 }

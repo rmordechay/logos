@@ -6,12 +6,6 @@
 #include <sstream>
 #include <llvm/IR/InlineAsm.h>
 
-Value* LgsSelection::loadIR(LgsCodeGen& cg) {
-    if (type->asEnum()) return IRValue;
-    if (!type->passByRef && asMethodCall()) return IRValue;
-    return cg.load(type->getIRTypeOrPtr(cg), IRValue);
-}
-
 LgsFuncCall* LgsSelection::asMethodCall() const {
     return exprs.back()->asFuncCall();
 }

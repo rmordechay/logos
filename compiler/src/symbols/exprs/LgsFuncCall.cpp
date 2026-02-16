@@ -8,10 +8,6 @@
 
 bool argAndParamEqual(const LgsExpr* arg, const LgsParam* param);
 
-Value* LgsFuncCall::loadIR(LgsCodeGen& cg) {
-    return IRValue;
-}
-
 bool LgsFuncCall::equals(LgsFuncType* funcType) const {
     if (args.empty() && funcType->params.empty()) return true;
     if (funcType->isVariadic) return equalsVariadic(funcType);

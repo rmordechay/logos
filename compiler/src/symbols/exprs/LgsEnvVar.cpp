@@ -2,10 +2,6 @@
 
 #include "LgsUtils.h"
 
-Value* LgsEnvVar::loadIR(LgsCodeGen& cg) {
-    return IRValue;
-}
-
 void LgsEnvVar::hashNode(size_t& oldHash) {
     hashNodeString(oldHash, '$' + name);
 }

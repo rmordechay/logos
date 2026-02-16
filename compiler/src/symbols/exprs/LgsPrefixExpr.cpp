@@ -2,10 +2,6 @@
 
 #include "LgsUtils.h"
 
-Value* LgsPrefixExpr::loadIR(LgsCodeGen& cg) {
-    return IRValue;
-}
-
 std::string LgsPrefixExpr::asText() {
     assert(0);
 }

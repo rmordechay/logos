@@ -12,14 +12,13 @@ FunctionType* LgsFuncType::getIRType(LgsCodeGen& cg) {
         const auto param = params[i];
         const auto paramType = param.type;
         if (param.isVariadic) types.emplace_back(cg.sizeTy());
-        types.emplace_back(paramType->getIRTypeOrPtr(cg));
+        types.emplace_back(paramType->getTypeOrPtr(cg));
     }
     if (swapReturn) {
         types.insert(types.begin() + isMethod, cg.ptrTy());
         IRType = cg.getFT(cg.voidTy(), types, this->isVariadic);
     } else {
-        const auto returnType = rt->getIRTypeOrPtr(cg);
-        IRType = cg.getFT(returnType, types, this->isVariadic);
+        IRType = cg.getFT(rt->getTypeOrPtr(cg), types, this->isVariadic);
     }
     return IRType;
 }

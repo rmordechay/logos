@@ -4,10 +4,6 @@
 #include "codegen/LgsCodeGen.h"
 #include "types/LgsNullable.h"
 
-Value* LgsArrayExpr::loadIR(LgsCodeGen& cg) {
-    return IRValue;
-}
-
 LgsExpr* LgsArrayExpr::cast(LgsType* toType, const bool explicitly) {
     if (iterable && iterable->baseType) return this;
     const auto otherIter = toType->asIterable();

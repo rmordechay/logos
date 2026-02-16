@@ -153,8 +153,15 @@ Value* LgsVec::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
 Value* LgsVec::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto lExpr = binExpr->left;
     const auto rExpr = binExpr->right;
-    auto l = lExpr->loadIR(cg);
-    auto r = rExpr->loadIR(cg);
+    auto l = lExpr->IRValue;
+    auto r = rExpr->IRValue;
+    if (l->getType()->isPointerTy()) {
+        l = cg.load(lExpr->type->getIRType(cg), l);
+    }
+    if (r->getType()->isPointerTy()) {
+        r = cg.load(lExpr->type->getIRType(cg), r);
+    }
+    const auto ty = getIRType(cg);
     if (baseType->isInt) {
         if (lExpr->type->isInt) {
             l = cg.builder.CreateVectorSplat(dimVec, cg.toInt(l));
@@ -162,7 +169,7 @@ Value* LgsVec::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
         if (rExpr->type->isInt) {
             r = cg.builder.CreateVectorSplat(dimVec, cg.toInt(r));
         }
-        return cg.allocaAndStore(getIRType(cg), cg.builder.CreateAdd(l, r));
+        return cg.allocaAndStore(ty, cg.builder.CreateAdd(l, r));
     }
     if (lExpr->type->isInt) {
         l = cg.builder.CreateVectorSplat(dimVec, cg.toFloat(l));
@@ -170,14 +177,21 @@ Value* LgsVec::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     if (rExpr->type->isInt) {
         r = cg.builder.CreateVectorSplat(dimVec, cg.toFloat(r));
     }
-    return cg.allocaAndStore(getIRType(cg), cg.builder.CreateFAdd(l, r));
+    return cg.allocaAndStore(ty, cg.builder.CreateFAdd(l, r));
 }
 
 Value* LgsVec::subIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto lExpr = binExpr->left;
     const auto rExpr = binExpr->right;
-    auto l = lExpr->loadIR(cg);
-    auto r = rExpr->loadIR(cg);
+    auto l = lExpr->IRValue;
+    auto r = rExpr->IRValue;
+    if (l->getType()->isPointerTy()) {
+        l = cg.load(lExpr->type->getIRType(cg), l);
+    }
+    if (r->getType()->isPointerTy()) {
+        r = cg.load(lExpr->type->getIRType(cg), r);
+    }
+    const auto ty = getIRType(cg);
     if (baseType->isInt) {
         if (lExpr->type->isInt) {
             l = cg.builder.CreateVectorSplat(dimVec, cg.toInt(l));
@@ -185,7 +199,7 @@ Value* LgsVec::subIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
         if (rExpr->type->isInt) {
             r = cg.builder.CreateVectorSplat(dimVec, cg.toInt(r));
         }
-        return cg.allocaAndStore(getIRType(cg), cg.builder.CreateSub(l, r));
+        return cg.allocaAndStore(ty, cg.builder.CreateSub(l, r));
     }
     if (lExpr->type->isInt) {
         l = cg.builder.CreateVectorSplat(dimVec, cg.toFloat(l));
@@ -193,14 +207,21 @@ Value* LgsVec::subIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     if (rExpr->type->isInt) {
         r = cg.builder.CreateVectorSplat(dimVec, cg.toFloat(r));
     }
-    return cg.allocaAndStore(getIRType(cg), cg.builder.CreateFSub(l, r));
+    return cg.allocaAndStore(ty, cg.builder.CreateFSub(l, r));
 }
 
 Value* LgsVec::mulIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto lExpr = binExpr->left;
     const auto rExpr = binExpr->right;
-    auto l = lExpr->loadIR(cg);
-    auto r = rExpr->loadIR(cg);
+    auto l = lExpr->IRValue;
+    auto r = rExpr->IRValue;
+    if (l->getType()->isPointerTy()) {
+        l = cg.load(lExpr->type->getIRType(cg), l);
+    }
+    if (r->getType()->isPointerTy()) {
+        r = cg.load(lExpr->type->getIRType(cg), r);
+    }
+    const auto ty = getIRType(cg);
     if (baseType->isInt) {
         if (lExpr->type->isInt) {
             l = cg.builder.CreateVectorSplat(dimVec, cg.toInt(l));
@@ -208,7 +229,7 @@ Value* LgsVec::mulIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
         if (rExpr->type->isInt) {
             r = cg.builder.CreateVectorSplat(dimVec, cg.toInt(r));
         }
-        return cg.allocaAndStore(getIRType(cg), cg.builder.CreateMul(l, cg.toInt(r)));
+        return cg.allocaAndStore(ty, cg.builder.CreateMul(l, cg.toInt(r)));
     }
     if (lExpr->type->isInt) {
         l = cg.builder.CreateVectorSplat(dimVec, cg.toFloat(l));
@@ -216,14 +237,21 @@ Value* LgsVec::mulIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     if (rExpr->type->isInt) {
         r = cg.builder.CreateVectorSplat(dimVec, cg.toFloat(r));
     }
-    return cg.allocaAndStore(getIRType(cg), cg.builder.CreateFMul(l, r));
+    return cg.allocaAndStore(ty, cg.builder.CreateFMul(l, r));
 }
 
 Value* LgsVec::divIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto lExpr = binExpr->left;
     const auto rExpr = binExpr->right;
-    auto l = lExpr->loadIR(cg);
-    auto r = rExpr->loadIR(cg);
+    auto l = lExpr->IRValue;
+    auto r = rExpr->IRValue;
+    if (l->getType()->isPointerTy()) {
+        l = cg.load(lExpr->type->getIRType(cg), l);
+    }
+    if (r->getType()->isPointerTy()) {
+        r = cg.load(lExpr->type->getIRType(cg), r);
+    }
+    const auto ty = getIRType(cg);
     if (baseType->isInt) {
         if (lExpr->type->isInt) {
             l = cg.builder.CreateVectorSplat(dimVec, cg.toInt(l));
@@ -231,7 +259,7 @@ Value* LgsVec::divIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
         if (rExpr->type->isInt) {
             r = cg.builder.CreateVectorSplat(dimVec, cg.toInt(r));
         }
-        return cg.allocaAndStore(getIRType(cg), cg.builder.CreateSDiv(l, r));
+        return cg.allocaAndStore(ty, cg.builder.CreateSDiv(l, r));
     }
     if (lExpr->type->isInt) {
         l = cg.builder.CreateVectorSplat(dimVec, cg.toFloat(l));
@@ -239,7 +267,7 @@ Value* LgsVec::divIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     if (rExpr->type->isInt) {
         r = cg.builder.CreateVectorSplat(dimVec, cg.toFloat(r));
     }
-    return cg.allocaAndStore(getIRType(cg), cg.builder.CreateFDiv(l, r));
+    return cg.allocaAndStore(ty, cg.builder.CreateFDiv(l, r));
 }
 
 Value* LgsVec::modIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
@@ -326,7 +354,7 @@ Value* LgsVec::crossIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
     const auto crossFunc = getCrossProductFunc(cg, left->type->asVec());
-    return cg.builder.CreateCall(crossFunc, {left->loadIR(cg), right->loadIR(cg)});
+    return cg.builder.CreateCall(crossFunc, {left->IRValue, right->IRValue});
 }
 
 size_t LgsVec::getSwizzleSet(const char c) {

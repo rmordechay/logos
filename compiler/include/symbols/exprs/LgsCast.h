@@ -11,7 +11,6 @@ public:
     LgsExpr* value = nullptr;
 
     LgsCast(LgsExpr* fromValue, LgsType* toType) : fromValue(fromValue), toType(toType) {}
-    Value* loadIR(LgsCodeGen& cg) override;
     std::string asText() override;
     void setDebugValue(LgsCodeGen& cg) override;
     ~LgsCast() override;

@@ -48,7 +48,6 @@ public:
     Value* callIR(LgsCodeGen& cg, const std::vector<Value*>& args = {});
     Value* callWithVariadic(LgsCodeGen& cg, const std::vector<LgsFuncArg>& args);
     Value* callExternal(LgsCodeGen& cg, const std::vector<LgsFuncArg>& args);
-    Value* loadIR(LgsCodeGen& cg) override;
     void replaceGenerics(const std::unordered_map<std::string, LgsType*>& replacements);
     void initFunc(const std::string& name, LgsType* rt, const std::vector<LgsParam>& params, uint32_t ops);
     void setDebugValue(LgsCodeGen& cg) override;

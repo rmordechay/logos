@@ -10,10 +10,6 @@ std::string LgsInstance::asText() {
     return name + "{}";
 }
 
-Value* LgsInstance::loadIR(LgsCodeGen& cg) {
-    return IRValue;
-}
-
 void LgsInstance::setType(LgsType* newObj) {
     obj = newObj->asObject();
     type = newObj;

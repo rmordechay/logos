@@ -14,7 +14,6 @@ public:
     LgsPrefixOperator op;
 
     LgsPrefixExpr(LgsExpr* baseExpr, const LgsPrefixOperator op) : expr(baseExpr), op(op) {}
-    Value* loadIR(LgsCodeGen& cg) override;
     std::string asText() override;
     void setDebugValue(LgsCodeGen& cg) override;
     ~LgsPrefixExpr() override;

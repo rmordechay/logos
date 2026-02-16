@@ -3,6 +3,7 @@
 #include "exprs/LgsFuncCall.h"
 #include "types/LgsEnum.h"
 #include "types/LgsFieldType.h"
+#include "types/LgsNullable.h"
 #include "types/iterables/LgsVec.h"
 #include "types/primitives/LgsBool.h"
 
@@ -11,11 +12,11 @@ Value* LgsPrint::call(LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) {
     const auto type = arg->type;
     if (type->isFloat) {
         const auto fmt = cg.getString(type->fmtStr() + "\n");
-        return cg.callPrintf({fmt, cg.builder.CreateFPExt(arg->loadIR(cg), cg.doubleTy())});
+        return cg.callPrintf({fmt, cg.builder.CreateFPExt(arg->IRValue, cg.doubleTy())});
     }
     if (type->asBool()) {
         const auto fmt = cg.getString(type->fmtStr() + "\n");
-        const auto v = cg.builder.CreateSelect(arg->loadIR(cg), cg.getString(LgsBool::trueLiteral), cg.getString(LgsBool::falseLiteral));
+        const auto v = cg.builder.CreateSelect(arg->IRValue, cg.getString(LgsBool::trueLiteral), cg.getString(LgsBool::falseLiteral));
         return cg.callPrintf({fmt, v});
     }
     if (type->asFieldType()) {
@@ -33,7 +34,7 @@ Value* LgsPrint::call(LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) {
     }
     if (const auto enum_ = type->asEnum()) {
         const auto fmt = cg.getString(type->fmtStr() + "\n");
-        const auto value = enum_->asIRStr(cg, arg->loadIR(cg));
+        const auto value = enum_->asIRStr(cg, arg->IRValue);
         return cg.callPrintf({fmt, value});
     }
     assert(arg->type->rttKind != RTT_UNKNOWN);

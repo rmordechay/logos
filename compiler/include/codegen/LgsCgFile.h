@@ -133,7 +133,7 @@ public:
     void initMainArgs(const LgsMainFunc* mainFunc) const;
     Type* getThunkCtxType(const LgsFuncCall* fc);
     Value* getThunkCtx(const LgsFuncCall* fc, Type* ctxTy);
-    Function* getThunkFunc(LgsFuncCall* fc, Type* ctxTy);
+    Function* getThunkFunc(const LgsFuncCall* fc, Type* ctxTy);
 
     void createVecField(LgsField* field, Value* parent);
     bool checkMock(LgsExpr* expr) const;

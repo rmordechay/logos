@@ -15,7 +15,6 @@ public:
 
     explicit LgsMetaVar(const LgsMetaVarType forType) : LgsMetaVar("", forType) {}
     explicit LgsMetaVar(const std::string& name, const LgsMetaVarType forType) : name(name), varType(forType) {}
-    Value* loadIR(LgsCodeGen& cg) override;
     bool equals(LgsExpr* other) override;
     std::string asText() override;
     void setDebugValue(LgsCodeGen& cg) override;

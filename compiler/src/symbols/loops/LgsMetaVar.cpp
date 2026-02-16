@@ -1,10 +1,6 @@
 #include "loops/LgsMetaVar.h"
 #include "codegen/LgsCodeGen.h"
 
-Value* LgsMetaVar::loadIR(LgsCodeGen& cg) {
-    return IRValue;
-}
-
 bool LgsMetaVar::equals(LgsExpr* other) {
     assert(0);
 }

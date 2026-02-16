@@ -3,10 +3,6 @@
 #include "codegen/LgsCodeGen.h"
 #include "../../../../include/symbols/types/primitives/LgsAny.h"
 
-Value* LgsFloatConst::loadIR(LgsCodeGen& cg) {
-    return IRValue;
-}
-
 std::string LgsFloatConst::asText() {
     return std::to_string(value);
 }

@@ -7,21 +7,6 @@
 #include <codegen/LgsCodeGen.h>
 #include "types/LgsEnum.h"
 
-Value* LgsVariable::loadIR(LgsCodeGen& cg) {
-    if (!IRValue->getType()->isPointerTy()) return IRValue;
-    const auto ty = type->getIRType(cg);
-    switch (ref.symbolType) {
-    case PARAM:
-        return cg.load(ty, ref.param->IRValue);
-    case VAR_DEC:
-        return cg.load(ty, ref.varDec->IRValue);
-    case FIELD:
-        return cg.load(ty, ref.field->IRValue);
-    default:
-        return IRValue;
-    }
-}
-
 bool LgsVariable::equals(LgsExpr* other) {
     const auto otherVar = other->asVariable();
     if (!otherVar) return false;

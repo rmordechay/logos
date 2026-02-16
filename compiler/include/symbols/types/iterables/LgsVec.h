@@ -10,7 +10,6 @@ public:
 
     explicit LgsVec(const size_t dim, LgsType* baseType = &LGS_FLOAT) : LgsIterable(baseType), dimVec(dim) {
         assert(dim > 1 && dim <= 4);
-        passByRef = true;
         isStatic = true;
         rttKind = RTT_VEC;
     }

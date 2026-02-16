@@ -12,7 +12,6 @@ public:
         setType(vec);
     }
     void setType(LgsType* newType) override;
-    Value* loadIR(LgsCodeGen& cg) override;
     void hashNode(size_t& oldHash) override;
     std::string asText() override;
     bool equals(LgsExpr* other) override;

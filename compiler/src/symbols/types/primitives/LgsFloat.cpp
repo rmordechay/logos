@@ -94,14 +94,14 @@ LgsType* LgsFloat::applyBinOp(LgsType* rightType, LgsBinOp& op) {
 Value* LgsFloat::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
-    auto [l, r] = loadNumberPair(cg, left->loadIR(cg), right->loadIR(cg), this);
+    auto [l, r] = loadNumberPair(cg, left->IRValue, right->IRValue, this);
     return cg.builder.CreateFAdd(l, r);
 }
 
 Value* LgsFloat::subIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
-    auto [l, r] = loadNumberPair(cg, left->loadIR(cg), right->loadIR(cg), this);
+    auto [l, r] = loadNumberPair(cg, left->IRValue, right->IRValue, this);
     return cg.builder.CreateFSub(l, r);
 }
 
@@ -110,16 +110,16 @@ Value* LgsFloat::mulIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto right = binExpr->right;
     if (left->type->asVec() && right->type->asVec()) {
         const auto dotFunc = getDotProductFunc(cg, left->type->asVec());
-        return cg.builder.CreateCall(dotFunc, {left->loadIR(cg), right->loadIR(cg)});
+        return cg.builder.CreateCall(dotFunc, {left->IRValue, right->IRValue});
     }
-    auto [l, r] = loadNumberPair(cg, left->loadIR(cg), right->loadIR(cg), this);
+    auto [l, r] = loadNumberPair(cg, left->IRValue, right->IRValue, this);
     return cg.builder.CreateFMul(l, r);
 }
 
 Value* LgsFloat::divIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
-    auto [l, r] = loadNumberPair(cg, left->loadIR(cg), right->loadIR(cg), this);
+    auto [l, r] = loadNumberPair(cg, left->IRValue, right->IRValue, this);
     return cg.builder.CreateFDiv(l, r);
 }
 

@@ -53,8 +53,8 @@ public:
     std::optional<int64_t> getConstInt();
     std::optional<double_t> getConstFloat();
     std::optional<std::string> getConstStr();
+    Value* loadIRPtr(LgsCodeGen& cg) const;
 
-    virtual Value* loadIR(LgsCodeGen& cg);
     virtual LgsExpr* cast(LgsType* toType, bool explicitly);
     virtual bool equals(LgsExpr* other);
     virtual std::string asText() = 0;

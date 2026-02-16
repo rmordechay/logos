@@ -4,11 +4,11 @@
 #include "stmts/LgsVarDec.h"
 
 Value* LgsRangeLoop::loopStart(LgsCodeGen& cg) {
-    return cg.toSize(startRange->loadIR(cg));
+    return cg.toSize(startRange->IRValue);
 }
 
 Value* LgsRangeLoop::loopEnd(LgsCodeGen& cg) {
-    return cg.toSize(endRange->loadIR(cg));
+    return cg.toSize(endRange->IRValue);
 }
 
 void LgsRangeLoop::setDebugValue(LgsCodeGen& cg) {

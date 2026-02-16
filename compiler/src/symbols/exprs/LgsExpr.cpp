@@ -132,8 +132,9 @@ std::optional<std::string> LgsExpr::getConstStr() {
     return std::nullopt;
 }
 
-Value* LgsExpr::loadIR(LgsCodeGen& cg) {
-    assert(0);
+Value* LgsExpr::loadIRPtr(LgsCodeGen& cg) const {
+    if (!IRValue->getType()->isPointerTy()) return IRValue;
+    return cg.load(type->getTypeOrPtr(cg), IRValue);
 }
 
 LgsExpr* LgsExpr::cast(LgsType* toType, const bool explicitly) {
