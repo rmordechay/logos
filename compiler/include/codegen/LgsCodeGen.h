@@ -127,7 +127,6 @@ public:
     Value* callPrintf(const std::string& fmt, const std::vector<Value*>& args);
     Value* callSnprintf(const std::string& fmt, const std::vector<Value*>& args);
     Value* callSnprintf(const std::string& fmt, Value* buffer, Value* size, Value* ptr);
-    Value* strBuilderAdd();
     Value* callStrlen(Value* str);
     Value* strsEqual(Value* str1, Value* str2);
     Value* strsNotEqual(Value* str1, Value* str2);
@@ -135,7 +134,7 @@ public:
     void callMemcpy(Value* dest, Value* src, Value* size);
 
     // Runtime funcs
-    GlobalVariable* getRTTypeInfo(const std::string& varName, const std::string& typeName, ConstantInt* size, int32_t kind, bool isHeapAlloc, Constant* extra = nullptr);
+    GlobalVariable* getRTTypeInfo(const std::string& varName, const std::string& typeName, ConstantInt* size, int32_t kind, bool isHeap, Constant* extra = nullptr);
     StructType* getRTTStruct();
 
     // Debugging

@@ -832,7 +832,6 @@ void LgsCgFile::visitNullableExpr(LgsNullableExpr* expr) {
         expr->IRValue = nullable->getIRZeroValue(cg, expr->pointee);
     } else {
         if (nullable->passByRef) {
-            if (expr->pointee) cg.store(expr->baseExpr->IRValue, expr->pointee);
             expr->IRValue = expr->baseExpr->IRValue;
         } else {
             expr->IRValue = nullable->getIRZeroValue(cg, expr->pointee);

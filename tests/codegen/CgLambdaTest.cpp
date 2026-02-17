@@ -24,8 +24,12 @@ TEST(CgLambdaTest, Test2) {
     func(f: (Int): Void) {
         f(2)
     }
+    func2(x: Int): Void {
+        print(x + 2)
+    }
     main() {
         func(x => print(x + 2))
+        func(func2)
     }
     )";
     std::istringstream stream(getLgsOutput(code));
