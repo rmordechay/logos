@@ -1138,14 +1138,15 @@ void LgsCgFile::createEpilogue(const LgsFunc* func) {
     }
 
     // With return
-    assert(!func->returnStmts.empty());
+    auto& stmts = func->returnStmts;
+    assert(!stmts.empty());
     cg.branchAndStartBlock(func->epilogue);
     if (ft->swapReturn) {
         cg.callPopStack();
         cg.builder.CreateRetVoid();
     } else {
-        const auto phi = cg.builder.CreatePHI(ft->rt->getIRTypeOrPtr(cg), func->returnStmts.size());
-        for (const auto returnStmt : func->returnStmts) {
+        const auto phi = cg.builder.CreatePHI(ft->rt->getTypeRef(cg), stmts.size());
+        for (const auto returnStmt : stmts) {
             phi->addIncoming(returnStmt->expr->IRValue, returnStmt->parentBlock);
         }
         const auto toLevel = cg.builder.CreateSub(cg.getCurrentLevel(), cg.usize(1));

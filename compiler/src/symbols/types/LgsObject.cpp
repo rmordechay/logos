@@ -103,7 +103,7 @@ Type* LgsObject::getIRType(LgsCodeGen& cg) {
     types.reserve(fields.size());
     for (size_t i = 0; i < fields.size(); ++i) {
         const auto field = fields[i];
-        types.emplace_back(field->type->getIRTypeOrPtr(cg));
+        types.emplace_back(field->type->getTypeRef(cg));
     }
     const auto IRType = StructType::create(cg.context, types, name);
     cg.typesRegistry[name] = IRType;
@@ -266,7 +266,7 @@ Function* LgsObject::getObjsEqFunc(LgsCodeGen& cg) const {
     cg.builder.SetInsertPoint(entryBlock);
 
     for (const auto field : fields) {
-        const auto ty = field->type->getIRTypeOrPtr(cg);
+        const auto ty = field->type->getTypeRef(cg);
         const auto gep1 = field->getGEP(cg, obj1);
         const auto gep2 = field->getGEP(cg, obj2);
         const auto ne = neIR(cg, cg.load(ty, gep1), cg.load(ty, gep2), field->type);
@@ -295,7 +295,7 @@ Function* LgsObject::getObjsHashFunc(LgsCodeGen& cg) const {
     Value* hash = cg.usize(0);
     for (const auto field : fields) {
         const auto gep = field->getGEP(cg, instance);
-        const auto v = cg.load(field->type->getIRTypeOrPtr(cg), gep);
+        const auto v = cg.load(field->type->getTypeRef(cg), gep);
         const auto fieldHash = field->type->hashValue(cg, v);
         hash = cg.builder.CreateXor(hash, cg.toSize(fieldHash));
         hash = cg.builder.CreateMul(hash, cg.usize(31));

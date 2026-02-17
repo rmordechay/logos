@@ -215,7 +215,7 @@ void LgsSema::visitFunc(LgsFunc* func) {
     if (ft->isVariadic && ft->hasDefaults) {
         addError(E10043, func->location);
     }
-    if (!validateBlockControlFlow(func->stmtsBlock, func)) {
+    if (!validateControlFlow(func->stmtsBlock, func)) {
         addError(E10055, func->location, {func->asText()});
     }
     stack.exitScope();
@@ -842,7 +842,7 @@ void LgsSema::visitNullableExpr(LgsNullableExpr* nullableExpr) {
     if (nullableExpr->isNull) return;
     const auto baseExpr = nullableExpr->baseExpr;
     visitExpr(baseExpr);
-    assert(!baseExpr->type->asNullable());
+    if (baseExpr->type->asNullable()) return;
     nullableExpr->setType(new LgsNullable(baseExpr->type));
 }
 
@@ -1577,8 +1577,7 @@ void LgsSema::validateObjDuplicates(LgsObject* type) {
     }
 }
 
-bool LgsSema::validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const LgsFunc* func) {
-    if (!func->funcType->rt) return true; // In this case an error was already added
+bool LgsSema::validateControlFlow(const LgsStmtsBlock* stmtBlock, const LgsFunc* func) {
     if (!stmtBlock || func->funcType->rt->isVoid()) return true;
     if (stmtBlock->stmts.empty()) return false;
     const auto lastStmt = stmtBlock->stmts.back();
@@ -1587,25 +1586,24 @@ bool LgsSema::validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const Lgs
     constexpr auto exprWrapper = LgsStmtWrapper::WrapperType::Expr;
     const auto isStmt = lastStmt.wrapperType == stmtWrapper;
     if (isStmt && lastStmt.stmt->asReturn()) return true;
-    auto isValid = false;
-    for (const auto stmt : stmtBlock->stmts) {
-        if (stmt.wrapperType == objWrapper || stmt.wrapperType == exprWrapper) continue;
-        if (const auto ifStmt = stmt.stmt->asIfStmt()) {
-            isValid = validateBlockControlFlow(ifStmt->ifBlock, func);
-            for (const auto [_, elseIfStmt] : ifStmt->elseIfs) {
-                isValid = isValid && validateBlockControlFlow(elseIfStmt, func);
-            }
-            isValid = isValid && validateBlockControlFlow(ifStmt->elseBlock, func);
-        } else if (const auto loop = stmt.stmt->asLoop()) {
-            isValid = isValid && validateBlockControlFlow(loop->stmtsBlock, func);
-        } else if (const auto switch_ = stmt.stmt->asIfStmt()) {
-            for (const auto [_, patternsStmtBlock] : switch_->elseIfs) {
-                isValid = isValid && validateBlockControlFlow(patternsStmtBlock, func);
-            }
-            isValid = isValid && validateBlockControlFlow(switch_->elseBlock, func);
+    if (lastStmt.wrapperType == objWrapper || lastStmt.wrapperType == exprWrapper) return false;
+    if (const auto ifStmt = lastStmt.stmt->asIfStmt()) {
+        if (!ifStmt->elseBlock) return false;
+        auto isValid = validateControlFlow(ifStmt->ifBlock, func);
+        for (const auto [_, elseIfStmt] : ifStmt->elseIfs) {
+            isValid = isValid && validateControlFlow(elseIfStmt, func);
         }
+        return isValid && validateControlFlow(ifStmt->elseBlock, func);
     }
-    return isValid;
+    if (const auto switch_ = lastStmt.stmt->asSwitch()) {
+        if (!switch_->elseBlock) return false;
+        auto isValid = true;
+        for (const auto [_, patternsStmtBlock] : switch_->patterns) {
+            isValid = isValid && validateControlFlow(patternsStmtBlock, func);
+        }
+        return isValid && validateControlFlow(switch_->elseBlock, func);
+    }
+    return false;
 }
 
 LgsFunc* LgsSema::cloneGenericFunc(const LgsFuncCall* funcCall, const LgsFunc* func) {

@@ -143,7 +143,7 @@ public:
     bool validateMethodVisibility(const LgsFunc* method, LgsType* parent, const LgsLocation& location);
     bool validateVecElements(const LgsVariable* fieldVar, LgsVec* vec);
     void validateObjDuplicates(LgsObject* type);
-    static bool validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const LgsFunc* func);
+    static bool validateControlFlow(const LgsStmtsBlock* stmtBlock, const LgsFunc* func);
 
     LgsFunc* cloneGenericFunc(const LgsFuncCall* funcCall, const LgsFunc* func);
     LgsSymbol* getSymbol(const std::string& name);

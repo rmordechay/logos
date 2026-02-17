@@ -135,7 +135,7 @@ bool LgsType::hasRecursiveTypes() const {
     return check(check, this);
 }
 
-Type* LgsType::getIRTypeOrPtr(LgsCodeGen& cg) {
+Type* LgsType::getTypeRef(LgsCodeGen& cg) {
     return passByRef ? cg.ptrTy() : getIRType(cg);
 }
 

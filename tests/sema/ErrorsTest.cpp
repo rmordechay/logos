@@ -699,6 +699,22 @@ TEST(ErrorsTest, E10055A) {
     expectErrors(app, E10055, 1);
 }
 
+TEST(ErrorsTest, E10055B) {
+    LgsApp app;
+    const auto code = R"(
+    func(): Str {
+        if true {
+            return ""
+        }
+    }
+    main() {}
+    )";
+    app.loadSrcFile(code, LGS_MAIN_FILE);
+    ASSERT_TRUE(app.errHandler.successful);
+    app.analyse();
+    expectErrors(app, E10055, 1);
+}
+
 TEST(ErrorsTest, E10056A) {
     LgsApp app;
     const auto code = R"(
