@@ -5,8 +5,8 @@
 #include "exprs/LgsArrayExpr.h"
 #include "types/primitives/LgsBool.h"
 #include <llvm/IR/Module.h>
-
 #include "LgsRTTIndices.h"
+#include "exprs/LgsFuncCall.h"
 
 LgsFunc* LgsDArray::getMethod(const std::string& methodName) {
     constexpr auto flags = BUILTIN | PUBLIC | METHOD;

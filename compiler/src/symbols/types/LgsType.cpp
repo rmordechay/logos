@@ -79,33 +79,6 @@ bool LgsType::addMethod(LgsFunc* method) {
     return true;
 }
 
-std::string LgsType::getRTTName() {
-    return LGS_TYPEINFO_PREFIX + getName();
-}
-
-void LgsType::asIRText(LgsCodeGen& cg, LgsStrBuilder& strBuilder, Value* ptr) {
-    assert(0);
-}
-
-Constant* LgsType::getRTType(LgsCodeGen& cg) {
-    assert(rttKind != RTT_UNKNOWN);
-    const auto rttName = getRTTName();
-    const auto baseStruct = cg.getRTTStruct();
-    Constant* initializer = nullptr;
-    if (cg.mode == CG_MODE_RTTYPES) {
-        const auto extra = getRTTypeExtra(cg);
-        const std::vector<Constant*> args = {
-            cg.getString(rttName), IRSize(cg), cg.i32(rttKind), cg.i1(isHeap), cg.i1(passByRef), extra
-        };
-        initializer = ConstantStruct::get(baseStruct, args);
-    }
-    return cg.createGlobal(getName(), baseStruct, initializer);
-}
-
-ConstantInt* LgsType::IRSize(LgsCodeGen& cg) {
-    return cg.getTypeSize(getIRType(cg));
-}
-
 bool LgsType::hasRecursiveTypes() const {
     std::unordered_set<std::string> visited;
     const auto check = [&](const auto& self, const LgsType* type) -> bool {
@@ -135,6 +108,29 @@ bool LgsType::hasRecursiveTypes() const {
     return check(check, this);
 }
 
+std::string LgsType::getRTTName() {
+    return LGS_TYPEINFO_PREFIX + getName();
+}
+
+Constant* LgsType::getRTType(LgsCodeGen& cg) {
+    assert(rttKind != RTT_UNKNOWN);
+    const auto rttName = getRTTName();
+    const auto baseStruct = cg.getRTTStruct();
+    Constant* initializer = nullptr;
+    if (cg.mode == CG_MODE_RTTYPES) {
+        const auto extra = getRTTypeExtra(cg);
+        const std::vector<Constant*> args = {
+        cg.getString(rttName), IRSize(cg), cg.i32(rttKind), cg.i1(isHeap), cg.i1(passByRef), extra
+        };
+        initializer = ConstantStruct::get(baseStruct, args);
+    }
+    return cg.createGlobal(getName(), baseStruct, initializer);
+}
+
+ConstantInt* LgsType::IRSize(LgsCodeGen& cg) {
+    return cg.getTypeSize(getIRType(cg));
+}
+
 Type* LgsType::getTypeRef(LgsCodeGen& cg) {
     return passByRef ? cg.ptrTy() : getIRType(cg);
 }
@@ -159,26 +155,34 @@ std::string LgsType::pname() {
     return getName();
 }
 
-Value* LgsType::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
-    assert(0);
-}
-
-Constant* LgsType::getRTTypeExtra(LgsCodeGen& cg) {
-    return cg.null();
-}
-
 bool LgsType::equals(LgsType* other) {
     return getName() == other->getName();
-}
-
-void LgsType::replaceGenerics(std::unordered_map<std::string, LgsType*>& replacements) {
-
 }
 
 void LgsType::hashNode(size_t& oldHash) { assert(0);}
 
 bool LgsType::hasGenerics() {
     return !!asGenericType();
+}
+
+Value* LgsType::moveValue(LgsCodeGen& cg, Value* value, Value* toLevel) {
+    return cg.moveValue(getBaseName(), value, toLevel);
+}
+
+void LgsType::asIRText(LgsCodeGen& cg, LgsStrBuilder& strBuilder, Value* ptr) {
+    assert(0);
+}
+
+void LgsType::replaceGenerics(std::unordered_map<std::string, LgsType*>& replacements) {
+
+}
+
+Constant* LgsType::getRTTypeExtra(LgsCodeGen& cg) {
+    return cg.null();
+}
+
+Value* LgsType::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
+    assert(0);
 }
 
 Value* LgsType::hashValue(LgsCodeGen& cg, Value* value) { assert(0);}

@@ -1,4 +1,6 @@
 #include "loops/LgsForeachLoop.h"
+
+#include "codegen/LgsCodeGen.h"
 #include "types/iterables/LgsMap.h"
 
 Value* LgsForeachLoop::loopStart(LgsCodeGen& cg) {

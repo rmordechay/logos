@@ -4,6 +4,8 @@
 #include "types/primitives/LgsInt.h"
 #include <llvm/IR/DIBuilder.h>
 
+#include "codegen/LgsCodeGen.h"
+
 Function* LgsMainFunc::getIRFunc(LgsCodeGen& cg) {
     FunctionType* mainFuncType;
     if (funcType->params.empty()) {

@@ -67,7 +67,7 @@ extern "C" void* Lgs_Runtime_reallocate(const void* ptr, const size_t size, cons
 extern "C" void* Lgs_Runtime_moveObject(void* obj, const size_t toLevel) {
     const auto leftLevel = static_cast<size_t*>(obj);
     assert(*leftLevel <= runtime.level && toLevel <= runtime.level);
-    if (*leftLevel >= toLevel) return obj;
+    if (*leftLevel <= toLevel) return obj;
     auto& allocator = runtime.stack.at(toLevel).allocator;
     const auto objType = (*reinterpret_cast<Lgs_TypeInfo**>(leftLevel + 1))->object;
     const auto newObj = allocator.allocate(objType->size, true);
@@ -95,9 +95,10 @@ extern "C" void* Lgs_Runtime_moveDArray(Lgs_DArrExpr* arr, const size_t toLevel)
 }
 
 extern "C" void* Lgs_Runtime_moveStr(Lgs_StrExpr* strExpr, const size_t toLevel) {
+    if (!strExpr) return strExpr;
     const auto leftLevel = strExpr->level;
     assert(leftLevel <= runtime.level && toLevel <= runtime.level);
-    if (leftLevel >= toLevel) return strExpr;
+    if (leftLevel <= toLevel) return strExpr;
     auto& allocator = runtime.stack.at(leftLevel).allocator;
     const auto newStr = static_cast<Lgs_StrExpr*>(allocator.allocate(sizeof(Lgs_StrExpr), false));
     newStr->level = leftLevel;

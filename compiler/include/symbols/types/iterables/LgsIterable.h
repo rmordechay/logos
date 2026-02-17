@@ -1,6 +1,8 @@
 #pragma once
 #include "LgsType.h"
-#include "codegen/LgsCodeGen.h"
+#include <optional>
+#include <string>
+#include <vector>
 
 class LgsForeachLoop;
 class LgsCodeGen;

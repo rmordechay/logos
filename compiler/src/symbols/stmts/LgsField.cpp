@@ -1,5 +1,6 @@
 #include "stmts/LgsField.h"
 #include "LgsType.h"
+#include "codegen/LgsCodeGen.h"
 #include "exprs/LgsExpr.h"
 #include "exprs/LgsHashMap.h"
 

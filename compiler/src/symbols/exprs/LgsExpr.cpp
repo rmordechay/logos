@@ -1,5 +1,6 @@
 #include "exprs/LgsExpr.h"
 
+#include "codegen/LgsCodeGen.h"
 #include "exprs/LgsArrayExpr.h"
 #include "exprs/LgsBinaryExpr.h"
 #include "exprs/LgsCast.h"

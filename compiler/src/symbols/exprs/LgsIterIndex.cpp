@@ -7,6 +7,8 @@
 #include <sstream>
 #include <llvm/IR/Module.h>
 
+#include "codegen/LgsCodeGen.h"
+
 Value* LgsIterIndex::getIRRangePtr(LgsCodeGen& cg) const {
     const auto fromIR = index.from->IRValue;
     const auto toIR = index.to->IRValue;

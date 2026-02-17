@@ -1,8 +1,7 @@
 #pragma once
 #include "Lgs_Types.h"
-#include <unordered_map>
-
-#include "codegen/LgsCodeGen.h"
+#include "LgsTokens.h"
+#include <vector>
 
 class LgsSelf;
 class LgsFieldType;
@@ -100,6 +99,7 @@ public:
     virtual bool hasGenerics();
     virtual bool canCastTo(LgsType* other) = 0;
     virtual LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) = 0;
+    virtual Value* moveValue(LgsCodeGen& cg, Value* value, Value* toLevel);
     virtual void asIRText(LgsCodeGen& cg, LgsStrBuilder& strBuilder, Value* ptr);
     virtual void replaceGenerics(std::unordered_map<std::string, LgsType*>& replacements);
     virtual Type* getIRType(LgsCodeGen& cg) = 0;

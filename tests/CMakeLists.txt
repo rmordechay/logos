@@ -2,9 +2,9 @@ find_package(GTest REQUIRED)
 enable_testing()
 
 add_executable(lgs_tests
+    ${COMPILER_SOURCE}
     main.cpp
     LgsTestUtils.h
-    ${COMPILER_SOURCE}
     parser/ParserTest.cpp
     sema/ErrorsTest.cpp
     sema/TypeResolverTest.cpp
@@ -23,6 +23,7 @@ add_executable(lgs_tests
     codegen/CgInterfaceTest.cpp
     codegen/CgFuncCallTest.cpp
     codegen/CgUnaryExprTest.cpp
+    codegen/CgNullableTest.cpp
 )
 
 target_include_directories(lgs_tests PRIVATE

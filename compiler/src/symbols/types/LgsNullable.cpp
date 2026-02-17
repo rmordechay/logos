@@ -38,6 +38,10 @@ Value* LgsNullable::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
     return ptr;
 }
 
+Value* LgsNullable::moveValue(LgsCodeGen& cg, Value* value, Value* toLevel) {
+    return cg.moveValue(baseType->getBaseName(), value, toLevel);
+}
+
 std::string LgsNullable::pname() {
     return baseType ? baseType->pname() + '?' : name;
 }

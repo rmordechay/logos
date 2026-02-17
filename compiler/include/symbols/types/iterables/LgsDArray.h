@@ -1,8 +1,9 @@
 #pragma once
 #include "LgsIterable.h"
-#include "exprs/LgsFuncCall.h"
-#include "funcs/LgsFunc.h"
-#include "../primitives/LgsAny.h"
+
+namespace llvm {
+    class Function;
+}
 
 class LgsDArray final : public LgsIterable {
 public:

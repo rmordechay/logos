@@ -7,6 +7,7 @@
 #include "types/primitives/LgsBool.h"
 #include <sstream>
 
+#include "codegen/LgsCodeGen.h"
 #include "exprs/LgsBinaryExpr.h"
 
 LgsField* LgsVec::getField(const std::string& fieldName) {

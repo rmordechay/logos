@@ -11,6 +11,12 @@
 #include "LgsConfigs.h"
 #include "LgsRTTIndices.h"
 #include "Lgs_Exprs.h"
+#include "codegen/LgsCodeGen.h"
+#include "exprs/LgsFuncCall.h"
+#include "funcs/LgsFunc.h"
+#include "types/LgsFuncType.h"
+#include "types/iterables/LgsDArray.h"
+#include "types/iterables/LgsStr.h"
 
 LgsFunc* LgsMap::getMethod(const std::string& methodName) {
     constexpr auto flags = BUILTIN | PUBLIC | METHOD;

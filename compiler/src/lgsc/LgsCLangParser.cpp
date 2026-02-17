@@ -19,6 +19,7 @@
 #include "stmts/LgsVarDec.h"
 #include "types/LgsSubType.h"
 #include "types/iterables/LgsSArray.h"
+#include "types/primitives/LgsAny.h"
 #include "types/primitives/LgsLong.h"
 
 void LgsCLangASTConsumer::HandleTranslationUnit(clang::ASTContext& clangContext) {

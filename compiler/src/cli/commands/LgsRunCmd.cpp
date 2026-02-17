@@ -38,9 +38,8 @@ void LgsRunCmd::parseCompileArgs(LgsApp& app, std::vector<const char*>& appArgs)
             errHandler.addError(E40003, {cmd});
         }
     });
-
     if (argStart < 0) return errHandler.addError(E40001, {});
-    if (app.configs.appMode == FILE_MODE) {
+    if (app.configs.appMode == CODE_MODE) {
         app.lgsCode = argv[argStart++];
     } else {
         auto path = argv[argStart++];

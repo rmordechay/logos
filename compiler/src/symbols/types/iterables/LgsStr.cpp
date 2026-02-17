@@ -4,6 +4,7 @@
 #include "exprs/constants/LgsStrConst.h"
 #include "exprs/LgsBinaryExpr.h"
 #include "../../../../include/symbols/types/primitives/LgsAny.h"
+#include "codegen/LgsCodeGen.h"
 #include "types/LgsNullable.h"
 #include "types/iterables/LgsSArray.h"
 #include "types/primitives/LgsBool.h"

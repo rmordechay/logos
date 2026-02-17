@@ -5,6 +5,7 @@
 #include "stmts/LgsField.h"
 #include "types/LgsObject.h"
 #include "LgsUtils.h"
+#include "codegen/LgsCodeGen.h"
 
 std::string LgsInstance::asText() {
     return name + "{}";

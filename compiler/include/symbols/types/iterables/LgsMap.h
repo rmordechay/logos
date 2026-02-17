@@ -1,10 +1,13 @@
 #pragma once
-#include "LgsDArray.h"
-#include "LgsStr.h"
+#include "LgsIterable.h"
 #include "types/LgsTypePair.h"
 
 #define KEYS_FUNC_NAME "keys"
 #define VALUES_FUNC_NAME "values"
+
+namespace llvm {
+    class Function;
+}
 
 class LgsMap final : public LgsIterable {
 public:

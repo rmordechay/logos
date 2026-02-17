@@ -2,8 +2,11 @@
 
 #include "LgsUtils.h"
 #include "codegen/LgsCodeGen.h"
+#include "exprs/LgsFuncCall.h"
 #include "exprs/LgsVariable.h"
+#include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
+#include "types/LgsFuncType.h"
 #include "types/primitives/LgsSize.h"
 
 #define VALUE_FUNC "value"

@@ -1,4 +1,5 @@
 #pragma once
+#include "LgsExpr.h"
 #include "types/iterables/LgsMap.h"
 
 class LgsPair final : public LgsExpr {

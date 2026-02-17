@@ -1,5 +1,9 @@
 #include "types/iterables/LgsVariadic.h"
 
+#include <cassert>
+
+#include "codegen/LgsCodeGen.h"
+
 size_t LgsVariadic::sizeBytes() {
     return sizeof(void*);
 }

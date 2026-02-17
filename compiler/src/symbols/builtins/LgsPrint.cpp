@@ -1,5 +1,7 @@
 #include "builtins/LgsPrint.h"
 #include <llvm/IR/Module.h>
+
+#include "codegen/LgsCodeGen.h"
 #include "exprs/LgsFuncCall.h"
 #include "types/LgsEnum.h"
 #include "types/LgsFieldType.h"

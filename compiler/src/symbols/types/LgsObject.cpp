@@ -19,6 +19,7 @@
 #include "errors/LgsErrors.h"
 #include "types/LgsFieldType.h"
 #include "types/iterables/LgsVariadic.h"
+#include "types/primitives/LgsAny.h"
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsSize.h"
 

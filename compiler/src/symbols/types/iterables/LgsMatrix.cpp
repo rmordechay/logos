@@ -4,6 +4,7 @@
 #include "exprs/LgsBinaryExpr.h"
 #include "exprs/LgsMatrixExpr.h"
 #include "../../../../include/symbols/types/primitives/LgsAny.h"
+#include "codegen/LgsCodeGen.h"
 #include "types/iterables/LgsSArray.h"
 #include "types/iterables/LgsVec.h"
 

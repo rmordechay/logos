@@ -96,11 +96,7 @@ LgsFile* LgsParser::parseSrcFile(const bool isTestRun) {
         file = objFile;
     } else if (const auto interfaceFile = parseInterfaceFile()) {
         file = interfaceFile;
-    } else if (isTestRun) {
-        if (const auto testFile = parseTestFile()) {
-            file = testFile;
-        }
-    }
+    } else if (isTestRun && ((file = parseTestFile()))) {}
     assert(file);
     file->symbolTable.importPaths = importPaths;
     return file;
@@ -316,9 +312,7 @@ LgsTestFile* LgsParser::parseTestFile() {
         }
         if (currentToken.type == T_EOF) break;
     }
-
-    if (currentToken.type != T_EOF)
-        assert(0);
+    if (currentToken.type != T_EOF) assert(0);
     validateTestFolder(file);
     return file;
 }

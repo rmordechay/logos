@@ -28,12 +28,12 @@ public:
     LgsSymbolTable globals;
     LgsErrHandler errHandler;
     std::vector<LgsFile*> srcFiles;
-    std::vector<LgsFile*> genericFiles;
     std::vector<LgsEnvFile*> envFiles;
+    std::vector<LgsFile*> genericFiles;
     std::vector<LgsTestFile*> testFiles;
-    std::vector<LgsApp*> importApps;
     LgsAppConfigFile* appConfigFile = nullptr;
-    std::string lgsCode; // Used when passing code directly.
+    std::vector<LgsApp*> importApps;
+    std::string lgsCode; // Used when passing code directly
     LgsFile rttFile{"rtt", CG_MODE_RTTYPES};
 
     explicit LgsApp(const fs::path& rootPath = "") {

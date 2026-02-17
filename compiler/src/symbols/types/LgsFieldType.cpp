@@ -4,6 +4,7 @@
 
 #include "LgsDefinitions.h"
 #include "LgsRTTIndices.h"
+#include "codegen/LgsCodeGen.h"
 #include "types/LgsObject.h"
 
 std::string LgsFieldType::getName() {

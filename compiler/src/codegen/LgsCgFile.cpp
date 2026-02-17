@@ -1150,7 +1150,7 @@ void LgsCgFile::createEpilogue(const LgsFunc* func) {
             phi->addIncoming(returnStmt->expr->IRValue, returnStmt->parentBlock);
         }
         const auto toLevel = cg.builder.CreateSub(cg.getCurrentLevel(), cg.usize(1));
-        const auto v = ft->rt->isHeap ? cg.moveValue(ft->rt->getBaseName(), phi, toLevel) : phi;
+        const auto v = ft->rt->isHeap ? ft->rt->moveValue(cg, phi, toLevel) : phi;
         cg.callPopStack();
         cg.builder.CreateRet(v);
     }

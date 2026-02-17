@@ -27,6 +27,7 @@
 #include <llvm/Target/TargetMachine.h>
 #include "exprs/constants/LgsIntConst.h"
 #include "stmts/LgsImport.h"
+#include "types/iterables/LgsDArray.h"
 #include "types/iterables/LgsSArray.h"
 
 inline ThreadPool threadPool;
@@ -77,11 +78,13 @@ bool LgsApp::setup() {
         errHandler.addError(E10010, {});
         return false;
     }
+
     if (fs::exists(paths.envsDir)) {
         for (const auto& entry : fs::recursive_directory_iterator(paths.envsDir)) {
             appCache.addFileMetadata(entry.path(), LGS_ENV_FILE);
         }
     }
+
     for (const auto& entry : fs::recursive_directory_iterator(paths.srcDir)) {
         if (!isLogosFile(entry)) continue;
         const auto fileName = entry.path().filename();

@@ -1,5 +1,6 @@
 #pragma once
-#include "LgsFuncType.h"
+#include <map>
+
 #include "exprs/LgsFuncCall.h"
 #include "exprs/constants/LgsStrConst.h"
 #include "funcs/LgsFunc.h"
