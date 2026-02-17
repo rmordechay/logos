@@ -292,11 +292,15 @@ void LgsSema::visitObjImplements(LgsObject* obj, const std::vector<LgsType*>& in
 
 void LgsSema::visitLambda(LgsFunc* lambda) {
     typeResolver.resolveFuncType(lambda->funcType);
-    if (!lambda->funcType->rt) {
-        lambda->funcType->rt = &LGS_VOID;
-    }
-    visitFunc(lambda);
     lambda->funcType->name = LGS_LAMBDA + to_string(lambdasIDGenerator++);
+    visitFunc(lambda);
+    if (lambda->funcType->rt->isVoid()) return;
+    const auto inferredType = lambda->returnStmts.front()->expr->type;
+    if (!inferredType) {
+        addError(E10049, lambda->location, {lambda->funcType->name});
+        return;
+    }
+    lambda->funcType->rt = inferredType;
 }
 
 void LgsSema::visitParam(LgsParam* param) {
@@ -701,9 +705,8 @@ void LgsSema::visitReturnStmt(const LgsReturn* returnStmt) {
     }
     const auto rt = ft->rt;
     if (!rt) return;
-    if (ft->isLambda) return;
     if (rt->isVoid() && retExpr && retExpr->type && !retExpr->type->isVoid()) {
-        addError(E10027, returnStmt->location, {retExpr->type->pname()});
+        addError(E10027, returnStmt->location);
     } else if (!rt->isVoid() && !retExpr) {
         addError(E10026, returnStmt->location, {ft->name, rt->pname()});
     } else if (retExpr && retExpr->type && !rt->canCastTo(retExpr->type)) {

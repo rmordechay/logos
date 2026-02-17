@@ -6,20 +6,51 @@ TEST(CgStrTest, Test1) {
     main() {
         hello = "Hello "
         world = "world"
-        mut hello2 = "Hello "
-        mut world2 = "world"
         print("Hello world")
         print("Hello" + " world")
         print("He" + "llo" + " world")
         print(hello + world)
         print("Hello " + world)
         print(hello + "world")
-        print(hello2 + world2)
-        print("Hello " + world2)
-        print(hello2 + "world")
     }
     )";
     std::istringstream stream(getLgsOutput(code));
-    const auto lines = getLines(stream, 9);
+    const auto lines = getLines(stream, 6);
     for (auto line : lines) EXPECT_EQ(line, "Hello world");
+}
+
+TEST(CgStrTest, Test2) {
+    const auto code = R"(
+    main() {
+        mut hello = "Hello "
+        mut world = "world"
+        print(hello + world)
+        print("Hello " + world)
+        print(hello + "world")
+    }
+    )";
+    std::istringstream stream(getLgsOutput(code));
+    const auto lines = getLines(stream, 3);
+    for (auto line : lines) EXPECT_EQ(line, "Hello world");
+}
+
+TEST(CgStrTest, Test3) {
+    const auto code = R"(
+    main() {
+        print("".len())
+        print("text".len())
+        print("".isEmpty())
+        print("".isNotEmpty())
+        print("text".isEmpty())
+        print("text".isNotEmpty())
+    }
+    )";
+    std::istringstream stream(getLgsOutput(code));
+    const auto lines = getLines(stream, 6);
+    EXPECT_EQ(lines[0], "0");
+    EXPECT_EQ(lines[1], "4");
+    EXPECT_EQ(lines[2], "true");
+    EXPECT_EQ(lines[3], "false");
+    EXPECT_EQ(lines[4], "false");
+    EXPECT_EQ(lines[5], "true");
 }

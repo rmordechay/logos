@@ -22,6 +22,7 @@ add_executable(lgs_tests
     codegen/CgIOPairTest.cpp
     codegen/CgInterfaceTest.cpp
     codegen/CgFuncCallTest.cpp
+    codegen/CgUnaryExprTest.cpp
 )
 
 target_include_directories(lgs_tests PRIVATE

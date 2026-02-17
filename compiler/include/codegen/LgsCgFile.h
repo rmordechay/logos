@@ -99,7 +99,7 @@ public:
     void visitIOStmt(const LgsIOStmt* ioStmt);
 
     // Exprs
-    void visitExpr(LgsExpr* expr);
+    void visitExpr(LgsExpr* expr, bool assign = false);
     void visitBinaryExpr(LgsBinaryExpr* binExpr);
     void visitTernaryExpr(LgsTernaryExpr* ternaryExpr);
     void visitInstance(LgsInstance* instance);
@@ -110,7 +110,7 @@ public:
     void visitCharConst(LgsCharConst* charConst);
     void visitPrefixExpr(LgsPrefixExpr* prefixExpr);
     void visitPostfixExpr(LgsPostfixExpr* postfixExpr);
-    void visitVariable(LgsVariable* variable);
+    void visitVariable(LgsVariable* variable, bool assign);
     void visitIterIndex(LgsIterIndex* iterIndex, bool assign);
     void visitNullableExpr(LgsNullableExpr* expr);
     void visitSelection(LgsSelection* selection, bool assign);
