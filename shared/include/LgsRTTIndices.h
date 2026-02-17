@@ -5,7 +5,8 @@ struct LgsTypeInfoIndices {
     static constexpr size_t size = 1;
     static constexpr size_t kind = 2;
     static constexpr size_t isHeap = 3;
-    static constexpr size_t extra = 4;
+    static constexpr size_t passByRef = 4;
+    static constexpr size_t extra = 5;
 };
 
 struct LgsStrIndices {

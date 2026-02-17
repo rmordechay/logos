@@ -62,7 +62,7 @@ inline LgsBaseMsg E10047{"External %s file '%s' was not found.", errCodeStart++}
 inline LgsBaseMsg E10048{"Recursive non-nullable objects are not allowed.", errCodeStart++};
 inline LgsBaseMsg E10049{"Not enough information to infer the type of %s.", errCodeStart++};
 inline LgsBaseMsg E10050{"Only integer values can be incremented (++) or decremented (--). Given: %s.", errCodeStart++};
-inline LgsBaseMsg E10051{"%s is immutable.", errCodeStart++};
+inline LgsBaseMsg E10051{"%s is not mutable.", errCodeStart++};
 inline LgsBaseMsg E10052{"Spread operator in %s... must only be used with iterables. Given type: %s.", errCodeStart++};
 inline LgsBaseMsg E10053{"'%s' is a Logos global name and cannot be redefined.", errCodeStart++};
 inline LgsBaseMsg E10054{"Field %s is set more than one time.", errCodeStart++};

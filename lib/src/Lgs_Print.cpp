@@ -105,6 +105,7 @@ static std::string formatElement(const Lgs_TypeInfo* type, void* value) {
     case RTT_NULLABLE: {
         const auto baseType = type->baseType;
         if (!baseType) return LGS_NULL_LITERAL;
+        if (type->passByRef) return formatElement(baseType, value);
         const auto isSetPtr = static_cast<char*>(value) + baseType->size;
         const auto isSet = *reinterpret_cast<bool*>(isSetPtr);
         if (isSet) str << formatElement(baseType, value);

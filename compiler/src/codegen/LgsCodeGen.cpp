@@ -377,19 +377,8 @@ void LgsCodeGen::callMemcpy(Value* dest, Value* src, Value* size) {
     builder.CreateMemCpy(dest, MaybeAlign(), src, MaybeAlign(), size);
 }
 
-GlobalVariable* LgsCodeGen::getRTTypeInfo(const std::string& varName, const std::string& typeName, ConstantInt* size, const int32_t kind, const bool isHeap, Constant* extra) {
-    assert(kind != RTT_UNKNOWN);
-    const auto baseStruct = getRTTStruct();
-    if (mode == CG_MODE_RTTYPES) {
-        const std::vector<Constant*> args = {getString(typeName), size, i32(kind), i1(isHeap), extra ? extra : null()};
-        const auto initializer = ConstantStruct::get(baseStruct, args);
-        return createGlobal(varName, baseStruct, initializer);
-    }
-    return createGlobal(varName, baseStruct, nullptr);
-}
-
 StructType* LgsCodeGen::getRTTStruct() {
-    return getStructType({ptrTy(), sizeTy(), i32Ty(), i1Ty(), ptrTy()}, "RTI");
+    return getStructType({ptrTy(), sizeTy(), i32Ty(), i1Ty(), i1Ty(), ptrTy()}, "RTI");
 }
 
 void LgsCodeGen::printStr(const std::string& value, const std::string& prefix) {

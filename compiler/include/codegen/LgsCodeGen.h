@@ -133,8 +133,6 @@ public:
     void callMemset(Value* dest, Value* src, Value* size);
     void callMemcpy(Value* dest, Value* src, Value* size);
 
-    // Runtime funcs
-    GlobalVariable* getRTTypeInfo(const std::string& varName, const std::string& typeName, ConstantInt* size, int32_t kind, bool isHeap, Constant* extra = nullptr);
     StructType* getRTTStruct();
 
     // Debugging

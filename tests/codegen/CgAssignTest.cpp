@@ -46,7 +46,23 @@ TEST(CgAssignmentTest, Test3) {
     EXPECT_EQ(lines[1], "4");
 }
 
+
 TEST(CgAssignmentTest, Test4) {
+    const auto code = R"(
+    main() {
+        mut a = "text"?
+        print(a)
+        a := null
+        print(a)
+    }
+    )";
+    std::istringstream stream(getLgsOutput(code));
+    const auto lines = getLines(stream, 2);
+    EXPECT_EQ(lines[0], "text");
+    EXPECT_EQ(lines[1], "null");
+}
+
+TEST(CgAssignmentTest, Test5) {
     const auto code = R"(
     object Obj {
         x: Int

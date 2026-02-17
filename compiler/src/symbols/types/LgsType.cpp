@@ -88,10 +88,18 @@ void LgsType::asIRText(LgsCodeGen& cg, LgsStrBuilder& strBuilder, Value* ptr) {
 }
 
 Constant* LgsType::getRTType(LgsCodeGen& cg) {
+    assert(rttKind != RTT_UNKNOWN);
     const auto rttName = getRTTName();
-    if (const auto v = cg.IRModule->getGlobalVariable(rttName)) return v;
-    if (cg.mode != CG_MODE_RTTYPES) return cg.getRTTypeInfo(rttName, getName(), IRSize(cg), rttKind, isHeap, nullptr);
-    return cg.getRTTypeInfo(rttName, getName(), IRSize(cg), rttKind, isHeap, getRTTypeExtra(cg));
+    const auto baseStruct = cg.getRTTStruct();
+    Constant* initializer = nullptr;
+    if (cg.mode == CG_MODE_RTTYPES) {
+        const auto extra = getRTTypeExtra(cg);
+        const std::vector<Constant*> args = {
+            cg.getString(rttName), IRSize(cg), cg.i32(rttKind), cg.i1(isHeap), cg.i1(passByRef), extra
+        };
+        initializer = ConstantStruct::get(baseStruct, args);
+    }
+    return cg.createGlobal(getName(), baseStruct, initializer);
 }
 
 ConstantInt* LgsType::IRSize(LgsCodeGen& cg) {
@@ -127,7 +135,7 @@ bool LgsType::hasRecursiveTypes() const {
     return check(check, this);
 }
 
-Type* LgsType::getTypeOrPtr(LgsCodeGen& cg) {
+Type* LgsType::getIRTypeOrPtr(LgsCodeGen& cg) {
     return passByRef ? cg.ptrTy() : getIRType(cg);
 }
 
@@ -156,7 +164,7 @@ Value* LgsType::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
 }
 
 Constant* LgsType::getRTTypeExtra(LgsCodeGen& cg) {
-    return nullptr;
+    return cg.null();
 }
 
 bool LgsType::equals(LgsType* other) {

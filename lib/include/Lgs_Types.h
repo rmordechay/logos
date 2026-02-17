@@ -78,6 +78,7 @@ struct Lgs_TypeInfo {
     const size_t size;
     const Lgs_TypeKind kind;
     const bool isHeap;
+    const bool passByRef;
     union {
         Lgs_Object* object;
         Lgs_SArr* sArr;
