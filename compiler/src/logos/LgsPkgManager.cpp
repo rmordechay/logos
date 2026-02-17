@@ -1,7 +1,7 @@
 #include "logos/LgsPkgManager.h"
 #define MINIZ_HEADER_FILE_ONLY
 #include "curl/curl.h"
-#include "files/LgsAppConfigFile.h"
+#include "files/LgsAppFile.h"
 #include "logos/LgsApp.h"
 #include <fstream>
 #include <filesystem>

@@ -24,9 +24,9 @@ struct LgsAppCache {
 
     void load(const fs::path& cacheFilePath);
     void save(const fs::path& cacheFilePath) const;
-    void print() const;
     void addFileMetadata(const fs::path& filePath, LgsFileType fileType);
     LgsFileMetadata* getAppConfigFile();
-    bool fileExists(const fs::path& entry) const;
     size_t getHashByPath(const fs::path& path) const;
+    bool fileExists(const fs::path& entry) const;
+    void print() const;
 };

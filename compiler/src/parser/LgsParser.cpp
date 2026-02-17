@@ -23,7 +23,7 @@
 #include "exprs/constants/LgsFloatConst.h"
 #include "exprs/constants/LgsStrConst.h"
 #include "exprs/constants/LgsUIntConst.h"
-#include "files/LgsAppConfigFile.h"
+#include "files/LgsAppFile.h"
 #include "files/LgsEnvFile.h"
 #include "files/LgsInterfaceFile.h"
 #include "files/LgsMainFile.h"
@@ -70,7 +70,7 @@ LgsFunc* wrapStmtsBlockWithLambda(LgsStmtsBlock* stmtsBlock);
 #define MAX_TOKENS_NUMBER 100000
 
 bool LgsParser::scanTokens() {
-    assert(!lgsCode.empty());
+    if (lgsCode.empty()) return false;
     LgsLexer lexer(filePath, lgsCode);
     tokens = lexer.tokenize();
     if (!lexer.errHandler.successful) {
@@ -157,9 +157,9 @@ LgsMainFile* LgsParser::parseMainFile() {
     return mainFile;
 }
 
-LgsAppConfigFile* LgsParser::parseAppConfigFile() {
+LgsAppFile* LgsParser::parseAppConfigFile() {
     if (!scanTokens()) return nullptr;
-    const auto file = new LgsAppConfigFile(filePath);
+    const auto file = new LgsAppFile(filePath);
     while (true) {
         const auto varDec = parseVarDec();
         if (!varDec) break;

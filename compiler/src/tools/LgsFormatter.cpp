@@ -18,13 +18,13 @@
 #define TAB_SIZE 4
 
 void LgsFormatter::formatFile(LgsFile* file) {
-    if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
+    if (const auto mainFile = file->asMainFile()) {
         formatMainFile(mainFile);
-    } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
+    } else if (const auto objFile = file->asObjectFile()) {
         formatObject(objFile->obj);
-    } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
+    } else if (const auto interfaceFile = file->asInterfaceFile()) {
         formatInterface(interfaceFile->interface);
-    } else if (const auto testFile = dynamic_cast<LgsTestFile*>(file)) {
+    } else if (const auto testFile = file->asTestFile()) {
         formatTestFile(testFile);
     } else {
         assert(0);

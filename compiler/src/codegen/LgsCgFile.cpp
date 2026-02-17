@@ -59,13 +59,13 @@
 
 bool LgsCgFile::generateSrcFile(LgsFile* file, const LgsPaths& paths) {
     visitExternalSymbols(file);
-    if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
+    if (const auto mainFile = file->asMainFile()) {
         visitMainFile(mainFile);
-    } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
+    } else if (const auto objFile = file->asObjectFile()) {
         visitObject(objFile->obj);
-    } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
+    } else if (const auto interfaceFile = file->asInterfaceFile()) {
         visitInterface(interfaceFile->interface);
-    } else if (const auto testFile = dynamic_cast<LgsTestFile*>(file)) {
+    } else if (const auto testFile = file->asTestFile()) {
         visitTestFile(testFile);
     }
     if (appConfigs->debugMode) cg.finalizeDebugger(paths.buildDir);

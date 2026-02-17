@@ -11,7 +11,7 @@
 
 class LgsMainFunc;
 class LgsMetaSelection;
-class LgsAppConfigFile;
+class LgsAppFile;
 class LgsTernaryExpr;
 class LgsVec;
 class LgsInterfaceFile;

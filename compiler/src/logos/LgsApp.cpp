@@ -1,5 +1,4 @@
 #include "logos/LgsApp.h"
-
 #include <ostream>
 #include <unordered_set>
 #include <llvm/Analysis/CGSCCPassManager.h>
@@ -18,7 +17,7 @@
 #include "parser/LgsParser.h"
 #include "LgsUtils.h"
 #include "errors/LgsErrors.h"
-#include "files/LgsAppConfigFile.h"
+#include "files/LgsAppFile.h"
 #include "files/LgsInterfaceFile.h"
 #include "files/LgsMainFile.h"
 #include "files/LgsObjectFile.h"
@@ -259,9 +258,10 @@ void LgsApp::loadSrcFile(const std::string& fileCode, const fs::path& filePath) 
     const auto file = parser.parseSrcFile(configs.isTestRun);
     {
         std::lock_guard lock(mtx);
-        if (file) srcFiles.push_back(file);
-        if (parser.errHandler.successful) return;
-        errHandler.mergeErrors(parser.errHandler);
+        if (file) file->asTestFile() ? testFiles.push_back(file->asTestFile()) : srcFiles.push_back(file);
+        if (!parser.errHandler.successful) {
+            errHandler.mergeErrors(parser.errHandler);
+        }
     }
 }
 
@@ -319,11 +319,11 @@ bool LgsApp::resolveGlobals() {
     for (const auto& file : srcFiles) {
         threadPool.runTask([&] {
             LgsTypeResolver typeResolver(file, errHandler, globals);
-            if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
+            if (const auto mainFile = file->asMainFile()) {
                 typeResolver.resolveMainFile(mainFile);
-            } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
+            } else if (const auto objFile = file->asObjectFile()) {
                 typeResolver.resolveObjTypes(objFile->obj);
-            } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
+            } else if (const auto interfaceFile = file->asInterfaceFile()) {
                 typeResolver.resolveInterface(interfaceFile->interface);
             }
             if (!errHandler.successful) {
@@ -358,7 +358,7 @@ bool LgsApp::generateRTTTypes() {
         for (const auto [_, type] : srcFile->symbolTable.rttTypes) {
             type->getRTType(rttFile.cgFile.cg);
         }
-        if (const auto mainFile = dynamic_cast<LgsMainFile*>(srcFile)) {
+        if (const auto mainFile = srcFile->asMainFile()) {
             for (const auto object : mainFile->objects) {
                 object->getRTType(rttFile.cgFile.cg);
                 for (const auto innerObj : object->objects) {
@@ -523,7 +523,7 @@ void LgsApp::initPaths(const fs::path& root) {
 
 LgsMainFile* LgsApp::getMainFile() const {
     for (const auto srcFile : srcFiles) {
-        if (srcFile->isMain()) return dynamic_cast<LgsMainFile*>(srcFile);
+        if (srcFile->isMain()) return srcFile->asMainFile();
     }
     return nullptr;
 }

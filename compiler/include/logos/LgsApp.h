@@ -5,7 +5,7 @@
 #include "LgsPaths.h"
 #include "errors/LgsErrHandler.h"
 
-class LgsAppConfigFile;
+class LgsAppFile;
 class LgsTestFile;
 class LogosParser;
 class LgsCodeGen;
@@ -31,7 +31,7 @@ public:
     std::vector<LgsEnvFile*> envFiles;
     std::vector<LgsFile*> genericFiles;
     std::vector<LgsTestFile*> testFiles;
-    LgsAppConfigFile* appConfigFile = nullptr;
+    LgsAppFile* appConfigFile = nullptr;
     std::vector<LgsApp*> importApps;
     std::string lgsCode; // Used when passing code directly
     LgsFile rttFile{"rtt", CG_MODE_RTTYPES};

@@ -50,12 +50,12 @@ set(COMPILER_SOURCE
 
     # Files
     ${CMAKE_SOURCE_DIR}/compiler/src/files/LgsFile.cpp
+    ${CMAKE_SOURCE_DIR}/compiler/src/files/LgsAppFile.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/files/LgsMainFile.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/files/LgsObjectFile.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/files/LgsInterfaceFile.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/files/LgsTestFile.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/files/LgsEnvFile.cpp
-    ${CMAKE_SOURCE_DIR}/compiler/src/files/LgsAppConfigFile.cpp
 
     # CLI
     ${CMAKE_SOURCE_DIR}/compiler/src/cli/LgsCliHandler.cpp

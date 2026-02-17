@@ -61,13 +61,13 @@ std::atomic<size_t> funcsIDGenerator{0};
 std::atomic<size_t> lambdasIDGenerator{0};
 
 void LgsSema::analyse() {
-    if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
+    if (const auto mainFile = file->asMainFile()) {
         visitMainFile(mainFile);
-    } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
+    } else if (const auto objFile = file->asObjectFile()) {
         visitObject(objFile->obj);
-    } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
+    } else if (const auto interfaceFile = file->asInterfaceFile()) {
         visitInterface(interfaceFile->interface);
-    } else if (const auto testFile = dynamic_cast<LgsTestFile*>(file)) {
+    } else if (const auto testFile = file->asTestFile()) {
         visitTestFile(testFile);
     } else {
         assert(0);
@@ -748,8 +748,7 @@ void LgsSema::visitIOStmt(LgsIOStmt* ioStmt) {
             ioStmt->closeFunc = ioPair->closeFunc;
         }
     } else if (file->isMain()) {
-        const auto mainFile = dynamic_cast<LgsMainFile*>(file);
-        for (const auto ioPair : mainFile->ioPairs) {
+        for (const auto ioPair : file->asMainFile()->ioPairs) {
             if (!funcCall->equals(ioPair->openFunc->funcType)) continue;
             ioStmt->closeFunc = ioPair->closeFunc;
         }

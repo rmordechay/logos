@@ -22,13 +22,13 @@
 #include <llvm/IR/InlineAsm.h>
 
 void LgsJsonParser::parseFile(LgsFile* file) {
-    if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
+    if (const auto mainFile = file->asMainFile()) {
         parseMainFile(mainFile);
-    } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
+    } else if (const auto objFile = file->asObjectFile()) {
         parseObject(objFile->obj);
-    } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
+    } else if (const auto interfaceFile = file->asInterfaceFile()) {
         parseInterface(interfaceFile->interface);
-    } else if (const auto testFile = dynamic_cast<LgsTestFile*>(file)) {
+    } else if (const auto testFile = file->asTestFile()) {
         parseTestFile(testFile);
     } else {
         assert(0);

@@ -13,7 +13,7 @@ class LgsStmtsBlock;
 class LgsMainFunc;
 class LgsMap;
 class LgsFuncType;
-class LgsAppConfigFile;
+class LgsAppFile;
 struct LgsFileMetadata;
 class LgsMetaSelection;
 class LgsMatrixExpr;
@@ -85,7 +85,7 @@ public:
     LgsFile* parseSrcFile(bool isTestRun);
     LgsFile* parseSrcFileHeaders();
     LgsMainFile* parseMainFile();
-    LgsAppConfigFile* parseAppConfigFile();
+    LgsAppFile* parseAppConfigFile();
     LgsObjectFile* parseObjectFile();
     LgsInterfaceFile* parseInterfaceFile();
     LgsEnvFile* parseEnvFile();
