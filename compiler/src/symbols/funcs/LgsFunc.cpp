@@ -71,12 +71,12 @@ Function* LgsFunc::getIRFunc(LgsCodeGen& cg) {
 
 Value* LgsFunc::call(LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) {
     if (fn) return fn(cg, args);
-    if (args.empty()) return callIR(cg, {});
+    if (!funcType->isMethod && args.empty()) return callIR(cg, {});
     if (funcType->isExternal) return callExternal(cg, args);
     if (funcType->isVariadic) return callWithVariadic(cg, args);
 
     std::vector<Value*> IRArgs;
-    const auto firstArgName = funcType->isMethod ? args[1].name : args.front().name;
+    const auto firstArgName = funcType->isMethod && funcType->params.size() > 1 ? args[1].name : args.front().name;
     const auto isNamed = !args.empty() && firstArgName != "";
     if (isNamed) {
         std::unordered_map<std::string, const LgsFuncArg*> argsByName;

@@ -24,11 +24,17 @@ LgsFunc* LgsIterable::getMethod(const std::string& methodName) {
     }
     if (methodName == IS_EMPTY_FUNC) {
         const auto func = new LgsFunc(methodName, getBaseName(), &LGS_BOOL, {this}, flags);
+        func->fn = [this](LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) {
+            return cg.builder.CreateICmpEQ(lenIR(cg, args.front().expr->IRValue), cg.zeroSize());
+        };
         addMethod(func);
         return func;
     }
     if (methodName == NOT_EMPTY_FUNC) {
         const auto func = new LgsFunc(methodName, getBaseName(), &LGS_BOOL, {this}, flags);
+        func->fn = [this](LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) {
+            return cg.builder.CreateICmpSGT(lenIR(cg, args.front().expr->IRValue), cg.zeroSize());
+        };
         addMethod(func);
         return func;
     }

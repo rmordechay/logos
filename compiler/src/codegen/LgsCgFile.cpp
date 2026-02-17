@@ -521,10 +521,11 @@ void LgsCgFile::visitDeferStmt(const LgsDeferStmt* defer) {
 void LgsCgFile::visitIOStmt(const LgsIOStmt* ioStmt) {
     visitExpr(ioStmt->varDec->expr);
     visitStmtsBlock(ioStmt->stmtsBlock);
+    // TODO handle return in the io block which will skip that
     ioStmt->closeFunc->call(cg, {});
 }
 
-void LgsCgFile::visitExpr(LgsExpr* expr) {
+void LgsCgFile::visitExpr(LgsExpr* expr, const bool assign) {
     if (!expr) return;
     if (const auto ternaryExpr = dynamic_cast<LgsTernaryExpr*>(expr)) {
         visitTernaryExpr(ternaryExpr);
@@ -539,9 +540,9 @@ void LgsCgFile::visitExpr(LgsExpr* expr) {
         else if (const auto floatConst = expr->asFloatConst()) visitFloatConst(floatConst);
         else if (const auto instance = expr->asInstance()) visitInstance(instance);
         else if (const auto funcCall = expr->asFuncCall()) visitFuncCall(funcCall);
-        else if (const auto variable = expr->asVariable()) visitVariable(variable);
-        else if (const auto iterIndex = expr->asIterIndex()) visitIterIndex(iterIndex, false);
-        else if (const auto selection = expr->asSelection()) visitSelection(selection, false);
+        else if (const auto variable = expr->asVariable()) visitVariable(variable, assign);
+        else if (const auto iterIndex = expr->asIterIndex()) visitIterIndex(iterIndex, assign);
+        else if (const auto selection = expr->asSelection()) visitSelection(selection, assign);
         else if (const auto nullableExpr = expr->asNullableExpr()) visitNullableExpr(nullableExpr);
         else if (const auto metaSelection = expr->asMetaSelection()) visitMetaSelection(metaSelection);
         else if (const auto arrayExpr = expr->asArrayExpr()) visitArrayExpr(arrayExpr);
@@ -713,31 +714,34 @@ void LgsCgFile::visitPrefixExpr(LgsPrefixExpr* prefixExpr) {
 }
 
 void LgsCgFile::visitPostfixExpr(LgsPostfixExpr* postfixExpr) {
-    visitExpr(postfixExpr->baseExpr);
-    postfixExpr->IRValue = postfixExpr->baseExpr->IRValue;
+    const auto variable = postfixExpr->baseExpr->asVariable();
+    assert(variable);
+    visitVariable(variable, true);
     const auto baseExprType = postfixExpr->baseExpr->type->getIRType(cg);
+    const auto baseValue = cg.load(baseExprType, postfixExpr->baseExpr->IRValue);
     const auto one = ConstantInt::get(baseExprType, 1, true);
     Value* newValue = nullptr;
     switch (postfixExpr->op) {
     case INC: {
-        newValue = cg.builder.CreateAdd(postfixExpr->IRValue, one);
+        newValue = cg.builder.CreateAdd(baseValue, one);
         break;
     }
     case DEC: {
-        newValue = cg.builder.CreateSub(postfixExpr->IRValue, one);
+        newValue = cg.builder.CreateSub(baseValue, one);
         break;
     }
     }
     cg.store(newValue, postfixExpr->baseExpr->IRValue);
+    postfixExpr->IRValue = newValue;
 }
 
-void LgsCgFile::visitVariable(LgsVariable* variable) {
+void LgsCgFile::visitVariable(LgsVariable* variable, const bool assign) {
     switch (variable->ref.symbolType) {
     case VAR_DEC: {
         const auto varDec = variable->ref.varDec;
         assert(variable->ref.varDec->IRValue);
         variable->IRValue = varDec->IRValue;
-        if (!variable->type->asSArray() && !variable->type->asNullable()) {
+        if (!assign) {
             variable->IRValue = variable->loadIRPtr(cg);
         }
         break;
@@ -803,11 +807,7 @@ void LgsCgFile::visitSelection(LgsSelection* selection, const bool assign) {
         const auto child = selection->exprs[i + 1];
         if (const auto var = child->asVariable()) {
             visitFieldSelection(var, parent);
-            if (assign) {
-                if (var->type->passByRef && i < iterationCount - 1) {
-                    var->IRValue = cg.loadPtr(var->IRValue);
-                }
-            } else if (var->type->passByRef) {
+            if (var->type->passByRef && (!assign || i < iterationCount - 1)) {
                 var->IRValue = cg.loadPtr(var->IRValue);
             }
         } else if (const auto methodCall = child->asFuncCall()) {

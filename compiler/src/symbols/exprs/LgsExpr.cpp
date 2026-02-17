@@ -134,6 +134,7 @@ std::optional<std::string> LgsExpr::getConstStr() {
 
 Value* LgsExpr::loadIRPtr(LgsCodeGen& cg) const {
     if (!IRValue->getType()->isPointerTy()) return IRValue;
+    if (type->asSArray() || type->asNullable()) return IRValue;
     return cg.load(type->getTypeOrPtr(cg), IRValue);
 }
 

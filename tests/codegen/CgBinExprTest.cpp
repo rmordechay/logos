@@ -9,15 +9,19 @@ TEST(CgBinExprTest, IntTest1) {
         print(23 * 34)
         print(23 + 34 - 235)
         print(23 - 34 * 2)
+        print((1 + 2) * 2)
+        print(1 + 2 * 2)
     }
     )";
     std::istringstream stream(getLgsOutput(code));
-    const auto lines = getLines(stream, 5);
+    const auto lines = getLines(stream, 7);
     EXPECT_EQ(lines[0], "57");
     EXPECT_EQ(lines[1], "-212");
     EXPECT_EQ(lines[2], "782");
     EXPECT_EQ(lines[3], "-178");
     EXPECT_EQ(lines[4], "-45");
+    EXPECT_EQ(lines[5], "6");
+    EXPECT_EQ(lines[6], "5");
 }
 
 TEST(CgBinExprTest, FloatTest1) {

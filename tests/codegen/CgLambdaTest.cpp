@@ -18,3 +18,17 @@ TEST(CgLambdaTest, Test1) {
     EXPECT_EQ(lines[1], "2.770");
     EXPECT_EQ(lines[2], "text");
 }
+
+TEST(CgLambdaTest, Test2) {
+    const auto code = R"(
+    func(f: (Int): Void) {
+        f(2)
+    }
+    main() {
+        func(x => print(x + 2))
+    }
+    )";
+    std::istringstream stream(getLgsOutput(code));
+    const auto lines = getLines(stream, 1);
+    EXPECT_EQ(lines[0], "4");
+}
