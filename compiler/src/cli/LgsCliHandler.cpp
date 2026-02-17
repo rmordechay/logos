@@ -28,7 +28,6 @@ bool LgsCliHandler::execute() const {
         printParentCmdHelp(COMMANDS);
         return false;
     }
-
     const std::string cmdStr = argv[1];
     if (isHelpCommand(cmdStr)) {
         printParentCmdHelp(COMMANDS);
@@ -44,6 +43,7 @@ bool LgsCliHandler::execute() const {
         printParentCmdHelp(COMMANDS);
         return false;
     }
+
     const auto isHelp = argc == 3 && isHelpCommand(argv[2]);
     if (isHelp) {
         cmd->printHelp();

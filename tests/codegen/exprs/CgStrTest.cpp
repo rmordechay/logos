@@ -14,7 +14,7 @@ TEST(CgStrTest, Test1) {
         print(hello + "world")
     }
     )";
-    std::istringstream stream(getLgsOutput(code));
+    std::istringstream stream(runLgsApp(code));
     const auto lines = getLines(stream, 6);
     for (auto line : lines) EXPECT_EQ(line, "Hello world");
 }
@@ -29,7 +29,7 @@ TEST(CgStrTest, Test2) {
         print(hello + "world")
     }
     )";
-    std::istringstream stream(getLgsOutput(code));
+    std::istringstream stream(runLgsApp(code));
     const auto lines = getLines(stream, 3);
     for (auto line : lines) EXPECT_EQ(line, "Hello world");
 }
@@ -45,7 +45,7 @@ TEST(CgStrTest, Test3) {
         print("text".isNotEmpty())
     }
     )";
-    std::istringstream stream(getLgsOutput(code));
+    std::istringstream stream(runLgsApp(code));
     const auto lines = getLines(stream, 6);
     EXPECT_EQ(lines[0], "0");
     EXPECT_EQ(lines[1], "4");

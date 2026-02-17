@@ -1,6 +1,7 @@
 #include "logos/LgsApp.h"
 #include <string>
 
+#include "LgsTestUtils.h"
 #include "exprs/LgsArrayExpr.h"
 #include "gtest/gtest.h"
 #include "files/LgsMainFile.h"
@@ -15,8 +16,7 @@ TEST(TypeResolverTest, SArrStr) {
         arr: Int[2] = [5, 6]
         arr2: Str[2] = ["text1", "text"]
     })";
-    app.loadSrcFile(code, LGS_MAIN_FILE);
-    app.analyse();
+    parseAndAnalyse(app, {code}, {LGS_MAIN_FILE});
     const auto mainFunc = app.getMainFile()->funcs.at(LGS_MAIN_FUNC);
 
     const auto varDec1 = mainFunc->stmtsBlock->stmts[0].stmt->asVarDec();
@@ -48,8 +48,7 @@ TEST(TypeResolverTest, Generics1) {
         arr = func([1, 2, 3])
     }
     )";
-    app.loadSrcFile(code, LGS_MAIN_FILE);
-    app.analyse();
+    parseAndAnalyse(app, {code}, {LGS_MAIN_FILE});
     const auto mainFile = app.getMainFile();
     const auto genericFunc = mainFile->symbolTable.genericsFuncs.at("u_func_DArrayInt");
     ASSERT_TRUE(genericFunc);
@@ -69,8 +68,7 @@ TEST(TypeResolverTest, Generics2) {
         arr = func([1, 2, 3])
     }
     )";
-    app.loadSrcFile(code, LGS_MAIN_FILE);
-    app.analyse();
+    parseAndAnalyse(app, {code}, {LGS_MAIN_FILE});
     const auto mainFile = app.getMainFile();
     const auto genericFunc = mainFile->symbolTable.genericsFuncs.at("u_func_DArrayInt");
     ASSERT_TRUE(genericFunc);

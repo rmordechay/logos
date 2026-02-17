@@ -21,7 +21,7 @@ TEST(CgInterfaceTest, Test1) {
         func(obj)
     }
     )";
-    std::istringstream stream(getLgsOutput(code));
+    std::istringstream stream(runLgsApp(code));
     const auto lines = getLines(stream, 2);
     EXPECT_EQ(lines[0], "From Obj");
     EXPECT_EQ(lines[1], "From Obj");
@@ -50,7 +50,7 @@ TEST(CgInterfaceTest, Test2) {
         obj2.func()
     }
     )";
-    std::istringstream stream(getLgsOutput(code));
+    std::istringstream stream(runLgsApp(code));
     const auto lines = getLines(stream, 2);
     EXPECT_EQ(lines[0], "From Obj");
     EXPECT_EQ(lines[1], "From Interface");

@@ -14,7 +14,7 @@ TEST(CgObjectTest, Test1) {
         print(obj)
     }
     )";
-    std::istringstream stream(getLgsOutput(code));
+    std::istringstream stream(runLgsApp(code));
     const auto lines = getLines(stream, 1);
     EXPECT_EQ(lines[0], "Obj{x=23, y=5.345, z=false, a=\"\"}");
 }

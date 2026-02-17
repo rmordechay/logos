@@ -12,7 +12,7 @@ TEST(CgLambdaTest, Test1) {
         f3("text")
     }
     )";
-    std::istringstream stream(getLgsOutput(code));
+    std::istringstream stream(runLgsApp(code));
     const auto lines = getLines(stream, 3);
     EXPECT_EQ(lines[0], "2");
     EXPECT_EQ(lines[1], "2.770");
@@ -32,7 +32,7 @@ TEST(CgLambdaTest, Test2) {
         func(func2)
     }
     )";
-    std::istringstream stream(getLgsOutput(code));
+    std::istringstream stream(runLgsApp(code));
     const auto lines = getLines(stream, 1);
     EXPECT_EQ(lines[0], "4");
 }

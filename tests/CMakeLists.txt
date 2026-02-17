@@ -8,22 +8,23 @@ add_executable(lgs_tests
     parser/ParserTest.cpp
     sema/ErrorsTest.cpp
     sema/TypeResolverTest.cpp
+    codegen/CgMemoryTest.cpp
     codegen/CgIfStmtTest.cpp
     codegen/CgLoopsTest.cpp
-    codegen/CgBinExprTest.cpp
-    codegen/CgArraysTest.cpp
     codegen/CgGenericsTest.cpp
-    codegen/CgStrTest.cpp
-    codegen/CgVecTest.cpp
     codegen/CgDeferTest.cpp
-    codegen/CgLambdaTest.cpp
     codegen/CgObjectTest.cpp
     codegen/CgAssignTest.cpp
     codegen/CgIOPairTest.cpp
     codegen/CgInterfaceTest.cpp
-    codegen/CgFuncCallTest.cpp
-    codegen/CgUnaryExprTest.cpp
-    codegen/CgNullableTest.cpp
+    codegen/exprs/CgBinExprTest.cpp
+    codegen/exprs/CgArraysTest.cpp
+    codegen/exprs/CgStrTest.cpp
+    codegen/exprs/CgVecTest.cpp
+    codegen/exprs/CgLambdaTest.cpp
+    codegen/exprs/CgFuncCallTest.cpp
+    codegen/exprs/CgUnaryExprTest.cpp
+    codegen/exprs/CgNullableTest.cpp
 )
 
 target_include_directories(lgs_tests PRIVATE

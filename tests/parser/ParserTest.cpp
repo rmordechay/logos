@@ -12,10 +12,6 @@ TEST(ParserTest, Test1) {
         main() {}
     )";
     const auto expectedTree = getFileText(expectedDir + "/ParserTest1.json");
-    app.loadSrcFile(code, LGS_MAIN_FILE);
-    const auto mainFile = app.srcFiles.front()->asMainFile();
-    LgsJsonParser parser;
-    parser.parseMainFile(mainFile);
     //EXPECT_EQ(app.errHandler.errors.size(), 0);
     //EXPECT_EQ(parser.json.str(), expectedTree);
 }

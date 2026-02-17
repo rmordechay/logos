@@ -6,7 +6,7 @@
 #include "Lgs_Types.h"
 
 #define NANO 1000000000LL
-
+static void moveAndAssign(const Lgs_TypeInfo* fieldType, void* left, void* right, size_t toLevel);
 extern "C" void* Lgs_Runtime_moveValue(const Lgs_TypeInfo* type, void* value, size_t toLevel);
 
 extern "C" void Lgs_Runtime_init() {}
@@ -75,7 +75,11 @@ extern "C" void* Lgs_Runtime_moveObject(void* obj, const size_t toLevel) {
         const auto fieldOffset = objType->fields[i].offset;
         const auto fieldType = objType->fields[i].type;
         void* fieldPtr = static_cast<char*>(obj) + fieldOffset;
-        Lgs_Runtime_moveValue(fieldType, fieldPtr, toLevel);
+        void* newFieldPtr = static_cast<char*>(newObj) + fieldOffset;
+        if (fieldType->isHeap) {
+            fieldPtr = *static_cast<void**>(fieldPtr);
+        }
+        moveAndAssign(fieldType, newFieldPtr, fieldPtr, toLevel);
     }
     return newObj;
 }
@@ -88,9 +92,15 @@ extern "C" void* Lgs_Runtime_moveDArray(Lgs_DArrExpr* arr, const size_t toLevel)
     newArr->baseType = arr->baseType;
     newArr->length = arr->length;
     newArr->capacity = arr->capacity;
-    const auto size = newArr->capacity * newArr->baseType->size;
-    newArr->data = static_cast<char*>(allocator.allocate(size, false));
-    std::memcpy(newArr->data, arr->data, size);
+    newArr->data = static_cast<char*>(allocator.allocate(arr->capacity * arr->baseType->size, false));
+    for (int i = 0; i < arr->length; ++i) {
+        void* element = arr->data + arr->baseType->size * i;
+        void* newElement = newArr->data + arr->baseType->size * i;
+        if (arr->baseType->isHeap) {
+            element = *static_cast<void**>(element);
+        }
+        moveAndAssign(arr->baseType, newElement, element, toLevel);
+    }
     return newArr;
 }
 
@@ -116,6 +126,15 @@ extern "C" void* Lgs_Runtime_moveValue(const Lgs_TypeInfo* type, void* value, co
     default: break;
     }
     return value;
+}
+
+static void moveAndAssign(const Lgs_TypeInfo* fieldType, void* left, void* right, const size_t toLevel) {
+    const auto ptr = Lgs_Runtime_moveValue(fieldType, right, toLevel);
+    if (fieldType->isHeap) {
+        *static_cast<void**>(left) = ptr;
+    } else {
+        std::memcpy(left, ptr, fieldType->size);
+    }
 }
 
 extern "C" void* Lgs_Runtime_getVField(const Lgs_Object* type, void* objInstance, const char* fieldName) {

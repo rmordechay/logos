@@ -11,7 +11,7 @@ inline void expectErrors(const LgsApp& app, const LgsBaseMsg& baseMsg, const siz
     }
 }
 
-inline std::string getLgsOutput(const std::string& code) {
+inline std::string runLgsApp(const std::string& code) {
     fs::path execPath = "";
     {
         LgsApp app;
@@ -41,4 +41,12 @@ inline std::vector<std::string> getLines(std::istringstream& stream, const size_
         lines.push_back(line);
     }
     return lines;
+}
+
+inline void parseAndAnalyse(LgsApp& app, const std::vector<std::string>& codes, const std::vector<fs::path>& paths) {
+    assert(paths.size() == codes.size());
+    for (int i = 0; i < codes.size(); ++i) {
+        app.loadSrcFile(codes[i], paths[i]);
+    }
+    app.analyse();
 }

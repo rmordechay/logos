@@ -15,7 +15,7 @@ TEST(CgLoopsTest, Test1) {
         }
     }
     )";
-    std::istringstream stream(getLgsOutput(code));
+    std::istringstream stream(runLgsApp(code));
     const auto lines = getLines(stream, 9);
     EXPECT_EQ(lines[0], "0");
     EXPECT_EQ(lines[1], "1");
@@ -36,7 +36,7 @@ TEST(CgLoopsTest, Test2) {
         }
     }
     )";
-    std::istringstream stream(getLgsOutput(code));
+    std::istringstream stream(runLgsApp(code));
     const auto lines = getLines(stream, 5);
     EXPECT_EQ(lines[0], "5");
     EXPECT_EQ(lines[1], "6");
@@ -59,7 +59,7 @@ TEST(CgLoopsTest, Test3) {
         print(arr)
     }
     )";
-    std::istringstream stream(getLgsOutput(code));
+    std::istringstream stream(runLgsApp(code));
     const auto lines = getLines(stream, 7);
     EXPECT_EQ(lines[0], "0");
     EXPECT_EQ(lines[1], "1");
@@ -81,7 +81,7 @@ TEST(CgLoopsTest, Test4) {
         }
     }
     )";
-    std::istringstream stream(getLgsOutput(code));
+    std::istringstream stream(runLgsApp(code));
     const auto lines = getLines(stream, 6);
     EXPECT_EQ(lines[0], "0");
     EXPECT_EQ(lines[1], "5");

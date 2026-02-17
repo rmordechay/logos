@@ -13,7 +13,7 @@ TEST(CgBinExprTest, IntTest1) {
         print(1 + 2 * 2)
     }
     )";
-    std::istringstream stream(getLgsOutput(code));
+    std::istringstream stream(runLgsApp(code));
     const auto lines = getLines(stream, 7);
     EXPECT_EQ(lines[0], "57");
     EXPECT_EQ(lines[1], "-212");
@@ -34,7 +34,7 @@ TEST(CgBinExprTest, FloatTest1) {
         print(23.3 - 34.3 * 2.2)
     }
     )";
-    std::istringstream stream(getLgsOutput(code));
+    std::istringstream stream(runLgsApp(code));
     const auto lines = getLines(stream, 5);
     EXPECT_EQ(lines[0], "58.230");
     EXPECT_EQ(lines[1], "-212.250");
@@ -58,7 +58,7 @@ TEST(CgBinExprTest, VecTest1) {
         //print(vec1 X vec2)
     }
     )";
-    std::istringstream stream(getLgsOutput(code));
+    std::istringstream stream(runLgsApp(code));
     const auto lines = getLines(stream, 6);
     EXPECT_EQ(lines[0], "Vec3(5.34, 6.71, 11.34)");
     EXPECT_EQ(lines[1], "Vec3(-0.66, 0.71, 5.34)");

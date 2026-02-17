@@ -16,7 +16,7 @@ TEST(CgIoPairTest, Test1) {
         }
     }
     )";
-    std::istringstream stream(getLgsOutput(code));
+    std::istringstream stream(runLgsApp(code));
     const auto lines = getLines(stream, 3);
     EXPECT_EQ(lines[0], "Opening file");
     EXPECT_EQ(lines[1], "Do Something");

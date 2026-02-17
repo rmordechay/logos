@@ -13,7 +13,7 @@ TEST(CgUnaryExprTest, PostfixExprTest) {
         print(a--)
     }
     )";
-    std::istringstream stream(getLgsOutput(code));
+    std::istringstream stream(runLgsApp(code));
     const auto lines = getLines(stream, 4);
     EXPECT_EQ(lines[0], "2");
     EXPECT_EQ(lines[1], "1");
@@ -30,7 +30,7 @@ TEST(CgUnaryExprTest, PrefixExprTest) {
         print(b)
     }
     )";
-    std::istringstream stream(getLgsOutput(code));
+    std::istringstream stream(runLgsApp(code));
     const auto lines = getLines(stream, 2);
     EXPECT_EQ(lines[0], "true");
     EXPECT_EQ(lines[1], "false");

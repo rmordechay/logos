@@ -13,7 +13,7 @@ TEST(CgVecTest, Test1) {
         print(Vec4(Vec2(1.2), Vec2(1.3)))
     }
     )";
-    std::istringstream stream(getLgsOutput(code));
+    std::istringstream stream(runLgsApp(code));
     const auto lines = getLines(stream, 7);
     EXPECT_EQ(lines[0], "Vec2(1, 1)");
     EXPECT_EQ(lines[1], "Vec2(1.1, 1.1)");

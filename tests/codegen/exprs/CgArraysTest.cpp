@@ -26,7 +26,7 @@ TEST(CgArraysTest, DArrTest1) {
         print(arr3)
     }
     )";
-    std::istringstream stream(getLgsOutput(code));
+    std::istringstream stream(runLgsApp(code));
     const auto lines = getLines(stream, 7);
     EXPECT_EQ(lines[0], "[1, 2]");
     EXPECT_EQ(lines[1], "[1, 2, 3]");
@@ -48,7 +48,7 @@ TEST(CgArraysTest, SArrTest1) {
         print(arr)
     }
     )";
-    std::istringstream stream(getLgsOutput(code));
+    std::istringstream stream(runLgsApp(code));
     const auto lines = getLines(stream, 3);
     EXPECT_EQ(lines[0], "[1, 2]");
     EXPECT_EQ(lines[1], "[3, 2]");
@@ -64,7 +64,7 @@ TEST(CgArraysTest, SArrTest2) {
         print(func())
     }
     )";
-    std::istringstream stream(getLgsOutput(code));
+    std::istringstream stream(runLgsApp(code));
     const auto lines = getLines(stream, 1);
     EXPECT_EQ(lines[0], "[1, 2, 3]");
 }
@@ -88,7 +88,7 @@ TEST(CgArraysTest, SArrTest3) {
         print(arr)
     }
     )";
-    std::istringstream stream(getLgsOutput(code));
+    std::istringstream stream(runLgsApp(code));
     const auto lines = getLines(stream, 7);
     EXPECT_EQ(lines[0], "[[[0, 0], [0, 0]], [[0, 0], [0, 0]]]");
     EXPECT_EQ(lines[1], "[[[1, 0], [0, 0]], [[0, 0], [0, 0]]]");

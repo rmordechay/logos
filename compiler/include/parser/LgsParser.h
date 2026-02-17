@@ -63,33 +63,33 @@ class LgsExpr;
 
 class LgsParser {
 public:
+    bool headersOnly;
+    const LgsPaths& paths;
     const fs::path filePath;
-    const std::string& lgsCode;
+    LgsSymbolTable& globals;
+    LgsErrHandler errHandler;
+    const std::string lgsCode;
     LgsToken currentToken;
     size_t currentIndex = 0;
     size_t recursionCount = 0;
     std::vector<LgsToken> tokens;
     LgsFunc* currentFunc = nullptr;
-    bool headersOnly;
-    const LgsPaths& paths;
-    LgsSymbolTable& globals;
-    LgsErrHandler errHandler;
-    std::vector<LgsImport*> importPaths;
+    std::vector<LgsImport> importPaths;
     std::unordered_set<std::string> importAppNames;
 
     LgsParser(const std::string& lgsCode, const fs::path& filePath, const LgsPaths& paths, LgsSymbolTable& globals, const bool headersOnly = false)
-        : filePath(filePath), lgsCode(lgsCode), headersOnly(headersOnly), paths(paths), globals(globals) {
+        : headersOnly(headersOnly), paths(paths), filePath(filePath), globals(globals), lgsCode(lgsCode) {
     }
     // Files
     bool scanTokens();
     LgsFile* parseSrcFile(bool isTestRun);
     LgsFile* parseSrcFileHeaders();
     LgsMainFile* parseMainFile();
-    LgsAppFile* parseAppConfigFile();
     LgsObjectFile* parseObjectFile();
     LgsInterfaceFile* parseInterfaceFile();
-    LgsEnvFile* parseEnvFile();
     LgsTestFile* parseTestFile();
+    LgsAppFile* parseAppFile();
+    LgsEnvFile* parseEnvFile();
 
     // Object
     LgsObject* parseObject();

@@ -10,7 +10,7 @@ TEST(CgAssignmentTest, Test1) {
         print(var)
     }
     )";
-    std::istringstream stream(getLgsOutput(code));
+    std::istringstream stream(runLgsApp(code));
     const auto lines = getLines(stream, 2);
     EXPECT_EQ(lines[0], "2");
     EXPECT_EQ(lines[1], "3");
@@ -25,7 +25,7 @@ TEST(CgAssignmentTest, Test2) {
         print(var2)
     }
     )";
-    std::istringstream stream(getLgsOutput(code));
+    std::istringstream stream(runLgsApp(code));
     const auto lines = getLines(stream, 2);
     EXPECT_EQ(lines[0], "[2, 3]");
     EXPECT_EQ(lines[1], "[6, 3]");
@@ -40,7 +40,7 @@ TEST(CgAssignmentTest, Test3) {
         print(var3)
     }
     )";
-    std::istringstream stream(getLgsOutput(code));
+    std::istringstream stream(runLgsApp(code));
     const auto lines = getLines(stream, 2);
     EXPECT_EQ(lines[0], "2");
     EXPECT_EQ(lines[1], "4");
@@ -56,7 +56,7 @@ TEST(CgAssignmentTest, Test4) {
         print(a)
     }
     )";
-    std::istringstream stream(getLgsOutput(code));
+    std::istringstream stream(runLgsApp(code));
     const auto lines = getLines(stream, 2);
     EXPECT_EQ(lines[0], "text");
     EXPECT_EQ(lines[1], "null");
@@ -74,7 +74,7 @@ TEST(CgAssignmentTest, Test5) {
         print(var4)
     }
     )";
-    std::istringstream stream(getLgsOutput(code));
+    std::istringstream stream(runLgsApp(code));
     const auto lines = getLines(stream, 2);
     EXPECT_EQ(lines[0], "Obj{x=0}");
     EXPECT_EQ(lines[1], "Obj{x=2}");

@@ -48,8 +48,9 @@ public:
     bool generate();
     bool link();
     bool loadConfigs();
-    void loadSrcFile(const std::string& fileCode, const fs::path& filePath);
-    bool loadConfigFile();
+    void loadSrcFile(const fs::path& filePath);
+    void loadSrcFile(const std::string& code, const fs::path& filePath);
+    bool loadAppFile();
     bool loadEnvFiles();
     void loadBuiltins();
     bool resolveGlobals();
@@ -59,7 +60,7 @@ public:
     bool validateProject();
     bool validateEnvsFiles();
     bool validateRequiredEnvs();
-    bool resolveImports();
+    bool resolvePackages();
     void printIR() const;
     void initPaths(const fs::path& root);
     LgsMainFile* getMainFile() const;

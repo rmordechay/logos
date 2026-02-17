@@ -18,7 +18,7 @@ void LgsAstCmd::run() {
     }
     LgsApp app(path);
     if (!app.setup()) return;
-    app.loadSrcFile(getFileText(path), path);
+    app.loadSrcFile(path);
     LgsJsonParser parser;
     parser.parseFile(app.srcFiles.front());
     std::cout << parser.json.str();

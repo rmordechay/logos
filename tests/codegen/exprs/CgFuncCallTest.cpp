@@ -13,7 +13,7 @@ TEST(CgFuncCallTest, Test1) {
         print(func(y=5, x=3))
     }
     )";
-    std::istringstream stream(getLgsOutput(code));
+    std::istringstream stream(runLgsApp(code));
     const auto lines = getLines(stream, 3);
     EXPECT_EQ(lines[0], "2");
     EXPECT_EQ(lines[1], "2");

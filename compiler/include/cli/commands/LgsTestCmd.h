@@ -1,10 +1,10 @@
 #pragma once
-#include "cli/LgsCliCmd.h"
+#include "LgsRunCmd.h"
 #include "types/iterables/LgsStr.h"
 
-class LgsTestCmd final : public LgsCliCmd{
+class LgsTestCmd final : public LgsRunCmd {
 public:
-    LgsTestCmd(const int argc, char** argv) : LgsCliCmd(argc, argv) {}
+    LgsTestCmd(const int argc, char** argv) : LgsRunCmd (argc, argv) {}
     void run() override;
     LgsCliCmdHelp& getHelp() override;
 };

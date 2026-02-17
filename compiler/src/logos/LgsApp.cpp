@@ -107,18 +107,17 @@ bool LgsApp::parse() {
     // File mode
     if (configs.appMode == FILE_MODE) {
         const auto filePath = appCache.files.front().path;
-        loadSrcFile(getFileText(filePath), filePath);
+        loadSrcFile(filePath);
         return errHandler.successful;
     }
 
     // Project mode
     if (!loadEnvFiles()) return false;
-    if (!resolveImports()) return false;
+    if (!resolvePackages()) return false;
     for (auto& metadata : appCache.files) {
         if (metadata.type != LGS_SRC_FILE) continue;
         threadPool.runTask([&metadata, this] {
-            const auto fileCode = getFileText(metadata.path);
-            loadSrcFile(fileCode, metadata.path);
+            loadSrcFile(metadata.path);
         });
     }
     threadPool.wait();
@@ -143,14 +142,14 @@ void LgsApp::parseCImports() {
     std::unordered_set<std::string> seen;
     for (const auto file : srcFiles) {
         LgsCCompiler lgsCC(paths);
-        for (const auto externalImport : file->symbolTable.importPaths) {
-            if (externalImport->type != LGS_C_IMPORT) continue;
-            auto headerPath = externalImport->importPath;
+        for (const auto& externalImport : file->symbolTable.importPaths) {
+            if (externalImport.type != LGS_C_IMPORT) continue;
+            auto headerPath = externalImport.importPath;
             if (!seen.insert(headerPath).second) continue;
             if (lgsCC.parseFile(headerPath)) {
                 file->symbolTable.symbols.merge(lgsCC.parser.symbolTable.symbols);
             } else {
-                errHandler.addError(E10106, &externalImport->location, file->path, {headerPath});
+                errHandler.addError(E10106, &externalImport.location, file->path, {headerPath});
             }
         }
     }
@@ -226,7 +225,7 @@ bool LgsApp::link() {
 bool LgsApp::loadConfigs() {
     assert(errHandler.successful);
     if (configs.appMode != PROJECT_MODE) return true;
-    if (!loadConfigFile()) return false;
+    if (!loadAppFile()) return false;
     for (const auto config : appConfigFile->configs) {
         const auto configNama = config->name;
         if (configNama == "name") {
@@ -249,9 +248,9 @@ bool LgsApp::loadConfigs() {
     return true;
 }
 
-void LgsApp::loadSrcFile(const std::string& fileCode, const fs::path& filePath) {
-    appCache.files.emplace_back(filePath);
-    LgsParser parser(fileCode, filePath, paths, globals);
+void LgsApp::loadSrcFile(const std::string& code, const fs::path& filePath) {
+    if (code == "") return;
+    LgsParser parser(code, filePath, paths, globals);
     for (const auto importApp : importApps) {
         parser.importAppNames.insert(importApp->configs.name);
     }
@@ -265,7 +264,13 @@ void LgsApp::loadSrcFile(const std::string& fileCode, const fs::path& filePath) 
     }
 }
 
-bool LgsApp::loadConfigFile() {
+void LgsApp::loadSrcFile(const fs::path& filePath) {
+    const auto code = getFileText(filePath);
+    if (code == "") return;
+    loadSrcFile(code, filePath);
+}
+
+bool LgsApp::loadAppFile() {
     if (configs.appMode != PROJECT_MODE && configs.appMode != PKG_MANAGER_MODE) return true;
     if (paths.appConfigFile == "") {
         errHandler.addError(E10086, {LGS_EMPTY_STR});
@@ -275,8 +280,9 @@ bool LgsApp::loadConfigFile() {
         errHandler.addError(E10086, {paths.appConfigFile});
         return false;
     }
-    LgsParser parser(getFileText(paths.appConfigFile), paths.appConfigFile, paths, globals);
-    appConfigFile = parser.parseAppConfigFile();
+    const auto code = getFileText(paths.appConfigFile);
+    LgsParser parser(code, paths.appConfigFile, paths, globals);
+    appConfigFile = parser.parseAppFile();
     if (!parser.errHandler.successful) {
         errHandler.mergeErrors(parser.errHandler);
     }
@@ -477,7 +483,7 @@ bool LgsApp::validateRequiredEnvs() {
     return errHandler.successful;
 }
 
-bool LgsApp::resolveImports() {
+bool LgsApp::resolvePackages() {
     if (!appConfigFile) return true;
     for (auto package : appConfigFile->packages) {
         const auto app = new LgsApp(package.path);

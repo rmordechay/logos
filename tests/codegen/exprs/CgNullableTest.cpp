@@ -17,7 +17,7 @@ TEST(CgNullableTest, Test1) {
         print(func2())
     }
     )";
-    std::istringstream stream(getLgsOutput(code));
+    std::istringstream stream(runLgsApp(code));
     const auto lines = getLines(stream, 2);
     EXPECT_EQ(lines[0], "text");
     EXPECT_EQ(lines[1], "null");

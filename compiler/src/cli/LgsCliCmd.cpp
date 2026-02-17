@@ -60,7 +60,7 @@ int LgsCliCmd::parseArgs(const int indexStart, const std::function<void(const st
 
 bool LgsCliCmd::isArgEqual(const std::string& arg1, const std::vector<std::string>& args) {
     for (auto arg2 : args) {
-        // -o 3 or -o3
+        // e.g. -o 3 or -o3
         const auto isSingleLetter = arg2.length() == 1 || (arg2.length() == 2 && isdigit(arg2[1]));
         if (isSingleLetter && arg2 == arg1.substr(0, arg1.length() - 1)) return true;
         if (arg1 == arg2) return true;

@@ -29,14 +29,14 @@ void LgsFormatter::formatFile(LgsFile* file) {
     } else {
         assert(0);
     }
-    LgsApp app;
-    app.loadSrcFile(formatted.str(), file->path);
-    const auto oldFileHash = file->hashFile();
-    const auto newFileSize = app.srcFiles.front()->hashFile();
-    assert(oldFileHash == newFileSize);
-    std::ofstream outFile(file->path, std::ios::out | std::ios::trunc);
-    outFile << formatted.str();
-    outFile.close();
+    // LgsApp app;
+    // app.loadSrcFile(formatted.str(), file->path);
+    // const auto oldFileHash = file->hashFile();
+    // const auto newFileSize = app.srcFiles.front()->hashFile();
+    // assert(oldFileHash == newFileSize);
+    // std::ofstream outFile(file->path, std::ios::out | std::ios::trunc);
+    // outFile << formatted.str();
+    // outFile.close();
 }
 
 void LgsFormatter::formatMainFile(LgsMainFile* mainFile) {

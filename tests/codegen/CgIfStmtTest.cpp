@@ -16,7 +16,7 @@ TEST(CgIfStmtTest, Test1) {
         }
     }
     )";
-    std::istringstream stream(getLgsOutput(code));
+    std::istringstream stream(runLgsApp(code));
     const auto lines = getLines(stream, 1);
     EXPECT_EQ(lines[0], "true");
 }
@@ -42,7 +42,7 @@ TEST(CgIfStmtTest, Test2) {
         }
     }
     )";
-    std::istringstream stream(getLgsOutput(code));
+    std::istringstream stream(runLgsApp(code));
     const auto lines = getLines(stream, 3);
     EXPECT_EQ(lines[0], "false");
     EXPECT_EQ(lines[1], "false");
@@ -62,7 +62,7 @@ TEST(CgIfStmtTest, Test3) {
         }
     }
     )";
-    std::istringstream stream(getLgsOutput(code));
+    std::istringstream stream(runLgsApp(code));
     const auto lines = getLines(stream, 1);
     EXPECT_EQ(lines[0], "false");
 }
@@ -82,7 +82,7 @@ TEST(CgIfStmtTest, Test4) {
         func()
     }
     )";
-    std::istringstream stream(getLgsOutput(code));
+    std::istringstream stream(runLgsApp(code));
     const auto lines = getLines(stream, 1);
     EXPECT_EQ(lines[0], "Hello world");
 }
