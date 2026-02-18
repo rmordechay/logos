@@ -26,7 +26,10 @@ bool LgsHashMap::equals(LgsExpr* other) {
 }
 
 std::string LgsHashMap::asText() {
-    return type->pname();
+    if (type) return type->pname();
+    if (elements.empty()) return "[]";
+    const auto p = elements.front()->asPair();
+    return "{" + p->key->asText() + ": " + p->key->asText() + "...}";
 }
 
 LgsHashMap::~LgsHashMap() {

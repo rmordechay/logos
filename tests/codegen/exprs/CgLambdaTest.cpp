@@ -36,3 +36,17 @@ TEST(CgLambdaTest, Test2) {
     const auto lines = getLines(stream, 1);
     EXPECT_EQ(lines[0], "4");
 }
+
+TEST(CgLambdaTest, Test3) {
+    const auto code = R"(
+    func(f: (Int): Void) {
+        f(2)
+    }
+    main() {
+        func({print(it)})
+    }
+    )";
+    std::istringstream stream(runLgsApp(code));
+    const auto lines = getLines(stream, 1);
+    EXPECT_EQ(lines[0], "2");
+}

@@ -437,7 +437,7 @@ LgsInterface* LgsParser::parseInterfaceBody(const LgsToken& tokenName) {
         const auto method = new LgsFunc(funcHeader);
         method->funcType->isPublic = true;
         method->funcType->addSelf(interface);
-        method->stmtsBlock = parseStmtsBlock(false);
+        method->stmtsBlock = parseStmtsBlock(false, false);
         if (!method->stmtsBlock) {
             method->funcType->isVirtual = true;
         }
@@ -838,11 +838,14 @@ LgsStmt* LgsParser::parseStmt() {
     return nullptr;
 }
 
-LgsStmtsBlock* LgsParser::parseStmtsBlock(const bool withSingleStmt) {
+LgsStmtsBlock* LgsParser::parseStmtsBlock(const bool wrapInFunc, const bool withSingleStmt) {
+    if (wrapInFunc && currentToken.type == T_LBRACE && peek().type == T_RBRACE) {
+        return nullptr;
+    }
     LgsStmtsBlock* stmtsBlock = nullptr;
     const auto startToken = currentToken;
     const auto isMacro = matchAndConsume(T_STAR_LBRACE);
-    if (isMacro || matchAndConsume(T_LBRACE)) {
+    if (matchAndConsume(T_LBRACE) || isMacro) {
         stmtsBlock = new LgsStmtsBlock();
         stmtsBlock->isMacro = isMacro;
         if (!matchAndConsume(T_RBRACE)) {
@@ -925,7 +928,7 @@ LgsVarDec* LgsParser::parseVarDec() {
 LgsStmt* LgsParser::parseAssignment() {
     const auto oldIndex = currentIndex;
     // Left expr
-    const auto l = parseExpr();
+    const auto l = parseExpr(false);
     if (!parsedOrReset(l, oldIndex)) return nullptr;
 
     // Operation
@@ -1169,7 +1172,7 @@ LgsDeferStmt* LgsParser::parseDeferStmt() {
     if (!matchAndConsume(T_DEFER)) return nullptr;
 
     LgsExpr* expr = nullptr;
-    if (const auto stmtsBlock = parseStmtsBlock(false)) {
+    if (const auto stmtsBlock = parseStmtsBlock(false, false)) {
         if (stmtsBlock->isMacro) addParsingError();
         const auto fc = new LgsFuncCall("");
         setLocation(fc->location, &deferToken, &currentToken);
@@ -1221,15 +1224,13 @@ LgsIOStmt* LgsParser::parseIOStmt() {
     return ioStmt;
 }
 
-LgsExpr* LgsParser::parseExpr(const bool withLamda) {
-    if (currentToken.type == T_RBRACE || currentToken.type == T_RPAREN || currentToken.type == T_RANGLE) {
-        return nullptr;
-    }
-    if (withLamda) if (const auto lambda = parseLambda()) return lambda;
-    return parseBinaryExpr(0, withLamda);
+LgsExpr* LgsParser::parseExpr(const bool withLambda) {
+    const auto t = currentToken.type;
+    if (t == T_RBRACE || t == T_RPAREN || t == T_RANGLE) return nullptr;
+    return parseBinExpr(0, withLambda);
 }
 
-LgsExpr* LgsParser::parseBinaryExpr(const int minPrecedence, const bool withLambda) {
+LgsExpr* LgsParser::parseBinExpr(const int minPrecedence, const bool withLambda) {
     auto left = parseUnary(withLambda);
     if (!left) return nullptr;
     while (true) {
@@ -1258,7 +1259,7 @@ LgsExpr* LgsParser::parseBinaryExpr(const int minPrecedence, const bool withLamb
         const auto precedence = getBinOpPrecedence(op->opType);
         if (precedence < minPrecedence) break;
         consume();
-        const auto right = parseBinaryExpr(precedence + 1, withLambda);
+        const auto right = parseBinExpr(precedence + 1, withLambda);
         if (!right) {
             addParsingError();
             return left;
@@ -1269,13 +1270,17 @@ LgsExpr* LgsParser::parseBinaryExpr(const int minPrecedence, const bool withLamb
 }
 
 LgsExpr* LgsParser::parseUnary(const bool withInstance) {
+    LgsExpr* expr = nullptr;
+    if (withInstance) {
+        if ((expr = parseHashMap())) return expr;
+        if ((expr = parseLambda())) return expr;
+    }
     if (matchAndConsume(T_LPAREN)) {
-        const auto expr = parseBinaryExpr(0, withInstance);
+        expr = parseExpr(withInstance);
         mustMatch(T_RPAREN);
         return expr;
     }
 
-    LgsExpr* expr = nullptr;
     if ((expr = parseConstant())) {}
     else if ((expr = parseLoopMetaVar())) {}
     else if ((expr = parseEnvVar())) {}
@@ -1638,6 +1643,9 @@ LgsHashMap* LgsParser::parseHashMap() {
 
 
 LgsFunc* LgsParser::parseLambda() {
+    if (const auto stmtBlock = parseStmtsBlock(true, false)) {
+        return stmtBlock->wrapBlockInFunc();
+    }
     const auto startToken = currentToken;
     const auto oldIndex = currentIndex;
     std::vector<LgsParam> params;

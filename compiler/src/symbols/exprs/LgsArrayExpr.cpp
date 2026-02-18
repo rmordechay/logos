@@ -40,7 +40,7 @@ void LgsArrayExpr::setDebugValue(LgsCodeGen& cg) {
 std::string LgsArrayExpr::asText() {
     if (type) return type->pname();
     if (elements.empty()) return "[]";
-    return "[" + elements.front()->asText() + ", ...]";
+    return "[" + elements.front()->asText() + "...]";
 }
 
 LgsExpr* LgsArrayExpr::clone() {

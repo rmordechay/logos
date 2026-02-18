@@ -29,3 +29,22 @@ TEST(CgGenericsTest, Test1) {
     EXPECT_EQ(lines[2], "3");
     EXPECT_EQ(lines[3], "[3]");
 }
+
+TEST(CgGenericsTest, Test2) {
+    const auto code = R"(
+    map<T, U>(arr: T[], cb: (T): U): U[] {
+        newArr: T[]
+        for arr {
+            newArr.add(cb(for.element))
+        }
+        return newArr
+    }
+    main() {
+        print(map([1, 2, 3], (x: Int) => x + 2))
+        //print(map([1, 2, 3], {it + 2}))
+    }
+    )";
+    std::istringstream stream(runLgsApp(code));
+    const auto lines = getLines(stream, 1);
+    EXPECT_EQ(lines[0], "[3, 4, 5]");
+}

@@ -97,31 +97,28 @@ bool LgsFuncType::equals(LgsType* other) {
 }
 
 bool LgsFuncType::hasGenerics() {
-    if (rt->hasGenerics()) return true;
-    for (const auto& param : params) if (param.type->hasGenerics()) return true;
+    if (rt && rt->hasGenerics()) return true;
+    for (const auto& param : params) {
+        if (param.type && param.type->hasGenerics()) return true;
+    }
     return false;
 }
 
 void LgsFuncType::replaceGenerics(std::unordered_map<std::string, LgsType*>& replacements) {
     const auto r = replacements.find(getName());
     if (r == replacements.end()) return;
-    const auto otherFuncType = r->second->asFuncType();
+    const auto replFuncType = r->second->asFuncType();
     for (size_t i = 0; i < params.size(); ++i) {
-        const auto paramName = params[i].type->getName();
-        if (!replacements.contains(paramName)) continue;
-        if (!replacements[paramName]) {
-            replacements[paramName] = otherFuncType->params[i].type;
-        }
-        assert(!replacements[paramName]->hasGenerics());
-        params[i].type = replacements[paramName];
+        auto& repl = replacements[params[i].type->getName()];
+        if (!replacements.contains(params[i].type->getName())) continue;
+        if (!repl) repl = replFuncType->params[i].type;
+        assert(!repl->hasGenerics());
+        params[i].type = repl;
     }
-    const auto rtName = rt->getName();
-    if (!replacements.contains(rtName)) return;
-    if (!replacements[rtName]) {
-        replacements[rtName] = otherFuncType->rt;
-    }
-    assert(!replacements[rtName]->hasGenerics());
-    rt = replacements[rtName];
+    auto& replacement = replacements[rt->getName()];
+    if (!replacements.contains(rt->getName())) return;
+    if (!replacement) replacement = replFuncType->rt;
+    rt = replacement;
     genericTypes.clear();
 }
 

@@ -294,13 +294,8 @@ void LgsSema::visitLambda(LgsFunc* lambda) {
     typeResolver.resolveFuncType(lambda->funcType);
     lambda->funcType->name = LGS_LAMBDA + to_string(lambdasIDGenerator++);
     visitFunc(lambda);
-    if (lambda->funcType->rt->isVoid()) return;
-    const auto inferredType = lambda->returnStmts.front()->expr->type;
-    if (!inferredType) {
-        addError(E10049, lambda->location, {lambda->funcType->name});
-        return;
-    }
-    lambda->funcType->rt = inferredType;
+    if (lambda->returnStmts.empty()) return;
+    lambda->funcType->rt = lambda->returnStmts.front()->expr->type;
 }
 
 void LgsSema::visitParam(LgsParam* param) {
@@ -701,6 +696,7 @@ void LgsSema::visitReturnStmt(const LgsReturn* returnStmt) {
         castExprImplicitly(retExpr, ft->rt);
         visitExpr(retExpr);
         currentFunc->returnStmts.push_back(returnStmt);
+        if (retExpr->type->isVoid()) addError(E10093, returnStmt->location);
     }
     const auto rt = ft->rt;
     if (!rt) return;

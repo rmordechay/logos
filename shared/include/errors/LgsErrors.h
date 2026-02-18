@@ -104,7 +104,7 @@ inline LgsBaseMsg E10089{"%s can only be assigned to an instance of %s, not the 
 inline LgsBaseMsg E10090{"%s can only prefix numbers. Given: %s.", errCodeStart++};
 inline LgsBaseMsg E10091{"'not' can only prefix Bool. Given: %s.", errCodeStart++};
 inline LgsBaseMsg E10092{"If condition must be of type Bool. Given: %s.", errCodeStart++};
-inline LgsBaseMsg E10093{"Cannot declare Void type.", errCodeStart++};
+inline LgsBaseMsg E10093{"Cannot assign to Void type.", errCodeStart++};
 inline LgsBaseMsg E10094{"%s is not a parameter of '%s'.", errCodeStart++};
 inline LgsBaseMsg E10095{"Could not infer iterable type.", errCodeStart++};
 inline LgsBaseMsg E10096{"Mixing named und position arguments is not allowed.", errCodeStart++};

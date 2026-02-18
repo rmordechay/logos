@@ -24,6 +24,36 @@ TEST(CgBinExprTest, IntTest1) {
     EXPECT_EQ(lines[6], "5");
 }
 
+TEST(CgBinExprTest, IntTest2) {
+    const auto code = R"(
+    main() {
+        a0 = 23 + 34
+        a1 = 23 - 235
+        a2 = 23 * 34
+        a3 = 23 + 34 - 235
+        a4 = 23 - 34 * 2
+        a5 = (1 + 2) * 2
+        a6 = 1 + 2 * 2
+        print(a0)
+        print(a1)
+        print(a2)
+        print(a3)
+        print(a4)
+        print(a5)
+        print(a6)
+    }
+    )";
+    std::istringstream stream(runLgsApp(code));
+    const auto lines = getLines(stream, 7);
+    EXPECT_EQ(lines[0], "57");
+    EXPECT_EQ(lines[1], "-212");
+    EXPECT_EQ(lines[2], "782");
+    EXPECT_EQ(lines[3], "-178");
+    EXPECT_EQ(lines[4], "-45");
+    EXPECT_EQ(lines[5], "6");
+    EXPECT_EQ(lines[6], "5");
+}
+
 TEST(CgBinExprTest, FloatTest1) {
     const auto code = R"(
     main() {

@@ -117,7 +117,7 @@ public:
 
     // Statements
     LgsStmt* parseStmt();
-    LgsStmtsBlock* parseStmtsBlock(bool withSingleStmt = true);
+    LgsStmtsBlock* parseStmtsBlock(bool wrapInFunc = false, bool withSingleStmt = true);
     LgsVarDec* parseVarDec();
     LgsStmt* parseAssignment();
     LgsStmt* parseIfStmt();
@@ -134,8 +134,8 @@ public:
     LgsIOStmt* parseIOStmt();
 
     // Exprs
-    LgsExpr* parseExpr(bool withLamda = true);
-    LgsExpr* parseBinaryExpr(int minPrecedence, bool withLambda = true);
+    LgsExpr* parseExpr(bool withLambda = true);
+    LgsExpr* parseBinExpr(int minPrecedence, bool withLambda = true);
     LgsExpr* parseUnary(bool withInstance = true);
     LgsVariable* parseVariable();
     LgsModuleExpr* parseModuleExpr();
