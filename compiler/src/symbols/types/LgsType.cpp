@@ -251,23 +251,23 @@ void freeType(LgsType* type) {
 }
 
 Value* loadRTTInfoName(LgsCodeGen& cg, Value* ptr) {
-    return cg.loadStructField(cg.getRTTStruct(), ptr, LgsTypeInfoIndices::name, cg.ptrTy());
+    return cg.loadField(cg.getRTTStruct(), ptr, LgsTypeInfoIndices::name, cg.ptrTy());
 }
 
 Value* loadRTTInfoSize(LgsCodeGen& cg, Value* ptr) {
-    return cg.loadStructField(cg.getRTTStruct(), ptr, LgsTypeInfoIndices::size, cg.sizeTy());
+    return cg.loadField(cg.getRTTStruct(), ptr, LgsTypeInfoIndices::size, cg.sizeTy());
 }
 
 Value* loadRTTInfoKind(LgsCodeGen& cg, Value* ptr) {
-    return cg.loadStructField(cg.getRTTStruct(), ptr, LgsTypeInfoIndices::kind, cg.i32Ty());
+    return cg.loadField(cg.getRTTStruct(), ptr, LgsTypeInfoIndices::kind, cg.i32Ty());
 }
 
 Value* loadRTTInfoIsHeap(LgsCodeGen& cg, Value* ptr) {
-    return cg.loadStructField(cg.getRTTStruct(), ptr, LgsTypeInfoIndices::isHeap, cg.i1Ty());
+    return cg.loadField(cg.getRTTStruct(), ptr, LgsTypeInfoIndices::isHeap, cg.i1Ty());
 }
 
 Value* loadRTTInfoExtra(LgsCodeGen& cg, Value* ptr) {
-    return cg.loadStructField(cg.getRTTStruct(), ptr, LgsTypeInfoIndices::extra, cg.ptrTy());
+    return cg.loadField(cg.getRTTStruct(), ptr, LgsTypeInfoIndices::extra, cg.ptrTy());
 }
 
 Value* exprEqNull(LgsCodeGen& cg, Value* expr, LgsType* type) {

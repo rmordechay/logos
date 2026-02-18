@@ -841,16 +841,6 @@ void LgsSema::visitNullableExpr(LgsNullableExpr* nullableExpr) {
     nullableExpr->setType(new LgsNullable(baseExpr->type));
 }
 
-void LgsSema::visitUnwrap(LgsExpr* expr) {
-    if (!expr->type || !expr->hasUnwrap) return;
-    if (!expr->type->asNullable()) {
-        addError(E10113, expr->location, {expr->type->pname()});
-        return;
-    }
-    const auto nullable = expr->type->asNullable();
-    expr->setType(nullable->baseType);
-}
-
 void LgsSema::visitArrayExpr(LgsArrayExpr* arrayExpr) {
     if (!arrayExpr->type && arrayExpr->elements.empty()) {
         addError(E10095, arrayExpr->location);
@@ -1352,6 +1342,16 @@ void LgsSema::visitInstance(LgsInstance* instance) {
         if (visited.contains(field->name)) continue;
         field->expr = field->type->getZeroValue();
     }
+}
+
+void LgsSema::visitUnwrap(LgsExpr* expr) {
+    if (!expr->type || !expr->hasUnwrap) return;
+    if (!expr->type->asNullable()) {
+        addError(E10113, expr->location, {expr->type->pname()});
+        return;
+    }
+    const auto nullable = expr->type->asNullable();
+    expr->setType(nullable->baseType);
 }
 
 void LgsSema::visitInlineInterface(LgsInstance* instance, LgsInterface* interface) {

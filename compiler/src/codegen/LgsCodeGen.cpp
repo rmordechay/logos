@@ -188,11 +188,11 @@ StructType* LgsCodeGen::getStructType(const std::vector<Type*>& types, const std
     return structType;
 }
 
-void LgsCodeGen::storeStructField(Type* parentType, Value* parentPtr, const size_t position, Value* v) {
+void LgsCodeGen::storeField(Type* parentType, Value* parentPtr, const size_t position, Value* v) {
     store(v, builder.CreateStructGEP(parentType, parentPtr, position));
 }
 
-Value* LgsCodeGen::loadStructField(Type* parentType, Value* parentPtr, const size_t position, Type* ty) {
+Value* LgsCodeGen::loadField(Type* parentType, Value* parentPtr, const size_t position, Type* ty) {
     assert(ty && parentPtr);
     return builder.CreateLoad(ty, builder.CreateStructGEP(parentType, parentPtr, position));
 }
@@ -235,12 +235,12 @@ Value* LgsCodeGen::allocInLevel(Value* size, Value* level, const bool setLevel) 
     return callRuntimeFunc("allocInLevel", ptrTy(), {sizeTy(), sizeTy(), i1Ty()}, {size, level, i1(setLevel)});
 }
 
-Value* LgsCodeGen::allocStrConst(Value* strPtr) {
-    return callRuntimeFunc("allocStrConst", ptrTy(), {ptrTy()}, {strPtr});
+Value* LgsCodeGen::allocStr(Value* strPtr) {
+    return callRuntimeFunc("allocStr", ptrTy(), {ptrTy()}, {strPtr});
 }
 
-Value* LgsCodeGen::allocStr(const size_t length) {
-    return callRuntimeFunc("allocStr", ptrTy(), {sizeTy()}, {usize(length)});
+Value* LgsCodeGen::allocEmptyStr(Value* length) {
+    return callRuntimeFunc("allocEmptyStr", ptrTy(), {sizeTy()}, {length});
 }
 
 Value* LgsCodeGen::reallocate(Value* ptr, Value* size, Value* level) {

@@ -109,7 +109,6 @@ public:
     void visitTernaryExpr(LgsTernaryExpr* ternary);
     void visitCast(LgsCast* cast);
     void visitNullableExpr(LgsNullableExpr* nullableExpr);
-    void visitUnwrap(LgsExpr* expr);
     void visitArrayExpr(LgsArrayExpr* arrayExpr);
     void visitHashMap(LgsHashMap* hashMap);
     void visitVectorExpr(LgsVectorExpr* vectorExpr);
@@ -130,6 +129,7 @@ public:
     void visitStrConst(const LgsStrConst* strConst);
     void visitTypeExpr(LgsTypeExpr* typeExpr);
     void visitInstance(LgsInstance* instance);
+    void visitUnwrap(LgsExpr* expr);
     void visitInlineInterface(LgsInstance* instance, LgsInterface* interface);
     void visitIterIndex(LgsIterIndex* iterIndex);
     void visitIndex(LgsIterIndex* iterIndex);

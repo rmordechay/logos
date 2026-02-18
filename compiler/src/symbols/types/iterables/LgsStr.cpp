@@ -31,7 +31,7 @@ LgsExpr* LgsStr::getZeroValue() {
 }
 
 Value* LgsStr::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
-    return cg.allocStrConst(cg.emptyStr());
+    return cg.allocStr(cg.emptyStr());
 }
 
 bool LgsStr::canCastTo(LgsType* other) {
@@ -92,22 +92,19 @@ Value* LgsStr::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
         // Str
         const auto rStr = right->getConstStr();
         if (rStr.has_value()) {
-            const auto str = cg.getString(lv + rStr.value());
-            cg.storeStructField(ty, alloc, LgsStrIndices::data, str);
+            storeData(cg, alloc, cg.getString(lv + rStr.value()));
             return alloc;
         }
         // Int
         const auto rInt = right->getConstInt();
         if (rInt.has_value()) {
-            const auto str = cg.getString(lv + std::to_string(rInt.value()));
-            cg.storeStructField(ty, alloc, LgsStrIndices::data, str);
+            storeData(cg, alloc, cg.getString(lv + std::to_string(rInt.value())));
             return alloc;
         }
         // Float
         const auto rFloat = right->getConstFloat();
         if (rFloat.has_value()) {
-            const auto str = cg.getString(lv + std::to_string(rFloat.value()));
-            cg.storeStructField(ty, alloc, LgsStrIndices::data, str);
+            storeData(cg, alloc, cg.getString(lv + std::to_string(rFloat.value())));
             return alloc;
         }
     }
@@ -134,7 +131,7 @@ Value* LgsStr::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     } else {
         assert(0);
     }
-    cg.storeStructField(ty, alloc, LgsStrIndices::data, ptr);
+    storeData(cg, alloc, ptr);
     assert(alloc->getType()->isPointerTy());
     return alloc;
 }
@@ -166,6 +163,10 @@ Type* LgsStr::getStrStruct(LgsCodeGen& cg) {
     return cg.getStructType({cg.sizeTy(), cg.ptrTy()}, name);
 }
 
+void LgsStr::storeData(LgsCodeGen& cg, Value* ptr, Value* value) {
+    cg.storeField(getStrStruct(cg), ptr, LgsStrIndices::data, value);
+}
+
 Value* LgsStr::loadRTData(LgsCodeGen& cg, Value* value) {
-    return cg.loadStructField(getStrStruct(cg), value, LgsStrIndices::data, cg.ptrTy());
+    return cg.loadField(getStrStruct(cg), value, LgsStrIndices::data, cg.ptrTy());
 }

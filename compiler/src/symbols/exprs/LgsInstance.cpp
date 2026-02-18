@@ -46,7 +46,7 @@ Value* LgsInstance::getInstanceRTType(LgsCodeGen& cg, Value* instance) {
 }
 
 Value* LgsInstance::loadRTType(LgsCodeGen& cg, Type* ty, Value* ptr) {
-    return cg.loadStructField(ty, ptr, LgsInstanceIndices::type, cg.ptrTy());
+    return cg.loadField(ty, ptr, LgsInstanceIndices::type, cg.ptrTy());
 }
 
 LgsInstance::~LgsInstance() {

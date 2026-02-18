@@ -25,6 +25,8 @@ add_executable(lgs_tests
     codegen/exprs/CgFuncCallTest.cpp
     codegen/exprs/CgUnaryExprTest.cpp
     codegen/exprs/CgNullableTest.cpp
+    codegen/exprs/CgHashMapTest.cpp
+    codegen/exprs/CgIterableTest.cpp
 )
 
 target_include_directories(lgs_tests PRIVATE

@@ -87,8 +87,8 @@ public:
     void incSize(Value* bufferOffset, Value* ptr);
     Value* allocaAndStore(Type* type, Value* v, const std::string& name = "");
     StructType* getStructType(const std::vector<Type*>& types, const std::string& name = "");
-    void storeStructField(Type* parentType, Value* parentPtr, size_t position, Value* v);
-    Value* loadStructField(Type* parentType, Value* parentPtr, size_t position, Type* ty);
+    void storeField(Type* parentType, Value* parentPtr, size_t position, Value* v);
+    Value* loadField(Type* parentType, Value* parentPtr, size_t position, Type* ty);
     void addNullTerminate(Value* strPtr, Value* pos);
 
     void callStackPush();
@@ -99,8 +99,8 @@ public:
     Value* getVFunc(Value* objType, Value* funcName);
     Value* allocInCurrent(Value* size, bool setLevel);
     Value* allocInLevel(Value* size, Value* level, bool setLevel);
-    Value* allocStrConst(Value* strPtr);
-    Value* allocStr(size_t length);
+    Value* allocStr(Value* strPtr);
+    Value* allocEmptyStr(Value* length);
     Value* reallocate(Value* ptr, Value* size, Value* level);
     Value* moveValue(const std::string& baseName, Value* v, Value* toLevel);
     void throwError(const LgsBaseMsg& err, const std::vector<Value*>& args = {});

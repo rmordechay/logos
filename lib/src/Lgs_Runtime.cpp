@@ -51,14 +51,14 @@ extern "C" void* Lgs_Runtime_allocDArr(Lgs_TypeInfo* baseType) {
     return arr;
 }
 
-extern "C" void* Lgs_Runtime_allocStrConst(char* str) {
+extern "C" void* Lgs_Runtime_allocStr(char* str) {
     const auto newPtr = runtime.stack.at(0).allocator.allocate(sizeof(Lgs_StrExpr), true);
     const auto newStr = static_cast<Lgs_StrExpr*>(newPtr);
     newStr->data = str;
     return newStr;
 }
 
-extern "C" void* Lgs_Runtime_allocStr(const size_t length) {
+extern "C" void* Lgs_Runtime_emptyStr(const size_t length) {
     auto& allocator = runtime.stack.at(runtime.level).allocator;
     const auto newPtr = allocator.allocate(sizeof(Lgs_StrExpr), true);
     const auto newStr = static_cast<Lgs_StrExpr*>(newPtr);

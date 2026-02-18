@@ -41,23 +41,23 @@ DIType* LgsFieldType::getDebugType(LgsCodeGen& cg) {
 }
 
 Value* LgsFieldType::loadRTName(LgsCodeGen& cg, Value* ptr) {
-    return cg.loadStructField(getRTTStruct(cg), ptr, LgsFieldIndices::name, cg.ptrTy());
+    return cg.loadField(getRTTStruct(cg), ptr, LgsFieldIndices::name, cg.ptrTy());
 }
 
 Value* LgsFieldType::loadRTSize(LgsCodeGen& cg, Value* ptr) {
-    return cg.loadStructField(getRTTStruct(cg), ptr, LgsFieldIndices::size, cg.sizeTy());
+    return cg.loadField(getRTTStruct(cg), ptr, LgsFieldIndices::size, cg.sizeTy());
 }
 
 Value* LgsFieldType::loadRTOffset(LgsCodeGen& cg, Value* ptr) {
-    return cg.loadStructField(getRTTStruct(cg), ptr, LgsFieldIndices::offset, cg.sizeTy());
+    return cg.loadField(getRTTStruct(cg), ptr, LgsFieldIndices::offset, cg.sizeTy());
 }
 
 Value* LgsFieldType::loadRTKind(LgsCodeGen& cg, Value* ptr) {
-    return cg.loadStructField(getRTTStruct(cg), ptr, LgsFieldIndices::kind, cg.i32Ty());
+    return cg.loadField(getRTTStruct(cg), ptr, LgsFieldIndices::kind, cg.i32Ty());
 }
 
 Value* LgsFieldType::loadRTType(LgsCodeGen& cg, Value* ptr) {
-    return cg.loadStructField(getRTTStruct(cg), ptr, LgsFieldIndices::type, cg.ptrTy());
+    return cg.loadField(getRTTStruct(cg), ptr, LgsFieldIndices::type, cg.ptrTy());
 }
 
 StructType* LgsFieldType::getRTTStruct(LgsCodeGen& cg) {

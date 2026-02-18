@@ -54,3 +54,26 @@ TEST(CgStrTest, Test3) {
     EXPECT_EQ(lines[4], "false");
     EXPECT_EQ(lines[5], "true");
 }
+
+TEST(CgStrTest, Test4) {
+    const auto code = R"(
+    main() {
+        print("Hello world")
+        print('Hello world')
+        print('"Hello" world')
+        print("'Hello' world")
+        print("""
+    Hello world
+""")
+    }
+    )";
+    std::istringstream stream(runLgsApp(code));
+    const auto lines = getLines(stream, 7);
+    EXPECT_EQ(lines[0], "Hello world");
+    EXPECT_EQ(lines[1], "Hello world");
+    EXPECT_EQ(lines[2], "\"Hello\" world");
+    EXPECT_EQ(lines[3], "'Hello' world");
+    EXPECT_EQ(lines[4], "");
+    EXPECT_EQ(lines[5], "    Hello world");
+    EXPECT_EQ(lines[6], "");
+}

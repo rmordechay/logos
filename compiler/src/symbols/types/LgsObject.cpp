@@ -100,7 +100,7 @@ LgsFunc* LgsObject::getMetaFunc(const std::string& methodName) {
     if (methodName == OBJ_AS_JSON) {
         const auto func = new LgsFunc(methodName, new LgsStr());
         func->fn = [&](LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) {
-            const auto str = cg.allocStr(LGS_STR_BUFFER_SIZE);
+            const auto str = cg.allocEmptyStr(cg.usize(LGS_STR_BUFFER_SIZE));
             cg.builder.CreateCall(getJSONFunc(cg), {args.front().expr->IRValue, str});
             return str;
         };
@@ -421,11 +421,11 @@ StructType* LgsObject::getMethodRTTStruct(LgsCodeGen& cg) {
 }
 
 Value* LgsObject::loadRTFieldsCount(LgsCodeGen& cg, Value* ptr) {
-    return cg.loadStructField(getObjRTTStruct(cg), ptr, LgsObjIndices::fieldsCount, cg.sizeTy());
+    return cg.loadField(getObjRTTStruct(cg), ptr, LgsObjIndices::fieldsCount, cg.sizeTy());
 }
 
 Value* LgsObject::loadRTFields(LgsCodeGen& cg, Value* ptr) {
-    return cg.loadStructField(getObjRTTStruct(cg), ptr, LgsObjIndices::fields, cg.ptrTy());
+    return cg.loadField(getObjRTTStruct(cg), ptr, LgsObjIndices::fields, cg.ptrTy());
 }
 
 LgsObject::~LgsObject() {

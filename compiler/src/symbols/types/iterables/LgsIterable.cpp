@@ -134,21 +134,34 @@ LgsType* LgsIterable::getValueType() {
 }
 
 bool LgsIterable::unpackLoopVars(LgsForeachLoop* loop) const {
-    if (loop->loopVars.size() > 1) return false;
+    if (loop->loopVars.size() > 2) return false;
     assert(baseType);
-    const auto iterIndex = new LgsIterIndex(loop->iterExpr, new LgsIntConst(&LGS_SIZE, 0));
+    const auto iterIndex = new LgsIterIndex(loop->iterExpr, LGS_SIZE.getZeroValue());
     iterIndex->setType(baseType);
-    loop->loopVars[0]->expr = iterIndex;
-    loop->loopVars[0]->setType(iterIndex->type);
+    if (loop->loopVars.size() == 1) {
+        loop->loopVars[0]->expr = iterIndex;
+        loop->loopVars[0]->setType(iterIndex->type);
+    } else if (loop->loopVars.size() == 2) {
+        loop->loopVars[0]->expr = LGS_SIZE.getZeroValue();
+        loop->loopVars[0]->setType(&LGS_SIZE);
+        loop->loopVars[1]->expr = iterIndex;
+        loop->loopVars[1]->setType(iterIndex->type);
+    }
     return true;
 }
 
 void LgsIterable::setLoopIRVars(LgsCodeGen& cg, LgsForeachLoop* loop) {
-    const auto iterIndex = loop->loopVars[0]->expr->asIterIndex();
+    const auto varsCount = loop->loopVars.size();
+    const auto iterIndex = loop->loopVars[varsCount == 1 ? 0 : 1]->expr->asIterIndex();
     const auto iterable = iterIndex->baseExpr->type->asIterable();
     iterIndex->index.from->IRValue = loop->loadIndex(cg);
     iterIndex->IRValue = iterable->getIRElement(cg, iterIndex->baseExpr->IRValue, iterIndex->index.from->IRValue);
-    loop->loopVars[0]->IRValue = iterIndex->IRValue;
+    if (varsCount == 1) {
+        loop->loopVars[0]->IRValue = iterIndex->IRValue;
+    } else if (varsCount == 2) {
+        loop->loopVars[0]->IRValue = loop->loadIndex(cg);
+        loop->loopVars[1]->IRValue = iterIndex->IRValue;
+    }
 }
 
 void LgsIterable::addIRElement(LgsCodeGen& cg, Value* iterable, Value* index, Value* value) {

@@ -90,3 +90,52 @@ TEST(CgLoopsTest, Test4) {
     EXPECT_EQ(lines[4], "5");
     EXPECT_EQ(lines[5], "6");
 }
+
+TEST(CgLoopsTest, Test5) {
+    const auto code = R"(
+    main() {
+        a = [1, 2]
+        b = ["text1", "text2"]
+        for i in a {
+            print(for.i)
+            print(for.element)
+            for j in b {
+                print(for.i)
+                print(for.element)
+            }
+        }
+    }
+    )";
+    std::istringstream stream(runLgsApp(code));
+    const auto lines = getLines(stream, 12);
+    EXPECT_EQ(lines[0], "0");
+    EXPECT_EQ(lines[1], "1");
+    EXPECT_EQ(lines[2], "0");
+    EXPECT_EQ(lines[3], "text1");
+    EXPECT_EQ(lines[4], "1");
+    EXPECT_EQ(lines[5], "text2");
+    EXPECT_EQ(lines[6], "1");
+    EXPECT_EQ(lines[7], "2");
+    EXPECT_EQ(lines[8], "0");
+    EXPECT_EQ(lines[9], "text1");
+    EXPECT_EQ(lines[10], "1");
+    EXPECT_EQ(lines[11], "text2");
+}
+
+TEST(CgLoopsTest, Test6) {
+    const auto code = R"(
+    main() {
+        a = ["text1", "text2"]
+        for i, k in a {
+            print(i)
+            print(k)
+        }
+    }
+    )";
+    std::istringstream stream(runLgsApp(code));
+    const auto lines = getLines(stream, 4);
+    EXPECT_EQ(lines[0], "0");
+    EXPECT_EQ(lines[1], "text1");
+    EXPECT_EQ(lines[2], "1");
+    EXPECT_EQ(lines[3], "text2");
+}

@@ -17,9 +17,9 @@ struct Lgs_DArrExpr {
 };
 
 struct Lgs_Entry {
-    void* key;
-    void* value;
-    void* next;
+    char* key;
+    char* value;
+    Lgs_Entry* next;
 };
 
 struct Lgs_HashMap {

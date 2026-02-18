@@ -674,7 +674,7 @@ void LgsCgFile::visitIntConst(LgsIntConst* intConst) {
 
 void LgsCgFile::visitStrConst(LgsStrConst* strConst) {
     if (strConst->parts.empty()) {
-        strConst->IRValue = cg.allocStrConst(cg.getString(strConst->value));
+        strConst->IRValue = cg.allocStr(cg.getString(strConst->value));
         return;
     }
     // Format with string parts
@@ -1083,7 +1083,8 @@ void LgsCgFile::visitHashMap(LgsHashMap* hashMap) {
 void LgsCgFile::visitEnvVar(LgsEnvVar* envVar) {
     const std::vector<Type*> params = {cg.ptrTy(), cg.ptrTy()};
     const std::vector<Value*> IRArgs = {cg.getString(envVar->name), cg.emptyStr()};
-    envVar->IRValue = cg.callLgsFunc(LgsSys::name, "getEnv", cg.ptrTy(), params, IRArgs);
+    const auto env = cg.callLgsFunc(LgsSys::name, "getEnv", cg.ptrTy(), params, IRArgs);
+    envVar->IRValue = cg.allocStr(env);
 }
 
 void LgsCgFile::visitCast(LgsCast* cast) {
@@ -1189,7 +1190,7 @@ Value* LgsCgFile::getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) {
     const auto ctx = cg.builder.CreateAlloca(ctxTy);
     for (size_t i = 0; i < fc->args.size(); i++) {
         const auto v = fc->args[i].expr->IRValue;
-        cg.storeStructField(ctxTy, ctx, i, v);
+        cg.storeField(ctxTy, ctx, i, v);
     }
     return ctx;
 }

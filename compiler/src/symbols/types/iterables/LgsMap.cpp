@@ -109,10 +109,10 @@ Value* LgsMap::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
     const auto totalSize = cg.builder.CreateMul(entriesSize, cap);
     const auto ptr = cg.allocInCurrent(IRSize(cg), true);
     const auto entries = cg.allocInCurrent(totalSize, false);
-    cg.storeStructField(ty, ptr, LgsHashMapIndices::type, getRTType(cg));
-    cg.storeStructField(ty, ptr, LgsHashMapIndices::entries, entries);
-    cg.storeStructField(ty, ptr, LgsHashMapIndices::length, cg.zeroSize());
-    cg.storeStructField(ty, ptr, LgsHashMapIndices::cap, cap);
+    cg.storeField(ty, ptr, LgsHashMapIndices::type, getRTType(cg));
+    cg.storeField(ty, ptr, LgsHashMapIndices::entries, entries);
+    cg.storeField(ty, ptr, LgsHashMapIndices::length, cg.zeroSize());
+    cg.storeField(ty, ptr, LgsHashMapIndices::cap, cap);
     return ptr;
 }
 
@@ -121,7 +121,7 @@ LgsType* LgsMap::applyBinOp(LgsType* rightType, LgsBinOp& op) {
 }
 
 Value* LgsMap::lenIR(LgsCodeGen& cg, Value* iterable) {
-    return cg.loadStructField(getIRType(cg), iterable, LgsHashMapIndices::length, cg.sizeTy());
+    return cg.loadField(getIRType(cg), iterable, LgsHashMapIndices::length, cg.sizeTy());
 }
 
 Value* LgsMap::inIR(LgsCodeGen& cg, Value* iterableExpr, Value* value) {
@@ -167,7 +167,7 @@ void LgsMap::setLoopIRVars(LgsCodeGen& cg, LgsForeachLoop* loop) {
     const auto checkEntryBlock = cg.createBlock("check_entry");
     const auto notFoundEntryBlock = cg.createBlock("not_found_entry");
     const auto foundEntryBlock = cg.createBlock("found_entry");
-    const auto entries = cg.loadStructField(mapTy, map, LgsHashMapIndices::entries, cg.ptrTy());
+    const auto entries = cg.loadField(mapTy, map, LgsHashMapIndices::entries, cg.ptrTy());
 
     // Check entry
     cg.branchAndStartBlock(checkEntryBlock);
@@ -224,9 +224,9 @@ Function* LgsMap::getGetFunc(LgsCodeGen& cg) {
     const auto mapIR = func->getArg(0);
     const auto keyIR = func->getArg(1);
 
-    const auto cap = cg.loadStructField(getIRType(cg), mapIR, LgsHashMapIndices::cap, cg.sizeTy());
+    const auto cap = cg.loadField(getIRType(cg), mapIR, LgsHashMapIndices::cap, cg.sizeTy());
     const auto hash = cg.builder.CreateURem(pairType->key->hashValue(cg, keyIR), cap);
-    const auto entries = cg.loadStructField(getIRType(cg), mapIR, LgsHashMapIndices::entries, cg.ptrTy());
+    const auto entries = cg.loadField(getIRType(cg), mapIR, LgsHashMapIndices::entries, cg.ptrTy());
     const auto entryPtr = cg.builder.CreateInBoundsGEP(cg.ptrTy(), entries, {hash});
     const auto entry = cg.loadPtr(entryPtr);
     const auto currentEntryPtr = cg.allocaAndStore(cg.ptrTy(), entry, "entry");
@@ -309,7 +309,8 @@ Function* LgsMap::getAddFunc(LgsCodeGen& cg) {
     const auto newEntries = cg.allocInLevel(newCap, level, false);
     auto entries = cg.loadPtr(entriesField);
 
-    cg.loop(cap, [&](Value* iValue, BasicBlock*) {
+    cg.loop(cap, [&](Value* iValue, BasicBlock* bb) {
+        bb->setName("resize_exit");
         auto entry = cg.builder.CreateInBoundsGEP(cg.ptrTy(), entries, {iValue});
         entry = cg.loadPtr(entry);
         const auto hash = cg.builder.CreateURem(pairType->key->hashValue(cg, entry), newCap);
@@ -343,7 +344,7 @@ Function* LgsMap::getAddFunc(LgsCodeGen& cg) {
     // Keys equal
     cg.startBlock(equalBlock);
     entryLoad = cg.loadPtr(entryAlloca);
-    cg.storeStructField(entryTy, entryLoad, LgsHashMapIndices::value, valueIR);
+    cg.storeField(entryTy, entryLoad, LgsHashMapIndices::value, valueIR);
     cg.builder.CreateRetVoid();
 
     // Keys not equal
@@ -357,9 +358,9 @@ Function* LgsMap::getAddFunc(LgsCodeGen& cg) {
     // Store entry
     cg.startBlock(storeElementBlock);
     const auto newEntry = cg.allocInLevel(size, level, false);
-    cg.storeStructField(entryTy, newEntry, LgsHashMapIndices::key, keyIR);
-    cg.storeStructField(entryTy, newEntry, LgsHashMapIndices::value, valueIR);
-    cg.storeStructField(entryTy, newEntry, LgsHashMapIndices::next, cg.null());
+    cg.storeField(entryTy, newEntry, LgsHashMapIndices::key, keyIR);
+    cg.storeField(entryTy, newEntry, LgsHashMapIndices::value, valueIR);
+    cg.storeField(entryTy, newEntry, LgsHashMapIndices::next, cg.null());
     cg.store(newEntry, cg.loadPtr(entryPtrAlloca));
 
     // Increment length

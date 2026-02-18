@@ -203,7 +203,7 @@ Function* LgsDArray::getAddFunc(LgsCodeGen& cg) {
     const auto level = cg.getLevel(arrIR);
     const auto newPtr = cg.reallocate(data, newSize, level);
     cg.store(newPtr, dataGEP);
-    cg.storeStructField(ty, arrIR, LgsDArrExprIndices::capacity, newCap);
+    cg.storeField(ty, arrIR, LgsDArrExprIndices::capacity, newCap);
 
     // Set element
     cg.branchAndStartBlock(exitBlock);
@@ -215,7 +215,7 @@ Function* LgsDArray::getAddFunc(LgsCodeGen& cg) {
 
     // Increment length
     const auto inc = cg.builder.CreateAdd(len, cg.usize(1));
-    cg.storeStructField(ty, arrIR, LgsDArrExprIndices::length, inc);
+    cg.storeField(ty, arrIR, LgsDArrExprIndices::length, inc);
 
     cg.builder.CreateRetVoid();
     cg.builder.restoreIP(cg.savedIP);
@@ -280,19 +280,19 @@ DIType* LgsDArray::getDebugType(LgsCodeGen& cg) {
 }
 
 Value* LgsDArray::loadRTBaseType(LgsCodeGen& cg, Value* ptr) {
-    return cg.loadStructField(getRTTStruct(cg), ptr, LgsDArrExprIndices::baseType, cg.ptrTy());
+    return cg.loadField(getRTTStruct(cg), ptr, LgsDArrExprIndices::baseType, cg.ptrTy());
 }
 
 Value* LgsDArray::loadRTLength(LgsCodeGen& cg, Value* ptr) {
-    return cg.loadStructField(getRTTStruct(cg), ptr, LgsDArrExprIndices::length, cg.sizeTy());
+    return cg.loadField(getRTTStruct(cg), ptr, LgsDArrExprIndices::length, cg.sizeTy());
 }
 
 Value* LgsDArray::loadRTCapacity(LgsCodeGen& cg, Value* ptr) {
-    return cg.loadStructField(getRTTStruct(cg), ptr, LgsDArrExprIndices::capacity, cg.sizeTy());
+    return cg.loadField(getRTTStruct(cg), ptr, LgsDArrExprIndices::capacity, cg.sizeTy());
 }
 
 Value* LgsDArray::loadRTData(LgsCodeGen& cg, Value* ptr) {
-    return cg.loadStructField(getRTTStruct(cg), ptr, LgsDArrExprIndices::data, cg.ptrTy());
+    return cg.loadField(getRTTStruct(cg), ptr, LgsDArrExprIndices::data, cg.ptrTy());
 }
 
 StructType* LgsDArray::getRTTStruct(LgsCodeGen& cg) {

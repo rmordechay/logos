@@ -8,7 +8,7 @@
 
 #include "LgsConfigs.h"
 
-static std::string formatElement(const Lgs_TypeInfo* type, void* value) {
+static std::string formatValue(const Lgs_TypeInfo* type, void* value) {
     if (!value) return LGS_NULL_LITERAL;
     std::ostringstream str;
     switch (type->kind) {
@@ -47,7 +47,7 @@ static std::string formatElement(const Lgs_TypeInfo* type, void* value) {
                 fieldPtr = *static_cast<void**>(fieldPtr);
             }
             str << fieldName << '=';
-            str << formatElement(fieldType, fieldPtr);
+            str << formatValue(fieldType, fieldPtr);
             if (i < obj->fieldsCount - 1) str << ", ";
         }
         str << "}";
@@ -63,7 +63,7 @@ static std::string formatElement(const Lgs_TypeInfo* type, void* value) {
             if (dArr->baseType->isHeap) {
                 element = *static_cast<void**>(element);
             }
-            str << formatElement(dArr->baseType, element);
+            str << formatValue(dArr->baseType, element);
             if (i < dArr->length - 1) str << ", ";
         }
         str << "]";
@@ -82,7 +82,7 @@ static std::string formatElement(const Lgs_TypeInfo* type, void* value) {
             if (sArr->baseType->isHeap) {
                 element = *static_cast<void**>(element);
             }
-            str << formatElement(sArr->baseType, element);
+            str << formatValue(sArr->baseType, element);
             if (i < sArr->length - 1) str << ", ";
             offset += sArr->baseType->isHeap ? sizeof(void*) : sArr->baseType->size;
         }
@@ -95,7 +95,7 @@ static std::string formatElement(const Lgs_TypeInfo* type, void* value) {
         auto offset = 0;
         for (int i = 0; i < vec->length; ++i) {
             void* element = static_cast<char*>(value) + offset;
-            str << formatElement(vec->baseType, element);
+            str << formatValue(vec->baseType, element);
             if (i < vec->length - 1) str << ", ";
             offset += vec->baseType->size;
         }
@@ -105,10 +105,10 @@ static std::string formatElement(const Lgs_TypeInfo* type, void* value) {
     case RTT_NULLABLE: {
         const auto baseType = type->baseType;
         if (!baseType) return LGS_NULL_LITERAL;
-        if (type->passByRef) return formatElement(baseType, value);
+        if (type->passByRef) return formatValue(baseType, value);
         const auto isSetPtr = static_cast<char*>(value) + baseType->size;
         const auto isSet = *reinterpret_cast<bool*>(isSetPtr);
-        if (isSet) str << formatElement(baseType, value);
+        if (isSet) str << formatValue(baseType, value);
         else str << LGS_NULL_LITERAL;
         break;
     }
@@ -118,13 +118,16 @@ static std::string formatElement(const Lgs_TypeInfo* type, void* value) {
         str << '{';
         auto isFirst = true;
         for (int i = 0; i < hashMap->capacity; ++i) {
-            const auto entry = hashMap->entries[i];
+            auto entry = hashMap->entries[i];
             if (!entry) continue;
-            if (!isFirst) str << ", ";
-            isFirst = false;
-            str << formatElement(map->key, entry->key);
-            str << ": ";
-            str << formatElement(map->value, entry->value);
+            while (entry) {
+                if (!isFirst) str << ", ";
+                isFirst = false;
+                str << formatValue(map->key, entry->key);
+                str << ": ";
+                str << formatValue(map->value, entry->value);
+                entry = entry->next;
+            }
         }
         str << '}';
         break;
@@ -137,5 +140,5 @@ static std::string formatElement(const Lgs_TypeInfo* type, void* value) {
 }
 
 extern "C" void Lgs_print(const Lgs_TypeInfo* type, void* v) {
-    printf("%s\n", formatElement(type, v).c_str());
+    printf("%s\n", formatValue(type, v).c_str());
 }

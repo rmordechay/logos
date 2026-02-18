@@ -30,6 +30,7 @@ public:
     std::string fmtStr() const override;
     DIType* getDebugType(LgsCodeGen& cg) override;
     static Type* getStrStruct(LgsCodeGen& cg);
+    static void storeData(LgsCodeGen& cg, Value* ptr, Value* value);
     static Value* loadRTData(LgsCodeGen& cg, Value* value);
 };
 
