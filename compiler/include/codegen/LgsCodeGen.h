@@ -107,6 +107,7 @@ public:
 
     // Blocks
     BasicBlock* createBlock(const std::string& name = "", Function* parent = nullptr);
+    void startFunc(Function* parent = nullptr);
     void branch(BasicBlock* block);
     void startBlock(BasicBlock* block);
     void branchAndStartBlock(BasicBlock* block);

@@ -14,7 +14,6 @@ public:
     LgsSymbolTable symbolTable;
 
     explicit LgsFile(const fs::path& path, const LgsCodeGenMode mode) : path(path), cgFile(mode) {}
-    bool isMain() const;
     virtual size_t hashFile();
     void setupCodeGen(LgsAppConfigs& appConfigs);
 

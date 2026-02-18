@@ -12,7 +12,7 @@ void LgsTestCmd::run() {
             errHandler.mergeErrors(app.errHandler);
             return;
         }
-        execPath = app.paths.testExecFile;
+        execPath = app.paths.execFile;
     }
     assert(execPath != "");
     execute(execPath, args);

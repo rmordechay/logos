@@ -81,7 +81,7 @@ bool LgsParser::scanTokens() {
     return true;
 }
 
-LgsFile* LgsParser::parseSrcFile(const bool isTestRun) {
+LgsFile* LgsParser::parseSrcFile() {
     assert(filePath != "");
     if (!scanTokens()) return nullptr;
     while (true) {
@@ -89,13 +89,10 @@ LgsFile* LgsParser::parseSrcFile(const bool isTestRun) {
         parseImports();
     }
     LgsFile* file = nullptr;
-    if (const auto mainFile = parseMainFile()) {
-        file = mainFile;
-    } else if (const auto objFile = parseObjectFile()) {
-        file = objFile;
-    } else if (const auto interfaceFile = parseInterfaceFile()) {
-        file = interfaceFile;
-    } else if (isTestRun && ((file = parseTestFile()))) {}
+    if ((file = parseMainFile())) {}
+    else if ((file = parseObjectFile())) {}
+    else if ((file = parseInterfaceFile())) {}
+    else if (appConfigs.isTestRun && ((file = parseTestFile()))) {}
     if (!file) return nullptr;
     file->symbolTable.importPaths = importPaths;
     return file;
@@ -709,7 +706,7 @@ LgsFunc* LgsParser::parseFunc() {
     func->location = ft->location;
     currentFunc = func;
     func->stmtsBlock = parseStmtsBlock();
-    if (func->stmtsBlock->isMacro) addParsingError();
+    if (func->stmtsBlock && func->stmtsBlock->isMacro) addParsingError();
     currentFunc = nullptr;
     return func;
 }
@@ -1913,7 +1910,7 @@ void LgsParser::extractStrParts(LgsStrConst* strConst) {
             return;
         }
         const auto part = replaced.substr(open + 2, close - 2);
-        LgsParser parser(part, filePath, paths, globals);
+        LgsParser parser(part, filePath, appConfigs, paths, globals);
         parser.scanTokens();
         const auto expr = parser.parseExpr();
         strConst->parts.push_back(expr);
@@ -1962,7 +1959,7 @@ bool fitsIn(const std::string& value, const std::string& limit) {
     return value <= limit;
 }
 
-LgsExpr* LgsParser::determineIntConst(const std::string& tokenStr, const int base) {
+LgsExpr* LgsParser::determineIntConst(const std::string& tokenStr, const int base) const {
     auto str = tokenStr;
     if (tokenStr.starts_with("0b") || tokenStr.starts_with("0x")) {
         str = tokenStr.substr(2).c_str();

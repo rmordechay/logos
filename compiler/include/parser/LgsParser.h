@@ -74,15 +74,16 @@ public:
     size_t recursionCount = 0;
     std::vector<LgsToken> tokens;
     LgsFunc* currentFunc = nullptr;
+    const LgsAppConfigs& appConfigs;
     std::vector<LgsImport> importPaths;
     std::unordered_set<std::string> importAppNames;
 
-    LgsParser(const std::string& lgsCode, const fs::path& filePath, const LgsPaths& paths, LgsSymbolTable& globals, const bool headersOnly = false)
-        : headersOnly(headersOnly), paths(paths), filePath(filePath), globals(globals), lgsCode(lgsCode) {
+    LgsParser(const std::string& lgsCode, const fs::path& filePath, const LgsAppConfigs& appConfigs, const LgsPaths& paths, LgsSymbolTable& globals, const bool headersOnly = false)
+        : headersOnly(headersOnly), paths(paths), filePath(filePath), globals(globals), lgsCode(lgsCode), appConfigs(appConfigs) {
     }
     // Files
     bool scanTokens();
-    LgsFile* parseSrcFile(bool isTestRun);
+    LgsFile* parseSrcFile();
     LgsFile* parseSrcFileHeaders();
     LgsMainFile* parseMainFile();
     LgsObjectFile* parseObjectFile();
@@ -165,7 +166,7 @@ public:
     void extractStrParts(LgsStrConst* strConst);
     std::pair<size_t, size_t> extractMatDims(const LgsToken& matToken);
     void validateTestFolder(const LgsFile* testFile);
-    LgsExpr* determineIntConst(const std::string& tokenStr, int base);
+    LgsExpr* determineIntConst(const std::string& tokenStr, int base) const;
     static int getBinOpPrecedence(LgsBinOpType opType);
 
     // Parser

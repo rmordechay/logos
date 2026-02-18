@@ -177,10 +177,9 @@ Function* LgsDArray::getAddFunc(LgsCodeGen& cg) {
     // Prologue
     cg.savedIP = cg.builder.saveIP();
     const auto func = cg.getFunc(funcName, ft);
-    const auto entryBlock = cg.createBlock(BLOCK_ENTRY, func);
     const auto needsResizeBlock = cg.createBlock("resize");
     const auto exitBlock = cg.createBlock(BLOCK_EXIT);
-    cg.builder.SetInsertPoint(entryBlock);
+    cg.startFunc(func);
 
     const auto ty = getIRType(cg);
     const auto arrIR = func->getArg(0);
@@ -230,9 +229,7 @@ Function* LgsDArray::getContainsFunc(LgsCodeGen& cg) {
 
     // Prologue
     const auto func = cg.getFunc(funcName, ft);
-    const auto entryBlock = cg.createBlock(BLOCK_ENTRY, func);
-    cg.builder.SetInsertPoint(entryBlock);
-
+    cg.startFunc(func);
     const auto arrIR = func->getArg(0);
     const auto value = func->getArg(1);
 
@@ -257,8 +254,7 @@ Function* LgsDArray::getEqFunc(LgsCodeGen& cg) {
     const auto func = cg.getFunc(funcName, ft);
 
     cg.savedIP = cg.builder.saveIP();
-    const auto entryBlock = cg.createBlock(BLOCK_ENTRY, func);
-    cg.builder.SetInsertPoint(entryBlock);
+    cg.startFunc(func);
     const auto ty = getIRType(cg);
 
     const auto arrIR1 = func->getArg(0);

@@ -58,7 +58,7 @@ extern "C" void* Lgs_Runtime_allocStr(char* str) {
     return newStr;
 }
 
-extern "C" void* Lgs_Runtime_emptyStr(const size_t length) {
+extern "C" void* Lgs_Runtime_allocEmptyStr(const size_t length) {
     auto& allocator = runtime.stack.at(runtime.level).allocator;
     const auto newPtr = allocator.allocate(sizeof(Lgs_StrExpr), true);
     const auto newStr = static_cast<Lgs_StrExpr*>(newPtr);

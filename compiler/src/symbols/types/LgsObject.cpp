@@ -275,8 +275,7 @@ Function* LgsObject::getObjsEqFunc(LgsCodeGen& cg) const {
     cg.savedIP = cg.builder.saveIP();
     const auto obj1 = func->getArg(0);
     const auto obj2 = func->getArg(1);
-    const auto entryBlock = cg.createBlock(BLOCK_ENTRY, func);
-    cg.builder.SetInsertPoint(entryBlock);
+    cg.startFunc(func);
 
     for (const auto field : fields) {
         const auto ty = field->type->getStorageType(cg);
@@ -302,8 +301,7 @@ Function* LgsObject::getObjsHashFunc(LgsCodeGen& cg) const {
     const auto func = cg.getFunc(funcName, ft);
     cg.savedIP = cg.builder.saveIP();
     const auto instance = func->getArg(0);
-    const auto entryBlock = cg.createBlock(BLOCK_ENTRY, func);
-    cg.builder.SetInsertPoint(entryBlock);
+    cg.startFunc(func);
 
     Value* hash = cg.usize(0);
     for (const auto field : fields) {
@@ -329,8 +327,7 @@ Function* LgsObject::getJSONFunc(LgsCodeGen& cg) {
     cg.savedIP = cg.builder.saveIP();
     const auto self = func->getArg(0);
     const auto strBuffer = func->getArg(1);
-    const auto entryBlock = cg.createBlock(BLOCK_ENTRY, func);
-    cg.builder.SetInsertPoint(entryBlock);
+    cg.startFunc(func);
 
     LgsStrBuilder sb(cg);
     sb.asJSON = true;
@@ -355,8 +352,7 @@ Function* LgsObject::getSetFieldFunc(LgsCodeGen& cg) {
     const auto fieldNameArg = func->getArg(1);
     const auto value = func->getArg(2);
     const auto valueTy = func->getArg(3);
-    const auto entryBlock = cg.createBlock(BLOCK_ENTRY, func);
-    cg.builder.SetInsertPoint(entryBlock);
+    cg.startFunc(func);
 
     const auto fieldTy = cg.builder.CreateCall(getGetFieldFunc(cg), {self, fieldNameArg});
     cg.ifStmt(cg.isNull(fieldTy), [&cg] { cg.builder.CreateRet(cg.false_()); });
@@ -389,8 +385,7 @@ Function* LgsObject::getGetFieldFunc(LgsCodeGen& cg) {
     cg.savedIP = cg.builder.saveIP();
     const auto self = func->getArg(0);
     const auto arg = func->getArg(1);
-    const auto entryBlock = cg.createBlock(BLOCK_ENTRY, func);
-    cg.builder.SetInsertPoint(entryBlock);
+    cg.startFunc(func);
 
     const auto fieldRTTStruct = LgsFieldType::getRTTStruct(cg);
     const auto instanceType = loadRTTInfoExtra(cg, LgsInstance::getInstanceRTType(cg, self));

@@ -24,7 +24,7 @@ struct LgsStackFrame {
 
 class LgsStack final {
 public:
-    std::vector<LgsStackFrame> stack;
+    std::vector<LgsStackFrame> frames;
 
     void enterScope(LgsValue* value);
     void exitScope();

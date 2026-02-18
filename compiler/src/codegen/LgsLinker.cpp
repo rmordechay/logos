@@ -6,10 +6,10 @@
 bool LgsLinker::link() const {
     assert(paths.lgsRootDir != "" && paths.execFile != "");
     std::string objFileList;
-    for (const auto& objPath : fs::directory_iterator(paths.buildDirObjs)) {
-        if (objPath.path().extension() == ".bc") {
-            objFileList += objPath.path().string() + " ";
-        }
+    for (const auto& fileName : filesToLink) {
+        const fs::path path(paths.buildDirObjs / (fileName + ".bc"));
+        if (!fs::exists(path)) continue;
+        objFileList += path.string() + " ";
     }
     for (auto importPath : importPaths) {
         for (const auto& objPath : fs::directory_iterator(importPath)) {

@@ -30,7 +30,6 @@ public:
     std::vector<LgsFile*> srcFiles;
     std::vector<LgsEnvFile*> envFiles;
     std::vector<LgsFile*> genericFiles;
-    std::vector<LgsTestFile*> testFiles;
     LgsAppFile* appConfigFile = nullptr;
     std::vector<LgsApp*> importApps;
     std::string lgsCode; // Used when passing code directly
@@ -54,6 +53,7 @@ public:
     bool loadEnvFiles();
     void loadBuiltins();
     bool resolveGlobals();
+    bool generateMainFile();
     bool generateRTTTypes();
     bool generateGenerics();
     void createBuildDirs();

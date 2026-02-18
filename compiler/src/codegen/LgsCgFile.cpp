@@ -86,7 +86,6 @@ void LgsCgFile::visitMainFile(LgsMainFile* mainFile) {
     for (const auto enum_ : mainFile->enums) {
         visitEnum(enum_);
     }
-
     for (const auto& [name, func] : mainFile->funcs) {
         if (const auto mainFunc = dynamic_cast<LgsMainFunc*>(func)) {
             visitMainFunc(mainFunc);
@@ -817,7 +816,6 @@ void LgsCgFile::visitSelection(LgsSelection* selection, const bool assign) {
                 var->IRValue = cg.loadPtr(var->IRValue);
             }
         } else if (const auto methodCall = child->asFuncCall()) {
-            if (methodCall->isMock) continue;
             visitFuncCall(methodCall);
         } else if (const auto metaSelection = child->asMetaSelection()) {
             visitMetaSelection(metaSelection);
@@ -900,6 +898,7 @@ void LgsCgFile::visitMetaSelection(LgsMetaSelection* metaSelection) {
 }
 
 void LgsCgFile::visitFuncCall(LgsFuncCall* funcCall) {
+    if (funcCall->isMock) return;;
     for (const auto& arg : funcCall->args) {
         if (arg.isSelf) continue;
         visitExpr(arg.expr);
@@ -1105,9 +1104,8 @@ void LgsCgFile::visitLambda(LgsFunc* func) {
 void LgsCgFile::createPrologue(LgsFunc* func) {
     if (appConfigs->debugMode) func->setDebugValue(cg);
     cg.currentFunc = func->getIRFunc(cg);
-    const auto entryBlock = cg.createBlock(BLOCK_ENTRY, cg.currentFunc);
     func->epilogue = cg.createBlock("epilogue");
-    cg.builder.SetInsertPoint(entryBlock);
+    cg.startFunc(cg.currentFunc);
     const auto ft = func->funcType;
     if (ft->name == LGS_MAIN_FUNC) {
         cg.callRuntimeFunc("init", cg.voidTy());
@@ -1203,9 +1201,7 @@ Function* LgsCgFile::getThunkFunc(const LgsFuncCall* fc, Type* ctxTy) {
 
     const auto ft = cg.getFT(cg.voidTy(), {cg.ptrTy()});
     thunkFunc = cg.getFunc(funcName, ft, Function::PrivateLinkage);
-    const auto entryBlock = cg.createBlock(BLOCK_ENTRY);
-    entryBlock->insertInto(thunkFunc);
-    cg.builder.SetInsertPoint(entryBlock);
+    cg.startFunc(thunkFunc);
     for (size_t i = 0; i < fc->args.size(); i++) {
         const auto expr = fc->args[i].expr;
         expr->IRValue = cg.builder.CreateStructGEP(ctxTy, thunkFunc->arg_begin(), i);
@@ -1234,7 +1230,7 @@ void LgsCgFile::createVecField(LgsField* field, Value* parent) {
 }
 
 bool LgsCgFile::checkMock(LgsExpr* expr) const {
-    if (stack.stack.empty()) return false;
+    if (stack.frames.empty()) return false;
     const auto currentFunc = stack.currentFunc();
     if (currentFunc->isTest) {
         for (auto [when, then] : currentFunc->mocks) {
@@ -1255,8 +1251,7 @@ void LgsCgFile::getMapFunc(LgsFuncType* mapFunc) {
     const auto ft = llvm::cast<FunctionType>(mapFunc->getIRType(cg));
     const auto cbFt = llvm::cast<FunctionType>(cbParam.type->getIRType(cg));
     const auto func = cg.getFunc(funcName, ft);
-    const auto entryBlock = cg.createBlock(BLOCK_ENTRY, func);
-    cg.builder.SetInsertPoint(entryBlock);
+    cg.startFunc(func);
     cg.callStackPush();
 
     const auto iter = func->getArg(0);
@@ -1287,8 +1282,7 @@ void LgsCgFile::getFilterFunc(LgsFuncType* filterFunc) {
     const auto ft = llvm::cast<FunctionType>(filterFunc->getIRType(cg));
     const auto cbFt = llvm::cast<FunctionType>(cbParam.type->getIRType(cg));
     const auto func = cg.getFunc(funcName, ft);
-    const auto entryBlock = cg.createBlock(BLOCK_ENTRY, func);
-    cg.builder.SetInsertPoint(entryBlock);
+    cg.startFunc();
     cg.callStackPush();
 
     const auto iter = func->getArg(0);
@@ -1322,8 +1316,7 @@ void LgsCgFile::getForeachFunc(LgsFuncType* forEachFunc) {
     const auto ft = llvm::cast<FunctionType>(forEachFunc->getIRType(cg));
     const auto cbFt = llvm::cast<FunctionType>(cbParam.type->getIRType(cg));
     const auto func = cg.getFunc(funcName, ft);
-    const auto entryBlock = cg.createBlock(BLOCK_ENTRY, func);
-    cg.builder.SetInsertPoint(entryBlock);
+    cg.startFunc(func);
     cg.callStackPush();
 
     const auto iter = func->getArg(0);

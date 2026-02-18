@@ -14,7 +14,6 @@ struct LgsPaths {
     fs::path cacheFile;
     fs::path appConfigFile;
     fs::path execFile;
-    fs::path testExecFile;
     fs::path lgsRootDir;
     fs::path lgsPackagesDir;
     fs::path cblasDir;

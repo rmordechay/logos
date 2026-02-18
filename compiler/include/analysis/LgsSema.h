@@ -147,8 +147,8 @@ public:
 
     LgsFunc* cloneGenericFunc(const LgsFuncCall* funcCall, const LgsFunc* func);
     void replaceGenerics(LgsValue* value, std::unordered_map<std::string, LgsType*>& replacements);
-    LgsSymbol* getSymbol(const std::string& name);
     void replaceForLoop(LgsStmtWrapper& stmt);
+    LgsSymbol* getSymbol(const std::string& name);
     void addLocalSymbol(const LgsSymbol& newSymbol);
     void createCoroutineFunc(LgsFuncCall* funcCall);
     void addError(const LgsBaseMsg& lgsErr, const LgsLocation& location, const std::vector<std::string>& args = {});

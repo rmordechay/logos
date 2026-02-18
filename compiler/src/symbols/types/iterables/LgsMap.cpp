@@ -213,14 +213,13 @@ Function* LgsMap::getGetFunc(LgsCodeGen& cg) {
     }
 
     const auto func = cg.getFunc(funcName, ft);
-    const auto entryBlock = cg.createBlock(BLOCK_ENTRY, func);
     const auto entryNullCheckBlock = cg.createBlock("entry_null_check");
     const auto entryNullBlock = cg.createBlock("entry_is_null");
     const auto keyCompareBlock = cg.createBlock("keys_compare");
     const auto keysEqualBlock = cg.createBlock("keys_equal");
     const auto keysNotEqualBlock = cg.createBlock("keys_not_equal");
 
-    cg.builder.SetInsertPoint(entryBlock);
+    cg.startFunc(func);
     const auto mapIR = func->getArg(0);
     const auto keyIR = func->getArg(1);
 
@@ -274,7 +273,6 @@ Function* LgsMap::getAddFunc(LgsCodeGen& cg) {
     }
 
     const auto func = cg.getFunc(funcName, ft);
-    const auto entryBlock = cg.createBlock(BLOCK_ENTRY, func);
     const auto resizeBlock = cg.createBlock("resize");
     const auto checkSlotBlock = cg.createBlock("check_slot");
     const auto entryNullCondBlock = cg.createBlock("entry_null_cond");
@@ -284,7 +282,7 @@ Function* LgsMap::getAddFunc(LgsCodeGen& cg) {
     const auto notEqualBlock = cg.createBlock("not_equal");
     const auto exitBlock = cg.createBlock(BLOCK_EXIT);
 
-    cg.builder.SetInsertPoint(entryBlock);
+    cg.startFunc(func);
     const auto mapIR = func->getArg(0);
     const auto keyIR = func->getArg(1);
     const auto valueIR = func->getArg(2);

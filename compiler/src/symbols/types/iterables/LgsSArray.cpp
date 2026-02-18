@@ -143,8 +143,7 @@ Function* LgsSArray::getEqFunc(LgsCodeGen& cg) {
 
     const auto func = cg.getFunc(funcName, ft);
     cg.savedIP = cg.builder.saveIP();
-    const auto entryBlock = cg.createBlock(BLOCK_ENTRY, func);
-    cg.builder.SetInsertPoint(entryBlock);
+    cg.startFunc(func);
 
     const auto arrIR1 = func->getArg(0);
     const auto arrIR2 = func->getArg(1);

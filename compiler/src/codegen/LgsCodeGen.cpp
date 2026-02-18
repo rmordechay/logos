@@ -47,7 +47,7 @@ bool LgsCodeGen::writeIRModule(const LgsPaths& paths, uint8_t optLevel) const {
         IRModule->print(textFile, nullptr);
     }
 
-    // Run pass
+    // Run passes
     PassBuilder passBuilder(targetMachine);
     LoopAnalysisManager loopAnalyser;
     FunctionAnalysisManager funcAnalyser;
@@ -58,7 +58,6 @@ bool LgsCodeGen::writeIRModule(const LgsPaths& paths, uint8_t optLevel) const {
     passBuilder.registerLoopAnalyses(loopAnalyser);
     passBuilder.registerCGSCCAnalyses(CGAnalyser);
     passBuilder.crossRegisterProxies(loopAnalyser, funcAnalyser, CGAnalyser, analysisManager);
-
     auto passManager = passBuilder.buildPerModuleDefaultPipeline(getOptLevel(optLevel));
     passManager.run(*IRModule, analysisManager);
 
@@ -262,6 +261,11 @@ void LgsCodeGen::throwError(const LgsBaseMsg& err, const std::vector<Value*>& ar
 
 BasicBlock* LgsCodeGen::createBlock(const std::string& name, Function* parent) {
     return BasicBlock::Create(context, name, parent);
+}
+
+void LgsCodeGen::startFunc(Function* parent) {
+    const auto entryBlock = BasicBlock::Create(context, BLOCK_ENTRY, parent);
+    builder.SetInsertPoint(entryBlock);
 }
 
 void LgsCodeGen::branch(BasicBlock* block) {

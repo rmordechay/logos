@@ -9,10 +9,6 @@
 #include "files/LgsTestFile.h"
 #include "logos/LgsAppConfigs.h"
 
-bool LgsFile::isMain() const {
-    return path.filename() == LGS_MAIN_FILE;
-}
-
 size_t LgsFile::hashFile() {
     assert(0);
 }

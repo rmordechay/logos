@@ -14,6 +14,7 @@ class LgsLinker {
 public:
     LgsPaths& paths;
     LgsAppConfigs& appConfigs;
+    std::vector<std::string> filesToLink;
     std::vector<std::string> importPaths;
 
     LgsLinker(LgsAppConfigs& appConfigs, LgsPaths& paths) : paths(paths), appConfigs(appConfigs) {}

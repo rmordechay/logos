@@ -742,7 +742,7 @@ void LgsSema::visitIOStmt(LgsIOStmt* ioStmt) {
             if (!funcCall->equals(ioPair->openFunc->funcType)) continue;
             ioStmt->closeFunc = ioPair->closeFunc;
         }
-    } else if (file->isMain()) {
+    } else if (file->asMainFile()) {
         for (const auto ioPair : file->asMainFile()->ioPairs) {
             if (!funcCall->equals(ioPair->openFunc->funcType)) continue;
             ioStmt->closeFunc = ioPair->closeFunc;
@@ -1155,12 +1155,6 @@ void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent) {
     }
 
     if (!validateMethodVisibility(method, parent->type, methodCall->location)) return;
-    methodCall->isMock = stack.currentFunc()->isTest && parent->type->pname() == LgsTest::name && methodCall->name == "mock";
-    if (methodCall->isMock) {
-        const auto pair = std::make_pair(methodCall->args[0].expr, methodCall->args[1].expr);
-        stack.currentFunc()->mocks.push_back(pair);
-    }
-
     if (method->funcType->genericTypes.empty()) {
         methodCall->func = method;
     } else {
@@ -1706,6 +1700,20 @@ void LgsSema::replaceGenerics(LgsValue* value, std::unordered_map<std::string, L
     addRTType(type);
 }
 
+void LgsSema::replaceForLoop(LgsStmtWrapper& stmt) {
+    const auto rangeLoop = stmt.stmt->asLoop()->asRangeLoop();
+    if (!rangeLoop) return;
+    visitExpr(rangeLoop->endRange);
+    if (rangeLoop->endRange->type && rangeLoop->endRange->type->asIterable()) {
+        const auto foreach = new LgsForeachLoop(rangeLoop->endRange);
+        foreach->stmtsBlock = rangeLoop->stmtsBlock;
+        rangeLoop->stmtsBlock = nullptr;
+        rangeLoop->endRange = nullptr;
+        delete rangeLoop;
+        stmt.stmt = foreach;
+    }
+}
+
 LgsSymbol* LgsSema::getSymbol(const std::string& name) {
     if (const auto globalSymbol = globals.getSymbol(name)) {
         return globalSymbol;
@@ -1722,20 +1730,6 @@ LgsSymbol* LgsSema::getSymbol(const std::string& name) {
         }
     }
     return nullptr;
-}
-
-void LgsSema::replaceForLoop(LgsStmtWrapper& stmt) {
-    const auto rangeLoop = stmt.stmt->asLoop()->asRangeLoop();
-    if (!rangeLoop) return;
-    visitExpr(rangeLoop->endRange);
-    if (rangeLoop->endRange->type && rangeLoop->endRange->type->asIterable()) {
-        const auto foreach = new LgsForeachLoop(rangeLoop->endRange);
-        foreach->stmtsBlock = rangeLoop->stmtsBlock;
-        rangeLoop->stmtsBlock = nullptr;
-        rangeLoop->endRange = nullptr;
-        delete rangeLoop;
-        stmt.stmt = foreach;
-    }
 }
 
 void LgsSema::addLocalSymbol(const LgsSymbol& newSymbol) {

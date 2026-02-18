@@ -29,8 +29,6 @@ public:
     std::string mangleName() const;
     bool equals(LgsExpr* other) override;
     bool equals(LgsFuncType* funcType) const;
-    bool equalsVariadic(const LgsFuncType* funcType) const;
-    bool equalsDefaults(LgsFuncType* funcType) const;
     std::string asText() override;
     void setDebugValue(LgsCodeGen& cg) override;
     LgsFuncCall* clone() override;
