@@ -10,5 +10,6 @@ public:
     std::string asText() override;
     bool equals(LgsExpr* other) override;
     void setDebugValue(LgsCodeGen& cg) override;
+    LgsExpr* clone() override;
     ~LgsSelection() override;
 };

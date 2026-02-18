@@ -134,9 +134,9 @@ public:
     LgsIOStmt* parseIOStmt();
 
     // Exprs
-    LgsExpr* parseExpr(bool withInstaOrLambda = true);
-    LgsExpr* parseBinaryExpr(int minPrecedence, bool witInstaOrLambda = true);
-    LgsExpr* parseUnary(bool withInstaOrLambda = true);
+    LgsExpr* parseExpr(bool withLamda = true);
+    LgsExpr* parseBinaryExpr(int minPrecedence, bool withLambda = true);
+    LgsExpr* parseUnary(bool withInstance = true);
     LgsVariable* parseVariable();
     LgsModuleExpr* parseModuleExpr();
     LgsInstance* parseInstance();

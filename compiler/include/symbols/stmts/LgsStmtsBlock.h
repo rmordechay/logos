@@ -29,6 +29,7 @@ public:
     bool isMacro = false;
 
     explicit LgsStmtsBlock(const std::vector<LgsStmtWrapper>& stmts = {}) : stmts(stmts) {}
+    LgsFunc* wrapBlockInFunc();
     void hashNode(size_t& oldHash) override;
     void setDebugValue(LgsCodeGen& cg) override;
     LgsStmtsBlock* clone() override;

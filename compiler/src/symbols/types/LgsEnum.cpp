@@ -14,9 +14,9 @@
 
 LgsFunc* LgsEnum::getMethod(const std::string& methodName) {
     constexpr auto flags = BUILTIN | PUBLIC | METHOD;
-    if (methodName == VALUE_FUNC && subtype) {
+    if (methodName == VALUE_FUNC && exprType) {
         if (methods.contains(VALUE_FUNC)) return methods[VALUE_FUNC];
-        const auto func = new LgsFunc(VALUE_FUNC, subtype, {this}, flags);
+        const auto func = new LgsFunc(VALUE_FUNC, exprType, {this}, flags);
         func->fn = [](LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) {
             const auto arg = args.front().expr->asVariable();
             if (arg && arg->ref.symbolType == FIELD && arg->ref.field->expr) return arg->ref.field->expr->IRValue;
@@ -45,8 +45,8 @@ LgsExpr* LgsEnum::getZeroValue() {
 }
 
 Type* LgsEnum::getIRType(LgsCodeGen& cg) {
-    if (subtype) {
-        return cg.getStructType({cg.sizeTy(), subtype->getIRType(cg)}, getName());
+    if (exprType) {
+        return cg.getStructType({cg.sizeTy(), exprType->getIRType(cg)}, getName());
     }
     return cg.sizeTy();
 }
@@ -75,7 +75,7 @@ Value* LgsEnum::asIRStr(LgsCodeGen& cg, Value* v) {
 
 Value* LgsEnum::hashValue(LgsCodeGen& cg, Value* value) {
     if (fieldName != "") return cg.usize(fieldIndex);
-    if (!subtype) return value;
+    if (!exprType) return value;
     return cg.builder.CreateExtractValue(value, 0);
 }
 

@@ -65,8 +65,6 @@
 #include "types/primitives/LgsSize.h"
 #include "types/primitives/LgsUInt.h"
 
-LgsFunc* wrapStmtsBlockWithLambda(LgsStmtsBlock* stmtsBlock);
-
 #define MAX_TOKENS_NUMBER 100000
 
 bool LgsParser::scanTokens() {
@@ -931,7 +929,7 @@ LgsStmt* LgsParser::parseAssignment() {
     if (!parsedOrReset(l, oldIndex)) return nullptr;
 
     // Operation
-    if (!LGS_BINARY_OPS_DICT.contains(currentToken.type) && currentToken.type != T_WALRUS) {
+    if (!LGS_ASSIGN_OPS_DICT.contains(currentToken.type)) {
         freeExpr(l);
         reset(oldIndex);
         return nullptr;
@@ -948,10 +946,10 @@ LgsStmt* LgsParser::parseAssignment() {
     }
 
     LgsAssignment* assignment;
-    if (currentToken.type != T_WALRUS) {
+    if (opToken.type == T_WALRUS) {
         assignment = new LgsAssignment(l, r);
     } else {
-        const auto op = LGS_BINARY_OPS_DICT.at(opToken.type);
+        const auto op = LGS_ASSIGN_OPS_DICT.at(opToken.type);
         const auto binExpr = new LgsBinaryExpr(l, r, op);
         assignment = new LgsAssignment(binExpr);
     }
@@ -1175,7 +1173,7 @@ LgsDeferStmt* LgsParser::parseDeferStmt() {
         if (stmtsBlock->isMacro) addParsingError();
         const auto fc = new LgsFuncCall("");
         setLocation(fc->location, &deferToken, &currentToken);
-        fc->func = wrapStmtsBlockWithLambda(stmtsBlock);
+        fc->func = stmtsBlock->wrapBlockInFunc();
         fc->setType(&LGS_VOID);
         expr = fc;
     } else {
@@ -1223,22 +1221,22 @@ LgsIOStmt* LgsParser::parseIOStmt() {
     return ioStmt;
 }
 
-LgsExpr* LgsParser::parseExpr(const bool withInstaOrLambda) {
+LgsExpr* LgsParser::parseExpr(const bool withLamda) {
     if (currentToken.type == T_RBRACE || currentToken.type == T_RPAREN || currentToken.type == T_RANGLE) {
         return nullptr;
     }
-    if (withInstaOrLambda) if (const auto lambda = parseLambda()) return lambda;
-    return parseBinaryExpr(0, withInstaOrLambda);
+    if (withLamda) if (const auto lambda = parseLambda()) return lambda;
+    return parseBinaryExpr(0, withLamda);
 }
 
-LgsExpr* LgsParser::parseBinaryExpr(const int minPrecedence, const bool witInstaOrLambda) {
-    auto left = parseUnary(witInstaOrLambda);
+LgsExpr* LgsParser::parseBinaryExpr(const int minPrecedence, const bool withLambda) {
+    auto left = parseUnary(withLambda);
     if (!left) return nullptr;
     while (true) {
         if (matchAndConsume(T_THEN)) {
-            const auto thenExpr = parseExpr(witInstaOrLambda);
+            const auto thenExpr = parseExpr(withLambda);
             mustMatch(T_ELSE);
-            const auto elseExpr = parseExpr(witInstaOrLambda);
+            const auto elseExpr = parseExpr(withLambda);
             mustParse(elseExpr);
             return new LgsTernaryExpr(left, thenExpr, elseExpr);
         }
@@ -1260,7 +1258,7 @@ LgsExpr* LgsParser::parseBinaryExpr(const int minPrecedence, const bool witInsta
         const auto precedence = getBinOpPrecedence(op->opType);
         if (precedence < minPrecedence) break;
         consume();
-        const auto right = parseBinaryExpr(precedence + 1, witInstaOrLambda);
+        const auto right = parseBinaryExpr(precedence + 1, withLambda);
         if (!right) {
             addParsingError();
             return left;
@@ -1270,28 +1268,26 @@ LgsExpr* LgsParser::parseBinaryExpr(const int minPrecedence, const bool witInsta
     return left;
 }
 
-LgsExpr* LgsParser::parseUnary(const bool withInstaOrLambda) {
+LgsExpr* LgsParser::parseUnary(const bool withInstance) {
     if (matchAndConsume(T_LPAREN)) {
-        const auto expr = parseBinaryExpr(0, withInstaOrLambda);
+        const auto expr = parseBinaryExpr(0, withInstance);
         mustMatch(T_RPAREN);
         return expr;
     }
 
     LgsExpr* expr = nullptr;
-    if (const auto metaVar = parseLoopMetaVar()) expr = metaVar;
-    else if (const auto constant = parseConstant()) expr = constant;
-    else if (const auto charConst = parseCharConst()) expr = charConst;
-    else if (const auto strConst = parseStrConst()) expr = strConst;
-    else if (const auto vector = parseVectorExpr()) expr = vector;
-    else if (const auto matrix = parseMatrixExpr()) expr = matrix;
-    else if (const auto envVar = parseEnvVar()) expr = envVar;
-    else if (const auto arrayExpr = parseArrayExpr()) expr = arrayExpr;
-    else if (const auto hashMap = parseHashMap()) expr = hashMap;
-    else if (const auto prefixExpr = parsePrefixExpr()) expr = prefixExpr;
-    else if (const auto funcCall = parseFuncCall()) expr = funcCall;
-    else if (const auto moduleExpr = parseModuleExpr()) expr = moduleExpr;
-    else if (withInstaOrLambda && ((expr = parseInstance()))) {}
-    else if (const auto variable = parseVariable()) expr = variable;
+    if ((expr = parseConstant())) {}
+    else if ((expr = parseLoopMetaVar())) {}
+    else if ((expr = parseEnvVar())) {}
+    else if ((expr = parseArrayExpr())) {}
+    else if ((expr = parseVectorExpr())) {}
+    else if ((expr = parseMatrixExpr())) {}
+    else if ((expr = parseHashMap())) {}
+    else if ((expr = parsePrefixExpr())) {}
+    else if ((expr = parseFuncCall())) {}
+    else if ((expr = parseModuleExpr())) {}
+    else if (withInstance && ((expr = parseInstance()))) {}
+    else if ((expr = parseVariable())) {}
     else return nullptr;
 
     if (matchAndConsume(T_DOT)) expr = parseSelection(expr);
@@ -1419,6 +1415,8 @@ LgsCharConst* LgsParser::parseCharConst() {
 }
 
 LgsExpr* LgsParser::parseConstant() {
+    if (const auto expr = parseCharConst()) return expr;
+    if (const auto expr = parseStrConst()) return expr;
     const auto startToken = currentToken;
     const auto tokenStr = currentToken.lexeme;
     LgsExpr* constant = nullptr;
@@ -2105,12 +2103,4 @@ void LgsParser::addParsingError(const LgsLocation* location) {
 void LgsParser::recursionGuard() {
     if (recursionCount++ < MAX_TOKENS_NUMBER) return;
     assert(0);
-}
-
-LgsFunc* wrapStmtsBlockWithLambda(LgsStmtsBlock* stmtsBlock) {
-    const auto func = new LgsFunc("", nullptr);
-    func->funcType->isLambda = true;
-    func->location = stmtsBlock->location;
-    func->stmtsBlock = stmtsBlock;
-    return func;
 }

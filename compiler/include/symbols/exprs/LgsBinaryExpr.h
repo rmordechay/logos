@@ -12,5 +12,6 @@ public:
     void setDebugValue(LgsCodeGen& cg) override;
     bool equals(LgsExpr* other) override;
     std::string asText() override;
+    LgsExpr* clone() override;
     ~LgsBinaryExpr() override;
 };

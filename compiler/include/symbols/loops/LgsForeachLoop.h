@@ -11,6 +11,7 @@ public:
     Value* loopEnd(LgsCodeGen& cg) override;
     void incAndJumpToCond(LgsCodeGen& cg) override;
     void setDebugValue(LgsCodeGen& cg) override;
+    LgsStmt* clone() override;
     ~LgsForeachLoop() override;
 };
 

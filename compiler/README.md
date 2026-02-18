@@ -1,1 +1,32 @@
 # Logos Compiler
+
+Type Holders
+1. Field
+    * type
+2. Cast
+    * toType
+3. VarDec
+    * type
+4. Expression
+    * type
+5. Param
+    * type
+6. FuncType
+    * rt
+7. Self
+    * baseType
+8. CPtr
+    * baseType
+9. Enum
+    * exprType
+10. Subtype
+     * baseType
+11. Iterable
+     * baseType
+12. Nullable
+     * baseType
+13. GenericType
+     * bounds
+14. TypePair
+     * key
+     * value

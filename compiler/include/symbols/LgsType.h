@@ -97,11 +97,11 @@ public:
     virtual bool equals(LgsType* other);
     virtual void hashNode(size_t& oldHash);
     virtual bool hasGenerics();
+    virtual void replaceGenerics(std::unordered_map<std::string, LgsType*>& replacements);
     virtual bool canCastTo(LgsType* other) = 0;
     virtual LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) = 0;
     virtual Value* moveValue(LgsCodeGen& cg, Value* value, Value* toLevel);
     virtual void asIRText(LgsCodeGen& cg, LgsStrBuilder& strBuilder, Value* ptr);
-    virtual void replaceGenerics(std::unordered_map<std::string, LgsType*>& replacements);
     virtual Type* getIRType(LgsCodeGen& cg) = 0;
     virtual Constant* getRTTypeExtra(LgsCodeGen& cg);
     virtual Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee);

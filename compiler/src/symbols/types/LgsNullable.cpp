@@ -3,7 +3,7 @@
 #include "codegen/LgsCodeGen.h"
 #include "exprs/LgsExpr.h"
 #include "exprs/LgsNullableExpr.h"
-#include "../../../include/symbols/types/primitives/LgsAny.h"
+#include "types/primitives/LgsAny.h"
 #include "types/primitives/LgsBool.h"
 #include <cassert>
 #include <llvm/IR/Module.h>

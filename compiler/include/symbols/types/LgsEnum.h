@@ -7,7 +7,7 @@ public:
     std::string name;
     std::string fieldName;
     size_t fieldIndex;
-    LgsType* subtype = nullptr;
+    LgsType* exprType = nullptr;
 
     explicit LgsEnum(const std::string& name) : LgsEnum(name, "", 0) {}
     LgsEnum(const std::string& name, const std::string& fieldName, const size_t fieldIndex) : name(name), fieldName(fieldName), fieldIndex(fieldIndex) {
@@ -26,4 +26,3 @@ public:
     DIType* getDebugType(LgsCodeGen& cg) override;
     ~LgsEnum() override;
 };
-

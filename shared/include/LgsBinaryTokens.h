@@ -3,6 +3,7 @@
 #include <unordered_map>
 
 enum LgsBinOpType {
+    ASSIGN,
     ADD,
     SUB,
     MUL,
@@ -32,6 +33,7 @@ struct LgsBinOp {
     std::string text;
 };
 
+const auto ASSIGN_OP = LgsBinOp{ADD, ":="};
 const auto ADD_OP = LgsBinOp{ADD, "+"};
 const auto SUB_OP = LgsBinOp{SUB, "-"};
 const auto MUL_OP = LgsBinOp{MUL, "*"};
@@ -57,27 +59,16 @@ const auto NOOP_BIN_OP = LgsBinOp{NOOP, ""};
 
 const std::unordered_map<LgsTokenType, LgsBinOp> LGS_BINARY_OPS_DICT = {
     {T_PLUS, ADD_OP},
-    {T_EQUAL_PLUS, ADD_OP},
     {T_MINUS, SUB_OP},
-    {T_EQUAL_MINUS, SUB_OP},
     {T_STAR, MUL_OP},
-    {T_EQUAL_STAR, MUL_OP},
     {T_SLASH, DIV_OP},
-    {T_EQUAL_SLASH, DIV_OP},
     {T_PERCENT, MODULO_OP},
-    {T_EQUAL_PERCENT, MODULO_OP},
     {T_CARET, POW_OP},
-    {T_EQUAL_CARET, POW_OP},
     {T_AMPERSAND, BIT_AND_OP},
-    {T_EQUAL_AMPERSAND, BIT_AND_OP},
     {T_PIPE, BIT_OR_OP},
-    {T_EQUAL_PIPE, BIT_OR_OP},
     {T_DOUBLE_CARET, BIT_XOR_OP},
-    {T_EQUAL_DOUBLE_CARET, BIT_XOR_OP},
     {T_DOUBLE_LANGLE, LSHIFT_OP},
-    {T_EQUAL_DOUBLE_RANGLE, LSHIFT_OP},
     {T_DOUBLE_RANGLE, RSHIFT_OP},
-    {T_EQUAL_DOUBLE_LANGLE, RSHIFT_OP},
     {T_DOUBLE_EQUAL, EQ_OP},
     {T_NOT_EQUAL, NE_OP},
     {T_LANGLE, LT_OP},
@@ -90,3 +81,17 @@ const std::unordered_map<LgsTokenType, LgsBinOp> LGS_BINARY_OPS_DICT = {
     {T_UNKNOWN, NOOP_BIN_OP},
 };
 
+const std::unordered_map<LgsTokenType, LgsBinOp> LGS_ASSIGN_OPS_DICT = {
+    {T_WALRUS, ASSIGN_OP},
+    {T_EQUAL_PLUS, ADD_OP},
+    {T_EQUAL_MINUS, SUB_OP},
+    {T_EQUAL_STAR, MUL_OP},
+    {T_EQUAL_SLASH, DIV_OP},
+    {T_EQUAL_PERCENT, MODULO_OP},
+    {T_EQUAL_CARET, POW_OP},
+    {T_EQUAL_AMPERSAND, BIT_AND_OP},
+    {T_EQUAL_PIPE, BIT_OR_OP},
+    {T_EQUAL_DOUBLE_CARET, BIT_XOR_OP},
+    {T_EQUAL_DOUBLE_RANGLE, LSHIFT_OP},
+    {T_EQUAL_DOUBLE_LANGLE, RSHIFT_OP},
+};

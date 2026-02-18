@@ -31,6 +31,14 @@ bool LgsStmtWrapper::isTerminator() const {
     return false;
 }
 
+LgsFunc* LgsStmtsBlock::wrapBlockInFunc() {
+    const auto func = new LgsFunc("", nullptr);
+    func->funcType->isLambda = true;
+    func->location = location;
+    func->stmtsBlock = this;
+    return func;
+}
+
 void LgsStmtsBlock::hashNode(size_t& oldHash) {
     for (const auto stmt : stmts) {
         stmt.stmt->hashNode(oldHash);

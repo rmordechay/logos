@@ -79,3 +79,27 @@ TEST(CgAssignmentTest, Test5) {
     EXPECT_EQ(lines[0], "Obj{x=0}");
     EXPECT_EQ(lines[1], "Obj{x=2}");
 }
+
+TEST(CgAssignmentTest, Test6) {
+    const auto code = R"(
+    main() {
+        mut a = 2
+        print(a)
+        a += 3
+        print(a)
+        a -= 2
+        print(a)
+        a *= 3
+        print(a)
+        a /= 3
+        print(a)
+    }
+    )";
+    std::istringstream stream(runLgsApp(code));
+    const auto lines = getLines(stream, 5);
+    EXPECT_EQ(lines[0], "2");
+    EXPECT_EQ(lines[1], "5");
+    EXPECT_EQ(lines[2], "3");
+    EXPECT_EQ(lines[3], "9");
+    EXPECT_EQ(lines[4], "3");
+}

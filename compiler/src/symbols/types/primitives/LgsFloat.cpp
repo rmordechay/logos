@@ -80,13 +80,8 @@ LgsType* LgsFloat::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     case GE:
     case LE:
         return &LGS_BOOL;
-    case AND:
-    case OR:
-    case IN:
-    case CROSS:
+    default:
         break;
-    case NOOP:
-        assert(0);
     }
     return nullptr;
 }

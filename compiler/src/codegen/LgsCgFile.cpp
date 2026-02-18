@@ -279,7 +279,7 @@ void LgsCgFile::visitLoopMetaVar(LgsMetaVar* metaVar) {
         break;
     }
     case FOR_ELEMENT:
-        metaVar->IRValue = loop->loopVars.front()->IRValue;
+        metaVar->IRValue = loop->loopVars.front()->expr->loadIRPtr(cg);
         break;
     }
 }
@@ -308,28 +308,34 @@ void LgsCgFile::visitVarDec(LgsVarDec* varDec) {
 }
 
 void LgsCgFile::visitAssignment(const LgsAssignment* assignment) {
-    assert(!assignment->binaryExpr);
-    const auto left = assignment->left;
-    const auto right = assignment->right;
-    if (const auto var = left->asVariable()) {
-        var->IRValue = var->ref.varDec->IRValue;
-    } else if (const auto iterIndex = left->asIterIndex()) {
-        const auto iterable = iterIndex->baseExpr->type->asIterable();
-        visitIterIndex(iterIndex, !iterable->isStatic);
-        if (!iterable->isStatic) {
-            right->pointee = iterIndex->IRValue;
-            visitExpr(right);
-            iterable->addIRElement(cg, iterIndex->baseExpr->IRValue, iterIndex->index.from->IRValue, right->IRValue);
-            return;
-        }
-    } else if (const auto selection = left->asSelection()) {
-        visitSelection(selection, true);
+    Value* lv;
+    Value* rv;
+    if (assignment->binaryExpr) {
+        visitBinaryExpr(assignment->binaryExpr, false);
+        visitExpr(assignment->binaryExpr->left, true);
+        lv = assignment->binaryExpr->left->IRValue;
+        rv = assignment->binaryExpr->IRValue;
     } else {
-        assert(0);
+        const auto left = assignment->left;
+        const auto right = assignment->right;
+        if (const auto iterIndex = left->asIterIndex()) {
+            const auto iterable = iterIndex->baseExpr->type->asIterable();
+            visitIterIndex(iterIndex, !iterable->isStatic);
+            if (!iterable->isStatic) {
+                right->pointee = iterIndex->IRValue;
+                visitExpr(right);
+                iterable->addIRElement(cg, iterIndex->baseExpr->IRValue, iterIndex->index.from->IRValue, right->IRValue);
+                return;
+            }
+        } else {
+            visitExpr(left, true);
+        }
+        right->pointee = left->IRValue;
+        visitExpr(right);
+        lv = left->pointee ? left->pointee : left->IRValue;
+        rv = right->IRValue;
     }
-    right->pointee = left->IRValue;
-    visitExpr(right);
-    cg.store(right->IRValue, left->pointee ? left->pointee : left->IRValue);
+    cg.store(rv, lv);
 }
 
 void LgsCgFile::visitIfStmt(LgsIfStmt* ifStmt) {
@@ -530,7 +536,7 @@ void LgsCgFile::visitExpr(LgsExpr* expr, const bool assign) {
     if (const auto ternaryExpr = dynamic_cast<LgsTernaryExpr*>(expr)) {
         visitTernaryExpr(ternaryExpr);
     } else if (const auto binaryExpr = dynamic_cast<LgsBinaryExpr*>(expr)) {
-        visitBinaryExpr(binaryExpr);
+        visitBinaryExpr(binaryExpr, assign);
     } else {
         if (checkMock(expr)) return;
         if (const auto func = expr->asFunc()) visitLambda(func);
@@ -557,12 +563,12 @@ void LgsCgFile::visitExpr(LgsExpr* expr, const bool assign) {
     }
 }
 
-void LgsCgFile::visitBinaryExpr(LgsBinaryExpr* binExpr) {
+void LgsCgFile::visitBinaryExpr(LgsBinaryExpr* binExpr, const bool assign) {
     assert(binExpr->type);
     const auto l = binExpr->left;
     const auto r = binExpr->right;
-    visitExpr(l);
-    visitExpr(r);
+    visitExpr(l, assign);
+    visitExpr(r, assign);
     const auto type = binExpr->type;
     switch (binExpr->op.opType) {
     case ADD: binExpr->IRValue = type->addIR(cg, binExpr); break;

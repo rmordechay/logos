@@ -35,6 +35,15 @@ void LgsSelection::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }
 
+LgsExpr* LgsSelection::clone() {
+    const auto newSelection = new LgsSelection(*this);
+    newSelection->exprs.clear();
+    for (const auto expr : exprs) {
+        newSelection->exprs.push_back(expr->clone());
+    }
+    return newSelection;
+}
+
 LgsSelection::~LgsSelection() {
     for (const auto& expr : exprs) {
         freeExpr(expr);

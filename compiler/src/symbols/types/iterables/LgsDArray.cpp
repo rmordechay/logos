@@ -58,7 +58,8 @@ bool LgsDArray::canCastTo(LgsType* other) {
 void LgsDArray::inferBaseType(const std::vector<LgsExpr*> elements) {
     LgsType* type = nullptr;
     for (const auto element : elements) {
-        if (const auto inner = element->type->asIterable()) {
+        const auto inner = element->type->asIterable();
+        if (inner && !inner->asStr()) {
             inner->inferBaseType({element});
             type = inner->baseType;
         } else {

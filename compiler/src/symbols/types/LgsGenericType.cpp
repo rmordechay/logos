@@ -1,5 +1,5 @@
 #include "types/LgsGenericType.h"
-#include "../../../include/symbols/types/primitives/LgsAny.h"
+#include "types/primitives/LgsAny.h"
 
 #include <cassert>
 
@@ -29,10 +29,6 @@ LgsType* LgsGenericType::applyBinOp(LgsType* rightType, LgsBinOp& op) {
 }
 
 std::string LgsGenericType::fmtStr() const {
-    assert(0);
-}
-
-void LgsGenericType::replaceGenerics(std::unordered_map<std::string, LgsType*>& replacements) {
     assert(0);
 }
 

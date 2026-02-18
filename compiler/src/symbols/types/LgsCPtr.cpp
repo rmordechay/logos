@@ -1,7 +1,7 @@
 #include "types/LgsCPtr.h"
 
 #include "codegen/LgsCgFile.h"
-#include "../../../include/symbols/types/primitives/LgsAny.h"
+#include "types/primitives/LgsAny.h"
 #include "types/iterables/LgsDArray.h"
 #include "types/iterables/LgsSArray.h"
 #include "types/primitives/LgsLong.h"

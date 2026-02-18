@@ -122,6 +122,7 @@ void LgsFuncType::replaceGenerics(std::unordered_map<std::string, LgsType*>& rep
     }
     assert(!replacements[rtName]->hasGenerics());
     rt = replacements[rtName];
+    genericTypes.clear();
 }
 
 LgsType* LgsFuncType::applyBinOp(LgsType* rightType, LgsBinOp& op) {

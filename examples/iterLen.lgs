@@ -1,0 +1,12 @@
+main() {
+    str = "Roi"
+    list = ["Roi", "Roi"]
+    list2: Str[2] = ["Roi", "Roi"]
+    vec = Vec3()
+    map = {"Roi": "Roi"}
+    print(str.len())
+    print(list.len())
+    print(list2.len())
+    print(vec.len())
+    print(map.len())
+}

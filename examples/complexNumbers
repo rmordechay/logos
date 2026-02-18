@@ -1,8 +1,0 @@
-main() {
-    i1 = 3 + 2i
-    i2 = 5 + 2i
-    print(i1 * i2)
-    if i1 == i1 {
-        print("He")
-    }
-}

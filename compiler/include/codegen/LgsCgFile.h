@@ -100,7 +100,7 @@ public:
 
     // Exprs
     void visitExpr(LgsExpr* expr, bool assign = false);
-    void visitBinaryExpr(LgsBinaryExpr* binExpr);
+    void visitBinaryExpr(LgsBinaryExpr* binExpr, bool assign);
     void visitTernaryExpr(LgsTernaryExpr* ternaryExpr);
     void visitInstance(LgsInstance* instance);
     void visitConstant(LgsExpr* expr);
