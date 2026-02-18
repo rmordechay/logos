@@ -4,7 +4,7 @@
 #include "exprs/LgsIterIndex.h"
 #include "loops/LgsForeachLoop.h"
 #include "stmts/LgsVarDec.h"
-#include "../../../../include/symbols/types/primitives/LgsAny.h"
+#include "types/primitives/LgsAny.h"
 #include "types/primitives/LgsVoid.h"
 #include <llvm/IR/Module.h>
 
@@ -171,7 +171,7 @@ void LgsMap::setLoopIRVars(LgsCodeGen& cg, LgsForeachLoop* loop) {
 
     // Check entry
     cg.branchAndStartBlock(checkEntryBlock);
-    const auto index = cg.load(cg.sizeTy(), loop->iteratorCounter);
+    const auto index = cg.loadSize(loop->iteratorCounter);
     const auto entryPtr = cg.builder.CreateInBoundsGEP(cg.ptrTy(), entries, index);
     const auto entry = cg.loadPtr(entryPtr);
     const auto hasEntry = cg.builder.CreateIsNotNull(entry);
@@ -204,8 +204,8 @@ DIType* LgsMap::getDebugType(LgsCodeGen& cg) {
 Function* LgsMap::getGetFunc(LgsCodeGen& cg) {
     const auto funcName = getName() + "_" + GET_FUNC;
     if (const auto func = cg.IRModule->getFunction(funcName)) return func;
-    const auto keyTy = pairType->key->getTypeRef(cg);
-    const auto valueTy = pairType->value->getTypeRef(cg);
+    const auto keyTy = pairType->key->getStorageType(cg);
+    const auto valueTy = pairType->value->getStorageType(cg);
     const std::vector<Type*> params = {cg.ptrTy(), keyTy};
     const auto ft = cg.getFT(valueTy, params);
     if (cg.mode == CG_MODE_SRC_CODE) {
@@ -266,8 +266,8 @@ Function* LgsMap::getGetFunc(LgsCodeGen& cg) {
 Function* LgsMap::getAddFunc(LgsCodeGen& cg) {
     const auto funcName = getName() + "_" + ADD_FUNC;
     if (const auto func = cg.IRModule->getFunction(funcName)) return func;
-    const auto keyType = pairType->key->getTypeRef(cg);
-    const auto valueTy = pairType->value->getTypeRef(cg);
+    const auto keyType = pairType->key->getStorageType(cg);
+    const auto valueTy = pairType->value->getStorageType(cg);
     const auto ft = cg.getFT(cg.voidTy(), {cg.ptrTy(), keyType, valueTy});
     if (cg.mode == CG_MODE_SRC_CODE) {
         return cg.getFunc(funcName, ft);
@@ -298,8 +298,8 @@ Function* LgsMap::getAddFunc(LgsCodeGen& cg) {
     const auto level = cg.builder.CreateSub(cg.getCurrentLevel(), cg.usize(1));
 
     // Resize
-    auto len = cg.load(cg.sizeTy(), lenField);
-    auto cap = cg.load(cg.sizeTy(), capField);
+    auto len = cg.loadSize(lenField);
+    auto cap = cg.loadSize(capField);
     const auto cond = cg.builder.CreateICmpUGE(len, cap);
     cg.builder.CreateCondBr(cond, resizeBlock, checkSlotBlock);
 
@@ -321,7 +321,7 @@ Function* LgsMap::getAddFunc(LgsCodeGen& cg) {
     cg.branchAndStartBlock(checkSlotBlock);
 
     // Check slot
-    cap = cg.load(cg.sizeTy(), capField);
+    cap = cg.loadSize(capField);
     entries = cg.loadPtr(entriesField);
     const auto hash = cg.builder.CreateURem(pairType->key->hashValue(cg, keyIR), cap);
     const auto entryPtr = cg.builder.CreateInBoundsGEP(cg.ptrTy(), entries, {hash});
@@ -363,7 +363,7 @@ Function* LgsMap::getAddFunc(LgsCodeGen& cg) {
     cg.store(newEntry, cg.loadPtr(entryPtrAlloca));
 
     // Increment length
-    len = cg.load(cg.sizeTy(), lenField);
+    len = cg.loadSize(lenField);
     const auto inc = cg.builder.CreateAdd(len, cg.usize(1));
     cg.store(inc, lenField);
     cg.branchAndStartBlock(exitBlock);

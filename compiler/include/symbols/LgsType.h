@@ -84,7 +84,7 @@ public:
     std::string getRTTName();
     Constant* getRTType(LgsCodeGen& cg);
     ConstantInt* IRSize(LgsCodeGen& cg);
-    Type* getTypeRef(LgsCodeGen& cg);
+    Type* getStorageType(LgsCodeGen& cg);
 
     virtual LgsField* getField(const std::string& fieldName);
     virtual LgsFunc* getMethod(const std::string& methodName);

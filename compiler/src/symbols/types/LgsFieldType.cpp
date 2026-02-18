@@ -20,7 +20,7 @@ LgsExpr* LgsFieldType::getZeroValue() {
 }
 
 Type* LgsFieldType::getIRType(LgsCodeGen& cg) {
-    return getFieldRTTStruct(cg);
+    return getRTTStruct(cg);
 }
 
 bool LgsFieldType::canCastTo(LgsType* other) {
@@ -41,26 +41,26 @@ DIType* LgsFieldType::getDebugType(LgsCodeGen& cg) {
 }
 
 Value* LgsFieldType::loadRTName(LgsCodeGen& cg, Value* ptr) {
-    return cg.loadStructField(getFieldRTTStruct(cg), ptr, LgsFieldIndices::name, cg.ptrTy());
+    return cg.loadStructField(getRTTStruct(cg), ptr, LgsFieldIndices::name, cg.ptrTy());
 }
 
 Value* LgsFieldType::loadRTSize(LgsCodeGen& cg, Value* ptr) {
-    return cg.loadStructField(getFieldRTTStruct(cg), ptr, LgsFieldIndices::size, cg.sizeTy());
+    return cg.loadStructField(getRTTStruct(cg), ptr, LgsFieldIndices::size, cg.sizeTy());
 }
 
 Value* LgsFieldType::loadRTOffset(LgsCodeGen& cg, Value* ptr) {
-    return cg.loadStructField(getFieldRTTStruct(cg), ptr, LgsFieldIndices::offset, cg.sizeTy());
+    return cg.loadStructField(getRTTStruct(cg), ptr, LgsFieldIndices::offset, cg.sizeTy());
 }
 
 Value* LgsFieldType::loadRTKind(LgsCodeGen& cg, Value* ptr) {
-    return cg.loadStructField(getFieldRTTStruct(cg), ptr, LgsFieldIndices::kind, cg.i32Ty());
+    return cg.loadStructField(getRTTStruct(cg), ptr, LgsFieldIndices::kind, cg.i32Ty());
 }
 
 Value* LgsFieldType::loadRTType(LgsCodeGen& cg, Value* ptr) {
-    return cg.loadStructField(getFieldRTTStruct(cg), ptr, LgsFieldIndices::type, cg.ptrTy());
+    return cg.loadStructField(getRTTStruct(cg), ptr, LgsFieldIndices::type, cg.ptrTy());
 }
 
-StructType* LgsFieldType::getFieldRTTStruct(LgsCodeGen& cg) {
+StructType* LgsFieldType::getRTTStruct(LgsCodeGen& cg) {
     constexpr auto rttName = std::string(LGS_TYPEINFO_PREFIX) + "field";
     return cg.getStructType({cg.ptrTy(), cg.sizeTy(), cg.sizeTy(), cg.i32Ty(), cg.ptrTy()}, rttName);
 }

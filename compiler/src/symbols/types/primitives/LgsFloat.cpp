@@ -6,7 +6,7 @@
 #include "codegen/LgsCodeGen.h"
 #include "exprs/LgsBinaryExpr.h"
 #include "exprs/constants/LgsFloatConst.h"
-#include "../../../../include/symbols/types/primitives/LgsAny.h"
+#include "types/primitives/LgsAny.h"
 #include "types/LgsNullable.h"
 #include "types/iterables/LgsVec.h"
 #include "types/primitives/LgsBool.h"

@@ -131,7 +131,7 @@ ConstantInt* LgsType::IRSize(LgsCodeGen& cg) {
     return cg.getTypeSize(getIRType(cg));
 }
 
-Type* LgsType::getTypeRef(LgsCodeGen& cg) {
+Type* LgsType::getStorageType(LgsCodeGen& cg) {
     return passByRef ? cg.ptrTy() : getIRType(cg);
 }
 

@@ -154,6 +154,10 @@ Value* LgsCodeGen::loadPtr(Value* value) {
     return builder.CreateLoad(ptrTy(), value);
 }
 
+Value* LgsCodeGen::loadSize(Value* value) {
+    return builder.CreateLoad(sizeTy(), value);
+}
+
 Value* LgsCodeGen::isNull(Value* value) {
     return builder.CreateIsNull(value);
 }
@@ -233,6 +237,10 @@ Value* LgsCodeGen::allocInLevel(Value* size, Value* level, const bool setLevel) 
 
 Value* LgsCodeGen::allocStrConst(Value* strPtr) {
     return callRuntimeFunc("allocStrConst", ptrTy(), {ptrTy()}, {strPtr});
+}
+
+Value* LgsCodeGen::allocStr(const size_t length) {
+    return callRuntimeFunc("allocStr", ptrTy(), {sizeTy()}, {usize(length)});
 }
 
 Value* LgsCodeGen::reallocate(Value* ptr, Value* size, Value* level) {
@@ -351,8 +359,8 @@ Value* LgsCodeGen::callSnprintf(const std::string& fmt, const std::vector<Value*
 }
 
 Value* LgsCodeGen::callSnprintf(const std::string& fmt, Value* buffer, Value* size, Value* ptr) {
-    const std::vector<Value*> tempArgs = {buffer, size, getString(fmt), ptr};
-    return callFunc("snprintf", i32Ty(), {ptrTy(), sizeTy(), ptrTy()}, tempArgs, true);
+    const std::vector<Value*> args = {buffer, size, getString(fmt), ptr};
+    return callFunc("snprintf", i32Ty(), {ptrTy(), sizeTy(), ptrTy()}, args, true);
 }
 
 Value* LgsCodeGen::callStrlen(Value* str) {
@@ -588,13 +596,17 @@ LgsCodeGen::~LgsCodeGen() {
     }
 }
 
-void LgsStrBuilder::add(Value* value, Value* size) {
-    const auto gep = cg.builder.CreatePtrAdd(buffer, index);
+void LgsStrBuilder::add(Value* value, Value* size) const {
+    const auto currentOffset = cg.loadSize(index);
+    const auto gep = cg.builder.CreatePtrAdd(buffer, currentOffset);
     cg.callMemcpy(gep, value, size);
-    index = cg.builder.CreateAdd(index, size);
+    cg.store(cg.builder.CreateAdd(currentOffset, size), index);
 }
 
-void LgsStrBuilder::print() const {
-    cg.addNullTerminate(buffer, index);
-    cg.printStr(buffer);
+void LgsStrBuilder::add(const std::string& value) const {
+    add(cg.getString(value, false), cg.usize(value.length()));
+}
+
+void LgsStrBuilder::finalize() const {
+    cg.addNullTerminate(buffer, cg.loadSize(index));
 }

@@ -27,9 +27,10 @@ public:
     Value* lenIR(LgsCodeGen& cg, Value* iterable) override;
     Value* inIR(LgsCodeGen& cg, Value* iterableExpr, Value* value) override;
     Value* hashValue(LgsCodeGen& cg, Value* value) override;
-    Value* loadRTData(LgsCodeGen& cg, Value* value);
     std::string fmtStr() const override;
     DIType* getDebugType(LgsCodeGen& cg) override;
+    static Type* getStrStruct(LgsCodeGen& cg);
+    static Value* loadRTData(LgsCodeGen& cg, Value* value);
 };
 
 inline LgsStr LGS_STR;

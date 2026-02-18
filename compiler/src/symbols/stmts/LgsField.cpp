@@ -12,6 +12,13 @@ LgsType* LgsField::getType() {
     return type;
 }
 
+Value* LgsField::loadIRPtr(LgsCodeGen& cg, Value* ptr) const {
+    if (!ptr->getType()->isPointerTy()) return ptr;
+    if (type->asSArray()) return ptr;
+    if (type->asNullable() && !type->passByRef) return ptr;
+    return cg.load(type->getStorageType(cg), ptr);
+}
+
 Value* LgsField::getGEP(LgsCodeGen& cg, Value* parentIRPtr) {
     assert(parentType && parentIRPtr);
     const auto ty = parentType->getIRType(cg);

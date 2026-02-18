@@ -1,5 +1,5 @@
 #include "exprs/constants/LgsStrConst.h"
-#include "../../../../include/symbols/types/primitives/LgsAny.h"
+#include "types/primitives/LgsAny.h"
 #include "LgsUtils.h"
 
 std::string LgsStrConst::asText() {

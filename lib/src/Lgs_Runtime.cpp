@@ -52,9 +52,18 @@ extern "C" void* Lgs_Runtime_allocDArr(Lgs_TypeInfo* baseType) {
 }
 
 extern "C" void* Lgs_Runtime_allocStrConst(char* str) {
-    const auto ptr = static_cast<Lgs_StrExpr*>(runtime.stack.at(0).allocator.allocate(sizeof(Lgs_StrExpr), true));
-    ptr->data = str;
-    return ptr;
+    const auto newPtr = runtime.stack.at(0).allocator.allocate(sizeof(Lgs_StrExpr), true);
+    const auto newStr = static_cast<Lgs_StrExpr*>(newPtr);
+    newStr->data = str;
+    return newStr;
+}
+
+extern "C" void* Lgs_Runtime_allocStr(const size_t length) {
+    auto& allocator = runtime.stack.at(runtime.level).allocator;
+    const auto newPtr = allocator.allocate(sizeof(Lgs_StrExpr), true);
+    const auto newStr = static_cast<Lgs_StrExpr*>(newPtr);
+    newStr->data = static_cast<char*>(allocator.allocate(length, false));
+    return newStr;
 }
 
 extern "C" void* Lgs_Runtime_reallocate(const void* ptr, const size_t size, const size_t level) {

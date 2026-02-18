@@ -80,6 +80,7 @@ public:
     void store(Value* v, Value* ptr);
     Value* load(Type* ty, Value* ptr);
     Value* loadPtr(Value* value);
+    Value* loadSize(Value* value);
     Value* isNull(Value* value);
     Value* getLevel(Value* v);
     Value* emptyBuffer(size_t size = 0);
@@ -99,6 +100,7 @@ public:
     Value* allocInCurrent(Value* size, bool setLevel);
     Value* allocInLevel(Value* size, Value* level, bool setLevel);
     Value* allocStrConst(Value* strPtr);
+    Value* allocStr(size_t length);
     Value* reallocate(Value* ptr, Value* size, Value* level);
     Value* moveValue(const std::string& baseName, Value* v, Value* toLevel);
     void throwError(const LgsBaseMsg& err, const std::vector<Value*>& args = {});
@@ -190,10 +192,14 @@ public:
 class LgsStrBuilder {
 public:
     Value* index;
-    Value* buffer;
+    Value* buffer = nullptr;
     LgsCodeGen& cg;
+    bool asJSON = false;
 
-    explicit LgsStrBuilder(LgsCodeGen& cg) : index(cg.zeroSize()), buffer(cg.emptyBuffer()), cg(cg) {}
-    void add(Value* value, Value* size);
-    void print() const;
+    explicit LgsStrBuilder(LgsCodeGen& cg) : cg(cg) {
+        index = cg.allocaAndStore(cg.sizeTy(), cg.zeroSize());
+    }
+    void add(Value* value, Value* size) const;
+    void add(const std::string& value) const;
+    void finalize() const;
 };

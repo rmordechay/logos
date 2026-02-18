@@ -24,6 +24,7 @@ public:
     bool equals(LgsExpr* other) override;
     void setDebugValue(LgsCodeGen& cg) override;
     std::string asText() override;
+    static Value* getInstanceRTType(LgsCodeGen& cg, Value* instance);
     static Value* loadRTType(LgsCodeGen& cg, Type* ty, Value* ptr);
     ~LgsInstance() override;
 };

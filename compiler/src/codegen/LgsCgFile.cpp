@@ -1145,7 +1145,7 @@ void LgsCgFile::createEpilogue(const LgsFunc* func) {
         cg.callPopStack();
         cg.builder.CreateRetVoid();
     } else {
-        const auto phi = cg.builder.CreatePHI(ft->rt->getTypeRef(cg), stmts.size());
+        const auto phi = cg.builder.CreatePHI(ft->rt->getStorageType(cg), stmts.size());
         for (const auto returnStmt : stmts) {
             phi->addIncoming(returnStmt->expr->IRValue, returnStmt->parentBlock);
         }

@@ -1,4 +1,7 @@
 #include "types/LgsObject.h"
+
+#include <format>
+
 #include "LgsDefinitions.h"
 #include "exprs/LgsInstance.h"
 #include "funcs/LgsFunc.h"
@@ -94,72 +97,30 @@ LgsFunc* LgsObject::getMetaFunc(const std::string& methodName) {
         metaFuncs[methodName] = func;
         return func;
     }
+    if (methodName == OBJ_AS_JSON) {
+        const auto func = new LgsFunc(methodName, new LgsStr());
+        func->fn = [&](LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) {
+            const auto str = cg.allocStr(LGS_STR_BUFFER_SIZE);
+            cg.builder.CreateCall(getJSONFunc(cg), {args.front().expr->IRValue, str});
+            return str;
+        };
+        metaFuncs[methodName] = func;
+        return func;
+    }
     return nullptr;
 }
 
-Type* LgsObject::getIRType(LgsCodeGen& cg) {
-    const auto type = cg.typesRegistry.find(name);
-    if (type != cg.typesRegistry.end()) return type->second;
-    std::vector<Type*> types = {cg.sizeTy(), cg.ptrTy()}; // First field is level
-    types.reserve(fields.size());
-    for (size_t i = 0; i < fields.size(); ++i) {
-        const auto field = fields[i];
-        types.emplace_back(field->type->getTypeRef(cg));
+std::string LgsObject::fmtStr() const {
+    std::stringstream str;
+    str << '{';
+    bool first = true;
+    for (const auto& field : fields) {
+        if (!first) str << ", ";
+        str << field->name << " = " << (field->type->asObject() ? "%s" : field->type->fmtStr());
+        first = false;
     }
-    const auto IRType = StructType::create(cg.context, types, name);
-    cg.typesRegistry[name] = IRType;
-    return IRType;
-}
-
-Constant* LgsObject::getRTTypeExtra(LgsCodeGen& cg) {
-    const auto rttName = getRTTName();
-    const auto numFields = fields.size();
-    const auto numMethods = methods.size();
-    const auto ty = llvm::cast<StructType>(getIRType(cg));
-    const auto sl = cg.IRModule->getDataLayout().getStructLayout(ty);
-
-    const auto objRTType = getObjRTTStruct(cg);
-    const auto fieldRTType = LgsFieldType::getFieldRTTStruct(cg);
-    const auto methodRTType = getMethodRTTStruct(cg);
-    const auto fieldTypeArr = ArrayType::get(fieldRTType, numFields);
-    const auto methodsTypeArr = ArrayType::get(methodRTType, numMethods);
-
-    std::vector<Constant*> rttFields;
-    for (size_t i = 0; i < fields.size(); ++i) {
-        const auto field = fields[i];
-        assert(field->type->rttKind != RTT_UNKNOWN);
-        const auto fieldName = cg.getString(field->name);
-        rttFields.emplace_back(ConstantStruct::get(fieldRTType, {
-            fieldName,
-            field->type->IRSize(cg),
-            cg.usize(sl->getElementOffset(i + 2)), // offset level and type
-            cg.i32(field->type->rttKind),
-            field->type->getRTType(cg),
-        }));
-    }
-
-    std::vector<Constant*> rttMethods;
-    for (auto& [_, method] : methods) {
-        if (method->funcType->isVirtual) continue;
-        const std::vector<Constant*> args = {cg.getString(method->funcType->name), method->getIRFunc(cg)};
-        rttMethods.emplace_back(ConstantStruct::get(methodRTType, args));
-    }
-
-    const auto initializerFields = ConstantArray::get(fieldTypeArr, rttFields);
-    const auto initializerMethods = ConstantArray::get(methodsTypeArr, rttMethods);
-    const auto rttFieldsGlobal = cg.createGlobal(rttName + "_fields", fieldTypeArr, initializerFields);
-    const auto rttMethodsGlobal = cg.createGlobal(rttName + "_funcs", methodsTypeArr, initializerMethods);
-    const auto objName = cg.getString(name);
-    objName->setName(rttName + "_name");
-    return cg.createGlobal(rttName + "_extra", objRTType, ConstantStruct::get(objRTType, {
-        cg.usize(id),
-        objName,
-        IRSize(cg),
-        cg.usize(numFields),
-        cg.usize(numMethods),
-        rttFieldsGlobal,
-        rttMethodsGlobal,
-    }));
+    str << '}';
+    return str.str();
 }
 
 size_t LgsObject::sizeBytes() {
@@ -181,10 +142,6 @@ LgsExpr* LgsObject::getZeroValue() {
     return instance;
 }
 
-Value* LgsObject::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
-    return cg.callRuntimeFunc("allocObject", cg.ptrTy(), {cg.ptrTy()}, {getRTType(cg)});
-}
-
 bool LgsObject::canCastTo(LgsType* other) {
     if (other->isAny()) return true;
     const auto otherType = other;
@@ -199,44 +156,8 @@ bool LgsObject::canCastTo(LgsType* other) {
     return name == otherType->getName();
 }
 
-Value* LgsObject::hashValue(LgsCodeGen& cg, Value* value) {
-    return cg.builder.CreateCall(getObjsHashFunc(cg), {value});
-}
-
 void LgsObject::hashNode(size_t& oldHash) {
     assert(0);
-}
-
-LgsType* LgsObject::applyBinOp(LgsType* rightType, LgsBinOp& op) {
-    if (op.opType != EQ && op.opType != NE) return nullptr;
-    return canCastTo(rightType) ? &LGS_BOOL : nullptr;
-}
-
-void LgsObject::asIRText(LgsCodeGen& cg, LgsStrBuilder& strBuilder, Value* ptr) {
-    const auto prefix = name + "{";
-    strBuilder.add(cg.getString(prefix, false), cg.usize(prefix.length()));
-    auto isFirst = true;
-    for (const auto field : fields) {
-        if (!isFirst) strBuilder.add(cg.getString(", ", false), cg.usize(2));
-        auto fieldName = field->name + "=";
-        strBuilder.add(cg.getString(fieldName, false), cg.usize(fieldName.length()));
-        field->type->asIRText(cg, strBuilder, field->getGEP(cg, ptr));
-        isFirst = false;
-    }
-    strBuilder.add(cg.getString("}", false), cg.usize(1));
-}
-
-std::string LgsObject::fmtStr() const {
-    std::stringstream str;
-    str << '{';
-    bool first = true;
-    for (const auto& field : fields) {
-        if (!first) str << ", ";
-        str << field->name << " = " << (field->type->asObject() ? "%s" : field->type->fmtStr());
-        first = false;
-    }
-    str << '}';
-    return str.str();
 }
 
 void LgsObject::cloneFields(LgsInstance* instance) const {
@@ -247,6 +168,97 @@ void LgsObject::cloneFields(LgsInstance* instance) const {
         }
         instance->fields.emplace_back(newField);
     }
+}
+
+Type* LgsObject::getIRType(LgsCodeGen& cg) {
+    const auto type = cg.typesRegistry.find(name);
+    if (type != cg.typesRegistry.end()) return type->second;
+    std::vector<Type*> types = {cg.sizeTy(), cg.ptrTy()}; // First field is level
+    types.reserve(fields.size());
+    for (size_t i = 0; i < fields.size(); ++i) {
+        const auto field = fields[i];
+        types.emplace_back(field->type->getStorageType(cg));
+    }
+    const auto IRType = StructType::create(cg.context, types, name);
+    cg.typesRegistry[name] = IRType;
+    return IRType;
+}
+
+LgsType* LgsObject::applyBinOp(LgsType* rightType, LgsBinOp& op) {
+    if (op.opType != EQ && op.opType != NE) return nullptr;
+    return canCastTo(rightType) ? &LGS_BOOL : nullptr;
+}
+
+void LgsObject::asIRText(LgsCodeGen& cg, LgsStrBuilder& strBuilder, Value* ptr) {
+    strBuilder.add((strBuilder.asJSON ? "" : name) + "{");
+    auto isFirst = true;
+    for (const auto field : fields) {
+        if (!isFirst) strBuilder.add(", ");
+        if (strBuilder.asJSON) {
+            strBuilder.add("\"" + field->name + "\": ");
+        } else {
+            strBuilder.add(field->name + "=");
+        }
+        const auto fieldValue = field->loadIRPtr(cg, field->getGEP(cg, ptr));
+        field->type->asIRText(cg, strBuilder, fieldValue);
+        isFirst = false;
+    }
+    strBuilder.add("}");
+}
+
+Constant* LgsObject::getRTTypeExtra(LgsCodeGen& cg) {
+    const auto rttName = getRTTName();
+    const auto numFields = fields.size();
+    const auto numMethods = methods.size();
+    const auto ty = llvm::cast<StructType>(getIRType(cg));
+    const auto sl = cg.IRModule->getDataLayout().getStructLayout(ty);
+
+    const auto objRTType = getObjRTTStruct(cg);
+    const auto fieldRTType = LgsFieldType::getRTTStruct(cg);
+    const auto methodRTType = getMethodRTTStruct(cg);
+    const auto fieldTypeArr = ArrayType::get(fieldRTType, numFields);
+    const auto methodsTypeArr = ArrayType::get(methodRTType, numMethods);
+
+    std::vector<Constant*> rttFields;
+    for (size_t i = 0; i < fields.size(); ++i) {
+        const auto field = fields[i];
+        assert(field->type->rttKind != RTT_UNKNOWN);
+        const auto fieldName = cg.getString(field->name);
+        const std::vector<Constant*> args = {
+            fieldName,
+            field->type->IRSize(cg),
+            cg.usize(sl->getElementOffset(i + 2)), // offset level and type
+            cg.i32(field->type->rttKind),
+            field->type->getRTType(cg)
+        };
+        rttFields.emplace_back(ConstantStruct::get(fieldRTType, args));
+    }
+
+    std::vector<Constant*> rttMethods;
+    for (auto& [_, method] : methods) {
+        if (method->funcType->isVirtual) continue;
+        const std::vector<Constant*> args = {cg.getString(method->funcType->name), method->getIRFunc(cg)};
+        rttMethods.emplace_back(ConstantStruct::get(methodRTType, args));
+    }
+
+    const auto initializerFields = ConstantArray::get(fieldTypeArr, rttFields);
+    const auto initializerMethods = ConstantArray::get(methodsTypeArr, rttMethods);
+    const auto rttFieldsGlobal = cg.createGlobal(rttName + "_fields", fieldTypeArr, initializerFields);
+    const auto rttMethodsGlobal = cg.createGlobal(rttName + "_funcs", methodsTypeArr, initializerMethods);
+    const auto objName = cg.getString(name);
+    objName->setName(rttName + "_name");
+    const std::vector<Constant*> args = {
+        cg.usize(id), objName, IRSize(cg), cg.usize(numFields), cg.usize(numMethods), rttFieldsGlobal, rttMethodsGlobal
+    };
+    return cg.createGlobal(rttName + "_extra", objRTType, ConstantStruct::get(objRTType, args));
+}
+
+Value* LgsObject::hashValue(LgsCodeGen& cg, Value* value) {
+    return cg.builder.CreateCall(getObjsHashFunc(cg), {value});
+}
+
+Value* LgsObject::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
+    return cg.callRuntimeFunc("allocObject", cg.ptrTy(), {cg.ptrTy()}, {getRTType(cg)});
 }
 
 DIType* LgsObject::getDebugType(LgsCodeGen& cg) {
@@ -267,7 +279,7 @@ Function* LgsObject::getObjsEqFunc(LgsCodeGen& cg) const {
     cg.builder.SetInsertPoint(entryBlock);
 
     for (const auto field : fields) {
-        const auto ty = field->type->getTypeRef(cg);
+        const auto ty = field->type->getStorageType(cg);
         const auto gep1 = field->getGEP(cg, obj1);
         const auto gep2 = field->getGEP(cg, obj2);
         const auto ne = neIR(cg, cg.load(ty, gep1), cg.load(ty, gep2), field->type);
@@ -296,13 +308,37 @@ Function* LgsObject::getObjsHashFunc(LgsCodeGen& cg) const {
     Value* hash = cg.usize(0);
     for (const auto field : fields) {
         const auto gep = field->getGEP(cg, instance);
-        const auto v = cg.load(field->type->getTypeRef(cg), gep);
+        const auto v = cg.load(field->type->getStorageType(cg), gep);
         const auto fieldHash = field->type->hashValue(cg, v);
         hash = cg.builder.CreateXor(hash, cg.toSize(fieldHash));
         hash = cg.builder.CreateMul(hash, cg.usize(31));
     }
 
     cg.builder.CreateRet(hash);
+    cg.builder.restoreIP(cg.savedIP);
+    return func;
+}
+
+Function* LgsObject::getJSONFunc(LgsCodeGen& cg) {
+    const auto funcName = LGS_PREFIX + metaName + "_" + OBJ_AS_JSON;
+    if (const auto func = cg.IRModule->getFunction(funcName)) return func;
+    const auto ft = cg.getFT(cg.voidTy(), {cg.ptrTy(), cg.ptrTy()});
+    if (cg.mode == CG_MODE_SRC_CODE) return cg.getFunc(funcName, ft);
+
+    const auto func = cg.getFunc(funcName, ft);
+    cg.savedIP = cg.builder.saveIP();
+    const auto self = func->getArg(0);
+    const auto strBuffer = func->getArg(1);
+    const auto entryBlock = cg.createBlock(BLOCK_ENTRY, func);
+    cg.builder.SetInsertPoint(entryBlock);
+
+    LgsStrBuilder sb(cg);
+    sb.asJSON = true;
+    sb.buffer = LgsStr::loadRTData(cg, strBuffer);
+    asIRText(cg, sb, self);
+    sb.finalize();
+
+    cg.builder.CreateRetVoid();
     cg.builder.restoreIP(cg.savedIP);
     return func;
 }
@@ -356,8 +392,8 @@ Function* LgsObject::getGetFieldFunc(LgsCodeGen& cg) {
     const auto entryBlock = cg.createBlock(BLOCK_ENTRY, func);
     cg.builder.SetInsertPoint(entryBlock);
 
-    const auto fieldRTTStruct = LgsFieldType::getFieldRTTStruct(cg);
-    const auto instanceType = loadRTTInfoExtra(cg, getInstanceRTType(cg, self));
+    const auto fieldRTTStruct = LgsFieldType::getRTTStruct(cg);
+    const auto instanceType = loadRTTInfoExtra(cg, LgsInstance::getInstanceRTType(cg, self));
     const auto fieldTypesPtr = loadRTFields(cg, instanceType);
     const auto fieldsCount = loadRTFieldsCount(cg, instanceType);
 
@@ -372,10 +408,6 @@ Function* LgsObject::getGetFieldFunc(LgsCodeGen& cg) {
     cg.builder.CreateRet(cg.null());
     cg.builder.restoreIP(cg.savedIP);
     return func;
-}
-
-Value* LgsObject::getInstanceRTType(LgsCodeGen& cg, Value* instance) {
-    return cg.loadPtr(cg.builder.CreatePtrAdd(instance, cg.getTypeSize(cg.sizeTy())));
 }
 
 StructType* LgsObject::getObjRTTStruct(LgsCodeGen& cg) {

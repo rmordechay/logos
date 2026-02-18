@@ -1,4 +1,6 @@
 #pragma once
+#include <llvm/IR/DerivedTypes.h>
+
 #include "LgsIterable.h"
 
 namespace llvm {
@@ -33,9 +35,15 @@ public:
     Value* inIR(LgsCodeGen& cg, Value* iterable, Value* value) override;
     Value* getIRElement(LgsCodeGen& cg, Value* iterable, Value* index) override;
     void addIRElement(LgsCodeGen& cg, Value* iterable, Value* index, Value* value) override;
+    void asIRText(LgsCodeGen& cg, LgsStrBuilder& strBuilder, Value* ptr) override;
     Value* hashValue(LgsCodeGen& cg, Value* value) override;
     Function* getAddFunc(LgsCodeGen& cg);
     Function* getContainsFunc(LgsCodeGen& cg);
     Function* getEqFunc(LgsCodeGen& cg);
     DIType* getDebugType(LgsCodeGen& cg) override;
+    static Value* loadRTBaseType(LgsCodeGen& cg, Value* ptr);
+    static Value* loadRTLength(LgsCodeGen& cg, Value* ptr);
+    static Value* loadRTCapacity(LgsCodeGen& cg, Value* ptr);
+    static Value* loadRTData(LgsCodeGen& cg, Value* ptr);
+    static StructType* getRTTStruct(LgsCodeGen& cg);
 };

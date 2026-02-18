@@ -137,7 +137,7 @@ Value* LgsExpr::loadIRPtr(LgsCodeGen& cg) const {
     if (!IRValue->getType()->isPointerTy()) return IRValue;
     if (type->asSArray()) return IRValue;
     if (type->asNullable() && !type->passByRef) return IRValue;
-    return cg.load(type->getTypeRef(cg), IRValue);
+    return cg.load(type->getStorageType(cg), IRValue);
 }
 
 LgsExpr* LgsExpr::cast(LgsType* toType, const bool explicitly) {

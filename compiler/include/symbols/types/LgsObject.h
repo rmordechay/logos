@@ -18,6 +18,7 @@ class LgsIOPair;
 #define OBJ_SET_FIELD_FUNC "setField"
 #define OBJ_GET_FIELDS_FUNC "getFields"
 #define OBJ_GET_METHOD_FUNC "getMethod"
+#define OBJ_AS_JSON "json"
 
 class LgsObject : public LgsType {
 public:
@@ -61,9 +62,9 @@ public:
     DIType* getDebugType(LgsCodeGen& cg) override;
     Function* getObjsEqFunc(LgsCodeGen& cg) const;
     Function* getObjsHashFunc(LgsCodeGen& cg) const;
+    Function* getJSONFunc(LgsCodeGen& cg);
     static Function* getSetFieldFunc(LgsCodeGen& cg);
     static Function* getGetFieldFunc(LgsCodeGen& cg);
-    static Value* getInstanceRTType(LgsCodeGen& cg, Value* instance);
     static StructType* getObjRTTStruct(LgsCodeGen& cg);
     static StructType* getMethodRTTStruct(LgsCodeGen& cg);
     static Value* loadRTFieldsCount(LgsCodeGen& cg, Value* ptr);

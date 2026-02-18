@@ -28,7 +28,7 @@ void LgsForLoop::incAndJumpToCond(LgsCodeGen& cg) {
 }
 
 Value* LgsForLoop::loadIndex(LgsCodeGen& cg) const {
-    return cg.load(cg.sizeTy(), iPtr);
+    return cg.loadSize(iPtr);
 }
 
 LgsForeachLoop* LgsForLoop::asForeachLoop() {

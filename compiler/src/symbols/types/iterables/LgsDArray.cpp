@@ -125,7 +125,7 @@ Value* LgsDArray::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
 
 Value* LgsDArray::lenIR(LgsCodeGen& cg, Value* iterable) {
     const auto lenFieldPtr = cg.builder.CreateStructGEP(getIRType(cg), iterable, LgsDArrExprIndices::length);
-    return cg.load(cg.sizeTy(), lenFieldPtr);
+    return cg.loadSize(lenFieldPtr);
 }
 
 Value* LgsDArray::inIR(LgsCodeGen& cg, Value* iterable, Value* value) {
@@ -148,6 +148,21 @@ void LgsDArray::addIRElement(LgsCodeGen& cg, Value* iterable, Value* index, Valu
     cg.builder.CreateCall(getAddFunc(cg), {iterable, value});
 }
 
+void LgsDArray::asIRText(LgsCodeGen& cg, LgsStrBuilder& strBuilder, Value* ptr) {
+    strBuilder.add("[");
+    const auto data = loadRTData(cg, ptr);
+    const auto len = loadRTLength(cg, ptr);
+    cg.loop(len, [&](Value* iValue, BasicBlock*) {
+        const auto isFirst = cg.builder.CreateICmpNE(iValue, cg.zeroSize());
+        cg.ifStmt(isFirst, [&] {strBuilder.add(", ");});
+        const auto offset = cg.builder.CreateMul(iValue, baseType->IRSize(cg));
+        auto element = cg.builder.CreatePtrAdd(data, offset);
+        element = cg.load(baseType->getIRType(cg), element);
+        baseType->asIRText(cg, strBuilder, element);
+    });
+    strBuilder.add("]");
+}
+
 Value* LgsDArray::hashValue(LgsCodeGen& cg, Value* value) {
     return cg.callHash(getRTType(cg), value);
 }
@@ -155,7 +170,7 @@ Value* LgsDArray::hashValue(LgsCodeGen& cg, Value* value) {
 Function* LgsDArray::getAddFunc(LgsCodeGen& cg) {
     const auto funcName = LGS_PREFIX + name + baseType->getBaseName() + "_" + ADD_FUNC;
     if (const auto func = cg.IRModule->getFunction(funcName)) return func;
-    const auto ft = cg.getFT(cg.voidTy(), {cg.ptrTy(), baseType->getTypeRef(cg)});
+    const auto ft = cg.getFT(cg.voidTy(), {cg.ptrTy(), baseType->getStorageType(cg)});
     if (cg.mode == CG_MODE_SRC_CODE) return cg.getFunc(funcName, ft);
 
     // Prologue
@@ -173,8 +188,8 @@ Function* LgsDArray::getAddFunc(LgsCodeGen& cg) {
     const auto lenGEP = cg.builder.CreateStructGEP(ty, arrIR, LgsDArrExprIndices::length);
     const auto capGEP = cg.builder.CreateStructGEP(ty, arrIR, LgsDArrExprIndices::capacity);
 
-    auto len = cg.load(cg.sizeTy(), lenGEP);
-    const auto cap = cg.load(cg.sizeTy(), capGEP);
+    auto len = cg.loadSize(lenGEP);
+    const auto cap = cg.loadSize(capGEP);
     const auto needsResize = cg.builder.CreateICmpSGE(len, cap);
     cg.builder.CreateCondBr(needsResize, needsResizeBlock, exitBlock);
 
@@ -191,7 +206,7 @@ Function* LgsDArray::getAddFunc(LgsCodeGen& cg) {
 
     // Set element
     cg.branchAndStartBlock(exitBlock);
-    len = cg.load(cg.sizeTy(), lenGEP);
+    len = cg.loadSize(lenGEP);
     data = cg.loadPtr(dataGEP);
     const auto offset = cg.builder.CreateMul(len, baseTypeSize);
     const auto elementPtr = cg.builder.CreateInBoundsPtrAdd(data, offset);
@@ -209,7 +224,7 @@ Function* LgsDArray::getAddFunc(LgsCodeGen& cg) {
 Function* LgsDArray::getContainsFunc(LgsCodeGen& cg) {
     const auto funcName = LGS_PREFIX + name + baseType->getBaseName() + "_" + CONTAINS_FUNC;
     if (const auto func = cg.IRModule->getFunction(funcName)) return func;
-    const auto ft = cg.getFT(cg.i1Ty(), {cg.ptrTy(), baseType->getTypeRef(cg)});
+    const auto ft = cg.getFT(cg.i1Ty(), {cg.ptrTy(), baseType->getStorageType(cg)});
     if (cg.mode == CG_MODE_SRC_CODE) return cg.getFunc(funcName, ft);
 
     // Prologue
@@ -224,7 +239,7 @@ Function* LgsDArray::getContainsFunc(LgsCodeGen& cg) {
         LgsIntConst size(&LGS_SIZE, 0);
         size.IRValue = iValue;
         const auto elementPtr = getIRElement(cg, arrIR, size.IRValue);
-        const auto element = cg.load(baseType->getTypeRef(cg), elementPtr);
+        const auto element = cg.load(baseType->getStorageType(cg), elementPtr);
         const auto elementsAreEqual = eqIR(cg, value, element, baseType);
         cg.ifStmt(elementsAreEqual, [&cg] {cg.builder.CreateRet(cg.true_());});
     });
@@ -261,4 +276,24 @@ Function* LgsDArray::getEqFunc(LgsCodeGen& cg) {
 
 DIType* LgsDArray::getDebugType(LgsCodeGen& cg) {
     assert(0);
+}
+
+Value* LgsDArray::loadRTBaseType(LgsCodeGen& cg, Value* ptr) {
+    return cg.loadStructField(getRTTStruct(cg), ptr, LgsDArrExprIndices::baseType, cg.ptrTy());
+}
+
+Value* LgsDArray::loadRTLength(LgsCodeGen& cg, Value* ptr) {
+    return cg.loadStructField(getRTTStruct(cg), ptr, LgsDArrExprIndices::length, cg.sizeTy());
+}
+
+Value* LgsDArray::loadRTCapacity(LgsCodeGen& cg, Value* ptr) {
+    return cg.loadStructField(getRTTStruct(cg), ptr, LgsDArrExprIndices::capacity, cg.sizeTy());
+}
+
+Value* LgsDArray::loadRTData(LgsCodeGen& cg, Value* ptr) {
+    return cg.loadStructField(getRTTStruct(cg), ptr, LgsDArrExprIndices::data, cg.ptrTy());
+}
+
+StructType* LgsDArray::getRTTStruct(LgsCodeGen& cg) {
+    return cg.getStructType({cg.sizeTy(), cg.ptrTy(), cg.ptrTy(), cg.sizeTy(), cg.sizeTy()}, name);
 }

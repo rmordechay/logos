@@ -7,8 +7,11 @@
 #include "LgsUtils.h"
 #include "codegen/LgsCodeGen.h"
 
-std::string LgsInstance::asText() {
-    return name + "{}";
+LgsField* LgsInstance::getField(const std::string& fieldName) const {
+    for (auto* f : fields) {
+        if (f->name == fieldName) return f;
+    }
+    return nullptr;
 }
 
 void LgsInstance::setType(LgsType* newObj) {
@@ -34,11 +37,12 @@ void LgsInstance::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }
 
-LgsField* LgsInstance::getField(const std::string& fieldName) const {
-    for (auto* f : fields) {
-        if (f->name == fieldName) return f;
-    }
-    return nullptr;
+std::string LgsInstance::asText() {
+    return name + "{}";
+}
+
+Value* LgsInstance::getInstanceRTType(LgsCodeGen& cg, Value* instance) {
+    return cg.loadPtr(cg.builder.CreatePtrAdd(instance, cg.getTypeSize(cg.sizeTy())));
 }
 
 Value* LgsInstance::loadRTType(LgsCodeGen& cg, Type* ty, Value* ptr) {

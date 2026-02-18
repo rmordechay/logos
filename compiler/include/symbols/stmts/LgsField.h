@@ -24,6 +24,7 @@ public:
     void setType(LgsType* newType) override;
     Value* getGEP(LgsCodeGen& cg, Value* parentIRPtr);
     LgsType* getType() override;
+    Value* loadIRPtr(LgsCodeGen& cg, Value* ptr) const;
     void setDebugValue(LgsCodeGen& cg) override;
     ~LgsField() override;
 };

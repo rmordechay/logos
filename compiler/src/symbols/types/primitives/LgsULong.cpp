@@ -4,7 +4,7 @@
 
 #include "exprs/constants/LgsIntConst.h"
 #include "codegen/LgsCodeGen.h"
-#include "../../../../include/symbols/types/primitives/LgsAny.h"
+#include "types/primitives/LgsAny.h"
 
 size_t LgsULong::sizeBytes() {
     return sizeof(uint64_t);

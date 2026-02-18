@@ -24,5 +24,5 @@ public:
     static Value* loadRTOffset(LgsCodeGen& cg, Value* ptr);
     static Value* loadRTKind(LgsCodeGen& cg, Value* ptr);
     static Value* loadRTType(LgsCodeGen& cg, Value* ptr);
-    static StructType* getFieldRTTStruct(LgsCodeGen& cg);
+    static StructType* getRTTStruct(LgsCodeGen& cg);
 };

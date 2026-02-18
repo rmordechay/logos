@@ -2,7 +2,7 @@
 #include <llvm/IR/Module.h>
 #include "codegen/LgsCodeGen.h"
 #include "exprs/constants/LgsIntConst.h"
-#include "../../../../include/symbols/types/primitives/LgsAny.h"
+#include "types/primitives/LgsAny.h"
 #include "types/primitives/LgsChar.h"
 #include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsInt.h"

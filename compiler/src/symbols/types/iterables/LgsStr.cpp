@@ -3,7 +3,7 @@
 #include "Lgs_Exprs.h"
 #include "exprs/constants/LgsStrConst.h"
 #include "exprs/LgsBinaryExpr.h"
-#include "../../../../include/symbols/types/primitives/LgsAny.h"
+#include "types/primitives/LgsAny.h"
 #include "codegen/LgsCodeGen.h"
 #include "types/LgsNullable.h"
 #include "types/iterables/LgsSArray.h"
@@ -11,7 +11,7 @@
 #include "types/primitives/LgsChar.h"
 
 Type* LgsStr::getIRType(LgsCodeGen& cg) {
-    return cg.getStructType({cg.sizeTy(), cg.ptrTy()}, name);
+    return getStrStruct(cg);
 }
 
 std::string LgsStr::getBaseName() {
@@ -71,16 +71,14 @@ std::optional<int64_t> LgsStr::getConstLength() {
 }
 
 void LgsStr::asIRText(LgsCodeGen& cg, LgsStrBuilder& strBuilder, Value* ptr) {
-    ptr = loadRTData(cg, cg.loadPtr(ptr));
+    strBuilder.add("\"");
+    ptr = loadRTData(cg, ptr);
     strBuilder.add(ptr, cg.callStrlen(ptr));
+    strBuilder.add("\"");
 }
 
 Value* LgsStr::getIRElement(LgsCodeGen& cg, Value* iterable, Value* index) {
     return cg.builder.CreateGEP(cg.i8Ty(), loadRTData(cg, iterable), {cg.zero32(), index});
-}
-
-std::string LgsStr::fmtStr() const {
-    return "%s";
 }
 
 Value* LgsStr::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
@@ -154,12 +152,20 @@ Value* LgsStr::hashValue(LgsCodeGen& cg, Value* value) {
     return cg.callHash(getRTType(cg), loadRTData(cg, value));
 }
 
-Value* LgsStr::loadRTData(LgsCodeGen& cg, Value* value) {
-    return cg.loadStructField(getIRType(cg), value, LgsStrIndices::data, cg.ptrTy());
+std::string LgsStr::fmtStr() const {
+    return "%s";
 }
 
 DIType* LgsStr::getDebugType(LgsCodeGen& cg) {
     const auto& diBuilder = cg.debugger.diBuilder;
     const auto charType = diBuilder->createBasicType("char", sizeof(char), dwarf::DW_ATE_signed_char);
     return diBuilder->createPointerType(charType, sizeof(void*));
+}
+
+Type* LgsStr::getStrStruct(LgsCodeGen& cg) {
+    return cg.getStructType({cg.sizeTy(), cg.ptrTy()}, name);
+}
+
+Value* LgsStr::loadRTData(LgsCodeGen& cg, Value* value) {
+    return cg.loadStructField(getStrStruct(cg), value, LgsStrIndices::data, cg.ptrTy());
 }
