@@ -9,11 +9,22 @@
 bool argAndParamEqual(const LgsExpr* arg, const LgsParam* param);
 
 bool LgsFuncCall::equals(LgsFuncType* funcType) const {
+    // Compare args and params size
     const auto argsSize = args.size();
     const auto paramsSize = funcType->params.size();
-    const auto minArgs = funcType->isVariadic && funcType->isExternal ? paramsSize - 1 : paramsSize;
-    if (!funcType->isVariadic && !funcType->hasDefaults && argsSize != paramsSize) return false;
+    size_t minArgs = 0;
+    if (funcType->isVariadic) {
+        minArgs = paramsSize - 1;
+    } else if (funcType->hasDefaults) {
+        for (minArgs = 0; minArgs < paramsSize; ++minArgs) {
+            if (funcType->params[minArgs].expr) break;
+        }
+    } else {
+        minArgs = paramsSize;
+    }
     if (argsSize < minArgs) return false;
+
+    // Names params
     if (isNamed) {
         auto paramsByName = funcType->getParamsByName();
         for (size_t i = funcType->isMethod; i < argsSize; ++i) {
@@ -21,11 +32,15 @@ bool LgsFuncCall::equals(LgsFuncType* funcType) const {
         }
         return true;
     }
+
+    // Positional params
     const auto checkUntil = funcType->isVariadic ? paramsSize - 1 : paramsSize;
     for (size_t i = funcType->isMethod; i < checkUntil; ++i) {
         if (i >= argsSize) continue;
         if (!argAndParamEqual(args[i].expr, &funcType->params[i])) return false;
     }
+
+    // Remaining variadic args
     if (funcType->isVariadic && !funcType->isExternal) {
         const auto variadic = funcType->params.back().type->asVariadic();
         assert(variadic);

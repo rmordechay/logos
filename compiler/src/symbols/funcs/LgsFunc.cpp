@@ -71,33 +71,41 @@ Function* LgsFunc::getIRFunc(LgsCodeGen& cg) {
 
 Value* LgsFunc::call(LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) {
     if (fn) return fn(cg, args);
-    if (!funcType->isMethod && args.empty()) return callIR(cg, {});
     if (funcType->isExternal) return callExternal(cg, args);
-    if (funcType->isVariadic) return callWithVariadic(cg, args);
 
     std::vector<Value*> IRArgs;
-    const auto firstArgName = funcType->isMethod && funcType->params.size() > 1 ? args[1].name : args.front().name;
-    const auto isNamed = !args.empty() && firstArgName != "";
-    if (isNamed) {
-        std::unordered_map<std::string, const LgsFuncArg*> argsByName;
-        for (const auto& arg : args) {
-            argsByName[arg.name] = &arg;
+    if (funcType->isVariadic) {
+        const auto variadicOffset = funcType->params.size() - 1;
+        for (size_t i = 0; i < variadicOffset; ++i) {
+            IRArgs.emplace_back(args[i].expr->IRValue);
         }
+        IRArgs.emplace_back(cg.usize(args.size()));
+        for (size_t i = variadicOffset; i < args.size(); ++i) {
+            IRArgs.emplace_back(args[i].expr->IRValue);
+        }
+        return callIR(cg, IRArgs);
+    }
+
+    std::string firstArgName = "";
+    if (funcType->isMethod) {
+        firstArgName = args.size() > 1 ? args[1].name : "";
+    } else {
+        firstArgName = !args.empty() ? args[0].name : "";
+    }
+    if (firstArgName != "") {
+        std::unordered_map<std::string, const LgsFuncArg*> argsByName;
+        for (const auto& arg : args) argsByName[arg.name] = &arg;
         for (const auto& param : funcType->params) {
             assert(argsByName.contains(param.name));
-            const auto arg = argsByName[param.name];
-            IRArgs.emplace_back(arg->expr->IRValue);
+            IRArgs.emplace_back(argsByName[param.name]->expr->IRValue);
         }
-        assert(!funcType->hasDefaults);
     } else {
         for (const auto& arg : args) {
             IRArgs.emplace_back(arg.expr->IRValue);
         }
         if (funcType->hasDefaults) {
-            const auto diff = funcType->params.size() - args.size() - 1;
-            for (size_t i = diff; i < funcType->params.size(); ++i) {
-                const auto& param = funcType->params[i];
-                IRArgs.emplace_back(param.expr->IRValue);
+            for (size_t i = args.size(); i < funcType->params.size(); ++i) {
+                IRArgs.emplace_back(funcType->params[i].expr->IRValue);
             }
         }
     }
@@ -118,26 +126,6 @@ Value* LgsFunc::callIR(LgsCodeGen& cg, const std::vector<Value*>& args) {
         rv = cg.builder.CreateCall(getIRFunc(cg), argsList);
     }
     return sret ? sret : rv;
-}
-
-Value* LgsFunc::callWithVariadic(LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) {
-    std::vector<Value*> IRArgs;
-    const auto variadicOffset = funcType->params.size() - 1;
-    for (size_t i = 0; i < variadicOffset; ++i) {
-        const auto arg = args[i];
-        const auto& param = funcType->params[i];
-        if (param.isSelf) {
-            IRArgs.emplace_back(arg.expr->IRValue);
-        } else {
-            IRArgs.emplace_back(arg.expr->IRValue);
-        }
-    }
-    IRArgs.emplace_back(cg.usize(args.size()));
-    for (size_t i = variadicOffset; i < args.size(); ++i) {
-        const auto arg = args[i];
-        IRArgs.emplace_back(arg.expr->IRValue);
-    }
-    return callIR(cg, IRArgs);
 }
 
 Value* LgsFunc::callExternal(LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) {

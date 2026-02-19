@@ -22,7 +22,7 @@ add_executable(lgs_tests
     codegen/exprs/CgStrTest.cpp
     codegen/exprs/CgVecTest.cpp
     codegen/exprs/CgLambdaTest.cpp
-    codegen/exprs/CgFuncCallTest.cpp
+    codegen/exprs/CgFuncTest.cpp
     codegen/exprs/CgUnaryExprTest.cpp
     codegen/exprs/CgNullableTest.cpp
     codegen/exprs/CgHashMapTest.cpp

@@ -924,9 +924,8 @@ void LgsCgFile::visitFuncCall(LgsFuncCall* funcCall) {
     assert(func->funcType->genericTypes.empty());
 
     // Default params
-    if (ft->hasDefaults) {
-        const auto diff = ft->params.size() - funcCall->args.size() - 1;
-        for (size_t i = diff; i < ft->params.size(); ++i) {
+    if (ft->hasDefaults && ft->params.size() > funcCall->args.size()) {
+        for (size_t i = funcCall->args.size(); i < ft->params.size(); ++i) {
             visitExpr(ft->params[i].expr);
         }
     }
