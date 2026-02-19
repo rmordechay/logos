@@ -55,7 +55,7 @@ public:
     void cloneFields(LgsInstance* instance) const;
     Type* getIRType(LgsCodeGen& cg) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
-    void asIRText(LgsCodeGen& cg, LgsStrBuilder& strBuilder, Value* ptr) override;
+    void asIRText(LgsStrBuilder& sb, Value* ptr) override;
     Constant* getRTTypeExtra(LgsCodeGen& cg) override;
     Value* hashValue(LgsCodeGen& cg, Value* value) override;
     Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee) override;

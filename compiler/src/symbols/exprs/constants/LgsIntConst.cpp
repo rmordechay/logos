@@ -3,6 +3,7 @@
 #include "types/primitives/LgsAny.h"
 #include "types/primitives/LgsLong.h"
 #include "LgsUtils.h"
+#include "types/primitives/LgsBool.h"
 
 LgsExpr* LgsIntConst::cast(LgsType* toType, const bool explicitly) {
     if (!toType || !toType->isScalar()) return this;
@@ -24,7 +25,8 @@ void LgsIntConst::hashNode(size_t& oldHash) {
 }
 
 std::string LgsIntConst::asText() {
-    return std::to_string(value);
+    if (!type->asBool()) return std::to_string(value);
+    return value ? LgsBool::trueLiteral : LgsBool::falseLiteral;
 }
 
 bool LgsIntConst::inRange(LgsType* toType) const {

@@ -28,13 +28,14 @@ public:
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     Type* getIRType(LgsCodeGen& cg) override;
     Constant* getRTTypeExtra(LgsCodeGen& cg) override;
+    void asIRText(LgsStrBuilder& sb, Value* ptr) override;
     Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee) override;
     Value* moveValue(LgsCodeGen& cg, Value* value, Value* toLevel) override;
     Value* addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
     void setIRFields(LgsCodeGen& cg, Value* ptr, Value* value, Value* isSet);
-    Value* loadIsSet(LgsCodeGen& cg, Value* ptr);
-    Value* loadValue(LgsCodeGen& cg, Value* ptr);
     Value* applyPtrBinOp(LgsCodeGen& cg, LgsBinaryExpr* binExpr, const std::function<Value*(LgsBinaryExpr*)>& func);
     Value* applyNumberBinOp(LgsCodeGen& cg, LgsBinaryExpr* binExpr, const std::function<Value*(LgsBinaryExpr*)>& func);
     DIType* getDebugType(LgsCodeGen& cg) override;
+    static Value* loadValue(LgsCodeGen& cg, Value* ptr);
+    static Value* loadIsSet(LgsCodeGen& cg, Value* ptr);
 };

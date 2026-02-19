@@ -80,7 +80,7 @@ Constant* LgsCodeGen::getString(const std::string& value, const bool addNull) {
         if (!dataArray || !dataArray->isCString() || dataArray->getAsCString() != value) continue;
         return &globals;
     }
-    const auto strConstant = ConstantDataArray::getString(context, value, true);
+    const auto strConstant = ConstantDataArray::getString(context, value, addNull);
     return new GlobalVariable(*IRModule, strConstant->getType(), true, GlobalValue::PrivateLinkage, strConstant);
 }
 
@@ -173,10 +173,23 @@ void LgsCodeGen::incSize(Value* bufferOffset, Value* ptr) {
     store(builder.CreateAdd(bufferOffset, usize(1)), ptr);
 }
 
+void LgsCodeGen::addNullTerminate(Value* strPtr, Value* pos) {
+    store(zero8(), builder.CreateInBoundsGEP(i8Ty(), strPtr, {pos}));
+}
+
 Value* LgsCodeGen::allocaAndStore(Type* type, Value* v, const std::string& name) {
     const auto ptr = builder.CreateAlloca(type, nullptr, name);
     builder.CreateStore(v, ptr);
     return ptr;
+}
+
+Value* LgsCodeGen::loadField(Type* parentType, Value* parentPtr, const size_t position, Type* ty) {
+    assert(ty && parentPtr);
+    return builder.CreateLoad(ty, builder.CreateStructGEP(parentType, parentPtr, position));
+}
+
+void LgsCodeGen::storeField(Type* parentType, Value* parentPtr, const size_t position, Value* v) {
+    store(v, builder.CreateStructGEP(parentType, parentPtr, position));
 }
 
 StructType* LgsCodeGen::getStructType(const std::vector<Type*>& types, const std::string& name) {
@@ -185,19 +198,6 @@ StructType* LgsCodeGen::getStructType(const std::vector<Type*>& types, const std
         return StructType::create(context, types, name);
     }
     return structType;
-}
-
-void LgsCodeGen::storeField(Type* parentType, Value* parentPtr, const size_t position, Value* v) {
-    store(v, builder.CreateStructGEP(parentType, parentPtr, position));
-}
-
-Value* LgsCodeGen::loadField(Type* parentType, Value* parentPtr, const size_t position, Type* ty) {
-    assert(ty && parentPtr);
-    return builder.CreateLoad(ty, builder.CreateStructGEP(parentType, parentPtr, position));
-}
-
-void LgsCodeGen::addNullTerminate(Value* strPtr, Value* pos) {
-    store(zero8(), builder.CreateInBoundsGEP(i8Ty(), strPtr, {pos}));
 }
 
 void LgsCodeGen::callStackPush() {

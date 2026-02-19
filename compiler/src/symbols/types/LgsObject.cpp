@@ -189,21 +189,21 @@ LgsType* LgsObject::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     return canCastTo(rightType) ? &LGS_BOOL : nullptr;
 }
 
-void LgsObject::asIRText(LgsCodeGen& cg, LgsStrBuilder& strBuilder, Value* ptr) {
-    strBuilder.add((strBuilder.asJSON ? "" : name) + "{");
+void LgsObject::asIRText(LgsStrBuilder& sb, Value* ptr) {
+    sb.add((sb.asJSON ? "" : name) + "{");
     auto isFirst = true;
     for (const auto field : fields) {
-        if (!isFirst) strBuilder.add(", ");
-        if (strBuilder.asJSON) {
-            strBuilder.add("\"" + field->name + "\": ");
+        if (!isFirst) sb.add(", ");
+        if (sb.asJSON) {
+            sb.add("\"" + field->name + "\": ");
         } else {
-            strBuilder.add(field->name + "=");
+            sb.add(field->name + "=");
         }
-        const auto fieldValue = field->loadIRPtr(cg, field->getGEP(cg, ptr));
-        field->type->asIRText(cg, strBuilder, fieldValue);
+        const auto fieldValue = field->loadIRPtr(sb.cg, field->getGEP(sb.cg, ptr));
+        field->type->asIRText(sb, fieldValue);
         isFirst = false;
     }
-    strBuilder.add("}");
+    sb.add("}");
 }
 
 Constant* LgsObject::getRTTypeExtra(LgsCodeGen& cg) {
@@ -329,10 +329,9 @@ Function* LgsObject::getJSONFunc(LgsCodeGen& cg) {
     const auto strBuffer = func->getArg(1);
     cg.startFunc(func);
 
-    LgsStrBuilder sb(cg);
+    LgsStrBuilder sb(cg, LgsStr::loadRTData(cg, strBuffer));
     sb.asJSON = true;
-    sb.buffer = LgsStr::loadRTData(cg, strBuffer);
-    asIRText(cg, sb, self);
+    asIRText(sb, self);
     sb.finalize();
 
     cg.builder.CreateRetVoid();

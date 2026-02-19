@@ -16,7 +16,7 @@ public:
     bool canCastTo(LgsType* other) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     LgsExpr* getZeroValue() override;
-    void asIRText(LgsCodeGen& cg, LgsStrBuilder& strBuilder, Value* ptr) override;
+    void asIRText(LgsStrBuilder& sb, Value* ptr) override;
     Type* getIRType(LgsCodeGen& cg) override;
     Value* hashValue(LgsCodeGen& cg, Value* value) override;
     Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee) override;

@@ -8,7 +8,6 @@ public:
     LgsExpr* cond;
     LgsStmtsBlock* elseBlock = nullptr;
     std::vector<std::pair<LgsExpr*, LgsStmtsBlock*>> patterns;
-    bool isExhausted = false;
 
     explicit LgsSwitch(LgsExpr* cond): cond(cond){}
     void setDebugValue(LgsCodeGen& cg) override;

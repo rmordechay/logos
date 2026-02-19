@@ -586,7 +586,7 @@ LgsEnum* LgsParser::parseEnum() {
     mustMatch(T_IDENTIFIER);
     mustMatch(T_LBRACE);
     const auto enum_ = new LgsEnum(nameToken.lexeme);
-    auto position = 0;
+    auto index = 0;
     while (true) {
         const auto enumField = currentToken;
         if (!mustMatch(T_IDENTIFIER)) break;
@@ -595,10 +595,11 @@ LgsEnum* LgsParser::parseEnum() {
             expr = parseExpr();
             mustParse(expr);
         }
-        position++;
-        const auto fieldType = new LgsEnum(enum_->name, enumField.lexeme, position);
+        index++;
+        const auto fieldType = new LgsEnumField(enum_->name, enumField.lexeme, index);
         const auto field = new LgsField(enumField.lexeme, fieldType, expr);
-        field->position = position;
+        field->position = index;
+        field->isMutable = false;
         setLocation(field->location, &enumField, &currentToken);
         enum_->fields.push_back(field);
         if (currentToken.type == T_RBRACE) break;

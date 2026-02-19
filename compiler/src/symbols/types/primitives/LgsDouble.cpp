@@ -45,7 +45,7 @@ LgsType* LgsDouble::applyBinOp(LgsType* rightType, LgsBinOp& op) {
 }
 
 std::string LgsDouble::fmtStr() const {
-    return "%f";
+    return "%.3f";
 }
 
 Type* LgsDouble::getIRType(LgsCodeGen& cg) {

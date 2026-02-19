@@ -438,41 +438,32 @@ void LgsCgFile::visitElseIf(LgsIfStmt* ifStmt) {
 
 void LgsCgFile::visitSwitch(LgsSwitch* switchStmt) {
     assert(switchStmt->cond);
-    const auto defaultBlock = cg.createBlock(BLOCK_DEFAULT);
-    const auto exitBlock = cg.createBlock(BLOCK_EXIT, cg.currentFunc);
     const auto cond = switchStmt->cond;
     visitExpr(cond);
-
-    const auto exprIRValue = cond->type->hashValue(cg, cond->IRValue);
-    SwitchInst* switchInst;
-    if (switchStmt->elseBlock) {
-        const auto numOfCases = switchStmt->patterns.size();
-        switchInst = cg.builder.CreateSwitch(exprIRValue, defaultBlock, numOfCases);
-    } else {
-        switchInst = cg.builder.CreateSwitch(exprIRValue, exitBlock, switchStmt->patterns.size());
-    }
-
+    const auto exitBlock = cg.createBlock(BLOCK_EXIT);
+    const auto defaultBlock = cg.createBlock(BLOCK_DEFAULT);
+    const auto v = cond->type->hashValue(cg, cond->IRValue);
+    const auto switchInst = cg.builder.CreateSwitch(v, defaultBlock, switchStmt->patterns.size());
     for (size_t i = 0; i < switchStmt->patterns.size(); ++i) {
         stack.enterScope(switchStmt);
         const auto [expr, stmtsBlock] = switchStmt->patterns[i];
         visitExpr(expr);
-        const auto patternBlock = cg.createBlock(BLOCK_CASE_PREFIX, cg.currentFunc);
+        const auto patternBlock = cg.createBlock(BLOCK_CASE_PREFIX + std::to_string(i));
         const auto hashed = expr->type->hashValue(cg, expr->IRValue);
         switchInst->addCase(llvm::dyn_cast<ConstantInt>(hashed), patternBlock);
-        cg.builder.SetInsertPoint(patternBlock);
+        cg.startBlock(patternBlock);
         visitStmtsBlock(stmtsBlock);
         cg.builder.CreateBr(exitBlock);
         stack.exitScope();
     }
-
     if (switchStmt->elseBlock) {
         stack.enterScope(switchStmt);
         cg.startBlock(defaultBlock);
         visitStmtsBlock(switchStmt->elseBlock);
-        cg.builder.CreateBr(exitBlock);
+        cg.branch(exitBlock);
         stack.exitScope();
     }
-    cg.builder.SetInsertPoint(exitBlock);
+    cg.startBlock(exitBlock);
 }
 
 void LgsCgFile::visitContinueStmt() {
@@ -676,21 +667,19 @@ void LgsCgFile::visitStrConst(LgsStrConst* strConst) {
         strConst->IRValue = cg.allocStr(cg.getString(strConst->value));
         return;
     }
-    // Format with string parts
-    for (const auto parts : strConst->parts) {
-        visitExpr(parts);
-    }
-    auto formatted = strConst->formatedStr;
     std::vector<Value*> values;
+    auto formatted = strConst->formatedStr;
     for (const auto part : strConst->parts) {
-        auto partIR = part->IRValue;
-        values.push_back(partIR);
+        visitExpr(part);
+        LgsStrBuilder sb(cg);
+        part->type->asIRText(sb, part->IRValue);
+        values.push_back(sb.buffer);
         const auto pos = formatted.find(LGS_STR_FMT_PLACEHOLDER);
         if (pos != std::string::npos) {
-            formatted.replace(pos, strlen(LGS_STR_FMT_PLACEHOLDER), part->type->fmtStr());
+            formatted.replace(pos, strlen(LGS_STR_FMT_PLACEHOLDER), "%s");
         }
     }
-    strConst->IRValue = cg.callSnprintf(formatted + "\n", values);
+    strConst->IRValue = cg.allocStr(cg.callSnprintf(formatted, values));
 }
 
 void LgsCgFile::visitCharConst(LgsCharConst* charConst) {
@@ -829,7 +818,7 @@ void LgsCgFile::visitSelection(LgsSelection* selection, const bool assign) {
 }
 
 void LgsCgFile::visitNullableExpr(LgsNullableExpr* expr) {
-    const auto nullable = expr->type->asNullable();
+     const auto nullable = expr->type->asNullable();
     assert(nullable);
     visitExpr(expr->baseExpr);
     if (expr->isNull) {
@@ -840,6 +829,7 @@ void LgsCgFile::visitNullableExpr(LgsNullableExpr* expr) {
         } else {
             expr->IRValue = nullable->getIRZeroValue(cg, expr->pointee);
             nullable->setIRFields(cg, expr->IRValue, expr->baseExpr->IRValue, cg.true_());
+            expr->IRValue = expr->loadIRPtr(cg);
         }
     }
 }
@@ -853,14 +843,19 @@ void LgsCgFile::visitFieldSelection(LgsVariable* var, LgsExpr* parent) {
         return;
     }
     // Enum field
-    if (const auto enum_ = var->type->asEnum()) {
+    if (const auto enumField = var->type->asEnumField()) {
         if (field->expr) {
-            var->IRValue = UndefValue::get(enum_->getIRType(cg));
-            var->IRValue = cg.builder.CreateInsertValue(var->IRValue, cg.usize(enum_->fieldIndex), 0);
+            var->IRValue = UndefValue::get(enumField->getIRType(cg));
+            var->IRValue = cg.builder.CreateInsertValue(var->IRValue, cg.usize(enumField->index), 0);
             var->IRValue = cg.builder.CreateInsertValue(var->IRValue, field->expr->IRValue, 1);
         } else {
-            var->IRValue = cg.usize(enum_->fieldIndex);
+            var->IRValue = cg.usize(enumField->index);
         }
+        return;
+    }
+    // Enum
+    if (const auto enum_ = var->type->asEnum()) {
+        var->IRValue = cg.getString(enum_->name);
         return;
     }
     // Singleton

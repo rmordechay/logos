@@ -17,6 +17,7 @@ add_executable(lgs_tests
     codegen/CgAssignTest.cpp
     codegen/CgIOPairTest.cpp
     codegen/CgInterfaceTest.cpp
+    codegen/CgEnumTest.cpp
     codegen/exprs/CgBinExprTest.cpp
     codegen/exprs/CgArraysTest.cpp
     codegen/exprs/CgStrTest.cpp

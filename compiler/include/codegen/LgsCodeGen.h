@@ -71,7 +71,7 @@ public:
     explicit LgsCodeGen(const LgsCodeGenMode mode) : mode(mode) {}
     void setupModule(const std::filesystem::path& file, bool debugMode = false);
     bool writeIRModule(const LgsPaths& paths, uint8_t optLevel) const;
-    Constant* getString(const std::string& value, bool addNull = false);
+    Constant* getString(const std::string& value, bool addNull = true);
     GlobalVariable* createGlobal(const std::string& name, Type* type, Constant* initializer, bool isConst = true, GlobalValue::LinkageTypes linkage = GlobalValue::ExternalLinkage) const;
     void loop(Value* loopLength, const std::function<void(Value*, BasicBlock*)>& body);
     void ifStmt(Value* cond, const std::function<void()>& body);
@@ -85,11 +85,11 @@ public:
     Value* getLevel(Value* v);
     Value* emptyBuffer(size_t size = 0);
     void incSize(Value* bufferOffset, Value* ptr);
-    Value* allocaAndStore(Type* type, Value* v, const std::string& name = "");
-    StructType* getStructType(const std::vector<Type*>& types, const std::string& name = "");
-    void storeField(Type* parentType, Value* parentPtr, size_t position, Value* v);
-    Value* loadField(Type* parentType, Value* parentPtr, size_t position, Type* ty);
     void addNullTerminate(Value* strPtr, Value* pos);
+    Value* allocaAndStore(Type* type, Value* v, const std::string& name = "");
+    Value* loadField(Type* parentType, Value* parentPtr, size_t position, Type* ty);
+    void storeField(Type* parentType, Value* parentPtr, size_t position, Value* v);
+    StructType* getStructType(const std::vector<Type*>& types, const std::string& name = "");
 
     void callStackPush();
     void callPopStack();
@@ -193,11 +193,12 @@ public:
 class LgsStrBuilder {
 public:
     Value* index;
-    Value* buffer = nullptr;
+    Value* buffer;
     LgsCodeGen& cg;
     bool asJSON = false;
 
-    explicit LgsStrBuilder(LgsCodeGen& cg) : cg(cg) {
+    explicit LgsStrBuilder(LgsCodeGen& cg, Value* buffer = nullptr) : cg(cg) {
+        this->buffer = buffer ? buffer : cg.emptyBuffer();
         index = cg.allocaAndStore(cg.sizeTy(), cg.zeroSize());
     }
     void add(Value* value, Value* size) const;

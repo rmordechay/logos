@@ -8,7 +8,7 @@ class LgsInstance;
 class LgsType;
 class LgsExpr;
 
-class LgsField final : public LgsValue {
+class LgsField : public LgsValue {
 public:
     std::string name;
     unsigned position = 0;
@@ -17,6 +17,7 @@ public:
     bool isPublic = false;
     bool isVirtual = false;
     bool isOptional = false;
+    bool isMutable = true;
     LgsType* parentType = nullptr;
     Value* gep = nullptr;
 

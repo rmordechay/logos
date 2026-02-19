@@ -56,9 +56,8 @@ std::string LgsEnum::getName() {
 }
 
 bool LgsEnum::canCastTo(LgsType* other) {
-    const auto otherName = other->getName();
     if (other->isAny()) return true;
-    return name == otherName;
+    return name == other->getName();
 }
 
 LgsType* LgsEnum::applyBinOp(LgsType* rightType, LgsBinOp& op) {
@@ -69,14 +68,8 @@ std::string LgsEnum::fmtStr() const {
     return "%s";
 }
 
-Value* LgsEnum::asIRStr(LgsCodeGen& cg, Value* v) {
-    return fieldName == "" ? cg.getString(name) : cg.getString(fieldName);
-}
-
 Value* LgsEnum::hashValue(LgsCodeGen& cg, Value* value) {
-    if (fieldName != "") return cg.usize(fieldIndex);
-    if (!exprType) return value;
-    return cg.builder.CreateExtractValue(value, 0);
+    return cg.usize(hashString(name));
 }
 
 size_t LgsEnum::sizeBytes() {
@@ -95,7 +88,22 @@ LgsEnum::~LgsEnum() {
         }
     }
     for (const auto field : fields) {
-        delete field->type;
         field->type = nullptr;
     }
+}
+
+std::string LgsEnumField::getName() {
+    return fieldName;
+}
+
+bool LgsEnumField::canCastTo(LgsType* other) {
+    if (other->isAny()) return true;
+    const auto otherEnumField = other->asEnumField();
+    if (otherEnumField && fieldName == otherEnumField->fieldName) return true;
+    const auto otherEnum = other->asEnum();
+    return otherEnum && name == otherEnum->name;
+}
+
+Value* LgsEnumField::hashValue(LgsCodeGen& cg, Value* value) {
+    return cg.usize(index);
 }

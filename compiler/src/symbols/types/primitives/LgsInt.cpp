@@ -60,8 +60,6 @@ LgsType* LgsInt::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     case GT:
     case GE:
     case LE: return &LGS_BOOL;
-    case NOOP:
-        assert(0);
     default:
         break;
     }
@@ -72,10 +70,10 @@ LgsExpr* LgsInt::getZeroValue() {
     return new LgsIntConst(&LGS_INT, 0);
 }
 
-void LgsInt::asIRText(LgsCodeGen& cg, LgsStrBuilder& strBuilder, Value* ptr) {
-    const auto buffer = cg.emptyBuffer(128);
-    const auto bytesRead = cg.callSnprintf(fmtStr(), buffer, cg.usize(128), ptr);
-    strBuilder.add(buffer, cg.toSize(bytesRead));
+void LgsInt::asIRText(LgsStrBuilder& sb, Value* ptr) {
+    const auto buffer = sb.cg.emptyBuffer(128);
+    const auto bytesRead = sb.cg.callSnprintf(fmtStr(), buffer, sb.cg.usize(128), ptr);
+    sb.add(buffer, sb.cg.toSize(bytesRead));
 }
 
 Value* LgsInt::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {

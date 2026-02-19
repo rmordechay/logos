@@ -149,19 +149,20 @@ void LgsDArray::addIRElement(LgsCodeGen& cg, Value* iterable, Value* index, Valu
     cg.builder.CreateCall(getAddFunc(cg), {iterable, value});
 }
 
-void LgsDArray::asIRText(LgsCodeGen& cg, LgsStrBuilder& strBuilder, Value* ptr) {
-    strBuilder.add("[");
+void LgsDArray::asIRText(LgsStrBuilder& sb, Value* ptr) {
+    auto& cg = sb.cg;
     const auto data = loadRTData(cg, ptr);
     const auto len = loadRTLength(cg, ptr);
+    sb.add("[");
     cg.loop(len, [&](Value* iValue, BasicBlock*) {
         const auto isFirst = cg.builder.CreateICmpNE(iValue, cg.zeroSize());
-        cg.ifStmt(isFirst, [&] {strBuilder.add(", ");});
+        cg.ifStmt(isFirst, [&] {sb.add(", ");});
         const auto offset = cg.builder.CreateMul(iValue, baseType->IRSize(cg));
         auto element = cg.builder.CreatePtrAdd(data, offset);
         element = cg.load(baseType->getIRType(cg), element);
-        baseType->asIRText(cg, strBuilder, element);
+        baseType->asIRText(sb, element);
     });
-    strBuilder.add("]");
+    sb.add("]");
 }
 
 Value* LgsDArray::hashValue(LgsCodeGen& cg, Value* value) {

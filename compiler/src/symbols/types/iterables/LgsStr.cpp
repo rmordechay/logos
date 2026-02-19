@@ -70,11 +70,11 @@ std::optional<int64_t> LgsStr::getConstLength() {
     return length;
 }
 
-void LgsStr::asIRText(LgsCodeGen& cg, LgsStrBuilder& strBuilder, Value* ptr) {
-    strBuilder.add("\"");
-    ptr = loadRTData(cg, ptr);
-    strBuilder.add(ptr, cg.callStrlen(ptr));
-    strBuilder.add("\"");
+void LgsStr::asIRText(LgsStrBuilder& sb, Value* ptr) {
+    if (sb.asJSON)  sb.add("\"");
+    ptr = loadRTData(sb.cg, ptr);
+    sb.add(ptr, sb.cg.callStrlen(ptr));
+    if (sb.asJSON)  sb.add("\"");
 }
 
 Value* LgsStr::getIRElement(LgsCodeGen& cg, Value* iterable, Value* index) {

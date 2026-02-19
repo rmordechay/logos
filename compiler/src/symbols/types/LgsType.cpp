@@ -165,16 +165,16 @@ bool LgsType::hasGenerics() {
     return !!asGenericType();
 }
 
+void LgsType::replaceGenerics(std::unordered_map<std::string, LgsType*>& replacements) {
+
+}
+
 Value* LgsType::moveValue(LgsCodeGen& cg, Value* value, Value* toLevel) {
     return cg.moveValue(getBaseName(), value, toLevel);
 }
 
-void LgsType::asIRText(LgsCodeGen& cg, LgsStrBuilder& strBuilder, Value* ptr) {
+void LgsType::asIRText(LgsStrBuilder& sb, Value* ptr) {
     assert(0);
-}
-
-void LgsType::replaceGenerics(std::unordered_map<std::string, LgsType*>& replacements) {
-
 }
 
 Constant* LgsType::getRTTypeExtra(LgsCodeGen& cg) {
@@ -214,8 +214,9 @@ LgsFuncType* LgsType::asFuncType() { return dynamic_cast<LgsFuncType*>(this); }
 LgsObject* LgsType::asObject() { return asSelf() ? dynamic_cast<LgsObject*>(asSelf()->baseType) : dynamic_cast<LgsObject*>(this); }
 LgsInterface* LgsType::asInterface() { return dynamic_cast<LgsInterface*>(this); }
 LgsEnum* LgsType::asEnum() { return dynamic_cast<LgsEnum*>(this); }
-LgsSelf* LgsType::asSelf() { return dynamic_cast<LgsSelf*>(this); }
+LgsEnumField* LgsType::asEnumField() { return dynamic_cast<LgsEnumField*>(this); }
 LgsGenericType* LgsType::asGenericType() { return dynamic_cast<LgsGenericType*>(this); }
+LgsSelf* LgsType::asSelf() { return dynamic_cast<LgsSelf*>(this); }
 LgsIterable* LgsType::asIterable() { return dynamic_cast<LgsIterable*>(this); }
 LgsSArray* LgsType::asSArray() { return dynamic_cast<LgsSArray*>(this); }
 LgsDArray* LgsType::asDArray() { return dynamic_cast<LgsDArray*>(this); }
@@ -378,7 +379,10 @@ Value* orIR(LgsCodeGen& cg, Value* left, Value* right) {
 }
 
 Value* crossIR(LgsCodeGen& cg, Value* left, Value* right, LgsVec* vec) {
-    return cg.builder.CreateCall(getCrossProductFunc(cg, vec), {left, right});
+    const auto results = vec->getIRZeroValue(cg, nullptr);
+    const auto [l, r] = loadVecPair(cg, left, right, vec);
+    cg.builder.CreateCall(getCrossProductFunc(cg, vec), {results, l, r});
+    return results;
 }
 
 LgsType* getBiggestIntType(const std::vector<LgsType*>& types) {
@@ -432,7 +436,7 @@ Value* loadAsInt(LgsCodeGen& cg, Value* v, Type* intType) {
     if (ty->isPointerTy()) return cg.load(intType, v);
     if (ty->isIntegerTy()) return cg.builder.CreateSExt(v, intType);
     if (ty->isFloatingPointTy()) return cg.builder.CreateFPToSI(v, intType);
-    assert(0);
+    return v;
 }
 
 Value* loadAsFloat(LgsCodeGen& cg, Value* v, Type* floatType) {
@@ -440,7 +444,12 @@ Value* loadAsFloat(LgsCodeGen& cg, Value* v, Type* floatType) {
     if (ty->isPointerTy()) return cg.load(floatType, v);
     if (ty->isFloatingPointTy()) return cg.builder.CreateFPExt(v, floatType);
     if (ty->isIntegerTy()) return cg.builder.CreateSIToFP(v, floatType);
-    assert(0);
+    return v;
+}
+
+Value* loadAsVec(LgsCodeGen& cg, Value* v, Type* vecType) {
+    if (v->getType()->isVectorTy()) return v;
+    return cg.load(vecType, v);
 }
 
 std::pair<Value*, Value*> loadNumberPair(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
@@ -448,4 +457,9 @@ std::pair<Value*, Value*> loadNumberPair(LgsCodeGen& cg, Value* left, Value* rig
     if (type->isInt) return {loadAsInt(cg, left, ty), loadAsInt(cg, right, ty)};
     if (type->isFloat) return {loadAsFloat(cg, left, ty), loadAsFloat(cg, right, ty)};
     assert(0);
+}
+
+std::pair<Value*, Value*> loadVecPair(LgsCodeGen& cg, Value* left, Value* right, LgsType* vec) {
+    const auto ty = vec->getIRType(cg);
+    return {loadAsVec(cg, left, ty), loadAsVec(cg, right, ty)};
 }

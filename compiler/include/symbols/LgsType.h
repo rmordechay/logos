@@ -101,7 +101,7 @@ public:
     virtual bool canCastTo(LgsType* other) = 0;
     virtual LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) = 0;
     virtual Value* moveValue(LgsCodeGen& cg, Value* value, Value* toLevel);
-    virtual void asIRText(LgsCodeGen& cg, LgsStrBuilder& strBuilder, Value* ptr);
+    virtual void asIRText(LgsStrBuilder& sb, Value* ptr);
     virtual Type* getIRType(LgsCodeGen& cg) = 0;
     virtual Constant* getRTTypeExtra(LgsCodeGen& cg);
     virtual Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee);
@@ -136,8 +136,9 @@ public:
     LgsObject* asObject();
     LgsInterface* asInterface();
     LgsEnum* asEnum();
-    LgsSelf* asSelf();
+    LgsEnumField* asEnumField();
     LgsGenericType* asGenericType();
+    LgsSelf* asSelf();
     LgsIterable* asIterable();
     LgsSArray* asSArray();
     LgsDArray* asDArray();
@@ -182,3 +183,4 @@ LgsType* getBiggestIntType(const std::vector<LgsType*>& types);
 Value* loadAsInt(LgsCodeGen& cg, Value* v, Type* intType);
 Value* loadAsFloat(LgsCodeGen& cg, Value* v, Type* floatType);
 std::pair<Value*, Value*> loadNumberPair(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
+std::pair<Value*, Value*> loadVecPair(LgsCodeGen& cg, Value* left, Value* right, LgsType* vec);

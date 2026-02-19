@@ -37,7 +37,6 @@ public:
     Value* getIRElement(LgsCodeGen& cg, Value* iterable, Value* index) override;
     void addIRElement(LgsCodeGen& cg, Value* iterable, Value* index, Value* value) override;
     Value* matVecMul(LgsCodeGen& cg, const LgsExpr* left, LgsExpr* right) const;
-    static Value* crossIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr);
     static size_t getSwizzleSet(char c);
     static size_t getComponentIndex(char c);
     DIType* getDebugType(LgsCodeGen& cg) override;

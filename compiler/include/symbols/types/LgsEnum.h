@@ -2,15 +2,14 @@
 #include "LgsType.h"
 #include <string>
 
+#include "stmts/LgsField.h"
+
 class LgsEnum : public LgsType {
 public:
     std::string name;
-    std::string fieldName;
-    size_t fieldIndex;
     LgsType* exprType = nullptr;
 
-    explicit LgsEnum(const std::string& name) : LgsEnum(name, "", 0) {}
-    LgsEnum(const std::string& name, const std::string& fieldName, const size_t fieldIndex) : name(name), fieldName(fieldName), fieldIndex(fieldIndex) {
+    explicit LgsEnum(const std::string& name) : name(name) {
         rttKind = RTT_ENUM;
     }
     LgsFunc* getMethod(const std::string& methodName) override;
@@ -20,9 +19,19 @@ public:
     bool canCastTo(LgsType* other) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     std::string fmtStr() const override;
-    Value* asIRStr(LgsCodeGen& cg, Value* v);
     Value* hashValue(LgsCodeGen& cg, Value* value) override;
     size_t sizeBytes() override;
     DIType* getDebugType(LgsCodeGen& cg) override;
     ~LgsEnum() override;
+};
+
+class LgsEnumField final : public LgsEnum {
+public:
+    size_t index;
+    std::string fieldName;
+
+    LgsEnumField(const std::string& enumName, const std::string& fieldName, const size_t index): LgsEnum(enumName), index(index), fieldName(fieldName) {}
+    std::string getName() override;
+    bool canCastTo(LgsType* other) override;
+    Value* hashValue(LgsCodeGen& cg, Value* value) override;
 };

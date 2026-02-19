@@ -50,10 +50,10 @@ bool LgsFloat::canCastTo(LgsType* other) {
     return false;
 }
 
-void LgsFloat::asIRText(LgsCodeGen& cg, LgsStrBuilder& strBuilder, Value* ptr) {
-    const auto buffer = cg.emptyBuffer(128);
-    const auto bytesRead = cg.callSnprintf(fmtStr(), buffer, cg.usize(128), ptr);
-    strBuilder.add(buffer, cg.toSize(bytesRead));
+void LgsFloat::asIRText(LgsStrBuilder& sb, Value* ptr) {
+    const auto buffer = sb.cg.emptyBuffer(128);
+    const auto bytesRead = sb.cg.callSnprintf(fmtStr(), buffer, sb.cg.usize(128), ptr);
+    sb.add(buffer, sb.cg.toSize(bytesRead));
 }
 
 LgsType* LgsFloat::applyBinOp(LgsType* rightType, LgsBinOp& op) {
@@ -104,8 +104,8 @@ Value* LgsFloat::mulIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
     if (left->type->asVec() && right->type->asVec()) {
-        const auto dotFunc = getDotProductFunc(cg, left->type->asVec());
-        return cg.builder.CreateCall(dotFunc, {left->IRValue, right->IRValue});
+        const auto [l, r] = loadVecPair(cg, left->IRValue, right->IRValue, left->type);
+        return cg.builder.CreateCall(getDotProductFunc(cg, left->type->asVec()), {l, r});
     }
     auto [l, r] = loadNumberPair(cg, left->IRValue, right->IRValue, this);
     return cg.builder.CreateFMul(l, r);

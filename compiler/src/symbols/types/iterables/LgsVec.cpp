@@ -351,13 +351,6 @@ Value* LgsVec::matVecMul(LgsCodeGen& cg, const LgsExpr* left, LgsExpr* right) co
     return results;
 }
 
-Value* LgsVec::crossIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
-    const auto left = binExpr->left;
-    const auto right = binExpr->right;
-    const auto crossFunc = getCrossProductFunc(cg, left->type->asVec());
-    return cg.builder.CreateCall(crossFunc, {left->IRValue, right->IRValue});
-}
-
 size_t LgsVec::getSwizzleSet(const char c) {
     if (strchr("xyzw", c)) return 0;
     if (strchr("rgba", c)) return 1;
@@ -380,9 +373,83 @@ DIType* LgsVec::getDebugType(LgsCodeGen& cg) {
 }
 
 Function* getDotProductFunc(LgsCodeGen& cg, LgsVec* vecType) {
-    assert(0);
+    const auto name = LGS_PREFIX + vecType->getName() + "_Dot";
+    auto func = cg.IRModule->getFunction(name);
+    if (func) return func;
+
+    cg.savedIP = cg.builder.saveIP();
+    const auto originalFunc = cg.currentFunc;
+
+    const auto params = {vecType->getIRType(cg), vecType->getIRType(cg)};
+    func = cg.getFunc(name, cg.getFT(cg.floatTy(), params));
+    const auto entryBlock = cg.createBlock(BLOCK_ENTRY, func);
+    cg.builder.SetInsertPoint(entryBlock);
+    Value* l = func->getArg(0);
+    Value* r = func->getArg(1);
+
+    const auto lx = cg.builder.CreateExtractElement(l, cg.i32(0));
+    const auto rx = cg.builder.CreateExtractElement(r, cg.i32(0));
+    const auto ly = cg.builder.CreateExtractElement(l, cg.i32(1));
+    const auto ry = cg.builder.CreateExtractElement(r, cg.i32(1));
+
+    const auto mulX = cg.builder.CreateFMul(lx, rx);
+    const auto mulY = cg.builder.CreateFMul(ly, ry);
+    Value* result = cg.builder.CreateFAdd(mulX, mulY);
+    const auto vectorDim = vecType->dimVec;
+    if (vectorDim == 3) {
+        const auto lz = cg.builder.CreateExtractElement(l, cg.i32(2));
+        const auto rz = cg.builder.CreateExtractElement(r, cg.i32(2));
+        const auto mulZ = cg.builder.CreateFMul(lz, rz);
+        result = cg.builder.CreateFAdd(result, mulZ);
+    }
+    if (vectorDim == 4) {
+        const auto lw = cg.builder.CreateExtractElement(l, cg.i32(3));
+        const auto rw = cg.builder.CreateExtractElement(r, cg.i32(3));
+        const auto mulW = cg.builder.CreateFMul(lw, rw);
+        result = cg.builder.CreateFAdd(result, mulW);
+    }
+    cg.builder.CreateRet(result);
+
+    cg.currentFunc = originalFunc;
+    cg.builder.restoreIP(cg.savedIP);
+    return func;
 }
 
 Function* getCrossProductFunc(LgsCodeGen& cg, LgsVec* vecType) {
-    assert(0);
+    assert(vecType->dimVec == 3);
+    const auto name = LGS_PREFIX + vecType->getName() + "_Cross";
+    auto func = cg.IRModule->getFunction(name);
+    if (func) return func;
+
+    cg.savedIP = cg.builder.saveIP();
+    const auto originalFunc = cg.currentFunc;
+    const auto ty = vecType->getIRType(cg);
+    const std::vector<Type*> params = {cg.ptrTy(), ty, ty};
+    func = cg.getFunc(name, cg.getFT(cg.voidTy(), params));
+    const auto entryBlock = cg.createBlock(BLOCK_ENTRY, func);
+    cg.builder.SetInsertPoint(entryBlock);
+    Value* result = func->getArg(0);
+    Value* l = func->getArg(1);
+    Value* r = func->getArg(2);
+
+    const auto lx = cg.builder.CreateExtractElement(l, cg.i32(0));
+    const auto ly = cg.builder.CreateExtractElement(l, cg.i32(1));
+    const auto lz = cg.builder.CreateExtractElement(l, cg.i32(2));
+    const auto rx = cg.builder.CreateExtractElement(r, cg.i32(0));
+    const auto ry = cg.builder.CreateExtractElement(r, cg.i32(1));
+    const auto rz = cg.builder.CreateExtractElement(r, cg.i32(2));
+
+    const auto cx = cg.builder.CreateFSub(cg.builder.CreateFMul(ly, rz), cg.builder.CreateFMul(lz, ry));
+    const auto cy = cg.builder.CreateFSub(cg.builder.CreateFMul(lz, rx), cg.builder.CreateFMul(lx, rz));
+    const auto cz = cg.builder.CreateFSub(cg.builder.CreateFMul(lx, ry), cg.builder.CreateFMul(ly, rx));
+
+    cg.storeField(ty, result, 0, cx);
+    cg.storeField(ty, result, 1, cy);
+    cg.storeField(ty, result, 2, cz);
+    cg.builder.CreateRetVoid();
+
+    // Restore state
+    cg.currentFunc = originalFunc;
+    cg.builder.restoreIP(cg.savedIP);
+    return func;
 }
