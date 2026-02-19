@@ -55,22 +55,6 @@ bool LgsDArray::canCastTo(LgsType* other) {
     return baseType->canCastTo(otherArr->baseType);
 }
 
-void LgsDArray::inferBaseType(const std::vector<LgsExpr*> elements) {
-    LgsType* type = nullptr;
-    for (const auto element : elements) {
-        const auto inner = element->type->asIterable();
-        if (inner && !inner->asStr()) {
-            inner->inferBaseType({element});
-            type = inner->baseType;
-        } else {
-            type = element->type;
-        }
-    }
-    if (type) {
-        baseType = type;
-    }
-}
-
 LgsType* LgsDArray::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     switch (op.opType) {
     case EQ:
@@ -173,7 +157,7 @@ Function* LgsDArray::getAddFunc(LgsCodeGen& cg) {
     const auto funcName = LGS_PREFIX + name + baseType->getBaseName() + "_" + ADD_FUNC;
     if (const auto func = cg.IRModule->getFunction(funcName)) return func;
     const auto ft = cg.getFT(cg.voidTy(), {cg.ptrTy(), baseType->getStorageType(cg)});
-    if (cg.mode == CG_MODE_SRC_CODE) return cg.getFunc(funcName, ft);
+    if (cg.mode == CG_MODE_SRC) return cg.getFunc(funcName, ft);
 
     // Prologue
     cg.savedIP = cg.builder.saveIP();
@@ -226,7 +210,7 @@ Function* LgsDArray::getContainsFunc(LgsCodeGen& cg) {
     const auto funcName = LGS_PREFIX + name + baseType->getBaseName() + "_" + CONTAINS_FUNC;
     if (const auto func = cg.IRModule->getFunction(funcName)) return func;
     const auto ft = cg.getFT(cg.i1Ty(), {cg.ptrTy(), baseType->getStorageType(cg)});
-    if (cg.mode == CG_MODE_SRC_CODE) return cg.getFunc(funcName, ft);
+    if (cg.mode == CG_MODE_SRC) return cg.getFunc(funcName, ft);
 
     // Prologue
     const auto func = cg.getFunc(funcName, ft);
@@ -251,7 +235,7 @@ Function* LgsDArray::getEqFunc(LgsCodeGen& cg) {
     const auto funcName = LGS_PREFIX + name + baseType->getBaseName() + "_" + EQUAL_FUNC;
     if (const auto func = cg.IRModule->getFunction(funcName)) return func;
     const auto ft = cg.getFT(cg.i1Ty(), {cg.ptrTy(), cg.ptrTy()});
-    if (cg.mode == CG_MODE_SRC_CODE) return cg.getFunc(funcName, ft);
+    if (cg.mode == CG_MODE_SRC) return cg.getFunc(funcName, ft);
     const auto func = cg.getFunc(funcName, ft);
 
     cg.savedIP = cg.builder.saveIP();

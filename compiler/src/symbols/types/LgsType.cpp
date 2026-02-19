@@ -13,6 +13,7 @@
 #include "types/LgsObject.h"
 #include "types/iterables/LgsDArray.h"
 #include "types/LgsEnum.h"
+#include "types/LgsEnumField.h"
 #include "types/LgsFieldType.h"
 #include "types/LgsGenericType.h"
 #include "types/LgsNullable.h"
@@ -117,10 +118,15 @@ Constant* LgsType::getRTType(LgsCodeGen& cg) {
     const auto rttName = getRTTName();
     const auto baseStruct = cg.getRTTStruct();
     Constant* initializer = nullptr;
-    if (cg.mode == CG_MODE_RTTYPES) {
+    if (cg.mode == CG_MODE_RTT) {
         const auto extra = getRTTypeExtra(cg);
         const std::vector<Constant*> args = {
-        cg.getString(rttName), IRSize(cg), cg.i32(rttKind), cg.i1(isHeap), cg.i1(passByRef), extra
+            cg.getString(rttName),
+            IRSize(cg),
+            cg.i32(rttKind),
+            cg.i1(isHeap),
+            cg.i1(passByRef),
+            extra
         };
         initializer = ConstantStruct::get(baseStruct, args);
     }
@@ -462,4 +468,19 @@ std::pair<Value*, Value*> loadNumberPair(LgsCodeGen& cg, Value* left, Value* rig
 std::pair<Value*, Value*> loadVecPair(LgsCodeGen& cg, Value* left, Value* right, LgsType* vec) {
     const auto ty = vec->getIRType(cg);
     return {loadAsVec(cg, left, ty), loadAsVec(cg, right, ty)};
+}
+
+LgsType* inferType(const std::vector<LgsExpr*>& elements) {
+    LgsType* result = nullptr;
+    for (const auto element : elements) {
+        const auto elemType = element->type;
+        if (!result) {
+            result = elemType;
+            continue;
+        }
+        if (result->canCastTo(elemType)) {
+            result = elemType;
+        }
+    }
+    return result;
 }

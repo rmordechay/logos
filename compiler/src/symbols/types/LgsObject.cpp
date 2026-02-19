@@ -269,7 +269,7 @@ Function* LgsObject::getObjsEqFunc(LgsCodeGen& cg) const {
     const auto funcName = LGS_PREFIX + name + "_" + EQUAL_FUNC;
     if (const auto func = cg.IRModule->getFunction(funcName)) return func;
     const auto ft = cg.getFT(cg.i1Ty(), {cg.ptrTy(), cg.ptrTy()});
-    if (cg.mode == CG_MODE_SRC_CODE) return cg.getFunc(funcName, ft);
+    if (cg.mode == CG_MODE_SRC) return cg.getFunc(funcName, ft);
 
     const auto func = cg.getFunc(funcName, ft);
     cg.savedIP = cg.builder.saveIP();
@@ -296,7 +296,7 @@ Function* LgsObject::getObjsHashFunc(LgsCodeGen& cg) const {
     const auto funcName = LGS_PREFIX + name + "_" + OBJ_HASH_FUNC;
     if (const auto func = cg.IRModule->getFunction(funcName)) return func;
     const auto ft = cg.getFT(cg.sizeTy(), {cg.ptrTy()});
-    if (cg.mode == CG_MODE_SRC_CODE) return cg.getFunc(funcName, ft);
+    if (cg.mode == CG_MODE_SRC) return cg.getFunc(funcName, ft);
 
     const auto func = cg.getFunc(funcName, ft);
     cg.savedIP = cg.builder.saveIP();
@@ -321,7 +321,7 @@ Function* LgsObject::getJSONFunc(LgsCodeGen& cg) {
     const auto funcName = LGS_PREFIX + metaName + "_" + OBJ_AS_JSON;
     if (const auto func = cg.IRModule->getFunction(funcName)) return func;
     const auto ft = cg.getFT(cg.voidTy(), {cg.ptrTy(), cg.ptrTy()});
-    if (cg.mode == CG_MODE_SRC_CODE) return cg.getFunc(funcName, ft);
+    if (cg.mode == CG_MODE_SRC) return cg.getFunc(funcName, ft);
 
     const auto func = cg.getFunc(funcName, ft);
     cg.savedIP = cg.builder.saveIP();
@@ -343,7 +343,7 @@ Function* LgsObject::getSetFieldFunc(LgsCodeGen& cg) {
     const auto funcName = LGS_PREFIX + metaName + "_" + OBJ_SET_FIELD_FUNC;
     if (const auto func = cg.IRModule->getFunction(funcName)) return func;
     const auto ft = cg.getFT(cg.i1Ty(), {cg.ptrTy(), cg.ptrTy(), cg.ptrTy(), cg.ptrTy()});
-    if (cg.mode == CG_MODE_SRC_CODE) return cg.getFunc(funcName, ft);
+    if (cg.mode == CG_MODE_SRC) return cg.getFunc(funcName, ft);
 
     const auto func = cg.getFunc(funcName, ft);
     cg.savedIP = cg.builder.saveIP();
@@ -378,7 +378,7 @@ Function* LgsObject::getGetFieldFunc(LgsCodeGen& cg) {
     const auto funcName = LGS_PREFIX + metaName + "_" + OBJ_GET_FIELD_FUNC;
     if (const auto func = cg.IRModule->getFunction(funcName)) return func;
     const auto ft = cg.getFT(cg.ptrTy(), {cg.ptrTy(), cg.ptrTy()});
-    if (cg.mode == CG_MODE_SRC_CODE) return cg.getFunc(funcName, ft);
+    if (cg.mode == CG_MODE_SRC) return cg.getFunc(funcName, ft);
 
     const auto func = cg.getFunc(funcName, ft);
     cg.savedIP = cg.builder.saveIP();

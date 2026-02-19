@@ -376,36 +376,31 @@ bool LgsApp::generateMainFile() {
     return true;
 }
 
-/**
- *  The runtime types are set in the semantic analysis
- */
 bool LgsApp::generateRTTTypes() {
     if (configs.isImport) return true;
-    rttFile.cgFile.cg.mode = CG_MODE_RTTYPES;
     rttFile.setupCodeGen(configs);
-
+    std::vector<LgsType*> rttTypes;
     // Globals
     for (auto [symbolName, symbol] : globals.symbols) {
         if (symbol.symbolType != OBJECT) continue;
-        symbol.object->getRTType(rttFile.cgFile.cg);
+        rttTypes.push_back(symbol.object);
         for (const auto innerObj : symbol.object->objects) {
-            innerObj->getRTType(rttFile.cgFile.cg);
+            rttTypes.push_back(innerObj);
         }
     }
-
     // Source files
     for (const auto srcFile : srcFiles) {
         for (const auto [_, type] : srcFile->symbolTable.rttTypes) {
-            type->getRTType(rttFile.cgFile.cg);
-        }
-        if (const auto mainFile = srcFile->asMainFile()) {
-            for (const auto object : mainFile->objects) {
-                object->getRTType(rttFile.cgFile.cg);
-                for (const auto innerObj : object->objects) {
-                    innerObj->getRTType(rttFile.cgFile.cg);
+            rttTypes.push_back(type);
+            if (const auto obj = type->asObject()) {
+                for (const auto innerObj : obj->objects) {
+                    rttTypes.push_back(innerObj);
                 }
             }
         }
+    }
+    for (const auto rttType : rttTypes) {
+        rttType->getRTType(rttFile.cgFile.cg);
     }
     return rttFile.cgFile.cg.writeIRModule(paths, 3);
 }

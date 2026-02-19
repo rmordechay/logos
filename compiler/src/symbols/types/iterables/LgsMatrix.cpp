@@ -105,7 +105,7 @@ LgsExpr* LgsMatrix::getZeroValue() {
 }
 
 LgsType* LgsMatrix::getValueType() {
-    return new LgsSArray(baseType, new LgsIntConst(columns));
+    return new LgsSArray(baseType, new LgsIntConst(&LGS_SIZE, columns));
 }
 
 std::string LgsMatrix::getBaseName() {

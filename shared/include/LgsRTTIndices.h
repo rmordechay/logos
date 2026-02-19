@@ -66,3 +66,8 @@ struct LgsNullableExprIndices {
     static constexpr size_t isSet = 1;
 };
 
+struct LgsEnumFieldIndices {
+    static constexpr size_t index = 0;
+    static constexpr size_t value = 1;
+};
+

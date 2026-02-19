@@ -1,5 +1,6 @@
 #include "exprs/LgsExpr.h"
 
+#include "LgsUtils.h"
 #include "codegen/LgsCodeGen.h"
 #include "exprs/LgsArrayExpr.h"
 #include "exprs/LgsBinaryExpr.h"
@@ -24,6 +25,7 @@
 #include "funcs/LgsFunc.h"
 #include "loops/LgsMetaVar.h"
 #include "stmts/LgsVarDec.h"
+#include "types/LgsEnumField.h"
 #include "types/LgsNullable.h"
 
 LgsType* LgsExpr::getType() {
@@ -133,10 +135,70 @@ std::optional<std::string> LgsExpr::getConstStr() {
     return std::nullopt;
 }
 
+std::optional<std::vector<LgsExpr*>> LgsExpr::getConstArr() {
+    if (const auto arrExpr = asArrayExpr()) {
+        return arrExpr->elements;
+    }
+    if (const auto var = asVariable()) {
+        if (var->ref.symbolType == VAR_DEC) {
+            if (var->ref.varDec->isMutable) return std::nullopt;
+            return var->ref.varDec->expr->getConstArr();
+        }
+    }
+    return std::nullopt;
+}
+
 Value* LgsExpr::loadIRPtr(LgsCodeGen& cg) const {
     if (!IRValue->getType()->isPointerTy()) return IRValue;
     if (type->asSArray()) return IRValue;
     return cg.load(type->getStorageType(cg), IRValue);
+}
+
+Constant* LgsExpr::getAsConst(LgsCodeGen& cg) {
+    const auto constInt = getConstInt();
+    if (constInt.has_value()) {
+        return ConstantInt::get(type->getIRType(cg), constInt.value());
+    }
+    const auto constFloat = getConstFloat();
+    if (constFloat.has_value()) {
+        return ConstantFP::get(type->getIRType(cg), constFloat.value());
+    }
+    const auto constStr = getConstStr();
+    if (constStr.has_value()) {
+        return LgsStr::getStrConst(cg, constStr.value());
+    }
+    const auto constArr = getConstArr();
+    if (constArr.has_value()) {
+        const auto arr = constArr.value();
+        const auto baseType = type->asIterable()->baseType;
+        const auto arrTy = ArrayType::get(baseType->getIRType(cg), arr.size());
+        std::vector<Constant*> elements;
+        for (const auto expr : arr) {
+            elements.push_back(expr->getAsConst(cg));
+        }
+        return ConstantArray::get(arrTy, elements);
+    }
+    return nullptr;
+}
+
+Constant* LgsExpr::hashConstValue(LgsCodeGen& cg) {
+    const auto constInt = getConstInt();
+    if (constInt.has_value()) {
+        return cg.usize(constInt.value());
+    }
+    const auto constFloat = getConstFloat();
+    if (constFloat.has_value()) {
+        return cg.floatv(constFloat.value());
+    }
+    const auto constStr = getConstStr();
+    if (constStr.has_value()) {
+        return cg.usize(hashString(constStr.value()));
+    }
+    const auto enumField = type->asEnumField();
+    if (enumField) {
+        return cg.usize(enumField->index);
+    }
+    return nullptr;
 }
 
 LgsExpr* LgsExpr::cast(LgsType* toType, const bool explicitly) {

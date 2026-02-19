@@ -791,3 +791,17 @@ TEST(ErrorsTest, E100117A) {
     parseAndAnalyse(app, {code}, {LGS_MAIN_FILE});
     expectErrors(app, E10117, 1);
 }
+
+TEST(ErrorsTest, E100118A) {
+    const auto code = R"(
+    enum Enum {
+        ENUM1 = "value1"
+        ENUM2 = "value2"
+        ENUM3
+    }
+    main() {}
+    )";
+    LgsApp app;
+    parseAndAnalyse(app, {code}, {LGS_MAIN_FILE});
+    expectErrors(app, E10118, 1);
+}

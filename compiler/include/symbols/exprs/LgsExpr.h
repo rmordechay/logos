@@ -53,7 +53,10 @@ public:
     std::optional<int64_t> getConstInt();
     std::optional<double_t> getConstFloat();
     std::optional<std::string> getConstStr();
+    std::optional<std::vector<LgsExpr*>> getConstArr();
     Value* loadIRPtr(LgsCodeGen& cg) const;
+    Constant* getAsConst(LgsCodeGen& cg);
+    Constant* hashConstValue(LgsCodeGen& cg);
 
     virtual LgsExpr* cast(LgsType* toType, bool explicitly);
     virtual bool equals(LgsExpr* other);

@@ -88,7 +88,7 @@ inline LgsBaseMsg E10073{"Vector elements can only be numbers or vectors.", errC
 inline LgsBaseMsg E10074{"Too many scalars for %s.", errCodeStart++};
 inline LgsBaseMsg E10075{"Enum field values must all be the same type.", errCodeStart++};
 inline LgsBaseMsg E10076{"'%s' is not defined between %s and %s.", errCodeStart++}; // operation, left-expr, right-expr
-inline LgsBaseMsg E10077{"Enum field value must be of constant type.", errCodeStart++};
+inline LgsBaseMsg E10077{"Enum value must be known at compile time.", errCodeStart++};
 inline LgsBaseMsg E10078{"Defer functions must return Void. Given: %s.", errCodeStart++};
 inline LgsBaseMsg E10079{"Test file %s must be inside tests directory.", errCodeStart++};
 inline LgsBaseMsg E10080{"Index %s was not found in iterable.", errCodeStart++};
@@ -129,3 +129,4 @@ inline LgsBaseMsg E10114{"Static array size must be known at compile time.", err
 inline LgsBaseMsg E10115{"Wrong number of generic arguments. Expected: %s. Given: %s.", errCodeStart++};
 inline LgsBaseMsg E10116{"Could not replace generic type %s with actual type.", errCodeStart++};
 inline LgsBaseMsg E10117{"Function call cannot be assigned to a value.", errCodeStart++};
+inline LgsBaseMsg E10118{"Enum fields must all have a value or none.", errCodeStart++};

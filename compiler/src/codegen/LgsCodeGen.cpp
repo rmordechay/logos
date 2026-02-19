@@ -23,13 +23,12 @@ inline TargetMachine* targetMachine;
 
 void LgsCodeGen::setupModule(const fs::path& file, const bool debugMode) {
     IRModule = new Module(file.stem().string(), context);
-    if (debugMode && mode == CG_MODE_RTTYPES) {
-        debugger.diBuilder = new DIBuilder(*IRModule);
-        debugger.diFile = debugger.diBuilder->createFile(fs::canonical(file).string(), "");
-        debugger.compileUnit = debugger.diBuilder->createCompileUnit(dwarf::DW_LANG_C, debugger.diFile, "Logos", false, "", 0);
-        IRModule->addModuleFlag(Module::Warning, "Dwarf Version", 5);
-        IRModule->addModuleFlag(Module::Warning, "Debug Info Version", DEBUG_METADATA_VERSION);
-    }
+    if (!debugMode) return;
+    debugger.diBuilder = new DIBuilder(*IRModule);
+    debugger.diFile = debugger.diBuilder->createFile(fs::canonical(file).string(), "");
+    debugger.compileUnit = debugger.diBuilder->createCompileUnit(dwarf::DW_LANG_C, debugger.diFile, "Logos", false, "", 0);
+    IRModule->addModuleFlag(Module::Warning, "Dwarf Version", 5);
+    IRModule->addModuleFlag(Module::Warning, "Debug Info Version", DEBUG_METADATA_VERSION);
 }
 
 bool LgsCodeGen::writeIRModule(const LgsPaths& paths, uint8_t optLevel) const {

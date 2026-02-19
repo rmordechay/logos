@@ -170,3 +170,9 @@ void LgsStr::storeData(LgsCodeGen& cg, Value* ptr, Value* value) {
 Value* LgsStr::loadRTData(LgsCodeGen& cg, Value* value) {
     return cg.loadField(getStrStruct(cg), value, LgsStrIndices::data, cg.ptrTy());
 }
+
+Constant* LgsStr::getStrConst(LgsCodeGen& cg, const std::string& text) {
+    const auto exprTy = llvm::cast<StructType>(getStrStruct(cg));
+    const auto initializer = ConstantStruct::get(exprTy, {cg.zeroSize(), cg.getString(text)});
+    return cg.createGlobal("", exprTy, initializer);
+}

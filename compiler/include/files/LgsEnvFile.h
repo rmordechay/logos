@@ -9,7 +9,7 @@ public:
     std::string name;
     std::vector<LgsVarDec*> varDecs;
 
-    explicit LgsEnvFile(const fs::path& path) : LgsFile(path, CG_MODE_SRC_CODE) {}
+    explicit LgsEnvFile(const fs::path& path) : LgsFile(path, CG_MODE_SRC) {}
     size_t hashFile() override;
     ~LgsEnvFile() override;
 };

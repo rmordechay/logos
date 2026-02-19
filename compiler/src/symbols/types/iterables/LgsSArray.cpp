@@ -139,7 +139,7 @@ Function* LgsSArray::getEqFunc(LgsCodeGen& cg) {
     const auto funcName = getName() + "_" + EQUAL_FUNC;
     if (const auto func = cg.IRModule->getFunction(funcName)) return func;
     const auto ft = cg.getFT(cg.i1Ty(), {cg.ptrTy(), cg.ptrTy()});
-    if (cg.mode == CG_MODE_SRC_CODE) return cg.getFunc(funcName, ft);
+    if (cg.mode == CG_MODE_SRC) return cg.getFunc(funcName, ft);
 
     const auto func = cg.getFunc(funcName, ft);
     cg.savedIP = cg.builder.saveIP();

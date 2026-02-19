@@ -57,6 +57,8 @@
 #include <unistd.h>
 #include <unordered_set>
 
+#include "types/LgsEnumField.h"
+
 bool LgsCgFile::generateSrcFile(LgsFile* file, const LgsPaths& paths) {
     visitExternalSymbols(file);
     if (const auto mainFile = file->asMainFile()) {
@@ -128,7 +130,7 @@ void LgsCgFile::visitObject(LgsObject* obj) {
 void LgsCgFile::visitEnum(const LgsEnum* enum_) {
     for (const auto field : enum_->fields) {
         if (!field->expr) continue;
-        visitExpr(field->expr);
+        // visitExpr(field->expr);
     }
 }
 
@@ -445,12 +447,12 @@ void LgsCgFile::visitSwitch(LgsSwitch* switchStmt) {
     const auto v = cond->type->hashValue(cg, cond->IRValue);
     const auto switchInst = cg.builder.CreateSwitch(v, defaultBlock, switchStmt->patterns.size());
     for (size_t i = 0; i < switchStmt->patterns.size(); ++i) {
-        stack.enterScope(switchStmt);
-        const auto [expr, stmtsBlock] = switchStmt->patterns[i];
-        visitExpr(expr);
         const auto patternBlock = cg.createBlock(BLOCK_CASE_PREFIX + std::to_string(i));
-        const auto hashed = expr->type->hashValue(cg, expr->IRValue);
-        switchInst->addCase(llvm::dyn_cast<ConstantInt>(hashed), patternBlock);
+        const auto [expr, stmtsBlock] = switchStmt->patterns[i];
+        const auto val = expr->hashConstValue(cg);
+        const auto hashed = llvm::cast<ConstantInt>(val);
+        switchInst->addCase(hashed, patternBlock);
+        stack.enterScope(switchStmt);
         cg.startBlock(patternBlock);
         visitStmtsBlock(stmtsBlock);
         cg.builder.CreateBr(exitBlock);
@@ -757,7 +759,7 @@ void LgsCgFile::visitVariable(LgsVariable* variable, const bool assign) {
         break;
     case FIELD:
         if (variable->ref.field->type->asEnum()) {
-            variable->IRValue = cg.usize(variable->ref.field->position);
+            variable->IRValue = cg.usize(variable->ref.field->index);
         } else {
             variable->IRValue = variable->pointee;
         }
@@ -845,9 +847,17 @@ void LgsCgFile::visitFieldSelection(LgsVariable* var, LgsExpr* parent) {
     // Enum field
     if (const auto enumField = var->type->asEnumField()) {
         if (field->expr) {
-            var->IRValue = UndefValue::get(enumField->getIRType(cg));
-            var->IRValue = cg.builder.CreateInsertValue(var->IRValue, cg.usize(enumField->index), 0);
-            var->IRValue = cg.builder.CreateInsertValue(var->IRValue, field->expr->IRValue, 1);
+            const auto g = field->expr->getAsConst(cg);
+            const auto fieldTy = field->type->getIRType(cg);
+            if (var->pointee) {
+                var->IRValue = var->pointee;
+                cg.storeField(fieldTy, var->IRValue, 0, cg.usize(enumField->index));
+                cg.storeField(fieldTy, var->IRValue, 1, g);
+            } else {
+                var->IRValue = UndefValue::get(fieldTy);
+                var->IRValue = cg.builder.CreateInsertValue(var->IRValue, cg.usize(enumField->index), 0);
+                var->IRValue = cg.builder.CreateInsertValue(var->IRValue, g, 1);
+            }
         } else {
             var->IRValue = cg.usize(enumField->index);
         }

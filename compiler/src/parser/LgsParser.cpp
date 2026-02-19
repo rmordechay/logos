@@ -50,6 +50,7 @@
 #include "stmts/LgsSwitch.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsEnum.h"
+#include "types/LgsEnumField.h"
 #include "types/LgsGenericType.h"
 #include "types/LgsInterface.h"
 #include "types/LgsNullable.h"
@@ -473,7 +474,7 @@ LgsField* LgsParser::parseField(const size_t fieldPosition) {
     const auto field = new LgsField(nameToken.lexeme, type, expr);
     setLocation(field->location, &nameToken, &currentToken);
     field->setType(type);
-    field->position = fieldPosition;
+    field->index = fieldPosition;
     if (isPublic.has_value()) field->isPublic = isPublic.value();
     return field;
 }
@@ -595,10 +596,9 @@ LgsEnum* LgsParser::parseEnum() {
             expr = parseExpr();
             mustParse(expr);
         }
-        index++;
         const auto fieldType = new LgsEnumField(enum_->name, enumField.lexeme, index);
         const auto field = new LgsField(enumField.lexeme, fieldType, expr);
-        field->position = index;
+        field->index = index++;
         field->isMutable = false;
         setLocation(field->location, &enumField, &currentToken);
         enum_->fields.push_back(field);

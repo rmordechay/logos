@@ -52,8 +52,8 @@ struct LgsBaseMsg;
 class LgsFile;
 
 enum LgsCodeGenMode {
-    CG_MODE_RTTYPES,
-    CG_MODE_SRC_CODE,
+    CG_MODE_RTT,
+    CG_MODE_SRC,
     CG_MODE_GENERICS,
 };
 

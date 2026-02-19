@@ -7,10 +7,8 @@
 #include "LgsUtils.h"
 #include "codegen/LgsCodeGen.h"
 #include "exprs/LgsFuncCall.h"
-#include "exprs/constants/LgsIntConst.h"
 #include "funcs/LgsFunc.h"
 #include "types/iterables/LgsDArray.h"
-#include "types/iterables/LgsMap.h"
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsVoid.h"
 
@@ -115,10 +113,6 @@ size_t LgsIterable::getDims() const {
         }
     }
     return dims;
-}
-
-void LgsIterable::inferBaseType(const std::vector<LgsExpr*> elements) {
-
 }
 
 std::optional<int64_t> LgsIterable::getConstLength() {

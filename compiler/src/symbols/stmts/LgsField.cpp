@@ -23,9 +23,9 @@ Value* LgsField::getGEP(LgsCodeGen& cg, Value* parentIRPtr) {
     assert(parentType && parentIRPtr);
     const auto ty = parentType->getIRType(cg);
     if (parentType->asVec()) {
-        gep = cg.builder.CreateGEP(ty, parentIRPtr, {cg.zero32(), cg.i32(position)});
+        gep = cg.builder.CreateGEP(ty, parentIRPtr, {cg.zero32(), cg.i32(index)});
     } else {
-        gep = cg.builder.CreateStructGEP(ty, parentIRPtr, position);
+        gep = cg.builder.CreateStructGEP(ty, parentIRPtr, index);
     }
     return gep;
 }

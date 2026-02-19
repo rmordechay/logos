@@ -12,7 +12,7 @@ public:
     std::vector<LgsVarDec*> varDecs;
     LgsFunc mockFunc{"mock", &LGS_VOID, {&LGS_ANY, &LGS_ANY}};
 
-    explicit LgsTestFile(const fs::path& path) : LgsFile(path, CG_MODE_SRC_CODE) {}
+    explicit LgsTestFile(const fs::path& path) : LgsFile(path, CG_MODE_SRC) {}
     size_t hashFile() override;
     ~LgsTestFile() override;
 };

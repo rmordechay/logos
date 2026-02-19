@@ -208,7 +208,7 @@ Function* LgsMap::getGetFunc(LgsCodeGen& cg) {
     const auto valueTy = pairType->value->getStorageType(cg);
     const std::vector<Type*> params = {cg.ptrTy(), keyTy};
     const auto ft = cg.getFT(valueTy, params);
-    if (cg.mode == CG_MODE_SRC_CODE) {
+    if (cg.mode == CG_MODE_SRC) {
         return cg.getFunc(funcName, ft);
     }
 
@@ -268,7 +268,7 @@ Function* LgsMap::getAddFunc(LgsCodeGen& cg) {
     const auto keyType = pairType->key->getStorageType(cg);
     const auto valueTy = pairType->value->getStorageType(cg);
     const auto ft = cg.getFT(cg.voidTy(), {cg.ptrTy(), keyType, valueTy});
-    if (cg.mode == CG_MODE_SRC_CODE) {
+    if (cg.mode == CG_MODE_SRC) {
         return cg.getFunc(funcName, ft);
     }
 

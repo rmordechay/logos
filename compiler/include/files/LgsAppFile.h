@@ -19,7 +19,7 @@ public:
     std::vector<LgsStrConst*> searchPaths;
     std::vector<LgsStrConst*> libs;
 
-    explicit LgsAppFile(const fs::path& path) : LgsFile(path, CG_MODE_SRC_CODE) {}
+    explicit LgsAppFile(const fs::path& path) : LgsFile(path, CG_MODE_SRC) {}
     size_t hashFile() override;
     ~LgsAppFile() override;
 };

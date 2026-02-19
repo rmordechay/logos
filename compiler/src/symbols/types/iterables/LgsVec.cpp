@@ -18,7 +18,7 @@ LgsField* LgsVec::getField(const std::string& fieldName) {
     LgsField* field = nullptr;
     if (newFieldDim == 1) {
         field = new LgsField(fieldName, baseType);
-        field->position = getComponentIndex(fieldName[0]);
+        field->index = getComponentIndex(fieldName[0]);
     } else {
         field = new LgsField(fieldName, new LgsVec(newFieldDim));
     }

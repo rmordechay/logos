@@ -19,7 +19,7 @@ public:
     std::vector<LgsInterface*> interfaces;
     std::vector<LgsEnum*> enums;
 
-    explicit LgsMainFile(const fs::path& path) : LgsFile(path, CG_MODE_SRC_CODE) {}
+    explicit LgsMainFile(const fs::path& path) : LgsFile(path, CG_MODE_SRC) {}
     size_t hashFile() override;
     ~LgsMainFile() override;
 };

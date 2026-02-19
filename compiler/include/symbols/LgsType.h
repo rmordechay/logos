@@ -165,6 +165,7 @@ void freeTypes(std::vector<T*>& types) {
     types.clear();
 }
 
+LgsType* inferType(const std::vector<LgsExpr*>& elements);
 Value* loadRTTInfoName(LgsCodeGen& cg, Value* ptr);
 Value* loadRTTInfoSize(LgsCodeGen& cg, Value* ptr);
 Value* loadRTTInfoKind(LgsCodeGen& cg, Value* ptr);

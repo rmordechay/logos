@@ -33,7 +33,6 @@ public:
     LgsType* getNestedBaseType() const;
     void setNestedBaseType(LgsType* newBaseType);
     size_t getDims() const;
-    virtual void inferBaseType(std::vector<LgsExpr*> elements);
     virtual LgsType* getIndexType();
     virtual LgsType* getValueType();
     virtual std::optional<int64_t> getConstLength();

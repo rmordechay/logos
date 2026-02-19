@@ -33,7 +33,7 @@ public:
     LgsAppFile* appConfigFile = nullptr;
     std::vector<LgsApp*> importApps;
     std::string lgsCode; // Used when passing code directly
-    LgsFile rttFile{"rtt", CG_MODE_RTTYPES};
+    LgsFile rttFile{"rtt", CG_MODE_RTT};
 
     explicit LgsApp(const fs::path& rootPath = "") {
         paths.rootPath = rootPath;

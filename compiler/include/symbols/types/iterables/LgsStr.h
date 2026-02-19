@@ -32,6 +32,7 @@ public:
     static Type* getStrStruct(LgsCodeGen& cg);
     static void storeData(LgsCodeGen& cg, Value* ptr, Value* value);
     static Value* loadRTData(LgsCodeGen& cg, Value* value);
+    static Constant* getStrConst(LgsCodeGen& cg, const std::string& text);
 };
 
 inline LgsStr LGS_STR;

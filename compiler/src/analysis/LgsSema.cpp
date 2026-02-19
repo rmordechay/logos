@@ -153,6 +153,7 @@ void LgsSema::visitInterface(LgsInterface* interface) {
 
 void LgsSema::visitEnum(LgsEnum* enum_) {
     validateTypeName(enum_->name, enum_->location);
+    size_t exprsCount = 0;
     LgsType* baseType = nullptr;
     for (const auto field : enum_->fields) {
         if (!field->expr) continue;
@@ -160,18 +161,19 @@ void LgsSema::visitEnum(LgsEnum* enum_) {
             addError(E10077, field->expr->location);
             continue;
         }
-        field->type->passByRef = field->expr->type->passByRef;
         if (!baseType) {
             baseType = field->expr->type;
-            field->type->asEnum()->exprType = baseType;
-            continue;
-        }
-        if (!baseType->equals(field->expr->type)) {
+        } else if (!baseType->canCastTo(field->expr->type)) {
             addError(E10075, field->location);
+            break;
         }
         field->type->asEnum()->exprType = baseType;
+        exprsCount++;
     }
     enum_->exprType = baseType;
+    if (exprsCount != 0 && exprsCount != enum_->fields.size()) {
+        addError(E10118, enum_->location);
+    }
 }
 
 void LgsSema::visitField(LgsField* field) {
@@ -236,7 +238,7 @@ void LgsSema::visitMainFunc(LgsMainFunc* mainFunc) {
         }
         // Replaces dyn array to static array
         freeType(firstParam.type);
-        const auto sArray = new LgsSArray(new LgsStr(), new LgsIntConst(0));
+        const auto sArray = new LgsSArray(new LgsStr(), LGS_INT.getZeroValue());
         firstParam.setType(sArray);
         firstParam.expr = new LgsArrayExpr(sArray);
     }
@@ -854,7 +856,7 @@ void LgsSema::visitArrayExpr(LgsArrayExpr* arrayExpr) {
         validateExprType(element, arrayExpr->iterable->baseType);
     }
     if (!arrayExpr->iterable->baseType) {
-        arrayExpr->iterable->inferBaseType(arrayExpr->elements);
+        arrayExpr->iterable->baseType = inferType(arrayExpr->elements);
     }
     if (arrayExpr->type->asSArray()) {
         const auto sArr = arrayExpr->type->asSArray();
@@ -1762,6 +1764,7 @@ void LgsSema::addError(const LgsBaseMsg& lgsErr, const LgsLocation& location, co
 
 void LgsSema::addRTType(LgsType* type) const {
     if (!type || type->rttKind == RTT_UNKNOWN || type->isVoid()) return;
+    if (type->asEnumField()) return;
     file->symbolTable.rttTypes[type->getName()] = type;
 }
 
