@@ -63,10 +63,14 @@ public:
     LLVMContext context;
     LgsLLDBGen debugger;
     Module* IRModule = nullptr;
+    Value* currentLevel = nullptr;
     Function* currentFunc = nullptr;
+    Value* lastLevel = nullptr;
+    Function* lastFunc = nullptr;
     IRBuilder<> builder = IRBuilder(context);
     std::map<std::string, Type*> typesRegistry;
     IRBuilderBase::InsertPoint savedIP;
+    Value* startTime = nullptr;
 
     explicit LgsCodeGen(const LgsCodeGenMode mode) : mode(mode) {}
     void setupModule(const std::filesystem::path& file, bool debugMode = false);
@@ -82,7 +86,6 @@ public:
     Value* loadPtr(Value* value);
     Value* loadSize(Value* value);
     Value* isNull(Value* value);
-    Value* getLevel(Value* v);
     Value* emptyBuffer(size_t size = 0);
     void incSize(Value* bufferOffset, Value* ptr);
     void addNullTerminate(Value* strPtr, Value* pos);
@@ -91,23 +94,23 @@ public:
     void storeField(Type* parentType, Value* parentPtr, size_t position, Value* v);
     StructType* getStructType(const std::vector<Type*>& types, const std::string& name = "");
 
-    void callStackPush();
-    void callPopStack();
     Value* getCurrentLevel();
+    Value* getLevelAbove();
     Value* callHash(Value* type, Value* arg);
     Value* getVField(Value* objType, Value* objInstance, Value* fieldName);
     Value* getVFunc(Value* objType, Value* funcName);
-    Value* allocInCurrent(Value* size, bool setLevel);
-    Value* allocInLevel(Value* size, Value* level, bool setLevel);
-    Value* allocStr(Value* strPtr);
-    Value* allocEmptyStr(Value* length);
+    Value* alloc(Value* size, Value* level, bool setLevel);
+    Value* alloc(const std::string& baseName, Value* type, Value* level = nullptr);
     Value* reallocate(Value* ptr, Value* size, Value* level);
     Value* moveValue(const std::string& baseName, Value* v, Value* toLevel);
     void throwError(const LgsBaseMsg& err, const std::vector<Value*>& args = {});
 
     // Blocks
     BasicBlock* createBlock(const std::string& name = "", Function* parent = nullptr);
-    void startFunc(Function* parent = nullptr);
+    void startFunc(Function* func, bool isMain = false);
+    void saveFuncState();
+    void restoreFuncState();
+    void createRet(Value* rv = nullptr, bool isMain = false);
     void branch(BasicBlock* block);
     void startBlock(BasicBlock* block);
     void branchAndStartBlock(BasicBlock* block);

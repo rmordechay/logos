@@ -85,7 +85,7 @@ inline LgsBaseMsg E10070{"Invalid scalars %s for %s.", errCodeStart++};
 inline LgsBaseMsg E10071{"break if must be inside an if statement.", errCodeStart++};
 inline LgsBaseMsg E10072{"%s has multiple methods with the same name %s.", errCodeStart++};
 inline LgsBaseMsg E10073{"Vector elements can only be numbers or vectors.", errCodeStart++};
-inline LgsBaseMsg E10074{"Too many scalars for %s.", errCodeStart++};
+inline LgsBaseMsg E10074{"", errCodeStart++};
 inline LgsBaseMsg E10075{"Enum field values must all be the same type.", errCodeStart++};
 inline LgsBaseMsg E10076{"'%s' is not defined between %s and %s.", errCodeStart++}; // operation, left-expr, right-expr
 inline LgsBaseMsg E10077{"Enum value must be known at compile time.", errCodeStart++};
@@ -130,3 +130,4 @@ inline LgsBaseMsg E10115{"Wrong number of generic arguments. Expected: %s. Given
 inline LgsBaseMsg E10116{"Could not replace generic type %s with actual type.", errCodeStart++};
 inline LgsBaseMsg E10117{"Function call cannot be assigned to a value.", errCodeStart++};
 inline LgsBaseMsg E10118{"Enum fields must all have a value or none.", errCodeStart++};
+inline LgsBaseMsg E10119{"Function '%s' has no generics.", errCodeStart++};

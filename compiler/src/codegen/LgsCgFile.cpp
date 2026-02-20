@@ -144,6 +144,7 @@ void LgsCgFile::visitMainFunc(LgsMainFunc* func) {
 }
 
 void LgsCgFile::visitFunc(LgsFunc* func) {
+    if (!func->stmtsBlock) return;
     const auto ft = func->funcType;
     if (!ft->genericTypes.empty()) return;
     stack.enterScope(func);
@@ -476,8 +477,7 @@ void LgsCgFile::visitReturnStmt(LgsReturn* returnStmt) {
     const auto currentFunc = stack.currentFunc();
     const auto ft = currentFunc->funcType;
     if (ft->rt->isVoid()) {
-        cg.callPopStack();
-        cg.builder.CreateRetVoid();
+        cg.createRet();
     } else if (!currentFunc->returnStmts.empty()) {
         if (ft->swapReturn) {
             returnStmt->expr->pointee = currentFunc->getIRFunc(cg)->getArg(ft->isMethod);
@@ -666,7 +666,7 @@ void LgsCgFile::visitIntConst(LgsIntConst* intConst) {
 
 void LgsCgFile::visitStrConst(LgsStrConst* strConst) {
     if (strConst->parts.empty()) {
-        strConst->IRValue = cg.allocStr(cg.getString(strConst->value));
+        strConst->IRValue = cg.alloc(LgsStr::name, cg.getString(strConst->value));
         return;
     }
     std::vector<Value*> values;
@@ -681,7 +681,7 @@ void LgsCgFile::visitStrConst(LgsStrConst* strConst) {
             formatted.replace(pos, strlen(LGS_STR_FMT_PLACEHOLDER), "%s");
         }
     }
-    strConst->IRValue = cg.allocStr(cg.callSnprintf(formatted, values));
+    strConst->IRValue = cg.alloc(LgsStr::name, cg.callSnprintf(formatted, values));
 }
 
 void LgsCgFile::visitCharConst(LgsCharConst* charConst) {
@@ -1087,7 +1087,7 @@ void LgsCgFile::visitEnvVar(LgsEnvVar* envVar) {
     const std::vector<Type*> params = {cg.ptrTy(), cg.ptrTy()};
     const std::vector<Value*> IRArgs = {cg.getString(envVar->name), cg.emptyStr()};
     const auto env = cg.callLgsFunc(LgsSys::name, "getEnv", cg.ptrTy(), params, IRArgs);
-    envVar->IRValue = cg.allocStr(env);
+    envVar->IRValue = cg.alloc(LgsStr::name, env);
 }
 
 void LgsCgFile::visitCast(LgsCast* cast) {
@@ -1096,73 +1096,54 @@ void LgsCgFile::visitCast(LgsCast* cast) {
     cast->IRValue = cast->value->IRValue;
 }
 
-void LgsCgFile::visitLambda(LgsFunc* func) {
-    cg.savedIP = cg.builder.saveIP();
-    const auto originalFunc = cg.currentFunc;
-    func->IRValue = func->getIRFunc(cg);
-    visitFunc(func);
-    cg.currentFunc = originalFunc;
-    cg.builder.restoreIP(cg.savedIP);
+void LgsCgFile::visitLambda(LgsFunc* lambda) {
+    lambda->IRValue = lambda->getIRFunc(cg);
+    visitFunc(lambda);
 }
 
 void LgsCgFile::createPrologue(LgsFunc* func) {
     if (appConfigs->debugMode) func->setDebugValue(cg);
-    cg.currentFunc = func->getIRFunc(cg);
     func->epilogue = cg.createBlock("epilogue");
-    cg.startFunc(cg.currentFunc);
     const auto ft = func->funcType;
-    if (ft->name == LGS_MAIN_FUNC) {
-        cg.callRuntimeFunc("init", cg.voidTy());
-        startTime = cg.measureTimeStart();
-    } else {
-        if (func->isTest) for (auto [_, then] : func->mocks) visitExpr(then);
-        if (ft->isVariadic) {
-            ft->params.back().IRValue = cg.builder.CreateAlloca(cg.ptrTy(), nullptr, "va_list");
-            cg.callIntrinsics(Intrinsic::vastart, {cg.ptrTy()}, {ft->params.back().IRValue});
-        }
+    cg.startFunc(func->getIRFunc(cg), ft->name == LGS_MAIN_FUNC);
+    if (func->isTest) for (auto [_, then] : func->mocks) visitExpr(then);
+    if (ft->isVariadic) {
+        ft->params.back().IRValue = cg.builder.CreateAlloca(cg.ptrTy(), nullptr, "va_list");
+        cg.callIntrinsics(Intrinsic::vastart, {cg.ptrTy()}, {ft->params.back().IRValue});
     }
-    cg.callStackPush();
 }
 
 void LgsCgFile::createEpilogue(const LgsFunc* func) {
     const auto ft = func->funcType;
     // Main func
     if (ft->name == LGS_MAIN_FUNC) {
-        cg.callPopStack();
-        cg.callRuntimeFunc("close", cg.voidTy());
-        cg.callPrintf("Time taken: %zuns\n", {cg.measureTimeEnd(startTime)});
-        cg.builder.CreateRet(cg.i32(EXIT_SUCCESS));
+        cg.createRet(cg.i32(EXIT_SUCCESS), true);
+        cg.restoreFuncState();
         return;
     }
-
     if (ft->isVariadic) {
         cg.callIntrinsics(Intrinsic::vaend, {cg.ptrTy()}, {ft->params.back().IRValue});
     }
-
     // No return
     if (ft->rt->isVoid() && !cg.lastInstTerminator()) {
-        cg.callPopStack();
-        cg.builder.CreateRetVoid();
-        return;
-    }
-
-    // With return
-    auto& stmts = func->returnStmts;
-    assert(!stmts.empty());
-    cg.branchAndStartBlock(func->epilogue);
-    if (ft->swapReturn) {
-        cg.callPopStack();
-        cg.builder.CreateRetVoid();
-    } else {
-        const auto phi = cg.builder.CreatePHI(ft->rt->getStorageType(cg), stmts.size());
-        for (const auto returnStmt : stmts) {
-            phi->addIncoming(returnStmt->expr->IRValue, returnStmt->parentBlock);
+        cg.createRet();
+    } else { // With return
+        auto& stmts = func->returnStmts;
+        assert(!stmts.empty());
+        cg.branchAndStartBlock(func->epilogue);
+        if (ft->swapReturn) {
+            cg.createRet();
+        } else {
+            const auto phi = cg.builder.CreatePHI(ft->rt->getStorageType(cg), stmts.size());
+            for (const auto returnStmt : stmts) {
+                phi->addIncoming(returnStmt->expr->IRValue, returnStmt->parentBlock);
+            }
+            const auto toLevel = cg.builder.CreateSub(cg.getCurrentLevel(), cg.usize(1));
+            const auto v = ft->rt->isHeap ? ft->rt->moveValue(cg, phi, toLevel) : phi;
+            cg.createRet(v);
         }
-        const auto toLevel = cg.builder.CreateSub(cg.getCurrentLevel(), cg.usize(1));
-        const auto v = ft->rt->isHeap ? ft->rt->moveValue(cg, phi, toLevel) : phi;
-        cg.callPopStack();
-        cg.builder.CreateRet(v);
     }
+    cg.restoreFuncState();
 }
 
 void LgsCgFile::initMainArgs(const LgsMainFunc* mainFunc) const {
@@ -1201,20 +1182,18 @@ Function* LgsCgFile::getThunkFunc(const LgsFuncCall* fc, Type* ctxTy) {
     const auto funcName = fc->name + "Thunk";
     auto thunkFunc = cg.IRModule->getFunction(funcName);
     if (thunkFunc) return thunkFunc;
-    cg.savedIP = cg.builder.saveIP();
-
     const auto ft = cg.getFT(cg.voidTy(), {cg.ptrTy()});
     thunkFunc = cg.getFunc(funcName, ft, Function::PrivateLinkage);
+
     cg.startFunc(thunkFunc);
     for (size_t i = 0; i < fc->args.size(); i++) {
         const auto expr = fc->args[i].expr;
         expr->IRValue = cg.builder.CreateStructGEP(ctxTy, thunkFunc->arg_begin(), i);
         expr->IRValue = expr->loadIRPtr(cg);
     }
-
     fc->func->call(cg, fc->args);
-    cg.builder.CreateRetVoid();
-    cg.builder.restoreIP(cg.savedIP);
+    cg.createRet();
+    cg.restoreFuncState();
     return thunkFunc;
 }
 
@@ -1251,19 +1230,17 @@ void LgsCgFile::getMapFunc(LgsFuncType* mapFunc) {
     const auto& cbParam = mapFunc->params[1];
     const auto iterable = iterableParam.type->asIterable();
     const auto funcName = mapFunc->getName();
-
     const auto ft = llvm::cast<FunctionType>(mapFunc->getIRType(cg));
     const auto cbFt = llvm::cast<FunctionType>(cbParam.type->getIRType(cg));
     const auto func = cg.getFunc(funcName, ft);
-    cg.startFunc(func);
-    cg.callStackPush();
 
+    cg.startFunc(func);
     const auto iter = func->getArg(0);
     const auto cb = func->getArg(1);
 
     LgsDArray dArr(iterable->baseType);
     LgsArrayExpr retArr(&dArr);
-    visitArrayExpr(&retArr);
+    retArr.IRValue = cg.alloc(LgsDArray::name, dArr.baseType->getRTType(cg), cg.getLevelAbove());
     const auto len = iterable->lenIR(cg, iter);
 
     cg.loop(len, [&](Value* iValue, BasicBlock*) {
@@ -1273,8 +1250,8 @@ void LgsCgFile::getMapFunc(LgsFuncType* mapFunc) {
         dArr.addIRElement(cg, retArr.IRValue, nullptr, results);
     });
 
-    cg.callPopStack();
-    cg.builder.CreateRet(retArr.IRValue);
+    cg.createRet(retArr.IRValue);
+    cg.restoreFuncState();
 }
 
 void LgsCgFile::getFilterFunc(LgsFuncType* filterFunc) {
@@ -1286,15 +1263,14 @@ void LgsCgFile::getFilterFunc(LgsFuncType* filterFunc) {
     const auto ft = llvm::cast<FunctionType>(filterFunc->getIRType(cg));
     const auto cbFt = llvm::cast<FunctionType>(cbParam.type->getIRType(cg));
     const auto func = cg.getFunc(funcName, ft);
-    cg.startFunc();
-    cg.callStackPush();
+    cg.startFunc(func);
 
     const auto iter = func->getArg(0);
     const auto cb = func->getArg(1);
 
     LgsDArray dArr(iterable->baseType);
     LgsArrayExpr retArr(&dArr);
-    visitArrayExpr(&retArr);
+    retArr.IRValue = cg.alloc(LgsDArray::name, dArr.baseType->getRTType(cg), cg.getLevelAbove());
     const auto len = iterable->lenIR(cg, iter);
 
     cg.loop(len, [&](Value* iValue, BasicBlock*) {
@@ -1307,8 +1283,8 @@ void LgsCgFile::getFilterFunc(LgsFuncType* filterFunc) {
         });
     });
 
-    cg.callPopStack();
-    cg.builder.CreateRet(retArr.IRValue);
+    cg.createRet(retArr.IRValue);
+    cg.restoreFuncState();
 }
 
 void LgsCgFile::getForeachFunc(LgsFuncType* forEachFunc) {
@@ -1321,7 +1297,6 @@ void LgsCgFile::getForeachFunc(LgsFuncType* forEachFunc) {
     const auto cbFt = llvm::cast<FunctionType>(cbParam.type->getIRType(cg));
     const auto func = cg.getFunc(funcName, ft);
     cg.startFunc(func);
-    cg.callStackPush();
 
     const auto iter = func->getArg(0);
     const auto cb = func->getArg(1);
@@ -1333,6 +1308,6 @@ void LgsCgFile::getForeachFunc(LgsFuncType* forEachFunc) {
         cg.builder.CreateCall(cbFt, cb, {loadElement});
     });
 
-    cg.callPopStack();
-    cg.builder.CreateRetVoid();
+    cg.createRet();
+    cg.restoreFuncState();
 }

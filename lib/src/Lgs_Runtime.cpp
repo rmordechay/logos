@@ -19,31 +19,28 @@ extern "C" void Lgs_Runtime_push() {
 }
 
 extern "C" void Lgs_Runtime_pop() {
-    auto top = runtime.stack.at(runtime.level);
+    assert(runtime.level > 0);
+    auto& top = runtime.stack.at(runtime.level);
     for (auto [defer, ctx] : top.defers) defer(ctx);
     top.allocator.freeBlocks();
     runtime.level--;
 }
 
-extern "C" void* Lgs_Runtime_allocInCurrent(const size_t size, const bool setLevel) {
-    return runtime.stack.at(runtime.level).allocator.allocate(size, setLevel);
-}
-
-extern "C" void* Lgs_Runtime_allocInLevel(const size_t size, const size_t level, const bool setLevel) {
+extern "C" void* Lgs_Runtime_alloc(const size_t size, const size_t level, const bool setLevel) {
     return runtime.stack.at(level).allocator.allocate(size, setLevel);
 }
 
-extern "C" void* Lgs_Runtime_allocObject(Lgs_TypeInfo* type) {
-    const auto obj = runtime.stack.at(runtime.level).allocator.allocate(type->size, true);
+extern "C" void* Lgs_Runtime_allocObject(Lgs_TypeInfo* type, const size_t level) {
+    const auto obj = runtime.stack.at(level).allocator.allocate(type->size, true);
     const auto typePtr = reinterpret_cast<Lgs_TypeInfo**>(static_cast<char*>(obj) + sizeof(size_t));
     *typePtr = type;
     return obj;
 }
 
-extern "C" void* Lgs_Runtime_allocDArr(Lgs_TypeInfo* baseType) {
-    auto& allocator = runtime.stack.at(runtime.level).allocator;
+extern "C" void* Lgs_Runtime_allocDArray(Lgs_TypeInfo* baseType, const size_t level) {
+    auto& allocator = runtime.stack.at(level).allocator;
     const auto arr = allocator.allocate(sizeof(Lgs_DArrExpr), true);
-    const auto dataPtr = Lgs_Runtime_allocInCurrent(baseType->size * LGS_ITER_INIT_CAP, false);
+    const auto dataPtr = allocator.allocate(baseType->size * LGS_ITER_INIT_CAP, false);
     const auto arrExpr = static_cast<Lgs_DArrExpr*>(arr);
     arrExpr->baseType = baseType;
     arrExpr->capacity = LGS_ITER_INIT_CAP;
@@ -51,18 +48,10 @@ extern "C" void* Lgs_Runtime_allocDArr(Lgs_TypeInfo* baseType) {
     return arr;
 }
 
-extern "C" void* Lgs_Runtime_allocStr(char* str) {
+extern "C" void* Lgs_Runtime_allocStr(char* str, const size_t level) {
     const auto newPtr = runtime.stack.at(0).allocator.allocate(sizeof(Lgs_StrExpr), true);
     const auto newStr = static_cast<Lgs_StrExpr*>(newPtr);
     newStr->data = str;
-    return newStr;
-}
-
-extern "C" void* Lgs_Runtime_allocEmptyStr(const size_t length) {
-    auto& allocator = runtime.stack.at(runtime.level).allocator;
-    const auto newPtr = allocator.allocate(sizeof(Lgs_StrExpr), true);
-    const auto newStr = static_cast<Lgs_StrExpr*>(newPtr);
-    newStr->data = static_cast<char*>(allocator.allocate(length, false));
     return newStr;
 }
 
@@ -96,8 +85,7 @@ extern "C" void* Lgs_Runtime_moveObject(void* obj, const size_t toLevel) {
 extern "C" void* Lgs_Runtime_moveDArray(Lgs_DArrExpr* arr, const size_t toLevel) {
     if (arr->level <= toLevel) return arr;
     auto& allocator = runtime.stack.at(toLevel).allocator;
-    const auto newArr = static_cast<Lgs_DArrExpr*>(allocator.allocate(sizeof(Lgs_DArrExpr), false));
-    newArr->level = arr->level;
+    const auto newArr = static_cast<Lgs_DArrExpr*>(allocator.allocate(sizeof(Lgs_DArrExpr), true));
     newArr->baseType = arr->baseType;
     newArr->length = arr->length;
     newArr->capacity = arr->capacity;

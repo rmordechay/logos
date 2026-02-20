@@ -18,6 +18,7 @@
 #include <llvm/IR/Module.h>
 #include "LgsBinaryTokens.h"
 #include "LgsRTTIndices.h"
+#include "Lgs_Exprs.h"
 #include "codegen/LgsCgFile.h"
 #include "errors/LgsErrors.h"
 #include "types/LgsFieldType.h"
@@ -100,7 +101,9 @@ LgsFunc* LgsObject::getMetaFunc(const std::string& methodName) {
     if (methodName == OBJ_AS_JSON) {
         const auto func = new LgsFunc(methodName, new LgsStr());
         func->fn = [&](LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) {
-            const auto str = cg.allocEmptyStr(cg.usize(LGS_STR_BUFFER_SIZE));
+            const auto str = cg.alloc(cg.usize(sizeof(Lgs_StrExpr)), cg.currentLevel, true);
+            const auto data = cg.alloc(cg.usize(LGS_STR_BUFFER_SIZE), cg.currentLevel, false);
+            cg.storeField(LgsStr::getStrStruct(cg), str, LgsStrIndices::data, data);
             cg.builder.CreateCall(getJSONFunc(cg), {args.front().expr->IRValue, str});
             return str;
         };
@@ -258,7 +261,7 @@ Value* LgsObject::hashValue(LgsCodeGen& cg, Value* value) {
 }
 
 Value* LgsObject::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
-    return cg.callRuntimeFunc("allocObject", cg.ptrTy(), {cg.ptrTy()}, {getRTType(cg)});
+    return cg.alloc(metaName, getRTType(cg));
 }
 
 DIType* LgsObject::getDebugType(LgsCodeGen& cg) {
@@ -272,10 +275,9 @@ Function* LgsObject::getObjsEqFunc(LgsCodeGen& cg) const {
     if (cg.mode == CG_MODE_SRC) return cg.getFunc(funcName, ft);
 
     const auto func = cg.getFunc(funcName, ft);
-    cg.savedIP = cg.builder.saveIP();
+    cg.startFunc(func);
     const auto obj1 = func->getArg(0);
     const auto obj2 = func->getArg(1);
-    cg.startFunc(func);
 
     for (const auto field : fields) {
         const auto ty = field->type->getStorageType(cg);
@@ -283,12 +285,12 @@ Function* LgsObject::getObjsEqFunc(LgsCodeGen& cg) const {
         const auto gep2 = field->getGEP(cg, obj2);
         const auto ne = neIR(cg, cg.load(ty, gep1), cg.load(ty, gep2), field->type);
         cg.ifStmt(ne, [&cg] {
-            cg.builder.CreateRet(cg.false_());
+            cg.createRet(cg.false_());
         });
     }
 
-    cg.builder.CreateRet(cg.true_());
-    cg.builder.restoreIP(cg.savedIP);
+    cg.createRet(cg.true_());
+    cg.restoreFuncState();
     return func;
 }
 
@@ -299,9 +301,8 @@ Function* LgsObject::getObjsHashFunc(LgsCodeGen& cg) const {
     if (cg.mode == CG_MODE_SRC) return cg.getFunc(funcName, ft);
 
     const auto func = cg.getFunc(funcName, ft);
-    cg.savedIP = cg.builder.saveIP();
-    const auto instance = func->getArg(0);
     cg.startFunc(func);
+    const auto instance = func->getArg(0);
 
     Value* hash = cg.usize(0);
     for (const auto field : fields) {
@@ -312,8 +313,8 @@ Function* LgsObject::getObjsHashFunc(LgsCodeGen& cg) const {
         hash = cg.builder.CreateMul(hash, cg.usize(31));
     }
 
-    cg.builder.CreateRet(hash);
-    cg.builder.restoreIP(cg.savedIP);
+    cg.createRet(hash);
+    cg.restoreFuncState();
     return func;
 }
 
@@ -324,18 +325,17 @@ Function* LgsObject::getJSONFunc(LgsCodeGen& cg) {
     if (cg.mode == CG_MODE_SRC) return cg.getFunc(funcName, ft);
 
     const auto func = cg.getFunc(funcName, ft);
-    cg.savedIP = cg.builder.saveIP();
+    cg.startFunc(func);
     const auto self = func->getArg(0);
     const auto strBuffer = func->getArg(1);
-    cg.startFunc(func);
 
     LgsStrBuilder sb(cg, LgsStr::loadRTData(cg, strBuffer));
     sb.asJSON = true;
     asIRText(sb, self);
     sb.finalize();
 
-    cg.builder.CreateRetVoid();
-    cg.builder.restoreIP(cg.savedIP);
+    cg.createRet();
+    cg.restoreFuncState();
     return func;
 }
 
@@ -346,15 +346,14 @@ Function* LgsObject::getSetFieldFunc(LgsCodeGen& cg) {
     if (cg.mode == CG_MODE_SRC) return cg.getFunc(funcName, ft);
 
     const auto func = cg.getFunc(funcName, ft);
-    cg.savedIP = cg.builder.saveIP();
+    cg.startFunc(func);
     const auto self = func->getArg(0);
     const auto fieldNameArg = func->getArg(1);
     const auto value = func->getArg(2);
     const auto valueTy = func->getArg(3);
-    cg.startFunc(func);
 
     const auto fieldTy = cg.builder.CreateCall(getGetFieldFunc(cg), {self, fieldNameArg});
-    cg.ifStmt(cg.isNull(fieldTy), [&cg] { cg.builder.CreateRet(cg.false_()); });
+    cg.ifStmt(cg.isNull(fieldTy), [&cg] { cg.createRet(cg.false_()); });
     const auto fieldKind1 = LgsFieldType::loadRTKind(cg, fieldTy);
     const auto fieldKind2 = loadRTTInfoKind(cg, valueTy);
     const auto canCast = cg.callRuntimeFunc("canCast", cg.i1Ty(), {cg.i32Ty(), cg.i32Ty()}, {fieldKind1, fieldKind2});
@@ -369,8 +368,8 @@ Function* LgsObject::getSetFieldFunc(LgsCodeGen& cg) {
     const auto fieldPtr = cg.builder.CreatePtrAdd(self, offset);
     cg.callMemcpy(fieldPtr, value, fieldSize);
 
-    cg.builder.CreateRet(cg.true_());
-    cg.builder.restoreIP(cg.savedIP);
+    cg.createRet(cg.true_());
+    cg.restoreFuncState();
     return func;
 }
 
@@ -381,10 +380,9 @@ Function* LgsObject::getGetFieldFunc(LgsCodeGen& cg) {
     if (cg.mode == CG_MODE_SRC) return cg.getFunc(funcName, ft);
 
     const auto func = cg.getFunc(funcName, ft);
-    cg.savedIP = cg.builder.saveIP();
+    cg.startFunc(func);
     const auto self = func->getArg(0);
     const auto arg = func->getArg(1);
-    cg.startFunc(func);
 
     const auto fieldRTTStruct = LgsFieldType::getRTTStruct(cg);
     const auto instanceType = loadRTTInfoExtra(cg, LgsInstance::getInstanceRTType(cg, self));
@@ -395,12 +393,12 @@ Function* LgsObject::getGetFieldFunc(LgsCodeGen& cg) {
         const auto fieldTypePtr = cg.builder.CreateInBoundsGEP(fieldRTTStruct, fieldTypesPtr, {iValue});
         const auto fieldName = LgsFieldType::loadRTName(cg, fieldTypePtr);
         cg.ifStmt(eqIR(cg, fieldName, arg, &LGS_STR), [&cg, &fieldTypePtr] {
-            cg.builder.CreateRet(fieldTypePtr);
+            cg.createRet(fieldTypePtr);
         });
     });
 
-    cg.builder.CreateRet(cg.null());
-    cg.builder.restoreIP(cg.savedIP);
+    cg.createRet(cg.null());
+    cg.restoreFuncState();
     return func;
 }
 

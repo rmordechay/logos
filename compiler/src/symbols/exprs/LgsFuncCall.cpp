@@ -1,5 +1,4 @@
 #include "exprs/LgsFuncCall.h"
-#include "LgsDefinitions.h"
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
 #include "LgsUtils.h"
@@ -55,16 +54,6 @@ bool LgsFuncCall::equals(LgsExpr* other) {
     const auto otherFuncCall = other->asFuncCall();
     if (!otherFuncCall || !otherFuncCall->func) return false;
     return equals(otherFuncCall->func->funcType);
-}
-
-std::string LgsFuncCall::mangleName() const {
-    std::stringstream str;
-    str << "u_" << name;
-    for (size_t i = inSelection; i < args.size(); ++i) {
-        const auto arg = args[i];
-        str << '_' << arg.expr->type->getName();
-    }
-    return str.str();
 }
 
 std::string LgsFuncCall::asText() {

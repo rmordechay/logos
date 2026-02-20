@@ -160,10 +160,6 @@ Value* LgsCodeGen::isNull(Value* value) {
     return builder.CreateIsNull(value);
 }
 
-Value* LgsCodeGen::getLevel(Value* v) {
-    return load(sizeTy(), v);
-}
-
 Value* LgsCodeGen::emptyBuffer(const size_t size) {
     return builder.CreateAlloca(ArrayType::get(i8Ty(), size > 0 ? size : LGS_STR_BUFFER_SIZE));
 }
@@ -199,16 +195,14 @@ StructType* LgsCodeGen::getStructType(const std::vector<Type*>& types, const std
     return structType;
 }
 
-void LgsCodeGen::callStackPush() {
-    callRuntimeFunc("push", sizeTy());
-}
-
-void LgsCodeGen::callPopStack() {
-    callRuntimeFunc("pop", voidTy());
-}
-
 Value* LgsCodeGen::getCurrentLevel() {
-    return callRuntimeFunc("getCurrentLevel", sizeTy());
+    const auto runtimeFunc = callRuntimeFunc("getCurrentLevel", sizeTy());
+    runtimeFunc->setName("currentLevel");
+    return runtimeFunc;
+}
+
+Value* LgsCodeGen::getLevelAbove() {
+    return builder.CreateSub(currentLevel, usize(1));
 }
 
 Value* LgsCodeGen::callHash(Value* type, Value* arg) {
@@ -223,22 +217,13 @@ Value* LgsCodeGen::getVFunc(Value* objType, Value* funcName) {
     return callRuntimeFunc("getVFunc", ptrTy(), {ptrTy(), ptrTy()}, {objType, funcName});
 }
 
-Value* LgsCodeGen::allocInCurrent(Value* size, const bool setLevel) {
-    assert(size);
-    return callRuntimeFunc("allocInCurrent", ptrTy(), {sizeTy(), i1Ty()}, {size, i1(setLevel)});
-}
-
-Value* LgsCodeGen::allocInLevel(Value* size, Value* level, const bool setLevel) {
+Value* LgsCodeGen::alloc(Value* size, Value* level, const bool setLevel) {
     assert(size && level);
-    return callRuntimeFunc("allocInLevel", ptrTy(), {sizeTy(), sizeTy(), i1Ty()}, {size, level, i1(setLevel)});
+    return callRuntimeFunc("alloc", ptrTy(), {sizeTy(), sizeTy(), i1Ty()}, {size, level, i1(setLevel)});
 }
 
-Value* LgsCodeGen::allocStr(Value* strPtr) {
-    return callRuntimeFunc("allocStr", ptrTy(), {ptrTy()}, {strPtr});
-}
-
-Value* LgsCodeGen::allocEmptyStr(Value* length) {
-    return callRuntimeFunc("allocEmptyStr", ptrTy(), {sizeTy()}, {length});
+Value* LgsCodeGen::alloc(const std::string& baseName, Value* type, Value* level) {
+    return callRuntimeFunc("alloc" + baseName, ptrTy(), {ptrTy(), sizeTy()}, {type, level ? level : currentLevel});
 }
 
 Value* LgsCodeGen::reallocate(Value* ptr, Value* size, Value* level) {
@@ -262,9 +247,39 @@ BasicBlock* LgsCodeGen::createBlock(const std::string& name, Function* parent) {
     return BasicBlock::Create(context, name, parent);
 }
 
-void LgsCodeGen::startFunc(Function* parent) {
-    const auto entryBlock = BasicBlock::Create(context, BLOCK_ENTRY, parent);
+void LgsCodeGen::startFunc(Function* func, const bool isMain) {
+    saveFuncState();
+    const auto entryBlock = BasicBlock::Create(context, BLOCK_ENTRY, func);
     builder.SetInsertPoint(entryBlock);
+    if (isMain) {
+        callRuntimeFunc("init", voidTy());
+        startTime = measureTimeStart();
+    }
+    callRuntimeFunc("push", sizeTy());
+    currentFunc = func;
+    currentLevel = getCurrentLevel();
+}
+
+void LgsCodeGen::saveFuncState() {
+    savedIP = builder.saveIP();
+    lastFunc = currentFunc;
+    lastLevel = currentLevel;
+}
+
+void LgsCodeGen::restoreFuncState() {
+    builder.restoreIP(savedIP);
+    currentFunc = lastFunc;
+    currentLevel = lastLevel;
+}
+
+void LgsCodeGen::createRet(Value* rv, const bool isMain) {
+    callRuntimeFunc("pop", voidTy());
+    if (isMain) {
+        callRuntimeFunc("close", voidTy());
+        callPrintf("Time taken: %zuns\n", {measureTimeEnd(startTime)});
+    }
+    if (rv) builder.CreateRet(rv);
+    else builder.CreateRetVoid();
 }
 
 void LgsCodeGen::branch(BasicBlock* block) {

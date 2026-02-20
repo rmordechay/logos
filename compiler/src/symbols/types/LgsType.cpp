@@ -121,7 +121,7 @@ Constant* LgsType::getRTType(LgsCodeGen& cg) {
     if (cg.mode == CG_MODE_RTT) {
         const auto extra = getRTTypeExtra(cg);
         const std::vector<Constant*> args = {
-            cg.getString(rttName),
+            cg.getString(getName()),
             IRSize(cg),
             cg.i32(rttKind),
             cg.i1(isHeap),
@@ -130,7 +130,7 @@ Constant* LgsType::getRTType(LgsCodeGen& cg) {
         };
         initializer = ConstantStruct::get(baseStruct, args);
     }
-    return cg.createGlobal(getName(), baseStruct, initializer);
+    return cg.createGlobal(rttName, baseStruct, initializer);
 }
 
 ConstantInt* LgsType::IRSize(LgsCodeGen& cg) {
@@ -458,16 +458,12 @@ Value* loadAsVec(LgsCodeGen& cg, Value* v, Type* vecType) {
     return cg.load(vecType, v);
 }
 
-std::pair<Value*, Value*> loadNumberPair(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
-    const auto ty = type->getIRType(cg);
-    if (type->isInt) return {loadAsInt(cg, left, ty), loadAsInt(cg, right, ty)};
-    if (type->isFloat) return {loadAsFloat(cg, left, ty), loadAsFloat(cg, right, ty)};
-    assert(0);
+std::string getTypeName(LgsType* type) {
+    return type ? type->getName() : LGS_UNKNOWN_TYPE;
 }
 
-std::pair<Value*, Value*> loadVecPair(LgsCodeGen& cg, Value* left, Value* right, LgsType* vec) {
-    const auto ty = vec->getIRType(cg);
-    return {loadAsVec(cg, left, ty), loadAsVec(cg, right, ty)};
+std::string getPrettyName(LgsType* type) {
+    return type ? type->pname() : LGS_UNKNOWN_TYPE;
 }
 
 LgsType* inferType(const std::vector<LgsExpr*>& elements) {
@@ -483,4 +479,16 @@ LgsType* inferType(const std::vector<LgsExpr*>& elements) {
         }
     }
     return result;
+}
+
+std::pair<Value*, Value*> loadNumberPair(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
+    const auto ty = type->getIRType(cg);
+    if (type->isInt) return {loadAsInt(cg, left, ty), loadAsInt(cg, right, ty)};
+    if (type->isFloat) return {loadAsFloat(cg, left, ty), loadAsFloat(cg, right, ty)};
+    assert(0);
+}
+
+std::pair<Value*, Value*> loadVecPair(LgsCodeGen& cg, Value* left, Value* right, LgsType* vec) {
+    const auto ty = vec->getIRType(cg);
+    return {loadAsVec(cg, left, ty), loadAsVec(cg, right, ty)};
 }

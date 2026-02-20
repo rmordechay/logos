@@ -44,7 +44,7 @@ LgsFunc* LgsIterable::getMethod(const std::string& methodName) {
         const auto U = new LgsGenericType("T");
         const auto T = new LgsGenericType("U");
         const auto callback = new LgsFuncType("cb", U, {LgsParam(T)});
-        const auto func = new LgsFunc(methodName, getBaseName(), new LgsDArray(U), {this, callback}, flags);
+        const auto func = new LgsFunc(methodName, getBaseName(), new LgsDArray(U), {new LgsDArray(T), callback}, flags);
         func->funcType->genericTypes.push_back(T);
         func->funcType->genericTypes.push_back(U);
         callback->genericTypes.push_back(T);

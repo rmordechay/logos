@@ -26,7 +26,6 @@ public:
     LgsSymbol ref;
 
     explicit LgsFuncCall(const std::string& name) : name(name) {}
-    std::string mangleName() const;
     bool equals(LgsExpr* other) override;
     bool equals(LgsFuncType* funcType) const;
     std::string asText() override;

@@ -125,7 +125,7 @@ public:
     void visitHashMap(LgsHashMap* hashMap);
     void visitEnvVar(LgsEnvVar* envVar);
     void visitCast(LgsCast* cast);
-    void visitLambda(LgsFunc* func);
+    void visitLambda(LgsFunc* lambda);
 
     // Funcs
     void createPrologue(LgsFunc* func);

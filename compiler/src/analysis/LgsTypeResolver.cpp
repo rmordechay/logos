@@ -44,10 +44,10 @@ void LgsTypeResolver::resolveType(LgsType*& type) {
     }
 
     if (type->isUnknown()) {
-        auto typeName = type->getName();
+        const auto typeName = type->getName();
         const auto newType = findSymbol(typeName);
         if (!newType) {
-            errHandler.addError(E10006, &type->location, file->path, {typeName});
+            errHandler.addError(E10006, &type->location, file->path, {type->pname()});
             return;
         }
         freeType(type);

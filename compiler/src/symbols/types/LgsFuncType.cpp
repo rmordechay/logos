@@ -40,8 +40,7 @@ std::string LgsFuncType::getName() {
     if (parentName != "") str << parentName << "_";
     str << name;
     for (size_t i = isMethod; i < params.size(); ++i) {
-        const auto& param = params[i];
-        str << '_' << param.type->getName();
+        str << '_' << getTypeName(params[i].type);
     }
     if (isCoroutine) str << LGS_CORO_SUFFIX;
     return str.str();
@@ -52,13 +51,11 @@ std::string LgsFuncType::pname() {
     str << (isLambda ? "" : name) << '(';
     for (size_t i = isMethod; i < params.size(); ++i) {
         const auto param = params[i];
-        if (param.type) str << param.type->pname();
-        else  str << LGS_UNKNOWN_TYPE;
+        str << getPrettyName(param.type);
         if (param.expr) str << " = " << param.expr->asText();
         if (i != params.size() - 1) str << ", ";
     }
-    if (rt) str << "): " << rt->pname();
-    else str << "): " << LGS_UNKNOWN_TYPE;
+    str << "): " << getPrettyName(rt);
     return str.str();
 }
 
@@ -76,7 +73,8 @@ bool LgsFuncType::canCastTo(LgsType* other) {
     for (size_t i = isMethod; i < params.size(); ++i) {
         const auto thisType = params[i].type;
         const auto otherType = otherFuncType->params[i].type;
-        if (!thisType || !otherType) return false;
+        if (!otherType) return false;
+        if (!thisType) continue;
         if (!thisType->canCastTo(otherType)) return false;
     }
     return true;
@@ -109,8 +107,9 @@ void LgsFuncType::replaceGenerics(std::unordered_map<std::string, LgsType*>& rep
     if (r == replacements.end()) return;
     const auto replFuncType = r->second->asFuncType();
     for (size_t i = 0; i < params.size(); ++i) {
-        auto& repl = replacements[params[i].type->getName()];
-        if (!replacements.contains(params[i].type->getName())) continue;
+        auto paramName = params[i].type->getName();
+        auto& repl = replacements[paramName];
+        if (!replacements.contains(paramName)) continue;
         if (!repl) repl = replFuncType->params[i].type;
         assert(!repl->hasGenerics());
         params[i].type = repl;

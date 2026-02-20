@@ -105,7 +105,7 @@ Constant* LgsDArray::getRTTypeExtra(LgsCodeGen& cg) {
 }
 
 Value* LgsDArray::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
-    return cg.callRuntimeFunc("allocDArr", cg.ptrTy(), {cg.ptrTy()}, {baseType->getRTType(cg)});
+    return cg.alloc(name, baseType->getRTType(cg));
 }
 
 Value* LgsDArray::lenIR(LgsCodeGen& cg, Value* iterable) {
@@ -128,7 +128,7 @@ Value* LgsDArray::getIRElement(LgsCodeGen& cg, Value* iterable, Value* index) {
 void LgsDArray::addIRElement(LgsCodeGen& cg, Value* iterable, Value* index, Value* value) {
     assert(!index);
     if (baseType->isHeap) {
-        value = cg.moveValue(baseType->getBaseName(), value, cg.getLevel(iterable));
+        value = cg.moveValue(baseType->getBaseName(), value, cg.load(cg.sizeTy(), iterable));
     }
     cg.builder.CreateCall(getAddFunc(cg), {iterable, value});
 }
@@ -160,21 +160,20 @@ Function* LgsDArray::getAddFunc(LgsCodeGen& cg) {
     if (cg.mode == CG_MODE_SRC) return cg.getFunc(funcName, ft);
 
     // Prologue
-    cg.savedIP = cg.builder.saveIP();
     const auto func = cg.getFunc(funcName, ft);
-    const auto needsResizeBlock = cg.createBlock("resize");
-    const auto exitBlock = cg.createBlock(BLOCK_EXIT);
     cg.startFunc(func);
-
-    const auto ty = getIRType(cg);
     const auto arrIR = func->getArg(0);
     const auto elementIR = func->getArg(1);
+
+    const auto ty = getIRType(cg);
     const auto dataGEP = cg.builder.CreateStructGEP(ty, arrIR, LgsDArrExprIndices::data);
     const auto lenGEP = cg.builder.CreateStructGEP(ty, arrIR, LgsDArrExprIndices::length);
     const auto capGEP = cg.builder.CreateStructGEP(ty, arrIR, LgsDArrExprIndices::capacity);
 
     auto len = cg.loadSize(lenGEP);
     const auto cap = cg.loadSize(capGEP);
+    const auto needsResizeBlock = cg.createBlock("resize");
+    const auto exitBlock = cg.createBlock(BLOCK_EXIT);
     const auto needsResize = cg.builder.CreateICmpSGE(len, cap);
     cg.builder.CreateCondBr(needsResize, needsResizeBlock, exitBlock);
 
@@ -184,7 +183,7 @@ Function* LgsDArray::getAddFunc(LgsCodeGen& cg) {
     const auto newCap = cg.builder.CreateMul(cap, cg.usize(2));
     const auto baseTypeSize = baseType->IRSize(cg);
     const auto newSize = cg.builder.CreateMul(newCap, baseTypeSize);
-    const auto level = cg.getLevel(arrIR);
+    const auto level = cg.load(cg.sizeTy(), arrIR);
     const auto newPtr = cg.reallocate(data, newSize, level);
     cg.store(newPtr, dataGEP);
     cg.storeField(ty, arrIR, LgsDArrExprIndices::capacity, newCap);
@@ -201,8 +200,8 @@ Function* LgsDArray::getAddFunc(LgsCodeGen& cg) {
     const auto inc = cg.builder.CreateAdd(len, cg.usize(1));
     cg.storeField(ty, arrIR, LgsDArrExprIndices::length, inc);
 
-    cg.builder.CreateRetVoid();
-    cg.builder.restoreIP(cg.savedIP);
+    cg.createRet();
+    cg.restoreFuncState();
     return func;
 }
 
@@ -224,10 +223,11 @@ Function* LgsDArray::getContainsFunc(LgsCodeGen& cg) {
         const auto elementPtr = getIRElement(cg, arrIR, size.IRValue);
         const auto element = cg.load(baseType->getStorageType(cg), elementPtr);
         const auto elementsAreEqual = eqIR(cg, value, element, baseType);
-        cg.ifStmt(elementsAreEqual, [&cg] {cg.builder.CreateRet(cg.true_());});
+        cg.ifStmt(elementsAreEqual, [&cg] {cg.createRet(cg.true_());});
     });
 
-    cg.builder.CreateRet(cg.false_());
+    cg.createRet(cg.false_());
+    cg.restoreFuncState();
     return func;
 }
 
@@ -238,21 +238,20 @@ Function* LgsDArray::getEqFunc(LgsCodeGen& cg) {
     if (cg.mode == CG_MODE_SRC) return cg.getFunc(funcName, ft);
     const auto func = cg.getFunc(funcName, ft);
 
-    cg.savedIP = cg.builder.saveIP();
     cg.startFunc(func);
-    const auto ty = getIRType(cg);
-
     const auto arrIR1 = func->getArg(0);
     const auto arrIR2 = func->getArg(1);
+
+    const auto ty = getIRType(cg);
     const auto len1 = lenIR(cg, arrIR1);
     const auto len2 = lenIR(cg, arrIR2);
-    cg.ifStmt(cg.builder.CreateICmpNE(len1, len2), [&cg] {cg.builder.CreateRet(cg.false_());});
+    cg.ifStmt(cg.builder.CreateICmpNE(len1, len2), [&cg] {cg.createRet(cg.false_());});
     const auto data1 = cg.builder.CreateStructGEP(ty, arrIR1, LgsDArrExprIndices::data);
     const auto data2 = cg.builder.CreateStructGEP(ty, arrIR2, LgsDArrExprIndices::data);
     const auto size = cg.builder.CreateMul(len1, baseType->IRSize(cg));
 
-    cg.builder.CreateRet(cg.true_());
-    cg.builder.restoreIP(cg.savedIP);
+    cg.createRet(cg.true_());
+    cg.restoreFuncState();
     return func;
 }
 

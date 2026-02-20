@@ -51,5 +51,6 @@ public:
     void initFunc(const std::string& name, LgsType* rt, const std::vector<LgsParam>& params, uint32_t ops);
     void setDebugValue(LgsCodeGen& cg) override;
     void hashNode(size_t& oldHash) override;
+    void inferRetType() const;
     ~LgsFunc() override;
 };

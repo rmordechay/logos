@@ -43,8 +43,7 @@ std::string LgsVec::getName() {
 
 std::string LgsVec::pname() {
     auto s = name + std::to_string(dimVec);
-    if (baseType) s += '<' + baseType->getName() + '>';
-    else s += LGS_UNKNOWN_TYPE;
+    s += '<' + getPrettyName(baseType) + '>';
     return s;
 }
 
@@ -376,14 +375,10 @@ Function* getDotProductFunc(LgsCodeGen& cg, LgsVec* vecType) {
     const auto name = LGS_PREFIX + vecType->getName() + "_Dot";
     auto func = cg.IRModule->getFunction(name);
     if (func) return func;
-
-    cg.savedIP = cg.builder.saveIP();
-    const auto originalFunc = cg.currentFunc;
-
     const auto params = {vecType->getIRType(cg), vecType->getIRType(cg)};
     func = cg.getFunc(name, cg.getFT(cg.floatTy(), params));
-    const auto entryBlock = cg.createBlock(BLOCK_ENTRY, func);
-    cg.builder.SetInsertPoint(entryBlock);
+
+    cg.startFunc(func);
     Value* l = func->getArg(0);
     Value* r = func->getArg(1);
 
@@ -408,10 +403,9 @@ Function* getDotProductFunc(LgsCodeGen& cg, LgsVec* vecType) {
         const auto mulW = cg.builder.CreateFMul(lw, rw);
         result = cg.builder.CreateFAdd(result, mulW);
     }
-    cg.builder.CreateRet(result);
 
-    cg.currentFunc = originalFunc;
-    cg.builder.restoreIP(cg.savedIP);
+    cg.createRet(result);
+    cg.restoreFuncState();
     return func;
 }
 
@@ -420,14 +414,11 @@ Function* getCrossProductFunc(LgsCodeGen& cg, LgsVec* vecType) {
     const auto name = LGS_PREFIX + vecType->getName() + "_Cross";
     auto func = cg.IRModule->getFunction(name);
     if (func) return func;
-
-    cg.savedIP = cg.builder.saveIP();
-    const auto originalFunc = cg.currentFunc;
     const auto ty = vecType->getIRType(cg);
     const std::vector<Type*> params = {cg.ptrTy(), ty, ty};
     func = cg.getFunc(name, cg.getFT(cg.voidTy(), params));
-    const auto entryBlock = cg.createBlock(BLOCK_ENTRY, func);
-    cg.builder.SetInsertPoint(entryBlock);
+
+    cg.startFunc(func);
     Value* result = func->getArg(0);
     Value* l = func->getArg(1);
     Value* r = func->getArg(2);
@@ -442,14 +433,11 @@ Function* getCrossProductFunc(LgsCodeGen& cg, LgsVec* vecType) {
     const auto cx = cg.builder.CreateFSub(cg.builder.CreateFMul(ly, rz), cg.builder.CreateFMul(lz, ry));
     const auto cy = cg.builder.CreateFSub(cg.builder.CreateFMul(lz, rx), cg.builder.CreateFMul(lx, rz));
     const auto cz = cg.builder.CreateFSub(cg.builder.CreateFMul(lx, ry), cg.builder.CreateFMul(ly, rx));
-
     cg.storeField(ty, result, 0, cx);
     cg.storeField(ty, result, 1, cy);
     cg.storeField(ty, result, 2, cz);
-    cg.builder.CreateRetVoid();
 
-    // Restore state
-    cg.currentFunc = originalFunc;
-    cg.builder.restoreIP(cg.savedIP);
+    cg.createRet();
+    cg.restoreFuncState();
     return func;
 }

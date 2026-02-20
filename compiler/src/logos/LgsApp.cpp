@@ -350,6 +350,8 @@ bool LgsApp::generateMainFile() {
     if (configs.isTestRun) {
         const auto mainFile = new LgsMainFile(std::string("t") + LGS_MAIN_FILE);
         const auto mainFunc = new LgsMainFunc();
+        mainFile->funcs[LGS_MAIN_FUNC] = mainFunc;
+        srcFiles.push_back(mainFile);
         mainFile->setupCodeGen(configs);
         auto& cg = mainFile->cgFile.cg;
         const auto func = mainFunc->getIRFunc(cg);
@@ -361,9 +363,8 @@ bool LgsApp::generateMainFile() {
                 cg.builder.CreateCall(test->getIRFunc(cg));
             }
         }
-        cg.builder.CreateRet(cg.i32(0));
-        mainFile->funcs[LGS_MAIN_FUNC] = mainFunc;
-        srcFiles.push_back(mainFile);
+        cg.createRet(cg.i32(0));
+        cg.restoreFuncState();
         return mainFile->cgFile.cg.writeIRModule(paths, 0);
     }
     const auto mainFile = getMainFile();
@@ -420,8 +421,17 @@ bool LgsApp::generateGenerics() {
 
     LgsObject::getGetFieldFunc(cgFile.cg);
     LgsObject::getSetFieldFunc(cgFile.cg);
-    for (const auto& [_, genericFunc] : genericsFuncs) {
-        cgFile.visitFunc(genericFunc);
+    for (const auto& [_, func] : genericsFuncs) {
+        const auto isBuiltin = func->funcType->isBuiltin;
+        if (isBuiltin && func->funcType->name == MAP_FUNC) {
+            cgFile.getMapFunc(func->funcType);
+        } else if (isBuiltin && func->funcType->name == FILTER_FUNC) {
+            cgFile.getFilterFunc(func->funcType);
+        } else if (isBuiltin && func->funcType->name == FOREACH_FUNC) {
+            cgFile.getForeachFunc(func->funcType);
+        } else {
+            cgFile.visitFunc(func);
+        }
     }
     for (const auto [_, genericType] : genericsTypes) {
         if (const auto dArr = genericType->asDArray()) {
@@ -437,16 +447,6 @@ bool LgsApp::generateGenerics() {
             obj->getObjsEqFunc(cgFile.cg);
             obj->getObjsHashFunc(cgFile.cg);
             obj->getJSONFunc(cgFile.cg);
-        } else if (const auto func = genericType->asFuncType()) {
-            if (func->name == MAP_FUNC) {
-                cgFile.getMapFunc(func);
-            } else if (func->name == FILTER_FUNC) {
-                cgFile.getFilterFunc(func);
-            } else if (func->name == FOREACH_FUNC) {
-                cgFile.getForeachFunc(func);
-            } else {
-                assert(0);
-            }
         } else {
             assert(0);
         }

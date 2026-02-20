@@ -1,11 +1,9 @@
 #include "exprs/LgsVariable.h"
 #include "exprs/LgsInstance.h"
 #include "funcs/LgsParam.h"
-#include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsNullable.h"
 #include <codegen/LgsCodeGen.h>
-#include "types/LgsEnum.h"
 
 bool LgsVariable::equals(LgsExpr* other) {
     const auto otherVar = other->asVariable();

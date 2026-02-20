@@ -6,7 +6,7 @@ static constexpr auto align = alignof(std::max_align_t) - 1;
 
 void* Lgs_Allocator::allocate(const size_t size, const bool withLevel) {
     auto offset = currentOffset + align & ~align;
-    if (!currentBlock || offset + size > BLOCK_SIZE) {
+    if (!currentBlock || offset + size >= BLOCK_SIZE) {
         const auto blockSize = std::max(BLOCK_SIZE, size);
         currentBlock = mmap(nullptr, blockSize, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
         blocks.push_back(currentBlock);
@@ -23,4 +23,6 @@ void Lgs_Allocator::freeBlocks() {
         munmap(block, BLOCK_SIZE);
     }
     blocks.clear();
+    currentOffset = 0;
+    currentBlock = nullptr;
 }

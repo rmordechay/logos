@@ -17,11 +17,11 @@ public:
     std::string getName() override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
-    Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee) override;
     bool canCastTo(LgsType* other) override;
-    LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     std::optional<int64_t> getConstLength() override;
+    LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     void asIRText(LgsStrBuilder& sb, Value* ptr) override;
+    Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee) override;
     Value* getIRElement(LgsCodeGen& cg, Value* iterable, Value* index) override;
     Value* addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
     Value* lenIR(LgsCodeGen& cg, Value* iterable) override;

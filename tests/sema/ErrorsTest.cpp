@@ -743,14 +743,17 @@ TEST(ErrorsTest, E10097A) {
 
 TEST(ErrorsTest, E10105A) {
     const auto code = R"(
+    func(arr: Int[2]) {
+        print(arr)
+    }
     main() {
         arr: Str[2][2] = [["text1"], ["text"], ["text"]]
-        print(arr)
+        func([1, 2, 3])
     }
     )";
     LgsApp app;
     parseAndAnalyse(app, {code}, {LGS_MAIN_FILE});
-    expectErrors(app, E10105, 1);
+    expectErrors(app, E10105, 2);
 }
 
 TEST(ErrorsTest, E100108A) {
@@ -804,4 +807,16 @@ TEST(ErrorsTest, E100118A) {
     LgsApp app;
     parseAndAnalyse(app, {code}, {LGS_MAIN_FILE});
     expectErrors(app, E10118, 1);
+}
+
+TEST(ErrorsTest, E100119A) {
+    const auto code = R"(
+    func() {}
+    main() {
+        func<Int>()
+    }
+    )";
+    LgsApp app;
+    parseAndAnalyse(app, {code}, {LGS_MAIN_FILE});
+    expectErrors(app, E10119, 1);
 }

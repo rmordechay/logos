@@ -3,7 +3,6 @@
 #include "types/iterables/LgsMap.h"
 #include "types/iterables/LgsVec.h"
 #include "LgsUtils.h"
-#include "types/iterables/LgsMatrix.h"
 #include <sstream>
 #include <llvm/IR/Module.h>
 

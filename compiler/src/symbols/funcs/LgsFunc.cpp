@@ -1,5 +1,4 @@
 #include "funcs/LgsFunc.h"
-
 #include "LgsDefinitions.h"
 #include "stmts/LgsStmtsBlock.h"
 #include "exprs/LgsExpr.h"
@@ -11,6 +10,8 @@
 #include "codegen/LgsCodeGen.h"
 #include <sstream>
 #include <llvm/IR/Module.h>
+
+#include "stmts/LgsReturn.h"
 #include "types/LgsObject.h"
 
 
@@ -29,12 +30,12 @@ LgsExpr* LgsFunc::cast(LgsType* toType, const bool explicitly) {
         for (size_t i = 0; i < funcType->params.size(); ++i) {
             auto& thisParam = funcType->params[i];
             const auto newType = toFuncType->params[i].type;
-            if (thisParam.type || newType->hasGenerics()) continue;
+            if (thisParam.type) continue;
             thisParam.setType(newType);
         }
     }
     // Return type
-    if (!funcType->rt && !toFuncType->rt->hasGenerics()) {
+    if (!funcType->rt) {
         funcType->rt = toFuncType->rt;
     }
     return this;
@@ -182,6 +183,11 @@ void LgsFunc::setDebugValue(LgsCodeGen& cg) {
 void LgsFunc::hashNode(size_t& oldHash) {
     funcType->hashNode(oldHash);
     stmtsBlock->hashNode(oldHash);
+}
+
+void LgsFunc::inferRetType() const {
+    if (funcType->rt || returnStmts.empty()) return;
+    funcType->rt = returnStmts.front()->expr->type;
 }
 
 LgsFunc::~LgsFunc() {
