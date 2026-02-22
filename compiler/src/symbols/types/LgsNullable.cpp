@@ -124,6 +124,10 @@ Value* LgsNullable::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     return passByRef ? applyPtrBinOp(cg, binExpr, f) : applyNumberBinOp(cg, binExpr, f);
 }
 
+Value* LgsNullable::hashValue(LgsCodeGen& cg, Value* value) {
+    assert(0);
+}
+
 void LgsNullable::setIRFields(LgsCodeGen& cg, Value* ptr, Value* value, Value* isSet) {
     const auto ty = getIRType(cg);
     cg.storeField(ty, ptr, LgsNullableExprIndices::value, value);

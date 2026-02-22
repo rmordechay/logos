@@ -32,6 +32,7 @@ public:
     Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee) override;
     Value* moveValue(LgsCodeGen& cg, Value* value, Value* toLevel) override;
     Value* addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
+    Value* hashValue(LgsCodeGen& cg, Value* value) override;
     void setIRFields(LgsCodeGen& cg, Value* ptr, Value* value, Value* isSet);
     Value* applyPtrBinOp(LgsCodeGen& cg, LgsBinaryExpr* binExpr, const std::function<Value*(LgsBinaryExpr*)>& func);
     Value* applyNumberBinOp(LgsCodeGen& cg, LgsBinaryExpr* binExpr, const std::function<Value*(LgsBinaryExpr*)>& func);

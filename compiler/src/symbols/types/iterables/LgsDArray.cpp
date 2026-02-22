@@ -105,7 +105,7 @@ Constant* LgsDArray::getRTTypeExtra(LgsCodeGen& cg) {
 }
 
 Value* LgsDArray::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
-    return cg.alloc(name, baseType->getRTType(cg));
+    return cg.heapAlloc(name, baseType->getRTType(cg));
 }
 
 Value* LgsDArray::lenIR(LgsCodeGen& cg, Value* iterable) {

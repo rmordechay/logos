@@ -119,7 +119,7 @@ Value* LgsFunc::callIR(LgsCodeGen& cg, const std::vector<Value*>& args) {
     Value* sret = nullptr;
     if (funcType->swapReturn) {
         sret = cg.builder.CreateAlloca(funcType->rt->getIRType(cg));
-        argsList.insert(args.begin() + funcType->isMethod, sret);
+        argsList.insert(argsList.begin() + funcType->isMethod, sret);
     }
     if (IRValue) {
         rv = cg.builder.CreateCall(funcType->getIRType(cg), IRValue, argsList);

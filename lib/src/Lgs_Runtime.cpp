@@ -31,7 +31,8 @@ extern "C" void* Lgs_Runtime_alloc(const size_t size, const size_t level, const 
 }
 
 extern "C" void* Lgs_Runtime_allocObject(Lgs_TypeInfo* type, const size_t level) {
-    const auto obj = runtime.stack.at(level).allocator.allocate(type->size, true);
+    auto& allocator = runtime.stack.at(level).allocator;
+    const auto obj = allocator.allocate(type->size, true);
     const auto typePtr = reinterpret_cast<Lgs_TypeInfo**>(static_cast<char*>(obj) + sizeof(size_t));
     *typePtr = type;
     return obj;
@@ -49,7 +50,7 @@ extern "C" void* Lgs_Runtime_allocDArray(Lgs_TypeInfo* baseType, const size_t le
 }
 
 extern "C" void* Lgs_Runtime_allocStr(char* str, const size_t level) {
-    const auto newPtr = runtime.stack.at(0).allocator.allocate(sizeof(Lgs_StrExpr), true);
+    const auto newPtr = runtime.stack.at(level).allocator.allocate(sizeof(Lgs_StrExpr), true);
     const auto newStr = static_cast<Lgs_StrExpr*>(newPtr);
     newStr->data = str;
     return newStr;

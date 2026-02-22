@@ -312,14 +312,17 @@ void LgsCgFile::visitVarDec(LgsVarDec* varDec) {
 void LgsCgFile::visitAssignment(const LgsAssignment* assignment) {
     Value* lv;
     Value* rv;
+    LgsType* lt;
     if (assignment->binaryExpr) {
         visitBinaryExpr(assignment->binaryExpr, false);
         visitExpr(assignment->binaryExpr->left, true);
         lv = assignment->binaryExpr->left->IRValue;
         rv = assignment->binaryExpr->IRValue;
+        lt = assignment->binaryExpr->left->type;
     } else {
         const auto left = assignment->left;
         const auto right = assignment->right;
+        lt = assignment->left->type;
         if (const auto iterIndex = left->asIterIndex()) {
             const auto iterable = iterIndex->baseExpr->type->asIterable();
             visitIterIndex(iterIndex, !iterable->isStatic);
@@ -336,6 +339,9 @@ void LgsCgFile::visitAssignment(const LgsAssignment* assignment) {
         visitExpr(right);
         lv = left->pointee ? left->pointee : left->IRValue;
         rv = right->IRValue;
+    }
+    if (lt->isHeap && !lt->asNullable()) {
+        rv = cg.moveValue(lt->getBaseName(), rv, cg.loadSize(cg.loadPtr(lv)));
     }
     cg.store(rv, lv);
 }
@@ -479,11 +485,15 @@ void LgsCgFile::visitReturnStmt(LgsReturn* returnStmt) {
     if (ft->rt->isVoid()) {
         cg.createRet();
     } else if (!currentFunc->returnStmts.empty()) {
+        const auto expr = returnStmt->expr;
         if (ft->swapReturn) {
-            returnStmt->expr->pointee = currentFunc->getIRFunc(cg)->getArg(ft->isMethod);
+            expr->pointee = currentFunc->getIRFunc(cg)->getArg(ft->isMethod);
         }
-        visitExpr(returnStmt->expr);
-        returnStmt->expr->IRValue = returnStmt->expr ? returnStmt->expr->IRValue : nullptr;
+        visitExpr(expr);
+        if (ft->swapReturn) {
+            const auto v = cg.load(expr->type->getIRType(cg), expr->IRValue);
+            cg.store(v, expr->pointee);
+        }
         returnStmt->parentBlock = cg.builder.GetInsertBlock();
         cg.builder.CreateBr(currentFunc->epilogue);
     }
@@ -580,8 +590,8 @@ void LgsCgFile::visitBinaryExpr(LgsBinaryExpr* binExpr, const bool assign) {
     case GT: binExpr->IRValue = gtIR(cg, l->IRValue, r->IRValue, l->type); break;
     case GE: binExpr->IRValue = geIR(cg, l->IRValue, r->IRValue, l->type); break;
     case LE: binExpr->IRValue = leIR(cg, l->IRValue, r->IRValue, l->type); break;
-    case AND: binExpr->IRValue = andIR(cg, l->IRValue, r->IRValue); break;
-    case OR: binExpr->IRValue = orIR(cg, l->IRValue, r->IRValue); break;
+    case AND: binExpr->IRValue = andIR(cg, {l->IRValue, r->IRValue}); break;
+    case OR: binExpr->IRValue = orIR(cg, {l->IRValue, r->IRValue}); break;
     case IN: binExpr->IRValue = r->type->asIterable()->inIR(cg, r->IRValue, l->IRValue); break;
     case CROSS: binExpr->IRValue = crossIR(cg, binExpr->left->IRValue, binExpr->right->IRValue, type->asVec()); break;
     default: assert(0);
@@ -666,7 +676,7 @@ void LgsCgFile::visitIntConst(LgsIntConst* intConst) {
 
 void LgsCgFile::visitStrConst(LgsStrConst* strConst) {
     if (strConst->parts.empty()) {
-        strConst->IRValue = cg.alloc(LgsStr::name, cg.getString(strConst->value));
+        strConst->IRValue = cg.heapAlloc(LgsStr::name, cg.getString(strConst->value), cg.zeroSize());
         return;
     }
     std::vector<Value*> values;
@@ -681,7 +691,7 @@ void LgsCgFile::visitStrConst(LgsStrConst* strConst) {
             formatted.replace(pos, strlen(LGS_STR_FMT_PLACEHOLDER), "%s");
         }
     }
-    strConst->IRValue = cg.alloc(LgsStr::name, cg.callSnprintf(formatted, values));
+    strConst->IRValue = cg.heapAlloc(LgsStr::name, cg.callSnprintf(formatted, values));
 }
 
 void LgsCgFile::visitCharConst(LgsCharConst* charConst) {
@@ -1087,7 +1097,7 @@ void LgsCgFile::visitEnvVar(LgsEnvVar* envVar) {
     const std::vector<Type*> params = {cg.ptrTy(), cg.ptrTy()};
     const std::vector<Value*> IRArgs = {cg.getString(envVar->name), cg.emptyStr()};
     const auto env = cg.callLgsFunc(LgsSys::name, "getEnv", cg.ptrTy(), params, IRArgs);
-    envVar->IRValue = cg.alloc(LgsStr::name, env);
+    envVar->IRValue = cg.heapAlloc(LgsStr::name, env);
 }
 
 void LgsCgFile::visitCast(LgsCast* cast) {
@@ -1240,7 +1250,7 @@ void LgsCgFile::getMapFunc(LgsFuncType* mapFunc) {
 
     LgsDArray dArr(iterable->baseType);
     LgsArrayExpr retArr(&dArr);
-    retArr.IRValue = cg.alloc(LgsDArray::name, dArr.baseType->getRTType(cg), cg.getLevelAbove());
+    retArr.IRValue = cg.heapAlloc(LgsDArray::name, dArr.baseType->getRTType(cg), cg.getLevelAbove());
     const auto len = iterable->lenIR(cg, iter);
 
     cg.loop(len, [&](Value* iValue, BasicBlock*) {
@@ -1270,7 +1280,7 @@ void LgsCgFile::getFilterFunc(LgsFuncType* filterFunc) {
 
     LgsDArray dArr(iterable->baseType);
     LgsArrayExpr retArr(&dArr);
-    retArr.IRValue = cg.alloc(LgsDArray::name, dArr.baseType->getRTType(cg), cg.getLevelAbove());
+    retArr.IRValue = cg.heapAlloc(LgsDArray::name, dArr.baseType->getRTType(cg), cg.getLevelAbove());
     const auto len = iterable->lenIR(cg, iter);
 
     cg.loop(len, [&](Value* iValue, BasicBlock*) {

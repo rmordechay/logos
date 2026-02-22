@@ -21,3 +21,28 @@ TEST(CgMemoryTest, Test1) {
     const auto lines = getLines(stream, 1);
     EXPECT_EQ(lines[0], "[Obj{x=2, name=text}]");
 }
+
+TEST(CgMemoryTest, Test2) {
+    const auto code = R"(
+    object Obj1 {
+        obj2: Obj2
+    }
+    object Obj2 {
+        id: Int
+        name: Str
+    }
+    func(obj1: Obj1) {
+        obj1.obj2 := Obj2{id=5, name="Roi"}
+    }
+    main() {
+        obj1 = Obj1{}
+        print(obj1)
+        func(obj1)
+        print(obj1)
+    }
+    )";
+    std::istringstream stream(runLgsApp(code));
+    const auto lines = getLines(stream, 2);
+    EXPECT_EQ(lines[0], "Obj1{obj2=Obj2{id=0, name=null}}");
+    EXPECT_EQ(lines[1], "Obj1{obj2=Obj2{id=5, name=Roi}}");
+}

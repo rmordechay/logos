@@ -99,8 +99,8 @@ public:
     Value* callHash(Value* type, Value* arg);
     Value* getVField(Value* objType, Value* objInstance, Value* fieldName);
     Value* getVFunc(Value* objType, Value* funcName);
-    Value* alloc(Value* size, Value* level, bool setLevel);
-    Value* alloc(const std::string& baseName, Value* type, Value* level = nullptr);
+    Value* heapAlloc(Value* size, Value* level, bool setLevel);
+    Value* heapAlloc(const std::string& baseName, Value* type, Value* level = nullptr);
     Value* reallocate(Value* ptr, Value* size, Value* level);
     Value* moveValue(const std::string& baseName, Value* v, Value* toLevel);
     void throwError(const LgsBaseMsg& err, const std::vector<Value*>& args = {});

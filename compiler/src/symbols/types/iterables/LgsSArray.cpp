@@ -38,9 +38,9 @@ bool LgsSArray::canCastTo(LgsType* other) {
     if (!baseType) return false;
     if (other->isAny()) return true;
     if (other->asStr()) return !!baseType->asChar();
-    const auto otherIter = other->asSArray();
-    if (!otherIter) return false;
-    return baseType->canCastTo(otherIter->baseType);
+    const auto otherSArr = other->asSArray();
+    if (!otherSArr) return false;
+    return len == otherSArr->len && baseType->canCastTo(otherSArr->baseType);
 }
 
 bool LgsSArray::equals(LgsType* other) {

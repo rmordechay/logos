@@ -354,33 +354,41 @@ Value* leIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
     assert(0);
 }
 
-Value* andIR(LgsCodeGen& cg, Value* left, Value* right) {
-    const auto currentBlock = cg.builder.GetInsertBlock();
-    const auto func = currentBlock->getParent();
-    const auto rightBlock = cg.createBlock("and_right", func);
-    const auto endBlock = cg.createBlock("and_end", func);
-    cg.builder.CreateCondBr(left, rightBlock, endBlock);
-    cg.builder.SetInsertPoint(rightBlock);
+Value* andIR(LgsCodeGen& cg, const std::vector<Value*>& values) {
+    const auto endBlock = cg.createBlock("and_end");
+    std::vector<std::pair<Value*, BasicBlock*>> incoming;
+    for (const auto value : values) {
+        const auto nextBlock = cg.createBlock("and_next");
+        cg.builder.CreateCondBr(value, nextBlock, endBlock);
+        incoming.emplace_back(cg.false_(), cg.builder.GetInsertBlock());
+        cg.startBlock(nextBlock);
+    }
     cg.builder.CreateBr(endBlock);
-    cg.builder.SetInsertPoint(endBlock);
-    auto* phi = cg.builder.CreatePHI(cg.builder.getInt1Ty(), 2);
-    phi->addIncoming(cg.false_(), currentBlock);
-    phi->addIncoming(right, rightBlock);
+    incoming.emplace_back(values.back(), cg.builder.GetInsertBlock());
+    cg.startBlock(endBlock);
+    const auto phi = cg.builder.CreatePHI(cg.builder.getInt1Ty(), incoming.size());
+    for (const auto& [val, block] : incoming) {
+        phi->addIncoming(val, block);
+    }
     return phi;
 }
 
-Value* orIR(LgsCodeGen& cg, Value* left, Value* right) {
-    const auto currentBlock = cg.builder.GetInsertBlock();
-    const auto func = currentBlock->getParent();
-    const auto rightBlock = cg.createBlock("or_right", func);
-    const auto endBlock = cg.createBlock("or_end", func);
-    cg.builder.CreateCondBr(left, endBlock, rightBlock);
-    cg.builder.SetInsertPoint(rightBlock);
+Value* orIR(LgsCodeGen& cg, const std::vector<Value*>& values) {
+    const auto endBlock = cg.createBlock("or_end");
+    std::vector<std::pair<Value*, BasicBlock*>> incoming;
+    for (const auto value : values) {
+        const auto nextBlock = cg.createBlock("or_next");
+        cg.builder.CreateCondBr(value, nextBlock, endBlock);
+        incoming.emplace_back(cg.true_(), cg.builder.GetInsertBlock());
+        cg.startBlock(nextBlock);
+    }
     cg.builder.CreateBr(endBlock);
-    cg.builder.SetInsertPoint(endBlock);
-    auto* phi = cg.builder.CreatePHI(cg.builder.getInt1Ty(), 2);
-    phi->addIncoming(cg.true_(), currentBlock);
-    phi->addIncoming(right, rightBlock);
+    incoming.emplace_back(values.back(), cg.builder.GetInsertBlock());
+    cg.startBlock(endBlock);
+    const auto phi = cg.builder.CreatePHI(cg.builder.getInt1Ty(), incoming.size());
+    for (const auto& [val, block] : incoming) {
+        phi->addIncoming(val, block);
+    }
     return phi;
 }
 

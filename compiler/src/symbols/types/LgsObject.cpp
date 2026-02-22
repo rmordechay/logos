@@ -101,8 +101,8 @@ LgsFunc* LgsObject::getMetaFunc(const std::string& methodName) {
     if (methodName == OBJ_AS_JSON) {
         const auto func = new LgsFunc(methodName, new LgsStr());
         func->fn = [&](LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) {
-            const auto str = cg.alloc(cg.usize(sizeof(Lgs_StrExpr)), cg.currentLevel, true);
-            const auto data = cg.alloc(cg.usize(LGS_STR_BUFFER_SIZE), cg.currentLevel, false);
+            const auto str = cg.heapAlloc(cg.usize(sizeof(Lgs_StrExpr)), cg.currentLevel, true);
+            const auto data = cg.heapAlloc(cg.usize(LGS_STR_BUFFER_SIZE), cg.currentLevel, false);
             cg.storeField(LgsStr::getStrStruct(cg), str, LgsStrIndices::data, data);
             cg.builder.CreateCall(getJSONFunc(cg), {args.front().expr->IRValue, str});
             return str;
@@ -261,7 +261,7 @@ Value* LgsObject::hashValue(LgsCodeGen& cg, Value* value) {
 }
 
 Value* LgsObject::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
-    return cg.alloc(metaName, getRTType(cg));
+    return cg.heapAlloc(metaName, getRTType(cg));
 }
 
 DIType* LgsObject::getDebugType(LgsCodeGen& cg) {

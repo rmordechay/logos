@@ -98,3 +98,17 @@ TEST(CgArraysTest, SArrTest3) {
     EXPECT_EQ(lines[5], "[[[1, 1], [1, 0]], [[0, 0], [0, 0]]]");
     EXPECT_EQ(lines[6], "[[[1, 1], [1, 0]], [[0, 0], [0, 1]]]");
 }
+
+TEST(CgArraysTest, SArrTest4) {
+    const auto code = R"(
+    func(arr: Int[3]): Int[3] {
+        return arr
+    }
+    main() {
+        print(func([1, 2]))
+    }
+    )";
+    std::istringstream stream(runLgsApp(code));
+    const auto lines = getLines(stream, 1);
+    EXPECT_EQ(lines[0], "[1, 2, 0]");
+}
