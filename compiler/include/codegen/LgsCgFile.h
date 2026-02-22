@@ -51,7 +51,6 @@ class LgsIfStmt;
 class LgsAssignment;
 class LgsIntConst;
 class LgsForLoop;
-class LgsTypeExpr;
 class LgsIOStmt;
 struct LgsSymbol;
 struct LgsIndex;

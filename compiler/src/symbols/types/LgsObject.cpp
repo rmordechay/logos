@@ -425,11 +425,6 @@ LgsObject::~LgsObject() {
     freeTypes(objects);
     // freeTypes(generics);
     freeTypes(subtypes);
-    if (singleton) {
-        singleton->setType(nullptr);
-        singleton->obj = nullptr;
-        freeExpr(singleton);
-    }
     for (const auto ioPair : ioPairs) {
         delete ioPair;
     }

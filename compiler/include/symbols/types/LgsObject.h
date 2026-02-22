@@ -32,7 +32,7 @@ public:
     std::vector<LgsGenericType*> generics;
     std::map<std::string, LgsFunc*> metaFuncs;
     std::map<std::string, LgsField*> metaFields;
-    LgsInstance* singleton = nullptr;
+    bool isSingleton = false;
     bool hasGenerics = false;
     static constexpr std::string metaName = "Object";
 

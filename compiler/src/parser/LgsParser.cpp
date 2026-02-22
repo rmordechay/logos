@@ -124,7 +124,6 @@ LgsMainFile* LgsParser::parseMainFile() {
     while (!isEOF()) {
         if (const auto obj = parseObject()) {
             mainFile->objects.push_back(obj);
-            if (obj->singleton) continue;
             mainFile->symbolTable.addSymbol(LgsSymbol(obj), &errHandler, filePath);
         } else if (const auto interface = parseInterface()) {
             mainFile->interfaces.push_back(interface);
@@ -337,6 +336,7 @@ LgsInterface* LgsParser::parseInterface() {
 
 LgsObject* LgsParser::parseObjectBody(const LgsToken& tokenName, const bool isSingleton) {
     auto const obj = new LgsObject(tokenName.lexeme);
+    obj->isSingleton = isSingleton;
 
     // Generic types
     if (matchAndConsume(T_TYPE)) {
@@ -401,10 +401,11 @@ LgsObject* LgsParser::parseObjectBody(const LgsToken& tokenName, const bool isSi
         if (currentToken.type == T_RBRACE || currentToken.type == T_EOF) break;
     }
 
-    if (isSingleton) {
-        obj->singleton = new LgsInstance(obj);
+    if (obj->isSingleton) {
+        const auto varDec = new LgsVarDec(obj->name, new LgsInstance(obj));
+        varDec->setType(obj);
         std::lock_guard lock(mtx);
-        globals.addSymbol(LgsSymbol(obj), &errHandler, filePath);
+        globals.addSymbol(LgsSymbol(varDec), &errHandler, filePath);
     }
 
     if (!headersOnly && currentToken.type != T_EOF && currentToken.type != T_RBRACE) {

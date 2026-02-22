@@ -116,7 +116,7 @@ public:
     void visitVariable(LgsVariable* variable);
     void visitSelection(LgsSelection* selection);
     void visitInnerSelections(const LgsSelection* selection);
-    void visitFieldSelection(LgsVariable* child, LgsType* parentType);
+    void visitFieldSelection(LgsVariable* child, LgsExpr* parent);
     void visitIterIndexSelection(LgsIterIndex* iterIndex, LgsType* parentType);
     void visitMetaSelection(LgsMetaSelection* metaSelection, LgsExpr* parent = nullptr);
     void visitFuncCall(LgsFuncCall* funcCall);
@@ -126,7 +126,6 @@ public:
     void visitPrefixExpr(LgsPrefixExpr* prefixExpr);
     void visitPostfixExpr(LgsPostfixExpr* postfixExpr);
     void visitStrConst(const LgsStrConst* strConst);
-    void visitTypeExpr(LgsTypeExpr* typeExpr);
     void visitInstance(LgsInstance* instance);
     void visitUnwrap(LgsExpr* expr);
     void visitInlineInterface(LgsInstance* instance, LgsInterface* interface);

@@ -4,7 +4,6 @@ class LgsSubType;
 class LgsEnum;
 class LgsIntConst;
 class LgsMetaVar;
-class LgsTypeExpr;
 class LgsVectorExpr;
 class LgsIOStmt;
 class LgsSwitch;
@@ -102,7 +101,6 @@ public:
     void visitPrefixExpr(LgsPrefixExpr* prefixExpr);
     void visitPostfixExpr(LgsPostfixExpr* postfixExpr);
     void visitStrConst(const LgsStrConst* strConst);
-    void visitTypeExpr(LgsTypeExpr* typeExpr);
     void visitInstance(LgsInstance* instance);
     void visitIntConst(const LgsIntConst* intConst);
     void visitInterfaceInstance(LgsInstance* instance, LgsInterface* interface);

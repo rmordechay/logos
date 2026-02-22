@@ -292,7 +292,7 @@ Function* LgsMap::getAddFunc(LgsCodeGen& cg) {
     const auto entriesField = cg.builder.CreateStructGEP(mapTy, mapIR, LgsHashMapIndices::entries);
     const auto lenField = cg.builder.CreateStructGEP(mapTy, mapIR, LgsHashMapIndices::length);
     const auto capField = cg.builder.CreateStructGEP(mapTy, mapIR, LgsHashMapIndices::cap);
-    const auto level = cg.builder.CreateSub(cg.getCurrentLevel(), cg.usize(1));
+    const auto level = cg.builder.CreateSub(cg.currentLevel, cg.usize(1));
 
     // Resize
     auto len = cg.loadSize(lenField);
@@ -334,8 +334,8 @@ Function* LgsMap::getAddFunc(LgsCodeGen& cg) {
 
     // Keys with same hash
     cg.startBlock(keyCompareBlock);
-    entryLoad = cg.loadPtr(entryAlloca);
-    const auto keysAreEqual = eqIR(cg, keyIR, getEntryKey(cg, entryLoad), pairType->key);
+    entryLoad = getEntryKey(cg, cg.loadPtr(entryAlloca));
+    const auto keysAreEqual = eqIR(cg, keyIR, cg.loadPtr(entryLoad), pairType->key);
     cg.builder.CreateCondBr(keysAreEqual, equalBlock, notEqualBlock);
 
     // Keys equal

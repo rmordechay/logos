@@ -24,6 +24,8 @@
 #include "types/iterables/LgsVec.h"
 #include "types/primitives/LgsByte.h"
 #include <llvm/Target/TargetMachine.h>
+
+#include "exprs/LgsInstance.h"
 #include "exprs/constants/LgsIntConst.h"
 #include "funcs/LgsMainFunc.h"
 #include "stmts/LgsImport.h"
@@ -415,6 +417,16 @@ bool LgsApp::generateGenerics() {
     LgsObject::getGetFieldFunc(objFile->cgFile.cg);
     LgsObject::getSetFieldFunc(objFile->cgFile.cg);
     genericFiles.push_back(objFile);
+    for (auto [_, symbol] : globals.symbols) {
+        if (symbol.symbolType != VAR_DEC) continue;
+        const auto obj = symbol.varDec->type->asObject();
+        if (!obj || !obj->isSingleton) continue;
+        const auto objIRType = obj->getIRType(objFile->cgFile.cg);
+        const auto initializer = ConstantAggregateZero::get(objIRType);
+        symbol.varDec->expr->IRValue = objFile->cgFile.cg.createGlobal(obj->name, objIRType, initializer);
+        symbol.varDec->IRValue = symbol.varDec->expr->IRValue;
+        objFile->cgFile.visitObject(obj);
+    }
 
     const auto genericsFile = new LgsFile("generics", CG_MODE_GENERICS);
     genericsFile->setupCodeGen(configs);
@@ -458,6 +470,7 @@ bool LgsApp::generateGenerics() {
     }
     genericFiles.push_back(genericsFile);
 
+    // Write files
     auto success = false;
     for (const auto file : genericFiles) {
         success = file->cgFile.cg.writeIRModule(paths, configs.optLevel);

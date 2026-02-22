@@ -101,14 +101,21 @@ TEST(CgArraysTest, SArrTest3) {
 
 TEST(CgArraysTest, SArrTest4) {
     const auto code = R"(
+    object Obj {
+        func(arr: Int[3]): Int[3] {
+            return arr
+        }
+    }
     func(arr: Int[3]): Int[3] {
         return arr
     }
     main() {
         print(func([1, 2]))
+        print(Obj.func([1, 2]))
     }
     )";
     std::istringstream stream(runLgsApp(code));
-    const auto lines = getLines(stream, 1);
+    const auto lines = getLines(stream, 2);
     EXPECT_EQ(lines[0], "[1, 2, 0]");
+    EXPECT_EQ(lines[1], "[1, 2, 0]");
 }

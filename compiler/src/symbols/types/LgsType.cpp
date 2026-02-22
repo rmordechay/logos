@@ -300,8 +300,8 @@ Value* eqIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
         const auto [l, r] = loadNumberPair(cg, left, right, type);
         return cg.builder.CreateFCmpOEQ(l, r);
     }
-    if (const auto str = type->asStr()) {
-        return cg.strsEqual(str->loadRTData(cg, left), str->loadRTData(cg, right));
+    if (type->asStr()) {
+        return cg.strsEqual(LgsStr::loadRTData(cg, left), LgsStr::loadRTData(cg, right));
     }
     if (const auto dArr = type->asDArray()) {
         return cg.builder.CreateCall(dArr->getEqFunc(cg), {left, right});

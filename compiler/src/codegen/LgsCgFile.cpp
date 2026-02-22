@@ -18,7 +18,6 @@
 #include "exprs/LgsPrefixExpr.h"
 #include "exprs/LgsSelection.h"
 #include "exprs/LgsTernaryExpr.h"
-#include "exprs/LgsTypeExpr.h"
 #include "exprs/LgsVariable.h"
 #include "exprs/LgsVectorExpr.h"
 #include "exprs/constants/LgsFloatConst.h"
@@ -64,6 +63,7 @@ bool LgsCgFile::generateSrcFile(LgsFile* file, const LgsPaths& paths) {
     if (const auto mainFile = file->asMainFile()) {
         visitMainFile(mainFile);
     } else if (const auto objFile = file->asObjectFile()) {
+        if (objFile->obj->isSingleton) return true;
         visitObject(objFile->obj);
     } else if (const auto interfaceFile = file->asInterfaceFile()) {
         visitInterface(interfaceFile->interface);
@@ -83,6 +83,7 @@ void LgsCgFile::visitMainFile(LgsMainFile* mainFile) {
         visitInterface(interface);
     }
     for (const auto object : mainFile->objects) {
+        if (object->isSingleton) continue;
         visitObject(object);
     }
     for (const auto enum_ : mainFile->enums) {
@@ -114,15 +115,6 @@ void LgsCgFile::visitTestFile(const LgsTestFile* testFile) {
 }
 
 void LgsCgFile::visitObject(LgsObject* obj) {
-    if(const auto singleton = obj->singleton) {
-        const auto objIRType = obj->getIRType(cg);
-        const auto gv = cg.IRModule->getGlobalVariable(obj->name);
-        singleton->IRValue = gv;
-        if (!singleton->IRValue) {
-            const auto zeroInit = ConstantAggregateZero::get(objIRType);
-            singleton->IRValue = cg.createGlobal(obj->name, objIRType, zeroInit);
-        }
-    }
     for (const auto& [_, method] : obj->methods) {
         visitFunc(method);
     }
@@ -747,9 +739,14 @@ void LgsCgFile::visitVariable(LgsVariable* variable, const bool assign) {
     case VAR_DEC: {
         const auto varDec = variable->ref.varDec;
         assert(variable->ref.varDec->IRValue);
-        variable->IRValue = varDec->IRValue;
-        if (!assign) {
-            variable->IRValue = variable->loadIRPtr(cg);
+        const auto obj = varDec->type->asObject();
+        if (obj && obj->isSingleton) {
+            variable->IRValue = cg.createGlobal(varDec->name, variable->type->getIRType(cg), nullptr);
+        } else {
+            variable->IRValue = varDec->IRValue;
+            if (!assign) {
+                variable->IRValue = variable->loadIRPtr(cg);
+            }
         }
         break;
     }
@@ -764,10 +761,6 @@ void LgsCgFile::visitVariable(LgsVariable* variable, const bool assign) {
     case FUNC:
         variable->IRValue = variable->ref.func->getIRFunc(cg);
         break;
-    case OBJECT:
-        if (!variable->ref.object->singleton) return;
-        variable->IRValue = variable->ref.object->singleton->IRValue;
-        break;
     case FIELD:
         if (variable->ref.field->type->asEnum()) {
             variable->IRValue = cg.usize(variable->ref.field->index);
@@ -775,6 +768,7 @@ void LgsCgFile::visitVariable(LgsVariable* variable, const bool assign) {
             variable->IRValue = variable->pointee;
         }
         break;
+    case OBJECT:
     case ENUM:
     case INTERFACE:
     case SUBTYPE:
@@ -880,7 +874,7 @@ void LgsCgFile::visitFieldSelection(LgsVariable* var, LgsExpr* parent) {
         return;
     }
     // Singleton
-    if (parent->asTypeExpr() && parent->type->asObject()->singleton) {
+    if (parent->type->asObject()->isSingleton) {
         assert(0);
     }
     // Virtual fields
@@ -956,6 +950,9 @@ void LgsCgFile::visitFuncCall(LgsFuncCall* funcCall) {
     }
 
     if (funcCall->coroutine || funcCall->isDeferred) return;
+    if (ft->isMethod && !ft->hasSelf && !funcCall->args.front().expr->IRValue) {
+        funcCall->args.front().expr->IRValue = cg.null();
+    }
     funcCall->IRValue = func->call(cg, funcCall->args);
 }
 
@@ -1149,7 +1146,7 @@ void LgsCgFile::createEpilogue(const LgsFunc* func) {
             for (const auto returnStmt : stmts) {
                 phi->addIncoming(returnStmt->expr->IRValue, returnStmt->parentBlock);
             }
-            const auto toLevel = cg.builder.CreateSub(cg.getCurrentLevel(), cg.usize(1));
+            const auto toLevel = cg.builder.CreateSub(cg.currentLevel, cg.usize(1));
             const auto v = ft->rt->isHeap ? ft->rt->moveValue(cg, phi, toLevel) : phi;
             cg.createRet(v);
         }

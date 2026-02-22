@@ -94,13 +94,13 @@ inline LgsBaseMsg E10079{"Test file %s must be inside tests directory.", errCode
 inline LgsBaseMsg E10080{"Index %s was not found in iterable.", errCodeStart++};
 inline LgsBaseMsg E10081{"Range-start type %s is not equal to the range-end type %s.", errCodeStart++};
 inline LgsBaseMsg E10082{"Loop range %s must be an integer. Given: %s.", errCodeStart++};
-inline LgsBaseMsg E10083{"%s is an object method but was called as a class method.", errCodeStart++};
+inline LgsBaseMsg E10083{"'%s' is an object method but was called as a class method.", errCodeStart++};
 inline LgsBaseMsg E10084{"%s does not belong to an IO pair.", errCodeStart++};
 inline LgsBaseMsg E10085{"Parsing error.", errCodeStart++};
 inline LgsBaseMsg E10086{"Invalid Logos path: %s.", errCodeStart++};
 inline LgsBaseMsg E10087{"Logos library cannot define a main() function.", errCodeStart++};
 inline LgsBaseMsg E10088{"Bad character.", errCodeStart++};
-inline LgsBaseMsg E10089{"%s can only be assigned to an instance of %s, not the object itself.", errCodeStart++};
+inline LgsBaseMsg E10089{"Illegal access to an object field.", errCodeStart++};
 inline LgsBaseMsg E10090{"%s can only prefix numbers. Given: %s.", errCodeStart++};
 inline LgsBaseMsg E10091{"'not' can only prefix Bool. Given: %s.", errCodeStart++};
 inline LgsBaseMsg E10092{"If condition must be of type Bool. Given: %s.", errCodeStart++};

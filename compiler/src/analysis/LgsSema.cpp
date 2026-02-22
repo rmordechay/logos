@@ -19,7 +19,6 @@
 #include "exprs/LgsPostfixExpr.h"
 #include "exprs/LgsPrefixExpr.h"
 #include "exprs/LgsTernaryExpr.h"
-#include "exprs/LgsTypeExpr.h"
 #include "exprs/LgsVectorExpr.h"
 #include "exprs/constants/LgsStrConst.h"
 #include "files/LgsMainFile.h"
@@ -448,11 +447,7 @@ void LgsSema::visitAssignment(const LgsAssignment* assignment) {
             validateExprType(r, l->type);
         }
     } else if (const auto selection = l->asSelection()) {
-        const auto firstExpr = selection->exprs.front();
-        const auto obj = firstExpr->type->asObject();
-        if (obj && !obj->singleton && firstExpr->asTypeExpr()) {
-            addError(E10089, selection->location, {firstExpr->asText(), selection->exprs.back()->asText()});
-        } else if (selection->asMethodCall()) {
+        if (selection->asMethodCall()) {
             addError(E10117, selection->location);
         } else {
             validateExprType(r, l->type);
@@ -998,14 +993,6 @@ void LgsSema::visitVariable(LgsVariable* variable) {
 void LgsSema::visitSelection(LgsSelection* selection) {
     const auto exprs = selection->exprs;
     visitExpr(selection->exprs.front());
-    const auto firstExpr = exprs.front();
-    if (const auto var = firstExpr->asVariable()) {
-        if (var->ref.symbolType == OBJECT) {
-            const auto typeExpr = new LgsTypeExpr(var->ref.object);
-            freeExpr(firstExpr);
-            selection->exprs[0] = typeExpr;
-        }
-    }
     visitInnerSelections(selection);
     selection->setType(selection->exprs.back()->type);
 }
@@ -1016,7 +1003,7 @@ void LgsSema::visitInnerSelections(const LgsSelection* selection) {
         const auto parent = exprs[i];
         const auto& child = exprs[i + 1];
         if (const auto var = child->asVariable()) {
-            visitFieldSelection(var, parent->type);
+            visitFieldSelection(var, parent);
         } else if (const auto methodCall = child->asFuncCall()) {
             visitMethodCall(methodCall, parent);
         } else if (const auto iterIndex = child->asIterIndex()) {
@@ -1033,8 +1020,15 @@ void LgsSema::visitInnerSelections(const LgsSelection* selection) {
     }
 }
 
-void LgsSema::visitFieldSelection(LgsVariable* child, LgsType* parentType) {
-    if (!parentType) return;
+void LgsSema::visitFieldSelection(LgsVariable* child, LgsExpr* parent) {
+    if (!parent) return;
+    if (const auto var = parent->asVariable()) {
+        if (var->ref.symbolType == OBJECT) {
+            addError(E10089, var->location);
+            return;
+        }
+    }
+    const auto parentType = parent->type;
     if (parentType->asVec() && !validateVecElements(child, parentType->asVec())) return;
     auto childName = child->name;
     if (const auto field = parentType->getField(childName)) {
@@ -1137,8 +1131,12 @@ void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent) {
     if (!method) {
         return addError(E10005, methodCall->location, {name, parent->type->pname()});
     }
-    if (parent->asTypeExpr() && method->funcType->isMethod) {
-        return addError(E10083, methodCall->location, {method->funcType->name});
+    if (method->funcType->hasSelf) {
+        if (parent->asInstance() || parent->asVariable()->ref.symbolType == OBJECT) {
+            if (!parent->type->asObject()->isSingleton) {
+                return addError(E10083, methodCall->location, {method->funcType->name});
+            }
+        }
     }
     if (method->funcType->isMethod || method->funcType->isVirtual) {
         methodCall->args.insert(methodCall->args.begin(), LgsFuncArg(parent, LGS_SELF, true));
@@ -1264,27 +1262,25 @@ void LgsSema::visitStrConst(const LgsStrConst* strConst) {
     }
 }
 
-void LgsSema::visitTypeExpr(LgsTypeExpr* typeExpr) {
-    typeResolver.resolveType(typeExpr->type);
-}
-
 void LgsSema::visitInstance(LgsInstance* instance) {
     const auto objName = instance->name;
     const auto symbol = getSymbol(objName);
     if (!symbol) return addError(E10006, instance->location, {instance->name});
     if (!validateTypeName(instance->name, instance->location)) return;
-    if (symbol->symbolType != OBJECT && symbol->symbolType != INTERFACE) {
+    if (!symbol->getType()->asObject()) {
         return addError(E10022, instance->location, {objName});
     }
 
     if (symbol->symbolType == INTERFACE) {
         return visitInlineInterface(instance, symbol->interface);
     }
-
-    const auto obj = symbol->object;
-    if (obj->singleton) {
-        return addError(E10032, instance->location, {objName});
+    if (symbol->symbolType == VAR_DEC) {
+        const auto singleton = symbol->varDec->type->asObject();
+        if (singleton && singleton->isSingleton) {
+            return addError(E10032, instance->location, {objName});
+        }
     }
+    const auto obj = symbol->object;
     instance->setType(obj);
     obj->cloneFields(instance);
 
@@ -1480,7 +1476,7 @@ void LgsSema::validateIndex(const LgsIterIndex* iterIndex) {
 bool LgsSema::validateFieldVisibility(LgsField* field, LgsType* parent, const LgsLocation& location) {
     assert(parent);
     if (parent->asVec()) return true;
-    if (parent->asObject() && parent->asObject()->singleton) return true;
+    if (parent->asObject() && parent->asObject()->isSingleton) return true;
     if (!field || field->isVirtual) return false;
     if (stack.currentFunc()->isTest) return true;
     assert(field->location.filepath != "");
@@ -1494,7 +1490,7 @@ bool LgsSema::validateFieldVisibility(LgsField* field, LgsType* parent, const Lg
 
 bool LgsSema::validateMethodVisibility(const LgsFunc* method, LgsType* parent, const LgsLocation& location) {
     if (!method) return false;
-    if (parent && parent->asObject() && parent->asObject()->singleton) return true;
+    if (parent && parent->asObject() && parent->asObject()->isSingleton) return true;
     const auto hasAccess = method->funcType->isPublic || file->path == method->location.filepath || stack.currentFunc()->isTest;
     if (!hasAccess) {
         addError(E10031, location, {method->funcType->name, method->funcType->parentName});
@@ -1741,6 +1737,9 @@ void LgsSema::addLocalSymbol(const LgsSymbol& newSymbol) {
         return addError(E10053, *newSymbol.location, {symbolName});
     }
     if (file->symbolTable.getSymbol(symbolName)) {
+        return addError(E10011, *newSymbol.location, {symbolName});
+    }
+    if (globals.getSymbol(symbolName)) {
         return addError(E10011, *newSymbol.location, {symbolName});
     }
     stack.getSymbolTable().addSymbol(newSymbol, &errHandler, file->path);

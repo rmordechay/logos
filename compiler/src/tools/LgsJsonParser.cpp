@@ -432,10 +432,6 @@ void LgsJsonParser::parseStrConst(const LgsStrConst* strConst) {
     closeObject();
 }
 
-void LgsJsonParser::parseTypeExpr(LgsTypeExpr* typeExpr) {
-    assert(0);
-}
-
 void LgsJsonParser::parseInstance(LgsInstance* instance) {
     assert(0);
 }

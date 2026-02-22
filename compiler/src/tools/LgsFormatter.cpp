@@ -312,10 +312,6 @@ void LgsFormatter::formatStrConst(const LgsStrConst* strConst) {
     insert("\"" + strConst->value + "\"");
 }
 
-void LgsFormatter::formatTypeExpr(LgsTypeExpr* typeExpr) {
-    assert(0);
-}
-
 void LgsFormatter::formatInstance(LgsInstance* instance) {
     insert(instance->name);
     insert("{");

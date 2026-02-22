@@ -189,6 +189,17 @@ TEST(ErrorsTest, E10011B) {
     expectErrors(app, E10011, 1);
 }
 
+TEST(ErrorsTest, E10011C) {
+    const auto code = R"(
+    single Obj {}
+    object Obj {}
+    main() {}
+    )";
+    LgsApp app;
+    parseAndAnalyse(app, {code}, {LGS_MAIN_FILE});
+    expectErrors(app, E10011, 1);
+}
+
 TEST(ErrorsTest, E10012A) {
     const auto code = R"(
     main() {
@@ -703,6 +714,23 @@ TEST(ErrorsTest, E10076A) {
     LgsApp app;
     parseAndAnalyse(app, {code}, {LGS_MAIN_FILE});
     expectErrors(app, E10076, 4);
+}
+
+TEST(ErrorsTest, E10083A) {
+    const auto code = R"(
+    object Obj {
+        x: Int
+        func() {
+            dummy = self.x
+        }
+    }
+    main() {
+        Obj.func()
+    }
+    )";
+    LgsApp app;
+    parseAndAnalyse(app, {code}, {LGS_MAIN_FILE});
+    expectErrors(app, E10083, 1);
 }
 
 TEST(ErrorsTest, E10089A) {

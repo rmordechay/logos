@@ -165,10 +165,6 @@ void LgsLinter::visitStrConst(const LgsStrConst* strConst) {
     assert(0);
 }
 
-void LgsLinter::visitTypeExpr(LgsTypeExpr* typeExpr) {
-    assert(0);
-}
-
 void LgsLinter::visitInstance(LgsInstance* instance) {
     assert(0);
 }

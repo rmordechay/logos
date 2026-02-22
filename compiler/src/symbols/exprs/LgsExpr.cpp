@@ -21,7 +21,6 @@
 #include "exprs/LgsNullableExpr.h"
 #include "exprs/LgsPostfixExpr.h"
 #include "exprs/LgsSelection.h"
-#include "exprs/LgsTypeExpr.h"
 #include "funcs/LgsFunc.h"
 #include "loops/LgsMetaVar.h"
 #include "stmts/LgsVarDec.h"
@@ -243,10 +242,6 @@ LgsSelection* LgsExpr::asSelection() {
 
 LgsIterIndex* LgsExpr::asIterIndex() {
     return dynamic_cast<LgsIterIndex*>(this);
-}
-
-LgsTypeExpr* LgsExpr::asTypeExpr() {
-    return dynamic_cast<LgsTypeExpr*>(this);
 }
 
 LgsInstance* LgsExpr::asInstance() {

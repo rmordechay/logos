@@ -16,7 +16,6 @@ class LgsMatrixExpr;
 class LgsEnvVar;
 class LgsBinaryExpr;
 class LgsCast;
-class LgsTypeExpr;
 class LgsMetaVar;
 class LgsIntConst;
 class LgsVectorExpr;
@@ -71,7 +70,6 @@ public:
     LgsPostfixExpr* asPostfixExpr();
     LgsSelection* asSelection();
     LgsIterIndex* asIterIndex();
-    LgsTypeExpr* asTypeExpr();
     LgsInstance* asInstance();
     LgsArrayExpr* asArrayExpr();
     LgsHashMap* asHashMap();
