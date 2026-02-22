@@ -84,6 +84,11 @@ Value* LgsDouble::divIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
 Value* LgsDouble::powIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
+    const auto cl = left->getConstInt();
+    const auto cr = right->getConstInt();
+    if (cl.has_value() && cr.has_value()) {
+        return cg.doublev(std::pow(cl.value(), cr.value()));
+    }
     const auto [l, r] = loadNumberPair(cg, left->IRValue, right->IRValue, this);
     return cg.callFunc("pow", cg.doubleTy(), {cg.doubleTy(), cg.doubleTy()}, {l, r});
 }

@@ -45,6 +45,27 @@ TEST(CgBinExprTest, IntTest2) {
     EXPECT_EQ(lines[5], "64.000");
 }
 
+TEST(CgBinExprTest, IntTest3) {
+    const auto code = R"(
+    main() {
+        print(8 == 2)
+        print(8 != 2)
+        print(8 < 2)
+        print(8 > 2)
+        print(8 <= 2)
+        print(8 >= 2)
+    }
+    )";
+    std::istringstream stream(runLgsApp(code));
+    const auto lines = getLines(stream, 6);
+    EXPECT_EQ(lines[0], "false");
+    EXPECT_EQ(lines[1], "true");
+    EXPECT_EQ(lines[2], "false");
+    EXPECT_EQ(lines[3], "true");
+    EXPECT_EQ(lines[4], "false");
+    EXPECT_EQ(lines[5], "true");
+}
+
 TEST(CgBinExprTest, FloatTest1) {
     const auto code = R"(
     main() {

@@ -45,3 +45,24 @@ TEST(CgNullableTest, Test2) {
     EXPECT_EQ(lines[1], "null");
     EXPECT_EQ(lines[2], "3");
 }
+
+TEST(CgNullableTest, Test3) {
+    const auto code = R"(
+    main() {
+        arr: Int?[4]
+        arr2: Int[4]
+        arr3: Int?[4][2]
+        arr4: Int[4][2]
+        print(arr)
+        print(arr2)
+        print(arr3)
+        print(arr4)
+    }
+    )";
+    std::istringstream stream(runLgsApp(code));
+    const auto lines = getLines(stream, 4);
+    EXPECT_EQ(lines[0], "[null, null, null, null]");
+    EXPECT_EQ(lines[1], "[0, 0, 0, 0]");
+    EXPECT_EQ(lines[2], "[[null, null], [null, null], [null, null], [null, null]]");
+    EXPECT_EQ(lines[3], "[[0, 0], [0, 0], [0, 0], [0, 0]]");
+}
