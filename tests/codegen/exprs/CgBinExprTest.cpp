@@ -96,6 +96,8 @@ TEST(CgBinExprTest, BoolTest1) {
         print(false or false)
         print(true or false)
         print(false or true)
+        print(true and false and true and false)
+        print(true or false or true and false)
         print((2 > 5) or (7 > 5))
         print((2 > 5) and (7 > 5))
         print(2 > 5 or 7 > 5)
@@ -103,18 +105,21 @@ TEST(CgBinExprTest, BoolTest1) {
     }
     )";
     std::istringstream stream(runLgsApp(code));
-    const auto lines = getLines(stream, 12);
+    const auto lines = getLines(stream, 14);
     EXPECT_EQ(lines[0], "true");
     EXPECT_EQ(lines[1], "false");
     EXPECT_EQ(lines[2], "false");
     EXPECT_EQ(lines[3], "false");
     EXPECT_EQ(lines[4], "true");
+    EXPECT_EQ(lines[5], "true");
     EXPECT_EQ(lines[6], "true");
     EXPECT_EQ(lines[7], "true");
-    EXPECT_EQ(lines[8], "true");
-    EXPECT_EQ(lines[9], "false");
+    EXPECT_EQ(lines[8], "false");
+    EXPECT_EQ(lines[9], "true");
     EXPECT_EQ(lines[10], "true");
     EXPECT_EQ(lines[11], "false");
+    EXPECT_EQ(lines[12], "true");
+    EXPECT_EQ(lines[13], "false");
 }
 
 TEST(CgBinExprTest, VecTest1) {

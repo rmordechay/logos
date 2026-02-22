@@ -30,10 +30,10 @@ public:
     std::vector<LgsFile*> srcFiles;
     std::vector<LgsEnvFile*> envFiles;
     std::vector<LgsFile*> genericFiles;
+    LgsFile rttFile{"rtt", CG_MODE_RTT};
     LgsAppFile* appConfigFile = nullptr;
     std::vector<LgsApp*> importApps;
     std::string lgsCode; // Used when passing code directly
-    LgsFile rttFile{"rtt", CG_MODE_RTT};
 
     explicit LgsApp(const fs::path& rootPath = "") {
         paths.rootPath = rootPath;

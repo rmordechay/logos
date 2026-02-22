@@ -2,7 +2,7 @@
 
 set -e
 
-LOGOS_GIT_URL=https://gitlab.com/rmordechay1/logos
+LOGOS_GIT_URL=https://github.com/rmordechay/logos
 INSTALL_PREFIX="${INSTALL_PREFIX:-/usr/local}"
 TEMP_DIR=$(mktemp -d)
 
@@ -13,7 +13,7 @@ cleanup() {
 
 trap cleanup EXIT
 
-detect_os() {
+setup_installation() {
   if [ -f /etc/os-release ]; then
     . /etc/os-release
     OS=$ID
@@ -35,25 +35,32 @@ detect_os() {
 
 install_debian() {
   apt-get update
-  DEBIAN_FRONTEND=noninteractive apt-get install -y curl git cmake clang-19 libclang-19-dev libclang-cpp19-dev
-  update-alternatives --install /usr/bin/clang clang /usr/lib/llvm-19/bin/clang 100
-  update-alternatives --install /usr/bin/clang++ clang++ /usr/lib/llvm-19/bin/clang++ 100
-  update-alternatives --install /usr/bin/llc llc /usr/lib/llvm-19/bin/llc 100
+  DEBIAN_FRONTEND=noninteractive apt-get install -y curl git cmake clang-21 libclang-21-dev libclang-cpp21-dev
+  update-alternatives --install /usr/bin/clang clang /usr/lib/llvm-21/bin/clang 100
+  update-alternatives --install /usr/bin/clang++ clang++ /usr/lib/llvm-21/bin/clang++ 100
+  update-alternatives --install /usr/bin/llc llc /usr/lib/llvm-21/bin/llc 100
 }
 
 install_alpine() {
-  apk add curl git cmake make clang19
-  ln -sf /usr/bin/clang-19 /usr/bin/cc
-  ln -sf /usr/bin/clang++-19 /usr/bin/c++
+  apk add curl git cmake make clang21
+  ln -sf /usr/bin/clang-21 /usr/bin/cc
+  ln -sf /usr/bin/clang++-21 /usr/bin/c++
 }
 
 install_macos() {
   echo "Installing for Mac..."
-  brew install -y curl git cmake llvm@19
+  brew install -y curl git cmake llvm@21
 }
 
 install_fedora() {
-    dnf install -y curl git cmake clang19
+    dnf install -y curl git cmake clang21
+}
+
+install_cblas() {
+    git clone --depth 1 https://github.com/OpenMathLib/OpenBLAS.git
+    make -C OpenBLAS CFLAGS="-O3 -Wno-uninitialized" > /dev/null
+    cp OpenBLAS/libopenblas.a libcblas.a
+    rm -rf OpenBLAS
 }
 
 install_dependencies() {
@@ -71,6 +78,8 @@ install_dependencies() {
       echo "Operating system is empty. Could not install dependencies."
       exit 1;;
   esac
+  echo "Installing cblas..."
+  install_cblas
 }
 
 install_logos() {
@@ -89,17 +98,9 @@ install_logos() {
   fi
 }
 
-build_cblas() {
-    git clone --depth 1 https://github.com/OpenMathLib/OpenBLAS.git
-    make -C OpenBLAS CFLAGS="-O3 -Wno-uninitialized" > /dev/null
-    cp OpenBLAS/libopenblas.a libcblas.a
-    rm -rf OpenBLAS
-}
-
-detect_os
-#install_dependencies
-build_cblas
-#install_logos
+setup_installation
+install_dependencies
+install_logos
 
 echo "Installation done."
 echo "Files installed:"

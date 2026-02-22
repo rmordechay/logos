@@ -116,7 +116,8 @@ void LgsCgFile::visitTestFile(const LgsTestFile* testFile) {
 void LgsCgFile::visitObject(LgsObject* obj) {
     if(const auto singleton = obj->singleton) {
         const auto objIRType = obj->getIRType(cg);
-        singleton->IRValue = cg.IRModule->getGlobalVariable(obj->name);
+        const auto gv = cg.IRModule->getGlobalVariable(obj->name);
+        singleton->IRValue = gv;
         if (!singleton->IRValue) {
             const auto zeroInit = ConstantAggregateZero::get(objIRType);
             singleton->IRValue = cg.createGlobal(obj->name, objIRType, zeroInit);

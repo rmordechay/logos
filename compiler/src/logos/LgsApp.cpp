@@ -408,10 +408,16 @@ bool LgsApp::generateRTTTypes() {
 
 bool LgsApp::generateGenerics() {
     if (configs.isImport) return true;
+
+    // Object generic
+    const auto objFile = new LgsFile("object", CG_MODE_GENERICS);
+    objFile->setupCodeGen(configs);
+    LgsObject::getGetFieldFunc(objFile->cgFile.cg);
+    LgsObject::getSetFieldFunc(objFile->cgFile.cg);
+    genericFiles.push_back(objFile);
+
     const auto genericsFile = new LgsFile("generics", CG_MODE_GENERICS);
     genericsFile->setupCodeGen(configs);
-    auto& cgFile = genericsFile->cgFile;
-
     std::unordered_map<std::string, LgsFunc*> genericsFuncs;
     std::unordered_map<std::string, LgsType*> genericsTypes;
     for (const auto srcFile : srcFiles) {
@@ -419,8 +425,7 @@ bool LgsApp::generateGenerics() {
         genericsFuncs.merge(srcFile->symbolTable.genericsFuncs);
     }
 
-    LgsObject::getGetFieldFunc(cgFile.cg);
-    LgsObject::getSetFieldFunc(cgFile.cg);
+    auto& cgFile = genericsFile->cgFile;
     for (const auto& [_, func] : genericsFuncs) {
         const auto isBuiltin = func->funcType->isBuiltin;
         if (isBuiltin && func->funcType->name == MAP_FUNC) {
@@ -452,7 +457,13 @@ bool LgsApp::generateGenerics() {
         }
     }
     genericFiles.push_back(genericsFile);
-    return genericsFile->cgFile.cg.writeIRModule(paths, configs.optLevel);
+
+    auto success = false;
+    for (const auto file : genericFiles) {
+        success = file->cgFile.cg.writeIRModule(paths, configs.optLevel);
+        if (!success) break;
+    }
+    return success;
 }
 
 void LgsApp::createBuildDirs() {

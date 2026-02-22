@@ -1138,12 +1138,11 @@ void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent) {
         return addError(E10005, methodCall->location, {name, parent->type->pname()});
     }
     if (parent->asTypeExpr() && method->funcType->isMethod) {
-        return addError(E10083, methodCall->location, {method->funcType->pname()});
+        return addError(E10083, methodCall->location, {method->funcType->name});
     }
     if (method->funcType->isMethod || method->funcType->isVirtual) {
         methodCall->args.insert(methodCall->args.begin(), LgsFuncArg(parent, LGS_SELF, true));
     }
-
     if (!visitFuncArgs(methodCall, method->funcType)) return;
     if (!methodCall->equals(method->funcType)) {
         addError(E10015, methodCall->location, {name, methodCall->asText(), method->asText()});

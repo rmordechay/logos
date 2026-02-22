@@ -16,7 +16,6 @@ public:
     explicit LgsFile(const fs::path& path, const LgsCodeGenMode mode) : path(path), cgFile(mode) {}
     virtual size_t hashFile();
     void setupCodeGen(LgsAppConfigs& appConfigs);
-
     LgsMainFile* asMainFile();
     LgsObjectFile* asObjectFile();
     LgsInterfaceFile* asInterfaceFile();

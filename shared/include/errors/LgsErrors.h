@@ -94,7 +94,7 @@ inline LgsBaseMsg E10079{"Test file %s must be inside tests directory.", errCode
 inline LgsBaseMsg E10080{"Index %s was not found in iterable.", errCodeStart++};
 inline LgsBaseMsg E10081{"Range-start type %s is not equal to the range-end type %s.", errCodeStart++};
 inline LgsBaseMsg E10082{"Loop range %s must be an integer. Given: %s.", errCodeStart++};
-inline LgsBaseMsg E10083{"Method %s is an object method but was called as a class method.", errCodeStart++};
+inline LgsBaseMsg E10083{"%s is an object method but was called as a class method.", errCodeStart++};
 inline LgsBaseMsg E10084{"%s does not belong to an IO pair.", errCodeStart++};
 inline LgsBaseMsg E10085{"Parsing error.", errCodeStart++};
 inline LgsBaseMsg E10086{"Invalid Logos path: %s.", errCodeStart++};
