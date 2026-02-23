@@ -485,8 +485,8 @@ Value* LgsCodeGen::measureTimeStart() {
     return callRuntimeFunc("timeStart", i64Ty());
 }
 
-Value* LgsCodeGen::measureTimeEnd(Value* startTime) {
-    return callRuntimeFunc("timeEnd", i64Ty(), {i64Ty()}, {startTime});
+Value* LgsCodeGen::measureTimeEnd(Value* start) {
+    return callRuntimeFunc("timeEnd", i64Ty(), {i64Ty()}, {start});
 }
 
 void LgsCodeGen::finalizeDebugger(const fs::path& buildPath) const {
@@ -631,7 +631,7 @@ ConstantInt* LgsCodeGen::zeroSize() {
 }
 
 Value* LgsCodeGen::toFloat(Value* v) {
-    if (v->getType()->isFloatingPointTy()) {
+    if (v->getType()->isIntegerTy()) {
         return builder.CreateSIToFP(v, floatTy());
     }
     return builder.CreateFPExt(v, floatTy());
@@ -642,6 +642,13 @@ Value* LgsCodeGen::toInt(Value* v) {
         return builder.CreateFPToSI(v, i32Ty());
     }
     return builder.CreateSExt(v, i32Ty());
+}
+
+Value* LgsCodeGen::toLong(Value* v) {
+    if (v->getType()->isFloatingPointTy()) {
+        return builder.CreateFPToSI(v, i64Ty());
+    }
+    return builder.CreateSExt(v, i64Ty());
 }
 
 Value* LgsCodeGen::toSize(Value* v) {

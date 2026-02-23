@@ -20,6 +20,7 @@ public:
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     bool canCastTo(LgsType* other) override;
     std::string fmtStr() const override;
+    void asIRText(LgsStrBuilder& sb, Value* value) override;
     DIType* getDebugType(LgsCodeGen& cg) override;
 };
 

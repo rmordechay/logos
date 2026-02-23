@@ -41,7 +41,7 @@ public:
     Value* inIR(LgsCodeGen& cg, Value* iterable, Value* value) override;
     Value* getIRElement(LgsCodeGen& cg, Value* iterable, Value* index) override;
     void addIRElement(LgsCodeGen& cg, Value* iterable, Value* index, Value* value) override;
-    void asIRText(LgsStrBuilder& sb, Value* ptr) override;
+    void asIRText(LgsStrBuilder& sb, Value* value) override;
     Value* hashValue(LgsCodeGen& cg, Value* value) override;
     Function* getAddFunc(LgsCodeGen& cg);
     Function* getContainsFunc(LgsCodeGen& cg);

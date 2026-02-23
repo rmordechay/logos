@@ -71,7 +71,6 @@ class Value;
 
 class LgsCgFile {
 public:
-    LgsStack stack;
     LgsCodeGen cg;
     LgsAppConfigs* appConfigs = nullptr;
     Value* startTime = nullptr;
@@ -103,7 +102,7 @@ public:
     void visitIfWithElse(LgsIfStmt* ifStmt);
     void visitElseIf(LgsIfStmt* ifStmt);
     void visitSwitch(LgsSwitch* switchStmt);
-    void visitContinueStmt();
+    void visitContinueStmt(const LgsContinue* continueStmt);
     void visitReturnStmt(LgsReturn* returnStmt);
     void visitBreakStmt(const LgsBreak* breakStmt);
     void visitCoroutine(const LgsCoroutine* coroutine);
@@ -148,7 +147,6 @@ public:
     Function* getThunkFunc(const LgsFuncCall* fc, Type* ctxTy);
 
     void createVecField(LgsField* field, Value* parent);
-    bool checkMock(LgsExpr* expr) const;
     void getMapFunc(LgsFuncType* mapFunc);
     void getFilterFunc(LgsFuncType* filterFunc);
     void getForeachFunc(LgsFuncType* forEachFunc);

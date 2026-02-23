@@ -116,9 +116,9 @@ public:
     void visitForeachLoop(LgsForeachLoop* foreachLoop);
     void visitInfiniteLoop(const LgsInfiniteLoop* infiniteLoop);
     void visitWhileLoop(const LgsWhileLoop* whileLoop);
-    void visitReturnStmt(const LgsReturn* returnStmt);
-    void visitContinueStmt(const LgsContinue* continueStmt);
-    void visitBreakStmt(const LgsBreak* breakStmt);
+    void visitReturnStmt(LgsReturn* returnStmt);
+    void visitContinueStmt(LgsContinue* continueStmt);
+    void visitBreakStmt(LgsBreak* breakStmt);
     void visitCoroutine(const LgsCoroutine* coroutine);
     void visitDeferStmt(const LgsDeferStmt* deferStmt);
     void visitIOStmt(LgsIOStmt* ioStmt);

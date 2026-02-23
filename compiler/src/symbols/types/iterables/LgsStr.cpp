@@ -88,10 +88,10 @@ std::optional<int64_t> LgsStr::getConstLength() {
     return length;
 }
 
-void LgsStr::asIRText(LgsStrBuilder& sb, Value* ptr) {
+void LgsStr::asIRText(LgsStrBuilder& sb, Value* value) {
     if (sb.asJSON)  sb.add("\"");
-    ptr = loadRTData(sb.cg, ptr);
-    sb.add(ptr, sb.cg.callStrlen(ptr));
+    value = loadRTData(sb.cg, value);
+    sb.add(value, sb.cg.callStrlen(value));
     if (sb.asJSON)  sb.add("\"");
 }
 

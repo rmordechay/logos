@@ -107,6 +107,7 @@
 #include "types/primitives/LgsChar.h"
 #include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsInt.h"
+#include "types/primitives/LgsULong.h"
 #include "types/primitives/LgsVoid.h"
 
 #define MAX_TOKENS_NUMBER 100000
@@ -390,8 +391,8 @@ LgsObject* LgsParser::parseObjectBody(const LgsToken& tokenName, const bool isSi
             obj->generics.push_back(type);
             const auto ct = currentToken.type;
             const auto nt = peek().type;
-            if (ct == T_EOF || ct == T_RBRACE || nt == T_COLON || nt == T_LPAREN || nt == T_ENUM || nt == T_INTERFACE ||
-                nt == T_IMPLEMENTS) {
+            if (ct == T_EOF || ct == T_RBRACE || nt == T_COLON || nt == T_LPAREN  ||
+                nt == T_ENUM || nt == T_INTERFACE || nt == T_IMPLEMENTS) {
                 break;
             }
             mustMatch(T_COMMA);
@@ -407,7 +408,8 @@ LgsObject* LgsParser::parseObjectBody(const LgsToken& tokenName, const bool isSi
             obj->implements.push_back(type);
             const auto ct = currentToken.type;
             const auto nt = peek().type;
-            if (ct == T_EOF || ct == T_RBRACE || nt == T_COLON || nt == T_LPAREN || nt == T_ENUM || nt == T_INTERFACE) {
+            if (ct == T_EOF || ct == T_RBRACE || nt == T_COLON ||
+                nt == T_LPAREN || nt == T_ENUM || nt == T_INTERFACE) {
                 break;
             }
             mustMatch(T_COMMA);
@@ -460,7 +462,6 @@ LgsObject* LgsParser::parseObjectBody(const LgsToken& tokenName, const bool isSi
 
 LgsInterface* LgsParser::parseInterfaceBody(const LgsToken& tokenName) {
     auto const interface = new LgsInterface(tokenName.lexeme);
-
     auto fieldPosition = 0;
     while (true) {
         if (const auto field = parseField(fieldPosition)) {
@@ -494,7 +495,6 @@ LgsInterface* LgsParser::parseInterfaceBody(const LgsToken& tokenName) {
 LgsField* LgsParser::parseField(const size_t fieldPosition) {
     const auto oldIndex = currentIndex;
     std::optional<bool> isPublic = std::nullopt;
-
     // Qualifiers
     while (true) {
         if (matchAndConsume(T_PUBLIC)) {
@@ -569,6 +569,7 @@ LgsType* LgsParser::parseType() {
         else if (typeText == LgsUInt::name) type = &LGS_UINT;
         else if (typeText == LgsShort::name) type = &LGS_SHORT;
         else if (typeText == LgsLong::name) type = &LGS_LONG;
+        else if (typeText == LgsULong::name) type = &LGS_ULONG;
         else if (typeText == LgsSize::name) type = &LGS_SIZE;
         else if (typeText == LgsFloat::name) type = &LGS_FLOAT;
         else if (typeText == LgsDouble::name) type = &LGS_DOUBLE;

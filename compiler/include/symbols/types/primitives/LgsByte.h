@@ -15,6 +15,7 @@ public:
     }
     Type* getIRType(LgsCodeGen& cg) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
+    void asIRText(LgsStrBuilder& sb, Value* value) override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
     std::string getName() override;

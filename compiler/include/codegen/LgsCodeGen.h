@@ -176,7 +176,7 @@ public:
     void printPtr(Value* value, const std::string& prefix = "");
     void printBytes(Value* value, Value* size, const std::string& prefix = "");
     Value* measureTimeStart();
-    Value* measureTimeEnd(Value* startTime);
+    Value* measureTimeEnd(Value* start);
 
     void finalizeDebugger(const std::filesystem::path& buildPath) const;
     llvm::DILocation* getDebugLoc(const LgsLocation& location);
@@ -214,6 +214,7 @@ public:
     ConstantInt* zeroSize();
     Value* toFloat(Value* v);
     Value* toInt(Value* v);
+    Value* toLong(Value* v);
     Value* toSize(Value* v);
     Constant* emptyStr();
     ~LgsCodeGen();

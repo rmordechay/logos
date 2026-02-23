@@ -209,7 +209,7 @@ Value* LgsType::moveValue(LgsCodeGen& cg, Value* value, Value* toLevel) {
     return cg.moveValue(getBaseName(), value, toLevel);
 }
 
-void LgsType::asIRText(LgsStrBuilder& sb, Value* ptr) {
+void LgsType::asIRText(LgsStrBuilder& sb, Value* value) {
     assert(0);
 }
 
@@ -244,6 +244,7 @@ LgsShort* LgsType::asShort() { return dynamic_cast<LgsShort*>(this); }
 LgsLong* LgsType::asLong() { return dynamic_cast<LgsLong*>(this); }
 LgsSize* LgsType::asSize() { return dynamic_cast<LgsSize*>(this); }
 LgsUInt* LgsType::asUInt() { return dynamic_cast<LgsUInt*>(this); }
+LgsULong* LgsType::asULong() { return dynamic_cast<LgsULong*>(this); }
 LgsFloat* LgsType::asFloat() { return dynamic_cast<LgsFloat*>(this); }
 LgsDouble* LgsType::asDouble() { return dynamic_cast<LgsDouble*>(this); }
 LgsFuncType* LgsType::asFuncType() { return dynamic_cast<LgsFuncType*>(this); }
@@ -494,6 +495,20 @@ Value* loadAsFloat(LgsCodeGen& cg, Value* v, Type* floatType) {
 Value* loadAsVec(LgsCodeGen& cg, Value* v, Type* vecType) {
     if (v->getType()->isVectorTy()) return v;
     return cg.load(vecType, v);
+}
+
+bool inRange(const uint64_t value, LgsType* toType) {
+    if (toType->asBool()) return value == 0 || value == 1;
+    if (toType->asChar() || toType->asByte()) return inRangeGeneric<int8_t>(value);
+    if (toType->asShort()) return inRangeGeneric<int16_t>(value);
+    if (toType->asInt()) return inRangeGeneric<int32_t>(value);
+    if (toType->asLong()) return inRangeGeneric<int64_t>(value);
+    if (toType->asSize()) return inRangeGeneric<size_t>(value);
+    if (toType->asUInt()) return inRangeGeneric<uint32_t>(value);
+    if (toType->asULong()) return inRangeGeneric<uint64_t>(value);
+    if (toType->asFloat()) return inRangeGeneric<float>(value);
+    if (toType->asDouble()) return inRangeGeneric<double>(value);
+    return false;
 }
 
 std::string getTypeName(LgsType* type) {

@@ -37,7 +37,7 @@ public:
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     Type* getIRType(LgsCodeGen& cg) override;
     Constant* getRTTypeExtra(LgsCodeGen& cg) override;
-    void asIRText(LgsStrBuilder& sb, Value* ptr) override;
+    void asIRText(LgsStrBuilder& sb, Value* value) override;
     Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level) override;
     Value* moveValue(LgsCodeGen& cg, Value* value, Value* toLevel) override;
     Value* addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;

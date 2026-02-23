@@ -79,6 +79,12 @@ std::string LgsSize::fmtStr() const {
     return "%zu";
 }
 
+void LgsSize::asIRText(LgsStrBuilder& sb, Value* value) {
+    const auto buffer = sb.cg.emptyBuffer(128);
+    const auto bytesRead = sb.cg.callSnprintf(fmtStr(), buffer, sb.cg.usize(128), value);
+    sb.add(buffer, sb.cg.toSize(bytesRead));
+}
+
 DIType* LgsSize::getDebugType(LgsCodeGen& cg) {
     assert(0);
 }

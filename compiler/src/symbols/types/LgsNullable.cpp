@@ -96,22 +96,22 @@ Constant* LgsNullable::getRTTypeExtra(LgsCodeGen& cg) {
     return baseType->asObject() ? cg.null() : baseType->getRTType(cg);
 }
 
-void LgsNullable::asIRText(LgsStrBuilder& sb, Value* ptr) {
-    if (!baseType || isa<ConstantPointerNull>(ptr)) {
+void LgsNullable::asIRText(LgsStrBuilder& sb, Value* value) {
+    if (!baseType || isa<ConstantPointerNull>(value)) {
         sb.add(LGS_NULL_LITERAL);
         return;
     }
     auto& cg = sb.cg;
     if (passByRef) {
         cg.ifElseStmt(
-            cg.isNull(ptr),
+            cg.isNull(value),
             [&]{sb.add(LGS_NULL_LITERAL);},
-            [&]{baseType->asIRText(sb, ptr);}
+            [&]{baseType->asIRText(sb, value);}
         );
     } else {
         cg.ifElseStmt(
-            loadIsSet(cg, ptr),
-            [&]{baseType->asIRText(sb, loadValue(cg, ptr));},
+            loadIsSet(cg, value),
+            [&]{baseType->asIRText(sb, loadValue(cg, value));},
             [&]{sb.add(LGS_NULL_LITERAL);}
         );
     }

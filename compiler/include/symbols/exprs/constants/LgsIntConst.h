@@ -13,7 +13,6 @@ public:
     LgsIntConst(LgsType* type, const int64_t value) : LgsExpr(type), value(value) {
         isMutable = false;
     }
-    bool inRange(LgsType* toType) const;
     LgsExpr* cast(LgsType* toType, bool explicitly) override;
     LgsIntConst* clone() override;
     std::string asText() override;

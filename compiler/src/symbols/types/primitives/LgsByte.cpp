@@ -21,6 +21,12 @@ LgsType* LgsByte::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     return nullptr;
 }
 
+void LgsByte::asIRText(LgsStrBuilder& sb, Value* value) {
+    const auto buffer = sb.cg.emptyBuffer(128);
+    const auto bytesRead = sb.cg.callSnprintf(fmtStr(), buffer, sb.cg.usize(128), sb.cg.toInt(value));
+    sb.add(buffer, sb.cg.toSize(bytesRead));
+}
+
 size_t LgsByte::sizeBytes() {
     return sizeof(int8_t);
 }

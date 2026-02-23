@@ -1,7 +1,8 @@
 #pragma once
 #include <string>
-
 #include "exprs/LgsExpr.h"
+
+class LgsForLoop;
 
 enum LgsMetaVarType {
     FOR_I,
@@ -14,6 +15,7 @@ class LgsMetaVar final : public LgsExpr {
 public:
     std::string name;
     LgsMetaVarType varType;
+    LgsForLoop* forLoop = nullptr;
 
     explicit LgsMetaVar(const LgsMetaVarType forType) : LgsMetaVar("", forType) {}
     explicit LgsMetaVar(const std::string& name, const LgsMetaVarType forType) : name(name), varType(forType) {}

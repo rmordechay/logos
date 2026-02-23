@@ -17,7 +17,7 @@ public:
     size_t sizeBytes() override;
     std::string fmtStr() const override;
     bool canCastTo(LgsType* other) override;
-    void asIRText(LgsStrBuilder& sb, Value* ptr) override;
+    void asIRText(LgsStrBuilder& sb, Value* value) override;
     LgsExpr* getZeroValue() override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     Type* getIRType(LgsCodeGen& cg) override;

@@ -4,6 +4,7 @@
 
 class LgsContinue final : public LgsStmt {
 public:
+    LgsForLoop* forLoop = nullptr;
     void setDebugValue(LgsCodeGen& cg) override;
 };
 

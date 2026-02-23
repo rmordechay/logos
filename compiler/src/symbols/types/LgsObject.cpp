@@ -217,7 +217,7 @@ LgsType* LgsObject::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     return canCastTo(rightType) ? &LGS_BOOL : nullptr;
 }
 
-void LgsObject::asIRText(LgsStrBuilder& sb, Value* ptr) {
+void LgsObject::asIRText(LgsStrBuilder& sb, Value* value) {
     sb.add((sb.asJSON ? "" : name) + "{");
     auto isFirst = true;
     for (const auto field : fields) {
@@ -227,7 +227,7 @@ void LgsObject::asIRText(LgsStrBuilder& sb, Value* ptr) {
         } else {
             sb.add(field->name + "=");
         }
-        const auto fieldValue = field->loadIRPtr(sb.cg, field->getGEP(sb.cg, ptr));
+        const auto fieldValue = field->loadIRPtr(sb.cg, field->getGEP(sb.cg, value));
         field->type->asIRText(sb, fieldValue);
         isFirst = false;
     }

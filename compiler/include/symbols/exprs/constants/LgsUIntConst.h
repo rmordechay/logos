@@ -13,6 +13,7 @@ public:
 
     LgsUIntConst(LgsType* type, const uint64_t value) : LgsExpr(type), value(value) {}
     explicit LgsUIntConst(const uint64_t value) : LgsExpr(&LGS_UINT), value(value) {}
+    LgsExpr* cast(LgsType* toType, bool explicitly) override;
     std::string asText() override;
     void setDebugValue(LgsCodeGen& cg) override;
     ~LgsUIntConst() override = default;

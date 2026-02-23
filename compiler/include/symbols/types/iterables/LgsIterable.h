@@ -2,7 +2,6 @@
 #include <optional>
 #include <string>
 #include <vector>
-
 #include "LgsType.h"
 
 class LgsForeachLoop;

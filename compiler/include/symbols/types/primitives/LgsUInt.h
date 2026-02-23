@@ -19,6 +19,7 @@ public:
     std::string getName() override;
     LgsExpr* getZeroValue() override;
     std::string fmtStr() const override;
+    void asIRText(LgsStrBuilder& sb, Value* value) override;
     bool canCastTo(LgsType* other) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     DIType* getDebugType(LgsCodeGen& cg) override;

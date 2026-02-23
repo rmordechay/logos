@@ -161,10 +161,10 @@ void LgsDArray::addIRElement(LgsCodeGen& cg, Value* iterable, Value* index, Valu
     cg.builder.CreateCall(getAddFunc(cg), {iterable, value});
 }
 
-void LgsDArray::asIRText(LgsStrBuilder& sb, Value* ptr) {
+void LgsDArray::asIRText(LgsStrBuilder& sb, Value* value) {
     auto& cg = sb.cg;
-    const auto data = loadRTData(cg, ptr);
-    const auto len = loadRTLength(cg, ptr);
+    const auto data = loadRTData(cg, value);
+    const auto len = loadRTLength(cg, value);
     sb.add("[");
     cg.loop(len, [&](Value* iValue, BasicBlock*) {
         const auto isFirst = cg.builder.CreateICmpNE(iValue, cg.zeroSize());

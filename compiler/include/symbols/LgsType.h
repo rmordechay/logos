@@ -3,6 +3,7 @@
 #include "LgsTokens.h"
 #include <vector>
 
+class LgsULong;
 class LgsSelf;
 class LgsFieldType;
 class LgsEnumField;
@@ -101,7 +102,7 @@ public:
     virtual bool canCastTo(LgsType* other) = 0;
     virtual LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) = 0;
     virtual Value* moveValue(LgsCodeGen& cg, Value* value, Value* toLevel);
-    virtual void asIRText(LgsStrBuilder& sb, Value* ptr);
+    virtual void asIRText(LgsStrBuilder& sb, Value* value);
     virtual Type* getIRType(LgsCodeGen& cg) = 0;
     virtual Constant* getRTTypeExtra(LgsCodeGen& cg);
     virtual Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level);
@@ -130,6 +131,7 @@ public:
     LgsLong* asLong();
     LgsSize* asSize();
     LgsUInt* asUInt();
+    LgsULong* asULong();
     LgsFloat* asFloat();
     LgsDouble* asDouble();
     LgsFuncType* asFuncType();
@@ -165,6 +167,17 @@ void freeTypes(std::vector<T*>& types) {
     types.clear();
 }
 
+template<typename T>
+bool inRangeGeneric(uint64_t value) {
+    if constexpr (std::is_unsigned_v<T>) {
+        return value <= std::numeric_limits<T>::max();
+    } else {
+        const auto signed_value = static_cast<int64_t>(value);
+        return signed_value >= std::numeric_limits<T>::lowest() && signed_value <= std::numeric_limits<T>::max();
+    }
+}
+
+bool inRange(uint64_t value, LgsType* toType);
 std::string getTypeName(LgsType* type);
 std::string getPrettyName(LgsType* type);
 LgsType* inferType(const std::vector<LgsExpr*>& elements);

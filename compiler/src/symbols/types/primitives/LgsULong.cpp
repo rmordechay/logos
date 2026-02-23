@@ -12,7 +12,7 @@ size_t LgsULong::sizeBytes() {
 }
 
 Type* LgsULong::getIRType(LgsCodeGen& cg) {
-    return cg.i32Ty();
+    return cg.i64Ty();
 }
 
 std::string LgsULong::getName() {
@@ -24,9 +24,8 @@ LgsExpr* LgsULong::getZeroValue() {
 }
 
 bool LgsULong::canCastTo(LgsType* other) {
-    const auto IRName = other->getName();
-    if (IRName == LgsAny::name) return true;
-    return name == IRName;
+    if (other->isAny()) return true;
+    return name == other->getName();
 }
 
 LgsType* LgsULong::applyBinOp(LgsType* rightType, LgsBinOp& op) {
@@ -38,5 +37,11 @@ DIType* LgsULong::getDebugType(LgsCodeGen& cg) {
 }
 
 std::string LgsULong::fmtStr() const {
-    return "%ul";
+    return "%" PRIu64;
+}
+
+void LgsULong::asIRText(LgsStrBuilder& sb, Value* value) {
+    const auto buffer = sb.cg.emptyBuffer(128);
+    const auto bytesRead = sb.cg.callSnprintf(fmtStr(), buffer, sb.cg.usize(128), value);
+    sb.add(buffer, sb.cg.toSize(bytesRead));
 }

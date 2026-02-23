@@ -77,9 +77,9 @@ LgsExpr* LgsInt::getZeroValue() {
     return new LgsIntConst(&LGS_INT, 0);
 }
 
-void LgsInt::asIRText(LgsStrBuilder& sb, Value* ptr) {
+void LgsInt::asIRText(LgsStrBuilder& sb, Value* value) {
     const auto buffer = sb.cg.emptyBuffer(128);
-    const auto bytesRead = sb.cg.callSnprintf(fmtStr(), buffer, sb.cg.usize(128), ptr);
+    const auto bytesRead = sb.cg.callSnprintf(fmtStr(), buffer, sb.cg.usize(128), value);
     sb.add(buffer, sb.cg.toSize(bytesRead));
 }
 

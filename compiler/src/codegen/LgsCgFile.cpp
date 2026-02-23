@@ -88,6 +88,7 @@
 #include "funcs/LgsFunc.h"
 #include "funcs/LgsParam.h"
 #include "loops/LgsMetaVar.h"
+#include "stmts/LgsContinue.h"
 #include "stmts/LgsStmt.h"
 #include "stmts/LgsStmtsBlock.h"
 #include "types/LgsFuncType.h"
@@ -172,26 +173,22 @@ void LgsCgFile::visitEnum(const LgsEnum* enum_) {
 }
 
 void LgsCgFile::visitMainFunc(LgsMainFunc* func) {
-    stack.enterScope(func);
     createPrologue(func);
     initMainArgs(func);
     visitStmtsBlock(func->stmtsBlock);
     createEpilogue(func);
-    stack.exitScope();
 }
 
 void LgsCgFile::visitFunc(LgsFunc* func) {
     if (!func->stmtsBlock) return;
     const auto ft = func->funcType;
     if (!ft->genericTypes.empty()) return;
-    stack.enterScope(func);
     createPrologue(func);
     visitStmtsBlock(func->stmtsBlock);
     if (ft->isVariadic) {
         cg.callIntrinsics(Intrinsic::vaend, {cg.ptrTy()}, {ft->params.back().IRValue});
     }
     createEpilogue(func);
-    stack.exitScope();
 }
 
 void LgsCgFile::visitExternalSymbols(LgsFile* file) {
@@ -214,7 +211,7 @@ void LgsCgFile::visitStmt(LgsStmt* stmt) {
     else if (const auto ioStmt = stmt->asIOStmt()) visitIOStmt(ioStmt);
     else if (const auto returnStmt = stmt->asReturn()) visitReturnStmt(returnStmt);
     else if (const auto breakStmt = stmt->asBreak()) visitBreakStmt(breakStmt);
-    else if (stmt->asContinue()) visitContinueStmt();
+    else if (const auto continueStmt = stmt->asContinue()) visitContinueStmt(continueStmt);
 }
 
 void LgsCgFile::visitStmtsBlock(const LgsStmtsBlock* stmtsBlock) {
@@ -237,7 +234,6 @@ void LgsCgFile::visitStmtsBlock(const LgsStmtsBlock* stmtsBlock) {
 }
 
 void LgsCgFile::visitLoop(LgsForLoop* loop) {
-    stack.enterScope(loop);
     loop->setBlocks(cg);
     if (const auto rangeLoop = loop->asRangeLoop()) {
         visitRangeLoop(rangeLoop);
@@ -253,7 +249,6 @@ void LgsCgFile::visitLoop(LgsForLoop* loop) {
     visitStmtsBlock(loop->stmtsBlock);
     loop->incAndJumpToCond(cg);
     cg.startBlock(loop->IRExitBlock);
-    stack.exitScope();
 }
 
 void LgsCgFile::visitRangeLoop(LgsRangeLoop* loop) {
@@ -301,7 +296,7 @@ void LgsCgFile::visitInfiniteLoop(const LgsInfiniteLoop* loop) {
 }
 
 void LgsCgFile::visitLoopMetaVar(LgsMetaVar* metaVar) {
-    const auto loop = stack.currentLoop();
+    const auto loop = metaVar->forLoop;
     const auto iValue = loop->loadIndex(cg);
     switch (metaVar->varType) {
     case FOR_I: {
@@ -399,7 +394,6 @@ void LgsCgFile::visitIfStmt(LgsIfStmt* ifStmt) {
 }
 
 void LgsCgFile::visitSimpleIf(LgsIfStmt* ifStmt) {
-    stack.enterScope(ifStmt);
     visitExpr(ifStmt->ifCond);
     const auto IRBlockIfTrue = cg.createBlock(BLOCK_TRUE);
     ifStmt->IRExitBlock = cg.createBlock(BLOCK_EXIT);
@@ -407,7 +401,6 @@ void LgsCgFile::visitSimpleIf(LgsIfStmt* ifStmt) {
     cg.startBlock(IRBlockIfTrue);
     visitStmtsBlock(ifStmt->ifBlock);
     cg.branchAndStartBlock(ifStmt->IRExitBlock);
-    stack.exitScope();
 }
 
 void LgsCgFile::visitIfWithElse(LgsIfStmt* ifStmt) {
@@ -416,21 +409,17 @@ void LgsCgFile::visitIfWithElse(LgsIfStmt* ifStmt) {
     ifStmt->IRExitBlock = cg.createBlock(BLOCK_FALSE);
 
     // if block
-    stack.enterScope(ifStmt);
     visitExpr(ifStmt->ifCond);
     const auto ifCondIR = ifStmt->ifCond->IRValue;
     cg.builder.CreateCondBr(ifCondIR, IRBlockTrue, IRBlockExit);
     cg.startBlock(IRBlockTrue);
     visitStmtsBlock(ifStmt->ifBlock);
     cg.branch(ifStmt->IRExitBlock);
-    stack.exitScope();
 
     // else block
-    stack.enterScope(ifStmt);
     cg.startBlock(IRBlockExit);
     visitStmtsBlock(ifStmt->elseBlock);
     cg.branchAndStartBlock(ifStmt->IRExitBlock);
-    stack.exitScope();
 }
 
 void LgsCgFile::visitElseIf(LgsIfStmt* ifStmt) {
@@ -440,18 +429,15 @@ void LgsCgFile::visitElseIf(LgsIfStmt* ifStmt) {
     ifStmt->IRExitBlock = cg.createBlock(BLOCK_FALSE);
 
     // if block
-    stack.enterScope(ifStmt);
     visitExpr(ifStmt->ifCond);
     const auto ifCondIR = ifStmt->ifCond->IRValue;
     cg.builder.CreateCondBr(ifCondIR, IRBlockTrue, IRBlockElseIfCheck);
     cg.startBlock(IRBlockTrue);
     visitStmtsBlock(ifStmt->ifBlock);
     cg.branch(ifStmt->IRExitBlock);
-    stack.exitScope();
 
     for (size_t i = 0; i < ifStmt->elseIfs.size(); ++i) {
         const auto [expr, stmtBlock] = ifStmt->elseIfs[i];
-        stack.enterScope(ifStmt);
         cg.startBlock(IRBlockElseIfCheck);
         visitExpr(expr);
         const auto elseIfCondIR = expr->IRValue;
@@ -469,15 +455,12 @@ void LgsCgFile::visitElseIf(LgsIfStmt* ifStmt) {
         cg.startBlock(IRBlockTrue);
         visitStmtsBlock(stmtBlock);
         cg.branch(ifStmt->IRExitBlock);
-        stack.exitScope();
     }
 
     if (ifStmt->elseBlock) {
-        stack.enterScope(ifStmt);
         cg.startBlock(IRBlockExit);
         visitStmtsBlock(ifStmt->elseBlock);
         cg.branch(ifStmt->IRExitBlock);
-        stack.exitScope();
     }
     cg.startBlock(ifStmt->IRExitBlock);
 }
@@ -496,28 +479,24 @@ void LgsCgFile::visitSwitch(LgsSwitch* switchStmt) {
         const auto val = expr->hashConstValue(cg);
         const auto hashed = llvm::cast<ConstantInt>(val);
         switchInst->addCase(hashed, patternBlock);
-        stack.enterScope(switchStmt);
         cg.startBlock(patternBlock);
         visitStmtsBlock(stmtsBlock);
         cg.builder.CreateBr(exitBlock);
-        stack.exitScope();
     }
     if (switchStmt->elseBlock) {
-        stack.enterScope(switchStmt);
         cg.startBlock(defaultBlock);
         visitStmtsBlock(switchStmt->elseBlock);
         cg.branch(exitBlock);
-        stack.exitScope();
     }
     cg.startBlock(exitBlock);
 }
 
-void LgsCgFile::visitContinueStmt() {
-    stack.currentLoop()->incAndJumpToCond(cg);
+void LgsCgFile::visitContinueStmt(const LgsContinue* continueStmt) {
+    continueStmt->forLoop->incAndJumpToCond(cg);
 }
 
 void LgsCgFile::visitReturnStmt(LgsReturn* returnStmt) {
-    const auto currentFunc = stack.currentFunc();
+    const auto currentFunc = returnStmt->func;
     const auto ft = currentFunc->funcType;
     if (ft->rt->isVoid()) {
         cg.createRet();
@@ -538,12 +517,11 @@ void LgsCgFile::visitReturnStmt(LgsReturn* returnStmt) {
 
 void LgsCgFile::visitBreakStmt(const LgsBreak* breakStmt) {
     if (breakStmt->isBreakIf) {
-        cg.builder.CreateBr(stack.getOutermostIfStmt()->IRExitBlock);
+        cg.builder.CreateBr(breakStmt->ifStmt->IRExitBlock);
     } else if (breakStmt->tag != "") {
-        cg.builder.CreateBr(stack.findTagExitBlock(breakStmt->tag));
+        assert(0);
     } else {
-        const auto loop = stack.currentLoop();
-        cg.builder.CreateBr(loop->IRExitBlock);
+        cg.builder.CreateBr(breakStmt->forLoop->IRExitBlock);
     }
 }
 
@@ -577,7 +555,6 @@ void LgsCgFile::visitExpr(LgsExpr* expr, const bool assign) {
     } else if (const auto binaryExpr = dynamic_cast<LgsBinaryExpr*>(expr)) {
         visitBinaryExpr(binaryExpr, assign);
     } else {
-        if (checkMock(expr)) return;
         if (const auto func = expr->asFunc()) visitLambda(func);
         else if (const auto charConst = expr->asCharConst()) visitCharConst(charConst);
         else if (const auto strConst = expr->asStrConst()) visitStrConst(strConst);
@@ -698,19 +675,20 @@ void LgsCgFile::visitFloatConst(LgsFloatConst* floatConst) {
 }
 
 void LgsCgFile::visitIntConst(LgsIntConst* intConst) {
-    if (intConst->type->asBool()) {
+    const auto ty = intConst->type;
+    if (ty->asBool()) {
         intConst->IRValue = cg.i1(intConst->value);
-    } else if (intConst->type->asByte() || intConst->type->asChar()) {
+    } else if (ty->asByte() || ty->asChar()) {
         intConst->IRValue = cg.i8(intConst->value);
-    } else if (intConst->type->asShort()) {
+    } else if (ty->asShort()) {
         intConst->IRValue = cg.i16(intConst->value);
-    } else if (intConst->type->asInt()) {
+    } else if (ty->asInt() || ty->asUInt()) {
         intConst->IRValue = cg.i32(intConst->value);
-    } else if (intConst->type->asLong()) {
+    } else if (ty->asLong() || ty->asULong()) {
         intConst->IRValue = cg.i64(intConst->value);
-    } else if (intConst->type->asSize()) {
+    } else if (ty->asSize()) {
         intConst->IRValue = cg.usize(intConst->value);
-    } else if (intConst->type->asFloat()) {
+    } else if (ty->asFloat()) {
         intConst->IRValue = cg.floatv(intConst->value);
     } else {
         assert(0);
@@ -1271,19 +1249,6 @@ void LgsCgFile::createVecField(LgsField* field, Value* parent) {
     const auto l = cg.load(parentTy, parent);
     const auto newVec = cg.builder.CreateShuffleVector(l, UndefValue::get(parentTy), mask);
     cg.store(newVec, field->IRValue);
-}
-
-bool LgsCgFile::checkMock(LgsExpr* expr) const {
-    if (stack.frames.empty()) return false;
-    const auto currentFunc = stack.currentFunc();
-    if (currentFunc->isTest) {
-        for (auto [when, then] : currentFunc->mocks) {
-            if (!when->equals(expr)) continue;
-            expr->IRValue = then->IRValue;
-            return true;
-        }
-    }
-    return false;
 }
 
 void LgsCgFile::getMapFunc(LgsFuncType* mapFunc) {

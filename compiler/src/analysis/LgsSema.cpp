@@ -406,6 +406,7 @@ void LgsSema::visitStmtsBlock(LgsStmtsBlock* stmtsBlock) {
         if (firstStmt.expr->type->isVoid()) return;
         ft->rt = firstStmt.expr->type;
         const auto returnStmt = new LgsReturn(firstStmt.expr);
+        returnStmt->func = stack.currentFunc();
         firstStmt.stmt = returnStmt;
         firstStmt.wrapperType = LgsStmtWrapper::WrapperType::Stmt;
         currentFunc->returnStmts.push_back(returnStmt);
@@ -723,14 +724,14 @@ void LgsSema::visitWhileLoop(const LgsWhileLoop* whileLoop) {
     visitStmtsBlock(whileLoop->stmtsBlock);
 }
 
-void LgsSema::visitReturnStmt(const LgsReturn* returnStmt) {
-    const auto currentFunc = stack.currentFunc();
-    const auto ft = currentFunc->funcType;
+void LgsSema::visitReturnStmt(LgsReturn* returnStmt) {
+    returnStmt->func = stack.currentFunc();
+    const auto ft = returnStmt->func->funcType;
     auto retExpr = returnStmt->expr;
     if (retExpr) {
         castExprImplicitly(retExpr, ft->rt);
         visitExpr(retExpr);
-        currentFunc->returnStmts.push_back(returnStmt);
+        returnStmt->func->returnStmts.push_back(returnStmt);
         if (retExpr->type->isVoid()) addError(E10093, returnStmt->location);
     }
     const auto rt = ft->rt;
@@ -746,16 +747,24 @@ void LgsSema::visitReturnStmt(const LgsReturn* returnStmt) {
     }
 }
 
-void LgsSema::visitContinueStmt(const LgsContinue* continueStmt) {
-    if (!stack.currentLoop()) {
+void LgsSema::visitContinueStmt(LgsContinue* continueStmt) {
+    const auto currentLoop = stack.currentLoop();
+    if (!currentLoop) {
         addError(E10038, continueStmt->location);
     }
+    continueStmt->forLoop = currentLoop;
 }
 
-void LgsSema::visitBreakStmt(const LgsBreak* breakStmt) {
+void LgsSema::visitBreakStmt(LgsBreak* breakStmt) {
     if (breakStmt->isBreakIf) {
-        if (!stack.currentIfStmt()) addError(E10071, breakStmt->location);
-    } else if (!stack.currentLoop() && breakStmt->tag == "") {
+        breakStmt->ifStmt = stack.getOutermostIfStmt();
+        if (!breakStmt->ifStmt) {
+            addError(E10071, breakStmt->location);
+        }
+        return;
+    }
+    breakStmt->forLoop = stack.currentLoop();
+    if (!breakStmt->forLoop && breakStmt->tag == "") {
         addError(E10017, breakStmt->location);
     }
 }
@@ -1413,22 +1422,20 @@ void LgsSema::visitIndex(LgsIterIndex* iterIndex) {
 }
 
 void LgsSema::visitLoopMetaVar(LgsMetaVar* metaVar) {
-    const auto loop = stack.currentLoop();
-    if (!loop) {
+    metaVar->forLoop = stack.currentLoop();
+    if (!metaVar->forLoop) {
         return addError(E10060, metaVar->location);
     }
-
     const auto name = metaVar->asText();
-    if (loop->asWhileLoop() || loop->asWhileLoop()) {
+    if (metaVar->forLoop->asWhileLoop() || metaVar->forLoop->asWhileLoop()) {
         return addError(E10061, metaVar->location, {name});
     }
     if (metaVar->varType == FOR_ELEMENT) {
         const auto loopVar = stack.getInnermostForeachLoop()->loopVars.front();
         metaVar->setType(loopVar->type);
     }
-
-    if (!loop->metaVars.contains(metaVar->varType)) {
-        loop->metaVars[metaVar->varType] = metaVar;
+    if (!metaVar->forLoop->metaVars.contains(metaVar->varType)) {
+        metaVar->forLoop->metaVars[metaVar->varType] = metaVar;
     }
 }
 

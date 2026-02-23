@@ -3,6 +3,7 @@
 #include "LgsUtils.h"
 #include "stmts/LgsIOPair.h"
 #include "types/LgsEnum.h"
+#include "types/LgsGenericType.h"
 #include "types/LgsObject.h"
 #include "types/LgsSubType.h"
 

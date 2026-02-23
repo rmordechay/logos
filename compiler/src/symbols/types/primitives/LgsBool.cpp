@@ -83,11 +83,11 @@ LgsType* LgsBool::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     return nullptr;
 }
 
-void LgsBool::asIRText(LgsStrBuilder& sb, Value* ptr) {
+void LgsBool::asIRText(LgsStrBuilder& sb, Value* value) {
     auto& cg = sb.cg;
     const auto trueStr = cg.getString(trueLiteral, false);
     const auto falseStr = cg.getString(falseLiteral, false);
-    const auto v = cg.builder.CreateSelect(ptr, trueStr, falseStr);
+    const auto v = cg.builder.CreateSelect(value, trueStr, falseStr);
     sb.add(v, cg.callStrlen(v));
 }
 
