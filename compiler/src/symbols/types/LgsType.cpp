@@ -187,7 +187,7 @@ Constant* LgsType::getRTTypeExtra(LgsCodeGen& cg) {
     return cg.null();
 }
 
-Value* LgsType::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
+Value* LgsType::getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level) {
     assert(0);
 }
 
@@ -393,7 +393,7 @@ Value* orIR(LgsCodeGen& cg, const std::vector<Value*>& values) {
 }
 
 Value* crossIR(LgsCodeGen& cg, Value* left, Value* right, LgsVec* vec) {
-    const auto results = vec->getIRZeroValue(cg, nullptr);
+    const auto results = vec->getIRZeroValue(cg, nullptr, cg.currentLevel);
     const auto [l, r] = loadVecPair(cg, left, right, vec);
     cg.builder.CreateCall(getCrossProductFunc(cg, vec), {results, l, r});
     return results;

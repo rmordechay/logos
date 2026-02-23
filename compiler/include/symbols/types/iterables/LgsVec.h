@@ -26,7 +26,7 @@ public:
     std::optional<int64_t> getConstLength() override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     Constant* getRTTypeExtra(LgsCodeGen& cg) override;
-    Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee) override;
+    Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level) override;
     Value* addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
     Value* subIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
     Value* mulIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;

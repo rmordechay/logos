@@ -100,13 +100,13 @@ LgsExpr* LgsMap::getZeroValue() {
     return new LgsHashMap(this);
 }
 
-Value* LgsMap::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
+Value* LgsMap::getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level) {
     const auto ty = getIRType(cg);
     const auto cap = cg.usize(LGS_ITER_INIT_CAP);
     const auto entriesSize = cg.builder.CreateAdd(pairType->IRSize(cg), cg.usize(sizeof(void*)));
     const auto totalSize = cg.builder.CreateMul(entriesSize, cap);
-    const auto ptr = cg.heapAlloc(IRSize(cg), cg.currentLevel, true);
-    const auto entries = cg.heapAlloc(totalSize, cg.currentLevel, false);
+    const auto ptr = cg.heapAllocSize(IRSize(cg), cg.currentLevel, true);
+    const auto entries = cg.heapAllocSize(totalSize, cg.currentLevel, false);
     cg.storeField(ty, ptr, LgsHashMapIndices::type, getRTType(cg));
     cg.storeField(ty, ptr, LgsHashMapIndices::entries, entries);
     cg.storeField(ty, ptr, LgsHashMapIndices::length, cg.zeroSize());
@@ -303,7 +303,7 @@ Function* LgsMap::getAddFunc(LgsCodeGen& cg) {
     cg.startBlock(resizeBlock);
     const auto size = cg.builder.CreateMul(pairType->IRSize(cg), cg.usize(sizeof(void*)));
     const auto newCap = cg.builder.CreateMul(size, cg.builder.CreateMul(cap, cg.usize(2)));
-    const auto newEntries = cg.heapAlloc(newCap, level, false);
+    const auto newEntries = cg.heapAllocSize(newCap, level, false);
     auto entries = cg.loadPtr(entriesField);
 
     cg.loop(cap, [&](Value* iValue, BasicBlock* bb) {
@@ -354,7 +354,7 @@ Function* LgsMap::getAddFunc(LgsCodeGen& cg) {
 
     // Store entry
     cg.startBlock(storeElementBlock);
-    const auto newEntry = cg.heapAlloc(size, level, false);
+    const auto newEntry = cg.heapAllocSize(size, level, false);
     cg.storeField(entryTy, newEntry, LgsHashMapIndices::key, keyIR);
     cg.storeField(entryTy, newEntry, LgsHashMapIndices::value, valueIR);
     cg.storeField(entryTy, newEntry, LgsHashMapIndices::next, cg.null());

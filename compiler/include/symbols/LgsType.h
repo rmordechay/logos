@@ -104,7 +104,7 @@ public:
     virtual void asIRText(LgsStrBuilder& sb, Value* ptr);
     virtual Type* getIRType(LgsCodeGen& cg) = 0;
     virtual Constant* getRTTypeExtra(LgsCodeGen& cg);
-    virtual Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee);
+    virtual Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level);
     virtual Value* hashValue(LgsCodeGen& cg, Value* value);
     virtual DIType* getDebugType(LgsCodeGen& cg) = 0;
 

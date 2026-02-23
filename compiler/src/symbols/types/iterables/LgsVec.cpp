@@ -145,7 +145,7 @@ Constant* LgsVec::getRTTypeExtra(LgsCodeGen& cg) {
     return cg.createGlobal(rttName + "_extra", st, ConstantStruct::get(st, args));
 }
 
-Value* LgsVec::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
+Value* LgsVec::getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level) {
     if (pointee) return pointee;
     return cg.builder.CreateAlloca(getIRType(cg));
 }

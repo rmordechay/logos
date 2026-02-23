@@ -95,12 +95,12 @@ public:
     StructType* getStructType(const std::vector<Type*>& types, const std::string& name = "");
 
     Value* getCurrentLevel();
-    Value* getLevelAbove();
+    Value* levelAbove();
     Value* callHash(Value* type, Value* arg);
     Value* getVField(Value* objType, Value* objInstance, Value* fieldName);
     Value* getVFunc(Value* objType, Value* funcName);
-    Value* heapAlloc(Value* size, Value* level, bool setLevel);
-    Value* heapAlloc(const std::string& baseName, Value* type, Value* level = nullptr);
+    Value* heapAllocSize(Value* size, Value* level, bool setLevel);
+    Value* heapAllocType(const std::string& baseName, Value* type, Value* level);
     Value* reallocate(Value* ptr, Value* size, Value* level);
     Value* moveValue(const std::string& baseName, Value* v, Value* toLevel);
     void throwError(const LgsBaseMsg& err, const std::vector<Value*>& args = {});

@@ -42,7 +42,6 @@ public:
         rttKind = RTT_OBJECT;
         metaFields[OBJ_META_NAME] = new LgsField(OBJ_META_NAME, new LgsStr(), new LgsStrConst(name));
     }
-
     std::string getName() override;
     std::string getBaseName() override;
     LgsFunc* getMethod(const std::string& methodName) override;
@@ -58,7 +57,7 @@ public:
     void asIRText(LgsStrBuilder& sb, Value* ptr) override;
     Constant* getRTTypeExtra(LgsCodeGen& cg) override;
     Value* hashValue(LgsCodeGen& cg, Value* value) override;
-    Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee) override;
+    Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level) override;
     DIType* getDebugType(LgsCodeGen& cg) override;
     Function* getObjsEqFunc(LgsCodeGen& cg) const;
     Function* getObjsHashFunc(LgsCodeGen& cg) const;

@@ -26,7 +26,7 @@ public:
     bool canCastTo(LgsType* other) override;
     bool equals(LgsType* other) override;
     LgsExpr* getZeroValue() override;
-    Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee) override;
+    Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level) override;
     Type* getIRType(LgsCodeGen& cg) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     Constant* getRTTypeExtra(LgsCodeGen& cg) override;

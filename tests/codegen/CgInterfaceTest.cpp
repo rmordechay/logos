@@ -55,3 +55,25 @@ TEST(CgInterfaceTest, Test2) {
     EXPECT_EQ(lines[0], "From Obj");
     EXPECT_EQ(lines[1], "From Interface");
 }
+
+TEST(CgInterfaceTest, Test3) {
+    const auto code = R"(
+    interface Interface {
+        func()
+    }
+    func(obj: Interface) {
+        obj.func()
+    }
+    main() {
+        obj = Interface{func={print("Hello world")}}
+        obj.func()
+        func(obj)
+        func(Interface{func={print("Hello world")}})
+    }
+    )";
+    std::istringstream stream(runLgsApp(code));
+    const auto lines = getLines(stream, 3);
+    EXPECT_EQ(lines[0], "Hello world");
+    EXPECT_EQ(lines[1], "Hello world");
+    EXPECT_EQ(lines[2], "Hello world");
+}

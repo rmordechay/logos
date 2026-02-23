@@ -30,8 +30,8 @@ LgsExpr* LgsStr::getZeroValue() {
     return new LgsStrConst("");
 }
 
-Value* LgsStr::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
-    return cg.heapAlloc(name, cg.emptyStr());
+Value* LgsStr::getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level) {
+    return cg.heapAllocType(name, cg.emptyStr(), level);
 }
 
 bool LgsStr::canCastTo(LgsType* other) {
@@ -85,7 +85,7 @@ Value* LgsStr::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
     const auto leftStrConst = left->getConstStr();
-    const auto alloc = cg.heapAlloc(IRSize(cg), cg.currentLevel, true);
+    const auto alloc = cg.heapAllocSize(IRSize(cg), cg.currentLevel, true);
     if (leftStrConst.has_value()) {
         const auto lv = leftStrConst.value();
         // Str
@@ -113,7 +113,7 @@ Value* LgsStr::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto leftSize = cg.callStrlen(leftPtr);
     if (right->type->asChar()) {
         const auto allocSize = cg.builder.CreateAdd(leftSize, cg.usize(2));
-        ptr = cg.heapAlloc(allocSize, cg.currentLevel, false);
+        ptr = cg.heapAllocSize(allocSize, cg.currentLevel, false);
         const auto rightPos = cg.builder.CreateInBoundsGEP(cg.i8Ty(), ptr, leftSize);
         cg.callMemcpy(ptr, leftPtr, leftSize);
         cg.store(right->IRValue, rightPos);
@@ -122,7 +122,7 @@ Value* LgsStr::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
         const auto rightSize = cg.callStrlen(rightPtr);
         const auto sumSize = cg.builder.CreateAdd(leftSize, rightSize);
         const auto allocSize = cg.builder.CreateAdd(sumSize, cg.usize(1));
-        ptr = cg.heapAlloc(allocSize, cg.currentLevel, false);
+        ptr = cg.heapAllocSize(allocSize, cg.currentLevel, false);
         assert(ptr->getType()->isPointerTy());
         const auto rightPos = cg.builder.CreateInBoundsGEP(cg.i8Ty(), ptr, leftSize);
         cg.callMemcpy(ptr, leftPtr, leftSize);

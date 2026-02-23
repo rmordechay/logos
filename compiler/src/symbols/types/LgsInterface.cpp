@@ -20,6 +20,6 @@ LgsExpr* LgsInterface::getZeroValue() {
     return nullptr;
 }
 
-Value* LgsInterface::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
+Value* LgsInterface::getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level) {
     return cg.null();
 }

@@ -76,7 +76,7 @@ void LgsInt::asIRText(LgsStrBuilder& sb, Value* ptr) {
     sb.add(buffer, sb.cg.toSize(bytesRead));
 }
 
-Value* LgsInt::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
+Value* LgsInt::getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level) {
     return cg.zero32();
 }
 

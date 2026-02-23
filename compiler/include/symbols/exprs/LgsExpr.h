@@ -49,6 +49,7 @@ public:
     explicit LgsExpr(LgsType* type = nullptr) : type(type) {}
     LgsType* getType() override;
     void setType(LgsType* newType) override;
+    Value* getLevel(LgsCodeGen& cg) const;
     std::optional<int64_t> getConstInt();
     std::optional<double_t> getConstFloat();
     std::optional<std::string> getConstStr();

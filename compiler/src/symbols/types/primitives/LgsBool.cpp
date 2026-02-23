@@ -87,7 +87,7 @@ void LgsBool::asIRText(LgsStrBuilder& sb, Value* ptr) {
     sb.add(v, cg.callStrlen(v));
 }
 
-Value* LgsBool::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
+Value* LgsBool::getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level) {
     return cg.false_();
 }
 

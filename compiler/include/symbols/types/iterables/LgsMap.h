@@ -31,7 +31,7 @@ public:
     LgsType* getValueType() override;
     bool canCastTo(LgsType* other) override;
     LgsExpr* getZeroValue() override;
-    Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee) override;
+    Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     Value* lenIR(LgsCodeGen& cg, Value* iterable) override;
     Value* inIR(LgsCodeGen& cg, Value* iterableExpr, Value* value) override;

@@ -1319,33 +1319,35 @@ void LgsSema::visitUnwrap(LgsExpr* expr) {
 }
 
 void LgsSema::visitInlineInterface(LgsInstance* instance, LgsInterface* interface) {
-    instance->setType(new LgsObject(interface->name));
-    instance->obj->location = instance->location;
-    instance->obj->implements.push_back(interface);
+    const auto obj = new LgsObject(instance->name);
+    obj->implements.push_back(interface);
     auto isValid = true;
     for (auto& [name, arg] : instance->args) {
-        const auto expr = arg.expr;
-        visitExpr(expr);
-        const auto field = interface->getField(name);
-        if (field) {
+        if (const auto field = interface->getField(name)) {
+            castExprImplicitly(arg.expr, field->type);
+            visitExpr(arg.expr);
+            isValid = isValid && validateExprType(arg.expr, field->type);
+            if (!isValid) continue;
             const auto newField = new LgsField(*field);
-            newField->expr = expr;
-            instance->fields.push_back(newField);
-            continue;
+            newField->expr = arg.expr;
+            obj->fields.push_back(newField);
+        } else if (const auto interfaceMethod = interface->getMethod(name)) {
+            castExprImplicitly(arg.expr, interfaceMethod->type);
+            visitExpr(arg.expr);
+            isValid = isValid && validateExprType(arg.expr, interfaceMethod->type);
+            if (!isValid) continue;
+            const auto method = arg.expr->asFunc();
+            method->funcType->isMethod = true;
+            method->funcType->name = name;
+            obj->addMethod(method);
+        } else {
+            addError(E10005, arg.expr->location, {name, interface->name});
+            isValid = false;
         }
-        const auto method = interface->getMethod(name);
-        if (method) {
-            const auto newMethod = expr->asFunc();
-            newMethod->funcType->addSelf(interface);
-            instance->obj->addMethod(newMethod);
-            continue;
-        }
-        addError(E10005, expr->location, {name, interface->name});
-        isValid = false;
     }
-    if (isValid) {
-        visitObject(instance->obj);
-    }
+    if (!isValid) return;
+    visitObjImplements(obj, obj->implements);
+    instance->setType(obj);
 }
 
 void LgsSema::visitIterIndex(LgsIterIndex* iterIndex) {

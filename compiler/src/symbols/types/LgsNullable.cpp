@@ -104,7 +104,7 @@ void LgsNullable::asIRText(LgsStrBuilder& sb, Value* ptr) {
     }
 }
 
-Value* LgsNullable::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
+Value* LgsNullable::getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level) {
     if (passByRef) {
         if (pointee) cg.store(cg.null(), pointee);
         return cg.null();

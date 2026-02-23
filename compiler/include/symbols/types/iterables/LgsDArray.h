@@ -29,7 +29,7 @@ public:
     bool hasGenerics() override;
     void replaceGenerics(std::unordered_map<std::string, LgsType*>& replacements) override;
     Constant* getRTTypeExtra(LgsCodeGen& cg) override;
-    Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee) override;
+    Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level) override;
     Value* lenIR(LgsCodeGen& cg, Value* iterable) override;
     Value* inIR(LgsCodeGen& cg, Value* iterable, Value* value) override;
     Value* getIRElement(LgsCodeGen& cg, Value* iterable, Value* index) override;

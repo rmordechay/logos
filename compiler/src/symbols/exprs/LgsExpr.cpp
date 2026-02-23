@@ -35,6 +35,10 @@ void LgsExpr::setType(LgsType* newType) {
     type = newType;
 }
 
+Value* LgsExpr::getLevel(LgsCodeGen& cg) const {
+    return isReturnExpr ? cg.levelAbove() : cg.currentLevel;
+}
+
 std::optional<int64_t> LgsExpr::getConstInt() {
     if (const auto intConst = asIntConst()) {
         return intConst->value;

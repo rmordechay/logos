@@ -24,7 +24,7 @@ LgsExpr* LgsFloat::getZeroValue() {
     return new LgsFloatConst(this, 0.0);
 }
 
-Value* LgsFloat::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
+Value* LgsFloat::getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level) {
     return cg.floatv(0);
 }
 

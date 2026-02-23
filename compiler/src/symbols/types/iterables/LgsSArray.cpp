@@ -55,7 +55,7 @@ LgsExpr* LgsSArray::getZeroValue() {
     return new LgsArrayExpr(this);
 }
 
-Value* LgsSArray::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
+Value* LgsSArray::getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level) {
     if (pointee) return pointee;
     return cg.builder.CreateAlloca(getIRType(cg));
 }

@@ -201,7 +201,7 @@ Value* LgsCodeGen::getCurrentLevel() {
     return runtimeFunc;
 }
 
-Value* LgsCodeGen::getLevelAbove() {
+Value* LgsCodeGen::levelAbove() {
     return builder.CreateSub(currentLevel, usize(1));
 }
 
@@ -217,12 +217,12 @@ Value* LgsCodeGen::getVFunc(Value* objType, Value* funcName) {
     return callRuntimeFunc("getVFunc", ptrTy(), {ptrTy(), ptrTy()}, {objType, funcName});
 }
 
-Value* LgsCodeGen::heapAlloc(Value* size, Value* level, const bool setLevel) {
+Value* LgsCodeGen::heapAllocSize(Value* size, Value* level, const bool setLevel) {
     assert(size && level);
     return callRuntimeFunc("alloc", ptrTy(), {sizeTy(), sizeTy(), i1Ty()}, {size, level, i1(setLevel)});
 }
 
-Value* LgsCodeGen::heapAlloc(const std::string& baseName, Value* type, Value* level) {
+Value* LgsCodeGen::heapAllocType(const std::string& baseName, Value* type, Value* level) {
     return callRuntimeFunc("alloc" + baseName, ptrTy(), {ptrTy(), sizeTy()}, {type, level ? level : currentLevel});
 }
 
