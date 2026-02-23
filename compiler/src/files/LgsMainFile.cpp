@@ -1,7 +1,15 @@
 #include "files/LgsMainFile.h"
-#include "LgsDefinitions.h"
+
+#include <utility>
+
 #include "LgsUtils.h"
 #include "stmts/LgsVarDec.h"
+#include "funcs/LgsFunc.h"
+#include "stmts/LgsStmt.h"
+#include "types/LgsEnum.h"
+#include "types/LgsInterface.h"
+#include "types/LgsObject.h"
+#include "types/LgsSubType.h"
 
 size_t LgsMainFile::hashFile() {
     size_t hash = 0;

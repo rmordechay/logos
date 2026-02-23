@@ -1,9 +1,12 @@
 #include "types/primitives/LgsBool.h"
-#include <llvm/IR/Module.h>
+
+#include <assert.h>
+#include <llvm/IR/Constant.h>
+#include <llvm/IR/Constants.h>
+#include <llvm/IR/IRBuilder.h>
 
 #include "LgsBinaryTokens.h"
 #include "exprs/constants/LgsIntConst.h"
-#include "types/primitives/LgsAny.h"
 #include "types/primitives/LgsByte.h"
 #include "types/primitives/LgsChar.h"
 #include "types/primitives/LgsDouble.h"
@@ -13,6 +16,7 @@
 #include "types/primitives/LgsShort.h"
 #include "types/primitives/LgsSize.h"
 #include "types/primitives/LgsUInt.h"
+#include "codegen/LgsCodeGen.h"
 
 std::string LgsBool::getName() {
     return name;

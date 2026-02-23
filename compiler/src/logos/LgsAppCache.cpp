@@ -1,5 +1,8 @@
 #include "logos/LgsAppCache.h"
+
 #include <fstream>
+#include <string>
+
 #include "LgsUtils.h"
 
 void LgsAppCache::load(const fs::path& cacheFilePath) {

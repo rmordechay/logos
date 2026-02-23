@@ -1,5 +1,7 @@
 #include "exprs/constants/LgsUIntConst.h"
 
+#include <assert.h>
+
 std::string LgsUIntConst::asText() {
     return std::to_string(value);
 }

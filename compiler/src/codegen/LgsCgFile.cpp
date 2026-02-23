@@ -1,9 +1,34 @@
 #include "codegen/LgsCgFile.h"
+
+#include <llvm/IR/Module.h>
+#include <__ostream/basic_ostream.h>
+#include <_stdlib.h>
+#include <_string.h>
+#include <assert.h>
+#include <llvm/ADT/ArrayRef.h>
+#include <llvm/ADT/Twine.h>
+#include <llvm/IR/Argument.h>
+#include <llvm/IR/Constant.h>
+#include <llvm/IR/Constants.h>
+#include <llvm/IR/DerivedTypes.h>
+#include <llvm/IR/Function.h>
+#include <llvm/IR/GlobalVariable.h>
+#include <llvm/IR/IRBuilder.h>
+#include <llvm/IR/Instructions.h>
+#include <llvm/IR/Intrinsics.h>
+#include <llvm/IR/Value.h>
+#include <llvm/Support/Casting.h>
 #include <sstream>
-#include "builtins/LgsTest.h"
+#include <unordered_set>
+#include <functional>
+#include <map>
+#include <string>
+#include <unordered_map>
+#include <utility>
+#include <vector>
+
 #include "builtins/LgsSys.h"
 #include "exprs/LgsArrayExpr.h"
-#include "funcs/LgsCoroutine.h"
 #include "files/LgsInterfaceFile.h"
 #include "files/LgsObjectFile.h"
 #include "stmts/LgsField.h"
@@ -29,7 +54,6 @@
 #include "logos/LgsAppConfigs.h"
 #include "logos/LgsPaths.h"
 #include "stmts/LgsBreak.h"
-#include "stmts/LgsContinue.h"
 #include "stmts/LgsDeferStmt.h"
 #include "stmts/LgsVarDec.h"
 #include "types/iterables/LgsDArray.h"
@@ -44,19 +68,39 @@
 #include "stmts/LgsSwitch.h"
 #include "types/iterables/LgsSArray.h"
 #include "types/iterables/LgsVec.h"
-#include "types/primitives/LgsSize.h"
 #include "exprs/LgsMatrixExpr.h"
 #include "exprs/LgsMetaSelection.h"
 #include "exprs/LgsNullableExpr.h"
 #include "exprs/constants/LgsCharConst.h"
 #include "types/LgsNullable.h"
-#include <llvm/IR/Module.h>
-#include <llvm/Passes/PassBuilder.h>
-#include "llvm/Bitcode/BitcodeWriter.h"
-#include <unistd.h>
-#include <unordered_set>
-
 #include "types/LgsEnumField.h"
+#include "LgsBinaryTokens.h"
+#include "LgsDefinitions.h"
+#include "LgsSymbol.h"
+#include "LgsSymbolTable.h"
+#include "LgsType.h"
+#include "LgsValue.h"
+#include "codegen/LgsCodeGen.h"
+#include "exprs/LgsExpr.h"
+#include "exprs/LgsHashMap.h"
+#include "exprs/constants/LgsIntConst.h"
+#include "files/LgsFile.h"
+#include "funcs/LgsFunc.h"
+#include "funcs/LgsParam.h"
+#include "loops/LgsMetaVar.h"
+#include "stmts/LgsStmt.h"
+#include "stmts/LgsStmtsBlock.h"
+#include "types/LgsFuncType.h"
+#include "types/LgsInterface.h"
+#include "types/LgsObject.h"
+#include "types/iterables/LgsIterable.h"
+#include "types/iterables/LgsMap.h"
+#include "types/iterables/LgsStr.h"
+
+namespace llvm {
+class BasicBlock;
+class Type;
+}
 
 bool LgsCgFile::generateSrcFile(LgsFile* file, const LgsPaths& paths) {
     visitExternalSymbols(file);

@@ -1,6 +1,14 @@
 #include "exprs/LgsHashMap.h"
-#include "LgsUtils.h"
+
+#include <assert.h>
+#include <llvm/IR/DIBuilder.h>
+#include <llvm/IR/DebugInfoMetadata.h>
+#include <llvm/IR/IRBuilder.h>
+
 #include "codegen/LgsCodeGen.h"
+#include "LgsTokens.h"
+#include "LgsType.h"
+#include "exprs/LgsExpr.h"
 
 void LgsPair::setDebugValue(LgsCodeGen& cg) {
     assert(0);

@@ -1,8 +1,15 @@
 #include "stmts/LgsField.h"
+
+#include <assert.h>
+#include <llvm/ADT/ArrayRef.h>
+#include <llvm/IR/Constants.h>
+#include <llvm/IR/IRBuilder.h>
+#include <llvm/IR/Type.h>
+#include <llvm/IR/Value.h>
+
 #include "LgsType.h"
 #include "codegen/LgsCodeGen.h"
 #include "exprs/LgsExpr.h"
-#include "exprs/LgsHashMap.h"
 
 void LgsField::setType(LgsType* newType) {
     type = newType;

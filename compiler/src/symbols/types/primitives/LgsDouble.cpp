@@ -1,12 +1,19 @@
 #include "types/primitives/LgsDouble.h"
 
-#include <llvm/IR/Module.h>
+#include <__math/exponential_functions.h>
+#include <assert.h>
+#include <llvm/IR/Constant.h>
+#include <llvm/IR/IRBuilder.h>
+#include <optional>
+#include <utility>
 
 #include "exprs/constants/LgsFloatConst.h"
 #include "codegen/LgsCodeGen.h"
 #include "exprs/LgsBinaryExpr.h"
 #include "types/primitives/LgsAny.h"
 #include "types/primitives/LgsBool.h"
+#include "LgsBinaryTokens.h"
+#include "exprs/LgsExpr.h"
 
 std::string LgsDouble::getName() {
     return name;

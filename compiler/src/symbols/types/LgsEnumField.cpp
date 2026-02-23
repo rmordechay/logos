@@ -1,12 +1,23 @@
 #include "types/LgsEnumField.h"
 
+#include <llvm/ADT/ArrayRef.h>
+#include <llvm/IR/Constants.h>
+#include <llvm/IR/DerivedTypes.h>
+#include <llvm/IR/IRBuilder.h>
+#include <llvm/IR/Type.h>
+#include <llvm/IR/Value.h>
+#include <unordered_map>
+#include <vector>
+
 #include "LgsRTTIndices.h"
 #include "codegen/LgsCodeGen.h"
 #include "exprs/LgsFuncCall.h"
-#include "exprs/LgsVariable.h"
 #include "funcs/LgsFunc.h"
-#include "stmts/LgsField.h"
 #include "types/primitives/LgsSize.h"
+#include "LgsType.h"
+#include "exprs/LgsExpr.h"
+#include "types/LgsEnum.h"
+#include "types/LgsFuncType.h"
 
 #define VALUE_FUNC "value"
 #define INDEX_FUNC "index"

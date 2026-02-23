@@ -1,6 +1,9 @@
 #pragma once
+#include <string>
+
 #include "LgsType.h"
 #include "codegen/LgsCodeGen.h"
+#include "Lgs_Types.h"
 
 class LgsLong final : public LgsType {
 public:

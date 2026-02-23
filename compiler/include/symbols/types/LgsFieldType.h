@@ -1,8 +1,16 @@
 #pragma once
 #include <llvm/IR/DerivedTypes.h>
 #include <llvm/IR/IRBuilder.h>
+#include <string>
 
 #include "LgsType.h"
+#include "Lgs_Types.h"
+
+class LgsCodeGen;
+namespace llvm {
+class StructType;
+class Value;
+}
 
 class LgsFieldType final : public LgsType {
 public:

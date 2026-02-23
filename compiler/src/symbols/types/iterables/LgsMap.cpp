@@ -1,13 +1,28 @@
 #include "types/iterables/LgsMap.h"
+
+#include <llvm/IR/Module.h>
+#include <assert.h>
+#include <llvm/ADT/ArrayRef.h>
+#include <llvm/ADT/Twine.h>
+#include <llvm/IR/Argument.h>
+#include <llvm/IR/BasicBlock.h>
+#include <llvm/IR/Constant.h>
+#include <llvm/IR/Constants.h>
+#include <llvm/IR/DerivedTypes.h>
+#include <llvm/IR/Function.h>
+#include <llvm/IR/GlobalVariable.h>
+#include <llvm/IR/IRBuilder.h>
+#include <llvm/IR/Instructions.h>
+#include <functional>
+#include <unordered_map>
+#include <vector>
+
 #include "LgsDefinitions.h"
 #include "exprs/LgsHashMap.h"
-#include "exprs/LgsIterIndex.h"
 #include "loops/LgsForeachLoop.h"
 #include "stmts/LgsVarDec.h"
 #include "types/primitives/LgsAny.h"
 #include "types/primitives/LgsVoid.h"
-#include <llvm/IR/Module.h>
-
 #include "LgsConfigs.h"
 #include "LgsRTTIndices.h"
 #include "Lgs_Exprs.h"
@@ -17,6 +32,13 @@
 #include "types/LgsFuncType.h"
 #include "types/iterables/LgsDArray.h"
 #include "types/iterables/LgsStr.h"
+#include "exprs/LgsExpr.h"
+#include "types/iterables/LgsIterable.h"
+
+namespace llvm {
+class Type;
+class Value;
+}
 
 LgsFunc* LgsMap::getMethod(const std::string& methodName) {
     constexpr auto flags = BUILTIN | PUBLIC | METHOD;

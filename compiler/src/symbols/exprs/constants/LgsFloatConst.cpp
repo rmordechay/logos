@@ -1,5 +1,6 @@
 #include "exprs/constants/LgsFloatConst.h"
-#include "codegen/LgsCodeGen.h"
+
+#include <assert.h>
 
 std::string LgsFloatConst::asText() {
     return std::to_string(value);

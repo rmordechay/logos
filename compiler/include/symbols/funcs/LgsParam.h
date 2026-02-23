@@ -1,11 +1,17 @@
 #pragma once
+#include <LgsValue.h>
+#include <string>
+#include <vector>
+
 #include "LgsType.h"
 #include "exprs/LgsExpr.h"
-#include <LgsValue.h>
 
 class LgsVariable;
 class LgsExpr;
 class LgsType;
+namespace llvm {
+class Value;
+}
 
 class LgsParam final : public LgsValue {
 public:

@@ -1,5 +1,9 @@
 #include "exprs/LgsNullableExpr.h"
-#include "codegen/LgsCodeGen.h"
+
+#include <assert.h>
+
+#include "LgsType.h"
+#include "exprs/LgsExpr.h"
 
 void LgsNullableExpr::setDebugValue(LgsCodeGen& cg) {
     assert(0);

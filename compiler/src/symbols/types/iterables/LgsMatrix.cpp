@@ -1,12 +1,24 @@
 #include "types/iterables/LgsMatrix.h"
 
+#include <assert.h>
+#include <llvm/ADT/ArrayRef.h>
+#include <llvm/IR/Constant.h>
+#include <llvm/IR/Constants.h>
+#include <llvm/IR/DerivedTypes.h>
+#include <llvm/IR/IRBuilder.h>
+#include <llvm/IR/Instructions.h>
+#include <vector>
+
 #include "LgsBinaryTokens.h"
 #include "exprs/LgsBinaryExpr.h"
 #include "exprs/LgsMatrixExpr.h"
-#include "types/primitives/LgsAny.h"
 #include "codegen/LgsCodeGen.h"
 #include "types/iterables/LgsSArray.h"
 #include "types/iterables/LgsVec.h"
+#include "LgsType.h"
+#include "exprs/LgsExpr.h"
+#include "exprs/constants/LgsIntConst.h"
+#include "types/primitives/LgsSize.h"
 
 Type* LgsMatrix::getIRType(LgsCodeGen& cg) {
     return ArrayType::get(baseType->getIRType(cg), rows * columns);

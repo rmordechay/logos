@@ -1,10 +1,21 @@
 #include "exprs/LgsInstance.h"
 
+#include <assert.h>
+#include <llvm/IR/Constants.h>
+#include <llvm/IR/DerivedTypes.h>
+#include <llvm/IR/IRBuilder.h>
+#include <utility>
+
 #include "LgsRTTIndices.h"
 #include "stmts/LgsField.h"
-#include "types/LgsObject.h"
 #include "LgsUtils.h"
 #include "codegen/LgsCodeGen.h"
+#include "LgsType.h"
+
+namespace llvm {
+class Type;
+class Value;
+}
 
 LgsField* LgsInstance::getField(const std::string& fieldName) const {
     for (auto* f : fields) {

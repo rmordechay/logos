@@ -1,8 +1,18 @@
 #pragma once
+#include <filesystem>
+
 #include "codegen/LgsCgFile.h"
+#include "LgsSymbolTable.h"
+#include "codegen/LgsCodeGen.h"
 
 class LgsAppFile;
 class LgsEnvFile;
+class LgsInterfaceFile;
+class LgsMainFile;
+class LgsObjectFile;
+class LgsTestFile;
+struct LgsAppConfigs;
+
 namespace fs = std::filesystem;
 class LgsStrConst;
 class LgsApp;

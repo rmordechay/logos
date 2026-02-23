@@ -1,11 +1,11 @@
 #pragma once
-#include "logos/LgsStack.h"
+#include <unordered_map>
+#include <string>
+#include <vector>
 
+#include "logos/LgsStack.h"
 #include "analysis/LgsTypeResolver.h"
 #include "files/LgsEnvFile.h"
-#include "logos/LgsAppConfigs.h"
-#include <unordered_map>
-
 #include "errors/LgsErrHandler.h"
 #include "stmts/LgsAssignment.h"
 
@@ -56,6 +56,24 @@ class LgsAssignment;
 class LgsForLoop;
 struct LgsSymbol;
 struct LgsIndex;
+class LgsEnum;
+class LgsField;
+class LgsFunc;
+class LgsIOPair;
+class LgsIOStmt;
+class LgsInterface;
+class LgsMatrixExpr;
+class LgsMetaVar;
+class LgsModuleExpr;
+class LgsNullableExpr;
+class LgsParam;
+class LgsStmtWrapper;
+class LgsSwitch;
+class LgsVectorExpr;
+struct LgsAppConfigs;
+struct LgsBaseMsg;
+struct LgsLocation;
+struct LgsSymbolTable;
 
 
 class LgsSema final {

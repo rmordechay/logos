@@ -1,6 +1,16 @@
 #include "analysis/LgsSema.h"
-#include "builtins/LgsTest.h"
-#include "funcs/LgsCoroutine.h"
+
+#include <__ostream/basic_ostream.h>
+#include <_ctype.h>
+#include <assert.h>
+#include <unordered_set>
+#include <atomic>
+#include <filesystem>
+#include <map>
+#include <optional>
+#include <sstream>
+#include <utility>
+
 #include "errors/LgsErrors.h"
 #include "files/LgsInterfaceFile.h"
 #include "files/LgsObjectFile.h"
@@ -45,12 +55,39 @@
 #include "stmts/LgsIOStmt.h"
 #include "stmts/LgsIfStmt.h"
 #include "stmts/LgsSwitch.h"
-#include "tools/LgsFormatter.h"
 #include "types/primitives/LgsDouble.h"
 #include "types/iterables/LgsVariadic.h"
-#include <ranges>
-#include <unordered_set>
 #include "exprs/LgsModuleExpr.h"
+#include "LgsBinaryTokens.h"
+#include "LgsDefinitions.h"
+#include "LgsSymbol.h"
+#include "LgsSymbolTable.h"
+#include "LgsTokens.h"
+#include "LgsType.h"
+#include "LgsValue.h"
+#include "Lgs_Types.h"
+#include "exprs/LgsExpr.h"
+#include "exprs/constants/LgsIntConst.h"
+#include "files/LgsFile.h"
+#include "funcs/LgsFunc.h"
+#include "funcs/LgsParam.h"
+#include "logos/LgsAppConfigs.h"
+#include "stmts/LgsStmt.h"
+#include "stmts/LgsStmtsBlock.h"
+#include "types/LgsFuncType.h"
+#include "types/LgsGenericType.h"
+#include "types/LgsNullable.h"
+#include "types/LgsObject.h"
+#include "types/iterables/LgsIterable.h"
+#include "types/iterables/LgsMap.h"
+#include "types/iterables/LgsMatrix.h"
+#include "types/iterables/LgsSArray.h"
+#include "types/iterables/LgsStr.h"
+#include "types/iterables/LgsVec.h"
+#include "types/primitives/LgsFloat.h"
+#include "types/primitives/LgsInt.h"
+#include "types/primitives/LgsSize.h"
+
 using std::to_string;
 
 static std::string getMissingImplementsStr(const std::vector<LgsField*>& fields, const std::vector<LgsFunc*>& methods);
@@ -1333,6 +1370,7 @@ void LgsSema::visitInlineInterface(LgsInstance* instance, LgsInterface* interfac
             obj->fields.push_back(newField);
         } else if (const auto interfaceMethod = interface->getMethod(name)) {
             castExprImplicitly(arg.expr, interfaceMethod->type);
+
             visitExpr(arg.expr);
             isValid = isValid && validateExprType(arg.expr, interfaceMethod->type);
             if (!isValid) continue;

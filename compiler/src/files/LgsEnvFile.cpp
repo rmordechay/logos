@@ -1,5 +1,8 @@
 #include "files/LgsEnvFile.h"
+
 #include "LgsUtils.h"
+#include "stmts/LgsStmt.h"
+#include "stmts/LgsVarDec.h"
 
 size_t LgsEnvFile::hashFile() {
     size_t hash = 0;

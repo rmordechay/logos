@@ -1,6 +1,14 @@
 #pragma once
+#include <functional>
+#include <string>
+#include <unordered_map>
+#include <utility>
+#include <vector>
+
 #include "exprs/LgsExpr.h"
 #include "types/LgsFuncType.h"
+#include "codegen/LgsCodeGen.h"
+#include "funcs/LgsParam.h"
 
 class LgsReturn;
 class LgsFuncType;
@@ -9,6 +17,11 @@ class LgsStmtsBlock;
 class LgsParam;
 class LgsStmt;
 class LgsType;
+namespace llvm {
+class BasicBlock;
+class Function;
+class Value;
+}
 
 typedef std::function<Value*(LgsCodeGen&, const std::vector<LgsFuncArg>&)> CallFn;
 

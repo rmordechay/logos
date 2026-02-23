@@ -1,13 +1,20 @@
 #include "stmts/LgsStmtsBlock.h"
+
+#include <assert.h>
+#include <string>
+
 #include "stmts/LgsReturn.h"
 #include "exprs/LgsFuncCall.h"
 #include "exprs/LgsSelection.h"
 #include "funcs/LgsFunc.h"
-#include "stmts/LgsAssignment.h"
 #include "stmts/LgsBreak.h"
 #include "stmts/LgsContinue.h"
-#include "stmts/LgsVarDec.h"
 #include "types/LgsObject.h"
+#include "LgsTokens.h"
+#include "LgsType.h"
+#include "exprs/LgsExpr.h"
+#include "stmts/LgsStmt.h"
+#include "types/LgsFuncType.h"
 
 bool LgsStmtWrapper::isTerminator() const {
     switch (wrapperType) {

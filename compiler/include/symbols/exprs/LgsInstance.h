@@ -1,6 +1,19 @@
 #pragma once
+#include <map>
+#include <string>
+#include <vector>
+
 #include "exprs/LgsExpr.h"
 #include "types/LgsObject.h"
+#include "LgsValue.h"
+
+class LgsCodeGen;
+class LgsField;
+class LgsType;
+namespace llvm {
+class Type;
+class Value;
+}
 
 struct LgsInstanceArg {
     std::string name = "";

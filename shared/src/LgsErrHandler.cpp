@@ -1,8 +1,12 @@
 #include "errors/LgsErrHandler.h"
+
+#include <_ctype.h>
+#include <algorithm>
+#include <iterator>
+
 #include "LgsDefinitions.h"
 #include "LgsUtils.h"
 #include "errors/LgsErrors.h"
-#include <algorithm>
 
 void LgsErrHandler::setUnsuccessful() {
     successful = false;

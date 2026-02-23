@@ -1,10 +1,13 @@
 #include "types/LgsCPtr.h"
 
-#include "codegen/LgsCgFile.h"
+#include <assert.h>
+#include <llvm/IR/DerivedTypes.h>
+
 #include "types/primitives/LgsAny.h"
 #include "types/iterables/LgsDArray.h"
 #include "types/iterables/LgsSArray.h"
 #include "types/primitives/LgsLong.h"
+#include "codegen/LgsCodeGen.h"
 
 std::string LgsCPtr::getName() {
     return name;

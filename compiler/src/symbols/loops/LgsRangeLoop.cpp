@@ -1,7 +1,15 @@
 #include "loops/LgsRangeLoop.h"
 
+#include <assert.h>
+#include <unordered_map>
+#include <vector>
+
 #include "codegen/LgsCodeGen.h"
 #include "stmts/LgsVarDec.h"
+#include "exprs/LgsExpr.h"
+#include "loops/LgsMetaVar.h"
+#include "stmts/LgsStmt.h"
+#include "stmts/LgsStmtsBlock.h"
 
 Value* LgsRangeLoop::loopStart(LgsCodeGen& cg) {
     return cg.toSize(startRange->IRValue);

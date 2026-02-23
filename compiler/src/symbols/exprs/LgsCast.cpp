@@ -1,6 +1,8 @@
 #include "exprs/LgsCast.h"
+
+#include <assert.h>
+
 #include "LgsType.h"
-#include "LgsUtils.h"
 
 std::string LgsCast::asText() {
     return fromValue->asText() + "->" + toType->pname();

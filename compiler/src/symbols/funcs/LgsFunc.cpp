@@ -1,18 +1,33 @@
 #include "funcs/LgsFunc.h"
+
+#include <llvm/IR/Module.h>
+#include <assert.h>
+#include <llvm/ADT/ArrayRef.h>
+#include <llvm/ADT/Twine.h>
+#include <llvm/IR/Attributes.h>
+#include <llvm/IR/DIBuilder.h>
+#include <llvm/IR/DebugInfoMetadata.h>
+#include <llvm/IR/Function.h>
+#include <llvm/IR/IRBuilder.h>
+#include <llvm/IR/Instructions.h>
+#include <llvm/Support/Casting.h>
+#include <llvm/Support/CodeGen.h>
+
 #include "LgsDefinitions.h"
 #include "stmts/LgsStmtsBlock.h"
 #include "exprs/LgsExpr.h"
 #include "exprs/LgsFuncCall.h"
 #include "types/LgsFuncType.h"
-#include "types/primitives/LgsVoid.h"
-#include "LgsUtils.h"
 #include "types/iterables/LgsStr.h"
 #include "codegen/LgsCodeGen.h"
-#include <sstream>
-#include <llvm/IR/Module.h>
-
 #include "stmts/LgsReturn.h"
-#include "types/LgsObject.h"
+#include "LgsTokens.h"
+#include "LgsType.h"
+
+namespace llvm {
+class FunctionType;
+class Value;
+}
 
 
 std::string LgsFunc::asText() {

@@ -1,8 +1,13 @@
 #include "types/iterables/LgsVariadic.h"
 
+#include <llvm/IR/Argument.h>
+#include <llvm/IR/Function.h>
+#include <llvm/IR/IRBuilder.h>
+#include <llvm/IR/Instructions.h>
 #include <cassert>
 
 #include "codegen/LgsCodeGen.h"
+#include "LgsType.h"
 
 size_t LgsVariadic::sizeBytes() {
     return sizeof(void*);

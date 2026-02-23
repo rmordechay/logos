@@ -1,8 +1,13 @@
 #pragma once
+#include <string>
+#include <vector>
+
 #include "exprs/LgsExpr.h"
 #include "types/iterables/LgsDArray.h"
 #include "types/iterables/LgsSArray.h"
 #include "types/iterables/LgsSet.h"
+
+class LgsIterable;
 
 class LgsArrayExpr final : public LgsExpr {
 public:

@@ -1,10 +1,12 @@
 #include "types/LgsEnum.h"
+
+#include <assert.h>
+#include <llvm/IR/Constants.h>
+#include <llvm/IR/DerivedTypes.h>
+
 #include "LgsUtils.h"
 #include "codegen/LgsCodeGen.h"
-#include "exprs/LgsFuncCall.h"
-#include "exprs/LgsVariable.h"
 #include "stmts/LgsField.h"
-#include "types/primitives/LgsSize.h"
 
 LgsExpr* LgsEnum::getZeroValue() {
     return nullptr;

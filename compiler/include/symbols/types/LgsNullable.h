@@ -1,6 +1,15 @@
 #pragma once
 #include <functional>
+#include <string>
+
 #include "LgsType.h"
+#include "Lgs_Types.h"
+
+class LgsBinaryExpr;
+class LgsCodeGen;
+namespace llvm {
+class Value;
+}
 
 class LgsNullable final : public LgsType {
 public:

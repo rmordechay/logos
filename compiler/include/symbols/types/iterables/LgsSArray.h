@@ -1,6 +1,19 @@
 #pragma once
+#include <optional>
+#include <string>
+
 #include "LgsIterable.h"
 #include "exprs/constants/LgsIntConst.h"
+#include "LgsValue.h"
+#include "Lgs_Types.h"
+#include "exprs/LgsExpr.h"
+#include "types/primitives/LgsSize.h"
+
+class LgsCodeGen;
+class LgsType;
+namespace llvm {
+class Function;
+}
 
 class LgsSArray final : public LgsIterable {
 public:

@@ -1,5 +1,11 @@
 #pragma once
 #include "LgsForLoop.h"
+#include "LgsValue.h"
+
+class LgsExpr;
+namespace llvm {
+class Value;
+}
 
 class LgsForeachLoop final : public LgsForLoop {
 public:

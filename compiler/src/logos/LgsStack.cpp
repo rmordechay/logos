@@ -1,8 +1,13 @@
 #include <logos/LgsStack.h>
+#include <assert.h>
+#include <cstddef>
+
 #include "funcs/LgsFunc.h"
 #include "loops/LgsForLoop.h"
 #include "stmts/LgsIfStmt.h"
 #include "stmts/LgsSwitch.h"
+
+class LgsForeachLoop;
 
 void LgsStack::enterScope(LgsValue* value) {
     LgsStackFrame stackFrame;

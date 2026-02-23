@@ -1,8 +1,11 @@
 #pragma once
-#include "LgsCLangParser.h"
-#include "logos/LgsPaths.h"
 #include <clang/Basic/Diagnostic.h>
 #include <clang/Frontend/CompilerInstance.h>
+#include <clang/Frontend/FrontendAction.h>
+#include <filesystem>
+
+#include "LgsCLangParser.h"
+#include "logos/LgsPaths.h"
 
 class LgsStrConst;
 class LgsFile;

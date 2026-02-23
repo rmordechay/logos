@@ -1,5 +1,10 @@
 #pragma once
+#include <string>
+#include <vector>
+
 #include "exprs/LgsExpr.h"
+
+class LgsFuncCall;
 
 class LgsSelection final : public LgsExpr {
 public:

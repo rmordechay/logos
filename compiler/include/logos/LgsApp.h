@@ -1,9 +1,16 @@
 #pragma once
+#include <filesystem>
+#include <mutex>
+#include <string>
+#include <vector>
+
 #include "LgsAppCache.h"
 #include "LgsAppConfigs.h"
-#include "LgsDefinitions.h"
 #include "LgsPaths.h"
 #include "errors/LgsErrHandler.h"
+#include "LgsSymbolTable.h"
+#include "codegen/LgsCodeGen.h"
+#include "files/LgsFile.h"
 
 class LgsAppFile;
 class LgsTestFile;

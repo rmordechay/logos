@@ -1,5 +1,7 @@
 #include "stmts/LgsIOStmt.h"
 
+#include <assert.h>
+
 #include "stmts/LgsStmtsBlock.h"
 
 LgsIOStmt::~LgsIOStmt() {

@@ -1,8 +1,15 @@
 #pragma once
+#include <filesystem>
+#include <string>
+#include <vector>
+
 #include "LgsFile.h"
 #include "funcs/LgsFunc.h"
 #include "types/primitives/LgsAny.h"
 #include "types/primitives/LgsVoid.h"
+#include "codegen/LgsCodeGen.h"
+
+class LgsVarDec;
 
 class LgsTestFile final : public LgsFile {
 public:

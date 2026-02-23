@@ -1,12 +1,22 @@
 #include "builtins/LgsPrint.h"
-#include <llvm/IR/Module.h>
+
+#include <assert.h>
+#include <llvm/IR/Constant.h>
+#include <llvm/IR/DerivedTypes.h>
+#include <llvm/IR/IRBuilder.h>
+
 #include "codegen/LgsCodeGen.h"
 #include "exprs/LgsFuncCall.h"
 #include "types/LgsEnum.h"
 #include "types/LgsFieldType.h"
-#include "types/LgsNullable.h"
-#include "types/iterables/LgsVec.h"
 #include "types/primitives/LgsBool.h"
+#include "LgsType.h"
+#include "Lgs_Types.h"
+#include "exprs/LgsExpr.h"
+
+namespace llvm {
+class Type;
+}
 
 Value* LgsPrint::call(LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) {
     const auto arg = args.empty() ? funcType->params.front().expr : args.front().expr;
@@ -28,7 +38,7 @@ Value* LgsPrint::call(LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) {
     }
     if (type->isInt || type->asChar()) {
         const auto fmt = cg.getString(type->fmtStr() + "\n");
-        return cg.callPrintf({fmt, loadAsInt(cg, v, type->getIRType(cg))});
+        return cg.callPrintf({fmt, cg.toInt(loadAsInt(cg, v, type->getIRType(cg)))});
     }
     if (type->asAny()) {
         const auto fmt = cg.getString(type->fmtStr() + "\n");

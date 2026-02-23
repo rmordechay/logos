@@ -1,4 +1,7 @@
 #pragma once
+#include <string>
+#include <vector>
+
 #include "exprs/LgsExpr.h"
 #include "types/iterables/LgsStr.h"
 

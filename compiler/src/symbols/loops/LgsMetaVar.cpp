@@ -1,5 +1,6 @@
 #include "loops/LgsMetaVar.h"
-#include "codegen/LgsCodeGen.h"
+
+#include <assert.h>
 
 bool LgsMetaVar::equals(LgsExpr* other) {
     assert(0);

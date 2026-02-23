@@ -1,4 +1,6 @@
 #pragma once
+#include <string>
+
 #include "LgsExpr.h"
 
 class LgsMetaSelection final : public LgsExpr {

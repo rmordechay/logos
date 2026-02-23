@@ -1,9 +1,15 @@
 #include "exprs/LgsFuncCall.h"
-#include "funcs/LgsFunc.h"
-#include "stmts/LgsField.h"
-#include "LgsUtils.h"
-#include "types/iterables/LgsVariadic.h"
+
+#include <__ostream/basic_ostream.h>
+#include <assert.h>
 #include <sstream>
+#include <unordered_map>
+
+#include "funcs/LgsFunc.h"
+#include "types/iterables/LgsVariadic.h"
+#include "LgsType.h"
+#include "funcs/LgsParam.h"
+#include "types/LgsFuncType.h"
 
 bool argAndParamEqual(const LgsExpr* arg, const LgsParam* param);
 

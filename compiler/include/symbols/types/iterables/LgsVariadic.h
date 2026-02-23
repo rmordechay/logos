@@ -1,6 +1,11 @@
 #pragma once
+#include <string>
+
 #include "LgsIterable.h"
 #include "LgsType.h"
+#include "Lgs_Types.h"
+
+class LgsType;
 
 class LgsVariadic final : public LgsIterable {
 public:

@@ -1,4 +1,9 @@
 #include "loops/LgsInfiniteLoop.h"
+
+#include <assert.h>
+#include <llvm/IR/Constants.h>
+#include <llvm/IR/IRBuilder.h>
+
 #include "LgsDefinitions.h"
 #include "codegen/LgsCodeGen.h"
 

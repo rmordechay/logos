@@ -1,4 +1,6 @@
 #pragma once
+#include <string>
+
 #include "LgsExpr.h"
 
 class LgsTernaryExpr final : public LgsExpr {

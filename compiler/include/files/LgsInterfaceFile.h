@@ -1,7 +1,11 @@
 #pragma once
-#include "types/LgsInterface.h"
-#include "LgsUtils.h"
 #include <files/LgsFile.h>
+#include <filesystem>
+
+#include "types/LgsInterface.h"
+#include "codegen/LgsCodeGen.h"
+
+class LgsInterface;
 
 class LgsInterfaceFile final : public LgsFile {
 public:

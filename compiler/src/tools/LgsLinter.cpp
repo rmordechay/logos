@@ -1,5 +1,6 @@
 #include "tools/LgsLinter.h"
-#include "files/LgsMainFile.h"
+
+#include <assert.h>
 
 void LgsLinter::visitMainFile(LgsMainFile* mainFile) {
     assert(0);

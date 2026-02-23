@@ -1,4 +1,7 @@
 #pragma once
+#include <filesystem>
+#include <vector>
+
 #include "files/LgsFile.h"
 
 struct LgsFileMetadata;

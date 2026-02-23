@@ -1,13 +1,25 @@
 #include "logos/LgsPkgManager.h"
+
 #define MINIZ_HEADER_FILE_ONLY
-#include "curl/curl.h"
-#include "files/LgsAppFile.h"
-#include "logos/LgsApp.h"
+#include <openssl/evp.h>
+#include <__ostream/basic_ostream.h>
+#include <assert.h>
 #include <fstream>
 #include <filesystem>
 #include <sstream>
 #include <string>
-#include <openssl/evp.h>
+#include <iomanip>
+#include <system_error>
+
+#include "curl/curl.h"
+#include "files/LgsAppFile.h"
+#include "logos/LgsApp.h"
+#include "LgsDefinitions.h"
+#include "LgsUtils.h"
+#include "LgsVersion.h"
+#include "errors/LgsErrHandler.h"
+#include "logos/LgsAppConfigs.h"
+#include "logos/LgsPaths.h"
 
 namespace fs = std::filesystem;
 #define MAX_DOWNLOAD_FILE_SIZE 10'000 * 1024

@@ -1,6 +1,11 @@
 #include "files/LgsAppFile.h"
 
+#include "LgsUtils.h"
 #include "exprs/constants/LgsStrConst.h"
+#include "exprs/LgsExpr.h"
+#include "exprs/LgsVariable.h"
+#include "stmts/LgsStmt.h"
+#include "stmts/LgsVarDec.h"
 
 size_t LgsAppFile::hashFile() {
     size_t hash = 0;

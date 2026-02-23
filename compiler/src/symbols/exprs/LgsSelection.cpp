@@ -1,10 +1,10 @@
 #include "exprs/LgsSelection.h"
-#include "exprs/LgsFuncCall.h"
-#include "stmts/LgsField.h"
-#include "types/LgsInterface.h"
-#include "LgsUtils.h"
+
+#include <__ostream/basic_ostream.h>
+#include <assert.h>
 #include <sstream>
-#include <llvm/IR/InlineAsm.h>
+
+class LgsFuncCall;
 
 LgsFuncCall* LgsSelection::asMethodCall() const {
     return exprs.back()->asFuncCall();

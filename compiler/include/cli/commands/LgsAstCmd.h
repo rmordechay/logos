@@ -1,6 +1,9 @@
 #pragma once
+#include <string>
+
 #include "cli/LgsCliCmd.h"
 #include "types/iterables/LgsStr.h"
+#include "cli/LgsCliHelp.h"
 
 class LgsAstCmd final : public LgsCliCmd {
 public:

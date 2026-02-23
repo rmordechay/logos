@@ -1,6 +1,11 @@
 #pragma once
+#include <string>
+#include <vector>
+
 #include "LgsExpr.h"
 #include "types/iterables/LgsMatrix.h"
+
+class LgsArrayExpr;
 
 class LgsMatrixExpr final : public LgsExpr {
 public:

@@ -1,7 +1,11 @@
 #pragma once
+#include <utility>
+#include <vector>
+
 #include "LgsStmt.h"
 
 class LgsStmtsBlock;
+class LgsExpr;
 
 class LgsSwitch final : public LgsStmt {
 public:

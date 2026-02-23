@@ -1,14 +1,27 @@
 #include "types/LgsNullable.h"
+
+#include <llvm/ADT/ArrayRef.h>
+#include <llvm/IR/Constant.h>
+#include <llvm/IR/Constants.h>
+#include <llvm/IR/DerivedTypes.h>
+#include <llvm/IR/IRBuilder.h>
+#include <llvm/IR/Instructions.h>
+#include <llvm/Support/Casting.h>
+#include <cassert>
+#include <vector>
+
 #include "LgsBinaryTokens.h"
 #include "codegen/LgsCodeGen.h"
 #include "exprs/LgsExpr.h"
 #include "exprs/LgsNullableExpr.h"
-#include "types/primitives/LgsAny.h"
 #include "types/primitives/LgsBool.h"
-#include <cassert>
-#include <llvm/IR/Module.h>
 #include "LgsRTTIndices.h"
 #include "exprs/LgsBinaryExpr.h"
+#include "LgsDefinitions.h"
+
+namespace llvm {
+class Value;
+}
 
 LgsField* LgsNullable::getField(const std::string& fieldName) {
     return baseType->getField(fieldName);

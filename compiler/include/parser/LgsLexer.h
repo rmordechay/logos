@@ -1,8 +1,10 @@
 #pragma once
-
 #include <filesystem>
+#include <string>
+#include <vector>
 
 #include "errors/LgsErrHandler.h"
+#include "LgsTokens.h"
 
 namespace fs = std::filesystem;
 

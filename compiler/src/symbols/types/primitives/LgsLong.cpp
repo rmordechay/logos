@@ -1,9 +1,8 @@
 #include "types/primitives/LgsLong.h"
 
-#include <llvm/IR/Module.h>
+#include <assert.h>
 
 #include "exprs/constants/LgsIntConst.h"
-#include "types/primitives/LgsAny.h"
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsChar.h"
 #include "types/primitives/LgsFloat.h"

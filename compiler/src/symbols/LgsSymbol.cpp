@@ -1,4 +1,7 @@
 #include "LgsSymbol.h"
+
+#include <assert.h>
+
 #include "types/LgsEnum.h"
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
@@ -6,8 +9,8 @@
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
 #include "types/LgsSubType.h"
-
-class LgsTable;
+#include "funcs/LgsParam.h"
+#include "types/LgsFuncType.h"
 
 LgsSymbol::LgsSymbol()
     : name(nullptr), symbolType(UNKNOWN), location(nullptr), unknown(nullptr) {

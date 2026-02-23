@@ -1,6 +1,7 @@
 #include "types/primitives/LgsSize.h"
 
-#include <llvm/IR/Module.h>
+#include <assert.h>
+#include <llvm/IR/DerivedTypes.h>
 
 #include "LgsBinaryTokens.h"
 #include "exprs/constants/LgsIntConst.h"
@@ -9,6 +10,7 @@
 #include "types/primitives/LgsDouble.h"
 #include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsLong.h"
+#include "codegen/LgsCodeGen.h"
 
 size_t LgsSize::sizeBytes() {
     return sizeof(size_t);

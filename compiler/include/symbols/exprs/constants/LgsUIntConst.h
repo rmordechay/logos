@@ -1,6 +1,11 @@
 #pragma once
+#include <stdint.h>
+#include <string>
+
 #include "exprs/LgsExpr.h"
 #include "types/primitives/LgsUInt.h"
+
+class LgsType;
 
 class LgsUIntConst final : public LgsExpr {
 public:

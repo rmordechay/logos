@@ -1,6 +1,15 @@
 #pragma once
+#include <string>
+
 #include "LgsIterable.h"
 #include "types/LgsTypePair.h"
+#include "LgsType.h"
+#include "Lgs_Types.h"
+
+class LgsCodeGen;
+namespace llvm {
+class Value;
+}
 
 #define KEYS_FUNC_NAME "keys"
 #define VALUES_FUNC_NAME "values"

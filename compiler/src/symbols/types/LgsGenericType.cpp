@@ -1,5 +1,4 @@
 #include "types/LgsGenericType.h"
-#include "types/primitives/LgsAny.h"
 
 #include <cassert>
 

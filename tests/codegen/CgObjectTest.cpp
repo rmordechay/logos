@@ -1,3 +1,7 @@
+#include <sstream>
+#include <string>
+#include <vector>
+
 #include "gtest/gtest.h"
 #include "LgsTestUtils.h"
 
@@ -27,23 +31,6 @@ TEST(CgObjectTest, Test1) {
 TEST(CgObjectTest, Test2) {
     const auto code = R"(
     object Obj {
-        x: Int
-        name: Str
-        arr: Int[]
-    }
-    main() {
-        obj = Obj{x=2, name="text", arr=[1, 2, 3]}
-        print(obj::json())
-    }
-    )";
-    std::istringstream stream(runLgsApp(code));
-    const auto lines = getLines(stream, 1);
-    EXPECT_EQ(lines[0], "{\"x\": 2, \"name\": \"text\", \"arr\": [1, 2, 3]}");
-}
-
-TEST(CgObjectTest, Test3) {
-    const auto code = R"(
-    object Obj {
         func() {
             print("Hello world")
         }
@@ -62,7 +49,7 @@ TEST(CgObjectTest, Test3) {
     EXPECT_EQ(lines[2], "Hello world");
 }
 
-TEST(CgObjectTest, Test5) {
+TEST(CgObjectTest, Test3) {
     const auto code = R"(
     single Obj {
         func() {
@@ -76,4 +63,23 @@ TEST(CgObjectTest, Test5) {
     std::istringstream stream(runLgsApp(code));
     const auto lines = getLines(stream, 1);
     EXPECT_EQ(lines[0], "Hello world");
+}
+
+TEST(CgObjectTest, Test4) {
+    const auto code = R"(
+    object Obj {
+        x: Int
+        name: Str
+        arr: Int[]
+    }
+    main() {
+        obj = Obj{x=2, name="text", arr=[1, 2, 3]}
+        print(obj::json())
+        print(obj::hash())
+    }
+    )";
+    std::istringstream stream(runLgsApp(code));
+    const auto lines = getLines(stream, 2);
+    EXPECT_EQ(lines[0], "{\"x\": 2, \"name\": \"text\", \"arr\": [1, 2, 3]}");
+    EXPECT_EQ(lines[1], "787664486683716969");
 }

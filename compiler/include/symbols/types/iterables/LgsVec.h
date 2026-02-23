@@ -1,7 +1,20 @@
 #pragma once
+#include <string>
+
 #include "stmts/LgsField.h"
 #include "types/primitives/LgsDouble.h"
 #include "types/primitives/LgsFloat.h"
+#include "LgsValue.h"
+#include "Lgs_Types.h"
+#include "types/iterables/LgsIterable.h"
+
+class LgsCodeGen;
+class LgsExpr;
+class LgsType;
+namespace llvm {
+class Function;
+class Value;
+}
 
 class LgsVec final : public LgsIterable {
 public:

@@ -1,12 +1,40 @@
 #include "types/iterables/LgsDArray.h"
+
+#include <llvm/IR/Module.h>
+#include <assert.h>
+#include <llvm/ADT/ArrayRef.h>
+#include <llvm/IR/Argument.h>
+#include <llvm/IR/Constant.h>
+#include <llvm/IR/Constants.h>
+#include <llvm/IR/DerivedTypes.h>
+#include <llvm/IR/Function.h>
+#include <llvm/IR/IRBuilder.h>
+#include <llvm/IR/Instructions.h>
+#include <functional>
+#include <unordered_map>
+#include <vector>
+
 #include "LgsBinaryTokens.h"
 #include "Lgs_Exprs.h"
 #include "codegen/LgsCodeGen.h"
 #include "exprs/LgsArrayExpr.h"
 #include "types/primitives/LgsBool.h"
-#include <llvm/IR/Module.h>
 #include "LgsRTTIndices.h"
 #include "exprs/LgsFuncCall.h"
+#include "LgsDefinitions.h"
+#include "LgsType.h"
+#include "exprs/LgsExpr.h"
+#include "exprs/constants/LgsIntConst.h"
+#include "funcs/LgsFunc.h"
+#include "types/LgsFuncType.h"
+#include "types/iterables/LgsIterable.h"
+#include "types/primitives/LgsSize.h"
+#include "types/primitives/LgsVoid.h"
+
+namespace llvm {
+class BasicBlock;
+class Value;
+}
 
 LgsFunc* LgsDArray::getMethod(const std::string& methodName) {
     constexpr auto flags = BUILTIN | PUBLIC | METHOD;

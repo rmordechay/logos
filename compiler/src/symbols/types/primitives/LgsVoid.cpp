@@ -1,8 +1,11 @@
 #include "types/primitives/LgsVoid.h"
-#include "codegen/LgsCodeGen.h"
-#include "types/LgsFuncType.h"
 
 #include <llvm/IR/DIBuilder.h>
+#include <assert.h>
+#include <llvm/IR/DebugInfoMetadata.h>
+#include <llvm/IR/Type.h>
+
+#include "codegen/LgsCodeGen.h"
 
 Type* LgsVoid::getIRType(LgsCodeGen& cg) {
     return Type::getVoidTy(cg.context);

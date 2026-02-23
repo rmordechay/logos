@@ -1,6 +1,8 @@
 #include "types/LgsTypePair.h"
+
+#include <llvm/IR/DerivedTypes.h>
 #include <cassert>
-#include <llvm/IR/Module.h>
+
 #include "codegen/LgsCodeGen.h"
 
 Type* LgsTypePair::getIRType(LgsCodeGen& cg) {

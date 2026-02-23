@@ -1,5 +1,8 @@
 #pragma once
 
+#include <array>
+#include <vector>
+
 #include "Lgs_Allocator.h"
 #include "errors/LgsErrHandler.h"
 

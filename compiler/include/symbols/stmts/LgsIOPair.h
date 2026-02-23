@@ -1,5 +1,9 @@
 #pragma once
+#include <string>
+
 #include "LgsValue.h"
+
+class LgsFunc;
 
 class LgsIOPair final : public LgsValue {
 public:

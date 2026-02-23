@@ -1,10 +1,14 @@
 #include "stmts/LgsVarDec.h"
-#include "codegen/LgsCodeGen.h"
-#include "types/iterables/LgsStr.h"
-#include "LgsUtils.h"
-#include "types/LgsNullable.h"
 
 #include <llvm/IR/DIBuilder.h>
+#include <llvm/IR/DebugInfoMetadata.h>
+#include <llvm/IR/IRBuilder.h>
+
+#include "codegen/LgsCodeGen.h"
+#include "LgsUtils.h"
+#include "LgsTokens.h"
+#include "LgsType.h"
+#include "exprs/LgsExpr.h"
 
 LgsType* LgsVarDec::getType() {
     return type;

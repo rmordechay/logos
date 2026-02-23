@@ -1,4 +1,7 @@
 #include "stmts/LgsStmt.h"
+
+#include <assert.h>
+
 #include "funcs/LgsCoroutine.h"
 #include "stmts/LgsAssignment.h"
 #include "stmts/LgsBreak.h"

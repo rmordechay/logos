@@ -1,8 +1,16 @@
 #include "Lgs_Runtime.h"
+
+#include <_stdlib.h>
+#include <_string.h>
+#include <_time.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <cassert>
+#include <string>
+
 #include "LgsConfigs.h"
 #include "Lgs_Exprs.h"
 #include "LgsUtils.h"
-#include <cassert>
 #include "Lgs_Types.h"
 
 #define NANO 1000000000LL

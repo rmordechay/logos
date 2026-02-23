@@ -1,8 +1,27 @@
 #include "lgsc/LgsCLangParser.h"
 
+#include <_ctype.h>
+#include <_stdlib.h>
+#include <assert.h>
+#include <clang/AST/ASTContext.h>
+#include <clang/AST/Decl.h>
+#include <clang/AST/Type.h>
+#include <clang/Basic/IdentifierTable.h>
+#include <clang/Frontend/CompilerInstance.h>
+#include <clang/Lex/Lexer.h>
+#include <clang/Lex/MacroInfo.h>
+#include <clang/Lex/Token.h>
+#include <llvm/ADT/APInt.h>
+#include <llvm/ADT/ArrayRef.h>
+#include <llvm/ADT/StringRef.h>
+#include <llvm/Support/Casting.h>
+#include <llvm/Support/raw_ostream.h>
+#include <string>
+#include <unordered_map>
+#include <vector>
+
 #include "LgsTokens.h"
 #include "exprs/constants/LgsIntConst.h"
-#include "files/LgsFile.h"
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
 #include "types/LgsObject.h"
@@ -15,12 +34,17 @@
 #include "types/primitives/LgsVoid.h"
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsChar.h"
-#include "LgsUtils.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsSubType.h"
 #include "types/iterables/LgsSArray.h"
 #include "types/primitives/LgsAny.h"
 #include "types/primitives/LgsLong.h"
+#include "LgsSymbol.h"
+#include "LgsType.h"
+#include "exprs/LgsExpr.h"
+#include "funcs/LgsParam.h"
+#include "types/LgsFuncType.h"
+#include "types/primitives/LgsSize.h"
 
 void LgsCLangASTConsumer::HandleTranslationUnit(clang::ASTContext& clangContext) {
     parser.TraverseDecl(clangContext.getTranslationUnitDecl());

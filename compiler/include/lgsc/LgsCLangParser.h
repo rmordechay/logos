@@ -1,9 +1,10 @@
 #pragma once
-#include "LgsSymbolTable.h"
-
 #include <clang/AST/RecursiveASTVisitor.h>
 #include <clang/Tooling/Tooling.h>
+#include <clang/AST/ASTConsumer.h>
+#include <clang/Lex/PPCallbacks.h>
 
+#include "LgsSymbolTable.h"
 #include "errors/LgsErrHandler.h"
 
 struct LgsSymbolTable;
@@ -12,6 +13,13 @@ class LgsFile;
 class LgsObject;
 class LgsType;
 struct LgsSymbol;
+namespace clang {
+class CompilerInstance;
+class FunctionDecl;
+class QualType;
+class RecordDecl;
+class TypedefDecl;
+}  // namespace clang
 
 class LgsCLangParser final : public clang::RecursiveASTVisitor<LgsCLangParser> {
 public:

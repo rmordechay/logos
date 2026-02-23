@@ -1,6 +1,6 @@
 #include "types/primitives/LgsShort.h"
 
-#include <llvm/IR/Module.h>
+#include <assert.h>
 
 #include "exprs/constants/LgsIntConst.h"
 #include "types/primitives/LgsAny.h"
@@ -9,6 +9,7 @@
 #include "types/primitives/LgsLong.h"
 #include "types/primitives/LgsSize.h"
 #include "types/primitives/LgsUInt.h"
+#include "codegen/LgsCodeGen.h"
 
 size_t LgsShort::sizeBytes() {
     return sizeof(short);

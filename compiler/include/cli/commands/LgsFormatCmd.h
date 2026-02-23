@@ -1,5 +1,8 @@
 #pragma once
+#include <string>
+
 #include "cli/LgsCliCmd.h"
+#include "cli/LgsCliHelp.h"
 
 class LgsFormatCmd final : public LgsCliCmd {
 public:

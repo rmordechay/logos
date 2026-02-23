@@ -1,8 +1,14 @@
 #pragma once
+#include <functional>
+#include <string>
+#include <vector>
+
 #include "LgsCliHelp.h"
 #include "logos/LgsApp.h"
-#include <iostream>
+#include "errors/LgsErrHandler.h"
+
 struct LgsCliCmdHelp;
+struct LgsCliCmdArgHelp;
 
 #define PADDING 4
 #define LGS_USAGE_STR "Usage: "

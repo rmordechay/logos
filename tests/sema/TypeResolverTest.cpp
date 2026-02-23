@@ -1,13 +1,26 @@
-#include "logos/LgsApp.h"
 #include <string>
+#include <filesystem>
+#include <map>
+#include <unordered_map>
+#include <vector>
 
+#include "logos/LgsApp.h"
 #include "LgsTestUtils.h"
 #include "exprs/LgsArrayExpr.h"
 #include "gtest/gtest.h"
 #include "files/LgsMainFile.h"
 #include "stmts/LgsVarDec.h"
-#include "types/LgsNullable.h"
 #include "types/iterables/LgsSArray.h"
+#include "LgsDefinitions.h"
+#include "LgsSymbolTable.h"
+#include "LgsType.h"
+#include "exprs/LgsExpr.h"
+#include "funcs/LgsFunc.h"
+#include "funcs/LgsParam.h"
+#include "stmts/LgsStmt.h"
+#include "stmts/LgsStmtsBlock.h"
+#include "types/LgsFuncType.h"
+#include "types/iterables/LgsDArray.h"
 
 TEST(TypeResolverTest, SArrStr) {
     LgsApp app;

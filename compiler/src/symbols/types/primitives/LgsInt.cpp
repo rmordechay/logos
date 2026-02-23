@@ -1,4 +1,11 @@
 #include "types/primitives/LgsInt.h"
+
+#include <llvm/IR/DIBuilder.h>
+#include <llvm/BinaryFormat/Dwarf.h>
+#include <llvm/IR/Constants.h>
+#include <llvm/IR/DebugInfoMetadata.h>
+#include <llvm/IR/IRBuilder.h>
+
 #include "LgsBinaryTokens.h"
 #include "exprs/constants/LgsIntConst.h"
 #include "types/primitives/LgsBool.h"
@@ -6,10 +13,10 @@
 #include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsLong.h"
 #include "types/primitives/LgsSize.h"
-#include <llvm/IR/DIBuilder.h>
-#include <llvm/IR/Module.h>
 #include "exprs/LgsBinaryExpr.h"
 #include "types/LgsNullable.h"
+#include "codegen/LgsCodeGen.h"
+#include "exprs/LgsExpr.h"
 
 std::string LgsInt::getName() {
     return name;

@@ -1,14 +1,38 @@
 #include "types/iterables/LgsVec.h"
+
 #include <llvm/IR/Module.h>
+#include <__ostream/basic_ostream.h>
+#include <llvm/ADT/ArrayRef.h>
+#include <llvm/IR/Argument.h>
+#include <llvm/IR/Constant.h>
+#include <llvm/IR/Constants.h>
+#include <llvm/IR/DerivedTypes.h>
+#include <llvm/IR/Function.h>
+#include <llvm/IR/GlobalVariable.h>
+#include <llvm/IR/IRBuilder.h>
+#include <llvm/IR/Instructions.h>
+#include <llvm/IR/Type.h>
+#include <llvm/IR/Value.h>
+#include <string.h>
+#include <sstream>
+#include <functional>
+#include <initializer_list>
+#include <optional>
+#include <vector>
+
 #include "LgsBinaryTokens.h"
-#include "exprs/LgsIterIndex.h"
 #include "exprs/LgsVectorExpr.h"
 #include "types/iterables/LgsMatrix.h"
-#include "types/primitives/LgsBool.h"
-#include <sstream>
-
 #include "codegen/LgsCodeGen.h"
 #include "exprs/LgsBinaryExpr.h"
+#include "LgsDefinitions.h"
+#include "LgsType.h"
+#include "exprs/LgsExpr.h"
+#include "stmts/LgsField.h"
+
+namespace llvm {
+class BasicBlock;
+}
 
 LgsField* LgsVec::getField(const std::string& fieldName) {
     for (auto* f : fields) {

@@ -1,12 +1,20 @@
 #include "exprs/LgsIterIndex.h"
-#include <exprs/LgsArrayExpr.h>
-#include "types/iterables/LgsMap.h"
-#include "types/iterables/LgsVec.h"
-#include "LgsUtils.h"
+
+#include <__ostream/basic_ostream.h>
+#include <assert.h>
+#include <llvm/ADT/ArrayRef.h>
+#include <llvm/IR/Constants.h>
+#include <llvm/IR/IRBuilder.h>
+#include <llvm/IR/Instructions.h>
 #include <sstream>
-#include <llvm/IR/Module.h>
 
 #include "codegen/LgsCodeGen.h"
+#include "LgsType.h"
+#include "types/iterables/LgsSArray.h"
+
+namespace llvm {
+class Value;
+}
 
 Value* LgsIterIndex::getIRRangePtr(LgsCodeGen& cg) const {
     const auto fromIR = index.from->IRValue;

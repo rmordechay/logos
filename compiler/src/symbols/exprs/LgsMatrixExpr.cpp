@@ -1,6 +1,9 @@
 #include "exprs/LgsMatrixExpr.h"
 
+#include <assert.h>
+
 #include "exprs/LgsArrayExpr.h"
+#include "exprs/LgsExpr.h"
 
 std::string LgsMatrixExpr::asText() {
     assert(0);

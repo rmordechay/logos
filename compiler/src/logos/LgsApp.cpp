@@ -1,14 +1,23 @@
 #include "logos/LgsApp.h"
-#include <ostream>
-#include <unordered_set>
-#include <llvm/Analysis/CGSCCPassManager.h>
+
 #include <llvm/IR/Module.h>
+#include <assert.h>
+#include <llvm/ADT/StringRef.h>
+#include <llvm/IR/Constants.h>
+#include <llvm/IR/GlobalVariable.h>
+#include <llvm/IR/IRBuilder.h>
+#include <llvm/Support/raw_ostream.h>
+#include <unordered_set>
+#include <atomic>
+#include <chrono>
+#include <map>
+#include <unordered_map>
+#include <utility>
+
 #include "analysis/LgsSema.h"
-#include "builtins/LgsTest.h"
 #include "logos/LgsPaths.h"
 #include "utils/ThreadPool.h"
 #include "builtins/LgsPrint.h"
-#include "builtins/LgsSys.h"
 #include "files/LgsEnvFile.h"
 #include "codegen/LgsCgFile.h"
 #include "codegen/LgsLinker.h"
@@ -21,16 +30,28 @@
 #include "files/LgsInterfaceFile.h"
 #include "files/LgsMainFile.h"
 #include "files/LgsObjectFile.h"
-#include "types/iterables/LgsVec.h"
-#include "types/primitives/LgsByte.h"
-#include <llvm/Target/TargetMachine.h>
-
-#include "exprs/LgsInstance.h"
 #include "exprs/constants/LgsIntConst.h"
 #include "funcs/LgsMainFunc.h"
 #include "stmts/LgsImport.h"
 #include "types/iterables/LgsDArray.h"
 #include "types/iterables/LgsSArray.h"
+#include "LgsDefinitions.h"
+#include "LgsSymbol.h"
+#include "LgsType.h"
+#include "LgsVersion.h"
+#include "analysis/LgsTypeResolver.h"
+#include "exprs/LgsExpr.h"
+#include "exprs/constants/LgsStrConst.h"
+#include "funcs/LgsFunc.h"
+#include "lgsc/LgsCCompiler.h"
+#include "lgsc/LgsCLangParser.h"
+#include "logos/LgsAppCache.h"
+#include "logos/LgsAppConfigs.h"
+#include "stmts/LgsVarDec.h"
+#include "types/LgsFuncType.h"
+#include "types/LgsObject.h"
+#include "types/iterables/LgsIterable.h"
+#include "types/iterables/LgsMap.h"
 
 inline ThreadPool threadPool;
 

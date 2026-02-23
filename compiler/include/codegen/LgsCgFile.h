@@ -55,6 +55,19 @@ class LgsIOStmt;
 struct LgsSymbol;
 struct LgsIndex;
 struct LgsAppConfigs;
+class LgsCharConst;
+class LgsEnum;
+class LgsField;
+class LgsFile;
+class LgsFunc;
+class LgsInterface;
+class LgsNullableExpr;
+class LgsSwitch;
+namespace llvm {
+class Function;
+class Type;
+class Value;
+}
 
 class LgsCgFile {
 public:

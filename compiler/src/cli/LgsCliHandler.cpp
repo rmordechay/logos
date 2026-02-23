@@ -1,4 +1,5 @@
 #include "cli/LgsCliHandler.h"
+
 #include "cli/commands/LgsAstCmd.h"
 #include "cli/commands/LgsCompileCmd.h"
 #include "cli/commands/LgsFormatCmd.h"
@@ -9,6 +10,9 @@
 #include "cli/commands/LgsTestCmd.h"
 #include "errors/LgsCliErrors.h"
 #include "LgsUtils.h"
+#include "cli/LgsCliCmd.h"
+#include "errors/LgsErrHandler.h"
+#include "errors/LgsErrors.h"
 
 static std::vector COMMANDS = {
     &runCmdHelp,

@@ -1,10 +1,17 @@
 #pragma once
 #include <llvm/IR/DerivedTypes.h>
+#include <string>
 
 #include "LgsIterable.h"
+#include "Lgs_Types.h"
+
+class LgsCodeGen;
+class LgsType;
 
 namespace llvm {
     class Function;
+class StructType;
+class Value;
 }
 
 class LgsDArray final : public LgsIterable {

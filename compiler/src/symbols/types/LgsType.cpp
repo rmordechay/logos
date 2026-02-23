@@ -1,10 +1,21 @@
+#include <assert.h>
+#include <llvm/ADT/ArrayRef.h>
+#include <llvm/IR/Constants.h>
+#include <llvm/IR/DerivedTypes.h>
+#include <llvm/IR/GlobalVariable.h>
+#include <llvm/IR/IRBuilder.h>
+#include <llvm/IR/Instructions.h>
+#include <llvm/IR/Type.h>
+#include <llvm/IR/Value.h>
+#include <llvm/Support/Casting.h>
+#include <stdint.h>
 #include <unordered_set>
-#include <llvm/IR/Module.h>
+#include <string>
+#include <unordered_map>
+#include <utility>
+#include <vector>
 
 #include "LgsRTTIndices.h"
-#include "exprs/LgsBinaryExpr.h"
-#include "exprs/LgsInstance.h"
-#include "exprs/LgsVectorExpr.h"
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
 #include "types/primitives/LgsAny.h"
@@ -35,6 +46,25 @@
 #include "types/primitives/LgsSize.h"
 #include "types/primitives/LgsUInt.h"
 #include "types/primitives/LgsULong.h"
+#include "LgsDefinitions.h"
+#include "LgsType.h"
+#include "Lgs_Types.h"
+#include "codegen/LgsCodeGen.h"
+#include "exprs/LgsExpr.h"
+#include "funcs/LgsParam.h"
+#include "types/LgsFuncType.h"
+#include "types/LgsTypePair.h"
+#include "types/iterables/LgsIterable.h"
+#include "types/iterables/LgsStr.h"
+#include "types/iterables/LgsVec.h"
+#include "types/primitives/LgsFloat.h"
+#include "types/primitives/LgsInt.h"
+
+class LgsBinaryExpr;
+namespace llvm {
+class BasicBlock;
+class Constant;
+}
 
 static std::unordered_map<std::string, uint8_t> numberPrecedences = {
     {LgsBool::name, 1},

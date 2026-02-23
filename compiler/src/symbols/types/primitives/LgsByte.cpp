@@ -1,5 +1,7 @@
 #include "types/primitives/LgsByte.h"
-#include <llvm/IR/Module.h>
+
+#include <assert.h>
+
 #include "codegen/LgsCodeGen.h"
 #include "exprs/constants/LgsIntConst.h"
 #include "types/primitives/LgsAny.h"

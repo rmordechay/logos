@@ -1,5 +1,8 @@
 #include "exprs/LgsVectorExpr.h"
-#include "LgsUtils.h"
+
+#include <assert.h>
+
+#include "LgsType.h"
 
 void LgsVectorExpr::setType(LgsType* newType) {
     vecType = newType->asVec();

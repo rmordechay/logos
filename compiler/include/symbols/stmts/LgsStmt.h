@@ -1,7 +1,7 @@
 #pragma once
-#include "LgsStmtsBlock.h"
-
 #include <LgsValue.h>
+
+#include "LgsStmtsBlock.h"
 
 class LgsIOStmt;
 class LgsSwitch;

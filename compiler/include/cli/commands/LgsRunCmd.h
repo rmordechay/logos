@@ -1,8 +1,14 @@
 #pragma once
+#include <string>
+#include <vector>
+
 #include "cli/LgsCliCmd.h"
 #include "types/iterables/LgsStr.h"
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsInt.h"
+#include "cli/LgsCliHelp.h"
+
+class LgsApp;
 
 class LgsRunCmd : public LgsCliCmd {
 public:

@@ -1,5 +1,7 @@
 #pragma once
 #include <utility>
+#include <string>
+
 #include "LgsType.h"
 
 class LgsUnknown final : public LgsType {

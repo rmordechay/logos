@@ -1,4 +1,6 @@
 #pragma once
+#include <string>
+
 #include "LgsEnum.h"
 
 class LgsEnumField final : public LgsEnum {

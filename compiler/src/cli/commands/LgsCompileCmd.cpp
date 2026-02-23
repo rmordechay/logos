@@ -1,6 +1,11 @@
 #include "cli/commands/LgsCompileCmd.h"
-#include "cli/LgsCliHelp.h"
+
+#include <filesystem>
+
 #include "logos/LgsApp.h"
+#include "LgsUtils.h"
+#include "errors/LgsErrHandler.h"
+#include "files/LgsFile.h"
 
 void LgsCompileCmd::run() {
     LgsApp app;

@@ -1,9 +1,17 @@
 #include "types/LgsFuncType.h"
+
+#include <__ostream/basic_ostream.h>
+#include <assert.h>
+#include <sstream>
+
 #include "LgsDefinitions.h"
 #include "codegen/LgsCodeGen.h"
 #include "types/LgsGenericType.h"
-#include "LgsUtils.h"
-#include <sstream>
+#include "exprs/LgsExpr.h"
+
+namespace llvm {
+class Type;
+}
 
 FunctionType* LgsFuncType::getIRType(LgsCodeGen& cg) {
     assert(rt);

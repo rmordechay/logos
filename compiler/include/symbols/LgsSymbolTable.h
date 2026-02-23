@@ -1,14 +1,18 @@
 #pragma once
-#include "LgsSymbol.h"
 #include <unordered_map>
-#include "stmts/LgsImport.h"
 #include <vector>
+#include <string>
+
+#include "LgsSymbol.h"
+#include "stmts/LgsImport.h"
 
 class LgsFuncCall;
 class LgsExpr;
 class LgsStrConst;
 class LgsApp;
 class LgsErrHandler;
+class LgsFunc;
+class LgsType;
 
 struct LgsSymbolTable {
     std::unordered_map<std::string, LgsSymbol> symbols;

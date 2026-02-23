@@ -1,7 +1,10 @@
 #pragma once
+#include <string>
+
 #include "exprs/LgsExpr.h"
 #include "types/primitives/LgsInt.h"
-#include "types/primitives/LgsSize.h"
+
+class LgsType;
 
 class LgsIntConst final : public LgsExpr {
 public:

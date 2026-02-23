@@ -1,4 +1,6 @@
 #pragma once
+#include <string>
+
 #include "LgsValue.h"
 #include "exprs/LgsHashMap.h"
 
@@ -7,6 +9,10 @@ class LgsObject;
 class LgsInstance;
 class LgsType;
 class LgsExpr;
+class LgsCodeGen;
+namespace llvm {
+class Value;
+}
 
 class LgsField : public LgsValue {
 public:

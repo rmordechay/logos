@@ -1,5 +1,14 @@
 #include "cli/commands/LgsTestCmd.h"
 
+#include <assert.h>
+#include <filesystem>
+
+#include "LgsUtils.h"
+#include "errors/LgsErrHandler.h"
+#include "logos/LgsApp.h"
+#include "logos/LgsAppConfigs.h"
+#include "logos/LgsPaths.h"
+
 void LgsTestCmd::run() {
     fs::path execPath = "";
     std::vector<const char*> args;

@@ -1,8 +1,18 @@
 #pragma once
+#include <string>
+#include <vector>
+
 #include "funcs/LgsFunc.h"
 #include "../primitives/LgsAny.h"
 #include "types/iterables/LgsIterable.h"
 #include "types/primitives/LgsVoid.h"
+#include "LgsValue.h"
+#include "types/LgsFuncType.h"
+
+class LgsType;
+namespace llvm {
+class StructType;
+}
 
 using llvm::StructType;
 

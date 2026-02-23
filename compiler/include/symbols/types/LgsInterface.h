@@ -1,6 +1,8 @@
 #pragma once
+#include <string>
+
 #include "LgsObject.h"
-#include "LgsType.h"
+#include "LgsValue.h"
 
 class LgsInterface final : public LgsObject {
 public:

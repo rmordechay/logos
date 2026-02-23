@@ -1,6 +1,12 @@
 #pragma once
+#include <string>
+#include <vector>
+
 #include "LgsSymbolTable.h"
 #include "loops/LgsForeachLoop.h"
+#include "LgsValue.h"
+
+class LgsForeachLoop;
 
 namespace llvm {
     class BasicBlock;

@@ -1,5 +1,13 @@
 #include "exprs/LgsExpr.h"
 
+#include <__math/exponential_functions.h>
+#include <assert.h>
+#include <llvm/ADT/ArrayRef.h>
+#include <llvm/IR/Constants.h>
+#include <llvm/IR/DerivedTypes.h>
+#include <llvm/IR/Type.h>
+#include <llvm/IR/Value.h>
+
 #include "LgsUtils.h"
 #include "codegen/LgsCodeGen.h"
 #include "exprs/LgsArrayExpr.h"
@@ -25,7 +33,17 @@
 #include "loops/LgsMetaVar.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsEnumField.h"
-#include "types/LgsNullable.h"
+#include "LgsBinaryTokens.h"
+#include "LgsSymbol.h"
+#include "LgsType.h"
+#include "exprs/LgsFuncCall.h"
+#include "exprs/constants/LgsIntConst.h"
+#include "types/iterables/LgsIterable.h"
+#include "types/iterables/LgsStr.h"
+
+namespace llvm {
+class Constant;
+}
 
 LgsType* LgsExpr::getType() {
     return type;

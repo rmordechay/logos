@@ -1,16 +1,31 @@
 #include "types/iterables/LgsIterable.h"
+
+#include <assert.h>
+#include <llvm/IR/Constants.h>
+#include <llvm/IR/IRBuilder.h>
+#include <unordered_map>
+#include <utility>
+#include <vector>
+
 #include "exprs/LgsIterIndex.h"
 #include "loops/LgsForeachLoop.h"
 #include "stmts/LgsVarDec.h"
 #include "types/primitives/LgsInt.h"
 #include "types/primitives/LgsSize.h"
-#include "LgsUtils.h"
 #include "codegen/LgsCodeGen.h"
 #include "exprs/LgsFuncCall.h"
 #include "funcs/LgsFunc.h"
 #include "types/iterables/LgsDArray.h"
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsVoid.h"
+#include "exprs/LgsExpr.h"
+#include "funcs/LgsParam.h"
+#include "types/LgsFuncType.h"
+#include "types/LgsGenericType.h"
+
+namespace llvm {
+class Value;
+}
 
 LgsFunc* LgsIterable::getMethod(const std::string& methodName) {
     if (methods.contains(methodName)) return methods[methodName];

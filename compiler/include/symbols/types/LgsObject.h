@@ -1,16 +1,30 @@
 #pragma once
 #include <map>
+#include <string>
+#include <vector>
 
 #include "exprs/LgsFuncCall.h"
 #include "exprs/constants/LgsStrConst.h"
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
+#include "LgsType.h"
+#include "LgsValue.h"
+#include "Lgs_Types.h"
+#include "types/iterables/LgsStr.h"
 
 class LgsGenericType;
 class LgsInstance;
 class LgsCodeGen;
 class LgsField;
 class LgsIOPair;
+class LgsEnum;
+class LgsFunc;
+class LgsSubType;
+namespace llvm {
+class Function;
+class StructType;
+class Value;
+}
 
 #define OBJ_META_NAME "name"
 #define OBJ_HASH_FUNC "hash"

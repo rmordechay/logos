@@ -1,6 +1,10 @@
 #pragma once
+#include <string>
+#include <vector>
+
 #include "cli/LgsCliCmd.h"
 #include "types/iterables/LgsStr.h"
+#include "cli/LgsCliHelp.h"
 
 class LgsGenerateCmd final : public LgsCliCmd {
 public:

@@ -1,6 +1,27 @@
 #include "types/LgsObject.h"
 
-#include <format>
+#include <llvm/IR/Module.h>
+#include <__ostream/basic_ostream.h>
+#include <assert.h>
+#include <llvm/ADT/ArrayRef.h>
+#include <llvm/ADT/Twine.h>
+#include <llvm/IR/Argument.h>
+#include <llvm/IR/Constant.h>
+#include <llvm/IR/Constants.h>
+#include <llvm/IR/DataLayout.h>
+#include <llvm/IR/DerivedTypes.h>
+#include <llvm/IR/Function.h>
+#include <llvm/IR/GlobalVariable.h>
+#include <llvm/IR/IRBuilder.h>
+#include <llvm/IR/Instructions.h>
+#include <llvm/IR/Type.h>
+#include <llvm/IR/Value.h>
+#include <llvm/Support/Casting.h>
+#include <llvm/Support/TypeSize.h>
+#include <sstream>
+#include <functional>
+#include <unordered_map>
+#include <utility>
 
 #include "LgsDefinitions.h"
 #include "exprs/LgsInstance.h"
@@ -10,22 +31,26 @@
 #include "types/LgsSubType.h"
 #include "types/LgsEnum.h"
 #include "types/LgsInterface.h"
-#include "LgsUtils.h"
 #include "LgsConfigs.h"
-#include <ranges>
-#include <sstream>
-#include <unordered_set>
-#include <llvm/IR/Module.h>
 #include "LgsBinaryTokens.h"
 #include "LgsRTTIndices.h"
 #include "Lgs_Exprs.h"
-#include "codegen/LgsCgFile.h"
 #include "errors/LgsErrors.h"
 #include "types/LgsFieldType.h"
 #include "types/iterables/LgsVariadic.h"
 #include "types/primitives/LgsAny.h"
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsSize.h"
+#include "codegen/LgsCodeGen.h"
+#include "exprs/LgsExpr.h"
+#include "exprs/LgsFuncCall.h"
+#include "funcs/LgsParam.h"
+#include "types/LgsFuncType.h"
+#include "types/iterables/LgsIterable.h"
+
+namespace llvm {
+class BasicBlock;
+}
 
 std::string LgsObject::getName() {
     return name;

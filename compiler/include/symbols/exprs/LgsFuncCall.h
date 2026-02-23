@@ -1,9 +1,14 @@
 #pragma once
+#include <string>
+#include <vector>
+
 #include "LgsSymbol.h"
 #include "exprs/LgsExpr.h"
 
 class LgsFuncType;
 struct LgsSymbol;
+class LgsFunc;
+class LgsType;
 
 struct LgsFuncArg {
     std::string name = "";

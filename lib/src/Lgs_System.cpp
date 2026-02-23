@@ -1,4 +1,7 @@
+#include <_stdlib.h>
 #include <thread>
+#include <chrono>
+#include <ratio>
 
 extern "C" const char* Lgs_Sys_getEnv(const char* key, const char* defaultKey) {
     const auto env = std::getenv(key);

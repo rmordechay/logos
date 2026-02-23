@@ -1,10 +1,13 @@
 #include "logos/LgsPaths.h"
+
+#include <_ctype.h>
+#include <_stdio.h>
+#include <assert.h>
+#include <string>
+
 #include "LgsConfigs.h"
 #include "LgsDefinitions.h"
 #include "LgsUtils.h"
-#include <iostream>
-#include <unistd.h>
-#include <llvm/TargetParser/Triple.h>
 
 void LgsPaths::findLgsRootDir() {
     assert(lgsConfigs.isDevMode);

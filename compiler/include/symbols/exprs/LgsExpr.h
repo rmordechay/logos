@@ -1,5 +1,8 @@
 #pragma once
 #include <cmath>
+#include <optional>
+#include <string>
+#include <vector>
 
 #include "LgsValue.h"
 
@@ -36,6 +39,10 @@ class LgsCharConst;
 class LgsFloatConst;
 class LgsStrConst;
 class LgsTypeConst;
+namespace llvm {
+class Constant;
+class Value;
+}
 
 class LgsExpr : public LgsValue {
 public:

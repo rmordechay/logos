@@ -1,6 +1,10 @@
 #pragma once
+#include <string>
+#include <vector>
+
 #include "LgsInstallCmd.h"
 #include "cli/LgsCliCmd.h"
+#include "cli/LgsCliHelp.h"
 
 class LgsPkgCmd final : public LgsCliCmd {
 public:

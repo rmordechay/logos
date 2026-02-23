@@ -1,5 +1,8 @@
 #pragma once
+#include <string>
+
 #include "LgsStmt.h"
+#include "LgsValue.h"
 
 class LgsForLoop;
 

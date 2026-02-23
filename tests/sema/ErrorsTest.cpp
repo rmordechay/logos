@@ -1,9 +1,15 @@
+#include <string>
+#include <filesystem>
+#include <vector>
+
 #include "logos/LgsApp.h"
 #include "LgsUtils.h"
 #include "LgsTestUtils.h"
 #include "errors/LgsErrors.h"
 #include "gtest/gtest.h"
-#include <string>
+#include "LgsDefinitions.h"
+#include "errors/LgsErrHandler.h"
+#include "logos/LgsAppConfigs.h"
 
 TEST(ErrorsTest, E10000A) {
     const auto code = R"(

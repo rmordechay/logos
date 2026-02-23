@@ -1,6 +1,10 @@
 #pragma once
-#include "logos/LgsPaths.h"
 #include <vector>
+#include <string>
+
+#include "logos/LgsPaths.h"
+
+struct LgsPaths;
 
 namespace llvm {
     class Module;

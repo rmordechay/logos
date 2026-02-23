@@ -1,6 +1,12 @@
 #pragma once
+#include <string>
+
 #include "LgsStmt.h"
 #include "exprs/LgsExpr.h"
+#include "LgsValue.h"
+
+class LgsExpr;
+class LgsType;
 
 namespace llvm {
     class Type;

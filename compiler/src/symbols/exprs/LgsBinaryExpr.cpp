@@ -1,5 +1,7 @@
 #include "exprs/LgsBinaryExpr.h"
 
+#include <assert.h>
+
 void LgsBinaryExpr::setDebugValue(LgsCodeGen& cg) {
     setDebugLoc(cg);
 }

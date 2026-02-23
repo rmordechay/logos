@@ -1,9 +1,3 @@
-#include "LgsDefinitions.h"
-#include "files/LgsFile.h"
-#include "LgsConfigs.h"
-#include "LgsUtils.h"
-#include "errors/LgsErrors.h"
-#include "logos/LgsPaths.h"
 #include <llvm/Support/FileSystem.h>
 #include <llvm/Bitcode/BitcodeWriter.h>
 #include <llvm/IR/Module.h>
@@ -11,13 +5,58 @@
 #include <llvm/TargetParser/Host.h>
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/MC/TargetRegistry.h>
-#include <llvm/Target/TargetMachine.h>
 #include <llvm/Target/TargetOptions.h>
-#include <string>
 #include <llvm/Analysis/CGSCCPassManager.h>
 #include <llvm/Analysis/LoopAnalysisManager.h>
 #include <llvm/IR/Verifier.h>
 #include <llvm/Passes/PassBuilder.h>
+#include <assert.h>
+#include <llvm/ADT/ArrayRef.h>
+#include <llvm/ADT/StringRef.h>
+#include <llvm/ADT/Twine.h>
+#include <llvm/ADT/iterator_range.h>
+#include <llvm/BinaryFormat/Dwarf.h>
+#include <llvm/IR/BasicBlock.h>
+#include <llvm/IR/Constant.h>
+#include <llvm/IR/Constants.h>
+#include <llvm/IR/DataLayout.h>
+#include <llvm/IR/DebugInfoMetadata.h>
+#include <llvm/IR/DebugLoc.h>
+#include <llvm/IR/DerivedTypes.h>
+#include <llvm/IR/Function.h>
+#include <llvm/IR/GlobalValue.h>
+#include <llvm/IR/GlobalVariable.h>
+#include <llvm/IR/IRBuilder.h>
+#include <llvm/IR/Instructions.h>
+#include <llvm/IR/Intrinsics.h>
+#include <llvm/IR/Metadata.h>
+#include <llvm/IR/PassManager.h>
+#include <llvm/IR/Type.h>
+#include <llvm/IR/Value.h>
+#include <llvm/Passes/OptimizationLevel.h>
+#include <llvm/Support/Alignment.h>
+#include <llvm/Support/Casting.h>
+#include <llvm/Support/TypeSize.h>
+#include <llvm/Support/raw_ostream.h>
+#include <llvm/TargetParser/Triple.h>
+#include <math.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <string>
+#include <filesystem>
+#include <functional>
+#include <optional>
+#include <system_error>
+#include <vector>
+
+#include "LgsDefinitions.h"
+#include "LgsConfigs.h"
+#include "errors/LgsErrors.h"
+#include "logos/LgsPaths.h"
+#include "LgsTokens.h"
+#include "codegen/LgsCodeGen.h"
+
+using namespace llvm;
 
 inline TargetMachine* targetMachine;
 
@@ -592,15 +631,24 @@ ConstantInt* LgsCodeGen::zeroSize() {
 }
 
 Value* LgsCodeGen::toFloat(Value* v) {
-    return builder.CreateSIToFP(v, floatTy());
+    if (v->getType()->isFloatingPointTy()) {
+        return builder.CreateSIToFP(v, floatTy());
+    }
+    return builder.CreateFPExt(v, floatTy());
 }
 
 Value* LgsCodeGen::toInt(Value* v) {
-    return builder.CreateFPToSI(v, i32Ty());
+    if (v->getType()->isFloatingPointTy()) {
+        return builder.CreateFPToSI(v, i32Ty());
+    }
+    return builder.CreateSExt(v, i32Ty());
 }
 
 Value* LgsCodeGen::toSize(Value* v) {
-    return builder.CreateZExt(v, sizeTy());
+    if (v->getType()->isFloatingPointTy()) {
+        return builder.CreateFPToSI(v, sizeTy());
+    }
+    return builder.CreateSExt(v, sizeTy());
 }
 
 Constant* LgsCodeGen::emptyStr() {

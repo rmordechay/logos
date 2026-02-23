@@ -1,6 +1,8 @@
 #include "funcs/LgsParam.h"
+
+#include <assert.h>
+
 #include "LgsType.h"
-#include "codegen/LgsCodeGen.h"
 
 LgsType* LgsParam::getType() {
     return type;

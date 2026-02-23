@@ -1,9 +1,16 @@
 #pragma once
+#include <string>
+
 #include "exprs/LgsExpr.h"
+#include "LgsValue.h"
 
 class LgsStr;
 class LgsMap;
 class LgsDArray;
+class LgsCodeGen;
+namespace llvm {
+class Value;
+}
 
 struct LgsIndex {
     LgsExpr* from;

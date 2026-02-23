@@ -1,8 +1,16 @@
 #pragma once
 #include <unordered_set>
+#include <filesystem>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include "LgsBinaryTokens.h"
 #include "LgsTokens.h"
 #include "lgsc/LgsCCompiler.h"
+#include "errors/LgsErrHandler.h"
+#include "logos/LgsPaths.h"
+#include "stmts/LgsImport.h"
 
 class LgsCharConst;
 class LgsModuleExpr;
@@ -60,6 +68,8 @@ class LgsReturn;
 class LgsStmt;
 class LgsFuncCall;
 class LgsExpr;
+class LgsVariable;
+struct LgsBaseMsg;
 
 class LgsParser {
 public:

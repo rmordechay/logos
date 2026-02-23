@@ -1,10 +1,20 @@
 #include "lgsc/LgsCCompiler.h"
-#include "LgsDefinitions.h"
+
+#include <clang/Lex/Preprocessor.h>
+#include <clang/Tooling/Tooling.h>
+#include <llvm/ADT/SmallString.h>
+#include <llvm/ADT/StringRef.h>
+#include <memory>
+#include <sstream>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include "lgsc/LgsCLangParser.h"
 #include "LgsConfigs.h"
 #include "LgsUtils.h"
-#include <clang/Driver/Driver.h>
-#include "types/primitives/LgsInt.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Frontend/CompilerInstance.h"
 
 using namespace clang;
 

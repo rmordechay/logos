@@ -1,5 +1,9 @@
 #pragma once
 #include "stmts/LgsStmt.h"
+#include "LgsValue.h"
+
+class LgsFuncCall;
+class LgsSelection;
 
 class LgsCoroutine final : public LgsStmt {
 public:

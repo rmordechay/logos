@@ -1,8 +1,17 @@
 #pragma once
+#include <filesystem>
+#include <string>
+#include <vector>
+
 #include "LgsFile.h"
 #include "exprs/LgsVariable.h"
-#include "logos/LgsAppConfigs.h"
 #include "stmts/LgsVarDec.h"
+#include "LgsVersion.h"
+#include "codegen/LgsCodeGen.h"
+
+class LgsStrConst;
+class LgsVarDec;
+class LgsVariable;
 
 struct LgsImportPkg {
     std::string name = "";

@@ -1,5 +1,7 @@
 #include "exprs/LgsEnvVar.h"
 
+#include <assert.h>
+
 #include "LgsUtils.h"
 
 void LgsEnvVar::hashNode(size_t& oldHash) {

@@ -1,7 +1,9 @@
 #include "exprs/constants/LgsCharConst.h"
 
-#include "codegen/LgsCodeGen.h"
+#include <assert.h>
+
 #include "exprs/constants/LgsStrConst.h"
+#include "LgsType.h"
 
 std::string LgsCharConst::asText() {
     return type->pname();

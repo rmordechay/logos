@@ -1,7 +1,11 @@
 #pragma once
+#include <string>
+
 #include "LgsSymbol.h"
 #include "exprs/LgsExpr.h"
+
 struct LgsSymbol;
+class LgsType;
 
 class LgsVariable final : public LgsExpr {
 public:

@@ -3,6 +3,8 @@
 
 class LgsIOPair;
 class LgsStmtsBlock;
+class LgsFunc;
+class LgsVarDec;
 
 class LgsIOStmt final : public LgsStmt {
 public:

@@ -1,10 +1,14 @@
 #pragma once
+#include <vector>
+
 #include "LgsValue.h"
 #include "types/LgsGenericType.h"
 
 class LgsReturn;
 class LgsStmt;
 class LgsObject;
+class LgsExpr;
+class LgsFunc;
 
 class LgsStmtWrapper {
 public:

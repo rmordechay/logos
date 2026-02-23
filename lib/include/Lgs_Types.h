@@ -1,5 +1,4 @@
 #pragma once
-#include <cmath>
 
 struct Lgs_TypeInfo;
 

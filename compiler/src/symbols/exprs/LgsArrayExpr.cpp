@@ -1,8 +1,15 @@
 #include "exprs/LgsArrayExpr.h"
+
+#include <assert.h>
+#include <llvm/IR/DIBuilder.h>
+#include <llvm/IR/DebugInfoMetadata.h>
+#include <llvm/IR/IRBuilder.h>
+
 #include "types/iterables/LgsSet.h"
-#include "LgsUtils.h"
 #include "codegen/LgsCodeGen.h"
-#include "types/LgsNullable.h"
+#include "LgsTokens.h"
+#include "LgsType.h"
+#include "types/iterables/LgsIterable.h"
 
 LgsExpr* LgsArrayExpr::cast(LgsType* toType, const bool explicitly) {
     if (iterable && iterable->baseType) return this;

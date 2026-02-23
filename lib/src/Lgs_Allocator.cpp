@@ -1,6 +1,7 @@
 #include "Lgs_Allocator.h"
-#include <ostream>
+#include <__cstddef/max_align_t.h>
 #include <sys/mman.h>
+#include <algorithm>
 
 static constexpr auto align = alignof(std::max_align_t) - 1;
 

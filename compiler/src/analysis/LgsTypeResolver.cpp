@@ -1,23 +1,33 @@
 #include "analysis/LgsTypeResolver.h"
 
+#include <assert.h>
+#include <filesystem>
+#include <map>
+#include <unordered_map>
+#include <utility>
+#include <vector>
+
 #include "errors/LgsErrHandler.h"
-#include "exprs/LgsVariable.h"
 #include "files/LgsFile.h"
 #include "files/LgsMainFile.h"
 #include "funcs/LgsFunc.h"
 #include "funcs/LgsMainFunc.h"
 #include "stmts/LgsField.h"
-#include "stmts/LgsIOPair.h"
 #include "types/LgsEnum.h"
 #include "types/LgsFuncType.h"
 #include "types/LgsGenericType.h"
 #include "types/LgsInterface.h"
 #include "types/iterables/LgsIterable.h"
 #include "types/LgsSubType.h"
-
 #include "errors/LgsErrors.h"
 #include "types/LgsNullable.h"
 #include "types/LgsSelf.h"
+#include "LgsSymbol.h"
+#include "LgsSymbolTable.h"
+#include "LgsType.h"
+#include "funcs/LgsParam.h"
+#include "types/LgsObject.h"
+#include "types/LgsTypePair.h"
 
 void LgsTypeResolver::resolveType(LgsType*& type) {
     if (!type) return;

@@ -1,14 +1,18 @@
 #pragma once
-#include "LgsType.h"
 #include <optional>
 #include <string>
 #include <vector>
+
+#include "LgsType.h"
 
 class LgsForeachLoop;
 class LgsCodeGen;
 class LgsVarDec;
 struct LgsIndex;
 struct CodegenMetadata;
+namespace llvm {
+class Value;
+}
 
 #define GET_FUNC "get"
 #define ADD_FUNC "add"

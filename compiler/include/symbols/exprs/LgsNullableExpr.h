@@ -1,4 +1,6 @@
 #pragma once
+#include <string>
+
 #include "LgsExpr.h"
 #include "types/LgsNullable.h"
 

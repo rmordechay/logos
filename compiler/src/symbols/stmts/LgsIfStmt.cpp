@@ -1,6 +1,9 @@
 #include "stmts/LgsIfStmt.h"
-#include "codegen/LgsCodeGen.h"
-#include "LgsUtils.h"
+
+#include <assert.h>
+
+#include "exprs/LgsExpr.h"
+#include "stmts/LgsStmtsBlock.h"
 
 void LgsIfStmt::setDebugValue(LgsCodeGen& cg) {
     assert(0);

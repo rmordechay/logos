@@ -1,15 +1,23 @@
 #include "LgsUtils.h"
-#include "LgsConfigs.h"
-#include "LgsDefinitions.h"
-#include "LgsTokens.h"
-#include "errors/LgsErrors.h"
 
+#include <unistd.h>
+#include <__ostream/basic_ostream.h>
+#include <_ctype.h>
+#include <_stdio.h>
+#include <_stdlib.h>
+#include <_string.h>
 #include <algorithm>
 #include <cassert>
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include <unistd.h>
+#include <chrono>
+#include <cstdlib>
+
+#include "LgsConfigs.h"
+#include "LgsDefinitions.h"
+#include "LgsTokens.h"
+#include "errors/LgsErrors.h"
 
 void execute(const fs::path& execPath, std::vector<const char*> mainArgs) {
     const auto path = const_cast<char*>(execPath.c_str());

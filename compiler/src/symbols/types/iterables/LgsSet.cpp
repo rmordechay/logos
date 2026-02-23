@@ -1,9 +1,11 @@
 #include "types/iterables/LgsSet.h"
 
+#include <assert.h>
+#include <llvm/IR/DerivedTypes.h>
+
 #include "LgsBinaryTokens.h"
 #include "codegen/LgsCodeGen.h"
-#include "types/primitives/LgsAny.h"
-#include "types/iterables/LgsDArray.h"
+#include "LgsType.h"
 
 Type* LgsSet::getIRType(LgsCodeGen& cg) {
     return cg.getStructType({cg.ptrTy(), cg.sizeTy(), cg.sizeTy(), cg.ptrTy()}, name);

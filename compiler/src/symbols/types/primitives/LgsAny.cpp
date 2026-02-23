@@ -1,4 +1,8 @@
 #include "types/primitives/LgsAny.h"
+
+#include <assert.h>
+#include <llvm/IR/DerivedTypes.h>
+
 #include "codegen/LgsCodeGen.h"
 
 size_t LgsAny::sizeBytes() {

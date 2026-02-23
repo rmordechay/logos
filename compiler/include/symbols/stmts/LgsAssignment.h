@@ -6,6 +6,8 @@ class LgsHashMap;
 struct LgsIndex;
 class LgsIterIndex;
 class LgsType;
+class LgsBinaryExpr;
+class LgsExpr;
 
 
 class LgsAssignment final : public LgsStmt {

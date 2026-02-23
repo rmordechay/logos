@@ -1,7 +1,12 @@
 #include "codegen/LgsLinker.h"
-#include "codegen/LgsCodeGen.h"
+
+#include <_stdio.h>
+#include <assert.h>
+#include <filesystem>
+
 #include "logos/LgsAppConfigs.h"
-#include <llvm/Support/FileSystem.h>
+#include "LgsUtils.h"
+#include "logos/LgsPaths.h"
 
 bool LgsLinker::link() const {
     assert(paths.lgsRootDir != "" && paths.execFile != "");

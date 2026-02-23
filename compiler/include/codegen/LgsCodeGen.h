@@ -1,14 +1,40 @@
 #pragma once
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/Passes/OptimizationLevel.h>
+#include <llvm/IR/Constants.h>
+#include <llvm/IR/DerivedTypes.h>
+#include <llvm/IR/GlobalValue.h>
+#include <llvm/IR/LLVMContext.h>
+#include <math.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <map>
 #include <filesystem>
+#include <functional>
+#include <string>
+#include <vector>
+
 #include "exprs/LgsExpr.h"
 
 namespace llvm {
     class DIBuilder;
     class PassBuilder;
     class TargetMachine;
+class BasicBlock;
+class Constant;
+class DIBasicType;
+class DICompileUnit;
+class DIFile;
+class DILocation;
+class DISubprogram;
+class Function;
+class GlobalVariable;
+class Instruction;
+class Module;
+class Type;
+class TypeSize;
+class Value;
+class raw_fd_ostream;
 }
 
 using llvm::DIFile;

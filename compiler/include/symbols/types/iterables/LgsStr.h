@@ -1,6 +1,18 @@
 #pragma once
+#include <stdint.h>
+#include <string>
+
 #include "LgsIterable.h"
 #include "types/primitives/LgsChar.h"
+#include "LgsValue.h"
+#include "Lgs_Types.h"
+
+class LgsCodeGen;
+namespace llvm {
+class Constant;
+class Type;
+class Value;
+}
 
 class LgsStr final : public LgsIterable {
 public:

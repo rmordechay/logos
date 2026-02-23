@@ -1,16 +1,23 @@
 #include "types/primitives/LgsFloat.h"
 
-#include <llvm/IR/Module.h>
+#include <assert.h>
+#include <llvm/ADT/ArrayRef.h>
+#include <llvm/IR/Constant.h>
+#include <llvm/IR/Constants.h>
+#include <llvm/IR/IRBuilder.h>
+#include <llvm/IR/Instructions.h>
+#include <llvm/IR/Type.h>
+#include <utility>
 
 #include "LgsBinaryTokens.h"
 #include "codegen/LgsCodeGen.h"
 #include "exprs/LgsBinaryExpr.h"
 #include "exprs/constants/LgsFloatConst.h"
-#include "types/primitives/LgsAny.h"
 #include "types/LgsNullable.h"
 #include "types/iterables/LgsVec.h"
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsDouble.h"
+#include "exprs/LgsExpr.h"
 
 std::string LgsFloat::getName() {
     return name;

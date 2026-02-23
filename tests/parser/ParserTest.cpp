@@ -1,8 +1,5 @@
-#include "files/LgsMainFile.h"
-#include "logos/LgsApp.h"
-#include "tools/LgsJsonParser.h"
-#include "LgsUtils.h"
-#include "gtest/gtest.h"
+
+#include <string>
 
 const std::string expectedDir = "../../tests/parser/expected";
 

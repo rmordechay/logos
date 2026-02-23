@@ -1,14 +1,32 @@
-#include <llvm/IR/Module.h>
+#include <llvm/ADT/ArrayRef.h>
+#include <llvm/BinaryFormat/Dwarf.h>
+#include <llvm/IR/Constant.h>
+#include <llvm/IR/Constants.h>
+#include <llvm/IR/DIBuilder.h>
+#include <llvm/IR/DebugInfoMetadata.h>
+#include <llvm/IR/DerivedTypes.h>
+#include <llvm/IR/GlobalVariable.h>
+#include <llvm/IR/IRBuilder.h>
+#include <llvm/IR/Type.h>
+#include <llvm/IR/Value.h>
+#include <llvm/Support/Casting.h>
+#include <optional>
+#include <string>
+#include <vector>
+
 #include "LgsRTTIndices.h"
 #include "Lgs_Exprs.h"
 #include "exprs/constants/LgsStrConst.h"
 #include "exprs/LgsBinaryExpr.h"
-#include "types/primitives/LgsAny.h"
 #include "codegen/LgsCodeGen.h"
 #include "types/LgsNullable.h"
 #include "types/iterables/LgsSArray.h"
 #include "types/primitives/LgsBool.h"
-#include "types/primitives/LgsChar.h"
+#include "LgsBinaryTokens.h"
+#include "LgsType.h"
+#include "exprs/LgsExpr.h"
+#include "types/iterables/LgsIterable.h"
+#include "types/iterables/LgsStr.h"
 
 Type* LgsStr::getIRType(LgsCodeGen& cg) {
     return getStrStruct(cg);

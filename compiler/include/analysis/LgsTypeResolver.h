@@ -1,7 +1,7 @@
 #pragma once
+#include <string>
+
 #include "LgsSymbol.h"
-
-
 
 class LgsMainFile;
 class LgsIOPair;

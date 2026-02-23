@@ -1,5 +1,11 @@
 #pragma once
 #include "LgsStmt.h"
+#include "LgsValue.h"
+
+class LgsExpr;
+namespace llvm {
+class BasicBlock;
+}
 
 class LgsReturn final : public LgsStmt {
 public:

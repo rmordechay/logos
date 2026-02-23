@@ -1,5 +1,19 @@
 #include "parser/LgsParser.h"
+
+#include <_ctype.h>
+#include <_stdlib.h>
+#include <_string.h>
+#include <assert.h>
+#include <errno.h>
+#include <stdint.h>
 #include <unordered_set>
+#include <algorithm>
+#include <limits>
+#include <map>
+#include <mutex>
+#include <optional>
+#include <unordered_map>
+
 #include "LgsTokens.h"
 #include "errors/LgsPlmErrors.h"
 #include "exprs/LgsArrayExpr.h"
@@ -31,7 +45,6 @@
 #include "files/LgsTestFile.h"
 #include "funcs/LgsCoroutine.h"
 #include "funcs/LgsMainFunc.h"
-#include "lgsc/LgsCCompiler.h"
 #include "logos/LgsApp.h"
 #include "loops/LgsForeachLoop.h"
 #include "loops/LgsInfiniteLoop.h"
@@ -65,6 +78,36 @@
 #include "types/primitives/LgsShort.h"
 #include "types/primitives/LgsSize.h"
 #include "types/primitives/LgsUInt.h"
+#include "LgsDefinitions.h"
+#include "LgsSymbol.h"
+#include "LgsSymbolTable.h"
+#include "LgsType.h"
+#include "LgsVersion.h"
+#include "errors/LgsErrors.h"
+#include "exprs/LgsExpr.h"
+#include "exprs/LgsHashMap.h"
+#include "exprs/constants/LgsIntConst.h"
+#include "files/LgsFile.h"
+#include "funcs/LgsFunc.h"
+#include "funcs/LgsParam.h"
+#include "logos/LgsAppConfigs.h"
+#include "loops/LgsForLoop.h"
+#include "loops/LgsMetaVar.h"
+#include "stmts/LgsField.h"
+#include "stmts/LgsStmt.h"
+#include "stmts/LgsStmtsBlock.h"
+#include "types/LgsFuncType.h"
+#include "types/LgsObject.h"
+#include "types/LgsTypePair.h"
+#include "types/iterables/LgsDArray.h"
+#include "types/iterables/LgsMap.h"
+#include "types/iterables/LgsSArray.h"
+#include "types/iterables/LgsStr.h"
+#include "types/iterables/LgsVec.h"
+#include "types/primitives/LgsChar.h"
+#include "types/primitives/LgsFloat.h"
+#include "types/primitives/LgsInt.h"
+#include "types/primitives/LgsVoid.h"
 
 #define MAX_TOKENS_NUMBER 100000
 
@@ -1419,11 +1462,11 @@ LgsCharConst* LgsParser::parseCharConst() {
 }
 
 LgsExpr* LgsParser::parseConstant() {
-    if (const auto expr = parseCharConst()) return expr;
-    if (const auto expr = parseStrConst()) return expr;
+    LgsExpr* constant = nullptr;
+    if ((constant = parseCharConst())) return constant;
+    if ((constant = parseStrConst())) return constant;
     const auto startToken = currentToken;
     const auto tokenStr = currentToken.lexeme;
-    LgsExpr* constant = nullptr;
     switch (currentToken.type) {
     case T_INT: {
         auto result = tokenStr;

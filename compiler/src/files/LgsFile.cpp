@@ -1,6 +1,7 @@
 #include "files/LgsFile.h"
 
-#include "LgsDefinitions.h"
+#include <assert.h>
+
 #include "files/LgsAppFile.h"
 #include "files/LgsEnvFile.h"
 #include "files/LgsInterfaceFile.h"

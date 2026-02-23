@@ -1,11 +1,16 @@
 #include "types/LgsFieldType.h"
 
+#include <llvm/IR/DerivedTypes.h>
 #include <cassert>
+#include <vector>
 
 #include "LgsDefinitions.h"
 #include "LgsRTTIndices.h"
 #include "codegen/LgsCodeGen.h"
-#include "types/LgsObject.h"
+
+namespace llvm {
+class Value;
+}
 
 std::string LgsFieldType::getName() {
     return name;

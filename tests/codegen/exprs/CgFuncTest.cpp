@@ -1,7 +1,11 @@
+#include <sstream>
+#include <string>
+#include <vector>
+
 #include "gtest/gtest.h"
 #include "LgsTestUtils.h"
 
-TEST(CgFuncCallTest, Test1) {
+TEST(CgFuncTest, Test1) {
     const auto code = R"(
     func(x: Int, y: Int): Int {
         return x - y
@@ -20,7 +24,7 @@ TEST(CgFuncCallTest, Test1) {
     EXPECT_EQ(lines[2], "-2");
 }
 
-TEST(CgFuncCallTest, Test2) {
+TEST(CgFuncTest, Test2) {
     const auto code = R"(
     func(x: Int = 3) {
         print(x)
@@ -36,7 +40,7 @@ TEST(CgFuncCallTest, Test2) {
     EXPECT_EQ(lines[1], "2");
 }
 
-TEST(CgFuncCallTest, Test3) {
+TEST(CgFuncTest, Test3) {
     const auto code = R"(
     func(x: Int = 3, y: Str = "text") {
         print(x)
@@ -58,7 +62,7 @@ TEST(CgFuncCallTest, Test3) {
     EXPECT_EQ(lines[5], "other text");
 }
 
-TEST(CgFuncCallTest, Test4) {
+TEST(CgFuncTest, Test4) {
     const auto code = R"(
     main() {
         arr = [1, 2, 3]
@@ -76,4 +80,38 @@ TEST(CgFuncCallTest, Test4) {
     EXPECT_EQ(lines[3], "1");
     EXPECT_EQ(lines[4], "2");
     EXPECT_EQ(lines[5], "3");
+}
+
+TEST(CgFuncTest, Test5) {
+    const auto code = R"(
+    funcBool(x: Bool) {print(x)}
+    funcByte(x: Byte) {print(x)}
+    funcShort(x: Short) {print(x)}
+    funcInt(x: Int) {print(x)}
+    funcLong(x: Long) {print(x)}
+    funcSize(x: Size) {print(x)}
+    funcChar(x: Char) {print(x)}
+    funcStr(x: Str) {print(x)}
+
+    main() {
+        funcBool(false)
+        funcByte(-4)
+        funcShort(-65)
+        funcInt(-56)
+        funcLong(-235456)
+        funcSize(34656)
+        funcChar('R')
+        funcStr("text")
+    }
+    )";
+    std::istringstream stream(runLgsApp(code));
+    const auto lines = getLines(stream, 8);
+    EXPECT_EQ(lines[0], "false");
+    EXPECT_EQ(lines[1], "-4");
+    EXPECT_EQ(lines[2], "-65");
+    EXPECT_EQ(lines[3], "-56");
+    EXPECT_EQ(lines[4], "-235456");
+    EXPECT_EQ(lines[5], "34656");
+    EXPECT_EQ(lines[6], "'R'");
+    EXPECT_EQ(lines[7], "text");
 }

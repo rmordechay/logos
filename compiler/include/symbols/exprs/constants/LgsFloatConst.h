@@ -1,6 +1,10 @@
 #pragma once
-#include "exprs/LgsExpr.h"
 #include <cmath>
+#include <string>
+
+#include "exprs/LgsExpr.h"
+
+class LgsType;
 
 class LgsFloatConst final : public LgsExpr {
 public:

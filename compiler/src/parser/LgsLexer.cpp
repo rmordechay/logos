@@ -1,4 +1,8 @@
 #include "parser/LgsLexer.h"
+
+#include <_ctype.h>
+#include <unordered_map>
+
 #include "errors/LgsErrors.h"
 
 std::vector<LgsToken> LgsLexer::tokenize() {

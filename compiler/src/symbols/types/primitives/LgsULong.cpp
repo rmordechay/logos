@@ -1,6 +1,7 @@
 #include "types/primitives/LgsULong.h"
 
-#include <llvm/IR/Module.h>
+#include <assert.h>
+#include <stdint.h>
 
 #include "exprs/constants/LgsIntConst.h"
 #include "codegen/LgsCodeGen.h"

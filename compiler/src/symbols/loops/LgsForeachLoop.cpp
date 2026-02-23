@@ -1,8 +1,19 @@
 #include "loops/LgsForeachLoop.h"
 
+#include <assert.h>
+#include <llvm/IR/Constants.h>
+#include <llvm/IR/IRBuilder.h>
+#include <unordered_map>
+#include <vector>
+
 #include "codegen/LgsCodeGen.h"
 #include "stmts/LgsVarDec.h"
-#include "types/iterables/LgsMap.h"
+#include "LgsType.h"
+#include "exprs/LgsExpr.h"
+#include "loops/LgsMetaVar.h"
+#include "stmts/LgsStmt.h"
+#include "stmts/LgsStmtsBlock.h"
+#include "types/iterables/LgsIterable.h"
 
 Value* LgsForeachLoop::loopStart(LgsCodeGen& cg) {
     return cg.zeroSize();

@@ -1,6 +1,17 @@
 #include "cli/commands/LgsGenerateCmd.h"
+
+#include <__ostream/basic_ostream.h>
+#include <_ctype.h>
+#include <_stdio.h>
+#include <assert.h>
+#include <filesystem>
+#include <fstream>
+
 #include "errors/LgsCliErrors.h"
 #include "LgsFileTemplates.h"
+#include "LgsDefinitions.h"
+#include "LgsUtils.h"
+#include "errors/LgsErrHandler.h"
 
 void LgsGenerateCmd::run() {
     if (argc != 3) {

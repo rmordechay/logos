@@ -1,7 +1,14 @@
 #pragma once
+#include <string>
+
 #include "LgsIterable.h"
 #include "types/primitives/LgsDouble.h"
 #include "types/primitives/LgsFloat.h"
+#include "Lgs_Types.h"
+
+class LgsType;
+class LgsVec;
+struct LgsBinOp;
 
 #define CBLAS_ROW_MAJOR 101
 #define CBLAS_NO_TRANS 111

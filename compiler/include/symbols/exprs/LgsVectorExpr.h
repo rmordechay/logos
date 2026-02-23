@@ -1,5 +1,9 @@
 #pragma once
+#include <string>
+#include <vector>
+
 #include "types/iterables/LgsVec.h"
+#include "exprs/LgsExpr.h"
 
 class LgsVectorExpr final : public LgsExpr {
 public:

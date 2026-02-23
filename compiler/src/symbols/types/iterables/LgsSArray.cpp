@@ -1,11 +1,25 @@
 #include "types/iterables/LgsSArray.h"
+
 #include <llvm/IR/Module.h>
+#include <assert.h>
+#include <llvm/ADT/ArrayRef.h>
+#include <llvm/IR/Argument.h>
+#include <llvm/IR/Constants.h>
+#include <llvm/IR/DerivedTypes.h>
+#include <llvm/IR/Function.h>
+#include <llvm/IR/GlobalVariable.h>
+#include <llvm/IR/IRBuilder.h>
+#include <llvm/IR/Instructions.h>
+#include <functional>
+#include <vector>
+
 #include "codegen/LgsCodeGen.h"
 #include "exprs/LgsArrayExpr.h"
 #include "types/primitives/LgsBool.h"
 #include "exprs/LgsBinaryExpr.h"
-#include "lgsc/LgsCCompiler.h"
-#include "types/iterables/LgsStr.h"
+#include "LgsBinaryTokens.h"
+#include "LgsType.h"
+#include "types/iterables/LgsIterable.h"
 
 std::string LgsSArray::getBaseName() {
     return name;

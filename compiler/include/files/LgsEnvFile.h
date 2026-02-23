@@ -1,6 +1,11 @@
 #pragma once
+#include <filesystem>
+#include <string>
+#include <vector>
+
 #include "LgsFile.h"
 #include "stmts/LgsVarDec.h"
+#include "codegen/LgsCodeGen.h"
 
 class LgsVarDec;
 

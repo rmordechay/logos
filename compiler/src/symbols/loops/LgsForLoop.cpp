@@ -1,4 +1,11 @@
 #include "loops/LgsForLoop.h"
+
+#include <llvm/ADT/ArrayRef.h>
+#include <llvm/IR/Constants.h>
+#include <llvm/IR/IRBuilder.h>
+#include <llvm/IR/Instructions.h>
+#include <llvm/IR/Metadata.h>
+
 #include "LgsDefinitions.h"
 #include "codegen/LgsCodeGen.h"
 #include "loops/LgsForeachLoop.h"
@@ -7,7 +14,10 @@
 #include "loops/LgsWhileLoop.h"
 #include "stmts/LgsStmtsBlock.h"
 #include "stmts/LgsVarDec.h"
-#include "LgsUtils.h"
+
+namespace llvm {
+class Value;
+}
 
 using llvm::MDNode;
 using llvm::MDString;

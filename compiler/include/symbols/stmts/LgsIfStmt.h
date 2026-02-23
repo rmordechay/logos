@@ -1,7 +1,17 @@
 #pragma once
+#include <string>
+#include <utility>
+#include <vector>
+
 #include "LgsStmt.h"
 #include "LgsStmtsBlock.h"
 #include "exprs/LgsExpr.h"
+#include "LgsValue.h"
+
+class LgsExpr;
+namespace llvm {
+class BasicBlock;
+}
 
 class LgsIfStmt final : public LgsStmt {
 public:

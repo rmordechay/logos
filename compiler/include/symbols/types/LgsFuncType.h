@@ -1,6 +1,13 @@
 #pragma once
+#include <llvm/IR/DerivedTypes.h>
+#include <string>
+#include <unordered_map>
+#include <vector>
+
 #include "LgsType.h"
 #include "funcs/LgsParam.h"
+
+class LgsGenericType;
 
 enum LgsFuncFlags : uint32_t {
     PUBLIC = 1 << 0,

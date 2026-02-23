@@ -1,4 +1,7 @@
 #include "exprs/constants/LgsStrConst.h"
+
+#include <assert.h>
+
 #include "LgsUtils.h"
 
 std::string LgsStrConst::asText() {

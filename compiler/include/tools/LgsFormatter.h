@@ -1,6 +1,8 @@
 #pragma once
+#include <stdint.h>
 #include <iosfwd>
 #include <sstream>
+#include <string>
 
 class LgsSubType;
 class LgsEnum;
