@@ -5,6 +5,11 @@
 #include "exprs/LgsArrayExpr.h"
 #include "exprs/LgsExpr.h"
 
+void LgsMatrixExpr::setType(LgsType* newType) {
+    type = newType;
+    matType = newType->asMatrix();
+}
+
 std::string LgsMatrixExpr::asText() {
     assert(0);
 }
@@ -22,8 +27,8 @@ bool LgsMatrixExpr::equals(LgsExpr* other) {
 }
 
 LgsMatrixExpr::~LgsMatrixExpr() {
-    for (const auto element : elements) {
+    for (const auto element : rows) {
         freeExpr(element);
     }
-    elements.clear();
+    rows.clear();
 }

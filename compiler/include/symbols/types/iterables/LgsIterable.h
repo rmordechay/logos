@@ -38,7 +38,7 @@ public:
     size_t getDims() const;
     virtual LgsType* getIndexType();
     virtual LgsType* getValueType();
-    virtual std::optional<int64_t> getConstLength();
+    virtual std::optional<size_t> getConstLength();
     virtual bool unpackLoopVars(LgsForeachLoop* loop) const;
     virtual void setLoopIRVars(LgsCodeGen& cg, LgsForeachLoop* loop);
     virtual Value* lenIR(LgsCodeGen& cg, Value* iterable) = 0;

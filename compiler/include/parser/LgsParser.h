@@ -97,15 +97,14 @@ public:
     LgsFile* parseSrcFileHeaders();
     LgsMainFile* parseMainFile();
     LgsObjectFile* parseObjectFile();
+    LgsObject* parseObject(bool withParen);
     LgsInterfaceFile* parseInterfaceFile();
     LgsTestFile* parseTestFile();
     LgsAppFile* parseAppFile();
     LgsEnvFile* parseEnvFile();
 
     // Object
-    LgsObject* parseObject();
     LgsInterface* parseInterface();
-    LgsObject* parseObjectBody(const LgsToken& tokenName, bool isSingleton);
     LgsInterface* parseInterfaceBody(const LgsToken& tokenName);
     LgsField* parseField(size_t fieldPosition);
     LgsIOPair* parseIOPair();

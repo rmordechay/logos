@@ -43,11 +43,9 @@ public:
     std::vector<LgsObject*> objects;
     std::vector<LgsSubType*> subtypes;
     std::vector<LgsIOPair*> ioPairs;
-    std::vector<LgsGenericType*> generics;
     std::map<std::string, LgsFunc*> metaFuncs;
     std::map<std::string, LgsField*> metaFields;
     bool isSingleton = false;
-    bool hasGenerics = false;
     static constexpr std::string metaName = "Object";
 
     explicit LgsObject(const std::string&  name) : name(name) {
@@ -63,9 +61,9 @@ public:
     std::string fmtStr() const override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
+    bool hasGenerics() override;
     bool canCastTo(LgsType* other) override;
     void hashNode(size_t& oldHash) override;
-    void cloneFields(LgsInstance* instance) const;
     Type* getIRType(LgsCodeGen& cg) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     void asIRText(LgsStrBuilder& sb, Value* value) override;

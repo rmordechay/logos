@@ -59,11 +59,11 @@ std::string LgsFuncType::pname() {
     str << (isLambda ? "" : name) << '(';
     for (size_t i = isMethod; i < params.size(); ++i) {
         const auto param = params[i];
-        str << getPrettyName(param.type);
+        str << (param.type ? param.type->pname() : LGS_UNKNOWN_TYPE);
         if (param.expr) str << " = " << param.expr->asText();
         if (i != params.size() - 1) str << ", ";
     }
-    str << "): " << getPrettyName(rt);
+    str << "): " << (rt ? rt->pname() : LGS_UNKNOWN_TYPE);
     return str.str();
 }
 

@@ -207,8 +207,8 @@ void LgsCodeGen::incSize(Value* bufferOffset, Value* ptr) {
     store(builder.CreateAdd(bufferOffset, usize(1)), ptr);
 }
 
-void LgsCodeGen::addNullTerminate(Value* strPtr, Value* pos) {
-    store(zero8(), builder.CreateInBoundsGEP(i8Ty(), strPtr, {pos}));
+void LgsCodeGen::addNullTerminate(Value* strPtr, Value* index) {
+    store(zero8(), builder.CreateInBoundsGEP(i8Ty(), strPtr, {index}));
 }
 
 Value* LgsCodeGen::allocaAndStore(Type* type, Value* v, const std::string& name) {
@@ -258,7 +258,7 @@ Value* LgsCodeGen::getVFunc(Value* objType, Value* funcName) {
 
 Value* LgsCodeGen::heapAllocSize(Value* size, Value* level, const bool setLevel) {
     assert(size && level);
-    return callRuntimeFunc("alloc", ptrTy(), {sizeTy(), sizeTy(), i1Ty()}, {size, level, i1(setLevel)});
+    return callRuntimeFunc("alloc", ptrTy(), {sizeTy(), sizeTy(), i1Ty()}, {toSize(size), toSize(level), i1(setLevel)});
 }
 
 Value* LgsCodeGen::heapAllocType(const std::string& baseName, Value* type, Value* level) {

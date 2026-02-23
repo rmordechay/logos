@@ -10,6 +10,7 @@ add_executable(lgs_tests
     sema/TypeResolverTest.cpp
     codegen/CgMemoryTest.cpp
     codegen/CgIfStmtTest.cpp
+    codegen/CgSwitchTest.cpp
     codegen/CgLoopsTest.cpp
     codegen/CgGenericsTest.cpp
     codegen/CgDeferTest.cpp
@@ -28,6 +29,9 @@ add_executable(lgs_tests
     codegen/exprs/CgNullableTest.cpp
     codegen/exprs/CgHashMapTest.cpp
     codegen/exprs/CgIterableTest.cpp
+    codegen/exprs/CgMatrixTest.cpp
+    codegen/exprs/CgVectorTest.cpp
+    codegen/exprs/CgSliceTest.cpp
 )
 
 target_include_directories(lgs_tests PRIVATE

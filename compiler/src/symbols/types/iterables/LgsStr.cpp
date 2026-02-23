@@ -28,6 +28,8 @@
 #include "types/iterables/LgsIterable.h"
 #include "types/iterables/LgsStr.h"
 
+#include "LgsConfigs.h"
+
 Type* LgsStr::getIRType(LgsCodeGen& cg) {
     return getStrStruct(cg);
 }
@@ -83,20 +85,20 @@ LgsType* LgsStr::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     return nullptr;
 }
 
-std::optional<int64_t> LgsStr::getConstLength() {
+std::optional<size_t> LgsStr::getConstLength() {
     if (length == 0) return std::nullopt;
     return length;
 }
 
 void LgsStr::asIRText(LgsStrBuilder& sb, Value* value) {
     if (sb.asJSON)  sb.add("\"");
-    value = loadRTData(sb.cg, value);
+    value = loadIRData(sb.cg, value);
     sb.add(value, sb.cg.callStrlen(value));
     if (sb.asJSON)  sb.add("\"");
 }
 
 Value* LgsStr::getIRElement(LgsCodeGen& cg, Value* iterable, Value* index) {
-    return cg.builder.CreateGEP(cg.i8Ty(), loadRTData(cg, iterable), {cg.zero32(), index});
+    return cg.builder.CreateGEP(cg.i8Ty(), loadIRData(cg, iterable), {cg.zero32(), index});
 }
 
 Value* LgsStr::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
@@ -127,7 +129,7 @@ Value* LgsStr::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     }
 
     Value* ptr = nullptr;
-    const auto leftPtr = loadRTData(cg, left->IRValue);
+    const auto leftPtr = loadIRData(cg, left->IRValue);
     const auto leftSize = cg.callStrlen(leftPtr);
     if (right->type->asChar()) {
         const auto allocSize = cg.builder.CreateAdd(leftSize, cg.usize(2));
@@ -136,7 +138,7 @@ Value* LgsStr::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
         cg.callMemcpy(ptr, leftPtr, leftSize);
         cg.store(right->IRValue, rightPos);
     } else if (right->type->asStr()) {
-        const auto rightPtr = loadRTData(cg, right->IRValue);
+        const auto rightPtr = loadIRData(cg, right->IRValue);
         const auto rightSize = cg.callStrlen(rightPtr);
         const auto sumSize = cg.builder.CreateAdd(leftSize, rightSize);
         const auto allocSize = cg.builder.CreateAdd(sumSize, cg.usize(1));
@@ -154,7 +156,7 @@ Value* LgsStr::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
 }
 
 Value* LgsStr::lenIR(LgsCodeGen& cg, Value* iterable) {
-    return cg.callStrlen(loadRTData(cg, iterable));
+    return cg.callStrlen(loadIRData(cg, iterable));
 }
 
 Value* LgsStr::inIR(LgsCodeGen& cg, Value* iterableExpr, Value* value) {
@@ -163,7 +165,7 @@ Value* LgsStr::inIR(LgsCodeGen& cg, Value* iterableExpr, Value* value) {
 }
 
 Value* LgsStr::hashValue(LgsCodeGen& cg, Value* value) {
-    return cg.callHash(getRTType(cg), loadRTData(cg, value));
+    return cg.callHash(getRTType(cg), loadIRData(cg, value));
 }
 
 std::string LgsStr::fmtStr() const {
@@ -184,7 +186,7 @@ void LgsStr::storeData(LgsCodeGen& cg, Value* ptr, Value* value) {
     cg.storeField(getStrStruct(cg), ptr, LgsStrIndices::data, value);
 }
 
-Value* LgsStr::loadRTData(LgsCodeGen& cg, Value* value) {
+Value* LgsStr::loadIRData(LgsCodeGen& cg, Value* value) {
     return cg.loadField(getStrStruct(cg), value, LgsStrIndices::data, cg.ptrTy());
 }
 
@@ -192,4 +194,12 @@ Constant* LgsStr::getStrConst(LgsCodeGen& cg, const std::string& text) {
     const auto exprTy = llvm::cast<StructType>(getStrStruct(cg));
     const auto initializer = ConstantStruct::get(exprTy, {cg.zeroSize(), cg.getString(text)});
     return cg.createGlobal("", exprTy, initializer);
+}
+
+Value* LgsStr::getEmptyIRStr(LgsCodeGen& cg, Value* size) {
+    // TODO make allocation in one go
+    const auto str = cg.heapAllocSize(cg.usize(sizeof(Lgs_StrExpr)), cg.currentLevel, true);
+    const auto data = cg.heapAllocSize(size, cg.currentLevel, false);
+    cg.storeField(getStrStruct(cg), str, LgsStrIndices::data, data);
+    return str;
 }

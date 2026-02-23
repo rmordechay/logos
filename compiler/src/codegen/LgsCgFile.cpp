@@ -20,7 +20,6 @@
 #include <llvm/Support/Casting.h>
 #include <sstream>
 #include <unordered_set>
-#include <functional>
 #include <map>
 #include <string>
 #include <unordered_map>
@@ -498,6 +497,9 @@ void LgsCgFile::visitContinueStmt(const LgsContinue* continueStmt) {
 void LgsCgFile::visitReturnStmt(LgsReturn* returnStmt) {
     const auto currentFunc = returnStmt->func;
     const auto ft = currentFunc->funcType;
+    for (const auto ioStmt : returnStmt->ioStmts) {
+        ioStmt->closeFunc->call(cg, {});
+    }
     if (ft->rt->isVoid()) {
         cg.createRet();
     } else if (!currentFunc->returnStmts.empty()) {
@@ -542,10 +544,15 @@ void LgsCgFile::visitDeferStmt(const LgsDeferStmt* defer) {
 }
 
 void LgsCgFile::visitIOStmt(const LgsIOStmt* ioStmt) {
+    const auto ioBlock = cg.createBlock("io_block");
+    const auto exitBlock = cg.createBlock("io_exit_block");
+    cg.branchAndStartBlock(ioBlock);
     visitExpr(ioStmt->varDec->expr);
     visitStmtsBlock(ioStmt->stmtsBlock);
-    // TODO handle return in the io block which will skip that
-    ioStmt->closeFunc->call(cg, {});
+    if (!cg.lastInstTerminator()) {
+        ioStmt->closeFunc->call(cg, {});
+    }
+    cg.branchAndStartBlock(exitBlock);
 }
 
 void LgsCgFile::visitExpr(LgsExpr* expr, const bool assign) {
@@ -648,7 +655,7 @@ void LgsCgFile::visitInstance(LgsInstance* instance) {
     }
 
     // Zero values
-    for (const auto field : instance->fields) {
+    for (const auto field : instance->obj->fields) {
         const auto fieldType = field->type;
         if (visited.contains(field->name) || fieldType->asEnum()) continue;
         const auto pointee = field->getGEP(cg, instance->IRValue);
@@ -678,9 +685,9 @@ void LgsCgFile::visitIntConst(LgsIntConst* intConst) {
     const auto ty = intConst->type;
     if (ty->asBool()) {
         intConst->IRValue = cg.i1(intConst->value);
-    } else if (ty->asByte() || ty->asChar()) {
+    } else if (ty->asByte() || ty->asUByte() || ty->asChar()) {
         intConst->IRValue = cg.i8(intConst->value);
-    } else if (ty->asShort()) {
+    } else if (ty->asShort() || ty->asUShort()) {
         intConst->IRValue = cg.i16(intConst->value);
     } else if (ty->asInt() || ty->asUInt()) {
         intConst->IRValue = cg.i32(intConst->value);
@@ -690,6 +697,8 @@ void LgsCgFile::visitIntConst(LgsIntConst* intConst) {
         intConst->IRValue = cg.usize(intConst->value);
     } else if (ty->asFloat()) {
         intConst->IRValue = cg.floatv(intConst->value);
+    } else if (ty->asDouble()) {
+        intConst->IRValue = cg.doublev(intConst->value);
     } else {
         assert(0);
     }
@@ -812,7 +821,6 @@ void LgsCgFile::visitIterIndex(LgsIterIndex* iterIndex, const bool assign) {
     const auto iterable = baseExpr->type->asIterable();
     const auto from = iterIndex->index.from;
     const auto to = iterIndex->index.to;
-    assert(iterable && !iterIndex->pointee);
     visitExpr(baseExpr);
     visitExpr(from);
     visitExpr(to);
@@ -869,7 +877,7 @@ void LgsCgFile::visitNullableExpr(LgsNullableExpr* expr) {
     }
 }
 
-void LgsCgFile::visitFieldSelection(LgsVariable* var, LgsExpr* parent) {
+void LgsCgFile::visitFieldSelection(LgsVariable* var, const LgsExpr* parent) {
     const auto field = var->ref.field;
     const auto fieldType = field->type;
     // Function pointer
@@ -1036,7 +1044,7 @@ void LgsCgFile::visitVectorExpr(LgsVectorExpr* vecExpr) {
     const auto ty = vecType->getIRType(cg);
     if (vecExpr->elements.empty()) {
         vecExpr->IRValue = vecType->getIRZeroValue(cg, vecExpr->pointee, vecExpr->getLevel(cg));
-        cg.store(Constant::getNullValue(ty), vecExpr->pointee);
+        cg.store(Constant::getNullValue(ty), vecExpr->pointee ? vecExpr->pointee : vecExpr->IRValue);
         return;
     }
 
@@ -1057,7 +1065,7 @@ void LgsCgFile::visitVectorExpr(LgsVectorExpr* vecExpr) {
     // Multiple elements
     vecExpr->IRValue = vecExpr->vecType->getIRZeroValue(cg, vecExpr->pointee, vecExpr->getLevel(cg));
     if (vecExpr->sumArgsDim < vecType->dimVec) {
-        cg.store(Constant::getNullValue(ty), vecExpr->pointee);
+        cg.store(Constant::getNullValue(ty), vecExpr->pointee ? vecExpr->pointee : vecExpr->IRValue);
     }
     size_t index = 0;
     for (size_t i = 0; i < vecExpr->elements.size(); ++i) {
@@ -1073,39 +1081,22 @@ void LgsCgFile::visitVectorExpr(LgsVectorExpr* vecExpr) {
     }
 }
 
-void LgsCgFile::visitMatrixExpr(const LgsMatrixExpr* matrixExpr) {
-    if (!matrixExpr->IRValue) return;
-    auto allArgsConst = true;
-    std::vector<Constant*> constantArgs;
-    for (size_t i = 0; i < matrixExpr->elements.size(); ++i) {
-        const auto vector = matrixExpr->elements[i];
-        for (size_t j = 0; j < vector->elements.size(); ++j) {
-            const auto element = vector->elements[j];
-            visitExpr(element);
-            if (const auto constant = llvm::dyn_cast<Constant>(element->IRValue)) {
-                constantArgs.push_back(constant);
-            } else {
-                allArgsConst = false;
-            }
-        }
+void LgsCgFile::visitMatrixExpr(LgsMatrixExpr* matExpr) {
+    const auto matType = matExpr->matType;
+    const auto ty = matType->getIRType(cg);
+    if (matExpr->rows.empty()) {
+        matExpr->IRValue = matType->getIRZeroValue(cg, matExpr->pointee, matExpr->getLevel(cg));
+        cg.store(Constant::getNullValue(ty), matExpr->pointee);
+        return;
     }
-
-    const auto matTypeIR = matrixExpr->type->getIRType(cg);
-    if (allArgsConst) {
-        const auto matArrayType = llvm::dyn_cast<ArrayType>(matTypeIR);
-        const auto constantMatrix = ConstantArray::get(matArrayType, constantArgs);
-        cg.store(constantMatrix, matrixExpr->IRValue);
-    } else {
-        auto index = 0;
-        for (size_t i = 0; i < matrixExpr->elements.size(); ++i) {
-            const auto vector = matrixExpr->elements[i];
-            for (size_t j = 0; j < vector->elements.size(); ++j) {
-                const auto element = vector->elements[j];
-                const std::vector<Value*> indices = {cg.zero32(), cg.i32(index++)};
-                const auto gep = cg.builder.CreateInBoundsGEP(matTypeIR, matrixExpr->IRValue, indices);
-                cg.store(element->IRValue, gep);
-            }
-        }
+    matExpr->IRValue = matExpr->matType->getIRZeroValue(cg, matExpr->pointee, matExpr->getLevel(cg));
+    cg.store(Constant::getNullValue(ty), matExpr->pointee ? matExpr->pointee : matExpr->IRValue);
+    for (size_t i = 0; i < matExpr->rows.size(); ++i) {
+        const auto row = matExpr->rows[i];
+        const auto rowTy = row->type->getIRType(cg);
+        row->pointee = cg.builder.CreateInBoundsGEP(rowTy, matExpr->IRValue, {cg.i32(i)});
+        visitExpr(row);
+        cg.store(row->loadIRPtr(cg), row->pointee);
     }
 }
 
@@ -1161,8 +1152,10 @@ void LgsCgFile::createEpilogue(const LgsFunc* func) {
         cg.callIntrinsics(Intrinsic::vaend, {cg.ptrTy()}, {ft->params.back().IRValue});
     }
     // No return
-    if (ft->rt->isVoid() && !cg.lastInstTerminator()) {
-        cg.createRet();
+    if (ft->rt->isVoid()) {
+        if (!cg.lastInstTerminator()) {
+            cg.createRet();
+        }
     } else { // With return
         auto& stmts = func->returnStmts;
         assert(!stmts.empty());
@@ -1174,9 +1167,8 @@ void LgsCgFile::createEpilogue(const LgsFunc* func) {
             for (const auto returnStmt : stmts) {
                 phi->addIncoming(returnStmt->expr->IRValue, returnStmt->parentBlock);
             }
-            const auto toLevel = cg.builder.CreateSub(cg.currentLevel, cg.usize(1));
             if (ft->rt->isHeap) {
-                cg.createRet(ft->rt->moveValue(cg, phi, toLevel));
+                cg.createRet(ft->rt->moveValue(cg, phi, cg.levelAbove()));
             } else {
                 cg.createRet(phi);
             }

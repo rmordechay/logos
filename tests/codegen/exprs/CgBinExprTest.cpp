@@ -152,3 +152,31 @@ TEST(CgBinExprTest, VecTest1) {
     EXPECT_EQ(lines[6], "79.276");
     EXPECT_EQ(lines[7], "Vec3(-31.4882, 22.398, -1.1288)");
 }
+
+TEST(CgBinExprTest, MatTest1) {
+    const auto code = R"(
+    main() {
+        mat = Mat3x3(
+            [1.0, 2.0, 3.0],
+            [4.0, 5.0, 6.0],
+            [7.0, 8.0, 9.0],
+        )
+        print(mat + 3.)
+        print(mat - 3.)
+        print(mat * 3.)
+        print(mat / 3.)
+        print(mat + mat)
+        print(mat - mat)
+        print(mat / mat)
+    }
+    )";
+    std::istringstream stream(runLgsApp(code));
+    const auto lines = getLines(stream, 7);
+    EXPECT_EQ(lines[0], "Mat3x3([4, 5, 6], [7, 8, 9], [10, 11, 12])");
+    EXPECT_EQ(lines[1], "Mat3x3([-2, -1, 0], [1, 2, 3], [4, 5, 6])");
+    EXPECT_EQ(lines[2], "Mat3x3([3, 6, 9], [12, 15, 18], [21, 24, 27])");
+    EXPECT_EQ(lines[3], "Mat3x3([0.333333, 0.666667, 1], [1.33333, 1.66667, 2], [2.33333, 2.66667, 3])");
+    EXPECT_EQ(lines[4], "Mat3x3([2, 4, 6], [8, 10, 12], [14, 16, 18])");
+    EXPECT_EQ(lines[5], "Mat3x3([0, 0, 0], [0, 0, 0], [0, 0, 0])");
+    EXPECT_EQ(lines[6], "Mat3x3([1, 1, 1], [1, 1, 1], [1, 1, 1])");
+}

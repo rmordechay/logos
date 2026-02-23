@@ -53,6 +53,12 @@ void LgsExpr::setType(LgsType* newType) {
     type = newType;
 }
 
+Value* LgsExpr::loadIRPtr(LgsCodeGen& cg) const {
+    if (!IRValue->getType()->isPointerTy()) return IRValue;
+    if (type->asSArray() || type->asMatrix()) return IRValue;
+    return cg.load(type->getStorageType(cg), IRValue);
+}
+
 Value* LgsExpr::getLevel(LgsCodeGen& cg) const {
     return isReturnExpr ? cg.levelAbove() : cg.currentLevel;
 }
@@ -167,12 +173,6 @@ std::optional<std::vector<LgsExpr*>> LgsExpr::getConstArr() {
         }
     }
     return std::nullopt;
-}
-
-Value* LgsExpr::loadIRPtr(LgsCodeGen& cg) const {
-    if (!IRValue->getType()->isPointerTy()) return IRValue;
-    if (type->asSArray()) return IRValue;
-    return cg.load(type->getStorageType(cg), IRValue);
 }
 
 Constant* LgsExpr::getAsConst(LgsCodeGen& cg) {

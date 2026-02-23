@@ -46,7 +46,7 @@ inline LgsBaseMsg E10031{"Non-public method %s is used outside its parent object
 inline LgsBaseMsg E10032{"Singleton object %s cannot be instantiated.", errCodeStart++};
 inline LgsBaseMsg E10033{"Type name must start with an uppercase letter.", errCodeStart++};
 inline LgsBaseMsg E10034{"Lambda function cannot be mutable.", errCodeStart++};
-inline LgsBaseMsg E10035{"Index of %s has %s level which is too deep. Max level: %s.", errCodeStart++};
+inline LgsBaseMsg E10035{"Index of %s has %s dimension which is too deep. Max level: %s.", errCodeStart++};
 inline LgsBaseMsg E10036{"Cannot be indexed with type %s.", errCodeStart++};
 inline LgsBaseMsg E10037{"Left index of slice must be less or equal than the right index.", errCodeStart++};
 inline LgsBaseMsg E10038{"continue must be inside a for loop.", errCodeStart++};
@@ -91,7 +91,7 @@ inline LgsBaseMsg E10076{"'%s' is not defined between %s and %s.", errCodeStart+
 inline LgsBaseMsg E10077{"Enum value must be known at compile time.", errCodeStart++};
 inline LgsBaseMsg E10078{"Defer functions must return Void. Given: %s.", errCodeStart++};
 inline LgsBaseMsg E10079{"Test file %s must be inside tests directory.", errCodeStart++};
-inline LgsBaseMsg E10080{"Index %s was not found in iterable.", errCodeStart++};
+inline LgsBaseMsg E10080{"", errCodeStart++};
 inline LgsBaseMsg E10081{"Range-start type %s is not equal to the range-end type %s.", errCodeStart++};
 inline LgsBaseMsg E10082{"Loop range %s must be an integer. Given: %s.", errCodeStart++};
 inline LgsBaseMsg E10083{"'%s' is an object method but was called as a class method.", errCodeStart++};

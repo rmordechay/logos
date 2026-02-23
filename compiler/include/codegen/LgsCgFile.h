@@ -125,14 +125,14 @@ public:
     void visitIterIndex(LgsIterIndex* iterIndex, bool assign);
     void visitNullableExpr(LgsNullableExpr* expr);
     void visitSelection(LgsSelection* selection, bool assign);
-    void visitFieldSelection(LgsVariable* var, LgsExpr* parent);
+    void visitFieldSelection(LgsVariable* var, const LgsExpr* parent);
     void visitMetaSelection(LgsMetaSelection* metaSelection);
     void visitFuncCall(LgsFuncCall* funcCall);
     void visitArrayExpr(LgsArrayExpr* arrayExpr);
     void visitStaticArray(LgsArrayExpr* arrayExpr);
     void visitDynamicArray(LgsArrayExpr* arrayExpr);
     void visitVectorExpr(LgsVectorExpr* vecExpr);
-    void visitMatrixExpr(const LgsMatrixExpr* matrixExpr);
+    void visitMatrixExpr(LgsMatrixExpr* matExpr);
     void visitHashMap(LgsHashMap* hashMap);
     void visitEnvVar(LgsEnvVar* envVar);
     void visitCast(LgsCast* cast);

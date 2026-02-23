@@ -91,7 +91,7 @@ void LgsTypeResolver::resolveObjTypes(LgsObject* obj) {
         }
     }
 
-    for (const auto generic : obj->generics) {
+    for (const auto generic : obj->genericTypes) {
         if (generic->asSelf()) {
             errHandler.addError(E10014, &generic->location, file->path, {});
         }
@@ -161,6 +161,13 @@ LgsType* LgsTypeResolver::findSymbol(const std::string& typeName) const {
     }
     if (currentFuncType) {
         for (const auto genericType : currentFuncType->genericTypes) {
+            if (genericType->name == typeName) {
+                return genericType;
+            }
+        }
+    }
+    if (currentObj) {
+        for (const auto genericType : currentObj->genericTypes) {
             if (genericType->name == typeName) {
                 return genericType;
             }

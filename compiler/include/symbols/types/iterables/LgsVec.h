@@ -36,7 +36,7 @@ public:
     LgsExpr* getZeroValue() override;
     bool equals(LgsType* other) override;
     bool canCastTo(LgsType* other) override;
-    std::optional<int64_t> getConstLength() override;
+    std::optional<size_t> getConstLength() override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     Constant* getRTTypeExtra(LgsCodeGen& cg) override;
     Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level) override;
@@ -50,6 +50,7 @@ public:
     Value* getIRElement(LgsCodeGen& cg, Value* iterable, Value* index) override;
     void addIRElement(LgsCodeGen& cg, Value* iterable, Value* index, Value* value) override;
     Value* matVecMul(LgsCodeGen& cg, const LgsExpr* left, LgsExpr* right) const;
+    std::pair<Value*, Value*> loadVecOperands(LgsCodeGen& cg, const LgsBinaryExpr* binExpr);
     static size_t getSwizzleSet(char c);
     static size_t getComponentIndex(char c);
     DIType* getDebugType(LgsCodeGen& cg) override;

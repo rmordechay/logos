@@ -9,13 +9,13 @@ class LgsArrayExpr;
 
 class LgsMatrixExpr final : public LgsExpr {
 public:
-    std::vector<LgsArrayExpr*> elements;
     LgsMatrix* matType = nullptr;
+    std::vector<LgsExpr*> rows;
 
     LgsMatrixExpr(const size_t rows, const size_t columns) {
-        matType = new LgsMatrix(rows, columns);
-        setType(matType);
+        setType(new LgsMatrix(rows, columns));
     }
+    void setType(LgsType* newType) override;
     std::string asText() override;
     void setDebugValue(LgsCodeGen& cg) override;
     void hashNode(size_t& oldHash) override;

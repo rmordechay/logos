@@ -130,7 +130,7 @@ size_t LgsIterable::getDims() const {
     return dims;
 }
 
-std::optional<int64_t> LgsIterable::getConstLength() {
+std::optional<size_t> LgsIterable::getConstLength() {
     return std::nullopt;
 }
 

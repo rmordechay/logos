@@ -30,7 +30,6 @@ public:
     std::string parentName;
     LgsType* rt = nullptr;
     std::vector<LgsParam> params;
-    std::vector<LgsGenericType*> genericTypes;
     FunctionType* IRType = nullptr;
     bool isPublic = false;
     bool isBuiltin = false;

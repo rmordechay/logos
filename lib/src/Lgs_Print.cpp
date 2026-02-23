@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <cassert>
 #include <cmath>
+#include <ostream>
 #include <sstream>
 #include <string>
 
@@ -95,13 +96,31 @@ static std::string formatValue(const Lgs_TypeInfo* type, void* value) {
     }
     case RTT_VEC: {
         const auto vec = type->vec;
-        str << "Vec" << std::to_string(vec->length) << "(";
+        str << type->name << "(";
         auto offset = 0;
         for (int i = 0; i < vec->length; ++i) {
             void* element = static_cast<char*>(value) + offset;
             str << formatValue(vec->baseType, element);
             if (i < vec->length - 1) str << ", ";
             offset += vec->baseType->size;
+        }
+        str << ")";
+        break;
+    }
+    case RTT_MATRIX: {
+        const auto mat = type->mat;
+        str << type->name << "(";
+        auto offset = 0;
+        for (size_t i = 0; i < mat->rows; ++i) {
+            str << '[';
+            for (size_t j = 0; j < mat->columns; ++j) {
+                void* element = static_cast<char*>(value) + offset;
+                str << formatValue(mat->baseType, element);
+                if (j < mat->columns - 1) str << ", ";
+                offset += mat->baseType->size;
+            }
+            str << ']';
+            if (i < mat->rows - 1) str << ", ";
         }
         str << ")";
         break;
@@ -121,7 +140,7 @@ static std::string formatValue(const Lgs_TypeInfo* type, void* value) {
         const auto map = hashMap->type->map;
         str << '{';
         auto isFirst = true;
-        for (int i = 0; i < hashMap->capacity; ++i) {
+        for (int i = 0; i < hashMap->cap; ++i) {
             auto entry = hashMap->entries[i];
             if (!entry) continue;
             while (entry) {
@@ -136,7 +155,6 @@ static std::string formatValue(const Lgs_TypeInfo* type, void* value) {
         str << '}';
         break;
     }
-    case RTT_MATRIX:
     default:
         assert(0);
     }

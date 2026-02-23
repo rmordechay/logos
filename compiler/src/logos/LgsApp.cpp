@@ -139,7 +139,7 @@ bool LgsApp::parse() {
     }
 
     // Project mode
-    if (!loadEnvFiles()) return false;
+    // if (!loadEnvFiles()) return false;
     if (!resolvePackages()) return false;
     for (auto& metadata : appCache.files) {
         if (metadata.type != LGS_SRC_FILE) continue;

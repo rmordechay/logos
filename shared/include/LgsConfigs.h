@@ -5,6 +5,7 @@
 #define LGS_STR_BUFFER_SIZE 1024
 #define LGS_MAX_LEVEL 1024*10
 #define LGS_ITER_INIT_CAP 3
+#define LGS_MAP_LOAD_THRESHOLD 0.75
 #define LGS_OBJ_MD_SIZE sizeof(size_t) + sizeof(void*)
 
 enum LgsLogLevel {

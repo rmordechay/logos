@@ -8,9 +8,12 @@
 #include <llvm/IR/Instructions.h>
 #include <sstream>
 
+#include "LgsRTTIndices.h"
 #include "codegen/LgsCodeGen.h"
 #include "LgsType.h"
+#include "Lgs_Exprs.h"
 #include "types/iterables/LgsSArray.h"
+#include "types/iterables/LgsStr.h"
 
 namespace llvm {
 class Value;
@@ -24,9 +27,12 @@ Value* LgsIterIndex::getIRRangePtr(LgsCodeGen& cg) const {
     if (type->asStr()) {
         const auto size = cg.builder.CreateSub(toIR, fromIR);
         const auto sizeWithNull = cg.builder.CreateAdd(size, cg.i32(1));
-        v = cg.builder.CreateAlloca(cg.i8Ty(), sizeWithNull);
-        const auto src = cg.builder.CreateInBoundsGEP(cg.i8Ty(), baseExpr->IRValue, {fromIR});
-        cg.callMemcpy(IRValue, src, size);
+        const auto data = cg.heapAllocSize(sizeWithNull, cg.currentLevel, false);
+        const auto baseData = LgsStr::loadIRData(cg, baseExpr->IRValue);
+        const auto src = cg.builder.CreateInBoundsGEP(cg.i8Ty(), baseData, {fromIR});
+        cg.callMemcpy(data, src, size);
+        v = cg.heapAllocSize(cg.usize(sizeof(Lgs_StrExpr)), cg.currentLevel, true);
+        cg.storeField(LgsStr::getStrStruct(cg), v, LgsStrIndices::data, data);
     } else if (const auto sArray = type->asSArray()) {
         const auto size = cg.builder.CreateSub(toIR, fromIR);
         const auto ty = sArray->baseType->getIRType(cg);
@@ -34,7 +40,7 @@ Value* LgsIterIndex::getIRRangePtr(LgsCodeGen& cg) const {
         const auto src = cg.builder.CreateInBoundsGEP(ty, baseExpr->IRValue, fromIR);
         const auto elementSize = cg.getTypeSize(ty);
         const auto sizeInBytes = cg.builder.CreateMul(size, elementSize);
-        cg.callMemcpy(IRValue, src, sizeInBytes);
+        cg.callMemcpy(v, src, sizeInBytes);
     } else {
         assert(0);
     }

@@ -150,18 +150,20 @@ set(COMPILER_SOURCE
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/iterables/LgsMatrix.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/iterables/LgsVariadic.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsAny.cpp
-    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsBool.cpp
+    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsVoid.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsChar.cpp
-    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsDouble.cpp
-    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsFloat.cpp
+    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsBool.cpp
+    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsByte.cpp
+    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsShort.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsInt.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsLong.cpp
-    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsShort.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsSize.cpp
+    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsUByte.cpp
+    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsUShort.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsUInt.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsULong.cpp
-    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsByte.cpp
-    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsVoid.cpp
+    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsFloat.cpp
+    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsDouble.cpp
 )
 
 set(LGS_LIB_SOURCE

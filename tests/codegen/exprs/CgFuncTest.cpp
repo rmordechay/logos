@@ -89,6 +89,8 @@ TEST(CgFuncTest, Test5) {
     funcShort(x: Short) {print(x)}
     funcInt(x: Int) {print(x)}
     funcLong(x: Long) {print(x)}
+    funcUByte(x: UByte) {print(x)}
+    funcUShort(x: UShort) {print(x)}
     funcUInt(x: UInt) {print(x)}
     funcULong(x: ULong) {print(x)}
     funcSize(x: Size) {print(x)}
@@ -101,6 +103,8 @@ TEST(CgFuncTest, Test5) {
         funcShort(-65)
         funcInt(-56)
         funcLong(-235456)
+        funcUByte(23)
+        funcUShort(2334)
         funcUInt(56)
         funcULong(235456)
         funcSize(34656)
@@ -109,15 +113,63 @@ TEST(CgFuncTest, Test5) {
     }
     )";
     std::istringstream stream(runLgsApp(code));
-    const auto lines = getLines(stream, 10);
+    const auto lines = getLines(stream, 12);
     EXPECT_EQ(lines[0], "false");
     EXPECT_EQ(lines[1], "-4");
     EXPECT_EQ(lines[2], "-65");
     EXPECT_EQ(lines[3], "-56");
     EXPECT_EQ(lines[4], "-235456");
-    EXPECT_EQ(lines[5], "56");
-    EXPECT_EQ(lines[6], "235456");
-    EXPECT_EQ(lines[7], "34656");
-    EXPECT_EQ(lines[8], "'R'");
-    EXPECT_EQ(lines[9], "text");
+    EXPECT_EQ(lines[5], "23");
+    EXPECT_EQ(lines[6], "2334");
+    EXPECT_EQ(lines[7], "56");
+    EXPECT_EQ(lines[8], "235456");
+    EXPECT_EQ(lines[9], "34656");
+    EXPECT_EQ(lines[10], "'R'");
+    EXPECT_EQ(lines[11], "text");
+}
+
+TEST(CgFuncTest, Test6) {
+    const auto code = R"(
+    funcBool(): Bool {return false}
+    funcByte(): Byte {return -4}
+    funcShort(): Short {return -65}
+    funcInt(): Int {return -56}
+    funcLong(): Long {return -235456}
+    funcUByte(): UByte {return 23}
+    funcUShort(): UShort {return 2334}
+    funcUInt(): UInt {return 56}
+    funcULong(): ULong {return 235456}
+    funcSize(): Size {return 34656}
+    funcChar(): Char {return 'R'}
+    funcStr(): Str {return "text"}
+
+    main() {
+        print(funcBool())
+        print(funcByte())
+        print(funcShort())
+        print(funcInt())
+        print(funcLong())
+        print(funcUByte())
+        print(funcUShort())
+        print(funcUInt())
+        print(funcULong())
+        print(funcSize())
+        print(funcChar())
+        print(funcStr())
+    }
+    )";
+    std::istringstream stream(runLgsApp(code));
+    const auto lines = getLines(stream, 12);
+    EXPECT_EQ(lines[0], "false");
+    EXPECT_EQ(lines[1], "-4");
+    EXPECT_EQ(lines[2], "-65");
+    EXPECT_EQ(lines[3], "-56");
+    EXPECT_EQ(lines[4], "-235456");
+    EXPECT_EQ(lines[5], "23");
+    EXPECT_EQ(lines[6], "2334");
+    EXPECT_EQ(lines[7], "56");
+    EXPECT_EQ(lines[8], "235456");
+    EXPECT_EQ(lines[9], "34656");
+    EXPECT_EQ(lines[10], "'R'");
+    EXPECT_EQ(lines[11], "text");
 }

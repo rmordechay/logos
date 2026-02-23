@@ -93,7 +93,9 @@ std::string LgsMap::getName() {
 }
 
 std::string LgsMap::pname() {
-    return '{' + getPrettyName(pairType->key) + ": " + getPrettyName(pairType->value) + '}';
+    const auto keyName = pairType->key ? pairType->key->pname() : LGS_UNKNOWN_TYPE;
+    const auto valueName = pairType->value ? pairType->value->pname() : LGS_UNKNOWN_TYPE;
+    return '{' +  keyName + ": " +  valueName + '}';
 }
 
 size_t LgsMap::sizeBytes() {
@@ -319,8 +321,9 @@ Function* LgsMap::getAddFunc(LgsCodeGen& cg) {
     // Resize
     auto len = cg.loadSize(lenField);
     auto cap = cg.loadSize(capField);
-    const auto cond = cg.builder.CreateICmpUGE(len, cap);
-    cg.builder.CreateCondBr(cond, resizeBlock, checkSlotBlock);
+    const auto loadFactor = cg.builder.CreateFDiv(cg.toFloat(len), cg.toFloat(cap));
+    const auto shouldResize = cg.builder.CreateFCmpOGE(loadFactor, cg.floatv(LGS_MAP_LOAD_THRESHOLD));
+    cg.builder.CreateCondBr(shouldResize, resizeBlock, checkSlotBlock);
 
     cg.startBlock(resizeBlock);
     const auto size = cg.builder.CreateMul(pairType->IRSize(cg), cg.usize(sizeof(void*)));

@@ -35,7 +35,7 @@ public:
     std::string pname() override;
     size_t sizeBytes() override;
     std::string fmtStr() const override;
-    std::optional<int64_t> getConstLength() override;
+    std::optional<size_t> getConstLength() override;
     bool canCastTo(LgsType* other) override;
     bool equals(LgsType* other) override;
     LgsExpr* getZeroValue() override;

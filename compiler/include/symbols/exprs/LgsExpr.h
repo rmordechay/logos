@@ -56,12 +56,12 @@ public:
     explicit LgsExpr(LgsType* type = nullptr) : type(type) {}
     LgsType* getType() override;
     void setType(LgsType* newType) override;
+    Value* loadIRPtr(LgsCodeGen& cg) const;
     Value* getLevel(LgsCodeGen& cg) const;
     std::optional<int64_t> getConstInt();
     std::optional<double_t> getConstFloat();
     std::optional<std::string> getConstStr();
     std::optional<std::vector<LgsExpr*>> getConstArr();
-    Value* loadIRPtr(LgsCodeGen& cg) const;
     Constant* getAsConst(LgsCodeGen& cg);
     Constant* hashConstValue(LgsCodeGen& cg);
 

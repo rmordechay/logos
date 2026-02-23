@@ -3,6 +3,8 @@
 #include "LgsTokens.h"
 #include <vector>
 
+class LgsUShort;
+class LgsUByte;
 class LgsULong;
 class LgsSelf;
 class LgsFieldType;
@@ -66,6 +68,7 @@ public:
     std::vector<LgsField*> fields;
     std::unordered_map<std::string, LgsFunc*> methods;
     std::vector<LgsType*> genericArgs;
+    std::vector<LgsGenericType*> genericTypes;
     Lgs_TypeKind rttKind = RTT_UNKNOWN;
     bool isInt = false;
     bool isUnsinged = false;
@@ -130,6 +133,8 @@ public:
     LgsShort* asShort();
     LgsLong* asLong();
     LgsSize* asSize();
+    LgsUByte* asUByte();
+    LgsUShort* asUShort();
     LgsUInt* asUInt();
     LgsULong* asULong();
     LgsFloat* asFloat();
@@ -179,7 +184,6 @@ bool inRangeGeneric(uint64_t value) {
 
 bool inRange(uint64_t value, LgsType* toType);
 std::string getTypeName(LgsType* type);
-std::string getPrettyName(LgsType* type);
 LgsType* inferType(const std::vector<LgsExpr*>& elements);
 Value* loadRTTInfoName(LgsCodeGen& cg, Value* ptr);
 Value* loadRTTInfoSize(LgsCodeGen& cg, Value* ptr);

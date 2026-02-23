@@ -5,6 +5,7 @@
 #include "funcs/LgsFunc.h"
 #include "loops/LgsForLoop.h"
 #include "stmts/LgsIfStmt.h"
+#include "stmts/LgsIOStmt.h"
 #include "stmts/LgsSwitch.h"
 
 class LgsForeachLoop;
@@ -21,6 +22,10 @@ void LgsStack::enterScope(LgsValue* value) {
         stackFrame.func = frames.back().func;
         stackFrame.symbolTable = frames.back().symbolTable;
         stackFrame.ifStmt = ifStmt;
+    } else if (const auto ioStmt = dynamic_cast<LgsIOStmt*>(value)) {
+        stackFrame.func = frames.back().func;
+        stackFrame.symbolTable = frames.back().symbolTable;
+        stackFrame.ioStmt = ioStmt;
     } else if (dynamic_cast<LgsSwitch*>(value)) {
         stackFrame.func = frames.back().func;
         stackFrame.symbolTable = frames.back().symbolTable;

@@ -114,7 +114,7 @@ public:
     Value* isNull(Value* value);
     Value* emptyBuffer(size_t size = 0);
     void incSize(Value* bufferOffset, Value* ptr);
-    void addNullTerminate(Value* strPtr, Value* pos);
+    void addNullTerminate(Value* strPtr, Value* index);
     Value* allocaAndStore(Type* type, Value* v, const std::string& name = "");
     Value* loadField(Type* parentType, Value* parentPtr, size_t position, Type* ty);
     void storeField(Type* parentType, Value* parentPtr, size_t position, Value* v);

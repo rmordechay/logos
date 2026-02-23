@@ -1,7 +1,7 @@
 #pragma once
-#include <stdint.h>
 #include <string>
 
+#include "LgsConfigs.h"
 #include "LgsIterable.h"
 #include "types/primitives/LgsChar.h"
 #include "LgsValue.h"
@@ -30,7 +30,7 @@ public:
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
     bool canCastTo(LgsType* other) override;
-    std::optional<int64_t> getConstLength() override;
+    std::optional<size_t> getConstLength() override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     void asIRText(LgsStrBuilder& sb, Value* value) override;
     Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level) override;
@@ -43,8 +43,9 @@ public:
     DIType* getDebugType(LgsCodeGen& cg) override;
     static Type* getStrStruct(LgsCodeGen& cg);
     static void storeData(LgsCodeGen& cg, Value* ptr, Value* value);
-    static Value* loadRTData(LgsCodeGen& cg, Value* value);
+    static Value* loadIRData(LgsCodeGen& cg, Value* value);
     static Constant* getStrConst(LgsCodeGen& cg, const std::string& text);
+    static Value* getEmptyIRStr(LgsCodeGen& cg, Value* size);
 };
 
 inline LgsStr LGS_STR;

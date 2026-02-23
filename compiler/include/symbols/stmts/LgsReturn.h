@@ -12,6 +12,7 @@ public:
     LgsExpr* expr = nullptr;
     BasicBlock* parentBlock = nullptr;
     LgsFunc* func = nullptr;
+    std::vector<LgsIOStmt*> ioStmts;
 
     explicit LgsReturn(LgsExpr* expr) : expr(expr) {}
     void setDebugValue(LgsCodeGen& cg) override;

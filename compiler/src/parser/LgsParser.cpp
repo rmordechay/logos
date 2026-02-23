@@ -107,7 +107,9 @@
 #include "types/primitives/LgsChar.h"
 #include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsInt.h"
+#include "types/primitives/LgsUByte.h"
 #include "types/primitives/LgsULong.h"
+#include "types/primitives/LgsUShort.h"
 #include "types/primitives/LgsVoid.h"
 
 #define MAX_TOKENS_NUMBER 100000
@@ -166,7 +168,7 @@ LgsMainFile* LgsParser::parseMainFile() {
     const auto startToken = currentToken;
     const auto mainFile = new LgsMainFile(filePath);
     while (!isEOF()) {
-        if (const auto obj = parseObject()) {
+        if (const auto obj = parseObject(true)) {
             mainFile->objects.push_back(obj);
             mainFile->symbolTable.addSymbol(LgsSymbol(obj), &errHandler, filePath);
         } else if (const auto interface = parseInterface()) {
@@ -198,24 +200,102 @@ LgsMainFile* LgsParser::parseMainFile() {
 }
 
 LgsObjectFile* LgsParser::parseObjectFile() {
-    const auto isSingleton = currentToken.type == T_SINGLETON;
-    if (currentToken.type != T_OBJECT && !isSingleton) return nullptr;
-    const auto nameToken = consume();
+    const auto obj = parseObject(false);
+    if (!obj) return nullptr;
     const auto objectFile = new LgsObjectFile(filePath);
-    mustMatch(T_IDENTIFIER);
-    const auto withBraces = matchAndConsume(T_LBRACE);
-    const auto obj = parseObjectBody(nameToken, isSingleton);
-    if (!mustParse(obj)) return objectFile;
-    if (withBraces) mustMatch(T_RBRACE);
     objectFile->obj = obj;
-    for (const auto innerObj : obj->objects) {
-        objectFile->symbolTable.addSymbol(LgsSymbol(innerObj), &errHandler, filePath);
-    }
     {
         std::lock_guard lock(mtx);
         globals.addSymbol(LgsSymbol(objectFile->obj), &errHandler, filePath);
     }
     return objectFile;
+}
+
+LgsObject* LgsParser::parseObject(const bool withParen) {
+    const auto isSingleton = currentToken.type == T_SINGLETON;
+    if (currentToken.type != T_OBJECT && !isSingleton) return nullptr;
+    consume();
+    const auto nameToken = currentToken;
+    mustMatch(T_IDENTIFIER);
+    auto const obj = new LgsObject(nameToken.lexeme);
+    obj->isSingleton = isSingleton;
+
+    // Generic types
+    if (matchAndConsume(T_LANGLE)) {
+        while (true) {
+            const auto type = parseGenericType();
+            if (!type) break;
+            obj->genericTypes.push_back(type);
+            if (currentToken.type == T_RANGLE) break;
+            mustMatch(T_COMMA);
+        }
+        if (obj->genericTypes.empty()) addParsingError();
+        mustMatch(T_RANGLE);
+        if (withParen) mustMatch(T_LBRACE);
+    } else if (withParen) {
+        mustMatch(T_LBRACE);
+    }
+
+    // Implements
+    if (matchAndConsume(T_IMPLEMENTS)) {
+        mustMatch(T_COLON);
+        while (true) {
+            const auto type = parseType();
+            if (!type) break;
+            obj->implements.push_back(type);
+            const auto ct = currentToken.type;
+            const auto nt = peek().type;
+            if (ct == T_EOF || ct == T_RBRACE || nt == T_COLON ||
+                nt == T_LPAREN || nt == T_ENUM || nt == T_INTERFACE) {
+                break;
+            }
+            mustMatch(T_COMMA);
+        }
+    }
+
+    // First field is level, second metadata
+    auto fieldPosition = 2;
+    while (true) {
+        if (const auto field = parseField(fieldPosition)) {
+            fieldPosition++;
+            if (headersOnly && !field->isPublic) continue;
+            field->parentType = obj;
+            obj->fields.push_back(field);
+        } else if (const auto innerObj = parseObject(true)) {
+            obj->objects.push_back(innerObj);
+        } else if (const auto enum_ = parseEnum()) {
+            obj->enums.push_back(enum_);
+        } else if (const auto subtype = parseSubtype()) {
+            obj->subtypes.push_back(subtype);
+        } else if (const auto ioPair = parseIOPair()) {
+            obj->ioPairs.push_back(ioPair);
+        } else {
+            break;
+        }
+    }
+
+    // Methods
+    while (true) {
+        const auto method = parseMethod(obj);
+        if (!method) break;
+        if (headersOnly && !method->funcType->isPublic) continue;
+        obj->addMethod(method);
+        if (currentToken.type == T_RBRACE || currentToken.type == T_EOF) break;
+    }
+
+    if (obj->isSingleton) {
+        const auto varDec = new LgsVarDec(obj->name, new LgsInstance(obj));
+        varDec->setType(obj);
+        std::lock_guard lock(mtx);
+        globals.addSymbol(LgsSymbol(varDec), &errHandler, filePath);
+    }
+
+    if (!headersOnly && currentToken.type != T_EOF && currentToken.type != T_RBRACE) {
+        assert(0);
+    }
+    setLocation(obj->location, &nameToken, &currentToken);
+    if (withParen) mustMatch(T_RBRACE);
+    return obj;
 }
 
 LgsInterfaceFile* LgsParser::parseInterfaceFile() {
@@ -357,17 +437,6 @@ LgsEnvFile* LgsParser::parseEnvFile() {
     return file;
 }
 
-LgsObject* LgsParser::parseObject() {
-    const auto isSingleton = currentToken.type == T_SINGLETON;
-    if (currentToken.type != T_OBJECT && !isSingleton) return nullptr;
-    const auto nameToken = consume();
-    mustMatch(T_IDENTIFIER);
-    mustMatch(T_LBRACE);
-    const auto obj = parseObjectBody(nameToken, isSingleton);
-    mustMatch(T_RBRACE);
-    return obj;
-}
-
 LgsInterface* LgsParser::parseInterface() {
     if (!matchAndConsume(T_INTERFACE)) return nullptr;
     const auto nameToken = currentToken;
@@ -376,88 +445,6 @@ LgsInterface* LgsParser::parseInterface() {
     const auto interface = parseInterfaceBody(nameToken);
     mustMatch(T_RBRACE);
     return interface;
-}
-
-LgsObject* LgsParser::parseObjectBody(const LgsToken& tokenName, const bool isSingleton) {
-    auto const obj = new LgsObject(tokenName.lexeme);
-    obj->isSingleton = isSingleton;
-
-    // Generic types
-    if (matchAndConsume(T_TYPE)) {
-        mustMatch(T_COLON);
-        while (true) {
-            const auto type = parseGenericType();
-            if (!type) break;
-            obj->generics.push_back(type);
-            const auto ct = currentToken.type;
-            const auto nt = peek().type;
-            if (ct == T_EOF || ct == T_RBRACE || nt == T_COLON || nt == T_LPAREN  ||
-                nt == T_ENUM || nt == T_INTERFACE || nt == T_IMPLEMENTS) {
-                break;
-            }
-            mustMatch(T_COMMA);
-        }
-    }
-
-    // Implements
-    if (matchAndConsume(T_IMPLEMENTS)) {
-        mustMatch(T_COLON);
-        while (true) {
-            const auto type = parseType();
-            if (!type) break;
-            obj->implements.push_back(type);
-            const auto ct = currentToken.type;
-            const auto nt = peek().type;
-            if (ct == T_EOF || ct == T_RBRACE || nt == T_COLON ||
-                nt == T_LPAREN || nt == T_ENUM || nt == T_INTERFACE) {
-                break;
-            }
-            mustMatch(T_COMMA);
-        }
-    }
-
-    // First field is level, second metadata
-    auto fieldPosition = 2;
-    while (true) {
-        if (const auto field = parseField(fieldPosition)) {
-            fieldPosition++;
-            if (headersOnly && !field->isPublic) continue;
-            field->parentType = obj;
-            obj->fields.push_back(field);
-        } else if (const auto innerObj = parseObject()) {
-            obj->objects.push_back(innerObj);
-        } else if (const auto enum_ = parseEnum()) {
-            obj->enums.push_back(enum_);
-        } else if (const auto subtype = parseSubtype()) {
-            obj->subtypes.push_back(subtype);
-        } else if (const auto ioPair = parseIOPair()) {
-            obj->ioPairs.push_back(ioPair);
-        } else {
-            break;
-        }
-    }
-
-    // Methods
-    while (true) {
-        const auto method = parseMethod(obj);
-        if (!method) break;
-        if (headersOnly && !method->funcType->isPublic) continue;
-        obj->addMethod(method);
-        if (currentToken.type == T_RBRACE || currentToken.type == T_EOF) break;
-    }
-
-    if (obj->isSingleton) {
-        const auto varDec = new LgsVarDec(obj->name, new LgsInstance(obj));
-        varDec->setType(obj);
-        std::lock_guard lock(mtx);
-        globals.addSymbol(LgsSymbol(varDec), &errHandler, filePath);
-    }
-
-    if (!headersOnly && currentToken.type != T_EOF && currentToken.type != T_RBRACE) {
-        assert(0);
-    }
-    setLocation(obj->location, &tokenName, &currentToken);
-    return obj;
 }
 
 LgsInterface* LgsParser::parseInterfaceBody(const LgsToken& tokenName) {
@@ -564,13 +551,15 @@ LgsType* LgsParser::parseType() {
         const auto typeText = startToken.lexeme;
         if (typeText == LgsBool::name) type = &LGS_BOOL;
         else if (typeText == LgsChar::name) type = &LGS_CHAR;
-        else if (typeText == LgsInt::name) type = &LGS_INT;
         else if (typeText == LgsByte::name) type = &LGS_BYTE;
-        else if (typeText == LgsUInt::name) type = &LGS_UINT;
         else if (typeText == LgsShort::name) type = &LGS_SHORT;
+        else if (typeText == LgsInt::name) type = &LGS_INT;
         else if (typeText == LgsLong::name) type = &LGS_LONG;
-        else if (typeText == LgsULong::name) type = &LGS_ULONG;
         else if (typeText == LgsSize::name) type = &LGS_SIZE;
+        else if (typeText == LgsUByte::name) type = &LGS_UBYTE;
+        else if (typeText == LgsUShort::name) type = &LGS_USHORT;
+        else if (typeText == LgsUInt::name) type = &LGS_UINT;
+        else if (typeText == LgsULong::name) type = &LGS_ULONG;
         else if (typeText == LgsFloat::name) type = &LGS_FLOAT;
         else if (typeText == LgsDouble::name) type = &LGS_DOUBLE;
         else if (typeText == LgsVoid::name) type = &LGS_VOID;
@@ -797,6 +786,7 @@ LgsFunc* LgsParser::parseMethod(LgsObject* obj) {
 LgsFuncType* LgsParser::parseFuncHeader() {
     const auto nameToken = currentToken;
     if (currentToken.type != T_IDENTIFIER) return nullptr;
+
     std::vector<LgsGenericType*> genericsTypes;
     if (peek().type == T_LANGLE) {
         consume(2);
@@ -895,7 +885,7 @@ LgsStmtsBlock* LgsParser::parseStmtsBlock(const bool wrapInFunc, const bool with
             while (true) {
                 if (const auto stmt = parseStmt()) {
                     stmtsBlock->stmts.push_back(LgsStmtWrapper(stmt));
-                } else if (const auto obj = parseObject()) {
+                } else if (const auto obj = parseObject(true)) {
                     stmtsBlock->stmts.push_back(LgsStmtWrapper(obj));
                 } else if (const auto expr = parseExpr()) {
                     stmtsBlock->stmts.push_back(LgsStmtWrapper(expr));
@@ -1390,7 +1380,7 @@ LgsInstance* LgsParser::parseInstance() {
     }
     const auto instance = new LgsInstance(tokenName.lexeme);
     instance->setType(new LgsUnknown(instance->name));
-    instance->generics = generics;
+    instance->genericArgs = generics;
     parseArgs(instance);
     mustMatch(T_RBRACE);
     setLocation(instance->location, &tokenName, &currentToken);
@@ -1629,9 +1619,9 @@ LgsMatrixExpr* LgsParser::parseMatrixExpr() {
     if (!matchAndConsume(T_MATRIX)) return nullptr;
     if (!mustMatch(T_LPAREN)) return nullptr;
 
-    std::vector<LgsArrayExpr*> args;
+    std::vector<LgsExpr*> args;
     while (true) {
-        const auto expr = parseArrayExpr();
+        const auto expr = parseExpr();
         if (!expr) break;
         args.push_back(expr);
         if (currentToken.type == T_RPAREN) break;
@@ -1642,7 +1632,7 @@ LgsMatrixExpr* LgsParser::parseMatrixExpr() {
     const auto [rows, columns] = extractMatDims(nameToken);
     auto const matExpr = new LgsMatrixExpr(rows, columns);
     setLocation(matExpr->location, &nameToken, &currentToken);
-    matExpr->elements = args;
+    matExpr->rows = args;
     return matExpr;
 }
 

@@ -15,7 +15,6 @@
 #include <llvm/IR/Value.h>
 #include <string.h>
 #include <sstream>
-#include <functional>
 #include <initializer_list>
 #include <optional>
 #include <vector>
@@ -66,9 +65,7 @@ std::string LgsVec::getName() {
 }
 
 std::string LgsVec::pname() {
-    auto s = name + std::to_string(dimVec);
-    s += '<' + getPrettyName(baseType) + '>';
-    return s;
+    return name + std::to_string(dimVec);
 }
 
 size_t LgsVec::sizeBytes() {
@@ -106,7 +103,7 @@ bool LgsVec::canCastTo(LgsType* other) {
     return dimVec == otherVec->dimVec && baseType->canCastTo(otherVec->baseType);
 }
 
-std::optional<int64_t> LgsVec::getConstLength() {
+std::optional<size_t> LgsVec::getConstLength() {
     return dimVec;
 }
 
@@ -175,123 +172,27 @@ Value* LgsVec::getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level) {
 }
 
 Value* LgsVec::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
-    const auto lExpr = binExpr->left;
-    const auto rExpr = binExpr->right;
-    auto l = lExpr->IRValue;
-    auto r = rExpr->IRValue;
-    if (l->getType()->isPointerTy()) {
-        l = cg.load(lExpr->type->getIRType(cg), l);
-    }
-    if (r->getType()->isPointerTy()) {
-        r = cg.load(lExpr->type->getIRType(cg), r);
-    }
+    const auto [l, r] = loadVecOperands(cg, binExpr);
     const auto ty = getIRType(cg);
-    if (baseType->isInt) {
-        if (lExpr->type->isInt) {
-            l = cg.builder.CreateVectorSplat(dimVec, cg.toInt(l));
-        }
-        if (rExpr->type->isInt) {
-            r = cg.builder.CreateVectorSplat(dimVec, cg.toInt(r));
-        }
-        return cg.allocaAndStore(ty, cg.builder.CreateAdd(l, r));
-    }
-    if (lExpr->type->isInt) {
-        l = cg.builder.CreateVectorSplat(dimVec, cg.toFloat(l));
-    }
-    if (rExpr->type->isInt) {
-        r = cg.builder.CreateVectorSplat(dimVec, cg.toFloat(r));
-    }
-    return cg.allocaAndStore(ty, cg.builder.CreateFAdd(l, r));
+    return cg.allocaAndStore(ty, baseType->isInt ? cg.builder.CreateAdd(l, r) : cg.builder.CreateFAdd(l, r));
 }
 
 Value* LgsVec::subIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
-    const auto lExpr = binExpr->left;
-    const auto rExpr = binExpr->right;
-    auto l = lExpr->IRValue;
-    auto r = rExpr->IRValue;
-    if (l->getType()->isPointerTy()) {
-        l = cg.load(lExpr->type->getIRType(cg), l);
-    }
-    if (r->getType()->isPointerTy()) {
-        r = cg.load(lExpr->type->getIRType(cg), r);
-    }
+    const auto [l, r] = loadVecOperands(cg, binExpr);
     const auto ty = getIRType(cg);
-    if (baseType->isInt) {
-        if (lExpr->type->isInt) {
-            l = cg.builder.CreateVectorSplat(dimVec, cg.toInt(l));
-        }
-        if (rExpr->type->isInt) {
-            r = cg.builder.CreateVectorSplat(dimVec, cg.toInt(r));
-        }
-        return cg.allocaAndStore(ty, cg.builder.CreateSub(l, r));
-    }
-    if (lExpr->type->isInt) {
-        l = cg.builder.CreateVectorSplat(dimVec, cg.toFloat(l));
-    }
-    if (rExpr->type->isInt) {
-        r = cg.builder.CreateVectorSplat(dimVec, cg.toFloat(r));
-    }
-    return cg.allocaAndStore(ty, cg.builder.CreateFSub(l, r));
+    return cg.allocaAndStore(ty, baseType->isInt ? cg.builder.CreateSub(l, r) : cg.builder.CreateFSub(l, r));
 }
 
 Value* LgsVec::mulIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
-    const auto lExpr = binExpr->left;
-    const auto rExpr = binExpr->right;
-    auto l = lExpr->IRValue;
-    auto r = rExpr->IRValue;
-    if (l->getType()->isPointerTy()) {
-        l = cg.load(lExpr->type->getIRType(cg), l);
-    }
-    if (r->getType()->isPointerTy()) {
-        r = cg.load(lExpr->type->getIRType(cg), r);
-    }
+    const auto [l, r] = loadVecOperands(cg, binExpr);
     const auto ty = getIRType(cg);
-    if (baseType->isInt) {
-        if (lExpr->type->isInt) {
-            l = cg.builder.CreateVectorSplat(dimVec, cg.toInt(l));
-        }
-        if (rExpr->type->isInt) {
-            r = cg.builder.CreateVectorSplat(dimVec, cg.toInt(r));
-        }
-        return cg.allocaAndStore(ty, cg.builder.CreateMul(l, cg.toInt(r)));
-    }
-    if (lExpr->type->isInt) {
-        l = cg.builder.CreateVectorSplat(dimVec, cg.toFloat(l));
-    }
-    if (rExpr->type->isInt) {
-        r = cg.builder.CreateVectorSplat(dimVec, cg.toFloat(r));
-    }
-    return cg.allocaAndStore(ty, cg.builder.CreateFMul(l, r));
+    return cg.allocaAndStore(ty, baseType->isInt ? cg.builder.CreateMul(l, r) : cg.builder.CreateFMul(l, r));
 }
 
 Value* LgsVec::divIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
-    const auto lExpr = binExpr->left;
-    const auto rExpr = binExpr->right;
-    auto l = lExpr->IRValue;
-    auto r = rExpr->IRValue;
-    if (l->getType()->isPointerTy()) {
-        l = cg.load(lExpr->type->getIRType(cg), l);
-    }
-    if (r->getType()->isPointerTy()) {
-        r = cg.load(lExpr->type->getIRType(cg), r);
-    }
+    const auto [l, r] = loadVecOperands(cg, binExpr);
     const auto ty = getIRType(cg);
-    if (baseType->isInt) {
-        if (lExpr->type->isInt) {
-            l = cg.builder.CreateVectorSplat(dimVec, cg.toInt(l));
-        }
-        if (rExpr->type->isInt) {
-            r = cg.builder.CreateVectorSplat(dimVec, cg.toInt(r));
-        }
-        return cg.allocaAndStore(ty, cg.builder.CreateSDiv(l, r));
-    }
-    if (lExpr->type->isInt) {
-        l = cg.builder.CreateVectorSplat(dimVec, cg.toFloat(l));
-    }
-    if (rExpr->type->isInt) {
-        r = cg.builder.CreateVectorSplat(dimVec, cg.toFloat(r));
-    }
-    return cg.allocaAndStore(ty, cg.builder.CreateFDiv(l, r));
+    return cg.allocaAndStore(ty, baseType->isInt ? cg.builder.CreateSDiv(l, r) : cg.builder.CreateFDiv(l, r));
 }
 
 Value* LgsVec::modIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
@@ -372,6 +273,24 @@ Value* LgsVec::matVecMul(LgsCodeGen& cg, const LgsExpr* left, LgsExpr* right) co
         incy
     });
     return results;
+}
+
+std::pair<Value*, Value*> LgsVec::loadVecOperands(LgsCodeGen& cg, const LgsBinaryExpr* binExpr) {
+    const auto lExpr = binExpr->left;
+    const auto rExpr = binExpr->right;
+    const auto ty = getIRType(cg);
+    auto l = lExpr->IRValue;
+    auto r = rExpr->IRValue;
+    if (l->getType()->isPointerTy()) l = cg.load(ty, l);
+    if (r->getType()->isPointerTy()) r = cg.load(ty, r);
+    if (baseType->isInt) {
+        if (lExpr->type->isInt) l = cg.builder.CreateVectorSplat(dimVec, cg.toInt(l));
+        if (rExpr->type->isInt) r = cg.builder.CreateVectorSplat(dimVec, cg.toInt(r));
+    } else {
+        if (lExpr->type->isInt) l = cg.builder.CreateVectorSplat(dimVec, cg.toFloat(l));
+        if (rExpr->type->isInt) r = cg.builder.CreateVectorSplat(dimVec, cg.toFloat(r));
+    }
+    return {l, r};
 }
 
 size_t LgsVec::getSwizzleSet(const char c) {

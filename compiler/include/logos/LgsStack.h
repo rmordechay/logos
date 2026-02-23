@@ -26,6 +26,7 @@ struct LgsStackFrame {
     LgsFunc* func = nullptr;
     LgsForLoop* loop = nullptr;
     LgsIfStmt* ifStmt = nullptr;
+    LgsIOStmt* ioStmt = nullptr;
 };
 
 class LgsStack final {

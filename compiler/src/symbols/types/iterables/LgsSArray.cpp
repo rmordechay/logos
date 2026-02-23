@@ -44,7 +44,7 @@ std::string LgsSArray::fmtStr() const {
     return "%p";
 }
 
-std::optional<int64_t> LgsSArray::getConstLength() {
+std::optional<size_t> LgsSArray::getConstLength() {
     return len;
 }
 

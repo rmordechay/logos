@@ -1,4 +1,3 @@
-#include <assert.h>
 #include <llvm/ADT/ArrayRef.h>
 #include <llvm/IR/Constants.h>
 #include <llvm/IR/DerivedTypes.h>
@@ -59,6 +58,8 @@
 #include "types/iterables/LgsVec.h"
 #include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsInt.h"
+#include "types/primitives/LgsUByte.h"
+#include "types/primitives/LgsUShort.h"
 
 class LgsBinaryExpr;
 namespace llvm {
@@ -69,9 +70,9 @@ class Constant;
 static std::unordered_map<std::string, uint8_t> numberPrecedences = {
     {LgsBool::name, 1},
     {LgsByte::name, 2},
-    // {LgsUByte::name, 3},
+    {LgsUByte::name, 3},
     {LgsShort::name, 4},
-    // {LgsUShort::name, 5},
+    {LgsUShort::name, 5},
     {LgsChar::name, 6},
     {LgsInt::name, 7},
     {LgsUInt::name, 8},
@@ -151,7 +152,7 @@ Constant* LgsType::getRTType(LgsCodeGen& cg) {
     if (cg.mode == CG_MODE_RTT) {
         const auto extra = getRTTypeExtra(cg);
         const std::vector<Constant*> args = {
-            cg.getString(getName()),
+            cg.getString(pname()),
             IRSize(cg),
             cg.i32(rttKind),
             cg.i1(isHeap),
@@ -243,6 +244,8 @@ LgsInt* LgsType::asInt() { return dynamic_cast<LgsInt*>(this); }
 LgsShort* LgsType::asShort() { return dynamic_cast<LgsShort*>(this); }
 LgsLong* LgsType::asLong() { return dynamic_cast<LgsLong*>(this); }
 LgsSize* LgsType::asSize() { return dynamic_cast<LgsSize*>(this); }
+LgsUByte* LgsType::asUByte() { return dynamic_cast<LgsUByte*>(this); }
+LgsUShort* LgsType::asUShort() { return dynamic_cast<LgsUShort*>(this); }
 LgsUInt* LgsType::asUInt() { return dynamic_cast<LgsUInt*>(this); }
 LgsULong* LgsType::asULong() { return dynamic_cast<LgsULong*>(this); }
 LgsFloat* LgsType::asFloat() { return dynamic_cast<LgsFloat*>(this); }
@@ -332,7 +335,7 @@ Value* eqIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
         return cg.builder.CreateFCmpOEQ(l, r);
     }
     if (type->asStr()) {
-        return cg.strsEqual(LgsStr::loadRTData(cg, left), LgsStr::loadRTData(cg, right));
+        return cg.strsEqual(LgsStr::loadIRData(cg, left), LgsStr::loadIRData(cg, right));
     }
     if (const auto dArr = type->asDArray()) {
         return cg.builder.CreateCall(dArr->getEqFunc(cg), {left, right});
@@ -504,6 +507,8 @@ bool inRange(const uint64_t value, LgsType* toType) {
     if (toType->asInt()) return inRangeGeneric<int32_t>(value);
     if (toType->asLong()) return inRangeGeneric<int64_t>(value);
     if (toType->asSize()) return inRangeGeneric<size_t>(value);
+    if (toType->asUByte()) return inRangeGeneric<uint8_t>(value);
+    if (toType->asUShort()) return inRangeGeneric<uint16_t>(value);
     if (toType->asUInt()) return inRangeGeneric<uint32_t>(value);
     if (toType->asULong()) return inRangeGeneric<uint64_t>(value);
     if (toType->asFloat()) return inRangeGeneric<float>(value);
@@ -513,10 +518,6 @@ bool inRange(const uint64_t value, LgsType* toType) {
 
 std::string getTypeName(LgsType* type) {
     return type ? type->getName() : LGS_UNKNOWN_TYPE;
-}
-
-std::string getPrettyName(LgsType* type) {
-    return type ? type->pname() : LGS_UNKNOWN_TYPE;
 }
 
 LgsType* inferType(const std::vector<LgsExpr*>& elements) {

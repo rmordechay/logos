@@ -18,7 +18,7 @@ class Value;
 }
 
 LgsField* LgsInstance::getField(const std::string& fieldName) const {
-    for (auto* f : fields) {
+    for (auto* f : obj->fields) {
         if (f->name == fieldName) return f;
     }
     return nullptr;
@@ -64,10 +64,6 @@ LgsInstance::~LgsInstance() {
         freeExpr(arg.expr);
     }
     args.clear();
-    for (const auto field : fields) {
-        field->type = nullptr;
-        delete field;
-    }
     obj = nullptr;
     type = nullptr;
 }

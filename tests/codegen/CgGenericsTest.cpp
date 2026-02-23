@@ -53,3 +53,18 @@ TEST(CgGenericsTest, Test2) {
     EXPECT_EQ(lines[0], "[3, 4, 5]");
     EXPECT_EQ(lines[1], "[3, 4, 5]");
 }
+
+TEST(CgGenericsTest, Test3) {
+    const auto code = R"(
+    object Obj<T> {
+        x: T
+    }
+    main() {
+        obj = Obj{x=23}
+        print(obj)
+    }
+    )";
+    std::istringstream stream(runLgsApp(code));
+    const auto lines = getLines(stream, 1);
+    EXPECT_EQ(lines[0], "Obj{x=23}");
+}

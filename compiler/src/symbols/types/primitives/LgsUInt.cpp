@@ -33,7 +33,7 @@ bool LgsUInt::canCastTo(LgsType* other) {
 }
 
 LgsType* LgsUInt::applyBinOp(LgsType* rightType, LgsBinOp& op) {
-    return nullptr;
+    assert(0);
 }
 
 DIType* LgsUInt::getDebugType(LgsCodeGen& cg) {

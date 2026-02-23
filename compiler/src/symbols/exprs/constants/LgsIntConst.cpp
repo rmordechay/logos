@@ -1,6 +1,5 @@
 #include "exprs/constants/LgsIntConst.h"
 #include <assert.h>
-#include <limits>
 #include "LgsUtils.h"
 #include "types/primitives/LgsBool.h"
 #include "LgsType.h"

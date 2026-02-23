@@ -162,7 +162,8 @@ public:
     static bool validateControlFlow(const LgsStmtsBlock* stmtBlock, const LgsFunc* func);
 
     void setFunc(LgsFuncCall* funcCall, LgsFunc* func);
-    bool cloneGenericFunc(const LgsFuncCall* funcCall, const LgsFunc* func);
+    bool cloneGenericObj(LgsInstance* instance, const LgsObject* obj);
+    bool cloneGenericFunc(LgsFuncCall* funcCall, const LgsFunc* func);
     void replaceGenerics(LgsValue* value, std::unordered_map<std::string, LgsType*>& replacements);
     void replaceForLoop(LgsStmtWrapper& stmt);
     LgsSymbol* getSymbol(const std::string& name);

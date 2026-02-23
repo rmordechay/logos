@@ -91,7 +91,7 @@ LgsFunc* LgsObject::getMetaFunc(const std::string& methodName) {
         func->fn = [](LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) {
             const auto objArg = args[0].expr;
             const auto methodNameArg = args[1].expr;
-            const auto funcName = methodNameArg->type->asStr()->loadRTData(cg, methodNameArg->IRValue);
+            const auto funcName = methodNameArg->type->asStr()->loadIRData(cg, methodNameArg->IRValue);
             const auto objType = loadRTTInfoExtra(cg, objArg->type->getRTType(cg));
             return cg.getVFunc(objType, funcName);
         };
@@ -103,7 +103,7 @@ LgsFunc* LgsObject::getMetaFunc(const std::string& methodName) {
         func->fn = [&](LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) {
             const auto self = args[0].expr;
             const auto fieldNameStr = args[1].expr;
-            const auto fieldName = fieldNameStr->type->asStr()->loadRTData(cg, fieldNameStr->IRValue);
+            const auto fieldName = fieldNameStr->type->asStr()->loadIRData(cg, fieldNameStr->IRValue);
             return cg.builder.CreateCall(getGetFieldFunc(cg), {self->IRValue, fieldName});
         };
         metaFuncs[methodName] = func;
@@ -115,7 +115,7 @@ LgsFunc* LgsObject::getMetaFunc(const std::string& methodName) {
             const auto self = args[0].expr;
             const auto fieldNameStr = args[1].expr;
             const auto value = args[2].expr;
-            const auto fieldName = fieldNameStr->type->asStr()->loadRTData(cg, fieldNameStr->IRValue);
+            const auto fieldName = fieldNameStr->type->asStr()->loadIRData(cg, fieldNameStr->IRValue);
             const auto ty = value->IRValue->getType();
             const auto v = ty->isPointerTy() ? value->IRValue : cg.allocaAndStore(ty, value->IRValue);
             return cg.builder.CreateCall(getSetFieldFunc(cg), {self->IRValue, fieldName, v, value->type->getRTType(cg)});
@@ -126,9 +126,7 @@ LgsFunc* LgsObject::getMetaFunc(const std::string& methodName) {
     if (methodName == OBJ_AS_JSON) {
         const auto func = new LgsFunc(methodName, new LgsStr());
         func->fn = [&](LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) {
-            const auto str = cg.heapAllocSize(cg.usize(sizeof(Lgs_StrExpr)), cg.currentLevel, true);
-            const auto data = cg.heapAllocSize(cg.usize(LGS_STR_BUFFER_SIZE), cg.currentLevel, false);
-            cg.storeField(LgsStr::getStrStruct(cg), str, LgsStrIndices::data, data);
+            const auto str = LgsStr::getEmptyIRStr(cg, cg.usize(LGS_STR_BUFFER_SIZE));
             cg.builder.CreateCall(getJSONFunc(cg), {args.front().expr->IRValue, str});
             return str;
         };
@@ -165,9 +163,11 @@ size_t LgsObject::sizeBytes() {
 }
 
 LgsExpr* LgsObject::getZeroValue() {
-    const auto instance = new LgsInstance(this);
-    cloneFields(instance);
-    return instance;
+    return new LgsInstance(this);
+}
+
+bool LgsObject::hasGenerics() {
+    return !genericTypes.empty();
 }
 
 bool LgsObject::canCastTo(LgsType* other) {
@@ -186,16 +186,6 @@ bool LgsObject::canCastTo(LgsType* other) {
 
 void LgsObject::hashNode(size_t& oldHash) {
     assert(0);
-}
-
-void LgsObject::cloneFields(LgsInstance* instance) const {
-    for (const auto field : fields) {
-        auto newField = new LgsField(*field);
-        if (newField->expr) {
-            newField->expr = newField->expr->clone();
-        }
-        instance->fields.emplace_back(newField);
-    }
 }
 
 Type* LgsObject::getIRType(LgsCodeGen& cg) {
@@ -354,7 +344,7 @@ Function* LgsObject::getJSONFunc(LgsCodeGen& cg) {
     const auto self = func->getArg(0);
     const auto strBuffer = func->getArg(1);
 
-    LgsStrBuilder sb(cg, LgsStr::loadRTData(cg, strBuffer));
+    LgsStrBuilder sb(cg, LgsStr::loadIRData(cg, strBuffer));
     sb.asJSON = true;
     asIRText(sb, self);
     sb.finalize();
