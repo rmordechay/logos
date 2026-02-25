@@ -13,7 +13,7 @@ struct LgsBinOp;
 class LgsBinaryExpr;
 class LgsValue;
 class LgsVariadic;
-class LgsGenericType;
+class LgsTypeParam;
 class LgsMatrix;
 class LgsSubType;
 class LgsSet;
@@ -67,8 +67,8 @@ public:
     LgsLocation location;
     std::vector<LgsField*> fields;
     std::unordered_map<std::string, LgsFunc*> methods;
+    std::vector<LgsTypeParam*> typeParams;
     std::vector<LgsType*> genericArgs;
-    std::vector<LgsGenericType*> genericTypes;
     Lgs_TypeKind rttKind = RTT_UNKNOWN;
     bool isInt = false;
     bool isUnsinged = false;
@@ -100,8 +100,6 @@ public:
     virtual std::string fmtStr() const = 0;
     virtual bool equals(LgsType* other);
     virtual void hashNode(size_t& oldHash);
-    virtual bool hasGenerics();
-    virtual void replaceGenerics(std::unordered_map<std::string, LgsType*>& replacements);
     virtual bool canCastTo(LgsType* other) = 0;
     virtual LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) = 0;
     virtual Value* moveValue(LgsCodeGen& cg, Value* value, Value* toLevel);
@@ -144,7 +142,7 @@ public:
     LgsInterface* asInterface();
     LgsEnum* asEnum();
     LgsEnumField* asEnumField();
-    LgsGenericType* asGenericType();
+    LgsTypeParam* asTypeParam();
     LgsSelf* asSelf();
     LgsIterable* asIterable();
     LgsSArray* asSArray();
@@ -183,7 +181,6 @@ bool inRangeGeneric(uint64_t value) {
 }
 
 bool inRange(uint64_t value, LgsType* toType);
-std::string getTypeName(LgsType* type);
 LgsType* inferType(const std::vector<LgsExpr*>& elements);
 Value* loadRTTInfoName(LgsCodeGen& cg, Value* ptr);
 Value* loadRTTInfoSize(LgsCodeGen& cg, Value* ptr);

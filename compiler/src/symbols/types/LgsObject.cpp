@@ -166,10 +166,6 @@ LgsExpr* LgsObject::getZeroValue() {
     return new LgsInstance(this);
 }
 
-bool LgsObject::hasGenerics() {
-    return !genericTypes.empty();
-}
-
 bool LgsObject::canCastTo(LgsType* other) {
     if (other->isAny()) return true;
     const auto otherType = other;

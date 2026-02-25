@@ -25,7 +25,7 @@
 #include "types/LgsEnum.h"
 #include "types/LgsEnumField.h"
 #include "types/LgsFieldType.h"
-#include "types/LgsGenericType.h"
+#include "types/LgsTypeParam.h"
 #include "types/LgsNullable.h"
 #include "types/LgsSelf.h"
 #include "types/iterables/LgsMap.h"
@@ -107,11 +107,6 @@ bool LgsType::isSliceable() {
 
 bool LgsType::addMethod(LgsFunc* method) {
     if (methods.contains(method->funcType->name)) return false;
-    method->funcType->genericTypes.insert(
-        method->funcType->genericTypes.end(),
-        genericTypes.begin(),
-        genericTypes.end()
-    );
     methods[method->funcType->name] = method;
     return true;
 }
@@ -203,14 +198,6 @@ bool LgsType::equals(LgsType* other) {
 
 void LgsType::hashNode(size_t& oldHash) { assert(0);}
 
-bool LgsType::hasGenerics() {
-    return !!asGenericType();
-}
-
-void LgsType::replaceGenerics(std::unordered_map<std::string, LgsType*>& replacements) {
-
-}
-
 Value* LgsType::moveValue(LgsCodeGen& cg, Value* value, Value* toLevel) {
     return cg.moveValue(getBaseName(), value, toLevel);
 }
@@ -260,7 +247,7 @@ LgsObject* LgsType::asObject() { return asSelf() ? dynamic_cast<LgsObject*>(asSe
 LgsInterface* LgsType::asInterface() { return dynamic_cast<LgsInterface*>(this); }
 LgsEnum* LgsType::asEnum() { return dynamic_cast<LgsEnum*>(this); }
 LgsEnumField* LgsType::asEnumField() { return dynamic_cast<LgsEnumField*>(this); }
-LgsGenericType* LgsType::asGenericType() { return dynamic_cast<LgsGenericType*>(this); }
+LgsTypeParam* LgsType::asTypeParam() { return dynamic_cast<LgsTypeParam*>(this); }
 LgsSelf* LgsType::asSelf() { return dynamic_cast<LgsSelf*>(this); }
 LgsIterable* LgsType::asIterable() { return dynamic_cast<LgsIterable*>(this); }
 LgsSArray* LgsType::asSArray() { return dynamic_cast<LgsSArray*>(this); }
@@ -292,7 +279,7 @@ LgsType::~LgsType() {
 void freeType(LgsType* type) {
     if (!type) return;
     if (type->isPrimitive) return;
-    if (type->asEnum() || type->asSubtype() || type->asGenericType() || type->asObject()) return;
+    if (type->asEnum() || type->asSubtype() || type->asTypeParam() || type->asObject()) return;
     delete type;
 }
 
@@ -521,10 +508,6 @@ bool inRange(const uint64_t value, LgsType* toType) {
     return false;
 }
 
-std::string getTypeName(LgsType* type) {
-    return type ? type->getName() : LGS_UNKNOWN_TYPE;
-}
-
 LgsType* inferType(const std::vector<LgsExpr*>& elements) {
     LgsType* result = nullptr;
     for (const auto element : elements) {
@@ -535,6 +518,8 @@ LgsType* inferType(const std::vector<LgsExpr*>& elements) {
         }
         if (result->canCastTo(elemType)) {
             result = elemType;
+        } else {
+            return nullptr;
         }
     }
     return result;

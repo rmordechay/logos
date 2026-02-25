@@ -38,7 +38,7 @@ LgsExpr* LgsFunc::cast(LgsType* toType, const bool explicitly) {
     const auto toFuncType = toType->asFuncType();
     if (!toFuncType) return this;
     // Add 'it' if needed, else as normal params
-    if (funcType->isLambda && funcType->params.empty() && toFuncType->params.size() == 1) {
+    if (isLambda && funcType->params.empty() && toFuncType->params.size() == 1) {
         auto itType = toFuncType->params.front().type;
         funcType->params.emplace_back(itType, LGS_LAMBDA_IT_PARAM);
     } else {
@@ -156,10 +156,6 @@ Value* LgsFunc::callExternal(LgsCodeGen& cg, const std::vector<LgsFuncArg>& args
     return callIR(cg, IRArgs);
 }
 
-void LgsFunc::replaceGenerics(const std::unordered_map<std::string, LgsType*>& replacements) {
-    assert(0);
-}
-
 void LgsFunc::initFunc(const std::string& name, LgsType* rt, const std::vector<LgsParam>& params, const uint32_t ops) {
     funcType = new LgsFuncType(name);
     funcType->rt = rt;
@@ -203,6 +199,13 @@ void LgsFunc::hashNode(size_t& oldHash) {
 void LgsFunc::inferRetType() const {
     if (funcType->rt || returnStmts.empty()) return;
     funcType->rt = returnStmts.front()->expr->type;
+}
+
+LgsFunc* LgsFunc::clone() {
+    const auto newFunc = new LgsFunc(*this);
+    newFunc->setType(new LgsFuncType(*funcType));
+    if (stmtsBlock) newFunc->stmtsBlock = stmtsBlock->clone();
+    return newFunc;
 }
 
 LgsFunc::~LgsFunc() {

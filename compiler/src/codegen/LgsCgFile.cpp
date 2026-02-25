@@ -101,6 +101,7 @@ namespace llvm {
 class BasicBlock;
 class Type;
 }
+std::atomic<size_t> lambdasIDGenerator{0};
 
 bool LgsCgFile::generateSrcFile(LgsFile* file, const LgsPaths& paths) {
     visitExternalSymbols(file);
@@ -159,8 +160,10 @@ void LgsCgFile::visitTestFile(const LgsTestFile* testFile) {
 }
 
 void LgsCgFile::visitObject(LgsObject* obj) {
+    if (!obj->typeParams.empty()) return;
     for (const auto& [_, method] : obj->methods) {
-        visitFunc(method);
+        if (method->isLambda) visitLambda(method);
+        else visitFunc(method);
     }
 }
 
@@ -179,9 +182,9 @@ void LgsCgFile::visitMainFunc(LgsMainFunc* func) {
 }
 
 void LgsCgFile::visitFunc(LgsFunc* func) {
+    if (!func->funcType->typeParams.empty()) return;
     if (!func->stmtsBlock) return;
     const auto ft = func->funcType;
-    if (!ft->genericTypes.empty()) return;
     createPrologue(func);
     visitStmtsBlock(func->stmtsBlock);
     if (ft->isVariadic) {
@@ -533,7 +536,7 @@ void LgsCgFile::visitCoroutine(const LgsCoroutine* coroutine) {
 
 void LgsCgFile::visitDeferStmt(const LgsDeferStmt* defer) {
     const auto fc = defer->getAsFuncCall();
-    if (fc->func->funcType->isLambda) {
+    if (fc->func->isLambda) {
         visitLambda(fc->func);
     }
     visitExpr(defer->expr);
@@ -968,7 +971,7 @@ void LgsCgFile::visitFuncCall(LgsFuncCall* funcCall) {
     assert(funcCall->func || funcCall->coroutine);
     const auto func = funcCall->func ? funcCall->func : funcCall->coroutine;
     const auto ft = func->funcType;
-    assert(func->funcType->genericTypes.empty());
+    assert(func->funcType->typeParams.empty());
 
     // Default params
     if (ft->hasDefaults && ft->params.size() > funcCall->args.size()) {

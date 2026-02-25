@@ -137,7 +137,7 @@ set(COMPILER_SOURCE
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsObject.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsSubType.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsTypePair.cpp
-    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsGenericType.cpp
+    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsTypeParam.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsNullable.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsFieldType.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/iterables/LgsMap.cpp

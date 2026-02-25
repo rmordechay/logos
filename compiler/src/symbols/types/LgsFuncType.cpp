@@ -6,7 +6,7 @@
 
 #include "LgsDefinitions.h"
 #include "codegen/LgsCodeGen.h"
-#include "types/LgsGenericType.h"
+#include "types/LgsTypeParam.h"
 #include "exprs/LgsExpr.h"
 
 namespace llvm {
@@ -40,7 +40,6 @@ size_t LgsFuncType::sizeBytes() {
 }
 
 std::string LgsFuncType::getName() {
-    assert(name != "");
     if (isExternal) return name;
     std::stringstream str;
     if (isBuiltin) str << LGS_PREFIX;
@@ -48,7 +47,7 @@ std::string LgsFuncType::getName() {
     if (parentName != "") str << parentName << "_";
     str << name;
     for (size_t i = isMethod; i < params.size(); ++i) {
-        str << '_' << getTypeName(params[i].type);
+        str << '_' << (params[i].type ? params[i].type->getName() : LGS_UNKNOWN_TYPE);
     }
     if (isCoroutine) str << LGS_CORO_SUFFIX;
     return str.str();
@@ -56,7 +55,7 @@ std::string LgsFuncType::getName() {
 
 std::string LgsFuncType::pname() {
     std::stringstream str;
-    str << (isLambda ? "" : name) << '(';
+    str << name << '(';
     for (size_t i = isMethod; i < params.size(); ++i) {
         const auto param = params[i];
         str << (param.type ? param.type->pname() : LGS_UNKNOWN_TYPE);
@@ -100,33 +99,6 @@ bool LgsFuncType::equals(LgsType* other) {
         if (!param1->equals(param2.type)) return false;
     }
     return true;
-}
-
-bool LgsFuncType::hasGenerics() {
-    if (rt && rt->hasGenerics()) return true;
-    for (const auto& param : params) {
-        if (param.type && param.type->hasGenerics()) return true;
-    }
-    return false;
-}
-
-void LgsFuncType::replaceGenerics(std::unordered_map<std::string, LgsType*>& replacements) {
-    const auto r = replacements.find(getName());
-    if (r == replacements.end()) return;
-    const auto replFuncType = r->second->asFuncType();
-    for (size_t i = 0; i < params.size(); ++i) {
-        auto paramName = params[i].type->getName();
-        auto& repl = replacements[paramName];
-        if (!replacements.contains(paramName)) continue;
-        if (!repl) repl = replFuncType->params[i].type;
-        assert(!repl->hasGenerics());
-        params[i].type = repl;
-    }
-    auto& replacement = replacements[rt->getName()];
-    if (!replacements.contains(rt->getName())) return;
-    if (!replacement) replacement = replFuncType->rt;
-    rt = replacement;
-    genericTypes.clear();
 }
 
 LgsType* LgsFuncType::applyBinOp(LgsType* rightType, LgsBinOp& op) {
@@ -174,8 +146,8 @@ LgsFuncType::~LgsFuncType() {
         if (param.expr) freeExpr(param.expr);
     }
     params.clear();
-    for (const auto& genericType : genericTypes) {
-        freeType(genericType);
+    for (const auto& typeParam : typeParams) {
+        freeType(typeParam);
     }
-    genericTypes.clear();
+    typeParams.clear();
 }

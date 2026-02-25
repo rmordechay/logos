@@ -21,7 +21,7 @@
 #include "exprs/LgsExpr.h"
 #include "funcs/LgsParam.h"
 #include "types/LgsFuncType.h"
-#include "types/LgsGenericType.h"
+#include "types/LgsTypeParam.h"
 
 namespace llvm {
 class Value;
@@ -56,32 +56,32 @@ LgsFunc* LgsIterable::getMethod(const std::string& methodName) {
     }
     if (methodName == MAP_FUNC) {
         // map<T, U>(arr: T[], cb: (T): U): U[]
-        const auto U = new LgsGenericType("T");
-        const auto T = new LgsGenericType("U");
+        const auto U = new LgsTypeParam("T");
+        const auto T = new LgsTypeParam("U");
         const auto callback = new LgsFuncType("cb", U, {LgsParam(T)});
         const auto func = new LgsFunc(methodName, getBaseName(), new LgsDArray(U), {new LgsDArray(T), callback}, flags);
-        func->funcType->genericTypes.push_back(T);
-        func->funcType->genericTypes.push_back(U);
-        callback->genericTypes.push_back(T);
-        callback->genericTypes.push_back(U);
+        func->funcType->typeParams.push_back(T);
+        func->funcType->typeParams.push_back(U);
+        callback->typeParams.push_back(T);
+        callback->typeParams.push_back(U);
         addMethod(func);
         return func;
     }
     if (methodName == FILTER_FUNC) {
-        const auto generic = new LgsGenericType("T"); // T is baseType
+        const auto generic = new LgsTypeParam("T"); // T is baseType
         const auto callback = new LgsFuncType("cb", &LGS_BOOL, {LgsParam(baseType)});
         const auto func = new LgsFunc(methodName, getBaseName(), new LgsDArray(baseType), {this, callback}, flags);
-        func->funcType->genericTypes.push_back(generic);
-        callback->genericTypes.push_back(generic);
+        func->funcType->typeParams.push_back(generic);
+        callback->typeParams.push_back(generic);
         addMethod(func);
         return func;
     }
     if (methodName == FOREACH_FUNC) {
-        const auto generic = new LgsGenericType("T"); // T is baseType
+        const auto generic = new LgsTypeParam("T"); // T is baseType
         const auto callback = new LgsFuncType("cb", &LGS_VOID, {LgsParam(baseType)});
         const auto func = new LgsFunc(methodName, &LGS_VOID, {this, callback}, flags);
-        func->funcType->genericTypes.push_back(generic);
-        callback->genericTypes.push_back(generic);
+        func->funcType->typeParams.push_back(generic);
+        callback->typeParams.push_back(generic);
         addMethod(func);
         return func;
     }

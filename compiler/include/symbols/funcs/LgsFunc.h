@@ -33,6 +33,7 @@ public:
     std::vector<const LgsReturn*> returnStmts;
     std::vector<std::pair<LgsExpr*, LgsExpr*>> mocks;
     BasicBlock* epilogue = nullptr;
+    bool isLambda = false;
     bool isTest = false;
     CallFn fn;
 
@@ -60,10 +61,10 @@ public:
     virtual Value* call(LgsCodeGen& cg, const std::vector<LgsFuncArg>& args);
     Value* callIR(LgsCodeGen& cg, const std::vector<Value*>& args = {});
     Value* callExternal(LgsCodeGen& cg, const std::vector<LgsFuncArg>& args);
-    void replaceGenerics(const std::unordered_map<std::string, LgsType*>& replacements);
     void initFunc(const std::string& name, LgsType* rt, const std::vector<LgsParam>& params, uint32_t ops);
     void setDebugValue(LgsCodeGen& cg) override;
     void hashNode(size_t& oldHash) override;
     void inferRetType() const;
+    LgsFunc* clone() override;
     ~LgsFunc() override;
 };

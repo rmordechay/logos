@@ -2,12 +2,12 @@
 #include <string>
 #include "LgsType.h"
 
-class LgsGenericType final : public LgsType {
+class LgsTypeParam final : public LgsType {
 public:
     std::string name;
     LgsType* bounds = nullptr;
 
-    explicit LgsGenericType(const std::string& name): name(name) {}
+    explicit LgsTypeParam(const std::string& name): name(name) {}
     Type* getIRType(LgsCodeGen& cg) override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;

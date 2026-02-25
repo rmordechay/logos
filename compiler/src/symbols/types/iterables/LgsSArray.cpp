@@ -27,7 +27,7 @@ std::string LgsSArray::getBaseName() {
 
 std::string LgsSArray::getName() {
     if (len <= 0) return "";
-    return name + std::to_string(len) + "_" +  baseType->getName();
+    return name + std::to_string(len) + "_" +  (baseType ? baseType->getName() : LGS_UNKNOWN_TYPE);
 }
 
 std::string LgsSArray::pname() {

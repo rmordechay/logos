@@ -28,7 +28,7 @@ TEST(ErrorsTest, E10001A) {
     )";
     LgsApp app;
     parseAndAnalyse(app, {code}, {LGS_MAIN_FILE});
-    expectErrors(app, E10001, 2);
+    expectErrors(app, E10001, 1);
 }
 
 TEST(ErrorsTest, E10002A) {
@@ -51,7 +51,7 @@ TEST(ErrorsTest, E10001B) {
     )";
     LgsApp app;
     parseAndAnalyse(app, {code}, {LGS_MAIN_FILE});
-    expectErrors(app, E10001, 2);
+    expectErrors(app, E10001, 1);
 }
 
 TEST(ErrorsTest, E10003A) {

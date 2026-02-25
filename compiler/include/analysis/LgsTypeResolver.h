@@ -20,7 +20,7 @@ public:
     LgsSymbolTable& globals;
     LgsErrHandler& errHandler;
     LgsObject* currentObj = nullptr;
-    LgsFuncType* currentFuncType = nullptr;
+    LgsFuncType* currentFunc = nullptr;
 
     LgsTypeResolver(LgsFile* file, LgsErrHandler& errHandler, LgsSymbolTable& globals) : file(file), globals(globals),errHandler(errHandler) {}
     void resolveType(LgsType*& type);

@@ -7,7 +7,7 @@
 #include "LgsType.h"
 #include "funcs/LgsParam.h"
 
-class LgsGenericType;
+class LgsTypeParam;
 
 enum LgsFuncFlags : uint32_t {
     PUBLIC = 1 << 0,
@@ -39,7 +39,6 @@ public:
     bool isMethod = false;
     bool isCoroutine = false;
     bool isDeferred = false;
-    bool isLambda = false;
     bool isSyscall = false;
     bool isTerminator = false;
     bool swapReturn = false;
@@ -60,8 +59,6 @@ public:
     std::string fmtStr() const override;
     bool canCastTo(LgsType* other) override;
     bool equals(LgsType* other) override;
-    bool hasGenerics() override;
-    void replaceGenerics(std::unordered_map<std::string, LgsType*>& replacements) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     void setFuncOptions(uint32_t ops);
     std::unordered_map<std::string, LgsParam*> getParamsByName();

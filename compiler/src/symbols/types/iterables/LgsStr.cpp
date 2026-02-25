@@ -56,7 +56,6 @@ Value* LgsStr::getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level) {
 
 bool LgsStr::canCastTo(LgsType* other) {
     if (other->isAny()) return true;
-    if (other->asGenericType()) return true;
     if (const auto sArr = other->asSArray()) return sArr->baseType && sArr->baseType->asChar();
     if (const auto nullable = other->asNullable()) return canCastTo(nullable->baseType);
     return name == other->getName();

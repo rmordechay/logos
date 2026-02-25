@@ -47,10 +47,8 @@ bool LgsFuncCall::equals(LgsFuncType* funcType) const {
 
     // Remaining variadic args
     if (funcType->isVariadic && !funcType->isExternal) {
-        const auto variadic = funcType->params.back().type->asVariadic();
-        assert(variadic);
         for (size_t i = paramsSize; i < argsSize; ++i) {
-            if (!args[i].expr->type->canCastTo(variadic->baseType)) return false;
+            if (!argAndParamEqual(args[i].expr, &funcType->params.back())) return false;
         }
     }
     return true;

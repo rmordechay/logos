@@ -40,7 +40,7 @@ bool LgsStmtWrapper::isTerminator() const {
 
 LgsFunc* LgsStmtsBlock::wrapBlockInFunc() {
     const auto func = new LgsFunc("", nullptr);
-    func->funcType->isLambda = true;
+    func->isLambda = true;
     func->location = location;
     func->stmtsBlock = this;
     return func;

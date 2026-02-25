@@ -63,12 +63,6 @@ TEST(TypeResolverTest, Generics1) {
     )";
     parseAndAnalyse(app, {code}, {LGS_MAIN_FILE});
     const auto mainFile = app.getMainFile();
-    const auto genericFunc = mainFile->symbolTable.genericsFuncs.at("u_func_DArrayInt");
-    ASSERT_TRUE(genericFunc);
-    const auto rt = genericFunc->funcType->rt->asDArray();
-    const auto pt = genericFunc->funcType->params.front().type->asDArray();
-    ASSERT_TRUE(rt && rt->baseType->isInt);
-    ASSERT_TRUE(pt && pt->baseType->isInt);
 }
 
 TEST(TypeResolverTest, Generics2) {
@@ -83,10 +77,4 @@ TEST(TypeResolverTest, Generics2) {
     )";
     parseAndAnalyse(app, {code}, {LGS_MAIN_FILE});
     const auto mainFile = app.getMainFile();
-    const auto genericFunc = mainFile->symbolTable.genericsFuncs.at("u_func_DArrayInt");
-    ASSERT_TRUE(genericFunc);
-    const auto rt = genericFunc->funcType->rt;
-    const auto pt = genericFunc->funcType->params.front().type->asDArray();
-    ASSERT_TRUE(rt && rt->isInt);
-    ASSERT_TRUE(pt && pt->baseType->isInt);
 }

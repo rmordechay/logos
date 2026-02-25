@@ -414,7 +414,7 @@ bool LgsApp::generateRTTTypes() {
     }
     // Source files
     for (const auto srcFile : srcFiles) {
-        for (const auto [_, type] : srcFile->symbolTable.rttTypes) {
+        for (const auto [_, type] : srcFile->symbolTable.rtTypes) {
             rttTypes.push_back(type);
             if (const auto obj = type->asObject()) {
                 for (const auto innerObj : obj->objects) {
@@ -451,43 +451,34 @@ bool LgsApp::generateGenerics() {
 
     const auto genericsFile = new LgsFile("generics", CG_MODE_GENERICS);
     genericsFile->setupCodeGen(configs);
-    std::unordered_map<std::string, LgsFunc*> genericsFuncs;
-    std::unordered_map<std::string, LgsType*> genericsTypes;
+    std::unordered_map<std::string, LgsType*> genericTypes;
+    std::unordered_map<std::string, LgsFunc*> genericFuncs;
     for (const auto srcFile : srcFiles) {
-        genericsTypes.merge(srcFile->symbolTable.genericsTypes);
-        genericsFuncs.merge(srcFile->symbolTable.genericsFuncs);
+        genericTypes.merge(srcFile->symbolTable.genericTypes);
+        genericFuncs.merge(srcFile->symbolTable.genericFuncs);
     }
 
     auto& cgFile = genericsFile->cgFile;
-    for (const auto& [_, func] : genericsFuncs) {
-        const auto isBuiltin = func->funcType->isBuiltin;
-        if (isBuiltin && func->funcType->name == MAP_FUNC) {
-            cgFile.getMapFunc(func->funcType);
-        } else if (isBuiltin && func->funcType->name == FILTER_FUNC) {
-            cgFile.getFilterFunc(func->funcType);
-        } else if (isBuiltin && func->funcType->name == FOREACH_FUNC) {
-            cgFile.getForeachFunc(func->funcType);
-        } else {
-            cgFile.visitFunc(func);
-        }
-    }
-    for (const auto [_, genericType] : genericsTypes) {
-        if (const auto dArr = genericType->asDArray()) {
+    for (const auto [_, genericArg] : genericTypes) {
+        if (const auto dArr = genericArg->asDArray()) {
             dArr->getAddFunc(cgFile.cg);
             dArr->getContainsFunc(cgFile.cg);
             dArr->getEqFunc(cgFile.cg);
-        } else if (const auto sArr = genericType->asSArray()) {
+        } else if (const auto sArr = genericArg->asSArray()) {
             sArr->getEqFunc(cgFile.cg);
-        } else if (const auto map = genericType->asMap()) {
+        } else if (const auto map = genericArg->asMap()) {
             map->getGetFunc(cgFile.cg);
             map->getAddFunc(cgFile.cg);
-        } else if (const auto obj = genericType->asObject()) {
+        } else if (const auto obj = genericArg->asObject()) {
             obj->getObjsEqFunc(cgFile.cg);
             obj->getObjsHashFunc(cgFile.cg);
             obj->getJSONFunc(cgFile.cg);
         } else {
             assert(0);
         }
+    }
+    for (auto [_, genericFunc] : genericFuncs) {
+        cgFile.visitFunc(genericFunc);
     }
     genericFiles.push_back(genericsFile);
 

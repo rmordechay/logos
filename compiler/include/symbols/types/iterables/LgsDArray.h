@@ -4,6 +4,7 @@
 
 #include "LgsIterable.h"
 #include "Lgs_Types.h"
+#include "types/LgsTypeParam.h"
 
 class LgsCodeGen;
 class LgsType;
@@ -33,8 +34,6 @@ public:
     LgsExpr* getZeroValue() override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     Type* getIRType(LgsCodeGen& cg) override;
-    bool hasGenerics() override;
-    void replaceGenerics(std::unordered_map<std::string, LgsType*>& replacements) override;
     Constant* getRTTypeExtra(LgsCodeGen& cg) override;
     Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level) override;
     Value* lenIR(LgsCodeGen& cg, Value* iterable) override;

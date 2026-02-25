@@ -41,6 +41,24 @@ TEST(CgArraysTest, DArrTest1) {
     EXPECT_EQ(lines[6], "[[23]]");
 }
 
+TEST(CgArraysTest, DArrTest2) {
+    const auto code = R"(
+    main() {
+        arr1: Int[] = [1, 2]
+        arr2: Int[][] = [[1], [2]]
+        arr3: Int[][][] = [[[1]], [[2]]]
+        print(arr1)
+        print(arr2)
+        print(arr3)
+    }
+    )";
+    std::istringstream stream(runLgsApp(code));
+    const auto lines = getLines(stream, 3);
+    EXPECT_EQ(lines[0], "[1, 2]");
+    EXPECT_EQ(lines[1], "[[1], [2]]");
+    EXPECT_EQ(lines[2], "[[[1]], [[2]]]");
+}
+
 TEST(CgArraysTest, SArrTest1) {
     const auto code = R"(
     main() {
@@ -61,6 +79,24 @@ TEST(CgArraysTest, SArrTest1) {
 
 TEST(CgArraysTest, SArrTest2) {
     const auto code = R"(
+    main() {
+        arr1: Int[2] = [1, 2]
+        arr2: Int[2][2] = [[1], [2]]
+        arr3: Int[2][2][2] = [[[1]], [[2]]]
+        print(arr1)
+        print(arr2)
+        print(arr3)
+    }
+    )";
+    std::istringstream stream(runLgsApp(code));
+    const auto lines = getLines(stream, 3);
+    EXPECT_EQ(lines[0], "[1, 2]");
+    EXPECT_EQ(lines[1], "[[1, 0], [2, 0]]");
+    EXPECT_EQ(lines[2], "[[[1, 0], [0, 0]], [[2, 0], [0, 0]]]");
+}
+
+TEST(CgArraysTest, SArrTest3) {
+    const auto code = R"(
     func(): Int[3] {
         return [1, 2, 3]
     }
@@ -73,7 +109,7 @@ TEST(CgArraysTest, SArrTest2) {
     EXPECT_EQ(lines[0], "[1, 2, 3]");
 }
 
-TEST(CgArraysTest, SArrTest3) {
+TEST(CgArraysTest, SArrTest4) {
     const auto code = R"(
     main() {
         arr: Int[2][2][2]
@@ -103,7 +139,7 @@ TEST(CgArraysTest, SArrTest3) {
     EXPECT_EQ(lines[6], "[[[1, 1], [1, 0]], [[0, 0], [0, 1]]]");
 }
 
-TEST(CgArraysTest, SArrTest4) {
+TEST(CgArraysTest, SArrTest5) {
     const auto code = R"(
     object Obj {
         func(arr: Int[3]): Int[3] {

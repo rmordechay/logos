@@ -7,6 +7,7 @@
 #include "analysis/LgsTypeResolver.h"
 #include "files/LgsEnvFile.h"
 #include "errors/LgsErrHandler.h"
+#include "exprs/LgsFuncCall.h"
 #include "stmts/LgsAssignment.h"
 
 class LgsMainFunc;
@@ -140,6 +141,7 @@ public:
     void visitFuncCall(LgsFuncCall* funcCall);
     void visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent);
     bool visitFuncArgs(LgsFuncCall* funcCall, LgsFuncType* ft);
+    void visitArg(bool isMixed, LgsFuncArg& arg, const LgsParam* param, const LgsLocation& location);
     void visitModuleExpr(LgsModuleExpr* moduleExpr);
     void visitPrefixExpr(LgsPrefixExpr* prefixExpr);
     void visitPostfixExpr(LgsPostfixExpr* postfixExpr);
@@ -162,14 +164,14 @@ public:
     static bool validateControlFlow(const LgsStmtsBlock* stmtBlock, const LgsFunc* func);
 
     void setFunc(LgsFuncCall* funcCall, LgsFunc* func);
-    bool cloneGenericObj(LgsInstance* instance, const LgsObject* obj);
-    bool cloneGenericFunc(LgsFuncCall* funcCall, const LgsFunc* func);
-    void replaceGenericTypes(LgsValue* value, std::unordered_map<std::string, LgsType*>& replacements);
+    void addTypeReplacement(LgsType* genericType, LgsType* replacement, std::unordered_map<std::string, LgsType*>& replacements);
+    static void replaceGenerics(LgsType*& type, const std::unordered_map<std::string, LgsType*>& replacements);
     void replaceForLoop(LgsStmtWrapper& stmt);
     LgsSymbol* getSymbol(const std::string& name);
     void addLocalSymbol(const LgsSymbol& newSymbol);
     void createCoroutineFunc(LgsFuncCall* funcCall);
     void addError(const LgsBaseMsg& lgsErr, const LgsLocation& location, const std::vector<std::string>& args = {});
+    void addGenericType(LgsType* type) const;
+    void addGenericFunc(LgsFunc* func) const;
     void addRTType(LgsType* type) const;
-    void addGenerics(LgsType* type) const;
 };

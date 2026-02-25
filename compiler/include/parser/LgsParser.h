@@ -25,7 +25,7 @@ class LgsAppFile;
 struct LgsFileMetadata;
 class LgsMetaSelection;
 class LgsMatrixExpr;
-class LgsGenericType;
+class LgsTypeParam;
 struct LgsPaths;
 struct LgsSymbol;
 struct LgsAppConfigs;
@@ -115,8 +115,8 @@ public:
     LgsSubType* parseSubtype();
     LgsFuncType* parseFuncType();
     LgsMap* parseMapType();
-    LgsGenericType* parseGenericType();
-    std::vector<LgsType*> parseGenericArgs();
+    LgsTypeParam* parseTypeParam();
+    std::vector<LgsType*> parseTypeArgs();
 
     // Funcs
     LgsFunc* parseFunc();

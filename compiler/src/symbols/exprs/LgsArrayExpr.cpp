@@ -12,11 +12,25 @@
 #include "types/iterables/LgsIterable.h"
 
 LgsExpr* LgsArrayExpr::cast(LgsType* toType, const bool explicitly) {
-    if (iterable && iterable->baseType) return this;
-    const auto otherIter = toType->asIterable();
-    if (!otherIter || otherIter->asStr()) return this;
-    if (otherIter->getNestedBaseType()->asGenericType()) return this;
-    setType(toType);
+    if (const auto dArr = toType->asDArray()) {
+        setType(new LgsDArray());
+        auto current = iterable->asDArray();
+        auto target = dArr;
+        while (const auto innerDArr = target->baseType->asDArray()) {
+            current->baseType = new LgsDArray();
+            current = current->baseType->asDArray();
+            target = innerDArr;
+        }
+    } else if (const auto sArr = toType->asSArray()) {
+        setType(new LgsSArray(nullptr, sArr->lengthExpr));
+        auto current = iterable->asSArray();
+        auto target = sArr;
+        while (const auto innerSArr = target->baseType->asSArray()) {
+            current->baseType = new LgsSArray(nullptr, innerSArr->lengthExpr);
+            current = current->baseType->asSArray();
+            target = innerSArr;
+        }
+    }
     return this;
 }
 

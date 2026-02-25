@@ -110,24 +110,6 @@ Type* LgsDArray::getIRType(LgsCodeGen& cg) {
     return cg.getStructType({cg.sizeTy(), cg.ptrTy(), cg.ptrTy(), cg.sizeTy(), cg.sizeTy()}, name);
 }
 
-bool LgsDArray::hasGenerics() {
-    return getNestedBaseType()->hasGenerics();
-}
-
-void LgsDArray::replaceGenerics(std::unordered_map<std::string, LgsType*>& replacements) {
-    const auto nestedTypeName = getNestedBaseType()->getName();
-    if (replacements.contains(nestedTypeName) && replacements[nestedTypeName]) {
-        setNestedBaseType(replacements[nestedTypeName]);
-        return;
-    }
-    const auto genericName = getName();
-    if (replacements.contains(genericName) && replacements[genericName]) {
-        const auto otherNestedBaseType = replacements[genericName]->asIterable()->getNestedBaseType();
-        replacements[nestedTypeName] = otherNestedBaseType;
-        setNestedBaseType(otherNestedBaseType);
-    }
-}
-
 Constant* LgsDArray::getRTTypeExtra(LgsCodeGen& cg) {
     return baseType->getRTType(cg);
 }

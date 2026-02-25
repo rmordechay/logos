@@ -52,7 +52,6 @@ bool LgsFloat::canCastTo(LgsType* other) {
     if (name == otherName) return true;
     if (other->isAny()) return true;
     if (otherName == LgsDouble::name) return true;
-    if (other->asGenericType()) return other->canCastTo(this);
     if (const auto nullable = other->asNullable()) return canCastTo(nullable->baseType);
     return false;
 }

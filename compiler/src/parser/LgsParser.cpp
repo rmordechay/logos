@@ -64,7 +64,7 @@
 #include "stmts/LgsVarDec.h"
 #include "types/LgsEnum.h"
 #include "types/LgsEnumField.h"
-#include "types/LgsGenericType.h"
+#include "types/LgsTypeParam.h"
 #include "types/LgsInterface.h"
 #include "types/LgsNullable.h"
 #include "types/LgsSelf.h"
@@ -223,13 +223,13 @@ LgsObject* LgsParser::parseObject(const bool withParen) {
     // Generic types
     if (matchAndConsume(T_LANGLE)) {
         while (true) {
-            const auto type = parseGenericType();
+            const auto type = parseTypeParam();
             if (!type) break;
-            obj->genericTypes.push_back(type);
+            obj->typeParams.push_back(type);
             if (currentToken.type == T_RANGLE) break;
             mustMatch(T_COMMA);
         }
-        if (obj->genericTypes.empty()) addParsingError();
+        if (obj->typeParams.empty()) addParsingError();
         mustMatch(T_RANGLE);
         if (withParen) mustMatch(T_LBRACE);
     } else if (withParen) {
@@ -569,7 +569,7 @@ LgsType* LgsParser::parseType() {
     }
     if (!type) return nullptr;
     if (currentToken.type == T_LANGLE) {
-        type->genericArgs = parseGenericArgs();
+        type->genericArgs = parseTypeArgs();
     }
     setLocation(type->location, &startToken, &currentToken);
 
@@ -703,16 +703,16 @@ LgsMap* LgsParser::parseMapType() {
     return mapType;
 }
 
-LgsGenericType* LgsParser::parseGenericType() {
+LgsTypeParam* LgsParser::parseTypeParam() {
     if (currentToken.type != T_IDENTIFIER) return nullptr;
     const auto startToken = currentToken;
-    const auto generic = new LgsGenericType(currentToken.lexeme);
+    const auto typeParam = new LgsTypeParam(currentToken.lexeme);
     consume();
-    setLocation(generic->location, &startToken, &currentToken);
-    return generic;
+    setLocation(typeParam->location, &startToken, &currentToken);
+    return typeParam;
 }
 
-std::vector<LgsType*> LgsParser::parseGenericArgs() {
+std::vector<LgsType*> LgsParser::parseTypeArgs() {
     const auto oldIndex = currentIndex;
     if (!matchAndConsume(T_LANGLE)) return {};
     std::vector<LgsType*> types;
@@ -787,18 +787,18 @@ LgsFuncType* LgsParser::parseFuncHeader() {
     const auto nameToken = currentToken;
     if (currentToken.type != T_IDENTIFIER) return nullptr;
 
-    std::vector<LgsGenericType*> genericsTypes;
+    std::vector<LgsTypeParam*> typeParams;
     if (peek().type == T_LANGLE) {
         consume(2);
         while (true) {
-            const auto type = parseGenericType();
+            const auto type = parseTypeParam();
             if (!type) break;
-            genericsTypes.push_back(type);
+            typeParams.push_back(type);
             if (currentToken.type == T_RANGLE) break;
             mustMatch(T_COMMA);
         }
         mustMatch(T_RANGLE);
-        if (genericsTypes.empty()) addParsingError();
+        if (typeParams.empty()) addParsingError();
     } else if (peek().type == T_LPAREN) {
         consume();
     } else {
@@ -806,7 +806,7 @@ LgsFuncType* LgsParser::parseFuncHeader() {
     }
 
     const auto funcType = new LgsFuncType(nameToken.lexeme);
-    funcType->genericTypes = genericsTypes;
+    funcType->typeParams = typeParams;
     parseParams(funcType);
     mustMatch(T_RPAREN);
     funcType->rt = matchAndConsume(T_COLON) ? parseType() : &LGS_VOID;
@@ -1373,7 +1373,7 @@ LgsInstance* LgsParser::parseInstance() {
     const auto tokenName = currentToken;
     const auto oldIndex = currentIndex;
     if (!matchAndConsume(T_IDENTIFIER)) return nullptr;
-    auto generics = parseGenericArgs();
+    auto generics = parseTypeArgs();
     if (!matchOrReset(T_LBRACE, oldIndex)) {
         freeTypes(generics);
         return nullptr;
@@ -1393,15 +1393,15 @@ LgsFuncCall* LgsParser::parseFuncCall() {
     if (!matchAndConsume(T_IDENTIFIER)) return nullptr;
 
     // Generic args
-    auto genericsArgs = parseGenericArgs();
+    auto typeArgs = parseTypeArgs();
     if (!matchOrReset(T_LPAREN, oldIndex)) {
-        freeTypes(genericsArgs);
+        freeTypes(typeArgs);
         return nullptr;
     }
 
     const auto funcCall = new LgsFuncCall(nameToken.lexeme);
     setLocation(funcCall->location, &nameToken, &currentToken);
-    funcCall->genericArgs = genericsArgs;
+    funcCall->typeArgs = typeArgs;
     if (matchAndConsume(T_RPAREN)) return funcCall;
 
     // Arguments
@@ -1725,7 +1725,7 @@ LgsFunc* LgsParser::parseLambda() {
 
     const auto lambda = new LgsFunc("", rt, params);
     currentFunc = lambda;
-    lambda->funcType->isLambda = true;
+    lambda->isLambda = true;
     lambda->stmtsBlock = parseStmtsBlock();
     mustParse(lambda->stmtsBlock);
     if (lambda->stmtsBlock->isMacro) addParsingError();

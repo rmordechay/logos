@@ -12,7 +12,7 @@
 #include "Lgs_Types.h"
 #include "types/iterables/LgsStr.h"
 
-class LgsGenericType;
+class LgsTypeParam;
 class LgsInstance;
 class LgsCodeGen;
 class LgsField;
@@ -61,7 +61,6 @@ public:
     std::string fmtStr() const override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
-    bool hasGenerics() override;
     bool canCastTo(LgsType* other) override;
     void hashNode(size_t& oldHash) override;
     Type* getIRType(LgsCodeGen& cg) override;
