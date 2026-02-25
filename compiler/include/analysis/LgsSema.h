@@ -164,7 +164,7 @@ public:
     void setFunc(LgsFuncCall* funcCall, LgsFunc* func);
     bool cloneGenericObj(LgsInstance* instance, const LgsObject* obj);
     bool cloneGenericFunc(LgsFuncCall* funcCall, const LgsFunc* func);
-    void replaceGenerics(LgsValue* value, std::unordered_map<std::string, LgsType*>& replacements);
+    void replaceGenericTypes(LgsValue* value, std::unordered_map<std::string, LgsType*>& replacements);
     void replaceForLoop(LgsStmtWrapper& stmt);
     LgsSymbol* getSymbol(const std::string& name);
     void addLocalSymbol(const LgsSymbol& newSymbol);

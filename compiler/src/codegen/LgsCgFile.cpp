@@ -631,6 +631,7 @@ void LgsCgFile::visitTernaryExpr(LgsTernaryExpr* ternaryExpr) {
 
 void LgsCgFile::visitInstance(LgsInstance* instance) {
     const auto obj = instance->obj;
+    visitObject(obj);
     if (obj->isExternal) {
         instance->IRValue = cg.builder.CreateAlloca(obj->getIRType(cg));
         assert(instance->args.empty());

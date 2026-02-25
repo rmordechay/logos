@@ -107,6 +107,11 @@ bool LgsType::isSliceable() {
 
 bool LgsType::addMethod(LgsFunc* method) {
     if (methods.contains(method->funcType->name)) return false;
+    method->funcType->genericTypes.insert(
+        method->funcType->genericTypes.end(),
+        genericTypes.begin(),
+        genericTypes.end()
+    );
     methods[method->funcType->name] = method;
     return true;
 }

@@ -206,6 +206,20 @@ TEST(ErrorsTest, E10011C) {
     expectErrors(app, E10011, 1);
 }
 
+TEST(ErrorsTest, E10011D) {
+    const auto code = R"(
+    object Obj<T> {
+        func<T>(y: T) {}
+    }
+    main() {
+        obj = Obj{x=23}
+    }
+    )";
+    LgsApp app;
+    parseAndAnalyse(app, {code}, {LGS_MAIN_FILE});
+    expectErrors(app, E10011, 1);
+}
+
 TEST(ErrorsTest, E10012A) {
     const auto code = R"(
     main() {

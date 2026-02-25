@@ -58,13 +58,18 @@ TEST(CgGenericsTest, Test3) {
     const auto code = R"(
     object Obj<T> {
         x: T
+        func(y: T) {
+            print(y)
+        }
     }
     main() {
         obj = Obj{x=23}
         print(obj)
+        obj.func(54)
     }
     )";
     std::istringstream stream(runLgsApp(code));
-    const auto lines = getLines(stream, 1);
+    const auto lines = getLines(stream, 2);
     EXPECT_EQ(lines[0], "Obj{x=23}");
+    EXPECT_EQ(lines[1], "54");
 }

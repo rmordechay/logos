@@ -1687,14 +1687,62 @@ bool LgsSema::cloneGenericObj(LgsInstance* instance, const LgsObject* obj) {
         if (!instance->args.contains(field->name)) return false;
         const auto arg = instance->args.at(field->name).expr;
         if (arg->type->hasGenerics()) {
-            replaceGenerics(arg, replacements);
+            replaceGenericTypes(arg, replacements);
             visitExpr(arg);
         }
         auto fieldTypeName = field->type->getName();
         if (!replacements.contains(fieldTypeName) || !replacements[fieldTypeName]) {
             replacements[fieldTypeName] = arg->type;
         }
-        replaceGenerics(field, replacements);
+        replaceGenericTypes(field, replacements);
+    }
+
+    // Methods
+    instance->obj->methods.clear();
+    for (auto [name, method] : obj->methods) {
+        const auto newMethod = new LgsFunc(*method);
+        newMethod->funcType = new LgsFuncType(*method->funcType);
+        for (const auto methodGenericType : newMethod->funcType->genericTypes) {
+            for (const auto objGenericType : obj->genericTypes) {
+                if (methodGenericType->equals(objGenericType)) {
+                    addError(E10011, objGenericType->location, {objGenericType->name});
+                    return false;
+                }
+            }
+        }
+        newMethod->funcType->genericTypes.clear();
+        method->funcType->params[0].type = instance->obj;
+        for (size_t i = 1; i < method->funcType->params.size(); ++i) {
+            if (i >= newMethod->funcType->params.size()) break;
+            auto& param = newMethod->funcType->params[i];
+            replaceGenericTypes(&param, replacements);
+        }
+        replaceGenericTypes(newMethod, replacements);
+
+        // Statements block
+        if (!method->stmtsBlock) return true;
+        newMethod->stmtsBlock = new LgsStmtsBlock();
+        for (const auto& stmt : method->stmtsBlock->stmts) {
+            switch (stmt.wrapperType) {
+            case LgsStmtWrapper::WrapperType::Stmt: {
+                auto newStmt = stmt.stmt->clone();
+                replaceGenericTypes(newStmt, replacements);
+                newMethod->stmtsBlock->stmts.emplace_back(newStmt);
+                break;
+            }
+            case LgsStmtWrapper::WrapperType::Expr: {
+                auto newExpr = stmt.expr->clone();
+                replaceGenericTypes(newExpr, replacements);
+                newMethod->stmtsBlock->stmts.emplace_back(newExpr);
+                break;
+            }
+            case LgsStmtWrapper::WrapperType::Object:
+                assert(0);
+            }
+        }
+        // Set new method
+        instance->obj->addMethod(newMethod);
+        visitFunc(newMethod);
     }
     return true;
 }
@@ -1726,16 +1774,16 @@ bool LgsSema::cloneGenericFunc(LgsFuncCall* funcCall, const LgsFunc* func) {
         const auto arg = funcCall->args[i].expr;
         if (!param.type->hasGenerics()) continue;
         if (arg->type->hasGenerics()) {
-            replaceGenerics(arg, replacements);
+            replaceGenericTypes(arg, replacements);
             visitExpr(arg);
         }
         auto paramName = param.type->getName();
         if (!replacements.contains(paramName) || !replacements[paramName]) {
             replacements[paramName] = arg->type;
         }
-        replaceGenerics(&param, replacements);
+        replaceGenericTypes(&param, replacements);
     }
-    replaceGenerics(funcCall->func, replacements);
+    replaceGenericTypes(funcCall->func, replacements);
 
     // Statements block
     if (!func->stmtsBlock) return true;
@@ -1744,12 +1792,14 @@ bool LgsSema::cloneGenericFunc(LgsFuncCall* funcCall, const LgsFunc* func) {
         switch (stmt.wrapperType) {
         case LgsStmtWrapper::WrapperType::Stmt: {
             auto newStmt = stmt.stmt->clone();
-            replaceGenerics(newStmt, replacements);
+            replaceGenericTypes(newStmt, replacements);
             funcCall->func->stmtsBlock->stmts.emplace_back(newStmt);
             break;
         }
         case LgsStmtWrapper::WrapperType::Expr: {
-            funcCall->func->stmtsBlock->stmts.emplace_back(stmt.expr->clone());
+            auto newExpr = stmt.expr->clone();
+            replaceGenericTypes(newExpr, replacements);
+            funcCall->func->stmtsBlock->stmts.emplace_back(newExpr);
             break;
         }
         case LgsStmtWrapper::WrapperType::Object:
@@ -1759,11 +1809,13 @@ bool LgsSema::cloneGenericFunc(LgsFuncCall* funcCall, const LgsFunc* func) {
     return true;
 }
 
-void LgsSema::replaceGenerics(LgsValue* value, std::unordered_map<std::string, LgsType*>& replacements) {
+void LgsSema::replaceGenericTypes(LgsValue* value, std::unordered_map<std::string, LgsType*>& replacements) {
     LgsType* type = nullptr;
     if (const auto func = dynamic_cast<LgsFunc*>(value)) {
-        for (auto& param : func->funcType->params) {
-            replaceGenerics(&param, replacements);
+        if (func->funcType->isLambda) {
+            for (auto& param : func->funcType->params) {
+                replaceGenericTypes(&param, replacements);
+            }
         }
         type = func->funcType->rt;
         type->replaceGenerics(replacements);
