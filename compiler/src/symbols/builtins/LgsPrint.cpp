@@ -18,7 +18,7 @@ namespace llvm {
 class Type;
 }
 
-Value* LgsPrint::call(LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) {
+Value* LgsPrint::call(LgsCodeGen& cg, const std::vector<LgsVarDec>& args) {
     const auto arg = args.empty() ? funcType->params.front().expr : args.front().expr;
     const auto type = arg->type;
     auto v = arg->IRValue;

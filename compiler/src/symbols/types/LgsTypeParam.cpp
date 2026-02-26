@@ -3,7 +3,7 @@
 #include <cassert>
 
 Type* LgsTypeParam::getIRType(LgsCodeGen& cg) {
-    return nullptr;
+    assert(0);
 }
 
 size_t LgsTypeParam::sizeBytes() {
@@ -33,4 +33,15 @@ std::string LgsTypeParam::fmtStr() const {
 
 DIType* LgsTypeParam::getDebugType(LgsCodeGen& cg) {
     assert(0);
+}
+
+LgsTypeParam* LgsTypeParam::clone() {
+    const auto cloned = new LgsTypeParam(*this);
+    if (bounds) cloned->bounds = bounds->clone();
+    return cloned;
+}
+
+LgsTypeParam::~LgsTypeParam() {
+    freeType(bounds);
+    bounds = nullptr;
 }

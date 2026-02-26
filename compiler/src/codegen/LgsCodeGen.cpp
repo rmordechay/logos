@@ -148,8 +148,7 @@ void LgsCodeGen::loop(Value* loopLength, const std::function<void(Value*, BasicB
     body(iValue, exitBlock);
     if (lastInstTerminator()) return;
     iValue = load(sizeTy(), iPtr);
-    const auto inc = builder.CreateAdd(iValue, usize(1));
-    store(inc, iPtr);
+    store(builder.CreateAdd(iValue, usize(1)), iPtr);
     builder.CreateBr(condBlock);
     startBlock(exitBlock);
 }
@@ -163,16 +162,16 @@ void LgsCodeGen::ifStmt(Value* cond, const std::function<void()>& body) {
     branchAndStartBlock(IRExitBlock);
 }
 
-void LgsCodeGen::ifElseStmt(Value* cond, const std::function<void()>& ifBody, const std::function<void()>& elseBody) {
+void LgsCodeGen::ifElseStmt(Value* cond, const std::function<void(BasicBlock*)>& ifBody, const std::function<void(BasicBlock*)>& elseBody) {
     const auto trueBlock = createBlock(BLOCK_TRUE);
     const auto falseBlock = createBlock(BLOCK_FALSE);
     const auto exitBlock = createBlock(BLOCK_EXIT);
     builder.CreateCondBr(cond, trueBlock, falseBlock);
     startBlock(trueBlock);
-    ifBody();
+    ifBody(trueBlock);
     branch(exitBlock);
     startBlock(falseBlock);
-    elseBody();
+    elseBody(falseBlock);
     branchAndStartBlock(exitBlock);
 }
 
@@ -201,10 +200,6 @@ Value* LgsCodeGen::isNull(Value* value) {
 
 Value* LgsCodeGen::emptyBuffer(const size_t size) {
     return builder.CreateAlloca(ArrayType::get(i8Ty(), size > 0 ? size : LGS_STR_BUFFER_SIZE));
-}
-
-void LgsCodeGen::incSize(Value* bufferOffset, Value* ptr) {
-    store(builder.CreateAdd(bufferOffset, usize(1)), ptr);
 }
 
 void LgsCodeGen::addNullTerminate(Value* strPtr, Value* index) {

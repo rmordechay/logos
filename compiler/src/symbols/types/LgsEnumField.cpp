@@ -27,7 +27,7 @@ LgsFunc* LgsEnumField::getMethod(const std::string& methodName) {
     if (methodName == VALUE_FUNC && exprType) {
         if (methods.contains(methodName)) return methods[methodName];
         const auto func = new LgsFunc(methodName, exprType, {this}, flags);
-        func->fn = [this](LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) -> Value* {
+        func->fn = [this](LgsCodeGen& cg, const std::vector<LgsVarDec>& args) -> Value* {
             const auto arg = args.front().expr;
             if (arg->IRValue->getType()->isPointerTy()) {
                 const auto fieldTy = arg->type->getIRType(cg);
@@ -42,7 +42,7 @@ LgsFunc* LgsEnumField::getMethod(const std::string& methodName) {
     if (methodName == INDEX_FUNC) {
         if (methods.contains(methodName)) return methods[methodName];
         const auto func = new LgsFunc(methodName, &LGS_SIZE, {this}, flags);
-        func->fn = [this](LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) -> Value* {
+        func->fn = [this](LgsCodeGen& cg, const std::vector<LgsVarDec>& args) -> Value* {
             if (!exprType) return cg.usize(index);
             const auto arg = args.front().expr;
             if (arg->IRValue->getType()->isPointerTy()) {

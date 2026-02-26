@@ -101,8 +101,8 @@ public:
     void visitFuncHeader(LgsFuncType* ft);
     void visitFunc(LgsFunc* func);
     void visitMainFunc(LgsMainFunc* mainFunc);
-    void visitObjImplements(LgsObject* obj, const std::vector<LgsType*>& interfaces);
     void visitLambda(LgsFunc* lambda);
+    void visitObjImplements(LgsObject* obj, const std::vector<LgsType*>& interfaces);
     void visitParam(LgsParam* param);
     void visitIOPair(LgsIOPair* ioPair, LgsObject* obj);
     void visitStmt(LgsStmtWrapper& stmt);
@@ -141,7 +141,7 @@ public:
     void visitFuncCall(LgsFuncCall* funcCall);
     void visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent);
     bool visitFuncArgs(LgsFuncCall* funcCall, LgsFuncType* ft);
-    void visitArg(bool isMixed, LgsFuncArg& arg, const LgsParam* param, const LgsLocation& location);
+    void visitArg(bool isMixed, LgsVarDec& varDec, const LgsParam* param, const LgsLocation& location);
     void visitModuleExpr(LgsModuleExpr* moduleExpr);
     void visitPrefixExpr(LgsPrefixExpr* prefixExpr);
     void visitPostfixExpr(LgsPostfixExpr* postfixExpr);
@@ -160,11 +160,12 @@ public:
     bool validateFieldVisibility(LgsField* field, LgsType* parent, const LgsLocation& location);
     bool validateMethodVisibility(const LgsFunc* method, LgsType* parent, const LgsLocation& location);
     bool validateVecElements(const LgsVariable* fieldVar, LgsVec* vec);
-    void validateObjDuplicates(LgsObject* type);
+    void validateObjDuplicates(LgsObject* obj);
     static bool validateControlFlow(const LgsStmtsBlock* stmtBlock, const LgsFunc* func);
 
     void setFunc(LgsFuncCall* funcCall, LgsFunc* func);
     void addTypeReplacement(LgsType* genericType, LgsType* replacement, std::unordered_map<std::string, LgsType*>& replacements);
+    static void replaceGenericFunc(LgsFunc* newFunc, const std::unordered_map<std::string, LgsType*>& replacements);
     static void replaceGenerics(LgsType*& type, const std::unordered_map<std::string, LgsType*>& replacements);
     void replaceForLoop(LgsStmtWrapper& stmt);
     LgsSymbol* getSymbol(const std::string& name);
@@ -172,6 +173,5 @@ public:
     void createCoroutineFunc(LgsFuncCall* funcCall);
     void addError(const LgsBaseMsg& lgsErr, const LgsLocation& location, const std::vector<std::string>& args = {});
     void addGenericType(LgsType* type) const;
-    void addGenericFunc(LgsFunc* func) const;
     void addRTType(LgsType* type) const;
 };

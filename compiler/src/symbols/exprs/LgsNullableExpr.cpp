@@ -22,7 +22,7 @@ std::string LgsNullableExpr::asText() {
     return baseExpr->asText() + '?';
 }
 
-LgsExpr* LgsNullableExpr::clone() {
+LgsExpr* LgsNullableExpr::clone() const {
     const auto newNullableExpr = new LgsNullableExpr(*this);
     if (newNullableExpr->baseExpr) {
         newNullableExpr->baseExpr = baseExpr->clone();

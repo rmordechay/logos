@@ -1,6 +1,5 @@
 #include "analysis/LgsTypeResolver.h"
 
-#include <assert.h>
 #include <filesystem>
 #include <map>
 #include <unordered_map>

@@ -9,7 +9,7 @@ void LgsIfStmt::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }
 
-LgsStmt* LgsIfStmt::clone() {
+LgsStmt* LgsIfStmt::clone() const {
     const auto newLgsIfStmt = new LgsIfStmt(*this);
     newLgsIfStmt->ifCond = ifCond->clone();
     newLgsIfStmt->ifBlock = ifBlock->clone();

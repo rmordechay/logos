@@ -26,8 +26,7 @@ public:
     void setType(LgsType* newType) override;
     void setDebugValue(LgsCodeGen& cg) override;
     void hashNode(size_t& oldHash) override;
-    LgsStmt* clone() override;
-    ~LgsVarDec() override;
+    LgsStmt* clone() const override;
 };
 
 

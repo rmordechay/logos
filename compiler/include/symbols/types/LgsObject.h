@@ -36,17 +36,19 @@ class Value;
 
 class LgsObject : public LgsType {
 public:
+    static constexpr std::string metaName = "Object";
     size_t id{};
     std::string name;
+    bool isSingleton = false;
     std::vector<LgsType*> implements;
     std::vector<LgsEnum*> enums;
     std::vector<LgsObject*> objects;
     std::vector<LgsSubType*> subtypes;
     std::vector<LgsIOPair*> ioPairs;
+    std::vector<LgsTypeParam*> typeParams;
     std::map<std::string, LgsFunc*> metaFuncs;
     std::map<std::string, LgsField*> metaFields;
-    bool isSingleton = false;
-    static constexpr std::string metaName = "Object";
+    std::unordered_map<std::string, LgsType*> replacements;
 
     explicit LgsObject(const std::string&  name) : name(name) {
         isHeap = true;
@@ -62,6 +64,7 @@ public:
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
     bool canCastTo(LgsType* other) override;
+    bool hasTypeParams() override;
     void hashNode(size_t& oldHash) override;
     Type* getIRType(LgsCodeGen& cg) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
@@ -73,6 +76,7 @@ public:
     Function* getObjsEqFunc(LgsCodeGen& cg) const;
     Function* getObjsHashFunc(LgsCodeGen& cg) const;
     Function* getJSONFunc(LgsCodeGen& cg);
+    LgsType* clone() override;
     static Function* getSetFieldFunc(LgsCodeGen& cg);
     static Function* getGetFieldFunc(LgsCodeGen& cg);
     static StructType* getObjRTTStruct(LgsCodeGen& cg);

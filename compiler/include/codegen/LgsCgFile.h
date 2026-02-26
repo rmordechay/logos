@@ -81,7 +81,6 @@ public:
     void visitInterface(const LgsInterface* interface);
     void visitTestFile(const LgsTestFile* testFile);
     void visitObject(LgsObject* obj);
-    void visitEnum(const LgsEnum* enum_);
     void visitMainFunc(LgsMainFunc* func);
     void visitFunc(LgsFunc* func);
     void visitExternalSymbols(LgsFile* file);
@@ -136,7 +135,6 @@ public:
     void visitHashMap(LgsHashMap* hashMap);
     void visitEnvVar(LgsEnvVar* envVar);
     void visitCast(LgsCast* cast);
-    void visitLambda(LgsFunc* lambda);
 
     // Funcs
     void createPrologue(LgsFunc* func);

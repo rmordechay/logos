@@ -45,7 +45,7 @@ LgsFunc* LgsMap::getMethod(const std::string& methodName) {
     if (methodName == ADD_FUNC) {
         if (methods.contains(ADD_FUNC)) return methods[ADD_FUNC];
         const auto func = new LgsFunc(ADD_FUNC, name, &LGS_VOID, {this, new LgsStr(), &LGS_ANY}, flags);
-        func->fn = [this](LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) {
+        func->fn = [this](LgsCodeGen& cg, const std::vector<LgsVarDec>& args) {
             addIRElement(cg, args[0].expr->IRValue, args[1].expr->IRValue, args[2].expr->IRValue);
             return nullptr;
         };
@@ -55,7 +55,7 @@ LgsFunc* LgsMap::getMethod(const std::string& methodName) {
     if (methodName == KEYS_FUNC_NAME) {
         if (methods.contains(KEYS_FUNC_NAME)) return methods[KEYS_FUNC_NAME];
         const auto func = new LgsFunc(KEYS_FUNC_NAME, name, new LgsDArray(pairType->key), {this}, flags);
-        func->fn = [](LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) {
+        func->fn = [](LgsCodeGen& cg, const std::vector<LgsVarDec>& args) {
             return nullptr;
         };
         addMethod(func);
@@ -64,7 +64,7 @@ LgsFunc* LgsMap::getMethod(const std::string& methodName) {
     if (methodName == VALUES_FUNC_NAME) {
         if (methods.contains(VALUES_FUNC_NAME)) return methods[VALUES_FUNC_NAME];
         const auto func = new LgsFunc(VALUES_FUNC_NAME, name, new LgsDArray(pairType->value), {this}, flags);
-        func->fn = [](LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) {
+        func->fn = [](LgsCodeGen& cg, const std::vector<LgsVarDec>& args) {
             return nullptr;
         };
         addMethod(func);

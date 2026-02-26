@@ -46,6 +46,7 @@ public:
     Function* getContainsFunc(LgsCodeGen& cg);
     Function* getEqFunc(LgsCodeGen& cg);
     DIType* getDebugType(LgsCodeGen& cg) override;
+    LgsDArray* clone() override;
     static Value* loadRTBaseType(LgsCodeGen& cg, Value* ptr);
     static Value* loadRTLength(LgsCodeGen& cg, Value* ptr);
     static Value* loadRTCapacity(LgsCodeGen& cg, Value* ptr);

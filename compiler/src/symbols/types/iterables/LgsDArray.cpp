@@ -41,7 +41,7 @@ LgsFunc* LgsDArray::getMethod(const std::string& methodName) {
     if (methodName == ADD_FUNC) {
         if (methods.contains(methodName)) return methods[methodName];
         const auto addFunc = new LgsFunc(methodName, name, &LGS_VOID, {this, baseType}, flags);
-        addFunc->fn = [this](LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) {
+        addFunc->fn = [this](LgsCodeGen& cg, const std::vector<LgsVarDec>& args) {
             const auto iterable = args[0].expr->IRValue;
             const auto value = args[1].expr->IRValue;
             addIRElement(cg, iterable, nullptr, value);
@@ -267,6 +267,12 @@ Function* LgsDArray::getEqFunc(LgsCodeGen& cg) {
 
 DIType* LgsDArray::getDebugType(LgsCodeGen& cg) {
     assert(0);
+}
+
+LgsDArray* LgsDArray::clone() {
+    const auto cloned = new LgsDArray();
+    if (baseType) cloned->baseType = baseType->clone();
+    return cloned;
 }
 
 Value* LgsDArray::loadRTBaseType(LgsCodeGen& cg, Value* ptr) {

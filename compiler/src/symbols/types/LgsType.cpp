@@ -192,6 +192,10 @@ std::string LgsType::pname() {
     return getName();
 }
 
+bool LgsType::hasTypeParams() {
+    return asTypeParam();
+}
+
 bool LgsType::equals(LgsType* other) {
     return getName() == other->getName();
 }
@@ -215,6 +219,11 @@ Value* LgsType::getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level) {
 }
 
 Value* LgsType::hashValue(LgsCodeGen& cg, Value* value) { assert(0);}
+
+LgsType* LgsType::clone() {
+    assert(0);
+}
+
 Value* LgsType::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) { assert(0);}
 Value* LgsType::subIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) { assert(0);}
 Value* LgsType::mulIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) { assert(0);}
@@ -338,8 +347,13 @@ Value* eqIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
     if (const auto obj = type->asObject()) {
         return cg.builder.CreateCall(obj->getObjsEqFunc(cg), {left, right});
     }
-    if (type->asNullable()) {
-        assert(0);
+    if (const auto nullable = type->asNullable()) {
+        if (nullable->passByRef) {
+            const auto cond = andIR(cg, {cg.isNull(left), cg.isNull(left)});
+            return cond;
+        } else {
+
+        }
     }
     assert(0);
 }

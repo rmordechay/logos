@@ -10,6 +10,6 @@ void LgsFloatConst::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }
 
-LgsExpr* LgsFloatConst::clone() {
+LgsExpr* LgsFloatConst::clone() const {
     return new LgsFloatConst(*this);
 }

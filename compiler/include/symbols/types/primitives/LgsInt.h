@@ -35,6 +35,7 @@ public:
     Value* rshiftIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
     Value* lshiftIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
     DIType* getDebugType(LgsCodeGen& cg) override;
+    LgsInt* clone() override;
 };
 
 inline LgsInt LGS_INT;

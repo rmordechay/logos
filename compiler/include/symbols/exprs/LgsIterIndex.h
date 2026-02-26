@@ -31,6 +31,6 @@ public:
     LgsExpr* getBaseExpr() const;
     std::string asText() override;
     void setDebugValue(LgsCodeGen& cg) override;
-    LgsExpr* clone() override;
+    LgsExpr* clone() const override;
     ~LgsIterIndex() override;
 };

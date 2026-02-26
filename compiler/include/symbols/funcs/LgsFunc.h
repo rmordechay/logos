@@ -1,7 +1,6 @@
 #pragma once
 #include <functional>
 #include <string>
-#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -12,7 +11,6 @@
 
 class LgsReturn;
 class LgsFuncType;
-struct LgsFuncArg;
 class LgsStmtsBlock;
 class LgsParam;
 class LgsStmt;
@@ -23,7 +21,7 @@ class Function;
 class Value;
 }
 
-typedef std::function<Value*(LgsCodeGen&, const std::vector<LgsFuncArg>&)> CallFn;
+typedef std::function<Value*(LgsCodeGen&, const std::vector<LgsVarDec>&)> CallFn;
 
 class LgsFunc : public LgsExpr {
 public:
@@ -32,6 +30,7 @@ public:
     LgsStmtsBlock* stmtsBlock = nullptr;
     std::vector<const LgsReturn*> returnStmts;
     std::vector<std::pair<LgsExpr*, LgsExpr*>> mocks;
+    std::unordered_map<std::string, LgsType*> replacements;
     BasicBlock* epilogue = nullptr;
     bool isLambda = false;
     bool isTest = false;
@@ -58,13 +57,13 @@ public:
     LgsExpr* cast(LgsType* toType, bool explicitly) override;
     void setType(LgsType* newType) override;
     virtual Function* getIRFunc(LgsCodeGen& cg);
-    virtual Value* call(LgsCodeGen& cg, const std::vector<LgsFuncArg>& args);
+    virtual Value* call(LgsCodeGen& cg, const std::vector<LgsVarDec>& args);
     Value* callIR(LgsCodeGen& cg, const std::vector<Value*>& args = {});
-    Value* callExternal(LgsCodeGen& cg, const std::vector<LgsFuncArg>& args);
+    Value* callExternal(LgsCodeGen& cg, const std::vector<LgsVarDec>& args);
     void initFunc(const std::string& name, LgsType* rt, const std::vector<LgsParam>& params, uint32_t ops);
     void setDebugValue(LgsCodeGen& cg) override;
     void hashNode(size_t& oldHash) override;
     void inferRetType() const;
-    LgsFunc* clone() override;
+    LgsFunc* clone() const override;
     ~LgsFunc() override;
 };

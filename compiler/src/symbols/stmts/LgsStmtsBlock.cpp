@@ -56,7 +56,7 @@ void LgsStmtsBlock::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }
 
-LgsStmtsBlock* LgsStmtsBlock::clone() {
+LgsStmtsBlock* LgsStmtsBlock::clone() const {
     const auto newStmtBlock = new LgsStmtsBlock();
     for (const auto& stmtWrapper : stmts) {
         switch (stmtWrapper.wrapperType) {

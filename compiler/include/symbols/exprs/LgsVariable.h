@@ -17,5 +17,5 @@ public:
     LgsExpr* cast(LgsType* toType, bool explicitly) override;
     std::string asText() override;
     void setDebugValue(LgsCodeGen& cg) override;
-    LgsVariable* clone() override;
+    LgsVariable* clone() const override;
 };

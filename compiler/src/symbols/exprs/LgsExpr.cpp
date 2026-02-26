@@ -330,7 +330,7 @@ LgsNullableExpr* LgsExpr::asNullableExpr() {
     return dynamic_cast<LgsNullableExpr*>(this);
 }
 
-LgsExpr* LgsExpr::clone() {
+LgsExpr* LgsExpr::clone() const {
     assert(0);
 }
 

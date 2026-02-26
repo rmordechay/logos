@@ -14,6 +14,6 @@ void LgsMetaVar::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }
 
-LgsExpr* LgsMetaVar::clone() {
+LgsExpr* LgsMetaVar::clone() const {
     return new LgsMetaVar(*this);
 }

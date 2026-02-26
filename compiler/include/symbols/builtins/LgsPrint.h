@@ -15,5 +15,5 @@ public:
     static constexpr auto name = "print";
 
     explicit LgsPrint(): LgsFunc(name, &LGS_VOID, {LgsParam(&LGS_ANY, "", new LgsStrConst("\n"))}, PUBLIC | BUILTIN | HAS_DEFAULTS) {}
-    Value* call(LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) override;
+    Value* call(LgsCodeGen& cg, const std::vector<LgsVarDec>& args) override;
 };

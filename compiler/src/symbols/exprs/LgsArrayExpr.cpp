@@ -64,7 +64,7 @@ std::string LgsArrayExpr::asText() {
     return "[" + elements.front()->asText() + "...]";
 }
 
-LgsExpr* LgsArrayExpr::clone() {
+LgsExpr* LgsArrayExpr::clone() const {
     const auto newArr = new LgsArrayExpr(*this);
     newArr->elements.clear();
     for (const auto element : elements) {

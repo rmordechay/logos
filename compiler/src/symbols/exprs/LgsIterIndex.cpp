@@ -73,7 +73,7 @@ void LgsIterIndex::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }
 
-LgsExpr* LgsIterIndex::clone() {
+LgsExpr* LgsIterIndex::clone() const {
     const auto newIterIndex = new LgsIterIndex(baseExpr->clone());
     newIterIndex->index.from = index.from->clone();
     if (index.to) {

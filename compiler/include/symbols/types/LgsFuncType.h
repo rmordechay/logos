@@ -31,6 +31,7 @@ public:
     LgsType* rt = nullptr;
     std::vector<LgsParam> params;
     FunctionType* IRType = nullptr;
+    std::vector<LgsTypeParam*> typeParams;
     bool isPublic = false;
     bool isBuiltin = false;
     bool isVirtual = false;
@@ -59,6 +60,7 @@ public:
     std::string fmtStr() const override;
     bool canCastTo(LgsType* other) override;
     bool equals(LgsType* other) override;
+    bool hasTypeParams() override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     void setFuncOptions(uint32_t ops);
     std::unordered_map<std::string, LgsParam*> getParamsByName();

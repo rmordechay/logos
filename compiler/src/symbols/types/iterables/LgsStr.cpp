@@ -28,8 +28,6 @@
 #include "types/iterables/LgsIterable.h"
 #include "types/iterables/LgsStr.h"
 
-#include "LgsConfigs.h"
-
 Type* LgsStr::getIRType(LgsCodeGen& cg) {
     return getStrStruct(cg);
 }

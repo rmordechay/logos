@@ -26,6 +26,6 @@ public:
     void setType(LgsType* newType) override;
     void setDebugValue(LgsCodeGen& cg) override;
     std::string asText() override;
-    LgsExpr* clone() override;
+    LgsExpr* clone() const override;
     ~LgsArrayExpr() override;
 };

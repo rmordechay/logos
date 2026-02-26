@@ -34,7 +34,6 @@
 #include "LgsConfigs.h"
 #include "LgsBinaryTokens.h"
 #include "LgsRTTIndices.h"
-#include "Lgs_Exprs.h"
 #include "errors/LgsErrors.h"
 #include "types/LgsFieldType.h"
 #include "types/iterables/LgsVariadic.h"
@@ -77,7 +76,7 @@ LgsFunc* LgsObject::getMetaFunc(const std::string& methodName) {
     if (methods.contains(methodName)) return methods[methodName];
     if (methodName == OBJ_HASH_FUNC) {
         const auto func = new LgsFunc(methodName, &LGS_SIZE);
-        func->fn = [&](LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) {
+        func->fn = [&](LgsCodeGen& cg, const std::vector<LgsVarDec>& args) {
             return hashValue(cg, args[0].expr->IRValue);
         };
         metaFuncs[methodName] = func;
@@ -88,7 +87,7 @@ LgsFunc* LgsObject::getMetaFunc(const std::string& methodName) {
         param.isVariadic = true;
         const auto rt = new LgsFuncType("", &LGS_ANY, {param}, VARIADIC);
         const auto func = new LgsFunc(methodName, rt, {new LgsStr()});
-        func->fn = [](LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) {
+        func->fn = [](LgsCodeGen& cg, const std::vector<LgsVarDec>& args) {
             const auto objArg = args[0].expr;
             const auto methodNameArg = args[1].expr;
             const auto funcName = methodNameArg->type->asStr()->loadIRData(cg, methodNameArg->IRValue);
@@ -100,7 +99,7 @@ LgsFunc* LgsObject::getMetaFunc(const std::string& methodName) {
     }
     if (methodName == OBJ_GET_FIELD_FUNC) {
         const auto func = new LgsFunc(methodName, new LgsFieldType(), {new LgsStr()});
-        func->fn = [&](LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) {
+        func->fn = [&](LgsCodeGen& cg, const std::vector<LgsVarDec>& args) {
             const auto self = args[0].expr;
             const auto fieldNameStr = args[1].expr;
             const auto fieldName = fieldNameStr->type->asStr()->loadIRData(cg, fieldNameStr->IRValue);
@@ -111,7 +110,7 @@ LgsFunc* LgsObject::getMetaFunc(const std::string& methodName) {
     }
     if (methodName == OBJ_SET_FIELD_FUNC) {
         const auto func = new LgsFunc(methodName, &LGS_BOOL, {new LgsStr(), &LGS_ANY});
-        func->fn = [&](LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) {
+        func->fn = [&](LgsCodeGen& cg, const std::vector<LgsVarDec>& args) {
             const auto self = args[0].expr;
             const auto fieldNameStr = args[1].expr;
             const auto value = args[2].expr;
@@ -125,7 +124,7 @@ LgsFunc* LgsObject::getMetaFunc(const std::string& methodName) {
     }
     if (methodName == OBJ_AS_JSON) {
         const auto func = new LgsFunc(methodName, new LgsStr());
-        func->fn = [&](LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) {
+        func->fn = [&](LgsCodeGen& cg, const std::vector<LgsVarDec>& args) {
             const auto str = LgsStr::getEmptyIRStr(cg, cg.usize(LGS_STR_BUFFER_SIZE));
             cg.builder.CreateCall(getJSONFunc(cg), {args.front().expr->IRValue, str});
             return str;
@@ -178,6 +177,10 @@ bool LgsObject::canCastTo(LgsType* other) {
         return false;
     }
     return name == otherType->getName();
+}
+
+bool LgsObject::hasTypeParams() {
+    return !typeParams.empty();
 }
 
 void LgsObject::hashNode(size_t& oldHash) {
@@ -348,6 +351,21 @@ Function* LgsObject::getJSONFunc(LgsCodeGen& cg) {
     cg.createRet();
     cg.restoreFuncState();
     return func;
+}
+
+LgsType* LgsObject::clone() {
+    const auto cloned = new LgsObject(*this);
+    cloned->fields.clear();
+    for (const auto field : fields) {
+        const auto clonedField = new LgsField(*field);
+        if (field->expr) clonedField->expr = clonedField->expr->clone();
+        cloned->fields.push_back(clonedField);
+    }
+    cloned->methods.clear();
+    for (const auto& [_, method] : methods) {
+        cloned->addMethod(method->clone());
+    }
+    return cloned;
 }
 
 Function* LgsObject::getSetFieldFunc(LgsCodeGen& cg) {

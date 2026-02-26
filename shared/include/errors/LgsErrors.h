@@ -65,7 +65,7 @@ inline LgsBaseMsg E10050{"Only integer values can be incremented (++) or decreme
 inline LgsBaseMsg E10051{"%s is not mutable.", errCodeStart++};
 inline LgsBaseMsg E10052{"Spread operator in %s... must only be used with iterables. Given type: %s.", errCodeStart++};
 inline LgsBaseMsg E10053{"'%s' is a Logos global name and cannot be redefined.", errCodeStart++};
-inline LgsBaseMsg E10054{"Field %s is set more than one time.", errCodeStart++};
+inline LgsBaseMsg E10054{"%s is set more than one time.", errCodeStart++};
 inline LgsBaseMsg E10055{"Function %s must return from all its paths.", errCodeStart++};
 inline LgsBaseMsg E10056{"%s has multiple fields with the same name %s.", errCodeStart++};
 inline LgsBaseMsg E10057{"Pattern matching expression %s must be of type Bool.", errCodeStart++};
@@ -131,3 +131,4 @@ inline LgsBaseMsg E10116{"Could not replace generic type %s with actual type.", 
 inline LgsBaseMsg E10117{"Function call cannot be assigned to a value.", errCodeStart++};
 inline LgsBaseMsg E10118{"Enum fields must all have a value or none.", errCodeStart++};
 inline LgsBaseMsg E10119{"Function '%s' has no generics.", errCodeStart++};
+inline LgsBaseMsg E10120{"Object '%s' has no generics.", errCodeStart++};

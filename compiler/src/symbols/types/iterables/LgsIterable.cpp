@@ -32,7 +32,7 @@ LgsFunc* LgsIterable::getMethod(const std::string& methodName) {
     constexpr auto flags = BUILTIN | PUBLIC | METHOD;
     if (methodName == LEN_FUNC) {
         const auto func = new LgsFunc(methodName, getBaseName(), &LGS_SIZE, {this}, flags);
-        func->fn = [this](LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) {
+        func->fn = [this](LgsCodeGen& cg, const std::vector<LgsVarDec>& args) {
             return lenIR(cg, args.front().expr->IRValue);
         };
         addMethod(func);
@@ -40,7 +40,7 @@ LgsFunc* LgsIterable::getMethod(const std::string& methodName) {
     }
     if (methodName == IS_EMPTY_FUNC) {
         const auto func = new LgsFunc(methodName, getBaseName(), &LGS_BOOL, {this}, flags);
-        func->fn = [this](LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) {
+        func->fn = [this](LgsCodeGen& cg, const std::vector<LgsVarDec>& args) {
             return cg.builder.CreateICmpEQ(lenIR(cg, args.front().expr->IRValue), cg.zeroSize());
         };
         addMethod(func);
@@ -48,7 +48,7 @@ LgsFunc* LgsIterable::getMethod(const std::string& methodName) {
     }
     if (methodName == NOT_EMPTY_FUNC) {
         const auto func = new LgsFunc(methodName, getBaseName(), &LGS_BOOL, {this}, flags);
-        func->fn = [this](LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) {
+        func->fn = [this](LgsCodeGen& cg, const std::vector<LgsVarDec>& args) {
             return cg.builder.CreateICmpSGT(lenIR(cg, args.front().expr->IRValue), cg.zeroSize());
         };
         addMethod(func);
@@ -56,8 +56,8 @@ LgsFunc* LgsIterable::getMethod(const std::string& methodName) {
     }
     if (methodName == MAP_FUNC) {
         // map<T, U>(arr: T[], cb: (T): U): U[]
-        const auto U = new LgsTypeParam("T");
-        const auto T = new LgsTypeParam("U");
+        const auto T = new LgsTypeParam("T");
+        const auto U = new LgsTypeParam("U");
         const auto callback = new LgsFuncType("cb", U, {LgsParam(T)});
         const auto func = new LgsFunc(methodName, getBaseName(), new LgsDArray(U), {new LgsDArray(T), callback}, flags);
         func->funcType->typeParams.push_back(T);
@@ -68,16 +68,16 @@ LgsFunc* LgsIterable::getMethod(const std::string& methodName) {
         return func;
     }
     if (methodName == FILTER_FUNC) {
-        const auto generic = new LgsTypeParam("T"); // T is baseType
+        const auto T = new LgsTypeParam("T");
         const auto callback = new LgsFuncType("cb", &LGS_BOOL, {LgsParam(baseType)});
         const auto func = new LgsFunc(methodName, getBaseName(), new LgsDArray(baseType), {this, callback}, flags);
-        func->funcType->typeParams.push_back(generic);
-        callback->typeParams.push_back(generic);
+        func->funcType->typeParams.push_back(T);
+        callback->typeParams.push_back(T);
         addMethod(func);
         return func;
     }
     if (methodName == FOREACH_FUNC) {
-        const auto generic = new LgsTypeParam("T"); // T is baseType
+        const auto generic = new LgsTypeParam("T");
         const auto callback = new LgsFuncType("cb", &LGS_VOID, {LgsParam(baseType)});
         const auto func = new LgsFunc(methodName, &LGS_VOID, {this, callback}, flags);
         func->funcType->typeParams.push_back(generic);
@@ -128,6 +128,10 @@ size_t LgsIterable::getDims() const {
         }
     }
     return dims;
+}
+
+bool LgsIterable::hasTypeParams() {
+    return baseType && baseType->hasTypeParams();
 }
 
 std::optional<size_t> LgsIterable::getConstLength() {

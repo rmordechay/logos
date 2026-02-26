@@ -1,7 +1,6 @@
 #pragma once
 #include <string>
 
-#include "LgsConfigs.h"
 #include "LgsIterable.h"
 #include "types/primitives/LgsChar.h"
 #include "LgsValue.h"

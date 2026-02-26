@@ -16,7 +16,7 @@ public:
 
     explicit LgsReturn(LgsExpr* expr) : expr(expr) {}
     void setDebugValue(LgsCodeGen& cg) override;
-    LgsStmt* clone() override;
+    LgsStmt* clone() const override;
     ~LgsReturn() override;
 };
 

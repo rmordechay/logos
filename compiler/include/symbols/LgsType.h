@@ -67,7 +67,6 @@ public:
     LgsLocation location;
     std::vector<LgsField*> fields;
     std::unordered_map<std::string, LgsFunc*> methods;
-    std::vector<LgsTypeParam*> typeParams;
     std::vector<LgsType*> genericArgs;
     Lgs_TypeKind rttKind = RTT_UNKNOWN;
     bool isInt = false;
@@ -95,6 +94,7 @@ public:
     virtual std::string getName() = 0;
     virtual std::string getBaseName();
     virtual std::string pname(); // pretty name
+    virtual bool hasTypeParams();
     virtual size_t sizeBytes() = 0;
     virtual LgsExpr* getZeroValue() = 0;
     virtual std::string fmtStr() const = 0;
@@ -109,6 +109,7 @@ public:
     virtual Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level);
     virtual Value* hashValue(LgsCodeGen& cg, Value* value);
     virtual DIType* getDebugType(LgsCodeGen& cg) = 0;
+    virtual LgsType* clone();
 
     virtual Value* addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr);
     virtual Value* subIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr);

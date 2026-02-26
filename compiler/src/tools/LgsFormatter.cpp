@@ -331,10 +331,10 @@ void LgsFormatter::formatInstance(LgsInstance* instance) {
     insert(instance->name);
     insert("{");
     auto isFirst = true;
-    for (auto [name, arg] : instance->args) {
+    for (auto arg : instance->args) {
         if (!isFirst) insert(", ");
         isFirst = false;
-        insert(name + "=");
+        insert(arg.name + "=");
         formatExpr(arg.expr);
     }
     insert("}");

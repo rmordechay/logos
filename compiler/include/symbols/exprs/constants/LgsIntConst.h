@@ -14,7 +14,7 @@ public:
         isMutable = false;
     }
     LgsExpr* cast(LgsType* toType, bool explicitly) override;
-    LgsIntConst* clone() override;
+    LgsIntConst* clone() const override;
     std::string asText() override;
     bool equals(LgsExpr* other) override;
     void hashNode(size_t& oldHash) override;

@@ -44,23 +44,9 @@ void LgsVarDec::hashNode(size_t& oldHash) {
     if (expr) expr->hashNode(oldHash);
 }
 
-LgsStmt* LgsVarDec::clone() {
+LgsStmt* LgsVarDec::clone() const {
     const auto newLgsVarDec = new LgsVarDec(*this);
     if (expr) newLgsVarDec->expr = expr->clone();
+    if (type) newLgsVarDec->type = type->clone();
     return newLgsVarDec;
-}
-
-LgsVarDec::~LgsVarDec() {
-    if (expr) {
-        if (type && expr->type && type == expr->type) {
-            freeExpr(expr);
-        } else {
-            freeType(type);
-            freeExpr(expr);
-        }
-    } else {
-        freeType(type);
-    }
-    setType(nullptr);
-    expr = nullptr;
 }

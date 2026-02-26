@@ -172,3 +172,7 @@ Value* LgsInt::lshiftIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
 DIType* LgsInt::getDebugType(LgsCodeGen& cg) {
     return cg.debugger.diBuilder->createBasicType(name, 32, dwarf::DW_ATE_signed);
 }
+
+LgsInt* LgsInt::clone() {
+    return this;
+}

@@ -101,7 +101,6 @@ namespace llvm {
 class BasicBlock;
 class Type;
 }
-std::atomic<size_t> lambdasIDGenerator{0};
 
 bool LgsCgFile::generateSrcFile(LgsFile* file, const LgsPaths& paths) {
     visitExternalSymbols(file);
@@ -131,9 +130,6 @@ void LgsCgFile::visitMainFile(LgsMainFile* mainFile) {
         if (object->isSingleton) continue;
         visitObject(object);
     }
-    for (const auto enum_ : mainFile->enums) {
-        visitEnum(enum_);
-    }
     for (const auto& [name, func] : mainFile->funcs) {
         if (const auto mainFunc = dynamic_cast<LgsMainFunc*>(func)) {
             visitMainFunc(mainFunc);
@@ -162,15 +158,7 @@ void LgsCgFile::visitTestFile(const LgsTestFile* testFile) {
 void LgsCgFile::visitObject(LgsObject* obj) {
     if (!obj->typeParams.empty()) return;
     for (const auto& [_, method] : obj->methods) {
-        if (method->isLambda) visitLambda(method);
-        else visitFunc(method);
-    }
-}
-
-void LgsCgFile::visitEnum(const LgsEnum* enum_) {
-    for (const auto field : enum_->fields) {
-        if (!field->expr) continue;
-        // visitExpr(field->expr);
+        visitFunc(method);
     }
 }
 
@@ -537,7 +525,7 @@ void LgsCgFile::visitCoroutine(const LgsCoroutine* coroutine) {
 void LgsCgFile::visitDeferStmt(const LgsDeferStmt* defer) {
     const auto fc = defer->getAsFuncCall();
     if (fc->func->isLambda) {
-        visitLambda(fc->func);
+        visitFunc(fc->func);
     }
     visitExpr(defer->expr);
     const auto ctxTy = getThunkCtxType(fc);
@@ -565,7 +553,7 @@ void LgsCgFile::visitExpr(LgsExpr* expr, const bool assign) {
     } else if (const auto binaryExpr = dynamic_cast<LgsBinaryExpr*>(expr)) {
         visitBinaryExpr(binaryExpr, assign);
     } else {
-        if (const auto func = expr->asFunc()) visitLambda(func);
+        if (const auto func = expr->asFunc()) visitFunc(func);
         else if (const auto charConst = expr->asCharConst()) visitCharConst(charConst);
         else if (const auto strConst = expr->asStrConst()) visitStrConst(strConst);
         else if (const auto intConst = expr->asIntConst()) visitIntConst(intConst);
@@ -645,13 +633,14 @@ void LgsCgFile::visitInstance(LgsInstance* instance) {
     instance->IRValue = obj->getIRZeroValue(cg, instance->pointee, level);
     // Args
     std::unordered_set<std::string> visited;
-    for (const auto& [argName, arg] : instance->args) {
-        visited.insert(argName);
-        if (obj->getMethod(argName)) {
+    for (const auto& arg : instance->args) {
+        const auto name = arg.name;
+        visited.insert(name);
+        if (obj->getMethod(name)) {
             visitExpr(arg.expr);
             continue;
         }
-        const auto field = instance->getField(argName);
+        const auto field = obj->getField(name);
         if (!field) continue;
         arg.expr->pointee = field->getGEP(cg, instance->IRValue);
         visitExpr(arg.expr);
@@ -848,8 +837,8 @@ void LgsCgFile::visitSelection(LgsSelection* selection, const bool assign) {
         const auto child = selection->exprs[i + 1];
         if (const auto var = child->asVariable()) {
             visitFieldSelection(var, parent);
-            if (var->type->passByRef && (!assign || i < iterationCount - 1)) {
-                var->IRValue = cg.loadPtr(var->IRValue);
+            if (!assign || i != iterationCount - 1) {
+                var->IRValue = var->loadIRPtr(cg);
             }
         } else if (const auto methodCall = child->asFuncCall()) {
             visitFuncCall(methodCall);
@@ -948,9 +937,9 @@ void LgsCgFile::visitMetaSelection(LgsMetaSelection* metaSelection) {
 }
 
 void LgsCgFile::visitFuncCall(LgsFuncCall* funcCall) {
-    if (funcCall->isMock) return;;
+    if (funcCall->isMock) return;
     for (const auto& arg : funcCall->args) {
-        if (arg.isSelf) continue;
+        if (arg.name == LGS_SELF) continue;
         visitExpr(arg.expr);
     }
 
@@ -1127,16 +1116,15 @@ void LgsCgFile::visitCast(LgsCast* cast) {
     cast->IRValue = cast->value->IRValue;
 }
 
-void LgsCgFile::visitLambda(LgsFunc* lambda) {
-    lambda->IRValue = lambda->getIRFunc(cg);
-    visitFunc(lambda);
-}
-
 void LgsCgFile::createPrologue(LgsFunc* func) {
     if (appConfigs->debugMode) func->setDebugValue(cg);
     func->epilogue = cg.createBlock("epilogue");
     const auto ft = func->funcType;
-    cg.startFunc(func->getIRFunc(cg), ft->name == LGS_MAIN_FUNC);
+    const auto IRFunc = func->getIRFunc(cg);
+    if (func->isLambda) {
+        func->IRValue = IRFunc;
+    }
+    cg.startFunc(IRFunc, ft->name == LGS_MAIN_FUNC);
     if (func->isTest) for (auto [_, then] : func->mocks) visitExpr(then);
     if (ft->isVariadic) {
         ft->params.back().IRValue = cg.builder.CreateAlloca(cg.ptrTy(), nullptr, "va_list");

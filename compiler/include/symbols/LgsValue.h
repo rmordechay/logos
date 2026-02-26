@@ -71,7 +71,7 @@ public:
     virtual void setType(LgsType* newType);
     virtual void hashNode(size_t& oldHash);
     virtual void setDebugValue(LgsCodeGen& cg) = 0;
-    virtual LgsValue* clone();
+    virtual LgsValue* clone() const;
     void setDebugLoc(LgsCodeGen& cg) const;
     virtual ~LgsValue() = default;
 };

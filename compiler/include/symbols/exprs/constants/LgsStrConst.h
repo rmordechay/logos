@@ -21,6 +21,6 @@ public:
     void hashNode(size_t& oldHash) override;
     bool equals(LgsExpr* other) override;
     void setDebugValue(LgsCodeGen& cg) override;
-    LgsExpr* clone() override;
+    LgsExpr* clone() const override;
     ~LgsStrConst() override;
 };

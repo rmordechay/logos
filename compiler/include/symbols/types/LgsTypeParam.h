@@ -16,4 +16,6 @@ public:
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     std::string fmtStr() const override;
     DIType* getDebugType(LgsCodeGen& cg) override;
+    LgsTypeParam* clone() override;
+    ~LgsTypeParam() override;
 };

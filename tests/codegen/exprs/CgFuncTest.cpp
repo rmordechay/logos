@@ -66,17 +66,24 @@ TEST(CgFuncTest, Test4) {
     const auto code = R"(
     main() {
         arr = [1, 2, 3]
-        print(arr.map({ it + 5 }))
-        print(arr.filter({ it < 5 }))
-        print(arr.map({ it + 5 }).filter({ it > 6 }))
-        arr.forEach({ print(it) })
+        print(arr.map<Int, Int>(x => x + 5))
+        print(arr.map((x: Int): Int => { x + 5 }))
+        print(arr.filter((x: Int): Bool => { x > 1 }))
+        print(arr.map((x: Int): Int => { x + 5 }).filter((x: Int): Bool => { x > 6 }))
+        print(arr.filter((x: Int): Bool => { x > 1 }).map((x: Int): Int => { x + 5 }))
+        //print(arr.map({ it + 5 }))
+        //print(arr.filter({ it < 5 }))
+        //print(arr.map({ it + 5 }).filter({ it > 6 }))
+        //arr.forEach({ print(it) })
     }
     )";
-    // std::istringstream stream(runLgsApp(code));
-    // const auto lines = getLines(stream, 6);
-    // EXPECT_EQ(lines[0], "[6, 7, 8]");
-    // EXPECT_EQ(lines[1], "[1, 2, 3]");
-    // EXPECT_EQ(lines[2], "[7, 8]");
+    std::istringstream stream(runLgsApp(code));
+    const auto lines = getLines(stream, 5);
+    EXPECT_EQ(lines[0], "[6, 7, 8]");
+    EXPECT_EQ(lines[1], "[6, 7, 8]");
+    EXPECT_EQ(lines[2], "[2, 3]");
+    EXPECT_EQ(lines[3], "[7, 8]");
+    EXPECT_EQ(lines[4], "[7, 8]");
     // EXPECT_EQ(lines[3], "1");
     // EXPECT_EQ(lines[4], "2");
     // EXPECT_EQ(lines[5], "3");

@@ -105,14 +105,14 @@ void LgsNullable::asIRText(LgsStrBuilder& sb, Value* value) {
     if (passByRef) {
         cg.ifElseStmt(
             cg.isNull(value),
-            [&]{sb.add(LGS_NULL_LITERAL);},
-            [&]{baseType->asIRText(sb, value);}
+            [&](BasicBlock*){sb.add(LGS_NULL_LITERAL);},
+            [&](BasicBlock*){baseType->asIRText(sb, value);}
         );
     } else {
         cg.ifElseStmt(
             loadIsSet(cg, value),
-            [&]{baseType->asIRText(sb, loadValue(cg, value));},
-            [&]{sb.add(LGS_NULL_LITERAL);}
+            [&](BasicBlock*){baseType->asIRText(sb, loadValue(cg, value));},
+            [&](BasicBlock*){sb.add(LGS_NULL_LITERAL);}
         );
     }
 }
@@ -138,6 +138,15 @@ Value* LgsNullable::addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
 }
 
 Value* LgsNullable::hashValue(LgsCodeGen& cg, Value* value) {
+    if (passByRef) {
+        const auto phi = cg.builder.CreatePHI(cg.sizeTy(), 2);
+        auto ifTrue = [&](BasicBlock* block) {phi->addIncoming(cg.zeroSize(), block);};
+        auto ifFalse = [&](BasicBlock* block) {phi->addIncoming(baseType->hashValue(cg, value), block);};
+        cg.ifElseStmt(cg.isNull(value), ifTrue, ifFalse);
+        return phi;
+    } else {
+
+    }
     assert(0);
 }
 

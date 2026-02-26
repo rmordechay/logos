@@ -48,9 +48,7 @@
 #include "logos/LgsAppCache.h"
 #include "logos/LgsAppConfigs.h"
 #include "stmts/LgsVarDec.h"
-#include "types/LgsFuncType.h"
 #include "types/LgsObject.h"
-#include "types/iterables/LgsIterable.h"
 #include "types/iterables/LgsMap.h"
 
 inline ThreadPool threadPool;
@@ -477,8 +475,17 @@ bool LgsApp::generateGenerics() {
             assert(0);
         }
     }
-    for (auto [_, genericFunc] : genericFuncs) {
-        cgFile.visitFunc(genericFunc);
+    for (auto [_, func] : genericFuncs) {
+        const auto isBuiltin = func->funcType->isBuiltin;
+        if (isBuiltin && func->funcType->name == MAP_FUNC) {
+            cgFile.getMapFunc(func->funcType);
+        } else if (isBuiltin && func->funcType->name == FILTER_FUNC) {
+            cgFile.getFilterFunc(func->funcType);
+        } else if (isBuiltin && func->funcType->name == FOREACH_FUNC) {
+            cgFile.getForeachFunc(func->funcType);
+        } else {
+            cgFile.visitFunc(func);
+        }
     }
     genericFiles.push_back(genericsFile);
 

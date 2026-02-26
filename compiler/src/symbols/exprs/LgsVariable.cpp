@@ -54,7 +54,7 @@ void LgsVariable::setDebugValue(LgsCodeGen& cg) {
     );
 }
 
-LgsVariable* LgsVariable::clone() {
+LgsVariable* LgsVariable::clone() const {
     const auto newVar = new LgsVariable(*this);
     newVar->setType(type);
     return newVar;

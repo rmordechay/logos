@@ -4,23 +4,17 @@
 
 #include "LgsSymbol.h"
 #include "exprs/LgsExpr.h"
+#include "stmts/LgsVarDec.h"
 
 class LgsFuncType;
 struct LgsSymbol;
 class LgsFunc;
 class LgsType;
 
-struct LgsFuncArg {
-    std::string name = "";
-    LgsExpr* expr = nullptr;
-    bool isSelf = false;
-    explicit LgsFuncArg(LgsExpr* expr, const std::string& name = "", const bool isSelf = false) : name(name), expr(expr), isSelf(isSelf) {}
-};
-
 class LgsFuncCall final : public LgsExpr {
 public:
     std::string name;
-    std::vector<LgsFuncArg> args;
+    std::vector<LgsVarDec> args;
     std::vector<LgsType*> typeArgs;
     LgsFunc* func = nullptr;
     LgsFunc* coroutine = nullptr;
@@ -34,7 +28,8 @@ public:
     bool equals(LgsExpr* other) override;
     bool equals(LgsFuncType* funcType) const;
     std::string asText() override;
+    std::string mangleName() const;
     void setDebugValue(LgsCodeGen& cg) override;
-    LgsFuncCall* clone() override;
+    LgsFuncCall* clone() const override;
     ~LgsFuncCall() override;
 };

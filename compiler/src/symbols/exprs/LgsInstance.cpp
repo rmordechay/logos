@@ -4,24 +4,17 @@
 #include <llvm/IR/Constants.h>
 #include <llvm/IR/DerivedTypes.h>
 #include <llvm/IR/IRBuilder.h>
-#include <utility>
 
 #include "LgsRTTIndices.h"
 #include "stmts/LgsField.h"
 #include "LgsUtils.h"
 #include "codegen/LgsCodeGen.h"
 #include "LgsType.h"
+#include "stmts/LgsVarDec.h"
 
 namespace llvm {
 class Type;
 class Value;
-}
-
-LgsField* LgsInstance::getField(const std::string& fieldName) const {
-    for (auto* f : obj->fields) {
-        if (f->name == fieldName) return f;
-    }
-    return nullptr;
 }
 
 void LgsInstance::setType(LgsType* newObj) {
@@ -31,8 +24,8 @@ void LgsInstance::setType(LgsType* newObj) {
 
 void LgsInstance::hashNode(size_t& oldHash) {
     hashNodeString(oldHash, name);
-    for (auto [argName, arg] : args) {
-        hashNodeString(oldHash, argName);
+    for (auto& arg : args) {
+        hashNodeString(oldHash, arg.name);
         arg.expr->hashNode(oldHash);
     }
 }
@@ -60,7 +53,7 @@ Value* LgsInstance::loadRTType(LgsCodeGen& cg, Type* ty, Value* ptr) {
 }
 
 LgsInstance::~LgsInstance() {
-    for (const auto& [_, arg] : args) {
+    for (const auto& arg : args) {
         freeExpr(arg.expr);
     }
     args.clear();

@@ -36,6 +36,7 @@ public:
     LgsType* getNestedBaseType() const;
     void setNestedBaseType(LgsType* newBaseType);
     size_t getDims() const;
+    bool hasTypeParams() override;
     virtual LgsType* getIndexType();
     virtual LgsType* getValueType();
     virtual std::optional<size_t> getConstLength();

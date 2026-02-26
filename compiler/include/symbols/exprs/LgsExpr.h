@@ -94,7 +94,7 @@ public:
     LgsMetaVar* asMetaVar();
     LgsMetaSelection* asMetaSelection();
     LgsNullableExpr* asNullableExpr();
-    LgsExpr* clone() override;
+    LgsExpr* clone() const override;
     ~LgsExpr() override = default;
 };
 

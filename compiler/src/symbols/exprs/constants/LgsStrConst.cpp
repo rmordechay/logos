@@ -22,7 +22,7 @@ void LgsStrConst::setDebugValue(LgsCodeGen& cg) {
     setDebugLoc(cg);
 }
 
-LgsExpr* LgsStrConst::clone() {
+LgsExpr* LgsStrConst::clone() const {
     const auto newStrConst = new LgsStrConst(*this);
     if (!parts.empty()) {
         newStrConst->parts.clear();

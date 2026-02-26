@@ -2,6 +2,7 @@
 
 #include <__ostream/basic_ostream.h>
 #include <assert.h>
+#include <ostream>
 #include <sstream>
 
 #include "LgsDefinitions.h"
@@ -99,6 +100,10 @@ bool LgsFuncType::equals(LgsType* other) {
         if (!param1->equals(param2.type)) return false;
     }
     return true;
+}
+
+bool LgsFuncType::hasTypeParams() {
+    return !typeParams.empty();
 }
 
 LgsType* LgsFuncType::applyBinOp(LgsType* rightType, LgsBinOp& op) {

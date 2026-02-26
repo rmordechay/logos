@@ -11,7 +11,7 @@ LgsExpr* LgsIntConst::cast(LgsType* toType, const bool explicitly) {
     return this;
 }
 
-LgsIntConst* LgsIntConst::clone() {
+LgsIntConst* LgsIntConst::clone() const {
     return new LgsIntConst(type, value);
 }
 

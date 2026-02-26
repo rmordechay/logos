@@ -6,7 +6,7 @@ void LgsReturn::setDebugValue(LgsCodeGen& cg) {
     setDebugLoc(cg);
 }
 
-LgsStmt* LgsReturn::clone() {
+LgsStmt* LgsReturn::clone() const {
     return new LgsReturn(expr->clone());
 }
 

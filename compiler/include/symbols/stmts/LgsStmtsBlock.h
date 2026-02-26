@@ -35,6 +35,6 @@ public:
     LgsFunc* wrapBlockInFunc();
     void hashNode(size_t& oldHash) override;
     void setDebugValue(LgsCodeGen& cg) override;
-    LgsStmtsBlock* clone() override;
+    LgsStmtsBlock* clone() const override;
     ~LgsStmtsBlock() override;
 };

@@ -290,9 +290,6 @@ LgsObject* LgsParser::parseObject(const bool withParen) {
         globals.addSymbol(LgsSymbol(varDec), &errHandler, filePath);
     }
 
-    if (!headersOnly && currentToken.type != T_EOF && currentToken.type != T_RBRACE) {
-        assert(0);
-    }
     setLocation(obj->location, &nameToken, &currentToken);
     if (withParen) mustMatch(T_RBRACE);
     return obj;
@@ -1380,7 +1377,7 @@ LgsInstance* LgsParser::parseInstance() {
     }
     const auto instance = new LgsInstance(tokenName.lexeme);
     instance->setType(new LgsUnknown(instance->name));
-    instance->genericArgs = generics;
+    instance->typeArgs = generics;
     parseArgs(instance);
     mustMatch(T_RBRACE);
     setLocation(instance->location, &tokenName, &currentToken);
@@ -1418,11 +1415,11 @@ LgsFuncCall* LgsParser::parseFuncCall() {
                 addError(E10054, exprOrLambda->location, {argName});
                 break;
             }
-            funcCall->args.emplace_back(exprOrLambda, argName);
+            funcCall->args.emplace_back(argName, exprOrLambda);
         } else {
             const auto exprOrLambda = parseExpr();
             if (!exprOrLambda) break;
-            funcCall->args.emplace_back(exprOrLambda, argName);
+            funcCall->args.emplace_back(argName, exprOrLambda);
         }
         if (currentToken.type == T_RPAREN) break;
         mustMatch(T_COMMA);
@@ -1859,7 +1856,7 @@ void LgsParser::parseArgs(LgsInstance* instance) {
             addError(E10054, expr->location, {argName});
             break;
         }
-        instance->args.emplace(argName, LgsInstanceArg{argName, expr});
+        instance->args.emplace_back(argName, expr);
         if (currentToken.type == T_RBRACE) break;
         mustMatch(T_COMMA);
     }

@@ -35,15 +35,15 @@ void LgsForeachLoop::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }
 
-LgsStmt* LgsForeachLoop::clone() {
+LgsStmt* LgsForeachLoop::clone() const {
     const auto newLgsRangeLoop = new LgsForeachLoop(*this);
     if (iterExpr) newLgsRangeLoop->iterExpr = iterExpr->clone();
     if (stmtsBlock) newLgsRangeLoop->stmtsBlock = stmtsBlock->clone();
-    loopVars.clear();
+    newLgsRangeLoop->loopVars.clear();
     for (const auto var : loopVars) {
         newLgsRangeLoop->loopVars.push_back(var->clone()->asVarDec());
     }
-    metaVars.clear();
+    newLgsRangeLoop->metaVars.clear();
     for (const auto var : metaVars) {
         newLgsRangeLoop->metaVars[var.first] = var.second->clone()->asMetaVar();
     }

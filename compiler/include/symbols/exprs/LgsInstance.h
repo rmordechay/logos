@@ -1,5 +1,4 @@
 #pragma once
-#include <map>
 #include <string>
 #include <vector>
 
@@ -15,22 +14,15 @@ class Type;
 class Value;
 }
 
-struct LgsInstanceArg {
-    std::string name = "";
-    LgsExpr* expr = nullptr;
-    LgsInstanceArg(const std::string& name, LgsExpr* expr) : name(name), expr(expr) {}
-};
-
 class LgsInstance final : public LgsExpr {
 public:
     std::string name;
     LgsObject* obj = nullptr;
-    std::map<std::string, LgsInstanceArg> args;
-    std::vector<LgsType*> genericArgs;
+    std::vector<LgsVarDec> args;
+    std::vector<LgsType*> typeArgs;
 
     explicit LgsInstance(const std::string& name): name(name) {}
     explicit LgsInstance(LgsObject* obj) : LgsExpr(obj), name(obj->name), obj(obj) {}
-    LgsField* getField(const std::string& fieldName) const;
     void setType(LgsType* newObj) override;
     void hashNode(size_t& oldHash) override;
     bool equals(LgsExpr* other) override;

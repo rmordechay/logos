@@ -212,7 +212,7 @@ TEST(ErrorsTest, E10011D) {
         func<T>(y: T) {}
     }
     main() {
-        obj = Obj{x=23}
+        obj = Obj{}
     }
     )";
     LgsApp app;
@@ -828,6 +828,18 @@ TEST(ErrorsTest, E100115A) {
     expectErrors(app, E10115, 1);
 }
 
+TEST(ErrorsTest, E100115B) {
+    const auto code = R"(
+    object Obj<T> {}
+    main() {
+        obj = Obj<Int, Int>{}
+    }
+    )";
+    LgsApp app;
+    parseAndAnalyse(app, {code}, {LGS_MAIN_FILE});
+    expectErrors(app, E10115, 1);
+}
+
 TEST(ErrorsTest, E100117A) {
     const auto code = R"(
     object Obj {
@@ -867,4 +879,16 @@ TEST(ErrorsTest, E100119A) {
     LgsApp app;
     parseAndAnalyse(app, {code}, {LGS_MAIN_FILE});
     expectErrors(app, E10119, 1);
+}
+
+TEST(ErrorsTest, E100120A) {
+    const auto code = R"(
+    object Obj {}
+    main() {
+        obj = Obj<Int>{}
+    }
+    )";
+    LgsApp app;
+    parseAndAnalyse(app, {code}, {LGS_MAIN_FILE});
+    expectErrors(app, E10120, 1);
 }
