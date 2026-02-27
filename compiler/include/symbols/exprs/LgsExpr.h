@@ -66,7 +66,6 @@ public:
     Constant* hashConstValue(LgsCodeGen& cg);
 
     virtual LgsExpr* cast(LgsType* toType, bool explicitly);
-    virtual bool equals(LgsExpr* other);
     virtual std::string asText() = 0;
 
     LgsFunc* asFunc();

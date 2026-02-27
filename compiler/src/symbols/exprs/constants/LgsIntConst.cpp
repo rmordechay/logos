@@ -15,10 +15,6 @@ LgsIntConst* LgsIntConst::clone() const {
     return new LgsIntConst(type, value);
 }
 
-bool LgsIntConst::equals(LgsExpr* other) {
-    assert(0);
-}
-
 void LgsIntConst::hashNode(size_t& oldHash) {
     hashNodeInt(oldHash, value);
 }

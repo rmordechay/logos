@@ -9,12 +9,13 @@
 #include "funcs/LgsParam.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsFuncType.h"
+#include "types/iterables/LgsVariadic.h"
 
-bool argAndParamEqual(const LgsExpr* arg, const LgsParam* param);
+bool argAndParamEqual(LgsType* arg, LgsType* param);
 
 bool LgsFuncCall::equals(LgsFuncType* funcType) const {
     // Compare args and params size
-    const auto args2Size = args.size();
+    const auto argsSize = args.size();
     const auto paramsSize = funcType->params.size();
     size_t minArgs = 0;
     if (funcType->isVariadic) {
@@ -26,13 +27,13 @@ bool LgsFuncCall::equals(LgsFuncType* funcType) const {
     } else {
         minArgs = paramsSize;
     }
-    if (args2Size < minArgs) return false;
+    if (argsSize < minArgs) return false;
 
     // Names params
     if (isNamed) {
         auto paramsByName = funcType->getParamsByName();
-        for (size_t i = funcType->isMethod; i < args2Size; ++i) {
-            if (!argAndParamEqual(args[i].expr, paramsByName[args[i].name])) return false;
+        for (size_t i = funcType->isMethod; i < argsSize; ++i) {
+            if (!argAndParamEqual(args[i].expr->type, paramsByName[args[i].name]->type)) return false;
         }
         return true;
     }
@@ -40,23 +41,18 @@ bool LgsFuncCall::equals(LgsFuncType* funcType) const {
     // Positional params
     const auto checkUntil = funcType->isVariadic ? paramsSize - 1 : paramsSize;
     for (size_t i = funcType->isMethod; i < checkUntil; ++i) {
-        if (i >= args2Size) continue;
-        if (!argAndParamEqual(args[i].expr, &funcType->params[i])) return false;
+        if (i >= argsSize) continue;
+        if (!argAndParamEqual(args[i].expr->type, funcType->params[i].type)) return false;
     }
 
-    // Remaining variadic args2
+    // Remaining variadic args
     if (funcType->isVariadic && !funcType->isExternal) {
-        for (size_t i = paramsSize; i < args2Size; ++i) {
-            if (!argAndParamEqual(args[i].expr, &funcType->params.back())) return false;
+        const auto variadicParam = funcType->params.back().type->asVariadic();
+        for (size_t i = paramsSize; i < argsSize; ++i) {
+            if (!argAndParamEqual(args[i].expr->type, variadicParam->baseType)) return false;
         }
     }
     return true;
-}
-
-bool LgsFuncCall::equals(LgsExpr* other) {
-    const auto otherFuncCall = other->asFuncCall();
-    if (!otherFuncCall || !otherFuncCall->func) return false;
-    return equals(otherFuncCall->func->funcType);
 }
 
 std::string LgsFuncCall::asText() {
@@ -98,9 +94,9 @@ LgsFuncCall* LgsFuncCall::clone() const {
     return newFuncCall;
 }
 
-bool argAndParamEqual(const LgsExpr* arg, const LgsParam* param) {
-    if (!param->type || !arg->type) return false;
-    return arg->type->canCastTo(param->type);
+bool argAndParamEqual(LgsType* arg, LgsType* param) {
+    if (!param || !arg) return false;
+    return arg->canCastTo(param);
 }
 
 LgsFuncCall::~LgsFuncCall() {

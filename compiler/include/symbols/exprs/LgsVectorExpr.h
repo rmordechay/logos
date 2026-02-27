@@ -18,7 +18,6 @@ public:
     void setType(LgsType* newType) override;
     void hashNode(size_t& oldHash) override;
     std::string asText() override;
-    bool equals(LgsExpr* other) override;
     void setDebugValue(LgsCodeGen& cg) override;
     ~LgsVectorExpr() override;
 };

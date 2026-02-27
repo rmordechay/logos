@@ -16,7 +16,6 @@ public:
     LgsExpr* cast(LgsType* toType, bool explicitly) override;
     LgsIntConst* clone() const override;
     std::string asText() override;
-    bool equals(LgsExpr* other) override;
     void hashNode(size_t& oldHash) override;
     void setDebugValue(LgsCodeGen& cg) override;
 };

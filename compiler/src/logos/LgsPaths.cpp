@@ -17,7 +17,7 @@ void LgsPaths::findLgsRootDir() {
 }
 
 void LgsPaths::findCLibHeaders() {
-    const auto pipe = popen("clang -E -Wp,-v -xc /dev/null 2>&1", "r");
+    const auto pipe = popen(CLANG_PATH " -E -Wp,-v -xc /dev/null 2>&1", "r");
     if (!pipe) assert(0);
     char buffer[512];
     while (fgets(buffer, sizeof(buffer), pipe)) {

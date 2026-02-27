@@ -13,7 +13,6 @@ public:
     explicit LgsSelection(const std::vector<LgsExpr*>& exprs) : exprs(exprs) {}
     LgsFuncCall* asMethodCall() const;
     std::string asText() override;
-    bool equals(LgsExpr* other) override;
     void setDebugValue(LgsCodeGen& cg) override;
     LgsExpr* clone() const override;
     ~LgsSelection() override;

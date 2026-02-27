@@ -21,10 +21,6 @@ std::string LgsVectorExpr::asText() {
     return type->pname();
 }
 
-bool LgsVectorExpr::equals(LgsExpr* other) {
-    assert(0);
-}
-
 LgsVectorExpr::~LgsVectorExpr() {
     for (const auto & arg : elements) {
         freeExpr(arg);

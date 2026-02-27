@@ -11,20 +11,6 @@
 #include "LgsTokens.h"
 #include "LgsType.h"
 
-bool LgsVariable::equals(LgsExpr* other) {
-    const auto otherVar = other->asVariable();
-    if (!otherVar) return false;
-    switch (ref.symbolType) {
-    case VAR_DEC:
-        return ref.varDec->name == otherVar->name;
-    case PARAM:
-        return ref.param->name == otherVar->name;
-    default:
-        break;
-    }
-    assert(0);
-}
-
 LgsExpr* LgsVariable::cast(LgsType* toType, bool explicitly) {
     if (toType && type && type->canCastTo(toType)) {
         setType(toType);

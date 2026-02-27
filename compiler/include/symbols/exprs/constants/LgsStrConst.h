@@ -19,7 +19,6 @@ public:
     }
     std::string asText() override;
     void hashNode(size_t& oldHash) override;
-    bool equals(LgsExpr* other) override;
     void setDebugValue(LgsCodeGen& cg) override;
     LgsExpr* clone() const override;
     ~LgsStrConst() override;

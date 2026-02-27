@@ -2,10 +2,6 @@
 
 #include <assert.h>
 
-bool LgsMetaVar::equals(LgsExpr* other) {
-    assert(0);
-}
-
 std::string LgsMetaVar::asText() {
     return name;
 }

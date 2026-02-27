@@ -25,7 +25,6 @@ public:
     explicit LgsInstance(LgsObject* obj) : LgsExpr(obj), name(obj->name), obj(obj) {}
     void setType(LgsType* newObj) override;
     void hashNode(size_t& oldHash) override;
-    bool equals(LgsExpr* other) override;
     void setDebugValue(LgsCodeGen& cg) override;
     std::string asText() override;
     static Value* getInstanceRTType(LgsCodeGen& cg, Value* instance);

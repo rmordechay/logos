@@ -35,25 +35,25 @@ setup_installation() {
 
 install_debian() {
   apt-get update
-  DEBIAN_FRONTEND=noninteractive apt-get install -y curl git cmake clang-21 libclang-21-dev libclang-cpp21-dev
-  update-alternatives --install /usr/bin/clang clang /usr/lib/llvm-21/bin/clang 100
-  update-alternatives --install /usr/bin/clang++ clang++ /usr/lib/llvm-21/bin/clang++ 100
-  update-alternatives --install /usr/bin/llc llc /usr/lib/llvm-21/bin/llc 100
+  DEBIAN_FRONTEND=noninteractive apt-get install -y curl git cmake clang-20 libclang-20-dev libclang-cpp20-dev
+  update-alternatives --install /usr/bin/clang clang /usr/lib/llvm-20/bin/clang 100
+  update-alternatives --install /usr/bin/clang++ clang++ /usr/lib/llvm-20/bin/clang++ 100
+  update-alternatives --install /usr/bin/llc llc /usr/lib/llvm-20/bin/llc 100
 }
 
 install_alpine() {
-  apk add curl git cmake make clang21
-  ln -sf /usr/bin/clang-21 /usr/bin/cc
-  ln -sf /usr/bin/clang++-21 /usr/bin/c++
+  apk add curl git cmake make clang20
+  ln -sf /usr/bin/clang-20 /usr/bin/cc
+  ln -sf /usr/bin/clang++-20 /usr/bin/c++
 }
 
 install_macos() {
   echo "Installing for Mac..."
-  brew install -y curl git cmake llvm@21
+  brew install -y curl git cmake llvm@20
 }
 
 install_fedora() {
-    dnf install -y curl git cmake clang21
+    dnf install -y curl git cmake clang20
 }
 
 install_cblas() {

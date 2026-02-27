@@ -12,12 +12,6 @@ void LgsStrConst::hashNode(size_t& oldHash) {
     hashNodeString(oldHash, value);
 }
 
-bool LgsStrConst::equals(LgsExpr* other) {
-    const auto otherStrConst = other->asStrConst();
-    if (otherStrConst->value == value) return true;
-    assert(0);
-}
-
 void LgsStrConst::setDebugValue(LgsCodeGen& cg) {
     setDebugLoc(cg);
 }

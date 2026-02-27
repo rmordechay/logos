@@ -226,10 +226,6 @@ LgsExpr* LgsExpr::cast(LgsType* toType, const bool explicitly) {
     return this;
 }
 
-bool LgsExpr::equals(LgsExpr* other) {
-    assert(0);
-}
-
 LgsFunc* LgsExpr::asFunc() {
     return dynamic_cast<LgsFunc*>(this);
 }

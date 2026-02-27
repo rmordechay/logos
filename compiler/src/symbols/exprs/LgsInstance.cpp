@@ -30,12 +30,6 @@ void LgsInstance::hashNode(size_t& oldHash) {
     }
 }
 
-bool LgsInstance::equals(LgsExpr* other) {
-    const auto otherInstance = other->asInstance();
-    if (!other->asInstance()) return false;
-    return name == otherInstance->name;
-}
-
 void LgsInstance::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }

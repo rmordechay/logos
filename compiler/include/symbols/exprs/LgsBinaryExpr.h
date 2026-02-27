@@ -12,7 +12,6 @@ public:
 
     LgsBinaryExpr(LgsExpr* left, LgsExpr* right, const LgsBinOp& op) : left(left), right(right), op(op) {}
     void setDebugValue(LgsCodeGen& cg) override;
-    bool equals(LgsExpr* other) override;
     std::string asText() override;
     LgsExpr* clone() const override;
     ~LgsBinaryExpr() override;

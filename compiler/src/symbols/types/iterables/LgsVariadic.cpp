@@ -22,6 +22,7 @@ Type* LgsVariadic::getIRType(LgsCodeGen& cg) {
 }
 
 bool LgsVariadic::canCastTo(LgsType* other) {
+    if (other->isAny()) return true;
     assert(0);
 }
 

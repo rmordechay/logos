@@ -29,10 +29,6 @@ void LgsHashMap::setDebugValue(LgsCodeGen& cg) {
     di->insertDeclare(IRValue, var, di->createExpression(), cg.getDebugLoc(location), cg.builder.GetInsertBlock());
 }
 
-bool LgsHashMap::equals(LgsExpr* other) {
-    assert(0);
-}
-
 std::string LgsHashMap::asText() {
     if (type) return type->pname();
     if (elements.empty()) return "[]";
