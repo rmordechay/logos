@@ -37,6 +37,7 @@ public:
     void setNestedBaseType(LgsType* newBaseType);
     size_t getDims() const;
     bool hasTypeParams() override;
+    bool isRecursive(std::unordered_set<std::string>& visited) const override;
     virtual LgsType* getIndexType();
     virtual LgsType* getValueType();
     virtual std::optional<size_t> getConstLength();

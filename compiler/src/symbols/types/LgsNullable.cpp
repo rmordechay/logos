@@ -87,6 +87,11 @@ LgsType* LgsNullable::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     return nullptr;
 }
 
+bool LgsNullable::isRecursive(std::unordered_set<std::string>& visited) const {
+    if (isNull) return false;
+    return baseType && baseType->isRecursive(visited);
+}
+
 Type* LgsNullable::getIRType(LgsCodeGen& cg) {
     if (passByRef) return cg.ptrTy();
     return cg.getStructType({baseType->getIRType(cg), cg.i1Ty()}, getName());

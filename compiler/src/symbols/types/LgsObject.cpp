@@ -165,6 +165,25 @@ LgsExpr* LgsObject::getZeroValue() {
     return new LgsInstance(this);
 }
 
+LgsType* LgsObject::clone() {
+    const auto cloned = new LgsObject(*this);
+    cloned->fields.clear();
+    for (const auto field : fields) {
+        const auto clonedField = new LgsField(*field);
+        if (field->expr) clonedField->expr = clonedField->expr->clone();
+        cloned->fields.push_back(clonedField);
+    }
+    cloned->methods.clear();
+    for (const auto& [_, method] : methods) {
+        cloned->addMethod(method->clone());
+    }
+    return cloned;
+}
+
+bool LgsObject::hasTypeParams() {
+    return !typeParams.empty();
+}
+
 bool LgsObject::canCastTo(LgsType* other) {
     if (other->isAny()) return true;
     const auto otherType = other;
@@ -177,10 +196,6 @@ bool LgsObject::canCastTo(LgsType* other) {
         return false;
     }
     return name == otherType->getName();
-}
-
-bool LgsObject::hasTypeParams() {
-    return !typeParams.empty();
 }
 
 void LgsObject::hashNode(size_t& oldHash) {
@@ -204,6 +219,18 @@ Type* LgsObject::getIRType(LgsCodeGen& cg) {
 LgsType* LgsObject::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     if (op.opType != EQ && op.opType != NE) return nullptr;
     return canCastTo(rightType) ? &LGS_BOOL : nullptr;
+}
+
+bool LgsObject::isRecursive(std::unordered_set<std::string>& visited) const {
+    if (visited.contains(name)) return true;
+    visited.insert(name);
+    for (const auto field : fields) {
+        if (field->type->isRecursive(visited)) return true;
+    }
+    for (const auto& [_, method] : methods) {
+        if (method->type->isRecursive(visited)) return true;
+    }
+    return false;
 }
 
 void LgsObject::asIRText(LgsStrBuilder& sb, Value* value) {
@@ -242,11 +269,11 @@ Constant* LgsObject::getRTTypeExtra(LgsCodeGen& cg) {
         assert(field->type->rttKind != RTT_UNKNOWN);
         const auto fieldName = cg.getString(field->name);
         const std::vector<Constant*> args = {
-            fieldName,
-            field->type->IRSize(cg),
-            cg.usize(sl->getElementOffset(i + 2)), // offset level and type
-            cg.i32(field->type->rttKind),
-            field->type->getRTType(cg)
+        fieldName,
+        field->type->IRSize(cg),
+        cg.usize(sl->getElementOffset(i + 2)), // offset level and type
+        cg.i32(field->type->rttKind),
+        field->type->getRTType(cg)
         };
         rttFields.emplace_back(ConstantStruct::get(fieldRTType, args));
     }
@@ -265,7 +292,7 @@ Constant* LgsObject::getRTTypeExtra(LgsCodeGen& cg) {
     const auto objName = cg.getString(name);
     objName->setName(rttName + "_name");
     const std::vector<Constant*> args = {
-        cg.usize(id), objName, IRSize(cg), cg.usize(numFields), cg.usize(numMethods), rttFieldsGlobal, rttMethodsGlobal
+    cg.usize(id), objName, IRSize(cg), cg.usize(numFields), cg.usize(numMethods), rttFieldsGlobal, rttMethodsGlobal
     };
     return cg.createGlobal(rttName + "_extra", objRTType, ConstantStruct::get(objRTType, args));
 }
@@ -351,21 +378,6 @@ Function* LgsObject::getJSONFunc(LgsCodeGen& cg) {
     cg.createRet();
     cg.restoreFuncState();
     return func;
-}
-
-LgsType* LgsObject::clone() {
-    const auto cloned = new LgsObject(*this);
-    cloned->fields.clear();
-    for (const auto field : fields) {
-        const auto clonedField = new LgsField(*field);
-        if (field->expr) clonedField->expr = clonedField->expr->clone();
-        cloned->fields.push_back(clonedField);
-    }
-    cloned->methods.clear();
-    for (const auto& [_, method] : methods) {
-        cloned->addMethod(method->clone());
-    }
-    return cloned;
 }
 
 Function* LgsObject::getSetFieldFunc(LgsCodeGen& cg) {

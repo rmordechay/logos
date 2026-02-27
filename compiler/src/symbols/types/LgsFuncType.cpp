@@ -106,10 +106,6 @@ bool LgsFuncType::hasTypeParams() {
     return !typeParams.empty();
 }
 
-LgsType* LgsFuncType::applyBinOp(LgsType* rightType, LgsBinOp& op) {
-    return nullptr;
-}
-
 void LgsFuncType::setFuncOptions(const uint32_t ops) {
     isPublic =  ops & PUBLIC;
     isBuiltin =  ops & BUILTIN;
@@ -122,6 +118,19 @@ void LgsFuncType::setFuncOptions(const uint32_t ops) {
     isSyscall =  ops & SYSCALL;
     isExternal =  ops & EXTERNAL;
     hasDefaults =  ops & HAS_DEFAULTS;
+}
+
+LgsType* LgsFuncType::applyBinOp(LgsType* rightType, LgsBinOp& op) {
+    return nullptr;
+}
+
+bool LgsFuncType::isRecursive(std::unordered_set<std::string>& visited) const {
+    if (rt && rt->isRecursive(visited)) return true;
+    for (size_t i = isMethod; i < params.size(); ++i) {
+        const auto paramType = params[i].type;
+        if (paramType && paramType->isRecursive(visited)) return true;
+    }
+    return false;
 }
 
 std::unordered_map<std::string, LgsParam*> LgsFuncType::getParamsByName() {

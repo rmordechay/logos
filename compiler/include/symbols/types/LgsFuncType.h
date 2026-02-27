@@ -61,8 +61,9 @@ public:
     bool canCastTo(LgsType* other) override;
     bool equals(LgsType* other) override;
     bool hasTypeParams() override;
-    LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     void setFuncOptions(uint32_t ops);
+    LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
+    bool isRecursive(std::unordered_set<std::string>& visited) const override;
     std::unordered_map<std::string, LgsParam*> getParamsByName();
     DIType* getDebugType(LgsCodeGen& cg) override;
     void addSelf(LgsType* selfType);

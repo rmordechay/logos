@@ -155,11 +155,20 @@ void LgsSema::visitTestFile(const LgsTestFile* testFile) {
     }
 }
 
+bool LgsSema::isTypeRecursive(const LgsType* type) {
+    std::unordered_set<std::string> visited;
+    if (type->isRecursive(visited)) {
+        addError(E10048, type->location);
+        return true;
+    }
+    return false;
+}
+
 void LgsSema::visitObject(LgsObject* obj) {
     obj->id = ++objsIDGenerator;
     currentObj = obj;
     validateTypeName(obj->name, obj->location);
-    if (obj->hasRecursiveTypes()) return addError(E10048, obj->location);
+    if (isTypeRecursive(obj)) return;
     validateObjDuplicates(obj);
     if (obj->hasTypeParams()) return;
     for (const auto field : obj->fields) {

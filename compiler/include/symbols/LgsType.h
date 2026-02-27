@@ -2,6 +2,7 @@
 #include "Lgs_Types.h"
 #include "LgsTokens.h"
 #include <vector>
+#include <unordered_set>
 
 class LgsUShort;
 class LgsUByte;
@@ -83,7 +84,6 @@ public:
     bool isUnknown();
     bool isSliceable();
     bool addMethod(LgsFunc* method);
-    bool hasRecursiveTypes() const;
     std::string getRTTName();
     Constant* getRTType(LgsCodeGen& cg);
     ConstantInt* IRSize(LgsCodeGen& cg);
@@ -102,6 +102,7 @@ public:
     virtual void hashNode(size_t& oldHash);
     virtual bool canCastTo(LgsType* other) = 0;
     virtual LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) = 0;
+    virtual bool isRecursive(std::unordered_set<std::string>& visited) const;
     virtual Value* moveValue(LgsCodeGen& cg, Value* value, Value* toLevel);
     virtual void asIRText(LgsStrBuilder& sb, Value* value);
     virtual Type* getIRType(LgsCodeGen& cg) = 0;

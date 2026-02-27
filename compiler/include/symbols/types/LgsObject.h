@@ -69,6 +69,7 @@ public:
     void hashNode(size_t& oldHash) override;
     Type* getIRType(LgsCodeGen& cg) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
+    bool isRecursive(std::unordered_set<std::string>& visited) const override;
     void asIRText(LgsStrBuilder& sb, Value* value) override;
     Constant* getRTTypeExtra(LgsCodeGen& cg) override;
     Value* hashValue(LgsCodeGen& cg, Value* value) override;

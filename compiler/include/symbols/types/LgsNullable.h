@@ -35,6 +35,7 @@ public:
     LgsExpr* getZeroValue() override;
     bool canCastTo(LgsType* other) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
+    bool isRecursive(std::unordered_set<std::string>& visited) const override;
     Type* getIRType(LgsCodeGen& cg) override;
     Constant* getRTTypeExtra(LgsCodeGen& cg) override;
     void asIRText(LgsStrBuilder& sb, Value* value) override;

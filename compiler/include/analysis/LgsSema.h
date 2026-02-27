@@ -94,6 +94,7 @@ public:
     void analyse();
     void visitMainFile(LgsMainFile* mainFile);
     void visitTestFile(const LgsTestFile* testFile);
+    bool isTypeRecursive(const LgsType* type);
     void visitObject(LgsObject* obj);
     void visitInterface(LgsInterface* interface);
     void visitEnum(LgsEnum* enum_);

@@ -134,6 +134,10 @@ bool LgsIterable::hasTypeParams() {
     return baseType && baseType->hasTypeParams();
 }
 
+bool LgsIterable::isRecursive(std::unordered_set<std::string>& visited) const {
+    return baseType && baseType->isRecursive(visited);
+}
+
 std::optional<size_t> LgsIterable::getConstLength() {
     return std::nullopt;
 }
