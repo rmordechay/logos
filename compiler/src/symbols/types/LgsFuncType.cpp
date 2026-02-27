@@ -17,17 +17,18 @@ class Type;
 FunctionType* LgsFuncType::getIRType(LgsCodeGen& cg) {
     assert(rt);
     std::vector<Type*> types;
-    for (size_t i = 0; i < params.size(); ++i) {
-        const auto param = params[i];
-        const auto paramType = param.type;
-        if (param.isVariadic) types.emplace_back(cg.sizeTy());
-        types.emplace_back(paramType->getStorageType(cg));
+    for (const auto& param : params) {
+        if (param.isVariadic) {
+            if (!isExternal) types.emplace_back(cg.sizeTy());
+            break;
+        }
+        types.emplace_back(param.type->getStorageType(cg));
     }
     if (swapReturn) {
         types.insert(types.begin() + isMethod, cg.ptrTy());
-        IRType = cg.getFT(cg.voidTy(), types, this->isVariadic);
+        IRType = cg.getFT(cg.voidTy(), types, isVariadic);
     } else {
-        IRType = cg.getFT(rt->getStorageType(cg), types, this->isVariadic);
+        IRType = cg.getFT(rt->getStorageType(cg), types, isVariadic);
     }
     return IRType;
 }

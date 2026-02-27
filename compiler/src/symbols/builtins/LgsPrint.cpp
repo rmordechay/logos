@@ -60,6 +60,12 @@ Value* LgsPrint::call(LgsCodeGen& cg, const std::vector<LgsVarDec>& args) {
         sb.finalize();
         return cg.callPrintf("%s\n", {sb.buffer});
     }
+    if (type->asVariadic()) {
+        LgsStrBuilder sb(cg);
+        type->asIRText(sb, v);
+        sb.finalize();
+        return cg.callPrintf("%s\n", {sb.buffer});
+    }
     assert(arg->type->rttKind != RTT_UNKNOWN);
     const std::vector<Type*> params = {cg.ptrTy(), cg.ptrTy()};
     const std::vector<Value*> IRArgs = {type->getRTType(cg), v};

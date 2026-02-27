@@ -20,9 +20,11 @@ public:
     bool canCastTo(LgsType* other) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     std::string fmtStr() const override;
+    Constant* getRTTypeExtra(LgsCodeGen& cg) override;
     DIType* getDebugType(LgsCodeGen& cg) override;
     std::string getBaseName() override;
     std::string getName() override;
+    std::string pname() override;
     Value* lenIR(LgsCodeGen& cg, Value* iterable) override;
     Value* inIR(LgsCodeGen& cg, Value* iterableExpr, Value* value) override;
     Value* getIRElement(LgsCodeGen& cg, Value* iterable, Value* index) override;

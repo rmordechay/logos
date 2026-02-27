@@ -7,6 +7,7 @@
 #include <ostream>
 #include <sstream>
 #include <string>
+#include <sys/stat.h>
 
 #include "LgsDefinitions.h"
 #include "Lgs_Exprs.h"

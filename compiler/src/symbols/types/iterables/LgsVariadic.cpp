@@ -34,6 +34,10 @@ std::string LgsVariadic::fmtStr() const {
     assert(0);
 }
 
+Constant* LgsVariadic::getRTTypeExtra(LgsCodeGen& cg) {
+    return baseType->getRTType(cg);
+}
+
 DIType* LgsVariadic::getDebugType(LgsCodeGen& cg) {
     assert(0);
 }
@@ -43,7 +47,11 @@ std::string LgsVariadic::getBaseName() {
 }
 
 std::string LgsVariadic::getName() {
-    return baseType->getName() + "...";
+    return name + baseType->getName();
+}
+
+std::string LgsVariadic::pname() {
+    return baseType->pname() + "...";
 }
 
 Value* LgsVariadic::lenIR(LgsCodeGen& cg, Value* iterable) {
