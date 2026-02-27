@@ -63,8 +63,9 @@ public:
     std::string fmtStr() const override;
     size_t sizeBytes() override;
     LgsExpr* getZeroValue() override;
-    bool canCastTo(LgsType* other) override;
+    LgsType* clone() override;
     bool hasTypeParams() override;
+    bool canCastTo(LgsType* other) override;
     void hashNode(size_t& oldHash) override;
     Type* getIRType(LgsCodeGen& cg) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
@@ -76,7 +77,6 @@ public:
     Function* getObjsEqFunc(LgsCodeGen& cg) const;
     Function* getObjsHashFunc(LgsCodeGen& cg) const;
     Function* getJSONFunc(LgsCodeGen& cg);
-    LgsType* clone() override;
     static Function* getSetFieldFunc(LgsCodeGen& cg);
     static Function* getGetFieldFunc(LgsCodeGen& cg);
     static StructType* getObjRTTStruct(LgsCodeGen& cg);

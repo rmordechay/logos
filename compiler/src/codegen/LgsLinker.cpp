@@ -26,7 +26,7 @@ bool LgsLinker::link() const {
     assert(objFileList != "");
     std::string additionalLibs;
     for (const auto& libDir : paths.userCLibs) {
-        additionalLibs += std::string(libDir) + " ";
+        additionalLibs += "-L" + libDir.string() + " -lLLVM ";
     }
     // paths.cblasDir = "../external/libcblas.a";
     // additionalLibs += std::string(paths.cblasDir) + " ";
@@ -43,7 +43,6 @@ bool LgsLinker::link() const {
         paths.lgsRootDir.c_str(),
         paths.execFile.c_str()
     );
-    if (!runCmd(cmd)) assert(0);
-    return true;
+    return runCmd(cmd);
 }
 

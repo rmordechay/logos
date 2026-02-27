@@ -21,13 +21,13 @@ class RecordDecl;
 class TypedefDecl;
 }  // namespace clang
 
-class LgsCLangParser final : public clang::RecursiveASTVisitor<LgsCLangParser> {
+class LgsCCParser final : public clang::RecursiveASTVisitor<LgsCCParser> {
 public:
     LgsSymbolTable symbolTable;
     LgsErrHandler errHandler;
     int recursionDepth = 0;
 
-    bool VisitFunctionDecl(const clang::FunctionDecl* func);
+    bool VisitFunctionDecl(clang::FunctionDecl* func);
     bool VisitRecordDecl(const clang::RecordDecl* record);
     bool VisitTypedefDecl(const clang::TypedefDecl* typedefDecl);
     LgsType* mapCType(clang::QualType type);
@@ -37,11 +37,11 @@ public:
     LgsType* mapCFunc(clang::QualType type);
 };
 
-class LgsCLangASTConsumer final : public clang::ASTConsumer {
+class LgsCCAstConsumer final : public clang::ASTConsumer {
 public:
-    LgsCLangParser& parser;
+    LgsCCParser& parser;
 
-    explicit LgsCLangASTConsumer(LgsCLangParser& parser): parser(parser) {}
+    explicit LgsCCAstConsumer(LgsCCParser& parser): parser(parser) {}
     void HandleTranslationUnit(clang::ASTContext& clangContext) override;
 };
 

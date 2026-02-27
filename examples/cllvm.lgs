@@ -1,0 +1,11 @@
+import C "llvm-c/Core.h"
+import C "llvm-c/Analysis.h"
+
+main() {
+    context = LLVMContextCreate()
+    module = LLVMModuleCreateWithNameInContext("my_module", context)
+    builder = LLVMCreateBuilderInContext(context)
+    ty32 = LLVMInt32TypeInContext(context)
+    error: Str
+    LLVMVerifyModule(module, LLVMPrintMessageAction, error)
+}

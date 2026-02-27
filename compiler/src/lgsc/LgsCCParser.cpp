@@ -1,8 +1,9 @@
-#include "lgsc/LgsCLangParser.h"
+#include "lgsc/LgsCCParser.h"
 
 #include <_ctype.h>
 #include <_stdlib.h>
 #include <assert.h>
+#include <ostream>
 #include <clang/AST/ASTContext.h>
 #include <clang/AST/Decl.h>
 #include <clang/AST/Type.h>
@@ -46,12 +47,15 @@
 #include "types/LgsFuncType.h"
 #include "types/primitives/LgsSize.h"
 
-void LgsCLangASTConsumer::HandleTranslationUnit(clang::ASTContext& clangContext) {
+void LgsCCAstConsumer::HandleTranslationUnit(clang::ASTContext& clangContext) {
     parser.TraverseDecl(clangContext.getTranslationUnitDecl());
 }
 
-bool LgsCLangParser::VisitFunctionDecl(const clang::FunctionDecl* func) {
+bool LgsCCParser::VisitFunctionDecl(clang::FunctionDecl* func) {
     auto name = func->getNameAsString();
+    if (name == "LLVMVerifyModule") {
+        printf("");
+    }
     if (LGS_KEYWORDS.contains(name)) {
         name = name + '_';
     }
@@ -71,7 +75,7 @@ bool LgsCLangParser::VisitFunctionDecl(const clang::FunctionDecl* func) {
     return true;
 }
 
-bool LgsCLangParser::VisitRecordDecl(const clang::RecordDecl* record) {
+bool LgsCCParser::VisitRecordDecl(const clang::RecordDecl* record) {
     auto name = record->getNameAsString();
     if (name.empty()) return true;
     if (LGS_KEYWORDS.contains(name)) name = name + '_';
@@ -81,7 +85,7 @@ bool LgsCLangParser::VisitRecordDecl(const clang::RecordDecl* record) {
     return true;
 }
 
-bool LgsCLangParser::VisitTypedefDecl(const clang::TypedefDecl* typedefDecl) {
+bool LgsCCParser::VisitTypedefDecl(const clang::TypedefDecl* typedefDecl) {
     const auto typedefName = typedefDecl->getNameAsString();
     const auto underlyingType = typedefDecl->getUnderlyingType();
     const auto cType = mapCType(underlyingType);
@@ -92,7 +96,7 @@ bool LgsCLangParser::VisitTypedefDecl(const clang::TypedefDecl* typedefDecl) {
     return true;
 }
 
-LgsType* LgsCLangParser::mapCType(const clang::QualType type) {
+LgsType* LgsCCParser::mapCType(const clang::QualType type) {
     if (recursionDepth++ > 100000) assert(0);
     if (type->isPointerType() && type->getPointeeType()->isCharType()) {
         return new LgsStr();
@@ -153,7 +157,7 @@ LgsType* LgsCLangParser::mapCType(const clang::QualType type) {
     assert(0);
 }
 
-LgsObject* LgsCLangParser::mapCRecord(const clang::RecordDecl* record) {
+LgsObject* LgsCCParser::mapCRecord(const clang::RecordDecl* record) {
     const auto name = record->getNameAsString();
     const auto obj = new LgsObject(name);
     for (const clang::FieldDecl* field : record->fields()) {
@@ -166,7 +170,7 @@ LgsObject* LgsCLangParser::mapCRecord(const clang::RecordDecl* record) {
     return obj;
 }
 
-LgsType* LgsCLangParser::mapCStruct(const clang::QualType type) {
+LgsType* LgsCCParser::mapCStruct(const clang::QualType type) {
     const auto recordType = type->getAsStructureType();
     const auto decl = recordType->getDecl();
     auto name = decl->getNameAsString();
@@ -183,7 +187,7 @@ LgsType* LgsCLangParser::mapCStruct(const clang::QualType type) {
     return obj;
 }
 
-LgsType* LgsCLangParser::mapCFunc(const clang::QualType type) {
+LgsType* LgsCCParser::mapCFunc(const clang::QualType type) {
     const auto lgsFuncType = new LgsFuncType();
     lgsFuncType->isExternal = true;
     const auto cFuncType = type->getAs<clang::FunctionProtoType>();
@@ -195,7 +199,7 @@ LgsType* LgsCLangParser::mapCFunc(const clang::QualType type) {
     return lgsFuncType;
 }
 
-LgsType* LgsCLangParser::mapCArray(const clang::QualType type) {
+LgsType* LgsCCParser::mapCArray(const clang::QualType type) {
     const auto arrayType = llvm::dyn_cast<clang::ConstantArrayType>(type.getTypePtr());
     if (!arrayType) return nullptr;
     const auto baseType = mapCType(arrayType->getElementType());

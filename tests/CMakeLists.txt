@@ -50,7 +50,6 @@ target_link_libraries(lgs_tests PRIVATE
     lgs_lib
     LLVM
     clang-cpp
-    CURL::libcurl
     OpenSSL::SSL
     OpenSSL::Crypto
     GTest::gtest

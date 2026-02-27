@@ -38,7 +38,7 @@ public:
     std::vector<LgsEnvFile*> envFiles;
     std::vector<LgsFile*> genericFiles;
     LgsFile rttFile{"rtt", CG_MODE_RTT};
-    LgsAppFile* appConfigFile = nullptr;
+    LgsAppFile* appFile = nullptr;
     std::vector<LgsApp*> importApps;
     std::string lgsCode; // Used when passing code directly
 

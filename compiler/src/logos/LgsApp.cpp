@@ -44,7 +44,7 @@
 #include "exprs/constants/LgsStrConst.h"
 #include "funcs/LgsFunc.h"
 #include "lgsc/LgsCCompiler.h"
-#include "lgsc/LgsCLangParser.h"
+#include "lgsc/LgsCCParser.h"
 #include "logos/LgsAppCache.h"
 #include "logos/LgsAppConfigs.h"
 #include "stmts/LgsVarDec.h"
@@ -245,7 +245,7 @@ bool LgsApp::loadConfigs() {
     if (!errHandler.successful) return false;
     if (configs.appMode != PROJECT_MODE) return true;
     if (!loadAppFile()) return false;
-    for (const auto config : appConfigFile->configs) {
+    for (const auto config : appFile->configs) {
         const auto configNama = config->name;
         if (configNama == "name") {
             configs.name = config->expr->asStrConst()->value;
@@ -259,15 +259,26 @@ bool LgsApp::loadConfigs() {
         if (configNama == "version") {
             auto value = config->expr->asStrConst()->value;
             if (!configs.version.setVersion(value)) {
-                errHandler.addError(E10068, &config->location, appConfigFile->path, {value});
+                errHandler.addError(E10068, &config->location, appFile->path, {value});
                 return false;
             }
         }
     }
-    for (const auto& path : paths.userCLibs) {
-        if (fs::exists(path)) continue;
-        errHandler.addError(E10107, {path});
-        return false;
+    for (const auto searchPath : appFile->searchPaths) {
+        auto path = searchPath->value;
+        if (fs::exists(path)) {
+            paths.userSearchPaths.push_back(path);
+        } else {
+            errHandler.addError(E10074, &searchPath->location, appFile->path, {path});
+        }
+    }
+    for (const auto lib : appFile->libs) {
+        auto path = lib->value;
+        if (fs::exists(path)) {
+            paths.userCLibs.push_back(path);
+        } else {
+            errHandler.addError(E10107, &lib->location, appFile->path, {path});
+        }
     }
     return true;
 }
@@ -306,7 +317,7 @@ bool LgsApp::loadAppFile() {
     }
     const auto code = getFileText(paths.appConfigFile);
     LgsParser parser(code, paths.appConfigFile, configs, paths, globals);
-    appConfigFile = parser.parseAppFile();
+    appFile = parser.parseAppFile();
     if (!parser.errHandler.successful) {
         errHandler.mergeErrors(parser.errHandler);
     }
@@ -536,8 +547,8 @@ bool LgsApp::validateEnvsFiles() {
 }
 
 bool LgsApp::validateRequiredEnvs() {
-    if (!appConfigFile) return true;
-    for (const auto requiredEnv : appConfigFile->requiredEnvs) {
+    if (!appFile) return true;
+    for (const auto requiredEnv : appFile->requiredEnvs) {
         for (const auto envFile : envFiles) {
             auto found = false;
             for (const auto varDec : envFile->varDecs) {
@@ -550,15 +561,15 @@ bool LgsApp::validateRequiredEnvs() {
                 break;
             }
             if (found) continue;
-            errHandler.addError(E10020, &requiredEnv->location, appConfigFile->path, {envFile->name, requiredEnv->name, requiredEnv->type->pname()});
+            errHandler.addError(E10020, &requiredEnv->location, appFile->path, {envFile->name, requiredEnv->name, requiredEnv->type->pname()});
         }
     }
     return errHandler.successful;
 }
 
 bool LgsApp::resolvePackages() {
-    if (!appConfigFile) return true;
-    for (auto package : appConfigFile->packages) {
+    if (!appFile) return true;
+    for (auto package : appFile->packages) {
         const auto app = new LgsApp(package.path);
         app->configs.isImport = true;
         if (!app->setup()) return false;
@@ -608,9 +619,9 @@ LgsMainFile* LgsApp::getMainFile() const {
 }
 
 LgsApp::~LgsApp() {
-    if (appConfigFile) {
-        delete appConfigFile;
-        appConfigFile = nullptr;
+    if (appFile) {
+        delete appFile;
+        appFile = nullptr;
     }
     for (const auto file : srcFiles) {
         delete file;

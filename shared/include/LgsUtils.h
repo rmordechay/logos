@@ -13,7 +13,7 @@ namespace fs = std::filesystem;
 #define HASH_MAP(map, hash) for (const auto [_, v] : map) v->hashNode(hash)
 
 void execute(const fs::path& execPath, std::vector<const char*> mainArgs = {});
-bool runCmd(const char* cmd);
+bool runCmd(const std::string& cmd);
 bool createDir(fs::path& dirPath);
 bool isLogosFile(const fs::path& filePath);
 

@@ -4,7 +4,7 @@
 #include <clang/Frontend/FrontendAction.h>
 #include <filesystem>
 
-#include "LgsCLangParser.h"
+#include "LgsCCParser.h"
 #include "logos/LgsPaths.h"
 
 class LgsStrConst;
@@ -13,7 +13,7 @@ class LgsFile;
 class LgsCCompiler final {
 public:
     LgsPaths& paths;
-    LgsCLangParser parser;
+    LgsCCParser parser;
     clang::CompilerInstance compiler;
 
     explicit LgsCCompiler(LgsPaths& paths): paths(paths) {}
@@ -22,9 +22,9 @@ public:
 
 class LgsParseAction : public clang::ASTFrontendAction {
 public:
-    LgsCLangParser& parser;
+    LgsCCParser& parser;
 
-    explicit LgsParseAction(LgsCLangParser& parser): parser(parser) {}
+    explicit LgsParseAction(LgsCCParser& parser): parser(parser) {}
     std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(clang::CompilerInstance &ci, llvm::StringRef inFile) override;
 };
 

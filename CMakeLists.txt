@@ -4,17 +4,16 @@ project(logos VERSION 0.0.1)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_definitions(-DLOGOS_VERSION="${CMAKE_PROJECT_VERSION}")
-option(LOGOS_RELEASE "Build release version" OFF)
+option(LOGOS_DEV_MODE ON)
 set(CMAKE_PREFIX_PATH "/opt/homebrew/Cellar/llvm/21.1.8" ${CMAKE_PREFIX_PATH})
 
 find_package(LLVM 21.1.8 REQUIRED CONFIG)
 find_package(Clang 21.1.8 REQUIRED CONFIG)
 find_package(OpenSSL REQUIRED)
-find_package(CURL REQUIRED)
+find_package(ZLIB REQUIRED)
 set(LLVM_LINK_LLVM_DYLIB ON)
 set(CLANG_LINK_CLANG_DYLIB ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-set(CURL_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external)
 get_filename_component(LLVM_BIN_DIR "${LLVM_TOOLS_BINARY_DIR}" ABSOLUTE)
 set(CLANG_EXECUTABLE "${LLVM_BIN_DIR}/clang")
 add_definitions(-DCLANG_PATH="${CLANG_EXECUTABLE}")
@@ -46,7 +45,7 @@ set(COMPILER_SOURCE
     ${CMAKE_SOURCE_DIR}/compiler/src/parser/LgsLexer.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/parser/LgsParser.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/lgsc/LgsCCompiler.cpp
-    ${CMAKE_SOURCE_DIR}/compiler/src/lgsc/LgsCLangParser.cpp
+    ${CMAKE_SOURCE_DIR}/compiler/src/lgsc/LgsCCParser.cpp
 
     # Files
     ${CMAKE_SOURCE_DIR}/compiler/src/files/LgsFile.cpp
@@ -176,7 +175,6 @@ set(LGS_LIB_SOURCE
 set(SHARED_SOURCE
     ${CMAKE_SOURCE_DIR}/shared/src/LgsErrHandler.cpp
     ${CMAKE_SOURCE_DIR}/shared/src/LgsUtils.cpp
-    ${CMAKE_SOURCE_DIR}/shared/include/LgsRTTIndices.h
 )
 
 # Logos lib and shared
@@ -216,24 +214,13 @@ target_link_libraries(lgs PRIVATE
     lgs_lib
     LLVM
     clang-cpp
-    CURL::libcurl
     OpenSSL::SSL
     OpenSSL::Crypto
 )
 
 # Options
-if (LOGOS_RELEASE)
-    target_compile_options(lgs PRIVATE -O3 -DNDEBUG)
-    target_compile_options(lgs_lib PRIVATE -O3 -DNDEBUG)
-    set_target_properties(lgs PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
-    set_target_properties(lgs_lib PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
-    if (UNIX AND NOT APPLE)
-        target_link_options(lgs PRIVATE -s)
-    endif ()
-else ()
-    target_compile_options(lgs PRIVATE -Wall -Wextra -Wpedantic -Wreturn-type -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function)
-    add_subdirectory(tests)
-endif ()
+target_compile_options(lgs PRIVATE -Wall -Wextra -Wpedantic -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function)
+add_subdirectory(tests)
 
 # Install
 install(TARGETS lgs RUNTIME DESTINATION bin)
