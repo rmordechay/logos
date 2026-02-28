@@ -38,7 +38,6 @@
 #include <llvm/Support/Casting.h>
 #include <llvm/Support/TypeSize.h>
 #include <llvm/Support/raw_ostream.h>
-#include <llvm/TargetParser/Triple.h>
 #include <math.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -283,7 +282,7 @@ BasicBlock* LgsCodeGen::createBlock(const std::string& name, Function* parent) {
 
 void LgsCodeGen::startFunc(Function* func, const bool isMain) {
     saveFuncState();
-    const auto entryBlock = BasicBlock::Create(context, BLOCK_ENTRY, func);
+    const auto entryBlock = createBlock(BLOCK_ENTRY, func);
     builder.SetInsertPoint(entryBlock);
     if (isMain) {
         callRuntimeFunc("init", voidTy());
@@ -295,12 +294,11 @@ void LgsCodeGen::startFunc(Function* func, const bool isMain) {
 }
 
 void LgsCodeGen::saveFuncState() {
-    savedIP = builder.saveIP();
     lastFunc = currentFunc;
     lastLevel = currentLevel;
 }
 
-void LgsCodeGen::restoreFuncState() {
+void LgsCodeGen::restoreFuncState(const IRBuilderBase::InsertPoint& savedIP) {
     builder.restoreIP(savedIP);
     currentFunc = lastFunc;
     currentLevel = lastLevel;

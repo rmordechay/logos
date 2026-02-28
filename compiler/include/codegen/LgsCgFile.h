@@ -138,7 +138,7 @@ public:
 
     // Funcs
     void createPrologue(LgsFunc* func);
-    void createEpilogue(const LgsFunc* func);
+    void createEpilogue(const LgsFunc* func, const IRBuilderBase::InsertPoint& savedIP);
     void initMainArgs(const LgsMainFunc* mainFunc) const;
     Type* getThunkCtxType(const LgsFuncCall* fc);
     Value* getThunkCtx(const LgsFuncCall* fc, Type* ctxTy);

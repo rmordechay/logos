@@ -27,7 +27,6 @@
 #include "LgsRTTIndices.h"
 #include "Lgs_Exprs.h"
 #include "codegen/LgsCodeGen.h"
-#include "exprs/LgsFuncCall.h"
 #include "funcs/LgsFunc.h"
 #include "types/LgsFuncType.h"
 #include "types/iterables/LgsDArray.h"
@@ -234,13 +233,14 @@ Function* LgsMap::getGetFunc(LgsCodeGen& cg) {
         return cg.getFunc(funcName, ft);
     }
 
-    const auto func = cg.getFunc(funcName, ft);
     const auto entryNullCheckBlock = cg.createBlock("entry_null_check");
     const auto entryNullBlock = cg.createBlock("entry_is_null");
     const auto keyCompareBlock = cg.createBlock("keys_compare");
     const auto keysEqualBlock = cg.createBlock("keys_equal");
     const auto keysNotEqualBlock = cg.createBlock("keys_not_equal");
 
+    const auto func = cg.getFunc(funcName, ft);
+    const auto savedIP =  cg.builder.saveIP();
     cg.startFunc(func);
     const auto mapIR = func->getArg(0);
     const auto keyIR = func->getArg(1);
@@ -281,7 +281,7 @@ Function* LgsMap::getGetFunc(LgsCodeGen& cg) {
     cg.startBlock(keysEqualBlock);
     currentEntry = cg.loadPtr(currentEntryPtr);
     cg.createRet(getEntryValue(cg, currentEntry));
-    cg.restoreFuncState();
+    cg.restoreFuncState(savedIP);
     return func;
 }
 
@@ -295,7 +295,6 @@ Function* LgsMap::getAddFunc(LgsCodeGen& cg) {
         return cg.getFunc(funcName, ft);
     }
 
-    const auto func = cg.getFunc(funcName, ft);
     const auto resizeBlock = cg.createBlock("resize");
     const auto checkSlotBlock = cg.createBlock("check_slot");
     const auto entryNullCondBlock = cg.createBlock("entry_null_cond");
@@ -305,6 +304,8 @@ Function* LgsMap::getAddFunc(LgsCodeGen& cg) {
     const auto notEqualBlock = cg.createBlock("not_equal");
     const auto exitBlock = cg.createBlock(BLOCK_EXIT);
 
+    const auto func = cg.getFunc(funcName, ft);
+    const auto savedIP =  cg.builder.saveIP();
     cg.startFunc(func);
     const auto mapIR = func->getArg(0);
     const auto keyIR = func->getArg(1);
@@ -392,6 +393,6 @@ Function* LgsMap::getAddFunc(LgsCodeGen& cg) {
     cg.branchAndStartBlock(exitBlock);
 
     cg.createRet();
-    cg.restoreFuncState();
+    cg.restoreFuncState(savedIP);
     return func;
 }

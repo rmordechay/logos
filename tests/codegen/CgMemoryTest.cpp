@@ -47,7 +47,7 @@ TEST(CgMemoryTest, Test2) {
     )";
     std::istringstream stream(runLgsApp(code));
     const auto lines = getLines(stream, 2);
-    EXPECT_EQ(lines[0], "Obj1{obj2=Obj2{id=0, name=null}}");
+    EXPECT_EQ(lines[0], "Obj1{obj2=Obj2{id=0, name=\"\"}}");
     EXPECT_EQ(lines[1], "Obj1{obj2=Obj2{id=5, name=Roi}}");
 }
 

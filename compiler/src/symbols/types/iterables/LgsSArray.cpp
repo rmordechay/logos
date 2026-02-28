@@ -156,6 +156,7 @@ Function* LgsSArray::getEqFunc(LgsCodeGen& cg) {
     if (cg.mode == CG_MODE_SRC) return cg.getFunc(funcName, ft);
 
     const auto func = cg.getFunc(funcName, ft);
+    const auto savedIP =  cg.builder.saveIP();
     cg.startFunc(func);
     const auto arrIR1 = func->getArg(0);
     const auto arrIR2 = func->getArg(1);
@@ -165,7 +166,7 @@ Function* LgsSArray::getEqFunc(LgsCodeGen& cg) {
     cg.ifStmt(cg.builder.CreateICmpNE(len1, len2), [&cg] {cg.createRet(cg.false_());});
 
     cg.createRet(cg.true_());
-    cg.restoreFuncState();
+    cg.restoreFuncState(savedIP);
     return func;
 }
 

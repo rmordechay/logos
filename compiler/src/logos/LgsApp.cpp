@@ -387,6 +387,7 @@ bool LgsApp::generateMainFile() {
         mainFile->setupCodeGen(configs);
         auto& cg = mainFile->cgFile.cg;
         const auto func = mainFunc->getIRFunc(cg);
+        const auto savedIP =  cg.builder.saveIP();
         cg.startFunc(func);
         for (const auto file : srcFiles) {
             const auto testFile = file->asTestFile();
@@ -396,7 +397,7 @@ bool LgsApp::generateMainFile() {
             }
         }
         cg.createRet(cg.i32(0));
-        cg.restoreFuncState();
+        cg.restoreFuncState(savedIP);
         return mainFile->cgFile.cg.writeIRModule(paths, 0);
     }
     const auto mainFile = getMainFile();

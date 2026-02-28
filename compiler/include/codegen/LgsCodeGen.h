@@ -95,7 +95,6 @@ public:
     Function* lastFunc = nullptr;
     IRBuilder<> builder = IRBuilder(context);
     std::map<std::string, Type*> typesRegistry;
-    IRBuilderBase::InsertPoint savedIP;
     Value* startTime = nullptr;
 
     explicit LgsCodeGen(const LgsCodeGenMode mode) : mode(mode) {}
@@ -134,7 +133,7 @@ public:
     BasicBlock* createBlock(const std::string& name = "", Function* parent = nullptr);
     void startFunc(Function* func, bool isMain = false);
     void saveFuncState();
-    void restoreFuncState();
+    void restoreFuncState(const IRBuilderBase::InsertPoint& savedIP);
     void createRet(Value* rv = nullptr, bool isMain = false);
     void branch(BasicBlock* block);
     void startBlock(BasicBlock* block);

@@ -32,6 +32,8 @@ add_executable(lgs_tests
     codegen/exprs/CgMatrixTest.cpp
     codegen/exprs/CgVectorTest.cpp
     codegen/exprs/CgSliceTest.cpp
+    codegen/exprs/CgSelectionTest.cpp
+    codegen/exprs/CgZeroValueTest.cpp
 )
 
 target_include_directories(lgs_tests PRIVATE

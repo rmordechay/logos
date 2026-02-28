@@ -171,6 +171,7 @@ Function* LgsDArray::getAddFunc(LgsCodeGen& cg) {
 
     // Prologue
     const auto func = cg.getFunc(funcName, ft);
+    const auto savedIP =  cg.builder.saveIP();
     cg.startFunc(func);
     const auto arrIR = func->getArg(0);
     const auto elementIR = func->getArg(1);
@@ -211,7 +212,7 @@ Function* LgsDArray::getAddFunc(LgsCodeGen& cg) {
     cg.storeField(ty, arrIR, LgsDArrExprIndices::length, inc);
 
     cg.createRet();
-    cg.restoreFuncState();
+    cg.restoreFuncState(savedIP);
     return func;
 }
 
@@ -223,6 +224,7 @@ Function* LgsDArray::getContainsFunc(LgsCodeGen& cg) {
 
     // Prologue
     const auto func = cg.getFunc(funcName, ft);
+    const auto savedIP =  cg.builder.saveIP();
     cg.startFunc(func);
     const auto arrIR = func->getArg(0);
     const auto value = func->getArg(1);
@@ -237,7 +239,7 @@ Function* LgsDArray::getContainsFunc(LgsCodeGen& cg) {
     });
 
     cg.createRet(cg.false_());
-    cg.restoreFuncState();
+    cg.restoreFuncState(savedIP);
     return func;
 }
 
@@ -246,8 +248,9 @@ Function* LgsDArray::getEqFunc(LgsCodeGen& cg) {
     if (const auto func = cg.IRModule->getFunction(funcName)) return func;
     const auto ft = cg.getFT(cg.i1Ty(), {cg.ptrTy(), cg.ptrTy()});
     if (cg.mode == CG_MODE_SRC) return cg.getFunc(funcName, ft);
-    const auto func = cg.getFunc(funcName, ft);
 
+    const auto func = cg.getFunc(funcName, ft);
+    const auto savedIP =  cg.builder.saveIP();
     cg.startFunc(func);
     const auto arrIR1 = func->getArg(0);
     const auto arrIR2 = func->getArg(1);
@@ -261,7 +264,7 @@ Function* LgsDArray::getEqFunc(LgsCodeGen& cg) {
     const auto size = cg.builder.CreateMul(len1, baseType->IRSize(cg));
 
     cg.createRet(cg.true_());
-    cg.restoreFuncState();
+    cg.restoreFuncState(savedIP);
     return func;
 }
 

@@ -163,22 +163,24 @@ void LgsCgFile::visitObject(LgsObject* obj) {
 }
 
 void LgsCgFile::visitMainFunc(LgsMainFunc* func) {
+    const auto savedIP =  cg.builder.saveIP();
     createPrologue(func);
     initMainArgs(func);
     visitStmtsBlock(func->stmtsBlock);
-    createEpilogue(func);
+    createEpilogue(func, savedIP);
 }
 
 void LgsCgFile::visitFunc(LgsFunc* func) {
     if (!func->funcType->typeParams.empty()) return;
     if (!func->stmtsBlock) return;
     const auto ft = func->funcType;
+    const auto savedIP =  cg.builder.saveIP();
     createPrologue(func);
     visitStmtsBlock(func->stmtsBlock);
     if (ft->isVariadic) {
         cg.callIntrinsics(Intrinsic::vaend, {cg.ptrTy()}, {ft->params.back().IRValue});
     }
-    createEpilogue(func);
+    createEpilogue(func, savedIP);
 }
 
 void LgsCgFile::visitExternalSymbols(LgsFile* file) {
@@ -631,6 +633,7 @@ void LgsCgFile::visitInstance(LgsInstance* instance) {
 
     const auto level = instance->getLevel(cg);
     instance->IRValue = obj->getIRZeroValue(cg, instance->pointee, level);
+
     // Args
     std::unordered_set<std::string> visited;
     for (const auto& arg : instance->args) {
@@ -1132,12 +1135,12 @@ void LgsCgFile::createPrologue(LgsFunc* func) {
     }
 }
 
-void LgsCgFile::createEpilogue(const LgsFunc* func) {
+void LgsCgFile::createEpilogue(const LgsFunc* func, const IRBuilderBase::InsertPoint& savedIP) {
     const auto ft = func->funcType;
     // Main func
     if (ft->name == LGS_MAIN_FUNC) {
         cg.createRet(cg.i32(EXIT_SUCCESS), true);
-        cg.restoreFuncState();
+
         return;
     }
     if (ft->isVariadic) {
@@ -1166,7 +1169,7 @@ void LgsCgFile::createEpilogue(const LgsFunc* func) {
             }
         }
     }
-    cg.restoreFuncState();
+    cg.restoreFuncState(savedIP);
 }
 
 void LgsCgFile::initMainArgs(const LgsMainFunc* mainFunc) const {
@@ -1208,6 +1211,7 @@ Function* LgsCgFile::getThunkFunc(const LgsFuncCall* fc, Type* ctxTy) {
     const auto ft = cg.getFT(cg.voidTy(), {cg.ptrTy()});
     thunkFunc = cg.getFunc(funcName, ft, Function::PrivateLinkage);
 
+    const auto savedIP =  cg.builder.saveIP();
     cg.startFunc(thunkFunc);
     for (size_t i = 0; i < fc->args.size(); i++) {
         const auto expr = fc->args[i].expr;
@@ -1216,7 +1220,7 @@ Function* LgsCgFile::getThunkFunc(const LgsFuncCall* fc, Type* ctxTy) {
     }
     fc->func->call(cg, fc->args);
     cg.createRet();
-    cg.restoreFuncState();
+    cg.restoreFuncState(savedIP);
     return thunkFunc;
 }
 
@@ -1242,8 +1246,9 @@ void LgsCgFile::getMapFunc(LgsFuncType* mapFunc) {
     const auto funcName = mapFunc->getName();
     const auto ft = llvm::cast<FunctionType>(mapFunc->getIRType(cg));
     const auto cbFt = llvm::cast<FunctionType>(cbParam.type->getIRType(cg));
-    const auto func = cg.getFunc(funcName, ft);
 
+    const auto func = cg.getFunc(funcName, ft);
+    const auto savedIP =  cg.builder.saveIP();
     cg.startFunc(func);
     const auto iter = func->getArg(0);
     const auto cb = func->getArg(1);
@@ -1261,7 +1266,7 @@ void LgsCgFile::getMapFunc(LgsFuncType* mapFunc) {
     });
 
     cg.createRet(retArr.IRValue);
-    cg.restoreFuncState();
+    cg.restoreFuncState(savedIP);
 }
 
 void LgsCgFile::getFilterFunc(LgsFuncType* filterFunc) {
@@ -1273,6 +1278,7 @@ void LgsCgFile::getFilterFunc(LgsFuncType* filterFunc) {
     const auto ft = llvm::cast<FunctionType>(filterFunc->getIRType(cg));
     const auto cbFt = llvm::cast<FunctionType>(cbParam.type->getIRType(cg));
     const auto func = cg.getFunc(funcName, ft);
+    const auto savedIP =  cg.builder.saveIP();
     cg.startFunc(func);
 
     const auto iter = func->getArg(0);
@@ -1294,7 +1300,7 @@ void LgsCgFile::getFilterFunc(LgsFuncType* filterFunc) {
     });
 
     cg.createRet(retArr.IRValue);
-    cg.restoreFuncState();
+    cg.restoreFuncState(savedIP);
 }
 
 void LgsCgFile::getForeachFunc(LgsFuncType* forEachFunc) {
@@ -1306,6 +1312,7 @@ void LgsCgFile::getForeachFunc(LgsFuncType* forEachFunc) {
     const auto ft = llvm::cast<FunctionType>(forEachFunc->getIRType(cg));
     const auto cbFt = llvm::cast<FunctionType>(cbParam.type->getIRType(cg));
     const auto func = cg.getFunc(funcName, ft);
+    const auto savedIP =  cg.builder.saveIP();
     cg.startFunc(func);
 
     const auto iter = func->getArg(0);
@@ -1319,5 +1326,5 @@ void LgsCgFile::getForeachFunc(LgsFuncType* forEachFunc) {
     });
 
     cg.createRet();
-    cg.restoreFuncState();
+    cg.restoreFuncState(savedIP);
 }

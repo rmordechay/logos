@@ -1,8 +1,5 @@
 #include "LgsValue.h"
-
 #include <assert.h>
-#include <llvm/IR/IRBuilder.h>
-
 #include "codegen/LgsCodeGen.h"
 
 LgsType* LgsValue::getType() {

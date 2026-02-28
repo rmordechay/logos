@@ -319,8 +319,9 @@ Function* getDotProductFunc(LgsCodeGen& cg, LgsVec* vecType) {
     auto func = cg.IRModule->getFunction(name);
     if (func) return func;
     const auto params = {vecType->getIRType(cg), vecType->getIRType(cg)};
-    func = cg.getFunc(name, cg.getFT(cg.floatTy(), params));
 
+    func = cg.getFunc(name, cg.getFT(cg.floatTy(), params));
+    const auto savedIP =  cg.builder.saveIP();
     cg.startFunc(func);
     Value* l = func->getArg(0);
     Value* r = func->getArg(1);
@@ -348,7 +349,7 @@ Function* getDotProductFunc(LgsCodeGen& cg, LgsVec* vecType) {
     }
 
     cg.createRet(result);
-    cg.restoreFuncState();
+    cg.restoreFuncState(savedIP);
     return func;
 }
 
@@ -359,8 +360,9 @@ Function* getCrossProductFunc(LgsCodeGen& cg, LgsVec* vecType) {
     if (func) return func;
     const auto ty = vecType->getIRType(cg);
     const std::vector<Type*> params = {cg.ptrTy(), ty, ty};
-    func = cg.getFunc(name, cg.getFT(cg.voidTy(), params));
 
+    func = cg.getFunc(name, cg.getFT(cg.voidTy(), params));
+    const auto savedIP =  cg.builder.saveIP();
     cg.startFunc(func);
     Value* result = func->getArg(0);
     Value* l = func->getArg(1);
@@ -381,6 +383,6 @@ Function* getCrossProductFunc(LgsCodeGen& cg, LgsVec* vecType) {
     cg.storeField(ty, result, 2, cz);
 
     cg.createRet();
-    cg.restoreFuncState();
+    cg.restoreFuncState(savedIP);
     return func;
 }

@@ -291,9 +291,7 @@ Constant* LgsObject::getRTTypeExtra(LgsCodeGen& cg) {
     const auto rttMethodsGlobal = cg.createGlobal(rttName + "_funcs", methodsTypeArr, initializerMethods);
     const auto objName = cg.getString(name);
     objName->setName(rttName + "_name");
-    const std::vector<Constant*> args = {
-    cg.usize(id), objName, IRSize(cg), cg.usize(numFields), cg.usize(numMethods), rttFieldsGlobal, rttMethodsGlobal
-    };
+    const std::vector<Constant*> args = {cg.usize(id), objName, IRSize(cg), cg.usize(numFields), cg.usize(numMethods), rttFieldsGlobal, rttMethodsGlobal};
     return cg.createGlobal(rttName + "_extra", objRTType, ConstantStruct::get(objRTType, args));
 }
 
@@ -302,7 +300,13 @@ Value* LgsObject::hashValue(LgsCodeGen& cg, Value* value) {
 }
 
 Value* LgsObject::getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level) {
-    return cg.heapAllocType(metaName, getRTType(cg), level);
+    const auto ty = getIRType(cg);
+    const auto obj = cg.heapAllocType(metaName, getRTType(cg), level);
+    for (const auto field : fields) {
+        const auto zero = field->type->getIRZeroValue(cg, pointee, level);
+        cg.storeField(ty, obj, field->index, zero);
+    }
+    return obj;
 }
 
 DIType* LgsObject::getDebugType(LgsCodeGen& cg) {
@@ -316,6 +320,7 @@ Function* LgsObject::getObjsEqFunc(LgsCodeGen& cg) const {
     if (cg.mode == CG_MODE_SRC) return cg.getFunc(funcName, ft);
 
     const auto func = cg.getFunc(funcName, ft);
+    const auto savedIP =  cg.builder.saveIP();
     cg.startFunc(func);
     const auto obj1 = func->getArg(0);
     const auto obj2 = func->getArg(1);
@@ -331,7 +336,7 @@ Function* LgsObject::getObjsEqFunc(LgsCodeGen& cg) const {
     }
 
     cg.createRet(cg.true_());
-    cg.restoreFuncState();
+    cg.restoreFuncState(savedIP);
     return func;
 }
 
@@ -342,6 +347,7 @@ Function* LgsObject::getObjsHashFunc(LgsCodeGen& cg) const {
     if (cg.mode == CG_MODE_SRC) return cg.getFunc(funcName, ft);
 
     const auto func = cg.getFunc(funcName, ft);
+    const auto savedIP =  cg.builder.saveIP();
     cg.startFunc(func);
     const auto instance = func->getArg(0);
 
@@ -355,7 +361,7 @@ Function* LgsObject::getObjsHashFunc(LgsCodeGen& cg) const {
     }
 
     cg.createRet(hash);
-    cg.restoreFuncState();
+    cg.restoreFuncState(savedIP);
     return func;
 }
 
@@ -366,6 +372,7 @@ Function* LgsObject::getJSONFunc(LgsCodeGen& cg) {
     if (cg.mode == CG_MODE_SRC) return cg.getFunc(funcName, ft);
 
     const auto func = cg.getFunc(funcName, ft);
+    const auto savedIP =  cg.builder.saveIP();
     cg.startFunc(func);
     const auto self = func->getArg(0);
     const auto strBuffer = func->getArg(1);
@@ -376,7 +383,7 @@ Function* LgsObject::getJSONFunc(LgsCodeGen& cg) {
     sb.finalize();
 
     cg.createRet();
-    cg.restoreFuncState();
+    cg.restoreFuncState(savedIP);
     return func;
 }
 
@@ -387,6 +394,7 @@ Function* LgsObject::getSetFieldFunc(LgsCodeGen& cg) {
     if (cg.mode == CG_MODE_SRC) return cg.getFunc(funcName, ft);
 
     const auto func = cg.getFunc(funcName, ft);
+    const auto savedIP =  cg.builder.saveIP();
     cg.startFunc(func);
     const auto self = func->getArg(0);
     const auto fieldNameArg = func->getArg(1);
@@ -410,7 +418,7 @@ Function* LgsObject::getSetFieldFunc(LgsCodeGen& cg) {
     cg.callMemcpy(fieldPtr, value, fieldSize);
 
     cg.createRet(cg.true_());
-    cg.restoreFuncState();
+    cg.restoreFuncState(savedIP);
     return func;
 }
 
@@ -421,6 +429,7 @@ Function* LgsObject::getGetFieldFunc(LgsCodeGen& cg) {
     if (cg.mode == CG_MODE_SRC) return cg.getFunc(funcName, ft);
 
     const auto func = cg.getFunc(funcName, ft);
+    const auto savedIP =  cg.builder.saveIP();
     cg.startFunc(func);
     const auto self = func->getArg(0);
     const auto arg = func->getArg(1);
@@ -439,7 +448,7 @@ Function* LgsObject::getGetFieldFunc(LgsCodeGen& cg) {
     });
 
     cg.createRet(cg.null());
-    cg.restoreFuncState();
+    cg.restoreFuncState(savedIP);
     return func;
 }
 
