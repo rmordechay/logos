@@ -21,6 +21,8 @@ public:
     std::string getName() override;
     bool canCastTo(LgsType* other) override;
     std::string fmtStr() const override;
+    Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level) override;
+    Value* hashValue(LgsCodeGen& cg, Value* value) override;
     DIType* getDebugType(LgsCodeGen& cg) override;
 };
 

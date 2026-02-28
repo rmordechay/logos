@@ -163,6 +163,27 @@ public:
 };
 
 void freeType(LgsType* type);
+Value* loadAsChar(LgsCodeGen& cg, Value* v);
+Value* loadAsInt(LgsCodeGen& cg, Value* v, Type* intType);
+Value* loadAsFloat(LgsCodeGen& cg, Value* v, Type* floatType);
+std::pair<Value*, Value*> loadNumberPair(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
+std::pair<Value*, Value*> loadVecPair(LgsCodeGen& cg, Value* left, Value* right, LgsType* vec);
+Value* eqIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
+Value* neIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
+Value* ltIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
+Value* gtIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
+Value* geIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
+Value* leIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
+Value* andIR(LgsCodeGen& cg, const std::vector<Value*>& values);
+Value* orIR(LgsCodeGen& cg, const std::vector<Value*>& values);
+Value* crossIR(LgsCodeGen& cg, Value* left, Value* right, LgsVec* vec);
+bool inRange(uint64_t value, LgsType* toType);
+LgsType* inferType(const std::vector<LgsExpr*>& elements);
+Value* loadRTTInfoName(LgsCodeGen& cg, Value* ptr);
+Value* loadRTTInfoSize(LgsCodeGen& cg, Value* ptr);
+Value* loadRTTInfoKind(LgsCodeGen& cg, Value* ptr);
+Value* loadRTTInfoIsHeap(LgsCodeGen& cg, Value* ptr);
+Value* loadRTTInfoExtra(LgsCodeGen& cg, Value* ptr);
 
 template<typename T>
 void freeTypes(std::vector<T*>& types) {
@@ -181,25 +202,3 @@ bool inRangeGeneric(uint64_t value) {
         return signed_value >= std::numeric_limits<T>::lowest() && signed_value <= std::numeric_limits<T>::max();
     }
 }
-
-bool inRange(uint64_t value, LgsType* toType);
-LgsType* inferType(const std::vector<LgsExpr*>& elements);
-Value* loadRTTInfoName(LgsCodeGen& cg, Value* ptr);
-Value* loadRTTInfoSize(LgsCodeGen& cg, Value* ptr);
-Value* loadRTTInfoKind(LgsCodeGen& cg, Value* ptr);
-Value* loadRTTInfoIsHeap(LgsCodeGen& cg, Value* ptr);
-Value* loadRTTInfoExtra(LgsCodeGen& cg, Value* ptr);
-Value* eqIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
-Value* neIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
-Value* ltIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
-Value* gtIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
-Value* geIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
-Value* leIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
-Value* andIR(LgsCodeGen& cg, const std::vector<Value*>& values);
-Value* orIR(LgsCodeGen& cg, const std::vector<Value*>& values);
-Value* crossIR(LgsCodeGen& cg, Value* left, Value* right, LgsVec* vec);
-LgsType* getBiggestIntType(const std::vector<LgsType*>& types);
-Value* loadAsInt(LgsCodeGen& cg, Value* v, Type* intType);
-Value* loadAsFloat(LgsCodeGen& cg, Value* v, Type* floatType);
-std::pair<Value*, Value*> loadNumberPair(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
-std::pair<Value*, Value*> loadVecPair(LgsCodeGen& cg, Value* left, Value* right, LgsType* vec);

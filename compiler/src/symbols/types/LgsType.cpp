@@ -267,26 +267,6 @@ void freeType(LgsType* type) {
     delete type;
 }
 
-Value* loadRTTInfoName(LgsCodeGen& cg, Value* ptr) {
-    return cg.loadField(cg.getRTTStruct(), ptr, LgsTypeInfoIndices::name, cg.ptrTy());
-}
-
-Value* loadRTTInfoSize(LgsCodeGen& cg, Value* ptr) {
-    return cg.loadField(cg.getRTTStruct(), ptr, LgsTypeInfoIndices::size, cg.sizeTy());
-}
-
-Value* loadRTTInfoKind(LgsCodeGen& cg, Value* ptr) {
-    return cg.loadField(cg.getRTTStruct(), ptr, LgsTypeInfoIndices::kind, cg.i32Ty());
-}
-
-Value* loadRTTInfoIsHeap(LgsCodeGen& cg, Value* ptr) {
-    return cg.loadField(cg.getRTTStruct(), ptr, LgsTypeInfoIndices::isHeap, cg.i1Ty());
-}
-
-Value* loadRTTInfoExtra(LgsCodeGen& cg, Value* ptr) {
-    return cg.loadField(cg.getRTTStruct(), ptr, LgsTypeInfoIndices::extra, cg.ptrTy());
-}
-
 Value* exprEqNull(LgsCodeGen& cg, Value* expr, LgsType* type) {
     if (type->passByRef) return cg.builder.CreateIsNull(expr);
     return cg.builder.CreateNot(type->asNullable()->loadIsSet(cg, expr));
@@ -302,7 +282,10 @@ Value* eqIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
     if (isa<ConstantPointerNull>(right)) {
         return exprEqNull(cg, left, type);
     }
-    if (type->isInt || type->asChar()) {
+    if (type->asChar()) {
+        return cg.builder.CreateICmpEQ(loadAsChar(cg, left), loadAsChar(cg, right));
+    }
+    if (type->isInt) {
         const auto [l, r] = loadNumberPair(cg, left, right, type);
         return cg.builder.CreateICmpEQ(l, r);
     }
@@ -326,8 +309,6 @@ Value* eqIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
         if (nullable->passByRef) {
             const auto cond = andIR(cg, {cg.isNull(left), cg.isNull(left)});
             return cond;
-        } else {
-
         }
     }
     assert(0);
@@ -414,50 +395,10 @@ Value* crossIR(LgsCodeGen& cg, Value* left, Value* right, LgsVec* vec) {
     return results;
 }
 
-LgsType* getBiggestIntType(const std::vector<LgsType*>& types) {
-    if (types.empty()) return nullptr;
-    LgsType* inferredType = nullptr;
-    uint8_t highestPrecedence = 0;
-    for (size_t i = 0; i < types.size(); ++i) {
-        const auto& arg = types[i];
-        if (!arg) return nullptr;
-        LgsType* currentType = nullptr;
-        if (arg->isScalar()) {
-            currentType = arg;
-        } else if (const auto iter = arg->asIterable()) {
-            currentType = iter->baseType;
-        }
-        if (!currentType || !currentType->isScalar()) return nullptr;
-        const auto precedence = numberPrecedences[currentType->getName()];
-        if (highestPrecedence >= precedence) continue;
-        inferredType = currentType;
-        highestPrecedence = precedence;
-    }
-    assert(inferredType);
-    return inferredType;
-}
-
-Type* getBiggestIntType(const std::vector<Type*>& types) {
-    if (types.empty()) return nullptr;
-    Type* inferredType = nullptr;
-    uint8_t highestPrecedence = 0;
-    for (const auto type : types) {
-        uint8_t precedence = 0;
-        if (type->isIntegerTy()) {
-            precedence = type->getIntegerBitWidth();
-        } else if (type->isFloatTy()) {
-            precedence = 64;
-        } else if (type->isDoubleTy()) {
-            precedence = 128;
-        } else {
-            return nullptr;
-        }
-        if (highestPrecedence >= precedence) continue;
-        inferredType = type;
-        highestPrecedence = precedence;
-    }
-    assert(inferredType);
-    return inferredType;
+Value* loadAsChar(LgsCodeGen& cg, Value* v) {
+    const auto ty = v->getType();
+    if (ty->isPointerTy()) return cg.load(cg.i8Ty(), v);
+    return v;
 }
 
 Value* loadAsInt(LgsCodeGen& cg, Value* v, Type* intType) {
@@ -479,6 +420,18 @@ Value* loadAsFloat(LgsCodeGen& cg, Value* v, Type* floatType) {
 Value* loadAsVec(LgsCodeGen& cg, Value* v, Type* vecType) {
     if (v->getType()->isVectorTy()) return v;
     return cg.load(vecType, v);
+}
+
+std::pair<Value*, Value*> loadNumberPair(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
+    const auto ty = type->getIRType(cg);
+    if (type->isInt) return {loadAsInt(cg, left, ty), loadAsInt(cg, right, ty)};
+    if (type->isFloat) return {loadAsFloat(cg, left, ty), loadAsFloat(cg, right, ty)};
+    assert(0);
+}
+
+std::pair<Value*, Value*> loadVecPair(LgsCodeGen& cg, Value* left, Value* right, LgsType* vec) {
+    const auto ty = vec->getIRType(cg);
+    return {loadAsVec(cg, left, ty), loadAsVec(cg, right, ty)};
 }
 
 bool inRange(const uint64_t value, LgsType* toType) {
@@ -514,14 +467,22 @@ LgsType* inferType(const std::vector<LgsExpr*>& elements) {
     return result;
 }
 
-std::pair<Value*, Value*> loadNumberPair(LgsCodeGen& cg, Value* left, Value* right, LgsType* type) {
-    const auto ty = type->getIRType(cg);
-    if (type->isInt) return {loadAsInt(cg, left, ty), loadAsInt(cg, right, ty)};
-    if (type->isFloat) return {loadAsFloat(cg, left, ty), loadAsFloat(cg, right, ty)};
-    assert(0);
+Value* loadRTTInfoName(LgsCodeGen& cg, Value* ptr) {
+    return cg.loadField(cg.getRTTStruct(), ptr, LgsTypeInfoIndices::name, cg.ptrTy());
 }
 
-std::pair<Value*, Value*> loadVecPair(LgsCodeGen& cg, Value* left, Value* right, LgsType* vec) {
-    const auto ty = vec->getIRType(cg);
-    return {loadAsVec(cg, left, ty), loadAsVec(cg, right, ty)};
+Value* loadRTTInfoSize(LgsCodeGen& cg, Value* ptr) {
+    return cg.loadField(cg.getRTTStruct(), ptr, LgsTypeInfoIndices::size, cg.sizeTy());
+}
+
+Value* loadRTTInfoKind(LgsCodeGen& cg, Value* ptr) {
+    return cg.loadField(cg.getRTTStruct(), ptr, LgsTypeInfoIndices::kind, cg.i32Ty());
+}
+
+Value* loadRTTInfoIsHeap(LgsCodeGen& cg, Value* ptr) {
+    return cg.loadField(cg.getRTTStruct(), ptr, LgsTypeInfoIndices::isHeap, cg.i1Ty());
+}
+
+Value* loadRTTInfoExtra(LgsCodeGen& cg, Value* ptr) {
+    return cg.loadField(cg.getRTTStruct(), ptr, LgsTypeInfoIndices::extra, cg.ptrTy());
 }

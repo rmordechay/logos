@@ -32,6 +32,10 @@ LgsType* LgsULong::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     return nullptr;
 }
 
+Value* LgsULong::getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level) {
+    return cg.zero64();
+}
+
 DIType* LgsULong::getDebugType(LgsCodeGen& cg) {
     assert(0);
 }
@@ -44,4 +48,9 @@ void LgsULong::asIRText(LgsStrBuilder& sb, Value* value) {
     const auto buffer = sb.cg.emptyBuffer(128);
     const auto bytesRead = sb.cg.callSnprintf(fmtStr(), buffer, sb.cg.usize(128), value);
     sb.add(buffer, sb.cg.toSize(bytesRead));
+}
+
+
+Value* LgsULong::hashValue(LgsCodeGen& cg, Value* value) {
+    return value;
 }

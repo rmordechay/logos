@@ -21,6 +21,8 @@ public:
     void asIRText(LgsStrBuilder& sb, Value* value) override;
     bool canCastTo(LgsType* other) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
+    Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level) override;
+    Value* hashValue(LgsCodeGen& cg, Value* value) override;
     DIType* getDebugType(LgsCodeGen& cg) override;
 };
 

@@ -188,9 +188,6 @@ target_include_directories(lgs_lib PUBLIC
 target_include_directories(lgs PUBLIC
     ${CMAKE_SOURCE_DIR}/compiler/include
     ${CMAKE_SOURCE_DIR}/compiler/include/symbols
-    ${CMAKE_SOURCE_DIR}/external/include
-    ${LLVM_INCLUDE_DIRS}
-    ${CLANG_INCLUDE_DIRS}
 )
 target_include_directories(lgs_shared PUBLIC
     ${CMAKE_SOURCE_DIR}/shared/include
@@ -214,7 +211,6 @@ target_link_libraries(lgs PRIVATE
 )
 
 # Options
-target_compile_options(lgs PRIVATE -isystem ${LLVM_INCLUDE_DIRS})
 if (DEV_MODE)
     target_compile_options(lgs PRIVATE -Wall -Wextra -Wpedantic -Wreturn-type -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function)
     add_subdirectory(tests)

@@ -11,6 +11,10 @@ Type* LgsUByte::getIRType(LgsCodeGen& cg) {
     return cg.i8Ty();
 }
 
+Value* LgsUByte::getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level) {
+    return cg.zero8();
+}
+
 std::string LgsUByte::getName() {
     return name;
 }
@@ -41,4 +45,9 @@ void LgsUByte::asIRText(LgsStrBuilder& sb, Value* value) {
     const auto buffer = sb.cg.emptyBuffer(128);
     const auto bytesRead = sb.cg.callSnprintf(fmtStr(), buffer, sb.cg.usize(128), value);
     sb.add(buffer, sb.cg.toSize(bytesRead));
+}
+
+
+Value* LgsUByte::hashValue(LgsCodeGen& cg, Value* value) {
+    return value;
 }

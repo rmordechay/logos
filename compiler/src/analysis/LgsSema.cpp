@@ -1202,6 +1202,7 @@ void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent) {
 
 bool LgsSema::visitFuncArgs(LgsFuncCall* funcCall, LgsFuncType* ft) {
     if (funcCall->isNamed) {
+        assert(!ft->hasDefaults);
         auto paramsByName = ft->getParamsByName();
         std::unordered_set<std::string> visited;
         for (auto arg : funcCall->args) {

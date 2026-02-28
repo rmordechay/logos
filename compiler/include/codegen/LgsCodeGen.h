@@ -13,7 +13,6 @@
 #include <functional>
 #include <string>
 #include <vector>
-
 #include "exprs/LgsExpr.h"
 
 namespace llvm {
@@ -117,6 +116,8 @@ public:
     Value* loadField(Type* parentType, Value* parentPtr, size_t position, Type* ty);
     void storeField(Type* parentType, Value* parentPtr, size_t position, Value* v);
     StructType* getStructType(const std::vector<Type*>& types, const std::string& name = "");
+    StructType* getRTTStruct();
+
 
     Value* getCurrentLevel();
     Value* levelAbove();
@@ -163,8 +164,6 @@ public:
     void callMemset(Value* dest, Value* src, Value* size);
     void callMemcpy(Value* dest, Value* src, Value* size);
 
-    StructType* getRTTStruct();
-
     // Debugging
     void printStr(const std::string& value, const std::string& prefix = "");
     void printStr(Value* value, const std::string& prefix = "");
@@ -207,6 +206,7 @@ public:
     Constant* floatv(float_t v);
     Constant* doublev(double_t v);
     ConstantInt* zero8();
+    ConstantInt* zero16();
     ConstantInt* zero32();
     ConstantInt* zero64();
     ConstantInt* zeroSize();

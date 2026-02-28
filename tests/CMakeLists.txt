@@ -42,7 +42,11 @@ target_include_directories(lgs_tests PRIVATE
     ${CMAKE_SOURCE_DIR}/compiler/include/symbols
     ${CMAKE_SOURCE_DIR}/lib/include
     ${CMAKE_SOURCE_DIR}/shared/include
+)
+
+target_include_directories(lgs_tests SYSTEM PUBLIC
     ${CMAKE_SOURCE_DIR}/external/include
+    ${OPENSSL_INCLUDE_DIR}
     ${LLVM_INCLUDE_DIRS}
     ${CLANG_INCLUDE_DIRS}
 )

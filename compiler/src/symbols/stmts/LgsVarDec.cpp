@@ -1,10 +1,6 @@
 #include "stmts/LgsVarDec.h"
-
-#include <llvm/IR/DIBuilder.h>
-#include <llvm/IR/DebugInfoMetadata.h>
-#include <llvm/IR/IRBuilder.h>
-
 #include "codegen/LgsCodeGen.h"
+#include <llvm/IR/DIBuilder.h>
 #include "LgsUtils.h"
 #include "LgsTokens.h"
 #include "LgsType.h"

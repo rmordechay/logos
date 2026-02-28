@@ -53,6 +53,14 @@ std::string LgsShort::fmtStr() const {
     return "%d";
 }
 
+Value* LgsShort::getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level) {
+    return cg.zero16();
+}
+
+Value* LgsShort::hashValue(LgsCodeGen& cg, Value* value) {
+    return value;
+}
+
 DIType* LgsShort::getDebugType(LgsCodeGen& cg) {
     assert(0);
 }

@@ -38,7 +38,7 @@ Value* LgsPrint::call(LgsCodeGen& cg, const std::vector<LgsVarDec>& args) {
     }
     if (type->asChar()) {
         const auto fmt = cg.getString(type->fmtStr() + "\n");
-        return cg.callPrintf({fmt, loadAsInt(cg, v, type->getIRType(cg))});
+        return cg.callPrintf({fmt, loadAsChar(cg, v)});
     }
     if (type->isInt) {
         LgsStrBuilder sb(cg);

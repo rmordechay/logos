@@ -22,6 +22,8 @@ public:
     std::string fmtStr() const override;
     void asIRText(LgsStrBuilder& sb, Value* value) override;
     DIType* getDebugType(LgsCodeGen& cg) override;
+    Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level) override;
+    Value* hashValue(LgsCodeGen& cg, Value* value) override;
 };
 
 inline LgsSize LGS_SIZE;

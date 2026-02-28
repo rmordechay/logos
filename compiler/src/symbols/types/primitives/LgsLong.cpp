@@ -30,6 +30,10 @@ void LgsLong::asIRText(LgsStrBuilder& sb, Value* value) {
     sb.add(buffer, sb.cg.toSize(bytesRead));
 }
 
+std::string LgsLong::fmtStr() const {
+    return "%" PRId64;
+}
+
 std::string LgsLong::getName() {
     return name;
 }
@@ -46,10 +50,14 @@ bool LgsLong::canCastTo(LgsType* other) {
     return name == otherName;
 }
 
-DIType* LgsLong::getDebugType(LgsCodeGen& cg) {
-    assert(0);
+Value* LgsLong::getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level) {
+    return cg.zero64();
 }
 
-std::string LgsLong::fmtStr() const {
-    return "%" PRId64;
+Value* LgsLong::hashValue(LgsCodeGen& cg, Value* value) {
+    return value;
+}
+
+DIType* LgsLong::getDebugType(LgsCodeGen& cg) {
+    assert(0);
 }

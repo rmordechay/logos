@@ -611,6 +611,10 @@ ConstantInt* LgsCodeGen::zero8() {
     return builder.getInt8(0);
 }
 
+ConstantInt* LgsCodeGen::zero16() {
+    return builder.getInt16(0);
+}
+
 ConstantInt* LgsCodeGen::zero32() {
     return builder.getInt32(0);
 }

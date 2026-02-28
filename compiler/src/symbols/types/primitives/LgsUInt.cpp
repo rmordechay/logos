@@ -49,3 +49,11 @@ void LgsUInt::asIRText(LgsStrBuilder& sb, Value* value) {
     const auto bytesRead = sb.cg.callSnprintf(fmtStr(), buffer, sb.cg.usize(128), value);
     sb.add(buffer, sb.cg.toSize(bytesRead));
 }
+
+Value* LgsUInt::hashValue(LgsCodeGen& cg, Value* value) {
+    return value;
+}
+
+Value* LgsUInt::getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level) {
+    return cg.zero32();
+}

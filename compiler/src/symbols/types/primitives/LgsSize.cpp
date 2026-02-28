@@ -88,3 +88,11 @@ void LgsSize::asIRText(LgsStrBuilder& sb, Value* value) {
 DIType* LgsSize::getDebugType(LgsCodeGen& cg) {
     assert(0);
 }
+
+Value* LgsSize::getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level) {
+    return cg.zeroSize();
+}
+
+Value* LgsSize::hashValue(LgsCodeGen& cg, Value* value) {
+    return value;
+}
