@@ -54,6 +54,7 @@ void LgsExpr::setType(LgsType* newType) {
 }
 
 Value* LgsExpr::loadIRPtr(LgsCodeGen& cg) const {
+    assert(type);
     if (!IRValue->getType()->isPointerTy()) return IRValue;
     if (type->asSArray() || type->asMatrix()) return IRValue;
     return cg.load(type->getStorageType(cg), IRValue);

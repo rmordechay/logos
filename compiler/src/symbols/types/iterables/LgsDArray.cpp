@@ -145,15 +145,13 @@ void LgsDArray::addIRElement(LgsCodeGen& cg, Value* iterable, Value* index, Valu
 
 void LgsDArray::asIRText(LgsStrBuilder& sb, Value* value) {
     auto& cg = sb.cg;
-    const auto data = loadRTData(cg, value);
     const auto len = loadRTLength(cg, value);
     sb.add("[");
     cg.loop(len, [&](Value* iValue, BasicBlock*) {
         const auto isFirst = cg.builder.CreateICmpNE(iValue, cg.zeroSize());
         cg.ifStmt(isFirst, [&] {sb.add(", ");});
-        const auto offset = cg.builder.CreateMul(iValue, baseType->IRSize(cg));
-        auto element = cg.builder.CreatePtrAdd(data, offset);
-        element = cg.load(baseType->getIRType(cg), element);
+        auto element = getIRElement(cg, value, iValue);;
+        element = cg.load(baseType->getStorageType(cg), element);
         baseType->asIRText(sb, element);
     });
     sb.add("]");

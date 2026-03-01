@@ -10,4 +10,5 @@ public:
     bool canCastTo(LgsType* other) override;
     LgsExpr* getZeroValue() override;
     Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level) override;
+    Constant* getRTTypeExtra(LgsCodeGen& cg) override;
 };

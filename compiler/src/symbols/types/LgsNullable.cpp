@@ -88,8 +88,7 @@ LgsType* LgsNullable::applyBinOp(LgsType* rightType, LgsBinOp& op) {
 }
 
 bool LgsNullable::isRecursive(std::unordered_set<std::string>& visited) const {
-    if (isNull) return false;
-    return baseType && baseType->isRecursive(visited);
+    return false;
 }
 
 Type* LgsNullable::getIRType(LgsCodeGen& cg) {
@@ -108,11 +107,19 @@ void LgsNullable::asIRText(LgsStrBuilder& sb, Value* value) {
     }
     auto& cg = sb.cg;
     if (passByRef) {
-        cg.ifElseStmt(
-            cg.isNull(value),
-            [&](BasicBlock*){sb.add(LGS_NULL_LITERAL);},
-            [&](BasicBlock*){baseType->asIRText(sb, value);}
-        );
+        if (baseType->asObject()) {
+            cg.ifElseStmt(
+                cg.isNull(value),
+                [&](BasicBlock*){sb.add(LGS_NULL_LITERAL);},
+                [&](BasicBlock*){sb.add(LGS_NULL_LITERAL);}
+            );
+        } else {
+            cg.ifElseStmt(
+                cg.isNull(value),
+                [&](BasicBlock*){sb.add(LGS_NULL_LITERAL);},
+                [&](BasicBlock*){baseType->asIRText(sb, value);}
+            );
+        }
     } else {
         cg.ifElseStmt(
             loadIsSet(cg, value),

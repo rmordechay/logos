@@ -166,8 +166,8 @@ public:
 
     void setFunc(LgsFuncCall* funcCall, LgsFunc* func);
     void addTypeReplacement(LgsType* genericType, LgsType* replacement, std::unordered_map<std::string, LgsType*>& replacements);
-    static void replaceGenericFunc(LgsFunc* newFunc, const std::unordered_map<std::string, LgsType*>& replacements);
-    static void replaceGenerics(LgsType*& type, const std::unordered_map<std::string, LgsType*>& replacements);
+    void replaceGenericFunc(LgsFunc* newFunc, const std::unordered_map<std::string, LgsType*>& replacements);
+    void replaceGenerics(LgsType*& type, const std::unordered_map<std::string, LgsType*>& replacements);
     void replaceForLoop(LgsStmtWrapper& stmt);
     LgsSymbol* getSymbol(const std::string& name);
     void addLocalSymbol(const LgsSymbol& newSymbol);

@@ -27,3 +27,7 @@ LgsExpr* LgsInterface::getZeroValue() {
 Value* LgsInterface::getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level) {
     return cg.null();
 }
+
+Constant* LgsInterface::getRTTypeExtra(LgsCodeGen& cg) {
+    return cg.null();
+}

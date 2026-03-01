@@ -25,7 +25,6 @@ public:
     bool isOptional = false;
     bool isMutable = true;
     LgsType* parentType = nullptr;
-    Value* gep = nullptr;
 
     LgsField(const std::string& name, LgsType* type, LgsExpr* expr = nullptr) : name(name), type(type), expr(expr) {}
     void setType(LgsType* newType) override;

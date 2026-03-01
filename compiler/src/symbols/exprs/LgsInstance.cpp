@@ -6,7 +6,6 @@
 #include <llvm/IR/IRBuilder.h>
 
 #include "LgsRTTIndices.h"
-#include "stmts/LgsField.h"
 #include "LgsUtils.h"
 #include "codegen/LgsCodeGen.h"
 #include "LgsType.h"
@@ -36,6 +35,12 @@ void LgsInstance::setDebugValue(LgsCodeGen& cg) {
 
 std::string LgsInstance::asText() {
     return name + "{}";
+}
+
+LgsExpr* LgsInstance::clone() const {
+    const auto cloned = new LgsInstance(*this);
+    cloned->obj = obj->clone();
+    return cloned;
 }
 
 Value* LgsInstance::getInstanceRTType(LgsCodeGen& cg, Value* instance) {

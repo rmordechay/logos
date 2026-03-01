@@ -186,10 +186,12 @@ Value* LgsCodeGen::load(Type* ty, Value* ptr) {
 }
 
 Value* LgsCodeGen::loadPtr(Value* value) {
+    if (!value->getType()->isPointerTy()) return value;
     return builder.CreateLoad(ptrTy(), value);
 }
 
 Value* LgsCodeGen::loadSize(Value* value) {
+    if (!value->getType()->isPointerTy()) return value;
     return builder.CreateLoad(sizeTy(), value);
 }
 
@@ -308,7 +310,7 @@ void LgsCodeGen::createRet(Value* rv, const bool isMain) {
     callRuntimeFunc("pop", voidTy());
     if (isMain) {
         callRuntimeFunc("close", voidTy());
-        callPrintf("Time taken: %zuns\n", {measureTimeEnd(startTime)});
+        // callPrintf("Time taken: %zuns\n", {measureTimeEnd(startTime)});
     }
     if (rv) builder.CreateRet(rv);
     else builder.CreateRetVoid();
