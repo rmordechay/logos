@@ -145,9 +145,9 @@ static void moveAndAssign(const Lgs_TypeInfo* fieldType, void* left, void* right
 
 extern "C" void* Lgs_Runtime_getVField(const Lgs_Object* type, void* objInstance, const char* fieldName) {
     for (int i = 0; i < type->fieldsCount; ++i) {
-        const auto func = type->fields[i];
-        if (std::strcmp(func.name, fieldName) == 0) {
-            return static_cast<char*>(objInstance) + func.offset;
+        const auto field = type->fields[i];
+        if (std::strcmp(field.name, fieldName) == 0) {
+            return static_cast<char*>(objInstance) + field.offset;
         }
     }
     return nullptr;

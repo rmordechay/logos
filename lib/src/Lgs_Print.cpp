@@ -46,8 +46,8 @@ static std::string formatValue(const Lgs_TypeInfo* type, void* value) {
         str << obj->name << "{";
         for (int i = 0; i < obj->fieldsCount; ++i) {
             const auto fieldName = obj->fields[i].name;
-            const auto fieldOffset = obj->fields[i].offset;
             const auto fieldType = obj->fields[i].type;
+            const auto fieldOffset = obj->fields[i].offset;
             void* fieldPtr = static_cast<char*>(value) + fieldOffset;
             if (fieldType->isHeap) {
                 fieldPtr = *static_cast<void**>(fieldPtr);

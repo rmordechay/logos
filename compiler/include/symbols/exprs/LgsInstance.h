@@ -10,8 +10,8 @@ class LgsCodeGen;
 class LgsField;
 class LgsType;
 namespace llvm {
-class Type;
-class Value;
+    class Type;
+    class Value;
 }
 
 class LgsInstance final : public LgsExpr {
@@ -27,6 +27,7 @@ public:
     void hashNode(size_t& oldHash) override;
     void setDebugValue(LgsCodeGen& cg) override;
     std::string asText() override;
+    LgsExpr* clone() const override;
     static Value* getInstanceRTType(LgsCodeGen& cg, Value* instance);
     static Value* loadRTType(LgsCodeGen& cg, Type* ty, Value* ptr);
     ~LgsInstance() override;

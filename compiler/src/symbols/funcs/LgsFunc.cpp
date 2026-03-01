@@ -16,7 +16,6 @@
 #include "LgsDefinitions.h"
 #include "stmts/LgsStmtsBlock.h"
 #include "exprs/LgsExpr.h"
-#include "exprs/LgsFuncCall.h"
 #include "types/LgsFuncType.h"
 #include "types/iterables/LgsStr.h"
 #include "codegen/LgsCodeGen.h"

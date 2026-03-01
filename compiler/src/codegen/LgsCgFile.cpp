@@ -21,6 +21,7 @@
 #include <sstream>
 #include <unordered_set>
 #include <map>
+#include <ostream>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -173,13 +174,9 @@ void LgsCgFile::visitMainFunc(LgsMainFunc* func) {
 void LgsCgFile::visitFunc(LgsFunc* func) {
     if (!func->funcType->typeParams.empty()) return;
     if (!func->stmtsBlock) return;
-    const auto ft = func->funcType;
     const auto savedIP =  cg.builder.saveIP();
     createPrologue(func);
     visitStmtsBlock(func->stmtsBlock);
-    if (ft->isVariadic) {
-        cg.callIntrinsics(Intrinsic::vaend, {cg.ptrTy()}, {ft->params.back().IRValue});
-    }
     createEpilogue(func, savedIP);
 }
 
@@ -624,13 +621,12 @@ void LgsCgFile::visitTernaryExpr(LgsTernaryExpr* ternaryExpr) {
 
 void LgsCgFile::visitInstance(LgsInstance* instance) {
     const auto obj = instance->obj;
-    visitObject(obj);
     if (obj->isExternal) {
         instance->IRValue = cg.builder.CreateAlloca(obj->getIRType(cg));
         assert(instance->args.empty());
         return;
     }
-
+    if (!obj->replacements.empty()) visitObject(obj);
     const auto level = instance->getLevel(cg);
     instance->IRValue = obj->getIRZeroValue(cg, instance->pointee, level);
 
@@ -798,7 +794,11 @@ void LgsCgFile::visitVariable(LgsVariable* variable, const bool assign) {
         if (variable->ref.field->type->asEnum()) {
             variable->IRValue = cg.usize(variable->ref.field->index);
         } else {
-            variable->IRValue = variable->pointee;
+            assert(variable->ref.field->IRValue);
+            variable->IRValue = variable->ref.field->IRValue;
+            if (!assign) {
+                variable->IRValue = variable->loadIRPtr(cg);
+            }
         }
         break;
     case OBJECT:
@@ -841,7 +841,7 @@ void LgsCgFile::visitSelection(LgsSelection* selection, const bool assign) {
         if (const auto var = child->asVariable()) {
             visitFieldSelection(var, parent);
             if (!assign || i != iterationCount - 1) {
-                var->IRValue = var->loadIRPtr(cg);
+                child->IRValue = child->loadIRPtr(cg);
             }
         } else if (const auto methodCall = child->asFuncCall()) {
             visitFuncCall(methodCall);
@@ -849,6 +849,22 @@ void LgsCgFile::visitSelection(LgsSelection* selection, const bool assign) {
             visitMetaSelection(metaSelection);
         } else if (const auto instance = child->asInstance()) {
             visitInstance(instance);
+        } else if (const auto iterIndex = child->asIterIndex()) {
+            const auto baseExpr = iterIndex->baseExpr;
+            const auto iterable = baseExpr->type->asIterable();
+            const auto from = iterIndex->index.from;
+            const auto to = iterIndex->index.to;
+            visitFieldSelection(iterIndex->baseExpr->asVariable(), parent);
+            visitExpr(iterIndex->index.from);
+            if (assign) continue;
+            if (to) {
+                iterIndex->IRValue = iterIndex->getIRRangePtr(cg);
+            } else {
+                iterIndex->IRValue = iterable->getIRElement(cg, baseExpr->loadIRPtr(cg), from->IRValue);
+                if (!iterable->isStatic) {
+                    iterIndex->IRValue = iterIndex->loadIRPtr(cg);
+                }
+            }
         } else {
             assert(0);
         }
@@ -1129,10 +1145,6 @@ void LgsCgFile::createPrologue(LgsFunc* func) {
     }
     cg.startFunc(IRFunc, ft->name == LGS_MAIN_FUNC);
     if (func->isTest) for (auto [_, then] : func->mocks) visitExpr(then);
-    if (ft->isVariadic) {
-        ft->params.back().IRValue = cg.builder.CreateAlloca(cg.ptrTy(), nullptr, "va_list");
-        cg.callIntrinsics(Intrinsic::vastart, {cg.ptrTy()}, {ft->params.back().IRValue});
-    }
 }
 
 void LgsCgFile::createEpilogue(const LgsFunc* func, const IRBuilderBase::InsertPoint& savedIP) {
@@ -1140,7 +1152,6 @@ void LgsCgFile::createEpilogue(const LgsFunc* func, const IRBuilderBase::InsertP
     // Main func
     if (ft->name == LGS_MAIN_FUNC) {
         cg.createRet(cg.i32(EXIT_SUCCESS), true);
-
         return;
     }
     if (ft->isVariadic) {

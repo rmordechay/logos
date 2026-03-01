@@ -11,7 +11,7 @@
 #include "exprs/LgsExpr.h"
 
 namespace llvm {
-class Type;
+    class Type;
 }
 
 FunctionType* LgsFuncType::getIRType(LgsCodeGen& cg) {

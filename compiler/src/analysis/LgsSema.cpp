@@ -1182,7 +1182,8 @@ void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent) {
         return addError(E10005, methodCall->location, {name, parent->type->pname()});
     }
     if (method->funcType->hasSelf) {
-        if (parent->asInstance() || parent->asVariable()->ref.symbolType == OBJECT) {
+        const auto parentAsVar = parent->asVariable();
+        if (parentAsVar && parentAsVar->ref.symbolType == OBJECT) {
             if (!parent->type->asObject()->isSingleton) {
                 return addError(E10083, methodCall->location, {method->funcType->name});
             }

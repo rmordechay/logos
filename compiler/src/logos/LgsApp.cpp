@@ -487,6 +487,7 @@ bool LgsApp::generateGenerics() {
             assert(0);
         }
     }
+
     for (auto [_, func] : genericFuncs) {
         const auto isBuiltin = func->funcType->isBuiltin;
         if (isBuiltin && func->funcType->name == MAP_FUNC) {
