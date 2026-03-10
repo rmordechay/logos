@@ -1,5 +1,9 @@
 #include "exprs/LgsTernaryExpr.h"
 
+#include <assert.h>
+
+#include "exprs/LgsExpr.h"
+
 std::string LgsTernaryExpr::asText() {
     assert(0);
 }

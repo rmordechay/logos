@@ -1,5 +1,8 @@
 #pragma once
 #include <cmath>
+#include <optional>
+#include <string>
+#include <vector>
 
 #include "LgsValue.h"
 
@@ -16,7 +19,6 @@ class LgsMatrixExpr;
 class LgsEnvVar;
 class LgsBinaryExpr;
 class LgsCast;
-class LgsTypeExpr;
 class LgsMetaVar;
 class LgsIntConst;
 class LgsVectorExpr;
@@ -37,6 +39,10 @@ class LgsCharConst;
 class LgsFloatConst;
 class LgsStrConst;
 class LgsTypeConst;
+namespace llvm {
+class Constant;
+class Value;
+}
 
 class LgsExpr : public LgsValue {
 public:
@@ -50,13 +56,16 @@ public:
     explicit LgsExpr(LgsType* type = nullptr) : type(type) {}
     LgsType* getType() override;
     void setType(LgsType* newType) override;
+    Value* loadIRPtr(LgsCodeGen& cg) const;
+    Value* getLevel(LgsCodeGen& cg) const;
     std::optional<int64_t> getConstInt();
     std::optional<double_t> getConstFloat();
     std::optional<std::string> getConstStr();
-    Value* loadIRPtr(LgsCodeGen& cg) const;
+    std::optional<std::vector<LgsExpr*>> getConstArr();
+    Constant* getAsConst(LgsCodeGen& cg);
+    Constant* hashConstValue(LgsCodeGen& cg);
 
     virtual LgsExpr* cast(LgsType* toType, bool explicitly);
-    virtual bool equals(LgsExpr* other);
     virtual std::string asText() = 0;
 
     LgsFunc* asFunc();
@@ -68,7 +77,6 @@ public:
     LgsPostfixExpr* asPostfixExpr();
     LgsSelection* asSelection();
     LgsIterIndex* asIterIndex();
-    LgsTypeExpr* asTypeExpr();
     LgsInstance* asInstance();
     LgsArrayExpr* asArrayExpr();
     LgsHashMap* asHashMap();
@@ -85,7 +93,7 @@ public:
     LgsMetaVar* asMetaVar();
     LgsMetaSelection* asMetaSelection();
     LgsNullableExpr* asNullableExpr();
-    LgsExpr* clone() override;
+    LgsExpr* clone() const override;
     ~LgsExpr() override = default;
 };
 

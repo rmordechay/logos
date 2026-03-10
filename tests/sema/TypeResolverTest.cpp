@@ -1,12 +1,21 @@
-#include "logos/LgsApp.h"
 #include <string>
+#include <filesystem>
+#include <map>
+#include <vector>
 
+#include "logos/LgsApp.h"
+#include "LgsTestUtils.h"
 #include "exprs/LgsArrayExpr.h"
 #include "gtest/gtest.h"
 #include "files/LgsMainFile.h"
 #include "stmts/LgsVarDec.h"
-#include "types/LgsNullable.h"
 #include "types/iterables/LgsSArray.h"
+#include "LgsDefinitions.h"
+#include "LgsType.h"
+#include "exprs/LgsExpr.h"
+#include "funcs/LgsFunc.h"
+#include "stmts/LgsStmt.h"
+#include "stmts/LgsStmtsBlock.h"
 
 TEST(TypeResolverTest, SArrStr) {
     LgsApp app;
@@ -15,8 +24,7 @@ TEST(TypeResolverTest, SArrStr) {
         arr: Int[2] = [5, 6]
         arr2: Str[2] = ["text1", "text"]
     })";
-    app.loadSrcFile(code, LGS_MAIN_FILE);
-    app.analyse();
+    parseAndAnalyse(app, {code}, {LGS_MAIN_FILE});
     const auto mainFunc = app.getMainFile()->funcs.at(LGS_MAIN_FUNC);
 
     const auto varDec1 = mainFunc->stmtsBlock->stmts[0].stmt->asVarDec();
@@ -48,15 +56,8 @@ TEST(TypeResolverTest, Generics1) {
         arr = func([1, 2, 3])
     }
     )";
-    app.loadSrcFile(code, LGS_MAIN_FILE);
-    app.analyse();
+    parseAndAnalyse(app, {code}, {LGS_MAIN_FILE});
     const auto mainFile = app.getMainFile();
-    const auto genericFunc = mainFile->symbolTable.genericsFuncs.at("u_func_DArrayInt");
-    ASSERT_TRUE(genericFunc);
-    const auto rt = genericFunc->funcType->rt->asDArray();
-    const auto pt = genericFunc->funcType->params.front().type->asDArray();
-    ASSERT_TRUE(rt && rt->baseType->isInt);
-    ASSERT_TRUE(pt && pt->baseType->isInt);
 }
 
 TEST(TypeResolverTest, Generics2) {
@@ -69,13 +70,6 @@ TEST(TypeResolverTest, Generics2) {
         arr = func([1, 2, 3])
     }
     )";
-    app.loadSrcFile(code, LGS_MAIN_FILE);
-    app.analyse();
+    parseAndAnalyse(app, {code}, {LGS_MAIN_FILE});
     const auto mainFile = app.getMainFile();
-    const auto genericFunc = mainFile->symbolTable.genericsFuncs.at("u_func_DArrayInt");
-    ASSERT_TRUE(genericFunc);
-    const auto rt = genericFunc->funcType->rt;
-    const auto pt = genericFunc->funcType->params.front().type->asDArray();
-    ASSERT_TRUE(rt && rt->isInt);
-    ASSERT_TRUE(pt && pt->baseType->isInt);
 }

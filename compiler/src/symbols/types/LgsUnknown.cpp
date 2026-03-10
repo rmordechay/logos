@@ -37,3 +37,7 @@ DIType* LgsUnknown::getDebugType(LgsCodeGen& cg) {
 Type* LgsUnknown::getIRType(LgsCodeGen& cg) {
     assert(0);
 }
+
+LgsType* LgsUnknown::clone() {
+    return new LgsUnknown(*this);
+}

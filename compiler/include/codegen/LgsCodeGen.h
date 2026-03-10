@@ -1,14 +1,39 @@
 #pragma once
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/Passes/OptimizationLevel.h>
+#include <llvm/IR/Constants.h>
+#include <llvm/IR/DerivedTypes.h>
+#include <llvm/IR/GlobalValue.h>
+#include <llvm/IR/LLVMContext.h>
+#include <math.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <map>
 #include <filesystem>
+#include <functional>
+#include <string>
+#include <vector>
 #include "exprs/LgsExpr.h"
 
 namespace llvm {
     class DIBuilder;
     class PassBuilder;
     class TargetMachine;
+class BasicBlock;
+class Constant;
+class DIBasicType;
+class DICompileUnit;
+class DIFile;
+class DILocation;
+class DISubprogram;
+class Function;
+class GlobalVariable;
+class Instruction;
+class Module;
+class Type;
+class TypeSize;
+class Value;
+class raw_fd_ostream;
 }
 
 using llvm::DIFile;
@@ -52,8 +77,8 @@ struct LgsBaseMsg;
 class LgsFile;
 
 enum LgsCodeGenMode {
-    CG_MODE_RTTYPES,
-    CG_MODE_SRC_CODE,
+    CG_MODE_RTT,
+    CG_MODE_SRC,
     CG_MODE_GENERICS,
 };
 
@@ -63,48 +88,54 @@ public:
     LLVMContext context;
     LgsLLDBGen debugger;
     Module* IRModule = nullptr;
+    Value* currentLevel = nullptr;
     Function* currentFunc = nullptr;
+    Value* lastLevel = nullptr;
+    Function* lastFunc = nullptr;
     IRBuilder<> builder = IRBuilder(context);
     std::map<std::string, Type*> typesRegistry;
-    IRBuilderBase::InsertPoint savedIP;
+    Value* startTime = nullptr;
 
     explicit LgsCodeGen(const LgsCodeGenMode mode) : mode(mode) {}
     void setupModule(const std::filesystem::path& file, bool debugMode = false);
     bool writeIRModule(const LgsPaths& paths, uint8_t optLevel) const;
-    Constant* getString(const std::string& value, bool addNull = false);
+    Constant* getString(const std::string& value, bool addNull = true);
     GlobalVariable* createGlobal(const std::string& name, Type* type, Constant* initializer, bool isConst = true, GlobalValue::LinkageTypes linkage = GlobalValue::ExternalLinkage) const;
     void loop(Value* loopLength, const std::function<void(Value*, BasicBlock*)>& body);
     void ifStmt(Value* cond, const std::function<void()>& body);
-    void ifElseStmt(Value* cond, const std::function<void()>& ifBody, const std::function<void()>& elseBody);
+    void ifElseStmt(Value* cond, const std::function<void(BasicBlock*)>& ifBody, const std::function<void(BasicBlock*)>& elseBody);
 
     void store(Value* v, Value* ptr);
     Value* load(Type* ty, Value* ptr);
     Value* loadPtr(Value* value);
+    Value* loadSize(Value* value);
     Value* isNull(Value* value);
-    Value* getLevel(Value* v);
     Value* emptyBuffer(size_t size = 0);
-    void incSize(Value* bufferOffset, Value* ptr);
+    void addNullTerminate(Value* strPtr, Value* index);
     Value* allocaAndStore(Type* type, Value* v, const std::string& name = "");
+    Value* loadField(Type* parentType, Value* parentPtr, size_t position, Type* ty);
+    void storeField(Type* parentType, Value* parentPtr, size_t position, Value* v);
     StructType* getStructType(const std::vector<Type*>& types, const std::string& name = "");
-    void storeStructField(Type* parentType, Value* parentPtr, size_t position, Value* v);
-    Value* loadStructField(Type* parentType, Value* parentPtr, size_t position, Type* ty);
-    void addNullTerminate(Value* strPtr, Value* pos);
+    StructType* getRTTStruct();
 
-    void callStackPush();
-    void callPopStack();
+
     Value* getCurrentLevel();
+    Value* levelAbove();
     Value* callHash(Value* type, Value* arg);
     Value* getVField(Value* objType, Value* objInstance, Value* fieldName);
     Value* getVFunc(Value* objType, Value* funcName);
-    Value* allocInCurrent(Value* size, bool setLevel);
-    Value* allocInLevel(Value* size, Value* level, bool setLevel);
-    Value* allocStrConst(Value* strPtr);
+    Value* heapAllocSize(Value* size, Value* level, bool setLevel);
+    Value* heapAllocType(const std::string& baseName, Value* type, Value* level);
     Value* reallocate(Value* ptr, Value* size, Value* level);
     Value* moveValue(const std::string& baseName, Value* v, Value* toLevel);
     void throwError(const LgsBaseMsg& err, const std::vector<Value*>& args = {});
 
     // Blocks
     BasicBlock* createBlock(const std::string& name = "", Function* parent = nullptr);
+    void startFunc(Function* func, bool isMain = false);
+    void saveFuncState();
+    void restoreFuncState(const IRBuilderBase::InsertPoint& savedIP);
+    void createRet(Value* rv = nullptr, bool isMain = false);
     void branch(BasicBlock* block);
     void startBlock(BasicBlock* block);
     void branchAndStartBlock(BasicBlock* block);
@@ -127,16 +158,11 @@ public:
     Value* callPrintf(const std::string& fmt, const std::vector<Value*>& args);
     Value* callSnprintf(const std::string& fmt, const std::vector<Value*>& args);
     Value* callSnprintf(const std::string& fmt, Value* buffer, Value* size, Value* ptr);
-    Value* strBuilderAdd();
     Value* callStrlen(Value* str);
     Value* strsEqual(Value* str1, Value* str2);
     Value* strsNotEqual(Value* str1, Value* str2);
     void callMemset(Value* dest, Value* src, Value* size);
     void callMemcpy(Value* dest, Value* src, Value* size);
-
-    // Runtime funcs
-    GlobalVariable* getRTTypeInfo(const std::string& varName, const std::string& typeName, ConstantInt* size, int32_t kind, bool isHeapAlloc, Constant* extra = nullptr);
-    StructType* getRTTStruct();
 
     // Debugging
     void printStr(const std::string& value, const std::string& prefix = "");
@@ -147,7 +173,7 @@ public:
     void printPtr(Value* value, const std::string& prefix = "");
     void printBytes(Value* value, Value* size, const std::string& prefix = "");
     Value* measureTimeStart();
-    Value* measureTimeEnd(Value* startTime);
+    Value* measureTimeEnd(Value* start);
 
     void finalizeDebugger(const std::filesystem::path& buildPath) const;
     llvm::DILocation* getDebugLoc(const LgsLocation& location);
@@ -180,11 +206,13 @@ public:
     Constant* floatv(float_t v);
     Constant* doublev(double_t v);
     ConstantInt* zero8();
+    ConstantInt* zero16();
     ConstantInt* zero32();
     ConstantInt* zero64();
     ConstantInt* zeroSize();
     Value* toFloat(Value* v);
     Value* toInt(Value* v);
+    Value* toLong(Value* v);
     Value* toSize(Value* v);
     Constant* emptyStr();
     ~LgsCodeGen();
@@ -195,8 +223,13 @@ public:
     Value* index;
     Value* buffer;
     LgsCodeGen& cg;
+    bool asJSON = false;
 
-    explicit LgsStrBuilder(LgsCodeGen& cg) : index(cg.zeroSize()), buffer(cg.emptyBuffer()), cg(cg) {}
-    void add(Value* value, Value* size);
-    void print() const;
+    explicit LgsStrBuilder(LgsCodeGen& cg, Value* buffer = nullptr) : cg(cg) {
+        this->buffer = buffer ? buffer : cg.emptyBuffer();
+        index = cg.allocaAndStore(cg.sizeTy(), cg.zeroSize());
+    }
+    void add(Value* value, Value* size) const;
+    void add(const std::string& value) const;
+    void finalize() const;
 };

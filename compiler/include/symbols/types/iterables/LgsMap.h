@@ -1,10 +1,22 @@
 #pragma once
-#include "LgsDArray.h"
-#include "LgsStr.h"
+#include <string>
+
+#include "LgsIterable.h"
 #include "types/LgsTypePair.h"
+#include "LgsType.h"
+#include "Lgs_Types.h"
+
+class LgsCodeGen;
+namespace llvm {
+class Value;
+}
 
 #define KEYS_FUNC_NAME "keys"
 #define VALUES_FUNC_NAME "values"
+
+namespace llvm {
+    class Function;
+}
 
 class LgsMap final : public LgsIterable {
 public:
@@ -28,7 +40,7 @@ public:
     LgsType* getValueType() override;
     bool canCastTo(LgsType* other) override;
     LgsExpr* getZeroValue() override;
-    Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee) override;
+    Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     Value* lenIR(LgsCodeGen& cg, Value* iterable) override;
     Value* inIR(LgsCodeGen& cg, Value* iterableExpr, Value* value) override;

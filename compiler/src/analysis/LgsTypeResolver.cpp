@@ -1,28 +1,36 @@
 #include "analysis/LgsTypeResolver.h"
 
+#include <filesystem>
+#include <map>
+#include <unordered_map>
+#include <utility>
+
 #include "errors/LgsErrHandler.h"
-#include "exprs/LgsVariable.h"
 #include "files/LgsFile.h"
 #include "files/LgsMainFile.h"
 #include "funcs/LgsFunc.h"
 #include "funcs/LgsMainFunc.h"
 #include "stmts/LgsField.h"
-#include "stmts/LgsIOPair.h"
 #include "types/LgsEnum.h"
 #include "types/LgsFuncType.h"
-#include "types/LgsGenericType.h"
+#include "types/LgsTypeParam.h"
 #include "types/LgsInterface.h"
 #include "types/iterables/LgsIterable.h"
 #include "types/LgsSubType.h"
-
 #include "errors/LgsErrors.h"
 #include "types/LgsNullable.h"
 #include "types/LgsSelf.h"
+#include "LgsSymbol.h"
+#include "LgsSymbolTable.h"
+#include "LgsType.h"
+#include "funcs/LgsParam.h"
+#include "types/LgsObject.h"
+#include "types/LgsTypePair.h"
 
 void LgsTypeResolver::resolveType(LgsType*& type) {
     if (!type) return;
-    for (size_t i = 0; i < type->genericArgs.size(); ++i) {
-        resolveType(type->genericArgs[i]);
+    for (auto& genericArg : type->genericArgs) {
+        resolveType(genericArg);
     }
     if (const auto self = type->asSelf()) {
         self->baseType = currentObj;
@@ -44,10 +52,10 @@ void LgsTypeResolver::resolveType(LgsType*& type) {
     }
 
     if (type->isUnknown()) {
-        auto typeName = type->getName();
+        const auto typeName = type->getName();
         const auto newType = findSymbol(typeName);
         if (!newType) {
-            errHandler.addError(E10006, &type->location, file->path, {typeName});
+            errHandler.addError(E10006, &type->location, file->path, {type->pname()});
             return;
         }
         freeType(type);
@@ -80,21 +88,17 @@ void LgsTypeResolver::resolveObjTypes(LgsObject* obj) {
             resolveType(interface);
         }
     }
-
-    for (const auto generic : obj->generics) {
+    for (const auto generic : obj->typeParams) {
         if (generic->asSelf()) {
             errHandler.addError(E10014, &generic->location, file->path, {});
         }
     }
-
     for (const auto& enum_ : obj->enums) {
         file->symbolTable.addSymbol(LgsSymbol(enum_), &errHandler, file->path);
     }
-
     for (const auto& field : obj->fields) {
         resolveType(field->type);
     }
-
     for (const auto& [_, method] : obj->methods) {
         resolveType(method->funcType->rt);
         for (auto& param : method->funcType->params) {
@@ -114,21 +118,17 @@ void LgsTypeResolver::resolveInterface(LgsInterface* interface) {
 }
 
 void LgsTypeResolver::resolveFuncType(LgsFuncType* funcType) {
-    assert(funcType);
-    const auto oldFunc = currentFuncType;
-    currentFuncType = funcType;
+    if (currentFunc && !currentFunc->typeParams.empty()) {
+        funcType->typeParams.insert(funcType->typeParams.end(), currentFunc->typeParams.begin(), currentFunc->typeParams.end());
+    }
+    const auto oldFunc = currentFunc;
+    currentFunc = funcType;
     for (auto& param : funcType->params) {
-        if (const auto& cb = param.type->asFuncType()) {
-            cb->genericTypes = funcType->genericTypes;
-        }
         resolveType(param.type);
-        if (const auto ft = param.type->asFuncType()) {
-            ft->name = param.name;
-        }
     }
     resolveType(funcType->rt);
     funcType->swapReturn = !funcType->isExternal && funcType->rt->asSArray();
-    currentFuncType = oldFunc;
+    currentFunc = oldFunc;
 }
 
 LgsType* LgsTypeResolver::findSymbol(const std::string& typeName) const {
@@ -149,11 +149,14 @@ LgsType* LgsTypeResolver::findSymbol(const std::string& typeName) const {
         default: break;
         }
     }
-    if (currentFuncType) {
-        for (const auto genericType : currentFuncType->genericTypes) {
-            if (genericType->name == typeName) {
-                return genericType;
-            }
+    if (currentObj) {
+        for (const auto typeParam : currentObj->typeParams) {
+            if (typeParam->name == typeName) return typeParam;
+        }
+    }
+    if (currentFunc) {
+        for (const auto typeParam : currentFunc->typeParams) {
+            if (typeParam->name == typeName) return typeParam;
         }
     }
     return nullptr;

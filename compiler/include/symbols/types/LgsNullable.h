@@ -1,6 +1,15 @@
 #pragma once
 #include <functional>
+#include <string>
+
 #include "LgsType.h"
+#include "Lgs_Types.h"
+
+class LgsBinaryExpr;
+class LgsCodeGen;
+namespace llvm {
+class Value;
+}
 
 class LgsNullable final : public LgsType {
 public:
@@ -20,20 +29,24 @@ public:
     LgsField* getField(const std::string& fieldName) override;
     LgsFunc* getMethod(const std::string& methodName) override;
     size_t sizeBytes() override;
-    LgsExpr* getZeroValue() override;
-    Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee) override;
     std::string pname() override;
     std::string getName() override;
+    std::string fmtStr() const override;
+    LgsExpr* getZeroValue() override;
+    bool canCastTo(LgsType* other) override;
+    LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
+    bool isRecursive(std::unordered_set<std::string>& visited) const override;
     Type* getIRType(LgsCodeGen& cg) override;
     Constant* getRTTypeExtra(LgsCodeGen& cg) override;
-    bool canCastTo(LgsType* other) override;
-    std::string fmtStr() const override;
-    DIType* getDebugType(LgsCodeGen& cg) override;
-    LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
+    void asIRText(LgsStrBuilder& sb, Value* value) override;
+    Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level) override;
+    Value* moveValue(LgsCodeGen& cg, Value* value, Value* toLevel) override;
     Value* addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) override;
+    Value* hashValue(LgsCodeGen& cg, Value* value) override;
     void setIRFields(LgsCodeGen& cg, Value* ptr, Value* value, Value* isSet);
-    Value* loadIsSet(LgsCodeGen& cg, Value* ptr);
-    Value* loadValue(LgsCodeGen& cg, Value* ptr);
-    Value* applyNumberBinOp(LgsCodeGen& cg, LgsBinaryExpr* binExpr, const std::function<Value*(LgsBinaryExpr*)>& func);
     Value* applyPtrBinOp(LgsCodeGen& cg, LgsBinaryExpr* binExpr, const std::function<Value*(LgsBinaryExpr*)>& func);
+    Value* applyNumberBinOp(LgsCodeGen& cg, LgsBinaryExpr* binExpr, const std::function<Value*(LgsBinaryExpr*)>& func);
+    DIType* getDebugType(LgsCodeGen& cg) override;
+    static Value* loadValue(LgsCodeGen& cg, Value* ptr);
+    static Value* loadIsSet(LgsCodeGen& cg, Value* ptr);
 };

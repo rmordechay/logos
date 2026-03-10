@@ -1,15 +1,36 @@
 #include "exprs/LgsArrayExpr.h"
+
+#include <assert.h>
+#include <llvm/IR/DIBuilder.h>
+#include <llvm/IR/DebugInfoMetadata.h>
+#include <llvm/IR/IRBuilder.h>
+
 #include "types/iterables/LgsSet.h"
-#include "LgsUtils.h"
 #include "codegen/LgsCodeGen.h"
-#include "types/LgsNullable.h"
+#include "LgsTokens.h"
+#include "LgsType.h"
+#include "types/iterables/LgsIterable.h"
 
 LgsExpr* LgsArrayExpr::cast(LgsType* toType, const bool explicitly) {
-    if (iterable && iterable->baseType) return this;
-    const auto otherIter = toType->asIterable();
-    if (!otherIter || otherIter->asStr()) return this;
-    if (otherIter->getNestedBaseType()->asGenericType()) return this;
-    setType(toType);
+    if (const auto dArr = toType->asDArray()) {
+        setType(new LgsDArray());
+        auto current = iterable->asDArray();
+        auto target = dArr;
+        while (const auto innerDArr = target->baseType->asDArray()) {
+            current->baseType = new LgsDArray();
+            current = current->baseType->asDArray();
+            target = innerDArr;
+        }
+    } else if (const auto sArr = toType->asSArray()) {
+        setType(new LgsSArray(nullptr, sArr->lengthExpr));
+        auto current = iterable->asSArray();
+        auto target = sArr;
+        while (const auto innerSArr = target->baseType->asSArray()) {
+            current->baseType = new LgsSArray(nullptr, innerSArr->lengthExpr);
+            current = current->baseType->asSArray();
+            target = innerSArr;
+        }
+    }
     return this;
 }
 
@@ -40,10 +61,10 @@ void LgsArrayExpr::setDebugValue(LgsCodeGen& cg) {
 std::string LgsArrayExpr::asText() {
     if (type) return type->pname();
     if (elements.empty()) return "[]";
-    return "[" + elements.front()->asText() + ", ...]";
+    return "[" + elements.front()->asText() + "...]";
 }
 
-LgsExpr* LgsArrayExpr::clone() {
+LgsExpr* LgsArrayExpr::clone() const {
     const auto newArr = new LgsArrayExpr(*this);
     newArr->elements.clear();
     for (const auto element : elements) {

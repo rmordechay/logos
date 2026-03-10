@@ -1,16 +1,23 @@
 #include "types/primitives/LgsFloat.h"
 
-#include <llvm/IR/Module.h>
+#include <assert.h>
+#include <llvm/ADT/ArrayRef.h>
+#include <llvm/IR/Constant.h>
+#include <llvm/IR/Constants.h>
+#include <llvm/IR/IRBuilder.h>
+#include <llvm/IR/Instructions.h>
+#include <llvm/IR/Type.h>
+#include <utility>
 
 #include "LgsBinaryTokens.h"
 #include "codegen/LgsCodeGen.h"
 #include "exprs/LgsBinaryExpr.h"
 #include "exprs/constants/LgsFloatConst.h"
-#include "../../../../include/symbols/types/primitives/LgsAny.h"
 #include "types/LgsNullable.h"
 #include "types/iterables/LgsVec.h"
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsDouble.h"
+#include "exprs/LgsExpr.h"
 
 std::string LgsFloat::getName() {
     return name;
@@ -24,7 +31,7 @@ LgsExpr* LgsFloat::getZeroValue() {
     return new LgsFloatConst(this, 0.0);
 }
 
-Value* LgsFloat::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
+Value* LgsFloat::getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level) {
     return cg.floatv(0);
 }
 
@@ -45,15 +52,14 @@ bool LgsFloat::canCastTo(LgsType* other) {
     if (name == otherName) return true;
     if (other->isAny()) return true;
     if (otherName == LgsDouble::name) return true;
-    if (other->asGenericType()) return other->canCastTo(this);
     if (const auto nullable = other->asNullable()) return canCastTo(nullable->baseType);
     return false;
 }
 
-void LgsFloat::asIRText(LgsCodeGen& cg, LgsStrBuilder& strBuilder, Value* ptr) {
-    const auto buffer = cg.emptyBuffer(128);
-    const auto bytesRead = cg.callSnprintf(fmtStr(), buffer, cg.usize(128), ptr);
-    strBuilder.add(buffer, cg.toSize(bytesRead));
+void LgsFloat::asIRText(LgsStrBuilder& sb, Value* value) {
+    const auto buffer = sb.cg.emptyBuffer(128);
+    const auto bytesRead = sb.cg.callSnprintf(fmtStr(), buffer, sb.cg.usize(128), value);
+    sb.add(buffer, sb.cg.toSize(bytesRead));
 }
 
 LgsType* LgsFloat::applyBinOp(LgsType* rightType, LgsBinOp& op) {
@@ -80,13 +86,8 @@ LgsType* LgsFloat::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     case GE:
     case LE:
         return &LGS_BOOL;
-    case AND:
-    case OR:
-    case IN:
-    case CROSS:
+    default:
         break;
-    case NOOP:
-        assert(0);
     }
     return nullptr;
 }
@@ -109,8 +110,8 @@ Value* LgsFloat::mulIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
     const auto left = binExpr->left;
     const auto right = binExpr->right;
     if (left->type->asVec() && right->type->asVec()) {
-        const auto dotFunc = getDotProductFunc(cg, left->type->asVec());
-        return cg.builder.CreateCall(dotFunc, {left->IRValue, right->IRValue});
+        const auto [l, r] = loadVecPair(cg, left->IRValue, right->IRValue, left->type);
+        return cg.builder.CreateCall(getDotProductFunc(cg, left->type->asVec()), {l, r});
     }
     auto [l, r] = loadNumberPair(cg, left->IRValue, right->IRValue, this);
     return cg.builder.CreateFMul(l, r);

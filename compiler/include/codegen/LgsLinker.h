@@ -1,6 +1,10 @@
 #pragma once
-#include "logos/LgsPaths.h"
 #include <vector>
+#include <string>
+
+#include "logos/LgsPaths.h"
+
+struct LgsPaths;
 
 namespace llvm {
     class Module;
@@ -14,6 +18,7 @@ class LgsLinker {
 public:
     LgsPaths& paths;
     LgsAppConfigs& appConfigs;
+    std::vector<std::string> filesToLink;
     std::vector<std::string> importPaths;
 
     LgsLinker(LgsAppConfigs& appConfigs, LgsPaths& paths) : paths(paths), appConfigs(appConfigs) {}

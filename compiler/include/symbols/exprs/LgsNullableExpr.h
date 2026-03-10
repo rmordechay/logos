@@ -1,4 +1,6 @@
 #pragma once
+#include <string>
+
 #include "LgsExpr.h"
 #include "types/LgsNullable.h"
 
@@ -14,5 +16,5 @@ public:
     void setDebugValue(LgsCodeGen& cg) override;
     LgsExpr* cast(LgsType* toType, bool explicitly) override;
     std::string asText() override;
-    LgsExpr* clone() override;
+    LgsExpr* clone() const override;
 };

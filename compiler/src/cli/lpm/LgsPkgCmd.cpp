@@ -1,7 +1,11 @@
 #include "cli/lpm/LgsPkgCmd.h"
+
 #include "errors/LgsCliErrors.h"
 #include "cli/LgsCliHandler.h"
 #include "cli/lpm/LgsInstallCmd.h"
+#include "LgsUtils.h"
+#include "errors/LgsErrHandler.h"
+#include "errors/LgsErrors.h"
 
 void LgsPkgCmd::run() {
     const std::string subcmd = argv[2];

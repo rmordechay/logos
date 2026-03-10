@@ -1,5 +1,8 @@
 #pragma once
+#include <string>
+
 #include "LgsType.h"
+#include "Lgs_Types.h"
 
 class LgsVoid final : public LgsType {
 public:
@@ -17,6 +20,7 @@ public:
     std::string fmtStr() const override;
     bool canCastTo(LgsType* other) override;
     DIType* getDebugType(LgsCodeGen& cg) override;
+    LgsVoid* clone() override;
 };
 
 inline LgsVoid LGS_VOID;

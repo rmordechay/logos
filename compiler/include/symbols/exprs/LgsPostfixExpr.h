@@ -1,4 +1,6 @@
 #pragma once
+#include <string>
+
 #include "exprs/LgsExpr.h"
 
 enum LgsPostfixOperator {

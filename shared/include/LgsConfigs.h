@@ -5,6 +5,7 @@
 #define LGS_STR_BUFFER_SIZE 1024
 #define LGS_MAX_LEVEL 1024*10
 #define LGS_ITER_INIT_CAP 3
+#define LGS_MAP_LOAD_THRESHOLD 0.75
 #define LGS_OBJ_MD_SIZE sizeof(size_t) + sizeof(void*)
 
 enum LgsLogLevel {
@@ -30,8 +31,8 @@ struct LgsConfigs {
     LgsArch arch;
     bool isDevMode = true;
     bool isTestMode = false;
-    bool printIR = true;
     bool writeIRFiles = false;
+    bool printIR = true;
     LgsLogLevel logLevel = LGS_INFO;
 
     LgsConfigs() {

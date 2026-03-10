@@ -1,5 +1,4 @@
-# WIP
-# Logos Programming Language
+# Logos Programming Language (WIP)
 
 ## Build
 ### Requirements

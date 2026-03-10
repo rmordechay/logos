@@ -1,5 +1,10 @@
 #pragma once
+#include <string>
+
 #include "LgsCliCmd.h"
+#include "cli/LgsCliHelp.h"
+
+class LgsCliCmd;
 
 class LgsCliHandler {
 public:

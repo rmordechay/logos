@@ -1,8 +1,11 @@
+#include <string>
+
 #include "codegen/LgsCodeGen.h"
 #include "exprs/constants/LgsCharConst.h"
-#include "../../../../include/symbols/types/primitives/LgsAny.h"
+#include "types/primitives/LgsAny.h"
 #include "types/iterables/LgsStr.h"
-#include <llvm/IR/Module.h>
+#include "LgsType.h"
+#include "types/primitives/LgsChar.h"
 
 
 size_t LgsChar::sizeBytes() {
@@ -38,4 +41,18 @@ bool LgsChar::canCastTo(LgsType* other) {
 
 DIType* LgsChar::getDebugType(LgsCodeGen& cg) {
     assert(0);
+}
+
+void LgsChar::asIRText(LgsStrBuilder& sb, Value* value) {
+    const auto buffer = sb.cg.emptyBuffer(2);
+    const auto bytesRead = sb.cg.callSnprintf(fmtStr(), buffer, sb.cg.usize(2), value);
+    sb.add(buffer, sb.cg.toSize(bytesRead));
+}
+
+Value* LgsChar::getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level) {
+    return cg.i8('0');
+}
+
+Value* LgsChar::hashValue(LgsCodeGen& cg, Value* value) {
+    return value;
 }

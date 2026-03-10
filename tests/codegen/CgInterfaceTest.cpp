@@ -1,3 +1,7 @@
+#include <sstream>
+#include <string>
+#include <vector>
+
 #include "gtest/gtest.h"
 #include "LgsTestUtils.h"
 
@@ -21,7 +25,7 @@ TEST(CgInterfaceTest, Test1) {
         func(obj)
     }
     )";
-    std::istringstream stream(getLgsOutput(code));
+    std::istringstream stream(runLgsApp(code));
     const auto lines = getLines(stream, 2);
     EXPECT_EQ(lines[0], "From Obj");
     EXPECT_EQ(lines[1], "From Obj");
@@ -50,8 +54,30 @@ TEST(CgInterfaceTest, Test2) {
         obj2.func()
     }
     )";
-    std::istringstream stream(getLgsOutput(code));
+    std::istringstream stream(runLgsApp(code));
     const auto lines = getLines(stream, 2);
     EXPECT_EQ(lines[0], "From Obj");
     EXPECT_EQ(lines[1], "From Interface");
+}
+
+TEST(CgInterfaceTest, Test3) {
+    const auto code = R"(
+    interface Interface {
+        func()
+    }
+    func(obj: Interface) {
+        obj.func()
+    }
+    main() {
+        obj = Interface{func={print("Hello world")}}
+        obj.func()
+        func(obj)
+        func(Interface{func={print("Hello world 2")}})
+    }
+    )";
+    std::istringstream stream(runLgsApp(code));
+    const auto lines = getLines(stream, 3);
+    EXPECT_EQ(lines[0], "Hello world");
+    EXPECT_EQ(lines[1], "Hello world");
+    EXPECT_EQ(lines[2], "Hello world 2");
 }

@@ -1,4 +1,8 @@
 #include "parser/LgsLexer.h"
+
+#include <_ctype.h>
+#include <unordered_map>
+
 #include "errors/LgsErrors.h"
 
 std::vector<LgsToken> LgsLexer::tokenize() {
@@ -133,7 +137,7 @@ LgsToken LgsLexer::nextToken() {
             if (match('=')) return {T_EQUAL_DOUBLE_RANGLE, "<<=", location};
             return {T_DOUBLE_RANGLE, "<<", location};
         }
-        if (currentChar == '=') return {T_LE, "<=", location};
+        if (match('=')) return {T_LE, "<=", location};
         return {T_LANGLE, "<", location};
     case '>':
         advance();
@@ -141,7 +145,7 @@ LgsToken LgsLexer::nextToken() {
             if (match('=')) return {T_EQUAL_DOUBLE_LANGLE, ">>=", location};
             return {T_DOUBLE_LANGLE, ">>", location};
         }
-        if (currentChar == '=') return {T_GE, ">=", location};
+        if (match('=')) return {T_GE, ">=", location};
         return {T_RANGLE, ">", location};
     case ':':
         advance();
@@ -195,7 +199,10 @@ LgsToken LgsLexer::nextToken() {
     case '^':
         advance();
         if (match('=')) return {T_EQUAL_CARET, "^=", location};
-        if (match('^')) return {T_DOUBLE_CARET, "^^", location};
+        if (match('^')) {
+            if (match('=')) return {T_EQUAL_DOUBLE_CARET, "^^=", location};
+            return {T_DOUBLE_CARET, "^^", location};
+        }
         return {T_CARET, "^", location};
     default:
         errHandler.addError(E10088, &location, filePath, {});

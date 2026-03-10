@@ -1,22 +1,21 @@
 #pragma once
+#include <string>
+#include <vector>
+
 #include "LgsSymbol.h"
 #include "exprs/LgsExpr.h"
+#include "stmts/LgsVarDec.h"
 
 class LgsFuncType;
 struct LgsSymbol;
-
-struct LgsFuncArg {
-    std::string name = "";
-    LgsExpr* expr = nullptr;
-    bool isSelf = false;
-    explicit LgsFuncArg(LgsExpr* expr, const std::string& name = "", const bool isSelf = false) : name(name), expr(expr), isSelf(isSelf) {}
-};
+class LgsFunc;
+class LgsType;
 
 class LgsFuncCall final : public LgsExpr {
 public:
     std::string name;
-    std::vector<LgsFuncArg> args;
-    std::vector<LgsType*> genericArgs;
+    std::vector<LgsVarDec> args;
+    std::vector<LgsType*> typeArgs;
     LgsFunc* func = nullptr;
     LgsFunc* coroutine = nullptr;
     bool inSelection = false;
@@ -26,13 +25,10 @@ public:
     LgsSymbol ref;
 
     explicit LgsFuncCall(const std::string& name) : name(name) {}
-    std::string mangleName() const;
-    bool equals(LgsExpr* other) override;
     bool equals(LgsFuncType* funcType) const;
-    bool equalsVariadic(const LgsFuncType* funcType) const;
-    bool equalsDefaults(LgsFuncType* funcType) const;
     std::string asText() override;
+    std::string mangleName() const;
     void setDebugValue(LgsCodeGen& cg) override;
-    LgsFuncCall* clone() override;
+    LgsFuncCall* clone() const override;
     ~LgsFuncCall() override;
 };

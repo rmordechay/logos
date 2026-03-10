@@ -1,10 +1,18 @@
 #pragma once
+#include <unordered_map>
+#include <vector>
+
 #include "loops/LgsMetaVar.h"
 #include "stmts/LgsStmt.h"
+#include "LgsValue.h"
+
+class LgsCodeGen;
+class LgsVarDec;
 
 namespace llvm {
     class BasicBlock;
     class AllocaInst;
+class Value;
 }
 
 class LgsWhileLoop;

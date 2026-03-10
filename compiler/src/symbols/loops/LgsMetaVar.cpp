@@ -1,9 +1,6 @@
 #include "loops/LgsMetaVar.h"
-#include "codegen/LgsCodeGen.h"
 
-bool LgsMetaVar::equals(LgsExpr* other) {
-    assert(0);
-}
+#include <assert.h>
 
 std::string LgsMetaVar::asText() {
     return name;
@@ -13,6 +10,6 @@ void LgsMetaVar::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }
 
-LgsExpr* LgsMetaVar::clone() {
+LgsExpr* LgsMetaVar::clone() const {
     return new LgsMetaVar(*this);
 }

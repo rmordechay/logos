@@ -1,9 +1,11 @@
 #include "types/iterables/LgsSet.h"
 
+#include <assert.h>
+#include <llvm/IR/DerivedTypes.h>
+
 #include "LgsBinaryTokens.h"
 #include "codegen/LgsCodeGen.h"
-#include "../../../../include/symbols/types/primitives/LgsAny.h"
-#include "types/iterables/LgsDArray.h"
+#include "LgsType.h"
 
 Type* LgsSet::getIRType(LgsCodeGen& cg) {
     return cg.getStructType({cg.ptrTy(), cg.sizeTy(), cg.sizeTy(), cg.ptrTy()}, name);
@@ -26,7 +28,7 @@ std::string LgsSet::getName() {
 }
 
 std::string LgsSet::pname() {
-    return std::string(name) + "<" + (genericArgs.empty() ? "" : genericArgs.front()->pname()) + ">";
+    return std::string(name);
 }
 
 bool LgsSet::canCastTo(LgsType* other) {

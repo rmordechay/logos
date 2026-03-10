@@ -1,11 +1,18 @@
 #pragma once
+#include <filesystem>
+#include <mutex>
+#include <string>
+#include <vector>
+
 #include "LgsAppCache.h"
 #include "LgsAppConfigs.h"
-#include "LgsDefinitions.h"
 #include "LgsPaths.h"
 #include "errors/LgsErrHandler.h"
+#include "LgsSymbolTable.h"
+#include "codegen/LgsCodeGen.h"
+#include "files/LgsFile.h"
 
-class LgsAppConfigFile;
+class LgsAppFile;
 class LgsTestFile;
 class LogosParser;
 class LgsCodeGen;
@@ -28,13 +35,12 @@ public:
     LgsSymbolTable globals;
     LgsErrHandler errHandler;
     std::vector<LgsFile*> srcFiles;
-    std::vector<LgsFile*> genericFiles;
     std::vector<LgsEnvFile*> envFiles;
-    std::vector<LgsTestFile*> testFiles;
+    std::vector<LgsFile*> genericFiles;
+    LgsFile rttFile{"rtt", CG_MODE_RTT};
+    LgsAppFile* appFile = nullptr;
     std::vector<LgsApp*> importApps;
-    LgsAppConfigFile* appConfigFile = nullptr;
-    std::string lgsCode; // Used when passing code directly.
-    LgsFile rttFile{"rtt", CG_MODE_RTTYPES};
+    std::string lgsCode; // Used when passing code directly
 
     explicit LgsApp(const fs::path& rootPath = "") {
         paths.rootPath = rootPath;
@@ -48,18 +54,20 @@ public:
     bool generate();
     bool link();
     bool loadConfigs();
-    void loadSrcFile(const std::string& fileCode, const fs::path& filePath);
-    bool loadConfigFile();
+    void loadSrcFile(const fs::path& filePath);
+    void loadSrcFile(const std::string& code, const fs::path& filePath);
+    bool loadAppFile();
     bool loadEnvFiles();
     void loadBuiltins();
     bool resolveGlobals();
+    bool generateMainFile();
     bool generateRTTTypes();
     bool generateGenerics();
     void createBuildDirs();
     bool validateProject();
     bool validateEnvsFiles();
     bool validateRequiredEnvs();
-    bool resolveImports();
+    bool resolvePackages();
     void printIR() const;
     void initPaths(const fs::path& root);
     LgsMainFile* getMainFile() const;

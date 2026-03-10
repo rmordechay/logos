@@ -1,6 +1,11 @@
 #include "cli/lpm/LgsInstallCmd.h"
+
+#include <filesystem>
+
 #include "errors/LgsCliErrors.h"
-#include "files/LgsAppConfigFile.h"
+#include "LgsDefinitions.h"
+#include "errors/LgsErrHandler.h"
+#include "logos/LgsPaths.h"
 
 void LgsInstallCmd::run() {
     const fs::path path = argv[3];

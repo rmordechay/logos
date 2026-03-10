@@ -1,7 +1,9 @@
 #include "stmts/LgsAssignment.h"
-#include "exprs/LgsArrayExpr.h"
-#include "exprs/LgsVariable.h"
+
+#include <assert.h>
+
 #include "exprs/LgsBinaryExpr.h"
+#include "exprs/LgsExpr.h"
 
 void LgsAssignment::setDebugValue(LgsCodeGen& cg) {
     assert(0);

@@ -1,5 +1,8 @@
 #pragma once
+#include <string>
+
 #include "LgsType.h"
+#include "Lgs_Types.h"
 
 class LgsShort final : public LgsType {
 public:
@@ -12,11 +15,14 @@ public:
     }
     size_t sizeBytes() override;
     Type* getIRType(LgsCodeGen& cg) override;
+    void asIRText(LgsStrBuilder& sb, Value* value) override;
     std::string getName() override;
     LgsExpr* getZeroValue() override;
     bool canCastTo(LgsType* other) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     std::string fmtStr() const override;
+    Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level) override;
+    Value* hashValue(LgsCodeGen& cg, Value* value) override;
     DIType* getDebugType(LgsCodeGen& cg) override;
 };
 

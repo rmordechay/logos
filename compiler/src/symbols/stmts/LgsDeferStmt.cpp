@@ -1,7 +1,11 @@
 #include "stmts/LgsDeferStmt.h"
 
-#include <exprs/LgsFuncCall.h>
 #include <exprs/LgsSelection.h>
+#include <assert.h>
+
+#include "exprs/LgsExpr.h"
+
+class LgsFuncCall;
 
 void LgsDeferStmt::setDebugValue(LgsCodeGen& cg) {
     assert(0);

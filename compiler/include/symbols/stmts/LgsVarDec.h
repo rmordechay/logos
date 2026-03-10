@@ -1,6 +1,12 @@
 #pragma once
+#include <string>
+
 #include "LgsStmt.h"
 #include "exprs/LgsExpr.h"
+#include "LgsValue.h"
+
+class LgsExpr;
+class LgsType;
 
 namespace llvm {
     class Type;
@@ -20,8 +26,7 @@ public:
     void setType(LgsType* newType) override;
     void setDebugValue(LgsCodeGen& cg) override;
     void hashNode(size_t& oldHash) override;
-    LgsStmt* clone() override;
-    ~LgsVarDec() override;
+    LgsStmt* clone() const override;
 };
 
 

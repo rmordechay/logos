@@ -1,0 +1,21 @@
+#pragma once
+#include <string>
+#include "LgsType.h"
+
+class LgsTypeParam final : public LgsType {
+public:
+    std::string name;
+    LgsType* bounds = nullptr;
+
+    explicit LgsTypeParam(const std::string& name): name(name) {}
+    Type* getIRType(LgsCodeGen& cg) override;
+    size_t sizeBytes() override;
+    LgsExpr* getZeroValue() override;
+    std::string getName() override;
+    bool canCastTo(LgsType* other) override;
+    LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
+    std::string fmtStr() const override;
+    DIType* getDebugType(LgsCodeGen& cg) override;
+    LgsTypeParam* clone() override;
+    ~LgsTypeParam() override;
+};

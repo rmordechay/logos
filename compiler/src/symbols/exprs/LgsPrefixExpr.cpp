@@ -1,6 +1,6 @@
 #include "exprs/LgsPrefixExpr.h"
 
-#include "LgsUtils.h"
+#include <assert.h>
 
 std::string LgsPrefixExpr::asText() {
     assert(0);

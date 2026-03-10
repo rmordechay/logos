@@ -1,6 +1,14 @@
 #include "exprs/LgsHashMap.h"
-#include "LgsUtils.h"
+
+#include <assert.h>
+#include <llvm/IR/DIBuilder.h>
+#include <llvm/IR/DebugInfoMetadata.h>
+#include <llvm/IR/IRBuilder.h>
+
 #include "codegen/LgsCodeGen.h"
+#include "LgsTokens.h"
+#include "LgsType.h"
+#include "exprs/LgsExpr.h"
 
 void LgsPair::setDebugValue(LgsCodeGen& cg) {
     assert(0);
@@ -21,12 +29,11 @@ void LgsHashMap::setDebugValue(LgsCodeGen& cg) {
     di->insertDeclare(IRValue, var, di->createExpression(), cg.getDebugLoc(location), cg.builder.GetInsertBlock());
 }
 
-bool LgsHashMap::equals(LgsExpr* other) {
-    assert(0);
-}
-
 std::string LgsHashMap::asText() {
-    return type->pname();
+    if (type) return type->pname();
+    if (elements.empty()) return "[]";
+    const auto p = elements.front()->asPair();
+    return "{" + p->key->asText() + ": " + p->key->asText() + "...}";
 }
 
 LgsHashMap::~LgsHashMap() {

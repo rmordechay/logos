@@ -1,6 +1,5 @@
 #include "LgsValue.h"
-
-#include "LgsType.h"
+#include <assert.h>
 #include "codegen/LgsCodeGen.h"
 
 LgsType* LgsValue::getType() {
@@ -15,7 +14,7 @@ void LgsValue::hashNode(size_t& oldHash) {
     assert(0);
 }
 
-LgsValue* LgsValue::clone() {
+LgsValue* LgsValue::clone() const {
     assert(0);
 }
 

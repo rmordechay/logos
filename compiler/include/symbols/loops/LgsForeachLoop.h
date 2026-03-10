@@ -1,5 +1,11 @@
 #pragma once
 #include "LgsForLoop.h"
+#include "LgsValue.h"
+
+class LgsExpr;
+namespace llvm {
+class Value;
+}
 
 class LgsForeachLoop final : public LgsForLoop {
 public:
@@ -11,6 +17,7 @@ public:
     Value* loopEnd(LgsCodeGen& cg) override;
     void incAndJumpToCond(LgsCodeGen& cg) override;
     void setDebugValue(LgsCodeGen& cg) override;
+    LgsStmt* clone() const override;
     ~LgsForeachLoop() override;
 };
 

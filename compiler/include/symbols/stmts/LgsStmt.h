@@ -1,7 +1,7 @@
 #pragma once
-#include "LgsStmtsBlock.h"
-
 #include <LgsValue.h>
+
+#include "LgsStmtsBlock.h"
 
 class LgsIOStmt;
 class LgsSwitch;
@@ -32,7 +32,7 @@ public:
     LgsReturn* asReturn();
     LgsVarDec* asVarDec();
     LgsAssignment* asAssignment();
-    LgsStmt* clone() override;
+    LgsStmt* clone() const override;
 };
 
-void freeStmt(const LgsStmt* stmt);
+void freeStmt(LgsStmt* stmt);

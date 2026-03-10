@@ -1,6 +1,12 @@
 #include "cli/commands/LgsFormatCmd.h"
+
+#include <filesystem>
+
 #include "errors/LgsCliErrors.h"
 #include "tools/LgsFormatter.h"
+#include "LgsUtils.h"
+#include "errors/LgsErrHandler.h"
+#include "logos/LgsApp.h"
 
 void LgsFormatCmd::run() {
     if (argc != 3) {
@@ -15,7 +21,7 @@ void LgsFormatCmd::run() {
     }
     LgsApp app(path);
     if (!app.setup()) return;
-    app.loadSrcFile(getFileText(path), path);
+    app.loadSrcFile(path);
     LgsFormatter formatter;
     formatter.formatFile(app.srcFiles.front());
 }

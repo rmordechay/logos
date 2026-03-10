@@ -1,5 +1,6 @@
 #pragma once
 #include "LgsForLoop.h"
+#include "LgsValue.h"
 
 class LgsInfiniteLoop final : public LgsForLoop {
 public:

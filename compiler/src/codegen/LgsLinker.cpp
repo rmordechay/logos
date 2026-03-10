@@ -1,15 +1,20 @@
 #include "codegen/LgsLinker.h"
-#include "codegen/LgsCodeGen.h"
+
+#include <_stdio.h>
+#include <assert.h>
+#include <filesystem>
+
 #include "logos/LgsAppConfigs.h"
-#include <llvm/Support/FileSystem.h>
+#include "LgsUtils.h"
+#include "logos/LgsPaths.h"
 
 bool LgsLinker::link() const {
     assert(paths.lgsRootDir != "" && paths.execFile != "");
     std::string objFileList;
-    for (const auto& objPath : fs::directory_iterator(paths.buildDirObjs)) {
-        if (objPath.path().extension() == ".bc") {
-            objFileList += objPath.path().string() + " ";
-        }
+    for (const auto& fileName : filesToLink) {
+        const fs::path path(paths.buildDirObjs / (fileName + ".bc"));
+        if (!fs::exists(path)) continue;
+        objFileList += path.string() + " ";
     }
     for (auto importPath : importPaths) {
         for (const auto& objPath : fs::directory_iterator(importPath)) {
@@ -21,7 +26,7 @@ bool LgsLinker::link() const {
     assert(objFileList != "");
     std::string additionalLibs;
     for (const auto& libDir : paths.userCLibs) {
-        additionalLibs += std::string(libDir) + " ";
+        additionalLibs += "-L" + libDir.string() + " -lLLVM ";
     }
     // paths.cblasDir = "../external/libcblas.a";
     // additionalLibs += std::string(paths.cblasDir) + " ";
@@ -38,7 +43,6 @@ bool LgsLinker::link() const {
         paths.lgsRootDir.c_str(),
         paths.execFile.c_str()
     );
-    if (!runCmd(cmd)) assert(0);
-    return true;
+    return runCmd(cmd);
 }
 

@@ -1,6 +1,5 @@
 #pragma once
-#include <cmath>
-
+#include <cstddef>
 struct Lgs_TypeInfo;
 
 enum Lgs_TypeKind {
@@ -68,6 +67,12 @@ struct Lgs_Vec {
     Lgs_TypeInfo* baseType;
 };
 
+struct Lgs_Matrix {
+    const size_t rows;
+    const size_t columns;
+    Lgs_TypeInfo* baseType;
+};
+
 struct Lgs_Map {
     Lgs_TypeInfo* key;
     Lgs_TypeInfo* value;
@@ -78,10 +83,12 @@ struct Lgs_TypeInfo {
     const size_t size;
     const Lgs_TypeKind kind;
     const bool isHeap;
+    const bool passByRef;
     union {
         Lgs_Object* object;
         Lgs_SArr* sArr;
         Lgs_Vec* vec;
+        Lgs_Matrix* mat;
         Lgs_Map* map;
         Lgs_TypeInfo* baseType;
     };

@@ -1,8 +1,16 @@
 #pragma once
 #include <llvm/IR/DerivedTypes.h>
 #include <llvm/IR/IRBuilder.h>
+#include <string>
 
 #include "LgsType.h"
+#include "Lgs_Types.h"
+
+class LgsCodeGen;
+namespace llvm {
+class StructType;
+class Value;
+}
 
 class LgsFieldType final : public LgsType {
 public:
@@ -24,5 +32,5 @@ public:
     static Value* loadRTOffset(LgsCodeGen& cg, Value* ptr);
     static Value* loadRTKind(LgsCodeGen& cg, Value* ptr);
     static Value* loadRTType(LgsCodeGen& cg, Value* ptr);
-    static StructType* getFieldRTTStruct(LgsCodeGen& cg);
+    static StructType* getRTTStruct(LgsCodeGen& cg);
 };

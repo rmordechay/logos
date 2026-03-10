@@ -3,25 +3,19 @@ project(logos VERSION 0.0.1)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-add_definitions(-DLOGOS_VERSION="${CMAKE_PROJECT_VERSION}")
-option(LOGOS_RELEASE "Build release version" OFF)
-set(CMAKE_PREFIX_PATH "/opt/homebrew/Cellar/llvm/21.1.8" ${CMAKE_PREFIX_PATH})
+set(DEV_MODE ON)
 
-find_package(LLVM 21.1.8 REQUIRED CONFIG)
-find_package(Clang 21.1.8 REQUIRED CONFIG)
+find_package(LLVM 20.1.8 CONFIG)
+find_package(Clang 20.1.8 CONFIG)
 find_package(OpenSSL REQUIRED)
-find_package(CURL REQUIRED)
+find_package(ZLIB REQUIRED)
+
 set(LLVM_LINK_LLVM_DYLIB ON)
 set(CLANG_LINK_CLANG_DYLIB ON)
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-set(CURL_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external)
-get_filename_component(LLVM_BIN_DIR "${LLVM_TOOLS_BINARY_DIR}" ABSOLUTE)
-set(CLANG_EXECUTABLE "${LLVM_BIN_DIR}/clang")
-add_definitions(-DCLANG_PATH="${CLANG_EXECUTABLE}")
 
-if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-    set(CMAKE_INSTALL_PREFIX "/usr/local" CACHE PATH "Install prefix" FORCE)
-endif ()
+get_filename_component(LLVM_BIN_DIR "${LLVM_TOOLS_BINARY_DIR}" ABSOLUTE)
+add_definitions(-DCLANG_PATH="${LLVM_BIN_DIR}/clang")
+add_definitions(-DLOGOS_VERSION="${CMAKE_PROJECT_VERSION}")
 
 find_program(CCACHE_PROGRAM ccache)
 if (CCACHE_PROGRAM AND NOT LOGOS_RELEASE)
@@ -46,16 +40,16 @@ set(COMPILER_SOURCE
     ${CMAKE_SOURCE_DIR}/compiler/src/parser/LgsLexer.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/parser/LgsParser.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/lgsc/LgsCCompiler.cpp
-    ${CMAKE_SOURCE_DIR}/compiler/src/lgsc/LgsCLangParser.cpp
+    ${CMAKE_SOURCE_DIR}/compiler/src/lgsc/LgsCCParser.cpp
 
     # Files
     ${CMAKE_SOURCE_DIR}/compiler/src/files/LgsFile.cpp
+    ${CMAKE_SOURCE_DIR}/compiler/src/files/LgsAppFile.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/files/LgsMainFile.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/files/LgsObjectFile.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/files/LgsInterfaceFile.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/files/LgsTestFile.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/files/LgsEnvFile.cpp
-    ${CMAKE_SOURCE_DIR}/compiler/src/files/LgsAppConfigFile.cpp
 
     # CLI
     ${CMAKE_SOURCE_DIR}/compiler/src/cli/LgsCliHandler.cpp
@@ -90,7 +84,6 @@ set(COMPILER_SOURCE
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/LgsVariable.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/LgsEnvVar.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/LgsVectorExpr.cpp
-    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/LgsTypeExpr.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/LgsMatrixExpr.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/LgsNullableExpr.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/exprs/LgsModuleExpr.cpp
@@ -132,12 +125,13 @@ set(COMPILER_SOURCE
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsSelf.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsCPtr.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsEnum.cpp
+    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsEnumField.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsFuncType.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsInterface.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsObject.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsSubType.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsTypePair.cpp
-    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsGenericType.cpp
+    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsTypeParam.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsNullable.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/LgsFieldType.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/iterables/LgsMap.cpp
@@ -150,18 +144,20 @@ set(COMPILER_SOURCE
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/iterables/LgsMatrix.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/iterables/LgsVariadic.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsAny.cpp
-    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsBool.cpp
+    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsVoid.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsChar.cpp
-    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsDouble.cpp
-    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsFloat.cpp
+    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsBool.cpp
+    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsByte.cpp
+    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsShort.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsInt.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsLong.cpp
-    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsShort.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsSize.cpp
+    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsUByte.cpp
+    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsUShort.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsUInt.cpp
     ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsULong.cpp
-    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsByte.cpp
-    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsVoid.cpp
+    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsFloat.cpp
+    ${CMAKE_SOURCE_DIR}/compiler/src/symbols/types/primitives/LgsDouble.cpp
 )
 
 set(LGS_LIB_SOURCE
@@ -174,7 +170,6 @@ set(LGS_LIB_SOURCE
 set(SHARED_SOURCE
     ${CMAKE_SOURCE_DIR}/shared/src/LgsErrHandler.cpp
     ${CMAKE_SOURCE_DIR}/shared/src/LgsUtils.cpp
-    ${CMAKE_SOURCE_DIR}/shared/include/LgsRTTIndices.h
 )
 
 # Logos lib and shared
@@ -193,9 +188,6 @@ target_include_directories(lgs_lib PUBLIC
 target_include_directories(lgs PUBLIC
     ${CMAKE_SOURCE_DIR}/compiler/include
     ${CMAKE_SOURCE_DIR}/compiler/include/symbols
-    ${CMAKE_SOURCE_DIR}/external/include
-    ${LLVM_INCLUDE_DIRS}
-    ${CLANG_INCLUDE_DIRS}
 )
 target_include_directories(lgs_shared PUBLIC
     ${CMAKE_SOURCE_DIR}/shared/include
@@ -214,13 +206,15 @@ target_link_libraries(lgs PRIVATE
     lgs_lib
     LLVM
     clang-cpp
-    CURL::libcurl
     OpenSSL::SSL
     OpenSSL::Crypto
 )
 
 # Options
-if (LOGOS_RELEASE)
+if (DEV_MODE)
+    target_compile_options(lgs PRIVATE -Wall -Wextra -Wpedantic -Wreturn-type -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function)
+    add_subdirectory(tests)
+else ()
     target_compile_options(lgs PRIVATE -O3 -DNDEBUG)
     target_compile_options(lgs_lib PRIVATE -O3 -DNDEBUG)
     set_target_properties(lgs PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
@@ -228,11 +222,5 @@ if (LOGOS_RELEASE)
     if (UNIX AND NOT APPLE)
         target_link_options(lgs PRIVATE -s)
     endif ()
-else ()
-    target_compile_options(lgs PRIVATE -Wall -Wextra -Wpedantic -Wreturn-type -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function)
-    add_subdirectory(tests)
 endif ()
 
-# Install
-install(TARGETS lgs RUNTIME DESTINATION bin)
-install(TARGETS lgs_lib LIBRARY DESTINATION lib)

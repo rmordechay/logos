@@ -1,17 +1,33 @@
 #include "funcs/LgsFunc.h"
 
+#include <llvm/IR/Module.h>
+#include <assert.h>
+#include <llvm/ADT/ArrayRef.h>
+#include <llvm/ADT/Twine.h>
+#include <llvm/IR/Attributes.h>
+#include <llvm/IR/DIBuilder.h>
+#include <llvm/IR/DebugInfoMetadata.h>
+#include <llvm/IR/Function.h>
+#include <llvm/IR/IRBuilder.h>
+#include <llvm/IR/Instructions.h>
+#include <llvm/Support/Casting.h>
+#include <llvm/Support/CodeGen.h>
+
 #include "LgsDefinitions.h"
 #include "stmts/LgsStmtsBlock.h"
 #include "exprs/LgsExpr.h"
-#include "exprs/LgsFuncCall.h"
 #include "types/LgsFuncType.h"
-#include "types/primitives/LgsVoid.h"
-#include "LgsUtils.h"
 #include "types/iterables/LgsStr.h"
 #include "codegen/LgsCodeGen.h"
-#include <sstream>
-#include <llvm/IR/Module.h>
-#include "types/LgsObject.h"
+#include "stmts/LgsReturn.h"
+#include "LgsTokens.h"
+#include "LgsType.h"
+#include "stmts/LgsVarDec.h"
+
+namespace llvm {
+class FunctionType;
+class Value;
+}
 
 
 std::string LgsFunc::asText() {
@@ -19,24 +35,28 @@ std::string LgsFunc::asText() {
 }
 
 LgsExpr* LgsFunc::cast(LgsType* toType, const bool explicitly) {
-    const auto toFuncType = toType->asFuncType();
-    if (!toFuncType) return this;
+    const auto otherFT = toType->asFuncType();
+    if (!otherFT) return this;
     // Add 'it' if needed, else as normal params
-    if (funcType->isLambda && funcType->params.empty() && toFuncType->params.size() == 1) {
-        auto itType = toFuncType->params.front().type;
+    if (isLambda && funcType->params.empty() && otherFT->params.size() == 1) {
+        auto itType = otherFT->params.front().type;
         funcType->params.emplace_back(itType, LGS_LAMBDA_IT_PARAM);
     } else {
         for (size_t i = 0; i < funcType->params.size(); ++i) {
             auto& thisParam = funcType->params[i];
-            const auto newType = toFuncType->params[i].type;
-            if (thisParam.type || newType->hasGenerics()) continue;
+            const auto newType = otherFT->params[i].type;
+            if (thisParam.type) continue;
             thisParam.setType(newType);
         }
     }
     // Return type
-    if (!funcType->rt && !toFuncType->rt->hasGenerics()) {
-        funcType->rt = toFuncType->rt;
+    if (!funcType->rt) {
+        funcType->rt = otherFT->rt;
     }
+    if (!otherFT->typeParams.empty()) {
+        funcType->typeParams.insert(funcType->typeParams.end(), otherFT->typeParams.begin(), otherFT->typeParams.end());
+    }
+
     return this;
 }
 
@@ -46,7 +66,8 @@ void LgsFunc::setType(LgsType* newType) {
 }
 
 Function* LgsFunc::getIRFunc(LgsCodeGen& cg) {
-    const auto funcName = funcType->getName();
+    auto funcName = funcType->getName();
+    if (isLambda) funcName += std::to_string(id);
     auto func = cg.IRModule->getFunction(funcName);
     if (func) return func;
     const auto type = funcType->getIRType(cg);
@@ -69,35 +90,43 @@ Function* LgsFunc::getIRFunc(LgsCodeGen& cg) {
     return func;
 }
 
-Value* LgsFunc::call(LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) {
+Value* LgsFunc::call(LgsCodeGen& cg, const std::vector<LgsVarDec>& args) {
     if (fn) return fn(cg, args);
-    if (!funcType->isMethod && args.empty()) return callIR(cg, {});
     if (funcType->isExternal) return callExternal(cg, args);
-    if (funcType->isVariadic) return callWithVariadic(cg, args);
 
     std::vector<Value*> IRArgs;
-    const auto firstArgName = funcType->isMethod && funcType->params.size() > 1 ? args[1].name : args.front().name;
-    const auto isNamed = !args.empty() && firstArgName != "";
-    if (isNamed) {
-        std::unordered_map<std::string, const LgsFuncArg*> argsByName;
-        for (const auto& arg : args) {
-            argsByName[arg.name] = &arg;
+    if (funcType->isVariadic) {
+        const auto variadicOffset = funcType->params.size() - 1;
+        for (size_t i = 0; i < variadicOffset; ++i) {
+            IRArgs.emplace_back(args[i].expr->IRValue);
         }
+        IRArgs.emplace_back(cg.usize(args.size()));
+        for (size_t i = variadicOffset; i < args.size(); ++i) {
+            IRArgs.emplace_back(args[i].expr->IRValue);
+        }
+        return callIR(cg, IRArgs);
+    }
+
+    std::string firstArgName = "";
+    if (funcType->isMethod) {
+        firstArgName = args.size() > 1 ? args[1].name : "";
+    } else {
+        firstArgName = !args.empty() ? args[0].name : "";
+    }
+    if (firstArgName != "") {
+        std::unordered_map<std::string, const LgsVarDec*> argsByName;
+        for (const auto& arg : args) argsByName[arg.name] = &arg;
         for (const auto& param : funcType->params) {
             assert(argsByName.contains(param.name));
-            const auto arg = argsByName[param.name];
-            IRArgs.emplace_back(arg->expr->IRValue);
+            IRArgs.emplace_back(argsByName[param.name]->expr->IRValue);
         }
-        assert(!funcType->hasDefaults);
     } else {
         for (const auto& arg : args) {
             IRArgs.emplace_back(arg.expr->IRValue);
         }
         if (funcType->hasDefaults) {
-            const auto diff = funcType->params.size() - args.size() - 1;
-            for (size_t i = diff; i < funcType->params.size(); ++i) {
-                const auto& param = funcType->params[i];
-                IRArgs.emplace_back(param.expr->IRValue);
+            for (size_t i = args.size(); i < funcType->params.size(); ++i) {
+                IRArgs.emplace_back(funcType->params[i].expr->IRValue);
             }
         }
     }
@@ -110,7 +139,7 @@ Value* LgsFunc::callIR(LgsCodeGen& cg, const std::vector<Value*>& args) {
     Value* sret = nullptr;
     if (funcType->swapReturn) {
         sret = cg.builder.CreateAlloca(funcType->rt->getIRType(cg));
-        argsList.insert(args.begin() + funcType->isMethod, sret);
+        argsList.insert(argsList.begin() + funcType->isMethod, sret);
     }
     if (IRValue) {
         rv = cg.builder.CreateCall(funcType->getIRType(cg), IRValue, argsList);
@@ -120,40 +149,16 @@ Value* LgsFunc::callIR(LgsCodeGen& cg, const std::vector<Value*>& args) {
     return sret ? sret : rv;
 }
 
-Value* LgsFunc::callWithVariadic(LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) {
-    std::vector<Value*> IRArgs;
-    const auto variadicOffset = funcType->params.size() - 1;
-    for (size_t i = 0; i < variadicOffset; ++i) {
-        const auto arg = args[i];
-        const auto& param = funcType->params[i];
-        if (param.isSelf) {
-            IRArgs.emplace_back(arg.expr->IRValue);
-        } else {
-            IRArgs.emplace_back(arg.expr->IRValue);
-        }
-    }
-    IRArgs.emplace_back(cg.usize(args.size()));
-    for (size_t i = variadicOffset; i < args.size(); ++i) {
-        const auto arg = args[i];
-        IRArgs.emplace_back(arg.expr->IRValue);
-    }
-    return callIR(cg, IRArgs);
-}
-
-Value* LgsFunc::callExternal(LgsCodeGen& cg, const std::vector<LgsFuncArg>& args) {
+Value* LgsFunc::callExternal(LgsCodeGen& cg, const std::vector<LgsVarDec>& args) {
     std::vector<Value*> IRArgs;
     for (const auto& arg : args) {
         if (const auto s = arg.expr->type->asStr()) {
-            IRArgs.emplace_back(s->loadRTData(cg, arg.expr->IRValue));
+            IRArgs.emplace_back(s->loadIRData(cg, arg.expr->IRValue));
         } else {
             IRArgs.emplace_back(arg.expr->IRValue);
         }
     }
     return callIR(cg, IRArgs);
-}
-
-void LgsFunc::replaceGenerics(const std::unordered_map<std::string, LgsType*>& replacements) {
-    assert(0);
 }
 
 void LgsFunc::initFunc(const std::string& name, LgsType* rt, const std::vector<LgsParam>& params, const uint32_t ops) {
@@ -194,6 +199,22 @@ void LgsFunc::setDebugValue(LgsCodeGen& cg) {
 void LgsFunc::hashNode(size_t& oldHash) {
     funcType->hashNode(oldHash);
     stmtsBlock->hashNode(oldHash);
+}
+
+void LgsFunc::inferRetType() const {
+    if (funcType->rt || returnStmts.empty()) return;
+    std::vector<LgsExpr*> exprs;
+    exprs.reserve(returnStmts.size());
+    for (const auto& stmt : returnStmts) exprs.push_back(stmt->expr);
+    funcType->rt = inferType(exprs);;
+}
+
+LgsFunc* LgsFunc::clone() const {
+    const auto newFunc = new LgsFunc(*this);
+    newFunc->setType(new LgsFuncType(*funcType));
+    if (funcType->rt) newFunc->funcType->rt = funcType->rt->clone();
+    if (stmtsBlock) newFunc->stmtsBlock = stmtsBlock->clone();
+    return newFunc;
 }
 
 LgsFunc::~LgsFunc() {

@@ -1,5 +1,8 @@
 #pragma once
+#include <string>
+
 #include "LgsType.h"
+#include "Lgs_Types.h"
 
 class LgsSelf final : public LgsType {
 public:

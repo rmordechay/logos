@@ -1,9 +1,14 @@
 #include "cli/commands/LgsAstCmd.h"
+
+#include <iostream>
+#include <filesystem>
+#include <sstream>
+
 #include "errors/LgsCliErrors.h"
 #include "tools/LgsJsonParser.h"
-#include <iostream>
-
-struct LgsCliCmdHelp;
+#include "LgsUtils.h"
+#include "errors/LgsErrHandler.h"
+#include "logos/LgsApp.h"
 
 void LgsAstCmd::run() {
     if (argc != 3) {
@@ -18,7 +23,7 @@ void LgsAstCmd::run() {
     }
     LgsApp app(path);
     if (!app.setup()) return;
-    app.loadSrcFile(getFileText(path), path);
+    app.loadSrcFile(path);
     LgsJsonParser parser;
     parser.parseFile(app.srcFiles.front());
     std::cout << parser.json.str();

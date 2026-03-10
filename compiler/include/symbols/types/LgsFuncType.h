@@ -1,6 +1,13 @@
 #pragma once
+#include <llvm/IR/DerivedTypes.h>
+#include <string>
+#include <unordered_map>
+#include <vector>
+
 #include "LgsType.h"
 #include "funcs/LgsParam.h"
+
+class LgsTypeParam;
 
 enum LgsFuncFlags : uint32_t {
     PUBLIC = 1 << 0,
@@ -23,8 +30,8 @@ public:
     std::string parentName;
     LgsType* rt = nullptr;
     std::vector<LgsParam> params;
-    std::vector<LgsGenericType*> genericTypes;
     FunctionType* IRType = nullptr;
+    std::vector<LgsTypeParam*> typeParams;
     bool isPublic = false;
     bool isBuiltin = false;
     bool isVirtual = false;
@@ -33,7 +40,6 @@ public:
     bool isMethod = false;
     bool isCoroutine = false;
     bool isDeferred = false;
-    bool isLambda = false;
     bool isSyscall = false;
     bool isTerminator = false;
     bool swapReturn = false;
@@ -54,10 +60,10 @@ public:
     std::string fmtStr() const override;
     bool canCastTo(LgsType* other) override;
     bool equals(LgsType* other) override;
-    bool hasGenerics() override;
-    void replaceGenerics(std::unordered_map<std::string, LgsType*>& replacements) override;
-    LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
+    bool hasTypeParams() override;
     void setFuncOptions(uint32_t ops);
+    LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
+    bool isRecursive(std::unordered_set<std::string>& visited) const override;
     std::unordered_map<std::string, LgsParam*> getParamsByName();
     DIType* getDebugType(LgsCodeGen& cg) override;
     void addSelf(LgsType* selfType);

@@ -6,12 +6,14 @@ struct LgsBaseMsg;
 struct LgsLocation;
 namespace fs = std::filesystem;
 
+namespace fs = std::filesystem;
+
 #define EXPECTED_ERR(E) "Expected error: '" << std::string(E.msg) << "'"
 #define HASH_VECTOR(vec, hash) for (const auto e : vec) e->hashNode(hash)
 #define HASH_MAP(map, hash) for (const auto [_, v] : map) v->hashNode(hash)
 
 void execute(const fs::path& execPath, std::vector<const char*> mainArgs = {});
-bool runCmd(const char* cmd);
+bool runCmd(const std::string& cmd);
 bool createDir(fs::path& dirPath);
 bool isLogosFile(const fs::path& filePath);
 

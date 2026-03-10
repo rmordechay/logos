@@ -1,5 +1,15 @@
 #include "exprs/LgsExpr.h"
 
+#include <__math/exponential_functions.h>
+#include <assert.h>
+#include <llvm/ADT/ArrayRef.h>
+#include <llvm/IR/Constants.h>
+#include <llvm/IR/DerivedTypes.h>
+#include <llvm/IR/Type.h>
+#include <llvm/IR/Value.h>
+
+#include "LgsUtils.h"
+#include "codegen/LgsCodeGen.h"
 #include "exprs/LgsArrayExpr.h"
 #include "exprs/LgsBinaryExpr.h"
 #include "exprs/LgsCast.h"
@@ -19,11 +29,21 @@
 #include "exprs/LgsNullableExpr.h"
 #include "exprs/LgsPostfixExpr.h"
 #include "exprs/LgsSelection.h"
-#include "exprs/LgsTypeExpr.h"
 #include "funcs/LgsFunc.h"
 #include "loops/LgsMetaVar.h"
 #include "stmts/LgsVarDec.h"
-#include "types/LgsNullable.h"
+#include "types/LgsEnumField.h"
+#include "LgsBinaryTokens.h"
+#include "LgsSymbol.h"
+#include "LgsType.h"
+#include "exprs/LgsFuncCall.h"
+#include "exprs/constants/LgsIntConst.h"
+#include "types/iterables/LgsIterable.h"
+#include "types/iterables/LgsStr.h"
+
+namespace llvm {
+class Constant;
+}
 
 LgsType* LgsExpr::getType() {
     return type;
@@ -31,6 +51,17 @@ LgsType* LgsExpr::getType() {
 
 void LgsExpr::setType(LgsType* newType) {
     type = newType;
+}
+
+Value* LgsExpr::loadIRPtr(LgsCodeGen& cg) const {
+    assert(type);
+    if (!IRValue->getType()->isPointerTy()) return IRValue;
+    if (type->asSArray() || type->asMatrix()) return IRValue;
+    return cg.load(type->getStorageType(cg), IRValue);
+}
+
+Value* LgsExpr::getLevel(LgsCodeGen& cg) const {
+    return isReturnExpr ? cg.levelAbove() : cg.currentLevel;
 }
 
 std::optional<int64_t> LgsExpr::getConstInt() {
@@ -132,18 +163,68 @@ std::optional<std::string> LgsExpr::getConstStr() {
     return std::nullopt;
 }
 
-Value* LgsExpr::loadIRPtr(LgsCodeGen& cg) const {
-    if (!IRValue->getType()->isPointerTy()) return IRValue;
-    if (type->asSArray() || type->asNullable()) return IRValue;
-    return cg.load(type->getTypeOrPtr(cg), IRValue);
+std::optional<std::vector<LgsExpr*>> LgsExpr::getConstArr() {
+    if (const auto arrExpr = asArrayExpr()) {
+        return arrExpr->elements;
+    }
+    if (const auto var = asVariable()) {
+        if (var->ref.symbolType == VAR_DEC) {
+            if (var->ref.varDec->isMutable) return std::nullopt;
+            return var->ref.varDec->expr->getConstArr();
+        }
+    }
+    return std::nullopt;
+}
+
+Constant* LgsExpr::getAsConst(LgsCodeGen& cg) {
+    const auto constInt = getConstInt();
+    if (constInt.has_value()) {
+        return ConstantInt::get(type->getIRType(cg), constInt.value());
+    }
+    const auto constFloat = getConstFloat();
+    if (constFloat.has_value()) {
+        return ConstantFP::get(type->getIRType(cg), constFloat.value());
+    }
+    const auto constStr = getConstStr();
+    if (constStr.has_value()) {
+        return LgsStr::getStrConst(cg, constStr.value());
+    }
+    const auto constArr = getConstArr();
+    if (constArr.has_value()) {
+        const auto arr = constArr.value();
+        const auto baseType = type->asIterable()->baseType;
+        const auto arrTy = ArrayType::get(baseType->getIRType(cg), arr.size());
+        std::vector<Constant*> elements;
+        for (const auto expr : arr) {
+            elements.push_back(expr->getAsConst(cg));
+        }
+        return ConstantArray::get(arrTy, elements);
+    }
+    return nullptr;
+}
+
+Constant* LgsExpr::hashConstValue(LgsCodeGen& cg) {
+    const auto constInt = getConstInt();
+    if (constInt.has_value()) {
+        return cg.usize(constInt.value());
+    }
+    const auto constFloat = getConstFloat();
+    if (constFloat.has_value()) {
+        return cg.floatv(constFloat.value());
+    }
+    const auto constStr = getConstStr();
+    if (constStr.has_value()) {
+        return cg.usize(hashString(constStr.value()));
+    }
+    const auto enumField = type->asEnumField();
+    if (enumField) {
+        return cg.usize(enumField->index);
+    }
+    return nullptr;
 }
 
 LgsExpr* LgsExpr::cast(LgsType* toType, const bool explicitly) {
     return this;
-}
-
-bool LgsExpr::equals(LgsExpr* other) {
-    assert(0);
 }
 
 LgsFunc* LgsExpr::asFunc() {
@@ -180,10 +261,6 @@ LgsSelection* LgsExpr::asSelection() {
 
 LgsIterIndex* LgsExpr::asIterIndex() {
     return dynamic_cast<LgsIterIndex*>(this);
-}
-
-LgsTypeExpr* LgsExpr::asTypeExpr() {
-    return dynamic_cast<LgsTypeExpr*>(this);
 }
 
 LgsInstance* LgsExpr::asInstance() {
@@ -250,7 +327,7 @@ LgsNullableExpr* LgsExpr::asNullableExpr() {
     return dynamic_cast<LgsNullableExpr*>(this);
 }
 
-LgsExpr* LgsExpr::clone() {
+LgsExpr* LgsExpr::clone() const {
     assert(0);
 }
 

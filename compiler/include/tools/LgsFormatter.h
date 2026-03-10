@@ -1,12 +1,13 @@
 #pragma once
+#include <stdint.h>
 #include <iosfwd>
 #include <sstream>
+#include <string>
 
 class LgsSubType;
 class LgsEnum;
 class LgsIntConst;
 class LgsMetaVar;
-class LgsTypeExpr;
 class LgsVectorExpr;
 class LgsIOStmt;
 class LgsSwitch;
@@ -112,7 +113,6 @@ public:
     void formatPrefixExpr(LgsPrefixExpr* prefixExpr);
     void formatPostfixExpr(LgsPostfixExpr* postfixExpr);
     void formatStrConst(const LgsStrConst* strConst);
-    void formatTypeExpr(LgsTypeExpr* typeExpr);
     void formatInstance(LgsInstance* instance);
     void formatIntConst(const LgsIntConst* intConst);
     void formatInterfaceInstance(LgsInstance* instance, LgsInterface* interface);

@@ -1,7 +1,15 @@
 #include "cli/commands/LgsRunCmd.h"
-#include "cli/LgsCliHelp.h"
+
+#include <assert.h>
+#include <filesystem>
+#include <functional>
+
 #include "errors/LgsCliErrors.h"
 #include "logos/LgsApp.h"
+#include "LgsUtils.h"
+#include "errors/LgsErrHandler.h"
+#include "logos/LgsAppConfigs.h"
+#include "logos/LgsPaths.h"
 
 void LgsRunCmd::run() {
     fs::path execPath = "";
@@ -38,9 +46,8 @@ void LgsRunCmd::parseCompileArgs(LgsApp& app, std::vector<const char*>& appArgs)
             errHandler.addError(E40003, {cmd});
         }
     });
-
     if (argStart < 0) return errHandler.addError(E40001, {});
-    if (app.configs.appMode == FILE_MODE) {
+    if (app.configs.appMode == CODE_MODE) {
         app.lgsCode = argv[argStart++];
     } else {
         auto path = argv[argStart++];

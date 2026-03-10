@@ -1,5 +1,8 @@
 #pragma once
+#include <string>
+
 #include "LgsType.h"
+#include "Lgs_Types.h"
 
 class LgsSize final : public LgsType {
 public:
@@ -17,7 +20,10 @@ public:
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     bool canCastTo(LgsType* other) override;
     std::string fmtStr() const override;
+    void asIRText(LgsStrBuilder& sb, Value* value) override;
     DIType* getDebugType(LgsCodeGen& cg) override;
+    Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level) override;
+    Value* hashValue(LgsCodeGen& cg, Value* value) override;
 };
 
 inline LgsSize LGS_SIZE;

@@ -1,14 +1,16 @@
 #include "types/primitives/LgsSize.h"
 
-#include <llvm/IR/Module.h>
+#include <assert.h>
+#include <llvm/IR/DerivedTypes.h>
 
 #include "LgsBinaryTokens.h"
 #include "exprs/constants/LgsIntConst.h"
-#include "../../../../include/symbols/types/primitives/LgsAny.h"
+#include "types/primitives/LgsAny.h"
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsDouble.h"
 #include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsLong.h"
+#include "codegen/LgsCodeGen.h"
 
 size_t LgsSize::sizeBytes() {
     return sizeof(size_t);
@@ -77,6 +79,20 @@ std::string LgsSize::fmtStr() const {
     return "%zu";
 }
 
+void LgsSize::asIRText(LgsStrBuilder& sb, Value* value) {
+    const auto buffer = sb.cg.emptyBuffer(128);
+    const auto bytesRead = sb.cg.callSnprintf(fmtStr(), buffer, sb.cg.usize(128), value);
+    sb.add(buffer, sb.cg.toSize(bytesRead));
+}
+
 DIType* LgsSize::getDebugType(LgsCodeGen& cg) {
     assert(0);
+}
+
+Value* LgsSize::getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level) {
+    return cg.zeroSize();
+}
+
+Value* LgsSize::hashValue(LgsCodeGen& cg, Value* value) {
+    return value;
 }

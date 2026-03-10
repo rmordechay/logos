@@ -1,4 +1,11 @@
 #include "tools/LgsFormatter.h"
+
+#include <__ostream/basic_ostream.h>
+#include <assert.h>
+#include <map>
+#include <utility>
+#include <vector>
+
 #include "exprs/LgsArrayExpr.h"
 #include "exprs/LgsBinaryExpr.h"
 #include "exprs/LgsFuncCall.h"
@@ -10,33 +17,41 @@
 #include "files/LgsInterfaceFile.h"
 #include "files/LgsMainFile.h"
 #include "files/LgsObjectFile.h"
-#include "files/LgsTestFile.h"
-#include "logos/LgsApp.h"
 #include "loops/LgsMetaVar.h"
 #include "stmts/LgsStmtsBlock.h"
 #include "stmts/LgsVarDec.h"
+#include "LgsBinaryTokens.h"
+#include "LgsType.h"
+#include "exprs/LgsExpr.h"
+#include "exprs/constants/LgsIntConst.h"
+#include "files/LgsFile.h"
+#include "funcs/LgsFunc.h"
+#include "funcs/LgsParam.h"
+#include "stmts/LgsStmt.h"
+#include "types/LgsFuncType.h"
+
 #define TAB_SIZE 4
 
 void LgsFormatter::formatFile(LgsFile* file) {
-    if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
+    if (const auto mainFile = file->asMainFile()) {
         formatMainFile(mainFile);
-    } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
+    } else if (const auto objFile = file->asObjectFile()) {
         formatObject(objFile->obj);
-    } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
+    } else if (const auto interfaceFile = file->asInterfaceFile()) {
         formatInterface(interfaceFile->interface);
-    } else if (const auto testFile = dynamic_cast<LgsTestFile*>(file)) {
+    } else if (const auto testFile = file->asTestFile()) {
         formatTestFile(testFile);
     } else {
         assert(0);
     }
-    LgsApp app;
-    app.loadSrcFile(formatted.str(), file->path);
-    const auto oldFileHash = file->hashFile();
-    const auto newFileSize = app.srcFiles.front()->hashFile();
-    assert(oldFileHash == newFileSize);
-    std::ofstream outFile(file->path, std::ios::out | std::ios::trunc);
-    outFile << formatted.str();
-    outFile.close();
+    // LgsApp app;
+    // app.loadSrcFile(formatted.str(), file->path);
+    // const auto oldFileHash = file->hashFile();
+    // const auto newFileSize = app.srcFiles.front()->hashFile();
+    // assert(oldFileHash == newFileSize);
+    // std::ofstream outFile(file->path, std::ios::out | std::ios::trunc);
+    // outFile << formatted.str();
+    // outFile.close();
 }
 
 void LgsFormatter::formatMainFile(LgsMainFile* mainFile) {
@@ -312,18 +327,14 @@ void LgsFormatter::formatStrConst(const LgsStrConst* strConst) {
     insert("\"" + strConst->value + "\"");
 }
 
-void LgsFormatter::formatTypeExpr(LgsTypeExpr* typeExpr) {
-    assert(0);
-}
-
 void LgsFormatter::formatInstance(LgsInstance* instance) {
     insert(instance->name);
     insert("{");
     auto isFirst = true;
-    for (auto [name, arg] : instance->args) {
+    for (auto arg : instance->args) {
         if (!isFirst) insert(", ");
         isFirst = false;
-        insert(name + "=");
+        insert(arg.name + "=");
         formatExpr(arg.expr);
     }
     insert("}");

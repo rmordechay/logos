@@ -1,6 +1,8 @@
 #include "stmts/LgsSwitch.h"
+
+#include <assert.h>
+
 #include "stmts/LgsStmtsBlock.h"
-#include "LgsUtils.h"
 #include "exprs/LgsExpr.h"
 
 void LgsSwitch::setDebugValue(LgsCodeGen& cg) {

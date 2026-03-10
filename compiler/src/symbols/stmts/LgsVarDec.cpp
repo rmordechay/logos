@@ -1,10 +1,10 @@
 #include "stmts/LgsVarDec.h"
 #include "codegen/LgsCodeGen.h"
-#include "types/iterables/LgsStr.h"
-#include "LgsUtils.h"
-#include "types/LgsNullable.h"
-
 #include <llvm/IR/DIBuilder.h>
+#include "LgsUtils.h"
+#include "LgsTokens.h"
+#include "LgsType.h"
+#include "exprs/LgsExpr.h"
 
 LgsType* LgsVarDec::getType() {
     return type;
@@ -40,23 +40,9 @@ void LgsVarDec::hashNode(size_t& oldHash) {
     if (expr) expr->hashNode(oldHash);
 }
 
-LgsStmt* LgsVarDec::clone() {
+LgsStmt* LgsVarDec::clone() const {
     const auto newLgsVarDec = new LgsVarDec(*this);
     if (expr) newLgsVarDec->expr = expr->clone();
+    if (type) newLgsVarDec->type = type->clone();
     return newLgsVarDec;
-}
-
-LgsVarDec::~LgsVarDec() {
-    if (expr) {
-        if (type && expr->type && type == expr->type) {
-            freeExpr(expr);
-        } else {
-            freeType(type);
-            freeExpr(expr);
-        }
-    } else {
-        freeType(type);
-    }
-    setType(nullptr);
-    expr = nullptr;
 }

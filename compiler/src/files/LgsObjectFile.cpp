@@ -1,9 +1,10 @@
 #include "files/LgsObjectFile.h"
-#include "funcs/LgsFunc.h"
-#include "stmts/LgsField.h"
+
+#include "LgsUtils.h"
 #include "stmts/LgsIOPair.h"
 #include "types/LgsEnum.h"
-#include "types/LgsGenericType.h"
+#include "types/LgsTypeParam.h"
+#include "types/LgsObject.h"
 #include "types/LgsSubType.h"
 
 size_t LgsObjectFile::hashFile() {
@@ -14,7 +15,7 @@ size_t LgsObjectFile::hashFile() {
     HASH_VECTOR(obj->implements, hash);
     HASH_VECTOR(obj->enums, hash);
     HASH_VECTOR(obj->objects, hash);
-    HASH_VECTOR(obj->generics, hash);
+    HASH_VECTOR(obj->typeParams, hash);
     HASH_VECTOR(obj->subtypes, hash);
     HASH_VECTOR(obj->ioPairs, hash);
     return hash;

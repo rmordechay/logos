@@ -1,6 +1,9 @@
 #include "LgsSymbolTable.h"
+
+#include <assert.h>
+
 #include "errors/LgsErrors.h"
-#include "logos/LgsApp.h"
+#include "errors/LgsErrHandler.h"
 
 
 void LgsSymbolTable::addSymbol(const LgsSymbol& symbol, LgsErrHandler* errHandler, const std::string& filePath) {

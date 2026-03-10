@@ -1,9 +1,6 @@
 #include "types/primitives/LgsLong.h"
-
-#include <llvm/IR/Module.h>
-
+#include <assert.h>
 #include "exprs/constants/LgsIntConst.h"
-#include "../../../../include/symbols/types/primitives/LgsAny.h"
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsChar.h"
 #include "types/primitives/LgsFloat.h"
@@ -15,7 +12,6 @@ Type* LgsLong::getIRType(LgsCodeGen& cg) {
     return cg.i64Ty();
 }
 
-
 size_t LgsLong::sizeBytes() {
     return sizeof(long);
 }
@@ -26,6 +22,16 @@ LgsExpr* LgsLong::getZeroValue() {
 
 LgsType* LgsLong::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     return nullptr;
+}
+
+void LgsLong::asIRText(LgsStrBuilder& sb, Value* value) {
+    const auto buffer = sb.cg.emptyBuffer(25);
+    const auto bytesRead = sb.cg.callSnprintf(fmtStr(), buffer, sb.cg.usize(25), sb.cg.toLong(value));
+    sb.add(buffer, sb.cg.toSize(bytesRead));
+}
+
+std::string LgsLong::fmtStr() const {
+    return "%" PRId64;
 }
 
 std::string LgsLong::getName() {
@@ -44,10 +50,14 @@ bool LgsLong::canCastTo(LgsType* other) {
     return name == otherName;
 }
 
-DIType* LgsLong::getDebugType(LgsCodeGen& cg) {
-    assert(0);
+Value* LgsLong::getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level) {
+    return cg.zero64();
 }
 
-std::string LgsLong::fmtStr() const {
-    return "%lu";
+Value* LgsLong::hashValue(LgsCodeGen& cg, Value* value) {
+    return value;
+}
+
+DIType* LgsLong::getDebugType(LgsCodeGen& cg) {
+    assert(0);
 }

@@ -1,5 +1,7 @@
 #include "exprs/LgsMetaSelection.h"
 
+#include <assert.h>
+
 void LgsMetaSelection::hashNode(size_t& oldHash) {
     assert(0);
 }

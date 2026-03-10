@@ -1,6 +1,19 @@
 #pragma once
+#include <optional>
+#include <string>
+
 #include "LgsIterable.h"
 #include "exprs/constants/LgsIntConst.h"
+#include "LgsValue.h"
+#include "Lgs_Types.h"
+#include "exprs/LgsExpr.h"
+#include "types/primitives/LgsSize.h"
+
+class LgsCodeGen;
+class LgsType;
+namespace llvm {
+class Function;
+}
 
 class LgsSArray final : public LgsIterable {
 public:
@@ -22,11 +35,11 @@ public:
     std::string pname() override;
     size_t sizeBytes() override;
     std::string fmtStr() const override;
-    std::optional<int64_t> getConstLength() override;
+    std::optional<size_t> getConstLength() override;
     bool canCastTo(LgsType* other) override;
     bool equals(LgsType* other) override;
     LgsExpr* getZeroValue() override;
-    Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee) override;
+    Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level) override;
     Type* getIRType(LgsCodeGen& cg) override;
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     Constant* getRTTypeExtra(LgsCodeGen& cg) override;

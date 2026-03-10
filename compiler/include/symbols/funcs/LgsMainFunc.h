@@ -2,6 +2,8 @@
 #include "LgsFunc.h"
 #include "types/primitives/LgsVoid.h"
 #include "LgsDefinitions.h"
+#include "LgsValue.h"
+#include "types/LgsFuncType.h"
 
 class LgsMainFunc final : public LgsFunc {
 public:

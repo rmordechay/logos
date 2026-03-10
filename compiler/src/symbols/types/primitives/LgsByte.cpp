@@ -1,8 +1,10 @@
 #include "types/primitives/LgsByte.h"
-#include <llvm/IR/Module.h>
+
+#include <assert.h>
+
 #include "codegen/LgsCodeGen.h"
 #include "exprs/constants/LgsIntConst.h"
-#include "../../../../include/symbols/types/primitives/LgsAny.h"
+#include "types/primitives/LgsAny.h"
 #include "types/primitives/LgsChar.h"
 #include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsInt.h"
@@ -17,6 +19,12 @@ Type* LgsByte::getIRType(LgsCodeGen& cg) {
 
 LgsType* LgsByte::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     return nullptr;
+}
+
+void LgsByte::asIRText(LgsStrBuilder& sb, Value* value) {
+    const auto buffer = sb.cg.emptyBuffer(128);
+    const auto bytesRead = sb.cg.callSnprintf(fmtStr(), buffer, sb.cg.usize(128), sb.cg.toInt(value));
+    sb.add(buffer, sb.cg.toSize(bytesRead));
 }
 
 size_t LgsByte::sizeBytes() {
@@ -46,6 +54,14 @@ bool LgsByte::canCastTo(LgsType* other) {
 
 std::string LgsByte::fmtStr() const {
     return "%d";
+}
+
+Value* LgsByte::getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level) {
+    return cg.zero8();
+}
+
+Value* LgsByte::hashValue(LgsCodeGen& cg, Value* value) {
+    return value;
 }
 
 DIType* LgsByte::getDebugType(LgsCodeGen& cg) {

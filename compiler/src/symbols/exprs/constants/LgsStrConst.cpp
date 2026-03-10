@@ -1,5 +1,7 @@
 #include "exprs/constants/LgsStrConst.h"
-#include "../../../../include/symbols/types/primitives/LgsAny.h"
+
+#include <assert.h>
+
 #include "LgsUtils.h"
 
 std::string LgsStrConst::asText() {
@@ -10,17 +12,11 @@ void LgsStrConst::hashNode(size_t& oldHash) {
     hashNodeString(oldHash, value);
 }
 
-bool LgsStrConst::equals(LgsExpr* other) {
-    const auto otherStrConst = other->asStrConst();
-    if (otherStrConst->value == value) return true;
-    assert(0);
-}
-
 void LgsStrConst::setDebugValue(LgsCodeGen& cg) {
     setDebugLoc(cg);
 }
 
-LgsExpr* LgsStrConst::clone() {
+LgsExpr* LgsStrConst::clone() const {
     const auto newStrConst = new LgsStrConst(*this);
     if (!parts.empty()) {
         newStrConst->parts.clear();

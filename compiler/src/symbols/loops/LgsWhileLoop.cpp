@@ -1,4 +1,8 @@
 #include "loops/LgsWhileLoop.h"
+
+#include <assert.h>
+#include <llvm/IR/IRBuilder.h>
+
 #include "exprs/LgsExpr.h"
 #include "codegen/LgsCodeGen.h"
 

@@ -1,12 +1,20 @@
 #include "Lgs_Runtime.h"
+
+#include <_stdlib.h>
+#include <_string.h>
+#include <_time.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <cassert>
+#include <string>
+
 #include "LgsConfigs.h"
 #include "Lgs_Exprs.h"
 #include "LgsUtils.h"
-#include <cassert>
 #include "Lgs_Types.h"
 
 #define NANO 1000000000LL
-
+static void moveAndAssign(const Lgs_TypeInfo* fieldType, void* left, void* right, size_t toLevel);
 extern "C" void* Lgs_Runtime_moveValue(const Lgs_TypeInfo* type, void* value, size_t toLevel);
 
 extern "C" void Lgs_Runtime_init() {}
@@ -19,31 +27,29 @@ extern "C" void Lgs_Runtime_push() {
 }
 
 extern "C" void Lgs_Runtime_pop() {
-    auto top = runtime.stack.at(runtime.level);
+    assert(runtime.level > 0);
+    auto& top = runtime.stack.at(runtime.level);
     for (auto [defer, ctx] : top.defers) defer(ctx);
     top.allocator.freeBlocks();
     runtime.level--;
 }
 
-extern "C" void* Lgs_Runtime_allocInCurrent(const size_t size, const bool setLevel) {
-    return runtime.stack.at(runtime.level).allocator.allocate(size, setLevel);
-}
-
-extern "C" void* Lgs_Runtime_allocInLevel(const size_t size, const size_t level, const bool setLevel) {
+extern "C" void* Lgs_Runtime_alloc(const size_t size, const size_t level, const bool setLevel) {
     return runtime.stack.at(level).allocator.allocate(size, setLevel);
 }
 
-extern "C" void* Lgs_Runtime_allocObject(Lgs_TypeInfo* type) {
-    const auto obj = runtime.stack.at(runtime.level).allocator.allocate(type->size, true);
+extern "C" void* Lgs_Runtime_allocObject(Lgs_TypeInfo* type, const size_t level) {
+    auto& allocator = runtime.stack.at(level).allocator;
+    const auto obj = allocator.allocate(type->size, true);
     const auto typePtr = reinterpret_cast<Lgs_TypeInfo**>(static_cast<char*>(obj) + sizeof(size_t));
     *typePtr = type;
     return obj;
 }
 
-extern "C" void* Lgs_Runtime_allocDArr(Lgs_TypeInfo* baseType) {
-    auto& allocator = runtime.stack.at(runtime.level).allocator;
+extern "C" void* Lgs_Runtime_allocDArray(Lgs_TypeInfo* baseType, const size_t level) {
+    auto& allocator = runtime.stack.at(level).allocator;
     const auto arr = allocator.allocate(sizeof(Lgs_DArrExpr), true);
-    const auto dataPtr = Lgs_Runtime_allocInCurrent(baseType->size * LGS_ITER_INIT_CAP, false);
+    const auto dataPtr = allocator.allocate(baseType->size * LGS_ITER_INIT_CAP, false);
     const auto arrExpr = static_cast<Lgs_DArrExpr*>(arr);
     arrExpr->baseType = baseType;
     arrExpr->capacity = LGS_ITER_INIT_CAP;
@@ -51,10 +57,11 @@ extern "C" void* Lgs_Runtime_allocDArr(Lgs_TypeInfo* baseType) {
     return arr;
 }
 
-extern "C" void* Lgs_Runtime_allocStrConst(char* str) {
-    const auto ptr = static_cast<Lgs_StrExpr*>(runtime.stack.at(0).allocator.allocate(sizeof(Lgs_StrExpr), true));
-    ptr->data = str;
-    return ptr;
+extern "C" void* Lgs_Runtime_allocStr(char* str, const size_t level) {
+    const auto newPtr = runtime.stack.at(level).allocator.allocate(sizeof(Lgs_StrExpr), true);
+    const auto newStr = static_cast<Lgs_StrExpr*>(newPtr);
+    newStr->data = str;
+    return newStr;
 }
 
 extern "C" void* Lgs_Runtime_reallocate(const void* ptr, const size_t size, const size_t level) {
@@ -67,7 +74,7 @@ extern "C" void* Lgs_Runtime_reallocate(const void* ptr, const size_t size, cons
 extern "C" void* Lgs_Runtime_moveObject(void* obj, const size_t toLevel) {
     const auto leftLevel = static_cast<size_t*>(obj);
     assert(*leftLevel <= runtime.level && toLevel <= runtime.level);
-    if (*leftLevel >= toLevel) return obj;
+    if (*leftLevel <= toLevel) return obj;
     auto& allocator = runtime.stack.at(toLevel).allocator;
     const auto objType = (*reinterpret_cast<Lgs_TypeInfo**>(leftLevel + 1))->object;
     const auto newObj = allocator.allocate(objType->size, true);
@@ -75,7 +82,11 @@ extern "C" void* Lgs_Runtime_moveObject(void* obj, const size_t toLevel) {
         const auto fieldOffset = objType->fields[i].offset;
         const auto fieldType = objType->fields[i].type;
         void* fieldPtr = static_cast<char*>(obj) + fieldOffset;
-        Lgs_Runtime_moveValue(fieldType, fieldPtr, toLevel);
+        void* newFieldPtr = static_cast<char*>(newObj) + fieldOffset;
+        if (fieldType->isHeap) {
+            fieldPtr = *static_cast<void**>(fieldPtr);
+        }
+        moveAndAssign(fieldType, newFieldPtr, fieldPtr, toLevel);
     }
     return newObj;
 }
@@ -83,21 +94,27 @@ extern "C" void* Lgs_Runtime_moveObject(void* obj, const size_t toLevel) {
 extern "C" void* Lgs_Runtime_moveDArray(Lgs_DArrExpr* arr, const size_t toLevel) {
     if (arr->level <= toLevel) return arr;
     auto& allocator = runtime.stack.at(toLevel).allocator;
-    const auto newArr = static_cast<Lgs_DArrExpr*>(allocator.allocate(sizeof(Lgs_DArrExpr), false));
-    newArr->level = arr->level;
+    const auto newArr = static_cast<Lgs_DArrExpr*>(allocator.allocate(sizeof(Lgs_DArrExpr), true));
     newArr->baseType = arr->baseType;
     newArr->length = arr->length;
     newArr->capacity = arr->capacity;
-    const auto size = newArr->capacity * newArr->baseType->size;
-    newArr->data = static_cast<char*>(allocator.allocate(size, false));
-    std::memcpy(newArr->data, arr->data, size);
+    newArr->data = static_cast<char*>(allocator.allocate(arr->capacity * arr->baseType->size, false));
+    for (int i = 0; i < arr->length; ++i) {
+        void* element = arr->data + arr->baseType->size * i;
+        void* newElement = newArr->data + arr->baseType->size * i;
+        if (arr->baseType->isHeap) {
+            element = *static_cast<void**>(element);
+        }
+        moveAndAssign(arr->baseType, newElement, element, toLevel);
+    }
     return newArr;
 }
 
 extern "C" void* Lgs_Runtime_moveStr(Lgs_StrExpr* strExpr, const size_t toLevel) {
+    if (!strExpr) return strExpr;
     const auto leftLevel = strExpr->level;
     assert(leftLevel <= runtime.level && toLevel <= runtime.level);
-    if (leftLevel >= toLevel) return strExpr;
+    if (leftLevel <= toLevel) return strExpr;
     auto& allocator = runtime.stack.at(leftLevel).allocator;
     const auto newStr = static_cast<Lgs_StrExpr*>(allocator.allocate(sizeof(Lgs_StrExpr), false));
     newStr->level = leftLevel;
@@ -117,11 +134,20 @@ extern "C" void* Lgs_Runtime_moveValue(const Lgs_TypeInfo* type, void* value, co
     return value;
 }
 
+static void moveAndAssign(const Lgs_TypeInfo* fieldType, void* left, void* right, const size_t toLevel) {
+    const auto ptr = Lgs_Runtime_moveValue(fieldType, right, toLevel);
+    if (fieldType->isHeap) {
+        *static_cast<void**>(left) = ptr;
+    } else {
+        std::memcpy(left, ptr, fieldType->size);
+    }
+}
+
 extern "C" void* Lgs_Runtime_getVField(const Lgs_Object* type, void* objInstance, const char* fieldName) {
     for (int i = 0; i < type->fieldsCount; ++i) {
-        const auto func = type->fields[i];
-        if (std::strcmp(func.name, fieldName) == 0) {
-            return static_cast<char*>(objInstance) + func.offset;
+        const auto field = type->fields[i];
+        if (std::strcmp(field.name, fieldName) == 0) {
+            return static_cast<char*>(objInstance) + field.offset;
         }
     }
     return nullptr;

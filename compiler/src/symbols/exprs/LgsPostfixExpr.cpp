@@ -1,6 +1,6 @@
 #include "exprs/LgsPostfixExpr.h"
-#include "LgsType.h"
-#include "LgsUtils.h"
+
+#include <assert.h>
 
 std::string LgsPostfixExpr::asText() {
     assert(0);

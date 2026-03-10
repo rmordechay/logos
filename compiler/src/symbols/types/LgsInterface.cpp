@@ -1,7 +1,11 @@
 #include "types/LgsInterface.h"
+
+#include <llvm/IR/Constant.h>
+#include <vector>
+
 #include "codegen/LgsCodeGen.h"
-#include "stmts/LgsField.h"
 #include "types/LgsObject.h"
+#include "LgsType.h"
 
 bool LgsInterface::canCastTo(LgsType* other) {
     if (other->isAny()) return true;
@@ -20,6 +24,10 @@ LgsExpr* LgsInterface::getZeroValue() {
     return nullptr;
 }
 
-Value* LgsInterface::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
+Value* LgsInterface::getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level) {
+    return cg.null();
+}
+
+Constant* LgsInterface::getRTTypeExtra(LgsCodeGen& cg) {
     return cg.null();
 }

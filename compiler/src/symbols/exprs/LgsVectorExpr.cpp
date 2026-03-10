@@ -1,5 +1,8 @@
 #include "exprs/LgsVectorExpr.h"
-#include "LgsUtils.h"
+
+#include <assert.h>
+
+#include "LgsType.h"
 
 void LgsVectorExpr::setType(LgsType* newType) {
     vecType = newType->asVec();
@@ -16,10 +19,6 @@ void LgsVectorExpr::hashNode(size_t& oldHash) {
 
 std::string LgsVectorExpr::asText() {
     return type->pname();
-}
-
-bool LgsVectorExpr::equals(LgsExpr* other) {
-    assert(0);
 }
 
 LgsVectorExpr::~LgsVectorExpr() {

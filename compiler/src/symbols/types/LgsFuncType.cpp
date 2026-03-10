@@ -1,24 +1,34 @@
 #include "types/LgsFuncType.h"
+
+#include <__ostream/basic_ostream.h>
+#include <assert.h>
+#include <ostream>
+#include <sstream>
+
 #include "LgsDefinitions.h"
 #include "codegen/LgsCodeGen.h"
-#include "types/LgsGenericType.h"
-#include "LgsUtils.h"
-#include <sstream>
+#include "types/LgsTypeParam.h"
+#include "exprs/LgsExpr.h"
+
+namespace llvm {
+    class Type;
+}
 
 FunctionType* LgsFuncType::getIRType(LgsCodeGen& cg) {
     assert(rt);
     std::vector<Type*> types;
-    for (size_t i = 0; i < params.size(); ++i) {
-        const auto param = params[i];
-        const auto paramType = param.type;
-        if (param.isVariadic) types.emplace_back(cg.sizeTy());
-        types.emplace_back(paramType->getTypeOrPtr(cg));
+    for (const auto& param : params) {
+        if (param.isVariadic) {
+            if (!isExternal) types.emplace_back(cg.sizeTy());
+            break;
+        }
+        types.emplace_back(param.type->getStorageType(cg));
     }
     if (swapReturn) {
         types.insert(types.begin() + isMethod, cg.ptrTy());
-        IRType = cg.getFT(cg.voidTy(), types, this->isVariadic);
+        IRType = cg.getFT(cg.voidTy(), types, isVariadic);
     } else {
-        IRType = cg.getFT(rt->getTypeOrPtr(cg), types, this->isVariadic);
+        IRType = cg.getFT(rt->getStorageType(cg), types, isVariadic);
     }
     return IRType;
 }
@@ -32,7 +42,6 @@ size_t LgsFuncType::sizeBytes() {
 }
 
 std::string LgsFuncType::getName() {
-    assert(name != "");
     if (isExternal) return name;
     std::stringstream str;
     if (isBuiltin) str << LGS_PREFIX;
@@ -40,8 +49,7 @@ std::string LgsFuncType::getName() {
     if (parentName != "") str << parentName << "_";
     str << name;
     for (size_t i = isMethod; i < params.size(); ++i) {
-        const auto& param = params[i];
-        str << '_' << param.type->getName();
+        str << '_' << (params[i].type ? params[i].type->getName() : LGS_UNKNOWN_TYPE);
     }
     if (isCoroutine) str << LGS_CORO_SUFFIX;
     return str.str();
@@ -49,16 +57,14 @@ std::string LgsFuncType::getName() {
 
 std::string LgsFuncType::pname() {
     std::stringstream str;
-    str << (isLambda ? "" : name) << '(';
+    str << name << '(';
     for (size_t i = isMethod; i < params.size(); ++i) {
         const auto param = params[i];
-        if (param.type) str << param.type->pname();
-        else  str << LGS_UNKNOWN_TYPE;
+        str << (param.type ? param.type->pname() : LGS_UNKNOWN_TYPE);
         if (param.expr) str << " = " << param.expr->asText();
         if (i != params.size() - 1) str << ", ";
     }
-    if (rt) str << "): " << rt->pname();
-    else str << "): " << LGS_UNKNOWN_TYPE;
+    str << "): " << (rt ? rt->pname() : LGS_UNKNOWN_TYPE);
     return str.str();
 }
 
@@ -76,7 +82,8 @@ bool LgsFuncType::canCastTo(LgsType* other) {
     for (size_t i = isMethod; i < params.size(); ++i) {
         const auto thisType = params[i].type;
         const auto otherType = otherFuncType->params[i].type;
-        if (!thisType || !otherType) return false;
+        if (!otherType) return false;
+        if (!thisType) continue;
         if (!thisType->canCastTo(otherType)) return false;
     }
     return true;
@@ -96,36 +103,8 @@ bool LgsFuncType::equals(LgsType* other) {
     return true;
 }
 
-bool LgsFuncType::hasGenerics() {
-    if (rt->hasGenerics()) return true;
-    for (const auto& param : params) if (param.type->hasGenerics()) return true;
-    return false;
-}
-
-void LgsFuncType::replaceGenerics(std::unordered_map<std::string, LgsType*>& replacements) {
-    const auto r = replacements.find(getName());
-    if (r == replacements.end()) return;
-    const auto otherFuncType = r->second->asFuncType();
-    for (size_t i = 0; i < params.size(); ++i) {
-        const auto paramName = params[i].type->getName();
-        if (!replacements.contains(paramName)) continue;
-        if (!replacements[paramName]) {
-            replacements[paramName] = otherFuncType->params[i].type;
-        }
-        assert(!replacements[paramName]->hasGenerics());
-        params[i].type = replacements[paramName];
-    }
-    const auto rtName = rt->getName();
-    if (!replacements.contains(rtName)) return;
-    if (!replacements[rtName]) {
-        replacements[rtName] = otherFuncType->rt;
-    }
-    assert(!replacements[rtName]->hasGenerics());
-    rt = replacements[rtName];
-}
-
-LgsType* LgsFuncType::applyBinOp(LgsType* rightType, LgsBinOp& op) {
-    return nullptr;
+bool LgsFuncType::hasTypeParams() {
+    return !typeParams.empty();
 }
 
 void LgsFuncType::setFuncOptions(const uint32_t ops) {
@@ -140,6 +119,19 @@ void LgsFuncType::setFuncOptions(const uint32_t ops) {
     isSyscall =  ops & SYSCALL;
     isExternal =  ops & EXTERNAL;
     hasDefaults =  ops & HAS_DEFAULTS;
+}
+
+LgsType* LgsFuncType::applyBinOp(LgsType* rightType, LgsBinOp& op) {
+    return nullptr;
+}
+
+bool LgsFuncType::isRecursive(std::unordered_set<std::string>& visited) const {
+    if (rt && rt->isRecursive(visited)) return true;
+    for (size_t i = isMethod; i < params.size(); ++i) {
+        const auto paramType = params[i].type;
+        if (paramType && paramType->isRecursive(visited)) return true;
+    }
+    return false;
 }
 
 std::unordered_map<std::string, LgsParam*> LgsFuncType::getParamsByName() {
@@ -169,8 +161,8 @@ LgsFuncType::~LgsFuncType() {
         if (param.expr) freeExpr(param.expr);
     }
     params.clear();
-    for (const auto& genericType : genericTypes) {
-        freeType(genericType);
+    for (const auto& typeParam : typeParams) {
+        freeType(typeParam);
     }
-    genericTypes.clear();
+    typeParams.clear();
 }

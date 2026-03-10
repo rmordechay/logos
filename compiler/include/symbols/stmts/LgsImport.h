@@ -1,4 +1,6 @@
 #pragma once
+#include <string>
+
 #include "LgsTokens.h"
 
 enum LgsImportType {
@@ -11,6 +13,5 @@ public:
     LgsImportType type;
     std::string importPath;
     LgsLocation location;
-
-    LgsImport(LgsImportType type, const std::string& importPath) : type(type), importPath(importPath) {}
+    LgsImport(const LgsImportType type, const std::string& importPath) : type(type), importPath(importPath) {}
 };

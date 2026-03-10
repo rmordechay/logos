@@ -1,9 +1,16 @@
 #pragma once
+#include <string>
+
 #include "exprs/LgsExpr.h"
+#include "LgsValue.h"
 
 class LgsStr;
 class LgsMap;
 class LgsDArray;
+class LgsCodeGen;
+namespace llvm {
+class Value;
+}
 
 struct LgsIndex {
     LgsExpr* from;
@@ -24,6 +31,6 @@ public:
     LgsExpr* getBaseExpr() const;
     std::string asText() override;
     void setDebugValue(LgsCodeGen& cg) override;
-    LgsExpr* clone() override;
+    LgsExpr* clone() const override;
     ~LgsIterIndex() override;
 };

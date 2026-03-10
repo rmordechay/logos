@@ -1,14 +1,20 @@
-#include "LgsDefinitions.h"
-#include "Lgs_Exprs.h"
-#include "Lgs_Runtime.h"
-#include "Lgs_Types.h"
+#include <__ostream/basic_ostream.h>
+#include <_string.h>
+#include <stdint.h>
+#include <stdio.h>
 #include <cassert>
 #include <cmath>
+#include <ostream>
 #include <sstream>
+#include <string>
+#include <sys/stat.h>
 
+#include "LgsDefinitions.h"
+#include "Lgs_Exprs.h"
+#include "Lgs_Types.h"
 #include "LgsConfigs.h"
 
-static std::string formatElement(const Lgs_TypeInfo* type, void* value) {
+static std::string formatValue(const Lgs_TypeInfo* type, void* value) {
     if (!value) return LGS_NULL_LITERAL;
     std::ostringstream str;
     switch (type->kind) {
@@ -40,14 +46,14 @@ static std::string formatElement(const Lgs_TypeInfo* type, void* value) {
         str << obj->name << "{";
         for (int i = 0; i < obj->fieldsCount; ++i) {
             const auto fieldName = obj->fields[i].name;
-            const auto fieldOffset = obj->fields[i].offset;
             const auto fieldType = obj->fields[i].type;
+            const auto fieldOffset = obj->fields[i].offset;
             void* fieldPtr = static_cast<char*>(value) + fieldOffset;
             if (fieldType->isHeap) {
                 fieldPtr = *static_cast<void**>(fieldPtr);
             }
             str << fieldName << '=';
-            str << formatElement(fieldType, fieldPtr);
+            str << formatValue(fieldType, fieldPtr);
             if (i < obj->fieldsCount - 1) str << ", ";
         }
         str << "}";
@@ -63,7 +69,7 @@ static std::string formatElement(const Lgs_TypeInfo* type, void* value) {
             if (dArr->baseType->isHeap) {
                 element = *static_cast<void**>(element);
             }
-            str << formatElement(dArr->baseType, element);
+            str << formatValue(dArr->baseType, element);
             if (i < dArr->length - 1) str << ", ";
         }
         str << "]";
@@ -82,7 +88,7 @@ static std::string formatElement(const Lgs_TypeInfo* type, void* value) {
             if (sArr->baseType->isHeap) {
                 element = *static_cast<void**>(element);
             }
-            str << formatElement(sArr->baseType, element);
+            str << formatValue(sArr->baseType, element);
             if (i < sArr->length - 1) str << ", ";
             offset += sArr->baseType->isHeap ? sizeof(void*) : sArr->baseType->size;
         }
@@ -91,13 +97,31 @@ static std::string formatElement(const Lgs_TypeInfo* type, void* value) {
     }
     case RTT_VEC: {
         const auto vec = type->vec;
-        str << "Vec" << std::to_string(vec->length) << "(";
+        str << type->name << "(";
         auto offset = 0;
         for (int i = 0; i < vec->length; ++i) {
             void* element = static_cast<char*>(value) + offset;
-            str << formatElement(vec->baseType, element);
+            str << formatValue(vec->baseType, element);
             if (i < vec->length - 1) str << ", ";
             offset += vec->baseType->size;
+        }
+        str << ")";
+        break;
+    }
+    case RTT_MATRIX: {
+        const auto mat = type->mat;
+        str << type->name << "(";
+        auto offset = 0;
+        for (size_t i = 0; i < mat->rows; ++i) {
+            str << '[';
+            for (size_t j = 0; j < mat->columns; ++j) {
+                void* element = static_cast<char*>(value) + offset;
+                str << formatValue(mat->baseType, element);
+                if (j < mat->columns - 1) str << ", ";
+                offset += mat->baseType->size;
+            }
+            str << ']';
+            if (i < mat->rows - 1) str << ", ";
         }
         str << ")";
         break;
@@ -105,9 +129,10 @@ static std::string formatElement(const Lgs_TypeInfo* type, void* value) {
     case RTT_NULLABLE: {
         const auto baseType = type->baseType;
         if (!baseType) return LGS_NULL_LITERAL;
+        if (type->passByRef) return formatValue(baseType, value);
         const auto isSetPtr = static_cast<char*>(value) + baseType->size;
         const auto isSet = *reinterpret_cast<bool*>(isSetPtr);
-        if (isSet) str << formatElement(baseType, value);
+        if (isSet) str << formatValue(baseType, value);
         else str << LGS_NULL_LITERAL;
         break;
     }
@@ -116,19 +141,21 @@ static std::string formatElement(const Lgs_TypeInfo* type, void* value) {
         const auto map = hashMap->type->map;
         str << '{';
         auto isFirst = true;
-        for (int i = 0; i < hashMap->capacity; ++i) {
-            const auto entry = hashMap->entries[i];
+        for (int i = 0; i < hashMap->cap; ++i) {
+            auto entry = hashMap->entries[i];
             if (!entry) continue;
-            if (!isFirst) str << ", ";
-            isFirst = false;
-            str << formatElement(map->key, entry->key);
-            str << ": ";
-            str << formatElement(map->value, entry->value);
+            while (entry) {
+                if (!isFirst) str << ", ";
+                isFirst = false;
+                str << formatValue(map->key, entry->key);
+                str << ": ";
+                str << formatValue(map->value, entry->value);
+                entry = entry->next;
+            }
         }
         str << '}';
         break;
     }
-    case RTT_MATRIX:
     default:
         assert(0);
     }
@@ -136,5 +163,5 @@ static std::string formatElement(const Lgs_TypeInfo* type, void* value) {
 }
 
 extern "C" void Lgs_print(const Lgs_TypeInfo* type, void* v) {
-    printf("%s\n", formatElement(type, v).c_str());
+    printf("%s\n", formatValue(type, v).c_str());
 }

@@ -1,6 +1,12 @@
 #pragma once
+#include <string>
+#include <vector>
+
 #include "LgsSymbolTable.h"
 #include "loops/LgsForeachLoop.h"
+#include "LgsValue.h"
+
+class LgsForeachLoop;
 
 namespace llvm {
     class BasicBlock;
@@ -20,11 +26,12 @@ struct LgsStackFrame {
     LgsFunc* func = nullptr;
     LgsForLoop* loop = nullptr;
     LgsIfStmt* ifStmt = nullptr;
+    LgsIOStmt* ioStmt = nullptr;
 };
 
 class LgsStack final {
 public:
-    std::vector<LgsStackFrame> stack;
+    std::vector<LgsStackFrame> frames;
 
     void enterScope(LgsValue* value);
     void exitScope();

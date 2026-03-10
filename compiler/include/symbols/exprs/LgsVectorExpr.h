@@ -1,5 +1,9 @@
 #pragma once
+#include <string>
+#include <vector>
+
 #include "types/iterables/LgsVec.h"
+#include "exprs/LgsExpr.h"
 
 class LgsVectorExpr final : public LgsExpr {
 public:
@@ -14,7 +18,6 @@ public:
     void setType(LgsType* newType) override;
     void hashNode(size_t& oldHash) override;
     std::string asText() override;
-    bool equals(LgsExpr* other) override;
     void setDebugValue(LgsCodeGen& cg) override;
     ~LgsVectorExpr() override;
 };

@@ -1,5 +1,8 @@
 #pragma once
 #include "loops/LgsForLoop.h"
+#include "LgsValue.h"
+
+class LgsExpr;
 
 class LgsRangeLoop final : public LgsForLoop {
 public:
@@ -10,6 +13,6 @@ public:
     Value* loopStart(LgsCodeGen& cg) override;
     Value* loopEnd(LgsCodeGen& cg) override;
     void setDebugValue(LgsCodeGen& cg) override;
-    LgsStmt* clone() override;
+    LgsStmt* clone() const override;
     ~LgsRangeLoop() override;
 };

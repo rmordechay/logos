@@ -1,25 +1,15 @@
 #include "exprs/LgsVariable.h"
-#include "exprs/LgsInstance.h"
-#include "funcs/LgsParam.h"
-#include "stmts/LgsField.h"
-#include "stmts/LgsVarDec.h"
-#include "types/LgsNullable.h"
-#include <codegen/LgsCodeGen.h>
-#include "types/LgsEnum.h"
 
-bool LgsVariable::equals(LgsExpr* other) {
-    const auto otherVar = other->asVariable();
-    if (!otherVar) return false;
-    switch (ref.symbolType) {
-    case VAR_DEC:
-        return ref.varDec->name == otherVar->name;
-    case PARAM:
-        return ref.param->name == otherVar->name;
-    default:
-        break;
-    }
-    assert(0);
-}
+#include <codegen/LgsCodeGen.h>
+#include <assert.h>
+#include <llvm/IR/DIBuilder.h>
+#include <llvm/IR/DebugInfoMetadata.h>
+#include <llvm/IR/IRBuilder.h>
+
+#include "funcs/LgsParam.h"
+#include "stmts/LgsVarDec.h"
+#include "LgsTokens.h"
+#include "LgsType.h"
 
 LgsExpr* LgsVariable::cast(LgsType* toType, bool explicitly) {
     if (toType && type && type->canCastTo(toType)) {
@@ -50,7 +40,7 @@ void LgsVariable::setDebugValue(LgsCodeGen& cg) {
     );
 }
 
-LgsVariable* LgsVariable::clone() {
+LgsVariable* LgsVariable::clone() const {
     const auto newVar = new LgsVariable(*this);
     newVar->setType(type);
     return newVar;

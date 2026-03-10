@@ -1,4 +1,12 @@
 #include "tools/LgsJsonParser.h"
+
+#include <__ostream/basic_ostream.h>
+#include <assert.h>
+#include <map>
+#include <unordered_map>
+#include <utility>
+#include <vector>
+
 #include "exprs/LgsArrayExpr.h"
 #include "exprs/LgsBinaryExpr.h"
 #include "exprs/LgsFuncCall.h"
@@ -9,26 +17,31 @@
 #include "files/LgsInterfaceFile.h"
 #include "files/LgsMainFile.h"
 #include "files/LgsObjectFile.h"
-#include "files/LgsTestFile.h"
 #include "funcs/LgsFunc.h"
-#include "stmts/LgsAssignment.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsIfStmt.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsEnum.h"
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
-
-#include <llvm/IR/InlineAsm.h>
+#include "LgsBinaryTokens.h"
+#include "LgsType.h"
+#include "exprs/LgsExpr.h"
+#include "exprs/constants/LgsIntConst.h"
+#include "files/LgsFile.h"
+#include "funcs/LgsParam.h"
+#include "stmts/LgsStmt.h"
+#include "stmts/LgsStmtsBlock.h"
+#include "types/LgsFuncType.h"
 
 void LgsJsonParser::parseFile(LgsFile* file) {
-    if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
+    if (const auto mainFile = file->asMainFile()) {
         parseMainFile(mainFile);
-    } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
+    } else if (const auto objFile = file->asObjectFile()) {
         parseObject(objFile->obj);
-    } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
+    } else if (const auto interfaceFile = file->asInterfaceFile()) {
         parseInterface(interfaceFile->interface);
-    } else if (const auto testFile = dynamic_cast<LgsTestFile*>(file)) {
+    } else if (const auto testFile = file->asTestFile()) {
         parseTestFile(testFile);
     } else {
         assert(0);
@@ -430,10 +443,6 @@ void LgsJsonParser::parseStrConst(const LgsStrConst* strConst) {
     addKeyValueStr("kind", "strConst", true);
     addKeyValueStr("value", strConst->value);
     closeObject();
-}
-
-void LgsJsonParser::parseTypeExpr(LgsTypeExpr* typeExpr) {
-    assert(0);
 }
 
 void LgsJsonParser::parseInstance(LgsInstance* instance) {

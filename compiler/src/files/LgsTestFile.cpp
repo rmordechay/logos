@@ -1,5 +1,7 @@
 #include "files/LgsTestFile.h"
 
+#include <assert.h>
+
 #include "funcs/LgsFunc.h"
 
 size_t LgsTestFile::hashFile() {

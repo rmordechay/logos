@@ -1,13 +1,20 @@
 #include "stmts/LgsStmtsBlock.h"
+
+#include <assert.h>
+#include <string>
+
 #include "stmts/LgsReturn.h"
 #include "exprs/LgsFuncCall.h"
 #include "exprs/LgsSelection.h"
 #include "funcs/LgsFunc.h"
-#include "stmts/LgsAssignment.h"
 #include "stmts/LgsBreak.h"
 #include "stmts/LgsContinue.h"
-#include "stmts/LgsVarDec.h"
 #include "types/LgsObject.h"
+#include "LgsTokens.h"
+#include "LgsType.h"
+#include "exprs/LgsExpr.h"
+#include "stmts/LgsStmt.h"
+#include "types/LgsFuncType.h"
 
 bool LgsStmtWrapper::isTerminator() const {
     switch (wrapperType) {
@@ -31,6 +38,14 @@ bool LgsStmtWrapper::isTerminator() const {
     return false;
 }
 
+LgsFunc* LgsStmtsBlock::wrapBlockInFunc() {
+    const auto func = new LgsFunc("", nullptr);
+    func->isLambda = true;
+    func->location = location;
+    func->stmtsBlock = this;
+    return func;
+}
+
 void LgsStmtsBlock::hashNode(size_t& oldHash) {
     for (const auto stmt : stmts) {
         stmt.stmt->hashNode(oldHash);
@@ -41,7 +56,7 @@ void LgsStmtsBlock::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }
 
-LgsStmtsBlock* LgsStmtsBlock::clone() {
+LgsStmtsBlock* LgsStmtsBlock::clone() const {
     const auto newStmtBlock = new LgsStmtsBlock();
     for (const auto& stmtWrapper : stmts) {
         switch (stmtWrapper.wrapperType) {

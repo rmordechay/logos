@@ -15,16 +15,6 @@ main() {
         print(for.isFirst)
         print(for.isLast)
     }
-    //for {
-    //    // for.i not allowed
-    //    // for.isFirst not allowed
-    //    // for.isLast not allowed
-    //}
-    //while true {
-    //    // for.i not allowed
-    //    // for.isFirst not allowed
-    //    // for.isLast not allowed
-    //}
     a = [3254, 235, 2345]
     for a {
         print(for.i)

@@ -1,11 +1,25 @@
 #include "types/iterables/LgsSArray.h"
+
 #include <llvm/IR/Module.h>
+#include <assert.h>
+#include <llvm/ADT/ArrayRef.h>
+#include <llvm/IR/Argument.h>
+#include <llvm/IR/Constants.h>
+#include <llvm/IR/DerivedTypes.h>
+#include <llvm/IR/Function.h>
+#include <llvm/IR/GlobalVariable.h>
+#include <llvm/IR/IRBuilder.h>
+#include <llvm/IR/Instructions.h>
+#include <functional>
+#include <vector>
+
 #include "codegen/LgsCodeGen.h"
 #include "exprs/LgsArrayExpr.h"
 #include "types/primitives/LgsBool.h"
 #include "exprs/LgsBinaryExpr.h"
-#include "lgsc/LgsCCompiler.h"
-#include "types/iterables/LgsStr.h"
+#include "LgsBinaryTokens.h"
+#include "LgsType.h"
+#include "types/iterables/LgsIterable.h"
 
 std::string LgsSArray::getBaseName() {
     return name;
@@ -13,7 +27,7 @@ std::string LgsSArray::getBaseName() {
 
 std::string LgsSArray::getName() {
     if (len <= 0) return "";
-    return name + std::to_string(len) + "_" +  baseType->getName();
+    return name + std::to_string(len) + "_" +  (baseType ? baseType->getName() : LGS_UNKNOWN_TYPE);
 }
 
 std::string LgsSArray::pname() {
@@ -30,7 +44,7 @@ std::string LgsSArray::fmtStr() const {
     return "%p";
 }
 
-std::optional<int64_t> LgsSArray::getConstLength() {
+std::optional<size_t> LgsSArray::getConstLength() {
     return len;
 }
 
@@ -38,9 +52,9 @@ bool LgsSArray::canCastTo(LgsType* other) {
     if (!baseType) return false;
     if (other->isAny()) return true;
     if (other->asStr()) return !!baseType->asChar();
-    const auto otherIter = other->asSArray();
-    if (!otherIter) return false;
-    return baseType->canCastTo(otherIter->baseType);
+    const auto otherSArr = other->asSArray();
+    if (!otherSArr) return false;
+    return len == otherSArr->len && baseType->canCastTo(otherSArr->baseType);
 }
 
 bool LgsSArray::equals(LgsType* other) {
@@ -55,7 +69,7 @@ LgsExpr* LgsSArray::getZeroValue() {
     return new LgsArrayExpr(this);
 }
 
-Value* LgsSArray::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
+Value* LgsSArray::getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level) {
     if (pointee) return pointee;
     return cg.builder.CreateAlloca(getIRType(cg));
 }
@@ -139,21 +153,20 @@ Function* LgsSArray::getEqFunc(LgsCodeGen& cg) {
     const auto funcName = getName() + "_" + EQUAL_FUNC;
     if (const auto func = cg.IRModule->getFunction(funcName)) return func;
     const auto ft = cg.getFT(cg.i1Ty(), {cg.ptrTy(), cg.ptrTy()});
-    if (cg.mode == CG_MODE_SRC_CODE) return cg.getFunc(funcName, ft);
+    if (cg.mode == CG_MODE_SRC) return cg.getFunc(funcName, ft);
 
     const auto func = cg.getFunc(funcName, ft);
-    cg.savedIP = cg.builder.saveIP();
-    const auto entryBlock = cg.createBlock(BLOCK_ENTRY, func);
-    cg.builder.SetInsertPoint(entryBlock);
-
+    const auto savedIP =  cg.builder.saveIP();
+    cg.startFunc(func);
     const auto arrIR1 = func->getArg(0);
     const auto arrIR2 = func->getArg(1);
+
     const auto len1 = lenIR(cg, arrIR1);
     const auto len2 = lenIR(cg, arrIR2);
-    cg.ifStmt(cg.builder.CreateICmpNE(len1, len2), [&cg] {cg.builder.CreateRet(cg.false_());});
+    cg.ifStmt(cg.builder.CreateICmpNE(len1, len2), [&cg] {cg.createRet(cg.false_());});
 
-    cg.builder.CreateRet(cg.true_());
-    cg.builder.restoreIP(cg.savedIP);
+    cg.createRet(cg.true_());
+    cg.restoreFuncState(savedIP);
     return func;
 }
 

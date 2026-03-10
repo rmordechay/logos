@@ -1,5 +1,6 @@
 #include "tools/LgsLinter.h"
-#include "files/LgsMainFile.h"
+
+#include <assert.h>
 
 void LgsLinter::visitMainFile(LgsMainFile* mainFile) {
     assert(0);
@@ -162,10 +163,6 @@ void LgsLinter::visitPostfixExpr(LgsPostfixExpr* postfixExpr) {
 }
 
 void LgsLinter::visitStrConst(const LgsStrConst* strConst) {
-    assert(0);
-}
-
-void LgsLinter::visitTypeExpr(LgsTypeExpr* typeExpr) {
     assert(0);
 }
 

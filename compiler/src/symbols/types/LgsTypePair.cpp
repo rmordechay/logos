@@ -1,10 +1,12 @@
 #include "types/LgsTypePair.h"
+
+#include <llvm/IR/DerivedTypes.h>
 #include <cassert>
-#include <llvm/IR/Module.h>
+
 #include "codegen/LgsCodeGen.h"
 
 Type* LgsTypePair::getIRType(LgsCodeGen& cg) {
-    return cg.getStructType({key->getIRType(cg), value->getIRType(cg), cg.ptrTy()}, name);
+    return cg.getStructType({key->getStorageType(cg), value->getStorageType(cg), cg.ptrTy()}, name);
 }
 
 LgsExpr* LgsTypePair::getZeroValue() {

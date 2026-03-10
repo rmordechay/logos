@@ -1,7 +1,10 @@
 #pragma once
 #include "LgsStmt.h"
+#include "LgsValue.h"
 
 class LgsStmtsBlock;
+class LgsExpr;
+class LgsFuncCall;
 
 class LgsDeferStmt final : public LgsStmt {
 public:

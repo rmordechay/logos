@@ -1,5 +1,7 @@
 #include "exprs/LgsModuleExpr.h"
 
+#include <assert.h>
+
 void LgsModuleExpr::setDebugValue(LgsCodeGen& cg) {
     assert(0);
 }

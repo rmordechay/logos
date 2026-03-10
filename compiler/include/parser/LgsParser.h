@@ -1,8 +1,16 @@
 #pragma once
 #include <unordered_set>
+#include <filesystem>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include "LgsBinaryTokens.h"
 #include "LgsTokens.h"
 #include "lgsc/LgsCCompiler.h"
+#include "errors/LgsErrHandler.h"
+#include "logos/LgsPaths.h"
+#include "stmts/LgsImport.h"
 
 class LgsCharConst;
 class LgsModuleExpr;
@@ -13,11 +21,11 @@ class LgsStmtsBlock;
 class LgsMainFunc;
 class LgsMap;
 class LgsFuncType;
-class LgsAppConfigFile;
+class LgsAppFile;
 struct LgsFileMetadata;
 class LgsMetaSelection;
 class LgsMatrixExpr;
-class LgsGenericType;
+class LgsTypeParam;
 struct LgsPaths;
 struct LgsSymbol;
 struct LgsAppConfigs;
@@ -60,41 +68,43 @@ class LgsReturn;
 class LgsStmt;
 class LgsFuncCall;
 class LgsExpr;
+class LgsVariable;
+struct LgsBaseMsg;
 
 class LgsParser {
 public:
+    bool headersOnly;
+    const LgsPaths& paths;
     const fs::path filePath;
-    const std::string& lgsCode;
+    LgsSymbolTable& globals;
+    LgsErrHandler errHandler;
+    const std::string lgsCode;
     LgsToken currentToken;
     size_t currentIndex = 0;
     size_t recursionCount = 0;
     std::vector<LgsToken> tokens;
     LgsFunc* currentFunc = nullptr;
-    bool headersOnly;
-    const LgsPaths& paths;
-    LgsSymbolTable& globals;
-    LgsErrHandler errHandler;
-    std::vector<LgsImport*> importPaths;
+    const LgsAppConfigs& appConfigs;
+    std::vector<LgsImport> importPaths;
     std::unordered_set<std::string> importAppNames;
 
-    LgsParser(const std::string& lgsCode, const fs::path& filePath, const LgsPaths& paths, LgsSymbolTable& globals, const bool headersOnly = false)
-        : filePath(filePath), lgsCode(lgsCode), headersOnly(headersOnly), paths(paths), globals(globals) {
+    LgsParser(const std::string& lgsCode, const fs::path& filePath, const LgsAppConfigs& appConfigs, const LgsPaths& paths, LgsSymbolTable& globals, const bool headersOnly = false)
+        : headersOnly(headersOnly), paths(paths), filePath(filePath), globals(globals), lgsCode(lgsCode), appConfigs(appConfigs) {
     }
     // Files
     bool scanTokens();
-    LgsFile* parseSrcFile(bool isTestRun);
+    LgsFile* parseSrcFile();
     LgsFile* parseSrcFileHeaders();
     LgsMainFile* parseMainFile();
-    LgsAppConfigFile* parseAppConfigFile();
     LgsObjectFile* parseObjectFile();
+    LgsObject* parseObject(bool withParen);
     LgsInterfaceFile* parseInterfaceFile();
-    LgsEnvFile* parseEnvFile();
     LgsTestFile* parseTestFile();
+    LgsAppFile* parseAppFile();
+    LgsEnvFile* parseEnvFile();
 
     // Object
-    LgsObject* parseObject();
     LgsInterface* parseInterface();
-    LgsObject* parseObjectBody(const LgsToken& tokenName, bool isSingleton);
     LgsInterface* parseInterfaceBody(const LgsToken& tokenName);
     LgsField* parseField(size_t fieldPosition);
     LgsIOPair* parseIOPair();
@@ -105,8 +115,8 @@ public:
     LgsSubType* parseSubtype();
     LgsFuncType* parseFuncType();
     LgsMap* parseMapType();
-    LgsGenericType* parseGenericType();
-    std::vector<LgsType*> parseGenericArgs();
+    LgsTypeParam* parseTypeParam();
+    std::vector<LgsType*> parseTypeArgs();
 
     // Funcs
     LgsFunc* parseFunc();
@@ -117,7 +127,7 @@ public:
 
     // Statements
     LgsStmt* parseStmt();
-    LgsStmtsBlock* parseStmtsBlock(bool withSingleStmt = true);
+    LgsStmtsBlock* parseStmtsBlock(bool wrapInFunc = false, bool withSingleStmt = true);
     LgsVarDec* parseVarDec();
     LgsStmt* parseAssignment();
     LgsStmt* parseIfStmt();
@@ -134,9 +144,9 @@ public:
     LgsIOStmt* parseIOStmt();
 
     // Exprs
-    LgsExpr* parseExpr(bool withInstaOrLambda = true);
-    LgsExpr* parseBinaryExpr(int minPrecedence, bool witInstaOrLambda = true);
-    LgsExpr* parseUnary(bool withInstaOrLambda = true);
+    LgsExpr* parseExpr(bool withLambda = true);
+    LgsExpr* parseBinExpr(int minPrecedence, bool withLambda = true);
+    LgsExpr* parseUnary(bool withInstance = true);
     LgsVariable* parseVariable();
     LgsModuleExpr* parseModuleExpr();
     LgsInstance* parseInstance();
@@ -165,7 +175,7 @@ public:
     void extractStrParts(LgsStrConst* strConst);
     std::pair<size_t, size_t> extractMatDims(const LgsToken& matToken);
     void validateTestFolder(const LgsFile* testFile);
-    LgsExpr* determineIntConst(const std::string& tokenStr, int base);
+    LgsExpr* determineIntConst(const std::string& tokenStr, int base) const;
     static int getBinOpPrecedence(LgsBinOpType opType);
 
     // Parser

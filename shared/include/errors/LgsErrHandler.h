@@ -1,7 +1,8 @@
 #pragma once
 #include <vector>
 #include <mutex>
-#include <fstream>
+#include <string>
+
 #include "LgsTokens.h"
 
 struct LgsBaseMsg;

@@ -17,9 +17,9 @@ struct Lgs_DArrExpr {
 };
 
 struct Lgs_Entry {
-    void* key;
-    void* value;
-    void* next;
+    char* key;
+    char* value;
+    Lgs_Entry* next;
 };
 
 struct Lgs_HashMap {
@@ -27,5 +27,5 @@ struct Lgs_HashMap {
     Lgs_TypeInfo* type;
     Lgs_Entry** entries;
     size_t len;
-    size_t capacity;
+    size_t cap;
 };

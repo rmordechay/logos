@@ -1,10 +1,13 @@
 #pragma once
+#include <vector>
 #include "LgsValue.h"
-#include "types/LgsGenericType.h"
+
 
 class LgsReturn;
 class LgsStmt;
 class LgsObject;
+class LgsExpr;
+class LgsFunc;
 
 class LgsStmtWrapper {
 public:
@@ -29,8 +32,9 @@ public:
     bool isMacro = false;
 
     explicit LgsStmtsBlock(const std::vector<LgsStmtWrapper>& stmts = {}) : stmts(stmts) {}
+    LgsFunc* wrapBlockInFunc();
     void hashNode(size_t& oldHash) override;
     void setDebugValue(LgsCodeGen& cg) override;
-    LgsStmtsBlock* clone() override;
+    LgsStmtsBlock* clone() const override;
     ~LgsStmtsBlock() override;
 };

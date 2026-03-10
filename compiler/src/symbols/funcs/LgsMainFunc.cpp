@@ -1,8 +1,17 @@
 #include "funcs/LgsMainFunc.h"
-#include <llvm/IR/Module.h>
-#include "types/iterables/LgsStr.h"
-#include "types/primitives/LgsInt.h"
+
 #include <llvm/IR/DIBuilder.h>
+#include <llvm/ADT/ArrayRef.h>
+#include <llvm/ADT/Twine.h>
+#include <llvm/IR/DebugInfoMetadata.h>
+#include <llvm/IR/DerivedTypes.h>
+#include <llvm/IR/Function.h>
+#include <llvm/IR/IRBuilder.h>
+#include <vector>
+
+#include "types/primitives/LgsInt.h"
+#include "codegen/LgsCodeGen.h"
+#include "LgsTokens.h"
 
 Function* LgsMainFunc::getIRFunc(LgsCodeGen& cg) {
     FunctionType* mainFuncType;

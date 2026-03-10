@@ -1,4 +1,7 @@
 #pragma once
+#include <string>
+#include <vector>
+
 #include "exprs/constants/LgsStrConst.h"
 #include "funcs/LgsFunc.h"
 #include "../types/primitives/LgsAny.h"
@@ -7,6 +10,9 @@
 #include "types/primitives/LgsVoid.h"
 #include "types/iterables/LgsStr.h"
 #include "types/primitives/LgsBool.h"
+#include "funcs/LgsParam.h"
+
+class LgsType;
 
 class LgsTest final : public LgsObject {
 public:

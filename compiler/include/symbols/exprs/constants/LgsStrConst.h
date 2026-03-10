@@ -1,4 +1,8 @@
 #pragma once
+#include <string>
+#include <vector>
+
+#include "exprs/LgsExpr.h"
 #include "types/iterables/LgsStr.h"
 
 class LgsStrConst final : public LgsExpr {
@@ -10,13 +14,12 @@ public:
     explicit LgsStrConst(const std::string& v) : value(v) {
         const auto str = new LgsStr(v.length());
         str->isStatic = true;
+        isMutable = false;
         type = str;
     }
-
     std::string asText() override;
     void hashNode(size_t& oldHash) override;
-    bool equals(LgsExpr* other) override;
     void setDebugValue(LgsCodeGen& cg) override;
-    LgsExpr* clone() override;
+    LgsExpr* clone() const override;
     ~LgsStrConst() override;
 };

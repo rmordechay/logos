@@ -1,4 +1,11 @@
 #include "types/primitives/LgsInt.h"
+
+#include <llvm/IR/DIBuilder.h>
+#include <llvm/BinaryFormat/Dwarf.h>
+#include <llvm/IR/Constants.h>
+#include <llvm/IR/DebugInfoMetadata.h>
+#include <llvm/IR/IRBuilder.h>
+
 #include "LgsBinaryTokens.h"
 #include "exprs/constants/LgsIntConst.h"
 #include "types/primitives/LgsBool.h"
@@ -6,10 +13,10 @@
 #include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsLong.h"
 #include "types/primitives/LgsSize.h"
-#include <llvm/IR/DIBuilder.h>
-#include <llvm/IR/Module.h>
 #include "exprs/LgsBinaryExpr.h"
 #include "types/LgsNullable.h"
+#include "codegen/LgsCodeGen.h"
+#include "exprs/LgsExpr.h"
 
 std::string LgsInt::getName() {
     return name;
@@ -31,7 +38,7 @@ bool LgsInt::canCastTo(LgsType* other) {
     if (otherName == LgsLong::name) return true;
     if (otherName == LgsFloat::name) return true;
     if (otherName == LgsDouble::name) return true;
-    if (other->asGenericType()) return other->canCastTo(this);
+    if (other->asTypeParam()) return other->canCastTo(this);
     if (const auto nullable = other->asNullable()) return canCastTo(nullable->baseType);
     return false;
 }
@@ -60,8 +67,6 @@ LgsType* LgsInt::applyBinOp(LgsType* rightType, LgsBinOp& op) {
     case GT:
     case GE:
     case LE: return &LGS_BOOL;
-    case NOOP:
-        assert(0);
     default:
         break;
     }
@@ -72,13 +77,13 @@ LgsExpr* LgsInt::getZeroValue() {
     return new LgsIntConst(&LGS_INT, 0);
 }
 
-void LgsInt::asIRText(LgsCodeGen& cg, LgsStrBuilder& strBuilder, Value* ptr) {
-    const auto buffer = cg.emptyBuffer(128);
-    const auto bytesRead = cg.callSnprintf(fmtStr(), buffer, cg.usize(128), ptr);
-    strBuilder.add(buffer, cg.toSize(bytesRead));
+void LgsInt::asIRText(LgsStrBuilder& sb, Value* value) {
+    const auto buffer = sb.cg.emptyBuffer(128);
+    const auto bytesRead = sb.cg.callSnprintf(fmtStr(), buffer, sb.cg.usize(128), value);
+    sb.add(buffer, sb.cg.toSize(bytesRead));
 }
 
-Value* LgsInt::getIRZeroValue(LgsCodeGen& cg, Value* pointee) {
+Value* LgsInt::getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level) {
     return cg.zero32();
 }
 
@@ -166,4 +171,8 @@ Value* LgsInt::lshiftIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr) {
 
 DIType* LgsInt::getDebugType(LgsCodeGen& cg) {
     return cg.debugger.diBuilder->createBasicType(name, 32, dwarf::DW_ATE_signed);
+}
+
+LgsInt* LgsInt::clone() {
+    return this;
 }

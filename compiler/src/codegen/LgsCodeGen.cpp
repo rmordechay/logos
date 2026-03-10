@@ -1,9 +1,3 @@
-#include "LgsDefinitions.h"
-#include "files/LgsFile.h"
-#include "LgsConfigs.h"
-#include "LgsUtils.h"
-#include "errors/LgsErrors.h"
-#include "logos/LgsPaths.h"
 #include <llvm/Support/FileSystem.h>
 #include <llvm/Bitcode/BitcodeWriter.h>
 #include <llvm/IR/Module.h>
@@ -11,25 +5,68 @@
 #include <llvm/TargetParser/Host.h>
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/MC/TargetRegistry.h>
-#include <llvm/Target/TargetMachine.h>
 #include <llvm/Target/TargetOptions.h>
-#include <string>
 #include <llvm/Analysis/CGSCCPassManager.h>
 #include <llvm/Analysis/LoopAnalysisManager.h>
 #include <llvm/IR/Verifier.h>
 #include <llvm/Passes/PassBuilder.h>
+#include <assert.h>
+#include <llvm/ADT/ArrayRef.h>
+#include <llvm/ADT/StringRef.h>
+#include <llvm/ADT/Twine.h>
+#include <llvm/ADT/iterator_range.h>
+#include <llvm/BinaryFormat/Dwarf.h>
+#include <llvm/IR/BasicBlock.h>
+#include <llvm/IR/Constant.h>
+#include <llvm/IR/Constants.h>
+#include <llvm/IR/DataLayout.h>
+#include <llvm/IR/DebugInfoMetadata.h>
+#include <llvm/IR/DebugLoc.h>
+#include <llvm/IR/DerivedTypes.h>
+#include <llvm/IR/Function.h>
+#include <llvm/IR/GlobalValue.h>
+#include <llvm/IR/GlobalVariable.h>
+#include <llvm/IR/IRBuilder.h>
+#include <llvm/IR/Instructions.h>
+#include <llvm/IR/Intrinsics.h>
+#include <llvm/IR/Metadata.h>
+#include <llvm/IR/PassManager.h>
+#include <llvm/IR/Type.h>
+#include <llvm/IR/Value.h>
+#include <llvm/Passes/OptimizationLevel.h>
+#include <llvm/Support/Alignment.h>
+#include <llvm/Support/Casting.h>
+#include <llvm/Support/TypeSize.h>
+#include <llvm/Support/raw_ostream.h>
+#include <math.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <string>
+#include <filesystem>
+#include <functional>
+#include <optional>
+#include <system_error>
+#include <vector>
+
+#include "LgsDefinitions.h"
+#include "LgsConfigs.h"
+#include "errors/LgsErrors.h"
+#include "logos/LgsPaths.h"
+#include "LgsTokens.h"
+#include "codegen/LgsCodeGen.h"
+
+using namespace llvm;
 
 inline TargetMachine* targetMachine;
 
 void LgsCodeGen::setupModule(const fs::path& file, const bool debugMode) {
     IRModule = new Module(file.stem().string(), context);
-    if (debugMode && mode == CG_MODE_RTTYPES) {
-        debugger.diBuilder = new DIBuilder(*IRModule);
-        debugger.diFile = debugger.diBuilder->createFile(fs::canonical(file).string(), "");
-        debugger.compileUnit = debugger.diBuilder->createCompileUnit(dwarf::DW_LANG_C, debugger.diFile, "Logos", false, "", 0);
-        IRModule->addModuleFlag(Module::Warning, "Dwarf Version", 5);
-        IRModule->addModuleFlag(Module::Warning, "Debug Info Version", DEBUG_METADATA_VERSION);
-    }
+    if (!debugMode) return;
+    debugger.diBuilder = new DIBuilder(*IRModule);
+    debugger.diFile = debugger.diBuilder->createFile(fs::canonical(file).string(), "");
+    debugger.compileUnit = debugger.diBuilder->createCompileUnit(dwarf::DW_LANG_C, debugger.diFile, "Logos", false, "", 0);
+    IRModule->addModuleFlag(Module::Warning, "Dwarf Version", 5);
+    IRModule->addModuleFlag(Module::Warning, "Debug Info Version", DEBUG_METADATA_VERSION);
 }
 
 bool LgsCodeGen::writeIRModule(const LgsPaths& paths, uint8_t optLevel) const {
@@ -47,7 +84,7 @@ bool LgsCodeGen::writeIRModule(const LgsPaths& paths, uint8_t optLevel) const {
         IRModule->print(textFile, nullptr);
     }
 
-    // Run pass
+    // Run passes
     PassBuilder passBuilder(targetMachine);
     LoopAnalysisManager loopAnalyser;
     FunctionAnalysisManager funcAnalyser;
@@ -58,7 +95,6 @@ bool LgsCodeGen::writeIRModule(const LgsPaths& paths, uint8_t optLevel) const {
     passBuilder.registerLoopAnalyses(loopAnalyser);
     passBuilder.registerCGSCCAnalyses(CGAnalyser);
     passBuilder.crossRegisterProxies(loopAnalyser, funcAnalyser, CGAnalyser, analysisManager);
-
     auto passManager = passBuilder.buildPerModuleDefaultPipeline(getOptLevel(optLevel));
     passManager.run(*IRModule, analysisManager);
 
@@ -81,7 +117,7 @@ Constant* LgsCodeGen::getString(const std::string& value, const bool addNull) {
         if (!dataArray || !dataArray->isCString() || dataArray->getAsCString() != value) continue;
         return &globals;
     }
-    const auto strConstant = ConstantDataArray::getString(context, value, true);
+    const auto strConstant = ConstantDataArray::getString(context, value, addNull);
     return new GlobalVariable(*IRModule, strConstant->getType(), true, GlobalValue::PrivateLinkage, strConstant);
 }
 
@@ -111,8 +147,7 @@ void LgsCodeGen::loop(Value* loopLength, const std::function<void(Value*, BasicB
     body(iValue, exitBlock);
     if (lastInstTerminator()) return;
     iValue = load(sizeTy(), iPtr);
-    const auto inc = builder.CreateAdd(iValue, usize(1));
-    store(inc, iPtr);
+    store(builder.CreateAdd(iValue, usize(1)), iPtr);
     builder.CreateBr(condBlock);
     startBlock(exitBlock);
 }
@@ -126,16 +161,16 @@ void LgsCodeGen::ifStmt(Value* cond, const std::function<void()>& body) {
     branchAndStartBlock(IRExitBlock);
 }
 
-void LgsCodeGen::ifElseStmt(Value* cond, const std::function<void()>& ifBody, const std::function<void()>& elseBody) {
+void LgsCodeGen::ifElseStmt(Value* cond, const std::function<void(BasicBlock*)>& ifBody, const std::function<void(BasicBlock*)>& elseBody) {
     const auto trueBlock = createBlock(BLOCK_TRUE);
     const auto falseBlock = createBlock(BLOCK_FALSE);
     const auto exitBlock = createBlock(BLOCK_EXIT);
     builder.CreateCondBr(cond, trueBlock, falseBlock);
     startBlock(trueBlock);
-    ifBody();
+    ifBody(trueBlock);
     branch(exitBlock);
     startBlock(falseBlock);
-    elseBody();
+    elseBody(falseBlock);
     branchAndStartBlock(exitBlock);
 }
 
@@ -151,29 +186,40 @@ Value* LgsCodeGen::load(Type* ty, Value* ptr) {
 }
 
 Value* LgsCodeGen::loadPtr(Value* value) {
+    if (!value->getType()->isPointerTy()) return value;
     return builder.CreateLoad(ptrTy(), value);
+}
+
+Value* LgsCodeGen::loadSize(Value* value) {
+    if (!value->getType()->isPointerTy()) return value;
+    return builder.CreateLoad(sizeTy(), value);
 }
 
 Value* LgsCodeGen::isNull(Value* value) {
     return builder.CreateIsNull(value);
 }
 
-Value* LgsCodeGen::getLevel(Value* v) {
-    return load(sizeTy(), v);
-}
-
 Value* LgsCodeGen::emptyBuffer(const size_t size) {
     return builder.CreateAlloca(ArrayType::get(i8Ty(), size > 0 ? size : LGS_STR_BUFFER_SIZE));
 }
 
-void LgsCodeGen::incSize(Value* bufferOffset, Value* ptr) {
-    store(builder.CreateAdd(bufferOffset, usize(1)), ptr);
+void LgsCodeGen::addNullTerminate(Value* strPtr, Value* index) {
+    store(zero8(), builder.CreateInBoundsGEP(i8Ty(), strPtr, {index}));
 }
 
 Value* LgsCodeGen::allocaAndStore(Type* type, Value* v, const std::string& name) {
     const auto ptr = builder.CreateAlloca(type, nullptr, name);
     builder.CreateStore(v, ptr);
     return ptr;
+}
+
+Value* LgsCodeGen::loadField(Type* parentType, Value* parentPtr, const size_t position, Type* ty) {
+    assert(ty && parentPtr);
+    return builder.CreateLoad(ty, builder.CreateStructGEP(parentType, parentPtr, position));
+}
+
+void LgsCodeGen::storeField(Type* parentType, Value* parentPtr, const size_t position, Value* v) {
+    store(v, builder.CreateStructGEP(parentType, parentPtr, position));
 }
 
 StructType* LgsCodeGen::getStructType(const std::vector<Type*>& types, const std::string& name) {
@@ -184,29 +230,14 @@ StructType* LgsCodeGen::getStructType(const std::vector<Type*>& types, const std
     return structType;
 }
 
-void LgsCodeGen::storeStructField(Type* parentType, Value* parentPtr, const size_t position, Value* v) {
-    store(v, builder.CreateStructGEP(parentType, parentPtr, position));
-}
-
-Value* LgsCodeGen::loadStructField(Type* parentType, Value* parentPtr, const size_t position, Type* ty) {
-    assert(ty && parentPtr);
-    return builder.CreateLoad(ty, builder.CreateStructGEP(parentType, parentPtr, position));
-}
-
-void LgsCodeGen::addNullTerminate(Value* strPtr, Value* pos) {
-    store(zero8(), builder.CreateInBoundsGEP(i8Ty(), strPtr, {pos}));
-}
-
-void LgsCodeGen::callStackPush() {
-    callRuntimeFunc("push", sizeTy());
-}
-
-void LgsCodeGen::callPopStack() {
-    callRuntimeFunc("pop", voidTy());
-}
-
 Value* LgsCodeGen::getCurrentLevel() {
-    return callRuntimeFunc("getCurrentLevel", sizeTy());
+    const auto runtimeFunc = callRuntimeFunc("getCurrentLevel", sizeTy());
+    runtimeFunc->setName("currentLevel");
+    return runtimeFunc;
+}
+
+Value* LgsCodeGen::levelAbove() {
+    return builder.CreateSub(currentLevel, usize(1));
 }
 
 Value* LgsCodeGen::callHash(Value* type, Value* arg) {
@@ -221,18 +252,13 @@ Value* LgsCodeGen::getVFunc(Value* objType, Value* funcName) {
     return callRuntimeFunc("getVFunc", ptrTy(), {ptrTy(), ptrTy()}, {objType, funcName});
 }
 
-Value* LgsCodeGen::allocInCurrent(Value* size, const bool setLevel) {
-    assert(size);
-    return callRuntimeFunc("allocInCurrent", ptrTy(), {sizeTy(), i1Ty()}, {size, i1(setLevel)});
-}
-
-Value* LgsCodeGen::allocInLevel(Value* size, Value* level, const bool setLevel) {
+Value* LgsCodeGen::heapAllocSize(Value* size, Value* level, const bool setLevel) {
     assert(size && level);
-    return callRuntimeFunc("allocInLevel", ptrTy(), {sizeTy(), sizeTy(), i1Ty()}, {size, level, i1(setLevel)});
+    return callRuntimeFunc("alloc", ptrTy(), {sizeTy(), sizeTy(), i1Ty()}, {toSize(size), toSize(level), i1(setLevel)});
 }
 
-Value* LgsCodeGen::allocStrConst(Value* strPtr) {
-    return callRuntimeFunc("allocStrConst", ptrTy(), {ptrTy()}, {strPtr});
+Value* LgsCodeGen::heapAllocType(const std::string& baseName, Value* type, Value* level) {
+    return callRuntimeFunc("alloc" + baseName, ptrTy(), {ptrTy(), sizeTy()}, {type, level ? level : currentLevel});
 }
 
 Value* LgsCodeGen::reallocate(Value* ptr, Value* size, Value* level) {
@@ -254,6 +280,40 @@ void LgsCodeGen::throwError(const LgsBaseMsg& err, const std::vector<Value*>& ar
 
 BasicBlock* LgsCodeGen::createBlock(const std::string& name, Function* parent) {
     return BasicBlock::Create(context, name, parent);
+}
+
+void LgsCodeGen::startFunc(Function* func, const bool isMain) {
+    saveFuncState();
+    const auto entryBlock = createBlock(BLOCK_ENTRY, func);
+    builder.SetInsertPoint(entryBlock);
+    if (isMain) {
+        callRuntimeFunc("init", voidTy());
+        startTime = measureTimeStart();
+    }
+    callRuntimeFunc("push", sizeTy());
+    currentFunc = func;
+    currentLevel = getCurrentLevel();
+}
+
+void LgsCodeGen::saveFuncState() {
+    lastFunc = currentFunc;
+    lastLevel = currentLevel;
+}
+
+void LgsCodeGen::restoreFuncState(const IRBuilderBase::InsertPoint& savedIP) {
+    builder.restoreIP(savedIP);
+    currentFunc = lastFunc;
+    currentLevel = lastLevel;
+}
+
+void LgsCodeGen::createRet(Value* rv, const bool isMain) {
+    callRuntimeFunc("pop", voidTy());
+    if (isMain) {
+        callRuntimeFunc("close", voidTy());
+        // callPrintf("Time taken: %zuns\n", {measureTimeEnd(startTime)});
+    }
+    if (rv) builder.CreateRet(rv);
+    else builder.CreateRetVoid();
 }
 
 void LgsCodeGen::branch(BasicBlock* block) {
@@ -351,8 +411,8 @@ Value* LgsCodeGen::callSnprintf(const std::string& fmt, const std::vector<Value*
 }
 
 Value* LgsCodeGen::callSnprintf(const std::string& fmt, Value* buffer, Value* size, Value* ptr) {
-    const std::vector<Value*> tempArgs = {buffer, size, getString(fmt), ptr};
-    return callFunc("snprintf", i32Ty(), {ptrTy(), sizeTy(), ptrTy()}, tempArgs, true);
+    const std::vector<Value*> args = {buffer, size, getString(fmt), ptr};
+    return callFunc("snprintf", i32Ty(), {ptrTy(), sizeTy(), ptrTy()}, args, true);
 }
 
 Value* LgsCodeGen::callStrlen(Value* str) {
@@ -377,19 +437,8 @@ void LgsCodeGen::callMemcpy(Value* dest, Value* src, Value* size) {
     builder.CreateMemCpy(dest, MaybeAlign(), src, MaybeAlign(), size);
 }
 
-GlobalVariable* LgsCodeGen::getRTTypeInfo(const std::string& varName, const std::string& typeName, ConstantInt* size, const int32_t kind, const bool isHeapAlloc, Constant* extra) {
-    assert(kind != RTT_UNKNOWN);
-    const auto baseStruct = getRTTStruct();
-    if (mode == CG_MODE_RTTYPES) {
-        const std::vector<Constant*> args = {getString(typeName), size, i32(kind), i1(isHeapAlloc), extra ? extra : null()};
-        const auto initializer = ConstantStruct::get(baseStruct, args);
-        return createGlobal(varName, baseStruct, initializer);
-    }
-    return createGlobal(varName, baseStruct, nullptr);
-}
-
 StructType* LgsCodeGen::getRTTStruct() {
-    return getStructType({ptrTy(), sizeTy(), i32Ty(), i1Ty(), ptrTy()}, "RTI");
+    return getStructType({ptrTy(), sizeTy(), i32Ty(), i1Ty(), i1Ty(), ptrTy()}, "RTI");
 }
 
 void LgsCodeGen::printStr(const std::string& value, const std::string& prefix) {
@@ -431,8 +480,8 @@ Value* LgsCodeGen::measureTimeStart() {
     return callRuntimeFunc("timeStart", i64Ty());
 }
 
-Value* LgsCodeGen::measureTimeEnd(Value* startTime) {
-    return callRuntimeFunc("timeEnd", i64Ty(), {i64Ty()}, {startTime});
+Value* LgsCodeGen::measureTimeEnd(Value* start) {
+    return callRuntimeFunc("timeEnd", i64Ty(), {i64Ty()}, {start});
 }
 
 void LgsCodeGen::finalizeDebugger(const fs::path& buildPath) const {
@@ -459,7 +508,7 @@ void LgsCodeGen::initLLVM() {
     InitializeNativeTargetAsmPrinter();
     InitializeNativeTargetAsmParser();
     std::string error;
-    const auto targetTriple = Triple(sys::getDefaultTargetTriple());
+    const auto targetTriple = sys::getDefaultTargetTriple();
     const auto target = TargetRegistry::lookupTarget(targetTriple, error);
     targetMachine = target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), std::nullopt);
 }
@@ -564,6 +613,10 @@ ConstantInt* LgsCodeGen::zero8() {
     return builder.getInt8(0);
 }
 
+ConstantInt* LgsCodeGen::zero16() {
+    return builder.getInt16(0);
+}
+
 ConstantInt* LgsCodeGen::zero32() {
     return builder.getInt32(0);
 }
@@ -577,15 +630,31 @@ ConstantInt* LgsCodeGen::zeroSize() {
 }
 
 Value* LgsCodeGen::toFloat(Value* v) {
-    return builder.CreateSIToFP(v, floatTy());
+    if (v->getType()->isIntegerTy()) {
+        return builder.CreateSIToFP(v, floatTy());
+    }
+    return builder.CreateFPExt(v, floatTy());
 }
 
 Value* LgsCodeGen::toInt(Value* v) {
-    return builder.CreateFPToSI(v, i32Ty());
+    if (v->getType()->isFloatingPointTy()) {
+        return builder.CreateFPToSI(v, i32Ty());
+    }
+    return builder.CreateSExt(v, i32Ty());
+}
+
+Value* LgsCodeGen::toLong(Value* v) {
+    if (v->getType()->isFloatingPointTy()) {
+        return builder.CreateFPToSI(v, i64Ty());
+    }
+    return builder.CreateSExt(v, i64Ty());
 }
 
 Value* LgsCodeGen::toSize(Value* v) {
-    return builder.CreateZExt(v, sizeTy());
+    if (v->getType()->isFloatingPointTy()) {
+        return builder.CreateFPToSI(v, sizeTy());
+    }
+    return builder.CreateSExt(v, sizeTy());
 }
 
 Constant* LgsCodeGen::emptyStr() {
@@ -599,13 +668,17 @@ LgsCodeGen::~LgsCodeGen() {
     }
 }
 
-void LgsStrBuilder::add(Value* value, Value* size) {
-    const auto gep = cg.builder.CreatePtrAdd(buffer, index);
+void LgsStrBuilder::add(Value* value, Value* size) const {
+    const auto currentOffset = cg.loadSize(index);
+    const auto gep = cg.builder.CreatePtrAdd(buffer, currentOffset);
     cg.callMemcpy(gep, value, size);
-    index = cg.builder.CreateAdd(index, size);
+    cg.store(cg.builder.CreateAdd(currentOffset, size), index);
 }
 
-void LgsStrBuilder::print() const {
-    cg.addNullTerminate(buffer, index);
-    cg.printStr(buffer);
+void LgsStrBuilder::add(const std::string& value) const {
+    add(cg.getString(value, false), cg.usize(value.length()));
+}
+
+void LgsStrBuilder::finalize() const {
+    cg.addNullTerminate(buffer, cg.loadSize(index));
 }

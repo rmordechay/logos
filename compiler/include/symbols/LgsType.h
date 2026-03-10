@@ -1,9 +1,12 @@
 #pragma once
 #include "Lgs_Types.h"
-#include <unordered_map>
+#include "LgsTokens.h"
+#include <vector>
+#include <unordered_set>
 
-#include "codegen/LgsCodeGen.h"
-
+class LgsUShort;
+class LgsUByte;
+class LgsULong;
 class LgsSelf;
 class LgsFieldType;
 class LgsEnumField;
@@ -11,7 +14,7 @@ struct LgsBinOp;
 class LgsBinaryExpr;
 class LgsValue;
 class LgsVariadic;
-class LgsGenericType;
+class LgsTypeParam;
 class LgsMatrix;
 class LgsSubType;
 class LgsSet;
@@ -81,32 +84,33 @@ public:
     bool isUnknown();
     bool isSliceable();
     bool addMethod(LgsFunc* method);
-    bool hasRecursiveTypes() const;
     std::string getRTTName();
     Constant* getRTType(LgsCodeGen& cg);
     ConstantInt* IRSize(LgsCodeGen& cg);
-    Type* getTypeOrPtr(LgsCodeGen& cg);
+    Type* getStorageType(LgsCodeGen& cg);
 
     virtual LgsField* getField(const std::string& fieldName);
     virtual LgsFunc* getMethod(const std::string& methodName);
     virtual std::string getName() = 0;
     virtual std::string getBaseName();
     virtual std::string pname(); // pretty name
+    virtual bool hasTypeParams();
     virtual size_t sizeBytes() = 0;
     virtual LgsExpr* getZeroValue() = 0;
     virtual std::string fmtStr() const = 0;
     virtual bool equals(LgsType* other);
     virtual void hashNode(size_t& oldHash);
-    virtual bool hasGenerics();
     virtual bool canCastTo(LgsType* other) = 0;
     virtual LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) = 0;
-    virtual void asIRText(LgsCodeGen& cg, LgsStrBuilder& strBuilder, Value* ptr);
-    virtual void replaceGenerics(std::unordered_map<std::string, LgsType*>& replacements);
+    virtual bool isRecursive(std::unordered_set<std::string>& visited) const;
+    virtual Value* moveValue(LgsCodeGen& cg, Value* value, Value* toLevel);
+    virtual void asIRText(LgsStrBuilder& sb, Value* value);
     virtual Type* getIRType(LgsCodeGen& cg) = 0;
     virtual Constant* getRTTypeExtra(LgsCodeGen& cg);
-    virtual Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee);
+    virtual Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level);
     virtual Value* hashValue(LgsCodeGen& cg, Value* value);
     virtual DIType* getDebugType(LgsCodeGen& cg) = 0;
+    virtual LgsType* clone();
 
     virtual Value* addIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr);
     virtual Value* subIR(LgsCodeGen& cg, LgsBinaryExpr* binExpr);
@@ -129,15 +133,19 @@ public:
     LgsShort* asShort();
     LgsLong* asLong();
     LgsSize* asSize();
+    LgsUByte* asUByte();
+    LgsUShort* asUShort();
     LgsUInt* asUInt();
+    LgsULong* asULong();
     LgsFloat* asFloat();
     LgsDouble* asDouble();
     LgsFuncType* asFuncType();
     LgsObject* asObject();
     LgsInterface* asInterface();
     LgsEnum* asEnum();
+    LgsEnumField* asEnumField();
+    LgsTypeParam* asTypeParam();
     LgsSelf* asSelf();
-    LgsGenericType* asGenericType();
     LgsIterable* asIterable();
     LgsSArray* asSArray();
     LgsDArray* asDArray();
@@ -155,6 +163,27 @@ public:
 };
 
 void freeType(LgsType* type);
+Value* loadAsChar(LgsCodeGen& cg, Value* v);
+Value* loadAsInt(LgsCodeGen& cg, Value* v, Type* intType);
+Value* loadAsFloat(LgsCodeGen& cg, Value* v, Type* floatType);
+std::pair<Value*, Value*> loadNumberPair(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
+std::pair<Value*, Value*> loadVecPair(LgsCodeGen& cg, Value* left, Value* right, LgsType* vec);
+Value* eqIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
+Value* neIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
+Value* ltIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
+Value* gtIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
+Value* geIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
+Value* leIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
+Value* andIR(LgsCodeGen& cg, const std::vector<Value*>& values);
+Value* orIR(LgsCodeGen& cg, const std::vector<Value*>& values);
+Value* crossIR(LgsCodeGen& cg, Value* left, Value* right, LgsVec* vec);
+bool inRange(uint64_t value, LgsType* toType);
+LgsType* inferType(const std::vector<LgsExpr*>& elements);
+Value* loadRTTInfoName(LgsCodeGen& cg, Value* ptr);
+Value* loadRTTInfoSize(LgsCodeGen& cg, Value* ptr);
+Value* loadRTTInfoKind(LgsCodeGen& cg, Value* ptr);
+Value* loadRTTInfoIsHeap(LgsCodeGen& cg, Value* ptr);
+Value* loadRTTInfoExtra(LgsCodeGen& cg, Value* ptr);
 
 template<typename T>
 void freeTypes(std::vector<T*>& types) {
@@ -164,21 +193,12 @@ void freeTypes(std::vector<T*>& types) {
     types.clear();
 }
 
-Value* loadRTTInfoName(LgsCodeGen& cg, Value* ptr);
-Value* loadRTTInfoSize(LgsCodeGen& cg, Value* ptr);
-Value* loadRTTInfoKind(LgsCodeGen& cg, Value* ptr);
-Value* loadRTTInfoIsHeap(LgsCodeGen& cg, Value* ptr);
-Value* loadRTTInfoExtra(LgsCodeGen& cg, Value* ptr);
-Value* eqIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
-Value* neIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
-Value* ltIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
-Value* gtIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
-Value* geIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
-Value* leIR(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
-Value* andIR(LgsCodeGen& cg, Value* left, Value* right);
-Value* orIR(LgsCodeGen& cg, Value* left, Value* right);
-Value* crossIR(LgsCodeGen& cg, Value* left, Value* right, LgsVec* vec);
-LgsType* getBiggestIntType(const std::vector<LgsType*>& types);
-Value* loadAsInt(LgsCodeGen& cg, Value* v, Type* intType);
-Value* loadAsFloat(LgsCodeGen& cg, Value* v, Type* floatType);
-std::pair<Value*, Value*> loadNumberPair(LgsCodeGen& cg, Value* left, Value* right, LgsType* type);
+template<typename T>
+bool inRangeGeneric(uint64_t value) {
+    if constexpr (std::is_unsigned_v<T>) {
+        return value <= std::numeric_limits<T>::max();
+    } else {
+        const auto signed_value = static_cast<int64_t>(value);
+        return signed_value >= std::numeric_limits<T>::lowest() && signed_value <= std::numeric_limits<T>::max();
+    }
+}

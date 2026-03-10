@@ -5,7 +5,8 @@ struct LgsTypeInfoIndices {
     static constexpr size_t size = 1;
     static constexpr size_t kind = 2;
     static constexpr size_t isHeap = 3;
-    static constexpr size_t extra = 4;
+    static constexpr size_t passByRef = 4;
+    static constexpr size_t extra = 5;
 };
 
 struct LgsStrIndices {
@@ -63,5 +64,10 @@ struct LgsInstanceIndices {
 struct LgsNullableExprIndices {
     static constexpr size_t value = 0;
     static constexpr size_t isSet = 1;
+};
+
+struct LgsEnumFieldIndices {
+    static constexpr size_t index = 0;
+    static constexpr size_t value = 1;
 };
 

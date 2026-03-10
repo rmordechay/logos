@@ -1,10 +1,10 @@
 #include "exprs/LgsSelection.h"
-#include "exprs/LgsFuncCall.h"
-#include "stmts/LgsField.h"
-#include "types/LgsInterface.h"
-#include "LgsUtils.h"
+
+#include <__ostream/basic_ostream.h>
+#include <assert.h>
 #include <sstream>
-#include <llvm/IR/InlineAsm.h>
+
+class LgsFuncCall;
 
 LgsFuncCall* LgsSelection::asMethodCall() const {
     return exprs.back()->asFuncCall();
@@ -19,20 +19,17 @@ std::string LgsSelection::asText() {
     return str.str();
 }
 
-bool LgsSelection::equals(LgsExpr* other) {
-    const auto otherSelection = other->asSelection();
-    if (!otherSelection) return false;
-    if (exprs.size() != otherSelection->exprs.size()) return false;
-    for (size_t i = 0; i < exprs.size(); ++i) {
-        const auto expr = exprs[i];
-        const auto otherExpr = otherSelection->exprs[i];
-        if (!expr->equals(otherExpr)) return false;
-    }
-    return true;
-}
-
 void LgsSelection::setDebugValue(LgsCodeGen& cg) {
     assert(0);
+}
+
+LgsExpr* LgsSelection::clone() const {
+    const auto newSelection = new LgsSelection(*this);
+    newSelection->exprs.clear();
+    for (const auto expr : exprs) {
+        newSelection->exprs.push_back(expr->clone());
+    }
+    return newSelection;
 }
 
 LgsSelection::~LgsSelection() {

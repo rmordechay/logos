@@ -1,12 +1,12 @@
 #pragma once
 #include <sstream>
+#include <string>
 
 class LgsSubType;
 class LgsEnum;
 class LgsIntConst;
 class LgsMetaVar;
 class LgsJson;
-class LgsTypeExpr;
 class LgsVectorExpr;
 class LgsIOStmt;
 class LgsSwitch;
@@ -107,7 +107,6 @@ public:
     void parsePrefixExpr(LgsPrefixExpr* prefixExpr);
     void parsePostfixExpr(LgsPostfixExpr* postfixExpr);
     void parseStrConst(const LgsStrConst* strConst);
-    void parseTypeExpr(LgsTypeExpr* typeExpr);
     void parseInstance(LgsInstance* instance);
     void parseIntConst(const LgsIntConst* intConst);
     void parseInterfaceInstance(LgsInstance* instance, LgsInterface* interface);

@@ -1,0 +1,6 @@
+test Test
+
+testSomething() {
+    print("Hello world")
+    mock(roi(2, 3), "roi")
+}

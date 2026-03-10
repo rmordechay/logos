@@ -1,12 +1,17 @@
 #pragma once
+#include <optional>
+#include <string>
+#include <vector>
 #include "LgsType.h"
-#include "codegen/LgsCodeGen.h"
 
 class LgsForeachLoop;
 class LgsCodeGen;
 class LgsVarDec;
 struct LgsIndex;
 struct CodegenMetadata;
+namespace llvm {
+class Value;
+}
 
 #define GET_FUNC "get"
 #define ADD_FUNC "add"
@@ -31,10 +36,11 @@ public:
     LgsType* getNestedBaseType() const;
     void setNestedBaseType(LgsType* newBaseType);
     size_t getDims() const;
-    virtual void inferBaseType(std::vector<LgsExpr*> elements);
+    bool hasTypeParams() override;
+    bool isRecursive(std::unordered_set<std::string>& visited) const override;
     virtual LgsType* getIndexType();
     virtual LgsType* getValueType();
-    virtual std::optional<int64_t> getConstLength();
+    virtual std::optional<size_t> getConstLength();
     virtual bool unpackLoopVars(LgsForeachLoop* loop) const;
     virtual void setLoopIRVars(LgsCodeGen& cg, LgsForeachLoop* loop);
     virtual Value* lenIR(LgsCodeGen& cg, Value* iterable) = 0;

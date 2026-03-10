@@ -1,5 +1,9 @@
 #pragma once
+#include <string>
+
 #include "LgsType.h"
+#include "Lgs_Types.h"
+#include "codegen/LgsCodeGen.h"
 
 class LgsChar final : public LgsType {
 public:
@@ -17,6 +21,9 @@ public:
     LgsType* applyBinOp(LgsType* rightType, LgsBinOp& op) override;
     bool canCastTo(LgsType* other) override;
     DIType* getDebugType(LgsCodeGen& cg) override;
+    void asIRText(LgsStrBuilder& sb, Value* value) override;
+    Value* getIRZeroValue(LgsCodeGen& cg, Value* pointee, Value* level) override;
+    Value* hashValue(LgsCodeGen& cg, Value* value) override;
 };
 
 inline LgsChar LGS_CHAR;

@@ -1,4 +1,6 @@
 #pragma once
+#include <string>
+
 #include "LgsType.h"
 
 class LgsSubType final : public LgsType {

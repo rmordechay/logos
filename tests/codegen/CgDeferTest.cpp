@@ -1,3 +1,7 @@
+#include <sstream>
+#include <string>
+#include <vector>
+
 #include "gtest/gtest.h"
 #include "LgsTestUtils.h"
 
@@ -16,7 +20,7 @@ TEST(CgDeferTest, Test1) {
         print("before")
     }
     )";
-    std::istringstream stream(getLgsOutput(code));
+    std::istringstream stream(runLgsApp(code));
     const auto lines = getLines(stream, 3);
     EXPECT_EQ(lines[0], "before");
     EXPECT_EQ(lines[1], "after");
